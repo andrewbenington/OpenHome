@@ -1,25 +1,25 @@
-import { Button, Card } from "@mui/material";
-import { Line } from "react-chartjs-2";
+import { Button } from "@mui/material";
 import {
   Chart as ChartJS,
+  Filler,
   LineElement,
   PointElement,
-  Title,
   RadialLinearScale,
-  Filler,
-  Tooltip,
   ScriptableScalePointLabelContext,
+  Title,
+  Tooltip,
 } from "chart.js";
-import { Radar } from "react-chartjs-2";
-import { pkm } from "../pkm/pkm";
-import { useState } from "react";
-import { getNatureSummary } from "../consts/Natures";
 import _ from "lodash";
-import { pk3 } from "../pkm/pk3";
+import { useState } from "react";
+import { Radar } from "react-chartjs-2";
+import { getNatureSummary } from "../consts/Natures";
 import { colopkm } from "../pkm/colopkm";
+import { pk3 } from "../pkm/pk3";
+import { pkm } from "../pkm/pkm";
+import { xdpkm } from "../pkm/xdpkm";
 
 const getSheenStars = (mon: pkm) => {
-  if (mon instanceof pk3 || mon instanceof colopkm) {
+  if (mon instanceof pk3 || mon instanceof colopkm || mon instanceof xdpkm) {
     return mon.contest.sheen === 255
       ? 10
       : Math.floor(mon.contest.sheen / 29) + 1;
@@ -95,7 +95,13 @@ const StatsDisplay = (props: { mon: pkm }) => {
               r: {
                 min: 0,
                 max:
-                  display === "IVs" ? 31 : display === "EVs" ? 252 : undefined,
+                  display === "IVs"
+                    ? 31
+                    : display === "DVs"
+                    ? 15
+                    : display === "EVs" && mon.evs && "spd" in mon.evs
+                    ? 252
+                    : undefined,
                 pointLabels: {
                   font: { size: 14, weight: "bold" },
                   color: (ctx: ScriptableScalePointLabelContext) => {
@@ -149,7 +155,9 @@ const StatsDisplay = (props: { mon: pkm }) => {
             labels:
               display === "Contest"
                 ? ["Cool", "Beauty", "Cute", "Smart", "Tough"]
-                : ["HP", "Atk", "Def", "Spe", "SpD", "SpA"],
+                : mon.evs && "spd" in mon.evs
+                ? ["HP", "Atk", "Def", "Spe", "SpD", "SpA"]
+                : ["HP", "Atk", "Def", "Spe", "Spc"],
             datasets: [
               display === "Stats"
                 ? {
@@ -170,7 +178,7 @@ const StatsDisplay = (props: { mon: pkm }) => {
                     pointHoverBackgroundColor: "#fff",
                     pointHoverBorderColor: "rgb(132, 99, 255)",
                   }
-                : display === "IVs"
+                : display === "IVs" && mon.ivs
                 ? {
                     label: "IVs",
                     data: [
@@ -189,16 +197,62 @@ const StatsDisplay = (props: { mon: pkm }) => {
                     pointHoverBackgroundColor: "#fff",
                     pointHoverBorderColor: "rgb(255, 99, 132)",
                   }
-                : display === "EVs"
+                : display === "DVs" && mon.dvs
+                ? {
+                    label: "DVs",
+                    data: [
+                      mon.dvs.hp,
+                      mon.dvs.atk,
+                      mon.dvs.def,
+                      mon.dvs.spe,
+                      mon.dvs.spc,
+                    ],
+                    fill: true,
+                    backgroundColor: "rgba(255, 99, 132, 0.2)",
+                    borderColor: "rgb(255, 99, 132)",
+                    pointBackgroundColor: "rgb(255, 99, 132)",
+                    pointBorderColor: "#fff",
+                    pointHoverBackgroundColor: "#fff",
+                    pointHoverBorderColor: "rgb(255, 99, 132)",
+                  }
+                : display === "EVs" && mon.evs
                 ? {
                     label: "EVs",
+                    data:
+                      "spd" in mon.evs
+                        ? [
+                            mon.evs.hp,
+                            mon.evs.atk,
+                            mon.evs.def,
+                            mon.evs.spe,
+                            mon.evs.spd,
+                            mon.evs.spa,
+                          ]
+                        : [
+                            mon.evs.hp,
+                            mon.evs.atk,
+                            mon.evs.def,
+                            mon.evs.spe,
+                            mon.evs.spc,
+                          ],
+                    fill: true,
+                    backgroundColor: "rgba(132, 99, 255, 0.2)",
+                    borderColor: "rgb(132, 99, 255)",
+                    pointBackgroundColor: "rgb(132, 99, 255)",
+                    pointBorderColor: "#fff",
+                    pointHoverBackgroundColor: "#fff",
+                    pointHoverBorderColor: "rgb(132, 99, 255)",
+                  }
+                : display === "AVs" && mon.avs
+                ? {
+                    label: "AVs",
                     data: [
-                      mon.evs.hp,
-                      mon.evs.atk,
-                      mon.evs.def,
-                      mon.evs.spe,
-                      mon.evs.spd,
-                      mon.evs.spa,
+                      mon.avs.hp,
+                      mon.avs.atk,
+                      mon.avs.def,
+                      mon.avs.spe,
+                      mon.avs.spd,
+                      mon.avs.spa,
                     ],
                     fill: true,
                     backgroundColor: "rgba(132, 99, 255, 0.2)",
@@ -252,6 +306,7 @@ const StatsDisplay = (props: { mon: pkm }) => {
           >
             {_.range(getSheenStars(mon)).map((level: number) => (
               <img
+              alt={`sheen star ${level}`}
                 src={process.env.PUBLIC_URL + "/icons/sheen.gif"}
                 style={{
                   height: 30,
@@ -280,6 +335,18 @@ const StatsDisplay = (props: { mon: pkm }) => {
         >
           Stats
         </Button>
+        {mon.avs ? (
+          <Button
+            style={{ marginLeft: 10 }}
+            variant="outlined"
+            size="small"
+            onClick={() => setDisplay("AVs")}
+          >
+            AVs
+          </Button>
+        ) : (
+          <></>
+        )}
         <Button
           style={{ marginLeft: 10 }}
           variant="outlined"
@@ -288,14 +355,26 @@ const StatsDisplay = (props: { mon: pkm }) => {
         >
           EVs
         </Button>
-        <Button
-          style={{ marginLeft: 10 }}
-          variant="outlined"
-          size="small"
-          onClick={() => setDisplay("IVs")}
-        >
-          IVs
-        </Button>
+
+        {mon.ivs !== undefined ? (
+          <Button
+            style={{ marginLeft: 10 }}
+            variant="outlined"
+            size="small"
+            onClick={() => setDisplay("IVs")}
+          >
+            IVs
+          </Button>
+        ) : (
+          <Button
+            style={{ marginLeft: 10 }}
+            variant="outlined"
+            size="small"
+            onClick={() => setDisplay("DVs")}
+          >
+            DVs
+          </Button>
+        )}
         <Button
           style={{ marginLeft: 10 }}
           variant="outlined"

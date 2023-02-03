@@ -21,6 +21,7 @@ const AttributeTag = (props: {
     >
       {icon ? (
         <img
+          alt={`${icon} icon`}
           src={process.env.PUBLIC_URL + icon}
           style={{
             height: 18,

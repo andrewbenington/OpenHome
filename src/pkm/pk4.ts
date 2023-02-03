@@ -3,17 +3,39 @@ import { Items } from "../consts/Items";
 import { Languages } from "../consts/Languages";
 import { Gen4RibbonsPart1, Gen4RibbonsPart2 } from "../consts/Ribbons";
 import { getMetLocation } from "../MetLocation/MetLocation";
-import { bytesToUint16LittleEndian, bytesToUint32LittleEndian } from "../util/utils";
+import { decryptByteArrayGen45, unshuffleBlocksGen45 } from "../util/Encryption";
+import { getGen3To5Gender } from "../util/GenderCalc";
+import {
+  getHPGen3Onward,
+  getLevelGen3Onward,
+  getStatGen3Onward,
+} from "../util/StatCalc";
+import { gen4StringToUTF } from "../util/Strings/StringConverter";
+import {
+  bytesToUint16LittleEndian,
+  bytesToUint32LittleEndian,
+} from "../util/utils";
 import { pkm } from "./pkm";
 
 export class pk4 extends pkm {
-  constructor(bytes: Uint8Array) {
-    super(bytes);
+  constructor(bytes: Uint8Array, encrypted: boolean = false) {
+    if (encrypted) {
+      let unencryptedBytes = decryptByteArrayGen45(bytes);
+      let unshuffledBytes = unshuffleBlocksGen45(unencryptedBytes);
+      super(unshuffledBytes);
+    } else {
+      super(bytes);
+    }
     this.format = "pk4";
     this.personalityValue = bytesToUint32LittleEndian(bytes, 0x00);
     this.dexNum = bytesToUint16LittleEndian(bytes, 0x08);
+    this.gender = getGen3To5Gender(this.personalityValue, this.dexNum);
+    this.exp = bytesToUint32LittleEndian(bytes, 0x10);
+    this.level = getLevelGen3Onward(this.dexNum, this.exp);
     this.markings = bytes[0x16];
     this.language = Languages[bytes[0x17]];
+    this.isFatefulEncounter = !!(bytes[0x40] & 1);
+    this.gender = (bytes[0x40] >> 1) & 3;
     this.formNum = bytes[0x40] >> 3;
     this.heldItem = Items[bytesToUint16LittleEndian(bytes, 0x0a)];
     this.ability = Abilities[bytesToUint16LittleEndian(bytes, 0x15)];
@@ -56,39 +78,17 @@ export class pk4 extends pkm {
       tough: bytes[0x22],
       sheen: bytes[0x23],
     };
+    this.stats = {
+      hp: getHPGen3Onward(this),
+      atk: getStatGen3Onward("Atk", this),
+      def: getStatGen3Onward("Def", this),
+      spe: getStatGen3Onward("Spe", this),
+      spa: getStatGen3Onward("SpA", this),
+      spd: getStatGen3Onward("SpD", this),
+    };
     this.gameOfOrigin = bytes[0x5f];
-    let charArray = new Uint16Array(12);
-    for (let i = 0; i < 11; i += 1) {
-      let value = bytesToUint16LittleEndian(bytes, 0x48 + 2 * i);
-      if (value === 0xffff) {
-        break;
-      }
-      if (value <= 324 && value >= 299) {
-        charArray[i] = value - 234;
-      } else if (value <= 350 && value >= 325) {
-        charArray[i] = value - 228;
-      } else {
-        charArray[i] = value;
-      }
-    }
-
-    this.nickname = new TextDecoder("utf-16").decode(charArray);
-    charArray = new Uint16Array(12);
-    for (let i = 0; i < 12; i += 1) {
-      let uint16 = bytesToUint16LittleEndian(bytes, 0x68 + 2 * i);
-      if (uint16 === 0xffff) {
-        break;
-      }
-      if (uint16 <= 324 && uint16 >= 299) {
-        charArray[i] = uint16 - 234;
-      } else if (uint16 <= 350 && uint16 >= 325) {
-        charArray[i] = uint16 - 228;
-      } else {
-        charArray[i] = uint16;
-      }
-    }
-
-    this.trainerName = new TextDecoder("utf-16").decode(charArray);
+    this.nickname = gen4StringToUTF(bytes, 0x48, 11)
+    this.trainerName = gen4StringToUTF(bytes, 0x68, 12)
     this.ribbons = [];
     for (let byte = 0; byte < 4; byte++) {
       let ribbonsUint8 = bytes[0x24 + byte];
@@ -122,8 +122,12 @@ export class pk4 extends pkm {
         ? bytesToUint16LittleEndian(bytes, 0x44)
         : bytesToUint16LittleEndian(bytes, 0x7e);
     this.eggLocation =
-      getMetLocation(this.gameOfOrigin, eggLocationValue, true) ??
-      bytesToUint16LittleEndian(bytes, 0x7e).toString();
+      getMetLocation(
+        this.gameOfOrigin,
+        eggLocationValue,
+        this.gameOfOrigin < 16 && ![10, 11, 12].includes(this.gameOfOrigin),
+        true
+      ) ?? bytesToUint16LittleEndian(bytes, 0x7e).toString();
     this.metYear = bytes[0x7b];
     this.metMonth = bytes[0x7c];
     this.metDay = bytes[0x7d];

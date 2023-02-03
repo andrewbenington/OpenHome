@@ -1,131 +1,130 @@
-import {
-  Button,
-  MenuItem, Select,
-  TablePagination
-} from "@mui/material";
+import { Button, Dialog, Grid, MenuItem, Select } from "@mui/material";
+import _ from "lodash";
 import { useEffect, useState } from "react";
-import { FileContent, useFilePicker } from "use-file-picker";
-import PokemonDisplay from "./components.ts/PokemonDisplay";
-import { colopkm } from "./pkm/colopkm";
-import { pa8 } from "./pkm/pa8";
-import { pb7 } from "./pkm/pb7";
-import { pk3 } from "./pkm/pk3";
-import { pk4 } from "./pkm/pk4";
-import { pk5 } from "./pkm/pk5";
-import { pk6 } from "./pkm/pk6";
-import { pk7 } from "./pkm/pk7";
-import { pk8 } from "./pkm/pk8";
-import { pk9 } from "./pkm/pk9";
-import { pokemon } from "./types/types";
-const _ = require("lodash");
+import PokemonButton from "./components.ts/buttons/PokemonButton";
+import PokemonDislay from "./components.ts/PokemonDisplay";
+import SaveDisplay from "./components.ts/SaveDisplay";
+import { pkm } from "./pkm/pkm";
+import { HomeData } from "./sav/HomeData";
+import Themes, { OpenHomeTheme } from "./Themes";
+const fs = window.require("fs")
 
-export const Home = () => {
-  const [openFileSelector, { filesContent, loading }] = useFilePicker({
-    accept: [
-      ".pkm",
-      ".colopkm",
-      ".xdpkm",
-      ".pk5",
-      ".pk6",
-      ".pk7",
-      ".pb7",
-      ".pk8",
-      ".pa8",
-      ".pb8",
-      ".pk9",
-    ],
-    readAs: "ArrayBuffer",
-  });
-  const [mons, setMons] = useState<pokemon[]>([]);
-  const [propTab, setPropTab] = useState("summary");
-  const [page, setPage] = useState(0);
-  const [pageSize, setPageSize] = useState(25);
+const Home = () => {
+  const [currentTheme, setCurrentTheme] = useState<OpenHomeTheme>(Themes[0]);
+  const [selectedMon, setSelectedMon] = useState<pkm>();
+  const [, setDraggingMon] = useState<pkm>();
+  const [homeData, setHomeData] = useState(new HomeData(new Uint8Array()));
+
   useEffect(() => {
-    // getMoves();
+    getCurrentDirectory();
   }, []);
-  useEffect(() => {
-    if (filesContent) {
-      let fileMons = filesContent.map((mon) => fileContentToMon(mon));
-      setMons(fileMons);
-      setPage(0)
+
+  const getCurrentDirectory = async () => {
+    try {
+      var text = fs.readFileSync("./men.text");
+      const dir = await fs.opendir("./");
+      for await (const dirent of dir) console.log(dirent.name);
+    } catch (err) {
+      console.error(err);
     }
-  }, [filesContent]);
+  };
+
   return (
-    <>
-      <div style={{ display: "flex" }}>
-        <Button variant="contained" onClick={() => openFileSelector()}>
-          Open PKM
-        </Button>
+    <div
+      style={{
+        backgroundColor: currentTheme.backgroundColor,
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      <div style={{ display: "flex", height: 40 }}>
+        <Button>Import PKM</Button>
         <Select
-          value={propTab}
-          onChange={(event) =>
-            setPropTab((event?.target?.value as string) ?? "summary")
-          }
+          value={currentTheme.name}
+          onChange={(event) => {
+            const themeName = (event?.target?.value as string) ?? "Default";
+            const theme = Themes.find((t) => t.name === themeName) ?? Themes[0];
+            setCurrentTheme(theme);
+          }}
         >
-          <MenuItem value="summary">Summary</MenuItem>
-          <MenuItem value="stats">Stats</MenuItem>
-          <MenuItem value="ribbons">Ribbons</MenuItem>
-          <MenuItem value="raw">Raw</MenuItem>
+          {Themes.map((theme) => (
+            <MenuItem value={theme.name}>{theme.name}</MenuItem>
+          ))}
         </Select>
       </div>
-      {mons?.slice(page * pageSize, (page + 1) * pageSize)?.map((mon) => (
-        <PokemonDisplay mon={mon} propTab={propTab} />
-      ))}
-      <TablePagination
-        component="div"
-        count={mons.length}
-        page={page}
-        onPageChange={(_, p) => setPage(p)}
-        rowsPerPage={pageSize}
-        onRowsPerPageChange={(event) => {
-          setPageSize(parseInt(event.target.value));
-        }}
-      />
-    </>
+      <div style={{ display: "flex", flex: 1 }}>
+        <div style={{ display: "flex", flexDirection: "column", width: "25%" }}>
+          <SaveDisplay
+            setSelectedMon={setSelectedMon}
+            setDraggingMon={setDraggingMon}
+          />
+          <SaveDisplay
+            setSelectedMon={setSelectedMon}
+            setDraggingMon={setDraggingMon}
+          />
+        </div>
+        <div
+          style={{
+            borderRadius: 10,
+            backgroundColor: currentTheme.contentColor,
+            width: "50%",
+            aspectRatio: 1,
+            borderWidth: 2,
+            borderColor: currentTheme.borderColor,
+            borderStyle: "solid",
+          }}
+        >
+          {_.range(10).map((row: number) => (
+            <Grid container key={`pc_row_${row}`}>
+              {_.range(12).map((rowIndex: number) => {
+                let mon = homeData.boxes[0].pokemon[row * 12 + rowIndex];
+                let currentBox = 0;
+                return (
+                  <Grid item xs={1} style={{ padding: "2px 2px 0px 2px" }}>
+                    <PokemonButton
+                      onClick={() => setSelectedMon(mon)}
+                      onDragStart={() => setDraggingMon(mon)}
+                      onDragEnd={() => setDraggingMon(undefined)}
+                      mon={mon}
+                      zIndex={10 - row}
+                      onDropFile={(importedMon) => {
+                        homeData.boxes[currentBox].pokemon[
+                          row * 12 + rowIndex
+                        ] = importedMon;
+                        let newBoxes = homeData.boxes;
+                        newBoxes[currentBox].pokemon[row * 12 + rowIndex] =
+                          importedMon;
+                        setHomeData({ ...homeData, boxes: newBoxes });
+                      }}
+                    />
+                  </Grid>
+                );
+              })}
+            </Grid>
+          ))}
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", width: "25%" }}>
+          <SaveDisplay
+            setSelectedMon={setSelectedMon}
+            setDraggingMon={setDraggingMon}
+          />
+          <SaveDisplay
+            setSelectedMon={setSelectedMon}
+            setDraggingMon={setDraggingMon}
+          />
+        </div>
+      </div>
+      <Dialog
+        open={!!selectedMon}
+        onClose={() => setSelectedMon(undefined)}
+        fullWidth
+        maxWidth="lg"
+      >
+        {selectedMon && <PokemonDislay mon={selectedMon} />}
+      </Dialog>
+    </div>
   );
 };
 
-const fileContentToMon = (fileContent: FileContent): pokemon => {
-  let bytes = new Uint8Array(fileContent.content as unknown as ArrayBuffer);
-  if (
-    fileContent.name?.endsWith(".colopkm") ||
-    fileContent.name?.endsWith(".xdpkm")
-  ) {
-    return new colopkm(bytes);
-  } else if (
-    fileContent.name?.endsWith(".pk3") ||
-    bytes.length === 100 ||
-    bytes.length === 80
-  ) {
-    return new pk3(bytes);
-  } else if (
-    bytes[0x5f] < 20 &&
-    (fileContent.name?.endsWith(".pk4") ||
-      bytes.length === 136 ||
-      bytes.length === 236)
-  ) {
-    return new pk4(bytes);
-  } else if (
-    fileContent.name?.endsWith(".pk5") ||
-    bytes.length === 0xdc ||
-    bytes.length === 0x88 ||
-    bytes.length === 136
-  ) {
-    return new pk5(bytes);
-  } else if (fileContent.name?.endsWith(".pk6")) {
-    return new pk6(bytes);
-  } else if (fileContent.name?.endsWith(".pk7")) {
-    return new pk7(bytes);
-  } else if (fileContent.name?.endsWith(".pb7")) {
-    return new pb7(bytes);
-  } else if (
-    fileContent.name?.endsWith(".pk8") ||
-    fileContent.name?.endsWith(".pb8")
-  ) {
-    return new pk8(bytes);
-  } else if (bytes.length === 0x178) {
-    return new pa8(bytes);
-  } else {
-    return new pk9(bytes);
-  }
-};
+export default Home;

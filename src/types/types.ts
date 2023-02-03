@@ -1,16 +1,5 @@
-import { pa8 } from "../pkm/pa8";
-import { pb7 } from "../pkm/pb7";
-import { pk3 } from "../pkm/pk3";
-import { pk4 } from "../pkm/pk4";
-import { pk5 } from "../pkm/pk5";
-import { pk6 } from "../pkm/pk6";
-import { pk7 } from "../pkm/pk7";
-import { pk8 } from "../pkm/pk8";
-import { pk9 } from "../pkm/pk9";
-import { pkm } from "../pkm/pkm";
-
 export type Dictionary = { [index: string]: any };
-export type Stat = "HP" | "Atk" | "Def" | "SpA" | "SpD" | "Spe" | "Sp"
+export type Stat = "HP" | "Atk" | "Def" | "SpA" | "SpD" | "Spe" | "Sp";
 export type Type =
   | "Fire"
   | "Grass"
@@ -30,13 +19,28 @@ export type Type =
   | "Poison"
   | "Dragon"
   | "Normal";
-export type pokemon = pkm | pk3 | pk4 | pk5 | pk6 | pk7 | pb7 | pk8 | pa8 | pk9;
+export type levelUpType =
+  | "Slow"
+  | "Medium Slow"
+  | "Medium Fast"
+  | "Fast"
+  | "Erratic"
+  | "Fluctuating";
+export enum SaveType {
+  RS,
+  FRLG,
+  E,
+  DPPt,
+  HGSS,
+  G5,
+}
 
 export type RegionalForme = "Alola" | "Galar" | "Hisui" | "Paldea";
 export type Pokemon = {
   name: string;
   nationalDex: number;
   formes: Forme[];
+  levelUpType: levelUpType;
 };
 
 export type Origin = {

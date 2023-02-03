@@ -11,3 +11,14 @@ export const Languages = [
     "CHS",
     "CHT"
 ]
+
+export const GCLanguages = [
+    "--",
+    "JPN",
+    "ENG",
+    "GER",
+    "FRE",
+    "ITL",
+    "SPN",
+    "--"
+]

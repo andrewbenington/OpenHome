@@ -1,12 +1,9 @@
-import { pkm } from "../pkm/pkm";
-
 const AttributeRow = (props: {
-  bottom?: boolean;
   label: string;
   value?: string;
   children?: any;
 }) => {
-  const { bottom, label, value, children } = { bottom: true, ...props };
+  const { label, value, children } = props;
   return (
     <div
       style={{
