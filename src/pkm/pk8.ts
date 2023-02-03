@@ -1,18 +1,24 @@
 import { getMetLocation } from "../MetLocation/MetLocation";
 import { Gen9RibbonsPart1, Gen9RibbonsPart2 } from "../consts/Ribbons";
-import { bytesToUint16LittleEndian, bytesToUint32LittleEndian } from "../util/utils";
+import {
+  bytesToUint16LittleEndian,
+  bytesToUint32LittleEndian,
+} from "../util/utils";
 import { pkm } from "./pkm";
 import { Abilities } from "../consts/Abilities";
 import { Items } from "../consts/Items";
 import { Languages } from "../consts/Languages";
+import { getHPGen3Onward, getLevelGen3Onward, getStatGen3Onward } from "../util/StatCalc";
 
 export class pk8 extends pkm {
-  constructor(bytes: Uint8Array) {
+  constructor(bytes: Uint8Array, format: string) {
     super(bytes);
-    this.format = "pk8";
+    this.format = format;
     this.bytes = bytes;
+    this.encryptionConstant = bytesToUint32LittleEndian(bytes, 0x00);
     this.personalityValue = bytesToUint32LittleEndian(bytes, 0x1c);
     this.dexNum = bytesToUint16LittleEndian(bytes, 0x08);
+    this.exp = bytesToUint32LittleEndian(bytes, 0x10);
     this.formNum = bytesToUint16LittleEndian(bytes, 0x24);
     this.heldItem = Items[bytesToUint16LittleEndian(bytes, 0x0a)];
     this.ability = Abilities[bytesToUint16LittleEndian(bytes, 0x14)];
@@ -20,10 +26,10 @@ export class pk8 extends pkm {
     this.markings = bytes[0x18];
     this.nature = bytes[0x20];
     this.statNature = bytes[0x21];
-    this.isFatefulEncounter = !!(bytes[0x22] & 1)
+    this.isFatefulEncounter = !!(bytes[0x22] & 1);
     this.canGigantamax = !!(bytes[0x16] & 16);
     this.dynamaxLevel = bytes[0x90];
-    this.isFatefulEncounter = !!(bytes[0x22] & 1)
+    this.isFatefulEncounter = !!(bytes[0x22] & 1);
     this.trainerID = bytesToUint16LittleEndian(bytes, 0x0c);
     this.secretID = bytesToUint16LittleEndian(bytes, 0x0e);
     this.ball = bytes[0x124];
@@ -41,23 +47,15 @@ export class pk8 extends pkm {
       bytesToUint16LittleEndian(bytes, 0x86),
       bytesToUint16LittleEndian(bytes, 0x88),
     ];
-    this.level = bytes[0x168]
-    this.stats = {
-      hp: bytesToUint16LittleEndian(bytes, 0x14a),
-      atk: bytesToUint16LittleEndian(bytes, 0x14c),
-      def: bytesToUint16LittleEndian(bytes, 0x14e),
-      spe: bytesToUint16LittleEndian(bytes, 0x150),
-      spa: bytesToUint16LittleEndian(bytes, 0x152),
-      spd: bytesToUint16LittleEndian(bytes, 0x154),
-    };
+    this.level = getLevelGen3Onward(this.dexNum, this.exp);
     let ivBytes = bytesToUint32LittleEndian(bytes, 0x8c);
     this.ivs = {
       hp: ivBytes & 0x1f,
       atk: (ivBytes >> 5) & 0x1f,
       def: (ivBytes >> 10) & 0x1f,
-      spa: (ivBytes >> 15) & 0x1f,
-      spd: (ivBytes >> 20) & 0x1f,
-      spe: (ivBytes >> 25) & 0x1f,
+      spe: (ivBytes >> 15) & 0x1f,
+      spa: (ivBytes >> 20) & 0x1f,
+      spd: (ivBytes >> 25) & 0x1f,
     };
     this.evs = {
       hp: bytes[0x26],
@@ -66,6 +64,14 @@ export class pk8 extends pkm {
       spa: bytes[0x29],
       spd: bytes[0x2a],
       spe: bytes[0x2b],
+    };
+    this.stats = {
+      hp: getHPGen3Onward(this),
+      atk: getStatGen3Onward("Atk", this),
+      def: getStatGen3Onward("Def", this),
+      spe: getStatGen3Onward("Spe", this),
+      spa: getStatGen3Onward("SpA", this),
+      spd: getStatGen3Onward("SpD", this),
     };
     this.contest = {
       cool: bytes[0x2c],
@@ -84,7 +90,7 @@ export class pk8 extends pkm {
     let byteArray = new Uint16Array(12);
     for (let i = 0; i < 12; i += 1) {
       let byte = bytesToUint16LittleEndian(bytes, 0x58 + 2 * i);
-      if (byte == 0) {
+      if (byte === 0) {
         break;
       }
       byteArray[i] = byte;
@@ -93,7 +99,7 @@ export class pk8 extends pkm {
     byteArray = new Uint16Array(12);
     for (let i = 0; i < 12; i += 1) {
       let byte = bytesToUint16LittleEndian(bytes, 0xf8 + 2 * i);
-      if (byte == 0) {
+      if (byte === 0) {
         break;
       }
       byteArray[i] = byte;

@@ -1,4 +1,4 @@
-import { Card, Tooltip } from "@mui/material";
+import { Tooltip } from "@mui/material";
 import { Gen9RibbonsPart2 } from "../consts/Ribbons";
 import { pk3 } from "../pkm/pk3";
 import { pkm } from "../pkm/pkm";
@@ -37,6 +37,7 @@ const RibbonsDisplay = (props: { mon: pkm }) => {
       {mon.ribbons.map((ribbon) => (
         <Tooltip title={`${ribbon} ${ribbon.endsWith("Mark") ? "" : "Ribbon"}`}>
           <img
+            alt={`${ribbon} ${ribbon.endsWith("Mark") ? "" : "Ribbon"}`}
             style={{ width: 50, height: 50 }}
             src={getRibbonURL(mon, ribbon)}
           />

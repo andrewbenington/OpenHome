@@ -4,13 +4,17 @@ import { bytesToUint16LittleEndian, bytesToUint32LittleEndian } from "../util/ut
 import { pkm } from "./pkm";
 import { Abilities } from "../consts/Abilities";
 import { Items } from "../consts/Items";
+import { getLevelGen3Onward } from "../util/StatCalc";
+import { Languages } from "../consts/Languages";
 
 export class pa8 extends pkm {
   constructor(bytes: Uint8Array) {
     super(bytes);
     this.format = "pa8";
+    this.encryptionConstant = bytesToUint32LittleEndian(bytes, 0x00);
     this.personalityValue = bytesToUint32LittleEndian(bytes, 0x1c);
     this.dexNum = bytesToUint16LittleEndian(bytes, 0x08);
+    this.exp = bytesToUint32LittleEndian(bytes, 0x10);
     this.formNum = bytesToUint16LittleEndian(bytes, 0x24);
     this.heldItem = Items[bytesToUint16LittleEndian(bytes, 0x0a)];
     this.ability = Abilities[bytesToUint16LittleEndian(bytes, 0x14)];
@@ -39,7 +43,7 @@ export class pa8 extends pkm {
       bytesToUint16LittleEndian(bytes, 0x8e),
       bytesToUint16LittleEndian(bytes, 0x90),
     ];
-    this.level = bytes[0x168];
+    this.level = getLevelGen3Onward(this.dexNum, this.exp)
     this.stats = {
       hp: bytesToUint16LittleEndian(bytes, 0x16a),
       atk: bytesToUint16LittleEndian(bytes, 0x16c),
@@ -73,11 +77,12 @@ export class pa8 extends pkm {
       tough: bytes[0x30],
       sheen: bytes[0x31],
     };
+    this.language = Languages[bytes[0xf2]]
     this.gameOfOrigin = bytesToUint16LittleEndian(bytes, 0xee);
     let byteArray = new Uint16Array(12);
     for (let i = 0; i < 12; i += 1) {
       let byte = bytesToUint16LittleEndian(bytes, 0x60 + 2 * i);
-      if (byte == 0) {
+      if (byte === 0) {
         break;
       }
       byteArray[i] = byte;
@@ -86,7 +91,7 @@ export class pa8 extends pkm {
     byteArray = new Uint16Array(12);
     for (let i = 0; i < 12; i += 1) {
       let byte = bytesToUint16LittleEndian(bytes, 0x110 + 2 * i);
-      if (byte == 0) {
+      if (byte === 0) {
         break;
       }
       byteArray[i] = byte;

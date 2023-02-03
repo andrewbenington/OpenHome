@@ -1,4 +1,4 @@
-import { Box, Card, Tab, Tabs } from "@mui/material";
+import { Box, Button, Card, Tab, Tabs } from "@mui/material";
 import _ from "lodash";
 import { useEffect, useState } from "react";
 import { MONS_LIST } from "../consts/Mons";
@@ -13,13 +13,13 @@ import StatsDisplay from "./StatsDisplay";
 import SummaryDisplay from "./SummaryDisplay";
 
 const getTypes = (mon: pkm) => {
-  let types = MONS_LIST[mon.dexNum].formes[mon.formNum]?.types;
+  let types = MONS_LIST[mon.dexNum]?.formes[mon.formNum]?.types;
   if (mon.format === "pk1" && (mon.dexNum === 81 || mon.dexNum === 82)) {
-    types = ["Electric"]
+    types = ["Electric"];
   } else if (
     ["pk1", "pk2", "pk3", "colopkm", "xdpkm", "pk4", "pk5"].includes(mon.format)
   ) {
-    if (types.includes("Fairy")) {
+    if (types?.includes("Fairy")) {
       if (types.length === 1 || types.includes("Flying")) {
         types = types.map((type) => (type === "Fairy" ? "Normal" : type));
       } else if (types[0] === "Fairy") {
@@ -29,18 +29,18 @@ const getTypes = (mon: pkm) => {
       }
     }
   }
-  return types;
+  return types ?? [];
 };
 
-const PokemonDislay = (props: { mon: pkm; propTab: string }) => {
+const PokemonDislay = (props: { mon: pkm; propTab?: string }) => {
   const { mon, propTab } = props;
   const [tab, setTab] = useState("summary");
   useEffect(() => {
-    setTab(propTab);
+    setTab(propTab ?? "summary");
   }, [propTab]);
   return (
-    <Card style={{ display: "flex", flexDirection: "row", padding: 20 }}>
-      <PokemonWithItem mon={mon} format={mon.format} />
+    <div style={{ display: "flex", flexDirection: "row", width: "100%" }}>
+      <PokemonWithItem mon={mon} format={mon.format} style={{ width: "20%" }} />
       <div style={{ textAlign: "left", width: "30%" }}>
         <AttributeRow
           label="Name"
@@ -48,16 +48,19 @@ const PokemonDislay = (props: { mon: pkm; propTab: string }) => {
         />
         <AttributeRow label="Dex No." value={`${mon.dexNum}`} />
         <AttributeRow label="Type">
-          {getTypes(mon)?.map((type) => (
+          {getTypes(mon)?.map((type, i) => (
             <img
+              alt={`pokemon type ${i + 1}`}
               style={{ height: 24, width: 24, marginRight: 5 }}
               src={`https://raw.githubusercontent.com/msikma/pokesprite/master/misc/types/gen8/${type.toLocaleLowerCase()}.png`}
             />
           ))}
         </AttributeRow>
-        {mon.teraTypeOriginal && mon.teraTypeOverride && (
+        {mon.teraTypeOriginal !== undefined &&
+        mon.teraTypeOverride !== undefined ? (
           <AttributeRow label="Tera Type">
             <img
+              alt="tera type"
               style={{ height: 24, width: 24, marginRight: 5 }}
               src={`https://raw.githubusercontent.com/msikma/pokesprite/master/misc/types/gen8/${Types[
                 mon.teraTypeOverride <= 18
@@ -69,6 +72,7 @@ const PokemonDislay = (props: { mon: pkm; propTab: string }) => {
               <>
                 <p>(originally </p>
                 <img
+                  alt="tera type original"
                   style={{ height: 24, width: 24, marginRight: 5 }}
                   src={`https://raw.githubusercontent.com/msikma/pokesprite/master/misc/types/gen8/${Types[
                     mon.teraTypeOriginal
@@ -78,6 +82,8 @@ const PokemonDislay = (props: { mon: pkm; propTab: string }) => {
               </>
             )}
           </AttributeRow>
+        ) : (
+          <></>
         )}
         <AttributeRow
           label="OT"
@@ -98,7 +104,7 @@ const PokemonDislay = (props: { mon: pkm; propTab: string }) => {
             mon.abilityNum === 4 ? "HA" : mon.abilityNum
           })`}
         />
-        {mon.dynamaxLevel != undefined && (
+        {mon.dynamaxLevel !== undefined && (
           <AttributeRow label="Dynamax">
             <div style={{ display: "flex", flexDirection: "row" }}>
               {_.range(10).map((level: number) => (
@@ -157,9 +163,9 @@ const PokemonDislay = (props: { mon: pkm; propTab: string }) => {
         </div>
       </div>
 
-      <Card style={{ width: "50%", marginLeft: 10 }}>
+      <Card style={{ width: "50%", marginLeft: 10, borderTopRightRadius: 0 }}>
         <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-          <Tabs value={tab}>
+          <Tabs value={tab} style={{ position: "relative" }}>
             <Tab
               style={{ marginLeft: 10 }}
               label="Summary"
@@ -184,6 +190,21 @@ const PokemonDislay = (props: { mon: pkm; propTab: string }) => {
               value="raw"
               onClick={() => setTab("raw")}
             />
+            <Button
+              style={{
+                position: "absolute",
+                right: 0,
+                top: 0,
+                bottom: 0,
+                backgroundColor: fileTypeColors[mon.format],
+                color: "white",
+                fontWeight: "bold",
+                borderRadius: 0,
+                fontSize: 20,
+              }}
+            >
+              {mon.format}
+            </Button>
           </Tabs>
         </Box>
         {tab === "summary" ? (
@@ -210,11 +231,28 @@ const PokemonDislay = (props: { mon: pkm; propTab: string }) => {
                 </div>
               );
             })}
+            {mon.personalityValue}
           </div>
         )}
       </Card>
-    </Card>
+    </div>
   );
+};
+
+const fileTypeColors: { [key: string]: string } = {
+  pk2: "#bbb",
+  pk3: "#9b3",
+  colopkm: "#93f",
+  xdpkm: "#53b",
+  pk4: "#f88",
+  pk5: "#484",
+  pk6: "blue",
+  pk7: "orange",
+  pb7: "#a75",
+  pk8: "#6bf",
+  pb8: "#6bf",
+  pa8: "#8cc",
+  pk9: "#f52",
 };
 
 export default PokemonDislay;

@@ -1,7 +1,7 @@
 import { Card } from "@mui/material";
 import { Balls } from "../consts/Balls";
+import { getCharacteristic } from "../consts/Characteristics";
 import { GameOfOrigin } from "../consts/GameOfOrigin";
-import { MONS_LIST } from "../consts/Mons";
 import MOVES from "../consts/Moves";
 import { Natures } from "../consts/Natures";
 import { pkm } from "../pkm/pkm";
@@ -28,17 +28,22 @@ const SummaryDisplay = (props: { mon: pkm }) => {
               alignItems: "center",
             }}
           >
-            <img
-              style={{ width: 24, height: 24 }}
-              src={`https://www.serebii.net/itemdex/sprites/${(
-                Balls[mon.ball] ?? ""
-              )
-                .replace("é", "e")
-                .replace(/\s/g, "")
-                .replace("(", "")
-                .replace(")", "")
-                .toLocaleLowerCase()}.png`}
-            />
+            {mon.ball ? (
+              <img
+                alt="poke ball type"
+                style={{ width: 24, height: 24 }}
+                src={`https://www.serebii.net/itemdex/sprites/${Balls[
+                  (mon.ball ?? 3) < Balls.length ? mon.ball : 3
+                ]
+                  .replace("é", "e")
+                  .replace(/\s/g, "")
+                  .replace("(", "")
+                  .replace(")", "")
+                  .toLocaleLowerCase()}.png`}
+              />
+            ) : (
+              <></>
+            )}
             <p style={{ fontWeight: "bold" }}>{mon.nickname}</p>
             <Card style={{ padding: "5px 10px 5px 10px", marginLeft: 10 }}>
               {mon.language}
@@ -63,25 +68,40 @@ const SummaryDisplay = (props: { mon: pkm }) => {
               : ""
           }.`}</p>
 
-          <p style={{ textAlign: "left" }}>
-            Has a
-            <span>
-              {["A", "E", "I", "O", "U"].includes(
-                Natures[mon.statNature ?? mon.nature][0]
-              )
-                ? "n"
-                : ""}
-            </span>{" "}
-            <span style={{ fontWeight: "bold" }}>
-              {Natures[mon.statNature ?? mon.nature]}
-            </span>{" "}
-            nature{" "}
-            <span>
-              {mon.statNature && mon.statNature !== mon.nature
-                ? `(originally ${Natures[mon.nature]})`
-                : ""}
-            </span>
-          </p>
+          {mon.nature ? (
+            <p style={{ textAlign: "left" }}>
+              Has a
+              <span>
+                {["A", "E", "I", "O", "U"].includes(
+                  (Natures[mon.statNature ?? mon.nature] ?? "Undefined")[0]
+                )
+                  ? "n"
+                  : ""}
+              </span>{" "}
+              <span style={{ fontWeight: "bold" }}>
+                {Natures[mon.statNature ?? mon.nature]}
+              </span>{" "}
+              nature{" "}
+              <span>
+                {mon.statNature && mon.statNature !== mon.nature
+                  ? `(originally ${Natures[mon.nature]})`
+                  : ""}
+              </span>
+            </p>
+          ) : (
+            <></>
+          )}
+          {mon.ivs ? (
+            <p>
+              {getCharacteristic(
+                mon.ivs,
+                mon.encryptionConstant ?? mon.personalityValue,
+                mon.encryptionConstant === undefined
+              )}
+            </p>
+          ) : (
+            <></>
+          )}
         </div>
         <div
           style={{
@@ -101,6 +121,7 @@ const SummaryDisplay = (props: { mon: pkm }) => {
             }}
           >
             <img
+            alt={`${GameOfOrigin[mon.gameOfOrigin]?.name} logo`}
               src={
                 getGameLogo(
                   mon.gameOfOrigin,
@@ -118,12 +139,16 @@ const SummaryDisplay = (props: { mon: pkm }) => {
                 opacity: 0.6,
               }}
             />
-            {GameOfOrigin[mon.gameOfOrigin]?.mark && (
+            {(GameOfOrigin[mon.gameOfOrigin]?.mark ||
+              mon.gameOfOrigin === -1) && (
               <img
+                alt="origin mark"
                 src={
                   process.env.PUBLIC_URL +
                   `/origin_marks/${
-                    GameOfOrigin[mon.gameOfOrigin]?.mark ?? ""
+                    mon.gameOfOrigin === -1
+                      ? "GB"
+                      : GameOfOrigin[mon.gameOfOrigin]?.mark ?? ""
                   }.png`
                 }
                 style={{
@@ -142,18 +167,21 @@ const SummaryDisplay = (props: { mon: pkm }) => {
         style={{
           display: "flex",
           flexDirection: "row",
+          justifyContent: "center",
         }}
       >
         {mon.moves
           .filter((move) => !!move)
-          .map((move) => {
+          .map((move, id) => {
             return (
               <Card
+                key={`move${id}`}
                 style={{
                   height: 70,
                   width: 120,
                   margin: 10,
                   backgroundColor: getTypeColor(MOVES[move]?.type),
+                  textAlign: "center",
                 }}
               >
                 <p

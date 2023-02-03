@@ -3,15 +3,36 @@ import { Items } from "../consts/Items";
 import { Languages } from "../consts/Languages";
 import { Gen9RibbonsPart1 } from "../consts/Ribbons";
 import { getMetLocation } from "../MetLocation/MetLocation";
-import { bytesToUint16LittleEndian, bytesToUint32LittleEndian } from "../util/utils";
+import {
+  decryptByteArrayGen45,
+  unshuffleBlocks,
+  unshuffleBlocksGen45,
+} from "../util/Encryption";
+import {
+  getHPGen3Onward,
+  getLevelGen3Onward,
+  getStatGen3Onward,
+} from "../util/StatCalc";
+import {
+  bytesToUint16LittleEndian,
+  bytesToUint32LittleEndian,
+  uint32ToBytesLittleEndian,
+} from "../util/utils";
 import { pkm } from "./pkm";
 
 export class pk5 extends pkm {
-  constructor(bytes: Uint8Array) {
-    super(bytes);
+  constructor(bytes: Uint8Array, encrypted: boolean = false) {
+    if (encrypted) {
+      let unencryptedBytes = decryptByteArrayGen45(bytes);
+      let unshuffledBytes = unshuffleBlocksGen45(unencryptedBytes);
+      super(unshuffledBytes);
+    } else {
+      super(bytes);
+    }
     this.format = "pk5";
     this.personalityValue = bytesToUint32LittleEndian(bytes, 0x00);
     this.dexNum = bytesToUint16LittleEndian(bytes, 0x08);
+    this.exp = bytesToUint32LittleEndian(bytes, 0x10);
     this.formNum = bytes[0x40] >> 3;
     this.heldItem = Items[bytesToUint16LittleEndian(bytes, 0x0a)];
     this.ability = Abilities[bytesToUint16LittleEndian(bytes, 0x15)];
@@ -30,16 +51,7 @@ export class pk5 extends pkm {
       bytesToUint16LittleEndian(bytes, 0x2c),
       bytesToUint16LittleEndian(bytes, 0x2e),
     ];
-    console.log(bytes[0x8c])
-    this.level = bytes[0x8c];
-    this.stats = {
-      hp: bytesToUint16LittleEndian(bytes, 0x90),
-      atk: bytesToUint16LittleEndian(bytes, 0x92),
-      def: bytesToUint16LittleEndian(bytes, 0x94),
-      spe: bytesToUint16LittleEndian(bytes, 0x96),
-      spa: bytesToUint16LittleEndian(bytes, 0x98),
-      spd: bytesToUint16LittleEndian(bytes, 0x9a),
-    };
+    this.level = getLevelGen3Onward(this.dexNum, this.exp);
     let ivBytes = bytesToUint32LittleEndian(bytes, 0x38);
     this.ivs = {
       hp: ivBytes & 0x1f,
@@ -65,13 +77,22 @@ export class pk5 extends pkm {
       tough: bytes[0x22],
       sheen: bytes[0x23],
     };
+
+    this.stats = {
+      hp: getHPGen3Onward(this),
+      atk: getStatGen3Onward("Atk", this),
+      def: getStatGen3Onward("Def", this),
+      spe: getStatGen3Onward("Spe", this),
+      spa: getStatGen3Onward("SpA", this),
+      spd: getStatGen3Onward("SpD", this),
+    };
     this.isFatefulEncounter = !!(bytes[0x40] & 1);
-    this.gender = bytes[0x40] >> 1 & 0x3;
+    this.gender = (bytes[0x40] >> 1) & 0x3;
     this.gameOfOrigin = bytesToUint16LittleEndian(bytes, 0x5f);
     let charArray = new Uint16Array(12);
     for (let i = 0; i < 11; i += 1) {
       let value = bytesToUint16LittleEndian(bytes, 0x48 + 2 * i);
-      if (value == 0xffff) {
+      if (value === 0xffff) {
         break;
       }
       charArray[i] = value;

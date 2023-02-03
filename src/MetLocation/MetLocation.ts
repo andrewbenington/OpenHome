@@ -1,6 +1,7 @@
 import { GameOfOrigin } from "../consts/GameOfOrigin";
 import BDSPLocations from "./BDSP";
 import BW2MetLocation from "./BW2";
+import CrystalLocation from "./Crystal";
 import CXDLocation from "./CXD";
 import G4Locations from "./G4";
 import G6Location from "./G6";
@@ -11,10 +12,17 @@ import SMUSUMLocations from "./SMUSUM";
 import SVMetLocation from "./SV";
 import SwShLocations from "./SwSh";
 
-export const getMetLocation = (game: number, index: number, egg: boolean = false) => {
+export const getMetLocation = (
+  game: number,
+  index: number,
+  forceRegion: boolean = false,
+  egg: boolean = false
+) => {
   let multiplier = 10000;
   let locations: { [key: number]: string[] } = {};
-  if (game < 20 && index > 30000) {
+  if (game === -1) {
+    locations = CrystalLocation;
+  } else if (forceRegion || (game < 20 && index > 30000)) {
     return `in the ${GameOfOrigin[game]?.region} region`;
   } else if (game <= 5) {
     locations = RSEFRLGLocations;

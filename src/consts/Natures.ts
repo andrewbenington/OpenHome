@@ -304,6 +304,9 @@ const NatureData = [
   },
 ];
 
-export const getNatureSummary = (nature: number) => {
+export const getNatureSummary = (nature?: number) => {
+  if (!nature) {
+    return ""
+  }
   return NatureData.find((n) => n.name === Natures[nature])?.summary;
 };

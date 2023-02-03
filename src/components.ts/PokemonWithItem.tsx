@@ -1,10 +1,10 @@
-import { pokemon } from "../types/types";
+import { pkm } from "../pkm/pkm";
 import { getItemSprite, getMonSprite } from "../util/utils";
 
-const PokemonWithItem = (props: { mon: pokemon; format?: string }) => {
-  const { mon, format } = props;
+const PokemonWithItem = (props: { mon: pkm; format?: string; style: any }) => {
+  const { mon, format, style } = props;
   return (
-    <div style={{ padding: 10 }}>
+    <div style={{ padding: 10, ...style }}>
       <div
         style={{
           width: 200,
@@ -15,6 +15,7 @@ const PokemonWithItem = (props: { mon: pokemon; format?: string }) => {
         }}
       >
         <img
+          alt="pokemon sprite"
           style={{
             maxWidth: 100,
             maxHeight: 100,
@@ -36,6 +37,17 @@ const PokemonWithItem = (props: { mon: pokemon; format?: string }) => {
         <p>{`Level ${mon.level}`}</p>
         <p>{mon.gender === 2 ? "" : mon.gender === 1 ? "♀" : "♂"}</p>
       </div>
+
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <p>{`${mon.exp} EXP`}</p>
+      </div>
       <div
         style={{
           display: "flex",
@@ -47,6 +59,7 @@ const PokemonWithItem = (props: { mon: pokemon; format?: string }) => {
         <p>{`Item:`}</p>
         {mon.heldItem !== "None" && (
           <img
+            alt="item icon"
             src={getItemSprite(mon.heldItem)}
             style={{ width: 24, height: 24 }}
           />
