@@ -1,6 +1,6 @@
 import { getMetLocation } from "../MetLocation/MetLocation";
 import { Gen9RibbonsPart1 } from "../consts/Ribbons";
-import { bytesToUint16LittleEndian, bytesToUint32LittleEndian } from "../util/utils";
+import { bytesToUint16LittleEndian, bytesToUint32LittleEndian } from "../util/ByteLogic";
 import { pkm } from "./pkm";
 import { Abilities } from "../consts/Abilities";
 import { Items } from "../consts/Items";

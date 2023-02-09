@@ -65,6 +65,10 @@ const StatsDisplay = (props: { mon: pkm }) => {
     Filler,
     Tooltip
   );
+  console.log("ivs", mon.ivs);
+  console.log("evs", mon.evs);
+  console.log("evs 12", mon.evsG12);
+  console.log("dvs", mon.dvs);
   return (
     <div
       style={{
@@ -155,9 +159,9 @@ const StatsDisplay = (props: { mon: pkm }) => {
             labels:
               display === "Contest"
                 ? ["Cool", "Beauty", "Cute", "Smart", "Tough"]
-                : mon.evs && "spd" in mon.evs
-                ? ["HP", "Atk", "Def", "Spe", "SpD", "SpA"]
-                : ["HP", "Atk", "Def", "Spe", "Spc"],
+                : mon.dvs
+                ? ["HP", "Atk", "Def", "Spe", "Spc"]
+                : ["HP", "Atk", "Def", "Spe", "SpD", "SpA"],
             datasets: [
               display === "Stats"
                 ? {
@@ -215,26 +219,27 @@ const StatsDisplay = (props: { mon: pkm }) => {
                     pointHoverBackgroundColor: "#fff",
                     pointHoverBorderColor: "rgb(255, 99, 132)",
                   }
-                : display === "EVs" && mon.evs
+                : display === "EVs" && (mon.evs || mon.evsG12)
                 ? {
                     label: "EVs",
-                    data:
-                      "spd" in mon.evs
-                        ? [
-                            mon.evs.hp,
-                            mon.evs.atk,
-                            mon.evs.def,
-                            mon.evs.spe,
-                            mon.evs.spd,
-                            mon.evs.spa,
-                          ]
-                        : [
-                            mon.evs.hp,
-                            mon.evs.atk,
-                            mon.evs.def,
-                            mon.evs.spe,
-                            mon.evs.spc,
-                          ],
+                    data: mon.evs
+                      ? [
+                          mon.evs.hp,
+                          mon.evs.atk,
+                          mon.evs.def,
+                          mon.evs.spe,
+                          mon.evs.spd,
+                          mon.evs.spa,
+                        ]
+                      : mon.evsG12
+                      ? [
+                          mon.evsG12.hp,
+                          mon.evsG12.atk,
+                          mon.evsG12.def,
+                          mon.evsG12.spe,
+                          mon.evsG12.spc,
+                        ]
+                      : [],
                     fill: true,
                     backgroundColor: "rgba(132, 99, 255, 0.2)",
                     borderColor: "rgb(132, 99, 255)",
@@ -306,7 +311,7 @@ const StatsDisplay = (props: { mon: pkm }) => {
           >
             {_.range(getSheenStars(mon)).map((level: number) => (
               <img
-              alt={`sheen star ${level}`}
+                alt={`sheen star ${level}`}
                 src={process.env.PUBLIC_URL + "/icons/sheen.gif"}
                 style={{
                   height: 30,

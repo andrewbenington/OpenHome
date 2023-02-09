@@ -5,7 +5,6 @@ import { Gen9RibbonsPart1 } from "../consts/Ribbons";
 import { getMetLocation } from "../MetLocation/MetLocation";
 import {
   decryptByteArrayGen45,
-  unshuffleBlocks,
   unshuffleBlocksGen45,
 } from "../util/Encryption";
 import {
@@ -16,11 +15,14 @@ import {
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
-  uint32ToBytesLittleEndian,
-} from "../util/utils";
+  writeUint16ToBuffer,
+  writeUint32ToBuffer,
+} from "../util/ByteLogic";
 import { pkm } from "./pkm";
 
 export class pk5 extends pkm {
+  static fileSize = 136;
+
   constructor(bytes: Uint8Array, encrypted: boolean = false) {
     if (encrypted) {
       let unencryptedBytes = decryptByteArrayGen45(bytes);
@@ -33,14 +35,16 @@ export class pk5 extends pkm {
     this.personalityValue = bytesToUint32LittleEndian(bytes, 0x00);
     this.dexNum = bytesToUint16LittleEndian(bytes, 0x08);
     this.exp = bytesToUint32LittleEndian(bytes, 0x10);
-    this.formNum = bytes[0x40] >> 3;
-    this.heldItem = Items[bytesToUint16LittleEndian(bytes, 0x0a)];
-    this.ability = Abilities[bytesToUint16LittleEndian(bytes, 0x15)];
-    this.abilityNum = bytes[0x42] & 1 ? 3 : (bytes[0x01] & 1) + 1;
-    this.language = Languages[bytes[0x17]];
-    this.nature = bytes[0x41];
+    this.heldItemIndex = bytesToUint16LittleEndian(bytes, 0x0a);
+    this.heldItem = Items[this.heldItemIndex];
     this.trainerID = bytesToUint16LittleEndian(bytes, 0x0c);
     this.secretID = bytesToUint16LittleEndian(bytes, 0x0e);
+    this.abilityIndex = bytesToUint16LittleEndian(bytes, 0x15);
+    this.ability = Abilities[this.abilityIndex];
+    this.abilityNum = bytes[0x42] & 1 ? 3 : (bytes[0x01] & 1) + 1;
+    this.language = Languages[bytes[0x17]];
+    this.formNum = bytes[0x40] >> 3;
+    this.nature = bytes[0x41];
     this.displayID = this.trainerID;
     this.ball = bytes[0x83];
     this.metLevel = bytes[0x84] & ~0x80;
@@ -131,5 +135,15 @@ export class pk5 extends pkm {
         bytesToUint16LittleEndian(bytes, 0x00) ^
         bytesToUint16LittleEndian(bytes, 0x02)) <
       8;
+
+    const getByteArray = () => {
+      let bytes = new Uint8Array(pk5.fileSize);
+      writeUint32ToBuffer(this.personalityValue, bytes, 0x00);
+      writeUint16ToBuffer(this.dexNum, bytes, 0x08);
+      writeUint16ToBuffer(this.heldItemIndex, bytes, 0x0a);
+      writeUint16ToBuffer(this.trainerID, bytes, 0x0c);
+      writeUint16ToBuffer(this.secretID, bytes, 0x0e);
+      writeUint32ToBuffer(this.exp, bytes, 0x10);
+    };
   }
 }

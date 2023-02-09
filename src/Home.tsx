@@ -2,12 +2,11 @@ import { Button, Dialog, Grid, MenuItem, Select } from "@mui/material";
 import _ from "lodash";
 import { useEffect, useState } from "react";
 import PokemonButton from "./components.ts/buttons/PokemonButton";
-import PokemonDislay from "./components.ts/PokemonDisplay";
+import PokemonDisplay from "./components.ts/PokemonDisplay";
 import SaveDisplay from "./components.ts/SaveDisplay";
 import { pkm } from "./pkm/pkm";
 import { HomeData } from "./sav/HomeData";
 import Themes, { OpenHomeTheme } from "./Themes";
-const fs = window.require("fs")
 
 const Home = () => {
   const [currentTheme, setCurrentTheme] = useState<OpenHomeTheme>(Themes[0]);
@@ -21,9 +20,8 @@ const Home = () => {
 
   const getCurrentDirectory = async () => {
     try {
-      var text = fs.readFileSync("./men.text");
-      const dir = await fs.opendir("./");
-      for await (const dirent of dir) console.log(dirent.name);
+      const result = await (window as unknown as any).electron.ipcRenderer.invoke("read-home-data");
+      console.log(result);
     } catch (err) {
       console.error(err);
     }
@@ -121,7 +119,7 @@ const Home = () => {
         fullWidth
         maxWidth="lg"
       >
-        {selectedMon && <PokemonDislay mon={selectedMon} />}
+        {selectedMon && <PokemonDisplay mon={selectedMon} />}
       </Dialog>
     </div>
   );

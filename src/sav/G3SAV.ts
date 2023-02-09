@@ -4,7 +4,7 @@ import { gen3StringToUTF } from "../util/Strings/StringConverter";
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian
-} from "../util/utils";
+} from "../util/ByteLogic";
 import { Box, SAV } from "./SAV";
 
 export class G3SAV implements SAV {

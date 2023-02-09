@@ -1,7 +1,13 @@
 import { Abilities } from "../consts/Abilities";
 import { Items } from "../consts/Items";
 import { Languages } from "../consts/Languages";
-import { Gen9Ribbons } from "../consts/Ribbons";
+import { MONS_LIST } from "../consts/Mons";
+import {
+  Gen34ContestRibbons,
+  Gen34TowerRibbons,
+  Gen9Ribbons,
+  OpenHomeRibbons,
+} from "../consts/Ribbons";
 import { getMetLocation } from "../MetLocation/MetLocation";
 import {
   bytesToUint16LittleEndian,
@@ -11,7 +17,11 @@ import {
   uint16ToBytesLittleEndian,
   uint32ToBytesLittleEndian,
 } from "../util/ByteLogic";
-import { getLevelGen3Onward } from "../util/StatCalc";
+import {
+  getHPGen3Onward,
+  getLevelGen3Onward,
+  getStatGen3Onward,
+} from "../util/StatCalc";
 import {
   utf16BytesToString,
   utf16StringToBytes,
@@ -24,12 +34,12 @@ import {
   pokedate,
   stats,
 } from "./pkm";
-import { writeIVsToBuffer } from "./util";
+import { generateIVs, gvsFromIVs, ivsFromDVs, writeIVsToBuffer } from "./util";
 
-export class pa8 extends pkm {
+export class pkoh extends pkm {
   static fileSize = 376;
   public get format() {
-    return "pa8";
+    return "ohpkm";
   }
   public get encryptionConstant() {
     return bytesToUint32LittleEndian(this.bytes, 0x00);
@@ -145,6 +155,12 @@ export class pa8 extends pkm {
   public set markings(value: number) {
     this.bytes.set(uint16ToBytesLittleEndian(value), 0x18);
   }
+  public get alphaMove() {
+    return bytesToUint16LittleEndian(this.bytes, 0x1a);
+  }
+  public set alphaMove(value: number) {
+    this.bytes.set(uint16ToBytesLittleEndian(value), 0x1a);
+  }
   public get personalityValue() {
     return bytesToUint32LittleEndian(this.bytes, 0x1c);
   }
@@ -229,28 +245,35 @@ export class pa8 extends pkm {
   public set pokerusByte(value: number) {
     this.bytes[0x32] = value;
   }
+  public get contestMemoryCount() {
+    return this.bytes[0x34];
+  }
+  public set contestMemoryCount(value: number) {
+    this.bytes[0x34] = value;
+  }
+  public get battleMemoryCount() {
+    return this.bytes[0x35];
+  }
+  public set battleMemoryCount(value: number) {
+    this.bytes[0x35] = value;
+  }
   public get ribbonBytes() {
-    let rBytes = new Uint8Array(16);
-    rBytes.set(this.bytes.slice(0x34, 0x3a), 0);
-    rBytes.set(this.bytes.slice(0x40, 0x48), 8);
-    console.log(this.bytes.slice(0x40, 0x48), 8);
-    return rBytes;
+    return this.bytes.slice(0x36, 0x4c);
   }
   public set ribbonBytes(value: Uint8Array) {
-    this.bytes.set(value.slice(0, 8), 0x34);
-    this.bytes.set(value.slice(8, 16), 0x40);
+    this.bytes.set(value.slice(0, 22), 0x36);
   }
   public get ribbons() {
     let ribbons = [];
     let rBytes = this.ribbonBytes;
-    for (let byte = 0; byte < 16; byte++) {
+    for (let byte = 0; byte < 22; byte++) {
       let ribbonsUint8 = rBytes[byte];
       for (let bit = 0; bit < 8; bit++) {
         if (
           ribbonsUint8 & Math.pow(2, bit) &&
-          8 * byte + bit < Gen9Ribbons.length
+          8 * byte + bit < OpenHomeRibbons.length
         ) {
-          ribbons.push(Gen9Ribbons[8 * byte + bit]);
+          ribbons.push(OpenHomeRibbons[8 * byte + bit]);
         }
       }
     }
@@ -261,33 +284,15 @@ export class pa8 extends pkm {
     value.forEach((ribbon) => {
       let index = Gen9Ribbons.indexOf(ribbon);
       if (index > 0) {
-        setFlag(this.ribbonBytes, index >= 64 ? 0x40 : 0x34, index, true);
+        setFlag(this.ribbonBytes, 0x3c, index, true);
       }
     });
   }
-  public get contestMemoryCount() {
-    return this.bytes[0x3c];
-  }
-  public set contestMemoryCount(value: number) {
-    this.bytes[0x3c] = value;
-  }
-  public get battleMemoryCount() {
-    return this.bytes[0x3d];
-  }
-  public set battleMemoryCount(value: number) {
-    this.bytes[0x3d] = value;
-  }
-  public get alphaMove() {
-    return bytesToUint16LittleEndian(this.bytes, 0x3e);
-  }
-  public set alphaMove(value: number) {
-    this.bytes.set(uint16ToBytesLittleEndian(value), 0x3e);
-  }
   public get sociability() {
-    return bytesToUint32LittleEndian(this.bytes, 0x48)
+    return bytesToUint32LittleEndian(this.bytes, 0x4c);
   }
   public set sociability(value: number) {
-    this.bytes.set(uint32ToBytesLittleEndian(value), 0x48)
+    this.bytes.set(uint32ToBytesLittleEndian(value), 0x4c);
   }
   public get height() {
     return this.bytes[0x50];
@@ -406,6 +411,18 @@ export class pa8 extends pkm {
   }
   public set dynamaxLevel(value: number) {
     this.bytes[0x98] = value;
+  }
+  public get teraTypeOriginal() {
+    return this.bytes[0x99];
+  }
+  public set teraTypeOriginal(value: number) {
+    this.bytes[0x99] = value;
+  }
+  public get teraTypeOverride() {
+    return this.bytes[0x9a];
+  }
+  public set teraTypeOverride(value: number) {
+    this.bytes[0x9a] = value;
   }
   public get statusCondition() {
     return bytesToUint32LittleEndian(this.bytes, 0x9c);
@@ -685,6 +702,19 @@ export class pa8 extends pkm {
     setFlag(this.bytes, 0x13e, 4, value.spd);
     setFlag(this.bytes, 0x13e, 5, value.spe);
   }
+
+  public get TRFlagsSwSh() {
+    return this.bytes.slice(0x15d, 0x15d + 8);
+  }
+  public set TRFlagsSwSh(value: Uint8Array) {
+    this.bytes.set(value.slice(0, 8), 0x15d);
+  }
+  public get TMFlagsBDSP() {
+    return this.bytes.slice(0x15d, 0x15d + 8);
+  }
+  public set TMFlagsBDSP(value: Uint8Array) {
+    this.bytes.set(value.slice(0, 8), 0x15d);
+  }
   public get MoveFlagsLA() {
     return this.bytes.slice(0x13f, 0x13f + 14);
   }
@@ -709,23 +739,21 @@ export class pa8 extends pkm {
   public set MasterFlagsLA(value: Uint8Array) {
     this.bytes.set(value.slice(0, 8), 0x15d);
   }
-  public get stats() {
-    return {
-      hp: bytesToUint16LittleEndian(this.bytes, 0x16a),
-      atk: bytesToUint16LittleEndian(this.bytes, 0x16c),
-      def: bytesToUint16LittleEndian(this.bytes, 0x16e),
-      spe: bytesToUint16LittleEndian(this.bytes, 0x170),
-      spa: bytesToUint16LittleEndian(this.bytes, 0x172),
-      spd: bytesToUint16LittleEndian(this.bytes, 0x174),
-    };
+  public get TMFlagsSV() {
+    return this.bytes.slice(0x15d, 0x15d + 8);
   }
-  public set stats(value: stats) {
-    this.bytes.set(uint16ToBytesLittleEndian(value.hp), 0x16a);
-    this.bytes.set(uint16ToBytesLittleEndian(value.atk), 0x16c);
-    this.bytes.set(uint16ToBytesLittleEndian(value.def), 0x16e);
-    this.bytes.set(uint16ToBytesLittleEndian(value.spe), 0x170);
-    this.bytes.set(uint16ToBytesLittleEndian(value.spa), 0x172);
-    this.bytes.set(uint16ToBytesLittleEndian(value.spd), 0x174);
+  public set TMFlagsSV(value: Uint8Array) {
+    this.bytes.set(value.slice(0, 8), 0x15d);
+  }
+  public get stats(): stats {
+    return {
+      hp: getHPGen3Onward(this),
+      atk: getStatGen3Onward("Atk", this),
+      def: getStatGen3Onward("Def", this),
+      spe: getStatGen3Onward("Spe", this),
+      spa: getStatGen3Onward("SpA", this),
+      spd: getStatGen3Onward("SpD", this),
+    };
   }
   public get isShiny() {
     return (
@@ -753,6 +781,57 @@ export class pa8 extends pkm {
       super(new Uint8Array(376));
       this.encryptionConstant =
         other.encryptionConstant ?? other.personalityValue;
+      this.sanity = other.sanity;
+      this.dexNum = other.dexNum;
+      this.heldItem = other.heldItem;
+      this.trainerID = other.trainerID;
+      this.secretID = other.secretID;
+      this.exp = other.exp;
+      this.abilityNum = other.abilityNum;
+      this.markings = other.markings;
+      this.alphaMove = other.alphaMove ?? 0;
+      this.personalityValue = other.personalityValue;
+      this.nature = other.nature ?? this.personalityValue % 25;
+      this.statNature = other.statNature ?? this.nature;
+      this.isFatefulEncounter = other.isFatefulEncounter;
+      this.flag2LA = other.flag2LA ?? false;
+      this.gender = other.gender;
+      this.formNum = other.formNum;
+      this.evs = other.evs ?? { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 };
+      this.contest = other.contest
+      this.pokerusByte = other.pokerusByte
+      this.contestMemoryCount = other.contestMemoryCount
+      this.battleMemoryCount = other.battleMemoryCount
+      // handle ribbons
+      this.sociability = other.sociability ?? 0
+      this.height = other.height
+      this.weight = other.weight
+      this.scale = other.scale
+      this.moves = other.moves
+      this.movePP = other.movePP
+      this.nickname = other.nickname
+      this.avs = other.avs
+      this.movePPUps = other.movePPUps
+      this.relearnMoves = other.relearnMoves ?? [0, 0, 0, 0]
+      this.currentHP = other.currentHP
+      this.ivs = other.ivs ?? other.dvs ? ivsFromDVs(other.dvs!!) : generateIVs()
+      this.isEgg = other.isEgg
+      this.isNicknamed = other.isNicknamed
+      this.statusCondition = other.statusCondition
+      this.unknownA0 = other.unknownA0 ?? 0
+      this.gvs = other.gvs ?? gvsFromIVs(this.ivs)
+      this.heightAbsoluteBytes = other.heightAbsoluteBytes ?? new Uint8Array(4)
+      this.weightAbsoluteBytes = other.weightAbsoluteBytes ?? new Uint8Array(4)
+      this.handlerName = other.handlerName ?? ""
+      this.evsG12 = other.evsG12 ?? { hp: 0, atk: 0, def: 0, spc: 0, spe: 0 };
+
+      this.ability =
+        (this.abilityNum === 1
+          ? MONS_LIST[this.dexNum]?.formes[this.formNum]?.ability1
+          : this.abilityNum === 2
+          ? MONS_LIST[this.dexNum]?.formes[this.formNum]?.ability2
+          : MONS_LIST[this.dexNum]?.formes[this.formNum]?.abilityH) ?? "None";
+      this.abilityIndex = Abilities.indexOf(this.ability);
     }
   }
 }

@@ -1,4 +1,4 @@
-import { bytesToUint16LittleEndian } from "../utils";
+import { bytesToUint16LittleEndian } from "../ByteLogic";
 import { Gen4ToUTFMap } from "./Gen4ToUTFMap";
 
 export const G1_TERMINATOR = 0x50;
@@ -152,6 +152,31 @@ export const gen4StringToUTF = (
     charArray[i] = Gen4ToUTFMap[value];
   }
   return new TextDecoder("utf-16").decode(charArray);
+};
+
+export const utf16BytesToString = (
+  bytes: Uint8Array,
+  offset: number,
+  length: number
+) => {
+  let byteArray = new Uint16Array(20);
+  for (let i = 0; i < length; i += 1) {
+    let value = bytesToUint16LittleEndian(bytes, offset + 2 * i);
+    if (value === 0) {
+      break;
+    }
+    byteArray[i] = value;
+  }
+  return new TextDecoder("utf-16").decode(byteArray);
+};
+
+export const utf16StringToBytes = (str: string, length: number) => {
+  var buf = new ArrayBuffer(length * 2);
+  var bufView = new Uint16Array(buf);
+  for (var i = 0; i < Math.min(str.length, length); i++) {
+    bufView[i] = str.charCodeAt(i);
+  }
+  return new Uint8Array(buf);
 };
 
 const Gen3CharacterSet = [

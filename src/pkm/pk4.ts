@@ -14,7 +14,7 @@ import { gen4StringToUTF } from "../util/Strings/StringConverter";
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
-} from "../util/utils";
+} from "../util/ByteLogic";
 import { pkm } from "./pkm";
 
 export class pk4 extends pkm {

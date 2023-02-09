@@ -4,6 +4,7 @@ import { Languages } from "../consts/Languages";
 import { MONS_LIST } from "../consts/Mons";
 import { Gen3Ribbons } from "../consts/Ribbons";
 import { getMetLocation } from "../MetLocation/MetLocation";
+import { gen3ToNational } from "../util/ConvertPokemonID";
 import { decryptByteArrayGen3, unshuffleBlocksGen3 } from "../util/Encryption";
 import { getGen3To5Gender } from "../util/GenderCalc";
 import {
@@ -15,8 +16,7 @@ import { gen3StringToUTF } from "../util/Strings/StringConverter";
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
-  gen3ToNational,
-} from "../util/utils";
+} from "../util/ByteLogic";
 import { pkm } from "./pkm";
 
 export class pk3 extends pkm {

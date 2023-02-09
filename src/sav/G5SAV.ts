@@ -2,7 +2,7 @@ import { pk5 } from "../pkm/pk5";
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
-} from "../util/utils";
+} from "../util/ByteLogic";
 import { Box, SAV } from "./SAV";
 
 export class G5SAV implements SAV {
