@@ -4,17 +4,14 @@ import { GCLanguages } from "../consts/Languages";
 import { MONS_LIST } from "../consts/Mons";
 import { Gen3Ribbons } from "../consts/Ribbons";
 import { getMetLocation } from "../MetLocation/MetLocation";
+import { gen3ToNational } from "../util/ConvertPokemonID";
 import { getGen3To5Gender } from "../util/GenderCalc";
 import {
   getHPGen3Onward,
   getLevelGen3Onward,
-  getStatGen3Onward,
+  getStatGen3Onward
 } from "../util/StatCalc";
-import {
-  bytesToUint16BigEndian,
-  bytesToUint32BigEndian,
-  gen3IDs,
-} from "../util/utils";
+import { bytesToUint16BigEndian, bytesToUint32BigEndian } from "../util/ByteLogic";
 import { pkm } from "./pkm";
 
 export class colopkm extends pkm {
@@ -22,7 +19,7 @@ export class colopkm extends pkm {
     super(bytes);
     this.format = "colopkm";
     this.personalityValue = bytesToUint32BigEndian(bytes, 0x04);
-    this.dexNum = gen3IDs[bytesToUint16BigEndian(bytes, 0x00)];
+    this.dexNum = gen3ToNational(bytesToUint16BigEndian(bytes, 0x00));
     this.gender = getGen3To5Gender(this.personalityValue, this.dexNum);
     this.exp = bytesToUint32BigEndian(bytes, 0x5c);
     this.level = getLevelGen3Onward(this.dexNum, this.exp);

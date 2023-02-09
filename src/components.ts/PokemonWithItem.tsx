@@ -1,5 +1,5 @@
 import { pkm } from "../pkm/pkm";
-import { getItemSprite, getMonSprite } from "../util/utils";
+import { getMonSprite, getItemSprite } from "../util/PokemonSprite";
 
 const PokemonWithItem = (props: { mon: pkm; format?: string; style: any }) => {
   const { mon, format, style } = props;

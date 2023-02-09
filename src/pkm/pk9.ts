@@ -3,7 +3,7 @@ import { Gen9RibbonsPart1, Gen9RibbonsPart2 } from "../consts/Ribbons";
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
-} from "../util/utils";
+} from "../util/ByteLogic";
 import { pkm } from "./pkm";
 import { Abilities } from "../consts/Abilities";
 import { Items } from "../consts/Items";

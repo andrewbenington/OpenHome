@@ -5,7 +5,7 @@ import { GameOfOrigin } from "../consts/GameOfOrigin";
 import MOVES from "../consts/Moves";
 import { Natures } from "../consts/Natures";
 import { pkm } from "../pkm/pkm";
-import { getGameLogo, getTypeColor } from "../util/utils";
+import { getGameLogo, getTypeColor } from "../util/PokemonSprite";
 
 const SummaryDisplay = (props: { mon: pkm }) => {
   const { mon } = props;

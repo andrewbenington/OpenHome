@@ -4,7 +4,7 @@ import {
   bytesToUint32LittleEndian,
   uint16ToBytesLittleEndian,
   uint32ToBytesLittleEndian,
-} from "./utils";
+} from "./ByteLogic";
 
 const GEN3_BLOCKS_OFFSET = 0x20;
 const GEN3_BLOCK_SIZE = 12;

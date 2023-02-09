@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import { MONS_LIST } from "../consts/Mons";
 import Types from "../consts/Types";
 import { pkm } from "../pkm/pkm";
-import { getTypeColor } from "../util/utils";
+import { writeIVsToBuffer } from "../pkm/util";
+import { getTypeColor } from "../util/PokemonSprite";
 import AttributeRow from "./AttributeRow";
 import AttributeTag from "./AttributeTag";
 import PokemonWithItem from "./PokemonWithItem";
@@ -32,12 +33,25 @@ const getTypes = (mon: pkm) => {
   return types ?? [];
 };
 
-const PokemonDislay = (props: { mon: pkm; propTab?: string }) => {
+const PokemonDisplay = (props: { mon: pkm; propTab?: string }) => {
   const { mon, propTab } = props;
   const [tab, setTab] = useState("summary");
   useEffect(() => {
     setTab(propTab ?? "summary");
   }, [propTab]);
+
+  const getIVBytes = (): string => {
+    let array = new Uint8Array(4);
+    console.log(mon.ivs);
+    if (!mon.ivs) {
+      return "";
+    }
+    writeIVsToBuffer(mon.ivs, array, 0, false, false);
+    let printedString = Array.from(array).map((byte: number) =>
+      byte.toString(16)
+    );
+    return printedString.join(" ");
+  };
   return (
     <div style={{ display: "flex", flexDirection: "row", width: "100%" }}>
       <PokemonWithItem mon={mon} format={mon.format} style={{ width: "20%" }} />
@@ -190,7 +204,7 @@ const PokemonDislay = (props: { mon: pkm; propTab?: string }) => {
               value="raw"
               onClick={() => setTab("raw")}
             />
-            <Button
+            <div
               style={{
                 position: "absolute",
                 right: 0,
@@ -204,7 +218,7 @@ const PokemonDislay = (props: { mon: pkm; propTab?: string }) => {
               }}
             >
               {mon.format}
-            </Button>
+            </div>
           </Tabs>
         </Box>
         {tab === "summary" ? (
@@ -232,6 +246,7 @@ const PokemonDislay = (props: { mon: pkm; propTab?: string }) => {
               );
             })}
             {mon.personalityValue}
+            <p>{getIVBytes()}</p>
           </div>
         )}
       </Card>
@@ -255,4 +270,4 @@ const fileTypeColors: { [key: string]: string } = {
   pk9: "#f52",
 };
 
-export default PokemonDislay;
+export default PokemonDisplay;

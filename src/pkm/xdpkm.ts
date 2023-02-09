@@ -4,21 +4,22 @@ import { GCLanguages } from "../consts/Languages";
 import { MONS_LIST } from "../consts/Mons";
 import { Gen3Ribbons } from "../consts/Ribbons";
 import { getMetLocation } from "../MetLocation/MetLocation";
+import { gen3ToNational } from "../util/ConvertPokemonID";
 import {
   getHPGen3Onward,
   getLevelGen3Onward,
-  getStatGen3Onward
+  getStatGen3Onward,
 } from "../util/StatCalc";
-import { bytesToUint16BigEndian, bytesToUint32BigEndian, gen3IDs } from "../util/utils";
+import { bytesToUint16BigEndian, bytesToUint32BigEndian } from "../util/ByteLogic";
 import { pkm } from "./pkm";
 
 export class xdpkm extends pkm {
   constructor(bytes: Uint8Array) {
-    console.log("making xd pkm")
+    console.log("making xd pkm");
     super(bytes);
     this.format = "xdpkm";
     this.personalityValue = bytesToUint32BigEndian(bytes, 0x28);
-    this.dexNum = gen3IDs[bytesToUint16BigEndian(bytes, 0x00)];
+    this.dexNum = gen3ToNational(bytesToUint16BigEndian(bytes, 0x00));
     this.exp = bytesToUint32BigEndian(bytes, 0x20);
     this.level = getLevelGen3Onward(this.dexNum, this.exp);
     this.formNum = 0;

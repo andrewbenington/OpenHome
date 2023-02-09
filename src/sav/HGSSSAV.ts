@@ -1,6 +1,6 @@
 import { pk4 } from "../pkm/pk4";
 import { gen4StringToUTF } from "../util/Strings/StringConverter";
-import { bytesToUint16LittleEndian } from "../util/utils";
+import { bytesToUint16LittleEndian } from "../util/ByteLogic";
 import { G4Box, G4SAV } from "./G4SAV";
 
 export class HGSSSAV extends G4SAV {

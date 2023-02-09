@@ -4,7 +4,7 @@ import { MONS_LIST } from "../consts/Mons";
 import { getMetLocation } from "../MetLocation/MetLocation";
 import { getLevelGen12 } from "../util/StatCalc";
 import { G1_TERMINATOR, GBStringDict } from "../util/Strings/StringConverter";
-import { bytesToUint16BigEndian, bytesToUint24BigEndian } from "../util/utils";
+import { bytesToUint16BigEndian, bytesToUint24BigEndian } from "../util/ByteLogic";
 import { pkm } from "./pkm";
 
 export class pk2 extends pkm {
@@ -46,7 +46,7 @@ export class pk2 extends pkm {
         ? MONS_LIST[this.dexNum].formes[0].genderRatio.M
         : -1;
     this.gender = maleRatio === -1 ? 2 : this.dvs.atk < maleRatio * 15 ? 1 : 0;
-    this.evs = {
+    this.evsG12 = {
       hp: bytesToUint16BigEndian(bytes, 0x0b),
       atk: bytesToUint16BigEndian(bytes, 0x0d),
       def: bytesToUint16BigEndian(bytes, 0x0f),

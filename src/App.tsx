@@ -1,3 +1,4 @@
+import { ipcMain } from "electron";
 import "./App.css";
 import Home from "./Home";
 

@@ -11,7 +11,7 @@ import {
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian
-} from "../util/utils";
+} from "../util/ByteLogic";
 import { pkm } from "./pkm";
 
 export class pk6 extends pkm {
