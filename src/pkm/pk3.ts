@@ -3,20 +3,20 @@ import { Gen3Items } from "../consts/Items";
 import { Languages } from "../consts/Languages";
 import { MONS_LIST } from "../consts/Mons";
 import { Gen3Ribbons } from "../consts/Ribbons";
-import { getMetLocation } from "../MetLocation/MetLocation";
-import { gen3ToNational } from "../util/ConvertPokemonID";
-import { decryptByteArrayGen3, unshuffleBlocksGen3 } from "../util/Encryption";
-import { getGen3To5Gender } from "../util/GenderCalc";
+import { getMetLocation } from "../renderer/MetLocation/MetLocation";
+import { gen3ToNational } from "../renderer/util/ConvertPokemonID";
+import { decryptByteArrayGen3, unshuffleBlocksGen3 } from "../renderer/util/Encryption";
+import { getGen3To5Gender } from "../renderer/util/GenderCalc";
 import {
   getHPGen3Onward,
   getLevelGen3Onward,
   getStatGen3Onward,
-} from "../util/StatCalc";
-import { gen3StringToUTF } from "../util/Strings/StringConverter";
+} from "../renderer/util/StatCalc";
+import { gen3StringToUTF } from "../renderer/util/Strings/StringConverter";
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
-} from "../util/ByteLogic";
+} from "../renderer/util/ByteLogic";
 import { pkm } from "./pkm";
 
 export class pk3 extends pkm {

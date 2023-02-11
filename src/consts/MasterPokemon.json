@@ -1674,7 +1674,6 @@
         "isMega": false,
         "isGMax": false,
         "isBattleOnly": false,
-        "regional": "Alola",
         "alias": "pikachualola",
         "types": ["Electric"],
         "genderRatio": { "M": 0, "F": 0 },
@@ -1700,41 +1699,6 @@
         "paradox": false,
         "cosmeticForme": false,
         "sprite": "pikachu-alolan-cap"
-      },
-      {
-        "name": "Pikachu",
-        "formeName": "Pikachu-Ash",
-        "formeNumber": 6,
-        "isBaseForme": false,
-        "isMega": false,
-        "isGMax": false,
-        "isBattleOnly": false,
-        "regional": "Alola",
-        "alias": "pikachuash",
-        "types": ["Electric"],
-        "genderRatio": { "M": 0, "F": 0 },
-        "baseStats": {
-          "hp": 35,
-          "atk": 55,
-          "def": 40,
-          "spa": 50,
-          "spd": 50,
-          "spe": 90
-        },
-        "ability1": "Static",
-        "abilityH": "Lightning Rod",
-        "height": 0.4,
-        "weight": 6,
-        "evos": [],
-        "eggGroups": ["Undiscovered"],
-        "gen": 7,
-        "restrictedLegendary": false,
-        "subLegendary": false,
-        "mythical": false,
-        "ultraBeast": false,
-        "paradox": false,
-        "cosmeticForme": false,
-        "sprite": "pikachu-ash-cap"
       },
       {
         "name": "Pikachu",
@@ -1772,13 +1736,14 @@
       },
       {
         "name": "Pikachu",
-        "formeName": "Pikachu-Gmax",
-        "formeNumber": 8,
+        "formeName": "Pikachu-Starter",
+        "formeNumber": 6,
         "isBaseForme": false,
         "isMega": false,
-        "isGMax": true,
-        "isBattleOnly": true,
-        "alias": "pikachugmax",
+        "isGMax": false,
+        "isBattleOnly": false,
+        "regional": "Alola",
+        "alias": "pikachustarter",
         "types": ["Electric"],
         "genderRatio": { "M": 0, "F": 0 },
         "baseStats": {
@@ -1791,18 +1756,18 @@
         },
         "ability1": "Static",
         "abilityH": "Lightning Rod",
-        "height": 21,
-        "weight": 0,
+        "height": 0.4,
+        "weight": 6,
         "evos": [],
-        "eggGroups": ["Field", "Fairy"],
-        "gen": 1,
+        "eggGroups": ["Undiscovered"],
+        "gen": 7,
         "restrictedLegendary": false,
         "subLegendary": false,
         "mythical": false,
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "pikachu-gmax"
+        "sprite": "pikachu-starter"
       },
       {
         "name": "Pikachu",
@@ -3707,7 +3672,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "growlithe"
+        "sprite": "growlithe-hisui"
       }
     ],
     "levelUpType": "Slow"
@@ -3791,7 +3756,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "arcanine"
+        "sprite": "arcanine-hisui"
       }
     ],
     "levelUpType": "Slow"
@@ -6175,7 +6140,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "voltorb"
+        "sprite": "voltorb-hisui"
       }
     ],
     "levelUpType": "Medium Fast"
@@ -6259,7 +6224,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "electrode"
+        "sprite": "electrode-hisui"
       }
     ],
     "levelUpType": "Medium Fast"
@@ -9458,7 +9423,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "typhlosion"
+        "sprite": "typhlosion-hisui"
       }
     ],
     "levelUpType": "Medium Slow"
@@ -12894,7 +12859,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "qwilfish"
+        "sprite": "qwilfish-hisui"
       }
     ],
     "levelUpType": "Medium Fast"
@@ -13173,7 +13138,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "sneasel"
+        "sprite": "sneasel-hisui"
       }
     ],
     "levelUpType": "Medium Slow"
@@ -27937,7 +27902,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "samurott"
+        "sprite": "samurott-hisui"
       }
     ],
     "levelUpType": "Medium Slow"
@@ -29967,7 +29932,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "lilligant"
+        "sprite": "lilligant-hisui"
       }
     ],
     "levelUpType": "Medium Fast"
@@ -30089,7 +30054,7 @@
         "paradox": false,
         "cosmeticForme": true,
         "regional": "Hisui",
-        "sprite": "basculin"
+        "sprite": "basculin-whitestriped"
       }
     ],
     "levelUpType": "Medium Fast"
@@ -31177,7 +31142,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "zorua"
+        "sprite": "zorua-hisui"
       }
     ],
     "levelUpType": "Medium Slow"
@@ -31257,7 +31222,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "zoroark"
+        "sprite": "zoroark-hisui"
       }
     ],
     "levelUpType": "Medium Slow"
@@ -34018,7 +33983,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "braviary"
+        "sprite": "braviary-hisui"
       }
     ],
     "levelUpType": "Slow"
@@ -40775,7 +40740,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "sliggoo"
+        "sprite": "sliggoo-hisui"
       }
     ],
     "levelUpType": "Slow"
@@ -40859,7 +40824,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "goodra"
+        "sprite": "goodra-hisui"
       }
     ],
     "levelUpType": "Slow"
@@ -41416,7 +41381,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "avalugg"
+        "sprite": "avalugg-hisui"
       }
     ],
     "levelUpType": "Medium Fast"
@@ -42123,7 +42088,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "decidueye"
+        "sprite": "decidueye-hisui"
       }
     ],
     "levelUpType": "Medium Slow"

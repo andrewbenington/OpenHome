@@ -1,11 +1,11 @@
-import { BigInteger } from "big-integer";
+import { BigInteger } from 'big-integer';
 
 export class pkm {
   static markingCount = 4;
   static markingColors = 1;
 
   bytes: Uint8Array = new Uint8Array();
-  private _format: string = "pkm";
+  private _format: string = 'pkm';
   public get format(): string {
     return this._format;
   }
@@ -56,7 +56,7 @@ export class pkm {
   public set heldItemIndex(value: number) {
     this._heldItemIndex = value;
   }
-  private _heldItem: string = "None";
+  private _heldItem: string = 'None';
   public get heldItem(): string {
     return this._heldItem;
   }
@@ -100,7 +100,7 @@ export class pkm {
   public set level(value: number) {
     this._level = value;
   }
-  private _ability: string = "No Ability";
+  private _ability: string = 'No Ability';
   public get ability(): string {
     return this._ability;
   }
@@ -180,7 +180,13 @@ export class pkm {
   public set evs(value: stats | undefined) {
     this._evs = value;
   }
-  evsG12?: statsPreSplit;
+  private _evsG12?: statsPreSplit | undefined;
+  public get evsG12(): statsPreSplit | undefined {
+    return this._evsG12;
+  }
+  public set evsG12(value: statsPreSplit | undefined) {
+    this._evsG12 = value;
+  }
   avs?: stats;
   private _contest: contestStats = {
     cool: 0,
@@ -270,7 +276,7 @@ export class pkm {
     this._scale = value;
   }
 
-  private _nickname: string = "Bad Egg";
+  private _nickname: string = 'Bad Egg';
   public get nickname(): string {
     return this._nickname;
   }
@@ -349,14 +355,7 @@ export class pkm {
   public set statusCondition(value: number) {
     this._statusCondition = value;
   }
-  private _gvs?: stats | undefined = {
-    hp: 0,
-    atk: 0,
-    def: 0,
-    spa: 0,
-    spd: 0,
-    spe: 0,
-  };
+  private _gvs?: stats | undefined;
   public get gvs(): stats | undefined {
     return this._gvs;
   }
@@ -486,7 +485,7 @@ export class pkm {
   public set languageIndex(value: number) {
     this._languageIndex = value;
   }
-  private _language: string = "";
+  private _language: string = '';
   public get language(): string {
     return this._language;
   }
@@ -502,7 +501,7 @@ export class pkm {
     this._affixedRibbon = value;
   }
 
-  private _trainerName: string = "TRAINER";
+  private _trainerName: string = 'TRAINER';
   public get trainerName(): string {
     return this._trainerName;
   }
@@ -551,7 +550,7 @@ export class pkm {
     this._metDate = value;
   }
   obedienceLevel?: number;
-  private _eggLocation: string = "a distant land";
+  private _eggLocation: string = 'a distant land';
   public get eggLocation(): string {
     return this._eggLocation;
   }
@@ -565,7 +564,7 @@ export class pkm {
   public set eggLocationIndex(value: number) {
     this._eggLocationIndex = value;
   }
-  private _metLocation: string = "a distant land";
+  private _metLocation: string = 'a distant land';
   public get metLocation(): string {
     return this._metLocation;
   }

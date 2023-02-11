@@ -1,5 +1,5 @@
 import masterPokemon from "./MasterPokemon.json";
-import { Pokemon } from "../types/types";
+import { Pokemon } from "../renderer/types/types";
 
 const monData = masterPokemon as unknown as { [key: string]: Pokemon };
 

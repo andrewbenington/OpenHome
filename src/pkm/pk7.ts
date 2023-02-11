@@ -1,11 +1,11 @@
-import { getMetLocation } from "../MetLocation/MetLocation";
+import { getMetLocation } from "../renderer/MetLocation/MetLocation";
 import { Gen9RibbonsPart1 } from "../consts/Ribbons";
-import { bytesToUint16LittleEndian, bytesToUint32LittleEndian } from "../util/ByteLogic";
+import { bytesToUint16LittleEndian, bytesToUint32LittleEndian } from "../renderer/util/ByteLogic";
 import { pkm } from "./pkm";
 import { Abilities } from "../consts/Abilities";
 import { Items } from "../consts/Items";
 import { Languages } from "../consts/Languages";
-import { getHPGen3Onward, getLevelGen3Onward, getStatGen3Onward } from "../util/StatCalc";
+import { getHPGen3Onward, getLevelGen3Onward, getStatGen3Onward } from "../renderer/util/StatCalc";
 
 export class pk7 extends pkm {
   constructor(bytes: Uint8Array) {

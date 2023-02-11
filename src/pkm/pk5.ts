@@ -2,22 +2,22 @@ import { Abilities } from "../consts/Abilities";
 import { Items } from "../consts/Items";
 import { Languages } from "../consts/Languages";
 import { Gen9RibbonsPart1 } from "../consts/Ribbons";
-import { getMetLocation } from "../MetLocation/MetLocation";
+import { getMetLocation } from "../renderer/MetLocation/MetLocation";
 import {
   decryptByteArrayGen45,
   unshuffleBlocksGen45,
-} from "../util/Encryption";
+} from "../renderer/util/Encryption";
 import {
   getHPGen3Onward,
   getLevelGen3Onward,
   getStatGen3Onward,
-} from "../util/StatCalc";
+} from "../renderer/util/StatCalc";
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
   writeUint16ToBuffer,
   writeUint32ToBuffer,
-} from "../util/ByteLogic";
+} from "../renderer/util/ByteLogic";
 import { pkm } from "./pkm";
 
 export class pk5 extends pkm {

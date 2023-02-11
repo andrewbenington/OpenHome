@@ -1,16 +1,16 @@
 import { Gen2Items } from "../consts/Items";
 import { Languages } from "../consts/Languages";
 import { MONS_LIST } from "../consts/Mons";
-import { getMetLocation } from "../MetLocation/MetLocation";
-import { getLevelGen12 } from "../util/StatCalc";
-import { G1_TERMINATOR, GBStringDict } from "../util/Strings/StringConverter";
-import { bytesToUint16BigEndian, bytesToUint24BigEndian } from "../util/ByteLogic";
+import { getMetLocation } from "../renderer/MetLocation/MetLocation";
+import { getLevelGen12 } from "../renderer/util/StatCalc";
+import { G1_TERMINATOR, GBStringDict } from "../renderer/util/Strings/StringConverter";
+import { bytesToUint16BigEndian, bytesToUint24BigEndian } from "../renderer/util/ByteLogic";
 import { pkm } from "./pkm";
 
-export class pk2 extends pkm {
+export class PK2 extends pkm {
   constructor(bytes: Uint8Array) {
     super(bytes);
-    this.format = "pk2";
+    this.format = "PK2";
     this.dexNum = bytes[0x00];
     this.exp = bytesToUint24BigEndian(bytes, 0x08);
     this.level = getLevelGen12(this.dexNum, this.exp);

@@ -1,4 +1,4 @@
-import { Move } from "../types/types";
+import { Move } from "../renderer/types/types";
 import Moves from "./Moves.json";
 
 const MOVES = Moves as unknown as Move[];
