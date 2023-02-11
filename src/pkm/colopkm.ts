@@ -3,18 +3,18 @@ import { Gen3Items } from "../consts/Items";
 import { GCLanguages } from "../consts/Languages";
 import { MONS_LIST } from "../consts/Mons";
 import { Gen3Ribbons } from "../consts/Ribbons";
-import { getMetLocation } from "../MetLocation/MetLocation";
-import { gen3ToNational } from "../util/ConvertPokemonID";
-import { getGen3To5Gender } from "../util/GenderCalc";
+import { getMetLocation } from "../renderer/MetLocation/MetLocation";
+import { gen3ToNational } from "../renderer/util/ConvertPokemonID";
+import { getGen3To5Gender } from "../renderer/util/GenderCalc";
 import {
   getHPGen3Onward,
   getLevelGen3Onward,
   getStatGen3Onward
-} from "../util/StatCalc";
-import { bytesToUint16BigEndian, bytesToUint32BigEndian } from "../util/ByteLogic";
+} from "../renderer/util/StatCalc";
+import { bytesToUint16BigEndian, bytesToUint32BigEndian } from "../renderer/util/ByteLogic";
 import { pkm } from "./pkm";
 
-export class colopkm extends pkm {
+export class COLOPKM extends pkm {
   constructor(bytes: Uint8Array) {
     super(bytes);
     this.format = "colopkm";

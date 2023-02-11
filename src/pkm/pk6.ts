@@ -2,16 +2,16 @@ import { Abilities } from "../consts/Abilities";
 import { Items } from "../consts/Items";
 import { Languages } from "../consts/Languages";
 import { Gen9RibbonsPart1 } from "../consts/Ribbons";
-import { getMetLocation } from "../MetLocation/MetLocation";
+import { getMetLocation } from "../renderer/MetLocation/MetLocation";
 import {
   getHPGen3Onward,
   getLevelGen3Onward,
   getStatGen3Onward
-} from "../util/StatCalc";
+} from "../renderer/util/StatCalc";
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian
-} from "../util/ByteLogic";
+} from "../renderer/util/ByteLogic";
 import { pkm } from "./pkm";
 
 export class pk6 extends pkm {

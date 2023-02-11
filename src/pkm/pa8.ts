@@ -2,7 +2,7 @@ import { Abilities } from "../consts/Abilities";
 import { Items } from "../consts/Items";
 import { Languages } from "../consts/Languages";
 import { Gen9Ribbons } from "../consts/Ribbons";
-import { getMetLocation } from "../MetLocation/MetLocation";
+import { getMetLocation } from "../renderer/MetLocation/MetLocation";
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -10,12 +10,12 @@ import {
   setFlag,
   uint16ToBytesLittleEndian,
   uint32ToBytesLittleEndian,
-} from "../util/ByteLogic";
-import { getLevelGen3Onward } from "../util/StatCalc";
+} from "../renderer/util/ByteLogic";
+import { getLevelGen3Onward } from "../renderer/util/StatCalc";
 import {
   utf16BytesToString,
   utf16StringToBytes,
-} from "../util/Strings/StringConverter";
+} from "../renderer/util/Strings/StringConverter";
 import {
   contestStats,
   hyperTrainStats,
@@ -658,13 +658,13 @@ export class pa8 extends pkm {
     return this.bytes[0x13d] & ~0x80;
   }
   public set metLevel(value: number) {
-    this.bytes[0x137] = (this.bytes[0x137] & 0x80) | (value & ~0x80);
+    this.bytes[0x13d] = (this.bytes[0x13d] & 0x80) | (value & ~0x80);
   }
   public get trainerGender() {
-    return getFlag(this.bytes, 0x137, 7) ? 1 : 0;
+    return getFlag(this.bytes, 0x13d, 7) ? 1 : 0;
   }
   public set trainerGender(value: number) {
-    setFlag(this.bytes, 0x137, 7, !!value);
+    setFlag(this.bytes, 0x13d, 7, !!value);
   }
 
   public get hyperTraining() {

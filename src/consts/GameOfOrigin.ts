@@ -1,4 +1,4 @@
-import { Origin } from "../types/types";
+import { Origin } from "../renderer/types/types";
 
 export const GameOfOrigin: (Origin | null)[] = [
   null,
