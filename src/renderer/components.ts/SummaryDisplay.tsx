@@ -1,14 +1,19 @@
 import { Card } from '@mui/material';
+import { borderRadius } from '@mui/system';
 import { Balls } from '../../consts/Balls';
 import { getCharacteristic } from '../../consts/Characteristics';
 import { GameOfOrigin } from '../../consts/GameOfOrigin';
 import MOVES from '../../consts/Moves';
 import { Natures } from '../../consts/Natures';
-import { pkm } from '../../pkm/pkm';
+import { pkm, marking } from '../../pkm/pkm';
 import { getGameLogo, getTypeColor } from '../util/PokemonSprite';
 
-const SummaryDisplay = (props: { mon: pkm }) => {
-  const { mon } = props;
+const getMarkingColor = (value: marking) => {
+  return ['grey', 'blue', 'red'][value];
+};
+
+const SummaryDisplay = (props: { mon: pkm; updateMon: (mon: pkm) => void }) => {
+  const { mon, updateMon } = props;
   return (
     <div>
       <div
@@ -95,7 +100,7 @@ const SummaryDisplay = (props: { mon: pkm }) => {
             <p>
               {getCharacteristic(
                 mon.ivs,
-                mon.encryptionConstant ?? mon.personalityValue,
+                mon.encryptionConstant ?? mon.personalityValue ?? 0,
                 mon.encryptionConstant === undefined
               )}
             </p>
@@ -106,8 +111,8 @@ const SummaryDisplay = (props: { mon: pkm }) => {
         <div
           style={{
             display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center',
+            flexDirection: 'column',
+            justifyContent: 'space-evenly',
           }}
         >
           <div
@@ -158,6 +163,50 @@ const SummaryDisplay = (props: { mon: pkm }) => {
               />
             )}
           </div>
+          {mon.markings ? (
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'center',
+                padding: 5,
+                backgroundColor: '#666',
+                marginTop: 10,
+                borderRadius: 5,
+              }}
+            >
+              <span
+                onClick={() => {
+                  if (mon.markings) {
+                    mon.markings[0] = 1;
+                    updateMon(mon);
+                  }
+                }}
+                style={{ color: getMarkingColor(mon.markings[0]) }}
+              >
+                ●
+              </span>
+              <span style={{ color: getMarkingColor(mon.markings[1]) }}>■</span>
+              <span style={{ color: getMarkingColor(mon.markings[2]) }}>▲</span>
+              <span style={{ color: getMarkingColor(mon.markings[3]) }}>♥</span>
+              {mon.markings[4] !== undefined ? (
+                <span style={{ color: getMarkingColor(mon.markings[4]) }}>
+                  ★
+                </span>
+              ) : (
+                <div />
+              )}
+              {mon.markings[5] !== undefined ? (
+                <span style={{ color: getMarkingColor(mon.markings[5]) }}>
+                  ◆
+                </span>
+              ) : (
+                <div />
+              )}
+            </div>
+          ) : (
+            <div />
+          )}
         </div>
       </div>
       <div

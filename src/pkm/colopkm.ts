@@ -1,23 +1,26 @@
-import { GameOfOrigin } from "../consts/GameOfOrigin";
-import { Gen3Items } from "../consts/Items";
-import { GCLanguages } from "../consts/Languages";
-import { MONS_LIST } from "../consts/Mons";
-import { Gen3Ribbons } from "../consts/Ribbons";
-import { getMetLocation } from "../renderer/MetLocation/MetLocation";
-import { gen3ToNational } from "../renderer/util/ConvertPokemonID";
-import { getGen3To5Gender } from "../renderer/util/GenderCalc";
+import { gen3ToNational } from '../util/ConvertPokemonID';
+import { GameOfOrigin } from '../consts/GameOfOrigin';
+import { Gen3Items } from '../consts/Items';
+import { GCLanguages } from '../consts/Languages';
+import { MONS_LIST } from '../consts/Mons';
+import { Gen3StandardRibbons } from '../consts/Ribbons';
+import { getMetLocation } from '../renderer/MetLocation/MetLocation';
+import { getGen3To5Gender } from '../util/GenderCalc';
+import {
+  bytesToUint16BigEndian,
+  bytesToUint32BigEndian,
+} from '../util/ByteLogic';
 import {
   getHPGen3Onward,
   getLevelGen3Onward,
-  getStatGen3Onward
-} from "../renderer/util/StatCalc";
-import { bytesToUint16BigEndian, bytesToUint32BigEndian } from "../renderer/util/ByteLogic";
-import { pkm } from "./pkm";
+  getStatGen3Onward,
+} from '../util/StatCalc';
+import { pkm } from './pkm';
 
 export class COLOPKM extends pkm {
   constructor(bytes: Uint8Array) {
     super(bytes);
-    this.format = "colopkm";
+    this.format = 'colopkm';
     this.personalityValue = bytesToUint32BigEndian(bytes, 0x04);
     this.dexNum = gen3ToNational(bytesToUint16BigEndian(bytes, 0x00));
     this.gender = getGen3To5Gender(this.personalityValue, this.dexNum);
@@ -46,7 +49,7 @@ export class COLOPKM extends pkm {
     this.ability =
       this.abilityNum === 1
         ? MONS_LIST[this.dexNum]?.formes[0].ability1
-        : MONS_LIST[this.dexNum]?.formes[0].ability2 ?? "None";
+        : MONS_LIST[this.dexNum]?.formes[0].ability2 ?? 'None';
     this.ivs = {
       hp: bytesToUint16BigEndian(bytes, 0xa4),
       atk: bytesToUint16BigEndian(bytes, 0xa6),
@@ -73,11 +76,11 @@ export class COLOPKM extends pkm {
     };
     this.stats = {
       hp: getHPGen3Onward(this),
-      atk: getStatGen3Onward("Atk", this),
-      def: getStatGen3Onward("Def", this),
-      spe: getStatGen3Onward("Spe", this),
-      spa: getStatGen3Onward("SpA", this),
-      spd: getStatGen3Onward("SpD", this),
+      atk: getStatGen3Onward('Atk', this),
+      def: getStatGen3Onward('Def', this),
+      spe: getStatGen3Onward('Spe', this),
+      spa: getStatGen3Onward('SpA', this),
+      spd: getStatGen3Onward('SpD', this),
     };
     let origin = GameOfOrigin.find((game) => game?.gc === bytes[0x08]) ?? null;
     this.gameOfOrigin = GameOfOrigin.indexOf(origin);
@@ -89,7 +92,7 @@ export class COLOPKM extends pkm {
       }
       byteArray[i] = byte;
     }
-    this.nickname = new TextDecoder("utf-16").decode(byteArray);
+    this.nickname = new TextDecoder('utf-16').decode(byteArray);
     byteArray = new Uint16Array(12);
     for (let i = 0; i < 12; i += 1) {
       let byte = bytesToUint16BigEndian(bytes, 0x18 + 2 * i);
@@ -98,11 +101,11 @@ export class COLOPKM extends pkm {
       }
       byteArray[i] = byte;
     }
-    this.trainerName = new TextDecoder("utf-16").decode(byteArray);
+    this.trainerName = new TextDecoder('utf-16').decode(byteArray);
     this.ribbons = [];
-    for (let index = 0; index < Gen3Ribbons.length; index++) {
+    for (let index = 0; index < Gen3StandardRibbons.length; index++) {
       if (bytes[index + 0xbd] === 1) {
-        this.ribbons.push(Gen3Ribbons[index]);
+        this.ribbons.push(Gen3StandardRibbons[index]);
       }
     }
     this.metYear = bytes[0x7b];

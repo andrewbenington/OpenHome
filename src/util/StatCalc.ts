@@ -1,8 +1,8 @@
-import LevelUpExp from '../../consts/LevelUpExp';
-import { MONS_LIST } from '../../consts/Mons';
-import { getNatureSummary } from '../../consts/Natures';
-import { pkm } from '../../pkm/pkm';
-import { Stat } from '../types/types';
+import LevelUpExp from '../consts/LevelUpExp';
+import { MONS_LIST } from '../consts/Mons';
+import { getNatureSummary } from '../consts/Natures';
+import { pkm } from '../pkm/pkm';
+import { Stat } from '../renderer/types/types';
 
 export const getStatGen3Onward = (stat: Stat, mon: pkm) => {
   if (mon.dexNum < 1 || mon.dexNum > 1008) {

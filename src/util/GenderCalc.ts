@@ -1,4 +1,4 @@
-import { MONS_LIST } from "../../consts/Mons";
+import { MONS_LIST } from "../consts/Mons";
 
 export const getGen3To5Gender = (PID: number, dexNum: number) => {
   if (dexNum === 0) {

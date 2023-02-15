@@ -1,27 +1,68 @@
-import { Button, Dialog, Grid, MenuItem, Select } from '@mui/material';
+import { Button, Card, Dialog, Grid, MenuItem, Select } from '@mui/material';
 import _ from 'lodash';
+import OHPKM from 'pkm/OHPKM';
 import { useEffect, useState } from 'react';
+import { SAV } from 'sav/SAV';
+import { pkm } from '../pkm/pkm';
+import { HomeData } from '../sav/HomeData';
 import PokemonButton from './components.ts/buttons/PokemonButton';
 import PokemonDisplay from './components.ts/PokemonDisplay';
 import SaveDisplay from './components.ts/SaveDisplay';
-import { pkm } from '../pkm/pkm';
-import { HomeData } from './sav/HomeData';
 import Themes, { OpenHomeTheme } from './Themes';
-import OHPKM from 'pkm/OHPKM';
 
 const Home = () => {
   const [currentTheme, setCurrentTheme] = useState<OpenHomeTheme>(Themes[0]);
   const [selectedMon, setSelectedMon] = useState<pkm>();
-  const [, setDraggingMon] = useState<pkm>();
+  const [draggingMon, setDraggingMon] = useState<pkm>();
+  const [box, setBox] = useState(0);
+  const [saves, setSaves] = useState<
+    [SAV | undefined, SAV | undefined, SAV | undefined, SAV | undefined]
+  >([undefined, undefined, undefined, undefined]);
+  const [homeMonMap, setHomeMonMap] = useState<{ [key: string]: OHPKM }>({});
+  const [newOHPKMList, setNewOHPKMList] = useState<string[]>([]);
   const [homeData, setHomeData] = useState(new HomeData(new Uint8Array()));
 
-  const testIPCMessage = async () => {
-    console.log('sending message');
-    console.log(window.electron.ipcRenderer.once);
-    window.electron.ipcRenderer.once('home-data-read', (result: any) => {
-      console.log(result);
+  const writeAllHomeMons = () => {
+    homeData.boxes.forEach((b) => {
+      b.pokemon.forEach((mon) => {
+        if (mon) {
+          window.electron.ipcRenderer.sendMessage('write-ohpkm', mon.bytes);
+        }
+      });
     });
+  };
+
+  const [onSaveListeners, setOnSaveListeners] = useState<(() => any)[]>([
+    writeAllHomeMons,
+  ]);
+
+  const readHomeData = async () => {
+    window.electron.ipcRenderer.once(
+      'home-data-read',
+      ({
+        byteMap,
+      }: {
+        byteMap: {
+          [key: string]: Uint8Array;
+        };
+      }) => {
+        const monMap: { [key: string]: OHPKM } = {};
+        Object.entries(byteMap).forEach(([id, bytes]) => {
+          monMap[id] = new OHPKM(bytes);
+        });
+        setHomeMonMap(monMap);
+      }
+    );
     window.electron.ipcRenderer.sendMessage('read-home-data', 'fake');
+  };
+
+  useEffect(() => {
+    readHomeData();
+  }, []);
+
+  const addOnSaveListener = (listener: () => any) => {
+    console.log('adding to listeners', listener);
+    setOnSaveListeners([...onSaveListeners, listener]);
   };
 
   return (
@@ -44,30 +85,48 @@ const Home = () => {
           }}
         >
           {Themes.map((theme) => (
-            <MenuItem value={theme.name}>{theme.name}</MenuItem>
+            <MenuItem key={theme.name} value={theme.name}>
+              {theme.name}
+            </MenuItem>
           ))}
         </Select>
+        <Button
+          onClick={() => {
+            console.log(onSaveListeners);
+            onSaveListeners.forEach((listener) => {
+              listener();
+            });
+          }}
+        >
+          Save
+        </Button>
       </div>
       <div style={{ display: 'flex', flex: 1 }}>
         <div style={{ display: 'flex', flexDirection: 'column', width: '25%' }}>
           <SaveDisplay
             setSelectedMon={setSelectedMon}
             setDraggingMon={setDraggingMon}
+            draggingMon={draggingMon}
+            setOnSaveListener={addOnSaveListener}
+            homeMonMap={homeMonMap}
           />
           <SaveDisplay
             setSelectedMon={setSelectedMon}
             setDraggingMon={setDraggingMon}
+            draggingMon={draggingMon}
+            setOnSaveListener={addOnSaveListener}
+            homeMonMap={homeMonMap}
           />
         </div>
-        <div
+        <Card
           style={{
-            borderRadius: 10,
+            borderRadius: 5,
             backgroundColor: currentTheme.contentColor,
             width: '50%',
-            aspectRatio: 1,
-            borderWidth: 2,
-            borderColor: currentTheme.borderColor,
-            borderStyle: 'solid',
+            height: 'fit-content',
+            // borderWidth: 2,
+            // borderColor: currentTheme.borderColor,
+            // borderStyle: 'solid',
           }}
         >
           {_.range(10).map((row: number) => (
@@ -80,26 +139,29 @@ const Home = () => {
                     <PokemonButton
                       onClick={() => setSelectedMon(mon)}
                       onDragStart={() => setDraggingMon(mon)}
-                      onDragEnd={() => setDraggingMon(undefined)}
+                      onDragEnd={(e) => {
+                        if (e.dataTransfer.dropEffect === 'copy') {
+                          homeData.boxes[box].pokemon[row * 12 + rowIndex] =
+                            undefined;
+                          homeData.changedMons.push({
+                            box,
+                            index: row * 12 + rowIndex,
+                          });
+                          console.log(homeData.boxes);
+                          setHomeData(homeData);
+                        }
+                        setDraggingMon(undefined);
+                      }}
                       mon={mon}
                       zIndex={10 - row}
-                      onDropFile={(importedMon) => {
-                        const homeMon = new OHPKM(importedMon);
-                        homeData.boxes[currentBox].pokemon[
-                          row * 12 + rowIndex
-                        ] = homeMon;
-                        console.log(homeMon);
-                        // window.electron.ipcRenderer.sendMessage('upload-pkm', {
-                        //   bytes: importedMon.bytes,
-                        //   format: importedMon.format,
-                        // });
-                        const newBoxes = homeData.boxes;
-                        newBoxes[currentBox].pokemon[row * 12 + rowIndex] =
-                          homeMon;
-                        newBoxes[currentBox].pokemon[
-                          (row - 1) * 12 + rowIndex
-                        ] = importedMon;
-                        setHomeData({ ...homeData, boxes: newBoxes });
+                      onDrop={(importedMon) => {
+                        if (importedMon || draggingMon) {
+                          const homeMon = new OHPKM(importedMon ?? draggingMon);
+                          const newBoxes = homeData.boxes;
+                          newBoxes[currentBox].pokemon[row * 12 + rowIndex] =
+                            homeMon;
+                          setHomeData({ ...homeData, boxes: newBoxes });
+                        }
                       }}
                     />
                   </Grid>
@@ -107,15 +169,21 @@ const Home = () => {
               })}
             </Grid>
           ))}
-        </div>
+        </Card>
         <div style={{ display: 'flex', flexDirection: 'column', width: '25%' }}>
           <SaveDisplay
             setSelectedMon={setSelectedMon}
             setDraggingMon={setDraggingMon}
+            draggingMon={draggingMon}
+            setOnSaveListener={addOnSaveListener}
+            homeMonMap={homeMonMap}
           />
           <SaveDisplay
             setSelectedMon={setSelectedMon}
             setDraggingMon={setDraggingMon}
+            draggingMon={draggingMon}
+            setOnSaveListener={addOnSaveListener}
+            homeMonMap={homeMonMap}
           />
         </div>
       </div>
@@ -125,7 +193,9 @@ const Home = () => {
         fullWidth
         maxWidth="lg"
       >
-        {selectedMon && <PokemonDisplay mon={selectedMon} />}
+        {selectedMon && (
+          <PokemonDisplay mon={selectedMon} updateMon={() => {}} />
+        )}
       </Dialog>
     </div>
   );

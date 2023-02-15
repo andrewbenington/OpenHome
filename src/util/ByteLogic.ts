@@ -1,4 +1,3 @@
-
 const bytesToNumberLittleEndian = (bytes: Uint8Array) => {
   return bytesToNumberBigEndian(bytes.reverse());
 };
@@ -36,6 +35,18 @@ export const uint16ToBytesLittleEndian = (value: number): Uint8Array => {
   return Uint8Array.from([value & 0xff, (value >> 8) & 0xff]);
 };
 
+export const get16ByteChecksumLittleEndian = (
+  bytes: Uint8Array,
+  start: number,
+  end: number
+) => {
+  let checksum = 0;
+  for (let i = start; i < end; i += 2) {
+    checksum = (checksum + bytesToUint16LittleEndian(bytes, i)) & 0xffff;
+  }
+  return checksum;
+};
+
 export const uint32ToBytesLittleEndian = (value: number): Uint8Array => {
   return Uint8Array.from([
     value & 0xff,
@@ -69,19 +80,10 @@ export const setFlag = (
 ) => {
   let byteIndex = offset + Math.floor(index / 8);
   let bitIndex = index % 8;
-  console.log('set flag', byteIndex.toString(16).padStart(3, '0'), bitIndex);
   if (byteIndex < buffer.length) {
     buffer[byteIndex] =
       (buffer[byteIndex] & ~Math.pow(2, bitIndex)) |
       (value ? Math.pow(2, bitIndex) : 0);
-    console.log(
-      buffer[byteIndex].toString(2),
-      (buffer[byteIndex] & ~Math.pow(2, bitIndex)).toString(2),
-      (
-        (buffer[byteIndex] & ~Math.pow(2, bitIndex)) |
-        (value ? Math.pow(2, bitIndex) : 0)
-      ).toString(2)
-    );
   }
 };
 
@@ -92,4 +94,8 @@ export const getFlag = (buffer: Uint8Array, offset: number, index: number) => {
     return !!((buffer[byteIndex] >> bitIndex) & 0x1);
   }
   return false;
+};
+
+export const bytesToString = (value: number, numBytes: number) => {
+  return value.toString(16).padStart(numBytes * 2, '0');
 };

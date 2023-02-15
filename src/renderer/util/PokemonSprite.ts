@@ -1,7 +1,7 @@
 import { GameOfOrigin } from '../../consts/GameOfOrigin';
 import { MONS_LIST } from '../../consts/Mons';
 import { pkm } from '../../pkm/pkm';
-import { natDexToSV } from './ConvertPokemonID';
+import { natDexToSV } from '../../util/ConvertPokemonID';
 
 const ColosseumOnlyNonShadow = [311];
 
@@ -166,7 +166,6 @@ export const getSerebiiSprite = (
   isShiny: boolean,
   game: string
 ) => {
-  console.log(dexNum, formNum);
   if (dexNum < 1 || dexNum > 1008) {
     return '';
   }
@@ -178,7 +177,6 @@ export const getSerebiiSprite = (
     ?.replace('paldeafire', 'b')
     ?.replace('paldeawater', 'a');
   let monName = MONS_LIST[dexNum].formes[0].sprite;
-  console.log(formeName);
   if (formNum === 0) {
     formeName = undefined;
   } else {
@@ -264,7 +262,6 @@ export const getItemSprite = (item: string) => {
 };
 
 export const getMonSprite = (mon: pkm, format: string) => {
-  console.log(mon, format)
   let formeName =
     (mon.formNum > 0 && mon.dexNum !== 664 && mon.dexNum !== 665
       ? MONS_LIST[mon.dexNum]?.formes[mon.formNum]?.formeName?.toLowerCase()
@@ -328,8 +325,6 @@ export const getMonSprite = (mon: pkm, format: string) => {
       'legends-arceus'
     );
   } else if (format === 'pk8' || format === 'pb8') {
-    console.log("getting serebii")
-    console.log(getSerebiiSprite(mon.dexNum, mon.formNum, mon.isShiny, 'SWSH'))
     return getSerebiiSprite(mon.dexNum, mon.formNum, mon.isShiny, 'SWSH');
   } else if (
     mon.dexNum <= 898 &&

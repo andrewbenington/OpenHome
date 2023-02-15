@@ -13,11 +13,11 @@ export class pkm {
     this._format = value;
   }
 
-  private _personalityValue: number = 0;
-  public get personalityValue(): number {
+  private _personalityValue?: number;
+  public get personalityValue(): number | undefined {
     return this._personalityValue;
   }
-  public set personalityValue(value: number) {
+  public set personalityValue(value: number | undefined) {
     this._personalityValue = value;
   }
   private _encryptionConstant?: number | undefined;
@@ -107,7 +107,7 @@ export class pkm {
   public set ability(value: string) {
     this._ability = value;
   }
-  private _abilityNum: number = 0;
+  private _abilityNum: number = 1;
   public get abilityNum(): number {
     return this._abilityNum;
   }
@@ -121,6 +121,24 @@ export class pkm {
   public set abilityIndex(value: number) {
     this._abilityIndex = value;
   }
+  private _markings?:
+    | [marking, marking, marking, marking, marking, marking]
+    | [marking, marking, marking, marking]
+  public get markings():
+    | [marking, marking, marking, marking, marking, marking]
+    | [marking, marking, marking, marking]
+    | undefined {
+    return this._markings;
+  }
+  public set markings(
+    value:
+      | [marking, marking, marking, marking, marking, marking]
+      | [marking, marking, marking, marking]
+      | undefined
+  ) {
+    console.log("setting markings", value)
+    this._markings = value;
+  }
 
   private _favorite: boolean = false;
   public get favorite(): boolean {
@@ -129,14 +147,37 @@ export class pkm {
   public set favorite(value: boolean) {
     this._favorite = value;
   }
+  private _circleMarking?: marking | undefined;
+  public get circleMarking(): marking | undefined {
+    return this._circleMarking;
+  }
+  public set circleMarking(value: marking | undefined) {
+    this._circleMarking = value;
+  }
+  private _squareMarking?: marking | undefined;
+  public get squareMarking(): marking | undefined {
+    return this._squareMarking;
+  }
+  public set squareMarking(value: marking | undefined) {
+    this._squareMarking = value;
+  }
+  private _triangleMarking?: marking | undefined;
+  public get triangleMarking(): marking | undefined {
+    return this._triangleMarking;
+  }
+  public set triangleMarking(value: marking | undefined) {
+    this._triangleMarking = value;
+  }
+  private _heartMarking?: marking | undefined;
+  public get heartMarking(): marking | undefined {
+    return this._heartMarking;
+  }
+  public set heartMarking(value: marking | undefined) {
+    this._heartMarking = value;
+  }
+  public starMarking?: marking;
+  public diamondMarking?: marking;
 
-  private _markings: number = 0;
-  public get markings(): number {
-    return this._markings;
-  }
-  public set markings(value: number) {
-    this._markings = value;
-  }
   private _nature?: number | undefined;
   public get nature(): number | undefined {
     return this._nature;
@@ -743,17 +784,16 @@ export class pkm {
     this._unknownF3 = value;
   }
 
-  constructor(bytes: Uint8Array) {
-    this.bytes = bytes;
+  constructor(arg: any) {
+    if (arg instanceof Uint8Array) {
+      this.bytes = arg;
+    } else if (arg instanceof pkm) {
+    }
   }
 
   getLevel() {
     return 1;
   }
-
-  getMarking: (index: number) => number = (index: number) => {
-    return (this.markings >> index) & 1;
-  };
 
   getPokerusDays() {
     return this.pokerusByte & 0xf;
@@ -811,3 +851,22 @@ export interface contestStats {
   tough: number;
   sheen: number;
 }
+
+interface markingsFourShapes {
+  circle: boolean;
+  square: boolean;
+  triangle: boolean;
+  heart: boolean;
+}
+
+interface markingsSixShapes {
+  circle: boolean;
+  square: boolean;
+  triangle: boolean;
+  heart: boolean;
+  star: boolean;
+  diamond: boolean;
+}
+
+// 1 = blue/black, 2 = red
+export type marking = 0 | 1 | 2;

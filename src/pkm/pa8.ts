@@ -1,8 +1,8 @@
-import { Abilities } from "../consts/Abilities";
-import { Items } from "../consts/Items";
-import { Languages } from "../consts/Languages";
-import { Gen9Ribbons } from "../consts/Ribbons";
-import { getMetLocation } from "../renderer/MetLocation/MetLocation";
+import { Abilities } from '../consts/Abilities';
+import { Items } from '../consts/Items';
+import { Languages } from '../consts/Languages';
+import { Gen9Ribbons } from '../consts/Ribbons';
+import { getMetLocation } from '../renderer/MetLocation/MetLocation';
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -10,12 +10,12 @@ import {
   setFlag,
   uint16ToBytesLittleEndian,
   uint32ToBytesLittleEndian,
-} from "../renderer/util/ByteLogic";
-import { getLevelGen3Onward } from "../renderer/util/StatCalc";
+} from '../util/ByteLogic';
+import { getLevelGen3Onward } from '../util/StatCalc';
 import {
   utf16BytesToString,
   utf16StringToBytes,
-} from "../renderer/util/Strings/StringConverter";
+} from '../util/Strings/StringConverter';
 import {
   contestStats,
   hyperTrainStats,
@@ -23,13 +23,13 @@ import {
   pkm,
   pokedate,
   stats,
-} from "./pkm";
-import { writeIVsToBuffer } from "./util";
+} from './pkm';
+import { writeIVsToBuffer } from './util';
 
 export class pa8 extends pkm {
   static fileSize = 376;
   public get format() {
-    return "pa8";
+    return 'pa8';
   }
   public get encryptionConstant() {
     return bytesToUint32LittleEndian(this.bytes, 0x00);
@@ -284,10 +284,10 @@ export class pa8 extends pkm {
     this.bytes.set(uint16ToBytesLittleEndian(value), 0x3e);
   }
   public get sociability() {
-    return bytesToUint32LittleEndian(this.bytes, 0x48)
+    return bytesToUint32LittleEndian(this.bytes, 0x48);
   }
   public set sociability(value: number) {
-    this.bytes.set(uint32ToBytesLittleEndian(value), 0x48)
+    this.bytes.set(uint32ToBytesLittleEndian(value), 0x48);
   }
   public get height() {
     return this.bytes[0x50];
@@ -381,9 +381,9 @@ export class pa8 extends pkm {
       hp: ivBytes & 0x1f,
       atk: (ivBytes >> 5) & 0x1f,
       def: (ivBytes >> 10) & 0x1f,
-      spa: (ivBytes >> 15) & 0x1f,
-      spd: (ivBytes >> 20) & 0x1f,
-      spe: (ivBytes >> 25) & 0x1f,
+      spe: (ivBytes >> 15) & 0x1f,
+      spa: (ivBytes >> 20) & 0x1f,
+      spd: (ivBytes >> 25) & 0x1f,
     };
   }
   public set ivs(value: stats) {

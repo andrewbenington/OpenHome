@@ -1,6 +1,10 @@
+import { SaveType } from '../renderer/types/types';
 import { MONS_LIST } from '../consts/Mons';
 import Types from '../consts/Types';
-import { writeUint32ToBuffer } from '../renderer/util/ByteLogic';
+import { bytesToString, writeUint32ToBuffer } from '../util/ByteLogic';
+import { pk3 } from './pk3';
+import { pk4 } from './pk4';
+import { pk5 } from './pk5';
 import { pkm, stats, statsPreSplit } from './pkm';
 
 export const writeIVsToBuffer = (
@@ -27,7 +31,6 @@ export const getAbilityFromNumber = (
   formNum: number,
   abilityNum: number
 ) => {
-  console.log("ability from number", !MONS_LIST[dexNum]?.formes[formNum])
   if (!MONS_LIST[dexNum]?.formes[formNum]) {
     return 'None';
   }
@@ -42,7 +45,7 @@ export const getAbilityFromNumber = (
       MONS_LIST[dexNum].formes[formNum].ability1
     );
   } else {
-    return MONS_LIST[dexNum].formes[formNum].ability1
+    return MONS_LIST[dexNum].formes[formNum].ability1;
   }
 };
 
@@ -103,4 +106,41 @@ export const generateIVs = () => {
     spd: Math.round(Math.random() * 31),
     spe: Math.round(Math.random() * 31),
   };
+};
+
+export const generatePersonalityValue = () => {
+  return Math.floor(Math.random() * Math.pow(2, 32));
+};
+
+export const convertPKMForSaveType = (
+  saveType: SaveType,
+  mon: pkm
+): pkm | undefined => {
+  switch (saveType) {
+    // case (SaveType.DPPt, SaveType.HGSS):
+    //   return new pk4(mon);
+    case (SaveType.RS, SaveType.FRLG, SaveType.E):
+      return new pk3(mon);
+    // case SaveType.G5:
+    //   return new pk5(mon);
+  }
+};
+
+export const getMonFileIdentifier = (mon: pkm) => {
+  if (mon.personalityValue) {
+    return `${mon.dexNum}-${bytesToString(mon.trainerID, 2).concat(
+      bytesToString(mon.secretID, 2)
+    )}-${bytesToString(mon.personalityValue, 4)}-${bytesToString(
+      mon.gameOfOrigin,
+      1
+    )}`;
+  }
+};
+
+export const formatHasColorMarkings = (format: string) => {
+  return (
+    (format.charAt(0) === 'p' &&
+      ['7', '8', '9'].includes(format.charAt(format.length - 1))) ||
+    format === 'ohpkm'
+  );
 };
