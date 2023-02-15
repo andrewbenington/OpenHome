@@ -14,9 +14,15 @@ import { autoUpdater } from 'electron-updater';
 import fs from 'fs';
 import _ from 'lodash';
 import path from 'path';
-import writePKMToFile from '../util/writePKMToFile';
+import writePKMToFile from './writePKMToFile';
+import {
+  initializeFolders,
+  readFileFromPath,
+  selectFile,
+} from './fileHandlers';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
+import { loadOHPKMs } from './loadOHPKMs';
 
 class AppUpdater {
   constructor() {
@@ -34,53 +40,46 @@ ipcMain.on('ipc-example', async (event, arg) => {
   event.reply('ipc-example', msgTemplate('pong'));
 });
 
-ipcMain.on(
-  'upload-pkm',
-  async (event, data: { bytes: Uint8Array; format: string }) => {
-    console.log(`bytes: ${data.bytes}`);
-    console.log(`format: ${data.format}`);
+ipcMain.on('write-ohpkm', async (event, bytes: Uint8Array) => {
+  writePKMToFile(bytes, 'ohpkm');
+});
 
-    if (data.format !== 'ohpkm') {
-      writePKMToFile(data.bytes, data.format);
-    }
-  }
-);
+ipcMain.on('load-all-ohpkm', async (event) => {
+  event.reply('all-ohpkm-loaded', { msg: 'test' });
+});
 
 ipcMain.on('read-home-data', async (event, arg) => {
   console.log('read-home-data', arg);
   const appDataPath = app.getPath('appData');
-  if (!fs.existsSync(`${appDataPath}/open-home/storage/boxes`)) {
-    _.range(24).forEach((boxNum) =>
-      fs.mkdirSync(
-        `${appDataPath}/open-home/storage/boxes/box${boxNum
-          .toString()
-          .padStart(2, '0')}`,
-        { recursive: true }
-      )
-    );
-  }
-  if (!fs.existsSync(`${appDataPath}/open-home/storage/mons`)) {
-    fs.mkdirSync(appDataPath, { recursive: true });
-  }
-  fs.opendir('../', (err, dir) => {
-    if (err) console.log('Error:', err);
-    else {
-      // Print the pathname of the directory
-      console.log('\nPath of the directory:', dir.path);
-
-      // Read the files in the directory
-      // as fs.Dirent objects
-      console.log('First Dirent:', dir.readSync());
-      console.log('Next Dirent:', dir.readSync());
-      console.log('Next Dirent:', dir.readSync());
-      console.log(`appData${app.getPath('appData')}`);
-      dir.closeSync();
-    }
-  });
-  const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
-  console.log(msgTemplate('HOMEDATA'));
-  event.reply('home-data-read', { msg: 'test' });
+  initializeFolders(appDataPath);
+  const byteMap = loadOHPKMs();
+  event.reply('home-data-read', { byteMap });
 });
+
+ipcMain.on('read-save-file', async (event, arg) => {
+  console.log('select-save-file', arg);
+  const filePaths = await selectFile();
+  if (filePaths) {
+    const fileBytes = readFileFromPath(filePaths[0]);
+    event.reply('save-file-read', { path: filePaths[0], fileBytes });
+  } else {
+    event.reply('save-file-read', { path: undefined, fileBytes: undefined });
+  }
+});
+
+ipcMain.on('write-save-file', async (event, { bytes, path }) => {
+  console.log('writing', path);
+  fs.writeFileSync(path, bytes);
+  // const appDataPath = app.getPath('appData');
+  // const filePaths = await selectFile();
+  // if (filePaths) {
+  //   const fileBytes = readFileFromPath(filePaths[0]);
+  //   event.reply('save-file-read', { path: filePaths[0], fileBytes });
+  // } else {
+  //   event.reply('save-file-read', { path: undefined, fileBytes: undefined });
+  // }
+});
+
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
   sourceMapSupport.install();

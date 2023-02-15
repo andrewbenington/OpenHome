@@ -1,21 +1,12 @@
-import { pk5 } from "../../pkm/pk5";
-import {
-  bytesToUint16LittleEndian,
-  bytesToUint32LittleEndian,
-} from "../util/ByteLogic";
-import { Box, SAV } from "./SAV";
+import { pk5 } from '../pkm/pk5';
+import { bytesToUint16LittleEndian } from '../util/ByteLogic';
+import { Box, BoxCoordinates, SAV } from './SAV';
 
-export class G5SAV implements SAV {
+export class G5SAV extends SAV {
   static PC_OFFSET = 0x400;
-  money: number = -1;
-  name: string = "";
-  tid: number = 0;
-  sid: number = 0;
-  currentPCBox: number = 0;
-  boxNames: string[];
-  boxes: Array<Box> = Array(24);
-  constructor(bytes: Uint8Array) {
-    this.boxNames = [];
+  constructor(path: string, bytes: Uint8Array) {
+    super(path, bytes)
+    this.boxes = Array(24)
     for (let box = 0; box < 24; box++) {
       let charArray = new Uint16Array(20);
       for (let i = 0; i < 20; i += 1) {
@@ -25,7 +16,7 @@ export class G5SAV implements SAV {
         }
         charArray[i] = value;
       }
-      this.boxes[box] = new G5Box(new TextDecoder("utf-16").decode(charArray));
+      this.boxes[box] = new G5Box(new TextDecoder('utf-16').decode(charArray));
     }
 
     for (let box = 0; box < 24; box++) {

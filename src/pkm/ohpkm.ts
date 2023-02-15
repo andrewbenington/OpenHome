@@ -1,8 +1,10 @@
+import { assert } from 'console';
+import { uniq } from 'lodash';
 import { Abilities } from '../consts/Abilities';
 import { Items } from '../consts/Items';
 import { Languages } from '../consts/Languages';
 import { MONS_LIST } from '../consts/Mons';
-import { Gen9Ribbons, OpenHomeRibbons } from '../consts/Ribbons';
+import { OpenHomeRibbons } from '../consts/Ribbons';
 import { getMetLocation } from '../renderer/MetLocation/MetLocation';
 import {
   bytesToUint16LittleEndian,
@@ -11,19 +13,20 @@ import {
   setFlag,
   uint16ToBytesLittleEndian,
   uint32ToBytesLittleEndian,
-} from '../renderer/util/ByteLogic';
+} from '../util/ByteLogic';
 import {
   getHPGen3Onward,
   getLevelGen3Onward,
   getStatGen3Onward,
-} from '../renderer/util/StatCalc';
+} from '../util/StatCalc';
 import {
   utf16BytesToString,
   utf16StringToBytes,
-} from '../renderer/util/Strings/StringConverter';
+} from '../util/Strings/StringConverter';
 import {
   contestStats,
   hyperTrainStats,
+  marking,
   memory,
   pkm,
   pokedate,
@@ -32,7 +35,9 @@ import {
 } from './pkm';
 import {
   dvsFromIVs,
+  formatHasColorMarkings,
   generateIVs,
+  generatePersonalityValue,
   generateTeraType,
   getAbilityFromNumber,
   gvsFromIVs,
@@ -42,6 +47,151 @@ import {
 
 class OHPKM extends pkm {
   static fileSize = 376;
+
+  constructor(...args: any[]) {
+    if (args[0] instanceof Uint8Array) {
+      super(args[0]);
+    } else if (args[0] instanceof pkm) {
+      const other = args[0];
+      super(new Uint8Array(420));
+      this.sanity = other.sanity;
+      this.dexNum = other.dexNum;
+      this.heldItem = other.heldItem;
+      this.trainerID = other.trainerID;
+      this.secretID = other.secretID;
+      this.exp = other.exp;
+      this.abilityNum = other.abilityNum;
+      this.ability = getAbilityFromNumber(
+        this.dexNum,
+        this.formNum,
+        this.abilityNum
+      );
+      console.log(other.markings);
+      other.markings?.forEach((value, index) => {
+        let temp = this.markings;
+        temp[index] = value;
+        this.markings = temp;
+      });
+      this.alphaMove = other.alphaMove ?? 0;
+      this.personalityValue =
+        other.personalityValue ?? generatePersonalityValue();
+      this.encryptionConstant =
+        other.encryptionConstant ??
+        other.personalityValue ??
+        generatePersonalityValue();
+      console.log(
+        this.nature,
+        typeof other,
+        other.nature,
+        this.personalityValue % 25
+      );
+      this.nature = other.nature ?? this.personalityValue % 25;
+      this.statNature = other.statNature ?? this.nature;
+      this.isFatefulEncounter = other.isFatefulEncounter;
+      this.flag2LA = other.flag2LA ?? false;
+      this.gender = other.gender;
+      this.formNum = other.formNum;
+      this.evs = other.evs ?? { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 };
+      this.contest = other.contest;
+      this.pokerusByte = other.pokerusByte;
+      this.contestMemoryCount = other.contestMemoryCount;
+      this.battleMemoryCount = other.battleMemoryCount;
+      // handle ribbons
+      this.ribbons = other.ribbons;
+      this.sociability = other.sociability ?? 0;
+      this.height = other.height;
+      this.weight = other.weight;
+      this.scale = other.scale;
+      this.moves = other.moves;
+      this.movePP = other.movePP;
+      this.nickname = other.nickname;
+      this.avs = other.avs;
+      this.movePPUps = other.movePPUps;
+      this.relearnMoves = other.relearnMoves ?? [0, 0, 0, 0];
+      this.currentHP = other.currentHP;
+      if (other.ivs) {
+        this.ivs = other.ivs;
+      } else if (other.dvs) {
+        this.ivs = ivsFromDVs(other.dvs);
+      } else {
+        this.ivs = generateIVs();
+      }
+      this.isEgg = other.isEgg;
+      this.isNicknamed = other.isNicknamed;
+      this.teraTypeOriginal =
+        other.teraTypeOriginal ??
+        generateTeraType(this.dexNum, this.formNum) ??
+        0;
+      this.teraTypeOverride = other.teraTypeOverride ?? 0x13;
+      this.statusCondition = other.statusCondition;
+      this.unknownA0 = other.unknownA0 ?? 0;
+      this.gvs = other.gvs ?? gvsFromIVs(this.ivs);
+      this.dvs = other.dvs ?? dvsFromIVs(this.ivs);
+      this.heightAbsoluteBytes = other.heightAbsoluteBytes ?? new Uint8Array(4);
+      this.weightAbsoluteBytes = other.weightAbsoluteBytes ?? new Uint8Array(4);
+      this.handlerName = other.handlerName ?? '';
+      // this.handlerGender
+      this.handlerLanguage = other.handlerLanguage ?? 'ENG';
+      this.isCurrentHandler = other.isCurrentHandler;
+      this.handlerID = other.handlerID ?? 0;
+      this.handlerFriendship = 0;
+      this.handlerMemory = other.handlerMemory ?? {
+        memory: 0,
+        intensity: 0,
+        textVariables: 0,
+        feeling: 0,
+      };
+      // this.superTraining
+      this.fullness = other.fullness ?? 0;
+      this.enjoyment = other.enjoyment ?? 0;
+      this.gameOfOrigin = other.gameOfOrigin;
+      this.gameOfOriginBattle = other.gameOfOriginBattle;
+      // this.region
+      // this.consoleRegion
+      this.language = other.languageIndex === 0 ? 'ENG' : other.language;
+      this.unknownF3 = other.unknownF3 ?? 0;
+      this.formArgument = other.formArgument ?? 0;
+      this.affixedRibbon = other.affixedRibbon ?? 0;
+      // this.geoRegions, this.geoCountries
+      // this.distByte
+      // this.groundTile
+      this.trainerName = other.trainerName;
+      this.trainerFriendship = other.trainerFriendship;
+      this.trainerMemory = other.trainerMemory ?? {
+        memory: 0,
+        intensity: 0,
+        textVariables: 0,
+        feeling: 0,
+      };
+      this.eggDate = other.eggDate ?? { month: 0, day: 0, year: 0 };
+      this.metDate = other.metDate ?? { month: 1, day: 1, year: 2000 };
+      this.ball = other.ball ?? 4;
+      this.eggLocationIndex = other.eggLocationIndex;
+      this.metLocationIndex = other.metLocationIndex;
+      this.metLevel = other.metLevel ?? this.level;
+      this.trainerGender = other.trainerGender;
+      this.hyperTraining = other.hyperTraining ?? {
+        hp: false,
+        atk: false,
+        def: false,
+        spa: false,
+        spd: false,
+        spe: false,
+      };
+      this.homeTracker = other.homeTracker ?? new Uint8Array(8);
+
+      this.evsG12 = other.evsG12 ?? { hp: 0, atk: 0, def: 0, spc: 0, spe: 0 };
+      this.ability =
+        (this.abilityNum === 1
+          ? MONS_LIST[this.dexNum]?.formes[this.formNum]?.ability1
+          : this.abilityNum === 2
+          ? MONS_LIST[this.dexNum]?.formes[this.formNum]?.ability2
+          : MONS_LIST[this.dexNum]?.formes[this.formNum]?.abilityH) ?? 'None';
+      this.abilityIndex = Abilities.indexOf(this.ability);
+    } else {
+      super(new Uint8Array());
+    }
+  }
 
   public get format() {
     return 'ohpkm';
@@ -76,9 +226,7 @@ class OHPKM extends pkm {
   }
 
   public set dexNum(value: number) {
-    console.log(uint16ToBytesLittleEndian(value));
     this.bytes.set(uint16ToBytesLittleEndian(value), 0x8);
-    console.log(this.bytes.slice(0, 16));
   }
 
   public get heldItemIndex() {
@@ -114,10 +262,6 @@ class OHPKM extends pkm {
 
   public set secretID(value: number) {
     this.bytes.set(uint16ToBytesLittleEndian(value), 0x0e);
-  }
-
-  public get displayID() {
-    return bytesToUint32LittleEndian(this.bytes, 0x0c) % 1000000;
   }
 
   public get exp() {
@@ -192,11 +336,27 @@ class OHPKM extends pkm {
   }
 
   public get markings() {
-    return bytesToUint16LittleEndian(this.bytes, 0x18);
+    const markingsValue = bytesToUint16LittleEndian(this.bytes, 0x18);
+    return [
+      markingsValue & 3,
+      (markingsValue >> 2) & 3,
+      (markingsValue >> 4) & 3,
+      (markingsValue >> 6) & 3,
+      (markingsValue >> 8) & 3,
+      (markingsValue >> 10) & 3,
+    ] as any as [marking, marking, marking, marking, marking, marking];
   }
 
-  public set markings(value: number) {
-    this.bytes.set(uint16ToBytesLittleEndian(value), 0x18);
+  public set markings(
+    value: [marking, marking, marking, marking, marking, marking]
+  ) {
+    let markingsValue = 0;
+    for (let i = 0; i < 6; i++) {
+      let shift = i * 2;
+      markingsValue =
+        (markingsValue & (0xffff ^ (3 << shift))) | (value[i] << shift);
+    }
+    this.bytes.set(uint16ToBytesLittleEndian(markingsValue), 0x18);
   }
 
   public get alphaMove() {
@@ -360,7 +520,6 @@ class OHPKM extends pkm {
         setFlag(this.bytes, 0x36, index, true);
       }
     });
-    console.log("ribbons: ", value, this.ribbonBytes)
   }
 
   public get sociability() {
@@ -696,6 +855,12 @@ class OHPKM extends pkm {
     this.bytes[0xef] = value;
   }
 
+  public get displayID() {
+    return this.gameOfOrigin < 30
+      ? this.trainerID
+      : bytesToUint32LittleEndian(this.bytes, 0x0c) % 1000000;
+  }
+
   public get languageIndex() {
     return this.bytes[0xf2];
   }
@@ -749,7 +914,6 @@ class OHPKM extends pkm {
 
   public set trainerName(value: string) {
     const utfBytes = utf16StringToBytes(value, 12);
-    console.log(utfBytes);
     this.bytes.set(utfBytes, 0x110);
   }
 
@@ -984,139 +1148,30 @@ class OHPKM extends pkm {
     );
   }
 
-  constructor(...args: any[]) {
-    if (args[0] instanceof Uint8Array) {
-      super(args[0]);
-    } else if (args[0] instanceof pkm) {
-      const other = args[0];
-      console.log('here 0');
-      super(new Uint8Array(420));
-      console.log('here 1');
-      this.encryptionConstant =
-        other.encryptionConstant ?? other.personalityValue;
-      this.sanity = other.sanity;
-      this.dexNum = other.dexNum;
-      this.heldItem = other.heldItem;
-      this.trainerID = other.trainerID;
-      this.secretID = other.secretID;
-      this.exp = other.exp;
-      this.abilityNum = other.abilityNum;
-      this.ability = getAbilityFromNumber(
-        this.dexNum,
-        this.formNum,
-        this.abilityNum
-      );
-      this.markings = other.markings;
-      this.alphaMove = other.alphaMove ?? 0;
-      this.personalityValue = other.personalityValue;
-      this.nature = other.nature ?? this.personalityValue % 25;
-      this.statNature = other.statNature ?? this.nature;
-      this.isFatefulEncounter = other.isFatefulEncounter;
-      this.flag2LA = other.flag2LA ?? false;
-      this.gender = other.gender;
-      this.formNum = other.formNum;
-      this.evs = other.evs ?? { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 };
-      this.contest = other.contest;
-      this.pokerusByte = other.pokerusByte;
-      this.contestMemoryCount = other.contestMemoryCount;
-      this.battleMemoryCount = other.battleMemoryCount;
-      // handle ribbons
-      this.ribbons = other.ribbons
-      this.sociability = other.sociability ?? 0;
-      this.height = other.height;
-      this.weight = other.weight;
-      this.scale = other.scale;
-      this.moves = other.moves;
-      this.movePP = other.movePP;
-      this.nickname = other.nickname;
-      this.avs = other.avs;
-      this.movePPUps = other.movePPUps;
-      this.relearnMoves = other.relearnMoves ?? [0, 0, 0, 0];
-      this.currentHP = other.currentHP;
-      console.log(other.ivs, other.dvs, other.gvs);
-      if (other.ivs) {
-        this.ivs = other.ivs;
-      } else if (other.dvs) {
-        this.ivs = ivsFromDVs(other.dvs);
+  public updateData(other: pkm) {
+    if (other.evs) {
+      this.evs = other.evs;
+    }
+    if (other.evsG12) {
+      this.evsG12 = other.evsG12;
+    }
+    if (other.ribbons) {
+      this.ribbons = uniq([...this.ribbons, ...other.ribbons]);
+    }
+    if (other.markings !== undefined) {
+      if (!formatHasColorMarkings(other.format)) {
+        for (let i = 0; i < other.markings.length; i++) {
+          this.markings[i] = (
+            other.markings[i] > 0
+              ? Math.max(this.markings[i], other.markings[i])
+              : 0
+          ) as marking;
+        }
       } else {
-        this.ivs = generateIVs();
+        other.markings.forEach((value, index) => {
+          this.markings[index] = value;
+        });
       }
-      this.isEgg = other.isEgg;
-      this.isNicknamed = other.isNicknamed;
-      this.teraTypeOriginal =
-        other.teraTypeOriginal ??
-        generateTeraType(this.dexNum, this.formNum) ??
-        0;
-      this.teraTypeOverride = other.teraTypeOverride ?? 0x13;
-      this.statusCondition = other.statusCondition;
-      this.unknownA0 = other.unknownA0 ?? 0;
-      console.log('here 5');
-      this.gvs = other.gvs ?? gvsFromIVs(this.ivs);
-      this.dvs = other.dvs ?? dvsFromIVs(this.ivs);
-      this.heightAbsoluteBytes = other.heightAbsoluteBytes ?? new Uint8Array(4);
-      this.weightAbsoluteBytes = other.weightAbsoluteBytes ?? new Uint8Array(4);
-      this.handlerName = other.handlerName ?? '';
-      // this.handlerGender
-      this.handlerLanguage = other.handlerLanguage ?? 'ENG';
-      this.isCurrentHandler = other.isCurrentHandler;
-      this.handlerID = other.handlerID ?? 0;
-      this.handlerFriendship = 0;
-      this.handlerMemory = other.handlerMemory ?? {
-        memory: 0,
-        intensity: 0,
-        textVariables: 0,
-        feeling: 0,
-      };
-      // this.superTraining
-      this.fullness = other.fullness ?? 0;
-      this.enjoyment = other.enjoyment ?? 0;
-      this.gameOfOrigin = other.gameOfOrigin;
-      this.gameOfOriginBattle = other.gameOfOriginBattle;
-      // this.region
-      // this.consoleRegion
-      this.language = other.language;
-      this.unknownF3 = other.unknownF3 ?? 0;
-      this.formArgument = other.formArgument ?? 0;
-      this.affixedRibbon = other.affixedRibbon ?? 0;
-      // this.geoRegions, this.geoCountries
-      // this.distByte
-      // this.groundTile
-      this.trainerName = other.trainerName;
-      this.trainerFriendship = other.trainerFriendship;
-      this.trainerMemory = other.trainerMemory ?? {
-        memory: 0,
-        intensity: 0,
-        textVariables: 0,
-        feeling: 0,
-      };
-      this.eggDate = other.eggDate ?? { month: 0, day: 0, year: 0 };
-      this.metDate = other.metDate ?? { month: 1, day: 1, year: 2000 };
-      this.ball = other.ball ?? 4;
-      this.eggLocationIndex = other.eggLocationIndex;
-      this.metLocationIndex = other.metLocationIndex;
-      this.metLevel = other.metLevel ?? this.level;
-      this.trainerGender = other.trainerGender;
-      this.hyperTraining = other.hyperTraining ?? {
-        hp: false,
-        atk: false,
-        def: false,
-        spa: false,
-        spd: false,
-        spe: false,
-      };
-      this.homeTracker = other.homeTracker ?? new Uint8Array(8);
-
-      this.evsG12 = other.evsG12 ?? { hp: 0, atk: 0, def: 0, spc: 0, spe: 0 };
-      console.log('here 6');
-      this.ability =
-        (this.abilityNum === 1
-          ? MONS_LIST[this.dexNum]?.formes[this.formNum]?.ability1
-          : this.abilityNum === 2
-          ? MONS_LIST[this.dexNum]?.formes[this.formNum]?.ability2
-          : MONS_LIST[this.dexNum]?.formes[this.formNum]?.abilityH) ?? 'None';
-      this.abilityIndex = Abilities.indexOf(this.ability);
-    } else {
-      super(new Uint8Array());
     }
   }
 }

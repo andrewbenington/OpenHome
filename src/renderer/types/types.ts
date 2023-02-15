@@ -1,31 +1,32 @@
 export type Dictionary = { [index: string]: any };
-export type Stat = "HP" | "Atk" | "Def" | "SpA" | "SpD" | "Spe" | "Sp";
+export type Stat = 'HP' | 'Atk' | 'Def' | 'SpA' | 'SpD' | 'Spe' | 'Sp';
 export type Type =
-  | "Fire"
-  | "Grass"
-  | "Electric"
-  | "Ghost"
-  | "Fairy"
-  | "Water"
-  | "Ice"
-  | "Rock"
-  | "Ground"
-  | "Flying"
-  | "Fighting"
-  | "Psychic"
-  | "Dark"
-  | "Bug"
-  | "Steel"
-  | "Poison"
-  | "Dragon"
-  | "Normal";
+  | 'Fire'
+  | 'Grass'
+  | 'Electric'
+  | 'Ghost'
+  | 'Fairy'
+  | 'Water'
+  | 'Ice'
+  | 'Rock'
+  | 'Ground'
+  | 'Flying'
+  | 'Fighting'
+  | 'Psychic'
+  | 'Dark'
+  | 'Bug'
+  | 'Steel'
+  | 'Poison'
+  | 'Dragon'
+  | 'Normal';
 export type levelUpType =
-  | "Slow"
-  | "Medium Slow"
-  | "Medium Fast"
-  | "Fast"
-  | "Erratic"
-  | "Fluctuating";
+  | 'Slow'
+  | 'Medium Slow'
+  | 'Medium Fast'
+  | 'Fast'
+  | 'Erratic'
+  | 'Fluctuating';
+  
 export enum SaveType {
   RS,
   FRLG,
@@ -35,7 +36,7 @@ export enum SaveType {
   G5,
 }
 
-export type RegionalForme = "Alola" | "Galar" | "Hisui" | "Paldea";
+export type RegionalForme = 'Alola' | 'Galar' | 'Hisui' | 'Paldea';
 export type Pokemon = {
   name: string;
   nationalDex: number;
@@ -88,12 +89,13 @@ export type Forme = {
   paradox: boolean;
   mythical: boolean;
   sprite: string;
+  spriteIndex: [number, number];
 };
 
 export type Move = {
   name: string;
   accuracy?: number;
-  class: "physical" | "status" | "special";
+  class: 'physical' | 'status' | 'special';
   generation: string;
   power?: number;
   pp?: number;

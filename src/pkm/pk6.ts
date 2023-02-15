@@ -1,23 +1,23 @@
-import { Abilities } from "../consts/Abilities";
-import { Items } from "../consts/Items";
-import { Languages } from "../consts/Languages";
-import { Gen9RibbonsPart1 } from "../consts/Ribbons";
-import { getMetLocation } from "../renderer/MetLocation/MetLocation";
+import { Abilities } from '../consts/Abilities';
+import { Items } from '../consts/Items';
+import { Languages } from '../consts/Languages';
+import { Gen9RibbonsPart1 } from '../consts/Ribbons';
+import { getMetLocation } from '../renderer/MetLocation/MetLocation';
+import {
+  bytesToUint16LittleEndian,
+  bytesToUint32LittleEndian,
+} from '../util/ByteLogic';
 import {
   getHPGen3Onward,
   getLevelGen3Onward,
-  getStatGen3Onward
-} from "../renderer/util/StatCalc";
-import {
-  bytesToUint16LittleEndian,
-  bytesToUint32LittleEndian
-} from "../renderer/util/ByteLogic";
-import { pkm } from "./pkm";
+  getStatGen3Onward,
+} from '../util/StatCalc';
+import { pkm } from './pkm';
 
 export class pk6 extends pkm {
   constructor(bytes: Uint8Array) {
     super(bytes);
-    this.format = "pk6";
+    this.format = 'pk6';
     this.encryptionConstant = bytesToUint32LittleEndian(bytes, 0x00);
     this.personalityValue = bytesToUint32LittleEndian(bytes, 0x18);
     this.dexNum = bytesToUint16LittleEndian(bytes, 0x08);
@@ -52,9 +52,9 @@ export class pk6 extends pkm {
       hp: ivBytes & 0x1f,
       atk: (ivBytes >> 5) & 0x1f,
       def: (ivBytes >> 10) & 0x1f,
-      spa: (ivBytes >> 15) & 0x1f,
-      spd: (ivBytes >> 20) & 0x1f,
-      spe: (ivBytes >> 25) & 0x1f,
+      spe: (ivBytes >> 15) & 0x1f,
+      spa: (ivBytes >> 20) & 0x1f,
+      spd: (ivBytes >> 25) & 0x1f,
     };
     this.evs = {
       hp: bytes[0x1e],
@@ -74,11 +74,11 @@ export class pk6 extends pkm {
     };
     this.stats = {
       hp: getHPGen3Onward(this),
-      atk: getStatGen3Onward("Atk", this),
-      def: getStatGen3Onward("Def", this),
-      spe: getStatGen3Onward("Spe", this),
-      spa: getStatGen3Onward("SpA", this),
-      spd: getStatGen3Onward("SpD", this),
+      atk: getStatGen3Onward('Atk', this),
+      def: getStatGen3Onward('Def', this),
+      spe: getStatGen3Onward('Spe', this),
+      spa: getStatGen3Onward('SpA', this),
+      spd: getStatGen3Onward('SpD', this),
     };
     this.gameOfOrigin = bytes[0xdf];
     let byteArray = new Uint16Array(12);
@@ -89,7 +89,7 @@ export class pk6 extends pkm {
       }
       byteArray[i] = byte;
     }
-    this.nickname = new TextDecoder("utf-16").decode(byteArray);
+    this.nickname = new TextDecoder('utf-16').decode(byteArray);
     byteArray = new Uint16Array(12);
     for (let i = 0; i < 12; i += 1) {
       let byte = bytesToUint16LittleEndian(bytes, 0xb0 + 2 * i);
@@ -98,7 +98,7 @@ export class pk6 extends pkm {
       }
       byteArray[i] = byte;
     }
-    this.trainerName = new TextDecoder("utf-16").decode(byteArray);
+    this.trainerName = new TextDecoder('utf-16').decode(byteArray);
     this.ribbons = [];
     for (let byte = 0; byte < 4; byte++) {
       let ribbonsUint8 = bytes[0x30 + byte];
@@ -112,21 +112,17 @@ export class pk6 extends pkm {
     this.eggYear = bytes[0xd1];
     this.eggMonth = bytes[0xd2];
     this.eggDay = bytes[0xd3];
+    this.eggLocationIndex = bytesToUint16LittleEndian(bytes, 0xd8);
     this.eggLocation =
-      getMetLocation(
-        this.gameOfOrigin,
-        bytesToUint16LittleEndian(bytes, 0xd8),
-        true
-      ) ?? bytesToUint16LittleEndian(bytes, 0xd8).toString();
+      getMetLocation(this.gameOfOrigin, this.eggLocationIndex) ??
+      this.metLocationIndex.toString();
     this.metYear = bytes[0xd4];
     this.metMonth = bytes[0xd5];
     this.metDay = bytes[0xd6];
+    this.metLocationIndex = bytesToUint16LittleEndian(bytes, 0xda);
     this.metLocation =
-      getMetLocation(
-        this.gameOfOrigin,
-        bytesToUint16LittleEndian(bytes, 0xda)
-      ) ?? bytesToUint16LittleEndian(bytes, 0xda).toString();
-
+      getMetLocation(this.gameOfOrigin, this.metLocationIndex) ??
+      this.metLocationIndex.toString();
     this.language = Languages[bytes[0xe3]];
     this.isShiny =
       (this.trainerID ^

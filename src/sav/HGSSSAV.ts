@@ -1,7 +1,7 @@
-import { pk4 } from "../../pkm/pk4";
-import { gen4StringToUTF } from "../util/Strings/StringConverter";
-import { bytesToUint16LittleEndian } from "../util/ByteLogic";
-import { G4Box, G4SAV } from "./G4SAV";
+import { pk4 } from '../pkm/pk4';
+import { bytesToUint16LittleEndian } from '../util/ByteLogic';
+import { gen4StringToUTF } from '../util/Strings/StringConverter';
+import { G4Box, G4SAV } from './G4SAV';
 
 export class HGSSSAV extends G4SAV {
   static TRAINER_OFFSET = 0x0ff4 * 0;
@@ -9,9 +9,8 @@ export class HGSSSAV extends G4SAV {
   static PC_OFFSET = 0xf700;
   static BOX_NAMES_OFFSET = 0x21708;
   static BOX_SIZE = 4080 + 0x10;
-  constructor(bytes: Uint8Array) {
-    super(bytes);
-    this.boxNames = [];
+  constructor(path: string, bytes: Uint8Array) {
+    super(path, bytes);
     for (let box = 0; box < 18; box++) {
       let charArray = new Uint16Array(20);
       let boxLabel = gen4StringToUTF(

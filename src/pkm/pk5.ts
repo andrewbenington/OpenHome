@@ -1,27 +1,43 @@
-import { Abilities } from "../consts/Abilities";
-import { Items } from "../consts/Items";
-import { Languages } from "../consts/Languages";
-import { Gen9RibbonsPart1 } from "../consts/Ribbons";
-import { getMetLocation } from "../renderer/MetLocation/MetLocation";
-import {
-  decryptByteArrayGen45,
-  unshuffleBlocksGen45,
-} from "../renderer/util/Encryption";
-import {
-  getHPGen3Onward,
-  getLevelGen3Onward,
-  getStatGen3Onward,
-} from "../renderer/util/StatCalc";
+import { Abilities } from '../consts/Abilities';
+import { Items } from '../consts/Items';
+import { Languages } from '../consts/Languages';
+import { Gen9RibbonsPart1 } from '../consts/Ribbons';
+import { getMetLocation } from '../renderer/MetLocation/MetLocation';
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
+  uint16ToBytesLittleEndian,
   writeUint16ToBuffer,
-  writeUint32ToBuffer,
-} from "../renderer/util/ByteLogic";
-import { pkm } from "./pkm";
+  writeUint32ToBuffer
+} from '../util/ByteLogic';
+import {
+  decryptByteArrayGen45,
+  unshuffleBlocksGen45
+} from '../util/Encryption';
+import {
+  getHPGen3Onward,
+  getLevelGen3Onward,
+  getStatGen3Onward
+} from '../util/StatCalc';
+import { pkm } from './pkm';
 
 export class pk5 extends pkm {
   static fileSize = 136;
+
+  public get metLocationIndex() {
+    return bytesToUint16LittleEndian(this.bytes, 0x80);
+  }
+
+  public set metLocationIndex(value: number) {
+    this.bytes.set(uint16ToBytesLittleEndian(value), 0x80);
+  }
+
+  public get metLocation() {
+    return (
+      getMetLocation(this.gameOfOrigin, this.metLocationIndex) ??
+      this.metLocationIndex.toString()
+    );
+  }
 
   constructor(bytes: Uint8Array, encrypted: boolean = false) {
     if (encrypted) {
@@ -31,7 +47,7 @@ export class pk5 extends pkm {
     } else {
       super(bytes);
     }
-    this.format = "pk5";
+    this.format = 'pk5';
     this.personalityValue = bytesToUint32LittleEndian(bytes, 0x00);
     this.dexNum = bytesToUint16LittleEndian(bytes, 0x08);
     this.exp = bytesToUint32LittleEndian(bytes, 0x10);
@@ -61,9 +77,9 @@ export class pk5 extends pkm {
       hp: ivBytes & 0x1f,
       atk: (ivBytes >> 5) & 0x1f,
       def: (ivBytes >> 10) & 0x1f,
-      spa: (ivBytes >> 15) & 0x1f,
-      spd: (ivBytes >> 20) & 0x1f,
-      spe: (ivBytes >> 25) & 0x1f,
+      spe: (ivBytes >> 15) & 0x1f,
+      spa: (ivBytes >> 20) & 0x1f,
+      spd: (ivBytes >> 25) & 0x1f,
     };
     this.evs = {
       hp: bytes[0x18],
@@ -84,11 +100,11 @@ export class pk5 extends pkm {
 
     this.stats = {
       hp: getHPGen3Onward(this),
-      atk: getStatGen3Onward("Atk", this),
-      def: getStatGen3Onward("Def", this),
-      spe: getStatGen3Onward("Spe", this),
-      spa: getStatGen3Onward("SpA", this),
-      spd: getStatGen3Onward("SpD", this),
+      atk: getStatGen3Onward('Atk', this),
+      def: getStatGen3Onward('Def', this),
+      spe: getStatGen3Onward('Spe', this),
+      spa: getStatGen3Onward('SpA', this),
+      spd: getStatGen3Onward('SpD', this),
     };
     this.isFatefulEncounter = !!(bytes[0x40] & 1);
     this.gender = (bytes[0x40] >> 1) & 0x3;
@@ -101,7 +117,7 @@ export class pk5 extends pkm {
       }
       charArray[i] = value;
     }
-    this.nickname = new TextDecoder("utf-16").decode(charArray);
+    this.nickname = new TextDecoder('utf-16').decode(charArray);
     charArray = new Uint16Array(12);
     for (let i = 0; i < 12; i += 1) {
       let uint16 = bytesToUint16LittleEndian(bytes, 0x68 + 2 * i);
@@ -110,7 +126,7 @@ export class pk5 extends pkm {
       }
       charArray[i] = uint16;
     }
-    this.trainerName = new TextDecoder("utf-16").decode(charArray);
+    this.trainerName = new TextDecoder('utf-16').decode(charArray);
     this.ribbons = [];
     for (let byte = 0; byte < 4; byte++) {
       let ribbonsUint8 = bytes[0x24 + byte];
@@ -124,11 +140,6 @@ export class pk5 extends pkm {
     this.metYear = bytes[0x7b];
     this.metMonth = bytes[0x7c];
     this.metDay = bytes[0x7d];
-    this.metLocation =
-      getMetLocation(
-        this.gameOfOrigin,
-        bytesToUint16LittleEndian(bytes, 0x80)
-      ) ?? bytesToUint16LittleEndian(bytes, 0x80).toString();
     this.isShiny =
       (this.trainerID ^
         this.secretID ^
