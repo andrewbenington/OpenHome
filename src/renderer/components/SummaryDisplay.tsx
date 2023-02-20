@@ -3,7 +3,7 @@ import { borderRadius } from '@mui/system';
 import { RibbonTitles } from 'consts/Ribbons';
 import OHPKM from 'pkm/OHPKM';
 import { PK2 } from 'pkm/PK2';
-import { getMonGen12Identifier } from 'pkm/util';
+import { getMonFileIdentifier, getMonGen12Identifier } from 'pkm/util';
 import { Balls } from '../../consts/Balls';
 import { getCharacteristic } from '../../consts/Characteristics';
 import { GameOfOriginData } from '../../consts/GameOfOrigin';
@@ -266,9 +266,7 @@ const SummaryDisplay = (props: { mon: pkm; updateMon: (mon: pkm) => void }) => {
             );
           })}
       </div>
-      {mon instanceof PK2 || mon instanceof OHPKM
-        ? getMonGen12Identifier(mon)
-        : ''}
+      {getMonFileIdentifier(mon)}
     </div>
   );
 };

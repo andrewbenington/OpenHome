@@ -1,12 +1,15 @@
 import { Button, Dialog, MenuItem, Select } from '@mui/material';
 import OHPKM from 'pkm/OHPKM';
+import { PK4 } from 'pkm/PK4';
 import { getMonFileIdentifier, getMonGen12Identifier } from 'pkm/util';
 import { useCallback, useEffect, useState } from 'react';
 import { G2SAV } from 'sav/G2SAV';
 import { G3SAV } from 'sav/G3SAV';
+import { HGSSSAV } from 'sav/HGSSSAV';
 import { BoxCoordinates, SAV } from 'sav/SAV';
 import { buildSaveFile, getSaveType } from 'sav/util';
 import { acceptableExtensions, bytesToPKM } from 'util/FileImport';
+import { utf16StringToGen4 } from 'util/Strings/StringConverter';
 import { pkm } from '../pkm/pkm';
 import { HomeData } from '../sav/HomeData';
 import HomeBoxDisplay from './components/HomeBoxDisplay';
@@ -15,6 +18,7 @@ import SaveDisplay from './components/SaveDisplay';
 import Themes, { OpenHomeTheme } from './Themes';
 import { SaveType } from './types/types';
 import {
+  handleDeleteOHPKM,
   handleMenuResetAndClose,
   handleMenuSave,
   readBoxData,
@@ -158,26 +162,74 @@ const Home = () => {
     });
   };
 
-  const onViewDrop: React.DragEventHandler<HTMLDivElement> = (e) => {
+  const onViewDrop = (e: any, type: string) => {
+    const processDroppedData = async (file: File) => {
+      let bytes = new Uint8Array(await file.arrayBuffer());
+      let [extension] = file.name.split('.').slice(-1);
+      if (acceptableExtensions.includes(`.${extension}`)) {
+        let mon = bytesToPKM(bytes, extension);
+        switch (type) {
+          case 'as is':
+            setSelectedMon(mon);
+            break;
+          case 'pk4':
+            setSelectedMon(new PK4(mon));
+            break;
+        }
+      } else {
+        console.log(`invalid extension: ${extension}`);
+      }
+    };
     let file = e.dataTransfer.files[0];
+    console.log(file, draggingSource);
     if (file) {
-      console.log(file)
+      console.log(file);
       processDroppedData(file);
+    } else {
+      if (draggingSource?.isHome) {
+        const mon =
+          homeData.boxes[draggingSource.box]?.pokemon[draggingSource.index];
+        if (mon && type === 'trash') {
+          changeHomeMon(draggingSource.box, draggingSource.index);
+          handleDeleteOHPKM(mon);
+        } else if (mon) {
+          switch (type) {
+            case 'as is':
+              setSelectedMon(mon);
+              break;
+            case 'pk4':
+              setSelectedMon(new PK4(mon));
+              break;
+          }
+        }
+      } else if (
+        draggingSource?.save !== undefined &&
+        draggingSource?.isHome === false
+      ) {
+        const mon =
+          saves[draggingSource.save]?.boxes[draggingSource.box]?.pokemon[
+            draggingSource.index
+          ];
+        if (mon && type === 'trash') {
+          changeSaveMon(
+            draggingSource.box,
+            draggingSource.index,
+            draggingSource.save
+          );
+          handleDeleteOHPKM(mon);
+        } else if (mon) {
+          switch (type) {
+            case 'as is':
+              setSelectedMon(mon);
+              break;
+            case 'pk4':
+              setSelectedMon(new PK4(mon));
+              break;
+          }
+        }
+      }
     }
     e.nativeEvent.preventDefault();
-  };
-
-  const processDroppedData = async (file: File) => {
-    let bytes = new Uint8Array(await file.arrayBuffer());
-    let [extension] = file.name.split('.').slice(-1);
-    if (acceptableExtensions.includes(`.${extension}`)) {
-      let mon = bytesToPKM(bytes, extension);
-      console.log(mon)
-      console.log(`accepting ${mon.dexNum} ${extension}`);
-      setSelectedMon(mon);
-    } else {
-      console.log(`invalid extension: ${extension}`);
-    }
   };
 
   const onImportMon = (
@@ -191,6 +243,7 @@ const Home = () => {
     }
     const homeMon = new OHPKM(importedMon);
     newSave.boxes[boxCoords.box].pokemon[boxCoords.index] = homeMon;
+    newSave.changedMons.push(boxCoords);
     const newSaves = saves;
     newSaves[saveIndex] = newSave;
     console.log('adding to changed list');
@@ -216,7 +269,11 @@ const Home = () => {
   const saveAllSaveFiles = () => {
     console.log(saves);
     saves.forEach((save) => {
-      if (save instanceof G3SAV || save instanceof G2SAV) {
+      if (
+        save instanceof G3SAV ||
+        save instanceof G2SAV ||
+        save instanceof HGSSSAV
+      ) {
         const changedMons = save.prepareBoxesForSaving();
         if (changedMons && save instanceof G2SAV) {
           const gen12LookupString = changedMons
@@ -428,34 +485,104 @@ const Home = () => {
           <PokemonDisplay mon={selectedMon} updateMon={() => {}} />
         )}
       </Dialog>
-      <button
-        type="button"
-        style={{
-          padding: 0,
-          width: '100%',
-          aspectRatio: 1,
-          backgroundColor: '#fff4',
-          position: 'relative',
-          border: 'none',
-          borderRadius: 2,
-          textAlign: 'center',
-        }}
-        //   disabled={!mon}
-      >
-        <div
-          draggable
+      <div style={{ display: 'flex', flex: 1 }}>
+        <button
+          type="button"
           style={{
-            cursor: 'grab',
-            height: '100%',
+            margin: 10,
+            height: 'calc(100% - 20px)',
             width: '100%',
+            backgroundColor: '#fff4',
+            position: 'relative',
+            border: 'none',
+            borderRadius: 4,
+            textAlign: 'center',
           }}
-          onDragOver={(e) => {
-            console.log('dragover')
-            e.preventDefault();
+          onClick={() => console.log(utf16StringToGen4('Starmie', 11, true))}
+          //   disabled={!mon}
+        >
+          <div
+            draggable
+            style={{
+              cursor: 'grab',
+              width: '100%',
+              height: '100%',
+              padding: 'auto',
+            }}
+            onDragOver={(e) => {
+              console.log('dragover');
+              e.preventDefault();
+            }}
+            onDrop={(e) => onViewDrop(e, 'as is')}
+          >
+            As Is
+          </div>
+        </button>
+        <button
+          type="button"
+          style={{
+            margin: 10,
+            height: 'calc(100% - 20px)',
+            width: '100%',
+            backgroundColor: '#fff4',
+            position: 'relative',
+            border: 'none',
+            borderRadius: 4,
+            textAlign: 'center',
           }}
-          onDrop={onViewDrop}
-        />
-      </button>
+          onClick={() => console.log(utf16StringToGen4('Starmie', 11, true))}
+          //   disabled={!mon}
+        >
+          <div
+            draggable
+            style={{
+              cursor: 'grab',
+              width: '100%',
+              height: '100%',
+              padding: 'auto',
+            }}
+            onDragOver={(e) => {
+              console.log('dragover');
+              e.preventDefault();
+            }}
+            onDrop={(e) => onViewDrop(e, 'pk4')}
+          >
+            PK4
+          </div>
+        </button>
+        <button
+          type="button"
+          style={{
+            margin: 10,
+            height: 'calc(100% - 20px)',
+            width: '100%',
+            backgroundColor: '#fff4',
+            position: 'relative',
+            border: 'none',
+            borderRadius: 4,
+            textAlign: 'center',
+          }}
+          onClick={() => console.log(utf16StringToGen4('Starmie', 11, true))}
+          //   disabled={!mon}
+        >
+          <div
+            draggable
+            style={{
+              cursor: 'grab',
+              width: '100%',
+              height: '100%',
+              padding: 'auto',
+            }}
+            onDragOver={(e) => {
+              console.log('dragover');
+              e.preventDefault();
+            }}
+            onDrop={(e) => onViewDrop(e, 'trash')}
+          >
+            TRASH
+          </div>
+        </button>
+      </div>
     </div>
   ) : (
     <div />

@@ -228,9 +228,11 @@ export const utf16StringToGen4 = (
   length: number,
   terminate: boolean
 ) => {
-  var bufView = new Uint16Array(length);
+  var buf = new ArrayBuffer(length * 2);
+  var bufView = new Uint16Array(buf);
   for (var i = 0; i < Math.min(str.length, length); i++) {
     let gen4Char = UTFToGen4Map[str.charCodeAt(i)];
+    console.log(str.charAt(i), str.charCodeAt(i), gen4Char)
     if (str.charCodeAt(i) === 0) {
       break;
     } else if (gen4Char === -1) {
@@ -244,7 +246,7 @@ export const utf16StringToGen4 = (
     let terminalIndex = Math.min(str.length, length - 1);
     bufView[terminalIndex] = 0xffff;
   }
-  return bufView;
+  return new Uint8Array(buf);
 };
 
 export const utf16BytesToString = (

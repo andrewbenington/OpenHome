@@ -110,7 +110,7 @@ class OHPKM extends pkm {
       this.pokerusByte = other.pokerusByte;
       this.contestMemoryCount = other.contestMemoryCount;
       this.battleMemoryCount = other.battleMemoryCount;
-      // handle ribbons
+      // TODO: handle ribbons
       this.ribbons = other.ribbons;
       this.sociability = other.sociability ?? 0;
       this.height = other.height;
@@ -118,9 +118,9 @@ class OHPKM extends pkm {
       this.scale = other.scale;
       this.moves = other.moves;
       this.movePP = other.movePP;
+      this.movePPUps = other.movePPUps;
       this.nickname = other.nickname;
       this.avs = other.avs;
-      this.movePPUps = other.movePPUps;
       this.relearnMoves = other.relearnMoves ?? [0, 0, 0, 0];
       this.currentHP = other.currentHP;
       if (other.ivs) {

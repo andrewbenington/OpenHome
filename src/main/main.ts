@@ -14,7 +14,7 @@ import { autoUpdater } from 'electron-updater';
 import fs from 'fs';
 import _ from 'lodash';
 import path from 'path';
-import writePKMToFile from './writePKMToFile';
+import writePKMToFile, { deleteOHPKMFile } from './writePKMToFile';
 import {
   initializeFolders,
   readBytesFromFile,
@@ -36,8 +36,11 @@ class AppUpdater {
 let mainWindow: BrowserWindow | null = null;
 
 ipcMain.on('write-ohpkm', async (event, bytes: Uint8Array) => {
-  console.log('write-ohpkm');
   writePKMToFile(bytes, 'ohpkm');
+});
+
+ipcMain.on('delete-ohpkm', async (event, fileName: string) => {
+  deleteOHPKMFile(fileName);
 });
 
 ipcMain.on('read-gen12-lookup', async (event) => {
@@ -83,7 +86,6 @@ ipcMain.on('read-home-box', async (event, boxName) => {
 
 ipcMain.on('write-home-box', async (event, { boxName, boxString }) => {
   const appDataPath = app.getPath('appData');
-  console.log('write-home-box', boxName);
   fs.writeFileSync(
     `${appDataPath}/open-home/storage/boxes/${boxName}.csv`,
     boxString
