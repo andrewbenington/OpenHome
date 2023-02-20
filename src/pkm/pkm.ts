@@ -1,4 +1,6 @@
 import { BigInteger } from 'big-integer';
+import { RibbonTitles } from 'consts/Ribbons';
+import { GameOfOrigin } from '../consts/GameOfOrigin';
 
 export class pkm {
   static markingCount = 4;
@@ -123,7 +125,7 @@ export class pkm {
   }
   private _markings?:
     | [marking, marking, marking, marking, marking, marking]
-    | [marking, marking, marking, marking]
+    | [marking, marking, marking, marking];
   public get markings():
     | [marking, marking, marking, marking, marking, marking]
     | [marking, marking, marking, marking]
@@ -136,7 +138,7 @@ export class pkm {
       | [marking, marking, marking, marking]
       | undefined
   ) {
-    console.log("setting markings", value)
+    console.log('setting markings', value);
     this._markings = value;
   }
 
@@ -374,7 +376,13 @@ export class pkm {
   public set ivs(value: stats | undefined) {
     this._ivs = value;
   }
-  dvs?: statsPreSplit;
+  private _dvs?: statsPreSplit | undefined;
+  public get dvs(): statsPreSplit | undefined {
+    return this._dvs;
+  }
+  public set dvs(value: statsPreSplit | undefined) {
+    this._dvs = value;
+  }
   private _isEgg: boolean = false;
   public get isEgg(): boolean {
     return this._isEgg;
@@ -483,6 +491,13 @@ export class pkm {
   public set handlerMemory(value: memory | undefined) {
     this._handlerMemory = value;
   }
+  private _shinyLeaves?: number | undefined;
+  public get shinyLeaves(): number | undefined {
+    return this._shinyLeaves;
+  }
+  public set shinyLeaves(value: number | undefined) {
+    this._shinyLeaves = value;
+  }
 
   private _fullness?: number | undefined;
   public get fullness(): number | undefined {
@@ -542,6 +557,33 @@ export class pkm {
     this._affixedRibbon = value;
   }
 
+  public get affixedRibbonTitle() {
+    return this.affixedRibbon ? RibbonTitles[this.affixedRibbon] : ''
+  }
+
+
+  // Gen4
+  private _groundTile?: number
+    // HGSS
+    | undefined;
+  public get groundTile(): number
+    // HGSS
+    | undefined {
+    return this._groundTile;
+  }
+  public set groundTile(value: number
+    // HGSS
+    | undefined) {
+    this._groundTile = value;
+  }
+  // HGSS
+  private _performance?: number | undefined;
+  public get performance(): number | undefined {
+    return this._performance;
+  }
+  public set performance(value: number | undefined) {
+    this._performance = value;
+  }
   private _trainerName: string = 'TRAINER';
   public get trainerName(): string {
     return this._trainerName;
@@ -605,18 +647,18 @@ export class pkm {
   public set eggLocationIndex(value: number) {
     this._eggLocationIndex = value;
   }
-  private _metLocation: string = 'a distant land';
-  public get metLocation(): string {
+  private _metLocation?: string;
+  public get metLocation(): string | undefined {
     return this._metLocation;
   }
-  public set metLocation(value: string) {
+  public set metLocation(value: string | undefined) {
     this._metLocation = value;
   }
-  private _metLocationIndex: number = 0;
-  public get metLocationIndex(): number {
+  private _metLocationIndex?: number;
+  public get metLocationIndex(): number | undefined {
     return this._metLocationIndex;
   }
-  public set metLocationIndex(value: number) {
+  public set metLocationIndex(value: number | undefined) {
     this._metLocationIndex = value;
   }
   private _ball?: number | undefined;
@@ -782,6 +824,13 @@ export class pkm {
   }
   public set unknownF3(value: number | undefined) {
     this._unknownF3 = value;
+  }
+
+  public get isGameBoy() {
+    return (
+      this.gameOfOrigin >= GameOfOrigin.Red &&
+      this.gameOfOrigin <= GameOfOrigin.Crystal
+    );
   }
 
   constructor(arg: any) {

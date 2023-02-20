@@ -1,4 +1,4 @@
-import { GameOfOrigin } from '../../consts/GameOfOrigin';
+import { GameOfOriginData } from '../../consts/GameOfOrigin';
 import { MONS_LIST } from '../../consts/Mons';
 import { pkm } from '../../pkm/pkm';
 import { natDexToSV } from '../../util/ConvertPokemonID';
@@ -280,9 +280,10 @@ export const getMonSprite = (mon: pkm, format: string) => {
   if (formeParts.length > 1) {
     formeName += `-${formeParts.slice(1).join('')}`;
   }
+  console.log(mon.format)
   if (format === 'ohpkm') {
     return getPokemonDBSprite(mon.dexNum, mon.formNum, mon.isShiny, 'home');
-  } else if (format === 'pk2') {
+  } else if (mon.format === 'pk2') {
     return getShowdownSprite(mon.dexNum, mon.formNum, mon.isShiny, 'gen2');
   } else if (format === 'xdpkm' || format === 'colopkm') {
     return `https://www.pokencyclopedia.info/sprites/spin-off/ani_xd${
@@ -290,12 +291,12 @@ export const getMonSprite = (mon: pkm, format: string) => {
     }/ani_xd${mon.isShiny ? '-S' : ''}_${mon.dexNum
       .toString()
       .padStart(3, '0')}.gif`;
-  } else if (format === 'pk3' || format === 'colopkm') {
+  } else if (format === 'PK3' || format === 'colopkm') {
     if (mon.dexNum === 201) {
       return getUnownSprite(mon.formNum, 3);
     }
     return getShowdownSprite(mon.dexNum, mon.formNum, mon.isShiny, 'gen3');
-  } else if (format === 'pk4') {
+  } else if (format === 'PK4') {
     return getShowdownSprite(mon.dexNum, mon.formNum, mon.isShiny, 'gen4');
   } else if (format === 'pk5') {
     return getShowdownSprite(mon.dexNum, mon.formNum, mon.isShiny, 'gen5ani');
@@ -366,8 +367,8 @@ export const getGameLogo = (
     return `/logos/GB.png`;
   } else {
     return `/logos/${
-      GameOfOrigin[gameOfOrigin]?.logo ??
-      GameOfOrigin[gameOfOrigin]?.name.split(' ').join('_')
+      GameOfOriginData[gameOfOrigin]?.logo ??
+      GameOfOriginData[gameOfOrigin]?.name.split(' ').join('_')
     }.png`;
   }
 };

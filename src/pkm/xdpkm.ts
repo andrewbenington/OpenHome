@@ -1,4 +1,4 @@
-import { GameOfOrigin } from '../consts/GameOfOrigin';
+import { GameOfOriginData } from '../consts/GameOfOrigin';
 import { Gen3Items } from '../consts/Items';
 import { GCLanguages } from '../consts/Languages';
 import { MONS_LIST } from '../consts/Mons';
@@ -78,8 +78,8 @@ export class xdpkm extends pkm {
       spa: getStatGen3Onward('SpA', this),
       spd: getStatGen3Onward('SpD', this),
     };
-    let origin = GameOfOrigin.find((game) => game?.gc === bytes[0x34]) ?? null;
-    this.gameOfOrigin = GameOfOrigin.indexOf(origin);
+    let origin = GameOfOriginData.find((game) => game?.gc === bytes[0x34]) ?? null;
+    this.gameOfOrigin = GameOfOriginData.indexOf(origin);
     let byteArray = new Uint16Array(12);
     for (let i = 0; i < 12; i += 1) {
       let byte = bytesToUint16BigEndian(bytes, 0x4e + 2 * i);

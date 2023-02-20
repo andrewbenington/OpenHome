@@ -8,7 +8,7 @@
  * When running `npm run build` or `npm run build:main`, this file is compiled to
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
-import { app, BrowserWindow, ipcMain, shell } from 'electron';
+import { app, BrowserWindow, ipcMain, Menu, MenuItem, shell } from 'electron';
 import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
 import fs from 'fs';
@@ -17,12 +17,13 @@ import path from 'path';
 import writePKMToFile from './writePKMToFile';
 import {
   initializeFolders,
-  readFileFromPath,
+  readBytesFromFile,
+  readStringFromFile,
   selectFile,
 } from './fileHandlers';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
-import { loadOHPKMs } from './loadOHPKMs';
+import { loadGen12Lookup, loadOHPKMs, registerGen12Lookup } from './loadData';
 
 class AppUpdater {
   constructor() {
@@ -34,33 +35,66 @@ class AppUpdater {
 
 let mainWindow: BrowserWindow | null = null;
 
-ipcMain.on('ipc-example', async (event, arg) => {
-  const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
-  console.log(msgTemplate(arg));
-  event.reply('ipc-example', msgTemplate('pong'));
-});
-
 ipcMain.on('write-ohpkm', async (event, bytes: Uint8Array) => {
+  console.log('write-ohpkm');
   writePKMToFile(bytes, 'ohpkm');
 });
 
-ipcMain.on('load-all-ohpkm', async (event) => {
-  event.reply('all-ohpkm-loaded', { msg: 'test' });
+ipcMain.on('read-gen12-lookup', async (event) => {
+  console.log('read-gen12-lookup');
+  const appDataPath = app.getPath('appData');
+  let lookupMap;
+  try {
+    lookupMap = loadGen12Lookup();
+  } catch (e) {
+    console.log('no gen12 lookup file');
+  }
+  event.reply('gen12-lookup-read', lookupMap);
 });
 
-ipcMain.on('read-home-data', async (event, arg) => {
-  console.log('read-home-data', arg);
+ipcMain.on('write-gen12-lookup', async (event, gen12LookupString) => {
+  console.log('write-gen12-lookup', gen12LookupString);
+  registerGen12Lookup(gen12LookupString);
+});
+
+ipcMain.on('read-home-data', async (event) => {
+  console.log('read-home-data');
   const appDataPath = app.getPath('appData');
   initializeFolders(appDataPath);
   const byteMap = loadOHPKMs();
-  event.reply('home-data-read', { byteMap });
+  event.reply('home-data-read', byteMap);
+});
+
+ipcMain.on('read-home-box', async (event, boxName) => {
+  console.log('read-home-box', boxName);
+  const appDataPath = app.getPath('appData');
+  const boxString = fs.readFileSync(
+    `${appDataPath}/open-home/storage/boxes/${boxName}.csv`,
+    {
+      encoding: 'utf8',
+    }
+  );
+  console.log(
+    `${appDataPath}/open-home/storage/boxes/${boxName}.csv`,
+    boxName
+  );
+  event.reply('home-box-read', boxString);
+});
+
+ipcMain.on('write-home-box', async (event, { boxName, boxString }) => {
+  const appDataPath = app.getPath('appData');
+  console.log('write-home-box', boxName);
+  fs.writeFileSync(
+    `${appDataPath}/open-home/storage/boxes/${boxName}.csv`,
+    boxString
+  );
 });
 
 ipcMain.on('read-save-file', async (event, arg) => {
   console.log('select-save-file', arg);
   const filePaths = await selectFile();
   if (filePaths) {
-    const fileBytes = readFileFromPath(filePaths[0]);
+    const fileBytes = readBytesFromFile(filePaths[0]);
     event.reply('save-file-read', { path: filePaths[0], fileBytes });
   } else {
     event.reply('save-file-read', { path: undefined, fileBytes: undefined });
@@ -70,14 +104,6 @@ ipcMain.on('read-save-file', async (event, arg) => {
 ipcMain.on('write-save-file', async (event, { bytes, path }) => {
   console.log('writing', path);
   fs.writeFileSync(path, bytes);
-  // const appDataPath = app.getPath('appData');
-  // const filePaths = await selectFile();
-  // if (filePaths) {
-  //   const fileBytes = readFileFromPath(filePaths[0]);
-  //   event.reply('save-file-read', { path: filePaths[0], fileBytes });
-  // } else {
-  //   event.reply('save-file-read', { path: undefined, fileBytes: undefined });
-  // }
 });
 
 if (process.env.NODE_ENV === 'production') {
@@ -136,6 +162,7 @@ const createWindow = async () => {
     if (!mainWindow) {
       throw new Error('"mainWindow" is not defined');
     }
+    setMainMenu();
     if (process.env.START_MINIMIZED) {
       mainWindow.minimize();
     } else {
@@ -146,9 +173,6 @@ const createWindow = async () => {
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
-
-  const menuBuilder = new MenuBuilder(mainWindow);
-  menuBuilder.buildMenu();
 
   // Open urls in the user's browser
   mainWindow.webContents.setWindowOpenHandler((edata) => {
@@ -164,6 +188,64 @@ const createWindow = async () => {
 /**
  * Add event listeners...
  */
+
+app;
+
+function setMainMenu() {
+  const template = [
+    {
+      label: 'OpenHome',
+      submenu: [
+        {
+          label: 'Preferences',
+          accelerator: 'CmdOrCtrl+P',
+          click() {
+            console.log('Oh, hi there!');
+          },
+        },
+      ],
+    },
+    {
+      label: 'File',
+      submenu: [
+        {
+          label: 'Save',
+          accelerator: 'CmdOrCtrl+S',
+          click() {
+            mainWindow?.webContents.send('save');
+          },
+        },
+        {
+          label: 'Reset',
+          accelerator: 'CmdOrCtrl+X',
+          click() {
+            mainWindow?.webContents.send('reset');
+          },
+        },
+        {
+          label: 'Reset And Close Saves',
+          accelerator: 'Shift+CmdOrCtrl+X',
+          click() {
+            mainWindow?.webContents.send('reset-close');
+          },
+        },
+      ],
+    },
+    {
+      label: 'Filter',
+      submenu: [
+        {
+          label: 'Hello',
+          accelerator: 'Shift+CmdOrCtrl+H',
+          click() {
+            console.log('Oh, hi there!');
+          },
+        },
+      ],
+    },
+  ];
+  Menu.setApplicationMenu(Menu.buildFromTemplate(template));
+}
 
 app.on('window-all-closed', () => {
   // Respect the OSX convention of having the application in memory even

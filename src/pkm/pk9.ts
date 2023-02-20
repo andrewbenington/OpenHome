@@ -150,4 +150,12 @@ export class pk9 extends pkm {
     //   return (this.markings >> (2 * index)) & 3;
     // };
   }
+
+  public get affixedRibbon() {
+    return this.bytes[0xd4] !== 0xff ? this.bytes[0xd4] : undefined;
+  }
+
+  public set affixedRibbon(value: number | undefined) {
+    this.bytes[0xd4] = value ?? 0xff
+  }
 }

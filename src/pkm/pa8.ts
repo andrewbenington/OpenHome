@@ -139,12 +139,6 @@ export class pa8 extends pkm {
   public set isNoble(value: boolean) {
     this.bytes[0x16] = (this.bytes[0x16] & ~64) | (value ? 64 : 0);
   }
-  public get markings() {
-    return bytesToUint16LittleEndian(this.bytes, 0x18);
-  }
-  public set markings(value: number) {
-    this.bytes.set(uint16ToBytesLittleEndian(value), 0x18);
-  }
   public get personalityValue() {
     return bytesToUint32LittleEndian(this.bytes, 0x1c);
   }
@@ -602,25 +596,25 @@ export class pa8 extends pkm {
   }
   public get eggDate() {
     return {
-      month: this.bytes[0x131],
-      day: this.bytes[0x132],
-      year: 2000 + this.bytes[0x133],
+      year: this.bytes[0x131],
+      month: this.bytes[0x132],
+      day: this.bytes[0x133],
     };
   }
   public set eggDate(value: pokedate) {
-    this.bytes[0x131] = value.year - 2000;
+    this.bytes[0x131] = value.year;
     this.bytes[0x132] = value.month;
     this.bytes[0x133] = value.day;
   }
   public get metDate() {
     return {
+      year: this.bytes[0x134],
       month: this.bytes[0x135],
-      day: this.bytes[0x134],
-      year: 2000 + this.bytes[0x136],
+      day: this.bytes[0x136],
     };
   }
   public set metDate(value: pokedate) {
-    this.bytes[0x134] = value.year - 2000;
+    this.bytes[0x134] = value.year;
     this.bytes[0x135] = value.month;
     this.bytes[0x136] = value.day;
   }
@@ -751,8 +745,6 @@ export class pa8 extends pkm {
     } else if (args[0] instanceof pkm) {
       const other = args[0];
       super(new Uint8Array(376));
-      this.encryptionConstant =
-        other.encryptionConstant ?? other.personalityValue;
     }
   }
 }

@@ -109,16 +109,20 @@ export class pk6 extends pkm {
         }
       }
     }
-    this.eggYear = bytes[0xd1];
-    this.eggMonth = bytes[0xd2];
-    this.eggDay = bytes[0xd3];
+    this.eggDate = {
+      day: bytes[0xd3],
+      month: bytes[0xd2],
+      year: bytes[0xd1],
+    };
     this.eggLocationIndex = bytesToUint16LittleEndian(bytes, 0xd8);
     this.eggLocation =
-      getMetLocation(this.gameOfOrigin, this.eggLocationIndex) ??
-      this.metLocationIndex.toString();
-    this.metYear = bytes[0xd4];
-    this.metMonth = bytes[0xd5];
-    this.metDay = bytes[0xd6];
+      getMetLocation(this.gameOfOrigin, this.eggLocationIndex, false, true) ??
+      this.eggLocationIndex.toString();
+    this.metDate = {
+      day: bytes[0xd6],
+      month: bytes[0xd5],
+      year: bytes[0xd4],
+    };
     this.metLocationIndex = bytesToUint16LittleEndian(bytes, 0xda);
     this.metLocation =
       getMetLocation(this.gameOfOrigin, this.metLocationIndex) ??

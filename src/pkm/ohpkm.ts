@@ -66,25 +66,39 @@ class OHPKM extends pkm {
         this.formNum,
         this.abilityNum
       );
-      console.log(other.markings);
-      other.markings?.forEach((value, index) => {
-        let temp = this.markings;
-        temp[index] = value;
-        this.markings = temp;
-      });
+      // console.log(other.markings);
+      // if (other.markings) {
+      //   other.markings?.forEach((value, index) => {
+      //     let temp = this.markings;
+      //     temp[index] = value;
+      //     this.markings = temp;
+      //   });
+      // }
+
+      console.log('after markings');
       this.alphaMove = other.alphaMove ?? 0;
-      this.personalityValue =
-        other.personalityValue ?? generatePersonalityValue();
+      if (other.personalityValue) {
+        this.personalityValue = other.personalityValue;
+      } else {
+        this.personalityValue = generatePersonalityValue();
+        if (other.dexNum === 201) {
+          this.personalityValue =
+            (this.personalityValue & 0xffffffe0) | other.formNum;
+        }
+        if (other.isShiny) {
+          let pvBytes = uint32ToBytesLittleEndian(this.personalityValue);
+          let pvLower16 = bytesToUint16LittleEndian(pvBytes, 0);
+          let pvUpper16 = pvLower16 ^ this.trainerID ^ this.secretID;
+          pvBytes.set(uint16ToBytesLittleEndian(pvUpper16), 2);
+          this.personalityValue = bytesToUint32LittleEndian(pvBytes, 0);
+        } else if (this.isShiny) {
+          this.personalityValue = this.personalityValue ^ 0x10000000;
+        }
+      }
       this.encryptionConstant =
         other.encryptionConstant ??
         other.personalityValue ??
         generatePersonalityValue();
-      console.log(
-        this.nature,
-        typeof other,
-        other.nature,
-        this.personalityValue % 25
-      );
       this.nature = other.nature ?? this.personalityValue % 25;
       this.statNature = other.statNature ?? this.nature;
       this.isFatefulEncounter = other.isFatefulEncounter;
@@ -126,7 +140,7 @@ class OHPKM extends pkm {
       this.statusCondition = other.statusCondition;
       this.unknownA0 = other.unknownA0 ?? 0;
       this.gvs = other.gvs ?? gvsFromIVs(this.ivs);
-      this.dvs = other.dvs ?? dvsFromIVs(this.ivs);
+      this.dvs = other.dvs ?? dvsFromIVs(this.ivs, other.isShiny);
       this.heightAbsoluteBytes = other.heightAbsoluteBytes ?? new Uint8Array(4);
       this.weightAbsoluteBytes = other.weightAbsoluteBytes ?? new Uint8Array(4);
       this.handlerName = other.handlerName ?? '';
@@ -142,6 +156,7 @@ class OHPKM extends pkm {
         feeling: 0,
       };
       // this.superTraining
+      this.shinyLeaves = other.shinyLeaves ?? 0;
       this.fullness = other.fullness ?? 0;
       this.enjoyment = other.enjoyment ?? 0;
       this.gameOfOrigin = other.gameOfOrigin;
@@ -154,7 +169,8 @@ class OHPKM extends pkm {
       this.affixedRibbon = other.affixedRibbon ?? 0;
       // this.geoRegions, this.geoCountries
       // this.distByte
-      // this.groundTile
+      this.groundTile = other.groundTile ?? 0;
+      this.performance = other.performance ?? 0;
       this.trainerName = other.trainerName;
       this.trainerFriendship = other.trainerFriendship;
       this.trainerMemory = other.trainerMemory ?? {
@@ -163,11 +179,16 @@ class OHPKM extends pkm {
         textVariables: 0,
         feeling: 0,
       };
-      this.eggDate = other.eggDate ?? { month: 0, day: 0, year: 0 };
-      this.metDate = other.metDate ?? { month: 1, day: 1, year: 2000 };
+      this.eggDate = other.eggDate;
+      let now = new Date();
+      this.metDate = other.metDate ?? {
+        month: now.getMonth(),
+        day: now.getDate(),
+        year: now.getFullYear() - 2000,
+      };
       this.ball = other.ball ?? 4;
       this.eggLocationIndex = other.eggLocationIndex;
-      this.metLocationIndex = other.metLocationIndex;
+      this.metLocationIndex = other.metLocationIndex ?? 0;
       this.metLevel = other.metLevel ?? this.level;
       this.trainerGender = other.trainerGender;
       this.hyperTraining = other.hyperTraining ?? {
@@ -179,7 +200,6 @@ class OHPKM extends pkm {
         spe: false,
       };
       this.homeTracker = other.homeTracker ?? new Uint8Array(8);
-
       this.evsG12 = other.evsG12 ?? { hp: 0, atk: 0, def: 0, spc: 0, spe: 0 };
       this.ability =
         (this.abilityNum === 1
@@ -823,6 +843,14 @@ class OHPKM extends pkm {
     this.bytes.set(uint16ToBytesLittleEndian(value.textVariables), 0xdc);
   }
 
+  public get shinyLeaves() {
+    return this.bytes[0xeb];
+  }
+
+  public set shinyLeaves(value: number) {
+    this.bytes[0xeb] = value;
+  }
+
   public get fullness() {
     return this.bytes[0xec];
   }
@@ -876,12 +904,12 @@ class OHPKM extends pkm {
     }
   }
 
-  public set unknownF3(value: number) {
-    this.bytes[0xf3] = value;
-  }
-
   public get unknownF3() {
     return this.bytes[0xf3];
+  }
+
+  public set unknownF3(value: number) {
+    this.bytes[0xf3] = value;
   }
 
   public get formArgument() {
@@ -898,6 +926,22 @@ class OHPKM extends pkm {
 
   public set affixedRibbon(value: number) {
     this.bytes[0xf8] = value;
+  }
+
+  public get groundTile() {
+    return this.bytes[0x10e];
+  }
+
+  public set groundTile(value: number) {
+    this.bytes[0x10e] = value;
+  }
+
+  public set performance(value: number) {
+    this.bytes[0x10f] = value;
+  }
+
+  public get performance() {
+    return this.bytes[0x10f];
   }
 
   public get trainerNameBytes() {
@@ -942,29 +986,38 @@ class OHPKM extends pkm {
   }
 
   public get eggDate() {
-    return {
-      month: this.bytes[0x130],
-      day: this.bytes[0x131],
-      year: 2000 + this.bytes[0x132],
-    };
+    return this.bytes[0x130]
+      ? {
+          month: this.bytes[0x130],
+          day: this.bytes[0x131],
+          year: this.bytes[0x132],
+        }
+      : undefined;
   }
 
-  public set eggDate(value: pokedate) {
-    this.bytes[0x130] = value.year - 2000;
-    this.bytes[0x131] = value.month;
-    this.bytes[0x132] = value.day;
+  public set eggDate(value: pokedate | undefined) {
+    if (value) {
+      this.bytes[0x130] = value.year;
+      this.bytes[0x131] = value.month;
+      this.bytes[0x132] = value.day;
+    } else {
+      this.bytes[0x130] = 0;
+      this.bytes[0x131] = 0;
+      this.bytes[0x132] = 0;
+    }
   }
 
   public get metDate() {
     return {
-      year: 2000 + this.bytes[0x133],
+      year: this.bytes[0x133],
       month: this.bytes[0x134],
       day: this.bytes[0x135],
     };
   }
 
   public set metDate(value: pokedate) {
-    this.bytes[0x133] = value.year - 2000;
+    console.log(value);
+    this.bytes[0x133] = value.year;
     this.bytes[0x134] = value.month;
     this.bytes[0x135] = value.day;
   }

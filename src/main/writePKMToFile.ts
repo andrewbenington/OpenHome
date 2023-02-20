@@ -6,10 +6,7 @@ import { getMonFileIdentifier } from '../pkm/util';
 
 export default function writePKMToFile(bytes: Uint8Array, format: string) {
   const originalMon = bytesToPKM(bytes, format);
-  console.log(originalMon);
   const mon = new OHPKM(originalMon);
-  console.log(mon.nickname);
-  console.log(mon.bytes);
   const appDataPath = app.getPath('appData');
   const fileName = getMonFileIdentifier(mon)
   fs.writeFileSync(

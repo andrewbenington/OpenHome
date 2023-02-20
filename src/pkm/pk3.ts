@@ -8,7 +8,7 @@ import { getMetLocation } from '../renderer/MetLocation/MetLocation';
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
-  get16ByteChecksumLittleEndian,
+  get16BitChecksumLittleEndian,
   getFlag,
   setFlag,
   uint16ToBytesLittleEndian,
@@ -44,7 +44,11 @@ import {
 
 const GEN3_MOVE_MAX = 354;
 
-export class pk3 extends pkm {
+export class PK3 extends pkm {
+  public get format() {
+    return 'PK3';
+  }
+
   public get personalityValue() {
     return bytesToUint32LittleEndian(this.bytes, 0x00);
   }
@@ -52,11 +56,6 @@ export class pk3 extends pkm {
   public set personalityValue(value: number) {
     this.bytes.set(uint32ToBytesLittleEndian(value), 0x00);
   }
-
-  public get format() {
-    return 'pk3';
-  }
-
   public get checksum() {
     return bytesToUint16LittleEndian(this.bytes, 0x1c);
   }
@@ -279,9 +278,9 @@ export class pk3 extends pkm {
       hp: this.bytes[0x38],
       atk: this.bytes[0x39],
       def: this.bytes[0x3a],
-      spa: this.bytes[0x3b],
-      spd: this.bytes[0x3c],
-      spe: this.bytes[0x3d],
+      spe: this.bytes[0x3b],
+      spa: this.bytes[0x3c],
+      spd: this.bytes[0x3d],
     };
   }
 
@@ -289,9 +288,9 @@ export class pk3 extends pkm {
     this.bytes[0x38] = value.hp;
     this.bytes[0x39] = value.atk;
     this.bytes[0x3a] = value.def;
-    this.bytes[0x3b] = value.spa;
-    this.bytes[0x3c] = value.spd;
-    this.bytes[0x3d] = value.spe;
+    this.bytes[0x3b] = value.spe;
+    this.bytes[0x3c] = value.spa;
+    this.bytes[0x3d] = value.spd;
   }
 
   public get contest() {
@@ -381,9 +380,9 @@ export class pk3 extends pkm {
       hp: ivBytes & 0x1f,
       atk: (ivBytes >> 5) & 0x1f,
       def: (ivBytes >> 10) & 0x1f,
-      spa: (ivBytes >> 15) & 0x1f,
-      spd: (ivBytes >> 20) & 0x1f,
-      spe: (ivBytes >> 25) & 0x1f,
+      spe: (ivBytes >> 15) & 0x1f,
+      spa: (ivBytes >> 20) & 0x1f,
+      spd: (ivBytes >> 25) & 0x1f,
     };
   }
 
@@ -399,6 +398,14 @@ export class pk3 extends pkm {
     setFlag(this.bytes, 0x48, 30, value);
     // handle egg name byte
     this.bytes[0x13] = 0x2 | (value ? 0x4 : 0);
+  }
+
+  public get isNicknamed() {
+    return getFlag(this.bytes, 0x48, 31);
+  }
+
+  public set isNicknamed(value: boolean) {
+    setFlag(this.bytes, 0x48, 31, value);
   }
 
   public get ribbonBytes() {
@@ -527,7 +534,7 @@ export class pk3 extends pkm {
   }
 
   public refreshChecksum() {
-    const newChecksum = get16ByteChecksumLittleEndian(this.bytes, 0x20, 0x50);
+    const newChecksum = get16BitChecksumLittleEndian(this.bytes, 0x20, 0x50);
     this.bytes.set(uint16ToBytesLittleEndian(newChecksum), 0x1c);
   }
 
@@ -616,16 +623,19 @@ export class pk3 extends pkm {
       this.trainerName = other.trainerName;
       this.trainerFriendship = other.trainerFriendship;
       this.ball = other.ball ? (other.ball <= 12 ? other.ball : 4) : 4;
-      const equivalentLocation = RSEFRLGLocations[0].indexOf(
-        other.metLocation.slice(3)
-      );
+      const equivalentLocation = other.metLocation
+        ? RSEFRLGLocations[0].indexOf(other.metLocation.slice(3))
+        : 0;
       this.metLocationIndex =
-        equivalentLocation > 0 ? equivalentLocation : other.metLocationIndex;
+        equivalentLocation > 0
+          ? equivalentLocation
+          : other.metLocationIndex ?? 260;
       this.metLevel = other.metLevel ?? this.level;
       this.trainerGender = other.trainerGender;
       this.refreshChecksum();
       return;
     } else {
+      super(new Uint8Array());
       return;
     }
   }

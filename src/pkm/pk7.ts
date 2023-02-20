@@ -109,23 +109,26 @@ export class pk7 extends pkm {
         }
       }
     }
-    this.eggYear = bytes[0xd1];
-    this.eggMonth = bytes[0xd2];
-    this.eggDay = bytes[0xd3];
+    this.eggDate = bytes[0xd2]
+      ? {
+          day: bytes[0xd3],
+          month: bytes[0xd2],
+          year: bytes[0xd1],
+        }
+      : undefined;
+    this.eggLocationIndex = bytesToUint16LittleEndian(bytes, 0xd8);
     this.eggLocation =
-      getMetLocation(
-        this.gameOfOrigin,
-        bytesToUint16LittleEndian(bytes, 0xd8),
-        true
-      ) ?? bytesToUint16LittleEndian(bytes, 0xd8).toString();
-    this.metYear = bytes[0xd4];
-    this.metMonth = bytes[0xd5];
-    this.metDay = bytes[0xd6];
+      getMetLocation(this.gameOfOrigin, this.eggLocationIndex, false, true) ??
+      this.eggLocationIndex.toString();
+    this.metDate = {
+      day: bytes[0xd6],
+      month: bytes[0xd5],
+      year: bytes[0xd4],
+    };
+    this.metLocationIndex = bytesToUint16LittleEndian(bytes, 0xda);
     this.metLocation =
-      getMetLocation(
-        this.gameOfOrigin,
-        bytesToUint16LittleEndian(bytes, 0xda)
-      ) ?? bytesToUint16LittleEndian(bytes, 0xda).toString();
+      getMetLocation(this.gameOfOrigin, this.metLocationIndex) ??
+      this.metLocationIndex.toString();
     this.language = Languages[bytes[0xe3]];
     this.isShiny =
       (this.trainerID ^
