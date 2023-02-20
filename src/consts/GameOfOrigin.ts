@@ -1,73 +1,73 @@
-import { Origin } from "../renderer/types/types";
+import { Origin } from '../renderer/types/types';
 
 export const GameOfOriginData: (Origin | null)[] = [
   null,
-  { name: "Sapphire", region: "Hoenn", gc: 8 },
-  { name: "Ruby", region: "Hoenn", gc: 9 },
-  { name: "Emerald", region: "Hoenn", gc: 10 },
-  { name: "FireRed", region: "Kanto", gc: 1 },
-  { name: "LeafGreen", region: "Kanto", gc: 2 },
+  { name: 'Sapphire', region: 'Hoenn', gc: 8 },
+  { name: 'Ruby', region: 'Hoenn', gc: 9 },
+  { name: 'Emerald', region: 'Hoenn', gc: 10 },
+  { name: 'FireRed', region: 'Kanto', gc: 1 },
+  { name: 'LeafGreen', region: 'Kanto', gc: 2 },
   null,
-  { name: "HeartGold", region: "Johto" },
-  { name: "SoulSilver", region: "Johto" },
+  { name: 'HeartGold', region: 'Johto' },
+  { name: 'SoulSilver', region: 'Johto' },
   null,
-  { name: "Diamond", region: "Sinnoh" },
-  { name: "Pearl", region: "Sinnoh" },
-  { name: "Platinum", region: "Sinnoh" },
-  null,
-  null,
-  { name: "Colosseum/XD", region: "Orre", gc: 11 },
+  { name: 'Diamond', region: 'Sinnoh' },
+  { name: 'Pearl', region: 'Sinnoh' },
+  { name: 'Platinum', region: 'Sinnoh' },
   null,
   null,
+  { name: 'Colosseum/XD', region: 'Orre', gc: 11 },
   null,
   null,
-  { name: "White" },
-  { name: "Black" },
-  { name: "White 2" },
-  { name: "Black 2" },
-  { name: "X", mark: "G6" },
-  { name: "Y", mark: "G6" },
-  { name: "Alpha Sapphire", mark: "G6" },
-  { name: "Omega Ruby", mark: "G6" },
   null,
   null,
-  { name: "Sun", mark: "Alola" },
-  { name: "Moon", mark: "Alola" },
-  { name: "Ultra Sun", mark: "Alola" },
-  { name: "Ultra Moon", mark: "Alola" },
-  { name: "GO", mark: "GO" },
-  { name: "Red", mark: "GB" },
-  { name: "Blue/Green", mark: "GB", logo: "Blue_Green" },
-  { name: "Blue (Japan)", mark: "GB", logo: "Blue_JP" },
-  { name: "Yellow", mark: "GB" },
-  { name: "Gold", mark: "GB" },
-  { name: "Silver", mark: "GB" },
-  { name: "Crystal", mark: "GB" },
-  { name: "Let's Go, Pikachu!", mark: "LGPE", logo: "Let's_Go_Pikachu" },
-  { name: "Let's Go, Eevee!", mark: "LGPE", logo: "Let's_Go_Eevee" },
-  { name: "Sword", mark: "Galar" },
-  { name: "Shield", mark: "Galar" },
+  { name: 'White' },
+  { name: 'Black' },
+  { name: 'White 2' },
+  { name: 'Black 2' },
+  { name: 'X', mark: 'G6' },
+  { name: 'Y', mark: 'G6' },
+  { name: 'Alpha Sapphire', mark: 'G6' },
+  { name: 'Omega Ruby', mark: 'G6' },
   null,
-  { name: "Legends: Arceus", mark: "LA", logo: "Legends_Arceus" },
-  { name: "Brilliant Diamond", mark: "BDSP" },
-  { name: "Shining Pearl", mark: "BDSP" },
-  { name: "Scarlet", mark: "Tera" },
-  { name: "Violet", mark: "Tera" },
+  null,
+  { name: 'Sun', mark: 'Alola' },
+  { name: 'Moon', mark: 'Alola' },
+  { name: 'Ultra Sun', mark: 'Alola' },
+  { name: 'Ultra Moon', mark: 'Alola' },
+  { name: 'GO', mark: 'GO' },
+  { name: 'Red', mark: 'GB' },
+  { name: 'Blue/Green', mark: 'GB', logo: 'Blue_Green' },
+  { name: 'Blue (Japan)', mark: 'GB', logo: 'Blue_JP' },
+  { name: 'Yellow', mark: 'GB' },
+  { name: 'Gold', mark: 'GB' },
+  { name: 'Silver', mark: 'GB' },
+  { name: 'Crystal', mark: 'GB' },
+  { name: "Let's Go, Pikachu!", mark: 'LGPE', logo: "Let's_Go_Pikachu" },
+  { name: "Let's Go, Eevee!", mark: 'LGPE', logo: "Let's_Go_Eevee" },
+  { name: 'Sword', mark: 'Galar' },
+  { name: 'Shield', mark: 'Galar' },
+  null,
+  { name: 'Legends: Arceus', mark: 'LA', logo: 'Legends_Arceus' },
+  { name: 'Brilliant Diamond', mark: 'BDSP' },
+  { name: 'Shining Pearl', mark: 'BDSP' },
+  { name: 'Scarlet', mark: 'Tera' },
+  { name: 'Violet', mark: 'Tera' },
 ];
 
 export const GameOfOriginDataGC = [
   null,
-  { name: "FireRed", region: "Kanto", gba: 4 },
-  { name: "LeafGreen", region: "Kanto", gba: 5 },
+  { name: 'FireRed', region: 'Kanto', gba: 4 },
+  { name: 'LeafGreen', region: 'Kanto', gba: 5 },
   null,
   null,
   null,
   null,
   null,
-  { name: "Sapphire", region: "Hoenn", gba: 1 },
-  { name: "Ruby", region: "Hoenn", gba: 2 },
-  { name: "Emerald", region: "Hoenn", gba: 3 },
-  { name: "Colosseum/XD", region: "Orre", gba: 15 },
+  { name: 'Sapphire', region: 'Hoenn', gba: 1 },
+  { name: 'Ruby', region: 'Hoenn', gba: 2 },
+  { name: 'Emerald', region: 'Hoenn', gba: 3 },
+  { name: 'Colosseum/XD', region: 'Orre', gba: 15 },
 ];
 
 export enum GameOfOrigin {
@@ -124,3 +124,36 @@ export enum GameOfOrigin {
   Scarlet,
   Violet,
 }
+
+export const isKanto = (origin: GameOfOrigin) => {
+  return (
+    origin === GameOfOrigin.Red ||
+    origin === GameOfOrigin.BlueGreen ||
+    origin === GameOfOrigin.BlueJapan ||
+    origin === GameOfOrigin.Yellow ||
+    origin === GameOfOrigin.FireRed ||
+    origin === GameOfOrigin.LeafGreen ||
+    origin === GameOfOrigin.LetsGoPikachu ||
+    origin === GameOfOrigin.LetsGoEevee
+  );
+};
+
+export const isHoenn = (origin: GameOfOrigin) => {
+  return (
+    origin === GameOfOrigin.Sapphire ||
+    origin === GameOfOrigin.Ruby ||
+    origin === GameOfOrigin.Emerald ||
+    origin === GameOfOrigin.AlphaSapphire ||
+    origin === GameOfOrigin.OmegaRuby
+  );
+};
+
+export const isSinnoh = (origin: GameOfOrigin) => {
+  return (
+    origin === GameOfOrigin.Diamond ||
+    origin === GameOfOrigin.Pearl ||
+    origin === GameOfOrigin.Platinum ||
+    origin === GameOfOrigin.BrilliantDiamond ||
+    origin === GameOfOrigin.ShiningPearl
+  );
+};

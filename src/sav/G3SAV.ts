@@ -1,3 +1,4 @@
+import OHPKM from 'pkm/OHPKM';
 import { PK3 } from '../pkm/PK3';
 import { SaveType } from '../renderer/types/types';
 import {
@@ -17,9 +18,10 @@ export class G3SAV extends SAV {
   primarySave: G3SaveBackup;
   backupSave: G3SaveBackup;
   primarySaveOffset: number;
+  boxes: Array<G3Box>;
 
   constructor(path: string, bytes: Uint8Array) {
-    super(path, bytes)
+    super(path, bytes);
     const saveIndexOne = bytesToUint32LittleEndian(bytes, 0xf20);
     const saveIndexTwo = bytesToUint32LittleEndian(bytes, 0xef20);
     if (saveIndexOne > saveIndexTwo) {
@@ -37,22 +39,33 @@ export class G3SAV extends SAV {
     this.tid = this.primarySave.tid;
     this.sid = this.primarySave.sid;
     this.currentPCBox = this.primarySave.currentPCBox;
-    this.boxes = this.primarySave.boxes
-    this.boxNames = this.primarySave.boxNames
+    this.boxes = this.primarySave.boxes;
+    this.boxNames = this.primarySave.boxNames;
   }
 
   prepareBoxesForSaving() {
+    const changedMonPKMs: OHPKM[] = [];
     this.changedMons.forEach(({ box, index }) => {
       const monOffset = 30 * box + index;
       const pcBytes = new Uint8Array(80);
-      try {
-        let mon = new PK3(this.boxes[box].pokemon[index]);
-        if (mon?.gameOfOrigin && mon?.dexNum) {
-          mon.refreshChecksum();
-          pcBytes.set(mon.toPCBytes(), 0);
+      const changedMon = this.boxes[box].pokemon[index];
+      // we don't want to save OHPKM files of mons that didn't leave the save
+      // (and would still be PK4s)
+      if (changedMon instanceof OHPKM) {
+        changedMonPKMs.push(changedMon);
+      }
+      // changedMon will be undefined if pokemon was moved from this slot
+      // and the slot was left empty
+      if (changedMon) {
+        try {
+          let mon = new PK3(this.boxes[box].pokemon[index]);
+          if (mon?.gameOfOrigin && mon?.dexNum) {
+            mon.refreshChecksum();
+            pcBytes.set(mon.toPCBytes(), 0);
+          }
+        } catch (e) {
+          console.log(e);
         }
-      } catch (e) {
-        console.log(e);
       }
       this.primarySave.pcDataContiguous.set(pcBytes, 4 + monOffset * 80);
     });
@@ -71,6 +84,7 @@ export class G3SAV extends SAV {
       );
     });
     this.bytes.set(this.primarySave.bytes, this.primarySaveOffset);
+    return changedMonPKMs;
   }
 }
 
@@ -87,7 +101,7 @@ export class G3SaveBackup {
   pcDataContiguous: Uint8Array;
   currentPCBox: number;
   boxNames: string[];
-  boxes: Array<Box> = Array(14);
+  boxes: Array<G3Box> = Array(14);
   saveType: SaveType;
   firstSectorIndex: number = 0;
 
@@ -169,7 +183,7 @@ export class G3SaveBackup {
 
 export class G3Box implements Box {
   name: string;
-  pokemon: Array<PK3> = new Array(30);
+  pokemon: Array<PK3 | OHPKM> = new Array(30);
   constructor(n: string) {
     this.name = n;
   }

@@ -1,4 +1,5 @@
-import { MONS_LIST } from 'consts/Mons';
+import { GameOfOrigin, isHoenn, isKanto, isSinnoh } from '../consts/GameOfOrigin';
+import G4Locations from '../renderer/MetLocation/G4';
 import { Abilities } from '../consts/Abilities';
 import { Items } from '../consts/Items';
 import { Languages } from '../consts/Languages';
@@ -22,7 +23,6 @@ import {
   shuffleBlocksGen45,
   unshuffleBlocksGen45,
 } from '../util/Encryption';
-import { getGen3To5Gender } from '../util/GenderCalc';
 import {
   getHPGen3Onward,
   getLevelGen3Onward,
@@ -33,9 +33,151 @@ import {
   utf16StringToGen4,
 } from '../util/Strings/StringConverter';
 import { contestStats, marking, pkm, pokedate, stats } from './pkm';
-import { writeIVsToBuffer } from './util';
+import {
+  generateIVs,
+  generatePersonalityValue,
+  getAbilityFromNumber,
+  ivsFromDVs,
+  writeIVsToBuffer,
+} from './util';
+
+const GEN4_MOVE_MAX = 467;
 
 export class PK4 extends pkm {
+  constructor(...args: any[]) {
+    if (args.length >= 1 && args[0] instanceof Uint8Array) {
+      const bytes = args[0];
+      const encrypted = args[1] ?? false;
+      if (encrypted) {
+        let unencryptedBytes = decryptByteArrayGen45(bytes);
+        let unshuffledBytes = unshuffleBlocksGen45(unencryptedBytes);
+        super(unshuffledBytes);
+      } else {
+        super(bytes);
+      }
+    } else if (args.length === 1 && args[0] instanceof pkm) {
+      const other = args[0];
+      super(new Uint8Array(136));
+      this.sanity = other.sanity;
+      this.dexNum = other.dexNum;
+      this.formNum = other.formNum;
+      this.heldItem = other.heldItem;
+      this.trainerID = other.trainerID;
+      this.secretID = other.secretID;
+      this.exp = other.exp;
+      this.ability =
+        other.ability ??
+        getAbilityFromNumber(this.dexNum, this.formNum, this.abilityNum);
+      // console
+      if (other.personalityValue) {
+        this.personalityValue = other.personalityValue;
+      } else {
+        this.personalityValue = generatePersonalityValue();
+        if (other.dexNum === 201) {
+          this.personalityValue =
+            (this.personalityValue & 0xffffffe0) | other.formNum;
+        }
+        if (other.isShiny) {
+          let pvBytes = uint32ToBytesLittleEndian(this.personalityValue);
+          let pvLower16 = bytesToUint16LittleEndian(pvBytes, 0);
+          let pvUpper16 = pvLower16 ^ this.trainerID ^ this.secretID;
+          // setting the top two bytes to result in a shiny personality value
+          pvBytes.set(uint16ToBytesLittleEndian(pvUpper16), 2);
+          this.personalityValue = bytesToUint32LittleEndian(pvBytes, 0);
+        } else if (this.isShiny) {
+          // inverting the highest bit will always revert a shiny personality value
+          this.personalityValue = this.personalityValue ^ 0x10000000;
+        }
+      }
+      this.isFatefulEncounter = other.isFatefulEncounter;
+      this.gender = other.gender;
+      this.evs = other.evs ?? { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 };
+      this.contest = other.contest;
+      this.pokerusByte = other.pokerusByte;
+      this.ribbons = other.ribbons;
+      // filtering out moves that didnt exist yet
+      const validMoves = other.moves.filter((move) => move <= GEN4_MOVE_MAX);
+      const validMovePP = other.movePP.filter(
+        (_, i) => other.moves[i] <= GEN4_MOVE_MAX
+      );
+      const validMovePPUps = other.movePPUps.filter(
+        (_, i) => other.moves[i] <= GEN4_MOVE_MAX
+      );
+      this.moves = other.moves;
+      this.moves = [
+        validMoves[0] ?? 0,
+        validMoves[1] ?? 0,
+        validMoves[2] ?? 0,
+        validMoves[3] ?? 0,
+      ];
+      this.movePP = [
+        validMovePP[0] ?? 0,
+        validMovePP[1] ?? 0,
+        validMovePP[2] ?? 0,
+        validMovePP[3] ?? 0,
+      ];
+      this.movePPUps = [
+        validMovePPUps[0] ?? 0,
+        validMovePPUps[1] ?? 0,
+        validMovePPUps[2] ?? 0,
+        validMovePPUps[3] ?? 0,
+      ];
+      this.nickname = other.nickname;
+      this.currentHP = other.currentHP;
+      if (other.ivs) {
+        this.ivs = other.ivs;
+      } else if (other.dvs) {
+        this.ivs = ivsFromDVs(other.dvs);
+      } else {
+        this.ivs = generateIVs();
+      }
+      this.isEgg = other.isEgg;
+      this.isNicknamed = other.isNicknamed;
+      this.shinyLeaves = other.shinyLeaves ?? 0;
+      this.gameOfOrigin = other.gameOfOrigin;
+      this.language = other.languageIndex === 0 ? 'ENG' : other.language;
+      this.groundTile = other.groundTile ?? 0;
+      this.performance = other.performance ?? 0;
+      this.trainerName = other.trainerName;
+      this.trainerFriendship = other.trainerFriendship;
+      this.eggDate = other.eggDate;
+      let now = new Date();
+      this.metDate = other.metDate ?? {
+        month: now.getMonth(),
+        day: now.getDate(),
+        year: now.getFullYear() - 2000,
+      };
+      this.ball = other.ball && other.ball <= 24 ? other.ball : 4;
+      const equivalentLocation = other.metLocation
+        ? G4Locations[0].indexOf(other.metLocation.slice(3))
+        : -1;
+      if (equivalentLocation > 0) {
+        this.eggLocationIndex = other.eggLocationIndex;
+        this.metLocationIndex = equivalentLocation;
+      } else if (
+        other.gameOfOrigin >= GameOfOrigin.HeartGold &&
+        other.gameOfOrigin <= GameOfOrigin.Platinum
+      ) {
+        this.eggLocationIndex = other.eggLocationIndex;
+        this.metLocationIndex = other.metLocationIndex ?? 3002;
+      } else if (isKanto(other.gameOfOrigin)) {
+        this.eggLocationIndex = other.eggLocationIndex ? 2003 : 0;
+        this.metLocationIndex = 2003;
+      } else if (isHoenn(other.gameOfOrigin)) {
+        this.eggLocationIndex = other.eggLocationIndex ? 2005 : 0;
+        this.metLocationIndex = 2005;
+      } else if (isSinnoh(other.gameOfOrigin)) {
+        this.eggLocationIndex = other.eggLocationIndex ? 2006 : 0;
+        this.metLocationIndex = 2006;
+      } else {
+        this.eggLocationIndex = other.eggLocationIndex ? 2001 : 0;
+        this.metLocationIndex = 2001;
+      }
+      this.metLevel = other.metLevel ?? this.level;
+      this.trainerGender = other.trainerGender;
+    }
+  }
+
   public get format() {
     return 'PK4';
   }
@@ -133,6 +275,10 @@ export class PK4 extends pkm {
 
   public get ability() {
     return Abilities[this.abilityIndex];
+  }
+
+  public set ability(value: string) {
+    this.abilityIndex = Abilities.indexOf(value);
   }
 
   public get markings() {
@@ -508,11 +654,12 @@ export class PK4 extends pkm {
   }
 
   public set ball(value: number) {
+    console.log('ball value:', value);
     if (value > 16) {
-      this.bytes[0x83] = value;
-    } else {
       // dppt see apriballs, sport ball as a pokeball
       this.bytes[0x83] = 4;
+    } else {
+      this.bytes[0x83] = value;
     }
     this.bytes[0x86] = value;
   }
@@ -577,15 +724,5 @@ export class PK4 extends pkm {
   public toPCBytes() {
     let shuffledBytes = shuffleBlocksGen45(this.bytes);
     return decryptByteArrayGen45(shuffledBytes);
-  }
-
-  constructor(bytes: Uint8Array, encrypted: boolean = false) {
-    if (encrypted) {
-      let unencryptedBytes = decryptByteArrayGen45(bytes);
-      let unshuffledBytes = unshuffleBlocksGen45(unencryptedBytes);
-      super(unshuffledBytes);
-    } else {
-      super(bytes);
-    }
   }
 }

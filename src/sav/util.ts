@@ -75,7 +75,26 @@ export const buildSaveFile = (
       }
       return saveFile;
     case SaveType.HGSS:
-      return new HGSSSAV(filePath, fileBytes);
+      saveFile = new HGSSSAV(filePath, fileBytes);
+      // if (homeMonMap) {
+      //   saveFile.boxes.forEach((box) => {
+      //     box.pokemon.forEach((mon, monIndex) => {
+      //       if (!mon) return;
+      //       const identifier = getMonFileIdentifier(mon);
+      //       if (!identifier) return;
+      //       const result = Object.entries(homeMonMap).find(
+      //         (entry) =>
+      //           entry[0].slice(0, entry[0].length - 3) ===
+      //           identifier.slice(0, identifier.length - 3)
+      //       );
+      //       if (result) {
+      //         console.log('home mon found:', result[1]);
+      //         box.pokemon[monIndex] = result[1];
+      //       }
+      //     });
+      //   });
+      // }
+      return saveFile;
     case SaveType.G5:
       return new G5SAV(filePath, fileBytes);
   }

@@ -14,3 +14,10 @@ export default function writePKMToFile(bytes: Uint8Array, format: string) {
     mon.bytes
   );
 }
+
+export function deleteOHPKMFile(fileName: string) {
+  const appDataPath = app.getPath('appData');
+  fs.unlinkSync(
+    `${appDataPath}/open-home/storage/mons/${fileName}.ohpkm`
+  );
+}

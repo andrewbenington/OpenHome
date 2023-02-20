@@ -1,5 +1,4 @@
-import { BigInteger } from 'big-integer';
-import { RibbonTitles } from 'consts/Ribbons';
+import { RibbonTitles } from '../consts/Ribbons';
 import { GameOfOrigin } from '../consts/GameOfOrigin';
 
 export class pkm {
@@ -102,11 +101,11 @@ export class pkm {
   public set level(value: number) {
     this._level = value;
   }
-  private _ability: string = 'No Ability';
-  public get ability(): string {
+  private _ability?: string
+  public get ability(): string | undefined {
     return this._ability;
   }
-  public set ability(value: string) {
+  public set ability(value: string | undefined) {
     this._ability = value;
   }
   private _abilityNum: number = 1;

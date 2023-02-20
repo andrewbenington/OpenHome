@@ -273,13 +273,21 @@ export class PK2 extends pkm {
       this.level = this.dexNum > 0 ? getLevelGen12(this.dexNum, this.exp) : 0;
       this.pokerusByte = other.pokerusByte;
       const validMoves = other.moves.filter((move) => move <= GEN2_MOVE_MAX);
+      const validMovePP = other.movePP.filter(
+        (_, i) => other.moves[i] <= GEN2_MOVE_MAX
+      );
       this.moves = [
         validMoves[0] ?? 0,
         validMoves[1] ?? 0,
         validMoves[2] ?? 0,
         validMoves[3] ?? 0,
       ];
-      this.movePP = other.movePP;
+      this.movePP = [
+        validMovePP[0] ?? 0,
+        validMovePP[1] ?? 0,
+        validMovePP[2] ?? 0,
+        validMovePP[3] ?? 0,
+      ];
       if (other.ivs) {
         this.dvs = dvsFromIVs(other.ivs, other.isShiny);
       } else if (other.dvs) {

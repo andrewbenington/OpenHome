@@ -584,14 +584,30 @@ export class PK3 extends pkm {
       // handle ribbons
       this.ribbons = other.ribbons;
       const validMoves = other.moves.filter((move) => move <= GEN3_MOVE_MAX);
+      const validMovePP = other.movePP.filter(
+        (_, i) => other.moves[i] <= GEN3_MOVE_MAX
+      );
+      const validMovePPUps = other.movePPUps.filter(
+        (_, i) => other.moves[i] <= GEN3_MOVE_MAX
+      );
       this.moves = [
         validMoves[0] ?? 0,
         validMoves[1] ?? 0,
         validMoves[2] ?? 0,
         validMoves[3] ?? 0,
       ];
-      this.movePP = other.movePP;
-      this.nickname = other.nickname;
+      this.movePP = [
+        validMovePP[0] ?? 0,
+        validMovePP[1] ?? 0,
+        validMovePP[2] ?? 0,
+        validMovePP[3] ?? 0,
+      ];
+      this.movePPUps = [
+        validMovePPUps[0] ?? 0,
+        validMovePPUps[1] ?? 0,
+        validMovePPUps[2] ?? 0,
+        validMovePPUps[3] ?? 0,
+      ];
       this.movePPUps = other.movePPUps;
       if (other.ivs) {
         this.ivs = other.ivs;

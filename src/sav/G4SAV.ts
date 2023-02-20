@@ -1,3 +1,4 @@
+import OHPKM from 'pkm/OHPKM';
 import {
   bytesToUint16LittleEndian,
   uint16ToBytesLittleEndian,
@@ -12,6 +13,7 @@ export class G4SAV extends SAV {
   boxSize: number = 0xff0;
   boxNamesOffset: number = 0;
   footerSize: number = 0x14;
+  boxes: Array<G4Box>;
 
   constructor(path: string, bytes: Uint8Array) {
     super(path, bytes);
@@ -20,7 +22,11 @@ export class G4SAV extends SAV {
 
   buildBoxes() {
     for (let box = 0; box < 18; box++) {
-      let boxLabel = gen4StringToUTF(this.bytes, this.boxNamesOffset + 40 * box, 20);
+      let boxLabel = gen4StringToUTF(
+        this.bytes,
+        this.boxNamesOffset + 40 * box,
+        20
+      );
       this.boxes[box] = new G4Box(boxLabel);
     }
 
@@ -72,16 +78,56 @@ export class G4SAV extends SAV {
 
   updateStorageChecksum = () => {
     const newChecksum = this.calculateStorageChecksum();
+    console.log(
+      'updating gen 4 checksum at',
+      '0x' +
+        (this.currentStorageBlockOffset + this.storageBlockSize - 2)
+          .toString(16)
+          .padStart(4, '0')
+    );
     this.bytes.set(
       uint16ToBytesLittleEndian(newChecksum),
       this.currentStorageBlockOffset + this.storageBlockSize - 2
     );
   };
+
+  prepareBoxesForSaving() {
+    const changedMonPKMs: OHPKM[] = [];
+    console.log(this.changedMons);
+    this.changedMons.forEach(({ box, index }) => {
+      const changedMon = this.boxes[box].pokemon[index];
+      // we don't want to save OHPKM files of mons that didn't leave the save
+      // (and would still be PK4s)
+      if (changedMon instanceof OHPKM) {
+        changedMonPKMs.push(changedMon);
+      }
+      let writeIndex =
+        this.currentStorageBlockOffset + this.boxSize * box + 136 * index;
+      // changedMon will be undefined if pokemon was moved from this slot
+      // and the slot was left empty
+      if (changedMon) {
+        try {
+          let mon = new PK4(changedMon);
+          if (mon?.gameOfOrigin && mon?.dexNum) {
+            mon.refreshChecksum();
+            this.bytes.set(mon.toPCBytes(), writeIndex);
+          }
+        } catch (e) {
+          console.log(e);
+        }
+      } else {
+        console.log('writing empty bytes to', writeIndex.toString(16));
+        this.bytes.set(new Uint8Array(136), writeIndex);
+      }
+    });
+    this.updateStorageChecksum();
+    return changedMonPKMs;
+  }
 }
 
 export class G4Box implements Box {
   name: string;
-  pokemon: Array<PK4> = new Array(30);
+  pokemon: Array<PK4 | OHPKM> = new Array(30);
   constructor(n: string) {
     this.name = n;
   }
