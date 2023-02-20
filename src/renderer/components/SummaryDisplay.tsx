@@ -1,8 +1,12 @@
 import { Card } from '@mui/material';
 import { borderRadius } from '@mui/system';
+import { RibbonTitles } from 'consts/Ribbons';
+import OHPKM from 'pkm/OHPKM';
+import { PK2 } from 'pkm/PK2';
+import { getMonGen12Identifier } from 'pkm/util';
 import { Balls } from '../../consts/Balls';
 import { getCharacteristic } from '../../consts/Characteristics';
-import { GameOfOrigin } from '../../consts/GameOfOrigin';
+import { GameOfOriginData } from '../../consts/GameOfOrigin';
 import MOVES from '../../consts/Moves';
 import { Natures } from '../../consts/Natures';
 import { pkm, marking } from '../../pkm/pkm';
@@ -49,29 +53,38 @@ const SummaryDisplay = (props: { mon: pkm; updateMon: (mon: pkm) => void }) => {
             ) : (
               <></>
             )}
-            <p style={{ fontWeight: 'bold' }}>{mon.nickname}</p>
+            <p style={{ fontWeight: 'bold' }}>
+              {mon.nickname}
+              {mon.affixedRibbon ? ` ${mon.affixedRibbonTitle}` : ''}
+            </p>
             <Card style={{ padding: '5px 10px 5px 10px', marginLeft: 10 }}>
               {mon.language}
             </Card>
           </div>
-          {mon.eggMonth ? (
+          {mon.eggDate ? (
             <p style={{ textAlign: 'left' }}>{`Egg received ${
-              mon.eggMonth
-                ? `on ${mon.eggMonth}/${mon.eggDay}/${mon.eggYear}`
+              mon.eggDate
+                ? `on ${mon.eggDate.month}/${mon.eggDate.day}/${mon.eggDate.year}`
                 : ''
             } ${mon.eggLocation}.`}</p>
           ) : (
-            <></>
+            <div />
           )}
-          <p style={{ textAlign: 'left' }}>{`Met ${
-            mon.metMonth
-              ? `on ${mon.metMonth}/${mon.metDay}/${mon.metYear},`
-              : ''
-          } at level ${mon.metLevel} ${mon.metLocation}${
-            mon.isFatefulEncounter
-              ? ', where it met its trainer in a fateful encounter'
-              : ''
-          }.`}</p>
+          {mon.metLocation ? (
+            <p style={{ textAlign: 'left' }}>{`Met ${
+              mon.metDate
+                ? `on ${mon.metDate.month}/${mon.metDate.day}/${mon.metDate.year},`
+                : ''
+            }${mon.metLevel ? ` at level ${mon.metLevel},` : ''} ${
+              mon.metLocation
+            }${
+              mon.isFatefulEncounter
+                ? ' where it met its trainer in a fateful encounter'
+                : ''
+            }.`}</p>
+          ) : (
+            <div />
+          )}
 
           {mon.nature ? (
             <p style={{ textAlign: 'left' }}>
@@ -126,7 +139,7 @@ const SummaryDisplay = (props: { mon: pkm; updateMon: (mon: pkm) => void }) => {
             }}
           >
             <img
-              alt={`${GameOfOrigin[mon.gameOfOrigin]?.name} logo`}
+              alt={`${GameOfOriginData[mon.gameOfOrigin]?.name} logo`}
               src={
                 getGameLogo(
                   mon.gameOfOrigin,
@@ -144,14 +157,14 @@ const SummaryDisplay = (props: { mon: pkm; updateMon: (mon: pkm) => void }) => {
                 opacity: 0.6,
               }}
             />
-            {(GameOfOrigin[mon.gameOfOrigin]?.mark ||
+            {(GameOfOriginData[mon.gameOfOrigin]?.mark ||
               mon.gameOfOrigin === -1) && (
               <img
                 alt="origin mark"
                 src={`/origin_marks/${
                   mon.gameOfOrigin === -1
                     ? 'GB'
-                    : GameOfOrigin[mon.gameOfOrigin]?.mark ?? ''
+                    : GameOfOriginData[mon.gameOfOrigin]?.mark ?? ''
                 }.png`}
                 style={{
                   width: 50,
@@ -253,6 +266,9 @@ const SummaryDisplay = (props: { mon: pkm; updateMon: (mon: pkm) => void }) => {
             );
           })}
       </div>
+      {mon instanceof PK2 || mon instanceof OHPKM
+        ? getMonGen12Identifier(mon)
+        : ''}
     </div>
   );
 };

@@ -1,7 +1,7 @@
 import { Box, Button, Card, Tab, Tabs } from '@mui/material';
 import _ from 'lodash';
 import { useEffect, useState } from 'react';
-import { get16ByteChecksumLittleEndian } from 'util/ByteLogic';
+import { get16BitChecksumLittleEndian } from 'util/ByteLogic';
 import { MONS_LIST } from '../../consts/Mons';
 import Types from '../../consts/Types';
 import { pkm } from '../../pkm/pkm';
@@ -19,7 +19,7 @@ const getTypes = (mon: pkm) => {
   if (mon.format === 'pk1' && (mon.dexNum === 81 || mon.dexNum === 82)) {
     types = ['Electric'];
   } else if (
-    ['pk1', 'pk2', 'pk3', 'colopkm', 'xdpkm', 'pk4', 'pk5'].includes(mon.format)
+    ['pk1', 'pk2', 'PK3', 'colopkm', 'xdpkm', 'PK4', 'pk5'].includes(mon.format)
   ) {
     if (types?.includes('Fairy')) {
       if (types.length === 1 || types.includes('Flying')) {
@@ -128,6 +128,7 @@ const PokemonDisplay = (props: {
             <div style={{ display: 'flex', flexDirection: 'row' }}>
               {_.range(10).map((level: number) => (
                 <div
+                  key={`dynamax_meter_${level}`}
                   style={{
                     backgroundColor:
                       level < (mon.dynamaxLevel ?? 0)
@@ -237,21 +238,19 @@ const PokemonDisplay = (props: {
         ) : tab === 'ribbons' ? (
           <RibbonsDisplay mon={mon} />
         ) : (
-          <div>
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
             {_.range(mon.bytes.length / 16).map((row: number) => {
               return (
-                <div>
-                  <code>{`0x${row.toString(16).padStart(3, '0')}0\t${_.range(16)
-                    .map(
-                      (byte: number) =>
-                        mon.bytes[
-                          Math.min(row * 16 + byte, mon.bytes.length - 1)
-                        ]
-                          .toString(16)
-                          .padStart(2, '0') + (byte % 2 ? ' ' : '')
-                    )
-                    .join('')}`}</code>
-                </div>
+                <code key={`code_row_${row}`}>{`0x${row
+                  .toString(16)
+                  .padStart(3, '0')}0\t${_.range(16)
+                  .map(
+                    (byte: number) =>
+                      mon.bytes[Math.min(row * 16 + byte, mon.bytes.length - 1)]
+                        .toString(16)
+                        .padStart(2, '0') + (byte % 2 ? ' ' : '')
+                  )
+                  .join('')}`}</code>
               );
             })}
           </div>
@@ -263,10 +262,10 @@ const PokemonDisplay = (props: {
 
 const fileTypeColors: { [key: string]: string } = {
   pk2: '#bbb',
-  pk3: '#9b3',
+  PK3: '#9b3',
   colopkm: '#93f',
   xdpkm: '#53b',
-  pk4: '#f88',
+  PK4: '#f88',
   pk5: '#484',
   pk6: 'blue',
   pk7: 'orange',

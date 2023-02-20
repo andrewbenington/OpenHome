@@ -1,6 +1,6 @@
 import { Origin } from "../renderer/types/types";
 
-export const GameOfOrigin: (Origin | null)[] = [
+export const GameOfOriginData: (Origin | null)[] = [
   null,
   { name: "Sapphire", region: "Hoenn", gc: 8 },
   { name: "Ruby", region: "Hoenn", gc: 9 },
@@ -55,7 +55,7 @@ export const GameOfOrigin: (Origin | null)[] = [
   { name: "Violet", mark: "Tera" },
 ];
 
-export const GameOfOriginGC = [
+export const GameOfOriginDataGC = [
   null,
   { name: "FireRed", region: "Kanto", gba: 4 },
   { name: "LeafGreen", region: "Kanto", gba: 5 },
@@ -69,3 +69,58 @@ export const GameOfOriginGC = [
   { name: "Emerald", region: "Hoenn", gba: 3 },
   { name: "Colosseum/XD", region: "Orre", gba: 15 },
 ];
+
+export enum GameOfOrigin {
+  INVALID_0,
+  Sapphire,
+  Ruby,
+  Emerald,
+  FireRed,
+  LeafGreen,
+  INVALID_6,
+  HeartGold,
+  SoulSilver,
+  INVALID_9,
+  Diamond,
+  Pearl,
+  Platinum,
+  INVALID_13,
+  INVALID_14,
+  ColosseumXD,
+  INVALID_16,
+  INVALID_17,
+  INVALID_18,
+  INVALID_19,
+  White,
+  Black,
+  White2,
+  Black2,
+  X,
+  Y,
+  AlphaSapphire,
+  OmegaRuby,
+  INVALID_28,
+  INVALID_29,
+  Sun,
+  Moon,
+  UltraSun,
+  UltraMoon,
+  GO,
+  Red,
+  BlueGreen,
+  BlueJapan,
+  Yellow,
+  Gold,
+  Silver,
+  Crystal,
+  LetsGoPikachu,
+  LetsGoEevee,
+  Sword,
+  Shield,
+  INVALID_46,
+  LegendsArceus,
+  BrilliantDiamond,
+  ShiningPearl,
+  Scarlet,
+  Violet,
+}

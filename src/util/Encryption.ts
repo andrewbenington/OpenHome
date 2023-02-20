@@ -167,6 +167,12 @@ export const decryptByteArrayGen3 = (bytes: Uint8Array) => {
   return unencryptedBytes;
 };
 
+export const shuffleBlocksGen45 = (bytes: Uint8Array) => {
+  let personalityValue = bytesToUint32LittleEndian(bytes, 0x00);
+  let shiftValue = ((personalityValue & 0x3e000) >> 0xd) % 24;
+  return shuffleBlocks(bytes, shiftValue, GEN45_BLOCK_SIZE, GEN45_BLOCKS_OFFSET);
+};
+
 export const unshuffleBlocksGen45 = (bytes: Uint8Array) => {
   let personalityValue = bytesToUint32LittleEndian(bytes, 0x00);
   let shiftValue = ((personalityValue & 0x3e000) >> 0xd) % 24;

@@ -1,11 +1,12 @@
 import { Abilities } from '../consts/Abilities';
 import { Items } from '../consts/Items';
 import { Languages } from '../consts/Languages';
-import { Gen9RibbonsPart1, Gen9RibbonsPart2 } from '../consts/Ribbons';
+import { Gen9RibbonsPart1, Gen9RibbonsPart2, RibbonTitles } from '../consts/Ribbons';
 import { getMetLocation } from '../renderer/MetLocation/MetLocation';
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
+  uint16ToBytesLittleEndian,
 } from '../util/ByteLogic';
 import {
   getHPGen3Onward,
@@ -15,6 +16,27 @@ import {
 import { pkm } from './pkm';
 
 export class pk8 extends pkm {
+  public get affixedRibbon() {
+    return this.bytes[0xe8] !== 0xff ? this.bytes[0xe8] : undefined;
+  }
+
+  public set affixedRibbon(value: number | undefined) {
+    this.bytes[0xe8] = value ?? 0xff
+  }
+
+  public get metLocationIndex() {
+    return bytesToUint16LittleEndian(this.bytes, 0x122);
+  }
+  public set metLocationIndex(value: number) {
+    this.bytes.set(uint16ToBytesLittleEndian(value), 0x122);
+  }
+  public get metLocation() {
+    return (
+      getMetLocation(this.gameOfOrigin, this.metLocationIndex) ??
+      this.metLocationIndex.toString()
+    );
+  }
+
   constructor(bytes: Uint8Array, format: string) {
     super(bytes);
     this.format = format;
@@ -140,11 +162,6 @@ export class pk8 extends pkm {
     this.metYear = bytes[0x11c];
     this.metMonth = bytes[0x11d];
     this.metDay = bytes[0x11e];
-    this.metLocation =
-      getMetLocation(
-        this.gameOfOrigin,
-        bytesToUint16LittleEndian(bytes, 0x122)
-      ) ?? bytesToUint16LittleEndian(bytes, 0x122).toString();
     this.isShiny =
       (this.trainerID ^
         this.secretID ^

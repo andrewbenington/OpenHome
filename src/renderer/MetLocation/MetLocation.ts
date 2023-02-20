@@ -1,16 +1,16 @@
-import { GameOfOrigin } from "../../consts/GameOfOrigin";
-import BDSPLocations from "./BDSP";
-import BW2MetLocation from "./BW2";
-import CrystalLocation from "./Crystal";
-import CXDLocation from "./CXD";
-import G4Locations from "./G4";
-import G6Location from "./G6";
-import LALocation from "./LA";
-import LGPELocations from "./LGPE";
-import RSEFRLGLocations from "./RSEFRLG";
-import SMUSUMLocations from "./SMUSUM";
-import SVMetLocation from "./SV";
-import SwShLocations from "./SwSh";
+import { GameOfOrigin, GameOfOriginData } from '../../consts/GameOfOrigin';
+import BDSPLocations from './BDSP';
+import BW2MetLocation from './BW2';
+import CrystalLocation from './Crystal';
+import CXDLocation from './CXD';
+import G4Locations from './G4';
+import G6Location from './G6';
+import LALocation from './LA';
+import LGPELocations from './LGPE';
+import RSEFRLGLocations from './RSEFRLG';
+import SMUSUMLocations from './SMUSUM';
+import SVMetLocation from './SV';
+import SwShLocations from './SwSh';
 
 export const getMetLocation = (
   game: number,
@@ -20,32 +20,32 @@ export const getMetLocation = (
 ) => {
   let multiplier = 10000;
   let locations: { [key: number]: string[] } = {};
-  if (game === -1) {
+  if (game >= GameOfOrigin.Red && game <= GameOfOrigin.Crystal) {
     locations = CrystalLocation;
-  } else if (forceRegion || (game < 20 && index > 30000)) {
-    return `in the ${GameOfOrigin[game]?.region} region`;
-  } else if (game <= 5) {
+  } else if (forceRegion || (game < GameOfOrigin.Black && index > 30000)) {
+    return `in the ${GameOfOriginData[game]?.region} region`;
+  } else if (game <= GameOfOrigin.LeafGreen) {
     locations = RSEFRLGLocations;
-  } else if (game === 15) {
+  } else if (game === GameOfOrigin.ColosseumXD) {
     locations = CXDLocation;
-  } else if (game >= 7 && game <= 12) {
+  } else if (game >= GameOfOrigin.HeartGold && game <= GameOfOrigin.Platinum) {
     multiplier = 1000;
     locations = G4Locations;
-  } else if (game >= 20 && game <= 23) {
+  } else if (game >= GameOfOrigin.Black && game <= GameOfOrigin.White2) {
     locations = BW2MetLocation;
-  } else if (game >= 24 && game <= 29) {
+  } else if (game >= GameOfOrigin.X && game <= GameOfOrigin.OmegaRuby) {
     locations = G6Location;
-  } else if (game >= 30 && game <= 41) {
+  } else if (game >= GameOfOrigin.Sun && game <= GameOfOrigin.UltraMoon) {
     locations = SMUSUMLocations;
-  } else if (game >= 42 && game <= 43) {
+  } else if (game >= GameOfOrigin.LetsGoPikachu && game <= GameOfOrigin.LetsGoEevee) {
     locations = LGPELocations;
-  } else if (game >= 44 && game <= 45) {
+  } else if (game >= GameOfOrigin.Sword && game <= GameOfOrigin.Shield) {
     locations = SwShLocations;
-  } else if (game === 47) {
+  } else if (game === GameOfOrigin.LegendsArceus) {
     locations = LALocation;
-  } else if (game >= 48 && game <= 49) {
+  } else if (game >= GameOfOrigin.BrilliantDiamond && game <= GameOfOrigin.ShiningPearl) {
     locations = BDSPLocations;
-  } else if (game >= 50 && game <= 51) {
+  } else if (game >= GameOfOrigin.Scarlet && game <= GameOfOrigin.Violet) {
     locations = SVMetLocation;
   }
   let locationBlock = locations[Math.floor(index / multiplier) * multiplier];
@@ -53,9 +53,9 @@ export const getMetLocation = (
     if (game === 47) {
       return locationBlock[index % multiplier];
     } else if (egg) {
-      return "from " + locationBlock[index % multiplier];
+      return 'from ' + locationBlock[index % multiplier];
     } else {
-      return "in " + locationBlock[index % multiplier];
+      return 'in ' + locationBlock[index % multiplier];
     }
   }
   return index.toString();

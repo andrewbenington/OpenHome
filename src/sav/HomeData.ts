@@ -1,22 +1,16 @@
 import _ from 'lodash';
 import OHPKM from 'pkm/OHPKM';
-import { pkm } from '../pkm/pkm';
+import { getMonFileIdentifier } from 'pkm/util';
 import { Box, BoxCoordinates, SAV } from './SAV';
 
-export class HomeData implements SAV {
-  bytes: Uint8Array;
-  static PC_OFFSET = 0x400;
-  money: number = -1;
-  name: string = '';
-  tid: number = 0;
-  sid: number = 0;
-  currentPCBox: number = 0;
-  boxNames: string[];
-  boxes: Array<HomeBox> = Array(36);
+export class HomeData extends SAV {
   changedMons: BoxCoordinates[] = [];
+  boxRows = 10;
+  boxColumns = 12;
+  boxes: Array<HomeBox>
   constructor(bytes: Uint8Array) {
-    this.bytes = bytes
-    this.boxNames = _.range(36).map((i) => `Home Box ${i + 1}`);
+    super('', bytes);
+    this.boxNames = _.range(36).map((i) => `Box ${i + 1}`);
     this.boxes = this.boxNames.map((name) => new HomeBox(name));
   }
 }
@@ -26,5 +20,28 @@ export class HomeBox implements Box {
   pokemon: Array<OHPKM | undefined> = new Array(120);
   constructor(n: string) {
     this.name = n;
+  }
+  writeMonsToString() {
+    return this.pokemon
+      .map((mon, i) => {
+        if (mon) {
+          return i.toString() + ',' + (getMonFileIdentifier(mon) ?? '') + '\n';
+        } else {
+          return '';
+        }
+      })
+      .join("");
+  }
+
+  getMonsFromString(fileString: string, monMap: { [key: string]: OHPKM }) {
+    console.log(monMap)
+    fileString.split('\n').forEach((monAndIndex) => {
+      const [indexStr, monRef] = monAndIndex.split(',');
+      const mon = monMap[monRef]
+      const index = parseInt(indexStr);
+      if (!Number.isNaN(index) && mon) {
+        this.pokemon[index] = mon;
+      }
+    });
   }
 }

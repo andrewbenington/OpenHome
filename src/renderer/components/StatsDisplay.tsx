@@ -14,12 +14,12 @@ import { useState } from 'react';
 import { Radar } from 'react-chartjs-2';
 import { getNatureSummary } from '../../consts/Natures';
 import { COLOPKM } from '../../pkm/colopkm';
-import { pk3 } from '../../pkm/pk3';
+import { PK3 } from '../../pkm/PK3';
 import { pkm } from '../../pkm/pkm';
 import { xdpkm } from '../../pkm/xdpkm';
 
 const getSheenStars = (mon: pkm) => {
-  if (mon instanceof pk3 || mon instanceof COLOPKM || mon instanceof xdpkm) {
+  if (mon instanceof PK3 || mon instanceof COLOPKM || mon instanceof xdpkm) {
     return mon.contest.sheen === 255
       ? 10
       : Math.floor(mon.contest.sheen / 29) + 1;
@@ -321,7 +321,7 @@ const StatsDisplay = (props: { mon: pkm }) => {
               alignItems: 'center',
               marginLeft: 10,
               marginRight: 10,
-              width: mon instanceof pk3 || mon instanceof COLOPKM ? 300 : 360,
+              width: mon instanceof PK3 || mon instanceof COLOPKM ? 300 : 360,
             }}
           >
             {_.range(getSheenStars(mon)).map((level: number) => (

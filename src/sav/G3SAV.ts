@@ -1,4 +1,4 @@
-import { pk3 } from '../pkm/pk3';
+import { PK3 } from '../pkm/PK3';
 import { SaveType } from '../renderer/types/types';
 import {
   bytesToUint16LittleEndian,
@@ -13,18 +13,6 @@ export class G3SAV extends SAV {
   static TRAINER_OFFSET = 0x0ff4 * 0;
   static TEAM_ITEMS_OFFSET = 0x0ff4 * 1;
   static PC_OFFSET = 0x0ff4 * 5;
-  public get boxes() {
-    return this.primarySave.boxes;
-  }
-  public set boxes(value: Array<Box>) {
-    this.primarySave.boxes = value;
-  }
-  public get boxNames() {
-    return this.primarySave.boxNames;
-  }
-  public set boxNames(value: string[]) {
-    this.primarySave.boxNames = value;
-  }
   saveType: SaveType;
   primarySave: G3SaveBackup;
   backupSave: G3SaveBackup;
@@ -49,6 +37,8 @@ export class G3SAV extends SAV {
     this.tid = this.primarySave.tid;
     this.sid = this.primarySave.sid;
     this.currentPCBox = this.primarySave.currentPCBox;
+    this.boxes = this.primarySave.boxes
+    this.boxNames = this.primarySave.boxNames
   }
 
   prepareBoxesForSaving() {
@@ -56,7 +46,7 @@ export class G3SAV extends SAV {
       const monOffset = 30 * box + index;
       const pcBytes = new Uint8Array(80);
       try {
-        let mon = new pk3(this.boxes[box].pokemon[index]);
+        let mon = new PK3(this.boxes[box].pokemon[index]);
         if (mon?.gameOfOrigin && mon?.dexNum) {
           mon.refreshChecksum();
           pcBytes.set(mon.toPCBytes(), 0);
@@ -133,7 +123,7 @@ export class G3SaveBackup {
     }
     for (let i = 0; i < 420; i++) {
       try {
-        let mon = new pk3(
+        let mon = new PK3(
           this.pcDataContiguous.slice(4 + i * 80, 4 + (i + 1) * 80),
           true
         );
@@ -179,7 +169,7 @@ export class G3SaveBackup {
 
 export class G3Box implements Box {
   name: string;
-  pokemon: Array<pk3> = new Array(30);
+  pokemon: Array<PK3> = new Array(30);
   constructor(n: string) {
     this.name = n;
   }

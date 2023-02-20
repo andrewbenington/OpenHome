@@ -28,10 +28,15 @@ export type levelUpType =
   | 'Fluctuating';
   
 export enum SaveType {
+  UNKNOWN,
+  GS_I,
+  C_I,
+  C_J,
   RS,
   FRLG,
   E,
-  DPPt,
+  DP,
+  Pt,
   HGSS,
   G5,
 }

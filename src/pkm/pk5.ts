@@ -8,16 +8,16 @@ import {
   bytesToUint32LittleEndian,
   uint16ToBytesLittleEndian,
   writeUint16ToBuffer,
-  writeUint32ToBuffer
+  writeUint32ToBuffer,
 } from '../util/ByteLogic';
 import {
   decryptByteArrayGen45,
-  unshuffleBlocksGen45
+  unshuffleBlocksGen45,
 } from '../util/Encryption';
 import {
   getHPGen3Onward,
   getLevelGen3Onward,
-  getStatGen3Onward
+  getStatGen3Onward,
 } from '../util/StatCalc';
 import { pkm } from './pkm';
 
@@ -137,24 +137,16 @@ export class pk5 extends pkm {
         }
       }
     }
-    this.metYear = bytes[0x7b];
-    this.metMonth = bytes[0x7c];
-    this.metDay = bytes[0x7d];
+    this.metDate = {
+      day: bytes[0x7d],
+      month: bytes[0x7c],
+      year: bytes[0x7b],
+    };
     this.isShiny =
       (this.trainerID ^
         this.secretID ^
         bytesToUint16LittleEndian(bytes, 0x00) ^
         bytesToUint16LittleEndian(bytes, 0x02)) <
       8;
-
-    const getByteArray = () => {
-      let bytes = new Uint8Array(pk5.fileSize);
-      writeUint32ToBuffer(this.personalityValue, bytes, 0x00);
-      writeUint16ToBuffer(this.dexNum, bytes, 0x08);
-      writeUint16ToBuffer(this.heldItemIndex, bytes, 0x0a);
-      writeUint16ToBuffer(this.trainerID, bytes, 0x0c);
-      writeUint16ToBuffer(this.secretID, bytes, 0x0e);
-      writeUint32ToBuffer(this.exp, bytes, 0x10);
-    };
   }
 }

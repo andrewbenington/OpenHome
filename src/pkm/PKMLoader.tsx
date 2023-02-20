@@ -1,7 +1,7 @@
 import { Button, MenuItem, Pagination, Select } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useFilePicker } from 'use-file-picker';
-import PokemonDisplay from '../renderer/components.ts/PokemonDisplay';
+import PokemonDisplay from '../renderer/components/PokemonDisplay';
 import { pkm } from './pkm';
 import { acceptableExtensions, bytesToPKM } from '../util/FileImport';
 

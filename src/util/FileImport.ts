@@ -3,8 +3,8 @@ import { COLOPKM } from '../pkm/colopkm';
 import { pa8 } from '../pkm/pa8';
 import { pb7 } from '../pkm/pb7';
 import { PK2 } from '../pkm/PK2';
-import { pk3 } from '../pkm/pk3';
-import { pk4 } from '../pkm/pk4';
+import { PK3 } from '../pkm/PK3';
+import { PK4 } from '../pkm/PK4';
 import { pk5 } from '../pkm/pk5';
 import { pk6 } from '../pkm/pk6';
 import { pk7 } from '../pkm/pk7';
@@ -39,16 +39,16 @@ export const bytesToPKM = (bytes: Uint8Array, extension: string): pkm => {
   } else if (extension === 'xdpkm') {
     return new xdpkm(bytes);
   } else if (
-    extension === 'pk3' ||
+    extension === 'PK3' ||
     bytes.length === 100 ||
     bytes.length === 80
   ) {
-    return new pk3(bytes);
+    return new PK3(bytes);
   } else if (
     bytes[0x5f] < 20 &&
-    (extension === 'pk4' || bytes.length === 136 || bytes.length === 236)
+    (extension === 'PK4' || bytes.length === 136 || bytes.length === 236)
   ) {
-    return new pk4(bytes);
+    return new PK4(bytes);
   } else if (
     extension === 'pk5' ||
     bytes.length === 0xdc ||
