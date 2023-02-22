@@ -1,4 +1,4 @@
-import { GameOfOrigin, GameOfOriginData } from '../../consts/GameOfOrigin';
+import { GameOfOrigin, GameOfOriginData } from '../GameOfOrigin';
 import BDSPLocations from './BDSP';
 import BW2MetLocation from './BW2';
 import CrystalLocation from './Crystal';
@@ -12,12 +12,13 @@ import SMUSUMLocations from './SMUSUM';
 import SVMetLocation from './SV';
 import SwShLocations from './SwSh';
 
-export const getMetLocation = (
+export const getLocation = (
   game: number,
   index: number,
   forceRegion: boolean = false,
   egg: boolean = false
 ) => {
+  console.log(game)
   let multiplier = 10000;
   let locations: { [key: number]: string[] } = {};
   if (game >= GameOfOrigin.Red && game <= GameOfOrigin.Crystal) {
@@ -37,13 +38,19 @@ export const getMetLocation = (
     locations = G6Location;
   } else if (game >= GameOfOrigin.Sun && game <= GameOfOrigin.UltraMoon) {
     locations = SMUSUMLocations;
-  } else if (game >= GameOfOrigin.LetsGoPikachu && game <= GameOfOrigin.LetsGoEevee) {
+  } else if (
+    game >= GameOfOrigin.LetsGoPikachu &&
+    game <= GameOfOrigin.LetsGoEevee
+  ) {
     locations = LGPELocations;
   } else if (game >= GameOfOrigin.Sword && game <= GameOfOrigin.Shield) {
     locations = SwShLocations;
   } else if (game === GameOfOrigin.LegendsArceus) {
     locations = LALocation;
-  } else if (game >= GameOfOrigin.BrilliantDiamond && game <= GameOfOrigin.ShiningPearl) {
+  } else if (
+    game >= GameOfOrigin.BrilliantDiamond &&
+    game <= GameOfOrigin.ShiningPearl
+  ) {
     locations = BDSPLocations;
   } else if (game >= GameOfOrigin.Scarlet && game <= GameOfOrigin.Violet) {
     locations = SVMetLocation;

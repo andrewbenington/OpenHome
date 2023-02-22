@@ -2,7 +2,6 @@ import { Abilities } from '../consts/Abilities';
 import { Items } from '../consts/Items';
 import { Languages } from '../consts/Languages';
 import { Gen9RibbonsPart1, Gen9RibbonsPart2, RibbonTitles } from '../consts/Ribbons';
-import { getMetLocation } from '../renderer/MetLocation/MetLocation';
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -13,9 +12,9 @@ import {
   getLevelGen3Onward,
   getStatGen3Onward,
 } from '../util/StatCalc';
-import { pkm } from './pkm';
+import { PKM } from './PKM';
 
-export class pk8 extends pkm {
+export class PK8 extends PKM {
   public get affixedRibbon() {
     return this.bytes[0xe8] !== 0xff ? this.bytes[0xe8] : undefined;
   }
@@ -29,12 +28,6 @@ export class pk8 extends pkm {
   }
   public set metLocationIndex(value: number) {
     this.bytes.set(uint16ToBytesLittleEndian(value), 0x122);
-  }
-  public get metLocation() {
-    return (
-      getMetLocation(this.gameOfOrigin, this.metLocationIndex) ??
-      this.metLocationIndex.toString()
-    );
   }
 
   constructor(bytes: Uint8Array, format: string) {
@@ -137,7 +130,6 @@ export class pk8 extends pkm {
       for (let bit = 0; bit < 8; bit++) {
         if (ribbonsUint8 & Math.pow(2, bit)) {
           this.ribbons.push(Gen9RibbonsPart1[8 * byte + bit]);
-        } else {
         }
       }
     }
@@ -146,19 +138,12 @@ export class pk8 extends pkm {
       for (let bit = 0; bit < 8; bit++) {
         if (ribbonsUint8 & Math.pow(2, bit)) {
           this.ribbons.push(Gen9RibbonsPart2[32 + 8 * byte + bit]);
-        } else {
         }
       }
     }
     this.eggYear = bytes[0x119];
     this.eggMonth = bytes[0x11a];
     this.eggDay = bytes[0x11b];
-    this.eggLocation =
-      getMetLocation(
-        this.gameOfOrigin,
-        bytesToUint16LittleEndian(bytes, 0x120),
-        true
-      ) ?? bytesToUint16LittleEndian(bytes, 0x120).toString();
     this.metYear = bytes[0x11c];
     this.metMonth = bytes[0x11d];
     this.metDay = bytes[0x11e];

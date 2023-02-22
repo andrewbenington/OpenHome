@@ -1,4 +1,4 @@
-import { PK4 } from '../pkm/PK4';
+import { PK4 } from '../PKM/PK4';
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -16,14 +16,23 @@ export class HGSSSAV extends G4SAV {
   static BOX_NAMES_OFFSET = 0x12008;
   static BLOCK_FOOTER_SIZE = 0x10;
 
-  currentStorageBlockOffset: number = HGSSSAV.STORAGE_BLOCK_OFFSET;
+  currentSaveStorageBlockOffset: number = HGSSSAV.STORAGE_BLOCK_OFFSET;
   storageBlockSize: number = HGSSSAV.STORAGE_BLOCK_SIZE;
   boxSize: number = HGSSSAV.BOX_SIZE;
-  boxNamesOffset: number;
   footerSize: number = HGSSSAV.BLOCK_FOOTER_SIZE;
 
   constructor(path: string, bytes: Uint8Array) {
     super(path, bytes);
+    console.log(
+      'first save is',
+      this.currentSaveStorageBlockOffset.toString(16),
+      'at',
+      this.getCurrentSaveCount(
+        this.currentSaveStorageBlockOffset,
+        HGSSSAV.STORAGE_BLOCK_SIZE
+      ),
+      'saves'
+    );
     // current storage block could be either the first or second one,
     // depending on save count
     if (
@@ -36,10 +45,31 @@ export class HGSSSAV extends G4SAV {
         HGSSSAV.STORAGE_BLOCK_SIZE
       )
     ) {
-      this.currentStorageBlockOffset += 0x40000;
+      this.currentSaveStorageBlockOffset += 0x40000;
     }
+    console.log(
+      'second save is',
+      (HGSSSAV.STORAGE_BLOCK_OFFSET + 0x40000).toString(16),
+      'at',
+      this.getCurrentSaveCount(
+        HGSSSAV.STORAGE_BLOCK_OFFSET + 0x40000,
+        HGSSSAV.STORAGE_BLOCK_SIZE
+      ),
+      'saves'
+    );
+    console.log(
+      'current save is',
+      this.currentSaveStorageBlockOffset.toString(16),
+      'at',
+      this.getCurrentSaveCount(
+        this.currentSaveStorageBlockOffset,
+        HGSSSAV.STORAGE_BLOCK_SIZE
+      ),
+      'saves'
+    );
+    this.currentSaveBoxStartOffset = this.currentSaveStorageBlockOffset;
     this.boxNamesOffset =
-      this.currentStorageBlockOffset + HGSSSAV.BOX_NAMES_OFFSET;
+      this.currentSaveStorageBlockOffset + HGSSSAV.BOX_NAMES_OFFSET;
     this.name = gen4StringToUTF(bytes, HGSSSAV.TRAINER_OFFSET, 8);
     this.buildBoxes();
 

@@ -1,10 +1,9 @@
-import { getMetLocation } from '../renderer/MetLocation/MetLocation';
 import { Gen9RibbonsPart1, Gen9RibbonsPart2 } from '../consts/Ribbons';
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
 } from '../util/ByteLogic';
-import { pkm } from './pkm';
+import { PKM } from './PKM';
 import { Abilities } from '../consts/Abilities';
 import { Items } from '../consts/Items';
 import { Languages } from '../consts/Languages';
@@ -15,11 +14,11 @@ import {
   getStatGen3Onward,
 } from '../util/StatCalc';
 
-export class pk9 extends pkm {
+export class PK9 extends PKM {
   constructor(bytes: Uint8Array) {
     super(bytes);
     this.encryptionConstant = bytesToUint32LittleEndian(bytes, 0x00);
-    this.format = 'pk9';
+    this.format = 'PK9';
     this.personalityValue = bytesToUint32LittleEndian(bytes, 0x00);
     this.dexNum = svToNatDex(bytesToUint16LittleEndian(bytes, 0x08));
     this.exp = bytesToUint32LittleEndian(bytes, 0x10);
@@ -128,9 +127,6 @@ export class pk9 extends pkm {
     this.metMonth = bytes[0x11d];
     this.metDay = bytes[0x11e];
     this.metLocationIndex = bytesToUint16LittleEndian(bytes, 0x122);
-    this.metLocation =
-      getMetLocation(this.gameOfOrigin, this.metLocationIndex) ??
-      this.metLocationIndex.toString();
     this.isShiny =
       (this.trainerID ^
         this.secretID ^

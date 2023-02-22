@@ -1,28 +1,31 @@
 import { Card } from '@mui/material';
-import { borderRadius } from '@mui/system';
-import { RibbonTitles } from 'consts/Ribbons';
-import OHPKM from 'pkm/OHPKM';
-import { PK2 } from 'pkm/PK2';
-import { getMonFileIdentifier, getMonGen12Identifier } from 'pkm/util';
+import { getMonFileIdentifier } from 'PKM/util';
 import { Balls } from '../../consts/Balls';
 import { getCharacteristic } from '../../consts/Characteristics';
 import { GameOfOriginData } from '../../consts/GameOfOrigin';
 import MOVES from '../../consts/Moves';
 import { Natures } from '../../consts/Natures';
-import { pkm, marking } from '../../pkm/pkm';
+import { marking, PKM } from '../../PKM/PKM';
 import { getGameLogo, getTypeColor } from '../util/PokemonSprite';
 
 const getMarkingColor = (value: marking) => {
   return ['grey', 'blue', 'red'][value];
 };
 
-const SummaryDisplay = (props: { mon: pkm; updateMon: (mon: pkm) => void }) => {
+const metTimesOfDay = [
+  'in the morning',
+  'during the daytime',
+  'in the evening',
+];
+
+const SummaryDisplay = (props: { mon: PKM; updateMon: (mon: PKM) => void }) => {
   const { mon, updateMon } = props;
   return (
-    <div>
+    <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
       <div
         style={{
           display: 'flex',
+          flex: 1,
           flexDirection: 'row',
           height: 'fit-content',
           padding: 10,
@@ -72,6 +75,8 @@ const SummaryDisplay = (props: { mon: pkm; updateMon: (mon: pkm) => void }) => {
           )}
           {mon.metLocation ? (
             <p style={{ textAlign: 'left' }}>{`Met ${
+              mon.metTimeOfDay ? metTimesOfDay[mon.metTimeOfDay - 1] + ' ' : ''
+            }${
               mon.metDate
                 ? `on ${mon.metDate.month}/${mon.metDate.day}/${mon.metDate.year},`
                 : ''
@@ -231,14 +236,14 @@ const SummaryDisplay = (props: { mon: pkm; updateMon: (mon: pkm) => void }) => {
       >
         {mon.moves
           .filter((move) => !!move)
-          .map((move, id) => {
+          .map((move, i) => {
             return (
               <Card
-                key={`move${id}`}
+                key={`move${i}`}
                 style={{
                   height: 70,
                   width: 120,
-                  margin: 10,
+                  margin: 5,
                   backgroundColor: getTypeColor(MOVES[move]?.type),
                   textAlign: 'center',
                 }}
@@ -260,13 +265,12 @@ const SummaryDisplay = (props: { mon: pkm; updateMon: (mon: pkm) => void }) => {
                     fontWeight: 'bold',
                   }}
                 >
-                  {MOVES[move]?.pp ?? '--'} PP
+                  {mon.movePP[i] ?? '--'}/{MOVES[move]?.pp ?? '--'} PP
                 </p>
               </Card>
             );
           })}
       </div>
-      {getMonFileIdentifier(mon)}
     </div>
   );
 };

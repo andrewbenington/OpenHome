@@ -1,8 +1,8 @@
-import { MONS_LIST } from 'consts/Mons';
-import OHPKM from 'pkm/OHPKM';
-import { PK2 } from 'pkm/PK2';
-import { pkm } from 'pkm/pkm';
+import { uniq } from 'lodash';
+import OHPKM from 'PKM/OHPKM';
+import { PK2 } from 'PKM/PK2';
 import { SaveType } from 'renderer/types/types';
+import { get8BitChecksum } from 'util/ByteLogic';
 import {
   gen12StringToUTF,
   utf16StringToGen12,
@@ -12,6 +12,7 @@ import { Box, SAV } from './SAV';
 export class G2SAV extends SAV {
   boxOffsets: number[];
   boxes: Array<G2Box>;
+  pkmType = PK2;
   constructor(path: string, bytes: Uint8Array) {
     super(path, bytes);
     this.boxOffsets = [
@@ -30,7 +31,7 @@ export class G2SAV extends SAV {
         this.boxColumns = 5;
     }
     this.boxes = new Array<G2Box>(this.boxOffsets.length);
-    if (this.saveType > 0 && this.saveType <= 2) {
+    if (this.saveType >= SaveType.GS_I && this.saveType <= SaveType.C_I) {
       let pokemonPerBox = this.boxRows * this.boxColumns;
       this.boxOffsets.forEach((offset, boxNumber) => {
         const monCount = bytes[offset];
@@ -76,42 +77,94 @@ export class G2SAV extends SAV {
 
   prepareBoxesForSaving() {
     const changedMonPKMs: OHPKM[] = [];
-    this.changedMons.forEach(({ box, index }) => {
-      let pokemonPerBox = this.boxRows * this.boxColumns;
-      const boxByteOffset = this.boxOffsets[box];
-      const changedMon = this.boxes[box].pokemon[index];
-      if (changedMon) {
-        if (changedMon instanceof OHPKM) {
-          changedMonPKMs.push(changedMon);
+    const changedBoxes = uniq(this.changedMons.map((coords) => coords.box));
+    const pokemonPerBox = this.boxRows * this.boxColumns;
+    changedBoxes.forEach((boxNumber) => {
+      const boxByteOffset = this.boxOffsets[boxNumber];
+      const box = this.boxes[boxNumber];
+      // functions as an index, to skip empty slots
+      let numMons = 0;
+      box.pokemon.forEach((boxMon) => {
+        if (boxMon) {
+          console.log('setting bytes for', boxMon.nickname);
+          if (boxMon instanceof OHPKM) {
+            changedMonPKMs.push(boxMon);
+          }
+          const PK2Mon = new PK2(boxMon);
+          // set the mon's dex number in the box
+          this.bytes[boxByteOffset + 1 + numMons] = PK2Mon.dexNum;
+          // set the mon's data in the box
+          this.bytes.set(
+            PK2Mon.bytes,
+            boxByteOffset + 1 + pokemonPerBox + 1 + numMons * 0x20
+          );
+          // set the mon's OT name in the box
+          const trainerNameBuffer = utf16StringToGen12(
+            PK2Mon.trainerName,
+            11,
+            true
+          );
+          this.bytes.set(
+            trainerNameBuffer,
+            boxByteOffset +
+              1 +
+              pokemonPerBox +
+              1 +
+              pokemonPerBox * 0x20 +
+              numMons * 11
+          );
+          // set the mon's nickname in the box
+          const nicknameBuffer = utf16StringToGen12(PK2Mon.nickname, 11, true);
+          this.bytes.set(
+            nicknameBuffer,
+            boxByteOffset +
+              1 +
+              pokemonPerBox +
+              1 +
+              pokemonPerBox * 0x20 +
+              pokemonPerBox * 11 +
+              numMons * 11
+          );
+          numMons++;
         }
-        const mon = new PK2(changedMon);
-        this.bytes[boxByteOffset + 1 + index] = mon.dexNum;
+      });
+      this.bytes[boxByteOffset] = numMons;
+      const remainingSlots = pokemonPerBox - numMons;
+      if (remainingSlots) {
+        // set all dex numbers to 0
         this.bytes.set(
-          mon.bytes,
-          boxByteOffset + 1 + pokemonPerBox + 1 + index * 0x20
+          new Uint8Array(remainingSlots + 1),
+          boxByteOffset + 1 + numMons
         );
-        const trainerNameBuffer = utf16StringToGen12(mon.trainerName, 11, true);
+        // set all mon data to all 0s
         this.bytes.set(
-          trainerNameBuffer,
+          new Uint8Array(0x20 * remainingSlots),
+          boxByteOffset + 1 + pokemonPerBox + 1 + numMons * 0x20
+        );
+        // set all OT names to all 0s
+        this.bytes.set(
+          new Uint8Array(11 * remainingSlots),
           boxByteOffset +
             1 +
             pokemonPerBox +
             1 +
             pokemonPerBox * 0x20 +
-            index * 11
+            numMons * 11
         );
-        const nicknameBuffer = utf16StringToGen12(mon.nickname, 11, true);
+        // set all nicknames to all 0s
         this.bytes.set(
-          nicknameBuffer,
+          new Uint8Array(11 * remainingSlots),
           boxByteOffset +
             1 +
             pokemonPerBox +
             1 +
             pokemonPerBox * 0x20 +
             pokemonPerBox * 11 +
-            index * 11
+            numMons * 11
         );
       }
+      // add terminator
+      this.bytes[boxByteOffset + 1 + numMons] = 0xff;
     });
     switch (this.saveType) {
       case SaveType.GS_I:
@@ -124,6 +177,7 @@ export class G2SAV extends SAV {
         this.bytes[0x1f0d] = this.getCrystalInternationalChecksum2();
         break;
     }
+    console.log(changedMonPKMs);
     return changedMonPKMs;
   }
 
@@ -137,55 +191,25 @@ export class G2SAV extends SAV {
   }
 
   getGoldSilverInternationalChecksum1() {
-    let checksum1 = 0;
-    for (let i = 0x2009; i <= 0x2d68; i += 1) {
-      checksum1 += this.bytes[i];
-      checksum1 = checksum1 & 0xff;
-    }
-    return checksum1;
+    return get8BitChecksum(this.bytes, 0x2009, 0x2d68);
   }
 
   getGoldSilverInternationalChecksum2() {
     let checksum = 0;
-    for (let i = 0x15c7; i <= 0x17ec; i += 1) {
-      checksum += this.bytes[i];
-      checksum = checksum & 0xff;
-    }
-    for (let i = 0x3d96; i <= 0x3f3f; i += 1) {
-      checksum += this.bytes[i];
-      checksum = checksum & 0xff;
-    }
-    for (let i = 0x0c6b; i <= 0x10e7; i += 1) {
-      checksum += this.bytes[i];
-      checksum = checksum & 0xff;
-    }
-    for (let i = 0x7e39; i <= 0x7e6c; i += 1) {
-      checksum += this.bytes[i];
-      checksum = checksum & 0xff;
-    }
-    for (let i = 0x10e8; i <= 0x15c6; i += 1) {
-      checksum += this.bytes[i];
-      checksum = checksum & 0xff;
-    }
+    checksum += get8BitChecksum(this.bytes, 0x15c7, 0x17ec);
+    checksum += get8BitChecksum(this.bytes, 0x3d96, 0x3f3f);
+    checksum += get8BitChecksum(this.bytes, 0x0c6b, 0x10e7);
+    checksum += get8BitChecksum(this.bytes, 0x7e39, 0x7e6c);
+    checksum += get8BitChecksum(this.bytes, 0x10e8, 0x15c6);
     return checksum;
   }
 
   getCrystalInternationalChecksum1() {
-    let checksum = 0;
-    for (let i = 0x2009; i <= 0x2b82; i += 1) {
-      checksum += this.bytes[i];
-      checksum = checksum & 0xff;
-    }
-    return checksum;
+    return get8BitChecksum(this.bytes, 0x2009, 0x2b82);
   }
 
   getCrystalInternationalChecksum2() {
-    let checksum = 0;
-    for (let i = 0x1209; i <= 0x1d82; i += 1) {
-      checksum += this.bytes[i];
-      checksum = checksum & 0xff;
-    }
-    return checksum;
+    return get8BitChecksum(this.bytes, 0x1209, 0x1d82);
   }
 
   areCrystalInternationalChecksumsValid() {

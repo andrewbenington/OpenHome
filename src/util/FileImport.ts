@@ -1,43 +1,47 @@
-import OHPKM from '../pkm/OHPKM';
-import { COLOPKM } from '../pkm/colopkm';
-import { pa8 } from '../pkm/pa8';
-import { pb7 } from '../pkm/pb7';
-import { PK2 } from '../pkm/PK2';
-import { PK3 } from '../pkm/PK3';
-import { PK4 } from '../pkm/PK4';
-import { pk5 } from '../pkm/pk5';
-import { pk6 } from '../pkm/pk6';
-import { pk7 } from '../pkm/pk7';
-import { pk8 } from '../pkm/pk8';
-import { pk9 } from '../pkm/pk9';
-import { pkm } from '../pkm/pkm';
-import { xdpkm } from '../pkm/xdpkm';
+import OHPKM from '../PKM/OHPKM';
+import { COLOPKM } from '../PKM/COLOPKM';
+import { PA8 } from '../PKM/PA8';
+import { PK2 } from '../PKM/PK2';
+import { PK3 } from '../PKM/PK3';
+import { PK4 } from '../PKM/PK4';
+import { PK5 } from '../PKM/PK5';
+import { PK6 } from '../PKM/PK6';
+import { PK7 } from '../PKM/PK7';
+import { PK8 } from '../PKM/PK8';
+import { PK9 } from '../PKM/PK9';
+import { PKM } from '../PKM/PKM';
+import { XDPKM } from '../PKM/XDPKM';
+import { PK1 } from '../PKM/PK1';
+import { PB7 } from '../PKM/PB7';
 
 export const acceptableExtensions = [
-  '.ohpkm',
-  '.pkm',
-  '.pk2',
-  '.colopkm',
-  '.xdpkm',
-  '.pk5',
-  '.pk6',
-  '.pk7',
-  '.pb7',
-  '.pk8',
-  '.pa8',
-  '.pb8',
-  '.pk9',
+  'OHPKM',
+  'PKM',
+  'PK1',
+  'PK2',
+  'COLOPKM',
+  'XDPKM',
+  'PK5',
+  'PK6',
+  'PK7',
+  'PB7',
+  'PK8',
+  'PA8',
+  'PB8',
+  'PK9',
 ];
 
-export const bytesToPKM = (bytes: Uint8Array, extension: string): pkm => {
+export const bytesToPKM = (bytes: Uint8Array, extension: string): PKM => {
   if (extension === 'ohpkm') {
     return new OHPKM(bytes);
-  } else if (bytes.length === 73) {
+  } else if (bytes.length === 69 || extension === 'PK1') {
+    return new PK1(bytes.slice(3, bytes.length));
+  } else if (bytes.length === 73 || extension === 'PK2') {
     return new PK2(bytes.slice(3, bytes.length));
-  } else if (extension === 'colopkm') {
+  } else if (extension === 'COLOPKM') {
     return new COLOPKM(bytes);
-  } else if (extension === 'xdpkm') {
-    return new xdpkm(bytes);
+  } else if (extension === 'XDPKM') {
+    return new XDPKM(bytes);
   } else if (
     extension === 'PK3' ||
     bytes.length === 100 ||
@@ -50,23 +54,23 @@ export const bytesToPKM = (bytes: Uint8Array, extension: string): pkm => {
   ) {
     return new PK4(bytes);
   } else if (
-    extension === 'pk5' ||
+    extension === 'PK5' ||
     bytes.length === 0xdc ||
     bytes.length === 0x88 ||
     bytes.length === 136
   ) {
-    return new pk5(bytes);
-  } else if (extension === 'pk6') {
-    return new pk6(bytes);
-  } else if (extension === 'pk7') {
-    return new pk7(bytes);
-  } else if (extension === 'pb7') {
-    return new pb7(bytes);
-  } else if (extension === 'pk8' || extension === 'pb8') {
-    return new pk8(bytes, extension === 'pb8' ? 'pb8' : 'pk8');
-  } else if (extension === 'pa8') {
-    return new pa8(bytes);
+    return new PK5(bytes);
+  } else if (extension === 'PK6') {
+    return new PK6(bytes);
+  } else if (extension === 'PK7') {
+    return new PK7(bytes);
+  } else if (extension === 'PB7') {
+    return new PB7(bytes);
+  } else if (extension === 'PK8' || extension === 'PB8') {
+    return new PK8(bytes, extension === 'PB8' ? 'PB8' : 'PK8');
+  } else if (extension === 'PA8') {
+    return new PA8(bytes);
   } else {
-    return new pk9(bytes);
+    return new PK9(bytes);
   }
 };

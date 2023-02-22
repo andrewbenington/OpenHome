@@ -1,10 +1,10 @@
 import LevelUpExp from '../consts/LevelUpExp';
 import { MONS_LIST } from '../consts/Mons';
 import { getNatureSummary } from '../consts/Natures';
-import { pkm } from '../pkm/pkm';
+import { PKM } from '../PKM/PKM';
 import { Stat } from '../renderer/types/types';
 
-export const getStatGen3Onward = (stat: Stat, mon: pkm) => {
+export const getStatGen3Onward = (stat: Stat, mon: PKM) => {
   if (mon.dexNum < 1 || mon.dexNum > 1008) {
     return 0;
   }
@@ -31,7 +31,7 @@ export const getStatGen3Onward = (stat: Stat, mon: pkm) => {
   }
 };
 
-export const getHPGen3Onward = (mon: pkm) => {
+export const getHPGen3Onward = (mon: PKM) => {
   if (mon.dexNum < 1 || mon.dexNum > 1008) {
     return 0;
   }
@@ -85,7 +85,7 @@ export const getLevelGen12 = (dexNum: number, exp: number) => {
       case 'Medium Slow':
         if (
           1.2 * Math.pow(level, 3) -
-            15 * Math.pow(level, 2) -
+            15 * Math.pow(level, 2) +
             100 * level -
             140 <=
           exp

@@ -1,5 +1,5 @@
-import { pkm } from 'pkm/pkm';
-import { getMonFileIdentifier } from 'pkm/util';
+import { PKM } from 'PKM/PKM';
+import { getMonFileIdentifier } from 'PKM/util';
 
 export const readBoxData = async (callback: (data: string) => void) => {
   window.electron.ipcRenderer.once('home-box-read', (boxString: string) => {
@@ -47,7 +47,7 @@ export const handleMenuResetAndClose = (
   };
 };
 
-export const handleDeleteOHPKM = (mon: pkm) => {
+export const handleDeleteOHPKM = (mon: PKM) => {
   const identifier = getMonFileIdentifier(mon);
   window.electron.ipcRenderer.sendMessage('delete-ohpkm', identifier);
 };

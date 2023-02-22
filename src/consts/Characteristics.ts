@@ -1,5 +1,5 @@
 import { max } from "lodash";
-import { stats } from "../pkm/pkm";
+import { stats } from "../PKM/PKM";
 
 export const getCharacteristic = (
   ivs: stats,

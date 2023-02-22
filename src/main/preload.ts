@@ -15,12 +15,10 @@ const electronHandler = {
       ipcRenderer.on(channel, subscription);
 
       return () => {
-        console.log('removing listener for', channel);
         ipcRenderer.removeListener(channel, subscription);
       };
     },
     once(channel: Channels, func: (...args: unknown[]) => void) {
-      console.log(`sending to ${channel}`);
       ipcRenderer.once(channel, (_event, ...args) => func(...args));
     },
   },

@@ -77,10 +77,7 @@ ipcMain.on('read-home-box', async (event, boxName) => {
       encoding: 'utf8',
     }
   );
-  console.log(
-    `${appDataPath}/open-home/storage/boxes/${boxName}.csv`,
-    boxName
-  );
+  console.log(`${appDataPath}/open-home/storage/boxes/${boxName}.csv`, boxName);
   event.reply('home-box-read', boxString);
 });
 
@@ -164,12 +161,15 @@ const createWindow = async () => {
     if (!mainWindow) {
       throw new Error('"mainWindow" is not defined');
     }
-    setMainMenu();
+    // setMainMenu();
     if (process.env.START_MINIMIZED) {
       mainWindow.minimize();
     } else {
       mainWindow.show();
     }
+
+    const menuBuilder = new MenuBuilder(mainWindow);
+    menuBuilder.buildMenu();
   });
 
   mainWindow.on('closed', () => {
@@ -193,61 +193,61 @@ const createWindow = async () => {
 
 app;
 
-function setMainMenu() {
-  const template = [
-    {
-      label: 'OpenHome',
-      submenu: [
-        {
-          label: 'Preferences',
-          accelerator: 'CmdOrCtrl+P',
-          click() {
-            console.log('Oh, hi there!');
-          },
-        },
-      ],
-    },
-    {
-      label: 'File',
-      submenu: [
-        {
-          label: 'Save',
-          accelerator: 'CmdOrCtrl+S',
-          click() {
-            mainWindow?.webContents.send('save');
-          },
-        },
-        {
-          label: 'Reset',
-          accelerator: 'CmdOrCtrl+X',
-          click() {
-            mainWindow?.webContents.send('reset');
-          },
-        },
-        {
-          label: 'Reset And Close Saves',
-          accelerator: 'Shift+CmdOrCtrl+X',
-          click() {
-            mainWindow?.webContents.send('reset-close');
-          },
-        },
-      ],
-    },
-    {
-      label: 'Filter',
-      submenu: [
-        {
-          label: 'Hello',
-          accelerator: 'Shift+CmdOrCtrl+H',
-          click() {
-            console.log('Oh, hi there!');
-          },
-        },
-      ],
-    },
-  ];
-  Menu.setApplicationMenu(Menu.buildFromTemplate(template));
-}
+// function setMainMenu() {
+//   const template = [
+//     {
+//       label: 'OpenHome',
+//       submenu: [
+//         {
+//           label: 'Preferences',
+//           accelerator: 'CmdOrCtrl+P',
+//           click() {
+//             console.log('Oh, hi there!');
+//           },
+//         },
+//       ],
+//     },
+//     {
+//       label: 'File',
+//       submenu: [
+//         {
+//           label: 'Save',
+//           accelerator: 'CmdOrCtrl+S',
+//           click() {
+//             mainWindow?.webContents.send('save');
+//           },
+//         },
+//         {
+//           label: 'Reset',
+//           accelerator: 'CmdOrCtrl+X',
+//           click() {
+//             mainWindow?.webContents.send('reset');
+//           },
+//         },
+//         {
+//           label: 'Reset And Close Saves',
+//           accelerator: 'Shift+CmdOrCtrl+X',
+//           click() {
+//             mainWindow?.webContents.send('reset-close');
+//           },
+//         },
+//       ],
+//     },
+//     {
+//       label: 'Filter',
+//       submenu: [
+//         {
+//           label: 'Hello',
+//           accelerator: 'Shift+CmdOrCtrl+H',
+//           click() {
+//             console.log('Oh, hi there!');
+//           },
+//         },
+//       ],
+//     },
+//   ];
+//   Menu.setApplicationMenu(Menu.buildFromTemplate(template));
+// }
 
 app.on('window-all-closed', () => {
   // Respect the OSX convention of having the application in memory even

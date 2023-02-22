@@ -3,7 +3,7 @@ import { Button, Card, Grid } from '@mui/material';
 import _ from 'lodash';
 import { useState } from 'react';
 import { SaveCoordinates } from 'renderer/Home';
-import { pkm } from '../../pkm/pkm';
+import { PKM } from '../../PKM/PKM';
 import { BoxCoordinates, SAV } from '../../sav/SAV';
 import OpenHomeButton from './buttons/OpenHomeButton';
 import PokemonButton from './buttons/PokemonButton';
@@ -15,11 +15,11 @@ interface SaveDisplayProps {
   onDrag: (coords: SaveCoordinates) => void;
   onDrop: (coords: SaveCoordinates) => void;
   onImport: (
-    importedMon: pkm,
+    importedMon: PKM,
     saveIndex: number,
     boxCoords: BoxCoordinates
   ) => void;
-  setSelectedMon: (mon: pkm | undefined) => void;
+  setSelectedMon: (mon: PKM | undefined) => void;
 }
 
 const SaveDisplay = (props: SaveDisplayProps) => {
@@ -55,7 +55,7 @@ const SaveDisplay = (props: SaveDisplayProps) => {
                 marginRight: 'auto',
               }}
             >
-              <div style={{ textAlign: 'center' }}>{save.name}</div>
+              <div style={{ textAlign: 'center' }}>{save?.name}</div>
             </Card>
             <Card
               style={{
@@ -82,7 +82,7 @@ const SaveDisplay = (props: SaveDisplayProps) => {
                   </OpenHomeButton>
                 </Grid>
                 <Grid xs={8} style={{ textAlign: 'center' }}>
-                  {save.boxes[box].name}
+                  {save.boxes[box]?.name}
                 </Grid>
                 <Grid xs={2} style={{ display: 'grid', alignItems: 'center' }}>
                   <OpenHomeButton
@@ -117,7 +117,13 @@ const SaveDisplay = (props: SaveDisplayProps) => {
                           style={{ padding: '2px 2px 0px 2px' }}
                         >
                           <PokemonButton
-                            onClick={() => setSelectedMon(mon)}
+                            onClick={() => {
+                              if (!mon || mon instanceof save.pkmType) {
+                                setSelectedMon(mon);
+                              } else {
+                                setSelectedMon(new save.pkmType(mon));
+                              }
+                            }}
                             onDragStart={(e) =>
                               onDrag({
                                 save: saveIndex,

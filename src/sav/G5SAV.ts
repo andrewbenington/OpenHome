@@ -1,9 +1,10 @@
-import { pk5 } from '../pkm/pk5';
+import { PK5 } from '../PKM/PK5';
 import { bytesToUint16LittleEndian } from '../util/ByteLogic';
 import { Box, BoxCoordinates, SAV } from './SAV';
 
 export class G5SAV extends SAV {
   static PC_OFFSET = 0x400;
+  pkmType = PK5;
   constructor(path: string, bytes: Uint8Array) {
     super(path, bytes)
     this.boxes = Array(24)
@@ -25,7 +26,7 @@ export class G5SAV extends SAV {
           let startByte = G5SAV.PC_OFFSET + 0x1000 * box + 136 * monIndex;
           let endByte = G5SAV.PC_OFFSET + 0x1000 * box + 136 * (monIndex + 1);
           let monData = bytes.slice(startByte, endByte);
-          let mon = new pk5(monData, true);
+          let mon = new PK5(monData, true);
           if (mon.gameOfOrigin !== 0 && mon.dexNum !== 0) {
             this.boxes[box].pokemon[monIndex] = mon;
           }
@@ -39,7 +40,7 @@ export class G5SAV extends SAV {
 
 export class G5Box implements Box {
   name: string;
-  pokemon: Array<pk5> = new Array(30);
+  pokemon: Array<PK5> = new Array(30);
   constructor(n: string) {
     this.name = n;
   }

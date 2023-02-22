@@ -1,5 +1,6 @@
-import OHPKM from 'pkm/OHPKM';
-import { PK3 } from '../pkm/PK3';
+import OHPKM from 'PKM/OHPKM';
+import { PKM } from '../PKM/PKM';
+import { PK3 } from '../PKM/PK3';
 import { SaveType } from '../renderer/types/types';
 import {
   bytesToUint16LittleEndian,
@@ -19,6 +20,8 @@ export class G3SAV extends SAV {
   backupSave: G3SaveBackup;
   primarySaveOffset: number;
   boxes: Array<G3Box>;
+  pkmType = PK3;
+  convertPKM = (mon: PKM) => new OHPKM(mon);
 
   constructor(path: string, bytes: Uint8Array) {
     super(path, bytes);

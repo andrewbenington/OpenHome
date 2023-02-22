@@ -1,6 +1,6 @@
-import OHPKM from 'pkm/OHPKM';
-import { PK2 } from 'pkm/PK2';
-import { getMonFileIdentifier, getMonGen12Identifier } from 'pkm/util';
+import OHPKM from 'PKM/OHPKM';
+import { PK2 } from 'PKM/PK2';
+import { getMonFileIdentifier, getMonGen12Identifier } from 'PKM/util';
 import { SaveType } from 'renderer/types/types';
 import { readGen12Lookup } from 'renderer/util/ipcFunctions';
 import {
@@ -8,12 +8,15 @@ import {
   bytesToUint32LittleEndian,
   bytesToUint64LittleEndian,
 } from 'util/ByteLogic';
+import { DPSAV } from './DPSAV';
+import { G1SAV } from './G1SAV';
 import { G2SAV } from './G2SAV';
 import { G3SAV } from './G3SAV';
 import { G5SAV } from './G5SAV';
 import { HGSSSAV } from './HGSSSAV';
+import { PtSAV } from './PtSAV';
 
-const SIZE_GEN2 = 0x8000;
+const SIZE_GEN12 = 0x8000;
 const SIZE_GEN3 = 0x20000;
 const SIZE_GEN45 = 0x80000;
 
@@ -26,6 +29,30 @@ export const buildSaveFile = (
 ) => {
   let saveFile;
   switch (saveType) {
+    case SaveType.RBY_I:
+      saveFile = new G1SAV(filePath, fileBytes);
+      if (homeMonMap && gen12MonMap) {
+        saveFile.boxes.forEach((box) => {
+          box.pokemon.forEach((mon, monIndex) => {
+            if (!(mon instanceof PK2)) return;
+            // GameBoy PKM files don't have a personality value to track the mons with OpenHome data,
+            // so they need to be identified with their IVs and OT
+            const gen12identifier = getMonGen12Identifier(mon);
+            if (!gen12identifier) return;
+            const homeIdentifier = gen12MonMap[gen12identifier];
+            if (!homeIdentifier) return;
+            // console.log(identifier.slice(0, identifier.length - 3))
+            const result = Object.entries(homeMonMap).find(
+              (entry) => entry[0] === homeIdentifier
+            );
+            if (result) {
+              console.log('home mon found:', result[1]);
+              box.pokemon[monIndex] = result[1];
+            }
+          });
+        });
+      }
+      return saveFile;
     case SaveType.C_I:
     case SaveType.GS_I:
       saveFile = new G2SAV(filePath, fileBytes);
@@ -55,48 +82,38 @@ export const buildSaveFile = (
     case SaveType.FRLG:
     case SaveType.E:
       saveFile = new G3SAV(filePath, fileBytes);
-      if (homeMonMap) {
-        saveFile.boxes.forEach((box) => {
-          box.pokemon.forEach((mon, monIndex) => {
-            if (!mon) return;
-            const identifier = getMonFileIdentifier(mon);
-            if (!identifier) return;
-            const result = Object.entries(homeMonMap).find(
-              (entry) =>
-                entry[0].slice(0, entry[0].length - 3) ===
-                identifier.slice(0, identifier.length - 3)
-            );
-            if (result) {
-              console.log('home mon found:', result[1]);
-              box.pokemon[monIndex] = result[1];
-            }
-          });
-        });
-      }
-      return saveFile;
+      break;
+    case SaveType.DP:
+      saveFile = new DPSAV(filePath, fileBytes);
+      break;
+    case SaveType.Pt:
+      saveFile = new PtSAV(filePath, fileBytes);
+      break;
     case SaveType.HGSS:
       saveFile = new HGSSSAV(filePath, fileBytes);
-      // if (homeMonMap) {
-      //   saveFile.boxes.forEach((box) => {
-      //     box.pokemon.forEach((mon, monIndex) => {
-      //       if (!mon) return;
-      //       const identifier = getMonFileIdentifier(mon);
-      //       if (!identifier) return;
-      //       const result = Object.entries(homeMonMap).find(
-      //         (entry) =>
-      //           entry[0].slice(0, entry[0].length - 3) ===
-      //           identifier.slice(0, identifier.length - 3)
-      //       );
-      //       if (result) {
-      //         console.log('home mon found:', result[1]);
-      //         box.pokemon[monIndex] = result[1];
-      //       }
-      //     });
-      //   });
-      // }
-      return saveFile;
+      break;
     case SaveType.G5:
-      return new G5SAV(filePath, fileBytes);
+      saveFile = new G5SAV(filePath, fileBytes);
+      break;
+  }
+  if (homeMonMap) {
+    // saveFile?.boxes?.forEach((box) => {
+    //   box.pokemon.forEach((mon, monIndex) => {
+    //     if (!mon) return;
+    //     const identifier = getMonFileIdentifier(mon);
+    //     if (!identifier) return;
+    //     const result = Object.entries(homeMonMap).find(
+    //       (entry) =>
+    //         entry[0].slice(0, entry[0].length - 3) ===
+    //         identifier.slice(0, identifier.length - 3)
+    //     );
+    //     if (result) {
+    //       console.log('home mon found:', result[1]);
+    //       box.pokemon[monIndex] = result[1];
+    //     }
+    //   });
+    // });
+    return saveFile;
   }
 };
 
@@ -144,13 +161,15 @@ export const getSaveType = (bytes: Uint8Array): SaveType => {
         }
         return SaveType.RS;
     }
-  } else if (bytes.length >= SIZE_GEN2) {
+  } else if (bytes.length >= SIZE_GEN12) {
     // hacky
     const save = new G2SAV('', bytes);
     if (save.areCrystalInternationalChecksumsValid()) {
       return SaveType.C_I;
     } else if (save.areGoldSilverChecksumsValid()) {
       return SaveType.GS_I;
+    } else {
+      return SaveType.RBY_I
     }
   }
   return SaveType.UNKNOWN;

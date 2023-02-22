@@ -157,3 +157,45 @@ export const isSinnoh = (origin: GameOfOrigin) => {
     origin === GameOfOrigin.ShiningPearl
   );
 };
+
+export const gameOfOriginFromFormat = (format: string) => {
+  console.log(format);
+  let game;
+  switch (format) {
+    case 'PK2':
+      game = GameOfOrigin.Crystal;
+      break;
+    case 'PK3':
+      game = GameOfOrigin.Sapphire;
+      break;
+    case 'PK4':
+      game = GameOfOrigin.SoulSilver;
+      break;
+    case 'PK5':
+      game = GameOfOrigin.White2;
+      break;
+    case 'PK6':
+      game = GameOfOrigin.OmegaRuby;
+      break;
+    case 'PK7':
+      game = GameOfOrigin.Moon;
+      break;
+    case 'PB7':
+      game = GameOfOrigin.LetsGoEevee;
+      break;
+    case 'PK8':
+      game = GameOfOrigin.Shield;
+      break;
+    case 'PA8':
+      game = GameOfOrigin.LegendsArceus;
+      break;
+    case 'PB8':
+      game = GameOfOrigin.BrilliantDiamond;
+      break;
+    case 'PK9':
+      game = GameOfOrigin.Scarlet;
+      break;
+  }
+  console.log(game);
+  return game;
+};

@@ -1,14 +1,16 @@
-import { GameOfOrigin, isHoenn, isKanto, isSinnoh } from '../consts/GameOfOrigin';
-import G4Locations from '../renderer/MetLocation/G4';
-import { Abilities } from '../consts/Abilities';
-import { Items } from '../consts/Items';
-import { Languages } from '../consts/Languages';
 import {
+  Abilities,
+  GameOfOrigin,
   Gen4RibbonsPart1,
   Gen4RibbonsPart2,
   Gen4RibbonsPart3,
-} from '../consts/Ribbons';
-import { getMetLocation } from '../renderer/MetLocation/MetLocation';
+  isHoenn,
+  isKanto,
+  isSinnoh,
+  Items,
+  Languages,
+} from '../consts';
+import G4Locations from '../consts/MetLocation/G4';
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -32,7 +34,7 @@ import {
   gen4StringToUTF,
   utf16StringToGen4,
 } from '../util/Strings/StringConverter';
-import { contestStats, marking, pkm, pokedate, stats } from './pkm';
+import { contestStats, marking, PKM, pokedate, stats } from './PKM';
 import {
   generateIVs,
   generatePersonalityValue,
@@ -41,9 +43,9 @@ import {
   writeIVsToBuffer,
 } from './util';
 
-const GEN4_MOVE_MAX = 467;
+export const GEN4_MOVE_MAX = 467;
 
-export class PK4 extends pkm {
+export class PK4 extends PKM {
   constructor(...args: any[]) {
     if (args.length >= 1 && args[0] instanceof Uint8Array) {
       const bytes = args[0];
@@ -55,7 +57,8 @@ export class PK4 extends pkm {
       } else {
         super(bytes);
       }
-    } else if (args.length === 1 && args[0] instanceof pkm) {
+      this.refreshChecksum();
+    } else if (args.length === 1 && args[0] instanceof PKM) {
       const other = args[0];
       super(new Uint8Array(136));
       this.sanity = other.sanity;
@@ -103,7 +106,6 @@ export class PK4 extends pkm {
       const validMovePPUps = other.movePPUps.filter(
         (_, i) => other.moves[i] <= GEN4_MOVE_MAX
       );
-      this.moves = other.moves;
       this.moves = [
         validMoves[0] ?? 0,
         validMoves[1] ?? 0,
@@ -151,15 +153,16 @@ export class PK4 extends pkm {
       const equivalentLocation = other.metLocation
         ? G4Locations[0].indexOf(other.metLocation.slice(3))
         : -1;
-      if (equivalentLocation > 0) {
-        this.eggLocationIndex = other.eggLocationIndex;
-        this.metLocationIndex = equivalentLocation;
-      } else if (
+      console.log('other.metlocattion', other.metLocationIndex);
+      if (
         other.gameOfOrigin >= GameOfOrigin.HeartGold &&
         other.gameOfOrigin <= GameOfOrigin.Platinum
       ) {
         this.eggLocationIndex = other.eggLocationIndex;
         this.metLocationIndex = other.metLocationIndex ?? 3002;
+      } else if (equivalentLocation > 0) {
+        this.eggLocationIndex = other.eggLocationIndex;
+        this.metLocationIndex = equivalentLocation;
       } else if (isKanto(other.gameOfOrigin)) {
         this.eggLocationIndex = other.eggLocationIndex ? 2003 : 0;
         this.metLocationIndex = 2003;
@@ -173,8 +176,10 @@ export class PK4 extends pkm {
         this.eggLocationIndex = other.eggLocationIndex ? 2001 : 0;
         this.metLocationIndex = 2001;
       }
+      console.log('this.metlocattion', this.metLocationIndex);
       this.metLevel = other.metLevel ?? this.level;
       this.trainerGender = other.trainerGender;
+      this.refreshChecksum();
     }
   }
 
@@ -288,12 +293,14 @@ export class PK4 extends pkm {
       (markingsValue >> 1) & 1,
       (markingsValue >> 2) & 1,
       (markingsValue >> 3) & 1,
-    ] as any as [marking, marking, marking, marking];
+      (markingsValue >> 4) & 1,
+      (markingsValue >> 5) & 1,
+    ] as any as [marking, marking, marking, marking, marking, marking];
   }
 
-  public set markings(value: [marking, marking, marking, marking]) {
+  public set markings(value: [marking, marking, marking, marking, marking, marking]) {
     let markingsValue = 0;
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < 6; i++) {
       if (value[i]) {
         markingsValue = markingsValue | Math.pow(2, i);
       }
@@ -348,12 +355,12 @@ export class PK4 extends pkm {
   }
 
   public set contest(value: contestStats) {
-    this.bytes[0x3e] = value.cool;
-    this.bytes[0x3f] = value.beauty;
-    this.bytes[0x40] = value.cute;
-    this.bytes[0x41] = value.smart;
-    this.bytes[0x42] = value.tough;
-    this.bytes[0x43] = value.sheen;
+    this.bytes[0x1e] = value.cool;
+    this.bytes[0x1f] = value.beauty;
+    this.bytes[0x20] = value.cute;
+    this.bytes[0x21] = value.smart;
+    this.bytes[0x22] = value.tough;
+    this.bytes[0x23] = value.sheen;
   }
 
   public get ribbonBytes() {
@@ -501,7 +508,8 @@ export class PK4 extends pkm {
   }
 
   public set isFatefulEncounter(value: boolean) {
-    setFlag(this.bytes, 0x40, 0, value);
+    const bit = 0;
+    setFlag(this.bytes, 0x40, bit, value);
   }
 
   public get gender() {
@@ -545,12 +553,6 @@ export class PK4 extends pkm {
     this.bytes.set(uint16ToBytesLittleEndian(value), 0x44);
   }
 
-  public get eggLocation() {
-    return (
-      getMetLocation(this.gameOfOrigin, this.eggLocationIndex, false, true) ??
-      this.eggLocationIndex.toString()
-    );
-  }
   public get metLocationIndex() {
     const dpLocation = bytesToUint16LittleEndian(this.bytes, 0x80);
     return dpLocation !== 0xbba
@@ -559,20 +561,13 @@ export class PK4 extends pkm {
   }
 
   public set metLocationIndex(value: number) {
-    if (value >= 0x0070) {
+    if (value >= 0x0070 && value < 2000) {
       // show "faraway place" in diamond/pearl for platinum/hgss locations
       this.bytes.set(uint16ToBytesLittleEndian(0xbba), 0x80);
     } else {
       this.bytes.set(uint16ToBytesLittleEndian(value), 0x80);
     }
     this.bytes.set(uint16ToBytesLittleEndian(value), 0x46);
-  }
-
-  public get metLocation() {
-    return (
-      getMetLocation(this.gameOfOrigin, this.metLocationIndex) ??
-      this.metLocationIndex.toString()
-    );
   }
 
   public get nickname() {
@@ -593,11 +588,11 @@ export class PK4 extends pkm {
   }
 
   public get trainerName() {
-    return gen4StringToUTF(this.bytes, 0x68, 7);
+    return gen4StringToUTF(this.bytes, 0x68, 8);
   }
 
   public set trainerName(value: string) {
-    const gen4Bytes = utf16StringToGen4(value, 7, true);
+    const gen4Bytes = utf16StringToGen4(value, 8, true);
     this.bytes.set(gen4Bytes, 0x68);
   }
 
@@ -654,14 +649,19 @@ export class PK4 extends pkm {
   }
 
   public set ball(value: number) {
-    console.log('ball value:', value);
     if (value > 16) {
       // dppt see apriballs, sport ball as a pokeball
       this.bytes[0x83] = 4;
     } else {
       this.bytes[0x83] = value;
     }
-    this.bytes[0x86] = value;
+    if (
+      this.gameOfOrigin === GameOfOrigin.HeartGold ||
+      this.gameOfOrigin === GameOfOrigin.SoulSilver ||
+      this.gameOfOrigin >= GameOfOrigin.Platinum
+    ) {
+      this.bytes[0x86] = value;
+    }
   }
 
   public get metLevel() {

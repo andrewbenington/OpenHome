@@ -1,5 +1,6 @@
+import OHPKM from 'PKM/OHPKM';
 import { SaveType } from 'renderer/types/types';
-import { pkm } from '../pkm/pkm';
+import { PKM } from '../PKM/PKM';
 
 export class SAV {
   filePath: string;
@@ -14,6 +15,8 @@ export class SAV {
   boxNames: string[] = [];
   boxes: Array<Box> = [];
   bytes: Uint8Array;
+  pkmType: typeof PKM = OHPKM;
+  convertPKM: (mon: PKM) => PKM = (mon) => new OHPKM(mon);
   changedMons: BoxCoordinates[] = [];
   constructor(path: string, bytes: Uint8Array) {
     this.filePath = path;
@@ -23,7 +26,7 @@ export class SAV {
 
 export interface Box {
   name: string;
-  pokemon: Array<pkm | undefined>;
+  pokemon: Array<PKM | undefined>;
 }
 
 export interface BoxCoordinates {
