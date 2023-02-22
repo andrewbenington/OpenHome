@@ -1,7 +1,7 @@
-import { pkm } from "../../pkm/pkm";
+import { PKM } from "../../PKM/PKM";
 import { getMonSprite, getItemSprite } from "../util/PokemonSprite";
 
-const PokemonWithItem = (props: { mon: pkm; format?: string; style: any }) => {
+const PokemonWithItem = (props: { mon: PKM; format?: string; style: any }) => {
   const { mon, format, style } = props;
   return (
     <div style={{ padding: 10, ...style }}>

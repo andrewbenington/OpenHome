@@ -1,16 +1,16 @@
-import { assert } from 'console';
 import { uniq } from 'lodash';
 import { Abilities } from '../consts/Abilities';
 import { Items } from '../consts/Items';
 import { Languages } from '../consts/Languages';
 import { MONS_LIST } from '../consts/Mons';
 import { OpenHomeRibbons } from '../consts/Ribbons';
-import { getMetLocation } from '../renderer/MetLocation/MetLocation';
 import {
+  bytesToUint16BigEndian,
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
   getFlag,
   setFlag,
+  uint16ToBytesBigEndian,
   uint16ToBytesLittleEndian,
   uint32ToBytesLittleEndian,
 } from '../util/ByteLogic';
@@ -28,14 +28,15 @@ import {
   hyperTrainStats,
   marking,
   memory,
-  pkm,
+  PKM,
   pokedate,
   stats,
   statsPreSplit,
-} from './pkm';
+} from './PKM';
 import {
   dvsFromIVs,
   formatHasColorMarkings,
+  generateDVs,
   generateIVs,
   generatePersonalityValue,
   generateTeraType,
@@ -45,13 +46,13 @@ import {
   writeIVsToBuffer,
 } from './util';
 
-class OHPKM extends pkm {
+class OHPKM extends PKM {
   static fileSize = 376;
 
   constructor(...args: any[]) {
     if (args[0] instanceof Uint8Array) {
       super(args[0]);
-    } else if (args[0] instanceof pkm) {
+    } else if (args[0] instanceof PKM) {
       const other = args[0];
       super(new Uint8Array(420));
       this.sanity = other.sanity;
@@ -66,14 +67,13 @@ class OHPKM extends pkm {
         this.formNum,
         this.abilityNum
       );
-      // console.log(other.markings);
-      // if (other.markings) {
-      //   other.markings?.forEach((value, index) => {
-      //     let temp = this.markings;
-      //     temp[index] = value;
-      //     this.markings = temp;
-      //   });
-      // }
+      if (other.markings) {
+        other.markings?.forEach((value, index) => {
+          let temp = this.markings;
+          temp[index] = value;
+          this.markings = temp;
+        });
+      }
 
       console.log('after markings');
       this.alphaMove = other.alphaMove ?? 0;
@@ -140,7 +140,14 @@ class OHPKM extends pkm {
       this.statusCondition = other.statusCondition;
       this.unknownA0 = other.unknownA0 ?? 0;
       this.gvs = other.gvs ?? gvsFromIVs(this.ivs);
-      this.dvs = other.dvs ?? dvsFromIVs(this.ivs, other.isShiny);
+      console.log('dvs:', other.dvs);
+      if (other.dvs) {
+        this.dvs = other.dvs;
+      } else if (other.ivs) {
+        this.dvs = dvsFromIVs(other.ivs, other.isShiny);
+      } else {
+        this.dvs = generateDVs(other.isShiny);
+      }
       this.heightAbsoluteBytes = other.heightAbsoluteBytes ?? new Uint8Array(4);
       this.weightAbsoluteBytes = other.weightAbsoluteBytes ?? new Uint8Array(4);
       this.handlerName = other.handlerName ?? '';
@@ -156,6 +163,7 @@ class OHPKM extends pkm {
         feeling: 0,
       };
       // this.superTraining
+      this.metTimeOfDay = other.metTimeOfDay;
       this.shinyLeaves = other.shinyLeaves ?? 0;
       this.fullness = other.fullness ?? 0;
       this.enjoyment = other.enjoyment ?? 0;
@@ -747,6 +755,32 @@ class OHPKM extends pkm {
     this.bytes[0xa9] = value.spe;
   }
 
+  public get dvs() {
+    // big endian to be the same as gameboy games (ugh)
+    let dvBytes = bytesToUint16BigEndian(this.bytes, 0xaa);
+    return {
+      spc: dvBytes & 0x0f,
+      spe: (dvBytes >> 4) & 0x0f,
+      def: (dvBytes >> 8) & 0x0f,
+      atk: (dvBytes >> 12) & 0x0f,
+      hp:
+        (((dvBytes >> 12) & 1) << 3) |
+        (((dvBytes >> 8) & 1) << 2) |
+        (((dvBytes >> 4) & 1) << 1) |
+        (dvBytes & 1),
+    };
+  }
+
+  public set dvs(value: statsPreSplit) {
+    console.log('setting dvs:', value);
+    let dvBytes = value.atk & 0x0f;
+    dvBytes = (dvBytes << 4) | (value.def & 0x0f);
+    dvBytes = (dvBytes << 4) | (value.spe & 0x0f);
+    dvBytes = (dvBytes << 4) | (value.spc & 0x0f);
+    // big endian to be the same as gameboy games (ugh)
+    this.bytes.set(uint16ToBytesBigEndian(dvBytes), 0xaa);
+  }
+
   public get heightAbsoluteBytes() {
     return this.bytes.slice(0xac, 0xb0);
   }
@@ -841,6 +875,14 @@ class OHPKM extends pkm {
     this.bytes[0xda] = value.memory;
     this.bytes[0xdb] = value.feeling;
     this.bytes.set(uint16ToBytesLittleEndian(value.textVariables), 0xdc);
+  }
+
+  public get metTimeOfDay() {
+    return this.bytes[0xea] > 0 ? this.bytes[0xea] : undefined;
+  }
+
+  public set metTimeOfDay(value: number | undefined) {
+    this.bytes[0xea] = (value ?? 0) & 0b11;
   }
 
   public get shinyLeaves() {
@@ -1038,26 +1080,12 @@ class OHPKM extends pkm {
     this.bytes.set(uint16ToBytesLittleEndian(value), 0x137);
   }
 
-  public get eggLocation() {
-    return (
-      getMetLocation(this.gameOfOrigin, this.eggLocationIndex, false, true) ??
-      this.eggLocationIndex.toString()
-    );
-  }
-
   public get metLocationIndex() {
     return bytesToUint16LittleEndian(this.bytes, 0x139);
   }
 
   public set metLocationIndex(value: number) {
     this.bytes.set(uint16ToBytesLittleEndian(value), 0x139);
-  }
-
-  public get metLocation() {
-    return (
-      getMetLocation(this.gameOfOrigin, this.metLocationIndex) ??
-      this.metLocationIndex.toString()
-    );
   }
 
   public get metLevel() {
@@ -1201,7 +1229,7 @@ class OHPKM extends pkm {
     );
   }
 
-  public updateData(other: pkm) {
+  public updateData(other: PKM) {
     if (other.evs) {
       this.evs = other.evs;
     }

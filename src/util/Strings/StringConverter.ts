@@ -130,7 +130,9 @@ export const gen12StringToUTF = (
   length: number
 ) => {
   let str = '';
+  // console.log(bytes);
   for (let i = offset; i < offset + length; i += 1) {
+    // console.log(i, bytes[i], GBStringDict[bytes[i]]);
     if (bytes[i] === G1_TERMINATOR) {
       break;
     }
@@ -145,13 +147,10 @@ export const utf16StringToGen12 = (
   terminate: boolean
 ) => {
   var bufView = new Uint8Array(length);
-  console.log(str);
   for (var i = 0; i < Math.min(str.length, length); i++) {
     let gen12DictEntry = Object.entries(GBStringDict).find(
       ([key, val]) => val === str.charAt(i)
     );
-    console.log(str.charCodeAt(i));
-    console.log(gen12DictEntry);
     if (str.charCodeAt(i) === 0) {
       break;
     } else if (!gen12DictEntry) {
@@ -189,7 +188,6 @@ export const utf16StringToGen3 = (
 ) => {
   var bufView = new Uint8Array(length);
   for (var i = 0; i < Math.min(str.length, length); i++) {
-    console.log(str.charCodeAt(i));
     let gen3Char = Gen3CharacterSet.indexOf(str.charAt(i));
     if (str.charCodeAt(i) === 0) {
       break;
@@ -230,22 +228,24 @@ export const utf16StringToGen4 = (
 ) => {
   var buf = new ArrayBuffer(length * 2);
   var bufView = new Uint16Array(buf);
-  for (var i = 0; i < Math.min(str.length, length); i++) {
-    let gen4Char = UTFToGen4Map[str.charCodeAt(i)];
-    console.log(str.charAt(i), str.charCodeAt(i), gen4Char)
-    if (str.charCodeAt(i) === 0) {
+  for (var i = 0; i < length; i++) {
+    console.log(str, str.length, str.charCodeAt(i))
+    if (i >= str.length || str.charCodeAt(i) === 0) {
+      console.log('adding terminator')
+      if (terminate) {
+        bufView[i] = 0xffff;
+      }
       break;
-    } else if (gen4Char === -1) {
+    }
+    let gen4Char = UTFToGen4Map[str.charCodeAt(i)];
+    if (gen4Char === -1) {
       // missing characters are now '?'
       bufView[i] = 0x01ac;
     } else {
       bufView[i] = gen4Char;
     }
   }
-  if (terminate) {
-    let terminalIndex = Math.min(str.length, length - 1);
-    bufView[terminalIndex] = 0xffff;
-  }
+
   return new Uint8Array(buf);
 };
 
@@ -342,7 +342,7 @@ const Gen3CharacterSet = [
   'ざ',
   'じ',
   'ず',
-  'ぜ', // 3
+  'ぜ',
   'ぞ',
   'だ',
   'ぢ',
@@ -358,7 +358,7 @@ const Gen3CharacterSet = [
   'ぴ',
   'ぷ',
   'ぺ',
-  'ぽ', // 4
+  'ぽ',
   'っ',
   '¿',
   '¡',
@@ -374,7 +374,7 @@ const Gen3CharacterSet = [
   'サ',
   'ス',
   'セ',
-  'ソ', // 5
+  'ソ',
   'タ',
   'チ',
   'ツ',
@@ -486,7 +486,7 @@ const Gen3CharacterSet = [
   'R',
   'S',
   'T',
-  'U', // C
+  'U',
   'V',
   'W',
   'X',

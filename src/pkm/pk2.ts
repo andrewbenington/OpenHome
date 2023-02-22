@@ -1,7 +1,5 @@
-import { GameOfOrigin } from '../consts/GameOfOrigin';
-import { Gen2Items } from '../consts/Items';
-import { MONS_LIST } from '../consts/Mons';
-import { getMetLocation } from '../renderer/MetLocation/MetLocation';
+import { GameOfOrigin, Gen2Items, MONS_LIST } from '../consts';
+import CrystalLocation from '../consts/MetLocation/Crystal';
 import {
   bytesToUint16BigEndian,
   bytesToUint24BigEndian,
@@ -11,19 +9,15 @@ import {
   uint24ToBytesBigEndian,
 } from '../util/ByteLogic';
 import { getLevelGen12 } from '../util/StatCalc';
-import {
-  G1_TERMINATOR,
-  GBStringDict,
-  gen12StringToUTF,
-} from '../util/Strings/StringConverter';
-import { pkm, statsPreSplit } from './pkm';
+import { gen12StringToUTF } from '../util/Strings/StringConverter';
+import { PKM, statsPreSplit } from './PKM';
 import { dvsFromIVs, generateDVs } from './util';
 
-const GEN2_MOVE_MAX = 251;
+export const GEN2_MOVE_MAX = 251;
 
-export class PK2 extends pkm {
+export class PK2 extends PKM {
   public get format() {
-    return 'pk2';
+    return 'PK2';
   }
   public get dexNum() {
     return this.bytes[0x00];
@@ -202,12 +196,17 @@ export class PK2 extends pkm {
     }
   }
 
-  public get metLocation() {
-    if (this.metLocationIndex) {
-      return (
-        getMetLocation(this.gameOfOrigin, this.metLocationIndex) ??
-        this.metLocationIndex.toString()
-      );
+  public get metTimeOfDay() {
+    return ((this.bytes[0x1d] >> 6) & 0b11) > 0
+      ? (this.bytes[0x1d] >> 6) & 0b11
+      : undefined;
+  }
+
+  public set metTimeOfDay(value: number | undefined) {
+    if (value) {
+      this.bytes[0x1d] = (this.bytes[0x1d] & 0x3f) | ((value & 0b11) << 6);
+    } else {
+      this.bytes[0x1d] = this.bytes[0x1d] & 0x3f;
     }
   }
 
@@ -224,21 +223,11 @@ export class PK2 extends pkm {
   }
 
   public get trainerGender() {
-    return getFlag(this.bytes, 0x1d, 7) ? 1 : 0;
+    return getFlag(this.bytes, 0x1e, 7) ? 1 : 0;
   }
 
   public set trainerGender(value: number) {
-    setFlag(this.bytes, 0x1d, 7, !!value);
-  }
-
-  public get isEgg() {
-    return getFlag(this.bytes, 0x48, 30);
-  }
-
-  public set isEgg(value: boolean) {
-    setFlag(this.bytes, 0x48, 30, value);
-    // handle egg name byte
-    this.bytes[0x13] = 0x2 | (value ? 0x4 : 0);
+    setFlag(this.bytes, 0x1e, 7, !!value);
   }
 
   public get isShiny() {
@@ -253,12 +242,15 @@ export class PK2 extends pkm {
   constructor(...args: any[]) {
     if (args[0] instanceof Uint8Array) {
       super(args[0]);
-      const bytes = args[0];
-      this.trainerName = gen12StringToUTF(this.bytes, 0x30, 11);
-      this.nickname = gen12StringToUTF(this.bytes, 0x3b, 11);
+      if (this.bytes.length >= 0x46) {
+        this.trainerName = gen12StringToUTF(this.bytes, 0x30, 11);
+        this.nickname = gen12StringToUTF(this.bytes, 0x3b, 11);
+      } else {
+        this.nickname = MONS_LIST[this.dexNum].name.toLocaleUpperCase();
+      }
       this.gameOfOrigin =
         this.metLocationIndex === 0 ? GameOfOrigin.Gold : GameOfOrigin.Crystal;
-    } else if (args[0] instanceof pkm) {
+    } else if (args[0] instanceof PKM) {
       super(new Uint8Array(32));
       const other = args[0];
       this.dexNum = other.dexNum;
@@ -288,21 +280,37 @@ export class PK2 extends pkm {
         validMovePP[2] ?? 0,
         validMovePP[3] ?? 0,
       ];
-      if (other.ivs) {
-        this.dvs = dvsFromIVs(other.ivs, other.isShiny);
-      } else if (other.dvs) {
+      if (other.dvs) {
         this.dvs = other.dvs;
+      } else if (other.ivs) {
+        this.dvs = dvsFromIVs(other.ivs, other.isShiny);
       } else {
         this.dvs = generateDVs(other.isShiny);
       }
       this.nickname = other.nickname;
-      console.log(this.nickname);
       this.isEgg = other.isEgg;
       this.trainerName = other.trainerName;
       this.trainerFriendship = other.trainerFriendship;
       this.metLevel = other.metLevel;
-      console.log(other);
+      const equivalentLocation = other.metLocation
+        ? CrystalLocation[0].indexOf(other.metLocation.slice(3))
+        : -1;
+      if (
+        other.gameOfOrigin >= GameOfOrigin.Gold &&
+        other.gameOfOrigin <= GameOfOrigin.Crystal
+      ) {
+        this.metLocationIndex = other.metLocationIndex ?? 0;
+      } else if (equivalentLocation > 0) {
+        this.metLocationIndex = equivalentLocation;
+      }
+      this.metTimeOfDay = other.metTimeOfDay;
       this.trainerGender = other.trainerGender;
+      console.log(other);
+      this.gameOfOrigin = GameOfOrigin.Crystal;
+    } else {
+      console.log(args[0]);
+      console.log(args[0] instanceof PKM);
+      super(new Uint8Array());
     }
   }
 }

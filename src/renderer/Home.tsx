@@ -1,16 +1,19 @@
 import { Button, Dialog, MenuItem, Select } from '@mui/material';
-import OHPKM from 'pkm/OHPKM';
-import { PK4 } from 'pkm/PK4';
-import { getMonFileIdentifier, getMonGen12Identifier } from 'pkm/util';
-import { useCallback, useEffect, useState } from 'react';
+import OHPKM from 'PKM/OHPKM';
+import { PK2 } from 'PKM/PK2';
+import { PK4 } from 'PKM/PK4';
+import { getMonFileIdentifier, getMonGen12Identifier } from 'PKM/util';
+import { useEffect, useState } from 'react';
+import { G1SAV } from 'sav/G1SAV';
 import { G2SAV } from 'sav/G2SAV';
 import { G3SAV } from 'sav/G3SAV';
-import { HGSSSAV } from 'sav/HGSSSAV';
+import { G4SAV } from 'sav/G4SAV';
 import { BoxCoordinates, SAV } from 'sav/SAV';
 import { buildSaveFile, getSaveType } from 'sav/util';
 import { acceptableExtensions, bytesToPKM } from 'util/FileImport';
+import Gen4ToUTFMap from 'util/Strings/Gen4ToUTFMap';
 import { utf16StringToGen4 } from 'util/Strings/StringConverter';
-import { pkm } from '../pkm/pkm';
+import { PKM } from '../PKM/PKM';
 import { HomeData } from '../sav/HomeData';
 import HomeBoxDisplay from './components/HomeBoxDisplay';
 import PokemonDisplay from './components/PokemonDisplay';
@@ -34,7 +37,7 @@ export interface SaveCoordinates {
 
 const Home = () => {
   const [currentTheme, setCurrentTheme] = useState<OpenHomeTheme>(Themes[0]);
-  const [selectedMon, setSelectedMon] = useState<pkm>();
+  const [selectedMon, setSelectedMon] = useState<PKM>();
   const [draggingSource, setDraggingSource] = useState<SaveCoordinates>();
   const [draggingDest, setDraggingDest] = useState<SaveCoordinates>();
   const [box, setBox] = useState(0);
@@ -166,13 +169,14 @@ const Home = () => {
     const processDroppedData = async (file: File) => {
       let bytes = new Uint8Array(await file.arrayBuffer());
       let [extension] = file.name.split('.').slice(-1);
-      if (acceptableExtensions.includes(`.${extension}`)) {
+      extension = extension.toUpperCase();
+      if (acceptableExtensions.includes(extension)) {
         let mon = bytesToPKM(bytes, extension);
         switch (type) {
           case 'as is':
             setSelectedMon(mon);
             break;
-          case 'pk4':
+          case 'PK4':
             setSelectedMon(new PK4(mon));
             break;
         }
@@ -197,8 +201,11 @@ const Home = () => {
             case 'as is':
               setSelectedMon(mon);
               break;
-            case 'pk4':
+            case 'PK4':
               setSelectedMon(new PK4(mon));
+              break;
+            case 'PK2':
+              setSelectedMon(new PK2(mon));
               break;
           }
         }
@@ -218,12 +225,16 @@ const Home = () => {
           );
           handleDeleteOHPKM(mon);
         } else if (mon) {
+          console.log(mon);
           switch (type) {
             case 'as is':
               setSelectedMon(mon);
               break;
-            case 'pk4':
+            case 'PK4':
               setSelectedMon(new PK4(mon));
+              break;
+            case 'PK2':
+              setSelectedMon(new PK2(mon));
               break;
           }
         }
@@ -233,9 +244,10 @@ const Home = () => {
   };
 
   const onImportMon = (
-    importedMon: pkm,
+    importedMon: PKM,
     saveIndex: number,
-    boxCoords: BoxCoordinates
+    boxCoords: BoxCoordinates,
+    isHome: boolean = false
   ) => {
     const newSave = saves[saveIndex];
     if (!newSave) {
@@ -270,10 +282,12 @@ const Home = () => {
     console.log(saves);
     saves.forEach((save) => {
       if (
-        save instanceof G3SAV ||
+        save instanceof G1SAV ||
         save instanceof G2SAV ||
-        save instanceof HGSSSAV
+        save instanceof G3SAV ||
+        save instanceof G4SAV
       ) {
+        console.log(save);
         const changedMons = save.prepareBoxesForSaving();
         if (changedMons && save instanceof G2SAV) {
           const gen12LookupString = changedMons
@@ -530,7 +544,6 @@ const Home = () => {
             borderRadius: 4,
             textAlign: 'center',
           }}
-          onClick={() => console.log(utf16StringToGen4('Starmie', 11, true))}
           //   disabled={!mon}
         >
           <div
@@ -545,7 +558,38 @@ const Home = () => {
               console.log('dragover');
               e.preventDefault();
             }}
-            onDrop={(e) => onViewDrop(e, 'pk4')}
+            onDrop={(e) => onViewDrop(e, 'PK2')}
+          >
+            PK2
+          </div>
+        </button>
+        <button
+          type="button"
+          style={{
+            margin: 10,
+            height: 'calc(100% - 20px)',
+            width: '100%',
+            backgroundColor: '#fff4',
+            position: 'relative',
+            border: 'none',
+            borderRadius: 4,
+            textAlign: 'center',
+          }}
+          //   disabled={!mon}
+        >
+          <div
+            draggable
+            style={{
+              cursor: 'grab',
+              width: '100%',
+              height: '100%',
+              padding: 'auto',
+            }}
+            onDragOver={(e) => {
+              console.log('dragover');
+              e.preventDefault();
+            }}
+            onDrop={(e) => onViewDrop(e, 'PK4')}
           >
             PK4
           </div>
@@ -562,7 +606,11 @@ const Home = () => {
             borderRadius: 4,
             textAlign: 'center',
           }}
-          onClick={() => console.log(utf16StringToGen4('Starmie', 11, true))}
+          onClick={() =>
+            Object.entries(Gen4ToUTFMap).forEach(([key, value]) => {
+              console.log(key, String.fromCharCode(value));
+            })
+          }
           //   disabled={!mon}
         >
           <div

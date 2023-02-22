@@ -2,7 +2,6 @@ import { Abilities } from '../consts/Abilities';
 import { Items } from '../consts/Items';
 import { Languages } from '../consts/Languages';
 import { Gen9Ribbons } from '../consts/Ribbons';
-import { getMetLocation } from '../renderer/MetLocation/MetLocation';
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -20,16 +19,16 @@ import {
   contestStats,
   hyperTrainStats,
   memory,
-  pkm,
+  PKM,
   pokedate,
   stats,
-} from './pkm';
+} from './PKM';
 import { writeIVsToBuffer } from './util';
 
-export class pa8 extends pkm {
+export class PA8 extends PKM {
   static fileSize = 376;
   public get format() {
-    return 'pa8';
+    return 'PA8';
   }
   public get encryptionConstant() {
     return bytesToUint32LittleEndian(this.bytes, 0x00);
@@ -630,23 +629,11 @@ export class pa8 extends pkm {
   public set eggLocationIndex(value: number) {
     this.bytes.set(uint16ToBytesLittleEndian(value), 0x13a);
   }
-  public get eggLocation() {
-    return (
-      getMetLocation(this.gameOfOrigin, this.eggLocationIndex, false, true) ??
-      this.eggLocationIndex.toString()
-    );
-  }
   public get metLocationIndex() {
     return bytesToUint16LittleEndian(this.bytes, 0x13a);
   }
   public set metLocationIndex(value: number) {
     this.bytes.set(uint16ToBytesLittleEndian(value), 0x13a);
-  }
-  public get metLocation() {
-    return (
-      getMetLocation(this.gameOfOrigin, this.metLocationIndex) ??
-      this.metLocationIndex.toString()
-    );
   }
   public get metLevel() {
     return this.bytes[0x13d] & ~0x80;
@@ -742,7 +729,7 @@ export class pa8 extends pkm {
   constructor(...args: any[]) {
     if (args[0] instanceof Uint8Array) {
       super(args[0]);
-    } else if (args[0] instanceof pkm) {
+    } else if (args[0] instanceof PKM) {
       const other = args[0];
       super(new Uint8Array(376));
     }

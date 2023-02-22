@@ -1,8 +1,8 @@
 import { app } from 'electron';
 import fs from 'fs';
 import { bytesToPKM } from '../util/FileImport';
-import OHPKM from '../pkm/OHPKM';
-import { getMonFileIdentifier } from '../pkm/util';
+import OHPKM from '../PKM/OHPKM';
+import { getMonFileIdentifier } from '../PKM/util';
 
 export default function writePKMToFile(bytes: Uint8Array, format: string) {
   const originalMon = bytesToPKM(bytes, format);

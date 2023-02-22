@@ -1,15 +1,15 @@
 import React, { useEffect } from 'react';
 import { MONS_LIST } from '../../../consts/Mons';
-import { pkm } from '../../../pkm/pkm';
+import { PKM } from '../../../PKM/PKM';
 import { acceptableExtensions, bytesToPKM } from '../../../util/FileImport';
 import { getBoxSprite } from '../../util/PokemonSprite';
 
 interface PokemonButtonProps {
   onClick: () => void;
   onDragStart: React.DragEventHandler<HTMLDivElement>;
-  onDrop: (mon: pkm | undefined) => void;
+  onDrop: (mon: PKM | undefined) => void;
   zIndex: number;
-  mon: pkm | undefined;
+  mon: PKM | undefined;
 }
 
 const PokemonButton = (props: PokemonButtonProps) => {
@@ -28,7 +28,9 @@ const PokemonButton = (props: PokemonButtonProps) => {
   const onDropFromFile = async (file: File) => {
     let bytes = new Uint8Array(await file.arrayBuffer());
     let [extension] = file.name.split('.').slice(-1);
-    if (acceptableExtensions.includes(`.${extension}`)) {
+    extension = extension.toUpperCase();
+    console.log(extension, acceptableExtensions);
+    if (acceptableExtensions.includes(extension)) {
       let mon = bytesToPKM(bytes, extension);
       console.log(`accepting ${mon.dexNum} ${extension}`);
       onDrop(mon);

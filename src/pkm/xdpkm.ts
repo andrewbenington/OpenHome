@@ -3,7 +3,6 @@ import { Gen3Items } from '../consts/Items';
 import { GCLanguages } from '../consts/Languages';
 import { MONS_LIST } from '../consts/Mons';
 import { Gen3StandardRibbons } from '../consts/Ribbons';
-import { getMetLocation } from '../renderer/MetLocation/MetLocation';
 import { gen3ToNational } from '../util/ConvertPokemonID';
 import {
   getHPGen3Onward,
@@ -14,13 +13,13 @@ import {
   bytesToUint16BigEndian,
   bytesToUint32BigEndian,
 } from '../util/ByteLogic';
-import { pkm } from './pkm';
+import { PKM } from './PKM';
 
-export class xdpkm extends pkm {
+export class XDPKM extends PKM {
   constructor(bytes: Uint8Array) {
-    console.log('making xd pkm');
+    console.log('making xd PKM');
     super(bytes);
-    this.format = 'xdpkm';
+    this.format = 'XDPKM';
     this.personalityValue = bytesToUint32BigEndian(bytes, 0x28);
     this.dexNum = gen3ToNational(bytesToUint16BigEndian(bytes, 0x00));
     this.exp = bytesToUint32BigEndian(bytes, 0x20);
@@ -78,7 +77,8 @@ export class xdpkm extends pkm {
       spa: getStatGen3Onward('SpA', this),
       spd: getStatGen3Onward('SpD', this),
     };
-    let origin = GameOfOriginData.find((game) => game?.gc === bytes[0x34]) ?? null;
+    let origin =
+      GameOfOriginData.find((game) => game?.gc === bytes[0x34]) ?? null;
     this.gameOfOrigin = GameOfOriginData.indexOf(origin);
     let byteArray = new Uint16Array(12);
     for (let i = 0; i < 12; i += 1) {
@@ -112,9 +112,6 @@ export class xdpkm extends pkm {
     this.metYear = bytes[0x7b];
     this.metMonth = bytes[0x7c];
     this.metDay = bytes[0x7d];
-    this.metLocation =
-      getMetLocation(this.gameOfOrigin, bytesToUint16BigEndian(bytes, 0x08)) ??
-      bytesToUint16BigEndian(bytes, 0x08).toString();
     this.isShiny =
       (this.trainerID ^
         this.secretID ^

@@ -1,19 +1,22 @@
-import OHPKM from 'pkm/OHPKM';
+import OHPKM from 'PKM/OHPKM';
+import { PKM } from 'PKM/PKM';
 import {
   bytesToUint16LittleEndian,
   uint16ToBytesLittleEndian,
 } from 'util/ByteLogic';
 import { gen4StringToUTF } from 'util/Strings/StringConverter';
-import { PK4 } from '../pkm/PK4';
+import { PK4 } from '../PKM/PK4';
 import { Box, SAV } from './SAV';
 
 export class G4SAV extends SAV {
-  currentStorageBlockOffset: number = 0;
+  currentSaveStorageBlockOffset: number = 0;
+  currentSaveBoxStartOffset: number = 0;
   storageBlockSize: number = 0;
   boxSize: number = 0xff0;
   boxNamesOffset: number = 0;
   footerSize: number = 0x14;
   boxes: Array<G4Box>;
+  pkmType = PK4;
 
   constructor(path: string, bytes: Uint8Array) {
     super(path, bytes);
@@ -34,11 +37,11 @@ export class G4SAV extends SAV {
       for (let monIndex = 0; monIndex < 30; monIndex++) {
         try {
           let startByte =
-            this.currentStorageBlockOffset +
+            this.currentSaveBoxStartOffset +
             this.boxSize * box +
             136 * monIndex;
           let endByte =
-            this.currentStorageBlockOffset +
+            this.currentSaveBoxStartOffset +
             this.boxSize * box +
             136 * (monIndex + 1);
           let monData = this.bytes.slice(startByte, endByte);
@@ -56,7 +59,7 @@ export class G4SAV extends SAV {
   getStorageChecksum() {
     return bytesToUint16LittleEndian(
       this.bytes,
-      this.currentStorageBlockOffset + this.storageBlockSize - 2
+      this.currentSaveStorageBlockOffset + this.storageBlockSize - 2
     );
   }
 
@@ -64,9 +67,11 @@ export class G4SAV extends SAV {
     let sum = 0xffff;
 
     for (
-      let i = this.currentStorageBlockOffset;
+      let i = this.currentSaveStorageBlockOffset;
       i <
-      this.currentStorageBlockOffset + this.storageBlockSize - this.footerSize;
+      this.currentSaveStorageBlockOffset +
+        this.storageBlockSize -
+        this.footerSize;
       i++
     )
       sum =
@@ -81,13 +86,13 @@ export class G4SAV extends SAV {
     console.log(
       'updating gen 4 checksum at',
       '0x' +
-        (this.currentStorageBlockOffset + this.storageBlockSize - 2)
+        (this.currentSaveStorageBlockOffset + this.storageBlockSize - 2)
           .toString(16)
           .padStart(4, '0')
     );
     this.bytes.set(
       uint16ToBytesLittleEndian(newChecksum),
-      this.currentStorageBlockOffset + this.storageBlockSize - 2
+      this.currentSaveStorageBlockOffset + this.storageBlockSize - 2
     );
   };
 
@@ -102,7 +107,7 @@ export class G4SAV extends SAV {
         changedMonPKMs.push(changedMon);
       }
       let writeIndex =
-        this.currentStorageBlockOffset + this.boxSize * box + 136 * index;
+        this.currentSaveBoxStartOffset + this.boxSize * box + 136 * index;
       // changedMon will be undefined if pokemon was moved from this slot
       // and the slot was left empty
       if (changedMon) {
@@ -121,6 +126,7 @@ export class G4SAV extends SAV {
       }
     });
     this.updateStorageChecksum();
+    console.log(this.getStorageChecksum(), this.calculateStorageChecksum());
     return changedMonPKMs;
   }
 }

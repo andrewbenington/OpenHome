@@ -43,6 +43,19 @@ export const uint16ToBytesBigEndian = (value: number): Uint8Array => {
   return Uint8Array.from([(value >> 8) & 0xff, value & 0xff]);
 };
 
+export const get8BitChecksum = (
+  bytes: Uint8Array,
+  start: number,
+  end: number
+) => {
+  let checksum = 0;
+  for (let i = start; i <= end; i += 1) {
+    checksum += bytes[i];
+    checksum = checksum & 0xff;
+  }
+  return checksum;
+};
+
 export const get16BitChecksumLittleEndian = (
   bytes: Uint8Array,
   start: number,
@@ -98,7 +111,7 @@ export const setFlag = (
   let bitIndex = index % 8;
   if (byteIndex < buffer.length) {
     buffer[byteIndex] =
-      (buffer[byteIndex] & ~Math.pow(2, bitIndex)) |
+      (buffer[byteIndex] & (0xff - Math.pow(2, bitIndex))) |
       (value ? Math.pow(2, bitIndex) : 0);
   }
 };

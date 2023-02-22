@@ -2,7 +2,6 @@ import { Abilities } from '../consts/Abilities';
 import { Items } from '../consts/Items';
 import { Languages } from '../consts/Languages';
 import { Gen9RibbonsPart1 } from '../consts/Ribbons';
-import { getMetLocation } from '../renderer/MetLocation/MetLocation';
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -12,12 +11,12 @@ import {
   getLevelGen3Onward,
   getStatGen3Onward,
 } from '../util/StatCalc';
-import { pkm } from './pkm';
+import { PKM } from './PKM';
 
-export class pk6 extends pkm {
+export class PK6 extends PKM {
   constructor(bytes: Uint8Array) {
     super(bytes);
-    this.format = 'pk6';
+    this.format = 'PK6';
     this.encryptionConstant = bytesToUint32LittleEndian(bytes, 0x00);
     this.personalityValue = bytesToUint32LittleEndian(bytes, 0x18);
     this.dexNum = bytesToUint16LittleEndian(bytes, 0x08);
@@ -115,18 +114,12 @@ export class pk6 extends pkm {
       year: bytes[0xd1],
     };
     this.eggLocationIndex = bytesToUint16LittleEndian(bytes, 0xd8);
-    this.eggLocation =
-      getMetLocation(this.gameOfOrigin, this.eggLocationIndex, false, true) ??
-      this.eggLocationIndex.toString();
     this.metDate = {
       day: bytes[0xd6],
       month: bytes[0xd5],
       year: bytes[0xd4],
     };
     this.metLocationIndex = bytesToUint16LittleEndian(bytes, 0xda);
-    this.metLocation =
-      getMetLocation(this.gameOfOrigin, this.metLocationIndex) ??
-      this.metLocationIndex.toString();
     this.language = Languages[bytes[0xe3]];
     this.isShiny =
       (this.trainerID ^

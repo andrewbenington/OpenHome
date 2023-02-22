@@ -1,13 +1,11 @@
-import { SaveType } from '../renderer/types/types';
-import { MONS_LIST } from '../consts/Mons';
+import { GameOfOrigin, MONS_LIST } from '../consts';
 import Types from '../consts/Types';
+import { SaveType } from '../renderer/types/types';
 import { bytesToString, writeUint32ToBuffer } from '../util/ByteLogic';
-import { PK3 } from './PK3';
-import { PK4 } from './PK4';
-import { pk5 } from './pk5';
-import { pkm, stats, statsPreSplit } from './pkm';
-import { PK2 } from './PK2';
 import OHPKM from './OHPKM';
+import { PK2 } from './PK2';
+import { PK3 } from './PK3';
+import { PKM, stats, statsPreSplit } from './PKM';
 
 export const writeIVsToBuffer = (
   ivs: stats,
@@ -159,19 +157,19 @@ export const generatePersonalityValue = () => {
 
 export const convertPKMForSaveType = (
   saveType: SaveType,
-  mon: pkm
-): pkm | undefined => {
+  mon: PKM
+): PKM | undefined => {
   switch (saveType) {
     // case (SaveType.DPPt, SaveType.HGSS):
     //   return new PK4(mon);
     case (SaveType.RS, SaveType.FRLG, SaveType.E):
       return new PK3(mon);
     // case SaveType.G5:
-    //   return new pk5(mon);
+    //   return new PK5(mon);
   }
 };
 
-export const getMonFileIdentifier = (mon: pkm) => {
+export const getMonFileIdentifier = (mon: PKM) => {
   if (mon.personalityValue) {
     const baseMon = getBaseMon(mon.dexNum, mon.formNum);
     if (baseMon) {
@@ -187,9 +185,11 @@ export const getMonFileIdentifier = (mon: pkm) => {
 };
 
 export const getMonGen12Identifier = (mon: PK2 | OHPKM) => {
+  console.log(mon, mon.dvs);
   let dvs = mon.dvs;
   if (dvs) {
     const baseMon = getBaseMon(mon.dexNum, mon.formNum);
+    console.log(mon, baseMon);
     const TID =
       mon.isGameBoy || mon.personalityValue === undefined
         ? mon.trainerID
@@ -222,4 +222,24 @@ export const formatHasColorMarkings = (format: string) => {
       ['7', '8', '9'].includes(format.charAt(format.length - 1))) ||
     format === 'ohpkm'
   );
+};
+
+export const getTypes = (mon: PKM) => {
+  let types = MONS_LIST[mon.dexNum]?.formes[mon.formNum]?.types;
+  if (mon.format === 'PK1' && (mon.dexNum === 81 || mon.dexNum === 82)) {
+    types = ['Electric'];
+  } else if (
+    ['PK1', 'PK2', 'PK3', 'COLOPKM', 'XDPKM', 'PK4', 'PK5'].includes(mon.format)
+  ) {
+    if (types?.includes('Fairy')) {
+      if (types.length === 1 || types.includes('Flying')) {
+        types = types.map((type) => (type === 'Fairy' ? 'Normal' : type));
+      } else if (types[0] === 'Fairy') {
+        return [types[1]];
+      } else {
+        return [types[0]];
+      }
+    }
+  }
+  return types ?? [];
 };

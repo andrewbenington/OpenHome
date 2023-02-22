@@ -1,10 +1,12 @@
-import RSEFRLGLocations from '../renderer/MetLocation/RSEFRLG';
-import { Abilities } from '../consts/Abilities';
-import { Gen3Items } from '../consts/Items';
-import { Languages } from '../consts/Languages';
-import { MONS_LIST } from '../consts/Mons';
-import { Gen3ContestRibbons, Gen3StandardRibbons } from '../consts/Ribbons';
-import { getMetLocation } from '../renderer/MetLocation/MetLocation';
+import {
+  Languages,
+  Gen3Items,
+  Abilities,
+  MONS_LIST,
+  Gen3ContestRibbons,
+  Gen3StandardRibbons,
+} from '../consts';
+import RSEFRLGLocations from '../consts/MetLocation/RSEFRLG';
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -14,11 +16,7 @@ import {
   uint16ToBytesLittleEndian,
   uint32ToBytesLittleEndian,
 } from '../util/ByteLogic';
-import {
-  gen3IDs,
-  gen3ToNational,
-  nationalToGen3,
-} from '../util/ConvertPokemonID';
+import { gen3ToNational, nationalToGen3 } from '../util/ConvertPokemonID';
 import {
   decryptByteArrayGen3,
   shuffleBlocksGen3,
@@ -34,7 +32,7 @@ import {
   gen3StringToUTF,
   utf16StringToGen3,
 } from '../util/Strings/StringConverter';
-import { contestStats, marking, pkm, stats } from './pkm';
+import { contestStats, marking, PKM, stats } from './PKM';
 import {
   generateIVs,
   generatePersonalityValue,
@@ -42,9 +40,9 @@ import {
   writeIVsToBuffer,
 } from './util';
 
-const GEN3_MOVE_MAX = 354;
+export const GEN3_MOVE_MAX = 354;
 
-export class PK3 extends pkm {
+export class PK3 extends PKM {
   public get format() {
     return 'PK3';
   }
@@ -329,13 +327,6 @@ export class PK3 extends pkm {
     this.bytes[0x45] = value;
   }
 
-  public get metLocation() {
-    return (
-      getMetLocation(this.gameOfOrigin, this.metLocationIndex) ??
-      this.metLocationIndex.toString()
-    );
-  }
-
   public get metLevel() {
     return this.bytes[0x46] & 0x7f;
   }
@@ -554,7 +545,7 @@ export class PK3 extends pkm {
       } else {
         super(bytes);
       }
-    } else if (args.length === 1 && args[0] instanceof pkm) {
+    } else if (args.length === 1 && args[0] instanceof PKM) {
       const other = args[0];
       super(new Uint8Array(80));
       this.dexNum = other.dexNum;
@@ -640,7 +631,7 @@ export class PK3 extends pkm {
       this.trainerFriendship = other.trainerFriendship;
       this.ball = other.ball ? (other.ball <= 12 ? other.ball : 4) : 4;
       const equivalentLocation = other.metLocation
-        ? RSEFRLGLocations[0].indexOf(other.metLocation.slice(3))
+        ? RSEFRLGLocations[0].indexOf(other.metLocation)
         : 0;
       this.metLocationIndex =
         equivalentLocation > 0

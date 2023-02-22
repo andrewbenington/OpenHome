@@ -1,11 +1,10 @@
-import { Box, Button, Card, Tab, Tabs } from '@mui/material';
+import { Box, Card, Tab, Tabs } from '@mui/material';
 import _ from 'lodash';
 import { useEffect, useState } from 'react';
-import { get16BitChecksumLittleEndian } from 'util/ByteLogic';
 import { MONS_LIST } from '../../consts/Mons';
 import Types from '../../consts/Types';
-import { pkm } from '../../pkm/pkm';
-import { writeIVsToBuffer } from '../../pkm/util';
+import { PKM } from '../../PKM/PKM';
+import { getMonFileIdentifier, getTypes } from '../../PKM/util';
 import { getTypeColor } from '../util/PokemonSprite';
 import AttributeRow from './AttributeRow';
 import AttributeTag from './AttributeTag';
@@ -14,29 +13,9 @@ import RibbonsDisplay from './RibbonsDisplay';
 import StatsDisplay from './StatsDisplay';
 import SummaryDisplay from './SummaryDisplay';
 
-const getTypes = (mon: pkm) => {
-  let types = MONS_LIST[mon.dexNum]?.formes[mon.formNum]?.types;
-  if (mon.format === 'pk1' && (mon.dexNum === 81 || mon.dexNum === 82)) {
-    types = ['Electric'];
-  } else if (
-    ['pk1', 'pk2', 'PK3', 'colopkm', 'xdpkm', 'PK4', 'pk5'].includes(mon.format)
-  ) {
-    if (types?.includes('Fairy')) {
-      if (types.length === 1 || types.includes('Flying')) {
-        types = types.map((type) => (type === 'Fairy' ? 'Normal' : type));
-      } else if (types[0] === 'Fairy') {
-        return [types[1]];
-      } else {
-        return [types[0]];
-      }
-    }
-  }
-  return types ?? [];
-};
-
 const PokemonDisplay = (props: {
-  mon: pkm;
-  updateMon: (mon: pkm) => void;
+  mon: PKM;
+  updateMon: (mon: PKM) => void;
   propTab?: string;
 }) => {
   const { mon, updateMon, propTab } = props;
@@ -45,18 +24,6 @@ const PokemonDisplay = (props: {
     setTab(propTab ?? 'summary');
   }, [propTab]);
 
-  const getIVBytes = (): string => {
-    let array = new Uint8Array(4);
-    console.log(mon.ivs);
-    if (!mon.ivs) {
-      return '';
-    }
-    writeIVsToBuffer(mon.ivs, array, 0, false, false);
-    let printedString = Array.from(array).map((byte: number) =>
-      byte.toString(16)
-    );
-    return printedString.join(' ');
-  };
   return (
     <div style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
       <PokemonWithItem mon={mon} format={mon.format} style={{ width: '20%' }} />
@@ -113,7 +80,7 @@ const PokemonDisplay = (props: {
           value={`${mon.displayID
             .toString()
             .padStart(
-              ['pk7', 'pk8', 'pa8', 'pk9'].includes(mon.format) ? 6 : 5,
+              ['PK7', 'PK8', 'PA8', 'PK9'].includes(mon.format) ? 6 : 5,
               '0'
             )}`}
         />
@@ -183,7 +150,15 @@ const PokemonDisplay = (props: {
         </div>
       </div>
 
-      <Card style={{ width: '50%', marginLeft: 10, borderTopRightRadius: 0 }}>
+      <Card
+        style={{
+          width: '50%',
+          marginLeft: 10,
+          borderTopRightRadius: 0,
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
           <Tabs value={tab} style={{ position: 'relative' }}>
             <Tab
@@ -253,6 +228,7 @@ const PokemonDisplay = (props: {
                   .join('')}`}</code>
               );
             })}
+            <code>{getMonFileIdentifier(mon)}</code>
           </div>
         )}
       </Card>
@@ -261,19 +237,19 @@ const PokemonDisplay = (props: {
 };
 
 const fileTypeColors: { [key: string]: string } = {
-  pk2: '#bbb',
+  PK2: '#bbb',
   PK3: '#9b3',
-  colopkm: '#93f',
-  xdpkm: '#53b',
+  COLOPKM: '#93f',
+  XDPKM: '#53b',
   PK4: '#f88',
-  pk5: '#484',
-  pk6: 'blue',
-  pk7: 'orange',
-  pb7: '#a75',
-  pk8: '#6bf',
-  pb8: '#6bf',
-  pa8: '#8cc',
-  pk9: '#f52',
+  PK5: '#484',
+  PK6: 'blue',
+  PK7: 'orange',
+  PB7: '#a75',
+  PK8: '#6bf',
+  PB8: '#6bf',
+  PA8: '#8cc',
+  PK9: '#f52',
 };
 
 export default PokemonDisplay;

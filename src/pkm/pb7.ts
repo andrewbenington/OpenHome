@@ -1,7 +1,6 @@
 import { Items } from '../consts/Items';
 import { Languages } from '../consts/Languages';
 import { Gen9RibbonsPart1 } from '../consts/Ribbons';
-import { getMetLocation } from '../renderer/MetLocation/MetLocation';
 import {
   getHPGen3Onward,
   getLevelGen3Onward,
@@ -11,12 +10,12 @@ import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
 } from '../util/ByteLogic';
-import { pkm } from './pkm';
+import { PKM } from './PKM';
 
-export class pb7 extends pkm {
+export class PB7 extends PKM {
   constructor(bytes: Uint8Array) {
     super(bytes);
-    this.format = 'pb7';
+    this.format = 'PB7';
     this.encryptionConstant = bytesToUint32LittleEndian(bytes, 0x00);
     this.personalityValue = bytesToUint32LittleEndian(bytes, 0x18);
     this.dexNum = bytesToUint16LittleEndian(bytes, 0x08);
@@ -111,9 +110,6 @@ export class pb7 extends pkm {
     this.metMonth = bytes[0xd5];
     this.metDay = bytes[0xd6];
     this.metLocationIndex = bytesToUint16LittleEndian(bytes, 0xda);
-    this.metLocation =
-      getMetLocation(this.gameOfOrigin, this.metLocationIndex) ??
-      this.metLocationIndex.toString();
     this.isShiny =
       (this.trainerID ^
         this.secretID ^

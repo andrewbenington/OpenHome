@@ -1,7 +1,7 @@
 import { Card, Grid } from '@mui/material';
 import _ from 'lodash';
-import OHPKM from 'pkm/OHPKM';
-import { pkm } from 'pkm/pkm';
+import OHPKM from 'PKM/OHPKM';
+import { PKM } from 'PKM/PKM';
 import { useEffect } from 'react';
 import { OpenHomeTheme } from 'renderer/Themes';
 import { HomeBox, HomeData } from 'sav/HomeData';
@@ -12,7 +12,7 @@ interface HomeBoxDisplayProps {
   box: HomeBox;
   setBox: (box: HomeBox) => void;
   currentTheme: OpenHomeTheme;
-  setSelectedMon: (mon: pkm | undefined) => void;
+  setSelectedMon: (mon: PKM | undefined) => void;
   onDrag: (index: number) => void;
   onDrop: (index: number) => void;
 }

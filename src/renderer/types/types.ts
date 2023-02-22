@@ -29,6 +29,7 @@ export type levelUpType =
   
 export enum SaveType {
   UNKNOWN,
+  RBY_I,
   GS_I,
   C_I,
   C_J,

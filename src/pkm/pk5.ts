@@ -2,13 +2,10 @@ import { Abilities } from '../consts/Abilities';
 import { Items } from '../consts/Items';
 import { Languages } from '../consts/Languages';
 import { Gen9RibbonsPart1 } from '../consts/Ribbons';
-import { getMetLocation } from '../renderer/MetLocation/MetLocation';
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
   uint16ToBytesLittleEndian,
-  writeUint16ToBuffer,
-  writeUint32ToBuffer,
 } from '../util/ByteLogic';
 import {
   decryptByteArrayGen45,
@@ -19,9 +16,9 @@ import {
   getLevelGen3Onward,
   getStatGen3Onward,
 } from '../util/StatCalc';
-import { pkm } from './pkm';
+import { PKM } from './PKM';
 
-export class pk5 extends pkm {
+export class PK5 extends PKM {
   static fileSize = 136;
 
   public get metLocationIndex() {
@@ -32,13 +29,6 @@ export class pk5 extends pkm {
     this.bytes.set(uint16ToBytesLittleEndian(value), 0x80);
   }
 
-  public get metLocation() {
-    return (
-      getMetLocation(this.gameOfOrigin, this.metLocationIndex) ??
-      this.metLocationIndex.toString()
-    );
-  }
-
   constructor(bytes: Uint8Array, encrypted: boolean = false) {
     if (encrypted) {
       let unencryptedBytes = decryptByteArrayGen45(bytes);
@@ -47,7 +37,7 @@ export class pk5 extends pkm {
     } else {
       super(bytes);
     }
-    this.format = 'pk5';
+    this.format = 'PK5';
     this.personalityValue = bytesToUint32LittleEndian(bytes, 0x00);
     this.dexNum = bytesToUint16LittleEndian(bytes, 0x08);
     this.exp = bytesToUint32LittleEndian(bytes, 0x10);

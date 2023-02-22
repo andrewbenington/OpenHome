@@ -4,7 +4,6 @@ import { Gen3Items } from '../consts/Items';
 import { GCLanguages } from '../consts/Languages';
 import { MONS_LIST } from '../consts/Mons';
 import { Gen3StandardRibbons } from '../consts/Ribbons';
-import { getMetLocation } from '../renderer/MetLocation/MetLocation';
 import { getGen3To5Gender } from '../util/GenderCalc';
 import {
   bytesToUint16BigEndian,
@@ -15,12 +14,12 @@ import {
   getLevelGen3Onward,
   getStatGen3Onward,
 } from '../util/StatCalc';
-import { pkm } from './pkm';
+import { PKM } from './PKM';
 
-export class COLOPKM extends pkm {
+export class COLOPKM extends PKM {
   constructor(bytes: Uint8Array) {
     super(bytes);
-    this.format = 'colopkm';
+    this.format = 'COLOPKM';
     this.personalityValue = bytesToUint32BigEndian(bytes, 0x04);
     this.dexNum = gen3ToNational(bytesToUint16BigEndian(bytes, 0x00));
     this.gender = getGen3To5Gender(this.personalityValue, this.dexNum);
@@ -111,9 +110,6 @@ export class COLOPKM extends pkm {
     this.metYear = bytes[0x7b];
     this.metMonth = bytes[0x7c];
     this.metDay = bytes[0x7d];
-    this.metLocation =
-      getMetLocation(this.gameOfOrigin, bytesToUint16BigEndian(bytes, 0x0c)) ??
-      bytesToUint16BigEndian(bytes, 0x0c).toString();
     this.isShiny =
       (this.trainerID ^
         this.secretID ^

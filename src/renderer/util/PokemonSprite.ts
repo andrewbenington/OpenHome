@@ -1,6 +1,6 @@
 import { GameOfOriginData } from '../../consts/GameOfOrigin';
 import { MONS_LIST } from '../../consts/Mons';
-import { pkm } from '../../pkm/pkm';
+import { PKM } from '../../PKM/PKM';
 import { natDexToSV } from '../../util/ConvertPokemonID';
 
 const ColosseumOnlyNonShadow = [311];
@@ -44,7 +44,7 @@ export const getBoxSprite = (dexNum: number, formNum: number) => {
 };
 
 export const getBoxSprite1 = (dexNum: number, formNum: number) => {
-  if (dexNum === 0) return;
+  if (!MONS_LIST[dexNum]?.formes[0]) return;
   let defaultFormeIsNamed =
     MONS_LIST[dexNum].formes[0].name === MONS_LIST[dexNum].formes[0].formeName;
   let forme = MONS_LIST[dexNum].formes[formNum];
@@ -145,7 +145,9 @@ export const getPokemonDBSprite = (
     .replace('paldea', 'paldean')
     .replace('-natural', '')
     .replace('-disguised', '')
-    .replace('-partner', '-johto');
+    .replace('-partner', '-johto')
+    .replace('-exclamation', '-em')
+    .replace('-questino', '-qm');
   if (dexNum === 25 && formNum > 0 && formNum != 8) {
     formeName += '-cap';
   }
@@ -261,7 +263,7 @@ export const getItemSprite = (item: string) => {
     ?.replaceAll(' ', '-')}.png`;
 };
 
-export const getMonSprite = (mon: pkm, format: string) => {
+export const getMonSprite = (mon: PKM, format: string) => {
   let formeName =
     (mon.formNum > 0 && mon.dexNum !== 664 && mon.dexNum !== 665
       ? MONS_LIST[mon.dexNum]?.formes[mon.formNum]?.formeName?.toLowerCase()
@@ -280,29 +282,30 @@ export const getMonSprite = (mon: pkm, format: string) => {
   if (formeParts.length > 1) {
     formeName += `-${formeParts.slice(1).join('')}`;
   }
-  console.log(mon.format)
   if (format === 'ohpkm') {
     return getPokemonDBSprite(mon.dexNum, mon.formNum, mon.isShiny, 'home');
-  } else if (mon.format === 'pk2') {
-    return getShowdownSprite(mon.dexNum, mon.formNum, mon.isShiny, 'gen2');
-  } else if (format === 'xdpkm' || format === 'colopkm') {
+  } else if (mon.format === 'PK1') {
+    return getShowdownSprite(mon.dexNum, mon.formNum, false, 'gen1');
+  }  else if (mon.format === 'PK2') {
+    return getPokemonDBSprite(mon.dexNum, mon.formNum, mon.isShiny, 'crystal');
+  } else if (format === 'XDPKM' || format === 'COLOPKM') {
     return `https://www.pokencyclopedia.info/sprites/spin-off/ani_xd${
       mon.isShiny ? '_shiny' : ''
     }/ani_xd${mon.isShiny ? '-S' : ''}_${mon.dexNum
       .toString()
       .padStart(3, '0')}.gif`;
-  } else if (format === 'PK3' || format === 'colopkm') {
+  } else if (format === 'PK3' || format === 'COLOPKM') {
     if (mon.dexNum === 201) {
       return getUnownSprite(mon.formNum, 3);
     }
     return getShowdownSprite(mon.dexNum, mon.formNum, mon.isShiny, 'gen3');
   } else if (format === 'PK4') {
-    return getShowdownSprite(mon.dexNum, mon.formNum, mon.isShiny, 'gen4');
-  } else if (format === 'pk5') {
+    return getPokemonDBSprite(mon.dexNum, mon.formNum, mon.isShiny, 'heartgold-soulsilver');
+  } else if (format === 'PK5') {
     return getShowdownSprite(mon.dexNum, mon.formNum, mon.isShiny, 'gen5ani');
-  } else if (format === 'pk6') {
+  } else if (format === 'PK6') {
     return getShowdownSprite(mon.dexNum, mon.formNum, mon.isShiny, 'ani');
-  } else if (format === 'pk7') {
+  } else if (format === 'PK7') {
     if (alolaDex.includes(mon.dexNum)) {
       return getPokemonDBSprite(
         mon.dexNum,
@@ -313,19 +316,19 @@ export const getMonSprite = (mon: pkm, format: string) => {
     } else {
       return getPokemonDBSprite(mon.dexNum, mon.formNum, mon.isShiny, 'home');
     }
-  } else if (format === 'pb7') {
+  } else if (format === 'PK9') {
     if (mon.formNum !== 0 && (mon.dexNum === 25 || mon.dexNum === 133)) {
       return getShowdownSprite(mon.dexNum, mon.formNum, mon.isShiny, 'ani');
     }
     return getPokemonDBSprite(mon.dexNum, mon.formNum, mon.isShiny, 'go');
-  } else if (format === 'pa8') {
+  } else if (format === 'PA8') {
     return getPokemonDBSprite(
       mon.dexNum,
       mon.formNum,
       mon.isShiny,
       'legends-arceus'
     );
-  } else if (format === 'pk8' || format === 'pb8') {
+  } else if (format === 'PK8' || format === 'PB8') {
     return getSerebiiSprite(mon.dexNum, mon.formNum, mon.isShiny, 'SWSH');
   } else if (
     mon.dexNum <= 898 &&

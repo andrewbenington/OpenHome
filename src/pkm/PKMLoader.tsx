@@ -2,7 +2,7 @@ import { Button, MenuItem, Pagination, Select } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useFilePicker } from 'use-file-picker';
 import PokemonDisplay from '../renderer/components/PokemonDisplay';
-import { pkm } from './pkm';
+import { PKM } from './PKM';
 import { acceptableExtensions, bytesToPKM } from '../util/FileImport';
 
 const PKMLoader = () => {
@@ -10,7 +10,7 @@ const PKMLoader = () => {
     accept: acceptableExtensions,
     readAs: 'ArrayBuffer',
   });
-  const [mons, setMons] = useState<pkm[]>([]);
+  const [mons, setMons] = useState<PKM[]>([]);
   const [propTab, setPropTab] = useState('summary');
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(100);

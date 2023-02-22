@@ -1,12 +1,12 @@
-import { RibbonTitles } from '../consts/Ribbons';
-import { GameOfOrigin } from '../consts/GameOfOrigin';
+import { RibbonTitles, GameOfOrigin, gameOfOriginFromFormat } from '../consts';
+import { getLocation } from '../consts/MetLocation/MetLocation';
 
-export class pkm {
+export class PKM {
   static markingCount = 4;
   static markingColors = 1;
 
   bytes: Uint8Array = new Uint8Array();
-  private _format: string = 'pkm';
+  private _format: string = 'PKM';
   public get format(): string {
     return this._format;
   }
@@ -101,7 +101,7 @@ export class pkm {
   public set level(value: number) {
     this._level = value;
   }
-  private _ability?: string
+  private _ability?: string;
   public get ability(): string | undefined {
     return this._ability;
   }
@@ -490,6 +490,13 @@ export class pkm {
   public set handlerMemory(value: memory | undefined) {
     this._handlerMemory = value;
   }
+  private _metTimeOfDay?: number | undefined;
+  public get metTimeOfDay(): number | undefined {
+    return this._metTimeOfDay;
+  }
+  public set metTimeOfDay(value: number | undefined) {
+    this._metTimeOfDay = value;
+  }
   private _shinyLeaves?: number | undefined;
   public get shinyLeaves(): number | undefined {
     return this._shinyLeaves;
@@ -557,22 +564,26 @@ export class pkm {
   }
 
   public get affixedRibbonTitle() {
-    return this.affixedRibbon ? RibbonTitles[this.affixedRibbon] : ''
+    return this.affixedRibbon ? RibbonTitles[this.affixedRibbon] : '';
   }
 
-
   // Gen4
-  private _groundTile?: number
+  private _groundTile?:
+    | number
     // HGSS
     | undefined;
-  public get groundTile(): number
+  public get groundTile():
+    | number
     // HGSS
     | undefined {
     return this._groundTile;
   }
-  public set groundTile(value: number
-    // HGSS
-    | undefined) {
+  public set groundTile(
+    value:
+      | number
+      // HGSS
+      | undefined
+  ) {
     this._groundTile = value;
   }
   // HGSS
@@ -632,26 +643,12 @@ export class pkm {
     this._metDate = value;
   }
   obedienceLevel?: number;
-  private _eggLocation: string = 'a distant land';
-  public get eggLocation(): string {
-    return this._eggLocation;
-  }
-  public set eggLocation(value: string) {
-    this._eggLocation = value;
-  }
   private _eggLocationIndex: number = 0;
   public get eggLocationIndex(): number {
     return this._eggLocationIndex;
   }
   public set eggLocationIndex(value: number) {
     this._eggLocationIndex = value;
-  }
-  private _metLocation?: string;
-  public get metLocation(): string | undefined {
-    return this._metLocation;
-  }
-  public set metLocation(value: string | undefined) {
-    this._metLocation = value;
   }
   private _metLocationIndex?: number;
   public get metLocationIndex(): number | undefined {
@@ -832,10 +829,23 @@ export class pkm {
     );
   }
 
+  public get metLocation() {
+    if (!this.metLocationIndex) return undefined;
+    const game = gameOfOriginFromFormat(this.format) ?? this.gameOfOrigin;
+    return getLocation(game, this.metLocationIndex, false, false);
+  }
+
+  public get eggLocation() {
+    if (!this.eggLocationIndex) return undefined;
+    // const game = gameOfOriginFromFormat(this.format) ?? this.gameOfOrigin;
+    // return getLocation(game, this.eggLocationIndex, false, true);
+    return undefined;
+  }
+
   constructor(arg: any) {
     if (arg instanceof Uint8Array) {
       this.bytes = arg;
-    } else if (arg instanceof pkm) {
+    } else if (arg instanceof PKM) {
     }
   }
 

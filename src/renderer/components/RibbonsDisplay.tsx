@@ -1,10 +1,10 @@
 import { Tooltip } from "@mui/material";
 import { Gen9RibbonsPart2 } from "../../consts/Ribbons";
-import { PK3 } from "../../pkm/PK3";
-import { pkm } from "../../pkm/pkm";
+import { PK3 } from "../../PKM/PK3";
+import { PKM } from "../../PKM/PKM";
 
-const getRibbonURL = (mon: pkm, ribbon: string) => {
-  if (pkm instanceof PK3) {
+const getRibbonURL = (mon: PKM, ribbon: string) => {
+  if (PKM instanceof PK3) {
   } else if (Gen9RibbonsPart2.indexOf(ribbon) > 33) {
     return `https://www.serebii.net/scarletviolet/ribbons/${ribbon
       .toLowerCase()
@@ -22,7 +22,7 @@ const getRibbonURL = (mon: pkm, ribbon: string) => {
   }
 };
 
-const RibbonsDisplay = (props: { mon: pkm }) => {
+const RibbonsDisplay = (props: { mon: PKM }) => {
   const { mon } = props;
   return (
     <div

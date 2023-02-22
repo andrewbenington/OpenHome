@@ -13,13 +13,13 @@ import _ from 'lodash';
 import { useState } from 'react';
 import { Radar } from 'react-chartjs-2';
 import { getNatureSummary } from '../../consts/Natures';
-import { COLOPKM } from '../../pkm/colopkm';
-import { PK3 } from '../../pkm/PK3';
-import { pkm } from '../../pkm/pkm';
-import { xdpkm } from '../../pkm/xdpkm';
+import { COLOPKM } from '../../PKM/COLOPKM';
+import { PK3 } from '../../PKM/PK3';
+import { PKM } from '../../PKM/PKM';
+import { XDPKM } from '../../PKM/XDPKM';
 
-const getSheenStars = (mon: pkm) => {
-  if (mon instanceof PK3 || mon instanceof COLOPKM || mon instanceof xdpkm) {
+const getSheenStars = (mon: PKM) => {
+  if (mon instanceof PK3 || mon instanceof COLOPKM || mon instanceof XDPKM) {
     return mon.contest.sheen === 255
       ? 10
       : Math.floor(mon.contest.sheen / 29) + 1;
@@ -52,7 +52,7 @@ const getSheenStars = (mon: pkm) => {
   }
 };
 
-const StatsDisplay = (props: { mon: pkm }) => {
+const StatsDisplay = (props: { mon: PKM }) => {
   const { mon } = props;
   const [display, setDisplay] = useState('Stats');
   ChartJS.register(
@@ -215,7 +215,36 @@ const StatsDisplay = (props: { mon: pkm }) => {
                     pointHoverBackgroundColor: '#fff',
                     pointHoverBorderColor: 'rgb(255, 99, 132)',
                   }
-                : display === 'EVs' && (mon.evs || mon.evsG12)
+                : display === 'EVs' && mon.evsG12
+                ? {
+                    label: 'EVs',
+                    data: mon.evs
+                      ? [
+                          mon.evs.hp,
+                          mon.evs.atk,
+                          mon.evs.def,
+                          mon.evs.spe,
+                          mon.evs.spd,
+                          mon.evs.spa,
+                        ]
+                      : mon.evsG12
+                      ? [
+                          mon.evsG12.hp,
+                          mon.evsG12.atk,
+                          mon.evsG12.def,
+                          mon.evsG12.spe,
+                          mon.evsG12.spc,
+                        ]
+                      : [],
+                    fill: true,
+                    backgroundColor: 'rgba(132, 99, 255, 0.2)',
+                    borderColor: 'rgb(132, 99, 255)',
+                    pointBackgroundColor: 'rgb(132, 99, 255)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgb(132, 99, 255)',
+                  }
+                : display === 'EVs (GB)' && mon.evsG12
                 ? {
                     label: 'EVs',
                     data: mon.evs
