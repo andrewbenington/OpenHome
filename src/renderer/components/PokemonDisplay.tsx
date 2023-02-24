@@ -1,10 +1,10 @@
-import { Box, Card, Tab, Tabs } from '@mui/material';
+import { Box, Card, Chip, Tab, Tabs } from '@mui/material';
 import _ from 'lodash';
 import { useEffect, useState } from 'react';
-import { MONS_LIST } from '../../consts/Mons';
+import { POKEMON_DATA } from '../../consts/Mons';
 import Types from '../../consts/Types';
-import { PKM } from '../../PKM/PKM';
-import { getMonFileIdentifier, getTypes } from '../../PKM/util';
+import { PKM } from '../../types/PKM/PKM';
+import { getMonFileIdentifier, getTypes } from '../../types/PKM/util';
 import { getTypeColor } from '../util/PokemonSprite';
 import AttributeRow from './AttributeRow';
 import AttributeTag from './AttributeTag';
@@ -26,16 +26,31 @@ const PokemonDisplay = (props: {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
+      <Chip
+        label={mon.format}
+        style={{
+          position: 'absolute',
+          left: 10,
+          top: 10,
+          backgroundColor: fileTypeColors[mon.format],
+          color: 'white',
+          fontWeight: 'bold',
+          fontSize: 20,
+        }}
+      ></Chip>
       <PokemonWithItem mon={mon} format={mon.format} style={{ width: '20%' }} />
       <div style={{ textAlign: 'left', width: '30%' }}>
         <AttributeRow
           label="Name"
-          value={`${MONS_LIST[mon.dexNum]?.formes[mon.formNum]?.formeName}`}
+          value={`${POKEMON_DATA[mon.dexNum]?.formes[mon.formNum]?.formeName} ${
+            mon.gender === 2 ? '' : mon.gender === 1 ? '♀' : '♂'
+          }`}
         />
         <AttributeRow label="Dex No." value={`${mon.dexNum}`} />
         <AttributeRow label="Type">
           {getTypes(mon)?.map((type, i) => (
             <img
+              draggable={false}
               alt={`pokemon type ${i + 1}`}
               style={{ height: 24, width: 24, marginRight: 5 }}
               src={`https://raw.githubusercontent.com/msikma/pokesprite/master/misc/types/gen8/${type.toLocaleLowerCase()}.png`}
@@ -150,7 +165,7 @@ const PokemonDisplay = (props: {
         </div>
       </div>
 
-      <Card
+      <div
         style={{
           width: '50%',
           marginLeft: 10,
@@ -189,21 +204,6 @@ const PokemonDisplay = (props: {
               value="raw"
               onClick={() => setTab('raw')}
             />
-            <div
-              style={{
-                position: 'absolute',
-                right: 0,
-                top: 0,
-                bottom: 0,
-                backgroundColor: fileTypeColors[mon.format],
-                color: 'white',
-                fontWeight: 'bold',
-                borderRadius: 0,
-                fontSize: 20,
-              }}
-            >
-              {mon.format}
-            </div>
           </Tabs>
         </Box>
         {tab === 'summary' ? (
@@ -231,13 +231,15 @@ const PokemonDisplay = (props: {
             <code>{getMonFileIdentifier(mon)}</code>
           </div>
         )}
-      </Card>
+      </div>
     </div>
   );
 };
 
 const fileTypeColors: { [key: string]: string } = {
-  PK2: '#bbb',
+  OHPKM: "#748fcd",
+  PK1: '#b34',
+  PK2: '#b6c',
   PK3: '#9b3',
   COLOPKM: '#93f',
   XDPKM: '#53b',

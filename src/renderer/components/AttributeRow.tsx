@@ -28,7 +28,7 @@ const AttributeRow = (props: {
           display: "flex",
           flexDirection: "row",
           alignItems: "center",
-          padding: value ? 10 : 0,
+          padding: 0,
           paddingLeft: 10,
           paddingRight: 10,
         }}

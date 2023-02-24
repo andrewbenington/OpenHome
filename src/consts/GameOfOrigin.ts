@@ -1,4 +1,4 @@
-import { Origin } from '../renderer/types/types';
+import { Origin } from '../types/types';
 
 export const GameOfOriginData: (Origin | null)[] = [
   null,
@@ -159,7 +159,6 @@ export const isSinnoh = (origin: GameOfOrigin) => {
 };
 
 export const gameOfOriginFromFormat = (format: string) => {
-  console.log(format);
   let game;
   switch (format) {
     case 'PK2':
@@ -196,6 +195,5 @@ export const gameOfOriginFromFormat = (format: string) => {
       game = GameOfOrigin.Scarlet;
       break;
   }
-  console.log(game);
   return game;
 };

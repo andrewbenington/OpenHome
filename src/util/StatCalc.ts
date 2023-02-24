@@ -1,8 +1,8 @@
 import LevelUpExp from '../consts/LevelUpExp';
-import { MONS_LIST } from '../consts/Mons';
+import { POKEMON_DATA } from '../consts/Mons';
 import { getNatureSummary } from '../consts/Natures';
-import { PKM } from '../PKM/PKM';
-import { Stat } from '../renderer/types/types';
+import { PKM } from '../types/PKM/PKM';
+import { Stat } from '../types/types';
 
 export const getStatGen3Onward = (stat: Stat, mon: PKM) => {
   if (mon.dexNum < 1 || mon.dexNum > 1008) {
@@ -14,7 +14,7 @@ export const getStatGen3Onward = (stat: Stat, mon: PKM) => {
     : natureSummary?.includes(`-${stat}`)
     ? 0.9
     : 1;
-  const baseStats = MONS_LIST[mon.dexNum]?.formes[mon.formNum]?.baseStats;
+  const baseStats = POKEMON_DATA[mon.dexNum]?.formes[mon.formNum]?.baseStats;
   if (baseStats) {
     const baseStat = (baseStats as any)[stat.toLowerCase()];
     const iv = (mon.ivs as any)[stat.toLowerCase()];
@@ -39,7 +39,7 @@ export const getHPGen3Onward = (mon: PKM) => {
     // shedinja
     return 1;
   }
-  const baseHP = MONS_LIST[mon.dexNum]?.formes[mon.formNum]?.baseStats?.hp;
+  const baseHP = POKEMON_DATA[mon.dexNum]?.formes[mon.formNum]?.baseStats?.hp;
   if (baseHP) {
     const iv = (mon.ivs as any).hp;
     const ev = (mon.evs as any).hp;
@@ -60,7 +60,7 @@ export const getLevelGen3Onward = (dexNum: number, exp: number) => {
   if (dexNum === 0) {
     return 1;
   }
-  const levelUpType = MONS_LIST[dexNum].levelUpType;
+  const levelUpType = POKEMON_DATA[dexNum].levelUpType;
   const cutoffList = LevelUpExp[levelUpType];
   return cutoffList.findIndex((minExp) => exp <= minExp) + 1;
 };
@@ -69,7 +69,7 @@ export const getLevelGen12 = (dexNum: number, exp: number) => {
   if (dexNum > 251) {
     return 1;
   }
-  const levelUpType = MONS_LIST[dexNum].levelUpType;
+  const levelUpType = POKEMON_DATA[dexNum].levelUpType;
   for (let level = 100; level > 0; level--) {
     switch (levelUpType) {
       case 'Fast':

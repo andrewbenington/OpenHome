@@ -1,13 +1,13 @@
-import { MONS_LIST } from "../consts/Mons";
+import { POKEMON_DATA } from "../consts/Mons";
 
 export const getGen3To5Gender = (PID: number, dexNum: number) => {
   if (dexNum === 0) {
     return 2
   }
   let maleRatio =
-    MONS_LIST[dexNum].formes[0].genderRatio.M > 0 ||
-    MONS_LIST[dexNum].formes[0].genderRatio.F > 0
-      ? MONS_LIST[dexNum].formes[0].genderRatio.M
+    POKEMON_DATA[dexNum].formes[0].genderRatio.M > 0 ||
+    POKEMON_DATA[dexNum].formes[0].genderRatio.F > 0
+      ? POKEMON_DATA[dexNum].formes[0].genderRatio.M
       : -1;
   if (maleRatio === -1) {
     return 2;

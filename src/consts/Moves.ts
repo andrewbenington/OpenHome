@@ -1,6 +1,4 @@
-import { Move } from '../renderer/types/types';
-import Moves from './Moves.json';
+import { Move } from '../types/types';
+import Moves from './JSON/Moves.json';
 
-const MOVES = Moves as unknown as Move[];
-
-export default MOVES;
+export const MOVE_DATA = Moves as unknown as Move[];

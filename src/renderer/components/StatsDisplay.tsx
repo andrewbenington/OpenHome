@@ -1,4 +1,4 @@
-import { Button } from '@mui/material';
+import { Button, MenuItem, Select } from '@mui/material';
 import {
   Chart as ChartJS,
   Filler,
@@ -13,10 +13,10 @@ import _ from 'lodash';
 import { useState } from 'react';
 import { Radar } from 'react-chartjs-2';
 import { getNatureSummary } from '../../consts/Natures';
-import { COLOPKM } from '../../PKM/COLOPKM';
-import { PK3 } from '../../PKM/PK3';
-import { PKM } from '../../PKM/PKM';
-import { XDPKM } from '../../PKM/XDPKM';
+import { COLOPKM } from '../../types/PKM/COLOPKM';
+import { PK3 } from '../../types/PKM/PK3';
+import { PKM } from '../../types/PKM/PKM';
+import { XDPKM } from '../../types/PKM/XDPKM';
 
 const getSheenStars = (mon: PKM) => {
   if (mon instanceof PK3 || mon instanceof COLOPKM || mon instanceof XDPKM) {
@@ -55,6 +55,7 @@ const getSheenStars = (mon: PKM) => {
 const StatsDisplay = (props: { mon: PKM }) => {
   const { mon } = props;
   const [display, setDisplay] = useState('Stats');
+  const [evType, setEVType] = useState('Modern');
   ChartJS.register(
     RadialLinearScale,
     PointElement,
@@ -75,6 +76,49 @@ const StatsDisplay = (props: { mon: PKM }) => {
         position: 'relative',
       }}
     >
+      <div
+        style={{
+          position: 'absolute',
+          right: 10,
+          top: 10,
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
+        <Select value={display} onChange={(e) => setDisplay(e.target.value)}>
+          <MenuItem value="Stats">Stats</MenuItem>
+          {mon.avs ? <MenuItem value="AVs">AVs</MenuItem> : <div />}
+          {mon.evs !== undefined ? (
+            <MenuItem value="EVs">EVs</MenuItem>
+          ) : (
+            <div />
+          )}
+          {mon.ivs !== undefined ? (
+            <MenuItem value="IVs">IVs</MenuItem>
+          ) : (
+            <div />
+          )}
+          {mon.dvs !== undefined ? (
+            <MenuItem value="DVs">DVs</MenuItem>
+          ) : (
+            <div />
+          )}
+          {mon.dvs !== undefined ? (
+            <MenuItem value="GVs">GVs</MenuItem>
+          ) : (
+            <div />
+          )}
+          <MenuItem value="Contest">Contest</MenuItem>
+        </Select>
+        {display === 'EVs' ? (
+          <Select value={evType} onChange={(e) => setEVType(e.target.value)}>
+            <MenuItem value="Modern">Modern</MenuItem>
+            <MenuItem value="Game Boy">Game Boy</MenuItem>
+          </Select>
+        ) : (
+          <div />
+        )}
+      </div>
       <div style={{ padding: 20, height: 280 }}>
         <Radar
           options={{
@@ -99,7 +143,7 @@ const StatsDisplay = (props: { mon: PKM }) => {
                     ? 15
                     : display === 'GVs'
                     ? 10
-                    : display === 'EVs' && mon.evs
+                    : display === 'EVs' && evType === 'Modern'
                     ? 252
                     : undefined,
                 pointLabels: {
@@ -155,7 +199,8 @@ const StatsDisplay = (props: { mon: PKM }) => {
             labels:
               display === 'Contest'
                 ? ['Cool', 'Beauty', 'Cute', 'Smart', 'Tough']
-                : display === 'EVs (GB)' || display === 'DVs'
+                : (display === 'EVs' && evType === 'Game Boy') ||
+                  display === 'DVs'
                 ? ['HP', 'Atk', 'Def', 'Spe', 'Spc']
                 : ['HP', 'Atk', 'Def', 'Spe', 'SpD', 'SpA'],
             datasets: [
@@ -215,7 +260,7 @@ const StatsDisplay = (props: { mon: PKM }) => {
                     pointHoverBackgroundColor: '#fff',
                     pointHoverBorderColor: 'rgb(255, 99, 132)',
                   }
-                : display === 'EVs' && mon.evsG12
+                : display === 'EVs' && evType === 'Modern' && mon.evs
                 ? {
                     label: 'EVs',
                     data: mon.evs
@@ -244,7 +289,7 @@ const StatsDisplay = (props: { mon: PKM }) => {
                     pointHoverBackgroundColor: '#fff',
                     pointHoverBorderColor: 'rgb(132, 99, 255)',
                   }
-                : display === 'EVs (GB)' && mon.evsG12
+                : display === 'EVs' && evType === 'Game Boy' && mon.evsG12
                 ? {
                     label: 'EVs',
                     data: mon.evs
@@ -367,105 +412,6 @@ const StatsDisplay = (props: { mon: PKM }) => {
           ({mon.contest.sheen})
         </div>
       )}
-
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'row',
-          position: 'absolute',
-          overflowX: 'scroll',
-          bottom: 10,
-        }}
-      >
-        <Button
-          style={{ marginLeft: 10 }}
-          variant="outlined"
-          size="small"
-          onClick={() => setDisplay('Stats')}
-        >
-          Stats
-        </Button>
-        {mon.avs ? (
-          <Button
-            style={{ marginLeft: 10 }}
-            variant="outlined"
-            size="small"
-            onClick={() => setDisplay('AVs')}
-          >
-            AVs
-          </Button>
-        ) : (
-          <div />
-        )}
-        {mon.evs !== undefined ? (
-          <Button
-            style={{ marginLeft: 10 }}
-            variant="outlined"
-            size="small"
-            onClick={() => setDisplay('EVs')}
-          >
-            EVs
-          </Button>
-        ) : (
-          <div />
-        )}
-        {mon.evsG12 !== undefined ? (
-          <Button
-            style={{ marginLeft: 10 }}
-            variant="outlined"
-            size="small"
-            onClick={() => setDisplay('EVs (GB)')}
-          >
-            EVs (GB)
-          </Button>
-        ) : (
-          <div />
-        )}
-        {mon.ivs !== undefined ? (
-          <Button
-            style={{ marginLeft: 10 }}
-            variant="outlined"
-            size="small"
-            onClick={() => setDisplay('IVs')}
-          >
-            IVs
-          </Button>
-        ) : (
-          <div />
-        )}
-        {mon.dvs !== undefined ? (
-          <Button
-            style={{ marginLeft: 10 }}
-            variant="outlined"
-            size="small"
-            onClick={() => setDisplay('DVs')}
-          >
-            DVs
-          </Button>
-        ) : (
-          <div />
-        )}
-        {mon.dvs !== undefined ? (
-          <Button
-            style={{ marginLeft: 10 }}
-            variant="outlined"
-            size="small"
-            onClick={() => setDisplay('GVs')}
-          >
-            GVs
-          </Button>
-        ) : (
-          <div />
-        )}
-        <Button
-          style={{ marginLeft: 10 }}
-          variant="outlined"
-          size="small"
-          onClick={() => setDisplay('Contest')}
-        >
-          Contest
-        </Button>
-      </div>
     </div>
   );
 };

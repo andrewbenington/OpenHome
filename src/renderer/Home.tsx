@@ -1,27 +1,28 @@
 import { Button, Dialog, MenuItem, Select } from '@mui/material';
-import OHPKM from 'PKM/OHPKM';
-import { PK2 } from 'PKM/PK2';
-import { PK4 } from 'PKM/PK4';
-import { getMonFileIdentifier, getMonGen12Identifier } from 'PKM/util';
 import { useEffect, useState } from 'react';
-import { G1SAV } from 'sav/G1SAV';
-import { G2SAV } from 'sav/G2SAV';
-import { G3SAV } from 'sav/G3SAV';
-import { G4SAV } from 'sav/G4SAV';
-import { BoxCoordinates, SAV } from 'sav/SAV';
-import { buildSaveFile, getSaveType } from 'sav/util';
+import OHPKM from 'types/PKM/OHPKM';
+import { PK2 } from 'types/PKM/PK2';
+import { PK3 } from 'types/PKM/PK3';
+import { PK4 } from 'types/PKM/PK4';
+import { getMonFileIdentifier, getMonGen12Identifier } from 'types/PKM/util';
+import G1SAV from 'types/SAV/G1SAV';
+import { G2SAV } from 'types/SAV/G2SAV';
+import { G3SAV } from 'types/SAV/G3SAV';
+import { G4SAV } from 'types/SAV/G4SAV';
+import { BoxCoordinates, SAV } from 'types/SAV/SAV';
+import { buildSaveFile, getSaveType } from 'types/SAV/util';
 import { acceptableExtensions, bytesToPKM } from 'util/FileImport';
 import Gen4ToUTFMap from 'util/Strings/Gen4ToUTFMap';
 import { utf16StringToGen4 } from 'util/Strings/StringConverter';
-import { PKM } from '../PKM/PKM';
-import { HomeData } from '../sav/HomeData';
+import { PKM } from '../types/PKM/PKM';
+import { HomeData } from '../types/SAV/HomeData';
+import { SaveType } from '../types/types';
 import HomeBoxDisplay from './components/HomeBoxDisplay';
 import PokemonDisplay from './components/PokemonDisplay';
 import SaveDisplay from './components/SaveDisplay';
 import Themes, { OpenHomeTheme } from './Themes';
-import { SaveType } from './types/types';
 import {
-  handleDeleteOHPKM,
+  handleDeleteOHPKMFiles,
   handleMenuResetAndClose,
   handleMenuSave,
   readBoxData,
@@ -46,10 +47,12 @@ const Home = () => {
   >([undefined, undefined, undefined, undefined]);
   const [homeMonMap, setHomeMonMap] = useState<{ [key: string]: OHPKM }>();
   const [changedOHPKMList, setChangedOHPKMList] = useState<OHPKM[]>([]);
+  const [deleteFileList, setDeleteFileList] = useState<string[]>([]);
   const [homeData, setHomeData] = useState(new HomeData(new Uint8Array()));
 
   useEffect(() => {
     if (homeMonMap) {
+      console.log('home mon map updated', homeMonMap);
       readBoxData((boxString) => {
         // box file just stores references, so we need to populate them from the map
         const newBox = homeData.boxes[0];
@@ -61,6 +64,10 @@ const Home = () => {
       });
     }
   }, [box, homeMonMap]);
+
+  useEffect(() => {
+    console.log('changedOHPKMList updated', changedOHPKMList);
+  }, [changedOHPKMList]);
 
   useEffect(() => {
     console.log('homedata changed');
@@ -122,7 +129,7 @@ const Home = () => {
   const changeHomeMon = (box: number, index: number, mon?: OHPKM) => {
     const newBoxes = homeData.boxes;
     newBoxes[box].pokemon[index] = mon;
-    let newData = homeData;
+    let newData = { ...homeData };
     newData.boxes = newBoxes;
     setHomeData(newData);
   };
@@ -141,7 +148,12 @@ const Home = () => {
       let newSaveData = changingSave;
       newSaveData.changedMons.push({ box, index });
       newSaveData.boxes = newBoxes;
-      const newSaves = saves;
+      const newSaves: [
+        SAV | undefined,
+        SAV | undefined,
+        SAV | undefined,
+        SAV | undefined
+      ] = [...saves];
       newSaves[saveNumber] = newSaveData;
       setSaves(newSaves);
     }
@@ -166,54 +178,52 @@ const Home = () => {
   };
 
   const onViewDrop = (e: any, type: string) => {
-    const processDroppedData = async (file: File) => {
-      let bytes = new Uint8Array(await file.arrayBuffer());
-      let [extension] = file.name.split('.').slice(-1);
-      extension = extension.toUpperCase();
-      if (acceptableExtensions.includes(extension)) {
-        let mon = bytesToPKM(bytes, extension);
-        switch (type) {
-          case 'as is':
-            setSelectedMon(mon);
-            break;
-          case 'PK4':
-            setSelectedMon(new PK4(mon));
-            break;
+    const processDroppedData = async (file?: File, droppedMon?: PKM) => {
+      let mon: PKM | undefined = droppedMon;
+      if (file) {
+        let bytes = new Uint8Array(await file.arrayBuffer());
+        let [extension] = file.name.split('.').slice(-1);
+        extension = extension.toUpperCase();
+        if (!acceptableExtensions.includes(extension)) {
+          console.log(`invalid extension: ${extension}`);
+          return;
         }
-      } else {
-        console.log(`invalid extension: ${extension}`);
+        mon = bytesToPKM(bytes, extension);
+      }
+      if (!mon) return;
+      switch (type) {
+        case 'as is':
+          setSelectedMon(mon);
+          break;
+        case 'PK4':
+          setSelectedMon(new PK4(mon));
+          break;
+        case 'PK3':
+          setSelectedMon(new PK3(mon));
+          break;
       }
     };
     let file = e.dataTransfer.files[0];
-    console.log(file, draggingSource);
-    if (file) {
-      console.log(file);
-      processDroppedData(file);
-    } else {
-      if (draggingSource?.isHome) {
-        const mon =
-          homeData.boxes[draggingSource.box]?.pokemon[draggingSource.index];
+    let mon;
+    if (!file && draggingSource) {
+      if (draggingSource.isHome) {
+        mon = homeData.boxes[draggingSource.box]?.pokemon[draggingSource.index];
         if (mon && type === 'trash') {
           changeHomeMon(draggingSource.box, draggingSource.index);
-          handleDeleteOHPKM(mon);
-        } else if (mon) {
-          switch (type) {
-            case 'as is':
-              setSelectedMon(mon);
-              break;
-            case 'PK4':
-              setSelectedMon(new PK4(mon));
-              break;
-            case 'PK2':
-              setSelectedMon(new PK2(mon));
-              break;
+          const changedOHPKMListIndex = changedOHPKMList.indexOf(mon);
+          console.log('removing at', changedOHPKMListIndex);
+          setChangedOHPKMList([
+            ...changedOHPKMList.slice(0, changedOHPKMListIndex),
+            ...changedOHPKMList.slice(changedOHPKMListIndex + 1),
+          ]);
+          const identifier = getMonFileIdentifier(mon);
+          if (identifier) {
+            setDeleteFileList([...deleteFileList, identifier]);
           }
+          return;
         }
-      } else if (
-        draggingSource?.save !== undefined &&
-        draggingSource?.isHome === false
-      ) {
-        const mon =
+      } else if (draggingSource.save !== undefined) {
+        mon =
           saves[draggingSource.save]?.boxes[draggingSource.box]?.pokemon[
             draggingSource.index
           ];
@@ -223,44 +233,56 @@ const Home = () => {
             draggingSource.index,
             draggingSource.save
           );
-          handleDeleteOHPKM(mon);
-        } else if (mon) {
-          console.log(mon);
-          switch (type) {
-            case 'as is':
-              setSelectedMon(mon);
-              break;
-            case 'PK4':
-              setSelectedMon(new PK4(mon));
-              break;
-            case 'PK2':
-              setSelectedMon(new PK2(mon));
-              break;
+          const identifier = getMonFileIdentifier(mon);
+          if (identifier) {
+            setDeleteFileList([...deleteFileList, identifier]);
           }
+          return;
         }
       }
+      setDraggingSource(undefined);
     }
+    processDroppedData(file, mon);
     e.nativeEvent.preventDefault();
   };
 
   const onImportMon = (
-    importedMon: PKM,
+    importedMons: PKM[],
     saveIndex: number,
     boxCoords: BoxCoordinates,
     isHome: boolean = false
   ) => {
-    const newSave = saves[saveIndex];
-    if (!newSave) {
-      return;
-    }
-    const homeMon = new OHPKM(importedMon);
-    newSave.boxes[boxCoords.box].pokemon[boxCoords.index] = homeMon;
-    newSave.changedMons.push(boxCoords);
-    const newSaves = saves;
-    newSaves[saveIndex] = newSave;
-    console.log('adding to changed list');
-    setChangedOHPKMList([...changedOHPKMList, homeMon]);
-    setSaves(newSaves);
+    const addedMons: OHPKM[] = [];
+    let nextIndex = boxCoords.index;
+    importedMons.forEach((mon) => {
+      const homeMon = new OHPKM(mon);
+      if (isHome) {
+        while (
+          homeData.boxes[boxCoords.box].pokemon[nextIndex] &&
+          nextIndex < 120
+        ) {
+          nextIndex++;
+        }
+        if (nextIndex < 120) {
+          changeHomeMon(boxCoords.box, nextIndex, homeMon);
+          addedMons.push(homeMon);
+          nextIndex++;
+        }
+      } else {
+        while (
+          homeData.boxes[boxCoords.box].pokemon[nextIndex] &&
+          nextIndex < 30
+        ) {
+          nextIndex++;
+        }
+        if (nextIndex < 30) {
+          changeSaveMon(boxCoords.box, nextIndex, saveIndex, homeMon);
+          addedMons.push(homeMon);
+          nextIndex++;
+        }
+      }
+    });
+    setChangedOHPKMList([...changedOHPKMList, ...addedMons]);
   };
 
   const writeAllHomeData = () => {
@@ -276,10 +298,10 @@ const Home = () => {
         window.electron.ipcRenderer.sendMessage('write-ohpkm', mon.bytes);
       }
     });
+    setChangedOHPKMList([]);
   };
 
   const saveAllSaveFiles = () => {
-    console.log(saves);
     saves.forEach((save) => {
       if (
         save instanceof G1SAV ||
@@ -287,9 +309,8 @@ const Home = () => {
         save instanceof G3SAV ||
         save instanceof G4SAV
       ) {
-        console.log(save);
         const changedMons = save.prepareBoxesForSaving();
-        if (changedMons && save instanceof G2SAV) {
+        if (changedMons && (save instanceof G2SAV || save instanceof G1SAV)) {
           const gen12LookupString = changedMons
             .map((mon, i) => {
               if (!mon) return '';
@@ -311,7 +332,13 @@ const Home = () => {
         });
       }
     });
+  };
+
+  const saveChanges = () => {
+    saveAllSaveFiles();
     writeAllHomeData();
+    handleDeleteOHPKMFiles(deleteFileList);
+    setDeleteFileList([]);
   };
 
   const readHomeData = async () => {
@@ -334,9 +361,9 @@ const Home = () => {
       if (path && fileBytes) {
         const saveType = getSaveType(fileBytes);
         switch (saveType) {
+          case SaveType.RBY_I:
           case SaveType.GS_I:
           case SaveType.C_I:
-            console.log('gen 2');
             readGen12Lookup((gen12LookupMap) => {
               console.log('lookup map', gen12LookupMap);
               const newSave = buildSaveFile(
@@ -391,8 +418,11 @@ const Home = () => {
     return () => callback();
   }, [saves]);
 
+
   useEffect(() => {
     readHomeData();
+    const img = new Image()
+    img.src = '/icons/BoxIcons.png'
   }, []);
 
   return homeMonMap ? (
@@ -420,7 +450,7 @@ const Home = () => {
             </MenuItem>
           ))}
         </Select>
-        <Button onClick={saveAllSaveFiles}>Save</Button>
+        <Button onClick={saveChanges}>Save</Button>
       </div>
       <div style={{ display: 'flex', flex: 1 }}>
         <div style={{ display: 'flex', flexDirection: 'column', width: '25%' }}>
@@ -443,31 +473,69 @@ const Home = () => {
             setSelectedMon={setSelectedMon}
           />
         </div>
-        <HomeBoxDisplay
-          box={homeData.boxes[box]}
-          setBox={(newBox) => {
-            homeData.boxes[box] = newBox;
-            setHomeData({ ...homeData });
-          }}
-          currentTheme={currentTheme}
-          setSelectedMon={setSelectedMon}
-          onDrag={(index) =>
-            setDraggingSource({
-              save: -1,
-              isHome: true,
-              box,
-              index,
-            })
-          }
-          onDrop={(index) =>
-            setDraggingDest({
-              save: -1,
-              isHome: true,
-              box,
-              index,
-            })
-          }
-        />
+        <div style={{ display: 'flex', flexDirection: 'column', width: '50%' }}>
+          <HomeBoxDisplay
+            box={homeData.boxes[box]}
+            setBox={(newBox) => {
+              homeData.boxes[box] = newBox;
+              setHomeData({ ...homeData });
+            }}
+            onImport={(mon, index) =>
+              onImportMon(mon, -1, { box, index }, true)
+            }
+            currentTheme={currentTheme}
+            setSelectedMon={setSelectedMon}
+            onDrag={(index) =>
+              setDraggingSource({
+                save: -1,
+                isHome: true,
+                box,
+                index,
+              })
+            }
+            onDrop={(index) =>
+              setDraggingDest({
+                save: -1,
+                isHome: true,
+                box,
+                index,
+              })
+            }
+          />
+          <button
+            type="button"
+            style={{
+              width: '100%',
+              backgroundColor: '#fff4',
+              position: 'relative',
+              border: 'none',
+              flex: 1,
+              borderRadius: 4,
+              textAlign: 'center',
+            }}
+            onClick={() =>
+              Object.entries(Gen4ToUTFMap).forEach(([key, value]) => {
+                console.log(key, String.fromCharCode(value));
+              })
+            }
+            //   disabled={!mon}
+          >
+            <div
+              style={{
+                width: '100%',
+                flex: 1,
+                padding: 'auto',
+              }}
+              onDragOver={(e) => {
+                console.log('dragover');
+                e.preventDefault();
+              }}
+              onDrop={(e) => onViewDrop(e, 'trash')}
+            >
+              TRASH
+            </div>
+          </button>
+        </div>
         <div style={{ display: 'flex', flexDirection: 'column', width: '25%' }}>
           <SaveDisplay
             save={saves[2]}
@@ -499,7 +567,7 @@ const Home = () => {
           <PokemonDisplay mon={selectedMon} updateMon={() => {}} />
         )}
       </Dialog>
-      <div style={{ display: 'flex', flex: 1 }}>
+      {/* <div style={{ display: 'flex', flex: 1 }}>
         <button
           type="button"
           style={{
@@ -558,9 +626,9 @@ const Home = () => {
               console.log('dragover');
               e.preventDefault();
             }}
-            onDrop={(e) => onViewDrop(e, 'PK2')}
+            onDrop={(e) => onViewDrop(e, 'PK3')}
           >
-            PK2
+            PK3
           </div>
         </button>
         <button
@@ -594,43 +662,7 @@ const Home = () => {
             PK4
           </div>
         </button>
-        <button
-          type="button"
-          style={{
-            margin: 10,
-            height: 'calc(100% - 20px)',
-            width: '100%',
-            backgroundColor: '#fff4',
-            position: 'relative',
-            border: 'none',
-            borderRadius: 4,
-            textAlign: 'center',
-          }}
-          onClick={() =>
-            Object.entries(Gen4ToUTFMap).forEach(([key, value]) => {
-              console.log(key, String.fromCharCode(value));
-            })
-          }
-          //   disabled={!mon}
-        >
-          <div
-            draggable
-            style={{
-              cursor: 'grab',
-              width: '100%',
-              height: '100%',
-              padding: 'auto',
-            }}
-            onDragOver={(e) => {
-              console.log('dragover');
-              e.preventDefault();
-            }}
-            onDrop={(e) => onViewDrop(e, 'trash')}
-          >
-            TRASH
-          </div>
-        </button>
-      </div>
+      </div> */}
     </div>
   ) : (
     <div />
