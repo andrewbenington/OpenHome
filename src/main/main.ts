@@ -8,22 +8,13 @@
  * When running `npm run build` or `npm run build:main`, this file is compiled to
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
-import { app, BrowserWindow, ipcMain, Menu, MenuItem, shell } from 'electron';
+import { app, BrowserWindow, shell } from 'electron';
 import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
-import fs from 'fs';
-import _ from 'lodash';
 import path from 'path';
-import writePKMToFile, { deleteOHPKMFile } from './writePKMToFile';
-import {
-  initializeFolders,
-  readBytesFromFile,
-  readStringFromFile,
-  selectFile,
-} from './fileHandlers';
+import initListeners from './initListeners';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
-import { loadGen12Lookup, loadOHPKMs, registerGen12Lookup } from './loadData';
 
 class AppUpdater {
   constructor() {
@@ -35,80 +26,12 @@ class AppUpdater {
 
 let mainWindow: BrowserWindow | null = null;
 
-ipcMain.on('write-ohpkm', async (event, bytes: Uint8Array) => {
-  writePKMToFile(bytes, 'ohpkm');
-});
-
-ipcMain.on('delete-ohpkm', async (event, fileName: string) => {
-  deleteOHPKMFile(fileName);
-});
-
-ipcMain.on('read-gen12-lookup', async (event) => {
-  console.log('read-gen12-lookup');
-  const appDataPath = app.getPath('appData');
-  let lookupMap;
-  try {
-    lookupMap = loadGen12Lookup();
-  } catch (e) {
-    console.log('no gen12 lookup file');
-  }
-  event.reply('gen12-lookup-read', lookupMap);
-});
-
-ipcMain.on('write-gen12-lookup', async (event, gen12LookupString) => {
-  console.log('write-gen12-lookup', gen12LookupString);
-  registerGen12Lookup(gen12LookupString);
-});
-
-ipcMain.on('read-home-data', async (event) => {
-  console.log('read-home-data');
-  const appDataPath = app.getPath('appData');
-  initializeFolders(appDataPath);
-  const byteMap = loadOHPKMs();
-  event.reply('home-data-read', byteMap);
-});
-
-ipcMain.on('read-home-box', async (event, boxName) => {
-  console.log('read-home-box', boxName);
-  const appDataPath = app.getPath('appData');
-  const boxString = fs.readFileSync(
-    `${appDataPath}/open-home/storage/boxes/${boxName}.csv`,
-    {
-      encoding: 'utf8',
-    }
-  );
-  console.log(`${appDataPath}/open-home/storage/boxes/${boxName}.csv`, boxName);
-  event.reply('home-box-read', boxString);
-});
-
-ipcMain.on('write-home-box', async (event, { boxName, boxString }) => {
-  const appDataPath = app.getPath('appData');
-  fs.writeFileSync(
-    `${appDataPath}/open-home/storage/boxes/${boxName}.csv`,
-    boxString
-  );
-});
-
-ipcMain.on('read-save-file', async (event, arg) => {
-  console.log('select-save-file', arg);
-  const filePaths = await selectFile();
-  if (filePaths) {
-    const fileBytes = readBytesFromFile(filePaths[0]);
-    event.reply('save-file-read', { path: filePaths[0], fileBytes });
-  } else {
-    event.reply('save-file-read', { path: undefined, fileBytes: undefined });
-  }
-});
-
-ipcMain.on('write-save-file', async (event, { bytes, path }) => {
-  console.log('writing', path);
-  fs.writeFileSync(path, bytes);
-});
-
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
   sourceMapSupport.install();
 }
+
+initListeners()
 
 const isDebug =
   process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true';

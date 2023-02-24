@@ -1,6 +1,6 @@
 import { GameOfOriginData } from '../../consts/GameOfOrigin';
-import { MONS_LIST } from '../../consts/Mons';
-import { PKM } from '../../PKM/PKM';
+import { POKEMON_DATA } from '../../consts/Mons';
+import { PKM } from '../../types/PKM/PKM';
 import { natDexToSV } from '../../util/ConvertPokemonID';
 
 const ColosseumOnlyNonShadow = [311];
@@ -22,8 +22,8 @@ const CXDNonShadow = [196, 197];
 export const getBoxSprite = (dexNum: number, formNum: number) => {
   let formeName =
     (dexNum !== 664 && dexNum !== 665 && formNum > 0
-      ? MONS_LIST[dexNum]?.formes[formNum]?.formeName?.toLowerCase()
-      : MONS_LIST[dexNum]?.name?.toLowerCase()) ?? '';
+      ? POKEMON_DATA[dexNum]?.formes[formNum]?.formeName?.toLowerCase()
+      : POKEMON_DATA[dexNum]?.name?.toLowerCase()) ?? '';
   formeName = formeName
     .replaceAll('é', 'e')
     .replaceAll("'", '')
@@ -44,10 +44,10 @@ export const getBoxSprite = (dexNum: number, formNum: number) => {
 };
 
 export const getBoxSprite1 = (dexNum: number, formNum: number) => {
-  if (!MONS_LIST[dexNum]?.formes[0]) return;
+  if (!POKEMON_DATA[dexNum]?.formes[0]) return;
   let defaultFormeIsNamed =
-    MONS_LIST[dexNum].formes[0].name === MONS_LIST[dexNum].formes[0].formeName;
-  let forme = MONS_LIST[dexNum].formes[formNum];
+    POKEMON_DATA[dexNum].formes[0].name === POKEMON_DATA[dexNum].formes[0].formeName;
+  let forme = POKEMON_DATA[dexNum].formes[formNum];
   if (forme === undefined) {
     return;
   }
@@ -61,7 +61,7 @@ export const getBoxSprite1 = (dexNum: number, formNum: number) => {
   let region =
     forme.regional ??
     (forme.prevo &&
-      MONS_LIST[forme.prevo.dexNumber].formes[forme.prevo.formeNumber]
+      POKEMON_DATA[forme.prevo.dexNumber].formes[forme.prevo.formeNumber]
         .regional);
   switch (region) {
     case 'Alola':
@@ -95,8 +95,8 @@ export const getShowdownSprite = (
   }
   let formeName =
     (formNum > 0 && dexNum !== 664 && dexNum !== 665
-      ? MONS_LIST[dexNum]?.formes[formNum]?.formeName?.toLowerCase()
-      : MONS_LIST[dexNum]?.name?.toLowerCase()?.replaceAll('-', '')) ?? '';
+      ? POKEMON_DATA[dexNum]?.formes[formNum]?.formeName?.toLowerCase()
+      : POKEMON_DATA[dexNum]?.name?.toLowerCase()?.replaceAll('-', '')) ?? '';
   let formeNameSegments = formeName.split('-');
   if (formeNameSegments.length === 1) {
     formeName = formeNameSegments[0];
@@ -129,8 +129,8 @@ export const getPokemonDBSprite = (
   }
   let formeName =
     (dexNum !== 664 && dexNum !== 665
-      ? MONS_LIST[dexNum]?.formes[formNum]?.formeName?.toLowerCase()
-      : MONS_LIST[dexNum]?.name?.toLowerCase()) ?? '';
+      ? POKEMON_DATA[dexNum]?.formes[formNum]?.formeName?.toLowerCase()
+      : POKEMON_DATA[dexNum]?.name?.toLowerCase()) ?? '';
   formeName = formeName
     .replaceAll('é', 'e')
     .replaceAll("'", '')
@@ -173,12 +173,12 @@ export const getSerebiiSprite = (
   }
   let formeName: string | undefined =
     dexNum !== 664 && dexNum !== 665
-      ? MONS_LIST[dexNum]?.formes[formNum]?.sprite
-      : MONS_LIST[dexNum]?.name?.toLowerCase();
+      ? POKEMON_DATA[dexNum]?.formes[formNum]?.sprite
+      : POKEMON_DATA[dexNum]?.name?.toLowerCase();
   formeName = formeName
     ?.replace('paldeafire', 'b')
     ?.replace('paldeawater', 'a');
-  let monName = MONS_LIST[dexNum].formes[0].sprite;
+  let monName = POKEMON_DATA[dexNum].formes[0].sprite;
   if (formNum === 0) {
     formeName = undefined;
   } else {
@@ -266,8 +266,8 @@ export const getItemSprite = (item: string) => {
 export const getMonSprite = (mon: PKM, format: string) => {
   let formeName =
     (mon.formNum > 0 && mon.dexNum !== 664 && mon.dexNum !== 665
-      ? MONS_LIST[mon.dexNum]?.formes[mon.formNum]?.formeName?.toLowerCase()
-      : MONS_LIST[mon.dexNum]?.name?.toLowerCase()?.replaceAll('-', '')) ?? '';
+      ? POKEMON_DATA[mon.dexNum]?.formes[mon.formNum]?.formeName?.toLowerCase()
+      : POKEMON_DATA[mon.dexNum]?.name?.toLowerCase()?.replaceAll('-', '')) ?? '';
   formeName = formeName
     .replaceAll('é', 'e')
     .replaceAll("'", '')
@@ -275,7 +275,7 @@ export const getMonSprite = (mon: PKM, format: string) => {
     .replace('-core', '')
     .replace(':', '');
   if (formeName.includes('nidoran')) {
-    formeName = MONS_LIST[mon.dexNum].name.toLocaleLowerCase();
+    formeName = POKEMON_DATA[mon.dexNum].name.toLocaleLowerCase();
   }
   let formeParts = formeName.split('-');
   formeName = formeParts[0];
@@ -446,6 +446,6 @@ export const getTypeColor = (type: string) => {
     case 'shadow':
       return '#604E82';
     default:
-      return '#555';
+      return '#888';
   }
 };

@@ -28,6 +28,10 @@
   color: #61dafb;
 }
 
+.No-Select {
+  user-select: none;
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);

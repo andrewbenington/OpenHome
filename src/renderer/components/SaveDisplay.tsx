@@ -1,11 +1,11 @@
-import { ArrowBackIos, ArrowForwardIos } from '@mui/icons-material';
+import { ArrowBack, ArrowForward } from '@mui/icons-material';
 import { Button, Card, Grid } from '@mui/material';
 import _ from 'lodash';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { SaveCoordinates } from 'renderer/Home';
-import { PKM } from '../../PKM/PKM';
-import { BoxCoordinates, SAV } from '../../sav/SAV';
-import OpenHomeButton from './buttons/OpenHomeButton';
+import { PKM } from '../../types/PKM/PKM';
+import { BoxCoordinates, SAV } from '../../types/SAV/SAV';
+import ArrowButton from './buttons/ArrowButton';
 import PokemonButton from './buttons/PokemonButton';
 
 interface SaveDisplayProps {
@@ -15,7 +15,7 @@ interface SaveDisplayProps {
   onDrag: (coords: SaveCoordinates) => void;
   onDrop: (coords: SaveCoordinates) => void;
   onImport: (
-    importedMon: PKM,
+    importedMon: PKM[],
     saveIndex: number,
     boxCoords: BoxCoordinates
   ) => void;
@@ -32,11 +32,18 @@ const SaveDisplay = (props: SaveDisplayProps) => {
     onImport,
     setSelectedMon,
   } = props;
-  const [box, setBox] = useState(0);
+  const [box, setBox] = useState<number>();
 
+  useEffect(() => {
+    setBox(save?.currentPCBox ?? 0);
+  }, [save]);
+
+  useEffect(() => {
+    console.log('box changed to', box);
+  }, [box]);
   return (
-    <>
-      {save ? (
+    <div style={{ flex: 1 }}>
+      {save && box !== undefined ? (
         <div style={{ display: 'flex' }}>
           <div
             style={{
@@ -55,44 +62,9 @@ const SaveDisplay = (props: SaveDisplayProps) => {
                 marginRight: 'auto',
               }}
             >
-              <div style={{ textAlign: 'center' }}>{save?.name}</div>
-            </Card>
-            <Card
-              style={{
-                backgroundColor: '#bcb',
-                margin: 5,
-                width: '80%',
-                color: 'white',
-                fontWeight: 'bold',
-                marginLeft: 'auto',
-                marginRight: 'auto',
-              }}
-            >
-              <Grid container>
-                <Grid xs={2} style={{ display: 'grid', alignItems: 'center' }}>
-                  <OpenHomeButton
-                    style={{
-                      borderRadius: 0,
-                    }}
-                    onClick={() =>
-                      setBox(box > 0 ? box - 1 : save.boxes.length - 1)
-                    }
-                  >
-                    <ArrowBackIos style={{ width: 12, height: 12 }} />
-                  </OpenHomeButton>
-                </Grid>
-                <Grid xs={8} style={{ textAlign: 'center' }}>
-                  {save.boxes[box]?.name}
-                </Grid>
-                <Grid xs={2} style={{ display: 'grid', alignItems: 'center' }}>
-                  <OpenHomeButton
-                    onClick={() => setBox((box + 1) % save.boxes.length)}
-                    style={{ borderRadius: 0 }}
-                  >
-                    <ArrowForwardIos style={{ width: 12, height: 12 }} />
-                  </OpenHomeButton>
-                </Grid>
-              </Grid>
+              <div style={{ textAlign: 'center' }}>
+                {save?.name} ({save?.displayID})
+              </div>
             </Card>
             <Card
               style={{
@@ -102,6 +74,33 @@ const SaveDisplay = (props: SaveDisplayProps) => {
               }}
             >
               <div>
+                <Grid container>
+                  <Grid
+                    xs={2}
+                    style={{ display: 'grid', alignItems: 'center' }}
+                  >
+                    <ArrowButton
+                      onClick={() =>
+                        setBox(box > 0 ? box - 1 : save.boxes.length - 1)
+                      }
+                    >
+                      <ArrowBack fontSize="small" />
+                    </ArrowButton>
+                  </Grid>
+                  <Grid xs={8} style={{ textAlign: 'center', color: 'white' }}>
+                    {save.boxes[box]?.name}
+                  </Grid>
+                  <Grid
+                    xs={2}
+                    style={{ display: 'grid', alignItems: 'center' }}
+                  >
+                    <ArrowButton
+                      onClick={() => setBox((box + 1) % save.boxes.length)}
+                    >
+                      <ArrowForward fontSize="small" />
+                    </ArrowButton>
+                  </Grid>
+                </Grid>
                 {_.range(save.boxRows).map((row: number) => (
                   <Grid container key={`pc_row_${row}`}>
                     {_.range(save.boxColumns).map((rowIndex: number) => {
@@ -134,10 +133,9 @@ const SaveDisplay = (props: SaveDisplayProps) => {
                             }
                             mon={mon}
                             zIndex={5 - row}
-                            onDrop={(importedMon) => {
-                              console.log(importedMon);
-                              if (importedMon) {
-                                onImport(importedMon, saveIndex, {
+                            onDrop={(importedMons) => {
+                              if (importedMons) {
+                                onImport(importedMons, saveIndex, {
                                   box,
                                   index: row * save.boxColumns + rowIndex,
                                 });
@@ -161,11 +159,14 @@ const SaveDisplay = (props: SaveDisplayProps) => {
           </div>
         </div>
       ) : (
-        <Button style={{ width: '100%' }} onClick={() => openSave(saveIndex)}>
+        <Button
+          style={{ width: '100%', height: '50%' }}
+          onClick={() => openSave(saveIndex)}
+        >
           <h2>Open Save File</h2>
         </Button>
       )}
-    </>
+    </div>
   );
 };
 

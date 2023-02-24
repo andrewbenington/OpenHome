@@ -1,5 +1,5 @@
-import { PKM } from "../../PKM/PKM";
-import { getMonSprite, getItemSprite } from "../util/PokemonSprite";
+import { PKM } from '../../types/PKM/PKM';
+import { getMonSprite, getItemSprite } from '../util/PokemonSprite';
 
 const PokemonWithItem = (props: { mon: PKM; format?: string; style: any }) => {
   const { mon, format, style } = props;
@@ -7,57 +7,56 @@ const PokemonWithItem = (props: { mon: PKM; format?: string; style: any }) => {
     <div style={{ padding: 10, ...style }}>
       <div
         style={{
-          width: 200,
           height: 200,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
         }}
       >
         <img
+          draggable={false}
           alt="pokemon sprite"
           style={{
             maxWidth: 100,
             maxHeight: 100,
-            transform: "scale(2)",
-            imageRendering: "pixelated",
-            objectFit: "contain",
+            transform: 'scale(2)',
+            imageRendering: 'pixelated',
+            objectFit: 'contain',
           }}
           src={getMonSprite(mon, mon.format)}
         />
       </div>
       <div
         style={{
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
         }}
       >
         <p>{`Level ${mon.level}`}</p>
-        <p>{mon.gender === 2 ? "" : mon.gender === 1 ? "♀" : "♂"}</p>
       </div>
 
       <div
         style={{
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
         }}
       >
         <p>{`${mon.exp} EXP`}</p>
       </div>
       <div
         style={{
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
         }}
       >
         <p>{`Item:`}</p>
-        {mon.heldItem !== "None" && (
+        {mon.heldItem !== 'None' && (
           <img
             alt="item icon"
             src={getItemSprite(mon.heldItem)}

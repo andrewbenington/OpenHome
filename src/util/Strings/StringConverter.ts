@@ -184,7 +184,8 @@ export const gen3StringToUTF = (
 export const utf16StringToGen3 = (
   str: string,
   length: number,
-  terminate: boolean
+  terminate: boolean,
+  terminateFill: boolean
 ) => {
   var bufView = new Uint8Array(length);
   for (var i = 0; i < Math.min(str.length, length); i++) {
@@ -198,8 +199,14 @@ export const utf16StringToGen3 = (
       bufView[i] = gen3Char;
     }
   }
-  if (terminate && Math.min(str.indexOf('\0'), str.length - 1) < length - 1) {
-    const terminalIndex = Math.min(str.indexOf('\0'), str.length - 1);
+  if (terminateFill) {
+    const terminalIndex = Math.min(length - 1, str.length);
+    bufView.set(
+      new Uint8Array(length - terminalIndex).fill(0xff),
+      terminalIndex
+    );
+  } else if (terminate) {
+    const terminalIndex = Math.min(length - 1, str.length);
     bufView[terminalIndex] = 0xff;
   }
   return bufView;
@@ -229,9 +236,9 @@ export const utf16StringToGen4 = (
   var buf = new ArrayBuffer(length * 2);
   var bufView = new Uint16Array(buf);
   for (var i = 0; i < length; i++) {
-    console.log(str, str.length, str.charCodeAt(i))
+    console.log(str, str.length, str.charCodeAt(i));
     if (i >= str.length || str.charCodeAt(i) === 0) {
-      console.log('adding terminator')
+      console.log('adding terminator');
       if (terminate) {
         bufView[i] = 0xffff;
       }

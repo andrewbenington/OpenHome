@@ -1,11 +1,7 @@
 import { Card } from '@mui/material';
-import { getMonFileIdentifier } from 'PKM/util';
-import { Balls } from '../../consts/Balls';
-import { getCharacteristic } from '../../consts/Characteristics';
-import { GameOfOriginData } from '../../consts/GameOfOrigin';
-import MOVES from '../../consts/Moves';
-import { Natures } from '../../consts/Natures';
-import { marking, PKM } from '../../PKM/PKM';
+import { getMoveMaxPP } from 'types/PKM/util';
+import { Balls, GameOfOriginData, MOVE_DATA, Natures } from '../../consts';
+import { marking, PKM } from '../../types/PKM/PKM';
 import { getGameLogo, getTypeColor } from '../util/PokemonSprite';
 
 const getMarkingColor = (value: marking) => {
@@ -42,6 +38,7 @@ const SummaryDisplay = (props: { mon: PKM; updateMon: (mon: PKM) => void }) => {
           >
             {mon.ball ? (
               <img
+                draggable={false}
                 alt="poke ball type"
                 style={{ width: 24, height: 24 }}
                 src={`https://www.serebii.net/itemdex/sprites/${Balls[
@@ -114,17 +111,7 @@ const SummaryDisplay = (props: { mon: PKM; updateMon: (mon: PKM) => void }) => {
           ) : (
             <></>
           )}
-          {mon.ivs ? (
-            <p>
-              {getCharacteristic(
-                mon.ivs,
-                mon.encryptionConstant ?? mon.personalityValue ?? 0,
-                mon.encryptionConstant === undefined
-              )}
-            </p>
-          ) : (
-            <></>
-          )}
+          {mon.ivs ? <p>{mon.characteristic}</p> : <></>}
         </div>
         <div
           style={{
@@ -144,6 +131,7 @@ const SummaryDisplay = (props: { mon: PKM; updateMon: (mon: PKM) => void }) => {
             }}
           >
             <img
+              draggable={false}
               alt={`${GameOfOriginData[mon.gameOfOrigin]?.name} logo`}
               src={
                 getGameLogo(
@@ -165,6 +153,7 @@ const SummaryDisplay = (props: { mon: PKM; updateMon: (mon: PKM) => void }) => {
             {(GameOfOriginData[mon.gameOfOrigin]?.mark ||
               mon.gameOfOrigin === -1) && (
               <img
+                draggable={false}
                 alt="origin mark"
                 src={`/origin_marks/${
                   mon.gameOfOrigin === -1
@@ -194,6 +183,7 @@ const SummaryDisplay = (props: { mon: PKM; updateMon: (mon: PKM) => void }) => {
               }}
             >
               <span
+                className="No-Select"
                 onClick={() => {
                   if (mon.markings) {
                     mon.markings[0] = 1;
@@ -204,18 +194,39 @@ const SummaryDisplay = (props: { mon: PKM; updateMon: (mon: PKM) => void }) => {
               >
                 ●
               </span>
-              <span style={{ color: getMarkingColor(mon.markings[1]) }}>■</span>
-              <span style={{ color: getMarkingColor(mon.markings[2]) }}>▲</span>
-              <span style={{ color: getMarkingColor(mon.markings[3]) }}>♥</span>
+              <span
+                className="No-Select"
+                style={{ color: getMarkingColor(mon.markings[1]) }}
+              >
+                ■
+              </span>
+              <span
+                className="No-Select"
+                style={{ color: getMarkingColor(mon.markings[2]) }}
+              >
+                ▲
+              </span>
+              <span
+                className="No-Select"
+                style={{ color: getMarkingColor(mon.markings[3]) }}
+              >
+                ♥
+              </span>
               {mon.markings[4] !== undefined ? (
-                <span style={{ color: getMarkingColor(mon.markings[4]) }}>
+                <span
+                  className="No-Select"
+                  style={{ color: getMarkingColor(mon.markings[4]) }}
+                >
                   ★
                 </span>
               ) : (
                 <div />
               )}
               {mon.markings[5] !== undefined ? (
-                <span style={{ color: getMarkingColor(mon.markings[5]) }}>
+                <span
+                  className="No-Select"
+                  style={{ color: getMarkingColor(mon.markings[5]) }}
+                >
                   ◆
                 </span>
               ) : (
@@ -234,42 +245,42 @@ const SummaryDisplay = (props: { mon: PKM; updateMon: (mon: PKM) => void }) => {
           justifyContent: 'center',
         }}
       >
-        {mon.moves
-          .filter((move) => !!move)
-          .map((move, i) => {
-            return (
-              <Card
-                key={`move${i}`}
+        {mon.moves.map((move, i) => {
+          return (
+            <Card
+              key={`move${i}`}
+              style={{
+                height: 70,
+                width: 120,
+                margin: 5,
+                backgroundColor: getTypeColor(MOVE_DATA[move]?.type),
+                textAlign: 'center',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+              }}
+            >
+              <div
                 style={{
-                  height: 70,
-                  width: 120,
-                  margin: 5,
-                  backgroundColor: getTypeColor(MOVES[move]?.type),
-                  textAlign: 'center',
+                  marginBottom: 8,
+                  color: 'white',
+                  fontWeight: 'bold',
                 }}
               >
-                <p
-                  style={{
-                    marginBottom: 8,
-                    marginTop: 8,
-                    color: 'white',
-                    fontWeight: 'bold',
-                  }}
-                >
-                  {MOVES[move]?.name}
-                </p>
-                <p
-                  style={{
-                    marginTop: 8,
-                    color: 'white',
-                    fontWeight: 'bold',
-                  }}
-                >
-                  {mon.movePP[i] ?? '--'}/{MOVES[move]?.pp ?? '--'} PP
-                </p>
-              </Card>
-            );
-          })}
+                {MOVE_DATA[move]?.name}
+              </div>
+              <div
+                style={{
+                  color: 'white',
+                  fontWeight: 'bold',
+                }}
+              >
+                {move ? mon.movePP[i] : '--'}/
+                {getMoveMaxPP(move, mon.format, mon.movePPUps[i]) ?? '--'} PP
+              </div>
+            </Card>
+          );
+        })}
       </div>
     </div>
   );

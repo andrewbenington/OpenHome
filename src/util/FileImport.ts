@@ -1,18 +1,18 @@
-import OHPKM from '../PKM/OHPKM';
-import { COLOPKM } from '../PKM/COLOPKM';
-import { PA8 } from '../PKM/PA8';
-import { PK2 } from '../PKM/PK2';
-import { PK3 } from '../PKM/PK3';
-import { PK4 } from '../PKM/PK4';
-import { PK5 } from '../PKM/PK5';
-import { PK6 } from '../PKM/PK6';
-import { PK7 } from '../PKM/PK7';
-import { PK8 } from '../PKM/PK8';
-import { PK9 } from '../PKM/PK9';
-import { PKM } from '../PKM/PKM';
-import { XDPKM } from '../PKM/XDPKM';
-import { PK1 } from '../PKM/PK1';
-import { PB7 } from '../PKM/PB7';
+import OHPKM from '../types/PKM/OHPKM';
+import { COLOPKM } from '../types/PKM/COLOPKM';
+import { PA8 } from '../types/PKM/PA8';
+import { PK2 } from '../types/PKM/PK2';
+import { PK3 } from '../types/PKM/PK3';
+import { PK4 } from '../types/PKM/PK4';
+import { PK5 } from '../types/PKM/PK5';
+import { PK6 } from '../types/PKM/PK6';
+import { PK7 } from '../types/PKM/PK7';
+import { PK8 } from '../types/PKM/PK8';
+import { PK9 } from '../types/PKM/PK9';
+import { PKM } from '../types/PKM/PKM';
+import { XDPKM } from '../types/PKM/XDPKM';
+import { PK1 } from '../types/PKM/PK1';
+import { PB7 } from '../types/PKM/PB7';
 
 export const acceptableExtensions = [
   'OHPKM',

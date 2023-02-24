@@ -1,11 +1,11 @@
 import { Card, Grid } from '@mui/material';
 import _ from 'lodash';
-import OHPKM from 'PKM/OHPKM';
-import { PKM } from 'PKM/PKM';
+import OHPKM from 'types/PKM/OHPKM';
+import { PKM } from 'types/PKM/PKM';
 import { useEffect } from 'react';
 import { OpenHomeTheme } from 'renderer/Themes';
-import { HomeBox, HomeData } from 'sav/HomeData';
-import { SAV, BoxCoordinates } from 'sav/SAV';
+import { HomeBox, HomeData } from 'types/SAV/HomeData';
+import { SAV, BoxCoordinates } from 'types/SAV/SAV';
 import PokemonButton from './buttons/PokemonButton';
 
 interface HomeBoxDisplayProps {
@@ -15,20 +15,18 @@ interface HomeBoxDisplayProps {
   setSelectedMon: (mon: PKM | undefined) => void;
   onDrag: (index: number) => void;
   onDrop: (index: number) => void;
+  onImport: (importedMons: PKM[], index: number) => void;
 }
 
 const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
-  const { box, setBox, currentTheme, setSelectedMon, onDrag, onDrop } = props;
-  useEffect(() => {
-    console.log(box);
-  }, [box]);
-  
+  const { box, currentTheme, setSelectedMon, onDrag, onDrop, onImport } = props;
+
   return (
     <Card
       style={{
         borderRadius: 5,
         backgroundColor: currentTheme.contentColor,
-        width: '50%',
+        width: '100%',
         height: 'fit-content',
       }}
     >
@@ -44,12 +42,9 @@ const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
                   onDragStart={() => onDrag(row * 12 + rowIndex)}
                   mon={mon}
                   zIndex={10 - row}
-                  onDrop={(importedMon) => {
-                    if (importedMon) {
-                      console.log(importedMon);
-                      const homeMon = new OHPKM(importedMon);
-                      box.pokemon[row * 12 + rowIndex] = homeMon;
-                      setBox(box);
+                  onDrop={(importedMons) => {
+                    if (importedMons) {
+                      onImport(importedMons, row * 12 + rowIndex);
                     } else {
                       onDrop(row * 12 + rowIndex);
                     }
