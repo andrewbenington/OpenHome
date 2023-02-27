@@ -1,5 +1,4 @@
 import OHPKM from 'types/PKM/OHPKM';
-import { PKM } from 'types/PKM/PKM';
 import {
   bytesToUint16LittleEndian,
   uint16ToBytesLittleEndian,

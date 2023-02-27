@@ -1,11 +1,10 @@
-import { PK4 } from '../PKM/PK4';
+import { RegionalForms } from 'types/TransferRestrictions';
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
 } from '../../util/ByteLogic';
 import { gen4StringToUTF } from '../../util/Strings/StringConverter';
-import { G4Box, G4SAV } from './G4SAV';
-import { RegionalForms } from 'types/TransferRestrictions';
+import { G4SAV } from './G4SAV';
 
 export class HGSSSAV extends G4SAV {
   transferRestrictions = {
@@ -13,7 +12,8 @@ export class HGSSSAV extends G4SAV {
     excludedForms: { ...RegionalForms, 483: [1], 484: [1] },
   };
 
-  static TRAINER_OFFSET = 0x64;
+  static TRAINER_NAME_OFFSET = 0x64;
+  static TRAINER_ID_OFFSET = 0x74;
   static BOX_SIZE = 0xff0 + 0x10;
   static GENERAL_BLOCK_OFFSET = 0x0000;
   static GENERAL_BLOCK_SIZE = 0xf628;
@@ -29,16 +29,6 @@ export class HGSSSAV extends G4SAV {
 
   constructor(path: string, bytes: Uint8Array) {
     super(path, bytes);
-    console.log(
-      'first save is',
-      this.currentSaveStorageBlockOffset.toString(16),
-      'at',
-      this.getCurrentSaveCount(
-        this.currentSaveStorageBlockOffset,
-        HGSSSAV.STORAGE_BLOCK_SIZE
-      ),
-      'saves'
-    );
     // current storage block could be either the first or second one,
     // depending on save count
     if (
@@ -53,33 +43,13 @@ export class HGSSSAV extends G4SAV {
     ) {
       this.currentSaveStorageBlockOffset += 0x40000;
     }
-    console.log(
-      'second save is',
-      (HGSSSAV.STORAGE_BLOCK_OFFSET + 0x40000).toString(16),
-      'at',
-      this.getCurrentSaveCount(
-        HGSSSAV.STORAGE_BLOCK_OFFSET + 0x40000,
-        HGSSSAV.STORAGE_BLOCK_SIZE
-      ),
-      'saves'
-    );
-    console.log(
-      'current save is',
-      this.currentSaveStorageBlockOffset.toString(16),
-      'at',
-      this.getCurrentSaveCount(
-        this.currentSaveStorageBlockOffset,
-        HGSSSAV.STORAGE_BLOCK_SIZE
-      ),
-      'saves'
-    );
     this.currentSaveBoxStartOffset = this.currentSaveStorageBlockOffset;
     this.boxNamesOffset =
       this.currentSaveStorageBlockOffset + HGSSSAV.BOX_NAMES_OFFSET;
-    this.name = gen4StringToUTF(bytes, HGSSSAV.TRAINER_OFFSET, 8);
+    this.name = gen4StringToUTF(bytes, HGSSSAV.TRAINER_NAME_OFFSET, 8);
+    this.tid = bytesToUint16LittleEndian(bytes, HGSSSAV.TRAINER_ID_OFFSET);
+    this.displayID = this.tid.toString().padStart(5, '0');
     this.buildBoxes();
-
-    console.log(this.getStorageChecksum(), this.calculateStorageChecksum());
   }
 
   getCurrentSaveCount(blockOffset: number, blockSize: number) {

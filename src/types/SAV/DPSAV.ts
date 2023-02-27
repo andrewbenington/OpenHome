@@ -1,11 +1,10 @@
-import { PK4 } from '../PKM/PK4';
+import { RegionalForms } from 'types/TransferRestrictions';
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
 } from '../../util/ByteLogic';
 import { gen4StringToUTF } from '../../util/Strings/StringConverter';
-import { G4Box, G4SAV } from './G4SAV';
-import { RegionalForms } from 'types/TransferRestrictions';
+import { G4SAV } from './G4SAV';
 
 export class DPSAV extends G4SAV {
   transferRestrictions = {
@@ -20,7 +19,8 @@ export class DPSAV extends G4SAV {
     },
   };
 
-  static TRAINER_OFFSET = 0x64;
+  static TRAINER_NAME_OFFSET = 0x68;
+  static TRAINER_ID_OFFSET = 0x78;
   static BOX_SIZE = 0xff0;
   static GENERAL_BLOCK_OFFSET = 0x0000;
   static GENERAL_BLOCK_SIZE = 0xc100;
@@ -52,10 +52,10 @@ export class DPSAV extends G4SAV {
     this.currentSaveBoxStartOffset = this.currentSaveStorageBlockOffset + 4;
     this.boxNamesOffset =
       this.currentSaveStorageBlockOffset + DPSAV.BOX_NAMES_OFFSET;
-    this.name = gen4StringToUTF(bytes, DPSAV.TRAINER_OFFSET, 8);
+    this.name = gen4StringToUTF(bytes, DPSAV.TRAINER_NAME_OFFSET, 8);
+    this.tid = bytesToUint16LittleEndian(bytes, DPSAV.TRAINER_ID_OFFSET);
+    this.displayID = this.tid.toString().padStart(5, '0');
     this.buildBoxes();
-
-    console.log(this.getStorageChecksum(), this.calculateStorageChecksum());
   }
 
   getCurrentSaveCount(blockOffset: number, blockSize: number) {

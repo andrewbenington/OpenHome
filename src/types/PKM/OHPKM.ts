@@ -63,8 +63,8 @@ class OHPKM extends PKM {
       this.secretID = other.secretID;
       this.exp = other.exp;
       this.abilityNum = other.abilityNum;
-      this.canGigantamax = other.canGigantamax ?? false
-      this.isShadow = other.isShadow
+      this.canGigantamax = other.canGigantamax ?? false;
+      this.isShadow = other.isShadow;
       this.ability = getAbilityFromNumber(
         this.dexNum,
         this.formNum,
@@ -1229,7 +1229,7 @@ class OHPKM extends PKM {
     );
   }
 
-  public updateData(other: PKM) {
+  public updateData(other: PKM, isFromOT: boolean = false) {
     if (other.evs) {
       this.evs = other.evs;
     }
@@ -1254,6 +1254,25 @@ class OHPKM extends PKM {
         });
       }
     }
+    if (other.shinyLeaves && this.shinyLeaves < other.shinyLeaves) {
+      this.shinyLeaves = other.shinyLeaves;
+    }
+    if (other.contest) {
+      this.contest = other.contest;
+    }
+    if (other.statNature) {
+      this.statNature = other.statNature
+    }
+    if (other.teraTypeOverride) {
+      this.teraTypeOverride = other.teraTypeOverride
+    }
+    if (isFromOT) {
+      this.nickname = other.nickname
+      this.trainerFriendship = other.trainerFriendship
+    }
+    other.moves.forEach((move, i) => {
+      
+    })
   }
 }
 
