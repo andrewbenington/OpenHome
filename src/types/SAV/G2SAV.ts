@@ -1,6 +1,7 @@
 import { uniq } from 'lodash';
 import OHPKM from 'types/PKM/OHPKM';
 import { PK2 } from 'types/PKM/PK2';
+import { RegionalForms } from 'types/TransferRestrictions';
 import { SaveType } from 'types/types';
 import { bytesToUint16BigEndian, get8BitChecksum } from 'util/ByteLogic';
 import {
@@ -13,6 +14,11 @@ export class G2SAV extends SAV {
   boxOffsets: number[];
   boxes: Array<G2Box>;
   pkmType = PK2;
+  transferRestrictions = {
+    maxDexNum: 251,
+    excludedForms: { ...RegionalForms, 201: [26, 27] },
+  };
+
   constructor(path: string, bytes: Uint8Array) {
     super(path, bytes);
     this.tid = bytesToUint16BigEndian(this.bytes, 0x2009);

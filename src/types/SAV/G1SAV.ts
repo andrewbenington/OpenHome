@@ -2,6 +2,7 @@ import { GameOfOrigin } from 'consts';
 import _, { uniq } from 'lodash';
 import OHPKM from 'types/PKM/OHPKM';
 import { PK1 } from 'types/PKM/PK1';
+import { RegionalForms } from '../TransferRestrictions';
 import { SaveType } from 'types/types';
 import { bytesToUint16BigEndian, get8BitChecksum } from 'util/ByteLogic';
 import { natDexToGen1ID } from 'util/ConvertPokemonID';
@@ -23,6 +24,12 @@ class G1Box implements Box {
 }
 
 export default class G1SAV extends SAV {
+  pkmType = PK1;
+  transferRestrictions = {
+    maxDexNum: 151,
+    excludedForms:{ ...RegionalForms },
+  };
+
   NUM_BOXES = 14;
 
   CURRENT_BOX_NUM_OFFSET = 0x284c;
@@ -40,8 +47,6 @@ export default class G1SAV extends SAV {
   BOX_NICKNAME_OFFSET = 0x386;
 
   boxes: Array<G1Box>;
-
-  pkmType = PK1;
 
   constructor(path: string, bytes: Uint8Array) {
     super(path, bytes);

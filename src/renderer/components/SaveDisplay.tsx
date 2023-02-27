@@ -12,14 +12,15 @@ interface SaveDisplayProps {
   save?: SAV;
   saveIndex: number;
   openSave: (saveIndex: number) => void;
-  onDrag: (coords: SaveCoordinates) => void;
-  onDrop: (coords: SaveCoordinates) => void;
+  setDragSource: (coords?: SaveCoordinates) => void;
+  setDragDest: (coords: SaveCoordinates) => void;
   onImport: (
     importedMon: PKM[],
     saveIndex: number,
     boxCoords: BoxCoordinates
   ) => void;
   setSelectedMon: (mon: PKM | undefined) => void;
+  disabled?: boolean;
 }
 
 const SaveDisplay = (props: SaveDisplayProps) => {
@@ -27,15 +28,18 @@ const SaveDisplay = (props: SaveDisplayProps) => {
     save,
     openSave,
     saveIndex,
-    onDrag,
-    onDrop,
+    setDragSource,
+    setDragDest,
     onImport,
     setSelectedMon,
-  } = props;
+    disabled,
+  } = { disabled: false, ...props };
   const [box, setBox] = useState<number>();
+  const [isloading, setIsLoading] = useState(false);
 
   useEffect(() => {
     setBox(save?.currentPCBox ?? 0);
+    setIsLoading(false);
   }, [save]);
 
   useEffect(() => {
@@ -43,7 +47,7 @@ const SaveDisplay = (props: SaveDisplayProps) => {
   }, [box]);
   return (
     <div style={{ flex: 1 }}>
-      {save && box !== undefined ? (
+      {save && box !== undefined && !isloading ? (
         <div style={{ display: 'flex' }}>
           <div
             style={{
@@ -68,7 +72,7 @@ const SaveDisplay = (props: SaveDisplayProps) => {
             </Card>
             <Card
               style={{
-                backgroundColor: '#bcb',
+                backgroundColor: disabled ? '#555' : '#bcb',
                 padding: 5,
                 margin: 10,
               }}
@@ -123,14 +127,23 @@ const SaveDisplay = (props: SaveDisplayProps) => {
                                 setSelectedMon(new save.pkmType(mon));
                               }
                             }}
-                            onDragStart={(e) =>
-                              onDrag({
-                                save: saveIndex,
-                                isHome: false,
-                                box,
-                                index: row * save.boxColumns + rowIndex,
-                              })
-                            }
+                            onDragEvent={(cancelled: boolean) => {
+                              console.log(
+                                'button drag event cancelled =',
+                                cancelled
+                              );
+                              setDragSource(
+                                cancelled
+                                  ? undefined
+                                  : {
+                                      save: saveIndex,
+                                      isHome: false,
+                                      box,
+                                      index: row * save.boxColumns + rowIndex,
+                                    }
+                              );
+                            }}
+                            disabled={disabled}
                             mon={mon}
                             zIndex={5 - row}
                             onDrop={(importedMons) => {
@@ -140,7 +153,7 @@ const SaveDisplay = (props: SaveDisplayProps) => {
                                   index: row * save.boxColumns + rowIndex,
                                 });
                               } else {
-                                onDrop({
+                                setDragDest({
                                   save: saveIndex,
                                   isHome: false,
                                   box,
@@ -161,7 +174,10 @@ const SaveDisplay = (props: SaveDisplayProps) => {
       ) : (
         <Button
           style={{ width: '100%', height: '50%' }}
-          onClick={() => openSave(saveIndex)}
+          onClick={() => {
+            openSave(saveIndex);
+            setIsLoading(true);
+          }}
         >
           <h2>Open Save File</h2>
         </Button>

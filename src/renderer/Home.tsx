@@ -11,16 +11,18 @@ import { G3SAV } from 'types/SAV/G3SAV';
 import { G4SAV } from 'types/SAV/G4SAV';
 import { BoxCoordinates, SAV } from 'types/SAV/SAV';
 import { buildSaveFile, getSaveType } from 'types/SAV/util';
+import { isRestricted } from 'types/TransferRestrictions';
 import { acceptableExtensions, bytesToPKM } from 'util/FileImport';
 import Gen4ToUTFMap from 'util/Strings/Gen4ToUTFMap';
 import { utf16StringToGen4 } from 'util/Strings/StringConverter';
 import { PKM } from '../types/PKM/PKM';
 import { HomeData } from '../types/SAV/HomeData';
-import { SaveType } from '../types/types';
+import { MonReference, SaveType } from '../types/types';
 import HomeBoxDisplay from './components/HomeBoxDisplay';
 import PokemonDisplay from './components/PokemonDisplay';
 import SaveDisplay from './components/SaveDisplay';
 import Themes, { OpenHomeTheme } from './Themes';
+import { initializeDragImage } from './util/initializeDragImage';
 import {
   handleDeleteOHPKMFiles,
   handleMenuResetAndClose,
@@ -41,6 +43,7 @@ const Home = () => {
   const [selectedMon, setSelectedMon] = useState<PKM>();
   const [draggingSource, setDraggingSource] = useState<SaveCoordinates>();
   const [draggingDest, setDraggingDest] = useState<SaveCoordinates>();
+  const [draggingMon, setDraggingMon] = useState<MonReference>();
   const [box, setBox] = useState(0);
   const [saves, setSaves] = useState<
     [SAV | undefined, SAV | undefined, SAV | undefined, SAV | undefined]
@@ -74,6 +77,7 @@ const Home = () => {
   }, [homeData]);
 
   useEffect(() => {
+    // console.log(draggingSource, draggingDest);
     if (draggingSource && draggingDest) {
       const sourceSave = draggingSource.isHome
         ? homeData
@@ -159,16 +163,34 @@ const Home = () => {
     }
   };
 
-  const onDragFromSave = (coords: SaveCoordinates) => {
-    setDraggingSource({
-      save: coords.save,
-      isHome: false,
-      box: coords.box,
-      index: coords.index,
-    });
+  const boxSetDragSource = (coords?: SaveCoordinates) => {
+    // if coords are undefined, drag event was cancelled
+    if (coords) {
+      const sourceSave = coords.isHome ? homeData : saves[coords.save];
+      const sourceMon = sourceSave?.boxes[coords.box]?.pokemon[coords.index];
+      console.log(sourceMon);
+      if (sourceMon) {
+        setDraggingMon({
+          dexNumber: sourceMon.dexNum,
+          formeNumber: sourceMon.formNum,
+        });
+      } else {
+        setDraggingMon(undefined);
+      }
+      setDraggingSource({
+        save: coords.save,
+        isHome: false,
+        box: coords.box,
+        index: coords.index,
+      });
+    } else {
+      setDraggingMon(undefined);
+      setDraggingSource(undefined);
+    }
   };
 
-  const onDropToSave = (coords: SaveCoordinates) => {
+  const boxSetDragDest = (coords: SaveCoordinates) => {
+    setDraggingMon(undefined);
     setDraggingDest({
       save: coords.save,
       isHome: false,
@@ -411,6 +433,10 @@ const Home = () => {
   }, [saveAllSaveFiles]);
 
   useEffect(() => {
+    console.log(draggingMon);
+  }, [draggingMon]);
+
+  useEffect(() => {
     const callback = handleMenuResetAndClose(
       () => console.log('reset'),
       () => setSaves([undefined, undefined, undefined, undefined])
@@ -418,11 +444,9 @@ const Home = () => {
     return () => callback();
   }, [saves]);
 
-
   useEffect(() => {
     readHomeData();
-    const img = new Image()
-    img.src = '/icons/BoxIcons.png'
+    initializeDragImage();
   }, []);
 
   return homeMonMap ? (
@@ -459,8 +483,17 @@ const Home = () => {
             saveIndex={0}
             openSave={openSave}
             onImport={onImportMon}
-            onDrag={onDragFromSave}
-            onDrop={onDropToSave}
+            setDragSource={boxSetDragSource}
+            setDragDest={boxSetDragDest}
+            disabled={
+              draggingMon &&
+              saves[0] &&
+              isRestricted(
+                saves[0].transferRestrictions,
+                draggingMon.dexNumber,
+                draggingMon.formeNumber
+              )
+            }
             setSelectedMon={setSelectedMon}
           />
           <SaveDisplay
@@ -468,8 +501,17 @@ const Home = () => {
             saveIndex={1}
             openSave={openSave}
             onImport={onImportMon}
-            onDrag={onDragFromSave}
-            onDrop={onDropToSave}
+            setDragSource={boxSetDragSource}
+            setDragDest={boxSetDragDest}
+            disabled={
+              draggingMon &&
+              saves[1] &&
+              isRestricted(
+                saves[1].transferRestrictions,
+                draggingMon.dexNumber,
+                draggingMon.formeNumber
+              )
+            }
             setSelectedMon={setSelectedMon}
           />
         </div>
@@ -485,22 +527,40 @@ const Home = () => {
             }
             currentTheme={currentTheme}
             setSelectedMon={setSelectedMon}
-            onDrag={(index) =>
-              setDraggingSource({
-                save: -1,
-                isHome: true,
-                box,
-                index,
-              })
-            }
-            onDrop={(index) =>
+            setDragSource={(index) => {
+              if (index) {
+                const sourceMon = homeData.boxes[box].pokemon[index];
+                if (sourceMon) {
+                  setDraggingMon({
+                    dexNumber: sourceMon.dexNum,
+                    formeNumber: sourceMon.formNum,
+                  });
+                } else {
+                  setDraggingMon(undefined);
+                }
+              } else {
+                setDraggingMon(undefined);
+              }
+              setDraggingSource(
+                index
+                  ? {
+                      save: -1,
+                      isHome: true,
+                      box,
+                      index,
+                    }
+                  : undefined
+              );
+            }}
+            setDragDest={(index) => {
+              setDraggingMon(undefined);
               setDraggingDest({
                 save: -1,
                 isHome: true,
                 box,
                 index,
-              })
-            }
+              });
+            }}
           />
           <button
             type="button"
@@ -542,8 +602,17 @@ const Home = () => {
             saveIndex={2}
             openSave={openSave}
             onImport={onImportMon}
-            onDrag={onDragFromSave}
-            onDrop={onDropToSave}
+            setDragSource={boxSetDragSource}
+            setDragDest={boxSetDragDest}
+            disabled={
+              draggingMon &&
+              saves[2] &&
+              isRestricted(
+                saves[2].transferRestrictions,
+                draggingMon.dexNumber,
+                draggingMon.formeNumber
+              )
+            }
             setSelectedMon={setSelectedMon}
           />
           <SaveDisplay
@@ -551,8 +620,17 @@ const Home = () => {
             saveIndex={3}
             openSave={openSave}
             onImport={onImportMon}
-            onDrag={onDragFromSave}
-            onDrop={onDropToSave}
+            setDragSource={boxSetDragSource}
+            setDragDest={boxSetDragDest}
+            disabled={
+              draggingMon &&
+              saves[3] &&
+              isRestricted(
+                saves[3].transferRestrictions,
+                draggingMon.dexNumber,
+                draggingMon.formeNumber
+              )
+            }
             setSelectedMon={setSelectedMon}
           />
         </div>
@@ -567,7 +645,7 @@ const Home = () => {
           <PokemonDisplay mon={selectedMon} updateMon={() => {}} />
         )}
       </Dialog>
-      {/* <div style={{ display: 'flex', flex: 1 }}>
+      <div style={{ display: 'flex', flex: 1 }}>
         <button
           type="button"
           style={{
@@ -662,7 +740,7 @@ const Home = () => {
             PK4
           </div>
         </button>
-      </div> */}
+      </div>
     </div>
   ) : (
     <div />

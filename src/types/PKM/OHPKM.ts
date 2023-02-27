@@ -63,6 +63,8 @@ class OHPKM extends PKM {
       this.secretID = other.secretID;
       this.exp = other.exp;
       this.abilityNum = other.abilityNum;
+      this.canGigantamax = other.canGigantamax ?? false
+      this.isShadow = other.isShadow
       this.ability = getAbilityFromNumber(
         this.dexNum,
         this.formNum,
@@ -328,7 +330,7 @@ class OHPKM extends PKM {
   }
 
   public set abilityNum(value: number) {
-    this.bytes[0x16] = (this.bytes[0x16] & ~7) | (value & 7);
+    this.bytes[0x16] = (this.bytes[0x16] & 0b11111000) | (value & 7);
   }
 
   public get favorite() {
@@ -336,7 +338,7 @@ class OHPKM extends PKM {
   }
 
   public set favorite(value: boolean) {
-    this.bytes[0x16] = (this.bytes[0x16] & ~8) | (value ? 8 : 0);
+    this.bytes[0x16] = (this.bytes[0x16] & 0b11110111) | (value ? 8 : 0);
   }
 
   public get canGigantamax() {
@@ -344,7 +346,7 @@ class OHPKM extends PKM {
   }
 
   public set canGigantamax(value: boolean) {
-    this.bytes[0x16] = (this.bytes[0x16] & ~16) | (value ? 16 : 0);
+    this.bytes[0x16] = (this.bytes[0x16] & 0b11101111) | (value ? 16 : 0);
   }
 
   public get isAlpha() {

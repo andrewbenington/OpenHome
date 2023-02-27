@@ -5,8 +5,14 @@ import {
 } from '../../util/ByteLogic';
 import { gen4StringToUTF } from '../../util/Strings/StringConverter';
 import { G4Box, G4SAV } from './G4SAV';
+import { RegionalForms } from 'types/TransferRestrictions';
 
 export class HGSSSAV extends G4SAV {
+  transferRestrictions = {
+    maxDexNum: 493,
+    excludedForms: { ...RegionalForms, 483: [1], 484: [1] },
+  };
+
   static TRAINER_OFFSET = 0x64;
   static BOX_SIZE = 0xff0 + 0x10;
   static GENERAL_BLOCK_OFFSET = 0x0000;

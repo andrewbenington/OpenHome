@@ -10,30 +10,36 @@ import {
 } from '../../util/ByteLogic';
 import { gen3StringToUTF } from '../../util/Strings/StringConverter';
 import { Box, BoxCoordinates, SAV } from './SAV';
+import { RegionalForms } from 'types/TransferRestrictions';
 
 export class G3SAV extends SAV {
   static TRAINER_OFFSET = 0x0ff4 * 0;
   static TEAM_ITEMS_OFFSET = 0x0ff4 * 1;
   static PC_OFFSET = 0x0ff4 * 5;
   saveType: SaveType;
+  pkmType = PK3;
+  transferRestrictions = {
+    maxDexNum: 386,
+    excludedForms: { ...RegionalForms },
+  };
+
   primarySave: G3SaveBackup;
   backupSave: G3SaveBackup;
   primarySaveOffset: number;
   boxes: Array<G3Box>;
-  pkmType = PK3;
   convertPKM = (mon: PKM) => new OHPKM(mon);
 
   constructor(path: string, bytes: Uint8Array) {
     super(path, bytes);
-    const saveIndexOne = bytesToUint32LittleEndian(bytes, 0xf20);
-    const saveIndexTwo = bytesToUint32LittleEndian(bytes, 0xef20);
-    if (saveIndexOne > saveIndexTwo) {
-      this.primarySave = new G3SaveBackup(bytes.slice(0, 0xe000));
-      this.backupSave = new G3SaveBackup(bytes.slice(0xe000, 0x1c000));
+    const saveOne = new G3SaveBackup(bytes.slice(0, 0xe000));
+    const saveTwo = new G3SaveBackup(bytes.slice(0xe000, 0x1c000));
+    if (saveOne.saveIndex > saveTwo.saveIndex) {
+      this.primarySave = saveOne;
+      this.backupSave = saveTwo;
       this.primarySaveOffset = 0;
     } else {
-      this.backupSave = new G3SaveBackup(bytes.slice(0, 0xe000));
-      this.primarySave = new G3SaveBackup(bytes.slice(0xe000, 0x1c000));
+      this.primarySave = saveTwo;
+      this.backupSave = saveOne;
       this.primarySaveOffset = 0xe000;
     }
     this.saveType = this.primarySave.saveType;
@@ -55,7 +61,7 @@ export class G3SAV extends SAV {
       const pcBytes = new Uint8Array(80);
       const changedMon = this.boxes[box].pokemon[index];
       // we don't want to save OHPKM files of mons that didn't leave the save
-      // (and would still be PK4s)
+      // (and would still be PK3s)
       if (changedMon instanceof OHPKM) {
         changedMonPKMs.push(changedMon);
       }
@@ -183,7 +189,7 @@ export class G3SaveBackup {
     this.name = gen3StringToUTF(this.sectors[0].data, 0x00, 7);
     this.tid = bytesToUint16LittleEndian(this.sectors[0].data, 0x0a);
     this.sid = bytesToUint16LittleEndian(this.sectors[0].data, 0x0c);
-    console.log(this.sectors[0].data)
+    console.log(this.sectors[0].data);
   }
 }
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { POKEMON_DATA } from '../../../consts/Mons';
 import { PKM } from '../../../types/PKM/PKM';
 import { acceptableExtensions, bytesToPKM } from '../../../util/FileImport';
@@ -6,15 +6,16 @@ import { getBoxSprite } from '../../util/PokemonSprite';
 
 interface PokemonButtonProps {
   onClick: () => void;
-  onDragStart: React.DragEventHandler<HTMLDivElement>;
+  onDragEvent: (cancelled: boolean) => void;
   onDrop: (mons: PKM[] | undefined) => void;
+  disabled: boolean;
   zIndex: number;
   mon: PKM | undefined;
 }
 
 const PokemonButton = (props: PokemonButtonProps) => {
-  const { onClick, onDragStart, onDrop, zIndex, mon } = props;
-  const [dragImage, setDragImage] = useState<HTMLDivElement>();
+  const { onClick, onDragEvent, onDrop, disabled, zIndex, mon } = props;
+  const [dragImage, setDragImage] = useState<HTMLElement>();
 
   const handleDrop: React.DragEventHandler<HTMLDivElement> = (e) => {
     if (e.dataTransfer.files[0]) {
@@ -23,6 +24,18 @@ const PokemonButton = (props: PokemonButtonProps) => {
       onDrop(undefined);
     }
     e.nativeEvent.preventDefault();
+  };
+
+  const getBackgroundDetails = () => {
+    if (disabled) {
+      return {
+        backgroundBlendMode: 'multiply',
+        backgroundColor: '#555',
+      };
+    } else {
+      return {
+      };
+    }
   };
 
   const onDropFromFiles = async (files: FileList) => {
@@ -54,24 +67,22 @@ const PokemonButton = (props: PokemonButtonProps) => {
         width: '100%',
         aspectRatio: 1,
         zIndex: zIndex,
-        backgroundColor: '#fff4',
+        backgroundColor: disabled ? '#555' : '#fff4',
         position: 'relative',
         border: 'none',
         borderRadius: 2,
         textAlign: 'center',
       }}
-      //   disabled={!mon}
+      disabled={disabled}
     >
       {mon ? (
         <div
           draggable
           onDragStart={(e) => {
             if (mon) {
-              var dragIcon = document.createElement('div');
-              dragIcon.style.height = '100%';
-              dragIcon.style.width = '100%';
-              dragIcon.style.background = `url(/icons/BoxIcons.png) no-repeat 0.027027% 0.027027%`;
-              dragIcon.style.backgroundSize = '3700%';
+              const dragIcon = document.getElementById('drag-image');
+              const div = document.getElementById('drag-image-container');
+              if (!dragIcon || !div) return;
               dragIcon.style.backgroundPosition =
                 mon.isEgg || !POKEMON_DATA[mon.dexNum]
                   ? '0% 0%'
@@ -88,23 +99,23 @@ const PokemonButton = (props: PokemonButtonProps) => {
                         35) *
                       100
                     }%`;
-              var div = document.createElement('div');
-              div.appendChild(dragIcon);
+              console.log(dragIcon.style.backgroundPosition);
               const dimension = window.outerWidth / 24 - 4;
               div.style.height = `${dimension}px`;
               div.style.width = `${dimension}px`;
-              div.style.position = 'absolute';
-              div.style.top = '-500px';
-              document.querySelector('body')?.appendChild(div);
-              setDragImage(div);
+              setDragImage(dragIcon);
               e.dataTransfer.setDragImage(div, dimension / 2, dimension / 2);
             }
-            onDragStart(e);
+            onDragEvent(false);
           }}
           onDragEnd={(e) => {
-            dragImage?.remove();
+            if (dragImage) {
+              dragImage.style.backgroundPosition = '0% 0%';
+            }
             if (e.dataTransfer.dropEffect !== 'copy') {
               setDragImage(undefined);
+              console.log('button cancelling drag event');
+              onDragEvent(true);
             }
           }}
           style={{
@@ -126,6 +137,7 @@ const PokemonButton = (props: PokemonButtonProps) => {
                       35) *
                     100
                   }%`,
+            ...getBackgroundDetails(),
             height: '100%',
             width: '100%',
             opacity: dragImage ? 0 : 1,
@@ -133,21 +145,23 @@ const PokemonButton = (props: PokemonButtonProps) => {
         />
       ) : (
         <div
-          style={{ width: '100%', height: '100%' }}
-          onDragOver={(e) => {
-            e.preventDefault();
+          style={{
+            width: '100%',
+            height: '100%',
+            ...getBackgroundDetails(),
           }}
+          onDragOver={
+            disabled
+              ? undefined
+              : (e) => {
+                  e.preventDefault();
+                }
+          }
           onDrop={handleDrop}
         />
       )}
     </button>
   );
 };
-
-function getOffsetCoords(dexNum: number, formNum: number) {
-  return `${((dexNum % 37) / 36) * 100}% ${
-    (Math.floor(dexNum / 37) / 35) * 100
-  }%`;
-}
 
 export default PokemonButton;
