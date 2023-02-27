@@ -401,7 +401,7 @@ const StatsDisplay = (props: { mon: PKM }) => {
             {_.range(getSheenStars(mon)).map((level: number) => (
               <img
                 alt={`sheen star ${level}`}
-                src={`${process.env.PUBLIC_URL}/icons/sheen.gif`}
+                src={`icons/sheen.gif`}
                 style={{
                   height: 30,
                   objectFit: 'contain',

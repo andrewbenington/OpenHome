@@ -5,14 +5,27 @@ import {
 } from '../../util/ByteLogic';
 import { gen4StringToUTF } from '../../util/Strings/StringConverter';
 import { G4Box, G4SAV } from './G4SAV';
+import { RegionalForms } from 'types/TransferRestrictions';
 
 export class DPSAV extends G4SAV {
+  transferRestrictions = {
+    maxDexNum: 493,
+    excludedForms: {
+      ...RegionalForms,
+      479: [1, 2, 3, 4, 5],
+      483: [1],
+      484: [1],
+      487: [1],
+      492: [1],
+    },
+  };
+
   static TRAINER_OFFSET = 0x64;
   static BOX_SIZE = 0xff0;
   static GENERAL_BLOCK_OFFSET = 0x0000;
   static GENERAL_BLOCK_SIZE = 0xc100;
   static STORAGE_BLOCK_OFFSET = 0xc100;
-  static STORAGE_BLOCK_SIZE = 0x121E0;
+  static STORAGE_BLOCK_SIZE = 0x121e0;
   static BOX_NAMES_OFFSET = 0x11ee0;
 
   currentSaveStorageBlockOffset: number = DPSAV.STORAGE_BLOCK_OFFSET;

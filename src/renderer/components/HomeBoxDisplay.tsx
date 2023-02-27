@@ -13,13 +13,20 @@ interface HomeBoxDisplayProps {
   setBox: (box: HomeBox) => void;
   currentTheme: OpenHomeTheme;
   setSelectedMon: (mon: PKM | undefined) => void;
-  onDrag: (index: number) => void;
-  onDrop: (index: number) => void;
+  setDragSource: (index?: number) => void;
+  setDragDest: (index: number) => void;
   onImport: (importedMons: PKM[], index: number) => void;
 }
 
 const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
-  const { box, currentTheme, setSelectedMon, onDrag, onDrop, onImport } = props;
+  const {
+    box,
+    currentTheme,
+    setSelectedMon,
+    setDragSource,
+    setDragDest,
+    onImport,
+  } = props;
 
   return (
     <Card
@@ -39,16 +46,19 @@ const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
               <Grid item xs={1} style={{ padding: '2px 2px 0px 2px' }}>
                 <PokemonButton
                   onClick={() => setSelectedMon(mon)}
-                  onDragStart={() => onDrag(row * 12 + rowIndex)}
+                  onDragEvent={(cancelled) =>
+                    setDragSource(cancelled ? undefined : row * 12 + rowIndex)
+                  }
                   mon={mon}
                   zIndex={10 - row}
                   onDrop={(importedMons) => {
                     if (importedMons) {
                       onImport(importedMons, row * 12 + rowIndex);
                     } else {
-                      onDrop(row * 12 + rowIndex);
+                      setDragDest(row * 12 + rowIndex);
                     }
                   }}
+                  disabled={false}
                 />
               </Grid>
             );

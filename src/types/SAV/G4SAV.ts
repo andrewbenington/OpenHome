@@ -9,6 +9,7 @@ import { PK4 } from '../PKM/PK4';
 import { Box, SAV } from './SAV';
 
 export class G4SAV extends SAV {
+  pkmType = PK4;
   currentSaveStorageBlockOffset: number = 0;
   currentSaveBoxStartOffset: number = 0;
   storageBlockSize: number = 0;
@@ -16,7 +17,6 @@ export class G4SAV extends SAV {
   boxNamesOffset: number = 0;
   footerSize: number = 0x14;
   boxes: Array<G4Box>;
-  pkmType = PK4;
 
   constructor(path: string, bytes: Uint8Array) {
     super(path, bytes);

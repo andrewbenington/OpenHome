@@ -282,7 +282,7 @@ export const getMonSprite = (mon: PKM, format: string) => {
   if (formeParts.length > 1) {
     formeName += `-${formeParts.slice(1).join('')}`;
   }
-  if (format === 'ohpkm') {
+  if (format === 'OHPKM') {
     return getPokemonDBSprite(mon.dexNum, mon.formNum, mon.isShiny, 'home');
   } else if (mon.format === 'PK1') {
     return getShowdownSprite(mon.dexNum, mon.formNum, false, 'gen1');

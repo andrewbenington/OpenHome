@@ -19,6 +19,30 @@ import {
 import { PKM } from './PKM';
 
 export class PK8 extends PKM {
+  public get abilityNum() {
+    return this.bytes[0x16] & 7;
+  }
+
+  public set abilityNum(value: number) {
+    this.bytes[0x16] = (this.bytes[0x16] & 0b11111000) | (value & 7);
+  }
+
+  public get favorite() {
+    return !!(this.bytes[0x16] & 8);
+  }
+
+  public set favorite(value: boolean) {
+    this.bytes[0x16] = (this.bytes[0x16] & 0b11110111) | (value ? 8 : 0);
+  }
+
+  public get canGigantamax() {
+    return !!(this.bytes[0x16] & 16);
+  }
+
+  public set canGigantamax(value: boolean) {
+    this.bytes[0x16] = (this.bytes[0x16] & 0b11101111) | (value ? 16 : 0);
+  }
+  
   public get affixedRibbon() {
     return this.bytes[0xe8] !== 0xff ? this.bytes[0xe8] : undefined;
   }
