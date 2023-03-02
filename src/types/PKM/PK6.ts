@@ -135,4 +135,12 @@ export class PK6 extends PKM {
         bytesToUint16LittleEndian(bytes, 0x1a)) ===
         0;
   }
+
+  public get gender() {
+    return (this.bytes[0x1d] >> 1) & 0x3;
+  }
+
+  public set gender(value: number) {
+    this.bytes[0x01d] = (this.bytes[0x01d] & 0b11110001) | ((value & 0x3) << 1);
+  }
 }

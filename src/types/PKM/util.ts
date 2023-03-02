@@ -1,8 +1,7 @@
 import { max } from 'lodash';
-import { POKEMON_DATA, MOVE_DATA } from '../../consts';
+import { MOVE_DATA, POKEMON_DATA } from '../../consts';
 import Types from '../../consts/Types';
-import { bytesToString, writeUint32ToBuffer } from '../../util/ByteLogic';
-import { SaveType } from '../types';
+import { bytesToString, bytesToUint16LittleEndian, bytesToUint32LittleEndian, uint16ToBytesLittleEndian, uint32ToBytesLittleEndian, writeUint32ToBuffer } from '../../util/ByteLogic';
 import { PKM, stats, statsPreSplit } from './PKM';
 
 export const writeIVsToBuffer = (
@@ -187,9 +186,9 @@ export const getMonGen12Identifier = (mon: PKM) => {
     const baseMon = getBaseMon(mon.dexNum, mon.formNum);
     console.log(mon, baseMon);
     const TID =
-      mon.isGameBoy || mon.personalityValue === undefined
+      mon.isGameBoyOrigin || mon.personalityValue === undefined
         ? mon.trainerID
-        : mon.personalityValue % 0xffff;
+        : mon.personalityValue % 0x10000;
     if (baseMon) {
       return `${baseMon.dexNumber.toString().padStart(4, '0')}-${bytesToString(
         TID,
@@ -288,16 +287,15 @@ export const adjustMovePPBetweenFormats = (
   sourceFormatMon: PKM
 ) => {
   return sourceFormatMon.moves.map((move, i) => {
-    const otherMaxPP = getMoveMaxPP(
-      move,
-      sourceFormatMon.format,
-      sourceFormatMon.movePPUps[i]
-    ) ?? 0;
-    const thisMaxPP = getMoveMaxPP(
-      move,
-      destFormatMon.format,
-      sourceFormatMon.movePPUps[i]
-    ) ?? 0;
+    const otherMaxPP =
+      getMoveMaxPP(
+        move,
+        sourceFormatMon.format,
+        sourceFormatMon.movePPUps[i]
+      ) ?? 0;
+    const thisMaxPP =
+      getMoveMaxPP(move, destFormatMon.format, sourceFormatMon.movePPUps[i]) ??
+      0;
     const adjustedMovePP = sourceFormatMon.movePP[i] - (otherMaxPP - thisMaxPP);
     return max([adjustedMovePP, 0]) ?? 0;
   }) as [number, number, number, number];

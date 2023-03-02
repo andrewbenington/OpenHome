@@ -18,7 +18,6 @@ export const getLocation = (
   forceRegion: boolean = false,
   egg: boolean = false
 ) => {
-  console.log(game)
   let multiplier = 10000;
   let locations: { [key: number]: string[] } = {};
   if (game >= GameOfOrigin.Red && game <= GameOfOrigin.Crystal) {

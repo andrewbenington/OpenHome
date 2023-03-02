@@ -193,6 +193,13 @@ export class PK8 extends PKM {
     // };
   }
 
+  public get gender() {
+    return (this.bytes[0x22] >> 2) & 0x3;
+  }
+  public set gender(value: number) {
+    this.bytes[0x22] = (this.bytes[0x22] & 0xf3) | (value << 2);
+  }
+
   public get movePP() {
     return [
       this.bytes[0x7a],

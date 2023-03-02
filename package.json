@@ -44,7 +44,7 @@
     "start:main": "cross-env NODE_ENV=development electronmon -r ts-node/register/transpile-only .",
     "start:preload": "cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.preload.dev.ts",
     "start:renderer": "cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack serve --config ./.erb/configs/webpack.config.renderer.dev.ts",
-    "test": "jest"
+    "test": "ELECTRON_RUN_AS_NODE=true ./node_modules/.bin/electron ./node_modules/.bin/jest --detectOpenHandles"
   },
   "browserslist": [],
   "prettier": {
@@ -52,8 +52,8 @@
     "overrides": [
       {
         "files": [
-          ".eslintrc",
-          ".prettierrc"
+          ".prettierrc",
+          ".eslintrc"
         ],
         "options": {
           "parser": "json"
@@ -155,7 +155,7 @@
     "file-loader": "^6.2.0",
     "html-webpack-plugin": "^5.5.0",
     "identity-obj-proxy": "^3.0.0",
-    "jest": "^29.4.2",
+    "jest": "^29.4.3",
     "jest-environment-jsdom": "^29.4.2",
     "mini-css-extract-plugin": "^2.7.2",
     "prettier": "^2.8.4",

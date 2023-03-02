@@ -146,7 +146,6 @@ export const getSaveType = (bytes: Uint8Array): SaveType => {
   } else if (bytes.length >= SIZE_GEN3) {
     console.log('gen 3');
     const valueAtAC = bytesToUint32LittleEndian(bytes, 0xac);
-    console.log(valueAtAC);
     switch (valueAtAC) {
       case 1:
         return SaveType.FRLG;

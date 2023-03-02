@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { BaseSyntheticEvent, useCallback, useEffect, useState } from 'react';
 import { POKEMON_DATA } from '../../../consts/Mons';
 import { PKM } from '../../../types/PKM/PKM';
 import { acceptableExtensions, bytesToPKM } from '../../../util/FileImport';
@@ -33,8 +33,7 @@ const PokemonButton = (props: PokemonButtonProps) => {
         backgroundColor: '#555',
       };
     } else {
-      return {
-      };
+      return {};
     }
   };
 
@@ -108,13 +107,17 @@ const PokemonButton = (props: PokemonButtonProps) => {
             }
             onDragEvent(false);
           }}
-          onDragEnd={(e) => {
+          onDragEnd={(e: {dataTransfer: any, target: any}) => {
             if (dragImage) {
               dragImage.style.backgroundPosition = '0% 0%';
             }
-            if (e.dataTransfer.dropEffect !== 'copy') {
+            // if not waiting for mon to show up in other slot, set drag image to 
+            // undefined so it shows up in this one again
+            if (
+              e.dataTransfer.dropEffect !== 'copy' ||
+              e.target.className !== 'pokemon_slot'
+            ) {
               setDragImage(undefined);
-              console.log('button cancelling drag event');
               onDragEvent(true);
             }
           }}
@@ -145,6 +148,7 @@ const PokemonButton = (props: PokemonButtonProps) => {
         />
       ) : (
         <div
+          className="pokemon_slot"
           style={{
             width: '100%',
             height: '100%',

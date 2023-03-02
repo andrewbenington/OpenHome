@@ -1,3 +1,4 @@
+import { utf16BytesToString } from '../../util/Strings/StringConverter';
 import { Abilities } from '../../consts/Abilities';
 import { Items } from '../../consts/Items';
 import { Languages } from '../../consts/Languages';
@@ -80,24 +81,8 @@ export class PK7 extends PKM {
       spd: getStatGen3Onward('SpD', this),
     };
     this.gameOfOrigin = bytes[0xdf];
-    let byteArray = new Uint16Array(12);
-    for (let i = 0; i < 12; i += 1) {
-      let byte = bytesToUint16LittleEndian(bytes, 0x40 + 2 * i);
-      if (byte === 0) {
-        break;
-      }
-      byteArray[i] = byte;
-    }
-    this.nickname = new TextDecoder('utf-16').decode(byteArray);
-    byteArray = new Uint16Array(12);
-    for (let i = 0; i < 12; i += 1) {
-      let byte = bytesToUint16LittleEndian(bytes, 0xb0 + 2 * i);
-      if (byte === 0) {
-        break;
-      }
-      byteArray[i] = byte;
-    }
-    this.trainerName = new TextDecoder('utf-16').decode(byteArray);
+    this.nickname = utf16BytesToString(bytes, 0x40, 12);
+    this.trainerName = utf16BytesToString(bytes, 0xb0, 12);
     this.ribbons = [];
     for (let byte = 0; byte < 4; byte++) {
       let ribbonsUint8 = bytes[0x30 + byte];

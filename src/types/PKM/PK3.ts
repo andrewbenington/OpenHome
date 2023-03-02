@@ -43,6 +43,7 @@ import {
 } from './util';
 
 export const GEN3_MOVE_MAX = 354;
+export const GEN3_ABILITY_MAX = 77;
 
 export class PK3 extends PKM {
   constructor(...args: any[]) {
@@ -64,7 +65,6 @@ export class PK3 extends PKM {
       this.trainerID = other.trainerID;
       this.secretID = other.secretID;
       this.exp = other.exp;
-      this.abilityNum = other.abilityNum === 2 ? 2 : 1;
       if (other.markings) {
         let temp = [0, 0, 0, 0];
         for (let i = 0; i < 4; i++) {
@@ -73,8 +73,7 @@ export class PK3 extends PKM {
         }
         this.markings = temp as [marking, marking, marking, marking];
       }
-      this.personalityValue =
-        other.personalityValue ?? generatePersonalityValue();
+      this.createPersonalityValueFromOtherPreGen6(other);
       // this.nature = other.nature ?? this.personalityValue % 25;
       this.isFatefulEncounter = other.isFatefulEncounter;
       // this.gender = other.gender;
@@ -345,9 +344,17 @@ export class PK3 extends PKM {
   }
 
   public get ability() {
-    return this.abilityNum === 1
-      ? POKEMON_DATA[this.dexNum]?.formes[0].ability1
-      : POKEMON_DATA[this.dexNum]?.formes[0].ability2 ?? 'None';
+    const ability1 = POKEMON_DATA[this.dexNum]?.formes[0].ability1;
+    const ability2 = POKEMON_DATA[this.dexNum]?.formes[0].ability2;
+    if (
+      this.abilityNum === 2 &&
+      ability2 &&
+      Abilities.indexOf(ability2) <= GEN3_ABILITY_MAX
+    ) {
+      return ability2;
+    } else {
+      return ability1;
+    }
   }
 
   public get moves() {
@@ -381,11 +388,7 @@ export class PK3 extends PKM {
   }
 
   public get abilityNum() {
-    return getFlag(this.bytes, 0x48, 31) ? 2 : 1;
-  }
-
-  public set abilityNum(value: number) {
-    setFlag(this.bytes, 0x48, 31, value != 1);
+    return getFlag(this.bytes, 0x00, 0) ? 2 : 1;
   }
 
   public get nature() {

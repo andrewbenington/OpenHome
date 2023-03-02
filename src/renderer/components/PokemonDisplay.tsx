@@ -229,6 +229,8 @@ const PokemonDisplay = (props: {
               );
             })}
             <code>{getMonFileIdentifier(mon)}</code>
+            <code>TID: {mon.trainerID}</code>
+            <code>SID: {mon.secretID}</code>
           </div>
         )}
       </div>

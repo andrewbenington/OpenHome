@@ -73,26 +73,7 @@ export class PK4 extends PKM {
         other.ability ??
         getAbilityFromNumber(this.dexNum, this.formNum, this.abilityNum);
       // console
-      if (other.personalityValue) {
-        this.personalityValue = other.personalityValue;
-      } else {
-        this.personalityValue = generatePersonalityValue();
-        if (other.dexNum === 201) {
-          this.personalityValue =
-            (this.personalityValue & 0xffffffe0) | other.formNum;
-        }
-        if (other.isShiny) {
-          let pvBytes = uint32ToBytesLittleEndian(this.personalityValue);
-          let pvLower16 = bytesToUint16LittleEndian(pvBytes, 0);
-          let pvUpper16 = pvLower16 ^ this.trainerID ^ this.secretID;
-          // setting the top two bytes to result in a shiny personality value
-          pvBytes.set(uint16ToBytesLittleEndian(pvUpper16), 2);
-          this.personalityValue = bytesToUint32LittleEndian(pvBytes, 0);
-        } else if (this.isShiny) {
-          // inverting the highest bit will always revert a shiny personality value
-          this.personalityValue = this.personalityValue ^ 0x10000000;
-        }
-      }
+      this.createPersonalityValueFromOtherPreGen6(other);
       this.isFatefulEncounter = other.isFatefulEncounter;
       this.gender = other.gender;
       this.evs = other.evs ?? { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 };
@@ -268,7 +249,7 @@ export class PK4 extends PKM {
   }
 
   public get abilityNum() {
-    return (this.bytes[0x01] & 1) + 1;
+    return (this.personalityValue & 1) + 1;
   }
 
   public get abilityIndex() {
