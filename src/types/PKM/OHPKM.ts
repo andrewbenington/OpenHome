@@ -1270,9 +1270,9 @@ class OHPKM extends PKM {
       this.nickname = other.nickname
       this.trainerFriendship = other.trainerFriendship
     }
-    other.moves.forEach((move, i) => {
-      
-    })
+    // other.moves.forEach((move, i) => {
+
+    // })
   }
 }
 

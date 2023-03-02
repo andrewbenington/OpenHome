@@ -189,7 +189,6 @@ export class G3SaveBackup {
     this.name = gen3StringToUTF(this.sectors[0].data, 0x00, 7);
     this.tid = bytesToUint16LittleEndian(this.sectors[0].data, 0x0a);
     this.sid = bytesToUint16LittleEndian(this.sectors[0].data, 0x0c);
-    console.log(this.sectors[0].data);
   }
 }
 

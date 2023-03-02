@@ -236,9 +236,7 @@ export const utf16StringToGen4 = (
   var buf = new ArrayBuffer(length * 2);
   var bufView = new Uint16Array(buf);
   for (var i = 0; i < length; i++) {
-    console.log(str, str.length, str.charCodeAt(i));
     if (i >= str.length || str.charCodeAt(i) === 0) {
-      console.log('adding terminator');
       if (terminate) {
         bufView[i] = 0xffff;
       }
@@ -251,6 +249,42 @@ export const utf16StringToGen4 = (
     } else {
       bufView[i] = gen4Char;
     }
+  }
+
+  return new Uint8Array(buf);
+};
+
+export const gen5StringToUTF = (
+  bytes: Uint8Array,
+  offset: number,
+  length: number
+) => {
+  let str = '';
+  for (let i = 0; i < length; i += 1) {
+    let value = bytesToUint16LittleEndian(bytes, offset + 2 * i);
+    if (value === 0xffff) {
+      return str;
+    }
+    str += String.fromCharCode(value);
+  }
+  return str;
+};
+
+export const utf16StringToGen5 = (
+  str: string,
+  length: number,
+  terminate: boolean
+) => {
+  var buf = new ArrayBuffer(length * 2);
+  var bufView = new Uint16Array(buf);
+  for (var i = 0; i < length; i++) {
+    if (i >= str.length || str.charCodeAt(i) === 0) {
+      if (terminate) {
+        bufView[i] = 0xffff;
+      }
+      break;
+    }
+    bufView[i] = str.charCodeAt(i);
   }
 
   return new Uint8Array(buf);

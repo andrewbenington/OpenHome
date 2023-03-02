@@ -256,8 +256,8 @@ export class PK2 extends PKM {
       this.dexNum = other.dexNum;
       this.heldItem = other.heldItem;
       // treated as a tracking number for non-GB origin mons
-      if (!other.isGameBoy && other.personalityValue) {
-        this.trainerID = other.personalityValue % 0xffff;
+      if (!other.isGameBoyOrigin && other.personalityValue !== undefined) {
+        this.trainerID = other.personalityValue % 0x10000;
       } else {
         this.trainerID = other.trainerID;
       }

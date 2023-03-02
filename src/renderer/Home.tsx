@@ -587,7 +587,6 @@ const Home = () => {
                 padding: 'auto',
               }}
               onDragOver={(e) => {
-                console.log('dragover');
                 e.preventDefault();
               }}
               onDrop={(e) => onViewDrop(e, 'trash')}
@@ -670,7 +669,6 @@ const Home = () => {
               padding: 'auto',
             }}
             onDragOver={(e) => {
-              console.log('dragover');
               e.preventDefault();
             }}
             onDrop={(e) => onViewDrop(e, 'as is')}
@@ -701,7 +699,6 @@ const Home = () => {
               padding: 'auto',
             }}
             onDragOver={(e) => {
-              console.log('dragover');
               e.preventDefault();
             }}
             onDrop={(e) => onViewDrop(e, 'PK3')}
@@ -732,7 +729,6 @@ const Home = () => {
               padding: 'auto',
             }}
             onDragOver={(e) => {
-              console.log('dragover');
               e.preventDefault();
             }}
             onDrop={(e) => onViewDrop(e, 'PK4')}

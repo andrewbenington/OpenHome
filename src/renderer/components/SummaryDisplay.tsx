@@ -88,7 +88,7 @@ const SummaryDisplay = (props: { mon: PKM; updateMon: (mon: PKM) => void }) => {
             <div />
           )}
 
-          {mon.nature ? (
+          {mon.nature !== undefined ? (
             <p style={{ textAlign: 'left' }}>
               Has a
               <span>
