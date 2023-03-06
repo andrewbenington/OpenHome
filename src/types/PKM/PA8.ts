@@ -554,10 +554,10 @@ export class PA8 extends PKM {
     this.bytes.set(uint32ToBytesLittleEndian(value), 0xf4);
   }
   public get affixedRibbon() {
-    return this.bytes[0xf8];
+    return this.bytes[0xf8] !== 0xff ? this.bytes[0xf8] : undefined;
   }
-  public set affixedRibbon(value: number) {
-    this.bytes[0xf8] = value;
+  public set affixedRibbon(value: number | undefined) {
+    this.bytes[0xf8] = value ?? 0xff;
   }
 
   public get trainerNameBytes() {

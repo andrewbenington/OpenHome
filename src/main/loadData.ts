@@ -1,8 +1,6 @@
-import fs from 'fs';
 import { app } from 'electron';
-import OHPKM from '../types/PKM/OHPKM';
+import fs from 'fs';
 import { readBytesFromFile } from './fileHandlers';
-import { getMonFileIdentifier, getMonGen12Identifier } from '../types/PKM/util';
 
 export function loadOHPKMs() {
   const appDataPath = app.getPath('appData');

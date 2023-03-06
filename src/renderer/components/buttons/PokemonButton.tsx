@@ -1,8 +1,7 @@
-import React, { BaseSyntheticEvent, useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { POKEMON_DATA } from '../../../consts/Mons';
 import { PKM } from '../../../types/PKM/PKM';
 import { acceptableExtensions, bytesToPKM } from '../../../util/FileImport';
-import { getBoxSprite } from '../../util/PokemonSprite';
 
 interface PokemonButtonProps {
   onClick: () => void;
@@ -107,11 +106,11 @@ const PokemonButton = (props: PokemonButtonProps) => {
             }
             onDragEvent(false);
           }}
-          onDragEnd={(e: {dataTransfer: any, target: any}) => {
+          onDragEnd={(e: { dataTransfer: any; target: any }) => {
             if (dragImage) {
               dragImage.style.backgroundPosition = '0% 0%';
             }
-            // if not waiting for mon to show up in other slot, set drag image to 
+            // if not waiting for mon to show up in other slot, set drag image to
             // undefined so it shows up in this one again
             if (
               e.dataTransfer.dropEffect !== 'copy' ||

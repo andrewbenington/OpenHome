@@ -129,7 +129,6 @@ export class PK8 extends PKM {
       sheen: bytes[0x31],
     };
     this.gameOfOrigin = bytesToUint16LittleEndian(bytes, 0xde);
-    this.language = Languages[bytes[0xe2]];
     this.displayID =
       this.gameOfOrigin < 31
         ? this.trainerID
@@ -227,6 +226,21 @@ export class PK8 extends PKM {
   public set movePPUps(value: [number, number, number, number]) {
     for (let i = 0; i < 4; i++) {
       this.bytes[0x7e + i] = value[i];
+    }
+  }
+
+  public get languageIndex() {
+    return this.bytes[0xe2];
+  }
+
+  public get language() {
+    return Languages[this.languageIndex];
+  }
+
+  public set language(value: string) {
+    const index = Languages.indexOf(value);
+    if (index > -1) {
+      this.bytes[0xe2] = index;
     }
   }
 }

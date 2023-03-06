@@ -9003,23 +9003,23 @@
     "id": 874
   },
   "875": {
-    "name": "Pound",
+    "name": "Psyblade",
     "accuracy": 100,
     "class": "physical",
     "generation": "generation-ix",
-    "power": 40,
-    "pp": 35,
-    "type": "normal",
+    "power": 80,
+    "pp": 15,
+    "type": "psychic",
     "id": 875
   },
   "876": {
-    "name": "Pound",
+    "name": "Hydro Steam",
     "accuracy": 100,
-    "class": "physical",
+    "class": "special",
     "generation": "generation-ix",
-    "power": 40,
-    "pp": 35,
-    "type": "normal",
+    "power": 80,
+    "pp": 15,
+    "type": "water",
     "id": 876
   },
   "877": {

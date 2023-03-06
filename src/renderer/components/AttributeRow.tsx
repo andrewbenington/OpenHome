@@ -1,36 +1,43 @@
 const AttributeRow = (props: {
   label: string;
   value?: string;
+  justifyEnd?: boolean;
   children?: any;
 }) => {
-  const { label, value, children } = props;
+  const { label, value, justifyEnd, children } = props;
   return (
     <div
       style={{
-        borderBottom: "2px solid #bbb",
-        display: "flex",
-        flexDirection: "row",
-        alignItems: "center",
+        height: 30,
+        borderBottom: '2px solid #bbb0',
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
       }}
     >
       <div
         style={{
-          width: "30%",
-          backgroundColor: "#ccc",
-          padding: 10,
+          width: '30%',
+          height: '100%',
+          backgroundColor: '#eee6',
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          paddingLeft: 10,
         }}
       >
         {label}
       </div>
       <div
         style={{
-          width: "70%",
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-          padding: 0,
-          paddingLeft: 10,
-          paddingRight: 10,
+          width: '70%',
+          height: '100%',
+          padding: '0px 0px 0px 10px',
+          backgroundColor: '#eee3',
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: justifyEnd ? 'end' : 'start',
         }}
       >
         {value ?? children}

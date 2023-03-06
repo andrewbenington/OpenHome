@@ -5,7 +5,7 @@ import { PKM } from '../types/PKM/PKM';
 import { Stat } from '../types/types';
 
 export const getStatGen3Onward = (stat: Stat, mon: PKM) => {
-  if (mon.dexNum < 1 || mon.dexNum > 1008) {
+  if (mon.dexNum < 1 || mon.dexNum > 1010) {
     return 0;
   }
   const natureSummary = getNatureSummary(mon.nature);
@@ -32,7 +32,7 @@ export const getStatGen3Onward = (stat: Stat, mon: PKM) => {
 };
 
 export const getHPGen3Onward = (mon: PKM) => {
-  if (mon.dexNum < 1 || mon.dexNum > 1008) {
+  if (mon.dexNum < 1 || mon.dexNum > 1010) {
     return 0;
   }
   if (mon.dexNum === 292) {
@@ -54,7 +54,7 @@ export const getHPGen3Onward = (mon: PKM) => {
 };
 
 export const getLevelGen3Onward = (dexNum: number, exp: number) => {
-  if (dexNum < 1 || dexNum > 1008) {
+  if (dexNum < 1 || dexNum > 1010) {
     return 1;
   }
   if (dexNum === 0) {
