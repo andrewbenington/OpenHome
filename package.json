@@ -1,5 +1,8 @@
 {
-  "description": "A foundation for scalable desktop apps",
+  "productName": "OpenHome",
+  "name": "openhome",
+  "version": "0.0.1",
+  "description": "A tool for moving Pokémon between game saves",
   "keywords": [
     "electron",
     "boilerplate",
@@ -179,8 +182,10 @@
     "webpack-merge": "^5.8.0"
   },
   "build": {
-    "productName": "ElectronReact",
-    "appId": "org.erb.ElectronReact",
+    "productName": "OpenHome",
+    "name": "open-home",
+    "version": "0.0.1",
+    "appId": "org.abenington.OpenHome",
     "asar": true,
     "asarUnpack": "**\\*.{node,dll}",
     "files": [

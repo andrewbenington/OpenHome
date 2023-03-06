@@ -32,7 +32,7 @@ export const acceptableExtensions = [
 ];
 
 export const bytesToPKM = (bytes: Uint8Array, extension: string): PKM => {
-  if (extension === 'ohpkm') {
+  if (extension === 'OHPKM') {
     return new OHPKM(bytes);
   } else if (bytes.length === 69 || extension === 'PK1') {
     return new PK1(bytes.slice(3, bytes.length));

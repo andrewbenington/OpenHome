@@ -305,7 +305,7 @@ const NatureData = [
 ];
 
 export const getNatureSummary = (nature?: number) => {
-  if (!nature) {
+  if (nature === undefined) {
     return ""
   }
   return NatureData.find((n) => n.name === Natures[nature])?.summary;

@@ -1,6 +1,7 @@
-import { Box, Card, Chip, Tab, Tabs } from '@mui/material';
+import { Box, Chip, Tab, Tabs } from '@mui/material';
 import _ from 'lodash';
 import { useEffect, useState } from 'react';
+import Themes from 'renderer/Themes';
 import { POKEMON_DATA } from '../../consts/Mons';
 import Types from '../../consts/Types';
 import { PKM } from '../../types/PKM/PKM';
@@ -25,7 +26,14 @@ const PokemonDisplay = (props: {
   }, [propTab]);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'row',
+        width: '100%',
+        backgroundColor: Themes[0].backgroundColor,
+      }}
+    >
       <Chip
         label={mon.format}
         style={{
@@ -37,9 +45,9 @@ const PokemonDisplay = (props: {
           fontWeight: 'bold',
           fontSize: 20,
         }}
-      ></Chip>
+      />
       <PokemonWithItem mon={mon} format={mon.format} style={{ width: '20%' }} />
-      <div style={{ textAlign: 'left', width: '30%' }}>
+      <div style={{ textAlign: 'left', width: '30%', marginTop: 10 }}>
         <AttributeRow
           label="Name"
           value={`${POKEMON_DATA[mon.dexNum]?.formes[mon.formNum]?.formeName} ${
@@ -99,12 +107,14 @@ const PokemonDisplay = (props: {
               '0'
             )}`}
         />
-        <AttributeRow
-          label="Ability"
-          value={`${mon.ability} (${
-            mon.abilityNum === 4 ? 'HA' : mon.abilityNum
-          })`}
-        />
+        {mon.ability !== undefined && (
+          <AttributeRow
+            label="Ability"
+            value={`${mon.ability} (${
+              mon.abilityNum === 4 ? 'HA' : mon.abilityNum
+            })`}
+          />
+        )}
         {mon.dynamaxLevel !== undefined && (
           <AttributeRow label="Dynamax">
             <div style={{ display: 'flex', flexDirection: 'row' }}>
@@ -168,6 +178,7 @@ const PokemonDisplay = (props: {
       <div
         style={{
           width: '50%',
+          backgroundColor: '#fff4',
           marginLeft: 10,
           borderTopRightRadius: 0,
           display: 'flex',
@@ -239,7 +250,7 @@ const PokemonDisplay = (props: {
 };
 
 const fileTypeColors: { [key: string]: string } = {
-  OHPKM: "#748fcd",
+  OHPKM: '#748fcd',
   PK1: '#b34',
   PK2: '#b6c',
   PK3: '#9b3',

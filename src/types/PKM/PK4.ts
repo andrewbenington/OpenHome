@@ -38,7 +38,6 @@ import { contestStats, marking, PKM, pokedate, stats } from './PKM';
 import {
   adjustMovePPBetweenFormats,
   generateIVs,
-  generatePersonalityValue,
   getAbilityFromNumber,
   ivsFromDVs,
   writeIVsToBuffer,
@@ -135,7 +134,6 @@ export class PK4 extends PKM {
       const equivalentLocation = other.metLocation
         ? G4Locations[0].indexOf(other.metLocation.slice(3))
         : -1;
-      console.log('other.metlocattion', other.metLocationIndex);
       if (
         other.gameOfOrigin >= GameOfOrigin.HeartGold &&
         other.gameOfOrigin <= GameOfOrigin.Platinum
@@ -158,7 +156,6 @@ export class PK4 extends PKM {
         this.eggLocationIndex = other.eggLocationIndex ? 2001 : 0;
         this.metLocationIndex = 2001;
       }
-      console.log('this.metlocattion', this.metLocationIndex);
       this.metLevel = other.metLevel ?? this.level;
       this.trainerGender = other.trainerGender;
       this.refreshChecksum();
@@ -393,16 +390,19 @@ export class PK4 extends PKM {
   public set ribbons(value: string[]) {
     value.forEach((ribbon) => {
       let index = Gen4RibbonsPart1.indexOf(ribbon);
+      console.log('ribbon', ribbon, 'index', index)
       if (index > -1) {
         setFlag(this.bytes, 0x24, index, true);
         return;
       }
       index = Gen4RibbonsPart2.indexOf(ribbon);
+      console.log('ribbon', ribbon, 'index', index)
       if (index > -1) {
         setFlag(this.bytes, 0x3c, index, true);
         return;
       }
-      index = Gen4RibbonsPart2.indexOf(ribbon);
+      index = Gen4RibbonsPart3.indexOf(ribbon);
+      console.log('ribbon', ribbon, 'index', index)
       if (index > -1) {
         setFlag(this.bytes, 0x60, index, true);
         return;

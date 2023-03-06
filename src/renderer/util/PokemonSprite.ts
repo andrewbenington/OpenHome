@@ -1,7 +1,7 @@
+import { Items } from '../../consts';
 import { GameOfOriginData } from '../../consts/GameOfOrigin';
 import { POKEMON_DATA } from '../../consts/Mons';
 import { PKM } from '../../types/PKM/PKM';
-import { natDexToSV } from '../../util/ConvertPokemonID';
 
 const ColosseumOnlyNonShadow = [311];
 
@@ -19,78 +19,13 @@ const CXDShadow = [
 
 const CXDNonShadow = [196, 197];
 
-export const getBoxSprite = (dexNum: number, formNum: number) => {
-  let formeName =
-    (dexNum !== 664 && dexNum !== 665 && formNum > 0
-      ? POKEMON_DATA[dexNum]?.formes[formNum]?.formeName?.toLowerCase()
-      : POKEMON_DATA[dexNum]?.name?.toLowerCase()) ?? '';
-  formeName = formeName
-    .replaceAll('é', 'e')
-    .replaceAll("'", '')
-    .replace('-own-tempo', '')
-    .replace(':', '')
-    .replace('. ', '-')
-    .replace(' ', '-')
-    .replace('.', '')
-    .replace('-natural', '')
-    .replace('-disguised', '');
-  if (!formeName.includes('nidoran') && dexNum !== 201) {
-    formeName = formeName.replace(/-f$/, '-female').replace(/-m$/, '-male');
-  }
-  if (formeName.includes('-core')) {
-    formeName = `${formeName.split('-core').join('')}-core`;
-  }
-  return `https://raw.githubusercontent.com/msikma/pokesprite/master/pokemon-gen8/regular/${formeName}.png`;
-};
-
-export const getBoxSprite1 = (dexNum: number, formNum: number) => {
-  if (!POKEMON_DATA[dexNum]?.formes[0]) return;
-  let defaultFormeIsNamed =
-    POKEMON_DATA[dexNum].formes[0].name === POKEMON_DATA[dexNum].formes[0].formeName;
-  let forme = POKEMON_DATA[dexNum].formes[formNum];
-  if (forme === undefined) {
-    return;
-  }
-  let regularForme =
-    forme.isBaseForme || forme.regional
-      ? '00'
-      : !defaultFormeIsNamed
-      ? `${formNum}`.padStart(2, '0')
-      : `${formNum + 1}`.padStart(2, '0');
-  let regionalForme;
-  let region =
-    forme.regional ??
-    (forme.prevo &&
-      POKEMON_DATA[forme.prevo.dexNumber].formes[forme.prevo.formeNumber]
-        .regional);
-  switch (region) {
-    case 'Alola':
-      regionalForme = '11';
-      break;
-    case 'Galar':
-      regionalForme = '31';
-      break;
-    case 'Hisui':
-      regionalForme = '41';
-      break;
-    case 'Paldea':
-      regionalForme = '51';
-      break;
-    default:
-      regionalForme = '00';
-  }
-  return `./box_icons/pm${dexNum
-    .toString()
-    .padStart(4, '0')}_${regularForme}_${regionalForme}_00.png`;
-};
-
 export const getShowdownSprite = (
   dexNum: number,
   formNum: number,
   isShiny: boolean,
   game: string
 ) => {
-  if (dexNum < 1 || dexNum > 1008) {
+  if (dexNum < 1 || dexNum > 1010) {
     return '';
   }
   let formeName =
@@ -118,13 +53,8 @@ export const getShowdownSprite = (
   }/${formeName}.${game.includes('ani') ? 'gif' : 'png'}`;
 };
 
-export const getPokemonDBSprite = (
-  dexNum: number,
-  formNum: number,
-  isShiny: boolean,
-  game: string
-) => {
-  if (dexNum < 1 || dexNum > 1008) {
+const formatPokemonDBForme = (dexNum: number, formNum: number) => {
+  if (dexNum < 1 || dexNum > 1010) {
     return '';
   }
   let formeName =
@@ -147,7 +77,7 @@ export const getPokemonDBSprite = (
     .replace('-disguised', '')
     .replace('-partner', '-johto')
     .replace('-exclamation', '-em')
-    .replace('-questino', '-qm');
+    .replace('-question', '-qm');
   if (dexNum === 25 && formNum > 0 && formNum != 8) {
     formeName += '-cap';
   }
@@ -157,6 +87,21 @@ export const getPokemonDBSprite = (
   if (formeName.includes('-core')) {
     formeName = `${formeName.split('-core').join('')}-core`;
   }
+  return formeName;
+};
+
+export const getPokemonDBArt = (dexNum: number, formNum: number) => {
+  const formeName = formatPokemonDBForme(dexNum, formNum);
+  return `https://img.pokemondb.net/artwork/large/${formeName}.jpg`;
+};
+
+export const getPokemonDBSprite = (
+  dexNum: number,
+  formNum: number,
+  isShiny: boolean,
+  game: string
+) => {
+  const formeName = formatPokemonDBForme(dexNum, formNum);
   return `https://img.pokemondb.net/sprites/${game}/${
     isShiny ? 'shiny' : 'normal'
   }/${formeName}.png`;
@@ -168,7 +113,7 @@ export const getSerebiiSprite = (
   isShiny: boolean,
   game: string
 ) => {
-  if (dexNum < 1 || dexNum > 1008) {
+  if (dexNum < 1 || dexNum > 1010) {
     return '';
   }
   let formeName: string | undefined =
@@ -196,11 +141,8 @@ export const getSerebiiSprite = (
   if (!isShiny) {
     gameURI = serebiiInitialsToGame[game];
   }
-  if (dexNum > 905) {
-    dexNum = natDexToSV(dexNum);
-  }
   return `https://www.serebii.net/${isShiny ? 'Shiny/' : ''}${gameURI}/${
-    isShiny ? '' : 'pokemon/'
+    isShiny ? '' : 'pokemon/new/'
   }${dexNum.toString().padStart(3, '0')}${
     formeName ? `-${formeName}` : ''
   }.png`;
@@ -225,49 +167,52 @@ const serebiiInitialsToGame: { [key: string]: string } = {
 
 export const getItemSprite = (item: string) => {
   if (!item) return;
-  if (
-    item.includes('Berry') &&
-    (!item.includes(' ') || item.includes('Gold'))
-  ) {
+  if (item.includes('Berry') && !Items.includes(item)) {
     return 'https://archives.bulbagarden.net/media/upload/3/3c/GSC_Berry_Tree.png';
-  } else if (
-    item?.toLocaleLowerCase()?.replaceAll(' ', '-')?.includes('tiny-mushroom')
-  ) {
-    return `https://raw.githubusercontent.com/msikma/pokesprite/master/items-outline/valuable-item/${item
-      ?.toLocaleLowerCase()
-      ?.replaceAll(' ', '-')}.png`;
+  } else {
+    return `https://www.serebii.net/itemdex/sprites/${item
+      .toLocaleLowerCase()
+      .replaceAll(' ', '')}.png`;
   }
-  if (item?.toLocaleLowerCase()?.replaceAll(' ', '-')?.includes('bottle-cap')) {
-    return `https://raw.githubusercontent.com/msikma/pokesprite/master/items-outline/other-item/${item
-      ?.toLocaleLowerCase()
-      ?.replaceAll(' ', '-')}.png`;
-  }
-  if (
-    item?.toLocaleLowerCase()?.replaceAll(' ', '-')?.includes('rusted') ||
-    item?.toLocaleLowerCase()?.replaceAll(' ', '-')?.includes('leek')
-  ) {
-    return `https://raw.githubusercontent.com/msikma/pokesprite/master/items-outline/hold-item/${item
-      ?.toLocaleLowerCase()
-      ?.replaceAll(' ', '-')
-      ?.replace('leek', 'stick')}.png`;
-  }
-  if (
-    item?.toLocaleLowerCase()?.replaceAll(' ', '')?.includes('ragecandybar')
-  ) {
-    return `https://play.pokemonshowdown.com/sprites/itemicons/${item
-      ?.toLocaleLowerCase()
-      ?.replaceAll(' ', '')}.png`;
-  }
-  return `https://play.pokemonshowdown.com/sprites/itemicons/${item
-    ?.toLocaleLowerCase()
-    ?.replaceAll(' ', '-')}.png`;
+  // else if (
+  //   item?.toLocaleLowerCase()?.replaceAll(' ', '-')?.includes('tiny-mushroom')
+  // ) {
+  //   return `https://raw.githubusercontent.com/msikma/pokesprite/master/items-outline/valuable-item/${item
+  //     ?.toLocaleLowerCase()
+  //     ?.replaceAll(' ', '-')}.png`;
+  // }
+  // if (item?.toLocaleLowerCase()?.replaceAll(' ', '-')?.includes('bottle-cap')) {
+  //   return `https://raw.githubusercontent.com/msikma/pokesprite/master/items-outline/other-item/${item
+  //     ?.toLocaleLowerCase()
+  //     ?.replaceAll(' ', '-')}.png`;
+  // }
+  // if (
+  //   item?.toLocaleLowerCase()?.replaceAll(' ', '-')?.includes('rusted') ||
+  //   item?.toLocaleLowerCase()?.replaceAll(' ', '-')?.includes('leek')
+  // ) {
+  //   return `https://raw.githubusercontent.com/msikma/pokesprite/master/items-outline/hold-item/${item
+  //     ?.toLocaleLowerCase()
+  //     ?.replaceAll(' ', '-')
+  //     ?.replace('leek', 'stick')}.png`;
+  // }
+  // if (
+  //   item?.toLocaleLowerCase()?.replaceAll(' ', '')?.includes('ragecandybar')
+  // ) {
+  //   return `https://play.pokemonshowdown.com/sprites/itemicons/${item
+  //     ?.toLocaleLowerCase()
+  //     ?.replaceAll(' ', '')}.png`;
+  // }
+  // return `https://play.pokemonshowdown.com/sprites/itemicons/${item
+  //   ?.toLocaleLowerCase()
+  //   ?.replaceAll(' ', '-')}.png`;
 };
 
 export const getMonSprite = (mon: PKM, format: string) => {
   let formeName =
     (mon.formNum > 0 && mon.dexNum !== 664 && mon.dexNum !== 665
       ? POKEMON_DATA[mon.dexNum]?.formes[mon.formNum]?.formeName?.toLowerCase()
-      : POKEMON_DATA[mon.dexNum]?.name?.toLowerCase()?.replaceAll('-', '')) ?? '';
+      : POKEMON_DATA[mon.dexNum]?.name?.toLowerCase()?.replaceAll('-', '')) ??
+    '';
   formeName = formeName
     .replaceAll('é', 'e')
     .replaceAll("'", '')
@@ -282,64 +227,72 @@ export const getMonSprite = (mon: PKM, format: string) => {
   if (formeParts.length > 1) {
     formeName += `-${formeParts.slice(1).join('')}`;
   }
-  if (format === 'OHPKM') {
-    return getPokemonDBSprite(mon.dexNum, mon.formNum, mon.isShiny, 'home');
-  } else if (mon.format === 'PK1') {
-    return getShowdownSprite(mon.dexNum, mon.formNum, false, 'gen1');
-  }  else if (mon.format === 'PK2') {
-    return getPokemonDBSprite(mon.dexNum, mon.formNum, mon.isShiny, 'crystal');
-  } else if (format === 'XDPKM' || format === 'COLOPKM') {
-    return `https://www.pokencyclopedia.info/sprites/spin-off/ani_xd${
-      mon.isShiny ? '_shiny' : ''
-    }/ani_xd${mon.isShiny ? '-S' : ''}_${mon.dexNum
-      .toString()
-      .padStart(3, '0')}.gif`;
-  } else if (format === 'PK3' || format === 'COLOPKM') {
-    if (mon.dexNum === 201) {
-      return getUnownSprite(mon.formNum, 3);
-    }
-    return getShowdownSprite(mon.dexNum, mon.formNum, mon.isShiny, 'gen3');
-  } else if (format === 'PK4') {
-    return getPokemonDBSprite(mon.dexNum, mon.formNum, mon.isShiny, 'heartgold-soulsilver');
-  } else if (format === 'PK5') {
-    return getShowdownSprite(mon.dexNum, mon.formNum, mon.isShiny, 'gen5ani');
-  } else if (format === 'PK6') {
-    return getShowdownSprite(mon.dexNum, mon.formNum, mon.isShiny, 'ani');
-  } else if (format === 'PK7') {
-    if (alolaDex.includes(mon.dexNum)) {
+  switch (format) {
+    case 'OHPKM':
+      if (mon.dexNum > 1008) {
+        return getPokemonDBArt(mon.dexNum, mon.formNum);
+      }
+      return getPokemonDBSprite(mon.dexNum, mon.formNum, mon.isShiny, 'home');
+    case 'PK1':
+      return getShowdownSprite(mon.dexNum, mon.formNum, false, 'gen1');
+    case 'PK2':
       return getPokemonDBSprite(
         mon.dexNum,
         mon.formNum,
         mon.isShiny,
-        'ultra-sun-ultra-moon'
+        'crystal'
       );
-    } else {
-      return getPokemonDBSprite(mon.dexNum, mon.formNum, mon.isShiny, 'home');
-    }
-  } else if (format === 'PK9') {
-    if (mon.formNum !== 0 && (mon.dexNum === 25 || mon.dexNum === 133)) {
+    case 'XDPKM':
+    case 'COLOPKM':
+      return `https://www.pokencyclopedia.info/sprites/spin-off/ani_xd${
+        mon.isShiny ? '_shiny' : ''
+      }/ani_xd${mon.isShiny ? '-S' : ''}_${mon.dexNum
+        .toString()
+        .padStart(3, '0')}.gif`;
+    case 'PK3':
+      if (mon.dexNum === 201) {
+        return getUnownSprite(mon.formNum, 3);
+      }
+      return getShowdownSprite(mon.dexNum, mon.formNum, mon.isShiny, 'gen3');
+    case 'PK4':
+      return getPokemonDBSprite(
+        mon.dexNum,
+        mon.formNum,
+        mon.isShiny,
+        'heartgold-soulsilver'
+      );
+    case 'PK5':
+      return getShowdownSprite(mon.dexNum, mon.formNum, mon.isShiny, 'gen5ani');
+    case 'PK6':
       return getShowdownSprite(mon.dexNum, mon.formNum, mon.isShiny, 'ani');
-    }
-    return getPokemonDBSprite(mon.dexNum, mon.formNum, mon.isShiny, 'go');
-  } else if (format === 'PA8') {
-    return getPokemonDBSprite(
-      mon.dexNum,
-      mon.formNum,
-      mon.isShiny,
-      'legends-arceus'
-    );
-  } else if (format === 'PK8' || format === 'PB8') {
-    return getSerebiiSprite(mon.dexNum, mon.formNum, mon.isShiny, 'SWSH');
-  } else if (
-    mon.dexNum <= 898 &&
-    !formeName.includes('-hisui') &&
-    !formeName.includes('-paldea')
-  ) {
-    return getSerebiiSprite(mon.dexNum, mon.formNum, mon.isShiny, 'SV');
-  } else if (mon.dexNum > 964 || formeName.includes('-paldea')) {
-    return getSerebiiSprite(mon.dexNum, mon.formNum, mon.isShiny, 'SV');
-  } else {
-    return getSerebiiSprite(mon.dexNum, mon.formNum, mon.isShiny, 'SV');
+    case 'PK7':
+      if (alolaDex.includes(mon.dexNum)) {
+        return getPokemonDBSprite(
+          mon.dexNum,
+          mon.formNum,
+          mon.isShiny,
+          'ultra-sun-ultra-moon'
+        );
+      } else {
+        return getPokemonDBSprite(mon.dexNum, mon.formNum, mon.isShiny, 'home');
+      }
+    case 'PA8':
+      return getPokemonDBSprite(
+        mon.dexNum,
+        mon.formNum,
+        mon.isShiny,
+        'legends-arceus'
+      );
+    case 'PK8':
+    case 'PB8':
+      return getSerebiiSprite(mon.dexNum, mon.formNum, mon.isShiny, 'SWSH');
+    case 'PK9':
+      if (mon.formNum !== 0 && (mon.dexNum === 25 || mon.dexNum === 133)) {
+        return getShowdownSprite(mon.dexNum, mon.formNum, mon.isShiny, 'ani');
+      }
+      return getSerebiiSprite(mon.dexNum, mon.formNum, mon.isShiny, 'SV');
+    default:
+      return getPokemonDBArt(mon.dexNum, mon.formNum);
   }
 };
 

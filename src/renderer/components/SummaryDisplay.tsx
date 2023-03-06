@@ -55,7 +55,7 @@ const SummaryDisplay = (props: { mon: PKM; updateMon: (mon: PKM) => void }) => {
             )}
             <p style={{ fontWeight: 'bold' }}>
               {mon.nickname}
-              {mon.affixedRibbon ? ` ${mon.affixedRibbonTitle}` : ''}
+              {mon.affixedRibbonTitle ? ` ${mon.affixedRibbonTitle}` : ''}
             </p>
             <Card style={{ padding: '5px 10px 5px 10px', marginLeft: 10 }}>
               {mon.language}

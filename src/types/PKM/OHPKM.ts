@@ -175,7 +175,7 @@ class OHPKM extends PKM {
       this.language = other.languageIndex === 0 ? 'ENG' : other.language;
       this.unknownF3 = other.unknownF3 ?? 0;
       this.formArgument = other.formArgument ?? 0;
-      this.affixedRibbon = other.affixedRibbon ?? 0;
+      this.affixedRibbon = other.affixedRibbon ?? 0xff;
       // this.geoRegions, this.geoCountries
       // this.distByte
       this.groundTile = other.groundTile ?? 0;
@@ -546,7 +546,7 @@ class OHPKM extends PKM {
     this.ribbonBytes = new Uint8Array(16);
     value.forEach((ribbon) => {
       const index = OpenHomeRibbons.indexOf(ribbon);
-      if (index > 0) {
+      if (index > -1) {
         setFlag(this.bytes, 0x36, index, true);
       }
     });

@@ -1,5 +1,6 @@
 import { PKM } from '../../types/PKM/PKM';
 import { getMonSprite, getItemSprite } from '../util/PokemonSprite';
+import AttributeRow from './AttributeRow';
 
 const PokemonWithItem = (props: { mon: PKM; format?: string; style: any }) => {
   const { mon, format, style } = props;
@@ -26,45 +27,26 @@ const PokemonWithItem = (props: { mon: PKM; format?: string; style: any }) => {
           src={getMonSprite(mon, mon.format)}
         />
       </div>
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }}
-      >
-        <p>{`Level ${mon.level}`}</p>
-      </div>
-
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }}
-      >
-        <p>{`${mon.exp} EXP`}</p>
-      </div>
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }}
-      >
-        <p>{`Item:`}</p>
-        {mon.heldItem !== 'None' && (
-          <img
-            alt="item icon"
-            src={getItemSprite(mon.heldItem)}
-            style={{ width: 24, height: 24 }}
-          />
-        )}
-        <p>{mon.heldItem}</p>
-      </div>
+      <AttributeRow label="Level" justifyEnd>{mon.level}</AttributeRow>
+      <AttributeRow label="EXP" justifyEnd>{mon.exp}</AttributeRow>
+      <AttributeRow label="Item" justifyEnd>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+          }}
+        >
+          {mon.heldItem !== 'None' && (
+            <img
+              alt="item icon"
+              src={getItemSprite(mon.heldItem)}
+              style={{ width: 24, height: 24, marginRight: 5 }}
+            />
+          )}
+          <p>{mon.heldItem}</p>
+        </div>
+      </AttributeRow>
     </div>
   );
 };

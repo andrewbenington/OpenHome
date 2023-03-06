@@ -85,7 +85,6 @@ export const gvsFromIVs = (ivs: stats) => {
 };
 
 export const dvsFromIVs = (ivs: stats, isShiny: boolean) => {
-  console.log('dvsFromIVs');
   if (isShiny) {
     let atkDV = Math.ceil((ivs.atk - 1) / 2);
     if ((atkDV & 0b11) === 0b01) {
@@ -205,7 +204,7 @@ export const formatHasColorMarkings = (format: string) => {
   return (
     (format.charAt(0) === 'p' &&
       ['7', '8', '9'].includes(format.charAt(format.length - 1))) ||
-    format === 'ohpkm'
+    format === 'OHPKM'
   );
 };
 

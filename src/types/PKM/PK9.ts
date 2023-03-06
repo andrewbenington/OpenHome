@@ -103,7 +103,6 @@ export class PK9 extends PKM {
       byteArray[i] = byte;
     }
     this.trainerName = new TextDecoder('utf-16').decode(byteArray);
-    this.language = Languages[bytes[0xd5]];
     this.ribbons = [];
     for (let byte = 0; byte < 4; byte++) {
       let ribbonsUint8 = bytes[0x34 + byte];
@@ -153,5 +152,20 @@ export class PK9 extends PKM {
 
   public set affixedRibbon(value: number | undefined) {
     this.bytes[0xd4] = value ?? 0xff
+  }
+
+  public get languageIndex() {
+    return this.bytes[0xd5];
+  }
+
+  public get language() {
+    return Languages[this.languageIndex];
+  }
+
+  public set language(value: string) {
+    const index = Languages.indexOf(value);
+    if (index > -1) {
+      this.bytes[0xd5] = index;
+    }
   }
 }

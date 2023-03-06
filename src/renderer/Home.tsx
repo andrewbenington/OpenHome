@@ -528,7 +528,7 @@ const Home = () => {
             currentTheme={currentTheme}
             setSelectedMon={setSelectedMon}
             setDragSource={(index) => {
-              if (index) {
+              if (index !== undefined) {
                 const sourceMon = homeData.boxes[box].pokemon[index];
                 if (sourceMon) {
                   setDraggingMon({
@@ -542,7 +542,7 @@ const Home = () => {
                 setDraggingMon(undefined);
               }
               setDraggingSource(
-                index
+                index !== undefined
                   ? {
                       save: -1,
                       isHome: true,

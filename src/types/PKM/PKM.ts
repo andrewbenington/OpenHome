@@ -158,7 +158,6 @@ export class PKM {
       | [marking, marking, marking, marking]
       | undefined
   ) {
-    console.log('setting markings', value);
     this._markings = value;
   }
 
@@ -585,7 +584,9 @@ export class PKM {
   }
 
   public get affixedRibbonTitle() {
-    return this.affixedRibbon ? RibbonTitles[this.affixedRibbon] : '';
+    return this.affixedRibbon !== undefined && this.affixedRibbon !== 0xff
+      ? RibbonTitles[this.affixedRibbon]
+      : '';
   }
 
   // Gen4
@@ -947,11 +948,12 @@ export class PKM {
       this.personalityValue = other.personalityValue;
     }
     // adjust personality value to match nature, while retaining xor of upper and lower
-    if (this.isNatureFromPersonalityValue) {
+    if (this.isNatureFromPersonalityValue && other.nature !== undefined) {
       let originalPersonalityValue = this.personalityValue;
       let newPersonalityValue = bigInt(originalPersonalityValue);
       let tid = this.trainerID;
       let sid = this.secretID;
+      let nature = other.statNature ?? other.nature;
       // xoring the other three values with this to calculate upper half of personality value
       // will ensure shininess or non-shininess depending on original mon
       let shinyXor = other.isShiny ? 0 : 8;
@@ -961,10 +963,10 @@ export class PKM {
       while (i < 0x10000) {
         if (
           // ability is stored separately in gen 4, so no need to recalc personality value
-          (this.format === 'PK4' ||
-            newPersonalityValue.and(1).add(1).toJSNumber() ===
-              otherAbilityNumNonHA) &&
-          newPersonalityValue.mod(25).toJSNumber() === other.nature &&
+
+          newPersonalityValue.and(1).add(1).toJSNumber() ===
+            otherAbilityNumNonHA &&
+          newPersonalityValue.mod(25).toJSNumber() === nature &&
           getIsShinyPreGen6(tid, sid, newPersonalityValue.toJSNumber()) ===
             other.isShiny
         ) {

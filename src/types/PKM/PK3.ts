@@ -68,7 +68,6 @@ export class PK3 extends PKM {
       if (other.markings) {
         let temp = [0, 0, 0, 0];
         for (let i = 0; i < 4; i++) {
-          console.log('marking', i, other.markings[i]);
           temp[i] = other.markings[i] > 0 ? 1 : 0;
         }
         this.markings = temp as [marking, marking, marking, marking];
@@ -329,6 +328,7 @@ export class PK3 extends PKM {
     for (let i = 0; i < 4; i++) {
       ppUpVal |= (value[i] & 3) << (2 * i);
     }
+    this.bytes[0x28] = ppUpVal
   }
 
   public get trainerFriendship() {
