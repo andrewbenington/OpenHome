@@ -2,7 +2,7 @@ import { Items } from '../../consts';
 import { GameOfOriginData } from '../../consts/GameOfOrigin';
 import { POKEMON_DATA } from '../../consts/Mons';
 import { PKM } from '../../types/PKM/PKM';
-
+import { GameLogos } from '../images/Images';
 const ColosseumOnlyNonShadow = [311];
 
 const ColosseumOnlyShadow = [
@@ -303,29 +303,30 @@ export const getGameLogo = (
 ) => {
   if (gameOfOrigin === 0x0f) {
     if (dexNum === undefined || hasNationalRibbon === undefined) {
-      return `/logos/ColosseumXD.png`;
+      return GameLogos.ColosseumXD;
     } else if (hasNationalRibbon) {
       if (ColosseumOnlyShadow.includes(dexNum)) {
-        return `logos/Colosseum.png`;
+        return GameLogos.Colosseum;
       } else if (CXDShadow.includes(dexNum)) {
-        return `/logos/ColosseumXD.png`;
+        return GameLogos.ColosseumXD;
       } else {
-        return `/logos/XD.png`;
+        return GameLogos.XD;
       }
     } else if (ColosseumOnlyNonShadow.includes(dexNum)) {
-      return `/logos/Colosseum.png`;
+      return GameLogos.Colosseum;
     } else if (CXDNonShadow.includes(dexNum)) {
-      return `/logos/ColosseumXD.png`;
+      return GameLogos.ColosseumXD;
     } else {
-      return `/logos/XD.png`;
+      return GameLogos.XD;
     }
   } else if (gameOfOrigin === -1) {
-    return `/logos/GB.png`;
+    return GameLogos.GB;
   } else {
-    return `/logos/${
+    return GameLogos[
       GameOfOriginData[gameOfOrigin]?.logo ??
-      GameOfOriginData[gameOfOrigin]?.name.split(' ').join('_')
-    }.png`;
+        GameOfOriginData[gameOfOrigin]?.name.replace(' ', '') ??
+        ''
+    ];
   }
 };
 

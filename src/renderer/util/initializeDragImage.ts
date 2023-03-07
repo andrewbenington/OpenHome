@@ -1,9 +1,11 @@
+import BoxIcons from '../images/icons/BoxIcons.png'
+
 export const initializeDragImage = () => {
   var dragIcon = document.createElement('div');
   dragIcon.id = 'drag-image';
   dragIcon.style.height = '100%';
   dragIcon.style.width = '100%';
-  dragIcon.style.background = `url(/icons/BoxIcons.png) no-repeat 0.027027% 0.027027%`;
+  dragIcon.style.background = `url(${BoxIcons}) no-repeat 0.027027% 0.027027%`;
   dragIcon.style.backgroundSize = '3700%';
   dragIcon.style.backgroundPosition = '100% 100%'
   var div = document.createElement('div');

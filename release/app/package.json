@@ -1,12 +1,12 @@
 {
-  "name": "electron-react-boilerplate",
-  "version": "4.6.0",
-  "description": "A foundation for scalable desktop apps",
+  "name": "openhome",
+  "productName": "OpenHome",
+  "version": "0.0.1",
+  "description": "A tool for moving pokemon between save data",
   "license": "MIT",
   "author": {
     "name": "Andrew Benington",
-    "email": "andrewbenington57@gmail.com",
-    "url": "https://github.com/electron-react-boilerplate"
+    "email": "andrewbenington57@gmail.com"
   },
   "main": "./dist/main/main.js",
   "scripts": {
