@@ -1,7 +1,6 @@
 {
   "productName": "OpenHome",
   "name": "openhome",
-  "version": "0.0.1",
   "description": "A tool for moving Pokémon between game saves",
   "keywords": [
     "electron",
@@ -183,8 +182,7 @@
   },
   "build": {
     "productName": "OpenHome",
-    "name": "open-home",
-    "version": "0.0.1",
+    "buildVersion": "0.0.1",
     "appId": "org.abenington.OpenHome",
     "asar": true,
     "asarUnpack": "**\\*.{node,dll}",
@@ -238,9 +236,6 @@
       "buildResources": "assets",
       "output": "release/build"
     },
-    "extraResources": [
-      "./assets/**"
-    ],
     "publish": {
       "provider": "github",
       "owner": "electron-react-boilerplate",

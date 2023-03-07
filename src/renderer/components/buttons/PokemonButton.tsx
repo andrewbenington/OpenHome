@@ -1,3 +1,4 @@
+import BoxIcons from '../../images/icons/BoxIcons.png'
 import React, { useEffect, useState } from 'react';
 import { POKEMON_DATA } from '../../../consts/Mons';
 import { PKM } from '../../../types/PKM/PKM';
@@ -121,7 +122,7 @@ const PokemonButton = (props: PokemonButtonProps) => {
             }
           }}
           style={{
-            background: `url(/icons/BoxIcons.png) no-repeat 0.027027% 0.027027%`,
+            background: `url(${BoxIcons}) no-repeat 0.027027% 0.027027%`,
             backgroundSize: '3700%',
             backgroundPosition:
               mon.isEgg || !POKEMON_DATA[mon.dexNum]

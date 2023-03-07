@@ -1,4 +1,5 @@
 import { Card } from '@mui/material';
+import { OriginMarks } from 'renderer/images/Images';
 import { getMoveMaxPP } from 'types/PKM/util';
 import { Balls, GameOfOriginData, MOVE_DATA, Natures } from '../../consts';
 import { marking, PKM } from '../../types/PKM/PKM';
@@ -155,11 +156,13 @@ const SummaryDisplay = (props: { mon: PKM; updateMon: (mon: PKM) => void }) => {
               <img
                 draggable={false}
                 alt="origin mark"
-                src={`/origin_marks/${
-                  mon.gameOfOrigin === -1
-                    ? 'GB'
-                    : GameOfOriginData[mon.gameOfOrigin]?.mark ?? ''
-                }.png`}
+                src={
+                  OriginMarks[
+                    mon.gameOfOrigin === -1
+                      ? 'GB'
+                      : GameOfOriginData[mon.gameOfOrigin]?.mark ?? ''
+                  ]
+                }
                 style={{
                   width: 50,
                   height: 50,

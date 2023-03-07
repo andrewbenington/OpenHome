@@ -69,6 +69,7 @@ const PokemonDisplay = (props: {
         mon.teraTypeOverride !== undefined ? (
           <AttributeRow label="Tera Type">
             <img
+              draggable={false}
               alt="tera type"
               style={{ height: 24, width: 24, marginRight: 5 }}
               src={`https://raw.githubusercontent.com/msikma/pokesprite/master/misc/types/gen8/${Types[
@@ -146,14 +147,14 @@ const PokemonDisplay = (props: {
         >
           {mon.canGigantamax && (
             <AttributeTag
-              icon="/icons/gmax.png"
+              icon="./img/icons/gmax.png"
               color="white"
               backgroundColor="#e60040"
             />
           )}
           {mon.isAlpha && (
             <AttributeTag
-              icon="/icons/alpha.png"
+              icon="./img/icons/alpha.png"
               color="white"
               backgroundColor="#f2352d"
             />
