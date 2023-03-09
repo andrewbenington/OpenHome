@@ -19,6 +19,7 @@ export class G4SAV extends SAV {
 
   constructor(path: string, bytes: Uint8Array) {
     super(path, bytes);
+    this.origin = bytes[0x80]
     this.boxes = Array(18);
   }
 

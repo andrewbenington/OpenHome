@@ -10,7 +10,7 @@ import fs from 'fs';
 
 function initListeners() {
   ipcMain.on('write-ohpkm', async (event, bytes: Uint8Array) => {
-    writePKMToFile(bytes, 'ohpkm');
+    writePKMToFile(bytes);
   });
 
   ipcMain.on('delete-ohpkm-files', async (event, fileNames: string[]) => {
@@ -46,13 +46,13 @@ function initListeners() {
     console.log('read-home-box', boxName);
     const appDataPath = app.getPath('appData');
     const boxString = fs.readFileSync(
-      `${appDataPath}/open-home/storage/boxes/${boxName}.csv`,
+      `${appDataPath}/OpenHome/storage/boxes/${boxName}.csv`,
       {
         encoding: 'utf8',
       }
     );
     console.log(
-      `${appDataPath}/open-home/storage/boxes/${boxName}.csv`,
+      `${appDataPath}/OpenHome/storage/boxes/${boxName}.csv`,
       boxName
     );
     event.reply('home-box-read', boxString);
@@ -61,7 +61,7 @@ function initListeners() {
   ipcMain.on('write-home-box', async (event, { boxName, boxString }) => {
     const appDataPath = app.getPath('appData');
     fs.writeFileSync(
-      `${appDataPath}/open-home/storage/boxes/${boxName}.csv`,
+      `${appDataPath}/OpenHome/storage/boxes/${boxName}.csv`,
       boxString
     );
   });

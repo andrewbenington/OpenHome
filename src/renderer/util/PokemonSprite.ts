@@ -174,37 +174,6 @@ export const getItemSprite = (item: string) => {
       .toLocaleLowerCase()
       .replaceAll(' ', '')}.png`;
   }
-  // else if (
-  //   item?.toLocaleLowerCase()?.replaceAll(' ', '-')?.includes('tiny-mushroom')
-  // ) {
-  //   return `https://raw.githubusercontent.com/msikma/pokesprite/master/items-outline/valuable-item/${item
-  //     ?.toLocaleLowerCase()
-  //     ?.replaceAll(' ', '-')}.png`;
-  // }
-  // if (item?.toLocaleLowerCase()?.replaceAll(' ', '-')?.includes('bottle-cap')) {
-  //   return `https://raw.githubusercontent.com/msikma/pokesprite/master/items-outline/other-item/${item
-  //     ?.toLocaleLowerCase()
-  //     ?.replaceAll(' ', '-')}.png`;
-  // }
-  // if (
-  //   item?.toLocaleLowerCase()?.replaceAll(' ', '-')?.includes('rusted') ||
-  //   item?.toLocaleLowerCase()?.replaceAll(' ', '-')?.includes('leek')
-  // ) {
-  //   return `https://raw.githubusercontent.com/msikma/pokesprite/master/items-outline/hold-item/${item
-  //     ?.toLocaleLowerCase()
-  //     ?.replaceAll(' ', '-')
-  //     ?.replace('leek', 'stick')}.png`;
-  // }
-  // if (
-  //   item?.toLocaleLowerCase()?.replaceAll(' ', '')?.includes('ragecandybar')
-  // ) {
-  //   return `https://play.pokemonshowdown.com/sprites/itemicons/${item
-  //     ?.toLocaleLowerCase()
-  //     ?.replaceAll(' ', '')}.png`;
-  // }
-  // return `https://play.pokemonshowdown.com/sprites/itemicons/${item
-  //   ?.toLocaleLowerCase()
-  //   ?.replaceAll(' ', '-')}.png`;
 };
 
 export const getMonSprite = (mon: PKM, format: string) => {
@@ -229,8 +198,8 @@ export const getMonSprite = (mon: PKM, format: string) => {
   }
   switch (format) {
     case 'OHPKM':
-      if (mon.dexNum > 1008) {
-        return getPokemonDBArt(mon.dexNum, mon.formNum);
+      if (mon.dexNum > 905) {
+        return getSerebiiSprite(mon.dexNum, mon.formNum, mon.isShiny, 'SV');
       }
       return getPokemonDBSprite(mon.dexNum, mon.formNum, mon.isShiny, 'home');
     case 'PK1':

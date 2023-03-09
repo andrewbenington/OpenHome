@@ -1,3 +1,4 @@
+import { GameOfOrigin } from 'consts';
 import OHPKM from 'types/PKM/OHPKM';
 import { TransferRestrictions } from 'types/TransferRestrictions';
 import { SaveType } from 'types/types';
@@ -5,6 +6,7 @@ import { PKM } from '../PKM/PKM';
 
 export class SAV {
   saveType: SaveType = SaveType.UNKNOWN;
+  origin: GameOfOrigin = 0;
   pkmType: typeof PKM = OHPKM;
   boxRows: number = 5;
   boxColumns: number = 6;

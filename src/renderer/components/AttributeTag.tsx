@@ -10,8 +10,8 @@ const AttributeTag = (props: {
   return (
     <Card
       style={{
-        marginRight: 5,
-        marginBottom: 5,
+        marginLeft: 5,
+        marginTop: 5,
         padding: icon ? "5px 5px 0px" : 5,
         width: "fit-content",
         fontWeight: "bold",

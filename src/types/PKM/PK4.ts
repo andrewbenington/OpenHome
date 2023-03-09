@@ -119,7 +119,7 @@ export class PK4 extends PKM {
       this.shinyLeaves = other.shinyLeaves ?? 0;
       this.gameOfOrigin = other.gameOfOrigin;
       this.language = other.languageIndex === 0 ? 'ENG' : other.language;
-      this.groundTile = other.groundTile ?? 0;
+      this.encounterType = other.encounterType ?? 0;
       this.performance = other.performance ?? 0;
       this.trainerName = other.trainerName;
       this.trainerFriendship = other.trainerFriendship;
@@ -663,11 +663,11 @@ export class PK4 extends PKM {
     setFlag(this.bytes, 0x84, 7, !!value);
   }
 
-  public get groundTile() {
+  public get encounterType() {
     return this.bytes[0x85];
   }
 
-  public set groundTile(value: number) {
+  public set encounterType(value: number) {
     this.bytes[0x85] = value;
   }
 

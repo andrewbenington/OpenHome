@@ -1,7 +1,7 @@
 import { RegionalForms } from 'types/TransferRestrictions';
 import {
   bytesToUint16LittleEndian,
-  bytesToUint32LittleEndian,
+  bytesToUint32LittleEndian
 } from '../../util/ByteLogic';
 import { gen4StringToUTF } from '../../util/Strings/StringConverter';
 import { G4SAV } from './G4SAV';

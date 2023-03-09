@@ -1,23 +1,20 @@
 import { app } from 'electron';
 import fs from 'fs';
-import { bytesToPKM } from '../util/FileImport';
 import OHPKM from '../types/PKM/OHPKM';
 import { getMonFileIdentifier } from '../types/PKM/util';
+import { bytesToPKM } from '../util/FileImport';
 
-export default function writePKMToFile(bytes: Uint8Array, format: string) {
-  const originalMon = bytesToPKM(bytes, format);
-  const mon = new OHPKM(originalMon);
+export default function writePKMToFile(bytes: Uint8Array) {
+  const mon = bytesToPKM(bytes, 'OHPKM') as OHPKM;
   const appDataPath = app.getPath('appData');
-  const fileName = getMonFileIdentifier(mon)
+  const fileName = getMonFileIdentifier(mon);
   fs.writeFileSync(
-    `${appDataPath}/open-home/storage/mons/${fileName}.ohpkm`,
+    `${appDataPath}/OpenHome/storage/mons/${fileName}.ohpkm`,
     mon.bytes
   );
 }
 
 export function deleteOHPKMFile(fileName: string) {
   const appDataPath = app.getPath('appData');
-  fs.unlinkSync(
-    `${appDataPath}/open-home/storage/mons/${fileName}.ohpkm`
-  );
+  fs.unlinkSync(`${appDataPath}/OpenHome/storage/mons/${fileName}.ohpkm`);
 }

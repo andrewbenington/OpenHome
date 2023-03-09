@@ -19,8 +19,8 @@ export class DPSAV extends G4SAV {
     },
   };
 
-  static TRAINER_NAME_OFFSET = 0x68;
-  static TRAINER_ID_OFFSET = 0x78;
+  static TRAINER_NAME_OFFSET = 0x64;
+  static TRAINER_ID_OFFSET = 0x74;
   static BOX_SIZE = 0xff0;
   static GENERAL_BLOCK_OFFSET = 0x0000;
   static GENERAL_BLOCK_SIZE = 0xc100;

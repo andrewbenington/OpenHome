@@ -4,6 +4,7 @@ import { getMoveMaxPP } from 'types/PKM/util';
 import { Balls, GameOfOriginData, MOVE_DATA, Natures } from '../../consts';
 import { marking, PKM } from '../../types/PKM/PKM';
 import { getGameLogo, getTypeColor } from '../util/PokemonSprite';
+import { detailsPaneContentStyle } from './styles';
 
 const getMarkingColor = (value: marking) => {
   return ['grey', 'blue', 'red'][value];
@@ -18,15 +19,13 @@ const metTimesOfDay = [
 const SummaryDisplay = (props: { mon: PKM; updateMon: (mon: PKM) => void }) => {
   const { mon, updateMon } = props;
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+    <div style={detailsPaneContentStyle}>
       <div
         style={{
           display: 'flex',
           flex: 1,
           flexDirection: 'row',
           height: 'fit-content',
-          padding: 10,
-          marginLeft: 10,
         }}
       >
         <div style={{ flex: 1 }}>

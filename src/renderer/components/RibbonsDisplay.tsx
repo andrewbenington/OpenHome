@@ -7,6 +7,7 @@ import {
 } from '../../consts/Ribbons';
 import { PK3 } from '../../types/PKM/PK3';
 import { PKM } from '../../types/PKM/PKM';
+import { detailsPaneContentStyle } from './styles';
 
 const getRibbonURL = (mon: PKM, ribbon: string) => {
   if (PKM instanceof PK3) {
@@ -54,11 +55,9 @@ const RibbonsDisplay = (props: { mon: PKM }) => {
   return (
     <div
       style={{
-        display: 'flex',
+        ...detailsPaneContentStyle,
         flexDirection: 'row',
         flexWrap: 'wrap',
-        marginLeft: 10,
-        padding: 10,
       }}
     >
       {mon.ribbons.map((ribbon) => (

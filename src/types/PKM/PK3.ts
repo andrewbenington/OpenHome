@@ -116,23 +116,23 @@ export class PK3 extends PKM {
         this.ivs = generateIVs();
       }
       this.isEgg = other.isEgg;
-      this.gameOfOrigin = other.gameOfOrigin < 10 ? other.gameOfOrigin : 0xf;
-      if (other.gameOfOrigin === 26) {
-        this.gameOfOrigin = 1;
-      } else if (other.gameOfOrigin === 27) {
-        this.gameOfOrigin = 2;
+      this.gameOfOrigin = other.gameOfOrigin <= GameOfOrigin.ColosseumXD ? other.gameOfOrigin : 0xf;
+      if (other.gameOfOrigin === GameOfOrigin.AlphaSapphire) {
+        this.gameOfOrigin = GameOfOrigin.Sapphire;
+      } else if (other.gameOfOrigin === GameOfOrigin.OmegaRuby) {
+        this.gameOfOrigin = GameOfOrigin.Ruby;
       } else if (
-        other.gameOfOrigin === 42 ||
-        other.gameOfOrigin === 35 ||
-        other.gameOfOrigin === 37
+        other.gameOfOrigin === GameOfOrigin.Red ||
+        other.gameOfOrigin === GameOfOrigin.BlueJapan ||
+        other.gameOfOrigin === GameOfOrigin.LetsGoPikachu
       ) {
-        this.gameOfOrigin = 4;
+        this.gameOfOrigin = GameOfOrigin.FireRed;
       } else if (
-        other.gameOfOrigin === 43 ||
-        other.gameOfOrigin === 36 ||
-        other.gameOfOrigin === 38
+        other.gameOfOrigin === GameOfOrigin.BlueGreen ||
+        other.gameOfOrigin === GameOfOrigin.Yellow ||
+        other.gameOfOrigin === GameOfOrigin.LetsGoEevee
       ) {
-        this.gameOfOrigin = 5;
+        this.gameOfOrigin = GameOfOrigin.LeafGreen;
       }
       this.language = other.language;
       this.nickname = other.nickname;
@@ -140,7 +140,7 @@ export class PK3 extends PKM {
       this.trainerFriendship = other.trainerFriendship;
       this.ball = other.ball ? (other.ball <= 12 ? other.ball : 4) : 4;
       const equivalentLocation = other.metLocation
-        ? RSEFRLGLocations[0].indexOf(other.metLocation)
+        ? RSEFRLGLocations[0].indexOf(other.metLocation.slice(3))
         : -1;
       if (
         other.gameOfOrigin >= GameOfOrigin.Sapphire &&

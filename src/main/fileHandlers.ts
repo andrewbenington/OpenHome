@@ -3,30 +3,30 @@ import fs from 'fs';
 import _ from 'lodash';
 
 export function initializeFolders(appDataPath: string) {
-  if (!fs.existsSync(`${appDataPath}/open-home/storage/boxes`)) {
-    fs.mkdirSync(`${appDataPath}/open-home/storage/boxes`);
+  if (!fs.existsSync(`${appDataPath}/OpenHome/storage/boxes`)) {
+    fs.mkdirSync(`${appDataPath}/OpenHome/storage/boxes`, { recursive: true });
   }
   _.range(36).forEach((boxNum) => {
     if (
       !fs.existsSync(
-        `${appDataPath}/open-home/storage/boxes/Box ${(
+        `${appDataPath}/OpenHome/storage/boxes/Box ${(
           boxNum + 1
         ).toString()}.csv`
       )
     ) {
       fs.writeFileSync(
-        `${appDataPath}/open-home/storage/boxes/Box ${(
+        `${appDataPath}/OpenHome/storage/boxes/Box ${(
           boxNum + 1
         ).toString()}.csv`,
         ''
       );
     }
   });
-  if (!fs.existsSync(`${appDataPath}/open-home/storage/mons`)) {
-    fs.mkdirSync(`${appDataPath}/open-home/storage/mons`, { recursive: true });
+  if (!fs.existsSync(`${appDataPath}/OpenHome/storage/mons`)) {
+    fs.mkdirSync(`${appDataPath}/OpenHome/storage/mons`, { recursive: true });
   }
-  if (!fs.existsSync(`${appDataPath}/open-home/storage/lookup`)) {
-    fs.mkdirSync(`${appDataPath}/open-home/storage/lookup`, { recursive: true });
+  if (!fs.existsSync(`${appDataPath}/OpenHome/storage/lookup`)) {
+    fs.mkdirSync(`${appDataPath}/OpenHome/storage/lookup`, { recursive: true });
   }
   fs.opendir('../', (err, dir) => {
     if (err) console.log('Error:', err);
