@@ -12,6 +12,7 @@ import { G4SAV } from 'types/SAV/G4SAV';
 import { BoxCoordinates, SAV } from 'types/SAV/SAV';
 import { buildSaveFile, getSaveType } from 'types/SAV/util';
 import { isRestricted } from 'types/TransferRestrictions';
+import { bytesToUint16LittleEndian } from 'util/ByteLogic';
 import { acceptableExtensions, bytesToPKM } from 'util/FileImport';
 import Gen4ToUTFMap from 'util/Strings/Gen4ToUTFMap';
 import { utf16StringToGen4 } from 'util/Strings/StringConverter';
@@ -57,6 +58,7 @@ const Home = () => {
     if (homeMonMap) {
       console.log('home mon map updated', homeMonMap);
       readBoxData((boxString) => {
+        console.log(boxString);
         // box file just stores references, so we need to populate them from the map
         const newBox = homeData.boxes[0];
         newBox.getMonsFromString(boxString, homeMonMap);
@@ -74,6 +76,7 @@ const Home = () => {
 
   useEffect(() => {
     console.log('homedata changed');
+    console.log(homeData);
   }, [homeData]);
 
   useEffect(() => {
@@ -316,6 +319,11 @@ const Home = () => {
     });
     changedOHPKMList.forEach((mon) => {
       console.log('writing', mon);
+      console.log(new OHPKM(mon));
+      console.log(
+        'pid',
+        bytesToUint16LittleEndian(mon.bytes, 0x1c).toString(16)
+      );
       if (mon) {
         window.electron.ipcRenderer.sendMessage('write-ohpkm', mon.bytes);
       }
@@ -639,6 +647,7 @@ const Home = () => {
         onClose={() => setSelectedMon(undefined)}
         fullWidth
         maxWidth="lg"
+        PaperProps={{ sx: { height: 400 } }}
       >
         {selectedMon && (
           <PokemonDisplay mon={selectedMon} updateMon={() => {}} />

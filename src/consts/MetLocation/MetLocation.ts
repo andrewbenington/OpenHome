@@ -22,7 +22,7 @@ export const getLocation = (
   let locations: { [key: number]: string[] } = {};
   if (game >= GameOfOrigin.Red && game <= GameOfOrigin.Crystal) {
     locations = CrystalLocation;
-  } else if (forceRegion || (game < GameOfOrigin.Black && index > 30000)) {
+  } else if (forceRegion || (game < GameOfOrigin.White && index > 30000)) {
     return `in the ${GameOfOriginData[game]?.region} region`;
   } else if (game <= GameOfOrigin.LeafGreen) {
     locations = RSEFRLGLocations;
@@ -31,7 +31,7 @@ export const getLocation = (
   } else if (game >= GameOfOrigin.HeartGold && game <= GameOfOrigin.Platinum) {
     multiplier = 1000;
     locations = G4Locations;
-  } else if (game >= GameOfOrigin.Black && game <= GameOfOrigin.White2) {
+  } else if (game >= GameOfOrigin.White && game <= GameOfOrigin.Black2) {
     locations = BW2MetLocation;
   } else if (game >= GameOfOrigin.X && game <= GameOfOrigin.OmegaRuby) {
     locations = G6Location;

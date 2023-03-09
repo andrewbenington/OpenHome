@@ -1,4 +1,4 @@
-import { Box, Chip, Tab, Tabs } from '@mui/material';
+import { Chip, Tab } from '@mui/material';
 import _ from 'lodash';
 import { useEffect, useState } from 'react';
 import Themes from 'renderer/Themes';
@@ -6,12 +6,18 @@ import { POKEMON_DATA } from '../../consts/Mons';
 import Types from '../../consts/Types';
 import { PKM } from '../../types/PKM/PKM';
 import { getMonFileIdentifier, getTypes } from '../../types/PKM/util';
-import { getTypeColor } from '../util/PokemonSprite';
 import AttributeRow from './AttributeRow';
-import AttributeTag from './AttributeTag';
+import OpenHomeButton from './buttons/OpenHomeButton';
+import OtherDisplay from './OtherDisplay';
 import PokemonWithItem from './PokemonWithItem';
 import RibbonsDisplay from './RibbonsDisplay';
 import StatsDisplay from './StatsDisplay';
+import {
+  detailsPaneScrollContainerStyle,
+  detailsPaneStyle,
+  fileTypeChipStyle,
+  tabButtonStyle,
+} from './styles';
 import SummaryDisplay from './SummaryDisplay';
 
 const PokemonDisplay = (props: {
@@ -31,19 +37,15 @@ const PokemonDisplay = (props: {
         display: 'flex',
         flexDirection: 'row',
         width: '100%',
+        height: '100%',
         backgroundColor: Themes[0].backgroundColor,
       }}
     >
       <Chip
         label={mon.format}
         style={{
-          position: 'absolute',
-          left: 10,
-          top: 10,
+          ...fileTypeChipStyle,
           backgroundColor: fileTypeColors[mon.format],
-          color: 'white',
-          fontWeight: 'bold',
-          fontSize: 20,
         }}
       />
       <PokemonWithItem mon={mon} format={mon.format} style={{ width: '20%' }} />
@@ -116,135 +118,96 @@ const PokemonDisplay = (props: {
             })`}
           />
         )}
-        {mon.dynamaxLevel !== undefined && (
-          <AttributeRow label="Dynamax">
-            <div style={{ display: 'flex', flexDirection: 'row' }}>
-              {_.range(10).map((level: number) => (
-                <div
-                  key={`dynamax_meter_${level}`}
-                  style={{
-                    backgroundColor:
-                      level < (mon.dynamaxLevel ?? 0)
-                        ? `#FF${(40 + ((mon.dynamaxLevel ?? 0) - level) * 20)
-                            ?.toString(16)
-                            .padStart(2, '0')}00`
-                        : 'grey',
-                    height: 20,
-                    width: 8,
-                    marginRight: 4,
-                  }}
-                ></div>
-              ))}
-            </div>
-          </AttributeRow>
-        )}
+      </div>
+      <div style={detailsPaneStyle}>
         <div
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-          }}
+          className="scroll-no-bar"
+          style={{ display: 'flex', flexDirection: 'row', overflowX: 'scroll' }}
         >
-          {mon.canGigantamax && (
-            <AttributeTag
-              icon="./img/icons/gmax.png"
-              color="white"
-              backgroundColor="#e60040"
-            />
-          )}
-          {mon.isAlpha && (
-            <AttributeTag
-              icon="./img/icons/alpha.png"
-              color="white"
-              backgroundColor="#f2352d"
-            />
-          )}
-          {mon.isSquareShiny && (
-            <AttributeTag
-              label="SQUARE SHINY"
-              color="white"
-              backgroundColor="black"
-            />
-          )}
-          {mon.isShadow && (
-            <AttributeTag
-              label="SHADOW"
-              backgroundColor={getTypeColor('shadow')}
-              color="white"
-            />
+          <OpenHomeButton
+            // @ts-ignore
+            style={{
+              ...tabButtonStyle,
+              backgroundColor: tab === 'summary' ? '#fff4' : '#0000',
+            }}
+            onClick={() => setTab('summary')}
+          >
+            Summary
+          </OpenHomeButton>
+          <OpenHomeButton
+            // @ts-ignore
+            style={{
+              ...tabButtonStyle,
+              backgroundColor: tab === 'stats' ? '#fff4' : '#0000',
+            }}
+            onClick={() => setTab('stats')}
+          >
+            Stats
+          </OpenHomeButton>
+          <OpenHomeButton
+            // @ts-ignore
+            style={{
+              ...tabButtonStyle,
+              backgroundColor: tab === 'ribbons' ? '#fff4' : '#0000',
+            }}
+            onClick={() => setTab('ribbons')}
+          >
+            Ribbons
+          </OpenHomeButton>
+          <OpenHomeButton
+            // @ts-ignore
+            style={{
+              ...tabButtonStyle,
+              backgroundColor: tab === 'other' ? '#fff4' : '#0000',
+            }}
+            onClick={() => setTab('other')}
+          >
+            Other
+          </OpenHomeButton>
+          <OpenHomeButton
+            // @ts-ignore
+            style={{
+              ...tabButtonStyle,
+              backgroundColor: tab === 'raw' ? '#fff4' : '#0000',
+            }}
+            onClick={() => setTab('raw')}
+          >
+            Raw
+          </OpenHomeButton>
+        </div>
+        <div style={detailsPaneScrollContainerStyle} className="scroll-no-bar">
+          {tab === 'summary' ? (
+            <SummaryDisplay mon={mon} updateMon={updateMon} />
+          ) : tab === 'stats' ? (
+            <StatsDisplay mon={mon} />
+          ) : tab === 'ribbons' ? (
+            <RibbonsDisplay mon={mon} />
+          ) : tab === 'other' ? (
+            <OtherDisplay mon={mon} />
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              {_.range(mon.bytes.length / 16).map((row: number) => {
+                return (
+                  <code key={`code_row_${row}`}>{`0x${row
+                    .toString(16)
+                    .padStart(3, '0')}0\t${_.range(16)
+                    .map(
+                      (byte: number) =>
+                        mon.bytes[
+                          Math.min(row * 16 + byte, mon.bytes.length - 1)
+                        ]
+                          .toString(16)
+                          .padStart(2, '0') + (byte % 2 ? ' ' : '')
+                    )
+                    .join('')}`}</code>
+                );
+              })}
+              <code>{getMonFileIdentifier(mon)}</code>
+              <code>TID: {mon.trainerID}</code>
+              <code>SID: {mon.secretID}</code>
+            </div>
           )}
         </div>
-      </div>
-
-      <div
-        style={{
-          width: '50%',
-          backgroundColor: '#fff4',
-          marginLeft: 10,
-          borderTopRightRadius: 0,
-          display: 'flex',
-          flexDirection: 'column',
-        }}
-      >
-        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <Tabs value={tab} style={{ position: 'relative' }}>
-            <Tab
-              // @ts-ignore
-              style={{ marginLeft: 10 }}
-              label="Summary"
-              value="summary"
-              onClick={() => setTab('summary')}
-            />
-            <Tab
-              // @ts-ignore
-              style={{ marginLeft: 10 }}
-              label="Stats"
-              value="stats"
-              onClick={() => setTab('stats')}
-            />
-            <Tab
-              // @ts-ignore
-              style={{ marginLeft: 10 }}
-              label="Ribbons"
-              value="ribbons"
-              onClick={() => setTab('ribbons')}
-            />
-            <Tab
-              // @ts-ignore
-              style={{ marginLeft: 10 }}
-              label="Raw"
-              value="raw"
-              onClick={() => setTab('raw')}
-            />
-          </Tabs>
-        </Box>
-        {tab === 'summary' ? (
-          <SummaryDisplay mon={mon} updateMon={updateMon} />
-        ) : tab === 'stats' ? (
-          <StatsDisplay mon={mon} />
-        ) : tab === 'ribbons' ? (
-          <RibbonsDisplay mon={mon} />
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            {_.range(mon.bytes.length / 16).map((row: number) => {
-              return (
-                <code key={`code_row_${row}`}>{`0x${row
-                  .toString(16)
-                  .padStart(3, '0')}0\t${_.range(16)
-                  .map(
-                    (byte: number) =>
-                      mon.bytes[Math.min(row * 16 + byte, mon.bytes.length - 1)]
-                        .toString(16)
-                        .padStart(2, '0') + (byte % 2 ? ' ' : '')
-                  )
-                  .join('')}`}</code>
-              );
-            })}
-            <code>{getMonFileIdentifier(mon)}</code>
-            <code>TID: {mon.trainerID}</code>
-            <code>SID: {mon.secretID}</code>
-          </div>
-        )}
       </div>
     </div>
   );

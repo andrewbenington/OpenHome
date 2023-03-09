@@ -21,6 +21,7 @@ import {
 import { getLocation } from '../../consts/MetLocation/MetLocation';
 import { generatePersonalityValue } from './util';
 import bigInt from 'big-integer';
+import { EncounterTypes } from 'consts/EncounterTypes';
 
 export class PKM {
   static markingCount = 4;
@@ -590,23 +591,23 @@ export class PKM {
   }
 
   // Gen4
-  private _groundTile?:
+  private _encounterType?:
     | number
     // HGSS
     | undefined;
-  public get groundTile():
+  public get encounterType():
     | number
     // HGSS
     | undefined {
-    return this._groundTile;
+    return this._encounterType;
   }
-  public set groundTile(
+  public set encounterType(
     value:
       | number
       // HGSS
       | undefined
   ) {
-    this._groundTile = value;
+    this._encounterType = value;
   }
   // HGSS
   private _performance?: number | undefined;
@@ -901,9 +902,30 @@ export class PKM {
 
   public get eggLocation() {
     if (!this.eggLocationIndex) return undefined;
-    // const game = gameOfOriginFromFormat(this.format) ?? this.gameOfOrigin;
-    // return getLocation(game, this.eggLocationIndex, false, true);
-    return undefined;
+    const game = gameOfOriginFromFormat(this.format) ?? this.gameOfOrigin;
+    return getLocation(game, this.eggLocationIndex, false, true);
+  }
+
+  public get shinyLeafValues() {
+    if (!this.shinyLeaves) return undefined;
+    return {
+      first: !!(this.shinyLeaves & 1),
+      second: !!(this.shinyLeaves & 2),
+      third: !!(this.shinyLeaves & 4),
+      fourth: !!(this.shinyLeaves & 8),
+      fifth: !!(this.shinyLeaves & 16),
+      crown: !!(this.shinyLeaves & 32),
+    };
+  }
+
+  public get encounterTypeLabel() {
+    if (
+      this.encounterType !== undefined &&
+      this.gameOfOrigin >= GameOfOrigin.HeartGold &&
+      this.gameOfOrigin <= GameOfOrigin.Platinum
+    ) {
+      return EncounterTypes[this.encounterType];
+    }
   }
 
   constructor(arg: any) {

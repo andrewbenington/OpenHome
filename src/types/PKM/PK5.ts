@@ -131,7 +131,7 @@ export class PK5 extends PKM {
     if (this.gameOfOrigin < GameOfOrigin.White) {
       return (this.personalityValue & 1) + 1;
     } else {
-      return this.bytes[0x42] & 1 ? 3 : ((this.personalityValue >> 16) & 1) + 1;
+      return this.bytes[0x42] & 1 ? 4 : ((this.personalityValue >> 16) & 1) + 1;
     }
   }
 
@@ -537,11 +537,11 @@ export class PK5 extends PKM {
     setFlag(this.bytes, 0x84, 7, !!value);
   }
 
-  public get groundTile() {
+  public get encounterType() {
     return this.bytes[0x85];
   }
 
-  public set groundTile(value: number) {
+  public set encounterType(value: number) {
     this.bytes[0x85] = value;
   }
 

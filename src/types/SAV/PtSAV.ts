@@ -1,3 +1,4 @@
+import { GameOfOrigin } from 'consts';
 import { RegionalForms } from 'types/TransferRestrictions';
 import {
   bytesToUint16LittleEndian,

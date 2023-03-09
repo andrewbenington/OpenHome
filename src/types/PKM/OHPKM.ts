@@ -78,7 +78,7 @@ class OHPKM extends PKM {
         });
       }
       this.alphaMove = other.alphaMove ?? 0;
-      if (other.personalityValue) {
+      if (other.personalityValue !== undefined) {
         this.personalityValue = other.personalityValue;
       } else {
         this.personalityValue = generatePersonalityValue();
@@ -97,6 +97,7 @@ class OHPKM extends PKM {
           this.personalityValue = this.personalityValue ^ 0x10000000;
         }
       }
+      console.log(this.personalityValue, other.personalityValue)
       this.encryptionConstant =
         other.encryptionConstant ??
         other.personalityValue ??
@@ -178,7 +179,7 @@ class OHPKM extends PKM {
       this.affixedRibbon = other.affixedRibbon ?? 0xff;
       // this.geoRegions, this.geoCountries
       // this.distByte
-      this.groundTile = other.groundTile ?? 0;
+      this.encounterType = other.encounterType ?? 0;
       this.performance = other.performance ?? 0;
       this.trainerName = other.trainerName;
       this.trainerFriendship = other.trainerFriendship;
@@ -971,11 +972,11 @@ class OHPKM extends PKM {
     this.bytes[0xf8] = value;
   }
 
-  public get groundTile() {
+  public get encounterType() {
     return this.bytes[0x10e];
   }
 
-  public set groundTile(value: number) {
+  public set encounterType(value: number) {
     this.bytes[0x10e] = value;
   }
 
@@ -1031,9 +1032,9 @@ class OHPKM extends PKM {
   public get eggDate() {
     return this.bytes[0x130]
       ? {
-          month: this.bytes[0x130],
-          day: this.bytes[0x131],
-          year: this.bytes[0x132],
+          year: this.bytes[0x130],
+          month: this.bytes[0x131],
+          day: this.bytes[0x132],
         }
       : undefined;
   }

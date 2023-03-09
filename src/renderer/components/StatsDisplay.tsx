@@ -1,4 +1,4 @@
-import { Button, MenuItem, Select } from '@mui/material';
+import { MenuItem, Select } from '@mui/material';
 import {
   Chart as ChartJS,
   Filler,
@@ -17,6 +17,8 @@ import { COLOPKM } from '../../types/PKM/COLOPKM';
 import { PK3 } from '../../types/PKM/PK3';
 import { PKM } from '../../types/PKM/PKM';
 import { XDPKM } from '../../types/PKM/XDPKM';
+import Sheen from '../images/icons/Sheen.gif';
+import { detailsPaneContentStyle } from './styles';
 
 const getSheenStars = (mon: PKM) => {
   if (mon instanceof PK3 || mon instanceof COLOPKM || mon instanceof XDPKM) {
@@ -67,11 +69,7 @@ const StatsDisplay = (props: { mon: PKM }) => {
   return (
     <div
       style={{
-        marginLeft: 10,
-        padding: 10,
-        height: 400,
-        display: 'flex',
-        flexDirection: 'column',
+        ...detailsPaneContentStyle,
         alignItems: 'center',
         position: 'relative',
       }}
@@ -401,7 +399,7 @@ const StatsDisplay = (props: { mon: PKM }) => {
             {_.range(getSheenStars(mon)).map((level: number) => (
               <img
                 alt={`sheen star ${level}`}
-                src={`./img/icons/sheen.gif`}
+                src={Sheen}
                 style={{
                   height: 30,
                   objectFit: 'contain',
