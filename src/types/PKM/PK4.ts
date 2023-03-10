@@ -390,19 +390,16 @@ export class PK4 extends PKM {
   public set ribbons(value: string[]) {
     value.forEach((ribbon) => {
       let index = Gen4RibbonsPart1.indexOf(ribbon);
-      console.log('ribbon', ribbon, 'index', index)
       if (index > -1) {
         setFlag(this.bytes, 0x24, index, true);
         return;
       }
       index = Gen4RibbonsPart2.indexOf(ribbon);
-      console.log('ribbon', ribbon, 'index', index)
       if (index > -1) {
         setFlag(this.bytes, 0x3c, index, true);
         return;
       }
       index = Gen4RibbonsPart3.indexOf(ribbon);
-      console.log('ribbon', ribbon, 'index', index)
       if (index > -1) {
         setFlag(this.bytes, 0x60, index, true);
         return;

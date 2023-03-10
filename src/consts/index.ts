@@ -1,6 +1,7 @@
 export * from './Abilities'
 export * from './Balls'
 export * from './Characteristics'
+export * from './EncounterTypes'
 export * from './Forms'
 export * from './GameOfOrigin'
 export * from './Items'

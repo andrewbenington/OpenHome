@@ -11,13 +11,14 @@ import {
 import { Box, SAV } from './SAV';
 
 export class G2SAV extends SAV {
-  boxOffsets: number[];
-  boxes: Array<G2Box>;
-  pkmType = PK2;
-  transferRestrictions = {
+  static TRANSFER_RESTRICTIONS = {
     maxDexNum: 251,
     excludedForms: { ...RegionalForms, 201: [26, 27] },
   };
+  boxOffsets: number[];
+  boxes: Array<G2Box>;
+  pkmType = PK2;
+  transferRestrictions = G2SAV.TRANSFER_RESTRICTIONS;
 
   constructor(path: string, bytes: Uint8Array) {
     super(path, bytes);

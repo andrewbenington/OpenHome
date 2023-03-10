@@ -13,15 +13,16 @@ import { Box, BoxCoordinates, SAV } from './SAV';
 import { RegionalForms } from 'types/TransferRestrictions';
 
 export class G3SAV extends SAV {
+  static TRANSFER_RESTRICTIONS = {
+    maxDexNum: 386,
+    excludedForms: { ...RegionalForms },
+  };
   static TRAINER_OFFSET = 0x0ff4 * 0;
   static TEAM_ITEMS_OFFSET = 0x0ff4 * 1;
   static PC_OFFSET = 0x0ff4 * 5;
   saveType: SaveType;
   pkmType = PK3;
-  transferRestrictions = {
-    maxDexNum: 386,
-    excludedForms: { ...RegionalForms },
-  };
+  transferRestrictions = G3SAV.TRANSFER_RESTRICTIONS;
 
   primarySave: G3SaveBackup;
   backupSave: G3SaveBackup;

@@ -1,7 +1,7 @@
 import { max } from 'lodash';
 import { MOVE_DATA, POKEMON_DATA } from '../../consts';
 import Types from '../../consts/Types';
-import { bytesToString, bytesToUint16LittleEndian, bytesToUint32LittleEndian, uint16ToBytesLittleEndian, uint32ToBytesLittleEndian, writeUint32ToBuffer } from '../../util/ByteLogic';
+import { bytesToString, writeUint32ToBuffer } from '../../util/ByteLogic';
 import { PKM, stats, statsPreSplit } from './PKM';
 
 export const writeIVsToBuffer = (
@@ -160,44 +160,6 @@ export const getBaseMon = (dexNum: number, forme: number) => {
     prevo = POKEMON_DATA[mon.dexNumber]?.formes[mon.formeNumber]?.prevo;
   }
   return mon;
-};
-
-export const getMonFileIdentifier = (mon: PKM) => {
-  if (mon.personalityValue) {
-    const baseMon = getBaseMon(mon.dexNum, mon.formNum);
-    if (baseMon) {
-      return `${baseMon.dexNumber.toString().padStart(4, '0')}-${bytesToString(
-        mon.trainerID,
-        2
-      ).concat(bytesToString(mon.secretID, 2))}-${bytesToString(
-        mon.personalityValue,
-        4
-      )}-${bytesToString(mon.gameOfOrigin, 1)}`;
-    }
-  }
-  return undefined;
-};
-
-export const getMonGen12Identifier = (mon: PKM) => {
-  console.log(mon, mon.dvs);
-  const { dvs } = mon;
-  if (dvs) {
-    const baseMon = getBaseMon(mon.dexNum, mon.formNum);
-    console.log(mon, baseMon);
-    const TID =
-      mon.isGameBoyOrigin || mon.personalityValue === undefined
-        ? mon.trainerID
-        : mon.personalityValue % 0x10000;
-    if (baseMon) {
-      return `${baseMon.dexNumber.toString().padStart(4, '0')}-${bytesToString(
-        TID,
-        2
-      )}-${mon.trainerName}-${dvs.atk.toString(16)}-${dvs.def.toString(
-        16
-      )}-${dvs.spc.toString(16)}-${dvs.spe.toString(16)}`;
-    }
-  }
-  return undefined;
 };
 
 export const formatHasColorMarkings = (format: string) => {

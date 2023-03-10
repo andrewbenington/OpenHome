@@ -7,10 +7,12 @@ import { gen4StringToUTF } from '../../util/Strings/StringConverter';
 import { G4SAV } from './G4SAV';
 
 export class HGSSSAV extends G4SAV {
-  transferRestrictions = {
+  static TRANSFER_RESTRICTIONS = {
     maxDexNum: 493,
     excludedForms: { ...RegionalForms, 483: [1], 484: [1] },
   };
+
+  transferRestrictions = HGSSSAV.TRANSFER_RESTRICTIONS
 
   static TRAINER_NAME_OFFSET = 0x64;
   static TRAINER_ID_OFFSET = 0x74;

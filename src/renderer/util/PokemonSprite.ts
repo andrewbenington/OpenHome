@@ -205,11 +205,11 @@ export const getMonSprite = (mon: PKM, format: string) => {
     case 'PK1':
       return getShowdownSprite(mon.dexNum, mon.formNum, false, 'gen1');
     case 'PK2':
-      return getPokemonDBSprite(
+      return getShowdownSprite(
         mon.dexNum,
         mon.formNum,
         mon.isShiny,
-        'crystal'
+        'gen2'
       );
     case 'XDPKM':
     case 'COLOPKM':
