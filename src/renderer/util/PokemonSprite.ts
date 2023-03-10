@@ -1,7 +1,7 @@
 import { Items } from '../../consts';
 import { GameOfOriginData } from '../../consts/GameOfOrigin';
 import { POKEMON_DATA } from '../../consts/Mons';
-import { PKM } from '../../types/PKM/PKM';
+import { PKM } from '../../types/PKMTypes/PKM';
 import { GameLogos } from '../images/Images';
 const ColosseumOnlyNonShadow = [311];
 

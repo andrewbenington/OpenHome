@@ -1,7 +1,7 @@
 import { app } from 'electron';
 import fs from 'fs';
 import { getMonFileIdentifier } from '../util/Lookup';
-import OHPKM from '../types/PKM/OHPKM';
+import OHPKM from '../types/PKMTypes/OHPKM';
 import { bytesToPKM } from '../util/FileImport';
 
 export default function writePKMToFile(bytes: Uint8Array) {

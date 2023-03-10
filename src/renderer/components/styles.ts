@@ -11,6 +11,12 @@ export const fileTypeChipStyle = {
   color: 'white',
   fontWeight: 'bold',
   fontSize: 20,
+  zIndex: 1,
+  borderRadius: 25,
+  '& .MuiSelect-select': {
+    paddingTop: 0,
+    paddingBottom: 0,
+  },
   position: 'absolute' as 'absolute',
 };
 
@@ -39,16 +45,15 @@ export const detailsPaneContentStyle = {
 export const leafCrownIconStyle = {
   height: 20,
   imageRendering: 'pixelated' as 'pixelated',
-  filter: 'drop-shadow(1px 1px grey)'
+  filter: 'drop-shadow(1px 1px grey)',
 };
-
 
 export const shinyLeafIconStyle = {
   marginRight: -7,
   height: 20,
   width: 20,
   imageRendering: 'pixelated' as 'pixelated',
-  filter: 'drop-shadow(1px 1px grey)'
+  filter: 'drop-shadow(1px 1px grey)',
 };
 
 export const shinyLeafEmptyIconStyle = {
@@ -57,5 +62,5 @@ export const shinyLeafEmptyIconStyle = {
   width: 20,
   imageRendering: 'pixelated' as 'pixelated',
   filter: 'grayscale(100%) drop-shadow(1px 1px grey)',
-  opacity: 0.8
+  opacity: 0.8,
 };

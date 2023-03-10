@@ -5,8 +5,8 @@ import {
   Gen9Ribbons,
   Gen9RibbonsPart2,
 } from '../../consts/Ribbons';
-import { PK3 } from '../../types/PKM/PK3';
-import { PKM } from '../../types/PKM/PKM';
+import { PK3 } from '../../types/PKMTypes/PK3';
+import { PKM } from '../../types/PKMTypes/PKM';
 import { detailsPaneContentStyle } from './styles';
 
 const getRibbonURL = (mon: PKM, ribbon: string) => {

@@ -1,7 +1,7 @@
-import { PK4 } from '../types/PKM/PK4';
-import { PKM } from '../types/PKM/PKM';
-import { getBaseMon } from '../types/PKM/util';
-import OHPKM from '../types/PKM/OHPKM';
+import { PK4 } from '../types/PKMTypes/PK4';
+import { PKM } from '../types/PKMTypes/PKM';
+import { getBaseMon } from '../types/PKMTypes/util';
+import OHPKM from '../types/PKMTypes/OHPKM';
 import { bytesToString } from './ByteLogic';
 
 export const getMonFileIdentifier = (mon: OHPKM) => {

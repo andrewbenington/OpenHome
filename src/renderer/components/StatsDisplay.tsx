@@ -13,10 +13,10 @@ import _ from 'lodash';
 import { useState } from 'react';
 import { Radar } from 'react-chartjs-2';
 import { getNatureSummary } from '../../consts/Natures';
-import { COLOPKM } from '../../types/PKM/COLOPKM';
-import { PK3 } from '../../types/PKM/PK3';
-import { PKM } from '../../types/PKM/PKM';
-import { XDPKM } from '../../types/PKM/XDPKM';
+import { COLOPKM } from '../../types/PKMTypes/COLOPKM';
+import { PK3 } from '../../types/PKMTypes/PK3';
+import { PKM } from '../../types/PKMTypes/PKM';
+import { XDPKM } from '../../types/PKMTypes/XDPKM';
 import Sheen from '../images/icons/Sheen.gif';
 import { detailsPaneContentStyle } from './styles';
 

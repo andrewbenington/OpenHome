@@ -1,4 +1,4 @@
-import { PKM } from '../../types/PKM/PKM';
+import { PKM } from '../../types/PKMTypes/PKM';
 import { getMonSprite, getItemSprite } from '../util/PokemonSprite';
 import AttributeRow from './AttributeRow';
 

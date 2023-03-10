@@ -1,6 +1,6 @@
-import OHPKM from 'types/PKM/OHPKM';
-import { PKM } from '../PKM/PKM';
-import { PK3 } from '../PKM/PK3';
+import OHPKM from 'types/PKMTypes/OHPKM';
+import { PKM } from '../PKMTypes/PKM';
+import { PK3 } from '../PKMTypes/PK3';
 import { SaveType } from '../types';
 import {
   bytesToUint16LittleEndian,

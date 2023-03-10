@@ -1,7 +1,7 @@
 import { GameOfOrigin } from 'consts';
 import _, { uniq } from 'lodash';
-import OHPKM from 'types/PKM/OHPKM';
-import { PK1 } from 'types/PKM/PK1';
+import OHPKM from 'types/PKMTypes/OHPKM';
+import { PK1 } from 'types/PKMTypes/PK1';
 import { RegionalForms } from '../TransferRestrictions';
 import { SaveType } from 'types/types';
 import { bytesToUint16BigEndian, get8BitChecksum } from 'util/ByteLogic';
@@ -25,10 +25,12 @@ class G1Box implements Box {
 
 export default class G1SAV extends SAV {
   pkmType = PK1;
-  transferRestrictions = {
+  static TRANSFER_RESTRICTIONS = {
     maxDexNum: 151,
     excludedForms:{ ...RegionalForms },
   };
+
+  transferRestrictions = G1SAV.TRANSFER_RESTRICTIONS
 
   NUM_BOXES = 14;
 

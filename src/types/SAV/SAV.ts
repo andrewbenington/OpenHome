@@ -1,8 +1,8 @@
 import { GameOfOrigin } from 'consts';
-import OHPKM from 'types/PKM/OHPKM';
+import OHPKM from 'types/PKMTypes/OHPKM';
 import { TransferRestrictions } from 'types/TransferRestrictions';
 import { SaveType } from 'types/types';
-import { PKM } from '../PKM/PKM';
+import { PKM } from '../PKMTypes/PKM';
 
 export class SAV {
   saveType: SaveType = SaveType.UNKNOWN;

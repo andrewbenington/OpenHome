@@ -1,7 +1,7 @@
 import { Card, Grid } from '@mui/material';
 import _ from 'lodash';
-import OHPKM from 'types/PKM/OHPKM';
-import { PKM } from 'types/PKM/PKM';
+import OHPKM from 'types/PKMTypes/OHPKM';
+import { PKM } from 'types/PKMTypes/PKM';
 import { useEffect } from 'react';
 import { OpenHomeTheme } from 'renderer/Themes';
 import { HomeBox, HomeData } from 'types/SAV/HomeData';
