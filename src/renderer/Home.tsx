@@ -406,6 +406,7 @@ const Home = () => {
               newSaves[saveIndex] = newSave;
               setSaves(newSaves);
             });
+            return;
           case SaveType.RS:
           case SaveType.E:
           case SaveType.FRLG:
@@ -421,6 +422,7 @@ const Home = () => {
               newSaves[saveIndex] = newSave;
               setSaves(newSaves);
             });
+            return;
           case SaveType.UNKNOWN:
             return;
           default:
