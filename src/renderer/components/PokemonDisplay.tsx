@@ -1,11 +1,14 @@
-import { Chip, Tab } from '@mui/material';
+import { MenuItem, Select } from '@mui/material';
 import _ from 'lodash';
 import { useEffect, useState } from 'react';
 import Themes from 'renderer/Themes';
+import OHPKM from '../../types/PKMTypes/OHPKM';
+import G1SAV from '../../types/SAV/G1SAV';
+import { isRestricted } from '../../types/TransferRestrictions';
 import { POKEMON_DATA } from '../../consts/Mons';
 import Types from '../../consts/Types';
-import { PKM } from '../../types/PKM/PKM';
-import { getTypes } from '../../types/PKM/util';
+import { PK1, PK2, PK3, PK4, PKM } from '../../types/PKMTypes';
+import { getTypes } from '../../types/PKMTypes/util';
 import AttributeRow from './AttributeRow';
 import OpenHomeButton from './buttons/OpenHomeButton';
 import OtherDisplay from './OtherDisplay';
@@ -19,6 +22,24 @@ import {
   tabButtonStyle,
 } from './styles';
 import SummaryDisplay from './SummaryDisplay';
+import { G2SAV } from '../../types/SAV/G2SAV';
+import { G3SAV } from '../../types/SAV/G3SAV';
+import { HGSSSAV } from '../../types/SAV/HGSSSAV';
+
+const getTypeFromString = (type: string) => {
+  switch (type) {
+    case 'OHPKM':
+      return OHPKM;
+    case 'PK1':
+      return PK1;
+    case 'PK2':
+      return PK2;
+    case 'PK3':
+      return PK3;
+    case 'PK4':
+      return PK4;
+  }
+};
 
 const PokemonDisplay = (props: {
   mon: PKM;
@@ -26,6 +47,7 @@ const PokemonDisplay = (props: {
   propTab?: string;
 }) => {
   const { mon, updateMon, propTab } = props;
+  const [displayMon, setDisplayMon] = useState(mon);
   const [tab, setTab] = useState('summary');
   useEffect(() => {
     setTab(propTab ?? 'summary');
@@ -41,24 +63,72 @@ const PokemonDisplay = (props: {
         backgroundColor: Themes[0].backgroundColor,
       }}
     >
-      <Chip
-        label={mon.format}
-        style={{
+      <Select
+        value={displayMon.format}
+        onChange={(e) => {
+          const T = getTypeFromString(e.target.value);
+          if (T) {
+            setDisplayMon(new T(mon));
+          }
+        }}
+        sx={{
           ...fileTypeChipStyle,
           backgroundColor: fileTypeColors[mon.format],
         }}
+      >
+        <MenuItem value="OHPKM">OHPKM</MenuItem>
+        {mon.format !== 'OHPKM' ? (
+          <MenuItem value={mon.format}>{mon.format}</MenuItem>
+        ) : (
+          <div />
+        )}
+        {mon.format === 'OHPKM' &&
+        !isRestricted(G1SAV.TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) ? (
+          <MenuItem value="PK1">PK1</MenuItem>
+        ) : (
+          <div />
+        )}
+        {mon.format === 'OHPKM' &&
+        !isRestricted(G2SAV.TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) ? (
+          <MenuItem value="PK2">PK2</MenuItem>
+        ) : (
+          <div />
+        )}
+        {mon.format === 'OHPKM' &&
+        !isRestricted(G3SAV.TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) ? (
+          <MenuItem value="PK3">PK3</MenuItem>
+        ) : (
+          <div />
+        )}
+        {mon.format === 'OHPKM' &&
+        !isRestricted(
+          HGSSSAV.TRANSFER_RESTRICTIONS,
+          mon.dexNum,
+          mon.formNum
+        ) ? (
+          <MenuItem value="PK4">PK4</MenuItem>
+        ) : (
+          <div />
+        )}
+      </Select>
+      <PokemonWithItem
+        mon={displayMon}
+        format={displayMon.format}
+        style={{ width: '20%' }}
       />
-      <PokemonWithItem mon={mon} format={mon.format} style={{ width: '20%' }} />
       <div style={{ textAlign: 'left', width: '30%', marginTop: 10 }}>
         <AttributeRow
           label="Name"
-          value={`${POKEMON_DATA[mon.dexNum]?.formes[mon.formNum]?.formeName} ${
-            mon.gender === 2 ? '' : mon.gender === 1 ? '♀' : '♂'
+          value={`${
+            POKEMON_DATA[displayMon.dexNum]?.formes[displayMon.formNum]
+              ?.formeName
+          } ${
+            displayMon.gender === 2 ? '' : displayMon.gender === 1 ? '♀' : '♂'
           }`}
         />
-        <AttributeRow label="Dex No." value={`${mon.dexNum}`} />
+        <AttributeRow label="Dex No." value={`${displayMon.dexNum}`} />
         <AttributeRow label="Type">
-          {getTypes(mon)?.map((type, i) => (
+          {getTypes(displayMon)?.map((type, i) => (
             <img
               draggable={false}
               alt={`pokemon type ${i + 1}`}
@@ -67,27 +137,27 @@ const PokemonDisplay = (props: {
             />
           ))}
         </AttributeRow>
-        {mon.teraTypeOriginal !== undefined &&
-        mon.teraTypeOverride !== undefined ? (
+        {displayMon.teraTypeOriginal !== undefined &&
+        displayMon.teraTypeOverride !== undefined ? (
           <AttributeRow label="Tera Type">
             <img
               draggable={false}
               alt="tera type"
               style={{ height: 24, width: 24, marginRight: 5 }}
               src={`https://raw.githubusercontent.com/msikma/pokesprite/master/misc/types/gen8/${Types[
-                mon.teraTypeOverride <= 18
-                  ? mon.teraTypeOverride
-                  : mon.teraTypeOriginal
+                displayMon.teraTypeOverride <= 18
+                  ? displayMon.teraTypeOverride
+                  : displayMon.teraTypeOriginal
               ]?.toLocaleLowerCase()}.png`}
             />
-            {mon.teraTypeOverride <= 18 && (
+            {displayMon.teraTypeOverride <= 18 && (
               <>
                 <p>(originally </p>
                 <img
                   alt="tera type original"
                   style={{ height: 24, width: 24, marginRight: 5 }}
                   src={`https://raw.githubusercontent.com/msikma/pokesprite/master/misc/types/gen8/${Types[
-                    mon.teraTypeOriginal
+                    displayMon.teraTypeOriginal
                   ]?.toLocaleLowerCase()}.png`}
                 />
                 <p>)</p>
@@ -99,22 +169,24 @@ const PokemonDisplay = (props: {
         )}
         <AttributeRow
           label="OT"
-          value={`${mon.trainerName} ${mon.trainerGender ? '♀' : '♂'}`}
+          value={`${displayMon.trainerName} ${
+            displayMon.trainerGender ? '♀' : '♂'
+          }`}
         />
         <AttributeRow
           label="Trainer ID"
-          value={`${mon.displayID
+          value={`${displayMon.displayID
             .toString()
             .padStart(
-              ['PK7', 'PK8', 'PA8', 'PK9'].includes(mon.format) ? 6 : 5,
+              ['PK7', 'PK8', 'PA8', 'PK9'].includes(displayMon.format) ? 6 : 5,
               '0'
             )}`}
         />
-        {mon.ability !== undefined && (
+        {displayMon.ability !== undefined && (
           <AttributeRow
             label="Ability"
-            value={`${mon.ability} (${
-              mon.abilityNum === 4 ? 'HA' : mon.abilityNum
+            value={`${displayMon.ability} (${
+              displayMon.abilityNum === 4 ? 'HA' : displayMon.abilityNum
             })`}
           />
         )}
@@ -177,24 +249,24 @@ const PokemonDisplay = (props: {
         </div>
         <div style={detailsPaneScrollContainerStyle} className="scroll-no-bar">
           {tab === 'summary' ? (
-            <SummaryDisplay mon={mon} updateMon={updateMon} />
+            <SummaryDisplay mon={displayMon} updateMon={updateMon} />
           ) : tab === 'stats' ? (
-            <StatsDisplay mon={mon} />
+            <StatsDisplay mon={displayMon} />
           ) : tab === 'ribbons' ? (
-            <RibbonsDisplay mon={mon} />
+            <RibbonsDisplay mon={displayMon} />
           ) : tab === 'other' ? (
-            <OtherDisplay mon={mon} />
+            <OtherDisplay mon={displayMon} />
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column' }}>
-              {_.range(mon.bytes.length / 16).map((row: number) => {
+              {_.range(displayMon.bytes.length / 16).map((row: number) => {
                 return (
                   <code key={`code_row_${row}`}>{`0x${row
                     .toString(16)
                     .padStart(3, '0')}0\t${_.range(16)
                     .map(
                       (byte: number) =>
-                        mon.bytes[
-                          Math.min(row * 16 + byte, mon.bytes.length - 1)
+                        displayMon.bytes[
+                          Math.min(row * 16 + byte, displayMon.bytes.length - 1)
                         ]
                           .toString(16)
                           .padStart(2, '0') + (byte % 2 ? ' ' : '')

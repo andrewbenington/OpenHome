@@ -1,8 +1,8 @@
 import { Button, Dialog, MenuItem, Select } from '@mui/material';
 import { useEffect, useState } from 'react';
-import OHPKM from 'types/PKM/OHPKM';
-import { PK3 } from 'types/PKM/PK3';
-import { PK4 } from 'types/PKM/PK4';
+import OHPKM from 'types/PKMTypes/OHPKM';
+import { PK3 } from 'types/PKMTypes/PK3';
+import { PK4 } from 'types/PKMTypes/PK4';
 import G1SAV from 'types/SAV/G1SAV';
 import { G2SAV } from 'types/SAV/G2SAV';
 import { G3SAV } from 'types/SAV/G3SAV';
@@ -19,7 +19,7 @@ import {
 } from '../util/Lookup';
 import Gen4ToUTFMap from 'util/Strings/Gen4ToUTFMap';
 import { utf16StringToGen4 } from 'util/Strings/StringConverter';
-import { PKM } from '../types/PKM/PKM';
+import { PKM } from '../types/PKMTypes/PKM';
 import { HomeData } from '../types/SAV/HomeData';
 import { MonReference, SaveType } from '../types/types';
 import HomeBoxDisplay from './components/HomeBoxDisplay';

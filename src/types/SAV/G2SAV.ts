@@ -1,6 +1,6 @@
 import { uniq } from 'lodash';
-import OHPKM from 'types/PKM/OHPKM';
-import { PK2 } from 'types/PKM/PK2';
+import OHPKM from 'types/PKMTypes/OHPKM';
+import { PK2 } from 'types/PKMTypes/PK2';
 import { RegionalForms } from 'types/TransferRestrictions';
 import { SaveType } from 'types/types';
 import { bytesToUint16BigEndian, get8BitChecksum } from 'util/ByteLogic';

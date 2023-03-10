@@ -1,4 +1,4 @@
-import { PK5 } from '../PKM/PK5';
+import { PK5 } from '../PKMTypes/PK5';
 import { bytesToUint16LittleEndian } from '../../util/ByteLogic';
 import { Box, BoxCoordinates, SAV } from './SAV';
 

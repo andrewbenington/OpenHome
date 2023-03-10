@@ -1,7 +1,7 @@
 import LevelUpExp from '../consts/LevelUpExp';
 import { POKEMON_DATA } from '../consts/Mons';
 import { getNatureSummary } from '../consts/Natures';
-import { PKM } from '../types/PKM/PKM';
+import { PKM } from '../types/PKMTypes/PKM';
 import { Stat } from '../types/types';
 
 export const getStatGen3Onward = (stat: Stat, mon: PKM) => {

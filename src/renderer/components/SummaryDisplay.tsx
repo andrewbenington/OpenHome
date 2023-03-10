@@ -1,8 +1,8 @@
 import { Card } from '@mui/material';
 import { OriginMarks } from 'renderer/images/Images';
-import { getMoveMaxPP } from 'types/PKM/util';
+import { getMoveMaxPP } from 'types/PKMTypes/util';
 import { Balls, GameOfOriginData, MOVE_DATA, Natures } from '../../consts';
-import { marking, PKM } from '../../types/PKM/PKM';
+import { marking, PKM } from '../../types/PKMTypes/PKM';
 import { getGameLogo, getTypeColor } from '../util/PokemonSprite';
 import { detailsPaneContentStyle } from './styles';
 

@@ -1,7 +1,7 @@
 import Types from 'consts/Types';
 import _ from 'lodash';
-import { PK3 } from 'types/PKM/PK3';
-import { PK4 } from 'types/PKM/PK4';
+import { PK3 } from 'types/PKMTypes/PK3';
+import { PK4 } from 'types/PKMTypes/PK4';
 import { G2SAV } from 'types/SAV/G2SAV';
 import { HGSSSAV } from 'types/SAV/HGSSSAV';
 import { isRestricted } from 'types/TransferRestrictions';
@@ -10,10 +10,10 @@ import {
   getMonGen12Identifier,
   getMonGen34Identifier,
 } from 'util/Lookup';
-import OHPKM from '../../types/PKM/OHPKM';
-import { PK1 } from '../../types/PKM/PK1';
-import { PK2 } from '../../types/PKM/PK2';
-import { PKM } from '../../types/PKM/PKM';
+import OHPKM from '../../types/PKMTypes/OHPKM';
+import { PK1 } from '../../types/PKMTypes/PK1';
+import { PK2 } from '../../types/PKMTypes/PK2';
+import { PKM } from '../../types/PKMTypes/PKM';
 import Alpha from '../images/icons/Alpha.png';
 import GMax from '../images/icons/GMax.png';
 import LeafCrown from '../images/icons/LeafCrown.png';

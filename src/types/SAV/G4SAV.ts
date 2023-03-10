@@ -1,10 +1,10 @@
-import OHPKM from 'types/PKM/OHPKM';
+import OHPKM from 'types/PKMTypes/OHPKM';
 import {
   bytesToUint16LittleEndian,
   uint16ToBytesLittleEndian,
 } from 'util/ByteLogic';
 import { gen4StringToUTF } from 'util/Strings/StringConverter';
-import { PK4 } from '../PKM/PK4';
+import { PK4 } from '../PKMTypes/PK4';
 import { Box, SAV } from './SAV';
 
 export class G4SAV extends SAV {
