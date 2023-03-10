@@ -20,48 +20,58 @@ export function loadOHPKMs() {
 }
 
 export function loadGen12Lookup() {
+  return loadLookup('gen12Lookup.csv');
+}
+
+export function registerGen12Lookup(lookupsToAdd: string) {
+  registerLookup('gen12Lookup.csv', lookupsToAdd);
+}
+
+export function loadGen34Lookup() {
+  return loadLookup('gen34Lookup.csv');
+}
+
+export function registerGen34Lookup(lookupsToAdd: string) {
+  registerLookup('gen34Lookup.csv', lookupsToAdd);
+}
+
+export function loadLookup(fileName: string) {
   const appDataPath = app.getPath('appData');
   const lookupMap: { [key: string]: string } = {};
-  const lookupString = fs
-    .readFileSync(`${appDataPath}/OpenHome/storage/lookup/gen12Lookup.csv`)
+  const lookupFileString = fs
+    .readFileSync(`${appDataPath}/OpenHome/storage/lookup/${fileName}`)
     .toString();
-  lookupString.split('\n').forEach((entry) => {
-    const [gen12String, monRef] = entry.split(',');
-    lookupMap[gen12String] = monRef;
+  lookupFileString.split('\n').forEach((entry) => {
+    const [lookupString, monRef] = entry.split(',');
+    lookupMap[lookupString] = monRef;
   });
   return lookupMap;
 }
 
-export function registerGen12Lookup(lookupsToAdd: string) {
+function registerLookup(fileName: string, lookupsToAdd: string) {
   const appDataPath = app.getPath('appData');
   const lookupMap: { [key: string]: string } = {};
-  if (
-    fs.existsSync(`${appDataPath}/OpenHome/storage/lookup/gen12Lookup.csv`)
-  ) {
+  if (fs.existsSync(`${appDataPath}/OpenHome/storage/lookup/${fileName}`)) {
     const lookupString = fs
-      .readFileSync(`${appDataPath}/OpenHome/storage/lookup/gen12Lookup.csv`)
+      .readFileSync(`${appDataPath}/OpenHome/storage/lookup/${fileName}`)
       .toString();
     lookupString.split('\n').forEach((entry) => {
-      const [gen12String, monRef] = entry.split(',');
-      lookupMap[gen12String] = monRef;
+      const [lookupIdentifier, monRef] = entry.split(',');
+      lookupMap[lookupIdentifier] = monRef;
     });
   }
   lookupsToAdd.split('\n').forEach((entry) => {
-    const [gen12String, monRef] = entry.split(',');
-    lookupMap[gen12String] = monRef;
+    const [lookupIdentifier, monRef] = entry.split(',');
+    lookupMap[lookupIdentifier] = monRef;
   });
   const newLookupString = Object.entries(lookupMap)
-    .map(([gen12Identifier, homeIdentifier], i) => {
-      return gen12Identifier + ',' + homeIdentifier + '\n';
+    .map(([lookupIdentifier, homeIdentifier], i) => {
+      return lookupIdentifier + ',' + homeIdentifier + '\n';
     })
     .join('');
-  console.log(
-    'writing',
-    `${appDataPath}/OpenHome/storage/lookup/gen12Lookup.csv`
-  );
-  console.log(newLookupString);
+  console.log('writing', fileName);
   fs.writeFileSync(
-    `${appDataPath}/OpenHome/storage/lookup/gen12Lookup.csv`,
+    `${appDataPath}/OpenHome/storage/lookup/${fileName}`,
     newLookupString
   );
 }

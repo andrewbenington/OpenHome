@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import OHPKM from 'types/PKM/OHPKM';
-import { getMonFileIdentifier } from 'types/PKM/util';
+import { getMonFileIdentifier } from '../../util/Lookup';
 import { Box, BoxCoordinates, SAV } from './SAV';
 
 export class HomeData extends SAV {

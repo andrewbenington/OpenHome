@@ -1,10 +1,23 @@
 import Types from 'consts/Types';
 import _ from 'lodash';
+import { PK3 } from 'types/PKM/PK3';
+import { PK4 } from 'types/PKM/PK4';
+import { G2SAV } from 'types/SAV/G2SAV';
+import { HGSSSAV } from 'types/SAV/HGSSSAV';
+import { isRestricted } from 'types/TransferRestrictions';
+import {
+  getMonFileIdentifier,
+  getMonGen12Identifier,
+  getMonGen34Identifier,
+} from 'util/Lookup';
+import OHPKM from '../../types/PKM/OHPKM';
+import { PK1 } from '../../types/PKM/PK1';
+import { PK2 } from '../../types/PKM/PK2';
 import { PKM } from '../../types/PKM/PKM';
 import Alpha from '../images/icons/Alpha.png';
 import GMax from '../images/icons/GMax.png';
-import ShinyLeaf from '../images/icons/ShinyLeaf.png';
 import LeafCrown from '../images/icons/LeafCrown.png';
+import ShinyLeaf from '../images/icons/ShinyLeaf.png';
 import { getTypeColor } from '../util/PokemonSprite';
 import AttributeRow from './AttributeRow';
 import AttributeTag from './AttributeTag';
@@ -14,7 +27,6 @@ import {
   shinyLeafEmptyIconStyle,
   shinyLeafIconStyle,
 } from './styles';
-import { EncounterTypes } from 'consts/EncounterTypes';
 
 const OtherDisplay = (props: { mon: PKM }) => {
   const { mon } = props;
@@ -178,6 +190,29 @@ const OtherDisplay = (props: { mon: PKM }) => {
             ))}
           </div>
         </AttributeRow>
+      )}
+      {!isRestricted(G2SAV.TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
+      (mon instanceof PK1 || mon instanceof PK2 || mon instanceof OHPKM) ? (
+        <AttributeRow
+          label="Gen 1/2 ID"
+          value={getMonGen12Identifier(mon)}
+        />
+      ) : (
+        <div />
+      )}
+      {!isRestricted(HGSSSAV.TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
+      (mon instanceof PK3 || mon instanceof PK4 || mon instanceof OHPKM) ? (
+        <AttributeRow
+          label="Gen 3/4 ID"
+          value={getMonGen34Identifier(mon)}
+        />
+      ) : (
+        <div />
+      )}
+      {mon instanceof OHPKM ? (
+        <AttributeRow label="OHPKM ID" value={getMonFileIdentifier(mon)} />
+      ) : (
+        <div />
       )}
       <div
         style={{

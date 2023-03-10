@@ -1,10 +1,8 @@
 import { Button, Dialog, MenuItem, Select } from '@mui/material';
 import { useEffect, useState } from 'react';
 import OHPKM from 'types/PKM/OHPKM';
-import { PK2 } from 'types/PKM/PK2';
 import { PK3 } from 'types/PKM/PK3';
 import { PK4 } from 'types/PKM/PK4';
-import { getMonFileIdentifier, getMonGen12Identifier } from 'types/PKM/util';
 import G1SAV from 'types/SAV/G1SAV';
 import { G2SAV } from 'types/SAV/G2SAV';
 import { G3SAV } from 'types/SAV/G3SAV';
@@ -14,6 +12,11 @@ import { buildSaveFile, getSaveType } from 'types/SAV/util';
 import { isRestricted } from 'types/TransferRestrictions';
 import { bytesToUint16LittleEndian } from 'util/ByteLogic';
 import { acceptableExtensions, bytesToPKM } from 'util/FileImport';
+import {
+  getMonFileIdentifier,
+  updateGen12LookupTable,
+  updateGen34LookupTable,
+} from '../util/Lookup';
 import Gen4ToUTFMap from 'util/Strings/Gen4ToUTFMap';
 import { utf16StringToGen4 } from 'util/Strings/StringConverter';
 import { PKM } from '../types/PKM/PKM';
@@ -30,6 +33,7 @@ import {
   handleMenuSave,
   readBoxData,
   readGen12Lookup,
+  readGen34Lookup,
 } from './util/ipcFunctions';
 
 export interface SaveCoordinates {
@@ -39,6 +43,13 @@ export interface SaveCoordinates {
   index: number;
 }
 
+type SaveArray = [
+  SAV | undefined,
+  SAV | undefined,
+  SAV | undefined,
+  SAV | undefined
+];
+
 const Home = () => {
   const [currentTheme, setCurrentTheme] = useState<OpenHomeTheme>(Themes[0]);
   const [selectedMon, setSelectedMon] = useState<PKM>();
@@ -46,9 +57,12 @@ const Home = () => {
   const [draggingDest, setDraggingDest] = useState<SaveCoordinates>();
   const [draggingMon, setDraggingMon] = useState<MonReference>();
   const [box, setBox] = useState(0);
-  const [saves, setSaves] = useState<
-    [SAV | undefined, SAV | undefined, SAV | undefined, SAV | undefined]
-  >([undefined, undefined, undefined, undefined]);
+  const [saves, setSaves] = useState<SaveArray>([
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+  ]);
   const [homeMonMap, setHomeMonMap] = useState<{ [key: string]: OHPKM }>();
   const [changedOHPKMList, setChangedOHPKMList] = useState<OHPKM[]>([]);
   const [deleteFileList, setDeleteFileList] = useState<string[]>([]);
@@ -155,12 +169,7 @@ const Home = () => {
       let newSaveData = changingSave;
       newSaveData.changedMons.push({ box, index });
       newSaveData.boxes = newBoxes;
-      const newSaves: [
-        SAV | undefined,
-        SAV | undefined,
-        SAV | undefined,
-        SAV | undefined
-      ] = [...saves];
+      const newSaves: SaveArray = [...saves];
       newSaves[saveNumber] = newSaveData;
       setSaves(newSaves);
     }
@@ -258,9 +267,11 @@ const Home = () => {
             draggingSource.index,
             draggingSource.save
           );
-          const identifier = getMonFileIdentifier(mon);
-          if (identifier) {
-            setDeleteFileList([...deleteFileList, identifier]);
+          if (mon instanceof OHPKM) {
+            const identifier = getMonFileIdentifier(mon);
+            if (identifier) {
+              setDeleteFileList([...deleteFileList, identifier]);
+            }
           }
           return;
         }
@@ -341,20 +352,12 @@ const Home = () => {
       ) {
         const changedMons = save.prepareBoxesForSaving();
         if (changedMons && (save instanceof G2SAV || save instanceof G1SAV)) {
-          const gen12LookupString = changedMons
-            .map((mon, i) => {
-              if (!mon) return '';
-              const gen12Identifier = getMonGen12Identifier(mon);
-              const homeIdentifier = getMonFileIdentifier(mon);
-              console.log(gen12Identifier, homeIdentifier);
-              if (!gen12Identifier || !homeIdentifier) return '';
-              return gen12Identifier + ',' + homeIdentifier + '\n';
-            })
-            .join('');
-          window.electron.ipcRenderer.sendMessage(
-            'write-gen12-lookup',
-            gen12LookupString
-          );
+          updateGen12LookupTable(changedMons);
+        } else if (
+          changedMons &&
+          (save instanceof G3SAV || save instanceof G4SAV)
+        ) {
+          updateGen34LookupTable(changedMons);
         }
         window.electron.ipcRenderer.sendMessage('write-save-file', {
           path: save.filePath,
@@ -395,38 +398,36 @@ const Home = () => {
           case SaveType.GS_I:
           case SaveType.C_I:
             readGen12Lookup((gen12LookupMap) => {
-              console.log('lookup map', gen12LookupMap);
-              const newSave = buildSaveFile(
-                path,
-                fileBytes,
-                saveType,
+              const newSave = buildSaveFile(path, fileBytes, saveType, {
                 homeMonMap,
-                gen12LookupMap
-              );
-              const newSaves: [
-                SAV | undefined,
-                SAV | undefined,
-                SAV | undefined,
-                SAV | undefined
-              ] = [saves[0], saves[1], saves[2], saves[3]];
+                gen12LookupMap,
+              });
+              const newSaves: SaveArray = [...saves];
+              newSaves[saveIndex] = newSave;
+              setSaves(newSaves);
+            });
+          case SaveType.RS:
+          case SaveType.E:
+          case SaveType.FRLG:
+          case SaveType.DP:
+          case SaveType.Pt:
+          case SaveType.HGSS:
+            readGen34Lookup((gen34LookupMap) => {
+              const newSave = buildSaveFile(path, fileBytes, saveType, {
+                homeMonMap,
+                gen34LookupMap,
+              });
+              const newSaves: SaveArray = [...saves];
               newSaves[saveIndex] = newSave;
               setSaves(newSaves);
             });
           case SaveType.UNKNOWN:
             return;
           default:
-            const newSave = buildSaveFile(
-              path,
-              fileBytes,
-              saveType,
-              homeMonMap
-            );
-            const newSaves: [
-              SAV | undefined,
-              SAV | undefined,
-              SAV | undefined,
-              SAV | undefined
-            ] = [saves[0], saves[1], saves[2], saves[3]];
+            const newSave = buildSaveFile(path, fileBytes, saveType, {
+              homeMonMap,
+            });
+            const newSaves: SaveArray = [...saves];
             newSaves[saveIndex] = newSave;
             setSaves(newSaves);
         }

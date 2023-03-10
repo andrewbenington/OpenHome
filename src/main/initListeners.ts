@@ -4,7 +4,13 @@ import {
   selectFile,
   readBytesFromFile,
 } from './fileHandlers';
-import { loadGen12Lookup, registerGen12Lookup, loadOHPKMs } from './loadData';
+import {
+  loadGen12Lookup,
+  registerGen12Lookup,
+  loadOHPKMs,
+  loadGen34Lookup,
+  registerGen34Lookup,
+} from './loadData';
 import writePKMToFile, { deleteOHPKMFile } from './writePKMToFile';
 import fs from 'fs';
 
@@ -32,6 +38,23 @@ function initListeners() {
   ipcMain.on('write-gen12-lookup', async (event, gen12LookupString) => {
     console.log('write-gen12-lookup', gen12LookupString);
     registerGen12Lookup(gen12LookupString);
+  });
+
+  ipcMain.on('read-gen34-lookup', async (event) => {
+    console.log('read-gen34-lookup');
+    const appDataPath = app.getPath('appData');
+    let lookupMap;
+    try {
+      lookupMap = loadGen34Lookup();
+    } catch (e) {
+      console.log('no gen34 lookup file');
+    }
+    event.reply('gen34-lookup-read', lookupMap);
+  });
+
+  ipcMain.on('write-gen34-lookup', async (event, gen34LookupString) => {
+    console.log('write-gen34-lookup', gen34LookupString);
+    registerGen34Lookup(gen34LookupString);
   });
 
   ipcMain.on('read-home-data', async (event) => {

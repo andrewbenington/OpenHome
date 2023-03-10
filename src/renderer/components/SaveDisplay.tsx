@@ -3,7 +3,6 @@ import { Button, Card, Grid } from '@mui/material';
 import _ from 'lodash';
 import { useEffect, useState } from 'react';
 import { SaveCoordinates } from 'renderer/Home';
-import { getGameLogo } from 'renderer/util/PokemonSprite';
 import { PKM } from '../../types/PKM/PKM';
 import { BoxCoordinates, SAV } from '../../types/SAV/SAV';
 import ArrowButton from './buttons/ArrowButton';
@@ -122,11 +121,12 @@ const SaveDisplay = (props: SaveDisplayProps) => {
                         >
                           <PokemonButton
                             onClick={() => {
-                              if (!mon || mon instanceof save.pkmType) {
-                                setSelectedMon(mon);
-                              } else {
-                                setSelectedMon(new save.pkmType(mon));
-                              }
+                              setSelectedMon(mon);
+                              // if (!mon || mon instanceof save.pkmType) {
+                              //   setSelectedMon(mon);
+                              // } else {
+                              //   setSelectedMon(new save.pkmType(mon));
+                              // }
                             }}
                             onDragEvent={(cancelled: boolean) => {
                               console.log(

@@ -4,6 +4,7 @@ import { bytesToPKM } from 'util/FileImport';
 import { TextDecoder, TextEncoder } from 'node:util'; // (ESM style imports)
 import { PK4 } from '../PK4';
 import OHPKM from '../OHPKM';
+import { getMonGen34Identifier } from '../../../util/Lookup';
 
 (global as any).TextDecoder = TextDecoder;
 
@@ -38,11 +39,12 @@ const typhlosionGen4 = bytesToPKM(
 
 const slowpokeGen7 = bytesToPKM(
   new Uint8Array(
-    fs.readFileSync(path.join(__dirname, './PKMFiles/Gen7', 'slowpoke-shiny.pk7'))
+    fs.readFileSync(
+      path.join(__dirname, './PKMFiles/Gen7', 'slowpoke-shiny.pk7')
+    )
   ),
   'PK7'
 );
-
 
 test('gen 4 EVs are updated', () => {
   const gen4pkm = new PK4(mightyenaOH);
@@ -109,8 +111,15 @@ test('gen 4 contest stats are updated', () => {
 test('gen 4 conversion to OHPKM and back is lossless', () => {
   const ohPKM = new OHPKM(typhlosionGen4);
   // gaining cool contest points
-  const gen4PKM = new PK4(ohPKM)
-  expect(typhlosionGen4.bytes).toEqual(gen4PKM.bytes)
+  const gen4PKM = new PK4(ohPKM);
+  expect(typhlosionGen4.bytes).toEqual(gen4PKM.bytes);
+});
+
+test('pk4 and ohpkm have the same gen34lookup key', () => {
+  const ohPKM = new OHPKM(typhlosionGen4);
+  expect(getMonGen34Identifier(ohPKM)).toEqual(
+    getMonGen34Identifier(typhlosionGen4)
+  );
 });
 
 test('gen 6+ nickname accuracy', () => {

@@ -97,7 +97,6 @@ class OHPKM extends PKM {
           this.personalityValue = this.personalityValue ^ 0x10000000;
         }
       }
-      console.log(this.personalityValue, other.personalityValue)
       this.encryptionConstant =
         other.encryptionConstant ??
         other.personalityValue ??

@@ -21,6 +21,22 @@ export const readGen12Lookup = async (
   window.electron.ipcRenderer.sendMessage('read-gen12-lookup');
 };
 
+export const readGen34Lookup = async (
+  callback: (map: { [key: string]: string } | undefined) => void
+) => {
+  window.electron.ipcRenderer.once(
+    'gen34-lookup-read',
+    (lookupMap: { [key: string]: string } | undefined) => {
+      if (!lookupMap) {
+        callback(undefined);
+        return;
+      }
+      callback(lookupMap);
+    }
+  );
+  window.electron.ipcRenderer.sendMessage('read-gen34-lookup');
+};
+
 export const handleMenuSave = (onSave: () => void) => {
   return window.electron.ipcRenderer.on('save', () => {
     onSave();

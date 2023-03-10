@@ -2,6 +2,7 @@ import fs from 'fs';
 import { TextDecoder } from 'node:util'; // (ESM style imports)
 import path from 'path';
 import { bytesToPKM } from 'util/FileImport';
+import { getMonGen34Identifier } from 'util/Lookup';
 import OHPKM from '../OHPKM';
 import { PK3 } from '../PK3';
 
@@ -110,6 +111,13 @@ test('gen 3 conversion to OHPKM and back is lossless', () => {
   // gaining cool contest points
   const gen3PKM = new PK3(ohPKM)
   expect(blazikenGen3.bytes).toEqual(gen3PKM.bytes)
+});
+
+test('pk3 and ohpkm have the same gen34lookup key', () => {
+  const ohPKM = new OHPKM(blazikenGen3);
+  expect(getMonGen34Identifier(ohPKM)).toEqual(
+    getMonGen34Identifier(blazikenGen3)
+  );
 });
 
 test('gen 6+ nickname accuracy', () => {

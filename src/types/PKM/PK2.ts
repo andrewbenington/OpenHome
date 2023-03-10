@@ -314,7 +314,6 @@ export class PK2 extends PKM {
       }
       this.metTimeOfDay = other.metTimeOfDay;
       this.trainerGender = other.trainerGender;
-      console.log(other);
       this.gameOfOrigin = GameOfOrigin.Crystal;
     } else {
       super(new Uint8Array());

@@ -5,7 +5,7 @@ import Themes from 'renderer/Themes';
 import { POKEMON_DATA } from '../../consts/Mons';
 import Types from '../../consts/Types';
 import { PKM } from '../../types/PKM/PKM';
-import { getMonFileIdentifier, getTypes } from '../../types/PKM/util';
+import { getTypes } from '../../types/PKM/util';
 import AttributeRow from './AttributeRow';
 import OpenHomeButton from './buttons/OpenHomeButton';
 import OtherDisplay from './OtherDisplay';
@@ -202,9 +202,6 @@ const PokemonDisplay = (props: {
                     .join('')}`}</code>
                 );
               })}
-              <code>{getMonFileIdentifier(mon)}</code>
-              <code>TID: {mon.trainerID}</code>
-              <code>SID: {mon.secretID}</code>
             </div>
           )}
         </div>
