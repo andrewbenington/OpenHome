@@ -61,6 +61,7 @@ export const buildSaveFile = (
       return saveFile;
     case SaveType.C_I:
     case SaveType.GS_I:
+      console.log(gen12LookupMap)
       saveFile = recoverOHPKMData(
         new G2SAV(filePath, fileBytes),
         getMonGen12Identifier,
@@ -170,7 +171,7 @@ export const getSaveType = (bytes: Uint8Array): SaveType => {
 const recoverOHPKMData = (
   saveFile: SAV,
   getIdentifier: (mon: PKM) => string | undefined,
-  homeMonMap?: { [key: string]: PKM },
+  homeMonMap?: { [key: string]: OHPKM },
   lookupMap?: { [key: string]: string }
 ) => {
   if (!homeMonMap || !lookupMap || !getIdentifier) return saveFile;
@@ -188,6 +189,8 @@ const recoverOHPKMData = (
           (entry) => entry[0] === homeIdentifier
         );
         if (result) {
+          let updatedOHPKM = result[1]
+          updatedOHPKM.updateData(mon)
           box.pokemon[monIndex] = result[1];
         }
       }
