@@ -539,7 +539,7 @@
         "isBattleOnly": false,
         "alias": "caterpie",
         "types": ["Bug"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 45,
           "atk": 30,
@@ -581,7 +581,7 @@
         "isBattleOnly": false,
         "alias": "metapod",
         "types": ["Bug"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 50,
           "atk": 20,
@@ -623,7 +623,7 @@
         "isBattleOnly": false,
         "alias": "butterfree",
         "types": ["Bug", "Flying"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 60,
           "atk": 45,
@@ -666,7 +666,7 @@
         "isBattleOnly": false,
         "alias": "weedle",
         "types": ["Bug", "Poison"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 40,
           "atk": 35,
@@ -708,7 +708,7 @@
         "isBattleOnly": false,
         "alias": "kakuna",
         "types": ["Bug", "Poison"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 45,
           "atk": 25,
@@ -750,7 +750,7 @@
         "isBattleOnly": false,
         "alias": "beedrill",
         "types": ["Bug", "Poison"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 65,
           "atk": 90,
@@ -786,7 +786,7 @@
         "isBattleOnly": true,
         "alias": "beedrillmega",
         "types": ["Bug", "Poison"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 65,
           "atk": 150,
@@ -827,7 +827,7 @@
         "isBattleOnly": false,
         "alias": "pidgey",
         "types": ["Normal", "Flying"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 40,
           "atk": 45,
@@ -870,7 +870,7 @@
         "isBattleOnly": false,
         "alias": "pidgeotto",
         "types": ["Normal", "Flying"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 63,
           "atk": 60,
@@ -914,7 +914,7 @@
         "isBattleOnly": false,
         "alias": "pidgeot",
         "types": ["Normal", "Flying"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 83,
           "atk": 80,
@@ -951,7 +951,7 @@
         "isBattleOnly": true,
         "alias": "pidgeotmega",
         "types": ["Normal", "Flying"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 83,
           "atk": 80,
@@ -992,7 +992,7 @@
         "isBattleOnly": false,
         "alias": "rattata",
         "types": ["Normal"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 30,
           "atk": 56,
@@ -1029,7 +1029,7 @@
         "regional": "Alola",
         "alias": "rattataalola",
         "types": ["Dark", "Normal"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 30,
           "atk": 56,
@@ -1072,7 +1072,7 @@
         "isBattleOnly": false,
         "alias": "raticate",
         "types": ["Normal"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 55,
           "atk": 81,
@@ -1110,7 +1110,7 @@
         "regional": "Alola",
         "alias": "raticatealola",
         "types": ["Dark", "Normal"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 75,
           "atk": 71,
@@ -1148,7 +1148,7 @@
         "regional": "Alola",
         "alias": "raticatealolatotem",
         "types": ["Dark", "Normal"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 75,
           "atk": 71,
@@ -1189,7 +1189,7 @@
         "isBattleOnly": false,
         "alias": "spearow",
         "types": ["Normal", "Flying"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 40,
           "atk": 60,
@@ -1231,7 +1231,7 @@
         "isBattleOnly": false,
         "alias": "fearow",
         "types": ["Normal", "Flying"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 65,
           "atk": 90,
@@ -1274,7 +1274,7 @@
         "isBattleOnly": false,
         "alias": "ekans",
         "types": ["Poison"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 35,
           "atk": 60,
@@ -1317,7 +1317,7 @@
         "isBattleOnly": false,
         "alias": "arbok",
         "types": ["Poison"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 60,
           "atk": 95,
@@ -1402,7 +1402,7 @@
         "isBattleOnly": false,
         "alias": "pikachuoriginal",
         "types": ["Electric"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 35,
           "atk": 55,
@@ -1437,7 +1437,7 @@
         "isBattleOnly": false,
         "alias": "pikachuhoenn",
         "types": ["Electric"],
-        "genderRatio": { "M": 1.0, "F": 0.0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 35,
           "atk": 55,
@@ -1474,7 +1474,7 @@
         "isBattleOnly": false,
         "alias": "pikachusinnoh",
         "types": ["Electric"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 35,
           "atk": 55,
@@ -1509,7 +1509,7 @@
         "isBattleOnly": false,
         "alias": "pikachuunova",
         "types": ["Electric"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 35,
           "atk": 55,
@@ -1544,7 +1544,7 @@
         "isBattleOnly": false,
         "alias": "pikachukalos",
         "types": ["Electric"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 35,
           "atk": 55,
@@ -1579,7 +1579,7 @@
         "isBattleOnly": false,
         "alias": "pikachualola",
         "types": ["Electric"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 35,
           "atk": 55,
@@ -1614,7 +1614,7 @@
         "isBattleOnly": false,
         "alias": "pikachupartner",
         "types": ["Electric"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 35,
           "atk": 55,
@@ -1650,7 +1650,7 @@
         "regional": "Alola",
         "alias": "pikachustarter",
         "types": ["Electric"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 35,
           "atk": 55,
@@ -1685,7 +1685,7 @@
         "isBattleOnly": false,
         "alias": "pikachuworld",
         "types": ["Electric"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 35,
           "atk": 55,
@@ -1810,7 +1810,7 @@
         "isBattleOnly": false,
         "alias": "sandshrew",
         "types": ["Ground"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 50,
           "atk": 75,
@@ -1846,7 +1846,7 @@
         "regional": "Alola",
         "alias": "sandshrewalola",
         "types": ["Ice", "Steel"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 50,
           "atk": 75,
@@ -1888,7 +1888,7 @@
         "isBattleOnly": false,
         "alias": "sandslash",
         "types": ["Ground"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 75,
           "atk": 100,
@@ -1925,7 +1925,7 @@
         "regional": "Alola",
         "alias": "sandslashalola",
         "types": ["Ice", "Steel"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 75,
           "atk": 100,
@@ -1968,7 +1968,7 @@
         "isBattleOnly": false,
         "alias": "nidoranf",
         "types": ["Poison"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
           "hp": 55,
           "atk": 47,
@@ -2011,7 +2011,7 @@
         "isBattleOnly": false,
         "alias": "nidorina",
         "types": ["Poison"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
           "hp": 70,
           "atk": 62,
@@ -2055,7 +2055,7 @@
         "isBattleOnly": false,
         "alias": "nidoqueen",
         "types": ["Poison", "Ground"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
           "hp": 90,
           "atk": 92,
@@ -2568,7 +2568,7 @@
         "isBattleOnly": false,
         "alias": "zubat",
         "types": ["Poison", "Flying"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 40,
           "atk": 45,
@@ -2610,7 +2610,7 @@
         "isBattleOnly": false,
         "alias": "golbat",
         "types": ["Poison", "Flying"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 75,
           "atk": 80,
@@ -2653,7 +2653,7 @@
         "isBattleOnly": false,
         "alias": "oddish",
         "types": ["Grass", "Poison"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 45,
           "atk": 50,
@@ -2695,7 +2695,7 @@
         "isBattleOnly": false,
         "alias": "gloom",
         "types": ["Grass", "Poison"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 60,
           "atk": 65,
@@ -2741,7 +2741,7 @@
         "isBattleOnly": false,
         "alias": "vileplume",
         "types": ["Grass", "Poison"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 75,
           "atk": 80,
@@ -2784,7 +2784,7 @@
         "isBattleOnly": false,
         "alias": "paras",
         "types": ["Bug", "Grass"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 35,
           "atk": 70,
@@ -2827,7 +2827,7 @@
         "isBattleOnly": false,
         "alias": "parasect",
         "types": ["Bug", "Grass"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 60,
           "atk": 95,
@@ -3693,7 +3693,7 @@
         "isBattleOnly": false,
         "alias": "poliwag",
         "types": ["Water"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 40,
           "atk": 50,
@@ -3736,7 +3736,7 @@
         "isBattleOnly": false,
         "alias": "poliwhirl",
         "types": ["Water"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 65,
           "atk": 65,
@@ -3783,7 +3783,7 @@
         "isBattleOnly": false,
         "alias": "poliwrath",
         "types": ["Water", "Fighting"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 90,
           "atk": 95,
@@ -4123,7 +4123,7 @@
         "isBattleOnly": false,
         "alias": "bellsprout",
         "types": ["Grass", "Poison"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 50,
           "atk": 75,
@@ -4165,7 +4165,7 @@
         "isBattleOnly": false,
         "alias": "weepinbell",
         "types": ["Grass", "Poison"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 65,
           "atk": 90,
@@ -4208,7 +4208,7 @@
         "isBattleOnly": false,
         "alias": "victreebel",
         "types": ["Grass", "Poison"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 80,
           "atk": 105,
@@ -4251,7 +4251,7 @@
         "isBattleOnly": false,
         "alias": "tentacool",
         "types": ["Water", "Poison"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 40,
           "atk": 40,
@@ -4294,7 +4294,7 @@
         "isBattleOnly": false,
         "alias": "tentacruel",
         "types": ["Water", "Poison"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 80,
           "atk": 70,
@@ -4338,7 +4338,7 @@
         "isBattleOnly": false,
         "alias": "geodude",
         "types": ["Rock", "Ground"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 40,
           "atk": 80,
@@ -4375,7 +4375,7 @@
         "regional": "Alola",
         "alias": "geodudealola",
         "types": ["Rock", "Electric"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 40,
           "atk": 80,
@@ -4418,7 +4418,7 @@
         "isBattleOnly": false,
         "alias": "graveler",
         "types": ["Rock", "Ground"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 55,
           "atk": 95,
@@ -4456,7 +4456,7 @@
         "regional": "Alola",
         "alias": "graveleralola",
         "types": ["Rock", "Electric"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 55,
           "atk": 95,
@@ -4500,7 +4500,7 @@
         "isBattleOnly": false,
         "alias": "golem",
         "types": ["Rock", "Ground"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 80,
           "atk": 120,
@@ -4538,7 +4538,7 @@
         "regional": "Alola",
         "alias": "golemalola",
         "types": ["Rock", "Electric"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 80,
           "atk": 120,
@@ -4582,7 +4582,7 @@
         "isBattleOnly": false,
         "alias": "ponyta",
         "types": ["Fire"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 50,
           "atk": 85,
@@ -4619,7 +4619,7 @@
         "regional": "Galar",
         "alias": "ponytagalar",
         "types": ["Psychic"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 50,
           "atk": 85,
@@ -4662,7 +4662,7 @@
         "isBattleOnly": false,
         "alias": "rapidash",
         "types": ["Fire"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 65,
           "atk": 100,
@@ -4700,7 +4700,7 @@
         "regional": "Galar",
         "alias": "rapidashgalar",
         "types": ["Psychic", "Fairy"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 65,
           "atk": 100,
@@ -4873,7 +4873,7 @@
         "isBattleOnly": true,
         "alias": "slowbromega",
         "types": ["Water", "Psychic"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 95,
           "atk": 75,
@@ -5045,7 +5045,7 @@
         "isBattleOnly": false,
         "alias": "farfetchd",
         "types": ["Normal", "Flying"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 52,
           "atk": 90,
@@ -5082,7 +5082,7 @@
         "regional": "Galar",
         "alias": "farfetchdgalar",
         "types": ["Fighting"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 52,
           "atk": 95,
@@ -5124,7 +5124,7 @@
         "isBattleOnly": false,
         "alias": "doduo",
         "types": ["Normal", "Flying"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 35,
           "atk": 85,
@@ -5167,7 +5167,7 @@
         "isBattleOnly": false,
         "alias": "dodrio",
         "types": ["Normal", "Flying"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 60,
           "atk": 110,
@@ -5211,7 +5211,7 @@
         "isBattleOnly": false,
         "alias": "seel",
         "types": ["Water"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 65,
           "atk": 45,
@@ -5254,7 +5254,7 @@
         "isBattleOnly": false,
         "alias": "dewgong",
         "types": ["Water", "Ice"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 90,
           "atk": 70,
@@ -5683,7 +5683,7 @@
         "isBattleOnly": true,
         "alias": "gengarmega",
         "types": ["Ghost", "Poison"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 60,
           "atk": 65,
@@ -5724,7 +5724,7 @@
         "isBattleOnly": false,
         "alias": "onix",
         "types": ["Rock", "Ground"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 35,
           "atk": 45,
@@ -5858,7 +5858,7 @@
         "isBattleOnly": false,
         "alias": "krabby",
         "types": ["Water"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 30,
           "atk": 105,
@@ -5901,7 +5901,7 @@
         "isBattleOnly": false,
         "alias": "kingler",
         "types": ["Water"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 55,
           "atk": 130,
@@ -6115,7 +6115,7 @@
         "isBattleOnly": false,
         "alias": "exeggcute",
         "types": ["Grass", "Psychic"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 60,
           "atk": 40,
@@ -6160,7 +6160,7 @@
         "isBattleOnly": false,
         "alias": "exeggutor",
         "types": ["Grass", "Psychic"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 95,
           "atk": 95,
@@ -6197,7 +6197,7 @@
         "regional": "Alola",
         "alias": "exeggutoralola",
         "types": ["Grass", "Dragon"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 95,
           "atk": 105,
@@ -6240,7 +6240,7 @@
         "isBattleOnly": false,
         "alias": "cubone",
         "types": ["Ground"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 50,
           "atk": 50,
@@ -6286,7 +6286,7 @@
         "isBattleOnly": false,
         "alias": "marowak",
         "types": ["Ground"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 60,
           "atk": 80,
@@ -6324,7 +6324,7 @@
         "regional": "Alola",
         "alias": "marowakalola",
         "types": ["Fire", "Ghost"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 60,
           "atk": 80,
@@ -6362,7 +6362,7 @@
         "regional": "Alola",
         "alias": "marowakalolatotem",
         "types": ["Fire", "Ghost"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 60,
           "atk": 80,
@@ -6491,7 +6491,7 @@
         "isBattleOnly": false,
         "alias": "lickitung",
         "types": ["Normal"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 90,
           "atk": 55,
@@ -6534,7 +6534,7 @@
         "isBattleOnly": false,
         "alias": "koffing",
         "types": ["Poison"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 40,
           "atk": 65,
@@ -6580,7 +6580,7 @@
         "isBattleOnly": false,
         "alias": "weezing",
         "types": ["Poison"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 65,
           "atk": 90,
@@ -6618,7 +6618,7 @@
         "regional": "Galar",
         "alias": "weezinggalar",
         "types": ["Poison", "Fairy"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 65,
           "atk": 90,
@@ -6662,7 +6662,7 @@
         "isBattleOnly": false,
         "alias": "rhyhorn",
         "types": ["Ground", "Rock"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 80,
           "atk": 85,
@@ -6705,7 +6705,7 @@
         "isBattleOnly": false,
         "alias": "rhydon",
         "types": ["Ground", "Rock"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 105,
           "atk": 130,
@@ -6749,7 +6749,7 @@
         "isBattleOnly": false,
         "alias": "chansey",
         "types": ["Normal"],
-        "genderRatio": { "M": 0, "F": 1 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
           "hp": 250,
           "atk": 5,
@@ -6795,7 +6795,7 @@
         "isBattleOnly": false,
         "alias": "tangela",
         "types": ["Grass"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 65,
           "atk": 55,
@@ -6838,7 +6838,7 @@
         "isBattleOnly": false,
         "alias": "kangaskhan",
         "types": ["Normal"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
           "hp": 105,
           "atk": 95,
@@ -6874,7 +6874,7 @@
         "isBattleOnly": true,
         "alias": "kangaskhanmega",
         "types": ["Normal"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
           "hp": 105,
           "atk": 125,
@@ -6915,7 +6915,7 @@
         "isBattleOnly": false,
         "alias": "horsea",
         "types": ["Water"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 30,
           "atk": 40,
@@ -6958,7 +6958,7 @@
         "isBattleOnly": false,
         "alias": "seadra",
         "types": ["Water"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 55,
           "atk": 65,
@@ -7002,7 +7002,7 @@
         "isBattleOnly": false,
         "alias": "goldeen",
         "types": ["Water"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 45,
           "atk": 67,
@@ -7045,7 +7045,7 @@
         "isBattleOnly": false,
         "alias": "seaking",
         "types": ["Water"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 80,
           "atk": 92,
@@ -7176,7 +7176,7 @@
         "isBattleOnly": false,
         "alias": "mrmime",
         "types": ["Psychic", "Fairy"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 40,
           "atk": 45,
@@ -7214,7 +7214,7 @@
         "regional": "Galar",
         "alias": "mrmimegalar",
         "types": ["Ice", "Psychic"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 50,
           "atk": 65,
@@ -7306,7 +7306,7 @@
         "isBattleOnly": false,
         "alias": "jynx",
         "types": ["Ice", "Psychic"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
           "hp": 65,
           "atk": 50,
@@ -7436,7 +7436,7 @@
         "isBattleOnly": false,
         "alias": "pinsir",
         "types": ["Bug"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 65,
           "atk": 125,
@@ -7472,7 +7472,7 @@
         "isBattleOnly": true,
         "alias": "pinsirmega",
         "types": ["Bug", "Flying"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 65,
           "atk": 155,
@@ -7757,7 +7757,7 @@
         "isBattleOnly": true,
         "alias": "gyaradosmega",
         "types": ["Water", "Dark"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 95,
           "atk": 155,
@@ -7798,7 +7798,7 @@
         "isBattleOnly": false,
         "alias": "lapras",
         "types": ["Water", "Ice"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 130,
           "atk": 85,
@@ -9412,7 +9412,7 @@
         "isBattleOnly": false,
         "alias": "sentret",
         "types": ["Normal"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 35,
           "atk": 46,
@@ -9455,7 +9455,7 @@
         "isBattleOnly": false,
         "alias": "furret",
         "types": ["Normal"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 85,
           "atk": 76,
@@ -9499,7 +9499,7 @@
         "isBattleOnly": false,
         "alias": "hoothoot",
         "types": ["Normal", "Flying"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 60,
           "atk": 30,
@@ -9542,7 +9542,7 @@
         "isBattleOnly": false,
         "alias": "noctowl",
         "types": ["Normal", "Flying"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 100,
           "atk": 50,
@@ -9586,7 +9586,7 @@
         "isBattleOnly": false,
         "alias": "ledyba",
         "types": ["Bug", "Flying"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 40,
           "atk": 20,
@@ -9629,7 +9629,7 @@
         "isBattleOnly": false,
         "alias": "ledian",
         "types": ["Bug", "Flying"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 55,
           "atk": 35,
@@ -9673,7 +9673,7 @@
         "isBattleOnly": false,
         "alias": "spinarak",
         "types": ["Bug", "Poison"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 40,
           "atk": 60,
@@ -9716,7 +9716,7 @@
         "isBattleOnly": false,
         "alias": "ariados",
         "types": ["Bug", "Poison"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 70,
           "atk": 90,
@@ -9760,7 +9760,7 @@
         "isBattleOnly": false,
         "alias": "crobat",
         "types": ["Poison", "Flying"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 85,
           "atk": 90,
@@ -9803,7 +9803,7 @@
         "isBattleOnly": false,
         "alias": "chinchou",
         "types": ["Water", "Electric"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 75,
           "atk": 38,
@@ -9846,7 +9846,7 @@
         "isBattleOnly": false,
         "alias": "lanturn",
         "types": ["Water", "Electric"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 125,
           "atk": 58,
@@ -9927,7 +9927,7 @@
         "isBattleOnly": false,
         "alias": "pichuspikyeared",
         "types": ["Electric"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 20,
           "atk": 40,
@@ -10143,7 +10143,7 @@
         "isBattleOnly": false,
         "alias": "natu",
         "types": ["Psychic", "Flying"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 40,
           "atk": 50,
@@ -10186,7 +10186,7 @@
         "isBattleOnly": false,
         "alias": "xatu",
         "types": ["Psychic", "Flying"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 65,
           "atk": 75,
@@ -10357,7 +10357,7 @@
         "isBattleOnly": true,
         "alias": "ampharosmega",
         "types": ["Electric", "Dragon"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 90,
           "atk": 95,
@@ -10398,7 +10398,7 @@
         "isBattleOnly": false,
         "alias": "bellossom",
         "types": ["Grass"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 75,
           "atk": 80,
@@ -10579,7 +10579,7 @@
         "isBattleOnly": false,
         "alias": "politoed",
         "types": ["Water"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 90,
           "atk": 75,
@@ -10760,7 +10760,7 @@
         "isBattleOnly": false,
         "alias": "aipom",
         "types": ["Normal"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 55,
           "atk": 70,
@@ -10894,7 +10894,7 @@
         "isBattleOnly": false,
         "alias": "yanma",
         "types": ["Bug", "Flying"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 65,
           "atk": 65,
@@ -12290,7 +12290,7 @@
         "isBattleOnly": false,
         "alias": "wobbuffet",
         "types": ["Psychic"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 190,
           "atk": 33,
@@ -12515,7 +12515,7 @@
         "isBattleOnly": false,
         "alias": "gligar",
         "types": ["Ground", "Flying"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 65,
           "atk": 75,
@@ -12558,7 +12558,7 @@
         "isBattleOnly": false,
         "alias": "steelix",
         "types": ["Steel", "Ground"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 75,
           "atk": 85,
@@ -12595,7 +12595,7 @@
         "isBattleOnly": true,
         "alias": "steelixmega",
         "types": ["Steel", "Ground"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 75,
           "atk": 125,
@@ -12846,7 +12846,7 @@
         "isBattleOnly": true,
         "alias": "scizormega",
         "types": ["Bug", "Steel"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 70,
           "atk": 150,
@@ -12887,7 +12887,7 @@
         "isBattleOnly": false,
         "alias": "shuckle",
         "types": ["Bug", "Rock"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 20,
           "atk": 10,
@@ -12968,7 +12968,7 @@
         "isBattleOnly": true,
         "alias": "heracrossmega",
         "types": ["Bug", "Fighting"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 80,
           "atk": 185,
@@ -13184,7 +13184,7 @@
         "isBattleOnly": false,
         "alias": "slugma",
         "types": ["Fire"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 40,
           "atk": 40,
@@ -13227,7 +13227,7 @@
         "isBattleOnly": false,
         "alias": "magcargo",
         "types": ["Fire", "Rock"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 60,
           "atk": 50,
@@ -13271,7 +13271,7 @@
         "isBattleOnly": false,
         "alias": "swinub",
         "types": ["Ice", "Ground"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 50,
           "atk": 50,
@@ -13314,7 +13314,7 @@
         "isBattleOnly": false,
         "alias": "piloswine",
         "types": ["Ice", "Ground"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 100,
           "atk": 100,
@@ -13437,7 +13437,7 @@
         "isBattleOnly": false,
         "alias": "remoraid",
         "types": ["Water"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 35,
           "atk": 65,
@@ -13480,7 +13480,7 @@
         "isBattleOnly": false,
         "alias": "octillery",
         "types": ["Water"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 75,
           "atk": 105,
@@ -13569,7 +13569,7 @@
         "isBattleOnly": false,
         "alias": "mantine",
         "types": ["Water", "Flying"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 85,
           "atk": 40,
@@ -13613,7 +13613,7 @@
         "isBattleOnly": false,
         "alias": "skarmory",
         "types": ["Steel", "Flying"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 65,
           "atk": 80,
@@ -13740,7 +13740,7 @@
         "isBattleOnly": true,
         "alias": "houndoommega",
         "types": ["Dark", "Fire"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 75,
           "atk": 90,
@@ -13781,7 +13781,7 @@
         "isBattleOnly": false,
         "alias": "kingdra",
         "types": ["Water", "Dragon"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 75,
           "atk": 95,
@@ -14003,7 +14003,7 @@
         "isBattleOnly": false,
         "alias": "smeargle",
         "types": ["Normal"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 55,
           "atk": 20,
@@ -14137,7 +14137,7 @@
         "isBattleOnly": false,
         "alias": "smoochum",
         "types": ["Ice", "Psychic"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
           "hp": 45,
           "atk": 30,
@@ -14264,7 +14264,7 @@
         "isBattleOnly": false,
         "alias": "miltank",
         "types": ["Normal"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
           "hp": 95,
           "atk": 80,
@@ -14307,7 +14307,7 @@
         "isBattleOnly": false,
         "alias": "blissey",
         "types": ["Normal"],
-        "genderRatio": { "M": 0, "F": 1 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
           "hp": 255,
           "atk": 10,
@@ -14605,7 +14605,7 @@
         "isBattleOnly": true,
         "alias": "tyranitarmega",
         "types": ["Rock", "Dark"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 100,
           "atk": 164,
@@ -15257,7 +15257,7 @@
         "isBattleOnly": false,
         "alias": "poochyena",
         "types": ["Dark"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 35,
           "atk": 55,
@@ -15300,7 +15300,7 @@
         "isBattleOnly": false,
         "alias": "mightyena",
         "types": ["Dark"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 70,
           "atk": 90,
@@ -15344,7 +15344,7 @@
         "isBattleOnly": false,
         "alias": "zigzagoon",
         "types": ["Normal"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 38,
           "atk": 30,
@@ -15381,7 +15381,7 @@
         "regional": "Galar",
         "alias": "zigzagoongalar",
         "types": ["Dark", "Normal"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 38,
           "atk": 30,
@@ -15424,7 +15424,7 @@
         "isBattleOnly": false,
         "alias": "linoone",
         "types": ["Normal"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 78,
           "atk": 70,
@@ -15462,7 +15462,7 @@
         "regional": "Galar",
         "alias": "linoonegalar",
         "types": ["Dark", "Normal"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 78,
           "atk": 70,
@@ -15506,7 +15506,7 @@
         "isBattleOnly": false,
         "alias": "wurmple",
         "types": ["Bug"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 45,
           "atk": 45,
@@ -15551,7 +15551,7 @@
         "isBattleOnly": false,
         "alias": "silcoon",
         "types": ["Bug"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 50,
           "atk": 35,
@@ -15593,7 +15593,7 @@
         "isBattleOnly": false,
         "alias": "beautifly",
         "types": ["Bug", "Flying"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 60,
           "atk": 70,
@@ -15636,7 +15636,7 @@
         "isBattleOnly": false,
         "alias": "cascoon",
         "types": ["Bug"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 50,
           "atk": 35,
@@ -15678,7 +15678,7 @@
         "isBattleOnly": false,
         "alias": "dustox",
         "types": ["Bug", "Poison"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 60,
           "atk": 50,
@@ -15721,7 +15721,7 @@
         "isBattleOnly": false,
         "alias": "lotad",
         "types": ["Water", "Grass"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 40,
           "atk": 30,
@@ -15764,7 +15764,7 @@
         "isBattleOnly": false,
         "alias": "lombre",
         "types": ["Water", "Grass"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 60,
           "atk": 50,
@@ -15808,7 +15808,7 @@
         "isBattleOnly": false,
         "alias": "ludicolo",
         "types": ["Water", "Grass"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 80,
           "atk": 70,
@@ -15852,7 +15852,7 @@
         "isBattleOnly": false,
         "alias": "seedot",
         "types": ["Grass"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 40,
           "atk": 40,
@@ -15895,7 +15895,7 @@
         "isBattleOnly": false,
         "alias": "nuzleaf",
         "types": ["Grass", "Dark"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 70,
           "atk": 70,
@@ -15939,7 +15939,7 @@
         "isBattleOnly": false,
         "alias": "shiftry",
         "types": ["Grass", "Dark"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 90,
           "atk": 100,
@@ -15983,7 +15983,7 @@
         "isBattleOnly": false,
         "alias": "taillow",
         "types": ["Normal", "Flying"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 40,
           "atk": 55,
@@ -16025,7 +16025,7 @@
         "isBattleOnly": false,
         "alias": "swellow",
         "types": ["Normal", "Flying"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 60,
           "atk": 85,
@@ -16292,7 +16292,7 @@
         "isBattleOnly": true,
         "alias": "gardevoirmega",
         "types": ["Psychic", "Fairy"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 68,
           "atk": 85,
@@ -16644,7 +16644,7 @@
         "isBattleOnly": false,
         "alias": "nincada",
         "types": ["Bug", "Ground"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 31,
           "atk": 45,
@@ -16689,7 +16689,7 @@
         "isBattleOnly": false,
         "alias": "ninjask",
         "types": ["Bug", "Flying"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 61,
           "atk": 90,
@@ -16732,7 +16732,7 @@
         "isBattleOnly": false,
         "alias": "shedinja",
         "types": ["Bug", "Ghost"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 1,
           "atk": 90,
@@ -16774,7 +16774,7 @@
         "isBattleOnly": false,
         "alias": "whismur",
         "types": ["Normal"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 64,
           "atk": 51,
@@ -16816,7 +16816,7 @@
         "isBattleOnly": false,
         "alias": "loudred",
         "types": ["Normal"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 84,
           "atk": 71,
@@ -16859,7 +16859,7 @@
         "isBattleOnly": false,
         "alias": "exploud",
         "types": ["Normal"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 104,
           "atk": 91,
@@ -17038,7 +17038,7 @@
         "isBattleOnly": false,
         "alias": "nosepass",
         "types": ["Rock"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 30,
           "atk": 45,
@@ -17206,7 +17206,7 @@
         "isBattleOnly": true,
         "alias": "sableyemega",
         "types": ["Dark", "Ghost"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 50,
           "atk": 85,
@@ -17247,7 +17247,7 @@
         "isBattleOnly": false,
         "alias": "mawile",
         "types": ["Steel", "Fairy"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 50,
           "atk": 85,
@@ -17283,7 +17283,7 @@
         "isBattleOnly": true,
         "alias": "mawilemega",
         "types": ["Steel", "Fairy"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 50,
           "atk": 105,
@@ -17324,7 +17324,7 @@
         "isBattleOnly": false,
         "alias": "aron",
         "types": ["Steel", "Rock"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 50,
           "atk": 70,
@@ -17367,7 +17367,7 @@
         "isBattleOnly": false,
         "alias": "lairon",
         "types": ["Steel", "Rock"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 60,
           "atk": 90,
@@ -17411,7 +17411,7 @@
         "isBattleOnly": false,
         "alias": "aggron",
         "types": ["Steel", "Rock"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 70,
           "atk": 110,
@@ -17448,7 +17448,7 @@
         "isBattleOnly": true,
         "alias": "aggronmega",
         "types": ["Steel"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 70,
           "atk": 140,
@@ -17571,7 +17571,7 @@
         "isBattleOnly": true,
         "alias": "medichammega",
         "types": ["Fighting", "Psychic"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 60,
           "atk": 100,
@@ -17612,7 +17612,7 @@
         "isBattleOnly": false,
         "alias": "electrike",
         "types": ["Electric"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 40,
           "atk": 45,
@@ -17655,7 +17655,7 @@
         "isBattleOnly": false,
         "alias": "manectric",
         "types": ["Electric"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 70,
           "atk": 75,
@@ -17692,7 +17692,7 @@
         "isBattleOnly": true,
         "alias": "manectricmega",
         "types": ["Electric"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 70,
           "atk": 75,
@@ -17733,7 +17733,7 @@
         "isBattleOnly": false,
         "alias": "plusle",
         "types": ["Electric"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 60,
           "atk": 50,
@@ -17775,7 +17775,7 @@
         "isBattleOnly": false,
         "alias": "minun",
         "types": ["Electric"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 60,
           "atk": 40,
@@ -17860,7 +17860,7 @@
         "isBattleOnly": false,
         "alias": "illumise",
         "types": ["Bug"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
           "hp": 65,
           "atk": 47,
@@ -17903,7 +17903,7 @@
         "isBattleOnly": false,
         "alias": "roselia",
         "types": ["Grass", "Poison"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 50,
           "atk": 60,
@@ -18038,7 +18038,7 @@
         "isBattleOnly": false,
         "alias": "carvanha",
         "types": ["Water", "Dark"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 45,
           "atk": 90,
@@ -18080,7 +18080,7 @@
         "isBattleOnly": false,
         "alias": "sharpedo",
         "types": ["Water", "Dark"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 70,
           "atk": 120,
@@ -18116,7 +18116,7 @@
         "isBattleOnly": true,
         "alias": "sharpedomega",
         "types": ["Water", "Dark"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 70,
           "atk": 140,
@@ -18157,7 +18157,7 @@
         "isBattleOnly": false,
         "alias": "wailmer",
         "types": ["Water"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 130,
           "atk": 70,
@@ -18200,7 +18200,7 @@
         "isBattleOnly": false,
         "alias": "wailord",
         "types": ["Water"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 170,
           "atk": 90,
@@ -18328,7 +18328,7 @@
         "isBattleOnly": true,
         "alias": "cameruptmega",
         "types": ["Fire", "Ground"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 70,
           "atk": 120,
@@ -18505,7 +18505,7 @@
         "isBattleOnly": false,
         "alias": "spinda",
         "types": ["Normal"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 60,
           "atk": 60,
@@ -18548,7 +18548,7 @@
         "isBattleOnly": false,
         "alias": "trapinch",
         "types": ["Ground"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 45,
           "atk": 100,
@@ -18591,7 +18591,7 @@
         "isBattleOnly": false,
         "alias": "vibrava",
         "types": ["Ground", "Dragon"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 50,
           "atk": 70,
@@ -18633,7 +18633,7 @@
         "isBattleOnly": false,
         "alias": "flygon",
         "types": ["Ground", "Dragon"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 80,
           "atk": 100,
@@ -18846,7 +18846,7 @@
         "isBattleOnly": true,
         "alias": "altariamega",
         "types": ["Dragon", "Fairy"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 75,
           "atk": 110,
@@ -19148,7 +19148,7 @@
         "isBattleOnly": false,
         "alias": "corphish",
         "types": ["Water"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 43,
           "atk": 80,
@@ -19191,7 +19191,7 @@
         "isBattleOnly": false,
         "alias": "crawdaunt",
         "types": ["Water", "Dark"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 63,
           "atk": 120,
@@ -19488,7 +19488,7 @@
         "isBattleOnly": false,
         "alias": "feebas",
         "types": ["Water"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 20,
           "atk": 15,
@@ -19531,7 +19531,7 @@
         "isBattleOnly": false,
         "alias": "milotic",
         "types": ["Water"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 95,
           "atk": 60,
@@ -19575,7 +19575,7 @@
         "isBattleOnly": false,
         "alias": "castform",
         "types": ["Normal"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 70,
           "atk": 70,
@@ -19609,7 +19609,7 @@
         "isBattleOnly": "Castform",
         "alias": "castformsunny",
         "types": ["Fire"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 70,
           "atk": 70,
@@ -19643,7 +19643,7 @@
         "isBattleOnly": "Castform",
         "alias": "castformrainy",
         "types": ["Water"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 70,
           "atk": 70,
@@ -19677,7 +19677,7 @@
         "isBattleOnly": "Castform",
         "alias": "castformsnowy",
         "types": ["Ice"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 70,
           "atk": 70,
@@ -19718,7 +19718,7 @@
         "isBattleOnly": false,
         "alias": "kecleon",
         "types": ["Normal"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 60,
           "atk": 90,
@@ -19844,7 +19844,7 @@
         "isBattleOnly": true,
         "alias": "banettemega",
         "types": ["Ghost"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 64,
           "atk": 165,
@@ -19885,7 +19885,7 @@
         "isBattleOnly": false,
         "alias": "duskull",
         "types": ["Ghost"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 20,
           "atk": 40,
@@ -19927,7 +19927,7 @@
         "isBattleOnly": false,
         "alias": "dusclops",
         "types": ["Ghost"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 40,
           "atk": 70,
@@ -20015,7 +20015,7 @@
         "isBattleOnly": false,
         "alias": "chimecho",
         "types": ["Psychic"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 75,
           "atk": 50,
@@ -20057,7 +20057,7 @@
         "isBattleOnly": false,
         "alias": "absol",
         "types": ["Dark"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 65,
           "atk": 130,
@@ -20093,7 +20093,7 @@
         "isBattleOnly": true,
         "alias": "absolmega",
         "types": ["Dark"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 65,
           "atk": 150,
@@ -20134,7 +20134,7 @@
         "isBattleOnly": false,
         "alias": "wynaut",
         "types": ["Psychic"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 95,
           "atk": 23,
@@ -20263,7 +20263,7 @@
         "isBattleOnly": true,
         "alias": "glaliemega",
         "types": ["Ice"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 80,
           "atk": 120,
@@ -20304,7 +20304,7 @@
         "isBattleOnly": false,
         "alias": "spheal",
         "types": ["Ice", "Water"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 70,
           "atk": 40,
@@ -20347,7 +20347,7 @@
         "isBattleOnly": false,
         "alias": "sealeo",
         "types": ["Ice", "Water"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 90,
           "atk": 60,
@@ -20391,7 +20391,7 @@
         "isBattleOnly": false,
         "alias": "walrein",
         "types": ["Ice", "Water"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 110,
           "atk": 80,
@@ -20435,7 +20435,7 @@
         "isBattleOnly": false,
         "alias": "clamperl",
         "types": ["Water"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 35,
           "atk": 64,
@@ -20480,7 +20480,7 @@
         "isBattleOnly": false,
         "alias": "huntail",
         "types": ["Water"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 55,
           "atk": 104,
@@ -20523,7 +20523,7 @@
         "isBattleOnly": false,
         "alias": "gorebyss",
         "types": ["Water"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 55,
           "atk": 84,
@@ -20780,7 +20780,7 @@
         "isBattleOnly": true,
         "alias": "salamencemega",
         "types": ["Dragon", "Flying"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 95,
           "atk": 145,
@@ -21109,7 +21109,7 @@
         "isBattleOnly": false,
         "alias": "latias",
         "types": ["Dragon", "Psychic"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
           "hp": 80,
           "atk": 80,
@@ -21143,7 +21143,7 @@
         "isBattleOnly": true,
         "alias": "latiasmega",
         "types": ["Dragon", "Psychic"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
           "hp": 80,
           "atk": 100,
@@ -22192,7 +22192,7 @@
         "isBattleOnly": false,
         "alias": "bidoof",
         "types": ["Normal"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 59,
           "atk": 45,
@@ -22235,7 +22235,7 @@
         "isBattleOnly": false,
         "alias": "bibarel",
         "types": ["Normal", "Water"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 79,
           "atk": 85,
@@ -22505,7 +22505,7 @@
         "isBattleOnly": false,
         "alias": "budew",
         "types": ["Grass", "Poison"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 40,
           "atk": 30,
@@ -22548,7 +22548,7 @@
         "isBattleOnly": false,
         "alias": "roserade",
         "types": ["Grass", "Poison"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 60,
           "atk": 70,
@@ -22762,7 +22762,7 @@
         "isBattleOnly": false,
         "alias": "burmy",
         "types": ["Bug"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 40,
           "atk": 29,
@@ -22802,7 +22802,7 @@
         "isBattleOnly": false,
         "alias": "burmysandy",
         "types": ["Bug"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 40,
           "atk": 29,
@@ -22842,7 +22842,7 @@
         "isBattleOnly": false,
         "alias": "burmytrash",
         "types": ["Bug"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 40,
           "atk": 29,
@@ -22889,7 +22889,7 @@
         "isBattleOnly": false,
         "alias": "wormadam",
         "types": ["Bug", "Grass"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
           "hp": 60,
           "atk": 59,
@@ -22925,7 +22925,7 @@
         "isBattleOnly": false,
         "alias": "wormadamsandy",
         "types": ["Bug", "Ground"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
           "hp": 60,
           "atk": 79,
@@ -22961,7 +22961,7 @@
         "isBattleOnly": false,
         "alias": "wormadamtrash",
         "types": ["Bug", "Steel"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
           "hp": 60,
           "atk": 69,
@@ -23004,7 +23004,7 @@
         "isBattleOnly": false,
         "alias": "mothim",
         "types": ["Bug", "Flying"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 70,
           "atk": 94,
@@ -23091,7 +23091,7 @@
         "isBattleOnly": false,
         "alias": "vespiquen",
         "types": ["Bug", "Flying"],
-        "genderRatio": { "M": 0, "F": 1 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
           "hp": 70,
           "atk": 80,
@@ -23270,7 +23270,7 @@
         "isBattleOnly": false,
         "alias": "cherubi",
         "types": ["Grass"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 45,
           "atk": 35,
@@ -23311,7 +23311,7 @@
         "isBattleOnly": false,
         "alias": "cherrim",
         "types": ["Grass"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 70,
           "atk": 60,
@@ -23346,7 +23346,7 @@
         "isBattleOnly": "Cherrim",
         "alias": "cherrimsunshine",
         "types": ["Grass"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 70,
           "atk": 60,
@@ -23558,7 +23558,7 @@
         "isBattleOnly": false,
         "alias": "ambipom",
         "types": ["Normal"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 75,
           "atk": 100,
@@ -23693,7 +23693,7 @@
         "isBattleOnly": false,
         "alias": "buneary",
         "types": ["Normal"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 55,
           "atk": 66,
@@ -23736,7 +23736,7 @@
         "isBattleOnly": false,
         "alias": "lopunny",
         "types": ["Normal"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 65,
           "atk": 76,
@@ -23773,7 +23773,7 @@
         "isBattleOnly": true,
         "alias": "lopunnymega",
         "types": ["Normal", "Fighting"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 65,
           "atk": 136,
@@ -23991,7 +23991,7 @@
         "isBattleOnly": false,
         "alias": "chingling",
         "types": ["Psychic"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 45,
           "atk": 30,
@@ -24259,7 +24259,7 @@
         "isBattleOnly": false,
         "alias": "mimejr",
         "types": ["Psychic", "Fairy"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 20,
           "atk": 25,
@@ -24305,7 +24305,7 @@
         "isBattleOnly": false,
         "alias": "happiny",
         "types": ["Normal"],
-        "genderRatio": { "M": 0, "F": 1 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
           "hp": 100,
           "atk": 5,
@@ -24350,7 +24350,7 @@
         "isBattleOnly": false,
         "alias": "chatot",
         "types": ["Normal", "Flying"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 76,
           "atk": 65,
@@ -24564,7 +24564,7 @@
         "isBattleOnly": true,
         "alias": "garchompmega",
         "types": ["Dragon", "Ground"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 108,
           "atk": 170,
@@ -24862,7 +24862,7 @@
         "isBattleOnly": false,
         "alias": "skorupi",
         "types": ["Poison", "Bug"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 40,
           "atk": 50,
@@ -24905,7 +24905,7 @@
         "isBattleOnly": false,
         "alias": "drapion",
         "types": ["Poison", "Dark"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 70,
           "atk": 90,
@@ -25040,7 +25040,7 @@
         "isBattleOnly": false,
         "alias": "carnivine",
         "types": ["Grass"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 74,
           "atk": 100,
@@ -25172,7 +25172,7 @@
         "isBattleOnly": false,
         "alias": "mantyke",
         "types": ["Water", "Flying"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 45,
           "atk": 20,
@@ -25297,7 +25297,7 @@
         "isBattleOnly": true,
         "alias": "abomasnowmega",
         "types": ["Grass", "Ice"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 90,
           "atk": 132,
@@ -25429,7 +25429,7 @@
         "isBattleOnly": false,
         "alias": "lickilicky",
         "types": ["Normal"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 110,
           "atk": 85,
@@ -25473,7 +25473,7 @@
         "isBattleOnly": false,
         "alias": "rhyperior",
         "types": ["Ground", "Rock"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 115,
           "atk": 140,
@@ -25517,7 +25517,7 @@
         "isBattleOnly": false,
         "alias": "tangrowth",
         "types": ["Grass"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 100,
           "atk": 100,
@@ -25691,7 +25691,7 @@
         "isBattleOnly": false,
         "alias": "yanmega",
         "types": ["Bug", "Flying"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 86,
           "atk": 76,
@@ -25825,7 +25825,7 @@
         "isBattleOnly": false,
         "alias": "gliscor",
         "types": ["Ground", "Flying"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 75,
           "atk": 95,
@@ -25869,7 +25869,7 @@
         "isBattleOnly": false,
         "alias": "mamoswine",
         "types": ["Ice", "Ground"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 110,
           "atk": 130,
@@ -25957,7 +25957,7 @@
         "isBattleOnly": false,
         "alias": "gallade",
         "types": ["Psychic", "Fighting"],
-        "genderRatio": { "M": 1.0, "F": 0.0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 68,
           "atk": 125,
@@ -26037,7 +26037,7 @@
         "isBattleOnly": false,
         "alias": "probopass",
         "types": ["Rock", "Steel"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 60,
           "atk": 55,
@@ -26081,7 +26081,7 @@
         "isBattleOnly": false,
         "alias": "dusknoir",
         "types": ["Ghost"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 45,
           "atk": 100,
@@ -26124,7 +26124,7 @@
         "isBattleOnly": false,
         "alias": "froslass",
         "types": ["Ice", "Ghost"],
-        "genderRatio": { "M": 0, "F": 1 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
           "hp": 70,
           "atk": 80,
@@ -26848,7 +26848,7 @@
         "isBattleOnly": false,
         "alias": "cresselia",
         "types": ["Psychic"],
-        "genderRatio": { "M": 0, "F": 1 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
           "hp": 120,
           "atk": 70,
@@ -28217,7 +28217,7 @@
         "isBattleOnly": false,
         "alias": "patrat",
         "types": ["Normal"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 45,
           "atk": 55,
@@ -28260,7 +28260,7 @@
         "isBattleOnly": false,
         "alias": "watchog",
         "types": ["Normal"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 60,
           "atk": 85,
@@ -28304,7 +28304,7 @@
         "isBattleOnly": false,
         "alias": "lillipup",
         "types": ["Normal"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 45,
           "atk": 60,
@@ -28347,7 +28347,7 @@
         "isBattleOnly": false,
         "alias": "herdier",
         "types": ["Normal"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 65,
           "atk": 80,
@@ -28391,7 +28391,7 @@
         "isBattleOnly": false,
         "alias": "stoutland",
         "types": ["Normal"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 85,
           "atk": 110,
@@ -28435,7 +28435,7 @@
         "isBattleOnly": false,
         "alias": "purrloin",
         "types": ["Dark"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 41,
           "atk": 50,
@@ -28478,7 +28478,7 @@
         "isBattleOnly": false,
         "alias": "liepard",
         "types": ["Dark"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 64,
           "atk": 88,
@@ -28777,7 +28777,7 @@
         "isBattleOnly": false,
         "alias": "munna",
         "types": ["Psychic"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 76,
           "atk": 25,
@@ -28820,7 +28820,7 @@
         "isBattleOnly": false,
         "alias": "musharna",
         "types": ["Psychic"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 116,
           "atk": 55,
@@ -28864,7 +28864,7 @@
         "isBattleOnly": false,
         "alias": "pidove",
         "types": ["Normal", "Flying"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 50,
           "atk": 55,
@@ -28907,7 +28907,7 @@
         "isBattleOnly": false,
         "alias": "tranquill",
         "types": ["Normal", "Flying"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 62,
           "atk": 77,
@@ -28951,7 +28951,7 @@
         "isBattleOnly": false,
         "alias": "unfezant",
         "types": ["Normal", "Flying"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 80,
           "atk": 115,
@@ -28995,7 +28995,7 @@
         "isBattleOnly": false,
         "alias": "blitzle",
         "types": ["Electric"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 45,
           "atk": 60,
@@ -29038,7 +29038,7 @@
         "isBattleOnly": false,
         "alias": "zebstrika",
         "types": ["Electric"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 75,
           "atk": 100,
@@ -29082,7 +29082,7 @@
         "isBattleOnly": false,
         "alias": "roggenrola",
         "types": ["Rock"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 55,
           "atk": 75,
@@ -29125,7 +29125,7 @@
         "isBattleOnly": false,
         "alias": "boldore",
         "types": ["Rock"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 70,
           "atk": 105,
@@ -29169,7 +29169,7 @@
         "isBattleOnly": false,
         "alias": "gigalith",
         "types": ["Rock"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 85,
           "atk": 135,
@@ -29213,7 +29213,7 @@
         "isBattleOnly": false,
         "alias": "woobat",
         "types": ["Psychic", "Flying"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 65,
           "atk": 45,
@@ -29256,7 +29256,7 @@
         "isBattleOnly": false,
         "alias": "swoobat",
         "types": ["Psychic", "Flying"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 67,
           "atk": 57,
@@ -29300,7 +29300,7 @@
         "isBattleOnly": false,
         "alias": "drilbur",
         "types": ["Ground"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 60,
           "atk": 85,
@@ -29343,7 +29343,7 @@
         "isBattleOnly": false,
         "alias": "excadrill",
         "types": ["Ground", "Steel"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 110,
           "atk": 135,
@@ -29387,7 +29387,7 @@
         "isBattleOnly": false,
         "alias": "audino",
         "types": ["Normal"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 103,
           "atk": 60,
@@ -29423,7 +29423,7 @@
         "isBattleOnly": true,
         "alias": "audinomega",
         "types": ["Normal", "Fairy"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 103,
           "atk": 60,
@@ -29595,7 +29595,7 @@
         "isBattleOnly": false,
         "alias": "tympole",
         "types": ["Water"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 50,
           "atk": 50,
@@ -29638,7 +29638,7 @@
         "isBattleOnly": false,
         "alias": "palpitoad",
         "types": ["Water", "Ground"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 75,
           "atk": 65,
@@ -29682,7 +29682,7 @@
         "isBattleOnly": false,
         "alias": "seismitoad",
         "types": ["Water", "Ground"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 105,
           "atk": 95,
@@ -29812,7 +29812,7 @@
         "isBattleOnly": false,
         "alias": "sewaddle",
         "types": ["Bug", "Grass"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 45,
           "atk": 53,
@@ -29855,7 +29855,7 @@
         "isBattleOnly": false,
         "alias": "swadloon",
         "types": ["Bug", "Grass"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 55,
           "atk": 63,
@@ -29899,7 +29899,7 @@
         "isBattleOnly": false,
         "alias": "leavanny",
         "types": ["Bug", "Grass"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 75,
           "atk": 103,
@@ -29943,7 +29943,7 @@
         "isBattleOnly": false,
         "alias": "venipede",
         "types": ["Bug", "Poison"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 30,
           "atk": 45,
@@ -29986,7 +29986,7 @@
         "isBattleOnly": false,
         "alias": "whirlipede",
         "types": ["Bug", "Poison"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 40,
           "atk": 55,
@@ -30030,7 +30030,7 @@
         "isBattleOnly": false,
         "alias": "scolipede",
         "types": ["Bug", "Poison"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 60,
           "atk": 100,
@@ -30074,7 +30074,7 @@
         "isBattleOnly": false,
         "alias": "cottonee",
         "types": ["Grass", "Fairy"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 40,
           "atk": 27,
@@ -30117,7 +30117,7 @@
         "isBattleOnly": false,
         "alias": "whimsicott",
         "types": ["Grass", "Fairy"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 60,
           "atk": 67,
@@ -30161,7 +30161,7 @@
         "isBattleOnly": false,
         "alias": "petilil",
         "types": ["Grass"],
-        "genderRatio": { "M": 0, "F": 1 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
           "hp": 45,
           "atk": 35,
@@ -30209,7 +30209,7 @@
         "isBattleOnly": false,
         "alias": "lilligant",
         "types": ["Grass"],
-        "genderRatio": { "M": 0, "F": 1 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
           "hp": 70,
           "atk": 60,
@@ -30249,7 +30249,7 @@
         "regional": "Hisui",
         "alias": "lilliganthisui",
         "types": ["Grass", "Fighting"],
-        "genderRatio": { "M": 0, "F": 1 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
           "hp": 70,
           "atk": 105,
@@ -30557,7 +30557,7 @@
         "isBattleOnly": false,
         "alias": "darumaka",
         "types": ["Fire"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 70,
           "atk": 90,
@@ -30593,7 +30593,7 @@
         "regional": "Galar",
         "alias": "darumakagalar",
         "types": ["Ice"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 70,
           "atk": 90,
@@ -30635,7 +30635,7 @@
         "isBattleOnly": false,
         "alias": "darmanitan",
         "types": ["Fire"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 105,
           "atk": 140,
@@ -30671,7 +30671,7 @@
         "isBattleOnly": "Darmanitan",
         "alias": "darmanitanzen",
         "types": ["Fire", "Psychic"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 105,
           "atk": 30,
@@ -30706,7 +30706,7 @@
         "regional": "Galar",
         "alias": "darmanitangalar",
         "types": ["Ice"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 105,
           "atk": 140,
@@ -30743,7 +30743,7 @@
         "regional": "Galar",
         "alias": "darmanitangalarzen",
         "types": ["Ice", "Fire"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 105,
           "atk": 160,
@@ -30784,7 +30784,7 @@
         "isBattleOnly": false,
         "alias": "maractus",
         "types": ["Grass"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 75,
           "atk": 86,
@@ -30827,7 +30827,7 @@
         "isBattleOnly": false,
         "alias": "dwebble",
         "types": ["Bug", "Rock"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 50,
           "atk": 65,
@@ -30870,7 +30870,7 @@
         "isBattleOnly": false,
         "alias": "crustle",
         "types": ["Bug", "Rock"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 70,
           "atk": 105,
@@ -30914,7 +30914,7 @@
         "isBattleOnly": false,
         "alias": "scraggy",
         "types": ["Dark", "Fighting"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 50,
           "atk": 75,
@@ -30957,7 +30957,7 @@
         "isBattleOnly": false,
         "alias": "scrafty",
         "types": ["Dark", "Fighting"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 65,
           "atk": 90,
@@ -31001,7 +31001,7 @@
         "isBattleOnly": false,
         "alias": "sigilyph",
         "types": ["Psychic", "Flying"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 72,
           "atk": 58,
@@ -31044,7 +31044,7 @@
         "isBattleOnly": false,
         "alias": "yamask",
         "types": ["Ghost"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 38,
           "atk": 30,
@@ -31079,7 +31079,7 @@
         "regional": "Galar",
         "alias": "yamaskgalar",
         "types": ["Ground", "Ghost"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 38,
           "atk": 55,
@@ -31120,7 +31120,7 @@
         "isBattleOnly": false,
         "alias": "cofagrigus",
         "types": ["Ghost"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 58,
           "atk": 50,
@@ -31332,7 +31332,7 @@
         "isBattleOnly": false,
         "alias": "trubbish",
         "types": ["Poison"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 50,
           "atk": 50,
@@ -31375,7 +31375,7 @@
         "isBattleOnly": false,
         "alias": "garbodor",
         "types": ["Poison"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 80,
           "atk": 95,
@@ -31805,7 +31805,7 @@
         "isBattleOnly": false,
         "alias": "solosis",
         "types": ["Psychic"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 45,
           "atk": 30,
@@ -31848,7 +31848,7 @@
         "isBattleOnly": false,
         "alias": "duosion",
         "types": ["Psychic"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 65,
           "atk": 40,
@@ -31892,7 +31892,7 @@
         "isBattleOnly": false,
         "alias": "reuniclus",
         "types": ["Psychic"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 110,
           "atk": 65,
@@ -31936,7 +31936,7 @@
         "isBattleOnly": false,
         "alias": "ducklett",
         "types": ["Water", "Flying"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 62,
           "atk": 44,
@@ -31979,7 +31979,7 @@
         "isBattleOnly": false,
         "alias": "swanna",
         "types": ["Water", "Flying"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 75,
           "atk": 87,
@@ -32023,7 +32023,7 @@
         "isBattleOnly": false,
         "alias": "vanillite",
         "types": ["Ice"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 36,
           "atk": 50,
@@ -32066,7 +32066,7 @@
         "isBattleOnly": false,
         "alias": "vanillish",
         "types": ["Ice"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 51,
           "atk": 65,
@@ -32110,7 +32110,7 @@
         "isBattleOnly": false,
         "alias": "vanilluxe",
         "types": ["Ice"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 71,
           "atk": 95,
@@ -32485,7 +32485,7 @@
         "isBattleOnly": false,
         "alias": "emolga",
         "types": ["Electric", "Flying"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 55,
           "atk": 75,
@@ -32527,7 +32527,7 @@
         "isBattleOnly": false,
         "alias": "karrablast",
         "types": ["Bug"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 50,
           "atk": 75,
@@ -32570,7 +32570,7 @@
         "isBattleOnly": false,
         "alias": "escavalier",
         "types": ["Bug", "Steel"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 70,
           "atk": 135,
@@ -32703,7 +32703,7 @@
         "isBattleOnly": false,
         "alias": "frillish",
         "types": ["Water", "Ghost"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 55,
           "atk": 40,
@@ -32746,7 +32746,7 @@
         "isBattleOnly": false,
         "alias": "jellicent",
         "types": ["Water", "Ghost"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 100,
           "atk": 60,
@@ -32835,7 +32835,7 @@
         "isBattleOnly": false,
         "alias": "joltik",
         "types": ["Bug", "Electric"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 50,
           "atk": 47,
@@ -32878,7 +32878,7 @@
         "isBattleOnly": false,
         "alias": "galvantula",
         "types": ["Bug", "Electric"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 70,
           "atk": 77,
@@ -32922,7 +32922,7 @@
         "isBattleOnly": false,
         "alias": "ferroseed",
         "types": ["Grass", "Steel"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 44,
           "atk": 50,
@@ -32963,7 +32963,7 @@
         "isBattleOnly": false,
         "alias": "ferrothorn",
         "types": ["Grass", "Steel"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 74,
           "atk": 94,
@@ -33268,7 +33268,7 @@
         "isBattleOnly": false,
         "alias": "elgyem",
         "types": ["Psychic"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 55,
           "atk": 55,
@@ -33311,7 +33311,7 @@
         "isBattleOnly": false,
         "alias": "beheeyem",
         "types": ["Psychic"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 75,
           "atk": 75,
@@ -33355,7 +33355,7 @@
         "isBattleOnly": false,
         "alias": "litwick",
         "types": ["Ghost", "Fire"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 50,
           "atk": 30,
@@ -33398,7 +33398,7 @@
         "isBattleOnly": false,
         "alias": "lampent",
         "types": ["Ghost", "Fire"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 60,
           "atk": 40,
@@ -33442,7 +33442,7 @@
         "isBattleOnly": false,
         "alias": "chandelure",
         "types": ["Ghost", "Fire"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 60,
           "atk": 55,
@@ -33757,7 +33757,7 @@
         "isBattleOnly": false,
         "alias": "shelmet",
         "types": ["Bug"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 50,
           "atk": 40,
@@ -33800,7 +33800,7 @@
         "isBattleOnly": false,
         "alias": "accelgor",
         "types": ["Bug"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 80,
           "atk": 70,
@@ -33844,7 +33844,7 @@
         "isBattleOnly": false,
         "alias": "stunfisk",
         "types": ["Ground", "Electric"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 109,
           "atk": 66,
@@ -33881,7 +33881,7 @@
         "regional": "Galar",
         "alias": "stunfiskgalar",
         "types": ["Ground", "Steel"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 109,
           "atk": 81,
@@ -33922,7 +33922,7 @@
         "isBattleOnly": false,
         "alias": "mienfoo",
         "types": ["Fighting"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 45,
           "atk": 85,
@@ -33965,7 +33965,7 @@
         "isBattleOnly": false,
         "alias": "mienshao",
         "types": ["Fighting"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 65,
           "atk": 125,
@@ -34009,7 +34009,7 @@
         "isBattleOnly": false,
         "alias": "druddigon",
         "types": ["Dragon"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 77,
           "atk": 120,
@@ -34230,7 +34230,7 @@
         "isBattleOnly": false,
         "alias": "bouffalant",
         "types": ["Normal"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 95,
           "atk": 110,
@@ -34407,7 +34407,7 @@
         "isBattleOnly": false,
         "alias": "vullaby",
         "types": ["Dark", "Flying"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
           "hp": 70,
           "atk": 55,
@@ -34450,7 +34450,7 @@
         "isBattleOnly": false,
         "alias": "mandibuzz",
         "types": ["Dark", "Flying"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
           "hp": 110,
           "atk": 65,
@@ -34494,7 +34494,7 @@
         "isBattleOnly": false,
         "alias": "heatmor",
         "types": ["Fire"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 85,
           "atk": 97,
@@ -34537,7 +34537,7 @@
         "isBattleOnly": false,
         "alias": "durant",
         "types": ["Bug", "Steel"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 58,
           "atk": 109,
@@ -36080,7 +36080,7 @@
         "isBattleOnly": "Greninja",
         "alias": "greninjaash",
         "types": ["Water", "Dark"],
-        "genderRatio": { "M": 1.0, "F": 0.0 },
+        "genderRatio": { "M": 0.875, "F": 0.125 },
         "baseStats": {
           "hp": 72,
           "atk": 95,
@@ -36123,7 +36123,7 @@
         "isBattleOnly": false,
         "alias": "bunnelby",
         "types": ["Normal"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 38,
           "atk": 36,
@@ -36166,7 +36166,7 @@
         "isBattleOnly": false,
         "alias": "diggersby",
         "types": ["Normal", "Ground"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 85,
           "atk": 56,
@@ -38723,7 +38723,7 @@
         "isBattleOnly": false,
         "alias": "litleo",
         "types": ["Fire", "Normal"],
-        "genderRatio": { "M": 0.11, "F": 0.89 },
+        "genderRatio": { "M": 0.125, "F": 0.875 },
         "baseStats": {
           "hp": 62,
           "atk": 50,
@@ -38768,7 +38768,7 @@
         "isBattleOnly": false,
         "alias": "pyroar",
         "types": ["Fire", "Normal"],
-        "genderRatio": { "M": 0.11, "F": 0.89 },
+        "genderRatio": { "M": 0.125, "F": 0.875 },
         "baseStats": {
           "hp": 86,
           "atk": 68,
@@ -38814,7 +38814,7 @@
         "isBattleOnly": false,
         "alias": "flab\u00e9b\u00e9",
         "types": ["Fairy"],
-        "genderRatio": { "M": 0, "F": 1 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
           "hp": 44,
           "atk": 38,
@@ -38851,7 +38851,7 @@
         "isBattleOnly": false,
         "alias": "flab\u00e9b\u00e9blue",
         "types": ["Fairy"],
-        "genderRatio": { "M": 0, "F": 1 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
           "hp": 44,
           "atk": 38,
@@ -38888,7 +38888,7 @@
         "isBattleOnly": false,
         "alias": "flab\u00e9b\u00e9orange",
         "types": ["Fairy"],
-        "genderRatio": { "M": 0, "F": 1 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
           "hp": 44,
           "atk": 38,
@@ -38925,7 +38925,7 @@
         "isBattleOnly": false,
         "alias": "flab\u00e9b\u00e9white",
         "types": ["Fairy"],
-        "genderRatio": { "M": 0, "F": 1 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
           "hp": 44,
           "atk": 38,
@@ -38962,7 +38962,7 @@
         "isBattleOnly": false,
         "alias": "flab\u00e9b\u00e9yellow",
         "types": ["Fairy"],
-        "genderRatio": { "M": 0, "F": 1 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
           "hp": 44,
           "atk": 38,
@@ -39006,7 +39006,7 @@
         "isBattleOnly": false,
         "alias": "floette",
         "types": ["Fairy"],
-        "genderRatio": { "M": 0, "F": 1 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
           "hp": 54,
           "atk": 45,
@@ -39044,7 +39044,7 @@
         "isBattleOnly": false,
         "alias": "floetteblue",
         "types": ["Fairy"],
-        "genderRatio": { "M": 0, "F": 1 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
           "hp": 54,
           "atk": 45,
@@ -39082,7 +39082,7 @@
         "isBattleOnly": false,
         "alias": "floetteorange",
         "types": ["Fairy"],
-        "genderRatio": { "M": 0, "F": 1 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
           "hp": 54,
           "atk": 45,
@@ -39120,7 +39120,7 @@
         "isBattleOnly": false,
         "alias": "floettewhite",
         "types": ["Fairy"],
-        "genderRatio": { "M": 0, "F": 1 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
           "hp": 54,
           "atk": 45,
@@ -39158,7 +39158,7 @@
         "isBattleOnly": false,
         "alias": "floetteyellow",
         "types": ["Fairy"],
-        "genderRatio": { "M": 0, "F": 1 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
           "hp": 54,
           "atk": 45,
@@ -39196,7 +39196,7 @@
         "isBattleOnly": false,
         "alias": "floetteeternal",
         "types": ["Fairy"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
           "hp": 74,
           "atk": 65,
@@ -39237,7 +39237,7 @@
         "isBattleOnly": false,
         "alias": "florges",
         "types": ["Fairy"],
-        "genderRatio": { "M": 0, "F": 1 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
           "hp": 78,
           "atk": 65,
@@ -39275,7 +39275,7 @@
         "isBattleOnly": false,
         "alias": "florgesblue",
         "types": ["Fairy"],
-        "genderRatio": { "M": 0, "F": 1 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
           "hp": 78,
           "atk": 65,
@@ -39313,7 +39313,7 @@
         "isBattleOnly": false,
         "alias": "florgesorange",
         "types": ["Fairy"],
-        "genderRatio": { "M": 0, "F": 1 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
           "hp": 78,
           "atk": 65,
@@ -39351,7 +39351,7 @@
         "isBattleOnly": false,
         "alias": "florgeswhite",
         "types": ["Fairy"],
-        "genderRatio": { "M": 0, "F": 1 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
           "hp": 78,
           "atk": 65,
@@ -39389,7 +39389,7 @@
         "isBattleOnly": false,
         "alias": "florgesyellow",
         "types": ["Fairy"],
-        "genderRatio": { "M": 0, "F": 1 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
           "hp": 78,
           "atk": 65,
@@ -39523,7 +39523,7 @@
         "isBattleOnly": false,
         "alias": "pancham",
         "types": ["Fighting"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 67,
           "atk": 82,
@@ -39566,7 +39566,7 @@
         "isBattleOnly": false,
         "alias": "pangoro",
         "types": ["Fighting", "Dark"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 95,
           "atk": 124,
@@ -39610,7 +39610,7 @@
         "isBattleOnly": false,
         "alias": "furfrou",
         "types": ["Normal"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 75,
           "atk": 80,
@@ -39644,7 +39644,7 @@
         "isBattleOnly": false,
         "alias": "furfroudandy",
         "types": ["Normal"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 75,
           "atk": 80,
@@ -39678,7 +39678,7 @@
         "isBattleOnly": false,
         "alias": "furfroudebutante",
         "types": ["Normal"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 75,
           "atk": 80,
@@ -39712,7 +39712,7 @@
         "isBattleOnly": false,
         "alias": "furfroudiamond",
         "types": ["Normal"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 75,
           "atk": 80,
@@ -39746,7 +39746,7 @@
         "isBattleOnly": false,
         "alias": "furfrouheart",
         "types": ["Normal"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 75,
           "atk": 80,
@@ -39780,7 +39780,7 @@
         "isBattleOnly": false,
         "alias": "furfroukabuki",
         "types": ["Normal"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 75,
           "atk": 80,
@@ -39814,7 +39814,7 @@
         "isBattleOnly": false,
         "alias": "furfroulareine",
         "types": ["Normal"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 75,
           "atk": 80,
@@ -39848,7 +39848,7 @@
         "isBattleOnly": false,
         "alias": "furfroumatron",
         "types": ["Normal"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 75,
           "atk": 80,
@@ -39882,7 +39882,7 @@
         "isBattleOnly": false,
         "alias": "furfroupharaoh",
         "types": ["Normal"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 75,
           "atk": 80,
@@ -39916,7 +39916,7 @@
         "isBattleOnly": false,
         "alias": "furfroustar",
         "types": ["Normal"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 75,
           "atk": 80,
@@ -39957,7 +39957,7 @@
         "isBattleOnly": false,
         "alias": "espurr",
         "types": ["Psychic"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 62,
           "atk": 48,
@@ -40003,7 +40003,7 @@
         "isBattleOnly": false,
         "alias": "meowstic",
         "types": ["Psychic"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 74,
           "atk": 48,
@@ -40040,7 +40040,7 @@
         "isBattleOnly": false,
         "alias": "meowsticf",
         "types": ["Psychic"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 74,
           "atk": 48,
@@ -40084,7 +40084,7 @@
         "isBattleOnly": false,
         "alias": "honedge",
         "types": ["Steel", "Ghost"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 45,
           "atk": 80,
@@ -40125,7 +40125,7 @@
         "isBattleOnly": false,
         "alias": "doublade",
         "types": ["Steel", "Ghost"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 59,
           "atk": 110,
@@ -40167,7 +40167,7 @@
         "isBattleOnly": false,
         "alias": "aegislash",
         "types": ["Steel", "Ghost"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 60,
           "atk": 50,
@@ -40202,7 +40202,7 @@
         "isBattleOnly": "Aegislash",
         "alias": "aegislashblade",
         "types": ["Steel", "Ghost"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 60,
           "atk": 140,
@@ -40243,7 +40243,7 @@
         "isBattleOnly": false,
         "alias": "spritzee",
         "types": ["Fairy"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 78,
           "atk": 52,
@@ -40285,7 +40285,7 @@
         "isBattleOnly": false,
         "alias": "aromatisse",
         "types": ["Fairy"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 101,
           "atk": 72,
@@ -40328,7 +40328,7 @@
         "isBattleOnly": false,
         "alias": "swirlix",
         "types": ["Fairy"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 62,
           "atk": 48,
@@ -40370,7 +40370,7 @@
         "isBattleOnly": false,
         "alias": "slurpuff",
         "types": ["Fairy"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 82,
           "atk": 80,
@@ -40413,7 +40413,7 @@
         "isBattleOnly": false,
         "alias": "inkay",
         "types": ["Dark", "Psychic"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 53,
           "atk": 54,
@@ -40456,7 +40456,7 @@
         "isBattleOnly": false,
         "alias": "malamar",
         "types": ["Dark", "Psychic"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 86,
           "atk": 92,
@@ -40500,7 +40500,7 @@
         "isBattleOnly": false,
         "alias": "binacle",
         "types": ["Rock", "Water"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 42,
           "atk": 52,
@@ -40543,7 +40543,7 @@
         "isBattleOnly": false,
         "alias": "barbaracle",
         "types": ["Rock", "Water"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 72,
           "atk": 105,
@@ -40765,7 +40765,7 @@
         "isBattleOnly": false,
         "alias": "helioptile",
         "types": ["Electric", "Normal"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 44,
           "atk": 38,
@@ -40808,7 +40808,7 @@
         "isBattleOnly": false,
         "alias": "heliolisk",
         "types": ["Electric", "Normal"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 62,
           "atk": 55,
@@ -41465,7 +41465,7 @@
         "isBattleOnly": false,
         "alias": "phantump",
         "types": ["Ghost", "Grass"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 43,
           "atk": 70,
@@ -41508,7 +41508,7 @@
         "isBattleOnly": false,
         "alias": "trevenant",
         "types": ["Ghost", "Grass"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 85,
           "atk": 110,
@@ -41552,7 +41552,7 @@
         "isBattleOnly": false,
         "alias": "pumpkaboo",
         "types": ["Ghost", "Grass"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 49,
           "atk": 66,
@@ -41588,7 +41588,7 @@
         "isBattleOnly": false,
         "alias": "pumpkaboosmall",
         "types": ["Ghost", "Grass"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 44,
           "atk": 66,
@@ -41624,7 +41624,7 @@
         "isBattleOnly": false,
         "alias": "pumpkaboolarge",
         "types": ["Ghost", "Grass"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 54,
           "atk": 66,
@@ -41660,7 +41660,7 @@
         "isBattleOnly": false,
         "alias": "pumpkaboosuper",
         "types": ["Ghost", "Grass"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 59,
           "atk": 66,
@@ -41703,7 +41703,7 @@
         "isBattleOnly": false,
         "alias": "gourgeist",
         "types": ["Ghost", "Grass"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 65,
           "atk": 90,
@@ -41740,7 +41740,7 @@
         "isBattleOnly": false,
         "alias": "gourgeistsmall",
         "types": ["Ghost", "Grass"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 55,
           "atk": 85,
@@ -41777,7 +41777,7 @@
         "isBattleOnly": false,
         "alias": "gourgeistlarge",
         "types": ["Ghost", "Grass"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 75,
           "atk": 95,
@@ -41814,7 +41814,7 @@
         "isBattleOnly": false,
         "alias": "gourgeistsuper",
         "types": ["Ghost", "Grass"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 85,
           "atk": 100,
@@ -42973,7 +42973,7 @@
         "isBattleOnly": false,
         "alias": "pikipek",
         "types": ["Normal", "Flying"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 35,
           "atk": 75,
@@ -43016,7 +43016,7 @@
         "isBattleOnly": false,
         "alias": "trumbeak",
         "types": ["Normal", "Flying"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 55,
           "atk": 85,
@@ -43060,7 +43060,7 @@
         "isBattleOnly": false,
         "alias": "toucannon",
         "types": ["Normal", "Flying"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 80,
           "atk": 120,
@@ -43188,7 +43188,7 @@
         "isBattleOnly": false,
         "alias": "gumshoostotem",
         "types": ["Normal"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 88,
           "atk": 110,
@@ -43229,7 +43229,7 @@
         "isBattleOnly": false,
         "alias": "grubbin",
         "types": ["Bug"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 47,
           "atk": 62,
@@ -43270,7 +43270,7 @@
         "isBattleOnly": false,
         "alias": "charjabug",
         "types": ["Bug", "Electric"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 57,
           "atk": 82,
@@ -43312,7 +43312,7 @@
         "isBattleOnly": false,
         "alias": "vikavolt",
         "types": ["Bug", "Electric"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 77,
           "atk": 70,
@@ -43347,7 +43347,7 @@
         "isBattleOnly": false,
         "alias": "vikavolttotem",
         "types": ["Bug", "Electric"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 77,
           "atk": 70,
@@ -43630,7 +43630,7 @@
         "isBattleOnly": false,
         "alias": "cutiefly",
         "types": ["Bug", "Fairy"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 40,
           "atk": 45,
@@ -43673,7 +43673,7 @@
         "isBattleOnly": false,
         "alias": "ribombee",
         "types": ["Bug", "Fairy"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 60,
           "atk": 55,
@@ -43710,7 +43710,7 @@
         "isBattleOnly": false,
         "alias": "ribombeetotem",
         "types": ["Bug", "Fairy"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 60,
           "atk": 55,
@@ -43958,7 +43958,7 @@
         "isBattleOnly": false,
         "alias": "wishiwashi",
         "types": ["Water"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 45,
           "atk": 20,
@@ -43992,7 +43992,7 @@
         "isBattleOnly": "Wishiwashi",
         "alias": "wishiwashischool",
         "types": ["Water"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 45,
           "atk": 140,
@@ -44215,7 +44215,7 @@
         "isBattleOnly": false,
         "alias": "dewpider",
         "types": ["Water", "Bug"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 38,
           "atk": 40,
@@ -44257,7 +44257,7 @@
         "isBattleOnly": false,
         "alias": "araquanid",
         "types": ["Water", "Bug"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 68,
           "atk": 70,
@@ -44293,7 +44293,7 @@
         "isBattleOnly": false,
         "alias": "araquanidtotem",
         "types": ["Water", "Bug"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 68,
           "atk": 70,
@@ -44416,7 +44416,7 @@
         "isBattleOnly": false,
         "alias": "lurantistotem",
         "types": ["Grass"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 70,
           "atk": 105,
@@ -44457,7 +44457,7 @@
         "isBattleOnly": false,
         "alias": "morelull",
         "types": ["Grass", "Fairy"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 40,
           "atk": 35,
@@ -44500,7 +44500,7 @@
         "isBattleOnly": false,
         "alias": "shiinotic",
         "types": ["Grass", "Fairy"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 60,
           "atk": 45,
@@ -44588,7 +44588,7 @@
         "isBattleOnly": false,
         "alias": "salazzle",
         "types": ["Poison", "Fire"],
-        "genderRatio": { "M": 0, "F": 1 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
           "hp": 68,
           "atk": 64,
@@ -44626,7 +44626,7 @@
         "isBattleOnly": false,
         "alias": "salazzletotem",
         "types": ["Poison", "Fire"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
           "hp": 68,
           "atk": 64,
@@ -44667,7 +44667,7 @@
         "isBattleOnly": false,
         "alias": "stufful",
         "types": ["Normal", "Fighting"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 70,
           "atk": 75,
@@ -44710,7 +44710,7 @@
         "isBattleOnly": false,
         "alias": "bewear",
         "types": ["Normal", "Fighting"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 120,
           "atk": 125,
@@ -44754,7 +44754,7 @@
         "isBattleOnly": false,
         "alias": "bounsweet",
         "types": ["Grass"],
-        "genderRatio": { "M": 0, "F": 1 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
           "hp": 42,
           "atk": 30,
@@ -44799,7 +44799,7 @@
         "isBattleOnly": false,
         "alias": "steenee",
         "types": ["Grass"],
-        "genderRatio": { "M": 0, "F": 1 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
           "hp": 52,
           "atk": 40,
@@ -44845,7 +44845,7 @@
         "isBattleOnly": false,
         "alias": "tsareena",
         "types": ["Grass"],
-        "genderRatio": { "M": 0, "F": 1 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
           "hp": 72,
           "atk": 120,
@@ -45023,7 +45023,7 @@
         "isBattleOnly": false,
         "alias": "wimpod",
         "types": ["Bug", "Water"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 25,
           "atk": 35,
@@ -45064,7 +45064,7 @@
         "isBattleOnly": false,
         "alias": "golisopod",
         "types": ["Bug", "Water"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 75,
           "atk": 125,
@@ -45195,7 +45195,7 @@
         "isBattleOnly": false,
         "alias": "pyukumuku",
         "types": ["Water"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 55,
           "atk": 60,
@@ -46424,7 +46424,7 @@
         "isBattleOnly": false,
         "alias": "turtonator",
         "types": ["Fire", "Dragon"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 60,
           "atk": 78,
@@ -46465,7 +46465,7 @@
         "isBattleOnly": false,
         "alias": "togedemaru",
         "types": ["Electric", "Steel"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 65,
           "atk": 98,
@@ -46501,7 +46501,7 @@
         "isBattleOnly": false,
         "alias": "togedemarutotem",
         "types": ["Electric", "Steel"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 65,
           "atk": 98,
@@ -46614,7 +46614,7 @@
         "isBattleOnly": false,
         "alias": "mimikyutotem",
         "types": ["Ghost", "Fairy"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 55,
           "atk": 90,
@@ -46648,7 +46648,7 @@
         "isBattleOnly": "Mimikyu-Totem",
         "alias": "mimikyubustedtotem",
         "types": ["Ghost", "Fairy"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 55,
           "atk": 90,
@@ -46734,7 +46734,7 @@
         "isBattleOnly": false,
         "alias": "drampa",
         "types": ["Normal", "Dragon"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 78,
           "atk": 60,
@@ -46818,7 +46818,7 @@
         "isBattleOnly": false,
         "alias": "jangmoo",
         "types": ["Dragon"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 45,
           "atk": 55,
@@ -46861,7 +46861,7 @@
         "isBattleOnly": false,
         "alias": "hakamoo",
         "types": ["Dragon", "Fighting"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 55,
           "atk": 75,
@@ -46905,7 +46905,7 @@
         "isBattleOnly": false,
         "alias": "kommoo",
         "types": ["Dragon", "Fighting"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 75,
           "atk": 110,
@@ -46942,7 +46942,7 @@
         "isBattleOnly": false,
         "alias": "kommoototem",
         "types": ["Dragon", "Fighting"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 75,
           "atk": 110,
@@ -48787,7 +48787,7 @@
         "isBattleOnly": false,
         "alias": "blipbug",
         "types": ["Bug"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 25,
           "atk": 20,
@@ -48830,7 +48830,7 @@
         "isBattleOnly": false,
         "alias": "dottler",
         "types": ["Bug", "Psychic"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 50,
           "atk": 35,
@@ -48874,7 +48874,7 @@
         "isBattleOnly": false,
         "alias": "orbeetle",
         "types": ["Bug", "Psychic"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 60,
           "atk": 45,
@@ -48918,7 +48918,7 @@
         "isBattleOnly": false,
         "alias": "nickit",
         "types": ["Dark"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 40,
           "atk": 28,
@@ -48961,7 +48961,7 @@
         "isBattleOnly": false,
         "alias": "thievul",
         "types": ["Dark"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 70,
           "atk": 58,
@@ -49005,7 +49005,7 @@
         "isBattleOnly": false,
         "alias": "gossifleur",
         "types": ["Grass"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 40,
           "atk": 40,
@@ -49048,7 +49048,7 @@
         "isBattleOnly": false,
         "alias": "eldegoss",
         "types": ["Grass"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 60,
           "atk": 50,
@@ -49092,7 +49092,7 @@
         "isBattleOnly": false,
         "alias": "wooloo",
         "types": ["Normal"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 42,
           "atk": 40,
@@ -49135,7 +49135,7 @@
         "isBattleOnly": false,
         "alias": "dubwool",
         "types": ["Normal"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 72,
           "atk": 80,
@@ -49270,7 +49270,7 @@
         "isBattleOnly": false,
         "alias": "yamper",
         "types": ["Electric"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 59,
           "atk": 45,
@@ -49312,7 +49312,7 @@
         "isBattleOnly": false,
         "alias": "boltund",
         "types": ["Electric"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 69,
           "atk": 90,
@@ -49723,7 +49723,7 @@
         "isBattleOnly": false,
         "alias": "cramorant",
         "types": ["Flying", "Water"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 70,
           "atk": 85,
@@ -49757,7 +49757,7 @@
         "isBattleOnly": "Cramorant",
         "alias": "cramorantgulping",
         "types": ["Flying", "Water"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 70,
           "atk": 85,
@@ -49791,7 +49791,7 @@
         "isBattleOnly": "Cramorant",
         "alias": "cramorantgorging",
         "types": ["Flying", "Water"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 70,
           "atk": 85,
@@ -50054,7 +50054,7 @@
         "isBattleOnly": false,
         "alias": "sizzlipede",
         "types": ["Fire", "Bug"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 50,
           "atk": 65,
@@ -50097,7 +50097,7 @@
         "isBattleOnly": false,
         "alias": "centiskorch",
         "types": ["Fire", "Bug"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 100,
           "atk": 115,
@@ -50141,7 +50141,7 @@
         "isBattleOnly": false,
         "alias": "clobbopus",
         "types": ["Fighting"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 50,
           "atk": 68,
@@ -50183,7 +50183,7 @@
         "isBattleOnly": false,
         "alias": "grapploct",
         "types": ["Fighting"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 80,
           "atk": 118,
@@ -50390,7 +50390,7 @@
         "isBattleOnly": false,
         "alias": "hatenna",
         "types": ["Psychic"],
-        "genderRatio": { "M": 0, "F": 1 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
           "hp": 42,
           "atk": 30,
@@ -50435,7 +50435,7 @@
         "isBattleOnly": false,
         "alias": "hattrem",
         "types": ["Psychic"],
-        "genderRatio": { "M": 0, "F": 1 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
           "hp": 57,
           "atk": 40,
@@ -50481,7 +50481,7 @@
         "isBattleOnly": false,
         "alias": "hatterene",
         "types": ["Psychic", "Fairy"],
-        "genderRatio": { "M": 0, "F": 1 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
           "hp": 57,
           "atk": 90,
@@ -50664,7 +50664,7 @@
         "isBattleOnly": false,
         "alias": "obstagoon",
         "types": ["Dark", "Normal"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 93,
           "atk": 90,
@@ -50797,7 +50797,7 @@
         "isBattleOnly": false,
         "alias": "sirfetchd",
         "types": ["Fighting"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 62,
           "atk": 135,
@@ -50840,7 +50840,7 @@
         "isBattleOnly": false,
         "alias": "mrrime",
         "types": ["Ice", "Psychic"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 80,
           "atk": 85,
@@ -50884,7 +50884,7 @@
         "isBattleOnly": false,
         "alias": "runerigus",
         "types": ["Ground", "Ghost"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 58,
           "atk": 95,
@@ -50926,7 +50926,7 @@
         "isBattleOnly": false,
         "alias": "milcery",
         "types": ["Fairy"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
           "hp": 45,
           "atk": 40,
@@ -50968,7 +50968,7 @@
         "isBattleOnly": false,
         "alias": "alcremie",
         "types": ["Fairy"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
           "hp": 65,
           "atk": 60,
@@ -51004,7 +51004,7 @@
         "isBattleOnly": false,
         "alias": "alcremierubycream",
         "types": ["Fairy"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
           "hp": 65,
           "atk": 60,
@@ -51040,7 +51040,7 @@
         "isBattleOnly": false,
         "alias": "alcremiematchacream",
         "types": ["Fairy"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
           "hp": 65,
           "atk": 60,
@@ -51076,7 +51076,7 @@
         "isBattleOnly": false,
         "alias": "alcremiemintcream",
         "types": ["Fairy"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
           "hp": 65,
           "atk": 60,
@@ -51112,7 +51112,7 @@
         "isBattleOnly": false,
         "alias": "alcremielemoncream",
         "types": ["Fairy"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
           "hp": 65,
           "atk": 60,
@@ -51148,7 +51148,7 @@
         "isBattleOnly": false,
         "alias": "alcremiesaltedcream",
         "types": ["Fairy"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
           "hp": 65,
           "atk": 60,
@@ -51184,7 +51184,7 @@
         "isBattleOnly": false,
         "alias": "alcremierubyswirl",
         "types": ["Fairy"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
           "hp": 65,
           "atk": 60,
@@ -51220,7 +51220,7 @@
         "isBattleOnly": false,
         "alias": "alcremiecaramelswirl",
         "types": ["Fairy"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
           "hp": 65,
           "atk": 60,
@@ -51256,7 +51256,7 @@
         "isBattleOnly": false,
         "alias": "alcremierainbowswirl",
         "types": ["Fairy"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
           "hp": 65,
           "atk": 60,
@@ -51598,7 +51598,7 @@
         "isBattleOnly": false,
         "alias": "indeedee",
         "types": ["Psychic", "Normal"],
-        "genderRatio": { "M": 1.0, "F": 0.0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 60,
           "atk": 65,
@@ -51636,7 +51636,7 @@
         "isBattleOnly": false,
         "alias": "indeedeef",
         "types": ["Psychic", "Normal"],
-        "genderRatio": { "M": 0, "F": 1 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 70,
           "atk": 55,
@@ -51681,7 +51681,7 @@
         "isBattleOnly": false,
         "alias": "morpeko",
         "types": ["Electric", "Dark"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 58,
           "atk": 95,
@@ -51715,7 +51715,7 @@
         "isBattleOnly": "Morpeko",
         "alias": "morpekohangry",
         "types": ["Electric", "Dark"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 58,
           "atk": 95,
@@ -52017,7 +52017,7 @@
         "isBattleOnly": false,
         "alias": "duraludon",
         "types": ["Steel", "Dragon"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 70,
           "atk": 95,
@@ -53063,7 +53063,7 @@
         "isBattleOnly": false,
         "alias": "basculegion",
         "types": ["Water", "Ghost"],
-        "genderRatio": { "M": 1.0, "F": 0.0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 120,
           "atk": 112,
@@ -53102,7 +53102,7 @@
         "isBattleOnly": false,
         "alias": "basculegionf",
         "types": ["Water", "Ghost"],
-        "genderRatio": { "M": 0, "F": 1 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "baseStats": {
           "hp": 120,
           "atk": 92,
@@ -53240,7 +53240,7 @@
         "isBattleOnly": false,
         "alias": "enamorus",
         "types": ["Fairy", "Flying"],
-        "genderRatio": { "M": 0, "F": 1 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
           "hp": 74,
           "atk": 115,
@@ -53277,7 +53277,7 @@
         "isBattleOnly": false,
         "alias": "enamorustherian",
         "types": ["Fairy", "Flying"],
-        "genderRatio": { "M": 0, "F": 1 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
           "hp": 74,
           "atk": 115,
@@ -53779,7 +53779,7 @@
         "isMega": false,
         "isGMax": false,
         "isBattleOnly": false,
-        "genderRatio": { "M": 1.0, "F": 0.0 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "alias": "oinkologne",
         "formeNumber": 0,
         "height": 1.0,
@@ -53818,7 +53818,7 @@
         "isMega": false,
         "isGMax": false,
         "isBattleOnly": false,
-        "genderRatio": { "M": 0, "F": 1 },
+        "genderRatio": { "M": 0.5, "F": 0.5 },
         "alias": "oinkolognef",
         "formeNumber": 1,
         "height": 1.0,
@@ -55824,7 +55824,7 @@
         "isMega": false,
         "isGMax": false,
         "isBattleOnly": false,
-        "genderRatio": { "M": 0, "F": 1 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "alias": "tinkatink",
         "formeNumber": 0,
         "height": 0.4,
@@ -55869,7 +55869,7 @@
         "isMega": false,
         "isGMax": false,
         "isBattleOnly": false,
-        "genderRatio": { "M": 0, "F": 1 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "alias": "tinkatuff",
         "formeNumber": 0,
         "height": 0.7,
@@ -55915,7 +55915,7 @@
         "isMega": false,
         "isGMax": false,
         "isBattleOnly": false,
-        "genderRatio": { "M": 0, "F": 1 },
+        "genderRatio": { "M": 0.0, "F": 1.0 },
         "alias": "tinkaton",
         "formeNumber": 0,
         "height": 0.7,
