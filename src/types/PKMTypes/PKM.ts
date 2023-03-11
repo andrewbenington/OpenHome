@@ -21,6 +21,7 @@ import {
 import { getLocation } from '../../consts/MetLocation/MetLocation';
 import { generatePersonalityValue } from './util';
 import bigInt from 'big-integer';
+import { getGen3To5Gender } from '../../util/GenderCalc';
 
 export class PKM {
   static markingCount = 4;
@@ -979,12 +980,16 @@ export class PKM {
       // will ensure shininess or non-shininess depending on original mon
       let shinyXor = other.isShiny ? 0 : 8;
       let otherAbilityNumNonHA = other.abilityNum > 2 ? 1 : other.abilityNum;
+      let otherGender = other.gender;
 
       let i = 0;
       while (i < 0x10000) {
+        let newGender = getGen3To5Gender(
+          newPersonalityValue.toJSNumber(),
+          this.dexNum
+        );
         if (
-          // ability is stored separately in gen 4, so no need to recalc personality value
-
+          newGender === otherGender &&
           newPersonalityValue.and(1).add(1).toJSNumber() ===
             otherAbilityNumNonHA &&
           newPersonalityValue.mod(25).toJSNumber() === nature &&

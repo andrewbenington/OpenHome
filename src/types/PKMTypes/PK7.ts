@@ -125,4 +125,13 @@ export class PK7 extends PKM {
     //   return (this.markings >> (2 * index)) & 3;
     // };
   }
+
+  public get gender() {
+    return (this.bytes[0x1d] >> 1) & 0x3;
+  }
+
+  public set gender(value: number) {
+    this.bytes[0x01d] = (this.bytes[0x01d] & 0b11110001) | ((value & 0x3) << 1);
+  }
+
 }

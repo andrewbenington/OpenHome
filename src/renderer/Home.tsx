@@ -65,7 +65,7 @@ const Home = () => {
   ]);
   const [homeMonMap, setHomeMonMap] = useState<{ [key: string]: OHPKM }>();
   const [changedOHPKMList, setChangedOHPKMList] = useState<OHPKM[]>([]);
-  const [deleteFileList, setDeleteFileList] = useState<string[]>([]);
+  const [filesToDelete, setFilesToDelete] = useState<string[]>([]);
   const [homeData, setHomeData] = useState(new HomeData(new Uint8Array()));
 
   useEffect(() => {
@@ -105,32 +105,32 @@ const Home = () => {
         const homeMon =
           sourceMon instanceof OHPKM ? sourceMon : new OHPKM(sourceMon);
         if (draggingDest.isHome && draggingSource.isHome) {
-          changeHomeMon(draggingDest.box, draggingDest.index, homeMon);
-          changeHomeMon(draggingSource.box, draggingSource.index, undefined);
+          setHomeMon(draggingDest.box, draggingDest.index, homeMon);
+          setHomeMon(draggingSource.box, draggingSource.index, undefined);
         } else if (draggingDest.isHome) {
-          changeHomeMon(draggingDest.box, draggingDest.index, homeMon);
-          changeSaveMon(
+          setHomeMon(draggingDest.box, draggingDest.index, homeMon);
+          setSaveMon(
             draggingSource.box,
             draggingSource.index,
             draggingSource.save,
             undefined
           );
         } else if (draggingSource.isHome) {
-          changeSaveMon(
+          setSaveMon(
             draggingDest.box,
             draggingDest.index,
             draggingDest.save,
             homeMon
           );
-          changeHomeMon(draggingSource.box, draggingSource.index, undefined);
+          setHomeMon(draggingSource.box, draggingSource.index, undefined);
         } else {
-          changeSaveMon(
+          setSaveMon(
             draggingDest.box,
             draggingDest.index,
             draggingDest.save,
             homeMon
           );
-          changeSaveMon(
+          setSaveMon(
             draggingSource.box,
             draggingSource.index,
             draggingSource.save,
@@ -147,7 +147,7 @@ const Home = () => {
     }
   }, [draggingSource, draggingDest]);
 
-  const changeHomeMon = (box: number, index: number, mon?: OHPKM) => {
+  const setHomeMon = (box: number, index: number, mon?: OHPKM) => {
     const newBoxes = homeData.boxes;
     newBoxes[box].pokemon[index] = mon;
     let newData = { ...homeData };
@@ -155,13 +155,13 @@ const Home = () => {
     setHomeData(newData);
   };
 
-  const changeSaveMon = (
+  const setSaveMon = (
     box: number,
     index: number,
     saveNumber: number,
     mon?: OHPKM
   ) => {
-    console.log('changeSaveMon', box, index, saveNumber, mon);
+    console.log('setSaveMon', box, index, saveNumber, mon);
     const changingSave = saves[saveNumber];
     if (changingSave) {
       const newBoxes = changingSave.boxes;
@@ -173,6 +173,10 @@ const Home = () => {
       newSaves[saveNumber] = newSaveData;
       setSaves(newSaves);
     }
+  };
+
+  const markMonsAsChanged = (changedMons: OHPKM[]) => {
+    setChangedOHPKMList([...changedOHPKMList, ...changedMons]);
   };
 
   const boxSetDragSource = (coords?: SaveCoordinates) => {
@@ -243,7 +247,7 @@ const Home = () => {
       if (draggingSource.isHome) {
         mon = homeData.boxes[draggingSource.box]?.pokemon[draggingSource.index];
         if (mon && type === 'trash') {
-          changeHomeMon(draggingSource.box, draggingSource.index);
+          setHomeMon(draggingSource.box, draggingSource.index);
           const changedOHPKMListIndex = changedOHPKMList.indexOf(mon);
           console.log('removing at', changedOHPKMListIndex);
           setChangedOHPKMList([
@@ -252,7 +256,7 @@ const Home = () => {
           ]);
           const identifier = getMonFileIdentifier(mon);
           if (identifier) {
-            setDeleteFileList([...deleteFileList, identifier]);
+            setFilesToDelete([...filesToDelete, identifier]);
           }
           return;
         }
@@ -262,7 +266,7 @@ const Home = () => {
             draggingSource.index
           ];
         if (mon && type === 'trash') {
-          changeSaveMon(
+          setSaveMon(
             draggingSource.box,
             draggingSource.index,
             draggingSource.save
@@ -270,7 +274,7 @@ const Home = () => {
           if (mon instanceof OHPKM) {
             const identifier = getMonFileIdentifier(mon);
             if (identifier) {
-              setDeleteFileList([...deleteFileList, identifier]);
+              setFilesToDelete([...filesToDelete, identifier]);
             }
           }
           return;
@@ -300,7 +304,7 @@ const Home = () => {
           nextIndex++;
         }
         if (nextIndex < 120) {
-          changeHomeMon(boxCoords.box, nextIndex, homeMon);
+          setHomeMon(boxCoords.box, nextIndex, homeMon);
           addedMons.push(homeMon);
           nextIndex++;
         }
@@ -312,13 +316,13 @@ const Home = () => {
           nextIndex++;
         }
         if (nextIndex < 30) {
-          changeSaveMon(boxCoords.box, nextIndex, saveIndex, homeMon);
+          setSaveMon(boxCoords.box, nextIndex, saveIndex, homeMon);
           addedMons.push(homeMon);
           nextIndex++;
         }
       }
     });
-    setChangedOHPKMList([...changedOHPKMList, ...addedMons]);
+    markMonsAsChanged(addedMons);
   };
 
   const writeAllHomeData = () => {
@@ -370,8 +374,8 @@ const Home = () => {
   const saveChanges = () => {
     saveAllSaveFiles();
     writeAllHomeData();
-    handleDeleteOHPKMFiles(deleteFileList);
-    setDeleteFileList([]);
+    handleDeleteOHPKMFiles(filesToDelete);
+    setFilesToDelete([]);
   };
 
   const readHomeData = async () => {
@@ -402,6 +406,13 @@ const Home = () => {
                 homeMonMap,
                 gen12LookupMap,
               });
+              const changedMons: OHPKM[] = [];
+              newSave?.changedMons.forEach(({ box, index }) => {
+                const mon = newSave.boxes[box].pokemon[index];
+                if (mon instanceof OHPKM) {
+                  changedMons.push(mon);
+                }
+              });
               const newSaves: SaveArray = [...saves];
               newSaves[saveIndex] = newSave;
               setSaves(newSaves);
@@ -418,6 +429,13 @@ const Home = () => {
                 homeMonMap,
                 gen34LookupMap,
               });
+              const changedMons: OHPKM[] = [];
+              newSave?.changedMons.forEach(({ box, index }) => {
+                const mon = newSave.boxes[box].pokemon[index];
+                if (mon instanceof OHPKM) {
+                  changedMons.push(mon);
+                }
+              });
               const newSaves: SaveArray = [...saves];
               newSaves[saveIndex] = newSave;
               setSaves(newSaves);
@@ -428,6 +446,13 @@ const Home = () => {
           default:
             const newSave = buildSaveFile(path, fileBytes, saveType, {
               homeMonMap,
+            });
+            const changedMons: OHPKM[] = [];
+            newSave?.changedMons.forEach(({ box, index }) => {
+              const mon = newSave.boxes[box].pokemon[index];
+              if (mon instanceof OHPKM) {
+                changedMons.push(mon);
+              }
             });
             const newSaves: SaveArray = [...saves];
             newSaves[saveIndex] = newSave;

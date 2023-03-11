@@ -61,7 +61,7 @@ export const buildSaveFile = (
       return saveFile;
     case SaveType.C_I:
     case SaveType.GS_I:
-      console.log(gen12LookupMap)
+      console.log(gen12LookupMap);
       saveFile = recoverOHPKMData(
         new G2SAV(filePath, fileBytes),
         getMonGen12Identifier,
@@ -175,7 +175,7 @@ const recoverOHPKMData = (
   lookupMap?: { [key: string]: string }
 ) => {
   if (!homeMonMap || !lookupMap || !getIdentifier) return saveFile;
-  saveFile.boxes.forEach((box) => {
+  saveFile.boxes.forEach((box, boxIndex) => {
     box.pokemon.forEach((mon, monIndex) => {
       if (mon) {
         // GameBoy PKM files don't have a personality value to track the mons with OpenHome data,
@@ -189,8 +189,9 @@ const recoverOHPKMData = (
           (entry) => entry[0] === homeIdentifier
         );
         if (result) {
-          let updatedOHPKM = result[1]
-          updatedOHPKM.updateData(mon)
+          let updatedOHPKM = result[1];
+          updatedOHPKM.updateData(mon);
+          saveFile.changedMons.push({ box: boxIndex, index: monIndex });
           box.pokemon[monIndex] = result[1];
         }
       }
