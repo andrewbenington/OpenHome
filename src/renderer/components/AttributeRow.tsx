@@ -17,7 +17,7 @@ const AttributeRow = (props: {
     >
       <div
         style={{
-          width: '30%',
+          width: '33%',
           height: '100%',
           backgroundColor: '#fff6',
           display: 'flex',
@@ -30,7 +30,7 @@ const AttributeRow = (props: {
       </div>
       <div
         style={{
-          width: '70%',
+          width: '67%',
           height: '100%',
           padding: '0px 10px',
           backgroundColor: '#6662',

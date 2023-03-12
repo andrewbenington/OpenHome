@@ -41,6 +41,7 @@ export const buildSaveFile = (
       if (homeMonMap && gen12LookupMap) {
         saveFile.boxes.forEach((box) => {
           box.pokemon.forEach((mon, monIndex) => {
+            if (!mon) return;
             // GameBoy PKM files don't have a personality value to track the mons with OpenHome data,
             // so they need to be identified with their IVs and OT
             const gen12identifier = getMonGen12Identifier(mon);

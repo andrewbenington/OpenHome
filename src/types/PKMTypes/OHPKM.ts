@@ -1,9 +1,11 @@
 import { uniq } from 'lodash';
-import { Abilities } from '../../consts/Abilities';
-import { Items } from '../../consts/Items';
-import { Languages } from '../../consts/Languages';
-import { POKEMON_DATA } from '../../consts/Mons';
-import { OpenHomeRibbons } from '../../consts/Ribbons';
+import {
+  Abilities,
+  GameOfOrigin,
+  Items,
+  Languages,
+  OpenHomeRibbons,
+} from '../../consts';
 import {
   bytesToUint16BigEndian,
   bytesToUint16LittleEndian,
@@ -39,13 +41,13 @@ import {
   formatHasColorMarkings,
   generateDVs,
   generateIVs,
-  generatePersonalityValue,
   generateTeraType,
   getAbilityFromNumber,
   gvsFromIVs,
   ivsFromDVs,
   writeIVsToBuffer,
 } from './util';
+import Prando from 'prando';
 
 class OHPKM extends PKM {
   static fileSize = 376;
@@ -56,20 +58,22 @@ class OHPKM extends PKM {
     } else if (args[0] instanceof PKM) {
       const other = args[0];
       super(new Uint8Array(420));
+      const prng = new Prando(
+        other.trainerName
+          .concat(
+            other.personalityValue?.toString() ?? JSON.stringify(other.dvs)
+          )
+          .concat(other.secretID.toString())
+          .concat(other.trainerID.toString())
+      );
       this.sanity = other.sanity;
       this.dexNum = other.dexNum;
       this.heldItem = other.heldItem;
       this.trainerID = other.trainerID;
       this.secretID = other.secretID;
       this.exp = other.exp;
-      this.abilityNum = other.abilityNum;
       this.canGigantamax = other.canGigantamax ?? false;
       this.isShadow = other.isShadow;
-      this.ability = getAbilityFromNumber(
-        this.dexNum,
-        this.formNum,
-        this.abilityNum
-      );
       if (other.markings) {
         other.markings?.forEach((value, index) => {
           let temp = this.markings;
@@ -77,35 +81,49 @@ class OHPKM extends PKM {
           this.markings = temp;
         });
       }
+      if (
+        other.gameOfOrigin >= GameOfOrigin.Red &&
+        other.gameOfOrigin <= GameOfOrigin.Crystal
+      ) {
+        this.abilityNum = 4;
+      } else {
+        this.abilityNum = other.abilityNum ?? (this.personalityValue & 1) + 1;
+      }
+      this.ability = getAbilityFromNumber(
+        this.dexNum,
+        this.formNum,
+        this.abilityNum
+      );
+      this.abilityIndex = Abilities.indexOf(this.ability);
       this.alphaMove = other.alphaMove ?? 0;
+      this.gender = other.gender;
       if (other.personalityValue !== undefined) {
         this.personalityValue = other.personalityValue;
       } else {
-        this.personalityValue = generatePersonalityValue();
-        if (other.dexNum === 201) {
-          this.personalityValue =
-            (this.personalityValue & 0xffffffe0) | other.formNum;
-        }
-        if (other.isShiny) {
-          let pvBytes = uint32ToBytesLittleEndian(this.personalityValue);
-          let pvLower16 = bytesToUint16LittleEndian(pvBytes, 0);
-          let pvUpper16 = pvLower16 ^ this.trainerID ^ this.secretID;
-          pvBytes.set(uint16ToBytesLittleEndian(pvUpper16), 2);
-          this.personalityValue = bytesToUint32LittleEndian(pvBytes, 0);
-        } else if (this.isShiny) {
-          // if generated value makes it shiny, we want to revert that
-          this.personalityValue = this.personalityValue ^ 0x10000000;
-        }
+        this.createPersonalityValueFromOtherPreGen6(other);
+        // if (other.dexNum === 201) {
+        //   this.personalityValue =
+        //     (this.personalityValue & 0xffffffe0) | other.formNum;
+        // }
+        // if (other.isShiny) {
+        //   let pvBytes = uint32ToBytesLittleEndian(this.personalityValue);
+        //   let pvLower16 = bytesToUint16LittleEndian(pvBytes, 0);
+        //   let pvUpper16 = pvLower16 ^ this.trainerID ^ this.secretID;
+        //   pvBytes.set(uint16ToBytesLittleEndian(pvUpper16), 2);
+        //   this.personalityValue = bytesToUint32LittleEndian(pvBytes, 0);
+        // } else if (this.isShiny) {
+        //   // if generated value makes it shiny, we want to revert that
+        //   this.personalityValue = this.personalityValue ^ 0x10000000;
+        // }
       }
       this.encryptionConstant =
         other.encryptionConstant ??
         other.personalityValue ??
-        generatePersonalityValue();
+        prng.nextInt(0, 0xffffffff);
       this.nature = other.nature ?? this.personalityValue % 25;
       this.statNature = other.statNature ?? this.nature;
       this.isFatefulEncounter = other.isFatefulEncounter;
       this.flag2LA = other.flag2LA ?? false;
-      this.gender = other.gender;
       this.formNum = other.formNum;
       this.evs = other.evs ?? { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 };
       this.contest = other.contest;
@@ -130,13 +148,13 @@ class OHPKM extends PKM {
       } else if (other.dvs) {
         this.ivs = ivsFromDVs(other.dvs);
       } else {
-        this.ivs = generateIVs();
+        this.ivs = generateIVs(prng);
       }
       this.isEgg = other.isEgg;
       this.isNicknamed = other.isNicknamed;
       this.teraTypeOriginal =
         other.teraTypeOriginal ??
-        generateTeraType(this.dexNum, this.formNum) ??
+        generateTeraType(prng, this.dexNum, this.formNum) ??
         0;
       this.teraTypeOverride = other.teraTypeOverride ?? 0x13;
       this.statusCondition = other.statusCondition;
@@ -144,10 +162,22 @@ class OHPKM extends PKM {
       this.gvs = other.gvs ?? gvsFromIVs(this.ivs);
       if (other.dvs) {
         this.dvs = other.dvs;
+      } else if (other.dexNum === 201) {
+        // unown
+        this.dvs = other.ivs
+          ? dvsFromIVs(other.ivs, other.isShiny)
+          : generateDVs(prng, other.isShiny);
+        let letterBits = other.formNum * 10;
+        let newDvs = this.dvs;
+        newDvs.atk = (newDvs.atk & 0b1001) | (((letterBits >> 6) & 0b11) << 1);
+        newDvs.def = (newDvs.def & 0b1001) | (((letterBits >> 4) & 0b11) << 1);
+        newDvs.spe = (newDvs.spe & 0b1001) | (((letterBits >> 2) & 0b11) << 1);
+        newDvs.spc = (newDvs.spc & 0b1001) | ((letterBits & 0b11) << 1);
+        this.dvs = newDvs;
       } else if (other.ivs) {
         this.dvs = dvsFromIVs(other.ivs, other.isShiny);
       } else {
-        this.dvs = generateDVs(other.isShiny);
+        this.dvs = generateDVs(prng, other.isShiny);
       }
       this.heightAbsoluteBytes = other.heightAbsoluteBytes ?? new Uint8Array(4);
       this.weightAbsoluteBytes = other.weightAbsoluteBytes ?? new Uint8Array(4);
@@ -210,14 +240,6 @@ class OHPKM extends PKM {
       };
       this.homeTracker = other.homeTracker ?? new Uint8Array(8);
       this.evsG12 = other.evsG12 ?? { hp: 0, atk: 0, def: 0, spc: 0, spe: 0 };
-      this.ability =
-        (this.abilityNum === 1
-          ? POKEMON_DATA[this.dexNum]?.formes[this.formNum]?.ability1
-          : this.abilityNum === 2
-          ? POKEMON_DATA[this.dexNum]?.formes[this.formNum]?.ability2
-          : POKEMON_DATA[this.dexNum]?.formes[this.formNum]?.abilityH) ??
-        'None';
-      this.abilityIndex = Abilities.indexOf(this.ability);
     } else {
       super(new Uint8Array());
     }
@@ -1261,14 +1283,14 @@ class OHPKM extends PKM {
       this.contest = other.contest;
     }
     if (other.statNature) {
-      this.statNature = other.statNature
+      this.statNature = other.statNature;
     }
     if (other.teraTypeOverride) {
-      this.teraTypeOverride = other.teraTypeOverride
+      this.teraTypeOverride = other.teraTypeOverride;
     }
     if (isFromOT) {
-      this.nickname = other.nickname
-      this.trainerFriendship = other.trainerFriendship
+      this.nickname = other.nickname;
+      this.trainerFriendship = other.trainerFriendship;
     }
     // other.moves.forEach((move, i) => {
 

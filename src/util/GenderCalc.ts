@@ -1,8 +1,8 @@
-import { POKEMON_DATA } from "../consts/Mons";
+import { POKEMON_DATA } from '../consts/Mons';
 
 export const getGen3To5Gender = (PID: number, dexNum: number) => {
   if (dexNum === 0) {
-    return 2
+    return 2;
   }
   let maleRatio =
     POKEMON_DATA[dexNum].formes[0].genderRatio.M > 0 ||
@@ -14,7 +14,7 @@ export const getGen3To5Gender = (PID: number, dexNum: number) => {
   } else if (maleRatio === 0) {
     return 1;
   } else {
-    return PID % 256 >= gen3To5MaleThreshold[maleRatio] ? 0 : 1;
+    return (PID & 0xff) >= gen3To5MaleThreshold[maleRatio] ? 0 : 1;
   }
 };
 

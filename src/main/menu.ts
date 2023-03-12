@@ -28,7 +28,7 @@ export default class MenuBuilder {
 
     const template =
       process.platform === 'darwin'
-        ? this.buildDarwinTemplate()
+        ? this.buildDarwinTemplate(this.mainWindow)
         : this.buildDefaultTemplate();
 
     const menu = Menu.buildFromTemplate(template);
@@ -52,7 +52,7 @@ export default class MenuBuilder {
     });
   }
 
-  buildDarwinTemplate(): MenuItemConstructorOptions[] {
+  buildDarwinTemplate(mainWindow: BrowserWindow): MenuItemConstructorOptions[] {
     const subMenuAbout: DarwinMenuItemConstructorOptions = {
       label: 'OpenHome',
       submenu: [
@@ -84,20 +84,39 @@ export default class MenuBuilder {
         },
       ],
     };
+
+    const subMenuFile: DarwinMenuItemConstructorOptions = {
+      label: 'File',
+      submenu: [
+        {
+          label: 'Save',
+          accelerator: 'CmdOrCtrl+S',
+          click() {
+            mainWindow?.webContents.send('save');
+          },
+        },
+        {
+          label: 'Reset',
+          accelerator: 'CmdOrCtrl+X',
+          click() {
+            mainWindow?.webContents.send('reset');
+          },
+        },
+        {
+          label: 'Reset And Close Saves',
+          accelerator: 'Shift+CmdOrCtrl+X',
+          click() {
+            mainWindow?.webContents.send('reset-close');
+          },
+        },
+      ],
+    };
     const subMenuEdit: DarwinMenuItemConstructorOptions = {
       label: 'Edit',
       submenu: [
-        { label: 'Undo', accelerator: 'Command+Z', selector: 'undo:' },
-        { label: 'Redo', accelerator: 'Shift+Command+Z', selector: 'redo:' },
-        { type: 'separator' },
         { label: 'Cut', accelerator: 'Command+X', selector: 'cut:' },
         { label: 'Copy', accelerator: 'Command+C', selector: 'copy:' },
         { label: 'Paste', accelerator: 'Command+V', selector: 'paste:' },
-        {
-          label: 'Select All',
-          accelerator: 'Command+A',
-          selector: 'selectAll:',
-        },
       ],
     };
     const subMenuViewDev: MenuItemConstructorOptions = {
@@ -155,29 +174,11 @@ export default class MenuBuilder {
       label: 'Help',
       submenu: [
         {
-          label: 'Learn More',
-          click() {
-            shell.openExternal('https://electronjs.org');
-          },
-        },
-        {
-          label: 'Documentation',
+          label: 'Visit GitHub',
           click() {
             shell.openExternal(
-              'https://github.com/electron/electron/tree/main/docs#readme'
+              'https://github.com/andrewbenington/OpenHome'
             );
-          },
-        },
-        {
-          label: 'Community Discussions',
-          click() {
-            shell.openExternal('https://www.electronjs.org/community');
-          },
-        },
-        {
-          label: 'Search Issues',
-          click() {
-            shell.openExternal('https://github.com/electron/electron/issues');
           },
         },
       ],
@@ -189,7 +190,7 @@ export default class MenuBuilder {
         ? subMenuViewDev
         : subMenuViewProd;
 
-    return [subMenuAbout, subMenuEdit, subMenuView, subMenuWindow, subMenuHelp];
+    return [subMenuAbout, subMenuFile, subMenuEdit, subMenuView, subMenuWindow, subMenuHelp];
   }
 
   buildDefaultTemplate() {

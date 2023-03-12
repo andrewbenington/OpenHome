@@ -8,13 +8,9 @@ import {
 import { gen1IDToNatDex, natDexToGen1ID } from '../../util/ConvertPokemonID';
 import { getLevelGen12 } from '../../util/StatCalc';
 import { gen12StringToUTF } from '../../util/Strings/StringConverter';
+import OHPKM from './OHPKM';
 import { PKM, statsPreSplit } from './PKM';
-import {
-  adjustMovePPBetweenFormats,
-  dvsFromIVs,
-  generateDVs,
-  getTypes,
-} from './util';
+import { adjustMovePPBetweenFormats, getTypes } from './util';
 
 const gen1TypeIndices: { [key: string]: number } = {
   Normal: 0,
@@ -137,6 +133,7 @@ export class PK1 extends PKM {
   }
 
   public get gender() {
+    if (!POKEMON_DATA[this.dexNum]) return 2;
     const maleRatio =
       POKEMON_DATA[this.dexNum].formes[0].genderRatio.M > 0 ||
       POKEMON_DATA[this.dexNum].formes[0].genderRatio.F > 0
@@ -254,7 +251,7 @@ export class PK1 extends PKM {
       }
       this.level = this.dexNum > 0 ? getLevelGen12(this.dexNum, this.exp) : 0;
       this.gameOfOrigin = GameOfOrigin.Red;
-    } else if (args[0] instanceof PKM) {
+    } else if (args[0] instanceof OHPKM) {
       super(new Uint8Array(33));
       const other = args[0];
       this.dexNum = other.dexNum;
@@ -275,32 +272,21 @@ export class PK1 extends PKM {
       const validMovePPUps = other.movePPUps.filter(
         (_, i) => other.moves[i] <= GEN1_MOVE_MAX
       );
-      this.moves = [
-        validMoves[0] ?? 0,
-        validMoves[1] ?? 0,
-        validMoves[2] ?? 0,
-        validMoves[3] ?? 0,
-      ];
+      this.moves = [validMoves[0], validMoves[1], validMoves[2], validMoves[3]];
       this.movePPUps = [
-        validMovePPUps[0] ?? 0,
-        validMovePPUps[1] ?? 0,
-        validMovePPUps[2] ?? 0,
-        validMovePPUps[3] ?? 0,
+        validMovePPUps[0],
+        validMovePPUps[1],
+        validMovePPUps[2],
+        validMovePPUps[3],
       ];
       this.movePP = [
-        validMovePP[0] ?? 0,
-        validMovePP[1] ?? 0,
-        validMovePP[2] ?? 0,
-        validMovePP[3] ?? 0,
+        validMovePP[0],
+        validMovePP[1],
+        validMovePP[2],
+        validMovePP[3],
       ];
-      this.evsG12 = other.evsG12 ?? { hp: 0, atk: 0, def: 0, spc: 0, spe: 0 };
-      if (other.dvs) {
-        this.dvs = other.dvs;
-      } else if (other.ivs) {
-        this.dvs = dvsFromIVs(other.ivs, other.isShiny);
-      } else {
-        this.dvs = generateDVs(other.isShiny);
-      }
+      this.evsG12 = other.evsG12;
+      this.dvs = other.dvs;
       const types = getTypes(this);
       this.type1 = types[0] in gen1TypeIndices ? gen1TypeIndices[types[0]] : 0;
       this.type2 =

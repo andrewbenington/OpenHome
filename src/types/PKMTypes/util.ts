@@ -1,7 +1,8 @@
 import { max } from 'lodash';
+import Prando from 'prando';
 import { MOVE_DATA, POKEMON_DATA } from '../../consts';
 import Types from '../../consts/Types';
-import { bytesToString, writeUint32ToBuffer } from '../../util/ByteLogic';
+import { writeUint32ToBuffer } from '../../util/ByteLogic';
 import { PKM, stats, statsPreSplit } from './PKM';
 
 export const writeIVsToBuffer = (
@@ -46,7 +47,19 @@ export const getAbilityFromNumber = (
   }
 };
 
-export const generateTeraType = (dexNum: number, formNum: number) => {
+export const getUnownLetterGen3 = (personalityValue: number) => {
+  let letterValue = (personalityValue >> 24) & 0x3;
+  letterValue = ((personalityValue >> 16) & 0x3) | (letterValue << 2);
+  letterValue = ((personalityValue >> 8) & 0x3) | (letterValue << 2);
+  letterValue = (personalityValue & 0x3) | (letterValue << 2);
+  return letterValue % 28;
+};
+
+export const generateTeraType = (
+  prng: Prando,
+  dexNum: number,
+  formNum: number
+) => {
   if (!POKEMON_DATA[dexNum]?.formes[formNum]) {
     return undefined;
   }
@@ -54,7 +67,7 @@ export const generateTeraType = (dexNum: number, formNum: number) => {
   if (!types) {
     return undefined;
   }
-  const typeIndex = Math.floor(Math.random() * types.length);
+  const typeIndex = prng.nextInt(0, types.length - 1);
   return Types.indexOf(types[typeIndex]);
 };
 
@@ -110,20 +123,20 @@ export const dvsFromIVs = (ivs: stats, isShiny: boolean) => {
   };
 };
 
-export const generateIVs = () => {
+export const generateIVs = (prng: Prando) => {
   return {
-    hp: Math.round(Math.random() * 31),
-    atk: Math.round(Math.random() * 31),
-    def: Math.round(Math.random() * 31),
-    spa: Math.round(Math.random() * 31),
-    spd: Math.round(Math.random() * 31),
-    spe: Math.round(Math.random() * 31),
+    hp: prng.nextInt(0, 31),
+    atk: prng.nextInt(0, 31),
+    def: prng.nextInt(0, 31),
+    spa: prng.nextInt(0, 31),
+    spd: prng.nextInt(0, 31),
+    spe: prng.nextInt(0, 31),
   };
 };
 
-export const generateDVs = (isShiny: boolean) => {
+export const generateDVs = (prng: Prando, isShiny: boolean) => {
   if (isShiny) {
-    let atkDV = Math.round(Math.random() * 15);
+    let atkDV = prng.nextInt(0, 15);
     if ((atkDV & 0b11) === 0b01) {
       atkDV += 1;
     } else if (atkDV % 4 === 0) {
@@ -139,11 +152,11 @@ export const generateDVs = (isShiny: boolean) => {
     };
   }
   return {
-    hp: Math.round(Math.random() * 15),
-    atk: Math.round(Math.random() * 15),
-    def: Math.round(Math.random() * 15),
-    spc: Math.round(Math.random() * 15),
-    spe: Math.round(Math.random() * 15),
+    hp: prng.nextInt(0, 15),
+    atk: prng.nextInt(0, 15),
+    def: prng.nextInt(0, 15),
+    spc: prng.nextInt(0, 15),
+    spe: prng.nextInt(0, 15),
   };
 };
 

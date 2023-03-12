@@ -7,7 +7,7 @@ export class HomeData extends SAV {
   changedMons: BoxCoordinates[] = [];
   boxRows = 10;
   boxColumns = 12;
-  boxes: Array<HomeBox>
+  boxes: Array<HomeBox>;
   constructor(bytes: Uint8Array) {
     super('', bytes);
     this.boxNames = _.range(36).map((i) => `Box ${i + 1}`);
@@ -21,6 +21,10 @@ export class HomeBox implements Box {
   constructor(n: string) {
     this.name = n;
   }
+  clear() {
+    this.pokemon = new Array(120);
+  }
+
   writeMonsToString() {
     return this.pokemon
       .map((mon, i) => {
@@ -30,14 +34,13 @@ export class HomeBox implements Box {
           return '';
         }
       })
-      .join("");
+      .join('');
   }
 
   getMonsFromString(fileString: string, monMap: { [key: string]: OHPKM }) {
-    console.log(monMap)
     fileString.split('\n').forEach((monAndIndex) => {
       const [indexStr, monRef] = monAndIndex.split(',');
-      const mon = monMap[monRef]
+      const mon = monMap[monRef];
       const index = parseInt(indexStr);
       if (!Number.isNaN(index) && mon) {
         this.pokemon[index] = mon;

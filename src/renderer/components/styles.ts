@@ -48,6 +48,16 @@ export const leafCrownIconStyle = {
   filter: 'drop-shadow(1px 1px grey)',
 };
 
+export const moveCardStyle = {
+  height: 50,
+  flex: 1,
+  margin: 5,
+  textAlign: 'center' as 'center',
+  display: 'flex' as 'flex',
+  flexDirection: 'column' as 'column',
+  justifyContent: 'center' as 'center',
+};
+
 export const shinyLeafIconStyle = {
   marginRight: -7,
   height: 20,

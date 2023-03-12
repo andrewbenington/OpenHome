@@ -61,9 +61,11 @@ export class G3SAV extends SAV {
       const monOffset = 30 * box + index;
       const pcBytes = new Uint8Array(80);
       const changedMon = this.boxes[box].pokemon[index];
+      console.log( box, index)
       // we don't want to save OHPKM files of mons that didn't leave the save
       // (and would still be PK3s)
       if (changedMon instanceof OHPKM) {
+        changedMon.ribbons = [...changedMon.ribbons, "Champion"]
         changedMonPKMs.push(changedMon);
       }
       // changedMon will be undefined if pokemon was moved from this slot

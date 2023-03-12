@@ -1,9 +1,16 @@
+import { POKEMON_DATA } from 'consts';
+import { useMemo } from 'react';
 import { PKM } from '../../types/PKMTypes/PKM';
 import { getMonSprite, getItemSprite } from '../util/PokemonSprite';
 import AttributeRow from './AttributeRow';
 
 const PokemonWithItem = (props: { mon: PKM; format?: string; style: any }) => {
   const { mon, format, style } = props;
+  const spriteAltText = useMemo(() => {
+    const monData = POKEMON_DATA[mon.dexNum]?.formes[mon.formNum];
+    if (!monData) return 'pokemon sprite';
+    return `${monData.formeName}${mon.isShiny ? '-shiny' : ''} sprite`;
+  }, [mon]);
   return (
     <div style={{ padding: 10, ...style }}>
       <div
@@ -16,7 +23,7 @@ const PokemonWithItem = (props: { mon: PKM; format?: string; style: any }) => {
       >
         <img
           draggable={false}
-          alt="pokemon sprite"
+          alt={`${spriteAltText}`}
           style={{
             maxWidth: 100,
             maxHeight: 100,
@@ -27,8 +34,12 @@ const PokemonWithItem = (props: { mon: PKM; format?: string; style: any }) => {
           src={getMonSprite(mon, mon.format)}
         />
       </div>
-      <AttributeRow label="Level" justifyEnd>{mon.level}</AttributeRow>
-      <AttributeRow label="EXP" justifyEnd>{mon.exp}</AttributeRow>
+      <AttributeRow label="Level" justifyEnd>
+        {mon.level}
+      </AttributeRow>
+      <AttributeRow label="EXP" justifyEnd>
+        {mon.exp}
+      </AttributeRow>
       <AttributeRow label="Item" justifyEnd>
         <div
           style={{

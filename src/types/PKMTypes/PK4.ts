@@ -34,6 +34,7 @@ import {
   gen4StringToUTF,
   utf16StringToGen4,
 } from '../../util/Strings/StringConverter';
+import OHPKM from './OHPKM';
 import { contestStats, marking, PKM, pokedate, stats } from './PKM';
 import {
   adjustMovePPBetweenFormats,
@@ -58,7 +59,7 @@ export class PK4 extends PKM {
         super(bytes);
       }
       this.refreshChecksum();
-    } else if (args.length === 1 && args[0] instanceof PKM) {
+    } else if (args.length === 1 && args[0] instanceof OHPKM) {
       const other = args[0];
       super(new Uint8Array(136));
       this.sanity = other.sanity;
@@ -87,40 +88,29 @@ export class PK4 extends PKM {
       const validMovePPUps = other.movePPUps.filter(
         (_, i) => other.moves[i] <= GEN4_MOVE_MAX
       );
-      this.moves = [
-        validMoves[0] ?? 0,
-        validMoves[1] ?? 0,
-        validMoves[2] ?? 0,
-        validMoves[3] ?? 0,
-      ];
+      this.moves = [validMoves[0], validMoves[1], validMoves[2], validMoves[3]];
       this.movePP = [
-        validMovePP[0] ?? 0,
-        validMovePP[1] ?? 0,
-        validMovePP[2] ?? 0,
-        validMovePP[3] ?? 0,
+        validMovePP[0],
+        validMovePP[1],
+        validMovePP[2],
+        validMovePP[3],
       ];
       this.movePPUps = [
-        validMovePPUps[0] ?? 0,
-        validMovePPUps[1] ?? 0,
-        validMovePPUps[2] ?? 0,
-        validMovePPUps[3] ?? 0,
+        validMovePPUps[0],
+        validMovePPUps[1],
+        validMovePPUps[2],
+        validMovePPUps[3],
       ];
       this.nickname = other.nickname;
       this.currentHP = other.currentHP;
-      if (other.ivs) {
-        this.ivs = other.ivs;
-      } else if (other.dvs) {
-        this.ivs = ivsFromDVs(other.dvs);
-      } else {
-        this.ivs = generateIVs();
-      }
+      this.ivs = other.ivs;
       this.isEgg = other.isEgg;
       this.isNicknamed = other.isNicknamed;
-      this.shinyLeaves = other.shinyLeaves ?? 0;
+      this.shinyLeaves = other.shinyLeaves;
       this.gameOfOrigin = other.gameOfOrigin;
       this.language = other.languageIndex === 0 ? 'ENG' : other.language;
-      this.encounterType = other.encounterType ?? 0;
-      this.performance = other.performance ?? 0;
+      this.encounterType = other.encounterType;
+      this.performance = other.performance;
       this.trainerName = other.trainerName;
       this.trainerFriendship = other.trainerFriendship;
       this.eggDate = other.eggDate;

@@ -1,4 +1,5 @@
 import { max } from 'lodash';
+import aleaPRNG from 'alea';
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -19,9 +20,10 @@ import {
   EncounterTypes,
 } from '../../consts';
 import { getLocation } from '../../consts/MetLocation/MetLocation';
-import { generatePersonalityValue } from './util';
+import { generatePersonalityValue, getUnownLetterGen3 } from './util';
 import bigInt from 'big-integer';
 import { getGen3To5Gender } from '../../util/GenderCalc';
+import Prando from 'prando';
 
 export class PKM {
   static markingCount = 4;
@@ -130,11 +132,11 @@ export class PKM {
   public set ability(value: string | undefined) {
     this._ability = value;
   }
-  private _abilityNum: number = 1;
-  public get abilityNum(): number {
+  private _abilityNum: number | undefined;
+  public get abilityNum(): number | undefined {
     return this._abilityNum;
   }
-  public set abilityNum(value: number) {
+  public set abilityNum(value: number | undefined) {
     this._abilityNum = value;
   }
   private _abilityIndex: number = 0;
@@ -947,85 +949,86 @@ export class PKM {
     return this.pokerusByte >> 4;
   }
 
-  createPersonalityValueFromOtherPreGen6(other: PKM) {
-    if (other.personalityValue === undefined) {
-      // from gameboy pkm
-      this.personalityValue = generatePersonalityValue();
+  createPersonalityValueFromOtherPreGen6(
+    other: PKM,
+    prng: Prando = new Prando()
+  ) {
+    this.personalityValue =
+      other.personalityValue ?? prng.nextInt(0, 0xffffffff);
+    let otherNature = other.statNature ?? other.nature;
+    // xoring the other three values with this to calculate upper half of personality value
+    // will ensure shininess or non-shininess depending on original mon
+    let otherGender = other.gender;
+    let otherAbilityNum = other.abilityNum ?? 4;
+    let i = 0;
+    let newPersonalityValue = bigInt(this.personalityValue);
+    let shouldCheckUnown = other.dexNum === 201 && this.format === 'PK3';
+    while (i < 0x10000) {
+      let newGender = getGen3To5Gender(
+        newPersonalityValue.toJSNumber(),
+        this.dexNum
+      );
+      let newNature = newPersonalityValue.mod(25).toJSNumber();
+      if (
+        (!shouldCheckUnown ||
+          getUnownLetterGen3(newPersonalityValue.toJSNumber()) ===
+            other.formNum) &&
+        newGender === otherGender &&
+        (otherAbilityNum === 4 ||
+          shouldCheckUnown ||
+          newPersonalityValue.and(1).add(1).toJSNumber() === otherAbilityNum) &&
+        (otherNature === undefined || newNature === otherNature) &&
+        getIsShinyPreGen6(
+          this.trainerID,
+          this.secretID,
+          newPersonalityValue.toJSNumber()
+        ) === other.isShiny
+      ) {
+        this.personalityValue = newPersonalityValue.toJSNumber();
+        return;
+      }
+      i++;
+      let pvBytes = uint32ToBytesLittleEndian(this.personalityValue);
+      let pvLower16, pvUpper16;
       if (other.dexNum === 201) {
-        this.personalityValue =
-          (this.personalityValue & 0xffffffe0) | other.formNum;
-      }
-      if (other.isShiny) {
-        let pvBytes = uint32ToBytesLittleEndian(this.personalityValue);
-        let pvLower16 = bytesToUint16LittleEndian(pvBytes, 0);
-        let pvUpper16 = pvLower16 ^ this.trainerID ^ this.secretID;
-        // setting the top two bytes to result in a shiny personality value
-        pvBytes.set(uint16ToBytesLittleEndian(pvUpper16), 2);
-        this.personalityValue = bytesToUint32LittleEndian(pvBytes, 0);
-      } else if (this.isShiny) {
-        // inverting the highest bit will always revert a shiny personality value
-        this.personalityValue = this.personalityValue ^ 0x10000000;
-      }
-    } else {
-      this.personalityValue = other.personalityValue;
-    }
-    // adjust personality value to match nature, while retaining xor of upper and lower
-    if (this.isNatureFromPersonalityValue && other.nature !== undefined) {
-      let originalPersonalityValue = this.personalityValue;
-      let newPersonalityValue = bigInt(originalPersonalityValue);
-      let tid = this.trainerID;
-      let sid = this.secretID;
-      let nature = other.statNature ?? other.nature;
-      // xoring the other three values with this to calculate upper half of personality value
-      // will ensure shininess or non-shininess depending on original mon
-      let shinyXor = other.isShiny ? 0 : 8;
-      let otherAbilityNumNonHA = other.abilityNum > 2 ? 1 : other.abilityNum;
-      let otherGender = other.gender;
-
-      let i = 0;
-      while (i < 0x10000) {
-        let newGender = getGen3To5Gender(
-          newPersonalityValue.toJSNumber(),
-          this.dexNum
-        );
-        if (
-          newGender === otherGender &&
-          newPersonalityValue.and(1).add(1).toJSNumber() ===
-            otherAbilityNumNonHA &&
-          newPersonalityValue.mod(25).toJSNumber() === nature &&
-          getIsShinyPreGen6(tid, sid, newPersonalityValue.toJSNumber()) ===
-            other.isShiny
-        ) {
-          this.personalityValue = newPersonalityValue.toJSNumber();
-          return;
+        pvLower16 = prng.nextInt(0, 0xffff);
+        pvUpper16 = prng.nextInt(0, 0xffff);
+        if (other.isShiny) {
+          pvUpper16 =
+            ((this.trainerID ^ this.secretID ^ pvLower16) & 0xfcfc) |
+            (pvUpper16 & 0x0303);
         }
-        i++;
-        let pvBytes = uint32ToBytesLittleEndian(originalPersonalityValue);
-        let pvLower16 = bytesToUint16LittleEndian(pvBytes, 0);
-        let pvUpper16 = bytesToUint16LittleEndian(pvBytes, 2);
+        const shinyXor = this.trainerID ^ this.secretID ^ pvLower16 ^ pvUpper16
+      } else {
+        pvLower16 = bytesToUint16LittleEndian(pvBytes, 0);
+        pvUpper16 = bytesToUint16LittleEndian(pvBytes, 2);
         pvLower16 ^= i;
-        pvUpper16 = tid ^ sid ^ pvLower16 ^ shinyXor;
-        pvBytes.set(uint16ToBytesLittleEndian(pvLower16), 0);
-        pvBytes.set(uint16ToBytesLittleEndian(pvUpper16), 2);
-        newPersonalityValue = bigInt(bytesToUint32LittleEndian(pvBytes, 0));
+        if (other.isShiny) {
+          let shinyXor = other.isSquareShiny ? 0 : 1;
+          pvUpper16 = this.trainerID ^ this.secretID ^ pvLower16 ^ shinyXor;
+        }
       }
-    } else if (
-      other.personalityValue !== undefined &&
-      other.isShiny &&
-      (other.trainerID ^
-        other.secretID ^
-        ((other.personalityValue >> 16) & 0xffff) ^
-        (other.personalityValue & 0xffff)) >=
-        8
-    ) {
-      let pvBytes = uint32ToBytesLittleEndian(other.personalityValue);
-      let pvUpper16 = bytesToUint16LittleEndian(pvBytes, 2);
-      // mon would not have been shiny pre-gen4, we need to subtract 8 from the xor value
-      pvUpper16 = pvUpper16 ^ 8;
       pvBytes.set(uint16ToBytesLittleEndian(pvUpper16), 2);
-      this.personalityValue = bytesToUint32LittleEndian(pvBytes, 0);
+      pvBytes.set(uint16ToBytesLittleEndian(pvLower16), 0);
+      newPersonalityValue = bigInt(bytesToUint32LittleEndian(pvBytes, 0));
     }
   }
+  // else if (
+  //   other.personalityValue !== undefined &&
+  //   other.isShiny &&
+  //   (other.trainerID ^
+  //     other.secretID ^
+  //     ((other.personalityValue >> 16) & 0xffff) ^
+  //     (other.personalityValue & 0xffff)) >=
+  //     8
+  // ) {
+  //   let pvBytes = uint32ToBytesLittleEndian(other.personalityValue);
+  //   let pvUpper16 = bytesToUint16LittleEndian(pvBytes, 2);
+  //   // mon would not have been shiny pre-gen4, we need to subtract 8 from the xor value
+  //   pvUpper16 = pvUpper16 ^ 8;
+  //   pvBytes.set(uint16ToBytesLittleEndian(pvUpper16), 2);
+  //   this.personalityValue = bytesToUint32LittleEndian(pvBytes, 0);
+  // }
 }
 
 export interface pokedate {

@@ -67,7 +67,9 @@ const PokemonDisplay = (props: {
         value={displayMon.format}
         onChange={(e) => {
           const T = getTypeFromString(e.target.value);
-          if (T) {
+          if (mon.format === e.target.value) {
+            setDisplayMon(mon);
+          } else if (T) {
             setDisplayMon(new T(mon));
           }
         }}
@@ -137,36 +139,6 @@ const PokemonDisplay = (props: {
             />
           ))}
         </AttributeRow>
-        {displayMon.teraTypeOriginal !== undefined &&
-        displayMon.teraTypeOverride !== undefined ? (
-          <AttributeRow label="Tera Type">
-            <img
-              draggable={false}
-              alt="tera type"
-              style={{ height: 24, width: 24, marginRight: 5 }}
-              src={`https://raw.githubusercontent.com/msikma/pokesprite/master/misc/types/gen8/${Types[
-                displayMon.teraTypeOverride <= 18
-                  ? displayMon.teraTypeOverride
-                  : displayMon.teraTypeOriginal
-              ]?.toLocaleLowerCase()}.png`}
-            />
-            {displayMon.teraTypeOverride <= 18 && (
-              <>
-                <p>(originally </p>
-                <img
-                  alt="tera type original"
-                  style={{ height: 24, width: 24, marginRight: 5 }}
-                  src={`https://raw.githubusercontent.com/msikma/pokesprite/master/misc/types/gen8/${Types[
-                    displayMon.teraTypeOriginal
-                  ]?.toLocaleLowerCase()}.png`}
-                />
-                <p>)</p>
-              </>
-            )}
-          </AttributeRow>
-        ) : (
-          <></>
-        )}
         <AttributeRow
           label="OT"
           value={`${displayMon.trainerName} ${
