@@ -100,7 +100,7 @@ export class G2SAV extends SAV {
           if (boxMon instanceof OHPKM) {
             changedMonPKMs.push(boxMon);
           }
-          const PK2Mon = new PK2(boxMon);
+          const PK2Mon = boxMon instanceof PK2 ? boxMon : new PK2(boxMon);
           // set the mon's dex number in the box
           this.bytes[boxByteOffset + 1 + numMons] = PK2Mon.dexNum;
           // set the mon's data in the box
@@ -234,7 +234,7 @@ export class G2SAV extends SAV {
 
 export class G2Box implements Box {
   name: string;
-  pokemon: Array<PK2 | OHPKM>;
+  pokemon: Array<PK2 | OHPKM | undefined>;
   constructor(name: string, boxSize: number) {
     this.name = name;
     this.pokemon = new Array(boxSize);

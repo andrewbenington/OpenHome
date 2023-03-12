@@ -4,6 +4,7 @@ import { getMoveMaxPP } from 'types/PKMTypes/util';
 import { Balls, GameOfOriginData, MOVE_DATA, Natures } from '../../consts';
 import { marking, PKM } from '../../types/PKMTypes/PKM';
 import { getGameLogo, getTypeColor } from '../util/PokemonSprite';
+import MoveCard from './MoveCard';
 import { detailsPaneContentStyle } from './styles';
 
 const getMarkingColor = (value: marking) => {
@@ -247,42 +248,34 @@ const SummaryDisplay = (props: { mon: PKM; updateMon: (mon: PKM) => void }) => {
           justifyContent: 'center',
         }}
       >
-        {mon.moves.map((move, i) => {
-          return (
-            <Card
-              key={`move${i}`}
-              style={{
-                height: 70,
-                width: 120,
-                margin: 5,
-                backgroundColor: getTypeColor(MOVE_DATA[move]?.type),
-                textAlign: 'center',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-              }}
-            >
-              <div
-                style={{
-                  marginBottom: 8,
-                  color: 'white',
-                  fontWeight: 'bold',
-                }}
-              >
-                {MOVE_DATA[move]?.name}
-              </div>
-              <div
-                style={{
-                  color: 'white',
-                  fontWeight: 'bold',
-                }}
-              >
-                {move ? mon.movePP[i] : '--'}/
-                {getMoveMaxPP(move, mon.format, mon.movePPUps[i]) ?? '--'} PP
-              </div>
-            </Card>
-          );
-        })}
+        <MoveCard
+          move={mon.moves[0]}
+          movePP={mon.moves[0] ? mon.movePP[0] : undefined}
+          maxPP={getMoveMaxPP(mon.moves[0], mon.format, mon.movePPUps[0])}
+        />
+        <MoveCard
+          move={mon.moves[1]}
+          movePP={mon.moves[1] ? mon.movePP[1] : undefined}
+          maxPP={getMoveMaxPP(mon.moves[1], mon.format, mon.movePPUps[1])}
+        />
+      </div>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'center',
+        }}
+      >
+        <MoveCard
+          move={mon.moves[2]}
+          movePP={mon.moves[2] ? mon.movePP[2] : undefined}
+          maxPP={getMoveMaxPP(mon.moves[2], mon.format, mon.movePPUps[2])}
+        />
+        <MoveCard
+          move={mon.moves[3]}
+          movePP={mon.moves[3] ? mon.movePP[3] : undefined}
+          maxPP={getMoveMaxPP(mon.moves[3], mon.format, mon.movePPUps[3])}
+        />
       </div>
     </div>
   );

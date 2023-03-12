@@ -33,6 +33,7 @@ import {
   gen3StringToUTF,
   utf16StringToGen3,
 } from '../../util/Strings/StringConverter';
+import OHPKM from './OHPKM';
 import { contestStats, marking, PKM, stats } from './PKM';
 import {
   adjustMovePPBetweenFormats,
@@ -57,7 +58,7 @@ export class PK3 extends PKM {
       } else {
         super(bytes);
       }
-    } else if (args.length === 1 && args[0] instanceof PKM) {
+    } else if (args.length === 1 && args[0] instanceof OHPKM) {
       const other = args[0];
       super(new Uint8Array(80));
       this.dexNum = other.dexNum;
@@ -89,34 +90,26 @@ export class PK3 extends PKM {
       const validMovePPUps = other.movePPUps.filter(
         (_, i) => other.moves[i] <= GEN3_MOVE_MAX
       );
-      this.moves = [
-        validMoves[0] ?? 0,
-        validMoves[1] ?? 0,
-        validMoves[2] ?? 0,
-        validMoves[3] ?? 0,
-      ];
+      this.moves = [validMoves[0], validMoves[1], validMoves[2], validMoves[3]];
       this.movePP = [
-        validMovePP[0] ?? 0,
-        validMovePP[1] ?? 0,
-        validMovePP[2] ?? 0,
-        validMovePP[3] ?? 0,
+        validMovePP[0],
+        validMovePP[1],
+        validMovePP[2],
+        validMovePP[3],
       ];
       this.movePPUps = [
-        validMovePPUps[0] ?? 0,
-        validMovePPUps[1] ?? 0,
-        validMovePPUps[2] ?? 0,
-        validMovePPUps[3] ?? 0,
+        validMovePPUps[0],
+        validMovePPUps[1],
+        validMovePPUps[2],
+        validMovePPUps[3],
       ];
       this.movePPUps = other.movePPUps;
-      if (other.ivs) {
-        this.ivs = other.ivs;
-      } else if (other.dvs) {
-        this.ivs = ivsFromDVs(other.dvs);
-      } else {
-        this.ivs = generateIVs();
-      }
+      this.ivs = other.ivs;
       this.isEgg = other.isEgg;
-      this.gameOfOrigin = other.gameOfOrigin <= GameOfOrigin.ColosseumXD ? other.gameOfOrigin : 0xf;
+      this.gameOfOrigin =
+        other.gameOfOrigin <= GameOfOrigin.ColosseumXD
+          ? other.gameOfOrigin
+          : 0xf;
       if (other.gameOfOrigin === GameOfOrigin.AlphaSapphire) {
         this.gameOfOrigin = GameOfOrigin.Sapphire;
       } else if (other.gameOfOrigin === GameOfOrigin.OmegaRuby) {
@@ -146,7 +139,7 @@ export class PK3 extends PKM {
         other.gameOfOrigin >= GameOfOrigin.Sapphire &&
         other.gameOfOrigin <= GameOfOrigin.LeafGreen
       ) {
-        this.metLocationIndex = other.metLocationIndex ?? 0;
+        this.metLocationIndex = other.metLocationIndex;
       } else if (equivalentLocation >= 0) {
         this.metLocationIndex = equivalentLocation;
       } else {
@@ -328,7 +321,7 @@ export class PK3 extends PKM {
     for (let i = 0; i < 4; i++) {
       ppUpVal |= (value[i] & 3) << (2 * i);
     }
-    this.bytes[0x28] = ppUpVal
+    this.bytes[0x28] = ppUpVal;
   }
 
   public get trainerFriendship() {

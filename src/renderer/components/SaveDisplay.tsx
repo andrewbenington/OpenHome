@@ -42,9 +42,6 @@ const SaveDisplay = (props: SaveDisplayProps) => {
     setIsLoading(false);
   }, [save]);
 
-  useEffect(() => {
-    console.log('box changed to', box);
-  }, [box]);
   return (
     <div style={{ flex: 1 }}>
       {save && box !== undefined && !isloading ? (
@@ -122,11 +119,6 @@ const SaveDisplay = (props: SaveDisplayProps) => {
                           <PokemonButton
                             onClick={() => {
                               setSelectedMon(mon);
-                              // if (!mon || mon instanceof save.pkmType) {
-                              //   setSelectedMon(mon);
-                              // } else {
-                              //   setSelectedMon(new save.pkmType(mon));
-                              // }
                             }}
                             onDragEvent={(cancelled: boolean) => {
                               console.log(

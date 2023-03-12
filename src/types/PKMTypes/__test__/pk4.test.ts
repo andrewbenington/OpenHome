@@ -30,21 +30,19 @@ const mightyenaOH = bytesToPKM(
   'OHPKM'
 ) as OHPKM;
 
+const slowpokeOH = bytesToPKM(
+  new Uint8Array(
+    fs.readFileSync(path.join(__dirname, './PKMFiles/OH', 'slowpoke-shiny.ohpkm'))
+  ),
+  'OHPKM'
+) as OHPKM;
+
 const typhlosionGen4 = bytesToPKM(
   new Uint8Array(
     fs.readFileSync(path.join(__dirname, './PKMFiles/Gen4', 'typhlosion.pkm'))
   ),
   'PK4'
 ) as PK4;
-
-const slowpokeGen7 = bytesToPKM(
-  new Uint8Array(
-    fs.readFileSync(
-      path.join(__dirname, './PKMFiles/Gen7', 'slowpoke-shiny.pk7')
-    )
-  ),
-  'PK7'
-);
 
 test('gen 4 EVs are updated', () => {
   const gen4pkm = new PK4(mightyenaOH);
@@ -123,19 +121,19 @@ test('pk4 and ohpkm have the same gen34lookup key', () => {
 });
 
 test('gen 6+ nickname accuracy', () => {
-  const converted = new PK4(slowpokeGen7);
-  expect(converted.nickname).toBe(slowpokeGen7.nickname);
+  const converted = new PK4(slowpokeOH);
+  expect(converted.nickname).toBe(slowpokeOH.nickname);
 });
 
 test('gen 6+ shiny accuracy', () => {
-  const converted = new PK4(slowpokeGen7);
-  if (!slowpokeGen7.personalityValue) {
+  const converted = new PK4(slowpokeOH);
+  if (!slowpokeOH.personalityValue) {
     fail('mon has no personality value');
   }
-  expect(converted.isShiny).toBe(slowpokeGen7.isShiny);
+  expect(converted.isShiny).toBe(slowpokeOH.isShiny);
 });
 
 test('gen 6+ nature accuracy', () => {
-  const converted = new PK4(slowpokeGen7);
-  expect(converted.nature).toBe(slowpokeGen7.nature);
+  const converted = new PK4(slowpokeOH);
+  expect(converted.nature).toBe(slowpokeOH.nature);
 });

@@ -32,7 +32,7 @@ const OtherDisplay = (props: { mon: PKM }) => {
   const { mon } = props;
   return (
     <div style={detailsPaneContentStyle}>
-      {mon.personalityValue ? (
+      {mon.personalityValue !== undefined ? (
         <AttributeRow
           label="Personality Value"
           value={'0x' + mon.personalityValue.toString(16).padStart(8, '0')}
@@ -40,7 +40,7 @@ const OtherDisplay = (props: { mon: PKM }) => {
       ) : (
         <div />
       )}
-      {mon.encryptionConstant ? (
+      {mon.encryptionConstant !== undefined ? (
         <AttributeRow
           label="Encryption Constant"
           value={'0x' + mon.encryptionConstant.toString(16).padStart(8, '0')}
@@ -48,7 +48,7 @@ const OtherDisplay = (props: { mon: PKM }) => {
       ) : (
         <div />
       )}
-      {mon.secretID ? (
+      {mon.secretID !== undefined ? (
         <AttributeRow
           label="Trainer Secret ID"
           value={'0x' + mon.secretID.toString(16).padStart(4, '0')}
@@ -56,10 +56,33 @@ const OtherDisplay = (props: { mon: PKM }) => {
       ) : (
         <div />
       )}
-      {mon.trainerFriendship ? (
+      {mon.trainerFriendship !== undefined ? (
         <AttributeRow
           label="OT Friendship"
           value={mon.trainerFriendship.toString()}
+        />
+      ) : (
+        <div />
+      )}
+      {mon.dexNum >= 265 && mon.dexNum <= 269 ? (
+        <AttributeRow
+          label="Wurmple Evolution"
+          value={
+            (((mon.personalityValue ?? 0) >> 16) & 0xffff) % 10 > 4
+              ? 'Dustox'
+              : 'Beautifly'
+          }
+        />
+      ) : (
+        <div />
+      )}
+      {mon.dexNum >= 265 && mon.dexNum <= 269 ? (
+        <AttributeRow
+          label="Wurmple Evolution"
+          value={(
+            (((mon.personalityValue ?? 0) >> 16) & 0xffff) %
+            10
+          ).toString()}
         />
       ) : (
         <div />
@@ -69,7 +92,8 @@ const OtherDisplay = (props: { mon: PKM }) => {
       ) : (
         <div />
       )}
-      {mon.shinyLeaves ? (
+      {!isRestricted(HGSSSAV.TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
+      mon.shinyLeaves !== undefined ? (
         <AttributeRow label="Shiny Leaves">
           {mon.shinyLeafValues?.crown ? (
             <img draggable={false} src={LeafCrown} style={leafCrownIconStyle} />
@@ -193,19 +217,13 @@ const OtherDisplay = (props: { mon: PKM }) => {
       )}
       {!isRestricted(G2SAV.TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
       (mon instanceof PK1 || mon instanceof PK2 || mon instanceof OHPKM) ? (
-        <AttributeRow
-          label="Gen 1/2 ID"
-          value={getMonGen12Identifier(mon)}
-        />
+        <AttributeRow label="Gen 1/2 ID" value={getMonGen12Identifier(mon)} />
       ) : (
         <div />
       )}
       {!isRestricted(HGSSSAV.TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
       (mon instanceof PK3 || mon instanceof PK4 || mon instanceof OHPKM) ? (
-        <AttributeRow
-          label="Gen 3/4 ID"
-          value={getMonGen34Identifier(mon)}
-        />
+        <AttributeRow label="Gen 3/4 ID" value={getMonGen34Identifier(mon)} />
       ) : (
         <div />
       )}

@@ -15,7 +15,7 @@ import { Box, SAV } from './SAV';
 class G1Box implements Box {
   name: string;
 
-  pokemon: Array<PK1 | OHPKM>;
+  pokemon: Array<PK1 | OHPKM | undefined>;
 
   constructor(name: string, boxSize: number) {
     this.name = name;
@@ -27,10 +27,10 @@ export default class G1SAV extends SAV {
   pkmType = PK1;
   static TRANSFER_RESTRICTIONS = {
     maxDexNum: 151,
-    excludedForms:{ ...RegionalForms },
+    excludedForms: { ...RegionalForms },
   };
 
-  transferRestrictions = G1SAV.TRANSFER_RESTRICTIONS
+  transferRestrictions = G1SAV.TRANSFER_RESTRICTIONS;
 
   NUM_BOXES = 14;
 
@@ -151,7 +151,7 @@ export default class G1SAV extends SAV {
           if (boxMon instanceof OHPKM) {
             changedMonPKMs.push(boxMon);
           }
-          const PK1Mon = new PK1(boxMon);
+          const PK1Mon = boxMon instanceof PK1 ? boxMon : new PK1(boxMon);
           // set the mon's dex number in the box
           this.bytes[boxByteOffset + 1 + numMons] =
             natDexToGen1ID[PK1Mon.dexNum];

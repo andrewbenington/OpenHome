@@ -51,6 +51,9 @@ type SaveArray = [
 ];
 
 const Home = () => {
+  const [loadingMessage, setLoadingMessage] = useState<string | undefined>(
+    'Starting app...'
+  );
   const [currentTheme, setCurrentTheme] = useState<OpenHomeTheme>(Themes[0]);
   const [selectedMon, setSelectedMon] = useState<PKM>();
   const [draggingSource, setDraggingSource] = useState<SaveCoordinates>();
@@ -68,13 +71,13 @@ const Home = () => {
   const [filesToDelete, setFilesToDelete] = useState<string[]>([]);
   const [homeData, setHomeData] = useState(new HomeData(new Uint8Array()));
 
-  useEffect(() => {
+  const updateBoxData = () => {
     if (homeMonMap) {
       console.log('home mon map updated', homeMonMap);
       readBoxData((boxString) => {
-        console.log(boxString);
         // box file just stores references, so we need to populate them from the map
         const newBox = homeData.boxes[0];
+        newBox.clear();
         newBox.getMonsFromString(boxString, homeMonMap);
         const newData = new HomeData(new Uint8Array());
         Object.assign(newData, homeData);
@@ -82,16 +85,14 @@ const Home = () => {
         setHomeData(newData);
       });
     }
-  }, [box, homeMonMap]);
+  };
 
   useEffect(() => {
-    console.log('changedOHPKMList updated', changedOHPKMList);
+    console.log(
+      'changedOHPKMList updated',
+      changedOHPKMList.map((mon) => mon.nickname)
+    );
   }, [changedOHPKMList]);
-
-  useEffect(() => {
-    console.log('homedata changed');
-    console.log(homeData);
-  }, [homeData]);
 
   useEffect(() => {
     // console.log(draggingSource, draggingDest);
@@ -138,7 +139,6 @@ const Home = () => {
           );
         }
         if (draggingSource.save != draggingDest.save) {
-          console.log('adding to changed list');
           setChangedOHPKMList([...changedOHPKMList, homeMon]);
         }
         setDraggingSource(undefined);
@@ -161,7 +161,6 @@ const Home = () => {
     saveNumber: number,
     mon?: OHPKM
   ) => {
-    console.log('setSaveMon', box, index, saveNumber, mon);
     const changingSave = saves[saveNumber];
     if (changingSave) {
       const newBoxes = changingSave.boxes;
@@ -184,7 +183,6 @@ const Home = () => {
     if (coords) {
       const sourceSave = coords.isHome ? homeData : saves[coords.save];
       const sourceMon = sourceSave?.boxes[coords.box]?.pokemon[coords.index];
-      console.log(sourceMon);
       if (sourceMon) {
         setDraggingMon({
           dexNumber: sourceMon.dexNum,
@@ -334,11 +332,6 @@ const Home = () => {
     });
     changedOHPKMList.forEach((mon) => {
       console.log('writing', mon);
-      console.log(new OHPKM(mon));
-      console.log(
-        'pid',
-        bytesToUint16LittleEndian(mon.bytes, 0x1c).toString(16)
-      );
       if (mon) {
         window.electron.ipcRenderer.sendMessage('write-ohpkm', mon.bytes);
       }
@@ -378,6 +371,10 @@ const Home = () => {
     setFilesToDelete([]);
   };
 
+  useEffect(() => {
+    updateBoxData();
+  }, [homeMonMap]);
+
   const readHomeData = async () => {
     window.electron.ipcRenderer.once(
       'home-data-read',
@@ -387,6 +384,7 @@ const Home = () => {
           monMap[id] = new OHPKM(bytes);
         });
         setHomeMonMap(monMap);
+        setLoadingMessage(undefined);
       }
     );
     window.electron.ipcRenderer.sendMessage('read-home-data', 'fake');
@@ -413,6 +411,7 @@ const Home = () => {
                   changedMons.push(mon);
                 }
               });
+              markMonsAsChanged(changedMons);
               const newSaves: SaveArray = [...saves];
               newSaves[saveIndex] = newSave;
               setSaves(newSaves);
@@ -436,6 +435,7 @@ const Home = () => {
                   changedMons.push(mon);
                 }
               });
+              markMonsAsChanged(changedMons);
               const newSaves: SaveArray = [...saves];
               newSaves[saveIndex] = newSave;
               setSaves(newSaves);
@@ -454,6 +454,7 @@ const Home = () => {
                 changedMons.push(mon);
               }
             });
+            markMonsAsChanged(changedMons);
             const newSaves: SaveArray = [...saves];
             newSaves[saveIndex] = newSave;
             setSaves(newSaves);
@@ -469,12 +470,8 @@ const Home = () => {
   }, [saveAllSaveFiles]);
 
   useEffect(() => {
-    console.log(draggingMon);
-  }, [draggingMon]);
-
-  useEffect(() => {
     const callback = handleMenuResetAndClose(
-      () => console.log('reset'),
+      () => readHomeData(),
       () => setSaves([undefined, undefined, undefined, undefined])
     );
     return () => callback();
@@ -485,7 +482,9 @@ const Home = () => {
     initializeDragImage();
   }, []);
 
-  return homeMonMap ? (
+  return loadingMessage ? (
+    <div>{loadingMessage}</div>
+  ) : (
     <div
       style={{
         backgroundColor: currentTheme.backgroundColor,
@@ -598,38 +597,6 @@ const Home = () => {
               });
             }}
           />
-          <button
-            type="button"
-            style={{
-              width: '100%',
-              backgroundColor: '#fff4',
-              position: 'relative',
-              border: 'none',
-              flex: 1,
-              borderRadius: 4,
-              textAlign: 'center',
-            }}
-            onClick={() =>
-              Object.entries(Gen4ToUTFMap).forEach(([key, value]) => {
-                console.log(key, String.fromCharCode(value));
-              })
-            }
-            //   disabled={!mon}
-          >
-            <div
-              style={{
-                width: '100%',
-                flex: 1,
-                padding: 'auto',
-              }}
-              onDragOver={(e) => {
-                e.preventDefault();
-              }}
-              onDrop={(e) => onViewDrop(e, 'trash')}
-            >
-              TRASH
-            </div>
-          </button>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', width: '25%' }}>
           <SaveDisplay
@@ -686,23 +653,21 @@ const Home = () => {
           type="button"
           style={{
             margin: 10,
-            height: 'calc(100% - 20px)',
-            width: '100%',
+            height: 'calc(100% - 40px)',
+            flex: 1,
             backgroundColor: '#fff4',
             position: 'relative',
             border: 'none',
             borderRadius: 4,
             textAlign: 'center',
           }}
-          onClick={() => console.log(utf16StringToGen4('Starmie', 11, true))}
-          //   disabled={!mon}
         >
           <div
             draggable
             style={{
-              cursor: 'grab',
-              width: '100%',
               height: '100%',
+              width: '100%',
+              flex: 1,
               padding: 'auto',
             }}
             onDragOver={(e) => {
@@ -710,73 +675,41 @@ const Home = () => {
             }}
             onDrop={(e) => onViewDrop(e, 'as is')}
           >
-            As Is
+            Preview
           </div>
         </button>
         <button
           type="button"
           style={{
             margin: 10,
-            height: 'calc(100% - 20px)',
-            width: '100%',
+            height: 'calc(100% - 40px)',
             backgroundColor: '#fff4',
             position: 'relative',
             border: 'none',
+            flex: 1,
             borderRadius: 4,
             textAlign: 'center',
           }}
+          onClick={() => {}}
           //   disabled={!mon}
         >
           <div
-            draggable
             style={{
-              cursor: 'grab',
-              width: '100%',
               height: '100%',
+              width: '100%',
+              flex: 1,
               padding: 'auto',
             }}
             onDragOver={(e) => {
               e.preventDefault();
             }}
-            onDrop={(e) => onViewDrop(e, 'PK3')}
+            onDrop={(e) => onViewDrop(e, 'trash')}
           >
-            PK3
-          </div>
-        </button>
-        <button
-          type="button"
-          style={{
-            margin: 10,
-            height: 'calc(100% - 20px)',
-            width: '100%',
-            backgroundColor: '#fff4',
-            position: 'relative',
-            border: 'none',
-            borderRadius: 4,
-            textAlign: 'center',
-          }}
-          //   disabled={!mon}
-        >
-          <div
-            draggable
-            style={{
-              cursor: 'grab',
-              width: '100%',
-              height: '100%',
-              padding: 'auto',
-            }}
-            onDragOver={(e) => {
-              e.preventDefault();
-            }}
-            onDrop={(e) => onViewDrop(e, 'PK4')}
-          >
-            PK4
+            TRASH
           </div>
         </button>
       </div>
     </div>
-  ) : (
-    <div />
   );
 };
 
