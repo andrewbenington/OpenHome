@@ -119,4 +119,33 @@ export class XDPKM extends PKM {
         bytesToUint16BigEndian(bytes, 0x02)) <
       8;
   }
+
+  public get movePP() {
+    return [
+      this.bytes[0x82],
+      this.bytes[0x86],
+      this.bytes[0x8a],
+      this.bytes[0x8e],
+    ];
+  }
+
+  public set movePP(value: [number, number, number, number]) {
+    for (let i = 0; i < 4; i += 4) {
+      this.bytes[0x7a + i] = value[i];
+    }
+  }
+  public get movePPUps() {
+    return [
+      this.bytes[0x83],
+      this.bytes[0x87],
+      this.bytes[0x8b],
+      this.bytes[0x8f],
+    ];
+  }
+
+  public set movePPUps(value: [number, number, number, number]) {
+    for (let i = 0; i < 4; i += 4) {
+      this.bytes[0x7b + i] = value[i];
+    }
+  }
 }
