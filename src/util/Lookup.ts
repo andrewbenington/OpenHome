@@ -1,8 +1,13 @@
 import { PK4 } from '../types/PKMTypes/PK4';
 import { PKM } from '../types/PKMTypes/PKM';
 import { getBaseMon } from '../types/PKMTypes/util';
-import OHPKM from '../types/PKMTypes/OHPKM';
+import { OHPKM } from '../types/PKMTypes/OHPKM';
 import { bytesToString } from './ByteLogic';
+import { PK2, PK3 } from 'types/PKMTypes';
+import {
+  gen12StringToUTF,
+  utf16StringToGen12,
+} from './Strings/StringConverter';
 
 export const getMonFileIdentifier = (mon: OHPKM) => {
   if (mon.personalityValue) {
@@ -22,6 +27,11 @@ export const getMonFileIdentifier = (mon: OHPKM) => {
 
 export const getMonGen12Identifier = (mon: PKM) => {
   const { dvs } = mon;
+  const convertedTrainerName = gen12StringToUTF(
+    utf16StringToGen12(mon.trainerName, 8, true),
+    0,
+    8
+  );
   if (!dvs) return undefined;
   const baseMon = getBaseMon(mon.dexNum, mon.formNum);
   const TID =
@@ -32,7 +42,7 @@ export const getMonGen12Identifier = (mon: PKM) => {
     return `${baseMon.dexNumber.toString().padStart(4, '0')}-${bytesToString(
       TID,
       2
-    )}-${mon.trainerName}-${dvs.atk.toString(16)}-${dvs.def.toString(
+    )}-${convertedTrainerName}-${dvs.atk.toString(16)}-${dvs.def.toString(
       16
     )}-${dvs.spc.toString(16)}-${dvs.spe.toString(16)}`;
   }
@@ -77,7 +87,7 @@ export const updateGen34LookupTable = (updatedMons: OHPKM[]) => {
   const gen34LookupString = updatedMons
     .map((mon, i) => {
       if (!mon) return '';
-      const gen34Identifier = getMonGen34Identifier(mon);
+      const gen34Identifier = getMonGen34Identifier(new PK3(mon));
       const homeIdentifier = getMonFileIdentifier(mon);
       console.log(gen34Identifier, homeIdentifier);
       if (!gen34Identifier || !homeIdentifier) return '';

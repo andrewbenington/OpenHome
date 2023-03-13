@@ -1,19 +1,14 @@
 import Types from 'consts/Types';
 import _ from 'lodash';
-import { PK3 } from 'types/PKMTypes/PK3';
-import { PK4 } from 'types/PKMTypes/PK4';
-import { G2SAV } from 'types/SAV/G2SAV';
-import { HGSSSAV } from 'types/SAV/HGSSSAV';
+import { PKM, PK1, PK2, OHPKM, PK3, PK4 } from 'types/PKMTypes';
+import { G2SAV } from 'types/SAVTypes/G2SAV';
+import { HGSSSAV } from 'types/SAVTypes/HGSSSAV';
 import { isRestricted } from 'types/TransferRestrictions';
 import {
   getMonFileIdentifier,
   getMonGen12Identifier,
   getMonGen34Identifier,
 } from 'util/Lookup';
-import OHPKM from '../../types/PKMTypes/OHPKM';
-import { PK1 } from '../../types/PKMTypes/PK1';
-import { PK2 } from '../../types/PKMTypes/PK2';
-import { PKM } from '../../types/PKMTypes/PKM';
 import Alpha from '../images/icons/Alpha.png';
 import GMax from '../images/icons/GMax.png';
 import LeafCrown from '../images/icons/LeafCrown.png';
@@ -33,9 +28,7 @@ const OtherDisplay = (props: { mon: PKM }) => {
   return (
     <div style={detailsPaneContentStyle}>
       {mon.personalityValue !== undefined ? (
-        <AttributeRow
-          label="Personality Value"
-        >
+        <AttributeRow label="Personality Value">
           <code>
             {'0x' + mon.personalityValue.toString(16).padStart(8, '0')}
           </code>
@@ -44,9 +37,7 @@ const OtherDisplay = (props: { mon: PKM }) => {
         <div />
       )}
       {mon.encryptionConstant !== undefined ? (
-        <AttributeRow
-          label="Encryption Constant"
-        >
+        <AttributeRow label="Encryption Constant">
           <code>
             {'0x' + mon.encryptionConstant.toString(16).padStart(8, '0')}
           </code>

@@ -1,27 +1,25 @@
 import { Button, Dialog, MenuItem, Select } from '@mui/material';
 import { useEffect, useState } from 'react';
-import OHPKM from 'types/PKMTypes/OHPKM';
-import { PK3 } from 'types/PKMTypes/PK3';
-import { PK4 } from 'types/PKMTypes/PK4';
-import G1SAV from 'types/SAV/G1SAV';
-import { G2SAV } from 'types/SAV/G2SAV';
-import { G3SAV } from 'types/SAV/G3SAV';
-import { G4SAV } from 'types/SAV/G4SAV';
-import { BoxCoordinates, SAV } from 'types/SAV/SAV';
-import { buildSaveFile, getSaveType } from 'types/SAV/util';
+import { OHPKM, PK3, PK4 } from 'types/PKMTypes';
+import {
+  BoxCoordinates,
+  G1SAV,
+  G2SAV,
+  G3SAV,
+  G4SAV,
+  SAV,
+} from 'types/SAVTypes';
+import { buildSaveFile, getSaveType } from 'types/SAVTypes/util';
 import { isRestricted } from 'types/TransferRestrictions';
-import { bytesToUint16LittleEndian } from 'util/ByteLogic';
 import { acceptableExtensions, bytesToPKM } from 'util/FileImport';
+import { PKM } from '../types/PKMTypes/PKM';
+import { HomeData } from '../types/SAVTypes/HomeData';
+import { MonReference, SaveType } from '../types/types';
 import {
   getMonFileIdentifier,
   updateGen12LookupTable,
   updateGen34LookupTable,
 } from '../util/Lookup';
-import Gen4ToUTFMap from 'util/Strings/Gen4ToUTFMap';
-import { utf16StringToGen4 } from 'util/Strings/StringConverter';
-import { PKM } from '../types/PKMTypes/PKM';
-import { HomeData } from '../types/SAV/HomeData';
-import { MonReference, SaveType } from '../types/types';
 import HomeBoxDisplay from './components/HomeBoxDisplay';
 import PokemonDisplay from './components/PokemonDisplay';
 import SaveDisplay from './components/SaveDisplay';
@@ -376,7 +374,7 @@ const Home = () => {
   }, [homeMonMap]);
 
   const readHomeData = async () => {
-    setChangedOHPKMList([])
+    setChangedOHPKMList([]);
     window.electron.ipcRenderer.once(
       'home-data-read',
       (byteMap: { [key: string]: Uint8Array }) => {

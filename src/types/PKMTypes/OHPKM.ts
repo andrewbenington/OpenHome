@@ -49,7 +49,7 @@ import {
 } from './util';
 import Prando from 'prando';
 
-class OHPKM extends PKM {
+export class OHPKM extends PKM {
   static fileSize = 376;
 
   constructor(...args: any[]) {
@@ -1297,5 +1297,3 @@ class OHPKM extends PKM {
     // })
   }
 }
-
-export default OHPKM;

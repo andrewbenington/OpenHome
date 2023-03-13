@@ -33,7 +33,7 @@ import {
   gen3StringToUTF,
   utf16StringToGen3,
 } from '../../util/Strings/StringConverter';
-import OHPKM from './OHPKM';
+import { OHPKM } from './OHPKM';
 import { contestStats, marking, PKM, stats } from './PKM';
 import {
   adjustMovePPBetweenFormats,

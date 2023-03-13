@@ -1,11 +1,8 @@
 import { Card, Grid } from '@mui/material';
 import _ from 'lodash';
-import OHPKM from 'types/PKMTypes/OHPKM';
-import { PKM } from 'types/PKMTypes/PKM';
-import { useEffect } from 'react';
 import { OpenHomeTheme } from 'renderer/Themes';
-import { HomeBox, HomeData } from 'types/SAV/HomeData';
-import { SAV, BoxCoordinates } from 'types/SAV/SAV';
+import { PKM } from 'types/PKMTypes/PKM';
+import { HomeBox } from '../../types/SAVTypes/HomeData';
 import PokemonButton from './buttons/PokemonButton';
 
 interface HomeBoxDisplayProps {

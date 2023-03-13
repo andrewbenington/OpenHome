@@ -12,7 +12,7 @@ import {
 import _ from 'lodash';
 import { useEffect, useState } from 'react';
 import { Radar } from 'react-chartjs-2';
-import { G2SAV } from 'types/SAV/G2SAV';
+import { G2SAV } from 'types/SAVTypes/G2SAV';
 import { isRestricted } from 'types/TransferRestrictions';
 import { getNatureSummary } from '../../consts/Natures';
 import { COLOPKM } from '../../types/PKMTypes/COLOPKM';

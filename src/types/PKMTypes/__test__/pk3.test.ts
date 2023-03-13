@@ -3,7 +3,7 @@ import { TextDecoder } from 'node:util'; // (ESM style imports)
 import path from 'path';
 import { bytesToPKM } from 'util/FileImport';
 import { getMonGen34Identifier } from 'util/Lookup';
-import OHPKM from '../OHPKM';
+import { OHPKM } from '../OHPKM';
 import { PK3 } from '../PK3';
 
 (global as any).TextDecoder = TextDecoder;
