@@ -448,15 +448,15 @@ export class OHPKM extends PKM {
   }
 
   public set isFatefulEncounter(value: boolean) {
-    this.bytes[0x22] = (this.bytes[0x22] & ~1) | (value ? 1 : 0);
+    this.bytes[0x22] = (this.bytes[0x22] & 0xfe) | (value ? 1 : 0);
   }
 
   public get flag2LA() {
-    return getFlag(this.bytes, 0x22, 2);
+    return getFlag(this.bytes, 0x22, 1);
   }
 
   public set flag2LA(value: boolean) {
-    setFlag(this.bytes, 0x22, 2, value);
+    setFlag(this.bytes, 0x22, 1, value);
   }
 
   public get gender() {
