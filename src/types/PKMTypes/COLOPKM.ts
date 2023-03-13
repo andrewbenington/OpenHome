@@ -81,7 +81,8 @@ export class COLOPKM extends PKM {
       spa: getStatGen3Onward('SpA', this),
       spd: getStatGen3Onward('SpD', this),
     };
-    let origin = GameOfOriginData.find((game) => game?.gc === bytes[0x08]) ?? null;
+    let origin =
+      GameOfOriginData.find((game) => game?.gc === bytes[0x08]) ?? null;
     this.gameOfOrigin = GameOfOriginData.indexOf(origin);
     let byteArray = new Uint16Array(12);
     for (let i = 0; i < 12; i += 1) {
@@ -107,14 +108,39 @@ export class COLOPKM extends PKM {
         this.ribbons.push(Gen3StandardRibbons[index]);
       }
     }
-    this.metYear = bytes[0x7b];
-    this.metMonth = bytes[0x7c];
-    this.metDay = bytes[0x7d];
     this.isShiny =
       (this.trainerID ^
         this.secretID ^
         bytesToUint16BigEndian(bytes, 0x00) ^
         bytesToUint16BigEndian(bytes, 0x02)) <
       8;
+  }
+  public get movePP() {
+    return [
+      this.bytes[0x7a],
+      this.bytes[0x7e],
+      this.bytes[0x82],
+      this.bytes[0x86],
+    ];
+  }
+
+  public set movePP(value: [number, number, number, number]) {
+    for (let i = 0; i < 4; i += 4) {
+      this.bytes[0x7a + i] = value[i];
+    }
+  }
+  public get movePPUps() {
+    return [
+      this.bytes[0x7b],
+      this.bytes[0x7f],
+      this.bytes[0x83],
+      this.bytes[0x87],
+    ];
+  }
+
+  public set movePPUps(value: [number, number, number, number]) {
+    for (let i = 0; i < 4; i += 4) {
+      this.bytes[0x7b + i] = value[i];
+    }
   }
 }
