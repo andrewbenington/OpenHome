@@ -1,6 +1,6 @@
-import { Items } from '../../consts';
-import { GameOfOriginData } from '../../consts/GameOfOrigin';
-import { POKEMON_DATA } from '../../consts/Mons';
+import { Items } from 'consts';
+import { GameOfOriginData } from 'consts/GameOfOrigin';
+import { POKEMON_DATA } from 'consts/Mons';
 import { PKM } from '../../types/PKMTypes/PKM';
 import { GameLogos } from '../images/Images';
 const ColosseumOnlyNonShadow = [311];
@@ -205,12 +205,7 @@ export const getMonSprite = (mon: PKM, format: string) => {
     case 'PK1':
       return getShowdownSprite(mon.dexNum, mon.formNum, false, 'gen1');
     case 'PK2':
-      return getShowdownSprite(
-        mon.dexNum,
-        mon.formNum,
-        mon.isShiny,
-        'gen2'
-      );
+      return getShowdownSprite(mon.dexNum, mon.formNum, mon.isShiny, 'gen2');
     case 'XDPKM':
     case 'COLOPKM':
       return `https://www.pokencyclopedia.info/sprites/spin-off/ani_xd${
@@ -245,6 +240,8 @@ export const getMonSprite = (mon: PKM, format: string) => {
       } else {
         return getPokemonDBSprite(mon.dexNum, mon.formNum, mon.isShiny, 'home');
       }
+    case 'PB7':
+      return getSerebiiSprite(mon.dexNum, mon.formNum, mon.isShiny, 'home');
     case 'PA8':
       return getPokemonDBSprite(
         mon.dexNum,

@@ -58269,7 +58269,7 @@
         "paradox": false,
         "cosmeticForme": false,
         "sprite": "koraidon",
-        "spriteIndex": [7, 35]
+        "spriteIndex": [8, 35]
       },
       {
         "name": "Koraidon",
@@ -58305,7 +58305,7 @@
         "paradox": false,
         "cosmeticForme": false,
         "sprite": "koraidon",
-        "spriteIndex": [7, 35]
+        "spriteIndex": [8, 35]
       },
       {
         "name": "Koraidon",
@@ -58341,7 +58341,7 @@
         "paradox": false,
         "cosmeticForme": false,
         "sprite": "koraidon",
-        "spriteIndex": [7, 35]
+        "spriteIndex": [8, 35]
       },
       {
         "name": "Koraidon",
@@ -58377,7 +58377,7 @@
         "paradox": false,
         "cosmeticForme": false,
         "sprite": "koraidon",
-        "spriteIndex": [7, 35]
+        "spriteIndex": [8, 35]
       }
     ],
     "levelUpType": "Slow"
@@ -58420,7 +58420,7 @@
         "paradox": false,
         "cosmeticForme": false,
         "sprite": "miraidon",
-        "spriteIndex": [8, 35]
+        "spriteIndex": [9, 35]
       },
       {
         "name": "Miraidon",
@@ -58456,7 +58456,7 @@
         "paradox": false,
         "cosmeticForme": false,
         "sprite": "miraidon",
-        "spriteIndex": [8, 35]
+        "spriteIndex": [10, 35]
       },
       {
         "name": "Miraidon",
@@ -58492,7 +58492,7 @@
         "paradox": false,
         "cosmeticForme": false,
         "sprite": "miraidon",
-        "spriteIndex": [8, 35]
+        "spriteIndex": [10, 35]
       },
       {
         "name": "Miraidon",
@@ -58528,7 +58528,7 @@
         "paradox": false,
         "cosmeticForme": false,
         "sprite": "miraidon",
-        "spriteIndex": [8, 35]
+        "spriteIndex": [10, 35]
       },
       {
         "name": "Miraidon",
@@ -58564,7 +58564,7 @@
         "paradox": false,
         "cosmeticForme": false,
         "sprite": "miraidon",
-        "spriteIndex": [8, 35]
+        "spriteIndex": [10, 35]
       }
     ],
     "levelUpType": "Slow"

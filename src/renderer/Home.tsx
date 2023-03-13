@@ -376,6 +376,7 @@ const Home = () => {
   }, [homeMonMap]);
 
   const readHomeData = async () => {
+    setChangedOHPKMList([])
     window.electron.ipcRenderer.once(
       'home-data-read',
       (byteMap: { [key: string]: Uint8Array }) => {

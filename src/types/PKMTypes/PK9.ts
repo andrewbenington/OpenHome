@@ -146,6 +146,13 @@ export class PK9 extends PKM {
     // };
   }
 
+  public get gender() {
+    return (this.bytes[0x22] >> 1) & 0x3;
+  }
+  public set gender(value: number) {
+    this.bytes[0x22] = (this.bytes[0x22] & 0xf9) | (value << 1);
+  }
+
   public get affixedRibbon() {
     return this.bytes[0xd4] !== 0xff ? this.bytes[0xd4] : undefined;
   }

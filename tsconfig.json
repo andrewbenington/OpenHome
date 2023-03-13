@@ -8,6 +8,11 @@
     "strict": true,
     "sourceMap": true,
     "baseUrl": "./src",
+    "paths": {
+      "src/*": [
+        "./src/*"
+      ]
+    },
     "moduleResolution": "node",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,

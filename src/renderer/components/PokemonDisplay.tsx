@@ -78,7 +78,7 @@ const PokemonDisplay = (props: {
           backgroundColor: fileTypeColors[mon.format],
         }}
       >
-        <MenuItem value="OHPKM">OHPKM</MenuItem>
+        <MenuItem value="OHPKM">OpenHome</MenuItem>
         {mon.format !== 'OHPKM' ? (
           <MenuItem value={mon.format}>{mon.format}</MenuItem>
         ) : (
