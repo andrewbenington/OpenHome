@@ -1,7 +1,7 @@
 import { uniq } from 'lodash';
 import { OHPKM } from 'types/PKMTypes/OHPKM';
 import { PK2 } from 'types/PKMTypes/PK2';
-import { RegionalForms } from 'types/TransferRestrictions';
+import { CapPikachus, RegionalForms } from 'types/TransferRestrictions';
 import { SaveType } from 'types/types';
 import { bytesToUint16BigEndian, get8BitChecksum } from 'util/ByteLogic';
 import {
@@ -13,7 +13,7 @@ import { Box, SAV } from './SAV';
 export class G2SAV extends SAV {
   static TRANSFER_RESTRICTIONS = {
     maxDexNum: 251,
-    excludedForms: { ...RegionalForms, 201: [26, 27] },
+    excludedForms: { ...RegionalForms, ...CapPikachus, 201: [26, 27] },
   };
   boxOffsets: number[];
   boxes: Array<G2Box>;

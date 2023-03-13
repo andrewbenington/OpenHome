@@ -2,9 +2,9 @@ import { MenuItem, Select } from '@mui/material';
 import _ from 'lodash';
 import { useEffect, useState } from 'react';
 import Themes from 'renderer/Themes';
-import { G1SAV, G2SAV, G3SAV, HGSSSAV } from 'types/SAVTypes';
+import { G1SAV, G2SAV, G3SAV, G5SAV, HGSSSAV } from 'types/SAVTypes';
 import { POKEMON_DATA } from '../../consts/Mons';
-import { OHPKM, PK1, PK2, PK3, PK4, PKM } from '../../types/PKMTypes';
+import { OHPKM, PK1, PK2, PK3, PK4, PK5, PKM } from '../../types/PKMTypes';
 import { getTypes } from '../../types/PKMTypes/util';
 import { isRestricted } from '../../types/TransferRestrictions';
 import AttributeRow from './AttributeRow';
@@ -33,6 +33,8 @@ const getTypeFromString = (type: string) => {
       return PK3;
     case 'PK4':
       return PK4;
+    case 'PK5':
+      return PK5;
   }
 };
 
@@ -104,6 +106,12 @@ const PokemonDisplay = (props: {
           mon.formNum
         ) ? (
           <MenuItem value="PK4">PK4</MenuItem>
+        ) : (
+          <div />
+        )}
+        {mon.format === 'OHPKM' &&
+        !isRestricted(G5SAV.TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) ? (
+          <MenuItem value="PK5">PK5</MenuItem>
         ) : (
           <div />
         )}

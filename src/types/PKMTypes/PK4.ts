@@ -5,6 +5,7 @@ import {
   Gen4RibbonsPart2,
   Gen4RibbonsPart3,
   isHoenn,
+  isJohto,
   isKanto,
   isSinnoh,
   Items,
@@ -136,6 +137,9 @@ export class PK4 extends PKM {
       } else if (isKanto(other.gameOfOrigin)) {
         this.eggLocationIndex = other.eggLocationIndex ? 2003 : 0;
         this.metLocationIndex = 2003;
+      } else if (isJohto(other.gameOfOrigin)) {
+        this.eggLocationIndex = other.eggLocationIndex ? 2004 : 0;
+        this.metLocationIndex = 2004;
       } else if (isHoenn(other.gameOfOrigin)) {
         this.eggLocationIndex = other.eggLocationIndex ? 2005 : 0;
         this.metLocationIndex = 2005;

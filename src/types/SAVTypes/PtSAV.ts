@@ -1,5 +1,5 @@
 import { GameOfOrigin } from 'consts';
-import { RegionalForms } from 'types/TransferRestrictions';
+import { CapPikachus, RegionalForms } from 'types/TransferRestrictions';
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -10,7 +10,7 @@ import { G4SAV } from './G4SAV';
 export class PtSAV extends G4SAV {
   transferRestrictions = {
     maxDexNum: 493,
-    excludedForms: { ...RegionalForms, 483: [1], 484: [1] },
+    excludedForms: { ...RegionalForms, ...CapPikachus, 483: [1], 484: [1] },
   };
 
   static TRAINER_NAME_OFFSET = 0x68;

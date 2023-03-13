@@ -1,13 +1,20 @@
-import { PK5 } from '../PKMTypes/PK5';
+import { CapPikachus, RegionalForms } from 'types/TransferRestrictions';
 import { bytesToUint16LittleEndian } from '../../util/ByteLogic';
-import { Box, BoxCoordinates, SAV } from './SAV';
+import { PK5 } from '../PKMTypes/PK5';
+import { Box, SAV } from './SAV';
 
 export class G5SAV extends SAV {
+  static TRANSFER_RESTRICTIONS = {
+    maxDexNum: 649,
+    excludedForms: { ...RegionalForms, ...CapPikachus, 483: [1], 484: [1] },
+  };
+
+  transferRestrictions = G5SAV.TRANSFER_RESTRICTIONS;
   static PC_OFFSET = 0x400;
   pkmType = PK5;
   constructor(path: string, bytes: Uint8Array) {
-    super(path, bytes)
-    this.boxes = Array(24)
+    super(path, bytes);
+    this.boxes = Array(24);
     for (let box = 0; box < 24; box++) {
       let charArray = new Uint16Array(20);
       for (let i = 0; i < 20; i += 1) {

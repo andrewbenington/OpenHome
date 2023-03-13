@@ -138,6 +138,16 @@ export const isKanto = (origin: GameOfOrigin) => {
   );
 };
 
+export const isJohto = (origin: GameOfOrigin) => {
+  return (
+    origin === GameOfOrigin.Gold ||
+    origin === GameOfOrigin.Silver ||
+    origin === GameOfOrigin.Crystal ||
+    origin === GameOfOrigin.HeartGold ||
+    origin === GameOfOrigin.SoulSilver
+  );
+};
+
 export const isHoenn = (origin: GameOfOrigin) => {
   return (
     origin === GameOfOrigin.Sapphire ||
