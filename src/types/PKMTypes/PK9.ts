@@ -152,6 +152,37 @@ export class PK9 extends PKM {
   public set gender(value: number) {
     this.bytes[0x22] = (this.bytes[0x22] & 0xf9) | (value << 1);
   }
+  
+  public get movePP() {
+    return [
+      this.bytes[0x7a],
+      this.bytes[0x7b],
+      this.bytes[0x7c],
+      this.bytes[0x7d],
+    ];
+  }
+
+  public set movePP(value: [number, number, number, number]) {
+    for (let i = 0; i < 4; i++) {
+      this.bytes[0x7a + i] = value[i];
+    }
+  }
+
+  public get movePPUps() {
+    return [
+      this.bytes[0x7e],
+      this.bytes[0x7f],
+      this.bytes[0x80],
+      this.bytes[0x81],
+    ];
+  }
+
+  public set movePPUps(value: [number, number, number, number]) {
+    for (let i = 0; i < 4; i++) {
+      this.bytes[0x7e + i] = value[i];
+    }
+  }
+
 
   public get affixedRibbon() {
     return this.bytes[0xd4] !== 0xff ? this.bytes[0xd4] : undefined;
