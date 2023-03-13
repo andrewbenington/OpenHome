@@ -1,4 +1,4 @@
-import { RegionalForms } from 'types/TransferRestrictions';
+import { CapPikachus, RegionalForms } from 'types/TransferRestrictions';
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -11,10 +11,14 @@ export class DPSAV extends G4SAV {
     maxDexNum: 493,
     excludedForms: {
       ...RegionalForms,
+      ...CapPikachus,
+      // rotom appliances
       479: [1, 2, 3, 4, 5],
+      // origin formes
       483: [1],
       484: [1],
       487: [1],
+      // shaymin sky
       492: [1],
     },
   };

@@ -11,6 +11,10 @@ interface FormRestrictions {
   [dexNum: number]: number[] | undefined;
 }
 
+export const CapPikachus: FormRestrictions = {
+  25: [1, 2, 3, 4, 5, 6, 7, 9],
+};
+
 export const AlolanForms: FormRestrictions = {
   19: [1],
   20: [1],
@@ -30,6 +34,7 @@ export const AlolanForms: FormRestrictions = {
   103: [1],
   105: [1],
 };
+
 export const GalarianForms: FormRestrictions = {
   52: [2],
   77: [1],

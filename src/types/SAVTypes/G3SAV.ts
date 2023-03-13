@@ -10,12 +10,12 @@ import {
 } from '../../util/ByteLogic';
 import { gen3StringToUTF } from '../../util/Strings/StringConverter';
 import { Box, BoxCoordinates, SAV } from './SAV';
-import { RegionalForms } from 'types/TransferRestrictions';
+import { CapPikachus, RegionalForms } from 'types/TransferRestrictions';
 
 export class G3SAV extends SAV {
   static TRANSFER_RESTRICTIONS = {
     maxDexNum: 386,
-    excludedForms: { ...RegionalForms },
+    excludedForms: { ...RegionalForms, ...CapPikachus },
   };
   static TRAINER_OFFSET = 0x0ff4 * 0;
   static TEAM_ITEMS_OFFSET = 0x0ff4 * 1;

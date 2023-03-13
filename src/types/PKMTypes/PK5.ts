@@ -1,8 +1,11 @@
+import G4Locations from 'consts/MetLocation/G4';
 import {
-  gen5StringToUTF,
-  utf16StringToGen5,
-} from '../../util/Strings/StringConverter';
-import { GameOfOrigin } from '../../consts';
+  GameOfOrigin,
+  isHoenn,
+  isJohto,
+  isKanto,
+  isSinnoh,
+} from '../../consts';
 import { Abilities } from '../../consts/Abilities';
 import { Items } from '../../consts/Items';
 import { Languages } from '../../consts/Languages';
@@ -14,6 +17,7 @@ import {
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
+  get16BitChecksumLittleEndian,
   getFlag,
   setFlag,
   uint16ToBytesLittleEndian,
@@ -21,6 +25,7 @@ import {
 } from '../../util/ByteLogic';
 import {
   decryptByteArrayGen45,
+  shuffleBlocksGen45,
   unshuffleBlocksGen45,
 } from '../../util/Encryption';
 import {
@@ -28,19 +33,123 @@ import {
   getLevelGen3Onward,
   getStatGen3Onward,
 } from '../../util/StatCalc';
+import {
+  gen5StringToUTF,
+  utf16StringToGen5,
+} from '../../util/Strings/StringConverter';
+import { OHPKM } from './OHPKM';
+import { GEN4_MOVE_MAX } from './PK4';
 import { contestStats, marking, PKM, pokedate, stats } from './PKM';
-import { writeIVsToBuffer } from './util';
+import {
+  adjustMovePPBetweenFormats,
+  getAbilityFromNumber,
+  writeIVsToBuffer,
+} from './util';
 
 export class PK5 extends PKM {
   static fileSize = 136;
 
-  constructor(bytes: Uint8Array, encrypted: boolean = false) {
-    if (encrypted) {
-      let unencryptedBytes = decryptByteArrayGen45(bytes);
-      let unshuffledBytes = unshuffleBlocksGen45(unencryptedBytes);
-      super(unshuffledBytes);
-    } else {
-      super(bytes);
+  constructor(...args: any[]) {
+    if (args.length >= 1 && args[0] instanceof Uint8Array) {
+      const bytes = args[0];
+      const encrypted = args[1] ?? false;
+      if (encrypted) {
+        let unencryptedBytes = decryptByteArrayGen45(bytes);
+        let unshuffledBytes = unshuffleBlocksGen45(unencryptedBytes);
+        super(unshuffledBytes);
+      } else {
+        super(bytes);
+      }
+      this.refreshChecksum();
+    } else if (args.length === 1 && args[0] instanceof OHPKM) {
+      const other = args[0];
+      super(new Uint8Array(136));
+      this.sanity = other.sanity;
+      this.dexNum = other.dexNum;
+      this.formNum = other.formNum;
+      this.heldItem = other.heldItem;
+      this.trainerID = other.trainerID;
+      this.secretID = other.secretID;
+      this.exp = other.exp;
+      this.abilityNum = other.abilityNum;
+      this.ability =
+        other.ability ??
+        getAbilityFromNumber(this.dexNum, this.formNum, this.abilityNum);
+      // console
+      this.createPersonalityValueFromOtherPreGen6(other);
+      this.isFatefulEncounter = other.isFatefulEncounter;
+      this.gender = other.gender;
+      this.evs = other.evs ?? { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 };
+      this.contest = other.contest;
+      this.pokerusByte = other.pokerusByte;
+      this.ribbons = other.ribbons;
+      // filtering out moves that didnt exist yet
+      const validMoves = other.moves.filter((move) => move <= GEN4_MOVE_MAX);
+      const validMovePP = adjustMovePPBetweenFormats(this, other).filter(
+        (_, i) => other.moves[i] <= GEN4_MOVE_MAX
+      );
+      const validMovePPUps = other.movePPUps.filter(
+        (_, i) => other.moves[i] <= GEN4_MOVE_MAX
+      );
+      this.moves = [validMoves[0], validMoves[1], validMoves[2], validMoves[3]];
+      this.movePP = [
+        validMovePP[0],
+        validMovePP[1],
+        validMovePP[2],
+        validMovePP[3],
+      ];
+      this.movePPUps = [
+        validMovePPUps[0],
+        validMovePPUps[1],
+        validMovePPUps[2],
+        validMovePPUps[3],
+      ];
+      this.nickname = other.nickname;
+      this.currentHP = other.currentHP;
+      this.ivs = other.ivs;
+      this.isEgg = other.isEgg;
+      this.isNicknamed = other.isNicknamed;
+      this.shinyLeaves = other.shinyLeaves;
+      this.gameOfOrigin = other.gameOfOrigin;
+      this.language = other.languageIndex === 0 ? 'ENG' : other.language;
+      this.encounterType = other.encounterType;
+      this.performance = other.performance;
+      this.trainerName = other.trainerName;
+      this.trainerFriendship = other.trainerFriendship;
+      this.eggDate = other.eggDate;
+      let now = new Date();
+      this.metDate = other.metDate ?? {
+        month: now.getMonth(),
+        day: now.getDate(),
+        year: now.getFullYear() - 2000,
+      };
+      this.ball = other.ball && other.ball <= 24 ? other.ball : 4;
+      this.nature = other.nature;
+      if (
+        other.gameOfOrigin >= GameOfOrigin.White &&
+        other.gameOfOrigin <= GameOfOrigin.Black2
+      ) {
+        this.eggLocationIndex = other.eggLocationIndex;
+        this.metLocationIndex = other.metLocationIndex ?? 40002;
+      } else if (isKanto(other.gameOfOrigin)) {
+        this.eggLocationIndex = other.eggLocationIndex ? 30004 : 0;
+        this.metLocationIndex = 30004;
+      } else if (isJohto(other.gameOfOrigin)) {
+        this.eggLocationIndex = other.eggLocationIndex ? 30005 : 0;
+        this.metLocationIndex = 30005;
+      } else if (isHoenn(other.gameOfOrigin)) {
+        this.eggLocationIndex = other.eggLocationIndex ? 30006 : 0;
+        this.metLocationIndex = 30006;
+      } else if (isSinnoh(other.gameOfOrigin)) {
+        this.eggLocationIndex = other.eggLocationIndex ? 30007 : 0;
+        this.metLocationIndex = 30007;
+      } else {
+        this.eggLocationIndex = other.eggLocationIndex ? 2 : 0;
+        this.metLocationIndex = 2;
+      }
+      this.metLevel = other.metLevel ?? this.level;
+      this.trainerGender = other.trainerGender;
+      this.refreshChecksum();
     }
   }
 
@@ -128,10 +237,17 @@ export class PK5 extends PKM {
   }
 
   public get abilityNum() {
+    // todo: figure this out for mons from before white with HA
     if (this.gameOfOrigin < GameOfOrigin.White) {
       return (this.personalityValue & 1) + 1;
     } else {
       return this.bytes[0x42] & 1 ? 4 : ((this.personalityValue >> 16) & 1) + 1;
+    }
+  }
+
+  public set abilityNum(value: number) {
+    if (value === 4) {
+      this.bytes[0x42] |= 1;
     }
   }
 
@@ -403,14 +519,6 @@ export class PK5 extends PKM {
     this.bytes[0x41] = value;
   }
 
-  public get isHiddenAbiliity() {
-    return !!(this.bytes[0x42] & 1);
-  }
-
-  public set isHiddenAbiliity(value: boolean) {
-    this.bytes[0x41] = (this.bytes[0x41] & 0b11111110) | (value ? 1 : 0);
-  }
-
   public get isNsPokemon() {
     return !!(this.bytes[0x42] & 2);
   }
@@ -572,5 +680,15 @@ export class PK5 extends PKM {
       spa: getStatGen3Onward('SpA', this),
       spd: getStatGen3Onward('SpD', this),
     };
+  }
+
+  public refreshChecksum() {
+    const newChecksum = get16BitChecksumLittleEndian(this.bytes, 0x08, 0x87);
+    this.bytes.set(uint16ToBytesLittleEndian(newChecksum), 0x06);
+  }
+
+  public toPCBytes() {
+    let shuffledBytes = shuffleBlocksGen45(this.bytes);
+    return decryptByteArrayGen45(shuffledBytes);
   }
 }
