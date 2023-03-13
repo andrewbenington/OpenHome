@@ -520,6 +520,15 @@ export class PKM {
   public set metTimeOfDay(value: number | undefined) {
     this._metTimeOfDay = value;
   }
+
+  private _isNsPokemon?: boolean | undefined;
+  public get isNsPokemon(): boolean | undefined {
+    return this._isNsPokemon;
+  }
+  public set isNsPokemon(value: boolean | undefined) {
+    this._isNsPokemon = value;
+  }
+
   private _shinyLeaves?: number | undefined;
   public get shinyLeaves(): number | undefined {
     return this._shinyLeaves;

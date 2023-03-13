@@ -3,7 +3,7 @@ import { TextDecoder } from 'node:util'; // (ESM style imports)
 import path from 'path';
 import { SaveType } from '../../types';
 import { bytesToPKM } from '../../../util/FileImport';
-import G1SAV from '../G1SAV';
+import { G1SAV } from '../G1SAV';
 import { buildSaveFile } from '../util';
 import { PK1 } from '../../PKMTypes';
 
@@ -77,4 +77,3 @@ test('inserting mon works', () => {
   expect(modifiedSaveFile2.boxes[7].pokemon[10]?.nickname).toEqual('MEW');
   expect(modifiedSaveFile2.boxes[7].pokemon[11]?.nickname).toEqual('Slowpoke');
 });
-

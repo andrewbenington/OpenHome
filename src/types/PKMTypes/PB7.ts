@@ -124,4 +124,34 @@ export class PB7 extends PKM {
         bytesToUint16LittleEndian(bytes, 0x1a)) ===
         0;
   }
+
+  public get movePP() {
+    return [
+      this.bytes[0x62],
+      this.bytes[0x63],
+      this.bytes[0x64],
+      this.bytes[0x65],
+    ];
+  }
+
+  public set movePP(value: [number, number, number, number]) {
+    for (let i = 0; i < 4; i++) {
+      this.bytes[0x62 + i] = value[i];
+    }
+  }
+
+  public get movePPUps() {
+    return [
+      this.bytes[0x66],
+      this.bytes[0x67],
+      this.bytes[0x68],
+      this.bytes[0x69],
+    ];
+  }
+
+  public set movePPUps(value: [number, number, number, number]) {
+    for (let i = 0; i < 4; i++) {
+      this.bytes[0x66 + i] = value[i];
+    }
+  }
 }
