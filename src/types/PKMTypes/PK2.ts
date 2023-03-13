@@ -15,7 +15,7 @@ import {
 } from '../../util/ByteLogic';
 import { getLevelGen12 } from '../../util/StatCalc';
 import { gen12StringToUTF } from '../../util/Strings/StringConverter';
-import OHPKM from './OHPKM';
+import { OHPKM } from './OHPKM';
 import { PKM, statsPreSplit } from './PKM';
 import { adjustMovePPBetweenFormats, dvsFromIVs, generateDVs } from './util';
 
@@ -249,7 +249,7 @@ export class PK2 extends PKM {
     if (args[0] instanceof Uint8Array) {
       super(args[0]);
       if (this.bytes.length >= 0x46) {
-        this.trainerName = gen12StringToUTF(this.bytes, 0x30, 11);
+        this.trainerName = gen12StringToUTF(this.bytes, 0x30, 8);
         this.nickname = gen12StringToUTF(this.bytes, 0x3b, 11);
       } else {
         this.nickname = POKEMON_DATA[this.dexNum].name.toLocaleUpperCase();

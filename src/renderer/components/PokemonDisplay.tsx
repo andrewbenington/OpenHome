@@ -2,13 +2,11 @@ import { MenuItem, Select } from '@mui/material';
 import _ from 'lodash';
 import { useEffect, useState } from 'react';
 import Themes from 'renderer/Themes';
-import OHPKM from '../../types/PKMTypes/OHPKM';
-import G1SAV from '../../types/SAV/G1SAV';
-import { isRestricted } from '../../types/TransferRestrictions';
+import { G1SAV, G2SAV, G3SAV, HGSSSAV } from 'types/SAVTypes';
 import { POKEMON_DATA } from '../../consts/Mons';
-import Types from '../../consts/Types';
-import { PK1, PK2, PK3, PK4, PKM } from '../../types/PKMTypes';
+import { OHPKM, PK1, PK2, PK3, PK4, PKM } from '../../types/PKMTypes';
 import { getTypes } from '../../types/PKMTypes/util';
+import { isRestricted } from '../../types/TransferRestrictions';
 import AttributeRow from './AttributeRow';
 import OpenHomeButton from './buttons/OpenHomeButton';
 import OtherDisplay from './OtherDisplay';
@@ -22,9 +20,6 @@ import {
   tabButtonStyle,
 } from './styles';
 import SummaryDisplay from './SummaryDisplay';
-import { G2SAV } from '../../types/SAV/G2SAV';
-import { G3SAV } from '../../types/SAV/G3SAV';
-import { HGSSSAV } from '../../types/SAV/HGSSSAV';
 
 const getTypeFromString = (type: string) => {
   switch (type) {

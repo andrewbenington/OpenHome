@@ -4,7 +4,7 @@ import _ from 'lodash';
 import { useEffect, useState } from 'react';
 import { SaveCoordinates } from 'renderer/Home';
 import { PKM } from '../../types/PKMTypes/PKM';
-import { BoxCoordinates, SAV } from '../../types/SAV/SAV';
+import { BoxCoordinates, SAV } from '../../types/SAVTypes/SAV';
 import ArrowButton from './buttons/ArrowButton';
 import PokemonButton from './buttons/PokemonButton';
 

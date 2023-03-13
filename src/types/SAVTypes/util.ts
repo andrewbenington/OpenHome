@@ -1,5 +1,3 @@
-import { OHPKM } from 'types/PKMTypes/OHPKM';
-import { PKM } from 'types/PKMTypes/PKM';
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -9,7 +7,7 @@ import {
   getMonGen12Identifier,
   getMonGen34Identifier,
 } from '../../util/Lookup';
-import { SaveType } from '../types';
+import { SaveType } from '../../types/types';
 import { DPSAV } from './DPSAV';
 import { G1SAV } from './G1SAV';
 import { G2SAV } from './G2SAV';
@@ -18,6 +16,7 @@ import { G5SAV } from './G5SAV';
 import { HGSSSAV } from './HGSSSAV';
 import { PtSAV } from './PtSAV';
 import { SAV } from './SAV';
+import { OHPKM, PKM } from 'types/PKMTypes';
 
 const SIZE_GEN12 = 0x8000;
 const SIZE_GEN3 = 0x20000;
@@ -32,7 +31,7 @@ export const buildSaveFile = (
     gen12LookupMap?: { [key: string]: string } | undefined;
     gen34LookupMap?: { [key: string]: string } | undefined;
   }
-) => {
+): SAV | undefined => {
   const { homeMonMap, gen12LookupMap, gen34LookupMap } = lookupMaps;
   let saveFile;
   switch (saveType) {

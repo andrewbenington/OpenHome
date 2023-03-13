@@ -1,4 +1,4 @@
-import OHPKM from '../types/PKMTypes/OHPKM';
+import { OHPKM } from '../types/PKMTypes/OHPKM';
 import { COLOPKM } from '../types/PKMTypes/COLOPKM';
 import { PA8 } from '../types/PKMTypes/PA8';
 import { PK2 } from '../types/PKMTypes/PK2';

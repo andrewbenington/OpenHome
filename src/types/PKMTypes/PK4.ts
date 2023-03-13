@@ -34,7 +34,7 @@ import {
   gen4StringToUTF,
   utf16StringToGen4,
 } from '../../util/Strings/StringConverter';
-import OHPKM from './OHPKM';
+import { OHPKM } from './OHPKM';
 import { contestStats, marking, PKM, pokedate, stats } from './PKM';
 import {
   adjustMovePPBetweenFormats,

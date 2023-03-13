@@ -6,7 +6,7 @@ import {
   getMonGen12Identifier,
   getMonGen34Identifier,
 } from '../../../util/Lookup';
-import OHPKM from '../OHPKM';
+import { OHPKM } from '../OHPKM';
 import { PK1 } from '../PK1';
 import { PK2 } from '../PK2';
 import { PK3 } from '../PK3';

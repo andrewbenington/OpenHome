@@ -8,7 +8,7 @@ import {
 import { gen1IDToNatDex, natDexToGen1ID } from '../../util/ConvertPokemonID';
 import { getLevelGen12 } from '../../util/StatCalc';
 import { gen12StringToUTF } from '../../util/Strings/StringConverter';
-import OHPKM from './OHPKM';
+import { OHPKM } from './OHPKM';
 import { PKM, statsPreSplit } from './PKM';
 import { adjustMovePPBetweenFormats, getTypes } from './util';
 
