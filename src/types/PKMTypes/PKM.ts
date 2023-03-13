@@ -998,7 +998,7 @@ export class PKM {
             ((this.trainerID ^ this.secretID ^ pvLower16) & 0xfcfc) |
             (pvUpper16 & 0x0303);
         }
-        const shinyXor = this.trainerID ^ this.secretID ^ pvLower16 ^ pvUpper16
+        const shinyXor = this.trainerID ^ this.secretID ^ pvLower16 ^ pvUpper16;
       } else {
         pvLower16 = bytesToUint16LittleEndian(pvBytes, 0);
         pvUpper16 = bytesToUint16LittleEndian(pvBytes, 2);

@@ -35,24 +35,29 @@ const OtherDisplay = (props: { mon: PKM }) => {
       {mon.personalityValue !== undefined ? (
         <AttributeRow
           label="Personality Value"
-          value={'0x' + mon.personalityValue.toString(16).padStart(8, '0')}
-        />
+        >
+          <code>
+            {'0x' + mon.personalityValue.toString(16).padStart(8, '0')}
+          </code>
+        </AttributeRow>
       ) : (
         <div />
       )}
       {mon.encryptionConstant !== undefined ? (
         <AttributeRow
           label="Encryption Constant"
-          value={'0x' + mon.encryptionConstant.toString(16).padStart(8, '0')}
-        />
+        >
+          <code>
+            {'0x' + mon.encryptionConstant.toString(16).padStart(8, '0')}
+          </code>
+        </AttributeRow>
       ) : (
         <div />
       )}
       {mon.secretID !== undefined ? (
-        <AttributeRow
-          label="Trainer Secret ID"
-          value={'0x' + mon.secretID.toString(16).padStart(4, '0')}
-        />
+        <AttributeRow label="Trainer Secret ID">
+          <code>{'0x' + mon.secretID.toString(16).padStart(4, '0')}</code>
+        </AttributeRow>
       ) : (
         <div />
       )}

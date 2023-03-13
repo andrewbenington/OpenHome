@@ -10,8 +10,10 @@ import {
   Tooltip,
 } from 'chart.js';
 import _ from 'lodash';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Radar } from 'react-chartjs-2';
+import { G2SAV } from 'types/SAV/G2SAV';
+import { isRestricted } from 'types/TransferRestrictions';
 import { getNatureSummary } from '../../consts/Natures';
 import { COLOPKM } from '../../types/PKMTypes/COLOPKM';
 import { PK3 } from '../../types/PKMTypes/PK3';
@@ -57,7 +59,16 @@ const getSheenStars = (mon: PKM) => {
 const StatsDisplay = (props: { mon: PKM }) => {
   const { mon } = props;
   const [display, setDisplay] = useState('Stats');
-  const [evType, setEVType] = useState('Modern');
+  const [evType, setEVType] = useState(!mon.evs ? 'Game Boy' : 'Modern');
+
+  useEffect(() => {
+    if (mon.evsG12 && !mon.evs) {
+      setEVType('Game Boy');
+    } else if (!mon.evsG12) {
+      setEVType('Modern');
+    }
+  }, [mon.format]);
+
   ChartJS.register(
     RadialLinearScale,
     PointElement,
@@ -86,7 +97,7 @@ const StatsDisplay = (props: { mon: PKM }) => {
         <Select value={display} onChange={(e) => setDisplay(e.target.value)}>
           <MenuItem value="Stats">Stats</MenuItem>
           {mon.avs ? <MenuItem value="AVs">AVs</MenuItem> : <div />}
-          {mon.evs !== undefined ? (
+          {mon.evs ?? mon.evsG12 !== undefined ? (
             <MenuItem value="EVs">EVs</MenuItem>
           ) : (
             <div />
@@ -96,7 +107,11 @@ const StatsDisplay = (props: { mon: PKM }) => {
           ) : (
             <div />
           )}
-          {mon.dvs !== undefined ? (
+          {!isRestricted(
+            G2SAV.TRANSFER_RESTRICTIONS,
+            mon.dexNum,
+            mon.formNum
+          ) && mon.dvs !== undefined ? (
             <MenuItem value="DVs">DVs</MenuItem>
           ) : (
             <div />
@@ -108,7 +123,7 @@ const StatsDisplay = (props: { mon: PKM }) => {
           )}
           <MenuItem value="Contest">Contest</MenuItem>
         </Select>
-        {display === 'EVs' ? (
+        {display === 'EVs' && mon.format === 'OHPKM' ? (
           <Select value={evType} onChange={(e) => setEVType(e.target.value)}>
             <MenuItem value="Modern">Modern</MenuItem>
             <MenuItem value="Game Boy">Game Boy</MenuItem>
@@ -143,6 +158,8 @@ const StatsDisplay = (props: { mon: PKM }) => {
                     ? 10
                     : display === 'EVs' && evType === 'Modern'
                     ? 252
+                    : display === 'EVs' && evType === 'Game Boy'
+                    ? 65536
                     : undefined,
                 pointLabels: {
                   font: { size: 14, weight: 'bold' },
