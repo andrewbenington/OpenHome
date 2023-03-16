@@ -58,6 +58,7 @@ const Home = () => {
   const [draggingDest, setDraggingDest] = useState<SaveCoordinates>();
   const [draggingMon, setDraggingMon] = useState<MonReference>();
   const [box, setBox] = useState(0);
+  const [tab, setTab] = useState('summary');
   const [saves, setSaves] = useState<SaveArray>([
     undefined,
     undefined,
@@ -644,7 +645,7 @@ const Home = () => {
         PaperProps={{ sx: { height: 400 } }}
       >
         {selectedMon && (
-          <PokemonDisplay mon={selectedMon} updateMon={() => {}} />
+          <PokemonDisplay mon={selectedMon} updateMon={() => {}} tab={tab} setTab={setTab}/>
         )}
       </Dialog>
       <div style={{ display: 'flex', flex: 1 }}>

@@ -1,5 +1,6 @@
 import { app } from 'electron';
 import fs from 'fs';
+import { SaveRef, SaveType } from '../types/types';
 import { readBytesFromFile } from './fileHandlers';
 
 export function loadOHPKMs() {
@@ -41,10 +42,13 @@ export function loadLookup(fileName: string) {
   const lookupFileString = fs
     .readFileSync(`${appDataPath}/OpenHome/storage/lookup/${fileName}`)
     .toString();
-  lookupFileString.split('\n').forEach((entry) => {
+  lookupFileString.split(/\r?\n/).forEach((entry) => {
     const [lookupString, monRef] = entry.split(',');
-    lookupMap[lookupString] = monRef;
+    if (lookupString && monRef) {
+      lookupMap[lookupString] = monRef;
+    }
   });
+  console.log(lookupMap);
   return lookupMap;
 }
 
@@ -55,12 +59,12 @@ function registerLookup(fileName: string, lookupsToAdd: string) {
     const lookupString = fs
       .readFileSync(`${appDataPath}/OpenHome/storage/lookup/${fileName}`)
       .toString();
-    lookupString.split('\n').forEach((entry) => {
+    lookupString.split(/\r?\n/).forEach((entry) => {
       const [lookupIdentifier, monRef] = entry.split(',');
       lookupMap[lookupIdentifier] = monRef;
     });
   }
-  lookupsToAdd.split('\n').forEach((entry) => {
+  lookupsToAdd.split(/\r?\n/).forEach((entry) => {
     const [lookupIdentifier, monRef] = entry.split(',');
     lookupMap[lookupIdentifier] = monRef;
   });
@@ -75,3 +79,42 @@ function registerLookup(fileName: string, lookupsToAdd: string) {
     newLookupString
   );
 }
+
+export function loadSaves() {
+  const appDataPath = app.getPath('appData');
+  const saveRefMap: { [key: string]: SaveRef } = {};
+  const lookupFileString = fs
+    .readFileSync(`${appDataPath}/OpenHome/storage/saveFiles`)
+    .toString();
+  lookupFileString.split(/\r?\n/).forEach((entry) => {
+    const [filePath, saveTypeString, game, trainerName, trainerID] =
+      entry.split(',');
+    const saveType = SaveTypeStrings[saveTypeString];
+    if (filePath && saveType) {
+      saveRefMap[filePath] = {
+        filePath,
+        saveType,
+        game,
+        trainerName,
+        trainerID,
+      };
+    }
+  });
+  console.log(saveRefMap);
+  return saveRefMap;
+}
+
+const SaveTypeStrings: { [key: string]: SaveType } = {
+  RGBY_J: SaveType.RGBY_J,
+  RBY_I: SaveType.RBY_I,
+  GS_J: SaveType.GS_J,
+  GS_I: SaveType.GS_I,
+  C_J: SaveType.C_J,
+  C_I: SaveType.C_I,
+  RS: SaveType.RS,
+  FRLG: SaveType.FRLG,
+  E: SaveType.E,
+  DP: SaveType.DP,
+  Pt: SaveType.Pt,
+  HGSS: SaveType.HGSS,
+};

@@ -41,14 +41,11 @@ const getTypeFromString = (type: string) => {
 const PokemonDisplay = (props: {
   mon: PKM;
   updateMon: (mon: PKM) => void;
-  propTab?: string;
+  tab: string;
+  setTab: (tab: string) => void;
 }) => {
-  const { mon, updateMon, propTab } = props;
+  const { mon, updateMon, tab, setTab } = props;
   const [displayMon, setDisplayMon] = useState(mon);
-  const [tab, setTab] = useState('summary');
-  useEffect(() => {
-    setTab(propTab ?? 'summary');
-  }, [propTab]);
 
   return (
     <div

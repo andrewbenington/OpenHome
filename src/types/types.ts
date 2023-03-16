@@ -29,10 +29,12 @@ export type levelUpType =
 
 export enum SaveType {
   UNKNOWN,
+  RGBY_J,
   RBY_I,
+  GS_J,
   GS_I,
-  C_I,
   C_J,
+  C_I,
   RS,
   FRLG,
   E,
@@ -40,6 +42,14 @@ export enum SaveType {
   Pt,
   HGSS,
   G5,
+}
+
+export interface SaveRef {
+  filePath: string;
+  saveType: SaveType;
+  game?: string;
+  trainerName?: string;
+  trainerID?: string;
 }
 
 export type RegionalForme = 'Alola' | 'Galar' | 'Hisui' | 'Paldea';
