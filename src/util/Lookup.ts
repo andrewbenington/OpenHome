@@ -1,9 +1,6 @@
-import { PK4 } from '../types/PKMTypes/PK4';
-import { PKM } from '../types/PKMTypes/PKM';
+import { OHPKM, PK3, PK4, PKM } from '../types/PKMTypes';
 import { getBaseMon } from '../types/PKMTypes/util';
-import { OHPKM } from '../types/PKMTypes/OHPKM';
 import { bytesToString } from './ByteLogic';
-import { PK2, PK3 } from 'types/PKMTypes';
 import {
   gen12StringToUTF,
   utf16StringToGen12,

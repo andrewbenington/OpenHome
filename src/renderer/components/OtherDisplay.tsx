@@ -72,13 +72,18 @@ const OtherDisplay = (props: { mon: PKM }) => {
       ) : (
         <div />
       )}
-      {mon.dexNum >= 265 && mon.dexNum <= 269 ? (
+      {mon.dexNum === 206 && mon.personalityValue ? (
         <AttributeRow
-          label="Wurmple Evolution"
-          value={(
-            (((mon.personalityValue ?? 0) >> 16) & 0xffff) %
-            10
-          ).toString()}
+          label="Dudunsparce"
+          value={mon.personalityValue % 100 ? 'Two-Segment' : 'Three-Segment'}
+        />
+      ) : (
+        <div />
+      )}
+      {mon.dexNum === 924 && mon.personalityValue ? (
+        <AttributeRow
+          label="Maushold"
+          value={mon.personalityValue % 100 ? 'Family of Four' : 'Family of Three'}
         />
       ) : (
         <div />
@@ -224,7 +229,7 @@ const OtherDisplay = (props: { mon: PKM }) => {
         <div />
       )}
       {mon instanceof OHPKM ? (
-        <AttributeRow label="OHPKM ID" value={getMonFileIdentifier(mon)} />
+        <AttributeRow label="OpenHome ID" value={getMonFileIdentifier(mon)} />
       ) : (
         <div />
       )}
