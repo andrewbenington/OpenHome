@@ -1,8 +1,10 @@
 import { ArrowBack, ArrowForward } from '@mui/icons-material';
 import { Button, Card, Grid } from '@mui/material';
+import { GameOfOriginData } from 'consts';
 import _ from 'lodash';
 import { useEffect, useState } from 'react';
 import { SaveCoordinates } from 'renderer/Home';
+import { getSaveTypeString } from 'types/types';
 import { PKM } from '../../types/PKMTypes/PKM';
 import { BoxCoordinates, SAV } from '../../types/SAVTypes/SAV';
 import ArrowButton from './buttons/ArrowButton';
@@ -63,6 +65,11 @@ const SaveDisplay = (props: SaveDisplayProps) => {
                 marginRight: 'auto',
               }}
             >
+              <div style={{ textAlign: 'center' }}>
+                {save.origin
+                  ? `Pokémon ${GameOfOriginData[save.origin]?.name}`
+                  : getSaveTypeString(save.saveType)}
+              </div>
               <div style={{ textAlign: 'center' }}>
                 {save?.name} ({save?.displayID})
               </div>

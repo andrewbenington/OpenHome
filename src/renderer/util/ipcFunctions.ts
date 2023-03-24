@@ -1,3 +1,5 @@
+import { SaveRef } from "types/types";
+
 export const readBoxData = async (callback: (data: string) => void) => {
   window.electron.ipcRenderer.once('home-box-read', (boxString: string) => {
     callback(boxString);
@@ -35,6 +37,28 @@ export const readGen34Lookup = async (
     }
   );
   window.electron.ipcRenderer.sendMessage('read-gen34-lookup');
+};
+
+export const readSaveRefs = async (
+  callback: (map: { [key: string]: SaveRef } | undefined) => void
+) => {
+  window.electron.ipcRenderer.once(
+    'save-refs-read',
+    (saveRefMap: { [key: string]: SaveRef } | undefined) => {
+      if (!saveRefMap) {
+        callback(undefined);
+        return;
+      }
+      callback(saveRefMap);
+    }
+  );
+  window.electron.ipcRenderer.sendMessage('read-save-refs');
+};
+
+export const addSaveRef = async (
+  saveRef: SaveRef
+) => {
+  window.electron.ipcRenderer.sendMessage('add-save-ref', saveRef);
 };
 
 export const handleMenuSave = (onSave: () => void) => {

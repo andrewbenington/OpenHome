@@ -1,3 +1,4 @@
+import { GameOfOrigin } from 'consts';
 import { uniq } from 'lodash';
 import { OHPKM } from 'types/PKMTypes/OHPKM';
 import { PK2 } from 'types/PKMTypes/PK2';
@@ -33,6 +34,7 @@ export class G2SAV extends SAV {
       this.saveType = SaveType.GS_I;
     } else if (this.areCrystalInternationalChecksumsValid()) {
       this.saveType = SaveType.C_I;
+      this.origin = GameOfOrigin.Crystal;
     }
     switch (this.saveType) {
       case SaveType.GS_I:

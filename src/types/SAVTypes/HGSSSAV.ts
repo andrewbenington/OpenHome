@@ -1,18 +1,20 @@
 import { CapPikachus, RegionalForms } from 'types/TransferRestrictions';
+import { SaveType } from 'types/types';
 import {
   bytesToUint16LittleEndian,
-  bytesToUint32LittleEndian
+  bytesToUint32LittleEndian,
 } from '../../util/ByteLogic';
 import { gen4StringToUTF } from '../../util/Strings/StringConverter';
 import { G4SAV } from './G4SAV';
 
 export class HGSSSAV extends G4SAV {
+  saveType = SaveType.HGSS;
   static TRANSFER_RESTRICTIONS = {
     maxDexNum: 493,
     excludedForms: { ...RegionalForms, ...CapPikachus, 483: [1], 484: [1] },
   };
 
-  transferRestrictions = HGSSSAV.TRANSFER_RESTRICTIONS
+  transferRestrictions = HGSSSAV.TRANSFER_RESTRICTIONS;
 
   static TRAINER_NAME_OFFSET = 0x64;
   static TRAINER_ID_OFFSET = 0x74;
@@ -50,6 +52,7 @@ export class HGSSSAV extends G4SAV {
       this.currentSaveStorageBlockOffset + HGSSSAV.BOX_NAMES_OFFSET;
     this.name = gen4StringToUTF(bytes, HGSSSAV.TRAINER_NAME_OFFSET, 8);
     this.tid = bytesToUint16LittleEndian(bytes, HGSSSAV.TRAINER_ID_OFFSET);
+    this.sid = bytesToUint16LittleEndian(bytes, HGSSSAV.TRAINER_ID_OFFSET + 2);
     this.displayID = this.tid.toString().padStart(5, '0');
     this.buildBoxes();
   }

@@ -19,7 +19,7 @@ export class G4SAV extends SAV {
 
   constructor(path: string, bytes: Uint8Array) {
     super(path, bytes);
-    this.origin = bytes[0x80]
+    this.origin = bytes[0x80];
     this.boxes = Array(18);
   }
 
@@ -47,6 +47,14 @@ export class G4SAV extends SAV {
           let monData = this.bytes.slice(startByte, endByte);
           let mon = new PK4(monData, true);
           if (mon.dexNum !== 0 && mon.gameOfOrigin !== 0) {
+            if (
+              this.origin === 0 &&
+              mon.trainerID === this.tid &&
+              mon.secretID === this.sid &&
+              mon.trainerName === this.name
+            ) {
+              this.origin = mon.gameOfOrigin;
+            }
             this.boxes[box].pokemon[monIndex] = mon;
           }
         } catch (e) {

@@ -79,6 +79,7 @@ const PokemonButton = (props: PokemonButtonProps) => {
           draggable
           onDragStart={(e) => {
             if (mon) {
+              console.log("starting drag")
               const dragIcon = document.getElementById('drag-image');
               const div = document.getElementById('drag-image-container');
               if (!dragIcon || !div) return;

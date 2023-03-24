@@ -1,7 +1,6 @@
+import { GameOfOrigin } from 'consts';
 import { OHPKM } from 'types/PKMTypes/OHPKM';
-import { PKM } from '../PKMTypes/PKM';
-import { PK3 } from '../PKMTypes/PK3';
-import { SaveType } from '../types';
+import { CapPikachus, RegionalForms } from 'types/TransferRestrictions';
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -9,8 +8,10 @@ import {
   uint32ToBytesLittleEndian,
 } from '../../util/ByteLogic';
 import { gen3StringToUTF } from '../../util/Strings/StringConverter';
-import { Box, BoxCoordinates, SAV } from './SAV';
-import { CapPikachus, RegionalForms } from 'types/TransferRestrictions';
+import { PK3 } from '../PKMTypes/PK3';
+import { PKM } from '../PKMTypes/PKM';
+import { SaveType } from '../types';
+import { Box, SAV } from './SAV';
 
 export class G3SAV extends SAV {
   static TRANSFER_RESTRICTIONS = {
@@ -53,6 +54,42 @@ export class G3SAV extends SAV {
     this.currentPCBox = this.primarySave.currentPCBox;
     this.boxes = this.primarySave.boxes;
     this.boxNames = this.primarySave.boxNames;
+    if (this.saveType === SaveType.E) {
+      this.origin = GameOfOrigin.Emerald;
+      return;
+    }
+    //hacky way to detect save version
+    this.boxes.forEach((box) => {
+      box.pokemon.forEach((mon) => {
+        if (
+          mon.trainerID === this.tid &&
+          mon.secretID === this.tid &&
+          mon.trainerName === this.name
+        ) {
+          this.origin = mon.gameOfOrigin;
+          return;
+        }
+      });
+    });
+    const filePathElements = this.filePath.split('/');
+    let fileName = filePathElements[filePathElements.length - 1]
+    fileName = fileName.replace(/\s+/g, '');
+    if (fileName.includes('Ruby')) {
+      this.origin = GameOfOrigin.Ruby;
+      return;
+    }
+    if (fileName.includes('Sapphire')) {
+      this.origin = GameOfOrigin.Sapphire;
+      return;
+    }
+    if (fileName.includes('FireRed')) {
+      this.origin = GameOfOrigin.FireRed;
+      return;
+    }
+    if (fileName.includes('LeafGreen')) {
+      this.origin = GameOfOrigin.LeafGreen;
+      return;
+    }
   }
 
   prepareBoxesForSaving() {
@@ -61,11 +98,11 @@ export class G3SAV extends SAV {
       const monOffset = 30 * box + index;
       const pcBytes = new Uint8Array(80);
       const changedMon = this.boxes[box].pokemon[index];
-      console.log( box, index)
+      console.log(box, index);
       // we don't want to save OHPKM files of mons that didn't leave the save
       // (and would still be PK3s)
       if (changedMon instanceof OHPKM) {
-        changedMon.ribbons = [...changedMon.ribbons, "Champion"]
+        changedMon.ribbons = [...changedMon.ribbons, 'Champion'];
         changedMonPKMs.push(changedMon);
       }
       // changedMon will be undefined if pokemon was moved from this slot
@@ -103,6 +140,7 @@ export class G3SAV extends SAV {
 }
 
 export class G3SaveBackup {
+  origin: GameOfOrigin = GameOfOrigin.INVALID_0;
   bytes: Uint8Array;
   saveIndex: number = 0;
   isFirstSave: boolean = false;

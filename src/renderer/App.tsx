@@ -1,6 +1,7 @@
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import './App.css';
 import Home from './Home';
+import Themes from './Themes';
 
 const theme = createTheme({
   components: {
@@ -9,6 +10,13 @@ const theme = createTheme({
         select: {
           paddingTop: 4,
           paddingBottom: 4,
+        },
+      },
+    },
+    MuiDialog: {
+      styleOverrides: {
+        paper: {
+          backgroundColor: Themes[0].backgroundColor,
         },
       },
     },
