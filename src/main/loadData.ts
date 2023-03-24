@@ -80,11 +80,11 @@ function registerLookup(fileName: string, lookupsToAdd: string) {
   );
 }
 
-export function loadSaves() {
+export function loadSaveRefs() {
   const appDataPath = app.getPath('appData');
   const saveRefMap: { [key: string]: SaveRef } = {};
   const lookupFileString = fs
-    .readFileSync(`${appDataPath}/OpenHome/storage/saveFiles`)
+    .readFileSync(`${appDataPath}/OpenHome/storage/saveFiles.csv`)
     .toString();
   lookupFileString.split(/\r?\n/).forEach((entry) => {
     const [filePath, saveTypeString, game, trainerName, trainerID] =
@@ -102,6 +102,23 @@ export function loadSaves() {
   });
   console.log(saveRefMap);
   return saveRefMap;
+}
+
+export function addSaveRef(save: SaveRef) {
+  const appDataPath = app.getPath('appData');
+  const saveRefMap = loadSaveRefs();
+  saveRefMap[save.filePath] = save;
+  const newLookupString = Object.values(saveRefMap)
+    .map((saveRef, i) => {
+      return `${saveRef.filePath},${SaveType[saveRef.saveType]},${
+        saveRef.game ?? ''
+      },${saveRef.trainerName},${saveRef.trainerID}\n`;
+    })
+    .join('');
+  fs.writeFileSync(
+    `${appDataPath}/OpenHome/storage/saveFiles.csv`,
+    newLookupString
+  );
 }
 
 const SaveTypeStrings: { [key: string]: SaveType } = {

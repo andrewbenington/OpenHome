@@ -1,7 +1,7 @@
 import { GameOfOrigin } from 'consts';
 import { OHPKM } from 'types/PKMTypes/OHPKM';
 import { TransferRestrictions } from 'types/TransferRestrictions';
-import { SaveType } from 'types/types';
+import { SaveRef, SaveType } from 'types/types';
 import { PKM } from '../PKMTypes/PKM';
 
 export class SAV {
@@ -24,6 +24,15 @@ export class SAV {
   boxes: Array<Box> = [];
   bytes: Uint8Array;
   convertPKM: (mon: PKM) => PKM = (mon) => new OHPKM(mon);
+  getSaveRef: () => SaveRef = () => {
+    return {
+      filePath: this.filePath,
+      saveType: this.saveType,
+      game: this.origin ? this.origin.toString() : undefined,
+      trainerName: this.name ? this.name : undefined,
+      trainerID: this.displayID,
+    };
+  };
   changedMons: BoxCoordinates[] = [];
   constructor(path: string, bytes: Uint8Array) {
     this.filePath = path;

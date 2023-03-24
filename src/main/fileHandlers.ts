@@ -28,6 +28,9 @@ export function initializeFolders(appDataPath: string) {
   if (!fs.existsSync(`${appDataPath}/OpenHome/storage/lookup`)) {
     fs.mkdirSync(`${appDataPath}/OpenHome/storage/lookup`, { recursive: true });
   }
+  if (!fs.existsSync(`${appDataPath}/OpenHome/storage/saveFiles.csv`)) {
+    fs.writeFileSync(`${appDataPath}/OpenHome/storage/saveFiles.csv`, '');
+  }
   fs.opendir('../', (err, dir) => {
     if (err) console.log('Error:', err);
     else {

@@ -44,6 +44,39 @@ export enum SaveType {
   G5,
 }
 
+export const getSaveTypeString = (saveType: SaveType): string => {
+  switch (saveType) {
+    case SaveType.UNKNOWN:
+      return 'Unknown Game';
+    case SaveType.RGBY_J:
+      return 'Pokémon Red/Blue/Green/Yellow (JP)';
+    case SaveType.RBY_I:
+      return 'Pokémon Red/Blue/Yellow (INT)';
+    case SaveType.GS_J:
+      return 'Pokémon Gold/Silver (JP)';
+    case SaveType.GS_I:
+      return 'Pokémon Gold/Silver (INT)';
+    case SaveType.C_J:
+      return 'Pokémon Crystal (JP)';
+    case SaveType.C_I:
+      return 'Pokémon Crystal';
+    case SaveType.RS:
+      return 'Pokémon Ruby/Sapphire';
+    case SaveType.FRLG:
+      return 'Pokémon FireRed/LeafGreen';
+    case SaveType.E:
+      return 'Pokémon Emerald';
+    case SaveType.DP:
+      return 'Pokémon Diamond/Pearl';
+    case SaveType.Pt:
+      return 'Pokémon Platinum';
+    case SaveType.HGSS:
+      return 'Pokémon HeartGold/SoulSilver';
+    case SaveType.G5:
+      return 'Pokémon Black/White/Black 2/White 2';
+  }
+};
+
 export interface SaveRef {
   filePath: string;
   saveType: SaveType;

@@ -23,9 +23,11 @@ import {
 import HomeBoxDisplay from './components/HomeBoxDisplay';
 import PokemonDisplay from './components/PokemonDisplay';
 import SaveDisplay from './components/SaveDisplay';
+import SaveFileSelector from './components/SaveFileSelector';
 import Themes, { OpenHomeTheme } from './Themes';
 import { initializeDragImage } from './util/initializeDragImage';
 import {
+  addSaveRef,
   handleDeleteOHPKMFiles,
   handleMenuResetAndClose,
   handleMenuSave,
@@ -59,6 +61,7 @@ const Home = () => {
   const [draggingMon, setDraggingMon] = useState<MonReference>();
   const [box, setBox] = useState(0);
   const [tab, setTab] = useState('summary');
+  const [openSaveDialog, setOpenSaveDialog] = useState(false);
   const [saves, setSaves] = useState<SaveArray>([
     undefined,
     undefined,
@@ -390,6 +393,21 @@ const Home = () => {
     window.electron.ipcRenderer.sendMessage('read-home-data', 'fake');
   };
 
+  const onOpenSave = (saveIndex: number, newSave: SAV) => {
+    const changedMons: OHPKM[] = [];
+    newSave.changedMons.forEach(({ box, index }) => {
+      const mon = newSave.boxes[box].pokemon[index];
+      if (mon instanceof OHPKM) {
+        changedMons.push(mon);
+      }
+    });
+    addSaveRef(newSave.getSaveRef());
+    markMonsAsChanged(changedMons);
+    const newSaves: SaveArray = [...saves];
+    newSaves[saveIndex] = newSave;
+    setSaves(newSaves);
+  };
+
   const openSave = async (saveIndex: number) => {
     window.electron.ipcRenderer.once('save-file-read', (result: any) => {
       const { path, fileBytes } = result;
@@ -404,17 +422,7 @@ const Home = () => {
                 homeMonMap,
                 gen12LookupMap,
               });
-              const changedMons: OHPKM[] = [];
-              newSave?.changedMons.forEach(({ box, index }) => {
-                const mon = newSave.boxes[box].pokemon[index];
-                if (mon instanceof OHPKM) {
-                  changedMons.push(mon);
-                }
-              });
-              markMonsAsChanged(changedMons);
-              const newSaves: SaveArray = [...saves];
-              newSaves[saveIndex] = newSave;
-              setSaves(newSaves);
+              if (newSave) onOpenSave(saveIndex, newSave);
             });
             return;
           case SaveType.RS:
@@ -428,17 +436,7 @@ const Home = () => {
                 homeMonMap,
                 gen34LookupMap,
               });
-              const changedMons: OHPKM[] = [];
-              newSave?.changedMons.forEach(({ box, index }) => {
-                const mon = newSave.boxes[box].pokemon[index];
-                if (mon instanceof OHPKM) {
-                  changedMons.push(mon);
-                }
-              });
-              markMonsAsChanged(changedMons);
-              const newSaves: SaveArray = [...saves];
-              newSaves[saveIndex] = newSave;
-              setSaves(newSaves);
+              if (newSave) onOpenSave(saveIndex, newSave);
             });
             return;
           case SaveType.UNKNOWN:
@@ -447,23 +445,14 @@ const Home = () => {
             const newSave = buildSaveFile(path, fileBytes, saveType, {
               homeMonMap,
             });
-            const changedMons: OHPKM[] = [];
-            newSave?.changedMons.forEach(({ box, index }) => {
-              const mon = newSave.boxes[box].pokemon[index];
-              if (mon instanceof OHPKM) {
-                changedMons.push(mon);
-              }
-            });
-            markMonsAsChanged(changedMons);
-            const newSaves: SaveArray = [...saves];
-            newSaves[saveIndex] = newSave;
-            setSaves(newSaves);
+            if (newSave) onOpenSave(saveIndex, newSave);
         }
       }
     });
-    window.electron.ipcRenderer.sendMessage('read-save-file');
+    setOpenSaveDialog(true);
   };
 
+  // necessary to update save function called by top menu
   useEffect(() => {
     const callback = handleMenuSave(saveAllSaveFiles);
     return () => callback();
@@ -489,6 +478,7 @@ const Home = () => {
       style={{
         backgroundColor: currentTheme.backgroundColor,
         height: '100%',
+        width: '100%',
         display: 'flex',
         flexDirection: 'column',
       }}
@@ -637,17 +627,6 @@ const Home = () => {
           />
         </div>
       </div>
-      <Dialog
-        open={!!selectedMon}
-        onClose={() => setSelectedMon(undefined)}
-        fullWidth
-        maxWidth="lg"
-        PaperProps={{ sx: { height: 400 } }}
-      >
-        {selectedMon && (
-          <PokemonDisplay mon={selectedMon} updateMon={() => {}} tab={tab} setTab={setTab}/>
-        )}
-      </Dialog>
       <div style={{ display: 'flex', flex: 1 }}>
         <button
           type="button"
@@ -709,6 +688,42 @@ const Home = () => {
           </div>
         </button>
       </div>
+      <Dialog
+        open={!!selectedMon}
+        onClose={() => setSelectedMon(undefined)}
+        fullWidth
+        maxWidth="lg"
+        PaperProps={{ sx: { height: 400 } }}
+      >
+        {selectedMon && (
+          <PokemonDisplay
+            mon={selectedMon}
+            updateMon={() => {}}
+            tab={tab}
+            setTab={setTab}
+          />
+        )}
+      </Dialog>
+      <Dialog
+        open={openSaveDialog}
+        onClose={() => setOpenSaveDialog(false)}
+        fullWidth
+        maxWidth="lg"
+        PaperProps={{ sx: { height: 400 } }}
+      >
+        <SaveFileSelector
+          onSelectFile={(filePath) => {
+            window.electron.ipcRenderer.sendMessage('read-save-file', [
+              filePath,
+            ]);
+            setOpenSaveDialog(false);
+          }}
+          onImportSave={() => {
+            window.electron.ipcRenderer.sendMessage('read-save-file');
+            setOpenSaveDialog(false);
+          }}
+        />
+      </Dialog>
     </div>
   );
 };

@@ -10,6 +10,8 @@ import {
   loadOHPKMs,
   loadGen34Lookup,
   registerGen34Lookup,
+  loadSaveRefs,
+  addSaveRef,
 } from './loadData';
 import writePKMToFile, { deleteOHPKMFile } from './writePKMToFile';
 import fs from 'fs';
@@ -25,7 +27,6 @@ function initListeners() {
 
   ipcMain.on('read-gen12-lookup', async (event) => {
     console.log('read-gen12-lookup');
-    const appDataPath = app.getPath('appData');
     let lookupMap;
     try {
       lookupMap = loadGen12Lookup();
@@ -42,7 +43,6 @@ function initListeners() {
 
   ipcMain.on('read-gen34-lookup', async (event) => {
     console.log('read-gen34-lookup');
-    const appDataPath = app.getPath('appData');
     let lookupMap;
     try {
       lookupMap = loadGen34Lookup();
@@ -56,6 +56,22 @@ function initListeners() {
     console.log('write-gen34-lookup', gen34LookupString);
     registerGen34Lookup(gen34LookupString);
   });
+
+  ipcMain.on('read-save-refs', async (event) => {
+    console.log('read-save-refs');
+    let saveRefMap;
+    try {
+      saveRefMap = loadSaveRefs();
+    } catch (e) {
+      console.log('no save refs file');
+    }
+    event.reply('save-refs-read', saveRefMap);
+  });
+
+  ipcMain.on('add-save-ref', async (event, saveRef) => {
+    addSaveRef(saveRef);
+  });
+
 
   ipcMain.on('read-home-data', async (event) => {
     console.log('read-home-data');
@@ -89,9 +105,11 @@ function initListeners() {
     );
   });
 
-  ipcMain.on('read-save-file', async (event, arg) => {
-    console.log('select-save-file', arg);
-    const filePaths = await selectFile();
+  ipcMain.on('read-save-file', async (event, filePath) => {
+    let filePaths = filePath
+    if (!filePaths) {
+      filePaths = await selectFile();
+    }
     if (filePaths) {
       const fileBytes = readBytesFromFile(filePaths[0]);
       event.reply('save-file-read', { path: filePaths[0], fileBytes });

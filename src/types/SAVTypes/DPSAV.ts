@@ -1,4 +1,5 @@
 import { CapPikachus, RegionalForms } from 'types/TransferRestrictions';
+import { SaveType } from 'types/types';
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -7,6 +8,7 @@ import { gen4StringToUTF } from '../../util/Strings/StringConverter';
 import { G4SAV } from './G4SAV';
 
 export class DPSAV extends G4SAV {
+  saveType = SaveType.DP;
   transferRestrictions = {
     maxDexNum: 493,
     excludedForms: {
@@ -58,6 +60,7 @@ export class DPSAV extends G4SAV {
       this.currentSaveStorageBlockOffset + DPSAV.BOX_NAMES_OFFSET;
     this.name = gen4StringToUTF(bytes, DPSAV.TRAINER_NAME_OFFSET, 8);
     this.tid = bytesToUint16LittleEndian(bytes, DPSAV.TRAINER_ID_OFFSET);
+    this.sid = bytesToUint16LittleEndian(bytes, DPSAV.TRAINER_ID_OFFSET + 2);
     this.displayID = this.tid.toString().padStart(5, '0');
     this.buildBoxes();
   }

@@ -14,7 +14,7 @@ const OpenHomeButton = (props: OpenHomeButtonProps) => {
       style={{
         border: "none",
         borderRadius: 3,
-        backgroundColor: hovered ? "#6663" : "#0000",
+        backgroundColor: hovered ? "#DDD" : "#FFF",
         cursor: "pointer",
         ...style
       }}
