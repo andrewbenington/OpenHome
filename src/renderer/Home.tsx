@@ -410,7 +410,7 @@ const Home = () => {
 
   const openSave = async (saveIndex: number) => {
     window.electron.ipcRenderer.once('save-file-read', (result: any) => {
-      const { path, fileBytes } = result;
+      const { path, fileBytes, createdDate } = result;
       if (path && fileBytes) {
         const saveType = getSaveType(fileBytes);
         switch (saveType) {
@@ -421,6 +421,7 @@ const Home = () => {
               const newSave = buildSaveFile(path, fileBytes, saveType, {
                 homeMonMap,
                 gen12LookupMap,
+                fileCreatedDate: createdDate
               });
               if (newSave) onOpenSave(saveIndex, newSave);
             });
@@ -435,6 +436,7 @@ const Home = () => {
               const newSave = buildSaveFile(path, fileBytes, saveType, {
                 homeMonMap,
                 gen34LookupMap,
+                fileCreatedDate: createdDate
               });
               if (newSave) onOpenSave(saveIndex, newSave);
             });
@@ -444,6 +446,7 @@ const Home = () => {
           default:
             const newSave = buildSaveFile(path, fileBytes, saveType, {
               homeMonMap,
+              fileCreatedDate: createdDate
             });
             if (newSave) onOpenSave(saveIndex, newSave);
         }

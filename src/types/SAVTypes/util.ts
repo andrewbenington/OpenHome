@@ -30,9 +30,10 @@ export const buildSaveFile = (
     homeMonMap?: { [key: string]: OHPKM } | undefined;
     gen12LookupMap?: { [key: string]: string } | undefined;
     gen34LookupMap?: { [key: string]: string } | undefined;
+    fileCreatedDate?: Date
   }
 ): SAV | undefined => {
-  const { homeMonMap, gen12LookupMap, gen34LookupMap } = lookupMaps;
+  const { homeMonMap, gen12LookupMap, gen34LookupMap, fileCreatedDate } = lookupMaps;
   let saveFile;
   switch (saveType) {
     case SaveType.RBY_I:
@@ -73,7 +74,7 @@ export const buildSaveFile = (
     case SaveType.FRLG:
     case SaveType.E:
       saveFile = recoverOHPKMData(
-        new G3SAV(filePath, fileBytes),
+        new G3SAV(filePath, fileBytes, fileCreatedDate),
         getMonGen34Identifier,
         homeMonMap,
         gen34LookupMap

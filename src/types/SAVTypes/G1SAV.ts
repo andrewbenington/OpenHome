@@ -50,8 +50,9 @@ export class G1SAV extends SAV {
 
   boxes: Array<G1Box>;
 
-  constructor(path: string, bytes: Uint8Array) {
+  constructor(path: string, bytes: Uint8Array, fileCreated?: Date) {
     super(path, bytes);
+    this.fileCreated = fileCreated
     this.tid = bytesToUint16BigEndian(this.bytes, 0x2605);
     this.displayID = this.tid.toString().padStart(5, '0');
     this.name = gen12StringToUTF(this.bytes, 0x2598, 11);

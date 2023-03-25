@@ -59,6 +59,11 @@ export async function selectFiles() {
   return result.filePaths;
 }
 
+export function getFileCreatedDate(path: string) {
+  const { birthtime } = fs.statSync(path)
+  return birthtime
+}
+
 export function readBytesFromFile(path: string) {
   const fileBytes = fs.readFileSync(path);
   if (fileBytes) {
