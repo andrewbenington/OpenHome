@@ -31,10 +31,11 @@ export class G3SAV extends SAV {
   boxes: Array<G3Box>;
   convertPKM = (mon: PKM) => new OHPKM(mon);
 
-  constructor(path: string, bytes: Uint8Array) {
+  constructor(path: string, bytes: Uint8Array, fileCreated?: Date) {
     super(path, bytes);
-    const saveOne = new G3SaveBackup(bytes.slice(0, 0xe000));
-    const saveTwo = new G3SaveBackup(bytes.slice(0xe000, 0x1c000));
+    this.fileCreated = fileCreated
+    const saveOne = new G3SaveBackup(bytes.slice(0, 0xe000), fileCreated);
+    const saveTwo = new G3SaveBackup(bytes.slice(0xe000, 0x1c000), fileCreated);
     if (saveOne.saveIndex > saveTwo.saveIndex) {
       this.primarySave = saveOne;
       this.backupSave = saveTwo;
@@ -157,7 +158,7 @@ export class G3SaveBackup {
   saveType: SaveType;
   firstSectorIndex: number = 0;
 
-  constructor(bytes: Uint8Array) {
+  constructor(bytes: Uint8Array, metDate?: Date) {
     this.bytes = bytes;
     this.saveIndex = bytesToUint32LittleEndian(bytes, 0xffc);
     this.securityKey = bytesToUint32LittleEndian(bytes, 0xf20);
@@ -193,6 +194,13 @@ export class G3SaveBackup {
           this.pcDataContiguous.slice(4 + i * 80, 4 + (i + 1) * 80),
           true
         );
+        if (metDate) {
+          mon.metDate = {
+            day: metDate.getDate(),
+            month: metDate.getMonth(),
+            year: metDate.getFullYear()
+          }
+        }
         if (mon.gameOfOrigin !== 0 && mon.dexNum !== 0) {
           let box = this.boxes[Math.floor(i / 30)];
           box.pokemon[i % 30] = mon;

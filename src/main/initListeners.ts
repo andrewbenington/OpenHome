@@ -3,6 +3,7 @@ import {
   initializeFolders,
   selectFile,
   readBytesFromFile,
+  getFileCreatedDate,
 } from './fileHandlers';
 import {
   loadGen12Lookup,
@@ -72,7 +73,6 @@ function initListeners() {
     addSaveRef(saveRef);
   });
 
-
   ipcMain.on('read-home-data', async (event) => {
     console.log('read-home-data');
     const appDataPath = app.getPath('appData');
@@ -106,15 +106,20 @@ function initListeners() {
   });
 
   ipcMain.on('read-save-file', async (event, filePath) => {
-    let filePaths = filePath
+    let filePaths = filePath;
     if (!filePaths) {
       filePaths = await selectFile();
     }
     if (filePaths) {
       const fileBytes = readBytesFromFile(filePaths[0]);
-      event.reply('save-file-read', { path: filePaths[0], fileBytes });
+      const createdDate = getFileCreatedDate(filePaths[0]);
+      event.reply('save-file-read', {
+        path: filePaths[0],
+        fileBytes,
+        createdDate,
+      });
     } else {
-      event.reply('save-file-read', { path: undefined, fileBytes: undefined });
+      event.reply('save-file-read', {});
     }
   });
 

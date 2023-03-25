@@ -13,6 +13,7 @@ export class SAV {
   transferRestrictions: TransferRestrictions = {};
 
   filePath: string;
+  fileCreated?: Date;
 
   money: number = 0;
   name: string = '';

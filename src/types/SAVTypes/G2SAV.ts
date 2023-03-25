@@ -21,8 +21,9 @@ export class G2SAV extends SAV {
   pkmType = PK2;
   transferRestrictions = G2SAV.TRANSFER_RESTRICTIONS;
 
-  constructor(path: string, bytes: Uint8Array) {
+  constructor(path: string, bytes: Uint8Array, fileCreated?: Date) {
     super(path, bytes);
+    this.fileCreated = fileCreated
     this.tid = bytesToUint16BigEndian(this.bytes, 0x2009);
     this.displayID = this.tid.toString().padStart(5, '0');
     this.name = gen12StringToUTF(this.bytes, 0x200b, 11);
