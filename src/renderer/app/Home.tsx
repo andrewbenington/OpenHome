@@ -365,6 +365,15 @@ const Home = () => {
         });
       }
     });
+    for(let i = 0; i < saves.length; i++) {
+      let newSaveData = saves[i];
+      if (newSaveData) {
+        newSaveData.changedMons = []
+        const newSaves: SaveArray = [...saves];
+        newSaves[i] = newSaveData;
+        setSaves(newSaves);
+      }
+    }
   };
 
   const saveChanges = () => {

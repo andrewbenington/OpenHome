@@ -1252,6 +1252,7 @@ export class OHPKM extends PKM {
   }
 
   public updateData(other: PKM, isFromOT: boolean = false) {
+    this.exp = other.exp;
     if (other.evs) {
       this.evs = other.evs;
     }
