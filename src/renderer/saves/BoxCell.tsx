@@ -1,10 +1,10 @@
-import BoxIcons from '../../images/icons/BoxIcons.png'
+import BoxIcons from '../images/icons/BoxIcons.png'
 import React, { useEffect, useState } from 'react';
-import { POKEMON_DATA } from '../../../consts/Mons';
-import { PKM } from '../../../types/PKMTypes/PKM';
-import { acceptableExtensions, bytesToPKM } from '../../../util/FileImport';
+import { POKEMON_DATA } from '../../consts/Mons';
+import { PKM } from '../../types/PKMTypes/PKM';
+import { acceptableExtensions, bytesToPKM } from '../../util/FileImport';
 
-interface PokemonButtonProps {
+interface BoxCellProps {
   onClick: () => void;
   onDragEvent: (cancelled: boolean) => void;
   onDrop: (mons: PKM[] | undefined) => void;
@@ -13,7 +13,7 @@ interface PokemonButtonProps {
   mon: PKM | undefined;
 }
 
-const PokemonButton = (props: PokemonButtonProps) => {
+const BoxCell = (props: BoxCellProps) => {
   const { onClick, onDragEvent, onDrop, disabled, zIndex, mon } = props;
   const [dragImage, setDragImage] = useState<HTMLElement>();
 
@@ -169,4 +169,4 @@ const PokemonButton = (props: PokemonButtonProps) => {
   );
 };
 
-export default PokemonButton;
+export default BoxCell;
