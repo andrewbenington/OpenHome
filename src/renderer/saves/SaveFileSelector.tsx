@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { readSaveRefs } from 'renderer/util/ipcFunctions';
 import { getGameLogo } from 'renderer/util/PokemonSprite';
 import { getSaveTypeString, SaveRef } from 'types/types';
-import OpenHomeButton from './buttons/OpenHomeButton';
+import OpenHomeButton from '../components/OpenHomeButton';
 
 interface SaveFileSelectorProps {
   onSelectFile: (filePath: string) => void;

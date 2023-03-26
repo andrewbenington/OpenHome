@@ -1,7 +1,6 @@
 import { Card } from '@mui/material';
 import { MOVE_DATA } from 'consts';
 import { getTypeColor } from 'renderer/util/PokemonSprite';
-import { getMoveMaxPP } from 'types/PKMTypes/util';
 import { moveCardStyle } from './styles';
 
 interface MoveCardProps {

@@ -1,14 +1,14 @@
 import { MenuItem, Select } from '@mui/material';
 import _ from 'lodash';
-import { useEffect, useState } from 'react';
-import Themes from 'renderer/Themes';
+import { useState } from 'react';
+import Themes from 'renderer/app/Themes';
 import { G1SAV, G2SAV, G3SAV, G5SAV, HGSSSAV } from 'types/SAVTypes';
 import { POKEMON_DATA } from '../../consts/Mons';
 import { OHPKM, PK1, PK2, PK3, PK4, PK5, PKM } from '../../types/PKMTypes';
 import { getTypes } from '../../types/PKMTypes/util';
 import { isRestricted } from '../../types/TransferRestrictions';
+import OpenHomeButton from '../components/OpenHomeButton';
 import AttributeRow from './AttributeRow';
-import OpenHomeButton from './buttons/OpenHomeButton';
 import OtherDisplay from './OtherDisplay';
 import PokemonWithItem from './PokemonWithItem';
 import RibbonsDisplay from './RibbonsDisplay';

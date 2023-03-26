@@ -3,13 +3,13 @@ import { Card, Grid, useTheme } from '@mui/material';
 import { GameOfOriginData } from 'consts';
 import _ from 'lodash';
 import { useEffect, useState } from 'react';
-import { SaveCoordinates } from 'renderer/Home';
+import { SaveCoordinates } from 'renderer/app/Home';
 import { getSaveTypeString } from 'types/types';
 import { PKM } from '../../types/PKMTypes/PKM';
 import { BoxCoordinates, SAV } from '../../types/SAVTypes/SAV';
-import ArrowButton from './buttons/ArrowButton';
-import OpenHomeButton from './buttons/OpenHomeButton';
-import PokemonButton from './buttons/PokemonButton';
+import ArrowButton from './ArrowButton';
+import OpenHomeButton from 'renderer/components/OpenHomeButton';
+import BoxCell from './BoxCell';
 
 interface SaveDisplayProps {
   save?: SAV;
@@ -149,7 +149,7 @@ const SaveDisplay = (props: SaveDisplayProps) => {
                           xs={12 / save.boxColumns}
                           style={{ padding: '2px 2px 0px 2px' }}
                         >
-                          <PokemonButton
+                          <BoxCell
                             onClick={() => {
                               setSelectedMon(mon);
                             }}

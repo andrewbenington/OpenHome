@@ -2,7 +2,7 @@ import { Card, Grid, useTheme } from '@mui/material';
 import _ from 'lodash';
 import { PKM } from 'types/PKMTypes/PKM';
 import { HomeBox } from '../../types/SAVTypes/HomeData';
-import PokemonButton from './buttons/PokemonButton';
+import BoxCell from './BoxCell';
 
 interface HomeBoxDisplayProps {
   box: HomeBox;
@@ -33,7 +33,7 @@ const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
             const currentBox = 0;
             return (
               <Grid item xs={1} style={{ padding: '2px 2px 0px 2px' }}>
-                <PokemonButton
+                <BoxCell
                   onClick={() => setSelectedMon(mon)}
                   onDragEvent={(cancelled) =>
                     setDragSource(cancelled ? undefined : row * 12 + rowIndex)

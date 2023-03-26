@@ -12,20 +12,20 @@ import {
 import { buildSaveFile, getSaveType } from 'types/SAVTypes/util';
 import { isRestricted } from 'types/TransferRestrictions';
 import { acceptableExtensions, bytesToPKM } from 'util/FileImport';
-import { PKM } from '../types/PKMTypes/PKM';
-import { HomeData } from '../types/SAVTypes/HomeData';
-import { MonReference, SaveType } from '../types/types';
+import { PKM } from '../../types/PKMTypes/PKM';
+import { HomeData } from '../../types/SAVTypes/HomeData';
+import { MonReference, SaveType } from '../../types/types';
 import {
   getMonFileIdentifier,
   updateGen12LookupTable,
   updateGen34LookupTable,
-} from '../util/Lookup';
-import HomeBoxDisplay from './components/HomeBoxDisplay';
-import PokemonDisplay from './components/PokemonDisplay';
-import SaveDisplay from './components/SaveDisplay';
-import SaveFileSelector from './components/SaveFileSelector';
+} from '../../util/Lookup';
+import HomeBoxDisplay from '../saves/HomeBoxDisplay';
+import PokemonDisplay from '../pokemon/PokemonDisplay';
+import SaveDisplay from '../saves/SaveDisplay';
+import SaveFileSelector from '../saves/SaveFileSelector';
 import Themes, { OpenHomeTheme } from './Themes';
-import { initializeDragImage } from './util/initializeDragImage';
+import { initializeDragImage } from '../util/initializeDragImage';
 import {
   addSaveToRecents,
   handleDeleteOHPKMFiles,
@@ -34,7 +34,7 @@ import {
   readBoxData,
   readGen12Lookup,
   readGen34Lookup,
-} from './util/ipcFunctions';
+} from '../util/ipcFunctions';
 
 export interface SaveCoordinates {
   save: number;
@@ -51,7 +51,7 @@ type SaveArray = [
 ];
 
 const Home = () => {
-  const theme = useTheme()
+  const theme = useTheme();
   const [loadingMessage, setLoadingMessage] = useState<string | undefined>(
     'Starting app...'
   );
@@ -404,14 +404,14 @@ const Home = () => {
     });
     addSaveToRecents(newSave.getSaveRef());
     markMonsAsChanged(changedMons);
-    setSave(saveIndex, newSave)
+    setSave(saveIndex, newSave);
   };
 
   const setSave = (index: number, save?: SAV) => {
     const newSaves: SaveArray = [...saves];
     newSaves[index] = save;
     setSaves(newSaves);
-  }
+  };
 
   const openSave = async (saveIndex: number) => {
     window.electron.ipcRenderer.once('save-file-read', (result: any) => {
@@ -426,7 +426,7 @@ const Home = () => {
               const newSave = buildSaveFile(path, fileBytes, saveType, {
                 homeMonMap,
                 gen12LookupMap,
-                fileCreatedDate: createdDate
+                fileCreatedDate: createdDate,
               });
               if (newSave) onOpenSave(saveIndex, newSave);
             });
@@ -441,7 +441,7 @@ const Home = () => {
               const newSave = buildSaveFile(path, fileBytes, saveType, {
                 homeMonMap,
                 gen34LookupMap,
-                fileCreatedDate: createdDate
+                fileCreatedDate: createdDate,
               });
               if (newSave) onOpenSave(saveIndex, newSave);
             });
@@ -451,7 +451,7 @@ const Home = () => {
           default:
             const newSave = buildSaveFile(path, fileBytes, saveType, {
               homeMonMap,
-              fileCreatedDate: createdDate
+              fileCreatedDate: createdDate,
             });
             if (newSave) onOpenSave(saveIndex, newSave);
         }
