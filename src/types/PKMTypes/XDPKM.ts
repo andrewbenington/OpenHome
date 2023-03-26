@@ -13,7 +13,8 @@ import {
   bytesToUint16BigEndian,
   bytesToUint32BigEndian,
 } from '../../util/ByteLogic';
-import { PKM } from './PKM';
+import { contestStats, PKM } from './PKM';
+import { utf16BytesToString } from 'util/Strings/StringConverter';
 
 export class XDPKM extends PKM {
   constructor(bytes: Uint8Array) {
@@ -61,14 +62,6 @@ export class XDPKM extends PKM {
       spd: bytesToUint16BigEndian(bytes, 0xa4),
       spe: bytesToUint16BigEndian(bytes, 0xa6),
     };
-    this.contest = {
-      cool: bytes[0xae],
-      beauty: bytes[0xaf],
-      cute: bytes[0xb0],
-      smart: bytes[0xb1],
-      tough: bytes[0xb2],
-      sheen: bytes[0x12],
-    };
     this.stats = {
       hp: getHPGen3Onward(this),
       atk: getStatGen3Onward('Atk', this),
@@ -80,24 +73,8 @@ export class XDPKM extends PKM {
     let origin =
       GameOfOriginData.find((game) => game?.gc === bytes[0x34]) ?? null;
     this.gameOfOrigin = GameOfOriginData.indexOf(origin);
-    let byteArray = new Uint16Array(12);
-    for (let i = 0; i < 12; i += 1) {
-      let byte = bytesToUint16BigEndian(bytes, 0x4e + 2 * i);
-      if (byte === 0) {
-        break;
-      }
-      byteArray[i] = byte;
-    }
-    this.nickname = new TextDecoder('utf-16').decode(byteArray);
-    byteArray = new Uint16Array(12);
-    for (let i = 0; i < 12; i += 1) {
-      let byte = bytesToUint16BigEndian(bytes, 0x38 + 2 * i);
-      if (byte === 0) {
-        break;
-      }
-      byteArray[i] = byte;
-    }
-    this.trainerName = new TextDecoder('utf-16').decode(byteArray);
+    this.trainerName = utf16BytesToString(this.bytes, 0x38, 11, true);
+    this.nickname = utf16BytesToString(this.bytes, 0x4e, 11, true);
     this.ribbons = [];
     let ribbonsValue = bytesToUint16BigEndian(bytes, 0x7c);
     for (let ribbon = 0; ribbon < Gen3StandardRibbons.length; ribbon++) {
@@ -109,9 +86,7 @@ export class XDPKM extends PKM {
       bytesToUint16BigEndian(bytes, 0xba) > 0 &&
       !this.ribbons.includes('National') &&
       this.gameOfOrigin === 0x0f;
-    this.metYear = bytes[0x7b];
-    this.metMonth = bytes[0x7c];
-    this.metDay = bytes[0x7d];
+    this.metLocationIndex = bytesToUint16BigEndian(bytes, 0x08);
     this.isShiny =
       (this.trainerID ^
         this.secretID ^
@@ -147,5 +122,24 @@ export class XDPKM extends PKM {
     for (let i = 0; i < 4; i += 4) {
       this.bytes[0x7b + i] = value[i];
     }
+  }
+  public get contest() {
+    return {
+      cool: this.bytes[0xae],
+      beauty: this.bytes[0xaf],
+      cute: this.bytes[0xb0],
+      smart: this.bytes[0xb1],
+      tough: this.bytes[0xb2],
+      sheen: this.bytes[0xb3],
+    };
+  }
+
+  public set contest(value: contestStats) {
+    this.bytes[0xae] = value.cool;
+    this.bytes[0xaf] = value.beauty;
+    this.bytes[0xb0] = value.cute;
+    this.bytes[0xb1] = value.smart;
+    this.bytes[0xb2] = value.tough;
+    this.bytes[0xb3] = value.sheen;
   }
 }

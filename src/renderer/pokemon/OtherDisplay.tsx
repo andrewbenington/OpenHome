@@ -54,8 +54,16 @@ const OtherDisplay = (props: { mon: PKM }) => {
       )}
       {mon.trainerFriendship !== undefined ? (
         <AttributeRow
-          label="OT Friendship"
+          label={`${mon.trainerName}'s Friendship`}
           value={mon.trainerFriendship.toString()}
+        />
+      ) : (
+        <div />
+      )}
+      {mon.handlerName && mon.handlerFriendship !== undefined ? (
+        <AttributeRow
+          label={`${mon.handlerName}'s Friendship`}
+          value={mon.handlerFriendship.toString()}
         />
       ) : (
         <div />
@@ -83,7 +91,9 @@ const OtherDisplay = (props: { mon: PKM }) => {
       {mon.dexNum === 924 && mon.personalityValue ? (
         <AttributeRow
           label="Maushold"
-          value={mon.personalityValue % 100 ? 'Family of Four' : 'Family of Three'}
+          value={
+            mon.personalityValue % 100 ? 'Family of Four' : 'Family of Three'
+          }
         />
       ) : (
         <div />

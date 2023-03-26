@@ -1,3 +1,6 @@
+import { GameOfOrigin, GameOfOriginData, isBDSP } from 'consts';
+import LALocations from 'consts/MetLocation/LA';
+import { OHPKM } from '.';
 import { Abilities } from '../../consts/Abilities';
 import { Items } from '../../consts/Items';
 import { Languages } from '../../consts/Languages';
@@ -23,10 +26,92 @@ import {
   pokedate,
   stats,
 } from './PKM';
-import { writeIVsToBuffer } from './util';
+import { adjustMovePPBetweenFormats, writeIVsToBuffer } from './util';
 
 export class PA8 extends PKM {
   static fileSize = 376;
+  constructor(...args: any[]) {
+    if (args[0] instanceof Uint8Array) {
+      super(args[0]);
+    } else if (args[0] instanceof OHPKM) {
+      const other = args[0];
+      super(new Uint8Array(376));
+      this.sanity = other.sanity;
+      this.dexNum = other.dexNum;
+      this.heldItem = other.heldItem;
+      this.trainerID = other.trainerID;
+      this.secretID = other.secretID;
+      this.exp = other.exp;
+      this.canGigantamax = other.canGigantamax;
+      this.markings = other.markings;
+      this.gameOfOrigin = other.gameOfOrigin;
+      this.ability = other.ability;
+      this.abilityNum = other.abilityNum;
+      this.abilityIndex = Abilities.indexOf(this.ability);
+      this.alphaMove = other.alphaMove;
+      this.gender = other.gender;
+      this.personalityValue = other.personalityValue;
+      this.encryptionConstant = other.encryptionConstant;
+      this.nature = other.nature;
+      this.statNature = other.statNature;
+      this.isFatefulEncounter = other.isFatefulEncounter;
+      this.flag2LA = other.flag2LA;
+      this.formNum = other.formNum;
+      this.evs = other.evs;
+      this.contest = other.contest;
+      this.pokerusByte = other.pokerusByte;
+      this.contestMemoryCount = other.contestMemoryCount;
+      this.battleMemoryCount = other.battleMemoryCount;
+      this.ribbons = other.ribbons;
+      this.sociability = other.sociability;
+      this.height = other.height;
+      this.weight = other.weight;
+      this.scale = other.scale;
+      this.moves = other.moves;
+      this.movePP = adjustMovePPBetweenFormats(this, other);
+      this.movePPUps = other.movePPUps;
+      this.nickname = other.nickname;
+      this.relearnMoves = other.relearnMoves;
+      this.ivs = other.ivs;
+      this.isNicknamed = other.isNicknamed;
+      this.unknownA0 = other.unknownA0;
+      this.gvs = other.gvs;
+      this.heightAbsoluteBytes = other.heightAbsoluteBytes;
+      this.weightAbsoluteBytes = other.weightAbsoluteBytes;
+      this.handlerName = other.handlerName;
+      this.handlerGender = other.handlerGender;
+      this.handlerLanguage = other.handlerLanguage;
+      this.isCurrentHandler = other.isCurrentHandler;
+      this.handlerID = other.handlerID;
+      this.handlerFriendship = other.handlerFriendship;
+      this.handlerMemory = other.handlerMemory;
+      this.contestMemoryCount = other.contestMemoryCount;
+      this.battleMemoryCount = other.battleMemoryCount;
+      this.fullness = other.fullness;
+      this.enjoyment = other.enjoyment;
+      this.gameOfOrigin = other.gameOfOrigin;
+      this.gameOfOriginBattle = other.gameOfOriginBattle;
+      this.region = other.region;
+      this.consoleRegion = other.consoleRegion;
+      this.language = other.language;
+      this.unknownF3 = other.unknownF3;
+      this.formArgument = other.formArgument;
+      this.affixedRibbon = other.affixedRibbon;
+      this.trainerName = other.trainerName;
+      this.trainerFriendship = other.trainerFriendship;
+      this.trainerMemory = other.trainerMemory;
+      this.eggDate = other.eggDate;
+      this.metDate = other.metDate;
+      this.ball = Math.max(other.ball, 27);
+      this.eggLocationIndex = other.eggLocationIndex;
+      this.metLocationIndex = other.metLocationIndex;
+      this.metLevel = other.metLevel;
+      this.trainerGender = other.trainerGender;
+      this.homeTracker = other.homeTracker;
+    } else {
+      super(new Uint8Array());
+    }
+  }
   public get format() {
     return 'PA8';
   }
@@ -235,26 +320,18 @@ export class PA8 extends PKM {
   }
   public get ribbons() {
     let ribbons = [];
-    let rBytes = this.ribbonBytes;
-    for (let byte = 0; byte < 16; byte++) {
-      let ribbonsUint8 = rBytes[byte];
-      for (let bit = 0; bit < 8; bit++) {
-        if (
-          ribbonsUint8 & Math.pow(2, bit) &&
-          8 * byte + bit < Gen9Ribbons.length
-        ) {
-          ribbons.push(Gen9Ribbons[8 * byte + bit]);
-        }
+    for (let i = 0; i <= Gen9Ribbons.indexOf('Hisui'); i++) {
+      if (getFlag(this.bytes, i >= 64 ? 0x40 : 0x34, i % 64)) {
+        ribbons.push(Gen9Ribbons[i]);
       }
     }
     return ribbons;
   }
   public set ribbons(value: string[]) {
-    this.ribbonBytes = new Uint8Array(16);
     value.forEach((ribbon) => {
       let index = Gen9Ribbons.indexOf(ribbon);
       if (index > 0) {
-        setFlag(this.ribbonBytes, index >= 64 ? 0x40 : 0x34, index, true);
+        setFlag(this.bytes, index >= 64 ? 0x40 : 0x34, index % 64, true);
       }
     });
   }
@@ -462,10 +539,10 @@ export class PA8 extends PKM {
     this.bytes.set(utfBytes, 0xb8);
   }
   public get handlerGender() {
-    return getFlag(this.bytes, 0xd2, 7) ? 1 : 0;
+    return getFlag(this.bytes, 0xd2, 7);
   }
-  public set handlerGender(value: number) {
-    setFlag(this.bytes, 0xd2, 7, !!value);
+  public set handlerGender(value: boolean) {
+    setFlag(this.bytes, 0xd2, 7, value);
   }
   public get handlerLanguageIndex() {
     return this.bytes[0xd3];
@@ -594,26 +671,28 @@ export class PA8 extends PKM {
     this.bytes.set(uint16ToBytesLittleEndian(value.textVariables), 0x12e);
   }
   public get eggDate() {
-    return {
-      year: this.bytes[0x131],
-      month: this.bytes[0x132],
-      day: this.bytes[0x133],
-    };
+    return this.bytes[0x132]
+      ? {
+          year: this.bytes[0x131] + 2000,
+          month: this.bytes[0x132],
+          day: this.bytes[0x133],
+        }
+      : undefined;
   }
-  public set eggDate(value: pokedate) {
-    this.bytes[0x131] = value.year;
-    this.bytes[0x132] = value.month;
-    this.bytes[0x133] = value.day;
+  public set eggDate(value: pokedate | undefined) {
+    this.bytes[0x131] = value?.year ? value.year - 2000 : 0;
+    this.bytes[0x132] = value?.month ?? 0;
+    this.bytes[0x133] = value?.day ?? 0;
   }
   public get metDate() {
     return {
-      year: this.bytes[0x134],
+      year: this.bytes[0x134] + 2000,
       month: this.bytes[0x135],
       day: this.bytes[0x136],
     };
   }
   public set metDate(value: pokedate) {
-    this.bytes[0x134] = value.year;
+    this.bytes[0x134] = value.year - 2000;
     this.bytes[0x135] = value.month;
     this.bytes[0x136] = value.day;
   }
@@ -634,6 +713,21 @@ export class PA8 extends PKM {
   }
   public set metLocationIndex(value: number) {
     this.bytes.set(uint16ToBytesLittleEndian(value), 0x13a);
+  }
+  public get metLocation() {
+    if (isBDSP(this.gameOfOrigin)) {
+      return 'in the Sinnoh region made new';
+    }
+    if (this.gameOfOrigin != GameOfOrigin.LegendsArceus) {
+      return this.gameOfOrigin <= GameOfOrigin.Scarlet
+        ? `in the ${GameOfOriginData[this.gameOfOrigin]?.region} region`
+        : 'in a faraway place';
+    }
+    let locationBlock =
+      LALocations[Math.floor(this.metLocationIndex / 10000) * 10000];
+    if (locationBlock) {
+      return locationBlock[this.metLocationIndex % 10000];
+    }
   }
   public get metLevel() {
     return this.bytes[0x13d] & ~0x80;
@@ -725,13 +819,5 @@ export class PA8 extends PKM {
         bytesToUint16LittleEndian(this.bytes, 0x1e)) ===
       0
     );
-  }
-  constructor(...args: any[]) {
-    if (args[0] instanceof Uint8Array) {
-      super(args[0]);
-    } else if (args[0] instanceof PKM) {
-      const other = args[0];
-      super(new Uint8Array(376));
-    }
   }
 }

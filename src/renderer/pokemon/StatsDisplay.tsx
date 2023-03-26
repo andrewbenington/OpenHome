@@ -23,6 +23,9 @@ import Sheen from '../images/icons/Sheen.gif';
 import { detailsPaneContentStyle } from './styles';
 
 const getSheenStars = (mon: PKM) => {
+  if (!mon.contest) {
+    return 0;
+  }
   if (mon instanceof PK3 || mon instanceof COLOPKM || mon instanceof XDPKM) {
     return mon.contest.sheen === 255
       ? 10
@@ -121,7 +124,11 @@ const StatsDisplay = (props: { mon: PKM }) => {
           ) : (
             <div />
           )}
-          <MenuItem value="Contest">Contest</MenuItem>
+          {mon.contest !== undefined ? (
+            <MenuItem value="Contest">Contest</MenuItem>
+          ) : (
+            <div />
+          )}
         </Select>
         {display === 'EVs' && mon.format === 'OHPKM' ? (
           <Select value={evType} onChange={(e) => setEVType(e.target.value)}>
@@ -373,13 +380,15 @@ const StatsDisplay = (props: { mon: PKM }) => {
                   }
                 : {
                     label: 'Contest',
-                    data: [
-                      mon.contest.cool,
-                      mon.contest.beauty,
-                      mon.contest.cute,
-                      mon.contest.smart,
-                      mon.contest.tough,
-                    ],
+                    data: mon.contest
+                      ? [
+                          mon.contest.cool,
+                          mon.contest.beauty,
+                          mon.contest.cute,
+                          mon.contest.smart,
+                          mon.contest.tough,
+                        ]
+                      : [],
                     fill: true,
                     backgroundColor: 'rgba(132, 99, 255, 0.2)',
                     borderColor: 'rgb(132, 99, 255)',
@@ -392,7 +401,7 @@ const StatsDisplay = (props: { mon: PKM }) => {
           }}
         />
       </div>
-      {display === 'Contest' && (
+      {display === 'Contest' && mon.contest && (
         <div
           style={{
             display: 'flex',

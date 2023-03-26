@@ -4,9 +4,23 @@ import { useState } from 'react';
 import Themes from 'renderer/app/Themes';
 import { G1SAV, G2SAV, G3SAV, G5SAV, HGSSSAV } from 'types/SAVTypes';
 import { POKEMON_DATA } from '../../consts/Mons';
-import { OHPKM, PK1, PK2, PK3, PK4, PK5, PKM } from '../../types/PKMTypes';
+import {
+  OHPKM,
+  PA8,
+  PK1,
+  PK2,
+  PK3,
+  PK4,
+  PK5,
+  PK6,
+  PKM,
+} from '../../types/PKMTypes';
 import { getTypes } from '../../types/PKMTypes/util';
-import { isRestricted } from '../../types/TransferRestrictions';
+import {
+  isRestricted,
+  LA_TRANSFER_RESTRICTIONS,
+  RegionalForms,
+} from '../../types/TransferRestrictions';
 import OpenHomeButton from '../components/OpenHomeButton';
 import AttributeRow from './AttributeRow';
 import OtherDisplay from './OtherDisplay';
@@ -35,6 +49,10 @@ const getTypeFromString = (type: string) => {
       return PK4;
     case 'PK5':
       return PK5;
+    case 'PK6':
+      return PK6;
+    case 'PA8':
+      return PA8;
   }
 };
 
@@ -109,6 +127,29 @@ const PokemonDisplay = (props: {
         {mon.format === 'OHPKM' &&
         !isRestricted(G5SAV.TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) ? (
           <MenuItem value="PK5">PK5</MenuItem>
+        ) : (
+          <div />
+        )}
+        {mon.format === 'OHPKM' &&
+        !isRestricted(
+          {
+            maxDexNum: 721,
+            excludedForms: {
+              ...RegionalForms,
+              483: [1],
+              484: [1],
+            },
+          },
+          mon.dexNum,
+          mon.formNum
+        ) ? (
+          <MenuItem value="PK6">PK6</MenuItem>
+        ) : (
+          <div />
+        )}
+        {mon.format === 'OHPKM' &&
+        !isRestricted(LA_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) ? (
+          <MenuItem value="PA8">PA8</MenuItem>
         ) : (
           <div />
         )}

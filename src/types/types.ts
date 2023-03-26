@@ -162,3 +162,5 @@ export type Move = {
   type: string;
   id: number;
 };
+
+export type GameLocations = { [key: number]: string[] }

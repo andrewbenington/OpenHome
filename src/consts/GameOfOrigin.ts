@@ -43,12 +43,27 @@ export const GameOfOriginData: (Origin | null)[] = [
   { name: 'Gold', region: 'Johto', mark: 'GB' },
   { name: 'Silver', region: 'Johto', mark: 'GB' },
   { name: 'Crystal', region: 'Johto', mark: 'GB' },
-  { name: "Let's Go, Pikachu!", region: 'Kanto', mark: 'LGPE', logo: 'LetsGoPikachu' },
-  { name: "Let's Go, Eevee!", region: 'Kanto', mark: 'LGPE', logo: 'LetsGoEevee' },
+  {
+    name: "Let's Go, Pikachu!",
+    region: 'Kanto',
+    mark: 'LGPE',
+    logo: 'LetsGoPikachu',
+  },
+  {
+    name: "Let's Go, Eevee!",
+    region: 'Kanto',
+    mark: 'LGPE',
+    logo: 'LetsGoEevee',
+  },
   { name: 'Sword', region: 'Galar', mark: 'Galar' },
   { name: 'Shield', region: 'Galar', mark: 'Galar' },
   null,
-  { name: 'Legends: Arceus', region: 'Hisui', mark: 'LA', logo: 'LegendsArceus' },
+  {
+    name: 'Legends: Arceus',
+    region: 'Hisui',
+    mark: 'LA',
+    logo: 'LegendsArceus',
+  },
   { name: 'Brilliant Diamond', region: 'Sinnoh', mark: 'BDSP' },
   { name: 'Shining Pearl', region: 'Sinnoh', mark: 'BDSP' },
   { name: 'Scarlet', region: 'Paldea', mark: 'Tera' },
@@ -127,10 +142,7 @@ export enum GameOfOrigin {
 
 export const isKanto = (origin: GameOfOrigin) => {
   return (
-    origin === GameOfOrigin.Red ||
-    origin === GameOfOrigin.BlueGreen ||
-    origin === GameOfOrigin.BlueJapan ||
-    origin === GameOfOrigin.Yellow ||
+    isGen1(origin) ||
     origin === GameOfOrigin.FireRed ||
     origin === GameOfOrigin.LeafGreen ||
     origin === GameOfOrigin.LetsGoPikachu ||
@@ -140,9 +152,7 @@ export const isKanto = (origin: GameOfOrigin) => {
 
 export const isJohto = (origin: GameOfOrigin) => {
   return (
-    origin === GameOfOrigin.Gold ||
-    origin === GameOfOrigin.Silver ||
-    origin === GameOfOrigin.Crystal ||
+    isGen2(origin) ||
     origin === GameOfOrigin.HeartGold ||
     origin === GameOfOrigin.SoulSilver
   );
@@ -166,6 +176,77 @@ export const isSinnoh = (origin: GameOfOrigin) => {
     origin === GameOfOrigin.BrilliantDiamond ||
     origin === GameOfOrigin.ShiningPearl
   );
+};
+
+export const isUnova = (origin: GameOfOrigin) => {
+  return isGen5(origin);
+};
+
+export const isKalos = (origin: GameOfOrigin) => {
+  return isGen6(origin);
+};
+
+export const isAlola = (origin: GameOfOrigin) => {
+  return origin >= GameOfOrigin.Sun && origin <= GameOfOrigin.UltraMoon;
+};
+
+export const isGalar = (origin: GameOfOrigin) => {
+  return origin === GameOfOrigin.Sword || origin === GameOfOrigin.Shield;
+};
+
+export const isGen1 = (origin: GameOfOrigin) => {
+  return origin >= GameOfOrigin.Red && origin <= GameOfOrigin.Yellow;
+};
+
+export const isGen2 = (origin: GameOfOrigin) => {
+  return origin >= GameOfOrigin.Gold && origin <= GameOfOrigin.Crystal;
+};
+
+export const isGen3 = (origin: GameOfOrigin) => {
+  return isGBA(origin) || origin === GameOfOrigin.ColosseumXD;
+};
+
+export const isGBA = (origin: GameOfOrigin) => {
+  return origin >= GameOfOrigin.Sapphire && origin <= GameOfOrigin.LeafGreen;
+};
+
+export const isGen4 = (origin: GameOfOrigin) => {
+  return origin >= GameOfOrigin.HeartGold && origin <= GameOfOrigin.Platinum;
+};
+
+export const isGen5 = (origin: GameOfOrigin) => {
+  return origin >= GameOfOrigin.White && origin <= GameOfOrigin.Black2;
+};
+
+export const isGen6 = (origin: GameOfOrigin) => {
+  return origin >= GameOfOrigin.X && origin <= GameOfOrigin.OmegaRuby;
+};
+
+export const isGen7 = (origin: GameOfOrigin) => {
+  return isAlola(origin) || isLetsGo(origin);
+};
+
+export const isLetsGo = (origin: GameOfOrigin) => {
+  return (
+    origin === GameOfOrigin.LetsGoPikachu || origin === GameOfOrigin.LetsGoEevee
+  );
+};
+
+export const isGen8 = (origin: GameOfOrigin) => {
+  return (
+    isGalar(origin) || isBDSP(origin) || origin === GameOfOrigin.LegendsArceus
+  );
+};
+
+export const isBDSP = (origin: GameOfOrigin) => {
+  return (
+    origin === GameOfOrigin.BrilliantDiamond ||
+    origin === GameOfOrigin.ShiningPearl
+  );
+};
+
+export const isGen9 = (origin: GameOfOrigin) => {
+  return origin === GameOfOrigin.Scarlet || origin === GameOfOrigin.Violet;
 };
 
 export const gameOfOriginFromFormat = (format: string) => {

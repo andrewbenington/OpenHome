@@ -1,4 +1,7 @@
-import { bytesToUint16LittleEndian } from '../ByteLogic';
+import {
+  bytesToUint16BigEndian,
+  bytesToUint16LittleEndian,
+} from '../ByteLogic';
 import Gen4ToUTFMap from './Gen4ToUTFMap';
 import UTFToGen4Map from './UTFToGen4Map';
 
@@ -124,6 +127,14 @@ export const GBStringDict: { [key: number]: string } = {
   0xff: '9',
 };
 
+/**
+ * Convert Gen 1/Gen 2 encoded bytes to string. Uses a proprietary encoding,
+ * terminated with 0x50 character
+ * @param bytes the buffer from which to read
+ * @param offset buffer offset to start at
+ * @param length character length of string
+ * @returns string of decoded Gen 1/2 bytes
+ */
 export const gen12StringToUTF = (
   bytes: Uint8Array,
   offset: number,
@@ -141,6 +152,15 @@ export const gen12StringToUTF = (
   return str;
 };
 
+/**
+ * Convert string to Gen 1/Gen 2 encoded bytes. Uses a proprietary encoding,
+ * terminated with 0xff character. Characters not in Gen 3 character
+ * set will be replaced with '?'
+ * @param str the string to encode
+ * @param length character length of string
+ * @param terminate include 0x50 at the end
+ * @returns UInt8Array of Gen 1/2 bytes
+ */
 export const utf16StringToGen12 = (
   str: string,
   length: number,
@@ -166,6 +186,14 @@ export const utf16StringToGen12 = (
   return bufView;
 };
 
+/**
+ * Convert Gen 3 encoded bytes to string. Uses a proprietary encoding,
+ * terminated with 0xff character
+ * @param bytes the buffer from which to read
+ * @param offset buffer offset to start at
+ * @param length character length of string
+ * @returns string of decoded Gen 3 bytes
+ */
 export const gen3StringToUTF = (
   bytes: Uint8Array,
   offset: number,
@@ -181,6 +209,16 @@ export const gen3StringToUTF = (
   return str;
 };
 
+/**
+ * Convert string to Gen 3 encoded bytes. Uses a proprietary encoding,
+ * terminated with 0xff character. Characters not in Gen 3 character
+ * set will be replaced with '?'
+ * @param str the string to encode
+ * @param length character length of string
+ * @param terminate include 0xff at the end
+ * @param terminateFill fill remaining bytes with 0xff
+ * @returns UInt8Array of Gen 3 bytes
+ */
 export const utf16StringToGen3 = (
   str: string,
   length: number,
@@ -212,6 +250,14 @@ export const utf16StringToGen3 = (
   return bufView;
 };
 
+/**
+ * Convert Gen 4 encoded bytes to string. Uses a proprietary encoding,
+ * terminated with 0xffff character
+ * @param bytes the buffer from which to read
+ * @param offset buffer offset to start at
+ * @param length character length of string (bytes * 2)
+ * @returns string of decoded Gen 4 bytes
+ */
 export const gen4StringToUTF = (
   bytes: Uint8Array,
   offset: number,
@@ -228,6 +274,15 @@ export const gen4StringToUTF = (
   return str;
 };
 
+/**
+ * Convert string to Gen 4 encoded bytes. Uses a proprietary encoding,
+ * terminated with 0xffff character. Characters not in Gen 4 character
+ * set will be replaced with '?'
+ * @param str the string to encode
+ * @param length character length of string (bytes * 2)
+ * @param terminate include 0xffff at the end
+ * @returns UInt8Array of Gen 4 bytes
+ */
 export const utf16StringToGen4 = (
   str: string,
   length: number,
@@ -254,6 +309,14 @@ export const utf16StringToGen4 = (
   return new Uint8Array(buf);
 };
 
+/**
+ * Convert Gen 5 encoded bytes to string. Equivalent to UTF-16, except
+ * terminated with 0xffff character
+ * @param bytes the buffer from which to read
+ * @param offset buffer offset to start at
+ * @param length character length of string (bytes / 2)
+ * @returns string of decoded Gen 5 bytes
+ */
 export const gen5StringToUTF = (
   bytes: Uint8Array,
   offset: number,
@@ -270,6 +333,14 @@ export const gen5StringToUTF = (
   return str;
 };
 
+/**
+ * Convert string to Gen 5 encoded bytes. Equivalent to UTF-16, except
+ * terminated with 0xffff character
+ * @param str the string to encode
+ * @param length character length of string
+ * @param terminate include 0xffff at the end
+ * @returns UInt8Array of Gen 5 bytes
+ */
 export const utf16StringToGen5 = (
   str: string,
   length: number,
@@ -290,14 +361,24 @@ export const utf16StringToGen5 = (
   return new Uint8Array(buf);
 };
 
+/**
+ * Convert UTF-16 encoded bytes to string
+ * @param bytes the buffer from which to read
+ * @param offset buffer offset to start at
+ * @param length character length of string (bytes / 2)
+ * @returns string of decoded utf-16 bytes
+ */
 export const utf16BytesToString = (
   bytes: Uint8Array,
   offset: number,
-  length: number
+  length: number,
+  bigEndian: boolean = false
 ) => {
   let byteArray = new Uint16Array(length);
   for (let i = 0; i < length; i += 1) {
-    let value = bytesToUint16LittleEndian(bytes, offset + 2 * i);
+    let value = bigEndian
+      ? bytesToUint16BigEndian(bytes, offset + 2 * i)
+      : bytesToUint16LittleEndian(bytes, offset + 2 * i);
     if (value === 0) {
       break;
     }
@@ -310,6 +391,12 @@ export const utf16BytesToString = (
   return new TextDecoder('utf-16').decode(byteArray.slice(0, stringLength));
 };
 
+/**
+ * Convert string to UTF-16 encoded bytes
+ * @param str the string to encode
+ * @param length character length of string
+ * @returns UInt8Array of UTF-16 bytes
+ */
 export const utf16StringToBytes = (str: string, length: number) => {
   var buf = new ArrayBuffer(length * 2);
   var bufView = new Uint16Array(buf);

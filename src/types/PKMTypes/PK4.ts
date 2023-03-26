@@ -4,6 +4,7 @@ import {
   Gen4RibbonsPart1,
   Gen4RibbonsPart2,
   Gen4RibbonsPart3,
+  isGen4,
   isHoenn,
   isJohto,
   isKanto,
@@ -39,9 +40,7 @@ import { OHPKM } from './OHPKM';
 import { contestStats, marking, PKM, pokedate, stats } from './PKM';
 import {
   adjustMovePPBetweenFormats,
-  generateIVs,
   getAbilityFromNumber,
-  ivsFromDVs,
   writeIVsToBuffer,
 } from './util';
 
@@ -119,36 +118,35 @@ export class PK4 extends PKM {
       this.metDate = other.metDate ?? {
         month: now.getMonth(),
         day: now.getDate(),
-        year: now.getFullYear() - 2000,
+        year: now.getFullYear(),
       };
       this.ball = other.ball && other.ball <= 24 ? other.ball : 4;
-      const equivalentLocation = other.metLocation
-        ? G4Locations[0].indexOf(other.metLocation.slice(3))
-        : -1;
-      if (
-        other.gameOfOrigin >= GameOfOrigin.HeartGold &&
-        other.gameOfOrigin <= GameOfOrigin.Platinum
-      ) {
+      if (isGen4(other.gameOfOrigin)) {
         this.eggLocationIndex = other.eggLocationIndex;
         this.metLocationIndex = other.metLocationIndex ?? 3002;
-      } else if (equivalentLocation > 0) {
-        this.eggLocationIndex = other.eggLocationIndex;
-        this.metLocationIndex = equivalentLocation;
-      } else if (isKanto(other.gameOfOrigin)) {
-        this.eggLocationIndex = other.eggLocationIndex ? 2003 : 0;
-        this.metLocationIndex = 2003;
-      } else if (isJohto(other.gameOfOrigin)) {
-        this.eggLocationIndex = other.eggLocationIndex ? 2004 : 0;
-        this.metLocationIndex = 2004;
-      } else if (isHoenn(other.gameOfOrigin)) {
-        this.eggLocationIndex = other.eggLocationIndex ? 2005 : 0;
-        this.metLocationIndex = 2005;
-      } else if (isSinnoh(other.gameOfOrigin)) {
-        this.eggLocationIndex = other.eggLocationIndex ? 2006 : 0;
-        this.metLocationIndex = 2006;
       } else {
-        this.eggLocationIndex = other.eggLocationIndex ? 2001 : 0;
-        this.metLocationIndex = 2001;
+        let equivalentLocation = other.metLocation
+          ? G4Locations[0].indexOf(other.metLocation.slice(3))
+          : undefined;
+        if (equivalentLocation !== undefined && equivalentLocation < 0) {
+          equivalentLocation = undefined;
+        }
+        if (isKanto(other.gameOfOrigin)) {
+          this.eggLocationIndex = other.eggLocationIndex ? 2003 : 0;
+          this.metLocationIndex = equivalentLocation ?? 2003;
+        } else if (isJohto(other.gameOfOrigin)) {
+          this.eggLocationIndex = other.eggLocationIndex ? 2004 : 0;
+          this.metLocationIndex = equivalentLocation ?? 2004;
+        } else if (isHoenn(other.gameOfOrigin)) {
+          this.eggLocationIndex = other.eggLocationIndex ? 2005 : 0;
+          this.metLocationIndex = 2005;
+        } else if (isSinnoh(other.gameOfOrigin)) {
+          this.eggLocationIndex = other.eggLocationIndex ? 2006 : 0;
+          this.metLocationIndex = equivalentLocation ?? 2006;
+        } else {
+          this.eggLocationIndex = other.eggLocationIndex ? 2001 : 0;
+          this.metLocationIndex = 2001;
+        }
       }
       this.metLevel = other.metLevel ?? this.level;
       this.trainerGender = other.trainerGender;
@@ -528,6 +526,14 @@ export class PK4 extends PKM {
     this.bytes.set(uint16ToBytesLittleEndian(value), 0x44);
   }
 
+  public get eggLocation() {
+    let locationBlock =
+      G4Locations[Math.floor(this.eggLocationIndex / 1000) * 1000];
+    if (locationBlock) {
+      return 'from ' + locationBlock[this.eggLocationIndex % 1000];
+    }
+  }
+
   public get metLocationIndex() {
     const dpLocation = bytesToUint16LittleEndian(this.bytes, 0x80);
     return dpLocation !== 0xbba
@@ -543,6 +549,14 @@ export class PK4 extends PKM {
       this.bytes.set(uint16ToBytesLittleEndian(value), 0x80);
     }
     this.bytes.set(uint16ToBytesLittleEndian(value), 0x46);
+  }
+
+  public get metLocation() {
+    let locationBlock =
+      G4Locations[Math.floor(this.metLocationIndex / 1000) * 1000];
+    if (locationBlock) {
+      return 'in ' + locationBlock[this.metLocationIndex % 1000];
+    }
   }
 
   public get nickname() {
@@ -574,7 +588,7 @@ export class PK4 extends PKM {
   public get eggDate() {
     return this.bytes[0x79]
       ? {
-          year: this.bytes[0x78],
+          year: this.bytes[0x78] + 2000,
           month: this.bytes[0x79],
           day: this.bytes[0x7a],
         }
@@ -583,7 +597,7 @@ export class PK4 extends PKM {
 
   public set eggDate(value: pokedate | undefined) {
     if (value) {
-      this.bytes[0x78] = value.year;
+      this.bytes[0x78] = value.year - 2000;
       this.bytes[0x79] = value.month;
       this.bytes[0x7a] = value.day;
     } else {
@@ -595,14 +609,14 @@ export class PK4 extends PKM {
 
   public get metDate() {
     return {
-      year: this.bytes[0x7b],
+      year: this.bytes[0x7b] + 2000,
       month: this.bytes[0x7c],
       day: this.bytes[0x7d],
     };
   }
 
   public set metDate(value: pokedate) {
-    this.bytes[0x7b] = value.year;
+    this.bytes[0x7b] = value.year - 2000;
     this.bytes[0x7c] = value.month;
     this.bytes[0x7d] = value.day;
   }
