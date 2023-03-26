@@ -1,6 +1,8 @@
 import G4Locations from 'consts/MetLocation/G4';
+import G5Locations from 'consts/MetLocation/G5';
 import {
   GameOfOrigin,
+  isGen5,
   isHoenn,
   isJohto,
   isKanto,
@@ -38,13 +40,14 @@ import {
   utf16StringToGen5,
 } from '../../util/Strings/StringConverter';
 import { OHPKM } from './OHPKM';
-import { GEN4_MOVE_MAX } from './PK4';
 import { contestStats, marking, PKM, pokedate, stats } from './PKM';
 import {
   adjustMovePPBetweenFormats,
   getAbilityFromNumber,
   writeIVsToBuffer,
 } from './util';
+
+export const GEN5_MOVE_MAX = 559;
 
 export class PK5 extends PKM {
   static fileSize = 136;
@@ -72,9 +75,7 @@ export class PK5 extends PKM {
       this.secretID = other.secretID;
       this.exp = other.exp;
       this.abilityNum = other.abilityNum;
-      this.ability =
-        other.ability ??
-        getAbilityFromNumber(this.dexNum, this.formNum, this.abilityNum);
+      this.ability = other.ability;
       // console
       this.createPersonalityValueFromOtherPreGen6(other);
       this.isFatefulEncounter = other.isFatefulEncounter;
@@ -84,12 +85,12 @@ export class PK5 extends PKM {
       this.pokerusByte = other.pokerusByte;
       this.ribbons = other.ribbons;
       // filtering out moves that didnt exist yet
-      const validMoves = other.moves.filter((move) => move <= GEN4_MOVE_MAX);
+      const validMoves = other.moves.filter((move) => move <= GEN5_MOVE_MAX);
       const validMovePP = adjustMovePPBetweenFormats(this, other).filter(
-        (_, i) => other.moves[i] <= GEN4_MOVE_MAX
+        (_, i) => other.moves[i] <= GEN5_MOVE_MAX
       );
       const validMovePPUps = other.movePPUps.filter(
-        (_, i) => other.moves[i] <= GEN4_MOVE_MAX
+        (_, i) => other.moves[i] <= GEN5_MOVE_MAX
       );
       this.moves = [validMoves[0], validMoves[1], validMoves[2], validMoves[3]];
       this.movePP = [
@@ -105,11 +106,11 @@ export class PK5 extends PKM {
         validMovePPUps[3],
       ];
       this.nickname = other.nickname;
-      this.currentHP = other.currentHP;
       this.ivs = other.ivs;
       this.isEgg = other.isEgg;
       this.isNicknamed = other.isNicknamed;
-      this.shinyLeaves = other.shinyLeaves;
+      this.isNsPokemon = other.isNsPokemon;
+      this.pokeStarFame = other.pokeStarFame;
       this.gameOfOrigin = other.gameOfOrigin;
       this.language = other.languageIndex === 0 ? 'ENG' : other.language;
       this.encounterType = other.encounterType;
@@ -121,14 +122,11 @@ export class PK5 extends PKM {
       this.metDate = other.metDate ?? {
         month: now.getMonth(),
         day: now.getDate(),
-        year: now.getFullYear() - 2000,
+        year: now.getFullYear(),
       };
-      this.ball = other.ball && other.ball <= 24 ? other.ball : 4;
+      this.ball = other.ball && other.ball <= 25 ? other.ball : 4;
       this.nature = other.nature;
-      if (
-        other.gameOfOrigin >= GameOfOrigin.White &&
-        other.gameOfOrigin <= GameOfOrigin.Black2
-      ) {
+      if (isGen5(other.gameOfOrigin)) {
         this.eggLocationIndex = other.eggLocationIndex;
         this.metLocationIndex = other.metLocationIndex ?? 40002;
       } else if (isKanto(other.gameOfOrigin)) {
@@ -149,6 +147,7 @@ export class PK5 extends PKM {
       }
       this.metLevel = other.metLevel ?? this.level;
       this.trainerGender = other.trainerGender;
+      this.currentHP = this.stats.hp;
       this.refreshChecksum();
     }
   }
@@ -175,6 +174,14 @@ export class PK5 extends PKM {
 
   public set dexNum(value: number) {
     this.bytes.set(uint16ToBytesLittleEndian(value), 0x08);
+  }
+
+  public get exp() {
+    return bytesToUint32LittleEndian(this.bytes, 0x10);
+  }
+
+  public set exp(value: number) {
+    this.bytes.set(uint32ToBytesLittleEndian(value), 0x10);
   }
 
   public get heldItemIndex() {
@@ -214,14 +221,6 @@ export class PK5 extends PKM {
 
   public get displayID() {
     return this.trainerID;
-  }
-
-  public get exp() {
-    return bytesToUint32LittleEndian(this.bytes, 0x10);
-  }
-
-  public set exp(value: number) {
-    this.bytes.set(uint32ToBytesLittleEndian(value), 0x10);
   }
 
   public get level() {
@@ -356,34 +355,19 @@ export class PK5 extends PKM {
 
   public get ribbons() {
     const ribbons: string[] = [];
-    for (let byte = 0; byte < 4; byte++) {
-      let ribbonsUint8 = this.bytes[0x24 + byte];
-      for (let bit = 0; bit < 8; bit++) {
-        if (ribbonsUint8 & Math.pow(2, bit)) {
-          if (8 * byte + bit < Gen4RibbonsPart1.length) {
-            ribbons.push(Gen4RibbonsPart1[8 * byte + bit]);
-          }
-        }
+    for (let i = 0; i < 32; i++) {
+      if (getFlag(this.bytes, 0x24, i)) {
+        ribbons.push(Gen4RibbonsPart1[i]);
       }
     }
-    for (let byte = 0; byte < 4; byte++) {
-      let ribbonsUint8 = this.bytes[0x3c + byte];
-      for (let bit = 0; bit < 8; bit++) {
-        if (ribbonsUint8 & Math.pow(2, bit)) {
-          if (8 * byte + bit < Gen4RibbonsPart2.length) {
-            ribbons.push(Gen4RibbonsPart2[8 * byte + bit]);
-          }
-        }
+    for (let i = 0; i < 32; i++) {
+      if (getFlag(this.bytes, 0x3c, i)) {
+        ribbons.push(Gen4RibbonsPart2[i]);
       }
     }
-    for (let byte = 0; byte < 4; byte++) {
-      let ribbonsUint8 = this.bytes[0x60 + byte];
-      for (let bit = 0; bit < 8; bit++) {
-        if (ribbonsUint8 & Math.pow(2, bit)) {
-          if (8 * byte + bit < Gen4RibbonsPart3.length) {
-            ribbons.push(Gen4RibbonsPart3[8 * byte + bit]);
-          }
-        }
+    for (let i = 0; i < 32; i++) {
+      if (getFlag(this.bytes, 0x60, i)) {
+        ribbons.push(Gen4RibbonsPart3[i]);
       }
     }
     return ribbons;
@@ -404,7 +388,6 @@ export class PK5 extends PKM {
       index = Gen4RibbonsPart2.indexOf(ribbon);
       if (index > -1) {
         setFlag(this.bytes, 0x60, index, true);
-        return;
       }
     });
   }
@@ -528,20 +511,19 @@ export class PK5 extends PKM {
   }
 
   public get eggLocationIndex() {
-    const dpLocation = bytesToUint16LittleEndian(this.bytes, 0x7e);
-    return dpLocation !== 0xbba
-      ? dpLocation
-      : bytesToUint16LittleEndian(this.bytes, 0x44);
+    return bytesToUint16LittleEndian(this.bytes, 0x7e);
   }
 
   public set eggLocationIndex(value: number) {
-    if (value >= 0x0070) {
-      // show "faraway place" in diamond/pearl for platinum/hgss locations
-      this.bytes.set(uint16ToBytesLittleEndian(0xbba), 0x7e);
-    } else {
-      this.bytes.set(uint16ToBytesLittleEndian(value), 0x7e);
+    this.bytes.set(uint16ToBytesLittleEndian(value), 0x7e);
+  }
+
+  public get eggLocation() {
+    let locationBlock =
+      G5Locations[Math.floor(this.eggLocationIndex / 10000) * 10000];
+    if (locationBlock) {
+      return 'from ' + locationBlock[this.eggLocationIndex % 10000];
     }
-    this.bytes.set(uint16ToBytesLittleEndian(value), 0x44);
   }
 
   public get metLocationIndex() {
@@ -550,6 +532,14 @@ export class PK5 extends PKM {
 
   public set metLocationIndex(value: number) {
     this.bytes.set(uint16ToBytesLittleEndian(value), 0x80);
+  }
+
+  public get metLocation() {
+    let locationBlock =
+      G5Locations[Math.floor(this.metLocationIndex / 10000) * 10000];
+    if (locationBlock) {
+      return 'in ' + locationBlock[this.metLocationIndex % 10000];
+    }
   }
 
   public get nickname() {
@@ -581,7 +571,7 @@ export class PK5 extends PKM {
   public get eggDate() {
     return this.bytes[0x79]
       ? {
-          year: this.bytes[0x78],
+          year: this.bytes[0x78] + 2000,
           month: this.bytes[0x79],
           day: this.bytes[0x7a],
         }
@@ -590,7 +580,7 @@ export class PK5 extends PKM {
 
   public set eggDate(value: pokedate | undefined) {
     if (value) {
-      this.bytes[0x78] = value.year;
+      this.bytes[0x78] = value.year - 2000;
       this.bytes[0x79] = value.month;
       this.bytes[0x7a] = value.day;
     } else {
@@ -602,14 +592,14 @@ export class PK5 extends PKM {
 
   public get metDate() {
     return {
-      year: this.bytes[0x7b],
+      year: this.bytes[0x7b] + 2000,
       month: this.bytes[0x7c],
       day: this.bytes[0x7d],
     };
   }
 
   public set metDate(value: pokedate) {
-    this.bytes[0x7b] = value.year;
+    this.bytes[0x7b] = value.year - 2000;
     this.bytes[0x7c] = value.month;
     this.bytes[0x7d] = value.day;
   }

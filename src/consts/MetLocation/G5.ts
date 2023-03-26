@@ -1,4 +1,6 @@
-const BW2MetLocation = {
+import { GameLocations } from 'types/types';
+
+const G5Locations: GameLocations = {
   0: [
     '－－－－－－－－－－',
     'Mystery Zone',
@@ -288,4 +290,4 @@ const BW2MetLocation = {
   60000: ['', 'Stranger', 'Day-Care Couple', 'Pokémon Breeder'],
 };
 
-export default BW2MetLocation;
+export default G5Locations;

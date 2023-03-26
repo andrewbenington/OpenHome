@@ -1,4 +1,5 @@
-import { utf16BytesToString } from '../../util/Strings/StringConverter';
+import { GameOfOrigin, GameOfOriginData, isAlola } from 'consts';
+import SMUSUMLocations from 'consts/MetLocation/SMUSUM';
 import { Abilities } from '../../consts/Abilities';
 import { Items } from '../../consts/Items';
 import { Languages } from '../../consts/Languages';
@@ -6,12 +7,14 @@ import { Gen9RibbonsPart1 } from '../../consts/Ribbons';
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
+  uint16ToBytesLittleEndian,
 } from '../../util/ByteLogic';
 import {
   getHPGen3Onward,
   getLevelGen3Onward,
   getStatGen3Onward,
 } from '../../util/StatCalc';
+import { utf16BytesToString } from '../../util/Strings/StringConverter';
 import { PKM } from './PKM';
 
 export class PK7 extends PKM {
@@ -164,4 +167,49 @@ export class PK7 extends PKM {
     }
   }
 
+  public get eggLocationIndex() {
+    return bytesToUint16LittleEndian(this.bytes, 0xd8);
+  }
+
+  public set eggLocationIndex(value: number) {
+    this.bytes.set(uint16ToBytesLittleEndian(value), 0xd8);
+  }
+
+  public get eggLocation() {
+    if (!isAlola(this.gameOfOrigin)) {
+      return this.gameOfOrigin <= GameOfOrigin.OmegaRuby ||
+        (this.gameOfOrigin >= GameOfOrigin.Red &&
+          this.gameOfOrigin <= GameOfOrigin.Crystal)
+        ? `from the ${GameOfOriginData[this.gameOfOrigin]?.region} region`
+        : 'from a faraway place';
+    }
+    let locationBlock =
+      SMUSUMLocations[Math.floor(this.eggLocationIndex / 10000) * 10000];
+    if (locationBlock) {
+      return 'from ' + locationBlock[this.eggLocationIndex % 10000];
+    }
+  }
+
+  public get metLocationIndex() {
+    return bytesToUint16LittleEndian(this.bytes, 0xda);
+  }
+
+  public set metLocationIndex(value: number) {
+    this.bytes.set(uint16ToBytesLittleEndian(value), 0xda);
+  }
+
+  public get metLocation() {
+    if (!isAlola(this.gameOfOrigin)) {
+      return this.gameOfOrigin <= GameOfOrigin.OmegaRuby ||
+        (this.gameOfOrigin >= GameOfOrigin.Red &&
+          this.gameOfOrigin <= GameOfOrigin.Crystal)
+        ? `in the ${GameOfOriginData[this.gameOfOrigin]?.region} region`
+        : 'in a faraway place';
+    }
+    let locationBlock =
+      SMUSUMLocations[Math.floor(this.metLocationIndex / 10000) * 10000];
+    if (locationBlock) {
+      return 'in ' + locationBlock[this.metLocationIndex % 10000];
+    }
+  }
 }

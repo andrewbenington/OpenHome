@@ -2,6 +2,8 @@ import { uniq } from 'lodash';
 import {
   Abilities,
   GameOfOrigin,
+  Gen34ContestRibbons,
+  Gen34TowerRibbons,
   Items,
   Languages,
   OpenHomeRibbons,
@@ -27,6 +29,7 @@ import {
 } from '../../util/Strings/StringConverter';
 import {
   contestStats,
+  geolocation,
   hyperTrainStats,
   marking,
   memory,
@@ -48,6 +51,7 @@ import {
   writeIVsToBuffer,
 } from './util';
 import Prando from 'prando';
+import _ from 'lodash';
 
 export class OHPKM extends PKM {
   static fileSize = 376;
@@ -101,20 +105,6 @@ export class OHPKM extends PKM {
         this.personalityValue = other.personalityValue;
       } else {
         this.createPersonalityValueFromOtherPreGen6(other);
-        // if (other.dexNum === 201) {
-        //   this.personalityValue =
-        //     (this.personalityValue & 0xffffffe0) | other.formNum;
-        // }
-        // if (other.isShiny) {
-        //   let pvBytes = uint32ToBytesLittleEndian(this.personalityValue);
-        //   let pvLower16 = bytesToUint16LittleEndian(pvBytes, 0);
-        //   let pvUpper16 = pvLower16 ^ this.trainerID ^ this.secretID;
-        //   pvBytes.set(uint16ToBytesLittleEndian(pvUpper16), 2);
-        //   this.personalityValue = bytesToUint32LittleEndian(pvBytes, 0);
-        // } else if (this.isShiny) {
-        //   // if generated value makes it shiny, we want to revert that
-        //   this.personalityValue = this.personalityValue ^ 0x10000000;
-        // }
       }
       this.encryptionConstant =
         other.encryptionConstant ??
@@ -126,11 +116,17 @@ export class OHPKM extends PKM {
       this.flag2LA = other.flag2LA ?? false;
       this.formNum = other.formNum;
       this.evs = other.evs ?? { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 };
-      this.contest = other.contest;
+      this.contest = other.contest ?? {
+        smart: 0,
+        cute: 0,
+        beauty: 0,
+        cool: 0,
+        tough: 0,
+        sheen: 0,
+      };
       this.pokerusByte = other.pokerusByte;
       this.contestMemoryCount = other.contestMemoryCount;
       this.battleMemoryCount = other.battleMemoryCount;
-      // TODO: handle ribbons
       this.ribbons = other.ribbons;
       this.sociability = other.sociability ?? 0;
       this.height = other.height;
@@ -142,7 +138,6 @@ export class OHPKM extends PKM {
       this.nickname = other.nickname;
       this.avs = other.avs;
       this.relearnMoves = other.relearnMoves ?? [0, 0, 0, 0];
-      this.currentHP = other.currentHP;
       if (other.ivs) {
         this.ivs = other.ivs;
       } else if (other.dvs) {
@@ -157,7 +152,6 @@ export class OHPKM extends PKM {
         generateTeraType(prng, this.dexNum, this.formNum) ??
         0;
       this.teraTypeOverride = other.teraTypeOverride ?? 0x13;
-      this.statusCondition = other.statusCondition;
       this.unknownA0 = other.unknownA0 ?? 0;
       this.gvs = other.gvs ?? gvsFromIVs(this.ivs);
       if (other.dvs) {
@@ -182,36 +176,54 @@ export class OHPKM extends PKM {
       this.heightAbsoluteBytes = other.heightAbsoluteBytes ?? new Uint8Array(4);
       this.weightAbsoluteBytes = other.weightAbsoluteBytes ?? new Uint8Array(4);
       this.handlerName = other.handlerName ?? '';
-      // this.handlerGender
+      this.handlerGender = other.handlerGender ?? false;
       this.handlerLanguage = other.handlerLanguage ?? 'ENG';
       this.isCurrentHandler = other.isCurrentHandler;
       this.handlerID = other.handlerID ?? 0;
-      this.handlerFriendship = 0;
+      this.handlerFriendship = other.handlerFriendship ?? 0;
       this.handlerMemory = other.handlerMemory ?? {
         memory: 0,
         intensity: 0,
         textVariables: 0,
         feeling: 0,
       };
-      // this.superTraining
+      this.handlerAffection = other.handlerAffection ?? 0;
+      this.resortEventStatus = other.resortEventStatus ?? 0;
+      this.superTrainingFlags = other.superTrainingFlags ?? 0;
+      this.superTrainingDistFlags = other.superTrainingDistFlags ?? 0;
+      this.secretSuperTrainingUnlocked = !!other.secretSuperTrainingUnlocked;
+      this.secretSuperTrainingComplete = !!other.secretSuperTrainingComplete;
+      this.trainingBagHits = other.trainingBagHits ?? 0;
+      this.trainingBag = other.trainingBag ?? 0;
+      this.contestMemoryCount = other.contestMemoryCount;
+      this.battleMemoryCount = other.battleMemoryCount;
+      this.pokeStarFame = other.pokeStarFame ?? 0;
       this.metTimeOfDay = other.metTimeOfDay;
+      this.isNsPokemon = !!other.isNsPokemon;
       this.shinyLeaves = other.shinyLeaves ?? 0;
       this.fullness = other.fullness ?? 0;
       this.enjoyment = other.enjoyment ?? 0;
       this.gameOfOrigin = other.gameOfOrigin;
       this.gameOfOriginBattle = other.gameOfOriginBattle;
-      // this.region
-      // this.consoleRegion
+      this.country = other.country ?? 0;
+      this.region = other.region ?? 0;
+      this.consoleRegion = other.consoleRegion ?? 0;
       this.language = other.languageIndex === 0 ? 'ENG' : other.language;
       this.unknownF3 = other.unknownF3 ?? 0;
       this.formArgument = other.formArgument ?? 0;
       this.affixedRibbon = other.affixedRibbon ?? 0xff;
-      // this.geoRegions, this.geoCountries
-      // this.distByte
+      this.geolocations = other.geolocations ?? [
+        { country: 0, region: 0 },
+        { country: 0, region: 0 },
+        { country: 0, region: 0 },
+        { country: 0, region: 0 },
+        { country: 0, region: 0 },
+      ];
       this.encounterType = other.encounterType ?? 0;
       this.performance = other.performance ?? 0;
       this.trainerName = other.trainerName;
       this.trainerFriendship = other.trainerFriendship;
+      this.trainerAffection = other.trainerAffection ?? 0;
       this.trainerMemory = other.trainerMemory ?? {
         memory: 0,
         intensity: 0,
@@ -223,7 +235,7 @@ export class OHPKM extends PKM {
       this.metDate = other.metDate ?? {
         month: now.getMonth(),
         day: now.getDate(),
-        year: now.getFullYear() - 2000,
+        year: now.getFullYear(),
       };
       this.ball = other.ball ?? 4;
       this.eggLocationIndex = other.eggLocationIndex;
@@ -679,14 +691,6 @@ export class OHPKM extends PKM {
     }
   }
 
-  public get currentHP() {
-    return bytesToUint16LittleEndian(this.bytes, 0x92);
-  }
-
-  public set currentHP(value: number) {
-    this.bytes.set(uint16ToBytesLittleEndian(value), 0x92);
-  }
-
   public get ivs() {
     const ivBytes = bytesToUint32LittleEndian(this.bytes, 0x94);
     return {
@@ -744,11 +748,7 @@ export class OHPKM extends PKM {
   }
 
   public get statusCondition() {
-    return bytesToUint32LittleEndian(this.bytes, 0x9c);
-  }
-
-  public set statusCondition(value: number) {
-    this.bytes.set(uint32ToBytesLittleEndian(value), 0x9c);
+    return 0;
   }
 
   public get unknownA0() {
@@ -845,14 +845,6 @@ export class OHPKM extends PKM {
     this.bytes.set(utfBytes, 0xb8);
   }
 
-  public get handlerGender() {
-    return getFlag(this.bytes, 0xd2, 7) ? 1 : 0;
-  }
-
-  public set handlerGender(value: number) {
-    setFlag(this.bytes, 0xd2, 7, !!value);
-  }
-
   public get handlerLanguageIndex() {
     return this.bytes[0xd3];
   }
@@ -866,6 +858,14 @@ export class OHPKM extends PKM {
     if (index > -1) {
       this.bytes[0xd3] = index;
     }
+  }
+
+  public get resortEventStatus() {
+    return this.bytes[0xd5];
+  }
+
+  public set resortEventStatus(value: number) {
+    this.bytes[0xd5] = value;
   }
 
   public get handlerID() {
@@ -900,52 +900,156 @@ export class OHPKM extends PKM {
     this.bytes.set(uint16ToBytesLittleEndian(value.textVariables), 0xdc);
   }
 
+  public get handlerAffection() {
+    return this.bytes[0xde];
+  }
+
+  public set handlerAffection(value: number) {
+    this.bytes[0xde] = value;
+  }
+
+  public get superTrainingFlags() {
+    return bytesToUint32LittleEndian(this.bytes, 0xdf);
+  }
+
+  public set superTrainingFlags(value: number) {
+    this.bytes.set(uint32ToBytesLittleEndian(value), 0xdf);
+  }
+
+  public get superTrainingDistFlags() {
+    return this.bytes[0xe3];
+  }
+
+  public set superTrainingDistFlags(value: number) {
+    this.bytes[0xe3] = value;
+  }
+
+  public get secretSuperTrainingUnlocked() {
+    return getFlag(this.bytes, 0xe4, 0);
+  }
+
+  public set secretSuperTrainingUnlocked(value: boolean) {
+    setFlag(this.bytes, 0xe4, 0, value);
+  }
+
+  public get secretSuperTrainingComplete() {
+    return getFlag(this.bytes, 0xe4, 1);
+  }
+
+  public set secretSuperTrainingComplete(value: boolean) {
+    setFlag(this.bytes, 0xe4, 1, value);
+  }
+
+  public get trainingBagHits() {
+    return this.bytes[0xe5];
+  }
+
+  public set trainingBagHits(value: number) {
+    this.bytes[0xe5] = value;
+  }
+
+  public get trainingBag() {
+    return this.bytes[0xe6];
+  }
+
+  public set trainingBag(value: number) {
+    this.bytes[0xe6] = value;
+  }
+
+  public get pokeStarFame() {
+    return this.bytes[0xe8];
+  }
+
+  public set pokeStarFame(value: number) {
+    this.bytes[0xe8] = value;
+  }
+
   public get metTimeOfDay() {
-    return this.bytes[0xea] > 0 ? this.bytes[0xea] : undefined;
+    return this.bytes[0xe9] > 0 ? this.bytes[0xe9] : undefined;
   }
 
   public set metTimeOfDay(value: number | undefined) {
-    this.bytes[0xea] = (value ?? 0) & 0b11;
+    this.bytes[0xe9] = (value ?? 0) & 0b11;
+  }
+
+  public get handlerGender() {
+    return getFlag(this.bytes, 0xea, 7);
+  }
+
+  public set handlerGender(value: boolean) {
+    setFlag(this.bytes, 0xea, 7, value);
+  }
+
+  public get isNsPokemon() {
+    return getFlag(this.bytes, 0xea, 6);
+  }
+
+  public set isNsPokemon(value: boolean) {
+    setFlag(this.bytes, 0xea, 6, value);
   }
 
   public get shinyLeaves() {
-    return this.bytes[0xeb];
+    return this.bytes[0xea] & 0x3f;
   }
 
   public set shinyLeaves(value: number) {
-    this.bytes[0xeb] = value;
+    this.bytes[0xea] = (this.bytes[0xea] & 0xc0) | (value & 0x3f);
   }
 
   public get fullness() {
-    return this.bytes[0xec];
+    return this.bytes[0xeb];
   }
 
   public set fullness(value: number) {
-    this.bytes[0xec] = value;
+    this.bytes[0xeb] = value;
   }
 
   public get enjoyment() {
-    return this.bytes[0xed];
+    return this.bytes[0xec];
   }
 
   public set enjoyment(value: number) {
-    this.bytes[0xed] = value;
+    this.bytes[0xec] = value;
   }
 
   public get gameOfOrigin() {
-    return this.bytes[0xee];
+    return this.bytes[0xed];
   }
 
   public set gameOfOrigin(value: number) {
-    this.bytes[0xee] = value;
+    this.bytes[0xed] = value;
   }
 
   public get gameOfOriginBattle() {
-    return this.bytes[0xef];
+    return this.bytes[0xee];
   }
 
   public set gameOfOriginBattle(value: number) {
+    this.bytes[0xee] = value;
+  }
+
+  public get country() {
+    return this.bytes[0xef];
+  }
+
+  public set country(value: number) {
     this.bytes[0xef] = value;
+  }
+
+  public get region() {
+    return this.bytes[0xf0];
+  }
+
+  public set region(value: number) {
+    this.bytes[0xf0] = value;
+  }
+
+  public get consoleRegion() {
+    return this.bytes[0xf0];
+  }
+
+  public set consoleRegion(value: number) {
+    this.bytes[0xf0] = value;
   }
 
   public get displayID() {
@@ -991,6 +1095,22 @@ export class OHPKM extends PKM {
 
   public set affixedRibbon(value: number) {
     this.bytes[0xf8] = value;
+  }
+
+  public get geolocations() {
+    return _.range(5).map((i) => ({
+      region: this.bytes[0xf9 + 2 * i],
+      country: this.bytes[0xfa + 2 * i],
+    })) as [geolocation, geolocation, geolocation, geolocation, geolocation];
+  }
+
+  public set geolocations(
+    value: [geolocation, geolocation, geolocation, geolocation, geolocation]
+  ) {
+    value.forEach((geo, i) => {
+      this.bytes[0xf9 + 2 * i] = geo.region;
+      this.bytes[0xfa + 2 * i] = geo.country;
+    });
   }
 
   public get encounterType() {
@@ -1050,64 +1170,72 @@ export class OHPKM extends PKM {
     this.bytes[0x12f] = value.feeling;
   }
 
+  public get trainerAffection() {
+    return this.bytes[0x130];
+  }
+
+  public set trainerAffection(value: number) {
+    this.bytes[0x130] = value;
+  }
+
   public get eggDate() {
-    return this.bytes[0x130]
+    return this.bytes[0x131]
       ? {
-          year: this.bytes[0x130],
-          month: this.bytes[0x131],
-          day: this.bytes[0x132],
+          year: this.bytes[0x131] + 2000,
+          month: this.bytes[0x132],
+          day: this.bytes[0x133],
         }
       : undefined;
   }
 
   public set eggDate(value: pokedate | undefined) {
     if (value) {
-      this.bytes[0x130] = value.year;
-      this.bytes[0x131] = value.month;
-      this.bytes[0x132] = value.day;
+      this.bytes[0x131] = value.year - 2000;
+      this.bytes[0x132] = value.month;
+      this.bytes[0x133] = value.day;
     } else {
-      this.bytes[0x130] = 0;
       this.bytes[0x131] = 0;
       this.bytes[0x132] = 0;
+      this.bytes[0x133] = 0;
     }
   }
 
   public get metDate() {
     return {
-      year: this.bytes[0x133],
-      month: this.bytes[0x134],
-      day: this.bytes[0x135],
+      year: this.bytes[0x134] + 2000,
+      month: this.bytes[0x135],
+      day: this.bytes[0x136],
     };
   }
 
   public set metDate(value: pokedate) {
-    this.bytes[0x133] = value.year;
-    this.bytes[0x134] = value.month;
-    this.bytes[0x135] = value.day;
+    this.bytes[0x134] = value.year - 2000;
+    this.bytes[0x135] = value.month;
+    this.bytes[0x136] = value.day;
   }
 
   public get ball() {
-    return this.bytes[0x136];
+    return this.bytes[0x137];
   }
 
   public set ball(value: number) {
-    this.bytes[0x136] = value;
+    this.bytes[0x137] = value;
   }
 
   public get eggLocationIndex() {
-    return bytesToUint16LittleEndian(this.bytes, 0x137);
+    return bytesToUint16LittleEndian(this.bytes, 0x138);
   }
 
   public set eggLocationIndex(value: number) {
-    this.bytes.set(uint16ToBytesLittleEndian(value), 0x137);
+    this.bytes.set(uint16ToBytesLittleEndian(value), 0x138);
   }
 
   public get metLocationIndex() {
-    return bytesToUint16LittleEndian(this.bytes, 0x139);
+    return bytesToUint16LittleEndian(this.bytes, 0x13a);
   }
 
   public set metLocationIndex(value: number) {
-    this.bytes.set(uint16ToBytesLittleEndian(value), 0x139);
+    this.bytes.set(uint16ToBytesLittleEndian(value), 0x13a);
   }
 
   public get metLevel() {
@@ -1259,9 +1387,28 @@ export class OHPKM extends PKM {
     if (other.evsG12) {
       this.evsG12 = other.evsG12;
     }
-    if (other.ribbons) {
-      this.ribbons = uniq([...this.ribbons, ...other.ribbons]);
+    this.superTrainingFlags &= other.superTrainingFlags ?? 0;
+    this.superTrainingDistFlags &= other.superTrainingDistFlags ?? 0;
+    if (other.secretSuperTrainingUnlocked) {
+      this.secretSuperTrainingUnlocked = true;
     }
+    if (other.secretSuperTrainingComplete) {
+      this.secretSuperTrainingComplete = true;
+    }
+    this.ribbons = uniq([...this.ribbons, ...other.ribbons]);
+
+    // memory ribbons need to be updated if new ribbons were earned to add to the count
+    const contestRibbons = _.intersection(this.ribbons, Gen34ContestRibbons);
+    this.contestMemoryCount = Math.max(
+      contestRibbons.length,
+      this.contestMemoryCount
+    );
+    const battleRibbons = _.intersection(this.ribbons, Gen34TowerRibbons);
+    this.battleMemoryCount = Math.max(
+      battleRibbons.length,
+      this.battleMemoryCount
+    );
+
     if (other.markings !== undefined) {
       if (!formatHasColorMarkings(other.format)) {
         for (let i = 0; i < other.markings.length; i++) {
@@ -1277,16 +1424,16 @@ export class OHPKM extends PKM {
         });
       }
     }
-    if (other.shinyLeaves && this.shinyLeaves < other.shinyLeaves) {
+    if (other.shinyLeaves != undefined) {
       this.shinyLeaves = other.shinyLeaves;
     }
     if (other.contest) {
       this.contest = other.contest;
     }
-    if (other.statNature) {
+    if (other.statNature !== undefined) {
       this.statNature = other.statNature;
     }
-    if (other.teraTypeOverride) {
+    if (other.teraTypeOverride !== undefined) {
       this.teraTypeOverride = other.teraTypeOverride;
     }
     if (isFromOT) {

@@ -14,7 +14,8 @@ import {
   getLevelGen3Onward,
   getStatGen3Onward,
 } from '../../util/StatCalc';
-import { PKM } from './PKM';
+import { contestStats, PKM } from './PKM';
+import { utf16BytesToString } from 'util/Strings/StringConverter';
 
 export class COLOPKM extends PKM {
   constructor(bytes: Uint8Array) {
@@ -33,6 +34,7 @@ export class COLOPKM extends PKM {
     this.displayID = this.trainerID;
     this.language = GCLanguages[bytes[0x0b]];
     this.ball = bytes[0x0f];
+    this.metLocationIndex = bytesToUint16BigEndian(bytes, 0x0c);
     this.metLevel = bytes[0x0e];
     this.trainerGender = bytes[0x10];
     this.isShadow =
@@ -84,24 +86,8 @@ export class COLOPKM extends PKM {
     let origin =
       GameOfOriginData.find((game) => game?.gc === bytes[0x08]) ?? null;
     this.gameOfOrigin = GameOfOriginData.indexOf(origin);
-    let byteArray = new Uint16Array(12);
-    for (let i = 0; i < 12; i += 1) {
-      let byte = bytesToUint16BigEndian(bytes, 0x2e + 2 * i);
-      if (byte === 0) {
-        break;
-      }
-      byteArray[i] = byte;
-    }
-    this.nickname = new TextDecoder('utf-16').decode(byteArray);
-    byteArray = new Uint16Array(12);
-    for (let i = 0; i < 12; i += 1) {
-      let byte = bytesToUint16BigEndian(bytes, 0x18 + 2 * i);
-      if (byte === 0) {
-        break;
-      }
-      byteArray[i] = byte;
-    }
-    this.trainerName = new TextDecoder('utf-16').decode(byteArray);
+    this.trainerName = utf16BytesToString(this.bytes, 0x18, 11, true);
+    this.nickname = utf16BytesToString(this.bytes, 0x2e, 11, true);
     this.ribbons = [];
     for (let index = 0; index < Gen3StandardRibbons.length; index++) {
       if (bytes[index + 0xbd] === 1) {
@@ -142,5 +128,25 @@ export class COLOPKM extends PKM {
     for (let i = 0; i < 4; i += 4) {
       this.bytes[0x7b + i] = value[i];
     }
+  }
+
+  public get contest() {
+    return {
+      cool: this.bytes[0xb2],
+      beauty: this.bytes[0xb3],
+      cute: this.bytes[0xb4],
+      smart: this.bytes[0xb5],
+      tough: this.bytes[0xb6],
+      sheen: this.bytes[0xb7],
+    };
+  }
+
+  public set contest(value: contestStats) {
+    this.bytes[0xb2] = value.cool;
+    this.bytes[0xb3] = value.beauty;
+    this.bytes[0xb4] = value.cute;
+    this.bytes[0xb5] = value.smart;
+    this.bytes[0xb6] = value.tough;
+    this.bytes[0xb7] = value.sheen;
   }
 }

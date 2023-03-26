@@ -171,36 +171,6 @@ export class PKM {
   public set favorite(value: boolean) {
     this._favorite = value;
   }
-  private _circleMarking?: marking | undefined;
-  public get circleMarking(): marking | undefined {
-    return this._circleMarking;
-  }
-  public set circleMarking(value: marking | undefined) {
-    this._circleMarking = value;
-  }
-  private _squareMarking?: marking | undefined;
-  public get squareMarking(): marking | undefined {
-    return this._squareMarking;
-  }
-  public set squareMarking(value: marking | undefined) {
-    this._squareMarking = value;
-  }
-  private _triangleMarking?: marking | undefined;
-  public get triangleMarking(): marking | undefined {
-    return this._triangleMarking;
-  }
-  public set triangleMarking(value: marking | undefined) {
-    this._triangleMarking = value;
-  }
-  private _heartMarking?: marking | undefined;
-  public get heartMarking(): marking | undefined {
-    return this._heartMarking;
-  }
-  public set heartMarking(value: marking | undefined) {
-    this._heartMarking = value;
-  }
-  public starMarking?: marking;
-  public diamondMarking?: marking;
 
   private _nature?: number | undefined;
   public get nature(): number | undefined {
@@ -253,18 +223,11 @@ export class PKM {
     this._evsG12 = value;
   }
   avs?: stats;
-  private _contest: contestStats = {
-    cool: 0,
-    beauty: 0,
-    cute: 0,
-    smart: 0,
-    tough: 0,
-    sheen: 0,
-  };
-  public get contest(): contestStats {
+  private _contest?: contestStats;
+  public get contest(): contestStats | undefined {
     return this._contest;
   }
-  public set contest(value: contestStats) {
+  public set contest(value: contestStats | undefined) {
     this._contest = value;
   }
   private _pokerusByte: number = 0;
@@ -278,6 +241,23 @@ export class PKM {
   public get ribbonBytes(): Uint8Array {
     return this._ribbonBytes;
   }
+
+  private _contestMemoryCount: number = 0;
+  public get contestMemoryCount(): number {
+    return this._contestMemoryCount;
+  }
+  public set contestMemoryCount(value: number) {
+    this._contestMemoryCount = value;
+  }
+
+  private _battleMemoryCount: number = 0;
+  public get battleMemoryCount(): number {
+    return this._battleMemoryCount;
+  }
+  public set battleMemoryCount(value: number) {
+    this._battleMemoryCount = value;
+  }
+
   public set ribbonBytes(value: Uint8Array) {
     this._ribbonBytes = value;
   }
@@ -287,20 +267,6 @@ export class PKM {
   }
   public set ribbons(value: string[]) {
     this._ribbons = value;
-  }
-  private _contestMemoryCount: number = 0;
-  public get contestMemoryCount(): number {
-    return this._contestMemoryCount;
-  }
-  public set contestMemoryCount(value: number) {
-    this._contestMemoryCount = value;
-  }
-  private _battleMemoryCount: number = 0;
-  public get battleMemoryCount(): number {
-    return this._battleMemoryCount;
-  }
-  public set battleMemoryCount(value: number) {
-    this._battleMemoryCount = value;
   }
 
   private _alphaMove?: number | undefined;
@@ -498,13 +464,26 @@ export class PKM {
   public set handlerLanguage(value: string | undefined) {
     this._handlerLanguage = value;
   }
-  isCurrentHandler?: number;
+  private _isCurrentHandler?: boolean | undefined;
+  public get isCurrentHandler(): boolean | undefined {
+    return this._isCurrentHandler;
+  }
+  public set isCurrentHandler(value: boolean | undefined) {
+    this._isCurrentHandler = value;
+  }
   private _handlerID?: number | undefined;
   public get handlerID(): number | undefined {
     return this._handlerID;
   }
   public set handlerID(value: number | undefined) {
     this._handlerID = value;
+  }
+  private _handlerFriendship?: number | undefined;
+  public get handlerFriendship(): number | undefined {
+    return this._handlerFriendship;
+  }
+  public set handlerFriendship(value: number | undefined) {
+    this._handlerFriendship = value;
   }
   private _handlerMemory?: memory | undefined;
   public get handlerMemory(): memory | undefined {
@@ -513,6 +492,71 @@ export class PKM {
   public set handlerMemory(value: memory | undefined) {
     this._handlerMemory = value;
   }
+  private _handlerAffection?: number | undefined;
+  public get handlerAffection(): number | undefined {
+    return this._handlerAffection;
+  }
+  public set handlerAffection(value: number | undefined) {
+    this._handlerAffection = value;
+  }
+  private _resortEventStatus?: number | undefined;
+  public get resortEventStatus(): number | undefined {
+    return this._resortEventStatus;
+  }
+  public set resortEventStatus(value: number | undefined) {
+    this._resortEventStatus = value;
+  }
+  private _superTrainingFlags?: number | undefined;
+  public get superTrainingFlags(): number | undefined {
+    return this._superTrainingFlags;
+  }
+  public set superTrainingFlags(value: number | undefined) {
+    this._superTrainingFlags = value;
+  }
+  private _superTrainingDistFlags?: number | undefined;
+  public get superTrainingDistFlags(): number | undefined {
+    return this._superTrainingDistFlags;
+  }
+  public set superTrainingDistFlags(value: number | undefined) {
+    this._superTrainingDistFlags = value;
+  }
+  private _secretSuperTrainingUnlocked?: boolean | undefined;
+  public get secretSuperTrainingUnlocked(): boolean | undefined {
+    return this._secretSuperTrainingUnlocked;
+  }
+  public set secretSuperTrainingUnlocked(value: boolean | undefined) {
+    this._secretSuperTrainingUnlocked = value;
+  }
+  private _secretSuperTrainingComplete?: boolean | undefined;
+  public get secretSuperTrainingComplete(): boolean | undefined {
+    return this._secretSuperTrainingComplete;
+  }
+  public set secretSuperTrainingComplete(value: boolean | undefined) {
+    this._secretSuperTrainingComplete = value;
+  }
+  private _trainingBag?: number | undefined;
+  public get trainingBag(): number | undefined {
+    return this._trainingBag;
+  }
+  public set trainingBag(value: number | undefined) {
+    this._trainingBag = value;
+  }
+  private _trainingBagHits?: number | undefined;
+  public get trainingBagHits(): number | undefined {
+    return this._trainingBagHits;
+  }
+  public set trainingBagHits(value: number | undefined) {
+    this._trainingBagHits = value;
+  }
+
+  private _pokeStarFame?: number | undefined;
+  public get pokeStarFame(): number | undefined {
+    return this._pokeStarFame;
+  }
+  public set pokeStarFame(value: number | undefined) {
+    this._pokeStarFame = value;
+  }
+
   private _metTimeOfDay?: number | undefined;
   public get metTimeOfDay(): number | undefined {
     return this._metTimeOfDay;
@@ -535,6 +579,13 @@ export class PKM {
   }
   public set shinyLeaves(value: number | undefined) {
     this._shinyLeaves = value;
+  }
+  private _handlerGender?: boolean | undefined;
+  public get handlerGender(): boolean | undefined {
+    return this._handlerGender;
+  }
+  public set handlerGender(value: boolean | undefined) {
+    this._handlerGender = value;
   }
 
   private _fullness?: number | undefined;
@@ -564,6 +615,27 @@ export class PKM {
   }
   public set gameOfOriginBattle(value: number) {
     this._gameOfOriginBattle = value;
+  }
+  private _country?: number | undefined;
+  public get country(): number | undefined {
+    return this._country;
+  }
+  public set country(value: number | undefined) {
+    this._country = value;
+  }
+  private _region?: number | undefined;
+  public get region(): number | undefined {
+    return this._region;
+  }
+  public set region(value: number | undefined) {
+    this._region = value;
+  }
+  private _consoleRegion?: number | undefined;
+  public get consoleRegion(): number | undefined {
+    return this._consoleRegion;
+  }
+  public set consoleRegion(value: number | undefined) {
+    this._consoleRegion = value;
   }
   private _formArgument?: number | undefined = 0;
   public get formArgument(): number | undefined {
@@ -599,6 +671,21 @@ export class PKM {
     return this.affixedRibbon !== undefined && this.affixedRibbon !== 0xff
       ? RibbonTitles[this.affixedRibbon]
       : '';
+  }
+  private _geolocations?:
+    | [geolocation, geolocation, geolocation, geolocation, geolocation]
+    | undefined;
+  public get geolocations():
+    | [geolocation, geolocation, geolocation, geolocation, geolocation]
+    | undefined {
+    return this._geolocations;
+  }
+  public set geolocations(
+    value:
+      | [geolocation, geolocation, geolocation, geolocation, geolocation]
+      | undefined
+  ) {
+    this._geolocations = value;
   }
 
   // Gen4
@@ -655,6 +742,13 @@ export class PKM {
   }
   public set trainerMemory(value: memory | undefined) {
     this._trainerMemory = value;
+  }
+  private _trainerAffection?: number | undefined;
+  public get trainerAffection(): number | undefined {
+    return this._trainerAffection;
+  }
+  public set trainerAffection(value: number | undefined) {
+    this._trainerAffection = value;
   }
   eggDay?: number;
   eggMonth?: number;
@@ -907,14 +1001,12 @@ export class PKM {
 
   public get metLocation() {
     if (!this.metLocationIndex) return undefined;
-    const game = gameOfOriginFromFormat(this.format) ?? this.gameOfOrigin;
-    return getLocation(game, this.metLocationIndex, false, false);
+    return getLocation(this.gameOfOrigin, this.metLocationIndex, this.format, false);
   }
 
   public get eggLocation() {
     if (!this.eggLocationIndex) return undefined;
-    const game = gameOfOriginFromFormat(this.format) ?? this.gameOfOrigin;
-    return getLocation(game, this.eggLocationIndex, false, true);
+    return getLocation(this.gameOfOrigin, this.eggLocationIndex, this.format, true);
   }
 
   public get shinyLeafValues() {
@@ -1022,22 +1114,6 @@ export class PKM {
       newPersonalityValue = bigInt(bytesToUint32LittleEndian(pvBytes, 0));
     }
   }
-  // else if (
-  //   other.personalityValue !== undefined &&
-  //   other.isShiny &&
-  //   (other.trainerID ^
-  //     other.secretID ^
-  //     ((other.personalityValue >> 16) & 0xffff) ^
-  //     (other.personalityValue & 0xffff)) >=
-  //     8
-  // ) {
-  //   let pvBytes = uint32ToBytesLittleEndian(other.personalityValue);
-  //   let pvUpper16 = bytesToUint16LittleEndian(pvBytes, 2);
-  //   // mon would not have been shiny pre-gen4, we need to subtract 8 from the xor value
-  //   pvUpper16 = pvUpper16 ^ 8;
-  //   pvBytes.set(uint16ToBytesLittleEndian(pvUpper16), 2);
-  //   this.personalityValue = bytesToUint32LittleEndian(pvBytes, 0);
-  // }
 }
 
 export interface pokedate {
@@ -1088,20 +1164,9 @@ export interface contestStats {
   sheen: number;
 }
 
-interface markingsFourShapes {
-  circle: boolean;
-  square: boolean;
-  triangle: boolean;
-  heart: boolean;
-}
-
-interface markingsSixShapes {
-  circle: boolean;
-  square: boolean;
-  triangle: boolean;
-  heart: boolean;
-  star: boolean;
-  diamond: boolean;
+export interface geolocation {
+  region: number;
+  country: number;
 }
 
 const getIsShinyPreGen6 = (

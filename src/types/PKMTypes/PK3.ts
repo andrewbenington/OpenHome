@@ -1,11 +1,14 @@
 import {
-  Languages,
-  Gen3Items,
   Abilities,
-  POKEMON_DATA,
-  Gen3ContestRibbons,
-  Gen3StandardRibbons,
   GameOfOrigin,
+  Gen3ContestRibbons,
+  Gen3Items,
+  Gen3StandardRibbons,
+  isGen3,
+  isHoenn,
+  isKanto,
+  Languages,
+  POKEMON_DATA,
 } from '../../consts';
 import RSEFRLGLocations from '../../consts/MetLocation/RSEFRLG';
 import {
@@ -35,13 +38,7 @@ import {
 } from '../../util/Strings/StringConverter';
 import { OHPKM } from './OHPKM';
 import { contestStats, marking, PKM, stats } from './PKM';
-import {
-  adjustMovePPBetweenFormats,
-  generateIVs,
-  generatePersonalityValue,
-  ivsFromDVs,
-  writeIVsToBuffer,
-} from './util';
+import { adjustMovePPBetweenFormats, writeIVsToBuffer } from './util';
 
 export const GEN3_MOVE_MAX = 354;
 export const GEN3_ABILITY_MAX = 77;
@@ -114,33 +111,21 @@ export class PK3 extends PKM {
         this.gameOfOrigin = GameOfOrigin.Sapphire;
       } else if (other.gameOfOrigin === GameOfOrigin.OmegaRuby) {
         this.gameOfOrigin = GameOfOrigin.Ruby;
-      } else if (
-        other.gameOfOrigin === GameOfOrigin.Red ||
-        other.gameOfOrigin === GameOfOrigin.BlueJapan ||
-        other.gameOfOrigin === GameOfOrigin.LetsGoPikachu
-      ) {
+      } else if (isKanto(other.gameOfOrigin)) {
         this.gameOfOrigin = GameOfOrigin.FireRed;
-      } else if (
-        other.gameOfOrigin === GameOfOrigin.BlueGreen ||
-        other.gameOfOrigin === GameOfOrigin.Yellow ||
-        other.gameOfOrigin === GameOfOrigin.LetsGoEevee
-      ) {
-        this.gameOfOrigin = GameOfOrigin.LeafGreen;
       }
       this.language = other.language;
       this.nickname = other.nickname;
       this.trainerName = other.trainerName;
       this.trainerFriendship = other.trainerFriendship;
       this.ball = other.ball ? (other.ball <= 12 ? other.ball : 4) : 4;
-      const equivalentLocation = other.metLocation
-        ? RSEFRLGLocations[0].indexOf(other.metLocation.slice(3))
-        : -1;
-      if (
-        other.gameOfOrigin >= GameOfOrigin.Sapphire &&
-        other.gameOfOrigin <= GameOfOrigin.LeafGreen
-      ) {
+      if (isGen3(other.gameOfOrigin)) {
         this.metLocationIndex = other.metLocationIndex;
-      } else if (equivalentLocation >= 0) {
+      } else if (isKanto(other.gameOfOrigin) || isHoenn(other.gameOfOrigin)) {
+        let equivalentLocation = other.metLocation
+          ? RSEFRLGLocations[0].indexOf(other.metLocation.slice(3))
+          : 254;
+        if (equivalentLocation < 0) equivalentLocation = 254;
         this.metLocationIndex = equivalentLocation;
       } else {
         this.metLocationIndex = 254;
