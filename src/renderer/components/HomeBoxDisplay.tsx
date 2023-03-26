@@ -1,6 +1,5 @@
-import { Card, Grid } from '@mui/material';
+import { Card, Grid, useTheme } from '@mui/material';
 import _ from 'lodash';
-import { OpenHomeTheme } from 'renderer/Themes';
 import { PKM } from 'types/PKMTypes/PKM';
 import { HomeBox } from '../../types/SAVTypes/HomeData';
 import PokemonButton from './buttons/PokemonButton';
@@ -8,7 +7,6 @@ import PokemonButton from './buttons/PokemonButton';
 interface HomeBoxDisplayProps {
   box: HomeBox;
   setBox: (box: HomeBox) => void;
-  currentTheme: OpenHomeTheme;
   setSelectedMon: (mon: PKM | undefined) => void;
   setDragSource: (index?: number) => void;
   setDragDest: (index: number) => void;
@@ -16,20 +14,14 @@ interface HomeBoxDisplayProps {
 }
 
 const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
-  const {
-    box,
-    currentTheme,
-    setSelectedMon,
-    setDragSource,
-    setDragDest,
-    onImport,
-  } = props;
+  const theme = useTheme();
+  const { box, setSelectedMon, setDragSource, setDragDest, onImport } = props;
 
   return (
     <Card
       style={{
         borderRadius: 5,
-        backgroundColor: currentTheme.contentColor,
+        backgroundColor: theme.palette.secondary.main,
         width: '100%',
         height: 'fit-content',
       }}

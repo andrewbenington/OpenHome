@@ -4,6 +4,18 @@ import Home from './Home';
 import Themes from './Themes';
 
 const theme = createTheme({
+  palette: {
+    primary: {
+      main: "#A9CEF4"
+    },
+    secondary: {
+      main: "#a6bf8f"
+    },
+    text: {
+      primary: "#000",
+      secondary: "#FFF"
+    }
+  },
   components: {
     MuiSelect: {
       styleOverrides: {
