@@ -1,4 +1,4 @@
-import { Button, Dialog, MenuItem, Select } from '@mui/material';
+import { Button, Dialog, MenuItem, Select, useTheme } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { OHPKM, PK3, PK4 } from 'types/PKMTypes';
 import {
@@ -27,7 +27,7 @@ import SaveFileSelector from './components/SaveFileSelector';
 import Themes, { OpenHomeTheme } from './Themes';
 import { initializeDragImage } from './util/initializeDragImage';
 import {
-  addSaveRef,
+  addSaveToRecents,
   handleDeleteOHPKMFiles,
   handleMenuResetAndClose,
   handleMenuSave,
@@ -51,6 +51,7 @@ type SaveArray = [
 ];
 
 const Home = () => {
+  const theme = useTheme()
   const [loadingMessage, setLoadingMessage] = useState<string | undefined>(
     'Starting app...'
   );
@@ -401,12 +402,16 @@ const Home = () => {
         changedMons.push(mon);
       }
     });
-    addSaveRef(newSave.getSaveRef());
+    addSaveToRecents(newSave.getSaveRef());
     markMonsAsChanged(changedMons);
-    const newSaves: SaveArray = [...saves];
-    newSaves[saveIndex] = newSave;
-    setSaves(newSaves);
+    setSave(saveIndex, newSave)
   };
+
+  const setSave = (index: number, save?: SAV) => {
+    const newSaves: SaveArray = [...saves];
+    newSaves[index] = save;
+    setSaves(newSaves);
+  }
 
   const openSave = async (saveIndex: number) => {
     window.electron.ipcRenderer.once('save-file-read', (result: any) => {
@@ -510,6 +515,7 @@ const Home = () => {
             save={saves[0]}
             saveIndex={0}
             openSave={openSave}
+            closeSave={() => setSave(0)}
             onImport={onImportMon}
             setDragSource={boxSetDragSource}
             setDragDest={boxSetDragDest}
@@ -528,6 +534,7 @@ const Home = () => {
             save={saves[1]}
             saveIndex={1}
             openSave={openSave}
+            closeSave={() => setSave(1)}
             onImport={onImportMon}
             setDragSource={boxSetDragSource}
             setDragDest={boxSetDragDest}
@@ -553,7 +560,6 @@ const Home = () => {
             onImport={(mon, index) =>
               onImportMon(mon, -1, { box, index }, true)
             }
-            currentTheme={currentTheme}
             setSelectedMon={setSelectedMon}
             setDragSource={(index) => {
               if (index !== undefined) {
@@ -596,6 +602,7 @@ const Home = () => {
             save={saves[2]}
             saveIndex={2}
             openSave={openSave}
+            closeSave={() => setSave(2)}
             onImport={onImportMon}
             setDragSource={boxSetDragSource}
             setDragDest={boxSetDragDest}
@@ -614,6 +621,7 @@ const Home = () => {
             save={saves[3]}
             saveIndex={3}
             openSave={openSave}
+            closeSave={() => setSave(3)}
             onImport={onImportMon}
             setDragSource={boxSetDragSource}
             setDragDest={boxSetDragDest}

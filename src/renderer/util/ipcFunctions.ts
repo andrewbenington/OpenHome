@@ -55,7 +55,7 @@ export const readSaveRefs = async (
   window.electron.ipcRenderer.sendMessage('read-save-refs');
 };
 
-export const addSaveRef = async (
+export const addSaveToRecents = async (
   saveRef: SaveRef
 ) => {
   window.electron.ipcRenderer.sendMessage('add-save-ref', saveRef);

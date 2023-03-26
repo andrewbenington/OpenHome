@@ -1,5 +1,5 @@
-import { ArrowBack, ArrowForward } from '@mui/icons-material';
-import { Button, Card, Grid } from '@mui/material';
+import { ArrowBack, ArrowForward, Close, FileOpen } from '@mui/icons-material';
+import { Card, Grid, useTheme } from '@mui/material';
 import { GameOfOriginData } from 'consts';
 import _ from 'lodash';
 import { useEffect, useState } from 'react';
@@ -8,12 +8,14 @@ import { getSaveTypeString } from 'types/types';
 import { PKM } from '../../types/PKMTypes/PKM';
 import { BoxCoordinates, SAV } from '../../types/SAVTypes/SAV';
 import ArrowButton from './buttons/ArrowButton';
+import OpenHomeButton from './buttons/OpenHomeButton';
 import PokemonButton from './buttons/PokemonButton';
 
 interface SaveDisplayProps {
   save?: SAV;
   saveIndex: number;
   openSave: (saveIndex: number) => void;
+  closeSave: () => void;
   setDragSource: (coords?: SaveCoordinates) => void;
   setDragDest: (coords: SaveCoordinates) => void;
   onImport: (
@@ -26,9 +28,11 @@ interface SaveDisplayProps {
 }
 
 const SaveDisplay = (props: SaveDisplayProps) => {
+  const { palette } = useTheme();
   const {
     save,
     openSave,
+    closeSave,
     saveIndex,
     setDragSource,
     setDragDest,
@@ -56,27 +60,46 @@ const SaveDisplay = (props: SaveDisplayProps) => {
           >
             <Card
               style={{
-                backgroundColor: '#bcb',
-                margin: 5,
-                width: '80%',
-                color: 'white',
-                fontWeight: 'bold',
-                marginLeft: 'auto',
-                marginRight: 'auto',
+                display: 'flex',
+                flexDirection: 'row',
+                marginLeft: 10,
+                marginRight: 10,
+                backgroundColor: palette.secondary.main,
               }}
             >
-              <div style={{ textAlign: 'center' }}>
-                {save.origin
-                  ? `Pokémon ${GameOfOriginData[save.origin]?.name}`
-                  : getSaveTypeString(save.saveType)}
-              </div>
-              <div style={{ textAlign: 'center' }}>
-                {save?.name} ({save?.displayID})
+              <OpenHomeButton
+                style={{
+                  color: !!save.changedMons.length
+                    ? palette.text.disabled
+                    : palette.text.secondary,
+                  fontWeight: 'bold',
+                  backgroundColor: palette.secondary.main,
+                }}
+                onClick={closeSave}
+                disabled={!!save.changedMons.length}
+              >
+                <Close style={{}} />
+              </OpenHomeButton>
+              <div
+                style={{
+                  flex: 1,
+                  color: 'white',
+                  fontWeight: 'bold',
+                }}
+              >
+                <div style={{ textAlign: 'center' }}>
+                  {save.origin
+                    ? `Pokémon ${GameOfOriginData[save.origin]?.name}`
+                    : getSaveTypeString(save.saveType)}
+                </div>
+                <div style={{ textAlign: 'center' }}>
+                  {save?.name} ({save?.displayID})
+                </div>
               </div>
             </Card>
             <Card
               style={{
-                backgroundColor: disabled ? '#555' : '#bcb',
+                backgroundColor: disabled ? '#555' : palette.secondary.main,
                 padding: 5,
                 margin: 10,
               }}
@@ -100,7 +123,10 @@ const SaveDisplay = (props: SaveDisplayProps) => {
                   </Grid>
                   <Grid
                     xs={2}
-                    style={{ display: 'grid', alignItems: 'center' }}
+                    style={{
+                      display: 'grid',
+                      alignItems: 'center',
+                    }}
                   >
                     <ArrowButton
                       onClick={() => setBox((box + 1) % save.boxes.length)}
@@ -172,15 +198,23 @@ const SaveDisplay = (props: SaveDisplayProps) => {
           </div>
         </div>
       ) : (
-        <Button
-          style={{ width: '100%', height: '50%' }}
+        <OpenHomeButton
+          style={{
+            margin: 'auto',
+            backgroundColor: palette.secondary.light,
+            color: palette.text.secondary,
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+          }}
           onClick={() => {
             openSave(saveIndex);
             setIsLoading(true);
           }}
         >
-          <h2>Open Save File</h2>
-        </Button>
+          <FileOpen />
+          <h2>Open Save</h2>
+        </OpenHomeButton>
       )}
     </div>
   );

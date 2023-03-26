@@ -1,5 +1,5 @@
 import { MoreVert } from '@mui/icons-material';
-import { IconButton } from '@mui/material';
+import { IconButton, useTheme } from '@mui/material';
 import { GameOfOriginData } from 'consts';
 import { useEffect, useState } from 'react';
 import { readSaveRefs } from 'renderer/util/ipcFunctions';
@@ -20,6 +20,7 @@ const getSaveLogo = (ref: SaveRef) => {
 
 const SaveFileSelector = (props: SaveFileSelectorProps) => {
   const { onSelectFile, onImportSave } = props;
+  const { palette } = useTheme();
   const [saveFileRefs, setSaveFileRefs] = useState<{ [key: string]: SaveRef }>(
     {}
   );
@@ -74,6 +75,8 @@ const SaveFileSelector = (props: SaveFileSelectorProps) => {
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-between',
+            backgroundColor: palette.secondary.light,
+            color: palette.text.secondary,
             boxShadow:
               '0px 2px 1px -1px rgb(0 0 0 / 20%), 0px 1px 1px 0px rgb(0 0 0 / 14%), 0px 1px 3px 0px rgb(0 0 0 / 12%)',
           }}
@@ -129,6 +132,7 @@ const SaveFileSelector = (props: SaveFileSelectorProps) => {
               right: 0,
               top: 0,
               zIndex: 3,
+              color: palette.text.secondary
             }}
           >
             <MoreVert />

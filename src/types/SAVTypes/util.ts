@@ -192,8 +192,9 @@ const recoverOHPKMData = (
         if (result) {
           let updatedOHPKM = result[1];
           updatedOHPKM.updateData(mon);
-          saveFile.changedMons.push({ box: boxIndex, index: monIndex });
-          box.pokemon[monIndex] = result[1];
+          console.log('updating home data for', updatedOHPKM.nickname);
+          window.electron.ipcRenderer.sendMessage('write-ohpkm', updatedOHPKM.bytes);
+          box.pokemon[monIndex] = updatedOHPKM;
         }
       }
     });
