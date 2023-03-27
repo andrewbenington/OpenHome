@@ -62,7 +62,7 @@ const SummaryDisplay = (props: { mon: PKM; updateMon: (mon: PKM) => void }) => {
               {mon.language}
             </Card>
           </div>
-          {mon.eggDate ? (
+          {mon.eggDate && mon.eggLocation ? (
             <p style={{ textAlign: 'left' }}>{`Egg received ${
               mon.eggDate
                 ? `on ${mon.eggDate.month}/${mon.eggDate.day}/${mon.eggDate.year}`

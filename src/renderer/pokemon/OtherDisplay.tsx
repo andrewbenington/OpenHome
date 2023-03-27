@@ -1,6 +1,12 @@
+import { ArrowForwardIosSharp } from '@mui/icons-material';
+import Accordion from '@mui/material/Accordion';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import { GameOfOrigin, isAlola, isGen6, isGen7 } from 'consts';
+import Countries from 'consts/Countries';
 import Types from 'consts/Types';
 import _ from 'lodash';
-import { PKM, PK1, PK2, OHPKM, PK3, PK4 } from 'types/PKMTypes';
+import { OHPKM, PK1, PK2, PK3, PK4, PKM } from 'types/PKMTypes';
+import { getSixDigitTID } from 'types/PKMTypes/util';
 import { G2SAV } from 'types/SAVTypes/G2SAV';
 import { HGSSSAV } from 'types/SAVTypes/HGSSSAV';
 import { isRestricted } from 'types/TransferRestrictions';
@@ -17,6 +23,8 @@ import { getTypeColor } from '../util/PokemonSprite';
 import AttributeRow from './AttributeRow';
 import AttributeTag from './AttributeTag';
 import {
+  accordionStyle,
+  accordionSummaryStyle,
   detailsPaneContentStyle,
   leafCrownIconStyle,
   shinyLeafEmptyIconStyle,
@@ -45,26 +53,93 @@ const OtherDisplay = (props: { mon: PKM }) => {
       ) : (
         <div />
       )}
-      {mon.secretID !== undefined ? (
-        <AttributeRow label="Trainer Secret ID">
-          <code>{'0x' + mon.secretID.toString(16).padStart(4, '0')}</code>
-        </AttributeRow>
-      ) : (
-        <div />
-      )}
-      {mon.trainerFriendship !== undefined ? (
-        <AttributeRow
-          label={`${mon.trainerName}'s Friendship`}
-          value={mon.trainerFriendship.toString()}
-        />
-      ) : (
-        <div />
-      )}
-      {mon.handlerName && mon.handlerFriendship !== undefined ? (
-        <AttributeRow
-          label={`${mon.handlerName}'s Friendship`}
-          value={mon.handlerFriendship.toString()}
-        />
+      <Accordion
+        disableGutters
+        elevation={0}
+        TransitionProps={{ unmountOnExit: true }}
+        sx={accordionStyle}
+      >
+        <AccordionSummary
+          expandIcon={<ArrowForwardIosSharp sx={{ fontSize: '0.9rem' }} />}
+          sx={accordionSummaryStyle}
+        >
+          <AttributeRow
+            label="Original Trainer"
+            value={`${mon.trainerName} ${mon.trainerGender ? '♀' : '♂'}`}
+          />
+        </AccordionSummary>
+        <AttributeRow label="ID" value={mon.displayID.toString()} indent={10} />
+        {mon.secretID !== undefined ? (
+          <AttributeRow label="Secret ID" indent={10}>
+            <code>{'0x' + mon.secretID.toString(16).padStart(4, '0')}</code>
+          </AttributeRow>
+        ) : (
+          <div />
+        )}
+        {mon.trainerFriendship !== undefined ? (
+          <AttributeRow
+            label="Friendship"
+            value={mon.trainerFriendship.toString()}
+            indent={10}
+          />
+        ) : (
+          <div />
+        )}
+        {mon.trainerAffection !== undefined &&
+        (isGen6(mon.gameOfOrigin) || isAlola(mon.gameOfOrigin)) ? (
+          <AttributeRow
+            label="Affection"
+            value={mon.trainerAffection.toString()}
+            indent={10}
+          />
+        ) : (
+          <div />
+        )}
+      </Accordion>
+      {mon.handlerName ? (
+        <Accordion
+          disableGutters
+          elevation={0}
+          TransitionProps={{ unmountOnExit: true }}
+          sx={accordionStyle}
+        >
+          <AccordionSummary
+            expandIcon={<ArrowForwardIosSharp sx={{ fontSize: '0.9rem' }} />}
+            sx={accordionSummaryStyle}
+          >
+            <AttributeRow
+              label="Recent Trainer"
+              value={`${mon.handlerName} ${mon.handlerGender ? '♀' : '♂'}`}
+            />
+          </AccordionSummary>
+          {mon.handlerID !== undefined ? (
+            <AttributeRow
+              label="ID"
+              value={mon.handlerID.toString()}
+              indent={10}
+            />
+          ) : (
+            <div />
+          )}
+          {mon.handlerFriendship !== undefined ? (
+            <AttributeRow
+              label="Friendship"
+              value={mon.handlerFriendship.toString()}
+              indent={10}
+            />
+          ) : (
+            <div />
+          )}
+          {mon.handlerAffection !== undefined ? (
+            <AttributeRow
+              label="Affection"
+              value={mon.handlerAffection.toString()}
+              indent={10}
+            />
+          ) : (
+            <div />
+          )}
+        </Accordion>
       ) : (
         <div />
       )}
@@ -72,7 +147,7 @@ const OtherDisplay = (props: { mon: PKM }) => {
         <AttributeRow
           label="Wurmple Evolution"
           value={
-            (((mon.personalityValue ?? 0) >> 16) & 0xffff) % 10 > 4
+            (((mon.encryptionConstant ?? 0) >> 16) & 0xffff) % 10 > 4
               ? 'Dustox'
               : 'Beautifly'
           }
@@ -80,19 +155,19 @@ const OtherDisplay = (props: { mon: PKM }) => {
       ) : (
         <div />
       )}
-      {mon.dexNum === 206 && mon.personalityValue ? (
+      {mon.dexNum === 206 && mon.encryptionConstant ? (
         <AttributeRow
           label="Dudunsparce"
-          value={mon.personalityValue % 100 ? 'Two-Segment' : 'Three-Segment'}
+          value={mon.encryptionConstant % 100 ? 'Two-Segment' : 'Three-Segment'}
         />
       ) : (
         <div />
       )}
-      {mon.dexNum === 924 && mon.personalityValue ? (
+      {mon.dexNum === 924 && mon.encryptionConstant ? (
         <AttributeRow
           label="Maushold"
           value={
-            mon.personalityValue % 100 ? 'Family of Four' : 'Family of Three'
+            mon.encryptionConstant % 100 ? 'Family of Four' : 'Family of Three'
           }
         />
       ) : (
@@ -174,6 +249,64 @@ const OtherDisplay = (props: { mon: PKM }) => {
       ) : (
         <div />
       )}
+
+      {mon.geolocations && mon.geolocations[0].country ? (
+        <Accordion
+          disableGutters
+          elevation={0}
+          TransitionProps={{ unmountOnExit: true }}
+          sx={accordionStyle}
+        >
+          <AccordionSummary
+            expandIcon={<ArrowForwardIosSharp sx={{ fontSize: '0.9rem' }} />}
+            sx={accordionSummaryStyle}
+          >
+            <AttributeRow
+              label="Geolocations"
+              value={mon.geolocations
+                .filter((geo) => geo.country)
+                .length.toString()}
+            />
+          </AccordionSummary>
+          {mon.geolocations?.map((geo, i) =>
+            geo.country ? (
+              <AttributeRow
+                key={`geo_${i + 1}`}
+                label={`Geolocation ${i + 1}`}
+                indent={10}
+              >
+                {Countries[geo.country]}, Region {geo.region}
+              </AttributeRow>
+            ) : (
+              <div />
+            )
+          )}
+        </Accordion>
+      ) : (
+        <div />
+      )}
+      {mon.dynamaxLevel !== undefined && (
+        <AttributeRow label="Dynamax">
+          <div style={{ display: 'flex', flexDirection: 'row' }}>
+            {_.range(10).map((level: number) => (
+              <div
+                key={`dynamax_meter_${level}`}
+                style={{
+                  backgroundColor:
+                    level < (mon.dynamaxLevel ?? 0)
+                      ? `#FF${(40 + ((mon.dynamaxLevel ?? 0) - level) * 20)
+                          ?.toString(16)
+                          .padStart(2, '0')}00`
+                      : 'grey',
+                  height: 20,
+                  width: 8,
+                  marginRight: 4,
+                }}
+              ></div>
+            ))}
+          </div>
+        </AttributeRow>
+      )}
       {mon.teraTypeOriginal !== undefined &&
       mon.teraTypeOverride !== undefined ? (
         <AttributeRow label="Tera Type">
@@ -203,28 +336,6 @@ const OtherDisplay = (props: { mon: PKM }) => {
         </AttributeRow>
       ) : (
         <div />
-      )}
-      {mon.dynamaxLevel !== undefined && (
-        <AttributeRow label="Dynamax">
-          <div style={{ display: 'flex', flexDirection: 'row' }}>
-            {_.range(10).map((level: number) => (
-              <div
-                key={`dynamax_meter_${level}`}
-                style={{
-                  backgroundColor:
-                    level < (mon.dynamaxLevel ?? 0)
-                      ? `#FF${(40 + ((mon.dynamaxLevel ?? 0) - level) * 20)
-                          ?.toString(16)
-                          .padStart(2, '0')}00`
-                      : 'grey',
-                  height: 20,
-                  width: 8,
-                  marginRight: 4,
-                }}
-              ></div>
-            ))}
-          </div>
-        </AttributeRow>
       )}
       {!isRestricted(G2SAV.TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
       (mon instanceof PK1 || mon instanceof PK2 || mon instanceof OHPKM) ? (

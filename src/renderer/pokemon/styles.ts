@@ -74,3 +74,26 @@ export const shinyLeafEmptyIconStyle = {
   filter: 'grayscale(100%) drop-shadow(1px 1px grey)',
   opacity: 0.8,
 };
+
+export const accordionSummaryStyle = {
+  backgroundColor: '#0000',
+  padding: 0,
+  minHeight: 'fit-content',
+  '& .MuiAccordionSummary-content': {
+    margin: 0,
+  },
+  '& .MuiAccordionSummary-expandIconWrapper': {
+    position: 'absolute',
+    right: 10,
+  },
+  '& .MuiAccordionSummary-expandIconWrapper.Mui-expanded': {
+    transform: 'rotate(90deg)',
+  },
+};
+
+export const accordionStyle = {
+  backgroundColor: '#0000',
+  '&:before': {
+    display: 'none',
+  },
+};

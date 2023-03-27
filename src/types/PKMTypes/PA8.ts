@@ -38,7 +38,6 @@ export class PA8 extends PKM {
       super(new Uint8Array(376));
       this.sanity = other.sanity;
       this.dexNum = other.dexNum;
-      this.heldItem = other.heldItem;
       this.trainerID = other.trainerID;
       this.secretID = other.secretID;
       this.exp = other.exp;
@@ -707,6 +706,9 @@ export class PA8 extends PKM {
   }
   public set eggLocationIndex(value: number) {
     this.bytes.set(uint16ToBytesLittleEndian(value), 0x13a);
+  }
+  public get eggLocation() {
+    return undefined;
   }
   public get metLocationIndex() {
     return bytesToUint16LittleEndian(this.bytes, 0x13a);
