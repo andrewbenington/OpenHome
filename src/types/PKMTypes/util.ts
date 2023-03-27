@@ -2,7 +2,11 @@ import { max } from 'lodash';
 import Prando from 'prando';
 import { MOVE_DATA, POKEMON_DATA } from '../../consts';
 import Types from '../../consts/Types';
-import { writeUint32ToBuffer } from '../../util/ByteLogic';
+import {
+  bytesToUint32LittleEndian,
+  uint16ToBytesLittleEndian,
+  writeUint32ToBuffer,
+} from '../../util/ByteLogic';
 import { PKM, stats, statsPreSplit } from './PKM';
 
 export const writeIVsToBuffer = (
@@ -273,4 +277,11 @@ export const adjustMovePPBetweenFormats = (
     const adjustedMovePP = sourceFormatMon.movePP[i] - (otherMaxPP - thisMaxPP);
     return max([adjustedMovePP, 0]) ?? 0;
   }) as [number, number, number, number];
+};
+
+export const getSixDigitTID = (tid: number, sid: number) => {
+  const bytes = new Uint8Array(4);
+  bytes.set(uint16ToBytesLittleEndian(tid), 0);
+  bytes.set(uint16ToBytesLittleEndian(sid), 2);
+  return bytesToUint32LittleEndian(bytes, 0x0c) % 1000000;
 };

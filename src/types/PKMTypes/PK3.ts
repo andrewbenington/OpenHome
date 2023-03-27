@@ -1,3 +1,4 @@
+import CXDLocation from 'consts/MetLocation/CXD';
 import {
   Abilities,
   GameOfOrigin,
@@ -103,16 +104,14 @@ export class PK3 extends PKM {
       this.movePPUps = other.movePPUps;
       this.ivs = other.ivs;
       this.isEgg = other.isEgg;
-      this.gameOfOrigin =
-        other.gameOfOrigin <= GameOfOrigin.ColosseumXD
-          ? other.gameOfOrigin
-          : 0xf;
-      if (other.gameOfOrigin === GameOfOrigin.AlphaSapphire) {
-        this.gameOfOrigin = GameOfOrigin.Sapphire;
-      } else if (other.gameOfOrigin === GameOfOrigin.OmegaRuby) {
-        this.gameOfOrigin = GameOfOrigin.Ruby;
+      if (other.gameOfOrigin <= GameOfOrigin.ColosseumXD) {
+        this.gameOfOrigin = other.gameOfOrigin;
       } else if (isKanto(other.gameOfOrigin)) {
         this.gameOfOrigin = GameOfOrigin.FireRed;
+      } else if (other.gameOfOrigin === GameOfOrigin.OmegaRuby) {
+        this.gameOfOrigin = GameOfOrigin.Ruby;
+      } else {
+        this.gameOfOrigin = GameOfOrigin.Sapphire;
       }
       this.language = other.language;
       this.nickname = other.nickname;
@@ -124,9 +123,12 @@ export class PK3 extends PKM {
       } else if (isKanto(other.gameOfOrigin) || isHoenn(other.gameOfOrigin)) {
         let equivalentLocation = other.metLocation
           ? RSEFRLGLocations[0].indexOf(other.metLocation.slice(3))
-          : 254;
-        if (equivalentLocation < 0) equivalentLocation = 254;
-        this.metLocationIndex = equivalentLocation;
+          : -1;
+        if (other.gameOfOrigin == GameOfOrigin.ColosseumXD) {
+          equivalentLocation = 254;
+        } else if (equivalentLocation < 0) {
+          this.metLocationIndex = equivalentLocation;
+        }
       } else {
         this.metLocationIndex = 254;
       }
@@ -427,6 +429,14 @@ export class PK3 extends PKM {
 
   public set metLocationIndex(value: number) {
     this.bytes[0x45] = value;
+  }
+
+  public get metLocation() {
+    if (this.gameOfOrigin === GameOfOrigin.ColosseumXD) {
+      return 'in ' + CXDLocation[0][this.metLocationIndex];
+    } else {
+      return 'in ' + RSEFRLGLocations[0][this.metLocationIndex];
+    }
   }
 
   public get metLevel() {

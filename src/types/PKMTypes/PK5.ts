@@ -1,4 +1,3 @@
-import G4Locations from 'consts/MetLocation/G4';
 import G5Locations from 'consts/MetLocation/G5';
 import {
   GameOfOrigin,
@@ -41,11 +40,7 @@ import {
 } from '../../util/Strings/StringConverter';
 import { OHPKM } from './OHPKM';
 import { contestStats, marking, PKM, pokedate, stats } from './PKM';
-import {
-  adjustMovePPBetweenFormats,
-  getAbilityFromNumber,
-  writeIVsToBuffer,
-} from './util';
+import { adjustMovePPBetweenFormats, writeIVsToBuffer } from './util';
 
 export const GEN5_MOVE_MAX = 559;
 
@@ -503,11 +498,11 @@ export class PK5 extends PKM {
   }
 
   public get isNsPokemon() {
-    return !!(this.bytes[0x42] & 2);
+    return getFlag(this.bytes, 0x42, 1);
   }
 
   public set isNsPokemon(value: boolean) {
-    this.bytes[0x41] = (this.bytes[0x41] & 0b11111101) | (value ? 1 : 0);
+    setFlag(this.bytes, 0x42, 1, value);
   }
 
   public get eggLocationIndex() {
