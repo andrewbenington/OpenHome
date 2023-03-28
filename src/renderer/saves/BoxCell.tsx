@@ -112,11 +112,12 @@ const BoxCell = (props: BoxCellProps) => {
             if (dragImage) {
               dragImage.style.backgroundPosition = '0% 0%';
             }
+            console.log("onDragEnd", e)
             // if not waiting for mon to show up in other slot, set drag image to
             // undefined so it shows up in this one again
             if (
-              e.dataTransfer.dropEffect !== 'copy' ||
-              e.target.className !== 'pokemon_slot'
+              e.dataTransfer.dropEffect !== 'copy'
+              // e.target.className !== 'pokemon_slot'
             ) {
               setDragImage(undefined);
               onDragEvent(true);

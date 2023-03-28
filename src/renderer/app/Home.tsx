@@ -1,30 +1,18 @@
-import { Button, Dialog, MenuItem, Select, useTheme } from '@mui/material';
+import { FileOpen } from '@mui/icons-material';
+import { Dialog, useTheme } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { OHPKM, PK3, PK4 } from 'types/PKMTypes';
-import {
-  BoxCoordinates,
-  G1SAV,
-  G2SAV,
-  G3SAV,
-  G4SAV,
-  SAV,
-} from 'types/SAVTypes';
+import OpenHomeButton from 'renderer/components/OpenHomeButton';
+import { OHPKM } from 'types/PKMTypes';
+import { SAV } from 'types/SAVTypes';
 import { buildSaveFile, getSaveType } from 'types/SAVTypes/util';
 import { isRestricted } from 'types/TransferRestrictions';
-import { acceptableExtensions, bytesToPKM } from 'util/FileImport';
 import { PKM } from '../../types/PKMTypes/PKM';
 import { HomeData } from '../../types/SAVTypes/HomeData';
 import { MonReference, SaveType } from '../../types/types';
-import {
-  getMonFileIdentifier,
-  updateGen12LookupTable,
-  updateGen34LookupTable,
-} from '../../util/Lookup';
-import HomeBoxDisplay from '../saves/HomeBoxDisplay';
 import PokemonDisplay from '../pokemon/PokemonDisplay';
+import HomeBoxDisplay from '../saves/HomeBoxDisplay';
 import SaveDisplay from '../saves/SaveDisplay';
 import SaveFileSelector from '../saves/SaveFileSelector';
-import Themes, { OpenHomeTheme } from './Themes';
 import { initializeDragImage } from '../util/initializeDragImage';
 import {
   addSaveToRecents,
@@ -35,6 +23,10 @@ import {
   readGen12Lookup,
   readGen34Lookup,
 } from '../util/ipcFunctions';
+import { useAppDispatch } from '../redux/hooks';
+import { useSaves } from '../redux/selectors';
+import { addSave, clearAllSaves } from '../redux/slices/savesSlice';
+import Themes, { OpenHomeTheme } from './Themes';
 
 export interface SaveCoordinates {
   save: number;
@@ -51,7 +43,8 @@ type SaveArray = [
 ];
 
 const Home = () => {
-  const theme = useTheme();
+  const { palette } = useTheme();
+  const saves = useSaves();
   const [loadingMessage, setLoadingMessage] = useState<string | undefined>(
     'Starting app...'
   );
@@ -63,16 +56,13 @@ const Home = () => {
   const [box, setBox] = useState(0);
   const [tab, setTab] = useState('summary');
   const [openSaveDialog, setOpenSaveDialog] = useState(false);
-  const [saves, setSaves] = useState<SaveArray>([
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-  ]);
   const [homeMonMap, setHomeMonMap] = useState<{ [key: string]: OHPKM }>();
   const [changedOHPKMList, setChangedOHPKMList] = useState<OHPKM[]>([]);
   const [filesToDelete, setFilesToDelete] = useState<string[]>([]);
   const [homeData, setHomeData] = useState(new HomeData(new Uint8Array()));
+  const dispatch = useAppDispatch();
+  const dispatchAddSave = (save: SAV) => dispatch(addSave(save));
+  const dispatchClearAllSaves = () => dispatch(clearAllSaves());
 
   const updateBoxData = () => {
     if (homeMonMap) {
@@ -97,234 +87,119 @@ const Home = () => {
     );
   }, [changedOHPKMList]);
 
-  useEffect(() => {
-    // console.log(draggingSource, draggingDest);
-    if (draggingSource && draggingDest) {
-      const sourceSave = draggingSource.isHome
-        ? homeData
-        : saves[draggingSource.save];
-      const sourceMon =
-        sourceSave?.boxes[draggingSource.box]?.pokemon[draggingSource.index];
-      if (sourceMon) {
-        const homeMon =
-          sourceMon instanceof OHPKM ? sourceMon : new OHPKM(sourceMon);
-        if (draggingDest.isHome && draggingSource.isHome) {
-          setHomeMon(draggingDest.box, draggingDest.index, homeMon);
-          setHomeMon(draggingSource.box, draggingSource.index, undefined);
-        } else if (draggingDest.isHome) {
-          setHomeMon(draggingDest.box, draggingDest.index, homeMon);
-          setSaveMon(
-            draggingSource.box,
-            draggingSource.index,
-            draggingSource.save,
-            undefined
-          );
-        } else if (draggingSource.isHome) {
-          setSaveMon(
-            draggingDest.box,
-            draggingDest.index,
-            draggingDest.save,
-            homeMon
-          );
-          setHomeMon(draggingSource.box, draggingSource.index, undefined);
-        } else {
-          setSaveMon(
-            draggingDest.box,
-            draggingDest.index,
-            draggingDest.save,
-            homeMon
-          );
-          setSaveMon(
-            draggingSource.box,
-            draggingSource.index,
-            draggingSource.save,
-            undefined
-          );
-        }
-        if (draggingSource.save != draggingDest.save) {
-          setChangedOHPKMList([...changedOHPKMList, homeMon]);
-        }
-        setDraggingSource(undefined);
-        setDraggingDest(undefined);
-      }
-    }
-  }, [draggingSource, draggingDest]);
-
-  const setHomeMon = (box: number, index: number, mon?: OHPKM) => {
-    const newBoxes = homeData.boxes;
-    newBoxes[box].pokemon[index] = mon;
-    let newData = { ...homeData };
-    newData.boxes = newBoxes;
-    setHomeData(newData);
-  };
-
-  const setSaveMon = (
-    box: number,
-    index: number,
-    saveNumber: number,
-    mon?: OHPKM
-  ) => {
-    const changingSave = saves[saveNumber];
-    if (changingSave) {
-      const newBoxes = changingSave.boxes;
-      newBoxes[box].pokemon[index] = mon;
-      let newSaveData = changingSave;
-      newSaveData.changedMons.push({ box, index });
-      newSaveData.boxes = newBoxes;
-      const newSaves: SaveArray = [...saves];
-      newSaves[saveNumber] = newSaveData;
-      setSaves(newSaves);
-    }
-  };
-
   const markMonsAsChanged = (changedMons: OHPKM[]) => {
     setChangedOHPKMList([...changedOHPKMList, ...changedMons]);
   };
 
-  const boxSetDragSource = (coords?: SaveCoordinates) => {
-    // if coords are undefined, drag event was cancelled
-    if (coords) {
-      const sourceSave = coords.isHome ? homeData : saves[coords.save];
-      const sourceMon = sourceSave?.boxes[coords.box]?.pokemon[coords.index];
-      if (sourceMon) {
-        setDraggingMon({
-          dexNumber: sourceMon.dexNum,
-          formeNumber: sourceMon.formNum,
-        });
-      } else {
-        setDraggingMon(undefined);
-      }
-      setDraggingSource({
-        save: coords.save,
-        isHome: false,
-        box: coords.box,
-        index: coords.index,
-      });
-    } else {
-      setDraggingMon(undefined);
-      setDraggingSource(undefined);
-    }
-  };
+  // const onViewDrop = (e: any, type: string) => {
+  //   const processDroppedData = async (file?: File, droppedMon?: PKM) => {
+  //     let mon: PKM | undefined = droppedMon;
+  //     if (file) {
+  //       let bytes = new Uint8Array(await file.arrayBuffer());
+  //       let [extension] = file.name.split('.').slice(-1);
+  //       extension = extension.toUpperCase();
+  //       if (!acceptableExtensions.includes(extension)) {
+  //         console.log(`invalid extension: ${extension}`);
+  //         return;
+  //       }
+  //       mon = bytesToPKM(bytes, extension);
+  //     }
+  //     if (!mon) return;
+  //     switch (type) {
+  //       case 'as is':
+  //         setSelectedMon(mon);
+  //         break;
+  //       case 'PK4':
+  //         setSelectedMon(new PK4(mon));
+  //         break;
+  //       case 'PK3':
+  //         setSelectedMon(new PK3(mon));
+  //         break;
+  //     }
+  //   };
+  //   let file = e.dataTransfer.files[0];
+  //   let mon;
+  //   if (!file && draggingSource) {
+  //     if (draggingSource.isHome) {
+  //       mon = homeData.boxes[draggingSource.box]?.pokemon[draggingSource.index];
+  //       if (mon && type === 'trash') {
+  //         setHomeMon(draggingSource.box, draggingSource.index);
+  //         const changedOHPKMListIndex = changedOHPKMList.indexOf(mon);
+  //         console.log('removing at', changedOHPKMListIndex);
+  //         setChangedOHPKMList([
+  //           ...changedOHPKMList.slice(0, changedOHPKMListIndex),
+  //           ...changedOHPKMList.slice(changedOHPKMListIndex + 1),
+  //         ]);
+  //         const identifier = getMonFileIdentifier(mon);
+  //         if (identifier) {
+  //           setFilesToDelete([...filesToDelete, identifier]);
+  //         }
+  //         return;
+  //       }
+  //     } else if (draggingSource.save !== undefined) {
+  //       mon =
+  //         saves[draggingSource.save]?.boxes[draggingSource.box]?.pokemon[
+  //           draggingSource.index
+  //         ];
+  //       if (mon && type === 'trash') {
+  //         setSaveMon(
+  //           draggingSource.box,
+  //           draggingSource.index,
+  //           draggingSource.save
+  //         );
+  //         if (mon instanceof OHPKM) {
+  //           const identifier = getMonFileIdentifier(mon);
+  //           if (identifier) {
+  //             setFilesToDelete([...filesToDelete, identifier]);
+  //           }
+  //         }
+  //         return;
+  //       }
+  //     }
+  //     setDraggingSource(undefined);
+  //   }
+  //   processDroppedData(file, mon);
+  //   e.nativeEvent.preventDefault();
+  // };
 
-  const boxSetDragDest = (coords: SaveCoordinates) => {
-    setDraggingMon(undefined);
-    setDraggingDest({
-      save: coords.save,
-      isHome: false,
-      box: coords.box,
-      index: coords.index,
-    });
-  };
-
-  const onViewDrop = (e: any, type: string) => {
-    const processDroppedData = async (file?: File, droppedMon?: PKM) => {
-      let mon: PKM | undefined = droppedMon;
-      if (file) {
-        let bytes = new Uint8Array(await file.arrayBuffer());
-        let [extension] = file.name.split('.').slice(-1);
-        extension = extension.toUpperCase();
-        if (!acceptableExtensions.includes(extension)) {
-          console.log(`invalid extension: ${extension}`);
-          return;
-        }
-        mon = bytesToPKM(bytes, extension);
-      }
-      if (!mon) return;
-      switch (type) {
-        case 'as is':
-          setSelectedMon(mon);
-          break;
-        case 'PK4':
-          setSelectedMon(new PK4(mon));
-          break;
-        case 'PK3':
-          setSelectedMon(new PK3(mon));
-          break;
-      }
-    };
-    let file = e.dataTransfer.files[0];
-    let mon;
-    if (!file && draggingSource) {
-      if (draggingSource.isHome) {
-        mon = homeData.boxes[draggingSource.box]?.pokemon[draggingSource.index];
-        if (mon && type === 'trash') {
-          setHomeMon(draggingSource.box, draggingSource.index);
-          const changedOHPKMListIndex = changedOHPKMList.indexOf(mon);
-          console.log('removing at', changedOHPKMListIndex);
-          setChangedOHPKMList([
-            ...changedOHPKMList.slice(0, changedOHPKMListIndex),
-            ...changedOHPKMList.slice(changedOHPKMListIndex + 1),
-          ]);
-          const identifier = getMonFileIdentifier(mon);
-          if (identifier) {
-            setFilesToDelete([...filesToDelete, identifier]);
-          }
-          return;
-        }
-      } else if (draggingSource.save !== undefined) {
-        mon =
-          saves[draggingSource.save]?.boxes[draggingSource.box]?.pokemon[
-            draggingSource.index
-          ];
-        if (mon && type === 'trash') {
-          setSaveMon(
-            draggingSource.box,
-            draggingSource.index,
-            draggingSource.save
-          );
-          if (mon instanceof OHPKM) {
-            const identifier = getMonFileIdentifier(mon);
-            if (identifier) {
-              setFilesToDelete([...filesToDelete, identifier]);
-            }
-          }
-          return;
-        }
-      }
-      setDraggingSource(undefined);
-    }
-    processDroppedData(file, mon);
-    e.nativeEvent.preventDefault();
-  };
-
-  const onImportMon = (
-    importedMons: PKM[],
-    saveIndex: number,
-    boxCoords: BoxCoordinates,
-    isHome: boolean = false
-  ) => {
-    const addedMons: OHPKM[] = [];
-    let nextIndex = boxCoords.index;
-    importedMons.forEach((mon) => {
-      const homeMon = new OHPKM(mon);
-      if (isHome) {
-        while (
-          homeData.boxes[boxCoords.box].pokemon[nextIndex] &&
-          nextIndex < 120
-        ) {
-          nextIndex++;
-        }
-        if (nextIndex < 120) {
-          setHomeMon(boxCoords.box, nextIndex, homeMon);
-          addedMons.push(homeMon);
-          nextIndex++;
-        }
-      } else {
-        while (
-          homeData.boxes[boxCoords.box].pokemon[nextIndex] &&
-          nextIndex < 30
-        ) {
-          nextIndex++;
-        }
-        if (nextIndex < 30) {
-          setSaveMon(boxCoords.box, nextIndex, saveIndex, homeMon);
-          addedMons.push(homeMon);
-          nextIndex++;
-        }
-      }
-    });
-    markMonsAsChanged(addedMons);
-  };
+  // const onImportMon = (
+  //   importedMons: PKM[],
+  //   saveIndex: number,
+  //   boxCoords: BoxCoordinates,
+  //   isHome: boolean = false
+  // ) => {
+  //   const addedMons: OHPKM[] = [];
+  //   let nextIndex = boxCoords.index;
+  //   importedMons.forEach((mon) => {
+  //     const homeMon = new OHPKM(mon);
+  //     if (isHome) {
+  //       while (
+  //         homeData.boxes[boxCoords.box].pokemon[nextIndex] &&
+  //         nextIndex < 120
+  //       ) {
+  //         nextIndex++;
+  //       }
+  //       if (nextIndex < 120) {
+  //         setHomeMon(boxCoords.box, nextIndex, homeMon);
+  //         addedMons.push(homeMon);
+  //         nextIndex++;
+  //       }
+  //     } else {
+  //       while (
+  //         homeData.boxes[boxCoords.box].pokemon[nextIndex] &&
+  //         nextIndex < 30
+  //       ) {
+  //         nextIndex++;
+  //       }
+  //       if (nextIndex < 30) {
+  //         setSaveMon(boxCoords.box, nextIndex, saveIndex, homeMon);
+  //         addedMons.push(homeMon);
+  //         nextIndex++;
+  //       }
+  //     }
+  //   });
+  //   markMonsAsChanged(addedMons);
+  // };
 
   const writeAllHomeData = () => {
     homeData.boxes.forEach((b) => {
@@ -342,42 +217,42 @@ const Home = () => {
     setChangedOHPKMList([]);
   };
 
-  const saveAllSaveFiles = () => {
-    saves.forEach((save) => {
-      if (
-        save instanceof G1SAV ||
-        save instanceof G2SAV ||
-        save instanceof G3SAV ||
-        save instanceof G4SAV
-      ) {
-        const changedMons = save.prepareBoxesForSaving();
-        if (changedMons && (save instanceof G2SAV || save instanceof G1SAV)) {
-          updateGen12LookupTable(changedMons);
-        } else if (
-          changedMons &&
-          (save instanceof G3SAV || save instanceof G4SAV)
-        ) {
-          updateGen34LookupTable(changedMons);
-        }
-        window.electron.ipcRenderer.sendMessage('write-save-file', {
-          path: save.filePath,
-          bytes: save.bytes,
-        });
-      }
-    });
-    for (let i = 0; i < saves.length; i++) {
-      let newSaveData = saves[i];
-      if (newSaveData) {
-        newSaveData.changedMons = [];
-        const newSaves: SaveArray = [...saves];
-        newSaves[i] = newSaveData;
-        setSaves(newSaves);
-      }
-    }
-  };
+  // const saveAllSaveFiles = () => {
+  //   saves.forEach((save) => {
+  //     if (
+  //       save instanceof G1SAV ||
+  //       save instanceof G2SAV ||
+  //       save instanceof G3SAV ||
+  //       save instanceof G4SAV
+  //     ) {
+  //       const changedMons = save.prepareBoxesForSaving();
+  //       if (changedMons && (save instanceof G2SAV || save instanceof G1SAV)) {
+  //         updateGen12LookupTable(changedMons);
+  //       } else if (
+  //         changedMons &&
+  //         (save instanceof G3SAV || save instanceof G4SAV)
+  //       ) {
+  //         updateGen34LookupTable(changedMons);
+  //       }
+  //       window.electron.ipcRenderer.sendMessage('write-save-file', {
+  //         path: save.filePath,
+  //         bytes: save.bytes,
+  //       });
+  //     }
+  //   });
+  //   for (let i = 0; i < saves.length; i++) {
+  //     let newSaveData = saves[i];
+  //     if (newSaveData) {
+  //       newSaveData.changedMons = [];
+  //       const newSaves: SaveArray = [...saves];
+  //       newSaves[i] = newSaveData;
+  //       setSaves(newSaves);
+  //     }
+  //   }
+  // };
 
   const saveChanges = () => {
-    saveAllSaveFiles();
+    // saveAllSaveFiles();
     writeAllHomeData();
     handleDeleteOHPKMFiles(filesToDelete);
     setFilesToDelete([]);
@@ -403,7 +278,7 @@ const Home = () => {
     window.electron.ipcRenderer.sendMessage('read-home-data', 'fake');
   };
 
-  const onOpenSave = (saveIndex: number, newSave: SAV) => {
+  const onOpenSave = (newSave: SAV) => {
     const changedMons: OHPKM[] = [];
     newSave.changedMons.forEach(({ box, index }) => {
       const mon = newSave.boxes[box].pokemon[index];
@@ -413,16 +288,10 @@ const Home = () => {
     });
     addSaveToRecents(newSave.getSaveRef());
     markMonsAsChanged(changedMons);
-    setSave(saveIndex, newSave);
+    dispatchAddSave(newSave);
   };
 
-  const setSave = (index: number, save?: SAV) => {
-    const newSaves: SaveArray = [...saves];
-    newSaves[index] = save;
-    setSaves(newSaves);
-  };
-
-  const openSave = async (saveIndex: number) => {
+  const openSave = async () => {
     window.electron.ipcRenderer.once('save-file-read', (result: any) => {
       const { path, fileBytes, createdDate } = result;
       if (path && fileBytes) {
@@ -437,7 +306,7 @@ const Home = () => {
                 gen12LookupMap,
                 fileCreatedDate: createdDate,
               });
-              if (newSave) onOpenSave(saveIndex, newSave);
+              if (newSave) onOpenSave(newSave);
             });
             return;
           case SaveType.RS:
@@ -452,7 +321,7 @@ const Home = () => {
                 gen34LookupMap,
                 fileCreatedDate: createdDate,
               });
-              if (newSave) onOpenSave(saveIndex, newSave);
+              if (newSave) onOpenSave(newSave);
             });
             return;
           case SaveType.UNKNOWN:
@@ -462,7 +331,7 @@ const Home = () => {
               homeMonMap,
               fileCreatedDate: createdDate,
             });
-            if (newSave) onOpenSave(saveIndex, newSave);
+            if (newSave) onOpenSave(newSave);
         }
       }
     });
@@ -478,7 +347,7 @@ const Home = () => {
   useEffect(() => {
     const callback = handleMenuResetAndClose(
       () => readHomeData(),
-      () => setSaves([undefined, undefined, undefined, undefined])
+      dispatchClearAllSaves
     );
     return () => callback();
   }, [saves]);
@@ -497,19 +366,19 @@ const Home = () => {
         height: '100%',
         width: '100%',
         display: 'flex',
-        flexDirection: 'column',
+        flexDirection: 'row',
       }}
     >
-      <div style={{ display: 'flex', flex: 1, marginTop: 10 }}>
-        <div style={{ display: 'flex', flexDirection: 'column', width: '25%' }}>
+      <div
+        className="scroll-no-bar"
+        style={{
+          width: '25%',
+          overflow: 'scroll',
+        }}
+      >
+        {saves.map((save, i) => (
           <SaveDisplay
-            save={saves[0]}
-            saveIndex={0}
-            openSave={openSave}
-            closeSave={() => setSave(0)}
-            onImport={onImportMon}
-            setDragSource={boxSetDragSource}
-            setDragDest={boxSetDragDest}
+            saveIndex={i}
             disabled={
               draggingMon &&
               saves[0] &&
@@ -521,113 +390,70 @@ const Home = () => {
             }
             setSelectedMon={setSelectedMon}
           />
-          <SaveDisplay
-            save={saves[1]}
-            saveIndex={1}
-            openSave={openSave}
-            closeSave={() => setSave(1)}
-            onImport={onImportMon}
-            setDragSource={boxSetDragSource}
-            setDragDest={boxSetDragDest}
-            disabled={
-              draggingMon &&
-              saves[1] &&
-              isRestricted(
-                saves[1].transferRestrictions,
-                draggingMon.dexNumber,
-                draggingMon.formeNumber
-              )
-            }
-            setSelectedMon={setSelectedMon}
-          />
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column', width: '50%' }}>
-          <HomeBoxDisplay
-            box={homeData.boxes[box]}
-            setBox={(newBox) => {
-              homeData.boxes[box] = newBox;
-              setHomeData({ ...homeData });
-            }}
-            onImport={(mon, index) =>
-              onImportMon(mon, -1, { box, index }, true)
-            }
-            setSelectedMon={setSelectedMon}
-            setDragSource={(index) => {
-              if (index !== undefined) {
-                const sourceMon = homeData.boxes[box].pokemon[index];
-                if (sourceMon) {
-                  setDraggingMon({
-                    dexNumber: sourceMon.dexNum,
-                    formeNumber: sourceMon.formNum,
-                  });
-                } else {
-                  setDraggingMon(undefined);
-                }
+        ))}
+        <OpenHomeButton
+          style={{
+            margin: 'auto',
+            backgroundColor: palette.secondary.light,
+            color: palette.text.secondary,
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+          }}
+          onClick={() => {
+            openSave();
+          }}
+        >
+          <FileOpen />
+          <h2>Open Save</h2>
+        </OpenHomeButton>
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', width: '50%' }}>
+        <HomeBoxDisplay
+          box={homeData.boxes[box]}
+          setBox={(newBox) => {
+            homeData.boxes[box] = newBox;
+            setHomeData({ ...homeData });
+          }}
+          onImport={(mon, index) => {}}
+          //   onImportMon(mon, -1, { box, index }, true)
+          // }
+          setSelectedMon={setSelectedMon}
+          setDragSource={(index) => {
+            if (index !== undefined) {
+              const sourceMon = homeData.boxes[box].pokemon[index];
+              if (sourceMon) {
+                setDraggingMon({
+                  dexNumber: sourceMon.dexNum,
+                  formeNumber: sourceMon.formNum,
+                });
               } else {
                 setDraggingMon(undefined);
               }
-              setDraggingSource(
-                index !== undefined
-                  ? {
-                      save: -1,
-                      isHome: true,
-                      box,
-                      index,
-                    }
-                  : undefined
-              );
-            }}
-            setDragDest={(index) => {
+            } else {
               setDraggingMon(undefined);
-              setDraggingDest({
-                save: -1,
-                isHome: true,
-                box,
-                index,
-              });
-            }}
-          />
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column', width: '25%' }}>
-          <SaveDisplay
-            save={saves[2]}
-            saveIndex={2}
-            openSave={openSave}
-            closeSave={() => setSave(2)}
-            onImport={onImportMon}
-            setDragSource={boxSetDragSource}
-            setDragDest={boxSetDragDest}
-            disabled={
-              draggingMon &&
-              saves[2] &&
-              isRestricted(
-                saves[2].transferRestrictions,
-                draggingMon.dexNumber,
-                draggingMon.formeNumber
-              )
             }
-            setSelectedMon={setSelectedMon}
-          />
-          <SaveDisplay
-            save={saves[3]}
-            saveIndex={3}
-            openSave={openSave}
-            closeSave={() => setSave(3)}
-            onImport={onImportMon}
-            setDragSource={boxSetDragSource}
-            setDragDest={boxSetDragDest}
-            disabled={
-              draggingMon &&
-              saves[3] &&
-              isRestricted(
-                saves[3].transferRestrictions,
-                draggingMon.dexNumber,
-                draggingMon.formeNumber
-              )
-            }
-            setSelectedMon={setSelectedMon}
-          />
-        </div>
+            setDraggingSource(
+              index !== undefined
+                ? {
+                    save: -1,
+                    isHome: true,
+                    box,
+                    index,
+                  }
+                : undefined
+            );
+          }}
+          setDragDest={(index) => {
+            setDraggingMon(undefined);
+            setDraggingDest({
+              save: -1,
+              isHome: true,
+              box,
+              index,
+            });
+          }}
+        />
       </div>
       <div style={{ display: 'flex', flex: 1 }}>
         <button
@@ -654,7 +480,7 @@ const Home = () => {
             onDragOver={(e) => {
               e.preventDefault();
             }}
-            onDrop={(e) => onViewDrop(e, 'as is')}
+            // onDrop={(e) => onViewDrop(e, 'as is')}
           >
             Preview
           </div>
@@ -684,7 +510,7 @@ const Home = () => {
             onDragOver={(e) => {
               e.preventDefault();
             }}
-            onDrop={(e) => onViewDrop(e, 'trash')}
+            // onDrop={(e) => onViewDrop(e, 'trash')}
           >
             TRASH
           </div>
