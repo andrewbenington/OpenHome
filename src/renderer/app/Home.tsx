@@ -365,10 +365,10 @@ const Home = () => {
         });
       }
     });
-    for(let i = 0; i < saves.length; i++) {
+    for (let i = 0; i < saves.length; i++) {
       let newSaveData = saves[i];
       if (newSaveData) {
-        newSaveData.changedMons = []
+        newSaveData.changedMons = [];
         const newSaves: SaveArray = [...saves];
         newSaves[i] = newSaveData;
         setSaves(newSaves);
@@ -471,9 +471,9 @@ const Home = () => {
 
   // necessary to update save function called by top menu
   useEffect(() => {
-    const callback = handleMenuSave(saveAllSaveFiles);
+    const callback = handleMenuSave(saveChanges);
     return () => callback();
-  }, [saveAllSaveFiles]);
+  }, [saveChanges]);
 
   useEffect(() => {
     const callback = handleMenuResetAndClose(
@@ -500,25 +500,7 @@ const Home = () => {
         flexDirection: 'column',
       }}
     >
-      <div style={{ display: 'flex', height: 40 }}>
-        <Button>Import PKM</Button>
-        <Select
-          value={currentTheme.name}
-          onChange={(event) => {
-            const themeName = (event?.target?.value as string) ?? 'Default';
-            const theme = Themes.find((t) => t.name === themeName) ?? Themes[0];
-            setCurrentTheme(theme);
-          }}
-        >
-          {Themes.map((theme) => (
-            <MenuItem key={theme.name} value={theme.name}>
-              {theme.name}
-            </MenuItem>
-          ))}
-        </Select>
-        <Button onClick={saveChanges}>Save</Button>
-      </div>
-      <div style={{ display: 'flex', flex: 1 }}>
+      <div style={{ display: 'flex', flex: 1, marginTop: 10 }}>
         <div style={{ display: 'flex', flexDirection: 'column', width: '25%' }}>
           <SaveDisplay
             save={saves[0]}
