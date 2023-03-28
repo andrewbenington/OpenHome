@@ -1,29 +1,27 @@
+import bigInt from 'big-integer';
 import { max } from 'lodash';
-import aleaPRNG from 'alea';
+import Prando from 'prando';
+import {
+  AttackCharacteristics,
+  DefenseCharacteristics,
+  EncounterTypes,
+  GameOfOrigin,
+  HPCharacteristics,
+  HPCharacteristicsPre6,
+  RibbonTitles,
+  SpecialAtkCharacteristics,
+  SpecialDefCharacteristics,
+  SpeedCharacteristics,
+} from '../../consts';
+import { getLocation } from '../../consts/MetLocation/MetLocation';
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
   uint16ToBytesLittleEndian,
   uint32ToBytesLittleEndian,
 } from '../../util/ByteLogic';
-import {
-  RibbonTitles,
-  GameOfOrigin,
-  gameOfOriginFromFormat,
-  HPCharacteristicsPre6,
-  AttackCharacteristics,
-  HPCharacteristics,
-  DefenseCharacteristics,
-  SpecialAtkCharacteristics,
-  SpecialDefCharacteristics,
-  SpeedCharacteristics,
-  EncounterTypes,
-} from '../../consts';
-import { getLocation } from '../../consts/MetLocation/MetLocation';
-import { generatePersonalityValue, getUnownLetterGen3 } from './util';
-import bigInt from 'big-integer';
 import { getGen3To5Gender } from '../../util/GenderCalc';
-import Prando from 'prando';
+import { getUnownLetterGen3 } from './util';
 
 export class PKM {
   static markingCount = 4;
@@ -1001,12 +999,22 @@ export class PKM {
 
   public get metLocation() {
     if (!this.metLocationIndex) return undefined;
-    return getLocation(this.gameOfOrigin, this.metLocationIndex, this.format, false);
+    return getLocation(
+      this.gameOfOrigin,
+      this.metLocationIndex,
+      this.format,
+      false
+    );
   }
 
   public get eggLocation() {
     if (!this.eggLocationIndex) return undefined;
-    return getLocation(this.gameOfOrigin, this.eggLocationIndex, this.format, true);
+    return getLocation(
+      this.gameOfOrigin,
+      this.eggLocationIndex,
+      this.format,
+      true
+    );
   }
 
   public get shinyLeafValues() {

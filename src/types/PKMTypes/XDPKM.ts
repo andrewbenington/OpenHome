@@ -14,7 +14,7 @@ import {
   bytesToUint32BigEndian,
 } from '../../util/ByteLogic';
 import { contestStats, PKM } from './PKM';
-import { utf16BytesToString } from 'util/Strings/StringConverter';
+import { utf16BytesToString } from '../../util/Strings/StringConverter';
 
 export class XDPKM extends PKM {
   constructor(bytes: Uint8Array) {

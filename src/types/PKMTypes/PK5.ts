@@ -1,4 +1,4 @@
-import G5Locations from 'consts/MetLocation/G5';
+import G5Locations from '../../consts/MetLocation/G5';
 import {
   GameOfOrigin,
   isGen5,

@@ -1,5 +1,5 @@
-import { GameOfOrigin, GameOfOriginData, isAlola } from 'consts';
-import SMUSUMLocations from 'consts/MetLocation/SMUSUM';
+import { GameOfOrigin, GameOfOriginData, isAlola } from '../../consts';
+import SMUSUMLocations from '../../consts/MetLocation/SMUSUM';
 import { Abilities } from '../../consts/Abilities';
 import { Items } from '../../consts/Items';
 import { Languages } from '../../consts/Languages';

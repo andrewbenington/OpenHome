@@ -15,7 +15,7 @@ import {
   getStatGen3Onward,
 } from '../../util/StatCalc';
 import { contestStats, PKM } from './PKM';
-import { utf16BytesToString } from 'util/Strings/StringConverter';
+import { utf16BytesToString } from '../../util/Strings/StringConverter';
 
 export class COLOPKM extends PKM {
   constructor(bytes: Uint8Array) {
