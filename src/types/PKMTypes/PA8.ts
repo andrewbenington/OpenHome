@@ -41,6 +41,7 @@ export class PA8 extends PKM {
       this.trainerID = other.trainerID;
       this.secretID = other.secretID;
       this.exp = other.exp;
+      this.heldItemIndex = 0;
       this.canGigantamax = other.canGigantamax;
       this.markings = other.markings;
       this.gameOfOrigin = other.gameOfOrigin;
@@ -136,7 +137,7 @@ export class PA8 extends PKM {
     return bytesToUint16LittleEndian(this.bytes, 0x08);
   }
   public set dexNum(value: number) {
-    this.bytes.set(uint16ToBytesLittleEndian(value), 0x8);
+    this.bytes.set(uint16ToBytesLittleEndian(value), 0x08);
   }
   public get heldItemIndex() {
     return bytesToUint16LittleEndian(this.bytes, 0x0a);
@@ -189,7 +190,7 @@ export class PA8 extends PKM {
   public set ability(value: string) {
     let abilityIndex = Abilities.indexOf(value);
     if (abilityIndex > -1) {
-      this.heldItemIndex = abilityIndex;
+      this.abilityIndex = abilityIndex;
     }
   }
   public get abilityNum() {

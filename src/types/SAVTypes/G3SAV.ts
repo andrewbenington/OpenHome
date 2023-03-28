@@ -103,7 +103,7 @@ export class G3SAV extends SAV {
       // we don't want to save OHPKM files of mons that didn't leave the save
       // (and would still be PK3s)
       if (changedMon instanceof OHPKM) {
-        changedMon.ribbons = [...changedMon.ribbons, 'Champion'];
+        changedMon.ribbons = changedMon.ribbons;
         changedMonPKMs.push(changedMon);
       }
       // changedMon will be undefined if pokemon was moved from this slot
