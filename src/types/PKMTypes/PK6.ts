@@ -1,5 +1,5 @@
-import { GameOfOrigin, GameOfOriginData, isGen6 } from 'consts';
-import G6Location from 'consts/MetLocation/G6';
+import { GameOfOrigin, GameOfOriginData, isGen6 } from '../../consts';
+import G6Location from '../../consts/MetLocation/G6';
 import _ from 'lodash';
 import { Abilities } from '../../consts/Abilities';
 import { Items } from '../../consts/Items';
