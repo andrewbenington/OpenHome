@@ -1,4 +1,4 @@
-import CXDLocation from 'consts/MetLocation/CXD';
+import CXDLocation from '../../consts/MetLocation/CXD';
 import {
   Abilities,
   GameOfOrigin,
