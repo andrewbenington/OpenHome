@@ -164,3 +164,9 @@ export type Move = {
 };
 
 export type GameLocations = { [key: number]: string[] }
+
+export interface SaveCoordinates {
+  saveNumber: number;
+  box: number;
+  index: number;
+}
