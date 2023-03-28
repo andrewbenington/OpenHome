@@ -1,4 +1,4 @@
-import { GameLocations } from 'types/types';
+import { GameLocations } from '../../types/types';
 
 const LALocations: GameLocations = {
   0: [
