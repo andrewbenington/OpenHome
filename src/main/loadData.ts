@@ -1,6 +1,6 @@
 import { app } from 'electron';
 import fs from 'fs';
-import { SaveRef, SaveType } from '../types/types';
+import { SaveRef, SaveType, StringIndexableMap } from '../types/types';
 import { readBytesFromFile } from './fileHandlers';
 
 export function loadOHPKMs() {
@@ -24,16 +24,16 @@ export function loadGen12Lookup() {
   return loadLookup('gen12Lookup.csv');
 }
 
-export function registerGen12Lookup(lookupsToAdd: string) {
-  registerLookup('gen12Lookup.csv', lookupsToAdd);
+export function registerGen12Lookup(lookupMap: StringIndexableMap) {
+  saveLookup('gen12Lookup.csv', lookupMap);
 }
 
-export function loadGen34Lookup() {
-  return loadLookup('gen34Lookup.csv');
+export function loadGen345Lookup() {
+  return loadLookup('gen345Lookup.csv');
 }
 
-export function registerGen34Lookup(lookupsToAdd: string) {
-  registerLookup('gen34Lookup.csv', lookupsToAdd);
+export function registerGen345Lookup(lookupMap: StringIndexableMap) {
+  saveLookup('gen345Lookup.csv', lookupMap);
 }
 
 export function loadLookup(fileName: string) {
@@ -52,22 +52,8 @@ export function loadLookup(fileName: string) {
   return lookupMap;
 }
 
-function registerLookup(fileName: string, lookupsToAdd: string) {
+function saveLookup(fileName: string, lookupMap: StringIndexableMap) {
   const appDataPath = app.getPath('appData');
-  const lookupMap: { [key: string]: string } = {};
-  if (fs.existsSync(`${appDataPath}/OpenHome/storage/lookup/${fileName}`)) {
-    const lookupString = fs
-      .readFileSync(`${appDataPath}/OpenHome/storage/lookup/${fileName}`)
-      .toString();
-    lookupString.split(/\r?\n/).forEach((entry) => {
-      const [lookupIdentifier, monRef] = entry.split(',');
-      lookupMap[lookupIdentifier] = monRef;
-    });
-  }
-  lookupsToAdd.split(/\r?\n/).forEach((entry) => {
-    const [lookupIdentifier, monRef] = entry.split(',');
-    lookupMap[lookupIdentifier] = monRef;
-  });
   const newLookupString = Object.entries(lookupMap)
     .map(([lookupIdentifier, homeIdentifier], i) => {
       return lookupIdentifier + ',' + homeIdentifier + '\n';

@@ -45,54 +45,20 @@ export const getMonGen12Identifier = (mon: PKM) => {
   }
 };
 
-export const getMonGen34Identifier = (mon: PKM) => {
-  let pk34 = mon;
+export const getMonGen345Identifier = (mon: PKM) => {
+  let pk345 = mon;
   if (mon instanceof OHPKM) {
-    pk34 = new PK4(mon);
+    pk345 = new PK4(mon);
   }
-  const baseMon = getBaseMon(pk34.dexNum, pk34.formNum);
+  const baseMon = getBaseMon(pk345.dexNum, pk345.formNum);
   if (baseMon) {
     return `${baseMon.dexNumber.toString().padStart(4, '0')}-${bytesToString(
-      pk34.trainerID,
+      pk345.trainerID,
       2
-    ).concat(bytesToString(pk34.secretID, 2))}-${bytesToString(
-      pk34.personalityValue!!,
+    ).concat(bytesToString(pk345.secretID, 2))}-${bytesToString(
+      pk345.personalityValue!!,
       4
     )}`;
   }
   return undefined;
-};
-
-export const updateGen12LookupTable = (updatedMons: OHPKM[]) => {
-  const gen12LookupString = updatedMons
-    .map((mon, i) => {
-      if (!mon) return '';
-      const gen12Identifier = getMonGen12Identifier(mon);
-      const homeIdentifier = getMonFileIdentifier(mon);
-      console.log(gen12Identifier, homeIdentifier);
-      if (!gen12Identifier || !homeIdentifier) return '';
-      return gen12Identifier + ',' + homeIdentifier + '\n';
-    })
-    .join('');
-  window.electron.ipcRenderer.sendMessage(
-    'write-gen12-lookup',
-    gen12LookupString
-  );
-};
-
-export const updateGen34LookupTable = (updatedMons: OHPKM[]) => {
-  const gen34LookupString = updatedMons
-    .map((mon, i) => {
-      if (!mon) return '';
-      const gen34Identifier = getMonGen34Identifier(new PK3(mon));
-      const homeIdentifier = getMonFileIdentifier(mon);
-      console.log(gen34Identifier, homeIdentifier);
-      if (!gen34Identifier || !homeIdentifier) return '';
-      return gen34Identifier + ',' + homeIdentifier + '\n';
-    })
-    .join('');
-  window.electron.ipcRenderer.sendMessage(
-    'write-gen34-lookup',
-    gen34LookupString
-  );
 };

@@ -5,15 +5,15 @@ import _ from 'lodash';
 import { useEffect, useMemo, useState } from 'react';
 import OpenHomeButton from 'renderer/components/OpenHomeButton';
 import { useAppDispatch, useAppSelector } from 'renderer/redux/hooks';
+import { useDragMon, useSaves } from 'renderer/redux/selectors';
 import {
   cancelDrag,
   completeDrag,
   removeSaveAt,
-  selectCount,
-  selectSaves,
   setSaveBox,
   startDrag,
-} from 'renderer/redux/slices/savesSlice';
+} from 'renderer/redux/slices/appSlice';
+import { isRestricted } from '../../types/TransferRestrictions';
 import { getSaveTypeString, SaveCoordinates } from 'types/types';
 import { PKM } from '../../types/PKMTypes/PKM';
 import ArrowButton from './ArrowButton';
@@ -27,17 +27,13 @@ interface SaveDisplayProps {
   //   boxCoords: BoxCoordinates
   // ) => void;
   setSelectedMon: (mon: PKM | undefined) => void;
-  disabled?: boolean;
 }
 
 const SaveDisplay = (props: SaveDisplayProps) => {
   const { palette } = useTheme();
-  const saves = useAppSelector(selectSaves);
-  const count = useAppSelector(selectCount);
-  const { saveIndex, setSelectedMon, disabled } = {
-    disabled: false,
-    ...props,
-  };
+  const saves = useSaves();
+  const dragMon = useDragMon();
+  const { saveIndex, setSelectedMon } = props;
   const [isloading, setIsLoading] = useState(false);
   const dispatch = useAppDispatch();
 
@@ -55,9 +51,12 @@ const SaveDisplay = (props: SaveDisplayProps) => {
     return saves[saveIndex];
   }, [saves, saveIndex]);
 
-  useEffect(() => {
-    console.log('new count', count);
-  }, [count]);
+  const isDisabled = useMemo(() => {
+    return (
+      dragMon ?
+      isRestricted(save.transferRestrictions, dragMon.dexNum, dragMon.formNum) : false
+    );
+  }, [save, dragMon]);
   return save && save.currentPCBox !== undefined && !isloading ? (
     <div style={{ display: 'flex' }}>
       <div
@@ -107,7 +106,7 @@ const SaveDisplay = (props: SaveDisplayProps) => {
         </Card>
         <Card
           style={{
-            backgroundColor: disabled ? '#555' : palette.secondary.main,
+            backgroundColor: isDisabled ? '#555' : palette.secondary.main,
             padding: 5,
             margin: 10,
           }}
@@ -175,7 +174,7 @@ const SaveDisplay = (props: SaveDisplayProps) => {
                             index: row * save.boxColumns + rowIndex,
                           });
                         }}
-                        disabled={disabled}
+                        disabled={isDisabled}
                         mon={mon}
                         zIndex={5 - row}
                         onDrop={(importedMons) => {

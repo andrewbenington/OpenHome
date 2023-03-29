@@ -9,8 +9,8 @@ import {
   loadGen12Lookup,
   registerGen12Lookup,
   loadOHPKMs,
-  loadGen34Lookup,
-  registerGen34Lookup,
+  loadGen345Lookup,
+  registerGen345Lookup,
   loadSaveRefs,
   addSaveRef,
 } from './loadData';
@@ -37,25 +37,25 @@ function initListeners() {
     event.reply('gen12-lookup-read', lookupMap);
   });
 
-  ipcMain.on('write-gen12-lookup', async (event, gen12LookupString) => {
-    console.log('write-gen12-lookup', gen12LookupString);
-    registerGen12Lookup(gen12LookupString);
+  ipcMain.on('write-gen12-lookup', async (event, lookupMap) => {
+    console.log('write-gen12-lookup', lookupMap);
+    registerGen12Lookup(lookupMap);
   });
 
-  ipcMain.on('read-gen34-lookup', async (event) => {
-    console.log('read-gen34-lookup');
+  ipcMain.on('read-gen345-lookup', async (event) => {
+    console.log('read-gen345-lookup');
     let lookupMap;
     try {
-      lookupMap = loadGen34Lookup();
+      lookupMap = loadGen345Lookup();
     } catch (e) {
-      console.log('no gen34 lookup file');
+      console.log('no gen345 lookup file');
     }
-    event.reply('gen34-lookup-read', lookupMap);
+    event.reply('gen345-lookup-read', lookupMap);
   });
 
-  ipcMain.on('write-gen34-lookup', async (event, gen34LookupString) => {
-    console.log('write-gen34-lookup', gen34LookupString);
-    registerGen34Lookup(gen34LookupString);
+  ipcMain.on('write-gen345-lookup', async (event, lookupMap) => {
+    console.log('write-gen345-lookup', lookupMap);
+    registerGen345Lookup(lookupMap);
   });
 
   ipcMain.on('read-save-refs', async (event) => {
