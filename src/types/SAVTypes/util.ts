@@ -5,7 +5,7 @@ import {
 } from 'util/ByteLogic';
 import {
   getMonGen12Identifier,
-  getMonGen34Identifier,
+  getMonGen345Identifier,
 } from '../../util/Lookup';
 import { SaveType } from '../../types/types';
 import { DPSAV } from './DPSAV';
@@ -29,11 +29,12 @@ export const buildSaveFile = (
   lookupMaps: {
     homeMonMap?: { [key: string]: OHPKM } | undefined;
     gen12LookupMap?: { [key: string]: string } | undefined;
-    gen34LookupMap?: { [key: string]: string } | undefined;
-    fileCreatedDate?: Date
+    gen345LookupMap?: { [key: string]: string } | undefined;
+    fileCreatedDate?: Date;
   }
 ): SAV | undefined => {
-  const { homeMonMap, gen12LookupMap, gen34LookupMap, fileCreatedDate } = lookupMaps;
+  const { homeMonMap, gen12LookupMap, gen345LookupMap, fileCreatedDate } =
+    lookupMaps;
   let saveFile;
   switch (saveType) {
     case SaveType.RBY_I:
@@ -75,33 +76,33 @@ export const buildSaveFile = (
     case SaveType.E:
       saveFile = recoverOHPKMData(
         new G3SAV(filePath, fileBytes, fileCreatedDate),
-        getMonGen34Identifier,
+        getMonGen345Identifier,
         homeMonMap,
-        gen34LookupMap
+        gen345LookupMap
       );
       break;
     case SaveType.DP:
       saveFile = recoverOHPKMData(
         new DPSAV(filePath, fileBytes),
-        getMonGen34Identifier,
+        getMonGen345Identifier,
         homeMonMap,
-        gen34LookupMap
+        gen345LookupMap
       );
       break;
     case SaveType.Pt:
       saveFile = recoverOHPKMData(
         new PtSAV(filePath, fileBytes),
-        getMonGen34Identifier,
+        getMonGen345Identifier,
         homeMonMap,
-        gen34LookupMap
+        gen345LookupMap
       );
       break;
     case SaveType.HGSS:
       saveFile = recoverOHPKMData(
         new HGSSSAV(filePath, fileBytes),
-        getMonGen34Identifier,
+        getMonGen345Identifier,
         homeMonMap,
-        gen34LookupMap
+        gen345LookupMap
       );
       break;
     case SaveType.G5:
@@ -193,7 +194,10 @@ const recoverOHPKMData = (
           let updatedOHPKM = result[1];
           updatedOHPKM.updateData(mon);
           console.log('updating home data for', updatedOHPKM.nickname);
-          window.electron.ipcRenderer.sendMessage('write-ohpkm', updatedOHPKM.bytes);
+          window.electron.ipcRenderer.sendMessage(
+            'write-ohpkm',
+            updatedOHPKM.bytes
+          );
           box.pokemon[monIndex] = updatedOHPKM;
         }
       }

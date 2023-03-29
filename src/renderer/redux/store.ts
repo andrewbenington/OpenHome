@@ -1,10 +1,10 @@
 import { configureStore } from '@reduxjs/toolkit';
-import savesReducer from './slices/savesSlice';
+import appReducer from './slices/appSlice';
 // ...
 
 export const store = configureStore({
   reducer: {
-    saves: savesReducer,
+    app: appReducer,
   },
 });
 
