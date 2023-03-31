@@ -1,52 +1,13 @@
-import { SaveRef, StringIndexableMap } from "types/types";
+import { SaveRef, StringToStringMap } from "types/types";
 
-export const readBoxData = async (callback: (data: string) => void) => {
-  window.electron.ipcRenderer.once('home-box-read', (boxString: string) => {
-    callback(boxString);
-  });
-  window.electron.ipcRenderer.sendMessage('read-home-box', 'Box 1');
-};
-
-export const readGen12Lookup = async (
-  callback: (map: { [key: string]: string } | undefined) => void
-) => {
-  window.electron.ipcRenderer.once(
-    'gen12-lookup-read',
-    (lookupMap: { [key: string]: string } | undefined) => {
-      if (!lookupMap) {
-        callback(undefined);
-        return;
-      }
-      callback(lookupMap);
-    }
-  );
-  window.electron.ipcRenderer.sendMessage('read-gen12-lookup');
-};
-
-export const saveGen12Lookup = async (lookupMap: StringIndexableMap) => {
+export const writeGen12LookupToFile = async (lookupMap: StringToStringMap) => {
   window.electron.ipcRenderer.sendMessage(
     'write-gen12-lookup',
     lookupMap
   );
 }
 
-export const readGen345Lookup = async (
-  callback: (map: { [key: string]: string } | undefined) => void
-) => {
-  window.electron.ipcRenderer.once(
-    'gen345-lookup-read',
-    (lookupMap: { [key: string]: string } | undefined) => {
-      if (!lookupMap) {
-        callback(undefined);
-        return;
-      }
-      callback(lookupMap);
-    }
-  );
-  window.electron.ipcRenderer.sendMessage('read-gen345-lookup');
-};
-
-export const saveGen345Lookup = async (lookupMap: StringIndexableMap) => {
+export const writeGen345LookupToFile = async (lookupMap: StringToStringMap) => {
   window.electron.ipcRenderer.sendMessage(
     'write-gen345-lookup',
     lookupMap

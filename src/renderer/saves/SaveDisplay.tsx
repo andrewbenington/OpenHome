@@ -9,6 +9,7 @@ import { useDragMon, useSaves } from 'renderer/redux/selectors';
 import {
   cancelDrag,
   completeDrag,
+  importMons,
   removeSaveAt,
   setSaveBox,
   startDrag,
@@ -21,11 +22,6 @@ import BoxCell from './BoxCell';
 
 interface SaveDisplayProps {
   saveIndex: number;
-  // onImport: (
-  //   importedMon: PKM[],
-  //   saveIndex: number,
-  //   boxCoords: BoxCoordinates
-  // ) => void;
   setSelectedMon: (mon: PKM | undefined) => void;
 }
 
@@ -34,17 +30,17 @@ const SaveDisplay = (props: SaveDisplayProps) => {
   const saves = useSaves();
   const dragMon = useDragMon();
   const { saveIndex, setSelectedMon } = props;
-  const [isloading, setIsLoading] = useState(false);
   const dispatch = useAppDispatch();
 
   const dispatchSetBox = (box: number) =>
     dispatch(setSaveBox({ saveNumber: saveIndex, box }));
   const dispatchStartDrag = (source: SaveCoordinates) =>
     dispatch(startDrag(source));
-  const dispatchCancelDrag = () => dispatch(cancelDrag());
   const dispatchCompleteDrag = (dest: SaveCoordinates) =>
     dispatch(completeDrag(dest));
   const dispatchRemoveSaveAt = (index: number) => dispatch(removeSaveAt(index));
+  const dispatchImportMons = (mons: PKM[], saveCoordinates: SaveCoordinates) =>
+    dispatch(importMons({ mons, saveCoordinates }));
 
   const save = useMemo(() => {
     console.log('saves changed');
@@ -52,12 +48,11 @@ const SaveDisplay = (props: SaveDisplayProps) => {
   }, [saves, saveIndex]);
 
   const isDisabled = useMemo(() => {
-    return (
-      dragMon ?
-      isRestricted(save.transferRestrictions, dragMon.dexNum, dragMon.formNum) : false
-    );
+    return dragMon
+      ? isRestricted(save.transferRestrictions, dragMon.dexNum, dragMon.formNum)
+      : false;
   }, [save, dragMon]);
-  return save && save.currentPCBox !== undefined && !isloading ? (
+  return save && save.currentPCBox !== undefined ? (
     <div style={{ display: 'flex' }}>
       <div
         style={{
@@ -179,10 +174,11 @@ const SaveDisplay = (props: SaveDisplayProps) => {
                         zIndex={5 - row}
                         onDrop={(importedMons) => {
                           if (importedMons) {
-                            // onImport(importedMons, saveIndex, {
-                            //   box,
-                            //   index: row * save.boxColumns + rowIndex,
-                            // });
+                            dispatchImportMons(importedMons, {
+                              saveNumber: saveIndex,
+                              box: save.currentPCBox,
+                              index: row * save.boxColumns + rowIndex,
+                            });
                           } else {
                             dispatchCompleteDrag({
                               saveNumber: saveIndex,
