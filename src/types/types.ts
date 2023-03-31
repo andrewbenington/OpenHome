@@ -1,4 +1,4 @@
-export type StringIndexableMap = { [key: string]: string };
+export type StringToStringMap = { [key: string]: string };
 export type KeyValuePairList = { key: string; value: string }[];
 export type Stat = 'HP' | 'Atk' | 'Def' | 'SpA' | 'SpD' | 'Spe' | 'Sp';
 export type Type =

@@ -1,6 +1,6 @@
 import { app } from 'electron';
 import fs from 'fs';
-import { SaveRef, SaveType, StringIndexableMap } from '../types/types';
+import { SaveRef, SaveType, StringToStringMap } from '../types/types';
 import { readBytesFromFile } from './fileHandlers';
 
 export function loadOHPKMs() {
@@ -24,7 +24,7 @@ export function loadGen12Lookup() {
   return loadLookup('gen12Lookup.csv');
 }
 
-export function registerGen12Lookup(lookupMap: StringIndexableMap) {
+export function registerGen12Lookup(lookupMap: StringToStringMap) {
   saveLookup('gen12Lookup.csv', lookupMap);
 }
 
@@ -32,7 +32,7 @@ export function loadGen345Lookup() {
   return loadLookup('gen345Lookup.csv');
 }
 
-export function registerGen345Lookup(lookupMap: StringIndexableMap) {
+export function registerGen345Lookup(lookupMap: StringToStringMap) {
   saveLookup('gen345Lookup.csv', lookupMap);
 }
 
@@ -52,7 +52,7 @@ export function loadLookup(fileName: string) {
   return lookupMap;
 }
 
-function saveLookup(fileName: string, lookupMap: StringIndexableMap) {
+function saveLookup(fileName: string, lookupMap: StringToStringMap) {
   const appDataPath = app.getPath('appData');
   const newLookupString = Object.entries(lookupMap)
     .map(([lookupIdentifier, homeIdentifier], i) => {
@@ -86,7 +86,6 @@ export function loadSaveRefs() {
       };
     }
   });
-  console.log(saveRefMap);
   return saveRefMap;
 }
 

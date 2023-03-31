@@ -16,6 +16,7 @@ import {
 } from './loadData';
 import writePKMToFile, { deleteOHPKMFile } from './writePKMToFile';
 import fs from 'fs';
+import { StringToStringMap } from 'types/types';
 
 function initListeners() {
   ipcMain.on('write-ohpkm', async (event, bytes: Uint8Array) => {
@@ -26,15 +27,14 @@ function initListeners() {
     fileNames.forEach((fn) => deleteOHPKMFile(fn));
   });
 
-  ipcMain.on('read-gen12-lookup', async (event) => {
-    console.log('read-gen12-lookup');
+  ipcMain.handle('read-gen12-lookup', async (event) => {
     let lookupMap;
     try {
       lookupMap = loadGen12Lookup();
     } catch (e) {
       console.log('no gen12 lookup file');
     }
-    event.reply('gen12-lookup-read', lookupMap);
+    return lookupMap
   });
 
   ipcMain.on('write-gen12-lookup', async (event, lookupMap) => {
@@ -42,15 +42,14 @@ function initListeners() {
     registerGen12Lookup(lookupMap);
   });
 
-  ipcMain.on('read-gen345-lookup', async (event) => {
-    console.log('read-gen345-lookup');
+  ipcMain.handle('read-gen345-lookup', async (event) => {
     let lookupMap;
     try {
       lookupMap = loadGen345Lookup();
     } catch (e) {
       console.log('no gen345 lookup file');
     }
-    event.reply('gen345-lookup-read', lookupMap);
+    return lookupMap
   });
 
   ipcMain.on('write-gen345-lookup', async (event, lookupMap) => {
@@ -73,16 +72,14 @@ function initListeners() {
     addSaveRef(saveRef);
   });
 
-  ipcMain.on('read-home-data', async (event) => {
-    console.log('read-home-data');
+  ipcMain.handle('read-home-mons', async (event) => {
+    console.log('read-home-mons');
     const appDataPath = app.getPath('appData');
     initializeFolders(appDataPath);
-    const byteMap = loadOHPKMs();
-    event.reply('home-data-read', byteMap);
+    return loadOHPKMs();
   });
 
-  ipcMain.on('read-home-box', async (event, boxName) => {
-    console.log('read-home-box', boxName);
+  ipcMain.handle('read-home-boxes', async (event, boxName) => {
     const appDataPath = app.getPath('appData');
     const boxString = fs.readFileSync(
       `${appDataPath}/OpenHome/storage/boxes/${boxName}.csv`,
@@ -94,7 +91,9 @@ function initListeners() {
       `${appDataPath}/OpenHome/storage/boxes/${boxName}.csv`,
       boxName
     );
-    event.reply('home-box-read', boxString);
+    const boxesMap: StringToStringMap = {}
+    boxesMap[`${boxName}`] = boxString
+    return boxesMap
   });
 
   ipcMain.on('write-home-box', async (event, { boxName, boxString }) => {
