@@ -381,6 +381,7 @@ export const appSlice = createSlice({
       Object.entries(action.payload).forEach(([id, bytes]) => {
         homeMons[id] = new OHPKM(bytes);
       });
+      console.log("loadHomeMons fulfilled")
       return {
         ...state,
         lookup: { ...state.lookup, homeMons },
@@ -394,6 +395,7 @@ export const appSlice = createSlice({
     });
     builder.addCase(loadHomeBoxes.fulfilled, (state, action) => {
       const homeMonMap = state.lookup.homeMons;
+      console.log("loadHomeBoxes fulfilled")
       if (homeMonMap) {
         Object.entries(action.payload).forEach(([boxName, boxString]) => {
           const newBox = state.homeData.boxes[0];
