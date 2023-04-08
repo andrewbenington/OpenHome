@@ -29,12 +29,8 @@ const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
   const dispatchImportMons = (mons: PKM[], saveCoordinates: SaveCoordinates) =>
     dispatch(importMons({ mons, saveCoordinates }));
 
-  useEffect(() => {
-    console.log('homedata updated');
-  }, [data]);
-
   return (
-    data.boxes && (
+    data.boxes[0] && (
       <Card
         style={{
           borderRadius: 5,

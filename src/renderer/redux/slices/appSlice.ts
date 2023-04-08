@@ -150,7 +150,6 @@ export const appSlice = createSlice({
       }
     },
     startDrag: (state, action: PayloadAction<SaveCoordinates>) => {
-      console.log('start drag', action.payload);
       const { box, index, saveNumber } = action.payload;
       if (state.saves.length <= saveNumber) {
         return;
@@ -160,12 +159,10 @@ export const appSlice = createSlice({
       state.dragSource = action.payload;
     },
     cancelDrag: (state) => {
-      console.log('cancel drag');
       state.dragMon = undefined;
       state.dragSource = undefined;
     },
     completeDrag: (state, action: PayloadAction<SaveCoordinates>) => {
-      console.log('complete drag', action);
       if (!state.dragSource) {
         state.dragMon = undefined;
         state.dragSource = undefined;
@@ -381,10 +378,9 @@ export const appSlice = createSlice({
       Object.entries(action.payload).forEach(([id, bytes]) => {
         homeMons[id] = new OHPKM(bytes);
       });
-      console.log("loadHomeMons fulfilled")
       return {
         ...state,
-        lookup: { ...state.lookup, homeMons },
+        lookup: { ...state.lookup, homeMons: homeMons },
       };
     });
     builder.addCase(loadGen12Lookup.fulfilled, (state, action) => {
@@ -395,17 +391,15 @@ export const appSlice = createSlice({
     });
     builder.addCase(loadHomeBoxes.fulfilled, (state, action) => {
       const homeMonMap = state.lookup.homeMons;
-      console.log("loadHomeBoxes fulfilled")
       if (homeMonMap) {
-        Object.entries(action.payload).forEach(([boxName, boxString]) => {
-          const newBox = state.homeData.boxes[0];
-          newBox.clear();
-          newBox.getMonsFromString(
+        const newBoxes = [...state.homeData.boxes];
+        Object.entries(action.payload).forEach(([boxName, boxString], i) => {
+          newBoxes[i].getMonsFromString(
             boxString as string,
             homeMonMap as { [key: string]: OHPKM }
           );
-          return { ...state, homeData: { ...state.homeData, boxes: [newBox] } };
         });
+        return { ...state, homeData: { ...state.homeData, boxes: newBoxes } };
       } else {
         console.error('box loaded before home lookup map');
       }

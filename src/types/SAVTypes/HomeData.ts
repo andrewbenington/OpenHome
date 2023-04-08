@@ -21,9 +21,6 @@ export class HomeBox implements Box {
   constructor(n: string) {
     this.name = n;
   }
-  clear() {
-    this.pokemon = new Array(120);
-  }
 
   writeMonsToString() {
     return this.pokemon
@@ -38,6 +35,7 @@ export class HomeBox implements Box {
   }
 
   getMonsFromString(fileString: string, monMap: { [key: string]: OHPKM }) {
+    this.pokemon = new Array(120);
     fileString.split('\n').forEach((monAndIndex) => {
       const [indexStr, monRef] = monAndIndex.split(',');
       const mon = monMap[monRef];
