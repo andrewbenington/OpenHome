@@ -73,7 +73,6 @@ function initListeners() {
   });
 
   ipcMain.handle('read-home-mons', async (event) => {
-    console.log('read-home-mons');
     const appDataPath = app.getPath('appData');
     initializeFolders(appDataPath);
     return loadOHPKMs();

@@ -36,7 +36,8 @@ import {
   adjustMovePPBetweenFormats, writeIVsToBuffer
 } from './util';
 
-export const GEN6_MOVE_MAX = 621;
+export const XY_MOVE_MAX = 617;
+export const ORAS_MOVE_MAX = 621;
 
 export class PK6 extends PKM {
   constructor(...args: any[]) {
@@ -82,15 +83,15 @@ export class PK6 extends PKM {
       this.formArgument = other.formArgument;
       this.nickname = other.nickname;
       // filtering out moves that didnt exist yet
-      const validMoves = other.moves.filter((move) => move <= GEN6_MOVE_MAX);
+      const validMoves = other.moves.filter((move) => move <= ORAS_MOVE_MAX);
       const validMovePP = adjustMovePPBetweenFormats(this, other).filter(
-        (_, i) => other.moves[i] <= GEN6_MOVE_MAX
+        (_, i) => other.moves[i] <= ORAS_MOVE_MAX
       );
       const validMovePPUps = other.movePPUps.filter(
-        (_, i) => other.moves[i] <= GEN6_MOVE_MAX
+        (_, i) => other.moves[i] <= ORAS_MOVE_MAX
       );
       const validRelearnMoves = other.relearnMoves.filter(
-        (_, i) => other.moves[i] <= GEN6_MOVE_MAX
+        (_, i) => other.moves[i] <= ORAS_MOVE_MAX
       );
       this.moves = [validMoves[0], validMoves[1], validMoves[2], validMoves[3]];
       this.movePP = [
