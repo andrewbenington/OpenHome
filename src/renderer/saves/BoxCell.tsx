@@ -79,7 +79,6 @@ const BoxCell = (props: BoxCellProps) => {
           draggable
           onDragStart={(e) => {
             if (mon) {
-              console.log("starting drag")
               const dragIcon = document.getElementById('drag-image');
               const div = document.getElementById('drag-image-container');
               if (!dragIcon || !div) return;
@@ -99,7 +98,6 @@ const BoxCell = (props: BoxCellProps) => {
                         35) *
                       100
                     }%`;
-              console.log(dragIcon.style.backgroundPosition);
               const dimension = window.outerWidth / 24 - 4;
               div.style.height = `${dimension}px`;
               div.style.width = `${dimension}px`;
