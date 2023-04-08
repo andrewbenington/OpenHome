@@ -14,10 +14,11 @@ import PokemonDisplay from '../pokemon/PokemonDisplay';
 import { useAppDispatch } from '../redux/hooks';
 import {
   useDragMon,
-  useDragSource, useLookupMaps,
+  useDragSource,
+  useLookupMaps,
   useModifiedOHPKMs,
   useSaveFunctions,
-  useSaves
+  useSaves,
 } from '../redux/selectors';
 import {
   addSave,
@@ -27,7 +28,7 @@ import {
   loadGen12Lookup,
   loadGen345Lookup,
   loadHomeBoxes,
-  loadHomeMons
+  loadHomeMons,
 } from '../redux/slices/appSlice';
 import HomeBoxDisplay from '../saves/HomeBoxDisplay';
 import SaveDisplay from '../saves/SaveDisplay';
@@ -37,7 +38,7 @@ import {
   addSaveToRecents,
   handleDeleteOHPKMFiles,
   handleMenuResetAndClose,
-  handleMenuSave
+  handleMenuSave,
 } from '../util/ipcFunctions';
 import Themes, { OpenHomeTheme } from './Themes';
 
@@ -193,8 +194,7 @@ const Home = () => {
 
   useEffect(() => {
     const callback = handleMenuResetAndClose(() => {
-      dispatch(loadHomeMons());
-      dispatch(loadHomeBoxes());
+      dispatch(loadHomeMons()).then(() => dispatch(loadHomeBoxes()));
     }, dispatchClearAllSaves);
     return () => callback();
   }, [saves]);
