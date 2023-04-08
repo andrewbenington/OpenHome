@@ -1,4 +1,4 @@
-import { configureStore } from '@reduxjs/toolkit';
+import { configureStore, getDefaultMiddleware } from '@reduxjs/toolkit';
 import appReducer from './slices/appSlice';
 // ...
 
@@ -6,6 +6,9 @@ export const store = configureStore({
   reducer: {
     app: appReducer,
   },
+  middleware: getDefaultMiddleware({
+    serializableCheck: false
+  })
 });
 
 // Infer the `RootState` and `AppDispatch` types from the store itself
