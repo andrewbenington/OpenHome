@@ -105,6 +105,7 @@ function initListeners() {
   });
 
   ipcMain.on('read-save-file', async (event, filePath) => {
+    console.log('read-save-file')
     let filePaths = filePath;
     if (!filePaths) {
       filePaths = await selectFile();

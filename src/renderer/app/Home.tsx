@@ -145,8 +145,10 @@ const Home = () => {
     window.electron.ipcRenderer.once('save-file-read', (result: any) => {
       const { path, fileBytes, createdDate } = result;
       if (!homeMonMap) return;
+      console.log(homeMonMap)
       if (path && fileBytes && homeMonMap) {
         const saveType = getSaveType(fileBytes);
+        console.log("savetype:", saveType)
         let newSave;
         switch (saveType) {
           case SaveType.RBY_I:
@@ -164,13 +166,16 @@ const Home = () => {
           case SaveType.DP:
           case SaveType.Pt:
           case SaveType.HGSS:
-            if (!gen345LookupMap) return;
+            if (!gen345LookupMap) {
+              console.log("no gen345lookup")
+              return;
+            }
             newSave = buildSaveFile(path, fileBytes, saveType, {
               homeMonMap,
               gen345LookupMap,
               fileCreatedDate: createdDate,
             });
-            if (newSave) onOpenSave(newSave);
+            if (newSave){ onOpenSave(newSave)} else {console.error("save build failed")};
           case SaveType.UNKNOWN:
             return;
           default:

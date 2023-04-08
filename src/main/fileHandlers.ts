@@ -3,6 +3,7 @@ import fs from 'fs';
 import _ from 'lodash';
 
 export function initializeFolders(appDataPath: string) {
+  console.log(appDataPath)
   if (!fs.existsSync(`${appDataPath}/OpenHome/storage/boxes`)) {
     fs.mkdirSync(`${appDataPath}/OpenHome/storage/boxes`, { recursive: true });
   }
@@ -27,6 +28,26 @@ export function initializeFolders(appDataPath: string) {
   }
   if (!fs.existsSync(`${appDataPath}/OpenHome/storage/lookup`)) {
     fs.mkdirSync(`${appDataPath}/OpenHome/storage/lookup`, { recursive: true });
+  }
+  if (
+    !fs.existsSync(
+      `${appDataPath}/OpenHome/storage/lookup/gen12Lookup.csv`
+    )
+  ) {
+    fs.writeFileSync(
+      `${appDataPath}/OpenHome/storage/lookup/gen12Lookup.csv`,
+      ''
+    );
+  }
+  if (
+    !fs.existsSync(
+      `${appDataPath}/OpenHome/storage/lookup/gen345Lookup.csv`
+    )
+  ) {
+    fs.writeFileSync(
+      `${appDataPath}/OpenHome/storage/lookup/gen345Lookup.csv`,
+      ''
+    );
   }
   if (!fs.existsSync(`${appDataPath}/OpenHome/storage/saveFiles.csv`)) {
     fs.writeFileSync(`${appDataPath}/OpenHome/storage/saveFiles.csv`, '');
