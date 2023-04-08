@@ -144,6 +144,7 @@ export const getSaveType = (bytes: Uint8Array): SaveType => {
   } else if (bytes.length >= SIZE_GEN3) {
     console.log('gen 3');
     const valueAtAC = bytesToUint32LittleEndian(bytes, 0xac);
+    console.log(valueAtAC)
     switch (valueAtAC) {
       case 1:
         return SaveType.FRLG;
@@ -176,7 +177,10 @@ const recoverOHPKMData = (
   homeMonMap?: { [key: string]: OHPKM },
   lookupMap?: { [key: string]: string }
 ) => {
-  if (!homeMonMap || !lookupMap || !getIdentifier) return saveFile;
+  console.log(saveFile, getIdentifier, homeMonMap, lookupMap)
+  if (!homeMonMap || !lookupMap || !getIdentifier) {
+    return saveFile
+  };
   saveFile.boxes.forEach((box, boxIndex) => {
     box.pokemon.forEach((mon, monIndex) => {
       if (mon) {

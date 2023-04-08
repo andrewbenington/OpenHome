@@ -196,19 +196,39 @@ export default class MenuBuilder {
   buildDefaultTemplate() {
     const templateDefault = [
       {
-        label: '&File',
-        submenu: [
+        label: '&File',submenu: [
           {
-            label: '&Open',
-            accelerator: 'Ctrl+O',
-          },
-          {
-            label: '&Close',
-            accelerator: 'Ctrl+W',
+            label: '&Save',
+            accelerator: 'Ctrl+S',
             click: () => {
-              this.mainWindow.close();
+              this.mainWindow.webContents.send('save');
             },
           },
+          {
+            label: '&Reset',
+            accelerator: 'Ctrl+X',
+            click: () => {
+              this.mainWindow.webContents.send('reset');
+            },
+          },
+          {
+            label: '&Reset And Close Saves',
+            accelerator: 'Shift+Ctrl+X',
+            click: () => {
+              this.mainWindow.webContents.send('reset-close');
+            },
+          },
+          // {
+          //   label: '&Open',
+          //   accelerator: 'Ctrl+O',
+          // },
+          // {
+          //   label: '&Close',
+          //   accelerator: 'Ctrl+W',
+          //   click: () => {
+          //     this.mainWindow.close();
+          //   },
+          // },
         ],
       },
       {
