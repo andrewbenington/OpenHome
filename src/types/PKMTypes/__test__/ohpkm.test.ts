@@ -4,7 +4,7 @@ import path from 'path';
 import { bytesToPKM } from 'util/FileImport';
 import {
   getMonGen12Identifier,
-  getMonGen34Identifier,
+  getMonGen345Identifier,
 } from '../../../util/Lookup';
 import { OHPKM } from '../OHPKM';
 import { PK1 } from '../PK1';
@@ -51,15 +51,15 @@ test('converted ohpkm always has the same gen2 lookup key', () => {
 });
 
 test('converted ohpkm always has the same gen3 lookup key', () => {
-  const lookup = getMonGen34Identifier(slowpokeOH);
+  const lookup = getMonGen345Identifier(slowpokeOH);
   for (let i = 0; i < 100; i++) {
-    expect(lookup).toEqual(getMonGen34Identifier(new PK3(slowpokeOH)));
+    expect(lookup).toEqual(getMonGen345Identifier(new PK3(slowpokeOH)));
   }
 });
 
 test('converted ohpkm always has the same gen4 lookup key', () => {
-  const lookup = getMonGen34Identifier(slowpokeOH);
+  const lookup = getMonGen345Identifier(slowpokeOH);
   for (let i = 0; i < 100; i++) {
-    expect(lookup).toEqual(getMonGen34Identifier(new PK4(slowpokeOH)));
+    expect(lookup).toEqual(getMonGen345Identifier(new PK4(slowpokeOH)));
   }
 });

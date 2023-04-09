@@ -1,5 +1,5 @@
-import { GameOfOrigin, GameOfOriginData, isBDSP } from 'consts';
-import LALocations from 'consts/MetLocation/LA';
+import { GameOfOrigin, GameOfOriginData, isBDSP } from '../../consts';
+import LALocations from '../../consts/MetLocation/LA';
 import { OHPKM } from '.';
 import { Abilities } from '../../consts/Abilities';
 import { Items } from '../../consts/Items';

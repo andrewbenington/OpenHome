@@ -13,6 +13,7 @@
 /out
 /release/app/dist
 /release/build
+
 # misc
 .DS_Store
 .env.local

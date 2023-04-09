@@ -4,7 +4,7 @@ import { bytesToPKM } from 'util/FileImport';
 import { TextDecoder, TextEncoder } from 'node:util'; // (ESM style imports)
 import { PK4 } from '../PK4';
 import { OHPKM } from '../OHPKM';
-import { getMonGen34Identifier } from '../../../util/Lookup';
+import { getMonGen345Identifier } from '../../../util/Lookup';
 
 (global as any).TextDecoder = TextDecoder;
 
@@ -113,10 +113,10 @@ test('gen 4 conversion to OHPKM and back is lossless', () => {
   expect(typhlosionGen4.bytes).toEqual(gen4PKM.bytes);
 });
 
-test('pk4 and ohpkm have the same gen34lookup key', () => {
+test('pk4 and ohpkm have the same gen345Lookup key', () => {
   const ohPKM = new OHPKM(typhlosionGen4);
-  expect(getMonGen34Identifier(ohPKM)).toEqual(
-    getMonGen34Identifier(typhlosionGen4)
+  expect(getMonGen345Identifier(ohPKM)).toEqual(
+    getMonGen345Identifier(typhlosionGen4)
   );
 });
 

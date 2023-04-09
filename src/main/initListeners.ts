@@ -9,13 +9,14 @@ import {
   loadGen12Lookup,
   registerGen12Lookup,
   loadOHPKMs,
-  loadGen34Lookup,
-  registerGen34Lookup,
+  loadGen345Lookup,
+  registerGen345Lookup,
   loadSaveRefs,
   addSaveRef,
 } from './loadData';
 import writePKMToFile, { deleteOHPKMFile } from './writePKMToFile';
 import fs from 'fs';
+import { StringToStringMap } from 'types/types';
 
 function initListeners() {
   ipcMain.on('write-ohpkm', async (event, bytes: Uint8Array) => {
@@ -26,36 +27,34 @@ function initListeners() {
     fileNames.forEach((fn) => deleteOHPKMFile(fn));
   });
 
-  ipcMain.on('read-gen12-lookup', async (event) => {
-    console.log('read-gen12-lookup');
+  ipcMain.handle('read-gen12-lookup', async (event) => {
     let lookupMap;
     try {
       lookupMap = loadGen12Lookup();
     } catch (e) {
       console.log('no gen12 lookup file');
     }
-    event.reply('gen12-lookup-read', lookupMap);
+    return lookupMap
   });
 
-  ipcMain.on('write-gen12-lookup', async (event, gen12LookupString) => {
-    console.log('write-gen12-lookup', gen12LookupString);
-    registerGen12Lookup(gen12LookupString);
+  ipcMain.on('write-gen12-lookup', async (event, lookupMap) => {
+    console.log('write-gen12-lookup', lookupMap);
+    registerGen12Lookup(lookupMap);
   });
 
-  ipcMain.on('read-gen34-lookup', async (event) => {
-    console.log('read-gen34-lookup');
+  ipcMain.handle('read-gen345-lookup', async (event) => {
     let lookupMap;
     try {
-      lookupMap = loadGen34Lookup();
+      lookupMap = loadGen345Lookup();
     } catch (e) {
-      console.log('no gen34 lookup file');
+      console.log('no gen345 lookup file');
     }
-    event.reply('gen34-lookup-read', lookupMap);
+    return lookupMap
   });
 
-  ipcMain.on('write-gen34-lookup', async (event, gen34LookupString) => {
-    console.log('write-gen34-lookup', gen34LookupString);
-    registerGen34Lookup(gen34LookupString);
+  ipcMain.on('write-gen345-lookup', async (event, lookupMap) => {
+    console.log('write-gen345-lookup', lookupMap);
+    registerGen345Lookup(lookupMap);
   });
 
   ipcMain.on('read-save-refs', async (event) => {
@@ -73,16 +72,13 @@ function initListeners() {
     addSaveRef(saveRef);
   });
 
-  ipcMain.on('read-home-data', async (event) => {
-    console.log('read-home-data');
+  ipcMain.handle('read-home-mons', async (event) => {
     const appDataPath = app.getPath('appData');
     initializeFolders(appDataPath);
-    const byteMap = loadOHPKMs();
-    event.reply('home-data-read', byteMap);
+    return loadOHPKMs();
   });
 
-  ipcMain.on('read-home-box', async (event, boxName) => {
-    console.log('read-home-box', boxName);
+  ipcMain.handle('read-home-boxes', async (event, boxName) => {
     const appDataPath = app.getPath('appData');
     const boxString = fs.readFileSync(
       `${appDataPath}/OpenHome/storage/boxes/${boxName}.csv`,
@@ -94,7 +90,9 @@ function initListeners() {
       `${appDataPath}/OpenHome/storage/boxes/${boxName}.csv`,
       boxName
     );
-    event.reply('home-box-read', boxString);
+    const boxesMap: StringToStringMap = {}
+    boxesMap[`${boxName}`] = boxString
+    return boxesMap
   });
 
   ipcMain.on('write-home-box', async (event, { boxName, boxString }) => {
@@ -106,6 +104,7 @@ function initListeners() {
   });
 
   ipcMain.on('read-save-file', async (event, filePath) => {
+    console.log('read-save-file')
     let filePaths = filePath;
     if (!filePaths) {
       filePaths = await selectFile();

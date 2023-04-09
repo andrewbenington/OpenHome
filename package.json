@@ -87,6 +87,7 @@
     "@emotion/styled": "^11.10.5",
     "@mui/icons-material": "^5.11.0",
     "@mui/material": "^5.11.8",
+    "@reduxjs/toolkit": "^1.9.3",
     "alea": "^1.0.1",
     "big-integer": "^1.6.51",
     "chart.js": "^4.2.0",
@@ -98,6 +99,7 @@
     "react": "^18.2.0",
     "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.2.0",
+    "react-redux": "^8.0.5",
     "react-router-dom": "^6.8.1",
     "use-file-picker": "^1.5.2",
     "web-vitals": "^3.1.1"

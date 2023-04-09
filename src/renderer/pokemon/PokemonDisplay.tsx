@@ -13,10 +13,12 @@ import {
   PK4,
   PK5,
   PK6,
+  PK7,
   PKM,
 } from '../../types/PKMTypes';
 import { getTypes } from '../../types/PKMTypes/util';
 import {
+  Gen89RegionalForms,
   isRestricted,
   LA_TRANSFER_RESTRICTIONS,
   RegionalForms,
@@ -51,6 +53,8 @@ const getTypeFromString = (type: string) => {
       return PK5;
     case 'PK6':
       return PK6;
+    case 'PK7':
+      return PK7;
     case 'PA8':
       return PA8;
   }
@@ -144,6 +148,23 @@ const PokemonDisplay = (props: {
           mon.formNum
         ) ? (
           <MenuItem value="PK6">PK6</MenuItem>
+        ) : (
+          <div />
+        )}
+        {mon.format === 'OHPKM' &&
+        !isRestricted(
+          {
+            maxDexNum: 807,
+            excludedForms: {
+              ...Gen89RegionalForms,
+              483: [1],
+              484: [1],
+            },
+          },
+          mon.dexNum,
+          mon.formNum
+        ) ? (
+          <MenuItem value="PK7">PK7</MenuItem>
         ) : (
           <div />
         )}
