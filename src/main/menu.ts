@@ -4,6 +4,7 @@ import {
   shell,
   BrowserWindow,
   MenuItemConstructorOptions,
+  dialog,
 } from 'electron';
 
 interface DarwinMenuItemConstructorOptions extends MenuItemConstructorOptions {
@@ -26,10 +27,10 @@ export default class MenuBuilder {
       this.setupDevelopmentEnvironment();
     }
 
-    const template =
+    const template = this.buildMenuTemplate(
+      this.mainWindow,
       process.platform === 'darwin'
-        ? this.buildDarwinTemplate(this.mainWindow)
-        : this.buildDefaultTemplate();
+    );
 
     const menu = Menu.buildFromTemplate(template);
     Menu.setApplicationMenu(menu);
@@ -52,7 +53,10 @@ export default class MenuBuilder {
     });
   }
 
-  buildDarwinTemplate(mainWindow: BrowserWindow): MenuItemConstructorOptions[] {
+  buildMenuTemplate(
+    mainWindow: BrowserWindow,
+    isMac: boolean
+  ): MenuItemConstructorOptions[] {
     const subMenuAbout: DarwinMenuItemConstructorOptions = {
       label: 'OpenHome',
       submenu: [
@@ -107,6 +111,16 @@ export default class MenuBuilder {
           accelerator: 'Shift+CmdOrCtrl+X',
           click() {
             mainWindow?.webContents.send('reset-close');
+          },
+        },
+        { type: 'separator' },
+        {
+          label: 'Import PKMs',
+          accelerator: 'CmdOrCtrl+I',
+          click() {
+            dialog.showMessageBox({
+              message: 'Drag the PKM file(s) you wish to import into a box.',
+            });
           },
         },
       ],
@@ -176,9 +190,7 @@ export default class MenuBuilder {
         {
           label: 'Visit GitHub',
           click() {
-            shell.openExternal(
-              'https://github.com/andrewbenington/OpenHome'
-            );
+            shell.openExternal('https://github.com/andrewbenington/OpenHome');
           },
         },
       ],
@@ -190,13 +202,21 @@ export default class MenuBuilder {
         ? subMenuViewDev
         : subMenuViewProd;
 
-    return [subMenuAbout, subMenuFile, subMenuEdit, subMenuView, subMenuWindow, subMenuHelp];
+    return [
+      ...(isMac ? [subMenuAbout] : []),
+      subMenuFile,
+      subMenuEdit,
+      subMenuView,
+      subMenuWindow,
+      subMenuHelp,
+    ];
   }
 
   buildDefaultTemplate() {
     const templateDefault = [
       {
-        label: '&File',submenu: [
+        label: '&File',
+        submenu: [
           {
             label: '&Save',
             accelerator: 'Ctrl+S',
@@ -218,17 +238,15 @@ export default class MenuBuilder {
               this.mainWindow.webContents.send('reset-close');
             },
           },
-          // {
-          //   label: '&Open',
-          //   accelerator: 'Ctrl+O',
-          // },
-          // {
-          //   label: '&Close',
-          //   accelerator: 'Ctrl+W',
-          //   click: () => {
-          //     this.mainWindow.close();
-          //   },
-          // },
+          {
+            label: '&Import PKMs',
+            accelerator: 'Ctrl+I',
+            click() {
+              dialog.showMessageBox({
+                message: 'Drag the PKM file(s) you wish to import into a box.',
+              });
+            },
+          },
         ],
       },
       {
