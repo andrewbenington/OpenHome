@@ -1,5 +1,6 @@
 import { OHPKM } from 'types/PKMTypes';
-import { StringToStringMap, KeyValuePairList } from '../../types/types';
+import { SAV } from 'types/SAVTypes';
+import { SaveRefMap, StringToStringMap } from '../../types/types';
 import { useAppDispatch, useAppSelector } from './hooks';
 import {
   selectDragMon,
@@ -13,6 +14,11 @@ import {
   writeAllHomeData,
   writeAllSaveFiles,
 } from './slices/appSlice';
+import {
+  removeRecentSave,
+  selectRecentSaves,
+  upsertRecentSave,
+} from './slices/recentSavesSlice';
 
 export const useSaves = () => useAppSelector(selectSaves);
 export const useHomeData = () => useAppSelector(selectHomeData);
@@ -22,13 +28,20 @@ export const useModifiedOHPKMs = () => useAppSelector(selectModifiedOHPKMs);
 export const useSaveFunctions = (): [() => void, () => void] => {
   const dispatch = useAppDispatch();
   return [
-    () => {
-      console.log('writing save files');
-      dispatch(writeAllSaveFiles());
-    },
-    () => {
-      dispatch(writeAllHomeData());
-    },
+    () => dispatch(writeAllSaveFiles()),
+    () => dispatch(writeAllHomeData()),
+  ];
+};
+export const useRecentSaves = (): [
+  SaveRefMap,
+  (save: SAV) => void,
+  (filePath: string) => void
+] => {
+  const dispatch = useAppDispatch();
+  return [
+    useAppSelector(selectRecentSaves),
+    (save) => dispatch(upsertRecentSave(save)),
+    (filePath) => dispatch(removeRecentSave(filePath)),
   ];
 };
 

@@ -6,6 +6,7 @@ import {
 import { gen4StringToUTF } from 'util/Strings/StringConverter';
 import { PK4 } from '../PKMTypes/PK4';
 import { Box, SAV } from './SAV';
+import { CRC16_CCITT } from 'util/Encryption';
 
 export class G4SAV extends SAV {
   pkmType = PK4;
@@ -71,26 +72,12 @@ export class G4SAV extends SAV {
     );
   }
 
-  calculateStorageChecksum() {
-    let sum = 0xffff;
-
-    for (
-      let i = this.currentSaveStorageBlockOffset;
-      i <
-      this.currentSaveStorageBlockOffset +
-        this.storageBlockSize -
-        this.footerSize;
-      i++
-    )
-      sum =
-        ((sum << 8) & 0xffff) ^
-        SeedTable[this.bytes[i] ^ ((sum >> 8) & 0xffff)];
-
-    return sum;
-  }
-
   updateStorageChecksum = () => {
-    const newChecksum = this.calculateStorageChecksum();
+    const newChecksum = CRC16_CCITT(
+      this.bytes,
+      this.currentSaveStorageBlockOffset,
+      this.storageBlockSize - this.footerSize
+    );
     console.log(
       'updating gen 4 checksum at',
       '0x' +
@@ -134,7 +121,14 @@ export class G4SAV extends SAV {
       }
     });
     this.updateStorageChecksum();
-    console.log(this.getStorageChecksum(), this.calculateStorageChecksum());
+    console.log(
+      this.getStorageChecksum(),
+      CRC16_CCITT(
+        this.bytes,
+        this.currentSaveStorageBlockOffset,
+        this.storageBlockSize - this.footerSize
+      )
+    );
     return changedMonPKMs;
   }
 }

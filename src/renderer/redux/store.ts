@@ -1,14 +1,16 @@
 import { configureStore, getDefaultMiddleware } from '@reduxjs/toolkit';
 import appReducer from './slices/appSlice';
+import recentSavesReducer from './slices/recentSavesSlice';
 // ...
 
 export const store = configureStore({
   reducer: {
     app: appReducer,
+    recentSaves: recentSavesReducer,
   },
   middleware: getDefaultMiddleware({
-    serializableCheck: false
-  })
+    serializableCheck: false,
+  }),
 });
 
 // Infer the `RootState` and `AppDispatch` types from the store itself

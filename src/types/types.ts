@@ -84,7 +84,9 @@ export interface SaveRef {
   game?: string;
   trainerName?: string;
   trainerID?: string;
+  lastOpened?: number;
 }
+export type SaveRefMap = { [key: string]: SaveRef };
 
 export type RegionalForme = 'Alola' | 'Galar' | 'Hisui' | 'Paldea';
 export type Pokemon = {

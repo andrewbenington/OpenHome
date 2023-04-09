@@ -32,6 +32,7 @@ export class SAV {
       game: this.origin ? this.origin.toString() : undefined,
       trainerName: this.name ? this.name : undefined,
       trainerID: this.displayID,
+      lastOpened: Date.now()
     };
   };
   changedMons: BoxCoordinates[] = [];

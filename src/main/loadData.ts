@@ -1,6 +1,11 @@
 import { app } from 'electron';
 import fs from 'fs';
-import { SaveRef, SaveType, StringToStringMap } from '../types/types';
+import {
+  SaveRef,
+  SaveRefMap,
+  SaveType,
+  StringToStringMap,
+} from '../types/types';
 import { readBytesFromFile } from './fileHandlers';
 
 export function loadOHPKMs() {
@@ -20,22 +25,6 @@ export function loadOHPKMs() {
   return monMap;
 }
 
-export function loadGen12Lookup() {
-  return loadLookup('gen12Lookup.csv');
-}
-
-export function registerGen12Lookup(lookupMap: StringToStringMap) {
-  saveLookup('gen12Lookup.csv', lookupMap);
-}
-
-export function loadGen345Lookup() {
-  return loadLookup('gen345Lookup.csv');
-}
-
-export function registerGen345Lookup(lookupMap: StringToStringMap) {
-  saveLookup('gen345Lookup.csv', lookupMap);
-}
-
 export function loadLookup(fileName: string) {
   const appDataPath = app.getPath('appData');
   const lookupMap: { [key: string]: string } = {};
@@ -52,9 +41,9 @@ export function loadLookup(fileName: string) {
   return lookupMap;
 }
 
-function saveLookup(fileName: string, lookupMap: StringToStringMap) {
+function writeLookup(fileName: string, lookupMap: StringToStringMap) {
   const appDataPath = app.getPath('appData');
-  const newLookupString = Object.entries(lookupMap)
+  const newCSVString = Object.entries(lookupMap)
     .map(([lookupIdentifier, homeIdentifier], i) => {
       return lookupIdentifier + ',' + homeIdentifier + '\n';
     })
@@ -62,48 +51,78 @@ function saveLookup(fileName: string, lookupMap: StringToStringMap) {
   console.log('writing', fileName);
   fs.writeFileSync(
     `${appDataPath}/OpenHome/storage/lookup/${fileName}`,
-    newLookupString
+    newCSVString
   );
 }
 
-export function loadSaveRefs() {
+export function loadGen12Lookup() {
+  return loadLookup('gen12Lookup.csv');
+}
+
+export function registerGen12Lookup(lookupMap: StringToStringMap) {
+  writeLookup('gen12Lookup.csv', lookupMap);
+}
+
+export function loadGen345Lookup() {
+  return loadLookup('gen345Lookup.csv');
+}
+
+export function registerGen345Lookup(lookupMap: StringToStringMap) {
+  writeLookup('gen345Lookup.csv', lookupMap);
+}
+
+export function loadRecentSaves() {
   const appDataPath = app.getPath('appData');
-  const saveRefMap: { [key: string]: SaveRef } = {};
+  const recentSaves: SaveRefMap = {};
   const lookupFileString = fs
     .readFileSync(`${appDataPath}/OpenHome/storage/saveFiles.csv`)
     .toString();
   lookupFileString.split(/\r?\n/).forEach((entry) => {
-    const [filePath, saveTypeString, game, trainerName, trainerID] =
+    let [filePath, saveTypeString, game, trainerName, trainerID, lastOpened] =
       entry.split(',');
+    filePath = decodeURIComponent(filePath);
     const saveType = SaveTypeStrings[saveTypeString];
     if (filePath && saveType) {
-      saveRefMap[filePath] = {
+      recentSaves[filePath] = {
         filePath,
         saveType,
         game,
         trainerName,
         trainerID,
+        lastOpened: parseInt(lastOpened)
       };
     }
   });
-  return saveRefMap;
+  return recentSaves;
 }
 
-export function addSaveRef(save: SaveRef) {
+function writeRecentSaves(recentSaves: SaveRefMap) {
   const appDataPath = app.getPath('appData');
-  const saveRefMap = loadSaveRefs();
-  saveRefMap[save.filePath] = save;
-  const newLookupString = Object.values(saveRefMap)
+  const newCSVString = Object.values(recentSaves)
     .map((saveRef, i) => {
-      return `${saveRef.filePath},${SaveType[saveRef.saveType]},${
-        saveRef.game ?? ''
-      },${saveRef.trainerName},${saveRef.trainerID}\n`;
+      return `${encodeURIComponent(saveRef.filePath)},${
+        SaveType[saveRef.saveType]
+      },${saveRef.game ?? ''},${saveRef.trainerName},${saveRef.trainerID},${
+        saveRef.lastOpened ?? Date.now()
+      }\n`;
     })
     .join('');
   fs.writeFileSync(
     `${appDataPath}/OpenHome/storage/saveFiles.csv`,
-    newLookupString
+    newCSVString
   );
+}
+
+export function addRecentSave(save: SaveRef) {
+  const saveRefMap = loadRecentSaves();
+  saveRefMap[save.filePath] = save;
+  writeRecentSaves(saveRefMap);
+}
+
+export function removeRecentSave(filePath: string) {
+  const saveRefMap = loadRecentSaves();
+  delete saveRefMap[encodeURIComponent(filePath)];
+  writeRecentSaves(saveRefMap);
 }
 
 const SaveTypeStrings: { [key: string]: SaveType } = {
@@ -119,4 +138,5 @@ const SaveTypeStrings: { [key: string]: SaveType } = {
   DP: SaveType.DP,
   Pt: SaveType.Pt,
   HGSS: SaveType.HGSS,
+  G5: SaveType.G5,
 };

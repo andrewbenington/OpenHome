@@ -7,7 +7,7 @@ import {
   getMonGen12Identifier,
   getMonGen345Identifier,
 } from '../../util/Lookup';
-import { SaveType } from '../../types/types';
+import { SaveType, StringToStringMap } from '../../types/types';
 import { DPSAV } from './DPSAV';
 import { G1SAV } from './G1SAV';
 import { G2SAV } from './G2SAV';
@@ -25,16 +25,16 @@ const SIZE_GEN45 = 0x80000;
 export const buildSaveFile = (
   filePath: string,
   fileBytes: Uint8Array,
-  saveType: SaveType,
   lookupMaps: {
-    homeMonMap?: { [key: string]: OHPKM } | undefined;
-    gen12LookupMap?: { [key: string]: string } | undefined;
-    gen345LookupMap?: { [key: string]: string } | undefined;
+    homeMonMap?: { [key: string]: OHPKM };
+    gen12LookupMap?: StringToStringMap;
+    gen345LookupMap?: StringToStringMap;
     fileCreatedDate?: Date;
   }
 ): SAV | undefined => {
   const { homeMonMap, gen12LookupMap, gen345LookupMap, fileCreatedDate } =
     lookupMaps;
+  const saveType = getSaveType(fileBytes);
   let saveFile;
   switch (saveType) {
     case SaveType.RBY_I:
@@ -106,9 +106,15 @@ export const buildSaveFile = (
       );
       break;
     case SaveType.G5:
-      saveFile = new G5SAV(filePath, fileBytes);
+      saveFile = recoverOHPKMData(
+        new G5SAV(filePath, fileBytes),
+        getMonGen345Identifier,
+        homeMonMap,
+        gen345LookupMap
+      );
       break;
   }
+  console.log(saveFile);
   return saveFile;
 };
 
@@ -144,7 +150,7 @@ export const getSaveType = (bytes: Uint8Array): SaveType => {
   } else if (bytes.length >= SIZE_GEN3) {
     console.log('gen 3');
     const valueAtAC = bytesToUint32LittleEndian(bytes, 0xac);
-    console.log(valueAtAC)
+    console.log(valueAtAC);
     switch (valueAtAC) {
       case 1:
         return SaveType.FRLG;
@@ -177,10 +183,10 @@ const recoverOHPKMData = (
   homeMonMap?: { [key: string]: OHPKM },
   lookupMap?: { [key: string]: string }
 ) => {
-  console.log(saveFile, getIdentifier, homeMonMap, lookupMap)
+  console.log(saveFile, getIdentifier, homeMonMap, lookupMap);
   if (!homeMonMap || !lookupMap || !getIdentifier) {
-    return saveFile
-  };
+    return saveFile;
+  }
   saveFile.boxes.forEach((box, boxIndex) => {
     box.pokemon.forEach((mon, monIndex) => {
       if (mon) {
