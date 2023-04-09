@@ -5,7 +5,7 @@ import { isAlola, isGen6 } from 'consts';
 import Countries from 'consts/Countries';
 import Types from 'consts/Types';
 import _ from 'lodash';
-import { OHPKM, PK1, PK2, PK3, PK4, PKM } from 'types/PKMTypes';
+import { OHPKM, PK1, PK2, PK3, PK4, PK5, PKM } from 'types/PKMTypes';
 import { G2SAV } from 'types/SAVTypes/G2SAV';
 import { HGSSSAV } from 'types/SAVTypes/HGSSSAV';
 import { isRestricted } from 'types/TransferRestrictions';
@@ -343,8 +343,8 @@ const OtherDisplay = (props: { mon: PKM }) => {
         <div />
       )}
       {!isRestricted(HGSSSAV.TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
-      (mon instanceof PK3 || mon instanceof PK4 || mon instanceof OHPKM) ? (
-        <AttributeRow label="Gen 3/4 ID" value={getMonGen345Identifier(mon)} />
+      (mon instanceof PK3 || mon instanceof PK4 || mon instanceof PK5 ||  mon instanceof OHPKM) ? (
+        <AttributeRow label="Gen 3/4/5 ID" value={getMonGen345Identifier(mon)} />
       ) : (
         <div />
       )}
