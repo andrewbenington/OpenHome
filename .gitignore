@@ -13,6 +13,7 @@
 /out
 /release/app/dist
 /release/build
+/resources
 
 # misc
 .DS_Store

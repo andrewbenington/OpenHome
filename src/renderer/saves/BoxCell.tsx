@@ -1,8 +1,9 @@
-import BoxIcons from '../images/icons/BoxIcons.png'
+import BoxIcons from '../images/icons/BoxIcons.png';
 import React, { useEffect, useState } from 'react';
-import { POKEMON_DATA } from '../../consts/Mons';
 import { PKM } from '../../types/PKMTypes/PKM';
 import { acceptableExtensions, bytesToPKM } from '../../util/FileImport';
+import { useResourcesPath } from 'renderer/redux/selectors';
+import { POKEMON_DATA } from 'consts';
 
 interface BoxCellProps {
   onClick: () => void;
@@ -15,7 +16,8 @@ interface BoxCellProps {
 
 const BoxCell = (props: BoxCellProps) => {
   const { onClick, onDragEvent, onDrop, disabled, zIndex, mon } = props;
-  const [dragImage, setDragImage] = useState<HTMLElement>();
+  const [dragImage, setDragImage] = useState<Element>();
+  const resourcesPath = useResourcesPath();
 
   const handleDrop: React.DragEventHandler<HTMLDivElement> = (e) => {
     if (e.dataTransfer.files[0]) {
@@ -33,7 +35,9 @@ const BoxCell = (props: BoxCellProps) => {
         backgroundColor: '#555',
       };
     } else {
-      return {};
+      return {
+        backgroundColor: '#0000',
+      };
     }
   };
 
@@ -76,13 +80,75 @@ const BoxCell = (props: BoxCellProps) => {
     >
       {mon ? (
         <div
-          draggable
-          onDragStart={(e) => {
-            if (mon) {
-              const dragIcon = document.getElementById('drag-image');
-              const div = document.getElementById('drag-image-container');
-              if (!dragIcon || !div) return;
-              dragIcon.style.backgroundPosition =
+          style={{
+            width: '100%',
+            height: '100%',
+          }}
+        >
+          <div
+            draggable
+            onDragStart={(e) => {
+              if (mon) {
+                // const dragIcon = document.getElementById('drag-image');
+                // const div = document.getElementById('drag-image-container');
+                // if (!dragIcon || !div) return;
+                // dragIcon.style.backgroundPosition =
+                //   mon.isEgg || !POKEMON_DATA[mon.dexNum]
+                //     ? '0% 0%'
+                //     : `${
+                //         (POKEMON_DATA[mon.dexNum].formes[mon.formNum]
+                //           .spriteIndex[0] /
+                //           36) *
+                //         100
+                //       }% ${
+                //         (Math.floor(
+                //           POKEMON_DATA[mon.dexNum].formes[mon.formNum]
+                //             .spriteIndex[1]
+                //         ) /
+                //           35) *
+                //         100
+                //       }%`;
+                // const imageFile = require(`../images/icons/BoxIcons/${
+                //   POKEMON_DATA[mon.dexNum].formes[mon.formNum].sprite
+                // }.png`);
+                // const dimension = window.outerWidth / 24 - 4;
+                // const img = document.getElementById(
+                //   'drag-image'
+                // ) as HTMLImageElement;
+                // if (!img) return;
+                // img.style.height = `${dimension}px`;
+                // img.style.width = `${dimension}px`;
+                // img.src = imageFile;
+                // img.onload = () => {
+                //   setDragImage(img);
+                //   e.dataTransfer.setDragImage(
+                //     img,
+                //     dimension / 2,
+                //     dimension / 2
+                //   );
+                // };
+              }
+              onDragEvent(false);
+            }}
+            onDragEnd={(e: { dataTransfer: any; target: any }) => {
+              if (dragImage) {
+                document.body.removeChild(dragImage);
+              }
+              console.log('onDragEnd', e);
+              // if not waiting for mon to show up in other slot, set drag image to
+              // undefined so it shows up in this one again
+              if (
+                e.dataTransfer.dropEffect !== 'copy'
+                // e.target.className !== 'pokemon_slot'
+              ) {
+                setDragImage(undefined);
+                onDragEvent(true);
+              }
+            }}
+            style={{
+              background: `url(${BoxIcons}) no-repeat 0.027027% 0.027027%`,
+              backgroundSize: '3700%',
+              backgroundPosition:
                 mon.isEgg || !POKEMON_DATA[mon.dexNum]
                   ? '0% 0%'
                   : `${
@@ -97,55 +163,19 @@ const BoxCell = (props: BoxCellProps) => {
                       ) /
                         35) *
                       100
-                    }%`;
-              const dimension = window.outerWidth / 24 - 4;
-              div.style.height = `${dimension}px`;
-              div.style.width = `${dimension}px`;
-              setDragImage(dragIcon);
-              e.dataTransfer.setDragImage(div, dimension / 2, dimension / 2);
-            }
-            onDragEvent(false);
-          }}
-          onDragEnd={(e: { dataTransfer: any; target: any }) => {
-            if (dragImage) {
-              dragImage.style.backgroundPosition = '0% 0%';
-            }
-            console.log("onDragEnd", e)
-            // if not waiting for mon to show up in other slot, set drag image to
-            // undefined so it shows up in this one again
-            if (
-              e.dataTransfer.dropEffect !== 'copy'
-              // e.target.className !== 'pokemon_slot'
-            ) {
-              setDragImage(undefined);
-              onDragEvent(true);
-            }
-          }}
-          style={{
-            background: `url(${BoxIcons}) no-repeat 0.027027% 0.027027%`,
-            backgroundSize: '3700%',
-            backgroundPosition:
-              mon.isEgg || !POKEMON_DATA[mon.dexNum]
-                ? '0% 0%'
-                : `${
-                    (POKEMON_DATA[mon.dexNum].formes[mon.formNum]
-                      .spriteIndex[0] /
-                      36) *
-                    100
-                  }% ${
-                    (Math.floor(
-                      POKEMON_DATA[mon.dexNum].formes[mon.formNum]
-                        .spriteIndex[1]
-                    ) /
-                      35) *
-                    100
-                  }%`,
-            ...getBackgroundDetails(),
-            height: '100%',
-            width: '100%',
-            opacity: dragImage ? 0 : 1,
-          }}
-        />
+                    }%`,
+              ...getBackgroundDetails(),
+              height: '100%',
+              width: '100%',
+              opacity: dragImage ? 0 : 1,
+              // boxShadow: '0px 0px 20px 5px #0ff',
+              zIndex: 100,
+              top: 0,
+              left: 0,
+              position: 'absolute',
+            }}
+          />
+        </div>
       ) : (
         <div
           className="pokemon_slot"

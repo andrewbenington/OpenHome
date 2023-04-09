@@ -27,9 +27,9 @@ export class G5SAV extends SAV {
   trainerDataOffset: number = 0x19400;
   boxes: Array<G5Box>;
   saveType = SaveType.G5;
-  checksumMirrorsOffset: number = 0x23f00
-  checksumMirrorsSize: number = 0x8c
-  checksumMirrorsChecksumOffset: number = 0x23f9a
+  checksumMirrorsOffset: number = 0x23f00;
+  checksumMirrorsSize: number = 0x8c;
+  checksumMirrorsChecksumOffset: number = 0x23f9a;
   constructor(path: string, bytes: Uint8Array) {
     super(path, bytes);
     this.name = gen5StringToUTF(
@@ -45,12 +45,13 @@ export class G5SAV extends SAV {
       this.bytes,
       this.trainerDataOffset + 0x16
     );
+    this.currentPCBox = this.bytes[0];
     this.displayID = this.tid.toString().padStart(5, '0');
     this.origin = this.bytes[this.trainerDataOffset + 0x1f];
     if (this.origin >= GameOfOrigin.White2) {
-      this.checksumMirrorsOffset = 0x25f00
-      this.checksumMirrorsSize = 0x94
-      this.checksumMirrorsChecksumOffset = 0x25fa2
+      this.checksumMirrorsOffset = 0x25f00;
+      this.checksumMirrorsSize = 0x94;
+      this.checksumMirrorsChecksumOffset = 0x25fa2;
     }
     this.boxes = Array(24);
     for (let box = 0; box < 24; box++) {
@@ -115,7 +116,9 @@ export class G5SAV extends SAV {
       this.checksumMirrorsSize
     );
     console.log(
-      `mirrors old: ${oldChecksum.toString(16).padStart(4, '0')}, mirrors new: ${newChecksum
+      `mirrors old: ${oldChecksum
+        .toString(16)
+        .padStart(4, '0')}, mirrors new: ${newChecksum
         .toString(16)
         .padStart(4, '0')}`
     );
@@ -123,7 +126,7 @@ export class G5SAV extends SAV {
       uint16ToBytesLittleEndian(newChecksum),
       this.checksumMirrorsChecksumOffset
     );
-  }
+  };
 
   prepareBoxesForSaving() {
     const changedMonPKMs: OHPKM[] = [];
@@ -156,7 +159,7 @@ export class G5SAV extends SAV {
     _.uniq(this.changedMons.map((coords) => coords.box)).forEach((boxIndex) =>
       this.updateBoxChecksum(boxIndex)
     );
-    this.updateMirrorsChecksum()
+    this.updateMirrorsChecksum();
     return changedMonPKMs;
   }
 }

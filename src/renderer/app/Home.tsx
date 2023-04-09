@@ -37,6 +37,7 @@ import {
 } from '../util/ipcFunctions';
 import Themes, { OpenHomeTheme } from './Themes';
 import { loadRecentSaves } from 'renderer/redux/slices/recentSavesSlice';
+import { loadResourcesPath } from 'renderer/redux/slices/resourcesSlice';
 
 const Home = () => {
   const { palette } = useTheme();
@@ -140,6 +141,7 @@ const Home = () => {
       dispatch(loadGen12Lookup()),
       dispatch(loadGen345Lookup()),
       dispatch(loadRecentSaves()),
+      dispatch(loadResourcesPath()),
     ]).then(() => setLoadingMessage(undefined));
   }, []);
 

@@ -18,6 +18,7 @@ import {
 import writePKMToFile, { deleteOHPKMFile } from './writePKMToFile';
 import fs from 'fs';
 import { StringToStringMap } from 'types/types';
+import path from 'path';
 
 function initListeners() {
   ipcMain.on('write-ohpkm', async (_, bytes: Uint8Array) => {
@@ -128,6 +129,10 @@ function initListeners() {
   ipcMain.on('write-save-file', async (_, { bytes, path }) => {
     console.log('writing', path);
     fs.writeFileSync(path, bytes);
+  });
+
+  ipcMain.handle('get-resources-path', (event) => {
+    return app.isPackaged ? path.join(process.resourcesPath, 'resources') : path.join(app.getAppPath() + 'resources');
   });
 }
 

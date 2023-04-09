@@ -19,6 +19,7 @@ import {
   selectRecentSaves,
   upsertRecentSave,
 } from './slices/recentSavesSlice';
+import { selectResourcesPath } from './slices/resourcesSlice';
 
 export const useSaves = () => useAppSelector(selectSaves);
 export const useHomeData = () => useAppSelector(selectHomeData);
@@ -50,6 +51,8 @@ export const useLookupMaps = (): LookupMapsHook => [
   useAppSelector(selectGen12Lookup),
   useAppSelector(selectGen345Lookup),
 ];
+
+export const useResourcesPath = () => useAppSelector(selectResourcesPath);
 
 type LookupMapsHook = [
   { [key: string]: OHPKM } | undefined,

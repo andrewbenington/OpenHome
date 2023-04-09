@@ -1672,7 +1672,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "pikachu-starter",
+        "sprite": "pikachu",
         "spriteIndex": [33, 0]
       },
       {
@@ -7955,7 +7955,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "eevee-starter",
+        "sprite": "eevee",
         "spriteIndex": [1, 5]
       }
     ],
