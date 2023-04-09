@@ -202,7 +202,7 @@ export class PK7 extends PKM {
   }
 
   public get displayID() {
-    return bytesToUint32LittleEndian(this.bytes, 0x0c) % 1000000;
+    return (isAlola(this.gameOfOrigin) || this.gameOfOrigin >= GameOfOrigin.LetsGoPikachu) ? bytesToUint32LittleEndian(this.bytes, 0x0c) % 1000000 : this.trainerID;
   }
 
   public get level() {
