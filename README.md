@@ -19,13 +19,13 @@ The extra Champion Ribbon in Emerald is a debugging oversight. The 0hp in Blue i
 - PK4
 - PK5
 - PK6
+- PK7
 
 #### Partially supported PKM import formats
 Importing these formats may be lossy when it comes to more obscure aspects of the original pokemon. Development is ongoing.
 
 - COLOPKM
 - XDPKM
-- PK7
 - PB7
 - PK8
 - PA8
