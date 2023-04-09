@@ -106,7 +106,7 @@ const Home = () => {
     let file = e.dataTransfer.files[0];
     let mon = dragMon;
     if (!file && dragSource) {
-      if (mon && type === 'trash') {
+      if (mon && type === 'release') {
         dispatchDeleteMon(dragSource);
         dispatchCancelDrag();
         if (mon instanceof OHPKM) {
@@ -310,9 +310,9 @@ const Home = () => {
             onDragOver={(e) => {
               e.preventDefault();
             }}
-            onDrop={(e) => onViewDrop(e, 'trash')}
+            onDrop={(e) => onViewDrop(e, 'release')}
           >
-            TRASH
+            RELEASE
           </div>
         </button>
       </div>
