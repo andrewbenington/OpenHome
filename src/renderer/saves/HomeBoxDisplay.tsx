@@ -1,60 +1,86 @@
 import { Card, Grid, useTheme } from '@mui/material';
 import _ from 'lodash';
+import { useEffect } from 'react';
+import { useAppDispatch } from 'renderer/redux/hooks';
+import { useHomeData } from 'renderer/redux/selectors';
+import {
+  completeDrag,
+  importMons,
+  startDrag,
+} from 'renderer/redux/slices/appSlice';
 import { PKM } from 'types/PKMTypes/PKM';
-import { HomeBox } from '../../types/SAVTypes/HomeData';
+import { SaveCoordinates } from 'types/types';
 import BoxCell from './BoxCell';
 
 interface HomeBoxDisplayProps {
-  box: HomeBox;
-  setBox: (box: HomeBox) => void;
   setSelectedMon: (mon: PKM | undefined) => void;
-  setDragSource: (index?: number) => void;
-  setDragDest: (index: number) => void;
-  onImport: (importedMons: PKM[], index: number) => void;
 }
 
 const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
+  const data = useHomeData();
   const theme = useTheme();
-  const { box, setSelectedMon, setDragSource, setDragDest, onImport } = props;
+  const { setSelectedMon } = props;
+
+  const dispatch = useAppDispatch();
+  const dispatchStartDrag = (source: SaveCoordinates) =>
+    dispatch(startDrag(source));
+  const dispatchCompleteDrag = (dest: SaveCoordinates) =>
+    dispatch(completeDrag(dest));
+  const dispatchImportMons = (mons: PKM[], saveCoordinates: SaveCoordinates) =>
+    dispatch(importMons({ mons, saveCoordinates }));
 
   return (
-    <Card
-      style={{
-        borderRadius: 5,
-        backgroundColor: theme.palette.secondary.main,
-        width: '100%',
-        height: 'fit-content',
-      }}
-    >
-      {_.range(10).map((row: number) => (
-        <Grid container key={`pc_row_${row}`}>
-          {_.range(12).map((rowIndex: number) => {
-            const mon = box.pokemon[row * 12 + rowIndex];
-            const currentBox = 0;
-            return (
-              <Grid item xs={1} style={{ padding: '2px 2px 0px 2px' }}>
-                <BoxCell
-                  onClick={() => setSelectedMon(mon)}
-                  onDragEvent={(cancelled) =>
-                    setDragSource(cancelled ? undefined : row * 12 + rowIndex)
-                  }
-                  mon={mon}
-                  zIndex={10 - row}
-                  onDrop={(importedMons) => {
-                    if (importedMons) {
-                      onImport(importedMons, row * 12 + rowIndex);
-                    } else {
-                      setDragDest(row * 12 + rowIndex);
+    data.boxes[0] && (
+      <Card
+        style={{
+          borderRadius: 5,
+          backgroundColor: theme.palette.secondary.main,
+          width: '100%',
+          height: 'fit-content',
+        }}
+      >
+        {_.range(10).map((row: number) => (
+          <Grid container key={`pc_row_${row}`}>
+            {_.range(12).map((rowIndex: number) => {
+              const mon =
+                data.boxes[data.currentPCBox].pokemon[row * 12 + rowIndex];
+              return (
+                <Grid item xs={1} style={{ padding: '2px 2px 0px 2px' }}>
+                  <BoxCell
+                    onClick={() => setSelectedMon(mon)}
+                    onDragEvent={(cancelled) =>
+                      dispatchStartDrag({
+                        saveNumber: -1,
+                        box: data.currentPCBox,
+                        index: row * 12 + rowIndex,
+                      })
                     }
-                  }}
-                  disabled={false}
-                />
-              </Grid>
-            );
-          })}
-        </Grid>
-      ))}
-    </Card>
+                    mon={mon}
+                    zIndex={10 - row}
+                    onDrop={(importedMons) => {
+                      if (importedMons) {
+                        dispatchImportMons(importedMons, {
+                          saveNumber: -1,
+                          box: data.currentPCBox,
+                          index: row * 12 + rowIndex,
+                        });
+                      } else {
+                        dispatchCompleteDrag({
+                          saveNumber: -1,
+                          box: data.currentPCBox,
+                          index: row * 12 + rowIndex,
+                        });
+                      }
+                    }}
+                    disabled={false}
+                  />
+                </Grid>
+              );
+            })}
+          </Grid>
+        ))}
+      </Card>
+    )
   );
 };
 

@@ -1,19 +1,18 @@
 import { ArrowForwardIosSharp } from '@mui/icons-material';
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
-import { GameOfOrigin, isAlola, isGen6, isGen7 } from 'consts';
+import { isAlola, isGen6 } from 'consts';
 import Countries from 'consts/Countries';
 import Types from 'consts/Types';
 import _ from 'lodash';
 import { OHPKM, PK1, PK2, PK3, PK4, PKM } from 'types/PKMTypes';
-import { getSixDigitTID } from 'types/PKMTypes/util';
 import { G2SAV } from 'types/SAVTypes/G2SAV';
 import { HGSSSAV } from 'types/SAVTypes/HGSSSAV';
 import { isRestricted } from 'types/TransferRestrictions';
 import {
   getMonFileIdentifier,
   getMonGen12Identifier,
-  getMonGen34Identifier,
+  getMonGen345Identifier,
 } from 'util/Lookup';
 import Alpha from '../images/icons/Alpha.png';
 import GMax from '../images/icons/GMax.png';
@@ -345,7 +344,7 @@ const OtherDisplay = (props: { mon: PKM }) => {
       )}
       {!isRestricted(HGSSSAV.TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
       (mon instanceof PK3 || mon instanceof PK4 || mon instanceof OHPKM) ? (
-        <AttributeRow label="Gen 3/4 ID" value={getMonGen34Identifier(mon)} />
+        <AttributeRow label="Gen 3/4 ID" value={getMonGen345Identifier(mon)} />
       ) : (
         <div />
       )}

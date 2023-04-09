@@ -1,4 +1,5 @@
-export type Dictionary = { [index: string]: any };
+export type StringToStringMap = { [key: string]: string };
+export type KeyValuePairList = { key: string; value: string }[];
 export type Stat = 'HP' | 'Atk' | 'Def' | 'SpA' | 'SpD' | 'Spe' | 'Sp';
 export type Type =
   | 'Fire'
@@ -163,4 +164,10 @@ export type Move = {
   id: number;
 };
 
-export type GameLocations = { [key: number]: string[] }
+export type GameLocations = { [key: number]: string[] };
+
+export interface SaveCoordinates {
+  saveNumber: number; // -1 means OpenHome
+  box: number;
+  index: number;
+}
