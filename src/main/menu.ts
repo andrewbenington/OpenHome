@@ -96,7 +96,8 @@ export default class MenuBuilder {
           label: 'Save',
           accelerator: 'CmdOrCtrl+S',
           click() {
-            mainWindow?.webContents.send('save');
+            const shouldSave = dialog.showMessageBoxSync({ message: "Save changes to OpenHome and all game saves?", buttons: ["Cancel", "Save"], title: "Save Changes", detail: "Pokémon in the 'Release' area will be lost permanently." })
+            if (shouldSave) { mainWindow?.webContents.send('save'); }
           },
         },
         {
@@ -128,60 +129,63 @@ export default class MenuBuilder {
     const subMenuEdit: DarwinMenuItemConstructorOptions = {
       label: 'Edit',
       submenu: [
-        { label: 'Cut', accelerator: 'Command+X', selector: 'cut:' },
-        { label: 'Copy', accelerator: 'Command+C', selector: 'copy:' },
-        { label: 'Paste', accelerator: 'Command+V', selector: 'paste:' },
-      ],
+        { role: 'cut' },
+        { role: 'copy' },
+        { role: 'paste' },
+        ...(isMac ? [
+          { role: 'pasteAndMatchStyle' },
+          { type: 'separator' },
+          {
+            label: 'Speech',
+            submenu: [
+              { role: 'startSpeaking' },
+              { role: 'stopSpeaking' }
+            ]
+          }
+        ] as DarwinMenuItemConstructorOptions[] : [
+        ])
+      ]
     };
     const subMenuViewDev: MenuItemConstructorOptions = {
       label: 'View',
       submenu: [
-        {
-          label: 'Reload',
-          accelerator: 'Command+R',
-          click: () => {
-            this.mainWindow.webContents.reload();
-          },
-        },
-        {
-          label: 'Toggle Full Screen',
-          accelerator: 'Ctrl+Command+F',
-          click: () => {
-            this.mainWindow.setFullScreen(!this.mainWindow.isFullScreen());
-          },
-        },
-        {
-          label: 'Toggle Developer Tools',
-          accelerator: 'Alt+Command+I',
-          click: () => {
-            this.mainWindow.webContents.toggleDevTools();
-          },
-        },
+        { role: 'reload' },
+        { role: 'forceReload' },
+        { role: 'toggleDevTools' },
+        { type: 'separator' },
+        { role: 'resetZoom' },
+        { role: 'zoomIn' },
+        { role: 'zoomOut' },
+        { type: 'separator' },
+        { role: 'togglefullscreen' }
       ],
     };
     const subMenuViewProd: MenuItemConstructorOptions = {
       label: 'View',
       submenu: [
-        {
-          label: 'Toggle Full Screen',
-          accelerator: 'Ctrl+Command+F',
-          click: () => {
-            this.mainWindow.setFullScreen(!this.mainWindow.isFullScreen());
-          },
-        },
+        { role: 'reload' },
+        { role: 'forceReload' },
+        { type: 'separator' },
+        { role: 'resetZoom' },
+        { role: 'zoomIn' },
+        { role: 'zoomOut' },
+        { type: 'separator' },
+        { role: 'togglefullscreen' }
       ],
     };
     const subMenuWindow: DarwinMenuItemConstructorOptions = {
       label: 'Window',
       submenu: [
-        {
-          label: 'Minimize',
-          accelerator: 'Command+M',
-          selector: 'performMiniaturize:',
-        },
-        { label: 'Close', accelerator: 'Command+W', selector: 'performClose:' },
-        { type: 'separator' },
-        { label: 'Bring All to Front', selector: 'arrangeInFront:' },
+        { role: 'minimize' },
+        { role: 'zoom' },
+        ...(isMac ? [
+          { type: 'separator' },
+          { role: 'front' },
+          { type: 'separator' },
+          { role: 'window' }
+        ] as DarwinMenuItemConstructorOptions[] : [
+          { role: 'close' as 'close' }
+        ])
       ],
     };
     const subMenuHelp: MenuItemConstructorOptions = {
@@ -198,7 +202,7 @@ export default class MenuBuilder {
 
     const subMenuView =
       process.env.NODE_ENV === 'development' ||
-      process.env.DEBUG_PROD === 'true'
+        process.env.DEBUG_PROD === 'true'
         ? subMenuViewDev
         : subMenuViewProd;
 
@@ -210,120 +214,5 @@ export default class MenuBuilder {
       subMenuWindow,
       subMenuHelp,
     ];
-  }
-
-  buildDefaultTemplate() {
-    const templateDefault = [
-      {
-        label: '&File',
-        submenu: [
-          {
-            label: '&Save',
-            accelerator: 'Ctrl+S',
-            click: () => {
-              this.mainWindow.webContents.send('save');
-            },
-          },
-          {
-            label: '&Reset',
-            accelerator: 'Ctrl+X',
-            click: () => {
-              this.mainWindow.webContents.send('reset');
-            },
-          },
-          {
-            label: '&Reset And Close Saves',
-            accelerator: 'Shift+Ctrl+X',
-            click: () => {
-              this.mainWindow.webContents.send('reset-close');
-            },
-          },
-          {
-            label: '&Import PKMs',
-            accelerator: 'Ctrl+I',
-            click() {
-              dialog.showMessageBox({
-                message: 'Drag the PKM file(s) you wish to import into a box.',
-              });
-            },
-          },
-        ],
-      },
-      {
-        label: '&View',
-        submenu:
-          process.env.NODE_ENV === 'development' ||
-          process.env.DEBUG_PROD === 'true'
-            ? [
-                {
-                  label: '&Reload',
-                  accelerator: 'Ctrl+R',
-                  click: () => {
-                    this.mainWindow.webContents.reload();
-                  },
-                },
-                {
-                  label: 'Toggle &Full Screen',
-                  accelerator: 'F11',
-                  click: () => {
-                    this.mainWindow.setFullScreen(
-                      !this.mainWindow.isFullScreen()
-                    );
-                  },
-                },
-                {
-                  label: 'Toggle &Developer Tools',
-                  accelerator: 'Alt+Ctrl+I',
-                  click: () => {
-                    this.mainWindow.webContents.toggleDevTools();
-                  },
-                },
-              ]
-            : [
-                {
-                  label: 'Toggle &Full Screen',
-                  accelerator: 'F11',
-                  click: () => {
-                    this.mainWindow.setFullScreen(
-                      !this.mainWindow.isFullScreen()
-                    );
-                  },
-                },
-              ],
-      },
-      {
-        label: 'Help',
-        submenu: [
-          {
-            label: 'Learn More',
-            click() {
-              shell.openExternal('https://electronjs.org');
-            },
-          },
-          {
-            label: 'Documentation',
-            click() {
-              shell.openExternal(
-                'https://github.com/electron/electron/tree/main/docs#readme'
-              );
-            },
-          },
-          {
-            label: 'Community Discussions',
-            click() {
-              shell.openExternal('https://www.electronjs.org/community');
-            },
-          },
-          {
-            label: 'Search Issues',
-            click() {
-              shell.openExternal('https://github.com/electron/electron/issues');
-            },
-          },
-        ],
-      },
-    ];
-
-    return templateDefault;
   }
 }
