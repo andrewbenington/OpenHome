@@ -13,7 +13,13 @@ export class PtSAV extends G4SAV {
   origin = GameOfOrigin.Platinum;
   transferRestrictions = {
     maxDexNum: 493,
-    excludedForms: { ...RegionalForms, ...CapPikachus, 483: [1], 484: [1] },
+    excludedForms: {
+      ...RegionalForms,
+      ...CapPikachus,
+      483: [1],
+      484: [1],
+      493: [17],
+    },
   };
 
   static TRAINER_NAME_OFFSET = 0x68;

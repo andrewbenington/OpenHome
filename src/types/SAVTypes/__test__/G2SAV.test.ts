@@ -14,7 +14,6 @@ const crystalSaveFile = buildSaveFile(
   new Uint8Array(
     fs.readFileSync(path.join(__dirname, './SAVFiles', 'crystal.sav'))
   ),
-  SaveType.C_I,
   {}
 ) as G2SAV;
 
@@ -38,7 +37,6 @@ test('removing mon shifts others in box', () => {
   const modifiedSaveFile1 = buildSaveFile(
     '',
     new Uint8Array(crystalSaveFile.bytes),
-    SaveType.C_I,
     {}
   ) as G2SAV;
   modifiedSaveFile1.boxes[9].pokemon[0] = undefined;
@@ -48,7 +46,6 @@ test('removing mon shifts others in box', () => {
   const modifiedSaveFile2 = buildSaveFile(
     '',
     new Uint8Array(modifiedSaveFile1.bytes),
-    SaveType.C_I,
     {}
   ) as G2SAV;
   expect(modifiedSaveFile2.boxes[9].pokemon[0]?.nickname).toEqual('BELLOSSOM');
@@ -60,7 +57,6 @@ test('inserting mon works', () => {
   const modifiedSaveFile1 = buildSaveFile(
     '',
     new Uint8Array(crystalSaveFile.bytes),
-    SaveType.C_I,
     {}
   ) as G2SAV;
   modifiedSaveFile1.boxes[13].pokemon[17] = new PK2(slowpokeOH);
@@ -70,7 +66,6 @@ test('inserting mon works', () => {
   const modifiedSaveFile2 = buildSaveFile(
     '',
     new Uint8Array(modifiedSaveFile1.bytes),
-    SaveType.C_I,
     {}
   ) as G2SAV;
   expect(modifiedSaveFile2.boxes[13].pokemon[0]?.nickname).toEqual('UNOWN');

@@ -22,8 +22,8 @@ const electronHandler = {
       ipcRenderer.once(channel, (_event, ...args) => func(...args));
     },
     invoke(channel: Channels, args?: unknown[]) {
-      return ipcRenderer.invoke(channel, args)
-    }
+      return ipcRenderer.invoke(channel, args);
+    },
   },
 };
 

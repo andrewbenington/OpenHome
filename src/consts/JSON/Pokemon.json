@@ -11352,7 +11352,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "unown",
+        "sprite": "unown-a",
         "spriteIndex": [5, 7]
       },
       {
@@ -11386,7 +11386,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "unown",
+        "sprite": "unown-b",
         "spriteIndex": [6, 7]
       },
       {
@@ -11420,7 +11420,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "unown",
+        "sprite": "unown-c",
         "spriteIndex": [7, 7]
       },
       {
@@ -11454,7 +11454,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "unown",
+        "sprite": "unown-d",
         "spriteIndex": [8, 7]
       },
       {
@@ -11488,7 +11488,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "unown",
+        "sprite": "unown-e",
         "spriteIndex": [9, 7]
       },
       {
@@ -11522,7 +11522,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "unown",
+        "sprite": "unown-f",
         "spriteIndex": [10, 7]
       },
       {
@@ -11556,7 +11556,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "unown",
+        "sprite": "unown-g",
         "spriteIndex": [11, 7]
       },
       {
@@ -11590,7 +11590,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "unown",
+        "sprite": "unown-h",
         "spriteIndex": [12, 7]
       },
       {
@@ -11624,7 +11624,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "unown",
+        "sprite": "unown-i",
         "spriteIndex": [13, 7]
       },
       {
@@ -11658,7 +11658,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "unown",
+        "sprite": "unown-j",
         "spriteIndex": [14, 7]
       },
       {
@@ -11692,7 +11692,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "unown",
+        "sprite": "unown-k",
         "spriteIndex": [15, 7]
       },
       {
@@ -11726,7 +11726,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "unown",
+        "sprite": "unown-l",
         "spriteIndex": [16, 7]
       },
       {
@@ -11760,7 +11760,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "unown",
+        "sprite": "unown-m",
         "spriteIndex": [17, 7]
       },
       {
@@ -11794,7 +11794,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "unown",
+        "sprite": "unown-n",
         "spriteIndex": [18, 7]
       },
       {
@@ -11828,7 +11828,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "unown",
+        "sprite": "unown-o",
         "spriteIndex": [19, 7]
       },
       {
@@ -11862,7 +11862,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "unown",
+        "sprite": "unown-p",
         "spriteIndex": [20, 7]
       },
       {
@@ -45919,7 +45919,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "minior",
+        "sprite": "minior-meteor",
         "spriteIndex": [35, 27]
       },
       {
@@ -45953,7 +45953,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "minior",
+        "sprite": "minior-meteor",
         "spriteIndex": [35, 27]
       },
       {
@@ -45987,7 +45987,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "minior",
+        "sprite": "minior-meteor",
         "spriteIndex": [35, 27]
       },
       {
@@ -46021,7 +46021,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "minior",
+        "sprite": "minior-meteor",
         "spriteIndex": [35, 27]
       },
       {
@@ -46055,7 +46055,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "minior",
+        "sprite": "minior-meteor",
         "spriteIndex": [35, 27]
       },
       {
@@ -46089,7 +46089,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "minior",
+        "sprite": "minior-meteor",
         "spriteIndex": [35, 27]
       },
       {
@@ -46123,7 +46123,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "minior",
+        "sprite": "minior-meteor",
         "spriteIndex": [35, 27]
       },
       {
@@ -46157,7 +46157,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "minior",
+        "sprite": "minior-core-red",
         "spriteIndex": [35, 27]
       },
       {
@@ -46191,7 +46191,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "minior",
+        "sprite": "minior-core-orange",
         "spriteIndex": [35, 27]
       },
       {
@@ -46225,7 +46225,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "minior",
+        "sprite": "minior-core-yellow",
         "spriteIndex": [35, 27]
       },
       {
@@ -46259,7 +46259,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "minior",
+        "sprite": "minior-core-green",
         "spriteIndex": [35, 27]
       },
       {
@@ -46293,7 +46293,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "minior",
+        "sprite": "minior-core-blue",
         "spriteIndex": [35, 27]
       },
       {
@@ -46327,7 +46327,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "minior",
+        "sprite": "minior-core-indigo",
         "spriteIndex": [35, 27]
       },
       {
@@ -46361,7 +46361,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "minior",
+        "sprite": "minior-core-violet",
         "spriteIndex": [35, 27]
       }
     ],

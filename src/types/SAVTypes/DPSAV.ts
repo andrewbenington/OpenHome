@@ -22,6 +22,8 @@ export class DPSAV extends G4SAV {
       487: [1],
       // shaymin sky
       492: [1],
+      // arceus fairy
+      493: [17]
     },
   };
 

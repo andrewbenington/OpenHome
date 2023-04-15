@@ -18,6 +18,7 @@ export const CapPikachus: FormRestrictions = {
 export const AlolanForms: FormRestrictions = {
   19: [1],
   20: [1],
+  26: [1],
   27: [1],
   28: [1],
   37: [1],
@@ -40,7 +41,7 @@ export const GalarianForms: FormRestrictions = {
   77: [1],
   78: [1],
   79: [1],
-  80: [1],
+  80: [2],
   83: [1],
   110: [1],
   122: [1],
@@ -52,7 +53,7 @@ export const GalarianForms: FormRestrictions = {
   263: [1],
   264: [1],
   554: [1],
-  555: [1],
+  555: [2, 3],
   562: [1],
   618: [1],
 };
@@ -74,7 +75,7 @@ export const HisuianForms: FormRestrictions = {
   705: [1],
   706: [1],
   713: [1],
-  721: [1],
+  724: [1],
 };
 
 export const PaldeanForms: FormRestrictions = {

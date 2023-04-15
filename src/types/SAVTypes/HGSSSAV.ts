@@ -11,7 +11,7 @@ export class HGSSSAV extends G4SAV {
   saveType = SaveType.HGSS;
   static TRANSFER_RESTRICTIONS = {
     maxDexNum: 493,
-    excludedForms: { ...RegionalForms, ...CapPikachus, 483: [1], 484: [1] },
+    excludedForms: { ...RegionalForms, ...CapPikachus, 483: [1], 484: [1], 493: [17] },
   };
 
   transferRestrictions = HGSSSAV.TRANSFER_RESTRICTIONS;
