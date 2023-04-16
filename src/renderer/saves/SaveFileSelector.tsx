@@ -67,7 +67,7 @@ const SaveFileSelector = (props: SaveFileSelectorProps) => {
 
   const openSaveFile = async (filePath?: string) => {
     const { path, fileBytes, createdDate } =
-      await window.electron.ipcRenderer.invoke('read-save-file', [filePath]);
+      await window.electron.ipcRenderer.invoke('read-save-file', filePath && [filePath]);
     if (path && fileBytes && homeMonMap) {
       const saveFile = buildSaveFile(path, fileBytes, {
         homeMonMap,

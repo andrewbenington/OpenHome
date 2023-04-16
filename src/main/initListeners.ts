@@ -85,16 +85,12 @@ function initListeners() {
 
   ipcMain.handle('read-home-boxes', async (_, boxName) => {
     const appDataPath = app.getPath('appData');
-    const boxString = fs.readFileSync(
-      `${appDataPath}/OpenHome/storage/boxes/${boxName}.csv`,
+    const boxString = fs.readFileSync(path.join(appDataPath, "OpenHome", "storage", "boxes", `${boxName}.csv`),
       {
         encoding: 'utf8',
       }
     );
-    console.log(
-      `${appDataPath}/OpenHome/storage/boxes/${boxName}.csv`,
-      boxName
-    );
+    console.log(path.join(appDataPath, "OpenHome", "storage", "boxes", `${boxName}.csv`));
     const boxesMap: StringToStringMap = {};
     boxesMap[`${boxName}`] = boxString;
     return boxesMap;
@@ -103,7 +99,7 @@ function initListeners() {
   ipcMain.on('write-home-box', async (event, { boxName, boxString }) => {
     const appDataPath = app.getPath('appData');
     fs.writeFileSync(
-      `${appDataPath}/OpenHome/storage/boxes/${boxName}.csv`,
+      path.join(appDataPath, "OpenHome", "storage", "boxes", `${boxName}.csv`),
       boxString
     );
   });

@@ -88,46 +88,6 @@ const BoxCell = (props: BoxCellProps) => {
           <div
             draggable
             onDragStart={(e) => {
-              if (mon) {
-                // const dragIcon = document.getElementById('drag-image');
-                // const div = document.getElementById('drag-image-container');
-                // if (!dragIcon || !div) return;
-                // dragIcon.style.backgroundPosition =
-                //   mon.isEgg || !POKEMON_DATA[mon.dexNum]
-                //     ? '0% 0%'
-                //     : `${
-                //         (POKEMON_DATA[mon.dexNum].formes[mon.formNum]
-                //           .spriteIndex[0] /
-                //           36) *
-                //         100
-                //       }% ${
-                //         (Math.floor(
-                //           POKEMON_DATA[mon.dexNum].formes[mon.formNum]
-                //             .spriteIndex[1]
-                //         ) /
-                //           35) *
-                //         100
-                //       }%`;
-                // const imageFile = require(`../images/icons/BoxIcons/${
-                //   POKEMON_DATA[mon.dexNum].formes[mon.formNum].sprite
-                // }.png`);
-                // const dimension = window.outerWidth / 24 - 4;
-                // const img = document.getElementById(
-                //   'drag-image'
-                // ) as HTMLImageElement;
-                // if (!img) return;
-                // img.style.height = `${dimension}px`;
-                // img.style.width = `${dimension}px`;
-                // img.src = imageFile;
-                // img.onload = () => {
-                //   setDragImage(img);
-                //   e.dataTransfer.setDragImage(
-                //     img,
-                //     dimension / 2,
-                //     dimension / 2
-                //   );
-                // };
-              }
               onDragEvent(false);
             }}
             onDragEnd={(e: { dataTransfer: any; target: any }) => {
@@ -165,6 +125,7 @@ const BoxCell = (props: BoxCellProps) => {
                       100
                     }%`,
               ...getBackgroundDetails(),
+              imageRendering: 'crisp-edges',
               height: '100%',
               width: '100%',
               opacity: dragImage ? 0 : 1,

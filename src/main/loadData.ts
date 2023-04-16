@@ -7,15 +7,16 @@ import {
   StringToStringMap,
 } from '../types/types';
 import { readBytesFromFile } from './fileHandlers';
+import path from 'path';
 
 export function loadOHPKMs() {
   const appDataPath = app.getPath('appData');
-  const files = fs.readdirSync(`${appDataPath}/OpenHome/storage/mons`);
+  const files = fs.readdirSync(path.join(appDataPath, "OpenHome", "storage", "mons"));
   const monMap: { [key: string]: Uint8Array } = {};
   files.forEach((file) => {
     if (file.endsWith('.ohpkm')) {
       const bytes = readBytesFromFile(
-        `${appDataPath}/OpenHome/storage/mons/${file}`
+        path.join(appDataPath, "OpenHome", "storage", "mons", file)
       );
       if (bytes) {
         monMap[file.slice(0, file.length - 6)] = bytes;
@@ -29,7 +30,7 @@ export function loadLookup(fileName: string) {
   const appDataPath = app.getPath('appData');
   const lookupMap: { [key: string]: string } = {};
   const lookupFileString = fs
-    .readFileSync(`${appDataPath}/OpenHome/storage/lookup/${fileName}`)
+    .readFileSync(path.join(appDataPath, "OpenHome", "storage", "lookup", fileName))
     .toString();
   lookupFileString.split(/\r?\n/).forEach((entry) => {
     const [lookupString, monRef] = entry.split(',');
@@ -50,7 +51,7 @@ function writeLookup(fileName: string, lookupMap: StringToStringMap) {
     .join('');
   console.log('writing', fileName);
   fs.writeFileSync(
-    `${appDataPath}/OpenHome/storage/lookup/${fileName}`,
+    path.join(appDataPath, "OpenHome", "storage", "lookup", fileName),
     newCSVString
   );
 }
@@ -75,7 +76,7 @@ export function loadRecentSaves() {
   const appDataPath = app.getPath('appData');
   const recentSaves: SaveRefMap = {};
   const lookupFileString = fs
-    .readFileSync(`${appDataPath}/OpenHome/storage/saveFiles.csv`)
+    .readFileSync(path.join(appDataPath, "OpenHome", "storage", "saveFiles.csv"))
     .toString();
   lookupFileString.split(/\r?\n/).forEach((entry) => {
     let [filePath, saveTypeString, game, trainerName, trainerID, lastOpened] =
@@ -108,7 +109,7 @@ function writeRecentSaves(recentSaves: SaveRefMap) {
     })
     .join('');
   fs.writeFileSync(
-    `${appDataPath}/OpenHome/storage/saveFiles.csv`,
+    path.join(appDataPath, "OpenHome", "storage", "saveFiles.csv"),
     newCSVString
   );
 }
