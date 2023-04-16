@@ -6,15 +6,11 @@ import {
 } from '../../util/ByteLogic';
 import { gen4StringToUTF } from '../../util/Strings/StringConverter';
 import { G4SAV } from './G4SAV';
+import { HGSS_TRANSFER_RESTRICTIONS } from 'consts/TransferRestrictions';
 
 export class HGSSSAV extends G4SAV {
   saveType = SaveType.HGSS;
-  static TRANSFER_RESTRICTIONS = {
-    maxDexNum: 493,
-    excludedForms: { ...RegionalForms, ...CapPikachus, 483: [1], 484: [1], 493: [17] },
-  };
-
-  transferRestrictions = HGSSSAV.TRANSFER_RESTRICTIONS;
+  transferRestrictions = HGSS_TRANSFER_RESTRICTIONS;
 
   static TRAINER_NAME_OFFSET = 0x64;
   static TRAINER_ID_OFFSET = 0x74;

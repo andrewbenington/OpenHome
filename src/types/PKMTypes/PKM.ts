@@ -14,6 +14,7 @@ import {
   SpeedCharacteristics,
 } from '../../consts';
 import { getLocation } from '../../consts/MetLocation/MetLocation';
+import { NDex } from '../../consts/NationalDex';
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -1071,7 +1072,7 @@ export class PKM {
     let otherAbilityNum = other.abilityNum ?? 4;
     let i = 0;
     let newPersonalityValue = bigInt(this.personalityValue);
-    let shouldCheckUnown = other.dexNum === 201 && this.format === 'PK3';
+    let shouldCheckUnown = other.dexNum === NDex.UNOWN && this.format === 'PK3';
     while (i < 0x10000) {
       let newGender = getGen3To5Gender(
         newPersonalityValue.toJSNumber(),
@@ -1099,7 +1100,7 @@ export class PKM {
       i++;
       let pvBytes = uint32ToBytesLittleEndian(this.personalityValue);
       let pvLower16, pvUpper16;
-      if (other.dexNum === 201) {
+      if (other.dexNum === NDex.UNOWN) {
         pvLower16 = prng.nextInt(0, 0xffff);
         pvUpper16 = prng.nextInt(0, 0xffff);
         if (other.isShiny) {

@@ -1,8 +1,10 @@
 import { MenuItem, Select } from '@mui/material';
 import _ from 'lodash';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Themes from 'renderer/app/Themes';
+import { getSpritePath } from 'renderer/util/PokemonSprite';
 import { G1SAV, G2SAV, G3SAV, G5SAV, HGSSSAV } from 'types/SAVTypes';
+import { StringToStringMap } from 'types/types';
 import { POKEMON_DATA } from '../../consts/Mons';
 import {
   OHPKM,
@@ -19,9 +21,8 @@ import {
 import { getTypes } from '../../types/PKMTypes/util';
 import {
   Gen89RegionalForms,
-  isRestricted,
-  LA_TRANSFER_RESTRICTIONS,
   RegionalForms,
+  isRestricted,
 } from '../../types/TransferRestrictions';
 import OpenHomeButton from '../components/OpenHomeButton';
 import AttributeRow from './AttributeRow';
@@ -29,13 +30,23 @@ import OtherDisplay from './OtherDisplay';
 import PokemonWithItem from './PokemonWithItem';
 import RibbonsDisplay from './RibbonsDisplay';
 import StatsDisplay from './StatsDisplay';
+import SummaryDisplay from './SummaryDisplay';
 import {
   detailsPaneScrollContainerStyle,
   detailsPaneStyle,
   fileTypeChipStyle,
   tabButtonStyle,
 } from './styles';
-import SummaryDisplay from './SummaryDisplay';
+import {
+  BW2_TRANSFER_RESTRICTIONS,
+  GEN1_TRANSFER_RESTRICTIONS,
+  GEN2_TRANSFER_RESTRICTIONS,
+  GEN3_TRANSFER_RESTRICTIONS,
+  HGSS_TRANSFER_RESTRICTIONS,
+  LA_TRANSFER_RESTRICTIONS,
+  ORAS_TRANSFER_RESTRICTIONS,
+  USUM_TRANSFER_RESTRICTIONS,
+} from 'consts/TransferRestrictions';
 
 const getTypeFromString = (type: string) => {
   switch (type) {
@@ -68,6 +79,48 @@ const PokemonDisplay = (props: {
 }) => {
   const { mon, updateMon, tab, setTab } = props;
   const [displayMon, setDisplayMon] = useState(mon);
+  const [monSprites, setMonSprites] = useState<StringToStringMap>();
+
+  useEffect(() => {
+    console.log('useEffect import sprites');
+    let sprites: StringToStringMap = {};
+    const importSprite = async (format: string) => {
+      if (!(format in sprites)) {
+        const sprite = await import(
+          `../images/sprites/${getSpritePath(mon, format)}`
+        );
+        console.log('sprite imported:', sprite.default, format);
+        sprites[format] = sprite.default;
+      }
+    };
+    const importSprites = async () => {
+      // load first sprite first
+      await importSprite(mon.format);
+      setMonSprites(sprites);
+      await Promise.all([
+        importSprite('OHPKM'),
+        !isRestricted(GEN1_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
+          importSprite('PK1'),
+        !isRestricted(GEN2_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
+          importSprite('PK2'),
+        !isRestricted(GEN3_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
+          importSprite('PK3'),
+        !isRestricted(HGSS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
+          importSprite('PK4'),
+        !isRestricted(BW2_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
+          importSprite('PK5'),
+        !isRestricted(ORAS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
+          importSprite('PK6'),
+        !isRestricted(USUM_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
+          importSprite('PK7'),
+        !isRestricted(LA_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
+          importSprite('PA8'),
+      ]);
+      console.log(sprites);
+      setMonSprites(sprites);
+    };
+    importSprites();
+  }, [mon]);
 
   return (
     <div
@@ -101,69 +154,43 @@ const PokemonDisplay = (props: {
           <div />
         )}
         {mon.format === 'OHPKM' &&
-        !isRestricted(G1SAV.TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) ? (
+        !isRestricted(GEN1_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) ? (
           <MenuItem value="PK1">PK1</MenuItem>
         ) : (
           <div />
         )}
         {mon.format === 'OHPKM' &&
-        !isRestricted(G2SAV.TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) ? (
+        !isRestricted(GEN2_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) ? (
           <MenuItem value="PK2">PK2</MenuItem>
         ) : (
           <div />
         )}
         {mon.format === 'OHPKM' &&
-        !isRestricted(G3SAV.TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) ? (
+        !isRestricted(GEN3_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) ? (
           <MenuItem value="PK3">PK3</MenuItem>
         ) : (
           <div />
         )}
         {mon.format === 'OHPKM' &&
-        !isRestricted(
-          HGSSSAV.TRANSFER_RESTRICTIONS,
-          mon.dexNum,
-          mon.formNum
-        ) ? (
+        !isRestricted(HGSS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) ? (
           <MenuItem value="PK4">PK4</MenuItem>
         ) : (
           <div />
         )}
         {mon.format === 'OHPKM' &&
-        !isRestricted(G5SAV.TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) ? (
+        !isRestricted(BW2_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) ? (
           <MenuItem value="PK5">PK5</MenuItem>
         ) : (
           <div />
         )}
         {mon.format === 'OHPKM' &&
-        !isRestricted(
-          {
-            maxDexNum: 721,
-            excludedForms: {
-              ...RegionalForms,
-              483: [1],
-              484: [1],
-            },
-          },
-          mon.dexNum,
-          mon.formNum
-        ) ? (
+        !isRestricted(ORAS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) ? (
           <MenuItem value="PK6">PK6</MenuItem>
         ) : (
           <div />
         )}
         {mon.format === 'OHPKM' &&
-        !isRestricted(
-          {
-            maxDexNum: 807,
-            excludedForms: {
-              ...Gen89RegionalForms,
-              483: [1],
-              484: [1],
-            },
-          },
-          mon.dexNum,
-          mon.formNum
-        ) ? (
+        !isRestricted(USUM_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) ? (
           <MenuItem value="PK7">PK7</MenuItem>
         ) : (
           <div />
@@ -177,8 +204,8 @@ const PokemonDisplay = (props: {
       </Select>
       <PokemonWithItem
         mon={displayMon}
-        format={displayMon.format}
         style={{ width: '20%' }}
+        sprites={monSprites}
       />
       <div style={{ textAlign: 'left', width: '30%', marginTop: 10 }}>
         <AttributeRow
@@ -316,7 +343,7 @@ const PokemonDisplay = (props: {
   );
 };
 
-const fileTypeColors: { [key: string]: string } = {
+const fileTypeColors: StringToStringMap = {
   OHPKM: '#748fcd',
   PK1: '#b34',
   PK2: '#b6c',

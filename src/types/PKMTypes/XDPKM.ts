@@ -3,18 +3,19 @@ import { Gen3Items } from '../../consts/Items';
 import { GCLanguages } from '../../consts/Languages';
 import { POKEMON_DATA } from '../../consts/Mons';
 import { Gen3StandardRibbons } from '../../consts/Ribbons';
+import {
+  bytesToUint16BigEndian,
+  bytesToUint32BigEndian,
+} from '../../util/ByteLogic';
 import { gen3ToNational } from '../../util/ConvertPokemonID';
+import { getGen3To5Gender } from '../../util/GenderCalc';
 import {
   getHPGen3Onward,
   getLevelGen3Onward,
   getStatGen3Onward,
 } from '../../util/StatCalc';
-import {
-  bytesToUint16BigEndian,
-  bytesToUint32BigEndian,
-} from '../../util/ByteLogic';
-import { contestStats, PKM } from './PKM';
 import { utf16BytesToString } from '../../util/Strings/StringConverter';
+import { PKM, contestStats } from './PKM';
 
 export class XDPKM extends PKM {
   constructor(bytes: Uint8Array) {
@@ -23,6 +24,7 @@ export class XDPKM extends PKM {
     this.format = 'XDPKM';
     this.personalityValue = bytesToUint32BigEndian(bytes, 0x28);
     this.dexNum = gen3ToNational(bytesToUint16BigEndian(bytes, 0x00));
+    this.gender = getGen3To5Gender(this.personalityValue, this.dexNum);
     this.exp = bytesToUint32BigEndian(bytes, 0x20);
     this.level = getLevelGen3Onward(this.dexNum, this.exp);
     this.formNum = 0;

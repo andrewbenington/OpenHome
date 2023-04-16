@@ -126,6 +126,11 @@ export function removeRecentSave(filePath: string) {
   writeRecentSaves(saveRefMap);
 }
 
+export function loadImage(image: string) {
+  const filePath = path.join(app.getAppPath(), 'images', 'sprites', 'gen4', 'abomasnow.png')
+  return new URL(`file://${filePath}`).toString()
+}
+
 const SaveTypeStrings: { [key: string]: SaveType } = {
   RGBY_J: SaveType.RGBY_J,
   RBY_I: SaveType.RBY_I,

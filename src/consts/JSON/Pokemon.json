@@ -1052,7 +1052,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "rattata-alolan",
+        "sprite": "rattata-alola",
         "spriteIndex": [26, 0]
       }
     ],
@@ -1134,7 +1134,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "raticate-alolan",
+        "sprite": "raticate-alola",
         "spriteIndex": [28, 0]
       },
       {
@@ -1169,7 +1169,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "raticate-alolan",
+        "sprite": "raticate-alola",
         "spriteIndex": [28, 0]
       }
     ],
@@ -1601,7 +1601,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "pikachu-alolan-cap",
+        "sprite": "pikachu-alola-cap",
         "spriteIndex": [2, 1]
       },
       {
@@ -1790,7 +1790,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "raichu-alolan",
+        "sprite": "raichu-alola",
         "spriteIndex": [6, 1]
       }
     ],
@@ -1868,7 +1868,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "sandshrew-alolan",
+        "sprite": "sandshrew-alola",
         "spriteIndex": [8, 1]
       }
     ],
@@ -1948,7 +1948,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "sandslash-alolan",
+        "sprite": "sandslash-alola",
         "spriteIndex": [10, 1]
       }
     ],
@@ -2099,7 +2099,7 @@
         "isBattleOnly": false,
         "alias": "nidoranm",
         "types": ["Poison"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 1, "F": 0 },
         "baseStats": {
           "hp": 46,
           "atk": 57,
@@ -2142,7 +2142,7 @@
         "isBattleOnly": false,
         "alias": "nidorino",
         "types": ["Poison"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 1, "F": 0 },
         "baseStats": {
           "hp": 61,
           "atk": 72,
@@ -2186,7 +2186,7 @@
         "isBattleOnly": false,
         "alias": "nidoking",
         "types": ["Poison", "Ground"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 1, "F": 0 },
         "baseStats": {
           "hp": 81,
           "atk": 102,
@@ -2376,7 +2376,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "vulpix-alolan",
+        "sprite": "vulpix-alola",
         "spriteIndex": [20, 1]
       }
     ],
@@ -2456,7 +2456,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "ninetales-alolan",
+        "sprite": "ninetales-alola",
         "spriteIndex": [22, 1]
       }
     ],
@@ -3026,7 +3026,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "diglett-alolan",
+        "sprite": "diglett-alola",
         "spriteIndex": [35, 1]
       }
     ],
@@ -3112,7 +3112,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "dugtrio-alolan",
+        "sprite": "dugtrio-alola",
         "spriteIndex": [0, 2]
       }
     ],
@@ -3196,7 +3196,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "meowth-alolan",
+        "sprite": "meowth-alola",
         "spriteIndex": [2, 2]
       },
       {
@@ -3235,7 +3235,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "meowth-galarian",
+        "sprite": "meowth-galar",
         "spriteIndex": [3, 2]
       }
     ],
@@ -3321,7 +3321,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "persian-alolan",
+        "sprite": "persian-alola",
         "spriteIndex": [5, 2]
       }
     ],
@@ -4398,7 +4398,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "geodude-alolan",
+        "sprite": "geodude-alola",
         "spriteIndex": [30, 2]
       }
     ],
@@ -4480,7 +4480,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "graveler-alolan",
+        "sprite": "graveler-alola",
         "spriteIndex": [32, 2]
       }
     ],
@@ -4562,7 +4562,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "golem-alolan",
+        "sprite": "golem-alola",
         "spriteIndex": [34, 2]
       }
     ],
@@ -4642,7 +4642,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "ponyta-galarian",
+        "sprite": "ponyta-galar",
         "spriteIndex": [36, 2]
       }
     ],
@@ -4724,7 +4724,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "rapidash-galarian",
+        "sprite": "rapidash-galar",
         "spriteIndex": [1, 3]
       }
     ],
@@ -4814,7 +4814,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "slowpoke-galarian",
+        "sprite": "slowpoke-galar",
         "spriteIndex": [3, 3]
       }
     ],
@@ -4934,7 +4934,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "slowbro-galarian",
+        "sprite": "slowbro-galar",
         "spriteIndex": [6, 3]
       }
     ],
@@ -5104,7 +5104,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "farfetchd-galarian",
+        "sprite": "farfetchd-galar",
         "spriteIndex": [10, 3]
       }
     ],
@@ -5362,7 +5362,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "grimer-alolan",
+        "sprite": "grimer-alola",
         "spriteIndex": [16, 3]
       }
     ],
@@ -5448,7 +5448,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "muk-alolan",
+        "sprite": "muk-alola",
         "spriteIndex": [18, 3]
       }
     ],
@@ -6220,7 +6220,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "exeggutor-alolan",
+        "sprite": "exeggutor-alola",
         "spriteIndex": [36, 3]
       }
     ],
@@ -6348,7 +6348,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "marowak-alolan",
+        "sprite": "marowak-alola",
         "spriteIndex": [2, 4]
       },
       {
@@ -6383,7 +6383,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "marowak-alolan",
+        "sprite": "marowak-alola",
         "spriteIndex": [2, 4]
       }
     ],
@@ -6403,7 +6403,7 @@
         "isBattleOnly": false,
         "alias": "hitmonlee",
         "types": ["Fighting"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 1, "F": 0 },
         "baseStats": {
           "hp": 50,
           "atk": 120,
@@ -6447,7 +6447,7 @@
         "isBattleOnly": false,
         "alias": "hitmonchan",
         "types": ["Fighting"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 1, "F": 0 },
         "baseStats": {
           "hp": 50,
           "atk": 105,
@@ -6642,7 +6642,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "weezing-galarian",
+        "sprite": "weezing-galar",
         "spriteIndex": [8, 4]
       }
     ],
@@ -7238,7 +7238,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "mr-mime-galarian",
+        "sprite": "mr-mime-galar",
         "spriteIndex": [22, 4]
       }
     ],
@@ -7616,7 +7616,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "tauros-paldeafire",
+        "sprite": "tauros-paldea-fire",
         "spriteIndex": [31, 4]
       },
       {
@@ -7655,7 +7655,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "tauros-paldeawater",
+        "sprite": "tauros-paldea-water",
         "spriteIndex": [32, 4]
       }
     ],
@@ -8509,7 +8509,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "articuno-galarian",
+        "sprite": "articuno-galar",
         "spriteIndex": [14, 5]
       }
     ],
@@ -8590,7 +8590,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "zapdos-galarian",
+        "sprite": "zapdos-galar",
         "spriteIndex": [16, 5]
       }
     ],
@@ -8671,7 +8671,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "moltres-galarian",
+        "sprite": "moltres-galar",
         "spriteIndex": [18, 5]
       }
     ],
@@ -11268,7 +11268,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "slowking-galarian",
+        "sprite": "slowking-galar",
         "spriteIndex": [3, 7]
       }
     ],
@@ -13417,7 +13417,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "corsola-galarian",
+        "sprite": "corsola-galar",
         "spriteIndex": [22, 8]
       }
     ],
@@ -14046,7 +14046,7 @@
         "isBattleOnly": false,
         "alias": "tyrogue",
         "types": ["Fighting"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 1, "F": 0 },
         "baseStats": {
           "hp": 35,
           "atk": 35,
@@ -14093,7 +14093,7 @@
         "isBattleOnly": false,
         "alias": "hitmontop",
         "types": ["Fighting"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 1, "F": 0 },
         "baseStats": {
           "hp": 50,
           "atk": 95,
@@ -15404,7 +15404,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "zigzagoon-galarian",
+        "sprite": "zigzagoon-galar",
         "spriteIndex": [32, 9]
       }
     ],
@@ -15486,7 +15486,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "linoone-galarian",
+        "sprite": "linoone-galar",
         "spriteIndex": [34, 9]
       }
     ],
@@ -17817,7 +17817,7 @@
         "isBattleOnly": false,
         "alias": "volbeat",
         "types": ["Bug"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 1, "F": 0 },
         "baseStats": {
           "hp": 65,
           "atk": 73,
@@ -21184,7 +21184,7 @@
         "isBattleOnly": false,
         "alias": "latios",
         "types": ["Dragon", "Psychic"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 1, "F": 0 },
         "baseStats": {
           "hp": 80,
           "atk": 90,
@@ -21218,7 +21218,7 @@
         "isBattleOnly": true,
         "alias": "latiosmega",
         "types": ["Dragon", "Psychic"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 1, "F": 0 },
         "baseStats": {
           "hp": 80,
           "atk": 130,
@@ -23412,7 +23412,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "shellos",
+        "sprite": "shellos-west",
         "spriteIndex": [0, 15]
       },
       {
@@ -23453,7 +23453,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "shellos",
+        "sprite": "shellos-east",
         "spriteIndex": [1, 15]
       }
     ],
@@ -23499,7 +23499,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "gastrodon",
+        "sprite": "gastrodon-west",
         "spriteIndex": [2, 15]
       },
       {
@@ -23538,7 +23538,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "gastrodon",
+        "sprite": "gastrodon-east",
         "spriteIndex": [3, 15]
       }
     ],
@@ -25996,7 +25996,7 @@
         "isBattleOnly": true,
         "alias": "gallademega",
         "types": ["Psychic", "Fighting"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 1, "F": 0 },
         "baseStats": {
           "hp": 68,
           "atk": 165,
@@ -29726,7 +29726,7 @@
         "isBattleOnly": false,
         "alias": "throh",
         "types": ["Fighting"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 1, "F": 0 },
         "baseStats": {
           "hp": 120,
           "atk": 100,
@@ -29769,7 +29769,7 @@
         "isBattleOnly": false,
         "alias": "sawk",
         "types": ["Fighting"],
-        "genderRatio": { "M": 0, "F": 0 },
+        "genderRatio": { "M": 1, "F": 0 },
         "baseStats": {
           "hp": 75,
           "atk": 125,
@@ -30320,7 +30320,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "basculin",
+        "sprite": "basculin-red-striped",
         "spriteIndex": [16, 19]
       },
       {
@@ -30400,7 +30400,7 @@
         "paradox": false,
         "cosmeticForme": true,
         "regional": "Hisui",
-        "sprite": "basculin-whitestriped",
+        "sprite": "basculin-white-striped",
         "spriteIndex": [18, 19]
       }
     ],
@@ -30615,7 +30615,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "darumaka-galarian",
+        "sprite": "darumaka-galar",
         "spriteIndex": [23, 19]
       }
     ],
@@ -30729,7 +30729,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "darmanitan-galarian",
+        "sprite": "darmanitan-galar",
         "spriteIndex": [26, 19]
       },
       {
@@ -30764,7 +30764,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "darmanitan-galarian-zen",
+        "sprite": "darmanitan-galar-zen",
         "spriteIndex": [27, 19]
       }
     ],
@@ -31100,7 +31100,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "yamask-galarian",
+        "sprite": "yamask-galar",
         "spriteIndex": [35, 19]
       }
     ],
@@ -33902,7 +33902,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "stunfisk-galarian",
+        "sprite": "stunfisk-galar",
         "spriteIndex": [26, 21]
       }
     ],
@@ -38801,18 +38801,18 @@
     "levelUpType": "Medium Slow"
   },
   "669": {
-    "name": "Flab\u00e9b\u00e9",
+    "name": "Flabébé",
     "nationalDex": 669,
     "formes": [
       {
-        "name": "Flab\u00e9b\u00e9",
-        "formeName": "Flab\u00e9b\u00e9-Red",
+        "name": "Flabébé",
+        "formeName": "Flabébé-Red",
         "formeNumber": 0,
         "isBaseForme": true,
         "isMega": false,
         "isGMax": false,
         "isBattleOnly": false,
-        "alias": "flab\u00e9b\u00e9",
+        "alias": "flabébé",
         "types": ["Fairy"],
         "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
@@ -38838,18 +38838,18 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "flab\u00e9b\u00e9",
+        "sprite": "flabebe-red",
         "spriteIndex": [34, 23]
       },
       {
-        "name": "Flab\u00e9b\u00e9",
-        "formeName": "Flab\u00e9b\u00e9-Blue",
+        "name": "Flabébé",
+        "formeName": "Flabébé-Blue",
         "formeNumber": 1,
         "isBaseForme": false,
         "isMega": false,
         "isGMax": false,
         "isBattleOnly": false,
-        "alias": "flab\u00e9b\u00e9blue",
+        "alias": "flabébéblue",
         "types": ["Fairy"],
         "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
@@ -38875,18 +38875,18 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "flab\u00e9b\u00e9",
+        "sprite": "flabebe-blue",
         "spriteIndex": [35, 23]
       },
       {
-        "name": "Flab\u00e9b\u00e9",
-        "formeName": "Flab\u00e9b\u00e9-Orange",
+        "name": "Flabébé",
+        "formeName": "Flabébé-Orange",
         "formeNumber": 2,
         "isBaseForme": false,
         "isMega": false,
         "isGMax": false,
         "isBattleOnly": false,
-        "alias": "flab\u00e9b\u00e9orange",
+        "alias": "flabébéorange",
         "types": ["Fairy"],
         "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
@@ -38912,18 +38912,18 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "flab\u00e9b\u00e9",
+        "sprite": "flabebe-orange",
         "spriteIndex": [36, 23]
       },
       {
-        "name": "Flab\u00e9b\u00e9",
-        "formeName": "Flab\u00e9b\u00e9-White",
+        "name": "Flabébé",
+        "formeName": "Flabébé-White",
         "formeNumber": 3,
         "isBaseForme": false,
         "isMega": false,
         "isGMax": false,
         "isBattleOnly": false,
-        "alias": "flab\u00e9b\u00e9white",
+        "alias": "flabébéwhite",
         "types": ["Fairy"],
         "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
@@ -38949,18 +38949,18 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "flab\u00e9b\u00e9",
+        "sprite": "flabebe-white",
         "spriteIndex": [0, 24]
       },
       {
-        "name": "Flab\u00e9b\u00e9",
-        "formeName": "Flab\u00e9b\u00e9-Yellow",
+        "name": "Flabébé",
+        "formeName": "Flabébé-Yellow",
         "formeNumber": 4,
         "isBaseForme": false,
         "isMega": false,
         "isGMax": false,
         "isBattleOnly": false,
-        "alias": "flab\u00e9b\u00e9yellow",
+        "alias": "flabébéyellow",
         "types": ["Fairy"],
         "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
@@ -38986,7 +38986,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "flab\u00e9b\u00e9",
+        "sprite": "flabebe-yellow",
         "spriteIndex": [1, 24]
       }
     ],
@@ -39031,7 +39031,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "floette",
+        "sprite": "floette-red",
         "spriteIndex": [2, 24]
       },
       {
@@ -39069,7 +39069,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "floette",
+        "sprite": "floette-blue",
         "spriteIndex": [3, 24]
       },
       {
@@ -39107,7 +39107,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "floette",
+        "sprite": "floette-orange",
         "spriteIndex": [4, 24]
       },
       {
@@ -39145,7 +39145,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "floette",
+        "sprite": "floette-white",
         "spriteIndex": [5, 24]
       },
       {
@@ -39183,7 +39183,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "floette",
+        "sprite": "floette-yellow",
         "spriteIndex": [6, 24]
       },
       {
@@ -39262,7 +39262,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "florges",
+        "sprite": "florges-red",
         "spriteIndex": [8, 24]
       },
       {
@@ -39300,7 +39300,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "florges",
+        "sprite": "florges-blue",
         "spriteIndex": [9, 24]
       },
       {
@@ -39338,7 +39338,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "florges",
+        "sprite": "florges-orange",
         "spriteIndex": [10, 24]
       },
       {
@@ -39376,7 +39376,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "florges",
+        "sprite": "florges-white",
         "spriteIndex": [11, 24]
       },
       {
@@ -39414,7 +39414,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "florges",
+        "sprite": "florges-yellow",
         "spriteIndex": [12, 24]
       }
     ],
@@ -42220,7 +42220,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "zygarde",
+        "sprite": "zygarde-50",
         "spriteIndex": [6, 26]
       },
       {
@@ -43502,7 +43502,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "oricorio",
+        "sprite": "oricorio-baile",
         "spriteIndex": [33, 26]
       },
       {
@@ -43862,7 +43862,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "lycanroc",
+        "sprite": "lycanroc-midday",
         "spriteIndex": [3, 27]
       },
       {
@@ -43979,7 +43979,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "wishiwashi",
+        "sprite": "wishiwashi-solo",
         "spriteIndex": [6, 27]
       },
       {
@@ -53128,7 +53128,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "basculegion",
+        "sprite": "basculegion-f",
         "spriteIndex": [3, 32]
       }
     ],

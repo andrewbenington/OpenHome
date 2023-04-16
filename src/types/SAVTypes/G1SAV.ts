@@ -11,6 +11,7 @@ import {
   utf16StringToGen12,
 } from 'util/Strings/StringConverter';
 import { Box, SAV } from './SAV';
+import { GEN1_TRANSFER_RESTRICTIONS } from 'consts/TransferRestrictions';
 
 class G1Box implements Box {
   name: string;
@@ -25,12 +26,8 @@ class G1Box implements Box {
 
 export class G1SAV extends SAV {
   pkmType = PK1;
-  static TRANSFER_RESTRICTIONS = {
-    maxDexNum: 151,
-    excludedForms: { ...RegionalForms, ...CapPikachus },
-  };
 
-  transferRestrictions = G1SAV.TRANSFER_RESTRICTIONS;
+  transferRestrictions = GEN1_TRANSFER_RESTRICTIONS;
 
   NUM_BOXES = 14;
 
@@ -52,7 +49,7 @@ export class G1SAV extends SAV {
 
   constructor(path: string, bytes: Uint8Array, fileCreated?: Date) {
     super(path, bytes);
-    this.fileCreated = fileCreated
+    this.fileCreated = fileCreated;
     this.tid = bytesToUint16BigEndian(this.bytes, 0x2605);
     this.displayID = this.tid.toString().padStart(5, '0');
     this.name = gen12StringToUTF(this.bytes, 0x2598, 11);

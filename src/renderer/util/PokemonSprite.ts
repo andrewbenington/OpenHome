@@ -3,6 +3,7 @@ import { GameOfOriginData } from 'consts/GameOfOrigin';
 import { POKEMON_DATA } from 'consts/Mons';
 import { PKM } from '../../types/PKMTypes/PKM';
 import { GameLogos } from '../images/Images';
+import { StringToStringMap } from 'types/types';
 const ColosseumOnlyNonShadow = [311];
 
 const ColosseumOnlyShadow = [
@@ -176,6 +177,21 @@ export const getItemSprite = (item: string) => {
   }
 };
 
+export const getSpritePath = (mon: PKM, format?: string) => {
+  const monFormat = format ?? mon.format
+  let spriteName = POKEMON_DATA[mon.dexNum]?.formes[mon.formNum]?.sprite ?? '';
+  let spriteFolder = fileToSpriteFolder[monFormat];
+  if (spriteFolder == "gen7" && !alolaDex.includes(mon.dexNum)) {
+    spriteFolder = "gen6"
+  }
+  console.log(`${spriteFolder}${mon.isShiny ? '/shiny/' : '/'}${spriteName}.${
+    monFormat === 'PK5' ? 'gif' : 'png'
+  }`)
+  return `${spriteFolder}${mon.isShiny ? '/shiny/' : '/'}${spriteName}.${
+    monFormat === 'PK5' ? 'gif' : 'png'
+  }`;
+};
+
 export const getMonSprite = (mon: PKM, format: string) => {
   let formeName =
     (mon.formNum > 0 && mon.dexNum !== 664 && mon.dexNum !== 665
@@ -324,6 +340,20 @@ const alolaDex = [
   778, 779, 780, 781, 782, 783, 784, 785, 786, 787, 788, 789, 790, 791, 792,
   793, 794, 795, 796, 797, 798, 799, 800, 801, 802, 803, 804, 805, 806, 807,
 ];
+
+export const fileToSpriteFolder: StringToStringMap = {
+  PK1: 'gen1',
+  PK2: 'gen2',
+  PK3: 'gen3',
+  PK4: 'gen4',
+  PK5: 'gen5',
+  PK6: 'gen6',
+  PK7: 'gen7',
+  PK8: 'gen8',
+  PA8: 'gen8a',
+  PK9: 'gen9',
+  OHPKM: 'home'
+};
 
 export const getTypeColor = (type: string) => {
   switch (type) {

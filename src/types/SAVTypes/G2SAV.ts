@@ -1,8 +1,8 @@
 import { GameOfOrigin } from 'consts';
+import { GEN2_TRANSFER_RESTRICTIONS } from 'consts/TransferRestrictions';
 import { uniq } from 'lodash';
 import { OHPKM } from 'types/PKMTypes/OHPKM';
 import { PK2 } from 'types/PKMTypes/PK2';
-import { CapPikachus, RegionalForms } from 'types/TransferRestrictions';
 import { SaveType } from 'types/types';
 import { bytesToUint16BigEndian, get8BitChecksum } from 'util/ByteLogic';
 import {
@@ -12,18 +12,14 @@ import {
 import { Box, SAV } from './SAV';
 
 export class G2SAV extends SAV {
-  static TRANSFER_RESTRICTIONS = {
-    maxDexNum: 251,
-    excludedForms: { ...RegionalForms, ...CapPikachus, 201: [26, 27] },
-  };
   boxOffsets: number[];
   boxes: Array<G2Box>;
   pkmType = PK2;
-  transferRestrictions = G2SAV.TRANSFER_RESTRICTIONS;
+  transferRestrictions = GEN2_TRANSFER_RESTRICTIONS;
 
   constructor(path: string, bytes: Uint8Array, fileCreated?: Date) {
     super(path, bytes);
-    this.fileCreated = fileCreated
+    this.fileCreated = fileCreated;
     this.tid = bytesToUint16BigEndian(this.bytes, 0x2009);
     this.displayID = this.tid.toString().padStart(5, '0');
     this.name = gen12StringToUTF(this.bytes, 0x200b, 11);

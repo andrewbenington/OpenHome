@@ -14,6 +14,7 @@ import {
   loadRecentSaves,
   addRecentSave,
   removeRecentSave,
+  loadImage,
 } from './loadData';
 import writePKMToFile, { deleteOHPKMFile } from './writePKMToFile';
 import fs from 'fs';
@@ -129,6 +130,10 @@ function initListeners() {
 
   ipcMain.handle('get-resources-path', (event) => {
     return app.isPackaged ? path.join(process.resourcesPath, 'resources') : path.join(app.getAppPath() + 'resources');
+  });
+
+  ipcMain.handle('get-image-path', (event) => {
+    return loadImage("")
   });
 }
 
