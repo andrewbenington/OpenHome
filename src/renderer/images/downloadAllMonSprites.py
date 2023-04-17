@@ -43,6 +43,10 @@ def format_pokemon_db_forme(dex_num: int, form_num: int) -> str:
         forme_name = forme_name + "ian"
     elif forme_name.endswith("-hisui"):
         forme_name = forme_name + "an"
+    elif forme_name.endswith("-exclamation"):
+        forme_name = forme_name[:-11] + "em"
+    elif forme_name.endswith("-question"):
+        forme_name = forme_name[:-8] + "qm"
     return forme_name
 
 

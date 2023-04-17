@@ -11896,7 +11896,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "unown",
+        "sprite": "unown-q",
         "spriteIndex": [21, 7]
       },
       {
@@ -11930,7 +11930,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "unown",
+        "sprite": "unown-r",
         "spriteIndex": [22, 7]
       },
       {
@@ -11964,7 +11964,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "unown",
+        "sprite": "unown-s",
         "spriteIndex": [23, 7]
       },
       {
@@ -11998,7 +11998,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "unown",
+        "sprite": "unown-t",
         "spriteIndex": [24, 7]
       },
       {
@@ -12032,7 +12032,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "unown",
+        "sprite": "unown-u",
         "spriteIndex": [25, 7]
       },
       {
@@ -12066,7 +12066,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "unown",
+        "sprite": "unown-v",
         "spriteIndex": [26, 7]
       },
       {
@@ -12100,7 +12100,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "unown",
+        "sprite": "unown-w",
         "spriteIndex": [27, 7]
       },
       {
@@ -12134,7 +12134,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "unown",
+        "sprite": "unown-x",
         "spriteIndex": [28, 7]
       },
       {
@@ -12168,7 +12168,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "unown",
+        "sprite": "unown-y",
         "spriteIndex": [29, 7]
       },
       {
@@ -12202,7 +12202,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "unown",
+        "sprite": "unown-z",
         "spriteIndex": [30, 7]
       },
       {
@@ -12236,7 +12236,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "unown",
+        "sprite": "unown-exclamation",
         "spriteIndex": [31, 7]
       },
       {
@@ -12270,7 +12270,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "unown",
+        "sprite": "unown-question",
         "spriteIndex": [32, 7]
       }
     ],
