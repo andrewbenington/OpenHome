@@ -443,6 +443,7 @@ export const selectModifiedOHPKMs = (state: RootState) =>
   state.app.modifiedOHPKMs;
 export const selectGen12Lookup = (state: RootState) => state.app.lookup.gen12;
 export const selectGen345Lookup = (state: RootState) => state.app.lookup.gen345;
+export const selectMonsToDelete = (state: RootState) => state.app.monsToDelete;
 
 export const selectCount = (state: RootState) => state.app.saves.length;
 

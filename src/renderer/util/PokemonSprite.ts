@@ -4,6 +4,8 @@ import { POKEMON_DATA } from 'consts/Mons';
 import { PKM } from '../../types/PKMTypes/PKM';
 import { GameLogos } from '../images/Images';
 import { StringToStringMap } from 'types/types';
+import { NDex } from 'consts/NationalDex';
+import { SWEETS } from 'consts/Formes';
 const ColosseumOnlyNonShadow = [311];
 
 const ColosseumOnlyShadow = [
@@ -180,6 +182,9 @@ export const getItemSprite = (item: string) => {
 export const getSpritePath = (mon: PKM, format?: string) => {
   const monFormat = format ?? mon.format
   let spriteName = POKEMON_DATA[mon.dexNum]?.formes[mon.formNum]?.sprite ?? '';
+  if (mon.dexNum === NDex.ALCREMIE) {
+    spriteName += "-" + SWEETS[mon.formArgument ?? 0].toLocaleLowerCase()
+  }
   let spriteFolder = fileToSpriteFolder[monFormat];
   if (spriteFolder == "gen7" && !alolaDex.includes(mon.dexNum)) {
     spriteFolder = "gen6"

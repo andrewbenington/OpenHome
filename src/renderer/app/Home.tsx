@@ -1,9 +1,12 @@
 import { FileOpen } from '@mui/icons-material';
 import { Dialog, useTheme } from '@mui/material';
+import BoxIcons from '../images/icons/BoxIcons.png';
 import _ from 'lodash';
 import { useEffect, useState } from 'react';
 import OpenHomeButton from 'renderer/components/OpenHomeButton';
-import { OHPKM, PK3, PK4 } from 'types/PKMTypes';
+import { loadRecentSaves } from 'renderer/redux/slices/recentSavesSlice';
+import { loadResourcesPath } from 'renderer/redux/slices/resourcesSlice';
+import { OHPKM } from 'types/PKMTypes';
 import { acceptableExtensions, bytesToPKM } from 'util/FileImport';
 import { getMonFileIdentifier } from 'util/Lookup';
 import { PKM } from '../../types/PKMTypes/PKM';
@@ -14,6 +17,7 @@ import {
   useDragMon,
   useDragSource,
   useModifiedOHPKMs,
+  useMonsToDelete,
   useSaveFunctions,
   useSaves,
 } from '../redux/selectors';
@@ -36,8 +40,8 @@ import {
   handleMenuSave,
 } from '../util/ipcFunctions';
 import Themes, { OpenHomeTheme } from './Themes';
-import { loadRecentSaves } from 'renderer/redux/slices/recentSavesSlice';
-import { loadResourcesPath } from 'renderer/redux/slices/resourcesSlice';
+import { dropAreaStyle } from './styles';
+import { POKEMON_DATA } from 'consts';
 
 const Home = () => {
   const { palette } = useTheme();
@@ -45,6 +49,7 @@ const Home = () => {
   const dragMon = useDragMon();
   const dragSource = useDragSource();
   const modifiedOHPKMs = useModifiedOHPKMs();
+  const monsToDelete = useMonsToDelete();
   const [loadingMessage, setLoadingMessage] = useState<string | undefined>(
     'Starting app...'
   );
@@ -80,16 +85,11 @@ const Home = () => {
         }
         mon = bytesToPKM(bytes, extension);
       }
+      console.log(mon);
       if (!mon) return;
       switch (type) {
         case 'as is':
           setSelectedMon(mon);
-          break;
-        case 'PK4':
-          setSelectedMon(new PK4(mon));
-          break;
-        case 'PK3':
-          setSelectedMon(new PK3(mon));
           break;
       }
     };
@@ -98,7 +98,6 @@ const Home = () => {
     if (!file && dragSource) {
       if (mon && type === 'release') {
         dispatchDeleteMon(dragSource);
-        dispatchCancelDrag();
         if (mon instanceof OHPKM) {
           const identifier = getMonFileIdentifier(mon);
           if (identifier) {
@@ -106,8 +105,11 @@ const Home = () => {
           }
         }
       }
+      dispatchCancelDrag();
       processDroppedData(file, mon);
       e.nativeEvent.preventDefault();
+    } else if (file) {
+      processDroppedData(file, undefined);
     }
   };
 
@@ -151,10 +153,11 @@ const Home = () => {
     <div
       style={{
         backgroundColor: currentTheme.backgroundColor,
-        height: '100%',
+        height: 'calc(100% - 10px)',
         width: '100%',
         display: 'flex',
         flexDirection: 'row',
+        paddingTop: 10,
       }}
     >
       <div
@@ -186,19 +189,7 @@ const Home = () => {
         <HomeBoxDisplay setSelectedMon={setSelectedMon} />
       </div>
       <div style={{ display: 'flex', flex: 1, flexDirection: 'column' }}>
-        <button
-          type="button"
-          style={{
-            margin: 10,
-            height: 'calc(100% - 40px)',
-            flex: 1,
-            backgroundColor: '#fff4',
-            position: 'relative',
-            border: 'none',
-            borderRadius: 4,
-            textAlign: 'center',
-          }}
-        >
+        <button type="button" style={dropAreaStyle}>
           <div
             draggable
             style={{
@@ -210,29 +201,19 @@ const Home = () => {
             onDragOver={(e) => {
               e.preventDefault();
             }}
-            // onDrop={(e) => onViewDrop(e, 'as is')}
+            onDrop={(e) => onViewDrop(e, 'as is')}
           >
             Preview
           </div>
         </button>
         <button
           type="button"
-          style={{
-            margin: 10,
-            height: 'calc(100% - 40px)',
-            backgroundColor: '#fff4',
-            position: 'relative',
-            border: 'none',
-            flex: 1,
-            borderRadius: 4,
-            textAlign: 'center',
-          }}
+          style={dropAreaStyle}
           onClick={() => {}}
           //   disabled={!mon}
         >
           <div
             style={{
-              height: '100%',
               width: '100%',
               flex: 1,
               padding: 'auto',
@@ -244,6 +225,34 @@ const Home = () => {
           >
             RELEASE
           </div>
+          {monsToDelete.map((mon) => (
+            <div
+              style={{
+                background: `url(${BoxIcons}) no-repeat 0.027027% 0.027027%`,
+                backgroundSize: '3700%',
+                backgroundPosition:
+                  mon.isEgg || !POKEMON_DATA[mon.dexNum]
+                    ? '0% 0%'
+                    : `${
+                        (POKEMON_DATA[mon.dexNum].formes[mon.formNum]
+                          .spriteIndex[0] /
+                          36) *
+                        100
+                      }% ${
+                        (Math.floor(
+                          POKEMON_DATA[mon.dexNum].formes[mon.formNum]
+                            .spriteIndex[1]
+                        ) /
+                          35) *
+                        100
+                      }%`,
+                imageRendering: 'crisp-edges',
+                height: '10%',
+                aspectRatio: 1,
+                zIndex: 100,
+              }}
+            />
+          ))}
         </button>
       </div>
       <Dialog

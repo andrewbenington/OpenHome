@@ -29,6 +29,9 @@ import {
   shinyLeafEmptyIconStyle,
   shinyLeafIconStyle,
 } from './styles';
+import { HGSS_TRANSFER_RESTRICTIONS, GEN2_TRANSFER_RESTRICTIONS } from 'consts/TransferRestrictions';
+import { NDex } from 'consts/NationalDex';
+import { SWEETS } from 'consts/Formes';
 
 const OtherDisplay = (props: { mon: PKM }) => {
   const { mon } = props;
@@ -142,7 +145,7 @@ const OtherDisplay = (props: { mon: PKM }) => {
       ) : (
         <div />
       )}
-      {mon.dexNum >= 265 && mon.dexNum <= 269 ? (
+      {mon.dexNum === NDex.WURMPLE ? (
         <AttributeRow
           label="Wurmple Evolution"
           value={
@@ -154,7 +157,15 @@ const OtherDisplay = (props: { mon: PKM }) => {
       ) : (
         <div />
       )}
-      {mon.dexNum === 206 && mon.encryptionConstant ? (
+      {mon.dexNum === NDex.ALCREMIE && mon.formArgument ? (
+        <AttributeRow
+          label="Sweet"
+          value={SWEETS[mon.formArgument]}
+        />
+      ) : (
+        <div />
+      )}
+      {mon.dexNum === NDex.DUNSPARCE && mon.encryptionConstant ? (
         <AttributeRow
           label="Dudunsparce"
           value={mon.encryptionConstant % 100 ? 'Two-Segment' : 'Three-Segment'}
@@ -162,7 +173,7 @@ const OtherDisplay = (props: { mon: PKM }) => {
       ) : (
         <div />
       )}
-      {mon.dexNum === 924 && mon.encryptionConstant ? (
+      {mon.dexNum === NDex.TANDEMAUS && mon.encryptionConstant ? (
         <AttributeRow
           label="Maushold"
           value={
@@ -177,7 +188,7 @@ const OtherDisplay = (props: { mon: PKM }) => {
       ) : (
         <div />
       )}
-      {!isRestricted(HGSSSAV.TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
+      {!isRestricted(HGSS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
       mon.shinyLeaves !== undefined ? (
         <AttributeRow label="Shiny Leaves">
           {mon.shinyLeafValues?.crown ? (
@@ -336,13 +347,13 @@ const OtherDisplay = (props: { mon: PKM }) => {
       ) : (
         <div />
       )}
-      {!isRestricted(G2SAV.TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
+      {!isRestricted(GEN2_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
       (mon instanceof PK1 || mon instanceof PK2 || mon instanceof OHPKM) ? (
         <AttributeRow label="Gen 1/2 ID" value={getMonGen12Identifier(mon)} />
       ) : (
         <div />
       )}
-      {!isRestricted(HGSSSAV.TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
+      {!isRestricted(HGSS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
       (mon instanceof PK3 || mon instanceof PK4 || mon instanceof PK5 ||  mon instanceof OHPKM) ? (
         <AttributeRow label="Gen 3/4/5 ID" value={getMonGen345Identifier(mon)} />
       ) : (

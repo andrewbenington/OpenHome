@@ -10,6 +10,7 @@ import {
   selectHomeData,
   selectHomeMons,
   selectModifiedOHPKMs,
+  selectMonsToDelete,
   selectSaves,
   writeAllHomeData,
   writeAllSaveFiles,
@@ -26,6 +27,7 @@ export const useHomeData = () => useAppSelector(selectHomeData);
 export const useDragMon = () => useAppSelector(selectDragMon);
 export const useDragSource = () => useAppSelector(selectDragSource);
 export const useModifiedOHPKMs = () => useAppSelector(selectModifiedOHPKMs);
+export const useMonsToDelete = () => useAppSelector(selectMonsToDelete)
 export const useSaveFunctions = (): [() => void, () => void] => {
   const dispatch = useAppDispatch();
   return [

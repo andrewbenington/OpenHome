@@ -21,6 +21,7 @@ import { PKM } from '../../types/PKMTypes/PKM';
 import { XDPKM } from '../../types/PKMTypes/XDPKM';
 import Sheen from '../images/icons/Sheen.gif';
 import { detailsPaneContentStyle } from './styles';
+import { GEN2_TRANSFER_RESTRICTIONS } from 'consts/TransferRestrictions';
 
 const getSheenStars = (mon: PKM) => {
   if (!mon.contest) {
@@ -111,7 +112,7 @@ const StatsDisplay = (props: { mon: PKM }) => {
             <div />
           )}
           {!isRestricted(
-            G2SAV.TRANSFER_RESTRICTIONS,
+            GEN2_TRANSFER_RESTRICTIONS,
             mon.dexNum,
             mon.formNum
           ) && mon.dvs !== undefined ? (

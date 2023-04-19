@@ -13,10 +13,22 @@ export const RESOLUTE = 1;
 export const UNBOUND = 1;
 export const TEN_PCT = 1;
 export const TEN_PCT_PC = 2;
-export const COMPLETE = 3
+export const COMPLETE = 3;
 export const DUSK_MANE = 1;
 export const DAWN_WINGS = 2;
 export const ULTRA = 3;
+export const LGP_STARTER = 8;
+export const LGE_STARTER = 1;
 
 export const BASE = 0;
 export const ALOLAN = 1;
+
+export enum SWEETS {
+  "Strawberry" = 0,
+  "Berry" = 1,
+  "Love" = 2,
+  "Star" = 3,
+  "Clover" = 4,
+  "Flower" = 5,
+  "Ribbon" = 6,
+}

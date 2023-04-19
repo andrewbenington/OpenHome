@@ -10,6 +10,7 @@ import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
   uint16ToBytesLittleEndian,
+  uint32ToBytesLittleEndian,
 } from '../../util/ByteLogic';
 import {
   getHPGen3Onward,
@@ -42,7 +43,7 @@ export class PK8 extends PKM {
   public set canGigantamax(value: boolean) {
     this.bytes[0x16] = (this.bytes[0x16] & 0b11101111) | (value ? 16 : 0);
   }
-  
+
   public get affixedRibbon() {
     return this.bytes[0xe8] !== 0xff ? this.bytes[0xe8] : undefined;
   }
@@ -242,5 +243,13 @@ export class PK8 extends PKM {
     if (index > -1) {
       this.bytes[0xe2] = index;
     }
+  }
+
+  public get formArgument() {
+    return bytesToUint32LittleEndian(this.bytes, 0xe4);
+  }
+
+  public set formArgument(value: number) {
+    this.bytes.set(uint32ToBytesLittleEndian(value), 0xe4);
   }
 }

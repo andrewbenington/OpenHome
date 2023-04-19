@@ -50,8 +50,9 @@ def format_pokemon_db_forme(dex_num: int, form_num: int) -> str:
     return forme_name
 
 
-def get_pokemon_db_sprite(dex_num: int, form_num: int, is_shiny: bool, game: str, is_female=False) -> str:
-    forme_name = format_pokemon_db_forme(dex_num, form_num)
+def get_pokemon_db_sprite(dex_num: int, form_num: int, is_shiny: bool, game: str, is_female=False, forme_name=None) -> str:
+    if forme_name == None:
+        forme_name = format_pokemon_db_forme(dex_num, form_num)
 
     female_stats = {"indeedee-f", "meowstic-f",
                     "oinkologne-f", "basculegion-f"}
@@ -205,7 +206,16 @@ first_forme_only = [
     25,
     172,
     718
+]
 
+sweets = [
+    "strawberry",
+    "berry",
+    "love",
+    "star",
+    "clover",
+    "flower",
+    "ribbon",
 ]
 
 alola_dex = [
@@ -281,99 +291,104 @@ def download_all_sprites_all_mons():
     for dex_num_str, mon in POKEMON_DATA.items():
         dex_number = int(dex_num_str)
         for forme_number, forme in enumerate(mon["formes"]):
-            thread = threading.Thread(target=download_all_sprites, args=(
-                dex_number, forme, forme_number))
-            thread.start()
-            threads.append(thread)
+            if dex_number != 869:
+                thread = threading.Thread(target=download_all_sprites, args=(
+                    dex_number, forme, forme_number, forme["sprite"]))
+                thread.start()
+                threads.append(thread)
+            else:
+                for sweet in sweets:
+                    thread = threading.Thread(target=download_all_sprites, args=(
+                        dex_number, forme, forme_number, forme["sprite"] + "-" + sweet))
+                    thread.start()
+                    threads.append(thread)
 
 
-def download_all_sprites(dex_number, forme, forme_number):
-    real_forme_name = forme["sprite"].replace("alolan", "alola").replace(
-        "galarian", "galar").replace("hisuian", "hisui").replace("paldean", "paldea")
+def download_all_sprites(dex_number, forme, forme_number, forme_name):
     if dex_number <= 151 and forme_number == 0:
         download_png(get_showdown_sprite(dex_number, forme_number,
-                     False, "gen1"), "sprites/gen1", real_forme_name + ".png")
+                     False, "gen1"), "sprites/gen1", forme_name + ".png")
     if dex_number <= 251 and forme_number == 0 or dex_number == 201 and forme_number <= 25:
         download_png(get_pokemon_db_sprite(dex_number, forme_number,
-                     False, "crystal"), "sprites/gen2", real_forme_name + ".png")
+                     False, "crystal"), "sprites/gen2", forme_name + ".png")
         download_png(get_pokemon_db_sprite(dex_number, forme_number, True,
-                     "crystal"), "sprites/gen2/shiny", real_forme_name + ".png")
+                     "crystal"), "sprites/gen2/shiny", forme_name + ".png")
     if dex_number <= 386 and forme_number == 0 or dex_number == 201 or dex_number == 386:
         download_png(get_pokemon_db_sprite(dex_number, forme_number,
-                     False, "emerald"), "sprites/gen3", real_forme_name + ".png")
+                     False, "emerald"), "sprites/gen3", forme_name + ".png")
         download_png(get_pokemon_db_sprite(dex_number, forme_number, True,
-                     "emerald"), "sprites/gen3/shiny", real_forme_name + ".png")
+                     "emerald"), "sprites/gen3/shiny", forme_name + ".png")
     if dex_number <= 493 and (dex_number not in RegionalForms or
                               forme_number not in RegionalForms[dex_number]) and "-mega" not in forme["sprite"] and "-Totem" not in forme["formeName"] and "-Fairy" not in forme["formeName"] and (dex_number not in first_forme_only or forme_number == 0):
         download_png(get_pokemon_db_sprite(dex_number, forme_number, False,
-                     "heartgold-soulsilver"), "sprites/gen4", real_forme_name + ".png")
+                     "heartgold-soulsilver"), "sprites/gen4", forme_name + ".png")
         download_png(get_pokemon_db_sprite(dex_number, forme_number, True,
-                     "heartgold-soulsilver"), "sprites/gen4/shiny", real_forme_name + ".png")
+                     "heartgold-soulsilver"), "sprites/gen4/shiny", forme_name + ".png")
         if dex_number in gender_differences and forme_number == 0 and dex_number != 133 and dex_number != 255 and dex_number != 418:
             download_png(get_pokemon_db_sprite(dex_number, forme_number, False,
-                         "heartgold-soulsilver", is_female=True), "sprites/gen4", real_forme_name + "-f.png")
+                         "heartgold-soulsilver", is_female=True), "sprites/gen4", forme_name + "-f.png")
             download_png(get_pokemon_db_sprite(dex_number, forme_number, False,
-                         "heartgold-soulsilver", is_female=True), "sprites/gen4", real_forme_name + "-f.png")
+                         "heartgold-soulsilver", is_female=True), "sprites/gen4", forme_name + "-f.png")
     if dex_number <= 649 and (dex_number not in RegionalForms or
                               forme_number not in RegionalForms[dex_number]) and "-mega" not in forme["sprite"] and "-Totem" not in forme["formeName"] and "-Fairy" not in forme["formeName"] and (dex_number not in first_forme_only or forme_number == 0):
         download_png(get_showdown_sprite(dex_number, forme_number, False,
-                     "gen5ani"), "sprites/gen5", real_forme_name + ".gif")
+                     "gen5ani"), "sprites/gen5", forme_name + ".gif")
         download_png(get_showdown_sprite(dex_number, forme_number, True,
-                     "gen5ani"), "sprites/gen5/shiny", real_forme_name + ".gif")
+                     "gen5ani"), "sprites/gen5/shiny", forme_name + ".gif")
         if dex_number in gender_differences and forme_number == 0 and dex_number != 133 and dex_number != 255 and dex_number != 418:
             download_png(get_showdown_sprite(dex_number, forme_number, False,
-                         "gen5ani", is_female=True), "sprites/gen5", real_forme_name + "-f.gif")
+                         "gen5ani", is_female=True), "sprites/gen5", forme_name + "-f.gif")
             download_png(get_showdown_sprite(dex_number, forme_number, False,
-                         "gen5ani", is_female=True), "sprites/gen5", real_forme_name + "-f.gif")
+                         "gen5ani", is_female=True), "sprites/gen5", forme_name + "-f.gif")
     if dex_number <= 721 and (dex_number not in RegionalForms or
                               forme_number not in RegionalForms[dex_number]) and "-Totem" not in forme["formeName"] and (dex_number not in first_forme_only or forme_number == 0):
         download_png(get_pokemon_db_sprite(dex_number, forme_number, False,
-                     "bank"), "sprites/gen6", real_forme_name + ".png")
+                     "bank"), "sprites/gen6", forme_name + ".png")
         download_png(get_pokemon_db_sprite(dex_number, forme_number, True,
-                     "bank"), "sprites/gen6/shiny", real_forme_name + ".png")
+                     "bank"), "sprites/gen6/shiny", forme_name + ".png")
         if dex_number in gender_differences and forme_number == 0 and dex_number != 133 and dex_number != 255 and dex_number != 418:
             download_png(get_pokemon_db_sprite(dex_number, forme_number, False,
-                         "bank", is_female=True), "sprites/gen6", real_forme_name + "-f.png")
+                         "bank", is_female=True), "sprites/gen6", forme_name + "-f.png")
             download_png(get_pokemon_db_sprite(dex_number, forme_number, False,
-                         "bank", is_female=True), "sprites/gen6", real_forme_name + "-f.png")
+                         "bank", is_female=True), "sprites/gen6", forme_name + "-f.png")
 
     if dex_number == 774:
         download_png(get_pokemon_db_sprite(dex_number, forme_number, False,
-                                           "sun-moon"), "sprites/gen7", real_forme_name + ".png")
+                                           "sun-moon"), "sprites/gen7", forme_name + ".png")
         download_png(get_pokemon_db_sprite(dex_number, forme_number, True,
-                                           "bank"), "sprites/gen7/shiny", real_forme_name + ".png")
+                                           "bank"), "sprites/gen7/shiny", forme_name + ".png")
     elif dex_number <= 809 and dex_number in alola_dex and (dex_number not in Gen89RegionalForms or
                                                             forme_number not in Gen89RegionalForms[dex_number]) and "-Totem" not in forme["formeName"] and "-Fairy" not in forme["formeName"] and (dex_number not in first_forme_only or forme_number == 0):
         download_png(get_pokemon_db_sprite(dex_number, forme_number, False,
-                                           "ultra-sun-ultra-moon"), "sprites/gen7", real_forme_name + ".png")
+                                           "ultra-sun-ultra-moon"), "sprites/gen7", forme_name + ".png")
         download_png(get_pokemon_db_sprite(dex_number, forme_number, True,
-                                           "ultra-sun-ultra-moon"), "sprites/gen7/shiny", real_forme_name + ".png")
+                                           "ultra-sun-ultra-moon"), "sprites/gen7/shiny", forme_name + ".png")
         if dex_number in gender_differences and forme_number == 0 and dex_number != 133 and dex_number != 255 and dex_number != 418:
             download_png(get_pokemon_db_sprite(dex_number, forme_number, False,
-                                               "ultra-sun-ultra-moon", is_female=True), "sprites/gen7", real_forme_name + "-f.png")
+                                               "ultra-sun-ultra-moon", is_female=True), "sprites/gen7", forme_name + "-f.png")
             download_png(get_pokemon_db_sprite(dex_number, forme_number, False,
-                                               "ultra-sun-ultra-moon", is_female=True), "sprites/gen7", real_forme_name + "-f.png")
+                                               "ultra-sun-ultra-moon", is_female=True), "sprites/gen7", forme_name + "-f.png")
     if dex_number <= 905 and "-Totem" not in forme["formeName"]:
         download_png(get_pokemon_db_sprite(dex_number, forme_number, False,
-                     "home"), "sprites/home", real_forme_name + ".png")
+                     "home", forme_name=forme_name), "sprites/home", forme_name + ".png")
         download_png(get_pokemon_db_sprite(dex_number, forme_number, True,
-                     "home"), "sprites/home/shiny", real_forme_name + ".png")
+                     "home", forme_name=forme_name), "sprites/home/shiny", forme_name + ".png")
         if dex_number in gender_differences and forme_number == 0 and dex_number != 133 and dex_number != 255 and dex_number != 418:
             download_png(get_pokemon_db_sprite(dex_number, forme_number, False,
-                         "home", is_female=True), "sprites/home", real_forme_name + "-f.png")
+                         "home", is_female=True), "sprites/home", forme_name + "-f.png")
             download_png(get_pokemon_db_sprite(dex_number, forme_number, False,
-                         "home", is_female=True), "sprites/home", real_forme_name + "-f.png")
+                         "home", is_female=True), "sprites/home", forme_name + "-f.png")
     if dex_number <= 724 and dex_number in legends_dex and (dex_number not in RegionalForms or (dex_number in HisuianForms and
                                                                                                 forme_number in HisuianForms[dex_number]) or dex_number in [37, 38, 215]) and "-Totem" not in forme["formeName"] and "-Mega" not in forme["formeName"] and (dex_number != 25 or forme_number == 0):
         download_png(get_pokemon_db_sprite(dex_number, forme_number, False,
-                                           "legends-arceus"), "sprites/gen8a", real_forme_name + ".png")
+                                           "legends-arceus"), "sprites/gen8a", forme_name + ".png")
         download_png(get_pokemon_db_sprite(dex_number, forme_number, True,
-                                           "legends-arceus"), "sprites/gen8a/shiny", real_forme_name + ".png")
+                                           "legends-arceus"), "sprites/gen8a/shiny", forme_name + ".png")
         if dex_number in gender_differences and forme_number == 0 and dex_number != 255 and dex_number != 418:
             download_png(get_pokemon_db_sprite(dex_number, forme_number, False,
-                                               "legends-arceus", is_female=True), "sprites/gen8a", real_forme_name + "-f.png")
+                                               "legends-arceus", is_female=True), "sprites/gen8a", forme_name + "-f.png")
             download_png(get_pokemon_db_sprite(dex_number, forme_number, False,
-                                               "legends-arceus", is_female=True), "sprites/gen8a", real_forme_name + "-f.png")
+                                               "legends-arceus", is_female=True), "sprites/gen8a", forme_name + "-f.png")
 
     # if dex_number <= 809:
     #     print("This Pokemon was present in Generation VII.")
