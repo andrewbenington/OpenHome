@@ -38812,7 +38812,7 @@
         "isMega": false,
         "isGMax": false,
         "isBattleOnly": false,
-        "alias": "flabébé",
+        "alias": "flabebe",
         "types": ["Fairy"],
         "genderRatio": { "M": 0.0, "F": 1.0 },
         "baseStats": {
@@ -52838,13 +52838,13 @@
       },
       {
         "name": "Calyrex",
-        "formeName": "Calyrex-Ice",
+        "formeName": "Calyrex-Ice-Rider",
         "formeNumber": 1,
         "isBaseForme": false,
         "isMega": false,
         "isGMax": false,
         "isBattleOnly": false,
-        "alias": "calyrexice",
+        "alias": "calyrexicerider",
         "types": ["Psychic", "Ice"],
         "genderRatio": { "M": 0, "F": 0 },
         "baseStats": {
@@ -52869,18 +52869,18 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "calyrex-ice",
+        "sprite": "calyrex-ice-rider",
         "spriteIndex": [34, 31]
       },
       {
         "name": "Calyrex",
-        "formeName": "Calyrex-Shadow",
+        "formeName": "Calyrex-Shadow-Rider",
         "formeNumber": 2,
         "isBaseForme": false,
         "isMega": false,
         "isGMax": false,
         "isBattleOnly": false,
-        "alias": "calyrexshadow",
+        "alias": "calyrexshadowrider",
         "types": ["Psychic", "Ghost"],
         "genderRatio": { "M": 0, "F": 0 },
         "baseStats": {
@@ -52905,7 +52905,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "calyrex-shadow",
+        "sprite": "calyrex-shadow-rider",
         "spriteIndex": [35, 31]
       }
     ],
@@ -54267,7 +54267,7 @@
         "isGMax": false,
         "isBattleOnly": false,
         "genderRatio": { "M": 0, "F": 0 },
-        "alias": "mausholdfour",
+        "alias": "maushold",
         "formeNumber": 1,
         "height": 0.3,
         "weight": 2.8,
@@ -54574,7 +54574,7 @@
         "isGMax": false,
         "isBattleOnly": false,
         "genderRatio": { "M": 0.5, "F": 0.5 },
-        "alias": "squawkabillyblue",
+        "alias": "squawkabilly",
         "formeNumber": 1,
         "height": 0.6,
         "weight": 2.4,
@@ -54612,7 +54612,7 @@
         "isGMax": false,
         "isBattleOnly": false,
         "genderRatio": { "M": 0.5, "F": 0.5 },
-        "alias": "squawkabillywhite",
+        "alias": "squawkabilly",
         "formeNumber": 2,
         "height": 0.6,
         "weight": 2.4,
@@ -54650,7 +54650,7 @@
         "isGMax": false,
         "isBattleOnly": false,
         "genderRatio": { "M": 0.5, "F": 0.5 },
-        "alias": "squawkabillyyellow",
+        "alias": "squawkabilly",
         "formeNumber": 3,
         "height": 0.6,
         "weight": 2.4,
@@ -57096,7 +57096,7 @@
         "isGMax": false,
         "isBattleOnly": false,
         "genderRatio": { "M": 0.5, "F": 0.5 },
-        "alias": "dudunsparcethreesegment",
+        "alias": "dudunsparce",
         "formeNumber": 1,
         "height": 4.5,
         "weight": 47.4,
@@ -57112,7 +57112,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "dudunsparce-threesegment",
+        "sprite": "dudunsparce-three-segment",
         "spriteIndex": [18, 34]
       }
     ],
@@ -57201,7 +57201,7 @@
         "ultraBeast": false,
         "paradox": true,
         "cosmeticForme": false,
-        "sprite": "great tusk",
+        "sprite": "great-tusk",
         "spriteIndex": [20, 34]
       }
     ],
@@ -57244,7 +57244,7 @@
         "ultraBeast": false,
         "paradox": true,
         "cosmeticForme": false,
-        "sprite": "scream tail",
+        "sprite": "scream-tail",
         "spriteIndex": [21, 34]
       }
     ],
@@ -57287,7 +57287,7 @@
         "ultraBeast": false,
         "paradox": true,
         "cosmeticForme": false,
-        "sprite": "brute bonnet",
+        "sprite": "brute-bonnet",
         "spriteIndex": [22, 34]
       }
     ],
@@ -57330,7 +57330,7 @@
         "ultraBeast": false,
         "paradox": true,
         "cosmeticForme": false,
-        "sprite": "flutter mane",
+        "sprite": "flutter-mane",
         "spriteIndex": [23, 34]
       }
     ],
@@ -57373,7 +57373,7 @@
         "ultraBeast": false,
         "paradox": true,
         "cosmeticForme": false,
-        "sprite": "slither wing",
+        "sprite": "slither-wing",
         "spriteIndex": [24, 34]
       }
     ],
@@ -57416,7 +57416,7 @@
         "ultraBeast": false,
         "paradox": true,
         "cosmeticForme": false,
-        "sprite": "sandy shocks",
+        "sprite": "sandy-shocks",
         "spriteIndex": [25, 34]
       }
     ],
@@ -57502,7 +57502,7 @@
         "ultraBeast": false,
         "paradox": true,
         "cosmeticForme": false,
-        "sprite": "iron bundle",
+        "sprite": "iron-bundle",
         "spriteIndex": [27, 34]
       }
     ],
@@ -57545,7 +57545,7 @@
         "ultraBeast": false,
         "paradox": true,
         "cosmeticForme": false,
-        "sprite": "iron hands",
+        "sprite": "iron-hands",
         "spriteIndex": [28, 34]
       }
     ],
@@ -57588,7 +57588,7 @@
         "ultraBeast": false,
         "paradox": true,
         "cosmeticForme": false,
-        "sprite": "iron jugulis",
+        "sprite": "iron-jugulis",
         "spriteIndex": [29, 34]
       }
     ],
@@ -57631,7 +57631,7 @@
         "ultraBeast": false,
         "paradox": true,
         "cosmeticForme": false,
-        "sprite": "iron moth",
+        "sprite": "iron-moth",
         "spriteIndex": [30, 34]
       }
     ],
@@ -57674,7 +57674,7 @@
         "ultraBeast": false,
         "paradox": true,
         "cosmeticForme": false,
-        "sprite": "iron thorns",
+        "sprite": "iron-thorns",
         "spriteIndex": [31, 34]
       }
     ],
@@ -58146,7 +58146,7 @@
         "ultraBeast": false,
         "paradox": true,
         "cosmeticForme": false,
-        "sprite": "roaring moon",
+        "sprite": "roaring-moon",
         "spriteIndex": [5, 35]
       }
     ],
@@ -58189,7 +58189,7 @@
         "ultraBeast": false,
         "paradox": true,
         "cosmeticForme": false,
-        "sprite": "iron valiant",
+        "sprite": "iron-valiant",
         "spriteIndex": [6, 35]
       }
     ],

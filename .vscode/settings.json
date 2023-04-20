@@ -1,1 +1,9 @@
-{}
+{
+  "python.linting.enabled": false,
+  "python.linting.pylintEnabled": false,
+  "python.linting.lintOnSave": true,
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": true
+  }
+}
