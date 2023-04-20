@@ -26,7 +26,13 @@ def get_serebii_sprite(dex_num, form_num, is_shiny, game, is_female=False):
         formeName = ""
     else:
         formeSections = formeName.split(f'{monName}-')
-        formeName = formeSections[1][0] if len(formeSections) > 1 else ""
+        if len(formeSections) > 1:
+            if dex_num == 493:
+                formeName = formeSections[1]
+            else:
+                formeName = formeSections[1][0] 
+        else:
+            formeName = ""
 
     if dex_num == 741 and form_num == 2:
         formeName = 'pau'
@@ -337,9 +343,12 @@ sv_transferrable = [
     962, 963, 964, 965, 966, 967, 968, 969, 970, 971, 972, 973, 974, 975, 976,
     977, 978, 979, 980, 981, 982, 983, 984, 985, 986, 987, 988, 989, 990, 991, 
     992, 993, 994, 995, 996, 997, 998, 999, 1000, 1001, 1002, 1003, 1004, 1005, 
-    1006, 1007, 1008, 1009, 1010, 1011
-
-
+    1006, 1007, 1008, 1009, 1010,
+    4, 5, 6, 144, 145, 146, 150, 151, 155, 156, 157, 195, 382, 383, 384, 480, 
+    481, 482, 483, 484, 485, 487, 488, 493, 501, 502, 503, 641, 642, 645, 648, 
+    650, 651, 652, 653, 654, 655, 656, 657, 658, 703, 719, 720, 721, 722, 723, 
+    724, 801, 810, 811, 812, 813, 814, 815, 816, 817, 818, 863, 888, 889, 890, 
+    891, 892, 893, 894, 895, 896, 897, 898, 899, 900, 901, 902, 903, 904, 905
 ]
 
 
@@ -406,7 +415,7 @@ def exclude_forme_gen9(dex_number, forme):
         return True
     if forme["formeName"] == "Floette-Eternal":
         return True
-    return "-Mega" in forme["formeName"] or (dex_number == 25 and forme["formeNumber"] > 0)
+    return "-Mega" in forme["formeName"] or "-Primal" in forme["formeName"] or (dex_number == 25 and forme["formeNumber"] > 0)
 
 
 def exclude_forme_home(dex_number, forme):
@@ -444,7 +453,7 @@ def download_all_sprites_all_mons():
             print("retrying...")
         else:
             retries = 4
-            sleep_time = 1.0
+            sleep_time = min(1.0, sleep_time)
             serebii_calls = serebii_calls[1:]
             if should_wait and sleep_time > 0.5:
                 sleep_time -= 0.1
@@ -515,6 +524,9 @@ def functions_to_download_serebii(dex_number, forme, forme_number, forme_name):
     if dex_number <= 1010 and not exclude_forme_gen9(dex_number, forme):
         return download_sprite_variants_serebii(
             dex_number, forme_number, forme_name, "SV", "gen9")
+    # if dex_number <= 1010 and not exclude_forme_gen8(dex_number, forme):
+    #     return download_sprite_variants_serebii(
+    #         dex_number, forme_number, forme_name, "SWSH", "gen8")
     return []
 
 
