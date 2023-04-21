@@ -1,5 +1,3 @@
-import BoxIcons from '../images/icons/BoxIcons.png';
-
 export const initializeDragImage = () => {
   const dragIcon = document.createElement('img');
   dragIcon.id = 'drag-image';
@@ -8,6 +6,6 @@ export const initializeDragImage = () => {
   dragIcon.style.width = `${dimension}px`;
   dragIcon.style.position = 'absolute';
   dragIcon.style.top = '-500px';
-  dragIcon.style.opacity = "0.3";
+  dragIcon.style.opacity = '0.3';
   document.querySelector('body')?.appendChild(dragIcon);
 };

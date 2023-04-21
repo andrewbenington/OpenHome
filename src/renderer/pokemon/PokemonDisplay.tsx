@@ -1,9 +1,19 @@
+/* eslint-disable no-nested-ternary */
 import { MenuItem, Select } from '@mui/material';
+import {
+  BW2_TRANSFER_RESTRICTIONS,
+  GEN1_TRANSFER_RESTRICTIONS,
+  GEN2_TRANSFER_RESTRICTIONS,
+  GEN3_TRANSFER_RESTRICTIONS,
+  HGSS_TRANSFER_RESTRICTIONS,
+  LA_TRANSFER_RESTRICTIONS,
+  ORAS_TRANSFER_RESTRICTIONS,
+  USUM_TRANSFER_RESTRICTIONS,
+} from 'consts/TransferRestrictions';
 import _ from 'lodash';
 import { useEffect, useState } from 'react';
 import Themes from 'renderer/app/Themes';
 import { getSpritePath } from 'renderer/util/PokemonSprite';
-import { G1SAV, G2SAV, G3SAV, G5SAV, HGSSSAV } from 'types/SAVTypes';
 import { StringToStringMap } from 'types/types';
 import { POKEMON_DATA } from '../../consts/Mons';
 import {
@@ -19,11 +29,7 @@ import {
   PKM,
 } from '../../types/PKMTypes';
 import { getTypes } from '../../types/PKMTypes/util';
-import {
-  Gen89RegionalForms,
-  RegionalForms,
-  isRestricted,
-} from '../../types/TransferRestrictions';
+import { isRestricted } from '../../types/TransferRestrictions';
 import OpenHomeButton from '../components/OpenHomeButton';
 import AttributeRow from './AttributeRow';
 import OtherDisplay from './OtherDisplay';
@@ -37,16 +43,6 @@ import {
   fileTypeChipStyle,
   tabButtonStyle,
 } from './styles';
-import {
-  BW2_TRANSFER_RESTRICTIONS,
-  GEN1_TRANSFER_RESTRICTIONS,
-  GEN2_TRANSFER_RESTRICTIONS,
-  GEN3_TRANSFER_RESTRICTIONS,
-  HGSS_TRANSFER_RESTRICTIONS,
-  LA_TRANSFER_RESTRICTIONS,
-  ORAS_TRANSFER_RESTRICTIONS,
-  USUM_TRANSFER_RESTRICTIONS,
-} from 'consts/TransferRestrictions';
 
 const getTypeFromString = (type: string) => {
   switch (type) {
@@ -68,28 +64,46 @@ const getTypeFromString = (type: string) => {
       return PK7;
     case 'PA8':
       return PA8;
+    default:
+      return undefined;
   }
+};
+
+const fileTypeColors: StringToStringMap = {
+  OHPKM: '#748fcd',
+  PK1: '#b34',
+  PK2: '#b6c',
+  PK3: '#9b3',
+  COLOPKM: '#93f',
+  XDPKM: '#53b',
+  PK4: '#f88',
+  PK5: '#484',
+  PK6: 'blue',
+  PK7: 'orange',
+  PB7: '#a75',
+  PK8: '#6bf',
+  PB8: '#6bf',
+  PA8: '#8cc',
+  PK9: '#f52',
 };
 
 const PokemonDisplay = (props: {
   mon: PKM;
-  updateMon: (mon: PKM) => void;
+  updateMon: (_: PKM) => void;
   tab: string;
-  setTab: (tab: string) => void;
+  setTab: (_: string) => void;
 }) => {
   const { mon, updateMon, tab, setTab } = props;
   const [displayMon, setDisplayMon] = useState(mon);
   const [monSprites, setMonSprites] = useState<StringToStringMap>();
 
   useEffect(() => {
-    console.log('useEffect import sprites');
-    let sprites: StringToStringMap = {};
+    const sprites: StringToStringMap = {};
     const importSprite = async (format: string) => {
       if (!(format in sprites)) {
         const sprite = await import(
           `../images/sprites/${getSpritePath(mon, format)}`
         );
-        console.log('sprite imported:', sprite.default, format);
         sprites[format] = sprite.default;
       }
     };
@@ -116,7 +130,6 @@ const PokemonDisplay = (props: {
         !isRestricted(LA_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
           importSprite('PA8'),
       ]);
-      console.log(sprites);
       setMonSprites(sprites);
     };
     importSprites();
@@ -341,24 +354,6 @@ const PokemonDisplay = (props: {
       </div>
     </div>
   );
-};
-
-const fileTypeColors: StringToStringMap = {
-  OHPKM: '#748fcd',
-  PK1: '#b34',
-  PK2: '#b6c',
-  PK3: '#9b3',
-  COLOPKM: '#93f',
-  XDPKM: '#53b',
-  PK4: '#f88',
-  PK5: '#484',
-  PK6: 'blue',
-  PK7: 'orange',
-  PB7: '#a75',
-  PK8: '#6bf',
-  PB8: '#6bf',
-  PA8: '#8cc',
-  PK9: '#f52',
 };
 
 export default PokemonDisplay;

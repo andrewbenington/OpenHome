@@ -1,4 +1,4 @@
-import { Card } from "@mui/material";
+import { Card } from '@mui/material';
 
 const AttributeTag = (props: {
   color: string;
@@ -12,9 +12,9 @@ const AttributeTag = (props: {
       style={{
         marginLeft: 5,
         marginTop: 5,
-        padding: icon ? "5px 5px 0px" : 5,
-        width: "fit-content",
-        fontWeight: "bold",
+        padding: icon ? '5px 5px 0px' : 5,
+        width: 'fit-content',
+        fontWeight: 'bold',
         color,
         backgroundColor,
       }}
@@ -25,11 +25,11 @@ const AttributeTag = (props: {
           src={icon}
           style={{
             height: 18,
-            objectFit: "contain",
+            objectFit: 'contain',
           }}
         />
       ) : (
-        label ?? ""
+        label ?? ''
       )}
     </Card>
   );

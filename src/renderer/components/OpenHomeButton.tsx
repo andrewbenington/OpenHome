@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState } from 'react';
 
 interface OpenHomeButtonProps {
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
   style?: any;
   children?: any;
-  disabled?: any
+  disabled?: any;
 }
 
 const OpenHomeButton = (props: OpenHomeButtonProps) => {
@@ -13,11 +13,11 @@ const OpenHomeButton = (props: OpenHomeButtonProps) => {
   return (
     <button
       style={{
-        border: "none",
+        border: 'none',
         borderRadius: 3,
-        cursor: "pointer",
-        filter: hovered ? "brightness(90%)" : undefined,
-        ...style
+        cursor: 'pointer',
+        filter: hovered ? 'brightness(90%)' : undefined,
+        ...style,
       }}
       onClick={onClick}
       onMouseEnter={() => setHovered(true)}

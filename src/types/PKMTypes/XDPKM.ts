@@ -1,3 +1,4 @@
+import { contestStats } from 'types/types';
 import { GameOfOriginData } from '../../consts/GameOfOrigin';
 import { Gen3Items } from '../../consts/Items';
 import { GCLanguages } from '../../consts/Languages';
@@ -15,11 +16,10 @@ import {
   getStatGen3Onward,
 } from '../../util/StatCalc';
 import { utf16BytesToString } from '../../util/Strings/StringConverter';
-import { PKM, contestStats } from './PKM';
+import { PKM } from './PKM';
 
 export class XDPKM extends PKM {
   constructor(bytes: Uint8Array) {
-    console.log('making xd PKM');
     super(bytes);
     this.format = 'XDPKM';
     this.personalityValue = bytesToUint32BigEndian(bytes, 0x28);
@@ -72,13 +72,13 @@ export class XDPKM extends PKM {
       spa: getStatGen3Onward('SpA', this),
       spd: getStatGen3Onward('SpD', this),
     };
-    let origin =
+    const origin =
       GameOfOriginData.find((game) => game?.gc === bytes[0x34]) ?? null;
     this.gameOfOrigin = GameOfOriginData.indexOf(origin);
     this.trainerName = utf16BytesToString(this.bytes, 0x38, 11, true);
     this.nickname = utf16BytesToString(this.bytes, 0x4e, 11, true);
     this.ribbons = [];
-    let ribbonsValue = bytesToUint16BigEndian(bytes, 0x7c);
+    const ribbonsValue = bytesToUint16BigEndian(bytes, 0x7c);
     for (let ribbon = 0; ribbon < Gen3StandardRibbons.length; ribbon++) {
       if (ribbonsValue & (1 << (15 - ribbon))) {
         this.ribbons.push(Gen3StandardRibbons[ribbon]);
@@ -111,6 +111,7 @@ export class XDPKM extends PKM {
       this.bytes[0x7a + i] = value[i];
     }
   }
+
   public get movePPUps() {
     return [
       this.bytes[0x83],
@@ -125,6 +126,7 @@ export class XDPKM extends PKM {
       this.bytes[0x7b + i] = value[i];
     }
   }
+
   public get contest() {
     return {
       cool: this.bytes[0xae],

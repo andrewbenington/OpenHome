@@ -1,8 +1,8 @@
 import { FileOpen } from '@mui/icons-material';
 import { Dialog, useTheme } from '@mui/material';
-import BoxIcons from '../images/icons/BoxIcons.png';
+import { POKEMON_DATA } from 'consts';
 import _ from 'lodash';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import OpenHomeButton from 'renderer/components/OpenHomeButton';
 import { loadRecentSaves } from 'renderer/redux/slices/recentSavesSlice';
 import { loadResourcesPath } from 'renderer/redux/slices/resourcesSlice';
@@ -11,6 +11,7 @@ import { acceptableExtensions, bytesToPKM } from 'util/FileImport';
 import { getMonFileIdentifier } from 'util/Lookup';
 import { PKM } from '../../types/PKMTypes/PKM';
 import { SaveCoordinates } from '../../types/types';
+import BoxIcons from '../images/icons/BoxIcons.png';
 import PokemonDisplay from '../pokemon/PokemonDisplay';
 import { useAppDispatch } from '../redux/hooks';
 import {
@@ -41,7 +42,6 @@ import {
 } from '../util/ipcFunctions';
 import Themes, { OpenHomeTheme } from './Themes';
 import { dropAreaStyle } from './styles';
-import { POKEMON_DATA } from 'consts';
 
 const Home = () => {
   const { palette } = useTheme();
@@ -62,11 +62,14 @@ const Home = () => {
   const dispatchDeleteMon = (saveCoordinates: SaveCoordinates) =>
     dispatch(deleteMon(saveCoordinates));
   const [writeAllSaveFiles, writeAllHomeData] = useSaveFunctions();
-  const dispatchClearAllSaves = () => dispatch(clearAllSaves());
+  const dispatchClearAllSaves = useCallback(
+    () => dispatch(clearAllSaves()),
+    [dispatch]
+  );
   const dispatchCancelDrag = () => dispatch(cancelDrag());
 
   useEffect(() => {
-    console.log(
+    console.info(
       'modifiedOHPKMs updated',
       Object.values(modifiedOHPKMs).map((mon) => mon.nickname)
     );
@@ -76,16 +79,15 @@ const Home = () => {
     const processDroppedData = async (file?: File, droppedMon?: PKM) => {
       let mon: PKM | undefined = droppedMon;
       if (file) {
-        let bytes = new Uint8Array(await file.arrayBuffer());
+        const bytes = new Uint8Array(await file.arrayBuffer());
         let [extension] = file.name.split('.').slice(-1);
         extension = extension.toUpperCase();
         if (!acceptableExtensions.includes(extension)) {
-          console.log(`invalid extension: ${extension}`);
+          console.error(`invalid extension: ${extension}`);
           return;
         }
         mon = bytesToPKM(bytes, extension);
       }
-      console.log(mon);
       if (!mon) return;
       switch (type) {
         case 'as is':
@@ -93,8 +95,8 @@ const Home = () => {
           break;
       }
     };
-    let file = e.dataTransfer.files[0];
-    let mon = dragMon;
+    const file = e.dataTransfer.files[0];
+    const mon = dragMon;
     if (!file && dragSource) {
       if (mon && type === 'release') {
         dispatchDeleteMon(dragSource);
@@ -113,13 +115,12 @@ const Home = () => {
     }
   };
 
-  const saveChanges = () => {
-    console.log('save changes');
+  const saveChanges = useCallback(() => {
     writeAllSaveFiles();
     writeAllHomeData();
     handleDeleteOHPKMFiles(filesToDelete);
     setFilesToDelete([]);
-  };
+  }, [filesToDelete, writeAllHomeData, writeAllSaveFiles]);
 
   // listener for menu save
   useEffect(() => {
@@ -133,7 +134,7 @@ const Home = () => {
       dispatch(loadHomeMons()).then(() => dispatch(loadHomeBoxes()));
     }, dispatchClearAllSaves);
     return () => callback();
-  }, [saves]);
+  }, [dispatch, dispatchClearAllSaves, saves]);
 
   // load all data when app starts
   useEffect(() => {
@@ -145,7 +146,7 @@ const Home = () => {
       dispatch(loadRecentSaves()),
       dispatch(loadResourcesPath()),
     ]).then(() => setLoadingMessage(undefined));
-  }, []);
+  }, [dispatch]);
 
   return loadingMessage ? (
     <div>{loadingMessage}</div>

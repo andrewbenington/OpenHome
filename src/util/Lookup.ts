@@ -1,4 +1,4 @@
-import { OHPKM, PK3, PK4, PKM } from '../types/PKMTypes';
+import { OHPKM, PK4, PKM } from '../types/PKMTypes';
 import { getBaseMon } from '../types/PKMTypes/util';
 import { bytesToString } from './ByteLogic';
 import {
@@ -17,6 +17,7 @@ export const getMonFileIdentifier = (mon: OHPKM) => {
       4
     )}-${bytesToString(mon.gameOfOrigin, 1)}`;
   }
+  return undefined;
 };
 
 export const getMonGen12Identifier = (mon: PKM) => {
@@ -40,6 +41,7 @@ export const getMonGen12Identifier = (mon: PKM) => {
       16
     )}-${dvs.spc.toString(16)}-${dvs.spe.toString(16)}`;
   }
+  return undefined;
 };
 
 export const getMonGen345Identifier = (mon: PKM) => {

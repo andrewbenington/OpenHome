@@ -1,13 +1,13 @@
 import { ArrowForwardIosSharp } from '@mui/icons-material';
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
-import { isAlola, isGen6 } from 'consts';
-import Countries from 'consts/Countries';
-import Types from 'consts/Types';
+import { Countries, NDex, SWEETS, Types, isAlola, isGen6 } from 'consts';
+import {
+  GEN2_TRANSFER_RESTRICTIONS,
+  HGSS_TRANSFER_RESTRICTIONS,
+} from 'consts/TransferRestrictions';
 import _ from 'lodash';
 import { OHPKM, PK1, PK2, PK3, PK4, PK5, PKM } from 'types/PKMTypes';
-import { G2SAV } from 'types/SAVTypes/G2SAV';
-import { HGSSSAV } from 'types/SAVTypes/HGSSSAV';
 import { isRestricted } from 'types/TransferRestrictions';
 import {
   getMonFileIdentifier,
@@ -29,9 +29,6 @@ import {
   shinyLeafEmptyIconStyle,
   shinyLeafIconStyle,
 } from './styles';
-import { HGSS_TRANSFER_RESTRICTIONS, GEN2_TRANSFER_RESTRICTIONS } from 'consts/TransferRestrictions';
-import { NDex } from 'consts/NationalDex';
-import { SWEETS } from 'consts/Formes';
 
 const OtherDisplay = (props: { mon: PKM }) => {
   const { mon } = props;
@@ -40,7 +37,7 @@ const OtherDisplay = (props: { mon: PKM }) => {
       {mon.personalityValue !== undefined ? (
         <AttributeRow label="Personality Value">
           <code>
-            {'0x' + mon.personalityValue.toString(16).padStart(8, '0')}
+            {`0x${mon.personalityValue.toString(16).padStart(8, '0')}`}
           </code>
         </AttributeRow>
       ) : (
@@ -49,7 +46,7 @@ const OtherDisplay = (props: { mon: PKM }) => {
       {mon.encryptionConstant !== undefined ? (
         <AttributeRow label="Encryption Constant">
           <code>
-            {'0x' + mon.encryptionConstant.toString(16).padStart(8, '0')}
+            {`0x${mon.encryptionConstant.toString(16).padStart(8, '0')}`}
           </code>
         </AttributeRow>
       ) : (
@@ -73,7 +70,7 @@ const OtherDisplay = (props: { mon: PKM }) => {
         <AttributeRow label="ID" value={mon.displayID.toString()} indent={10} />
         {mon.secretID !== undefined ? (
           <AttributeRow label="Secret ID" indent={10}>
-            <code>{'0x' + mon.secretID.toString(16).padStart(4, '0')}</code>
+            <code>{`0x${mon.secretID.toString(16).padStart(4, '0')}`}</code>
           </AttributeRow>
         ) : (
           <div />
@@ -158,10 +155,7 @@ const OtherDisplay = (props: { mon: PKM }) => {
         <div />
       )}
       {mon.dexNum === NDex.ALCREMIE && mon.formArgument ? (
-        <AttributeRow
-          label="Sweet"
-          value={SWEETS[mon.formArgument]}
-        />
+        <AttributeRow label="Sweet" value={SWEETS[mon.formArgument]} />
       ) : (
         <div />
       )}
@@ -192,10 +186,16 @@ const OtherDisplay = (props: { mon: PKM }) => {
       mon.shinyLeaves !== undefined ? (
         <AttributeRow label="Shiny Leaves">
           {mon.shinyLeafValues?.crown ? (
-            <img draggable={false} src={LeafCrown} style={leafCrownIconStyle} />
+            <img
+              alt="shiny_leaf_crown"
+              draggable={false}
+              src={LeafCrown}
+              style={leafCrownIconStyle}
+            />
           ) : (
             <div style={{ display: 'flex', flexDirection: 'row' }}>
               <img
+                alt="shiny_leaf_1"
                 draggable={false}
                 src={ShinyLeaf}
                 style={{
@@ -206,6 +206,7 @@ const OtherDisplay = (props: { mon: PKM }) => {
                 }}
               />
               <img
+                alt="shiny_leaf_2"
                 draggable={false}
                 src={ShinyLeaf}
                 style={{
@@ -216,6 +217,7 @@ const OtherDisplay = (props: { mon: PKM }) => {
                 }}
               />
               <img
+                alt="shiny_leaf_3"
                 draggable={false}
                 src={ShinyLeaf}
                 style={{
@@ -226,6 +228,7 @@ const OtherDisplay = (props: { mon: PKM }) => {
                 }}
               />
               <img
+                alt="shiny_leaf_4"
                 draggable={false}
                 src={ShinyLeaf}
                 style={{
@@ -236,6 +239,7 @@ const OtherDisplay = (props: { mon: PKM }) => {
                 }}
               />
               <img
+                alt="shiny_leaf_5"
                 draggable={false}
                 src={ShinyLeaf}
                 style={{
@@ -312,7 +316,7 @@ const OtherDisplay = (props: { mon: PKM }) => {
                   width: 8,
                   marginRight: 4,
                 }}
-              ></div>
+              />
             ))}
           </div>
         </AttributeRow>
@@ -354,8 +358,14 @@ const OtherDisplay = (props: { mon: PKM }) => {
         <div />
       )}
       {!isRestricted(HGSS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
-      (mon instanceof PK3 || mon instanceof PK4 || mon instanceof PK5 ||  mon instanceof OHPKM) ? (
-        <AttributeRow label="Gen 3/4/5 ID" value={getMonGen345Identifier(mon)} />
+      (mon instanceof PK3 ||
+        mon instanceof PK4 ||
+        mon instanceof PK5 ||
+        mon instanceof OHPKM) ? (
+        <AttributeRow
+          label="Gen 3/4/5 ID"
+          value={getMonGen345Identifier(mon)}
+        />
       ) : (
         <div />
       )}
@@ -394,7 +404,7 @@ const OtherDisplay = (props: { mon: PKM }) => {
         {mon.isNsPokemon && (
           <AttributeTag
             label="N's Pokémon"
-            backgroundColor={'green'}
+            backgroundColor="green"
             color="white"
           />
         )}

@@ -9,6 +9,7 @@ import { G4SAV } from './G4SAV';
 
 export class DPSAV extends G4SAV {
   saveType = SaveType.DP;
+
   transferRestrictions = {
     maxDexNum: 493,
     excludedForms: {
@@ -23,22 +24,32 @@ export class DPSAV extends G4SAV {
       // shaymin sky
       492: [1],
       // arceus fairy
-      493: [17]
+      493: [17],
     },
   };
 
   static TRAINER_NAME_OFFSET = 0x64;
+
   static TRAINER_ID_OFFSET = 0x74;
+
   static BOX_SIZE = 0xff0;
+
   static GENERAL_BLOCK_OFFSET = 0x0000;
+
   static GENERAL_BLOCK_SIZE = 0xc100;
+
   static STORAGE_BLOCK_OFFSET = 0xc100;
+
   static STORAGE_BLOCK_SIZE = 0x121e0;
+
   static BOX_NAMES_OFFSET = 0x11ee0;
 
   currentSaveStorageBlockOffset: number = DPSAV.STORAGE_BLOCK_OFFSET;
+
   storageBlockSize: number = DPSAV.STORAGE_BLOCK_SIZE;
+
   boxSize: number = DPSAV.BOX_SIZE;
+
   boxNamesOffset: number;
 
   constructor(path: string, bytes: Uint8Array) {
@@ -68,7 +79,6 @@ export class DPSAV extends G4SAV {
   }
 
   getCurrentSaveCount(blockOffset: number, blockSize: number) {
-    console.log((blockOffset + blockSize).toString(16));
     return bytesToUint32LittleEndian(
       this.bytes,
       blockOffset + blockSize - this.footerSize

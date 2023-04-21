@@ -1,11 +1,7 @@
 import { Abilities } from '../../consts/Abilities';
 import { Items } from '../../consts/Items';
 import { Languages } from '../../consts/Languages';
-import {
-  Gen9RibbonsPart1,
-  Gen9RibbonsPart2,
-  RibbonTitles,
-} from '../../consts/Ribbons';
+import { Gen9RibbonsPart1, Gen9RibbonsPart2 } from '../../consts/Ribbons';
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -55,6 +51,7 @@ export class PK8 extends PKM {
   public get metLocationIndex() {
     return bytesToUint16LittleEndian(this.bytes, 0x122);
   }
+
   public set metLocationIndex(value: number) {
     this.bytes.set(uint16ToBytesLittleEndian(value), 0x122);
   }
@@ -96,7 +93,7 @@ export class PK8 extends PKM {
       bytesToUint16LittleEndian(bytes, 0x88),
     ];
     this.level = getLevelGen3Onward(this.dexNum, this.exp);
-    let ivBytes = bytesToUint32LittleEndian(bytes, 0x8c);
+    const ivBytes = bytesToUint32LittleEndian(bytes, 0x8c);
     this.ivs = {
       hp: ivBytes & 0x1f,
       atk: (ivBytes >> 5) & 0x1f,
@@ -136,7 +133,7 @@ export class PK8 extends PKM {
         : bytesToUint32LittleEndian(bytes, 0x0c) % 1000000;
     let byteArray = new Uint16Array(12);
     for (let i = 0; i < 12; i += 1) {
-      let byte = bytesToUint16LittleEndian(bytes, 0x58 + 2 * i);
+      const byte = bytesToUint16LittleEndian(bytes, 0x58 + 2 * i);
       if (byte === 0) {
         break;
       }
@@ -145,7 +142,7 @@ export class PK8 extends PKM {
     this.nickname = new TextDecoder('utf-16').decode(byteArray);
     byteArray = new Uint16Array(12);
     for (let i = 0; i < 12; i += 1) {
-      let byte = bytesToUint16LittleEndian(bytes, 0xf8 + 2 * i);
+      const byte = bytesToUint16LittleEndian(bytes, 0xf8 + 2 * i);
       if (byte === 0) {
         break;
       }
@@ -154,17 +151,17 @@ export class PK8 extends PKM {
     this.trainerName = new TextDecoder('utf-16').decode(byteArray);
     this.ribbons = [];
     for (let byte = 0; byte < 8; byte++) {
-      let ribbonsUint8 = bytes[0x34 + byte];
+      const ribbonsUint8 = bytes[0x34 + byte];
       for (let bit = 0; bit < 8; bit++) {
-        if (ribbonsUint8 & Math.pow(2, bit)) {
+        if (ribbonsUint8 & (2 ** bit)) {
           this.ribbons.push(Gen9RibbonsPart1[8 * byte + bit]);
         }
       }
     }
     for (let byte = 0; byte < 6; byte++) {
-      let ribbonsUint8 = bytes[0x40 + byte];
+      const ribbonsUint8 = bytes[0x40 + byte];
       for (let bit = 0; bit < 8; bit++) {
-        if (ribbonsUint8 & Math.pow(2, bit)) {
+        if (ribbonsUint8 & (2 ** bit)) {
           this.ribbons.push(Gen9RibbonsPart2[32 + 8 * byte + bit]);
         }
       }
@@ -196,6 +193,7 @@ export class PK8 extends PKM {
   public get gender() {
     return (this.bytes[0x22] >> 2) & 0x3;
   }
+
   public set gender(value: number) {
     this.bytes[0x22] = (this.bytes[0x22] & 0xf3) | (value << 2);
   }

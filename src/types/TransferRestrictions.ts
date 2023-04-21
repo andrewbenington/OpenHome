@@ -1,6 +1,10 @@
 import { LGE_STARTER, LGP_STARTER } from 'consts/Formes';
 import { NDex } from 'consts/NationalDex';
 
+interface FormRestrictions {
+  [dexNum: number]: number[] | undefined;
+}
+
 export interface TransferRestrictions {
   // games up to USUM include all up to one number
   maxDexNum?: number;
@@ -9,11 +13,6 @@ export interface TransferRestrictions {
   // e.g. Alolan forms in BDSP
   excludedForms?: FormRestrictions;
 }
-
-interface FormRestrictions {
-  [dexNum: number]: number[] | undefined;
-}
-
 export const CapPikachus: FormRestrictions = {
   [NDex.PIKACHU]: [1, 2, 3, 4, 5, 6, 7, 9],
 };
@@ -38,7 +37,6 @@ export const AlolanForms: FormRestrictions = {
   [NDex.EXEGGUTOR]: [1],
   [NDex.MAROWAK]: [1],
 };
-
 
 export const GalarianForms: FormRestrictions = {
   [NDex.MEOWTH]: [2],

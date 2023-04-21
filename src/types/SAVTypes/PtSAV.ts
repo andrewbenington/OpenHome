@@ -1,5 +1,5 @@
 import { GameOfOrigin } from 'consts';
-import { CapPikachus, RegionalForms } from 'types/TransferRestrictions';
+import { PT_TRANSFER_RESTRICTIONS } from 'consts/TransferRestrictions';
 import { SaveType } from 'types/types';
 import {
   bytesToUint16LittleEndian,
@@ -10,30 +10,33 @@ import { G4SAV } from './G4SAV';
 
 export class PtSAV extends G4SAV {
   saveType = SaveType.Pt;
+
   origin = GameOfOrigin.Platinum;
-  transferRestrictions = {
-    maxDexNum: 493,
-    excludedForms: {
-      ...RegionalForms,
-      ...CapPikachus,
-      483: [1],
-      484: [1],
-      493: [17],
-    },
-  };
+
+  transferRestrictions = PT_TRANSFER_RESTRICTIONS;
 
   static TRAINER_NAME_OFFSET = 0x68;
+
   static TRAINER_ID_OFFSET = 0x78;
+
   static BOX_SIZE = 0xff0;
+
   static GENERAL_BLOCK_OFFSET = 0x0000;
+
   static GENERAL_BLOCK_SIZE = 0xcf2c;
+
   static STORAGE_BLOCK_OFFSET = 0xcf2c;
+
   static STORAGE_BLOCK_SIZE = 0x121e4;
+
   static BOX_NAMES_OFFSET = 0x11ee0;
 
   currentSaveStorageBlockOffset: number = PtSAV.STORAGE_BLOCK_OFFSET;
+
   storageBlockSize: number = PtSAV.STORAGE_BLOCK_SIZE;
+
   boxSize: number = PtSAV.BOX_SIZE;
+
   boxNamesOffset: number;
 
   constructor(path: string, bytes: Uint8Array) {
@@ -63,7 +66,6 @@ export class PtSAV extends G4SAV {
   }
 
   getCurrentSaveCount(blockOffset: number, blockSize: number) {
-    console.log((blockOffset + blockSize).toString(16));
     return bytesToUint32LittleEndian(
       this.bytes,
       blockOffset + blockSize - this.footerSize

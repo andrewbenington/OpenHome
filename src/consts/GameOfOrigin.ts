@@ -1,4 +1,5 @@
-import { Origin } from '../types/types';
+/* eslint-disable no-unused-vars */
+import { Origin } from 'types/types';
 
 export const GameOfOriginData: (Origin | null)[] = [
   null,
@@ -140,6 +141,77 @@ export enum GameOfOrigin {
   Violet,
 }
 
+export const isAlola = (origin: GameOfOrigin) => {
+  return origin >= GameOfOrigin.Sun && origin <= GameOfOrigin.UltraMoon;
+};
+
+export const isGalar = (origin: GameOfOrigin) => {
+  return origin === GameOfOrigin.Sword || origin === GameOfOrigin.Shield;
+};
+
+export const isGen1 = (origin: GameOfOrigin) => {
+  return origin >= GameOfOrigin.Red && origin <= GameOfOrigin.Yellow;
+};
+
+export const isGen2 = (origin: GameOfOrigin) => {
+  return origin >= GameOfOrigin.Gold && origin <= GameOfOrigin.Crystal;
+};
+
+export const isGBA = (origin: GameOfOrigin) => {
+  return origin >= GameOfOrigin.Sapphire && origin <= GameOfOrigin.LeafGreen;
+};
+
+export const isGen3 = (origin: GameOfOrigin) => {
+  return isGBA(origin) || origin === GameOfOrigin.ColosseumXD;
+};
+
+export const isGen4 = (origin: GameOfOrigin) => {
+  return origin >= GameOfOrigin.HeartGold && origin <= GameOfOrigin.Platinum;
+};
+
+export const isGen5 = (origin: GameOfOrigin) => {
+  return origin >= GameOfOrigin.White && origin <= GameOfOrigin.Black2;
+};
+
+export const isUnova = (origin: GameOfOrigin) => {
+  return isGen5(origin);
+};
+
+export const isGen6 = (origin: GameOfOrigin) => {
+  return origin >= GameOfOrigin.X && origin <= GameOfOrigin.OmegaRuby;
+};
+
+export const isKalos = (origin: GameOfOrigin) => {
+  return isGen6(origin);
+};
+
+export const isLetsGo = (origin: GameOfOrigin) => {
+  return (
+    origin === GameOfOrigin.LetsGoPikachu || origin === GameOfOrigin.LetsGoEevee
+  );
+};
+
+export const isGen7 = (origin: GameOfOrigin) => {
+  return isAlola(origin) || isLetsGo(origin);
+};
+
+export const isBDSP = (origin: GameOfOrigin) => {
+  return (
+    origin === GameOfOrigin.BrilliantDiamond ||
+    origin === GameOfOrigin.ShiningPearl
+  );
+};
+
+export const isGen8 = (origin: GameOfOrigin) => {
+  return (
+    isGalar(origin) || isBDSP(origin) || origin === GameOfOrigin.LegendsArceus
+  );
+};
+
+export const isGen9 = (origin: GameOfOrigin) => {
+  return origin === GameOfOrigin.Scarlet || origin === GameOfOrigin.Violet;
+};
+
 export const isKanto = (origin: GameOfOrigin) => {
   return (
     isGen1(origin) ||
@@ -176,77 +248,6 @@ export const isSinnoh = (origin: GameOfOrigin) => {
     origin === GameOfOrigin.BrilliantDiamond ||
     origin === GameOfOrigin.ShiningPearl
   );
-};
-
-export const isUnova = (origin: GameOfOrigin) => {
-  return isGen5(origin);
-};
-
-export const isKalos = (origin: GameOfOrigin) => {
-  return isGen6(origin);
-};
-
-export const isAlola = (origin: GameOfOrigin) => {
-  return origin >= GameOfOrigin.Sun && origin <= GameOfOrigin.UltraMoon;
-};
-
-export const isGalar = (origin: GameOfOrigin) => {
-  return origin === GameOfOrigin.Sword || origin === GameOfOrigin.Shield;
-};
-
-export const isGen1 = (origin: GameOfOrigin) => {
-  return origin >= GameOfOrigin.Red && origin <= GameOfOrigin.Yellow;
-};
-
-export const isGen2 = (origin: GameOfOrigin) => {
-  return origin >= GameOfOrigin.Gold && origin <= GameOfOrigin.Crystal;
-};
-
-export const isGen3 = (origin: GameOfOrigin) => {
-  return isGBA(origin) || origin === GameOfOrigin.ColosseumXD;
-};
-
-export const isGBA = (origin: GameOfOrigin) => {
-  return origin >= GameOfOrigin.Sapphire && origin <= GameOfOrigin.LeafGreen;
-};
-
-export const isGen4 = (origin: GameOfOrigin) => {
-  return origin >= GameOfOrigin.HeartGold && origin <= GameOfOrigin.Platinum;
-};
-
-export const isGen5 = (origin: GameOfOrigin) => {
-  return origin >= GameOfOrigin.White && origin <= GameOfOrigin.Black2;
-};
-
-export const isGen6 = (origin: GameOfOrigin) => {
-  return origin >= GameOfOrigin.X && origin <= GameOfOrigin.OmegaRuby;
-};
-
-export const isGen7 = (origin: GameOfOrigin) => {
-  return isAlola(origin) || isLetsGo(origin);
-};
-
-export const isLetsGo = (origin: GameOfOrigin) => {
-  return (
-    origin === GameOfOrigin.LetsGoPikachu || origin === GameOfOrigin.LetsGoEevee
-  );
-};
-
-export const isGen8 = (origin: GameOfOrigin) => {
-  return (
-    isGalar(origin) || isBDSP(origin) || origin === GameOfOrigin.LegendsArceus
-  );
-};
-
-export const isBDSP = (origin: GameOfOrigin) => {
-  return (
-    origin === GameOfOrigin.BrilliantDiamond ||
-    origin === GameOfOrigin.ShiningPearl
-  );
-};
-
-export const isGen9 = (origin: GameOfOrigin) => {
-  return origin === GameOfOrigin.Scarlet || origin === GameOfOrigin.Violet;
 };
 
 export const gameOfOriginFromFormat = (format: string) => {

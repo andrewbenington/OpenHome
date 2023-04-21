@@ -1,13 +1,17 @@
+import bigInt from 'big-integer';
 import { max } from 'lodash';
 import Prando from 'prando';
-import { MOVE_DATA, POKEMON_DATA } from '../../consts';
-import Types from '../../consts/Types';
+import { stats, statsPreSplit } from 'types/types';
+import { MOVE_DATA, NDex, POKEMON_DATA, Types } from '../../consts';
 import {
+  bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
   uint16ToBytesLittleEndian,
+  uint32ToBytesLittleEndian,
   writeUint32ToBuffer,
 } from '../../util/ByteLogic';
-import { PKM, stats, statsPreSplit } from './PKM';
+import { getGen3To5Gender } from '../../util/GenderCalc';
+import { PKM } from './PKM';
 
 export const writeIVsToBuffer = (
   ivs: stats,
@@ -41,14 +45,14 @@ export const getAbilityFromNumber = (
       POKEMON_DATA[dexNum].formes[formNum].abilityH ??
       POKEMON_DATA[dexNum].formes[formNum].ability1
     );
-  } else if (abilityNum === 2) {
+  }
+  if (abilityNum === 2) {
     return (
       POKEMON_DATA[dexNum].formes[formNum].ability2 ??
       POKEMON_DATA[dexNum].formes[formNum].ability1
     );
-  } else {
-    return POKEMON_DATA[dexNum].formes[formNum].ability1;
   }
+  return POKEMON_DATA[dexNum].formes[formNum].ability1;
 };
 
 export const getUnownLetterGen3 = (personalityValue: number) => {
@@ -87,7 +91,16 @@ export const ivsFromDVs = (dvs: statsPreSplit) => {
 };
 
 const gvFromIV = (iv: number) => {
-  return iv < 20 ? 0 : iv < 26 ? 1 : iv < 31 ? 2 : 3;
+  if (iv < 20) {
+    return 0;
+  }
+  if (iv < 26) {
+    return 1;
+  }
+  if (iv < 31) {
+    return 2;
+  }
+  return 3;
 };
 
 export const gvsFromIVs = (ivs: stats) => {
@@ -284,4 +297,77 @@ export const getSixDigitTID = (tid: number, sid: number) => {
   bytes.set(uint16ToBytesLittleEndian(tid), 0);
   bytes.set(uint16ToBytesLittleEndian(sid), 2);
   return bytesToUint32LittleEndian(bytes, 0x0c) % 1000000;
+};
+
+const getIsShinyPreGen6 = (
+  trainerID: number,
+  secretID: number,
+  personalityValue: number
+) =>
+  (trainerID ^
+    secretID ^
+    ((personalityValue >> 16) & 0xffff) ^
+    (personalityValue & 0xffff)) <
+  8;
+
+export const generatePersonalityValuePreservingAttributes = (
+  mon: PKM,
+  prng: Prando = new Prando()
+) => {
+  const personalityValue = mon.personalityValue ?? prng.nextInt(0, 0xffffffff);
+  const otherNature = mon.statNature ?? mon.nature;
+  // xoring the other three values with this to calculate upper half of personality value
+  // will ensure shininess or non-shininess depending on original mon
+  const otherGender = mon.gender;
+  const otherAbilityNum = mon.abilityNum ?? 4;
+  let i = 0;
+  let newPersonalityValue = bigInt(personalityValue);
+  const shouldCheckUnown = mon.dexNum === NDex.UNOWN;
+  while (i < 0x10000) {
+    const newGender = getGen3To5Gender(
+      newPersonalityValue.toJSNumber(),
+      mon.dexNum
+    );
+    const newNature = newPersonalityValue.mod(25).toJSNumber();
+    if (
+      (!shouldCheckUnown ||
+        getUnownLetterGen3(newPersonalityValue.toJSNumber()) === mon.formNum) &&
+      newGender === otherGender &&
+      (otherAbilityNum === 4 ||
+        shouldCheckUnown ||
+        newPersonalityValue.and(1).add(1).toJSNumber() === otherAbilityNum) &&
+      (otherNature === undefined || newNature === otherNature) &&
+      getIsShinyPreGen6(
+        mon.trainerID,
+        mon.secretID,
+        newPersonalityValue.toJSNumber()
+      ) === mon.isShiny
+    ) {
+      return newPersonalityValue.toJSNumber();
+    }
+    i++;
+    const pvBytes = uint32ToBytesLittleEndian(personalityValue);
+    let pvLower16, pvUpper16;
+    if (mon.dexNum === NDex.UNOWN) {
+      pvLower16 = prng.nextInt(0, 0xffff);
+      pvUpper16 = prng.nextInt(0, 0xffff);
+      if (mon.isShiny) {
+        pvUpper16 =
+          ((mon.trainerID ^ mon.secretID ^ pvLower16) & 0xfcfc) |
+          (pvUpper16 & 0x0303);
+      }
+    } else {
+      pvLower16 = bytesToUint16LittleEndian(pvBytes, 0);
+      pvUpper16 = bytesToUint16LittleEndian(pvBytes, 2);
+      pvLower16 ^= i;
+      if (mon.isShiny) {
+        const shinyXor = mon.isSquareShiny ? 0 : 1;
+        pvUpper16 = mon.trainerID ^ mon.secretID ^ pvLower16 ^ shinyXor;
+      }
+    }
+    pvBytes.set(uint16ToBytesLittleEndian(pvUpper16), 2);
+    pvBytes.set(uint16ToBytesLittleEndian(pvLower16), 0);
+    newPersonalityValue = bigInt(bytesToUint32LittleEndian(pvBytes, 0));
+  }
+  return personalityValue;
 };

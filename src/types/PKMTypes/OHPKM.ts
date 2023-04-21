@@ -1,4 +1,15 @@
-import { uniq } from 'lodash';
+import _, { uniq } from 'lodash';
+import Prando from 'prando';
+import {
+  contestStats,
+  geolocation,
+  hyperTrainStats,
+  marking,
+  memory,
+  pokedate,
+  stats,
+  statsPreSplit,
+} from 'types/types';
 import {
   Abilities,
   GameOfOrigin,
@@ -27,31 +38,20 @@ import {
   utf16BytesToString,
   utf16StringToBytes,
 } from '../../util/Strings/StringConverter';
-import {
-  contestStats,
-  geolocation,
-  hyperTrainStats,
-  marking,
-  memory,
-  PKM,
-  pokedate,
-  stats,
-  statsPreSplit,
-} from './PKM';
+import { PKM } from './PKM';
 import {
   adjustMovePPBetweenFormats,
   dvsFromIVs,
   formatHasColorMarkings,
   generateDVs,
   generateIVs,
+  generatePersonalityValuePreservingAttributes,
   generateTeraType,
   getAbilityFromNumber,
   gvsFromIVs,
   ivsFromDVs,
   writeIVsToBuffer,
 } from './util';
-import Prando from 'prando';
-import _ from 'lodash';
 
 export class OHPKM extends PKM {
   static fileSize = 376;
@@ -80,7 +80,7 @@ export class OHPKM extends PKM {
       this.isShadow = other.isShadow;
       if (other.markings) {
         other.markings?.forEach((value, index) => {
-          let temp = this.markings;
+          const temp = this.markings;
           temp[index] = value;
           this.markings = temp;
         });
@@ -104,7 +104,10 @@ export class OHPKM extends PKM {
       if (other.personalityValue !== undefined) {
         this.personalityValue = other.personalityValue;
       } else {
-        this.createPersonalityValueFromOtherPreGen6(other);
+        this.personalityValue = generatePersonalityValuePreservingAttributes(
+          other,
+          prng
+        );
       }
       this.encryptionConstant =
         other.encryptionConstant ??
@@ -161,8 +164,8 @@ export class OHPKM extends PKM {
         this.dvs = other.ivs
           ? dvsFromIVs(other.ivs, other.isShiny)
           : generateDVs(prng, other.isShiny);
-        let letterBits = other.formNum * 10;
-        let newDvs = this.dvs;
+        const letterBits = other.formNum * 10;
+        const newDvs = this.dvs;
         newDvs.atk = (newDvs.atk & 0b1001) | (((letterBits >> 6) & 0b11) << 1);
         newDvs.def = (newDvs.def & 0b1001) | (((letterBits >> 4) & 0b11) << 1);
         newDvs.spe = (newDvs.spe & 0b1001) | (((letterBits >> 2) & 0b11) << 1);
@@ -231,7 +234,7 @@ export class OHPKM extends PKM {
         feeling: 0,
       };
       this.eggDate = other.eggDate;
-      let now = new Date();
+      const now = new Date();
       this.metDate = other.metDate ?? {
         month: now.getMonth(),
         day: now.getDate(),
@@ -416,7 +419,7 @@ export class OHPKM extends PKM {
   ) {
     let markingsValue = 0;
     for (let i = 0; i < 6; i++) {
-      let shift = i * 2;
+      const shift = i * 2;
       markingsValue =
         (markingsValue & (0xffff ^ (3 << shift))) | (value[i] << shift);
     }
@@ -781,7 +784,7 @@ export class OHPKM extends PKM {
 
   public get dvs() {
     // big endian to be the same as gameboy games (ugh)
-    let dvBytes = bytesToUint16BigEndian(this.bytes, 0xaa);
+    const dvBytes = bytesToUint16BigEndian(this.bytes, 0xaa);
     return {
       spc: dvBytes & 0x0f,
       spe: (dvBytes >> 4) & 0x0f,
@@ -1424,7 +1427,7 @@ export class OHPKM extends PKM {
         });
       }
     }
-    if (other.shinyLeaves != undefined) {
+    if (other.shinyLeaves !== undefined) {
       this.shinyLeaves = other.shinyLeaves;
     }
     if (other.contest) {

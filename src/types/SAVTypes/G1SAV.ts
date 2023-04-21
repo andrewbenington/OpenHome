@@ -1,8 +1,8 @@
 import { GameOfOrigin } from 'consts';
+import { GEN1_TRANSFER_RESTRICTIONS } from 'consts/TransferRestrictions';
 import _, { uniq } from 'lodash';
 import { OHPKM } from 'types/PKMTypes/OHPKM';
 import { PK1 } from 'types/PKMTypes/PK1';
-import { CapPikachus, RegionalForms } from '../TransferRestrictions';
 import { SaveType } from 'types/types';
 import { bytesToUint16BigEndian, get8BitChecksum } from 'util/ByteLogic';
 import { natDexToGen1ID } from 'util/ConvertPokemonID';
@@ -11,7 +11,6 @@ import {
   utf16StringToGen12,
 } from 'util/Strings/StringConverter';
 import { Box, SAV } from './SAV';
-import { GEN1_TRANSFER_RESTRICTIONS } from 'consts/TransferRestrictions';
 
 class G1Box implements Box {
   name: string;
@@ -54,9 +53,8 @@ export class G1SAV extends SAV {
     this.displayID = this.tid.toString().padStart(5, '0');
     this.name = gen12StringToUTF(this.bytes, 0x2598, 11);
     this.currentPCBox = this.bytes[this.CURRENT_BOX_NUM_OFFSET] & 0x7f;
-    if (true) {
-      this.saveType = SaveType.RBY_I;
-    }
+    this.saveType = SaveType.RBY_I;
+
     let currenBoxByteOffset;
     if (this.currentPCBox < 6) {
       currenBoxByteOffset = 0x4000 + this.currentPCBox * this.BOX_SIZE;

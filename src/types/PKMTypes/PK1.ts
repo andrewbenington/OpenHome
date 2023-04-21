@@ -1,3 +1,4 @@
+import { statsPreSplit } from 'types/types';
 import { GameOfOrigin, Gen2Items, POKEMON_DATA } from '../../consts';
 import {
   bytesToUint16BigEndian,
@@ -9,7 +10,7 @@ import { gen1IDToNatDex, natDexToGen1ID } from '../../util/ConvertPokemonID';
 import { getLevelGen12 } from '../../util/StatCalc';
 import { gen12StringToUTF } from '../../util/Strings/StringConverter';
 import { OHPKM } from './OHPKM';
-import { PKM, statsPreSplit } from './PKM';
+import { PKM } from './PKM';
 import { adjustMovePPBetweenFormats, getTypes } from './util';
 
 const gen1TypeIndices: { [key: string]: number } = {
@@ -139,7 +140,10 @@ export class PK1 extends PKM {
       POKEMON_DATA[this.dexNum].formes[0].genderRatio.F > 0
         ? POKEMON_DATA[this.dexNum].formes[0].genderRatio.M
         : -1;
-    return maleRatio === -1 ? 2 : this.dvs.atk < maleRatio * 15 ? 1 : 0;
+    if (maleRatio === -1) {
+      return 2;
+    }
+    return this.dvs.atk < maleRatio * 15 ? 1 : 0;
   }
 
   public get formNum() {

@@ -1,3 +1,4 @@
+export const SPIKY_EAR = 1;
 export const EXCLAMATION = 26;
 export const QUESTION = 27;
 export const HEAT = 1;
@@ -24,11 +25,11 @@ export const BASE = 0;
 export const ALOLAN = 1;
 
 export enum SWEETS {
-  "Strawberry" = 0,
-  "Berry" = 1,
-  "Love" = 2,
-  "Star" = 3,
-  "Clover" = 4,
-  "Flower" = 5,
-  "Ribbon" = 6,
+  'Strawberry' = 0,
+  'Berry' = 1,
+  'Love' = 2,
+  'Star' = 3,
+  'Clover' = 4,
+  'Flower' = 5,
+  'Ribbon' = 6,
 }

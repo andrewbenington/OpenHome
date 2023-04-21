@@ -1,18 +1,18 @@
+import { Abilities } from '../../consts/Abilities';
+import { Items } from '../../consts/Items';
+import { Languages } from '../../consts/Languages';
 import { Gen9RibbonsPart1, Gen9RibbonsPart2 } from '../../consts/Ribbons';
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
 } from '../../util/ByteLogic';
-import { PKM } from './PKM';
-import { Abilities } from '../../consts/Abilities';
-import { Items } from '../../consts/Items';
-import { Languages } from '../../consts/Languages';
 import { svToNatDex } from '../../util/ConvertPokemonID';
 import {
   getHPGen3Onward,
   getLevelGen3Onward,
   getStatGen3Onward,
 } from '../../util/StatCalc';
+import { PKM } from './PKM';
 
 export class PK9 extends PKM {
   constructor(bytes: Uint8Array) {
@@ -59,7 +59,7 @@ export class PK9 extends PKM {
       spa: bytesToUint16LittleEndian(bytes, 0x152),
       spd: bytesToUint16LittleEndian(bytes, 0x154),
     };
-    let ivBytes = bytesToUint32LittleEndian(bytes, 0x8c);
+    const ivBytes = bytesToUint32LittleEndian(bytes, 0x8c);
     this.ivs = {
       hp: ivBytes & 0x1f,
       atk: (ivBytes >> 5) & 0x1f,
@@ -87,7 +87,7 @@ export class PK9 extends PKM {
     this.gameOfOrigin = bytesToUint16LittleEndian(bytes, 0xce);
     let byteArray = new Uint16Array(12);
     for (let i = 0; i < 12; i += 1) {
-      let byte = bytesToUint16LittleEndian(bytes, 0x58 + 2 * i);
+      const byte = bytesToUint16LittleEndian(bytes, 0x58 + 2 * i);
       if (byte === 0) {
         break;
       }
@@ -96,7 +96,7 @@ export class PK9 extends PKM {
     this.nickname = new TextDecoder('utf-16').decode(byteArray);
     byteArray = new Uint16Array(12);
     for (let i = 0; i < 12; i += 1) {
-      let byte = bytesToUint16LittleEndian(bytes, 0xf8 + 2 * i);
+      const byte = bytesToUint16LittleEndian(bytes, 0xf8 + 2 * i);
       if (byte === 0) {
         break;
       }
@@ -105,20 +105,18 @@ export class PK9 extends PKM {
     this.trainerName = new TextDecoder('utf-16').decode(byteArray);
     this.ribbons = [];
     for (let byte = 0; byte < 4; byte++) {
-      let ribbonsUint8 = bytes[0x34 + byte];
+      const ribbonsUint8 = bytes[0x34 + byte];
       for (let bit = 0; bit < 8; bit++) {
-        if (ribbonsUint8 & Math.pow(2, bit)) {
+        if (ribbonsUint8 & (2 ** bit)) {
           this.ribbons.push(Gen9RibbonsPart1[8 * byte + bit]);
-        } else {
         }
       }
     }
     for (let byte = 0; byte < 2; byte++) {
-      let ribbonsUint8 = bytes[0x44 + byte];
+      const ribbonsUint8 = bytes[0x44 + byte];
       for (let bit = 0; bit < 8; bit++) {
-        if (ribbonsUint8 & Math.pow(2, bit)) {
+        if (ribbonsUint8 & (2 ** bit)) {
           this.ribbons.push(Gen9RibbonsPart2[32 + 8 * byte + bit]);
-        } else {
         }
       }
     }
@@ -149,10 +147,11 @@ export class PK9 extends PKM {
   public get gender() {
     return (this.bytes[0x22] >> 1) & 0x3;
   }
+
   public set gender(value: number) {
     this.bytes[0x22] = (this.bytes[0x22] & 0xf9) | (value << 1);
   }
-  
+
   public get movePP() {
     return [
       this.bytes[0x7a],
@@ -183,13 +182,12 @@ export class PK9 extends PKM {
     }
   }
 
-
   public get affixedRibbon() {
     return this.bytes[0xd4] !== 0xff ? this.bytes[0xd4] : undefined;
   }
 
   public set affixedRibbon(value: number | undefined) {
-    this.bytes[0xd4] = value ?? 0xff
+    this.bytes[0xd4] = value ?? 0xff;
   }
 
   public get languageIndex() {

@@ -42,7 +42,7 @@ const AttributeRow = (props: {
           flexDirection: 'row',
           alignItems: 'center',
           justifyContent: justifyEnd ? 'end' : 'start',
-          textAlign: justifyEnd ? 'end' : 'start'
+          textAlign: justifyEnd ? 'end' : 'start',
         }}
       >
         {value ?? children}

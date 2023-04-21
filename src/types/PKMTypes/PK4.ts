@@ -1,16 +1,17 @@
+import { contestStats, marking, pokedate, stats } from 'types/types';
 import {
   Abilities,
   GameOfOrigin,
   Gen4RibbonsPart1,
   Gen4RibbonsPart2,
   Gen4RibbonsPart3,
+  Items,
+  Languages,
   isGen4,
   isHoenn,
   isJohto,
   isKanto,
   isSinnoh,
-  Items,
-  Languages,
 } from '../../consts';
 import G4Locations from '../../consts/MetLocation/G4';
 import {
@@ -37,9 +38,10 @@ import {
   utf16StringToGen4,
 } from '../../util/Strings/StringConverter';
 import { OHPKM } from './OHPKM';
-import { contestStats, marking, PKM, pokedate, stats } from './PKM';
+import { PKM } from './PKM';
 import {
   adjustMovePPBetweenFormats,
+  generatePersonalityValuePreservingAttributes,
   getAbilityFromNumber,
   writeIVsToBuffer,
 } from './util';
@@ -52,8 +54,8 @@ export class PK4 extends PKM {
       const bytes = args[0];
       const encrypted = args[1] ?? false;
       if (encrypted) {
-        let unencryptedBytes = decryptByteArrayGen45(bytes);
-        let unshuffledBytes = unshuffleBlocksGen45(unencryptedBytes);
+        const unencryptedBytes = decryptByteArrayGen45(bytes);
+        const unshuffledBytes = unshuffleBlocksGen45(unencryptedBytes);
         super(unshuffledBytes);
       } else {
         super(bytes);
@@ -73,10 +75,18 @@ export class PK4 extends PKM {
         other.ability ??
         getAbilityFromNumber(this.dexNum, this.formNum, this.abilityNum);
       // console
-      this.createPersonalityValueFromOtherPreGen6(other);
+      this.personalityValue =
+        generatePersonalityValuePreservingAttributes(other);
       this.isFatefulEncounter = other.isFatefulEncounter;
       this.gender = other.gender;
-      this.evs = other.evs ?? { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 };
+      this.evs = other.evs ?? {
+        hp: 0,
+        atk: 0,
+        def: 0,
+        spa: 0,
+        spd: 0,
+        spe: 0,
+      };
       this.contest = other.contest;
       this.pokerusByte = other.pokerusByte;
       this.ribbons = other.ribbons;
@@ -114,7 +124,7 @@ export class PK4 extends PKM {
       this.trainerName = other.trainerName;
       this.trainerFriendship = other.trainerFriendship;
       this.eggDate = other.eggDate;
-      let now = new Date();
+      const now = new Date();
       this.metDate = other.metDate ?? {
         month: now.getMonth(),
         day: now.getDate(),
@@ -151,6 +161,8 @@ export class PK4 extends PKM {
       this.metLevel = other.metLevel ?? this.level;
       this.trainerGender = other.trainerGender;
       this.refreshChecksum();
+    } else {
+      super(args[0]);
     }
   }
 
@@ -275,7 +287,7 @@ export class PK4 extends PKM {
     let markingsValue = 0;
     for (let i = 0; i < 6; i++) {
       if (value[i]) {
-        markingsValue = markingsValue | Math.pow(2, i);
+        markingsValue |= 2 ** i;
       }
     }
     this.bytes[0x16] = markingsValue;
@@ -347,9 +359,9 @@ export class PK4 extends PKM {
   public get ribbons() {
     const ribbons: string[] = [];
     for (let byte = 0; byte < 4; byte++) {
-      let ribbonsUint8 = this.bytes[0x24 + byte];
+      const ribbonsUint8 = this.bytes[0x24 + byte];
       for (let bit = 0; bit < 8; bit++) {
-        if (ribbonsUint8 & Math.pow(2, bit)) {
+        if (ribbonsUint8 & (2 ** bit)) {
           if (8 * byte + bit < Gen4RibbonsPart1.length) {
             ribbons.push(Gen4RibbonsPart1[8 * byte + bit]);
           }
@@ -357,9 +369,9 @@ export class PK4 extends PKM {
       }
     }
     for (let byte = 0; byte < 4; byte++) {
-      let ribbonsUint8 = this.bytes[0x3c + byte];
+      const ribbonsUint8 = this.bytes[0x3c + byte];
       for (let bit = 0; bit < 8; bit++) {
-        if (ribbonsUint8 & Math.pow(2, bit)) {
+        if (ribbonsUint8 & (2 ** bit)) {
           if (8 * byte + bit < Gen4RibbonsPart2.length) {
             ribbons.push(Gen4RibbonsPart2[8 * byte + bit]);
           }
@@ -367,9 +379,9 @@ export class PK4 extends PKM {
       }
     }
     for (let byte = 0; byte < 4; byte++) {
-      let ribbonsUint8 = this.bytes[0x60 + byte];
+      const ribbonsUint8 = this.bytes[0x60 + byte];
       for (let bit = 0; bit < 8; bit++) {
-        if (ribbonsUint8 & Math.pow(2, bit)) {
+        if (ribbonsUint8 & (2 ** bit)) {
           if (8 * byte + bit < Gen4RibbonsPart3.length) {
             ribbons.push(Gen4RibbonsPart3[8 * byte + bit]);
           }
@@ -394,7 +406,6 @@ export class PK4 extends PKM {
       index = Gen4RibbonsPart3.indexOf(ribbon);
       if (index > -1) {
         setFlag(this.bytes, 0x60, index, true);
-        return;
       }
     });
   }
@@ -527,11 +538,12 @@ export class PK4 extends PKM {
   }
 
   public get eggLocation() {
-    let locationBlock =
+    const locationBlock =
       G4Locations[Math.floor(this.eggLocationIndex / 1000) * 1000];
     if (locationBlock) {
-      return 'from ' + locationBlock[this.eggLocationIndex % 1000];
+      return `from ${locationBlock[this.eggLocationIndex % 1000]}`;
     }
+    return undefined;
   }
 
   public get metLocationIndex() {
@@ -552,11 +564,12 @@ export class PK4 extends PKM {
   }
 
   public get metLocation() {
-    let locationBlock =
+    const locationBlock =
       G4Locations[Math.floor(this.metLocationIndex / 1000) * 1000];
     if (locationBlock) {
-      return 'in ' + locationBlock[this.metLocationIndex % 1000];
+      return `in ${locationBlock[this.metLocationIndex % 1000]}`;
     }
+    return undefined;
   }
 
   public get nickname() {
@@ -660,6 +673,7 @@ export class PK4 extends PKM {
   public set metLevel(value: number) {
     this.bytes[0x84] = (this.bytes[0x84] & 0x80) | (value & 0x7f);
   }
+
   public get trainerGender() {
     return getFlag(this.bytes, 0x84, 7) ? 1 : 0;
   }
@@ -711,7 +725,7 @@ export class PK4 extends PKM {
   }
 
   public toPCBytes() {
-    let shuffledBytes = shuffleBlocksGen45(this.bytes);
+    const shuffledBytes = shuffleBlocksGen45(this.bytes);
     return decryptByteArrayGen45(shuffledBytes);
   }
 }

@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 export enum NDex {
   BULBASAUR = 1,
   IVYSAUR = 2,
@@ -1008,5 +1009,5 @@ export enum NDex {
   KORAIDON = 1007,
   MIRAIDON = 1008,
   WALKING_WAKE = 1009,
-  IRON_LEAVES = 1010
+  IRON_LEAVES = 1010,
 }

@@ -1,10 +1,10 @@
 import {
-  app,
-  Menu,
-  shell,
   BrowserWindow,
+  Menu,
   MenuItemConstructorOptions,
+  app,
   dialog,
+  shell,
 } from 'electron';
 
 interface DarwinMenuItemConstructorOptions extends MenuItemConstructorOptions {
@@ -96,8 +96,15 @@ export default class MenuBuilder {
           label: 'Save',
           accelerator: 'CmdOrCtrl+S',
           click() {
-            const shouldSave = dialog.showMessageBoxSync({ message: "Save changes to OpenHome and all game saves?", buttons: ["Cancel", "Save"], title: "Save Changes", detail: "Pokémon in the 'Release' area will be lost permanently." })
-            if (shouldSave) { mainWindow?.webContents.send('save'); }
+            const shouldSave = dialog.showMessageBoxSync({
+              message: 'Save changes to OpenHome and all game saves?',
+              buttons: ['Cancel', 'Save'],
+              title: 'Save Changes',
+              detail: "Pokémon in the 'Release' area will be lost permanently.",
+            });
+            if (shouldSave) {
+              mainWindow?.webContents.send('save');
+            }
           },
         },
         {
@@ -132,19 +139,17 @@ export default class MenuBuilder {
         { role: 'cut' },
         { role: 'copy' },
         { role: 'paste' },
-        ...(isMac ? [
-          { role: 'pasteAndMatchStyle' },
-          { type: 'separator' },
-          {
-            label: 'Speech',
-            submenu: [
-              { role: 'startSpeaking' },
-              { role: 'stopSpeaking' }
-            ]
-          }
-        ] as DarwinMenuItemConstructorOptions[] : [
-        ])
-      ]
+        ...(isMac
+          ? ([
+              { role: 'pasteAndMatchStyle' },
+              { type: 'separator' },
+              {
+                label: 'Speech',
+                submenu: [{ role: 'startSpeaking' }, { role: 'stopSpeaking' }],
+              },
+            ] as DarwinMenuItemConstructorOptions[])
+          : []),
+      ],
     };
     const subMenuViewDev: MenuItemConstructorOptions = {
       label: 'View',
@@ -157,7 +162,7 @@ export default class MenuBuilder {
         { role: 'zoomIn' },
         { role: 'zoomOut' },
         { type: 'separator' },
-        { role: 'togglefullscreen' }
+        { role: 'togglefullscreen' },
       ],
     };
     const subMenuViewProd: MenuItemConstructorOptions = {
@@ -171,7 +176,7 @@ export default class MenuBuilder {
         { role: 'zoomIn' },
         { role: 'zoomOut' },
         { type: 'separator' },
-        { role: 'togglefullscreen' }
+        { role: 'togglefullscreen' },
       ],
     };
     const subMenuWindow: DarwinMenuItemConstructorOptions = {
@@ -179,14 +184,14 @@ export default class MenuBuilder {
       submenu: [
         { role: 'minimize' },
         { role: 'zoom' },
-        ...(isMac ? [
-          { type: 'separator' },
-          { role: 'front' },
-          { type: 'separator' },
-          { role: 'window' }
-        ] as DarwinMenuItemConstructorOptions[] : [
-          { role: 'close' as 'close' }
-        ])
+        ...(isMac
+          ? ([
+              { type: 'separator' },
+              { role: 'front' },
+              { type: 'separator' },
+              { role: 'window' },
+            ] as DarwinMenuItemConstructorOptions[])
+          : [{ role: 'close' as 'close' }]),
       ],
     };
     const subMenuHelp: MenuItemConstructorOptions = {
@@ -203,7 +208,7 @@ export default class MenuBuilder {
 
     const subMenuView =
       process.env.NODE_ENV === 'development' ||
-        process.env.DEBUG_PROD === 'true'
+      process.env.DEBUG_PROD === 'true'
         ? subMenuViewDev
         : subMenuViewProd;
 

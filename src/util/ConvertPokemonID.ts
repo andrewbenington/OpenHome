@@ -1,19 +1,3 @@
-export const svToNatDex = (svNum: number) => {
-  if (svNum in svToNatMap) {
-    return svToNatMap[svNum];
-  } else {
-    return svNum;
-  }
-};
-
-export const natDexToSV = (dexNum: number) => {
-  if (dexNum in natToSVMap) {
-    return natToSVMap[dexNum];
-  } else {
-    return dexNum;
-  }
-};
-
 const svToNatMap: { [key: number]: number } = {
   917: 982,
   918: 917,
@@ -206,13 +190,19 @@ const natToSVMap: { [key: number]: number } = {
   1008: 999,
 };
 
-export function gen3ToNational(value: number) {
-  return value < gen3IDs.length ? gen3IDs[value] : 0;
-}
+export const svToNatDex = (svNum: number) => {
+  if (svNum in svToNatMap) {
+    return svToNatMap[svNum];
+  }
+  return svNum;
+};
 
-export function nationalToGen3(value: number) {
-  return gen3IDs.indexOf(value) ?? 0;
-}
+export const natDexToSV = (dexNum: number) => {
+  if (dexNum in natToSVMap) {
+    return natToSVMap[dexNum];
+  }
+  return dexNum;
+};
 
 export const gen3IDs = [
   0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
@@ -242,6 +232,14 @@ export const gen3IDs = [
   371, 372, 373, 374, 375, 376, 377, 378, 379, 382, 383, 384, 380, 381, 385,
   386, 358,
 ];
+
+export function gen3ToNational(value: number) {
+  return value < gen3IDs.length ? gen3IDs[value] : 0;
+}
+
+export function nationalToGen3(value: number) {
+  return gen3IDs.indexOf(value) ?? 0;
+}
 
 export const gen1IDToNatDex = [
   -1, 112, 115, 32, 35, 21, 100, 34, 80, 2, 103, 108, 102, 88, 94, 29, 31, 104,
