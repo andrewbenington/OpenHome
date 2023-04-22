@@ -1,21 +1,22 @@
-import { gen3ToNational } from '../../util/ConvertPokemonID';
+import { contestStats } from 'types/types';
 import { GameOfOriginData } from '../../consts/GameOfOrigin';
 import { Gen3Items } from '../../consts/Items';
 import { GCLanguages } from '../../consts/Languages';
 import { POKEMON_DATA } from '../../consts/Mons';
 import { Gen3StandardRibbons } from '../../consts/Ribbons';
-import { getGen3To5Gender } from '../../util/GenderCalc';
 import {
   bytesToUint16BigEndian,
   bytesToUint32BigEndian,
 } from '../../util/ByteLogic';
+import { gen3ToNational } from '../../util/ConvertPokemonID';
+import { getGen3To5Gender } from '../../util/GenderCalc';
 import {
   getHPGen3Onward,
   getLevelGen3Onward,
   getStatGen3Onward,
 } from '../../util/StatCalc';
-import { contestStats, PKM } from './PKM';
 import { utf16BytesToString } from '../../util/Strings/StringConverter';
+import { PKM } from './PKM';
 
 export class COLOPKM extends PKM {
   constructor(bytes: Uint8Array) {
@@ -83,7 +84,7 @@ export class COLOPKM extends PKM {
       spa: getStatGen3Onward('SpA', this),
       spd: getStatGen3Onward('SpD', this),
     };
-    let origin =
+    const origin =
       GameOfOriginData.find((game) => game?.gc === bytes[0x08]) ?? null;
     this.gameOfOrigin = GameOfOriginData.indexOf(origin);
     this.trainerName = utf16BytesToString(this.bytes, 0x18, 11, true);
@@ -101,6 +102,7 @@ export class COLOPKM extends PKM {
         bytesToUint16BigEndian(bytes, 0x02)) <
       8;
   }
+
   public get movePP() {
     return [
       this.bytes[0x7a],
@@ -115,6 +117,7 @@ export class COLOPKM extends PKM {
       this.bytes[0x7a + i] = value[i];
     }
   }
+
   public get movePPUps() {
     return [
       this.bytes[0x7b],

@@ -1,4 +1,4 @@
-import G5Locations from '../../consts/MetLocation/G5';
+import { contestStats, marking, pokedate, stats } from 'types/types';
 import {
   GameOfOrigin,
   isGen5,
@@ -10,6 +10,7 @@ import {
 import { Abilities } from '../../consts/Abilities';
 import { Items } from '../../consts/Items';
 import { Languages } from '../../consts/Languages';
+import G5Locations from '../../consts/MetLocation/G5';
 import {
   Gen4RibbonsPart1,
   Gen4RibbonsPart2,
@@ -39,8 +40,12 @@ import {
   utf16StringToGen5,
 } from '../../util/Strings/StringConverter';
 import { OHPKM } from './OHPKM';
-import { contestStats, marking, PKM, pokedate, stats } from './PKM';
-import { adjustMovePPBetweenFormats, writeIVsToBuffer } from './util';
+import { PKM } from './PKM';
+import {
+  adjustMovePPBetweenFormats,
+  generatePersonalityValuePreservingAttributes,
+  writeIVsToBuffer,
+} from './util';
 
 export const GEN5_MOVE_MAX = 559;
 
@@ -52,8 +57,8 @@ export class PK5 extends PKM {
       const bytes = args[0];
       const encrypted = args[1] ?? false;
       if (encrypted) {
-        let unencryptedBytes = decryptByteArrayGen45(bytes);
-        let unshuffledBytes = unshuffleBlocksGen45(unencryptedBytes);
+        const unencryptedBytes = decryptByteArrayGen45(bytes);
+        const unshuffledBytes = unshuffleBlocksGen45(unencryptedBytes);
         super(unshuffledBytes);
       } else {
         super(bytes);
@@ -72,10 +77,18 @@ export class PK5 extends PKM {
       this.abilityNum = other.abilityNum;
       this.ability = other.ability;
       // console
-      this.createPersonalityValueFromOtherPreGen6(other);
+      this.personalityValue =
+        generatePersonalityValuePreservingAttributes(other);
       this.isFatefulEncounter = other.isFatefulEncounter;
       this.gender = other.gender;
-      this.evs = other.evs ?? { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 };
+      this.evs = other.evs ?? {
+        hp: 0,
+        atk: 0,
+        def: 0,
+        spa: 0,
+        spd: 0,
+        spe: 0,
+      };
       this.contest = other.contest;
       this.pokerusByte = other.pokerusByte;
       this.ribbons = other.ribbons;
@@ -113,7 +126,7 @@ export class PK5 extends PKM {
       this.trainerName = other.trainerName;
       this.trainerFriendship = other.trainerFriendship;
       this.eggDate = other.eggDate;
-      let now = new Date();
+      const now = new Date();
       this.metDate = other.metDate ?? {
         month: now.getMonth(),
         day: now.getDate(),
@@ -144,6 +157,8 @@ export class PK5 extends PKM {
       this.trainerGender = other.trainerGender;
       this.currentHP = this.stats.hp;
       this.refreshChecksum();
+    } else {
+      super(args[0]);
     }
   }
 
@@ -234,9 +249,8 @@ export class PK5 extends PKM {
     // todo: figure this out for mons from before white with HA
     if (this.gameOfOrigin < GameOfOrigin.White) {
       return (this.personalityValue & 1) + 1;
-    } else {
-      return this.bytes[0x42] & 1 ? 4 : ((this.personalityValue >> 16) & 1) + 1;
     }
+    return this.bytes[0x42] & 1 ? 4 : ((this.personalityValue >> 16) & 1) + 1;
   }
 
   public set abilityNum(value: number) {
@@ -279,7 +293,7 @@ export class PK5 extends PKM {
     let markingsValue = 0;
     for (let i = 0; i < 6; i++) {
       if (value[i]) {
-        markingsValue = markingsValue | Math.pow(2, i);
+        markingsValue |= 2 ** i;
       }
     }
     this.bytes[0x16] = markingsValue;
@@ -514,11 +528,12 @@ export class PK5 extends PKM {
   }
 
   public get eggLocation() {
-    let locationBlock =
+    const locationBlock =
       G5Locations[Math.floor(this.eggLocationIndex / 10000) * 10000];
     if (locationBlock) {
-      return 'from ' + locationBlock[this.eggLocationIndex % 10000];
+      return `from ${locationBlock[this.eggLocationIndex % 10000]}`;
     }
+    return undefined;
   }
 
   public get metLocationIndex() {
@@ -530,11 +545,12 @@ export class PK5 extends PKM {
   }
 
   public get metLocation() {
-    let locationBlock =
+    const locationBlock =
       G5Locations[Math.floor(this.metLocationIndex / 10000) * 10000];
     if (locationBlock) {
-      return 'in ' + locationBlock[this.metLocationIndex % 10000];
+      return `in ${locationBlock[this.metLocationIndex % 10000]}`;
     }
+    return undefined;
   }
 
   public get nickname() {
@@ -622,6 +638,7 @@ export class PK5 extends PKM {
   public set metLevel(value: number) {
     this.bytes[0x84] = (this.bytes[0x84] & 0x80) | (value & 0x7f);
   }
+
   public get trainerGender() {
     return getFlag(this.bytes, 0x84, 7) ? 1 : 0;
   }
@@ -673,7 +690,7 @@ export class PK5 extends PKM {
   }
 
   public toPCBytes() {
-    let shuffledBytes = shuffleBlocksGen45(this.bytes);
+    const shuffledBytes = shuffleBlocksGen45(this.bytes);
     return decryptByteArrayGen45(shuffledBytes);
   }
 }

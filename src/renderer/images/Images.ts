@@ -1,3 +1,4 @@
+/* eslint-disable global-require */
 export const GameLogos: { [key: string]: string } = {
   AlphaSapphire: require(`./logos/Alpha_Sapphire.png`),
   Black2: require(`./logos/Black_2.png`),

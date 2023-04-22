@@ -5,14 +5,10 @@ import {
   Draft,
   PayloadAction,
 } from '@reduxjs/toolkit';
-import {
-  writeGen12LookupToFile,
-  writeGen345LookupToFile,
-} from 'renderer/util/ipcFunctions';
 import { OHPKM, PKM } from 'types/PKMTypes';
 import { G1SAV, G2SAV, G3SAV, G4SAV, G5SAV, SAV } from 'types/SAVTypes';
 import { HomeData } from 'types/SAVTypes/HomeData';
-import { SaveCoordinates } from 'types/types';
+import { SaveCoordinates, StringToStringMap } from 'types/types';
 import {
   getMonFileIdentifier,
   getMonGen12Identifier,
@@ -22,8 +18,8 @@ import { RootState } from '../store';
 
 interface LookupState {
   homeMons?: { [key: string]: OHPKM };
-  gen12?: { [key: string]: string };
-  gen345?: { [key: string]: string };
+  gen12?: StringToStringMap;
+  gen345?: StringToStringMap;
 }
 
 interface AppState {
@@ -31,7 +27,7 @@ interface AppState {
   saves: SAV[];
   dragSource?: SaveCoordinates;
   dragMon?: PKM;
-  modifiedOHPKMs: OHPKM[];
+  modifiedOHPKMs: { [key: string]: OHPKM };
   monsToDelete: OHPKM[];
   lookup: LookupState;
 }
@@ -39,7 +35,7 @@ interface AppState {
 const initialState: AppState = {
   homeData: new HomeData(new Uint8Array()),
   saves: [],
-  modifiedOHPKMs: [],
+  modifiedOHPKMs: {},
   monsToDelete: [],
   lookup: {},
 };
@@ -87,6 +83,13 @@ const updateMonInSave = (
   return replacedMon;
 };
 
+const markMonAsModified = (state: Draft<AppState>, mon: OHPKM) => {
+  const identifier = getMonFileIdentifier(mon);
+  if (identifier) {
+    state.modifiedOHPKMs[identifier] = mon;
+  }
+};
+
 export const appSlice = createSlice({
   name: 'saves',
   initialState,
@@ -96,13 +99,8 @@ export const appSlice = createSlice({
       const replacedMon = updateMonInSave(state, undefined, action.payload);
       if (replacedMon && replacedMon instanceof OHPKM) {
         const identifier = getMonFileIdentifier(replacedMon);
-        const modifiedListIndex = state.modifiedOHPKMs.findIndex((m) => {
-          console.log(getMonFileIdentifier(m as OHPKM), identifier);
-          return getMonFileIdentifier(m as OHPKM) === identifier;
-        });
-        if (modifiedListIndex > -1) {
-          console.log('removing from modified OHPKMs');
-          state.modifiedOHPKMs.splice(modifiedListIndex, 1);
+        if (identifier) {
+          delete state.modifiedOHPKMs[identifier];
         }
         state.monsToDelete.push(replacedMon);
       }
@@ -132,13 +130,12 @@ export const appSlice = createSlice({
           nextIndex++;
         }
       });
-      console.log(state.saves, tempSave, action);
       if (isHome) {
         state.homeData = { ...tempSave } as HomeData;
       } else {
         state.saves[saveCoordinates.saveNumber] = tempSave;
       }
-      state.modifiedOHPKMs.push(...addedMons);
+      addedMons.forEach((mon) => markMonAsModified(state, mon));
     },
     setSaveBox: (state, action: PayloadAction<SetSaveBoxParams>) => {
       const { box, saveNumber } = action.payload;
@@ -152,7 +149,7 @@ export const appSlice = createSlice({
     startDrag: (state, action: PayloadAction<SaveCoordinates>) => {
       const { box, index, saveNumber } = action.payload;
       if (state.saves.length <= saveNumber) {
-        return;
+        return state;
       }
       const save = saveNumber === -1 ? state.homeData : state.saves[saveNumber];
       state.dragMon = save.boxes[box].pokemon[index];
@@ -166,7 +163,7 @@ export const appSlice = createSlice({
       if (!state.dragSource) {
         state.dragMon = undefined;
         state.dragSource = undefined;
-        return;
+        return state;
       }
       const {
         box: srcBox,
@@ -184,7 +181,7 @@ export const appSlice = createSlice({
       let mon = state.dragMon;
       if (srcSaveNumber != destSaveNumber) {
         mon = new OHPKM(mon);
-        state.modifiedOHPKMs.push(mon as OHPKM);
+        markMonAsModified(state, mon as OHPKM);
       }
 
       const tempSaves = [...state.saves];
@@ -225,7 +222,8 @@ export const appSlice = createSlice({
           save instanceof G1SAV ||
           save instanceof G2SAV ||
           save instanceof G3SAV ||
-          save instanceof G4SAV
+          save instanceof G4SAV ||
+          save instanceof G5SAV
         ) {
           const changedMons = save.prepareBoxesForSaving();
           if (changedMons && (save instanceof G2SAV || save instanceof G1SAV)) {
@@ -234,7 +232,7 @@ export const appSlice = createSlice({
               const value = getMonFileIdentifier(mon);
               if (!state.lookup.gen12) {
                 console.log('no gen12 map loaded. cancelling save');
-                return;
+                return state;
               }
               if (key && value) {
                 state.lookup.gen12[key] = value;
@@ -248,7 +246,7 @@ export const appSlice = createSlice({
           ) {
             if (!state.lookup.gen345) {
               console.log('no gen345 map loaded. cancelling save');
-              return;
+              return state;
             }
             appSlice.caseReducers.writeGen345Lookup(state, {
               type: '',
@@ -279,13 +277,13 @@ export const appSlice = createSlice({
           boxString: b.writeMonsToString(),
         });
       });
-      state.modifiedOHPKMs.forEach((mon) => {
+      Object.values(state.modifiedOHPKMs).forEach((mon) => {
         console.log('writing', mon);
         if (mon) {
           window.electron.ipcRenderer.sendMessage('write-ohpkm', mon.bytes);
         }
       });
-      state.modifiedOHPKMs = [];
+      state.modifiedOHPKMs = {};
       state.monsToDelete.forEach((mon) => {
         const gen345Identifier = getMonGen345Identifier(mon as OHPKM);
         if (
@@ -326,8 +324,10 @@ export const appSlice = createSlice({
     ) => {
       action.payload.forEach(({ key, value }) => {
         if (!state.lookup.gen12) {
-          console.log('attempted to save before gen12 map loaded. cancelling');
-          return;
+          console.error(
+            'attempted to save before gen12 map loaded. cancelling'
+          );
+          return state;
         }
         state.lookup.gen12[key] = value;
       });
@@ -337,7 +337,7 @@ export const appSlice = createSlice({
       const monsToAdd = action.payload;
       if (!newLookupMap) {
         console.error('attempted to save before gen12 map loaded. cancelling');
-        return;
+        return state;
       }
       monsToAdd.forEach((mon) => {
         const key = getMonGen12Identifier(mon);
@@ -346,7 +346,11 @@ export const appSlice = createSlice({
           newLookupMap[key] = value;
         }
       });
-      writeGen12LookupToFile(current(newLookupMap));
+      window.electron.ipcRenderer.sendMessage(
+        'write-gen12-lookup',
+        current(newLookupMap)
+      );
+      state.lookup.gen12 = newLookupMap;
     },
     setGen345Lookup: (
       state,
@@ -359,7 +363,7 @@ export const appSlice = createSlice({
       const monsToAdd = action.payload;
       if (!newLookupMap) {
         console.error('attempted to save before gen345 map loaded. cancelling');
-        return;
+        return state;
       }
       monsToAdd.forEach((mon) => {
         const key = getMonGen345Identifier(mon);
@@ -369,7 +373,11 @@ export const appSlice = createSlice({
           newLookupMap[key] = value;
         }
       });
-      writeGen345LookupToFile(current(newLookupMap));
+      window.electron.ipcRenderer.sendMessage(
+        'write-gen345-lookup',
+        current(newLookupMap)
+      );
+      state.lookup.gen345 = newLookupMap;
     },
   },
   extraReducers: (builder) => {
@@ -435,6 +443,7 @@ export const selectModifiedOHPKMs = (state: RootState) =>
   state.app.modifiedOHPKMs;
 export const selectGen12Lookup = (state: RootState) => state.app.lookup.gen12;
 export const selectGen345Lookup = (state: RootState) => state.app.lookup.gen345;
+export const selectMonsToDelete = (state: RootState) => state.app.monsToDelete;
 
 export const selectCount = (state: RootState) => state.app.saves.length;
 

@@ -1,8 +1,7 @@
-import LevelUpExp from '../consts/LevelUpExp';
-import { POKEMON_DATA } from '../consts/Mons';
-import { getNatureSummary } from '../consts/Natures';
-import { PKM } from '../types/PKMTypes/PKM';
-import { Stat } from '../types/types';
+/* eslint-disable no-nested-ternary */
+import { PKM } from 'types/PKMTypes/PKM';
+import { Stat } from 'types/types';
+import { LevelUpExp, POKEMON_DATA, getNatureSummary } from '../consts';
 
 export const getStatGen3Onward = (stat: Stat, mon: PKM) => {
   if (mon.dexNum < 1 || mon.dexNum > 1010) {
@@ -26,9 +25,8 @@ export const getStatGen3Onward = (stat: Stat, mon: PKM) => {
         ) +
           5)
     );
-  } else {
-    return 0;
   }
+  return 0;
 };
 
 export const getHPGen3Onward = (mon: PKM) => {
@@ -48,9 +46,8 @@ export const getHPGen3Onward = (mon: PKM) => {
       mon.level +
       10
     );
-  } else {
-    return 0;
   }
+  return 0;
 };
 
 export const getLevelGen3Onward = (dexNum: number, exp: number) => {
@@ -73,28 +70,22 @@ export const getLevelGen12 = (dexNum: number, exp: number) => {
   for (let level = 100; level > 0; level--) {
     switch (levelUpType) {
       case 'Fast':
-        if (Math.floor(0.8 * Math.pow(level, 3)) <= exp) {
+        if (Math.floor(0.8 * level ** 3) <= exp) {
           return level;
         }
         break;
       case 'Medium Fast':
-        if (Math.pow(level, 3) <= exp) {
+        if (level ** 3 <= exp) {
           return level;
         }
         break;
       case 'Medium Slow':
-        if (
-          1.2 * Math.pow(level, 3) -
-            15 * Math.pow(level, 2) +
-            100 * level -
-            140 <=
-          exp
-        ) {
+        if (1.2 * level ** 3 - 15 * level ** 2 + 100 * level - 140 <= exp) {
           return level;
         }
         break;
       case 'Slow':
-        if (Math.floor(1.25 * Math.pow(level, 3)) <= exp) {
+        if (Math.floor(1.25 * level ** 3) <= exp) {
           return level;
         }
         break;

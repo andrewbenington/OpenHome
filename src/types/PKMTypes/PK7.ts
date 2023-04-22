@@ -1,9 +1,18 @@
-import { GameOfOrigin, GameOfOriginData, isAlola, isGen6 } from '../../consts';
-import SMUSUMLocations from '../../consts/MetLocation/SMUSUM';
+import _ from 'lodash';
+import {
+  contestStats,
+  geolocation,
+  marking,
+  memory,
+  pokedate,
+  stats,
+} from 'types/types';
+import { GameOfOrigin, GameOfOriginData, isAlola } from '../../consts';
 import { Abilities } from '../../consts/Abilities';
 import { Items } from '../../consts/Items';
 import { Languages } from '../../consts/Languages';
-import { Gen9Ribbons, Gen9RibbonsPart1 } from '../../consts/Ribbons';
+import SMUSUMLocations from '../../consts/MetLocation/SMUSUM';
+import { Gen9Ribbons } from '../../consts/Ribbons';
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -17,11 +26,13 @@ import {
   getLevelGen3Onward,
   getStatGen3Onward,
 } from '../../util/StatCalc';
-import { utf16BytesToString, utf16StringToBytes } from '../../util/Strings/StringConverter';
-import { contestStats, geolocation, marking, memory, PKM, pokedate, stats } from './PKM';
-import _ from 'lodash';
+import {
+  utf16BytesToString,
+  utf16StringToBytes,
+} from '../../util/Strings/StringConverter';
+import { OHPKM } from './OHPKM';
+import { PKM } from './PKM';
 import { adjustMovePPBetweenFormats, writeIVsToBuffer } from './util';
-import { OHPKM } from '.';
 
 export const SM_MOVE_MAX = 719;
 export const USUM_MOVE_MAX = 728;
@@ -35,6 +46,7 @@ export class PK7 extends PKM {
         // let unencryptedBytes = decryptByteArrayGen45(bytes);
         // let unshuffledBytes = unshuffleBlocksGen45(unencryptedBytes);
         // super(unshuffledBytes);
+        super(undefined);
       } else {
         super(bytes);
       }
@@ -72,13 +84,13 @@ export class PK7 extends PKM {
       // filtering out moves that didnt exist yet
       const validMoves = other.moves.filter((move) => move <= USUM_MOVE_MAX);
       const validMovePP = adjustMovePPBetweenFormats(this, other).filter(
-        (_, i) => other.moves[i] <= USUM_MOVE_MAX
+        (v, i) => other.moves[i] <= USUM_MOVE_MAX
       );
       const validMovePPUps = other.movePPUps.filter(
-        (_, i) => other.moves[i] <= USUM_MOVE_MAX
+        (v, i) => other.moves[i] <= USUM_MOVE_MAX
       );
       const validRelearnMoves = other.relearnMoves.filter(
-        (_, i) => other.moves[i] <= USUM_MOVE_MAX
+        (v, i) => other.moves[i] <= USUM_MOVE_MAX
       );
       this.moves = [validMoves[0], validMoves[1], validMoves[2], validMoves[3]];
       this.movePP = [
@@ -131,6 +143,8 @@ export class PK7 extends PKM {
       this.consoleRegion = other.consoleRegion;
       this.language = other.language;
       this.currentHP = this.stats.hp;
+    } else {
+      super(args[0]);
     }
   }
 
@@ -202,7 +216,10 @@ export class PK7 extends PKM {
   }
 
   public get displayID() {
-    return (isAlola(this.gameOfOrigin) || this.gameOfOrigin >= GameOfOrigin.LetsGoPikachu) ? bytesToUint32LittleEndian(this.bytes, 0x0c) % 1000000 : this.trainerID;
+    return isAlola(this.gameOfOrigin) ||
+      this.gameOfOrigin >= GameOfOrigin.LetsGoPikachu
+      ? bytesToUint32LittleEndian(this.bytes, 0x0c) % 1000000
+      : this.trainerID;
   }
 
   public get level() {
@@ -273,6 +290,7 @@ export class PK7 extends PKM {
     const bit = 0;
     setFlag(this.bytes, 0x1d, bit, value);
   }
+
   public get formNum() {
     return this.bytes[0x1d] >> 3;
   }
@@ -347,7 +365,7 @@ export class PK7 extends PKM {
     let markingsValue = 0;
     for (let i = 0; i < 6; i++) {
       if (value[i]) {
-        markingsValue = markingsValue | Math.pow(2, i);
+        markingsValue = markingsValue | (2 ** i);
       }
     }
     this.bytes[0x2a] = markingsValue;
@@ -378,7 +396,7 @@ export class PK7 extends PKM {
   }
 
   public get ribbons() {
-    let ribbons = [];
+    const ribbons = [];
     for (let i = 0; i < 38; i++) {
       if (getFlag(this.bytes, 0x30, i)) {
         ribbons.push(Gen9Ribbons[i]);
@@ -389,7 +407,7 @@ export class PK7 extends PKM {
 
   public set ribbons(value: string[]) {
     value.forEach((ribbon) => {
-      let index = Gen9Ribbons.indexOf(ribbon);
+      const index = Gen9Ribbons.indexOf(ribbon);
       if (index > -1) {
         setFlag(this.bytes, 0x30, index, true);
       }
@@ -727,13 +745,13 @@ export class PK7 extends PKM {
         ? `from the ${GameOfOriginData[this.gameOfOrigin]?.region} region`
         : 'from a faraway place';
     }
-    let locationBlock =
+    const locationBlock =
       SMUSUMLocations[Math.floor(this.eggLocationIndex / 10000) * 10000];
     if (locationBlock) {
-      return 'from ' + locationBlock[this.eggLocationIndex % 10000];
+      return `from ${locationBlock[this.eggLocationIndex % 10000]}`;
     }
+    return undefined;
   }
-
 
   public get metLocationIndex() {
     return bytesToUint16LittleEndian(this.bytes, 0xda);
@@ -751,11 +769,12 @@ export class PK7 extends PKM {
         ? `in the ${GameOfOriginData[this.gameOfOrigin]?.region} region`
         : 'in a faraway place';
     }
-    let locationBlock =
+    const locationBlock =
       SMUSUMLocations[Math.floor(this.metLocationIndex / 10000) * 10000];
     if (locationBlock) {
-      return 'in ' + locationBlock[this.metLocationIndex % 10000];
+      return `in ${locationBlock[this.metLocationIndex % 10000]}`;
     }
+    return undefined;
   }
 
   public get ball() {

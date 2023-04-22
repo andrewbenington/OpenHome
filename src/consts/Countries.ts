@@ -1,4 +1,4 @@
-const Countries = [
+export const Countries = [
   '',
   'Japan',
   '',
@@ -187,5 +187,3 @@ const Countries = [
   'Vatican City',
   'Bermuda',
 ];
-
-export default Countries;

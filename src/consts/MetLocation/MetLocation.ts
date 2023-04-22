@@ -75,15 +75,15 @@ export const getLocation = (
   } else if (isGen9(game)) {
     locations = SVMetLocation;
   }
-  let locationBlock = locations[Math.floor(index / multiplier) * multiplier];
+  const locationBlock = locations[Math.floor(index / multiplier) * multiplier];
   if (locationBlock) {
     if (game === GameOfOrigin.LegendsArceus) {
       return locationBlock[index % multiplier];
-    } else if (egg) {
-      return 'from ' + locationBlock[index % multiplier];
-    } else {
-      return 'in ' + locationBlock[index % multiplier];
     }
+    if (egg) {
+      return `from ${locationBlock[index % multiplier]}`;
+    }
+    return `in ${locationBlock[index % multiplier]}`;
   }
   return index.toString();
 };

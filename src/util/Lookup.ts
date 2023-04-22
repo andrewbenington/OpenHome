@@ -1,4 +1,4 @@
-import { OHPKM, PK3, PK4, PKM } from '../types/PKMTypes';
+import { OHPKM, PK4, PKM } from '../types/PKMTypes';
 import { getBaseMon } from '../types/PKMTypes/util';
 import { bytesToString } from './ByteLogic';
 import {
@@ -7,17 +7,15 @@ import {
 } from './Strings/StringConverter';
 
 export const getMonFileIdentifier = (mon: OHPKM) => {
-  if (mon.personalityValue) {
-    const baseMon = getBaseMon(mon.dexNum, mon.formNum);
-    if (baseMon) {
-      return `${baseMon.dexNumber.toString().padStart(4, '0')}-${bytesToString(
-        mon.trainerID,
-        2
-      ).concat(bytesToString(mon.secretID, 2))}-${bytesToString(
-        mon.personalityValue,
-        4
-      )}-${bytesToString(mon.gameOfOrigin, 1)}`;
-    }
+  const baseMon = getBaseMon(mon.dexNum, mon.formNum);
+  if (baseMon) {
+    return `${baseMon.dexNumber.toString().padStart(4, '0')}-${bytesToString(
+      mon.trainerID,
+      2
+    ).concat(bytesToString(mon.secretID, 2))}-${bytesToString(
+      mon.personalityValue,
+      4
+    )}-${bytesToString(mon.gameOfOrigin, 1)}`;
   }
   return undefined;
 };
@@ -43,6 +41,7 @@ export const getMonGen12Identifier = (mon: PKM) => {
       16
     )}-${dvs.spc.toString(16)}-${dvs.spe.toString(16)}`;
   }
+  return undefined;
 };
 
 export const getMonGen345Identifier = (mon: PKM) => {

@@ -2,18 +2,18 @@ import { Button, MenuItem, Pagination, Select } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useFilePicker } from 'use-file-picker';
 import PokemonDisplay from '../../renderer/pokemon/PokemonDisplay';
-import { PKM } from './PKM';
 import { acceptableExtensions, bytesToPKM } from '../../util/FileImport';
+import { PKM } from './PKM';
 
 const PKMLoader = () => {
-  const [openFileSelector, { filesContent, loading }] = useFilePicker({
+  const [openFileSelector, { filesContent }] = useFilePicker({
     accept: acceptableExtensions,
     readAs: 'ArrayBuffer',
   });
   const [mons, setMons] = useState<PKM[]>([]);
   const [propTab, setPropTab] = useState('summary');
   const [page, setPage] = useState(0);
-  const [pageSize, setPageSize] = useState(100);
+  const [pageSize] = useState(100);
   useEffect(() => {
     // getMoves();
   }, []);
@@ -49,7 +49,12 @@ const PKMLoader = () => {
         </Select>
       </div>
       {mons?.slice(page * pageSize, (page + 1) * pageSize)?.map((mon) => (
-        <PokemonDisplay mon={mon} propTab={propTab} />
+        <PokemonDisplay
+          mon={mon}
+          updateMon={() => {}}
+          tab=""
+          setTab={() => {}}
+        />
       ))}
       <Pagination
         count={Math.ceil(mons.length / 100)}

@@ -1,7 +1,3 @@
-const bytesToNumberLittleEndian = (bytes: Uint8Array) => {
-  return bytesToNumberBigEndian(bytes.reverse());
-};
-
 const bytesToNumberBigEndian = (bytes: Uint8Array) => {
   let value = 0;
   bytes.forEach((byte) => {
@@ -9,6 +5,10 @@ const bytesToNumberBigEndian = (bytes: Uint8Array) => {
     value += byte;
   });
   return value;
+};
+
+const bytesToNumberLittleEndian = (bytes: Uint8Array) => {
+  return bytesToNumberBigEndian(bytes.reverse());
 };
 
 export const bytesToUint16LittleEndian = (bytes: Uint8Array, index: number) => {
@@ -107,18 +107,18 @@ export const setFlag = (
   index: number,
   value: boolean
 ) => {
-  let byteIndex = offset + Math.floor(index / 8);
-  let bitIndex = index % 8;
+  const byteIndex = offset + Math.floor(index / 8);
+  const bitIndex = index % 8;
   if (byteIndex < buffer.length) {
     buffer[byteIndex] =
-      (buffer[byteIndex] & (0xff - Math.pow(2, bitIndex))) |
-      (value ? Math.pow(2, bitIndex) : 0);
+      (buffer[byteIndex] & (0xff - 2 ** bitIndex)) |
+      (value ? 2 ** bitIndex : 0);
   }
 };
 
 export const getFlag = (buffer: Uint8Array, offset: number, index: number) => {
-  let byteIndex = offset + Math.floor(index / 8);
-  let bitIndex = index % 8;
+  const byteIndex = offset + Math.floor(index / 8);
+  const bitIndex = index % 8;
   if (byteIndex < buffer.length) {
     return !!((buffer[byteIndex] >> bitIndex) & 0x1);
   }
