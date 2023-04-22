@@ -8,7 +8,7 @@ OpenHome is an open source tool for moving Pokémon between games losslessly, mu
 ## Moving Between Saves
 [![Demo Video](https://img.youtube.com/vi/s8MoLsySvOw/hqdefault.jpg)](https://youtu.be/s8MoLsySvOw)
 
-The extra Champion Ribbon in Emerald is a debugging oversight. The 0hp in Blue is a known bug.
+The extra Champion Ribbon in Emerald is a debugging oversight. The 0hp in Blue is a known bug, as is the fact that it thinks the HeartGold save is SoulSilver.
 
 ## Current Support
 ### Importing PKMs
@@ -19,13 +19,13 @@ The extra Champion Ribbon in Emerald is a debugging oversight. The 0hp in Blue i
 - PK4
 - PK5
 - PK6
+- PK7
 
 #### Partially supported PKM import formats
 Importing these formats may be lossy when it comes to more obscure aspects of the original pokemon. Development is ongoing.
 
 - COLOPKM
 - XDPKM
-- PK7
 - PB7
 - PK8
 - PA8
