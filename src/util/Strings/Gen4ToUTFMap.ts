@@ -2876,4 +2876,4 @@ const Gen4ToUTFMap: { [key: number]: number } = {
   0x25bd: 0x000c,
 };
 
-export default Gen4ToUTFMap
+export default Gen4ToUTFMap;

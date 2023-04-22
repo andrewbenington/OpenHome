@@ -2,14 +2,14 @@ import { Items } from '../../consts/Items';
 import { Languages } from '../../consts/Languages';
 import { Gen9RibbonsPart1 } from '../../consts/Ribbons';
 import {
+  bytesToUint16LittleEndian,
+  bytesToUint32LittleEndian,
+} from '../../util/ByteLogic';
+import {
   getHPGen3Onward,
   getLevelGen3Onward,
   getStatGen3Onward,
 } from '../../util/StatCalc';
-import {
-  bytesToUint16LittleEndian,
-  bytesToUint32LittleEndian,
-} from '../../util/ByteLogic';
 import { PKM } from './PKM';
 
 export class PB7 extends PKM {
@@ -44,7 +44,7 @@ export class PB7 extends PKM {
       bytesToUint16LittleEndian(bytes, 0x6e),
       bytesToUint16LittleEndian(bytes, 0x70),
     ];
-    let ivBytes = bytesToUint32LittleEndian(bytes, 0x74);
+    const ivBytes = bytesToUint32LittleEndian(bytes, 0x74);
     this.ivs = {
       hp: ivBytes & 0x1f,
       atk: (ivBytes >> 5) & 0x1f,
@@ -80,7 +80,7 @@ export class PB7 extends PKM {
     this.gameOfOrigin = bytes[0xdf];
     let byteArray = new Uint16Array(12);
     for (let i = 0; i < 12; i += 1) {
-      let byte = bytesToUint16LittleEndian(bytes, 0x40 + 2 * i);
+      const byte = bytesToUint16LittleEndian(bytes, 0x40 + 2 * i);
       if (byte === 0) {
         break;
       }
@@ -89,7 +89,7 @@ export class PB7 extends PKM {
     this.nickname = new TextDecoder('utf-16').decode(byteArray);
     byteArray = new Uint16Array(12);
     for (let i = 0; i < 12; i += 1) {
-      let byte = bytesToUint16LittleEndian(bytes, 0xb0 + 2 * i);
+      const byte = bytesToUint16LittleEndian(bytes, 0xb0 + 2 * i);
       if (byte === 0) {
         break;
       }
@@ -98,11 +98,10 @@ export class PB7 extends PKM {
     this.trainerName = new TextDecoder('utf-16').decode(byteArray);
     this.ribbons = [];
     for (let byte = 0; byte < 4; byte++) {
-      let ribbonsUint8 = bytes[0x30 + byte];
+      const ribbonsUint8 = bytes[0x30 + byte];
       for (let bit = 0; bit < 8; bit++) {
-        if (ribbonsUint8 & Math.pow(2, bit)) {
+        if (ribbonsUint8 & (2 ** bit)) {
           this.ribbons.push(Gen9RibbonsPart1[8 * byte + bit]);
-        } else {
         }
       }
     }

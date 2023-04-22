@@ -1,16 +1,17 @@
-import CXDLocation from '../../consts/MetLocation/CXD';
+import { contestStats, marking, stats } from 'types/types';
 import {
   Abilities,
   GameOfOrigin,
   Gen3ContestRibbons,
   Gen3Items,
   Gen3StandardRibbons,
+  Languages,
+  POKEMON_DATA,
   isGen3,
   isHoenn,
   isKanto,
-  Languages,
-  POKEMON_DATA,
 } from '../../consts';
+import CXDLocation from '../../consts/MetLocation/CXD';
 import RSEFRLGLocations from '../../consts/MetLocation/RSEFRLG';
 import {
   bytesToUint16LittleEndian,
@@ -38,8 +39,12 @@ import {
   utf16StringToGen3,
 } from '../../util/Strings/StringConverter';
 import { OHPKM } from './OHPKM';
-import { contestStats, marking, PKM, stats } from './PKM';
-import { adjustMovePPBetweenFormats, writeIVsToBuffer } from './util';
+import { PKM } from './PKM';
+import {
+  adjustMovePPBetweenFormats,
+  generatePersonalityValuePreservingAttributes,
+  writeIVsToBuffer,
+} from './util';
 
 export const GEN3_MOVE_MAX = 354;
 export const GEN3_ABILITY_MAX = 77;
@@ -50,8 +55,8 @@ export class PK3 extends PKM {
       const bytes = args[0];
       const encrypted = args[1] ?? false;
       if (encrypted) {
-        let unencryptedBytes = decryptByteArrayGen3(bytes);
-        let unshuffledBytes = unshuffleBlocksGen3(unencryptedBytes);
+        const unencryptedBytes = decryptByteArrayGen3(bytes);
+        const unshuffledBytes = unshuffleBlocksGen3(unencryptedBytes);
         super(unshuffledBytes);
       } else {
         super(bytes);
@@ -65,13 +70,14 @@ export class PK3 extends PKM {
       this.secretID = other.secretID;
       this.exp = other.exp;
       if (other.markings) {
-        let temp = [0, 0, 0, 0];
+        const temp = [0, 0, 0, 0];
         for (let i = 0; i < 4; i++) {
           temp[i] = other.markings[i] > 0 ? 1 : 0;
         }
         this.markings = temp as [marking, marking, marking, marking];
       }
-      this.createPersonalityValueFromOtherPreGen6(other);
+      this.personalityValue =
+        generatePersonalityValuePreservingAttributes(other);
       // this.nature = other.nature ?? this.personalityValue % 25;
       this.isFatefulEncounter = other.isFatefulEncounter;
       // this.gender = other.gender;
@@ -117,14 +123,18 @@ export class PK3 extends PKM {
       this.nickname = other.nickname;
       this.trainerName = other.trainerName;
       this.trainerFriendship = other.trainerFriendship;
-      this.ball = other.ball ? (other.ball <= 12 ? other.ball : 4) : 4;
+      if (other.ball <= 12) {
+        this.ball = other.ball;
+      } else {
+        this.ball = 4;
+      }
       if (isGen3(other.gameOfOrigin)) {
         this.metLocationIndex = other.metLocationIndex;
       } else if (isKanto(other.gameOfOrigin) || isHoenn(other.gameOfOrigin)) {
         let equivalentLocation = other.metLocation
           ? RSEFRLGLocations[0].indexOf(other.metLocation.slice(3))
           : -1;
-        if (other.gameOfOrigin == GameOfOrigin.ColosseumXD) {
+        if (other.gameOfOrigin === GameOfOrigin.ColosseumXD) {
           equivalentLocation = 254;
         } else if (equivalentLocation < 0) {
           this.metLocationIndex = equivalentLocation;
@@ -135,10 +145,8 @@ export class PK3 extends PKM {
       this.metLevel = other.metLevel ?? this.level;
       this.trainerGender = other.trainerGender;
       this.refreshChecksum();
-      return;
     } else {
       super(new Uint8Array());
-      return;
     }
   }
 
@@ -153,6 +161,7 @@ export class PK3 extends PKM {
   public set personalityValue(value: number) {
     this.bytes.set(uint32ToBytesLittleEndian(value), 0x00);
   }
+
   public get checksum() {
     return bytesToUint16LittleEndian(this.bytes, 0x1c);
   }
@@ -232,7 +241,7 @@ export class PK3 extends PKM {
     let markingsValue = 0;
     for (let i = 0; i < 4; i++) {
       if (value[i]) {
-        markingsValue = markingsValue | Math.pow(2, i);
+        markingsValue |= 2 ** i;
       }
     }
     this.bytes[0x1b] = markingsValue;
@@ -249,9 +258,8 @@ export class PK3 extends PKM {
       letterValue = ((this.personalityValue >> 8) & 0x3) | (letterValue << 2);
       letterValue = (this.personalityValue & 0x3) | (letterValue << 2);
       return letterValue % 28;
-    } else {
-      return 0;
     }
+    return 0;
   }
 
   public get dexNum() {
@@ -332,9 +340,8 @@ export class PK3 extends PKM {
       Abilities.indexOf(ability2) <= GEN3_ABILITY_MAX
     ) {
       return ability2;
-    } else {
-      return ability1;
     }
+    return ability1;
   }
 
   public get moves() {
@@ -433,10 +440,9 @@ export class PK3 extends PKM {
 
   public get metLocation() {
     if (this.gameOfOrigin === GameOfOrigin.ColosseumXD) {
-      return 'in ' + CXDLocation[0][this.metLocationIndex];
-    } else {
-      return 'in ' + RSEFRLGLocations[0][this.metLocationIndex];
+      return `in ${CXDLocation[0][this.metLocationIndex]}`;
     }
+    return `in ${RSEFRLGLocations[0][this.metLocationIndex]}`;
   }
 
   public get metLevel() {
@@ -521,7 +527,7 @@ export class PK3 extends PKM {
 
   public get ribbons() {
     const ribbons = [];
-    let ribbonsValue = bytesToUint32LittleEndian(this.ribbonBytes, 0);
+    const ribbonsValue = bytesToUint32LittleEndian(this.ribbonBytes, 0);
     const coolRibbonsNum = Math.min((ribbonsValue >> 0) & 7, 4);
     for (let i = 0; i < coolRibbonsNum; i++) {
       ribbons.push(Gen3ContestRibbons[i]);
@@ -551,7 +557,7 @@ export class PK3 extends PKM {
   }
 
   public set ribbons(value: string[]) {
-    let newRibbonBytes = new Uint8Array(4);
+    const newRibbonBytes = new Uint8Array(4);
     let maxCoolRibbon = 0;
     let maxBeautyRibbon = 0;
     let maxCuteRibbon = 0;
@@ -642,7 +648,7 @@ export class PK3 extends PKM {
   }
 
   public toPCBytes() {
-    let shuffledBytes = shuffleBlocksGen3(this.bytes);
+    const shuffledBytes = shuffleBlocksGen3(this.bytes);
     return decryptByteArrayGen3(shuffledBytes);
   }
 }

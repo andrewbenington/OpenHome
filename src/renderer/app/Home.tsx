@@ -1,27 +1,28 @@
 import { FileOpen } from '@mui/icons-material';
 import { Dialog, useTheme } from '@mui/material';
+import { POKEMON_DATA } from 'consts';
 import _ from 'lodash';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import OpenHomeButton from 'renderer/components/OpenHomeButton';
-import { OHPKM, PK3, PK4 } from 'types/PKMTypes';
-import { SAV } from 'types/SAVTypes';
-import { buildSaveFile, getSaveType } from 'types/SAVTypes/util';
+import { loadRecentSaves } from 'renderer/redux/slices/recentSavesSlice';
+import { loadResourcesPath } from 'renderer/redux/slices/resourcesSlice';
+import { OHPKM } from 'types/PKMTypes';
 import { acceptableExtensions, bytesToPKM } from 'util/FileImport';
 import { getMonFileIdentifier } from 'util/Lookup';
 import { PKM } from '../../types/PKMTypes/PKM';
-import { SaveCoordinates, SaveType } from '../../types/types';
+import { SaveCoordinates } from '../../types/types';
+import BoxIcons from '../images/icons/BoxIcons.png';
 import PokemonDisplay from '../pokemon/PokemonDisplay';
 import { useAppDispatch } from '../redux/hooks';
 import {
   useDragMon,
   useDragSource,
-  useLookupMaps,
   useModifiedOHPKMs,
+  useMonsToDelete,
   useSaveFunctions,
   useSaves,
 } from '../redux/selectors';
 import {
-  addSave,
   cancelDrag,
   clearAllSaves,
   deleteMon,
@@ -35,12 +36,12 @@ import SaveDisplay from '../saves/SaveDisplay';
 import SaveFileSelector from '../saves/SaveFileSelector';
 import { initializeDragImage } from '../util/initializeDragImage';
 import {
-  addSaveToRecents,
   handleDeleteOHPKMFiles,
   handleMenuResetAndClose,
   handleMenuSave,
 } from '../util/ipcFunctions';
 import Themes, { OpenHomeTheme } from './Themes';
+import { dropAreaStyle } from './styles';
 
 const Home = () => {
   const { palette } = useTheme();
@@ -48,44 +49,41 @@ const Home = () => {
   const dragMon = useDragMon();
   const dragSource = useDragSource();
   const modifiedOHPKMs = useModifiedOHPKMs();
+  const monsToDelete = useMonsToDelete();
   const [loadingMessage, setLoadingMessage] = useState<string | undefined>(
     'Starting app...'
   );
-  const [currentTheme, setCurrentTheme] = useState<OpenHomeTheme>(Themes[0]);
+  const [currentTheme] = useState<OpenHomeTheme>(Themes[0]);
   const [selectedMon, setSelectedMon] = useState<PKM>();
   const [tab, setTab] = useState('summary');
   const [openSaveDialog, setOpenSaveDialog] = useState(false);
-  const [changedOHPKMList, setChangedOHPKMList] = useState<OHPKM[]>([]);
   const [filesToDelete, setFilesToDelete] = useState<string[]>([]);
-  const [homeMonMap, gen12LookupMap, gen345LookupMap] = useLookupMaps();
   const dispatch = useAppDispatch();
   const dispatchDeleteMon = (saveCoordinates: SaveCoordinates) =>
     dispatch(deleteMon(saveCoordinates));
   const [writeAllSaveFiles, writeAllHomeData] = useSaveFunctions();
-  const dispatchAddSave = (save: SAV) => dispatch(addSave(save));
-  const dispatchClearAllSaves = () => dispatch(clearAllSaves());
+  const dispatchClearAllSaves = useCallback(
+    () => dispatch(clearAllSaves()),
+    [dispatch]
+  );
   const dispatchCancelDrag = () => dispatch(cancelDrag());
 
   useEffect(() => {
-    console.log(
+    console.info(
       'modifiedOHPKMs updated',
-      modifiedOHPKMs.map((mon) => mon.nickname)
+      Object.values(modifiedOHPKMs).map((mon) => mon.nickname)
     );
   }, [modifiedOHPKMs]);
-
-  const markMonsAsChanged = (changedMons: OHPKM[]) => {
-    setChangedOHPKMList([...changedOHPKMList, ...changedMons]);
-  };
 
   const onViewDrop = (e: any, type: string) => {
     const processDroppedData = async (file?: File, droppedMon?: PKM) => {
       let mon: PKM | undefined = droppedMon;
       if (file) {
-        let bytes = new Uint8Array(await file.arrayBuffer());
+        const bytes = new Uint8Array(await file.arrayBuffer());
         let [extension] = file.name.split('.').slice(-1);
         extension = extension.toUpperCase();
         if (!acceptableExtensions.includes(extension)) {
-          console.log(`invalid extension: ${extension}`);
+          console.error(`invalid extension: ${extension}`);
           return;
         }
         mon = bytesToPKM(bytes, extension);
@@ -95,20 +93,13 @@ const Home = () => {
         case 'as is':
           setSelectedMon(mon);
           break;
-        case 'PK4':
-          setSelectedMon(new PK4(mon));
-          break;
-        case 'PK3':
-          setSelectedMon(new PK3(mon));
-          break;
       }
     };
-    let file = e.dataTransfer.files[0];
-    let mon = dragMon;
+    const file = e.dataTransfer.files[0];
+    const mon = dragMon;
     if (!file && dragSource) {
       if (mon && type === 'release') {
         dispatchDeleteMon(dragSource);
-        dispatchCancelDrag();
         if (mon instanceof OHPKM) {
           const identifier = getMonFileIdentifier(mon);
           if (identifier) {
@@ -116,102 +107,46 @@ const Home = () => {
           }
         }
       }
+      dispatchCancelDrag();
       processDroppedData(file, mon);
       e.nativeEvent.preventDefault();
+    } else if (file) {
+      processDroppedData(file, undefined);
     }
   };
 
-  const saveChanges = () => {
-    console.log('save changes');
+  const saveChanges = useCallback(() => {
     writeAllSaveFiles();
     writeAllHomeData();
     handleDeleteOHPKMFiles(filesToDelete);
     setFilesToDelete([]);
-  };
+  }, [filesToDelete, writeAllHomeData, writeAllSaveFiles]);
 
-  const onOpenSave = (newSave: SAV) => {
-    const changedMons: OHPKM[] = [];
-    newSave.changedMons.forEach(({ box, index }) => {
-      const mon = newSave.boxes[box].pokemon[index];
-      if (mon instanceof OHPKM) {
-        changedMons.push(mon);
-      }
-    });
-    addSaveToRecents(newSave.getSaveRef());
-    markMonsAsChanged(changedMons);
-    dispatchAddSave(newSave);
-  };
-
-  const openSave = async () => {
-    window.electron.ipcRenderer.once('save-file-read', (result: any) => {
-      const { path, fileBytes, createdDate } = result;
-      if (!homeMonMap) return;
-      console.log(homeMonMap)
-      if (path && fileBytes && homeMonMap) {
-        const saveType = getSaveType(fileBytes);
-        console.log("savetype:", saveType)
-        let newSave;
-        switch (saveType) {
-          case SaveType.RBY_I:
-          case SaveType.GS_I:
-          case SaveType.C_I:
-            if (!gen12LookupMap) return;
-            newSave = buildSaveFile(path, fileBytes, saveType, {
-              homeMonMap,
-              gen12LookupMap,
-              fileCreatedDate: createdDate,
-            });
-          case SaveType.RS:
-          case SaveType.E:
-          case SaveType.FRLG:
-          case SaveType.DP:
-          case SaveType.Pt:
-          case SaveType.HGSS:
-            if (!gen345LookupMap) {
-              console.log("no gen345lookup")
-              return;
-            }
-            newSave = buildSaveFile(path, fileBytes, saveType, {
-              homeMonMap,
-              gen345LookupMap,
-              fileCreatedDate: createdDate,
-            });
-            if (newSave){ onOpenSave(newSave)} else {console.error("save build failed")};
-          case SaveType.UNKNOWN:
-            return;
-          default:
-            newSave = buildSaveFile(path, fileBytes, saveType, {
-              homeMonMap,
-              fileCreatedDate: createdDate,
-            });
-        }
-        if (newSave) onOpenSave(newSave);
-      }
-    });
-    setOpenSaveDialog(true);
-  };
-
-  // necessary to update save function called by top menu
+  // listener for menu save
   useEffect(() => {
     const callback = handleMenuSave(saveChanges);
     return () => callback();
   }, [saveChanges]);
 
+  // listener for menu reset + close
   useEffect(() => {
     const callback = handleMenuResetAndClose(() => {
       dispatch(loadHomeMons()).then(() => dispatch(loadHomeBoxes()));
     }, dispatchClearAllSaves);
     return () => callback();
-  }, [saves]);
+  }, [dispatch, dispatchClearAllSaves, saves]);
 
+  // load all data when app starts
   useEffect(() => {
     initializeDragImage();
     Promise.all([
       dispatch(loadHomeMons()).then(() => dispatch(loadHomeBoxes())),
       dispatch(loadGen12Lookup()),
       dispatch(loadGen345Lookup()),
+      dispatch(loadRecentSaves()),
+      dispatch(loadResourcesPath()),
     ]).then(() => setLoadingMessage(undefined));
-  }, []);
+  }, [dispatch]);
 
   return loadingMessage ? (
     <div>{loadingMessage}</div>
@@ -219,10 +154,11 @@ const Home = () => {
     <div
       style={{
         backgroundColor: currentTheme.backgroundColor,
-        height: '100%',
+        height: 'calc(100% - 10px)',
         width: '100%',
         display: 'flex',
         flexDirection: 'row',
+        paddingTop: 10,
       }}
     >
       <div
@@ -244,9 +180,7 @@ const Home = () => {
             flexDirection: 'row',
             alignItems: 'center',
           }}
-          onClick={() => {
-            openSave();
-          }}
+          onClick={() => setOpenSaveDialog(true)}
         >
           <FileOpen />
           <h2>Open Save</h2>
@@ -256,19 +190,7 @@ const Home = () => {
         <HomeBoxDisplay setSelectedMon={setSelectedMon} />
       </div>
       <div style={{ display: 'flex', flex: 1, flexDirection: 'column' }}>
-        <button
-          type="button"
-          style={{
-            margin: 10,
-            height: 'calc(100% - 40px)',
-            flex: 1,
-            backgroundColor: '#fff4',
-            position: 'relative',
-            border: 'none',
-            borderRadius: 4,
-            textAlign: 'center',
-          }}
-        >
+        <button type="button" style={dropAreaStyle}>
           <div
             draggable
             style={{
@@ -280,29 +202,19 @@ const Home = () => {
             onDragOver={(e) => {
               e.preventDefault();
             }}
-            // onDrop={(e) => onViewDrop(e, 'as is')}
+            onDrop={(e) => onViewDrop(e, 'as is')}
           >
             Preview
           </div>
         </button>
         <button
           type="button"
-          style={{
-            margin: 10,
-            height: 'calc(100% - 40px)',
-            backgroundColor: '#fff4',
-            position: 'relative',
-            border: 'none',
-            flex: 1,
-            borderRadius: 4,
-            textAlign: 'center',
-          }}
+          style={dropAreaStyle}
           onClick={() => {}}
           //   disabled={!mon}
         >
           <div
             style={{
-              height: '100%',
               width: '100%',
               flex: 1,
               padding: 'auto',
@@ -314,6 +226,34 @@ const Home = () => {
           >
             RELEASE
           </div>
+          {monsToDelete.map((mon) => (
+            <div
+              style={{
+                background: `url(${BoxIcons}) no-repeat 0.027027% 0.027027%`,
+                backgroundSize: '3700%',
+                backgroundPosition:
+                  mon.isEgg || !POKEMON_DATA[mon.dexNum]
+                    ? '0% 0%'
+                    : `${
+                        (POKEMON_DATA[mon.dexNum].formes[mon.formNum]
+                          .spriteIndex[0] /
+                          36) *
+                        100
+                      }% ${
+                        (Math.floor(
+                          POKEMON_DATA[mon.dexNum].formes[mon.formNum]
+                            .spriteIndex[1]
+                        ) /
+                          35) *
+                        100
+                      }%`,
+                imageRendering: 'crisp-edges',
+                height: '10%',
+                aspectRatio: 1,
+                zIndex: 100,
+              }}
+            />
+          ))}
         </button>
       </div>
       <Dialog
@@ -340,14 +280,7 @@ const Home = () => {
         PaperProps={{ sx: { height: 400 } }}
       >
         <SaveFileSelector
-          onSelectFile={(filePath) => {
-            window.electron.ipcRenderer.sendMessage('read-save-file', [
-              filePath,
-            ]);
-            setOpenSaveDialog(false);
-          }}
-          onImportSave={() => {
-            window.electron.ipcRenderer.sendMessage('read-save-file');
+          onClose={() => {
             setOpenSaveDialog(false);
           }}
         />

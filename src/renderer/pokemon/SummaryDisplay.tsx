@@ -1,9 +1,10 @@
 import { Card } from '@mui/material';
 import { OriginMarks } from 'renderer/images/Images';
 import { getMoveMaxPP } from 'types/PKMTypes/util';
-import { Balls, GameOfOriginData, MOVE_DATA, Natures } from '../../consts';
-import { marking, PKM } from '../../types/PKMTypes/PKM';
-import { getGameLogo, getTypeColor } from '../util/PokemonSprite';
+import { marking } from 'types/types';
+import { Balls, GameOfOriginData, Natures } from '../../consts';
+import { PKM } from '../../types/PKMTypes/PKM';
+import { getGameLogo } from '../util/PokemonSprite';
 import MoveCard from './MoveCard';
 import { detailsPaneContentStyle } from './styles';
 
@@ -17,7 +18,7 @@ const metTimesOfDay = [
   'in the evening',
 ];
 
-const SummaryDisplay = (props: { mon: PKM; updateMon: (mon: PKM) => void }) => {
+const SummaryDisplay = (props: { mon: PKM; updateMon: (_: PKM) => void }) => {
   const { mon, updateMon } = props;
   return (
     <div style={detailsPaneContentStyle}>
@@ -52,7 +53,7 @@ const SummaryDisplay = (props: { mon: PKM; updateMon: (mon: PKM) => void }) => {
                   .toLocaleLowerCase()}.png`}
               />
             ) : (
-              <></>
+              <div />
             )}
             <p style={{ fontWeight: 'bold' }}>
               {mon.nickname}
@@ -73,7 +74,7 @@ const SummaryDisplay = (props: { mon: PKM; updateMon: (mon: PKM) => void }) => {
           )}
           {mon.metLocation ? (
             <p style={{ textAlign: 'left' }}>{`Met ${
-              mon.metTimeOfDay ? metTimesOfDay[mon.metTimeOfDay - 1] + ' ' : ''
+              mon.metTimeOfDay ? `${metTimesOfDay[mon.metTimeOfDay - 1]} ` : ''
             }${
               mon.metDate
                 ? `on ${mon.metDate.month}/${mon.metDate.day}/${mon.metDate.year},`
@@ -110,9 +111,9 @@ const SummaryDisplay = (props: { mon: PKM; updateMon: (mon: PKM) => void }) => {
               </span>
             </p>
           ) : (
-            <></>
+            <div />
           )}
-          {mon.ivs ? <p>{mon.characteristic}</p> : <></>}
+          {mon.ivs ? <p>{mon.characteristic}</p> : <div />}
         </div>
         <div
           style={{

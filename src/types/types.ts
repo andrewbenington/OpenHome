@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 export type StringToStringMap = { [key: string]: string };
 export type KeyValuePairList = { key: string; value: string }[];
 export type Stat = 'HP' | 'Atk' | 'Def' | 'SpA' | 'SpD' | 'Spe' | 'Sp';
@@ -45,10 +46,64 @@ export enum SaveType {
   G5,
 }
 
+export interface pokedate {
+  month: number;
+  day: number;
+  year: number;
+}
+
+export interface memory {
+  intensity: number;
+  memory: number;
+  feeling: number;
+  textVariables: number;
+}
+
+export interface stats {
+  hp: number;
+  atk: number;
+  def: number;
+  spa: number;
+  spd: number;
+  spe: number;
+}
+
+export interface statsPreSplit {
+  hp: number;
+  atk: number;
+  def: number;
+  spc: number;
+  spe: number;
+}
+
+export interface hyperTrainStats {
+  hp: boolean;
+  atk: boolean;
+  def: boolean;
+  spa: boolean;
+  spd: boolean;
+  spe: boolean;
+}
+
+export interface contestStats {
+  cool: number;
+  beauty: number;
+  cute: number;
+  smart: number;
+  tough: number;
+  sheen: number;
+}
+
+export interface geolocation {
+  region: number;
+  country: number;
+}
+
+// 1 = blue/black, 2 = red
+export type marking = 0 | 1 | 2;
+
 export const getSaveTypeString = (saveType: SaveType): string => {
   switch (saveType) {
-    case SaveType.UNKNOWN:
-      return 'Unknown Game';
     case SaveType.RGBY_J:
       return 'Pokémon Red/Blue/Green/Yellow (JP)';
     case SaveType.RBY_I:
@@ -75,6 +130,8 @@ export const getSaveTypeString = (saveType: SaveType): string => {
       return 'Pokémon HeartGold/SoulSilver';
     case SaveType.G5:
       return 'Pokémon Black/White/Black 2/White 2';
+    default:
+      return 'Unknown Game';
   }
 };
 
@@ -84,23 +141,11 @@ export interface SaveRef {
   game?: string;
   trainerName?: string;
   trainerID?: string;
+  lastOpened?: number;
 }
+export type SaveRefMap = { [key: string]: SaveRef };
 
 export type RegionalForme = 'Alola' | 'Galar' | 'Hisui' | 'Paldea';
-export type Pokemon = {
-  name: string;
-  nationalDex: number;
-  formes: Forme[];
-  levelUpType: levelUpType;
-};
-
-export type Origin = {
-  name: string;
-  mark?: string;
-  region?: string;
-  logo?: string;
-  gc?: number;
-};
 
 export type MonReference = { dexNumber: number; formeNumber: number };
 
@@ -140,6 +185,21 @@ export type Forme = {
   mythical: boolean;
   sprite: string;
   spriteIndex: [number, number];
+};
+
+export type Pokemon = {
+  name: string;
+  nationalDex: number;
+  formes: Forme[];
+  levelUpType: levelUpType;
+};
+
+export type Origin = {
+  name: string;
+  mark?: string;
+  region?: string;
+  logo?: string;
+  gc?: number;
 };
 
 export type Move = {

@@ -1,3 +1,5 @@
+/* eslint-disable no-nested-ternary */
+/* eslint-disable no-else-return */
 import { MenuItem, Select } from '@mui/material';
 import {
   Chart as ChartJS,
@@ -9,10 +11,10 @@ import {
   Title,
   Tooltip,
 } from 'chart.js';
+import { GEN2_TRANSFER_RESTRICTIONS } from 'consts/TransferRestrictions';
 import _ from 'lodash';
 import { useEffect, useState } from 'react';
 import { Radar } from 'react-chartjs-2';
-import { G2SAV } from 'types/SAVTypes/G2SAV';
 import { isRestricted } from 'types/TransferRestrictions';
 import { getNatureSummary } from '../../consts/Natures';
 import { COLOPKM } from '../../types/PKMTypes/COLOPKM';
@@ -70,7 +72,7 @@ const StatsDisplay = (props: { mon: PKM }) => {
     } else if (!mon.evsG12) {
       setEVType('Modern');
     }
-  }, [mon.format]);
+  }, [mon.evs, mon.evsG12, mon.format]);
 
   ChartJS.register(
     RadialLinearScale,
@@ -110,11 +112,8 @@ const StatsDisplay = (props: { mon: PKM }) => {
           ) : (
             <div />
           )}
-          {!isRestricted(
-            G2SAV.TRANSFER_RESTRICTIONS,
-            mon.dexNum,
-            mon.formNum
-          ) && mon.dvs !== undefined ? (
+          {!isRestricted(GEN2_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
+          mon.dvs !== undefined ? (
             <MenuItem value="DVs">DVs</MenuItem>
           ) : (
             <div />

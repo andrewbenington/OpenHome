@@ -1,3 +1,4 @@
+import { statsPreSplit } from 'types/types';
 import {
   GameOfOrigin,
   GameOfOriginData,
@@ -16,8 +17,8 @@ import {
 import { getLevelGen12 } from '../../util/StatCalc';
 import { gen12StringToUTF } from '../../util/Strings/StringConverter';
 import { OHPKM } from './OHPKM';
-import { PKM, statsPreSplit } from './PKM';
-import { adjustMovePPBetweenFormats, dvsFromIVs, generateDVs } from './util';
+import { PKM } from './PKM';
+import { adjustMovePPBetweenFormats } from './util';
 
 export const GEN2_MOVE_MAX = 251;
 
@@ -25,6 +26,7 @@ export class PK2 extends PKM {
   public get format() {
     return 'PK2';
   }
+
   public get dexNum() {
     return this.bytes[0x00];
   }
@@ -32,6 +34,7 @@ export class PK2 extends PKM {
   public set dexNum(value: number) {
     this.bytes[0x00] = value;
   }
+
   public get heldItemIndex() {
     return this.bytes[0x01];
   }
@@ -64,12 +67,15 @@ export class PK2 extends PKM {
   }
 
   public get gender() {
-    let maleRatio =
+    const maleRatio =
       POKEMON_DATA[this.dexNum].formes[0].genderRatio.M > 0 ||
       POKEMON_DATA[this.dexNum].formes[0].genderRatio.F > 0
         ? POKEMON_DATA[this.dexNum].formes[0].genderRatio.M
         : -1;
-    return maleRatio === -1 ? 2 : this.dvs.atk < maleRatio * 15 ? 1 : 0;
+    if (maleRatio === -1) {
+      return 2;
+    }
+    return this.dvs.atk < maleRatio * 15 ? 1 : 0;
   }
 
   public get formNum() {
@@ -80,9 +86,8 @@ export class PK2 extends PKM {
       ivCombinationVal += (this.dvs.spc >> 1) & 0b11;
       ivCombinationVal /= 10;
       return Math.floor(ivCombinationVal);
-    } else {
-      return 0;
     }
+    return 0;
   }
 
   public get exp() {
@@ -135,7 +140,7 @@ export class PK2 extends PKM {
   }
 
   public get dvs() {
-    let dvBytes = bytesToUint16BigEndian(this.bytes, 0x15);
+    const dvBytes = bytesToUint16BigEndian(this.bytes, 0x15);
     return {
       spc: dvBytes & 0x0f,
       spe: (dvBytes >> 4) & 0x0f,

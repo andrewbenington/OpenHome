@@ -1,6 +1,5 @@
 import { Card, Grid, useTheme } from '@mui/material';
 import _ from 'lodash';
-import { useEffect } from 'react';
 import { useAppDispatch } from 'renderer/redux/hooks';
 import { useHomeData } from 'renderer/redux/selectors';
 import {
@@ -13,7 +12,7 @@ import { SaveCoordinates } from 'types/types';
 import BoxCell from './BoxCell';
 
 interface HomeBoxDisplayProps {
-  setSelectedMon: (mon: PKM | undefined) => void;
+  setSelectedMon: (_: PKM | undefined) => void;
 }
 
 const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
@@ -48,7 +47,7 @@ const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
                 <Grid item xs={1} style={{ padding: '2px 2px 0px 2px' }}>
                   <BoxCell
                     onClick={() => setSelectedMon(mon)}
-                    onDragEvent={(cancelled) =>
+                    onDragEvent={() =>
                       dispatchStartDrag({
                         saveNumber: -1,
                         box: data.currentPCBox,

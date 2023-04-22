@@ -1,8 +1,8 @@
 import { GameOfOrigin } from 'consts';
+import { GEN2_TRANSFER_RESTRICTIONS } from 'consts/TransferRestrictions';
 import { uniq } from 'lodash';
 import { OHPKM } from 'types/PKMTypes/OHPKM';
 import { PK2 } from 'types/PKMTypes/PK2';
-import { CapPikachus, RegionalForms } from 'types/TransferRestrictions';
 import { SaveType } from 'types/types';
 import { bytesToUint16BigEndian, get8BitChecksum } from 'util/ByteLogic';
 import {
@@ -11,19 +11,29 @@ import {
 } from 'util/Strings/StringConverter';
 import { Box, SAV } from './SAV';
 
+export class G2Box implements Box {
+  name: string;
+
+  pokemon: Array<PK2 | OHPKM | undefined>;
+
+  constructor(name: string, boxSize: number) {
+    this.name = name;
+    this.pokemon = new Array(boxSize);
+  }
+}
+
 export class G2SAV extends SAV {
-  static TRANSFER_RESTRICTIONS = {
-    maxDexNum: 251,
-    excludedForms: { ...RegionalForms, ...CapPikachus, 201: [26, 27] },
-  };
   boxOffsets: number[];
+
   boxes: Array<G2Box>;
+
   pkmType = PK2;
-  transferRestrictions = G2SAV.TRANSFER_RESTRICTIONS;
+
+  transferRestrictions = GEN2_TRANSFER_RESTRICTIONS;
 
   constructor(path: string, bytes: Uint8Array, fileCreated?: Date) {
     super(path, bytes);
-    this.fileCreated = fileCreated
+    this.fileCreated = fileCreated;
     this.tid = bytesToUint16BigEndian(this.bytes, 0x2009);
     this.displayID = this.tid.toString().padStart(5, '0');
     this.name = gen12StringToUTF(this.bytes, 0x200b, 11);
@@ -45,7 +55,7 @@ export class G2SAV extends SAV {
     }
     this.boxes = new Array<G2Box>(this.boxOffsets.length);
     if (this.saveType >= SaveType.GS_I && this.saveType <= SaveType.C_I) {
-      let pokemonPerBox = this.boxRows * this.boxColumns;
+      const pokemonPerBox = this.boxRows * this.boxColumns;
       this.boxOffsets.forEach((offset, boxNumber) => {
         const monCount = bytes[offset];
         this.boxes[boxNumber] = new G2Box(
@@ -99,7 +109,6 @@ export class G2SAV extends SAV {
       let numMons = 0;
       box.pokemon.forEach((boxMon) => {
         if (boxMon) {
-          console.log('setting bytes for', boxMon.nickname);
           if (boxMon instanceof OHPKM) {
             changedMonPKMs.push(boxMon);
           }
@@ -190,7 +199,6 @@ export class G2SAV extends SAV {
         this.bytes[0x1f0d] = this.getCrystalInternationalChecksum2();
         break;
     }
-    console.log(changedMonPKMs);
     return changedMonPKMs;
   }
 
@@ -232,14 +240,5 @@ export class G2SAV extends SAV {
     }
     const checksum2 = this.getCrystalInternationalChecksum2();
     return checksum2 === this.bytes[0x1f0d];
-  }
-}
-
-export class G2Box implements Box {
-  name: string;
-  pokemon: Array<PK2 | OHPKM | undefined>;
-  constructor(name: string, boxSize: number) {
-    this.name = name;
-    this.pokemon = new Array(boxSize);
   }
 }

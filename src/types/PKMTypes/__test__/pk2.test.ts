@@ -1,3 +1,4 @@
+/* eslint-disable jest/no-commented-out-tests */
 import fs from 'fs';
 import { TextDecoder } from 'node:util'; // (ESM style imports)
 import path from 'path';
@@ -23,26 +24,12 @@ import { PK2 } from '../PK2';
 //   });
 // });
 
-const blazikenOH = bytesToPKM(
-  new Uint8Array(
-    fs.readFileSync(path.join(__dirname, './PKMFiles/OH', 'blaziken.ohpkm'))
-  ),
-  'OHPKM'
-) as OHPKM;
-
 const hoohGen2 = bytesToPKM(
   new Uint8Array(
     fs.readFileSync(path.join(__dirname, './PKMFiles/Gen2', 'hooh.pk2'))
   ),
   'PK2'
 ) as PK2;
-
-const slowpokeGen7 = bytesToPKM(
-  new Uint8Array(
-    fs.readFileSync(path.join(__dirname, './PKMFiles/Gen7', 'slowpoke-shiny.pk7'))
-  ),
-  'PK7'
-);
 
 // test('gen 3 EVs are updated', () => {
 //   const emeraldPKM = new PK3(blazikenOH);
@@ -115,9 +102,7 @@ const slowpokeGen7 = bytesToPKM(
 
 test('pk2 and ohpkm have the same gen12lookup key', () => {
   const ohPKM = new OHPKM(hoohGen2);
-  expect(getMonGen12Identifier(ohPKM)).toEqual(
-    getMonGen12Identifier(hoohGen2)
-  );
+  expect(getMonGen12Identifier(ohPKM)).toEqual(getMonGen12Identifier(hoohGen2));
 });
 
 // test('gen 6+ nickname accuracy', () => {

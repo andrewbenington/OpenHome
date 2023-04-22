@@ -22,9 +22,12 @@
   },
   "main": "./src/main/main.ts",
   "scripts": {
-    "build": "concurrently \"npm run build:main\" \"npm run build:renderer\"",
+    "build": "npm run copy-resources && concurrently \"npm run build:main\" \"npm run build:renderer\"",
     "build:main": "cross-env NODE_ENV=production TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.main.prod.ts",
     "build:renderer": "cross-env NODE_ENV=production TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.renderer.prod.ts",
+    "copy-resources": "run-script-os",
+    "copy-resources:darwin:linux": "mkdir -p ./resources && rsync -av --ignore-existing ./src/renderer/images ./",
+    "copy-resources:win32:win64": "mkdir -p ./resources && robocopy ./src/renderer/images ./ /E",
     "postinstall": "ts-node .erb/scripts/check-native-dep.js && electron-builder install-app-deps && cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.renderer.dev.dll.ts",
     "lint": "cross-env NODE_ENV=development eslint . --ext .js,.jsx,.ts,.tsx",
     "package": "ts-node ./.erb/scripts/clean.js dist && npm run build && electron-builder build --publish never",
@@ -41,20 +44,22 @@
     "overrides": [
       {
         "files": [
-          ".prettierrc",
-          ".eslintrc"
+          ".prettierrc"
         ],
         "options": {
           "parser": "json"
         }
       }
-    ]
+    ],
+    "tabWidth": 2
   },
   "jest": {
     "moduleDirectories": [
       "node_modules",
       "release/app/node_modules",
-      "src"
+      "src",
+      "src/renderer",
+      "src/main"
     ],
     "moduleFileExtensions": [
       "js",
@@ -94,6 +99,7 @@
     "electron-debug": "^3.2.0",
     "electron-log": "^4.4.8",
     "electron-updater": "^5.3.0",
+    "lodash": "^4.17.21",
     "prando": "^6.0.1",
     "random-seedable": "^1.0.8",
     "react": "^18.2.0",
@@ -101,10 +107,12 @@
     "react-dom": "^18.2.0",
     "react-redux": "^8.0.5",
     "react-router-dom": "^6.8.1",
+    "run-script-os": "^1.1.6",
     "use-file-picker": "^1.5.2",
     "web-vitals": "^3.1.1"
   },
   "devDependencies": {
+    "@babel/eslint-parser": "^7.21.3",
     "@electron/notarize": "^1.2.3",
     "@electron/rebuild": "^3.2.10",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.10",
@@ -137,7 +145,7 @@
     "eslint": "^8.33.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-erb": "^4.0.6",
-    "eslint-import-resolver-typescript": "^3.5.3",
+    "eslint-import-resolver-typescript": "^3.5.5",
     "eslint-import-resolver-webpack": "^0.13.2",
     "eslint-plugin-compat": "^4.1.1",
     "eslint-plugin-import": "^2.27.5",

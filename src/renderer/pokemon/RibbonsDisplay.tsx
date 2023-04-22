@@ -5,49 +5,46 @@ import {
   Gen9Ribbons,
   Gen9RibbonsPart2,
 } from '../../consts/Ribbons';
-import { PK3 } from '../../types/PKMTypes/PK3';
 import { PKM } from '../../types/PKMTypes/PKM';
 import { detailsPaneContentStyle } from './styles';
 
 const getRibbonURL = (mon: PKM, ribbon: string) => {
-  if (PKM instanceof PK3) {
-  } else if (Gen9RibbonsPart2.indexOf(ribbon) > 33) {
+  if (Gen9RibbonsPart2.indexOf(ribbon) > 33) {
     return `https://www.serebii.net/scarletviolet/ribbons/${ribbon
       .toLowerCase()
       .replaceAll(' ', '')}${ribbon.endsWith('Mark') ? '' : 'ribbon'}.png`;
-  } else {
-    if (ribbon.endsWith('Mark')) {
-      return `https://raw.githubusercontent.com/msikma/pokesprite/master/misc/mark/${ribbon
-        .toLowerCase()
-        .replaceAll(' ', '-')}.png`;
-    } else if (Gen34ContestRibbons.includes(ribbon)) {
-      let ribbonStringParts = ribbon
-        .replaceAll(' (Gen 3)', '')
-        .replaceAll(' (Gen 4)', '')
-        .toLowerCase()
-        .split(' ');
-      ribbonStringParts = [
-        ribbonStringParts[0],
-        'ribbon',
-        ...ribbonStringParts.slice(1),
-      ];
-      if (Gen34ContestRibbons.indexOf(ribbon) > 20) {
-        return `https://raw.githubusercontent.com/msikma/pokesprite/master/misc/ribbon/${ribbonStringParts.join(
-          '-'
-        )}-sinnoh.png`;
-      } else {
-        return `https://raw.githubusercontent.com/msikma/pokesprite/master/misc/ribbon/${ribbonStringParts.join(
-          '-'
-        )}-hoenn.png`;
-      }
-    } else if (Gen34TowerRibbons.includes(ribbon)) {
-      return `https://raw.githubusercontent.com/msikma/pokesprite/master/misc/ribbon/${ribbon.toLowerCase()}-ribbon.png`;
-    } else {
-      return `https://raw.githubusercontent.com/msikma/pokesprite/master/misc/ribbon/gen8/${ribbon
-        .toLowerCase()
-        .replaceAll(' ', '-')}-ribbon.png`;
-    }
   }
+  if (ribbon.endsWith('Mark')) {
+    return `https://raw.githubusercontent.com/msikma/pokesprite/master/misc/mark/${ribbon
+      .toLowerCase()
+      .replaceAll(' ', '-')}.png`;
+  }
+  if (Gen34ContestRibbons.includes(ribbon)) {
+    let ribbonStringParts = ribbon
+      .replaceAll(' (Gen 3)', '')
+      .replaceAll(' (Gen 4)', '')
+      .toLowerCase()
+      .split(' ');
+    ribbonStringParts = [
+      ribbonStringParts[0],
+      'ribbon',
+      ...ribbonStringParts.slice(1),
+    ];
+    if (Gen34ContestRibbons.indexOf(ribbon) > 20) {
+      return `https://raw.githubusercontent.com/msikma/pokesprite/master/misc/ribbon/${ribbonStringParts.join(
+        '-'
+      )}-sinnoh.png`;
+    }
+    return `https://raw.githubusercontent.com/msikma/pokesprite/master/misc/ribbon/${ribbonStringParts.join(
+      '-'
+    )}-hoenn.png`;
+  }
+  if (Gen34TowerRibbons.includes(ribbon)) {
+    return `https://raw.githubusercontent.com/msikma/pokesprite/master/misc/ribbon/${ribbon.toLowerCase()}-ribbon.png`;
+  }
+  return `https://raw.githubusercontent.com/msikma/pokesprite/master/misc/ribbon/gen8/${ribbon
+    .toLowerCase()
+    .replaceAll(' ', '-')}-ribbon.png`;
 };
 
 const RibbonsDisplay = (props: { mon: PKM }) => {

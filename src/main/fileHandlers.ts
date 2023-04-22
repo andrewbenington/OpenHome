@@ -3,7 +3,6 @@ import fs from 'fs';
 import _ from 'lodash';
 
 export function initializeFolders(appDataPath: string) {
-  console.log(appDataPath)
   if (!fs.existsSync(`${appDataPath}/OpenHome/storage/boxes`)) {
     fs.mkdirSync(`${appDataPath}/OpenHome/storage/boxes`, { recursive: true });
   }
@@ -30,9 +29,7 @@ export function initializeFolders(appDataPath: string) {
     fs.mkdirSync(`${appDataPath}/OpenHome/storage/lookup`, { recursive: true });
   }
   if (
-    !fs.existsSync(
-      `${appDataPath}/OpenHome/storage/lookup/gen12Lookup.csv`
-    )
+    !fs.existsSync(`${appDataPath}/OpenHome/storage/lookup/gen12Lookup.csv`)
   ) {
     fs.writeFileSync(
       `${appDataPath}/OpenHome/storage/lookup/gen12Lookup.csv`,
@@ -40,9 +37,7 @@ export function initializeFolders(appDataPath: string) {
     );
   }
   if (
-    !fs.existsSync(
-      `${appDataPath}/OpenHome/storage/lookup/gen345Lookup.csv`
-    )
+    !fs.existsSync(`${appDataPath}/OpenHome/storage/lookup/gen345Lookup.csv`)
   ) {
     fs.writeFileSync(
       `${appDataPath}/OpenHome/storage/lookup/gen345Lookup.csv`,
@@ -53,15 +48,12 @@ export function initializeFolders(appDataPath: string) {
     fs.writeFileSync(`${appDataPath}/OpenHome/storage/saveFiles.csv`, '');
   }
   fs.opendir('../', (err, dir) => {
-    if (err) console.log('Error:', err);
+    if (err) console.error('Error:', err);
     else {
       // Print the pathname of the directory
-      console.log('\nPath of the directory:', dir.path);
       dir.closeSync();
     }
   });
-  const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
-  console.log(msgTemplate('HOMEDATA'));
 }
 
 export async function selectFile() {
@@ -81,24 +73,23 @@ export async function selectFiles() {
 }
 
 export function getFileCreatedDate(path: string) {
-  const { birthtime } = fs.statSync(path)
-  return birthtime
+  const { birthtime } = fs.statSync(path);
+  return birthtime;
 }
 
 export function readBytesFromFile(path: string) {
   const fileBytes = fs.readFileSync(path);
   if (fileBytes) {
     return new Uint8Array(fileBytes);
-  } else {
-    return undefined;
   }
+  return undefined;
 }
 
 export function readStringFromFile(path: string) {
   try {
     return fs.readFileSync(path, { encoding: 'utf8' });
   } catch (e) {
-    console.log(`error reading ${path}: ${e}`);
+    console.error(`error reading ${path}: ${e}`);
   }
   return '';
 }
