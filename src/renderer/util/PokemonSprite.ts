@@ -1,5 +1,4 @@
-import { Items } from 'consts';
-import { SWEETS } from 'consts/Formes';
+import { Items, SWEETS } from 'consts';
 import { GameOfOriginData } from 'consts/GameOfOrigin';
 import { POKEMON_DATA } from 'consts/Mons';
 import { NDex } from 'consts/NationalDex';

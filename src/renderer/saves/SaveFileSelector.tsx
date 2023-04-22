@@ -14,9 +14,7 @@ interface SaveFileSelectorProps {
 }
 
 const getSaveLogo = (ref: SaveRef) => {
-  if (ref.game) {
-    return getGameLogo(parseInt(ref.game ?? '0'));
-  }
+  return getGameLogo(parseInt(ref.game ?? '0'));
 };
 
 const formatTimeSince = (timestamp: number) => {
@@ -61,13 +59,16 @@ const formatTimeSince = (timestamp: number) => {
 const SaveFileSelector = (props: SaveFileSelectorProps) => {
   const { onClose } = props;
   const { palette } = useTheme();
-  const [recentSaves, upsertRecentSave, removeRecentSave] = useRecentSaves();
+  const [recentSaves, upsertRecentSave] = useRecentSaves();
   const [homeMonMap, gen12LookupMap, gen345LookupMap] = useLookupMaps();
   const dispatch = useAppDispatch();
 
   const openSaveFile = async (filePath?: string) => {
     const { path, fileBytes, createdDate } =
-      await window.electron.ipcRenderer.invoke('read-save-file', filePath && [filePath]);
+      await window.electron.ipcRenderer.invoke(
+        'read-save-file',
+        filePath && [filePath]
+      );
     if (path && fileBytes && homeMonMap) {
       const saveFile = buildSaveFile(path, fileBytes, {
         homeMonMap,
@@ -142,6 +143,7 @@ const SaveFileSelector = (props: SaveFileSelectorProps) => {
             }}
           >
             <img
+              alt="save logo"
               width={150}
               src={getSaveLogo(ref)}
               style={{

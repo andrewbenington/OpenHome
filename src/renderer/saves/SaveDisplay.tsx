@@ -2,27 +2,26 @@ import { ArrowBack, ArrowForward, Close } from '@mui/icons-material';
 import { Card, Grid, useTheme } from '@mui/material';
 import { GameOfOriginData } from 'consts';
 import _ from 'lodash';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import OpenHomeButton from 'renderer/components/OpenHomeButton';
-import { useAppDispatch, useAppSelector } from 'renderer/redux/hooks';
+import { useAppDispatch } from 'renderer/redux/hooks';
 import { useDragMon, useSaves } from 'renderer/redux/selectors';
 import {
-  cancelDrag,
   completeDrag,
   importMons,
   removeSaveAt,
   setSaveBox,
   startDrag,
 } from 'renderer/redux/slices/appSlice';
-import { isRestricted } from '../../types/TransferRestrictions';
-import { getSaveTypeString, SaveCoordinates } from 'types/types';
+import { SaveCoordinates, getSaveTypeString } from 'types/types';
 import { PKM } from '../../types/PKMTypes/PKM';
+import { isRestricted } from '../../types/TransferRestrictions';
 import ArrowButton from './ArrowButton';
 import BoxCell from './BoxCell';
 
 interface SaveDisplayProps {
   saveIndex: number;
-  setSelectedMon: (mon: PKM | undefined) => void;
+  setSelectedMon: (_: PKM | undefined) => void;
 }
 
 const SaveDisplay = (props: SaveDisplayProps) => {
@@ -43,7 +42,6 @@ const SaveDisplay = (props: SaveDisplayProps) => {
     dispatch(importMons({ mons, saveCoordinates }));
 
   const save = useMemo(() => {
-    console.log('saves changed');
     return saves[saveIndex];
   }, [saves, saveIndex]);
 
@@ -71,7 +69,7 @@ const SaveDisplay = (props: SaveDisplayProps) => {
         >
           <OpenHomeButton
             style={{
-              color: !!save.changedMons.length
+              color: save.changedMons.length
                 ? palette.text.disabled
                 : palette.text.secondary,
               fontWeight: 'bold',
@@ -158,11 +156,7 @@ const SaveDisplay = (props: SaveDisplayProps) => {
                         onClick={() => {
                           setSelectedMon(mon);
                         }}
-                        onDragEvent={(cancelled: boolean) => {
-                          console.log(
-                            'button drag event cancelled =',
-                            cancelled
-                          );
+                        onDragEvent={() => {
                           dispatchStartDrag({
                             saveNumber: saveIndex,
                             box: save.currentPCBox,

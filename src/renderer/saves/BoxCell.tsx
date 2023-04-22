@@ -1,14 +1,13 @@
-import BoxIcons from '../images/icons/BoxIcons.png';
+import { POKEMON_DATA } from 'consts';
 import React, { useEffect, useState } from 'react';
 import { PKM } from '../../types/PKMTypes/PKM';
 import { acceptableExtensions, bytesToPKM } from '../../util/FileImport';
-import { useResourcesPath } from 'renderer/redux/selectors';
-import { POKEMON_DATA } from 'consts';
+import BoxIcons from '../images/icons/BoxIcons.png';
 
 interface BoxCellProps {
   onClick: () => void;
-  onDragEvent: (cancelled: boolean) => void;
-  onDrop: (mons: PKM[] | undefined) => void;
+  onDragEvent: (_: boolean) => void;
+  onDrop: (_: PKM[] | undefined) => void;
   disabled: boolean;
   zIndex: number;
   mon: PKM | undefined;
@@ -17,7 +16,23 @@ interface BoxCellProps {
 const BoxCell = (props: BoxCellProps) => {
   const { onClick, onDragEvent, onDrop, disabled, zIndex, mon } = props;
   const [dragImage, setDragImage] = useState<Element>();
-  const resourcesPath = useResourcesPath();
+
+  const onDropFromFiles = async (files: FileList) => {
+    const importedMons: PKM[] = [];
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      // eslint-disable-next-line no-await-in-loop
+      const bytes = new Uint8Array(await file.arrayBuffer());
+      let [extension] = file.name.split('.').slice(-1);
+      extension = extension.toUpperCase();
+      if (acceptableExtensions.includes(extension)) {
+        importedMons.push(bytesToPKM(bytes, extension));
+      } else {
+        console.error(`invalid extension: ${extension}`);
+      }
+    }
+    onDrop(importedMons);
+  };
 
   const handleDrop: React.DragEventHandler<HTMLDivElement> = (e) => {
     if (e.dataTransfer.files[0]) {
@@ -34,27 +49,10 @@ const BoxCell = (props: BoxCellProps) => {
         backgroundBlendMode: 'multiply',
         backgroundColor: '#555',
       };
-    } else {
-      return {
-        backgroundColor: '#0000',
-      };
     }
-  };
-
-  const onDropFromFiles = async (files: FileList) => {
-    const importedMons: PKM[] = [];
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      let bytes = new Uint8Array(await file.arrayBuffer());
-      let [extension] = file.name.split('.').slice(-1);
-      extension = extension.toUpperCase();
-      if (acceptableExtensions.includes(extension)) {
-        importedMons.push(bytesToPKM(bytes, extension));
-      } else {
-        console.log(`invalid extension: ${extension}`);
-      }
-    }
-    onDrop(importedMons);
+    return {
+      backgroundColor: '#0000',
+    };
   };
 
   useEffect(() => {
@@ -69,7 +67,7 @@ const BoxCell = (props: BoxCellProps) => {
         padding: 0,
         width: '100%',
         aspectRatio: 1,
-        zIndex: zIndex,
+        zIndex,
         backgroundColor: disabled ? '#555' : '#fff4',
         position: 'relative',
         border: 'none',
@@ -87,14 +85,13 @@ const BoxCell = (props: BoxCellProps) => {
         >
           <div
             draggable
-            onDragStart={(e) => {
+            onDragStart={() => {
               onDragEvent(false);
             }}
             onDragEnd={(e: { dataTransfer: any; target: any }) => {
               if (dragImage) {
                 document.body.removeChild(dragImage);
               }
-              console.log('onDragEnd', e);
               // if not waiting for mon to show up in other slot, set drag image to
               // undefined so it shows up in this one again
               if (
