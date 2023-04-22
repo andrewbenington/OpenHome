@@ -8,27 +8,67 @@ import urllib.request
 with open('../../consts/JSON/Pokemon.json') as f:
     POKEMON_DATA = json.load(f)
 
-
-def get_serebii_sprite(dex_num, form_num, is_shiny, game, is_female=False):
-    formeName = (
-        POKEMON_DATA[str(dex_num)]['formes'][form_num]['sprite']
-        if dex_num not in [664, 665] else POKEMON_DATA[str(dex_num)]['name'].lower()
-    )
+def get_serebii_sprite(dex_num, form_num, is_shiny, game, is_female=False, formeOverride=None):
+    
+    if formeOverride == None:
+        formeName = (
+            POKEMON_DATA[str(dex_num)]['formes'][form_num]['sprite']
+            if dex_num not in [664, 665] else POKEMON_DATA[str(dex_num)]['name'].lower()
+        )
+    else:
+        formeName = formeOverride
     formeName = (
         formeName.replace('paldea-fire', 'b')
         .replace('paldea-water', 'a')
     )
     monName = POKEMON_DATA[str(dex_num)]['formes'][0]['sprite']
-    if monName != POKEMON_DATA[str(dex_num)]['name']:
+    if POKEMON_DATA[str(dex_num)]['formes'][0]['name'] != POKEMON_DATA[str(dex_num)]['name'] and formeName != "wishiwashi-school":
         monName = POKEMON_DATA[str(dex_num)]['formes'][0]['alias']
 
-    if form_num == 0:
+    if "alcremie" in formeName:
+        print(formeName)
+        formeName = formeName.split(f'alcremie-')[1]
+        flavor, pattern = formeName.split('-')[:2]
+        sweet = "strawberry"
+        if len(formeName.split('-')) > 2:
+            sweet = formeName.split('-')[2]
+        formeName = ""
+        if not is_shiny:
+            if flavor[0] == "m" or flavor == "rainbow":
+                formeName += flavor[:2] + pattern[0]
+            elif flavor != "vanilla":
+                formeName += flavor[0] + pattern[0]
+        if sweet != "strawberry":
+            formeName += sweet
+        print(flavor, pattern, sweet, "->", formeName)
+    elif form_num == 0:
         formeName = ""
     else:
         formeSections = formeName.split(f'{monName}-')
         if len(formeSections) > 1:
-            if dex_num == 493:
+            if dex_num == 493 or "silvally" in formeName:
                 formeName = formeSections[1]
+            elif "genesect" in formeName:
+                if "shock" in formeName:
+                    formeName = "e"
+                elif "burn" in formeName:
+                    formeName = "f"
+                elif "chill" in formeName:
+                    formeName = "i"
+                elif "douse" in formeName:
+                    formeName = "w"
+            elif "wormadam" in formeName:
+                if "sandy" in formeName:
+                    formeName = "c"
+                elif "trash" in formeName:
+                    formeName = "s"
+            elif "necrozma" in formeName:
+                if "dusk" in formeName:
+                    formeName = "dm"
+                elif "dawn" in formeName:
+                    formeName = "dw"
+            elif "cramorant" in formeName:
+                formeName = formeSections[1][:2]
             else:
                 formeName = formeSections[1][0] 
         else:
@@ -45,8 +85,12 @@ def get_serebii_sprite(dex_num, form_num, is_shiny, game, is_female=False):
             gameURI = "scarletviolet"
     if formeName != "":
         formeName = "-" + formeName
-    elif is_female:
+    elif is_female and gameURI != "SWSH":
         formeName = "-f"
+
+    if gameURI == "SWSH":
+        if "silvally" in monName:
+            formeName = ""
     return (
         f"https://www.serebii.net/{'Shiny/' if is_shiny else ''}"
         f"{gameURI}/{'pokemon/' if not is_shiny else ''}{'new/' if gameURI == 'SV' else ''}"
@@ -116,16 +160,17 @@ def download_png(url, directory, filename):
         # print(f"{filename} already exists in {directory}")
         return False, False
 
+    print(f"Downloading {filename} from {url}...")
     try:
         opener = urllib.request.build_opener()
         opener.addheaders = [('User-agent', 'Mozilla/5.0')]
         urllib.request.install_opener(opener)
         urllib.request.urlretrieve(url, os.path.join(directory, filename))
-        print(f"Downloaded {filename} to {directory}")
+        print(f"\tDownloaded to {directory}")
         return True, False
     except Exception as e:
-        print(f"Error downloading {filename} from {url}. Exception: {e}")
-        return True, True
+        print(f"\tError downloading: {e}")
+        return True, "404" not in str(e)
     # print(f"{filename} from {url}")
     # return False, False
 
@@ -520,12 +565,14 @@ def download_all_sprites(dex_number, forme, forme_number):
         return functions_to_download_serebii(
             dex_number, forme, forme_number, forme["sprite"])
     else:
+        functions = []
         for sweet in sweets:
             thread = threading.Thread(target=download_non_serebii_sprites, args=(
                 dex_number, forme, forme_number, forme["sprite"] + "-" + sweet))
             thread.start()
-            return functions_to_download_serebii(
+            functions += functions_to_download_serebii(
                 dex_number, forme, forme_number, forme["sprite"] + "-" + sweet)
+        return functions
 
 
 def download_non_serebii_sprites(dex_number, forme, forme_number, forme_name):
@@ -603,14 +650,14 @@ def download_sprite_variants_serebii(dex_number, forme_number, forme_name, game,
     if "-totem" in forme_name:
         return
     functions.append(lambda : download_png(get_serebii_sprite(dex_number, forme_number, False,
-                                    game), "sprites/" + folder, forme_name + ".png"))
+                                    game, formeOverride=forme_name), "sprites/" + folder, forme_name + ".png"))
     functions.append(lambda : download_png(get_serebii_sprite(dex_number, forme_number, True,
-                                       game), "sprites/" + folder + "/shiny", forme_name + ".png"))
+                                       game, formeOverride=forme_name), "sprites/" + folder + "/shiny", forme_name + ".png"))
     if includeFemale and dex_number in gender_differences and forme_number == 0 and dex_number != 255 and dex_number != 418:
         functions.append(lambda : download_png(get_serebii_sprite(dex_number, forme_number, False,
-                                           game, is_female=True), "sprites/" + folder, forme_name + "-f.png"))
+                                           game, is_female=True, formeOverride=forme_name), "sprites/" + folder, forme_name + "-f.png"))
         functions.append(lambda : download_png(get_serebii_sprite(dex_number, forme_number, True,
-                                           game, is_female=True), "sprites/" + folder + "/shiny", forme_name + "-f.png"))
+                                           game, is_female=True, formeOverride=forme_name), "sprites/" + folder + "/shiny", forme_name + "-f.png"))
     return functions
     # if dex_number <= 809:
     #     print("This Pokemon was present in Generation VII.")
