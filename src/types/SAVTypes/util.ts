@@ -109,14 +109,17 @@ export const getSaveType = (bytes: Uint8Array): SaveType => {
     }
   } else if (bytes.length >= SIZE_GEN12) {
     // hacky
-    const save = new G2SAV('', bytes);
-    if (save.areCrystalInternationalChecksumsValid()) {
+    const g2save = new G2SAV('', bytes);
+    if (g2save.areCrystalInternationalChecksumsValid()) {
       return SaveType.C_I;
     }
-    if (save.areGoldSilverChecksumsValid()) {
+    if (g2save.areGoldSilverChecksumsValid()) {
       return SaveType.GS_I;
     }
-    return SaveType.RBY_I;
+    const g1save = new G1SAV('', bytes);
+    if (!g1save.invalid) {
+      return SaveType.RBY_I;
+    }
   }
   return SaveType.UNKNOWN;
 };
