@@ -157,7 +157,7 @@ const PokemonDisplay = (props: {
         }}
         sx={{
           ...fileTypeChipStyle,
-          backgroundColor: fileTypeColors[mon.format],
+          backgroundColor: fileTypeColors[displayMon.format],
         }}
       >
         <MenuItem value="OHPKM">OpenHome</MenuItem>
