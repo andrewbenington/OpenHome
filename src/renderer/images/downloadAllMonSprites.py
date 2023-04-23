@@ -153,6 +153,9 @@ def get_pokemon_db_sprite(dex_num: int, form_num: int, is_shiny: bool, game: str
         forme_name = "pikachu-johto-cap"
     return f"https://img.pokemondb.net/sprites/{game}/{'normal' if not is_shiny else 'shiny'}/{forme_name}{'-female' if is_female and forme_name in female_stats else '-f' if is_female else ''}.png"
 
+def get_pokencyclopedia_coloxd_sprite(dex_num, is_shiny, forme_name):
+    return f"https://www.pokencyclopedia.info/sprites/spin-off/ani_xd{'_shiny' if is_shiny else ''}/ani_xd{'-S' if is_shiny else ''}_{str(dex_num).zfill(3)}{'-' + forme_name if forme_name != None else ''}.gif"
+
 
 def download_png(url, directory, filename):
     # Check if the file already exists in the directory
@@ -526,6 +529,7 @@ def download_all_sprites_all_mons():
     os.makedirs("sprites/gen1", exist_ok=True)
     os.makedirs("sprites/gen2/shiny", exist_ok=True)
     os.makedirs("sprites/gen3/shiny", exist_ok=True)
+    os.makedirs("sprites/gen3gc/shiny", exist_ok=True)
     os.makedirs("sprites/gen4/shiny", exist_ok=True)
     os.makedirs("sprites/gen5/shiny", exist_ok=True)
     os.makedirs("sprites/gen6/shiny", exist_ok=True)
@@ -587,6 +591,7 @@ def download_non_serebii_sprites(dex_number, forme, forme_number, forme_name):
     if dex_number <= 386 and forme_number == 0 or dex_number == 201 or dex_number == 386:
         download_sprite_variants_pokemon_db(
             dex_number, forme_number, forme_name, "emerald", "gen3", False)
+        download_sprite_variants_pokencyclopedia_coloxd(dex_number, forme_number, forme_name)
     if dex_number <= 493 and not excludeFormeGen4(dex_number, forme):
         download_sprite_variants_pokemon_db(
             dex_number, forme_number, forme_name, 
@@ -630,7 +635,6 @@ def functions_to_download_serebii(dex_number, forme, forme_number, forme_name):
             dex_number, forme_number, forme_name, "SWSH", "gen8", dex_number in swsh_transferrable)
     return functions
 
-
 def download_sprite_variants_pokemon_db(dex_number, forme_number, forme_name, game, folder, includeFemale=True):
     if "-totem" in forme_name:
         return
@@ -644,6 +648,12 @@ def download_sprite_variants_pokemon_db(dex_number, forme_number, forme_name, ga
         download_png(get_pokemon_db_sprite(dex_number, forme_number, True,
                                            game, is_female=True), "sprites/" + folder + "/shiny", forme_name + "-f.png")
 
+def download_sprite_variants_pokencyclopedia_coloxd(dex_number, forme_number, forme_name):
+    gen3_forme = None
+    if forme_number > 0 or dex_number == 201:
+        gen3_forme = forme_name.split('-')[1]
+    download_png(get_pokencyclopedia_coloxd_sprite(dex_number, False, gen3_forme), "sprites/gen3gc", forme_name + ".gif")
+    download_png(get_pokencyclopedia_coloxd_sprite(dex_number, True, gen3_forme), "sprites/gen3gc/shiny", forme_name + ".gif")
 
 def download_sprite_variants_serebii(dex_number, forme_number, forme_name, game, folder, includeFemale=True):
     functions = []

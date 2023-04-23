@@ -1,8 +1,8 @@
 import { POKEMON_DATA } from 'consts';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { StringToStringMap } from 'types/types';
 import { PKM } from '../../types/PKMTypes/PKM';
-import { getItemSprite } from '../util/PokemonSprite';
+import { getItemIconPath } from '../util/PokemonSprite';
 import AttributeRow from './AttributeRow';
 
 interface PokemonWithItemProps {
@@ -17,6 +17,22 @@ const PokemonWithItem = (props: PokemonWithItemProps) => {
     const monData = POKEMON_DATA[mon.dexNum]?.formes[mon.formNum];
     if (!monData) return 'pokemon sprite';
     return `${monData.formeName}${mon.isShiny ? '-shiny' : ''} sprite`;
+  }, [mon]);
+  const [itemIcon, setItemIcon] = useState<string>();
+
+  useEffect(() => {
+    const importIcon = async () => {
+      console.info(
+        `item: ${mon.heldItem}\n
+        \tindex: ${mon.heldItemIndex}\n
+        \tpath: ${`../images/items/${getItemIconPath(mon.heldItem)}\n`}`
+      );
+      const icon = await import(
+        `../images/items/${getItemIconPath(mon.heldItem)}`
+      );
+      setItemIcon(icon?.default);
+    };
+    importIcon();
   }, [mon]);
 
   return (
@@ -61,7 +77,7 @@ const PokemonWithItem = (props: PokemonWithItemProps) => {
           {mon.heldItem !== 'None' && (
             <img
               alt="item icon"
-              src={getItemSprite(mon.heldItem)}
+              src={itemIcon}
               style={{ width: 24, height: 24, marginRight: 5 }}
             />
           )}

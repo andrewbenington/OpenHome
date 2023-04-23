@@ -17,6 +17,13 @@ export const fileTypeChipStyle = {
     paddingTop: 0,
     paddingBottom: 0,
   },
+  '& .MuiSelect-outlined': {
+    paddingTop: 0,
+    paddingBottom: 0,
+  },
+  '& .Mui-focused': {
+    border: 0,
+  },
   position: 'absolute' as 'absolute',
 };
 

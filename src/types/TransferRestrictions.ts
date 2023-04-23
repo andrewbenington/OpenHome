@@ -66,7 +66,7 @@ export const HisuianForms: FormRestrictions = {
   [NDex.ELECTRODE]: [1],
   [NDex.TYPHLOSION]: [1],
   [NDex.QWILFISH]: [1],
-  [NDex.SNEASEL]: undefined,
+  [NDex.SNEASEL]: [1],
   [NDex.SAMUROTT]: [1],
   [NDex.LILLIGANT]: [1],
   [NDex.BASCULIN]: [2],

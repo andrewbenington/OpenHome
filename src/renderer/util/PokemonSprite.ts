@@ -1,5 +1,5 @@
 import { Items, SWEETS } from 'consts';
-import { GameOfOriginData } from 'consts/GameOfOrigin';
+import { GameOfOrigin, GameOfOriginData } from 'consts/GameOfOrigin';
 import { POKEMON_DATA } from 'consts/Mons';
 import { NDex } from 'consts/NationalDex';
 import { StringToStringMap } from 'types/types';
@@ -39,12 +39,15 @@ export const fileToSpriteFolder: StringToStringMap = {
   PK1: 'gen1',
   PK2: 'gen2',
   PK3: 'gen3',
+  COLOPKM: 'gen3gc',
+  XDPKM: 'gen3gc',
   PK4: 'gen4',
   PK5: 'gen5',
   PK6: 'gen6',
   PK7: 'gen7',
   PK8: 'gen8',
   PA8: 'gen8a',
+  PB8: 'gen8',
   PK9: 'gen9',
   OHPKM: 'home',
 };
@@ -65,14 +68,43 @@ const CXDShadow = [
 
 const CXDNonShadow = [196, 197];
 
-export const getItemSprite = (item: string): string => {
-  if (!item) return '';
-  if (item.includes('Berry') && !Items.includes(item)) {
-    return 'https://archives.bulbagarden.net/media/upload/3/3c/GSC_Berry_Tree.png';
+const SharedItemSpritePrefixes = [
+  'Data Card',
+  'Lost Satchel',
+  'Old Verse',
+  'Lost Satchel',
+];
+
+export const getItemIconPath = (item: string): string | undefined => {
+  const itemIndex = Items.indexOf(item);
+  if (itemIndex > 0) {
+    if (
+      item.startsWith('HM') ||
+      (item.startsWith('TM') && item.charAt(2) !== 'V')
+    ) {
+      return 'tm/normal.png';
+    }
+    if (item.startsWith('TR')) {
+      return 'tr/normal.png';
+    }
+    if (item.startsWith('★')) {
+      return 'shared/dynamax-crystal.png';
+    }
+    if (
+      (itemIndex > 2310 && itemIndex < 2344) ||
+      (itemIndex > 2347 && itemIndex < 2401)
+    ) {
+      return 'shared/picnic-set.png';
+    }
+    for (let i = 0; i < SharedItemSpritePrefixes.length; i++) {
+      const prefix = SharedItemSpritePrefixes[i];
+      if (item.startsWith(prefix)) {
+        return `shared/${prefix.toLocaleLowerCase().replaceAll(' ', '-')}`;
+      }
+    }
+    return `index/${itemIndex.toString().padStart(4, '0')}.png`;
   }
-  return `https://www.serebii.net/itemdex/sprites/${item
-    .toLocaleLowerCase()
-    .replaceAll(' ', '')}.png`;
+  return undefined;
 };
 
 export const getSpritePath = (mon: PKM, format?: string) => {
@@ -84,14 +116,16 @@ export const getSpritePath = (mon: PKM, format?: string) => {
   let spriteFolder = fileToSpriteFolder[monFormat];
   if (spriteFolder === 'gen7' && !alolaDex.includes(mon.dexNum)) {
     spriteFolder = 'gen6';
+  } else if (spriteFolder === 'home' && mon.dexNum > NDex.ENAMORUS) {
+    spriteFolder = 'gen9';
   }
   console.info(
     `${spriteFolder}${mon.isShiny ? '/shiny/' : '/'}${spriteName}.${
-      monFormat === 'PK5' ? 'gif' : 'png'
+      spriteFolder === 'gen5' || spriteFolder === 'gen3gc' ? 'gif' : 'png'
     }`
   );
   return `${spriteFolder}${mon.isShiny ? '/shiny/' : '/'}${spriteName}.${
-    monFormat === 'PK5' ? 'gif' : 'png'
+    spriteFolder === 'gen5' || spriteFolder === 'gen3gc' ? 'gif' : 'png'
   }`;
 };
 
@@ -100,7 +134,7 @@ export const getGameLogo = (
   dexNum?: number,
   hasNationalRibbon?: boolean
 ) => {
-  if (gameOfOrigin === 0x0f) {
+  if (gameOfOrigin === GameOfOrigin.ColosseumXD) {
     if (dexNum === undefined || hasNationalRibbon === undefined) {
       return GameLogos.ColosseumXD;
     }
