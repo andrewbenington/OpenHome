@@ -49,6 +49,8 @@ export class SAV {
 
   bytes: Uint8Array;
 
+  invalid: boolean = false;
+
   convertPKM: (_: PKM) => PKM = (mon) => new OHPKM(mon);
 
   getSaveRef: () => SaveRef = () => {

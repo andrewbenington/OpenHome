@@ -53,6 +53,11 @@ export class G1SAV extends SAV {
     this.displayID = this.tid.toString().padStart(5, '0');
     this.name = gen12StringToUTF(this.bytes, 0x2598, 11);
     this.currentPCBox = this.bytes[this.CURRENT_BOX_NUM_OFFSET] & 0x7f;
+    this.boxes = [];
+    if (this.currentPCBox > this.NUM_BOXES) {
+      this.invalid = true;
+      return;
+    }
     this.saveType = SaveType.RBY_I;
 
     let currenBoxByteOffset;
@@ -61,7 +66,6 @@ export class G1SAV extends SAV {
     } else {
       currenBoxByteOffset = 0x6000 + (this.currentPCBox - 6) * this.BOX_SIZE;
     }
-    console.log('currentbox', currenBoxByteOffset, this.currentPCBox);
     this.bytes.set(
       this.bytes.slice(
         this.CURRENT_BOX_DATA_OFFSET,
@@ -75,7 +79,7 @@ export class G1SAV extends SAV {
         this.boxColumns = 5;
         break;
       default:
-        this.boxes = [];
+        this.invalid = true;
         return;
     }
     this.boxes = new Array<G1Box>(this.NUM_BOXES);
@@ -129,7 +133,9 @@ export class G1SAV extends SAV {
 
   prepareBoxesForSaving() {
     const changedMonPKMs: OHPKM[] = [];
-    const changedBoxes = uniq(this.changedMons.map((coords) => coords.box));
+    const changedBoxes: number[] = uniq(
+      this.changedMons.map((coords) => coords.box)
+    );
     const pokemonPerBox = this.boxRows * this.boxColumns;
     changedBoxes.forEach((boxNumber) => {
       let boxByteOffset: number;
@@ -138,12 +144,10 @@ export class G1SAV extends SAV {
       } else {
         boxByteOffset = 0x6000 + (boxNumber - 6) * this.BOX_SIZE;
       }
-      console.log('box', boxNumber + 1, 'at', boxByteOffset.toString(16));
       const box = this.boxes[boxNumber];
       let numMons = 0;
       box.pokemon.forEach((boxMon) => {
         if (boxMon) {
-          console.log('setting bytes for', boxMon.nickname);
           if (boxMon instanceof OHPKM) {
             changedMonPKMs.push(boxMon);
           }
@@ -179,16 +183,6 @@ export class G1SAV extends SAV {
       const remainingSlots = pokemonPerBox - numMons;
       if (remainingSlots) {
         // set all mon data to all 0s
-        console.log(
-          'clearing',
-          boxByteOffset + this.BOX_PKM_OFFSET + numMons * this.BOX_PKM_SIZE,
-          'mon bytes at',
-          (
-            boxByteOffset +
-            this.BOX_PKM_OFFSET +
-            numMons * this.BOX_PKM_SIZE
-          ).toString(16)
-        );
         this.bytes.set(
           new Uint8Array(this.BOX_PKM_SIZE * remainingSlots),
           boxByteOffset + this.BOX_PKM_OFFSET + numMons * this.BOX_PKM_SIZE

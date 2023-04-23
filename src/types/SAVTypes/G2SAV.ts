@@ -41,6 +41,7 @@ export class G2SAV extends SAV {
       0x4000, 0x4450, 0x48a0, 0x4cf0, 0x5140, 0x5590, 0x59e0, 0x6000, 0x6450,
       0x68a0, 0x6cf0, 0x7140, 0x7590, 0x79e0,
     ];
+    this.boxes = [];
     if (this.areGoldSilverChecksumsValid()) {
       this.saveType = SaveType.GS_I;
     } else if (this.areCrystalInternationalChecksumsValid()) {
@@ -52,6 +53,10 @@ export class G2SAV extends SAV {
       case SaveType.C_I:
         this.boxRows = 4;
         this.boxColumns = 5;
+        break;
+      default:
+        this.invalid = true;
+        return;
     }
     this.boxes = new Array<G2Box>(this.boxOffsets.length);
     if (this.saveType >= SaveType.GS_I && this.saveType <= SaveType.C_I) {
