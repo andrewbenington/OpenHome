@@ -58,14 +58,14 @@ const hoohGen2 = bytesToPKM(
 //   // gaining Gen 3 ribbons
 //   emeraldPKM.ribbons = [
 //     ...emeraldPKM.ribbons,
-//     'Cool (Gen 3)',
+//     'Cool (Hoenn)',
 //     'Cool Super',
 //     'Cool Hyper',
-//     'Cool Master (Gen 3)',
+//     'Cool Master (Hoenn)',
 //     'Winning',
 //   ];
 //   blazikenOH.updateData(emeraldPKM);
-//   expect(blazikenOH.ribbons).toContain('Cool Master (Gen 3)');
+//   expect(blazikenOH.ribbons).toContain('Cool Master (Hoenn)');
 //   expect(blazikenOH.ribbons).toContain('Winning');
 //   expect(blazikenOH.ribbons).toContain('Effort');
 //   expect(blazikenOH.ribbons).toContain('Footprint');

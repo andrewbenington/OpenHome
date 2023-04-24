@@ -130,7 +130,24 @@ export class OHPKM extends PKM {
       this.pokerusByte = other.pokerusByte;
       this.contestMemoryCount = other.contestMemoryCount;
       this.battleMemoryCount = other.battleMemoryCount;
-      this.ribbons = other.ribbons;
+      const contestRibbons = _.intersection(other.ribbons, Gen34ContestRibbons);
+      this.contestMemoryCount = Math.max(
+        contestRibbons.length,
+        this.contestMemoryCount
+      );
+      const battleRibbons = _.intersection(other.ribbons, Gen34TowerRibbons);
+      this.battleMemoryCount = Math.max(
+        battleRibbons.length,
+        this.battleMemoryCount
+      );
+      const ribbons = other.ribbons;
+      if (this.contestMemoryCount) {
+        ribbons.push('Contest Memory');
+      }
+      if (this.battleMemoryCount) {
+        ribbons.push('Battle Memory');
+      }
+      this.ribbons = ribbons;
       this.sociability = other.sociability ?? 0;
       this.height = other.height;
       this.weight = other.weight;
@@ -198,8 +215,6 @@ export class OHPKM extends PKM {
       this.secretSuperTrainingComplete = !!other.secretSuperTrainingComplete;
       this.trainingBagHits = other.trainingBagHits ?? 0;
       this.trainingBag = other.trainingBag ?? 0;
-      this.contestMemoryCount = other.contestMemoryCount;
-      this.battleMemoryCount = other.battleMemoryCount;
       this.pokeStarFame = other.pokeStarFame ?? 0;
       this.metTimeOfDay = other.metTimeOfDay;
       this.isNsPokemon = !!other.isNsPokemon;
@@ -254,6 +269,11 @@ export class OHPKM extends PKM {
         spe: false,
       };
       this.homeTracker = other.homeTracker ?? new Uint8Array(8);
+      this.TRFlagsSwSh = other.TRFlagsSwSh ?? new Uint8Array(14);
+      this.TMFlagsBDSP = other.TMFlagsBDSP ?? new Uint8Array(14);
+      this.TutorFlagsLA = other.TutorFlagsLA ?? new Uint8Array(8);
+      this.masterFlagsLA = other.masterFlagsLA ?? new Uint8Array(8);
+      this.TMFlagsSV = other.TMFlagsSV ?? new Uint8Array(26);
       this.evsG12 = other.evsG12 ?? { hp: 0, atk: 0, def: 0, spc: 0, spe: 0 };
     } else {
       super(new Uint8Array());
@@ -1132,14 +1152,6 @@ export class OHPKM extends PKM {
     return this.bytes[0x10f];
   }
 
-  public get trainerNameBytes() {
-    return this.bytes.slice(0x110, 26);
-  }
-
-  public set trainerNameBytes(value: Uint8Array) {
-    this.bytes.set(value.slice(0, 12), 0x110);
-  }
-
   public get trainerName() {
     return utf16BytesToString(this.bytes, 0x110, 12);
   }
@@ -1317,11 +1329,11 @@ export class OHPKM extends PKM {
     this.bytes.set(value.slice(0, 8), 0x170);
   }
 
-  public get MasterFlagsLA() {
+  public get masterFlagsLA() {
     return this.bytes.slice(0x178, 0x178 + 8);
   }
 
-  public set MasterFlagsLA(value: Uint8Array) {
+  public set masterFlagsLA(value: Uint8Array) {
     this.bytes.set(value.slice(0, 8), 0x178);
   }
 

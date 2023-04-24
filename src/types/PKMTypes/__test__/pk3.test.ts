@@ -39,7 +39,9 @@ const blazikenGen3 = bytesToPKM(
 
 const slowpokeOH = bytesToPKM(
   new Uint8Array(
-    fs.readFileSync(path.join(__dirname, './PKMFiles/OH', 'slowpoke-shiny.ohpkm'))
+    fs.readFileSync(
+      path.join(__dirname, './PKMFiles/OH', 'slowpoke-shiny.ohpkm')
+    )
   ),
   'OHPKM'
 ) as OHPKM;
@@ -71,14 +73,14 @@ test('gen 3 ribbons are updated', () => {
   // gaining Gen 3 ribbons
   emeraldPKM.ribbons = [
     ...emeraldPKM.ribbons,
-    'Cool (Gen 3)',
+    'Cool (Hoenn)',
     'Cool Super',
     'Cool Hyper',
-    'Cool Master (Gen 3)',
+    'Cool Master (Hoenn)',
     'Winning',
   ];
   blazikenOH.updateData(emeraldPKM);
-  expect(blazikenOH.ribbons).toContain('Cool Master (Gen 3)');
+  expect(blazikenOH.ribbons).toContain('Cool Master (Hoenn)');
   expect(blazikenOH.ribbons).toContain('Winning');
   expect(blazikenOH.ribbons).toContain('Effort');
   expect(blazikenOH.ribbons).toContain('Footprint');
@@ -109,8 +111,8 @@ test('gen 3 contest stats are updated', () => {
 test('gen 3 conversion to OHPKM and back is lossless', () => {
   const ohPKM = new OHPKM(blazikenGen3);
   // gaining cool contest points
-  const gen3PKM = new PK3(ohPKM)
-  expect(blazikenGen3.bytes).toEqual(gen3PKM.bytes)
+  const gen3PKM = new PK3(ohPKM);
+  expect(blazikenGen3.bytes).toEqual(gen3PKM.bytes);
 });
 
 test('pk3 and ohpkm have the same gen345Lookup key', () => {
