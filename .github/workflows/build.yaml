@@ -12,8 +12,10 @@ jobs:
       - name: install dependencies
         run: npm install
       - name: build
-        run: npm run make
+        run: npm run build
       - name: publish
+        env:
+          gh_token: ${{ secrets.GITHUB_TOKEN }}
         run: npm run release
 
   build_on_mac:
@@ -28,6 +30,10 @@ jobs:
       - name: build
         run: npm run build
       - name: publish
+        env:
+          gh_token: ${{ secrets.GITHUB_TOKEN }}
+          apple_id: ${{ secrets.APPLE_ID }}
+          apple_id_pass: ${{ secrets.APPLE_ID_PASS }}
         run: npm run release
 
   build_on_win:
@@ -42,4 +48,6 @@ jobs:
       - name: build
         run: npm run build
       - name: publish
+        env:
+          gh_token: ${{ secrets.GITHUB_TOKEN }}
         run: npm run release
