@@ -2,7 +2,7 @@ name: Build
 on: [push, pull_request]
 
 env:
-  GH_TOKEN: { { secrets.GITHUB_TOKEN } }
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   build_on_linux:
