@@ -130,7 +130,7 @@ test('gen 6+ nickname accuracy', () => {
 test('gen 6+ shiny accuracy', () => {
   const converted = new PK4(slowpokeOH);
   if (!slowpokeOH.personalityValue) {
-    fail('mon has no personality value');
+    throw Error('mon has no personality value');
   }
   expect(converted.isShiny).toBe(slowpokeOH.isShiny);
 });

@@ -72,7 +72,7 @@ export const getSaveType = (bytes: Uint8Array): SaveType => {
     const DATE_KO = 0x20070903;
     return date === DATE_INT || date === DATE_KO;
   };
-  // eslint-disable-next-line no-unused-vars
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const validGen5Footer = (mainSize: number, infoLength: number) => {
     const footer = bytes.slice(
       mainSize - 0x100,

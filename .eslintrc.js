@@ -1,5 +1,6 @@
 module.exports = {
-  extends: ['erb', 'plugin:prettier/recommended'],
+  extends: ['erb', 'prettier'],
+  plugins: ['import', '@typescript-eslint'],
   parserOptions: {
     ecmaVersion: 2020,
     sourceType: 'module',
@@ -10,7 +11,9 @@ module.exports = {
   settings: {
     'import/resolver': {
       // See https://github.com/benmosher/eslint-plugin-import/issues/1396#issuecomment-575727774 for line below
-      node: {},
+      node: {
+        extensions: ['.js', '.jsx', '.ts', '.tsx'],
+      },
       typescript: {
         alwaysTryTypes: true,
         project: './tsconfig.json',
@@ -46,7 +49,6 @@ module.exports = {
     'react/jsx-filename-extension': 'off',
     'react/react-in-jsx-scope': 'off',
     'max-classes-per-file': 'off',
-    'no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
     'import/no-extraneous-dependencies': 'off',
     'no-console': ['error', { allow: ['warn', 'error', 'info'] }],
     radix: 'off',
@@ -55,5 +57,7 @@ module.exports = {
     'jsx-a11y/click-events-have-key-events': 'off',
     'jsx-a11y/no-static-element-interactions': 'off',
     'promise/catch-or-return': 'off',
+    'no-unused-vars': 'off',
+    '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
   },
 };
