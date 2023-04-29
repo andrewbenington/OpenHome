@@ -8,9 +8,9 @@ jobs:
   build_on_linux:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
       - name: check env variables
         run: ./check-envs.sh
-      - uses: actions/checkout@v2
       - uses: actions/setup-node@master
         with:
           node-version: 20
@@ -29,9 +29,9 @@ jobs:
       APPLE_ID: ${{ secrets.APPLE_ID }}
       APPLE_ID_PASS: ${{ secrets.APPLE_ID_PASS }}
     steps:
+      - uses: actions/checkout@v2
       - name: check env variables
         run: ./check-envs.sh --mac
-      - uses: actions/checkout@v2
       - uses: actions/setup-node@master
         with:
           node-version: 20
@@ -45,9 +45,9 @@ jobs:
   build_on_win:
     runs-on: windows-latest
     steps:
-      - name: check env variables
-        run: \.check-envs.ps1
       - uses: actions/checkout@v2
+      - name: check env variables
+        run: .\check-envs.ps1
       - uses: actions/setup-node@master
         with:
           node-version: 20
