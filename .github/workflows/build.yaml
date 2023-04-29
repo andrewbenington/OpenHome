@@ -1,10 +1,15 @@
 name: Build
 on: [push, pull_request]
 
+env:
+  GH_TOKEN: { { secrets.GITHUB_TOKEN } }
+
 jobs:
   build_on_linux:
     runs-on: ubuntu-latest
     steps:
+      - name: check env variables
+        run: ./check-envs.sh
       - uses: actions/checkout@v2
       - uses: actions/setup-node@master
         with:
@@ -20,7 +25,12 @@ jobs:
 
   build_on_mac:
     runs-on: macos-latest
+    env:
+      APPLE_ID: { { secrets.APPLE_ID } }
+      APPLE_ID_PASS: { { secrets.APPLE_ID_PASS } }
     steps:
+      - name: check env variables
+        run: ./check-envs.sh --mac
       - uses: actions/checkout@v2
       - uses: actions/setup-node@master
         with:
@@ -30,15 +40,13 @@ jobs:
       - name: build
         run: npm run build
       - name: publish
-        env:
-          gh_token: ${{ secrets.GITHUB_TOKEN }}
-          apple_id: ${{ secrets.APPLE_ID }}
-          apple_id_pass: ${{ secrets.APPLE_ID_PASS }}
         run: npm run release
 
   build_on_win:
     runs-on: windows-latest
     steps:
+      - name: check env variables
+        run: \.check-envs.ps1
       - uses: actions/checkout@v2
       - uses: actions/setup-node@master
         with:
