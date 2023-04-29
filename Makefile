@@ -16,4 +16,4 @@ test:
 
 .PHONY: lint
 lint: 
-	@npx prettier --write . && npx eslint .
+	@npm run lint
