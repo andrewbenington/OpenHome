@@ -26,8 +26,8 @@ jobs:
   build_on_mac:
     runs-on: macos-latest
     env:
-      APPLE_ID: { { secrets.APPLE_ID } }
-      APPLE_ID_PASS: { { secrets.APPLE_ID_PASS } }
+      APPLE_ID: ${{ secrets.APPLE_ID }}
+      APPLE_ID_PASS: ${{ secrets.APPLE_ID_PASS }}
     steps:
       - name: check env variables
         run: ./check-envs.sh --mac
