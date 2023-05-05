@@ -48,20 +48,20 @@ jobs:
   #     - name: publish
   #       run: npm run release
 
-  build_on_win:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: check env variables
-        run: .\check-envs.ps1
-      - uses: actions/setup-node@master
-        with:
-          node-version: 20
-      - name: install dependencies
-        run: npm install
-      - name: build
-        run: npm run build
-      - name: publish
-        env:
-          gh_token: ${{ secrets.GITHUB_TOKEN }}
-        run: npm run release
+  # build_on_win:
+  #   runs-on: windows-latest
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - name: check env variables
+  #       run: .\check-envs.ps1
+  #     - uses: actions/setup-node@master
+  #       with:
+  #         node-version: 20
+  #     - name: install dependencies
+  #       run: npm install
+  #     - name: build
+  #       run: npm run build
+  #     - name: publish
+  #       env:
+  #         gh_token: ${{ secrets.GITHUB_TOKEN }}
+  #       run: npm run release
