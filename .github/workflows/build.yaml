@@ -1,0 +1,67 @@
+name: Build
+
+on:
+  release:
+    types:
+      - created
+
+env:
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  build_linux_windows:
+    runs-on: ubuntu-latest
+    steps:
+      - name: install wine
+        run: sudo apt-get install -y wine
+      - uses: actions/checkout@v2
+      - name: check env variables
+        run: ./check-envs.sh
+      - uses: actions/setup-node@master
+        with:
+          node-version: 20
+      - name: install dependencies
+        run: npm install
+      - name: build
+        run: npm run build
+      - name: publish
+        env:
+          gh_token: ${{ secrets.GITHUB_TOKEN }}
+        run: npm run release
+
+  # build_on_mac:
+  #   runs-on: macos-latest
+  #   env:
+  #     APPLE_ID: ${{ secrets.APPLE_ID }}
+  #     APPLE_ID_PASS: ${{ secrets.APPLE_ID_PASS }}
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - name: check env variables
+  #       run: ./check-envs.sh --mac
+  #     - uses: actions/setup-node@master
+  #       with:
+  #         node-version: 20
+  #     - name: install dependencies
+  #       run: npm install
+  #     - name: build
+  #       run: npm run build
+  #     - name: publish
+  #       run: npm run release
+
+  # build_on_win:
+  #   runs-on: windows-latest
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - name: check env variables
+  #       run: .\check-envs.ps1
+  #     - uses: actions/setup-node@master
+  #       with:
+  #         node-version: 20
+  #     - name: install dependencies
+  #       run: npm install
+  #     - name: build
+  #       run: npm run build
+  #     - name: publish
+  #       env:
+  #         gh_token: ${{ secrets.GITHUB_TOKEN }}
+  #       run: npm run release

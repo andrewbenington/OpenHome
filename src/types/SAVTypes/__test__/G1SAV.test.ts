@@ -1,11 +1,10 @@
 import fs from 'fs';
 import { TextDecoder } from 'node:util'; // (ESM style imports)
 import path from 'path';
-import { SaveType } from '../../types';
 import { bytesToPKM } from '../../../util/FileImport';
+import { PK1 } from '../../PKMTypes';
 import { G1SAV } from '../G1SAV';
 import { buildSaveFile } from '../util';
-import { PK1 } from '../../PKMTypes';
 
 (global as any).TextDecoder = TextDecoder;
 

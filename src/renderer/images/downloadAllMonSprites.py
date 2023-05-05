@@ -8,109 +8,6 @@ import urllib.request
 with open('../../consts/JSON/Pokemon.json') as f:
     POKEMON_DATA = json.load(f)
 
-def get_serebii_sprite(dex_num, form_num, is_shiny, game, is_female=False, formeOverride=None):
-    
-    if formeOverride == None:
-        formeName = (
-            POKEMON_DATA[str(dex_num)]['formes'][form_num]['sprite']
-            if dex_num not in [664, 665] else POKEMON_DATA[str(dex_num)]['name'].lower()
-        )
-    else:
-        formeName = formeOverride
-    formeName = (
-        formeName.replace('paldea-fire', 'b')
-        .replace('paldea-water', 'a')
-    )
-    monName = POKEMON_DATA[str(dex_num)]['formes'][0]['sprite']
-    if POKEMON_DATA[str(dex_num)]['formes'][0]['name'] != POKEMON_DATA[str(dex_num)]['name'] and formeName != "wishiwashi-school":
-        monName = POKEMON_DATA[str(dex_num)]['formes'][0]['alias']
-
-    if "alcremie" in formeName:
-        print(formeName)
-        formeName = formeName.split(f'alcremie-')[1]
-        flavor, pattern = formeName.split('-')[:2]
-        sweet = "strawberry"
-        if len(formeName.split('-')) > 2:
-            sweet = formeName.split('-')[2]
-        formeName = ""
-        if not is_shiny:
-            if flavor[0] == "m" or flavor == "rainbow":
-                formeName += flavor[:2] + pattern[0]
-            elif flavor != "vanilla":
-                formeName += flavor[0] + pattern[0]
-        if sweet != "strawberry":
-            formeName += sweet
-        print(flavor, pattern, sweet, "->", formeName)
-    elif form_num == 0:
-        formeName = ""
-    else:
-        formeSections = formeName.split(f'{monName}-')
-        if len(formeSections) > 1:
-            if dex_num == 493 or "silvally" in formeName:
-                formeName = formeSections[1]
-            elif "genesect" in formeName:
-                if "shock" in formeName:
-                    formeName = "e"
-                elif "burn" in formeName:
-                    formeName = "f"
-                elif "chill" in formeName:
-                    formeName = "i"
-                elif "douse" in formeName:
-                    formeName = "w"
-            elif "wormadam" in formeName:
-                if "sandy" in formeName:
-                    formeName = "c"
-                elif "trash" in formeName:
-                    formeName = "s"
-            elif "necrozma" in formeName:
-                if "dusk" in formeName:
-                    formeName = "dm"
-                elif "dawn" in formeName:
-                    formeName = "dw"
-            elif "cramorant" in formeName:
-                formeName = formeSections[1][:2]
-            else:
-                formeName = formeSections[1][0] 
-        else:
-            formeName = ""
-
-    if dex_num == 741 and form_num == 2:
-        formeName = 'pau'
-
-    gameURI = game
-    if not is_shiny:
-        if gameURI == "SWSH":
-            gameURI = "swordshield"
-        elif gameURI == "SV":
-            gameURI = "scarletviolet"
-    if formeName != "":
-        formeName = "-" + formeName
-    elif is_female and gameURI != "SWSH":
-        formeName = "-f"
-
-    if gameURI == "SWSH":
-        if "silvally" in monName:
-            formeName = ""
-    return (
-        f"https://www.serebii.net/{'Shiny/' if is_shiny else ''}"
-        f"{gameURI}/{'pokemon/' if not is_shiny else ''}{'new/' if gameURI == 'SV' else ''}"
-        f"{str(dex_num).zfill(3)}{formeName}.png"
-    )
-
-
-def get_showdown_sprite(dex_num: int, form_num: int, is_shiny: bool, game: str, is_female=False) -> str:
-    if dex_num < 1 or dex_num > 1010:
-        return ""
-    forme_name = (
-        POKEMON_DATA[str(dex_num)]["formes"][form_num]["sprite"]
-    )
-    if forme_name.endswith("-west"):
-        forme_name = forme_name[:-5]
-    elif forme_name == "basculin-red-striped":
-        forme_name = "basculin"
-    return f"https://play.pokemonshowdown.com/sprites/{game}{'-shiny' if is_shiny else ''}/{forme_name}.gif" if "ani" in game else f"https://play.pokemonshowdown.com/sprites/{game}{'-shiny' if is_shiny else ''}/{forme_name}{'-f' if is_female else ''}.{'gif' if 'ani' in game else 'png'}"
-
-
 def format_pokemon_db_forme(dex_num: int, form_num: int) -> str:
     if dex_num < 1 or dex_num > 1010:
         return ""
@@ -130,6 +27,8 @@ def format_pokemon_db_forme(dex_num: int, form_num: int) -> str:
         forme_name = forme_name[:-4] + "-ball"
     elif forme_name.endswith("-alola"):
         forme_name = forme_name + "n"
+    elif "paldea" in forme_name:
+        forme_name = forme_name.replace("paldea", "paldean")
     elif forme_name.endswith("-hisui"):
         forme_name = forme_name + "an"
     elif forme_name.endswith("-exclamation"):
@@ -142,18 +41,28 @@ def format_pokemon_db_forme(dex_num: int, form_num: int) -> str:
 def get_pokemon_db_sprite(dex_num: int, form_num: int, is_shiny: bool, game: str, is_female=False, forme_name=None) -> str:
     if forme_name is None:
         forme_name = format_pokemon_db_forme(dex_num, form_num)
-
-    female_stats = {"indeedee-f", "meowstic-f",
-                    "oinkologne-f", "basculegion-f"}
+    female_stats = ["indeedee-f", "meowstic-f",
+                    "oinkologne-f", "basculegion-f"]
     if game == "home" and forme_name in female_stats:
         forme_name += "emale"
     elif game == "bank" and forme_name.endswith("-core"):
         forme_name = forme_name[:-5]
     elif forme_name == "pikachu-partner-cap":
         forme_name = "pikachu-johto-cap"
-    return f"https://img.pokemondb.net/sprites/{game}/{'normal' if not is_shiny else 'shiny'}/{forme_name}{'-female' if is_female and forme_name in female_stats else '-f' if is_female else ''}.png"
+    elif game == "black-white/anim" and ("therian" in forme_name or "kyurem-" in forme_name or "resolute" in forme_name):
+        game = "black-white-2/anim"
+    elif game == "red-blue":
+        forme_name += "-color"
+    elif game == "black-white/anim" and "darmanitan" in forme_name:
+        forme_name += "-mode"
+    extension = ".gif" if "anim" in game else ".png"
+    shininess = 'normal' if not is_shiny or game == "scarlet-violet" else 'shiny'
+    female_tag = '-female' if is_female and forme_name in female_stats else ('-f' if is_female else '')
+    return f"https://img.pokemondb.net/sprites/{game}/{shininess}/{forme_name}{female_tag}{extension}"
 
 def get_pokencyclopedia_coloxd_sprite(dex_num, is_shiny, forme_name):
+    if dex_num == 201 and len(forme_name) > 1:
+        forme_name = "-" + forme_name
     return f"https://www.pokencyclopedia.info/sprites/spin-off/ani_xd{'_shiny' if is_shiny else ''}/ani_xd{'-S' if is_shiny else ''}_{str(dex_num).zfill(3)}{'-' + forme_name if forme_name != None else ''}.gif"
 
 
@@ -537,54 +446,29 @@ def download_all_sprites_all_mons():
     os.makedirs("sprites/gen8/shiny", exist_ok=True)
     os.makedirs("sprites/gen8a/shiny", exist_ok=True)
     os.makedirs("sprites/gen9/shiny", exist_ok=True)
-    serebii_calls = []
-    sleep_time = 1.0
     for dex_num_str, mon in POKEMON_DATA.items():
         dex_number = int(dex_num_str)
         for forme_number, forme in enumerate(mon["formes"]):
-            serebii_calls += download_all_sprites(dex_number, forme, forme_number)
-    retries = 4
-    while len(serebii_calls) > 0:
-        should_wait, should_retry = serebii_calls[0]()
-        if should_retry and retries > 0:
-            sleep_time += 0.5
-            retries -= 1
-            print("retrying...")
-        else:
-            retries = 4
-            sleep_time = min(1.0, sleep_time)
-            serebii_calls = serebii_calls[1:]
-            if should_wait and sleep_time > 0.5:
-                sleep_time -= 0.1
-                print("sleep time:", sleep_time)
+            thread_all_sprite_downloads(dex_number, forme, forme_number)
 
-        if should_wait:
-            time.sleep(sleep_time)
-
-def download_all_sprites(dex_number, forme, forme_number):
+def thread_all_sprite_downloads(dex_number, forme, forme_number):
     if dex_number != 869:
-        thread = threading.Thread(target=download_non_serebii_sprites, args=(
+        thread = threading.Thread(target=download_all_sprites, args=(
             dex_number, forme, forme_number, forme["sprite"]))
         thread.start()
-        return functions_to_download_serebii(
-            dex_number, forme, forme_number, forme["sprite"])
     else:
-        functions = []
         for sweet in sweets:
-            thread = threading.Thread(target=download_non_serebii_sprites, args=(
+            thread = threading.Thread(target=download_all_sprites, args=(
                 dex_number, forme, forme_number, forme["sprite"] + "-" + sweet))
             thread.start()
-            functions += functions_to_download_serebii(
-                dex_number, forme, forme_number, forme["sprite"] + "-" + sweet)
-        return functions
 
 
-def download_non_serebii_sprites(dex_number, forme, forme_number, forme_name):
+def download_all_sprites(dex_number, forme, forme_number, forme_name):
     if "Totem" in forme["formeName"]:
         return
     if dex_number <= 151 and forme_number == 0:
-        download_png(get_showdown_sprite(dex_number, forme_number,
-                     False, "gen1"), "sprites/gen1", forme_name + ".png")
+        download_sprite_variants_pokemon_db(
+            dex_number, forme_number, forme_name, "red-blue", "gen1", False)
     if dex_number <= 251 and forme_number == 0 or dex_number == 201 and forme_number <= 25:
         download_sprite_variants_pokemon_db(
             dex_number, forme_number, forme_name, "crystal", "gen2", False)
@@ -597,15 +481,8 @@ def download_non_serebii_sprites(dex_number, forme, forme_number, forme_name):
             dex_number, forme_number, forme_name, 
             "heartgold-soulsilver", "gen4", dex_number != 133 and dex_number != 419)
     if dex_number <= 649 and not excludeFormeGen5(dex_number, forme):
-        download_png(get_showdown_sprite(dex_number, forme_number, False,
-                     "gen5ani"), "sprites/gen5", forme_name + ".gif")
-        download_png(get_showdown_sprite(dex_number, forme_number, True,
-                     "gen5ani"), "sprites/gen5/shiny", forme_name + ".gif")
-        if dex_number in gender_differences and forme_number == 0 and dex_number != 133 and dex_number != 255 and dex_number != 418:
-            download_png(get_showdown_sprite(dex_number, forme_number, False,
-                         "gen5ani", is_female=True), "sprites/gen5", forme_name + "-f.gif")
-            download_png(get_showdown_sprite(dex_number, forme_number, False,
-                         "gen5ani", is_female=True), "sprites/gen5", forme_name + "-f.gif")
+        download_sprite_variants_pokemon_db(
+            dex_number, forme_number, forme_name, "black-white/anim", "gen5", dex_number != 133)
     if dex_number <= 721 and not excludeFormeGen456(dex_number, forme):
         download_sprite_variants_pokemon_db(
             dex_number, forme_number, forme_name, "bank", "gen6", dex_number != 133)
@@ -621,32 +498,25 @@ def download_non_serebii_sprites(dex_number, forme, forme_number, forme_name):
     if dex_number <= 724 and not excludeFormeLA(dex_number, forme):
         download_sprite_variants_pokemon_db(
             dex_number, forme_number, forme_name, "legends-arceus", "gen8a")
-
-def functions_to_download_serebii(dex_number, forme, forme_number, forme_name):
-    functions = []
     if dex_number <= 1010 and not exclude_forme_gen9(dex_number, forme):
-        functions += download_sprite_variants_serebii(
-            dex_number, forme_number, forme_name, "SV", "gen9")
-    if dex_number <= 1010 and not exclude_forme_gen8(dex_number, forme):
-        if (dex_number == 19):
-            print("adding rattata")
-            print(exclude_forme_gen9(dex_number, forme), exclude_forme_gen8(dex_number, forme))
-        functions += download_sprite_variants_serebii(
-            dex_number, forme_number, forme_name, "SWSH", "gen8", dex_number in swsh_transferrable)
-    return functions
+        download_sprite_variants_pokemon_db(
+            dex_number, forme_number, forme_name, "scarlet-violet", "gen9")
 
 def download_sprite_variants_pokemon_db(dex_number, forme_number, forme_name, game, folder, includeFemale=True):
     if "-totem" in forme_name:
         return
+    extension = ".gif" if "anim" in game else ".png"
     download_png(get_pokemon_db_sprite(dex_number, forme_number, False,
-                                       game), "sprites/" + folder, forme_name + ".png")
+                                       game), "sprites/" + folder, forme_name + extension)
+    if game == "red-blue":
+        return
     download_png(get_pokemon_db_sprite(dex_number, forme_number, True,
-                                       game), "sprites/" + folder + "/shiny", forme_name + ".png")
+                                       game), "sprites/" + folder + "/shiny", forme_name + extension)
     if includeFemale and dex_number in gender_differences and forme_number == 0 and dex_number != 255 and dex_number != 418:
         download_png(get_pokemon_db_sprite(dex_number, forme_number, False,
-                                           game, is_female=True), "sprites/" + folder, forme_name + "-f.png")
+                                           game, is_female=True), "sprites/" + folder, forme_name + "-f" + extension)
         download_png(get_pokemon_db_sprite(dex_number, forme_number, True,
-                                           game, is_female=True), "sprites/" + folder + "/shiny", forme_name + "-f.png")
+                                           game, is_female=True), "sprites/" + folder + "/shiny", forme_name + "-f" + extension)
 
 def download_sprite_variants_pokencyclopedia_coloxd(dex_number, forme_number, forme_name):
     gen3_forme = None
@@ -654,24 +524,6 @@ def download_sprite_variants_pokencyclopedia_coloxd(dex_number, forme_number, fo
         gen3_forme = forme_name.split('-')[1]
     download_png(get_pokencyclopedia_coloxd_sprite(dex_number, False, gen3_forme), "sprites/gen3gc", forme_name + ".gif")
     download_png(get_pokencyclopedia_coloxd_sprite(dex_number, True, gen3_forme), "sprites/gen3gc/shiny", forme_name + ".gif")
-
-def download_sprite_variants_serebii(dex_number, forme_number, forme_name, game, folder, includeFemale=True):
-    functions = []
-    if "-totem" in forme_name:
-        return
-    functions.append(lambda : download_png(get_serebii_sprite(dex_number, forme_number, False,
-                                    game, formeOverride=forme_name), "sprites/" + folder, forme_name + ".png"))
-    functions.append(lambda : download_png(get_serebii_sprite(dex_number, forme_number, True,
-                                       game, formeOverride=forme_name), "sprites/" + folder + "/shiny", forme_name + ".png"))
-    if includeFemale and dex_number in gender_differences and forme_number == 0 and dex_number != 255 and dex_number != 418:
-        functions.append(lambda : download_png(get_serebii_sprite(dex_number, forme_number, False,
-                                           game, is_female=True, formeOverride=forme_name), "sprites/" + folder, forme_name + "-f.png"))
-        functions.append(lambda : download_png(get_serebii_sprite(dex_number, forme_number, True,
-                                           game, is_female=True, formeOverride=forme_name), "sprites/" + folder + "/shiny", forme_name + "-f.png"))
-    return functions
-    # if dex_number <= 809:
-    #     print("This Pokemon was present in Generation VII.")
-
 
 download_all_sprites_all_mons()
 # print(POKEMON_DATA["19"]["formes"][1])

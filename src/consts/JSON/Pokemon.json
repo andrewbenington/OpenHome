@@ -57459,7 +57459,7 @@
         "ultraBeast": false,
         "paradox": true,
         "cosmeticForme": false,
-        "sprite": "iron treads",
+        "sprite": "iron-treads",
         "spriteIndex": [26, 34]
       }
     ],
@@ -58606,7 +58606,7 @@
         "ultraBeast": false,
         "paradox": true,
         "cosmeticForme": false,
-        "sprite": "walking wake",
+        "sprite": "walking-wake",
         "spriteIndex": [11, 35]
       }
     ],
@@ -58649,7 +58649,7 @@
         "ultraBeast": false,
         "paradox": true,
         "cosmeticForme": false,
-        "sprite": "iron leaves",
+        "sprite": "iron-leaves",
         "spriteIndex": [12, 35]
       }
     ],

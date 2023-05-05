@@ -1,8 +1,8 @@
 import { Card } from '@mui/material';
-import { OriginMarks } from 'renderer/images/Images';
+import { BallsList, OriginMarks } from 'renderer/images/Images';
 import { getMoveMaxPP } from 'types/PKMTypes/util';
 import { marking } from 'types/types';
-import { Balls, GameOfOriginData, Natures } from '../../consts';
+import { GameOfOriginData, Natures } from '../../consts';
 import { PKM } from '../../types/PKMTypes/PKM';
 import { getGameLogo } from '../util/PokemonSprite';
 import MoveCard from './MoveCard';
@@ -43,14 +43,7 @@ const SummaryDisplay = (props: { mon: PKM; updateMon: (_: PKM) => void }) => {
                 draggable={false}
                 alt="poke ball type"
                 style={{ width: 24, height: 24 }}
-                src={`https://www.serebii.net/itemdex/sprites/${Balls[
-                  (mon.ball ?? 3) < Balls.length ? mon.ball : 3
-                ]
-                  .replace('é', 'e')
-                  .replace(/\s/g, '')
-                  .replace('(', '')
-                  .replace(')', '')
-                  .toLocaleLowerCase()}.png`}
+                src={BallsList[mon.ball ?? 3]}
               />
             ) : (
               <div />

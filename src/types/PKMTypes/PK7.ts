@@ -397,7 +397,7 @@ export class PK7 extends PKM {
 
   public get ribbons() {
     const ribbons = [];
-    for (let i = 0; i < 38; i++) {
+    for (let i = 0; i < 50; i++) {
       if (getFlag(this.bytes, 0x30, i)) {
         ribbons.push(Gen9Ribbons[i]);
       }

@@ -8,28 +8,22 @@ import {
 import { OHPKM, PKM } from 'types/PKMTypes';
 import { G1SAV, G2SAV, G3SAV, G4SAV, G5SAV, SAV } from 'types/SAVTypes';
 import { HomeData } from 'types/SAVTypes/HomeData';
-import { SaveCoordinates, StringToStringMap } from 'types/types';
+import { SaveCoordinates } from 'types/types';
 import {
   getMonFileIdentifier,
   getMonGen12Identifier,
   getMonGen345Identifier,
 } from 'util/Lookup';
-import { RootState } from '../store';
+import { AppState, RootState } from '../state';
 
-interface LookupState {
-  homeMons?: { [key: string]: OHPKM };
-  gen12?: StringToStringMap;
-  gen345?: StringToStringMap;
+export interface ImportMonsParams {
+  mons: PKM[];
+  saveCoordinates: SaveCoordinates;
 }
 
-interface AppState {
-  homeData: HomeData;
-  saves: SAV[];
-  dragSource?: SaveCoordinates;
-  dragMon?: PKM;
-  modifiedOHPKMs: { [key: string]: OHPKM };
-  monsToDelete: OHPKM[];
-  lookup: LookupState;
+export interface SetSaveBoxParams {
+  saveNumber: number;
+  box: number;
 }
 
 const initialState: AppState = {
@@ -41,24 +35,24 @@ const initialState: AppState = {
 };
 
 export const loadHomeBoxes = createAsyncThunk('app/loadHomeBoxes', async () => {
-  return await window.electron.ipcRenderer.invoke('read-home-boxes', 'Box 1');
+  return window.electron.ipcRenderer.invoke('read-home-boxes', 'Box 1');
 });
 
 export const loadHomeMons = createAsyncThunk('app/loadHomeMons', async () => {
-  return await window.electron.ipcRenderer.invoke('read-home-mons');
+  return window.electron.ipcRenderer.invoke('read-home-mons');
 });
 
 export const loadGen12Lookup = createAsyncThunk(
   'app/loadGen12Lookup',
   async () => {
-    return await window.electron.ipcRenderer.invoke('read-gen12-lookup');
+    return window.electron.ipcRenderer.invoke('read-gen12-lookup');
   }
 );
 
 export const loadGen345Lookup = createAsyncThunk(
   'app/loadGen345Lookup',
   async () => {
-    return await window.electron.ipcRenderer.invoke('read-gen345-lookup');
+    return window.electron.ipcRenderer.invoke('read-gen345-lookup');
   }
 );
 
@@ -95,7 +89,6 @@ export const appSlice = createSlice({
   initialState,
   reducers: {
     deleteMon: (state, action: PayloadAction<SaveCoordinates>) => {
-      console.log('deleteMon', action.payload);
       const replacedMon = updateMonInSave(state, undefined, action.payload);
       if (replacedMon && replacedMon instanceof OHPKM) {
         const identifier = getMonFileIdentifier(replacedMon);
@@ -149,7 +142,7 @@ export const appSlice = createSlice({
     startDrag: (state, action: PayloadAction<SaveCoordinates>) => {
       const { box, index, saveNumber } = action.payload;
       if (state.saves.length <= saveNumber) {
-        return state;
+        return;
       }
       const save = saveNumber === -1 ? state.homeData : state.saves[saveNumber];
       state.dragMon = save.boxes[box].pokemon[index];
@@ -163,7 +156,7 @@ export const appSlice = createSlice({
       if (!state.dragSource) {
         state.dragMon = undefined;
         state.dragSource = undefined;
-        return state;
+        return;
       }
       const {
         box: srcBox,
@@ -179,7 +172,7 @@ export const appSlice = createSlice({
       const destIsHome = destSaveNumber === -1;
 
       let mon = state.dragMon;
-      if (srcSaveNumber != destSaveNumber) {
+      if (srcSaveNumber !== destSaveNumber) {
         mon = new OHPKM(mon);
         markMonAsModified(state, mon as OHPKM);
       }
@@ -215,7 +208,7 @@ export const appSlice = createSlice({
       state.saves.splice(action.payload, 1);
     },
     writeAllSaveFiles: (state) => {
-      console.log('writing all save files');
+      console.info('writing all save files');
       const tempSaves = [...state.saves];
       tempSaves.forEach((save) => {
         if (
@@ -231,8 +224,8 @@ export const appSlice = createSlice({
               const key = getMonGen12Identifier(mon);
               const value = getMonFileIdentifier(mon);
               if (!state.lookup.gen12) {
-                console.log('no gen12 map loaded. cancelling save');
-                return state;
+                console.error('no gen12 map loaded. cancelling save');
+                return;
               }
               if (key && value) {
                 state.lookup.gen12[key] = value;
@@ -245,8 +238,8 @@ export const appSlice = createSlice({
               save instanceof G5SAV)
           ) {
             if (!state.lookup.gen345) {
-              console.log('no gen345 map loaded. cancelling save');
-              return state;
+              console.error('no gen345 map loaded. cancelling save');
+              return;
             }
             appSlice.caseReducers.writeGen345Lookup(state, {
               type: '',
@@ -254,7 +247,6 @@ export const appSlice = createSlice({
             });
           }
         }
-        console.log(current(state));
         window.electron.ipcRenderer.sendMessage('write-save-file', {
           path: save.filePath,
           bytes: save.bytes,
@@ -270,7 +262,6 @@ export const appSlice = createSlice({
       state.homeData = action.payload;
     },
     writeAllHomeData: (state) => {
-      console.log(current(state));
       state.homeData.boxes.forEach((b) => {
         window.electron.ipcRenderer.sendMessage('write-home-box', {
           boxName: b.name,
@@ -278,7 +269,6 @@ export const appSlice = createSlice({
         });
       });
       Object.values(state.modifiedOHPKMs).forEach((mon) => {
-        console.log('writing', mon);
         if (mon) {
           window.electron.ipcRenderer.sendMessage('write-ohpkm', mon.bytes);
         }
@@ -327,7 +317,7 @@ export const appSlice = createSlice({
           console.error(
             'attempted to save before gen12 map loaded. cancelling'
           );
-          return state;
+          return;
         }
         state.lookup.gen12[key] = value;
       });
@@ -337,7 +327,7 @@ export const appSlice = createSlice({
       const monsToAdd = action.payload;
       if (!newLookupMap) {
         console.error('attempted to save before gen12 map loaded. cancelling');
-        return state;
+        return;
       }
       monsToAdd.forEach((mon) => {
         const key = getMonGen12Identifier(mon);
@@ -363,13 +353,12 @@ export const appSlice = createSlice({
       const monsToAdd = action.payload;
       if (!newLookupMap) {
         console.error('attempted to save before gen345 map loaded. cancelling');
-        return state;
+        return;
       }
       monsToAdd.forEach((mon) => {
         const key = getMonGen345Identifier(mon);
         const value = getMonFileIdentifier(mon);
         if (key && value) {
-          console.log(`setting ${key} to ${value}`);
           newLookupMap[key] = value;
         }
       });
@@ -388,7 +377,7 @@ export const appSlice = createSlice({
       });
       return {
         ...state,
-        lookup: { ...state.lookup, homeMons: homeMons },
+        lookup: { ...state.lookup, homeMons },
       };
     });
     builder.addCase(loadGen12Lookup.fulfilled, (state, action) => {
@@ -401,16 +390,16 @@ export const appSlice = createSlice({
       const homeMonMap = state.lookup.homeMons;
       if (homeMonMap) {
         const newBoxes = [...state.homeData.boxes];
-        Object.entries(action.payload).forEach(([boxName, boxString], i) => {
+        Object.entries(action.payload).forEach(([, boxString], i) => {
           newBoxes[i].getMonsFromString(
             boxString as string,
             homeMonMap as { [key: string]: OHPKM }
           );
         });
         return { ...state, homeData: { ...state.homeData, boxes: newBoxes } };
-      } else {
-        console.error('box loaded before home lookup map');
       }
+      console.error('box loaded before home lookup map');
+      return state;
     });
   },
 });
@@ -446,15 +435,5 @@ export const selectGen345Lookup = (state: RootState) => state.app.lookup.gen345;
 export const selectMonsToDelete = (state: RootState) => state.app.monsToDelete;
 
 export const selectCount = (state: RootState) => state.app.saves.length;
-
-export interface ImportMonsParams {
-  mons: PKM[];
-  saveCoordinates: SaveCoordinates;
-}
-
-export interface SetSaveBoxParams {
-  saveNumber: number;
-  box: number;
-}
 
 export default appSlice.reducer;

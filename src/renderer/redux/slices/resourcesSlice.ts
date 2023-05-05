@@ -1,10 +1,10 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { RootState } from '../store';
+import { RootState } from '../state';
 
 export const loadResourcesPath = createAsyncThunk(
   'resources/load',
   async () => {
-    return await window.electron.ipcRenderer.invoke('get-resources-path');
+    return window.electron.ipcRenderer.invoke('get-resources-path');
   }
 );
 
