@@ -775,14 +775,6 @@ export class PA8 extends PKM {
     this.bytes[0xf8] = value ?? 0xff;
   }
 
-  public get trainerNameBytes() {
-    return this.bytes.slice(0x110, 26);
-  }
-
-  public set trainerNameBytes(value: Uint8Array) {
-    this.bytes.set(value.slice(0, 12), 0x110);
-  }
-
   public get trainerName() {
     return utf16BytesToString(this.bytes, 0x110, 12);
   }
@@ -951,11 +943,11 @@ export class PA8 extends PKM {
     this.bytes.set(value.slice(0, 8), 0x155);
   }
 
-  public get MasterFlagsLA() {
+  public get masterFlagsLA() {
     return this.bytes.slice(0x15d, 0x15d + 8);
   }
 
-  public set MasterFlagsLA(value: Uint8Array) {
+  public set masterFlagsLA(value: Uint8Array) {
     this.bytes.set(value.slice(0, 8), 0x15d);
   }
 

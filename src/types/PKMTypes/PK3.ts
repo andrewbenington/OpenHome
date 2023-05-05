@@ -210,14 +210,6 @@ export class PK3 extends PKM {
     }
   }
 
-  public get trainerNameBytes() {
-    return this.bytes.slice(0x14, 8);
-  }
-
-  public set trainerNameBytes(value: Uint8Array) {
-    this.bytes.set(value.slice(0, 8), 0x14);
-  }
-
   public get trainerName() {
     return gen3StringToUTF(this.bytes, 0x14, 7);
   }
@@ -571,7 +563,7 @@ export class PK3 extends PKM {
         let ribbonVal = 0;
         const [ribbonCategory, ribbonLevel] = ribbon.split(' ');
         switch (ribbonLevel) {
-          case '(Gen 3)':
+          case '(Hoenn)':
             ribbonVal = 1;
             break;
           case 'Super':

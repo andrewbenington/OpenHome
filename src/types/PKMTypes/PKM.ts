@@ -973,16 +973,6 @@ export class PKM {
     this._trainerName = value;
   }
 
-  private _trainerNameBytes: Uint8Array = new Uint8Array(13);
-
-  public get trainerNameBytes(): Uint8Array {
-    return this._trainerNameBytes;
-  }
-
-  public set trainerNameBytes(value: Uint8Array) {
-    this._trainerNameBytes = value;
-  }
-
   private _trainerFriendship: number = 0;
 
   public get trainerFriendship(): number {
@@ -1157,14 +1147,14 @@ export class PKM {
     this._TutorFlagsLA = value;
   }
 
-  private _MasterFlagsLA?: Uint8Array | undefined;
+  private _masterFlagsLA?: Uint8Array | undefined;
 
-  public get MasterFlagsLA(): Uint8Array | undefined {
-    return this._MasterFlagsLA;
+  public get masterFlagsLA(): Uint8Array | undefined {
+    return this._masterFlagsLA;
   }
 
-  public set MasterFlagsLA(value: Uint8Array | undefined) {
-    this._MasterFlagsLA = value;
+  public set masterFlagsLA(value: Uint8Array | undefined) {
+    this._masterFlagsLA = value;
   }
 
   private _TMFlagsSV?: Uint8Array | undefined;

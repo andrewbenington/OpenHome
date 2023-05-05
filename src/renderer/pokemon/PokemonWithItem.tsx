@@ -22,18 +22,15 @@ const PokemonWithItem = (props: PokemonWithItemProps) => {
 
   useEffect(() => {
     const importIcon = async () => {
-      console.info(
-        `item: ${mon.heldItem}\n
-        \tindex: ${mon.heldItemIndex}\n
-        \tpath: ${`../images/items/${getItemIconPath(mon.heldItem)}\n`}`
-      );
       const icon = await import(
         `../images/items/${getItemIconPath(mon.heldItem)}`
       );
       setItemIcon(icon?.default);
     };
-    importIcon();
-  }, [mon]);
+    if (mon.heldItemIndex) {
+      importIcon();
+    }
+  }, [mon.heldItem, mon.heldItemIndex]);
 
   return (
     <div style={{ padding: 10, ...style }}>

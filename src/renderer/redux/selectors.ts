@@ -22,12 +22,18 @@ import {
 } from './slices/recentSavesSlice';
 import { selectResourcesPath } from './slices/resourcesSlice';
 
+type LookupMapsHook = [
+  { [key: string]: OHPKM } | undefined,
+  StringToStringMap | undefined,
+  StringToStringMap | undefined
+];
+
 export const useSaves = () => useAppSelector(selectSaves);
 export const useHomeData = () => useAppSelector(selectHomeData);
 export const useDragMon = () => useAppSelector(selectDragMon);
 export const useDragSource = () => useAppSelector(selectDragSource);
 export const useModifiedOHPKMs = () => useAppSelector(selectModifiedOHPKMs);
-export const useMonsToDelete = () => useAppSelector(selectMonsToDelete)
+export const useMonsToDelete = () => useAppSelector(selectMonsToDelete);
 export const useSaveFunctions = (): [() => void, () => void] => {
   const dispatch = useAppDispatch();
   return [
@@ -37,8 +43,8 @@ export const useSaveFunctions = (): [() => void, () => void] => {
 };
 export const useRecentSaves = (): [
   SaveRefMap,
-  (save: SAV) => void,
-  (filePath: string) => void
+  (_: SAV) => void,
+  (_: string) => void
 ] => {
   const dispatch = useAppDispatch();
   return [
@@ -55,9 +61,3 @@ export const useLookupMaps = (): LookupMapsHook => [
 ];
 
 export const useResourcesPath = () => useAppSelector(selectResourcesPath);
-
-type LookupMapsHook = [
-  { [key: string]: OHPKM } | undefined,
-  StringToStringMap | undefined,
-  StringToStringMap | undefined
-];

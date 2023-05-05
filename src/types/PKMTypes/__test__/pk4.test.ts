@@ -1,10 +1,10 @@
 import fs from 'fs';
+import { TextDecoder } from 'node:util'; // (ESM style imports)
 import path from 'path';
 import { bytesToPKM } from 'util/FileImport';
-import { TextDecoder, TextEncoder } from 'node:util'; // (ESM style imports)
-import { PK4 } from '../PK4';
-import { OHPKM } from '../OHPKM';
 import { getMonGen345Identifier } from '../../../util/Lookup';
+import { OHPKM } from '../OHPKM';
+import { PK4 } from '../PK4';
 
 (global as any).TextDecoder = TextDecoder;
 
@@ -32,7 +32,9 @@ const mightyenaOH = bytesToPKM(
 
 const slowpokeOH = bytesToPKM(
   new Uint8Array(
-    fs.readFileSync(path.join(__dirname, './PKMFiles/OH', 'slowpoke-shiny.ohpkm'))
+    fs.readFileSync(
+      path.join(__dirname, './PKMFiles/OH', 'slowpoke-shiny.ohpkm')
+    )
   ),
   'OHPKM'
 ) as OHPKM;
@@ -72,11 +74,11 @@ test('gen 4 ribbons are updated', () => {
   gen4pkm.ribbons = [
     ...gen4pkm.ribbons,
     'Winning',
-    'Beauty (Gen 4)',
+    'Beauty (Sinnoh)',
     'National',
   ];
   mightyenaOH.updateData(gen4pkm);
-  expect(mightyenaOH.ribbons).toContain('Beauty (Gen 4)');
+  expect(mightyenaOH.ribbons).toContain('Beauty (Sinnoh)');
   expect(mightyenaOH.ribbons).toContain('National');
   expect(mightyenaOH.ribbons).toContain('Winning');
   expect(mightyenaOH.ribbons).toContain('Kalos Champion');
@@ -128,7 +130,7 @@ test('gen 6+ nickname accuracy', () => {
 test('gen 6+ shiny accuracy', () => {
   const converted = new PK4(slowpokeOH);
   if (!slowpokeOH.personalityValue) {
-    fail('mon has no personality value');
+    throw Error('mon has no personality value');
   }
   expect(converted.isShiny).toBe(slowpokeOH.isShiny);
 });

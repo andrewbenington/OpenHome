@@ -1,14 +1,14 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { SAV } from 'types/SAVTypes';
 import { SaveRefMap } from 'types/types';
-import { RootState } from '../store';
+import { RootState } from '../state';
 
 const initialState: SaveRefMap = {};
 
 export const loadRecentSaves = createAsyncThunk(
   'recentSaves/load',
   async () => {
-    return await window.electron.ipcRenderer.invoke('read-recent-saves');
+    return window.electron.ipcRenderer.invoke('read-recent-saves');
   }
 );
 
@@ -18,7 +18,7 @@ export const recentSavesSlice = createSlice({
   reducers: {
     upsertRecentSave: (state, action: PayloadAction<SAV>) => {
       if (!action.payload.filePath) {
-        return state;
+        return;
       }
       const saveRef = action.payload.getSaveRef();
       window.electron.ipcRenderer.sendMessage('add-recent-save', saveRef);
