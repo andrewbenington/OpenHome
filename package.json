@@ -28,7 +28,7 @@
     "postinstall": "ts-node .erb/scripts/check-native-dep.js && electron-builder install-app-deps && cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.renderer.dev.dll.ts",
     "lint": "cross-env NODE_ENV=development prettier --write . && eslint . --ext .js,.jsx,.ts,.tsx",
     "package": "ts-node ./.erb/scripts/clean.js dist && npm run build && electron-builder build --publish never",
-    "release": "electron-builder",
+    "release": "electron-builder -wl",
     "rebuild": "electron-rebuild --parallel --types prod,dev,optional --module-dir release/app",
     "start": "ts-node ./.erb/scripts/check-port-in-use.js && npm run start:renderer",
     "start:main": "cross-env NODE_ENV=development electronmon -r ts-node/register/transpile-only .",
@@ -182,7 +182,7 @@
   },
   "build": {
     "productName": "OpenHome",
-    "buildVersion": "0.0.1",
+    "buildVersion": "0.1.0",
     "appId": "org.abenington.OpenHome",
     "asar": true,
     "asarUnpack": "**\\*.{node,dll}",

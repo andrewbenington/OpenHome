@@ -13,10 +13,10 @@ if [[ $* == *--mac* ]]; then
   else
     echo "APPLE_ID is present"
   fi
-  if [[ -z "${APPLE_ID_PASS}"  ]]; then
-    echo "APPLE_ID_PASS not present; exiting"
+  if [[ -z "${APPLE_ID_PASSWORD}"  ]]; then
+    echo "APPLE_ID_PASSWORD not present; exiting"
     exit 1
   else
-    echo "APPLE_ID_PASS is present"
+    echo "APPLE_ID_PASSWORD is present"
   fi
 fi

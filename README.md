@@ -6,6 +6,25 @@
 
 OpenHome is an open source tool for moving Pokémon between games losslessly, much like Pokémon Home on the Nintendo Switch. Unlike Pokémon Home, OpenHome allows for moving pokémon to past generations from future ones. All pokémon data is saved in OpenHome, so nothing is lost when transferring to past generations.
 
+## Downloading and Installing
+
+On Linux, download OpenHome-x.x.x.AppImage from the [latest release](https://github.com/andrewbenington/OpenHome/releases). This should work out of the box.
+
+On Windows and MacOS, you can also download an installer from that location, but the app will not be signed. Your operating system will give you warnings about running or even downloading the app. If you (understandably) have concerns about that, jump to the [Building App Locally](#building-app-locally) section.
+
+On MacOS visit the [latest release](https://github.com/andrewbenington/OpenHome/releases), and download and open OpenHome-x.x.x.dmg (for Intel Macs) or OpenHome-x.x.x-arm64.dmg (for Apple Silicon Macs).
+Follow the instructions to move the application to your Applications folder if you'd like. If you run the app by double clicking, it will give you a security error. To bypass this, ctrl + click the app, select "Open", and the click "Open" again.
+
+On Windows visit the [latest release](https://github.com/andrewbenington/OpenHome/releases) and download and open OpenHome-Setup-x.x.x.exe. If you're using Edge, go to the Privacy settings and turn off Windows Defender SmartScreen. Once the file is downloaded, make sure to turn it back on.
+
+## Building App Locally
+
+If you don't want to bypass your security restrictions to download the app, you can instead download the source code and build the app locally. Follow these instructions:
+
+For [Windows](./docs/BUILD_WINDOWS.md)
+
+For [MacOS](./docs/BUILD_MAC.md)
+
 ## Moving Between Saves
 
 [![Demo Video](https://img.youtube.com/vi/s8MoLsySvOw/hqdefault.jpg)](https://youtu.be/s8MoLsySvOw)
