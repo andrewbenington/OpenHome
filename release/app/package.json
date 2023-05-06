@@ -1,7 +1,7 @@
 {
   "name": "openhome",
   "productName": "OpenHome",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "A tool for moving pokemon between save data",
   "license": "MIT",
   "author": {

@@ -1,3 +1,5 @@
+VERSION=0.1.0
+
 .PHONY: build
 build: 
 	@npm run build
@@ -18,3 +20,7 @@ test:
 lint: 
 	@npm run lint
 	
+.PHONY: set-version
+set-version:
+	@npm version $(VERSION) --no-git-tag-version --allow-same-version
+	@npm --prefix release/app version $(VERSION) --no-git-tag-version --allow-same-version
