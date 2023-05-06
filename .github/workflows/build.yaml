@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: install wine
-        run: dpkg --add-architecture i386 && apt-get update -y && apt-get install -y wine32 && sudo apt-get install -y wine
+        run: sudo dpkg --add-architecture i386 && sudo apt-get update -y && sudo apt-get install -y wine32 && sudo apt-get install -y wine
       - uses: actions/checkout@v2
       - name: check env variables
         run: ./check-envs.sh
