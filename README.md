@@ -44,6 +44,7 @@ The extra Champion Ribbon in Emerald is a debugging oversight. The 0hp in Blue i
 - PK5
 - PK6
 - PK7
+- PA8
 
 #### Partially supported PKM import formats
 
@@ -53,7 +54,6 @@ Importing these formats may be lossy when it comes to more obscure aspects of th
 - XDPKM
 - PB7
 - PK8
-- PA8
 - PB8
 - PK9
 
@@ -70,12 +70,6 @@ Importing these formats may be lossy when it comes to more obscure aspects of th
 - Pokémon Diamond/Pearl
 - Pokémon Platinum
 - Pokémon HeartGold/SoulSilver
-
-#### Copy only
-
-These save files can be opened and pokemon can be copied into OpenHome or another supported save, but the original save file itself is not modified.
-Any mon dropped brought in will be lost, and any mon brought out will essentially be duplicated.
-
 - Pokémon Black/White
 - Pokémon Black 2/White 2
 
