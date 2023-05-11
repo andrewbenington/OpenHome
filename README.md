@@ -86,3 +86,7 @@ For this to work, some compromises have to be made. OpenHome will try its best t
 For example, a pokémon originating in Generation 6 being moved into a Generation 3 game will have its personality value altered to preserve its nature, ability (if possible), gender, and shininess.
 
 A pokémon transferred into Generation 1 or 2 will have it's Original Trainer's ID changed to a "tracking number" of sorts
+
+## Credits
+
+This application would not have been possible without the research done at https://projectpokemon.org/, the work done by the [PKHeX](https://github.com/kwsch/PKHeX) developers, or the sprites archived by https://pokemondb.net/.
