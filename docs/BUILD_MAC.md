@@ -33,13 +33,14 @@ Visit https://github.com/andrewbenington/OpenHome/releases and download the sour
 
 ## Build and run the app
 
-In the window that opens, run the following command:
+In the window that opens, run the following commands:
 
 ```zsh
+npm install
 npm run package
 ```
 
-This will take a bit. When it's finished, execute the following command to open the folder with the disk image:
+These will take a bit. When they're finished, execute the following command to open the folder with the disk image:
 
 ```zsh
 open ./release/build
