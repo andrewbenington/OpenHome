@@ -18,16 +18,17 @@ Visit https://github.com/andrewbenington/OpenHome/releases and download the sour
 
 ## Build and run the app
 
-In the window that opens, run the following command:
+In the window that opens, run the following commands:
 
 ```powershell
+npm install
 npm run package
 ```
 
-This will take a bit. When it's finished, execute the following command to open the folder with the disk image:
+These will take a bit. When they're finished, execute the following command to open the folder with the disk image:
 
 ```powershell
 explorer.exe .\release\build
 ```
 
-A Windows Explorer window should open, and inside it will be the built `OpenHome.exe`!
+A Windows Explorer window should open. In it you will find `OpenHome Setup x.x.x.exe` if you want to install it, or you can open `OpenHome.exe` directly from the `win-unpacked` folder. Enjoy!
