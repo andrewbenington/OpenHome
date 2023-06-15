@@ -17,6 +17,7 @@ import { useAppDispatch } from '../redux/hooks';
 import {
   useDragMon,
   useDragSource,
+  useHomeData,
   useModifiedOHPKMs,
   useMonsToDelete,
   useSaveFunctions,
@@ -46,6 +47,7 @@ import { dropAreaStyle } from './styles';
 const Home = () => {
   const { palette } = useTheme();
   const saves = useSaves();
+  const homeData = useHomeData();
   const dragMon = useDragMon();
   const dragSource = useDragSource();
   const modifiedOHPKMs = useModifiedOHPKMs();
@@ -74,6 +76,18 @@ const Home = () => {
       Object.values(modifiedOHPKMs).map((mon) => mon.nickname)
     );
   }, [modifiedOHPKMs]);
+
+  useEffect(() => {
+    console.log('updatedBoxSlots:', homeData.updatedBoxSlots);
+    console.log(
+      'all saves unchanged:',
+      saves.every((save) => save.updatedBoxSlots.length === 0)
+    );
+    const edited =
+      homeData.updatedBoxSlots.length > 0 ||
+      !saves.every((save) => save.updatedBoxSlots.length === 0);
+    window.electron.ipcRenderer.invoke('set-document-edited', edited);
+  }, [saves, homeData]);
 
   const onViewDrop = (e: any, type: string) => {
     const processDroppedData = async (file?: File, droppedMon?: PKM) => {

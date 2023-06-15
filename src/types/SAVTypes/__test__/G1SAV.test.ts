@@ -39,7 +39,7 @@ test('removing mon shifts others in box', () => {
     {}
   ) as G1SAV;
   modifiedSaveFile1.boxes[7].pokemon[0] = undefined;
-  modifiedSaveFile1.changedMons.push({ box: 7, index: 0 });
+  modifiedSaveFile1.updatedBoxSlots.push({ box: 7, index: 0 });
   modifiedSaveFile1.prepareBoxesForSaving();
 
   const modifiedSaveFile2 = buildSaveFile(
@@ -59,7 +59,7 @@ test('inserting mon works', () => {
     {}
   ) as G1SAV;
   modifiedSaveFile1.boxes[7].pokemon[11] = new PK1(slowpokeOH);
-  modifiedSaveFile1.changedMons.push({ box: 7, index: 0 });
+  modifiedSaveFile1.updatedBoxSlots.push({ box: 7, index: 0 });
   modifiedSaveFile1.prepareBoxesForSaving();
 
   const modifiedSaveFile2 = buildSaveFile(

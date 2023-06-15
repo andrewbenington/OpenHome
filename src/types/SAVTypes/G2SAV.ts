@@ -105,7 +105,7 @@ export class G2SAV extends SAV {
 
   prepareBoxesForSaving() {
     const changedMonPKMs: OHPKM[] = [];
-    const changedBoxes = uniq(this.changedMons.map((coords) => coords.box));
+    const changedBoxes = uniq(this.updatedBoxSlots.map((coords) => coords.box));
     const pokemonPerBox = this.boxRows * this.boxColumns;
     changedBoxes.forEach((boxNumber) => {
       const boxByteOffset = this.boxOffsets[boxNumber];

@@ -27,7 +27,7 @@ export interface SetSaveBoxParams {
 }
 
 const initialState: AppState = {
-  homeData: new HomeData(new Uint8Array()),
+  homeData: new HomeData(),
   saves: [],
   modifiedOHPKMs: {},
   monsToDelete: [],
@@ -71,7 +71,7 @@ const updateMonInSave = (
     const tempSaves = [...state.saves];
     replacedMon = tempSaves[saveNumber].boxes[box].pokemon[index];
     tempSaves[saveNumber].boxes[box].pokemon[index] = mon;
-    tempSaves[saveNumber].changedMons.push({ box, index });
+    tempSaves[saveNumber].updatedBoxSlots.push({ box, index });
     state.saves = tempSaves;
   }
   return replacedMon;
@@ -179,17 +179,19 @@ export const appSlice = createSlice({
 
       const tempSaves = [...state.saves];
       const srcSave =
-        srcSaveNumber === -1 ? state.homeData : tempSaves[srcSaveNumber];
+        srcSaveNumber === -1 ? { ...state.homeData } : tempSaves[srcSaveNumber];
       const destSave =
-        destSaveNumber === -1 ? state.homeData : tempSaves[destSaveNumber];
+        destSaveNumber === -1
+          ? { ...state.homeData }
+          : tempSaves[destSaveNumber];
 
       srcSave.boxes[srcBox].pokemon[srcIndex] = undefined;
-      srcSave.changedMons.push({
+      srcSave.updatedBoxSlots.push({
         box: srcBox,
         index: srcIndex,
       });
       destSave.boxes[destBox].pokemon[destIndex] = mon;
-      destSave.changedMons.push({
+      destSave.updatedBoxSlots.push({
         box: destBox,
         index: destIndex,
       });
@@ -197,8 +199,10 @@ export const appSlice = createSlice({
       state.dragSource = undefined;
       if (!(srcIsHome && destIsHome)) {
         state.saves = tempSaves;
-      } else if (srcIsHome || destIsHome) {
-        state.homeData = { ...state.homeData };
+      } else if (srcIsHome) {
+        state.homeData = srcSave as any;
+      } else if (destIsHome) {
+        state.homeData = destSave as any;
       }
     },
     addSave: (state, action: PayloadAction<SAV>) => {
@@ -251,7 +255,7 @@ export const appSlice = createSlice({
           path: save.filePath,
           bytes: save.bytes,
         });
-        save.changedMons = [];
+        save.updatedBoxSlots = [];
       });
       state.saves = [...tempSaves];
     },
@@ -389,14 +393,14 @@ export const appSlice = createSlice({
     builder.addCase(loadHomeBoxes.fulfilled, (state, action) => {
       const homeMonMap = state.lookup.homeMons;
       if (homeMonMap) {
-        const newBoxes = [...state.homeData.boxes];
+        const newHomeData = new HomeData();
         Object.entries(action.payload).forEach(([, boxString], i) => {
-          newBoxes[i].getMonsFromString(
+          newHomeData.boxes[i].getMonsFromString(
             boxString as string,
             homeMonMap as { [key: string]: OHPKM }
           );
         });
-        return { ...state, homeData: { ...state.homeData, boxes: newBoxes } };
+        return { ...state, homeData: newHomeData };
       }
       console.error('box loaded before home lookup map');
       return state;

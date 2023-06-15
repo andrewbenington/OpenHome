@@ -137,7 +137,7 @@ export class G5SAV extends SAV {
 
   prepareBoxesForSaving() {
     const changedMonPKMs: OHPKM[] = [];
-    this.changedMons.forEach(({ box, index }) => {
+    this.updatedBoxSlots.forEach(({ box, index }) => {
       const changedMon = this.boxes[box].pokemon[index];
       // we don't want to save OHPKM files of mons that didn't leave the save
       // (and would still be PK4s)
@@ -161,8 +161,8 @@ export class G5SAV extends SAV {
         this.bytes.set(new Uint8Array(136), writeIndex);
       }
     });
-    _.uniq(this.changedMons.map((coords) => coords.box)).forEach((boxIndex) =>
-      this.updateBoxChecksum(boxIndex)
+    _.uniq(this.updatedBoxSlots.map((coords) => coords.box)).forEach(
+      (boxIndex) => this.updateBoxChecksum(boxIndex)
     );
     this.updateMirrorsChecksum();
     return changedMonPKMs;

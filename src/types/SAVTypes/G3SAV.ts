@@ -287,7 +287,7 @@ export class G3SAV extends SAV {
 
   prepareBoxesForSaving() {
     const changedMonPKMs: OHPKM[] = [];
-    this.changedMons.forEach(({ box, index }) => {
+    this.updatedBoxSlots.forEach(({ box, index }) => {
       const monOffset = 30 * box + index;
       const pcBytes = new Uint8Array(80);
       const changedMon = this.boxes[box].pokemon[index];

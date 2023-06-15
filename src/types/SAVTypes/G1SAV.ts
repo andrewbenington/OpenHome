@@ -134,7 +134,7 @@ export class G1SAV extends SAV {
   prepareBoxesForSaving() {
     const changedMonPKMs: OHPKM[] = [];
     const changedBoxes: number[] = uniq(
-      this.changedMons.map((coords) => coords.box)
+      this.updatedBoxSlots.map((coords) => coords.box)
     );
     const pokemonPerBox = this.boxRows * this.boxColumns;
     changedBoxes.forEach((boxNumber) => {
