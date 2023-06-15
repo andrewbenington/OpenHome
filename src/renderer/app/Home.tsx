@@ -78,11 +78,6 @@ const Home = () => {
   }, [modifiedOHPKMs]);
 
   useEffect(() => {
-    console.log('updatedBoxSlots:', homeData.updatedBoxSlots);
-    console.log(
-      'all saves unchanged:',
-      saves.every((save) => save.updatedBoxSlots.length === 0)
-    );
     const edited =
       homeData.updatedBoxSlots.length > 0 ||
       !saves.every((save) => save.updatedBoxSlots.length === 0);
