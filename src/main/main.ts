@@ -8,7 +8,7 @@
  * When running `npm run build` or `npm run build:main`, this file is compiled to
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
-import { app, BrowserWindow, shell } from 'electron';
+import { app, BrowserWindow, dialog, shell } from 'electron';
 import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
 import path from 'path';
@@ -95,8 +95,23 @@ const createWindow = async () => {
     menuBuilder.buildMenu();
   });
 
-  mainWindow.on('closed', () => {
-    mainWindow = null;
+  mainWindow.on('close', (event: any) => {
+    event.preventDefault();
+    console.log(mainWindow?.isDocumentEdited());
+    if (mainWindow?.isDocumentEdited()) {
+      dialog
+        .showMessageBox({
+          message: 'You have unsaved changes. Save changes?',
+          buttons: ['Cancel', 'Discard', 'Save'],
+        })
+        .then((response) => {
+          if (response.response === 1) {
+            app.exit();
+          }
+        });
+    } else {
+      app.exit();
+    }
   });
 
   // Open urls in the user's browser

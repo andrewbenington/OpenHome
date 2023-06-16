@@ -37,7 +37,7 @@ export class HomeBox implements Box {
 }
 
 export class HomeData extends SAV {
-  changedMons: BoxCoordinates[] = [];
+  updatedBoxSlots: BoxCoordinates[] = [];
 
   boxRows = 10;
 
@@ -45,8 +45,8 @@ export class HomeData extends SAV {
 
   boxes: Array<HomeBox>;
 
-  constructor(bytes: Uint8Array) {
-    super('', bytes);
+  constructor() {
+    super('', new Uint8Array());
     this.boxNames = _.range(36).map((i) => `Box ${i + 1}`);
     this.boxes = this.boxNames.map((name) => new HomeBox(name));
   }

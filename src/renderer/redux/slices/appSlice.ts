@@ -27,7 +27,7 @@ export interface SetSaveBoxParams {
 }
 
 const initialState: AppState = {
-  homeData: new HomeData(new Uint8Array()),
+  homeData: new HomeData(),
   saves: [],
   modifiedOHPKMs: {},
   monsToDelete: [],
@@ -58,7 +58,7 @@ export const loadGen345Lookup = createAsyncThunk(
 
 const updateMonInSave = (
   state: Draft<AppState>,
-  mon: PKM | undefined,
+  mon: PKM | Draft<PKM> | undefined,
   saveCoordinates: SaveCoordinates
 ) => {
   let replacedMon;
@@ -66,12 +66,13 @@ const updateMonInSave = (
   if (saveNumber === -1 && (!mon || mon instanceof OHPKM)) {
     replacedMon = state.homeData.boxes[box].pokemon[index];
     state.homeData.boxes[box].pokemon[index] = mon;
+    state.homeData.updatedBoxSlots.push({ box, index });
     state.homeData = { ...state.homeData };
   } else if (saveNumber < state.saves.length) {
     const tempSaves = [...state.saves];
     replacedMon = tempSaves[saveNumber].boxes[box].pokemon[index];
     tempSaves[saveNumber].boxes[box].pokemon[index] = mon;
-    tempSaves[saveNumber].changedMons.push({ box, index });
+    tempSaves[saveNumber].updatedBoxSlots.push({ box, index });
     state.saves = tempSaves;
   }
   return replacedMon;
@@ -158,48 +159,17 @@ export const appSlice = createSlice({
         state.dragSource = undefined;
         return;
       }
-      const {
-        box: srcBox,
-        index: srcIndex,
-        saveNumber: srcSaveNumber,
-      } = state.dragSource;
-      const srcIsHome = srcSaveNumber === -1;
-      const {
-        box: destBox,
-        index: destIndex,
-        saveNumber: destSaveNumber,
-      } = action.payload;
-      const destIsHome = destSaveNumber === -1;
+      const source = state.dragSource;
+      const dest = action.payload;
 
       let mon = state.dragMon;
-      if (srcSaveNumber !== destSaveNumber) {
+      if (source.saveNumber !== dest.saveNumber) {
         mon = new OHPKM(mon);
         markMonAsModified(state, mon as OHPKM);
       }
 
-      const tempSaves = [...state.saves];
-      const srcSave =
-        srcSaveNumber === -1 ? state.homeData : tempSaves[srcSaveNumber];
-      const destSave =
-        destSaveNumber === -1 ? state.homeData : tempSaves[destSaveNumber];
-
-      srcSave.boxes[srcBox].pokemon[srcIndex] = undefined;
-      srcSave.changedMons.push({
-        box: srcBox,
-        index: srcIndex,
-      });
-      destSave.boxes[destBox].pokemon[destIndex] = mon;
-      destSave.changedMons.push({
-        box: destBox,
-        index: destIndex,
-      });
-      state.dragMon = undefined;
-      state.dragSource = undefined;
-      if (!(srcIsHome && destIsHome)) {
-        state.saves = tempSaves;
-      } else if (srcIsHome || destIsHome) {
-        state.homeData = { ...state.homeData };
-      }
+      updateMonInSave(state, mon, action.payload);
+      updateMonInSave(state, undefined, state.dragSource);
     },
     addSave: (state, action: PayloadAction<SAV>) => {
       state.saves.push(action.payload);
@@ -251,7 +221,7 @@ export const appSlice = createSlice({
           path: save.filePath,
           bytes: save.bytes,
         });
-        save.changedMons = [];
+        save.updatedBoxSlots = [];
       });
       state.saves = [...tempSaves];
     },
@@ -274,6 +244,7 @@ export const appSlice = createSlice({
         }
       });
       state.modifiedOHPKMs = {};
+      state.homeData.updatedBoxSlots = [];
       state.monsToDelete.forEach((mon) => {
         const gen345Identifier = getMonGen345Identifier(mon as OHPKM);
         if (
@@ -389,14 +360,14 @@ export const appSlice = createSlice({
     builder.addCase(loadHomeBoxes.fulfilled, (state, action) => {
       const homeMonMap = state.lookup.homeMons;
       if (homeMonMap) {
-        const newBoxes = [...state.homeData.boxes];
+        const newHomeData = new HomeData();
         Object.entries(action.payload).forEach(([, boxString], i) => {
-          newBoxes[i].getMonsFromString(
+          newHomeData.boxes[i].getMonsFromString(
             boxString as string,
             homeMonMap as { [key: string]: OHPKM }
           );
         });
-        return { ...state, homeData: { ...state.homeData, boxes: newBoxes } };
+        return { ...state, homeData: newHomeData };
       }
       console.error('box loaded before home lookup map');
       return state;
