@@ -1,4 +1,4 @@
-import { app, ipcMain } from 'electron';
+import { BrowserWindow, IpcMainInvokeEvent, app, ipcMain } from 'electron';
 import fs from 'fs';
 import path from 'path';
 import { StringToStringMap } from 'types/types';
@@ -128,6 +128,16 @@ function initListeners() {
       ? path.join(process.resourcesPath, 'resources')
       : path.join(`${app.getAppPath()}resources`);
   });
+
+  ipcMain.handle(
+    'set-document-edited',
+    (event: IpcMainInvokeEvent, edited: boolean) => {
+      const window = BrowserWindow.getAllWindows().find(
+        (win) => win.webContents.id === event.sender.id
+      );
+      window?.setDocumentEdited(edited);
+    }
+  );
 }
 
 export default initListeners;

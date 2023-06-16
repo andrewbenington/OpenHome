@@ -64,7 +64,7 @@ export class SAV {
     };
   };
 
-  changedMons: BoxCoordinates[] = [];
+  updatedBoxSlots: BoxCoordinates[] = [];
 
   constructor(path: string, bytes: Uint8Array) {
     this.filePath = path;

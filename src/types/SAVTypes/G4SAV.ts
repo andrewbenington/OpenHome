@@ -109,7 +109,7 @@ export class G4SAV extends SAV {
 
   prepareBoxesForSaving() {
     const changedMonPKMs: OHPKM[] = [];
-    this.changedMons.forEach(({ box, index }) => {
+    this.updatedBoxSlots.forEach(({ box, index }) => {
       const changedMon = this.boxes[box].pokemon[index];
       // we don't want to save OHPKM files of mons that didn't leave the save
       // (and would still be PK4s)

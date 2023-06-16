@@ -69,14 +69,14 @@ const SaveDisplay = (props: SaveDisplayProps) => {
         >
           <OpenHomeButton
             style={{
-              color: save.changedMons.length
+              color: save.updatedBoxSlots.length
                 ? palette.text.disabled
                 : palette.text.secondary,
               fontWeight: 'bold',
               backgroundColor: palette.secondary.main,
             }}
             onClick={() => dispatchRemoveSaveAt(saveIndex)}
-            disabled={!!save.changedMons.length}
+            disabled={!!save.updatedBoxSlots.length}
           >
             <Close style={{}} />
           </OpenHomeButton>
