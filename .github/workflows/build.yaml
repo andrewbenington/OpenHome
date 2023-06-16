@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: install wine
-        run: sudo dpkg --add-architecture i386 && sudo apt-get update -y && sudo apt-get install -y libgcc-s1:i386 && sudo apt-get install -y wine32 && sudo apt-get install -y wine
+        run: sudo dpkg --add-architecture i386 && sudo apt-get update -y && sudo apt-get install -y libgcc-s1:i386 libstdc++6:i386 wine32 wine
       - uses: actions/checkout@v3
       - name: check env variables
         run: ./check-envs.sh
