@@ -1,5 +1,6 @@
 import { contestStats, marking, pokedate, stats } from 'types/types';
 import {
+  Ball,
   GameOfOrigin,
   isGen5,
   isHoenn,
@@ -132,7 +133,8 @@ export class PK5 extends PKM {
         day: now.getDate(),
         year: now.getFullYear(),
       };
-      this.ball = other.ball && other.ball <= 25 ? other.ball : 4;
+      this.ball =
+        other.ball && other.ball <= Ball.Dream ? other.ball : Ball.Poke;
       this.nature = other.nature;
       if (isGen5(other.gameOfOrigin)) {
         this.eggLocationIndex = other.eggLocationIndex;

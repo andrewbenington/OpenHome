@@ -1,8 +1,33 @@
 import { POKEMON_DATA } from 'consts';
 import React, { useEffect, useState } from 'react';
+import { Styles } from 'types/types';
 import { PKM } from '../../types/PKMTypes/PKM';
 import { acceptableExtensions, bytesToPKM } from '../../util/FileImport';
 import BoxIcons from '../images/icons/BoxIcons.png';
+
+const styles = {
+  fillContainer: { width: '100%', height: '100%' },
+  button: {
+    padding: 0,
+    width: '100%',
+    aspectRatio: 1,
+    position: 'relative',
+    border: 'none',
+    borderRadius: 3,
+    textAlign: 'center',
+  },
+  background: {
+    background: `url(${BoxIcons}) no-repeat 0.027027% 0.027027%`,
+    backgroundSize: '3700%',
+    imageRendering: 'crisp-edges',
+    height: '100%',
+    width: '100%',
+    zIndex: 100,
+    top: 0,
+    left: 0,
+    position: 'absolute',
+  },
+} as Styles;
 
 interface BoxCellProps {
   onClick: () => void;
@@ -55,6 +80,21 @@ const BoxCell = (props: BoxCellProps) => {
     };
   };
 
+  const getBackgroundPosition = (mon: PKM) => {
+    return mon.isEgg || !POKEMON_DATA[mon.dexNum]
+      ? '0% 0%'
+      : `${
+          (POKEMON_DATA[mon.dexNum].formes[mon.formNum].spriteIndex[0] / 36) *
+          100
+        }% ${
+          (Math.floor(
+            POKEMON_DATA[mon.dexNum].formes[mon.formNum].spriteIndex[1]
+          ) /
+            35) *
+          100
+        }%`;
+  };
+
   useEffect(() => {
     setDragImage(undefined);
   }, [mon]);
@@ -64,25 +104,14 @@ const BoxCell = (props: BoxCellProps) => {
       type="button"
       onClick={onClick}
       style={{
-        padding: 0,
-        width: '100%',
-        aspectRatio: 1,
-        zIndex,
+        ...styles.button,
         backgroundColor: disabled ? '#555' : '#fff4',
-        position: 'relative',
-        border: 'none',
-        borderRadius: 2,
-        textAlign: 'center',
+        zIndex,
       }}
       disabled={disabled}
     >
       {mon ? (
-        <div
-          style={{
-            width: '100%',
-            height: '100%',
-          }}
-        >
+        <div style={styles.fillContainer}>
           <div
             draggable
             onDragStart={() => {
@@ -94,54 +123,23 @@ const BoxCell = (props: BoxCellProps) => {
               }
               // if not waiting for mon to show up in other slot, set drag image to
               // undefined so it shows up in this one again
-              if (
-                e.dataTransfer.dropEffect !== 'copy'
-                // e.target.className !== 'pokemon_slot'
-              ) {
+              if (e.dataTransfer.dropEffect !== 'copy') {
                 setDragImage(undefined);
                 onDragEvent(true);
               }
             }}
             style={{
-              background: `url(${BoxIcons}) no-repeat 0.027027% 0.027027%`,
-              backgroundSize: '3700%',
-              backgroundPosition:
-                mon.isEgg || !POKEMON_DATA[mon.dexNum]
-                  ? '0% 0%'
-                  : `${
-                      (POKEMON_DATA[mon.dexNum].formes[mon.formNum]
-                        .spriteIndex[0] /
-                        36) *
-                      100
-                    }% ${
-                      (Math.floor(
-                        POKEMON_DATA[mon.dexNum].formes[mon.formNum]
-                          .spriteIndex[1]
-                      ) /
-                        35) *
-                      100
-                    }%`,
+              ...styles.background,
+              backgroundPosition: getBackgroundPosition(mon),
               ...getBackgroundDetails(),
-              imageRendering: 'crisp-edges',
-              height: '100%',
-              width: '100%',
               opacity: dragImage ? 0 : 1,
-              // boxShadow: '0px 0px 20px 5px #0ff',
-              zIndex: 100,
-              top: 0,
-              left: 0,
-              position: 'absolute',
             }}
           />
         </div>
       ) : (
         <div
           className="pokemon_slot"
-          style={{
-            width: '100%',
-            height: '100%',
-            ...getBackgroundDetails(),
-          }}
+          style={{ ...styles.fillContainer, ...getBackgroundDetails() }}
           onDragOver={
             disabled
               ? undefined

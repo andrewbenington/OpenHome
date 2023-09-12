@@ -273,12 +273,7 @@ const Home = () => {
         PaperProps={{ sx: { height: 400 } }}
       >
         {selectedMon && (
-          <PokemonDisplay
-            mon={selectedMon}
-            updateMon={() => {}}
-            tab={tab}
-            setTab={setTab}
-          />
+          <PokemonDisplay mon={selectedMon} tab={tab} setTab={setTab} />
         )}
       </Dialog>
       <Dialog

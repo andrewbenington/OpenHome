@@ -170,6 +170,8 @@ export const appSlice = createSlice({
 
       updateMonInSave(state, mon, action.payload);
       updateMonInSave(state, undefined, state.dragSource);
+      state.dragMon = undefined;
+      state.dragSource = undefined;
     },
     addSave: (state, action: PayloadAction<SAV>) => {
       state.saves.push(action.payload);

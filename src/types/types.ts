@@ -1,3 +1,5 @@
+import { CSSProperties } from 'react';
+
 /* eslint-disable no-unused-vars */
 export type StringToStringMap = { [key: string]: string };
 export type KeyValuePairList = { key: string; value: string }[];
@@ -231,3 +233,5 @@ export interface SaveCoordinates {
   box: number;
   index: number;
 }
+
+export type Styles = { [key: string]: CSSProperties };

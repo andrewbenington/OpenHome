@@ -1,6 +1,7 @@
 import { contestStats, marking, pokedate, stats } from 'types/types';
 import {
   Abilities,
+  Ball,
   GameOfOrigin,
   Gen4RibbonsPart1,
   Gen4RibbonsPart2,
@@ -130,7 +131,8 @@ export class PK4 extends PKM {
         day: now.getDate(),
         year: now.getFullYear(),
       };
-      this.ball = other.ball && other.ball <= 24 ? other.ball : 4;
+      this.ball =
+        other.ball && other.ball <= Ball.Sport ? other.ball : Ball.Poke;
       if (isGen4(other.gameOfOrigin)) {
         this.eggLocationIndex = other.eggLocationIndex;
         this.metLocationIndex = other.metLocationIndex ?? 3002;

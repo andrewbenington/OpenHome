@@ -119,11 +119,6 @@ export const getSpritePath = (mon: PKM, format?: string) => {
   } else if (spriteFolder === 'home' && mon.dexNum > NDex.ENAMORUS) {
     spriteFolder = 'gen9';
   }
-  console.info(
-    `${spriteFolder}${mon.isShiny ? '/shiny/' : '/'}${spriteName}.${
-      spriteFolder === 'gen5' || spriteFolder === 'gen3gc' ? 'gif' : 'png'
-    }`
-  );
   return `${spriteFolder}${mon.isShiny ? '/shiny/' : '/'}${spriteName}.${
     spriteFolder === 'gen5' || spriteFolder === 'gen3gc' ? 'gif' : 'png'
   }`;

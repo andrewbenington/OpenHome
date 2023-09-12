@@ -12,54 +12,32 @@ import {
   Tooltip,
 } from 'chart.js';
 import { GEN2_TRANSFER_RESTRICTIONS } from 'consts/TransferRestrictions';
-import _ from 'lodash';
 import { useEffect, useState } from 'react';
 import { Radar } from 'react-chartjs-2';
+import SheenStars from 'renderer/components/SheenStars';
 import { isRestricted } from 'types/TransferRestrictions';
+import { Styles } from 'types/types';
 import { getNatureSummary } from '../../consts/Natures';
-import { COLOPKM } from '../../types/PKMTypes/COLOPKM';
-import { PK3 } from '../../types/PKMTypes/PK3';
 import { PKM } from '../../types/PKMTypes/PKM';
-import { XDPKM } from '../../types/PKMTypes/XDPKM';
-import Sheen from '../images/icons/Sheen.gif';
-import { detailsPaneContentStyle } from './styles';
 
-const getSheenStars = (mon: PKM) => {
-  if (!mon.contest) {
-    return 0;
-  }
-  if (mon instanceof PK3 || mon instanceof COLOPKM || mon instanceof XDPKM) {
-    return mon.contest.sheen === 255
-      ? 10
-      : Math.floor(mon.contest.sheen / 29) + 1;
-  } else if (mon.contest.sheen < 22) {
-    return 0;
-  } else if (mon.contest.sheen < 43) {
-    return 1;
-  } else if (mon.contest.sheen < 64) {
-    return 2;
-  } else if (mon.contest.sheen < 86) {
-    return 3;
-  } else if (mon.contest.sheen < 107) {
-    return 4;
-  } else if (mon.contest.sheen < 128) {
-    return 5;
-  } else if (mon.contest.sheen < 150) {
-    return 6;
-  } else if (mon.contest.sheen < 171) {
-    return 7;
-  } else if (mon.contest.sheen < 192) {
-    return 8;
-  } else if (mon.contest.sheen < 214) {
-    return 9;
-  } else if (mon.contest.sheen < 235) {
-    return 10;
-  } else if (mon.contest.sheen < 255) {
-    return 11;
-  } else {
-    return 12;
-  }
-};
+const styles = {
+  container: {
+    display: 'flex',
+    flexDirection: 'column',
+    height: 'calc(100% - 20px)',
+    padding: 10,
+    alignItems: 'center',
+    position: 'relative',
+  },
+  selectors: {
+    position: 'absolute',
+    right: 10,
+    top: 10,
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  chartContainer: { padding: 20, height: 280 },
+} as Styles;
 
 const StatsDisplay = (props: { mon: PKM }) => {
   const { mon } = props;
@@ -83,22 +61,8 @@ const StatsDisplay = (props: { mon: PKM }) => {
     Tooltip
   );
   return (
-    <div
-      style={{
-        ...detailsPaneContentStyle,
-        alignItems: 'center',
-        position: 'relative',
-      }}
-    >
-      <div
-        style={{
-          position: 'absolute',
-          right: 10,
-          top: 10,
-          display: 'flex',
-          flexDirection: 'column',
-        }}
-      >
+    <div style={styles.container}>
+      <div style={styles.selectors}>
         <Select value={display} onChange={(e) => setDisplay(e.target.value)}>
           <MenuItem value="Stats">Stats</MenuItem>
           {mon.avs ? <MenuItem value="AVs">AVs</MenuItem> : <div />}
@@ -138,7 +102,7 @@ const StatsDisplay = (props: { mon: PKM }) => {
           <div />
         )}
       </div>
-      <div style={{ padding: 20, height: 280 }}>
+      <div style={styles.chartContainer}>
         <Radar
           options={{
             plugins: {
@@ -400,41 +364,7 @@ const StatsDisplay = (props: { mon: PKM }) => {
           }}
         />
       </div>
-      {display === 'Contest' && mon.contest && (
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center',
-            height: 40,
-          }}
-        >
-          <p>Sheen:</p>
-          <div
-            style={{
-              backgroundColor: '#666',
-              borderRadius: 5,
-              display: 'flex',
-              alignItems: 'center',
-              marginLeft: 10,
-              marginRight: 10,
-              width: mon instanceof PK3 || mon instanceof COLOPKM ? 300 : 360,
-            }}
-          >
-            {_.range(getSheenStars(mon)).map((level: number) => (
-              <img
-                alt={`sheen star ${level}`}
-                src={Sheen}
-                style={{
-                  height: 30,
-                  objectFit: 'contain',
-                }}
-              />
-            ))}
-          </div>
-          ({mon.contest.sheen})
-        </div>
-      )}
+      {display === 'Contest' && mon.contest && <SheenStars mon={mon} />}
     </div>
   );
 };

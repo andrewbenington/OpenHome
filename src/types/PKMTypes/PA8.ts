@@ -5,7 +5,7 @@ import {
   pokedate,
   stats,
 } from 'types/types';
-import { GameOfOrigin, GameOfOriginData, isBDSP } from '../../consts';
+import { Ball, GameOfOrigin, GameOfOriginData, isBDSP } from '../../consts';
 import { Abilities } from '../../consts/Abilities';
 import { Items } from '../../consts/Items';
 import { Languages } from '../../consts/Languages';
@@ -103,7 +103,7 @@ export class PA8 extends PKM {
       this.trainerMemory = other.trainerMemory;
       this.eggDate = other.eggDate;
       this.metDate = other.metDate;
-      this.ball = Math.max(other.ball, 27);
+      this.ball = Math.max(other.ball, Ball.Strange);
       this.eggLocationIndex = other.eggLocationIndex;
       this.metLocationIndex = other.metLocationIndex;
       this.metLevel = other.metLevel;
