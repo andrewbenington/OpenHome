@@ -1,8 +1,33 @@
 import { Tooltip } from '@mui/material';
 import { RibbonsMap } from 'renderer/images/Images';
+import { Styles } from 'types/types';
 import { Gen9Ribbons } from '../../consts/Ribbons';
 import { PKM } from '../../types/PKMTypes/PKM';
-import { detailsPaneContentStyle } from './styles';
+
+const styles = {
+  container: {
+    display: 'flex',
+    padding: 10,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  ribbon: {
+    width: 50,
+    height: 50,
+    borderWidth: 2,
+    imageRendering: 'pixelated',
+  },
+  affixedRibbon: {
+    width: 50,
+    height: 50,
+    imageRendering: 'pixelated',
+    backgroundColor: '#fff6',
+    borderRadius: 5,
+    borderWidth: 2,
+    borderStyle: 'solid',
+    borderColor: 'white',
+  },
+} as Styles;
 
 const RibbonsDisplay = (props: { mon: PKM }) => {
   const { mon } = props;
@@ -35,14 +60,7 @@ const RibbonsDisplay = (props: { mon: PKM }) => {
   };
 
   return (
-    <div
-      style={{
-        ...detailsPaneContentStyle,
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        height: undefined,
-      }}
-    >
+    <div style={styles.container}>
       {mon.ribbons.map((ribbon) => {
         const ribbonDisplay = formatRibbon(ribbon);
         return (
@@ -51,21 +69,11 @@ const RibbonsDisplay = (props: { mon: PKM }) => {
               draggable={false}
               key={ribbonDisplay}
               alt={ribbonDisplay}
-              style={{
-                width: 50,
-                height: 50,
-                borderWidth: 2,
-                imageRendering: 'pixelated',
-                ...(Gen9Ribbons.indexOf(ribbon) === mon.affixedRibbon
-                  ? {
-                      backgroundColor: '#fff6',
-                      borderRadius: 5,
-                      borderWidth: 2,
-                      borderStyle: 'solid',
-                      borderColor: 'white',
-                    }
-                  : {}),
-              }}
+              style={
+                Gen9Ribbons.indexOf(ribbon) === mon.affixedRibbon
+                  ? styles.affixedRibbon
+                  : styles.ribbon
+              }
               src={getRibbonImage(ribbon)}
             />
           </Tooltip>

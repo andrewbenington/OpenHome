@@ -59,5 +59,7 @@ module.exports = {
     'promise/catch-or-return': 'off',
     'no-unused-vars': 'off',
     '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+    'react/destructuring-assignment': 'off',
+    'react/jsx-props-no-spreading': 'off',
   },
 };

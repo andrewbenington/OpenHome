@@ -1,16 +1,57 @@
 import { Card } from '@mui/material';
+import Markings from 'renderer/components/Markings';
 import { BallsList, OriginMarks } from 'renderer/images/Images';
 import { getMoveMaxPP } from 'types/PKMTypes/util';
-import { marking } from 'types/types';
+import { Styles } from 'types/types';
 import { GameOfOriginData, Natures } from '../../consts';
 import { PKM } from '../../types/PKMTypes/PKM';
 import { getGameLogo } from '../util/PokemonSprite';
 import MoveCard from './MoveCard';
-import { detailsPaneContentStyle } from './styles';
 
-const getMarkingColor = (value: marking) => {
-  return ['grey', 'blue', 'red'][value];
-};
+const styles = {
+  container: {
+    display: 'flex',
+    flexDirection: 'column' as 'column',
+    height: 'calc(100% - 20px)',
+    padding: 10,
+  },
+  detailsContainer: {
+    display: 'flex',
+    flex: 1,
+    flexDirection: 'row',
+    height: 'fit-content',
+  },
+  language: { padding: '5px 10px 5px 10px', marginLeft: 10 },
+  gameContainer: {
+    position: 'relative',
+    width: 100,
+    height: 60,
+    alignItems: 'center',
+    display: 'flex',
+    justifyContent: 'center',
+  },
+  gameImage: {
+    width: 100,
+    height: 60,
+    objectFit: 'contain',
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    opacity: 0.6,
+  },
+  originMark: {
+    width: 50,
+    height: 50,
+    objectFit: 'contain',
+    zIndex: 2,
+    opacity: 0.8,
+  },
+  centerFlex: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+} as Styles;
 
 const metTimesOfDay = [
   'in the morning',
@@ -18,18 +59,11 @@ const metTimesOfDay = [
   'in the evening',
 ];
 
-const SummaryDisplay = (props: { mon: PKM; updateMon: (_: PKM) => void }) => {
-  const { mon, updateMon } = props;
+const SummaryDisplay = (props: { mon: PKM }) => {
+  const { mon } = props;
   return (
-    <div style={detailsPaneContentStyle}>
-      <div
-        style={{
-          display: 'flex',
-          flex: 1,
-          flexDirection: 'row',
-          height: 'fit-content',
-        }}
-      >
+    <div style={styles.container}>
+      <div style={styles.detailsContainer}>
         <div style={{ flex: 1 }}>
           <div
             style={{
@@ -52,9 +86,7 @@ const SummaryDisplay = (props: { mon: PKM; updateMon: (_: PKM) => void }) => {
               {mon.nickname}
               {mon.affixedRibbonTitle ? ` ${mon.affixedRibbonTitle}` : ''}
             </p>
-            <Card style={{ padding: '5px 10px 5px 10px', marginLeft: 10 }}>
-              {mon.language}
-            </Card>
+            <Card style={styles.language}>{mon.language}</Card>
           </div>
           {mon.eggDate && mon.eggLocation ? (
             <p style={{ textAlign: 'left' }}>{`Egg received ${
@@ -115,16 +147,7 @@ const SummaryDisplay = (props: { mon: PKM; updateMon: (_: PKM) => void }) => {
             justifyContent: 'space-evenly',
           }}
         >
-          <div
-            style={{
-              position: 'relative',
-              width: 100,
-              height: 60,
-              alignItems: 'center',
-              display: 'flex',
-              justifyContent: 'center',
-            }}
-          >
+          <div style={styles.gameContainer}>
             <img
               draggable={false}
               alt={`${GameOfOriginData[mon.gameOfOrigin]?.name} logo`}
@@ -135,15 +158,7 @@ const SummaryDisplay = (props: { mon: PKM; updateMon: (_: PKM) => void }) => {
                   mon.ribbons.includes('National') || mon.isShadow
                 ) ?? ''
               }
-              style={{
-                width: 100,
-                height: 60,
-                objectFit: 'contain',
-                position: 'absolute',
-                left: 0,
-                right: 0,
-                opacity: 0.6,
-              }}
+              style={styles.gameImage}
             />
             {(GameOfOriginData[mon.gameOfOrigin]?.mark ||
               mon.gameOfOrigin === -1) && (
@@ -157,91 +172,14 @@ const SummaryDisplay = (props: { mon: PKM; updateMon: (_: PKM) => void }) => {
                       : GameOfOriginData[mon.gameOfOrigin]?.mark ?? ''
                   ]
                 }
-                style={{
-                  width: 50,
-                  height: 50,
-                  objectFit: 'contain',
-                  zIndex: 2,
-                  opacity: 0.8,
-                }}
+                style={styles.originMark}
               />
             )}
           </div>
-          {mon.markings ? (
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'row',
-                justifyContent: 'center',
-                padding: 5,
-                backgroundColor: '#666',
-                marginTop: 10,
-                borderRadius: 5,
-              }}
-            >
-              <span
-                className="No-Select"
-                onClick={() => {
-                  if (mon.markings) {
-                    mon.markings[0] = 1;
-                    updateMon(mon);
-                  }
-                }}
-                style={{ color: getMarkingColor(mon.markings[0]) }}
-              >
-                ●
-              </span>
-              <span
-                className="No-Select"
-                style={{ color: getMarkingColor(mon.markings[1]) }}
-              >
-                ■
-              </span>
-              <span
-                className="No-Select"
-                style={{ color: getMarkingColor(mon.markings[2]) }}
-              >
-                ▲
-              </span>
-              <span
-                className="No-Select"
-                style={{ color: getMarkingColor(mon.markings[3]) }}
-              >
-                ♥
-              </span>
-              {mon.markings[4] !== undefined ? (
-                <span
-                  className="No-Select"
-                  style={{ color: getMarkingColor(mon.markings[4]) }}
-                >
-                  ★
-                </span>
-              ) : (
-                <div />
-              )}
-              {mon.markings[5] !== undefined ? (
-                <span
-                  className="No-Select"
-                  style={{ color: getMarkingColor(mon.markings[5]) }}
-                >
-                  ◆
-                </span>
-              ) : (
-                <div />
-              )}
-            </div>
-          ) : (
-            <div />
-          )}
+          {mon.markings ? <Markings markings={mon.markings} /> : <div />}
         </div>
       </div>
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'row',
-          justifyContent: 'center',
-        }}
-      >
+      <div style={styles.centerFlex}>
         <MoveCard
           move={mon.moves[0]}
           movePP={mon.moves[0] ? mon.movePP[0] : undefined}
@@ -253,13 +191,7 @@ const SummaryDisplay = (props: { mon: PKM; updateMon: (_: PKM) => void }) => {
           maxPP={getMoveMaxPP(mon.moves[1], mon.format, mon.movePPUps[1])}
         />
       </div>
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'row',
-          justifyContent: 'center',
-        }}
-      >
+      <div style={styles.centerFlex}>
         <MoveCard
           move={mon.moves[2]}
           movePP={mon.moves[2] ? mon.movePP[2] : undefined}

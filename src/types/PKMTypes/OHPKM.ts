@@ -12,6 +12,7 @@ import {
 } from 'types/types';
 import {
   Abilities,
+  Ball,
   GameOfOrigin,
   Gen34ContestRibbons,
   Gen34TowerRibbons,
@@ -167,6 +168,7 @@ export class OHPKM extends PKM {
       }
       this.isEgg = other.isEgg;
       this.isNicknamed = other.isNicknamed;
+      this.dynamaxLevel = other.dynamaxLevel ?? 0;
       this.teraTypeOriginal =
         other.teraTypeOriginal ??
         generateTeraType(prng, this.dexNum, this.formNum) ??
@@ -255,7 +257,7 @@ export class OHPKM extends PKM {
         day: now.getDate(),
         year: now.getFullYear(),
       };
-      this.ball = other.ball ?? 4;
+      this.ball = other.ball ?? Ball.Poke;
       this.eggLocationIndex = other.eggLocationIndex;
       this.metLocationIndex = other.metLocationIndex ?? 0;
       this.metLevel = other.metLevel ?? this.level;

@@ -7,7 +7,7 @@ import {
   pokedate,
   stats,
 } from 'types/types';
-import { GameOfOrigin, GameOfOriginData, isAlola } from '../../consts';
+import { Ball, GameOfOrigin, GameOfOriginData, isAlola } from '../../consts';
 import { Abilities } from '../../consts/Abilities';
 import { Items } from '../../consts/Items';
 import { Languages } from '../../consts/Languages';
@@ -133,7 +133,8 @@ export class PK7 extends PKM {
       this.metDate = other.metDate;
       this.eggLocationIndex = other.eggLocationIndex;
       this.metLocationIndex = other.metLocationIndex;
-      this.ball = other.ball && other.ball <= 25 ? other.ball : 4;
+      this.ball =
+        other.ball && other.ball <= Ball.Beast ? other.ball : Ball.Poke;
       this.metLevel = other.metLevel ?? this.level;
       this.trainerGender = other.trainerGender;
       this.encounterType = other.encounterType;

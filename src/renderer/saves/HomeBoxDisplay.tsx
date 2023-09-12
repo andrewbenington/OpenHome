@@ -1,8 +1,9 @@
-import { Card, Grid, useTheme } from '@mui/material';
+import { Grid, useTheme } from '@mui/material';
 import _ from 'lodash';
 import { useAppDispatch } from 'renderer/redux/hooks';
 import { useHomeData } from 'renderer/redux/selectors';
 import {
+  cancelDrag,
   completeDrag,
   importMons,
   startDrag,
@@ -23,6 +24,7 @@ const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
   const dispatch = useAppDispatch();
   const dispatchStartDrag = (source: SaveCoordinates) =>
     dispatch(startDrag(source));
+  const dispatchCancelDrag = () => dispatch(cancelDrag());
   const dispatchCompleteDrag = (dest: SaveCoordinates) =>
     dispatch(completeDrag(dest));
   const dispatchImportMons = (mons: PKM[], saveCoordinates: SaveCoordinates) =>
@@ -30,9 +32,10 @@ const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
 
   return (
     data.boxes[0] && (
-      <Card
+      <div
         style={{
           borderRadius: 5,
+          padding: 2,
           backgroundColor: theme.palette.secondary.main,
           width: '100%',
           height: 'fit-content',
@@ -47,12 +50,14 @@ const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
                 <Grid item xs={1} style={{ padding: '2px 2px 0px 2px' }}>
                   <BoxCell
                     onClick={() => setSelectedMon(mon)}
-                    onDragEvent={() =>
-                      dispatchStartDrag({
-                        saveNumber: -1,
-                        box: data.currentPCBox,
-                        index: row * 12 + rowIndex,
-                      })
+                    onDragEvent={(cancel: boolean) =>
+                      cancel
+                        ? dispatchCancelDrag()
+                        : dispatchStartDrag({
+                            saveNumber: -1,
+                            box: data.currentPCBox,
+                            index: row * 12 + rowIndex,
+                          })
                     }
                     mon={mon}
                     zIndex={10 - row}
@@ -78,7 +83,7 @@ const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
             })}
           </Grid>
         ))}
-      </Card>
+      </div>
     )
   );
 };

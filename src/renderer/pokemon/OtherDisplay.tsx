@@ -1,14 +1,18 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import { ArrowForwardIosSharp } from '@mui/icons-material';
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
-import { Countries, NDex, SWEETS, Types, isAlola, isGen6 } from 'consts';
+import { Countries, NDex, SWEETS, isAlola, isGen6 } from 'consts';
 import {
   GEN2_TRANSFER_RESTRICTIONS,
   HGSS_TRANSFER_RESTRICTIONS,
 } from 'consts/TransferRestrictions';
-import _ from 'lodash';
+import DynamaxLevel from 'renderer/components/DynamaxLevel';
+import ShinyLeaves from 'renderer/components/ShinyLeaves';
+import TypeIcon from 'renderer/components/TypeIcon';
 import { OHPKM, PK1, PK2, PK3, PK4, PK5, PKM } from 'types/PKMTypes';
 import { isRestricted } from 'types/TransferRestrictions';
+import { Styles } from 'types/types';
 import {
   getMonFileIdentifier,
   getMonGen12Identifier,
@@ -16,24 +20,49 @@ import {
 } from 'util/Lookup';
 import Alpha from '../images/icons/Alpha.png';
 import GMax from '../images/icons/GMax.png';
-import LeafCrown from '../images/icons/LeafCrown.png';
-import ShinyLeaf from '../images/icons/ShinyLeaf.png';
 import { getTypeColor } from '../util/PokemonSprite';
 import AttributeRow from './AttributeRow';
 import AttributeTag from './AttributeTag';
-import {
-  accordionStyle,
-  accordionSummaryStyle,
-  detailsPaneContentStyle,
-  leafCrownIconStyle,
-  shinyLeafEmptyIconStyle,
-  shinyLeafIconStyle,
-} from './styles';
+
+const styles = {
+  accordion: {
+    backgroundColor: '#0000',
+    '&:before': {
+      display: 'none',
+    },
+  },
+  accordionSummary: {
+    backgroundColor: '#0000',
+    padding: 0,
+    minHeight: 'fit-content',
+    '& .MuiAccordionSummary-content': {
+      margin: 0,
+    },
+    '& .MuiAccordionSummary-expandIconWrapper': {
+      position: 'absolute',
+      right: 10,
+    },
+    '& .MuiAccordionSummary-expandIconWrapper.Mui-expanded': {
+      transform: 'rotate(90deg)',
+    },
+  },
+  flexRowWrap: {
+    display: 'flex',
+    flexDirection: 'row' as 'row',
+    flexWrap: 'wrap' as 'wrap',
+  },
+  detailsPaneContent: {
+    display: 'flex',
+    flexDirection: 'column' as 'column',
+    height: 'calc(100% - 20px)',
+    padding: 10,
+  },
+} as Styles;
 
 const OtherDisplay = (props: { mon: PKM }) => {
   const { mon } = props;
   return (
-    <div style={detailsPaneContentStyle}>
+    <div style={styles.detailsPaneContent}>
       {mon.personalityValue !== undefined ? (
         <AttributeRow label="Personality Value">
           <code>
@@ -56,11 +85,11 @@ const OtherDisplay = (props: { mon: PKM }) => {
         disableGutters
         elevation={0}
         TransitionProps={{ unmountOnExit: true }}
-        sx={accordionStyle}
+        sx={styles.accordion}
       >
         <AccordionSummary
           expandIcon={<ArrowForwardIosSharp sx={{ fontSize: '0.9rem' }} />}
-          sx={accordionSummaryStyle}
+          sx={styles.accordionSummary}
         >
           <AttributeRow
             label="Original Trainer"
@@ -100,11 +129,11 @@ const OtherDisplay = (props: { mon: PKM }) => {
           disableGutters
           elevation={0}
           TransitionProps={{ unmountOnExit: true }}
-          sx={accordionStyle}
+          sx={styles.accordion}
         >
           <AccordionSummary
             expandIcon={<ArrowForwardIosSharp sx={{ fontSize: '0.9rem' }} />}
-            sx={accordionSummaryStyle}
+            sx={styles.accordionSummary}
           >
             <AttributeRow
               label="Recent Trainer"
@@ -183,74 +212,9 @@ const OtherDisplay = (props: { mon: PKM }) => {
         <div />
       )}
       {!isRestricted(HGSS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
-      mon.shinyLeaves !== undefined ? (
+      mon.shinyLeafValues !== undefined ? (
         <AttributeRow label="Shiny Leaves">
-          {mon.shinyLeafValues?.crown ? (
-            <img
-              alt="shiny_leaf_crown"
-              draggable={false}
-              src={LeafCrown}
-              style={leafCrownIconStyle}
-            />
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'row' }}>
-              <img
-                alt="shiny_leaf_1"
-                draggable={false}
-                src={ShinyLeaf}
-                style={{
-                  ...(mon.shinyLeafValues?.first
-                    ? shinyLeafIconStyle
-                    : shinyLeafEmptyIconStyle),
-                  zIndex: 1,
-                }}
-              />
-              <img
-                alt="shiny_leaf_2"
-                draggable={false}
-                src={ShinyLeaf}
-                style={{
-                  ...(mon.shinyLeafValues?.second
-                    ? shinyLeafIconStyle
-                    : shinyLeafEmptyIconStyle),
-                  zIndex: 2,
-                }}
-              />
-              <img
-                alt="shiny_leaf_3"
-                draggable={false}
-                src={ShinyLeaf}
-                style={{
-                  ...(mon.shinyLeafValues?.third
-                    ? shinyLeafIconStyle
-                    : shinyLeafEmptyIconStyle),
-                  zIndex: 3,
-                }}
-              />
-              <img
-                alt="shiny_leaf_4"
-                draggable={false}
-                src={ShinyLeaf}
-                style={{
-                  ...(mon.shinyLeafValues?.fourth
-                    ? shinyLeafIconStyle
-                    : shinyLeafEmptyIconStyle),
-                  zIndex: 4,
-                }}
-              />
-              <img
-                alt="shiny_leaf_5"
-                draggable={false}
-                src={ShinyLeaf}
-                style={{
-                  ...(mon.shinyLeafValues?.fifth
-                    ? shinyLeafIconStyle
-                    : shinyLeafEmptyIconStyle),
-                  zIndex: 5,
-                }}
-              />
-            </div>
-          )}
+          <ShinyLeaves {...mon.shinyLeafValues} />
         </AttributeRow>
       ) : (
         <div />
@@ -269,11 +233,11 @@ const OtherDisplay = (props: { mon: PKM }) => {
           disableGutters
           elevation={0}
           TransitionProps={{ unmountOnExit: true }}
-          sx={accordionStyle}
+          sx={styles.accordion}
         >
           <AccordionSummary
             expandIcon={<ArrowForwardIosSharp sx={{ fontSize: '0.9rem' }} />}
-            sx={accordionSummaryStyle}
+            sx={styles.accordionSummary}
           >
             <AttributeRow
               label="Geolocations"
@@ -301,49 +265,23 @@ const OtherDisplay = (props: { mon: PKM }) => {
       )}
       {mon.dynamaxLevel !== undefined && (
         <AttributeRow label="Dynamax">
-          <div style={{ display: 'flex', flexDirection: 'row' }}>
-            {_.range(10).map((level: number) => (
-              <div
-                key={`dynamax_meter_${level}`}
-                style={{
-                  backgroundColor:
-                    level < (mon.dynamaxLevel ?? 0)
-                      ? `#FF${(40 + ((mon.dynamaxLevel ?? 0) - level) * 20)
-                          ?.toString(16)
-                          .padStart(2, '0')}00`
-                      : 'grey',
-                  height: 20,
-                  width: 8,
-                  marginRight: 4,
-                }}
-              />
-            ))}
-          </div>
+          <DynamaxLevel level={mon.dynamaxLevel} />
         </AttributeRow>
       )}
       {mon.teraTypeOriginal !== undefined &&
       mon.teraTypeOverride !== undefined ? (
         <AttributeRow label="Tera Type">
-          <img
-            draggable={false}
-            alt="tera type"
-            style={{ height: 24, width: 24, marginRight: 5 }}
-            src={`https://raw.githubusercontent.com/msikma/pokesprite/master/misc/types/gen8/${Types[
+          <TypeIcon
+            typeIndex={
               mon.teraTypeOverride <= 18
                 ? mon.teraTypeOverride
                 : mon.teraTypeOriginal
-            ]?.toLocaleLowerCase()}.png`}
+            }
           />
           {mon.teraTypeOverride <= 18 && (
             <>
               <p>(originally </p>
-              <img
-                alt="tera type original"
-                style={{ height: 24, width: 24, marginRight: 5 }}
-                src={`https://raw.githubusercontent.com/msikma/pokesprite/master/misc/types/gen8/${Types[
-                  mon.teraTypeOriginal
-                ]?.toLocaleLowerCase()}.png`}
-              />
+              <TypeIcon typeIndex={mon.teraTypeOriginal} />
               <p>)</p>
             </>
           )}
@@ -374,13 +312,7 @@ const OtherDisplay = (props: { mon: PKM }) => {
       ) : (
         <div />
       )}
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'row',
-          flexWrap: 'wrap',
-        }}
-      >
+      <div style={styles.flexRowWrap}>
         {mon.canGigantamax && (
           <AttributeTag icon={GMax} color="white" backgroundColor="#e60040" />
         )}

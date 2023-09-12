@@ -1,6 +1,7 @@
 import { contestStats, marking, stats } from 'types/types';
 import {
   Abilities,
+  Ball,
   GameOfOrigin,
   Gen3ContestRibbons,
   Gen3Items,
@@ -123,10 +124,10 @@ export class PK3 extends PKM {
       this.nickname = other.nickname;
       this.trainerName = other.trainerName;
       this.trainerFriendship = other.trainerFriendship;
-      if (other.ball <= 12) {
+      if (other.ball <= Ball.Premier) {
         this.ball = other.ball;
       } else {
-        this.ball = 4;
+        this.ball = Ball.Poke;
       }
       if (isGen3(other.gameOfOrigin)) {
         this.metLocationIndex = other.metLocationIndex;

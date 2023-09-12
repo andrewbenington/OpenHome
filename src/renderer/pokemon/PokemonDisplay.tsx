@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import { MenuItem, Select } from '@mui/material';
+import { Grid, MenuItem, Select } from '@mui/material';
 import {
   BW2_TRANSFER_RESTRICTIONS,
   GEN1_TRANSFER_RESTRICTIONS,
@@ -10,11 +10,10 @@ import {
   ORAS_TRANSFER_RESTRICTIONS,
   USUM_TRANSFER_RESTRICTIONS,
 } from 'consts/TransferRestrictions';
-import _ from 'lodash';
-import { useEffect, useState } from 'react';
-import Themes from 'renderer/app/Themes';
-import { getSpritePath } from 'renderer/util/PokemonSprite';
-import { StringToStringMap } from 'types/types';
+import { useEffect, useMemo, useState } from 'react';
+import TypeIcon from 'renderer/components/TypeIcon';
+import { getItemIconPath, getSpritePath } from 'renderer/util/PokemonSprite';
+import { StringToStringMap, Styles } from 'types/types';
 import { POKEMON_DATA } from '../../consts/Mons';
 import {
   OHPKM,
@@ -33,16 +32,78 @@ import { isRestricted } from '../../types/TransferRestrictions';
 import OpenHomeButton from '../components/OpenHomeButton';
 import AttributeRow from './AttributeRow';
 import OtherDisplay from './OtherDisplay';
-import PokemonWithItem from './PokemonWithItem';
+import RawDisplay from './RawDisplay';
 import RibbonsDisplay from './RibbonsDisplay';
 import StatsDisplay from './StatsDisplay';
 import SummaryDisplay from './SummaryDisplay';
-import {
-  detailsPaneScrollContainerStyle,
-  detailsPaneStyle,
-  fileTypeChipStyle,
-  tabButtonStyle,
-} from './styles';
+
+const styles = {
+  column: {
+    height: 200,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  image: {
+    maxWidth: 100,
+    maxHeight: 100,
+    transform: 'scale(2)',
+    imageRendering: 'pixelated',
+    objectFit: 'contain',
+  },
+  attributesList: { textAlign: 'left', width: '30%', marginTop: 10 },
+  tabScrollContainer: {
+    backgroundColor: '#fff4',
+    height: '100%',
+    overflow: 'scroll',
+  },
+  detailsPane: {
+    width: '50%',
+    height: '100%',
+    borderTopRightRadius: 0,
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  pokemonDisplay: {
+    display: 'flex',
+    flexDirection: 'row',
+    width: '100%',
+    height: '100%',
+  },
+  pokemonSprite: { width: 24, height: 24, marginRight: 5 },
+  tabButton: {
+    margin: 0,
+    borderRadius: 0,
+    fontSize: 16,
+    padding: '10px 20px 12px 20px',
+  },
+  detailsTabRow: {
+    display: 'flex',
+    flexDirection: 'row',
+    overflowX: 'scroll',
+  },
+  fileTypeChip: {
+    left: 10,
+    top: 10,
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 20,
+    zIndex: 1,
+    borderRadius: 25,
+    '& .MuiSelect-select': {
+      paddingTop: 0,
+      paddingBottom: 0,
+    },
+    '& .MuiSelect-outlined': {
+      paddingTop: 0,
+      paddingBottom: 0,
+    },
+    '& .Mui-focused': {
+      border: 0,
+    },
+    position: 'absolute',
+  },
+} as Styles;
 
 const getTypeFromString = (type: string) => {
   switch (type) {
@@ -89,13 +150,36 @@ const fileTypeColors: StringToStringMap = {
 
 const PokemonDisplay = (props: {
   mon: PKM;
-  updateMon: (_: PKM) => void;
   tab: string;
   setTab: (_: string) => void;
 }) => {
-  const { mon, updateMon, tab, setTab } = props;
+  const { mon, tab, setTab } = props;
   const [displayMon, setDisplayMon] = useState(mon);
   const [monSprites, setMonSprites] = useState<StringToStringMap>();
+  const [itemIcon, setItemIcon] = useState<string>();
+
+  const itemAltText = useMemo(() => {
+    const monData = POKEMON_DATA[mon.dexNum]?.formes[mon.formNum];
+    if (!monData) return 'pokemon sprite';
+    return `${monData.formeName}${mon.isShiny ? '-shiny' : ''} sprite`;
+  }, [mon]);
+
+  const monSpriteSource = useMemo(
+    () => (monSprites ? monSprites[displayMon.format] : ''),
+    [displayMon.format, monSprites]
+  );
+
+  useEffect(() => {
+    const importIcon = async () => {
+      const icon = await import(
+        `../images/items/${getItemIconPath(mon.heldItem)}`
+      );
+      setItemIcon(icon?.default);
+    };
+    if (mon.heldItemIndex) {
+      importIcon();
+    }
+  }, [mon.heldItem, mon.heldItemIndex]);
 
   useEffect(() => {
     const sprites: StringToStringMap = {};
@@ -136,144 +220,195 @@ const PokemonDisplay = (props: {
   }, [mon]);
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'row',
-        width: '100%',
-        height: '100%',
-        backgroundColor: Themes[0].backgroundColor,
-      }}
-    >
-      <Select
-        value={displayMon.format}
-        onChange={(e) => {
-          const T = getTypeFromString(e.target.value);
-          if (mon.format === e.target.value) {
-            setDisplayMon(mon);
-          } else if (T) {
-            setDisplayMon(new T(mon));
-          }
-        }}
-        sx={{
-          ...fileTypeChipStyle,
-          backgroundColor: fileTypeColors[displayMon.format],
-        }}
-      >
-        <MenuItem value="OHPKM">OpenHome</MenuItem>
-        {mon.format !== 'OHPKM' ? (
-          <MenuItem value={mon.format}>{mon.format}</MenuItem>
-        ) : (
-          <div />
-        )}
-        {mon.format === 'OHPKM' &&
-        !isRestricted(GEN1_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) ? (
-          <MenuItem value="PK1">PK1</MenuItem>
-        ) : (
-          <div />
-        )}
-        {mon.format === 'OHPKM' &&
-        !isRestricted(GEN2_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) ? (
-          <MenuItem value="PK2">PK2</MenuItem>
-        ) : (
-          <div />
-        )}
-        {mon.format === 'OHPKM' &&
-        !isRestricted(GEN3_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) ? (
-          <MenuItem value="PK3">PK3</MenuItem>
-        ) : (
-          <div />
-        )}
-        {mon.format === 'OHPKM' &&
-        !isRestricted(HGSS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) ? (
-          <MenuItem value="PK4">PK4</MenuItem>
-        ) : (
-          <div />
-        )}
-        {mon.format === 'OHPKM' &&
-        !isRestricted(BW2_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) ? (
-          <MenuItem value="PK5">PK5</MenuItem>
-        ) : (
-          <div />
-        )}
-        {mon.format === 'OHPKM' &&
-        !isRestricted(ORAS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) ? (
-          <MenuItem value="PK6">PK6</MenuItem>
-        ) : (
-          <div />
-        )}
-        {mon.format === 'OHPKM' &&
-        !isRestricted(USUM_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) ? (
-          <MenuItem value="PK7">PK7</MenuItem>
-        ) : (
-          <div />
-        )}
-        {mon.format === 'OHPKM' &&
-        !isRestricted(LA_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) ? (
-          <MenuItem value="PA8">PA8</MenuItem>
-        ) : (
-          <div />
-        )}
-      </Select>
-      <PokemonWithItem
-        mon={displayMon}
-        style={{ width: '20%' }}
-        sprites={monSprites}
-      />
-      <div style={{ textAlign: 'left', width: '30%', marginTop: 10 }}>
-        <AttributeRow
-          label="Name"
-          value={`${
-            POKEMON_DATA[displayMon.dexNum]?.formes[displayMon.formNum]
-              ?.formeName
-          } ${
-            displayMon.gender === 2 ? '' : displayMon.gender === 1 ? '♀' : '♂'
-          }`}
-        />
-        <AttributeRow label="Dex No." value={`${displayMon.dexNum}`} />
-        <AttributeRow label="Type">
-          {getTypes(displayMon)?.map((type, i) => (
-            <img
-              draggable={false}
-              alt={`pokemon type ${i + 1}`}
-              style={{ height: 24, width: 24, marginRight: 5 }}
-              src={`https://raw.githubusercontent.com/msikma/pokesprite/master/misc/types/gen8/${type.toLocaleLowerCase()}.png`}
+    <Grid container style={styles.pokemonDisplay}>
+      <Grid item xs={6}>
+        <Grid container>
+          <Grid xs={4}>
+            <Select
+              value={displayMon.format}
+              onChange={(e) => {
+                const T = getTypeFromString(e.target.value);
+                if (mon.format === e.target.value) {
+                  setDisplayMon(mon);
+                } else if (T) {
+                  setDisplayMon(new T(mon));
+                }
+              }}
+              sx={{
+                ...styles.fileTypeChip,
+                backgroundColor: fileTypeColors[displayMon.format],
+              }}
+            >
+              <MenuItem value="OHPKM">OpenHome</MenuItem>
+              {mon.format !== 'OHPKM' ? (
+                <MenuItem value={mon.format}>{mon.format}</MenuItem>
+              ) : (
+                <div />
+              )}
+              {mon.format === 'OHPKM' &&
+              !isRestricted(
+                GEN1_TRANSFER_RESTRICTIONS,
+                mon.dexNum,
+                mon.formNum
+              ) ? (
+                <MenuItem value="PK1">PK1</MenuItem>
+              ) : (
+                <div />
+              )}
+              {mon.format === 'OHPKM' &&
+              !isRestricted(
+                GEN2_TRANSFER_RESTRICTIONS,
+                mon.dexNum,
+                mon.formNum
+              ) ? (
+                <MenuItem value="PK2">PK2</MenuItem>
+              ) : (
+                <div />
+              )}
+              {mon.format === 'OHPKM' &&
+              !isRestricted(
+                GEN3_TRANSFER_RESTRICTIONS,
+                mon.dexNum,
+                mon.formNum
+              ) ? (
+                <MenuItem value="PK3">PK3</MenuItem>
+              ) : (
+                <div />
+              )}
+              {mon.format === 'OHPKM' &&
+              !isRestricted(
+                HGSS_TRANSFER_RESTRICTIONS,
+                mon.dexNum,
+                mon.formNum
+              ) ? (
+                <MenuItem value="PK4">PK4</MenuItem>
+              ) : (
+                <div />
+              )}
+              {mon.format === 'OHPKM' &&
+              !isRestricted(
+                BW2_TRANSFER_RESTRICTIONS,
+                mon.dexNum,
+                mon.formNum
+              ) ? (
+                <MenuItem value="PK5">PK5</MenuItem>
+              ) : (
+                <div />
+              )}
+              {mon.format === 'OHPKM' &&
+              !isRestricted(
+                ORAS_TRANSFER_RESTRICTIONS,
+                mon.dexNum,
+                mon.formNum
+              ) ? (
+                <MenuItem value="PK6">PK6</MenuItem>
+              ) : (
+                <div />
+              )}
+              {mon.format === 'OHPKM' &&
+              !isRestricted(
+                USUM_TRANSFER_RESTRICTIONS,
+                mon.dexNum,
+                mon.formNum
+              ) ? (
+                <MenuItem value="PK7">PK7</MenuItem>
+              ) : (
+                <div />
+              )}
+              {mon.format === 'OHPKM' &&
+              !isRestricted(
+                LA_TRANSFER_RESTRICTIONS,
+                mon.dexNum,
+                mon.formNum
+              ) ? (
+                <MenuItem value="PA8">PA8</MenuItem>
+              ) : (
+                <div />
+              )}
+            </Select>
+          </Grid>
+          <Grid xs={8} />
+          <Grid xs={4}>
+            <div style={styles.column}>
+              {monSprites && (
+                <img
+                  draggable={false}
+                  alt={itemAltText}
+                  style={styles.image}
+                  src={monSpriteSource}
+                />
+              )}
+            </div>
+            <AttributeRow label="Level" justifyEnd>
+              {mon.level}
+            </AttributeRow>
+            <AttributeRow label="EXP" justifyEnd>
+              {mon.exp}
+            </AttributeRow>
+            <AttributeRow label="Item" justifyEnd>
+              {mon.heldItem !== 'None' && (
+                <img
+                  alt="item icon"
+                  src={itemIcon}
+                  style={{ width: 24, height: 24, marginRight: 5 }}
+                />
+              )}
+              <div>{mon.heldItem}</div>
+            </AttributeRow>
+          </Grid>
+          <Grid xs={8} style={styles.attributesList}>
+            <AttributeRow
+              label="Name"
+              value={`${
+                POKEMON_DATA[displayMon.dexNum]?.formes[displayMon.formNum]
+                  ?.formeName
+              } ${
+                displayMon.gender === 2
+                  ? ''
+                  : displayMon.gender === 1
+                  ? '♀'
+                  : '♂'
+              }`}
             />
-          ))}
-        </AttributeRow>
-        <AttributeRow
-          label="OT"
-          value={`${displayMon.trainerName} ${
-            displayMon.trainerGender ? '♀' : '♂'
-          }`}
-        />
-        <AttributeRow
-          label="Trainer ID"
-          value={`${displayMon.displayID
-            .toString()
-            .padStart(
-              ['PK7', 'PK8', 'PA8', 'PK9'].includes(displayMon.format) ? 6 : 5,
-              '0'
-            )}`}
-        />
-        {displayMon.ability !== undefined && (
-          <AttributeRow
-            label="Ability"
-            value={`${displayMon.ability} (${
-              displayMon.abilityNum === 4 ? 'HA' : displayMon.abilityNum
-            })`}
-          />
-        )}
-      </div>
-      <div style={detailsPaneStyle}>
-        <div
-          className="scroll-no-bar"
-          style={{ display: 'flex', flexDirection: 'row', overflowX: 'scroll' }}
-        >
+            <AttributeRow label="Dex No." value={`${displayMon.dexNum}`} />
+            <AttributeRow label="Type">
+              {getTypes(displayMon)?.map((type) => (
+                <TypeIcon type={type} />
+              ))}
+            </AttributeRow>
+            <AttributeRow
+              label="OT"
+              value={`${displayMon.trainerName} ${
+                displayMon.trainerGender ? '♀' : '♂'
+              }`}
+            />
+            <AttributeRow
+              label="Trainer ID"
+              value={`${displayMon.displayID
+                .toString()
+                .padStart(
+                  ['PK7', 'PK8', 'PA8', 'PK9'].includes(displayMon.format)
+                    ? 6
+                    : 5,
+                  '0'
+                )}`}
+            />
+            {displayMon.ability !== undefined && (
+              <AttributeRow
+                label="Ability"
+                value={`${displayMon.ability} (${
+                  displayMon.abilityNum === 4 ? 'HA' : displayMon.abilityNum
+                })`}
+              />
+            )}
+          </Grid>
+        </Grid>
+      </Grid>
+      <Grid item xs={6} style={styles.detailsPane}>
+        <div className="scroll-no-bar" style={styles.detailsTabRow}>
           <OpenHomeButton
-            // @ts-ignore
             style={{
-              ...tabButtonStyle,
+              ...styles.tabButton,
               backgroundColor: tab === 'summary' ? '#fff4' : '#0000',
             }}
             onClick={() => setTab('summary')}
@@ -281,9 +416,8 @@ const PokemonDisplay = (props: {
             Summary
           </OpenHomeButton>
           <OpenHomeButton
-            // @ts-ignore
             style={{
-              ...tabButtonStyle,
+              ...styles.tabButton,
               backgroundColor: tab === 'stats' ? '#fff4' : '#0000',
             }}
             onClick={() => setTab('stats')}
@@ -291,9 +425,8 @@ const PokemonDisplay = (props: {
             Stats
           </OpenHomeButton>
           <OpenHomeButton
-            // @ts-ignore
             style={{
-              ...tabButtonStyle,
+              ...styles.tabButton,
               backgroundColor: tab === 'ribbons' ? '#fff4' : '#0000',
             }}
             onClick={() => setTab('ribbons')}
@@ -301,9 +434,8 @@ const PokemonDisplay = (props: {
             Ribbons
           </OpenHomeButton>
           <OpenHomeButton
-            // @ts-ignore
             style={{
-              ...tabButtonStyle,
+              ...styles.tabButton,
               backgroundColor: tab === 'other' ? '#fff4' : '#0000',
             }}
             onClick={() => setTab('other')}
@@ -311,9 +443,8 @@ const PokemonDisplay = (props: {
             Other
           </OpenHomeButton>
           <OpenHomeButton
-            // @ts-ignore
             style={{
-              ...tabButtonStyle,
+              ...styles.tabButton,
               backgroundColor: tab === 'raw' ? '#fff4' : '#0000',
             }}
             onClick={() => setTab('raw')}
@@ -321,9 +452,9 @@ const PokemonDisplay = (props: {
             Raw
           </OpenHomeButton>
         </div>
-        <div style={detailsPaneScrollContainerStyle} className="scroll-no-bar">
+        <div style={styles.tabScrollContainer} className="scroll-no-bar">
           {tab === 'summary' ? (
-            <SummaryDisplay mon={displayMon} updateMon={updateMon} />
+            <SummaryDisplay mon={displayMon} />
           ) : tab === 'stats' ? (
             <StatsDisplay mon={displayMon} />
           ) : tab === 'ribbons' ? (
@@ -331,28 +462,11 @@ const PokemonDisplay = (props: {
           ) : tab === 'other' ? (
             <OtherDisplay mon={displayMon} />
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-              {_.range(displayMon.bytes.length / 16).map((row: number) => {
-                return (
-                  <code key={`code_row_${row}`}>{`0x${row
-                    .toString(16)
-                    .padStart(3, '0')}0\t${_.range(16)
-                    .map(
-                      (byte: number) =>
-                        displayMon.bytes[
-                          Math.min(row * 16 + byte, displayMon.bytes.length - 1)
-                        ]
-                          .toString(16)
-                          .padStart(2, '0') + (byte % 2 ? ' ' : '')
-                    )
-                    .join('')}`}</code>
-                );
-              })}
-            </div>
+            <RawDisplay bytes={displayMon.bytes} />
           )}
         </div>
-      </div>
-    </div>
+      </Grid>
+    </Grid>
   );
 };
 
