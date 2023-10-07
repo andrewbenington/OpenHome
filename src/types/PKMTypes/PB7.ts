@@ -1,6 +1,5 @@
-import { Items } from '../../consts/Items';
+import { GameOfOrigin, Gen9RibbonsPart1, Items } from '../../consts';
 import { Languages } from '../../consts/Languages';
-import { Gen9RibbonsPart1 } from '../../consts/Ribbons';
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -116,7 +115,7 @@ export class PB7 extends PKM {
         bytesToUint16LittleEndian(bytes, 0x1a)) <
       16;
     this.isSquareShiny =
-      (this.isShiny && this.gameOfOrigin === 34) ||
+      (this.isShiny && this.gameOfOrigin === GameOfOrigin.GO) ||
       (this.trainerID ^
         this.secretID ^
         bytesToUint16LittleEndian(bytes, 0x18) ^

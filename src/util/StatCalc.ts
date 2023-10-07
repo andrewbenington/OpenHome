@@ -1,10 +1,10 @@
 /* eslint-disable no-nested-ternary */
 import { PKM } from 'types/PKMTypes/PKM';
 import { Stat } from 'types/types';
-import { LevelUpExp, POKEMON_DATA, getNatureSummary } from '../consts';
+import { LevelUpExp, NDex, POKEMON_DATA, getNatureSummary } from '../consts';
 
 export const getStatGen3Onward = (stat: Stat, mon: PKM) => {
-  if (mon.dexNum < 1 || mon.dexNum > 1010) {
+  if (mon.dexNum < 1 || mon.dexNum > NDex.MAX) {
     return 0;
   }
   const natureSummary = getNatureSummary(mon.nature);
@@ -30,11 +30,10 @@ export const getStatGen3Onward = (stat: Stat, mon: PKM) => {
 };
 
 export const getHPGen3Onward = (mon: PKM) => {
-  if (mon.dexNum < 1 || mon.dexNum > 1010) {
+  if (mon.dexNum < 1 || mon.dexNum > NDex.MAX) {
     return 0;
   }
-  if (mon.dexNum === 292) {
-    // shedinja
+  if (mon.dexNum === NDex.SHEDINJA) {
     return 1;
   }
   const baseHP = POKEMON_DATA[mon.dexNum]?.formes[mon.formNum]?.baseStats?.hp;
@@ -51,7 +50,7 @@ export const getHPGen3Onward = (mon: PKM) => {
 };
 
 export const getLevelGen3Onward = (dexNum: number, exp: number) => {
-  if (dexNum < 1 || dexNum > 1010) {
+  if (dexNum < 1 || dexNum > NDex.MAX) {
     return 1;
   }
   if (dexNum === 0) {

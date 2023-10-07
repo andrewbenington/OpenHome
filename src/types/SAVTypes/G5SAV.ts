@@ -1,4 +1,4 @@
-import { GameOfOrigin } from 'consts';
+import { GameOfOrigin, NDex } from 'consts';
 import _ from 'lodash';
 import { CRC16_CCITT } from 'util/Encryption';
 import {
@@ -29,7 +29,7 @@ export class G5Box implements Box {
 
 export class G5SAV extends SAV {
   static TRANSFER_RESTRICTIONS = {
-    maxDexNum: 649,
+    maxDexNum: NDex.GENESECT,
     excludedForms: { ...RegionalForms, ...CapPikachus, 483: [1], 484: [1] },
   };
 

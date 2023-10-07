@@ -3,6 +3,7 @@ import {
   GameOfOrigin,
   GameOfOriginData,
   Gen2Items,
+  NDex,
   POKEMON_DATA,
 } from '../../consts';
 import CrystalLocation from '../../consts/MetLocation/Crystal';
@@ -79,7 +80,7 @@ export class PK2 extends PKM {
   }
 
   public get formNum() {
-    if (this.dexNum === 201) {
+    if (this.dexNum === NDex.UNOWN) {
       let ivCombinationVal = ((this.dvs.atk >> 1) & 0b11) << 6;
       ivCombinationVal += ((this.dvs.def >> 1) & 0b11) << 4;
       ivCombinationVal += ((this.dvs.spe >> 1) & 0b11) << 2;

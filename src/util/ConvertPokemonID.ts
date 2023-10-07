@@ -93,6 +93,9 @@ const svToNatMap: { [key: number]: number } = {
   1008: 983,
   1009: 980,
   1010: 979,
+  1011: 1017,
+  1012: 1011,
+  1013: 1012,
 };
 
 const natToSVMap: { [key: number]: number } = {
@@ -188,6 +191,11 @@ const natToSVMap: { [key: number]: number } = {
   1006: 993,
   1007: 998,
   1008: 999,
+  1009: 980,
+  1010: 979,
+  1017: 1011,
+  1011: 1012,
+  1012: 1013,
 };
 
 export const svToNatDex = (svNum: number) => {

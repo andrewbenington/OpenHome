@@ -1,4 +1,4 @@
-import { GameOfOrigin } from 'consts';
+import { GameOfOrigin, NDex } from 'consts';
 import { OHPKM } from 'types/PKMTypes/OHPKM';
 import { CapPikachus, RegionalForms } from 'types/TransferRestrictions';
 import {
@@ -199,7 +199,7 @@ export class G3SaveBackup {
 
 export class G3SAV extends SAV {
   static TRANSFER_RESTRICTIONS = {
-    maxDexNum: 386,
+    maxDexNum: NDex.DEOXYS,
     excludedForms: { ...RegionalForms, ...CapPikachus },
   };
 

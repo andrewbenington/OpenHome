@@ -7,6 +7,7 @@ import {
   Gen3Items,
   Gen3StandardRibbons,
   Languages,
+  NDex,
   POKEMON_DATA,
   isGen3,
   isHoenn,
@@ -245,7 +246,7 @@ export class PK3 extends PKM {
   }
 
   public get formNum() {
-    if (this.dexNum === 201) {
+    if (this.dexNum === NDex.UNOWN) {
       let letterValue = (this.personalityValue >> 24) & 0x3;
       letterValue = ((this.personalityValue >> 16) & 0x3) | (letterValue << 2);
       letterValue = ((this.personalityValue >> 8) & 0x3) | (letterValue << 2);
