@@ -1,3 +1,4 @@
+import { NDex } from 'consts';
 import { CapPikachus, RegionalForms } from 'types/TransferRestrictions';
 import { SaveType } from 'types/types';
 import {
@@ -11,7 +12,7 @@ export class DPSAV extends G4SAV {
   saveType = SaveType.DP;
 
   transferRestrictions = {
-    maxDexNum: 493,
+    maxDexNum: NDex.ARCEUS,
     excludedForms: {
       ...RegionalForms,
       ...CapPikachus,

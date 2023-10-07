@@ -9262,6 +9262,46 @@
     "type": "fairy",
     "id": 900
   },
+  "901": {
+    "name": "Blood Moon",
+    "accuracy": 100,
+    "class": "special",
+    "generation": "generation-ix",
+    "power": 140,
+    "pp": 5,
+    "type": "normal",
+    "id": 901
+  },
+  "902": {
+    "name": "Matcha Gotcha",
+    "accuracy": 90,
+    "class": "special",
+    "generation": "generation-ix",
+    "power": 80,
+    "pp": 15,
+    "type": "grass",
+    "id": 902
+  },
+  "903": {
+    "name": "Syrup Bomb",
+    "accuracy": 85,
+    "class": "special",
+    "generation": "generation-ix",
+    "power": 60,
+    "pp": 10,
+    "type": "grass",
+    "id": 903
+  },
+  "904": {
+    "name": "Ivy Cudgel",
+    "accuracy": 100,
+    "class": "physical",
+    "generation": "generation-ix",
+    "power": 100,
+    "pp": 10,
+    "type": "grass",
+    "id": 904
+  },
   "10001": {
     "name": "Shadow Rush",
     "accuracy": 100,

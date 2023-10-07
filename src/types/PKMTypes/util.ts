@@ -202,7 +202,10 @@ export const formatHasColorMarkings = (format: string) => {
 
 export const getTypes = (mon: PKM) => {
   let types = POKEMON_DATA[mon.dexNum]?.formes[mon.formNum]?.types;
-  if (mon.format === 'PK1' && (mon.dexNum === 81 || mon.dexNum === 82)) {
+  if (
+    mon.format === 'PK1' &&
+    (mon.dexNum === NDex.MAGNEMITE || mon.dexNum === NDex.MAGNETON)
+  ) {
     types = ['Electric'];
   } else if (
     ['PK1', 'PK2', 'PK3', 'COLOPKM', 'XDPKM', 'PK4', 'PK5'].includes(mon.format)

@@ -18,6 +18,7 @@ import {
   Gen34TowerRibbons,
   Items,
   Languages,
+  NDex,
   OpenHomeRibbons,
 } from '../../consts';
 import {
@@ -178,7 +179,7 @@ export class OHPKM extends PKM {
       this.gvs = other.gvs ?? gvsFromIVs(this.ivs);
       if (other.dvs) {
         this.dvs = other.dvs;
-      } else if (other.dexNum === 201) {
+      } else if (other.dexNum === NDex.UNOWN) {
         // unown
         this.dvs = other.ivs
           ? dvsFromIVs(other.ivs, other.isShiny)
@@ -1078,7 +1079,7 @@ export class OHPKM extends PKM {
   }
 
   public get displayID() {
-    return this.gameOfOrigin < 30
+    return this.gameOfOrigin < GameOfOrigin.Sun
       ? this.trainerID
       : bytesToUint32LittleEndian(this.bytes, 0x0c) % 1000000;
   }

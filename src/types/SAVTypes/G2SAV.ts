@@ -95,7 +95,10 @@ export class G2SAV extends SAV {
               monIndex * 11,
             11
           );
-          mon.gameOfOrigin = this.saveType === SaveType.GS_I ? 40 : 41;
+          mon.gameOfOrigin =
+            this.saveType === SaveType.GS_I
+              ? GameOfOrigin.Silver
+              : GameOfOrigin.Crystal;
           mon.language = 'ENG';
           this.boxes[boxNumber].pokemon[monIndex] = mon;
         }

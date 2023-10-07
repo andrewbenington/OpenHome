@@ -9,7 +9,7 @@ with open('../../consts/JSON/Pokemon.json') as f:
     POKEMON_DATA = json.load(f)
 
 def format_pokemon_db_forme(dex_num: int, form_num: int) -> str:
-    if dex_num < 1 or dex_num > 1010:
+    if dex_num < 1 or dex_num > len(POKEMON_DATA):
         return ""
     forme_name = (
         POKEMON_DATA[str(dex_num)]["formes"][form_num]["sprite"]
@@ -342,7 +342,13 @@ sv_transferrable = [
     481, 482, 483, 484, 485, 487, 488, 493, 501, 502, 503, 641, 642, 645, 648, 
     650, 651, 652, 653, 654, 655, 656, 657, 658, 703, 719, 720, 721, 722, 723, 
     724, 801, 810, 811, 812, 813, 814, 815, 816, 817, 818, 863, 888, 889, 890, 
-    891, 892, 893, 894, 895, 896, 897, 898, 899, 900, 901, 902, 903, 904, 905
+    891, 892, 893, 894, 895, 896, 897, 898, 899, 900, 901, 902, 903, 904, 905,
+    23,24,27,28,35,36,37,38,60,61,62,69,70,71,74,75,76,109,110,143,161,162,163,
+    164,173,190,193,207,218,219,220,221,261,262,270,271,272,273,274,275,299,341,
+    313,314,342,349,350,355,356,358,387,388,389,390,391,392,393,394,395,424,433,
+    446,469,472,473,477,532,533,534,540,541,542,580,581,607,608,609,619,620,629,
+    630,708,709,736,737,738,742,742,782,783,784,845,1011,1012,1013,1014,1015,1016,
+    1017
 ]
 
 
@@ -453,6 +459,8 @@ def download_all_sprites_all_mons():
 
 def thread_all_sprite_downloads(dex_number, forme, forme_number):
     if dex_number != 869:
+        if 'sprite' not in forme:
+            print(forme['name'], 'missing sprite')
         thread = threading.Thread(target=download_all_sprites, args=(
             dex_number, forme, forme_number, forme["sprite"]))
         thread.start()
@@ -498,7 +506,7 @@ def download_all_sprites(dex_number, forme, forme_number, forme_name):
     if dex_number <= 724 and not excludeFormeLA(dex_number, forme):
         download_sprite_variants_pokemon_db(
             dex_number, forme_number, forme_name, "legends-arceus", "gen8a")
-    if dex_number <= 1010 and not exclude_forme_gen9(dex_number, forme):
+    if dex_number <= 1017 and not exclude_forme_gen9(dex_number, forme):
         download_sprite_variants_pokemon_db(
             dex_number, forme_number, forme_name, "scarlet-violet", "gen9")
 

@@ -298,4 +298,12 @@ export const Abilities = [
   'Armor Tail',
   'Earth Eater',
   'Mycelium Might',
+  'Hospitality',
+  'Mind’s Eye',
+  'Embody Aspect',
+  'Embody Aspect',
+  'Embody Aspect',
+  'Embody Aspect',
+  'Toxic Chain',
+  'Supersweet Syrup',
 ];

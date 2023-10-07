@@ -1,6 +1,4 @@
-import { Abilities } from '../../consts/Abilities';
-import { Items } from '../../consts/Items';
-import { Languages } from '../../consts/Languages';
+import { Abilities, GameOfOrigin, Items, Languages } from '../../consts';
 import { Gen9RibbonsPart1, Gen9RibbonsPart2 } from '../../consts/Ribbons';
 import {
   bytesToUint16LittleEndian,
@@ -128,7 +126,7 @@ export class PK8 extends PKM {
     };
     this.gameOfOrigin = bytesToUint16LittleEndian(bytes, 0xde);
     this.displayID =
-      this.gameOfOrigin < 31
+      this.gameOfOrigin < GameOfOrigin.Sun
         ? this.trainerID
         : bytesToUint32LittleEndian(bytes, 0x0c) % 1000000;
     let byteArray = new Uint16Array(12);
@@ -179,7 +177,7 @@ export class PK8 extends PKM {
         bytesToUint16LittleEndian(bytes, 0x1e)) <
       16;
     this.isSquareShiny =
-      (this.isShiny && this.gameOfOrigin === 34) ||
+      (this.isShiny && this.gameOfOrigin === GameOfOrigin.GO) ||
       (this.trainerID ^
         this.secretID ^
         bytesToUint16LittleEndian(bytes, 0x1c) ^

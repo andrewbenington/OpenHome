@@ -17,8 +17,8 @@ const styles = {
     textAlign: 'center',
   },
   background: {
-    background: `url(${BoxIcons}) no-repeat 0.027027% 0.027027%`,
-    backgroundSize: '3700%',
+    background: `url(${BoxIcons}) no-repeat 0.02777% 0.02777%`,
+    backgroundSize: '3600%',
     imageRendering: 'crisp-edges',
     height: '100%',
     width: '100%',
@@ -81,18 +81,11 @@ const BoxCell = (props: BoxCellProps) => {
   };
 
   const getBackgroundPosition = (mon: PKM) => {
-    return mon.isEgg || !POKEMON_DATA[mon.dexNum]
-      ? '0% 0%'
-      : `${
-          (POKEMON_DATA[mon.dexNum].formes[mon.formNum].spriteIndex[0] / 36) *
-          100
-        }% ${
-          (Math.floor(
-            POKEMON_DATA[mon.dexNum].formes[mon.formNum].spriteIndex[1]
-          ) /
-            35) *
-          100
-        }%`;
+    if (mon.isEgg || !POKEMON_DATA[mon.dexNum]) {
+      return '0% 0%';
+    }
+    const [x, y] = POKEMON_DATA[mon.dexNum].formes[mon.formNum].spriteIndex;
+    return `${(x / 35) * 100}% ${(y / 36) * 100}%`;
   };
 
   useEffect(() => {

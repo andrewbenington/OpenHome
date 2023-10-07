@@ -1,6 +1,4 @@
-import { Abilities } from '../../consts/Abilities';
-import { Items } from '../../consts/Items';
-import { Languages } from '../../consts/Languages';
+import { Abilities, GameOfOrigin, Items, Languages } from '../../consts';
 import { Gen9RibbonsPart1, Gen9RibbonsPart2 } from '../../consts/Ribbons';
 import {
   bytesToUint16LittleEndian,
@@ -51,14 +49,6 @@ export class PK9 extends PKM {
     this.teraTypeOriginal = bytes[0x94];
     this.teraTypeOverride = bytes[0x95];
     this.level = getLevelGen3Onward(this.dexNum, this.exp);
-    this.stats = {
-      hp: bytesToUint16LittleEndian(bytes, 0x14a),
-      atk: bytesToUint16LittleEndian(bytes, 0x14c),
-      def: bytesToUint16LittleEndian(bytes, 0x14e),
-      spe: bytesToUint16LittleEndian(bytes, 0x150),
-      spa: bytesToUint16LittleEndian(bytes, 0x152),
-      spd: bytesToUint16LittleEndian(bytes, 0x154),
-    };
     const ivBytes = bytesToUint32LittleEndian(bytes, 0x8c);
     this.ivs = {
       hp: ivBytes & 0x1f,
@@ -132,7 +122,7 @@ export class PK9 extends PKM {
       16;
 
     this.isSquareShiny =
-      (this.isShiny && this.gameOfOrigin === 34) ||
+      (this.isShiny && this.gameOfOrigin === GameOfOrigin.GO) ||
       (this.trainerID ^
         this.secretID ^
         bytesToUint16LittleEndian(bytes, 0x00) ^
@@ -203,5 +193,21 @@ export class PK9 extends PKM {
     if (index > -1) {
       this.bytes[0xd5] = index;
     }
+  }
+
+  public get handlerFriendship() {
+    return this.bytes[0xc8];
+  }
+
+  public set handlerFriendship(value: number) {
+    this.bytes[0xc8] = value;
+  }
+
+  public get trainerFriendship() {
+    return this.bytes[0x112];
+  }
+
+  public set trainerFriendship(value: number) {
+    this.bytes[0x112] = value;
   }
 }
