@@ -5671,7 +5671,14 @@
         "paradox": false,
         "cosmeticForme": false,
         "sprite": "gengar",
-        "spriteIndex": [26, 3]
+        "spriteIndex": [26, 3],
+        "pastAbilities": [
+          {
+            "number": "ability1",
+            "ability": "Levitate",
+            "until": 7
+          }
+        ]
       },
       {
         "name": "Gengar",
@@ -15949,7 +15956,7 @@
           "spe": 80
         },
         "ability1": "Chlorophyll",
-        "ability2": "Early Bird",
+        "ability2": "Wind Rider",
         "abilityH": "Pickpocket",
         "height": 1.3,
         "weight": 59.6,
@@ -15964,7 +15971,14 @@
         "paradox": false,
         "cosmeticForme": false,
         "sprite": "shiftry",
-        "spriteIndex": [18, 10]
+        "spriteIndex": [18, 10],
+        "pastAbilities": [
+          {
+            "number": "ability2",
+            "ability": "Early Bird",
+            "until": 9
+          }
+        ]
       }
     ],
     "levelUpType": "Medium Slow"
@@ -25967,6 +25981,7 @@
           "spe": 80
         },
         "ability1": "Steadfast",
+        "ability2": "Sharpness",
         "abilityH": "Justified",
         "height": 1.6,
         "weight": 52.0,
@@ -25976,7 +25991,6 @@
         "gen": 4,
         "baseFriendship": 35,
         "evYield": { "atk": 3 },
-        "ability2": "Sharpness",
         "restrictedLegendary": false,
         "subLegendary": false,
         "mythical": false,
@@ -25984,7 +25998,14 @@
         "paradox": false,
         "cosmeticForme": false,
         "sprite": "gallade",
-        "spriteIndex": [2, 17]
+        "spriteIndex": [2, 17],
+        "pastAbilities": [
+          {
+            "number": "ability2",
+            "ability": null,
+            "until": 9
+          }
+        ]
       },
       {
         "name": "Gallade",
@@ -58702,6 +58723,8 @@
         "isMythical": false,
         "height": 0.4,
         "weight": 9.7,
+        "evos": [],
+        "eggGroups": ["Grass", "Dragon"],
         "baseFriendship": 0,
         "genderRatio": { "M": 0, "F": 0 },
         "gen": 9,
@@ -58744,6 +58767,7 @@
         "genderRatio": { "M": 0, "F": 0 },
         "gen": 9,
         "evos": [{ "dexNumber": 1013, "formeNumber": 0 }],
+        "eggGroups": ["Mineral", "Amorphous"],
         "baseStats": {
           "hp": 40,
           "atk": 45,
@@ -58780,6 +58804,8 @@
         "baseFriendship": 0,
         "genderRatio": { "M": 0, "F": 0 },
         "gen": 9,
+        "evos": [],
+        "eggGroups": ["Mineral", "Amorphous"],
         "prevo": { "dexNumber": 1012, "formeNumber": 0 },
         "baseStats": {
           "hp": 71,
@@ -58817,6 +58843,8 @@
         "baseFriendship": 0,
         "genderRatio": { "M": 0, "F": 0 },
         "gen": 9,
+        "evos": [],
+        "eggGroups": ["Undiscovered"],
         "baseStats": {
           "hp": 88,
           "atk": 128,
@@ -58853,6 +58881,8 @@
         "baseFriendship": 0,
         "genderRatio": { "M": 0, "F": 0 },
         "gen": 9,
+        "evos": [],
+        "eggGroups": ["Undiscovered"],
         "baseStats": {
           "hp": 88,
           "atk": 75,
@@ -58889,6 +58919,8 @@
         "baseFriendship": 0,
         "genderRatio": { "M": 0, "F": 0 },
         "gen": 9,
+        "evos": [],
+        "eggGroups": ["Undiscovered"],
         "baseStats": {
           "hp": 88,
           "atk": 91,
@@ -58925,6 +58957,8 @@
         "baseFriendship": 0,
         "genderRatio": { "M": 0, "F": 0 },
         "gen": 9,
+        "evos": [],
+        "eggGroups": ["Undiscovered"],
         "baseStats": {
           "hp": 80,
           "atk": 120,
