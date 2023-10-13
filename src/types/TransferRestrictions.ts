@@ -1,21 +1,21 @@
-import { LGE_STARTER, LGP_STARTER } from 'consts/Formes';
-import { NDex } from 'consts/NationalDex';
+import { LGE_STARTER, LGP_STARTER } from 'consts/Formes'
+import { NDex } from 'consts/NationalDex'
 
 interface FormRestrictions {
-  [dexNum: number]: number[] | undefined;
+  [dexNum: number]: number[] | undefined
 }
 
 export interface TransferRestrictions {
   // games up to USUM include all up to one number
-  maxDexNum?: number;
+  maxDexNum?: number
   // games LGPE and on have noncontiguous dex numbers transferable
-  transferableDexNums?: number[];
+  transferableDexNums?: number[]
   // e.g. Alolan forms in BDSP
-  excludedForms?: FormRestrictions;
+  excludedForms?: FormRestrictions
 }
 export const CapPikachus: FormRestrictions = {
   [NDex.PIKACHU]: [1, 2, 3, 4, 5, 6, 7, 9],
-};
+}
 
 export const AlolanForms: FormRestrictions = {
   [NDex.RATTATA]: [1],
@@ -36,7 +36,7 @@ export const AlolanForms: FormRestrictions = {
   [NDex.MUK]: [1],
   [NDex.EXEGGUTOR]: [1],
   [NDex.MAROWAK]: [1],
-};
+}
 
 export const GalarianForms: FormRestrictions = {
   [NDex.MEOWTH]: [2],
@@ -57,7 +57,7 @@ export const GalarianForms: FormRestrictions = {
   [NDex.DARMANITAN]: [2, 3],
   [NDex.YAMASK]: [1],
   [NDex.STUNFISK]: [1],
-};
+}
 
 export const HisuianForms: FormRestrictions = {
   [NDex.GROWLITHE]: [1],
@@ -77,12 +77,12 @@ export const HisuianForms: FormRestrictions = {
   [NDex.GOODRA]: [1],
   [NDex.AVALUGG]: [1],
   [NDex.DECIDUEYE]: [1],
-};
+}
 
 export const PaldeanForms: FormRestrictions = {
   [NDex.TAUROS]: [1, 2, 3],
   [NDex.WOOPER]: [1],
-};
+}
 
 export const TransferLockedForms: FormRestrictions = {
   [NDex.PIKACHU]: [LGP_STARTER],
@@ -90,7 +90,7 @@ export const TransferLockedForms: FormRestrictions = {
   [NDex.KYUREM]: [1, 2],
   [NDex.NECROZMA]: [1, 2],
   [NDex.CALYREX]: [1, 2],
-};
+}
 
 export const LegendsArceusExcludedForms: FormRestrictions = {
   ...AlolanForms,
@@ -114,39 +114,39 @@ export const LegendsArceusExcludedForms: FormRestrictions = {
   [NDex.GOODRA]: [0],
   [NDex.AVALUGG]: [0],
   [NDex.DECIDUEYE]: [0],
-};
+}
 
 export const Gen89RegionalForms: FormRestrictions = {
   ...GalarianForms,
   ...HisuianForms,
   ...PaldeanForms,
-};
+}
 
 export const RegionalForms: FormRestrictions = {
   ...Gen89RegionalForms,
   ...AlolanForms,
   // combine meowth form lists
   [NDex.MEOWTH]: [1, 2],
-};
+}
 
 export const isRestricted = (
   restrictions: TransferRestrictions,
   dexNum: number,
   formNum: number
 ) => {
-  const { maxDexNum, transferableDexNums, excludedForms } = restrictions;
+  const { maxDexNum, transferableDexNums, excludedForms } = restrictions
   if (maxDexNum && dexNum > maxDexNum) {
-    return true;
+    return true
   }
   if (transferableDexNums && !transferableDexNums.includes(dexNum)) {
-    return true;
+    return true
   }
   if (
     excludedForms &&
     excludedForms[dexNum] &&
     excludedForms[dexNum]?.includes(formNum)
   ) {
-    return true;
+    return true
   }
-  return false;
-};
+  return false
+}

@@ -1,28 +1,28 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import { ArrowForwardIosSharp } from '@mui/icons-material';
-import Accordion from '@mui/material/Accordion';
-import AccordionSummary from '@mui/material/AccordionSummary';
-import { Countries, NDex, SWEETS, isAlola, isGen6 } from 'consts';
+import { ArrowForwardIosSharp } from '@mui/icons-material'
+import Accordion from '@mui/material/Accordion'
+import AccordionSummary from '@mui/material/AccordionSummary'
+import { Countries, NDex, SWEETS, isAlola, isGen6 } from 'consts'
 import {
   GEN2_TRANSFER_RESTRICTIONS,
   HGSS_TRANSFER_RESTRICTIONS,
-} from 'consts/TransferRestrictions';
-import DynamaxLevel from 'renderer/components/DynamaxLevel';
-import ShinyLeaves from 'renderer/components/ShinyLeaves';
-import TypeIcon from 'renderer/components/TypeIcon';
-import { OHPKM, PK1, PK2, PK3, PK4, PK5, PKM } from 'types/PKMTypes';
-import { isRestricted } from 'types/TransferRestrictions';
-import { Styles } from 'types/types';
+} from 'consts/TransferRestrictions'
+import DynamaxLevel from 'renderer/components/DynamaxLevel'
+import ShinyLeaves from 'renderer/components/ShinyLeaves'
+import TypeIcon from 'renderer/components/TypeIcon'
+import { OHPKM, PK1, PK2, PK3, PK4, PK5, PKM } from 'types/PKMTypes'
+import { isRestricted } from 'types/TransferRestrictions'
+import { Styles } from 'types/types'
 import {
   getMonFileIdentifier,
   getMonGen12Identifier,
   getMonGen345Identifier,
-} from 'util/Lookup';
-import Alpha from '../images/icons/Alpha.png';
-import GMax from '../images/icons/GMax.png';
-import { getTypeColor } from '../util/PokemonSprite';
-import AttributeRow from './AttributeRow';
-import AttributeTag from './AttributeTag';
+} from 'util/Lookup'
+import Alpha from '../images/icons/Alpha.png'
+import GMax from '../images/icons/GMax.png'
+import { getTypeColor } from '../util/PokemonSprite'
+import AttributeRow from './AttributeRow'
+import AttributeTag from './AttributeTag'
 
 const styles = {
   accordion: {
@@ -57,10 +57,10 @@ const styles = {
     height: 'calc(100% - 20px)',
     padding: 10,
   },
-} as Styles;
+} as Styles
 
 const OtherDisplay = (props: { mon: PKM }) => {
-  const { mon } = props;
+  const { mon } = props
   return (
     <div style={styles.detailsPaneContent}>
       {mon.personalityValue !== undefined ? (
@@ -342,6 +342,6 @@ const OtherDisplay = (props: { mon: PKM }) => {
         )}
       </div>
     </div>
-  );
-};
-export default OtherDisplay;
+  )
+}
+export default OtherDisplay

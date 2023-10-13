@@ -1,4 +1,4 @@
-import { GameLocations } from '../../types/types';
+import { GameLocations } from '../../types/types'
 
 const LALocations: GameLocations = {
   0: [
@@ -184,6 +184,6 @@ const LALocations: GameLocations = {
     'the Hisui region',
     'the Sinnoh region',
   ],
-};
+}
 
-export default LALocations;
+export default LALocations

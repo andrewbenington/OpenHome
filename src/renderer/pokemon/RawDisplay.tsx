@@ -1,12 +1,12 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import _ from 'lodash';
+import _ from 'lodash'
 
 interface RawDisplayProps {
-  bytes: Uint8Array;
+  bytes: Uint8Array
 }
 
 const RawDisplay = (props: RawDisplayProps) => {
-  const { bytes } = props;
+  const { bytes } = props
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
       {_.range(bytes.length / 16).map((row: number) => {
@@ -21,9 +21,9 @@ const RawDisplay = (props: RawDisplayProps) => {
                   .padStart(2, '0') + (byte % 2 ? ' ' : '')
             )
             .join('')}`}</code>
-        );
+        )
       })}
     </div>
-  );
-};
-export default RawDisplay;
+  )
+}
+export default RawDisplay

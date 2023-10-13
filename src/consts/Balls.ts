@@ -37,7 +37,7 @@ export const Balls = [
   'Leaden Ball',
   'Gigaton Ball',
   'Origin Ball',
-];
+]
 
 export enum Ball {
   INVALID,

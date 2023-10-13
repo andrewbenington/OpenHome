@@ -1,16 +1,16 @@
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { SAV } from 'types/SAVTypes';
-import { SaveRefMap } from 'types/types';
-import { RootState } from '../state';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { SAV } from 'types/SAVTypes'
+import { SaveRefMap } from 'types/types'
+import { RootState } from '../state'
 
-const initialState: SaveRefMap = {};
+const initialState: SaveRefMap = {}
 
 export const loadRecentSaves = createAsyncThunk(
   'recentSaves/load',
   async () => {
-    return window.electron.ipcRenderer.invoke('read-recent-saves');
+    return window.electron.ipcRenderer.invoke('read-recent-saves')
   }
-);
+)
 
 export const recentSavesSlice = createSlice({
   name: 'recentSaves',
@@ -18,27 +18,27 @@ export const recentSavesSlice = createSlice({
   reducers: {
     upsertRecentSave: (state, action: PayloadAction<SAV>) => {
       if (!action.payload.filePath) {
-        return;
+        return
       }
-      const saveRef = action.payload.getSaveRef();
-      window.electron.ipcRenderer.sendMessage('add-recent-save', saveRef);
-      state[action.payload.filePath] = saveRef;
+      const saveRef = action.payload.getSaveRef()
+      window.electron.ipcRenderer.sendMessage('add-recent-save', saveRef)
+      state[action.payload.filePath] = saveRef
     },
     removeRecentSave: (state, action: PayloadAction<string>) => {
-      const filePath = action.payload;
-      window.electron.ipcRenderer.sendMessage('remove-recent-save', filePath);
-      delete state[filePath];
+      const filePath = action.payload
+      window.electron.ipcRenderer.sendMessage('remove-recent-save', filePath)
+      delete state[filePath]
     },
   },
   extraReducers: (builder) => {
     builder.addCase(loadRecentSaves.fulfilled, (state, action) => {
-      Object.assign(state, action.payload);
-    });
+      Object.assign(state, action.payload)
+    })
   },
-});
+})
 
-export const { upsertRecentSave, removeRecentSave } = recentSavesSlice.actions;
+export const { upsertRecentSave, removeRecentSave } = recentSavesSlice.actions
 
-export const selectRecentSaves = (state: RootState) => state.recentSaves;
+export const selectRecentSaves = (state: RootState) => state.recentSaves
 
-export default recentSavesSlice.reducer;
+export default recentSavesSlice.reducer

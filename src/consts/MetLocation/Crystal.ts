@@ -129,5 +129,5 @@ const CrystalLocation = {
     "Can't Tell",
     'Event',
   ],
-};
-export default CrystalLocation;
+}
+export default CrystalLocation

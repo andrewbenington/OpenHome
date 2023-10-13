@@ -6,7 +6,7 @@ export const moveCardStyle = {
   display: 'flex' as 'flex',
   flexDirection: 'column' as 'column',
   justifyContent: 'center' as 'center',
-};
+}
 
 const styles = {
   detailsPane: {
@@ -35,6 +35,6 @@ const styles = {
     width: '100%',
     height: '100%',
   },
-};
+}
 
-export default styles;
+export default styles

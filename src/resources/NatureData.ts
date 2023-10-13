@@ -1,4 +1,4 @@
-import { Nature } from './gen/other/Natures';
+import { Nature } from './gen/other/Natures'
 
 const NatureData = [
   {
@@ -276,11 +276,11 @@ const NatureData = [
     summary: '+Spe, -Atk',
     genfamily: ['RS', 'DP', 'BW', 'XY'],
   },
-];
+]
 
 export const getNatureSummary = (nature?: Nature) => {
   if (nature === undefined) {
-    return '';
+    return ''
   }
-  return NatureData[nature]?.summary;
-};
+  return NatureData[nature]?.summary
+}

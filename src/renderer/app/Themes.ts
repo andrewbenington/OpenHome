@@ -1,8 +1,8 @@
 export interface OpenHomeTheme {
-  name: string;
-  backgroundColor: string;
-  borderColor: string;
-  contentColor: string;
+  name: string
+  backgroundColor: string
+  borderColor: string
+  contentColor: string
 }
 
 const Themes: OpenHomeTheme[] = [
@@ -18,6 +18,6 @@ const Themes: OpenHomeTheme[] = [
     borderColor: '#DE0D92',
     contentColor: '#686993',
   },
-];
+]
 
-export default Themes;
+export default Themes

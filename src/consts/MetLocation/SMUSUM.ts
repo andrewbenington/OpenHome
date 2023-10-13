@@ -1,4 +1,4 @@
-import { GameLocations } from '../../types/types';
+import { GameLocations } from '../../types/types'
 
 const SMUSUMLocations: GameLocations = {
   0: [
@@ -354,6 +354,6 @@ const SMUSUMLocations: GameLocations = {
     'a treasure hunter',
     'an old hot-springs visitor',
   ],
-};
+}
 
-export default SMUSUMLocations;
+export default SMUSUMLocations

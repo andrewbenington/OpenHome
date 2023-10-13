@@ -1,12 +1,12 @@
-import { Card } from '@mui/material';
+import { Card } from '@mui/material'
 
 const AttributeTag = (props: {
-  color: string;
-  backgroundColor: string;
-  label?: string;
-  icon?: string;
+  color: string
+  backgroundColor: string
+  label?: string
+  icon?: string
 }) => {
-  const { color, backgroundColor, label, icon } = props;
+  const { color, backgroundColor, label, icon } = props
   return (
     <Card
       style={{
@@ -32,6 +32,6 @@ const AttributeTag = (props: {
         label ?? ''
       )}
     </Card>
-  );
-};
-export default AttributeTag;
+  )
+}
+export default AttributeTag

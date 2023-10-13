@@ -1,4 +1,4 @@
-import { GameLocations } from '../../types/types';
+import { GameLocations } from '../../types/types'
 
 const G5Locations: GameLocations = {
   0: [
@@ -288,6 +288,6 @@ const G5Locations: GameLocations = {
     'Event Site',
   ],
   60000: ['', 'Stranger', 'Day-Care Couple', 'Pokémon Breeder'],
-};
+}
 
-export default G5Locations;
+export default G5Locations

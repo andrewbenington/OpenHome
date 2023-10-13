@@ -1134,4 +1134,4 @@ export const Forms = [
   'Cornerstone',
   'Artisan',
   'Masterpiece',
-];
+]

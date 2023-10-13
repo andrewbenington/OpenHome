@@ -2487,9384 +2487,9384 @@ export enum Item {
 export function ItemToString(item: Item): string {
   switch (item) {
     case Item.None:
-      return 'None';
+      return 'None'
     case Item.MasterBall:
-      return 'Master Ball';
+      return 'Master Ball'
     case Item.UltraBall:
-      return 'Ultra Ball';
+      return 'Ultra Ball'
     case Item.GreatBall:
-      return 'Great Ball';
+      return 'Great Ball'
     case Item.PokeBall:
-      return 'Pok\u00E9 Ball';
+      return 'Pok\u00E9 Ball'
     case Item.SafariBall:
-      return 'Safari Ball';
+      return 'Safari Ball'
     case Item.NetBall:
-      return 'Net Ball';
+      return 'Net Ball'
     case Item.DiveBall:
-      return 'Dive Ball';
+      return 'Dive Ball'
     case Item.NestBall:
-      return 'Nest Ball';
+      return 'Nest Ball'
     case Item.RepeatBall:
-      return 'Repeat Ball';
+      return 'Repeat Ball'
     case Item.TimerBall:
-      return 'Timer Ball';
+      return 'Timer Ball'
     case Item.LuxuryBall:
-      return 'Luxury Ball';
+      return 'Luxury Ball'
     case Item.PremierBall:
-      return 'Premier Ball';
+      return 'Premier Ball'
     case Item.DuskBall:
-      return 'Dusk Ball';
+      return 'Dusk Ball'
     case Item.HealBall:
-      return 'Heal Ball';
+      return 'Heal Ball'
     case Item.QuickBall:
-      return 'Quick Ball';
+      return 'Quick Ball'
     case Item.CherishBall:
-      return 'Cherish Ball';
+      return 'Cherish Ball'
     case Item.Potion:
-      return 'Potion';
+      return 'Potion'
     case Item.Antidote:
-      return 'Antidote';
+      return 'Antidote'
     case Item.BurnHeal:
-      return 'Burn Heal';
+      return 'Burn Heal'
     case Item.IceHeal:
-      return 'Ice Heal';
+      return 'Ice Heal'
     case Item.Awakening:
-      return 'Awakening';
+      return 'Awakening'
     case Item.ParalyzeHeal:
-      return 'Paralyze Heal';
+      return 'Paralyze Heal'
     case Item.FullRestore:
-      return 'Full Restore';
+      return 'Full Restore'
     case Item.MaxPotion:
-      return 'Max Potion';
+      return 'Max Potion'
     case Item.HyperPotion:
-      return 'Hyper Potion';
+      return 'Hyper Potion'
     case Item.SuperPotion:
-      return 'Super Potion';
+      return 'Super Potion'
     case Item.FullHeal:
-      return 'Full Heal';
+      return 'Full Heal'
     case Item.Revive:
-      return 'Revive';
+      return 'Revive'
     case Item.MaxRevive:
-      return 'Max Revive';
+      return 'Max Revive'
     case Item.FreshWater:
-      return 'Fresh Water';
+      return 'Fresh Water'
     case Item.SodaPop:
-      return 'Soda Pop';
+      return 'Soda Pop'
     case Item.Lemonade:
-      return 'Lemonade';
+      return 'Lemonade'
     case Item.MoomooMilk:
-      return 'Moomoo Milk';
+      return 'Moomoo Milk'
     case Item.EnergyPowder:
-      return 'Energy Powder';
+      return 'Energy Powder'
     case Item.EnergyRoot:
-      return 'Energy Root';
+      return 'Energy Root'
     case Item.HealPowder:
-      return 'Heal Powder';
+      return 'Heal Powder'
     case Item.RevivalHerb:
-      return 'Revival Herb';
+      return 'Revival Herb'
     case Item.Ether:
-      return 'Ether';
+      return 'Ether'
     case Item.MaxEther:
-      return 'Max Ether';
+      return 'Max Ether'
     case Item.Elixir:
-      return 'Elixir';
+      return 'Elixir'
     case Item.MaxElixir:
-      return 'Max Elixir';
+      return 'Max Elixir'
     case Item.LavaCookie:
-      return 'Lava Cookie';
+      return 'Lava Cookie'
     case Item.BerryJuice:
-      return 'Berry Juice';
+      return 'Berry Juice'
     case Item.SacredAsh:
-      return 'Sacred Ash';
+      return 'Sacred Ash'
     case Item.HPUp:
-      return 'HP Up';
+      return 'HP Up'
     case Item.Protein:
-      return 'Protein';
+      return 'Protein'
     case Item.Iron:
-      return 'Iron';
+      return 'Iron'
     case Item.Carbos:
-      return 'Carbos';
+      return 'Carbos'
     case Item.Calcium:
-      return 'Calcium';
+      return 'Calcium'
     case Item.RareCandy:
-      return 'Rare Candy';
+      return 'Rare Candy'
     case Item.PPUp:
-      return 'PP Up';
+      return 'PP Up'
     case Item.Zinc:
-      return 'Zinc';
+      return 'Zinc'
     case Item.PPMax:
-      return 'PP Max';
+      return 'PP Max'
     case Item.OldGateau:
-      return 'Old Gateau';
+      return 'Old Gateau'
     case Item.GuardSpec:
-      return 'Guard Spec.';
+      return 'Guard Spec.'
     case Item.DireHit:
-      return 'Dire Hit';
+      return 'Dire Hit'
     case Item.XAttack:
-      return 'X Attack';
+      return 'X Attack'
     case Item.XDefense:
-      return 'X Defense';
+      return 'X Defense'
     case Item.XSpeed:
-      return 'X Speed';
+      return 'X Speed'
     case Item.XAccuracy:
-      return 'X Accuracy';
+      return 'X Accuracy'
     case Item.XSpAtk:
-      return 'X Sp. Atk';
+      return 'X Sp. Atk'
     case Item.XSpDef:
-      return 'X Sp. Def';
+      return 'X Sp. Def'
     case Item.PokeDoll:
-      return 'Pok\u00E9 Doll';
+      return 'Pok\u00E9 Doll'
     case Item.FluffyTail:
-      return 'Fluffy Tail';
+      return 'Fluffy Tail'
     case Item.BlueFlute:
-      return 'Blue Flute';
+      return 'Blue Flute'
     case Item.YellowFlute:
-      return 'Yellow Flute';
+      return 'Yellow Flute'
     case Item.RedFlute:
-      return 'Red Flute';
+      return 'Red Flute'
     case Item.BlackFlute:
-      return 'Black Flute';
+      return 'Black Flute'
     case Item.WhiteFlute:
-      return 'White Flute';
+      return 'White Flute'
     case Item.ShoalSalt:
-      return 'Shoal Salt';
+      return 'Shoal Salt'
     case Item.ShoalShell:
-      return 'Shoal Shell';
+      return 'Shoal Shell'
     case Item.RedShard:
-      return 'Red Shard';
+      return 'Red Shard'
     case Item.BlueShard:
-      return 'Blue Shard';
+      return 'Blue Shard'
     case Item.YellowShard:
-      return 'Yellow Shard';
+      return 'Yellow Shard'
     case Item.GreenShard:
-      return 'Green Shard';
+      return 'Green Shard'
     case Item.SuperRepel:
-      return 'Super Repel';
+      return 'Super Repel'
     case Item.MaxRepel:
-      return 'Max Repel';
+      return 'Max Repel'
     case Item.EscapeRope:
-      return 'Escape Rope';
+      return 'Escape Rope'
     case Item.Repel:
-      return 'Repel';
+      return 'Repel'
     case Item.SunStone:
-      return 'Sun Stone';
+      return 'Sun Stone'
     case Item.MoonStone:
-      return 'Moon Stone';
+      return 'Moon Stone'
     case Item.FireStone:
-      return 'Fire Stone';
+      return 'Fire Stone'
     case Item.ThunderStone:
-      return 'Thunder Stone';
+      return 'Thunder Stone'
     case Item.WaterStone:
-      return 'Water Stone';
+      return 'Water Stone'
     case Item.LeafStone:
-      return 'Leaf Stone';
+      return 'Leaf Stone'
     case Item.TinyMushroom:
-      return 'Tiny Mushroom';
+      return 'Tiny Mushroom'
     case Item.BigMushroom:
-      return 'Big Mushroom';
+      return 'Big Mushroom'
     case Item.Pearl:
-      return 'Pearl';
+      return 'Pearl'
     case Item.BigPearl:
-      return 'Big Pearl';
+      return 'Big Pearl'
     case Item.Stardust:
-      return 'Stardust';
+      return 'Stardust'
     case Item.StarPiece:
-      return 'Star Piece';
+      return 'Star Piece'
     case Item.Nugget:
-      return 'Nugget';
+      return 'Nugget'
     case Item.HeartScale:
-      return 'Heart Scale';
+      return 'Heart Scale'
     case Item.Honey:
-      return 'Honey';
+      return 'Honey'
     case Item.GrowthMulch:
-      return 'Growth Mulch';
+      return 'Growth Mulch'
     case Item.DampMulch:
-      return 'Damp Mulch';
+      return 'Damp Mulch'
     case Item.StableMulch:
-      return 'Stable Mulch';
+      return 'Stable Mulch'
     case Item.GooeyMulch:
-      return 'Gooey Mulch';
+      return 'Gooey Mulch'
     case Item.RootFossil:
-      return 'Root Fossil';
+      return 'Root Fossil'
     case Item.ClawFossil:
-      return 'Claw Fossil';
+      return 'Claw Fossil'
     case Item.HelixFossil:
-      return 'Helix Fossil';
+      return 'Helix Fossil'
     case Item.DomeFossil:
-      return 'Dome Fossil';
+      return 'Dome Fossil'
     case Item.OldAmber:
-      return 'Old Amber';
+      return 'Old Amber'
     case Item.ArmorFossil:
-      return 'Armor Fossil';
+      return 'Armor Fossil'
     case Item.SkullFossil:
-      return 'Skull Fossil';
+      return 'Skull Fossil'
     case Item.RareBone:
-      return 'Rare Bone';
+      return 'Rare Bone'
     case Item.ShinyStone:
-      return 'Shiny Stone';
+      return 'Shiny Stone'
     case Item.DuskStone:
-      return 'Dusk Stone';
+      return 'Dusk Stone'
     case Item.DawnStone:
-      return 'Dawn Stone';
+      return 'Dawn Stone'
     case Item.OvalStone:
-      return 'Oval Stone';
+      return 'Oval Stone'
     case Item.OddKeystone:
-      return 'Odd Keystone';
+      return 'Odd Keystone'
     case Item.GriseousOrb:
-      return 'Griseous Orb';
+      return 'Griseous Orb'
     case Item.Tea:
-      return 'Tea';
+      return 'Tea'
     case Item.Unknown:
-      return '???';
+      return '???'
     case Item.Autograph:
-      return 'Autograph';
+      return 'Autograph'
     case Item.DouseDrive:
-      return 'Douse Drive';
+      return 'Douse Drive'
     case Item.ShockDrive:
-      return 'Shock Drive';
+      return 'Shock Drive'
     case Item.BurnDrive:
-      return 'Burn Drive';
+      return 'Burn Drive'
     case Item.ChillDrive:
-      return 'Chill Drive';
+      return 'Chill Drive'
     case Item.Unknown_1:
-      return '???';
+      return '???'
     case Item.PokemonBoxLink:
-      return 'Pok\u00E9mon Box Link';
+      return 'Pok\u00E9mon Box Link'
     case Item.MedicinePocket:
-      return 'Medicine Pocket';
+      return 'Medicine Pocket'
     case Item.TMCase:
-      return 'TM Case';
+      return 'TM Case'
     case Item.CandyJar:
-      return 'Candy Jar';
+      return 'Candy Jar'
     case Item.PowerUpPocket:
-      return 'Power-Up Pocket';
+      return 'Power-Up Pocket'
     case Item.ClothingTrunk:
-      return 'Clothing Trunk';
+      return 'Clothing Trunk'
     case Item.CatchingPocket:
-      return 'Catching Pocket';
+      return 'Catching Pocket'
     case Item.BattlePocket:
-      return 'Battle Pocket';
+      return 'Battle Pocket'
     case Item.Unknown_2:
-      return '???';
+      return '???'
     case Item.Unknown_3:
-      return '???';
+      return '???'
     case Item.Unknown_4:
-      return '???';
+      return '???'
     case Item.Unknown_5:
-      return '???';
+      return '???'
     case Item.Unknown_6:
-      return '???';
+      return '???'
     case Item.SweetHeart:
-      return 'Sweet Heart';
+      return 'Sweet Heart'
     case Item.AdamantOrb:
-      return 'Adamant Orb';
+      return 'Adamant Orb'
     case Item.LustrousOrb:
-      return 'Lustrous Orb';
+      return 'Lustrous Orb'
     case Item.GreetMail:
-      return 'Greet Mail';
+      return 'Greet Mail'
     case Item.FavoredMail:
-      return 'Favored Mail';
+      return 'Favored Mail'
     case Item.RSVPMail:
-      return 'RSVP Mail';
+      return 'RSVP Mail'
     case Item.ThanksMail:
-      return 'Thanks Mail';
+      return 'Thanks Mail'
     case Item.InquiryMail:
-      return 'Inquiry Mail';
+      return 'Inquiry Mail'
     case Item.LikeMail:
-      return 'Like Mail';
+      return 'Like Mail'
     case Item.ReplyMail:
-      return 'Reply Mail';
+      return 'Reply Mail'
     case Item.BridgeMailS:
-      return 'Bridge Mail S';
+      return 'Bridge Mail S'
     case Item.BridgeMailD:
-      return 'Bridge Mail D';
+      return 'Bridge Mail D'
     case Item.BridgeMailT:
-      return 'Bridge Mail T';
+      return 'Bridge Mail T'
     case Item.BridgeMailV:
-      return 'Bridge Mail V';
+      return 'Bridge Mail V'
     case Item.BridgeMailM:
-      return 'Bridge Mail M';
+      return 'Bridge Mail M'
     case Item.CheriBerry:
-      return 'Cheri Berry';
+      return 'Cheri Berry'
     case Item.ChestoBerry:
-      return 'Chesto Berry';
+      return 'Chesto Berry'
     case Item.PechaBerry:
-      return 'Pecha Berry';
+      return 'Pecha Berry'
     case Item.RawstBerry:
-      return 'Rawst Berry';
+      return 'Rawst Berry'
     case Item.AspearBerry:
-      return 'Aspear Berry';
+      return 'Aspear Berry'
     case Item.LeppaBerry:
-      return 'Leppa Berry';
+      return 'Leppa Berry'
     case Item.OranBerry:
-      return 'Oran Berry';
+      return 'Oran Berry'
     case Item.PersimBerry:
-      return 'Persim Berry';
+      return 'Persim Berry'
     case Item.LumBerry:
-      return 'Lum Berry';
+      return 'Lum Berry'
     case Item.SitrusBerry:
-      return 'Sitrus Berry';
+      return 'Sitrus Berry'
     case Item.FigyBerry:
-      return 'Figy Berry';
+      return 'Figy Berry'
     case Item.WikiBerry:
-      return 'Wiki Berry';
+      return 'Wiki Berry'
     case Item.MagoBerry:
-      return 'Mago Berry';
+      return 'Mago Berry'
     case Item.AguavBerry:
-      return 'Aguav Berry';
+      return 'Aguav Berry'
     case Item.IapapaBerry:
-      return 'Iapapa Berry';
+      return 'Iapapa Berry'
     case Item.RazzBerry:
-      return 'Razz Berry';
+      return 'Razz Berry'
     case Item.BlukBerry:
-      return 'Bluk Berry';
+      return 'Bluk Berry'
     case Item.NanabBerry:
-      return 'Nanab Berry';
+      return 'Nanab Berry'
     case Item.WepearBerry:
-      return 'Wepear Berry';
+      return 'Wepear Berry'
     case Item.PinapBerry:
-      return 'Pinap Berry';
+      return 'Pinap Berry'
     case Item.PomegBerry:
-      return 'Pomeg Berry';
+      return 'Pomeg Berry'
     case Item.KelpsyBerry:
-      return 'Kelpsy Berry';
+      return 'Kelpsy Berry'
     case Item.QualotBerry:
-      return 'Qualot Berry';
+      return 'Qualot Berry'
     case Item.HondewBerry:
-      return 'Hondew Berry';
+      return 'Hondew Berry'
     case Item.GrepaBerry:
-      return 'Grepa Berry';
+      return 'Grepa Berry'
     case Item.TamatoBerry:
-      return 'Tamato Berry';
+      return 'Tamato Berry'
     case Item.CornnBerry:
-      return 'Cornn Berry';
+      return 'Cornn Berry'
     case Item.MagostBerry:
-      return 'Magost Berry';
+      return 'Magost Berry'
     case Item.RabutaBerry:
-      return 'Rabuta Berry';
+      return 'Rabuta Berry'
     case Item.NomelBerry:
-      return 'Nomel Berry';
+      return 'Nomel Berry'
     case Item.SpelonBerry:
-      return 'Spelon Berry';
+      return 'Spelon Berry'
     case Item.PamtreBerry:
-      return 'Pamtre Berry';
+      return 'Pamtre Berry'
     case Item.WatmelBerry:
-      return 'Watmel Berry';
+      return 'Watmel Berry'
     case Item.DurinBerry:
-      return 'Durin Berry';
+      return 'Durin Berry'
     case Item.BelueBerry:
-      return 'Belue Berry';
+      return 'Belue Berry'
     case Item.OccaBerry:
-      return 'Occa Berry';
+      return 'Occa Berry'
     case Item.PasshoBerry:
-      return 'Passho Berry';
+      return 'Passho Berry'
     case Item.WacanBerry:
-      return 'Wacan Berry';
+      return 'Wacan Berry'
     case Item.RindoBerry:
-      return 'Rindo Berry';
+      return 'Rindo Berry'
     case Item.YacheBerry:
-      return 'Yache Berry';
+      return 'Yache Berry'
     case Item.ChopleBerry:
-      return 'Chople Berry';
+      return 'Chople Berry'
     case Item.KebiaBerry:
-      return 'Kebia Berry';
+      return 'Kebia Berry'
     case Item.ShucaBerry:
-      return 'Shuca Berry';
+      return 'Shuca Berry'
     case Item.CobaBerry:
-      return 'Coba Berry';
+      return 'Coba Berry'
     case Item.PayapaBerry:
-      return 'Payapa Berry';
+      return 'Payapa Berry'
     case Item.TangaBerry:
-      return 'Tanga Berry';
+      return 'Tanga Berry'
     case Item.ChartiBerry:
-      return 'Charti Berry';
+      return 'Charti Berry'
     case Item.KasibBerry:
-      return 'Kasib Berry';
+      return 'Kasib Berry'
     case Item.HabanBerry:
-      return 'Haban Berry';
+      return 'Haban Berry'
     case Item.ColburBerry:
-      return 'Colbur Berry';
+      return 'Colbur Berry'
     case Item.BabiriBerry:
-      return 'Babiri Berry';
+      return 'Babiri Berry'
     case Item.ChilanBerry:
-      return 'Chilan Berry';
+      return 'Chilan Berry'
     case Item.LiechiBerry:
-      return 'Liechi Berry';
+      return 'Liechi Berry'
     case Item.GanlonBerry:
-      return 'Ganlon Berry';
+      return 'Ganlon Berry'
     case Item.SalacBerry:
-      return 'Salac Berry';
+      return 'Salac Berry'
     case Item.PetayaBerry:
-      return 'Petaya Berry';
+      return 'Petaya Berry'
     case Item.ApicotBerry:
-      return 'Apicot Berry';
+      return 'Apicot Berry'
     case Item.LansatBerry:
-      return 'Lansat Berry';
+      return 'Lansat Berry'
     case Item.StarfBerry:
-      return 'Starf Berry';
+      return 'Starf Berry'
     case Item.EnigmaBerry:
-      return 'Enigma Berry';
+      return 'Enigma Berry'
     case Item.MicleBerry:
-      return 'Micle Berry';
+      return 'Micle Berry'
     case Item.CustapBerry:
-      return 'Custap Berry';
+      return 'Custap Berry'
     case Item.JabocaBerry:
-      return 'Jaboca Berry';
+      return 'Jaboca Berry'
     case Item.RowapBerry:
-      return 'Rowap Berry';
+      return 'Rowap Berry'
     case Item.BrightPowder:
-      return 'Bright Powder';
+      return 'Bright Powder'
     case Item.WhiteHerb:
-      return 'White Herb';
+      return 'White Herb'
     case Item.MachoBrace:
-      return 'Macho Brace';
+      return 'Macho Brace'
     case Item.ExpShare:
-      return 'Exp. Share';
+      return 'Exp. Share'
     case Item.QuickClaw:
-      return 'Quick Claw';
+      return 'Quick Claw'
     case Item.SootheBell:
-      return 'Soothe Bell';
+      return 'Soothe Bell'
     case Item.MentalHerb:
-      return 'Mental Herb';
+      return 'Mental Herb'
     case Item.ChoiceBand:
-      return 'Choice Band';
+      return 'Choice Band'
     case Item.KingsRock:
-      return 'King\u2019s Rock';
+      return 'King\u2019s Rock'
     case Item.SilverPowder:
-      return 'Silver Powder';
+      return 'Silver Powder'
     case Item.AmuletCoin:
-      return 'Amulet Coin';
+      return 'Amulet Coin'
     case Item.CleanseTag:
-      return 'Cleanse Tag';
+      return 'Cleanse Tag'
     case Item.SoulDew:
-      return 'Soul Dew';
+      return 'Soul Dew'
     case Item.DeepSeaTooth:
-      return 'Deep Sea Tooth';
+      return 'Deep Sea Tooth'
     case Item.DeepSeaScale:
-      return 'Deep Sea Scale';
+      return 'Deep Sea Scale'
     case Item.SmokeBall:
-      return 'Smoke Ball';
+      return 'Smoke Ball'
     case Item.Everstone:
-      return 'Everstone';
+      return 'Everstone'
     case Item.FocusBand:
-      return 'Focus Band';
+      return 'Focus Band'
     case Item.LuckyEgg:
-      return 'Lucky Egg';
+      return 'Lucky Egg'
     case Item.ScopeLens:
-      return 'Scope Lens';
+      return 'Scope Lens'
     case Item.MetalCoat:
-      return 'Metal Coat';
+      return 'Metal Coat'
     case Item.Leftovers:
-      return 'Leftovers';
+      return 'Leftovers'
     case Item.DragonScale:
-      return 'Dragon Scale';
+      return 'Dragon Scale'
     case Item.LightBall:
-      return 'Light Ball';
+      return 'Light Ball'
     case Item.SoftSand:
-      return 'Soft Sand';
+      return 'Soft Sand'
     case Item.HardStone:
-      return 'Hard Stone';
+      return 'Hard Stone'
     case Item.MiracleSeed:
-      return 'Miracle Seed';
+      return 'Miracle Seed'
     case Item.BlackGlasses:
-      return 'Black Glasses';
+      return 'Black Glasses'
     case Item.BlackBelt:
-      return 'Black Belt';
+      return 'Black Belt'
     case Item.Magnet:
-      return 'Magnet';
+      return 'Magnet'
     case Item.MysticWater:
-      return 'Mystic Water';
+      return 'Mystic Water'
     case Item.SharpBeak:
-      return 'Sharp Beak';
+      return 'Sharp Beak'
     case Item.PoisonBarb:
-      return 'Poison Barb';
+      return 'Poison Barb'
     case Item.NeverMeltIce:
-      return 'Never-Melt Ice';
+      return 'Never-Melt Ice'
     case Item.SpellTag:
-      return 'Spell Tag';
+      return 'Spell Tag'
     case Item.TwistedSpoon:
-      return 'Twisted Spoon';
+      return 'Twisted Spoon'
     case Item.Charcoal:
-      return 'Charcoal';
+      return 'Charcoal'
     case Item.DragonFang:
-      return 'Dragon Fang';
+      return 'Dragon Fang'
     case Item.SilkScarf:
-      return 'Silk Scarf';
+      return 'Silk Scarf'
     case Item.Upgrade:
-      return 'Upgrade';
+      return 'Upgrade'
     case Item.ShellBell:
-      return 'Shell Bell';
+      return 'Shell Bell'
     case Item.SeaIncense:
-      return 'Sea Incense';
+      return 'Sea Incense'
     case Item.LaxIncense:
-      return 'Lax Incense';
+      return 'Lax Incense'
     case Item.LuckyPunch:
-      return 'Lucky Punch';
+      return 'Lucky Punch'
     case Item.MetalPowder:
-      return 'Metal Powder';
+      return 'Metal Powder'
     case Item.ThickClub:
-      return 'Thick Club';
+      return 'Thick Club'
     case Item.Leek:
-      return 'Leek';
+      return 'Leek'
     case Item.RedScarf:
-      return 'Red Scarf';
+      return 'Red Scarf'
     case Item.BlueScarf:
-      return 'Blue Scarf';
+      return 'Blue Scarf'
     case Item.PinkScarf:
-      return 'Pink Scarf';
+      return 'Pink Scarf'
     case Item.GreenScarf:
-      return 'Green Scarf';
+      return 'Green Scarf'
     case Item.YellowScarf:
-      return 'Yellow Scarf';
+      return 'Yellow Scarf'
     case Item.WideLens:
-      return 'Wide Lens';
+      return 'Wide Lens'
     case Item.MuscleBand:
-      return 'Muscle Band';
+      return 'Muscle Band'
     case Item.WiseGlasses:
-      return 'Wise Glasses';
+      return 'Wise Glasses'
     case Item.ExpertBelt:
-      return 'Expert Belt';
+      return 'Expert Belt'
     case Item.LightClay:
-      return 'Light Clay';
+      return 'Light Clay'
     case Item.LifeOrb:
-      return 'Life Orb';
+      return 'Life Orb'
     case Item.PowerHerb:
-      return 'Power Herb';
+      return 'Power Herb'
     case Item.ToxicOrb:
-      return 'Toxic Orb';
+      return 'Toxic Orb'
     case Item.FlameOrb:
-      return 'Flame Orb';
+      return 'Flame Orb'
     case Item.QuickPowder:
-      return 'Quick Powder';
+      return 'Quick Powder'
     case Item.FocusSash:
-      return 'Focus Sash';
+      return 'Focus Sash'
     case Item.ZoomLens:
-      return 'Zoom Lens';
+      return 'Zoom Lens'
     case Item.Metronome:
-      return 'Metronome';
+      return 'Metronome'
     case Item.IronBall:
-      return 'Iron Ball';
+      return 'Iron Ball'
     case Item.LaggingTail:
-      return 'Lagging Tail';
+      return 'Lagging Tail'
     case Item.DestinyKnot:
-      return 'Destiny Knot';
+      return 'Destiny Knot'
     case Item.BlackSludge:
-      return 'Black Sludge';
+      return 'Black Sludge'
     case Item.IcyRock:
-      return 'Icy Rock';
+      return 'Icy Rock'
     case Item.SmoothRock:
-      return 'Smooth Rock';
+      return 'Smooth Rock'
     case Item.HeatRock:
-      return 'Heat Rock';
+      return 'Heat Rock'
     case Item.DampRock:
-      return 'Damp Rock';
+      return 'Damp Rock'
     case Item.GripClaw:
-      return 'Grip Claw';
+      return 'Grip Claw'
     case Item.ChoiceScarf:
-      return 'Choice Scarf';
+      return 'Choice Scarf'
     case Item.StickyBarb:
-      return 'Sticky Barb';
+      return 'Sticky Barb'
     case Item.PowerBracer:
-      return 'Power Bracer';
+      return 'Power Bracer'
     case Item.PowerBelt:
-      return 'Power Belt';
+      return 'Power Belt'
     case Item.PowerLens:
-      return 'Power Lens';
+      return 'Power Lens'
     case Item.PowerBand:
-      return 'Power Band';
+      return 'Power Band'
     case Item.PowerAnklet:
-      return 'Power Anklet';
+      return 'Power Anklet'
     case Item.PowerWeight:
-      return 'Power Weight';
+      return 'Power Weight'
     case Item.ShedShell:
-      return 'Shed Shell';
+      return 'Shed Shell'
     case Item.BigRoot:
-      return 'Big Root';
+      return 'Big Root'
     case Item.ChoiceSpecs:
-      return 'Choice Specs';
+      return 'Choice Specs'
     case Item.FlamePlate:
-      return 'Flame Plate';
+      return 'Flame Plate'
     case Item.SplashPlate:
-      return 'Splash Plate';
+      return 'Splash Plate'
     case Item.ZapPlate:
-      return 'Zap Plate';
+      return 'Zap Plate'
     case Item.MeadowPlate:
-      return 'Meadow Plate';
+      return 'Meadow Plate'
     case Item.IciclePlate:
-      return 'Icicle Plate';
+      return 'Icicle Plate'
     case Item.FistPlate:
-      return 'Fist Plate';
+      return 'Fist Plate'
     case Item.ToxicPlate:
-      return 'Toxic Plate';
+      return 'Toxic Plate'
     case Item.EarthPlate:
-      return 'Earth Plate';
+      return 'Earth Plate'
     case Item.SkyPlate:
-      return 'Sky Plate';
+      return 'Sky Plate'
     case Item.MindPlate:
-      return 'Mind Plate';
+      return 'Mind Plate'
     case Item.InsectPlate:
-      return 'Insect Plate';
+      return 'Insect Plate'
     case Item.StonePlate:
-      return 'Stone Plate';
+      return 'Stone Plate'
     case Item.SpookyPlate:
-      return 'Spooky Plate';
+      return 'Spooky Plate'
     case Item.DracoPlate:
-      return 'Draco Plate';
+      return 'Draco Plate'
     case Item.DreadPlate:
-      return 'Dread Plate';
+      return 'Dread Plate'
     case Item.IronPlate:
-      return 'Iron Plate';
+      return 'Iron Plate'
     case Item.OddIncense:
-      return 'Odd Incense';
+      return 'Odd Incense'
     case Item.RockIncense:
-      return 'Rock Incense';
+      return 'Rock Incense'
     case Item.FullIncense:
-      return 'Full Incense';
+      return 'Full Incense'
     case Item.WaveIncense:
-      return 'Wave Incense';
+      return 'Wave Incense'
     case Item.RoseIncense:
-      return 'Rose Incense';
+      return 'Rose Incense'
     case Item.LuckIncense:
-      return 'Luck Incense';
+      return 'Luck Incense'
     case Item.PureIncense:
-      return 'Pure Incense';
+      return 'Pure Incense'
     case Item.Protector:
-      return 'Protector';
+      return 'Protector'
     case Item.Electirizer:
-      return 'Electirizer';
+      return 'Electirizer'
     case Item.Magmarizer:
-      return 'Magmarizer';
+      return 'Magmarizer'
     case Item.DubiousDisc:
-      return 'Dubious Disc';
+      return 'Dubious Disc'
     case Item.ReaperCloth:
-      return 'Reaper Cloth';
+      return 'Reaper Cloth'
     case Item.RazorClaw:
-      return 'Razor Claw';
+      return 'Razor Claw'
     case Item.RazorFang:
-      return 'Razor Fang';
+      return 'Razor Fang'
     case Item.TM01:
-      return 'TM01';
+      return 'TM01'
     case Item.TM02:
-      return 'TM02';
+      return 'TM02'
     case Item.TM03:
-      return 'TM03';
+      return 'TM03'
     case Item.TM04:
-      return 'TM04';
+      return 'TM04'
     case Item.TM05:
-      return 'TM05';
+      return 'TM05'
     case Item.TM06:
-      return 'TM06';
+      return 'TM06'
     case Item.TM07:
-      return 'TM07';
+      return 'TM07'
     case Item.TM08:
-      return 'TM08';
+      return 'TM08'
     case Item.TM09:
-      return 'TM09';
+      return 'TM09'
     case Item.TM10:
-      return 'TM10';
+      return 'TM10'
     case Item.TM11:
-      return 'TM11';
+      return 'TM11'
     case Item.TM12:
-      return 'TM12';
+      return 'TM12'
     case Item.TM13:
-      return 'TM13';
+      return 'TM13'
     case Item.TM14:
-      return 'TM14';
+      return 'TM14'
     case Item.TM15:
-      return 'TM15';
+      return 'TM15'
     case Item.TM16:
-      return 'TM16';
+      return 'TM16'
     case Item.TM17:
-      return 'TM17';
+      return 'TM17'
     case Item.TM18:
-      return 'TM18';
+      return 'TM18'
     case Item.TM19:
-      return 'TM19';
+      return 'TM19'
     case Item.TM20:
-      return 'TM20';
+      return 'TM20'
     case Item.TM21:
-      return 'TM21';
+      return 'TM21'
     case Item.TM22:
-      return 'TM22';
+      return 'TM22'
     case Item.TM23:
-      return 'TM23';
+      return 'TM23'
     case Item.TM24:
-      return 'TM24';
+      return 'TM24'
     case Item.TM25:
-      return 'TM25';
+      return 'TM25'
     case Item.TM26:
-      return 'TM26';
+      return 'TM26'
     case Item.TM27:
-      return 'TM27';
+      return 'TM27'
     case Item.TM28:
-      return 'TM28';
+      return 'TM28'
     case Item.TM29:
-      return 'TM29';
+      return 'TM29'
     case Item.TM30:
-      return 'TM30';
+      return 'TM30'
     case Item.TM31:
-      return 'TM31';
+      return 'TM31'
     case Item.TM32:
-      return 'TM32';
+      return 'TM32'
     case Item.TM33:
-      return 'TM33';
+      return 'TM33'
     case Item.TM34:
-      return 'TM34';
+      return 'TM34'
     case Item.TM35:
-      return 'TM35';
+      return 'TM35'
     case Item.TM36:
-      return 'TM36';
+      return 'TM36'
     case Item.TM37:
-      return 'TM37';
+      return 'TM37'
     case Item.TM38:
-      return 'TM38';
+      return 'TM38'
     case Item.TM39:
-      return 'TM39';
+      return 'TM39'
     case Item.TM40:
-      return 'TM40';
+      return 'TM40'
     case Item.TM41:
-      return 'TM41';
+      return 'TM41'
     case Item.TM42:
-      return 'TM42';
+      return 'TM42'
     case Item.TM43:
-      return 'TM43';
+      return 'TM43'
     case Item.TM44:
-      return 'TM44';
+      return 'TM44'
     case Item.TM45:
-      return 'TM45';
+      return 'TM45'
     case Item.TM46:
-      return 'TM46';
+      return 'TM46'
     case Item.TM47:
-      return 'TM47';
+      return 'TM47'
     case Item.TM48:
-      return 'TM48';
+      return 'TM48'
     case Item.TM49:
-      return 'TM49';
+      return 'TM49'
     case Item.TM50:
-      return 'TM50';
+      return 'TM50'
     case Item.TM51:
-      return 'TM51';
+      return 'TM51'
     case Item.TM52:
-      return 'TM52';
+      return 'TM52'
     case Item.TM53:
-      return 'TM53';
+      return 'TM53'
     case Item.TM54:
-      return 'TM54';
+      return 'TM54'
     case Item.TM55:
-      return 'TM55';
+      return 'TM55'
     case Item.TM56:
-      return 'TM56';
+      return 'TM56'
     case Item.TM57:
-      return 'TM57';
+      return 'TM57'
     case Item.TM58:
-      return 'TM58';
+      return 'TM58'
     case Item.TM59:
-      return 'TM59';
+      return 'TM59'
     case Item.TM60:
-      return 'TM60';
+      return 'TM60'
     case Item.TM61:
-      return 'TM61';
+      return 'TM61'
     case Item.TM62:
-      return 'TM62';
+      return 'TM62'
     case Item.TM63:
-      return 'TM63';
+      return 'TM63'
     case Item.TM64:
-      return 'TM64';
+      return 'TM64'
     case Item.TM65:
-      return 'TM65';
+      return 'TM65'
     case Item.TM66:
-      return 'TM66';
+      return 'TM66'
     case Item.TM67:
-      return 'TM67';
+      return 'TM67'
     case Item.TM68:
-      return 'TM68';
+      return 'TM68'
     case Item.TM69:
-      return 'TM69';
+      return 'TM69'
     case Item.TM70:
-      return 'TM70';
+      return 'TM70'
     case Item.TM71:
-      return 'TM71';
+      return 'TM71'
     case Item.TM72:
-      return 'TM72';
+      return 'TM72'
     case Item.TM73:
-      return 'TM73';
+      return 'TM73'
     case Item.TM74:
-      return 'TM74';
+      return 'TM74'
     case Item.TM75:
-      return 'TM75';
+      return 'TM75'
     case Item.TM76:
-      return 'TM76';
+      return 'TM76'
     case Item.TM77:
-      return 'TM77';
+      return 'TM77'
     case Item.TM78:
-      return 'TM78';
+      return 'TM78'
     case Item.TM79:
-      return 'TM79';
+      return 'TM79'
     case Item.TM80:
-      return 'TM80';
+      return 'TM80'
     case Item.TM81:
-      return 'TM81';
+      return 'TM81'
     case Item.TM82:
-      return 'TM82';
+      return 'TM82'
     case Item.TM83:
-      return 'TM83';
+      return 'TM83'
     case Item.TM84:
-      return 'TM84';
+      return 'TM84'
     case Item.TM85:
-      return 'TM85';
+      return 'TM85'
     case Item.TM86:
-      return 'TM86';
+      return 'TM86'
     case Item.TM87:
-      return 'TM87';
+      return 'TM87'
     case Item.TM88:
-      return 'TM88';
+      return 'TM88'
     case Item.TM89:
-      return 'TM89';
+      return 'TM89'
     case Item.TM90:
-      return 'TM90';
+      return 'TM90'
     case Item.TM91:
-      return 'TM91';
+      return 'TM91'
     case Item.TM92:
-      return 'TM92';
+      return 'TM92'
     case Item.HM01:
-      return 'HM01';
+      return 'HM01'
     case Item.HM02:
-      return 'HM02';
+      return 'HM02'
     case Item.HM03:
-      return 'HM03';
+      return 'HM03'
     case Item.HM04:
-      return 'HM04';
+      return 'HM04'
     case Item.HM05:
-      return 'HM05';
+      return 'HM05'
     case Item.HM06:
-      return 'HM06';
+      return 'HM06'
     case Item.Unknown_7:
-      return '???';
+      return '???'
     case Item.Unknown_8:
-      return '???';
+      return '???'
     case Item.ExplorerKit:
-      return 'Explorer Kit';
+      return 'Explorer Kit'
     case Item.LootSack:
-      return 'Loot Sack';
+      return 'Loot Sack'
     case Item.RuleBook:
-      return 'Rule Book';
+      return 'Rule Book'
     case Item.PokeRadar:
-      return 'Pok\u00E9 Radar';
+      return 'Pok\u00E9 Radar'
     case Item.PointCard:
-      return 'Point Card';
+      return 'Point Card'
     case Item.Guidebook:
-      return 'Guidebook';
+      return 'Guidebook'
     case Item.StickerCase:
-      return 'Sticker Case';
+      return 'Sticker Case'
     case Item.FashionCase:
-      return 'Fashion Case';
+      return 'Fashion Case'
     case Item.StickerBag:
-      return 'Sticker Bag';
+      return 'Sticker Bag'
     case Item.PalPad:
-      return 'Pal Pad';
+      return 'Pal Pad'
     case Item.WorksKey:
-      return 'Works Key';
+      return 'Works Key'
     case Item.OldCharm:
-      return 'Old Charm';
+      return 'Old Charm'
     case Item.GalacticKey:
-      return 'Galactic Key';
+      return 'Galactic Key'
     case Item.RedChain:
-      return 'Red Chain';
+      return 'Red Chain'
     case Item.TownMap:
-      return 'Town Map';
+      return 'Town Map'
     case Item.VsSeeker:
-      return 'Vs. Seeker';
+      return 'Vs. Seeker'
     case Item.CoinCase:
-      return 'Coin Case';
+      return 'Coin Case'
     case Item.OldRod:
-      return 'Old Rod';
+      return 'Old Rod'
     case Item.GoodRod:
-      return 'Good Rod';
+      return 'Good Rod'
     case Item.SuperRod:
-      return 'Super Rod';
+      return 'Super Rod'
     case Item.Sprayduck:
-      return 'Sprayduck';
+      return 'Sprayduck'
     case Item.PoffinCase:
-      return 'Poffin Case';
+      return 'Poffin Case'
     case Item.Bike:
-      return 'Bike';
+      return 'Bike'
     case Item.SuiteKey:
-      return 'Suite Key';
+      return 'Suite Key'
     case Item.OaksLetter:
-      return 'Oak\u2019s Letter';
+      return 'Oak\u2019s Letter'
     case Item.LunarFeather:
-      return 'Lunar Feather';
+      return 'Lunar Feather'
     case Item.MemberCard:
-      return 'Member Card';
+      return 'Member Card'
     case Item.AzureFlute:
-      return 'Azure Flute';
+      return 'Azure Flute'
     case Item.SSTicket:
-      return 'S.S. Ticket';
+      return 'S.S. Ticket'
     case Item.ContestPass:
-      return 'Contest Pass';
+      return 'Contest Pass'
     case Item.MagmaStone:
-      return 'Magma Stone';
+      return 'Magma Stone'
     case Item.Parcel:
-      return 'Parcel';
+      return 'Parcel'
     case Item.Coupon1:
-      return 'Coupon 1';
+      return 'Coupon 1'
     case Item.Coupon2:
-      return 'Coupon 2';
+      return 'Coupon 2'
     case Item.Coupon3:
-      return 'Coupon 3';
+      return 'Coupon 3'
     case Item.StorageKey:
-      return 'Storage Key';
+      return 'Storage Key'
     case Item.SecretMedicine:
-      return 'Secret Medicine';
+      return 'Secret Medicine'
     case Item.VsRecorder:
-      return 'Vs. Recorder';
+      return 'Vs. Recorder'
     case Item.Gracidea:
-      return 'Gracidea';
+      return 'Gracidea'
     case Item.SecretKey:
-      return 'Secret Key';
+      return 'Secret Key'
     case Item.ApricornBox:
-      return 'Apricorn Box';
+      return 'Apricorn Box'
     case Item.UnownReport:
-      return 'Unown Report';
+      return 'Unown Report'
     case Item.BerryPots:
-      return 'Berry Pots';
+      return 'Berry Pots'
     case Item.DowsingMachine:
-      return 'Dowsing Machine';
+      return 'Dowsing Machine'
     case Item.BlueCard:
-      return 'Blue Card';
+      return 'Blue Card'
     case Item.SlowpokeTail:
-      return 'Slowpoke Tail';
+      return 'Slowpoke Tail'
     case Item.ClearBell:
-      return 'Clear Bell';
+      return 'Clear Bell'
     case Item.CardKey:
-      return 'Card Key';
+      return 'Card Key'
     case Item.BasementKey:
-      return 'Basement Key';
+      return 'Basement Key'
     case Item.SquirtBottle:
-      return 'Squirt Bottle';
+      return 'Squirt Bottle'
     case Item.RedScale:
-      return 'Red Scale';
+      return 'Red Scale'
     case Item.LostItem:
-      return 'Lost Item';
+      return 'Lost Item'
     case Item.Pass:
-      return 'Pass';
+      return 'Pass'
     case Item.MachinePart:
-      return 'Machine Part';
+      return 'Machine Part'
     case Item.SilverFeather:
-      return 'Silver Feather';
+      return 'Silver Feather'
     case Item.RainbowFeather:
-      return 'Rainbow Feather';
+      return 'Rainbow Feather'
     case Item.MysteryEgg:
-      return 'Mystery Egg';
+      return 'Mystery Egg'
     case Item.RedApricorn:
-      return 'Red Apricorn';
+      return 'Red Apricorn'
     case Item.BlueApricorn:
-      return 'Blue Apricorn';
+      return 'Blue Apricorn'
     case Item.YellowApricorn:
-      return 'Yellow Apricorn';
+      return 'Yellow Apricorn'
     case Item.GreenApricorn:
-      return 'Green Apricorn';
+      return 'Green Apricorn'
     case Item.PinkApricorn:
-      return 'Pink Apricorn';
+      return 'Pink Apricorn'
     case Item.WhiteApricorn:
-      return 'White Apricorn';
+      return 'White Apricorn'
     case Item.BlackApricorn:
-      return 'Black Apricorn';
+      return 'Black Apricorn'
     case Item.FastBall:
-      return 'Fast Ball';
+      return 'Fast Ball'
     case Item.LevelBall:
-      return 'Level Ball';
+      return 'Level Ball'
     case Item.LureBall:
-      return 'Lure Ball';
+      return 'Lure Ball'
     case Item.HeavyBall:
-      return 'Heavy Ball';
+      return 'Heavy Ball'
     case Item.LoveBall:
-      return 'Love Ball';
+      return 'Love Ball'
     case Item.FriendBall:
-      return 'Friend Ball';
+      return 'Friend Ball'
     case Item.MoonBall:
-      return 'Moon Ball';
+      return 'Moon Ball'
     case Item.SportBall:
-      return 'Sport Ball';
+      return 'Sport Ball'
     case Item.ParkBall:
-      return 'Park Ball';
+      return 'Park Ball'
     case Item.PhotoAlbum:
-      return 'Photo Album';
+      return 'Photo Album'
     case Item.GBSounds:
-      return 'GB Sounds';
+      return 'GB Sounds'
     case Item.TidalBell:
-      return 'Tidal Bell';
+      return 'Tidal Bell'
     case Item.RageCandyBar:
-      return 'Rage Candy Bar';
+      return 'Rage Candy Bar'
     case Item.DataCard01:
-      return 'Data Card 01';
+      return 'Data Card 01'
     case Item.DataCard02:
-      return 'Data Card 02';
+      return 'Data Card 02'
     case Item.DataCard03:
-      return 'Data Card 03';
+      return 'Data Card 03'
     case Item.DataCard04:
-      return 'Data Card 04';
+      return 'Data Card 04'
     case Item.DataCard05:
-      return 'Data Card 05';
+      return 'Data Card 05'
     case Item.DataCard06:
-      return 'Data Card 06';
+      return 'Data Card 06'
     case Item.DataCard07:
-      return 'Data Card 07';
+      return 'Data Card 07'
     case Item.DataCard08:
-      return 'Data Card 08';
+      return 'Data Card 08'
     case Item.DataCard09:
-      return 'Data Card 09';
+      return 'Data Card 09'
     case Item.DataCard10:
-      return 'Data Card 10';
+      return 'Data Card 10'
     case Item.DataCard11:
-      return 'Data Card 11';
+      return 'Data Card 11'
     case Item.DataCard12:
-      return 'Data Card 12';
+      return 'Data Card 12'
     case Item.DataCard13:
-      return 'Data Card 13';
+      return 'Data Card 13'
     case Item.DataCard14:
-      return 'Data Card 14';
+      return 'Data Card 14'
     case Item.DataCard15:
-      return 'Data Card 15';
+      return 'Data Card 15'
     case Item.DataCard16:
-      return 'Data Card 16';
+      return 'Data Card 16'
     case Item.DataCard17:
-      return 'Data Card 17';
+      return 'Data Card 17'
     case Item.DataCard18:
-      return 'Data Card 18';
+      return 'Data Card 18'
     case Item.DataCard19:
-      return 'Data Card 19';
+      return 'Data Card 19'
     case Item.DataCard20:
-      return 'Data Card 20';
+      return 'Data Card 20'
     case Item.DataCard21:
-      return 'Data Card 21';
+      return 'Data Card 21'
     case Item.DataCard22:
-      return 'Data Card 22';
+      return 'Data Card 22'
     case Item.DataCard23:
-      return 'Data Card 23';
+      return 'Data Card 23'
     case Item.DataCard24:
-      return 'Data Card 24';
+      return 'Data Card 24'
     case Item.DataCard25:
-      return 'Data Card 25';
+      return 'Data Card 25'
     case Item.DataCard26:
-      return 'Data Card 26';
+      return 'Data Card 26'
     case Item.DataCard27:
-      return 'Data Card 27';
+      return 'Data Card 27'
     case Item.JadeOrb:
-      return 'Jade Orb';
+      return 'Jade Orb'
     case Item.LockCapsule:
-      return 'Lock Capsule';
+      return 'Lock Capsule'
     case Item.RedOrb:
-      return 'Red Orb';
+      return 'Red Orb'
     case Item.BlueOrb:
-      return 'Blue Orb';
+      return 'Blue Orb'
     case Item.EnigmaStone:
-      return 'Enigma Stone';
+      return 'Enigma Stone'
     case Item.PrismScale:
-      return 'Prism Scale';
+      return 'Prism Scale'
     case Item.Eviolite:
-      return 'Eviolite';
+      return 'Eviolite'
     case Item.FloatStone:
-      return 'Float Stone';
+      return 'Float Stone'
     case Item.RockyHelmet:
-      return 'Rocky Helmet';
+      return 'Rocky Helmet'
     case Item.AirBalloon:
-      return 'Air Balloon';
+      return 'Air Balloon'
     case Item.RedCard:
-      return 'Red Card';
+      return 'Red Card'
     case Item.RingTarget:
-      return 'Ring Target';
+      return 'Ring Target'
     case Item.BindingBand:
-      return 'Binding Band';
+      return 'Binding Band'
     case Item.AbsorbBulb:
-      return 'Absorb Bulb';
+      return 'Absorb Bulb'
     case Item.CellBattery:
-      return 'Cell Battery';
+      return 'Cell Battery'
     case Item.EjectButton:
-      return 'Eject Button';
+      return 'Eject Button'
     case Item.FireGem:
-      return 'Fire Gem';
+      return 'Fire Gem'
     case Item.WaterGem:
-      return 'Water Gem';
+      return 'Water Gem'
     case Item.ElectricGem:
-      return 'Electric Gem';
+      return 'Electric Gem'
     case Item.GrassGem:
-      return 'Grass Gem';
+      return 'Grass Gem'
     case Item.IceGem:
-      return 'Ice Gem';
+      return 'Ice Gem'
     case Item.FightingGem:
-      return 'Fighting Gem';
+      return 'Fighting Gem'
     case Item.PoisonGem:
-      return 'Poison Gem';
+      return 'Poison Gem'
     case Item.GroundGem:
-      return 'Ground Gem';
+      return 'Ground Gem'
     case Item.FlyingGem:
-      return 'Flying Gem';
+      return 'Flying Gem'
     case Item.PsychicGem:
-      return 'Psychic Gem';
+      return 'Psychic Gem'
     case Item.BugGem:
-      return 'Bug Gem';
+      return 'Bug Gem'
     case Item.RockGem:
-      return 'Rock Gem';
+      return 'Rock Gem'
     case Item.GhostGem:
-      return 'Ghost Gem';
+      return 'Ghost Gem'
     case Item.DragonGem:
-      return 'Dragon Gem';
+      return 'Dragon Gem'
     case Item.DarkGem:
-      return 'Dark Gem';
+      return 'Dark Gem'
     case Item.SteelGem:
-      return 'Steel Gem';
+      return 'Steel Gem'
     case Item.NormalGem:
-      return 'Normal Gem';
+      return 'Normal Gem'
     case Item.HealthFeather:
-      return 'Health Feather';
+      return 'Health Feather'
     case Item.MuscleFeather:
-      return 'Muscle Feather';
+      return 'Muscle Feather'
     case Item.ResistFeather:
-      return 'Resist Feather';
+      return 'Resist Feather'
     case Item.GeniusFeather:
-      return 'Genius Feather';
+      return 'Genius Feather'
     case Item.CleverFeather:
-      return 'Clever Feather';
+      return 'Clever Feather'
     case Item.SwiftFeather:
-      return 'Swift Feather';
+      return 'Swift Feather'
     case Item.PrettyFeather:
-      return 'Pretty Feather';
+      return 'Pretty Feather'
     case Item.CoverFossil:
-      return 'Cover Fossil';
+      return 'Cover Fossil'
     case Item.PlumeFossil:
-      return 'Plume Fossil';
+      return 'Plume Fossil'
     case Item.LibertyPass:
-      return 'Liberty Pass';
+      return 'Liberty Pass'
     case Item.PassOrb:
-      return 'Pass Orb';
+      return 'Pass Orb'
     case Item.DreamBall:
-      return 'Dream Ball';
+      return 'Dream Ball'
     case Item.PokeToy:
-      return 'Pok\u00E9 Toy';
+      return 'Pok\u00E9 Toy'
     case Item.PropCase:
-      return 'Prop Case';
+      return 'Prop Case'
     case Item.DragonSkull:
-      return 'Dragon Skull';
+      return 'Dragon Skull'
     case Item.BalmMushroom:
-      return 'Balm Mushroom';
+      return 'Balm Mushroom'
     case Item.BigNugget:
-      return 'Big Nugget';
+      return 'Big Nugget'
     case Item.PearlString:
-      return 'Pearl String';
+      return 'Pearl String'
     case Item.CometShard:
-      return 'Comet Shard';
+      return 'Comet Shard'
     case Item.RelicCopper:
-      return 'Relic Copper';
+      return 'Relic Copper'
     case Item.RelicSilver:
-      return 'Relic Silver';
+      return 'Relic Silver'
     case Item.RelicGold:
-      return 'Relic Gold';
+      return 'Relic Gold'
     case Item.RelicVase:
-      return 'Relic Vase';
+      return 'Relic Vase'
     case Item.RelicBand:
-      return 'Relic Band';
+      return 'Relic Band'
     case Item.RelicStatue:
-      return 'Relic Statue';
+      return 'Relic Statue'
     case Item.RelicCrown:
-      return 'Relic Crown';
+      return 'Relic Crown'
     case Item.Casteliacone:
-      return 'Casteliacone';
+      return 'Casteliacone'
     case Item.DireHit2:
-      return 'Dire Hit 2';
+      return 'Dire Hit 2'
     case Item.XSpeed2:
-      return 'X Speed 2';
+      return 'X Speed 2'
     case Item.XSpAtk2:
-      return 'X Sp. Atk 2';
+      return 'X Sp. Atk 2'
     case Item.XSpDef2:
-      return 'X Sp. Def 2';
+      return 'X Sp. Def 2'
     case Item.XDefense2:
-      return 'X Defense 2';
+      return 'X Defense 2'
     case Item.XAttack2:
-      return 'X Attack 2';
+      return 'X Attack 2'
     case Item.XAccuracy2:
-      return 'X Accuracy 2';
+      return 'X Accuracy 2'
     case Item.XSpeed3:
-      return 'X Speed 3';
+      return 'X Speed 3'
     case Item.XSpAtk3:
-      return 'X Sp. Atk 3';
+      return 'X Sp. Atk 3'
     case Item.XSpDef3:
-      return 'X Sp. Def 3';
+      return 'X Sp. Def 3'
     case Item.XDefense3:
-      return 'X Defense 3';
+      return 'X Defense 3'
     case Item.XAttack3:
-      return 'X Attack 3';
+      return 'X Attack 3'
     case Item.XAccuracy3:
-      return 'X Accuracy 3';
+      return 'X Accuracy 3'
     case Item.XSpeed6:
-      return 'X Speed 6';
+      return 'X Speed 6'
     case Item.XSpAtk6:
-      return 'X Sp. Atk 6';
+      return 'X Sp. Atk 6'
     case Item.XSpDef6:
-      return 'X Sp. Def 6';
+      return 'X Sp. Def 6'
     case Item.XDefense6:
-      return 'X Defense 6';
+      return 'X Defense 6'
     case Item.XAttack6:
-      return 'X Attack 6';
+      return 'X Attack 6'
     case Item.XAccuracy6:
-      return 'X Accuracy 6';
+      return 'X Accuracy 6'
     case Item.AbilityUrge:
-      return 'Ability Urge';
+      return 'Ability Urge'
     case Item.ItemDrop:
-      return 'Item Drop';
+      return 'Item Drop'
     case Item.ItemUrge:
-      return 'Item Urge';
+      return 'Item Urge'
     case Item.ResetUrge:
-      return 'Reset Urge';
+      return 'Reset Urge'
     case Item.DireHit3:
-      return 'Dire Hit 3';
+      return 'Dire Hit 3'
     case Item.LightStone:
-      return 'Light Stone';
+      return 'Light Stone'
     case Item.DarkStone:
-      return 'Dark Stone';
+      return 'Dark Stone'
     case Item.TM93:
-      return 'TM93';
+      return 'TM93'
     case Item.TM94:
-      return 'TM94';
+      return 'TM94'
     case Item.TM95:
-      return 'TM95';
+      return 'TM95'
     case Item.Xtransceiver:
-      return 'Xtransceiver';
+      return 'Xtransceiver'
     case Item.Unknown_9:
-      return '???';
+      return '???'
     case Item.Gram1:
-      return 'Gram 1';
+      return 'Gram 1'
     case Item.Gram2:
-      return 'Gram 2';
+      return 'Gram 2'
     case Item.Gram3:
-      return 'Gram 3';
+      return 'Gram 3'
     case Item.Xtransceiver_1:
-      return 'Xtransceiver';
+      return 'Xtransceiver'
     case Item.MedalBox:
-      return 'Medal Box';
+      return 'Medal Box'
     case Item.DNASplicers:
-      return 'DNA Splicers';
+      return 'DNA Splicers'
     case Item.DNASplicers_1:
-      return 'DNA Splicers';
+      return 'DNA Splicers'
     case Item.Permit:
-      return 'Permit';
+      return 'Permit'
     case Item.OvalCharm:
-      return 'Oval Charm';
+      return 'Oval Charm'
     case Item.ShinyCharm:
-      return 'Shiny Charm';
+      return 'Shiny Charm'
     case Item.PlasmaCard:
-      return 'Plasma Card';
+      return 'Plasma Card'
     case Item.GrubbyHanky:
-      return 'Grubby Hanky';
+      return 'Grubby Hanky'
     case Item.ColressMachine:
-      return 'Colress Machine';
+      return 'Colress Machine'
     case Item.DroppedItem:
-      return 'Dropped Item';
+      return 'Dropped Item'
     case Item.DroppedItem_1:
-      return 'Dropped Item';
+      return 'Dropped Item'
     case Item.RevealGlass:
-      return 'Reveal Glass';
+      return 'Reveal Glass'
     case Item.WeaknessPolicy:
-      return 'Weakness Policy';
+      return 'Weakness Policy'
     case Item.AssaultVest:
-      return 'Assault Vest';
+      return 'Assault Vest'
     case Item.HoloCaster:
-      return 'Holo Caster';
+      return 'Holo Caster'
     case Item.ProfsLetter:
-      return 'Prof\u2019s Letter';
+      return 'Prof\u2019s Letter'
     case Item.RollerSkates:
-      return 'Roller Skates';
+      return 'Roller Skates'
     case Item.PixiePlate:
-      return 'Pixie Plate';
+      return 'Pixie Plate'
     case Item.AbilityCapsule:
-      return 'Ability Capsule';
+      return 'Ability Capsule'
     case Item.WhippedDream:
-      return 'Whipped Dream';
+      return 'Whipped Dream'
     case Item.Sachet:
-      return 'Sachet';
+      return 'Sachet'
     case Item.LuminousMoss:
-      return 'Luminous Moss';
+      return 'Luminous Moss'
     case Item.Snowball:
-      return 'Snowball';
+      return 'Snowball'
     case Item.SafetyGoggles:
-      return 'Safety Goggles';
+      return 'Safety Goggles'
     case Item.PokeFlute:
-      return 'Pok\u00E9 Flute';
+      return 'Pok\u00E9 Flute'
     case Item.RichMulch:
-      return 'Rich Mulch';
+      return 'Rich Mulch'
     case Item.SurpriseMulch:
-      return 'Surprise Mulch';
+      return 'Surprise Mulch'
     case Item.BoostMulch:
-      return 'Boost Mulch';
+      return 'Boost Mulch'
     case Item.AmazeMulch:
-      return 'Amaze Mulch';
+      return 'Amaze Mulch'
     case Item.Gengarite:
-      return 'Gengarite';
+      return 'Gengarite'
     case Item.Gardevoirite:
-      return 'Gardevoirite';
+      return 'Gardevoirite'
     case Item.Ampharosite:
-      return 'Ampharosite';
+      return 'Ampharosite'
     case Item.Venusaurite:
-      return 'Venusaurite';
+      return 'Venusaurite'
     case Item.CharizarditeX:
-      return 'Charizardite X';
+      return 'Charizardite X'
     case Item.Blastoisinite:
-      return 'Blastoisinite';
+      return 'Blastoisinite'
     case Item.MewtwoniteX:
-      return 'Mewtwonite X';
+      return 'Mewtwonite X'
     case Item.MewtwoniteY:
-      return 'Mewtwonite Y';
+      return 'Mewtwonite Y'
     case Item.Blazikenite:
-      return 'Blazikenite';
+      return 'Blazikenite'
     case Item.Medichamite:
-      return 'Medichamite';
+      return 'Medichamite'
     case Item.Houndoominite:
-      return 'Houndoominite';
+      return 'Houndoominite'
     case Item.Aggronite:
-      return 'Aggronite';
+      return 'Aggronite'
     case Item.Banettite:
-      return 'Banettite';
+      return 'Banettite'
     case Item.Tyranitarite:
-      return 'Tyranitarite';
+      return 'Tyranitarite'
     case Item.Scizorite:
-      return 'Scizorite';
+      return 'Scizorite'
     case Item.Pinsirite:
-      return 'Pinsirite';
+      return 'Pinsirite'
     case Item.Aerodactylite:
-      return 'Aerodactylite';
+      return 'Aerodactylite'
     case Item.Lucarionite:
-      return 'Lucarionite';
+      return 'Lucarionite'
     case Item.Abomasite:
-      return 'Abomasite';
+      return 'Abomasite'
     case Item.Kangaskhanite:
-      return 'Kangaskhanite';
+      return 'Kangaskhanite'
     case Item.Gyaradosite:
-      return 'Gyaradosite';
+      return 'Gyaradosite'
     case Item.Absolite:
-      return 'Absolite';
+      return 'Absolite'
     case Item.CharizarditeY:
-      return 'Charizardite Y';
+      return 'Charizardite Y'
     case Item.Alakazite:
-      return 'Alakazite';
+      return 'Alakazite'
     case Item.Heracronite:
-      return 'Heracronite';
+      return 'Heracronite'
     case Item.Mawilite:
-      return 'Mawilite';
+      return 'Mawilite'
     case Item.Manectite:
-      return 'Manectite';
+      return 'Manectite'
     case Item.Garchompite:
-      return 'Garchompite';
+      return 'Garchompite'
     case Item.Latiasite:
-      return 'Latiasite';
+      return 'Latiasite'
     case Item.Latiosite:
-      return 'Latiosite';
+      return 'Latiosite'
     case Item.RoseliBerry:
-      return 'Roseli Berry';
+      return 'Roseli Berry'
     case Item.KeeBerry:
-      return 'Kee Berry';
+      return 'Kee Berry'
     case Item.MarangaBerry:
-      return 'Maranga Berry';
+      return 'Maranga Berry'
     case Item.Sprinklotad:
-      return 'Sprinklotad';
+      return 'Sprinklotad'
     case Item.TM96:
-      return 'TM96';
+      return 'TM96'
     case Item.TM97:
-      return 'TM97';
+      return 'TM97'
     case Item.TM98:
-      return 'TM98';
+      return 'TM98'
     case Item.TM99:
-      return 'TM99';
+      return 'TM99'
     case Item.TM100:
-      return 'TM100';
+      return 'TM100'
     case Item.PowerPlantPass:
-      return 'Power Plant Pass';
+      return 'Power Plant Pass'
     case Item.MegaRing:
-      return 'Mega Ring';
+      return 'Mega Ring'
     case Item.IntriguingStone:
-      return 'Intriguing Stone';
+      return 'Intriguing Stone'
     case Item.CommonStone:
-      return 'Common Stone';
+      return 'Common Stone'
     case Item.DiscountCoupon:
-      return 'Discount Coupon';
+      return 'Discount Coupon'
     case Item.ElevatorKey:
-      return 'Elevator Key';
+      return 'Elevator Key'
     case Item.TMVPass:
-      return 'TMV Pass';
+      return 'TMV Pass'
     case Item.HonorOfKalos:
-      return 'Honor of Kalos';
+      return 'Honor of Kalos'
     case Item.AdventureGuide:
-      return 'Adventure Guide';
+      return 'Adventure Guide'
     case Item.StrangeSouvenir:
-      return 'Strange Souvenir';
+      return 'Strange Souvenir'
     case Item.LensCase:
-      return 'Lens Case';
+      return 'Lens Case'
     case Item.MakeupBag:
-      return 'Makeup Bag';
+      return 'Makeup Bag'
     case Item.TravelTrunk:
-      return 'Travel Trunk';
+      return 'Travel Trunk'
     case Item.LumioseGalette:
-      return 'Lumiose Galette';
+      return 'Lumiose Galette'
     case Item.ShalourSable:
-      return 'Shalour Sable';
+      return 'Shalour Sable'
     case Item.JawFossil:
-      return 'Jaw Fossil';
+      return 'Jaw Fossil'
     case Item.SailFossil:
-      return 'Sail Fossil';
+      return 'Sail Fossil'
     case Item.LookerTicket:
-      return 'Looker Ticket';
+      return 'Looker Ticket'
     case Item.Bike_1:
-      return 'Bike';
+      return 'Bike'
     case Item.HoloCaster_1:
-      return 'Holo Caster';
+      return 'Holo Caster'
     case Item.FairyGem:
-      return 'Fairy Gem';
+      return 'Fairy Gem'
     case Item.MegaCharm:
-      return 'Mega Charm';
+      return 'Mega Charm'
     case Item.MegaGlove:
-      return 'Mega Glove';
+      return 'Mega Glove'
     case Item.MachBike:
-      return 'Mach Bike';
+      return 'Mach Bike'
     case Item.AcroBike:
-      return 'Acro Bike';
+      return 'Acro Bike'
     case Item.WailmerPail:
-      return 'Wailmer Pail';
+      return 'Wailmer Pail'
     case Item.DevonParts:
-      return 'Devon Parts';
+      return 'Devon Parts'
     case Item.SootSack:
-      return 'Soot Sack';
+      return 'Soot Sack'
     case Item.BasementKey_1:
-      return 'Basement Key';
+      return 'Basement Key'
     case Item.PokeblockKit:
-      return 'Pok\u00E9block Kit';
+      return 'Pok\u00E9block Kit'
     case Item.Letter:
-      return 'Letter';
+      return 'Letter'
     case Item.EonTicket:
-      return 'Eon Ticket';
+      return 'Eon Ticket'
     case Item.Scanner:
-      return 'Scanner';
+      return 'Scanner'
     case Item.GoGoggles:
-      return 'Go-Goggles';
+      return 'Go-Goggles'
     case Item.Meteorite:
-      return 'Meteorite';
+      return 'Meteorite'
     case Item.KeyToRoom1:
-      return 'Key to Room 1';
+      return 'Key to Room 1'
     case Item.KeyToRoom2:
-      return 'Key to Room 2';
+      return 'Key to Room 2'
     case Item.KeyToRoom4:
-      return 'Key to Room 4';
+      return 'Key to Room 4'
     case Item.KeyToRoom6:
-      return 'Key to Room 6';
+      return 'Key to Room 6'
     case Item.StorageKey_1:
-      return 'Storage Key';
+      return 'Storage Key'
     case Item.DevonScope:
-      return 'Devon Scope';
+      return 'Devon Scope'
     case Item.SSTicket_1:
-      return 'S.S. Ticket';
+      return 'S.S. Ticket'
     case Item.HM07:
-      return 'HM07';
+      return 'HM07'
     case Item.DevonScubaGear:
-      return 'Devon Scuba Gear';
+      return 'Devon Scuba Gear'
     case Item.ContestCostume:
-      return 'Contest Costume';
+      return 'Contest Costume'
     case Item.ContestCostume_1:
-      return 'Contest Costume';
+      return 'Contest Costume'
     case Item.MagmaSuit:
-      return 'Magma Suit';
+      return 'Magma Suit'
     case Item.AquaSuit:
-      return 'Aqua Suit';
+      return 'Aqua Suit'
     case Item.PairOfTickets:
-      return 'Pair of Tickets';
+      return 'Pair of Tickets'
     case Item.MegaBracelet:
-      return 'Mega Bracelet';
+      return 'Mega Bracelet'
     case Item.MegaPendant:
-      return 'Mega Pendant';
+      return 'Mega Pendant'
     case Item.MegaGlasses:
-      return 'Mega Glasses';
+      return 'Mega Glasses'
     case Item.MegaAnchor:
-      return 'Mega Anchor';
+      return 'Mega Anchor'
     case Item.MegaStickpin:
-      return 'Mega Stickpin';
+      return 'Mega Stickpin'
     case Item.MegaTiara:
-      return 'Mega Tiara';
+      return 'Mega Tiara'
     case Item.MegaAnklet:
-      return 'Mega Anklet';
+      return 'Mega Anklet'
     case Item.Meteorite_1:
-      return 'Meteorite';
+      return 'Meteorite'
     case Item.Swampertite:
-      return 'Swampertite';
+      return 'Swampertite'
     case Item.Sceptilite:
-      return 'Sceptilite';
+      return 'Sceptilite'
     case Item.Sablenite:
-      return 'Sablenite';
+      return 'Sablenite'
     case Item.Altarianite:
-      return 'Altarianite';
+      return 'Altarianite'
     case Item.Galladite:
-      return 'Galladite';
+      return 'Galladite'
     case Item.Audinite:
-      return 'Audinite';
+      return 'Audinite'
     case Item.Metagrossite:
-      return 'Metagrossite';
+      return 'Metagrossite'
     case Item.Sharpedonite:
-      return 'Sharpedonite';
+      return 'Sharpedonite'
     case Item.Slowbronite:
-      return 'Slowbronite';
+      return 'Slowbronite'
     case Item.Steelixite:
-      return 'Steelixite';
+      return 'Steelixite'
     case Item.Pidgeotite:
-      return 'Pidgeotite';
+      return 'Pidgeotite'
     case Item.Glalitite:
-      return 'Glalitite';
+      return 'Glalitite'
     case Item.Diancite:
-      return 'Diancite';
+      return 'Diancite'
     case Item.PrisonBottle:
-      return 'Prison Bottle';
+      return 'Prison Bottle'
     case Item.MegaCuff:
-      return 'Mega Cuff';
+      return 'Mega Cuff'
     case Item.Cameruptite:
-      return 'Cameruptite';
+      return 'Cameruptite'
     case Item.Lopunnite:
-      return 'Lopunnite';
+      return 'Lopunnite'
     case Item.Salamencite:
-      return 'Salamencite';
+      return 'Salamencite'
     case Item.Beedrillite:
-      return 'Beedrillite';
+      return 'Beedrillite'
     case Item.Meteorite_2:
-      return 'Meteorite';
+      return 'Meteorite'
     case Item.Meteorite_3:
-      return 'Meteorite';
+      return 'Meteorite'
     case Item.KeyStone:
-      return 'Key Stone';
+      return 'Key Stone'
     case Item.MeteoriteShard:
-      return 'Meteorite Shard';
+      return 'Meteorite Shard'
     case Item.EonFlute:
-      return 'Eon Flute';
+      return 'Eon Flute'
     case Item.NormaliumZ:
-      return 'Normalium Z';
+      return 'Normalium Z'
     case Item.FiriumZ:
-      return 'Firium Z';
+      return 'Firium Z'
     case Item.WateriumZ:
-      return 'Waterium Z';
+      return 'Waterium Z'
     case Item.ElectriumZ:
-      return 'Electrium Z';
+      return 'Electrium Z'
     case Item.GrassiumZ:
-      return 'Grassium Z';
+      return 'Grassium Z'
     case Item.IciumZ:
-      return 'Icium Z';
+      return 'Icium Z'
     case Item.FightiniumZ:
-      return 'Fightinium Z';
+      return 'Fightinium Z'
     case Item.PoisoniumZ:
-      return 'Poisonium Z';
+      return 'Poisonium Z'
     case Item.GroundiumZ:
-      return 'Groundium Z';
+      return 'Groundium Z'
     case Item.FlyiniumZ:
-      return 'Flyinium Z';
+      return 'Flyinium Z'
     case Item.PsychiumZ:
-      return 'Psychium Z';
+      return 'Psychium Z'
     case Item.BuginiumZ:
-      return 'Buginium Z';
+      return 'Buginium Z'
     case Item.RockiumZ:
-      return 'Rockium Z';
+      return 'Rockium Z'
     case Item.GhostiumZ:
-      return 'Ghostium Z';
+      return 'Ghostium Z'
     case Item.DragoniumZ:
-      return 'Dragonium Z';
+      return 'Dragonium Z'
     case Item.DarkiniumZ:
-      return 'Darkinium Z';
+      return 'Darkinium Z'
     case Item.SteeliumZ:
-      return 'Steelium Z';
+      return 'Steelium Z'
     case Item.FairiumZ:
-      return 'Fairium Z';
+      return 'Fairium Z'
     case Item.PikaniumZ:
-      return 'Pikanium Z';
+      return 'Pikanium Z'
     case Item.BottleCap:
-      return 'Bottle Cap';
+      return 'Bottle Cap'
     case Item.GoldBottleCap:
-      return 'Gold Bottle Cap';
+      return 'Gold Bottle Cap'
     case Item.ZRing:
-      return 'Z-Ring';
+      return 'Z-Ring'
     case Item.DecidiumZ:
-      return 'Decidium Z';
+      return 'Decidium Z'
     case Item.InciniumZ:
-      return 'Incinium Z';
+      return 'Incinium Z'
     case Item.PrimariumZ:
-      return 'Primarium Z';
+      return 'Primarium Z'
     case Item.TapuniumZ:
-      return 'Tapunium Z';
+      return 'Tapunium Z'
     case Item.MarshadiumZ:
-      return 'Marshadium Z';
+      return 'Marshadium Z'
     case Item.AloraichiumZ:
-      return 'Aloraichium Z';
+      return 'Aloraichium Z'
     case Item.SnorliumZ:
-      return 'Snorlium Z';
+      return 'Snorlium Z'
     case Item.EeviumZ:
-      return 'Eevium Z';
+      return 'Eevium Z'
     case Item.MewniumZ:
-      return 'Mewnium Z';
+      return 'Mewnium Z'
     case Item.NormaliumZ_1:
-      return 'Normalium Z';
+      return 'Normalium Z'
     case Item.FiriumZ_1:
-      return 'Firium Z';
+      return 'Firium Z'
     case Item.WateriumZ_1:
-      return 'Waterium Z';
+      return 'Waterium Z'
     case Item.ElectriumZ_1:
-      return 'Electrium Z';
+      return 'Electrium Z'
     case Item.GrassiumZ_1:
-      return 'Grassium Z';
+      return 'Grassium Z'
     case Item.IciumZ_1:
-      return 'Icium Z';
+      return 'Icium Z'
     case Item.FightiniumZ_1:
-      return 'Fightinium Z';
+      return 'Fightinium Z'
     case Item.PoisoniumZ_1:
-      return 'Poisonium Z';
+      return 'Poisonium Z'
     case Item.GroundiumZ_1:
-      return 'Groundium Z';
+      return 'Groundium Z'
     case Item.FlyiniumZ_1:
-      return 'Flyinium Z';
+      return 'Flyinium Z'
     case Item.PsychiumZ_1:
-      return 'Psychium Z';
+      return 'Psychium Z'
     case Item.BuginiumZ_1:
-      return 'Buginium Z';
+      return 'Buginium Z'
     case Item.RockiumZ_1:
-      return 'Rockium Z';
+      return 'Rockium Z'
     case Item.GhostiumZ_1:
-      return 'Ghostium Z';
+      return 'Ghostium Z'
     case Item.DragoniumZ_1:
-      return 'Dragonium Z';
+      return 'Dragonium Z'
     case Item.DarkiniumZ_1:
-      return 'Darkinium Z';
+      return 'Darkinium Z'
     case Item.SteeliumZ_1:
-      return 'Steelium Z';
+      return 'Steelium Z'
     case Item.FairiumZ_1:
-      return 'Fairium Z';
+      return 'Fairium Z'
     case Item.PikaniumZ_1:
-      return 'Pikanium Z';
+      return 'Pikanium Z'
     case Item.DecidiumZ_1:
-      return 'Decidium Z';
+      return 'Decidium Z'
     case Item.InciniumZ_1:
-      return 'Incinium Z';
+      return 'Incinium Z'
     case Item.PrimariumZ_1:
-      return 'Primarium Z';
+      return 'Primarium Z'
     case Item.TapuniumZ_1:
-      return 'Tapunium Z';
+      return 'Tapunium Z'
     case Item.MarshadiumZ_1:
-      return 'Marshadium Z';
+      return 'Marshadium Z'
     case Item.AloraichiumZ_1:
-      return 'Aloraichium Z';
+      return 'Aloraichium Z'
     case Item.SnorliumZ_1:
-      return 'Snorlium Z';
+      return 'Snorlium Z'
     case Item.EeviumZ_1:
-      return 'Eevium Z';
+      return 'Eevium Z'
     case Item.MewniumZ_1:
-      return 'Mewnium Z';
+      return 'Mewnium Z'
     case Item.PikashuniumZ:
-      return 'Pikashunium Z';
+      return 'Pikashunium Z'
     case Item.PikashuniumZ_1:
-      return 'Pikashunium Z';
+      return 'Pikashunium Z'
     case Item.Unknown_10:
-      return '???';
+      return '???'
     case Item.Unknown_11:
-      return '???';
+      return '???'
     case Item.Unknown_12:
-      return '???';
+      return '???'
     case Item.Unknown_13:
-      return '???';
+      return '???'
     case Item.ForageBag:
-      return 'Forage Bag';
+      return 'Forage Bag'
     case Item.FishingRod:
-      return 'Fishing Rod';
+      return 'Fishing Rod'
     case Item.ProfessorsMask:
-      return 'Professor\u2019s Mask';
+      return 'Professor\u2019s Mask'
     case Item.FestivalTicket:
-      return 'Festival Ticket';
+      return 'Festival Ticket'
     case Item.SparklingStone:
-      return 'Sparkling Stone';
+      return 'Sparkling Stone'
     case Item.AdrenalineOrb:
-      return 'Adrenaline Orb';
+      return 'Adrenaline Orb'
     case Item.ZygardeCube:
-      return 'Zygarde Cube';
+      return 'Zygarde Cube'
     case Item.Unknown_14:
-      return '???';
+      return '???'
     case Item.IceStone:
-      return 'Ice Stone';
+      return 'Ice Stone'
     case Item.RidePager:
-      return 'Ride Pager';
+      return 'Ride Pager'
     case Item.BeastBall:
-      return 'Beast Ball';
+      return 'Beast Ball'
     case Item.BigMalasada:
-      return 'Big Malasada';
+      return 'Big Malasada'
     case Item.RedNectar:
-      return 'Red Nectar';
+      return 'Red Nectar'
     case Item.YellowNectar:
-      return 'Yellow Nectar';
+      return 'Yellow Nectar'
     case Item.PinkNectar:
-      return 'Pink Nectar';
+      return 'Pink Nectar'
     case Item.PurpleNectar:
-      return 'Purple Nectar';
+      return 'Purple Nectar'
     case Item.SunFlute:
-      return 'Sun Flute';
+      return 'Sun Flute'
     case Item.MoonFlute:
-      return 'Moon Flute';
+      return 'Moon Flute'
     case Item.Unknown_15:
-      return '???';
+      return '???'
     case Item.EnigmaticCard:
-      return 'Enigmatic Card';
+      return 'Enigmatic Card'
     case Item.SilverRazzBerry:
-      return 'Silver Razz Berry';
+      return 'Silver Razz Berry'
     case Item.GoldenRazzBerry:
-      return 'Golden Razz Berry';
+      return 'Golden Razz Berry'
     case Item.SilverNanabBerry:
-      return 'Silver Nanab Berry';
+      return 'Silver Nanab Berry'
     case Item.GoldenNanabBerry:
-      return 'Golden Nanab Berry';
+      return 'Golden Nanab Berry'
     case Item.SilverPinapBerry:
-      return 'Silver Pinap Berry';
+      return 'Silver Pinap Berry'
     case Item.GoldenPinapBerry:
-      return 'Golden Pinap Berry';
+      return 'Golden Pinap Berry'
     case Item.Unknown_16:
-      return '???';
+      return '???'
     case Item.Unknown_17:
-      return '???';
+      return '???'
     case Item.Unknown_18:
-      return '???';
+      return '???'
     case Item.Unknown_19:
-      return '???';
+      return '???'
     case Item.Unknown_20:
-      return '???';
+      return '???'
     case Item.SecretKey_1:
-      return 'Secret Key';
+      return 'Secret Key'
     case Item.SSTicket_2:
-      return 'S.S. Ticket';
+      return 'S.S. Ticket'
     case Item.SilphScope:
-      return 'Silph Scope';
+      return 'Silph Scope'
     case Item.Parcel_1:
-      return 'Parcel';
+      return 'Parcel'
     case Item.CardKey_1:
-      return 'Card Key';
+      return 'Card Key'
     case Item.GoldTeeth:
-      return 'Gold Teeth';
+      return 'Gold Teeth'
     case Item.LiftKey:
-      return 'Lift Key';
+      return 'Lift Key'
     case Item.TerrainExtender:
-      return 'Terrain Extender';
+      return 'Terrain Extender'
     case Item.ProtectivePads:
-      return 'Protective Pads';
+      return 'Protective Pads'
     case Item.ElectricSeed:
-      return 'Electric Seed';
+      return 'Electric Seed'
     case Item.PsychicSeed:
-      return 'Psychic Seed';
+      return 'Psychic Seed'
     case Item.MistySeed:
-      return 'Misty Seed';
+      return 'Misty Seed'
     case Item.GrassySeed:
-      return 'Grassy Seed';
+      return 'Grassy Seed'
     case Item.StretchySpring:
-      return 'Stretchy Spring';
+      return 'Stretchy Spring'
     case Item.ChalkyStone:
-      return 'Chalky Stone';
+      return 'Chalky Stone'
     case Item.Marble:
-      return 'Marble';
+      return 'Marble'
     case Item.LoneEarring:
-      return 'Lone Earring';
+      return 'Lone Earring'
     case Item.BeachGlass:
-      return 'Beach Glass';
+      return 'Beach Glass'
     case Item.GoldLeaf:
-      return 'Gold Leaf';
+      return 'Gold Leaf'
     case Item.SilverLeaf:
-      return 'Silver Leaf';
+      return 'Silver Leaf'
     case Item.PolishedMudBall:
-      return 'Polished Mud Ball';
+      return 'Polished Mud Ball'
     case Item.TropicalShell:
-      return 'Tropical Shell';
+      return 'Tropical Shell'
     case Item.LeafLetter:
-      return 'Leaf Letter';
+      return 'Leaf Letter'
     case Item.LeafLetter_1:
-      return 'Leaf Letter';
+      return 'Leaf Letter'
     case Item.SmallBouquet:
-      return 'Small Bouquet';
+      return 'Small Bouquet'
     case Item.Unknown_21:
-      return '???';
+      return '???'
     case Item.Unknown_22:
-      return '???';
+      return '???'
     case Item.Unknown_23:
-      return '???';
+      return '???'
     case Item.Lure:
-      return 'Lure';
+      return 'Lure'
     case Item.SuperLure:
-      return 'Super Lure';
+      return 'Super Lure'
     case Item.MaxLure:
-      return 'Max Lure';
+      return 'Max Lure'
     case Item.PewterCrunchies:
-      return 'Pewter Crunchies';
+      return 'Pewter Crunchies'
     case Item.FightingMemory:
-      return 'Fighting Memory';
+      return 'Fighting Memory'
     case Item.FlyingMemory:
-      return 'Flying Memory';
+      return 'Flying Memory'
     case Item.PoisonMemory:
-      return 'Poison Memory';
+      return 'Poison Memory'
     case Item.GroundMemory:
-      return 'Ground Memory';
+      return 'Ground Memory'
     case Item.RockMemory:
-      return 'Rock Memory';
+      return 'Rock Memory'
     case Item.BugMemory:
-      return 'Bug Memory';
+      return 'Bug Memory'
     case Item.GhostMemory:
-      return 'Ghost Memory';
+      return 'Ghost Memory'
     case Item.SteelMemory:
-      return 'Steel Memory';
+      return 'Steel Memory'
     case Item.FireMemory:
-      return 'Fire Memory';
+      return 'Fire Memory'
     case Item.WaterMemory:
-      return 'Water Memory';
+      return 'Water Memory'
     case Item.GrassMemory:
-      return 'Grass Memory';
+      return 'Grass Memory'
     case Item.ElectricMemory:
-      return 'Electric Memory';
+      return 'Electric Memory'
     case Item.PsychicMemory:
-      return 'Psychic Memory';
+      return 'Psychic Memory'
     case Item.IceMemory:
-      return 'Ice Memory';
+      return 'Ice Memory'
     case Item.DragonMemory:
-      return 'Dragon Memory';
+      return 'Dragon Memory'
     case Item.DarkMemory:
-      return 'Dark Memory';
+      return 'Dark Memory'
     case Item.FairyMemory:
-      return 'Fairy Memory';
+      return 'Fairy Memory'
     case Item.SolganiumZ:
-      return 'Solganium Z';
+      return 'Solganium Z'
     case Item.LunaliumZ:
-      return 'Lunalium Z';
+      return 'Lunalium Z'
     case Item.UltranecroziumZ:
-      return 'Ultranecrozium Z';
+      return 'Ultranecrozium Z'
     case Item.MimikiumZ:
-      return 'Mimikium Z';
+      return 'Mimikium Z'
     case Item.LycaniumZ:
-      return 'Lycanium Z';
+      return 'Lycanium Z'
     case Item.KommoniumZ:
-      return 'Kommonium Z';
+      return 'Kommonium Z'
     case Item.SolganiumZ_1:
-      return 'Solganium Z';
+      return 'Solganium Z'
     case Item.LunaliumZ_1:
-      return 'Lunalium Z';
+      return 'Lunalium Z'
     case Item.UltranecroziumZ_1:
-      return 'Ultranecrozium Z';
+      return 'Ultranecrozium Z'
     case Item.MimikiumZ_1:
-      return 'Mimikium Z';
+      return 'Mimikium Z'
     case Item.LycaniumZ_1:
-      return 'Lycanium Z';
+      return 'Lycanium Z'
     case Item.KommoniumZ_1:
-      return 'Kommonium Z';
+      return 'Kommonium Z'
     case Item.ZPowerRing:
-      return 'Z-Power Ring';
+      return 'Z-Power Ring'
     case Item.PinkPetal:
-      return 'Pink Petal';
+      return 'Pink Petal'
     case Item.OrangePetal:
-      return 'Orange Petal';
+      return 'Orange Petal'
     case Item.BluePetal:
-      return 'Blue Petal';
+      return 'Blue Petal'
     case Item.RedPetal:
-      return 'Red Petal';
+      return 'Red Petal'
     case Item.GreenPetal:
-      return 'Green Petal';
+      return 'Green Petal'
     case Item.YellowPetal:
-      return 'Yellow Petal';
+      return 'Yellow Petal'
     case Item.PurplePetal:
-      return 'Purple Petal';
+      return 'Purple Petal'
     case Item.RainbowFlower:
-      return 'Rainbow Flower';
+      return 'Rainbow Flower'
     case Item.SurgeBadge:
-      return 'Surge Badge';
+      return 'Surge Badge'
     case Item.NSolarizer:
-      return 'N-Solarizer';
+      return 'N-Solarizer'
     case Item.NLunarizer:
-      return 'N-Lunarizer';
+      return 'N-Lunarizer'
     case Item.NSolarizer_1:
-      return 'N-Solarizer';
+      return 'N-Solarizer'
     case Item.NLunarizer_1:
-      return 'N-Lunarizer';
+      return 'N-Lunarizer'
     case Item.IlimasNormaliumZ:
-      return 'Ilima\u2019s Normalium Z';
+      return 'Ilima\u2019s Normalium Z'
     case Item.LeftPokeBall:
-      return 'Left Pok\u00E9 Ball';
+      return 'Left Pok\u00E9 Ball'
     case Item.RotoHatch:
-      return 'Roto Hatch';
+      return 'Roto Hatch'
     case Item.RotoBargain:
-      return 'Roto Bargain';
+      return 'Roto Bargain'
     case Item.RotoPrizeMoney:
-      return 'Roto Prize Money';
+      return 'Roto Prize Money'
     case Item.RotoExpPoints:
-      return 'Roto Exp. Points';
+      return 'Roto Exp. Points'
     case Item.RotoFriendship:
-      return 'Roto Friendship';
+      return 'Roto Friendship'
     case Item.RotoEncounter:
-      return 'Roto Encounter';
+      return 'Roto Encounter'
     case Item.RotoStealth:
-      return 'Roto Stealth';
+      return 'Roto Stealth'
     case Item.RotoHPRestore:
-      return 'Roto HP Restore';
+      return 'Roto HP Restore'
     case Item.RotoPPRestore:
-      return 'Roto PP Restore';
+      return 'Roto PP Restore'
     case Item.RotoBoost:
-      return 'Roto Boost';
+      return 'Roto Boost'
     case Item.RotoCatch:
-      return 'Roto Catch';
+      return 'Roto Catch'
     case Item.HealthCandy:
-      return 'Health Candy';
+      return 'Health Candy'
     case Item.MightyCandy:
-      return 'Mighty Candy';
+      return 'Mighty Candy'
     case Item.ToughCandy:
-      return 'Tough Candy';
+      return 'Tough Candy'
     case Item.SmartCandy:
-      return 'Smart Candy';
+      return 'Smart Candy'
     case Item.CourageCandy:
-      return 'Courage Candy';
+      return 'Courage Candy'
     case Item.QuickCandy:
-      return 'Quick Candy';
+      return 'Quick Candy'
     case Item.HealthCandyL:
-      return 'Health Candy L';
+      return 'Health Candy L'
     case Item.MightyCandyL:
-      return 'Mighty Candy L';
+      return 'Mighty Candy L'
     case Item.ToughCandyL:
-      return 'Tough Candy L';
+      return 'Tough Candy L'
     case Item.SmartCandyL:
-      return 'Smart Candy L';
+      return 'Smart Candy L'
     case Item.CourageCandyL:
-      return 'Courage Candy L';
+      return 'Courage Candy L'
     case Item.QuickCandyL:
-      return 'Quick Candy L';
+      return 'Quick Candy L'
     case Item.HealthCandyXL:
-      return 'Health Candy XL';
+      return 'Health Candy XL'
     case Item.MightyCandyXL:
-      return 'Mighty Candy XL';
+      return 'Mighty Candy XL'
     case Item.ToughCandyXL:
-      return 'Tough Candy XL';
+      return 'Tough Candy XL'
     case Item.SmartCandyXL:
-      return 'Smart Candy XL';
+      return 'Smart Candy XL'
     case Item.CourageCandyXL:
-      return 'Courage Candy XL';
+      return 'Courage Candy XL'
     case Item.QuickCandyXL:
-      return 'Quick Candy XL';
+      return 'Quick Candy XL'
     case Item.BulbasaurCandy:
-      return 'Bulbasaur Candy';
+      return 'Bulbasaur Candy'
     case Item.CharmanderCandy:
-      return 'Charmander Candy';
+      return 'Charmander Candy'
     case Item.SquirtleCandy:
-      return 'Squirtle Candy';
+      return 'Squirtle Candy'
     case Item.CaterpieCandy:
-      return 'Caterpie Candy';
+      return 'Caterpie Candy'
     case Item.WeedleCandy:
-      return 'Weedle Candy';
+      return 'Weedle Candy'
     case Item.PidgeyCandy:
-      return 'Pidgey Candy';
+      return 'Pidgey Candy'
     case Item.RattataCandy:
-      return 'Rattata Candy';
+      return 'Rattata Candy'
     case Item.SpearowCandy:
-      return 'Spearow Candy';
+      return 'Spearow Candy'
     case Item.EkansCandy:
-      return 'Ekans Candy';
+      return 'Ekans Candy'
     case Item.PikachuCandy:
-      return 'Pikachu Candy';
+      return 'Pikachu Candy'
     case Item.SandshrewCandy:
-      return 'Sandshrew Candy';
+      return 'Sandshrew Candy'
     case Item.NidoranCandy:
-      return 'Nidoran\u2640 Candy';
+      return 'Nidoran\u2640 Candy'
     case Item.NidoranCandy_1:
-      return 'Nidoran\u2642 Candy';
+      return 'Nidoran\u2642 Candy'
     case Item.ClefairyCandy:
-      return 'Clefairy Candy';
+      return 'Clefairy Candy'
     case Item.VulpixCandy:
-      return 'Vulpix Candy';
+      return 'Vulpix Candy'
     case Item.JigglypuffCandy:
-      return 'Jigglypuff Candy';
+      return 'Jigglypuff Candy'
     case Item.ZubatCandy:
-      return 'Zubat Candy';
+      return 'Zubat Candy'
     case Item.OddishCandy:
-      return 'Oddish Candy';
+      return 'Oddish Candy'
     case Item.ParasCandy:
-      return 'Paras Candy';
+      return 'Paras Candy'
     case Item.VenonatCandy:
-      return 'Venonat Candy';
+      return 'Venonat Candy'
     case Item.DiglettCandy:
-      return 'Diglett Candy';
+      return 'Diglett Candy'
     case Item.MeowthCandy:
-      return 'Meowth Candy';
+      return 'Meowth Candy'
     case Item.PsyduckCandy:
-      return 'Psyduck Candy';
+      return 'Psyduck Candy'
     case Item.MankeyCandy:
-      return 'Mankey Candy';
+      return 'Mankey Candy'
     case Item.GrowlitheCandy:
-      return 'Growlithe Candy';
+      return 'Growlithe Candy'
     case Item.PoliwagCandy:
-      return 'Poliwag Candy';
+      return 'Poliwag Candy'
     case Item.AbraCandy:
-      return 'Abra Candy';
+      return 'Abra Candy'
     case Item.MachopCandy:
-      return 'Machop Candy';
+      return 'Machop Candy'
     case Item.BellsproutCandy:
-      return 'Bellsprout Candy';
+      return 'Bellsprout Candy'
     case Item.TentacoolCandy:
-      return 'Tentacool Candy';
+      return 'Tentacool Candy'
     case Item.GeodudeCandy:
-      return 'Geodude Candy';
+      return 'Geodude Candy'
     case Item.PonytaCandy:
-      return 'Ponyta Candy';
+      return 'Ponyta Candy'
     case Item.SlowpokeCandy:
-      return 'Slowpoke Candy';
+      return 'Slowpoke Candy'
     case Item.MagnemiteCandy:
-      return 'Magnemite Candy';
+      return 'Magnemite Candy'
     case Item.FarfetchdCandy:
-      return 'Farfetch\u2019d Candy';
+      return 'Farfetch\u2019d Candy'
     case Item.DoduoCandy:
-      return 'Doduo Candy';
+      return 'Doduo Candy'
     case Item.SeelCandy:
-      return 'Seel Candy';
+      return 'Seel Candy'
     case Item.GrimerCandy:
-      return 'Grimer Candy';
+      return 'Grimer Candy'
     case Item.ShellderCandy:
-      return 'Shellder Candy';
+      return 'Shellder Candy'
     case Item.GastlyCandy:
-      return 'Gastly Candy';
+      return 'Gastly Candy'
     case Item.OnixCandy:
-      return 'Onix Candy';
+      return 'Onix Candy'
     case Item.DrowzeeCandy:
-      return 'Drowzee Candy';
+      return 'Drowzee Candy'
     case Item.KrabbyCandy:
-      return 'Krabby Candy';
+      return 'Krabby Candy'
     case Item.VoltorbCandy:
-      return 'Voltorb Candy';
+      return 'Voltorb Candy'
     case Item.ExeggcuteCandy:
-      return 'Exeggcute Candy';
+      return 'Exeggcute Candy'
     case Item.CuboneCandy:
-      return 'Cubone Candy';
+      return 'Cubone Candy'
     case Item.HitmonleeCandy:
-      return 'Hitmonlee Candy';
+      return 'Hitmonlee Candy'
     case Item.HitmonchanCandy:
-      return 'Hitmonchan Candy';
+      return 'Hitmonchan Candy'
     case Item.LickitungCandy:
-      return 'Lickitung Candy';
+      return 'Lickitung Candy'
     case Item.KoffingCandy:
-      return 'Koffing Candy';
+      return 'Koffing Candy'
     case Item.RhyhornCandy:
-      return 'Rhyhorn Candy';
+      return 'Rhyhorn Candy'
     case Item.ChanseyCandy:
-      return 'Chansey Candy';
+      return 'Chansey Candy'
     case Item.TangelaCandy:
-      return 'Tangela Candy';
+      return 'Tangela Candy'
     case Item.KangaskhanCandy:
-      return 'Kangaskhan Candy';
+      return 'Kangaskhan Candy'
     case Item.HorseaCandy:
-      return 'Horsea Candy';
+      return 'Horsea Candy'
     case Item.GoldeenCandy:
-      return 'Goldeen Candy';
+      return 'Goldeen Candy'
     case Item.StaryuCandy:
-      return 'Staryu Candy';
+      return 'Staryu Candy'
     case Item.MrMimeCandy:
-      return 'Mr. Mime Candy';
+      return 'Mr. Mime Candy'
     case Item.ScytherCandy:
-      return 'Scyther Candy';
+      return 'Scyther Candy'
     case Item.JynxCandy:
-      return 'Jynx Candy';
+      return 'Jynx Candy'
     case Item.ElectabuzzCandy:
-      return 'Electabuzz Candy';
+      return 'Electabuzz Candy'
     case Item.PinsirCandy:
-      return 'Pinsir Candy';
+      return 'Pinsir Candy'
     case Item.TaurosCandy:
-      return 'Tauros Candy';
+      return 'Tauros Candy'
     case Item.MagikarpCandy:
-      return 'Magikarp Candy';
+      return 'Magikarp Candy'
     case Item.LaprasCandy:
-      return 'Lapras Candy';
+      return 'Lapras Candy'
     case Item.DittoCandy:
-      return 'Ditto Candy';
+      return 'Ditto Candy'
     case Item.EeveeCandy:
-      return 'Eevee Candy';
+      return 'Eevee Candy'
     case Item.PorygonCandy:
-      return 'Porygon Candy';
+      return 'Porygon Candy'
     case Item.OmanyteCandy:
-      return 'Omanyte Candy';
+      return 'Omanyte Candy'
     case Item.KabutoCandy:
-      return 'Kabuto Candy';
+      return 'Kabuto Candy'
     case Item.AerodactylCandy:
-      return 'Aerodactyl Candy';
+      return 'Aerodactyl Candy'
     case Item.SnorlaxCandy:
-      return 'Snorlax Candy';
+      return 'Snorlax Candy'
     case Item.ArticunoCandy:
-      return 'Articuno Candy';
+      return 'Articuno Candy'
     case Item.ZapdosCandy:
-      return 'Zapdos Candy';
+      return 'Zapdos Candy'
     case Item.MoltresCandy:
-      return 'Moltres Candy';
+      return 'Moltres Candy'
     case Item.DratiniCandy:
-      return 'Dratini Candy';
+      return 'Dratini Candy'
     case Item.MewtwoCandy:
-      return 'Mewtwo Candy';
+      return 'Mewtwo Candy'
     case Item.MewCandy:
-      return 'Mew Candy';
+      return 'Mew Candy'
     case Item.MeltanCandy:
-      return 'Meltan Candy';
+      return 'Meltan Candy'
     case Item.MagmarCandy:
-      return 'Magmar Candy';
+      return 'Magmar Candy'
     case Item.Unknown_24:
-      return '???';
+      return '???'
     case Item.Unknown_25:
-      return '???';
+      return '???'
     case Item.Unknown_26:
-      return '???';
+      return '???'
     case Item.Unknown_27:
-      return '???';
+      return '???'
     case Item.Unknown_28:
-      return '???';
+      return '???'
     case Item.Unknown_29:
-      return '???';
+      return '???'
     case Item.Unknown_30:
-      return '???';
+      return '???'
     case Item.Unknown_31:
-      return '???';
+      return '???'
     case Item.Unknown_32:
-      return '???';
+      return '???'
     case Item.Unknown_33:
-      return '???';
+      return '???'
     case Item.Unknown_34:
-      return '???';
+      return '???'
     case Item.Unknown_35:
-      return '???';
+      return '???'
     case Item.Unknown_36:
-      return '???';
+      return '???'
     case Item.Unknown_37:
-      return '???';
+      return '???'
     case Item.Unknown_38:
-      return '???';
+      return '???'
     case Item.Unknown_39:
-      return '???';
+      return '???'
     case Item.Endorsement:
-      return 'Endorsement';
+      return 'Endorsement'
     case Item.PokemonBoxLink_1:
-      return 'Pok\u00E9mon Box Link';
+      return 'Pok\u00E9mon Box Link'
     case Item.WishingStar:
-      return 'Wishing Star';
+      return 'Wishing Star'
     case Item.DynamaxBand:
-      return 'Dynamax Band';
+      return 'Dynamax Band'
     case Item.Unknown_40:
-      return '???';
+      return '???'
     case Item.Unknown_41:
-      return '???';
+      return '???'
     case Item.FishingRod_1:
-      return 'Fishing Rod';
+      return 'Fishing Rod'
     case Item.RotomBike:
-      return 'Rotom Bike';
+      return 'Rotom Bike'
     case Item.Unknown_42:
-      return '???';
+      return '???'
     case Item.Unknown_43:
-      return '???';
+      return '???'
     case Item.Sausages:
-      return 'Sausages';
+      return 'Sausages'
     case Item.BobsFoodTin:
-      return 'Bob\u2019s Food Tin';
+      return 'Bob\u2019s Food Tin'
     case Item.BachsFoodTin:
-      return 'Bach\u2019s Food Tin';
+      return 'Bach\u2019s Food Tin'
     case Item.TinOfBeans:
-      return 'Tin of Beans';
+      return 'Tin of Beans'
     case Item.Bread:
-      return 'Bread';
+      return 'Bread'
     case Item.Pasta:
-      return 'Pasta';
+      return 'Pasta'
     case Item.MixedMushrooms:
-      return 'Mixed Mushrooms';
+      return 'Mixed Mushrooms'
     case Item.SmokePokeTail:
-      return 'Smoke-Poke Tail';
+      return 'Smoke-Poke Tail'
     case Item.LargeLeek:
-      return 'Large Leek';
+      return 'Large Leek'
     case Item.FancyApple:
-      return 'Fancy Apple';
+      return 'Fancy Apple'
     case Item.BrittleBones:
-      return 'Brittle Bones';
+      return 'Brittle Bones'
     case Item.PackOfPotatoes:
-      return 'Pack of Potatoes';
+      return 'Pack of Potatoes'
     case Item.PungentRoot:
-      return 'Pungent Root';
+      return 'Pungent Root'
     case Item.SaladMix:
-      return 'Salad Mix';
+      return 'Salad Mix'
     case Item.FriedFood:
-      return 'Fried Food';
+      return 'Fried Food'
     case Item.BoiledEgg:
-      return 'Boiled Egg';
+      return 'Boiled Egg'
     case Item.CampingGear:
-      return 'Camping Gear';
+      return 'Camping Gear'
     case Item.Unknown_44:
-      return '???';
+      return '???'
     case Item.Unknown_45:
-      return '???';
+      return '???'
     case Item.RustedSword:
-      return 'Rusted Sword';
+      return 'Rusted Sword'
     case Item.RustedShield:
-      return 'Rusted Shield';
+      return 'Rusted Shield'
     case Item.FossilizedBird:
-      return 'Fossilized Bird';
+      return 'Fossilized Bird'
     case Item.FossilizedFish:
-      return 'Fossilized Fish';
+      return 'Fossilized Fish'
     case Item.FossilizedDrake:
-      return 'Fossilized Drake';
+      return 'Fossilized Drake'
     case Item.FossilizedDino:
-      return 'Fossilized Dino';
+      return 'Fossilized Dino'
     case Item.StrawberrySweet:
-      return 'Strawberry Sweet';
+      return 'Strawberry Sweet'
     case Item.LoveSweet:
-      return 'Love Sweet';
+      return 'Love Sweet'
     case Item.BerrySweet:
-      return 'Berry Sweet';
+      return 'Berry Sweet'
     case Item.CloverSweet:
-      return 'Clover Sweet';
+      return 'Clover Sweet'
     case Item.FlowerSweet:
-      return 'Flower Sweet';
+      return 'Flower Sweet'
     case Item.StarSweet:
-      return 'Star Sweet';
+      return 'Star Sweet'
     case Item.RibbonSweet:
-      return 'Ribbon Sweet';
+      return 'Ribbon Sweet'
     case Item.SweetApple:
-      return 'Sweet Apple';
+      return 'Sweet Apple'
     case Item.TartApple:
-      return 'Tart Apple';
+      return 'Tart Apple'
     case Item.ThroatSpray:
-      return 'Throat Spray';
+      return 'Throat Spray'
     case Item.EjectPack:
-      return 'Eject Pack';
+      return 'Eject Pack'
     case Item.HeavyDutyBoots:
-      return 'Heavy-Duty Boots';
+      return 'Heavy-Duty Boots'
     case Item.BlunderPolicy:
-      return 'Blunder Policy';
+      return 'Blunder Policy'
     case Item.RoomService:
-      return 'Room Service';
+      return 'Room Service'
     case Item.UtilityUmbrella:
-      return 'Utility Umbrella';
+      return 'Utility Umbrella'
     case Item.ExpCandyXS:
-      return 'Exp. Candy XS';
+      return 'Exp. Candy XS'
     case Item.ExpCandyS:
-      return 'Exp. Candy S';
+      return 'Exp. Candy S'
     case Item.ExpCandyM:
-      return 'Exp. Candy M';
+      return 'Exp. Candy M'
     case Item.ExpCandyL:
-      return 'Exp. Candy L';
+      return 'Exp. Candy L'
     case Item.ExpCandyXL:
-      return 'Exp. Candy XL';
+      return 'Exp. Candy XL'
     case Item.DynamaxCandy:
-      return 'Dynamax Candy';
+      return 'Dynamax Candy'
     case Item.TR00:
-      return 'TR00';
+      return 'TR00'
     case Item.TR01:
-      return 'TR01';
+      return 'TR01'
     case Item.TR02:
-      return 'TR02';
+      return 'TR02'
     case Item.TR03:
-      return 'TR03';
+      return 'TR03'
     case Item.TR04:
-      return 'TR04';
+      return 'TR04'
     case Item.TR05:
-      return 'TR05';
+      return 'TR05'
     case Item.TR06:
-      return 'TR06';
+      return 'TR06'
     case Item.TR07:
-      return 'TR07';
+      return 'TR07'
     case Item.TR08:
-      return 'TR08';
+      return 'TR08'
     case Item.TR09:
-      return 'TR09';
+      return 'TR09'
     case Item.TR10:
-      return 'TR10';
+      return 'TR10'
     case Item.TR11:
-      return 'TR11';
+      return 'TR11'
     case Item.TR12:
-      return 'TR12';
+      return 'TR12'
     case Item.TR13:
-      return 'TR13';
+      return 'TR13'
     case Item.TR14:
-      return 'TR14';
+      return 'TR14'
     case Item.TR15:
-      return 'TR15';
+      return 'TR15'
     case Item.TR16:
-      return 'TR16';
+      return 'TR16'
     case Item.TR17:
-      return 'TR17';
+      return 'TR17'
     case Item.TR18:
-      return 'TR18';
+      return 'TR18'
     case Item.TR19:
-      return 'TR19';
+      return 'TR19'
     case Item.TR20:
-      return 'TR20';
+      return 'TR20'
     case Item.TR21:
-      return 'TR21';
+      return 'TR21'
     case Item.TR22:
-      return 'TR22';
+      return 'TR22'
     case Item.TR23:
-      return 'TR23';
+      return 'TR23'
     case Item.TR24:
-      return 'TR24';
+      return 'TR24'
     case Item.TR25:
-      return 'TR25';
+      return 'TR25'
     case Item.TR26:
-      return 'TR26';
+      return 'TR26'
     case Item.TR27:
-      return 'TR27';
+      return 'TR27'
     case Item.TR28:
-      return 'TR28';
+      return 'TR28'
     case Item.TR29:
-      return 'TR29';
+      return 'TR29'
     case Item.TR30:
-      return 'TR30';
+      return 'TR30'
     case Item.TR31:
-      return 'TR31';
+      return 'TR31'
     case Item.TR32:
-      return 'TR32';
+      return 'TR32'
     case Item.TR33:
-      return 'TR33';
+      return 'TR33'
     case Item.TR34:
-      return 'TR34';
+      return 'TR34'
     case Item.TR35:
-      return 'TR35';
+      return 'TR35'
     case Item.TR36:
-      return 'TR36';
+      return 'TR36'
     case Item.TR37:
-      return 'TR37';
+      return 'TR37'
     case Item.TR38:
-      return 'TR38';
+      return 'TR38'
     case Item.TR39:
-      return 'TR39';
+      return 'TR39'
     case Item.TR40:
-      return 'TR40';
+      return 'TR40'
     case Item.TR41:
-      return 'TR41';
+      return 'TR41'
     case Item.TR42:
-      return 'TR42';
+      return 'TR42'
     case Item.TR43:
-      return 'TR43';
+      return 'TR43'
     case Item.TR44:
-      return 'TR44';
+      return 'TR44'
     case Item.TR45:
-      return 'TR45';
+      return 'TR45'
     case Item.TR46:
-      return 'TR46';
+      return 'TR46'
     case Item.TR47:
-      return 'TR47';
+      return 'TR47'
     case Item.TR48:
-      return 'TR48';
+      return 'TR48'
     case Item.TR49:
-      return 'TR49';
+      return 'TR49'
     case Item.TR50:
-      return 'TR50';
+      return 'TR50'
     case Item.TR51:
-      return 'TR51';
+      return 'TR51'
     case Item.TR52:
-      return 'TR52';
+      return 'TR52'
     case Item.TR53:
-      return 'TR53';
+      return 'TR53'
     case Item.TR54:
-      return 'TR54';
+      return 'TR54'
     case Item.TR55:
-      return 'TR55';
+      return 'TR55'
     case Item.TR56:
-      return 'TR56';
+      return 'TR56'
     case Item.TR57:
-      return 'TR57';
+      return 'TR57'
     case Item.TR58:
-      return 'TR58';
+      return 'TR58'
     case Item.TR59:
-      return 'TR59';
+      return 'TR59'
     case Item.TR60:
-      return 'TR60';
+      return 'TR60'
     case Item.TR61:
-      return 'TR61';
+      return 'TR61'
     case Item.TR62:
-      return 'TR62';
+      return 'TR62'
     case Item.TR63:
-      return 'TR63';
+      return 'TR63'
     case Item.TR64:
-      return 'TR64';
+      return 'TR64'
     case Item.TR65:
-      return 'TR65';
+      return 'TR65'
     case Item.TR66:
-      return 'TR66';
+      return 'TR66'
     case Item.TR67:
-      return 'TR67';
+      return 'TR67'
     case Item.TR68:
-      return 'TR68';
+      return 'TR68'
     case Item.TR69:
-      return 'TR69';
+      return 'TR69'
     case Item.TR70:
-      return 'TR70';
+      return 'TR70'
     case Item.TR71:
-      return 'TR71';
+      return 'TR71'
     case Item.TR72:
-      return 'TR72';
+      return 'TR72'
     case Item.TR73:
-      return 'TR73';
+      return 'TR73'
     case Item.TR74:
-      return 'TR74';
+      return 'TR74'
     case Item.TR75:
-      return 'TR75';
+      return 'TR75'
     case Item.TR76:
-      return 'TR76';
+      return 'TR76'
     case Item.TR77:
-      return 'TR77';
+      return 'TR77'
     case Item.TR78:
-      return 'TR78';
+      return 'TR78'
     case Item.TR79:
-      return 'TR79';
+      return 'TR79'
     case Item.TR80:
-      return 'TR80';
+      return 'TR80'
     case Item.TR81:
-      return 'TR81';
+      return 'TR81'
     case Item.TR82:
-      return 'TR82';
+      return 'TR82'
     case Item.TR83:
-      return 'TR83';
+      return 'TR83'
     case Item.TR84:
-      return 'TR84';
+      return 'TR84'
     case Item.TR85:
-      return 'TR85';
+      return 'TR85'
     case Item.TR86:
-      return 'TR86';
+      return 'TR86'
     case Item.TR87:
-      return 'TR87';
+      return 'TR87'
     case Item.TR88:
-      return 'TR88';
+      return 'TR88'
     case Item.TR89:
-      return 'TR89';
+      return 'TR89'
     case Item.TR90:
-      return 'TR90';
+      return 'TR90'
     case Item.TR91:
-      return 'TR91';
+      return 'TR91'
     case Item.TR92:
-      return 'TR92';
+      return 'TR92'
     case Item.TR93:
-      return 'TR93';
+      return 'TR93'
     case Item.TR94:
-      return 'TR94';
+      return 'TR94'
     case Item.TR95:
-      return 'TR95';
+      return 'TR95'
     case Item.TR96:
-      return 'TR96';
+      return 'TR96'
     case Item.TR97:
-      return 'TR97';
+      return 'TR97'
     case Item.TR98:
-      return 'TR98';
+      return 'TR98'
     case Item.TR99:
-      return 'TR99';
+      return 'TR99'
     case Item.TM00:
-      return 'TM00';
+      return 'TM00'
     case Item.LonelyMint:
-      return 'Lonely Mint';
+      return 'Lonely Mint'
     case Item.AdamantMint:
-      return 'Adamant Mint';
+      return 'Adamant Mint'
     case Item.NaughtyMint:
-      return 'Naughty Mint';
+      return 'Naughty Mint'
     case Item.BraveMint:
-      return 'Brave Mint';
+      return 'Brave Mint'
     case Item.BoldMint:
-      return 'Bold Mint';
+      return 'Bold Mint'
     case Item.ImpishMint:
-      return 'Impish Mint';
+      return 'Impish Mint'
     case Item.LaxMint:
-      return 'Lax Mint';
+      return 'Lax Mint'
     case Item.RelaxedMint:
-      return 'Relaxed Mint';
+      return 'Relaxed Mint'
     case Item.ModestMint:
-      return 'Modest Mint';
+      return 'Modest Mint'
     case Item.MildMint:
-      return 'Mild Mint';
+      return 'Mild Mint'
     case Item.RashMint:
-      return 'Rash Mint';
+      return 'Rash Mint'
     case Item.QuietMint:
-      return 'Quiet Mint';
+      return 'Quiet Mint'
     case Item.CalmMint:
-      return 'Calm Mint';
+      return 'Calm Mint'
     case Item.GentleMint:
-      return 'Gentle Mint';
+      return 'Gentle Mint'
     case Item.CarefulMint:
-      return 'Careful Mint';
+      return 'Careful Mint'
     case Item.SassyMint:
-      return 'Sassy Mint';
+      return 'Sassy Mint'
     case Item.TimidMint:
-      return 'Timid Mint';
+      return 'Timid Mint'
     case Item.HastyMint:
-      return 'Hasty Mint';
+      return 'Hasty Mint'
     case Item.JollyMint:
-      return 'Jolly Mint';
+      return 'Jolly Mint'
     case Item.NaiveMint:
-      return 'Naive Mint';
+      return 'Naive Mint'
     case Item.SeriousMint:
-      return 'Serious Mint';
+      return 'Serious Mint'
     case Item.WishingPiece:
-      return 'Wishing Piece';
+      return 'Wishing Piece'
     case Item.CrackedPot:
-      return 'Cracked Pot';
+      return 'Cracked Pot'
     case Item.ChippedPot:
-      return 'Chipped Pot';
+      return 'Chipped Pot'
     case Item.HitechEarbuds:
-      return 'Hi-tech Earbuds';
+      return 'Hi-tech Earbuds'
     case Item.FruitBunch:
-      return 'Fruit Bunch';
+      return 'Fruit Bunch'
     case Item.MoomooCheese:
-      return 'Moomoo Cheese';
+      return 'Moomoo Cheese'
     case Item.SpiceMix:
-      return 'Spice Mix';
+      return 'Spice Mix'
     case Item.FreshCream:
-      return 'Fresh Cream';
+      return 'Fresh Cream'
     case Item.PackagedCurry:
-      return 'Packaged Curry';
+      return 'Packaged Curry'
     case Item.CoconutMilk:
-      return 'Coconut Milk';
+      return 'Coconut Milk'
     case Item.InstantNoodles:
-      return 'Instant Noodles';
+      return 'Instant Noodles'
     case Item.PrecookedBurger:
-      return 'Precooked Burger';
+      return 'Precooked Burger'
     case Item.Gigantamix:
-      return 'Gigantamix';
+      return 'Gigantamix'
     case Item.WishingChip:
-      return 'Wishing Chip';
+      return 'Wishing Chip'
     case Item.RotomBike_1:
-      return 'Rotom Bike';
+      return 'Rotom Bike'
     case Item.CatchingCharm:
-      return 'Catching Charm';
+      return 'Catching Charm'
     case Item.Unknown_46:
-      return '???';
+      return '???'
     case Item.OldLetter:
-      return 'Old Letter';
+      return 'Old Letter'
     case Item.BandAutograph:
-      return 'Band Autograph';
+      return 'Band Autograph'
     case Item.SoniasBook:
-      return 'Sonia\u2019s Book';
+      return 'Sonia\u2019s Book'
     case Item.Unknown_47:
-      return '???';
+      return '???'
     case Item.Unknown_48:
-      return '???';
+      return '???'
     case Item.Unknown_49:
-      return '???';
+      return '???'
     case Item.Unknown_50:
-      return '???';
+      return '???'
     case Item.Unknown_51:
-      return '???';
+      return '???'
     case Item.Unknown_52:
-      return '???';
+      return '???'
     case Item.RotomCatalog:
-      return 'Rotom Catalog';
+      return 'Rotom Catalog'
     case Item.And458:
-      return '\u2605And458';
+      return '\u2605And458'
     case Item.And15:
-      return '\u2605And15';
+      return '\u2605And15'
     case Item.And337:
-      return '\u2605And337';
+      return '\u2605And337'
     case Item.And603:
-      return '\u2605And603';
+      return '\u2605And603'
     case Item.And390:
-      return '\u2605And390';
+      return '\u2605And390'
     case Item.Sgr6879:
-      return '\u2605Sgr6879';
+      return '\u2605Sgr6879'
     case Item.Sgr6859:
-      return '\u2605Sgr6859';
+      return '\u2605Sgr6859'
     case Item.Sgr6913:
-      return '\u2605Sgr6913';
+      return '\u2605Sgr6913'
     case Item.Sgr7348:
-      return '\u2605Sgr7348';
+      return '\u2605Sgr7348'
     case Item.Sgr7121:
-      return '\u2605Sgr7121';
+      return '\u2605Sgr7121'
     case Item.Sgr6746:
-      return '\u2605Sgr6746';
+      return '\u2605Sgr6746'
     case Item.Sgr7194:
-      return '\u2605Sgr7194';
+      return '\u2605Sgr7194'
     case Item.Sgr7337:
-      return '\u2605Sgr7337';
+      return '\u2605Sgr7337'
     case Item.Sgr7343:
-      return '\u2605Sgr7343';
+      return '\u2605Sgr7343'
     case Item.Sgr6812:
-      return '\u2605Sgr6812';
+      return '\u2605Sgr6812'
     case Item.Sgr7116:
-      return '\u2605Sgr7116';
+      return '\u2605Sgr7116'
     case Item.Sgr7264:
-      return '\u2605Sgr7264';
+      return '\u2605Sgr7264'
     case Item.Sgr7597:
-      return '\u2605Sgr7597';
+      return '\u2605Sgr7597'
     case Item.Del7882:
-      return '\u2605Del7882';
+      return '\u2605Del7882'
     case Item.Del7906:
-      return '\u2605Del7906';
+      return '\u2605Del7906'
     case Item.Del7852:
-      return '\u2605Del7852';
+      return '\u2605Del7852'
     case Item.Psc596:
-      return '\u2605Psc596';
+      return '\u2605Psc596'
     case Item.Psc361:
-      return '\u2605Psc361';
+      return '\u2605Psc361'
     case Item.Psc510:
-      return '\u2605Psc510';
+      return '\u2605Psc510'
     case Item.Psc437:
-      return '\u2605Psc437';
+      return '\u2605Psc437'
     case Item.Psc8773:
-      return '\u2605Psc8773';
+      return '\u2605Psc8773'
     case Item.Lep1865:
-      return '\u2605Lep1865';
+      return '\u2605Lep1865'
     case Item.Lep1829:
-      return '\u2605Lep1829';
+      return '\u2605Lep1829'
     case Item.Boo5340:
-      return '\u2605Boo5340';
+      return '\u2605Boo5340'
     case Item.Boo5506:
-      return '\u2605Boo5506';
+      return '\u2605Boo5506'
     case Item.Boo5435:
-      return '\u2605Boo5435';
+      return '\u2605Boo5435'
     case Item.Boo5602:
-      return '\u2605Boo5602';
+      return '\u2605Boo5602'
     case Item.Boo5733:
-      return '\u2605Boo5733';
+      return '\u2605Boo5733'
     case Item.Boo5235:
-      return '\u2605Boo5235';
+      return '\u2605Boo5235'
     case Item.Boo5351:
-      return '\u2605Boo5351';
+      return '\u2605Boo5351'
     case Item.Hya3748:
-      return '\u2605Hya3748';
+      return '\u2605Hya3748'
     case Item.Hya3903:
-      return '\u2605Hya3903';
+      return '\u2605Hya3903'
     case Item.Hya3418:
-      return '\u2605Hya3418';
+      return '\u2605Hya3418'
     case Item.Hya3482:
-      return '\u2605Hya3482';
+      return '\u2605Hya3482'
     case Item.Hya3845:
-      return '\u2605Hya3845';
+      return '\u2605Hya3845'
     case Item.Eri1084:
-      return '\u2605Eri1084';
+      return '\u2605Eri1084'
     case Item.Eri472:
-      return '\u2605Eri472';
+      return '\u2605Eri472'
     case Item.Eri1666:
-      return '\u2605Eri1666';
+      return '\u2605Eri1666'
     case Item.Eri897:
-      return '\u2605Eri897';
+      return '\u2605Eri897'
     case Item.Eri1231:
-      return '\u2605Eri1231';
+      return '\u2605Eri1231'
     case Item.Eri874:
-      return '\u2605Eri874';
+      return '\u2605Eri874'
     case Item.Eri1298:
-      return '\u2605Eri1298';
+      return '\u2605Eri1298'
     case Item.Eri1325:
-      return '\u2605Eri1325';
+      return '\u2605Eri1325'
     case Item.Eri984:
-      return '\u2605Eri984';
+      return '\u2605Eri984'
     case Item.Eri1464:
-      return '\u2605Eri1464';
+      return '\u2605Eri1464'
     case Item.Eri1393:
-      return '\u2605Eri1393';
+      return '\u2605Eri1393'
     case Item.Eri850:
-      return '\u2605Eri850';
+      return '\u2605Eri850'
     case Item.Tau1409:
-      return '\u2605Tau1409';
+      return '\u2605Tau1409'
     case Item.Tau1457:
-      return '\u2605Tau1457';
+      return '\u2605Tau1457'
     case Item.Tau1165:
-      return '\u2605Tau1165';
+      return '\u2605Tau1165'
     case Item.Tau1791:
-      return '\u2605Tau1791';
+      return '\u2605Tau1791'
     case Item.Tau1910:
-      return '\u2605Tau1910';
+      return '\u2605Tau1910'
     case Item.Tau1346:
-      return '\u2605Tau1346';
+      return '\u2605Tau1346'
     case Item.Tau1373:
-      return '\u2605Tau1373';
+      return '\u2605Tau1373'
     case Item.Tau1412:
-      return '\u2605Tau1412';
+      return '\u2605Tau1412'
     case Item.CMa2491:
-      return '\u2605CMa2491';
+      return '\u2605CMa2491'
     case Item.CMa2693:
-      return '\u2605CMa2693';
+      return '\u2605CMa2693'
     case Item.CMa2294:
-      return '\u2605CMa2294';
+      return '\u2605CMa2294'
     case Item.CMa2827:
-      return '\u2605CMa2827';
+      return '\u2605CMa2827'
     case Item.CMa2282:
-      return '\u2605CMa2282';
+      return '\u2605CMa2282'
     case Item.CMa2618:
-      return '\u2605CMa2618';
+      return '\u2605CMa2618'
     case Item.CMa2657:
-      return '\u2605CMa2657';
+      return '\u2605CMa2657'
     case Item.CMa2646:
-      return '\u2605CMa2646';
+      return '\u2605CMa2646'
     case Item.UMa4905:
-      return '\u2605UMa4905';
+      return '\u2605UMa4905'
     case Item.UMa4301:
-      return '\u2605UMa4301';
+      return '\u2605UMa4301'
     case Item.UMa5191:
-      return '\u2605UMa5191';
+      return '\u2605UMa5191'
     case Item.UMa5054:
-      return '\u2605UMa5054';
+      return '\u2605UMa5054'
     case Item.UMa4295:
-      return '\u2605UMa4295';
+      return '\u2605UMa4295'
     case Item.UMa4660:
-      return '\u2605UMa4660';
+      return '\u2605UMa4660'
     case Item.UMa4554:
-      return '\u2605UMa4554';
+      return '\u2605UMa4554'
     case Item.UMa4069:
-      return '\u2605UMa4069';
+      return '\u2605UMa4069'
     case Item.UMa3569:
-      return '\u2605UMa3569';
+      return '\u2605UMa3569'
     case Item.UMa3323:
-      return '\u2605UMa3323';
+      return '\u2605UMa3323'
     case Item.UMa4033:
-      return '\u2605UMa4033';
+      return '\u2605UMa4033'
     case Item.UMa4377:
-      return '\u2605UMa4377';
+      return '\u2605UMa4377'
     case Item.UMa4375:
-      return '\u2605UMa4375';
+      return '\u2605UMa4375'
     case Item.UMa4518:
-      return '\u2605UMa4518';
+      return '\u2605UMa4518'
     case Item.UMa3594:
-      return '\u2605UMa3594';
+      return '\u2605UMa3594'
     case Item.Vir5056:
-      return '\u2605Vir5056';
+      return '\u2605Vir5056'
     case Item.Vir4825:
-      return '\u2605Vir4825';
+      return '\u2605Vir4825'
     case Item.Vir4932:
-      return '\u2605Vir4932';
+      return '\u2605Vir4932'
     case Item.Vir4540:
-      return '\u2605Vir4540';
+      return '\u2605Vir4540'
     case Item.Vir4689:
-      return '\u2605Vir4689';
+      return '\u2605Vir4689'
     case Item.Vir5338:
-      return '\u2605Vir5338';
+      return '\u2605Vir5338'
     case Item.Vir4910:
-      return '\u2605Vir4910';
+      return '\u2605Vir4910'
     case Item.Vir5315:
-      return '\u2605Vir5315';
+      return '\u2605Vir5315'
     case Item.Vir5359:
-      return '\u2605Vir5359';
+      return '\u2605Vir5359'
     case Item.Vir5409:
-      return '\u2605Vir5409';
+      return '\u2605Vir5409'
     case Item.Vir5107:
-      return '\u2605Vir5107';
+      return '\u2605Vir5107'
     case Item.Ari617:
-      return '\u2605Ari617';
+      return '\u2605Ari617'
     case Item.Ari553:
-      return '\u2605Ari553';
+      return '\u2605Ari553'
     case Item.Ari546:
-      return '\u2605Ari546';
+      return '\u2605Ari546'
     case Item.Ari951:
-      return '\u2605Ari951';
+      return '\u2605Ari951'
     case Item.Ori1713:
-      return '\u2605Ori1713';
+      return '\u2605Ori1713'
     case Item.Ori2061:
-      return '\u2605Ori2061';
+      return '\u2605Ori2061'
     case Item.Ori1790:
-      return '\u2605Ori1790';
+      return '\u2605Ori1790'
     case Item.Ori1903:
-      return '\u2605Ori1903';
+      return '\u2605Ori1903'
     case Item.Ori1948:
-      return '\u2605Ori1948';
+      return '\u2605Ori1948'
     case Item.Ori2004:
-      return '\u2605Ori2004';
+      return '\u2605Ori2004'
     case Item.Ori1852:
-      return '\u2605Ori1852';
+      return '\u2605Ori1852'
     case Item.Ori1879:
-      return '\u2605Ori1879';
+      return '\u2605Ori1879'
     case Item.Ori1899:
-      return '\u2605Ori1899';
+      return '\u2605Ori1899'
     case Item.Ori1543:
-      return '\u2605Ori1543';
+      return '\u2605Ori1543'
     case Item.Cas21:
-      return '\u2605Cas21';
+      return '\u2605Cas21'
     case Item.Cas168:
-      return '\u2605Cas168';
+      return '\u2605Cas168'
     case Item.Cas403:
-      return '\u2605Cas403';
+      return '\u2605Cas403'
     case Item.Cas153:
-      return '\u2605Cas153';
+      return '\u2605Cas153'
     case Item.Cas542:
-      return '\u2605Cas542';
+      return '\u2605Cas542'
     case Item.Cas219:
-      return '\u2605Cas219';
+      return '\u2605Cas219'
     case Item.Cas265:
-      return '\u2605Cas265';
+      return '\u2605Cas265'
     case Item.Cnc3572:
-      return '\u2605Cnc3572';
+      return '\u2605Cnc3572'
     case Item.Cnc3208:
-      return '\u2605Cnc3208';
+      return '\u2605Cnc3208'
     case Item.Cnc3461:
-      return '\u2605Cnc3461';
+      return '\u2605Cnc3461'
     case Item.Cnc3449:
-      return '\u2605Cnc3449';
+      return '\u2605Cnc3449'
     case Item.Cnc3429:
-      return '\u2605Cnc3429';
+      return '\u2605Cnc3429'
     case Item.Cnc3627:
-      return '\u2605Cnc3627';
+      return '\u2605Cnc3627'
     case Item.Cnc3268:
-      return '\u2605Cnc3268';
+      return '\u2605Cnc3268'
     case Item.Cnc3249:
-      return '\u2605Cnc3249';
+      return '\u2605Cnc3249'
     case Item.Com4968:
-      return '\u2605Com4968';
+      return '\u2605Com4968'
     case Item.Crv4757:
-      return '\u2605Crv4757';
+      return '\u2605Crv4757'
     case Item.Crv4623:
-      return '\u2605Crv4623';
+      return '\u2605Crv4623'
     case Item.Crv4662:
-      return '\u2605Crv4662';
+      return '\u2605Crv4662'
     case Item.Crv4786:
-      return '\u2605Crv4786';
+      return '\u2605Crv4786'
     case Item.Aur1708:
-      return '\u2605Aur1708';
+      return '\u2605Aur1708'
     case Item.Aur2088:
-      return '\u2605Aur2088';
+      return '\u2605Aur2088'
     case Item.Aur1605:
-      return '\u2605Aur1605';
+      return '\u2605Aur1605'
     case Item.Aur2095:
-      return '\u2605Aur2095';
+      return '\u2605Aur2095'
     case Item.Aur1577:
-      return '\u2605Aur1577';
+      return '\u2605Aur1577'
     case Item.Aur1641:
-      return '\u2605Aur1641';
+      return '\u2605Aur1641'
     case Item.Aur1612:
-      return '\u2605Aur1612';
+      return '\u2605Aur1612'
     case Item.Pav7790:
-      return '\u2605Pav7790';
+      return '\u2605Pav7790'
     case Item.Cet911:
-      return '\u2605Cet911';
+      return '\u2605Cet911'
     case Item.Cet681:
-      return '\u2605Cet681';
+      return '\u2605Cet681'
     case Item.Cet188:
-      return '\u2605Cet188';
+      return '\u2605Cet188'
     case Item.Cet539:
-      return '\u2605Cet539';
+      return '\u2605Cet539'
     case Item.Cet804:
-      return '\u2605Cet804';
+      return '\u2605Cet804'
     case Item.Cep8974:
-      return '\u2605Cep8974';
+      return '\u2605Cep8974'
     case Item.Cep8162:
-      return '\u2605Cep8162';
+      return '\u2605Cep8162'
     case Item.Cep8238:
-      return '\u2605Cep8238';
+      return '\u2605Cep8238'
     case Item.Cep8417:
-      return '\u2605Cep8417';
+      return '\u2605Cep8417'
     case Item.Cen5267:
-      return '\u2605Cen5267';
+      return '\u2605Cen5267'
     case Item.Cen5288:
-      return '\u2605Cen5288';
+      return '\u2605Cen5288'
     case Item.Cen551:
-      return '\u2605Cen551';
+      return '\u2605Cen551'
     case Item.Cen5459:
-      return '\u2605Cen5459';
+      return '\u2605Cen5459'
     case Item.Cen5460:
-      return '\u2605Cen5460';
+      return '\u2605Cen5460'
     case Item.CMi2943:
-      return '\u2605CMi2943';
+      return '\u2605CMi2943'
     case Item.CMi2845:
-      return '\u2605CMi2845';
+      return '\u2605CMi2845'
     case Item.Equ8131:
-      return '\u2605Equ8131';
+      return '\u2605Equ8131'
     case Item.Vul7405:
-      return '\u2605Vul7405';
+      return '\u2605Vul7405'
     case Item.UMi424:
-      return '\u2605UMi424';
+      return '\u2605UMi424'
     case Item.UMi5563:
-      return '\u2605UMi5563';
+      return '\u2605UMi5563'
     case Item.UMi5735:
-      return '\u2605UMi5735';
+      return '\u2605UMi5735'
     case Item.UMi6789:
-      return '\u2605UMi6789';
+      return '\u2605UMi6789'
     case Item.Crt4287:
-      return '\u2605Crt4287';
+      return '\u2605Crt4287'
     case Item.Lyr7001:
-      return '\u2605Lyr7001';
+      return '\u2605Lyr7001'
     case Item.Lyr7178:
-      return '\u2605Lyr7178';
+      return '\u2605Lyr7178'
     case Item.Lyr7106:
-      return '\u2605Lyr7106';
+      return '\u2605Lyr7106'
     case Item.Lyr7298:
-      return '\u2605Lyr7298';
+      return '\u2605Lyr7298'
     case Item.Ara6585:
-      return '\u2605Ara6585';
+      return '\u2605Ara6585'
     case Item.Sco6134:
-      return '\u2605Sco6134';
+      return '\u2605Sco6134'
     case Item.Sco6527:
-      return '\u2605Sco6527';
+      return '\u2605Sco6527'
     case Item.Sco6553:
-      return '\u2605Sco6553';
+      return '\u2605Sco6553'
     case Item.Sco5953:
-      return '\u2605Sco5953';
+      return '\u2605Sco5953'
     case Item.Sco5984:
-      return '\u2605Sco5984';
+      return '\u2605Sco5984'
     case Item.Sco6508:
-      return '\u2605Sco6508';
+      return '\u2605Sco6508'
     case Item.Sco6084:
-      return '\u2605Sco6084';
+      return '\u2605Sco6084'
     case Item.Sco5944:
-      return '\u2605Sco5944';
+      return '\u2605Sco5944'
     case Item.Sco6630:
-      return '\u2605Sco6630';
+      return '\u2605Sco6630'
     case Item.Sco6027:
-      return '\u2605Sco6027';
+      return '\u2605Sco6027'
     case Item.Sco6247:
-      return '\u2605Sco6247';
+      return '\u2605Sco6247'
     case Item.Sco6252:
-      return '\u2605Sco6252';
+      return '\u2605Sco6252'
     case Item.Sco5928:
-      return '\u2605Sco5928';
+      return '\u2605Sco5928'
     case Item.Sco6241:
-      return '\u2605Sco6241';
+      return '\u2605Sco6241'
     case Item.Sco6165:
-      return '\u2605Sco6165';
+      return '\u2605Sco6165'
     case Item.Tri544:
-      return '\u2605Tri544';
+      return '\u2605Tri544'
     case Item.Leo3982:
-      return '\u2605Leo3982';
+      return '\u2605Leo3982'
     case Item.Leo4534:
-      return '\u2605Leo4534';
+      return '\u2605Leo4534'
     case Item.Leo4357:
-      return '\u2605Leo4357';
+      return '\u2605Leo4357'
     case Item.Leo4057:
-      return '\u2605Leo4057';
+      return '\u2605Leo4057'
     case Item.Leo4359:
-      return '\u2605Leo4359';
+      return '\u2605Leo4359'
     case Item.Leo4031:
-      return '\u2605Leo4031';
+      return '\u2605Leo4031'
     case Item.Leo3852:
-      return '\u2605Leo3852';
+      return '\u2605Leo3852'
     case Item.Leo3905:
-      return '\u2605Leo3905';
+      return '\u2605Leo3905'
     case Item.Leo3773:
-      return '\u2605Leo3773';
+      return '\u2605Leo3773'
     case Item.Gru8425:
-      return '\u2605Gru8425';
+      return '\u2605Gru8425'
     case Item.Gru8636:
-      return '\u2605Gru8636';
+      return '\u2605Gru8636'
     case Item.Gru8353:
-      return '\u2605Gru8353';
+      return '\u2605Gru8353'
     case Item.Lib5685:
-      return '\u2605Lib5685';
+      return '\u2605Lib5685'
     case Item.Lib5531:
-      return '\u2605Lib5531';
+      return '\u2605Lib5531'
     case Item.Lib5787:
-      return '\u2605Lib5787';
+      return '\u2605Lib5787'
     case Item.Lib5603:
-      return '\u2605Lib5603';
+      return '\u2605Lib5603'
     case Item.Pup3165:
-      return '\u2605Pup3165';
+      return '\u2605Pup3165'
     case Item.Pup3185:
-      return '\u2605Pup3185';
+      return '\u2605Pup3185'
     case Item.Pup3045:
-      return '\u2605Pup3045';
+      return '\u2605Pup3045'
     case Item.Cyg7924:
-      return '\u2605Cyg7924';
+      return '\u2605Cyg7924'
     case Item.Cyg7417:
-      return '\u2605Cyg7417';
+      return '\u2605Cyg7417'
     case Item.Cyg7796:
-      return '\u2605Cyg7796';
+      return '\u2605Cyg7796'
     case Item.Cyg8301:
-      return '\u2605Cyg8301';
+      return '\u2605Cyg8301'
     case Item.Cyg7949:
-      return '\u2605Cyg7949';
+      return '\u2605Cyg7949'
     case Item.Cyg7528:
-      return '\u2605Cyg7528';
+      return '\u2605Cyg7528'
     case Item.Oct7228:
-      return '\u2605Oct7228';
+      return '\u2605Oct7228'
     case Item.Col1956:
-      return '\u2605Col1956';
+      return '\u2605Col1956'
     case Item.Col2040:
-      return '\u2605Col2040';
+      return '\u2605Col2040'
     case Item.Col2177:
-      return '\u2605Col2177';
+      return '\u2605Col2177'
     case Item.Gem2990:
-      return '\u2605Gem2990';
+      return '\u2605Gem2990'
     case Item.Gem2891:
-      return '\u2605Gem2891';
+      return '\u2605Gem2891'
     case Item.Gem2421:
-      return '\u2605Gem2421';
+      return '\u2605Gem2421'
     case Item.Gem2473:
-      return '\u2605Gem2473';
+      return '\u2605Gem2473'
     case Item.Gem2216:
-      return '\u2605Gem2216';
+      return '\u2605Gem2216'
     case Item.Gem2777:
-      return '\u2605Gem2777';
+      return '\u2605Gem2777'
     case Item.Gem2650:
-      return '\u2605Gem2650';
+      return '\u2605Gem2650'
     case Item.Gem2286:
-      return '\u2605Gem2286';
+      return '\u2605Gem2286'
     case Item.Gem2484:
-      return '\u2605Gem2484';
+      return '\u2605Gem2484'
     case Item.Gem2930:
-      return '\u2605Gem2930';
+      return '\u2605Gem2930'
     case Item.Peg8775:
-      return '\u2605Peg8775';
+      return '\u2605Peg8775'
     case Item.Peg8781:
-      return '\u2605Peg8781';
+      return '\u2605Peg8781'
     case Item.Peg39:
-      return '\u2605Peg39';
+      return '\u2605Peg39'
     case Item.Peg8308:
-      return '\u2605Peg8308';
+      return '\u2605Peg8308'
     case Item.Peg8650:
-      return '\u2605Peg8650';
+      return '\u2605Peg8650'
     case Item.Peg8634:
-      return '\u2605Peg8634';
+      return '\u2605Peg8634'
     case Item.Peg8684:
-      return '\u2605Peg8684';
+      return '\u2605Peg8684'
     case Item.Peg8450:
-      return '\u2605Peg8450';
+      return '\u2605Peg8450'
     case Item.Peg8880:
-      return '\u2605Peg8880';
+      return '\u2605Peg8880'
     case Item.Peg8905:
-      return '\u2605Peg8905';
+      return '\u2605Peg8905'
     case Item.Oph6556:
-      return '\u2605Oph6556';
+      return '\u2605Oph6556'
     case Item.Oph6378:
-      return '\u2605Oph6378';
+      return '\u2605Oph6378'
     case Item.Oph6603:
-      return '\u2605Oph6603';
+      return '\u2605Oph6603'
     case Item.Oph6149:
-      return '\u2605Oph6149';
+      return '\u2605Oph6149'
     case Item.Oph6056:
-      return '\u2605Oph6056';
+      return '\u2605Oph6056'
     case Item.Oph6075:
-      return '\u2605Oph6075';
+      return '\u2605Oph6075'
     case Item.Ser5854:
-      return '\u2605Ser5854';
+      return '\u2605Ser5854'
     case Item.Ser7141:
-      return '\u2605Ser7141';
+      return '\u2605Ser7141'
     case Item.Ser5879:
-      return '\u2605Ser5879';
+      return '\u2605Ser5879'
     case Item.Her6406:
-      return '\u2605Her6406';
+      return '\u2605Her6406'
     case Item.Her6148:
-      return '\u2605Her6148';
+      return '\u2605Her6148'
     case Item.Her6410:
-      return '\u2605Her6410';
+      return '\u2605Her6410'
     case Item.Her6526:
-      return '\u2605Her6526';
+      return '\u2605Her6526'
     case Item.Her6117:
-      return '\u2605Her6117';
+      return '\u2605Her6117'
     case Item.Her6008:
-      return '\u2605Her6008';
+      return '\u2605Her6008'
     case Item.Per936:
-      return '\u2605Per936';
+      return '\u2605Per936'
     case Item.Per1017:
-      return '\u2605Per1017';
+      return '\u2605Per1017'
     case Item.Per1131:
-      return '\u2605Per1131';
+      return '\u2605Per1131'
     case Item.Per1228:
-      return '\u2605Per1228';
+      return '\u2605Per1228'
     case Item.Per834:
-      return '\u2605Per834';
+      return '\u2605Per834'
     case Item.Per941:
-      return '\u2605Per941';
+      return '\u2605Per941'
     case Item.Phe99:
-      return '\u2605Phe99';
+      return '\u2605Phe99'
     case Item.Phe338:
-      return '\u2605Phe338';
+      return '\u2605Phe338'
     case Item.Vel3634:
-      return '\u2605Vel3634';
+      return '\u2605Vel3634'
     case Item.Vel3485:
-      return '\u2605Vel3485';
+      return '\u2605Vel3485'
     case Item.Vel3734:
-      return '\u2605Vel3734';
+      return '\u2605Vel3734'
     case Item.Aqr8232:
-      return '\u2605Aqr8232';
+      return '\u2605Aqr8232'
     case Item.Aqr8414:
-      return '\u2605Aqr8414';
+      return '\u2605Aqr8414'
     case Item.Aqr8709:
-      return '\u2605Aqr8709';
+      return '\u2605Aqr8709'
     case Item.Aqr8518:
-      return '\u2605Aqr8518';
+      return '\u2605Aqr8518'
     case Item.Aqr7950:
-      return '\u2605Aqr7950';
+      return '\u2605Aqr7950'
     case Item.Aqr8499:
-      return '\u2605Aqr8499';
+      return '\u2605Aqr8499'
     case Item.Aqr8610:
-      return '\u2605Aqr8610';
+      return '\u2605Aqr8610'
     case Item.Aqr8264:
-      return '\u2605Aqr8264';
+      return '\u2605Aqr8264'
     case Item.Cru4853:
-      return '\u2605Cru4853';
+      return '\u2605Cru4853'
     case Item.Cru4730:
-      return '\u2605Cru4730';
+      return '\u2605Cru4730'
     case Item.Cru4763:
-      return '\u2605Cru4763';
+      return '\u2605Cru4763'
     case Item.Cru4700:
-      return '\u2605Cru4700';
+      return '\u2605Cru4700'
     case Item.Cru4656:
-      return '\u2605Cru4656';
+      return '\u2605Cru4656'
     case Item.PsA8728:
-      return '\u2605PsA8728';
+      return '\u2605PsA8728'
     case Item.TrA6217:
-      return '\u2605TrA6217';
+      return '\u2605TrA6217'
     case Item.Cap7776:
-      return '\u2605Cap7776';
+      return '\u2605Cap7776'
     case Item.Cap7754:
-      return '\u2605Cap7754';
+      return '\u2605Cap7754'
     case Item.Cap8278:
-      return '\u2605Cap8278';
+      return '\u2605Cap8278'
     case Item.Cap8322:
-      return '\u2605Cap8322';
+      return '\u2605Cap8322'
     case Item.Cap7773:
-      return '\u2605Cap7773';
+      return '\u2605Cap7773'
     case Item.Sge7479:
-      return '\u2605Sge7479';
+      return '\u2605Sge7479'
     case Item.Car2326:
-      return '\u2605Car2326';
+      return '\u2605Car2326'
     case Item.Car3685:
-      return '\u2605Car3685';
+      return '\u2605Car3685'
     case Item.Car3307:
-      return '\u2605Car3307';
+      return '\u2605Car3307'
     case Item.Car3699:
-      return '\u2605Car3699';
+      return '\u2605Car3699'
     case Item.Dra5744:
-      return '\u2605Dra5744';
+      return '\u2605Dra5744'
     case Item.Dra5291:
-      return '\u2605Dra5291';
+      return '\u2605Dra5291'
     case Item.Dra6705:
-      return '\u2605Dra6705';
+      return '\u2605Dra6705'
     case Item.Dra6536:
-      return '\u2605Dra6536';
+      return '\u2605Dra6536'
     case Item.Dra7310:
-      return '\u2605Dra7310';
+      return '\u2605Dra7310'
     case Item.Dra6688:
-      return '\u2605Dra6688';
+      return '\u2605Dra6688'
     case Item.Dra4434:
-      return '\u2605Dra4434';
+      return '\u2605Dra4434'
     case Item.Dra6370:
-      return '\u2605Dra6370';
+      return '\u2605Dra6370'
     case Item.Dra7462:
-      return '\u2605Dra7462';
+      return '\u2605Dra7462'
     case Item.Dra6396:
-      return '\u2605Dra6396';
+      return '\u2605Dra6396'
     case Item.Dra6132:
-      return '\u2605Dra6132';
+      return '\u2605Dra6132'
     case Item.Dra6636:
-      return '\u2605Dra6636';
+      return '\u2605Dra6636'
     case Item.CVn4915:
-      return '\u2605CVn4915';
+      return '\u2605CVn4915'
     case Item.CVn4785:
-      return '\u2605CVn4785';
+      return '\u2605CVn4785'
     case Item.CVn4846:
-      return '\u2605CVn4846';
+      return '\u2605CVn4846'
     case Item.Aql7595:
-      return '\u2605Aql7595';
+      return '\u2605Aql7595'
     case Item.Aql7557:
-      return '\u2605Aql7557';
+      return '\u2605Aql7557'
     case Item.Aql7525:
-      return '\u2605Aql7525';
+      return '\u2605Aql7525'
     case Item.Aql7602:
-      return '\u2605Aql7602';
+      return '\u2605Aql7602'
     case Item.Aql7235:
-      return '\u2605Aql7235';
+      return '\u2605Aql7235'
     case Item.MaxHoney:
-      return 'Max Honey';
+      return 'Max Honey'
     case Item.MaxMushrooms:
-      return 'Max Mushrooms';
+      return 'Max Mushrooms'
     case Item.GalaricaTwig:
-      return 'Galarica Twig';
+      return 'Galarica Twig'
     case Item.GalaricaCuff:
-      return 'Galarica Cuff';
+      return 'Galarica Cuff'
     case Item.StyleCard:
-      return 'Style Card';
+      return 'Style Card'
     case Item.ArmorPass:
-      return 'Armor Pass';
+      return 'Armor Pass'
     case Item.RotomBike_2:
-      return 'Rotom Bike';
+      return 'Rotom Bike'
     case Item.RotomBike_3:
-      return 'Rotom Bike';
+      return 'Rotom Bike'
     case Item.ExpCharm:
-      return 'Exp. Charm';
+      return 'Exp. Charm'
     case Item.ArmoriteOre:
-      return 'Armorite Ore';
+      return 'Armorite Ore'
     case Item.MarkCharm:
-      return 'Mark Charm';
+      return 'Mark Charm'
     case Item.ReinsOfUnity:
-      return 'Reins of Unity';
+      return 'Reins of Unity'
     case Item.ReinsOfUnity_1:
-      return 'Reins of Unity';
+      return 'Reins of Unity'
     case Item.GalaricaWreath:
-      return 'Galarica Wreath';
+      return 'Galarica Wreath'
     case Item.LegendaryClue1:
-      return 'Legendary Clue 1';
+      return 'Legendary Clue 1'
     case Item.LegendaryClue2:
-      return 'Legendary Clue 2';
+      return 'Legendary Clue 2'
     case Item.LegendaryClue3:
-      return 'Legendary Clue 3';
+      return 'Legendary Clue 3'
     case Item.LegendaryClue:
-      return 'Legendary Clue?';
+      return 'Legendary Clue?'
     case Item.CrownPass:
-      return 'Crown Pass';
+      return 'Crown Pass'
     case Item.WoodenCrown:
-      return 'Wooden Crown';
+      return 'Wooden Crown'
     case Item.RadiantPetal:
-      return 'Radiant Petal';
+      return 'Radiant Petal'
     case Item.WhiteManeHair:
-      return 'White Mane Hair';
+      return 'White Mane Hair'
     case Item.BlackManeHair:
-      return 'Black Mane Hair';
+      return 'Black Mane Hair'
     case Item.IcerootCarrot:
-      return 'Iceroot Carrot';
+      return 'Iceroot Carrot'
     case Item.ShaderootCarrot:
-      return 'Shaderoot Carrot';
+      return 'Shaderoot Carrot'
     case Item.DyniteOre:
-      return 'Dynite Ore';
+      return 'Dynite Ore'
     case Item.CarrotSeeds:
-      return 'Carrot Seeds';
+      return 'Carrot Seeds'
     case Item.AbilityPatch:
-      return 'Ability Patch';
+      return 'Ability Patch'
     case Item.ReinsOfUnity_2:
-      return 'Reins of Unity';
+      return 'Reins of Unity'
     case Item.TimeBalm:
-      return 'Time Balm';
+      return 'Time Balm'
     case Item.SpaceBalm:
-      return 'Space Balm';
+      return 'Space Balm'
     case Item.MysteriousBalm:
-      return 'Mysterious Balm';
+      return 'Mysterious Balm'
     case Item.LinkingCord:
-      return 'Linking Cord';
+      return 'Linking Cord'
     case Item.HometownMuffin:
-      return 'Hometown Muffin';
+      return 'Hometown Muffin'
     case Item.Apricorn:
-      return 'Apricorn';
+      return 'Apricorn'
     case Item.JubilifeMuffin:
-      return 'Jubilife Muffin';
+      return 'Jubilife Muffin'
     case Item.AuxPowerguard:
-      return 'Aux Powerguard';
+      return 'Aux Powerguard'
     case Item.DireHit_1:
-      return 'Dire Hit';
+      return 'Dire Hit'
     case Item.ChoiceDumpling:
-      return 'Choice Dumpling';
+      return 'Choice Dumpling'
     case Item.TwiceSpicedRadish:
-      return 'Twice-Spiced Radish';
+      return 'Twice-Spiced Radish'
     case Item.SwapSnack:
-      return 'Swap Snack';
+      return 'Swap Snack'
     case Item.CasterFern:
-      return 'Caster Fern';
+      return 'Caster Fern'
     case Item.SeedOfMastery:
-      return 'Seed of Mastery';
+      return 'Seed of Mastery'
     case Item.PokeBall_1:
-      return 'Pok\u00E9 Ball';
+      return 'Pok\u00E9 Ball'
     case Item.Unknown_53:
-      return '???';
+      return '???'
     case Item.EternalIce:
-      return 'Eternal Ice';
+      return 'Eternal Ice'
     case Item.UxiesClaw:
-      return 'Uxie\u2019s Claw';
+      return 'Uxie\u2019s Claw'
     case Item.AzelfsFang:
-      return 'Azelf\u2019s Fang';
+      return 'Azelf\u2019s Fang'
     case Item.MespritsPlume:
-      return 'Mesprit\u2019s Plume';
+      return 'Mesprit\u2019s Plume'
     case Item.Tumblestone:
-      return 'Tumblestone';
+      return 'Tumblestone'
     case Item.CelesticaFlute:
-      return 'Celestica Flute';
+      return 'Celestica Flute'
     case Item.Remedy:
-      return 'Remedy';
+      return 'Remedy'
     case Item.FineRemedy:
-      return 'Fine Remedy';
+      return 'Fine Remedy'
     case Item.DazzlingHoney:
-      return 'Dazzling Honey';
+      return 'Dazzling Honey'
     case Item.HeartyGrains:
-      return 'Hearty Grains';
+      return 'Hearty Grains'
     case Item.PlumpBeans:
-      return 'Plump Beans';
+      return 'Plump Beans'
     case Item.SpringyMushroom:
-      return 'Springy Mushroom';
+      return 'Springy Mushroom'
     case Item.CrunchySalt:
-      return 'Crunchy Salt';
+      return 'Crunchy Salt'
     case Item.Wood:
-      return 'Wood';
+      return 'Wood'
     case Item.KingsLeaf:
-      return 'King\u2019s Leaf';
+      return 'King\u2019s Leaf'
     case Item.MarshBalm:
-      return 'Marsh Balm';
+      return 'Marsh Balm'
     case Item.PokeBall_2:
-      return 'Pok\u00E9 Ball';
+      return 'Pok\u00E9 Ball'
     case Item.GreatBall_1:
-      return 'Great Ball';
+      return 'Great Ball'
     case Item.UltraBall_1:
-      return 'Ultra Ball';
+      return 'Ultra Ball'
     case Item.FeatherBall:
-      return 'Feather Ball';
+      return 'Feather Ball'
     case Item.PokeshiDoll:
-      return 'Pok\u00E9shi Doll';
+      return 'Pok\u00E9shi Doll'
     case Item.Unknown_54:
-      return '???';
+      return '???'
     case Item.SmokeBomb:
-      return 'Smoke Bomb';
+      return 'Smoke Bomb'
     case Item.ScatterBang:
-      return 'Scatter Bang';
+      return 'Scatter Bang'
     case Item.StickyGlob:
-      return 'Sticky Glob';
+      return 'Sticky Glob'
     case Item.StarPiece_1:
-      return 'Star Piece';
+      return 'Star Piece'
     case Item.MushroomCake:
-      return 'Mushroom Cake';
+      return 'Mushroom Cake'
     case Item.Bugwort:
-      return 'Bugwort';
+      return 'Bugwort'
     case Item.HoneyCake:
-      return 'Honey Cake';
+      return 'Honey Cake'
     case Item.GrainCake:
-      return 'Grain Cake';
+      return 'Grain Cake'
     case Item.BeanCake:
-      return 'Bean Cake';
+      return 'Bean Cake'
     case Item.SaltCake:
-      return 'Salt Cake';
+      return 'Salt Cake'
     case Item.Potion_1:
-      return 'Potion';
+      return 'Potion'
     case Item.SuperPotion_1:
-      return 'Super Potion';
+      return 'Super Potion'
     case Item.HyperPotion_1:
-      return 'Hyper Potion';
+      return 'Hyper Potion'
     case Item.MaxPotion_1:
-      return 'Max Potion';
+      return 'Max Potion'
     case Item.FullRestore_1:
-      return 'Full Restore';
+      return 'Full Restore'
     case Item.Remedy_1:
-      return 'Remedy';
+      return 'Remedy'
     case Item.FineRemedy_1:
-      return 'Fine Remedy';
+      return 'Fine Remedy'
     case Item.SuperbRemedy:
-      return 'Superb Remedy';
+      return 'Superb Remedy'
     case Item.OldGateau_1:
-      return 'Old Gateau';
+      return 'Old Gateau'
     case Item.JubilifeMuffin_1:
-      return 'Jubilife Muffin';
+      return 'Jubilife Muffin'
     case Item.FullHeal_1:
-      return 'Full Heal';
+      return 'Full Heal'
     case Item.Revive_1:
-      return 'Revive';
+      return 'Revive'
     case Item.MaxRevive_1:
-      return 'Max Revive';
+      return 'Max Revive'
     case Item.MaxEther_1:
-      return 'Max Ether';
+      return 'Max Ether'
     case Item.MaxElixir_1:
-      return 'Max Elixir';
+      return 'Max Elixir'
     case Item.StealthSpray:
-      return 'Stealth Spray';
+      return 'Stealth Spray'
     case Item.Unknown_55:
-      return '???';
+      return '???'
     case Item.AuxPower:
-      return 'Aux Power';
+      return 'Aux Power'
     case Item.AuxGuard:
-      return 'Aux Guard';
+      return 'Aux Guard'
     case Item.DireHit_2:
-      return 'Dire Hit';
+      return 'Dire Hit'
     case Item.AuxEvasion:
-      return 'Aux Evasion';
+      return 'Aux Evasion'
     case Item.AuxPowerguard_1:
-      return 'Aux Powerguard';
+      return 'Aux Powerguard'
     case Item.ForestBalm:
-      return 'Forest Balm';
+      return 'Forest Balm'
     case Item.IronChunk:
-      return 'Iron Chunk';
+      return 'Iron Chunk'
     case Item.Unknown_56:
-      return '???';
+      return '???'
     case Item.BlackTumblestone:
-      return 'Black Tumblestone';
+      return 'Black Tumblestone'
     case Item.SkyTumblestone:
-      return 'Sky Tumblestone';
+      return 'Sky Tumblestone'
     case Item.Unknown_57:
-      return '???';
+      return '???'
     case Item.BallOfMud:
-      return 'Ball of Mud';
+      return 'Ball of Mud'
     case Item.Unknown_58:
-      return '???';
+      return '???'
     case Item.PopPod:
-      return 'Pop Pod';
+      return 'Pop Pod'
     case Item.SootfootRoot:
-      return 'Sootfoot Root';
+      return 'Sootfoot Root'
     case Item.SpoiledApricorn:
-      return 'Spoiled Apricorn';
+      return 'Spoiled Apricorn'
     case Item.Snowball_1:
-      return 'Snowball';
+      return 'Snowball'
     case Item.StickyGlob_1:
-      return 'Sticky Glob';
+      return 'Sticky Glob'
     case Item.BlackAugurite:
-      return 'Black Augurite';
+      return 'Black Augurite'
     case Item.PeatBlock:
-      return 'Peat Block';
+      return 'Peat Block'
     case Item.StealthSpray_1:
-      return 'Stealth Spray';
+      return 'Stealth Spray'
     case Item.MedicinalLeek:
-      return 'Medicinal Leek';
+      return 'Medicinal Leek'
     case Item.Vivichoke:
-      return 'Vivichoke';
+      return 'Vivichoke'
     case Item.PepUpPlant:
-      return 'Pep-Up Plant';
+      return 'Pep-Up Plant'
     case Item.Unknown_59:
-      return '???';
+      return '???'
     case Item.Unknown_60:
-      return '???';
+      return '???'
     case Item.TemptingCharmB:
-      return 'Tempting Charm B';
+      return 'Tempting Charm B'
     case Item.TemptingCharmP:
-      return 'Tempting Charm P';
+      return 'Tempting Charm P'
     case Item.Swordcap:
-      return 'Swordcap';
+      return 'Swordcap'
     case Item.IronBarktongue:
-      return 'Iron Barktongue';
+      return 'Iron Barktongue'
     case Item.DoppelBonnets:
-      return 'Doppel Bonnets';
+      return 'Doppel Bonnets'
     case Item.Direshroom:
-      return 'Direshroom';
+      return 'Direshroom'
     case Item.SandRadish:
-      return 'Sand Radish';
+      return 'Sand Radish'
     case Item.TemptingCharmT:
-      return 'Tempting Charm T';
+      return 'Tempting Charm T'
     case Item.TemptingCharmY:
-      return 'Tempting Charm Y';
+      return 'Tempting Charm Y'
     case Item.CandyTruffle:
-      return 'Candy Truffle';
+      return 'Candy Truffle'
     case Item.CakeLureBase:
-      return 'Cake-Lure Base';
+      return 'Cake-Lure Base'
     case Item.PokeBall_3:
-      return 'Pok\u00E9 Ball';
+      return 'Pok\u00E9 Ball'
     case Item.GreatBall_2:
-      return 'Great Ball';
+      return 'Great Ball'
     case Item.UltraBall_2:
-      return 'Ultra Ball';
+      return 'Ultra Ball'
     case Item.FeatherBall_1:
-      return 'Feather Ball';
+      return 'Feather Ball'
     case Item.Unknown_61:
-      return '???';
+      return '???'
     case Item.Unknown_62:
-      return '???';
+      return '???'
     case Item.ScatterBang_1:
-      return 'Scatter Bang';
+      return 'Scatter Bang'
     case Item.SmokeBomb_1:
-      return 'Smoke Bomb';
+      return 'Smoke Bomb'
     case Item.Unknown_63:
-      return '???';
+      return '???'
     case Item.Unknown_64:
-      return '???';
+      return '???'
     case Item.PokeshiDoll_1:
-      return 'Pok\u00E9shi Doll';
+      return 'Pok\u00E9shi Doll'
     case Item.VolcanoBalm:
-      return 'Volcano Balm';
+      return 'Volcano Balm'
     case Item.MountainBalm:
-      return 'Mountain Balm';
+      return 'Mountain Balm'
     case Item.SnowBalm:
-      return 'Snow Balm';
+      return 'Snow Balm'
     case Item.HoneyCake_1:
-      return 'Honey Cake';
+      return 'Honey Cake'
     case Item.GrainCake_1:
-      return 'Grain Cake';
+      return 'Grain Cake'
     case Item.BeanCake_1:
-      return 'Bean Cake';
+      return 'Bean Cake'
     case Item.MushroomCake_1:
-      return 'Mushroom Cake';
+      return 'Mushroom Cake'
     case Item.SaltCake_1:
-      return 'Salt Cake';
+      return 'Salt Cake'
     case Item.SwapSnack_1:
-      return 'Swap Snack';
+      return 'Swap Snack'
     case Item.ChoiceDumpling_1:
-      return 'Choice Dumpling';
+      return 'Choice Dumpling'
     case Item.TwiceSpicedRadish_1:
-      return 'Twice-Spiced Radish';
+      return 'Twice-Spiced Radish'
     case Item.SurvivalCharmR:
-      return 'Survival Charm R';
+      return 'Survival Charm R'
     case Item.SurvivalCharmB:
-      return 'Survival Charm B';
+      return 'Survival Charm B'
     case Item.SurvivalCharmP:
-      return 'Survival Charm P';
+      return 'Survival Charm P'
     case Item.SurvivalCharmT:
-      return 'Survival Charm T';
+      return 'Survival Charm T'
     case Item.SurvivalCharmY:
-      return 'Survival Charm Y';
+      return 'Survival Charm Y'
     case Item.TornJournal:
-      return 'Torn Journal';
+      return 'Torn Journal'
     case Item.WardingCharmR:
-      return 'Warding Charm R';
+      return 'Warding Charm R'
     case Item.WardingCharmB:
-      return 'Warding Charm B';
+      return 'Warding Charm B'
     case Item.WardingCharmP:
-      return 'Warding Charm P';
+      return 'Warding Charm P'
     case Item.WardingCharmT:
-      return 'Warding Charm T';
+      return 'Warding Charm T'
     case Item.WardingCharmY:
-      return 'Warding Charm Y';
+      return 'Warding Charm Y'
     case Item.WallFragment:
-      return 'Wall Fragment';
+      return 'Wall Fragment'
     case Item.BasculegionFood:
-      return 'Basculegion Food';
+      return 'Basculegion Food'
     case Item.OldJournal:
-      return 'Old Journal';
+      return 'Old Journal'
     case Item.WingBall:
-      return 'Wing Ball';
+      return 'Wing Ball'
     case Item.JetBall:
-      return 'Jet Ball';
+      return 'Jet Ball'
     case Item.HeavyBall_1:
-      return 'Heavy Ball';
+      return 'Heavy Ball'
     case Item.LeadenBall:
-      return 'Leaden Ball';
+      return 'Leaden Ball'
     case Item.GigatonBall:
-      return 'Gigaton Ball';
+      return 'Gigaton Ball'
     case Item.WingBall_1:
-      return 'Wing Ball';
+      return 'Wing Ball'
     case Item.JetBall_1:
-      return 'Jet Ball';
+      return 'Jet Ball'
     case Item.HeavyBall_2:
-      return 'Heavy Ball';
+      return 'Heavy Ball'
     case Item.HopoBerry:
-      return 'Hopo Berry';
+      return 'Hopo Berry'
     case Item.SuperbRemedy_1:
-      return 'Superb Remedy';
+      return 'Superb Remedy'
     case Item.AuxPower_1:
-      return 'Aux Power';
+      return 'Aux Power'
     case Item.AuxGuard_1:
-      return 'Aux Guard';
+      return 'Aux Guard'
     case Item.AuxEvasion_1:
-      return 'Aux Evasion';
+      return 'Aux Evasion'
     case Item.GritDust:
-      return 'Grit Dust';
+      return 'Grit Dust'
     case Item.GritGravel:
-      return 'Grit Gravel';
+      return 'Grit Gravel'
     case Item.GritPebble:
-      return 'Grit Pebble';
+      return 'Grit Pebble'
     case Item.GritRock:
-      return 'Grit Rock';
+      return 'Grit Rock'
     case Item.SecretMedicine_1:
-      return 'Secret Medicine';
+      return 'Secret Medicine'
     case Item.TemptingCharmR:
-      return 'Tempting Charm R';
+      return 'Tempting Charm R'
     case Item.LostSatchel:
-      return 'Lost Satchel';
+      return 'Lost Satchel'
     case Item.LostSatchel_1:
-      return 'Lost Satchel';
+      return 'Lost Satchel'
     case Item.LostSatchel_2:
-      return 'Lost Satchel';
+      return 'Lost Satchel'
     case Item.LostSatchel_3:
-      return 'Lost Satchel';
+      return 'Lost Satchel'
     case Item.LostSatchel_4:
-      return 'Lost Satchel';
+      return 'Lost Satchel'
     case Item.Unknown_65:
-      return '???';
+      return '???'
     case Item.OriginBall:
-      return 'Origin Ball';
+      return 'Origin Ball'
     case Item.Unknown_66:
-      return '???';
+      return '???'
     case Item.Unknown_67:
-      return '???';
+      return '???'
     case Item.Unknown_68:
-      return '???';
+      return '???'
     case Item.Unknown_69:
-      return '???';
+      return '???'
     case Item.OriginOre:
-      return 'Origin Ore';
+      return 'Origin Ore'
     case Item.AdamantCrystal:
-      return 'Adamant Crystal';
+      return 'Adamant Crystal'
     case Item.LustrousGlobe:
-      return 'Lustrous Globe';
+      return 'Lustrous Globe'
     case Item.GriseousCore:
-      return 'Griseous Core';
+      return 'Griseous Core'
     case Item.BlankPlate:
-      return 'Blank Plate';
+      return 'Blank Plate'
     case Item.Unknown_70:
-      return '???';
+      return '???'
     case Item.CraftingKit:
-      return 'Crafting Kit';
+      return 'Crafting Kit'
     case Item.LeadenBall_1:
-      return 'Leaden Ball';
+      return 'Leaden Ball'
     case Item.GigatonBall_1:
-      return 'Gigaton Ball';
+      return 'Gigaton Ball'
     case Item.StrangeBall:
-      return 'Strange Ball';
+      return 'Strange Ball'
     case Item.Pokedex:
-      return 'Pok\u00E9dex';
+      return 'Pok\u00E9dex'
     case Item.OldVerse1:
-      return 'Old Verse 1';
+      return 'Old Verse 1'
     case Item.OldVerse2:
-      return 'Old Verse 2';
+      return 'Old Verse 2'
     case Item.OldVerse3:
-      return 'Old Verse 3';
+      return 'Old Verse 3'
     case Item.OldVerse4:
-      return 'Old Verse 4';
+      return 'Old Verse 4'
     case Item.Unknown_71:
-      return '???';
+      return '???'
     case Item.OldVerse5:
-      return 'Old Verse 5';
+      return 'Old Verse 5'
     case Item.OldVerse6:
-      return 'Old Verse 6';
+      return 'Old Verse 6'
     case Item.OldVerse7:
-      return 'Old Verse 7';
+      return 'Old Verse 7'
     case Item.OldVerse8:
-      return 'Old Verse 8';
+      return 'Old Verse 8'
     case Item.OldVerse9:
-      return 'Old Verse 9';
+      return 'Old Verse 9'
     case Item.OldVerse10:
-      return 'Old Verse 10';
+      return 'Old Verse 10'
     case Item.OldVerse11:
-      return 'Old Verse 11';
+      return 'Old Verse 11'
     case Item.OldVerse12:
-      return 'Old Verse 12';
+      return 'Old Verse 12'
     case Item.OldVerse13:
-      return 'Old Verse 13';
+      return 'Old Verse 13'
     case Item.OldVerse14:
-      return 'Old Verse 14';
+      return 'Old Verse 14'
     case Item.OldVerse15:
-      return 'Old Verse 15';
+      return 'Old Verse 15'
     case Item.OldVerse16:
-      return 'Old Verse 16';
+      return 'Old Verse 16'
     case Item.OldVerse17:
-      return 'Old Verse 17';
+      return 'Old Verse 17'
     case Item.OldVerse18:
-      return 'Old Verse 18';
+      return 'Old Verse 18'
     case Item.OldVerse19:
-      return 'Old Verse 19';
+      return 'Old Verse 19'
     case Item.OldVerse20:
-      return 'Old Verse 20';
+      return 'Old Verse 20'
     case Item.MysteriousShardS:
-      return 'Mysterious Shard S';
+      return 'Mysterious Shard S'
     case Item.MysteriousShardL:
-      return 'Mysterious Shard L';
+      return 'Mysterious Shard L'
     case Item.DiggerDrill:
-      return 'Digger Drill';
+      return 'Digger Drill'
     case Item.KantoSlate:
-      return 'Kanto Slate';
+      return 'Kanto Slate'
     case Item.JohtoSlate:
-      return 'Johto Slate';
+      return 'Johto Slate'
     case Item.SoulSlate:
-      return 'Soul Slate';
+      return 'Soul Slate'
     case Item.RainbowSlate:
-      return 'Rainbow Slate';
+      return 'Rainbow Slate'
     case Item.SquallSlate:
-      return 'Squall Slate';
+      return 'Squall Slate'
     case Item.OceanicSlate:
-      return 'Oceanic Slate';
+      return 'Oceanic Slate'
     case Item.TectonicSlate:
-      return 'Tectonic Slate';
+      return 'Tectonic Slate'
     case Item.StratosphericSlate:
-      return 'Stratospheric Slate';
+      return 'Stratospheric Slate'
     case Item.GenomeSlate:
-      return 'Genome Slate';
+      return 'Genome Slate'
     case Item.DiscoverySlate:
-      return 'Discovery Slate';
+      return 'Discovery Slate'
     case Item.DistortionSlate:
-      return 'Distortion Slate';
+      return 'Distortion Slate'
     case Item.DSSounds:
-      return 'DS Sounds';
+      return 'DS Sounds'
     case Item.Unknown_72:
-      return '';
+      return ''
     case Item.Unknown_73:
-      return '';
+      return ''
     case Item.Unknown_74:
-      return '';
+      return ''
     case Item.Unknown_75:
-      return '';
+      return ''
     case Item.Unknown_76:
-      return '';
+      return ''
     case Item.LegendPlate:
-      return 'Legend Plate';
+      return 'Legend Plate'
     case Item.RotomPhone:
-      return 'Rotom Phone';
+      return 'Rotom Phone'
     case Item.Sandwich:
-      return 'Sandwich';
+      return 'Sandwich'
     case Item.KoraidonsPokeBall:
-      return 'Koraidon\u2019s Pok\u00E9 Ball';
+      return 'Koraidon\u2019s Pok\u00E9 Ball'
     case Item.MiraidonsPokeBall:
-      return 'Miraidon\u2019s Pok\u00E9 Ball';
+      return 'Miraidon\u2019s Pok\u00E9 Ball'
     case Item.TeraOrb:
-      return 'Tera Orb';
+      return 'Tera Orb'
     case Item.ScarletBook:
-      return 'Scarlet Book';
+      return 'Scarlet Book'
     case Item.VioletBook:
-      return 'Violet Book';
+      return 'Violet Book'
     case Item.KofusWallet:
-      return 'Kofu\u2019s Wallet';
+      return 'Kofu\u2019s Wallet'
     case Item.Unknown_77:
-      return '';
+      return ''
     case Item.Unknown_78:
-      return '';
+      return ''
     case Item.Unknown_79:
-      return '';
+      return ''
     case Item.Unknown_80:
-      return '';
+      return ''
     case Item.Unknown_81:
-      return '';
+      return ''
     case Item.TinyBambooShoot:
-      return 'Tiny Bamboo Shoot';
+      return 'Tiny Bamboo Shoot'
     case Item.BigBambooShoot:
-      return 'Big Bamboo Shoot';
+      return 'Big Bamboo Shoot'
     case Item.Unknown_82:
-      return '';
+      return ''
     case Item.Unknown_83:
-      return '';
+      return ''
     case Item.Unknown_84:
-      return '';
+      return ''
     case Item.Unknown_85:
-      return '';
+      return ''
     case Item.Unknown_86:
-      return '';
+      return ''
     case Item.Unknown_87:
-      return '';
+      return ''
     case Item.Unknown_88:
-      return '';
+      return ''
     case Item.Unknown_89:
-      return '';
+      return ''
     case Item.Unknown_90:
-      return '';
+      return ''
     case Item.Unknown_91:
-      return '';
+      return ''
     case Item.Unknown_92:
-      return '';
+      return ''
     case Item.Unknown_93:
-      return '';
+      return ''
     case Item.Unknown_94:
-      return '';
+      return ''
     case Item.ScrollOfDarkness:
-      return 'Scroll of Darkness';
+      return 'Scroll of Darkness'
     case Item.ScrollOfWaters:
-      return 'Scroll of Waters';
+      return 'Scroll of Waters'
     case Item.Unknown_95:
-      return '';
+      return ''
     case Item.Unknown_96:
-      return '';
+      return ''
     case Item.MaliciousArmor:
-      return 'Malicious Armor';
+      return 'Malicious Armor'
     case Item.NormalTeraShard:
-      return 'Normal Tera Shard';
+      return 'Normal Tera Shard'
     case Item.FireTeraShard:
-      return 'Fire Tera Shard';
+      return 'Fire Tera Shard'
     case Item.WaterTeraShard:
-      return 'Water Tera Shard';
+      return 'Water Tera Shard'
     case Item.ElectricTeraShard:
-      return 'Electric Tera Shard';
+      return 'Electric Tera Shard'
     case Item.GrassTeraShard:
-      return 'Grass Tera Shard';
+      return 'Grass Tera Shard'
     case Item.IceTeraShard:
-      return 'Ice Tera Shard';
+      return 'Ice Tera Shard'
     case Item.FightingTeraShard:
-      return 'Fighting Tera Shard';
+      return 'Fighting Tera Shard'
     case Item.PoisonTeraShard:
-      return 'Poison Tera Shard';
+      return 'Poison Tera Shard'
     case Item.GroundTeraShard:
-      return 'Ground Tera Shard';
+      return 'Ground Tera Shard'
     case Item.FlyingTeraShard:
-      return 'Flying Tera Shard';
+      return 'Flying Tera Shard'
     case Item.PsychicTeraShard:
-      return 'Psychic Tera Shard';
+      return 'Psychic Tera Shard'
     case Item.BugTeraShard:
-      return 'Bug Tera Shard';
+      return 'Bug Tera Shard'
     case Item.RockTeraShard:
-      return 'Rock Tera Shard';
+      return 'Rock Tera Shard'
     case Item.GhostTeraShard:
-      return 'Ghost Tera Shard';
+      return 'Ghost Tera Shard'
     case Item.DragonTeraShard:
-      return 'Dragon Tera Shard';
+      return 'Dragon Tera Shard'
     case Item.DarkTeraShard:
-      return 'Dark Tera Shard';
+      return 'Dark Tera Shard'
     case Item.SteelTeraShard:
-      return 'Steel Tera Shard';
+      return 'Steel Tera Shard'
     case Item.FairyTeraShard:
-      return 'Fairy Tera Shard';
+      return 'Fairy Tera Shard'
     case Item.BoosterEnergy:
-      return 'Booster Energy';
+      return 'Booster Energy'
     case Item.AbilityShield:
-      return 'Ability Shield';
+      return 'Ability Shield'
     case Item.ClearAmulet:
-      return 'Clear Amulet';
+      return 'Clear Amulet'
     case Item.MirrorHerb:
-      return 'Mirror Herb';
+      return 'Mirror Herb'
     case Item.PunchingGlove:
-      return 'Punching Glove';
+      return 'Punching Glove'
     case Item.CovertCloak:
-      return 'Covert Cloak';
+      return 'Covert Cloak'
     case Item.LoadedDice:
-      return 'Loaded Dice';
+      return 'Loaded Dice'
     case Item.Unknown_97:
-      return '';
+      return ''
     case Item.Baguette:
-      return 'Baguette';
+      return 'Baguette'
     case Item.Mayonnaise:
-      return 'Mayonnaise';
+      return 'Mayonnaise'
     case Item.Ketchup:
-      return 'Ketchup';
+      return 'Ketchup'
     case Item.Mustard:
-      return 'Mustard';
+      return 'Mustard'
     case Item.Butter:
-      return 'Butter';
+      return 'Butter'
     case Item.PeanutButter:
-      return 'Peanut Butter';
+      return 'Peanut Butter'
     case Item.ChiliSauce:
-      return 'Chili Sauce';
+      return 'Chili Sauce'
     case Item.Salt:
-      return 'Salt';
+      return 'Salt'
     case Item.Pepper:
-      return 'Pepper';
+      return 'Pepper'
     case Item.Yogurt:
-      return 'Yogurt';
+      return 'Yogurt'
     case Item.WhippedCream:
-      return 'Whipped Cream';
+      return 'Whipped Cream'
     case Item.CreamCheese:
-      return 'Cream Cheese';
+      return 'Cream Cheese'
     case Item.Jam:
-      return 'Jam';
+      return 'Jam'
     case Item.Marmalade:
-      return 'Marmalade';
+      return 'Marmalade'
     case Item.OliveOil:
-      return 'Olive Oil';
+      return 'Olive Oil'
     case Item.Vinegar:
-      return 'Vinegar';
+      return 'Vinegar'
     case Item.SweetHerbaMystica:
-      return 'Sweet Herba Mystica';
+      return 'Sweet Herba Mystica'
     case Item.SaltyHerbaMystica:
-      return 'Salty Herba Mystica';
+      return 'Salty Herba Mystica'
     case Item.SourHerbaMystica:
-      return 'Sour Herba Mystica';
+      return 'Sour Herba Mystica'
     case Item.BitterHerbaMystica:
-      return 'Bitter Herba Mystica';
+      return 'Bitter Herba Mystica'
     case Item.SpicyHerbaMystica:
-      return 'Spicy Herba Mystica';
+      return 'Spicy Herba Mystica'
     case Item.Lettuce:
-      return 'Lettuce';
+      return 'Lettuce'
     case Item.Tomato:
-      return 'Tomato';
+      return 'Tomato'
     case Item.CherryTomatoes:
-      return 'Cherry Tomatoes';
+      return 'Cherry Tomatoes'
     case Item.Cucumber:
-      return 'Cucumber';
+      return 'Cucumber'
     case Item.Pickle:
-      return 'Pickle';
+      return 'Pickle'
     case Item.Onion:
-      return 'Onion';
+      return 'Onion'
     case Item.RedOnion:
-      return 'Red Onion';
+      return 'Red Onion'
     case Item.GreenBellPepper:
-      return 'Green Bell Pepper';
+      return 'Green Bell Pepper'
     case Item.RedBellPepper:
-      return 'Red Bell Pepper';
+      return 'Red Bell Pepper'
     case Item.YellowBellPepper:
-      return 'Yellow Bell Pepper';
+      return 'Yellow Bell Pepper'
     case Item.Avocado:
-      return 'Avocado';
+      return 'Avocado'
     case Item.Bacon:
-      return 'Bacon';
+      return 'Bacon'
     case Item.Ham:
-      return 'Ham';
+      return 'Ham'
     case Item.Prosciutto:
-      return 'Prosciutto';
+      return 'Prosciutto'
     case Item.Chorizo:
-      return 'Chorizo';
+      return 'Chorizo'
     case Item.HerbedSausage:
-      return 'Herbed Sausage';
+      return 'Herbed Sausage'
     case Item.Hamburger:
-      return 'Hamburger';
+      return 'Hamburger'
     case Item.KlawfStick:
-      return 'Klawf Stick';
+      return 'Klawf Stick'
     case Item.SmokedFillet:
-      return 'Smoked Fillet';
+      return 'Smoked Fillet'
     case Item.FriedFillet:
-      return 'Fried Fillet';
+      return 'Fried Fillet'
     case Item.Egg:
-      return 'Egg';
+      return 'Egg'
     case Item.PotatoTortilla:
-      return 'Potato Tortilla';
+      return 'Potato Tortilla'
     case Item.Tofu:
-      return 'Tofu';
+      return 'Tofu'
     case Item.Rice:
-      return 'Rice';
+      return 'Rice'
     case Item.Noodles:
-      return 'Noodles';
+      return 'Noodles'
     case Item.PotatoSalad:
-      return 'Potato Salad';
+      return 'Potato Salad'
     case Item.Cheese:
-      return 'Cheese';
+      return 'Cheese'
     case Item.Banana:
-      return 'Banana';
+      return 'Banana'
     case Item.Strawberry:
-      return 'Strawberry';
+      return 'Strawberry'
     case Item.Apple:
-      return 'Apple';
+      return 'Apple'
     case Item.Kiwi:
-      return 'Kiwi';
+      return 'Kiwi'
     case Item.Pineapple:
-      return 'Pineapple';
+      return 'Pineapple'
     case Item.Jalapeno:
-      return 'Jalape\u00F1o';
+      return 'Jalape\u00F1o'
     case Item.Horseradish:
-      return 'Horseradish';
+      return 'Horseradish'
     case Item.CurryPowder:
-      return 'Curry Powder';
+      return 'Curry Powder'
     case Item.Wasabi:
-      return 'Wasabi';
+      return 'Wasabi'
     case Item.Watercress:
-      return 'Watercress';
+      return 'Watercress'
     case Item.Basil:
-      return 'Basil';
+      return 'Basil'
     case Item.Unknown_98:
-      return '';
+      return ''
     case Item.Unknown_99:
-      return '';
+      return ''
     case Item.Unknown_100:
-      return '';
+      return ''
     case Item.Unknown_101:
-      return '';
+      return ''
     case Item.Unknown_102:
-      return '';
+      return ''
     case Item.Unknown_103:
-      return '';
+      return ''
     case Item.Unknown_104:
-      return '';
+      return ''
     case Item.Unknown_105:
-      return '';
+      return ''
     case Item.Unknown_106:
-      return '';
+      return ''
     case Item.VenonatFang:
-      return 'Venonat Fang';
+      return 'Venonat Fang'
     case Item.DiglettDirt:
-      return 'Diglett Dirt';
+      return 'Diglett Dirt'
     case Item.MeowthFur:
-      return 'Meowth Fur';
+      return 'Meowth Fur'
     case Item.PsyduckDown:
-      return 'Psyduck Down';
+      return 'Psyduck Down'
     case Item.MankeyFur:
-      return 'Mankey Fur';
+      return 'Mankey Fur'
     case Item.GrowlitheFur:
-      return 'Growlithe Fur';
+      return 'Growlithe Fur'
     case Item.SlowpokeClaw:
-      return 'Slowpoke Claw';
+      return 'Slowpoke Claw'
     case Item.MagnemiteScrew:
-      return 'Magnemite Screw';
+      return 'Magnemite Screw'
     case Item.GrimerToxin:
-      return 'Grimer Toxin';
+      return 'Grimer Toxin'
     case Item.ShellderPearl:
-      return 'Shellder Pearl';
+      return 'Shellder Pearl'
     case Item.GastlyGas:
-      return 'Gastly Gas';
+      return 'Gastly Gas'
     case Item.DrowzeeFur:
-      return 'Drowzee Fur';
+      return 'Drowzee Fur'
     case Item.VoltorbSparks:
-      return 'Voltorb Sparks';
+      return 'Voltorb Sparks'
     case Item.ScytherClaw:
-      return 'Scyther Claw';
+      return 'Scyther Claw'
     case Item.TaurosHair:
-      return 'Tauros Hair';
+      return 'Tauros Hair'
     case Item.MagikarpScales:
-      return 'Magikarp Scales';
+      return 'Magikarp Scales'
     case Item.DittoGoo:
-      return 'Ditto Goo';
+      return 'Ditto Goo'
     case Item.EeveeFur:
-      return 'Eevee Fur';
+      return 'Eevee Fur'
     case Item.DratiniScales:
-      return 'Dratini Scales';
+      return 'Dratini Scales'
     case Item.PichuFur:
-      return 'Pichu Fur';
+      return 'Pichu Fur'
     case Item.IgglybuffFluff:
-      return 'Igglybuff Fluff';
+      return 'Igglybuff Fluff'
     case Item.MareepWool:
-      return 'Mareep Wool';
+      return 'Mareep Wool'
     case Item.HoppipLeaf:
-      return 'Hoppip Leaf';
+      return 'Hoppip Leaf'
     case Item.SunkernLeaf:
-      return 'Sunkern Leaf';
+      return 'Sunkern Leaf'
     case Item.MurkrowBauble:
-      return 'Murkrow Bauble';
+      return 'Murkrow Bauble'
     case Item.MisdreavusTears:
-      return 'Misdreavus Tears';
+      return 'Misdreavus Tears'
     case Item.GirafarigFur:
-      return 'Girafarig Fur';
+      return 'Girafarig Fur'
     case Item.PinecoHusk:
-      return 'Pineco Husk';
+      return 'Pineco Husk'
     case Item.DunsparceScales:
-      return 'Dunsparce Scales';
+      return 'Dunsparce Scales'
     case Item.QwilfishSpines:
-      return 'Qwilfish Spines';
+      return 'Qwilfish Spines'
     case Item.HeracrossClaw:
-      return 'Heracross Claw';
+      return 'Heracross Claw'
     case Item.SneaselClaw:
-      return 'Sneasel Claw';
+      return 'Sneasel Claw'
     case Item.TeddiursaClaw:
-      return 'Teddiursa Claw';
+      return 'Teddiursa Claw'
     case Item.DelibirdParcel:
-      return 'Delibird Parcel';
+      return 'Delibird Parcel'
     case Item.HoundourFang:
-      return 'Houndour Fang';
+      return 'Houndour Fang'
     case Item.PhanpyNail:
-      return 'Phanpy Nail';
+      return 'Phanpy Nail'
     case Item.StantlerHair:
-      return 'Stantler Hair';
+      return 'Stantler Hair'
     case Item.LarvitarClaw:
-      return 'Larvitar Claw';
+      return 'Larvitar Claw'
     case Item.WingullFeather:
-      return 'Wingull Feather';
+      return 'Wingull Feather'
     case Item.RaltsDust:
-      return 'Ralts Dust';
+      return 'Ralts Dust'
     case Item.SurskitSyrup:
-      return 'Surskit Syrup';
+      return 'Surskit Syrup'
     case Item.ShroomishSpores:
-      return 'Shroomish Spores';
+      return 'Shroomish Spores'
     case Item.SlakothFur:
-      return 'Slakoth Fur';
+      return 'Slakoth Fur'
     case Item.MakuhitaSweat:
-      return 'Makuhita Sweat';
+      return 'Makuhita Sweat'
     case Item.AzurillFur:
-      return 'Azurill Fur';
+      return 'Azurill Fur'
     case Item.SableyeGem:
-      return 'Sableye Gem';
+      return 'Sableye Gem'
     case Item.MedititeSweat:
-      return 'Meditite Sweat';
+      return 'Meditite Sweat'
     case Item.GulpinMucus:
-      return 'Gulpin Mucus';
+      return 'Gulpin Mucus'
     case Item.NumelLava:
-      return 'Numel Lava';
+      return 'Numel Lava'
     case Item.TorkoalCoal:
-      return 'Torkoal Coal';
+      return 'Torkoal Coal'
     case Item.SpoinkPearl:
-      return 'Spoink Pearl';
+      return 'Spoink Pearl'
     case Item.CacneaNeedle:
-      return 'Cacnea Needle';
+      return 'Cacnea Needle'
     case Item.SwabluFluff:
-      return 'Swablu Fluff';
+      return 'Swablu Fluff'
     case Item.ZangooseClaw:
-      return 'Zangoose Claw';
+      return 'Zangoose Claw'
     case Item.SeviperFang:
-      return 'Seviper Fang';
+      return 'Seviper Fang'
     case Item.BarboachSlime:
-      return 'Barboach Slime';
+      return 'Barboach Slime'
     case Item.ShuppetScrap:
-      return 'Shuppet Scrap';
+      return 'Shuppet Scrap'
     case Item.TropiusLeaf:
-      return 'Tropius Leaf';
+      return 'Tropius Leaf'
     case Item.SnoruntFur:
-      return 'Snorunt Fur';
+      return 'Snorunt Fur'
     case Item.LuvdiscScales:
-      return 'Luvdisc Scales';
+      return 'Luvdisc Scales'
     case Item.BagonScales:
-      return 'Bagon Scales';
+      return 'Bagon Scales'
     case Item.StarlyFeather:
-      return 'Starly Feather';
+      return 'Starly Feather'
     case Item.KricketotShell:
-      return 'Kricketot Shell';
+      return 'Kricketot Shell'
     case Item.ShinxFang:
-      return 'Shinx Fang';
+      return 'Shinx Fang'
     case Item.CombeeHoney:
-      return 'Combee Honey';
+      return 'Combee Honey'
     case Item.PachirisuFur:
-      return 'Pachirisu Fur';
+      return 'Pachirisu Fur'
     case Item.BuizelFur:
-      return 'Buizel Fur';
+      return 'Buizel Fur'
     case Item.ShellosMucus:
-      return 'Shellos Mucus';
+      return 'Shellos Mucus'
     case Item.DrifloonGas:
-      return 'Drifloon Gas';
+      return 'Drifloon Gas'
     case Item.StunkyFur:
-      return 'Stunky Fur';
+      return 'Stunky Fur'
     case Item.BronzorFragment:
-      return 'Bronzor Fragment';
+      return 'Bronzor Fragment'
     case Item.BonslyTears:
-      return 'Bonsly Tears';
+      return 'Bonsly Tears'
     case Item.HappinyDust:
-      return 'Happiny Dust';
+      return 'Happiny Dust'
     case Item.SpiritombFragment:
-      return 'Spiritomb Fragment';
+      return 'Spiritomb Fragment'
     case Item.GibleScales:
-      return 'Gible Scales';
+      return 'Gible Scales'
     case Item.RioluFur:
-      return 'Riolu Fur';
+      return 'Riolu Fur'
     case Item.HippopotasSand:
-      return 'Hippopotas Sand';
+      return 'Hippopotas Sand'
     case Item.CroagunkPoison:
-      return 'Croagunk Poison';
+      return 'Croagunk Poison'
     case Item.FinneonScales:
-      return 'Finneon Scales';
+      return 'Finneon Scales'
     case Item.SnoverBerries:
-      return 'Snover Berries';
+      return 'Snover Berries'
     case Item.RotomSparks:
-      return 'Rotom Sparks';
+      return 'Rotom Sparks'
     case Item.PetililLeaf:
-      return 'Petilil Leaf';
+      return 'Petilil Leaf'
     case Item.BasculinFang:
-      return 'Basculin Fang';
+      return 'Basculin Fang'
     case Item.SandileClaw:
-      return 'Sandile Claw';
+      return 'Sandile Claw'
     case Item.ZoruaFur:
-      return 'Zorua Fur';
+      return 'Zorua Fur'
     case Item.GothitaEyelash:
-      return 'Gothita Eyelash';
+      return 'Gothita Eyelash'
     case Item.DeerlingHair:
-      return 'Deerling Hair';
+      return 'Deerling Hair'
     case Item.FoongusSpores:
-      return 'Foongus Spores';
+      return 'Foongus Spores'
     case Item.AlomomolaMucus:
-      return 'Alomomola Mucus';
+      return 'Alomomola Mucus'
     case Item.TynamoSlime:
-      return 'Tynamo Slime';
+      return 'Tynamo Slime'
     case Item.AxewScales:
-      return 'Axew Scales';
+      return 'Axew Scales'
     case Item.CubchooFur:
-      return 'Cubchoo Fur';
+      return 'Cubchoo Fur'
     case Item.CryogonalIce:
-      return 'Cryogonal Ice';
+      return 'Cryogonal Ice'
     case Item.PawniardBlade:
-      return 'Pawniard Blade';
+      return 'Pawniard Blade'
     case Item.RuffletFeather:
-      return 'Rufflet Feather';
+      return 'Rufflet Feather'
     case Item.DeinoScales:
-      return 'Deino Scales';
+      return 'Deino Scales'
     case Item.LarvestaFuzz:
-      return 'Larvesta Fuzz';
+      return 'Larvesta Fuzz'
     case Item.FletchlingFeather:
-      return 'Fletchling Feather';
+      return 'Fletchling Feather'
     case Item.ScatterbugPowder:
-      return 'Scatterbug Powder';
+      return 'Scatterbug Powder'
     case Item.LitleoTuft:
-      return 'Litleo Tuft';
+      return 'Litleo Tuft'
     case Item.FlabebePollen:
-      return 'Flab\u00E9b\u00E9 Pollen';
+      return 'Flab\u00E9b\u00E9 Pollen'
     case Item.SkiddoLeaf:
-      return 'Skiddo Leaf';
+      return 'Skiddo Leaf'
     case Item.SkrelpKelp:
-      return 'Skrelp Kelp';
+      return 'Skrelp Kelp'
     case Item.ClauncherClaw:
-      return 'Clauncher Claw';
+      return 'Clauncher Claw'
     case Item.HawluchaDown:
-      return 'Hawlucha Down';
+      return 'Hawlucha Down'
     case Item.DedenneFur:
-      return 'Dedenne Fur';
+      return 'Dedenne Fur'
     case Item.GoomyGoo:
-      return 'Goomy Goo';
+      return 'Goomy Goo'
     case Item.KlefkiKey:
-      return 'Klefki Key';
+      return 'Klefki Key'
     case Item.BergmiteIce:
-      return 'Bergmite Ice';
+      return 'Bergmite Ice'
     case Item.NoibatFur:
-      return 'Noibat Fur';
+      return 'Noibat Fur'
     case Item.YungoosFur:
-      return 'Yungoos Fur';
+      return 'Yungoos Fur'
     case Item.CrabrawlerShell:
-      return 'Crabrawler Shell';
+      return 'Crabrawler Shell'
     case Item.OricorioFeather:
-      return 'Oricorio Feather';
+      return 'Oricorio Feather'
     case Item.RockruffRock:
-      return 'Rockruff Rock';
+      return 'Rockruff Rock'
     case Item.MareanieSpike:
-      return 'Mareanie Spike';
+      return 'Mareanie Spike'
     case Item.MudbrayMud:
-      return 'Mudbray Mud';
+      return 'Mudbray Mud'
     case Item.FomantisLeaf:
-      return 'Fomantis Leaf';
+      return 'Fomantis Leaf'
     case Item.SalanditGas:
-      return 'Salandit Gas';
+      return 'Salandit Gas'
     case Item.BounsweetSweat:
-      return 'Bounsweet Sweat';
+      return 'Bounsweet Sweat'
     case Item.OranguruFur:
-      return 'Oranguru Fur';
+      return 'Oranguru Fur'
     case Item.PassimianFur:
-      return 'Passimian Fur';
+      return 'Passimian Fur'
     case Item.SandygastSand:
-      return 'Sandygast Sand';
+      return 'Sandygast Sand'
     case Item.KomalaClaw:
-      return 'Komala Claw';
+      return 'Komala Claw'
     case Item.MimikyuScrap:
-      return 'Mimikyu Scrap';
+      return 'Mimikyu Scrap'
     case Item.BruxishTooth:
-      return 'Bruxish Tooth';
+      return 'Bruxish Tooth'
     case Item.ChewtleClaw:
-      return 'Chewtle Claw';
+      return 'Chewtle Claw'
     case Item.SkwovetFur:
-      return 'Skwovet Fur';
+      return 'Skwovet Fur'
     case Item.ArrokudaScales:
-      return 'Arrokuda Scales';
+      return 'Arrokuda Scales'
     case Item.RookideeFeather:
-      return 'Rookidee Feather';
+      return 'Rookidee Feather'
     case Item.ToxelSparks:
-      return 'Toxel Sparks';
+      return 'Toxel Sparks'
     case Item.FalinksSweat:
-      return 'Falinks Sweat';
+      return 'Falinks Sweat'
     case Item.CufantTarnish:
-      return 'Cufant Tarnish';
+      return 'Cufant Tarnish'
     case Item.RolycolyCoal:
-      return 'Rolycoly Coal';
+      return 'Rolycoly Coal'
     case Item.SilicobraSand:
-      return 'Silicobra Sand';
+      return 'Silicobra Sand'
     case Item.IndeedeeFur:
-      return 'Indeedee Fur';
+      return 'Indeedee Fur'
     case Item.PincurchinSpines:
-      return 'Pincurchin Spines';
+      return 'Pincurchin Spines'
     case Item.SnomThread:
-      return 'Snom Thread';
+      return 'Snom Thread'
     case Item.ImpidimpHair:
-      return 'Impidimp Hair';
+      return 'Impidimp Hair'
     case Item.ApplinJuice:
-      return 'Applin Juice';
+      return 'Applin Juice'
     case Item.SinisteaChip:
-      return 'Sinistea Chip';
+      return 'Sinistea Chip'
     case Item.HatennaDust:
-      return 'Hatenna Dust';
+      return 'Hatenna Dust'
     case Item.StonjournerStone:
-      return 'Stonjourner Stone';
+      return 'Stonjourner Stone'
     case Item.EiscueDown:
-      return 'Eiscue Down';
+      return 'Eiscue Down'
     case Item.DreepyPowder:
-      return 'Dreepy Powder';
+      return 'Dreepy Powder'
     case Item.Unknown_107:
-      return '';
+      return ''
     case Item.Unknown_108:
-      return '';
+      return ''
     case Item.Unknown_109:
-      return '';
+      return ''
     case Item.LechonkHair:
-      return 'Lechonk Hair';
+      return 'Lechonk Hair'
     case Item.TarountulaThread:
-      return 'Tarountula Thread';
+      return 'Tarountula Thread'
     case Item.NymbleClaw:
-      return 'Nymble Claw';
+      return 'Nymble Claw'
     case Item.RellorMud:
-      return 'Rellor Mud';
+      return 'Rellor Mud'
     case Item.GreavardWax:
-      return 'Greavard Wax';
+      return 'Greavard Wax'
     case Item.FlittleDown:
-      return 'Flittle Down';
+      return 'Flittle Down'
     case Item.WiglettSand:
-      return 'Wiglett Sand';
+      return 'Wiglett Sand'
     case Item.DondozoWhisker:
-      return 'Dondozo Whisker';
+      return 'Dondozo Whisker'
     case Item.VeluzaFillet:
-      return 'Veluza Fillet';
+      return 'Veluza Fillet'
     case Item.FinizenMucus:
-      return 'Finizen Mucus';
+      return 'Finizen Mucus'
     case Item.SmolivOil:
-      return 'Smoliv Oil';
+      return 'Smoliv Oil'
     case Item.CapsakidSeed:
-      return 'Capsakid Seed';
+      return 'Capsakid Seed'
     case Item.TadbulbMucus:
-      return 'Tadbulb Mucus';
+      return 'Tadbulb Mucus'
     case Item.VaroomFume:
-      return 'Varoom Fume';
+      return 'Varoom Fume'
     case Item.OrthwormTarnish:
-      return 'Orthworm Tarnish';
+      return 'Orthworm Tarnish'
     case Item.TandemausFur:
-      return 'Tandemaus Fur';
+      return 'Tandemaus Fur'
     case Item.CetoddleGrease:
-      return 'Cetoddle Grease';
+      return 'Cetoddle Grease'
     case Item.FrigibaxScales:
-      return 'Frigibax Scales';
+      return 'Frigibax Scales'
     case Item.TatsugiriScales:
-      return 'Tatsugiri Scales';
+      return 'Tatsugiri Scales'
     case Item.CyclizarScales:
-      return 'Cyclizar Scales';
+      return 'Cyclizar Scales'
     case Item.PawmiFur:
-      return 'Pawmi Fur';
+      return 'Pawmi Fur'
     case Item.Unknown_110:
-      return '';
+      return ''
     case Item.Unknown_111:
-      return '';
+      return ''
     case Item.WattrelFeather:
-      return 'Wattrel Feather';
+      return 'Wattrel Feather'
     case Item.BombirdierFeather:
-      return 'Bombirdier Feather';
+      return 'Bombirdier Feather'
     case Item.SquawkabillyFeather:
-      return 'Squawkabilly Feather';
+      return 'Squawkabilly Feather'
     case Item.FlamigoDown:
-      return 'Flamigo Down';
+      return 'Flamigo Down'
     case Item.KlawfClaw:
-      return 'Klawf Claw';
+      return 'Klawf Claw'
     case Item.NacliSalt:
-      return 'Nacli Salt';
+      return 'Nacli Salt'
     case Item.GlimmetCrystal:
-      return 'Glimmet Crystal';
+      return 'Glimmet Crystal'
     case Item.ShroodleInk:
-      return 'Shroodle Ink';
+      return 'Shroodle Ink'
     case Item.FidoughFur:
-      return 'Fidough Fur';
+      return 'Fidough Fur'
     case Item.MaschiffFang:
-      return 'Maschiff Fang';
+      return 'Maschiff Fang'
     case Item.BramblinTwig:
-      return 'Bramblin Twig';
+      return 'Bramblin Twig'
     case Item.GimmighoulCoin:
-      return 'Gimmighoul Coin';
+      return 'Gimmighoul Coin'
     case Item.Unknown_112:
-      return '';
+      return ''
     case Item.Unknown_113:
-      return '';
+      return ''
     case Item.Unknown_114:
-      return '';
+      return ''
     case Item.Unknown_115:
-      return '';
+      return ''
     case Item.Unknown_116:
-      return '';
+      return ''
     case Item.Unknown_117:
-      return '';
+      return ''
     case Item.Unknown_118:
-      return '';
+      return ''
     case Item.Unknown_119:
-      return '';
+      return ''
     case Item.Unknown_120:
-      return '';
+      return ''
     case Item.Unknown_121:
-      return '';
+      return ''
     case Item.Unknown_122:
-      return '';
+      return ''
     case Item.Unknown_123:
-      return '';
+      return ''
     case Item.Unknown_124:
-      return '';
+      return ''
     case Item.Unknown_125:
-      return '';
+      return ''
     case Item.Unknown_126:
-      return '';
+      return ''
     case Item.Unknown_127:
-      return '';
+      return ''
     case Item.Unknown_128:
-      return '';
+      return ''
     case Item.Unknown_129:
-      return '';
+      return ''
     case Item.TinkatinkHair:
-      return 'Tinkatink Hair';
+      return 'Tinkatink Hair'
     case Item.CharcadetSoot:
-      return 'Charcadet Soot';
+      return 'Charcadet Soot'
     case Item.ToedscoolFlaps:
-      return 'Toedscool Flaps';
+      return 'Toedscool Flaps'
     case Item.WooperSlime:
-      return 'Wooper Slime';
+      return 'Wooper Slime'
     case Item.TM100_1:
-      return 'TM100';
+      return 'TM100'
     case Item.TM101:
-      return 'TM101';
+      return 'TM101'
     case Item.TM102:
-      return 'TM102';
+      return 'TM102'
     case Item.TM103:
-      return 'TM103';
+      return 'TM103'
     case Item.TM104:
-      return 'TM104';
+      return 'TM104'
     case Item.TM105:
-      return 'TM105';
+      return 'TM105'
     case Item.TM106:
-      return 'TM106';
+      return 'TM106'
     case Item.TM107:
-      return 'TM107';
+      return 'TM107'
     case Item.TM108:
-      return 'TM108';
+      return 'TM108'
     case Item.TM109:
-      return 'TM109';
+      return 'TM109'
     case Item.TM110:
-      return 'TM110';
+      return 'TM110'
     case Item.TM111:
-      return 'TM111';
+      return 'TM111'
     case Item.TM112:
-      return 'TM112';
+      return 'TM112'
     case Item.TM113:
-      return 'TM113';
+      return 'TM113'
     case Item.TM114:
-      return 'TM114';
+      return 'TM114'
     case Item.TM115:
-      return 'TM115';
+      return 'TM115'
     case Item.TM116:
-      return 'TM116';
+      return 'TM116'
     case Item.TM117:
-      return 'TM117';
+      return 'TM117'
     case Item.TM118:
-      return 'TM118';
+      return 'TM118'
     case Item.TM119:
-      return 'TM119';
+      return 'TM119'
     case Item.TM120:
-      return 'TM120';
+      return 'TM120'
     case Item.TM121:
-      return 'TM121';
+      return 'TM121'
     case Item.TM122:
-      return 'TM122';
+      return 'TM122'
     case Item.TM123:
-      return 'TM123';
+      return 'TM123'
     case Item.TM124:
-      return 'TM124';
+      return 'TM124'
     case Item.TM125:
-      return 'TM125';
+      return 'TM125'
     case Item.TM126:
-      return 'TM126';
+      return 'TM126'
     case Item.TM127:
-      return 'TM127';
+      return 'TM127'
     case Item.TM128:
-      return 'TM128';
+      return 'TM128'
     case Item.TM129:
-      return 'TM129';
+      return 'TM129'
     case Item.TM130:
-      return 'TM130';
+      return 'TM130'
     case Item.TM131:
-      return 'TM131';
+      return 'TM131'
     case Item.TM132:
-      return 'TM132';
+      return 'TM132'
     case Item.TM133:
-      return 'TM133';
+      return 'TM133'
     case Item.TM134:
-      return 'TM134';
+      return 'TM134'
     case Item.TM135:
-      return 'TM135';
+      return 'TM135'
     case Item.TM136:
-      return 'TM136';
+      return 'TM136'
     case Item.TM137:
-      return 'TM137';
+      return 'TM137'
     case Item.TM138:
-      return 'TM138';
+      return 'TM138'
     case Item.TM139:
-      return 'TM139';
+      return 'TM139'
     case Item.TM140:
-      return 'TM140';
+      return 'TM140'
     case Item.TM141:
-      return 'TM141';
+      return 'TM141'
     case Item.TM142:
-      return 'TM142';
+      return 'TM142'
     case Item.TM143:
-      return 'TM143';
+      return 'TM143'
     case Item.TM144:
-      return 'TM144';
+      return 'TM144'
     case Item.TM145:
-      return 'TM145';
+      return 'TM145'
     case Item.TM146:
-      return 'TM146';
+      return 'TM146'
     case Item.TM147:
-      return 'TM147';
+      return 'TM147'
     case Item.TM148:
-      return 'TM148';
+      return 'TM148'
     case Item.TM149:
-      return 'TM149';
+      return 'TM149'
     case Item.TM150:
-      return 'TM150';
+      return 'TM150'
     case Item.TM151:
-      return 'TM151';
+      return 'TM151'
     case Item.TM152:
-      return 'TM152';
+      return 'TM152'
     case Item.TM153:
-      return 'TM153';
+      return 'TM153'
     case Item.TM154:
-      return 'TM154';
+      return 'TM154'
     case Item.TM155:
-      return 'TM155';
+      return 'TM155'
     case Item.TM156:
-      return 'TM156';
+      return 'TM156'
     case Item.TM157:
-      return 'TM157';
+      return 'TM157'
     case Item.TM158:
-      return 'TM158';
+      return 'TM158'
     case Item.TM159:
-      return 'TM159';
+      return 'TM159'
     case Item.TM160:
-      return 'TM160';
+      return 'TM160'
     case Item.TM161:
-      return 'TM161';
+      return 'TM161'
     case Item.TM162:
-      return 'TM162';
+      return 'TM162'
     case Item.TM163:
-      return 'TM163';
+      return 'TM163'
     case Item.TM164:
-      return 'TM164';
+      return 'TM164'
     case Item.TM165:
-      return 'TM165';
+      return 'TM165'
     case Item.TM166:
-      return 'TM166';
+      return 'TM166'
     case Item.TM167:
-      return 'TM167';
+      return 'TM167'
     case Item.TM168:
-      return 'TM168';
+      return 'TM168'
     case Item.TM169:
-      return 'TM169';
+      return 'TM169'
     case Item.TM170:
-      return 'TM170';
+      return 'TM170'
     case Item.TM171:
-      return 'TM171';
+      return 'TM171'
     case Item.TM172:
-      return 'TM172';
+      return 'TM172'
     case Item.TM173:
-      return 'TM173';
+      return 'TM173'
     case Item.TM174:
-      return 'TM174';
+      return 'TM174'
     case Item.TM175:
-      return 'TM175';
+      return 'TM175'
     case Item.TM176:
-      return 'TM176';
+      return 'TM176'
     case Item.TM177:
-      return 'TM177';
+      return 'TM177'
     case Item.TM178:
-      return 'TM178';
+      return 'TM178'
     case Item.TM179:
-      return 'TM179';
+      return 'TM179'
     case Item.TM180:
-      return 'TM180';
+      return 'TM180'
     case Item.TM181:
-      return 'TM181';
+      return 'TM181'
     case Item.TM182:
-      return 'TM182';
+      return 'TM182'
     case Item.TM183:
-      return 'TM183';
+      return 'TM183'
     case Item.TM184:
-      return 'TM184';
+      return 'TM184'
     case Item.TM185:
-      return 'TM185';
+      return 'TM185'
     case Item.TM186:
-      return 'TM186';
+      return 'TM186'
     case Item.TM187:
-      return 'TM187';
+      return 'TM187'
     case Item.TM188:
-      return 'TM188';
+      return 'TM188'
     case Item.TM189:
-      return 'TM189';
+      return 'TM189'
     case Item.TM190:
-      return 'TM190';
+      return 'TM190'
     case Item.TM191:
-      return 'TM191';
+      return 'TM191'
     case Item.TM192:
-      return 'TM192';
+      return 'TM192'
     case Item.TM193:
-      return 'TM193';
+      return 'TM193'
     case Item.TM194:
-      return 'TM194';
+      return 'TM194'
     case Item.TM195:
-      return 'TM195';
+      return 'TM195'
     case Item.TM196:
-      return 'TM196';
+      return 'TM196'
     case Item.TM197:
-      return 'TM197';
+      return 'TM197'
     case Item.TM198:
-      return 'TM198';
+      return 'TM198'
     case Item.TM199:
-      return 'TM199';
+      return 'TM199'
     case Item.TM200:
-      return 'TM200';
+      return 'TM200'
     case Item.TM201:
-      return 'TM201';
+      return 'TM201'
     case Item.TM202:
-      return 'TM202';
+      return 'TM202'
     case Item.TM203:
-      return 'TM203';
+      return 'TM203'
     case Item.TM204:
-      return 'TM204';
+      return 'TM204'
     case Item.TM205:
-      return 'TM205';
+      return 'TM205'
     case Item.TM206:
-      return 'TM206';
+      return 'TM206'
     case Item.TM207:
-      return 'TM207';
+      return 'TM207'
     case Item.TM208:
-      return 'TM208';
+      return 'TM208'
     case Item.TM209:
-      return 'TM209';
+      return 'TM209'
     case Item.TM210:
-      return 'TM210';
+      return 'TM210'
     case Item.TM211:
-      return 'TM211';
+      return 'TM211'
     case Item.TM212:
-      return 'TM212';
+      return 'TM212'
     case Item.TM213:
-      return 'TM213';
+      return 'TM213'
     case Item.TM214:
-      return 'TM214';
+      return 'TM214'
     case Item.TM215:
-      return 'TM215';
+      return 'TM215'
     case Item.TM216:
-      return 'TM216';
+      return 'TM216'
     case Item.TM217:
-      return 'TM217';
+      return 'TM217'
     case Item.TM218:
-      return 'TM218';
+      return 'TM218'
     case Item.TM219:
-      return 'TM219';
+      return 'TM219'
     case Item.TM220:
-      return 'TM220';
+      return 'TM220'
     case Item.TM221:
-      return 'TM221';
+      return 'TM221'
     case Item.TM222:
-      return 'TM222';
+      return 'TM222'
     case Item.TM223:
-      return 'TM223';
+      return 'TM223'
     case Item.TM224:
-      return 'TM224';
+      return 'TM224'
     case Item.TM225:
-      return 'TM225';
+      return 'TM225'
     case Item.TM226:
-      return 'TM226';
+      return 'TM226'
     case Item.TM227:
-      return 'TM227';
+      return 'TM227'
     case Item.TM228:
-      return 'TM228';
+      return 'TM228'
     case Item.TM229:
-      return 'TM229';
+      return 'TM229'
     case Item.Unknown_130:
-      return '';
+      return ''
     case Item.Unknown_131:
-      return '';
+      return ''
     case Item.Unknown_132:
-      return '';
+      return ''
     case Item.Unknown_133:
-      return '';
+      return ''
     case Item.Unknown_134:
-      return '';
+      return ''
     case Item.Unknown_135:
-      return '';
+      return ''
     case Item.Unknown_136:
-      return '';
+      return ''
     case Item.Unknown_137:
-      return '';
+      return ''
     case Item.Unknown_138:
-      return '';
+      return ''
     case Item.Unknown_139:
-      return '';
+      return ''
     case Item.Unknown_140:
-      return '';
+      return ''
     case Item.Unknown_141:
-      return '';
+      return ''
     case Item.Unknown_142:
-      return '';
+      return ''
     case Item.Unknown_143:
-      return '';
+      return ''
     case Item.Unknown_144:
-      return '';
+      return ''
     case Item.Unknown_145:
-      return '';
+      return ''
     case Item.Unknown_146:
-      return '';
+      return ''
     case Item.Unknown_147:
-      return '';
+      return ''
     case Item.Unknown_148:
-      return '';
+      return ''
     case Item.Unknown_149:
-      return '';
+      return ''
     case Item.Unknown_150:
-      return '';
+      return ''
     case Item.PicnicSet:
-      return 'Picnic Set';
+      return 'Picnic Set'
     case Item.Unknown_151:
-      return '';
+      return ''
     case Item.AcademyBottle:
-      return 'Academy Bottle';
+      return 'Academy Bottle'
     case Item.AcademyBottle_1:
-      return 'Academy Bottle';
+      return 'Academy Bottle'
     case Item.PolkaDotBottle:
-      return 'Polka-Dot Bottle';
+      return 'Polka-Dot Bottle'
     case Item.StripedBottle:
-      return 'Striped Bottle';
+      return 'Striped Bottle'
     case Item.DiamondBottle:
-      return 'Diamond Bottle';
+      return 'Diamond Bottle'
     case Item.AcademyCup:
-      return 'Academy Cup';
+      return 'Academy Cup'
     case Item.AcademyCup_1:
-      return 'Academy Cup';
+      return 'Academy Cup'
     case Item.StripedCup:
-      return 'Striped Cup';
+      return 'Striped Cup'
     case Item.PolkaDotCup:
-      return 'Polka-Dot Cup';
+      return 'Polka-Dot Cup'
     case Item.FlowerPatternCup:
-      return 'Flower Pattern Cup';
+      return 'Flower Pattern Cup'
     case Item.AcademyTablecloth:
-      return 'Academy Tablecloth';
+      return 'Academy Tablecloth'
     case Item.AcademyTablecloth_1:
-      return 'Academy Tablecloth';
+      return 'Academy Tablecloth'
     case Item.WhimsicalTablecloth:
-      return 'Whimsical Tablecloth';
+      return 'Whimsical Tablecloth'
     case Item.LeafyTablecloth:
-      return 'Leafy Tablecloth';
+      return 'Leafy Tablecloth'
     case Item.SpookyTablecloth:
-      return 'Spooky Tablecloth';
+      return 'Spooky Tablecloth'
     case Item.Unknown_152:
-      return '';
+      return ''
     case Item.AcademyBall:
-      return 'Academy Ball';
+      return 'Academy Ball'
     case Item.AcademyBall_1:
-      return 'Academy Ball';
+      return 'Academy Ball'
     case Item.MarillBall:
-      return 'Marill Ball';
+      return 'Marill Ball'
     case Item.YarnBall:
-      return 'Yarn Ball';
+      return 'Yarn Ball'
     case Item.CyberBall:
-      return 'Cyber Ball';
+      return 'Cyber Ball'
     case Item.GoldPick:
-      return 'Gold Pick';
+      return 'Gold Pick'
     case Item.SilverPick:
-      return 'Silver Pick';
+      return 'Silver Pick'
     case Item.RedFlagPick:
-      return 'Red-Flag Pick';
+      return 'Red-Flag Pick'
     case Item.BlueFlagPick:
-      return 'Blue-Flag Pick';
+      return 'Blue-Flag Pick'
     case Item.PikaPikaPick:
-      return 'Pika-Pika Pick';
+      return 'Pika-Pika Pick'
     case Item.WinkingPikaPick:
-      return 'Winking Pika Pick';
+      return 'Winking Pika Pick'
     case Item.VeeVeePick:
-      return 'Vee-Vee Pick';
+      return 'Vee-Vee Pick'
     case Item.SmilingVeePick:
-      return 'Smiling Vee Pick';
+      return 'Smiling Vee Pick'
     case Item.BluePokeBallPick:
-      return 'Blue Pok\u00E9 Ball Pick';
+      return 'Blue Pok\u00E9 Ball Pick'
     case Item.Unknown_153:
-      return '';
+      return ''
     case Item.AuspiciousArmor:
-      return 'Auspicious Armor';
+      return 'Auspicious Armor'
     case Item.LeadersCrest:
-      return 'Leader\u2019s Crest';
+      return 'Leader\u2019s Crest'
     case Item.Unknown_154:
-      return '';
+      return ''
     case Item.Unknown_155:
-      return '';
+      return ''
     case Item.PinkBottle:
-      return 'Pink Bottle';
+      return 'Pink Bottle'
     case Item.BlueBottle:
-      return 'Blue Bottle';
+      return 'Blue Bottle'
     case Item.YellowBottle:
-      return 'Yellow Bottle';
+      return 'Yellow Bottle'
     case Item.SteelBottleR:
-      return 'Steel Bottle (R)';
+      return 'Steel Bottle (R)'
     case Item.SteelBottleY:
-      return 'Steel Bottle (Y)';
+      return 'Steel Bottle (Y)'
     case Item.SteelBottleB:
-      return 'Steel Bottle (B)';
+      return 'Steel Bottle (B)'
     case Item.SilverBottle:
-      return 'Silver Bottle';
+      return 'Silver Bottle'
     case Item.BarredCup:
-      return 'Barred Cup';
+      return 'Barred Cup'
     case Item.DiamondPatternCup:
-      return 'Diamond Pattern Cup';
+      return 'Diamond Pattern Cup'
     case Item.FirePatternCup:
-      return 'Fire Pattern Cup';
+      return 'Fire Pattern Cup'
     case Item.PinkCup:
-      return 'Pink Cup';
+      return 'Pink Cup'
     case Item.BlueCup:
-      return 'Blue Cup';
+      return 'Blue Cup'
     case Item.YellowCup:
-      return 'Yellow Cup';
+      return 'Yellow Cup'
     case Item.PikachuCup:
-      return 'Pikachu Cup';
+      return 'Pikachu Cup'
     case Item.EeveeCup:
-      return 'Eevee Cup';
+      return 'Eevee Cup'
     case Item.SlowpokeCup:
-      return 'Slowpoke Cup';
+      return 'Slowpoke Cup'
     case Item.SilverCup:
-      return 'Silver Cup';
+      return 'Silver Cup'
     case Item.ExerciseBall:
-      return 'Exercise Ball';
+      return 'Exercise Ball'
     case Item.PlaidTableclothY:
-      return 'Plaid Tablecloth (Y)';
+      return 'Plaid Tablecloth (Y)'
     case Item.PlaidTableclothB:
-      return 'Plaid Tablecloth (B)';
+      return 'Plaid Tablecloth (B)'
     case Item.PlaidTableclothR:
-      return 'Plaid Tablecloth (R)';
+      return 'Plaid Tablecloth (R)'
     case Item.BWGrassTablecloth:
-      return 'B&W Grass Tablecloth';
+      return 'B&W Grass Tablecloth'
     case Item.BattleTablecloth:
-      return 'Battle Tablecloth';
+      return 'Battle Tablecloth'
     case Item.MonstrousTablecloth:
-      return 'Monstrous Tablecloth';
+      return 'Monstrous Tablecloth'
     case Item.StripedTablecloth:
-      return 'Striped Tablecloth';
+      return 'Striped Tablecloth'
     case Item.DiamondTablecloth:
-      return 'Diamond Tablecloth';
+      return 'Diamond Tablecloth'
     case Item.PolkaDotTablecloth:
-      return 'Polka-Dot Tablecloth';
+      return 'Polka-Dot Tablecloth'
     case Item.LilacTablecloth:
-      return 'Lilac Tablecloth';
+      return 'Lilac Tablecloth'
     case Item.MintTablecloth:
-      return 'Mint Tablecloth';
+      return 'Mint Tablecloth'
     case Item.PeachTablecloth:
-      return 'Peach Tablecloth';
+      return 'Peach Tablecloth'
     case Item.YellowTablecloth:
-      return 'Yellow Tablecloth';
+      return 'Yellow Tablecloth'
     case Item.BlueTablecloth:
-      return 'Blue Tablecloth';
+      return 'Blue Tablecloth'
     case Item.PinkTablecloth:
-      return 'Pink Tablecloth';
+      return 'Pink Tablecloth'
     case Item.GoldBottle:
-      return 'Gold Bottle';
+      return 'Gold Bottle'
     case Item.BronzeBottle:
-      return 'Bronze Bottle';
+      return 'Bronze Bottle'
     case Item.GoldCup:
-      return 'Gold Cup';
+      return 'Gold Cup'
     case Item.BronzeCup:
-      return 'Bronze Cup';
+      return 'Bronze Cup'
     case Item.GreenPokeBallPick:
-      return 'Green Pok\u00E9 Ball Pick';
+      return 'Green Pok\u00E9 Ball Pick'
     case Item.RedPokeBallPick:
-      return 'Red Pok\u00E9 Ball Pick';
+      return 'Red Pok\u00E9 Ball Pick'
     case Item.PartySparklerPick:
-      return 'Party Sparkler Pick';
+      return 'Party Sparkler Pick'
     case Item.HeroicSwordPick:
-      return 'Heroic Sword Pick';
+      return 'Heroic Sword Pick'
     case Item.MagicalStarPick:
-      return 'Magical Star Pick';
+      return 'Magical Star Pick'
     case Item.MagicalHeartPick:
-      return 'Magical Heart Pick';
+      return 'Magical Heart Pick'
     case Item.ParasolPick:
-      return 'Parasol Pick';
+      return 'Parasol Pick'
     case Item.BlueSkyFlowerPick:
-      return 'Blue-Sky Flower Pick';
+      return 'Blue-Sky Flower Pick'
     case Item.SunsetFlowerPick:
-      return 'Sunset Flower Pick';
+      return 'Sunset Flower Pick'
     case Item.SunriseFlowerPick:
-      return 'Sunrise Flower Pick';
+      return 'Sunrise Flower Pick'
     case Item.BlueDish:
-      return 'Blue Dish';
+      return 'Blue Dish'
     case Item.GreenDish:
-      return 'Green Dish';
+      return 'Green Dish'
     case Item.OrangeDish:
-      return 'Orange Dish';
+      return 'Orange Dish'
     case Item.RedDish:
-      return 'Red Dish';
+      return 'Red Dish'
     case Item.WhiteDish:
-      return 'White Dish';
+      return 'White Dish'
     case Item.YellowDish:
-      return 'Yellow Dish';
+      return 'Yellow Dish'
     case Item.FairyFeather:
-      return 'Fairy Feather';
+      return 'Fairy Feather'
     case Item.SyrupyApple:
-      return 'Syrupy Apple';
+      return 'Syrupy Apple'
     case Item.UnremarkableTeacup:
-      return 'Unremarkable Teacup';
+      return 'Unremarkable Teacup'
     case Item.MasterpieceTeacup:
-      return 'Masterpiece Teacup';
+      return 'Masterpiece Teacup'
     case Item.TealMask:
-      return 'Teal Mask';
+      return 'Teal Mask'
     case Item.CornerstoneMask:
-      return 'Cornerstone Mask';
+      return 'Cornerstone Mask'
     case Item.WellspringMask:
-      return 'Wellspring Mask';
+      return 'Wellspring Mask'
     case Item.HearthflameMask:
-      return 'Hearthflame Mask';
+      return 'Hearthflame Mask'
     case Item.TealStyleCard:
-      return 'Teal Style Card';
+      return 'Teal Style Card'
     case Item.CrystalCluster:
-      return 'Crystal Cluster';
+      return 'Crystal Cluster'
     case Item.HealthMochi:
-      return 'Health Mochi';
+      return 'Health Mochi'
     case Item.MuscleMochi:
-      return 'Muscle Mochi';
+      return 'Muscle Mochi'
     case Item.ResistMochi:
-      return 'Resist Mochi';
+      return 'Resist Mochi'
     case Item.GeniusMochi:
-      return 'Genius Mochi';
+      return 'Genius Mochi'
     case Item.CleverMochi:
-      return 'Clever Mochi';
+      return 'Clever Mochi'
     case Item.SwiftMochi:
-      return 'Swift Mochi';
+      return 'Swift Mochi'
     case Item.SimpleChairs:
-      return 'Simple Chairs';
+      return 'Simple Chairs'
     case Item.AcademyChairs:
-      return 'Academy Chairs';
+      return 'Academy Chairs'
     case Item.AcademyChairs_1:
-      return 'Academy Chairs';
+      return 'Academy Chairs'
     case Item.WhimsicalChairs:
-      return 'Whimsical Chairs';
+      return 'Whimsical Chairs'
     case Item.LeafyChairs:
-      return 'Leafy Chairs';
+      return 'Leafy Chairs'
     case Item.SpookyChairs:
-      return 'Spooky Chairs';
+      return 'Spooky Chairs'
     case Item.PlaidChairsY:
-      return 'Plaid Chairs (Y)';
+      return 'Plaid Chairs (Y)'
     case Item.PlaidChairsB:
-      return 'Plaid Chairs (B)';
+      return 'Plaid Chairs (B)'
     case Item.PlaidChairsR:
-      return 'Plaid Chairs (R)';
+      return 'Plaid Chairs (R)'
     case Item.BWGrassChairs:
-      return 'B&W Grass Chairs';
+      return 'B&W Grass Chairs'
     case Item.BattleChairs:
-      return 'Battle Chairs';
+      return 'Battle Chairs'
     case Item.MonstrousChairs:
-      return 'Monstrous Chairs';
+      return 'Monstrous Chairs'
     case Item.StripedChairs:
-      return 'Striped Chairs';
+      return 'Striped Chairs'
     case Item.DiamondChairs:
-      return 'Diamond Chairs';
+      return 'Diamond Chairs'
     case Item.PolkaDotChairs:
-      return 'Polka-Dot Chairs';
+      return 'Polka-Dot Chairs'
     case Item.LilacChairs:
-      return 'Lilac Chairs';
+      return 'Lilac Chairs'
     case Item.MintChairs:
-      return 'Mint Chairs';
+      return 'Mint Chairs'
     case Item.PeachChairs:
-      return 'Peach Chairs';
+      return 'Peach Chairs'
     case Item.YellowChairs:
-      return 'Yellow Chairs';
+      return 'Yellow Chairs'
     case Item.BlueChairs:
-      return 'Blue Chairs';
+      return 'Blue Chairs'
     case Item.PinkChairs:
-      return 'Pink Chairs';
+      return 'Pink Chairs'
     case Item.EkansFang:
-      return 'Ekans Fang';
+      return 'Ekans Fang'
     case Item.SandshrewClaw:
-      return 'Sandshrew Claw';
+      return 'Sandshrew Claw'
     case Item.CleffaFur:
-      return 'Cleffa Fur';
+      return 'Cleffa Fur'
     case Item.VulpixFur:
-      return 'Vulpix Fur';
+      return 'Vulpix Fur'
     case Item.PoliwagSlime:
-      return 'Poliwag Slime';
+      return 'Poliwag Slime'
     case Item.BellsproutVine:
-      return 'Bellsprout Vine';
+      return 'Bellsprout Vine'
     case Item.GeodudeFragment:
-      return 'Geodude Fragment';
+      return 'Geodude Fragment'
     case Item.KoffingGas:
-      return 'Koffing Gas';
+      return 'Koffing Gas'
     case Item.MunchlaxFang:
-      return 'Munchlax Fang';
+      return 'Munchlax Fang'
     case Item.SentretFur:
-      return 'Sentret Fur';
+      return 'Sentret Fur'
     case Item.HoothootFeather:
-      return 'Hoothoot Feather';
+      return 'Hoothoot Feather'
     case Item.SpinarakThread:
-      return 'Spinarak Thread';
+      return 'Spinarak Thread'
     case Item.AipomHair:
-      return 'Aipom Hair';
+      return 'Aipom Hair'
     case Item.YanmaSpike:
-      return 'Yanma Spike';
+      return 'Yanma Spike'
     case Item.GligarFang:
-      return 'Gligar Fang';
+      return 'Gligar Fang'
     case Item.SlugmaLava:
-      return 'Slugma Lava';
+      return 'Slugma Lava'
     case Item.SwinubHair:
-      return 'Swinub Hair';
+      return 'Swinub Hair'
     case Item.PoochyenaFang:
-      return 'Poochyena Fang';
+      return 'Poochyena Fang'
     case Item.LotadLeaf:
-      return 'Lotad Leaf';
+      return 'Lotad Leaf'
     case Item.SeedotStem:
-      return 'Seedot Stem';
+      return 'Seedot Stem'
     case Item.NosepassFragment:
-      return 'Nosepass Fragment';
+      return 'Nosepass Fragment'
     case Item.VolbeatFluid:
-      return 'Volbeat Fluid';
+      return 'Volbeat Fluid'
     case Item.IllumiseFluid:
-      return 'Illumise Fluid';
+      return 'Illumise Fluid'
     case Item.CorphishShell:
-      return 'Corphish Shell';
+      return 'Corphish Shell'
     case Item.FeebasScales:
-      return 'Feebas Scales';
+      return 'Feebas Scales'
     case Item.DuskullFragment:
-      return 'Duskull Fragment';
+      return 'Duskull Fragment'
     case Item.ChinglingFragment:
-      return 'Chingling Fragment';
+      return 'Chingling Fragment'
     case Item.TimburrSweat:
-      return 'Timburr Sweat';
+      return 'Timburr Sweat'
     case Item.SewaddleLeaf:
-      return 'Sewaddle Leaf';
+      return 'Sewaddle Leaf'
     case Item.DucklettFeather:
-      return 'Ducklett Feather';
+      return 'Ducklett Feather'
     case Item.LitwickSoot:
-      return 'Litwick Soot';
+      return 'Litwick Soot'
     case Item.MienfooClaw:
-      return 'Mienfoo Claw';
+      return 'Mienfoo Claw'
     case Item.VullabyFeather:
-      return 'Vullaby Feather';
+      return 'Vullaby Feather'
     case Item.CarbinkJewel:
-      return 'Carbink Jewel';
+      return 'Carbink Jewel'
     case Item.PhantumpTwig:
-      return 'Phantump Twig';
+      return 'Phantump Twig'
     case Item.GrubbinThread:
-      return 'Grubbin Thread';
+      return 'Grubbin Thread'
     case Item.CutieflyPowder:
-      return 'Cutiefly Powder';
+      return 'Cutiefly Powder'
     case Item.JangmooScales:
-      return 'Jangmo-o Scales';
+      return 'Jangmo-o Scales'
     case Item.CramorantDown:
-      return 'Cramorant Down';
+      return 'Cramorant Down'
     case Item.MorpekoSnack:
-      return 'Morpeko Snack';
+      return 'Morpeko Snack'
     case Item.PoltchageistPowder:
-      return 'Poltchageist Powder';
+      return 'Poltchageist Powder'
     case Item.FreshStartMochi:
-      return 'Fresh-Start Mochi';
+      return 'Fresh-Start Mochi'
     case Item.RotoStick:
-      return 'Roto-Stick';
+      return 'Roto-Stick'
     case Item.GlimmeringCharm:
-      return 'Glimmering Charm';
+      return 'Glimmering Charm'
     default:
-      return '';
+      return ''
   }
 }
 export function ItemFromString(item: string): Item {
   switch (item) {
     case 'None':
-      return Item.None;
+      return Item.None
     case 'Master Ball':
-      return Item.MasterBall;
+      return Item.MasterBall
     case 'Ultra Ball':
-      return Item.UltraBall;
+      return Item.UltraBall
     case 'Great Ball':
-      return Item.GreatBall;
+      return Item.GreatBall
     case 'Pok\u00E9 Ball':
-      return Item.PokeBall;
+      return Item.PokeBall
     case 'Safari Ball':
-      return Item.SafariBall;
+      return Item.SafariBall
     case 'Net Ball':
-      return Item.NetBall;
+      return Item.NetBall
     case 'Dive Ball':
-      return Item.DiveBall;
+      return Item.DiveBall
     case 'Nest Ball':
-      return Item.NestBall;
+      return Item.NestBall
     case 'Repeat Ball':
-      return Item.RepeatBall;
+      return Item.RepeatBall
     case 'Timer Ball':
-      return Item.TimerBall;
+      return Item.TimerBall
     case 'Luxury Ball':
-      return Item.LuxuryBall;
+      return Item.LuxuryBall
     case 'Premier Ball':
-      return Item.PremierBall;
+      return Item.PremierBall
     case 'Dusk Ball':
-      return Item.DuskBall;
+      return Item.DuskBall
     case 'Heal Ball':
-      return Item.HealBall;
+      return Item.HealBall
     case 'Quick Ball':
-      return Item.QuickBall;
+      return Item.QuickBall
     case 'Cherish Ball':
-      return Item.CherishBall;
+      return Item.CherishBall
     case 'Potion':
-      return Item.Potion;
+      return Item.Potion
     case 'Antidote':
-      return Item.Antidote;
+      return Item.Antidote
     case 'Burn Heal':
-      return Item.BurnHeal;
+      return Item.BurnHeal
     case 'Ice Heal':
-      return Item.IceHeal;
+      return Item.IceHeal
     case 'Awakening':
-      return Item.Awakening;
+      return Item.Awakening
     case 'Paralyze Heal':
-      return Item.ParalyzeHeal;
+      return Item.ParalyzeHeal
     case 'Full Restore':
-      return Item.FullRestore;
+      return Item.FullRestore
     case 'Max Potion':
-      return Item.MaxPotion;
+      return Item.MaxPotion
     case 'Hyper Potion':
-      return Item.HyperPotion;
+      return Item.HyperPotion
     case 'Super Potion':
-      return Item.SuperPotion;
+      return Item.SuperPotion
     case 'Full Heal':
-      return Item.FullHeal;
+      return Item.FullHeal
     case 'Revive':
-      return Item.Revive;
+      return Item.Revive
     case 'Max Revive':
-      return Item.MaxRevive;
+      return Item.MaxRevive
     case 'Fresh Water':
-      return Item.FreshWater;
+      return Item.FreshWater
     case 'Soda Pop':
-      return Item.SodaPop;
+      return Item.SodaPop
     case 'Lemonade':
-      return Item.Lemonade;
+      return Item.Lemonade
     case 'Moomoo Milk':
-      return Item.MoomooMilk;
+      return Item.MoomooMilk
     case 'Energy Powder':
-      return Item.EnergyPowder;
+      return Item.EnergyPowder
     case 'Energy Root':
-      return Item.EnergyRoot;
+      return Item.EnergyRoot
     case 'Heal Powder':
-      return Item.HealPowder;
+      return Item.HealPowder
     case 'Revival Herb':
-      return Item.RevivalHerb;
+      return Item.RevivalHerb
     case 'Ether':
-      return Item.Ether;
+      return Item.Ether
     case 'Max Ether':
-      return Item.MaxEther;
+      return Item.MaxEther
     case 'Elixir':
-      return Item.Elixir;
+      return Item.Elixir
     case 'Max Elixir':
-      return Item.MaxElixir;
+      return Item.MaxElixir
     case 'Lava Cookie':
-      return Item.LavaCookie;
+      return Item.LavaCookie
     case 'Berry Juice':
-      return Item.BerryJuice;
+      return Item.BerryJuice
     case 'Sacred Ash':
-      return Item.SacredAsh;
+      return Item.SacredAsh
     case 'HP Up':
-      return Item.HPUp;
+      return Item.HPUp
     case 'Protein':
-      return Item.Protein;
+      return Item.Protein
     case 'Iron':
-      return Item.Iron;
+      return Item.Iron
     case 'Carbos':
-      return Item.Carbos;
+      return Item.Carbos
     case 'Calcium':
-      return Item.Calcium;
+      return Item.Calcium
     case 'Rare Candy':
-      return Item.RareCandy;
+      return Item.RareCandy
     case 'PP Up':
-      return Item.PPUp;
+      return Item.PPUp
     case 'Zinc':
-      return Item.Zinc;
+      return Item.Zinc
     case 'PP Max':
-      return Item.PPMax;
+      return Item.PPMax
     case 'Old Gateau':
-      return Item.OldGateau;
+      return Item.OldGateau
     case 'Guard Spec.':
-      return Item.GuardSpec;
+      return Item.GuardSpec
     case 'Dire Hit':
-      return Item.DireHit;
+      return Item.DireHit
     case 'X Attack':
-      return Item.XAttack;
+      return Item.XAttack
     case 'X Defense':
-      return Item.XDefense;
+      return Item.XDefense
     case 'X Speed':
-      return Item.XSpeed;
+      return Item.XSpeed
     case 'X Accuracy':
-      return Item.XAccuracy;
+      return Item.XAccuracy
     case 'X Sp. Atk':
-      return Item.XSpAtk;
+      return Item.XSpAtk
     case 'X Sp. Def':
-      return Item.XSpDef;
+      return Item.XSpDef
     case 'Pok\u00E9 Doll':
-      return Item.PokeDoll;
+      return Item.PokeDoll
     case 'Fluffy Tail':
-      return Item.FluffyTail;
+      return Item.FluffyTail
     case 'Blue Flute':
-      return Item.BlueFlute;
+      return Item.BlueFlute
     case 'Yellow Flute':
-      return Item.YellowFlute;
+      return Item.YellowFlute
     case 'Red Flute':
-      return Item.RedFlute;
+      return Item.RedFlute
     case 'Black Flute':
-      return Item.BlackFlute;
+      return Item.BlackFlute
     case 'White Flute':
-      return Item.WhiteFlute;
+      return Item.WhiteFlute
     case 'Shoal Salt':
-      return Item.ShoalSalt;
+      return Item.ShoalSalt
     case 'Shoal Shell':
-      return Item.ShoalShell;
+      return Item.ShoalShell
     case 'Red Shard':
-      return Item.RedShard;
+      return Item.RedShard
     case 'Blue Shard':
-      return Item.BlueShard;
+      return Item.BlueShard
     case 'Yellow Shard':
-      return Item.YellowShard;
+      return Item.YellowShard
     case 'Green Shard':
-      return Item.GreenShard;
+      return Item.GreenShard
     case 'Super Repel':
-      return Item.SuperRepel;
+      return Item.SuperRepel
     case 'Max Repel':
-      return Item.MaxRepel;
+      return Item.MaxRepel
     case 'Escape Rope':
-      return Item.EscapeRope;
+      return Item.EscapeRope
     case 'Repel':
-      return Item.Repel;
+      return Item.Repel
     case 'Sun Stone':
-      return Item.SunStone;
+      return Item.SunStone
     case 'Moon Stone':
-      return Item.MoonStone;
+      return Item.MoonStone
     case 'Fire Stone':
-      return Item.FireStone;
+      return Item.FireStone
     case 'Thunder Stone':
-      return Item.ThunderStone;
+      return Item.ThunderStone
     case 'Water Stone':
-      return Item.WaterStone;
+      return Item.WaterStone
     case 'Leaf Stone':
-      return Item.LeafStone;
+      return Item.LeafStone
     case 'Tiny Mushroom':
-      return Item.TinyMushroom;
+      return Item.TinyMushroom
     case 'Big Mushroom':
-      return Item.BigMushroom;
+      return Item.BigMushroom
     case 'Pearl':
-      return Item.Pearl;
+      return Item.Pearl
     case 'Big Pearl':
-      return Item.BigPearl;
+      return Item.BigPearl
     case 'Stardust':
-      return Item.Stardust;
+      return Item.Stardust
     case 'Star Piece':
-      return Item.StarPiece;
+      return Item.StarPiece
     case 'Nugget':
-      return Item.Nugget;
+      return Item.Nugget
     case 'Heart Scale':
-      return Item.HeartScale;
+      return Item.HeartScale
     case 'Honey':
-      return Item.Honey;
+      return Item.Honey
     case 'Growth Mulch':
-      return Item.GrowthMulch;
+      return Item.GrowthMulch
     case 'Damp Mulch':
-      return Item.DampMulch;
+      return Item.DampMulch
     case 'Stable Mulch':
-      return Item.StableMulch;
+      return Item.StableMulch
     case 'Gooey Mulch':
-      return Item.GooeyMulch;
+      return Item.GooeyMulch
     case 'Root Fossil':
-      return Item.RootFossil;
+      return Item.RootFossil
     case 'Claw Fossil':
-      return Item.ClawFossil;
+      return Item.ClawFossil
     case 'Helix Fossil':
-      return Item.HelixFossil;
+      return Item.HelixFossil
     case 'Dome Fossil':
-      return Item.DomeFossil;
+      return Item.DomeFossil
     case 'Old Amber':
-      return Item.OldAmber;
+      return Item.OldAmber
     case 'Armor Fossil':
-      return Item.ArmorFossil;
+      return Item.ArmorFossil
     case 'Skull Fossil':
-      return Item.SkullFossil;
+      return Item.SkullFossil
     case 'Rare Bone':
-      return Item.RareBone;
+      return Item.RareBone
     case 'Shiny Stone':
-      return Item.ShinyStone;
+      return Item.ShinyStone
     case 'Dusk Stone':
-      return Item.DuskStone;
+      return Item.DuskStone
     case 'Dawn Stone':
-      return Item.DawnStone;
+      return Item.DawnStone
     case 'Oval Stone':
-      return Item.OvalStone;
+      return Item.OvalStone
     case 'Odd Keystone':
-      return Item.OddKeystone;
+      return Item.OddKeystone
     case 'Griseous Orb':
-      return Item.GriseousOrb;
+      return Item.GriseousOrb
     case 'Tea':
-      return Item.Tea;
+      return Item.Tea
     case '???':
-      return Item.Unknown;
+      return Item.Unknown
     case 'Autograph':
-      return Item.Autograph;
+      return Item.Autograph
     case 'Douse Drive':
-      return Item.DouseDrive;
+      return Item.DouseDrive
     case 'Shock Drive':
-      return Item.ShockDrive;
+      return Item.ShockDrive
     case 'Burn Drive':
-      return Item.BurnDrive;
+      return Item.BurnDrive
     case 'Chill Drive':
-      return Item.ChillDrive;
+      return Item.ChillDrive
     case 'Pok\u00E9mon Box Link':
-      return Item.PokemonBoxLink;
+      return Item.PokemonBoxLink
     case 'Medicine Pocket':
-      return Item.MedicinePocket;
+      return Item.MedicinePocket
     case 'TM Case':
-      return Item.TMCase;
+      return Item.TMCase
     case 'Candy Jar':
-      return Item.CandyJar;
+      return Item.CandyJar
     case 'Power-Up Pocket':
-      return Item.PowerUpPocket;
+      return Item.PowerUpPocket
     case 'Clothing Trunk':
-      return Item.ClothingTrunk;
+      return Item.ClothingTrunk
     case 'Catching Pocket':
-      return Item.CatchingPocket;
+      return Item.CatchingPocket
     case 'Battle Pocket':
-      return Item.BattlePocket;
+      return Item.BattlePocket
     case 'Sweet Heart':
-      return Item.SweetHeart;
+      return Item.SweetHeart
     case 'Adamant Orb':
-      return Item.AdamantOrb;
+      return Item.AdamantOrb
     case 'Lustrous Orb':
-      return Item.LustrousOrb;
+      return Item.LustrousOrb
     case 'Greet Mail':
-      return Item.GreetMail;
+      return Item.GreetMail
     case 'Favored Mail':
-      return Item.FavoredMail;
+      return Item.FavoredMail
     case 'RSVP Mail':
-      return Item.RSVPMail;
+      return Item.RSVPMail
     case 'Thanks Mail':
-      return Item.ThanksMail;
+      return Item.ThanksMail
     case 'Inquiry Mail':
-      return Item.InquiryMail;
+      return Item.InquiryMail
     case 'Like Mail':
-      return Item.LikeMail;
+      return Item.LikeMail
     case 'Reply Mail':
-      return Item.ReplyMail;
+      return Item.ReplyMail
     case 'Bridge Mail S':
-      return Item.BridgeMailS;
+      return Item.BridgeMailS
     case 'Bridge Mail D':
-      return Item.BridgeMailD;
+      return Item.BridgeMailD
     case 'Bridge Mail T':
-      return Item.BridgeMailT;
+      return Item.BridgeMailT
     case 'Bridge Mail V':
-      return Item.BridgeMailV;
+      return Item.BridgeMailV
     case 'Bridge Mail M':
-      return Item.BridgeMailM;
+      return Item.BridgeMailM
     case 'Cheri Berry':
-      return Item.CheriBerry;
+      return Item.CheriBerry
     case 'Chesto Berry':
-      return Item.ChestoBerry;
+      return Item.ChestoBerry
     case 'Pecha Berry':
-      return Item.PechaBerry;
+      return Item.PechaBerry
     case 'Rawst Berry':
-      return Item.RawstBerry;
+      return Item.RawstBerry
     case 'Aspear Berry':
-      return Item.AspearBerry;
+      return Item.AspearBerry
     case 'Leppa Berry':
-      return Item.LeppaBerry;
+      return Item.LeppaBerry
     case 'Oran Berry':
-      return Item.OranBerry;
+      return Item.OranBerry
     case 'Persim Berry':
-      return Item.PersimBerry;
+      return Item.PersimBerry
     case 'Lum Berry':
-      return Item.LumBerry;
+      return Item.LumBerry
     case 'Sitrus Berry':
-      return Item.SitrusBerry;
+      return Item.SitrusBerry
     case 'Figy Berry':
-      return Item.FigyBerry;
+      return Item.FigyBerry
     case 'Wiki Berry':
-      return Item.WikiBerry;
+      return Item.WikiBerry
     case 'Mago Berry':
-      return Item.MagoBerry;
+      return Item.MagoBerry
     case 'Aguav Berry':
-      return Item.AguavBerry;
+      return Item.AguavBerry
     case 'Iapapa Berry':
-      return Item.IapapaBerry;
+      return Item.IapapaBerry
     case 'Razz Berry':
-      return Item.RazzBerry;
+      return Item.RazzBerry
     case 'Bluk Berry':
-      return Item.BlukBerry;
+      return Item.BlukBerry
     case 'Nanab Berry':
-      return Item.NanabBerry;
+      return Item.NanabBerry
     case 'Wepear Berry':
-      return Item.WepearBerry;
+      return Item.WepearBerry
     case 'Pinap Berry':
-      return Item.PinapBerry;
+      return Item.PinapBerry
     case 'Pomeg Berry':
-      return Item.PomegBerry;
+      return Item.PomegBerry
     case 'Kelpsy Berry':
-      return Item.KelpsyBerry;
+      return Item.KelpsyBerry
     case 'Qualot Berry':
-      return Item.QualotBerry;
+      return Item.QualotBerry
     case 'Hondew Berry':
-      return Item.HondewBerry;
+      return Item.HondewBerry
     case 'Grepa Berry':
-      return Item.GrepaBerry;
+      return Item.GrepaBerry
     case 'Tamato Berry':
-      return Item.TamatoBerry;
+      return Item.TamatoBerry
     case 'Cornn Berry':
-      return Item.CornnBerry;
+      return Item.CornnBerry
     case 'Magost Berry':
-      return Item.MagostBerry;
+      return Item.MagostBerry
     case 'Rabuta Berry':
-      return Item.RabutaBerry;
+      return Item.RabutaBerry
     case 'Nomel Berry':
-      return Item.NomelBerry;
+      return Item.NomelBerry
     case 'Spelon Berry':
-      return Item.SpelonBerry;
+      return Item.SpelonBerry
     case 'Pamtre Berry':
-      return Item.PamtreBerry;
+      return Item.PamtreBerry
     case 'Watmel Berry':
-      return Item.WatmelBerry;
+      return Item.WatmelBerry
     case 'Durin Berry':
-      return Item.DurinBerry;
+      return Item.DurinBerry
     case 'Belue Berry':
-      return Item.BelueBerry;
+      return Item.BelueBerry
     case 'Occa Berry':
-      return Item.OccaBerry;
+      return Item.OccaBerry
     case 'Passho Berry':
-      return Item.PasshoBerry;
+      return Item.PasshoBerry
     case 'Wacan Berry':
-      return Item.WacanBerry;
+      return Item.WacanBerry
     case 'Rindo Berry':
-      return Item.RindoBerry;
+      return Item.RindoBerry
     case 'Yache Berry':
-      return Item.YacheBerry;
+      return Item.YacheBerry
     case 'Chople Berry':
-      return Item.ChopleBerry;
+      return Item.ChopleBerry
     case 'Kebia Berry':
-      return Item.KebiaBerry;
+      return Item.KebiaBerry
     case 'Shuca Berry':
-      return Item.ShucaBerry;
+      return Item.ShucaBerry
     case 'Coba Berry':
-      return Item.CobaBerry;
+      return Item.CobaBerry
     case 'Payapa Berry':
-      return Item.PayapaBerry;
+      return Item.PayapaBerry
     case 'Tanga Berry':
-      return Item.TangaBerry;
+      return Item.TangaBerry
     case 'Charti Berry':
-      return Item.ChartiBerry;
+      return Item.ChartiBerry
     case 'Kasib Berry':
-      return Item.KasibBerry;
+      return Item.KasibBerry
     case 'Haban Berry':
-      return Item.HabanBerry;
+      return Item.HabanBerry
     case 'Colbur Berry':
-      return Item.ColburBerry;
+      return Item.ColburBerry
     case 'Babiri Berry':
-      return Item.BabiriBerry;
+      return Item.BabiriBerry
     case 'Chilan Berry':
-      return Item.ChilanBerry;
+      return Item.ChilanBerry
     case 'Liechi Berry':
-      return Item.LiechiBerry;
+      return Item.LiechiBerry
     case 'Ganlon Berry':
-      return Item.GanlonBerry;
+      return Item.GanlonBerry
     case 'Salac Berry':
-      return Item.SalacBerry;
+      return Item.SalacBerry
     case 'Petaya Berry':
-      return Item.PetayaBerry;
+      return Item.PetayaBerry
     case 'Apicot Berry':
-      return Item.ApicotBerry;
+      return Item.ApicotBerry
     case 'Lansat Berry':
-      return Item.LansatBerry;
+      return Item.LansatBerry
     case 'Starf Berry':
-      return Item.StarfBerry;
+      return Item.StarfBerry
     case 'Enigma Berry':
-      return Item.EnigmaBerry;
+      return Item.EnigmaBerry
     case 'Micle Berry':
-      return Item.MicleBerry;
+      return Item.MicleBerry
     case 'Custap Berry':
-      return Item.CustapBerry;
+      return Item.CustapBerry
     case 'Jaboca Berry':
-      return Item.JabocaBerry;
+      return Item.JabocaBerry
     case 'Rowap Berry':
-      return Item.RowapBerry;
+      return Item.RowapBerry
     case 'Bright Powder':
-      return Item.BrightPowder;
+      return Item.BrightPowder
     case 'White Herb':
-      return Item.WhiteHerb;
+      return Item.WhiteHerb
     case 'Macho Brace':
-      return Item.MachoBrace;
+      return Item.MachoBrace
     case 'Exp. Share':
-      return Item.ExpShare;
+      return Item.ExpShare
     case 'Quick Claw':
-      return Item.QuickClaw;
+      return Item.QuickClaw
     case 'Soothe Bell':
-      return Item.SootheBell;
+      return Item.SootheBell
     case 'Mental Herb':
-      return Item.MentalHerb;
+      return Item.MentalHerb
     case 'Choice Band':
-      return Item.ChoiceBand;
+      return Item.ChoiceBand
     case 'King\u2019s Rock':
-      return Item.KingsRock;
+      return Item.KingsRock
     case 'Silver Powder':
-      return Item.SilverPowder;
+      return Item.SilverPowder
     case 'Amulet Coin':
-      return Item.AmuletCoin;
+      return Item.AmuletCoin
     case 'Cleanse Tag':
-      return Item.CleanseTag;
+      return Item.CleanseTag
     case 'Soul Dew':
-      return Item.SoulDew;
+      return Item.SoulDew
     case 'Deep Sea Tooth':
-      return Item.DeepSeaTooth;
+      return Item.DeepSeaTooth
     case 'Deep Sea Scale':
-      return Item.DeepSeaScale;
+      return Item.DeepSeaScale
     case 'Smoke Ball':
-      return Item.SmokeBall;
+      return Item.SmokeBall
     case 'Everstone':
-      return Item.Everstone;
+      return Item.Everstone
     case 'Focus Band':
-      return Item.FocusBand;
+      return Item.FocusBand
     case 'Lucky Egg':
-      return Item.LuckyEgg;
+      return Item.LuckyEgg
     case 'Scope Lens':
-      return Item.ScopeLens;
+      return Item.ScopeLens
     case 'Metal Coat':
-      return Item.MetalCoat;
+      return Item.MetalCoat
     case 'Leftovers':
-      return Item.Leftovers;
+      return Item.Leftovers
     case 'Dragon Scale':
-      return Item.DragonScale;
+      return Item.DragonScale
     case 'Light Ball':
-      return Item.LightBall;
+      return Item.LightBall
     case 'Soft Sand':
-      return Item.SoftSand;
+      return Item.SoftSand
     case 'Hard Stone':
-      return Item.HardStone;
+      return Item.HardStone
     case 'Miracle Seed':
-      return Item.MiracleSeed;
+      return Item.MiracleSeed
     case 'Black Glasses':
-      return Item.BlackGlasses;
+      return Item.BlackGlasses
     case 'Black Belt':
-      return Item.BlackBelt;
+      return Item.BlackBelt
     case 'Magnet':
-      return Item.Magnet;
+      return Item.Magnet
     case 'Mystic Water':
-      return Item.MysticWater;
+      return Item.MysticWater
     case 'Sharp Beak':
-      return Item.SharpBeak;
+      return Item.SharpBeak
     case 'Poison Barb':
-      return Item.PoisonBarb;
+      return Item.PoisonBarb
     case 'Never-Melt Ice':
-      return Item.NeverMeltIce;
+      return Item.NeverMeltIce
     case 'Spell Tag':
-      return Item.SpellTag;
+      return Item.SpellTag
     case 'Twisted Spoon':
-      return Item.TwistedSpoon;
+      return Item.TwistedSpoon
     case 'Charcoal':
-      return Item.Charcoal;
+      return Item.Charcoal
     case 'Dragon Fang':
-      return Item.DragonFang;
+      return Item.DragonFang
     case 'Silk Scarf':
-      return Item.SilkScarf;
+      return Item.SilkScarf
     case 'Upgrade':
-      return Item.Upgrade;
+      return Item.Upgrade
     case 'Shell Bell':
-      return Item.ShellBell;
+      return Item.ShellBell
     case 'Sea Incense':
-      return Item.SeaIncense;
+      return Item.SeaIncense
     case 'Lax Incense':
-      return Item.LaxIncense;
+      return Item.LaxIncense
     case 'Lucky Punch':
-      return Item.LuckyPunch;
+      return Item.LuckyPunch
     case 'Metal Powder':
-      return Item.MetalPowder;
+      return Item.MetalPowder
     case 'Thick Club':
-      return Item.ThickClub;
+      return Item.ThickClub
     case 'Leek':
-      return Item.Leek;
+      return Item.Leek
     case 'Red Scarf':
-      return Item.RedScarf;
+      return Item.RedScarf
     case 'Blue Scarf':
-      return Item.BlueScarf;
+      return Item.BlueScarf
     case 'Pink Scarf':
-      return Item.PinkScarf;
+      return Item.PinkScarf
     case 'Green Scarf':
-      return Item.GreenScarf;
+      return Item.GreenScarf
     case 'Yellow Scarf':
-      return Item.YellowScarf;
+      return Item.YellowScarf
     case 'Wide Lens':
-      return Item.WideLens;
+      return Item.WideLens
     case 'Muscle Band':
-      return Item.MuscleBand;
+      return Item.MuscleBand
     case 'Wise Glasses':
-      return Item.WiseGlasses;
+      return Item.WiseGlasses
     case 'Expert Belt':
-      return Item.ExpertBelt;
+      return Item.ExpertBelt
     case 'Light Clay':
-      return Item.LightClay;
+      return Item.LightClay
     case 'Life Orb':
-      return Item.LifeOrb;
+      return Item.LifeOrb
     case 'Power Herb':
-      return Item.PowerHerb;
+      return Item.PowerHerb
     case 'Toxic Orb':
-      return Item.ToxicOrb;
+      return Item.ToxicOrb
     case 'Flame Orb':
-      return Item.FlameOrb;
+      return Item.FlameOrb
     case 'Quick Powder':
-      return Item.QuickPowder;
+      return Item.QuickPowder
     case 'Focus Sash':
-      return Item.FocusSash;
+      return Item.FocusSash
     case 'Zoom Lens':
-      return Item.ZoomLens;
+      return Item.ZoomLens
     case 'Metronome':
-      return Item.Metronome;
+      return Item.Metronome
     case 'Iron Ball':
-      return Item.IronBall;
+      return Item.IronBall
     case 'Lagging Tail':
-      return Item.LaggingTail;
+      return Item.LaggingTail
     case 'Destiny Knot':
-      return Item.DestinyKnot;
+      return Item.DestinyKnot
     case 'Black Sludge':
-      return Item.BlackSludge;
+      return Item.BlackSludge
     case 'Icy Rock':
-      return Item.IcyRock;
+      return Item.IcyRock
     case 'Smooth Rock':
-      return Item.SmoothRock;
+      return Item.SmoothRock
     case 'Heat Rock':
-      return Item.HeatRock;
+      return Item.HeatRock
     case 'Damp Rock':
-      return Item.DampRock;
+      return Item.DampRock
     case 'Grip Claw':
-      return Item.GripClaw;
+      return Item.GripClaw
     case 'Choice Scarf':
-      return Item.ChoiceScarf;
+      return Item.ChoiceScarf
     case 'Sticky Barb':
-      return Item.StickyBarb;
+      return Item.StickyBarb
     case 'Power Bracer':
-      return Item.PowerBracer;
+      return Item.PowerBracer
     case 'Power Belt':
-      return Item.PowerBelt;
+      return Item.PowerBelt
     case 'Power Lens':
-      return Item.PowerLens;
+      return Item.PowerLens
     case 'Power Band':
-      return Item.PowerBand;
+      return Item.PowerBand
     case 'Power Anklet':
-      return Item.PowerAnklet;
+      return Item.PowerAnklet
     case 'Power Weight':
-      return Item.PowerWeight;
+      return Item.PowerWeight
     case 'Shed Shell':
-      return Item.ShedShell;
+      return Item.ShedShell
     case 'Big Root':
-      return Item.BigRoot;
+      return Item.BigRoot
     case 'Choice Specs':
-      return Item.ChoiceSpecs;
+      return Item.ChoiceSpecs
     case 'Flame Plate':
-      return Item.FlamePlate;
+      return Item.FlamePlate
     case 'Splash Plate':
-      return Item.SplashPlate;
+      return Item.SplashPlate
     case 'Zap Plate':
-      return Item.ZapPlate;
+      return Item.ZapPlate
     case 'Meadow Plate':
-      return Item.MeadowPlate;
+      return Item.MeadowPlate
     case 'Icicle Plate':
-      return Item.IciclePlate;
+      return Item.IciclePlate
     case 'Fist Plate':
-      return Item.FistPlate;
+      return Item.FistPlate
     case 'Toxic Plate':
-      return Item.ToxicPlate;
+      return Item.ToxicPlate
     case 'Earth Plate':
-      return Item.EarthPlate;
+      return Item.EarthPlate
     case 'Sky Plate':
-      return Item.SkyPlate;
+      return Item.SkyPlate
     case 'Mind Plate':
-      return Item.MindPlate;
+      return Item.MindPlate
     case 'Insect Plate':
-      return Item.InsectPlate;
+      return Item.InsectPlate
     case 'Stone Plate':
-      return Item.StonePlate;
+      return Item.StonePlate
     case 'Spooky Plate':
-      return Item.SpookyPlate;
+      return Item.SpookyPlate
     case 'Draco Plate':
-      return Item.DracoPlate;
+      return Item.DracoPlate
     case 'Dread Plate':
-      return Item.DreadPlate;
+      return Item.DreadPlate
     case 'Iron Plate':
-      return Item.IronPlate;
+      return Item.IronPlate
     case 'Odd Incense':
-      return Item.OddIncense;
+      return Item.OddIncense
     case 'Rock Incense':
-      return Item.RockIncense;
+      return Item.RockIncense
     case 'Full Incense':
-      return Item.FullIncense;
+      return Item.FullIncense
     case 'Wave Incense':
-      return Item.WaveIncense;
+      return Item.WaveIncense
     case 'Rose Incense':
-      return Item.RoseIncense;
+      return Item.RoseIncense
     case 'Luck Incense':
-      return Item.LuckIncense;
+      return Item.LuckIncense
     case 'Pure Incense':
-      return Item.PureIncense;
+      return Item.PureIncense
     case 'Protector':
-      return Item.Protector;
+      return Item.Protector
     case 'Electirizer':
-      return Item.Electirizer;
+      return Item.Electirizer
     case 'Magmarizer':
-      return Item.Magmarizer;
+      return Item.Magmarizer
     case 'Dubious Disc':
-      return Item.DubiousDisc;
+      return Item.DubiousDisc
     case 'Reaper Cloth':
-      return Item.ReaperCloth;
+      return Item.ReaperCloth
     case 'Razor Claw':
-      return Item.RazorClaw;
+      return Item.RazorClaw
     case 'Razor Fang':
-      return Item.RazorFang;
+      return Item.RazorFang
     case 'TM01':
-      return Item.TM01;
+      return Item.TM01
     case 'TM02':
-      return Item.TM02;
+      return Item.TM02
     case 'TM03':
-      return Item.TM03;
+      return Item.TM03
     case 'TM04':
-      return Item.TM04;
+      return Item.TM04
     case 'TM05':
-      return Item.TM05;
+      return Item.TM05
     case 'TM06':
-      return Item.TM06;
+      return Item.TM06
     case 'TM07':
-      return Item.TM07;
+      return Item.TM07
     case 'TM08':
-      return Item.TM08;
+      return Item.TM08
     case 'TM09':
-      return Item.TM09;
+      return Item.TM09
     case 'TM10':
-      return Item.TM10;
+      return Item.TM10
     case 'TM11':
-      return Item.TM11;
+      return Item.TM11
     case 'TM12':
-      return Item.TM12;
+      return Item.TM12
     case 'TM13':
-      return Item.TM13;
+      return Item.TM13
     case 'TM14':
-      return Item.TM14;
+      return Item.TM14
     case 'TM15':
-      return Item.TM15;
+      return Item.TM15
     case 'TM16':
-      return Item.TM16;
+      return Item.TM16
     case 'TM17':
-      return Item.TM17;
+      return Item.TM17
     case 'TM18':
-      return Item.TM18;
+      return Item.TM18
     case 'TM19':
-      return Item.TM19;
+      return Item.TM19
     case 'TM20':
-      return Item.TM20;
+      return Item.TM20
     case 'TM21':
-      return Item.TM21;
+      return Item.TM21
     case 'TM22':
-      return Item.TM22;
+      return Item.TM22
     case 'TM23':
-      return Item.TM23;
+      return Item.TM23
     case 'TM24':
-      return Item.TM24;
+      return Item.TM24
     case 'TM25':
-      return Item.TM25;
+      return Item.TM25
     case 'TM26':
-      return Item.TM26;
+      return Item.TM26
     case 'TM27':
-      return Item.TM27;
+      return Item.TM27
     case 'TM28':
-      return Item.TM28;
+      return Item.TM28
     case 'TM29':
-      return Item.TM29;
+      return Item.TM29
     case 'TM30':
-      return Item.TM30;
+      return Item.TM30
     case 'TM31':
-      return Item.TM31;
+      return Item.TM31
     case 'TM32':
-      return Item.TM32;
+      return Item.TM32
     case 'TM33':
-      return Item.TM33;
+      return Item.TM33
     case 'TM34':
-      return Item.TM34;
+      return Item.TM34
     case 'TM35':
-      return Item.TM35;
+      return Item.TM35
     case 'TM36':
-      return Item.TM36;
+      return Item.TM36
     case 'TM37':
-      return Item.TM37;
+      return Item.TM37
     case 'TM38':
-      return Item.TM38;
+      return Item.TM38
     case 'TM39':
-      return Item.TM39;
+      return Item.TM39
     case 'TM40':
-      return Item.TM40;
+      return Item.TM40
     case 'TM41':
-      return Item.TM41;
+      return Item.TM41
     case 'TM42':
-      return Item.TM42;
+      return Item.TM42
     case 'TM43':
-      return Item.TM43;
+      return Item.TM43
     case 'TM44':
-      return Item.TM44;
+      return Item.TM44
     case 'TM45':
-      return Item.TM45;
+      return Item.TM45
     case 'TM46':
-      return Item.TM46;
+      return Item.TM46
     case 'TM47':
-      return Item.TM47;
+      return Item.TM47
     case 'TM48':
-      return Item.TM48;
+      return Item.TM48
     case 'TM49':
-      return Item.TM49;
+      return Item.TM49
     case 'TM50':
-      return Item.TM50;
+      return Item.TM50
     case 'TM51':
-      return Item.TM51;
+      return Item.TM51
     case 'TM52':
-      return Item.TM52;
+      return Item.TM52
     case 'TM53':
-      return Item.TM53;
+      return Item.TM53
     case 'TM54':
-      return Item.TM54;
+      return Item.TM54
     case 'TM55':
-      return Item.TM55;
+      return Item.TM55
     case 'TM56':
-      return Item.TM56;
+      return Item.TM56
     case 'TM57':
-      return Item.TM57;
+      return Item.TM57
     case 'TM58':
-      return Item.TM58;
+      return Item.TM58
     case 'TM59':
-      return Item.TM59;
+      return Item.TM59
     case 'TM60':
-      return Item.TM60;
+      return Item.TM60
     case 'TM61':
-      return Item.TM61;
+      return Item.TM61
     case 'TM62':
-      return Item.TM62;
+      return Item.TM62
     case 'TM63':
-      return Item.TM63;
+      return Item.TM63
     case 'TM64':
-      return Item.TM64;
+      return Item.TM64
     case 'TM65':
-      return Item.TM65;
+      return Item.TM65
     case 'TM66':
-      return Item.TM66;
+      return Item.TM66
     case 'TM67':
-      return Item.TM67;
+      return Item.TM67
     case 'TM68':
-      return Item.TM68;
+      return Item.TM68
     case 'TM69':
-      return Item.TM69;
+      return Item.TM69
     case 'TM70':
-      return Item.TM70;
+      return Item.TM70
     case 'TM71':
-      return Item.TM71;
+      return Item.TM71
     case 'TM72':
-      return Item.TM72;
+      return Item.TM72
     case 'TM73':
-      return Item.TM73;
+      return Item.TM73
     case 'TM74':
-      return Item.TM74;
+      return Item.TM74
     case 'TM75':
-      return Item.TM75;
+      return Item.TM75
     case 'TM76':
-      return Item.TM76;
+      return Item.TM76
     case 'TM77':
-      return Item.TM77;
+      return Item.TM77
     case 'TM78':
-      return Item.TM78;
+      return Item.TM78
     case 'TM79':
-      return Item.TM79;
+      return Item.TM79
     case 'TM80':
-      return Item.TM80;
+      return Item.TM80
     case 'TM81':
-      return Item.TM81;
+      return Item.TM81
     case 'TM82':
-      return Item.TM82;
+      return Item.TM82
     case 'TM83':
-      return Item.TM83;
+      return Item.TM83
     case 'TM84':
-      return Item.TM84;
+      return Item.TM84
     case 'TM85':
-      return Item.TM85;
+      return Item.TM85
     case 'TM86':
-      return Item.TM86;
+      return Item.TM86
     case 'TM87':
-      return Item.TM87;
+      return Item.TM87
     case 'TM88':
-      return Item.TM88;
+      return Item.TM88
     case 'TM89':
-      return Item.TM89;
+      return Item.TM89
     case 'TM90':
-      return Item.TM90;
+      return Item.TM90
     case 'TM91':
-      return Item.TM91;
+      return Item.TM91
     case 'TM92':
-      return Item.TM92;
+      return Item.TM92
     case 'HM01':
-      return Item.HM01;
+      return Item.HM01
     case 'HM02':
-      return Item.HM02;
+      return Item.HM02
     case 'HM03':
-      return Item.HM03;
+      return Item.HM03
     case 'HM04':
-      return Item.HM04;
+      return Item.HM04
     case 'HM05':
-      return Item.HM05;
+      return Item.HM05
     case 'HM06':
-      return Item.HM06;
+      return Item.HM06
     case 'Explorer Kit':
-      return Item.ExplorerKit;
+      return Item.ExplorerKit
     case 'Loot Sack':
-      return Item.LootSack;
+      return Item.LootSack
     case 'Rule Book':
-      return Item.RuleBook;
+      return Item.RuleBook
     case 'Pok\u00E9 Radar':
-      return Item.PokeRadar;
+      return Item.PokeRadar
     case 'Point Card':
-      return Item.PointCard;
+      return Item.PointCard
     case 'Guidebook':
-      return Item.Guidebook;
+      return Item.Guidebook
     case 'Sticker Case':
-      return Item.StickerCase;
+      return Item.StickerCase
     case 'Fashion Case':
-      return Item.FashionCase;
+      return Item.FashionCase
     case 'Sticker Bag':
-      return Item.StickerBag;
+      return Item.StickerBag
     case 'Pal Pad':
-      return Item.PalPad;
+      return Item.PalPad
     case 'Works Key':
-      return Item.WorksKey;
+      return Item.WorksKey
     case 'Old Charm':
-      return Item.OldCharm;
+      return Item.OldCharm
     case 'Galactic Key':
-      return Item.GalacticKey;
+      return Item.GalacticKey
     case 'Red Chain':
-      return Item.RedChain;
+      return Item.RedChain
     case 'Town Map':
-      return Item.TownMap;
+      return Item.TownMap
     case 'Vs. Seeker':
-      return Item.VsSeeker;
+      return Item.VsSeeker
     case 'Coin Case':
-      return Item.CoinCase;
+      return Item.CoinCase
     case 'Old Rod':
-      return Item.OldRod;
+      return Item.OldRod
     case 'Good Rod':
-      return Item.GoodRod;
+      return Item.GoodRod
     case 'Super Rod':
-      return Item.SuperRod;
+      return Item.SuperRod
     case 'Sprayduck':
-      return Item.Sprayduck;
+      return Item.Sprayduck
     case 'Poffin Case':
-      return Item.PoffinCase;
+      return Item.PoffinCase
     case 'Bike':
-      return Item.Bike;
+      return Item.Bike
     case 'Suite Key':
-      return Item.SuiteKey;
+      return Item.SuiteKey
     case 'Oak\u2019s Letter':
-      return Item.OaksLetter;
+      return Item.OaksLetter
     case 'Lunar Feather':
-      return Item.LunarFeather;
+      return Item.LunarFeather
     case 'Member Card':
-      return Item.MemberCard;
+      return Item.MemberCard
     case 'Azure Flute':
-      return Item.AzureFlute;
+      return Item.AzureFlute
     case 'S.S. Ticket':
-      return Item.SSTicket;
+      return Item.SSTicket
     case 'Contest Pass':
-      return Item.ContestPass;
+      return Item.ContestPass
     case 'Magma Stone':
-      return Item.MagmaStone;
+      return Item.MagmaStone
     case 'Parcel':
-      return Item.Parcel;
+      return Item.Parcel
     case 'Coupon 1':
-      return Item.Coupon1;
+      return Item.Coupon1
     case 'Coupon 2':
-      return Item.Coupon2;
+      return Item.Coupon2
     case 'Coupon 3':
-      return Item.Coupon3;
+      return Item.Coupon3
     case 'Storage Key':
-      return Item.StorageKey;
+      return Item.StorageKey
     case 'Secret Medicine':
-      return Item.SecretMedicine;
+      return Item.SecretMedicine
     case 'Vs. Recorder':
-      return Item.VsRecorder;
+      return Item.VsRecorder
     case 'Gracidea':
-      return Item.Gracidea;
+      return Item.Gracidea
     case 'Secret Key':
-      return Item.SecretKey;
+      return Item.SecretKey
     case 'Apricorn Box':
-      return Item.ApricornBox;
+      return Item.ApricornBox
     case 'Unown Report':
-      return Item.UnownReport;
+      return Item.UnownReport
     case 'Berry Pots':
-      return Item.BerryPots;
+      return Item.BerryPots
     case 'Dowsing Machine':
-      return Item.DowsingMachine;
+      return Item.DowsingMachine
     case 'Blue Card':
-      return Item.BlueCard;
+      return Item.BlueCard
     case 'Slowpoke Tail':
-      return Item.SlowpokeTail;
+      return Item.SlowpokeTail
     case 'Clear Bell':
-      return Item.ClearBell;
+      return Item.ClearBell
     case 'Card Key':
-      return Item.CardKey;
+      return Item.CardKey
     case 'Basement Key':
-      return Item.BasementKey;
+      return Item.BasementKey
     case 'Squirt Bottle':
-      return Item.SquirtBottle;
+      return Item.SquirtBottle
     case 'Red Scale':
-      return Item.RedScale;
+      return Item.RedScale
     case 'Lost Item':
-      return Item.LostItem;
+      return Item.LostItem
     case 'Pass':
-      return Item.Pass;
+      return Item.Pass
     case 'Machine Part':
-      return Item.MachinePart;
+      return Item.MachinePart
     case 'Silver Feather':
-      return Item.SilverFeather;
+      return Item.SilverFeather
     case 'Rainbow Feather':
-      return Item.RainbowFeather;
+      return Item.RainbowFeather
     case 'Mystery Egg':
-      return Item.MysteryEgg;
+      return Item.MysteryEgg
     case 'Red Apricorn':
-      return Item.RedApricorn;
+      return Item.RedApricorn
     case 'Blue Apricorn':
-      return Item.BlueApricorn;
+      return Item.BlueApricorn
     case 'Yellow Apricorn':
-      return Item.YellowApricorn;
+      return Item.YellowApricorn
     case 'Green Apricorn':
-      return Item.GreenApricorn;
+      return Item.GreenApricorn
     case 'Pink Apricorn':
-      return Item.PinkApricorn;
+      return Item.PinkApricorn
     case 'White Apricorn':
-      return Item.WhiteApricorn;
+      return Item.WhiteApricorn
     case 'Black Apricorn':
-      return Item.BlackApricorn;
+      return Item.BlackApricorn
     case 'Fast Ball':
-      return Item.FastBall;
+      return Item.FastBall
     case 'Level Ball':
-      return Item.LevelBall;
+      return Item.LevelBall
     case 'Lure Ball':
-      return Item.LureBall;
+      return Item.LureBall
     case 'Heavy Ball':
-      return Item.HeavyBall;
+      return Item.HeavyBall
     case 'Love Ball':
-      return Item.LoveBall;
+      return Item.LoveBall
     case 'Friend Ball':
-      return Item.FriendBall;
+      return Item.FriendBall
     case 'Moon Ball':
-      return Item.MoonBall;
+      return Item.MoonBall
     case 'Sport Ball':
-      return Item.SportBall;
+      return Item.SportBall
     case 'Park Ball':
-      return Item.ParkBall;
+      return Item.ParkBall
     case 'Photo Album':
-      return Item.PhotoAlbum;
+      return Item.PhotoAlbum
     case 'GB Sounds':
-      return Item.GBSounds;
+      return Item.GBSounds
     case 'Tidal Bell':
-      return Item.TidalBell;
+      return Item.TidalBell
     case 'Rage Candy Bar':
-      return Item.RageCandyBar;
+      return Item.RageCandyBar
     case 'Data Card 01':
-      return Item.DataCard01;
+      return Item.DataCard01
     case 'Data Card 02':
-      return Item.DataCard02;
+      return Item.DataCard02
     case 'Data Card 03':
-      return Item.DataCard03;
+      return Item.DataCard03
     case 'Data Card 04':
-      return Item.DataCard04;
+      return Item.DataCard04
     case 'Data Card 05':
-      return Item.DataCard05;
+      return Item.DataCard05
     case 'Data Card 06':
-      return Item.DataCard06;
+      return Item.DataCard06
     case 'Data Card 07':
-      return Item.DataCard07;
+      return Item.DataCard07
     case 'Data Card 08':
-      return Item.DataCard08;
+      return Item.DataCard08
     case 'Data Card 09':
-      return Item.DataCard09;
+      return Item.DataCard09
     case 'Data Card 10':
-      return Item.DataCard10;
+      return Item.DataCard10
     case 'Data Card 11':
-      return Item.DataCard11;
+      return Item.DataCard11
     case 'Data Card 12':
-      return Item.DataCard12;
+      return Item.DataCard12
     case 'Data Card 13':
-      return Item.DataCard13;
+      return Item.DataCard13
     case 'Data Card 14':
-      return Item.DataCard14;
+      return Item.DataCard14
     case 'Data Card 15':
-      return Item.DataCard15;
+      return Item.DataCard15
     case 'Data Card 16':
-      return Item.DataCard16;
+      return Item.DataCard16
     case 'Data Card 17':
-      return Item.DataCard17;
+      return Item.DataCard17
     case 'Data Card 18':
-      return Item.DataCard18;
+      return Item.DataCard18
     case 'Data Card 19':
-      return Item.DataCard19;
+      return Item.DataCard19
     case 'Data Card 20':
-      return Item.DataCard20;
+      return Item.DataCard20
     case 'Data Card 21':
-      return Item.DataCard21;
+      return Item.DataCard21
     case 'Data Card 22':
-      return Item.DataCard22;
+      return Item.DataCard22
     case 'Data Card 23':
-      return Item.DataCard23;
+      return Item.DataCard23
     case 'Data Card 24':
-      return Item.DataCard24;
+      return Item.DataCard24
     case 'Data Card 25':
-      return Item.DataCard25;
+      return Item.DataCard25
     case 'Data Card 26':
-      return Item.DataCard26;
+      return Item.DataCard26
     case 'Data Card 27':
-      return Item.DataCard27;
+      return Item.DataCard27
     case 'Jade Orb':
-      return Item.JadeOrb;
+      return Item.JadeOrb
     case 'Lock Capsule':
-      return Item.LockCapsule;
+      return Item.LockCapsule
     case 'Red Orb':
-      return Item.RedOrb;
+      return Item.RedOrb
     case 'Blue Orb':
-      return Item.BlueOrb;
+      return Item.BlueOrb
     case 'Enigma Stone':
-      return Item.EnigmaStone;
+      return Item.EnigmaStone
     case 'Prism Scale':
-      return Item.PrismScale;
+      return Item.PrismScale
     case 'Eviolite':
-      return Item.Eviolite;
+      return Item.Eviolite
     case 'Float Stone':
-      return Item.FloatStone;
+      return Item.FloatStone
     case 'Rocky Helmet':
-      return Item.RockyHelmet;
+      return Item.RockyHelmet
     case 'Air Balloon':
-      return Item.AirBalloon;
+      return Item.AirBalloon
     case 'Red Card':
-      return Item.RedCard;
+      return Item.RedCard
     case 'Ring Target':
-      return Item.RingTarget;
+      return Item.RingTarget
     case 'Binding Band':
-      return Item.BindingBand;
+      return Item.BindingBand
     case 'Absorb Bulb':
-      return Item.AbsorbBulb;
+      return Item.AbsorbBulb
     case 'Cell Battery':
-      return Item.CellBattery;
+      return Item.CellBattery
     case 'Eject Button':
-      return Item.EjectButton;
+      return Item.EjectButton
     case 'Fire Gem':
-      return Item.FireGem;
+      return Item.FireGem
     case 'Water Gem':
-      return Item.WaterGem;
+      return Item.WaterGem
     case 'Electric Gem':
-      return Item.ElectricGem;
+      return Item.ElectricGem
     case 'Grass Gem':
-      return Item.GrassGem;
+      return Item.GrassGem
     case 'Ice Gem':
-      return Item.IceGem;
+      return Item.IceGem
     case 'Fighting Gem':
-      return Item.FightingGem;
+      return Item.FightingGem
     case 'Poison Gem':
-      return Item.PoisonGem;
+      return Item.PoisonGem
     case 'Ground Gem':
-      return Item.GroundGem;
+      return Item.GroundGem
     case 'Flying Gem':
-      return Item.FlyingGem;
+      return Item.FlyingGem
     case 'Psychic Gem':
-      return Item.PsychicGem;
+      return Item.PsychicGem
     case 'Bug Gem':
-      return Item.BugGem;
+      return Item.BugGem
     case 'Rock Gem':
-      return Item.RockGem;
+      return Item.RockGem
     case 'Ghost Gem':
-      return Item.GhostGem;
+      return Item.GhostGem
     case 'Dragon Gem':
-      return Item.DragonGem;
+      return Item.DragonGem
     case 'Dark Gem':
-      return Item.DarkGem;
+      return Item.DarkGem
     case 'Steel Gem':
-      return Item.SteelGem;
+      return Item.SteelGem
     case 'Normal Gem':
-      return Item.NormalGem;
+      return Item.NormalGem
     case 'Health Feather':
-      return Item.HealthFeather;
+      return Item.HealthFeather
     case 'Muscle Feather':
-      return Item.MuscleFeather;
+      return Item.MuscleFeather
     case 'Resist Feather':
-      return Item.ResistFeather;
+      return Item.ResistFeather
     case 'Genius Feather':
-      return Item.GeniusFeather;
+      return Item.GeniusFeather
     case 'Clever Feather':
-      return Item.CleverFeather;
+      return Item.CleverFeather
     case 'Swift Feather':
-      return Item.SwiftFeather;
+      return Item.SwiftFeather
     case 'Pretty Feather':
-      return Item.PrettyFeather;
+      return Item.PrettyFeather
     case 'Cover Fossil':
-      return Item.CoverFossil;
+      return Item.CoverFossil
     case 'Plume Fossil':
-      return Item.PlumeFossil;
+      return Item.PlumeFossil
     case 'Liberty Pass':
-      return Item.LibertyPass;
+      return Item.LibertyPass
     case 'Pass Orb':
-      return Item.PassOrb;
+      return Item.PassOrb
     case 'Dream Ball':
-      return Item.DreamBall;
+      return Item.DreamBall
     case 'Pok\u00E9 Toy':
-      return Item.PokeToy;
+      return Item.PokeToy
     case 'Prop Case':
-      return Item.PropCase;
+      return Item.PropCase
     case 'Dragon Skull':
-      return Item.DragonSkull;
+      return Item.DragonSkull
     case 'Balm Mushroom':
-      return Item.BalmMushroom;
+      return Item.BalmMushroom
     case 'Big Nugget':
-      return Item.BigNugget;
+      return Item.BigNugget
     case 'Pearl String':
-      return Item.PearlString;
+      return Item.PearlString
     case 'Comet Shard':
-      return Item.CometShard;
+      return Item.CometShard
     case 'Relic Copper':
-      return Item.RelicCopper;
+      return Item.RelicCopper
     case 'Relic Silver':
-      return Item.RelicSilver;
+      return Item.RelicSilver
     case 'Relic Gold':
-      return Item.RelicGold;
+      return Item.RelicGold
     case 'Relic Vase':
-      return Item.RelicVase;
+      return Item.RelicVase
     case 'Relic Band':
-      return Item.RelicBand;
+      return Item.RelicBand
     case 'Relic Statue':
-      return Item.RelicStatue;
+      return Item.RelicStatue
     case 'Relic Crown':
-      return Item.RelicCrown;
+      return Item.RelicCrown
     case 'Casteliacone':
-      return Item.Casteliacone;
+      return Item.Casteliacone
     case 'Dire Hit 2':
-      return Item.DireHit2;
+      return Item.DireHit2
     case 'X Speed 2':
-      return Item.XSpeed2;
+      return Item.XSpeed2
     case 'X Sp. Atk 2':
-      return Item.XSpAtk2;
+      return Item.XSpAtk2
     case 'X Sp. Def 2':
-      return Item.XSpDef2;
+      return Item.XSpDef2
     case 'X Defense 2':
-      return Item.XDefense2;
+      return Item.XDefense2
     case 'X Attack 2':
-      return Item.XAttack2;
+      return Item.XAttack2
     case 'X Accuracy 2':
-      return Item.XAccuracy2;
+      return Item.XAccuracy2
     case 'X Speed 3':
-      return Item.XSpeed3;
+      return Item.XSpeed3
     case 'X Sp. Atk 3':
-      return Item.XSpAtk3;
+      return Item.XSpAtk3
     case 'X Sp. Def 3':
-      return Item.XSpDef3;
+      return Item.XSpDef3
     case 'X Defense 3':
-      return Item.XDefense3;
+      return Item.XDefense3
     case 'X Attack 3':
-      return Item.XAttack3;
+      return Item.XAttack3
     case 'X Accuracy 3':
-      return Item.XAccuracy3;
+      return Item.XAccuracy3
     case 'X Speed 6':
-      return Item.XSpeed6;
+      return Item.XSpeed6
     case 'X Sp. Atk 6':
-      return Item.XSpAtk6;
+      return Item.XSpAtk6
     case 'X Sp. Def 6':
-      return Item.XSpDef6;
+      return Item.XSpDef6
     case 'X Defense 6':
-      return Item.XDefense6;
+      return Item.XDefense6
     case 'X Attack 6':
-      return Item.XAttack6;
+      return Item.XAttack6
     case 'X Accuracy 6':
-      return Item.XAccuracy6;
+      return Item.XAccuracy6
     case 'Ability Urge':
-      return Item.AbilityUrge;
+      return Item.AbilityUrge
     case 'Item Drop':
-      return Item.ItemDrop;
+      return Item.ItemDrop
     case 'Item Urge':
-      return Item.ItemUrge;
+      return Item.ItemUrge
     case 'Reset Urge':
-      return Item.ResetUrge;
+      return Item.ResetUrge
     case 'Dire Hit 3':
-      return Item.DireHit3;
+      return Item.DireHit3
     case 'Light Stone':
-      return Item.LightStone;
+      return Item.LightStone
     case 'Dark Stone':
-      return Item.DarkStone;
+      return Item.DarkStone
     case 'TM93':
-      return Item.TM93;
+      return Item.TM93
     case 'TM94':
-      return Item.TM94;
+      return Item.TM94
     case 'TM95':
-      return Item.TM95;
+      return Item.TM95
     case 'Xtransceiver':
-      return Item.Xtransceiver;
+      return Item.Xtransceiver
     case 'Gram 1':
-      return Item.Gram1;
+      return Item.Gram1
     case 'Gram 2':
-      return Item.Gram2;
+      return Item.Gram2
     case 'Gram 3':
-      return Item.Gram3;
+      return Item.Gram3
     case 'Medal Box':
-      return Item.MedalBox;
+      return Item.MedalBox
     case 'DNA Splicers':
-      return Item.DNASplicers;
+      return Item.DNASplicers
     case 'Permit':
-      return Item.Permit;
+      return Item.Permit
     case 'Oval Charm':
-      return Item.OvalCharm;
+      return Item.OvalCharm
     case 'Shiny Charm':
-      return Item.ShinyCharm;
+      return Item.ShinyCharm
     case 'Plasma Card':
-      return Item.PlasmaCard;
+      return Item.PlasmaCard
     case 'Grubby Hanky':
-      return Item.GrubbyHanky;
+      return Item.GrubbyHanky
     case 'Colress Machine':
-      return Item.ColressMachine;
+      return Item.ColressMachine
     case 'Dropped Item':
-      return Item.DroppedItem;
+      return Item.DroppedItem
     case 'Reveal Glass':
-      return Item.RevealGlass;
+      return Item.RevealGlass
     case 'Weakness Policy':
-      return Item.WeaknessPolicy;
+      return Item.WeaknessPolicy
     case 'Assault Vest':
-      return Item.AssaultVest;
+      return Item.AssaultVest
     case 'Holo Caster':
-      return Item.HoloCaster;
+      return Item.HoloCaster
     case 'Prof\u2019s Letter':
-      return Item.ProfsLetter;
+      return Item.ProfsLetter
     case 'Roller Skates':
-      return Item.RollerSkates;
+      return Item.RollerSkates
     case 'Pixie Plate':
-      return Item.PixiePlate;
+      return Item.PixiePlate
     case 'Ability Capsule':
-      return Item.AbilityCapsule;
+      return Item.AbilityCapsule
     case 'Whipped Dream':
-      return Item.WhippedDream;
+      return Item.WhippedDream
     case 'Sachet':
-      return Item.Sachet;
+      return Item.Sachet
     case 'Luminous Moss':
-      return Item.LuminousMoss;
+      return Item.LuminousMoss
     case 'Snowball':
-      return Item.Snowball;
+      return Item.Snowball
     case 'Safety Goggles':
-      return Item.SafetyGoggles;
+      return Item.SafetyGoggles
     case 'Pok\u00E9 Flute':
-      return Item.PokeFlute;
+      return Item.PokeFlute
     case 'Rich Mulch':
-      return Item.RichMulch;
+      return Item.RichMulch
     case 'Surprise Mulch':
-      return Item.SurpriseMulch;
+      return Item.SurpriseMulch
     case 'Boost Mulch':
-      return Item.BoostMulch;
+      return Item.BoostMulch
     case 'Amaze Mulch':
-      return Item.AmazeMulch;
+      return Item.AmazeMulch
     case 'Gengarite':
-      return Item.Gengarite;
+      return Item.Gengarite
     case 'Gardevoirite':
-      return Item.Gardevoirite;
+      return Item.Gardevoirite
     case 'Ampharosite':
-      return Item.Ampharosite;
+      return Item.Ampharosite
     case 'Venusaurite':
-      return Item.Venusaurite;
+      return Item.Venusaurite
     case 'Charizardite X':
-      return Item.CharizarditeX;
+      return Item.CharizarditeX
     case 'Blastoisinite':
-      return Item.Blastoisinite;
+      return Item.Blastoisinite
     case 'Mewtwonite X':
-      return Item.MewtwoniteX;
+      return Item.MewtwoniteX
     case 'Mewtwonite Y':
-      return Item.MewtwoniteY;
+      return Item.MewtwoniteY
     case 'Blazikenite':
-      return Item.Blazikenite;
+      return Item.Blazikenite
     case 'Medichamite':
-      return Item.Medichamite;
+      return Item.Medichamite
     case 'Houndoominite':
-      return Item.Houndoominite;
+      return Item.Houndoominite
     case 'Aggronite':
-      return Item.Aggronite;
+      return Item.Aggronite
     case 'Banettite':
-      return Item.Banettite;
+      return Item.Banettite
     case 'Tyranitarite':
-      return Item.Tyranitarite;
+      return Item.Tyranitarite
     case 'Scizorite':
-      return Item.Scizorite;
+      return Item.Scizorite
     case 'Pinsirite':
-      return Item.Pinsirite;
+      return Item.Pinsirite
     case 'Aerodactylite':
-      return Item.Aerodactylite;
+      return Item.Aerodactylite
     case 'Lucarionite':
-      return Item.Lucarionite;
+      return Item.Lucarionite
     case 'Abomasite':
-      return Item.Abomasite;
+      return Item.Abomasite
     case 'Kangaskhanite':
-      return Item.Kangaskhanite;
+      return Item.Kangaskhanite
     case 'Gyaradosite':
-      return Item.Gyaradosite;
+      return Item.Gyaradosite
     case 'Absolite':
-      return Item.Absolite;
+      return Item.Absolite
     case 'Charizardite Y':
-      return Item.CharizarditeY;
+      return Item.CharizarditeY
     case 'Alakazite':
-      return Item.Alakazite;
+      return Item.Alakazite
     case 'Heracronite':
-      return Item.Heracronite;
+      return Item.Heracronite
     case 'Mawilite':
-      return Item.Mawilite;
+      return Item.Mawilite
     case 'Manectite':
-      return Item.Manectite;
+      return Item.Manectite
     case 'Garchompite':
-      return Item.Garchompite;
+      return Item.Garchompite
     case 'Latiasite':
-      return Item.Latiasite;
+      return Item.Latiasite
     case 'Latiosite':
-      return Item.Latiosite;
+      return Item.Latiosite
     case 'Roseli Berry':
-      return Item.RoseliBerry;
+      return Item.RoseliBerry
     case 'Kee Berry':
-      return Item.KeeBerry;
+      return Item.KeeBerry
     case 'Maranga Berry':
-      return Item.MarangaBerry;
+      return Item.MarangaBerry
     case 'Sprinklotad':
-      return Item.Sprinklotad;
+      return Item.Sprinklotad
     case 'TM96':
-      return Item.TM96;
+      return Item.TM96
     case 'TM97':
-      return Item.TM97;
+      return Item.TM97
     case 'TM98':
-      return Item.TM98;
+      return Item.TM98
     case 'TM99':
-      return Item.TM99;
+      return Item.TM99
     case 'TM100':
-      return Item.TM100;
+      return Item.TM100
     case 'Power Plant Pass':
-      return Item.PowerPlantPass;
+      return Item.PowerPlantPass
     case 'Mega Ring':
-      return Item.MegaRing;
+      return Item.MegaRing
     case 'Intriguing Stone':
-      return Item.IntriguingStone;
+      return Item.IntriguingStone
     case 'Common Stone':
-      return Item.CommonStone;
+      return Item.CommonStone
     case 'Discount Coupon':
-      return Item.DiscountCoupon;
+      return Item.DiscountCoupon
     case 'Elevator Key':
-      return Item.ElevatorKey;
+      return Item.ElevatorKey
     case 'TMV Pass':
-      return Item.TMVPass;
+      return Item.TMVPass
     case 'Honor of Kalos':
-      return Item.HonorOfKalos;
+      return Item.HonorOfKalos
     case 'Adventure Guide':
-      return Item.AdventureGuide;
+      return Item.AdventureGuide
     case 'Strange Souvenir':
-      return Item.StrangeSouvenir;
+      return Item.StrangeSouvenir
     case 'Lens Case':
-      return Item.LensCase;
+      return Item.LensCase
     case 'Makeup Bag':
-      return Item.MakeupBag;
+      return Item.MakeupBag
     case 'Travel Trunk':
-      return Item.TravelTrunk;
+      return Item.TravelTrunk
     case 'Lumiose Galette':
-      return Item.LumioseGalette;
+      return Item.LumioseGalette
     case 'Shalour Sable':
-      return Item.ShalourSable;
+      return Item.ShalourSable
     case 'Jaw Fossil':
-      return Item.JawFossil;
+      return Item.JawFossil
     case 'Sail Fossil':
-      return Item.SailFossil;
+      return Item.SailFossil
     case 'Looker Ticket':
-      return Item.LookerTicket;
+      return Item.LookerTicket
     case 'Fairy Gem':
-      return Item.FairyGem;
+      return Item.FairyGem
     case 'Mega Charm':
-      return Item.MegaCharm;
+      return Item.MegaCharm
     case 'Mega Glove':
-      return Item.MegaGlove;
+      return Item.MegaGlove
     case 'Mach Bike':
-      return Item.MachBike;
+      return Item.MachBike
     case 'Acro Bike':
-      return Item.AcroBike;
+      return Item.AcroBike
     case 'Wailmer Pail':
-      return Item.WailmerPail;
+      return Item.WailmerPail
     case 'Devon Parts':
-      return Item.DevonParts;
+      return Item.DevonParts
     case 'Soot Sack':
-      return Item.SootSack;
+      return Item.SootSack
     case 'Pok\u00E9block Kit':
-      return Item.PokeblockKit;
+      return Item.PokeblockKit
     case 'Letter':
-      return Item.Letter;
+      return Item.Letter
     case 'Eon Ticket':
-      return Item.EonTicket;
+      return Item.EonTicket
     case 'Scanner':
-      return Item.Scanner;
+      return Item.Scanner
     case 'Go-Goggles':
-      return Item.GoGoggles;
+      return Item.GoGoggles
     case 'Meteorite':
-      return Item.Meteorite;
+      return Item.Meteorite
     case 'Key to Room 1':
-      return Item.KeyToRoom1;
+      return Item.KeyToRoom1
     case 'Key to Room 2':
-      return Item.KeyToRoom2;
+      return Item.KeyToRoom2
     case 'Key to Room 4':
-      return Item.KeyToRoom4;
+      return Item.KeyToRoom4
     case 'Key to Room 6':
-      return Item.KeyToRoom6;
+      return Item.KeyToRoom6
     case 'Devon Scope':
-      return Item.DevonScope;
+      return Item.DevonScope
     case 'HM07':
-      return Item.HM07;
+      return Item.HM07
     case 'Devon Scuba Gear':
-      return Item.DevonScubaGear;
+      return Item.DevonScubaGear
     case 'Contest Costume':
-      return Item.ContestCostume;
+      return Item.ContestCostume
     case 'Magma Suit':
-      return Item.MagmaSuit;
+      return Item.MagmaSuit
     case 'Aqua Suit':
-      return Item.AquaSuit;
+      return Item.AquaSuit
     case 'Pair of Tickets':
-      return Item.PairOfTickets;
+      return Item.PairOfTickets
     case 'Mega Bracelet':
-      return Item.MegaBracelet;
+      return Item.MegaBracelet
     case 'Mega Pendant':
-      return Item.MegaPendant;
+      return Item.MegaPendant
     case 'Mega Glasses':
-      return Item.MegaGlasses;
+      return Item.MegaGlasses
     case 'Mega Anchor':
-      return Item.MegaAnchor;
+      return Item.MegaAnchor
     case 'Mega Stickpin':
-      return Item.MegaStickpin;
+      return Item.MegaStickpin
     case 'Mega Tiara':
-      return Item.MegaTiara;
+      return Item.MegaTiara
     case 'Mega Anklet':
-      return Item.MegaAnklet;
+      return Item.MegaAnklet
     case 'Swampertite':
-      return Item.Swampertite;
+      return Item.Swampertite
     case 'Sceptilite':
-      return Item.Sceptilite;
+      return Item.Sceptilite
     case 'Sablenite':
-      return Item.Sablenite;
+      return Item.Sablenite
     case 'Altarianite':
-      return Item.Altarianite;
+      return Item.Altarianite
     case 'Galladite':
-      return Item.Galladite;
+      return Item.Galladite
     case 'Audinite':
-      return Item.Audinite;
+      return Item.Audinite
     case 'Metagrossite':
-      return Item.Metagrossite;
+      return Item.Metagrossite
     case 'Sharpedonite':
-      return Item.Sharpedonite;
+      return Item.Sharpedonite
     case 'Slowbronite':
-      return Item.Slowbronite;
+      return Item.Slowbronite
     case 'Steelixite':
-      return Item.Steelixite;
+      return Item.Steelixite
     case 'Pidgeotite':
-      return Item.Pidgeotite;
+      return Item.Pidgeotite
     case 'Glalitite':
-      return Item.Glalitite;
+      return Item.Glalitite
     case 'Diancite':
-      return Item.Diancite;
+      return Item.Diancite
     case 'Prison Bottle':
-      return Item.PrisonBottle;
+      return Item.PrisonBottle
     case 'Mega Cuff':
-      return Item.MegaCuff;
+      return Item.MegaCuff
     case 'Cameruptite':
-      return Item.Cameruptite;
+      return Item.Cameruptite
     case 'Lopunnite':
-      return Item.Lopunnite;
+      return Item.Lopunnite
     case 'Salamencite':
-      return Item.Salamencite;
+      return Item.Salamencite
     case 'Beedrillite':
-      return Item.Beedrillite;
+      return Item.Beedrillite
     case 'Key Stone':
-      return Item.KeyStone;
+      return Item.KeyStone
     case 'Meteorite Shard':
-      return Item.MeteoriteShard;
+      return Item.MeteoriteShard
     case 'Eon Flute':
-      return Item.EonFlute;
+      return Item.EonFlute
     case 'Normalium Z':
-      return Item.NormaliumZ;
+      return Item.NormaliumZ
     case 'Firium Z':
-      return Item.FiriumZ;
+      return Item.FiriumZ
     case 'Waterium Z':
-      return Item.WateriumZ;
+      return Item.WateriumZ
     case 'Electrium Z':
-      return Item.ElectriumZ;
+      return Item.ElectriumZ
     case 'Grassium Z':
-      return Item.GrassiumZ;
+      return Item.GrassiumZ
     case 'Icium Z':
-      return Item.IciumZ;
+      return Item.IciumZ
     case 'Fightinium Z':
-      return Item.FightiniumZ;
+      return Item.FightiniumZ
     case 'Poisonium Z':
-      return Item.PoisoniumZ;
+      return Item.PoisoniumZ
     case 'Groundium Z':
-      return Item.GroundiumZ;
+      return Item.GroundiumZ
     case 'Flyinium Z':
-      return Item.FlyiniumZ;
+      return Item.FlyiniumZ
     case 'Psychium Z':
-      return Item.PsychiumZ;
+      return Item.PsychiumZ
     case 'Buginium Z':
-      return Item.BuginiumZ;
+      return Item.BuginiumZ
     case 'Rockium Z':
-      return Item.RockiumZ;
+      return Item.RockiumZ
     case 'Ghostium Z':
-      return Item.GhostiumZ;
+      return Item.GhostiumZ
     case 'Dragonium Z':
-      return Item.DragoniumZ;
+      return Item.DragoniumZ
     case 'Darkinium Z':
-      return Item.DarkiniumZ;
+      return Item.DarkiniumZ
     case 'Steelium Z':
-      return Item.SteeliumZ;
+      return Item.SteeliumZ
     case 'Fairium Z':
-      return Item.FairiumZ;
+      return Item.FairiumZ
     case 'Pikanium Z':
-      return Item.PikaniumZ;
+      return Item.PikaniumZ
     case 'Bottle Cap':
-      return Item.BottleCap;
+      return Item.BottleCap
     case 'Gold Bottle Cap':
-      return Item.GoldBottleCap;
+      return Item.GoldBottleCap
     case 'Z-Ring':
-      return Item.ZRing;
+      return Item.ZRing
     case 'Decidium Z':
-      return Item.DecidiumZ;
+      return Item.DecidiumZ
     case 'Incinium Z':
-      return Item.InciniumZ;
+      return Item.InciniumZ
     case 'Primarium Z':
-      return Item.PrimariumZ;
+      return Item.PrimariumZ
     case 'Tapunium Z':
-      return Item.TapuniumZ;
+      return Item.TapuniumZ
     case 'Marshadium Z':
-      return Item.MarshadiumZ;
+      return Item.MarshadiumZ
     case 'Aloraichium Z':
-      return Item.AloraichiumZ;
+      return Item.AloraichiumZ
     case 'Snorlium Z':
-      return Item.SnorliumZ;
+      return Item.SnorliumZ
     case 'Eevium Z':
-      return Item.EeviumZ;
+      return Item.EeviumZ
     case 'Mewnium Z':
-      return Item.MewniumZ;
+      return Item.MewniumZ
     case 'Pikashunium Z':
-      return Item.PikashuniumZ;
+      return Item.PikashuniumZ
     case 'Forage Bag':
-      return Item.ForageBag;
+      return Item.ForageBag
     case 'Fishing Rod':
-      return Item.FishingRod;
+      return Item.FishingRod
     case 'Professor\u2019s Mask':
-      return Item.ProfessorsMask;
+      return Item.ProfessorsMask
     case 'Festival Ticket':
-      return Item.FestivalTicket;
+      return Item.FestivalTicket
     case 'Sparkling Stone':
-      return Item.SparklingStone;
+      return Item.SparklingStone
     case 'Adrenaline Orb':
-      return Item.AdrenalineOrb;
+      return Item.AdrenalineOrb
     case 'Zygarde Cube':
-      return Item.ZygardeCube;
+      return Item.ZygardeCube
     case 'Ice Stone':
-      return Item.IceStone;
+      return Item.IceStone
     case 'Ride Pager':
-      return Item.RidePager;
+      return Item.RidePager
     case 'Beast Ball':
-      return Item.BeastBall;
+      return Item.BeastBall
     case 'Big Malasada':
-      return Item.BigMalasada;
+      return Item.BigMalasada
     case 'Red Nectar':
-      return Item.RedNectar;
+      return Item.RedNectar
     case 'Yellow Nectar':
-      return Item.YellowNectar;
+      return Item.YellowNectar
     case 'Pink Nectar':
-      return Item.PinkNectar;
+      return Item.PinkNectar
     case 'Purple Nectar':
-      return Item.PurpleNectar;
+      return Item.PurpleNectar
     case 'Sun Flute':
-      return Item.SunFlute;
+      return Item.SunFlute
     case 'Moon Flute':
-      return Item.MoonFlute;
+      return Item.MoonFlute
     case 'Enigmatic Card':
-      return Item.EnigmaticCard;
+      return Item.EnigmaticCard
     case 'Silver Razz Berry':
-      return Item.SilverRazzBerry;
+      return Item.SilverRazzBerry
     case 'Golden Razz Berry':
-      return Item.GoldenRazzBerry;
+      return Item.GoldenRazzBerry
     case 'Silver Nanab Berry':
-      return Item.SilverNanabBerry;
+      return Item.SilverNanabBerry
     case 'Golden Nanab Berry':
-      return Item.GoldenNanabBerry;
+      return Item.GoldenNanabBerry
     case 'Silver Pinap Berry':
-      return Item.SilverPinapBerry;
+      return Item.SilverPinapBerry
     case 'Golden Pinap Berry':
-      return Item.GoldenPinapBerry;
+      return Item.GoldenPinapBerry
     case 'Silph Scope':
-      return Item.SilphScope;
+      return Item.SilphScope
     case 'Gold Teeth':
-      return Item.GoldTeeth;
+      return Item.GoldTeeth
     case 'Lift Key':
-      return Item.LiftKey;
+      return Item.LiftKey
     case 'Terrain Extender':
-      return Item.TerrainExtender;
+      return Item.TerrainExtender
     case 'Protective Pads':
-      return Item.ProtectivePads;
+      return Item.ProtectivePads
     case 'Electric Seed':
-      return Item.ElectricSeed;
+      return Item.ElectricSeed
     case 'Psychic Seed':
-      return Item.PsychicSeed;
+      return Item.PsychicSeed
     case 'Misty Seed':
-      return Item.MistySeed;
+      return Item.MistySeed
     case 'Grassy Seed':
-      return Item.GrassySeed;
+      return Item.GrassySeed
     case 'Stretchy Spring':
-      return Item.StretchySpring;
+      return Item.StretchySpring
     case 'Chalky Stone':
-      return Item.ChalkyStone;
+      return Item.ChalkyStone
     case 'Marble':
-      return Item.Marble;
+      return Item.Marble
     case 'Lone Earring':
-      return Item.LoneEarring;
+      return Item.LoneEarring
     case 'Beach Glass':
-      return Item.BeachGlass;
+      return Item.BeachGlass
     case 'Gold Leaf':
-      return Item.GoldLeaf;
+      return Item.GoldLeaf
     case 'Silver Leaf':
-      return Item.SilverLeaf;
+      return Item.SilverLeaf
     case 'Polished Mud Ball':
-      return Item.PolishedMudBall;
+      return Item.PolishedMudBall
     case 'Tropical Shell':
-      return Item.TropicalShell;
+      return Item.TropicalShell
     case 'Leaf Letter':
-      return Item.LeafLetter;
+      return Item.LeafLetter
     case 'Small Bouquet':
-      return Item.SmallBouquet;
+      return Item.SmallBouquet
     case 'Lure':
-      return Item.Lure;
+      return Item.Lure
     case 'Super Lure':
-      return Item.SuperLure;
+      return Item.SuperLure
     case 'Max Lure':
-      return Item.MaxLure;
+      return Item.MaxLure
     case 'Pewter Crunchies':
-      return Item.PewterCrunchies;
+      return Item.PewterCrunchies
     case 'Fighting Memory':
-      return Item.FightingMemory;
+      return Item.FightingMemory
     case 'Flying Memory':
-      return Item.FlyingMemory;
+      return Item.FlyingMemory
     case 'Poison Memory':
-      return Item.PoisonMemory;
+      return Item.PoisonMemory
     case 'Ground Memory':
-      return Item.GroundMemory;
+      return Item.GroundMemory
     case 'Rock Memory':
-      return Item.RockMemory;
+      return Item.RockMemory
     case 'Bug Memory':
-      return Item.BugMemory;
+      return Item.BugMemory
     case 'Ghost Memory':
-      return Item.GhostMemory;
+      return Item.GhostMemory
     case 'Steel Memory':
-      return Item.SteelMemory;
+      return Item.SteelMemory
     case 'Fire Memory':
-      return Item.FireMemory;
+      return Item.FireMemory
     case 'Water Memory':
-      return Item.WaterMemory;
+      return Item.WaterMemory
     case 'Grass Memory':
-      return Item.GrassMemory;
+      return Item.GrassMemory
     case 'Electric Memory':
-      return Item.ElectricMemory;
+      return Item.ElectricMemory
     case 'Psychic Memory':
-      return Item.PsychicMemory;
+      return Item.PsychicMemory
     case 'Ice Memory':
-      return Item.IceMemory;
+      return Item.IceMemory
     case 'Dragon Memory':
-      return Item.DragonMemory;
+      return Item.DragonMemory
     case 'Dark Memory':
-      return Item.DarkMemory;
+      return Item.DarkMemory
     case 'Fairy Memory':
-      return Item.FairyMemory;
+      return Item.FairyMemory
     case 'Solganium Z':
-      return Item.SolganiumZ;
+      return Item.SolganiumZ
     case 'Lunalium Z':
-      return Item.LunaliumZ;
+      return Item.LunaliumZ
     case 'Ultranecrozium Z':
-      return Item.UltranecroziumZ;
+      return Item.UltranecroziumZ
     case 'Mimikium Z':
-      return Item.MimikiumZ;
+      return Item.MimikiumZ
     case 'Lycanium Z':
-      return Item.LycaniumZ;
+      return Item.LycaniumZ
     case 'Kommonium Z':
-      return Item.KommoniumZ;
+      return Item.KommoniumZ
     case 'Z-Power Ring':
-      return Item.ZPowerRing;
+      return Item.ZPowerRing
     case 'Pink Petal':
-      return Item.PinkPetal;
+      return Item.PinkPetal
     case 'Orange Petal':
-      return Item.OrangePetal;
+      return Item.OrangePetal
     case 'Blue Petal':
-      return Item.BluePetal;
+      return Item.BluePetal
     case 'Red Petal':
-      return Item.RedPetal;
+      return Item.RedPetal
     case 'Green Petal':
-      return Item.GreenPetal;
+      return Item.GreenPetal
     case 'Yellow Petal':
-      return Item.YellowPetal;
+      return Item.YellowPetal
     case 'Purple Petal':
-      return Item.PurplePetal;
+      return Item.PurplePetal
     case 'Rainbow Flower':
-      return Item.RainbowFlower;
+      return Item.RainbowFlower
     case 'Surge Badge':
-      return Item.SurgeBadge;
+      return Item.SurgeBadge
     case 'N-Solarizer':
-      return Item.NSolarizer;
+      return Item.NSolarizer
     case 'N-Lunarizer':
-      return Item.NLunarizer;
+      return Item.NLunarizer
     case 'Ilima\u2019s Normalium Z':
-      return Item.IlimasNormaliumZ;
+      return Item.IlimasNormaliumZ
     case 'Left Pok\u00E9 Ball':
-      return Item.LeftPokeBall;
+      return Item.LeftPokeBall
     case 'Roto Hatch':
-      return Item.RotoHatch;
+      return Item.RotoHatch
     case 'Roto Bargain':
-      return Item.RotoBargain;
+      return Item.RotoBargain
     case 'Roto Prize Money':
-      return Item.RotoPrizeMoney;
+      return Item.RotoPrizeMoney
     case 'Roto Exp. Points':
-      return Item.RotoExpPoints;
+      return Item.RotoExpPoints
     case 'Roto Friendship':
-      return Item.RotoFriendship;
+      return Item.RotoFriendship
     case 'Roto Encounter':
-      return Item.RotoEncounter;
+      return Item.RotoEncounter
     case 'Roto Stealth':
-      return Item.RotoStealth;
+      return Item.RotoStealth
     case 'Roto HP Restore':
-      return Item.RotoHPRestore;
+      return Item.RotoHPRestore
     case 'Roto PP Restore':
-      return Item.RotoPPRestore;
+      return Item.RotoPPRestore
     case 'Roto Boost':
-      return Item.RotoBoost;
+      return Item.RotoBoost
     case 'Roto Catch':
-      return Item.RotoCatch;
+      return Item.RotoCatch
     case 'Health Candy':
-      return Item.HealthCandy;
+      return Item.HealthCandy
     case 'Mighty Candy':
-      return Item.MightyCandy;
+      return Item.MightyCandy
     case 'Tough Candy':
-      return Item.ToughCandy;
+      return Item.ToughCandy
     case 'Smart Candy':
-      return Item.SmartCandy;
+      return Item.SmartCandy
     case 'Courage Candy':
-      return Item.CourageCandy;
+      return Item.CourageCandy
     case 'Quick Candy':
-      return Item.QuickCandy;
+      return Item.QuickCandy
     case 'Health Candy L':
-      return Item.HealthCandyL;
+      return Item.HealthCandyL
     case 'Mighty Candy L':
-      return Item.MightyCandyL;
+      return Item.MightyCandyL
     case 'Tough Candy L':
-      return Item.ToughCandyL;
+      return Item.ToughCandyL
     case 'Smart Candy L':
-      return Item.SmartCandyL;
+      return Item.SmartCandyL
     case 'Courage Candy L':
-      return Item.CourageCandyL;
+      return Item.CourageCandyL
     case 'Quick Candy L':
-      return Item.QuickCandyL;
+      return Item.QuickCandyL
     case 'Health Candy XL':
-      return Item.HealthCandyXL;
+      return Item.HealthCandyXL
     case 'Mighty Candy XL':
-      return Item.MightyCandyXL;
+      return Item.MightyCandyXL
     case 'Tough Candy XL':
-      return Item.ToughCandyXL;
+      return Item.ToughCandyXL
     case 'Smart Candy XL':
-      return Item.SmartCandyXL;
+      return Item.SmartCandyXL
     case 'Courage Candy XL':
-      return Item.CourageCandyXL;
+      return Item.CourageCandyXL
     case 'Quick Candy XL':
-      return Item.QuickCandyXL;
+      return Item.QuickCandyXL
     case 'Bulbasaur Candy':
-      return Item.BulbasaurCandy;
+      return Item.BulbasaurCandy
     case 'Charmander Candy':
-      return Item.CharmanderCandy;
+      return Item.CharmanderCandy
     case 'Squirtle Candy':
-      return Item.SquirtleCandy;
+      return Item.SquirtleCandy
     case 'Caterpie Candy':
-      return Item.CaterpieCandy;
+      return Item.CaterpieCandy
     case 'Weedle Candy':
-      return Item.WeedleCandy;
+      return Item.WeedleCandy
     case 'Pidgey Candy':
-      return Item.PidgeyCandy;
+      return Item.PidgeyCandy
     case 'Rattata Candy':
-      return Item.RattataCandy;
+      return Item.RattataCandy
     case 'Spearow Candy':
-      return Item.SpearowCandy;
+      return Item.SpearowCandy
     case 'Ekans Candy':
-      return Item.EkansCandy;
+      return Item.EkansCandy
     case 'Pikachu Candy':
-      return Item.PikachuCandy;
+      return Item.PikachuCandy
     case 'Sandshrew Candy':
-      return Item.SandshrewCandy;
+      return Item.SandshrewCandy
     case 'Nidoran\u2640 Candy':
-      return Item.NidoranCandy;
+      return Item.NidoranCandy
     case 'Clefairy Candy':
-      return Item.ClefairyCandy;
+      return Item.ClefairyCandy
     case 'Vulpix Candy':
-      return Item.VulpixCandy;
+      return Item.VulpixCandy
     case 'Jigglypuff Candy':
-      return Item.JigglypuffCandy;
+      return Item.JigglypuffCandy
     case 'Zubat Candy':
-      return Item.ZubatCandy;
+      return Item.ZubatCandy
     case 'Oddish Candy':
-      return Item.OddishCandy;
+      return Item.OddishCandy
     case 'Paras Candy':
-      return Item.ParasCandy;
+      return Item.ParasCandy
     case 'Venonat Candy':
-      return Item.VenonatCandy;
+      return Item.VenonatCandy
     case 'Diglett Candy':
-      return Item.DiglettCandy;
+      return Item.DiglettCandy
     case 'Meowth Candy':
-      return Item.MeowthCandy;
+      return Item.MeowthCandy
     case 'Psyduck Candy':
-      return Item.PsyduckCandy;
+      return Item.PsyduckCandy
     case 'Mankey Candy':
-      return Item.MankeyCandy;
+      return Item.MankeyCandy
     case 'Growlithe Candy':
-      return Item.GrowlitheCandy;
+      return Item.GrowlitheCandy
     case 'Poliwag Candy':
-      return Item.PoliwagCandy;
+      return Item.PoliwagCandy
     case 'Abra Candy':
-      return Item.AbraCandy;
+      return Item.AbraCandy
     case 'Machop Candy':
-      return Item.MachopCandy;
+      return Item.MachopCandy
     case 'Bellsprout Candy':
-      return Item.BellsproutCandy;
+      return Item.BellsproutCandy
     case 'Tentacool Candy':
-      return Item.TentacoolCandy;
+      return Item.TentacoolCandy
     case 'Geodude Candy':
-      return Item.GeodudeCandy;
+      return Item.GeodudeCandy
     case 'Ponyta Candy':
-      return Item.PonytaCandy;
+      return Item.PonytaCandy
     case 'Slowpoke Candy':
-      return Item.SlowpokeCandy;
+      return Item.SlowpokeCandy
     case 'Magnemite Candy':
-      return Item.MagnemiteCandy;
+      return Item.MagnemiteCandy
     case 'Farfetch\u2019d Candy':
-      return Item.FarfetchdCandy;
+      return Item.FarfetchdCandy
     case 'Doduo Candy':
-      return Item.DoduoCandy;
+      return Item.DoduoCandy
     case 'Seel Candy':
-      return Item.SeelCandy;
+      return Item.SeelCandy
     case 'Grimer Candy':
-      return Item.GrimerCandy;
+      return Item.GrimerCandy
     case 'Shellder Candy':
-      return Item.ShellderCandy;
+      return Item.ShellderCandy
     case 'Gastly Candy':
-      return Item.GastlyCandy;
+      return Item.GastlyCandy
     case 'Onix Candy':
-      return Item.OnixCandy;
+      return Item.OnixCandy
     case 'Drowzee Candy':
-      return Item.DrowzeeCandy;
+      return Item.DrowzeeCandy
     case 'Krabby Candy':
-      return Item.KrabbyCandy;
+      return Item.KrabbyCandy
     case 'Voltorb Candy':
-      return Item.VoltorbCandy;
+      return Item.VoltorbCandy
     case 'Exeggcute Candy':
-      return Item.ExeggcuteCandy;
+      return Item.ExeggcuteCandy
     case 'Cubone Candy':
-      return Item.CuboneCandy;
+      return Item.CuboneCandy
     case 'Hitmonlee Candy':
-      return Item.HitmonleeCandy;
+      return Item.HitmonleeCandy
     case 'Hitmonchan Candy':
-      return Item.HitmonchanCandy;
+      return Item.HitmonchanCandy
     case 'Lickitung Candy':
-      return Item.LickitungCandy;
+      return Item.LickitungCandy
     case 'Koffing Candy':
-      return Item.KoffingCandy;
+      return Item.KoffingCandy
     case 'Rhyhorn Candy':
-      return Item.RhyhornCandy;
+      return Item.RhyhornCandy
     case 'Chansey Candy':
-      return Item.ChanseyCandy;
+      return Item.ChanseyCandy
     case 'Tangela Candy':
-      return Item.TangelaCandy;
+      return Item.TangelaCandy
     case 'Kangaskhan Candy':
-      return Item.KangaskhanCandy;
+      return Item.KangaskhanCandy
     case 'Horsea Candy':
-      return Item.HorseaCandy;
+      return Item.HorseaCandy
     case 'Goldeen Candy':
-      return Item.GoldeenCandy;
+      return Item.GoldeenCandy
     case 'Staryu Candy':
-      return Item.StaryuCandy;
+      return Item.StaryuCandy
     case 'Mr. Mime Candy':
-      return Item.MrMimeCandy;
+      return Item.MrMimeCandy
     case 'Scyther Candy':
-      return Item.ScytherCandy;
+      return Item.ScytherCandy
     case 'Jynx Candy':
-      return Item.JynxCandy;
+      return Item.JynxCandy
     case 'Electabuzz Candy':
-      return Item.ElectabuzzCandy;
+      return Item.ElectabuzzCandy
     case 'Pinsir Candy':
-      return Item.PinsirCandy;
+      return Item.PinsirCandy
     case 'Tauros Candy':
-      return Item.TaurosCandy;
+      return Item.TaurosCandy
     case 'Magikarp Candy':
-      return Item.MagikarpCandy;
+      return Item.MagikarpCandy
     case 'Lapras Candy':
-      return Item.LaprasCandy;
+      return Item.LaprasCandy
     case 'Ditto Candy':
-      return Item.DittoCandy;
+      return Item.DittoCandy
     case 'Eevee Candy':
-      return Item.EeveeCandy;
+      return Item.EeveeCandy
     case 'Porygon Candy':
-      return Item.PorygonCandy;
+      return Item.PorygonCandy
     case 'Omanyte Candy':
-      return Item.OmanyteCandy;
+      return Item.OmanyteCandy
     case 'Kabuto Candy':
-      return Item.KabutoCandy;
+      return Item.KabutoCandy
     case 'Aerodactyl Candy':
-      return Item.AerodactylCandy;
+      return Item.AerodactylCandy
     case 'Snorlax Candy':
-      return Item.SnorlaxCandy;
+      return Item.SnorlaxCandy
     case 'Articuno Candy':
-      return Item.ArticunoCandy;
+      return Item.ArticunoCandy
     case 'Zapdos Candy':
-      return Item.ZapdosCandy;
+      return Item.ZapdosCandy
     case 'Moltres Candy':
-      return Item.MoltresCandy;
+      return Item.MoltresCandy
     case 'Dratini Candy':
-      return Item.DratiniCandy;
+      return Item.DratiniCandy
     case 'Mewtwo Candy':
-      return Item.MewtwoCandy;
+      return Item.MewtwoCandy
     case 'Mew Candy':
-      return Item.MewCandy;
+      return Item.MewCandy
     case 'Meltan Candy':
-      return Item.MeltanCandy;
+      return Item.MeltanCandy
     case 'Magmar Candy':
-      return Item.MagmarCandy;
+      return Item.MagmarCandy
     case 'Endorsement':
-      return Item.Endorsement;
+      return Item.Endorsement
     case 'Wishing Star':
-      return Item.WishingStar;
+      return Item.WishingStar
     case 'Dynamax Band':
-      return Item.DynamaxBand;
+      return Item.DynamaxBand
     case 'Rotom Bike':
-      return Item.RotomBike;
+      return Item.RotomBike
     case 'Sausages':
-      return Item.Sausages;
+      return Item.Sausages
     case 'Bob\u2019s Food Tin':
-      return Item.BobsFoodTin;
+      return Item.BobsFoodTin
     case 'Bach\u2019s Food Tin':
-      return Item.BachsFoodTin;
+      return Item.BachsFoodTin
     case 'Tin of Beans':
-      return Item.TinOfBeans;
+      return Item.TinOfBeans
     case 'Bread':
-      return Item.Bread;
+      return Item.Bread
     case 'Pasta':
-      return Item.Pasta;
+      return Item.Pasta
     case 'Mixed Mushrooms':
-      return Item.MixedMushrooms;
+      return Item.MixedMushrooms
     case 'Smoke-Poke Tail':
-      return Item.SmokePokeTail;
+      return Item.SmokePokeTail
     case 'Large Leek':
-      return Item.LargeLeek;
+      return Item.LargeLeek
     case 'Fancy Apple':
-      return Item.FancyApple;
+      return Item.FancyApple
     case 'Brittle Bones':
-      return Item.BrittleBones;
+      return Item.BrittleBones
     case 'Pack of Potatoes':
-      return Item.PackOfPotatoes;
+      return Item.PackOfPotatoes
     case 'Pungent Root':
-      return Item.PungentRoot;
+      return Item.PungentRoot
     case 'Salad Mix':
-      return Item.SaladMix;
+      return Item.SaladMix
     case 'Fried Food':
-      return Item.FriedFood;
+      return Item.FriedFood
     case 'Boiled Egg':
-      return Item.BoiledEgg;
+      return Item.BoiledEgg
     case 'Camping Gear':
-      return Item.CampingGear;
+      return Item.CampingGear
     case 'Rusted Sword':
-      return Item.RustedSword;
+      return Item.RustedSword
     case 'Rusted Shield':
-      return Item.RustedShield;
+      return Item.RustedShield
     case 'Fossilized Bird':
-      return Item.FossilizedBird;
+      return Item.FossilizedBird
     case 'Fossilized Fish':
-      return Item.FossilizedFish;
+      return Item.FossilizedFish
     case 'Fossilized Drake':
-      return Item.FossilizedDrake;
+      return Item.FossilizedDrake
     case 'Fossilized Dino':
-      return Item.FossilizedDino;
+      return Item.FossilizedDino
     case 'Strawberry Sweet':
-      return Item.StrawberrySweet;
+      return Item.StrawberrySweet
     case 'Love Sweet':
-      return Item.LoveSweet;
+      return Item.LoveSweet
     case 'Berry Sweet':
-      return Item.BerrySweet;
+      return Item.BerrySweet
     case 'Clover Sweet':
-      return Item.CloverSweet;
+      return Item.CloverSweet
     case 'Flower Sweet':
-      return Item.FlowerSweet;
+      return Item.FlowerSweet
     case 'Star Sweet':
-      return Item.StarSweet;
+      return Item.StarSweet
     case 'Ribbon Sweet':
-      return Item.RibbonSweet;
+      return Item.RibbonSweet
     case 'Sweet Apple':
-      return Item.SweetApple;
+      return Item.SweetApple
     case 'Tart Apple':
-      return Item.TartApple;
+      return Item.TartApple
     case 'Throat Spray':
-      return Item.ThroatSpray;
+      return Item.ThroatSpray
     case 'Eject Pack':
-      return Item.EjectPack;
+      return Item.EjectPack
     case 'Heavy-Duty Boots':
-      return Item.HeavyDutyBoots;
+      return Item.HeavyDutyBoots
     case 'Blunder Policy':
-      return Item.BlunderPolicy;
+      return Item.BlunderPolicy
     case 'Room Service':
-      return Item.RoomService;
+      return Item.RoomService
     case 'Utility Umbrella':
-      return Item.UtilityUmbrella;
+      return Item.UtilityUmbrella
     case 'Exp. Candy XS':
-      return Item.ExpCandyXS;
+      return Item.ExpCandyXS
     case 'Exp. Candy S':
-      return Item.ExpCandyS;
+      return Item.ExpCandyS
     case 'Exp. Candy M':
-      return Item.ExpCandyM;
+      return Item.ExpCandyM
     case 'Exp. Candy L':
-      return Item.ExpCandyL;
+      return Item.ExpCandyL
     case 'Exp. Candy XL':
-      return Item.ExpCandyXL;
+      return Item.ExpCandyXL
     case 'Dynamax Candy':
-      return Item.DynamaxCandy;
+      return Item.DynamaxCandy
     case 'TR00':
-      return Item.TR00;
+      return Item.TR00
     case 'TR01':
-      return Item.TR01;
+      return Item.TR01
     case 'TR02':
-      return Item.TR02;
+      return Item.TR02
     case 'TR03':
-      return Item.TR03;
+      return Item.TR03
     case 'TR04':
-      return Item.TR04;
+      return Item.TR04
     case 'TR05':
-      return Item.TR05;
+      return Item.TR05
     case 'TR06':
-      return Item.TR06;
+      return Item.TR06
     case 'TR07':
-      return Item.TR07;
+      return Item.TR07
     case 'TR08':
-      return Item.TR08;
+      return Item.TR08
     case 'TR09':
-      return Item.TR09;
+      return Item.TR09
     case 'TR10':
-      return Item.TR10;
+      return Item.TR10
     case 'TR11':
-      return Item.TR11;
+      return Item.TR11
     case 'TR12':
-      return Item.TR12;
+      return Item.TR12
     case 'TR13':
-      return Item.TR13;
+      return Item.TR13
     case 'TR14':
-      return Item.TR14;
+      return Item.TR14
     case 'TR15':
-      return Item.TR15;
+      return Item.TR15
     case 'TR16':
-      return Item.TR16;
+      return Item.TR16
     case 'TR17':
-      return Item.TR17;
+      return Item.TR17
     case 'TR18':
-      return Item.TR18;
+      return Item.TR18
     case 'TR19':
-      return Item.TR19;
+      return Item.TR19
     case 'TR20':
-      return Item.TR20;
+      return Item.TR20
     case 'TR21':
-      return Item.TR21;
+      return Item.TR21
     case 'TR22':
-      return Item.TR22;
+      return Item.TR22
     case 'TR23':
-      return Item.TR23;
+      return Item.TR23
     case 'TR24':
-      return Item.TR24;
+      return Item.TR24
     case 'TR25':
-      return Item.TR25;
+      return Item.TR25
     case 'TR26':
-      return Item.TR26;
+      return Item.TR26
     case 'TR27':
-      return Item.TR27;
+      return Item.TR27
     case 'TR28':
-      return Item.TR28;
+      return Item.TR28
     case 'TR29':
-      return Item.TR29;
+      return Item.TR29
     case 'TR30':
-      return Item.TR30;
+      return Item.TR30
     case 'TR31':
-      return Item.TR31;
+      return Item.TR31
     case 'TR32':
-      return Item.TR32;
+      return Item.TR32
     case 'TR33':
-      return Item.TR33;
+      return Item.TR33
     case 'TR34':
-      return Item.TR34;
+      return Item.TR34
     case 'TR35':
-      return Item.TR35;
+      return Item.TR35
     case 'TR36':
-      return Item.TR36;
+      return Item.TR36
     case 'TR37':
-      return Item.TR37;
+      return Item.TR37
     case 'TR38':
-      return Item.TR38;
+      return Item.TR38
     case 'TR39':
-      return Item.TR39;
+      return Item.TR39
     case 'TR40':
-      return Item.TR40;
+      return Item.TR40
     case 'TR41':
-      return Item.TR41;
+      return Item.TR41
     case 'TR42':
-      return Item.TR42;
+      return Item.TR42
     case 'TR43':
-      return Item.TR43;
+      return Item.TR43
     case 'TR44':
-      return Item.TR44;
+      return Item.TR44
     case 'TR45':
-      return Item.TR45;
+      return Item.TR45
     case 'TR46':
-      return Item.TR46;
+      return Item.TR46
     case 'TR47':
-      return Item.TR47;
+      return Item.TR47
     case 'TR48':
-      return Item.TR48;
+      return Item.TR48
     case 'TR49':
-      return Item.TR49;
+      return Item.TR49
     case 'TR50':
-      return Item.TR50;
+      return Item.TR50
     case 'TR51':
-      return Item.TR51;
+      return Item.TR51
     case 'TR52':
-      return Item.TR52;
+      return Item.TR52
     case 'TR53':
-      return Item.TR53;
+      return Item.TR53
     case 'TR54':
-      return Item.TR54;
+      return Item.TR54
     case 'TR55':
-      return Item.TR55;
+      return Item.TR55
     case 'TR56':
-      return Item.TR56;
+      return Item.TR56
     case 'TR57':
-      return Item.TR57;
+      return Item.TR57
     case 'TR58':
-      return Item.TR58;
+      return Item.TR58
     case 'TR59':
-      return Item.TR59;
+      return Item.TR59
     case 'TR60':
-      return Item.TR60;
+      return Item.TR60
     case 'TR61':
-      return Item.TR61;
+      return Item.TR61
     case 'TR62':
-      return Item.TR62;
+      return Item.TR62
     case 'TR63':
-      return Item.TR63;
+      return Item.TR63
     case 'TR64':
-      return Item.TR64;
+      return Item.TR64
     case 'TR65':
-      return Item.TR65;
+      return Item.TR65
     case 'TR66':
-      return Item.TR66;
+      return Item.TR66
     case 'TR67':
-      return Item.TR67;
+      return Item.TR67
     case 'TR68':
-      return Item.TR68;
+      return Item.TR68
     case 'TR69':
-      return Item.TR69;
+      return Item.TR69
     case 'TR70':
-      return Item.TR70;
+      return Item.TR70
     case 'TR71':
-      return Item.TR71;
+      return Item.TR71
     case 'TR72':
-      return Item.TR72;
+      return Item.TR72
     case 'TR73':
-      return Item.TR73;
+      return Item.TR73
     case 'TR74':
-      return Item.TR74;
+      return Item.TR74
     case 'TR75':
-      return Item.TR75;
+      return Item.TR75
     case 'TR76':
-      return Item.TR76;
+      return Item.TR76
     case 'TR77':
-      return Item.TR77;
+      return Item.TR77
     case 'TR78':
-      return Item.TR78;
+      return Item.TR78
     case 'TR79':
-      return Item.TR79;
+      return Item.TR79
     case 'TR80':
-      return Item.TR80;
+      return Item.TR80
     case 'TR81':
-      return Item.TR81;
+      return Item.TR81
     case 'TR82':
-      return Item.TR82;
+      return Item.TR82
     case 'TR83':
-      return Item.TR83;
+      return Item.TR83
     case 'TR84':
-      return Item.TR84;
+      return Item.TR84
     case 'TR85':
-      return Item.TR85;
+      return Item.TR85
     case 'TR86':
-      return Item.TR86;
+      return Item.TR86
     case 'TR87':
-      return Item.TR87;
+      return Item.TR87
     case 'TR88':
-      return Item.TR88;
+      return Item.TR88
     case 'TR89':
-      return Item.TR89;
+      return Item.TR89
     case 'TR90':
-      return Item.TR90;
+      return Item.TR90
     case 'TR91':
-      return Item.TR91;
+      return Item.TR91
     case 'TR92':
-      return Item.TR92;
+      return Item.TR92
     case 'TR93':
-      return Item.TR93;
+      return Item.TR93
     case 'TR94':
-      return Item.TR94;
+      return Item.TR94
     case 'TR95':
-      return Item.TR95;
+      return Item.TR95
     case 'TR96':
-      return Item.TR96;
+      return Item.TR96
     case 'TR97':
-      return Item.TR97;
+      return Item.TR97
     case 'TR98':
-      return Item.TR98;
+      return Item.TR98
     case 'TR99':
-      return Item.TR99;
+      return Item.TR99
     case 'TM00':
-      return Item.TM00;
+      return Item.TM00
     case 'Lonely Mint':
-      return Item.LonelyMint;
+      return Item.LonelyMint
     case 'Adamant Mint':
-      return Item.AdamantMint;
+      return Item.AdamantMint
     case 'Naughty Mint':
-      return Item.NaughtyMint;
+      return Item.NaughtyMint
     case 'Brave Mint':
-      return Item.BraveMint;
+      return Item.BraveMint
     case 'Bold Mint':
-      return Item.BoldMint;
+      return Item.BoldMint
     case 'Impish Mint':
-      return Item.ImpishMint;
+      return Item.ImpishMint
     case 'Lax Mint':
-      return Item.LaxMint;
+      return Item.LaxMint
     case 'Relaxed Mint':
-      return Item.RelaxedMint;
+      return Item.RelaxedMint
     case 'Modest Mint':
-      return Item.ModestMint;
+      return Item.ModestMint
     case 'Mild Mint':
-      return Item.MildMint;
+      return Item.MildMint
     case 'Rash Mint':
-      return Item.RashMint;
+      return Item.RashMint
     case 'Quiet Mint':
-      return Item.QuietMint;
+      return Item.QuietMint
     case 'Calm Mint':
-      return Item.CalmMint;
+      return Item.CalmMint
     case 'Gentle Mint':
-      return Item.GentleMint;
+      return Item.GentleMint
     case 'Careful Mint':
-      return Item.CarefulMint;
+      return Item.CarefulMint
     case 'Sassy Mint':
-      return Item.SassyMint;
+      return Item.SassyMint
     case 'Timid Mint':
-      return Item.TimidMint;
+      return Item.TimidMint
     case 'Hasty Mint':
-      return Item.HastyMint;
+      return Item.HastyMint
     case 'Jolly Mint':
-      return Item.JollyMint;
+      return Item.JollyMint
     case 'Naive Mint':
-      return Item.NaiveMint;
+      return Item.NaiveMint
     case 'Serious Mint':
-      return Item.SeriousMint;
+      return Item.SeriousMint
     case 'Wishing Piece':
-      return Item.WishingPiece;
+      return Item.WishingPiece
     case 'Cracked Pot':
-      return Item.CrackedPot;
+      return Item.CrackedPot
     case 'Chipped Pot':
-      return Item.ChippedPot;
+      return Item.ChippedPot
     case 'Hi-tech Earbuds':
-      return Item.HitechEarbuds;
+      return Item.HitechEarbuds
     case 'Fruit Bunch':
-      return Item.FruitBunch;
+      return Item.FruitBunch
     case 'Moomoo Cheese':
-      return Item.MoomooCheese;
+      return Item.MoomooCheese
     case 'Spice Mix':
-      return Item.SpiceMix;
+      return Item.SpiceMix
     case 'Fresh Cream':
-      return Item.FreshCream;
+      return Item.FreshCream
     case 'Packaged Curry':
-      return Item.PackagedCurry;
+      return Item.PackagedCurry
     case 'Coconut Milk':
-      return Item.CoconutMilk;
+      return Item.CoconutMilk
     case 'Instant Noodles':
-      return Item.InstantNoodles;
+      return Item.InstantNoodles
     case 'Precooked Burger':
-      return Item.PrecookedBurger;
+      return Item.PrecookedBurger
     case 'Gigantamix':
-      return Item.Gigantamix;
+      return Item.Gigantamix
     case 'Wishing Chip':
-      return Item.WishingChip;
+      return Item.WishingChip
     case 'Catching Charm':
-      return Item.CatchingCharm;
+      return Item.CatchingCharm
     case 'Old Letter':
-      return Item.OldLetter;
+      return Item.OldLetter
     case 'Band Autograph':
-      return Item.BandAutograph;
+      return Item.BandAutograph
     case 'Sonia\u2019s Book':
-      return Item.SoniasBook;
+      return Item.SoniasBook
     case 'Rotom Catalog':
-      return Item.RotomCatalog;
+      return Item.RotomCatalog
     case '\u2605And458':
-      return Item.And458;
+      return Item.And458
     case '\u2605And15':
-      return Item.And15;
+      return Item.And15
     case '\u2605And337':
-      return Item.And337;
+      return Item.And337
     case '\u2605And603':
-      return Item.And603;
+      return Item.And603
     case '\u2605And390':
-      return Item.And390;
+      return Item.And390
     case '\u2605Sgr6879':
-      return Item.Sgr6879;
+      return Item.Sgr6879
     case '\u2605Sgr6859':
-      return Item.Sgr6859;
+      return Item.Sgr6859
     case '\u2605Sgr6913':
-      return Item.Sgr6913;
+      return Item.Sgr6913
     case '\u2605Sgr7348':
-      return Item.Sgr7348;
+      return Item.Sgr7348
     case '\u2605Sgr7121':
-      return Item.Sgr7121;
+      return Item.Sgr7121
     case '\u2605Sgr6746':
-      return Item.Sgr6746;
+      return Item.Sgr6746
     case '\u2605Sgr7194':
-      return Item.Sgr7194;
+      return Item.Sgr7194
     case '\u2605Sgr7337':
-      return Item.Sgr7337;
+      return Item.Sgr7337
     case '\u2605Sgr7343':
-      return Item.Sgr7343;
+      return Item.Sgr7343
     case '\u2605Sgr6812':
-      return Item.Sgr6812;
+      return Item.Sgr6812
     case '\u2605Sgr7116':
-      return Item.Sgr7116;
+      return Item.Sgr7116
     case '\u2605Sgr7264':
-      return Item.Sgr7264;
+      return Item.Sgr7264
     case '\u2605Sgr7597':
-      return Item.Sgr7597;
+      return Item.Sgr7597
     case '\u2605Del7882':
-      return Item.Del7882;
+      return Item.Del7882
     case '\u2605Del7906':
-      return Item.Del7906;
+      return Item.Del7906
     case '\u2605Del7852':
-      return Item.Del7852;
+      return Item.Del7852
     case '\u2605Psc596':
-      return Item.Psc596;
+      return Item.Psc596
     case '\u2605Psc361':
-      return Item.Psc361;
+      return Item.Psc361
     case '\u2605Psc510':
-      return Item.Psc510;
+      return Item.Psc510
     case '\u2605Psc437':
-      return Item.Psc437;
+      return Item.Psc437
     case '\u2605Psc8773':
-      return Item.Psc8773;
+      return Item.Psc8773
     case '\u2605Lep1865':
-      return Item.Lep1865;
+      return Item.Lep1865
     case '\u2605Lep1829':
-      return Item.Lep1829;
+      return Item.Lep1829
     case '\u2605Boo5340':
-      return Item.Boo5340;
+      return Item.Boo5340
     case '\u2605Boo5506':
-      return Item.Boo5506;
+      return Item.Boo5506
     case '\u2605Boo5435':
-      return Item.Boo5435;
+      return Item.Boo5435
     case '\u2605Boo5602':
-      return Item.Boo5602;
+      return Item.Boo5602
     case '\u2605Boo5733':
-      return Item.Boo5733;
+      return Item.Boo5733
     case '\u2605Boo5235':
-      return Item.Boo5235;
+      return Item.Boo5235
     case '\u2605Boo5351':
-      return Item.Boo5351;
+      return Item.Boo5351
     case '\u2605Hya3748':
-      return Item.Hya3748;
+      return Item.Hya3748
     case '\u2605Hya3903':
-      return Item.Hya3903;
+      return Item.Hya3903
     case '\u2605Hya3418':
-      return Item.Hya3418;
+      return Item.Hya3418
     case '\u2605Hya3482':
-      return Item.Hya3482;
+      return Item.Hya3482
     case '\u2605Hya3845':
-      return Item.Hya3845;
+      return Item.Hya3845
     case '\u2605Eri1084':
-      return Item.Eri1084;
+      return Item.Eri1084
     case '\u2605Eri472':
-      return Item.Eri472;
+      return Item.Eri472
     case '\u2605Eri1666':
-      return Item.Eri1666;
+      return Item.Eri1666
     case '\u2605Eri897':
-      return Item.Eri897;
+      return Item.Eri897
     case '\u2605Eri1231':
-      return Item.Eri1231;
+      return Item.Eri1231
     case '\u2605Eri874':
-      return Item.Eri874;
+      return Item.Eri874
     case '\u2605Eri1298':
-      return Item.Eri1298;
+      return Item.Eri1298
     case '\u2605Eri1325':
-      return Item.Eri1325;
+      return Item.Eri1325
     case '\u2605Eri984':
-      return Item.Eri984;
+      return Item.Eri984
     case '\u2605Eri1464':
-      return Item.Eri1464;
+      return Item.Eri1464
     case '\u2605Eri1393':
-      return Item.Eri1393;
+      return Item.Eri1393
     case '\u2605Eri850':
-      return Item.Eri850;
+      return Item.Eri850
     case '\u2605Tau1409':
-      return Item.Tau1409;
+      return Item.Tau1409
     case '\u2605Tau1457':
-      return Item.Tau1457;
+      return Item.Tau1457
     case '\u2605Tau1165':
-      return Item.Tau1165;
+      return Item.Tau1165
     case '\u2605Tau1791':
-      return Item.Tau1791;
+      return Item.Tau1791
     case '\u2605Tau1910':
-      return Item.Tau1910;
+      return Item.Tau1910
     case '\u2605Tau1346':
-      return Item.Tau1346;
+      return Item.Tau1346
     case '\u2605Tau1373':
-      return Item.Tau1373;
+      return Item.Tau1373
     case '\u2605Tau1412':
-      return Item.Tau1412;
+      return Item.Tau1412
     case '\u2605CMa2491':
-      return Item.CMa2491;
+      return Item.CMa2491
     case '\u2605CMa2693':
-      return Item.CMa2693;
+      return Item.CMa2693
     case '\u2605CMa2294':
-      return Item.CMa2294;
+      return Item.CMa2294
     case '\u2605CMa2827':
-      return Item.CMa2827;
+      return Item.CMa2827
     case '\u2605CMa2282':
-      return Item.CMa2282;
+      return Item.CMa2282
     case '\u2605CMa2618':
-      return Item.CMa2618;
+      return Item.CMa2618
     case '\u2605CMa2657':
-      return Item.CMa2657;
+      return Item.CMa2657
     case '\u2605CMa2646':
-      return Item.CMa2646;
+      return Item.CMa2646
     case '\u2605UMa4905':
-      return Item.UMa4905;
+      return Item.UMa4905
     case '\u2605UMa4301':
-      return Item.UMa4301;
+      return Item.UMa4301
     case '\u2605UMa5191':
-      return Item.UMa5191;
+      return Item.UMa5191
     case '\u2605UMa5054':
-      return Item.UMa5054;
+      return Item.UMa5054
     case '\u2605UMa4295':
-      return Item.UMa4295;
+      return Item.UMa4295
     case '\u2605UMa4660':
-      return Item.UMa4660;
+      return Item.UMa4660
     case '\u2605UMa4554':
-      return Item.UMa4554;
+      return Item.UMa4554
     case '\u2605UMa4069':
-      return Item.UMa4069;
+      return Item.UMa4069
     case '\u2605UMa3569':
-      return Item.UMa3569;
+      return Item.UMa3569
     case '\u2605UMa3323':
-      return Item.UMa3323;
+      return Item.UMa3323
     case '\u2605UMa4033':
-      return Item.UMa4033;
+      return Item.UMa4033
     case '\u2605UMa4377':
-      return Item.UMa4377;
+      return Item.UMa4377
     case '\u2605UMa4375':
-      return Item.UMa4375;
+      return Item.UMa4375
     case '\u2605UMa4518':
-      return Item.UMa4518;
+      return Item.UMa4518
     case '\u2605UMa3594':
-      return Item.UMa3594;
+      return Item.UMa3594
     case '\u2605Vir5056':
-      return Item.Vir5056;
+      return Item.Vir5056
     case '\u2605Vir4825':
-      return Item.Vir4825;
+      return Item.Vir4825
     case '\u2605Vir4932':
-      return Item.Vir4932;
+      return Item.Vir4932
     case '\u2605Vir4540':
-      return Item.Vir4540;
+      return Item.Vir4540
     case '\u2605Vir4689':
-      return Item.Vir4689;
+      return Item.Vir4689
     case '\u2605Vir5338':
-      return Item.Vir5338;
+      return Item.Vir5338
     case '\u2605Vir4910':
-      return Item.Vir4910;
+      return Item.Vir4910
     case '\u2605Vir5315':
-      return Item.Vir5315;
+      return Item.Vir5315
     case '\u2605Vir5359':
-      return Item.Vir5359;
+      return Item.Vir5359
     case '\u2605Vir5409':
-      return Item.Vir5409;
+      return Item.Vir5409
     case '\u2605Vir5107':
-      return Item.Vir5107;
+      return Item.Vir5107
     case '\u2605Ari617':
-      return Item.Ari617;
+      return Item.Ari617
     case '\u2605Ari553':
-      return Item.Ari553;
+      return Item.Ari553
     case '\u2605Ari546':
-      return Item.Ari546;
+      return Item.Ari546
     case '\u2605Ari951':
-      return Item.Ari951;
+      return Item.Ari951
     case '\u2605Ori1713':
-      return Item.Ori1713;
+      return Item.Ori1713
     case '\u2605Ori2061':
-      return Item.Ori2061;
+      return Item.Ori2061
     case '\u2605Ori1790':
-      return Item.Ori1790;
+      return Item.Ori1790
     case '\u2605Ori1903':
-      return Item.Ori1903;
+      return Item.Ori1903
     case '\u2605Ori1948':
-      return Item.Ori1948;
+      return Item.Ori1948
     case '\u2605Ori2004':
-      return Item.Ori2004;
+      return Item.Ori2004
     case '\u2605Ori1852':
-      return Item.Ori1852;
+      return Item.Ori1852
     case '\u2605Ori1879':
-      return Item.Ori1879;
+      return Item.Ori1879
     case '\u2605Ori1899':
-      return Item.Ori1899;
+      return Item.Ori1899
     case '\u2605Ori1543':
-      return Item.Ori1543;
+      return Item.Ori1543
     case '\u2605Cas21':
-      return Item.Cas21;
+      return Item.Cas21
     case '\u2605Cas168':
-      return Item.Cas168;
+      return Item.Cas168
     case '\u2605Cas403':
-      return Item.Cas403;
+      return Item.Cas403
     case '\u2605Cas153':
-      return Item.Cas153;
+      return Item.Cas153
     case '\u2605Cas542':
-      return Item.Cas542;
+      return Item.Cas542
     case '\u2605Cas219':
-      return Item.Cas219;
+      return Item.Cas219
     case '\u2605Cas265':
-      return Item.Cas265;
+      return Item.Cas265
     case '\u2605Cnc3572':
-      return Item.Cnc3572;
+      return Item.Cnc3572
     case '\u2605Cnc3208':
-      return Item.Cnc3208;
+      return Item.Cnc3208
     case '\u2605Cnc3461':
-      return Item.Cnc3461;
+      return Item.Cnc3461
     case '\u2605Cnc3449':
-      return Item.Cnc3449;
+      return Item.Cnc3449
     case '\u2605Cnc3429':
-      return Item.Cnc3429;
+      return Item.Cnc3429
     case '\u2605Cnc3627':
-      return Item.Cnc3627;
+      return Item.Cnc3627
     case '\u2605Cnc3268':
-      return Item.Cnc3268;
+      return Item.Cnc3268
     case '\u2605Cnc3249':
-      return Item.Cnc3249;
+      return Item.Cnc3249
     case '\u2605Com4968':
-      return Item.Com4968;
+      return Item.Com4968
     case '\u2605Crv4757':
-      return Item.Crv4757;
+      return Item.Crv4757
     case '\u2605Crv4623':
-      return Item.Crv4623;
+      return Item.Crv4623
     case '\u2605Crv4662':
-      return Item.Crv4662;
+      return Item.Crv4662
     case '\u2605Crv4786':
-      return Item.Crv4786;
+      return Item.Crv4786
     case '\u2605Aur1708':
-      return Item.Aur1708;
+      return Item.Aur1708
     case '\u2605Aur2088':
-      return Item.Aur2088;
+      return Item.Aur2088
     case '\u2605Aur1605':
-      return Item.Aur1605;
+      return Item.Aur1605
     case '\u2605Aur2095':
-      return Item.Aur2095;
+      return Item.Aur2095
     case '\u2605Aur1577':
-      return Item.Aur1577;
+      return Item.Aur1577
     case '\u2605Aur1641':
-      return Item.Aur1641;
+      return Item.Aur1641
     case '\u2605Aur1612':
-      return Item.Aur1612;
+      return Item.Aur1612
     case '\u2605Pav7790':
-      return Item.Pav7790;
+      return Item.Pav7790
     case '\u2605Cet911':
-      return Item.Cet911;
+      return Item.Cet911
     case '\u2605Cet681':
-      return Item.Cet681;
+      return Item.Cet681
     case '\u2605Cet188':
-      return Item.Cet188;
+      return Item.Cet188
     case '\u2605Cet539':
-      return Item.Cet539;
+      return Item.Cet539
     case '\u2605Cet804':
-      return Item.Cet804;
+      return Item.Cet804
     case '\u2605Cep8974':
-      return Item.Cep8974;
+      return Item.Cep8974
     case '\u2605Cep8162':
-      return Item.Cep8162;
+      return Item.Cep8162
     case '\u2605Cep8238':
-      return Item.Cep8238;
+      return Item.Cep8238
     case '\u2605Cep8417':
-      return Item.Cep8417;
+      return Item.Cep8417
     case '\u2605Cen5267':
-      return Item.Cen5267;
+      return Item.Cen5267
     case '\u2605Cen5288':
-      return Item.Cen5288;
+      return Item.Cen5288
     case '\u2605Cen551':
-      return Item.Cen551;
+      return Item.Cen551
     case '\u2605Cen5459':
-      return Item.Cen5459;
+      return Item.Cen5459
     case '\u2605Cen5460':
-      return Item.Cen5460;
+      return Item.Cen5460
     case '\u2605CMi2943':
-      return Item.CMi2943;
+      return Item.CMi2943
     case '\u2605CMi2845':
-      return Item.CMi2845;
+      return Item.CMi2845
     case '\u2605Equ8131':
-      return Item.Equ8131;
+      return Item.Equ8131
     case '\u2605Vul7405':
-      return Item.Vul7405;
+      return Item.Vul7405
     case '\u2605UMi424':
-      return Item.UMi424;
+      return Item.UMi424
     case '\u2605UMi5563':
-      return Item.UMi5563;
+      return Item.UMi5563
     case '\u2605UMi5735':
-      return Item.UMi5735;
+      return Item.UMi5735
     case '\u2605UMi6789':
-      return Item.UMi6789;
+      return Item.UMi6789
     case '\u2605Crt4287':
-      return Item.Crt4287;
+      return Item.Crt4287
     case '\u2605Lyr7001':
-      return Item.Lyr7001;
+      return Item.Lyr7001
     case '\u2605Lyr7178':
-      return Item.Lyr7178;
+      return Item.Lyr7178
     case '\u2605Lyr7106':
-      return Item.Lyr7106;
+      return Item.Lyr7106
     case '\u2605Lyr7298':
-      return Item.Lyr7298;
+      return Item.Lyr7298
     case '\u2605Ara6585':
-      return Item.Ara6585;
+      return Item.Ara6585
     case '\u2605Sco6134':
-      return Item.Sco6134;
+      return Item.Sco6134
     case '\u2605Sco6527':
-      return Item.Sco6527;
+      return Item.Sco6527
     case '\u2605Sco6553':
-      return Item.Sco6553;
+      return Item.Sco6553
     case '\u2605Sco5953':
-      return Item.Sco5953;
+      return Item.Sco5953
     case '\u2605Sco5984':
-      return Item.Sco5984;
+      return Item.Sco5984
     case '\u2605Sco6508':
-      return Item.Sco6508;
+      return Item.Sco6508
     case '\u2605Sco6084':
-      return Item.Sco6084;
+      return Item.Sco6084
     case '\u2605Sco5944':
-      return Item.Sco5944;
+      return Item.Sco5944
     case '\u2605Sco6630':
-      return Item.Sco6630;
+      return Item.Sco6630
     case '\u2605Sco6027':
-      return Item.Sco6027;
+      return Item.Sco6027
     case '\u2605Sco6247':
-      return Item.Sco6247;
+      return Item.Sco6247
     case '\u2605Sco6252':
-      return Item.Sco6252;
+      return Item.Sco6252
     case '\u2605Sco5928':
-      return Item.Sco5928;
+      return Item.Sco5928
     case '\u2605Sco6241':
-      return Item.Sco6241;
+      return Item.Sco6241
     case '\u2605Sco6165':
-      return Item.Sco6165;
+      return Item.Sco6165
     case '\u2605Tri544':
-      return Item.Tri544;
+      return Item.Tri544
     case '\u2605Leo3982':
-      return Item.Leo3982;
+      return Item.Leo3982
     case '\u2605Leo4534':
-      return Item.Leo4534;
+      return Item.Leo4534
     case '\u2605Leo4357':
-      return Item.Leo4357;
+      return Item.Leo4357
     case '\u2605Leo4057':
-      return Item.Leo4057;
+      return Item.Leo4057
     case '\u2605Leo4359':
-      return Item.Leo4359;
+      return Item.Leo4359
     case '\u2605Leo4031':
-      return Item.Leo4031;
+      return Item.Leo4031
     case '\u2605Leo3852':
-      return Item.Leo3852;
+      return Item.Leo3852
     case '\u2605Leo3905':
-      return Item.Leo3905;
+      return Item.Leo3905
     case '\u2605Leo3773':
-      return Item.Leo3773;
+      return Item.Leo3773
     case '\u2605Gru8425':
-      return Item.Gru8425;
+      return Item.Gru8425
     case '\u2605Gru8636':
-      return Item.Gru8636;
+      return Item.Gru8636
     case '\u2605Gru8353':
-      return Item.Gru8353;
+      return Item.Gru8353
     case '\u2605Lib5685':
-      return Item.Lib5685;
+      return Item.Lib5685
     case '\u2605Lib5531':
-      return Item.Lib5531;
+      return Item.Lib5531
     case '\u2605Lib5787':
-      return Item.Lib5787;
+      return Item.Lib5787
     case '\u2605Lib5603':
-      return Item.Lib5603;
+      return Item.Lib5603
     case '\u2605Pup3165':
-      return Item.Pup3165;
+      return Item.Pup3165
     case '\u2605Pup3185':
-      return Item.Pup3185;
+      return Item.Pup3185
     case '\u2605Pup3045':
-      return Item.Pup3045;
+      return Item.Pup3045
     case '\u2605Cyg7924':
-      return Item.Cyg7924;
+      return Item.Cyg7924
     case '\u2605Cyg7417':
-      return Item.Cyg7417;
+      return Item.Cyg7417
     case '\u2605Cyg7796':
-      return Item.Cyg7796;
+      return Item.Cyg7796
     case '\u2605Cyg8301':
-      return Item.Cyg8301;
+      return Item.Cyg8301
     case '\u2605Cyg7949':
-      return Item.Cyg7949;
+      return Item.Cyg7949
     case '\u2605Cyg7528':
-      return Item.Cyg7528;
+      return Item.Cyg7528
     case '\u2605Oct7228':
-      return Item.Oct7228;
+      return Item.Oct7228
     case '\u2605Col1956':
-      return Item.Col1956;
+      return Item.Col1956
     case '\u2605Col2040':
-      return Item.Col2040;
+      return Item.Col2040
     case '\u2605Col2177':
-      return Item.Col2177;
+      return Item.Col2177
     case '\u2605Gem2990':
-      return Item.Gem2990;
+      return Item.Gem2990
     case '\u2605Gem2891':
-      return Item.Gem2891;
+      return Item.Gem2891
     case '\u2605Gem2421':
-      return Item.Gem2421;
+      return Item.Gem2421
     case '\u2605Gem2473':
-      return Item.Gem2473;
+      return Item.Gem2473
     case '\u2605Gem2216':
-      return Item.Gem2216;
+      return Item.Gem2216
     case '\u2605Gem2777':
-      return Item.Gem2777;
+      return Item.Gem2777
     case '\u2605Gem2650':
-      return Item.Gem2650;
+      return Item.Gem2650
     case '\u2605Gem2286':
-      return Item.Gem2286;
+      return Item.Gem2286
     case '\u2605Gem2484':
-      return Item.Gem2484;
+      return Item.Gem2484
     case '\u2605Gem2930':
-      return Item.Gem2930;
+      return Item.Gem2930
     case '\u2605Peg8775':
-      return Item.Peg8775;
+      return Item.Peg8775
     case '\u2605Peg8781':
-      return Item.Peg8781;
+      return Item.Peg8781
     case '\u2605Peg39':
-      return Item.Peg39;
+      return Item.Peg39
     case '\u2605Peg8308':
-      return Item.Peg8308;
+      return Item.Peg8308
     case '\u2605Peg8650':
-      return Item.Peg8650;
+      return Item.Peg8650
     case '\u2605Peg8634':
-      return Item.Peg8634;
+      return Item.Peg8634
     case '\u2605Peg8684':
-      return Item.Peg8684;
+      return Item.Peg8684
     case '\u2605Peg8450':
-      return Item.Peg8450;
+      return Item.Peg8450
     case '\u2605Peg8880':
-      return Item.Peg8880;
+      return Item.Peg8880
     case '\u2605Peg8905':
-      return Item.Peg8905;
+      return Item.Peg8905
     case '\u2605Oph6556':
-      return Item.Oph6556;
+      return Item.Oph6556
     case '\u2605Oph6378':
-      return Item.Oph6378;
+      return Item.Oph6378
     case '\u2605Oph6603':
-      return Item.Oph6603;
+      return Item.Oph6603
     case '\u2605Oph6149':
-      return Item.Oph6149;
+      return Item.Oph6149
     case '\u2605Oph6056':
-      return Item.Oph6056;
+      return Item.Oph6056
     case '\u2605Oph6075':
-      return Item.Oph6075;
+      return Item.Oph6075
     case '\u2605Ser5854':
-      return Item.Ser5854;
+      return Item.Ser5854
     case '\u2605Ser7141':
-      return Item.Ser7141;
+      return Item.Ser7141
     case '\u2605Ser5879':
-      return Item.Ser5879;
+      return Item.Ser5879
     case '\u2605Her6406':
-      return Item.Her6406;
+      return Item.Her6406
     case '\u2605Her6148':
-      return Item.Her6148;
+      return Item.Her6148
     case '\u2605Her6410':
-      return Item.Her6410;
+      return Item.Her6410
     case '\u2605Her6526':
-      return Item.Her6526;
+      return Item.Her6526
     case '\u2605Her6117':
-      return Item.Her6117;
+      return Item.Her6117
     case '\u2605Her6008':
-      return Item.Her6008;
+      return Item.Her6008
     case '\u2605Per936':
-      return Item.Per936;
+      return Item.Per936
     case '\u2605Per1017':
-      return Item.Per1017;
+      return Item.Per1017
     case '\u2605Per1131':
-      return Item.Per1131;
+      return Item.Per1131
     case '\u2605Per1228':
-      return Item.Per1228;
+      return Item.Per1228
     case '\u2605Per834':
-      return Item.Per834;
+      return Item.Per834
     case '\u2605Per941':
-      return Item.Per941;
+      return Item.Per941
     case '\u2605Phe99':
-      return Item.Phe99;
+      return Item.Phe99
     case '\u2605Phe338':
-      return Item.Phe338;
+      return Item.Phe338
     case '\u2605Vel3634':
-      return Item.Vel3634;
+      return Item.Vel3634
     case '\u2605Vel3485':
-      return Item.Vel3485;
+      return Item.Vel3485
     case '\u2605Vel3734':
-      return Item.Vel3734;
+      return Item.Vel3734
     case '\u2605Aqr8232':
-      return Item.Aqr8232;
+      return Item.Aqr8232
     case '\u2605Aqr8414':
-      return Item.Aqr8414;
+      return Item.Aqr8414
     case '\u2605Aqr8709':
-      return Item.Aqr8709;
+      return Item.Aqr8709
     case '\u2605Aqr8518':
-      return Item.Aqr8518;
+      return Item.Aqr8518
     case '\u2605Aqr7950':
-      return Item.Aqr7950;
+      return Item.Aqr7950
     case '\u2605Aqr8499':
-      return Item.Aqr8499;
+      return Item.Aqr8499
     case '\u2605Aqr8610':
-      return Item.Aqr8610;
+      return Item.Aqr8610
     case '\u2605Aqr8264':
-      return Item.Aqr8264;
+      return Item.Aqr8264
     case '\u2605Cru4853':
-      return Item.Cru4853;
+      return Item.Cru4853
     case '\u2605Cru4730':
-      return Item.Cru4730;
+      return Item.Cru4730
     case '\u2605Cru4763':
-      return Item.Cru4763;
+      return Item.Cru4763
     case '\u2605Cru4700':
-      return Item.Cru4700;
+      return Item.Cru4700
     case '\u2605Cru4656':
-      return Item.Cru4656;
+      return Item.Cru4656
     case '\u2605PsA8728':
-      return Item.PsA8728;
+      return Item.PsA8728
     case '\u2605TrA6217':
-      return Item.TrA6217;
+      return Item.TrA6217
     case '\u2605Cap7776':
-      return Item.Cap7776;
+      return Item.Cap7776
     case '\u2605Cap7754':
-      return Item.Cap7754;
+      return Item.Cap7754
     case '\u2605Cap8278':
-      return Item.Cap8278;
+      return Item.Cap8278
     case '\u2605Cap8322':
-      return Item.Cap8322;
+      return Item.Cap8322
     case '\u2605Cap7773':
-      return Item.Cap7773;
+      return Item.Cap7773
     case '\u2605Sge7479':
-      return Item.Sge7479;
+      return Item.Sge7479
     case '\u2605Car2326':
-      return Item.Car2326;
+      return Item.Car2326
     case '\u2605Car3685':
-      return Item.Car3685;
+      return Item.Car3685
     case '\u2605Car3307':
-      return Item.Car3307;
+      return Item.Car3307
     case '\u2605Car3699':
-      return Item.Car3699;
+      return Item.Car3699
     case '\u2605Dra5744':
-      return Item.Dra5744;
+      return Item.Dra5744
     case '\u2605Dra5291':
-      return Item.Dra5291;
+      return Item.Dra5291
     case '\u2605Dra6705':
-      return Item.Dra6705;
+      return Item.Dra6705
     case '\u2605Dra6536':
-      return Item.Dra6536;
+      return Item.Dra6536
     case '\u2605Dra7310':
-      return Item.Dra7310;
+      return Item.Dra7310
     case '\u2605Dra6688':
-      return Item.Dra6688;
+      return Item.Dra6688
     case '\u2605Dra4434':
-      return Item.Dra4434;
+      return Item.Dra4434
     case '\u2605Dra6370':
-      return Item.Dra6370;
+      return Item.Dra6370
     case '\u2605Dra7462':
-      return Item.Dra7462;
+      return Item.Dra7462
     case '\u2605Dra6396':
-      return Item.Dra6396;
+      return Item.Dra6396
     case '\u2605Dra6132':
-      return Item.Dra6132;
+      return Item.Dra6132
     case '\u2605Dra6636':
-      return Item.Dra6636;
+      return Item.Dra6636
     case '\u2605CVn4915':
-      return Item.CVn4915;
+      return Item.CVn4915
     case '\u2605CVn4785':
-      return Item.CVn4785;
+      return Item.CVn4785
     case '\u2605CVn4846':
-      return Item.CVn4846;
+      return Item.CVn4846
     case '\u2605Aql7595':
-      return Item.Aql7595;
+      return Item.Aql7595
     case '\u2605Aql7557':
-      return Item.Aql7557;
+      return Item.Aql7557
     case '\u2605Aql7525':
-      return Item.Aql7525;
+      return Item.Aql7525
     case '\u2605Aql7602':
-      return Item.Aql7602;
+      return Item.Aql7602
     case '\u2605Aql7235':
-      return Item.Aql7235;
+      return Item.Aql7235
     case 'Max Honey':
-      return Item.MaxHoney;
+      return Item.MaxHoney
     case 'Max Mushrooms':
-      return Item.MaxMushrooms;
+      return Item.MaxMushrooms
     case 'Galarica Twig':
-      return Item.GalaricaTwig;
+      return Item.GalaricaTwig
     case 'Galarica Cuff':
-      return Item.GalaricaCuff;
+      return Item.GalaricaCuff
     case 'Style Card':
-      return Item.StyleCard;
+      return Item.StyleCard
     case 'Armor Pass':
-      return Item.ArmorPass;
+      return Item.ArmorPass
     case 'Exp. Charm':
-      return Item.ExpCharm;
+      return Item.ExpCharm
     case 'Armorite Ore':
-      return Item.ArmoriteOre;
+      return Item.ArmoriteOre
     case 'Mark Charm':
-      return Item.MarkCharm;
+      return Item.MarkCharm
     case 'Reins of Unity':
-      return Item.ReinsOfUnity;
+      return Item.ReinsOfUnity
     case 'Galarica Wreath':
-      return Item.GalaricaWreath;
+      return Item.GalaricaWreath
     case 'Legendary Clue 1':
-      return Item.LegendaryClue1;
+      return Item.LegendaryClue1
     case 'Legendary Clue 2':
-      return Item.LegendaryClue2;
+      return Item.LegendaryClue2
     case 'Legendary Clue 3':
-      return Item.LegendaryClue3;
+      return Item.LegendaryClue3
     case 'Legendary Clue?':
-      return Item.LegendaryClue;
+      return Item.LegendaryClue
     case 'Crown Pass':
-      return Item.CrownPass;
+      return Item.CrownPass
     case 'Wooden Crown':
-      return Item.WoodenCrown;
+      return Item.WoodenCrown
     case 'Radiant Petal':
-      return Item.RadiantPetal;
+      return Item.RadiantPetal
     case 'White Mane Hair':
-      return Item.WhiteManeHair;
+      return Item.WhiteManeHair
     case 'Black Mane Hair':
-      return Item.BlackManeHair;
+      return Item.BlackManeHair
     case 'Iceroot Carrot':
-      return Item.IcerootCarrot;
+      return Item.IcerootCarrot
     case 'Shaderoot Carrot':
-      return Item.ShaderootCarrot;
+      return Item.ShaderootCarrot
     case 'Dynite Ore':
-      return Item.DyniteOre;
+      return Item.DyniteOre
     case 'Carrot Seeds':
-      return Item.CarrotSeeds;
+      return Item.CarrotSeeds
     case 'Ability Patch':
-      return Item.AbilityPatch;
+      return Item.AbilityPatch
     case 'Time Balm':
-      return Item.TimeBalm;
+      return Item.TimeBalm
     case 'Space Balm':
-      return Item.SpaceBalm;
+      return Item.SpaceBalm
     case 'Mysterious Balm':
-      return Item.MysteriousBalm;
+      return Item.MysteriousBalm
     case 'Linking Cord':
-      return Item.LinkingCord;
+      return Item.LinkingCord
     case 'Hometown Muffin':
-      return Item.HometownMuffin;
+      return Item.HometownMuffin
     case 'Apricorn':
-      return Item.Apricorn;
+      return Item.Apricorn
     case 'Jubilife Muffin':
-      return Item.JubilifeMuffin;
+      return Item.JubilifeMuffin
     case 'Aux Powerguard':
-      return Item.AuxPowerguard;
+      return Item.AuxPowerguard
     case 'Choice Dumpling':
-      return Item.ChoiceDumpling;
+      return Item.ChoiceDumpling
     case 'Twice-Spiced Radish':
-      return Item.TwiceSpicedRadish;
+      return Item.TwiceSpicedRadish
     case 'Swap Snack':
-      return Item.SwapSnack;
+      return Item.SwapSnack
     case 'Caster Fern':
-      return Item.CasterFern;
+      return Item.CasterFern
     case 'Seed of Mastery':
-      return Item.SeedOfMastery;
+      return Item.SeedOfMastery
     case 'Eternal Ice':
-      return Item.EternalIce;
+      return Item.EternalIce
     case 'Uxie\u2019s Claw':
-      return Item.UxiesClaw;
+      return Item.UxiesClaw
     case 'Azelf\u2019s Fang':
-      return Item.AzelfsFang;
+      return Item.AzelfsFang
     case 'Mesprit\u2019s Plume':
-      return Item.MespritsPlume;
+      return Item.MespritsPlume
     case 'Tumblestone':
-      return Item.Tumblestone;
+      return Item.Tumblestone
     case 'Celestica Flute':
-      return Item.CelesticaFlute;
+      return Item.CelesticaFlute
     case 'Remedy':
-      return Item.Remedy;
+      return Item.Remedy
     case 'Fine Remedy':
-      return Item.FineRemedy;
+      return Item.FineRemedy
     case 'Dazzling Honey':
-      return Item.DazzlingHoney;
+      return Item.DazzlingHoney
     case 'Hearty Grains':
-      return Item.HeartyGrains;
+      return Item.HeartyGrains
     case 'Plump Beans':
-      return Item.PlumpBeans;
+      return Item.PlumpBeans
     case 'Springy Mushroom':
-      return Item.SpringyMushroom;
+      return Item.SpringyMushroom
     case 'Crunchy Salt':
-      return Item.CrunchySalt;
+      return Item.CrunchySalt
     case 'Wood':
-      return Item.Wood;
+      return Item.Wood
     case 'King\u2019s Leaf':
-      return Item.KingsLeaf;
+      return Item.KingsLeaf
     case 'Marsh Balm':
-      return Item.MarshBalm;
+      return Item.MarshBalm
     case 'Feather Ball':
-      return Item.FeatherBall;
+      return Item.FeatherBall
     case 'Pok\u00E9shi Doll':
-      return Item.PokeshiDoll;
+      return Item.PokeshiDoll
     case 'Smoke Bomb':
-      return Item.SmokeBomb;
+      return Item.SmokeBomb
     case 'Scatter Bang':
-      return Item.ScatterBang;
+      return Item.ScatterBang
     case 'Sticky Glob':
-      return Item.StickyGlob;
+      return Item.StickyGlob
     case 'Mushroom Cake':
-      return Item.MushroomCake;
+      return Item.MushroomCake
     case 'Bugwort':
-      return Item.Bugwort;
+      return Item.Bugwort
     case 'Honey Cake':
-      return Item.HoneyCake;
+      return Item.HoneyCake
     case 'Grain Cake':
-      return Item.GrainCake;
+      return Item.GrainCake
     case 'Bean Cake':
-      return Item.BeanCake;
+      return Item.BeanCake
     case 'Salt Cake':
-      return Item.SaltCake;
+      return Item.SaltCake
     case 'Superb Remedy':
-      return Item.SuperbRemedy;
+      return Item.SuperbRemedy
     case 'Stealth Spray':
-      return Item.StealthSpray;
+      return Item.StealthSpray
     case 'Aux Power':
-      return Item.AuxPower;
+      return Item.AuxPower
     case 'Aux Guard':
-      return Item.AuxGuard;
+      return Item.AuxGuard
     case 'Aux Evasion':
-      return Item.AuxEvasion;
+      return Item.AuxEvasion
     case 'Forest Balm':
-      return Item.ForestBalm;
+      return Item.ForestBalm
     case 'Iron Chunk':
-      return Item.IronChunk;
+      return Item.IronChunk
     case 'Black Tumblestone':
-      return Item.BlackTumblestone;
+      return Item.BlackTumblestone
     case 'Sky Tumblestone':
-      return Item.SkyTumblestone;
+      return Item.SkyTumblestone
     case 'Ball of Mud':
-      return Item.BallOfMud;
+      return Item.BallOfMud
     case 'Pop Pod':
-      return Item.PopPod;
+      return Item.PopPod
     case 'Sootfoot Root':
-      return Item.SootfootRoot;
+      return Item.SootfootRoot
     case 'Spoiled Apricorn':
-      return Item.SpoiledApricorn;
+      return Item.SpoiledApricorn
     case 'Black Augurite':
-      return Item.BlackAugurite;
+      return Item.BlackAugurite
     case 'Peat Block':
-      return Item.PeatBlock;
+      return Item.PeatBlock
     case 'Medicinal Leek':
-      return Item.MedicinalLeek;
+      return Item.MedicinalLeek
     case 'Vivichoke':
-      return Item.Vivichoke;
+      return Item.Vivichoke
     case 'Pep-Up Plant':
-      return Item.PepUpPlant;
+      return Item.PepUpPlant
     case 'Tempting Charm B':
-      return Item.TemptingCharmB;
+      return Item.TemptingCharmB
     case 'Tempting Charm P':
-      return Item.TemptingCharmP;
+      return Item.TemptingCharmP
     case 'Swordcap':
-      return Item.Swordcap;
+      return Item.Swordcap
     case 'Iron Barktongue':
-      return Item.IronBarktongue;
+      return Item.IronBarktongue
     case 'Doppel Bonnets':
-      return Item.DoppelBonnets;
+      return Item.DoppelBonnets
     case 'Direshroom':
-      return Item.Direshroom;
+      return Item.Direshroom
     case 'Sand Radish':
-      return Item.SandRadish;
+      return Item.SandRadish
     case 'Tempting Charm T':
-      return Item.TemptingCharmT;
+      return Item.TemptingCharmT
     case 'Tempting Charm Y':
-      return Item.TemptingCharmY;
+      return Item.TemptingCharmY
     case 'Candy Truffle':
-      return Item.CandyTruffle;
+      return Item.CandyTruffle
     case 'Cake-Lure Base':
-      return Item.CakeLureBase;
+      return Item.CakeLureBase
     case 'Volcano Balm':
-      return Item.VolcanoBalm;
+      return Item.VolcanoBalm
     case 'Mountain Balm':
-      return Item.MountainBalm;
+      return Item.MountainBalm
     case 'Snow Balm':
-      return Item.SnowBalm;
+      return Item.SnowBalm
     case 'Survival Charm R':
-      return Item.SurvivalCharmR;
+      return Item.SurvivalCharmR
     case 'Survival Charm B':
-      return Item.SurvivalCharmB;
+      return Item.SurvivalCharmB
     case 'Survival Charm P':
-      return Item.SurvivalCharmP;
+      return Item.SurvivalCharmP
     case 'Survival Charm T':
-      return Item.SurvivalCharmT;
+      return Item.SurvivalCharmT
     case 'Survival Charm Y':
-      return Item.SurvivalCharmY;
+      return Item.SurvivalCharmY
     case 'Torn Journal':
-      return Item.TornJournal;
+      return Item.TornJournal
     case 'Warding Charm R':
-      return Item.WardingCharmR;
+      return Item.WardingCharmR
     case 'Warding Charm B':
-      return Item.WardingCharmB;
+      return Item.WardingCharmB
     case 'Warding Charm P':
-      return Item.WardingCharmP;
+      return Item.WardingCharmP
     case 'Warding Charm T':
-      return Item.WardingCharmT;
+      return Item.WardingCharmT
     case 'Warding Charm Y':
-      return Item.WardingCharmY;
+      return Item.WardingCharmY
     case 'Wall Fragment':
-      return Item.WallFragment;
+      return Item.WallFragment
     case 'Basculegion Food':
-      return Item.BasculegionFood;
+      return Item.BasculegionFood
     case 'Old Journal':
-      return Item.OldJournal;
+      return Item.OldJournal
     case 'Wing Ball':
-      return Item.WingBall;
+      return Item.WingBall
     case 'Jet Ball':
-      return Item.JetBall;
+      return Item.JetBall
     case 'Leaden Ball':
-      return Item.LeadenBall;
+      return Item.LeadenBall
     case 'Gigaton Ball':
-      return Item.GigatonBall;
+      return Item.GigatonBall
     case 'Hopo Berry':
-      return Item.HopoBerry;
+      return Item.HopoBerry
     case 'Grit Dust':
-      return Item.GritDust;
+      return Item.GritDust
     case 'Grit Gravel':
-      return Item.GritGravel;
+      return Item.GritGravel
     case 'Grit Pebble':
-      return Item.GritPebble;
+      return Item.GritPebble
     case 'Grit Rock':
-      return Item.GritRock;
+      return Item.GritRock
     case 'Tempting Charm R':
-      return Item.TemptingCharmR;
+      return Item.TemptingCharmR
     case 'Lost Satchel':
-      return Item.LostSatchel;
+      return Item.LostSatchel
     case 'Origin Ball':
-      return Item.OriginBall;
+      return Item.OriginBall
     case 'Origin Ore':
-      return Item.OriginOre;
+      return Item.OriginOre
     case 'Adamant Crystal':
-      return Item.AdamantCrystal;
+      return Item.AdamantCrystal
     case 'Lustrous Globe':
-      return Item.LustrousGlobe;
+      return Item.LustrousGlobe
     case 'Griseous Core':
-      return Item.GriseousCore;
+      return Item.GriseousCore
     case 'Blank Plate':
-      return Item.BlankPlate;
+      return Item.BlankPlate
     case 'Crafting Kit':
-      return Item.CraftingKit;
+      return Item.CraftingKit
     case 'Strange Ball':
-      return Item.StrangeBall;
+      return Item.StrangeBall
     case 'Pok\u00E9dex':
-      return Item.Pokedex;
+      return Item.Pokedex
     case 'Old Verse 1':
-      return Item.OldVerse1;
+      return Item.OldVerse1
     case 'Old Verse 2':
-      return Item.OldVerse2;
+      return Item.OldVerse2
     case 'Old Verse 3':
-      return Item.OldVerse3;
+      return Item.OldVerse3
     case 'Old Verse 4':
-      return Item.OldVerse4;
+      return Item.OldVerse4
     case 'Old Verse 5':
-      return Item.OldVerse5;
+      return Item.OldVerse5
     case 'Old Verse 6':
-      return Item.OldVerse6;
+      return Item.OldVerse6
     case 'Old Verse 7':
-      return Item.OldVerse7;
+      return Item.OldVerse7
     case 'Old Verse 8':
-      return Item.OldVerse8;
+      return Item.OldVerse8
     case 'Old Verse 9':
-      return Item.OldVerse9;
+      return Item.OldVerse9
     case 'Old Verse 10':
-      return Item.OldVerse10;
+      return Item.OldVerse10
     case 'Old Verse 11':
-      return Item.OldVerse11;
+      return Item.OldVerse11
     case 'Old Verse 12':
-      return Item.OldVerse12;
+      return Item.OldVerse12
     case 'Old Verse 13':
-      return Item.OldVerse13;
+      return Item.OldVerse13
     case 'Old Verse 14':
-      return Item.OldVerse14;
+      return Item.OldVerse14
     case 'Old Verse 15':
-      return Item.OldVerse15;
+      return Item.OldVerse15
     case 'Old Verse 16':
-      return Item.OldVerse16;
+      return Item.OldVerse16
     case 'Old Verse 17':
-      return Item.OldVerse17;
+      return Item.OldVerse17
     case 'Old Verse 18':
-      return Item.OldVerse18;
+      return Item.OldVerse18
     case 'Old Verse 19':
-      return Item.OldVerse19;
+      return Item.OldVerse19
     case 'Old Verse 20':
-      return Item.OldVerse20;
+      return Item.OldVerse20
     case 'Mysterious Shard S':
-      return Item.MysteriousShardS;
+      return Item.MysteriousShardS
     case 'Mysterious Shard L':
-      return Item.MysteriousShardL;
+      return Item.MysteriousShardL
     case 'Digger Drill':
-      return Item.DiggerDrill;
+      return Item.DiggerDrill
     case 'Kanto Slate':
-      return Item.KantoSlate;
+      return Item.KantoSlate
     case 'Johto Slate':
-      return Item.JohtoSlate;
+      return Item.JohtoSlate
     case 'Soul Slate':
-      return Item.SoulSlate;
+      return Item.SoulSlate
     case 'Rainbow Slate':
-      return Item.RainbowSlate;
+      return Item.RainbowSlate
     case 'Squall Slate':
-      return Item.SquallSlate;
+      return Item.SquallSlate
     case 'Oceanic Slate':
-      return Item.OceanicSlate;
+      return Item.OceanicSlate
     case 'Tectonic Slate':
-      return Item.TectonicSlate;
+      return Item.TectonicSlate
     case 'Stratospheric Slate':
-      return Item.StratosphericSlate;
+      return Item.StratosphericSlate
     case 'Genome Slate':
-      return Item.GenomeSlate;
+      return Item.GenomeSlate
     case 'Discovery Slate':
-      return Item.DiscoverySlate;
+      return Item.DiscoverySlate
     case 'Distortion Slate':
-      return Item.DistortionSlate;
+      return Item.DistortionSlate
     case 'DS Sounds':
-      return Item.DSSounds;
+      return Item.DSSounds
     case 'Legend Plate':
-      return Item.LegendPlate;
+      return Item.LegendPlate
     case 'Rotom Phone':
-      return Item.RotomPhone;
+      return Item.RotomPhone
     case 'Sandwich':
-      return Item.Sandwich;
+      return Item.Sandwich
     case 'Koraidon\u2019s Pok\u00E9 Ball':
-      return Item.KoraidonsPokeBall;
+      return Item.KoraidonsPokeBall
     case 'Miraidon\u2019s Pok\u00E9 Ball':
-      return Item.MiraidonsPokeBall;
+      return Item.MiraidonsPokeBall
     case 'Tera Orb':
-      return Item.TeraOrb;
+      return Item.TeraOrb
     case 'Scarlet Book':
-      return Item.ScarletBook;
+      return Item.ScarletBook
     case 'Violet Book':
-      return Item.VioletBook;
+      return Item.VioletBook
     case 'Kofu\u2019s Wallet':
-      return Item.KofusWallet;
+      return Item.KofusWallet
     case 'Tiny Bamboo Shoot':
-      return Item.TinyBambooShoot;
+      return Item.TinyBambooShoot
     case 'Big Bamboo Shoot':
-      return Item.BigBambooShoot;
+      return Item.BigBambooShoot
     case 'Scroll of Darkness':
-      return Item.ScrollOfDarkness;
+      return Item.ScrollOfDarkness
     case 'Scroll of Waters':
-      return Item.ScrollOfWaters;
+      return Item.ScrollOfWaters
     case 'Malicious Armor':
-      return Item.MaliciousArmor;
+      return Item.MaliciousArmor
     case 'Normal Tera Shard':
-      return Item.NormalTeraShard;
+      return Item.NormalTeraShard
     case 'Fire Tera Shard':
-      return Item.FireTeraShard;
+      return Item.FireTeraShard
     case 'Water Tera Shard':
-      return Item.WaterTeraShard;
+      return Item.WaterTeraShard
     case 'Electric Tera Shard':
-      return Item.ElectricTeraShard;
+      return Item.ElectricTeraShard
     case 'Grass Tera Shard':
-      return Item.GrassTeraShard;
+      return Item.GrassTeraShard
     case 'Ice Tera Shard':
-      return Item.IceTeraShard;
+      return Item.IceTeraShard
     case 'Fighting Tera Shard':
-      return Item.FightingTeraShard;
+      return Item.FightingTeraShard
     case 'Poison Tera Shard':
-      return Item.PoisonTeraShard;
+      return Item.PoisonTeraShard
     case 'Ground Tera Shard':
-      return Item.GroundTeraShard;
+      return Item.GroundTeraShard
     case 'Flying Tera Shard':
-      return Item.FlyingTeraShard;
+      return Item.FlyingTeraShard
     case 'Psychic Tera Shard':
-      return Item.PsychicTeraShard;
+      return Item.PsychicTeraShard
     case 'Bug Tera Shard':
-      return Item.BugTeraShard;
+      return Item.BugTeraShard
     case 'Rock Tera Shard':
-      return Item.RockTeraShard;
+      return Item.RockTeraShard
     case 'Ghost Tera Shard':
-      return Item.GhostTeraShard;
+      return Item.GhostTeraShard
     case 'Dragon Tera Shard':
-      return Item.DragonTeraShard;
+      return Item.DragonTeraShard
     case 'Dark Tera Shard':
-      return Item.DarkTeraShard;
+      return Item.DarkTeraShard
     case 'Steel Tera Shard':
-      return Item.SteelTeraShard;
+      return Item.SteelTeraShard
     case 'Fairy Tera Shard':
-      return Item.FairyTeraShard;
+      return Item.FairyTeraShard
     case 'Booster Energy':
-      return Item.BoosterEnergy;
+      return Item.BoosterEnergy
     case 'Ability Shield':
-      return Item.AbilityShield;
+      return Item.AbilityShield
     case 'Clear Amulet':
-      return Item.ClearAmulet;
+      return Item.ClearAmulet
     case 'Mirror Herb':
-      return Item.MirrorHerb;
+      return Item.MirrorHerb
     case 'Punching Glove':
-      return Item.PunchingGlove;
+      return Item.PunchingGlove
     case 'Covert Cloak':
-      return Item.CovertCloak;
+      return Item.CovertCloak
     case 'Loaded Dice':
-      return Item.LoadedDice;
+      return Item.LoadedDice
     case 'Baguette':
-      return Item.Baguette;
+      return Item.Baguette
     case 'Mayonnaise':
-      return Item.Mayonnaise;
+      return Item.Mayonnaise
     case 'Ketchup':
-      return Item.Ketchup;
+      return Item.Ketchup
     case 'Mustard':
-      return Item.Mustard;
+      return Item.Mustard
     case 'Butter':
-      return Item.Butter;
+      return Item.Butter
     case 'Peanut Butter':
-      return Item.PeanutButter;
+      return Item.PeanutButter
     case 'Chili Sauce':
-      return Item.ChiliSauce;
+      return Item.ChiliSauce
     case 'Salt':
-      return Item.Salt;
+      return Item.Salt
     case 'Pepper':
-      return Item.Pepper;
+      return Item.Pepper
     case 'Yogurt':
-      return Item.Yogurt;
+      return Item.Yogurt
     case 'Whipped Cream':
-      return Item.WhippedCream;
+      return Item.WhippedCream
     case 'Cream Cheese':
-      return Item.CreamCheese;
+      return Item.CreamCheese
     case 'Jam':
-      return Item.Jam;
+      return Item.Jam
     case 'Marmalade':
-      return Item.Marmalade;
+      return Item.Marmalade
     case 'Olive Oil':
-      return Item.OliveOil;
+      return Item.OliveOil
     case 'Vinegar':
-      return Item.Vinegar;
+      return Item.Vinegar
     case 'Sweet Herba Mystica':
-      return Item.SweetHerbaMystica;
+      return Item.SweetHerbaMystica
     case 'Salty Herba Mystica':
-      return Item.SaltyHerbaMystica;
+      return Item.SaltyHerbaMystica
     case 'Sour Herba Mystica':
-      return Item.SourHerbaMystica;
+      return Item.SourHerbaMystica
     case 'Bitter Herba Mystica':
-      return Item.BitterHerbaMystica;
+      return Item.BitterHerbaMystica
     case 'Spicy Herba Mystica':
-      return Item.SpicyHerbaMystica;
+      return Item.SpicyHerbaMystica
     case 'Lettuce':
-      return Item.Lettuce;
+      return Item.Lettuce
     case 'Tomato':
-      return Item.Tomato;
+      return Item.Tomato
     case 'Cherry Tomatoes':
-      return Item.CherryTomatoes;
+      return Item.CherryTomatoes
     case 'Cucumber':
-      return Item.Cucumber;
+      return Item.Cucumber
     case 'Pickle':
-      return Item.Pickle;
+      return Item.Pickle
     case 'Onion':
-      return Item.Onion;
+      return Item.Onion
     case 'Red Onion':
-      return Item.RedOnion;
+      return Item.RedOnion
     case 'Green Bell Pepper':
-      return Item.GreenBellPepper;
+      return Item.GreenBellPepper
     case 'Red Bell Pepper':
-      return Item.RedBellPepper;
+      return Item.RedBellPepper
     case 'Yellow Bell Pepper':
-      return Item.YellowBellPepper;
+      return Item.YellowBellPepper
     case 'Avocado':
-      return Item.Avocado;
+      return Item.Avocado
     case 'Bacon':
-      return Item.Bacon;
+      return Item.Bacon
     case 'Ham':
-      return Item.Ham;
+      return Item.Ham
     case 'Prosciutto':
-      return Item.Prosciutto;
+      return Item.Prosciutto
     case 'Chorizo':
-      return Item.Chorizo;
+      return Item.Chorizo
     case 'Herbed Sausage':
-      return Item.HerbedSausage;
+      return Item.HerbedSausage
     case 'Hamburger':
-      return Item.Hamburger;
+      return Item.Hamburger
     case 'Klawf Stick':
-      return Item.KlawfStick;
+      return Item.KlawfStick
     case 'Smoked Fillet':
-      return Item.SmokedFillet;
+      return Item.SmokedFillet
     case 'Fried Fillet':
-      return Item.FriedFillet;
+      return Item.FriedFillet
     case 'Egg':
-      return Item.Egg;
+      return Item.Egg
     case 'Potato Tortilla':
-      return Item.PotatoTortilla;
+      return Item.PotatoTortilla
     case 'Tofu':
-      return Item.Tofu;
+      return Item.Tofu
     case 'Rice':
-      return Item.Rice;
+      return Item.Rice
     case 'Noodles':
-      return Item.Noodles;
+      return Item.Noodles
     case 'Potato Salad':
-      return Item.PotatoSalad;
+      return Item.PotatoSalad
     case 'Cheese':
-      return Item.Cheese;
+      return Item.Cheese
     case 'Banana':
-      return Item.Banana;
+      return Item.Banana
     case 'Strawberry':
-      return Item.Strawberry;
+      return Item.Strawberry
     case 'Apple':
-      return Item.Apple;
+      return Item.Apple
     case 'Kiwi':
-      return Item.Kiwi;
+      return Item.Kiwi
     case 'Pineapple':
-      return Item.Pineapple;
+      return Item.Pineapple
     case 'Jalape\u00F1o':
-      return Item.Jalapeno;
+      return Item.Jalapeno
     case 'Horseradish':
-      return Item.Horseradish;
+      return Item.Horseradish
     case 'Curry Powder':
-      return Item.CurryPowder;
+      return Item.CurryPowder
     case 'Wasabi':
-      return Item.Wasabi;
+      return Item.Wasabi
     case 'Watercress':
-      return Item.Watercress;
+      return Item.Watercress
     case 'Basil':
-      return Item.Basil;
+      return Item.Basil
     case 'Venonat Fang':
-      return Item.VenonatFang;
+      return Item.VenonatFang
     case 'Diglett Dirt':
-      return Item.DiglettDirt;
+      return Item.DiglettDirt
     case 'Meowth Fur':
-      return Item.MeowthFur;
+      return Item.MeowthFur
     case 'Psyduck Down':
-      return Item.PsyduckDown;
+      return Item.PsyduckDown
     case 'Mankey Fur':
-      return Item.MankeyFur;
+      return Item.MankeyFur
     case 'Growlithe Fur':
-      return Item.GrowlitheFur;
+      return Item.GrowlitheFur
     case 'Slowpoke Claw':
-      return Item.SlowpokeClaw;
+      return Item.SlowpokeClaw
     case 'Magnemite Screw':
-      return Item.MagnemiteScrew;
+      return Item.MagnemiteScrew
     case 'Grimer Toxin':
-      return Item.GrimerToxin;
+      return Item.GrimerToxin
     case 'Shellder Pearl':
-      return Item.ShellderPearl;
+      return Item.ShellderPearl
     case 'Gastly Gas':
-      return Item.GastlyGas;
+      return Item.GastlyGas
     case 'Drowzee Fur':
-      return Item.DrowzeeFur;
+      return Item.DrowzeeFur
     case 'Voltorb Sparks':
-      return Item.VoltorbSparks;
+      return Item.VoltorbSparks
     case 'Scyther Claw':
-      return Item.ScytherClaw;
+      return Item.ScytherClaw
     case 'Tauros Hair':
-      return Item.TaurosHair;
+      return Item.TaurosHair
     case 'Magikarp Scales':
-      return Item.MagikarpScales;
+      return Item.MagikarpScales
     case 'Ditto Goo':
-      return Item.DittoGoo;
+      return Item.DittoGoo
     case 'Eevee Fur':
-      return Item.EeveeFur;
+      return Item.EeveeFur
     case 'Dratini Scales':
-      return Item.DratiniScales;
+      return Item.DratiniScales
     case 'Pichu Fur':
-      return Item.PichuFur;
+      return Item.PichuFur
     case 'Igglybuff Fluff':
-      return Item.IgglybuffFluff;
+      return Item.IgglybuffFluff
     case 'Mareep Wool':
-      return Item.MareepWool;
+      return Item.MareepWool
     case 'Hoppip Leaf':
-      return Item.HoppipLeaf;
+      return Item.HoppipLeaf
     case 'Sunkern Leaf':
-      return Item.SunkernLeaf;
+      return Item.SunkernLeaf
     case 'Murkrow Bauble':
-      return Item.MurkrowBauble;
+      return Item.MurkrowBauble
     case 'Misdreavus Tears':
-      return Item.MisdreavusTears;
+      return Item.MisdreavusTears
     case 'Girafarig Fur':
-      return Item.GirafarigFur;
+      return Item.GirafarigFur
     case 'Pineco Husk':
-      return Item.PinecoHusk;
+      return Item.PinecoHusk
     case 'Dunsparce Scales':
-      return Item.DunsparceScales;
+      return Item.DunsparceScales
     case 'Qwilfish Spines':
-      return Item.QwilfishSpines;
+      return Item.QwilfishSpines
     case 'Heracross Claw':
-      return Item.HeracrossClaw;
+      return Item.HeracrossClaw
     case 'Sneasel Claw':
-      return Item.SneaselClaw;
+      return Item.SneaselClaw
     case 'Teddiursa Claw':
-      return Item.TeddiursaClaw;
+      return Item.TeddiursaClaw
     case 'Delibird Parcel':
-      return Item.DelibirdParcel;
+      return Item.DelibirdParcel
     case 'Houndour Fang':
-      return Item.HoundourFang;
+      return Item.HoundourFang
     case 'Phanpy Nail':
-      return Item.PhanpyNail;
+      return Item.PhanpyNail
     case 'Stantler Hair':
-      return Item.StantlerHair;
+      return Item.StantlerHair
     case 'Larvitar Claw':
-      return Item.LarvitarClaw;
+      return Item.LarvitarClaw
     case 'Wingull Feather':
-      return Item.WingullFeather;
+      return Item.WingullFeather
     case 'Ralts Dust':
-      return Item.RaltsDust;
+      return Item.RaltsDust
     case 'Surskit Syrup':
-      return Item.SurskitSyrup;
+      return Item.SurskitSyrup
     case 'Shroomish Spores':
-      return Item.ShroomishSpores;
+      return Item.ShroomishSpores
     case 'Slakoth Fur':
-      return Item.SlakothFur;
+      return Item.SlakothFur
     case 'Makuhita Sweat':
-      return Item.MakuhitaSweat;
+      return Item.MakuhitaSweat
     case 'Azurill Fur':
-      return Item.AzurillFur;
+      return Item.AzurillFur
     case 'Sableye Gem':
-      return Item.SableyeGem;
+      return Item.SableyeGem
     case 'Meditite Sweat':
-      return Item.MedititeSweat;
+      return Item.MedititeSweat
     case 'Gulpin Mucus':
-      return Item.GulpinMucus;
+      return Item.GulpinMucus
     case 'Numel Lava':
-      return Item.NumelLava;
+      return Item.NumelLava
     case 'Torkoal Coal':
-      return Item.TorkoalCoal;
+      return Item.TorkoalCoal
     case 'Spoink Pearl':
-      return Item.SpoinkPearl;
+      return Item.SpoinkPearl
     case 'Cacnea Needle':
-      return Item.CacneaNeedle;
+      return Item.CacneaNeedle
     case 'Swablu Fluff':
-      return Item.SwabluFluff;
+      return Item.SwabluFluff
     case 'Zangoose Claw':
-      return Item.ZangooseClaw;
+      return Item.ZangooseClaw
     case 'Seviper Fang':
-      return Item.SeviperFang;
+      return Item.SeviperFang
     case 'Barboach Slime':
-      return Item.BarboachSlime;
+      return Item.BarboachSlime
     case 'Shuppet Scrap':
-      return Item.ShuppetScrap;
+      return Item.ShuppetScrap
     case 'Tropius Leaf':
-      return Item.TropiusLeaf;
+      return Item.TropiusLeaf
     case 'Snorunt Fur':
-      return Item.SnoruntFur;
+      return Item.SnoruntFur
     case 'Luvdisc Scales':
-      return Item.LuvdiscScales;
+      return Item.LuvdiscScales
     case 'Bagon Scales':
-      return Item.BagonScales;
+      return Item.BagonScales
     case 'Starly Feather':
-      return Item.StarlyFeather;
+      return Item.StarlyFeather
     case 'Kricketot Shell':
-      return Item.KricketotShell;
+      return Item.KricketotShell
     case 'Shinx Fang':
-      return Item.ShinxFang;
+      return Item.ShinxFang
     case 'Combee Honey':
-      return Item.CombeeHoney;
+      return Item.CombeeHoney
     case 'Pachirisu Fur':
-      return Item.PachirisuFur;
+      return Item.PachirisuFur
     case 'Buizel Fur':
-      return Item.BuizelFur;
+      return Item.BuizelFur
     case 'Shellos Mucus':
-      return Item.ShellosMucus;
+      return Item.ShellosMucus
     case 'Drifloon Gas':
-      return Item.DrifloonGas;
+      return Item.DrifloonGas
     case 'Stunky Fur':
-      return Item.StunkyFur;
+      return Item.StunkyFur
     case 'Bronzor Fragment':
-      return Item.BronzorFragment;
+      return Item.BronzorFragment
     case 'Bonsly Tears':
-      return Item.BonslyTears;
+      return Item.BonslyTears
     case 'Happiny Dust':
-      return Item.HappinyDust;
+      return Item.HappinyDust
     case 'Spiritomb Fragment':
-      return Item.SpiritombFragment;
+      return Item.SpiritombFragment
     case 'Gible Scales':
-      return Item.GibleScales;
+      return Item.GibleScales
     case 'Riolu Fur':
-      return Item.RioluFur;
+      return Item.RioluFur
     case 'Hippopotas Sand':
-      return Item.HippopotasSand;
+      return Item.HippopotasSand
     case 'Croagunk Poison':
-      return Item.CroagunkPoison;
+      return Item.CroagunkPoison
     case 'Finneon Scales':
-      return Item.FinneonScales;
+      return Item.FinneonScales
     case 'Snover Berries':
-      return Item.SnoverBerries;
+      return Item.SnoverBerries
     case 'Rotom Sparks':
-      return Item.RotomSparks;
+      return Item.RotomSparks
     case 'Petilil Leaf':
-      return Item.PetililLeaf;
+      return Item.PetililLeaf
     case 'Basculin Fang':
-      return Item.BasculinFang;
+      return Item.BasculinFang
     case 'Sandile Claw':
-      return Item.SandileClaw;
+      return Item.SandileClaw
     case 'Zorua Fur':
-      return Item.ZoruaFur;
+      return Item.ZoruaFur
     case 'Gothita Eyelash':
-      return Item.GothitaEyelash;
+      return Item.GothitaEyelash
     case 'Deerling Hair':
-      return Item.DeerlingHair;
+      return Item.DeerlingHair
     case 'Foongus Spores':
-      return Item.FoongusSpores;
+      return Item.FoongusSpores
     case 'Alomomola Mucus':
-      return Item.AlomomolaMucus;
+      return Item.AlomomolaMucus
     case 'Tynamo Slime':
-      return Item.TynamoSlime;
+      return Item.TynamoSlime
     case 'Axew Scales':
-      return Item.AxewScales;
+      return Item.AxewScales
     case 'Cubchoo Fur':
-      return Item.CubchooFur;
+      return Item.CubchooFur
     case 'Cryogonal Ice':
-      return Item.CryogonalIce;
+      return Item.CryogonalIce
     case 'Pawniard Blade':
-      return Item.PawniardBlade;
+      return Item.PawniardBlade
     case 'Rufflet Feather':
-      return Item.RuffletFeather;
+      return Item.RuffletFeather
     case 'Deino Scales':
-      return Item.DeinoScales;
+      return Item.DeinoScales
     case 'Larvesta Fuzz':
-      return Item.LarvestaFuzz;
+      return Item.LarvestaFuzz
     case 'Fletchling Feather':
-      return Item.FletchlingFeather;
+      return Item.FletchlingFeather
     case 'Scatterbug Powder':
-      return Item.ScatterbugPowder;
+      return Item.ScatterbugPowder
     case 'Litleo Tuft':
-      return Item.LitleoTuft;
+      return Item.LitleoTuft
     case 'Flab\u00E9b\u00E9 Pollen':
-      return Item.FlabebePollen;
+      return Item.FlabebePollen
     case 'Skiddo Leaf':
-      return Item.SkiddoLeaf;
+      return Item.SkiddoLeaf
     case 'Skrelp Kelp':
-      return Item.SkrelpKelp;
+      return Item.SkrelpKelp
     case 'Clauncher Claw':
-      return Item.ClauncherClaw;
+      return Item.ClauncherClaw
     case 'Hawlucha Down':
-      return Item.HawluchaDown;
+      return Item.HawluchaDown
     case 'Dedenne Fur':
-      return Item.DedenneFur;
+      return Item.DedenneFur
     case 'Goomy Goo':
-      return Item.GoomyGoo;
+      return Item.GoomyGoo
     case 'Klefki Key':
-      return Item.KlefkiKey;
+      return Item.KlefkiKey
     case 'Bergmite Ice':
-      return Item.BergmiteIce;
+      return Item.BergmiteIce
     case 'Noibat Fur':
-      return Item.NoibatFur;
+      return Item.NoibatFur
     case 'Yungoos Fur':
-      return Item.YungoosFur;
+      return Item.YungoosFur
     case 'Crabrawler Shell':
-      return Item.CrabrawlerShell;
+      return Item.CrabrawlerShell
     case 'Oricorio Feather':
-      return Item.OricorioFeather;
+      return Item.OricorioFeather
     case 'Rockruff Rock':
-      return Item.RockruffRock;
+      return Item.RockruffRock
     case 'Mareanie Spike':
-      return Item.MareanieSpike;
+      return Item.MareanieSpike
     case 'Mudbray Mud':
-      return Item.MudbrayMud;
+      return Item.MudbrayMud
     case 'Fomantis Leaf':
-      return Item.FomantisLeaf;
+      return Item.FomantisLeaf
     case 'Salandit Gas':
-      return Item.SalanditGas;
+      return Item.SalanditGas
     case 'Bounsweet Sweat':
-      return Item.BounsweetSweat;
+      return Item.BounsweetSweat
     case 'Oranguru Fur':
-      return Item.OranguruFur;
+      return Item.OranguruFur
     case 'Passimian Fur':
-      return Item.PassimianFur;
+      return Item.PassimianFur
     case 'Sandygast Sand':
-      return Item.SandygastSand;
+      return Item.SandygastSand
     case 'Komala Claw':
-      return Item.KomalaClaw;
+      return Item.KomalaClaw
     case 'Mimikyu Scrap':
-      return Item.MimikyuScrap;
+      return Item.MimikyuScrap
     case 'Bruxish Tooth':
-      return Item.BruxishTooth;
+      return Item.BruxishTooth
     case 'Chewtle Claw':
-      return Item.ChewtleClaw;
+      return Item.ChewtleClaw
     case 'Skwovet Fur':
-      return Item.SkwovetFur;
+      return Item.SkwovetFur
     case 'Arrokuda Scales':
-      return Item.ArrokudaScales;
+      return Item.ArrokudaScales
     case 'Rookidee Feather':
-      return Item.RookideeFeather;
+      return Item.RookideeFeather
     case 'Toxel Sparks':
-      return Item.ToxelSparks;
+      return Item.ToxelSparks
     case 'Falinks Sweat':
-      return Item.FalinksSweat;
+      return Item.FalinksSweat
     case 'Cufant Tarnish':
-      return Item.CufantTarnish;
+      return Item.CufantTarnish
     case 'Rolycoly Coal':
-      return Item.RolycolyCoal;
+      return Item.RolycolyCoal
     case 'Silicobra Sand':
-      return Item.SilicobraSand;
+      return Item.SilicobraSand
     case 'Indeedee Fur':
-      return Item.IndeedeeFur;
+      return Item.IndeedeeFur
     case 'Pincurchin Spines':
-      return Item.PincurchinSpines;
+      return Item.PincurchinSpines
     case 'Snom Thread':
-      return Item.SnomThread;
+      return Item.SnomThread
     case 'Impidimp Hair':
-      return Item.ImpidimpHair;
+      return Item.ImpidimpHair
     case 'Applin Juice':
-      return Item.ApplinJuice;
+      return Item.ApplinJuice
     case 'Sinistea Chip':
-      return Item.SinisteaChip;
+      return Item.SinisteaChip
     case 'Hatenna Dust':
-      return Item.HatennaDust;
+      return Item.HatennaDust
     case 'Stonjourner Stone':
-      return Item.StonjournerStone;
+      return Item.StonjournerStone
     case 'Eiscue Down':
-      return Item.EiscueDown;
+      return Item.EiscueDown
     case 'Dreepy Powder':
-      return Item.DreepyPowder;
+      return Item.DreepyPowder
     case 'Lechonk Hair':
-      return Item.LechonkHair;
+      return Item.LechonkHair
     case 'Tarountula Thread':
-      return Item.TarountulaThread;
+      return Item.TarountulaThread
     case 'Nymble Claw':
-      return Item.NymbleClaw;
+      return Item.NymbleClaw
     case 'Rellor Mud':
-      return Item.RellorMud;
+      return Item.RellorMud
     case 'Greavard Wax':
-      return Item.GreavardWax;
+      return Item.GreavardWax
     case 'Flittle Down':
-      return Item.FlittleDown;
+      return Item.FlittleDown
     case 'Wiglett Sand':
-      return Item.WiglettSand;
+      return Item.WiglettSand
     case 'Dondozo Whisker':
-      return Item.DondozoWhisker;
+      return Item.DondozoWhisker
     case 'Veluza Fillet':
-      return Item.VeluzaFillet;
+      return Item.VeluzaFillet
     case 'Finizen Mucus':
-      return Item.FinizenMucus;
+      return Item.FinizenMucus
     case 'Smoliv Oil':
-      return Item.SmolivOil;
+      return Item.SmolivOil
     case 'Capsakid Seed':
-      return Item.CapsakidSeed;
+      return Item.CapsakidSeed
     case 'Tadbulb Mucus':
-      return Item.TadbulbMucus;
+      return Item.TadbulbMucus
     case 'Varoom Fume':
-      return Item.VaroomFume;
+      return Item.VaroomFume
     case 'Orthworm Tarnish':
-      return Item.OrthwormTarnish;
+      return Item.OrthwormTarnish
     case 'Tandemaus Fur':
-      return Item.TandemausFur;
+      return Item.TandemausFur
     case 'Cetoddle Grease':
-      return Item.CetoddleGrease;
+      return Item.CetoddleGrease
     case 'Frigibax Scales':
-      return Item.FrigibaxScales;
+      return Item.FrigibaxScales
     case 'Tatsugiri Scales':
-      return Item.TatsugiriScales;
+      return Item.TatsugiriScales
     case 'Cyclizar Scales':
-      return Item.CyclizarScales;
+      return Item.CyclizarScales
     case 'Pawmi Fur':
-      return Item.PawmiFur;
+      return Item.PawmiFur
     case 'Wattrel Feather':
-      return Item.WattrelFeather;
+      return Item.WattrelFeather
     case 'Bombirdier Feather':
-      return Item.BombirdierFeather;
+      return Item.BombirdierFeather
     case 'Squawkabilly Feather':
-      return Item.SquawkabillyFeather;
+      return Item.SquawkabillyFeather
     case 'Flamigo Down':
-      return Item.FlamigoDown;
+      return Item.FlamigoDown
     case 'Klawf Claw':
-      return Item.KlawfClaw;
+      return Item.KlawfClaw
     case 'Nacli Salt':
-      return Item.NacliSalt;
+      return Item.NacliSalt
     case 'Glimmet Crystal':
-      return Item.GlimmetCrystal;
+      return Item.GlimmetCrystal
     case 'Shroodle Ink':
-      return Item.ShroodleInk;
+      return Item.ShroodleInk
     case 'Fidough Fur':
-      return Item.FidoughFur;
+      return Item.FidoughFur
     case 'Maschiff Fang':
-      return Item.MaschiffFang;
+      return Item.MaschiffFang
     case 'Bramblin Twig':
-      return Item.BramblinTwig;
+      return Item.BramblinTwig
     case 'Gimmighoul Coin':
-      return Item.GimmighoulCoin;
+      return Item.GimmighoulCoin
     case 'Tinkatink Hair':
-      return Item.TinkatinkHair;
+      return Item.TinkatinkHair
     case 'Charcadet Soot':
-      return Item.CharcadetSoot;
+      return Item.CharcadetSoot
     case 'Toedscool Flaps':
-      return Item.ToedscoolFlaps;
+      return Item.ToedscoolFlaps
     case 'Wooper Slime':
-      return Item.WooperSlime;
+      return Item.WooperSlime
     case 'TM101':
-      return Item.TM101;
+      return Item.TM101
     case 'TM102':
-      return Item.TM102;
+      return Item.TM102
     case 'TM103':
-      return Item.TM103;
+      return Item.TM103
     case 'TM104':
-      return Item.TM104;
+      return Item.TM104
     case 'TM105':
-      return Item.TM105;
+      return Item.TM105
     case 'TM106':
-      return Item.TM106;
+      return Item.TM106
     case 'TM107':
-      return Item.TM107;
+      return Item.TM107
     case 'TM108':
-      return Item.TM108;
+      return Item.TM108
     case 'TM109':
-      return Item.TM109;
+      return Item.TM109
     case 'TM110':
-      return Item.TM110;
+      return Item.TM110
     case 'TM111':
-      return Item.TM111;
+      return Item.TM111
     case 'TM112':
-      return Item.TM112;
+      return Item.TM112
     case 'TM113':
-      return Item.TM113;
+      return Item.TM113
     case 'TM114':
-      return Item.TM114;
+      return Item.TM114
     case 'TM115':
-      return Item.TM115;
+      return Item.TM115
     case 'TM116':
-      return Item.TM116;
+      return Item.TM116
     case 'TM117':
-      return Item.TM117;
+      return Item.TM117
     case 'TM118':
-      return Item.TM118;
+      return Item.TM118
     case 'TM119':
-      return Item.TM119;
+      return Item.TM119
     case 'TM120':
-      return Item.TM120;
+      return Item.TM120
     case 'TM121':
-      return Item.TM121;
+      return Item.TM121
     case 'TM122':
-      return Item.TM122;
+      return Item.TM122
     case 'TM123':
-      return Item.TM123;
+      return Item.TM123
     case 'TM124':
-      return Item.TM124;
+      return Item.TM124
     case 'TM125':
-      return Item.TM125;
+      return Item.TM125
     case 'TM126':
-      return Item.TM126;
+      return Item.TM126
     case 'TM127':
-      return Item.TM127;
+      return Item.TM127
     case 'TM128':
-      return Item.TM128;
+      return Item.TM128
     case 'TM129':
-      return Item.TM129;
+      return Item.TM129
     case 'TM130':
-      return Item.TM130;
+      return Item.TM130
     case 'TM131':
-      return Item.TM131;
+      return Item.TM131
     case 'TM132':
-      return Item.TM132;
+      return Item.TM132
     case 'TM133':
-      return Item.TM133;
+      return Item.TM133
     case 'TM134':
-      return Item.TM134;
+      return Item.TM134
     case 'TM135':
-      return Item.TM135;
+      return Item.TM135
     case 'TM136':
-      return Item.TM136;
+      return Item.TM136
     case 'TM137':
-      return Item.TM137;
+      return Item.TM137
     case 'TM138':
-      return Item.TM138;
+      return Item.TM138
     case 'TM139':
-      return Item.TM139;
+      return Item.TM139
     case 'TM140':
-      return Item.TM140;
+      return Item.TM140
     case 'TM141':
-      return Item.TM141;
+      return Item.TM141
     case 'TM142':
-      return Item.TM142;
+      return Item.TM142
     case 'TM143':
-      return Item.TM143;
+      return Item.TM143
     case 'TM144':
-      return Item.TM144;
+      return Item.TM144
     case 'TM145':
-      return Item.TM145;
+      return Item.TM145
     case 'TM146':
-      return Item.TM146;
+      return Item.TM146
     case 'TM147':
-      return Item.TM147;
+      return Item.TM147
     case 'TM148':
-      return Item.TM148;
+      return Item.TM148
     case 'TM149':
-      return Item.TM149;
+      return Item.TM149
     case 'TM150':
-      return Item.TM150;
+      return Item.TM150
     case 'TM151':
-      return Item.TM151;
+      return Item.TM151
     case 'TM152':
-      return Item.TM152;
+      return Item.TM152
     case 'TM153':
-      return Item.TM153;
+      return Item.TM153
     case 'TM154':
-      return Item.TM154;
+      return Item.TM154
     case 'TM155':
-      return Item.TM155;
+      return Item.TM155
     case 'TM156':
-      return Item.TM156;
+      return Item.TM156
     case 'TM157':
-      return Item.TM157;
+      return Item.TM157
     case 'TM158':
-      return Item.TM158;
+      return Item.TM158
     case 'TM159':
-      return Item.TM159;
+      return Item.TM159
     case 'TM160':
-      return Item.TM160;
+      return Item.TM160
     case 'TM161':
-      return Item.TM161;
+      return Item.TM161
     case 'TM162':
-      return Item.TM162;
+      return Item.TM162
     case 'TM163':
-      return Item.TM163;
+      return Item.TM163
     case 'TM164':
-      return Item.TM164;
+      return Item.TM164
     case 'TM165':
-      return Item.TM165;
+      return Item.TM165
     case 'TM166':
-      return Item.TM166;
+      return Item.TM166
     case 'TM167':
-      return Item.TM167;
+      return Item.TM167
     case 'TM168':
-      return Item.TM168;
+      return Item.TM168
     case 'TM169':
-      return Item.TM169;
+      return Item.TM169
     case 'TM170':
-      return Item.TM170;
+      return Item.TM170
     case 'TM171':
-      return Item.TM171;
+      return Item.TM171
     case 'TM172':
-      return Item.TM172;
+      return Item.TM172
     case 'TM173':
-      return Item.TM173;
+      return Item.TM173
     case 'TM174':
-      return Item.TM174;
+      return Item.TM174
     case 'TM175':
-      return Item.TM175;
+      return Item.TM175
     case 'TM176':
-      return Item.TM176;
+      return Item.TM176
     case 'TM177':
-      return Item.TM177;
+      return Item.TM177
     case 'TM178':
-      return Item.TM178;
+      return Item.TM178
     case 'TM179':
-      return Item.TM179;
+      return Item.TM179
     case 'TM180':
-      return Item.TM180;
+      return Item.TM180
     case 'TM181':
-      return Item.TM181;
+      return Item.TM181
     case 'TM182':
-      return Item.TM182;
+      return Item.TM182
     case 'TM183':
-      return Item.TM183;
+      return Item.TM183
     case 'TM184':
-      return Item.TM184;
+      return Item.TM184
     case 'TM185':
-      return Item.TM185;
+      return Item.TM185
     case 'TM186':
-      return Item.TM186;
+      return Item.TM186
     case 'TM187':
-      return Item.TM187;
+      return Item.TM187
     case 'TM188':
-      return Item.TM188;
+      return Item.TM188
     case 'TM189':
-      return Item.TM189;
+      return Item.TM189
     case 'TM190':
-      return Item.TM190;
+      return Item.TM190
     case 'TM191':
-      return Item.TM191;
+      return Item.TM191
     case 'TM192':
-      return Item.TM192;
+      return Item.TM192
     case 'TM193':
-      return Item.TM193;
+      return Item.TM193
     case 'TM194':
-      return Item.TM194;
+      return Item.TM194
     case 'TM195':
-      return Item.TM195;
+      return Item.TM195
     case 'TM196':
-      return Item.TM196;
+      return Item.TM196
     case 'TM197':
-      return Item.TM197;
+      return Item.TM197
     case 'TM198':
-      return Item.TM198;
+      return Item.TM198
     case 'TM199':
-      return Item.TM199;
+      return Item.TM199
     case 'TM200':
-      return Item.TM200;
+      return Item.TM200
     case 'TM201':
-      return Item.TM201;
+      return Item.TM201
     case 'TM202':
-      return Item.TM202;
+      return Item.TM202
     case 'TM203':
-      return Item.TM203;
+      return Item.TM203
     case 'TM204':
-      return Item.TM204;
+      return Item.TM204
     case 'TM205':
-      return Item.TM205;
+      return Item.TM205
     case 'TM206':
-      return Item.TM206;
+      return Item.TM206
     case 'TM207':
-      return Item.TM207;
+      return Item.TM207
     case 'TM208':
-      return Item.TM208;
+      return Item.TM208
     case 'TM209':
-      return Item.TM209;
+      return Item.TM209
     case 'TM210':
-      return Item.TM210;
+      return Item.TM210
     case 'TM211':
-      return Item.TM211;
+      return Item.TM211
     case 'TM212':
-      return Item.TM212;
+      return Item.TM212
     case 'TM213':
-      return Item.TM213;
+      return Item.TM213
     case 'TM214':
-      return Item.TM214;
+      return Item.TM214
     case 'TM215':
-      return Item.TM215;
+      return Item.TM215
     case 'TM216':
-      return Item.TM216;
+      return Item.TM216
     case 'TM217':
-      return Item.TM217;
+      return Item.TM217
     case 'TM218':
-      return Item.TM218;
+      return Item.TM218
     case 'TM219':
-      return Item.TM219;
+      return Item.TM219
     case 'TM220':
-      return Item.TM220;
+      return Item.TM220
     case 'TM221':
-      return Item.TM221;
+      return Item.TM221
     case 'TM222':
-      return Item.TM222;
+      return Item.TM222
     case 'TM223':
-      return Item.TM223;
+      return Item.TM223
     case 'TM224':
-      return Item.TM224;
+      return Item.TM224
     case 'TM225':
-      return Item.TM225;
+      return Item.TM225
     case 'TM226':
-      return Item.TM226;
+      return Item.TM226
     case 'TM227':
-      return Item.TM227;
+      return Item.TM227
     case 'TM228':
-      return Item.TM228;
+      return Item.TM228
     case 'TM229':
-      return Item.TM229;
+      return Item.TM229
     case 'Picnic Set':
-      return Item.PicnicSet;
+      return Item.PicnicSet
     case 'Academy Bottle':
-      return Item.AcademyBottle;
+      return Item.AcademyBottle
     case 'Polka-Dot Bottle':
-      return Item.PolkaDotBottle;
+      return Item.PolkaDotBottle
     case 'Striped Bottle':
-      return Item.StripedBottle;
+      return Item.StripedBottle
     case 'Diamond Bottle':
-      return Item.DiamondBottle;
+      return Item.DiamondBottle
     case 'Academy Cup':
-      return Item.AcademyCup;
+      return Item.AcademyCup
     case 'Striped Cup':
-      return Item.StripedCup;
+      return Item.StripedCup
     case 'Polka-Dot Cup':
-      return Item.PolkaDotCup;
+      return Item.PolkaDotCup
     case 'Flower Pattern Cup':
-      return Item.FlowerPatternCup;
+      return Item.FlowerPatternCup
     case 'Academy Tablecloth':
-      return Item.AcademyTablecloth;
+      return Item.AcademyTablecloth
     case 'Whimsical Tablecloth':
-      return Item.WhimsicalTablecloth;
+      return Item.WhimsicalTablecloth
     case 'Leafy Tablecloth':
-      return Item.LeafyTablecloth;
+      return Item.LeafyTablecloth
     case 'Spooky Tablecloth':
-      return Item.SpookyTablecloth;
+      return Item.SpookyTablecloth
     case 'Academy Ball':
-      return Item.AcademyBall;
+      return Item.AcademyBall
     case 'Marill Ball':
-      return Item.MarillBall;
+      return Item.MarillBall
     case 'Yarn Ball':
-      return Item.YarnBall;
+      return Item.YarnBall
     case 'Cyber Ball':
-      return Item.CyberBall;
+      return Item.CyberBall
     case 'Gold Pick':
-      return Item.GoldPick;
+      return Item.GoldPick
     case 'Silver Pick':
-      return Item.SilverPick;
+      return Item.SilverPick
     case 'Red-Flag Pick':
-      return Item.RedFlagPick;
+      return Item.RedFlagPick
     case 'Blue-Flag Pick':
-      return Item.BlueFlagPick;
+      return Item.BlueFlagPick
     case 'Pika-Pika Pick':
-      return Item.PikaPikaPick;
+      return Item.PikaPikaPick
     case 'Winking Pika Pick':
-      return Item.WinkingPikaPick;
+      return Item.WinkingPikaPick
     case 'Vee-Vee Pick':
-      return Item.VeeVeePick;
+      return Item.VeeVeePick
     case 'Smiling Vee Pick':
-      return Item.SmilingVeePick;
+      return Item.SmilingVeePick
     case 'Blue Pok\u00E9 Ball Pick':
-      return Item.BluePokeBallPick;
+      return Item.BluePokeBallPick
     case 'Auspicious Armor':
-      return Item.AuspiciousArmor;
+      return Item.AuspiciousArmor
     case 'Leader\u2019s Crest':
-      return Item.LeadersCrest;
+      return Item.LeadersCrest
     case 'Pink Bottle':
-      return Item.PinkBottle;
+      return Item.PinkBottle
     case 'Blue Bottle':
-      return Item.BlueBottle;
+      return Item.BlueBottle
     case 'Yellow Bottle':
-      return Item.YellowBottle;
+      return Item.YellowBottle
     case 'Steel Bottle (R)':
-      return Item.SteelBottleR;
+      return Item.SteelBottleR
     case 'Steel Bottle (Y)':
-      return Item.SteelBottleY;
+      return Item.SteelBottleY
     case 'Steel Bottle (B)':
-      return Item.SteelBottleB;
+      return Item.SteelBottleB
     case 'Silver Bottle':
-      return Item.SilverBottle;
+      return Item.SilverBottle
     case 'Barred Cup':
-      return Item.BarredCup;
+      return Item.BarredCup
     case 'Diamond Pattern Cup':
-      return Item.DiamondPatternCup;
+      return Item.DiamondPatternCup
     case 'Fire Pattern Cup':
-      return Item.FirePatternCup;
+      return Item.FirePatternCup
     case 'Pink Cup':
-      return Item.PinkCup;
+      return Item.PinkCup
     case 'Blue Cup':
-      return Item.BlueCup;
+      return Item.BlueCup
     case 'Yellow Cup':
-      return Item.YellowCup;
+      return Item.YellowCup
     case 'Pikachu Cup':
-      return Item.PikachuCup;
+      return Item.PikachuCup
     case 'Eevee Cup':
-      return Item.EeveeCup;
+      return Item.EeveeCup
     case 'Slowpoke Cup':
-      return Item.SlowpokeCup;
+      return Item.SlowpokeCup
     case 'Silver Cup':
-      return Item.SilverCup;
+      return Item.SilverCup
     case 'Exercise Ball':
-      return Item.ExerciseBall;
+      return Item.ExerciseBall
     case 'Plaid Tablecloth (Y)':
-      return Item.PlaidTableclothY;
+      return Item.PlaidTableclothY
     case 'Plaid Tablecloth (B)':
-      return Item.PlaidTableclothB;
+      return Item.PlaidTableclothB
     case 'Plaid Tablecloth (R)':
-      return Item.PlaidTableclothR;
+      return Item.PlaidTableclothR
     case 'B&W Grass Tablecloth':
-      return Item.BWGrassTablecloth;
+      return Item.BWGrassTablecloth
     case 'Battle Tablecloth':
-      return Item.BattleTablecloth;
+      return Item.BattleTablecloth
     case 'Monstrous Tablecloth':
-      return Item.MonstrousTablecloth;
+      return Item.MonstrousTablecloth
     case 'Striped Tablecloth':
-      return Item.StripedTablecloth;
+      return Item.StripedTablecloth
     case 'Diamond Tablecloth':
-      return Item.DiamondTablecloth;
+      return Item.DiamondTablecloth
     case 'Polka-Dot Tablecloth':
-      return Item.PolkaDotTablecloth;
+      return Item.PolkaDotTablecloth
     case 'Lilac Tablecloth':
-      return Item.LilacTablecloth;
+      return Item.LilacTablecloth
     case 'Mint Tablecloth':
-      return Item.MintTablecloth;
+      return Item.MintTablecloth
     case 'Peach Tablecloth':
-      return Item.PeachTablecloth;
+      return Item.PeachTablecloth
     case 'Yellow Tablecloth':
-      return Item.YellowTablecloth;
+      return Item.YellowTablecloth
     case 'Blue Tablecloth':
-      return Item.BlueTablecloth;
+      return Item.BlueTablecloth
     case 'Pink Tablecloth':
-      return Item.PinkTablecloth;
+      return Item.PinkTablecloth
     case 'Gold Bottle':
-      return Item.GoldBottle;
+      return Item.GoldBottle
     case 'Bronze Bottle':
-      return Item.BronzeBottle;
+      return Item.BronzeBottle
     case 'Gold Cup':
-      return Item.GoldCup;
+      return Item.GoldCup
     case 'Bronze Cup':
-      return Item.BronzeCup;
+      return Item.BronzeCup
     case 'Green Pok\u00E9 Ball Pick':
-      return Item.GreenPokeBallPick;
+      return Item.GreenPokeBallPick
     case 'Red Pok\u00E9 Ball Pick':
-      return Item.RedPokeBallPick;
+      return Item.RedPokeBallPick
     case 'Party Sparkler Pick':
-      return Item.PartySparklerPick;
+      return Item.PartySparklerPick
     case 'Heroic Sword Pick':
-      return Item.HeroicSwordPick;
+      return Item.HeroicSwordPick
     case 'Magical Star Pick':
-      return Item.MagicalStarPick;
+      return Item.MagicalStarPick
     case 'Magical Heart Pick':
-      return Item.MagicalHeartPick;
+      return Item.MagicalHeartPick
     case 'Parasol Pick':
-      return Item.ParasolPick;
+      return Item.ParasolPick
     case 'Blue-Sky Flower Pick':
-      return Item.BlueSkyFlowerPick;
+      return Item.BlueSkyFlowerPick
     case 'Sunset Flower Pick':
-      return Item.SunsetFlowerPick;
+      return Item.SunsetFlowerPick
     case 'Sunrise Flower Pick':
-      return Item.SunriseFlowerPick;
+      return Item.SunriseFlowerPick
     case 'Blue Dish':
-      return Item.BlueDish;
+      return Item.BlueDish
     case 'Green Dish':
-      return Item.GreenDish;
+      return Item.GreenDish
     case 'Orange Dish':
-      return Item.OrangeDish;
+      return Item.OrangeDish
     case 'Red Dish':
-      return Item.RedDish;
+      return Item.RedDish
     case 'White Dish':
-      return Item.WhiteDish;
+      return Item.WhiteDish
     case 'Yellow Dish':
-      return Item.YellowDish;
+      return Item.YellowDish
     case 'Fairy Feather':
-      return Item.FairyFeather;
+      return Item.FairyFeather
     case 'Syrupy Apple':
-      return Item.SyrupyApple;
+      return Item.SyrupyApple
     case 'Unremarkable Teacup':
-      return Item.UnremarkableTeacup;
+      return Item.UnremarkableTeacup
     case 'Masterpiece Teacup':
-      return Item.MasterpieceTeacup;
+      return Item.MasterpieceTeacup
     case 'Teal Mask':
-      return Item.TealMask;
+      return Item.TealMask
     case 'Cornerstone Mask':
-      return Item.CornerstoneMask;
+      return Item.CornerstoneMask
     case 'Wellspring Mask':
-      return Item.WellspringMask;
+      return Item.WellspringMask
     case 'Hearthflame Mask':
-      return Item.HearthflameMask;
+      return Item.HearthflameMask
     case 'Teal Style Card':
-      return Item.TealStyleCard;
+      return Item.TealStyleCard
     case 'Crystal Cluster':
-      return Item.CrystalCluster;
+      return Item.CrystalCluster
     case 'Health Mochi':
-      return Item.HealthMochi;
+      return Item.HealthMochi
     case 'Muscle Mochi':
-      return Item.MuscleMochi;
+      return Item.MuscleMochi
     case 'Resist Mochi':
-      return Item.ResistMochi;
+      return Item.ResistMochi
     case 'Genius Mochi':
-      return Item.GeniusMochi;
+      return Item.GeniusMochi
     case 'Clever Mochi':
-      return Item.CleverMochi;
+      return Item.CleverMochi
     case 'Swift Mochi':
-      return Item.SwiftMochi;
+      return Item.SwiftMochi
     case 'Simple Chairs':
-      return Item.SimpleChairs;
+      return Item.SimpleChairs
     case 'Academy Chairs':
-      return Item.AcademyChairs;
+      return Item.AcademyChairs
     case 'Whimsical Chairs':
-      return Item.WhimsicalChairs;
+      return Item.WhimsicalChairs
     case 'Leafy Chairs':
-      return Item.LeafyChairs;
+      return Item.LeafyChairs
     case 'Spooky Chairs':
-      return Item.SpookyChairs;
+      return Item.SpookyChairs
     case 'Plaid Chairs (Y)':
-      return Item.PlaidChairsY;
+      return Item.PlaidChairsY
     case 'Plaid Chairs (B)':
-      return Item.PlaidChairsB;
+      return Item.PlaidChairsB
     case 'Plaid Chairs (R)':
-      return Item.PlaidChairsR;
+      return Item.PlaidChairsR
     case 'B&W Grass Chairs':
-      return Item.BWGrassChairs;
+      return Item.BWGrassChairs
     case 'Battle Chairs':
-      return Item.BattleChairs;
+      return Item.BattleChairs
     case 'Monstrous Chairs':
-      return Item.MonstrousChairs;
+      return Item.MonstrousChairs
     case 'Striped Chairs':
-      return Item.StripedChairs;
+      return Item.StripedChairs
     case 'Diamond Chairs':
-      return Item.DiamondChairs;
+      return Item.DiamondChairs
     case 'Polka-Dot Chairs':
-      return Item.PolkaDotChairs;
+      return Item.PolkaDotChairs
     case 'Lilac Chairs':
-      return Item.LilacChairs;
+      return Item.LilacChairs
     case 'Mint Chairs':
-      return Item.MintChairs;
+      return Item.MintChairs
     case 'Peach Chairs':
-      return Item.PeachChairs;
+      return Item.PeachChairs
     case 'Yellow Chairs':
-      return Item.YellowChairs;
+      return Item.YellowChairs
     case 'Blue Chairs':
-      return Item.BlueChairs;
+      return Item.BlueChairs
     case 'Pink Chairs':
-      return Item.PinkChairs;
+      return Item.PinkChairs
     case 'Ekans Fang':
-      return Item.EkansFang;
+      return Item.EkansFang
     case 'Sandshrew Claw':
-      return Item.SandshrewClaw;
+      return Item.SandshrewClaw
     case 'Cleffa Fur':
-      return Item.CleffaFur;
+      return Item.CleffaFur
     case 'Vulpix Fur':
-      return Item.VulpixFur;
+      return Item.VulpixFur
     case 'Poliwag Slime':
-      return Item.PoliwagSlime;
+      return Item.PoliwagSlime
     case 'Bellsprout Vine':
-      return Item.BellsproutVine;
+      return Item.BellsproutVine
     case 'Geodude Fragment':
-      return Item.GeodudeFragment;
+      return Item.GeodudeFragment
     case 'Koffing Gas':
-      return Item.KoffingGas;
+      return Item.KoffingGas
     case 'Munchlax Fang':
-      return Item.MunchlaxFang;
+      return Item.MunchlaxFang
     case 'Sentret Fur':
-      return Item.SentretFur;
+      return Item.SentretFur
     case 'Hoothoot Feather':
-      return Item.HoothootFeather;
+      return Item.HoothootFeather
     case 'Spinarak Thread':
-      return Item.SpinarakThread;
+      return Item.SpinarakThread
     case 'Aipom Hair':
-      return Item.AipomHair;
+      return Item.AipomHair
     case 'Yanma Spike':
-      return Item.YanmaSpike;
+      return Item.YanmaSpike
     case 'Gligar Fang':
-      return Item.GligarFang;
+      return Item.GligarFang
     case 'Slugma Lava':
-      return Item.SlugmaLava;
+      return Item.SlugmaLava
     case 'Swinub Hair':
-      return Item.SwinubHair;
+      return Item.SwinubHair
     case 'Poochyena Fang':
-      return Item.PoochyenaFang;
+      return Item.PoochyenaFang
     case 'Lotad Leaf':
-      return Item.LotadLeaf;
+      return Item.LotadLeaf
     case 'Seedot Stem':
-      return Item.SeedotStem;
+      return Item.SeedotStem
     case 'Nosepass Fragment':
-      return Item.NosepassFragment;
+      return Item.NosepassFragment
     case 'Volbeat Fluid':
-      return Item.VolbeatFluid;
+      return Item.VolbeatFluid
     case 'Illumise Fluid':
-      return Item.IllumiseFluid;
+      return Item.IllumiseFluid
     case 'Corphish Shell':
-      return Item.CorphishShell;
+      return Item.CorphishShell
     case 'Feebas Scales':
-      return Item.FeebasScales;
+      return Item.FeebasScales
     case 'Duskull Fragment':
-      return Item.DuskullFragment;
+      return Item.DuskullFragment
     case 'Chingling Fragment':
-      return Item.ChinglingFragment;
+      return Item.ChinglingFragment
     case 'Timburr Sweat':
-      return Item.TimburrSweat;
+      return Item.TimburrSweat
     case 'Sewaddle Leaf':
-      return Item.SewaddleLeaf;
+      return Item.SewaddleLeaf
     case 'Ducklett Feather':
-      return Item.DucklettFeather;
+      return Item.DucklettFeather
     case 'Litwick Soot':
-      return Item.LitwickSoot;
+      return Item.LitwickSoot
     case 'Mienfoo Claw':
-      return Item.MienfooClaw;
+      return Item.MienfooClaw
     case 'Vullaby Feather':
-      return Item.VullabyFeather;
+      return Item.VullabyFeather
     case 'Carbink Jewel':
-      return Item.CarbinkJewel;
+      return Item.CarbinkJewel
     case 'Phantump Twig':
-      return Item.PhantumpTwig;
+      return Item.PhantumpTwig
     case 'Grubbin Thread':
-      return Item.GrubbinThread;
+      return Item.GrubbinThread
     case 'Cutiefly Powder':
-      return Item.CutieflyPowder;
+      return Item.CutieflyPowder
     case 'Jangmo-o Scales':
-      return Item.JangmooScales;
+      return Item.JangmooScales
     case 'Cramorant Down':
-      return Item.CramorantDown;
+      return Item.CramorantDown
     case 'Morpeko Snack':
-      return Item.MorpekoSnack;
+      return Item.MorpekoSnack
     case 'Poltchageist Powder':
-      return Item.PoltchageistPowder;
+      return Item.PoltchageistPowder
     case 'Fresh-Start Mochi':
-      return Item.FreshStartMochi;
+      return Item.FreshStartMochi
     case 'Roto-Stick':
-      return Item.RotoStick;
+      return Item.RotoStick
     case 'Glimmering Charm':
-      return Item.GlimmeringCharm;
+      return Item.GlimmeringCharm
     default:
-      return Item.None;
+      return Item.None
   }
 }

@@ -1,8 +1,8 @@
-import { Tooltip } from '@mui/material';
-import { RibbonsMap } from 'renderer/images/Images';
-import { Styles } from 'types/types';
-import { Gen9Ribbons } from '../../consts/Ribbons';
-import { PKM } from '../../types/PKMTypes/PKM';
+import { Tooltip } from '@mui/material'
+import { RibbonsMap } from 'renderer/images/Images'
+import { Styles } from 'types/types'
+import { Gen9Ribbons } from '../../consts/Ribbons'
+import { PKM } from '../../types/PKMTypes/PKM'
 
 const styles = {
   container: {
@@ -27,42 +27,42 @@ const styles = {
     borderStyle: 'solid',
     borderColor: 'white',
   },
-} as Styles;
+} as Styles
 
 const RibbonsDisplay = (props: { mon: PKM }) => {
-  const { mon } = props;
+  const { mon } = props
 
   const formatRibbon = (ribbon: string) => {
     if (ribbon.endsWith('Mark')) {
-      return ribbon;
+      return ribbon
     }
     if (ribbon.includes(' (')) {
-      const [contestRibbon, region] = ribbon.split(' (');
-      return `${contestRibbon} Ribbon (${region}`;
+      const [contestRibbon, region] = ribbon.split(' (')
+      return `${contestRibbon} Ribbon (${region}`
     }
     if (ribbon === 'Contest Memory') {
-      return `${ribbon} Ribbon (${mon.contestMemoryCount})`;
+      return `${ribbon} Ribbon (${mon.contestMemoryCount})`
     }
     if (ribbon === 'Battle Memory') {
-      return `${ribbon} Ribbon (${mon.battleMemoryCount})`;
+      return `${ribbon} Ribbon (${mon.battleMemoryCount})`
     }
-    return `${ribbon} Ribbon`;
-  };
+    return `${ribbon} Ribbon`
+  }
 
   const getRibbonImage = (ribbon: string) => {
     if (ribbon === 'Contest Memory' && mon.contestMemoryCount === 40) {
-      return RibbonsMap['Contest Memory Gold'];
+      return RibbonsMap['Contest Memory Gold']
     }
     if (ribbon === 'Battle Memory' && mon.contestMemoryCount === 6) {
-      return RibbonsMap['battle Memory Gold'];
+      return RibbonsMap['battle Memory Gold']
     }
-    return RibbonsMap[ribbon];
-  };
+    return RibbonsMap[ribbon]
+  }
 
   return (
     <div style={styles.container}>
       {mon.ribbons.map((ribbon) => {
-        const ribbonDisplay = formatRibbon(ribbon);
+        const ribbonDisplay = formatRibbon(ribbon)
         return (
           <Tooltip title={ribbonDisplay}>
             <img
@@ -77,10 +77,10 @@ const RibbonsDisplay = (props: { mon: PKM }) => {
               src={getRibbonImage(ribbon)}
             />
           </Tooltip>
-        );
+        )
       })}
     </div>
-  );
-};
+  )
+}
 
-export default RibbonsDisplay;
+export default RibbonsDisplay

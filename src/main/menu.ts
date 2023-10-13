@@ -5,18 +5,18 @@ import {
   app,
   dialog,
   shell,
-} from 'electron';
+} from 'electron'
 
 interface DarwinMenuItemConstructorOptions extends MenuItemConstructorOptions {
-  selector?: string;
-  submenu?: DarwinMenuItemConstructorOptions[] | Menu;
+  selector?: string
+  submenu?: DarwinMenuItemConstructorOptions[] | Menu
 }
 
 export default class MenuBuilder {
-  mainWindow: BrowserWindow;
+  mainWindow: BrowserWindow
 
   constructor(mainWindow: BrowserWindow) {
-    this.mainWindow = mainWindow;
+    this.mainWindow = mainWindow
   }
 
   buildMenu(): Menu {
@@ -24,33 +24,33 @@ export default class MenuBuilder {
       process.env.NODE_ENV === 'development' ||
       process.env.DEBUG_PROD === 'true'
     ) {
-      this.setupDevelopmentEnvironment();
+      this.setupDevelopmentEnvironment()
     }
 
     const template = this.buildMenuTemplate(
       this.mainWindow,
       process.platform === 'darwin'
-    );
+    )
 
-    const menu = Menu.buildFromTemplate(template);
-    Menu.setApplicationMenu(menu);
+    const menu = Menu.buildFromTemplate(template)
+    Menu.setApplicationMenu(menu)
 
-    return menu;
+    return menu
   }
 
   setupDevelopmentEnvironment(): void {
     this.mainWindow.webContents.on('context-menu', (_, props) => {
-      const { x, y } = props;
+      const { x, y } = props
 
       Menu.buildFromTemplate([
         {
           label: 'Inspect element',
           click: () => {
-            this.mainWindow.webContents.inspectElement(x, y);
+            this.mainWindow.webContents.inspectElement(x, y)
           },
         },
-      ]).popup({ window: this.mainWindow });
-    });
+      ]).popup({ window: this.mainWindow })
+    })
   }
 
   buildMenuTemplate(
@@ -83,11 +83,11 @@ export default class MenuBuilder {
           label: 'Quit',
           accelerator: 'Command+Q',
           click: () => {
-            app.quit();
+            app.quit()
           },
         },
       ],
-    };
+    }
 
     const subMenuFile: DarwinMenuItemConstructorOptions = {
       label: 'File',
@@ -101,9 +101,9 @@ export default class MenuBuilder {
               buttons: ['Cancel', 'Save'],
               title: 'Save Changes',
               detail: "Pokémon in the 'Release' area will be lost permanently.",
-            });
+            })
             if (shouldSave) {
-              mainWindow?.webContents.send('save');
+              mainWindow?.webContents.send('save')
             }
           },
         },
@@ -111,14 +111,14 @@ export default class MenuBuilder {
           label: 'Reset',
           accelerator: 'CmdOrCtrl+X',
           click() {
-            mainWindow?.webContents.send('reset');
+            mainWindow?.webContents.send('reset')
           },
         },
         {
           label: 'Reset And Close Saves',
           accelerator: 'Shift+CmdOrCtrl+X',
           click() {
-            mainWindow?.webContents.send('reset-close');
+            mainWindow?.webContents.send('reset-close')
           },
         },
         { type: 'separator' },
@@ -128,11 +128,11 @@ export default class MenuBuilder {
           click() {
             dialog.showMessageBox({
               message: 'Drag the PKM file(s) you wish to import into a box.',
-            });
+            })
           },
         },
       ],
-    };
+    }
     const subMenuEdit: DarwinMenuItemConstructorOptions = {
       label: 'Edit',
       submenu: [
@@ -150,7 +150,7 @@ export default class MenuBuilder {
             ] as DarwinMenuItemConstructorOptions[])
           : []),
       ],
-    };
+    }
     const subMenuViewDev: MenuItemConstructorOptions = {
       label: 'View',
       submenu: [
@@ -164,7 +164,7 @@ export default class MenuBuilder {
         { type: 'separator' },
         { role: 'togglefullscreen' },
       ],
-    };
+    }
     const subMenuViewProd: MenuItemConstructorOptions = {
       label: 'View',
       submenu: [
@@ -178,7 +178,7 @@ export default class MenuBuilder {
         { type: 'separator' },
         { role: 'togglefullscreen' },
       ],
-    };
+    }
     const subMenuWindow: DarwinMenuItemConstructorOptions = {
       label: 'Window',
       submenu: [
@@ -193,24 +193,24 @@ export default class MenuBuilder {
             ] as DarwinMenuItemConstructorOptions[])
           : [{ role: 'close' as 'close' }]),
       ],
-    };
+    }
     const subMenuHelp: MenuItemConstructorOptions = {
       label: 'Help',
       submenu: [
         {
           label: 'Visit GitHub',
           click() {
-            shell.openExternal('https://github.com/andrewbenington/OpenHome');
+            shell.openExternal('https://github.com/andrewbenington/OpenHome')
           },
         },
       ],
-    };
+    }
 
     const subMenuView =
       process.env.NODE_ENV === 'development' ||
       process.env.DEBUG_PROD === 'true'
         ? subMenuViewDev
-        : subMenuViewProd;
+        : subMenuViewProd
 
     return [
       ...(isMac ? [subMenuAbout] : []),
@@ -219,6 +219,6 @@ export default class MenuBuilder {
       subMenuView,
       subMenuWindow,
       subMenuHelp,
-    ];
+    ]
   }
 }

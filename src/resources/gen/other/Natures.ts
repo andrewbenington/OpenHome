@@ -30,112 +30,112 @@ export enum Nature {
 export function NatureToString(item: Nature): string {
   switch (item) {
     case Nature.Hardy:
-      return 'Hardy';
+      return 'Hardy'
     case Nature.Lonely:
-      return 'Lonely';
+      return 'Lonely'
     case Nature.Brave:
-      return 'Brave';
+      return 'Brave'
     case Nature.Adamant:
-      return 'Adamant';
+      return 'Adamant'
     case Nature.Naughty:
-      return 'Naughty';
+      return 'Naughty'
     case Nature.Bold:
-      return 'Bold';
+      return 'Bold'
     case Nature.Docile:
-      return 'Docile';
+      return 'Docile'
     case Nature.Relaxed:
-      return 'Relaxed';
+      return 'Relaxed'
     case Nature.Impish:
-      return 'Impish';
+      return 'Impish'
     case Nature.Lax:
-      return 'Lax';
+      return 'Lax'
     case Nature.Timid:
-      return 'Timid';
+      return 'Timid'
     case Nature.Hasty:
-      return 'Hasty';
+      return 'Hasty'
     case Nature.Serious:
-      return 'Serious';
+      return 'Serious'
     case Nature.Jolly:
-      return 'Jolly';
+      return 'Jolly'
     case Nature.Naive:
-      return 'Naive';
+      return 'Naive'
     case Nature.Modest:
-      return 'Modest';
+      return 'Modest'
     case Nature.Mild:
-      return 'Mild';
+      return 'Mild'
     case Nature.Quiet:
-      return 'Quiet';
+      return 'Quiet'
     case Nature.Bashful:
-      return 'Bashful';
+      return 'Bashful'
     case Nature.Rash:
-      return 'Rash';
+      return 'Rash'
     case Nature.Calm:
-      return 'Calm';
+      return 'Calm'
     case Nature.Gentle:
-      return 'Gentle';
+      return 'Gentle'
     case Nature.Sassy:
-      return 'Sassy';
+      return 'Sassy'
     case Nature.Careful:
-      return 'Careful';
+      return 'Careful'
     case Nature.Quirky:
-      return 'Quirky';
+      return 'Quirky'
     default:
-      return '';
+      return ''
   }
 }
 export function NatureFromString(item: string): Nature {
   switch (item) {
     case 'Hardy':
-      return Nature.Hardy;
+      return Nature.Hardy
     case 'Lonely':
-      return Nature.Lonely;
+      return Nature.Lonely
     case 'Brave':
-      return Nature.Brave;
+      return Nature.Brave
     case 'Adamant':
-      return Nature.Adamant;
+      return Nature.Adamant
     case 'Naughty':
-      return Nature.Naughty;
+      return Nature.Naughty
     case 'Bold':
-      return Nature.Bold;
+      return Nature.Bold
     case 'Docile':
-      return Nature.Docile;
+      return Nature.Docile
     case 'Relaxed':
-      return Nature.Relaxed;
+      return Nature.Relaxed
     case 'Impish':
-      return Nature.Impish;
+      return Nature.Impish
     case 'Lax':
-      return Nature.Lax;
+      return Nature.Lax
     case 'Timid':
-      return Nature.Timid;
+      return Nature.Timid
     case 'Hasty':
-      return Nature.Hasty;
+      return Nature.Hasty
     case 'Serious':
-      return Nature.Serious;
+      return Nature.Serious
     case 'Jolly':
-      return Nature.Jolly;
+      return Nature.Jolly
     case 'Naive':
-      return Nature.Naive;
+      return Nature.Naive
     case 'Modest':
-      return Nature.Modest;
+      return Nature.Modest
     case 'Mild':
-      return Nature.Mild;
+      return Nature.Mild
     case 'Quiet':
-      return Nature.Quiet;
+      return Nature.Quiet
     case 'Bashful':
-      return Nature.Bashful;
+      return Nature.Bashful
     case 'Rash':
-      return Nature.Rash;
+      return Nature.Rash
     case 'Calm':
-      return Nature.Calm;
+      return Nature.Calm
     case 'Gentle':
-      return Nature.Gentle;
+      return Nature.Gentle
     case 'Sassy':
-      return Nature.Sassy;
+      return Nature.Sassy
     case 'Careful':
-      return Nature.Careful;
+      return Nature.Careful
     case 'Quirky':
-      return Nature.Quirky;
+      return Nature.Quirky
     default:
-      return Nature.Hardy;
+      return Nature.Hardy
   }
 }

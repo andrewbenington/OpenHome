@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import { Grid, MenuItem, Select } from '@mui/material';
+import { Grid, MenuItem, Select } from '@mui/material'
 import {
   BW2_TRANSFER_RESTRICTIONS,
   GEN1_TRANSFER_RESTRICTIONS,
@@ -9,9 +9,9 @@ import {
   LA_TRANSFER_RESTRICTIONS,
   ORAS_TRANSFER_RESTRICTIONS,
   USUM_TRANSFER_RESTRICTIONS,
-} from 'consts/TransferRestrictions';
-import { useState } from 'react';
-import { StringToStringMap, Styles } from 'types/types';
+} from 'consts/TransferRestrictions'
+import { useState } from 'react'
+import { StringToStringMap, Styles } from 'types/types'
 import {
   OHPKM,
   PA8,
@@ -23,15 +23,15 @@ import {
   PK6,
   PK7,
   PKM,
-} from '../../types/PKMTypes';
-import { isRestricted } from '../../types/TransferRestrictions';
-import OpenHomeButton from '../components/OpenHomeButton';
-import MetDataMovesDisplay from './MetDataMovesDisplay';
-import OtherDisplay from './OtherDisplay';
-import RawDisplay from './RawDisplay';
-import RibbonsDisplay from './RibbonsDisplay';
-import StatsDisplay from './StatsDisplay';
-import SummaryDisplay from './SummaryDisplay';
+} from '../../types/PKMTypes'
+import { isRestricted } from '../../types/TransferRestrictions'
+import OpenHomeButton from '../components/OpenHomeButton'
+import MetDataMovesDisplay from './MetDataMovesDisplay'
+import OtherDisplay from './OtherDisplay'
+import RawDisplay from './RawDisplay'
+import RibbonsDisplay from './RibbonsDisplay'
+import StatsDisplay from './StatsDisplay'
+import SummaryDisplay from './SummaryDisplay'
 
 const styles = {
   tabScrollContainer: {
@@ -73,32 +73,32 @@ const styles = {
     boxShadow: 'none',
     '.MuiOutlinedInput-notchedOutline': { border: 0 },
   },
-} as Styles;
+} as Styles
 
 const getTypeFromString = (type: string) => {
   switch (type) {
     case 'OHPKM':
-      return OHPKM;
+      return OHPKM
     case 'PK1':
-      return PK1;
+      return PK1
     case 'PK2':
-      return PK2;
+      return PK2
     case 'PK3':
-      return PK3;
+      return PK3
     case 'PK4':
-      return PK4;
+      return PK4
     case 'PK5':
-      return PK5;
+      return PK5
     case 'PK6':
-      return PK6;
+      return PK6
     case 'PK7':
-      return PK7;
+      return PK7
     case 'PA8':
-      return PA8;
+      return PA8
     default:
-      return undefined;
+      return undefined
   }
-};
+}
 
 const fileTypeColors: StringToStringMap = {
   OHPKM: '#748fcd',
@@ -116,15 +116,15 @@ const fileTypeColors: StringToStringMap = {
   PB8: '#6bf',
   PA8: '#8cc',
   PK9: '#f52',
-};
+}
 
 const PokemonDisplay = (props: {
-  mon: PKM;
-  tab: string;
-  setTab: (_: string) => void;
+  mon: PKM
+  tab: string
+  setTab: (_: string) => void
 }) => {
-  const { mon, tab, setTab } = props;
-  const [displayMon, setDisplayMon] = useState(mon);
+  const { mon, tab, setTab } = props
+  const [displayMon, setDisplayMon] = useState(mon)
 
   return (
     <Grid container style={styles.pokemonDisplay}>
@@ -133,11 +133,11 @@ const PokemonDisplay = (props: {
           <Select
             value={displayMon.format}
             onChange={(e) => {
-              const T = getTypeFromString(e.target.value);
+              const T = getTypeFromString(e.target.value)
               if (mon.format === e.target.value) {
-                setDisplayMon(mon);
+                setDisplayMon(mon)
               } else if (T) {
-                setDisplayMon(new T(mon));
+                setDisplayMon(new T(mon))
               }
             }}
             sx={{
@@ -302,7 +302,7 @@ const PokemonDisplay = (props: {
         </div>
       </Grid>
     </Grid>
-  );
-};
+  )
+}
 
-export default PokemonDisplay;
+export default PokemonDisplay

@@ -1,6 +1,6 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-else-return */
-import { MenuItem, Select } from '@mui/material';
+import { MenuItem, Select } from '@mui/material'
 import {
   Chart as ChartJS,
   Filler,
@@ -10,15 +10,15 @@ import {
   ScriptableScalePointLabelContext,
   Title,
   Tooltip,
-} from 'chart.js';
-import { GEN2_TRANSFER_RESTRICTIONS } from 'consts/TransferRestrictions';
-import { useEffect, useState } from 'react';
-import { Radar } from 'react-chartjs-2';
-import SheenStars from 'renderer/components/SheenStars';
-import { isRestricted } from 'types/TransferRestrictions';
-import { Styles } from 'types/types';
-import { getNatureSummary } from '../../resources/NatureData';
-import { PKM } from '../../types/PKMTypes/PKM';
+} from 'chart.js'
+import { GEN2_TRANSFER_RESTRICTIONS } from 'consts/TransferRestrictions'
+import { useEffect, useState } from 'react'
+import { Radar } from 'react-chartjs-2'
+import SheenStars from 'renderer/components/SheenStars'
+import { isRestricted } from 'types/TransferRestrictions'
+import { Styles } from 'types/types'
+import { getNatureSummary } from '../../resources/NatureData'
+import { PKM } from '../../types/PKMTypes/PKM'
 
 const styles = {
   container: {
@@ -37,20 +37,20 @@ const styles = {
     flexDirection: 'column',
   },
   chartContainer: { padding: 20, height: 280 },
-} as Styles;
+} as Styles
 
 const StatsDisplay = (props: { mon: PKM }) => {
-  const { mon } = props;
-  const [display, setDisplay] = useState('Stats');
-  const [evType, setEVType] = useState(!mon.evs ? 'Game Boy' : 'Modern');
+  const { mon } = props
+  const [display, setDisplay] = useState('Stats')
+  const [evType, setEVType] = useState(!mon.evs ? 'Game Boy' : 'Modern')
 
   useEffect(() => {
     if (mon.evsG12 && !mon.evs) {
-      setEVType('Game Boy');
+      setEVType('Game Boy')
     } else if (!mon.evsG12) {
-      setEVType('Modern');
+      setEVType('Modern')
     }
-  }, [mon.evs, mon.evsG12, mon.format]);
+  }, [mon.evs, mon.evsG12, mon.format])
 
   ChartJS.register(
     RadialLinearScale,
@@ -59,7 +59,7 @@ const StatsDisplay = (props: { mon: PKM }) => {
     Title,
     Filler,
     Tooltip
-  );
+  )
   return (
     <div style={styles.container}>
       <div style={styles.selectors}>
@@ -111,7 +111,7 @@ const StatsDisplay = (props: { mon: PKM }) => {
                 callbacks: {
                   title: () => '',
                   label: (context: { label: any; raw: any }) => {
-                    return `${context.label}: ${context.raw}`;
+                    return `${context.label}: ${context.raw}`
                   },
                 },
               },
@@ -135,31 +135,31 @@ const StatsDisplay = (props: { mon: PKM }) => {
                   font: { size: 14, weight: 'bold' },
                   color: (ctx: ScriptableScalePointLabelContext) => {
                     if (display === 'Contest') {
-                      return 'white';
+                      return 'white'
                     }
                     return ctx.label.includes('▲')
                       ? '#F58'
                       : ctx.label.includes('▼')
                       ? '#78F'
-                      : 'black';
+                      : 'black'
                   },
                   backdropColor: (ctx: ScriptableScalePointLabelContext) => {
                     if (display !== 'Contest') {
-                      return undefined;
+                      return undefined
                     }
                     switch (ctx.label) {
                       case 'Cool':
-                        return '#F08030';
+                        return '#F08030'
                       case 'Beauty':
-                        return '#6890F0';
+                        return '#6890F0'
                       case 'Cute':
-                        return '#F85888';
+                        return '#F85888'
                       case 'Smart':
-                        return '#78C850';
+                        return '#78C850'
                       case 'Tough':
-                        return '#F8D030';
+                        return '#F8D030'
                       default:
-                        return undefined;
+                        return undefined
                     }
                   },
                   borderRadius: display === 'Contest' ? 12 : 0,
@@ -167,13 +167,13 @@ const StatsDisplay = (props: { mon: PKM }) => {
                   callback: (value) => {
                     const natureSummary = getNatureSummary(
                       mon.statNature ?? mon.nature
-                    );
+                    )
                     if (natureSummary?.includes(`-${value}`)) {
-                      return `${value}▼`;
+                      return `${value}▼`
                     } else if (natureSummary?.includes(`+${value}`)) {
-                      return `${value}▲`;
+                      return `${value}▲`
                     } else {
-                      return `${value}`;
+                      return `${value}`
                     }
                   },
                 },
@@ -366,7 +366,7 @@ const StatsDisplay = (props: { mon: PKM }) => {
       </div>
       {display === 'Contest' && mon.contest && <SheenStars mon={mon} />}
     </div>
-  );
-};
+  )
+}
 
-export default StatsDisplay;
+export default StatsDisplay

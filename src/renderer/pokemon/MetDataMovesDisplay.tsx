@@ -1,14 +1,14 @@
-import { Card } from '@mui/material';
-import { useMemo } from 'react';
-import Markings from 'renderer/components/Markings';
-import { BallsList, OriginMarks } from 'renderer/images/Images';
-import { getMoveMaxPP } from 'types/PKMTypes/util';
-import { Styles } from 'types/types';
-import { GameOfOriginData } from '../../consts';
-import { NatureToString } from '../../resources/gen/other/Natures';
-import { PKM } from '../../types/PKMTypes/PKM';
-import { getGameLogo } from '../util/PokemonSprite';
-import MoveCard from './MoveCard';
+import { Card } from '@mui/material'
+import { useMemo } from 'react'
+import Markings from 'renderer/components/Markings'
+import { BallsList, OriginMarks } from 'renderer/images/Images'
+import { getMoveMaxPP } from 'types/PKMTypes/util'
+import { Styles } from 'types/types'
+import { GameOfOriginData } from '../../consts'
+import { NatureToString } from '../../resources/gen/other/Natures'
+import { PKM } from '../../types/PKMTypes/PKM'
+import { getGameLogo } from '../util/PokemonSprite'
+import MoveCard from './MoveCard'
 
 const styles = {
   container: {
@@ -56,67 +56,63 @@ const styles = {
   description: {
     textAlign: 'left',
   },
-} as Styles;
+} as Styles
 
-const metTimesOfDay = [
-  'in the morning',
-  'during the daytime',
-  'in the evening',
-];
+const metTimesOfDay = ['in the morning', 'during the daytime', 'in the evening']
 
 const MetDataMovesDisplay = (props: { mon: PKM }) => {
-  const { mon } = props;
+  const { mon } = props
 
   const eggMessage = useMemo(() => {
     if (!mon.eggLocation) {
-      return undefined;
+      return undefined
     }
     return `Egg received ${
       mon.eggDate
         ? `on ${mon.eggDate.month}/${mon.eggDate.day}/${mon.eggDate.year}`
         : ''
-    } ${mon.eggLocation}.`;
-  }, [mon]);
+    } ${mon.eggLocation}.`
+  }, [mon])
 
   const metMessage = useMemo(() => {
     if (!mon.metLocation) {
-      return 'Met location unknown.';
+      return 'Met location unknown.'
     }
-    let message = 'Met';
+    let message = 'Met'
     if (mon.metTimeOfDay) {
-      message += metTimesOfDay[mon.metTimeOfDay - 1];
+      message += metTimesOfDay[mon.metTimeOfDay - 1]
     }
     if (mon.metDate) {
-      message += ` on ${mon.metDate.month}/${mon.metDate.day}/${mon.metDate.year}`;
+      message += ` on ${mon.metDate.month}/${mon.metDate.day}/${mon.metDate.year}`
     }
     if (mon.isFatefulEncounter) {
-      message += ' where it met its trainer in a fateful encounter';
+      message += ' where it met its trainer in a fateful encounter'
     }
-    message += ` ${mon.metLocation}.`;
+    message += ` ${mon.metLocation}.`
     if (mon.metLevel) {
-      message += ` At the time, it was level ${mon.metLevel}.`;
+      message += ` At the time, it was level ${mon.metLevel}.`
     }
-    return message;
-  }, [mon]);
+    return message
+  }, [mon])
 
   const natureMessage = useMemo(() => {
     if (!mon.nature) {
-      return undefined;
+      return undefined
     }
-    const currentNature = mon.statNature ?? mon.nature;
-    let message = 'Has a';
+    const currentNature = mon.statNature ?? mon.nature
+    let message = 'Has a'
     const vowelStart = ['A', 'E', 'I', 'O', 'U'].includes(
       (NatureToString(mon.statNature ?? mon.nature) ?? 'Undefined')[0]
-    );
+    )
     if (vowelStart) {
-      message += 'n';
+      message += 'n'
     }
-    message += ` ${NatureToString(currentNature)}`;
+    message += ` ${NatureToString(currentNature)}`
     if (currentNature !== mon.statNature) {
-      message += ` (originally ${NatureToString(mon.nature)})`;
+      message += ` (originally ${NatureToString(mon.nature)})`
     }
-    return message;
-  }, [mon.nature, mon.statNature]);
+    return message
+  }, [mon.nature, mon.statNature])
 
   return (
     <div style={styles.container}>
@@ -223,6 +219,6 @@ const MetDataMovesDisplay = (props: { mon: PKM }) => {
         />
       </div>
     </div>
-  );
-};
-export default MetDataMovesDisplay;
+  )
+}
+export default MetDataMovesDisplay

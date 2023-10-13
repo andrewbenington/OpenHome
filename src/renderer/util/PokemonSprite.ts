@@ -1,11 +1,11 @@
-import { SWEETS } from 'consts';
-import { GameOfOrigin, GameOfOriginData } from 'consts/GameOfOrigin';
-import { POKEMON_DATA } from 'consts/Mons';
-import { NDex } from 'consts/NationalDex';
-import { StringToStringMap } from 'types/types';
-import { Item, ItemToString } from '../../resources/gen/items/Items';
-import { PKM } from '../../types/PKMTypes/PKM';
-import { GameLogos } from '../images/Images';
+import { SWEETS } from 'consts'
+import { GameOfOrigin, GameOfOriginData } from 'consts/GameOfOrigin'
+import { POKEMON_DATA } from 'consts/Mons'
+import { NDex } from 'consts/NationalDex'
+import { StringToStringMap } from 'types/types'
+import { Item, ItemToString } from '../../resources/gen/items/Items'
+import { PKM } from '../../types/PKMTypes/PKM'
+import { GameLogos } from '../images/Images'
 
 const alolaDex = [
   10, 11, 12, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 35, 36, 37, 38, 39, 40,
@@ -34,7 +34,7 @@ const alolaDex = [
   763, 764, 765, 766, 767, 768, 769, 770, 771, 772, 773, 774, 775, 776, 777,
   778, 779, 780, 781, 782, 783, 784, 785, 786, 787, 788, 789, 790, 791, 792,
   793, 794, 795, 796, 797, 798, 799, 800, 801, 802, 803, 804, 805, 806, 807,
-];
+]
 
 export const fileToSpriteFolder: StringToStringMap = {
   PK1: 'gen1',
@@ -51,79 +51,79 @@ export const fileToSpriteFolder: StringToStringMap = {
   PB8: 'home',
   PK9: 'gen9',
   OHPKM: 'home',
-};
+}
 
-const ColosseumOnlyNonShadow = [311];
+const ColosseumOnlyNonShadow = [311]
 
 const ColosseumOnlyShadow = [
   153, 154, 156, 157, 159, 160, 162, 164, 176, 468, 185, 188, 189, 190, 192,
   193, 195, 198, 200, 206, 207, 210, 211, 213, 214, 215, 218, 223, 461, 472,
   469, 430, 429, 982, 223, 224, 225, 226, 227, 234, 899, 235, 237, 241, 243,
   244, 245, 248, 250, 307, 308, 329, 330, 333, 357, 359, 376,
-];
+]
 
 const CXDShadow = [
   166, 168, 180, 181, 196, 197, 205, 217, 219, 221, 473, 901, 229, 296, 297,
   334,
-];
+]
 
-const CXDNonShadow = [196, 197];
+const CXDNonShadow = [196, 197]
 
 const SharedItemSpritePrefixes = [
   'Data Card',
   'Lost Satchel',
   'Old Verse',
   'Lost Satchel',
-];
+]
 
 export const getItemIconPath = (item: Item): string | undefined => {
-  const itemName = ItemToString(item);
+  const itemName = ItemToString(item)
   if (item > 0) {
     if (
       itemName.startsWith('HM') ||
       (itemName.startsWith('TM') && itemName.charAt(2) !== 'V')
     ) {
-      return 'tm/normal.png';
+      return 'tm/normal.png'
     }
     if (itemName.startsWith('TR')) {
-      return 'tr/normal.png';
+      return 'tr/normal.png'
     }
     if (itemName.startsWith('★')) {
-      return 'shared/dynamax-crystal.png';
+      return 'shared/dynamax-crystal.png'
     }
     if (
       (item >= Item.PicnicSet && item <= Item.BluePokeBallPick) ||
       (item >= Item.PinkBottle && item <= Item.YellowDish)
     ) {
-      return 'shared/picnic-set.png';
+      return 'shared/picnic-set.png'
     }
     for (let i = 0; i < SharedItemSpritePrefixes.length; i++) {
-      const prefix = SharedItemSpritePrefixes[i];
+      const prefix = SharedItemSpritePrefixes[i]
       if (itemName.startsWith(prefix)) {
-        return `shared/${prefix.toLocaleLowerCase().replaceAll(' ', '-')}`;
+        return `shared/${prefix.toLocaleLowerCase().replaceAll(' ', '-')}`
       }
     }
-    return `index/${item.toString().padStart(4, '0')}.png`;
+    return `index/${item.toString().padStart(4, '0')}.png`
   }
-  return undefined;
-};
+  return undefined
+}
 
 export const getSpritePath = (mon: PKM, format?: string) => {
-  const monFormat = format ?? mon.format;
-  let spriteName = POKEMON_DATA[mon.dexNum]?.formes[mon.formNum]?.sprite ?? '';
+  const monFormat = format ?? mon.format
+  let spriteName = POKEMON_DATA[mon.dexNum]?.formes[mon.formNum]?.sprite ?? ''
   if (mon.dexNum === NDex.ALCREMIE) {
-    spriteName += `-${SWEETS[mon.formArgument ?? 0].toLocaleLowerCase()}`;
+    spriteName += `-${SWEETS[mon.formArgument ?? 0].toLocaleLowerCase()}`
   }
-  let spriteFolder = fileToSpriteFolder[monFormat];
+  let spriteFolder = fileToSpriteFolder[monFormat]
   if (spriteFolder === 'gen7' && !alolaDex.includes(mon.dexNum)) {
-    spriteFolder = 'gen6';
+    spriteFolder = 'gen6'
   } else if (spriteFolder === 'home' && mon.dexNum > NDex.ENAMORUS) {
-    spriteFolder = 'gen9';
+    spriteFolder = 'gen9'
   }
   return `${spriteFolder}${mon.isShiny ? '/shiny/' : '/'}${spriteName}.${
     spriteFolder === 'gen5' || spriteFolder === 'gen3gc' ? 'gif' : 'png'
-  }`;
-};
+  }`
+}
 
 export const getGameLogo = (
   gameOfOrigin: number,
@@ -132,76 +132,76 @@ export const getGameLogo = (
 ) => {
   if (gameOfOrigin === GameOfOrigin.ColosseumXD) {
     if (dexNum === undefined || hasNationalRibbon === undefined) {
-      return GameLogos.ColosseumXD;
+      return GameLogos.ColosseumXD
     }
     if (hasNationalRibbon) {
       if (ColosseumOnlyShadow.includes(dexNum)) {
-        return GameLogos.Colosseum;
+        return GameLogos.Colosseum
       }
       if (CXDShadow.includes(dexNum)) {
-        return GameLogos.ColosseumXD;
+        return GameLogos.ColosseumXD
       }
-      return GameLogos.XD;
+      return GameLogos.XD
     }
     if (ColosseumOnlyNonShadow.includes(dexNum)) {
-      return GameLogos.Colosseum;
+      return GameLogos.Colosseum
     }
     if (CXDNonShadow.includes(dexNum)) {
-      return GameLogos.ColosseumXD;
+      return GameLogos.ColosseumXD
     }
-    return GameLogos.XD;
+    return GameLogos.XD
   }
   if (gameOfOrigin === -1) {
-    return GameLogos.GB;
+    return GameLogos.GB
   }
   return GameLogos[
     GameOfOriginData[gameOfOrigin]?.logo ??
       GameOfOriginData[gameOfOrigin]?.name.replace(' ', '') ??
       ''
-  ];
-};
+  ]
+}
 
 export const getTypeColor = (type: string) => {
   switch (type) {
     case 'normal':
-      return '#A8A878';
+      return '#A8A878'
     case 'fire':
-      return '#F08030';
+      return '#F08030'
     case 'fighting':
-      return '#C03028';
+      return '#C03028'
     case 'water':
-      return '#6890F0';
+      return '#6890F0'
     case 'flying':
-      return '#A890F0';
+      return '#A890F0'
     case 'grass':
-      return '#78C850';
+      return '#78C850'
     case 'poison':
-      return '#A040A0';
+      return '#A040A0'
     case 'electric':
-      return '#F8D030';
+      return '#F8D030'
     case 'ground':
-      return '#E0C068';
+      return '#E0C068'
     case 'psychic':
-      return '#F85888';
+      return '#F85888'
     case 'rock':
-      return '#B8A038';
+      return '#B8A038'
     case 'ice':
-      return '#98D8D8';
+      return '#98D8D8'
     case 'bug':
-      return '#A8B820';
+      return '#A8B820'
     case 'dragon':
-      return '#7038F8';
+      return '#7038F8'
     case 'ghost':
-      return '#705898';
+      return '#705898'
     case 'dark':
-      return '#705848';
+      return '#705848'
     case 'steel':
-      return '#B8B8D0';
+      return '#B8B8D0'
     case 'fairy':
-      return '#EE99AC';
+      return '#EE99AC'
     case 'shadow':
-      return '#604E82';
+      return '#604E82'
     default:
-      return '#888';
+      return '#888'
   }
-};
+}

@@ -1,7 +1,7 @@
-import { configureStore, getDefaultMiddleware } from '@reduxjs/toolkit';
-import appReducer from './slices/appSlice';
-import recentSavesReducer from './slices/recentSavesSlice';
-import resourcesSlice from './slices/resourcesSlice';
+import { configureStore, getDefaultMiddleware } from '@reduxjs/toolkit'
+import appReducer from './slices/appSlice'
+import recentSavesReducer from './slices/recentSavesSlice'
+import resourcesSlice from './slices/resourcesSlice'
 
 export const store = configureStore({
   reducer: {
@@ -12,7 +12,7 @@ export const store = configureStore({
   middleware: getDefaultMiddleware({
     serializableCheck: false,
   }),
-});
+})
 
 // Inferred type: {posts: PostsState, comments: CommentsState, users: UsersState}
-export type AppDispatch = typeof store.dispatch;
+export type AppDispatch = typeof store.dispatch

@@ -1,55 +1,55 @@
-import { ArrowBack, ArrowForward, Close } from '@mui/icons-material';
-import { Card, Grid, useTheme } from '@mui/material';
-import { GameOfOriginData } from 'consts';
-import _ from 'lodash';
-import { useMemo } from 'react';
-import OpenHomeButton from 'renderer/components/OpenHomeButton';
-import { useAppDispatch } from 'renderer/redux/hooks';
-import { useDragMon, useSaves } from 'renderer/redux/selectors';
+import { ArrowBack, ArrowForward, Close } from '@mui/icons-material'
+import { Card, Grid, useTheme } from '@mui/material'
+import { GameOfOriginData } from 'consts'
+import _ from 'lodash'
+import { useMemo } from 'react'
+import OpenHomeButton from 'renderer/components/OpenHomeButton'
+import { useAppDispatch } from 'renderer/redux/hooks'
+import { useDragMon, useSaves } from 'renderer/redux/selectors'
 import {
   completeDrag,
   importMons,
   removeSaveAt,
   setSaveBox,
   startDrag,
-} from 'renderer/redux/slices/appSlice';
-import { SaveCoordinates, getSaveTypeString } from 'types/types';
-import { PKM } from '../../types/PKMTypes/PKM';
-import { isRestricted } from '../../types/TransferRestrictions';
-import ArrowButton from './ArrowButton';
-import BoxCell from './BoxCell';
+} from 'renderer/redux/slices/appSlice'
+import { SaveCoordinates, getSaveTypeString } from 'types/types'
+import { PKM } from '../../types/PKMTypes/PKM'
+import { isRestricted } from '../../types/TransferRestrictions'
+import ArrowButton from './ArrowButton'
+import BoxCell from './BoxCell'
 
 interface SaveDisplayProps {
-  saveIndex: number;
-  setSelectedMon: (_: PKM | undefined) => void;
+  saveIndex: number
+  setSelectedMon: (_: PKM | undefined) => void
 }
 
 const SaveDisplay = (props: SaveDisplayProps) => {
-  const { palette } = useTheme();
-  const saves = useSaves();
-  const dragMon = useDragMon();
-  const { saveIndex, setSelectedMon } = props;
-  const dispatch = useAppDispatch();
+  const { palette } = useTheme()
+  const saves = useSaves()
+  const dragMon = useDragMon()
+  const { saveIndex, setSelectedMon } = props
+  const dispatch = useAppDispatch()
 
   const dispatchSetBox = (box: number) =>
-    dispatch(setSaveBox({ saveNumber: saveIndex, box }));
+    dispatch(setSaveBox({ saveNumber: saveIndex, box }))
   const dispatchStartDrag = (source: SaveCoordinates) =>
-    dispatch(startDrag(source));
+    dispatch(startDrag(source))
   const dispatchCompleteDrag = (dest: SaveCoordinates) =>
-    dispatch(completeDrag(dest));
-  const dispatchRemoveSaveAt = (index: number) => dispatch(removeSaveAt(index));
+    dispatch(completeDrag(dest))
+  const dispatchRemoveSaveAt = (index: number) => dispatch(removeSaveAt(index))
   const dispatchImportMons = (mons: PKM[], saveCoordinates: SaveCoordinates) =>
-    dispatch(importMons({ mons, saveCoordinates }));
+    dispatch(importMons({ mons, saveCoordinates }))
 
   const save = useMemo(() => {
-    return saves[saveIndex];
-  }, [saves, saveIndex]);
+    return saves[saveIndex]
+  }, [saves, saveIndex])
 
   const isDisabled = useMemo(() => {
     return dragMon
       ? isRestricted(save.transferRestrictions, dragMon.dexNum, dragMon.formNum)
-      : false;
-  }, [save, dragMon]);
+      : false
+  }, [save, dragMon])
   return save && save.currentPCBox !== undefined ? (
     <div style={{ display: 'flex' }}>
       <div
@@ -144,7 +144,7 @@ const SaveDisplay = (props: SaveDisplayProps) => {
                   const mon =
                     save.boxes[save.currentPCBox].pokemon[
                       row * save.boxColumns + rowIndex
-                    ];
+                    ]
                   return (
                     <Grid
                       key={`pc_row_${row}_slot_${rowIndex}`}
@@ -154,14 +154,14 @@ const SaveDisplay = (props: SaveDisplayProps) => {
                     >
                       <BoxCell
                         onClick={() => {
-                          setSelectedMon(mon);
+                          setSelectedMon(mon)
                         }}
                         onDragEvent={() => {
                           dispatchStartDrag({
                             saveNumber: saveIndex,
                             box: save.currentPCBox,
                             index: row * save.boxColumns + rowIndex,
-                          });
+                          })
                         }}
                         disabled={isDisabled}
                         mon={mon}
@@ -172,18 +172,18 @@ const SaveDisplay = (props: SaveDisplayProps) => {
                               saveNumber: saveIndex,
                               box: save.currentPCBox,
                               index: row * save.boxColumns + rowIndex,
-                            });
+                            })
                           } else {
                             dispatchCompleteDrag({
                               saveNumber: saveIndex,
                               box: save.currentPCBox,
                               index: row * save.boxColumns + rowIndex,
-                            });
+                            })
                           }
                         }}
                       />
                     </Grid>
-                  );
+                  )
                 })}
               </Grid>
             ))}
@@ -193,7 +193,7 @@ const SaveDisplay = (props: SaveDisplayProps) => {
     </div>
   ) : (
     <div />
-  );
-};
+  )
+}
 
-export default SaveDisplay;
+export default SaveDisplay

@@ -11,7 +11,7 @@ export const Gen3StandardRibbons = [
   'National',
   'Earth',
   'World',
-];
+]
 
 export const Gen3ContestRibbons = [
   'Cool (Hoenn)',
@@ -34,7 +34,7 @@ export const Gen3ContestRibbons = [
   'Tough Super (Hoenn)',
   'Tough Hyper (Hoenn)',
   'Tough Master (Hoenn)',
-];
+]
 
 export const Gen34TowerRibbons = [
   'Winning',
@@ -45,7 +45,7 @@ export const Gen34TowerRibbons = [
   'Multi Ability',
   'Pair Ability',
   'World Ability',
-];
+]
 
 export const Gen34ContestRibbons = [
   'Cool (Hoenn)',
@@ -88,7 +88,7 @@ export const Gen34ContestRibbons = [
   'Tough Great (Sinnoh)',
   'Tough Ultra (Sinnoh)',
   'Tough Master (Sinnoh)',
-];
+]
 
 export const Gen4RibbonsPart1 = [
   'Sinnoh Champion',
@@ -119,7 +119,7 @@ export const Gen4RibbonsPart1 = [
   'Wishing',
   'Classic',
   'Premier',
-];
+]
 export const Gen4RibbonsPart2 = [
   'Cool (Hoenn)',
   'Cool Super (Hoenn)',
@@ -153,7 +153,7 @@ export const Gen4RibbonsPart2 = [
   'National',
   'Earth',
   'World',
-];
+]
 
 export const Gen4RibbonsPart3 = [
   'Cool (Sinnoh)',
@@ -176,7 +176,7 @@ export const Gen4RibbonsPart3 = [
   'Tough Great (Sinnoh)',
   'Tough Ultra (Sinnoh)',
   'Tough Master (Sinnoh)',
-];
+]
 
 export const Gen9Ribbons = [
   'Kalos Champion',
@@ -289,7 +289,7 @@ export const Gen9Ribbons = [
   'Alpha Mark',
   'Mightiest Mark',
   'Titan Mark',
-];
+]
 export const Gen9RibbonsPart1 = [
   'Kalos Champion',
   'Champion',
@@ -355,7 +355,7 @@ export const Gen9RibbonsPart1 = [
   'Blizzard Mark',
   'Dry Mark',
   'Sandstorm Mark',
-];
+]
 export const Gen9RibbonsPart2 = [
   'Misty Mark',
   'Destiny Mark',
@@ -403,10 +403,10 @@ export const Gen9RibbonsPart2 = [
   'Alpha Mark',
   'Mightiest Mark',
   'Titan Mark',
-];
+]
 
 export const OpenHomeRibbons =
-  Gen34TowerRibbons.concat(Gen34ContestRibbons).concat(Gen9Ribbons);
+  Gen34TowerRibbons.concat(Gen34ContestRibbons).concat(Gen9Ribbons)
 
 export const RibbonTitles = [
   'the Kalos Champion',
@@ -519,4 +519,4 @@ export const RibbonTitles = [
   'the Former Alpha',
   'the Unrivaled',
   'the Former Titan',
-];
+]

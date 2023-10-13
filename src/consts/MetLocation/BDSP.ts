@@ -786,6 +786,6 @@ const BDSPLocations = {
     '',
     'Nursery Couple',
   ],
-};
+}
 
-export default BDSPLocations;
+export default BDSPLocations

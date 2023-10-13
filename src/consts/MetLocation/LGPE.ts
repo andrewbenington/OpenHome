@@ -155,6 +155,6 @@ const LGPELocations = {
     'a demo version',
     'Poké Ball Plus',
   ],
-};
+}
 
-export default LGPELocations;
+export default LGPELocations
