@@ -1,0 +1,23 @@
+resources:
+  - source: items/text_Items_en.txt
+    dest: text/items/items.txt
+    replaceExisting: false
+  - source: items/gen1/text_ItemsG1_en.txt
+    dest: text/items/gen1.txt
+    replaceExisting: false
+  - source: items/gen2/text_ItemsG2_en.txt
+    dest: text/items/gen2.txt
+    replaceExisting: false
+  - source: items/gen3/text_ItemsG3_en.txt
+    dest: text/items/gen3.txt
+    replaceExisting: false
+  - source: items/gen3/text_ItemsG3Colosseum_en.txt
+    dest: text/items/gen3col.txt
+    replaceExisting: false
+  - source: items/gen3/text_ItemsG3XD_en.txt
+    dest: text/items/gen3xd.txt
+    replaceExisting: false
+  - source: other/en/text_Ribbons_en.txt
+    dest: text/ribbons/ribbons.txt
+    replaceExisting: false
+forceReplaceExisting: false
