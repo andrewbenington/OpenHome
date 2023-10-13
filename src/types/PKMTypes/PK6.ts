@@ -8,10 +8,10 @@ import {
   stats,
 } from 'types/types';
 import { Ball, GameOfOrigin, GameOfOriginData, isGen6 } from '../../consts';
-import { Items } from '../../consts/Items';
 import { Languages } from '../../consts/Languages';
 import G6Location from '../../consts/MetLocation/G6';
 import { Gen9Ribbons } from '../../consts/Ribbons';
+import { ItemFromString, ItemToString } from '../../resources/gen/items/Items';
 import {
   AbilityFromString,
   AbilityToString,
@@ -193,11 +193,11 @@ export class PK6 extends PKM {
   }
 
   public get heldItem() {
-    return Items[this.heldItemIndex];
+    return ItemToString(this.heldItemIndex);
   }
 
   public set heldItem(value: string) {
-    const itemIndex = Items.indexOf(value);
+    const itemIndex = ItemFromString(value);
     if (itemIndex > -1) {
       this.heldItemIndex = itemIndex;
     }

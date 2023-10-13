@@ -1,9 +1,9 @@
 import { contestStats } from 'types/types';
 import { GameOfOriginData } from '../../consts/GameOfOrigin';
-import { Gen3Items } from '../../consts/Items';
 import { GCLanguages } from '../../consts/Languages';
 import { POKEMON_DATA } from '../../consts/Mons';
 import { Gen3StandardRibbons } from '../../consts/Ribbons';
+import { ItemGen3ToString } from '../../resources/gen/items/Gen3';
 import {
   bytesToUint16BigEndian,
   bytesToUint32BigEndian,
@@ -28,7 +28,7 @@ export class XDPKM extends PKM {
     this.exp = bytesToUint32BigEndian(bytes, 0x20);
     this.level = getLevelGen3Onward(this.dexNum, this.exp);
     this.formNum = 0;
-    this.heldItem = Gen3Items[bytesToUint16BigEndian(bytes, 0x02)];
+    this.heldItem = ItemGen3ToString(bytesToUint16BigEndian(bytes, 0x02));
     this.nature = this.personalityValue % 25;
     this.trainerID = bytesToUint16BigEndian(bytes, 0x26);
     this.secretID = bytesToUint16BigEndian(bytes, 0x24);

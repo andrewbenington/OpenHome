@@ -1,4 +1,4 @@
-import { GameOfOrigin, Gen9RibbonsPart1, Items } from '../../consts';
+import { GameOfOrigin, Gen9RibbonsPart1 } from '../../consts';
 import { Languages } from '../../consts/Languages';
 import {
   bytesToUint16LittleEndian,
@@ -21,7 +21,7 @@ export class PB7 extends PKM {
     this.exp = bytesToUint32LittleEndian(bytes, 0x10);
     this.level = getLevelGen3Onward(this.dexNum, this.exp);
     this.formNum = bytes[0x1d] >> 3;
-    this.heldItem = Items[bytesToUint16LittleEndian(bytes, 0x0a)];
+    this.heldItem = ItemToString(bytesToUint16LittleEndian(bytes, 0x0a));
     this.nature = bytes[0x1c];
     this.gender = (bytes[0x1d] >> 1) & 0x3;
     this.trainerID = bytesToUint16LittleEndian(bytes, 0x0c);

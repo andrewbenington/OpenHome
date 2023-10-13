@@ -4,7 +4,6 @@ export * from './Countries';
 export * from './EncounterTypes';
 export * from './Formes';
 export * from './GameOfOrigin';
-export * from './Items';
 export * from './Languages';
 export * from './LevelUpExp';
 export * from './Mons';

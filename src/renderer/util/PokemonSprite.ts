@@ -1,8 +1,9 @@
-import { Items, SWEETS } from 'consts';
+import { SWEETS } from 'consts';
 import { GameOfOrigin, GameOfOriginData } from 'consts/GameOfOrigin';
 import { POKEMON_DATA } from 'consts/Mons';
 import { NDex } from 'consts/NationalDex';
 import { StringToStringMap } from 'types/types';
+import { Item, ItemToString } from '../../resources/gen/items/Items';
 import { PKM } from '../../types/PKMTypes/PKM';
 import { GameLogos } from '../images/Images';
 
@@ -75,34 +76,34 @@ const SharedItemSpritePrefixes = [
   'Lost Satchel',
 ];
 
-export const getItemIconPath = (item: string): string | undefined => {
-  const itemIndex = Items.indexOf(item);
-  if (itemIndex > 0) {
+export const getItemIconPath = (item: Item): string | undefined => {
+  const itemName = ItemToString(item);
+  if (item > 0) {
     if (
-      item.startsWith('HM') ||
-      (item.startsWith('TM') && item.charAt(2) !== 'V')
+      itemName.startsWith('HM') ||
+      (itemName.startsWith('TM') && itemName.charAt(2) !== 'V')
     ) {
       return 'tm/normal.png';
     }
-    if (item.startsWith('TR')) {
+    if (itemName.startsWith('TR')) {
       return 'tr/normal.png';
     }
-    if (item.startsWith('★')) {
+    if (itemName.startsWith('★')) {
       return 'shared/dynamax-crystal.png';
     }
     if (
-      (itemIndex > 2310 && itemIndex < 2344) ||
-      (itemIndex > 2347 && itemIndex < 2401)
+      (item >= Item.PicnicSet && item <= Item.BluePokeBallPick) ||
+      (item >= Item.PinkBottle && item <= Item.YellowDish)
     ) {
       return 'shared/picnic-set.png';
     }
     for (let i = 0; i < SharedItemSpritePrefixes.length; i++) {
       const prefix = SharedItemSpritePrefixes[i];
-      if (item.startsWith(prefix)) {
+      if (itemName.startsWith(prefix)) {
         return `shared/${prefix.toLocaleLowerCase().replaceAll(' ', '-')}`;
       }
     }
-    return `index/${itemIndex.toString().padStart(4, '0')}.png`;
+    return `index/${item.toString().padStart(4, '0')}.png`;
   }
   return undefined;
 };

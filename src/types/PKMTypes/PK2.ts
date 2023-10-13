@@ -2,11 +2,14 @@ import { statsPreSplit } from 'types/types';
 import {
   GameOfOrigin,
   GameOfOriginData,
-  Gen2Items,
   NDex,
   POKEMON_DATA,
 } from '../../consts';
 import CrystalLocation from '../../consts/MetLocation/Crystal';
+import {
+  ItemGen2FromString,
+  ItemGen2ToString,
+} from '../../resources/gen/items/Gen2';
 import {
   bytesToUint16BigEndian,
   bytesToUint24BigEndian,
@@ -45,11 +48,11 @@ export class PK2 extends PKM {
   }
 
   public get heldItem() {
-    return Gen2Items[this.heldItemIndex];
+    return ItemGen2ToString(this.heldItemIndex);
   }
 
   public set heldItem(value: string) {
-    const itemIndex = Gen2Items.indexOf(value);
+    const itemIndex = ItemGen2FromString(value);
     if (itemIndex > -1) {
       this.heldItemIndex = itemIndex;
     }

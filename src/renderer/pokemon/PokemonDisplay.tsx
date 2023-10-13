@@ -172,7 +172,7 @@ const PokemonDisplay = (props: {
   useEffect(() => {
     const importIcon = async () => {
       const icon = await import(
-        `../images/items/${getItemIconPath(mon.heldItem)}`
+        `../images/items/${getItemIconPath(mon.heldItemIndex)}`
       );
       setItemIcon(icon?.default);
     };
@@ -223,7 +223,7 @@ const PokemonDisplay = (props: {
     <Grid container style={styles.pokemonDisplay}>
       <Grid item xs={6}>
         <Grid container>
-          <Grid xs={4}>
+          <Grid item xs={4}>
             <Select
               value={displayMon.format}
               onChange={(e) => {
@@ -373,7 +373,7 @@ const PokemonDisplay = (props: {
             <AttributeRow label="Dex No." value={`${displayMon.dexNum}`} />
             <AttributeRow label="Type">
               {getTypes(displayMon)?.map((type) => (
-                <TypeIcon type={type} />
+                <TypeIcon type={type} key={`${type}_type_icon`} />
               ))}
             </AttributeRow>
             <AttributeRow

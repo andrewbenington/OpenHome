@@ -15,11 +15,11 @@ import {
   GameOfOrigin,
   Gen34ContestRibbons,
   Gen34TowerRibbons,
-  Items,
   Languages,
   NDex,
   OpenHomeRibbons,
 } from '../../consts';
+import { ItemFromString, ItemToString } from '../../resources/gen/items/Items';
 import {
   AbilityFromString,
   AbilityToString,
@@ -331,11 +331,11 @@ export class OHPKM extends PKM {
   }
 
   public get heldItem() {
-    return Items[this.heldItemIndex];
+    return ItemToString(this.heldItemIndex);
   }
 
   public set heldItem(value: string) {
-    const itemIndex = Items.indexOf(value);
+    const itemIndex = ItemFromString(value);
     if (itemIndex > -1) {
       this.heldItemIndex = itemIndex;
     }

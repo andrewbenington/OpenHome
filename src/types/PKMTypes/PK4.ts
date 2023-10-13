@@ -5,7 +5,6 @@ import {
   Gen4RibbonsPart1,
   Gen4RibbonsPart2,
   Gen4RibbonsPart3,
-  Items,
   Languages,
   isGen4,
   isHoenn,
@@ -14,6 +13,7 @@ import {
   isSinnoh,
 } from '../../consts';
 import G4Locations from '../../consts/MetLocation/G4';
+import { ItemFromString, ItemToString } from '../../resources/gen/items/Items';
 import {
   AbilityFromString,
   AbilityToString,
@@ -204,11 +204,11 @@ export class PK4 extends PKM {
   }
 
   public get heldItem() {
-    return Items[this.heldItemIndex];
+    return ItemToString(this.heldItemIndex);
   }
 
   public set heldItem(value: string) {
-    const itemIndex = Items.indexOf(value);
+    const itemIndex = ItemFromString(value);
     if (itemIndex > -1) {
       this.heldItemIndex = itemIndex;
     }

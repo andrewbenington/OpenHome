@@ -3,7 +3,6 @@ import {
   Ball,
   GameOfOrigin,
   Gen3ContestRibbons,
-  Gen3Items,
   Gen3StandardRibbons,
   Languages,
   NDex,
@@ -14,6 +13,10 @@ import {
 } from '../../consts';
 import CXDLocation from '../../consts/MetLocation/CXD';
 import RSEFRLGLocations from '../../consts/MetLocation/RSEFRLG';
+import {
+  ItemGen3FromString,
+  ItemGen3ToString,
+} from '../../resources/gen/items/Gen3';
 import { AbilityFromString } from '../../resources/gen/other/Abilities';
 import {
   bytesToUint16LittleEndian,
@@ -273,11 +276,11 @@ export class PK3 extends PKM {
   }
 
   public get heldItem() {
-    return Gen3Items[this.heldItemIndex];
+    return ItemGen3ToString(this.heldItemIndex);
   }
 
   public set heldItem(value: string) {
-    const itemIndex = Gen3Items.indexOf(value);
+    const itemIndex = ItemGen3FromString(value);
     if (itemIndex > -1) {
       this.heldItemIndex = itemIndex;
     }
