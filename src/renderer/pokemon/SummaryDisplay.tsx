@@ -1,209 +1,172 @@
-import { Card } from '@mui/material';
-import Markings from 'renderer/components/Markings';
-import { BallsList, OriginMarks } from 'renderer/images/Images';
-import { getMoveMaxPP } from 'types/PKMTypes/util';
-import { Styles } from 'types/types';
-import { GameOfOriginData, Natures } from '../../consts';
+import { Grid } from '@mui/material';
+import { useEffect, useMemo, useState } from 'react';
+import { getTypes } from 'types/PKMTypes/util';
+import { StringToStringMap, Styles } from 'types/types';
+import { POKEMON_DATA } from '../../consts';
+import {
+  BW2_TRANSFER_RESTRICTIONS,
+  GEN1_TRANSFER_RESTRICTIONS,
+  GEN2_TRANSFER_RESTRICTIONS,
+  GEN3_TRANSFER_RESTRICTIONS,
+  HGSS_TRANSFER_RESTRICTIONS,
+  LA_TRANSFER_RESTRICTIONS,
+  ORAS_TRANSFER_RESTRICTIONS,
+  USUM_TRANSFER_RESTRICTIONS,
+} from '../../consts/TransferRestrictions';
 import { PKM } from '../../types/PKMTypes/PKM';
-import { getGameLogo } from '../util/PokemonSprite';
-import MoveCard from './MoveCard';
+import { isRestricted } from '../../types/TransferRestrictions';
+import TypeIcon from '../components/TypeIcon';
+import { getItemIconPath, getSpritePath } from '../util/PokemonSprite';
+import AttributeRow from './AttributeRow';
 
 const styles = {
-  container: {
-    display: 'flex',
-    flexDirection: 'column' as 'column',
-    height: 'calc(100% - 20px)',
-    padding: 10,
-  },
-  detailsContainer: {
-    display: 'flex',
-    flex: 1,
-    flexDirection: 'row',
-    height: 'fit-content',
-  },
-  language: { padding: '5px 10px 5px 10px', marginLeft: 10 },
-  gameContainer: {
-    position: 'relative',
-    width: 100,
-    height: 60,
-    alignItems: 'center',
+  column: {
+    height: 200,
     display: 'flex',
     justifyContent: 'center',
   },
-  gameImage: {
-    width: 100,
-    height: 60,
+  image: {
+    maxWidth: 100,
+    maxHeight: 100,
+    transform: 'scale(2)',
+    imageRendering: 'pixelated',
     objectFit: 'contain',
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    opacity: 0.6,
   },
-  originMark: {
-    width: 50,
-    height: 50,
-    objectFit: 'contain',
-    zIndex: 2,
-    opacity: 0.8,
-  },
-  centerFlex: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'center',
-  },
+  attributesList: { textAlign: 'left', width: '30%', marginTop: 10 },
 } as Styles;
-
-const metTimesOfDay = [
-  'in the morning',
-  'during the daytime',
-  'in the evening',
-];
 
 const SummaryDisplay = (props: { mon: PKM }) => {
   const { mon } = props;
-  return (
-    <div style={styles.container}>
-      <div style={styles.detailsContainer}>
-        <div style={{ flex: 1 }}>
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              alignItems: 'center',
-            }}
-          >
-            {mon.ball ? (
-              <img
-                draggable={false}
-                alt="poke ball type"
-                style={{ width: 24, height: 24 }}
-                src={BallsList[mon.ball ?? 3]}
-              />
-            ) : (
-              <div />
-            )}
-            <p style={{ fontWeight: 'bold' }}>
-              {mon.nickname}
-              {mon.affixedRibbonTitle ? ` ${mon.affixedRibbonTitle}` : ''}
-            </p>
-            <Card style={styles.language}>{mon.language}</Card>
-          </div>
-          {mon.eggDate && mon.eggLocation ? (
-            <p style={{ textAlign: 'left' }}>{`Egg received ${
-              mon.eggDate
-                ? `on ${mon.eggDate.month}/${mon.eggDate.day}/${mon.eggDate.year}`
-                : ''
-            } ${mon.eggLocation}.`}</p>
-          ) : (
-            <div />
-          )}
-          {mon.metLocation ? (
-            <p style={{ textAlign: 'left' }}>{`Met ${
-              mon.metTimeOfDay ? `${metTimesOfDay[mon.metTimeOfDay - 1]} ` : ''
-            }${
-              mon.metDate
-                ? `on ${mon.metDate.month}/${mon.metDate.day}/${mon.metDate.year},`
-                : ''
-            }${mon.metLevel ? ` at level ${mon.metLevel},` : ''} ${
-              mon.metLocation
-            }${
-              mon.isFatefulEncounter
-                ? ' where it met its trainer in a fateful encounter'
-                : ''
-            }.`}</p>
-          ) : (
-            <div />
-          )}
+  const [monSprites, setMonSprites] = useState<StringToStringMap>();
+  const [itemIcon, setItemIcon] = useState<string>();
 
-          {mon.nature !== undefined ? (
-            <p style={{ textAlign: 'left' }}>
-              Has a
-              <span>
-                {['A', 'E', 'I', 'O', 'U'].includes(
-                  (Natures[mon.statNature ?? mon.nature] ?? 'Undefined')[0]
-                )
-                  ? 'n'
-                  : ''}
-              </span>{' '}
-              <span style={{ fontWeight: 'bold' }}>
-                {Natures[mon.statNature ?? mon.nature]}
-              </span>{' '}
-              nature{' '}
-              <span>
-                {mon.statNature && mon.statNature !== mon.nature
-                  ? `(originally ${Natures[mon.nature]})`
-                  : ''}
-              </span>
-            </p>
-          ) : (
-            <div />
-          )}
-          {mon.ivs ? <p>{mon.characteristic}</p> : <div />}
-        </div>
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-evenly',
-          }}
-        >
-          <div style={styles.gameContainer}>
+  const itemAltText = useMemo(() => {
+    const monData = POKEMON_DATA[mon.dexNum]?.formes[mon.formNum];
+    if (!monData) return 'pokemon sprite';
+    return `${monData.formeName}${mon.isShiny ? '-shiny' : ''} sprite`;
+  }, [mon]);
+
+  const monSpriteSource = useMemo(
+    () => (monSprites ? monSprites[mon.format] : ''),
+    [mon.format, monSprites]
+  );
+
+  useEffect(() => {
+    const importIcon = async () => {
+      const icon = await import(
+        `../images/items/${getItemIconPath(mon.heldItemIndex)}`
+      );
+      setItemIcon(icon?.default);
+    };
+    if (mon.heldItemIndex) {
+      importIcon();
+    }
+  }, [mon.heldItem, mon.heldItemIndex]);
+
+  useEffect(() => {
+    const sprites: StringToStringMap = {};
+    const importSprite = async (format: string) => {
+      if (!(format in sprites)) {
+        const sprite = await import(
+          `../images/sprites/${getSpritePath(mon, format)}`
+        );
+        sprites[format] = sprite.default;
+      }
+    };
+    const importSprites = async () => {
+      // load first sprite first
+      await importSprite(mon.format);
+      setMonSprites(sprites);
+      await Promise.all([
+        importSprite('OHPKM'),
+        !isRestricted(GEN1_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
+          importSprite('PK1'),
+        !isRestricted(GEN2_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
+          importSprite('PK2'),
+        !isRestricted(GEN3_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
+          importSprite('PK3'),
+        !isRestricted(HGSS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
+          importSprite('PK4'),
+        !isRestricted(BW2_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
+          importSprite('PK5'),
+        !isRestricted(ORAS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
+          importSprite('PK6'),
+        !isRestricted(USUM_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
+          importSprite('PK7'),
+        !isRestricted(LA_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
+          importSprite('PA8'),
+      ]);
+      setMonSprites(sprites);
+    };
+    importSprites();
+  }, [mon]);
+
+  return (
+    <Grid container>
+      <Grid xs={5}>
+        <div style={styles.column}>
+          {monSprites && (
             <img
               draggable={false}
-              alt={`${GameOfOriginData[mon.gameOfOrigin]?.name} logo`}
-              src={
-                getGameLogo(
-                  mon.gameOfOrigin,
-                  mon.dexNum,
-                  mon.ribbons.includes('National') || mon.isShadow
-                ) ?? ''
-              }
-              style={styles.gameImage}
+              alt={itemAltText}
+              style={styles.image}
+              src={monSpriteSource}
             />
-            {(GameOfOriginData[mon.gameOfOrigin]?.mark ||
-              mon.gameOfOrigin === -1) && (
-              <img
-                draggable={false}
-                alt="origin mark"
-                src={
-                  OriginMarks[
-                    mon.gameOfOrigin === -1
-                      ? 'GB'
-                      : GameOfOriginData[mon.gameOfOrigin]?.mark ?? ''
-                  ]
-                }
-                style={styles.originMark}
-              />
-            )}
-          </div>
-          {mon.markings ? <Markings markings={mon.markings} /> : <div />}
+          )}
         </div>
-      </div>
-      <div style={styles.centerFlex}>
-        <MoveCard
-          move={mon.moves[0]}
-          movePP={mon.moves[0] ? mon.movePP[0] : undefined}
-          maxPP={getMoveMaxPP(mon.moves[0], mon.format, mon.movePPUps[0])}
+        <AttributeRow label="Level" justifyEnd>
+          {mon.level}
+        </AttributeRow>
+        <AttributeRow label="EXP" justifyEnd>
+          {mon.exp}
+        </AttributeRow>
+        <AttributeRow label="Item" justifyEnd>
+          {mon.heldItem !== 'None' && (
+            <img
+              alt="item icon"
+              src={itemIcon}
+              style={{ width: 24, height: 24, marginRight: 5 }}
+            />
+          )}
+          <div>{mon.heldItem}</div>
+        </AttributeRow>
+      </Grid>
+      <Grid xs={7} style={styles.attributesList}>
+        <AttributeRow
+          label="Name"
+          value={`${POKEMON_DATA[mon.dexNum]?.formes[mon.formNum]?.formeName} ${
+            ['♂', '♀', ''][mon.gender]
+          }`}
         />
-        <MoveCard
-          move={mon.moves[1]}
-          movePP={mon.moves[1] ? mon.movePP[1] : undefined}
-          maxPP={getMoveMaxPP(mon.moves[1], mon.format, mon.movePPUps[1])}
+        <AttributeRow label="Dex No." value={`${mon.dexNum}`} />
+        <AttributeRow label="Type">
+          {getTypes(mon)?.map((type) => (
+            <TypeIcon type={type} key={`${type}_type_icon`} />
+          ))}
+        </AttributeRow>
+        <AttributeRow
+          label="OT"
+          value={`${mon.trainerName} ${mon.trainerGender ? '♀' : '♂'}`}
         />
-      </div>
-      <div style={styles.centerFlex}>
-        <MoveCard
-          move={mon.moves[2]}
-          movePP={mon.moves[2] ? mon.movePP[2] : undefined}
-          maxPP={getMoveMaxPP(mon.moves[2], mon.format, mon.movePPUps[2])}
+        <AttributeRow
+          label="Trainer ID"
+          value={`${mon.displayID
+            .toString()
+            .padStart(
+              ['PK7', 'PK8', 'PA8', 'PK9'].includes(mon.format) ? 6 : 5,
+              '0'
+            )}`}
         />
-        <MoveCard
-          move={mon.moves[3]}
-          movePP={mon.moves[3] ? mon.movePP[3] : undefined}
-          maxPP={getMoveMaxPP(mon.moves[3], mon.format, mon.movePPUps[3])}
-        />
-      </div>
-    </div>
+        {mon.ability !== undefined && (
+          <AttributeRow
+            label="Ability"
+            value={`${mon.ability} (${
+              mon.abilityNum === 4 ? 'HA' : mon.abilityNum
+            })`}
+          />
+        )}
+      </Grid>
+    </Grid>
   );
 };
 export default SummaryDisplay;

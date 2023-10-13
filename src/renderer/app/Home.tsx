@@ -198,78 +198,72 @@ const Home = () => {
       <div style={{ display: 'flex', flexDirection: 'column', width: '50%' }}>
         <HomeBoxDisplay setSelectedMon={setSelectedMon} />
       </div>
-      <div style={{ display: 'flex', flex: 1, flexDirection: 'column' }}>
-        <button type="button" style={dropAreaStyle}>
-          <div
-            draggable
-            style={{
-              height: '100%',
-              width: '100%',
-              flex: 1,
-              padding: 'auto',
-            }}
-            onDragOver={(e) => {
-              e.preventDefault();
-            }}
-            onDrop={(e) => onViewDrop(e, 'as is')}
-          >
-            Preview
-          </div>
-        </button>
-        <button
-          type="button"
-          style={dropAreaStyle}
-          onClick={() => {}}
-          //   disabled={!mon}
+      <button type="button" style={dropAreaStyle}>
+        <div
+          draggable
+          style={{
+            height: '100%',
+            width: '100%',
+            flex: 1,
+            padding: 'auto',
+          }}
+          onDragOver={(e) => {
+            e.preventDefault();
+          }}
+          onDrop={(e) => onViewDrop(e, 'as is')}
         >
-          <div
-            style={{
-              width: '100%',
-              flex: 1,
-              padding: 'auto',
-            }}
-            onDragOver={(e) => {
-              e.preventDefault();
-            }}
-            onDrop={(e) => onViewDrop(e, 'release')}
-          >
-            RELEASE
-          </div>
-          {monsToDelete.map((mon) => (
-            <div
-              style={{
-                background: `url(${BoxIcons}) no-repeat 0.027027% 0.027027%`,
-                backgroundSize: '3700%',
-                backgroundPosition:
-                  mon.isEgg || !POKEMON_DATA[mon.dexNum]
-                    ? '0% 0%'
-                    : `${
-                        (POKEMON_DATA[mon.dexNum].formes[mon.formNum]
-                          .spriteIndex[0] /
-                          36) *
-                        100
-                      }% ${
-                        (Math.floor(
-                          POKEMON_DATA[mon.dexNum].formes[mon.formNum]
-                            .spriteIndex[1]
-                        ) /
-                          35) *
-                        100
-                      }%`,
-                imageRendering: 'crisp-edges',
-                height: '10%',
-                aspectRatio: 1,
-                zIndex: 100,
-              }}
-            />
-          ))}
-        </button>
-      </div>
+          Preview
+        </div>
+      </button>
+      <button
+        type="button"
+        style={dropAreaStyle}
+        onClick={() => {}}
+        //   disabled={!mon}
+      >
+        <div
+          style={{
+            width: '100%',
+            flex: 1,
+            padding: 'auto',
+          }}
+          onDragOver={(e) => {
+            e.preventDefault();
+          }}
+          onDrop={(e) => onViewDrop(e, 'release')}
+        >
+          RELEASE
+        </div>
+        <div
+          style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }}
+        >
+          {monsToDelete.map((mon) => {
+            if (mon.isEgg || !POKEMON_DATA[mon.dexNum]) {
+              return '0% 0%';
+            }
+            const [x, y] =
+              POKEMON_DATA[mon.dexNum].formes[mon.formNum].spriteIndex;
+            const backgroundPosition = `${(x / 35) * 100}% ${(y / 36) * 100}%`;
+            return (
+              <div
+                style={{
+                  background: `url(${BoxIcons}) no-repeat 0.02777% 0.02777%`,
+                  backgroundSize: '3600%',
+                  backgroundPosition,
+                  imageRendering: 'crisp-edges',
+                  height: '10%',
+                  aspectRatio: 1,
+                  zIndex: 100,
+                }}
+              />
+            );
+          })}
+        </div>
+      </button>
       <Dialog
         open={!!selectedMon}
         onClose={() => setSelectedMon(undefined)}
         fullWidth
-        maxWidth="lg"
         PaperProps={{ sx: { height: 400 } }}
       >
         {selectedMon && (
