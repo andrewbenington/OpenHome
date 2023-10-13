@@ -17,7 +17,7 @@ import { Radar } from 'react-chartjs-2';
 import SheenStars from 'renderer/components/SheenStars';
 import { isRestricted } from 'types/TransferRestrictions';
 import { Styles } from 'types/types';
-import { getNatureSummary } from '../../consts/Natures';
+import { getNatureSummary } from '../../resources/NatureData';
 import { PKM } from '../../types/PKMTypes/PKM';
 
 const styles = {

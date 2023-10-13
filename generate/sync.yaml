@@ -23,4 +23,7 @@ resources:
   - source: other/en/text_Abilities_en.txt
     dest: text/other/abilities.txt
     replaceExisting: false
+  - source: other/en/text_Natures_en.txt
+    dest: text/other/natures.txt
+    replaceExisting: false
 forceReplaceExisting: false

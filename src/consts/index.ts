@@ -1,3 +1,4 @@
+export * from '../resources/NatureData';
 export * from './Balls';
 export * from './Characteristics';
 export * from './Countries';
@@ -9,7 +10,6 @@ export * from './LevelUpExp';
 export * from './Mons';
 export * from './Moves';
 export * from './NationalDex';
-export * from './Natures';
 export * from './PKHEXForms';
 export * from './Ribbons';
 export * from './Types';

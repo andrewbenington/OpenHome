@@ -1,9 +1,11 @@
 import { Card } from '@mui/material';
+import { useMemo } from 'react';
 import Markings from 'renderer/components/Markings';
 import { BallsList, OriginMarks } from 'renderer/images/Images';
 import { getMoveMaxPP } from 'types/PKMTypes/util';
 import { Styles } from 'types/types';
-import { GameOfOriginData, Natures } from '../../consts';
+import { GameOfOriginData } from '../../consts';
+import { NatureToString } from '../../resources/gen/other/Natures';
 import { PKM } from '../../types/PKMTypes/PKM';
 import { getGameLogo } from '../util/PokemonSprite';
 import MoveCard from './MoveCard';
@@ -51,6 +53,9 @@ const styles = {
     flexDirection: 'row',
     justifyContent: 'center',
   },
+  description: {
+    textAlign: 'left',
+  },
 } as Styles;
 
 const metTimesOfDay = [
@@ -61,6 +66,58 @@ const metTimesOfDay = [
 
 const MetDataMovesDisplay = (props: { mon: PKM }) => {
   const { mon } = props;
+
+  const eggMessage = useMemo(() => {
+    if (!mon.eggLocation) {
+      return undefined;
+    }
+    return `Egg received ${
+      mon.eggDate
+        ? `on ${mon.eggDate.month}/${mon.eggDate.day}/${mon.eggDate.year}`
+        : ''
+    } ${mon.eggLocation}.`;
+  }, [mon]);
+
+  const metMessage = useMemo(() => {
+    if (!mon.metLocation) {
+      return 'Met location unknown.';
+    }
+    let message = 'Met';
+    if (mon.metTimeOfDay) {
+      message += metTimesOfDay[mon.metTimeOfDay - 1];
+    }
+    if (mon.metDate) {
+      message += ` on ${mon.metDate.month}/${mon.metDate.day}/${mon.metDate.year}`;
+    }
+    if (mon.isFatefulEncounter) {
+      message += ' where it met its trainer in a fateful encounter';
+    }
+    message += ` ${mon.metLocation}.`;
+    if (mon.metLevel) {
+      message += ` At the time, it was level ${mon.metLevel}.`;
+    }
+    return message;
+  }, [mon]);
+
+  const natureMessage = useMemo(() => {
+    if (!mon.nature) {
+      return undefined;
+    }
+    const currentNature = mon.statNature ?? mon.nature;
+    let message = 'Has a';
+    const vowelStart = ['A', 'E', 'I', 'O', 'U'].includes(
+      (NatureToString(mon.statNature ?? mon.nature) ?? 'Undefined')[0]
+    );
+    if (vowelStart) {
+      message += 'n';
+    }
+    message += ` ${NatureToString(currentNature)}`;
+    if (currentNature !== mon.statNature) {
+      message += ` (originally ${NatureToString(mon.nature)})`;
+    }
+    return message;
+  }, [mon.nature, mon.statNature]);
+
   return (
     <div style={styles.container}>
       <div style={styles.detailsContainer}>
@@ -86,55 +143,17 @@ const MetDataMovesDisplay = (props: { mon: PKM }) => {
               {mon.nickname}
               {mon.affixedRibbonTitle ? ` ${mon.affixedRibbonTitle}` : ''}
             </p>
-            <Card style={styles.language}>{mon.language}</Card>
+            <Card sx={styles.language}>{mon.language}</Card>
           </div>
-          {mon.eggDate && mon.eggLocation ? (
-            <p style={{ textAlign: 'left' }}>{`Egg received ${
-              mon.eggDate
-                ? `on ${mon.eggDate.month}/${mon.eggDate.day}/${mon.eggDate.year}`
-                : ''
-            } ${mon.eggLocation}.`}</p>
+          {eggMessage ? (
+            <p style={styles.description}>{eggMessage}</p>
           ) : (
             <div />
           )}
-          {mon.metLocation ? (
-            <p style={{ textAlign: 'left' }}>{`Met ${
-              mon.metTimeOfDay ? `${metTimesOfDay[mon.metTimeOfDay - 1]} ` : ''
-            }${
-              mon.metDate
-                ? `on ${mon.metDate.month}/${mon.metDate.day}/${mon.metDate.year},`
-                : ''
-            }${mon.metLevel ? ` at level ${mon.metLevel},` : ''} ${
-              mon.metLocation
-            }${
-              mon.isFatefulEncounter
-                ? ' where it met its trainer in a fateful encounter'
-                : ''
-            }.`}</p>
-          ) : (
-            <div />
-          )}
-
+          <p style={styles.description}>{metMessage}</p>
+          {/* check for undefined because 0 nature is Hardy */}
           {mon.nature !== undefined ? (
-            <p style={{ textAlign: 'left' }}>
-              Has a
-              <span>
-                {['A', 'E', 'I', 'O', 'U'].includes(
-                  (Natures[mon.statNature ?? mon.nature] ?? 'Undefined')[0]
-                )
-                  ? 'n'
-                  : ''}
-              </span>{' '}
-              <span style={{ fontWeight: 'bold' }}>
-                {Natures[mon.statNature ?? mon.nature]}
-              </span>{' '}
-              nature{' '}
-              <span>
-                {mon.statNature && mon.statNature !== mon.nature
-                  ? `(originally ${Natures[mon.nature]})`
-                  : ''}
-              </span>
-            </p>
+            <p style={styles.description}>{natureMessage}</p>
           ) : (
             <div />
           )}

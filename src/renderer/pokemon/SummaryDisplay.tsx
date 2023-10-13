@@ -1,4 +1,4 @@
-import { Grid } from '@mui/material';
+import { Card, Grid } from '@mui/material';
 import { useEffect, useMemo, useState } from 'react';
 import { getTypes } from 'types/PKMTypes/util';
 import { StringToStringMap, Styles } from 'types/types';
@@ -16,6 +16,7 @@ import {
 import { PKM } from '../../types/PKMTypes/PKM';
 import { isRestricted } from '../../types/TransferRestrictions';
 import TypeIcon from '../components/TypeIcon';
+import { BallsList } from '../images/Images';
 import { getItemIconPath, getSpritePath } from '../util/PokemonSprite';
 import AttributeRow from './AttributeRow';
 
@@ -24,6 +25,7 @@ const styles = {
     height: 200,
     display: 'flex',
     justifyContent: 'center',
+    alignItems: 'center',
   },
   image: {
     maxWidth: 100,
@@ -33,6 +35,14 @@ const styles = {
     objectFit: 'contain',
   },
   attributesList: { textAlign: 'left', width: '30%', marginTop: 10 },
+  language: { padding: '5px 10px 5px 10px', marginLeft: 'auto' },
+  nicknameRow: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingLeft: 10,
+    paddingRight: 10,
+  },
 } as Styles;
 
 const SummaryDisplay = (props: { mon: PKM }) => {
@@ -114,12 +124,23 @@ const SummaryDisplay = (props: { mon: PKM }) => {
             />
           )}
         </div>
-        <AttributeRow label="Level" justifyEnd>
-          {mon.level}
-        </AttributeRow>
-        <AttributeRow label="EXP" justifyEnd>
-          {mon.exp}
-        </AttributeRow>
+        <div style={styles.nicknameRow}>
+          {mon.ball ? (
+            <img
+              draggable={false}
+              alt="poke ball type"
+              style={{ width: 24, height: 24 }}
+              src={BallsList[mon.ball ?? 3]}
+            />
+          ) : (
+            <div />
+          )}
+          <p style={{ fontWeight: 'bold' }}>
+            {mon.nickname}
+            {mon.affixedRibbonTitle ? ` ${mon.affixedRibbonTitle}` : ''}
+          </p>
+          <Card style={styles.language}>{mon.language}</Card>
+        </div>
         <AttributeRow label="Item" justifyEnd>
           {mon.heldItem !== 'None' && (
             <img
@@ -165,6 +186,12 @@ const SummaryDisplay = (props: { mon: PKM }) => {
             })`}
           />
         )}
+        <AttributeRow label="Level" justifyEnd>
+          {mon.level}
+        </AttributeRow>
+        <AttributeRow label="EXP" justifyEnd>
+          {mon.exp}
+        </AttributeRow>
       </Grid>
     </Grid>
   );

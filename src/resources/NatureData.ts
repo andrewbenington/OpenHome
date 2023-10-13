@@ -1,30 +1,4 @@
-export const Natures = [
-  'Hardy',
-  'Lonely',
-  'Brave',
-  'Adamant',
-  'Naughty',
-  'Bold',
-  'Docile',
-  'Relaxed',
-  'Impish',
-  'Lax',
-  'Timid',
-  'Hasty',
-  'Serious',
-  'Jolly',
-  'Naive',
-  'Modest',
-  'Mild',
-  'Quiet',
-  'Bashful',
-  'Rash',
-  'Calm',
-  'Gentle',
-  'Sassy',
-  'Careful',
-  'Quirky',
-];
+import { Nature } from './gen/other/Natures';
 
 const NatureData = [
   {
@@ -304,9 +278,9 @@ const NatureData = [
   },
 ];
 
-export const getNatureSummary = (nature?: number) => {
+export const getNatureSummary = (nature?: Nature) => {
   if (nature === undefined) {
     return '';
   }
-  return NatureData.find((n) => n.name === Natures[nature])?.summary;
+  return NatureData[nature]?.summary;
 };

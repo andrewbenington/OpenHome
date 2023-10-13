@@ -20,3 +20,6 @@ enums:
   - name: Ability
     source: text/other/abilities.txt
     dest: other/Abilities.ts
+  - name: Nature
+    source: text/other/natures.txt
+    dest: other/Natures.ts

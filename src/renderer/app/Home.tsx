@@ -1,5 +1,5 @@
 import { FileOpen } from '@mui/icons-material';
-import { Dialog, useTheme } from '@mui/material';
+import { Dialog, Grid, useTheme } from '@mui/material';
 import { POKEMON_DATA } from 'consts';
 import _ from 'lodash';
 import { useCallback, useEffect, useState } from 'react';
@@ -160,17 +160,20 @@ const Home = () => {
   return loadingMessage ? (
     <div>{loadingMessage}</div>
   ) : (
-    <div
+    <Grid
+      container
       style={{
         backgroundColor: currentTheme.backgroundColor,
-        height: 'calc(100% - 10px)',
+        height: '100%',
         width: '100%',
         display: 'flex',
         flexDirection: 'row',
         paddingTop: 10,
       }}
     >
-      <div
+      <Grid
+        item
+        xs={3}
         className="scroll-no-bar"
         style={{
           width: '25%',
@@ -194,72 +197,80 @@ const Home = () => {
           <FileOpen />
           <h2>Open Save</h2>
         </OpenHomeButton>
-      </div>
-      <div style={{ display: 'flex', flexDirection: 'column', width: '50%' }}>
-        <HomeBoxDisplay setSelectedMon={setSelectedMon} />
-      </div>
-      <button type="button" style={dropAreaStyle}>
-        <div
-          draggable
-          style={{
-            height: '100%',
-            width: '100%',
-            flex: 1,
-            padding: 'auto',
-          }}
-          onDragOver={(e) => {
-            e.preventDefault();
-          }}
-          onDrop={(e) => onViewDrop(e, 'as is')}
-        >
-          Preview
-        </div>
-      </button>
-      <button
-        type="button"
-        style={dropAreaStyle}
-        onClick={() => {}}
-        //   disabled={!mon}
+      </Grid>
+      <Grid
+        item
+        xs={6}
+        style={{ display: 'flex', flexDirection: 'column', width: '50%' }}
       >
-        <div
-          style={{
-            width: '100%',
-            flex: 1,
-            padding: 'auto',
-          }}
-          onDragOver={(e) => {
-            e.preventDefault();
-          }}
-          onDrop={(e) => onViewDrop(e, 'release')}
+        <HomeBoxDisplay setSelectedMon={setSelectedMon} />
+      </Grid>
+      <Grid item xs={3} style={{ display: 'flex', flexDirection: 'column' }}>
+        <button type="button" style={dropAreaStyle}>
+          <div
+            draggable
+            style={{
+              height: '100%',
+              width: '100%',
+              flex: 1,
+              padding: 'auto',
+            }}
+            onDragOver={(e) => {
+              e.preventDefault();
+            }}
+            onDrop={(e) => onViewDrop(e, 'as is')}
+          >
+            Preview
+          </div>
+        </button>
+        <button
+          type="button"
+          style={dropAreaStyle}
+          onClick={() => {}}
+          //   disabled={!mon}
         >
-          RELEASE
-        </div>
-        <div
-          style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }}
-        >
-          {monsToDelete.map((mon) => {
-            if (mon.isEgg || !POKEMON_DATA[mon.dexNum]) {
-              return '0% 0%';
-            }
-            const [x, y] =
-              POKEMON_DATA[mon.dexNum].formes[mon.formNum].spriteIndex;
-            const backgroundPosition = `${(x / 35) * 100}% ${(y / 36) * 100}%`;
-            return (
-              <div
-                style={{
-                  background: `url(${BoxIcons}) no-repeat 0.02777% 0.02777%`,
-                  backgroundSize: '3600%',
-                  backgroundPosition,
-                  imageRendering: 'crisp-edges',
-                  height: '10%',
-                  aspectRatio: 1,
-                  zIndex: 100,
-                }}
-              />
-            );
-          })}
-        </div>
-      </button>
+          <div
+            style={{
+              width: '100%',
+              flex: 1,
+              padding: 'auto',
+            }}
+            onDragOver={(e) => {
+              e.preventDefault();
+            }}
+            onDrop={(e) => onViewDrop(e, 'release')}
+          >
+            RELEASE
+          </div>
+          <div
+            style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }}
+          >
+            {monsToDelete.map((mon) => {
+              if (mon.isEgg || !POKEMON_DATA[mon.dexNum]) {
+                return '0% 0%';
+              }
+              const [x, y] =
+                POKEMON_DATA[mon.dexNum].formes[mon.formNum].spriteIndex;
+              const backgroundPosition = `${(x / 35) * 100}% ${
+                (y / 36) * 100
+              }%`;
+              return (
+                <div
+                  style={{
+                    background: `url(${BoxIcons}) no-repeat 0.02777% 0.02777%`,
+                    backgroundSize: '3600%',
+                    backgroundPosition,
+                    imageRendering: 'crisp-edges',
+                    height: '10%',
+                    aspectRatio: 1,
+                    zIndex: 100,
+                  }}
+                />
+              );
+            })}
+          </div>
+        </button>
+      </Grid>
       <Dialog
         open={!!selectedMon}
         onClose={() => setSelectedMon(undefined)}
@@ -283,7 +294,7 @@ const Home = () => {
           }}
         />
       </Dialog>
-    </div>
+    </Grid>
   );
 };
 
