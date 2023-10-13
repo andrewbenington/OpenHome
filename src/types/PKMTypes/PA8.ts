@@ -6,11 +6,14 @@ import {
   stats,
 } from 'types/types';
 import { Ball, GameOfOrigin, GameOfOriginData, isBDSP } from '../../consts';
-import { Abilities } from '../../consts/Abilities';
 import { Items } from '../../consts/Items';
 import { Languages } from '../../consts/Languages';
 import LALocations from '../../consts/MetLocation/LA';
 import { Gen9Ribbons } from '../../consts/Ribbons';
+import {
+  AbilityFromString,
+  AbilityToString,
+} from '../../resources/gen/other/Abilities';
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -48,7 +51,7 @@ export class PA8 extends PKM {
       this.gameOfOrigin = other.gameOfOrigin;
       this.ability = other.ability;
       this.abilityNum = other.abilityNum;
-      this.abilityIndex = Abilities.indexOf(this.ability);
+      this.abilityIndex = AbilityFromString(this.ability);
       this.alphaMove = other.alphaMove;
       this.gender = other.gender;
       this.personalityValue = other.personalityValue;
@@ -210,11 +213,11 @@ export class PA8 extends PKM {
   }
 
   public get ability() {
-    return Abilities[this.abilityIndex];
+    return AbilityToString(this.abilityIndex);
   }
 
   public set ability(value: string) {
-    const abilityIndex = Abilities.indexOf(value);
+    const abilityIndex = AbilityFromString(value);
     if (abilityIndex > -1) {
       this.abilityIndex = abilityIndex;
     }

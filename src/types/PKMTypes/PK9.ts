@@ -1,5 +1,6 @@
-import { Abilities, GameOfOrigin, Items, Languages } from '../../consts';
+import { GameOfOrigin, Items, Languages } from '../../consts';
 import { Gen9RibbonsPart1, Gen9RibbonsPart2 } from '../../consts/Ribbons';
+import { AbilityToString } from '../../resources/gen/other/Abilities';
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -22,7 +23,7 @@ export class PK9 extends PKM {
     this.exp = bytesToUint32LittleEndian(bytes, 0x10);
     this.formNum = bytes[0x24];
     this.heldItem = Items[bytesToUint16LittleEndian(bytes, 0x0a)];
-    this.ability = Abilities[bytesToUint16LittleEndian(bytes, 0x14)];
+    this.ability = AbilityToString(bytesToUint16LittleEndian(bytes, 0x14));
     this.abilityNum = bytes[0x16] & 7;
     this.nature = bytes[0x20];
     // this.markings = bytes[0x18];

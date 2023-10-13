@@ -1,6 +1,6 @@
 // This file is auto-generated. Do not modify.
 
-export enum ItemsGen3 {
+export enum ItemGen3 {
   None,
   MasterBall,
   UltraBall,
@@ -379,763 +379,1391 @@ export enum ItemsGen3 {
   MagmaEmblem,
   OldSeaMap,
 }
-export function ItemsGen3ToString(item: ItemsGen3): string {
+export function ItemGen3ToString(item: ItemGen3): string {
   switch (item) {
-    case ItemsGen3.None:
+    case ItemGen3.None:
       return '(None)';
-    case ItemsGen3.MasterBall:
+    case ItemGen3.MasterBall:
       return 'Master Ball';
-    case ItemsGen3.UltraBall:
+    case ItemGen3.UltraBall:
       return 'Ultra Ball';
-    case ItemsGen3.GreatBall:
+    case ItemGen3.GreatBall:
       return 'Great Ball';
-    case ItemsGen3.PokeBall:
+    case ItemGen3.PokeBall:
       return 'Pok\u00E9 Ball';
-    case ItemsGen3.SafariBall:
+    case ItemGen3.SafariBall:
       return 'Safari Ball';
-    case ItemsGen3.NetBall:
+    case ItemGen3.NetBall:
       return 'Net Ball';
-    case ItemsGen3.DiveBall:
+    case ItemGen3.DiveBall:
       return 'Dive Ball';
-    case ItemsGen3.NestBall:
+    case ItemGen3.NestBall:
       return 'Nest Ball';
-    case ItemsGen3.RepeatBall:
+    case ItemGen3.RepeatBall:
       return 'Repeat Ball';
-    case ItemsGen3.TimerBall:
+    case ItemGen3.TimerBall:
       return 'Timer Ball';
-    case ItemsGen3.LuxuryBall:
+    case ItemGen3.LuxuryBall:
       return 'Luxury Ball';
-    case ItemsGen3.PremierBall:
+    case ItemGen3.PremierBall:
       return 'Premier Ball';
-    case ItemsGen3.Potion:
+    case ItemGen3.Potion:
       return 'Potion';
-    case ItemsGen3.Antidote:
+    case ItemGen3.Antidote:
       return 'Antidote';
-    case ItemsGen3.BurnHeal:
+    case ItemGen3.BurnHeal:
       return 'Burn Heal';
-    case ItemsGen3.IceHeal:
+    case ItemGen3.IceHeal:
       return 'Ice Heal';
-    case ItemsGen3.Awakening:
+    case ItemGen3.Awakening:
       return 'Awakening';
-    case ItemsGen3.ParlyzHeal:
+    case ItemGen3.ParlyzHeal:
       return 'Parlyz Heal';
-    case ItemsGen3.FullRestore:
+    case ItemGen3.FullRestore:
       return 'Full Restore';
-    case ItemsGen3.MaxPotion:
+    case ItemGen3.MaxPotion:
       return 'Max Potion';
-    case ItemsGen3.HyperPotion:
+    case ItemGen3.HyperPotion:
       return 'Hyper Potion';
-    case ItemsGen3.SuperPotion:
+    case ItemGen3.SuperPotion:
       return 'Super Potion';
-    case ItemsGen3.FullHeal:
+    case ItemGen3.FullHeal:
       return 'Full Heal';
-    case ItemsGen3.Revive:
+    case ItemGen3.Revive:
       return 'Revive';
-    case ItemsGen3.MaxRevive:
+    case ItemGen3.MaxRevive:
       return 'Max Revive';
-    case ItemsGen3.FreshWater:
+    case ItemGen3.FreshWater:
       return 'Fresh Water';
-    case ItemsGen3.SodaPop:
+    case ItemGen3.SodaPop:
       return 'Soda Pop';
-    case ItemsGen3.Lemonade:
+    case ItemGen3.Lemonade:
       return 'Lemonade';
-    case ItemsGen3.MoomooMilk:
+    case ItemGen3.MoomooMilk:
       return 'Moomoo Milk';
-    case ItemsGen3.EnergyPowder:
+    case ItemGen3.EnergyPowder:
       return 'EnergyPowder';
-    case ItemsGen3.EnergyRoot:
+    case ItemGen3.EnergyRoot:
       return 'Energy Root';
-    case ItemsGen3.HealPowder:
+    case ItemGen3.HealPowder:
       return 'Heal Powder';
-    case ItemsGen3.RevivalHerb:
+    case ItemGen3.RevivalHerb:
       return 'Revival Herb';
-    case ItemsGen3.Ether:
+    case ItemGen3.Ether:
       return 'Ether';
-    case ItemsGen3.MaxEther:
+    case ItemGen3.MaxEther:
       return 'Max Ether';
-    case ItemsGen3.Elixir:
+    case ItemGen3.Elixir:
       return 'Elixir';
-    case ItemsGen3.MaxElixir:
+    case ItemGen3.MaxElixir:
       return 'Max Elixir';
-    case ItemsGen3.LavaCookie:
+    case ItemGen3.LavaCookie:
       return 'Lava Cookie';
-    case ItemsGen3.BlueFlute:
+    case ItemGen3.BlueFlute:
       return 'Blue Flute';
-    case ItemsGen3.YellowFlute:
+    case ItemGen3.YellowFlute:
       return 'Yellow Flute';
-    case ItemsGen3.RedFlute:
+    case ItemGen3.RedFlute:
       return 'Red Flute';
-    case ItemsGen3.BlackFlute:
+    case ItemGen3.BlackFlute:
       return 'Black Flute';
-    case ItemsGen3.WhiteFlute:
+    case ItemGen3.WhiteFlute:
       return 'White Flute';
-    case ItemsGen3.BerryJuice:
+    case ItemGen3.BerryJuice:
       return 'Berry Juice';
-    case ItemsGen3.SacredAsh:
+    case ItemGen3.SacredAsh:
       return 'Sacred Ash';
-    case ItemsGen3.ShoalSalt:
+    case ItemGen3.ShoalSalt:
       return 'Shoal Salt';
-    case ItemsGen3.ShoalShell:
+    case ItemGen3.ShoalShell:
       return 'Shoal Shell';
-    case ItemsGen3.RedShard:
+    case ItemGen3.RedShard:
       return 'Red Shard';
-    case ItemsGen3.BlueShard:
+    case ItemGen3.BlueShard:
       return 'Blue Shard';
-    case ItemsGen3.YellowShard:
+    case ItemGen3.YellowShard:
       return 'Yellow Shard';
-    case ItemsGen3.GreenShard:
+    case ItemGen3.GreenShard:
       return 'Green Shard';
-    case ItemsGen3.Unknown:
+    case ItemGen3.Unknown:
       return '???';
-    case ItemsGen3.Unknown_1:
+    case ItemGen3.Unknown_1:
       return '???';
-    case ItemsGen3.Unknown_2:
+    case ItemGen3.Unknown_2:
       return '???';
-    case ItemsGen3.Unknown_3:
+    case ItemGen3.Unknown_3:
       return '???';
-    case ItemsGen3.Unknown_4:
+    case ItemGen3.Unknown_4:
       return '???';
-    case ItemsGen3.Unknown_5:
+    case ItemGen3.Unknown_5:
       return '???';
-    case ItemsGen3.Unknown_6:
+    case ItemGen3.Unknown_6:
       return '???';
-    case ItemsGen3.Unknown_7:
+    case ItemGen3.Unknown_7:
       return '???';
-    case ItemsGen3.Unknown_8:
+    case ItemGen3.Unknown_8:
       return '???';
-    case ItemsGen3.Unknown_9:
+    case ItemGen3.Unknown_9:
       return '???';
-    case ItemsGen3.Unknown_10:
+    case ItemGen3.Unknown_10:
       return '???';
-    case ItemsGen3.HPUp:
+    case ItemGen3.HPUp:
       return 'HP Up';
-    case ItemsGen3.Protein:
+    case ItemGen3.Protein:
       return 'Protein';
-    case ItemsGen3.Iron:
+    case ItemGen3.Iron:
       return 'Iron';
-    case ItemsGen3.Carbos:
+    case ItemGen3.Carbos:
       return 'Carbos';
-    case ItemsGen3.Calcium:
+    case ItemGen3.Calcium:
       return 'Calcium';
-    case ItemsGen3.RareCandy:
+    case ItemGen3.RareCandy:
       return 'Rare Candy';
-    case ItemsGen3.PPUp:
+    case ItemGen3.PPUp:
       return 'PP Up';
-    case ItemsGen3.Zinc:
+    case ItemGen3.Zinc:
       return 'Zinc';
-    case ItemsGen3.PPMax:
+    case ItemGen3.PPMax:
       return 'PP Max';
-    case ItemsGen3.Unknown_11:
+    case ItemGen3.Unknown_11:
       return '???';
-    case ItemsGen3.GuardSpec:
+    case ItemGen3.GuardSpec:
       return 'Guard Spec.';
-    case ItemsGen3.DireHit:
+    case ItemGen3.DireHit:
       return 'Dire Hit';
-    case ItemsGen3.XAttack:
+    case ItemGen3.XAttack:
       return 'X Attack';
-    case ItemsGen3.XDefend:
+    case ItemGen3.XDefend:
       return 'X Defend';
-    case ItemsGen3.XSpeed:
+    case ItemGen3.XSpeed:
       return 'X Speed';
-    case ItemsGen3.XAccuracy:
+    case ItemGen3.XAccuracy:
       return 'X Accuracy';
-    case ItemsGen3.XSpecial:
+    case ItemGen3.XSpecial:
       return 'X Special';
-    case ItemsGen3.PokeDoll:
+    case ItemGen3.PokeDoll:
       return 'Pok\u00E9 Doll';
-    case ItemsGen3.FluffyTail:
+    case ItemGen3.FluffyTail:
       return 'Fluffy Tail';
-    case ItemsGen3.Unknown_12:
+    case ItemGen3.Unknown_12:
       return '???';
-    case ItemsGen3.SuperRepel:
+    case ItemGen3.SuperRepel:
       return 'Super Repel';
-    case ItemsGen3.MaxRepel:
+    case ItemGen3.MaxRepel:
       return 'Max Repel';
-    case ItemsGen3.EscapeRope:
+    case ItemGen3.EscapeRope:
       return 'Escape Rope';
-    case ItemsGen3.Repel:
+    case ItemGen3.Repel:
       return 'Repel';
-    case ItemsGen3.Unknown_13:
+    case ItemGen3.Unknown_13:
       return '???';
-    case ItemsGen3.Unknown_14:
+    case ItemGen3.Unknown_14:
       return '???';
-    case ItemsGen3.Unknown_15:
+    case ItemGen3.Unknown_15:
       return '???';
-    case ItemsGen3.Unknown_16:
+    case ItemGen3.Unknown_16:
       return '???';
-    case ItemsGen3.Unknown_17:
+    case ItemGen3.Unknown_17:
       return '???';
-    case ItemsGen3.Unknown_18:
+    case ItemGen3.Unknown_18:
       return '???';
-    case ItemsGen3.SunStone:
+    case ItemGen3.SunStone:
       return 'Sun Stone';
-    case ItemsGen3.MoonStone:
+    case ItemGen3.MoonStone:
       return 'Moon Stone';
-    case ItemsGen3.FireStone:
+    case ItemGen3.FireStone:
       return 'Fire Stone';
-    case ItemsGen3.ThunderStone:
+    case ItemGen3.ThunderStone:
       return 'Thunder Stone';
-    case ItemsGen3.WaterStone:
+    case ItemGen3.WaterStone:
       return 'Water Stone';
-    case ItemsGen3.LeafStone:
+    case ItemGen3.LeafStone:
       return 'Leaf Stone';
-    case ItemsGen3.Unknown_19:
+    case ItemGen3.Unknown_19:
       return '???';
-    case ItemsGen3.Unknown_20:
+    case ItemGen3.Unknown_20:
       return '???';
-    case ItemsGen3.Unknown_21:
+    case ItemGen3.Unknown_21:
       return '???';
-    case ItemsGen3.Unknown_22:
+    case ItemGen3.Unknown_22:
       return '???';
-    case ItemsGen3.TinyMushroom:
+    case ItemGen3.TinyMushroom:
       return 'TinyMushroom';
-    case ItemsGen3.BigMushroom:
+    case ItemGen3.BigMushroom:
       return 'Big Mushroom';
-    case ItemsGen3.Unknown_23:
+    case ItemGen3.Unknown_23:
       return '???';
-    case ItemsGen3.Pearl:
+    case ItemGen3.Pearl:
       return 'Pearl';
-    case ItemsGen3.BigPearl:
+    case ItemGen3.BigPearl:
       return 'Big Pearl';
-    case ItemsGen3.Stardust:
+    case ItemGen3.Stardust:
       return 'Stardust';
-    case ItemsGen3.StarPiece:
+    case ItemGen3.StarPiece:
       return 'Star Piece';
-    case ItemsGen3.Nugget:
+    case ItemGen3.Nugget:
       return 'Nugget';
-    case ItemsGen3.HeartScale:
+    case ItemGen3.HeartScale:
       return 'Heart Scale';
-    case ItemsGen3.Unknown_24:
+    case ItemGen3.Unknown_24:
       return '???';
-    case ItemsGen3.Unknown_25:
+    case ItemGen3.Unknown_25:
       return '???';
-    case ItemsGen3.Unknown_26:
+    case ItemGen3.Unknown_26:
       return '???';
-    case ItemsGen3.Unknown_27:
+    case ItemGen3.Unknown_27:
       return '???';
-    case ItemsGen3.Unknown_28:
+    case ItemGen3.Unknown_28:
       return '???';
-    case ItemsGen3.Unknown_29:
+    case ItemGen3.Unknown_29:
       return '???';
-    case ItemsGen3.Unknown_30:
+    case ItemGen3.Unknown_30:
       return '???';
-    case ItemsGen3.Unknown_31:
+    case ItemGen3.Unknown_31:
       return '???';
-    case ItemsGen3.Unknown_32:
+    case ItemGen3.Unknown_32:
       return '???';
-    case ItemsGen3.OrangeMail:
+    case ItemGen3.OrangeMail:
       return 'Orange Mail';
-    case ItemsGen3.HarborMail:
+    case ItemGen3.HarborMail:
       return 'Harbor Mail';
-    case ItemsGen3.GlitterMail:
+    case ItemGen3.GlitterMail:
       return 'Glitter Mail';
-    case ItemsGen3.MechMail:
+    case ItemGen3.MechMail:
       return 'Mech Mail';
-    case ItemsGen3.WoodMail:
+    case ItemGen3.WoodMail:
       return 'Wood Mail';
-    case ItemsGen3.WaveMail:
+    case ItemGen3.WaveMail:
       return 'Wave Mail';
-    case ItemsGen3.BeadMail:
+    case ItemGen3.BeadMail:
       return 'Bead Mail';
-    case ItemsGen3.ShadowMail:
+    case ItemGen3.ShadowMail:
       return 'Shadow Mail';
-    case ItemsGen3.TropicMail:
+    case ItemGen3.TropicMail:
       return 'Tropic Mail';
-    case ItemsGen3.DreamMail:
+    case ItemGen3.DreamMail:
       return 'Dream Mail';
-    case ItemsGen3.FabMail:
+    case ItemGen3.FabMail:
       return 'Fab Mail';
-    case ItemsGen3.RetroMail:
+    case ItemGen3.RetroMail:
       return 'Retro Mail';
-    case ItemsGen3.CheriBerry:
+    case ItemGen3.CheriBerry:
       return 'Cheri Berry';
-    case ItemsGen3.ChestoBerry:
+    case ItemGen3.ChestoBerry:
       return 'Chesto Berry';
-    case ItemsGen3.PechaBerry:
+    case ItemGen3.PechaBerry:
       return 'Pecha Berry';
-    case ItemsGen3.RawstBerry:
+    case ItemGen3.RawstBerry:
       return 'Rawst Berry';
-    case ItemsGen3.AspearBerry:
+    case ItemGen3.AspearBerry:
       return 'Aspear Berry';
-    case ItemsGen3.LeppaBerry:
+    case ItemGen3.LeppaBerry:
       return 'Leppa Berry';
-    case ItemsGen3.OranBerry:
+    case ItemGen3.OranBerry:
       return 'Oran Berry';
-    case ItemsGen3.PersimBerry:
+    case ItemGen3.PersimBerry:
       return 'Persim Berry';
-    case ItemsGen3.LumBerry:
+    case ItemGen3.LumBerry:
       return 'Lum Berry';
-    case ItemsGen3.SitrusBerry:
+    case ItemGen3.SitrusBerry:
       return 'Sitrus Berry';
-    case ItemsGen3.FigyBerry:
+    case ItemGen3.FigyBerry:
       return 'Figy Berry';
-    case ItemsGen3.WikiBerry:
+    case ItemGen3.WikiBerry:
       return 'Wiki Berry';
-    case ItemsGen3.MagoBerry:
+    case ItemGen3.MagoBerry:
       return 'Mago Berry';
-    case ItemsGen3.AguavBerry:
+    case ItemGen3.AguavBerry:
       return 'Aguav Berry';
-    case ItemsGen3.IapapaBerry:
+    case ItemGen3.IapapaBerry:
       return 'Iapapa Berry';
-    case ItemsGen3.RazzBerry:
+    case ItemGen3.RazzBerry:
       return 'Razz Berry';
-    case ItemsGen3.BlukBerry:
+    case ItemGen3.BlukBerry:
       return 'Bluk Berry';
-    case ItemsGen3.NanabBerry:
+    case ItemGen3.NanabBerry:
       return 'Nanab Berry';
-    case ItemsGen3.WepearBerry:
+    case ItemGen3.WepearBerry:
       return 'Wepear Berry';
-    case ItemsGen3.PinapBerry:
+    case ItemGen3.PinapBerry:
       return 'Pinap Berry';
-    case ItemsGen3.PomegBerry:
+    case ItemGen3.PomegBerry:
       return 'Pomeg Berry';
-    case ItemsGen3.KelpsyBerry:
+    case ItemGen3.KelpsyBerry:
       return 'Kelpsy Berry';
-    case ItemsGen3.QualotBerry:
+    case ItemGen3.QualotBerry:
       return 'Qualot Berry';
-    case ItemsGen3.HondewBerry:
+    case ItemGen3.HondewBerry:
       return 'Hondew Berry';
-    case ItemsGen3.GrepaBerry:
+    case ItemGen3.GrepaBerry:
       return 'Grepa Berry';
-    case ItemsGen3.TamatoBerry:
+    case ItemGen3.TamatoBerry:
       return 'Tamato Berry';
-    case ItemsGen3.CornnBerry:
+    case ItemGen3.CornnBerry:
       return 'Cornn Berry';
-    case ItemsGen3.MagostBerry:
+    case ItemGen3.MagostBerry:
       return 'Magost Berry';
-    case ItemsGen3.RabutaBerry:
+    case ItemGen3.RabutaBerry:
       return 'Rabuta Berry';
-    case ItemsGen3.NomelBerry:
+    case ItemGen3.NomelBerry:
       return 'Nomel Berry';
-    case ItemsGen3.SpelonBerry:
+    case ItemGen3.SpelonBerry:
       return 'Spelon Berry';
-    case ItemsGen3.PamtreBerry:
+    case ItemGen3.PamtreBerry:
       return 'Pamtre Berry';
-    case ItemsGen3.WatmelBerry:
+    case ItemGen3.WatmelBerry:
       return 'Watmel Berry';
-    case ItemsGen3.DurinBerry:
+    case ItemGen3.DurinBerry:
       return 'Durin Berry';
-    case ItemsGen3.BelueBerry:
+    case ItemGen3.BelueBerry:
       return 'Belue Berry';
-    case ItemsGen3.LiechiBerry:
+    case ItemGen3.LiechiBerry:
       return 'Liechi Berry';
-    case ItemsGen3.GanlonBerry:
+    case ItemGen3.GanlonBerry:
       return 'Ganlon Berry';
-    case ItemsGen3.SalacBerry:
+    case ItemGen3.SalacBerry:
       return 'Salac Berry';
-    case ItemsGen3.PetayaBerry:
+    case ItemGen3.PetayaBerry:
       return 'Petaya Berry';
-    case ItemsGen3.ApicotBerry:
+    case ItemGen3.ApicotBerry:
       return 'Apicot Berry';
-    case ItemsGen3.LansatBerry:
+    case ItemGen3.LansatBerry:
       return 'Lansat Berry';
-    case ItemsGen3.StarfBerry:
+    case ItemGen3.StarfBerry:
       return 'Starf Berry';
-    case ItemsGen3.EnigmaBerry:
+    case ItemGen3.EnigmaBerry:
       return 'Enigma Berry';
-    case ItemsGen3.Unknown_33:
+    case ItemGen3.Unknown_33:
       return '???';
-    case ItemsGen3.Unknown_34:
+    case ItemGen3.Unknown_34:
       return '???';
-    case ItemsGen3.Unknown_35:
+    case ItemGen3.Unknown_35:
       return '???';
-    case ItemsGen3.BrightPowder:
+    case ItemGen3.BrightPowder:
       return 'BrightPowder';
-    case ItemsGen3.WhiteHerb:
+    case ItemGen3.WhiteHerb:
       return 'White Herb';
-    case ItemsGen3.MachoBrace:
+    case ItemGen3.MachoBrace:
       return 'Macho Brace';
-    case ItemsGen3.ExpShare:
+    case ItemGen3.ExpShare:
       return 'Exp. Share';
-    case ItemsGen3.QuickClaw:
+    case ItemGen3.QuickClaw:
       return 'Quick Claw';
-    case ItemsGen3.SootheBell:
+    case ItemGen3.SootheBell:
       return 'Soothe Bell';
-    case ItemsGen3.MentalHerb:
+    case ItemGen3.MentalHerb:
       return 'Mental Herb';
-    case ItemsGen3.ChoiceBand:
+    case ItemGen3.ChoiceBand:
       return 'Choice Band';
-    case ItemsGen3.KingsRock:
+    case ItemGen3.KingsRock:
       return "King's Rock";
-    case ItemsGen3.SilverPowder:
+    case ItemGen3.SilverPowder:
       return 'SilverPowder';
-    case ItemsGen3.AmuletCoin:
+    case ItemGen3.AmuletCoin:
       return 'Amulet Coin';
-    case ItemsGen3.CleanseTag:
+    case ItemGen3.CleanseTag:
       return 'Cleanse Tag';
-    case ItemsGen3.SoulDew:
+    case ItemGen3.SoulDew:
       return 'Soul Dew';
-    case ItemsGen3.DeepSeaTooth:
+    case ItemGen3.DeepSeaTooth:
       return 'DeepSeaTooth';
-    case ItemsGen3.DeepSeaScale:
+    case ItemGen3.DeepSeaScale:
       return 'DeepSeaScale';
-    case ItemsGen3.SmokeBall:
+    case ItemGen3.SmokeBall:
       return 'Smoke Ball';
-    case ItemsGen3.Everstone:
+    case ItemGen3.Everstone:
       return 'Everstone';
-    case ItemsGen3.FocusBand:
+    case ItemGen3.FocusBand:
       return 'Focus Band';
-    case ItemsGen3.LuckyEgg:
+    case ItemGen3.LuckyEgg:
       return 'Lucky Egg';
-    case ItemsGen3.ScopeLens:
+    case ItemGen3.ScopeLens:
       return 'Scope Lens';
-    case ItemsGen3.MetalCoat:
+    case ItemGen3.MetalCoat:
       return 'Metal Coat';
-    case ItemsGen3.Leftovers:
+    case ItemGen3.Leftovers:
       return 'Leftovers';
-    case ItemsGen3.DragonScale:
+    case ItemGen3.DragonScale:
       return 'Dragon Scale';
-    case ItemsGen3.LightBall:
+    case ItemGen3.LightBall:
       return 'Light Ball';
-    case ItemsGen3.SoftSand:
+    case ItemGen3.SoftSand:
       return 'Soft Sand';
-    case ItemsGen3.HardStone:
+    case ItemGen3.HardStone:
       return 'Hard Stone';
-    case ItemsGen3.MiracleSeed:
+    case ItemGen3.MiracleSeed:
       return 'Miracle Seed';
-    case ItemsGen3.BlackGlasses:
+    case ItemGen3.BlackGlasses:
       return 'BlackGlasses';
-    case ItemsGen3.BlackBelt:
+    case ItemGen3.BlackBelt:
       return 'Black Belt';
-    case ItemsGen3.Magnet:
+    case ItemGen3.Magnet:
       return 'Magnet';
-    case ItemsGen3.MysticWater:
+    case ItemGen3.MysticWater:
       return 'Mystic Water';
-    case ItemsGen3.SharpBeak:
+    case ItemGen3.SharpBeak:
       return 'Sharp Beak';
-    case ItemsGen3.PoisonBarb:
+    case ItemGen3.PoisonBarb:
       return 'Poison Barb';
-    case ItemsGen3.NeverMeltIce:
+    case ItemGen3.NeverMeltIce:
       return 'NeverMeltIce';
-    case ItemsGen3.SpellTag:
+    case ItemGen3.SpellTag:
       return 'Spell Tag';
-    case ItemsGen3.TwistedSpoon:
+    case ItemGen3.TwistedSpoon:
       return 'TwistedSpoon';
-    case ItemsGen3.Charcoal:
+    case ItemGen3.Charcoal:
       return 'Charcoal';
-    case ItemsGen3.DragonFang:
+    case ItemGen3.DragonFang:
       return 'Dragon Fang';
-    case ItemsGen3.SilkScarf:
+    case ItemGen3.SilkScarf:
       return 'Silk Scarf';
-    case ItemsGen3.UpGrade:
+    case ItemGen3.UpGrade:
       return 'Up-Grade';
-    case ItemsGen3.ShellBell:
+    case ItemGen3.ShellBell:
       return 'Shell Bell';
-    case ItemsGen3.SeaIncense:
+    case ItemGen3.SeaIncense:
       return 'Sea Incense';
-    case ItemsGen3.LaxIncense:
+    case ItemGen3.LaxIncense:
       return 'Lax Incense';
-    case ItemsGen3.LuckyPunch:
+    case ItemGen3.LuckyPunch:
       return 'Lucky Punch';
-    case ItemsGen3.MetalPowder:
+    case ItemGen3.MetalPowder:
       return 'Metal Powder';
-    case ItemsGen3.ThickClub:
+    case ItemGen3.ThickClub:
       return 'Thick Club';
-    case ItemsGen3.Stick:
+    case ItemGen3.Stick:
       return 'Stick';
-    case ItemsGen3.Unknown_36:
+    case ItemGen3.Unknown_36:
       return '???';
-    case ItemsGen3.Unknown_37:
+    case ItemGen3.Unknown_37:
       return '???';
-    case ItemsGen3.Unknown_38:
+    case ItemGen3.Unknown_38:
       return '???';
-    case ItemsGen3.Unknown_39:
+    case ItemGen3.Unknown_39:
       return '???';
-    case ItemsGen3.Unknown_40:
+    case ItemGen3.Unknown_40:
       return '???';
-    case ItemsGen3.Unknown_41:
+    case ItemGen3.Unknown_41:
       return '???';
-    case ItemsGen3.Unknown_42:
+    case ItemGen3.Unknown_42:
       return '???';
-    case ItemsGen3.Unknown_43:
+    case ItemGen3.Unknown_43:
       return '???';
-    case ItemsGen3.Unknown_44:
+    case ItemGen3.Unknown_44:
       return '???';
-    case ItemsGen3.Unknown_45:
+    case ItemGen3.Unknown_45:
       return '???';
-    case ItemsGen3.Unknown_46:
+    case ItemGen3.Unknown_46:
       return '???';
-    case ItemsGen3.Unknown_47:
+    case ItemGen3.Unknown_47:
       return '???';
-    case ItemsGen3.Unknown_48:
+    case ItemGen3.Unknown_48:
       return '???';
-    case ItemsGen3.Unknown_49:
+    case ItemGen3.Unknown_49:
       return '???';
-    case ItemsGen3.Unknown_50:
+    case ItemGen3.Unknown_50:
       return '???';
-    case ItemsGen3.Unknown_51:
+    case ItemGen3.Unknown_51:
       return '???';
-    case ItemsGen3.Unknown_52:
+    case ItemGen3.Unknown_52:
       return '???';
-    case ItemsGen3.Unknown_53:
+    case ItemGen3.Unknown_53:
       return '???';
-    case ItemsGen3.Unknown_54:
+    case ItemGen3.Unknown_54:
       return '???';
-    case ItemsGen3.Unknown_55:
+    case ItemGen3.Unknown_55:
       return '???';
-    case ItemsGen3.Unknown_56:
+    case ItemGen3.Unknown_56:
       return '???';
-    case ItemsGen3.Unknown_57:
+    case ItemGen3.Unknown_57:
       return '???';
-    case ItemsGen3.Unknown_58:
+    case ItemGen3.Unknown_58:
       return '???';
-    case ItemsGen3.Unknown_59:
+    case ItemGen3.Unknown_59:
       return '???';
-    case ItemsGen3.Unknown_60:
+    case ItemGen3.Unknown_60:
       return '???';
-    case ItemsGen3.Unknown_61:
+    case ItemGen3.Unknown_61:
       return '???';
-    case ItemsGen3.Unknown_62:
+    case ItemGen3.Unknown_62:
       return '???';
-    case ItemsGen3.Unknown_63:
+    case ItemGen3.Unknown_63:
       return '???';
-    case ItemsGen3.RedScarf:
+    case ItemGen3.RedScarf:
       return 'Red Scarf';
-    case ItemsGen3.BlueScarf:
+    case ItemGen3.BlueScarf:
       return 'Blue Scarf';
-    case ItemsGen3.PinkScarf:
+    case ItemGen3.PinkScarf:
       return 'Pink Scarf';
-    case ItemsGen3.GreenScarf:
+    case ItemGen3.GreenScarf:
       return 'Green Scarf';
-    case ItemsGen3.YellowScarf:
+    case ItemGen3.YellowScarf:
       return 'Yellow Scarf';
-    case ItemsGen3.MachBike:
+    case ItemGen3.MachBike:
       return 'Mach Bike';
-    case ItemsGen3.CoinCase:
+    case ItemGen3.CoinCase:
       return 'Coin Case';
-    case ItemsGen3.Itemfinder:
+    case ItemGen3.Itemfinder:
       return 'Itemfinder';
-    case ItemsGen3.OldRod:
+    case ItemGen3.OldRod:
       return 'Old Rod';
-    case ItemsGen3.GoodRod:
+    case ItemGen3.GoodRod:
       return 'Good Rod';
-    case ItemsGen3.SuperRod:
+    case ItemGen3.SuperRod:
       return 'Super Rod';
-    case ItemsGen3.SSTicket:
+    case ItemGen3.SSTicket:
       return 'S.S. Ticket';
-    case ItemsGen3.ContestPass:
+    case ItemGen3.ContestPass:
       return 'Contest Pass';
-    case ItemsGen3.Unknown_64:
+    case ItemGen3.Unknown_64:
       return '???';
-    case ItemsGen3.WailmerPail:
+    case ItemGen3.WailmerPail:
       return 'Wailmer Pail';
-    case ItemsGen3.DevonGoods:
+    case ItemGen3.DevonGoods:
       return 'Devon Goods';
-    case ItemsGen3.SootSack:
+    case ItemGen3.SootSack:
       return 'Soot Sack';
-    case ItemsGen3.BasementKey:
+    case ItemGen3.BasementKey:
       return 'Basement Key';
-    case ItemsGen3.AcroBike:
+    case ItemGen3.AcroBike:
       return 'Acro Bike';
-    case ItemsGen3.PokeblockCase:
+    case ItemGen3.PokeblockCase:
       return 'Pok\u00E9block Case';
-    case ItemsGen3.Letter:
+    case ItemGen3.Letter:
       return 'Letter';
-    case ItemsGen3.EonTicket:
+    case ItemGen3.EonTicket:
       return 'Eon Ticket';
-    case ItemsGen3.RedOrb:
+    case ItemGen3.RedOrb:
       return 'Red Orb';
-    case ItemsGen3.BlueOrb:
+    case ItemGen3.BlueOrb:
       return 'Blue Orb';
-    case ItemsGen3.Scanner:
+    case ItemGen3.Scanner:
       return 'Scanner';
-    case ItemsGen3.GoGoggles:
+    case ItemGen3.GoGoggles:
       return 'Go-Goggles';
-    case ItemsGen3.Meteorite:
+    case ItemGen3.Meteorite:
       return 'Meteorite';
-    case ItemsGen3.Rm1Key:
+    case ItemGen3.Rm1Key:
       return 'Rm. 1 Key';
-    case ItemsGen3.Rm2Key:
+    case ItemGen3.Rm2Key:
       return 'Rm. 2 Key';
-    case ItemsGen3.Rm4Key:
+    case ItemGen3.Rm4Key:
       return 'Rm. 4 Key';
-    case ItemsGen3.Rm6Key:
+    case ItemGen3.Rm6Key:
       return 'Rm. 6 Key';
-    case ItemsGen3.StorageKey:
+    case ItemGen3.StorageKey:
       return 'Storage Key';
-    case ItemsGen3.RootFossil:
+    case ItemGen3.RootFossil:
       return 'Root Fossil';
-    case ItemsGen3.ClawFossil:
+    case ItemGen3.ClawFossil:
       return 'Claw Fossil';
-    case ItemsGen3.DevonScope:
+    case ItemGen3.DevonScope:
       return 'Devon Scope';
-    case ItemsGen3.TM01:
+    case ItemGen3.TM01:
       return 'TM01';
-    case ItemsGen3.TM02:
+    case ItemGen3.TM02:
       return 'TM02';
-    case ItemsGen3.TM03:
+    case ItemGen3.TM03:
       return 'TM03';
-    case ItemsGen3.TM04:
+    case ItemGen3.TM04:
       return 'TM04';
-    case ItemsGen3.TM05:
+    case ItemGen3.TM05:
       return 'TM05';
-    case ItemsGen3.TM06:
+    case ItemGen3.TM06:
       return 'TM06';
-    case ItemsGen3.TM07:
+    case ItemGen3.TM07:
       return 'TM07';
-    case ItemsGen3.TM08:
+    case ItemGen3.TM08:
       return 'TM08';
-    case ItemsGen3.TM09:
+    case ItemGen3.TM09:
       return 'TM09';
-    case ItemsGen3.TM10:
+    case ItemGen3.TM10:
       return 'TM10';
-    case ItemsGen3.TM11:
+    case ItemGen3.TM11:
       return 'TM11';
-    case ItemsGen3.TM12:
+    case ItemGen3.TM12:
       return 'TM12';
-    case ItemsGen3.TM13:
+    case ItemGen3.TM13:
       return 'TM13';
-    case ItemsGen3.TM14:
+    case ItemGen3.TM14:
       return 'TM14';
-    case ItemsGen3.TM15:
+    case ItemGen3.TM15:
       return 'TM15';
-    case ItemsGen3.TM16:
+    case ItemGen3.TM16:
       return 'TM16';
-    case ItemsGen3.TM17:
+    case ItemGen3.TM17:
       return 'TM17';
-    case ItemsGen3.TM18:
+    case ItemGen3.TM18:
       return 'TM18';
-    case ItemsGen3.TM19:
+    case ItemGen3.TM19:
       return 'TM19';
-    case ItemsGen3.TM20:
+    case ItemGen3.TM20:
       return 'TM20';
-    case ItemsGen3.TM21:
+    case ItemGen3.TM21:
       return 'TM21';
-    case ItemsGen3.TM22:
+    case ItemGen3.TM22:
       return 'TM22';
-    case ItemsGen3.TM23:
+    case ItemGen3.TM23:
       return 'TM23';
-    case ItemsGen3.TM24:
+    case ItemGen3.TM24:
       return 'TM24';
-    case ItemsGen3.TM25:
+    case ItemGen3.TM25:
       return 'TM25';
-    case ItemsGen3.TM26:
+    case ItemGen3.TM26:
       return 'TM26';
-    case ItemsGen3.TM27:
+    case ItemGen3.TM27:
       return 'TM27';
-    case ItemsGen3.TM28:
+    case ItemGen3.TM28:
       return 'TM28';
-    case ItemsGen3.TM29:
+    case ItemGen3.TM29:
       return 'TM29';
-    case ItemsGen3.TM30:
+    case ItemGen3.TM30:
       return 'TM30';
-    case ItemsGen3.TM31:
+    case ItemGen3.TM31:
       return 'TM31';
-    case ItemsGen3.TM32:
+    case ItemGen3.TM32:
       return 'TM32';
-    case ItemsGen3.TM33:
+    case ItemGen3.TM33:
       return 'TM33';
-    case ItemsGen3.TM34:
+    case ItemGen3.TM34:
       return 'TM34';
-    case ItemsGen3.TM35:
+    case ItemGen3.TM35:
       return 'TM35';
-    case ItemsGen3.TM36:
+    case ItemGen3.TM36:
       return 'TM36';
-    case ItemsGen3.TM37:
+    case ItemGen3.TM37:
       return 'TM37';
-    case ItemsGen3.TM38:
+    case ItemGen3.TM38:
       return 'TM38';
-    case ItemsGen3.TM39:
+    case ItemGen3.TM39:
       return 'TM39';
-    case ItemsGen3.TM40:
+    case ItemGen3.TM40:
       return 'TM40';
-    case ItemsGen3.TM41:
+    case ItemGen3.TM41:
       return 'TM41';
-    case ItemsGen3.TM42:
+    case ItemGen3.TM42:
       return 'TM42';
-    case ItemsGen3.TM43:
+    case ItemGen3.TM43:
       return 'TM43';
-    case ItemsGen3.TM44:
+    case ItemGen3.TM44:
       return 'TM44';
-    case ItemsGen3.TM45:
+    case ItemGen3.TM45:
       return 'TM45';
-    case ItemsGen3.TM46:
+    case ItemGen3.TM46:
       return 'TM46';
-    case ItemsGen3.TM47:
+    case ItemGen3.TM47:
       return 'TM47';
-    case ItemsGen3.TM48:
+    case ItemGen3.TM48:
       return 'TM48';
-    case ItemsGen3.TM49:
+    case ItemGen3.TM49:
       return 'TM49';
-    case ItemsGen3.TM50:
+    case ItemGen3.TM50:
       return 'TM50';
-    case ItemsGen3.HM01:
+    case ItemGen3.HM01:
       return 'HM01';
-    case ItemsGen3.HM02:
+    case ItemGen3.HM02:
       return 'HM02';
-    case ItemsGen3.HM03:
+    case ItemGen3.HM03:
       return 'HM03';
-    case ItemsGen3.HM04:
+    case ItemGen3.HM04:
       return 'HM04';
-    case ItemsGen3.HM05:
+    case ItemGen3.HM05:
       return 'HM05';
-    case ItemsGen3.HM06:
+    case ItemGen3.HM06:
       return 'HM06';
-    case ItemsGen3.HM07:
+    case ItemGen3.HM07:
       return 'HM07';
-    case ItemsGen3.HM08:
+    case ItemGen3.HM08:
       return 'HM08';
-    case ItemsGen3.Unknown_65:
+    case ItemGen3.Unknown_65:
       return '???';
-    case ItemsGen3.Unknown_66:
+    case ItemGen3.Unknown_66:
       return '???';
-    case ItemsGen3.OaksParcel:
+    case ItemGen3.OaksParcel:
       return "Oak's Parcel";
-    case ItemsGen3.PokeFlute:
+    case ItemGen3.PokeFlute:
       return 'Pok\u00E9 Flute';
-    case ItemsGen3.SecretKey:
+    case ItemGen3.SecretKey:
       return 'Secret Key';
-    case ItemsGen3.BikeVoucher:
+    case ItemGen3.BikeVoucher:
       return 'Bike Voucher';
-    case ItemsGen3.GoldTeeth:
+    case ItemGen3.GoldTeeth:
       return 'Gold Teeth';
-    case ItemsGen3.OldAmber:
+    case ItemGen3.OldAmber:
       return 'Old Amber';
-    case ItemsGen3.CardKey:
+    case ItemGen3.CardKey:
       return 'Card Key';
-    case ItemsGen3.LiftKey:
+    case ItemGen3.LiftKey:
       return 'Lift Key';
-    case ItemsGen3.HelixFossil:
+    case ItemGen3.HelixFossil:
       return 'Helix Fossil';
-    case ItemsGen3.DomeFossil:
+    case ItemGen3.DomeFossil:
       return 'Dome Fossil';
-    case ItemsGen3.SilphScope:
+    case ItemGen3.SilphScope:
       return 'Silph Scope';
-    case ItemsGen3.Bicycle:
+    case ItemGen3.Bicycle:
       return 'Bicycle';
-    case ItemsGen3.TownMap:
+    case ItemGen3.TownMap:
       return 'Town Map';
-    case ItemsGen3.VsSeeker:
+    case ItemGen3.VsSeeker:
       return 'Vs. Seeker';
-    case ItemsGen3.FameChecker:
+    case ItemGen3.FameChecker:
       return 'Fame Checker';
-    case ItemsGen3.TMCase:
+    case ItemGen3.TMCase:
       return 'TM Case';
-    case ItemsGen3.BerryPouch:
+    case ItemGen3.BerryPouch:
       return 'Berry Pouch';
-    case ItemsGen3.TeachyTV:
+    case ItemGen3.TeachyTV:
       return 'Teachy TV';
-    case ItemsGen3.TriPass:
+    case ItemGen3.TriPass:
       return 'Tri-Pass';
-    case ItemsGen3.RainbowPass:
+    case ItemGen3.RainbowPass:
       return 'Rainbow Pass';
-    case ItemsGen3.Tea:
+    case ItemGen3.Tea:
       return 'Tea';
-    case ItemsGen3.MysticTicket:
+    case ItemGen3.MysticTicket:
       return 'MysticTicket';
-    case ItemsGen3.AuroraTicket:
+    case ItemGen3.AuroraTicket:
       return 'AuroraTicket';
-    case ItemsGen3.PowderJar:
+    case ItemGen3.PowderJar:
       return 'Powder Jar';
-    case ItemsGen3.Ruby:
+    case ItemGen3.Ruby:
       return 'Ruby';
-    case ItemsGen3.Sapphire:
+    case ItemGen3.Sapphire:
       return 'Sapphire';
-    case ItemsGen3.MagmaEmblem:
+    case ItemGen3.MagmaEmblem:
       return 'Magma Emblem';
-    case ItemsGen3.OldSeaMap:
+    case ItemGen3.OldSeaMap:
       return 'Old Sea Map';
     default:
       return '';
+  }
+}
+export function ItemGen3FromString(item: string): ItemGen3 {
+  switch (item) {
+    case '(None)':
+      return ItemGen3.None;
+    case 'Master Ball':
+      return ItemGen3.MasterBall;
+    case 'Ultra Ball':
+      return ItemGen3.UltraBall;
+    case 'Great Ball':
+      return ItemGen3.GreatBall;
+    case 'Pok\u00E9 Ball':
+      return ItemGen3.PokeBall;
+    case 'Safari Ball':
+      return ItemGen3.SafariBall;
+    case 'Net Ball':
+      return ItemGen3.NetBall;
+    case 'Dive Ball':
+      return ItemGen3.DiveBall;
+    case 'Nest Ball':
+      return ItemGen3.NestBall;
+    case 'Repeat Ball':
+      return ItemGen3.RepeatBall;
+    case 'Timer Ball':
+      return ItemGen3.TimerBall;
+    case 'Luxury Ball':
+      return ItemGen3.LuxuryBall;
+    case 'Premier Ball':
+      return ItemGen3.PremierBall;
+    case 'Potion':
+      return ItemGen3.Potion;
+    case 'Antidote':
+      return ItemGen3.Antidote;
+    case 'Burn Heal':
+      return ItemGen3.BurnHeal;
+    case 'Ice Heal':
+      return ItemGen3.IceHeal;
+    case 'Awakening':
+      return ItemGen3.Awakening;
+    case 'Parlyz Heal':
+      return ItemGen3.ParlyzHeal;
+    case 'Full Restore':
+      return ItemGen3.FullRestore;
+    case 'Max Potion':
+      return ItemGen3.MaxPotion;
+    case 'Hyper Potion':
+      return ItemGen3.HyperPotion;
+    case 'Super Potion':
+      return ItemGen3.SuperPotion;
+    case 'Full Heal':
+      return ItemGen3.FullHeal;
+    case 'Revive':
+      return ItemGen3.Revive;
+    case 'Max Revive':
+      return ItemGen3.MaxRevive;
+    case 'Fresh Water':
+      return ItemGen3.FreshWater;
+    case 'Soda Pop':
+      return ItemGen3.SodaPop;
+    case 'Lemonade':
+      return ItemGen3.Lemonade;
+    case 'Moomoo Milk':
+      return ItemGen3.MoomooMilk;
+    case 'EnergyPowder':
+      return ItemGen3.EnergyPowder;
+    case 'Energy Root':
+      return ItemGen3.EnergyRoot;
+    case 'Heal Powder':
+      return ItemGen3.HealPowder;
+    case 'Revival Herb':
+      return ItemGen3.RevivalHerb;
+    case 'Ether':
+      return ItemGen3.Ether;
+    case 'Max Ether':
+      return ItemGen3.MaxEther;
+    case 'Elixir':
+      return ItemGen3.Elixir;
+    case 'Max Elixir':
+      return ItemGen3.MaxElixir;
+    case 'Lava Cookie':
+      return ItemGen3.LavaCookie;
+    case 'Blue Flute':
+      return ItemGen3.BlueFlute;
+    case 'Yellow Flute':
+      return ItemGen3.YellowFlute;
+    case 'Red Flute':
+      return ItemGen3.RedFlute;
+    case 'Black Flute':
+      return ItemGen3.BlackFlute;
+    case 'White Flute':
+      return ItemGen3.WhiteFlute;
+    case 'Berry Juice':
+      return ItemGen3.BerryJuice;
+    case 'Sacred Ash':
+      return ItemGen3.SacredAsh;
+    case 'Shoal Salt':
+      return ItemGen3.ShoalSalt;
+    case 'Shoal Shell':
+      return ItemGen3.ShoalShell;
+    case 'Red Shard':
+      return ItemGen3.RedShard;
+    case 'Blue Shard':
+      return ItemGen3.BlueShard;
+    case 'Yellow Shard':
+      return ItemGen3.YellowShard;
+    case 'Green Shard':
+      return ItemGen3.GreenShard;
+    case '???':
+      return ItemGen3.Unknown;
+    case 'HP Up':
+      return ItemGen3.HPUp;
+    case 'Protein':
+      return ItemGen3.Protein;
+    case 'Iron':
+      return ItemGen3.Iron;
+    case 'Carbos':
+      return ItemGen3.Carbos;
+    case 'Calcium':
+      return ItemGen3.Calcium;
+    case 'Rare Candy':
+      return ItemGen3.RareCandy;
+    case 'PP Up':
+      return ItemGen3.PPUp;
+    case 'Zinc':
+      return ItemGen3.Zinc;
+    case 'PP Max':
+      return ItemGen3.PPMax;
+    case 'Guard Spec.':
+      return ItemGen3.GuardSpec;
+    case 'Dire Hit':
+      return ItemGen3.DireHit;
+    case 'X Attack':
+      return ItemGen3.XAttack;
+    case 'X Defend':
+      return ItemGen3.XDefend;
+    case 'X Speed':
+      return ItemGen3.XSpeed;
+    case 'X Accuracy':
+      return ItemGen3.XAccuracy;
+    case 'X Special':
+      return ItemGen3.XSpecial;
+    case 'Pok\u00E9 Doll':
+      return ItemGen3.PokeDoll;
+    case 'Fluffy Tail':
+      return ItemGen3.FluffyTail;
+    case 'Super Repel':
+      return ItemGen3.SuperRepel;
+    case 'Max Repel':
+      return ItemGen3.MaxRepel;
+    case 'Escape Rope':
+      return ItemGen3.EscapeRope;
+    case 'Repel':
+      return ItemGen3.Repel;
+    case 'Sun Stone':
+      return ItemGen3.SunStone;
+    case 'Moon Stone':
+      return ItemGen3.MoonStone;
+    case 'Fire Stone':
+      return ItemGen3.FireStone;
+    case 'Thunder Stone':
+      return ItemGen3.ThunderStone;
+    case 'Water Stone':
+      return ItemGen3.WaterStone;
+    case 'Leaf Stone':
+      return ItemGen3.LeafStone;
+    case 'TinyMushroom':
+      return ItemGen3.TinyMushroom;
+    case 'Big Mushroom':
+      return ItemGen3.BigMushroom;
+    case 'Pearl':
+      return ItemGen3.Pearl;
+    case 'Big Pearl':
+      return ItemGen3.BigPearl;
+    case 'Stardust':
+      return ItemGen3.Stardust;
+    case 'Star Piece':
+      return ItemGen3.StarPiece;
+    case 'Nugget':
+      return ItemGen3.Nugget;
+    case 'Heart Scale':
+      return ItemGen3.HeartScale;
+    case 'Orange Mail':
+      return ItemGen3.OrangeMail;
+    case 'Harbor Mail':
+      return ItemGen3.HarborMail;
+    case 'Glitter Mail':
+      return ItemGen3.GlitterMail;
+    case 'Mech Mail':
+      return ItemGen3.MechMail;
+    case 'Wood Mail':
+      return ItemGen3.WoodMail;
+    case 'Wave Mail':
+      return ItemGen3.WaveMail;
+    case 'Bead Mail':
+      return ItemGen3.BeadMail;
+    case 'Shadow Mail':
+      return ItemGen3.ShadowMail;
+    case 'Tropic Mail':
+      return ItemGen3.TropicMail;
+    case 'Dream Mail':
+      return ItemGen3.DreamMail;
+    case 'Fab Mail':
+      return ItemGen3.FabMail;
+    case 'Retro Mail':
+      return ItemGen3.RetroMail;
+    case 'Cheri Berry':
+      return ItemGen3.CheriBerry;
+    case 'Chesto Berry':
+      return ItemGen3.ChestoBerry;
+    case 'Pecha Berry':
+      return ItemGen3.PechaBerry;
+    case 'Rawst Berry':
+      return ItemGen3.RawstBerry;
+    case 'Aspear Berry':
+      return ItemGen3.AspearBerry;
+    case 'Leppa Berry':
+      return ItemGen3.LeppaBerry;
+    case 'Oran Berry':
+      return ItemGen3.OranBerry;
+    case 'Persim Berry':
+      return ItemGen3.PersimBerry;
+    case 'Lum Berry':
+      return ItemGen3.LumBerry;
+    case 'Sitrus Berry':
+      return ItemGen3.SitrusBerry;
+    case 'Figy Berry':
+      return ItemGen3.FigyBerry;
+    case 'Wiki Berry':
+      return ItemGen3.WikiBerry;
+    case 'Mago Berry':
+      return ItemGen3.MagoBerry;
+    case 'Aguav Berry':
+      return ItemGen3.AguavBerry;
+    case 'Iapapa Berry':
+      return ItemGen3.IapapaBerry;
+    case 'Razz Berry':
+      return ItemGen3.RazzBerry;
+    case 'Bluk Berry':
+      return ItemGen3.BlukBerry;
+    case 'Nanab Berry':
+      return ItemGen3.NanabBerry;
+    case 'Wepear Berry':
+      return ItemGen3.WepearBerry;
+    case 'Pinap Berry':
+      return ItemGen3.PinapBerry;
+    case 'Pomeg Berry':
+      return ItemGen3.PomegBerry;
+    case 'Kelpsy Berry':
+      return ItemGen3.KelpsyBerry;
+    case 'Qualot Berry':
+      return ItemGen3.QualotBerry;
+    case 'Hondew Berry':
+      return ItemGen3.HondewBerry;
+    case 'Grepa Berry':
+      return ItemGen3.GrepaBerry;
+    case 'Tamato Berry':
+      return ItemGen3.TamatoBerry;
+    case 'Cornn Berry':
+      return ItemGen3.CornnBerry;
+    case 'Magost Berry':
+      return ItemGen3.MagostBerry;
+    case 'Rabuta Berry':
+      return ItemGen3.RabutaBerry;
+    case 'Nomel Berry':
+      return ItemGen3.NomelBerry;
+    case 'Spelon Berry':
+      return ItemGen3.SpelonBerry;
+    case 'Pamtre Berry':
+      return ItemGen3.PamtreBerry;
+    case 'Watmel Berry':
+      return ItemGen3.WatmelBerry;
+    case 'Durin Berry':
+      return ItemGen3.DurinBerry;
+    case 'Belue Berry':
+      return ItemGen3.BelueBerry;
+    case 'Liechi Berry':
+      return ItemGen3.LiechiBerry;
+    case 'Ganlon Berry':
+      return ItemGen3.GanlonBerry;
+    case 'Salac Berry':
+      return ItemGen3.SalacBerry;
+    case 'Petaya Berry':
+      return ItemGen3.PetayaBerry;
+    case 'Apicot Berry':
+      return ItemGen3.ApicotBerry;
+    case 'Lansat Berry':
+      return ItemGen3.LansatBerry;
+    case 'Starf Berry':
+      return ItemGen3.StarfBerry;
+    case 'Enigma Berry':
+      return ItemGen3.EnigmaBerry;
+    case 'BrightPowder':
+      return ItemGen3.BrightPowder;
+    case 'White Herb':
+      return ItemGen3.WhiteHerb;
+    case 'Macho Brace':
+      return ItemGen3.MachoBrace;
+    case 'Exp. Share':
+      return ItemGen3.ExpShare;
+    case 'Quick Claw':
+      return ItemGen3.QuickClaw;
+    case 'Soothe Bell':
+      return ItemGen3.SootheBell;
+    case 'Mental Herb':
+      return ItemGen3.MentalHerb;
+    case 'Choice Band':
+      return ItemGen3.ChoiceBand;
+    case "King's Rock":
+      return ItemGen3.KingsRock;
+    case 'SilverPowder':
+      return ItemGen3.SilverPowder;
+    case 'Amulet Coin':
+      return ItemGen3.AmuletCoin;
+    case 'Cleanse Tag':
+      return ItemGen3.CleanseTag;
+    case 'Soul Dew':
+      return ItemGen3.SoulDew;
+    case 'DeepSeaTooth':
+      return ItemGen3.DeepSeaTooth;
+    case 'DeepSeaScale':
+      return ItemGen3.DeepSeaScale;
+    case 'Smoke Ball':
+      return ItemGen3.SmokeBall;
+    case 'Everstone':
+      return ItemGen3.Everstone;
+    case 'Focus Band':
+      return ItemGen3.FocusBand;
+    case 'Lucky Egg':
+      return ItemGen3.LuckyEgg;
+    case 'Scope Lens':
+      return ItemGen3.ScopeLens;
+    case 'Metal Coat':
+      return ItemGen3.MetalCoat;
+    case 'Leftovers':
+      return ItemGen3.Leftovers;
+    case 'Dragon Scale':
+      return ItemGen3.DragonScale;
+    case 'Light Ball':
+      return ItemGen3.LightBall;
+    case 'Soft Sand':
+      return ItemGen3.SoftSand;
+    case 'Hard Stone':
+      return ItemGen3.HardStone;
+    case 'Miracle Seed':
+      return ItemGen3.MiracleSeed;
+    case 'BlackGlasses':
+      return ItemGen3.BlackGlasses;
+    case 'Black Belt':
+      return ItemGen3.BlackBelt;
+    case 'Magnet':
+      return ItemGen3.Magnet;
+    case 'Mystic Water':
+      return ItemGen3.MysticWater;
+    case 'Sharp Beak':
+      return ItemGen3.SharpBeak;
+    case 'Poison Barb':
+      return ItemGen3.PoisonBarb;
+    case 'NeverMeltIce':
+      return ItemGen3.NeverMeltIce;
+    case 'Spell Tag':
+      return ItemGen3.SpellTag;
+    case 'TwistedSpoon':
+      return ItemGen3.TwistedSpoon;
+    case 'Charcoal':
+      return ItemGen3.Charcoal;
+    case 'Dragon Fang':
+      return ItemGen3.DragonFang;
+    case 'Silk Scarf':
+      return ItemGen3.SilkScarf;
+    case 'Up-Grade':
+      return ItemGen3.UpGrade;
+    case 'Shell Bell':
+      return ItemGen3.ShellBell;
+    case 'Sea Incense':
+      return ItemGen3.SeaIncense;
+    case 'Lax Incense':
+      return ItemGen3.LaxIncense;
+    case 'Lucky Punch':
+      return ItemGen3.LuckyPunch;
+    case 'Metal Powder':
+      return ItemGen3.MetalPowder;
+    case 'Thick Club':
+      return ItemGen3.ThickClub;
+    case 'Stick':
+      return ItemGen3.Stick;
+    case 'Red Scarf':
+      return ItemGen3.RedScarf;
+    case 'Blue Scarf':
+      return ItemGen3.BlueScarf;
+    case 'Pink Scarf':
+      return ItemGen3.PinkScarf;
+    case 'Green Scarf':
+      return ItemGen3.GreenScarf;
+    case 'Yellow Scarf':
+      return ItemGen3.YellowScarf;
+    case 'Mach Bike':
+      return ItemGen3.MachBike;
+    case 'Coin Case':
+      return ItemGen3.CoinCase;
+    case 'Itemfinder':
+      return ItemGen3.Itemfinder;
+    case 'Old Rod':
+      return ItemGen3.OldRod;
+    case 'Good Rod':
+      return ItemGen3.GoodRod;
+    case 'Super Rod':
+      return ItemGen3.SuperRod;
+    case 'S.S. Ticket':
+      return ItemGen3.SSTicket;
+    case 'Contest Pass':
+      return ItemGen3.ContestPass;
+    case 'Wailmer Pail':
+      return ItemGen3.WailmerPail;
+    case 'Devon Goods':
+      return ItemGen3.DevonGoods;
+    case 'Soot Sack':
+      return ItemGen3.SootSack;
+    case 'Basement Key':
+      return ItemGen3.BasementKey;
+    case 'Acro Bike':
+      return ItemGen3.AcroBike;
+    case 'Pok\u00E9block Case':
+      return ItemGen3.PokeblockCase;
+    case 'Letter':
+      return ItemGen3.Letter;
+    case 'Eon Ticket':
+      return ItemGen3.EonTicket;
+    case 'Red Orb':
+      return ItemGen3.RedOrb;
+    case 'Blue Orb':
+      return ItemGen3.BlueOrb;
+    case 'Scanner':
+      return ItemGen3.Scanner;
+    case 'Go-Goggles':
+      return ItemGen3.GoGoggles;
+    case 'Meteorite':
+      return ItemGen3.Meteorite;
+    case 'Rm. 1 Key':
+      return ItemGen3.Rm1Key;
+    case 'Rm. 2 Key':
+      return ItemGen3.Rm2Key;
+    case 'Rm. 4 Key':
+      return ItemGen3.Rm4Key;
+    case 'Rm. 6 Key':
+      return ItemGen3.Rm6Key;
+    case 'Storage Key':
+      return ItemGen3.StorageKey;
+    case 'Root Fossil':
+      return ItemGen3.RootFossil;
+    case 'Claw Fossil':
+      return ItemGen3.ClawFossil;
+    case 'Devon Scope':
+      return ItemGen3.DevonScope;
+    case 'TM01':
+      return ItemGen3.TM01;
+    case 'TM02':
+      return ItemGen3.TM02;
+    case 'TM03':
+      return ItemGen3.TM03;
+    case 'TM04':
+      return ItemGen3.TM04;
+    case 'TM05':
+      return ItemGen3.TM05;
+    case 'TM06':
+      return ItemGen3.TM06;
+    case 'TM07':
+      return ItemGen3.TM07;
+    case 'TM08':
+      return ItemGen3.TM08;
+    case 'TM09':
+      return ItemGen3.TM09;
+    case 'TM10':
+      return ItemGen3.TM10;
+    case 'TM11':
+      return ItemGen3.TM11;
+    case 'TM12':
+      return ItemGen3.TM12;
+    case 'TM13':
+      return ItemGen3.TM13;
+    case 'TM14':
+      return ItemGen3.TM14;
+    case 'TM15':
+      return ItemGen3.TM15;
+    case 'TM16':
+      return ItemGen3.TM16;
+    case 'TM17':
+      return ItemGen3.TM17;
+    case 'TM18':
+      return ItemGen3.TM18;
+    case 'TM19':
+      return ItemGen3.TM19;
+    case 'TM20':
+      return ItemGen3.TM20;
+    case 'TM21':
+      return ItemGen3.TM21;
+    case 'TM22':
+      return ItemGen3.TM22;
+    case 'TM23':
+      return ItemGen3.TM23;
+    case 'TM24':
+      return ItemGen3.TM24;
+    case 'TM25':
+      return ItemGen3.TM25;
+    case 'TM26':
+      return ItemGen3.TM26;
+    case 'TM27':
+      return ItemGen3.TM27;
+    case 'TM28':
+      return ItemGen3.TM28;
+    case 'TM29':
+      return ItemGen3.TM29;
+    case 'TM30':
+      return ItemGen3.TM30;
+    case 'TM31':
+      return ItemGen3.TM31;
+    case 'TM32':
+      return ItemGen3.TM32;
+    case 'TM33':
+      return ItemGen3.TM33;
+    case 'TM34':
+      return ItemGen3.TM34;
+    case 'TM35':
+      return ItemGen3.TM35;
+    case 'TM36':
+      return ItemGen3.TM36;
+    case 'TM37':
+      return ItemGen3.TM37;
+    case 'TM38':
+      return ItemGen3.TM38;
+    case 'TM39':
+      return ItemGen3.TM39;
+    case 'TM40':
+      return ItemGen3.TM40;
+    case 'TM41':
+      return ItemGen3.TM41;
+    case 'TM42':
+      return ItemGen3.TM42;
+    case 'TM43':
+      return ItemGen3.TM43;
+    case 'TM44':
+      return ItemGen3.TM44;
+    case 'TM45':
+      return ItemGen3.TM45;
+    case 'TM46':
+      return ItemGen3.TM46;
+    case 'TM47':
+      return ItemGen3.TM47;
+    case 'TM48':
+      return ItemGen3.TM48;
+    case 'TM49':
+      return ItemGen3.TM49;
+    case 'TM50':
+      return ItemGen3.TM50;
+    case 'HM01':
+      return ItemGen3.HM01;
+    case 'HM02':
+      return ItemGen3.HM02;
+    case 'HM03':
+      return ItemGen3.HM03;
+    case 'HM04':
+      return ItemGen3.HM04;
+    case 'HM05':
+      return ItemGen3.HM05;
+    case 'HM06':
+      return ItemGen3.HM06;
+    case 'HM07':
+      return ItemGen3.HM07;
+    case 'HM08':
+      return ItemGen3.HM08;
+    case "Oak's Parcel":
+      return ItemGen3.OaksParcel;
+    case 'Pok\u00E9 Flute':
+      return ItemGen3.PokeFlute;
+    case 'Secret Key':
+      return ItemGen3.SecretKey;
+    case 'Bike Voucher':
+      return ItemGen3.BikeVoucher;
+    case 'Gold Teeth':
+      return ItemGen3.GoldTeeth;
+    case 'Old Amber':
+      return ItemGen3.OldAmber;
+    case 'Card Key':
+      return ItemGen3.CardKey;
+    case 'Lift Key':
+      return ItemGen3.LiftKey;
+    case 'Helix Fossil':
+      return ItemGen3.HelixFossil;
+    case 'Dome Fossil':
+      return ItemGen3.DomeFossil;
+    case 'Silph Scope':
+      return ItemGen3.SilphScope;
+    case 'Bicycle':
+      return ItemGen3.Bicycle;
+    case 'Town Map':
+      return ItemGen3.TownMap;
+    case 'Vs. Seeker':
+      return ItemGen3.VsSeeker;
+    case 'Fame Checker':
+      return ItemGen3.FameChecker;
+    case 'TM Case':
+      return ItemGen3.TMCase;
+    case 'Berry Pouch':
+      return ItemGen3.BerryPouch;
+    case 'Teachy TV':
+      return ItemGen3.TeachyTV;
+    case 'Tri-Pass':
+      return ItemGen3.TriPass;
+    case 'Rainbow Pass':
+      return ItemGen3.RainbowPass;
+    case 'Tea':
+      return ItemGen3.Tea;
+    case 'MysticTicket':
+      return ItemGen3.MysticTicket;
+    case 'AuroraTicket':
+      return ItemGen3.AuroraTicket;
+    case 'Powder Jar':
+      return ItemGen3.PowderJar;
+    case 'Ruby':
+      return ItemGen3.Ruby;
+    case 'Sapphire':
+      return ItemGen3.Sapphire;
+    case 'Magma Emblem':
+      return ItemGen3.MagmaEmblem;
+    case 'Old Sea Map':
+      return ItemGen3.OldSeaMap;
+    default:
+      return ItemGen3.None;
   }
 }

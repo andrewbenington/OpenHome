@@ -8,11 +8,14 @@ import {
   stats,
 } from 'types/types';
 import { Ball, GameOfOrigin, GameOfOriginData, isGen6 } from '../../consts';
-import { Abilities } from '../../consts/Abilities';
 import { Items } from '../../consts/Items';
 import { Languages } from '../../consts/Languages';
 import G6Location from '../../consts/MetLocation/G6';
 import { Gen9Ribbons } from '../../consts/Ribbons';
+import {
+  AbilityFromString,
+  AbilityToString,
+} from '../../resources/gen/other/Abilities';
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -233,11 +236,11 @@ export class PK6 extends PKM {
   }
 
   public get ability() {
-    return Abilities[this.abilityIndex];
+    return AbilityToString(this.abilityIndex);
   }
 
   public set ability(value: string) {
-    this.abilityIndex = Abilities.indexOf(value);
+    this.abilityIndex = AbilityFromString(value);
   }
 
   public get abilityNum() {

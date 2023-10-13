@@ -41,7 +41,8 @@ const generateEnumAndStringFunction = (
 ) => {
   const duplicates: { [key: string]: number } = {};
   const enumMembers: ts.EnumMember[] = [];
-  const caseClauses: ts.CaseOrDefaultClause[] = [];
+  const toStringClauses: ts.CaseOrDefaultClause[] = [];
+  const fromStringClauses: ts.CaseOrDefaultClause[] = [];
   values.forEach((value) => {
     // eslint-disable-next-line prefer-const
     let { key, str } = keyAndStringFromLine(value);
@@ -51,19 +52,41 @@ const generateEnumAndStringFunction = (
     } else {
       duplicates[key] = 0;
     }
+
     enumMembers.push(
       ts.factory.createEnumMember(ts.factory.createIdentifier(key))
     );
-    caseClauses.push(
+
+    toStringClauses.push(
       ts.factory.createCaseClause(
         ts.factory.createIdentifier(`${enumName}.${key}`),
         [ts.factory.createReturnStatement(ts.factory.createStringLiteral(str))]
       )
     );
+
+    if (duplicates[key] === 0) {
+      fromStringClauses.push(
+        ts.factory.createCaseClause(ts.factory.createStringLiteral(str), [
+          ts.factory.createReturnStatement(
+            ts.factory.createIdentifier(`${enumName}.${key}`)
+          ),
+        ])
+      );
+    }
   });
-  caseClauses.push(
+
+  toStringClauses.push(
     ts.factory.createDefaultClause([
       ts.factory.createReturnStatement(ts.factory.createStringLiteral('')),
+    ])
+  );
+
+  const { key } = keyAndStringFromLine(values[0]);
+  fromStringClauses.push(
+    ts.factory.createDefaultClause([
+      ts.factory.createReturnStatement(
+        ts.factory.createIdentifier(`${enumName}.${key}`)
+      ),
     ])
   );
 
@@ -73,7 +96,7 @@ const generateEnumAndStringFunction = (
     enumMembers
   );
 
-  const stringFunctionDeclaration = ts.factory.createFunctionDeclaration(
+  const toStringDeclaration = ts.factory.createFunctionDeclaration(
     [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
     undefined,
     ts.factory.createIdentifier(`${enumName}ToString`),
@@ -93,12 +116,35 @@ const generateEnumAndStringFunction = (
     ts.factory.createBlock([
       ts.factory.createSwitchStatement(
         ts.factory.createIdentifier('item'),
-        ts.factory.createCaseBlock(caseClauses)
+        ts.factory.createCaseBlock(toStringClauses)
       ),
     ])
   );
 
-  return { enumDeclaration, stringFunctionDeclaration };
+  const fromStringDeclaration = ts.factory.createFunctionDeclaration(
+    [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
+    undefined,
+    ts.factory.createIdentifier(`${enumName}FromString`),
+    undefined,
+    [
+      ts.factory.createParameterDeclaration(
+        undefined,
+        undefined,
+        'item',
+        undefined,
+        ts.factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword)
+      ),
+    ],
+    ts.factory.createTypeReferenceNode(ts.factory.createIdentifier(enumName)),
+    ts.factory.createBlock([
+      ts.factory.createSwitchStatement(
+        ts.factory.createIdentifier('item'),
+        ts.factory.createCaseBlock(fromStringClauses)
+      ),
+    ])
+  );
+
+  return { enumDeclaration, toStringDeclaration, fromStringDeclaration };
 };
 
 const readFileLinesToList = (filePath: string) => {
@@ -127,7 +173,7 @@ export const GenerateEnumFromTextFile = (
     false,
     ts.ScriptKind.TS
   );
-  const { enumDeclaration, stringFunctionDeclaration } =
+  const { enumDeclaration, toStringDeclaration, fromStringDeclaration } =
     generateEnumAndStringFunction(
       enumName,
       readFileLinesToList(`${process.cwd()}/src/resources/${textFile}`),
@@ -141,9 +187,15 @@ export const GenerateEnumFromTextFile = (
     resultFile
   );
 
-  const stringFunctionContent = printer.printNode(
+  const toStringContent = printer.printNode(
     ts.EmitHint.Unspecified,
-    stringFunctionDeclaration,
+    toStringDeclaration,
+    resultFile
+  );
+
+  const fromStringContent = printer.printNode(
+    ts.EmitHint.Unspecified,
+    fromStringDeclaration,
     resultFile
   );
 
@@ -156,6 +208,6 @@ export const GenerateEnumFromTextFile = (
   // Write the generated content to the output file
   fs.writeFileSync(
     outputFilePath,
-    `${outputFileContent}\n${stringFunctionContent}`
+    `${outputFileContent}\n${toStringContent}\n${fromStringContent}`
   );
 };

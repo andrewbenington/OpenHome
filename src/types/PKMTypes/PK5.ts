@@ -8,7 +8,6 @@ import {
   isKanto,
   isSinnoh,
 } from '../../consts';
-import { Abilities } from '../../consts/Abilities';
 import { Items } from '../../consts/Items';
 import { Languages } from '../../consts/Languages';
 import G5Locations from '../../consts/MetLocation/G5';
@@ -17,6 +16,10 @@ import {
   Gen4RibbonsPart2,
   Gen4RibbonsPart3,
 } from '../../consts/Ribbons';
+import {
+  AbilityFromString,
+  AbilityToString,
+} from '../../resources/gen/other/Abilities';
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -270,11 +273,11 @@ export class PK5 extends PKM {
   }
 
   public get ability() {
-    return Abilities[this.abilityIndex];
+    return AbilityToString(this.abilityIndex);
   }
 
   public set ability(value: string) {
-    this.abilityIndex = Abilities.indexOf(value);
+    this.abilityIndex = AbilityFromString(value);
   }
 
   public get markings() {

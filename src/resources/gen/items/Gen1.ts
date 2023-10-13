@@ -1,6 +1,6 @@
 // This file is auto-generated. Do not modify.
 
-export enum ItemsGen1 {
+export enum ItemGen1 {
   None,
   MasterBall,
   UltraBall,
@@ -258,521 +258,813 @@ export enum ItemsGen1 {
   TM54,
   TM55,
 }
-export function ItemsGen1ToString(item: ItemsGen1): string {
+export function ItemGen1ToString(item: ItemGen1): string {
   switch (item) {
-    case ItemsGen1.None:
+    case ItemGen1.None:
       return '(None)';
-    case ItemsGen1.MasterBall:
+    case ItemGen1.MasterBall:
       return 'Master Ball';
-    case ItemsGen1.UltraBall:
+    case ItemGen1.UltraBall:
       return 'Ultra Ball';
-    case ItemsGen1.GreatBall:
+    case ItemGen1.GreatBall:
       return 'Great Ball';
-    case ItemsGen1.PokeBall:
+    case ItemGen1.PokeBall:
       return 'Pok\u00E9 Ball';
-    case ItemsGen1.TownMap:
+    case ItemGen1.TownMap:
       return 'Town Map';
-    case ItemsGen1.Bicycle:
+    case ItemGen1.Bicycle:
       return 'Bicycle';
-    case ItemsGen1.Unknown:
+    case ItemGen1.Unknown:
       return '????? (7)';
-    case ItemsGen1.SafariBall:
+    case ItemGen1.SafariBall:
       return 'Safari Ball';
-    case ItemsGen1.Pokedex:
+    case ItemGen1.Pokedex:
       return 'Pok\u00E9dex';
-    case ItemsGen1.MoonStone:
+    case ItemGen1.MoonStone:
       return 'Moon Stone';
-    case ItemsGen1.Antidote:
+    case ItemGen1.Antidote:
       return 'Antidote';
-    case ItemsGen1.BurnHeal:
+    case ItemGen1.BurnHeal:
       return 'Burn Heal';
-    case ItemsGen1.IceHeal:
+    case ItemGen1.IceHeal:
       return 'Ice Heal';
-    case ItemsGen1.Awakening:
+    case ItemGen1.Awakening:
       return 'Awakening';
-    case ItemsGen1.ParlyzHeal:
+    case ItemGen1.ParlyzHeal:
       return 'Parlyz Heal';
-    case ItemsGen1.FullRestore:
+    case ItemGen1.FullRestore:
       return 'Full Restore';
-    case ItemsGen1.MaxPotion:
+    case ItemGen1.MaxPotion:
       return 'Max Potion';
-    case ItemsGen1.HyperPotion:
+    case ItemGen1.HyperPotion:
       return 'Hyper Potion';
-    case ItemsGen1.SuperPotion:
+    case ItemGen1.SuperPotion:
       return 'Super Potion';
-    case ItemsGen1.Potion:
+    case ItemGen1.Potion:
       return 'Potion';
-    case ItemsGen1.BoulderBadge:
+    case ItemGen1.BoulderBadge:
       return 'BoulderBadge';
-    case ItemsGen1.CascadeBadge:
+    case ItemGen1.CascadeBadge:
       return 'CascadeBadge';
-    case ItemsGen1.ThunderBadge:
+    case ItemGen1.ThunderBadge:
       return 'ThunderBadge';
-    case ItemsGen1.RainbowBadge:
+    case ItemGen1.RainbowBadge:
       return 'RainbowBadge';
-    case ItemsGen1.SoulBadge:
+    case ItemGen1.SoulBadge:
       return 'SoulBadge';
-    case ItemsGen1.MarshBadge:
+    case ItemGen1.MarshBadge:
       return 'MarshBadge';
-    case ItemsGen1.VolcanoBadge:
+    case ItemGen1.VolcanoBadge:
       return 'VolcanoBadge';
-    case ItemsGen1.EarthBadge:
+    case ItemGen1.EarthBadge:
       return 'EarthBadge';
-    case ItemsGen1.EscapeRope:
+    case ItemGen1.EscapeRope:
       return 'Escape Rope';
-    case ItemsGen1.Repel:
+    case ItemGen1.Repel:
       return 'Repel';
-    case ItemsGen1.OldAmber:
+    case ItemGen1.OldAmber:
       return 'Old Amber';
-    case ItemsGen1.FireStone:
+    case ItemGen1.FireStone:
       return 'Fire Stone';
-    case ItemsGen1.ThunderStone:
+    case ItemGen1.ThunderStone:
       return 'Thunder Stone';
-    case ItemsGen1.WaterStone:
+    case ItemGen1.WaterStone:
       return 'Water Stone';
-    case ItemsGen1.HPUp:
+    case ItemGen1.HPUp:
       return 'HP Up';
-    case ItemsGen1.Protein:
+    case ItemGen1.Protein:
       return 'Protein';
-    case ItemsGen1.Iron:
+    case ItemGen1.Iron:
       return 'Iron';
-    case ItemsGen1.Carbos:
+    case ItemGen1.Carbos:
       return 'Carbos';
-    case ItemsGen1.Calcium:
+    case ItemGen1.Calcium:
       return 'Calcium';
-    case ItemsGen1.RareCandy:
+    case ItemGen1.RareCandy:
       return 'Rare Candy';
-    case ItemsGen1.DomeFossil:
+    case ItemGen1.DomeFossil:
       return 'Dome Fossil';
-    case ItemsGen1.HelixFossil:
+    case ItemGen1.HelixFossil:
       return 'Helix Fossil';
-    case ItemsGen1.SecretKey:
+    case ItemGen1.SecretKey:
       return 'Secret Key';
-    case ItemsGen1.Unknown_1:
+    case ItemGen1.Unknown_1:
       return '????? (44)';
-    case ItemsGen1.BikeVoucher:
+    case ItemGen1.BikeVoucher:
       return 'Bike Voucher';
-    case ItemsGen1.XAccuracy:
+    case ItemGen1.XAccuracy:
       return 'X Accuracy';
-    case ItemsGen1.LeafStone:
+    case ItemGen1.LeafStone:
       return 'Leaf Stone';
-    case ItemsGen1.CardKey:
+    case ItemGen1.CardKey:
       return 'Card Key';
-    case ItemsGen1.Nugget:
+    case ItemGen1.Nugget:
       return 'Nugget';
-    case ItemsGen1.PPUpUnused:
+    case ItemGen1.PPUpUnused:
       return 'PP Up (Unused)';
-    case ItemsGen1.PokeDoll:
+    case ItemGen1.PokeDoll:
       return 'Pok\u00E9 Doll';
-    case ItemsGen1.FullHeal:
+    case ItemGen1.FullHeal:
       return 'Full Heal';
-    case ItemsGen1.Revive:
+    case ItemGen1.Revive:
       return 'Revive';
-    case ItemsGen1.MaxRevive:
+    case ItemGen1.MaxRevive:
       return 'Max Revive';
-    case ItemsGen1.GuardSpec:
+    case ItemGen1.GuardSpec:
       return 'Guard Spec.';
-    case ItemsGen1.SuperRepel:
+    case ItemGen1.SuperRepel:
       return 'Super Repel';
-    case ItemsGen1.MaxRepel:
+    case ItemGen1.MaxRepel:
       return 'Max Repel';
-    case ItemsGen1.DireHit:
+    case ItemGen1.DireHit:
       return 'Dire Hit';
-    case ItemsGen1.Coin:
+    case ItemGen1.Coin:
       return 'Coin';
-    case ItemsGen1.FreshWater:
+    case ItemGen1.FreshWater:
       return 'Fresh Water';
-    case ItemsGen1.SodaPop:
+    case ItemGen1.SodaPop:
       return 'Soda Pop';
-    case ItemsGen1.Lemonade:
+    case ItemGen1.Lemonade:
       return 'Lemonade';
-    case ItemsGen1.SSTicket:
+    case ItemGen1.SSTicket:
       return 'S.S. Ticket';
-    case ItemsGen1.GoldTeeth:
+    case ItemGen1.GoldTeeth:
       return 'Gold Teeth';
-    case ItemsGen1.XAttack:
+    case ItemGen1.XAttack:
       return 'X Attack';
-    case ItemsGen1.XDefend:
+    case ItemGen1.XDefend:
       return 'X Defend';
-    case ItemsGen1.XSpeed:
+    case ItemGen1.XSpeed:
       return 'X Speed';
-    case ItemsGen1.XSpecial:
+    case ItemGen1.XSpecial:
       return 'X Special';
-    case ItemsGen1.CoinCase:
+    case ItemGen1.CoinCase:
       return 'Coin Case';
-    case ItemsGen1.OaksParcel:
+    case ItemGen1.OaksParcel:
       return "Oak's Parcel";
-    case ItemsGen1.Itemfinder:
+    case ItemGen1.Itemfinder:
       return 'Itemfinder';
-    case ItemsGen1.SilphScope:
+    case ItemGen1.SilphScope:
       return 'Silph Scope';
-    case ItemsGen1.PokeFlute:
+    case ItemGen1.PokeFlute:
       return 'Pok\u00E9 Flute';
-    case ItemsGen1.LiftKey:
+    case ItemGen1.LiftKey:
       return 'Lift Key';
-    case ItemsGen1.ExpAll:
+    case ItemGen1.ExpAll:
       return 'Exp. All';
-    case ItemsGen1.OldRod:
+    case ItemGen1.OldRod:
       return 'Old Rod';
-    case ItemsGen1.GoodRod:
+    case ItemGen1.GoodRod:
       return 'Good Rod';
-    case ItemsGen1.SuperRod:
+    case ItemGen1.SuperRod:
       return 'Super Rod';
-    case ItemsGen1.PPUp:
+    case ItemGen1.PPUp:
       return 'PP Up';
-    case ItemsGen1.Ether:
+    case ItemGen1.Ether:
       return 'Ether';
-    case ItemsGen1.MaxEther:
+    case ItemGen1.MaxEther:
       return 'Max Ether';
-    case ItemsGen1.Elixir:
+    case ItemGen1.Elixir:
       return 'Elixir';
-    case ItemsGen1.MaxElixir:
+    case ItemGen1.MaxElixir:
       return 'Max Elixir';
-    case ItemsGen1.Unknown_2:
+    case ItemGen1.Unknown_2:
       return '';
-    case ItemsGen1.Unknown_3:
+    case ItemGen1.Unknown_3:
       return '';
-    case ItemsGen1.Unknown_4:
+    case ItemGen1.Unknown_4:
       return '';
-    case ItemsGen1.Unknown_5:
+    case ItemGen1.Unknown_5:
       return '';
-    case ItemsGen1.Unknown_6:
+    case ItemGen1.Unknown_6:
       return '';
-    case ItemsGen1.Unknown_7:
+    case ItemGen1.Unknown_7:
       return '';
-    case ItemsGen1.Unknown_8:
+    case ItemGen1.Unknown_8:
       return '';
-    case ItemsGen1.Unknown_9:
+    case ItemGen1.Unknown_9:
       return '';
-    case ItemsGen1.Unknown_10:
+    case ItemGen1.Unknown_10:
       return '';
-    case ItemsGen1.Unknown_11:
+    case ItemGen1.Unknown_11:
       return '';
-    case ItemsGen1.Unknown_12:
+    case ItemGen1.Unknown_12:
       return '';
-    case ItemsGen1.Unknown_13:
+    case ItemGen1.Unknown_13:
       return '';
-    case ItemsGen1.Unknown_14:
+    case ItemGen1.Unknown_14:
       return '';
-    case ItemsGen1.Unknown_15:
+    case ItemGen1.Unknown_15:
       return '';
-    case ItemsGen1.Unknown_16:
+    case ItemGen1.Unknown_16:
       return '';
-    case ItemsGen1.Unknown_17:
+    case ItemGen1.Unknown_17:
       return '';
-    case ItemsGen1.Unknown_18:
+    case ItemGen1.Unknown_18:
       return '';
-    case ItemsGen1.Unknown_19:
+    case ItemGen1.Unknown_19:
       return '';
-    case ItemsGen1.Unknown_20:
+    case ItemGen1.Unknown_20:
       return '';
-    case ItemsGen1.Unknown_21:
+    case ItemGen1.Unknown_21:
       return '';
-    case ItemsGen1.Unknown_22:
+    case ItemGen1.Unknown_22:
       return '';
-    case ItemsGen1.Unknown_23:
+    case ItemGen1.Unknown_23:
       return '';
-    case ItemsGen1.Unknown_24:
+    case ItemGen1.Unknown_24:
       return '';
-    case ItemsGen1.Unknown_25:
+    case ItemGen1.Unknown_25:
       return '';
-    case ItemsGen1.Unknown_26:
+    case ItemGen1.Unknown_26:
       return '';
-    case ItemsGen1.Unknown_27:
+    case ItemGen1.Unknown_27:
       return '';
-    case ItemsGen1.Unknown_28:
+    case ItemGen1.Unknown_28:
       return '';
-    case ItemsGen1.Unknown_29:
+    case ItemGen1.Unknown_29:
       return '';
-    case ItemsGen1.Unknown_30:
+    case ItemGen1.Unknown_30:
       return '';
-    case ItemsGen1.Unknown_31:
+    case ItemGen1.Unknown_31:
       return '';
-    case ItemsGen1.Unknown_32:
+    case ItemGen1.Unknown_32:
       return '';
-    case ItemsGen1.Unknown_33:
+    case ItemGen1.Unknown_33:
       return '';
-    case ItemsGen1.Unknown_34:
+    case ItemGen1.Unknown_34:
       return '';
-    case ItemsGen1.Unknown_35:
+    case ItemGen1.Unknown_35:
       return '';
-    case ItemsGen1.Unknown_36:
+    case ItemGen1.Unknown_36:
       return '';
-    case ItemsGen1.Unknown_37:
+    case ItemGen1.Unknown_37:
       return '';
-    case ItemsGen1.Unknown_38:
+    case ItemGen1.Unknown_38:
       return '';
-    case ItemsGen1.Unknown_39:
+    case ItemGen1.Unknown_39:
       return '';
-    case ItemsGen1.Unknown_40:
+    case ItemGen1.Unknown_40:
       return '';
-    case ItemsGen1.Unknown_41:
+    case ItemGen1.Unknown_41:
       return '';
-    case ItemsGen1.Unknown_42:
+    case ItemGen1.Unknown_42:
       return '';
-    case ItemsGen1.Unknown_43:
+    case ItemGen1.Unknown_43:
       return '';
-    case ItemsGen1.Unknown_44:
+    case ItemGen1.Unknown_44:
       return '';
-    case ItemsGen1.Unknown_45:
+    case ItemGen1.Unknown_45:
       return '';
-    case ItemsGen1.Unknown_46:
+    case ItemGen1.Unknown_46:
       return '';
-    case ItemsGen1.Unknown_47:
+    case ItemGen1.Unknown_47:
       return '';
-    case ItemsGen1.Unknown_48:
+    case ItemGen1.Unknown_48:
       return '';
-    case ItemsGen1.Unknown_49:
+    case ItemGen1.Unknown_49:
       return '';
-    case ItemsGen1.Unknown_50:
+    case ItemGen1.Unknown_50:
       return '';
-    case ItemsGen1.Unknown_51:
+    case ItemGen1.Unknown_51:
       return '';
-    case ItemsGen1.Unknown_52:
+    case ItemGen1.Unknown_52:
       return '';
-    case ItemsGen1.Unknown_53:
+    case ItemGen1.Unknown_53:
       return '';
-    case ItemsGen1.Unknown_54:
+    case ItemGen1.Unknown_54:
       return '';
-    case ItemsGen1.Unknown_55:
+    case ItemGen1.Unknown_55:
       return '';
-    case ItemsGen1.Unknown_56:
+    case ItemGen1.Unknown_56:
       return '';
-    case ItemsGen1.Unknown_57:
+    case ItemGen1.Unknown_57:
       return '';
-    case ItemsGen1.Unknown_58:
+    case ItemGen1.Unknown_58:
       return '';
-    case ItemsGen1.Unknown_59:
+    case ItemGen1.Unknown_59:
       return '';
-    case ItemsGen1.Unknown_60:
+    case ItemGen1.Unknown_60:
       return '';
-    case ItemsGen1.Unknown_61:
+    case ItemGen1.Unknown_61:
       return '';
-    case ItemsGen1.Unknown_62:
+    case ItemGen1.Unknown_62:
       return '';
-    case ItemsGen1.Unknown_63:
+    case ItemGen1.Unknown_63:
       return '';
-    case ItemsGen1.Unknown_64:
+    case ItemGen1.Unknown_64:
       return '';
-    case ItemsGen1.Unknown_65:
+    case ItemGen1.Unknown_65:
       return '';
-    case ItemsGen1.Unknown_66:
+    case ItemGen1.Unknown_66:
       return '';
-    case ItemsGen1.Unknown_67:
+    case ItemGen1.Unknown_67:
       return '';
-    case ItemsGen1.Unknown_68:
+    case ItemGen1.Unknown_68:
       return '';
-    case ItemsGen1.Unknown_69:
+    case ItemGen1.Unknown_69:
       return '';
-    case ItemsGen1.Unknown_70:
+    case ItemGen1.Unknown_70:
       return '';
-    case ItemsGen1.Unknown_71:
+    case ItemGen1.Unknown_71:
       return '';
-    case ItemsGen1.Unknown_72:
+    case ItemGen1.Unknown_72:
       return '';
-    case ItemsGen1.Unknown_73:
+    case ItemGen1.Unknown_73:
       return '';
-    case ItemsGen1.Unknown_74:
+    case ItemGen1.Unknown_74:
       return '';
-    case ItemsGen1.Unknown_75:
+    case ItemGen1.Unknown_75:
       return '';
-    case ItemsGen1.Unknown_76:
+    case ItemGen1.Unknown_76:
       return '';
-    case ItemsGen1.Unknown_77:
+    case ItemGen1.Unknown_77:
       return '';
-    case ItemsGen1.Unknown_78:
+    case ItemGen1.Unknown_78:
       return '';
-    case ItemsGen1.Unknown_79:
+    case ItemGen1.Unknown_79:
       return '';
-    case ItemsGen1.Unknown_80:
+    case ItemGen1.Unknown_80:
       return '';
-    case ItemsGen1.Unknown_81:
+    case ItemGen1.Unknown_81:
       return '';
-    case ItemsGen1.Unknown_82:
+    case ItemGen1.Unknown_82:
       return '';
-    case ItemsGen1.Unknown_83:
+    case ItemGen1.Unknown_83:
       return '';
-    case ItemsGen1.Unknown_84:
+    case ItemGen1.Unknown_84:
       return '';
-    case ItemsGen1.Unknown_85:
+    case ItemGen1.Unknown_85:
       return '';
-    case ItemsGen1.Unknown_86:
+    case ItemGen1.Unknown_86:
       return '';
-    case ItemsGen1.Unknown_87:
+    case ItemGen1.Unknown_87:
       return '';
-    case ItemsGen1.Unknown_88:
+    case ItemGen1.Unknown_88:
       return '';
-    case ItemsGen1.Unknown_89:
+    case ItemGen1.Unknown_89:
       return '';
-    case ItemsGen1.Unknown_90:
+    case ItemGen1.Unknown_90:
       return '';
-    case ItemsGen1.Unknown_91:
+    case ItemGen1.Unknown_91:
       return '';
-    case ItemsGen1.Unknown_92:
+    case ItemGen1.Unknown_92:
       return '';
-    case ItemsGen1.Unknown_93:
+    case ItemGen1.Unknown_93:
       return '';
-    case ItemsGen1.Unknown_94:
+    case ItemGen1.Unknown_94:
       return '';
-    case ItemsGen1.Unknown_95:
+    case ItemGen1.Unknown_95:
       return '';
-    case ItemsGen1.Unknown_96:
+    case ItemGen1.Unknown_96:
       return '';
-    case ItemsGen1.Unknown_97:
+    case ItemGen1.Unknown_97:
       return '';
-    case ItemsGen1.Unknown_98:
+    case ItemGen1.Unknown_98:
       return '';
-    case ItemsGen1.Unknown_99:
+    case ItemGen1.Unknown_99:
       return '';
-    case ItemsGen1.Unknown_100:
+    case ItemGen1.Unknown_100:
       return '';
-    case ItemsGen1.Unknown_101:
+    case ItemGen1.Unknown_101:
       return '';
-    case ItemsGen1.Unknown_102:
+    case ItemGen1.Unknown_102:
       return '';
-    case ItemsGen1.Unknown_103:
+    case ItemGen1.Unknown_103:
       return '';
-    case ItemsGen1.Unknown_104:
+    case ItemGen1.Unknown_104:
       return '';
-    case ItemsGen1.Unknown_105:
+    case ItemGen1.Unknown_105:
       return '';
-    case ItemsGen1.Unknown_106:
+    case ItemGen1.Unknown_106:
       return '';
-    case ItemsGen1.Unknown_107:
+    case ItemGen1.Unknown_107:
       return '';
-    case ItemsGen1.Unknown_108:
+    case ItemGen1.Unknown_108:
       return '';
-    case ItemsGen1.Unknown_109:
+    case ItemGen1.Unknown_109:
       return '';
-    case ItemsGen1.Unknown_110:
+    case ItemGen1.Unknown_110:
       return '';
-    case ItemsGen1.Unknown_111:
+    case ItemGen1.Unknown_111:
       return '';
-    case ItemsGen1.Unknown_112:
+    case ItemGen1.Unknown_112:
       return '';
-    case ItemsGen1.Unknown_113:
+    case ItemGen1.Unknown_113:
       return '';
-    case ItemsGen1.HM01:
+    case ItemGen1.HM01:
       return 'HM01';
-    case ItemsGen1.HM02:
+    case ItemGen1.HM02:
       return 'HM02';
-    case ItemsGen1.HM03:
+    case ItemGen1.HM03:
       return 'HM03';
-    case ItemsGen1.HM04:
+    case ItemGen1.HM04:
       return 'HM04';
-    case ItemsGen1.HM05:
+    case ItemGen1.HM05:
       return 'HM05';
-    case ItemsGen1.TM01:
+    case ItemGen1.TM01:
       return 'TM01';
-    case ItemsGen1.TM02:
+    case ItemGen1.TM02:
       return 'TM02';
-    case ItemsGen1.TM03:
+    case ItemGen1.TM03:
       return 'TM03';
-    case ItemsGen1.TM04:
+    case ItemGen1.TM04:
       return 'TM04';
-    case ItemsGen1.TM05:
+    case ItemGen1.TM05:
       return 'TM05';
-    case ItemsGen1.TM06:
+    case ItemGen1.TM06:
       return 'TM06';
-    case ItemsGen1.TM07:
+    case ItemGen1.TM07:
       return 'TM07';
-    case ItemsGen1.TM08:
+    case ItemGen1.TM08:
       return 'TM08';
-    case ItemsGen1.TM09:
+    case ItemGen1.TM09:
       return 'TM09';
-    case ItemsGen1.TM10:
+    case ItemGen1.TM10:
       return 'TM10';
-    case ItemsGen1.TM11:
+    case ItemGen1.TM11:
       return 'TM11';
-    case ItemsGen1.TM12:
+    case ItemGen1.TM12:
       return 'TM12';
-    case ItemsGen1.TM13:
+    case ItemGen1.TM13:
       return 'TM13';
-    case ItemsGen1.TM14:
+    case ItemGen1.TM14:
       return 'TM14';
-    case ItemsGen1.TM15:
+    case ItemGen1.TM15:
       return 'TM15';
-    case ItemsGen1.TM16:
+    case ItemGen1.TM16:
       return 'TM16';
-    case ItemsGen1.TM17:
+    case ItemGen1.TM17:
       return 'TM17';
-    case ItemsGen1.TM18:
+    case ItemGen1.TM18:
       return 'TM18';
-    case ItemsGen1.TM19:
+    case ItemGen1.TM19:
       return 'TM19';
-    case ItemsGen1.TM20:
+    case ItemGen1.TM20:
       return 'TM20';
-    case ItemsGen1.TM21:
+    case ItemGen1.TM21:
       return 'TM21';
-    case ItemsGen1.TM22:
+    case ItemGen1.TM22:
       return 'TM22';
-    case ItemsGen1.TM23:
+    case ItemGen1.TM23:
       return 'TM23';
-    case ItemsGen1.TM24:
+    case ItemGen1.TM24:
       return 'TM24';
-    case ItemsGen1.TM25:
+    case ItemGen1.TM25:
       return 'TM25';
-    case ItemsGen1.TM26:
+    case ItemGen1.TM26:
       return 'TM26';
-    case ItemsGen1.TM27:
+    case ItemGen1.TM27:
       return 'TM27';
-    case ItemsGen1.TM28:
+    case ItemGen1.TM28:
       return 'TM28';
-    case ItemsGen1.TM29:
+    case ItemGen1.TM29:
       return 'TM29';
-    case ItemsGen1.TM30:
+    case ItemGen1.TM30:
       return 'TM30';
-    case ItemsGen1.TM31:
+    case ItemGen1.TM31:
       return 'TM31';
-    case ItemsGen1.TM32:
+    case ItemGen1.TM32:
       return 'TM32';
-    case ItemsGen1.TM33:
+    case ItemGen1.TM33:
       return 'TM33';
-    case ItemsGen1.TM34:
+    case ItemGen1.TM34:
       return 'TM34';
-    case ItemsGen1.TM35:
+    case ItemGen1.TM35:
       return 'TM35';
-    case ItemsGen1.TM36:
+    case ItemGen1.TM36:
       return 'TM36';
-    case ItemsGen1.TM37:
+    case ItemGen1.TM37:
       return 'TM37';
-    case ItemsGen1.TM38:
+    case ItemGen1.TM38:
       return 'TM38';
-    case ItemsGen1.TM39:
+    case ItemGen1.TM39:
       return 'TM39';
-    case ItemsGen1.TM40:
+    case ItemGen1.TM40:
       return 'TM40';
-    case ItemsGen1.TM41:
+    case ItemGen1.TM41:
       return 'TM41';
-    case ItemsGen1.TM42:
+    case ItemGen1.TM42:
       return 'TM42';
-    case ItemsGen1.TM43:
+    case ItemGen1.TM43:
       return 'TM43';
-    case ItemsGen1.TM44:
+    case ItemGen1.TM44:
       return 'TM44';
-    case ItemsGen1.TM45:
+    case ItemGen1.TM45:
       return 'TM45';
-    case ItemsGen1.TM46:
+    case ItemGen1.TM46:
       return 'TM46';
-    case ItemsGen1.TM47:
+    case ItemGen1.TM47:
       return 'TM47';
-    case ItemsGen1.TM48:
+    case ItemGen1.TM48:
       return 'TM48';
-    case ItemsGen1.TM49:
+    case ItemGen1.TM49:
       return 'TM49';
-    case ItemsGen1.TM50:
+    case ItemGen1.TM50:
       return 'TM50';
-    case ItemsGen1.TM51:
+    case ItemGen1.TM51:
       return 'TM51';
-    case ItemsGen1.TM52:
+    case ItemGen1.TM52:
       return 'TM52';
-    case ItemsGen1.TM53:
+    case ItemGen1.TM53:
       return 'TM53';
-    case ItemsGen1.TM54:
+    case ItemGen1.TM54:
       return 'TM54';
-    case ItemsGen1.TM55:
+    case ItemGen1.TM55:
       return 'TM55';
     default:
       return '';
+  }
+}
+export function ItemGen1FromString(item: string): ItemGen1 {
+  switch (item) {
+    case '(None)':
+      return ItemGen1.None;
+    case 'Master Ball':
+      return ItemGen1.MasterBall;
+    case 'Ultra Ball':
+      return ItemGen1.UltraBall;
+    case 'Great Ball':
+      return ItemGen1.GreatBall;
+    case 'Pok\u00E9 Ball':
+      return ItemGen1.PokeBall;
+    case 'Town Map':
+      return ItemGen1.TownMap;
+    case 'Bicycle':
+      return ItemGen1.Bicycle;
+    case '????? (7)':
+      return ItemGen1.Unknown;
+    case 'Safari Ball':
+      return ItemGen1.SafariBall;
+    case 'Pok\u00E9dex':
+      return ItemGen1.Pokedex;
+    case 'Moon Stone':
+      return ItemGen1.MoonStone;
+    case 'Antidote':
+      return ItemGen1.Antidote;
+    case 'Burn Heal':
+      return ItemGen1.BurnHeal;
+    case 'Ice Heal':
+      return ItemGen1.IceHeal;
+    case 'Awakening':
+      return ItemGen1.Awakening;
+    case 'Parlyz Heal':
+      return ItemGen1.ParlyzHeal;
+    case 'Full Restore':
+      return ItemGen1.FullRestore;
+    case 'Max Potion':
+      return ItemGen1.MaxPotion;
+    case 'Hyper Potion':
+      return ItemGen1.HyperPotion;
+    case 'Super Potion':
+      return ItemGen1.SuperPotion;
+    case 'Potion':
+      return ItemGen1.Potion;
+    case 'BoulderBadge':
+      return ItemGen1.BoulderBadge;
+    case 'CascadeBadge':
+      return ItemGen1.CascadeBadge;
+    case 'ThunderBadge':
+      return ItemGen1.ThunderBadge;
+    case 'RainbowBadge':
+      return ItemGen1.RainbowBadge;
+    case 'SoulBadge':
+      return ItemGen1.SoulBadge;
+    case 'MarshBadge':
+      return ItemGen1.MarshBadge;
+    case 'VolcanoBadge':
+      return ItemGen1.VolcanoBadge;
+    case 'EarthBadge':
+      return ItemGen1.EarthBadge;
+    case 'Escape Rope':
+      return ItemGen1.EscapeRope;
+    case 'Repel':
+      return ItemGen1.Repel;
+    case 'Old Amber':
+      return ItemGen1.OldAmber;
+    case 'Fire Stone':
+      return ItemGen1.FireStone;
+    case 'Thunder Stone':
+      return ItemGen1.ThunderStone;
+    case 'Water Stone':
+      return ItemGen1.WaterStone;
+    case 'HP Up':
+      return ItemGen1.HPUp;
+    case 'Protein':
+      return ItemGen1.Protein;
+    case 'Iron':
+      return ItemGen1.Iron;
+    case 'Carbos':
+      return ItemGen1.Carbos;
+    case 'Calcium':
+      return ItemGen1.Calcium;
+    case 'Rare Candy':
+      return ItemGen1.RareCandy;
+    case 'Dome Fossil':
+      return ItemGen1.DomeFossil;
+    case 'Helix Fossil':
+      return ItemGen1.HelixFossil;
+    case 'Secret Key':
+      return ItemGen1.SecretKey;
+    case 'Bike Voucher':
+      return ItemGen1.BikeVoucher;
+    case 'X Accuracy':
+      return ItemGen1.XAccuracy;
+    case 'Leaf Stone':
+      return ItemGen1.LeafStone;
+    case 'Card Key':
+      return ItemGen1.CardKey;
+    case 'Nugget':
+      return ItemGen1.Nugget;
+    case 'PP Up (Unused)':
+      return ItemGen1.PPUpUnused;
+    case 'Pok\u00E9 Doll':
+      return ItemGen1.PokeDoll;
+    case 'Full Heal':
+      return ItemGen1.FullHeal;
+    case 'Revive':
+      return ItemGen1.Revive;
+    case 'Max Revive':
+      return ItemGen1.MaxRevive;
+    case 'Guard Spec.':
+      return ItemGen1.GuardSpec;
+    case 'Super Repel':
+      return ItemGen1.SuperRepel;
+    case 'Max Repel':
+      return ItemGen1.MaxRepel;
+    case 'Dire Hit':
+      return ItemGen1.DireHit;
+    case 'Coin':
+      return ItemGen1.Coin;
+    case 'Fresh Water':
+      return ItemGen1.FreshWater;
+    case 'Soda Pop':
+      return ItemGen1.SodaPop;
+    case 'Lemonade':
+      return ItemGen1.Lemonade;
+    case 'S.S. Ticket':
+      return ItemGen1.SSTicket;
+    case 'Gold Teeth':
+      return ItemGen1.GoldTeeth;
+    case 'X Attack':
+      return ItemGen1.XAttack;
+    case 'X Defend':
+      return ItemGen1.XDefend;
+    case 'X Speed':
+      return ItemGen1.XSpeed;
+    case 'X Special':
+      return ItemGen1.XSpecial;
+    case 'Coin Case':
+      return ItemGen1.CoinCase;
+    case "Oak's Parcel":
+      return ItemGen1.OaksParcel;
+    case 'Itemfinder':
+      return ItemGen1.Itemfinder;
+    case 'Silph Scope':
+      return ItemGen1.SilphScope;
+    case 'Pok\u00E9 Flute':
+      return ItemGen1.PokeFlute;
+    case 'Lift Key':
+      return ItemGen1.LiftKey;
+    case 'Exp. All':
+      return ItemGen1.ExpAll;
+    case 'Old Rod':
+      return ItemGen1.OldRod;
+    case 'Good Rod':
+      return ItemGen1.GoodRod;
+    case 'Super Rod':
+      return ItemGen1.SuperRod;
+    case 'PP Up':
+      return ItemGen1.PPUp;
+    case 'Ether':
+      return ItemGen1.Ether;
+    case 'Max Ether':
+      return ItemGen1.MaxEther;
+    case 'Elixir':
+      return ItemGen1.Elixir;
+    case 'Max Elixir':
+      return ItemGen1.MaxElixir;
+    case 'HM01':
+      return ItemGen1.HM01;
+    case 'HM02':
+      return ItemGen1.HM02;
+    case 'HM03':
+      return ItemGen1.HM03;
+    case 'HM04':
+      return ItemGen1.HM04;
+    case 'HM05':
+      return ItemGen1.HM05;
+    case 'TM01':
+      return ItemGen1.TM01;
+    case 'TM02':
+      return ItemGen1.TM02;
+    case 'TM03':
+      return ItemGen1.TM03;
+    case 'TM04':
+      return ItemGen1.TM04;
+    case 'TM05':
+      return ItemGen1.TM05;
+    case 'TM06':
+      return ItemGen1.TM06;
+    case 'TM07':
+      return ItemGen1.TM07;
+    case 'TM08':
+      return ItemGen1.TM08;
+    case 'TM09':
+      return ItemGen1.TM09;
+    case 'TM10':
+      return ItemGen1.TM10;
+    case 'TM11':
+      return ItemGen1.TM11;
+    case 'TM12':
+      return ItemGen1.TM12;
+    case 'TM13':
+      return ItemGen1.TM13;
+    case 'TM14':
+      return ItemGen1.TM14;
+    case 'TM15':
+      return ItemGen1.TM15;
+    case 'TM16':
+      return ItemGen1.TM16;
+    case 'TM17':
+      return ItemGen1.TM17;
+    case 'TM18':
+      return ItemGen1.TM18;
+    case 'TM19':
+      return ItemGen1.TM19;
+    case 'TM20':
+      return ItemGen1.TM20;
+    case 'TM21':
+      return ItemGen1.TM21;
+    case 'TM22':
+      return ItemGen1.TM22;
+    case 'TM23':
+      return ItemGen1.TM23;
+    case 'TM24':
+      return ItemGen1.TM24;
+    case 'TM25':
+      return ItemGen1.TM25;
+    case 'TM26':
+      return ItemGen1.TM26;
+    case 'TM27':
+      return ItemGen1.TM27;
+    case 'TM28':
+      return ItemGen1.TM28;
+    case 'TM29':
+      return ItemGen1.TM29;
+    case 'TM30':
+      return ItemGen1.TM30;
+    case 'TM31':
+      return ItemGen1.TM31;
+    case 'TM32':
+      return ItemGen1.TM32;
+    case 'TM33':
+      return ItemGen1.TM33;
+    case 'TM34':
+      return ItemGen1.TM34;
+    case 'TM35':
+      return ItemGen1.TM35;
+    case 'TM36':
+      return ItemGen1.TM36;
+    case 'TM37':
+      return ItemGen1.TM37;
+    case 'TM38':
+      return ItemGen1.TM38;
+    case 'TM39':
+      return ItemGen1.TM39;
+    case 'TM40':
+      return ItemGen1.TM40;
+    case 'TM41':
+      return ItemGen1.TM41;
+    case 'TM42':
+      return ItemGen1.TM42;
+    case 'TM43':
+      return ItemGen1.TM43;
+    case 'TM44':
+      return ItemGen1.TM44;
+    case 'TM45':
+      return ItemGen1.TM45;
+    case 'TM46':
+      return ItemGen1.TM46;
+    case 'TM47':
+      return ItemGen1.TM47;
+    case 'TM48':
+      return ItemGen1.TM48;
+    case 'TM49':
+      return ItemGen1.TM49;
+    case 'TM50':
+      return ItemGen1.TM50;
+    case 'TM51':
+      return ItemGen1.TM51;
+    case 'TM52':
+      return ItemGen1.TM52;
+    case 'TM53':
+      return ItemGen1.TM53;
+    case 'TM54':
+      return ItemGen1.TM54;
+    case 'TM55':
+      return ItemGen1.TM55;
+    default:
+      return ItemGen1.None;
   }
 }

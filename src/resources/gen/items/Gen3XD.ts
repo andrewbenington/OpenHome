@@ -290,3 +290,193 @@ export function ItemsGen3XDToString(item: ItemsGen3XD): string {
       return '';
   }
 }
+export function ItemsGen3XDFromString(item: string): ItemsGen3XD {
+  switch (item) {
+    case 'Safe Key':
+      return ItemsGen3XD.SafeKey;
+    case 'Elevator Key':
+      return ItemsGen3XD.ElevatorKey;
+    case 'Bonsly Card':
+      return ItemsGen3XD.BonslyCard;
+    case 'Machine Part':
+      return ItemsGen3XD.MachinePart;
+    case "Gonzap's Key":
+      return ItemsGen3XD.GonzapsKey;
+    case 'Data ROM':
+      return ItemsGen3XD.DataROM;
+    case 'ID Card':
+      return ItemsGen3XD.IDCard;
+    case 'Music Disc':
+      return ItemsGen3XD.MusicDisc;
+    case 'System Lever':
+      return ItemsGen3XD.SystemLever;
+    case "Mayor's Note":
+      return ItemsGen3XD.MayorsNote;
+    case 'Miror Radar':
+      return ItemsGen3XD.MirorRadar;
+    case 'Pok\u00E9 Snack':
+      return ItemsGen3XD.PokeSnack;
+    case 'Cologne Case':
+      return ItemsGen3XD.CologneCase;
+    case 'Joy Scent':
+      return ItemsGen3XD.JoyScent;
+    case 'Excite Scent':
+      return ItemsGen3XD.ExciteScent;
+    case 'Vivid Scent':
+      return ItemsGen3XD.VividScent;
+    case 'Sun Shard':
+      return ItemsGen3XD.SunShard;
+    case 'Moon Shard':
+      return ItemsGen3XD.MoonShard;
+    case 'Bonsly Photo':
+      return ItemsGen3XD.BonslyPhoto;
+    case 'Cry Analyzer':
+      return ItemsGen3XD.CryAnalyzer;
+    case '???':
+      return ItemsGen3XD.Unknown;
+    case 'Krane Memo 1':
+      return ItemsGen3XD.KraneMemo1;
+    case 'Krane Memo 2':
+      return ItemsGen3XD.KraneMemo2;
+    case 'Krane Memo 3':
+      return ItemsGen3XD.KraneMemo3;
+    case 'Krane Memo 4':
+      return ItemsGen3XD.KraneMemo4;
+    case 'Krane Memo 5':
+      return ItemsGen3XD.KraneMemo5;
+    case 'Voice Case 1':
+      return ItemsGen3XD.VoiceCase1;
+    case 'Voice Case 2':
+      return ItemsGen3XD.VoiceCase2;
+    case 'Voice Case 3':
+      return ItemsGen3XD.VoiceCase3;
+    case 'Voice Case 4':
+      return ItemsGen3XD.VoiceCase4;
+    case 'Voice Case 5':
+      return ItemsGen3XD.VoiceCase5;
+    case 'Disc Case':
+      return ItemsGen3XD.DiscCase;
+    case 'Battle CD 01':
+      return ItemsGen3XD.BattleCD01;
+    case 'Battle CD 02':
+      return ItemsGen3XD.BattleCD02;
+    case 'Battle CD 03':
+      return ItemsGen3XD.BattleCD03;
+    case 'Battle CD 04':
+      return ItemsGen3XD.BattleCD04;
+    case 'Battle CD 05':
+      return ItemsGen3XD.BattleCD05;
+    case 'Battle CD 06':
+      return ItemsGen3XD.BattleCD06;
+    case 'Battle CD 07':
+      return ItemsGen3XD.BattleCD07;
+    case 'Battle CD 08':
+      return ItemsGen3XD.BattleCD08;
+    case 'Battle CD 09':
+      return ItemsGen3XD.BattleCD09;
+    case 'Battle CD 10':
+      return ItemsGen3XD.BattleCD10;
+    case 'Battle CD 11':
+      return ItemsGen3XD.BattleCD11;
+    case 'Battle CD 12':
+      return ItemsGen3XD.BattleCD12;
+    case 'Battle CD 13':
+      return ItemsGen3XD.BattleCD13;
+    case 'Battle CD 14':
+      return ItemsGen3XD.BattleCD14;
+    case 'Battle CD 15':
+      return ItemsGen3XD.BattleCD15;
+    case 'Battle CD 16':
+      return ItemsGen3XD.BattleCD16;
+    case 'Battle CD 17':
+      return ItemsGen3XD.BattleCD17;
+    case 'Battle CD 18':
+      return ItemsGen3XD.BattleCD18;
+    case 'Battle CD 19':
+      return ItemsGen3XD.BattleCD19;
+    case 'Battle CD 20':
+      return ItemsGen3XD.BattleCD20;
+    case 'Battle CD 21':
+      return ItemsGen3XD.BattleCD21;
+    case 'Battle CD 22':
+      return ItemsGen3XD.BattleCD22;
+    case 'Battle CD 23':
+      return ItemsGen3XD.BattleCD23;
+    case 'Battle CD 24':
+      return ItemsGen3XD.BattleCD24;
+    case 'Battle CD 25':
+      return ItemsGen3XD.BattleCD25;
+    case 'Battle CD 26':
+      return ItemsGen3XD.BattleCD26;
+    case 'Battle CD 27':
+      return ItemsGen3XD.BattleCD27;
+    case 'Battle CD 28':
+      return ItemsGen3XD.BattleCD28;
+    case 'Battle CD 29':
+      return ItemsGen3XD.BattleCD29;
+    case 'Battle CD 30':
+      return ItemsGen3XD.BattleCD30;
+    case 'Battle CD 31':
+      return ItemsGen3XD.BattleCD31;
+    case 'Battle CD 32':
+      return ItemsGen3XD.BattleCD32;
+    case 'Battle CD 33':
+      return ItemsGen3XD.BattleCD33;
+    case 'Battle CD 34':
+      return ItemsGen3XD.BattleCD34;
+    case 'Battle CD 35':
+      return ItemsGen3XD.BattleCD35;
+    case 'Battle CD 36':
+      return ItemsGen3XD.BattleCD36;
+    case 'Battle CD 37':
+      return ItemsGen3XD.BattleCD37;
+    case 'Battle CD 38':
+      return ItemsGen3XD.BattleCD38;
+    case 'Battle CD 39':
+      return ItemsGen3XD.BattleCD39;
+    case 'Battle CD 40':
+      return ItemsGen3XD.BattleCD40;
+    case 'Battle CD 41':
+      return ItemsGen3XD.BattleCD41;
+    case 'Battle CD 42':
+      return ItemsGen3XD.BattleCD42;
+    case 'Battle CD 43':
+      return ItemsGen3XD.BattleCD43;
+    case 'Battle CD 44':
+      return ItemsGen3XD.BattleCD44;
+    case 'Battle CD 45':
+      return ItemsGen3XD.BattleCD45;
+    case 'Battle CD 46':
+      return ItemsGen3XD.BattleCD46;
+    case 'Battle CD 47':
+      return ItemsGen3XD.BattleCD47;
+    case 'Battle CD 48':
+      return ItemsGen3XD.BattleCD48;
+    case 'Battle CD 49':
+      return ItemsGen3XD.BattleCD49;
+    case 'Battle CD 50':
+      return ItemsGen3XD.BattleCD50;
+    case 'Battle CD 51':
+      return ItemsGen3XD.BattleCD51;
+    case 'Battle CD 52':
+      return ItemsGen3XD.BattleCD52;
+    case 'Battle CD 53':
+      return ItemsGen3XD.BattleCD53;
+    case 'Battle CD 54':
+      return ItemsGen3XD.BattleCD54;
+    case 'Battle CD 55':
+      return ItemsGen3XD.BattleCD55;
+    case 'Battle CD 56':
+      return ItemsGen3XD.BattleCD56;
+    case 'Battle CD 57':
+      return ItemsGen3XD.BattleCD57;
+    case 'Battle CD 58':
+      return ItemsGen3XD.BattleCD58;
+    case 'Battle CD 59':
+      return ItemsGen3XD.BattleCD59;
+    case 'Battle CD 60':
+      return ItemsGen3XD.BattleCD60;
+    default:
+      return ItemsGen3XD.SafeKey;
+  }
+}

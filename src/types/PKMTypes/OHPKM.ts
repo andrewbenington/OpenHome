@@ -11,7 +11,6 @@ import {
   statsPreSplit,
 } from 'types/types';
 import {
-  Abilities,
   Ball,
   GameOfOrigin,
   Gen34ContestRibbons,
@@ -21,6 +20,10 @@ import {
   NDex,
   OpenHomeRibbons,
 } from '../../consts';
+import {
+  AbilityFromString,
+  AbilityToString,
+} from '../../resources/gen/other/Abilities';
 import {
   bytesToUint16BigEndian,
   bytesToUint16LittleEndian,
@@ -100,7 +103,7 @@ export class OHPKM extends PKM {
         this.formNum,
         this.abilityNum
       );
-      this.abilityIndex = Abilities.indexOf(this.ability);
+      this.abilityIndex = AbilityFromString(this.ability);
       this.alphaMove = other.alphaMove ?? 0;
       this.gender = other.gender;
       if (other.personalityValue !== undefined) {
@@ -375,11 +378,11 @@ export class OHPKM extends PKM {
   }
 
   public get ability() {
-    return Abilities[this.abilityIndex];
+    return AbilityToString(this.abilityIndex);
   }
 
   public set ability(value: string) {
-    const abilityIndex = Abilities.indexOf(value);
+    const abilityIndex = AbilityFromString(value);
     if (abilityIndex > -1) {
       this.abilityIndex = abilityIndex;
     }

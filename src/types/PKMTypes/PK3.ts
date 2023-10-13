@@ -1,6 +1,5 @@
 import { contestStats, marking, stats } from 'types/types';
 import {
-  Abilities,
   Ball,
   GameOfOrigin,
   Gen3ContestRibbons,
@@ -15,6 +14,7 @@ import {
 } from '../../consts';
 import CXDLocation from '../../consts/MetLocation/CXD';
 import RSEFRLGLocations from '../../consts/MetLocation/RSEFRLG';
+import { AbilityFromString } from '../../resources/gen/other/Abilities';
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -322,7 +322,7 @@ export class PK3 extends PKM {
   }
 
   public get abilityIndex() {
-    return Abilities.indexOf(this.ability);
+    return AbilityFromString(this.ability);
   }
 
   public get ability() {
@@ -331,7 +331,7 @@ export class PK3 extends PKM {
     if (
       this.abilityNum === 2 &&
       ability2 &&
-      Abilities.indexOf(ability2) <= GEN3_ABILITY_MAX
+      AbilityFromString(ability2) <= GEN3_ABILITY_MAX
     ) {
       return ability2;
     }

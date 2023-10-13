@@ -1,23 +1,22 @@
 enums:
-  - name: Items
+  - name: Item
     source: text/items/items.txt
     dest: items/Items.ts
-  - name: ItemsGen1
+  - name: ItemGen1
     source: text/items/gen1.txt
     dest: items/Gen1.ts
-  - name: ItemsGen2
+  - name: ItemGen2
     source: text/items/gen2.txt
     dest: items/Gen2.ts
-  - name: ItemsGen3
+  - name: ItemGen3
     source: text/items/gen3.txt
     dest: items/Gen3.ts
-  - name: ItemsGen3Col
+  - name: ItemGen3Col
     source: text/items/gen3col.txt
     dest: items/Gen3Col.ts
   - name: ItemsGen3XD
     source: text/items/gen3xd.txt
     dest: items/Gen3XD.ts
-  - name: Ribbons
-    source: text/ribbons/ribbons.txt
-    dest: ribbons/Ribbons.ts
-    getKeyAndStr: ribbons.ts
+  - name: Ability
+    source: text/other/abilities.txt
+    dest: other/Abilities.ts

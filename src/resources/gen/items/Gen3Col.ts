@@ -1,6 +1,6 @@
 // This file is auto-generated. Do not modify.
 
-export enum ItemsGen3Col {
+export enum ItemGen3Col {
   JailKey,
   ElevatorKey,
   SmallTablet,
@@ -50,105 +50,173 @@ export enum ItemsGen3Col {
   PowerupPart,
   EinFileF,
 }
-export function ItemsGen3ColToString(item: ItemsGen3Col): string {
+export function ItemGen3ColToString(item: ItemGen3Col): string {
   switch (item) {
-    case ItemsGen3Col.JailKey:
+    case ItemGen3Col.JailKey:
       return 'Jail Key';
-    case ItemsGen3Col.ElevatorKey:
+    case ItemGen3Col.ElevatorKey:
       return 'Elevator Key';
-    case ItemsGen3Col.SmallTablet:
+    case ItemGen3Col.SmallTablet:
       return 'Small Tablet';
-    case ItemsGen3Col.FDisk:
+    case ItemGen3Col.FDisk:
       return 'F-Disk';
-    case ItemsGen3Col.RDisk:
+    case ItemGen3Col.RDisk:
       return 'R-Disk';
-    case ItemsGen3Col.LDisk:
+    case ItemGen3Col.LDisk:
       return 'L-Disk';
-    case ItemsGen3Col.DDisk:
+    case ItemGen3Col.DDisk:
       return 'D-Disk';
-    case ItemsGen3Col.UDisk:
+    case ItemGen3Col.UDisk:
       return 'U-Disk';
-    case ItemsGen3Col.SubwayKey:
+    case ItemGen3Col.SubwayKey:
       return 'Subway Key';
-    case ItemsGen3Col.MaingateKey:
+    case ItemGen3Col.MaingateKey:
       return 'Maingate Key';
-    case ItemsGen3Col.CardKey:
+    case ItemGen3Col.CardKey:
       return 'Card Key';
-    case ItemsGen3Col.DownStKey:
+    case ItemGen3Col.DownStKey:
       return 'Down St. Key';
-    case ItemsGen3Col.DNASample:
+    case ItemGen3Col.DNASample:
       return 'DNA Sample';
-    case ItemsGen3Col.DNASample_1:
+    case ItemGen3Col.DNASample_1:
       return 'DNA Sample';
-    case ItemsGen3Col.DNASample_2:
+    case ItemGen3Col.DNASample_2:
       return 'DNA Sample';
-    case ItemsGen3Col.DNASample_3:
+    case ItemGen3Col.DNASample_3:
       return 'DNA Sample';
-    case ItemsGen3Col.DNASample_4:
+    case ItemGen3Col.DNASample_4:
       return 'DNA Sample';
-    case ItemsGen3Col.DNASample_5:
+    case ItemGen3Col.DNASample_5:
       return 'DNA Sample';
-    case ItemsGen3Col.DNASample_6:
+    case ItemGen3Col.DNASample_6:
       return 'DNA Sample';
-    case ItemsGen3Col.DNASample_7:
+    case ItemGen3Col.DNASample_7:
       return 'DNA Sample';
-    case ItemsGen3Col.DNASample_8:
+    case ItemGen3Col.DNASample_8:
       return 'DNA Sample';
-    case ItemsGen3Col.DNASample_9:
+    case ItemGen3Col.DNASample_9:
       return 'DNA Sample';
-    case ItemsGen3Col.DNASample_10:
+    case ItemGen3Col.DNASample_10:
       return 'DNA Sample';
-    case ItemsGen3Col.DNASample_11:
+    case ItemGen3Col.DNASample_11:
       return 'DNA Sample';
-    case ItemsGen3Col.DNASample_12:
+    case ItemGen3Col.DNASample_12:
       return 'DNA Sample';
-    case ItemsGen3Col.DNASample_13:
+    case ItemGen3Col.DNASample_13:
       return 'DNA Sample';
-    case ItemsGen3Col.DNASample_14:
+    case ItemGen3Col.DNASample_14:
       return 'DNA Sample';
-    case ItemsGen3Col.DNASample_15:
+    case ItemGen3Col.DNASample_15:
       return 'DNA Sample';
-    case ItemsGen3Col.DNASample_16:
+    case ItemGen3Col.DNASample_16:
       return 'DNA Sample';
-    case ItemsGen3Col.DNASample_17:
+    case ItemGen3Col.DNASample_17:
       return 'DNA Sample';
-    case ItemsGen3Col.DataROM:
+    case ItemGen3Col.DataROM:
       return 'Data ROM';
-    case ItemsGen3Col.SteelTeeth:
+    case ItemGen3Col.SteelTeeth:
       return 'Steel Teeth';
-    case ItemsGen3Col.Gear:
+    case ItemGen3Col.Gear:
       return 'Gear';
-    case ItemsGen3Col.RedIDBadge:
+    case ItemGen3Col.RedIDBadge:
       return 'Red ID Badge';
-    case ItemsGen3Col.GrnIDBadge:
+    case ItemGen3Col.GrnIDBadge:
       return 'Grn ID Badge';
-    case ItemsGen3Col.BluIDBadge:
+    case ItemGen3Col.BluIDBadge:
       return 'Blu ID Badge';
-    case ItemsGen3Col.YlwIDBadge:
+    case ItemGen3Col.YlwIDBadge:
       return 'Ylw ID Badge';
-    case ItemsGen3Col.TimeFlute:
+    case ItemGen3Col.TimeFlute:
       return 'Time Flute';
-    case ItemsGen3Col.EinFileS:
+    case ItemGen3Col.EinFileS:
       return 'Ein File S';
-    case ItemsGen3Col.EinFileH:
+    case ItemGen3Col.EinFileH:
       return 'Ein File H';
-    case ItemsGen3Col.EinFileC:
+    case ItemGen3Col.EinFileC:
       return 'Ein File C';
-    case ItemsGen3Col.EinFileP:
+    case ItemGen3Col.EinFileP:
       return 'Ein File P';
-    case ItemsGen3Col.CologneCase:
+    case ItemGen3Col.CologneCase:
       return 'Cologne Case';
-    case ItemsGen3Col.JoyScent:
+    case ItemGen3Col.JoyScent:
       return 'Joy Scent';
-    case ItemsGen3Col.ExciteScent:
+    case ItemGen3Col.ExciteScent:
       return 'Excite Scent';
-    case ItemsGen3Col.VividScent:
+    case ItemGen3Col.VividScent:
       return 'Vivid Scent';
-    case ItemsGen3Col.PowerupPart:
+    case ItemGen3Col.PowerupPart:
       return 'Powerup Part';
-    case ItemsGen3Col.EinFileF:
+    case ItemGen3Col.EinFileF:
       return 'Ein File F';
     default:
       return '';
+  }
+}
+export function ItemGen3ColFromString(item: string): ItemGen3Col {
+  switch (item) {
+    case 'Jail Key':
+      return ItemGen3Col.JailKey;
+    case 'Elevator Key':
+      return ItemGen3Col.ElevatorKey;
+    case 'Small Tablet':
+      return ItemGen3Col.SmallTablet;
+    case 'F-Disk':
+      return ItemGen3Col.FDisk;
+    case 'R-Disk':
+      return ItemGen3Col.RDisk;
+    case 'L-Disk':
+      return ItemGen3Col.LDisk;
+    case 'D-Disk':
+      return ItemGen3Col.DDisk;
+    case 'U-Disk':
+      return ItemGen3Col.UDisk;
+    case 'Subway Key':
+      return ItemGen3Col.SubwayKey;
+    case 'Maingate Key':
+      return ItemGen3Col.MaingateKey;
+    case 'Card Key':
+      return ItemGen3Col.CardKey;
+    case 'Down St. Key':
+      return ItemGen3Col.DownStKey;
+    case 'DNA Sample':
+      return ItemGen3Col.DNASample;
+    case 'Data ROM':
+      return ItemGen3Col.DataROM;
+    case 'Steel Teeth':
+      return ItemGen3Col.SteelTeeth;
+    case 'Gear':
+      return ItemGen3Col.Gear;
+    case 'Red ID Badge':
+      return ItemGen3Col.RedIDBadge;
+    case 'Grn ID Badge':
+      return ItemGen3Col.GrnIDBadge;
+    case 'Blu ID Badge':
+      return ItemGen3Col.BluIDBadge;
+    case 'Ylw ID Badge':
+      return ItemGen3Col.YlwIDBadge;
+    case 'Time Flute':
+      return ItemGen3Col.TimeFlute;
+    case 'Ein File S':
+      return ItemGen3Col.EinFileS;
+    case 'Ein File H':
+      return ItemGen3Col.EinFileH;
+    case 'Ein File C':
+      return ItemGen3Col.EinFileC;
+    case 'Ein File P':
+      return ItemGen3Col.EinFileP;
+    case 'Cologne Case':
+      return ItemGen3Col.CologneCase;
+    case 'Joy Scent':
+      return ItemGen3Col.JoyScent;
+    case 'Excite Scent':
+      return ItemGen3Col.ExciteScent;
+    case 'Vivid Scent':
+      return ItemGen3Col.VividScent;
+    case 'Powerup Part':
+      return ItemGen3Col.PowerupPart;
+    case 'Ein File F':
+      return ItemGen3Col.EinFileF;
+    default:
+      return ItemGen3Col.JailKey;
   }
 }

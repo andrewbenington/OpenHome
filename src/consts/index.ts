@@ -1,4 +1,3 @@
-export * from './Abilities';
 export * from './Balls';
 export * from './Characteristics';
 export * from './Countries';

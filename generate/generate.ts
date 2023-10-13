@@ -25,11 +25,9 @@ config.enums.forEach((e) => {
     | undefined;
   if (e.getKeyAndStr) {
     getKeyAndStr = require(`./parseFunctions/ribbons`).parseFunction;
-    console.log(require(`./parseFunctions/ribbons`));
     if (!getKeyAndStr) {
       getKeyAndStr = () => ({ key: 'uh', str: 'oh' });
     }
-    console.log(getKeyAndStr('Test\tOther Stuff'));
   }
   GenerateEnumFromTextFile(e.name, e.source, e.dest, getKeyAndStr);
 });

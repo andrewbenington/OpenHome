@@ -1,6 +1,5 @@
 import { contestStats, marking, pokedate, stats } from 'types/types';
 import {
-  Abilities,
   Ball,
   GameOfOrigin,
   Gen4RibbonsPart1,
@@ -15,6 +14,10 @@ import {
   isSinnoh,
 } from '../../consts';
 import G4Locations from '../../consts/MetLocation/G4';
+import {
+  AbilityFromString,
+  AbilityToString,
+} from '../../resources/gen/other/Abilities';
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -264,11 +267,11 @@ export class PK4 extends PKM {
   }
 
   public get ability() {
-    return Abilities[this.abilityIndex];
+    return AbilityToString(this.abilityIndex);
   }
 
   public set ability(value: string) {
-    this.abilityIndex = Abilities.indexOf(value);
+    this.abilityIndex = AbilityFromString(value);
   }
 
   public get markings() {
