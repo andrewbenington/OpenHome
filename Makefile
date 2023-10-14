@@ -1,4 +1,4 @@
-VERSION=0.1.0
+VERSION=0.2.0
 
 .PHONY: build
 build:
@@ -27,7 +27,6 @@ lint:
 .PHONY: set-version
 set-version:
 	@npm version $(VERSION) --no-git-tag-version --allow-same-version
-	@npm --prefix release/app version $(VERSION) --no-git-tag-version --allow-same-version
 
 generate/out/generate.js: generate/generate.ts generate/syncPKHexResources.ts generate/enums.ts generate/parseFunctions/*
 	@echo "compiling generate/*.ts..."

@@ -1,11 +1,12 @@
-import { Grid, useTheme } from '@mui/material'
+import { Grid, Paper } from '@mui/material'
 import _ from 'lodash'
+import { PKM } from '../../types/PKMTypes/PKM'
+import { SaveCoordinates } from '../../types/types'
 import { useAppDispatch } from '../redux/hooks'
 import { useHomeData } from '../redux/selectors'
 import { cancelDrag, completeDrag, importMons, startDrag } from '../redux/slices/appSlice'
-import { PKM } from '../../types/PKMTypes/PKM'
-import { SaveCoordinates } from '../../types/types'
 import BoxCell from './BoxCell'
+import { useTheme } from '@mui/material'
 
 interface HomeBoxDisplayProps {
   setSelectedMon: (_: PKM | undefined) => void
@@ -13,8 +14,8 @@ interface HomeBoxDisplayProps {
 
 const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
   const data = useHomeData()
-  const theme = useTheme()
   const { setSelectedMon } = props
+  const { palette } = useTheme()
 
   const dispatch = useAppDispatch()
   const dispatchStartDrag = (source: SaveCoordinates) => dispatch(startDrag(source))
@@ -25,13 +26,12 @@ const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
 
   return (
     data.boxes[0] && (
-      <div
+      <Paper
         style={{
-          borderRadius: 5,
           padding: 2,
-          backgroundColor: theme.palette.secondary.main,
           width: '100%',
           height: 'fit-content',
+          backgroundColor: palette.primary.main,
         }}
       >
         {_.range(10).map((row: number) => (
@@ -80,7 +80,7 @@ const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
             })}
           </Grid>
         ))}
-      </div>
+      </Paper>
     )
   )
 }

@@ -18,19 +18,19 @@ import {
   useDragMon,
   useDragSource,
   useHomeData,
-  useModifiedOHPKMs,
-  useMonsToDelete,
+  useMonsToRelease,
   useSaveFunctions,
   useSaves,
 } from '../redux/selectors'
 import {
   cancelDrag,
   clearAllSaves,
-  deleteMon,
+  setMonToRelease,
   loadGen12Lookup,
   loadGen345Lookup,
   loadHomeBoxes,
   loadHomeMons,
+  clearMonsToRelease,
 } from '../redux/slices/appSlice'
 import HomeBoxDisplay from '../saves/HomeBoxDisplay'
 import SaveDisplay from '../saves/SaveDisplay'
@@ -43,6 +43,7 @@ import {
 } from '../util/ipcFunctions'
 import Themes, { OpenHomeTheme } from './Themes'
 import { dropAreaStyle } from './styles'
+import useWindowDimensions from '../util/windowDimensions'
 
 const Home = () => {
   const { palette } = useTheme()
@@ -50,27 +51,21 @@ const Home = () => {
   const homeData = useHomeData()
   const dragMon = useDragMon()
   const dragSource = useDragSource()
-  const modifiedOHPKMs = useModifiedOHPKMs()
-  const monsToDelete = useMonsToDelete()
+  const monsToRelease = useMonsToRelease()
   const [loadingMessage, setLoadingMessage] = useState<string | undefined>('Starting app...')
   const [currentTheme] = useState<OpenHomeTheme>(Themes[0])
   const [selectedMon, setSelectedMon] = useState<PKM>()
   const [tab, setTab] = useState('summary')
   const [openSaveDialog, setOpenSaveDialog] = useState(false)
   const [filesToDelete, setFilesToDelete] = useState<string[]>([])
+  const { height } = useWindowDimensions()
   const dispatch = useAppDispatch()
-  const dispatchDeleteMon = (saveCoordinates: SaveCoordinates) =>
-    dispatch(deleteMon(saveCoordinates))
+  const dispatchReleaseMon = (saveCoordinates: SaveCoordinates) =>
+    dispatch(setMonToRelease(saveCoordinates))
+  const dispatchClearMonsToRelease = useCallback(() => dispatch(clearMonsToRelease()), [dispatch])
   const [writeAllSaveFiles, writeAllHomeData] = useSaveFunctions()
   const dispatchClearAllSaves = useCallback(() => dispatch(clearAllSaves()), [dispatch])
   const dispatchCancelDrag = () => dispatch(cancelDrag())
-
-  useEffect(() => {
-    console.info(
-      'modifiedOHPKMs updated',
-      Object.values(modifiedOHPKMs).map((mon) => mon.nickname)
-    )
-  }, [modifiedOHPKMs])
 
   useEffect(() => {
     const edited =
@@ -103,7 +98,7 @@ const Home = () => {
     const mon = dragMon
     if (!file && dragSource) {
       if (mon && type === 'release') {
-        dispatchDeleteMon(dragSource)
+        dispatchReleaseMon(dragSource)
         if (mon instanceof OHPKM) {
           const identifier = getMonFileIdentifier(mon)
           if (identifier) {
@@ -135,6 +130,7 @@ const Home = () => {
   // listener for menu reset + close
   useEffect(() => {
     const callback = handleMenuResetAndClose(() => {
+      dispatchClearMonsToRelease()
       dispatch(loadHomeMons()).then(() => dispatch(loadHomeBoxes()))
     }, dispatchClearAllSaves)
     return () => callback()
@@ -157,22 +153,16 @@ const Home = () => {
   ) : (
     <Grid
       container
+      height="100%"
       style={{
         backgroundColor: currentTheme.backgroundColor,
-        height: '100%',
-        width: '100%',
-        display: 'flex',
-        flexDirection: 'row',
-        paddingTop: 10,
       }}
     >
       <Grid
         item
-        xs={3}
-        className="scroll-no-bar"
+        xs={3.5}
         style={{
-          width: '25%',
-          overflow: 'scroll',
+          overflowY: 'scroll',
         }}
       >
         {_.range(saves.length).map((i) => (
@@ -186,6 +176,7 @@ const Home = () => {
             display: 'flex',
             flexDirection: 'row',
             alignItems: 'center',
+            marginTop: 10,
           }}
           onClick={() => setOpenSaveDialog(true)}
         >
@@ -193,76 +184,82 @@ const Home = () => {
           <h2>Open Save</h2>
         </OpenHomeButton>
       </Grid>
-      <Grid item xs={6} style={{ display: 'flex', flexDirection: 'column', width: '50%' }}>
-        <HomeBoxDisplay setSelectedMon={setSelectedMon} />
-      </Grid>
-      <Grid item xs={3} style={{ display: 'flex', flexDirection: 'column' }}>
-        <button type="button" style={dropAreaStyle}>
-          <div
-            draggable
-            style={{
-              height: '100%',
-              width: '100%',
-              flex: 1,
-              padding: 'auto',
-            }}
-            onDragOver={(e) => {
-              e.preventDefault()
-            }}
-            onDrop={(e) => onViewDrop(e, 'as is')}
-          >
-            Preview
-          </div>
-        </button>
-        <button
-          type="button"
-          style={dropAreaStyle}
-          onClick={() => {}}
-          //   disabled={!mon}
-        >
-          <div
-            style={{
-              width: '100%',
-              flex: 1,
-              padding: 'auto',
-            }}
-            onDragOver={(e) => {
-              e.preventDefault()
-            }}
-            onDrop={(e) => onViewDrop(e, 'release')}
-          >
+      <Grid
+        item
+        xs={8.5}
+        display="flex"
+        flexDirection="column"
+        alignItems="center"
+        style={{ padding: 10 }}
+      >
+        <div style={{ width: height * 0.75 }}>
+          <HomeBoxDisplay setSelectedMon={setSelectedMon} />
+        </div>
+        <Grid container flex={1}>
+          <Grid item xs={6} style={dropAreaStyle}>
+            <div
+              draggable
+              style={{
+                height: '100%',
+                width: '100%',
+                flex: 1,
+              }}
+              onDragOver={(e) => {
+                e.preventDefault()
+              }}
+              onDrop={(e) => onViewDrop(e, 'as is')}
+            >
+              Preview
+            </div>
+          </Grid>
+          <Grid item xs={6} style={dropAreaStyle}>
             RELEASE
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }}>
-            {monsToDelete.map((mon, i) => {
-              if (mon.isEgg || !POKEMON_DATA[mon.dexNum]) {
-                return '0% 0%'
-              }
-              const [x, y] = POKEMON_DATA[mon.dexNum].formes[mon.formNum].spriteIndex
-              const backgroundPosition = `${(x / 35) * 100}% ${(y / 36) * 100}%`
-              return (
-                <div
-                  key={`delete_mon_${i}`}
-                  style={{
-                    background: `url(${BoxIcons}) no-repeat 0.02777% 0.02777%`,
-                    backgroundSize: '3600%',
-                    backgroundPosition,
-                    imageRendering: 'crisp-edges',
-                    height: '10%',
-                    aspectRatio: 1,
-                    zIndex: 100,
-                  }}
-                />
-              )
-            })}
-          </div>
-        </button>
+            <div
+              onDragOver={(e) => {
+                e.preventDefault()
+              }}
+              onDrop={(e) => onViewDrop(e, 'release')}
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                flexWrap: 'wrap',
+                height: '100%',
+                width: '100%',
+                position: 'absolute',
+                top: 0,
+              }}
+            >
+              {monsToRelease.map((mon, i) => {
+                if (mon.isEgg || !POKEMON_DATA[mon.dexNum]) {
+                  return '0% 0%'
+                }
+                const [x, y] = POKEMON_DATA[mon.dexNum].formes[mon.formNum].spriteIndex
+                const backgroundPosition = `${(x / 35) * 100}% ${(y / 36) * 100}%`
+                return (
+                  <div key={`delete_mon_${i}`} style={{ width: '10%', aspectRatio: 1 }}>
+                    <div
+                      style={{
+                        background: `url(${BoxIcons}) no-repeat 0.02777% 0.02777%`,
+                        backgroundSize: '3600%',
+                        backgroundPosition,
+                        imageRendering: 'crisp-edges',
+                        aspectRatio: 1,
+                      }}
+                    />
+                  </div>
+                )
+              })}
+            </div>
+          </Grid>
+        </Grid>
       </Grid>
+
       <Dialog
         open={!!selectedMon}
         onClose={() => setSelectedMon(undefined)}
         fullWidth
-        PaperProps={{ sx: { height: 400 } }}
+        maxWidth="md"
+        PaperProps={{ sx: { height: 400, maxWidth: 800 } }}
       >
         {selectedMon && <PokemonDisplay mon={selectedMon} tab={tab} setTab={setTab} />}
       </Dialog>

@@ -10,7 +10,7 @@ import {
   selectHomeData,
   selectHomeMons,
   selectModifiedOHPKMs,
-  selectMonsToDelete,
+  selectMonsToRelease,
   selectSaves,
   writeAllHomeData,
   writeAllSaveFiles,
@@ -29,7 +29,7 @@ export const useHomeData = () => useAppSelector(selectHomeData)
 export const useDragMon = () => useAppSelector(selectDragMon)
 export const useDragSource = () => useAppSelector(selectDragSource)
 export const useModifiedOHPKMs = () => useAppSelector(selectModifiedOHPKMs)
-export const useMonsToDelete = () => useAppSelector(selectMonsToDelete)
+export const useMonsToRelease = () => useAppSelector(selectMonsToRelease)
 export const useSaveFunctions = (): [() => void, () => void] => {
   const dispatch = useAppDispatch()
   return [() => dispatch(writeAllSaveFiles()), () => dispatch(writeAllHomeData())]
