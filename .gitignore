@@ -9,12 +9,8 @@
 /coverage
 
 # production
-/build
 /out
-/release/app/dist
-/release/build
-/resources
-/images
+/dist
 
 # misc
 .DS_Store
@@ -28,9 +24,7 @@
 *.pyc
 __pycache__/
 
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+*.log*
 
 # js
 generate/out/

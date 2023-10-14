@@ -1,0 +1,4 @@
+singleQuote: true
+semi: false
+printWidth: 80
+trailingComma: es5
