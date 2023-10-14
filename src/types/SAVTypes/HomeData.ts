@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { OHPKM } from 'types/PKMTypes/OHPKM'
+import { OHPKM } from '../../types/PKMTypes/OHPKM'
 import { getMonFileIdentifier } from '../../util/Lookup'
 import { Box, BoxCoordinates, SAV } from './SAV'
 

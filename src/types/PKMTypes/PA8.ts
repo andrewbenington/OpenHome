@@ -4,7 +4,7 @@ import {
   memory,
   pokedate,
   stats,
-} from 'types/types'
+} from '../../types/types'
 import { Ball, GameOfOrigin, GameOfOriginData, isBDSP } from '../../consts'
 import { Languages } from '../../consts/Languages'
 import LALocations from '../../consts/MetLocation/LA'
@@ -380,7 +380,7 @@ export class PA8 extends PKM {
   }
 
   public get ribbons() {
-    const ribbons = []
+    const ribbons: string[] = []
     for (let i = 0; i <= Gen9Ribbons.indexOf('Hisui'); i++) {
       if (getFlag(this.bytes, i >= 64 ? 0x40 : 0x34, i % 64)) {
         ribbons.push(Gen9Ribbons[i])

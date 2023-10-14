@@ -1,7 +1,7 @@
-import { GameOfOrigin } from 'consts'
-import { OHPKM } from 'types/PKMTypes/OHPKM'
-import { TransferRestrictions } from 'types/TransferRestrictions'
-import { SaveRef, SaveType } from 'types/types'
+import { GameOfOrigin } from '../../consts'
+import { OHPKM } from '../../types/PKMTypes/OHPKM'
+import { TransferRestrictions } from '../../types/TransferRestrictions'
+import { SaveRef, SaveType } from '../../types/types'
 import { PKM } from '../PKMTypes/PKM'
 
 export interface Box {

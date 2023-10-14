@@ -2,8 +2,8 @@
 import fs from 'fs'
 import { TextDecoder } from 'node:util'
 import path from 'path'
-import { bytesToPKM } from 'util/FileImport'
-import { getMonGen12Identifier } from 'util/Lookup'
+import { bytesToPKM } from '../../../util/FileImport'
+import { getMonGen12Identifier } from '../../../util/Lookup'
 import { OHPKM } from '../OHPKM'
 import { PK2 } from '../PK2'
 ;(global as any).TextDecoder = TextDecoder

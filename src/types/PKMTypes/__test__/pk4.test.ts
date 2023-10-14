@@ -1,7 +1,7 @@
 import fs from 'fs'
 import { TextDecoder } from 'node:util' // (ESM style imports)
 import path from 'path'
-import { bytesToPKM } from 'util/FileImport'
+import { bytesToPKM } from '../../../util/FileImport'
 import { getMonGen345Identifier } from '../../../util/Lookup'
 import { OHPKM } from '../OHPKM'
 import { PK4 } from '../PK4'

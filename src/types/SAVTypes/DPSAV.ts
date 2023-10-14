@@ -1,6 +1,6 @@
-import { NDex } from 'consts'
-import { CapPikachus, RegionalForms } from 'types/TransferRestrictions'
-import { SaveType } from 'types/types'
+import { NDex } from '../../consts'
+import { CapPikachus, RegionalForms } from '../TransferRestrictions'
+import { SaveType } from '../types'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,

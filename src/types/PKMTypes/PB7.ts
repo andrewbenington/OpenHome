@@ -1,3 +1,4 @@
+import { ItemToString } from '../../resources/gen/items/Items'
 import { GameOfOrigin, Gen9RibbonsPart1 } from '../../consts'
 import { Languages } from '../../consts/Languages'
 import {

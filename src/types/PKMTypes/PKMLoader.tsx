@@ -48,9 +48,9 @@ const PKMLoader = () => {
           <MenuItem value="raw">Raw</MenuItem>
         </Select>
       </div>
-      {mons?.slice(page * pageSize, (page + 1) * pageSize)?.map((mon) => (
-        <PokemonDisplay mon={mon} tab="" setTab={() => {}} />
-      ))}
+      {mons
+        ?.slice(page * pageSize, (page + 1) * pageSize)
+        ?.map((mon) => <PokemonDisplay mon={mon} tab="" setTab={() => {}} />)}
       <Pagination
         count={Math.ceil(mons.length / 100)}
         page={page + 1}

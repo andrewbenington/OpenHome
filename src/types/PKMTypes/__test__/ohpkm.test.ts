@@ -1,7 +1,7 @@
 import fs from 'fs'
 import { TextDecoder } from 'node:util'
 import path from 'path'
-import { bytesToPKM } from 'util/FileImport'
+import { bytesToPKM } from '../../../util/FileImport'
 import {
   getMonGen12Identifier,
   getMonGen345Identifier,
