@@ -24,4 +24,4 @@ export const EncounterTypes = [
   undefined,
   undefined,
   'Gift Starter/Pt Starter/Sinjoh Ruins',
-];
+]

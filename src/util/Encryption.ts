@@ -1,15 +1,15 @@
-import bigInt from 'big-integer';
+import bigInt from 'big-integer'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
   uint16ToBytesLittleEndian,
   uint32ToBytesLittleEndian,
-} from './ByteLogic';
+} from './ByteLogic'
 
-const GEN3_BLOCKS_OFFSET = 0x20;
-const GEN3_BLOCK_SIZE = 12;
-const GEN45_BLOCKS_OFFSET = 0x08;
-const GEN45_BLOCK_SIZE = 0x20;
+const GEN3_BLOCKS_OFFSET = 0x20
+const GEN3_BLOCK_SIZE = 12
+const GEN45_BLOCKS_OFFSET = 0x08
+const GEN45_BLOCK_SIZE = 0x20
 
 const shuffleBlockOrders = [
   [0, 1, 2, 3],
@@ -39,7 +39,7 @@ const shuffleBlockOrders = [
   [3, 1, 2, 0],
   [3, 2, 0, 1],
   [3, 2, 1, 0],
-];
+]
 
 const unshuffleBlockOrders = [
   [0, 1, 2, 3],
@@ -69,7 +69,7 @@ const unshuffleBlockOrders = [
   [3, 1, 2, 0],
   [2, 3, 1, 0],
   [3, 2, 1, 0],
-];
+]
 
 export const unshuffleBlocks = (
   bytes: Uint8Array,
@@ -77,30 +77,30 @@ export const unshuffleBlocks = (
   blockSize: number,
   startIndex: number
 ) => {
-  const blockOrder = unshuffleBlockOrders[shiftValue];
+  const blockOrder = unshuffleBlockOrders[shiftValue]
   const growthBlock = bytes.slice(
     startIndex + blockOrder[0] * blockSize,
     startIndex + (blockOrder[0] + 1) * blockSize
-  );
+  )
   const attackBlock = bytes.slice(
     startIndex + blockOrder[1] * blockSize,
     startIndex + (blockOrder[1] + 1) * blockSize
-  );
+  )
   const statsBlock = bytes.slice(
     startIndex + blockOrder[2] * blockSize,
     startIndex + (blockOrder[2] + 1) * blockSize
-  );
+  )
   const miscBlock = bytes.slice(
     startIndex + blockOrder[3] * blockSize,
     startIndex + (blockOrder[3] + 1) * blockSize
-  );
-  const unshuffledBytes = bytes;
-  unshuffledBytes.set(growthBlock, startIndex);
-  unshuffledBytes.set(attackBlock, startIndex + blockSize);
-  unshuffledBytes.set(statsBlock, startIndex + 2 * blockSize);
-  unshuffledBytes.set(miscBlock, startIndex + 3 * blockSize);
-  return unshuffledBytes;
-};
+  )
+  const unshuffledBytes = bytes
+  unshuffledBytes.set(growthBlock, startIndex)
+  unshuffledBytes.set(attackBlock, startIndex + blockSize)
+  unshuffledBytes.set(statsBlock, startIndex + 2 * blockSize)
+  unshuffledBytes.set(miscBlock, startIndex + 3 * blockSize)
+  return unshuffledBytes
+}
 
 export const shuffleBlocks = (
   bytes: Uint8Array,
@@ -108,105 +108,95 @@ export const shuffleBlocks = (
   blockSize: number,
   startIndex: number
 ) => {
-  const blockOrder = shuffleBlockOrders[shiftValue];
+  const blockOrder = shuffleBlockOrders[shiftValue]
   const firstBlock = bytes.slice(
     startIndex + blockOrder[0] * blockSize,
     startIndex + (blockOrder[0] + 1) * blockSize
-  );
+  )
   const secondBlock = bytes.slice(
     startIndex + blockOrder[1] * blockSize,
     startIndex + (blockOrder[1] + 1) * blockSize
-  );
+  )
   const thirdBlock = bytes.slice(
     startIndex + blockOrder[2] * blockSize,
     startIndex + (blockOrder[2] + 1) * blockSize
-  );
+  )
   const fourthBlock = bytes.slice(
     startIndex + blockOrder[3] * blockSize,
     startIndex + (blockOrder[3] + 1) * blockSize
-  );
-  const unshuffledBytes = bytes;
-  unshuffledBytes.set(firstBlock, startIndex);
-  unshuffledBytes.set(secondBlock, startIndex + blockSize);
-  unshuffledBytes.set(thirdBlock, startIndex + 2 * blockSize);
-  unshuffledBytes.set(fourthBlock, startIndex + 3 * blockSize);
-  return unshuffledBytes;
-};
+  )
+  const unshuffledBytes = bytes
+  unshuffledBytes.set(firstBlock, startIndex)
+  unshuffledBytes.set(secondBlock, startIndex + blockSize)
+  unshuffledBytes.set(thirdBlock, startIndex + 2 * blockSize)
+  unshuffledBytes.set(fourthBlock, startIndex + 3 * blockSize)
+  return unshuffledBytes
+}
 
 export const shuffleBlocksGen3 = (bytes: Uint8Array) => {
-  const personalityValue = bytesToUint32LittleEndian(bytes, 0x00);
-  const shiftValue = personalityValue % 24;
-  return shuffleBlocks(bytes, shiftValue, GEN3_BLOCK_SIZE, GEN3_BLOCKS_OFFSET);
-};
+  const personalityValue = bytesToUint32LittleEndian(bytes, 0x00)
+  const shiftValue = personalityValue % 24
+  return shuffleBlocks(bytes, shiftValue, GEN3_BLOCK_SIZE, GEN3_BLOCKS_OFFSET)
+}
 
 export const unshuffleBlocksGen3 = (bytes: Uint8Array) => {
-  const personalityValue = bytesToUint32LittleEndian(bytes, 0x00);
-  const shiftValue = personalityValue % 24;
-  return unshuffleBlocks(
-    bytes,
-    shiftValue,
-    GEN3_BLOCK_SIZE,
-    GEN3_BLOCKS_OFFSET
-  );
-};
+  const personalityValue = bytesToUint32LittleEndian(bytes, 0x00)
+  const shiftValue = personalityValue % 24
+  return unshuffleBlocks(bytes, shiftValue, GEN3_BLOCK_SIZE, GEN3_BLOCKS_OFFSET)
+}
 
 export const decryptByteArrayGen3 = (bytes: Uint8Array) => {
-  const unencryptedBytes = bytes;
+  const unencryptedBytes = bytes
   const encryptionKey =
     bytesToUint32LittleEndian(bytes, 0x00) ^
-    bytesToUint32LittleEndian(bytes, 0x04);
+    bytesToUint32LittleEndian(bytes, 0x04)
   for (
     let i = GEN3_BLOCKS_OFFSET;
     i < GEN3_BLOCKS_OFFSET + 4 * GEN3_BLOCK_SIZE;
     i += 4
   ) {
-    let value = bytesToUint32LittleEndian(unencryptedBytes, i);
-    value = value ^ encryptionKey;
-    unencryptedBytes.set(uint32ToBytesLittleEndian(value), i);
+    let value = bytesToUint32LittleEndian(unencryptedBytes, i)
+    value = value ^ encryptionKey
+    unencryptedBytes.set(uint32ToBytesLittleEndian(value), i)
   }
-  return unencryptedBytes;
-};
+  return unencryptedBytes
+}
 
 export const shuffleBlocksGen45 = (bytes: Uint8Array) => {
-  const personalityValue = bytesToUint32LittleEndian(bytes, 0x00);
-  const shiftValue = ((personalityValue & 0x3e000) >> 0xd) % 24;
-  return shuffleBlocks(
-    bytes,
-    shiftValue,
-    GEN45_BLOCK_SIZE,
-    GEN45_BLOCKS_OFFSET
-  );
-};
+  const personalityValue = bytesToUint32LittleEndian(bytes, 0x00)
+  const shiftValue = ((personalityValue & 0x3e000) >> 0xd) % 24
+  return shuffleBlocks(bytes, shiftValue, GEN45_BLOCK_SIZE, GEN45_BLOCKS_OFFSET)
+}
 
 export const unshuffleBlocksGen45 = (bytes: Uint8Array) => {
-  const personalityValue = bytesToUint32LittleEndian(bytes, 0x00);
-  const shiftValue = ((personalityValue & 0x3e000) >> 0xd) % 24;
+  const personalityValue = bytesToUint32LittleEndian(bytes, 0x00)
+  const shiftValue = ((personalityValue & 0x3e000) >> 0xd) % 24
   return unshuffleBlocks(
     bytes,
     shiftValue,
     GEN45_BLOCK_SIZE,
     GEN45_BLOCKS_OFFSET
-  );
-};
+  )
+}
 
 export const decryptByteArrayGen45 = (bytes: Uint8Array) => {
-  const checksum = bytesToUint16LittleEndian(bytes, 0x06);
-  const unencryptedBytes = bytes;
-  let seed = checksum;
+  const checksum = bytesToUint16LittleEndian(bytes, 0x06)
+  const unencryptedBytes = bytes
+  let seed = checksum
   for (
     let i = GEN45_BLOCKS_OFFSET;
     i < GEN45_BLOCKS_OFFSET + 4 * GEN45_BLOCK_SIZE;
     i += 2
   ) {
-    const bigIntSeed = bigInt(0x41c64e6d).times(seed).plus(0x6073);
-    seed = bigIntSeed.and(0xffffffff).toJSNumber();
-    const xorValue = (seed >> 16) & 0xffff;
-    const unencryptedWord = bytesToUint16LittleEndian(bytes, i) ^ xorValue;
-    const unencryptedWordBytes = uint16ToBytesLittleEndian(unencryptedWord);
-    unencryptedBytes.set(unencryptedWordBytes, i);
+    const bigIntSeed = bigInt(0x41c64e6d).times(seed).plus(0x6073)
+    seed = bigIntSeed.and(0xffffffff).toJSNumber()
+    const xorValue = (seed >> 16) & 0xffff
+    const unencryptedWord = bytesToUint16LittleEndian(bytes, i) ^ xorValue
+    const unencryptedWordBytes = uint16ToBytesLittleEndian(unencryptedWord)
+    unencryptedBytes.set(unencryptedWordBytes, i)
   }
-  return unencryptedBytes;
-};
+  return unencryptedBytes
+}
 
 const SeedTable: number[] = [
   0x0000, 0x1021, 0x2042, 0x3063, 0x4084, 0x50a5, 0x60c6, 0x70e7, 0x8108,
@@ -238,14 +228,14 @@ const SeedTable: number[] = [
   0x5c64, 0x4c45, 0x3ca2, 0x2c83, 0x1ce0, 0x0cc1, 0xef1f, 0xff3e, 0xcf5d,
   0xdf7c, 0xaf9b, 0xbfba, 0x8fd9, 0x9ff8, 0x6e17, 0x7e36, 0x4e55, 0x5e74,
   0x2e93, 0x3eb2, 0x0ed1, 0x1ef0,
-];
+]
 
 export const CRC16_CCITT = (bytes: Uint8Array, start: number, size: number) => {
-  let sum = 0xffff;
+  let sum = 0xffff
 
   for (let i = start; i < start + size; i++) {
-    sum = ((sum << 8) & 0xffff) ^ SeedTable[bytes[i] ^ ((sum >> 8) & 0xffff)];
+    sum = ((sum << 8) & 0xffff) ^ SeedTable[bytes[i] ^ ((sum >> 8) & 0xffff)]
   }
 
-  return sum;
-};
+  return sum
+}

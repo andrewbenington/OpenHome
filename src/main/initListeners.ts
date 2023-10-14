@@ -1,13 +1,13 @@
-import { BrowserWindow, IpcMainInvokeEvent, app, ipcMain } from 'electron';
-import fs from 'fs';
-import path from 'path';
-import { StringToStringMap } from 'types/types';
+import { BrowserWindow, IpcMainInvokeEvent, app, ipcMain } from 'electron'
+import fs from 'fs'
+import path from 'path'
+import { StringToStringMap } from 'types/types'
 import {
   getFileCreatedDate,
   initializeFolders,
   readBytesFromFile,
   selectFile,
-} from './fileHandlers';
+} from './fileHandlers'
 import {
   addRecentSave,
   loadGen12Lookup,
@@ -17,127 +17,127 @@ import {
   registerGen12Lookup,
   registerGen345Lookup,
   removeRecentSave,
-} from './loadData';
-import writePKMToFile, { deleteOHPKMFile } from './writePKMToFile';
+} from './loadData'
+import writePKMToFile, { deleteOHPKMFile } from './writePKMToFile'
 
 function initListeners() {
   ipcMain.on('write-ohpkm', async (_, bytes: Uint8Array) => {
-    writePKMToFile(bytes);
-  });
+    writePKMToFile(bytes)
+  })
 
   ipcMain.on('delete-ohpkm-files', async (_, fileNames: string[]) => {
-    fileNames.forEach((fn) => deleteOHPKMFile(fn));
-  });
+    fileNames.forEach((fn) => deleteOHPKMFile(fn))
+  })
 
   ipcMain.handle('read-gen12-lookup', async () => {
-    let lookupMap;
+    let lookupMap
     try {
-      lookupMap = loadGen12Lookup();
+      lookupMap = loadGen12Lookup()
     } catch (e) {
-      console.error('no gen12 lookup file');
+      console.error('no gen12 lookup file')
     }
-    return lookupMap;
-  });
+    return lookupMap
+  })
 
   ipcMain.on('write-gen12-lookup', async (_, lookupMap) => {
-    registerGen12Lookup(lookupMap);
-  });
+    registerGen12Lookup(lookupMap)
+  })
 
   ipcMain.handle('read-gen345-lookup', async () => {
-    let lookupMap;
+    let lookupMap
     try {
-      lookupMap = loadGen345Lookup();
+      lookupMap = loadGen345Lookup()
     } catch (e) {
-      console.error('no gen345 lookup file');
+      console.error('no gen345 lookup file')
     }
-    return lookupMap;
-  });
+    return lookupMap
+  })
 
   ipcMain.on('write-gen345-lookup', async (_, lookupMap) => {
-    registerGen345Lookup(lookupMap);
-  });
+    registerGen345Lookup(lookupMap)
+  })
 
   ipcMain.handle('read-recent-saves', async () => {
-    let recentSaves;
+    let recentSaves
     try {
-      recentSaves = loadRecentSaves();
+      recentSaves = loadRecentSaves()
     } catch (e) {
-      console.error('no save refs file');
+      console.error('no save refs file')
     }
-    return recentSaves;
-  });
+    return recentSaves
+  })
 
   ipcMain.on('add-recent-save', async (_, saveRef) => {
-    addRecentSave(saveRef);
-  });
+    addRecentSave(saveRef)
+  })
 
   ipcMain.on('remove-recent-save', async (_, saveRef) => {
-    removeRecentSave(saveRef);
-  });
+    removeRecentSave(saveRef)
+  })
 
   ipcMain.handle('read-home-mons', async () => {
-    const appDataPath = app.getPath('appData');
-    initializeFolders(appDataPath);
-    return loadOHPKMs();
-  });
+    const appDataPath = app.getPath('appData')
+    initializeFolders(appDataPath)
+    return loadOHPKMs()
+  })
 
   ipcMain.handle('read-home-boxes', async (_, boxName) => {
-    const appDataPath = app.getPath('appData');
+    const appDataPath = app.getPath('appData')
     const boxString = fs.readFileSync(
       path.join(appDataPath, 'OpenHome', 'storage', 'boxes', `${boxName}.csv`),
       {
         encoding: 'utf8',
       }
-    );
-    const boxesMap: StringToStringMap = {};
-    boxesMap[`${boxName}`] = boxString;
-    return boxesMap;
-  });
+    )
+    const boxesMap: StringToStringMap = {}
+    boxesMap[`${boxName}`] = boxString
+    return boxesMap
+  })
 
   ipcMain.on('write-home-box', async (event, { boxName, boxString }) => {
-    const appDataPath = app.getPath('appData');
+    const appDataPath = app.getPath('appData')
     fs.writeFileSync(
       path.join(appDataPath, 'OpenHome', 'storage', 'boxes', `${boxName}.csv`),
       boxString
-    );
-  });
+    )
+  })
 
   ipcMain.handle('read-save-file', async (_, filePath) => {
-    let filePaths = filePath;
+    let filePaths = filePath
     if (!filePaths) {
-      filePaths = await selectFile();
+      filePaths = await selectFile()
     }
     if (filePaths) {
-      const fileBytes = readBytesFromFile(filePaths[0]);
-      const createdDate = getFileCreatedDate(filePaths[0]);
+      const fileBytes = readBytesFromFile(filePaths[0])
+      const createdDate = getFileCreatedDate(filePaths[0])
       return {
         path: filePaths[0],
         fileBytes,
         createdDate,
-      };
+      }
     }
-    return {};
-  });
+    return {}
+  })
 
   ipcMain.on('write-save-file', async (_, { bytes, path }) => {
-    fs.writeFileSync(path, bytes);
-  });
+    fs.writeFileSync(path, bytes)
+  })
 
   ipcMain.handle('get-resources-path', () => {
     return app.isPackaged
       ? path.join(process.resourcesPath, 'resources')
-      : path.join(`${app.getAppPath()}resources`);
-  });
+      : path.join(`${app.getAppPath()}resources`)
+  })
 
   ipcMain.handle(
     'set-document-edited',
     (event: IpcMainInvokeEvent, edited: boolean) => {
       const window = BrowserWindow.getAllWindows().find(
         (win) => win.webContents.id === event.sender.id
-      );
-      window?.setDocumentEdited(edited);
+      )
+      window?.setDocumentEdited(edited)
     }
-  );
+  )
 }
 
-export default initListeners;
+export default initListeners

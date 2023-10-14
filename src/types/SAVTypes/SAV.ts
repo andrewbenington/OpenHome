@@ -1,57 +1,57 @@
-import { GameOfOrigin } from 'consts';
-import { OHPKM } from 'types/PKMTypes/OHPKM';
-import { TransferRestrictions } from 'types/TransferRestrictions';
-import { SaveRef, SaveType } from 'types/types';
-import { PKM } from '../PKMTypes/PKM';
+import { GameOfOrigin } from 'consts'
+import { OHPKM } from 'types/PKMTypes/OHPKM'
+import { TransferRestrictions } from 'types/TransferRestrictions'
+import { SaveRef, SaveType } from 'types/types'
+import { PKM } from '../PKMTypes/PKM'
 
 export interface Box {
-  name: string;
-  pokemon: Array<PKM | undefined>;
+  name: string
+  pokemon: Array<PKM | undefined>
 }
 
 export interface BoxCoordinates {
-  box: number;
-  index: number;
+  box: number
+  index: number
 }
 
 export class SAV {
-  saveType: SaveType = SaveType.UNKNOWN;
+  saveType: SaveType = SaveType.UNKNOWN
 
-  origin: GameOfOrigin = 0;
+  origin: GameOfOrigin = 0
 
-  pkmType: typeof PKM = OHPKM;
+  pkmType: typeof PKM = OHPKM
 
-  boxRows: number = 5;
+  boxRows: number = 5
 
-  boxColumns: number = 6;
+  boxColumns: number = 6
 
-  transferRestrictions: TransferRestrictions = {};
+  transferRestrictions: TransferRestrictions = {}
 
-  filePath: string;
+  filePath: string
 
-  fileCreated?: Date;
+  fileCreated?: Date
 
-  money: number = 0;
+  money: number = 0
 
-  name: string = '';
+  name: string = ''
 
-  tid: number = 0;
+  tid: number = 0
 
-  sid?: number;
+  sid?: number
 
-  displayID: string = '000000';
+  displayID: string = '000000'
 
-  currentPCBox: number = 0;
+  currentPCBox: number = 0
 
-  boxNames: string[] = [];
+  boxNames: string[] = []
 
-  boxes: Array<Box> = [];
+  boxes: Array<Box> = []
 
-  bytes: Uint8Array;
+  bytes: Uint8Array
 
-  invalid: boolean = false;
+  invalid: boolean = false
 
-  convertPKM: (_: PKM) => PKM = (mon) => new OHPKM(mon);
+  convertPKM: (_: PKM) => PKM = (mon) => new OHPKM(mon)
 
   getSaveRef: () => SaveRef = () => {
     return {
@@ -61,13 +61,13 @@ export class SAV {
       trainerName: this.name ? this.name : undefined,
       trainerID: this.displayID,
       lastOpened: Date.now(),
-    };
-  };
+    }
+  }
 
-  updatedBoxSlots: BoxCoordinates[] = [];
+  updatedBoxSlots: BoxCoordinates[] = []
 
   constructor(path: string, bytes: Uint8Array) {
-    this.filePath = path;
-    this.bytes = bytes;
+    this.filePath = path
+    this.bytes = bytes
   }
 }

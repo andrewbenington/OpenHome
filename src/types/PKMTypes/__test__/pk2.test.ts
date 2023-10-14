@@ -1,13 +1,12 @@
 /* eslint-disable jest/no-commented-out-tests */
-import fs from 'fs';
-import { TextDecoder } from 'node:util';
-import path from 'path';
-import { bytesToPKM } from 'util/FileImport';
-import { getMonGen12Identifier } from 'util/Lookup';
-import { OHPKM } from '../OHPKM';
-import { PK2 } from '../PK2';
-
-(global as any).TextDecoder = TextDecoder;
+import fs from 'fs'
+import { TextDecoder } from 'node:util'
+import path from 'path'
+import { bytesToPKM } from 'util/FileImport'
+import { getMonGen12Identifier } from 'util/Lookup'
+import { OHPKM } from '../OHPKM'
+import { PK2 } from '../PK2'
+;(global as any).TextDecoder = TextDecoder
 
 // test('gen 3 stat calculations', () => {
 //   const file = path.join(__dirname, './PKMFiles/Gen3', 'blaziken.pkm');
@@ -29,7 +28,7 @@ const hoohGen2 = bytesToPKM(
     fs.readFileSync(path.join(__dirname, './PKMFiles/Gen2', 'hooh.pk2'))
   ),
   'PK2'
-) as PK2;
+) as PK2
 
 // test('gen 3 EVs are updated', () => {
 //   const emeraldPKM = new PK3(blazikenOH);
@@ -101,9 +100,9 @@ const hoohGen2 = bytesToPKM(
 // });
 
 test('pk2 and ohpkm have the same gen12lookup key', () => {
-  const ohPKM = new OHPKM(hoohGen2);
-  expect(getMonGen12Identifier(ohPKM)).toEqual(getMonGen12Identifier(hoohGen2));
-});
+  const ohPKM = new OHPKM(hoohGen2)
+  expect(getMonGen12Identifier(ohPKM)).toEqual(getMonGen12Identifier(hoohGen2))
+})
 
 // test('gen 6+ nickname accuracy', () => {
 //   const converted = new PK3(slowpokeGen7);

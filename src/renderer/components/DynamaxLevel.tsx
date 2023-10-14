@@ -1,23 +1,23 @@
-import _ from 'lodash';
+import _ from 'lodash'
 
 interface DynamaxLevelProps {
-  level: number;
+  level: number
 }
 
-const dynamaxRowStyle = { display: 'flex', flexDirection: 'row' as 'row' };
+const dynamaxRowStyle = { display: 'flex', flexDirection: 'row' as 'row' }
 const dynamaxLevelStyle = {
   height: 20,
   width: 8,
   marginRight: 4,
-};
+}
 
 function dynamaxLevelColor(index: number): string {
-  const greenHex = (40 + index * 20)?.toString(16).padStart(2, '0');
-  return `#FF${greenHex}00`;
+  const greenHex = (40 + index * 20)?.toString(16).padStart(2, '0')
+  return `#FF${greenHex}00`
 }
 
 const DynamaxLevel = (props: DynamaxLevelProps) => {
-  const { level } = props;
+  const { level } = props
   return (
     <div style={dynamaxRowStyle}>
       {_.range(10).map((index: number) => (
@@ -30,7 +30,7 @@ const DynamaxLevel = (props: DynamaxLevelProps) => {
         />
       ))}
     </div>
-  );
-};
+  )
+}
 
-export default DynamaxLevel;
+export default DynamaxLevel

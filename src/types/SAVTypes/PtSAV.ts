@@ -1,46 +1,46 @@
-import { GameOfOrigin } from 'consts';
-import { PT_TRANSFER_RESTRICTIONS } from 'consts/TransferRestrictions';
-import { SaveType } from 'types/types';
+import { GameOfOrigin } from 'consts'
+import { PT_TRANSFER_RESTRICTIONS } from 'consts/TransferRestrictions'
+import { SaveType } from 'types/types'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
-} from '../../util/ByteLogic';
-import { gen4StringToUTF } from '../../util/Strings/StringConverter';
-import { G4SAV } from './G4SAV';
+} from '../../util/ByteLogic'
+import { gen4StringToUTF } from '../../util/Strings/StringConverter'
+import { G4SAV } from './G4SAV'
 
 export class PtSAV extends G4SAV {
-  saveType = SaveType.Pt;
+  saveType = SaveType.Pt
 
-  origin = GameOfOrigin.Platinum;
+  origin = GameOfOrigin.Platinum
 
-  transferRestrictions = PT_TRANSFER_RESTRICTIONS;
+  transferRestrictions = PT_TRANSFER_RESTRICTIONS
 
-  static TRAINER_NAME_OFFSET = 0x68;
+  static TRAINER_NAME_OFFSET = 0x68
 
-  static TRAINER_ID_OFFSET = 0x78;
+  static TRAINER_ID_OFFSET = 0x78
 
-  static BOX_SIZE = 0xff0;
+  static BOX_SIZE = 0xff0
 
-  static GENERAL_BLOCK_OFFSET = 0x0000;
+  static GENERAL_BLOCK_OFFSET = 0x0000
 
-  static GENERAL_BLOCK_SIZE = 0xcf2c;
+  static GENERAL_BLOCK_SIZE = 0xcf2c
 
-  static STORAGE_BLOCK_OFFSET = 0xcf2c;
+  static STORAGE_BLOCK_OFFSET = 0xcf2c
 
-  static STORAGE_BLOCK_SIZE = 0x121e4;
+  static STORAGE_BLOCK_SIZE = 0x121e4
 
-  static BOX_NAMES_OFFSET = 0x11ee0;
+  static BOX_NAMES_OFFSET = 0x11ee0
 
-  currentSaveStorageBlockOffset: number = PtSAV.STORAGE_BLOCK_OFFSET;
+  currentSaveStorageBlockOffset: number = PtSAV.STORAGE_BLOCK_OFFSET
 
-  storageBlockSize: number = PtSAV.STORAGE_BLOCK_SIZE;
+  storageBlockSize: number = PtSAV.STORAGE_BLOCK_SIZE
 
-  boxSize: number = PtSAV.BOX_SIZE;
+  boxSize: number = PtSAV.BOX_SIZE
 
-  boxNamesOffset: number;
+  boxNamesOffset: number
 
   constructor(path: string, bytes: Uint8Array) {
-    super(path, bytes);
+    super(path, bytes)
     // current storage block could be either the first or second one,
     // depending on save count
     if (
@@ -53,22 +53,22 @@ export class PtSAV extends G4SAV {
         PtSAV.STORAGE_BLOCK_SIZE
       )
     ) {
-      this.currentSaveStorageBlockOffset += 0x40000;
+      this.currentSaveStorageBlockOffset += 0x40000
     }
-    this.currentSaveBoxStartOffset = this.currentSaveStorageBlockOffset + 4;
+    this.currentSaveBoxStartOffset = this.currentSaveStorageBlockOffset + 4
     this.boxNamesOffset =
-      this.currentSaveStorageBlockOffset + PtSAV.BOX_NAMES_OFFSET;
-    this.name = gen4StringToUTF(bytes, PtSAV.TRAINER_NAME_OFFSET, 8);
-    this.tid = bytesToUint16LittleEndian(bytes, PtSAV.TRAINER_ID_OFFSET);
-    this.sid = bytesToUint16LittleEndian(bytes, PtSAV.TRAINER_ID_OFFSET + 2);
-    this.displayID = this.tid.toString().padStart(5, '0');
-    this.buildBoxes();
+      this.currentSaveStorageBlockOffset + PtSAV.BOX_NAMES_OFFSET
+    this.name = gen4StringToUTF(bytes, PtSAV.TRAINER_NAME_OFFSET, 8)
+    this.tid = bytesToUint16LittleEndian(bytes, PtSAV.TRAINER_ID_OFFSET)
+    this.sid = bytesToUint16LittleEndian(bytes, PtSAV.TRAINER_ID_OFFSET + 2)
+    this.displayID = this.tid.toString().padStart(5, '0')
+    this.buildBoxes()
   }
 
   getCurrentSaveCount(blockOffset: number, blockSize: number) {
     return bytesToUint32LittleEndian(
       this.bytes,
       blockOffset + blockSize - this.footerSize
-    );
+    )
   }
 }

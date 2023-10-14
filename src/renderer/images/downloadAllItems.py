@@ -87,7 +87,7 @@ def scrape_bulbapedia_gen_9():
             sprite_src = "https:" + columns[2].find("img")["src"]
             name = columns[3].text.strip()
             directory = "items/index/"
-            if name.startswith("TM"):
+            if name.startswith("TM") and "Bag_TM_" in sprite_src:
                 directory = "items/tm/"
                 filename = sprite_src.split("Bag_TM_")[1].split("_")[0].lower() + ".png"
             elif "TM_Material_Sprite" in sprite_src:
@@ -96,6 +96,8 @@ def scrape_bulbapedia_gen_9():
             elif "Picnic_Set" in sprite_src:
                 directory = "items/shared"
                 filename = "picnic-set.png"
+            elif "Bag_None_Sprite" in sprite_src:
+                continue
 
             thread = threading.Thread(target=download_png, args=(
                 sprite_src, directory, filename))
@@ -247,8 +249,8 @@ def download_all_sprites():
 
 
 
-# scrape_bulbapedia_gen_9()
-# scrape_bulbapedia_gen_8()
+scrape_bulbapedia_gen_9()
+scrape_bulbapedia_gen_8()
 scrape_bulbapedia_gen_3()
 # print(POKEMON_DATA["19"]["formes"][1])
 # print(exclude_forme_gen8(19, POKEMON_DATA["19"]["formes"][1]))

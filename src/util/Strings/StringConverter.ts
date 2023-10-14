@@ -1,12 +1,9 @@
-import {
-  bytesToUint16BigEndian,
-  bytesToUint16LittleEndian,
-} from '../ByteLogic';
-import Gen4ToUTFMap from './Gen4ToUTFMap';
-import UTFToGen4Map from './UTFToGen4Map';
+import { bytesToUint16BigEndian, bytesToUint16LittleEndian } from '../ByteLogic'
+import Gen4ToUTFMap from './Gen4ToUTFMap'
+import UTFToGen4Map from './UTFToGen4Map'
 
-export const G1_TERMINATOR = 0x50;
-export const G1_TRADE_OT = 0x5d;
+export const G1_TERMINATOR = 0x50
+export const G1_TRADE_OT = 0x5d
 
 const Gen3CharacterSet = [
   ' ',
@@ -256,7 +253,7 @@ const Gen3CharacterSet = [
   'ä',
   'ö',
   'ü',
-];
+]
 
 export const GBStringDict: { [key: number]: string } = {
   0x7f: ' ',
@@ -375,7 +372,7 @@ export const GBStringDict: { [key: number]: string } = {
   0xfd: '7',
   0xfe: '8',
   0xff: '9',
-};
+}
 
 /**
  * Convert Gen 1/Gen 2 encoded bytes to string. Uses a proprietary encoding,
@@ -390,17 +387,17 @@ export const gen12StringToUTF = (
   offset: number,
   length: number
 ) => {
-  let str = '';
+  let str = ''
   // console.log(bytes);
   for (let i = offset; i < offset + length; i += 1) {
     // console.log(i, bytes[i], GBStringDict[bytes[i]]);
     if (bytes[i] === G1_TERMINATOR) {
-      break;
+      break
     }
-    str += GBStringDict[bytes[i]] ?? '';
+    str += GBStringDict[bytes[i]] ?? ''
   }
-  return str;
-};
+  return str
+}
 
 /**
  * Convert string to Gen 1/Gen 2 encoded bytes. Uses a proprietary encoding,
@@ -416,25 +413,25 @@ export const utf16StringToGen12 = (
   length: number,
   terminate: boolean
 ) => {
-  const bufView = new Uint8Array(length);
+  const bufView = new Uint8Array(length)
   for (let i = 0; i < Math.min(str.length, length); i++) {
     const gen12DictEntry = Object.entries(GBStringDict).find(
       ([_, val]) => val === str.charAt(i)
-    );
+    )
     if (str.charCodeAt(i) === 0) {
-      break;
+      break
     } else if (!gen12DictEntry) {
-      bufView[i] = 0xe6;
+      bufView[i] = 0xe6
     } else {
-      bufView[i] = parseInt(gen12DictEntry[0]);
+      bufView[i] = parseInt(gen12DictEntry[0])
     }
   }
   if (terminate) {
-    const terminalIndex = Math.min(str.length, length - 1);
-    bufView[terminalIndex] = G1_TERMINATOR;
+    const terminalIndex = Math.min(str.length, length - 1)
+    bufView[terminalIndex] = G1_TERMINATOR
   }
-  return bufView;
-};
+  return bufView
+}
 
 /**
  * Convert Gen 3 encoded bytes to string. Uses a proprietary encoding,
@@ -449,15 +446,15 @@ export const gen3StringToUTF = (
   offset: number,
   length: number
 ) => {
-  let str = '';
+  let str = ''
   for (let i = offset; i < offset + length; i += 1) {
     if (bytes[i] === 0xff) {
-      return str;
+      return str
     }
-    str += Gen3CharacterSet[bytes[i]];
+    str += Gen3CharacterSet[bytes[i]]
   }
-  return str;
-};
+  return str
+}
 
 /**
  * Convert string to Gen 3 encoded bytes. Uses a proprietary encoding,
@@ -475,30 +472,30 @@ export const utf16StringToGen3 = (
   terminate: boolean,
   terminateFill: boolean
 ) => {
-  const bufView = new Uint8Array(length);
+  const bufView = new Uint8Array(length)
   for (let i = 0; i < Math.min(str.length, length); i++) {
-    const gen3Char = Gen3CharacterSet.indexOf(str.charAt(i));
+    const gen3Char = Gen3CharacterSet.indexOf(str.charAt(i))
     if (str.charCodeAt(i) === 0) {
-      break;
+      break
     } else if (gen3Char === -1) {
       // missing characters are now '?'
-      bufView[i] = 172;
+      bufView[i] = 172
     } else {
-      bufView[i] = gen3Char;
+      bufView[i] = gen3Char
     }
   }
   if (terminateFill) {
-    const terminalIndex = Math.min(length - 1, str.length);
+    const terminalIndex = Math.min(length - 1, str.length)
     bufView.set(
       new Uint8Array(length - terminalIndex).fill(0xff),
       terminalIndex
-    );
+    )
   } else if (terminate) {
-    const terminalIndex = Math.min(length - 1, str.length);
-    bufView[terminalIndex] = 0xff;
+    const terminalIndex = Math.min(length - 1, str.length)
+    bufView[terminalIndex] = 0xff
   }
-  return bufView;
-};
+  return bufView
+}
 
 /**
  * Convert Gen 4 encoded bytes to string. Uses a proprietary encoding,
@@ -513,16 +510,16 @@ export const gen4StringToUTF = (
   offset: number,
   length: number
 ) => {
-  let str = '';
+  let str = ''
   for (let i = 0; i < length; i += 1) {
-    const value = bytesToUint16LittleEndian(bytes, offset + 2 * i);
+    const value = bytesToUint16LittleEndian(bytes, offset + 2 * i)
     if (value === 0xffff) {
-      return str;
+      return str
     }
-    str += String.fromCharCode(Gen4ToUTFMap[value]);
+    str += String.fromCharCode(Gen4ToUTFMap[value])
   }
-  return str;
-};
+  return str
+}
 
 /**
  * Convert string to Gen 4 encoded bytes. Uses a proprietary encoding,
@@ -538,26 +535,26 @@ export const utf16StringToGen4 = (
   length: number,
   terminate: boolean
 ) => {
-  const buf = new ArrayBuffer(length * 2);
-  const bufView = new Uint16Array(buf);
+  const buf = new ArrayBuffer(length * 2)
+  const bufView = new Uint16Array(buf)
   for (let i = 0; i < length; i++) {
     if (i >= str.length || str.charCodeAt(i) === 0) {
       if (terminate) {
-        bufView[i] = 0xffff;
+        bufView[i] = 0xffff
       }
-      break;
+      break
     }
-    const gen4Char = UTFToGen4Map[str.charCodeAt(i)];
+    const gen4Char = UTFToGen4Map[str.charCodeAt(i)]
     if (gen4Char === -1) {
       // missing characters are now '?'
-      bufView[i] = 0x01ac;
+      bufView[i] = 0x01ac
     } else {
-      bufView[i] = gen4Char;
+      bufView[i] = gen4Char
     }
   }
 
-  return new Uint8Array(buf);
-};
+  return new Uint8Array(buf)
+}
 
 /**
  * Convert Gen 5 encoded bytes to string. Equivalent to UTF-16, except
@@ -572,16 +569,16 @@ export const gen5StringToUTF = (
   offset: number,
   length: number
 ) => {
-  let str = '';
+  let str = ''
   for (let i = 0; i < length; i += 1) {
-    const value = bytesToUint16LittleEndian(bytes, offset + 2 * i);
+    const value = bytesToUint16LittleEndian(bytes, offset + 2 * i)
     if (value === 0xffff) {
-      return str;
+      return str
     }
-    str += String.fromCharCode(value);
+    str += String.fromCharCode(value)
   }
-  return str;
-};
+  return str
+}
 
 /**
  * Convert string to Gen 5 encoded bytes. Equivalent to UTF-16, except
@@ -596,20 +593,20 @@ export const utf16StringToGen5 = (
   length: number,
   terminate: boolean
 ) => {
-  const buf = new ArrayBuffer(length * 2);
-  const bufView = new Uint16Array(buf);
+  const buf = new ArrayBuffer(length * 2)
+  const bufView = new Uint16Array(buf)
   for (let i = 0; i < length; i++) {
     if (i >= str.length || str.charCodeAt(i) === 0) {
       if (terminate) {
-        bufView[i] = 0xffff;
+        bufView[i] = 0xffff
       }
-      break;
+      break
     }
-    bufView[i] = str.charCodeAt(i);
+    bufView[i] = str.charCodeAt(i)
   }
 
-  return new Uint8Array(buf);
-};
+  return new Uint8Array(buf)
+}
 
 /**
  * Convert UTF-16 encoded bytes to string
@@ -624,22 +621,22 @@ export const utf16BytesToString = (
   length: number,
   bigEndian: boolean = false
 ) => {
-  const byteArray = new Uint16Array(length);
+  const byteArray = new Uint16Array(length)
   for (let i = 0; i < length; i += 1) {
     const value = bigEndian
       ? bytesToUint16BigEndian(bytes, offset + 2 * i)
-      : bytesToUint16LittleEndian(bytes, offset + 2 * i);
+      : bytesToUint16LittleEndian(bytes, offset + 2 * i)
     if (value === 0) {
-      break;
+      break
     }
-    byteArray[i] = value;
+    byteArray[i] = value
   }
-  let stringLength = byteArray.indexOf(0);
+  let stringLength = byteArray.indexOf(0)
   if (stringLength < 0) {
-    stringLength = length;
+    stringLength = length
   }
-  return new TextDecoder('utf-16').decode(byteArray.slice(0, stringLength));
-};
+  return new TextDecoder('utf-16').decode(byteArray.slice(0, stringLength))
+}
 
 /**
  * Convert string to UTF-16 encoded bytes
@@ -648,10 +645,10 @@ export const utf16BytesToString = (
  * @returns UInt8Array of UTF-16 bytes
  */
 export const utf16StringToBytes = (str: string, length: number) => {
-  const buf = new ArrayBuffer(length * 2);
-  const bufView = new Uint16Array(buf);
+  const buf = new ArrayBuffer(length * 2)
+  const bufView = new Uint16Array(buf)
   for (let i = 0; i < Math.min(str.length, length); i++) {
-    bufView[i] = str.charCodeAt(i);
+    bufView[i] = str.charCodeAt(i)
   }
-  return new Uint8Array(buf);
-};
+  return new Uint8Array(buf)
+}

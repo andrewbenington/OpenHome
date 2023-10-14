@@ -1,10 +1,8 @@
 {
-  "python.linting.enabled": false,
-  "python.linting.pylintEnabled": false,
-  "python.linting.lintOnSave": true,
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
     "source.organizeImports": true
   },
-  "editor.tabSize": 2
+  "editor.tabSize": 2,
+  "typescript.preferences.importModuleSpecifier": "relative"
 }

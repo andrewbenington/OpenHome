@@ -1,4 +1,4 @@
-import { GameLocations } from '../../types/types';
+import { GameLocations } from '../../types/types'
 
 const G6Locations: GameLocations = {
   0: [
@@ -461,5 +461,5 @@ const G6Locations: GameLocations = {
     'a treasure hunter',
     'an old hot-springs visitor',
   ],
-};
-export default G6Locations;
+}
+export default G6Locations

@@ -1,9 +1,9 @@
-import { POKEMON_DATA } from 'consts';
-import React, { useEffect, useState } from 'react';
-import { Styles } from 'types/types';
-import { PKM } from '../../types/PKMTypes/PKM';
-import { acceptableExtensions, bytesToPKM } from '../../util/FileImport';
-import BoxIcons from '../images/icons/BoxIcons.png';
+import { POKEMON_DATA } from 'consts'
+import React, { useEffect, useState } from 'react'
+import { Styles } from 'types/types'
+import { PKM } from '../../types/PKMTypes/PKM'
+import { acceptableExtensions, bytesToPKM } from '../../util/FileImport'
+import BoxIcons from '../images/icons/BoxIcons.png'
 
 const styles = {
   fillContainer: { width: '100%', height: '100%' },
@@ -27,70 +27,70 @@ const styles = {
     left: 0,
     position: 'absolute',
   },
-} as Styles;
+} as Styles
 
 interface BoxCellProps {
-  onClick: () => void;
-  onDragEvent: (_: boolean) => void;
-  onDrop: (_: PKM[] | undefined) => void;
-  disabled: boolean;
-  zIndex: number;
-  mon: PKM | undefined;
+  onClick: () => void
+  onDragEvent: (_: boolean) => void
+  onDrop: (_: PKM[] | undefined) => void
+  disabled: boolean
+  zIndex: number
+  mon: PKM | undefined
 }
 
 const BoxCell = (props: BoxCellProps) => {
-  const { onClick, onDragEvent, onDrop, disabled, zIndex, mon } = props;
-  const [dragImage, setDragImage] = useState<Element>();
+  const { onClick, onDragEvent, onDrop, disabled, zIndex, mon } = props
+  const [dragImage, setDragImage] = useState<Element>()
 
   const onDropFromFiles = async (files: FileList) => {
-    const importedMons: PKM[] = [];
+    const importedMons: PKM[] = []
     for (let i = 0; i < files.length; i++) {
-      const file = files[i];
+      const file = files[i]
       // eslint-disable-next-line no-await-in-loop
-      const bytes = new Uint8Array(await file.arrayBuffer());
-      let [extension] = file.name.split('.').slice(-1);
-      extension = extension.toUpperCase();
+      const bytes = new Uint8Array(await file.arrayBuffer())
+      let [extension] = file.name.split('.').slice(-1)
+      extension = extension.toUpperCase()
       if (acceptableExtensions.includes(extension)) {
-        importedMons.push(bytesToPKM(bytes, extension));
+        importedMons.push(bytesToPKM(bytes, extension))
       } else {
-        console.error(`invalid extension: ${extension}`);
+        console.error(`invalid extension: ${extension}`)
       }
     }
-    onDrop(importedMons);
-  };
+    onDrop(importedMons)
+  }
 
   const handleDrop: React.DragEventHandler<HTMLDivElement> = (e) => {
     if (e.dataTransfer.files[0]) {
-      onDropFromFiles(e.dataTransfer.files);
+      onDropFromFiles(e.dataTransfer.files)
     } else {
-      onDrop(undefined);
+      onDrop(undefined)
     }
-    e.nativeEvent.preventDefault();
-  };
+    e.nativeEvent.preventDefault()
+  }
 
   const getBackgroundDetails = () => {
     if (disabled) {
       return {
         backgroundBlendMode: 'multiply',
         backgroundColor: '#555',
-      };
+      }
     }
     return {
       backgroundColor: '#0000',
-    };
-  };
+    }
+  }
 
   const getBackgroundPosition = (mon: PKM) => {
     if (mon.isEgg || !POKEMON_DATA[mon.dexNum]) {
-      return '0% 0%';
+      return '0% 0%'
     }
-    const [x, y] = POKEMON_DATA[mon.dexNum].formes[mon.formNum].spriteIndex;
-    return `${(x / 35) * 100}% ${(y / 36) * 100}%`;
-  };
+    const [x, y] = POKEMON_DATA[mon.dexNum].formes[mon.formNum].spriteIndex
+    return `${(x / 35) * 100}% ${(y / 36) * 100}%`
+  }
 
   useEffect(() => {
-    setDragImage(undefined);
-  }, [mon]);
+    setDragImage(undefined)
+  }, [mon])
 
   return (
     <button
@@ -108,17 +108,17 @@ const BoxCell = (props: BoxCellProps) => {
           <div
             draggable
             onDragStart={() => {
-              onDragEvent(false);
+              onDragEvent(false)
             }}
             onDragEnd={(e: { dataTransfer: any; target: any }) => {
               if (dragImage) {
-                document.body.removeChild(dragImage);
+                document.body.removeChild(dragImage)
               }
               // if not waiting for mon to show up in other slot, set drag image to
               // undefined so it shows up in this one again
               if (e.dataTransfer.dropEffect !== 'copy') {
-                setDragImage(undefined);
-                onDragEvent(true);
+                setDragImage(undefined)
+                onDragEvent(true)
               }
             }}
             style={{
@@ -137,14 +137,14 @@ const BoxCell = (props: BoxCellProps) => {
             disabled
               ? undefined
               : (e) => {
-                  e.preventDefault();
+                  e.preventDefault()
                 }
           }
           onDrop={handleDrop}
         />
       )}
     </button>
-  );
-};
+  )
+}
 
-export default BoxCell;
+export default BoxCell

@@ -1,90 +1,90 @@
-import { MoreVert } from '@mui/icons-material';
-import { IconButton, useTheme } from '@mui/material';
-import { GameOfOriginData } from 'consts';
-import { useAppDispatch } from 'renderer/redux/hooks';
-import { useLookupMaps, useRecentSaves } from 'renderer/redux/selectors';
-import { addSave } from 'renderer/redux/slices/appSlice';
-import { getGameLogo } from 'renderer/util/PokemonSprite';
-import { buildSaveFile } from 'types/SAVTypes/util';
-import { SaveRef, getSaveTypeString } from 'types/types';
-import OpenHomeButton from '../components/OpenHomeButton';
+import { MoreVert } from '@mui/icons-material'
+import { IconButton, useTheme } from '@mui/material'
+import { GameOfOriginData } from 'consts'
+import { useAppDispatch } from 'renderer/redux/hooks'
+import { useLookupMaps, useRecentSaves } from 'renderer/redux/selectors'
+import { addSave } from 'renderer/redux/slices/appSlice'
+import { getGameLogo } from 'renderer/util/PokemonSprite'
+import { buildSaveFile } from 'types/SAVTypes/util'
+import { SaveRef, getSaveTypeString } from 'types/types'
+import OpenHomeButton from '../components/OpenHomeButton'
 
 interface SaveFileSelectorProps {
-  onClose: () => void;
+  onClose: () => void
 }
 
 const getSaveLogo = (ref: SaveRef) => {
-  return getGameLogo(parseInt(ref.game ?? '0'));
-};
+  return getGameLogo(parseInt(ref.game ?? '0'))
+}
 
 const formatTimeSince = (timestamp: number) => {
-  const now = Date.now();
-  const seconds = Math.floor((now - timestamp) / 1000);
-  let interval = seconds / 31536000;
+  const now = Date.now()
+  const seconds = Math.floor((now - timestamp) / 1000)
+  let interval = seconds / 31536000
 
   if (interval > 1) {
     return `${Math.floor(interval)} year${
       Math.floor(interval) > 1 ? 's' : ''
-    } ago`;
+    } ago`
   }
-  interval = seconds / 2592000;
+  interval = seconds / 2592000
   if (interval > 1) {
     return `${Math.floor(interval)} month${
       Math.floor(interval) > 1 ? 's' : ''
-    } ago`;
+    } ago`
   }
-  interval = seconds / 86400;
+  interval = seconds / 86400
   if (interval > 1) {
     return `${Math.floor(interval)} day${
       Math.floor(interval) > 1 ? 's' : ''
-    } ago`;
+    } ago`
   }
-  interval = seconds / 3600;
+  interval = seconds / 3600
   if (interval > 1) {
     return `${Math.floor(interval)} hour${
       Math.floor(interval) > 1 ? 's' : ''
-    } ago`;
+    } ago`
   }
-  interval = seconds / 60;
+  interval = seconds / 60
   if (interval > 1) {
     return `${Math.floor(interval)} minute${
       Math.floor(interval) > 1 ? 's' : ''
-    } ago`;
+    } ago`
   }
   return `${Math.floor(seconds)} second${
     Math.floor(seconds) > 1 ? 's' : ''
-  } ago`;
-};
+  } ago`
+}
 
 const SaveFileSelector = (props: SaveFileSelectorProps) => {
-  const { onClose } = props;
-  const { palette } = useTheme();
-  const [recentSaves, upsertRecentSave] = useRecentSaves();
-  const [homeMonMap, gen12LookupMap, gen345LookupMap] = useLookupMaps();
-  const dispatch = useAppDispatch();
+  const { onClose } = props
+  const { palette } = useTheme()
+  const [recentSaves, upsertRecentSave] = useRecentSaves()
+  const [homeMonMap, gen12LookupMap, gen345LookupMap] = useLookupMaps()
+  const dispatch = useAppDispatch()
 
   const openSaveFile = async (filePath?: string) => {
     const { path, fileBytes, createdDate } =
       await window.electron.ipcRenderer.invoke(
         'read-save-file',
         filePath && [filePath]
-      );
+      )
     if (path && fileBytes && homeMonMap) {
       const saveFile = buildSaveFile(path, fileBytes, {
         homeMonMap,
         gen12LookupMap,
         gen345LookupMap,
         fileCreatedDate: createdDate,
-      });
+      })
       if (!saveFile) {
-        onClose();
-        return;
+        onClose()
+        return
       }
-      onClose();
-      upsertRecentSave(saveFile);
-      dispatch(addSave(saveFile));
+      onClose()
+      upsertRecentSave(saveFile)
+      dispatch(addSave(saveFile))
     }
-  };
+  }
 
   return (
     <div
@@ -188,7 +188,7 @@ const SaveFileSelector = (props: SaveFileSelectorProps) => {
             </div>
             <IconButton
               onClick={(e) => {
-                e.stopPropagation();
+                e.stopPropagation()
               }}
               style={{
                 position: 'absolute',
@@ -203,7 +203,7 @@ const SaveFileSelector = (props: SaveFileSelectorProps) => {
           </OpenHomeButton>
         ))}
     </div>
-  );
-};
+  )
+}
 
-export default SaveFileSelector;
+export default SaveFileSelector

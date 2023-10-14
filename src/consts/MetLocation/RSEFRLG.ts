@@ -1,4 +1,4 @@
-import { GameLocations } from '../../types/types';
+import { GameLocations } from '../../types/types'
 
 const RSEFRLGLocations: GameLocations = {
   0: [
@@ -259,5 +259,5 @@ const RSEFRLGLocations: GameLocations = {
     'an in-game trade',
     'a fateful encounter',
   ],
-};
-export default RSEFRLGLocations;
+}
+export default RSEFRLGLocations

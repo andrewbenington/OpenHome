@@ -256,6 +256,6 @@ const CXDLocation = {
     '',
     '(ingame trade)',
   ],
-};
+}
 
-export default CXDLocation;
+export default CXDLocation

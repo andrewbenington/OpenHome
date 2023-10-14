@@ -1,10 +1,10 @@
-import { CSSProperties } from 'react';
-import { marking } from 'types/types';
+import { CSSProperties } from 'react'
+import { marking } from 'types/types'
 
 interface MarkingsProps {
   markings:
     | [marking, marking, marking, marking, marking, marking]
-    | [marking, marking, marking, marking];
+    | [marking, marking, marking, marking]
 }
 
 const markingsContainerStyle = {
@@ -15,14 +15,14 @@ const markingsContainerStyle = {
   backgroundColor: '#666',
   marginTop: 10,
   borderRadius: 5,
-} as CSSProperties;
+} as CSSProperties
 
 const getMarkingColor = (value: marking) => {
-  return ['grey', 'blue', 'red'][value];
-};
+  return ['grey', 'blue', 'red'][value]
+}
 
 const Markings = (props: MarkingsProps) => {
-  const { markings } = props;
+  const { markings } = props
   return (
     <div style={markingsContainerStyle}>
       <span
@@ -70,7 +70,7 @@ const Markings = (props: MarkingsProps) => {
         <div />
       )}
     </div>
-  );
-};
+  )
+}
 
-export default Markings;
+export default Markings

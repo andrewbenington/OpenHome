@@ -1,15 +1,15 @@
-import { NDex } from 'consts';
-import { CapPikachus, RegionalForms } from 'types/TransferRestrictions';
-import { SaveType } from 'types/types';
+import { NDex } from 'consts'
+import { CapPikachus, RegionalForms } from 'types/TransferRestrictions'
+import { SaveType } from 'types/types'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
-} from '../../util/ByteLogic';
-import { gen4StringToUTF } from '../../util/Strings/StringConverter';
-import { G4SAV } from './G4SAV';
+} from '../../util/ByteLogic'
+import { gen4StringToUTF } from '../../util/Strings/StringConverter'
+import { G4SAV } from './G4SAV'
 
 export class DPSAV extends G4SAV {
-  saveType = SaveType.DP;
+  saveType = SaveType.DP
 
   transferRestrictions = {
     maxDexNum: NDex.ARCEUS,
@@ -27,34 +27,34 @@ export class DPSAV extends G4SAV {
       // arceus fairy
       493: [17],
     },
-  };
+  }
 
-  static TRAINER_NAME_OFFSET = 0x64;
+  static TRAINER_NAME_OFFSET = 0x64
 
-  static TRAINER_ID_OFFSET = 0x74;
+  static TRAINER_ID_OFFSET = 0x74
 
-  static BOX_SIZE = 0xff0;
+  static BOX_SIZE = 0xff0
 
-  static GENERAL_BLOCK_OFFSET = 0x0000;
+  static GENERAL_BLOCK_OFFSET = 0x0000
 
-  static GENERAL_BLOCK_SIZE = 0xc100;
+  static GENERAL_BLOCK_SIZE = 0xc100
 
-  static STORAGE_BLOCK_OFFSET = 0xc100;
+  static STORAGE_BLOCK_OFFSET = 0xc100
 
-  static STORAGE_BLOCK_SIZE = 0x121e0;
+  static STORAGE_BLOCK_SIZE = 0x121e0
 
-  static BOX_NAMES_OFFSET = 0x11ee0;
+  static BOX_NAMES_OFFSET = 0x11ee0
 
-  currentSaveStorageBlockOffset: number = DPSAV.STORAGE_BLOCK_OFFSET;
+  currentSaveStorageBlockOffset: number = DPSAV.STORAGE_BLOCK_OFFSET
 
-  storageBlockSize: number = DPSAV.STORAGE_BLOCK_SIZE;
+  storageBlockSize: number = DPSAV.STORAGE_BLOCK_SIZE
 
-  boxSize: number = DPSAV.BOX_SIZE;
+  boxSize: number = DPSAV.BOX_SIZE
 
-  boxNamesOffset: number;
+  boxNamesOffset: number
 
   constructor(path: string, bytes: Uint8Array) {
-    super(path, bytes);
+    super(path, bytes)
     // current storage block could be either the first or second one,
     // depending on save count
     if (
@@ -67,22 +67,22 @@ export class DPSAV extends G4SAV {
         DPSAV.STORAGE_BLOCK_SIZE
       )
     ) {
-      this.currentSaveStorageBlockOffset += 0x40000;
+      this.currentSaveStorageBlockOffset += 0x40000
     }
-    this.currentSaveBoxStartOffset = this.currentSaveStorageBlockOffset + 4;
+    this.currentSaveBoxStartOffset = this.currentSaveStorageBlockOffset + 4
     this.boxNamesOffset =
-      this.currentSaveStorageBlockOffset + DPSAV.BOX_NAMES_OFFSET;
-    this.name = gen4StringToUTF(bytes, DPSAV.TRAINER_NAME_OFFSET, 8);
-    this.tid = bytesToUint16LittleEndian(bytes, DPSAV.TRAINER_ID_OFFSET);
-    this.sid = bytesToUint16LittleEndian(bytes, DPSAV.TRAINER_ID_OFFSET + 2);
-    this.displayID = this.tid.toString().padStart(5, '0');
-    this.buildBoxes();
+      this.currentSaveStorageBlockOffset + DPSAV.BOX_NAMES_OFFSET
+    this.name = gen4StringToUTF(bytes, DPSAV.TRAINER_NAME_OFFSET, 8)
+    this.tid = bytesToUint16LittleEndian(bytes, DPSAV.TRAINER_ID_OFFSET)
+    this.sid = bytesToUint16LittleEndian(bytes, DPSAV.TRAINER_ID_OFFSET + 2)
+    this.displayID = this.tid.toString().padStart(5, '0')
+    this.buildBoxes()
   }
 
   getCurrentSaveCount(blockOffset: number, blockSize: number) {
     return bytesToUint32LittleEndian(
       this.bytes,
       blockOffset + blockSize - this.footerSize
-    );
+    )
   }
 }

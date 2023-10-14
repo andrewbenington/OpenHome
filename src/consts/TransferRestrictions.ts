@@ -1,11 +1,11 @@
-import _ from 'lodash';
+import _ from 'lodash'
 import {
   CapPikachus,
   Gen89RegionalForms,
   LegendsArceusExcludedForms,
   RegionalForms,
   TransferRestrictions,
-} from 'types/TransferRestrictions';
+} from 'types/TransferRestrictions'
 import {
   COMPLETE,
   DAWN_WINGS,
@@ -27,13 +27,13 @@ import {
   ULTRA,
   UNBOUND,
   WASH,
-} from './Formes';
-import { NDex } from './NationalDex';
+} from './Formes'
+import { NDex } from './NationalDex'
 
 export const GEN1_TRANSFER_RESTRICTIONS: TransferRestrictions = {
   maxDexNum: NDex.MEW,
   excludedForms: { ...RegionalForms, ...CapPikachus },
-};
+}
 
 export const GEN2_TRANSFER_RESTRICTIONS: TransferRestrictions = {
   maxDexNum: NDex.CELEBI,
@@ -43,7 +43,7 @@ export const GEN2_TRANSFER_RESTRICTIONS: TransferRestrictions = {
     [NDex.PICHU]: [SPIKY_EAR],
     [NDex.UNOWN]: [EXCLAMATION, QUESTION],
   },
-};
+}
 
 export const GEN3_TRANSFER_RESTRICTIONS: TransferRestrictions = {
   maxDexNum: NDex.DEOXYS,
@@ -52,7 +52,7 @@ export const GEN3_TRANSFER_RESTRICTIONS: TransferRestrictions = {
     ...CapPikachus,
     [NDex.PICHU]: [SPIKY_EAR],
   },
-};
+}
 
 export const DP_TRANSFER_RESTRICTIONS: TransferRestrictions = {
   maxDexNum: NDex.ARCEUS,
@@ -67,7 +67,7 @@ export const DP_TRANSFER_RESTRICTIONS: TransferRestrictions = {
     [NDex.SHAYMIN]: [SKY],
     [NDex.ARCEUS]: [FAIRY],
   },
-};
+}
 
 export const PT_TRANSFER_RESTRICTIONS: TransferRestrictions = {
   maxDexNum: NDex.ARCEUS,
@@ -79,7 +79,7 @@ export const PT_TRANSFER_RESTRICTIONS: TransferRestrictions = {
     [NDex.PALKIA]: [ORIGIN],
     [NDex.ARCEUS]: [FAIRY],
   },
-};
+}
 
 export const HGSS_TRANSFER_RESTRICTIONS: TransferRestrictions = {
   maxDexNum: NDex.ARCEUS,
@@ -90,7 +90,7 @@ export const HGSS_TRANSFER_RESTRICTIONS: TransferRestrictions = {
     [NDex.PALKIA]: [ORIGIN],
     [NDex.ARCEUS]: [FAIRY],
   },
-};
+}
 
 export const BW_TRANSFER_RESTRICTIONS: TransferRestrictions = {
   maxDexNum: NDex.GENESECT,
@@ -106,7 +106,7 @@ export const BW_TRANSFER_RESTRICTIONS: TransferRestrictions = {
     [NDex.LANDORUS]: [THERIAN],
     [NDex.KELDEO]: [RESOLUTE],
   },
-};
+}
 
 export const BW2_TRANSFER_RESTRICTIONS: TransferRestrictions = {
   maxDexNum: NDex.GENESECT,
@@ -118,7 +118,7 @@ export const BW2_TRANSFER_RESTRICTIONS: TransferRestrictions = {
     [NDex.PALKIA]: [ORIGIN],
     [NDex.ARCEUS]: [FAIRY],
   },
-};
+}
 
 export const XY_TRANSFER_RESTRICTIONS: TransferRestrictions = {
   maxDexNum: NDex.VOLCANION,
@@ -130,7 +130,7 @@ export const XY_TRANSFER_RESTRICTIONS: TransferRestrictions = {
     [NDex.ZYGARDE]: [TEN_PCT, TEN_PCT_PC, COMPLETE],
     [NDex.HOOPA]: [UNBOUND],
   },
-};
+}
 
 export const ORAS_TRANSFER_RESTRICTIONS: TransferRestrictions = {
   maxDexNum: NDex.VOLCANION,
@@ -141,7 +141,7 @@ export const ORAS_TRANSFER_RESTRICTIONS: TransferRestrictions = {
     [NDex.PALKIA]: [ORIGIN],
     [NDex.ZYGARDE]: [TEN_PCT, TEN_PCT_PC, COMPLETE],
   },
-};
+}
 
 export const SM_TRANSFER_RESTRICTIONS: TransferRestrictions = {
   maxDexNum: NDex.MARSHADOW,
@@ -152,7 +152,7 @@ export const SM_TRANSFER_RESTRICTIONS: TransferRestrictions = {
     [NDex.PALKIA]: [ORIGIN],
     [NDex.NECROZMA]: [DUSK_MANE, DAWN_WINGS, ULTRA],
   },
-};
+}
 
 export const USUM_TRANSFER_RESTRICTIONS: TransferRestrictions = {
   maxDexNum: NDex.ZERAORA,
@@ -162,7 +162,7 @@ export const USUM_TRANSFER_RESTRICTIONS: TransferRestrictions = {
     [NDex.DIALGA]: [ORIGIN],
     [NDex.PALKIA]: [ORIGIN],
   },
-};
+}
 
 export const LGPE_TRANSFER_RESTRICTIONS: TransferRestrictions = {
   transferableDexNums: [
@@ -171,7 +171,7 @@ export const LGPE_TRANSFER_RESTRICTIONS: TransferRestrictions = {
     NDex.MELMETAL,
   ],
   excludedForms: Gen89RegionalForms,
-};
+}
 
 export const LA_TRANSFER_RESTRICTIONS: TransferRestrictions = {
   transferableDexNums: [
@@ -193,4 +193,4 @@ export const LA_TRANSFER_RESTRICTIONS: TransferRestrictions = {
     722, 723, 724, 899, 900, 901, 902, 903, 904, 905,
   ],
   excludedForms: LegendsArceusExcludedForms,
-};
+}
