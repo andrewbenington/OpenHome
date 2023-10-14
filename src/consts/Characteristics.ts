@@ -4,7 +4,7 @@ export const HPCharacteristicsPre6 = [
   'Often scatters things',
   'Scatters things often',
   'Likes to relax',
-];
+]
 
 export const HPCharacteristics = [
   'Loves to eat',
@@ -12,7 +12,7 @@ export const HPCharacteristics = [
   'Nods off a lot',
   'Scatters things often',
   'Likes to relax',
-];
+]
 
 export const AttackCharacteristics = [
   'Proud of its power',
@@ -20,7 +20,7 @@ export const AttackCharacteristics = [
   'A little quick tempered',
   'Likes to fight',
   'Quick tempered',
-];
+]
 
 export const DefenseCharacteristics = [
   'Sturdy body',
@@ -28,7 +28,7 @@ export const DefenseCharacteristics = [
   'Highly persistent',
   'Good endurance',
   'Good perseverance',
-];
+]
 
 export const SpecialAtkCharacteristics = [
   'Highly curious',
@@ -36,7 +36,7 @@ export const SpecialAtkCharacteristics = [
   'Thoroughly cunning',
   'Often lost in thought',
   'Very finicky',
-];
+]
 
 export const SpecialDefCharacteristics = [
   'Strong willed',
@@ -44,7 +44,7 @@ export const SpecialDefCharacteristics = [
   'Strongly defiant',
   'Hates to lose',
   'Somewhat stubborn',
-];
+]
 
 export const SpeedCharacteristics = [
   'Likes to run',
@@ -52,4 +52,4 @@ export const SpeedCharacteristics = [
   'Impetuous and silly',
   'Somewhat of a clown',
   'Quick to flee',
-];
+]

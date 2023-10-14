@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'
 
 interface OpenHomeButtonProps {
-  onClick?: React.MouseEventHandler<HTMLButtonElement>;
-  style?: any;
-  children?: any;
+  onClick?: React.MouseEventHandler<HTMLButtonElement>
+  style?: any
+  children?: any
 }
 
 const ArrowButton = (props: OpenHomeButtonProps) => {
-  const { onClick, style, children } = props;
-  const [hovered, setHovered] = useState(false);
+  const { onClick, style, children } = props
+  const [hovered, setHovered] = useState(false)
   return (
     <button
       style={{
@@ -23,7 +23,7 @@ const ArrowButton = (props: OpenHomeButtonProps) => {
     >
       {children}
     </button>
-  );
-};
+  )
+}
 
-export default ArrowButton;
+export default ArrowButton

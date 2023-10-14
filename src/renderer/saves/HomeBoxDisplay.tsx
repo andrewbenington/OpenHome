@@ -1,34 +1,34 @@
-import { Grid, useTheme } from '@mui/material';
-import _ from 'lodash';
-import { useAppDispatch } from 'renderer/redux/hooks';
-import { useHomeData } from 'renderer/redux/selectors';
+import { Grid, useTheme } from '@mui/material'
+import _ from 'lodash'
+import { useAppDispatch } from 'renderer/redux/hooks'
+import { useHomeData } from 'renderer/redux/selectors'
 import {
   cancelDrag,
   completeDrag,
   importMons,
   startDrag,
-} from 'renderer/redux/slices/appSlice';
-import { PKM } from 'types/PKMTypes/PKM';
-import { SaveCoordinates } from 'types/types';
-import BoxCell from './BoxCell';
+} from 'renderer/redux/slices/appSlice'
+import { PKM } from 'types/PKMTypes/PKM'
+import { SaveCoordinates } from 'types/types'
+import BoxCell from './BoxCell'
 
 interface HomeBoxDisplayProps {
-  setSelectedMon: (_: PKM | undefined) => void;
+  setSelectedMon: (_: PKM | undefined) => void
 }
 
 const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
-  const data = useHomeData();
-  const theme = useTheme();
-  const { setSelectedMon } = props;
+  const data = useHomeData()
+  const theme = useTheme()
+  const { setSelectedMon } = props
 
-  const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch()
   const dispatchStartDrag = (source: SaveCoordinates) =>
-    dispatch(startDrag(source));
-  const dispatchCancelDrag = () => dispatch(cancelDrag());
+    dispatch(startDrag(source))
+  const dispatchCancelDrag = () => dispatch(cancelDrag())
   const dispatchCompleteDrag = (dest: SaveCoordinates) =>
-    dispatch(completeDrag(dest));
+    dispatch(completeDrag(dest))
   const dispatchImportMons = (mons: PKM[], saveCoordinates: SaveCoordinates) =>
-    dispatch(importMons({ mons, saveCoordinates }));
+    dispatch(importMons({ mons, saveCoordinates }))
 
   return (
     data.boxes[0] && (
@@ -45,7 +45,7 @@ const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
           <Grid container key={`pc_row_${row}`}>
             {_.range(12).map((rowIndex: number) => {
               const mon =
-                data.boxes[data.currentPCBox].pokemon[row * 12 + rowIndex];
+                data.boxes[data.currentPCBox].pokemon[row * 12 + rowIndex]
               return (
                 <Grid item xs={1} style={{ padding: '2px 2px 0px 2px' }}>
                   <BoxCell
@@ -67,25 +67,25 @@ const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
                           saveNumber: -1,
                           box: data.currentPCBox,
                           index: row * 12 + rowIndex,
-                        });
+                        })
                       } else {
                         dispatchCompleteDrag({
                           saveNumber: -1,
                           box: data.currentPCBox,
                           index: row * 12 + rowIndex,
-                        });
+                        })
                       }
                     }}
                     disabled={false}
                   />
                 </Grid>
-              );
+              )
             })}
           </Grid>
         ))}
       </div>
     )
-  );
-};
+  )
+}
 
-export default HomeBoxDisplay;
+export default HomeBoxDisplay

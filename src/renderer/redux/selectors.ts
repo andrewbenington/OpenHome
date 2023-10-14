@@ -1,7 +1,7 @@
-import { OHPKM } from 'types/PKMTypes';
-import { SAV } from 'types/SAVTypes';
-import { SaveRefMap, StringToStringMap } from '../../types/types';
-import { useAppDispatch, useAppSelector } from './hooks';
+import { OHPKM } from 'types/PKMTypes'
+import { SAV } from 'types/SAVTypes'
+import { SaveRefMap, StringToStringMap } from '../../types/types'
+import { useAppDispatch, useAppSelector } from './hooks'
 import {
   selectDragMon,
   selectDragSource,
@@ -14,50 +14,50 @@ import {
   selectSaves,
   writeAllHomeData,
   writeAllSaveFiles,
-} from './slices/appSlice';
+} from './slices/appSlice'
 import {
   removeRecentSave,
   selectRecentSaves,
   upsertRecentSave,
-} from './slices/recentSavesSlice';
-import { selectResourcesPath } from './slices/resourcesSlice';
+} from './slices/recentSavesSlice'
+import { selectResourcesPath } from './slices/resourcesSlice'
 
 type LookupMapsHook = [
   { [key: string]: OHPKM } | undefined,
   StringToStringMap | undefined,
   StringToStringMap | undefined
-];
+]
 
-export const useSaves = () => useAppSelector(selectSaves);
-export const useHomeData = () => useAppSelector(selectHomeData);
-export const useDragMon = () => useAppSelector(selectDragMon);
-export const useDragSource = () => useAppSelector(selectDragSource);
-export const useModifiedOHPKMs = () => useAppSelector(selectModifiedOHPKMs);
-export const useMonsToDelete = () => useAppSelector(selectMonsToDelete);
+export const useSaves = () => useAppSelector(selectSaves)
+export const useHomeData = () => useAppSelector(selectHomeData)
+export const useDragMon = () => useAppSelector(selectDragMon)
+export const useDragSource = () => useAppSelector(selectDragSource)
+export const useModifiedOHPKMs = () => useAppSelector(selectModifiedOHPKMs)
+export const useMonsToDelete = () => useAppSelector(selectMonsToDelete)
 export const useSaveFunctions = (): [() => void, () => void] => {
-  const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch()
   return [
     () => dispatch(writeAllSaveFiles()),
     () => dispatch(writeAllHomeData()),
-  ];
-};
+  ]
+}
 export const useRecentSaves = (): [
   SaveRefMap,
   (_: SAV) => void,
   (_: string) => void
 ] => {
-  const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch()
   return [
     useAppSelector(selectRecentSaves),
     (save) => dispatch(upsertRecentSave(save)),
     (filePath) => dispatch(removeRecentSave(filePath)),
-  ];
-};
+  ]
+}
 
 export const useLookupMaps = (): LookupMapsHook => [
   useAppSelector(selectHomeMons),
   useAppSelector(selectGen12Lookup),
   useAppSelector(selectGen345Lookup),
-];
+]
 
-export const useResourcesPath = () => useAppSelector(selectResourcesPath);
+export const useResourcesPath = () => useAppSelector(selectResourcesPath)

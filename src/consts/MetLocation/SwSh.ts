@@ -393,5 +393,5 @@ const SwShLocations = {
     'a treasure hunter',
     'an old hot-springs visitor',
   ],
-};
-export default SwShLocations;
+}
+export default SwShLocations

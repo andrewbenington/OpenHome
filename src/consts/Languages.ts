@@ -10,7 +10,7 @@ export const Languages = [
   'KOR',
   'CHS',
   'CHT',
-];
+]
 
 export const GCLanguages = [
   '--',
@@ -21,4 +21,4 @@ export const GCLanguages = [
   'ITL',
   'SPN',
   '--',
-];
+]

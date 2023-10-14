@@ -22,7 +22,7 @@ module.exports = {
     'import/parsers': {
       '@typescript-eslint/parser': ['.ts', '.tsx'],
     },
-    'prettier/prettier': ['error', { printWidth: 80, tabWidth: 2 }],
+    'prettier/prettier': ['error', { printWidth: 80, tabWidth: 2, semi }],
   },
   rules: {
     'import/extensions': [
@@ -61,5 +61,6 @@ module.exports = {
     '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
     'react/destructuring-assignment': 'off',
     'react/jsx-props-no-spreading': 'off',
+    semi: ['error', 'never'],
   },
-};
+}

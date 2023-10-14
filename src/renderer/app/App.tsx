@@ -1,7 +1,7 @@
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import './App.css';
-import Home from './Home';
-import Themes from './Themes';
+import { createTheme, ThemeProvider } from '@mui/material/styles'
+import './App.css'
+import Home from './Home'
+import Themes from './Themes'
 
 const theme = createTheme({
   palette: {
@@ -33,14 +33,14 @@ const theme = createTheme({
       },
     },
   },
-});
+})
 
 function App() {
   return (
     <ThemeProvider theme={theme}>
       <Home />
     </ThemeProvider>
-  );
+  )
 }
 
-export default App;
+export default App

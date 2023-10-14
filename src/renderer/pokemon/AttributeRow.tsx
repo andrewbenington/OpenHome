@@ -1,11 +1,11 @@
 const AttributeRow = (props: {
-  label: string;
-  value?: string;
-  justifyEnd?: boolean;
-  indent?: number;
-  children?: any;
+  label: string
+  value?: string
+  justifyEnd?: boolean
+  indent?: number
+  children?: any
 }) => {
-  const { label, value, justifyEnd, indent, children } = props;
+  const { label, value, justifyEnd, indent, children } = props
   return (
     <div
       style={{
@@ -48,7 +48,7 @@ const AttributeRow = (props: {
         {value ?? children}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default AttributeRow;
+export default AttributeRow

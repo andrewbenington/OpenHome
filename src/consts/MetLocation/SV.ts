@@ -355,5 +355,5 @@ const SVMetLocation = {
     'an old hot-springs visitor',
     'Jacq',
   ],
-};
-export default SVMetLocation;
+}
+export default SVMetLocation

@@ -1,4 +1,4 @@
-import { GameLocations } from '../../types/types';
+import { GameLocations } from '../../types/types'
 
 const G4Locations: GameLocations = {
   0: [
@@ -334,6 +334,6 @@ const G4Locations: GameLocations = {
     'Event Site',
     'Concert Event',
   ],
-};
+}
 
-export default G4Locations;
+export default G4Locations

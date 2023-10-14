@@ -43,7 +43,7 @@ export const GameLogos: { [key: string]: string } = {
   XD: require(`./logos/XD.png`),
   Y: require(`./logos/Y.png`),
   Yellow: require(`./logos/Yellow.png`),
-};
+}
 
 export const OriginMarks: { [key: string]: string } = {
   Alola: require(`./origin_marks/Alola.png`),
@@ -55,7 +55,7 @@ export const OriginMarks: { [key: string]: string } = {
   LA: require(`./origin_marks/LA.png`),
   LGPE: require(`./origin_marks/LGPE.png`),
   Tera: require(`./origin_marks/Tera.png`),
-};
+}
 
 export const BallsMap: { [key: string]: string } = {
   Master: require(`./items/index/0001.png`),
@@ -94,7 +94,7 @@ export const BallsMap: { [key: string]: string } = {
   Leaden: require(`./items/index/1749.png`),
   Gigaton: require(`./items/index/1750.png`),
   Origin: require(`./items/index/1771.png`),
-};
+}
 
 export const BallsList = [
   '',
@@ -134,7 +134,7 @@ export const BallsList = [
   BallsMap.Leaden,
   BallsMap.Gigaton,
   BallsMap.Origin,
-];
+]
 
 export const RibbonsMap: { [key: string]: string } = {
   'Absent Minded Mark': require(`./ribbons/absent-minded-mark.png`),
@@ -298,4 +298,4 @@ export const RibbonsMap: { [key: string]: string } = {
   'Multi Ability': require('./ribbons/multi-ability.png'),
   'Pair Ability': require('./ribbons/pair-ability.png'),
   'World Ability': require('./ribbons/world-ability.png'),
-};
+}

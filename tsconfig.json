@@ -7,10 +7,7 @@
     "jsx": "react-jsx",
     "strict": true,
     "sourceMap": true,
-    "baseUrl": "./src",
-    "paths": {
-      "src/*": ["./src/*"]
-    },
+    "baseUrl": "src",
     "moduleResolution": "node",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,

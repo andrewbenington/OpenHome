@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'
 
 interface OpenHomeButtonProps {
-  onClick?: React.MouseEventHandler<HTMLButtonElement>;
-  style?: any;
-  children?: any;
-  disabled?: any;
+  onClick?: React.MouseEventHandler<HTMLButtonElement>
+  style?: any
+  children?: any
+  disabled?: any
 }
 
 const OpenHomeButton = (props: OpenHomeButtonProps) => {
-  const { onClick, style, children, disabled } = props;
-  const [hovered, setHovered] = useState(false);
+  const { onClick, style, children, disabled } = props
+  const [hovered, setHovered] = useState(false)
   return (
     <button
       style={{
@@ -26,7 +26,7 @@ const OpenHomeButton = (props: OpenHomeButtonProps) => {
     >
       {children}
     </button>
-  );
-};
+  )
+}
 
-export default OpenHomeButton;
+export default OpenHomeButton

@@ -2863,6 +2863,6 @@ const UTFToGen4Map: { [key: number]: number } = {
   0x000d: 0x25bc,
   0x000c: 0x25bd,
   0x000a: 0xe000,
-};
+}
 
-export default UTFToGen4Map;
+export default UTFToGen4Map

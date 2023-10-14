@@ -1,5 +1,5 @@
-import LeafCrown from '../images/icons/LeafCrown.png';
-import ShinyLeaf from '../images/icons/ShinyLeaf.png';
+import LeafCrown from '../images/icons/LeafCrown.png'
+import ShinyLeaf from '../images/icons/ShinyLeaf.png'
 
 const styles = {
   crownIcon: {
@@ -22,15 +22,15 @@ const styles = {
     filter: 'grayscale(100%) drop-shadow(1px 1px grey)',
     opacity: 0.8,
   },
-};
+}
 
 interface ShinyLeafIconProps {
-  full: boolean;
-  index: number;
+  full: boolean
+  index: number
 }
 
 const ShinyLeafIcon = (props: ShinyLeafIconProps) => {
-  const { full, index } = props;
+  const { full, index } = props
   return (
     <img
       alt={`shiny leaf ${index + 1} (${full ? 'full' : 'empty'})`}
@@ -41,20 +41,20 @@ const ShinyLeafIcon = (props: ShinyLeafIconProps) => {
         zIndex: index + 1,
       }}
     />
-  );
-};
+  )
+}
 
 interface ShinyLeavesProps {
-  first: boolean;
-  second: boolean;
-  third: boolean;
-  fourth: boolean;
-  fifth: boolean;
-  crown: boolean;
+  first: boolean
+  second: boolean
+  third: boolean
+  fourth: boolean
+  fifth: boolean
+  crown: boolean
 }
 
 const ShinyLeaves = (props: ShinyLeavesProps) => {
-  const { first, second, third, fourth, fifth, crown } = props;
+  const { first, second, third, fourth, fifth, crown } = props
   return crown ? (
     <img
       alt="shiny_leaf_crown"
@@ -70,7 +70,7 @@ const ShinyLeaves = (props: ShinyLeavesProps) => {
       <ShinyLeafIcon full={fourth} index={3} />
       <ShinyLeafIcon full={fifth} index={4} />
     </div>
-  );
-};
+  )
+}
 
-export default ShinyLeaves;
+export default ShinyLeaves

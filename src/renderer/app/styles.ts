@@ -7,4 +7,4 @@ export const dropAreaStyle = {
   flex: 1,
   borderRadius: 4,
   textAlign: 'center' as 'center',
-};
+}

@@ -9,19 +9,19 @@ import {
   isGen6,
   isGen9,
   isLetsGo,
-} from '../GameOfOrigin';
-import BDSPLocations from './BDSP';
-import CrystalLocation from './Crystal';
-import CXDLocation from './CXD';
-import G4Locations from './G4';
-import G5Locations from './G5';
-import G6Locations from './G6';
-import LALocations from './LA';
-import LGPELocations from './LGPE';
-import RSEFRLGLocations from './RSEFRLG';
-import SMUSUMLocations from './SMUSUM';
-import SVMetLocation from './SV';
-import SwShLocations from './SwSh';
+} from '../GameOfOrigin'
+import BDSPLocations from './BDSP'
+import CrystalLocation from './Crystal'
+import CXDLocation from './CXD'
+import G4Locations from './G4'
+import G5Locations from './G5'
+import G6Locations from './G6'
+import LALocations from './LA'
+import LGPELocations from './LGPE'
+import RSEFRLGLocations from './RSEFRLG'
+import SMUSUMLocations from './SMUSUM'
+import SVMetLocation from './SV'
+import SwShLocations from './SwSh'
 
 export const getLocation = (
   game: number,
@@ -29,61 +29,61 @@ export const getLocation = (
   format: string,
   egg: boolean = false
 ) => {
-  let multiplier = 10000;
-  let locations: { [key: number]: string[] } = {};
+  let multiplier = 10000
+  let locations: { [key: number]: string[] } = {}
   if (game >= GameOfOrigin.Red && game <= GameOfOrigin.Crystal) {
-    locations = CrystalLocation;
+    locations = CrystalLocation
   } else if (format === 'PB7') {
     if (game < GameOfOrigin.LetsGoPikachu || game > GameOfOrigin.LetsGoEevee) {
       return game <= GameOfOrigin.UltraMoon
         ? `in the ${GameOfOriginData[game]?.region} region`
-        : 'in a faraway place';
+        : 'in a faraway place'
     }
-    locations = LGPELocations;
+    locations = LGPELocations
   } else if (format === 'PK8') {
     if (game < GameOfOrigin.Sword || game > GameOfOrigin.ShiningPearl) {
       return game <= GameOfOrigin.LetsGoEevee
         ? `in the ${GameOfOriginData[game]?.region} region`
-        : 'in a faraway place';
+        : 'in a faraway place'
     }
     if (game >= GameOfOrigin.BrilliantDiamond) {
-      locations = BDSPLocations;
+      locations = BDSPLocations
     } else {
-      locations = SwShLocations;
+      locations = SwShLocations
     }
   } else if (game <= GameOfOrigin.LeafGreen) {
-    locations = RSEFRLGLocations;
+    locations = RSEFRLGLocations
   } else if (game === GameOfOrigin.ColosseumXD) {
-    locations = CXDLocation;
+    locations = CXDLocation
   } else if (isGen4(game)) {
-    multiplier = 1000;
-    locations = G4Locations;
+    multiplier = 1000
+    locations = G4Locations
   } else if (isGen5(game)) {
-    locations = G5Locations;
+    locations = G5Locations
   } else if (isGen6(game)) {
-    locations = G6Locations;
+    locations = G6Locations
   } else if (isAlola(game)) {
-    locations = SMUSUMLocations;
+    locations = SMUSUMLocations
   } else if (isLetsGo(game)) {
-    locations = LGPELocations;
+    locations = LGPELocations
   } else if (isGalar(game)) {
-    locations = SwShLocations;
+    locations = SwShLocations
   } else if (game === GameOfOrigin.LegendsArceus) {
-    locations = LALocations;
+    locations = LALocations
   } else if (isBDSP(game)) {
-    locations = BDSPLocations;
+    locations = BDSPLocations
   } else if (isGen9(game)) {
-    locations = SVMetLocation;
+    locations = SVMetLocation
   }
-  const locationBlock = locations[Math.floor(index / multiplier) * multiplier];
+  const locationBlock = locations[Math.floor(index / multiplier) * multiplier]
   if (locationBlock) {
     if (game === GameOfOrigin.LegendsArceus) {
-      return locationBlock[index % multiplier];
+      return locationBlock[index % multiplier]
     }
     if (egg) {
-      return `from ${locationBlock[index % multiplier]}`;
+      return `from ${locationBlock[index % multiplier]}`
     }
-    return `in ${locationBlock[index % multiplier]}`;
+    return `in ${locationBlock[index % multiplier]}`
   }
-  return index.toString();
-};
+  return index.toString()
+}

@@ -1,12 +1,12 @@
-import { Card } from '@mui/material';
-import { MOVE_DATA } from 'consts';
-import { getTypeColor } from 'renderer/util/PokemonSprite';
-import { moveCardStyle } from './styles';
+import { Card } from '@mui/material'
+import { MOVE_DATA } from 'consts'
+import { getTypeColor } from 'renderer/util/PokemonSprite'
+import { moveCardStyle } from './styles'
 
 interface MoveCardProps {
-  move: number;
-  movePP?: number;
-  maxPP?: number;
+  move: number
+  movePP?: number
+  maxPP?: number
 }
 
 const MoveCard = ({ move, movePP, maxPP }: MoveCardProps) => {
@@ -33,7 +33,7 @@ const MoveCard = ({ move, movePP, maxPP }: MoveCardProps) => {
         {movePP ?? '--'}/{maxPP ?? '--'} PP
       </div>
     </Card>
-  );
-};
+  )
+}
 
-export default MoveCard;
+export default MoveCard
