@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { Origin } from 'types/types'
+import { Origin } from '../types/types'
 
 export const GameOfOriginData: (Origin | null)[] = [
   null,
@@ -288,4 +288,51 @@ export const gameOfOriginFromFormat = (format: string) => {
       break
   }
   return game
+}
+
+const ColosseumOnlyNonShadow = [311]
+
+const ColosseumOnlyShadow = [
+  153, 154, 156, 157, 159, 160, 162, 164, 176, 468, 185, 188, 189, 190, 192,
+  193, 195, 198, 200, 206, 207, 210, 211, 213, 214, 215, 218, 223, 461, 472,
+  469, 430, 429, 982, 223, 224, 225, 226, 227, 234, 899, 235, 237, 241, 243,
+  244, 245, 248, 250, 307, 308, 329, 330, 333, 357, 359, 376,
+]
+
+const CXDShadow = [
+  166, 168, 180, 181, 196, 197, 205, 217, 219, 221, 473, 901, 229, 296, 297,
+  334,
+]
+
+const CXDNonShadow = [196, 197]
+
+export enum ColosseumOrXD {
+  Colosseum,
+  XD,
+  NotDeterminable,
+}
+
+export const colosseumOrXD = (
+  dexNum?: number,
+  hasNationalRibbon?: boolean
+): ColosseumOrXD => {
+  if (dexNum === undefined || hasNationalRibbon === undefined) {
+    return ColosseumOrXD.NotDeterminable
+  }
+  if (hasNationalRibbon) {
+    if (ColosseumOnlyShadow.includes(dexNum)) {
+      return ColosseumOrXD.Colosseum
+    }
+    if (CXDShadow.includes(dexNum)) {
+      return ColosseumOrXD.NotDeterminable
+    }
+    return ColosseumOrXD.XD
+  }
+  if (ColosseumOnlyNonShadow.includes(dexNum)) {
+    return ColosseumOrXD.Colosseum
+  }
+  if (CXDNonShadow.includes(dexNum)) {
+    return ColosseumOrXD.NotDeterminable
+  }
+  return ColosseumOrXD.XD
 }

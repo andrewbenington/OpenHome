@@ -6,7 +6,7 @@ import {
   memory,
   pokedate,
   stats,
-} from 'types/types'
+} from '../../types/types'
 import { Ball, GameOfOrigin, GameOfOriginData, isGen6 } from '../../consts'
 import { Languages } from '../../consts/Languages'
 import G6Location from '../../consts/MetLocation/G6'
@@ -87,13 +87,13 @@ export class PK6 extends PKM {
       // filtering out moves that didnt exist yet
       const validMoves = other.moves.filter((move) => move <= ORAS_MOVE_MAX)
       const validMovePP = adjustMovePPBetweenFormats(this, other).filter(
-        (v, i) => other.moves[i] <= ORAS_MOVE_MAX
+        (_, i) => other.moves[i] <= ORAS_MOVE_MAX
       )
       const validMovePPUps = other.movePPUps.filter(
-        (v, i) => other.moves[i] <= ORAS_MOVE_MAX
+        (_, i) => other.moves[i] <= ORAS_MOVE_MAX
       )
       const validRelearnMoves = other.relearnMoves.filter(
-        (v, i) => other.moves[i] <= ORAS_MOVE_MAX
+        (_, i) => other.moves[i] <= ORAS_MOVE_MAX
       )
       this.moves = [validMoves[0], validMoves[1], validMoves[2], validMoves[3]]
       this.movePP = [
@@ -397,7 +397,7 @@ export class PK6 extends PKM {
   }
 
   public get ribbons() {
-    const ribbons = []
+    const ribbons: string[] = []
     for (let i = 0; i < 46; i++) {
       if (getFlag(this.bytes, 0x30, i)) {
         ribbons.push(Gen9Ribbons[i])
@@ -739,6 +739,9 @@ export class PK6 extends PKM {
   }
 
   public get eggLocation() {
+    if (!this.eggLocationIndex) {
+      return undefined
+    }
     if (!isGen6(this.gameOfOrigin)) {
       return this.gameOfOrigin <= GameOfOrigin.Black2
         ? `in the ${GameOfOriginData[this.gameOfOrigin]?.region} region`

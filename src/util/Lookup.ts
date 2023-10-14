@@ -52,7 +52,7 @@ export const getMonGen345Identifier = (mon: PKM) => {
       pk345.trainerID,
       2
     ).concat(bytesToString(pk345.secretID, 2))}-${bytesToString(
-      pk345.personalityValue!!,
+      pk345.personalityValue!,
       4
     )}`
   }

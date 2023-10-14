@@ -1,7 +1,7 @@
 import bigInt from 'big-integer'
 import { max } from 'lodash'
 import Prando from 'prando'
-import { stats, statsPreSplit } from 'types/types'
+import { stats, statsPreSplit } from '../../types/types'
 import { MOVE_DATA, NDex, POKEMON_DATA, Types } from '../../consts'
 import {
   bytesToUint16LittleEndian,

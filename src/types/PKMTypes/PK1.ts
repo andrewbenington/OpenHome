@@ -1,4 +1,4 @@
-import { statsPreSplit } from 'types/types'
+import { statsPreSplit } from '../../types/types'
 import { GameOfOrigin, POKEMON_DATA } from '../../consts'
 import {
   ItemGen2FromString,

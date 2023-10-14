@@ -1,4 +1,4 @@
-import { contestStats, marking, pokedate, stats } from 'types/types'
+import { contestStats, marking, pokedate, stats } from '../../types/types'
 import {
   Ball,
   GameOfOrigin,
@@ -533,12 +533,12 @@ export class PK5 extends PKM {
   }
 
   public get eggLocation() {
+    if (!this.eggLocationIndex) {
+      return undefined
+    }
     const locationBlock =
       G5Locations[Math.floor(this.eggLocationIndex / 10000) * 10000]
-    if (locationBlock) {
-      return `from ${locationBlock[this.eggLocationIndex % 10000]}`
-    }
-    return undefined
+    return `from ${locationBlock[this.eggLocationIndex % 10000]}`
   }
 
   public get metLocationIndex() {

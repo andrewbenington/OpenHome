@@ -1,6 +1,6 @@
-import { GameOfOrigin, NDex } from 'consts'
-import { OHPKM } from 'types/PKMTypes/OHPKM'
-import { CapPikachus, RegionalForms } from 'types/TransferRestrictions'
+import { GameOfOrigin, NDex } from '../../consts'
+import { OHPKM } from '../../types/PKMTypes/OHPKM'
+import { CapPikachus, RegionalForms } from '../../types/TransferRestrictions'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,

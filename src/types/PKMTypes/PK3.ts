@@ -1,4 +1,4 @@
-import { contestStats, marking, stats } from 'types/types'
+import { contestStats, marking, stats } from '../../types/types'
 import {
   Ball,
   GameOfOrigin,
@@ -141,7 +141,7 @@ export class PK3 extends PKM {
           : -1
         if (other.gameOfOrigin === GameOfOrigin.ColosseumXD) {
           equivalentLocation = 254
-        } else if (equivalentLocation < 0) {
+        } else if (equivalentLocation >= 0) {
           this.metLocationIndex = equivalentLocation
         }
       } else {
@@ -523,7 +523,7 @@ export class PK3 extends PKM {
   }
 
   public get ribbons() {
-    const ribbons = []
+    const ribbons: string[] = []
     const ribbonsValue = bytesToUint32LittleEndian(this.ribbonBytes, 0)
     const coolRibbonsNum = Math.min((ribbonsValue >> 0) & 7, 4)
     for (let i = 0; i < coolRibbonsNum; i++) {

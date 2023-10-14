@@ -1,8 +1,9 @@
 import { Tooltip } from '@mui/material'
-import { RibbonsMap } from 'renderer/images/Images'
-import { Styles } from 'types/types'
+import { Styles } from '../../types/types'
 import { Gen9Ribbons } from '../../consts/Ribbons'
 import { PKM } from '../../types/PKMTypes/PKM'
+import { getRibbonSpritePath } from '../images/ribbons'
+import { getPublicImageURL } from '../images/images'
 
 const styles = {
   container: {
@@ -51,12 +52,12 @@ const RibbonsDisplay = (props: { mon: PKM }) => {
 
   const getRibbonImage = (ribbon: string) => {
     if (ribbon === 'Contest Memory' && mon.contestMemoryCount === 40) {
-      return RibbonsMap['Contest Memory Gold']
+      return getPublicImageURL(getRibbonSpritePath('Contest Memory Gold'))
     }
     if (ribbon === 'Battle Memory' && mon.contestMemoryCount === 6) {
-      return RibbonsMap['battle Memory Gold']
+      return getPublicImageURL(getRibbonSpritePath('battle Memory Gold'))
     }
-    return RibbonsMap[ribbon]
+    return getPublicImageURL(getRibbonSpritePath(ribbon))
   }
 
   return (

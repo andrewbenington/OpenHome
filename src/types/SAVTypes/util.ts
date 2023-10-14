@@ -1,13 +1,12 @@
-import { OHPKM, PKM } from 'types/PKMTypes'
 import {
-  bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
   bytesToUint64LittleEndian,
-} from 'util/ByteLogic'
+} from '../../util/ByteLogic'
 import {
   getMonGen12Identifier,
   getMonGen345Identifier,
 } from '../../util/Lookup'
+import { OHPKM, PKM } from '../PKMTypes'
 import { SaveType, StringToStringMap } from '../types'
 import { DPSAV } from './DPSAV'
 import { G1SAV } from './G1SAV'
@@ -32,7 +31,7 @@ const recoverOHPKMData = (
   if (!homeMonMap || !lookupMap || !getIdentifier) {
     return saveFile
   }
-  saveFile.boxes.forEach((box, _) => {
+  saveFile.boxes.forEach((box) => {
     box.pokemon.forEach((mon, monIndex) => {
       if (mon) {
         // GameBoy PKM files don't have a personality value to track the mons with OpenHome data,
@@ -49,10 +48,7 @@ const recoverOHPKMData = (
           const updatedOHPKM = result[1]
           updatedOHPKM.updateData(mon)
           console.info('updating home data for', updatedOHPKM.nickname)
-          window.electron.ipcRenderer.sendMessage(
-            'write-ohpkm',
-            updatedOHPKM.bytes
-          )
+          window.electron.ipcRenderer.send('write-ohpkm', updatedOHPKM.bytes)
           box.pokemon[monIndex] = updatedOHPKM
         }
       }
@@ -72,16 +68,15 @@ export const getSaveType = (bytes: Uint8Array): SaveType => {
     const DATE_KO = 0x20070903
     return date === DATE_INT || date === DATE_KO
   }
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const validGen5Footer = (mainSize: number, infoLength: number) => {
-    const footer = bytes.slice(
-      mainSize - 0x100,
-      mainSize - 0x100 + infoLength + 0x10
-    )
-    const stored = bytesToUint16LittleEndian(footer, 2)
-    const actual = 0 // Checksums.CRC16_CCITT(footer[..infoLength]);
-    return stored === actual
-  }
+  // const validGen5Footer = (mainSize: number, infoLength: number) => {
+  //   const footer = bytes.slice(
+  //     mainSize - 0x100,
+  //     mainSize - 0x100 + infoLength + 0x10
+  //   )
+  //   const stored = bytesToUint16LittleEndian(footer, 2)
+  //   const actual = 0 // Checksums.CRC16_CCITT(footer[..infoLength]);
+  //   return stored === actual
+  // }
   if (bytes.length >= SIZE_GEN45) {
     if (validGen4DateAndSize(0x4c100)) {
       return SaveType.DP

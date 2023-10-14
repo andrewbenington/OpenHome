@@ -2,27 +2,26 @@
 import { ArrowForwardIosSharp } from '@mui/icons-material'
 import Accordion from '@mui/material/Accordion'
 import AccordionSummary from '@mui/material/AccordionSummary'
-import { Countries, NDex, SWEETS, isAlola, isGen6 } from 'consts'
+import { Countries, NDex, SWEETS, isAlola, isGen6 } from '../../consts'
 import {
   GEN2_TRANSFER_RESTRICTIONS,
   HGSS_TRANSFER_RESTRICTIONS,
-} from 'consts/TransferRestrictions'
-import DynamaxLevel from 'renderer/components/DynamaxLevel'
-import ShinyLeaves from 'renderer/components/ShinyLeaves'
-import TypeIcon from 'renderer/components/TypeIcon'
-import { OHPKM, PK1, PK2, PK3, PK4, PK5, PKM } from 'types/PKMTypes'
-import { isRestricted } from 'types/TransferRestrictions'
-import { Styles } from 'types/types'
+} from '../../consts/TransferRestrictions'
+import DynamaxLevel from '../components/DynamaxLevel'
+import ShinyLeaves from '../components/ShinyLeaves'
+import TypeIcon from '../components/TypeIcon'
+import { OHPKM, PK1, PK2, PK3, PK4, PK5, PKM } from '../../types/PKMTypes'
+import { isRestricted } from '../../types/TransferRestrictions'
+import { Styles } from '../../types/types'
 import {
   getMonFileIdentifier,
   getMonGen12Identifier,
   getMonGen345Identifier,
-} from 'util/Lookup'
-import Alpha from '../images/icons/Alpha.png'
-import GMax from '../images/icons/GMax.png'
+} from '../../util/Lookup'
 import { getTypeColor } from '../util/PokemonSprite'
 import AttributeRow from './AttributeRow'
 import AttributeTag from './AttributeTag'
+import { getPublicImageURL } from '../images/images'
 
 const styles = {
   accordion: {
@@ -314,10 +313,18 @@ const OtherDisplay = (props: { mon: PKM }) => {
       )}
       <div style={styles.flexRowWrap}>
         {mon.canGigantamax && (
-          <AttributeTag icon={GMax} color="white" backgroundColor="#e60040" />
+          <AttributeTag
+            icon={getPublicImageURL('icons/GMax.png')}
+            color="white"
+            backgroundColor="#e60040"
+          />
         )}
         {mon.isAlpha && (
-          <AttributeTag icon={Alpha} color="white" backgroundColor="#f2352d" />
+          <AttributeTag
+            icon={getPublicImageURL('icons/Alpha.png')}
+            color="white"
+            backgroundColor="#f2352d"
+          />
         )}
         {mon.isSquareShiny && (
           <AttributeTag

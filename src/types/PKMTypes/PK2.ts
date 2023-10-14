@@ -1,4 +1,4 @@
-import { statsPreSplit } from 'types/types'
+import { statsPreSplit } from '../../types/types'
 import {
   GameOfOrigin,
   GameOfOriginData,

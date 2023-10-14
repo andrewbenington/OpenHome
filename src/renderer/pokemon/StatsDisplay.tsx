@@ -11,12 +11,12 @@ import {
   Title,
   Tooltip,
 } from 'chart.js'
-import { GEN2_TRANSFER_RESTRICTIONS } from 'consts/TransferRestrictions'
+import { GEN2_TRANSFER_RESTRICTIONS } from '../../consts/TransferRestrictions'
 import { useEffect, useState } from 'react'
 import { Radar } from 'react-chartjs-2'
-import SheenStars from 'renderer/components/SheenStars'
-import { isRestricted } from 'types/TransferRestrictions'
-import { Styles } from 'types/types'
+import SheenStars from '../components/SheenStars'
+import { isRestricted } from '../../types/TransferRestrictions'
+import { Styles } from '../../types/types'
 import { getNatureSummary } from '../../resources/NatureData'
 import { PKM } from '../../types/PKMTypes/PKM'
 

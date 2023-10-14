@@ -1,5 +1,5 @@
-import { HGSS_TRANSFER_RESTRICTIONS } from 'consts/TransferRestrictions'
-import { SaveType } from 'types/types'
+import { HGSS_TRANSFER_RESTRICTIONS } from '../../consts/TransferRestrictions'
+import { SaveType } from '../../types/types'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,

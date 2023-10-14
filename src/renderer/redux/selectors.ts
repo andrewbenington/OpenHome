@@ -1,5 +1,5 @@
-import { OHPKM } from 'types/PKMTypes'
-import { SAV } from 'types/SAVTypes'
+import { OHPKM } from '../../types/PKMTypes'
+import { SAV } from '../../types/SAVTypes'
 import { SaveRefMap, StringToStringMap } from '../../types/types'
 import { useAppDispatch, useAppSelector } from './hooks'
 import {
@@ -25,7 +25,7 @@ import { selectResourcesPath } from './slices/resourcesSlice'
 type LookupMapsHook = [
   { [key: string]: OHPKM } | undefined,
   StringToStringMap | undefined,
-  StringToStringMap | undefined
+  StringToStringMap | undefined,
 ]
 
 export const useSaves = () => useAppSelector(selectSaves)
@@ -44,7 +44,7 @@ export const useSaveFunctions = (): [() => void, () => void] => {
 export const useRecentSaves = (): [
   SaveRefMap,
   (_: SAV) => void,
-  (_: string) => void
+  (_: string) => void,
 ] => {
   const dispatch = useAppDispatch()
   return [

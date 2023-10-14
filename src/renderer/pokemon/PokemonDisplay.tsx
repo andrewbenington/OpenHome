@@ -9,9 +9,9 @@ import {
   LA_TRANSFER_RESTRICTIONS,
   ORAS_TRANSFER_RESTRICTIONS,
   USUM_TRANSFER_RESTRICTIONS,
-} from 'consts/TransferRestrictions'
+} from '../../consts/TransferRestrictions'
 import { useState } from 'react'
-import { StringToStringMap, Styles } from 'types/types'
+import { StringToStringMap, Styles } from '../../types/types'
 import {
   OHPKM,
   PA8,

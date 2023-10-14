@@ -416,7 +416,7 @@ export const utf16StringToGen12 = (
   const bufView = new Uint8Array(length)
   for (let i = 0; i < Math.min(str.length, length); i++) {
     const gen12DictEntry = Object.entries(GBStringDict).find(
-      ([_, val]) => val === str.charAt(i)
+      ([, val]) => val === str.charAt(i)
     )
     if (str.charCodeAt(i) === 0) {
       break

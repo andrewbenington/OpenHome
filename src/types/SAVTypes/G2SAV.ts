@@ -1,14 +1,14 @@
-import { GameOfOrigin } from 'consts'
-import { GEN2_TRANSFER_RESTRICTIONS } from 'consts/TransferRestrictions'
+import { GameOfOrigin } from '../../consts'
+import { GEN2_TRANSFER_RESTRICTIONS } from '../../consts/TransferRestrictions'
 import { uniq } from 'lodash'
-import { OHPKM } from 'types/PKMTypes/OHPKM'
-import { PK2 } from 'types/PKMTypes/PK2'
-import { SaveType } from 'types/types'
-import { bytesToUint16BigEndian, get8BitChecksum } from 'util/ByteLogic'
+import { OHPKM } from '../../types/PKMTypes/OHPKM'
+import { PK2 } from '../../types/PKMTypes/PK2'
+import { SaveType } from '../../types/types'
+import { bytesToUint16BigEndian, get8BitChecksum } from '../../util/ByteLogic'
 import {
   gen12StringToUTF,
   utf16StringToGen12,
-} from 'util/Strings/StringConverter'
+} from '../../util/Strings/StringConverter'
 import { Box, SAV } from './SAV'
 
 export class G2Box implements Box {

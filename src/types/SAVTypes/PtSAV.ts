@@ -1,6 +1,6 @@
-import { GameOfOrigin } from 'consts'
-import { PT_TRANSFER_RESTRICTIONS } from 'consts/TransferRestrictions'
-import { SaveType } from 'types/types'
+import { GameOfOrigin } from '../../consts'
+import { PT_TRANSFER_RESTRICTIONS } from '../../consts/TransferRestrictions'
+import { SaveType } from '../../types/types'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
