@@ -1,7 +1,7 @@
 import { BrowserWindow, IpcMainInvokeEvent, app, ipcMain } from 'electron'
 import fs from 'fs'
 import path from 'path'
-import { StringToStringMap } from 'types/types'
+import { StringToStringMap } from '../types/types'
 import {
   getFileCreatedDate,
   initializeFolders,
@@ -94,7 +94,7 @@ function initListeners() {
     return boxesMap
   })
 
-  ipcMain.on('write-home-box', async (event, { boxName, boxString }) => {
+  ipcMain.on('write-home-box', async (_, { boxName, boxString }) => {
     const appDataPath = app.getPath('appData')
     fs.writeFileSync(
       path.join(appDataPath, 'OpenHome', 'storage', 'boxes', `${boxName}.csv`),
