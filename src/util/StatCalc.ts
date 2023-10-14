@@ -1,6 +1,6 @@
 /* eslint-disable no-nested-ternary */
-import { PKM } from 'types/PKMTypes/PKM'
-import { Stat } from 'types/types'
+import { PKM } from '../types/PKMTypes/PKM'
+import { Stat } from '../types/types'
 import { LevelUpExp, NDex, POKEMON_DATA, getNatureSummary } from '../consts'
 
 export const getStatGen3Onward = (stat: Stat, mon: PKM) => {
