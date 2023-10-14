@@ -241,22 +241,20 @@ const PokemonDisplay = (props: { mon: PKM; tab: string; setTab: (_: string) => v
           </OpenHomeButton>
         </div>
       </Grid>
-      <Grid item xs={9} style={styles.detailsPane}>
-        <div style={styles.tabScrollContainer} className="scroll-no-bar">
-          {tab === 'summary' ? (
-            <SummaryDisplay mon={displayMon} />
-          ) : tab === 'metDataMoves' ? (
-            <MetDataMovesDisplay mon={displayMon} />
-          ) : tab === 'stats' ? (
-            <StatsDisplay mon={displayMon} />
-          ) : tab === 'ribbons' ? (
-            <RibbonsDisplay mon={displayMon} />
-          ) : tab === 'other' ? (
-            <OtherDisplay mon={displayMon} />
-          ) : (
-            <RawDisplay bytes={displayMon.bytes} />
-          )}
-        </div>
+      <Grid item xs={9}>
+        {tab === 'summary' ? (
+          <SummaryDisplay mon={displayMon} />
+        ) : tab === 'metDataMoves' ? (
+          <MetDataMovesDisplay mon={displayMon} />
+        ) : tab === 'stats' ? (
+          <StatsDisplay mon={displayMon} />
+        ) : tab === 'ribbons' ? (
+          <RibbonsDisplay mon={displayMon} />
+        ) : tab === 'other' ? (
+          <OtherDisplay mon={displayMon} />
+        ) : (
+          <RawDisplay bytes={displayMon.bytes} />
+        )}
       </Grid>
     </Grid>
   )

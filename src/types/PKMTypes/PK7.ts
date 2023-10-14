@@ -53,7 +53,6 @@ export class PK7 extends PKM {
       this.personalityValue = other.personalityValue
       this.nature = other.nature
       this.isFatefulEncounter = other.isFatefulEncounter
-      console.log(other.formNum)
       this.formNum = other.formNum
       this.gender = other.gender
       this.evs = other.evs

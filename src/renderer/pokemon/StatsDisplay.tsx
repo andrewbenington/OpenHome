@@ -1,5 +1,3 @@
-/* eslint-disable no-nested-ternary */
-/* eslint-disable no-else-return */
 import { MenuItem, Select } from '@mui/material'
 import {
   Chart as ChartJS,
@@ -24,8 +22,7 @@ const styles = {
   container: {
     display: 'flex',
     flexDirection: 'column',
-    height: 'calc(100% - 20px)',
-    padding: 10,
+    height: '100%',
     alignItems: 'center',
     position: 'relative',
   },
@@ -36,8 +33,26 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
   },
-  chartContainer: { padding: 20, height: 280 },
+  chartContainer: { height: 'calc(100% - 40px)' },
+  sheenStars: { padding: 10 },
 } as Styles
+
+const getMaxValue = (stat: string, evType?: string): number | undefined => {
+  switch (stat) {
+    case 'IVs':
+      return 31
+    case 'DVs':
+      return 15
+    case 'GVs':
+      return 10
+    case 'EVs':
+      return evType === 'Modern' ? 252 : 65536
+    case 'Contest':
+      return 255
+    default:
+      return undefined
+  }
+}
 
 const StatsDisplay = (props: { mon: PKM }) => {
   const { mon } = props
@@ -93,21 +108,13 @@ const StatsDisplay = (props: { mon: PKM }) => {
                 },
               },
             },
+            layout: {
+              padding: 10,
+            },
             scales: {
               r: {
                 min: 0,
-                max:
-                  display === 'IVs'
-                    ? 31
-                    : display === 'DVs'
-                    ? 15
-                    : display === 'GVs'
-                    ? 10
-                    : display === 'EVs' && evType === 'Modern'
-                    ? 252
-                    : display === 'EVs' && evType === 'Game Boy'
-                    ? 65536
-                    : undefined,
+                max: getMaxValue(display, evType),
                 pointLabels: {
                   font: { size: 14, weight: 'bold' },
                   color: (ctx: ScriptableScalePointLabelContext) => {
@@ -332,7 +339,11 @@ const StatsDisplay = (props: { mon: PKM }) => {
           }}
         />
       </div>
-      {display === 'Contest' && mon.contest && <SheenStars mon={mon} />}
+      {display === 'Contest' && mon.contest && (
+        <div style={styles.sheenStars}>
+          <SheenStars mon={mon} />
+        </div>
+      )}
     </div>
   )
 }
