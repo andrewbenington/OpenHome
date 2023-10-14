@@ -9,18 +9,12 @@ import { buildSaveFile } from '../util'
 
 const blueSaveFile = buildSaveFile(
   '',
-  new Uint8Array(
-    fs.readFileSync(path.join(__dirname, './SAVFiles', 'blue.sav'))
-  ),
+  new Uint8Array(fs.readFileSync(path.join(__dirname, './SAVFiles', 'blue.sav'))),
   {}
 ) as G1SAV
 
 const slowpokeOH = bytesToPKM(
-  new Uint8Array(
-    fs.readFileSync(
-      path.join(__dirname, './PKMFiles/OH', 'slowpoke-shiny.ohpkm')
-    )
-  ),
+  new Uint8Array(fs.readFileSync(path.join(__dirname, './PKMFiles/OH', 'slowpoke-shiny.ohpkm'))),
   'OHPKM'
 )
 
@@ -32,40 +26,24 @@ test('pc box decoded correctly', () => {
 })
 
 test('removing mon shifts others in box', () => {
-  const modifiedSaveFile1 = buildSaveFile(
-    '',
-    new Uint8Array(blueSaveFile.bytes),
-    {}
-  ) as G1SAV
+  const modifiedSaveFile1 = buildSaveFile('', new Uint8Array(blueSaveFile.bytes), {}) as G1SAV
   modifiedSaveFile1.boxes[7].pokemon[0] = undefined
   modifiedSaveFile1.updatedBoxSlots.push({ box: 7, index: 0 })
   modifiedSaveFile1.prepareBoxesForSaving()
 
-  const modifiedSaveFile2 = buildSaveFile(
-    '',
-    new Uint8Array(modifiedSaveFile1.bytes),
-    {}
-  ) as G1SAV
+  const modifiedSaveFile2 = buildSaveFile('', new Uint8Array(modifiedSaveFile1.bytes), {}) as G1SAV
   expect(modifiedSaveFile2.boxes[7].pokemon[0]?.nickname).toEqual('AERODACTYL')
   expect(modifiedSaveFile2.boxes[7].pokemon[9]?.nickname).toEqual('MEW')
   expect(modifiedSaveFile2.boxes[7].pokemon[10]).toEqual(undefined)
 })
 
 test('inserting mon works', () => {
-  const modifiedSaveFile1 = buildSaveFile(
-    '',
-    new Uint8Array(blueSaveFile.bytes),
-    {}
-  ) as G1SAV
+  const modifiedSaveFile1 = buildSaveFile('', new Uint8Array(blueSaveFile.bytes), {}) as G1SAV
   modifiedSaveFile1.boxes[7].pokemon[11] = new PK1(slowpokeOH)
   modifiedSaveFile1.updatedBoxSlots.push({ box: 7, index: 0 })
   modifiedSaveFile1.prepareBoxesForSaving()
 
-  const modifiedSaveFile2 = buildSaveFile(
-    '',
-    new Uint8Array(modifiedSaveFile1.bytes),
-    {}
-  ) as G1SAV
+  const modifiedSaveFile2 = buildSaveFile('', new Uint8Array(modifiedSaveFile1.bytes), {}) as G1SAV
   expect(modifiedSaveFile2.boxes[7].pokemon[0]?.nickname).toEqual('KABUTOPS')
   expect(modifiedSaveFile2.boxes[7].pokemon[10]?.nickname).toEqual('MEW')
   expect(modifiedSaveFile2.boxes[7].pokemon[11]?.nickname).toEqual('Slowpoke')

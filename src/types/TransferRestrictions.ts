@@ -141,11 +141,7 @@ export const isRestricted = (
   if (transferableDexNums && !transferableDexNums.includes(dexNum)) {
     return true
   }
-  if (
-    excludedForms &&
-    excludedForms[dexNum] &&
-    excludedForms[dexNum]?.includes(formNum)
-  ) {
+  if (excludedForms && excludedForms[dexNum] && excludedForms[dexNum]?.includes(formNum)) {
     return true
   }
   return false

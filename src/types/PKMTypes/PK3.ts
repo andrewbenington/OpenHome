@@ -13,10 +13,7 @@ import {
 } from '../../consts'
 import CXDLocation from '../../consts/MetLocation/CXD'
 import RSEFRLGLocations from '../../consts/MetLocation/RSEFRLG'
-import {
-  ItemGen3FromString,
-  ItemGen3ToString,
-} from '../../resources/gen/items/Gen3'
+import { ItemGen3FromString, ItemGen3ToString } from '../../resources/gen/items/Gen3'
 import { AbilityFromString } from '../../resources/gen/other/Abilities'
 import {
   bytesToUint16LittleEndian,
@@ -28,21 +25,10 @@ import {
   uint32ToBytesLittleEndian,
 } from '../../util/ByteLogic'
 import { gen3ToNational, nationalToGen3 } from '../../util/ConvertPokemonID'
-import {
-  decryptByteArrayGen3,
-  shuffleBlocksGen3,
-  unshuffleBlocksGen3,
-} from '../../util/Encryption'
+import { decryptByteArrayGen3, shuffleBlocksGen3, unshuffleBlocksGen3 } from '../../util/Encryption'
 import { getGen3To5Gender } from '../../util/GenderCalc'
-import {
-  getHPGen3Onward,
-  getLevelGen3Onward,
-  getStatGen3Onward,
-} from '../../util/StatCalc'
-import {
-  gen3StringToUTF,
-  utf16StringToGen3,
-} from '../../util/Strings/StringConverter'
+import { getHPGen3Onward, getLevelGen3Onward, getStatGen3Onward } from '../../util/StatCalc'
+import { gen3StringToUTF, utf16StringToGen3 } from '../../util/Strings/StringConverter'
 import { OHPKM } from './OHPKM'
 import { PKM } from './PKM'
 import {
@@ -81,8 +67,7 @@ export class PK3 extends PKM {
         }
         this.markings = temp as [marking, marking, marking, marking]
       }
-      this.personalityValue =
-        generatePersonalityValuePreservingAttributes(other)
+      this.personalityValue = generatePersonalityValuePreservingAttributes(other)
       // this.nature = other.nature ?? this.personalityValue % 25;
       this.isFatefulEncounter = other.isFatefulEncounter
       // this.gender = other.gender;
@@ -96,22 +81,10 @@ export class PK3 extends PKM {
       const validMovePP = adjustMovePPBetweenFormats(this, other).filter(
         (_, i) => other.moves[i] <= GEN3_MOVE_MAX
       )
-      const validMovePPUps = other.movePPUps.filter(
-        (_, i) => other.moves[i] <= GEN3_MOVE_MAX
-      )
+      const validMovePPUps = other.movePPUps.filter((_, i) => other.moves[i] <= GEN3_MOVE_MAX)
       this.moves = [validMoves[0], validMoves[1], validMoves[2], validMoves[3]]
-      this.movePP = [
-        validMovePP[0],
-        validMovePP[1],
-        validMovePP[2],
-        validMovePP[3],
-      ]
-      this.movePPUps = [
-        validMovePPUps[0],
-        validMovePPUps[1],
-        validMovePPUps[2],
-        validMovePPUps[3],
-      ]
+      this.movePP = [validMovePP[0], validMovePP[1], validMovePP[2], validMovePP[3]]
+      this.movePPUps = [validMovePPUps[0], validMovePPUps[1], validMovePPUps[2], validMovePPUps[3]]
       this.movePPUps = other.movePPUps
       this.ivs = other.ivs
       this.isEgg = other.isEgg
@@ -300,12 +273,7 @@ export class PK3 extends PKM {
 
   public get movePPUps() {
     const ppUpVal = this.bytes[0x28]
-    return [
-      (ppUpVal >> 0) & 3,
-      (ppUpVal >> 2) & 3,
-      (ppUpVal >> 4) & 3,
-      (ppUpVal >> 6) & 3,
-    ]
+    return [(ppUpVal >> 0) & 3, (ppUpVal >> 2) & 3, (ppUpVal >> 4) & 3, (ppUpVal >> 6) & 3]
   }
 
   public set movePPUps(value: [number, number, number, number]) {
@@ -331,11 +299,7 @@ export class PK3 extends PKM {
   public get ability() {
     const ability1 = POKEMON_DATA[this.dexNum]?.formes[0].ability1
     const ability2 = POKEMON_DATA[this.dexNum]?.formes[0].ability2
-    if (
-      this.abilityNum === 2 &&
-      ability2 &&
-      AbilityFromString(ability2) <= GEN3_ABILITY_MAX
-    ) {
+    if (this.abilityNum === 2 && ability2 && AbilityFromString(ability2) <= GEN3_ABILITY_MAX) {
       return ability2
     }
     return ability1
@@ -357,12 +321,7 @@ export class PK3 extends PKM {
   }
 
   public get movePP() {
-    return [
-      this.bytes[0x34],
-      this.bytes[0x35],
-      this.bytes[0x36],
-      this.bytes[0x37],
-    ]
+    return [this.bytes[0x34], this.bytes[0x35], this.bytes[0x36], this.bytes[0x37]]
   }
 
   public set movePP(value: [number, number, number, number]) {
@@ -605,8 +564,7 @@ export class PK3 extends PKM {
     ribbonUInt32 = (ribbonUInt32 & ~(7 << 6)) | ((maxCuteRibbon & 7) << 6)
     ribbonUInt32 = (ribbonUInt32 & ~(7 << 9)) | ((maxSmartRibbon & 7) << 9)
     ribbonUInt32 = (ribbonUInt32 & ~(7 << 12)) | ((maxToughRibbon & 7) << 12)
-    ribbonUInt32 =
-      (ribbonUInt32 & ~(1 << 31)) | ((this.isFatefulEncounter ? 1 : 0) << 31)
+    ribbonUInt32 = (ribbonUInt32 & ~(1 << 31)) | ((this.isFatefulEncounter ? 1 : 0) << 31)
     this.ribbonBytes = uint32ToBytesLittleEndian(ribbonUInt32)
   }
 

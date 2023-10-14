@@ -4,17 +4,10 @@ import { GCLanguages } from '../../consts/Languages'
 import { POKEMON_DATA } from '../../consts/Mons'
 import { Gen3StandardRibbons } from '../../consts/Ribbons'
 import { ItemGen3ToString } from '../../resources/gen/items/Gen3'
-import {
-  bytesToUint16BigEndian,
-  bytesToUint32BigEndian,
-} from '../../util/ByteLogic'
+import { bytesToUint16BigEndian, bytesToUint32BigEndian } from '../../util/ByteLogic'
 import { gen3ToNational } from '../../util/ConvertPokemonID'
 import { getGen3To5Gender } from '../../util/GenderCalc'
-import {
-  getHPGen3Onward,
-  getLevelGen3Onward,
-  getStatGen3Onward,
-} from '../../util/StatCalc'
+import { getHPGen3Onward, getLevelGen3Onward, getStatGen3Onward } from '../../util/StatCalc'
 import { utf16BytesToString } from '../../util/Strings/StringConverter'
 import { PKM } from './PKM'
 
@@ -39,8 +32,7 @@ export class COLOPKM extends PKM {
     this.metLevel = bytes[0x0e]
     this.trainerGender = bytes[0x10]
     this.isShadow =
-      bytesToUint16BigEndian(bytes, 0xd8) > 0 &&
-      bytesToUint16BigEndian(bytes, 0xdc) === 0
+      bytesToUint16BigEndian(bytes, 0xd8) > 0 && bytesToUint16BigEndian(bytes, 0xdc) === 0
     this.moves = [
       bytesToUint16BigEndian(bytes, 0x78),
       bytesToUint16BigEndian(bytes, 0x7c),
@@ -84,8 +76,7 @@ export class COLOPKM extends PKM {
       spa: getStatGen3Onward('SpA', this),
       spd: getStatGen3Onward('SpD', this),
     }
-    const origin =
-      GameOfOriginData.find((game) => game?.gc === bytes[0x08]) ?? null
+    const origin = GameOfOriginData.find((game) => game?.gc === bytes[0x08]) ?? null
     this.gameOfOrigin = GameOfOriginData.indexOf(origin)
     this.trainerName = utf16BytesToString(this.bytes, 0x18, 11, true)
     this.nickname = utf16BytesToString(this.bytes, 0x2e, 11, true)
@@ -104,12 +95,7 @@ export class COLOPKM extends PKM {
   }
 
   public get movePP() {
-    return [
-      this.bytes[0x7a],
-      this.bytes[0x7e],
-      this.bytes[0x82],
-      this.bytes[0x86],
-    ]
+    return [this.bytes[0x7a], this.bytes[0x7e], this.bytes[0x82], this.bytes[0x86]]
   }
 
   public set movePP(value: [number, number, number, number]) {
@@ -119,12 +105,7 @@ export class COLOPKM extends PKM {
   }
 
   public get movePPUps() {
-    return [
-      this.bytes[0x7b],
-      this.bytes[0x7f],
-      this.bytes[0x83],
-      this.bytes[0x87],
-    ]
+    return [this.bytes[0x7b], this.bytes[0x7f], this.bytes[0x83], this.bytes[0x87]]
   }
 
   public set movePPUps(value: [number, number, number, number]) {

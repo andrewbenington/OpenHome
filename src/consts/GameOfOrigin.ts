@@ -186,9 +186,7 @@ export const isKalos = (origin: GameOfOrigin) => {
 }
 
 export const isLetsGo = (origin: GameOfOrigin) => {
-  return (
-    origin === GameOfOrigin.LetsGoPikachu || origin === GameOfOrigin.LetsGoEevee
-  )
+  return origin === GameOfOrigin.LetsGoPikachu || origin === GameOfOrigin.LetsGoEevee
 }
 
 export const isGen7 = (origin: GameOfOrigin) => {
@@ -196,16 +194,11 @@ export const isGen7 = (origin: GameOfOrigin) => {
 }
 
 export const isBDSP = (origin: GameOfOrigin) => {
-  return (
-    origin === GameOfOrigin.BrilliantDiamond ||
-    origin === GameOfOrigin.ShiningPearl
-  )
+  return origin === GameOfOrigin.BrilliantDiamond || origin === GameOfOrigin.ShiningPearl
 }
 
 export const isGen8 = (origin: GameOfOrigin) => {
-  return (
-    isGalar(origin) || isBDSP(origin) || origin === GameOfOrigin.LegendsArceus
-  )
+  return isGalar(origin) || isBDSP(origin) || origin === GameOfOrigin.LegendsArceus
 }
 
 export const isGen9 = (origin: GameOfOrigin) => {
@@ -223,11 +216,7 @@ export const isKanto = (origin: GameOfOrigin) => {
 }
 
 export const isJohto = (origin: GameOfOrigin) => {
-  return (
-    isGen2(origin) ||
-    origin === GameOfOrigin.HeartGold ||
-    origin === GameOfOrigin.SoulSilver
-  )
+  return isGen2(origin) || origin === GameOfOrigin.HeartGold || origin === GameOfOrigin.SoulSilver
 }
 
 export const isHoenn = (origin: GameOfOrigin) => {
@@ -293,16 +282,12 @@ export const gameOfOriginFromFormat = (format: string) => {
 const ColosseumOnlyNonShadow = [311]
 
 const ColosseumOnlyShadow = [
-  153, 154, 156, 157, 159, 160, 162, 164, 176, 468, 185, 188, 189, 190, 192,
-  193, 195, 198, 200, 206, 207, 210, 211, 213, 214, 215, 218, 223, 461, 472,
-  469, 430, 429, 982, 223, 224, 225, 226, 227, 234, 899, 235, 237, 241, 243,
-  244, 245, 248, 250, 307, 308, 329, 330, 333, 357, 359, 376,
+  153, 154, 156, 157, 159, 160, 162, 164, 176, 468, 185, 188, 189, 190, 192, 193, 195, 198, 200,
+  206, 207, 210, 211, 213, 214, 215, 218, 223, 461, 472, 469, 430, 429, 982, 223, 224, 225, 226,
+  227, 234, 899, 235, 237, 241, 243, 244, 245, 248, 250, 307, 308, 329, 330, 333, 357, 359, 376,
 ]
 
-const CXDShadow = [
-  166, 168, 180, 181, 196, 197, 205, 217, 219, 221, 473, 901, 229, 296, 297,
-  334,
-]
+const CXDShadow = [166, 168, 180, 181, 196, 197, 205, 217, 219, 221, 473, 901, 229, 296, 297, 334]
 
 const CXDNonShadow = [196, 197]
 
@@ -312,10 +297,7 @@ export enum ColosseumOrXD {
   NotDeterminable,
 }
 
-export const colosseumOrXD = (
-  dexNum?: number,
-  hasNationalRibbon?: boolean
-): ColosseumOrXD => {
+export const colosseumOrXD = (dexNum?: number, hasNationalRibbon?: boolean): ColosseumOrXD => {
   if (dexNum === undefined || hasNationalRibbon === undefined) {
     return ColosseumOrXD.NotDeterminable
   }

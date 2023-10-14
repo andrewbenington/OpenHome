@@ -1,10 +1,6 @@
 import { ItemGen2, ItemGen2ToString } from '../../resources/gen/items/Gen2'
 import { ItemGen3, ItemGen3ToString } from '../../resources/gen/items/Gen3'
-import {
-  ItemToString,
-  Item,
-  ItemFromString,
-} from '../../resources/gen/items/Items'
+import { ItemToString, Item, ItemFromString } from '../../resources/gen/items/Items'
 
 const BallIcons: { [key: string]: string } = {
   Master: 'items/index/0001.png',
@@ -85,12 +81,7 @@ export const BallsList = [
   BallIcons.Origin,
 ]
 
-const SharedItemSpritePrefixes = [
-  'Data Card',
-  'Lost Satchel',
-  'Old Verse',
-  'Lost Satchel',
-]
+const SharedItemSpritePrefixes = ['Data Card', 'Lost Satchel', 'Old Verse', 'Lost Satchel']
 
 const itemEquivalents = {
   'Parlyz Heal': 'Paralyze Heal',
@@ -104,10 +95,7 @@ const itemEquivalents = {
   "Oak's Parcel": 'Parcel',
 }
 
-export const getItemIconPath = (
-  item: Item | ItemGen3 | ItemGen2,
-  format?: string
-): string => {
+export const getItemIconPath = (item: Item | ItemGen3 | ItemGen2, format?: string): string => {
   let itemName: string
   if (format === 'PK3' || format === 'COLOPKM' || format === 'XDPKM') {
     itemName = ItemGen3ToString(item as ItemGen3)
@@ -125,10 +113,7 @@ export const getItemIconPath = (
     itemName = ItemToString(item as Item)
   }
   if (item > 0) {
-    if (
-      itemName.startsWith('HM') ||
-      (itemName.startsWith('TM') && itemName.charAt(2) !== 'V')
-    ) {
+    if (itemName.startsWith('HM') || (itemName.startsWith('TM') && itemName.charAt(2) !== 'V')) {
       return 'items/tm/normal.png'
     }
     if (itemName.startsWith('TR')) {

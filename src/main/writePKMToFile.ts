@@ -8,10 +8,7 @@ export default function writePKMToFile(bytes: Uint8Array) {
   const mon = bytesToPKM(bytes, 'OHPKM') as OHPKM
   const appDataPath = app.getPath('appData')
   const fileName = getMonFileIdentifier(mon)
-  fs.writeFileSync(
-    `${appDataPath}/OpenHome/storage/mons/${fileName}.ohpkm`,
-    mon.bytes
-  )
+  fs.writeFileSync(`${appDataPath}/OpenHome/storage/mons/${fileName}.ohpkm`, mon.bytes)
 }
 
 export function deleteOHPKMFile(fileName: string) {

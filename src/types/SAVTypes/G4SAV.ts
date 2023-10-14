@@ -1,8 +1,5 @@
 import { OHPKM } from '../../types/PKMTypes/OHPKM'
-import {
-  bytesToUint16LittleEndian,
-  uint16ToBytesLittleEndian,
-} from '../../util/ByteLogic'
+import { bytesToUint16LittleEndian, uint16ToBytesLittleEndian } from '../../util/ByteLogic'
 import { CRC16_CCITT } from '../../util/Encryption'
 import { gen4StringToUTF } from '../../util/Strings/StringConverter'
 import { PK4 } from '../PKMTypes/PK4'
@@ -43,23 +40,15 @@ export class G4SAV extends SAV {
 
   buildBoxes() {
     for (let box = 0; box < 18; box++) {
-      const boxLabel = gen4StringToUTF(
-        this.bytes,
-        this.boxNamesOffset + 40 * box,
-        20
-      )
+      const boxLabel = gen4StringToUTF(this.bytes, this.boxNamesOffset + 40 * box, 20)
       this.boxes[box] = new G4Box(boxLabel)
     }
 
     for (let box = 0; box < 18; box++) {
       for (let monIndex = 0; monIndex < 30; monIndex++) {
         try {
-          const startByte =
-            this.currentSaveBoxStartOffset + this.boxSize * box + 136 * monIndex
-          const endByte =
-            this.currentSaveBoxStartOffset +
-            this.boxSize * box +
-            136 * (monIndex + 1)
+          const startByte = this.currentSaveBoxStartOffset + this.boxSize * box + 136 * monIndex
+          const endByte = this.currentSaveBoxStartOffset + this.boxSize * box + 136 * (monIndex + 1)
           const monData = this.bytes.slice(startByte, endByte)
           const mon = new PK4(monData, true)
           if (mon.dexNum !== 0 && mon.gameOfOrigin !== 0) {
@@ -114,8 +103,7 @@ export class G4SAV extends SAV {
       if (changedMon instanceof OHPKM) {
         changedMonPKMs.push(changedMon)
       }
-      const writeIndex =
-        this.currentSaveBoxStartOffset + this.boxSize * box + 136 * index
+      const writeIndex = this.currentSaveBoxStartOffset + this.boxSize * box + 136 * index
       // changedMon will be undefined if pokemon was moved from this slot
       // and the slot was left empty
       if (changedMon) {

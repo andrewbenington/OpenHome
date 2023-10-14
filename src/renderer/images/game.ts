@@ -1,9 +1,4 @@
-import {
-  GameOfOrigin,
-  colosseumOrXD,
-  ColosseumOrXD,
-  GameOfOriginData,
-} from '../../consts'
+import { GameOfOrigin, colosseumOrXD, ColosseumOrXD, GameOfOriginData } from '../../consts'
 
 const GameLogos: { [key: string]: string } = {
   AlphaSapphire: `logos/Alpha_Sapphire.png`,
@@ -51,11 +46,7 @@ const GameLogos: { [key: string]: string } = {
   Yellow: `logos/Yellow.png`,
 }
 
-export const getGameLogo = (
-  gameOfOrigin: number,
-  dexNum?: number,
-  hasNationalRibbon?: boolean
-) => {
+export const getGameLogo = (gameOfOrigin: number, dexNum?: number, hasNationalRibbon?: boolean) => {
   if (gameOfOrigin === GameOfOrigin.ColosseumXD) {
     switch (colosseumOrXD(dexNum, hasNationalRibbon)) {
       case ColosseumOrXD.Colosseum:

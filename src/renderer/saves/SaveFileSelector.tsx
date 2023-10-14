@@ -24,37 +24,25 @@ const formatTimeSince = (timestamp: number) => {
   let interval = seconds / 31536000
 
   if (interval > 1) {
-    return `${Math.floor(interval)} year${
-      Math.floor(interval) > 1 ? 's' : ''
-    } ago`
+    return `${Math.floor(interval)} year${Math.floor(interval) > 1 ? 's' : ''} ago`
   }
   interval = seconds / 2592000
   if (interval > 1) {
-    return `${Math.floor(interval)} month${
-      Math.floor(interval) > 1 ? 's' : ''
-    } ago`
+    return `${Math.floor(interval)} month${Math.floor(interval) > 1 ? 's' : ''} ago`
   }
   interval = seconds / 86400
   if (interval > 1) {
-    return `${Math.floor(interval)} day${
-      Math.floor(interval) > 1 ? 's' : ''
-    } ago`
+    return `${Math.floor(interval)} day${Math.floor(interval) > 1 ? 's' : ''} ago`
   }
   interval = seconds / 3600
   if (interval > 1) {
-    return `${Math.floor(interval)} hour${
-      Math.floor(interval) > 1 ? 's' : ''
-    } ago`
+    return `${Math.floor(interval)} hour${Math.floor(interval) > 1 ? 's' : ''} ago`
   }
   interval = seconds / 60
   if (interval > 1) {
-    return `${Math.floor(interval)} minute${
-      Math.floor(interval) > 1 ? 's' : ''
-    } ago`
+    return `${Math.floor(interval)} minute${Math.floor(interval) > 1 ? 's' : ''} ago`
   }
-  return `${Math.floor(seconds)} second${
-    Math.floor(seconds) > 1 ? 's' : ''
-  } ago`
+  return `${Math.floor(seconds)} second${Math.floor(seconds) > 1 ? 's' : ''} ago`
 }
 
 const SaveFileSelector = (props: SaveFileSelectorProps) => {
@@ -65,11 +53,10 @@ const SaveFileSelector = (props: SaveFileSelectorProps) => {
   const dispatch = useAppDispatch()
 
   const openSaveFile = async (filePath?: string) => {
-    const { path, fileBytes, createdDate } =
-      await window.electron.ipcRenderer.invoke(
-        'read-save-file',
-        filePath && [filePath]
-      )
+    const { path, fileBytes, createdDate } = await window.electron.ipcRenderer.invoke(
+      'read-save-file',
+      filePath && [filePath]
+    )
     if (path && fileBytes && homeMonMap) {
       const saveFile = buildSaveFile(path, fileBytes, {
         homeMonMap,
@@ -125,8 +112,9 @@ const SaveFileSelector = (props: SaveFileSelectorProps) => {
       </OpenHomeButton>
       {Object.values(recentSaves)
         .sort((a, b) => (b.lastOpened ?? 0) - (a.lastOpened ?? 0))
-        .map((ref) => (
+        .map((ref, i) => (
           <OpenHomeButton
+            key={`save_file_${i}`}
             onClick={() => openSaveFile(ref.filePath)}
             style={{
               width: 'calc(50% - 10px)',

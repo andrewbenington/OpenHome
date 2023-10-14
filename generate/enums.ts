@@ -12,9 +12,7 @@ function convertToPascalCase(input: string): string {
 
   // Capitalize the first letter of each word and join them
   const pascalCaseString = words
-    .map((word) =>
-      word.length === 0 ? '' : word[0].toUpperCase() + word.slice(1)
-    )
+    .map((word) => (word.length === 0 ? '' : word[0].toUpperCase() + word.slice(1)))
     .join('')
 
   return pascalCaseString
@@ -53,23 +51,18 @@ const generateEnumAndStringFunction = (
       duplicates[key] = 0
     }
 
-    enumMembers.push(
-      ts.factory.createEnumMember(ts.factory.createIdentifier(key))
-    )
+    enumMembers.push(ts.factory.createEnumMember(ts.factory.createIdentifier(key)))
 
     toStringClauses.push(
-      ts.factory.createCaseClause(
-        ts.factory.createIdentifier(`${enumName}.${key}`),
-        [ts.factory.createReturnStatement(ts.factory.createStringLiteral(str))]
-      )
+      ts.factory.createCaseClause(ts.factory.createIdentifier(`${enumName}.${key}`), [
+        ts.factory.createReturnStatement(ts.factory.createStringLiteral(str)),
+      ])
     )
 
     if (duplicates[key] === 0) {
       fromStringClauses.push(
         ts.factory.createCaseClause(ts.factory.createStringLiteral(str), [
-          ts.factory.createReturnStatement(
-            ts.factory.createIdentifier(`${enumName}.${key}`)
-          ),
+          ts.factory.createReturnStatement(ts.factory.createIdentifier(`${enumName}.${key}`)),
         ])
       )
     }
@@ -84,9 +77,7 @@ const generateEnumAndStringFunction = (
   const { key } = keyAndStringFromLine(values[0])
   fromStringClauses.push(
     ts.factory.createDefaultClause([
-      ts.factory.createReturnStatement(
-        ts.factory.createIdentifier(`${enumName}.${key}`)
-      ),
+      ts.factory.createReturnStatement(ts.factory.createIdentifier(`${enumName}.${key}`)),
     ])
   )
 
@@ -107,9 +98,7 @@ const generateEnumAndStringFunction = (
         undefined,
         'item',
         undefined,
-        ts.factory.createTypeReferenceNode(
-          ts.factory.createIdentifier(enumName)
-        )
+        ts.factory.createTypeReferenceNode(ts.factory.createIdentifier(enumName))
       ),
     ],
     ts.factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
@@ -181,11 +170,7 @@ export const GenerateEnumFromTextFile = (
     )
 
   const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed })
-  const enumContent = printer.printNode(
-    ts.EmitHint.Unspecified,
-    enumDeclaration,
-    resultFile
-  )
+  const enumContent = printer.printNode(ts.EmitHint.Unspecified, enumDeclaration, resultFile)
 
   const toStringContent = printer.printNode(
     ts.EmitHint.Unspecified,
@@ -206,8 +191,5 @@ export const GenerateEnumFromTextFile = (
     fs.mkdirSync(dirname(outputFilePath), { recursive: true })
   }
   // Write the generated content to the output file
-  fs.writeFileSync(
-    outputFilePath,
-    `${outputFileContent}\n${toStringContent}\n${fromStringContent}`
-  )
+  fs.writeFileSync(outputFilePath, `${outputFileContent}\n${toStringContent}\n${fromStringContent}`)
 }

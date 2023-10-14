@@ -52,46 +52,23 @@ const StatsDisplay = (props: { mon: PKM }) => {
     }
   }, [mon.evs, mon.evsG12, mon.format])
 
-  ChartJS.register(
-    RadialLinearScale,
-    PointElement,
-    LineElement,
-    Title,
-    Filler,
-    Tooltip
-  )
+  ChartJS.register(RadialLinearScale, PointElement, LineElement, Title, Filler, Tooltip)
   return (
     <div style={styles.container}>
       <div style={styles.selectors}>
         <Select value={display} onChange={(e) => setDisplay(e.target.value)}>
           <MenuItem value="Stats">Stats</MenuItem>
           {mon.avs ? <MenuItem value="AVs">AVs</MenuItem> : <div />}
-          {mon.evs ?? mon.evsG12 !== undefined ? (
-            <MenuItem value="EVs">EVs</MenuItem>
-          ) : (
-            <div />
-          )}
-          {mon.ivs !== undefined ? (
-            <MenuItem value="IVs">IVs</MenuItem>
-          ) : (
-            <div />
-          )}
+          {mon.evs ?? mon.evsG12 !== undefined ? <MenuItem value="EVs">EVs</MenuItem> : <div />}
+          {mon.ivs !== undefined ? <MenuItem value="IVs">IVs</MenuItem> : <div />}
           {!isRestricted(GEN2_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
           mon.dvs !== undefined ? (
             <MenuItem value="DVs">DVs</MenuItem>
           ) : (
             <div />
           )}
-          {mon.dvs !== undefined ? (
-            <MenuItem value="GVs">GVs</MenuItem>
-          ) : (
-            <div />
-          )}
-          {mon.contest !== undefined ? (
-            <MenuItem value="Contest">Contest</MenuItem>
-          ) : (
-            <div />
-          )}
+          {mon.dvs !== undefined ? <MenuItem value="GVs">GVs</MenuItem> : <div />}
+          {mon.contest !== undefined ? <MenuItem value="Contest">Contest</MenuItem> : <div />}
         </Select>
         {display === 'EVs' && mon.format === 'OHPKM' ? (
           <Select value={evType} onChange={(e) => setEVType(e.target.value)}>
@@ -165,9 +142,7 @@ const StatsDisplay = (props: { mon: PKM }) => {
                   borderRadius: display === 'Contest' ? 12 : 0,
                   backdropPadding: display === 'Contest' ? 4 : 0,
                   callback: (value) => {
-                    const natureSummary = getNatureSummary(
-                      mon.statNature ?? mon.nature
-                    )
+                    const natureSummary = getNatureSummary(mon.statNature ?? mon.nature)
                     if (natureSummary?.includes(`-${value}`)) {
                       return `${value}▼`
                     } else if (natureSummary?.includes(`+${value}`)) {
@@ -184,8 +159,7 @@ const StatsDisplay = (props: { mon: PKM }) => {
             labels:
               display === 'Contest'
                 ? ['Cool', 'Beauty', 'Cute', 'Smart', 'Tough']
-                : (display === 'EVs' && evType === 'Game Boy') ||
-                  display === 'DVs'
+                : (display === 'EVs' && evType === 'Game Boy') || display === 'DVs'
                 ? ['HP', 'Atk', 'Def', 'Spe', 'Spc']
                 : ['HP', 'Atk', 'Def', 'Spe', 'SpD', 'SpA'],
             datasets: [
@@ -230,13 +204,7 @@ const StatsDisplay = (props: { mon: PKM }) => {
                 : display === 'DVs' && mon.dvs
                 ? {
                     label: 'DVs',
-                    data: [
-                      mon.dvs.hp,
-                      mon.dvs.atk,
-                      mon.dvs.def,
-                      mon.dvs.spe,
-                      mon.dvs.spc,
-                    ],
+                    data: [mon.dvs.hp, mon.dvs.atk, mon.dvs.def, mon.dvs.spe, mon.dvs.spc],
                     fill: true,
                     backgroundColor: 'rgba(255, 99, 132, 0.2)',
                     borderColor: 'rgb(255, 99, 132)',

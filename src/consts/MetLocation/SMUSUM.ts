@@ -347,13 +347,7 @@ const SMUSUMLocations: GameLocations = {
     'a demo version',
     'the Pokémon Trainer Club',
   ],
-  60000: [
-    '',
-    'a stranger',
-    'Nursery helpers',
-    'a treasure hunter',
-    'an old hot-springs visitor',
-  ],
+  60000: ['', 'a stranger', 'Nursery helpers', 'a treasure hunter', 'an old hot-springs visitor'],
 }
 
 export default SMUSUMLocations

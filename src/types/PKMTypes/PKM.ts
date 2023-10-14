@@ -923,9 +923,7 @@ export class PKM {
   }
 
   public set geolocations(
-    value:
-      | [geolocation, geolocation, geolocation, geolocation, geolocation]
-      | undefined
+    value: [geolocation, geolocation, geolocation, geolocation, geolocation] | undefined
   ) {
     this._geolocations = value
   }
@@ -1288,10 +1286,7 @@ export class PKM {
   }
 
   public get isGameBoyOrigin() {
-    return (
-      this.gameOfOrigin >= GameOfOrigin.Red &&
-      this.gameOfOrigin <= GameOfOrigin.Crystal
-    )
+    return this.gameOfOrigin >= GameOfOrigin.Red && this.gameOfOrigin <= GameOfOrigin.Crystal
   }
 
   public get characteristic() {
@@ -1309,9 +1304,7 @@ export class PKM {
     }
     switch (determiningIV) {
       case 'hp':
-        return ['PK1', 'PK2', 'PK3', 'COLOPKM', 'XDPKM', 'PK4', 'PK5'].includes(
-          this.format
-        )
+        return ['PK1', 'PK2', 'PK3', 'COLOPKM', 'XDPKM', 'PK4', 'PK5'].includes(this.format)
           ? HPCharacteristicsPre6[maxIV % 5]
           : HPCharacteristics[maxIV % 5]
       case 'atk':
@@ -1329,23 +1322,13 @@ export class PKM {
 
   public get metLocation() {
     if (!this.metLocationIndex) return undefined
-    return getLocation(
-      this.gameOfOrigin,
-      this.metLocationIndex,
-      this.format,
-      false
-    )
+    return getLocation(this.gameOfOrigin, this.metLocationIndex, this.format, false)
   }
 
   public get eggLocation() {
     console.log(this.eggLocationIndex)
     if (!this.eggLocationIndex) return undefined
-    return getLocation(
-      this.gameOfOrigin,
-      this.eggLocationIndex,
-      this.format,
-      true
-    )
+    return getLocation(this.gameOfOrigin, this.eggLocationIndex, this.format, true)
   }
 
   public get shinyLeafValues() {

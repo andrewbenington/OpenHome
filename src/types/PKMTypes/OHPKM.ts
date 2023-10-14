@@ -20,10 +20,7 @@ import {
   OpenHomeRibbons,
 } from '../../consts'
 import { ItemFromString, ItemToString } from '../../resources/gen/items/Items'
-import {
-  AbilityFromString,
-  AbilityToString,
-} from '../../resources/gen/other/Abilities'
+import { AbilityFromString, AbilityToString } from '../../resources/gen/other/Abilities'
 import {
   bytesToUint16BigEndian,
   bytesToUint16LittleEndian,
@@ -34,15 +31,8 @@ import {
   uint16ToBytesLittleEndian,
   uint32ToBytesLittleEndian,
 } from '../../util/ByteLogic'
-import {
-  getHPGen3Onward,
-  getLevelGen3Onward,
-  getStatGen3Onward,
-} from '../../util/StatCalc'
-import {
-  utf16BytesToString,
-  utf16StringToBytes,
-} from '../../util/Strings/StringConverter'
+import { getHPGen3Onward, getLevelGen3Onward, getStatGen3Onward } from '../../util/StatCalc'
+import { utf16BytesToString, utf16StringToBytes } from '../../util/Strings/StringConverter'
 import { PKM } from './PKM'
 import {
   adjustMovePPBetweenFormats,
@@ -69,9 +59,7 @@ export class OHPKM extends PKM {
       super(new Uint8Array(420))
       const prng = new Prando(
         other.trainerName
-          .concat(
-            other.personalityValue?.toString() ?? JSON.stringify(other.dvs)
-          )
+          .concat(other.personalityValue?.toString() ?? JSON.stringify(other.dvs))
           .concat(other.secretID.toString())
           .concat(other.trainerID.toString())
       )
@@ -90,34 +78,22 @@ export class OHPKM extends PKM {
           this.markings = temp
         })
       }
-      if (
-        other.gameOfOrigin >= GameOfOrigin.Red &&
-        other.gameOfOrigin <= GameOfOrigin.Crystal
-      ) {
+      if (other.gameOfOrigin >= GameOfOrigin.Red && other.gameOfOrigin <= GameOfOrigin.Crystal) {
         this.abilityNum = 4
       } else {
         this.abilityNum = other.abilityNum ?? (this.personalityValue & 1) + 1
       }
-      this.ability = getAbilityFromNumber(
-        this.dexNum,
-        this.formNum,
-        this.abilityNum
-      )
+      this.ability = getAbilityFromNumber(this.dexNum, this.formNum, this.abilityNum)
       this.abilityIndex = AbilityFromString(this.ability)
       this.alphaMove = other.alphaMove ?? 0
       this.gender = other.gender
       if (other.personalityValue !== undefined) {
         this.personalityValue = other.personalityValue
       } else {
-        this.personalityValue = generatePersonalityValuePreservingAttributes(
-          other,
-          prng
-        )
+        this.personalityValue = generatePersonalityValuePreservingAttributes(other, prng)
       }
       this.encryptionConstant =
-        other.encryptionConstant ??
-        other.personalityValue ??
-        prng.nextInt(0, 0xffffffff)
+        other.encryptionConstant ?? other.personalityValue ?? prng.nextInt(0, 0xffffffff)
       this.nature = other.nature ?? this.personalityValue % 25
       this.statNature = other.statNature ?? this.nature
       this.isFatefulEncounter = other.isFatefulEncounter
@@ -136,15 +112,9 @@ export class OHPKM extends PKM {
       this.contestMemoryCount = other.contestMemoryCount
       this.battleMemoryCount = other.battleMemoryCount
       const contestRibbons = _.intersection(other.ribbons, Gen34ContestRibbons)
-      this.contestMemoryCount = Math.max(
-        contestRibbons.length,
-        this.contestMemoryCount
-      )
+      this.contestMemoryCount = Math.max(contestRibbons.length, this.contestMemoryCount)
       const battleRibbons = _.intersection(other.ribbons, Gen34TowerRibbons)
-      this.battleMemoryCount = Math.max(
-        battleRibbons.length,
-        this.battleMemoryCount
-      )
+      this.battleMemoryCount = Math.max(battleRibbons.length, this.battleMemoryCount)
       const ribbons = other.ribbons
       if (this.contestMemoryCount) {
         ribbons.push('Contest Memory')
@@ -174,9 +144,7 @@ export class OHPKM extends PKM {
       this.isNicknamed = other.isNicknamed
       this.dynamaxLevel = other.dynamaxLevel ?? 0
       this.teraTypeOriginal =
-        other.teraTypeOriginal ??
-        generateTeraType(prng, this.dexNum, this.formNum) ??
-        0
+        other.teraTypeOriginal ?? generateTeraType(prng, this.dexNum, this.formNum) ?? 0
       this.teraTypeOverride = other.teraTypeOverride ?? 0x13
       this.unknownA0 = other.unknownA0 ?? 0
       this.gvs = other.gvs ?? gvsFromIVs(this.ivs)
@@ -440,14 +408,11 @@ export class OHPKM extends PKM {
     ] as any as [marking, marking, marking, marking, marking, marking]
   }
 
-  public set markings(
-    value: [marking, marking, marking, marking, marking, marking]
-  ) {
+  public set markings(value: [marking, marking, marking, marking, marking, marking]) {
     let markingsValue = 0
     for (let i = 0; i < 6; i++) {
       const shift = i * 2
-      markingsValue =
-        (markingsValue & (0xffff ^ (3 << shift))) | (value[i] << shift)
+      markingsValue = (markingsValue & (0xffff ^ (3 << shift))) | (value[i] << shift)
     }
     this.bytes.set(uint16ToBytesLittleEndian(markingsValue), 0x18)
   }
@@ -594,10 +559,7 @@ export class OHPKM extends PKM {
     for (let byte = 0; byte < 22; byte++) {
       const ribbonsUint8 = rBytes[byte]
       for (let bit = 0; bit < 8; bit++) {
-        if (
-          ribbonsUint8 & (2 ** bit) &&
-          8 * byte + bit < OpenHomeRibbons.length
-        ) {
+        if (ribbonsUint8 & (2 ** bit) && 8 * byte + bit < OpenHomeRibbons.length) {
           ribbons.push(OpenHomeRibbons[8 * byte + bit])
         }
       }
@@ -663,12 +625,7 @@ export class OHPKM extends PKM {
   }
 
   public get movePP() {
-    return [
-      this.bytes[0x5c],
-      this.bytes[0x5d],
-      this.bytes[0x5e],
-      this.bytes[0x5f],
-    ]
+    return [this.bytes[0x5c], this.bytes[0x5d], this.bytes[0x5e], this.bytes[0x5f]]
   }
 
   public set movePP(value: [number, number, number, number]) {
@@ -691,12 +648,7 @@ export class OHPKM extends PKM {
   }
 
   public get movePPUps() {
-    return [
-      this.bytes[0x86],
-      this.bytes[0x87],
-      this.bytes[0x88],
-      this.bytes[0x89],
-    ]
+    return [this.bytes[0x86], this.bytes[0x87], this.bytes[0x88], this.bytes[0x89]]
   }
 
   public set movePPUps(value: [number, number, number, number]) {
@@ -1420,23 +1372,15 @@ export class OHPKM extends PKM {
 
     // memory ribbons need to be updated if new ribbons were earned to add to the count
     const contestRibbons = _.intersection(this.ribbons, Gen34ContestRibbons)
-    this.contestMemoryCount = Math.max(
-      contestRibbons.length,
-      this.contestMemoryCount
-    )
+    this.contestMemoryCount = Math.max(contestRibbons.length, this.contestMemoryCount)
     const battleRibbons = _.intersection(this.ribbons, Gen34TowerRibbons)
-    this.battleMemoryCount = Math.max(
-      battleRibbons.length,
-      this.battleMemoryCount
-    )
+    this.battleMemoryCount = Math.max(battleRibbons.length, this.battleMemoryCount)
 
     if (other.markings !== undefined) {
       if (!formatHasColorMarkings(other.format)) {
         for (let i = 0; i < other.markings.length; i++) {
           this.markings[i] = (
-            other.markings[i] > 0
-              ? Math.max(this.markings[i], other.markings[i])
-              : 0
+            other.markings[i] > 0 ? Math.max(this.markings[i], other.markings[i]) : 0
           ) as marking
         }
       } else {

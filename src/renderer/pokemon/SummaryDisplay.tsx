@@ -76,9 +76,7 @@ const SummaryDisplay = (props: { mon: PKM }) => {
           {mon.heldItem !== 'None' && (
             <img
               alt="item icon"
-              src={getPublicImageURL(
-                getItemIconPath(mon.heldItemIndex, mon.format)
-              )}
+              src={getPublicImageURL(getItemIconPath(mon.heldItemIndex, mon.format))}
               style={{ width: 24, height: 24, marginRight: 5 }}
             />
           )}
@@ -94,29 +92,19 @@ const SummaryDisplay = (props: { mon: PKM }) => {
         />
         <AttributeRow label="Dex No." value={`${mon.dexNum}`} />
         <AttributeRow label="Type">
-          {getTypes(mon)?.map((type) => (
-            <TypeIcon type={type} key={`${type}_type_icon`} />
-          ))}
+          {getTypes(mon)?.map((type) => <TypeIcon type={type} key={`${type}_type_icon`} />)}
         </AttributeRow>
-        <AttributeRow
-          label="OT"
-          value={`${mon.trainerName} ${mon.trainerGender ? '♀' : '♂'}`}
-        />
+        <AttributeRow label="OT" value={`${mon.trainerName} ${mon.trainerGender ? '♀' : '♂'}`} />
         <AttributeRow
           label="Trainer ID"
           value={`${mon.displayID
             .toString()
-            .padStart(
-              ['PK7', 'PK8', 'PA8', 'PK9'].includes(mon.format) ? 6 : 5,
-              '0'
-            )}`}
+            .padStart(['PK7', 'PK8', 'PA8', 'PK9'].includes(mon.format) ? 6 : 5, '0')}`}
         />
         {mon.ability !== undefined && (
           <AttributeRow
             label="Ability"
-            value={`${mon.ability} (${
-              mon.abilityNum === 4 ? 'HA' : mon.abilityNum
-            })`}
+            value={`${mon.ability} (${mon.abilityNum === 4 ? 'HA' : mon.abilityNum})`}
           />
         )}
         <AttributeRow label="Level" justifyEnd>

@@ -31,12 +31,9 @@ const SaveDisplay = (props: SaveDisplayProps) => {
   const { saveIndex, setSelectedMon } = props
   const dispatch = useAppDispatch()
 
-  const dispatchSetBox = (box: number) =>
-    dispatch(setSaveBox({ saveNumber: saveIndex, box }))
-  const dispatchStartDrag = (source: SaveCoordinates) =>
-    dispatch(startDrag(source))
-  const dispatchCompleteDrag = (dest: SaveCoordinates) =>
-    dispatch(completeDrag(dest))
+  const dispatchSetBox = (box: number) => dispatch(setSaveBox({ saveNumber: saveIndex, box }))
+  const dispatchStartDrag = (source: SaveCoordinates) => dispatch(startDrag(source))
+  const dispatchCompleteDrag = (dest: SaveCoordinates) => dispatch(completeDrag(dest))
   const dispatchRemoveSaveAt = (index: number) => dispatch(removeSaveAt(index))
   const dispatchImportMons = (mons: PKM[], saveCoordinates: SaveCoordinates) =>
     dispatch(importMons({ mons, saveCoordinates }))
@@ -69,9 +66,7 @@ const SaveDisplay = (props: SaveDisplayProps) => {
         >
           <OpenHomeButton
             style={{
-              color: save.updatedBoxSlots.length
-                ? palette.text.disabled
-                : palette.text.secondary,
+              color: save.updatedBoxSlots.length ? palette.text.disabled : palette.text.secondary,
               fontWeight: 'bold',
               backgroundColor: palette.secondary.main,
             }}
@@ -110,9 +105,7 @@ const SaveDisplay = (props: SaveDisplayProps) => {
                 <ArrowButton
                   onClick={() =>
                     dispatchSetBox(
-                      save.currentPCBox > 0
-                        ? save.currentPCBox - 1
-                        : save.boxes.length - 1
+                      save.currentPCBox > 0 ? save.currentPCBox - 1 : save.boxes.length - 1
                     )
                   }
                 >
@@ -130,9 +123,7 @@ const SaveDisplay = (props: SaveDisplayProps) => {
                 }}
               >
                 <ArrowButton
-                  onClick={() =>
-                    dispatchSetBox((save.currentPCBox + 1) % save.boxes.length)
-                  }
+                  onClick={() => dispatchSetBox((save.currentPCBox + 1) % save.boxes.length)}
                 >
                   <ArrowForward fontSize="small" />
                 </ArrowButton>
@@ -142,9 +133,7 @@ const SaveDisplay = (props: SaveDisplayProps) => {
               <Grid container key={`pc_row_${row}`}>
                 {_.range(save.boxColumns).map((rowIndex: number) => {
                   const mon =
-                    save.boxes[save.currentPCBox].pokemon[
-                      row * save.boxColumns + rowIndex
-                    ]
+                    save.boxes[save.currentPCBox].pokemon[row * save.boxColumns + rowIndex]
                   return (
                     <Grid
                       key={`pc_row_${row}_slot_${rowIndex}`}

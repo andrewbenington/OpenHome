@@ -1,11 +1,4 @@
-import {
-  BrowserWindow,
-  Menu,
-  MenuItemConstructorOptions,
-  app,
-  dialog,
-  shell,
-} from 'electron'
+import { BrowserWindow, Menu, MenuItemConstructorOptions, app, dialog, shell } from 'electron'
 
 interface DarwinMenuItemConstructorOptions extends MenuItemConstructorOptions {
   selector?: string
@@ -20,17 +13,11 @@ export default class MenuBuilder {
   }
 
   buildMenu(): Menu {
-    if (
-      process.env.NODE_ENV === 'development' ||
-      process.env.DEBUG_PROD === 'true'
-    ) {
+    if (process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true') {
       this.setupDevelopmentEnvironment()
     }
 
-    const template = this.buildMenuTemplate(
-      this.mainWindow,
-      process.platform === 'darwin'
-    )
+    const template = this.buildMenuTemplate(this.mainWindow, process.platform === 'darwin')
 
     const menu = Menu.buildFromTemplate(template)
     Menu.setApplicationMenu(menu)
@@ -53,10 +40,7 @@ export default class MenuBuilder {
     })
   }
 
-  buildMenuTemplate(
-    mainWindow: BrowserWindow,
-    isMac: boolean
-  ): MenuItemConstructorOptions[] {
+  buildMenuTemplate(mainWindow: BrowserWindow, isMac: boolean): MenuItemConstructorOptions[] {
     const subMenuAbout: DarwinMenuItemConstructorOptions = {
       label: 'OpenHome',
       submenu: [
@@ -207,8 +191,7 @@ export default class MenuBuilder {
     }
 
     const subMenuView =
-      process.env.NODE_ENV === 'development' ||
-      process.env.DEBUG_PROD === 'true'
+      process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true'
         ? subMenuViewDev
         : subMenuViewProd
 

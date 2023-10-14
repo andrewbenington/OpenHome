@@ -1,10 +1,7 @@
 import { NDex } from '../../consts'
 import { CapPikachus, RegionalForms } from '../TransferRestrictions'
 import { SaveType } from '../types'
-import {
-  bytesToUint16LittleEndian,
-  bytesToUint32LittleEndian,
-} from '../../util/ByteLogic'
+import { bytesToUint16LittleEndian, bytesToUint32LittleEndian } from '../../util/ByteLogic'
 import { gen4StringToUTF } from '../../util/Strings/StringConverter'
 import { G4SAV } from './G4SAV'
 
@@ -58,20 +55,13 @@ export class DPSAV extends G4SAV {
     // current storage block could be either the first or second one,
     // depending on save count
     if (
-      this.getCurrentSaveCount(
-        DPSAV.STORAGE_BLOCK_OFFSET,
-        DPSAV.STORAGE_BLOCK_SIZE
-      ) <
-      this.getCurrentSaveCount(
-        DPSAV.STORAGE_BLOCK_OFFSET + 0x40000,
-        DPSAV.STORAGE_BLOCK_SIZE
-      )
+      this.getCurrentSaveCount(DPSAV.STORAGE_BLOCK_OFFSET, DPSAV.STORAGE_BLOCK_SIZE) <
+      this.getCurrentSaveCount(DPSAV.STORAGE_BLOCK_OFFSET + 0x40000, DPSAV.STORAGE_BLOCK_SIZE)
     ) {
       this.currentSaveStorageBlockOffset += 0x40000
     }
     this.currentSaveBoxStartOffset = this.currentSaveStorageBlockOffset + 4
-    this.boxNamesOffset =
-      this.currentSaveStorageBlockOffset + DPSAV.BOX_NAMES_OFFSET
+    this.boxNamesOffset = this.currentSaveStorageBlockOffset + DPSAV.BOX_NAMES_OFFSET
     this.name = gen4StringToUTF(bytes, DPSAV.TRAINER_NAME_OFFSET, 8)
     this.tid = bytesToUint16LittleEndian(bytes, DPSAV.TRAINER_ID_OFFSET)
     this.sid = bytesToUint16LittleEndian(bytes, DPSAV.TRAINER_ID_OFFSET + 2)
@@ -80,9 +70,6 @@ export class DPSAV extends G4SAV {
   }
 
   getCurrentSaveCount(blockOffset: number, blockSize: number) {
-    return bytesToUint32LittleEndian(
-      this.bytes,
-      blockOffset + blockSize - this.footerSize
-    )
+    return bytesToUint32LittleEndian(this.bytes, blockOffset + blockSize - this.footerSize)
   }
 }

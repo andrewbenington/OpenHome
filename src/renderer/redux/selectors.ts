@@ -15,11 +15,7 @@ import {
   writeAllHomeData,
   writeAllSaveFiles,
 } from './slices/appSlice'
-import {
-  removeRecentSave,
-  selectRecentSaves,
-  upsertRecentSave,
-} from './slices/recentSavesSlice'
+import { removeRecentSave, selectRecentSaves, upsertRecentSave } from './slices/recentSavesSlice'
 import { selectResourcesPath } from './slices/resourcesSlice'
 
 type LookupMapsHook = [
@@ -36,16 +32,9 @@ export const useModifiedOHPKMs = () => useAppSelector(selectModifiedOHPKMs)
 export const useMonsToDelete = () => useAppSelector(selectMonsToDelete)
 export const useSaveFunctions = (): [() => void, () => void] => {
   const dispatch = useAppDispatch()
-  return [
-    () => dispatch(writeAllSaveFiles()),
-    () => dispatch(writeAllHomeData()),
-  ]
+  return [() => dispatch(writeAllSaveFiles()), () => dispatch(writeAllHomeData())]
 }
-export const useRecentSaves = (): [
-  SaveRefMap,
-  (_: SAV) => void,
-  (_: string) => void,
-] => {
+export const useRecentSaves = (): [SaveRefMap, (_: SAV) => void, (_: string) => void] => {
   const dispatch = useAppDispatch()
   return [
     useAppSelector(selectRecentSaves),
