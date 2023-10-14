@@ -23,25 +23,17 @@ test('gen 3 stat calculations', () => {
 })
 
 const blazikenOH = bytesToPKM(
-  new Uint8Array(
-    fs.readFileSync(path.join(__dirname, './PKMFiles/OH', 'blaziken.ohpkm'))
-  ),
+  new Uint8Array(fs.readFileSync(path.join(__dirname, './PKMFiles/OH', 'blaziken.ohpkm'))),
   'OHPKM'
 ) as OHPKM
 
 const blazikenGen3 = bytesToPKM(
-  new Uint8Array(
-    fs.readFileSync(path.join(__dirname, './PKMFiles/Gen3', 'blaziken.pkm'))
-  ),
+  new Uint8Array(fs.readFileSync(path.join(__dirname, './PKMFiles/Gen3', 'blaziken.pkm'))),
   'PK3'
 ) as OHPKM
 
 const slowpokeOH = bytesToPKM(
-  new Uint8Array(
-    fs.readFileSync(
-      path.join(__dirname, './PKMFiles/OH', 'slowpoke-shiny.ohpkm')
-    )
-  ),
+  new Uint8Array(fs.readFileSync(path.join(__dirname, './PKMFiles/OH', 'slowpoke-shiny.ohpkm'))),
   'OHPKM'
 ) as OHPKM
 
@@ -116,9 +108,7 @@ test('gen 3 conversion to OHPKM and back is lossless', () => {
 
 test('pk3 and ohpkm have the same gen345Lookup key', () => {
   const ohPKM = new OHPKM(blazikenGen3)
-  expect(getMonGen345Identifier(ohPKM)).toEqual(
-    getMonGen345Identifier(blazikenGen3)
-  )
+  expect(getMonGen345Identifier(ohPKM)).toEqual(getMonGen345Identifier(blazikenGen3))
 })
 
 test('gen 6+ nickname accuracy', () => {

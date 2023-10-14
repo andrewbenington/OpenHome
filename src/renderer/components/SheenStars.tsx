@@ -33,9 +33,7 @@ const getSheenStars = (mon: PKM) => {
     return 0
   }
   if (mon instanceof PK3 || mon instanceof COLOPKM || mon instanceof XDPKM) {
-    return mon.contest.sheen === 255
-      ? 10
-      : Math.floor(mon.contest.sheen / 29) + 1
+    return mon.contest.sheen === 255 ? 10 : Math.floor(mon.contest.sheen / 29) + 1
   }
   if (mon.contest.sheen < 22) {
     return 0
@@ -85,14 +83,12 @@ const SheenStars = (props: SheenStarsProps) => {
       <div
         style={{
           ...styles.starRow,
-          width:
-            mon instanceof PK3 || mon instanceof COLOPKM || mon instanceof XDPKM
-              ? 300
-              : 360,
+          width: mon instanceof PK3 || mon instanceof COLOPKM || mon instanceof XDPKM ? 300 : 360,
         }}
       >
         {_.range(getSheenStars(mon)).map((level: number) => (
           <img
+            key={`sheen_star_${level}`}
             alt={`sheen star ${level}`}
             src={getPublicImageURL('images/icons/Sheen.gif')}
             style={styles.star}

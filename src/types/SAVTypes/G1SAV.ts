@@ -6,10 +6,7 @@ import { PK1 } from '../PKMTypes/PK1'
 import { SaveType } from '../types'
 import { bytesToUint16BigEndian, get8BitChecksum } from '../../util/ByteLogic'
 import { natDexToGen1ID } from '../../util/ConvertPokemonID'
-import {
-  gen12StringToUTF,
-  utf16StringToGen12,
-} from '../../util/Strings/StringConverter'
+import { gen12StringToUTF, utf16StringToGen12 } from '../../util/Strings/StringConverter'
 import { Box, SAV } from './SAV'
 
 class G1Box implements Box {
@@ -67,10 +64,7 @@ export class G1SAV extends SAV {
       currenBoxByteOffset = 0x6000 + (this.currentPCBox - 6) * this.BOX_SIZE
     }
     this.bytes.set(
-      this.bytes.slice(
-        this.CURRENT_BOX_DATA_OFFSET,
-        this.CURRENT_BOX_DATA_OFFSET + this.BOX_SIZE
-      ),
+      this.bytes.slice(this.CURRENT_BOX_DATA_OFFSET, this.CURRENT_BOX_DATA_OFFSET + this.BOX_SIZE),
       currenBoxByteOffset
     )
     switch (this.saveType) {
@@ -94,19 +88,11 @@ export class G1SAV extends SAV {
           boxByteOffset = 0x6000 + (boxNumber - 6) * this.BOX_SIZE
         }
         for (let monIndex = 0; monIndex < pokemonPerBox; monIndex++) {
-          if (
-            this.bytes[
-              boxByteOffset + this.BOX_PKM_OFFSET + monIndex * this.BOX_PKM_SIZE
-            ]
-          ) {
+          if (this.bytes[boxByteOffset + this.BOX_PKM_OFFSET + monIndex * this.BOX_PKM_SIZE]) {
             const mon = new PK1(
               this.bytes.slice(
-                boxByteOffset +
-                  this.BOX_PKM_OFFSET +
-                  monIndex * this.BOX_PKM_SIZE,
-                boxByteOffset +
-                  this.BOX_PKM_OFFSET +
-                  (monIndex + 1) * this.BOX_PKM_SIZE
+                boxByteOffset + this.BOX_PKM_OFFSET + monIndex * this.BOX_PKM_SIZE,
+                boxByteOffset + this.BOX_PKM_OFFSET + (monIndex + 1) * this.BOX_PKM_SIZE
               )
             )
             mon.trainerName = gen12StringToUTF(
@@ -130,9 +116,7 @@ export class G1SAV extends SAV {
 
   prepareBoxesForSaving() {
     const changedMonPKMs: OHPKM[] = []
-    const changedBoxes: number[] = uniq(
-      this.updatedBoxSlots.map((coords) => coords.box)
-    )
+    const changedBoxes: number[] = uniq(this.updatedBoxSlots.map((coords) => coords.box))
     const pokemonPerBox = this.boxRows * this.boxColumns
     changedBoxes.forEach((boxNumber) => {
       let boxByteOffset: number
@@ -150,29 +134,18 @@ export class G1SAV extends SAV {
           }
           const PK1Mon = boxMon instanceof PK1 ? boxMon : new PK1(boxMon)
           // set the mon's dex number in the box
-          this.bytes[boxByteOffset + 1 + numMons] =
-            natDexToGen1ID[PK1Mon.dexNum]
+          this.bytes[boxByteOffset + 1 + numMons] = natDexToGen1ID[PK1Mon.dexNum]
           // set the mon's data in the box
           this.bytes.set(
             PK1Mon.bytes,
             boxByteOffset + this.BOX_PKM_OFFSET + numMons * this.BOX_PKM_SIZE
           )
           // set the mon's OT name in the box
-          const trainerNameBuffer = utf16StringToGen12(
-            PK1Mon.trainerName,
-            11,
-            true
-          )
-          this.bytes.set(
-            trainerNameBuffer,
-            boxByteOffset + this.BOX_OT_OFFSET + numMons * 11
-          )
+          const trainerNameBuffer = utf16StringToGen12(PK1Mon.trainerName, 11, true)
+          this.bytes.set(trainerNameBuffer, boxByteOffset + this.BOX_OT_OFFSET + numMons * 11)
           // set the mon's nickname in the box
           const nicknameBuffer = utf16StringToGen12(PK1Mon.nickname, 11, true)
-          this.bytes.set(
-            nicknameBuffer,
-            boxByteOffset + this.BOX_NICKNAME_OFFSET + numMons * 11
-          )
+          this.bytes.set(nicknameBuffer, boxByteOffset + this.BOX_NICKNAME_OFFSET + numMons * 11)
           numMons++
         }
       })
@@ -196,10 +169,7 @@ export class G1SAV extends SAV {
         )
       }
       // set all dex numbers to 0xFF or add terminator
-      this.bytes.set(
-        new Uint8Array(remainingSlots + 1).fill(0xff),
-        boxByteOffset + 1 + numMons
-      )
+      this.bytes.set(new Uint8Array(remainingSlots + 1).fill(0xff), boxByteOffset + 1 + numMons)
       let boxChecksumOffset
       if (boxNumber < 6) {
         boxChecksumOffset = 0x5a4d + boxNumber
@@ -207,11 +177,7 @@ export class G1SAV extends SAV {
         boxChecksumOffset = 0x7a4d + boxNumber
       }
       const boxChecksum =
-        get8BitChecksum(
-          this.bytes,
-          boxByteOffset,
-          boxByteOffset + this.BOX_SIZE
-        ) ^ 0xff
+        get8BitChecksum(this.bytes, boxByteOffset, boxByteOffset + this.BOX_SIZE) ^ 0xff
       this.bytes[boxChecksumOffset] = boxChecksum
       if (boxNumber === this.currentPCBox) {
         this.bytes.set(

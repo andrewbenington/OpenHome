@@ -52,10 +52,7 @@ export const bytesToPKM = (bytes: Uint8Array, extension: string): PKM => {
   if (extension === 'PK3' || bytes.length === 100 || bytes.length === 80) {
     return new PK3(bytes)
   }
-  if (
-    bytes[0x5f] < 20 &&
-    (extension === 'PK4' || bytes.length === 136 || bytes.length === 236)
-  ) {
+  if (bytes[0x5f] < 20 && (extension === 'PK4' || bytes.length === 136 || bytes.length === 236)) {
     return new PK4(bytes)
   }
   if (

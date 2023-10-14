@@ -20,9 +20,7 @@ const PKMLoader = () => {
   useEffect(() => {
     if (filesContent) {
       const fileMons = filesContent.map((fileContent) => {
-        const bytes = new Uint8Array(
-          fileContent.content as unknown as ArrayBuffer
-        )
+        const bytes = new Uint8Array(fileContent.content as unknown as ArrayBuffer)
         const [extension] = fileContent.name.split('.').slice(-1)
         return bytesToPKM(bytes, extension)
       })
@@ -38,9 +36,7 @@ const PKMLoader = () => {
         </Button>
         <Select
           value={propTab}
-          onChange={(event) =>
-            setPropTab((event?.target?.value as string) ?? 'summary')
-          }
+          onChange={(event) => setPropTab((event?.target?.value as string) ?? 'summary')}
         >
           <MenuItem value="summary">Summary</MenuItem>
           <MenuItem value="stats">Stats</MenuItem>
@@ -50,7 +46,9 @@ const PKMLoader = () => {
       </div>
       {mons
         ?.slice(page * pageSize, (page + 1) * pageSize)
-        ?.map((mon) => <PokemonDisplay mon={mon} tab="" setTab={() => {}} />)}
+        ?.map((mon, i) => (
+          <PokemonDisplay key={`pokemon_${i}`} mon={mon} tab="" setTab={() => {}} />
+        ))}
       <Pagination
         count={Math.ceil(mons.length / 100)}
         page={page + 1}

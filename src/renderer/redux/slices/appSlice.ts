@@ -1,10 +1,4 @@
-import {
-  createAsyncThunk,
-  createSlice,
-  current,
-  Draft,
-  PayloadAction,
-} from '@reduxjs/toolkit'
+import { createAsyncThunk, createSlice, current, Draft, PayloadAction } from '@reduxjs/toolkit'
 import { OHPKM, PKM } from '../../../types/PKMTypes'
 import { G1SAV, G2SAV, G3SAV, G4SAV, G5SAV, SAV } from '../../../types/SAVTypes'
 import { HomeData } from '../../../types/SAVTypes/HomeData'
@@ -42,19 +36,13 @@ export const loadHomeMons = createAsyncThunk('app/loadHomeMons', async () => {
   return window.electron.ipcRenderer.invoke('read-home-mons')
 })
 
-export const loadGen12Lookup = createAsyncThunk(
-  'app/loadGen12Lookup',
-  async () => {
-    return window.electron.ipcRenderer.invoke('read-gen12-lookup')
-  }
-)
+export const loadGen12Lookup = createAsyncThunk('app/loadGen12Lookup', async () => {
+  return window.electron.ipcRenderer.invoke('read-gen12-lookup')
+})
 
-export const loadGen345Lookup = createAsyncThunk(
-  'app/loadGen345Lookup',
-  async () => {
-    return window.electron.ipcRenderer.invoke('read-gen345-lookup')
-  }
-)
+export const loadGen345Lookup = createAsyncThunk('app/loadGen345Lookup', async () => {
+  return window.electron.ipcRenderer.invoke('read-gen345-lookup')
+})
 
 const updateMonInSave = (
   state: Draft<AppState>,
@@ -104,9 +92,7 @@ export const appSlice = createSlice({
       const { mons, saveCoordinates } = action.payload
       let nextIndex = saveCoordinates.index
       const isHome = saveCoordinates.saveNumber === -1
-      const tempSave = isHome
-        ? state.homeData
-        : state.saves[saveCoordinates.saveNumber]
+      const tempSave = isHome ? state.homeData : state.saves[saveCoordinates.saveNumber]
       mons.forEach((mon) => {
         const homeMon = new OHPKM(mon)
         while (
@@ -205,9 +191,7 @@ export const appSlice = createSlice({
             })
           } else if (
             changedMons &&
-            (save instanceof G3SAV ||
-              save instanceof G4SAV ||
-              save instanceof G5SAV)
+            (save instanceof G3SAV || save instanceof G4SAV || save instanceof G5SAV)
           ) {
             if (!state.lookup.gen345) {
               console.error('no gen345 map loaded. cancelling save')
@@ -249,11 +233,7 @@ export const appSlice = createSlice({
       state.homeData.updatedBoxSlots = []
       state.monsToDelete.forEach((mon) => {
         const gen345Identifier = getMonGen345Identifier(mon as OHPKM)
-        if (
-          state.lookup.gen345 &&
-          gen345Identifier &&
-          gen345Identifier in state.lookup.gen345
-        ) {
+        if (state.lookup.gen345 && gen345Identifier && gen345Identifier in state.lookup.gen345) {
           delete state.lookup.gen345[gen345Identifier]
           appSlice.caseReducers.writeGen345Lookup(state, {
             type: '',
@@ -261,11 +241,7 @@ export const appSlice = createSlice({
           })
         }
         const gen12Identifier = getMonGen12Identifier(mon as OHPKM)
-        if (
-          state.lookup.gen12 &&
-          gen12Identifier &&
-          gen12Identifier in state.lookup.gen12
-        ) {
+        if (state.lookup.gen12 && gen12Identifier && gen12Identifier in state.lookup.gen12) {
           delete state.lookup.gen12[gen12Identifier]
           appSlice.caseReducers.writeGen12Lookup(state, {
             type: '',
@@ -275,16 +251,10 @@ export const appSlice = createSlice({
       })
       state.monsToDelete = []
     },
-    setGen12Lookup: (
-      state,
-      action: PayloadAction<{ [key: string]: string }>
-    ) => {
+    setGen12Lookup: (state, action: PayloadAction<{ [key: string]: string }>) => {
       state.lookup.gen12 = action.payload
     },
-    updateGen12Lookup: (
-      state,
-      action: PayloadAction<{ key: string; value: string }[]>
-    ) => {
+    updateGen12Lookup: (state, action: PayloadAction<{ key: string; value: string }[]>) => {
       action.payload.forEach(({ key, value }) => {
         if (!state.lookup.gen12) {
           console.error('attempted to save before gen12 map loaded. cancelling')
@@ -307,16 +277,10 @@ export const appSlice = createSlice({
           newLookupMap[key] = value
         }
       })
-      window.electron.ipcRenderer.invoke(
-        'write-gen12-lookup',
-        current(newLookupMap)
-      )
+      window.electron.ipcRenderer.invoke('write-gen12-lookup', current(newLookupMap))
       state.lookup.gen12 = newLookupMap
     },
-    setGen345Lookup: (
-      state,
-      action: PayloadAction<{ [key: string]: string }>
-    ) => {
+    setGen345Lookup: (state, action: PayloadAction<{ [key: string]: string }>) => {
       state.lookup.gen345 = action.payload
     },
     writeGen345Lookup: (state, action: PayloadAction<OHPKM[]>) => {
@@ -333,10 +297,7 @@ export const appSlice = createSlice({
           newLookupMap[key] = value
         }
       })
-      window.electron.ipcRenderer.invoke(
-        'write-gen345-lookup',
-        current(newLookupMap)
-      )
+      window.electron.ipcRenderer.invoke('write-gen345-lookup', current(newLookupMap))
       state.lookup.gen345 = newLookupMap
     },
   },
@@ -399,8 +360,7 @@ export const selectHomeData = (state: RootState) => state.app.homeData
 export const selectHomeMons = (state: RootState) => state.app.lookup.homeMons
 export const selectDragSource = (state: RootState) => state.app.dragSource
 export const selectDragMon = (state: RootState) => state.app.dragMon
-export const selectModifiedOHPKMs = (state: RootState) =>
-  state.app.modifiedOHPKMs
+export const selectModifiedOHPKMs = (state: RootState) => state.app.modifiedOHPKMs
 export const selectGen12Lookup = (state: RootState) => state.app.lookup.gen12
 export const selectGen345Lookup = (state: RootState) => state.app.lookup.gen345
 export const selectMonsToDelete = (state: RootState) => state.app.monsToDelete

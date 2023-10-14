@@ -36,7 +36,8 @@
     "build:mac": "electron-vite build && electron-builder --mac --config",
     "build:linux": "electron-vite build && electron-builder --linux --config",
     "build:no-mac": "electron-vite build && electron-builder --linux  --win --config",
-    "build:all": "electron-vite build && electron-builder --linux --mac --win --config"
+    "build:all": "electron-vite build && electron-builder --linux --mac --win --config",
+    "release": "electron-builder -wl"
   },
   "dependencies": {
     "@electron-toolkit/preload": "^2.0.0",

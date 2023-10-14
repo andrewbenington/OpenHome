@@ -1,9 +1,6 @@
 import { statsPreSplit } from '../../types/types'
 import { GameOfOrigin, POKEMON_DATA } from '../../consts'
-import {
-  ItemGen2FromString,
-  ItemGen2ToString,
-} from '../../resources/gen/items/Gen2'
+import { ItemGen2FromString, ItemGen2ToString } from '../../resources/gen/items/Gen2'
 import {
   bytesToUint16BigEndian,
   bytesToUint24BigEndian,
@@ -111,12 +108,7 @@ export class PK1 extends PKM {
   }
 
   public get moves() {
-    return [
-      this.bytes[0x08],
-      this.bytes[0x09],
-      this.bytes[0x0a],
-      this.bytes[0x0b],
-    ]
+    return [this.bytes[0x08], this.bytes[0x09], this.bytes[0x0a], this.bytes[0x0b]]
   }
 
   public set moves(value: [number, number, number, number]) {
@@ -214,8 +206,7 @@ export class PK1 extends PKM {
 
   public set movePP(value: [number, number, number, number]) {
     for (let i = 0; i < 4; i++) {
-      this.bytes[0x1d + i] =
-        (this.bytes[0x1d + i] & 0b11000000) | (value[i] & 0b00111111)
+      this.bytes[0x1d + i] = (this.bytes[0x1d + i] & 0b11000000) | (value[i] & 0b00111111)
     }
   }
 
@@ -230,8 +221,7 @@ export class PK1 extends PKM {
 
   public set movePPUps(value: [number, number, number, number]) {
     for (let i = 0; i < 4; i++) {
-      this.bytes[0x1d + i] =
-        (this.bytes[0x1d + i] & 0b00111111) | ((value[i] << 6) & 0b11000000)
+      this.bytes[0x1d + i] = (this.bytes[0x1d + i] & 0b00111111) | ((value[i] << 6) & 0b11000000)
     }
   }
 
@@ -277,28 +267,15 @@ export class PK1 extends PKM {
       const validMovePP = adjustMovePPBetweenFormats(this, other).filter(
         (_, i) => other.moves[i] <= GEN1_MOVE_MAX
       )
-      const validMovePPUps = other.movePPUps.filter(
-        (_, i) => other.moves[i] <= GEN1_MOVE_MAX
-      )
+      const validMovePPUps = other.movePPUps.filter((_, i) => other.moves[i] <= GEN1_MOVE_MAX)
       this.moves = [validMoves[0], validMoves[1], validMoves[2], validMoves[3]]
-      this.movePPUps = [
-        validMovePPUps[0],
-        validMovePPUps[1],
-        validMovePPUps[2],
-        validMovePPUps[3],
-      ]
-      this.movePP = [
-        validMovePP[0],
-        validMovePP[1],
-        validMovePP[2],
-        validMovePP[3],
-      ]
+      this.movePPUps = [validMovePPUps[0], validMovePPUps[1], validMovePPUps[2], validMovePPUps[3]]
+      this.movePP = [validMovePP[0], validMovePP[1], validMovePP[2], validMovePP[3]]
       this.evsG12 = other.evsG12
       this.dvs = other.dvs
       const types = getTypes(this)
       this.type1 = types[0] in gen1TypeIndices ? gen1TypeIndices[types[0]] : 0
-      this.type2 =
-        types[1] in gen1TypeIndices ? gen1TypeIndices[types[1]] : this.type1
+      this.type2 = types[1] in gen1TypeIndices ? gen1TypeIndices[types[1]] : this.type1
       this.nickname = other.nickname
       this.trainerName = other.trainerName
       this.gameOfOrigin = other.gameOfOrigin

@@ -1,12 +1,7 @@
 import { app } from 'electron'
 import fs from 'fs'
 import path from 'path'
-import {
-  SaveRef,
-  SaveRefMap,
-  SaveType,
-  StringToStringMap,
-} from '../types/types'
+import { SaveRef, SaveRefMap, SaveType, StringToStringMap } from '../types/types'
 import { readBytesFromFile } from './fileHandlers'
 
 const SaveTypeStrings: { [key: string]: SaveType } = {
@@ -27,15 +22,11 @@ const SaveTypeStrings: { [key: string]: SaveType } = {
 
 export function loadOHPKMs() {
   const appDataPath = app.getPath('appData')
-  const files = fs.readdirSync(
-    path.join(appDataPath, 'OpenHome', 'storage', 'mons')
-  )
+  const files = fs.readdirSync(path.join(appDataPath, 'OpenHome', 'storage', 'mons'))
   const monMap: { [key: string]: Uint8Array } = {}
   files.forEach((file) => {
     if (file.endsWith('.ohpkm')) {
-      const bytes = readBytesFromFile(
-        path.join(appDataPath, 'OpenHome', 'storage', 'mons', file)
-      )
+      const bytes = readBytesFromFile(path.join(appDataPath, 'OpenHome', 'storage', 'mons', file))
       if (bytes) {
         monMap[file.slice(0, file.length - 6)] = bytes
       }
@@ -48,9 +39,7 @@ export function loadLookup(fileName: string) {
   const appDataPath = app.getPath('appData')
   const lookupMap: { [key: string]: string } = {}
   const lookupFileString = fs
-    .readFileSync(
-      path.join(appDataPath, 'OpenHome', 'storage', 'lookup', fileName)
-    )
+    .readFileSync(path.join(appDataPath, 'OpenHome', 'storage', 'lookup', fileName))
     .toString()
   lookupFileString.split(/\r?\n/).forEach((entry) => {
     const [lookupString, monRef] = entry.split(',')
@@ -69,10 +58,7 @@ function writeLookup(fileName: string, lookupMap: StringToStringMap) {
     })
     .join('')
   console.info('writing', fileName)
-  fs.writeFileSync(
-    path.join(appDataPath, 'OpenHome', 'storage', 'lookup', fileName),
-    newCSVString
-  )
+  fs.writeFileSync(path.join(appDataPath, 'OpenHome', 'storage', 'lookup', fileName), newCSVString)
 }
 
 export function loadGen12Lookup() {
@@ -95,14 +81,11 @@ export function loadRecentSaves() {
   const appDataPath = app.getPath('appData')
   const recentSaves: SaveRefMap = {}
   const lookupFileString = fs
-    .readFileSync(
-      path.join(appDataPath, 'OpenHome', 'storage', 'saveFiles.csv')
-    )
+    .readFileSync(path.join(appDataPath, 'OpenHome', 'storage', 'saveFiles.csv'))
     .toString()
   lookupFileString.split(/\r?\n/).forEach((entry) => {
     // eslint-disable-next-line prefer-const
-    let [filePath, saveTypeString, game, trainerName, trainerID, lastOpened] =
-      entry.split(',')
+    let [filePath, saveTypeString, game, trainerName, trainerID, lastOpened] = entry.split(',')
     filePath = decodeURIComponent(filePath)
     const saveType = SaveTypeStrings[saveTypeString]
     if (filePath && saveType) {
@@ -123,17 +106,12 @@ function writeRecentSaves(recentSaves: SaveRefMap) {
   const appDataPath = app.getPath('appData')
   const newCSVString = Object.values(recentSaves)
     .map((saveRef) => {
-      return `${encodeURIComponent(saveRef.filePath)},${
-        SaveType[saveRef.saveType]
-      },${saveRef.game ?? ''},${saveRef.trainerName},${saveRef.trainerID},${
-        saveRef.lastOpened ?? Date.now()
-      }\n`
+      return `${encodeURIComponent(saveRef.filePath)},${SaveType[saveRef.saveType]},${
+        saveRef.game ?? ''
+      },${saveRef.trainerName},${saveRef.trainerID},${saveRef.lastOpened ?? Date.now()}\n`
     })
     .join('')
-  fs.writeFileSync(
-    path.join(appDataPath, 'OpenHome', 'storage', 'saveFiles.csv'),
-    newCSVString
-  )
+  fs.writeFileSync(path.join(appDataPath, 'OpenHome', 'storage', 'saveFiles.csv'), newCSVString)
 }
 
 export function addRecentSave(save: SaveRef) {

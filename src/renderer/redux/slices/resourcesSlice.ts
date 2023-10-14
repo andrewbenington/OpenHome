@@ -1,12 +1,9 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { RootState } from '../state'
 
-export const loadResourcesPath = createAsyncThunk(
-  'resources/load',
-  async () => {
-    return window.electron.ipcRenderer.invoke('get-resources-path')
-  }
-)
+export const loadResourcesPath = createAsyncThunk('resources/load', async () => {
+  return window.electron.ipcRenderer.invoke('get-resources-path')
+})
 
 const initialState: { resourcesPath?: string } = {
   resourcesPath: undefined,
@@ -23,7 +20,6 @@ export const resoursesSlice = createSlice({
   },
 })
 
-export const selectResourcesPath = (state: RootState) =>
-  state.resources.resourcesPath
+export const selectResourcesPath = (state: RootState) => state.resources.resourcesPath
 
 export default resoursesSlice.reducer

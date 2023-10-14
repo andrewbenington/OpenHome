@@ -1,11 +1,5 @@
-import {
-  bytesToUint32LittleEndian,
-  bytesToUint64LittleEndian,
-} from '../../util/ByteLogic'
-import {
-  getMonGen12Identifier,
-  getMonGen345Identifier,
-} from '../../util/Lookup'
+import { bytesToUint32LittleEndian, bytesToUint64LittleEndian } from '../../util/ByteLogic'
+import { getMonGen12Identifier, getMonGen345Identifier } from '../../util/Lookup'
 import { OHPKM, PKM } from '../PKMTypes'
 import { SaveType, StringToStringMap } from '../types'
 import { DPSAV } from './DPSAV'
@@ -41,9 +35,7 @@ const recoverOHPKMData = (
         const homeIdentifier = lookupMap[lookupIdentifier]
         if (!homeIdentifier) return
         // console.log(identifier.slice(0, identifier.length - 3))
-        const result = Object.entries(homeMonMap).find(
-          (entry) => entry[0] === homeIdentifier
-        )
+        const result = Object.entries(homeMonMap).find((entry) => entry[0] === homeIdentifier)
         if (result) {
           const updatedOHPKM = result[1]
           updatedOHPKM.updateData(mon)
@@ -129,8 +121,7 @@ export const buildSaveFile = (
     fileCreatedDate?: Date
   }
 ): SAV | undefined => {
-  const { homeMonMap, gen12LookupMap, gen345LookupMap, fileCreatedDate } =
-    lookupMaps
+  const { homeMonMap, gen12LookupMap, gen345LookupMap, fileCreatedDate } = lookupMaps
   const saveType = getSaveType(fileBytes)
   let saveFile
   switch (saveType) {
@@ -147,9 +138,7 @@ export const buildSaveFile = (
             const homeIdentifier = gen12LookupMap[gen12identifier]
             if (!homeIdentifier) return
             // console.log(identifier.slice(0, identifier.length - 3))
-            const result = Object.entries(homeMonMap).find(
-              (entry) => entry[0] === homeIdentifier
-            )
+            const result = Object.entries(homeMonMap).find((entry) => entry[0] === homeIdentifier)
             if (result) {
               console.info('home mon found:', result[1])
               box.pokemon[monIndex] = result[1]

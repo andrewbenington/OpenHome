@@ -5,12 +5,9 @@ import { RootState } from '../state'
 
 const initialState: SaveRefMap = {}
 
-export const loadRecentSaves = createAsyncThunk(
-  'recentSaves/load',
-  async () => {
-    return window.electron.ipcRenderer.invoke('read-recent-saves')
-  }
-)
+export const loadRecentSaves = createAsyncThunk('recentSaves/load', async () => {
+  return window.electron.ipcRenderer.invoke('read-recent-saves')
+})
 
 export const recentSavesSlice = createSlice({
   name: 'recentSaves',

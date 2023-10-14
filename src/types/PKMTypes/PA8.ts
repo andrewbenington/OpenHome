@@ -1,19 +1,10 @@
-import {
-  contestStats,
-  hyperTrainStats,
-  memory,
-  pokedate,
-  stats,
-} from '../../types/types'
+import { contestStats, hyperTrainStats, memory, pokedate, stats } from '../../types/types'
 import { Ball, GameOfOrigin, GameOfOriginData, isBDSP } from '../../consts'
 import { Languages } from '../../consts/Languages'
 import LALocations from '../../consts/MetLocation/LA'
 import { Gen9Ribbons } from '../../consts/Ribbons'
 import { ItemFromString, ItemToString } from '../../resources/gen/items/Items'
-import {
-  AbilityFromString,
-  AbilityToString,
-} from '../../resources/gen/other/Abilities'
+import { AbilityFromString, AbilityToString } from '../../resources/gen/other/Abilities'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -23,10 +14,7 @@ import {
   uint32ToBytesLittleEndian,
 } from '../../util/ByteLogic'
 import { getLevelGen3Onward } from '../../util/StatCalc'
-import {
-  utf16BytesToString,
-  utf16StringToBytes,
-} from '../../util/Strings/StringConverter'
+import { utf16BytesToString, utf16StringToBytes } from '../../util/Strings/StringConverter'
 import { OHPKM } from './OHPKM'
 import { PKM } from './PKM'
 import { adjustMovePPBetweenFormats, writeIVsToBuffer } from './util'
@@ -470,12 +458,7 @@ export class PA8 extends PKM {
   }
 
   public get movePP() {
-    return [
-      this.bytes[0x5c],
-      this.bytes[0x5d],
-      this.bytes[0x5e],
-      this.bytes[0x5f],
-    ]
+    return [this.bytes[0x5c], this.bytes[0x5d], this.bytes[0x5e], this.bytes[0x5f]]
   }
 
   public set movePP(value: [number, number, number, number]) {
@@ -498,12 +481,7 @@ export class PA8 extends PKM {
   }
 
   public get movePPUps() {
-    return [
-      this.bytes[0x86],
-      this.bytes[0x87],
-      this.bytes[0x88],
-      this.bytes[0x89],
-    ]
+    return [this.bytes[0x86], this.bytes[0x87], this.bytes[0x88], this.bytes[0x89]]
   }
 
   public set movePPUps(value: [number, number, number, number]) {
@@ -878,8 +856,7 @@ export class PA8 extends PKM {
         ? `in the ${GameOfOriginData[this.gameOfOrigin]?.region} region`
         : 'in a faraway place'
     }
-    const locationBlock =
-      LALocations[Math.floor(this.metLocationIndex / 10000) * 10000]
+    const locationBlock = LALocations[Math.floor(this.metLocationIndex / 10000) * 10000]
     if (locationBlock) {
       return locationBlock[this.metLocationIndex % 10000]
     }

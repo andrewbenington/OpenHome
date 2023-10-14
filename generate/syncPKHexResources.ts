@@ -50,10 +50,7 @@ const downloadTextResource = (source: string, dest: string) => {
   })
 }
 
-const configFile = fs.readFileSync(
-  `${process.cwd()}/generate/sync.yaml`,
-  'utf-8'
-)
+const configFile = fs.readFileSync(`${process.cwd()}/generate/sync.yaml`, 'utf-8')
 const config: Config = YAML.parse(configFile, {
   prettyErrors: true,
 })

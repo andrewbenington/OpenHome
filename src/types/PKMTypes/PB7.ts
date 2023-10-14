@@ -1,15 +1,8 @@
 import { ItemToString } from '../../resources/gen/items/Items'
 import { GameOfOrigin, Gen9RibbonsPart1 } from '../../consts'
 import { Languages } from '../../consts/Languages'
-import {
-  bytesToUint16LittleEndian,
-  bytesToUint32LittleEndian,
-} from '../../util/ByteLogic'
-import {
-  getHPGen3Onward,
-  getLevelGen3Onward,
-  getStatGen3Onward,
-} from '../../util/StatCalc'
+import { bytesToUint16LittleEndian, bytesToUint32LittleEndian } from '../../util/ByteLogic'
+import { getHPGen3Onward, getLevelGen3Onward, getStatGen3Onward } from '../../util/StatCalc'
 import { PKM } from './PKM'
 
 export class PB7 extends PKM {
@@ -125,12 +118,7 @@ export class PB7 extends PKM {
   }
 
   public get movePP() {
-    return [
-      this.bytes[0x62],
-      this.bytes[0x63],
-      this.bytes[0x64],
-      this.bytes[0x65],
-    ]
+    return [this.bytes[0x62], this.bytes[0x63], this.bytes[0x64], this.bytes[0x65]]
   }
 
   public set movePP(value: [number, number, number, number]) {
@@ -140,12 +128,7 @@ export class PB7 extends PKM {
   }
 
   public get movePPUps() {
-    return [
-      this.bytes[0x66],
-      this.bytes[0x67],
-      this.bytes[0x68],
-      this.bytes[0x69],
-    ]
+    return [this.bytes[0x66], this.bytes[0x67], this.bytes[0x68], this.bytes[0x69]]
   }
 
   public set movePPUps(value: [number, number, number, number]) {

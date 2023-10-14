@@ -405,8 +405,7 @@ export const Gen9RibbonsPart2 = [
   'Titan Mark',
 ]
 
-export const OpenHomeRibbons =
-  Gen34TowerRibbons.concat(Gen34ContestRibbons).concat(Gen9Ribbons)
+export const OpenHomeRibbons = Gen34TowerRibbons.concat(Gen34ContestRibbons).concat(Gen9Ribbons)
 
 export const RibbonTitles = [
   'the Kalos Champion',

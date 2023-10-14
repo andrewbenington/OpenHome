@@ -2,12 +2,7 @@ import { Grid, useTheme } from '@mui/material'
 import _ from 'lodash'
 import { useAppDispatch } from '../redux/hooks'
 import { useHomeData } from '../redux/selectors'
-import {
-  cancelDrag,
-  completeDrag,
-  importMons,
-  startDrag,
-} from '../redux/slices/appSlice'
+import { cancelDrag, completeDrag, importMons, startDrag } from '../redux/slices/appSlice'
 import { PKM } from '../../types/PKMTypes/PKM'
 import { SaveCoordinates } from '../../types/types'
 import BoxCell from './BoxCell'
@@ -22,11 +17,9 @@ const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
   const { setSelectedMon } = props
 
   const dispatch = useAppDispatch()
-  const dispatchStartDrag = (source: SaveCoordinates) =>
-    dispatch(startDrag(source))
+  const dispatchStartDrag = (source: SaveCoordinates) => dispatch(startDrag(source))
   const dispatchCancelDrag = () => dispatch(cancelDrag())
-  const dispatchCompleteDrag = (dest: SaveCoordinates) =>
-    dispatch(completeDrag(dest))
+  const dispatchCompleteDrag = (dest: SaveCoordinates) => dispatch(completeDrag(dest))
   const dispatchImportMons = (mons: PKM[], saveCoordinates: SaveCoordinates) =>
     dispatch(importMons({ mons, saveCoordinates }))
 
@@ -44,10 +37,14 @@ const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
         {_.range(10).map((row: number) => (
           <Grid container key={`pc_row_${row}`}>
             {_.range(12).map((rowIndex: number) => {
-              const mon =
-                data.boxes[data.currentPCBox].pokemon[row * 12 + rowIndex]
+              const mon = data.boxes[data.currentPCBox].pokemon[row * 12 + rowIndex]
               return (
-                <Grid item xs={1} style={{ padding: '2px 2px 0px 2px' }}>
+                <Grid
+                  item
+                  key={`home_box_row_${rowIndex}`}
+                  xs={1}
+                  style={{ padding: '2px 2px 0px 2px' }}
+                >
                   <BoxCell
                     onClick={() => setSelectedMon(mon)}
                     onDragEvent={(cancel: boolean) =>

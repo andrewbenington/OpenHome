@@ -386,12 +386,6 @@ const SwShLocations = {
     '[~ 111]',
     '[~ 112]',
   ],
-  60000: [
-    ' 	',
-    'a stranger',
-    'a Nursery worker',
-    'a treasure hunter',
-    'an old hot-springs visitor',
-  ],
+  60000: [' 	', 'a stranger', 'a Nursery worker', 'a treasure hunter', 'an old hot-springs visitor'],
 }
 export default SwShLocations

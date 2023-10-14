@@ -4,18 +4,8 @@ import { Languages } from '../../consts/Languages'
 import SMUSUMLocations from '../../consts/MetLocation/SMUSUM'
 import { Gen9Ribbons } from '../../consts/Ribbons'
 import { ItemFromString, ItemToString } from '../../resources/gen/items/Items'
-import {
-  AbilityFromString,
-  AbilityToString,
-} from '../../resources/gen/other/Abilities'
-import {
-  contestStats,
-  geolocation,
-  marking,
-  memory,
-  pokedate,
-  stats,
-} from '../../types/types'
+import { AbilityFromString, AbilityToString } from '../../resources/gen/other/Abilities'
+import { contestStats, geolocation, marking, memory, pokedate, stats } from '../../types/types'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -24,15 +14,8 @@ import {
   uint16ToBytesLittleEndian,
   uint32ToBytesLittleEndian,
 } from '../../util/ByteLogic'
-import {
-  getHPGen3Onward,
-  getLevelGen3Onward,
-  getStatGen3Onward,
-} from '../../util/StatCalc'
-import {
-  utf16BytesToString,
-  utf16StringToBytes,
-} from '../../util/Strings/StringConverter'
+import { getHPGen3Onward, getLevelGen3Onward, getStatGen3Onward } from '../../util/StatCalc'
+import { utf16BytesToString, utf16StringToBytes } from '../../util/Strings/StringConverter'
 import { OHPKM } from './OHPKM'
 import { PKM } from './PKM'
 import { adjustMovePPBetweenFormats, writeIVsToBuffer } from './util'
@@ -89,25 +72,11 @@ export class PK7 extends PKM {
       const validMovePP = adjustMovePPBetweenFormats(this, other).filter(
         (_, i) => other.moves[i] <= USUM_MOVE_MAX
       )
-      const validMovePPUps = other.movePPUps.filter(
-        (_, i) => other.moves[i] <= USUM_MOVE_MAX
-      )
-      const validRelearnMoves = other.relearnMoves.filter(
-        (_, i) => other.moves[i] <= USUM_MOVE_MAX
-      )
+      const validMovePPUps = other.movePPUps.filter((_, i) => other.moves[i] <= USUM_MOVE_MAX)
+      const validRelearnMoves = other.relearnMoves.filter((_, i) => other.moves[i] <= USUM_MOVE_MAX)
       this.moves = [validMoves[0], validMoves[1], validMoves[2], validMoves[3]]
-      this.movePP = [
-        validMovePP[0],
-        validMovePP[1],
-        validMovePP[2],
-        validMovePP[3],
-      ]
-      this.movePPUps = [
-        validMovePPUps[0],
-        validMovePPUps[1],
-        validMovePPUps[2],
-        validMovePPUps[3],
-      ]
+      this.movePP = [validMovePP[0], validMovePP[1], validMovePP[2], validMovePP[3]]
+      this.movePPUps = [validMovePPUps[0], validMovePPUps[1], validMovePPUps[2], validMovePPUps[3]]
       this.relearnMoves = [
         validRelearnMoves[0],
         validRelearnMoves[1],
@@ -136,8 +105,7 @@ export class PK7 extends PKM {
       this.metDate = other.metDate
       this.eggLocationIndex = other.eggLocationIndex
       this.metLocationIndex = other.metLocationIndex
-      this.ball =
-        other.ball && other.ball <= Ball.Beast ? other.ball : Ball.Poke
+      this.ball = other.ball && other.ball <= Ball.Beast ? other.ball : Ball.Poke
       this.metLevel = other.metLevel ?? this.level
       this.trainerGender = other.trainerGender
       this.encounterType = other.encounterType
@@ -220,8 +188,7 @@ export class PK7 extends PKM {
   }
 
   public get displayID() {
-    return isAlola(this.gameOfOrigin) ||
-      this.gameOfOrigin >= GameOfOrigin.LetsGoPikachu
+    return isAlola(this.gameOfOrigin) || this.gameOfOrigin >= GameOfOrigin.LetsGoPikachu
       ? bytesToUint32LittleEndian(this.bytes, 0x0c) % 1000000
       : this.trainerID
   }
@@ -363,9 +330,7 @@ export class PK7 extends PKM {
     ] as any as [marking, marking, marking, marking, marking, marking]
   }
 
-  public set markings(
-    value: [marking, marking, marking, marking, marking, marking]
-  ) {
+  public set markings(value: [marking, marking, marking, marking, marking, marking]) {
     let markingsValue = 0
     for (let i = 0; i < 6; i++) {
       if (value[i]) {
@@ -475,12 +440,7 @@ export class PK7 extends PKM {
   }
 
   public get movePP() {
-    return [
-      this.bytes[0x62],
-      this.bytes[0x63],
-      this.bytes[0x64],
-      this.bytes[0x65],
-    ]
+    return [this.bytes[0x62], this.bytes[0x63], this.bytes[0x64], this.bytes[0x65]]
   }
 
   public set movePP(value: [number, number, number, number]) {
@@ -490,12 +450,7 @@ export class PK7 extends PKM {
   }
 
   public get movePPUps() {
-    return [
-      this.bytes[0x66],
-      this.bytes[0x67],
-      this.bytes[0x68],
-      this.bytes[0x69],
-    ]
+    return [this.bytes[0x66], this.bytes[0x67], this.bytes[0x68], this.bytes[0x69]]
   }
 
   public set movePPUps(value: [number, number, number, number]) {
@@ -747,13 +702,11 @@ export class PK7 extends PKM {
     }
     if (!isAlola(this.gameOfOrigin)) {
       return this.gameOfOrigin <= GameOfOrigin.OmegaRuby ||
-        (this.gameOfOrigin >= GameOfOrigin.Red &&
-          this.gameOfOrigin <= GameOfOrigin.Crystal)
+        (this.gameOfOrigin >= GameOfOrigin.Red && this.gameOfOrigin <= GameOfOrigin.Crystal)
         ? `from the ${GameOfOriginData[this.gameOfOrigin]?.region} region`
         : 'from a faraway place'
     }
-    const locationBlock =
-      SMUSUMLocations[Math.floor(this.eggLocationIndex / 10000) * 10000]
+    const locationBlock = SMUSUMLocations[Math.floor(this.eggLocationIndex / 10000) * 10000]
     return `from ${locationBlock[this.eggLocationIndex % 10000]}`
   }
 
@@ -768,13 +721,11 @@ export class PK7 extends PKM {
   public get metLocation() {
     if (!isAlola(this.gameOfOrigin)) {
       return this.gameOfOrigin <= GameOfOrigin.OmegaRuby ||
-        (this.gameOfOrigin >= GameOfOrigin.Red &&
-          this.gameOfOrigin <= GameOfOrigin.Crystal)
+        (this.gameOfOrigin >= GameOfOrigin.Red && this.gameOfOrigin <= GameOfOrigin.Crystal)
         ? `in the ${GameOfOriginData[this.gameOfOrigin]?.region} region`
         : 'in a faraway place'
     }
-    const locationBlock =
-      SMUSUMLocations[Math.floor(this.metLocationIndex / 10000) * 10000]
+    const locationBlock = SMUSUMLocations[Math.floor(this.metLocationIndex / 10000) * 10000]
     if (locationBlock) {
       return `in ${locationBlock[this.metLocationIndex % 10000]}`
     }

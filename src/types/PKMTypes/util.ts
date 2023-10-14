@@ -32,24 +32,18 @@ export const writeIVsToBuffer = (
   writeUint32ToBuffer(ivsValue, buffer, offset)
 }
 
-export const getAbilityFromNumber = (
-  dexNum: number,
-  formNum: number,
-  abilityNum: number
-) => {
+export const getAbilityFromNumber = (dexNum: number, formNum: number, abilityNum: number) => {
   if (!POKEMON_DATA[dexNum]?.formes[formNum]) {
     return 'None'
   }
   if (abilityNum === 4) {
     return (
-      POKEMON_DATA[dexNum].formes[formNum].abilityH ??
-      POKEMON_DATA[dexNum].formes[formNum].ability1
+      POKEMON_DATA[dexNum].formes[formNum].abilityH ?? POKEMON_DATA[dexNum].formes[formNum].ability1
     )
   }
   if (abilityNum === 2) {
     return (
-      POKEMON_DATA[dexNum].formes[formNum].ability2 ??
-      POKEMON_DATA[dexNum].formes[formNum].ability1
+      POKEMON_DATA[dexNum].formes[formNum].ability2 ?? POKEMON_DATA[dexNum].formes[formNum].ability1
     )
   }
   return POKEMON_DATA[dexNum].formes[formNum].ability1
@@ -63,11 +57,7 @@ export const getUnownLetterGen3 = (personalityValue: number) => {
   return letterValue % 28
 }
 
-export const generateTeraType = (
-  prng: Prando,
-  dexNum: number,
-  formNum: number
-) => {
+export const generateTeraType = (prng: Prando, dexNum: number, formNum: number) => {
   if (!POKEMON_DATA[dexNum]?.formes[formNum]) {
     return undefined
   }
@@ -194,22 +184,16 @@ export const getBaseMon = (dexNum: number, forme: number) => {
 
 export const formatHasColorMarkings = (format: string) => {
   return (
-    (format.charAt(0) === 'p' &&
-      ['7', '8', '9'].includes(format.charAt(format.length - 1))) ||
+    (format.charAt(0) === 'p' && ['7', '8', '9'].includes(format.charAt(format.length - 1))) ||
     format === 'OHPKM'
   )
 }
 
 export const getTypes = (mon: PKM) => {
   let types = POKEMON_DATA[mon.dexNum]?.formes[mon.formNum]?.types
-  if (
-    mon.format === 'PK1' &&
-    (mon.dexNum === NDex.MAGNEMITE || mon.dexNum === NDex.MAGNETON)
-  ) {
+  if (mon.format === 'PK1' && (mon.dexNum === NDex.MAGNEMITE || mon.dexNum === NDex.MAGNETON)) {
     types = ['Electric']
-  } else if (
-    ['PK1', 'PK2', 'PK3', 'COLOPKM', 'XDPKM', 'PK4', 'PK5'].includes(mon.format)
-  ) {
+  } else if (['PK1', 'PK2', 'PK3', 'COLOPKM', 'XDPKM', 'PK4', 'PK5'].includes(mon.format)) {
     if (types?.includes('Fairy')) {
       if (types.length === 1 || types.includes('Flying')) {
         types = types.map((type) => (type === 'Fairy' ? 'Normal' : type))
@@ -276,20 +260,10 @@ export const getMoveMaxPP = (moveIndex: number, format: string, ppUps = 0) => {
   return baseMaxPP + Math.floor(ppUps * (baseMaxPP / 5))
 }
 
-export const adjustMovePPBetweenFormats = (
-  destFormatMon: PKM,
-  sourceFormatMon: PKM
-) => {
+export const adjustMovePPBetweenFormats = (destFormatMon: PKM, sourceFormatMon: PKM) => {
   return sourceFormatMon.moves.map((move, i) => {
-    const otherMaxPP =
-      getMoveMaxPP(
-        move,
-        sourceFormatMon.format,
-        sourceFormatMon.movePPUps[i]
-      ) ?? 0
-    const thisMaxPP =
-      getMoveMaxPP(move, destFormatMon.format, sourceFormatMon.movePPUps[i]) ??
-      0
+    const otherMaxPP = getMoveMaxPP(move, sourceFormatMon.format, sourceFormatMon.movePPUps[i]) ?? 0
+    const thisMaxPP = getMoveMaxPP(move, destFormatMon.format, sourceFormatMon.movePPUps[i]) ?? 0
     const adjustedMovePP = sourceFormatMon.movePP[i] - (otherMaxPP - thisMaxPP)
     return max([adjustedMovePP, 0]) ?? 0
   }) as [number, number, number, number]
@@ -302,16 +276,8 @@ export const getSixDigitTID = (tid: number, sid: number) => {
   return bytesToUint32LittleEndian(bytes, 0x0c) % 1000000
 }
 
-const getIsShinyPreGen6 = (
-  trainerID: number,
-  secretID: number,
-  personalityValue: number
-) =>
-  (trainerID ^
-    secretID ^
-    ((personalityValue >> 16) & 0xffff) ^
-    (personalityValue & 0xffff)) <
-  8
+const getIsShinyPreGen6 = (trainerID: number, secretID: number, personalityValue: number) =>
+  (trainerID ^ secretID ^ ((personalityValue >> 16) & 0xffff) ^ (personalityValue & 0xffff)) < 8
 
 export const generatePersonalityValuePreservingAttributes = (
   mon: PKM,
@@ -327,24 +293,17 @@ export const generatePersonalityValuePreservingAttributes = (
   let newPersonalityValue = bigInt(personalityValue)
   const shouldCheckUnown = mon.dexNum === NDex.UNOWN
   while (i < 0x10000) {
-    const newGender = getGen3To5Gender(
-      newPersonalityValue.toJSNumber(),
-      mon.dexNum
-    )
+    const newGender = getGen3To5Gender(newPersonalityValue.toJSNumber(), mon.dexNum)
     const newNature = newPersonalityValue.mod(25).toJSNumber()
     if (
-      (!shouldCheckUnown ||
-        getUnownLetterGen3(newPersonalityValue.toJSNumber()) === mon.formNum) &&
+      (!shouldCheckUnown || getUnownLetterGen3(newPersonalityValue.toJSNumber()) === mon.formNum) &&
       newGender === otherGender &&
       (otherAbilityNum === 4 ||
         shouldCheckUnown ||
         newPersonalityValue.and(1).add(1).toJSNumber() === otherAbilityNum) &&
       (otherNature === undefined || newNature === otherNature) &&
-      getIsShinyPreGen6(
-        mon.trainerID,
-        mon.secretID,
-        newPersonalityValue.toJSNumber()
-      ) === mon.isShiny
+      getIsShinyPreGen6(mon.trainerID, mon.secretID, newPersonalityValue.toJSNumber()) ===
+        mon.isShiny
     ) {
       return newPersonalityValue.toJSNumber()
     }
@@ -355,9 +314,7 @@ export const generatePersonalityValuePreservingAttributes = (
       pvLower16 = prng.nextInt(0, 0xffff)
       pvUpper16 = prng.nextInt(0, 0xffff)
       if (mon.isShiny) {
-        pvUpper16 =
-          ((mon.trainerID ^ mon.secretID ^ pvLower16) & 0xfcfc) |
-          (pvUpper16 & 0x0303)
+        pvUpper16 = ((mon.trainerID ^ mon.secretID ^ pvLower16) & 0xfcfc) | (pvUpper16 & 0x0303)
       }
     } else {
       pvLower16 = bytesToUint16LittleEndian(pvBytes, 0)
