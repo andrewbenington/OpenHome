@@ -90,7 +90,7 @@ const SheenStars = (props: SheenStarsProps) => {
           <img
             key={`sheen_star_${level}`}
             alt={`sheen star ${level}`}
-            src={getPublicImageURL('images/icons/Sheen.gif')}
+            src={getPublicImageURL('icons/Sheen.gif')}
             style={styles.star}
           />
         ))}
