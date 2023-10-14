@@ -1,4 +1,3 @@
-/* eslint-disable jest/no-commented-out-tests */
 import fs from 'fs'
 import { TextDecoder } from 'node:util'
 import path from 'path'
