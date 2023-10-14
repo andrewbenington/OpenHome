@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { SAV } from 'types/SAVTypes'
-import { SaveRefMap } from 'types/types'
+import { SAV } from '../../../types/SAVTypes'
+import { SaveRefMap } from '../../../types/types'
 import { RootState } from '../state'
 
 const initialState: SaveRefMap = {}
@@ -21,12 +21,12 @@ export const recentSavesSlice = createSlice({
         return
       }
       const saveRef = action.payload.getSaveRef()
-      window.electron.ipcRenderer.sendMessage('add-recent-save', saveRef)
+      window.electron.ipcRenderer.send('add-recent-save', saveRef)
       state[action.payload.filePath] = saveRef
     },
     removeRecentSave: (state, action: PayloadAction<string>) => {
       const filePath = action.payload
-      window.electron.ipcRenderer.sendMessage('remove-recent-save', filePath)
+      window.electron.ipcRenderer.invoke('remove-recent-save', filePath)
       delete state[filePath]
     },
   },

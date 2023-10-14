@@ -9,7 +9,7 @@ import {
   pokedate,
   stats,
   statsPreSplit,
-} from 'types/types'
+} from '../../types/types'
 import {
   Ball,
   GameOfOrigin,
@@ -589,7 +589,7 @@ export class OHPKM extends PKM {
   }
 
   public get ribbons() {
-    const ribbons = []
+    const ribbons: string[] = []
     const rBytes = this.ribbonBytes
     for (let byte = 0; byte < 22; byte++) {
       const ribbonsUint8 = rBytes[byte]

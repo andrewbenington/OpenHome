@@ -1,10 +1,10 @@
-import { OHPKM } from 'types/PKMTypes/OHPKM'
+import { OHPKM } from '../../types/PKMTypes/OHPKM'
 import {
   bytesToUint16LittleEndian,
   uint16ToBytesLittleEndian,
-} from 'util/ByteLogic'
-import { CRC16_CCITT } from 'util/Encryption'
-import { gen4StringToUTF } from 'util/Strings/StringConverter'
+} from '../../util/ByteLogic'
+import { CRC16_CCITT } from '../../util/Encryption'
+import { gen4StringToUTF } from '../../util/Strings/StringConverter'
 import { PK4 } from '../PKMTypes/PK4'
 import { Box, SAV } from './SAV'
 

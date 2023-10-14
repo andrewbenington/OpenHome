@@ -8,7 +8,7 @@ import {
   pokedate,
   stats,
   statsPreSplit,
-} from 'types/types'
+} from '../../types/types'
 import {
   AttackCharacteristics,
   DefenseCharacteristics,
@@ -1338,6 +1338,7 @@ export class PKM {
   }
 
   public get eggLocation() {
+    console.log(this.eggLocationIndex)
     if (!this.eggLocationIndex) return undefined
     return getLocation(
       this.gameOfOrigin,

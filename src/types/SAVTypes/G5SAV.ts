@@ -1,6 +1,6 @@
-import { GameOfOrigin, NDex } from 'consts'
+import { GameOfOrigin, NDex } from '../../consts'
 import _ from 'lodash'
-import { CRC16_CCITT } from 'util/Encryption'
+import { CRC16_CCITT } from '../../util/Encryption'
 import {
   bytesToUint16LittleEndian,
   uint16ToBytesLittleEndian,

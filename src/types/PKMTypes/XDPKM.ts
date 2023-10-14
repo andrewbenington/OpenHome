@@ -1,4 +1,4 @@
-import { contestStats } from 'types/types'
+import { contestStats } from '../../types/types'
 import { GameOfOriginData } from '../../consts/GameOfOrigin'
 import { GCLanguages } from '../../consts/Languages'
 import { POKEMON_DATA } from '../../consts/Mons'

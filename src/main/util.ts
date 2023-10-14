@@ -1,6 +1,5 @@
-/* eslint import/prefer-default-export: off */
-import { URL } from 'url'
 import path from 'path'
+import { URL } from 'url'
 
 export function resolveHtmlPath(htmlFileName: string) {
   if (process.env.NODE_ENV === 'development') {

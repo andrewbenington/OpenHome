@@ -1,5 +1,5 @@
 import { CSSProperties } from 'react'
-import { marking } from 'types/types'
+import { marking } from '../../types/types'
 
 interface MarkingsProps {
   markings:

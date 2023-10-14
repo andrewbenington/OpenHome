@@ -5,7 +5,7 @@ import {
   LegendsArceusExcludedForms,
   RegionalForms,
   TransferRestrictions,
-} from 'types/TransferRestrictions'
+} from '../types/TransferRestrictions'
 import {
   COMPLETE,
   DAWN_WINGS,

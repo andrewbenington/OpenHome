@@ -1,5 +1,5 @@
-import { LGE_STARTER, LGP_STARTER } from 'consts/Formes'
-import { NDex } from 'consts/NationalDex'
+import { LGE_STARTER, LGP_STARTER } from '../consts/Formes'
+import { NDex } from '../consts/NationalDex'
 
 interface FormRestrictions {
   [dexNum: number]: number[] | undefined

@@ -1,12 +1,4 @@
 import _ from 'lodash'
-import {
-  contestStats,
-  geolocation,
-  marking,
-  memory,
-  pokedate,
-  stats,
-} from 'types/types'
 import { Ball, GameOfOrigin, GameOfOriginData, isAlola } from '../../consts'
 import { Languages } from '../../consts/Languages'
 import SMUSUMLocations from '../../consts/MetLocation/SMUSUM'
@@ -16,6 +8,14 @@ import {
   AbilityFromString,
   AbilityToString,
 } from '../../resources/gen/other/Abilities'
+import {
+  contestStats,
+  geolocation,
+  marking,
+  memory,
+  pokedate,
+  stats,
+} from '../../types/types'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -87,13 +87,13 @@ export class PK7 extends PKM {
       // filtering out moves that didnt exist yet
       const validMoves = other.moves.filter((move) => move <= USUM_MOVE_MAX)
       const validMovePP = adjustMovePPBetweenFormats(this, other).filter(
-        (v, i) => other.moves[i] <= USUM_MOVE_MAX
+        (_, i) => other.moves[i] <= USUM_MOVE_MAX
       )
       const validMovePPUps = other.movePPUps.filter(
-        (v, i) => other.moves[i] <= USUM_MOVE_MAX
+        (_, i) => other.moves[i] <= USUM_MOVE_MAX
       )
       const validRelearnMoves = other.relearnMoves.filter(
-        (v, i) => other.moves[i] <= USUM_MOVE_MAX
+        (_, i) => other.moves[i] <= USUM_MOVE_MAX
       )
       this.moves = [validMoves[0], validMoves[1], validMoves[2], validMoves[3]]
       this.movePP = [
@@ -400,7 +400,7 @@ export class PK7 extends PKM {
   }
 
   public get ribbons() {
-    const ribbons = []
+    const ribbons: string[] = []
     for (let i = 0; i < 50; i++) {
       if (getFlag(this.bytes, 0x30, i)) {
         ribbons.push(Gen9Ribbons[i])
@@ -742,6 +742,9 @@ export class PK7 extends PKM {
   }
 
   public get eggLocation() {
+    if (!this.eggLocationIndex) {
+      return undefined
+    }
     if (!isAlola(this.gameOfOrigin)) {
       return this.gameOfOrigin <= GameOfOrigin.OmegaRuby ||
         (this.gameOfOrigin >= GameOfOrigin.Red &&
@@ -751,10 +754,7 @@ export class PK7 extends PKM {
     }
     const locationBlock =
       SMUSUMLocations[Math.floor(this.eggLocationIndex / 10000) * 10000]
-    if (locationBlock) {
-      return `from ${locationBlock[this.eggLocationIndex % 10000]}`
-    }
-    return undefined
+    return `from ${locationBlock[this.eggLocationIndex % 10000]}`
   }
 
   public get metLocationIndex() {

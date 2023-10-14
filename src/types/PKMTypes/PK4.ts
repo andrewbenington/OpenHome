@@ -1,4 +1,4 @@
-import { contestStats, marking, pokedate, stats } from 'types/types'
+import { contestStats, marking, pokedate, stats } from '../../types/types'
 import {
   Ball,
   GameOfOrigin,
@@ -543,12 +543,12 @@ export class PK4 extends PKM {
   }
 
   public get eggLocation() {
+    if (!this.eggLocationIndex) {
+      return undefined
+    }
     const locationBlock =
       G4Locations[Math.floor(this.eggLocationIndex / 1000) * 1000]
-    if (locationBlock) {
-      return `from ${locationBlock[this.eggLocationIndex % 1000]}`
-    }
-    return undefined
+    return `from ${locationBlock[this.eggLocationIndex % 1000]}`
   }
 
   public get metLocationIndex() {

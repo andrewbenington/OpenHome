@@ -1,9 +1,9 @@
-import { POKEMON_DATA } from 'consts'
+import { POKEMON_DATA } from '../../consts'
 import React, { useEffect, useState } from 'react'
-import { Styles } from 'types/types'
+import { Styles } from '../../types/types'
 import { PKM } from '../../types/PKMTypes/PKM'
 import { acceptableExtensions, bytesToPKM } from '../../util/FileImport'
-import BoxIcons from '../images/icons/BoxIcons.png'
+import BoxIcons from '../images/BoxIcons.png'
 
 const styles = {
   fillContainer: { width: '100%', height: '100%' },

@@ -1,5 +1,5 @@
-import { Types } from 'consts'
-import { Type } from 'types/types'
+import { Types } from '../../consts'
+import { Type } from '../../types/types'
 
 interface TypeIconProps {
   type?: Type

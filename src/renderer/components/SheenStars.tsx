@@ -1,7 +1,7 @@
 import _ from 'lodash'
-import Sheen from 'renderer/images/icons/Sheen.gif'
-import { COLOPKM, PK3, PKM, XDPKM } from 'types/PKMTypes'
-import { Styles } from 'types/types'
+import { COLOPKM, PK3, PKM, XDPKM } from '../../types/PKMTypes'
+import { Styles } from '../../types/types'
+import { getPublicImageURL } from '../images/images'
 
 const styles = {
   container: {
@@ -92,7 +92,11 @@ const SheenStars = (props: SheenStarsProps) => {
         }}
       >
         {_.range(getSheenStars(mon)).map((level: number) => (
-          <img alt={`sheen star ${level}`} src={Sheen} style={styles.star} />
+          <img
+            alt={`sheen star ${level}`}
+            src={getPublicImageURL('images/icons/Sheen.gif')}
+            style={styles.star}
+          />
         ))}
       </div>
       ({mon.contest?.sheen ?? '--'})

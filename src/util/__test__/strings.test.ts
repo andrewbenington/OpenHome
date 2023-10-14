@@ -1,5 +1,5 @@
 import { TextDecoder } from 'node:util' // (ESM style imports)
-import { utf16BytesToString } from 'util/Strings/StringConverter'
+import { utf16BytesToString } from '../../util/Strings/StringConverter'
 ;(global as any).TextDecoder = TextDecoder
 
 test('utf16 decoding null terminated', () => {

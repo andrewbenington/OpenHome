@@ -1,15 +1,15 @@
-import { GameOfOrigin } from 'consts'
-import { GEN1_TRANSFER_RESTRICTIONS } from 'consts/TransferRestrictions'
+import { GameOfOrigin } from '../../consts'
+import { GEN1_TRANSFER_RESTRICTIONS } from '../../consts/TransferRestrictions'
 import _, { uniq } from 'lodash'
-import { OHPKM } from 'types/PKMTypes/OHPKM'
-import { PK1 } from 'types/PKMTypes/PK1'
-import { SaveType } from 'types/types'
-import { bytesToUint16BigEndian, get8BitChecksum } from 'util/ByteLogic'
-import { natDexToGen1ID } from 'util/ConvertPokemonID'
+import { OHPKM } from '../PKMTypes/OHPKM'
+import { PK1 } from '../PKMTypes/PK1'
+import { SaveType } from '../types'
+import { bytesToUint16BigEndian, get8BitChecksum } from '../../util/ByteLogic'
+import { natDexToGen1ID } from '../../util/ConvertPokemonID'
 import {
   gen12StringToUTF,
   utf16StringToGen12,
-} from 'util/Strings/StringConverter'
+} from '../../util/Strings/StringConverter'
 import { Box, SAV } from './SAV'
 
 class G1Box implements Box {
