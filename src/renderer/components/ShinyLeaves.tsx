@@ -1,5 +1,4 @@
-import LeafCrown from '../images/icons/LeafCrown.png'
-import ShinyLeaf from '../images/icons/ShinyLeaf.png'
+import { getPublicImageURL } from '../images/images'
 
 const styles = {
   crownIcon: {
@@ -35,7 +34,7 @@ const ShinyLeafIcon = (props: ShinyLeafIconProps) => {
     <img
       alt={`shiny leaf ${index + 1} (${full ? 'full' : 'empty'})`}
       draggable={false}
-      src={ShinyLeaf}
+      src={getPublicImageURL('icons/ShinyLeaf.png')}
       style={{
         ...(full ? styles.leafIconFull : styles.leafIconEmpty),
         zIndex: index + 1,
@@ -59,7 +58,7 @@ const ShinyLeaves = (props: ShinyLeavesProps) => {
     <img
       alt="shiny_leaf_crown"
       draggable={false}
-      src={LeafCrown}
+      src={getPublicImageURL('icons/LeafCrown.png')}
       style={styles.crownIcon}
     />
   ) : (

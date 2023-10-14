@@ -5,15 +5,15 @@ import {
   Draft,
   PayloadAction,
 } from '@reduxjs/toolkit'
-import { OHPKM, PKM } from 'types/PKMTypes'
-import { G1SAV, G2SAV, G3SAV, G4SAV, G5SAV, SAV } from 'types/SAVTypes'
-import { HomeData } from 'types/SAVTypes/HomeData'
-import { SaveCoordinates } from 'types/types'
+import { OHPKM, PKM } from '../../../types/PKMTypes'
+import { G1SAV, G2SAV, G3SAV, G4SAV, G5SAV, SAV } from '../../../types/SAVTypes'
+import { HomeData } from '../../../types/SAVTypes/HomeData'
+import { SaveCoordinates } from '../../../types/types'
 import {
   getMonFileIdentifier,
   getMonGen12Identifier,
   getMonGen345Identifier,
-} from 'util/Lookup'
+} from '../../../util/Lookup'
 import { AppState, RootState } from '../state'
 
 export interface ImportMonsParams {
@@ -219,7 +219,7 @@ export const appSlice = createSlice({
             })
           }
         }
-        window.electron.ipcRenderer.sendMessage('write-save-file', {
+        window.electron.ipcRenderer.invoke('write-save-file', {
           path: save.filePath,
           bytes: save.bytes,
         })
@@ -235,14 +235,14 @@ export const appSlice = createSlice({
     },
     writeAllHomeData: (state) => {
       state.homeData.boxes.forEach((b) => {
-        window.electron.ipcRenderer.sendMessage('write-home-box', {
+        window.electron.ipcRenderer.send('write-home-box', {
           boxName: b.name,
           boxString: b.writeMonsToString(),
         })
       })
       Object.values(state.modifiedOHPKMs).forEach((mon) => {
         if (mon) {
-          window.electron.ipcRenderer.sendMessage('write-ohpkm', mon.bytes)
+          window.electron.ipcRenderer.send('write-ohpkm', mon.bytes)
         }
       })
       state.modifiedOHPKMs = {}
@@ -307,7 +307,7 @@ export const appSlice = createSlice({
           newLookupMap[key] = value
         }
       })
-      window.electron.ipcRenderer.sendMessage(
+      window.electron.ipcRenderer.invoke(
         'write-gen12-lookup',
         current(newLookupMap)
       )
@@ -333,7 +333,7 @@ export const appSlice = createSlice({
           newLookupMap[key] = value
         }
       })
-      window.electron.ipcRenderer.sendMessage(
+      window.electron.ipcRenderer.invoke(
         'write-gen345-lookup',
         current(newLookupMap)
       )

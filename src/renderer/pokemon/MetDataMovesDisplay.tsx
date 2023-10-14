@@ -1,14 +1,15 @@
 import { Card } from '@mui/material'
 import { useMemo } from 'react'
-import Markings from 'renderer/components/Markings'
-import { BallsList, OriginMarks } from 'renderer/images/Images'
-import { getMoveMaxPP } from 'types/PKMTypes/util'
-import { Styles } from 'types/types'
+import Markings from '../components/Markings'
+import { getPublicImageURL } from '../images/images'
+import { getMoveMaxPP } from '../../types/PKMTypes/util'
+import { Styles } from '../../types/types'
 import { GameOfOriginData } from '../../consts'
 import { NatureToString } from '../../resources/gen/other/Natures'
 import { PKM } from '../../types/PKMTypes/PKM'
-import { getGameLogo } from '../util/PokemonSprite'
 import MoveCard from './MoveCard'
+import { getGameLogo, getOriginMark } from '../images/game'
+import { getBallIconPath } from '../images/items'
 
 const styles = {
   container: {
@@ -107,9 +108,9 @@ const MetDataMovesDisplay = (props: { mon: PKM }) => {
     if (vowelStart) {
       message += 'n'
     }
-    message += ` ${NatureToString(currentNature)}`
-    if (currentNature !== mon.statNature) {
-      message += ` (originally ${NatureToString(mon.nature)})`
+    message += ` ${NatureToString(currentNature)} nature.`
+    if (mon.statNature && mon.nature !== mon.statNature) {
+      message += ` (originally ${NatureToString(mon.statNature)})`
     }
     return message
   }, [mon.nature, mon.statNature])
@@ -130,7 +131,7 @@ const MetDataMovesDisplay = (props: { mon: PKM }) => {
                 draggable={false}
                 alt="poke ball type"
                 style={{ width: 24, height: 24 }}
-                src={BallsList[mon.ball ?? 3]}
+                src={getPublicImageURL(getBallIconPath(mon.ball ?? 3))}
               />
             ) : (
               <div />
@@ -166,13 +167,13 @@ const MetDataMovesDisplay = (props: { mon: PKM }) => {
             <img
               draggable={false}
               alt={`${GameOfOriginData[mon.gameOfOrigin]?.name} logo`}
-              src={
+              src={getPublicImageURL(
                 getGameLogo(
                   mon.gameOfOrigin,
                   mon.dexNum,
                   mon.ribbons.includes('National') || mon.isShadow
                 ) ?? ''
-              }
+              )}
               style={styles.gameImage}
             />
             {(GameOfOriginData[mon.gameOfOrigin]?.mark ||
@@ -180,13 +181,13 @@ const MetDataMovesDisplay = (props: { mon: PKM }) => {
               <img
                 draggable={false}
                 alt="origin mark"
-                src={
-                  OriginMarks[
+                src={getPublicImageURL(
+                  getOriginMark(
                     mon.gameOfOrigin === -1
                       ? 'GB'
                       : GameOfOriginData[mon.gameOfOrigin]?.mark ?? ''
-                  ]
-                }
+                  )
+                )}
                 style={styles.originMark}
               />
             )}

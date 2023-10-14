@@ -22,5 +22,5 @@ export const handleMenuResetAndClose = (
 }
 
 export const handleDeleteOHPKMFiles = (filenames: string[]) => {
-  window.electron.ipcRenderer.sendMessage('delete-ohpkm-files', filenames)
+  window.electron.ipcRenderer.send('delete-ohpkm-files', filenames)
 }

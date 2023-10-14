@@ -1,15 +1,15 @@
 import { Grid, useTheme } from '@mui/material'
 import _ from 'lodash'
-import { useAppDispatch } from 'renderer/redux/hooks'
-import { useHomeData } from 'renderer/redux/selectors'
+import { useAppDispatch } from '../redux/hooks'
+import { useHomeData } from '../redux/selectors'
 import {
   cancelDrag,
   completeDrag,
   importMons,
   startDrag,
-} from 'renderer/redux/slices/appSlice'
-import { PKM } from 'types/PKMTypes/PKM'
-import { SaveCoordinates } from 'types/types'
+} from '../redux/slices/appSlice'
+import { PKM } from '../../types/PKMTypes/PKM'
+import { SaveCoordinates } from '../../types/types'
 import BoxCell from './BoxCell'
 
 interface HomeBoxDisplayProps {

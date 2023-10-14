@@ -1,20 +1,21 @@
 import { MoreVert } from '@mui/icons-material'
 import { IconButton, useTheme } from '@mui/material'
-import { GameOfOriginData } from 'consts'
-import { useAppDispatch } from 'renderer/redux/hooks'
-import { useLookupMaps, useRecentSaves } from 'renderer/redux/selectors'
-import { addSave } from 'renderer/redux/slices/appSlice'
-import { getGameLogo } from 'renderer/util/PokemonSprite'
-import { buildSaveFile } from 'types/SAVTypes/util'
-import { SaveRef, getSaveTypeString } from 'types/types'
+import { GameOfOriginData } from '../../consts'
+import { useAppDispatch } from '../../renderer/redux/hooks'
+import { useLookupMaps, useRecentSaves } from '../../renderer/redux/selectors'
+import { addSave } from '../../renderer/redux/slices/appSlice'
+import { buildSaveFile } from '../../types/SAVTypes/util'
+import { SaveRef, getSaveTypeString } from '../../types/types'
 import OpenHomeButton from '../components/OpenHomeButton'
+import { getGameLogo } from '../images/game'
+import { getPublicImageURL } from '../images/images'
 
 interface SaveFileSelectorProps {
   onClose: () => void
 }
 
 const getSaveLogo = (ref: SaveRef) => {
-  return getGameLogo(parseInt(ref.game ?? '0'))
+  return getPublicImageURL(getGameLogo(parseInt(ref.game ?? '0')))
 }
 
 const formatTimeSince = (timestamp: number) => {

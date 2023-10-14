@@ -1,19 +1,19 @@
 import { ArrowBack, ArrowForward, Close } from '@mui/icons-material'
 import { Card, Grid, useTheme } from '@mui/material'
-import { GameOfOriginData } from 'consts'
+import { GameOfOriginData } from '../../consts'
 import _ from 'lodash'
 import { useMemo } from 'react'
-import OpenHomeButton from 'renderer/components/OpenHomeButton'
-import { useAppDispatch } from 'renderer/redux/hooks'
-import { useDragMon, useSaves } from 'renderer/redux/selectors'
+import OpenHomeButton from '../components/OpenHomeButton'
+import { useAppDispatch } from '../redux/hooks'
+import { useDragMon, useSaves } from '../redux/selectors'
 import {
   completeDrag,
   importMons,
   removeSaveAt,
   setSaveBox,
   startDrag,
-} from 'renderer/redux/slices/appSlice'
-import { SaveCoordinates, getSaveTypeString } from 'types/types'
+} from '../redux/slices/appSlice'
+import { SaveCoordinates, getSaveTypeString } from '../../types/types'
 import { PKM } from '../../types/PKMTypes/PKM'
 import { isRestricted } from '../../types/TransferRestrictions'
 import ArrowButton from './ArrowButton'

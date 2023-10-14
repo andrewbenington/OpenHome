@@ -1,24 +1,14 @@
 import { Card, Grid } from '@mui/material'
-import { useEffect, useMemo, useState } from 'react'
-import { getTypes } from 'types/PKMTypes/util'
-import { StringToStringMap, Styles } from 'types/types'
+import { useMemo } from 'react'
 import { POKEMON_DATA } from '../../consts'
-import {
-  BW2_TRANSFER_RESTRICTIONS,
-  GEN1_TRANSFER_RESTRICTIONS,
-  GEN2_TRANSFER_RESTRICTIONS,
-  GEN3_TRANSFER_RESTRICTIONS,
-  HGSS_TRANSFER_RESTRICTIONS,
-  LA_TRANSFER_RESTRICTIONS,
-  ORAS_TRANSFER_RESTRICTIONS,
-  USUM_TRANSFER_RESTRICTIONS,
-} from '../../consts/TransferRestrictions'
 import { PKM } from '../../types/PKMTypes/PKM'
-import { isRestricted } from '../../types/TransferRestrictions'
+import { getTypes } from '../../types/PKMTypes/util'
+import { Styles } from '../../types/types'
 import TypeIcon from '../components/TypeIcon'
-import { BallsList } from '../images/Images'
-import { getItemIconPath, getSpritePath } from '../util/PokemonSprite'
+import { getPublicImageURL } from '../images/images'
+import { getPokemonSpritePath } from '../images/pokemon'
 import AttributeRow from './AttributeRow'
+import { BallsList, getItemIconPath } from '../images/items'
 
 const styles = {
   column: {
@@ -47,8 +37,6 @@ const styles = {
 
 const SummaryDisplay = (props: { mon: PKM }) => {
   const { mon } = props
-  const [monSprites, setMonSprites] = useState<StringToStringMap>()
-  const [itemIcon, setItemIcon] = useState<string>()
 
   const itemAltText = useMemo(() => {
     const monData = POKEMON_DATA[mon.dexNum]?.formes[mon.formNum]
@@ -56,73 +44,16 @@ const SummaryDisplay = (props: { mon: PKM }) => {
     return `${monData.formeName}${mon.isShiny ? '-shiny' : ''} sprite`
   }, [mon])
 
-  const monSpriteSource = useMemo(
-    () => (monSprites ? monSprites[mon.format] : ''),
-    [mon.format, monSprites]
-  )
-
-  useEffect(() => {
-    const importIcon = async () => {
-      const icon = await import(
-        `../images/items/${getItemIconPath(mon.heldItemIndex)}`
-      )
-      setItemIcon(icon?.default)
-    }
-    if (mon.heldItemIndex) {
-      importIcon()
-    }
-  }, [mon.heldItem, mon.heldItemIndex])
-
-  useEffect(() => {
-    const sprites: StringToStringMap = {}
-    const importSprite = async (format: string) => {
-      if (!(format in sprites)) {
-        const sprite = await import(
-          `../images/sprites/${getSpritePath(mon, format)}`
-        )
-        sprites[format] = sprite.default
-      }
-    }
-    const importSprites = async () => {
-      // load first sprite first
-      await importSprite(mon.format)
-      setMonSprites(sprites)
-      await Promise.all([
-        importSprite('OHPKM'),
-        !isRestricted(GEN1_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
-          importSprite('PK1'),
-        !isRestricted(GEN2_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
-          importSprite('PK2'),
-        !isRestricted(GEN3_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
-          importSprite('PK3'),
-        !isRestricted(HGSS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
-          importSprite('PK4'),
-        !isRestricted(BW2_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
-          importSprite('PK5'),
-        !isRestricted(ORAS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
-          importSprite('PK6'),
-        !isRestricted(USUM_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
-          importSprite('PK7'),
-        !isRestricted(LA_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
-          importSprite('PA8'),
-      ])
-      setMonSprites(sprites)
-    }
-    importSprites()
-  }, [mon])
-
   return (
     <Grid container>
       <Grid xs={5}>
         <div style={styles.column}>
-          {monSprites && (
-            <img
-              draggable={false}
-              alt={itemAltText}
-              style={styles.image}
-              src={monSpriteSource}
-            />
-          )}
+          <img
+            draggable={false}
+            alt={itemAltText}
+            style={styles.image}
+            src={getPublicImageURL(getPokemonSpritePath(mon))}
+          />
         </div>
         <div style={styles.nicknameRow}>
           {mon.ball ? (
@@ -145,7 +76,9 @@ const SummaryDisplay = (props: { mon: PKM }) => {
           {mon.heldItem !== 'None' && (
             <img
               alt="item icon"
-              src={itemIcon}
+              src={getPublicImageURL(
+                getItemIconPath(mon.heldItemIndex, mon.format)
+              )}
               style={{ width: 24, height: 24, marginRight: 5 }}
             />
           )}
