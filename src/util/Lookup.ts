@@ -19,11 +19,7 @@ export const getMonFileIdentifier = (mon: OHPKM) => {
 
 export const getMonGen12Identifier = (mon: PKM) => {
   const { dvs } = mon
-  const convertedTrainerName = gen12StringToUTF(
-    utf16StringToGen12(mon.trainerName, 8, true),
-    0,
-    8
-  )
+  const convertedTrainerName = gen12StringToUTF(utf16StringToGen12(mon.trainerName, 8, true), 0, 8)
   if (!dvs) return undefined
   const baseMon = getBaseMon(mon.dexNum, mon.formNum)
   const TID =
@@ -34,9 +30,9 @@ export const getMonGen12Identifier = (mon: PKM) => {
     return `${baseMon.dexNumber.toString().padStart(4, '0')}-${bytesToString(
       TID,
       2
-    )}-${convertedTrainerName}-${dvs.atk.toString(16)}-${dvs.def.toString(
+    )}-${convertedTrainerName}-${dvs.atk.toString(16)}-${dvs.def.toString(16)}-${dvs.spc.toString(
       16
-    )}-${dvs.spc.toString(16)}-${dvs.spe.toString(16)}`
+    )}-${dvs.spe.toString(16)}`
   }
   return undefined
 }
@@ -51,10 +47,7 @@ export const getMonGen345Identifier = (mon: PKM) => {
     return `${baseMon.dexNumber.toString().padStart(4, '0')}-${bytesToString(
       pk345.trainerID,
       2
-    ).concat(bytesToString(pk345.secretID, 2))}-${bytesToString(
-      pk345.personalityValue!,
-      4
-    )}`
+    ).concat(bytesToString(pk345.secretID, 2))}-${bytesToString(pk345.personalityValue!, 4)}`
   }
   return undefined
 }

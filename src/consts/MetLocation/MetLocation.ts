@@ -23,12 +23,7 @@ import SMUSUMLocations from './SMUSUM'
 import SVMetLocation from './SV'
 import SwShLocations from './SwSh'
 
-export const getLocation = (
-  game: number,
-  index: number,
-  format: string,
-  egg: boolean = false
-) => {
+export const getLocation = (game: number, index: number, format: string, egg: boolean = false) => {
   let multiplier = 10000
   let locations: { [key: number]: string[] } = {}
   if (game >= GameOfOrigin.Red && game <= GameOfOrigin.Crystal) {

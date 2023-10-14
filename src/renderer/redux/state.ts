@@ -1,11 +1,7 @@
 import { OHPKM, PKM } from '../../types/PKMTypes'
 import { SAV } from '../../types/SAVTypes'
 import { HomeData } from '../../types/SAVTypes/HomeData'
-import {
-  SaveCoordinates,
-  SaveRefMap,
-  StringToStringMap,
-} from '../../types/types'
+import { SaveCoordinates, SaveRefMap, StringToStringMap } from '../../types/types'
 
 export interface LookupState {
   homeMons?: { [key: string]: OHPKM }

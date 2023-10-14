@@ -2,10 +2,7 @@ import fs from 'fs'
 import { TextDecoder } from 'node:util'
 import path from 'path'
 import { bytesToPKM } from '../../../util/FileImport'
-import {
-  getMonGen12Identifier,
-  getMonGen345Identifier,
-} from '../../../util/Lookup'
+import { getMonGen12Identifier, getMonGen345Identifier } from '../../../util/Lookup'
 import { OHPKM } from '../OHPKM'
 import { PK1 } from '../PK1'
 import { PK2 } from '../PK2'
@@ -14,18 +11,12 @@ import { PK4 } from '../PK4'
 ;(global as any).TextDecoder = TextDecoder
 
 const blazikenOH = bytesToPKM(
-  new Uint8Array(
-    fs.readFileSync(path.join(__dirname, './PKMFiles/OH', 'blaziken.ohpkm'))
-  ),
+  new Uint8Array(fs.readFileSync(path.join(__dirname, './PKMFiles/OH', 'blaziken.ohpkm'))),
   'OHPKM'
 ) as OHPKM
 
 const slowpokeOH = bytesToPKM(
-  new Uint8Array(
-    fs.readFileSync(
-      path.join(__dirname, './PKMFiles/OH', 'slowpoke-shiny.ohpkm')
-    )
-  ),
+  new Uint8Array(fs.readFileSync(path.join(__dirname, './PKMFiles/OH', 'slowpoke-shiny.ohpkm'))),
   'OHPKM'
 )
 

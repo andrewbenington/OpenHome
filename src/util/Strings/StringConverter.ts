@@ -382,11 +382,7 @@ export const GBStringDict: { [key: number]: string } = {
  * @param length character length of string
  * @returns string of decoded Gen 1/2 bytes
  */
-export const gen12StringToUTF = (
-  bytes: Uint8Array,
-  offset: number,
-  length: number
-) => {
+export const gen12StringToUTF = (bytes: Uint8Array, offset: number, length: number) => {
   let str = ''
   // console.log(bytes);
   for (let i = offset; i < offset + length; i += 1) {
@@ -408,16 +404,10 @@ export const gen12StringToUTF = (
  * @param terminate include 0x50 at the end
  * @returns UInt8Array of Gen 1/2 bytes
  */
-export const utf16StringToGen12 = (
-  str: string,
-  length: number,
-  terminate: boolean
-) => {
+export const utf16StringToGen12 = (str: string, length: number, terminate: boolean) => {
   const bufView = new Uint8Array(length)
   for (let i = 0; i < Math.min(str.length, length); i++) {
-    const gen12DictEntry = Object.entries(GBStringDict).find(
-      ([, val]) => val === str.charAt(i)
-    )
+    const gen12DictEntry = Object.entries(GBStringDict).find(([, val]) => val === str.charAt(i))
     if (str.charCodeAt(i) === 0) {
       break
     } else if (!gen12DictEntry) {
@@ -441,11 +431,7 @@ export const utf16StringToGen12 = (
  * @param length character length of string
  * @returns string of decoded Gen 3 bytes
  */
-export const gen3StringToUTF = (
-  bytes: Uint8Array,
-  offset: number,
-  length: number
-) => {
+export const gen3StringToUTF = (bytes: Uint8Array, offset: number, length: number) => {
   let str = ''
   for (let i = offset; i < offset + length; i += 1) {
     if (bytes[i] === 0xff) {
@@ -486,10 +472,7 @@ export const utf16StringToGen3 = (
   }
   if (terminateFill) {
     const terminalIndex = Math.min(length - 1, str.length)
-    bufView.set(
-      new Uint8Array(length - terminalIndex).fill(0xff),
-      terminalIndex
-    )
+    bufView.set(new Uint8Array(length - terminalIndex).fill(0xff), terminalIndex)
   } else if (terminate) {
     const terminalIndex = Math.min(length - 1, str.length)
     bufView[terminalIndex] = 0xff
@@ -505,11 +488,7 @@ export const utf16StringToGen3 = (
  * @param length character length of string (bytes * 2)
  * @returns string of decoded Gen 4 bytes
  */
-export const gen4StringToUTF = (
-  bytes: Uint8Array,
-  offset: number,
-  length: number
-) => {
+export const gen4StringToUTF = (bytes: Uint8Array, offset: number, length: number) => {
   let str = ''
   for (let i = 0; i < length; i += 1) {
     const value = bytesToUint16LittleEndian(bytes, offset + 2 * i)
@@ -530,11 +509,7 @@ export const gen4StringToUTF = (
  * @param terminate include 0xffff at the end
  * @returns UInt8Array of Gen 4 bytes
  */
-export const utf16StringToGen4 = (
-  str: string,
-  length: number,
-  terminate: boolean
-) => {
+export const utf16StringToGen4 = (str: string, length: number, terminate: boolean) => {
   const buf = new ArrayBuffer(length * 2)
   const bufView = new Uint16Array(buf)
   for (let i = 0; i < length; i++) {
@@ -564,11 +539,7 @@ export const utf16StringToGen4 = (
  * @param length character length of string (bytes / 2)
  * @returns string of decoded Gen 5 bytes
  */
-export const gen5StringToUTF = (
-  bytes: Uint8Array,
-  offset: number,
-  length: number
-) => {
+export const gen5StringToUTF = (bytes: Uint8Array, offset: number, length: number) => {
   let str = ''
   for (let i = 0; i < length; i += 1) {
     const value = bytesToUint16LittleEndian(bytes, offset + 2 * i)
@@ -588,11 +559,7 @@ export const gen5StringToUTF = (
  * @param terminate include 0xffff at the end
  * @returns UInt8Array of Gen 5 bytes
  */
-export const utf16StringToGen5 = (
-  str: string,
-  length: number,
-  terminate: boolean
-) => {
+export const utf16StringToGen5 = (str: string, length: number, terminate: boolean) => {
   const buf = new ArrayBuffer(length * 2)
   const bufView = new Uint16Array(buf)
   for (let i = 0; i < length; i++) {

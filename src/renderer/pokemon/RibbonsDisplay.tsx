@@ -65,7 +65,7 @@ const RibbonsDisplay = (props: { mon: PKM }) => {
       {mon.ribbons.map((ribbon) => {
         const ribbonDisplay = formatRibbon(ribbon)
         return (
-          <Tooltip title={ribbonDisplay}>
+          <Tooltip key={`ribbon_${ribbon}`} title={ribbonDisplay}>
             <img
               draggable={false}
               key={ribbonDisplay}

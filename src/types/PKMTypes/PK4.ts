@@ -14,10 +14,7 @@ import {
 } from '../../consts'
 import G4Locations from '../../consts/MetLocation/G4'
 import { ItemFromString, ItemToString } from '../../resources/gen/items/Items'
-import {
-  AbilityFromString,
-  AbilityToString,
-} from '../../resources/gen/other/Abilities'
+import { AbilityFromString, AbilityToString } from '../../resources/gen/other/Abilities'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -32,15 +29,8 @@ import {
   shuffleBlocksGen45,
   unshuffleBlocksGen45,
 } from '../../util/Encryption'
-import {
-  getHPGen3Onward,
-  getLevelGen3Onward,
-  getStatGen3Onward,
-} from '../../util/StatCalc'
-import {
-  gen4StringToUTF,
-  utf16StringToGen4,
-} from '../../util/Strings/StringConverter'
+import { getHPGen3Onward, getLevelGen3Onward, getStatGen3Onward } from '../../util/StatCalc'
+import { gen4StringToUTF, utf16StringToGen4 } from '../../util/Strings/StringConverter'
 import { OHPKM } from './OHPKM'
 import { PKM } from './PKM'
 import {
@@ -76,11 +66,9 @@ export class PK4 extends PKM {
       this.secretID = other.secretID
       this.exp = other.exp
       this.ability =
-        other.ability ??
-        getAbilityFromNumber(this.dexNum, this.formNum, this.abilityNum)
+        other.ability ?? getAbilityFromNumber(this.dexNum, this.formNum, this.abilityNum)
       // console
-      this.personalityValue =
-        generatePersonalityValuePreservingAttributes(other)
+      this.personalityValue = generatePersonalityValuePreservingAttributes(other)
       this.isFatefulEncounter = other.isFatefulEncounter
       this.gender = other.gender
       this.evs = other.evs ?? {
@@ -99,22 +87,10 @@ export class PK4 extends PKM {
       const validMovePP = adjustMovePPBetweenFormats(this, other).filter(
         (_, i) => other.moves[i] <= GEN4_MOVE_MAX
       )
-      const validMovePPUps = other.movePPUps.filter(
-        (_, i) => other.moves[i] <= GEN4_MOVE_MAX
-      )
+      const validMovePPUps = other.movePPUps.filter((_, i) => other.moves[i] <= GEN4_MOVE_MAX)
       this.moves = [validMoves[0], validMoves[1], validMoves[2], validMoves[3]]
-      this.movePP = [
-        validMovePP[0],
-        validMovePP[1],
-        validMovePP[2],
-        validMovePP[3],
-      ]
-      this.movePPUps = [
-        validMovePPUps[0],
-        validMovePPUps[1],
-        validMovePPUps[2],
-        validMovePPUps[3],
-      ]
+      this.movePP = [validMovePP[0], validMovePP[1], validMovePP[2], validMovePP[3]]
+      this.movePPUps = [validMovePPUps[0], validMovePPUps[1], validMovePPUps[2], validMovePPUps[3]]
       this.nickname = other.nickname
       this.currentHP = other.currentHP
       this.ivs = other.ivs
@@ -134,8 +110,7 @@ export class PK4 extends PKM {
         day: now.getDate(),
         year: now.getFullYear(),
       }
-      this.ball =
-        other.ball && other.ball <= Ball.Sport ? other.ball : Ball.Poke
+      this.ball = other.ball && other.ball <= Ball.Sport ? other.ball : Ball.Poke
       if (isGen4(other.gameOfOrigin)) {
         this.eggLocationIndex = other.eggLocationIndex
         this.metLocationIndex = other.metLocationIndex ?? 3002
@@ -286,9 +261,7 @@ export class PK4 extends PKM {
     ] as any as [marking, marking, marking, marking, marking, marking]
   }
 
-  public set markings(
-    value: [marking, marking, marking, marking, marking, marking]
-  ) {
+  public set markings(value: [marking, marking, marking, marking, marking, marking]) {
     let markingsValue = 0
     for (let i = 0; i < 6; i++) {
       if (value[i]) {
@@ -431,12 +404,7 @@ export class PK4 extends PKM {
   }
 
   public get movePP() {
-    return [
-      this.bytes[0x30],
-      this.bytes[0x31],
-      this.bytes[0x32],
-      this.bytes[0x33],
-    ]
+    return [this.bytes[0x30], this.bytes[0x31], this.bytes[0x32], this.bytes[0x33]]
   }
 
   public set movePP(value: [number, number, number, number]) {
@@ -446,12 +414,7 @@ export class PK4 extends PKM {
   }
 
   public get movePPUps() {
-    return [
-      this.bytes[0x34],
-      this.bytes[0x35],
-      this.bytes[0x36],
-      this.bytes[0x37],
-    ]
+    return [this.bytes[0x34], this.bytes[0x35], this.bytes[0x36], this.bytes[0x37]]
   }
 
   public set movePPUps(value: [number, number, number, number]) {
@@ -527,9 +490,7 @@ export class PK4 extends PKM {
 
   public get eggLocationIndex() {
     const dpLocation = bytesToUint16LittleEndian(this.bytes, 0x7e)
-    return dpLocation !== 0xbba
-      ? dpLocation
-      : bytesToUint16LittleEndian(this.bytes, 0x44)
+    return dpLocation !== 0xbba ? dpLocation : bytesToUint16LittleEndian(this.bytes, 0x44)
   }
 
   public set eggLocationIndex(value: number) {
@@ -546,16 +507,13 @@ export class PK4 extends PKM {
     if (!this.eggLocationIndex) {
       return undefined
     }
-    const locationBlock =
-      G4Locations[Math.floor(this.eggLocationIndex / 1000) * 1000]
+    const locationBlock = G4Locations[Math.floor(this.eggLocationIndex / 1000) * 1000]
     return `from ${locationBlock[this.eggLocationIndex % 1000]}`
   }
 
   public get metLocationIndex() {
     const dpLocation = bytesToUint16LittleEndian(this.bytes, 0x80)
-    return dpLocation !== 0xbba
-      ? dpLocation
-      : bytesToUint16LittleEndian(this.bytes, 0x46)
+    return dpLocation !== 0xbba ? dpLocation : bytesToUint16LittleEndian(this.bytes, 0x46)
   }
 
   public set metLocationIndex(value: number) {
@@ -569,8 +527,7 @@ export class PK4 extends PKM {
   }
 
   public get metLocation() {
-    const locationBlock =
-      G4Locations[Math.floor(this.metLocationIndex / 1000) * 1000]
+    const locationBlock = G4Locations[Math.floor(this.metLocationIndex / 1000) * 1000]
     if (locationBlock) {
       return `in ${locationBlock[this.metLocationIndex % 1000]}`
     }

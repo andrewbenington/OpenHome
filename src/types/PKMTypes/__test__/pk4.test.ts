@@ -23,25 +23,17 @@ test('gen 4 stat calculations', () => {
 })
 
 const mightyenaOH = bytesToPKM(
-  new Uint8Array(
-    fs.readFileSync(path.join(__dirname, './PKMFiles/OH', 'mightyena.ohpkm'))
-  ),
+  new Uint8Array(fs.readFileSync(path.join(__dirname, './PKMFiles/OH', 'mightyena.ohpkm'))),
   'OHPKM'
 ) as OHPKM
 
 const slowpokeOH = bytesToPKM(
-  new Uint8Array(
-    fs.readFileSync(
-      path.join(__dirname, './PKMFiles/OH', 'slowpoke-shiny.ohpkm')
-    )
-  ),
+  new Uint8Array(fs.readFileSync(path.join(__dirname, './PKMFiles/OH', 'slowpoke-shiny.ohpkm'))),
   'OHPKM'
 ) as OHPKM
 
 const typhlosionGen4 = bytesToPKM(
-  new Uint8Array(
-    fs.readFileSync(path.join(__dirname, './PKMFiles/Gen4', 'typhlosion.pkm'))
-  ),
+  new Uint8Array(fs.readFileSync(path.join(__dirname, './PKMFiles/Gen4', 'typhlosion.pkm'))),
   'PK4'
 ) as PK4
 
@@ -70,12 +62,7 @@ test('gen 4 EVs are updated', () => {
 test('gen 4 ribbons are updated', () => {
   const gen4pkm = new PK4(mightyenaOH)
   // gaining Gen 4 ribbons
-  gen4pkm.ribbons = [
-    ...gen4pkm.ribbons,
-    'Winning',
-    'Beauty (Sinnoh)',
-    'National',
-  ]
+  gen4pkm.ribbons = [...gen4pkm.ribbons, 'Winning', 'Beauty (Sinnoh)', 'National']
   mightyenaOH.updateData(gen4pkm)
   expect(mightyenaOH.ribbons).toContain('Beauty (Sinnoh)')
   expect(mightyenaOH.ribbons).toContain('National')
@@ -116,9 +103,7 @@ test('gen 4 conversion to OHPKM and back is lossless', () => {
 
 test('pk4 and ohpkm have the same gen345Lookup key', () => {
   const ohPKM = new OHPKM(typhlosionGen4)
-  expect(getMonGen345Identifier(ohPKM)).toEqual(
-    getMonGen345Identifier(typhlosionGen4)
-  )
+  expect(getMonGen345Identifier(ohPKM)).toEqual(getMonGen345Identifier(typhlosionGen4))
 })
 
 test('gen 6+ nickname accuracy', () => {

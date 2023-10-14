@@ -8,16 +8,10 @@ export function initializeFolders(appDataPath: string) {
   }
   _.range(36).forEach((boxNum) => {
     if (
-      !fs.existsSync(
-        `${appDataPath}/OpenHome/storage/boxes/Box ${(
-          boxNum + 1
-        ).toString()}.csv`
-      )
+      !fs.existsSync(`${appDataPath}/OpenHome/storage/boxes/Box ${(boxNum + 1).toString()}.csv`)
     ) {
       fs.writeFileSync(
-        `${appDataPath}/OpenHome/storage/boxes/Box ${(
-          boxNum + 1
-        ).toString()}.csv`,
+        `${appDataPath}/OpenHome/storage/boxes/Box ${(boxNum + 1).toString()}.csv`,
         ''
       )
     }
@@ -28,21 +22,11 @@ export function initializeFolders(appDataPath: string) {
   if (!fs.existsSync(`${appDataPath}/OpenHome/storage/lookup`)) {
     fs.mkdirSync(`${appDataPath}/OpenHome/storage/lookup`, { recursive: true })
   }
-  if (
-    !fs.existsSync(`${appDataPath}/OpenHome/storage/lookup/gen12Lookup.csv`)
-  ) {
-    fs.writeFileSync(
-      `${appDataPath}/OpenHome/storage/lookup/gen12Lookup.csv`,
-      ''
-    )
+  if (!fs.existsSync(`${appDataPath}/OpenHome/storage/lookup/gen12Lookup.csv`)) {
+    fs.writeFileSync(`${appDataPath}/OpenHome/storage/lookup/gen12Lookup.csv`, '')
   }
-  if (
-    !fs.existsSync(`${appDataPath}/OpenHome/storage/lookup/gen345Lookup.csv`)
-  ) {
-    fs.writeFileSync(
-      `${appDataPath}/OpenHome/storage/lookup/gen345Lookup.csv`,
-      ''
-    )
+  if (!fs.existsSync(`${appDataPath}/OpenHome/storage/lookup/gen345Lookup.csv`)) {
+    fs.writeFileSync(`${appDataPath}/OpenHome/storage/lookup/gen345Lookup.csv`, '')
   }
   if (!fs.existsSync(`${appDataPath}/OpenHome/storage/saveFiles.csv`)) {
     fs.writeFileSync(`${appDataPath}/OpenHome/storage/saveFiles.csv`, '')

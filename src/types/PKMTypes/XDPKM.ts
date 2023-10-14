@@ -4,17 +4,10 @@ import { GCLanguages } from '../../consts/Languages'
 import { POKEMON_DATA } from '../../consts/Mons'
 import { Gen3StandardRibbons } from '../../consts/Ribbons'
 import { ItemGen3ToString } from '../../resources/gen/items/Gen3'
-import {
-  bytesToUint16BigEndian,
-  bytesToUint32BigEndian,
-} from '../../util/ByteLogic'
+import { bytesToUint16BigEndian, bytesToUint32BigEndian } from '../../util/ByteLogic'
 import { gen3ToNational } from '../../util/ConvertPokemonID'
 import { getGen3To5Gender } from '../../util/GenderCalc'
-import {
-  getHPGen3Onward,
-  getLevelGen3Onward,
-  getStatGen3Onward,
-} from '../../util/StatCalc'
+import { getHPGen3Onward, getLevelGen3Onward, getStatGen3Onward } from '../../util/StatCalc'
 import { utf16BytesToString } from '../../util/Strings/StringConverter'
 import { PKM } from './PKM'
 
@@ -72,8 +65,7 @@ export class XDPKM extends PKM {
       spa: getStatGen3Onward('SpA', this),
       spd: getStatGen3Onward('SpD', this),
     }
-    const origin =
-      GameOfOriginData.find((game) => game?.gc === bytes[0x34]) ?? null
+    const origin = GameOfOriginData.find((game) => game?.gc === bytes[0x34]) ?? null
     this.gameOfOrigin = GameOfOriginData.indexOf(origin)
     this.trainerName = utf16BytesToString(this.bytes, 0x38, 11, true)
     this.nickname = utf16BytesToString(this.bytes, 0x4e, 11, true)
@@ -98,12 +90,7 @@ export class XDPKM extends PKM {
   }
 
   public get movePP() {
-    return [
-      this.bytes[0x82],
-      this.bytes[0x86],
-      this.bytes[0x8a],
-      this.bytes[0x8e],
-    ]
+    return [this.bytes[0x82], this.bytes[0x86], this.bytes[0x8a], this.bytes[0x8e]]
   }
 
   public set movePP(value: [number, number, number, number]) {
@@ -113,12 +100,7 @@ export class XDPKM extends PKM {
   }
 
   public get movePPUps() {
-    return [
-      this.bytes[0x83],
-      this.bytes[0x87],
-      this.bytes[0x8b],
-      this.bytes[0x8f],
-    ]
+    return [this.bytes[0x83], this.bytes[0x87], this.bytes[0x8b], this.bytes[0x8f]]
   }
 
   public set movePPUps(value: [number, number, number, number]) {

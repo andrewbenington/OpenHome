@@ -5,10 +5,7 @@ import { OHPKM } from '../../types/PKMTypes/OHPKM'
 import { PK2 } from '../../types/PKMTypes/PK2'
 import { SaveType } from '../../types/types'
 import { bytesToUint16BigEndian, get8BitChecksum } from '../../util/ByteLogic'
-import {
-  gen12StringToUTF,
-  utf16StringToGen12,
-} from '../../util/Strings/StringConverter'
+import { gen12StringToUTF, utf16StringToGen12 } from '../../util/Strings/StringConverter'
 import { Box, SAV } from './SAV'
 
 export class G2Box implements Box {
@@ -38,8 +35,8 @@ export class G2SAV extends SAV {
     this.displayID = this.tid.toString().padStart(5, '0')
     this.name = gen12StringToUTF(this.bytes, 0x200b, 11)
     this.boxOffsets = [
-      0x4000, 0x4450, 0x48a0, 0x4cf0, 0x5140, 0x5590, 0x59e0, 0x6000, 0x6450,
-      0x68a0, 0x6cf0, 0x7140, 0x7590, 0x79e0,
+      0x4000, 0x4450, 0x48a0, 0x4cf0, 0x5140, 0x5590, 0x59e0, 0x6000, 0x6450, 0x68a0, 0x6cf0,
+      0x7140, 0x7590, 0x79e0,
     ]
     this.boxes = []
     if (this.areGoldSilverChecksumsValid()) {
@@ -73,12 +70,7 @@ export class G2SAV extends SAV {
           )
           mon.trainerName = gen12StringToUTF(
             this.bytes,
-            offset +
-              1 +
-              pokemonPerBox +
-              1 +
-              pokemonPerBox * 0x20 +
-              monIndex * 11,
+            offset + 1 + pokemonPerBox + 1 + pokemonPerBox * 0x20 + monIndex * 11,
             11
           )
           mon.nickname = gen12StringToUTF(
@@ -93,9 +85,7 @@ export class G2SAV extends SAV {
             11
           )
           mon.gameOfOrigin =
-            this.saveType === SaveType.GS_I
-              ? GameOfOrigin.Silver
-              : GameOfOrigin.Crystal
+            this.saveType === SaveType.GS_I ? GameOfOrigin.Silver : GameOfOrigin.Crystal
           mon.language = 'ENG'
           this.boxes[boxNumber].pokemon[monIndex] = mon
         }
@@ -121,24 +111,12 @@ export class G2SAV extends SAV {
           // set the mon's dex number in the box
           this.bytes[boxByteOffset + 1 + numMons] = PK2Mon.dexNum
           // set the mon's data in the box
-          this.bytes.set(
-            PK2Mon.bytes,
-            boxByteOffset + 1 + pokemonPerBox + 1 + numMons * 0x20
-          )
+          this.bytes.set(PK2Mon.bytes, boxByteOffset + 1 + pokemonPerBox + 1 + numMons * 0x20)
           // set the mon's OT name in the box
-          const trainerNameBuffer = utf16StringToGen12(
-            PK2Mon.trainerName,
-            11,
-            true
-          )
+          const trainerNameBuffer = utf16StringToGen12(PK2Mon.trainerName, 11, true)
           this.bytes.set(
             trainerNameBuffer,
-            boxByteOffset +
-              1 +
-              pokemonPerBox +
-              1 +
-              pokemonPerBox * 0x20 +
-              numMons * 11
+            boxByteOffset + 1 + pokemonPerBox + 1 + pokemonPerBox * 0x20 + numMons * 11
           )
           // set the mon's nickname in the box
           const nicknameBuffer = utf16StringToGen12(PK2Mon.nickname, 11, true)
@@ -159,10 +137,7 @@ export class G2SAV extends SAV {
       const remainingSlots = pokemonPerBox - numMons
       if (remainingSlots) {
         // set all dex numbers to 0
-        this.bytes.set(
-          new Uint8Array(remainingSlots + 1),
-          boxByteOffset + 1 + numMons
-        )
+        this.bytes.set(new Uint8Array(remainingSlots + 1), boxByteOffset + 1 + numMons)
         // set all mon data to all 0s
         this.bytes.set(
           new Uint8Array(0x20 * remainingSlots),
@@ -171,12 +146,7 @@ export class G2SAV extends SAV {
         // set all OT names to all 0s
         this.bytes.set(
           new Uint8Array(11 * remainingSlots),
-          boxByteOffset +
-            1 +
-            pokemonPerBox +
-            1 +
-            pokemonPerBox * 0x20 +
-            numMons * 11
+          boxByteOffset + 1 + pokemonPerBox + 1 + pokemonPerBox * 0x20 + numMons * 11
         )
         // set all nicknames to all 0s
         this.bytes.set(

@@ -25,45 +25,27 @@ const Markings = (props: MarkingsProps) => {
   const { markings } = props
   return (
     <div style={markingsContainerStyle}>
-      <span
-        className="No-Select"
-        style={{ color: getMarkingColor(markings[0]) }}
-      >
+      <span className="No-Select" style={{ color: getMarkingColor(markings[0]) }}>
         ●
       </span>
-      <span
-        className="No-Select"
-        style={{ color: getMarkingColor(markings[1]) }}
-      >
+      <span className="No-Select" style={{ color: getMarkingColor(markings[1]) }}>
         ■
       </span>
-      <span
-        className="No-Select"
-        style={{ color: getMarkingColor(markings[2]) }}
-      >
+      <span className="No-Select" style={{ color: getMarkingColor(markings[2]) }}>
         ▲
       </span>
-      <span
-        className="No-Select"
-        style={{ color: getMarkingColor(markings[3]) }}
-      >
+      <span className="No-Select" style={{ color: getMarkingColor(markings[3]) }}>
         ♥
       </span>
       {markings[4] !== undefined ? (
-        <span
-          className="No-Select"
-          style={{ color: getMarkingColor(markings[4]) }}
-        >
+        <span className="No-Select" style={{ color: getMarkingColor(markings[4]) }}>
           ★
         </span>
       ) : (
         <div />
       )}
       {markings[5] !== undefined ? (
-        <span
-          className="No-Select"
-          style={{ color: getMarkingColor(markings[5]) }}
-        >
+        <span className="No-Select" style={{ color: getMarkingColor(markings[5]) }}>
           ◆
         </span>
       ) : (

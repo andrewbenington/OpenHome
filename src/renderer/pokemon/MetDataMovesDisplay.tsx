@@ -69,9 +69,7 @@ const MetDataMovesDisplay = (props: { mon: PKM }) => {
       return undefined
     }
     return `Egg received ${
-      mon.eggDate
-        ? `on ${mon.eggDate.month}/${mon.eggDate.day}/${mon.eggDate.year}`
-        : ''
+      mon.eggDate ? `on ${mon.eggDate.month}/${mon.eggDate.day}/${mon.eggDate.year}` : ''
     } ${mon.eggLocation}.`
   }, [mon])
 
@@ -142,18 +140,10 @@ const MetDataMovesDisplay = (props: { mon: PKM }) => {
             </p>
             <Card sx={styles.language}>{mon.language}</Card>
           </div>
-          {eggMessage ? (
-            <p style={styles.description}>{eggMessage}</p>
-          ) : (
-            <div />
-          )}
+          {eggMessage ? <p style={styles.description}>{eggMessage}</p> : <div />}
           <p style={styles.description}>{metMessage}</p>
           {/* check for undefined because 0 nature is Hardy */}
-          {mon.nature !== undefined ? (
-            <p style={styles.description}>{natureMessage}</p>
-          ) : (
-            <div />
-          )}
+          {mon.nature !== undefined ? <p style={styles.description}>{natureMessage}</p> : <div />}
           {mon.ivs ? <p>{mon.characteristic}</p> : <div />}
         </div>
         <div
@@ -176,16 +166,13 @@ const MetDataMovesDisplay = (props: { mon: PKM }) => {
               )}
               style={styles.gameImage}
             />
-            {(GameOfOriginData[mon.gameOfOrigin]?.mark ||
-              mon.gameOfOrigin === -1) && (
+            {(GameOfOriginData[mon.gameOfOrigin]?.mark || mon.gameOfOrigin === -1) && (
               <img
                 draggable={false}
                 alt="origin mark"
                 src={getPublicImageURL(
                   getOriginMark(
-                    mon.gameOfOrigin === -1
-                      ? 'GB'
-                      : GameOfOriginData[mon.gameOfOrigin]?.mark ?? ''
+                    mon.gameOfOrigin === -1 ? 'GB' : GameOfOriginData[mon.gameOfOrigin]?.mark ?? ''
                   )
                 )}
                 style={styles.originMark}

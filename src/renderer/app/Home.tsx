@@ -52,9 +52,7 @@ const Home = () => {
   const dragSource = useDragSource()
   const modifiedOHPKMs = useModifiedOHPKMs()
   const monsToDelete = useMonsToDelete()
-  const [loadingMessage, setLoadingMessage] = useState<string | undefined>(
-    'Starting app...'
-  )
+  const [loadingMessage, setLoadingMessage] = useState<string | undefined>('Starting app...')
   const [currentTheme] = useState<OpenHomeTheme>(Themes[0])
   const [selectedMon, setSelectedMon] = useState<PKM>()
   const [tab, setTab] = useState('summary')
@@ -64,10 +62,7 @@ const Home = () => {
   const dispatchDeleteMon = (saveCoordinates: SaveCoordinates) =>
     dispatch(deleteMon(saveCoordinates))
   const [writeAllSaveFiles, writeAllHomeData] = useSaveFunctions()
-  const dispatchClearAllSaves = useCallback(
-    () => dispatch(clearAllSaves()),
-    [dispatch]
-  )
+  const dispatchClearAllSaves = useCallback(() => dispatch(clearAllSaves()), [dispatch])
   const dispatchCancelDrag = () => dispatch(cancelDrag())
 
   useEffect(() => {
@@ -181,7 +176,7 @@ const Home = () => {
         }}
       >
         {_.range(saves.length).map((i) => (
-          <SaveDisplay saveIndex={i} setSelectedMon={setSelectedMon} />
+          <SaveDisplay key={`save_display_${i}`} saveIndex={i} setSelectedMon={setSelectedMon} />
         ))}
         <OpenHomeButton
           style={{
@@ -198,11 +193,7 @@ const Home = () => {
           <h2>Open Save</h2>
         </OpenHomeButton>
       </Grid>
-      <Grid
-        item
-        xs={6}
-        style={{ display: 'flex', flexDirection: 'column', width: '50%' }}
-      >
+      <Grid item xs={6} style={{ display: 'flex', flexDirection: 'column', width: '50%' }}>
         <HomeBoxDisplay setSelectedMon={setSelectedMon} />
       </Grid>
       <Grid item xs={3} style={{ display: 'flex', flexDirection: 'column' }}>
@@ -242,18 +233,16 @@ const Home = () => {
           >
             RELEASE
           </div>
-          <div
-            style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }}
-          >
-            {monsToDelete.map((mon) => {
+          <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }}>
+            {monsToDelete.map((mon, i) => {
               if (mon.isEgg || !POKEMON_DATA[mon.dexNum]) {
                 return '0% 0%'
               }
-              const [x, y] =
-                POKEMON_DATA[mon.dexNum].formes[mon.formNum].spriteIndex
+              const [x, y] = POKEMON_DATA[mon.dexNum].formes[mon.formNum].spriteIndex
               const backgroundPosition = `${(x / 35) * 100}% ${(y / 36) * 100}%`
               return (
                 <div
+                  key={`delete_mon_${i}`}
                   style={{
                     background: `url(${BoxIcons}) no-repeat 0.02777% 0.02777%`,
                     backgroundSize: '3600%',
@@ -275,9 +264,7 @@ const Home = () => {
         fullWidth
         PaperProps={{ sx: { height: 400 } }}
       >
-        {selectedMon && (
-          <PokemonDisplay mon={selectedMon} tab={tab} setTab={setTab} />
-        )}
+        {selectedMon && <PokemonDisplay mon={selectedMon} tab={tab} setTab={setTab} />}
       </Dialog>
       <Dialog
         open={openSaveDialog}

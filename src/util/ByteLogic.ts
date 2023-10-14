@@ -43,11 +43,7 @@ export const uint16ToBytesBigEndian = (value: number): Uint8Array => {
   return Uint8Array.from([(value >> 8) & 0xff, value & 0xff])
 }
 
-export const get8BitChecksum = (
-  bytes: Uint8Array,
-  start: number,
-  end: number
-) => {
+export const get8BitChecksum = (bytes: Uint8Array, start: number, end: number) => {
   let checksum = 0
   for (let i = start; i <= end; i += 1) {
     checksum += bytes[i]
@@ -56,11 +52,7 @@ export const get8BitChecksum = (
   return checksum
 }
 
-export const get16BitChecksumLittleEndian = (
-  bytes: Uint8Array,
-  start: number,
-  end: number
-) => {
+export const get16BitChecksumLittleEndian = (bytes: Uint8Array, start: number, end: number) => {
   let checksum = 0
   for (let i = start; i < end; i += 2) {
     checksum = (checksum + bytesToUint16LittleEndian(bytes, i)) & 0xffff
@@ -69,11 +61,7 @@ export const get16BitChecksumLittleEndian = (
 }
 
 export const uint24ToBytesBigEndian = (value: number): Uint8Array => {
-  return Uint8Array.from([
-    (value >> 16) & 0xff,
-    (value >> 8) & 0xff,
-    value & 0xff,
-  ])
+  return Uint8Array.from([(value >> 16) & 0xff, (value >> 8) & 0xff, value & 0xff])
 }
 
 export const uint32ToBytesLittleEndian = (value: number): Uint8Array => {
@@ -85,33 +73,19 @@ export const uint32ToBytesLittleEndian = (value: number): Uint8Array => {
   ])
 }
 
-export const writeUint32ToBuffer = (
-  value: number,
-  buffer: Uint8Array,
-  offset: number
-) => {
+export const writeUint32ToBuffer = (value: number, buffer: Uint8Array, offset: number) => {
   buffer.set(uint32ToBytesLittleEndian(value), offset)
 }
 
-export const writeUint16ToBuffer = (
-  value: number,
-  buffer: Uint8Array,
-  offset: number
-) => {
+export const writeUint16ToBuffer = (value: number, buffer: Uint8Array, offset: number) => {
   buffer.set(uint16ToBytesLittleEndian(value), offset)
 }
 
-export const setFlag = (
-  buffer: Uint8Array,
-  offset: number,
-  index: number,
-  value: boolean
-) => {
+export const setFlag = (buffer: Uint8Array, offset: number, index: number, value: boolean) => {
   const byteIndex = offset + Math.floor(index / 8)
   const bitIndex = index % 8
   if (byteIndex < buffer.length) {
-    buffer[byteIndex] =
-      (buffer[byteIndex] & (0xff - 2 ** bitIndex)) | (value ? 2 ** bitIndex : 0)
+    buffer[byteIndex] = (buffer[byteIndex] & (0xff - 2 ** bitIndex)) | (value ? 2 ** bitIndex : 0)
   }
 }
 

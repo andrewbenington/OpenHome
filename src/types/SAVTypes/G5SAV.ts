@@ -1,10 +1,7 @@
 import { GameOfOrigin, NDex } from '../../consts'
 import _ from 'lodash'
 import { CRC16_CCITT } from '../../util/Encryption'
-import {
-  bytesToUint16LittleEndian,
-  uint16ToBytesLittleEndian,
-} from '../../util/ByteLogic'
+import { bytesToUint16LittleEndian, uint16ToBytesLittleEndian } from '../../util/ByteLogic'
 import { gen5StringToUTF } from '../../util/Strings/StringConverter'
 import { OHPKM } from '../PKMTypes'
 import { PK5 } from '../PKMTypes/PK5'
@@ -52,14 +49,8 @@ export class G5SAV extends SAV {
   constructor(path: string, bytes: Uint8Array) {
     super(path, bytes)
     this.name = gen5StringToUTF(this.bytes, this.trainerDataOffset + 0x04, 0x10)
-    this.tid = bytesToUint16LittleEndian(
-      this.bytes,
-      this.trainerDataOffset + 0x14
-    )
-    this.sid = bytesToUint16LittleEndian(
-      this.bytes,
-      this.trainerDataOffset + 0x16
-    )
+    this.tid = bytesToUint16LittleEndian(this.bytes, this.trainerDataOffset + 0x14)
+    this.sid = bytesToUint16LittleEndian(this.bytes, this.trainerDataOffset + 0x16)
     this.currentPCBox = this.bytes[0]
     this.displayID = this.tid.toString().padStart(5, '0')
     this.origin = this.bytes[this.trainerDataOffset + 0x1f]
@@ -70,11 +61,7 @@ export class G5SAV extends SAV {
     }
     this.boxes = Array(24)
     for (let box = 0; box < 24; box++) {
-      const boxName = gen5StringToUTF(
-        this.bytes,
-        BOX_NAMES_OFFSET + 40 * box,
-        20
-      )
+      const boxName = gen5StringToUTF(this.bytes, BOX_NAMES_OFFSET + 40 * box, 20)
       this.boxes[box] = new G5Box(boxName)
     }
 
@@ -125,10 +112,7 @@ export class G5SAV extends SAV {
       this.checksumMirrorsOffset,
       this.checksumMirrorsSize
     )
-    this.bytes.set(
-      uint16ToBytesLittleEndian(newChecksum),
-      this.checksumMirrorsChecksumOffset
-    )
+    this.bytes.set(uint16ToBytesLittleEndian(newChecksum), this.checksumMirrorsChecksumOffset)
   }
 
   prepareBoxesForSaving() {
@@ -157,8 +141,8 @@ export class G5SAV extends SAV {
         this.bytes.set(new Uint8Array(136), writeIndex)
       }
     })
-    _.uniq(this.updatedBoxSlots.map((coords) => coords.box)).forEach(
-      (boxIndex) => this.updateBoxChecksum(boxIndex)
+    _.uniq(this.updatedBoxSlots.map((coords) => coords.box)).forEach((boxIndex) =>
+      this.updateBoxChecksum(boxIndex)
     )
     this.updateMirrorsChecksum()
     return changedMonPKMs

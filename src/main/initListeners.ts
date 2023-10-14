@@ -129,15 +129,12 @@ function initListeners() {
       : path.join(`${app.getAppPath()}resources`)
   })
 
-  ipcMain.handle(
-    'set-document-edited',
-    (event: IpcMainInvokeEvent, edited: boolean) => {
-      const window = BrowserWindow.getAllWindows().find(
-        (win) => win.webContents.id === event.sender.id
-      )
-      window?.setDocumentEdited(edited)
-    }
-  )
+  ipcMain.handle('set-document-edited', (event: IpcMainInvokeEvent, edited: boolean) => {
+    const window = BrowserWindow.getAllWindows().find(
+      (win) => win.webContents.id === event.sender.id
+    )
+    window?.setDocumentEdited(edited)
+  })
 }
 
 export default initListeners

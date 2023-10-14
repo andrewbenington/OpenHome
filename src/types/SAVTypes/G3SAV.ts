@@ -114,9 +114,7 @@ export class G3SaveBackup {
       this.sectors.push(new G3Sector(bytes, i))
       this.firstSectorIndex = this.sectors[0].sectionID
     }
-    this.sectors.sort(
-      (sector1, sector2) => sector1.sectionID - sector2.sectionID
-    )
+    this.sectors.sort((sector1, sector2) => sector1.sectionID - sector2.sectionID)
     this.name = gen3StringToUTF(this.sectors[0].data, 0, 10)
     // concatenate pc data from all sectors
     this.pcDataContiguous = new Uint8Array(33744)
@@ -130,16 +128,11 @@ export class G3SaveBackup {
     this.currentPCBox = this.pcDataContiguous[0]
     this.boxNames = []
     for (let i = 0; i < 14; i++) {
-      this.boxes[i] = new G3Box(
-        gen3StringToUTF(this.pcDataContiguous, 0x8344 + i * 9, 10)
-      )
+      this.boxes[i] = new G3Box(gen3StringToUTF(this.pcDataContiguous, 0x8344 + i * 9, 10))
     }
     for (let i = 0; i < 420; i++) {
       try {
-        const mon = new PK3(
-          this.pcDataContiguous.slice(4 + i * 80, 4 + (i + 1) * 80),
-          true
-        )
+        const mon = new PK3(this.pcDataContiguous.slice(4 + i * 80, 4 + (i + 1) * 80), true)
         if (metDate) {
           mon.metDate = {
             day: metDate.getDate(),
@@ -162,20 +155,13 @@ export class G3SaveBackup {
         break
       case 1:
         this.saveType = SaveType.FRLG
-        this.securityKey = bytesToUint32LittleEndian(
-          this.sectors[0].data,
-          0xaf8
-        )
-        this.money =
-          bytesToUint32LittleEndian(this.sectors[1].data, 0x290) ^
-          this.securityKey
+        this.securityKey = bytesToUint32LittleEndian(this.sectors[0].data, 0xaf8)
+        this.money = bytesToUint32LittleEndian(this.sectors[1].data, 0x290) ^ this.securityKey
         break
       default:
         this.saveType = SaveType.E
         this.securityKey = bytesToUint32LittleEndian(this.sectors[0].data, 0xac)
-        this.money =
-          bytesToUint32LittleEndian(this.sectors[1].data, 0x490) ^
-          this.securityKey
+        this.money = bytesToUint32LittleEndian(this.sectors[1].data, 0x490) ^ this.securityKey
         break
     }
     this.name = gen3StringToUTF(this.sectors[0].data, 0x00, 7)
@@ -306,11 +292,7 @@ export class G3SAV extends SAV {
         i * 3968 + (i + 5 === 13 ? 2000 : 3968)
       )
       sector.data.set(pcData)
-      sector.writeToBuffer(
-        this.primarySave.bytes,
-        i + 5,
-        this.primarySave.firstSectorIndex
-      )
+      sector.writeToBuffer(this.primarySave.bytes, i + 5, this.primarySave.firstSectorIndex)
     })
     this.bytes.set(this.primarySave.bytes, this.primarySaveOffset)
     return changedMonPKMs

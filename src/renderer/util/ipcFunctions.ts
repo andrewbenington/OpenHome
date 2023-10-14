@@ -4,10 +4,7 @@ export const handleMenuSave = (onSave: () => void) => {
   })
 }
 
-export const handleMenuResetAndClose = (
-  onReset: () => void,
-  onClose: () => void
-) => {
+export const handleMenuResetAndClose = (onReset: () => void, onClose: () => void) => {
   const callback1 = window.electron.ipcRenderer.on('reset', () => {
     onReset()
   })

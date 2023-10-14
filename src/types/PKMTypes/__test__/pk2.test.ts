@@ -23,9 +23,7 @@ import { PK2 } from '../PK2'
 // });
 
 const hoohGen2 = bytesToPKM(
-  new Uint8Array(
-    fs.readFileSync(path.join(__dirname, './PKMFiles/Gen2', 'hooh.pk2'))
-  ),
+  new Uint8Array(fs.readFileSync(path.join(__dirname, './PKMFiles/Gen2', 'hooh.pk2'))),
   'PK2'
 ) as PK2
 

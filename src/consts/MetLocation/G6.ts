@@ -454,12 +454,6 @@ const G6Locations: GameLocations = {
     'the VGC 2017',
     'the VGC 2018',
   ],
-  60000: [
-    '',
-    'a stranger',
-    'Day Care helpers',
-    'a treasure hunter',
-    'an old hot-springs visitor',
-  ],
+  60000: ['', 'a stranger', 'Day Care helpers', 'a treasure hunter', 'an old hot-springs visitor'],
 }
 export default G6Locations

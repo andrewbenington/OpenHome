@@ -64,18 +64,14 @@ const OtherDisplay = (props: { mon: PKM }) => {
     <div style={styles.detailsPaneContent}>
       {mon.personalityValue !== undefined ? (
         <AttributeRow label="Personality Value">
-          <code>
-            {`0x${mon.personalityValue.toString(16).padStart(8, '0')}`}
-          </code>
+          <code>{`0x${mon.personalityValue.toString(16).padStart(8, '0')}`}</code>
         </AttributeRow>
       ) : (
         <div />
       )}
       {mon.encryptionConstant !== undefined ? (
         <AttributeRow label="Encryption Constant">
-          <code>
-            {`0x${mon.encryptionConstant.toString(16).padStart(8, '0')}`}
-          </code>
+          <code>{`0x${mon.encryptionConstant.toString(16).padStart(8, '0')}`}</code>
         </AttributeRow>
       ) : (
         <div />
@@ -104,21 +100,13 @@ const OtherDisplay = (props: { mon: PKM }) => {
           <div />
         )}
         {mon.trainerFriendship !== undefined ? (
-          <AttributeRow
-            label="Friendship"
-            value={mon.trainerFriendship.toString()}
-            indent={10}
-          />
+          <AttributeRow label="Friendship" value={mon.trainerFriendship.toString()} indent={10} />
         ) : (
           <div />
         )}
         {mon.trainerAffection !== undefined &&
         (isGen6(mon.gameOfOrigin) || isAlola(mon.gameOfOrigin)) ? (
-          <AttributeRow
-            label="Affection"
-            value={mon.trainerAffection.toString()}
-            indent={10}
-          />
+          <AttributeRow label="Affection" value={mon.trainerAffection.toString()} indent={10} />
         ) : (
           <div />
         )}
@@ -140,29 +128,17 @@ const OtherDisplay = (props: { mon: PKM }) => {
             />
           </AccordionSummary>
           {mon.handlerID !== undefined ? (
-            <AttributeRow
-              label="ID"
-              value={mon.handlerID.toString()}
-              indent={10}
-            />
+            <AttributeRow label="ID" value={mon.handlerID.toString()} indent={10} />
           ) : (
             <div />
           )}
           {mon.handlerFriendship !== undefined ? (
-            <AttributeRow
-              label="Friendship"
-              value={mon.handlerFriendship.toString()}
-              indent={10}
-            />
+            <AttributeRow label="Friendship" value={mon.handlerFriendship.toString()} indent={10} />
           ) : (
             <div />
           )}
           {mon.handlerAffection !== undefined ? (
-            <AttributeRow
-              label="Affection"
-              value={mon.handlerAffection.toString()}
-              indent={10}
-            />
+            <AttributeRow label="Affection" value={mon.handlerAffection.toString()} indent={10} />
           ) : (
             <div />
           )}
@@ -173,11 +149,7 @@ const OtherDisplay = (props: { mon: PKM }) => {
       {mon.dexNum === NDex.WURMPLE ? (
         <AttributeRow
           label="Wurmple Evolution"
-          value={
-            (((mon.encryptionConstant ?? 0) >> 16) & 0xffff) % 10 > 4
-              ? 'Dustox'
-              : 'Beautifly'
-          }
+          value={(((mon.encryptionConstant ?? 0) >> 16) & 0xffff) % 10 > 4 ? 'Dustox' : 'Beautifly'}
         />
       ) : (
         <div />
@@ -198,9 +170,7 @@ const OtherDisplay = (props: { mon: PKM }) => {
       {mon.dexNum === NDex.TANDEMAUS && mon.encryptionConstant ? (
         <AttributeRow
           label="Maushold"
-          value={
-            mon.encryptionConstant % 100 ? 'Family of Four' : 'Family of Three'
-          }
+          value={mon.encryptionConstant % 100 ? 'Family of Four' : 'Family of Three'}
         />
       ) : (
         <div />
@@ -219,10 +189,7 @@ const OtherDisplay = (props: { mon: PKM }) => {
         <div />
       )}
       {mon.isShiny ? (
-        <AttributeRow
-          label="SwSh Shiny Type"
-          value={mon.isSquareShiny ? 'Square' : 'Star'}
-        />
+        <AttributeRow label="SwSh Shiny Type" value={mon.isSquareShiny ? 'Square' : 'Star'} />
       ) : (
         <div />
       )}
@@ -240,22 +207,16 @@ const OtherDisplay = (props: { mon: PKM }) => {
           >
             <AttributeRow
               label="Geolocations"
-              value={mon.geolocations
-                .filter((geo) => geo.country)
-                .length.toString()}
+              value={mon.geolocations.filter((geo) => geo.country).length.toString()}
             />
           </AccordionSummary>
           {mon.geolocations?.map((geo, i) =>
             geo.country ? (
-              <AttributeRow
-                key={`geo_${i + 1}`}
-                label={`Geolocation ${i + 1}`}
-                indent={10}
-              >
+              <AttributeRow key={`geo_${i + 1}`} label={`Geolocation ${i + 1}`} indent={10}>
                 {Countries[geo.country]}, Region {geo.region}
               </AttributeRow>
             ) : (
-              <div />
+              <div key={`geo_${i + 1}`} />
             )
           )}
         </Accordion>
@@ -267,15 +228,10 @@ const OtherDisplay = (props: { mon: PKM }) => {
           <DynamaxLevel level={mon.dynamaxLevel} />
         </AttributeRow>
       )}
-      {mon.teraTypeOriginal !== undefined &&
-      mon.teraTypeOverride !== undefined ? (
+      {mon.teraTypeOriginal !== undefined && mon.teraTypeOverride !== undefined ? (
         <AttributeRow label="Tera Type">
           <TypeIcon
-            typeIndex={
-              mon.teraTypeOverride <= 18
-                ? mon.teraTypeOverride
-                : mon.teraTypeOriginal
-            }
+            typeIndex={mon.teraTypeOverride <= 18 ? mon.teraTypeOverride : mon.teraTypeOriginal}
           />
           {mon.teraTypeOverride <= 18 && (
             <>
@@ -295,14 +251,8 @@ const OtherDisplay = (props: { mon: PKM }) => {
         <div />
       )}
       {!isRestricted(HGSS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
-      (mon instanceof PK3 ||
-        mon instanceof PK4 ||
-        mon instanceof PK5 ||
-        mon instanceof OHPKM) ? (
-        <AttributeRow
-          label="Gen 3/4/5 ID"
-          value={getMonGen345Identifier(mon)}
-        />
+      (mon instanceof PK3 || mon instanceof PK4 || mon instanceof PK5 || mon instanceof OHPKM) ? (
+        <AttributeRow label="Gen 3/4/5 ID" value={getMonGen345Identifier(mon)} />
       ) : (
         <div />
       )}
@@ -327,25 +277,13 @@ const OtherDisplay = (props: { mon: PKM }) => {
           />
         )}
         {mon.isSquareShiny && (
-          <AttributeTag
-            label="SQUARE SHINY"
-            color="white"
-            backgroundColor="black"
-          />
+          <AttributeTag label="SQUARE SHINY" color="white" backgroundColor="black" />
         )}
         {mon.isShadow && (
-          <AttributeTag
-            label="SHADOW"
-            backgroundColor={getTypeColor('shadow')}
-            color="white"
-          />
+          <AttributeTag label="SHADOW" backgroundColor={getTypeColor('shadow')} color="white" />
         )}
         {mon.isNsPokemon && (
-          <AttributeTag
-            label="N's Pokémon"
-            backgroundColor="green"
-            color="white"
-          />
+          <AttributeTag label="N's Pokémon" backgroundColor="green" color="white" />
         )}
       </div>
     </div>

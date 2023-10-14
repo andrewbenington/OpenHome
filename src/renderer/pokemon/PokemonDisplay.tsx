@@ -12,18 +12,7 @@ import {
 } from '../../consts/TransferRestrictions'
 import { useState } from 'react'
 import { StringToStringMap, Styles } from '../../types/types'
-import {
-  OHPKM,
-  PA8,
-  PK1,
-  PK2,
-  PK3,
-  PK4,
-  PK5,
-  PK6,
-  PK7,
-  PKM,
-} from '../../types/PKMTypes'
+import { OHPKM, PA8, PK1, PK2, PK3, PK4, PK5, PK6, PK7, PKM } from '../../types/PKMTypes'
 import { isRestricted } from '../../types/TransferRestrictions'
 import OpenHomeButton from '../components/OpenHomeButton'
 import MetDataMovesDisplay from './MetDataMovesDisplay'
@@ -118,11 +107,7 @@ const fileTypeColors: StringToStringMap = {
   PK9: '#f52',
 }
 
-const PokemonDisplay = (props: {
-  mon: PKM
-  tab: string
-  setTab: (_: string) => void
-}) => {
+const PokemonDisplay = (props: { mon: PKM; tab: string; setTab: (_: string) => void }) => {
   const { mon, tab, setTab } = props
   const [displayMon, setDisplayMon] = useState(mon)
 
@@ -152,71 +137,43 @@ const PokemonDisplay = (props: {
               <div />
             )}
             {mon.format === 'OHPKM' &&
-            !isRestricted(
-              GEN1_TRANSFER_RESTRICTIONS,
-              mon.dexNum,
-              mon.formNum
-            ) ? (
+            !isRestricted(GEN1_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) ? (
               <MenuItem value="PK1">PK1</MenuItem>
             ) : (
               <div />
             )}
             {mon.format === 'OHPKM' &&
-            !isRestricted(
-              GEN2_TRANSFER_RESTRICTIONS,
-              mon.dexNum,
-              mon.formNum
-            ) ? (
+            !isRestricted(GEN2_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) ? (
               <MenuItem value="PK2">PK2</MenuItem>
             ) : (
               <div />
             )}
             {mon.format === 'OHPKM' &&
-            !isRestricted(
-              GEN3_TRANSFER_RESTRICTIONS,
-              mon.dexNum,
-              mon.formNum
-            ) ? (
+            !isRestricted(GEN3_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) ? (
               <MenuItem value="PK3">PK3</MenuItem>
             ) : (
               <div />
             )}
             {mon.format === 'OHPKM' &&
-            !isRestricted(
-              HGSS_TRANSFER_RESTRICTIONS,
-              mon.dexNum,
-              mon.formNum
-            ) ? (
+            !isRestricted(HGSS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) ? (
               <MenuItem value="PK4">PK4</MenuItem>
             ) : (
               <div />
             )}
             {mon.format === 'OHPKM' &&
-            !isRestricted(
-              BW2_TRANSFER_RESTRICTIONS,
-              mon.dexNum,
-              mon.formNum
-            ) ? (
+            !isRestricted(BW2_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) ? (
               <MenuItem value="PK5">PK5</MenuItem>
             ) : (
               <div />
             )}
             {mon.format === 'OHPKM' &&
-            !isRestricted(
-              ORAS_TRANSFER_RESTRICTIONS,
-              mon.dexNum,
-              mon.formNum
-            ) ? (
+            !isRestricted(ORAS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) ? (
               <MenuItem value="PK6">PK6</MenuItem>
             ) : (
               <div />
             )}
             {mon.format === 'OHPKM' &&
-            !isRestricted(
-              USUM_TRANSFER_RESTRICTIONS,
-              mon.dexNum,
-              mon.formNum
-            ) ? (
+            !isRestricted(USUM_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) ? (
               <MenuItem value="PK7">PK7</MenuItem>
             ) : (
               <div />

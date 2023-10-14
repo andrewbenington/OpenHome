@@ -1,10 +1,7 @@
 import { GameOfOrigin } from '../../consts'
 import { PT_TRANSFER_RESTRICTIONS } from '../../consts/TransferRestrictions'
 import { SaveType } from '../../types/types'
-import {
-  bytesToUint16LittleEndian,
-  bytesToUint32LittleEndian,
-} from '../../util/ByteLogic'
+import { bytesToUint16LittleEndian, bytesToUint32LittleEndian } from '../../util/ByteLogic'
 import { gen4StringToUTF } from '../../util/Strings/StringConverter'
 import { G4SAV } from './G4SAV'
 
@@ -44,20 +41,13 @@ export class PtSAV extends G4SAV {
     // current storage block could be either the first or second one,
     // depending on save count
     if (
-      this.getCurrentSaveCount(
-        PtSAV.STORAGE_BLOCK_OFFSET,
-        PtSAV.STORAGE_BLOCK_SIZE
-      ) <
-      this.getCurrentSaveCount(
-        PtSAV.STORAGE_BLOCK_OFFSET + 0x40000,
-        PtSAV.STORAGE_BLOCK_SIZE
-      )
+      this.getCurrentSaveCount(PtSAV.STORAGE_BLOCK_OFFSET, PtSAV.STORAGE_BLOCK_SIZE) <
+      this.getCurrentSaveCount(PtSAV.STORAGE_BLOCK_OFFSET + 0x40000, PtSAV.STORAGE_BLOCK_SIZE)
     ) {
       this.currentSaveStorageBlockOffset += 0x40000
     }
     this.currentSaveBoxStartOffset = this.currentSaveStorageBlockOffset + 4
-    this.boxNamesOffset =
-      this.currentSaveStorageBlockOffset + PtSAV.BOX_NAMES_OFFSET
+    this.boxNamesOffset = this.currentSaveStorageBlockOffset + PtSAV.BOX_NAMES_OFFSET
     this.name = gen4StringToUTF(bytes, PtSAV.TRAINER_NAME_OFFSET, 8)
     this.tid = bytesToUint16LittleEndian(bytes, PtSAV.TRAINER_ID_OFFSET)
     this.sid = bytesToUint16LittleEndian(bytes, PtSAV.TRAINER_ID_OFFSET + 2)
@@ -66,9 +56,6 @@ export class PtSAV extends G4SAV {
   }
 
   getCurrentSaveCount(blockOffset: number, blockSize: number) {
-    return bytesToUint32LittleEndian(
-      this.bytes,
-      blockOffset + blockSize - this.footerSize
-    )
+    return bytesToUint32LittleEndian(this.bytes, blockOffset + blockSize - this.footerSize)
   }
 }
