@@ -12,7 +12,7 @@ export class PK9 extends PKM {
     super(bytes)
     this.encryptionConstant = bytesToUint32LittleEndian(bytes, 0x00)
     this.format = 'PK9'
-    this.personalityValue = bytesToUint32LittleEndian(bytes, 0x00)
+    this.personalityValue = bytesToUint32LittleEndian(bytes, 0x1c)
     this.dexNum = svToNatDex(bytesToUint16LittleEndian(bytes, 0x08))
     this.exp = bytesToUint32LittleEndian(bytes, 0x10)
     this.formNum = bytes[0x24]

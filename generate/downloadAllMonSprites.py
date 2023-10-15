@@ -5,7 +5,11 @@ import threading
 import time
 import urllib.request
 
-with open('../../consts/JSON/Pokemon.json') as f:
+if not os.path.isdir('src/renderer/public'):
+    print("current directory must be project source. aborting")
+    exit(1)
+
+with open('src/consts/JSON/Pokemon.json') as f:
     POKEMON_DATA = json.load(f)
 
 def format_pokemon_db_forme(dex_num: int, form_num: int) -> str:
@@ -225,8 +229,8 @@ sweets = [
 ]
 
 alola_dex = [
-    10, 11, 12, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 35, 36, 37, 38, 39, 
-    40, 41, 42, 46, 47, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 
+    10, 11, 12, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 35, 36, 37, 38, 39,
+    40, 41, 42, 46, 47, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62,
     63, 64, 65, 66, 67, 68, 72, 73, 74, 75, 76, 79, 80, 81, 82, 86, 87, 88,
     89, 90, 91, 92, 93, 94, 96, 97, 102, 103, 104, 105, 108, 113, 115, 118,
       119, 120, 121,
@@ -317,31 +321,31 @@ sv_transferrable = [
     185, 187, 188, 189, 191, 192, 194, 196, 197, 198, 199, 200, 203, 204, 205,
     206, 211, 212, 214, 215, 216, 217, 225, 228, 229, 231, 232, 234, 242, 246,
     247, 248, 278, 279, 280, 281, 282, 283, 284, 285, 286, 287, 288, 289, 296,
-    297, 298, 302, 307, 308, 316, 317, 322, 323, 324, 325, 326, 331, 332, 333, 
-    334, 335, 336, 339, 340, 353, 354, 357, 361, 362, 370, 371, 372, 373, 396, 
-    397, 398, 401, 402, 403, 404, 405, 415, 416, 417, 418, 419, 422, 423, 425, 
-    426, 429, 430, 434, 435, 436, 437, 438, 440, 442, 443, 444, 445, 447, 448, 
-    449, 450, 456, 457, 459, 460, 461, 462, 470, 471, 475, 478, 479, 548, 549, 
-    550, 551, 552, 553, 570, 571, 574, 574, 576, 585, 586, 590, 591, 594, 602, 
-    603, 604, 610, 611, 612, 613, 614, 615, 624, 625, 627, 628, 633, 634, 635, 
-    636, 637, 661, 662, 663, 664, 665, 666, 667, 668, 669, 670, 671, 672, 673, 
-    690, 691, 692, 693, 700, 701, 702, 704, 705, 706, 707, 712, 713, 714, 715, 
-    734, 735, 739, 740, 741, 744, 745, 747, 748, 749, 750, 753, 754, 757, 758, 
+    297, 298, 302, 307, 308, 316, 317, 322, 323, 324, 325, 326, 331, 332, 333,
+    334, 335, 336, 339, 340, 353, 354, 357, 361, 362, 370, 371, 372, 373, 396,
+    397, 398, 401, 402, 403, 404, 405, 415, 416, 417, 418, 419, 422, 423, 425,
+    426, 429, 430, 434, 435, 436, 437, 438, 440, 442, 443, 444, 445, 447, 448,
+    449, 450, 456, 457, 459, 460, 461, 462, 470, 471, 475, 478, 479, 548, 549,
+    550, 551, 552, 553, 570, 571, 574, 574, 576, 585, 586, 590, 591, 594, 602,
+    603, 604, 610, 611, 612, 613, 614, 615, 624, 625, 627, 628, 633, 634, 635,
+    636, 637, 661, 662, 663, 664, 665, 666, 667, 668, 669, 670, 671, 672, 673,
+    690, 691, 692, 693, 700, 701, 702, 704, 705, 706, 707, 712, 713, 714, 715,
+    734, 735, 739, 740, 741, 744, 745, 747, 748, 749, 750, 753, 754, 757, 758,
     761, 762, 763, 765, 766, 769, 770, 775, 778, 779, 819, 820, 821, 822, 823,
     833, 834, 837, 838, 839, 840, 841, 842, 843, 844, 846, 847, 848, 849, 854,
     855, 856, 857, 858, 859, 860, 861, 870, 871, 872, 873, 874, 875, 876, 878,
     879, 885, 886, 887, 906, 907, 908, 909, 910, 911, 912, 913, 914, 915, 916,
-    917, 918, 919, 920, 921, 922, 923, 924, 925, 926, 927, 928, 929, 930, 931, 
-    932, 933, 934, 935, 936, 937, 938, 939, 940, 941, 942, 943, 944, 945, 946, 
-    947, 948, 949, 950, 951, 952, 953, 954, 955, 956, 957, 958, 959, 960, 961, 
+    917, 918, 919, 920, 921, 922, 923, 924, 925, 926, 927, 928, 929, 930, 931,
+    932, 933, 934, 935, 936, 937, 938, 939, 940, 941, 942, 943, 944, 945, 946,
+    947, 948, 949, 950, 951, 952, 953, 954, 955, 956, 957, 958, 959, 960, 961,
     962, 963, 964, 965, 966, 967, 968, 969, 970, 971, 972, 973, 974, 975, 976,
-    977, 978, 979, 980, 981, 982, 983, 984, 985, 986, 987, 988, 989, 990, 991, 
-    992, 993, 994, 995, 996, 997, 998, 999, 1000, 1001, 1002, 1003, 1004, 1005, 
+    977, 978, 979, 980, 981, 982, 983, 984, 985, 986, 987, 988, 989, 990, 991,
+    992, 993, 994, 995, 996, 997, 998, 999, 1000, 1001, 1002, 1003, 1004, 1005,
     1006, 1007, 1008, 1009, 1010,
-    4, 5, 6, 144, 145, 146, 150, 151, 155, 156, 157, 195, 382, 383, 384, 480, 
-    481, 482, 483, 484, 485, 487, 488, 493, 501, 502, 503, 641, 642, 645, 648, 
-    650, 651, 652, 653, 654, 655, 656, 657, 658, 703, 719, 720, 721, 722, 723, 
-    724, 801, 810, 811, 812, 813, 814, 815, 816, 817, 818, 863, 888, 889, 890, 
+    4, 5, 6, 144, 145, 146, 150, 151, 155, 156, 157, 195, 382, 383, 384, 480,
+    481, 482, 483, 484, 485, 487, 488, 493, 501, 502, 503, 641, 642, 645, 648,
+    650, 651, 652, 653, 654, 655, 656, 657, 658, 703, 719, 720, 721, 722, 723,
+    724, 801, 810, 811, 812, 813, 814, 815, 816, 817, 818, 863, 888, 889, 890,
     891, 892, 893, 894, 895, 896, 897, 898, 899, 900, 901, 902, 903, 904, 905,
     23,24,27,28,35,36,37,38,60,61,62,69,70,71,74,75,76,109,110,143,161,162,163,
     164,173,190,193,207,218,219,220,221,261,262,270,271,272,273,274,275,299,341,
@@ -440,18 +444,18 @@ def exclude_forme_home(dex_number, forme):
 
 
 def download_all_sprites_all_mons():
-    os.makedirs("sprites/home/shiny", exist_ok=True)
-    os.makedirs("sprites/gen1", exist_ok=True)
-    os.makedirs("sprites/gen2/shiny", exist_ok=True)
-    os.makedirs("sprites/gen3/shiny", exist_ok=True)
-    os.makedirs("sprites/gen3gc/shiny", exist_ok=True)
-    os.makedirs("sprites/gen4/shiny", exist_ok=True)
-    os.makedirs("sprites/gen5/shiny", exist_ok=True)
-    os.makedirs("sprites/gen6/shiny", exist_ok=True)
-    os.makedirs("sprites/gen7/shiny", exist_ok=True)
-    os.makedirs("sprites/gen8/shiny", exist_ok=True)
-    os.makedirs("sprites/gen8a/shiny", exist_ok=True)
-    os.makedirs("sprites/gen9/shiny", exist_ok=True)
+    os.makedirs("src/renderer/public/sprites/home/shiny", exist_ok=True)
+    os.makedirs("src/renderer/public/sprites/gen1", exist_ok=True)
+    os.makedirs("src/renderer/public/sprites/gen2/shiny", exist_ok=True)
+    os.makedirs("src/renderer/public/sprites/gen3/shiny", exist_ok=True)
+    os.makedirs("src/renderer/public/sprites/gen3gc/shiny", exist_ok=True)
+    os.makedirs("src/renderer/public/sprites/gen4/shiny", exist_ok=True)
+    os.makedirs("src/renderer/public/sprites/gen5/shiny", exist_ok=True)
+    os.makedirs("src/renderer/public/sprites/gen6/shiny", exist_ok=True)
+    os.makedirs("src/renderer/public/sprites/gen7/shiny", exist_ok=True)
+    os.makedirs("src/renderer/public/sprites/gen8/shiny", exist_ok=True)
+    os.makedirs("src/renderer/public/sprites/gen8a/shiny", exist_ok=True)
+    os.makedirs("src/renderer/public/sprites/gen9/shiny", exist_ok=True)
     for dex_num_str, mon in POKEMON_DATA.items():
         dex_number = int(dex_num_str)
         for forme_number, forme in enumerate(mon["formes"]):
@@ -486,7 +490,7 @@ def download_all_sprites(dex_number, forme, forme_number, forme_name):
         download_sprite_variants_pokencyclopedia_coloxd(dex_number, forme_number, forme_name)
     if dex_number <= 493 and not excludeFormeGen4(dex_number, forme):
         download_sprite_variants_pokemon_db(
-            dex_number, forme_number, forme_name, 
+            dex_number, forme_number, forme_name,
             "heartgold-soulsilver", "gen4", dex_number != 133 and dex_number != 419)
     if dex_number <= 649 and not excludeFormeGen5(dex_number, forme):
         download_sprite_variants_pokemon_db(
@@ -500,7 +504,7 @@ def download_all_sprites(dex_number, forme, forme_number, forme_name):
     elif dex_number <= 809 and not excludeFormeGen7(dex_number, forme):
         download_sprite_variants_pokemon_db(
             dex_number, forme_number, forme_name, "ultra-sun-ultra-moon", "gen7", dex_number != 133)
-    if dex_number <= 905 and not exclude_forme_home(dex_number, forme):
+    if dex_number <= 1017 and not exclude_forme_home(dex_number, forme):
         download_sprite_variants_pokemon_db(
             dex_number, forme_number, forme_name, "home", "home")
     if dex_number <= 724 and not excludeFormeLA(dex_number, forme):
@@ -515,23 +519,23 @@ def download_sprite_variants_pokemon_db(dex_number, forme_number, forme_name, ga
         return
     extension = ".gif" if "anim" in game else ".png"
     download_png(get_pokemon_db_sprite(dex_number, forme_number, False,
-                                       game), "sprites/" + folder, forme_name + extension)
+                                       game), "src/renderer/public/sprites/" + folder, forme_name + extension)
     if game == "red-blue":
         return
     download_png(get_pokemon_db_sprite(dex_number, forme_number, True,
-                                       game), "sprites/" + folder + "/shiny", forme_name + extension)
+                                       game), "src/renderer/public/sprites/" + folder + "/shiny", forme_name + extension)
     if includeFemale and dex_number in gender_differences and forme_number == 0 and dex_number != 255 and dex_number != 418:
         download_png(get_pokemon_db_sprite(dex_number, forme_number, False,
-                                           game, is_female=True), "sprites/" + folder, forme_name + "-f" + extension)
+                                           game, is_female=True), "src/renderer/public/sprites/" + folder, forme_name + "-f" + extension)
         download_png(get_pokemon_db_sprite(dex_number, forme_number, True,
-                                           game, is_female=True), "sprites/" + folder + "/shiny", forme_name + "-f" + extension)
+                                           game, is_female=True), "src/renderer/public/sprites/" + folder + "/shiny", forme_name + "-f" + extension)
 
 def download_sprite_variants_pokencyclopedia_coloxd(dex_number, forme_number, forme_name):
     gen3_forme = None
     if forme_number > 0 or dex_number == 201:
         gen3_forme = forme_name.split('-')[1]
-    download_png(get_pokencyclopedia_coloxd_sprite(dex_number, False, gen3_forme), "sprites/gen3gc", forme_name + ".gif")
-    download_png(get_pokencyclopedia_coloxd_sprite(dex_number, True, gen3_forme), "sprites/gen3gc/shiny", forme_name + ".gif")
+    download_png(get_pokencyclopedia_coloxd_sprite(dex_number, False, gen3_forme), "src/renderer/public/sprites/gen3gc", forme_name + ".gif")
+    download_png(get_pokencyclopedia_coloxd_sprite(dex_number, True, gen3_forme), "src/renderer/public/sprites/gen3gc/shiny", forme_name + ".gif")
 
 download_all_sprites_all_mons()
 # print(POKEMON_DATA["19"]["formes"][1])

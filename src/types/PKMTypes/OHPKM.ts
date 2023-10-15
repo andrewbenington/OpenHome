@@ -1,16 +1,6 @@
 import _, { uniq } from 'lodash'
 import Prando from 'prando'
 import {
-  contestStats,
-  geolocation,
-  hyperTrainStats,
-  marking,
-  memory,
-  pokedate,
-  stats,
-  statsPreSplit,
-} from '../../types/types'
-import {
   Ball,
   GameOfOrigin,
   Gen34ContestRibbons,
@@ -21,6 +11,16 @@ import {
 } from '../../consts'
 import { ItemFromString, ItemToString } from '../../resources/gen/items/Items'
 import { AbilityFromString, AbilityToString } from '../../resources/gen/other/Abilities'
+import {
+  contestStats,
+  geolocation,
+  hyperTrainStats,
+  marking,
+  memory,
+  pokedate,
+  stats,
+  statsPreSplit,
+} from '../../types/types'
 import {
   bytesToUint16BigEndian,
   bytesToUint16LittleEndian,
@@ -65,6 +65,7 @@ export class OHPKM extends PKM {
       )
       this.sanity = other.sanity
       this.dexNum = other.dexNum
+      this.formNum = other.formNum
       this.heldItem = other.heldItem
       this.trainerID = other.trainerID
       this.secretID = other.secretID
@@ -98,7 +99,6 @@ export class OHPKM extends PKM {
       this.statNature = other.statNature ?? this.nature
       this.isFatefulEncounter = other.isFatefulEncounter
       this.flag2LA = other.flag2LA ?? false
-      this.formNum = other.formNum
       this.evs = other.evs ?? { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 }
       this.contest = other.contest ?? {
         smart: 0,

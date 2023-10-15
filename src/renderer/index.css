@@ -15,6 +15,7 @@ body,
 #root {
   height: 100%;
 }
+
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -26,4 +27,11 @@ body,
 ::-webkit-scrollbar-thumb {
   border-radius: 10px;
   background-color: #fff;
+}
+
+.disable-select {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }

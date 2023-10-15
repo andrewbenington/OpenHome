@@ -58781,6 +58781,37 @@
         "abilityH": "Heatproof",
         "spriteIndex": [13, 36],
         "sprite": "poltchageist"
+      },
+      {
+        "formeNumber": 1,
+        "name": "Poltchageist",
+        "formeName": "Poltchageist-Masterpiece",
+        "alias": "poltchageist-masterpiece",
+        "isBaseForm": true,
+        "isMega": false,
+        "isBattleOnly": false,
+        "isLegendary": false,
+        "isMythical": false,
+        "height": 0.1,
+        "weight": 1.1,
+        "baseFriendship": 0,
+        "genderRatio": { "M": 0, "F": 0 },
+        "gen": 9,
+        "evos": [{ "dexNumber": 1013, "formeNumber": 0 }],
+        "eggGroups": ["Mineral", "Amorphous"],
+        "baseStats": {
+          "hp": 40,
+          "atk": 45,
+          "def": 45,
+          "spa": 74,
+          "spd": 54,
+          "spe": 50
+        },
+        "types": ["Grass", "Ghost"],
+        "ability1": "Hospitality",
+        "abilityH": "Heatproof",
+        "spriteIndex": [13, 36],
+        "sprite": "poltchageist-masterpiece"
       }
     ],
     "levelUpType": "Medium Fast"
@@ -58820,6 +58851,38 @@
         "abilityH": "Heatproof",
         "spriteIndex": [14, 36],
         "sprite": "sinistcha"
+      },
+      {
+        "formeNumber": 1,
+        "name": "Sinistcha",
+        "formeName": "Sinistcha-Masterpiece",
+        "alias": "sinistcha-masterpiece",
+        "isBaseForm": true,
+        "isMega": false,
+        "isBattleOnly": false,
+        "isLegendary": false,
+        "isMythical": false,
+        "height": 0.2,
+        "weight": 2.2,
+        "baseFriendship": 0,
+        "genderRatio": { "M": 0, "F": 0 },
+        "gen": 9,
+        "evos": [],
+        "eggGroups": ["Mineral", "Amorphous"],
+        "prevo": { "dexNumber": 1012, "formeNumber": 0 },
+        "baseStats": {
+          "hp": 71,
+          "atk": 60,
+          "def": 106,
+          "spa": 121,
+          "spd": 80,
+          "spe": 70
+        },
+        "types": ["Grass", "Ghost"],
+        "ability1": "Hospitality",
+        "abilityH": "Heatproof",
+        "spriteIndex": [14, 36],
+        "sprite": "sinistcha-masterpiece"
       }
     ],
     "levelUpType": "Medium Fast"
@@ -58945,7 +59008,7 @@
       {
         "formeNumber": 0,
         "name": "Ogerpon",
-        "formeName": "Ogerpon",
+        "formeName": "Ogerpon-Teal-Mask",
         "alias": "ogerpon",
         "isBaseForm": true,
         "isMega": false,
@@ -58975,7 +59038,7 @@
       {
         "formeNumber": 1,
         "name": "Ogerpon",
-        "formeName": "Ogerpon",
+        "formeName": "Ogerpon-Wellspring-Mask",
         "alias": "ogerpon-wellspring-mask",
         "isBaseForm": false,
         "isMega": false,
@@ -59003,7 +59066,7 @@
       {
         "formeNumber": 2,
         "name": "Ogerpon",
-        "formeName": "Ogerpon",
+        "formeName": "Ogerpon-Hearthflame-Mask",
         "alias": "ogerpon-hearthflame-mask",
         "isBaseForm": false,
         "isMega": false,
@@ -59031,7 +59094,7 @@
       {
         "formeNumber": 3,
         "name": "Ogerpon",
-        "formeName": "Ogerpon",
+        "formeName": "Ogerpon-Cornerstone-Mask",
         "alias": "ogerpon-cornerstone-mask",
         "isBaseForm": false,
         "isMega": false,
