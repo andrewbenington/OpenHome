@@ -47,13 +47,15 @@ export const getPokemonSpritePath = (mon: PKM, format?: string) => {
   const monFormat = format ?? mon.format
   let spriteName = POKEMON_DATA[mon.dexNum]?.formes[mon.formNum]?.sprite ?? ''
   if (mon.dexNum === NDex.ALCREMIE) {
-    spriteName += `-${SWEETS[mon.formArgument ?? 0].toLocaleLowerCase()}`
+    spriteName = `${
+      POKEMON_DATA[mon.dexNum]?.formes[mon.formNum]?.formeName?.toLowerCase() ??
+      'alcremie-vanilla-cream'
+    }-${SWEETS[mon.formArgument ?? 0].toLocaleLowerCase()}`
   }
+  console.log(POKEMON_DATA[mon.dexNum]?.formes[mon.formNum], spriteName)
   let spriteFolder = fileToSpriteFolder[monFormat]
   if (spriteFolder === 'gen7' && !alolaDex.includes(mon.dexNum)) {
     spriteFolder = 'gen6'
-  } else if (spriteFolder === 'home' && mon.dexNum > NDex.ENAMORUS) {
-    spriteFolder = 'gen9'
   }
   return `sprites/${spriteFolder}${mon.isShiny ? '/shiny/' : '/'}${spriteName}.${
     spriteFolder === 'gen5' || spriteFolder === 'gen3gc' ? 'gif' : 'png'

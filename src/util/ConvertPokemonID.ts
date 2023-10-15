@@ -95,7 +95,8 @@ const svToNatMap: { [key: number]: number } = {
   1010: 979,
   1011: 1017,
   1012: 1011,
-  1013: 1012,
+  1024: 1012,
+  1025: 1013,
 }
 
 const natToSVMap: { [key: number]: number } = {

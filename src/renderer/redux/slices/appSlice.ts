@@ -24,7 +24,7 @@ const initialState: AppState = {
   homeData: new HomeData(),
   saves: [],
   modifiedOHPKMs: {},
-  monsToDelete: [],
+  monsToRelease: [],
   lookup: {},
 }
 
@@ -77,15 +77,18 @@ export const appSlice = createSlice({
   name: 'saves',
   initialState,
   reducers: {
-    deleteMon: (state, action: PayloadAction<SaveCoordinates>) => {
+    setMonToRelease: (state, action: PayloadAction<SaveCoordinates>) => {
       const replacedMon = updateMonInSave(state, undefined, action.payload)
       if (replacedMon && replacedMon instanceof OHPKM) {
         const identifier = getMonFileIdentifier(replacedMon)
         if (identifier) {
           delete state.modifiedOHPKMs[identifier]
         }
-        state.monsToDelete.push(replacedMon)
+        state.monsToRelease.push(replacedMon)
       }
+    },
+    clearMonsToRelease: (state) => {
+      state.monsToRelease = []
     },
     importMons: (state, action: PayloadAction<ImportMonsParams>) => {
       const addedMons: OHPKM[] = []
@@ -231,7 +234,7 @@ export const appSlice = createSlice({
       })
       state.modifiedOHPKMs = {}
       state.homeData.updatedBoxSlots = []
-      state.monsToDelete.forEach((mon) => {
+      state.monsToRelease.forEach((mon) => {
         const gen345Identifier = getMonGen345Identifier(mon as OHPKM)
         if (state.lookup.gen345 && gen345Identifier && gen345Identifier in state.lookup.gen345) {
           delete state.lookup.gen345[gen345Identifier]
@@ -249,7 +252,7 @@ export const appSlice = createSlice({
           })
         }
       })
-      state.monsToDelete = []
+      state.monsToRelease = []
     },
     setGen12Lookup: (state, action: PayloadAction<{ [key: string]: string }>) => {
       state.lookup.gen12 = action.payload
@@ -337,7 +340,8 @@ export const appSlice = createSlice({
 })
 
 export const {
-  deleteMon,
+  setMonToRelease,
+  clearMonsToRelease,
   importMons,
   setSaveBox,
   startDrag,
@@ -363,7 +367,7 @@ export const selectDragMon = (state: RootState) => state.app.dragMon
 export const selectModifiedOHPKMs = (state: RootState) => state.app.modifiedOHPKMs
 export const selectGen12Lookup = (state: RootState) => state.app.lookup.gen12
 export const selectGen345Lookup = (state: RootState) => state.app.lookup.gen345
-export const selectMonsToDelete = (state: RootState) => state.app.monsToDelete
+export const selectMonsToRelease = (state: RootState) => state.app.monsToRelease
 
 export const selectCount = (state: RootState) => state.app.saves.length
 

@@ -15,7 +15,7 @@ export interface AppState {
   dragSource?: SaveCoordinates
   dragMon?: PKM
   modifiedOHPKMs: { [key: string]: OHPKM }
-  monsToDelete: OHPKM[]
+  monsToRelease: OHPKM[]
   lookup: LookupState
 }
 
