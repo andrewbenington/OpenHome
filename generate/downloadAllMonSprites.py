@@ -82,7 +82,7 @@ def download_png(url, directory, filename):
         opener.addheaders = [('User-agent', 'Mozilla/5.0')]
         urllib.request.install_opener(opener)
         urllib.request.urlretrieve(url, os.path.join(directory, filename))
-        print(f"\tDownloaded to {directory}")
+        print(f"\tDownloaded {filename} to {directory}")
         return True, False
     except Exception as e:
         print(f"\tError downloading: {e}")
@@ -510,20 +510,20 @@ def download_all_sprites(dex_number, forme, forme_number, forme_name):
     if dex_number <= 724 and not excludeFormeLA(dex_number, forme):
         download_sprite_variants_pokemon_db(
             dex_number, forme_number, forme_name, "legends-arceus", "gen8a")
-    if dex_number <= 1017 and not exclude_forme_gen9(dex_number, forme):
-        download_sprite_variants_pokemon_db(
-            dex_number, forme_number, forme_name, "scarlet-violet", "gen9")
+    # if dex_number <= 1017 and not exclude_forme_gen9(dex_number, forme):
+    #     download_sprite_variants_pokemon_db(
+    #         dex_number, forme_number, forme_name, "scarlet-violet", "gen9")
 
 def download_sprite_variants_pokemon_db(dex_number, forme_number, forme_name, game, folder, includeFemale=True):
     if "-totem" in forme_name:
         return
     extension = ".gif" if "anim" in game else ".png"
     download_png(get_pokemon_db_sprite(dex_number, forme_number, False,
-                                       game), "src/renderer/public/sprites/" + folder, forme_name + extension)
+                                       game, False, forme_name), "src/renderer/public/sprites/" + folder, forme_name + extension)
     if game == "red-blue":
         return
     download_png(get_pokemon_db_sprite(dex_number, forme_number, True,
-                                       game), "src/renderer/public/sprites/" + folder + "/shiny", forme_name + extension)
+                                       game, False, forme_name), "src/renderer/public/sprites/" + folder + "/shiny", forme_name + extension)
     if includeFemale and dex_number in gender_differences and forme_number == 0 and dex_number != 255 and dex_number != 418:
         download_png(get_pokemon_db_sprite(dex_number, forme_number, False,
                                            game, is_female=True), "src/renderer/public/sprites/" + folder, forme_name + "-f" + extension)
@@ -538,5 +538,3 @@ def download_sprite_variants_pokencyclopedia_coloxd(dex_number, forme_number, fo
     download_png(get_pokencyclopedia_coloxd_sprite(dex_number, True, gen3_forme), "src/renderer/public/sprites/gen3gc/shiny", forme_name + ".gif")
 
 download_all_sprites_all_mons()
-# print(POKEMON_DATA["19"]["formes"][1])
-# print(exclude_forme_gen8(19, POKEMON_DATA["19"]["formes"][1]))

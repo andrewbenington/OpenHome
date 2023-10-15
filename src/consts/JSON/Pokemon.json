@@ -51012,7 +51012,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": false,
-        "sprite": "alcremie-",
+        "sprite": "alcremie-vanilla-cream",
         "spriteIndex": [21, 31]
       },
       {
@@ -51048,7 +51048,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "alcremie-rubycream",
+        "sprite": "alcremie-ruby-cream",
         "spriteIndex": [22, 31]
       },
       {
@@ -51084,7 +51084,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "alcremie-matchacream",
+        "sprite": "alcremie-matcha-cream",
         "spriteIndex": [23, 31]
       },
       {
@@ -51120,7 +51120,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "alcremie-mintcream",
+        "sprite": "alcremie-mint-cream",
         "spriteIndex": [24, 31]
       },
       {
@@ -51156,7 +51156,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "alcremie-lemoncream",
+        "sprite": "alcremie-lemon-cream",
         "spriteIndex": [25, 31]
       },
       {
@@ -51192,7 +51192,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "alcremie-saltedcream",
+        "sprite": "alcremie-salted-cream",
         "spriteIndex": [26, 31]
       },
       {
@@ -51228,7 +51228,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "alcremie-rubyswirl",
+        "sprite": "alcremie-ruby-swirl",
         "spriteIndex": [27, 31]
       },
       {
@@ -51264,7 +51264,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "alcremie-caramelswirl",
+        "sprite": "alcremie-caramel-swirl",
         "spriteIndex": [28, 31]
       },
       {
@@ -51300,7 +51300,7 @@
         "ultraBeast": false,
         "paradox": false,
         "cosmeticForme": true,
-        "sprite": "alcremie-rainbowswirl",
+        "sprite": "alcremie-rainbow-swirl",
         "spriteIndex": [29, 31]
       }
     ],
