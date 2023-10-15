@@ -61,28 +61,32 @@ const SaveDisplay = (props: SaveDisplayProps) => {
             flexDirection: 'row',
             marginLeft: 10,
             marginRight: 10,
-            backgroundColor: palette.secondary.main,
+            backgroundColor: palette.primary.main,
+            position: 'relative',
           }}
         >
           <OpenHomeButton
             style={{
               color: save.updatedBoxSlots.length ? palette.text.disabled : palette.text.secondary,
+              backgroundColor: palette.primary.main,
               fontWeight: 'bold',
-              backgroundColor: palette.secondary.main,
+              position: 'absolute',
+              left: 0,
+              top: 0,
+              bottom: 0,
             }}
             onClick={() => dispatchRemoveSaveAt(saveIndex)}
             disabled={!!save.updatedBoxSlots.length}
           >
-            <Close style={{}} />
+            <Close />
           </OpenHomeButton>
           <div
             style={{
               flex: 1,
               color: 'white',
-              fontWeight: 'bold',
             }}
           >
-            <div style={{ textAlign: 'center' }}>
+            <div style={{ textAlign: 'center', fontWeight: 'bold' }}>
               {save.origin
                 ? `Pokémon ${GameOfOriginData[save.origin]?.name}`
                 : getSaveTypeString(save.saveType)}
@@ -94,14 +98,14 @@ const SaveDisplay = (props: SaveDisplayProps) => {
         </Card>
         <Card
           style={{
-            backgroundColor: isDisabled ? '#555' : palette.secondary.main,
             padding: 5,
             margin: 10,
+            backgroundColor: isDisabled ? '#666' : palette.primary.main,
           }}
         >
           <div>
             <Grid container>
-              <Grid xs={2} style={{ display: 'grid', alignItems: 'center' }}>
+              <Grid xs={2} display="grid" alignItems="center">
                 <ArrowButton
                   onClick={() =>
                     dispatchSetBox(
@@ -112,7 +116,7 @@ const SaveDisplay = (props: SaveDisplayProps) => {
                   <ArrowBack fontSize="small" />
                 </ArrowButton>
               </Grid>
-              <Grid xs={8} style={{ textAlign: 'center', color: 'white' }}>
+              <Grid xs={8} textAlign="center" color="white">
                 {save.boxes[save.currentPCBox]?.name}
               </Grid>
               <Grid

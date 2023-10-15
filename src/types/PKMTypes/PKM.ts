@@ -1,15 +1,5 @@
 import { max } from 'lodash'
 import {
-  contestStats,
-  geolocation,
-  hyperTrainStats,
-  marking,
-  memory,
-  pokedate,
-  stats,
-  statsPreSplit,
-} from '../../types/types'
-import {
   AttackCharacteristics,
   DefenseCharacteristics,
   EncounterTypes,
@@ -22,6 +12,16 @@ import {
   SpeedCharacteristics,
 } from '../../consts'
 import { getLocation } from '../../consts/MetLocation/MetLocation'
+import {
+  contestStats,
+  geolocation,
+  hyperTrainStats,
+  marking,
+  memory,
+  pokedate,
+  stats,
+  statsPreSplit,
+} from '../../types/types'
 
 export class PKM {
   static markingCount = 4
@@ -1326,7 +1326,6 @@ export class PKM {
   }
 
   public get eggLocation() {
-    console.log(this.eggLocationIndex)
     if (!this.eggLocationIndex) return undefined
     return getLocation(this.gameOfOrigin, this.eggLocationIndex, this.format, true)
   }

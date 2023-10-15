@@ -18,6 +18,13 @@ const styles = {
     borderWidth: 2,
     imageRendering: 'pixelated',
   },
+  noRibbonsMessage: {
+    width: '100%',
+    height: '100%',
+    display: 'grid',
+    alignItems: 'center',
+    textAlign: 'center',
+  },
   affixedRibbon: {
     width: 50,
     height: 50,
@@ -60,7 +67,9 @@ const RibbonsDisplay = (props: { mon: PKM }) => {
     return getPublicImageURL(getRibbonSpritePath(ribbon))
   }
 
-  return (
+  return mon.ribbons.length === 0 ? (
+    <div style={styles.noRibbonsMessage}>This Pokémon has no ribbons.</div>
+  ) : (
     <div style={styles.container}>
       {mon.ribbons.map((ribbon) => {
         const ribbonDisplay = formatRibbon(ribbon)

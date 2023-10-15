@@ -275,7 +275,7 @@ export class PK7 extends PKM {
   }
 
   public set gender(value: number) {
-    this.bytes[0x01d] = (this.bytes[0x01d] & 0b11110001) | ((value & 0x3) << 1)
+    this.bytes[0x01d] = (this.bytes[0x01d] & 0b11111001) | ((value & 0x3) << 1)
   }
 
   public get evs() {

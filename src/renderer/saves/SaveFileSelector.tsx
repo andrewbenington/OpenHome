@@ -125,7 +125,7 @@ const SaveFileSelector = (props: SaveFileSelectorProps) => {
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between',
-              backgroundColor: palette.secondary.light,
+              backgroundColor: palette.primary.light,
               color: palette.text.secondary,
               boxShadow:
                 '0px 2px 1px -1px rgb(0 0 0 / 20%), 0px 1px 1px 0px rgb(0 0 0 / 14%), 0px 1px 3px 0px rgb(0 0 0 / 12%)',

@@ -1,5 +1,6 @@
 import { Types } from '../../consts'
 import { Type } from '../../types/types'
+import { getPublicImageURL, getTypeIconPath } from '../images/images'
 
 interface TypeIconProps {
   type?: Type
@@ -15,7 +16,7 @@ const TypeIcon = (props: TypeIconProps) => {
       draggable={false}
       alt={`${type} type`}
       style={typeIconStyle}
-      src={`https://raw.githubusercontent.com/msikma/pokesprite/master/misc/types/gen8/${type.toLocaleLowerCase()}.png`}
+      src={getPublicImageURL(getTypeIconPath(type))}
     />
   )
 }

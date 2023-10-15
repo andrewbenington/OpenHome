@@ -28,7 +28,6 @@ function createWindow(): void {
 
   mainWindow.on('close', (event) => {
     event.preventDefault()
-    console.log(mainWindow?.isDocumentEdited())
     if (mainWindow?.isDocumentEdited()) {
       dialog
         .showMessageBox({

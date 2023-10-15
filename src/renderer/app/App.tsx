@@ -5,11 +5,15 @@ import Themes from './Themes'
 
 const theme = createTheme({
   palette: {
-    primary: {
+    secondary: {
       main: '#A9CEF4',
     },
-    secondary: {
+    primary: {
       main: '#a6bf8f',
+    },
+    background: {
+      default: '#A9CEF4',
+      paper: '#ffffff',
     },
     text: {
       primary: '#000',

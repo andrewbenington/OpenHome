@@ -8,7 +8,6 @@ const styles = {
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
-    height: 40,
   },
   starRow: {
     backgroundColor: '#666',
@@ -79,7 +78,7 @@ const SheenStars = (props: SheenStarsProps) => {
 
   return (
     <div style={styles.container}>
-      <p>Sheen:</p>
+      <div>Sheen:</div>
       <div
         style={{
           ...styles.starRow,
@@ -90,12 +89,12 @@ const SheenStars = (props: SheenStarsProps) => {
           <img
             key={`sheen_star_${level}`}
             alt={`sheen star ${level}`}
-            src={getPublicImageURL('images/icons/Sheen.gif')}
+            src={getPublicImageURL('icons/Sheen.gif')}
             style={styles.star}
           />
         ))}
       </div>
-      ({mon.contest?.sheen ?? '--'})
+      <div>({mon.contest?.sheen ?? '--'})</div>
     </div>
   )
 }
