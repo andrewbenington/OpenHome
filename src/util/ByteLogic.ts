@@ -35,6 +35,14 @@ export const bytesToUint32BigEndian = (bytes: Uint8Array, index: number) => {
   return bytesToNumberBigEndian(bytes.slice(index, index + 4))
 }
 
+export const bytesToInt32BigEndian = (bytes: Uint8Array, index: number) => {
+  const unsigned = bytesToNumberBigEndian(bytes.slice(index, index + 4))
+  if (!(bytes[index] & 0b10000000)) {
+    return unsigned
+  }
+  return -(~(unsigned - 1) & 0xffffffff)
+}
+
 export const uint16ToBytesLittleEndian = (value: number): Uint8Array => {
   return Uint8Array.from([value & 0xff, (value >> 8) & 0xff])
 }
@@ -70,6 +78,15 @@ export const uint32ToBytesLittleEndian = (value: number): Uint8Array => {
     (value >> 8) & 0xff,
     (value >> 16) & 0xff,
     (value >> 24) & 0xff,
+  ])
+}
+
+export const uint32ToBytesBigEndian = (value: number): Uint8Array => {
+  return Uint8Array.from([
+    (value >> 24) & 0xff,
+    (value >> 16) & 0xff,
+    (value >> 8) & 0xff,
+    value & 0xff,
   ])
 }
 

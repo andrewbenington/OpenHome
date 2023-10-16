@@ -1,4 +1,3 @@
-import { contestStats, marking, stats } from '../../types/types'
 import {
   Ball,
   GameOfOrigin,
@@ -15,6 +14,7 @@ import CXDLocation from '../../consts/MetLocation/CXD'
 import RSEFRLGLocations from '../../consts/MetLocation/RSEFRLG'
 import { ItemGen3FromString, ItemGen3ToString } from '../../resources/gen/items/Gen3'
 import { AbilityFromString } from '../../resources/gen/other/Abilities'
+import { contestStats, marking, stats } from '../../types/types'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -40,21 +40,30 @@ import {
 export const GEN3_MOVE_MAX = 354
 export const GEN3_ABILITY_MAX = 77
 
-export class PK3 extends PKM {
-  constructor(...args: any[]) {
-    if (args.length >= 1 && args[0] instanceof Uint8Array) {
-      const bytes = args[0]
-      const encrypted = args[1] ?? false
+export class PK3 implements PKM {
+  public get fileSize() {
+    return 80
+  }
+
+  get markingCount(): number {
+    return 4
+  }
+
+  get markingColors(): number {
+    return 1
+  }
+
+  bytes = new Uint8Array(80)
+  constructor(bytes?: Uint8Array, encrypted?: boolean, other?: OHPKM) {
+    if (bytes) {
       if (encrypted) {
         const unencryptedBytes = decryptByteArrayGen3(bytes)
         const unshuffledBytes = unshuffleBlocksGen3(unencryptedBytes)
-        super(unshuffledBytes)
+        this.bytes = unshuffledBytes
       } else {
-        super(bytes)
+        this.bytes = bytes
       }
-    } else if (args.length === 1 && args[0] instanceof OHPKM) {
-      const other = args[0]
-      super(new Uint8Array(80))
+    } else if (other) {
       this.dexNum = other.dexNum
       this.heldItem = other.heldItem
       this.trainerID = other.trainerID
@@ -68,15 +77,12 @@ export class PK3 extends PKM {
         this.markings = temp as [marking, marking, marking, marking]
       }
       this.personalityValue = generatePersonalityValuePreservingAttributes(other)
-      // this.nature = other.nature ?? this.personalityValue % 25;
       this.isFatefulEncounter = other.isFatefulEncounter
-      // this.gender = other.gender;
-      // this.formNum = other.formNum;
-      this.evs = other.evs ?? { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 }
+      this.evs = other.evs
       this.contest = other.contest
       this.pokerusByte = other.pokerusByte
-      // handle ribbons
       this.ribbons = other.ribbons
+
       const validMoves = other.moves.filter((move) => move <= GEN3_MOVE_MAX)
       const validMovePP = adjustMovePPBetweenFormats(this, other).filter(
         (_, i) => other.moves[i] <= GEN3_MOVE_MAX
@@ -86,6 +92,7 @@ export class PK3 extends PKM {
       this.movePP = [validMovePP[0], validMovePP[1], validMovePP[2], validMovePP[3]]
       this.movePPUps = [validMovePPUps[0], validMovePPUps[1], validMovePPUps[2], validMovePPUps[3]]
       this.movePPUps = other.movePPUps
+
       this.ivs = other.ivs
       this.isEgg = other.isEgg
       if (other.gameOfOrigin <= GameOfOrigin.ColosseumXD) {
@@ -123,8 +130,6 @@ export class PK3 extends PKM {
       this.metLevel = other.metLevel ?? this.level
       this.trainerGender = other.trainerGender
       this.refreshChecksum()
-    } else {
-      super(new Uint8Array())
     }
   }
 
@@ -138,10 +143,6 @@ export class PK3 extends PKM {
 
   public set personalityValue(value: number) {
     this.bytes.set(uint32ToBytesLittleEndian(value), 0x00)
-  }
-
-  public get checksum() {
-    return bytesToUint16LittleEndian(this.bytes, 0x1c)
   }
 
   public get trainerID() {
@@ -230,6 +231,14 @@ export class PK3 extends PKM {
       return letterValue % 28
     }
     return 0
+  }
+
+  public get checksum() {
+    return bytesToUint16LittleEndian(this.bytes, 0x1c)
+  }
+
+  public get sanity() {
+    return bytesToUint16LittleEndian(this.bytes, 0x1e)
   }
 
   public get dexNum() {
@@ -605,5 +614,35 @@ export class PK3 extends PKM {
   public toPCBytes() {
     const shuffledBytes = shuffleBlocksGen3(this.bytes)
     return decryptByteArrayGen3(shuffledBytes)
+  }
+
+  public get hasPartyData(): boolean {
+    return this.bytes.length >= 0x50
+  }
+
+  public get currentHP() {
+    if (!this.hasPartyData) {
+      return this.stats.hp
+    }
+    return this.bytes[0x56]
+  }
+
+  public set currentHP(value: number) {
+    if (this.hasPartyData) {
+      this.bytes[0x56] = value
+    }
+  }
+
+  public get statusCondition() {
+    if (!this.hasPartyData) {
+      return 0
+    }
+    return this.bytes[0x50]
+  }
+
+  public set statusCondition(value: number) {
+    if (this.hasPartyData) {
+      this.bytes[0x50] = value
+    }
   }
 }

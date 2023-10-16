@@ -1,3 +1,4 @@
+import { isGameBoy } from '../consts'
 import { OHPKM, PK4, PKM } from '../types/PKMTypes'
 import { getBaseMon } from '../types/PKMTypes/util'
 import { bytesToString } from './ByteLogic'
@@ -23,7 +24,7 @@ export const getMonGen12Identifier = (mon: PKM) => {
   if (!dvs) return undefined
   const baseMon = getBaseMon(mon.dexNum, mon.formNum)
   const TID =
-    mon.isGameBoyOrigin || mon.personalityValue === undefined
+    isGameBoy(mon.gameOfOrigin) || mon.personalityValue === undefined
       ? mon.trainerID
       : mon.personalityValue % 0x10000
   if (baseMon) {
@@ -40,7 +41,7 @@ export const getMonGen12Identifier = (mon: PKM) => {
 export const getMonGen345Identifier = (mon: PKM) => {
   let pk345 = mon
   if (mon instanceof OHPKM) {
-    pk345 = new PK4(mon)
+    pk345 = new PK4(undefined, undefined, mon)
   }
   const baseMon = getBaseMon(pk345.dexNum, pk345.formNum)
   if (baseMon) {

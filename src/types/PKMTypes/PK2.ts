@@ -1,7 +1,7 @@
-import { statsPreSplit } from '../../types/types'
-import { GameOfOrigin, GameOfOriginData, NDex, POKEMON_DATA } from '../../consts'
+import { GameOfOrigin, GameOfOriginData, NDex, POKEMON_DATA, isGameBoy } from '../../consts'
 import CrystalLocation from '../../consts/MetLocation/Crystal'
 import { ItemGen2FromString, ItemGen2ToString } from '../../resources/gen/items/Gen2'
+import { statsPreSplit } from '../../types/types'
 import {
   bytesToUint16BigEndian,
   bytesToUint24BigEndian,
@@ -18,7 +18,80 @@ import { adjustMovePPBetweenFormats } from './util'
 
 export const GEN2_MOVE_MAX = 251
 
-export class PK2 extends PKM {
+export class PK2 implements PKM {
+  get fileSize(): number {
+    return 33
+  }
+
+  get markingCount(): number {
+    return 0
+  }
+
+  get markingColors(): number {
+    return 0
+  }
+
+  bytes = new Uint8Array(32)
+  nickname = 'NO NAME'
+  trainerName = 'TRAINER'
+  gameOfOrigin = GameOfOrigin.Gold
+  language = 'ENG'
+  isEgg = false
+
+  constructor(bytes?: Uint8Array, _?: boolean, other?: OHPKM) {
+    if (bytes) {
+      this.bytes = bytes
+      if (this.bytes.length >= 0x46) {
+        this.trainerName = gen12StringToUTF(this.bytes, 0x30, 8)
+        this.nickname = gen12StringToUTF(this.bytes, 0x3b, 11)
+      } else {
+        this.nickname = POKEMON_DATA[this.dexNum].name.toLocaleUpperCase()
+      }
+      this.gameOfOrigin = this.metLocationIndex === 0 ? GameOfOrigin.Gold : GameOfOrigin.Crystal
+    } else if (other) {
+      this.dexNum = other.dexNum
+      this.heldItem = other.heldItem
+      // treated as a tracking number for non-GB origin mons
+      if (!isGameBoy(other.gameOfOrigin) && other.personalityValue !== undefined) {
+        this.trainerID = other.personalityValue % 0x10000
+      } else {
+        this.trainerID = other.trainerID
+      }
+      this.exp = other.exp
+      this.level = this.dexNum > 0 ? getLevelGen12(this.dexNum, this.exp) : 0
+      this.pokerusByte = other.pokerusByte
+      const validMoves = other.moves.filter((move) => move <= GEN2_MOVE_MAX)
+      const validMovePP = adjustMovePPBetweenFormats(this, other).filter(
+        (_, i) => other.moves[i] <= GEN2_MOVE_MAX
+      )
+      const validMovePPUps = other.movePPUps.filter((_, i) => other.moves[i] <= GEN2_MOVE_MAX)
+      this.moves = [validMoves[0], validMoves[1], validMoves[2], validMoves[3]]
+      this.movePP = [validMovePP[0], validMovePP[1], validMovePP[2], validMovePP[3]]
+      this.movePPUps = [validMovePPUps[0], validMovePPUps[1], validMovePPUps[2], validMovePPUps[3]]
+      this.dvs = other.dvs
+      this.nickname = other.nickname
+      this.isEgg = other.isEgg
+      this.trainerName = other.trainerName
+      this.trainerFriendship = other.trainerFriendship
+      this.metLevel = other.metLevel
+
+      if (other.gameOfOrigin >= GameOfOrigin.Gold && other.gameOfOrigin <= GameOfOrigin.Crystal) {
+        this.metLocationIndex = other.metLocationIndex
+      } else if (
+        GameOfOriginData[other.gameOfOrigin]?.region === 'Johto' ||
+        GameOfOriginData[other.gameOfOrigin]?.region === 'Kanto'
+      ) {
+        this.metLocationIndex = other.metLocation
+          ? CrystalLocation[0].indexOf(other.metLocation.slice(3))
+          : 0
+      }
+      this.metTimeOfDay = other.metTimeOfDay
+      this.trainerGender = other.trainerGender
+      this.gameOfOrigin = other.gameOfOrigin
+      this.language = other.language
+    }
+  }
+
   public get format() {
     return 'PK2'
   }
@@ -56,6 +129,10 @@ export class PK2 extends PKM {
 
   public set trainerID(value: number) {
     this.bytes.set(uint16ToBytesBigEndian(value), 0x06)
+  }
+
+  public get secretID() {
+    return 0
   }
 
   public get displayID() {
@@ -162,6 +239,20 @@ export class PK2 extends PKM {
       this.bytes[0x17 + i] = value[i]
     }
   }
+  public get movePPUps() {
+    return [
+      (this.bytes[0x17] & 0b11000000) >> 6,
+      (this.bytes[0x18] & 0b11000000) >> 6,
+      (this.bytes[0x19] & 0b11000000) >> 6,
+      (this.bytes[0x1a] & 0b11000000) >> 6,
+    ]
+  }
+
+  public set movePPUps(value: [number, number, number, number]) {
+    for (let i = 0; i < 4; i++) {
+      this.bytes[0x17 + i] = (this.bytes[0x17 + i] & 0b00111111) | ((value[i] << 6) & 0b11000000)
+    }
+  }
 
   public get trainerFriendship() {
     return this.isEgg ? 0 : this.bytes[0x1b]
@@ -225,6 +316,51 @@ export class PK2 extends PKM {
     setFlag(this.bytes, 0x1e, 7, !!value)
   }
 
+  public get hasPartyData(): boolean {
+    return this.bytes.length > 32
+  }
+
+  public get currentHP() {
+    if (!this.hasPartyData) {
+      return this.stats.hp
+    }
+    return this.bytes[0x22]
+  }
+
+  public set currentHP(value: number) {
+    if (this.hasPartyData) {
+      this.bytes[0x22] = value
+    }
+  }
+
+  public get statusCondition() {
+    if (!this.hasPartyData) {
+      return 0
+    }
+    return this.bytes[0x20]
+  }
+
+  public set statusCondition(value: number) {
+    if (this.hasPartyData) {
+      this.bytes[0x20] = value
+    }
+  }
+
+  public get isFatefulEncounter(): boolean {
+    return this.dexNum === NDex.MEW
+  }
+
+  // TODO: gen 2 stat calc
+  public get stats(): statsPreSplit {
+    return {
+      hp: 0,
+      atk: 0,
+      def: 0,
+      spe: 0,
+      spc: 0,
+    }
+  }
+
   public get isShiny() {
     return (
       this.dvs.spe === 10 &&
@@ -232,63 +368,5 @@ export class PK2 extends PKM {
       this.dvs.spc === 10 &&
       [2, 3, 6, 7, 10, 11, 14, 15].includes(this.dvs.atk)
     )
-  }
-
-  constructor(...args: any[]) {
-    if (args[0] instanceof Uint8Array) {
-      super(args[0])
-      if (this.bytes.length >= 0x46) {
-        this.trainerName = gen12StringToUTF(this.bytes, 0x30, 8)
-        this.nickname = gen12StringToUTF(this.bytes, 0x3b, 11)
-      } else {
-        this.nickname = POKEMON_DATA[this.dexNum].name.toLocaleUpperCase()
-      }
-      this.gameOfOrigin = this.metLocationIndex === 0 ? GameOfOrigin.Gold : GameOfOrigin.Crystal
-    } else if (args[0] instanceof OHPKM) {
-      super(new Uint8Array(32))
-      const other = args[0]
-      this.dexNum = other.dexNum
-      this.heldItem = other.heldItem
-      // treated as a tracking number for non-GB origin mons
-      if (!other.isGameBoyOrigin) {
-        this.trainerID = other.personalityValue % 0x10000
-      } else {
-        this.trainerID = other.trainerID
-      }
-      this.exp = other.exp
-      this.level = this.dexNum > 0 ? getLevelGen12(this.dexNum, this.exp) : 0
-      this.pokerusByte = other.pokerusByte
-      const validMoves = other.moves.filter((move) => move <= GEN2_MOVE_MAX)
-      const validMovePP = adjustMovePPBetweenFormats(this, other).filter(
-        (_, i) => other.moves[i] <= GEN2_MOVE_MAX
-      )
-      const validMovePPUps = other.movePPUps.filter((_, i) => other.moves[i] <= GEN2_MOVE_MAX)
-      this.moves = [validMoves[0], validMoves[1], validMoves[2], validMoves[3]]
-      this.movePP = [validMovePP[0], validMovePP[1], validMovePP[2], validMovePP[3]]
-      this.movePPUps = [validMovePPUps[0], validMovePPUps[1], validMovePPUps[2], validMovePPUps[3]]
-      this.dvs = other.dvs
-      this.nickname = other.nickname
-      this.isEgg = other.isEgg
-      this.trainerName = other.trainerName
-      this.trainerFriendship = other.trainerFriendship
-      this.metLevel = other.metLevel
-
-      if (other.gameOfOrigin >= GameOfOrigin.Gold && other.gameOfOrigin <= GameOfOrigin.Crystal) {
-        this.metLocationIndex = other.metLocationIndex
-      } else if (
-        GameOfOriginData[other.gameOfOrigin]?.region === 'Johto' ||
-        GameOfOriginData[other.gameOfOrigin]?.region === 'Kanto'
-      ) {
-        this.metLocationIndex = other.metLocation
-          ? CrystalLocation[0].indexOf(other.metLocation.slice(3))
-          : 0
-      }
-      this.metTimeOfDay = other.metTimeOfDay
-      this.trainerGender = other.trainerGender
-      this.gameOfOrigin = other.gameOfOrigin
-      this.language = other.language
-    } else {
-      super(new Uint8Array())
-    }
   }
 }

@@ -1,6 +1,6 @@
 import { Card, Grid } from '@mui/material'
 import { useMemo } from 'react'
-import { POKEMON_DATA } from '../../consts'
+import { POKEMON_DATA, RibbonTitles } from '../../consts'
 import { PKM } from '../../types/PKMTypes/PKM'
 import { getTypes } from '../../types/PKMTypes/util'
 import { Styles } from '../../types/types'
@@ -68,7 +68,7 @@ const SummaryDisplay = (props: { mon: PKM }) => {
           )}
           <p style={{ fontWeight: 'bold' }}>
             {mon.nickname}
-            {mon.affixedRibbonTitle ? ` ${mon.affixedRibbonTitle}` : ''}
+            {mon.affixedRibbon !== undefined ? ` ${RibbonTitles[mon.affixedRibbon]}` : ''}
           </p>
           <Card style={styles.language}>{mon.language}</Card>
         </div>
@@ -87,7 +87,7 @@ const SummaryDisplay = (props: { mon: PKM }) => {
         <AttributeRow
           label="Name"
           value={`${POKEMON_DATA[mon.dexNum]?.formes[mon.formNum]?.formeName} ${
-            ['♂', '♀', ''][mon.gender]
+            ['♂', '♀', ''][mon.gender ?? 2]
           }`}
         />
         <AttributeRow label="Dex No." value={`${mon.dexNum}`} />
