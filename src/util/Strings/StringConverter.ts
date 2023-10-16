@@ -611,11 +611,16 @@ export const utf16BytesToString = (
  * @param length character length of string
  * @returns UInt8Array of UTF-16 bytes
  */
-export const utf16StringToBytes = (str: string, length: number) => {
+export const utf16StringToBytes = (str: string, length: number, bigEndian: boolean = false) => {
   const buf = new ArrayBuffer(length * 2)
   const bufView = new Uint16Array(buf)
   for (let i = 0; i < Math.min(str.length, length); i++) {
-    bufView[i] = str.charCodeAt(i)
+    if (bigEndian) {
+      const leCode = str.charCodeAt(i)
+      bufView[i] = ((leCode & 0xff) << 8) | ((leCode >> 8) & 0xff)
+    } else {
+      bufView[i] = str.charCodeAt(i)
+    }
   }
   return new Uint8Array(buf)
 }

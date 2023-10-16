@@ -12,7 +12,20 @@ import {
 } from '../../consts/TransferRestrictions'
 import { useState } from 'react'
 import { StringToStringMap, Styles } from '../../types/types'
-import { OHPKM, PA8, PK1, PK2, PK3, PK4, PK5, PK6, PK7, PKM } from '../../types/PKMTypes'
+import {
+  COLOPKM,
+  OHPKM,
+  PA8,
+  PK1,
+  PK2,
+  PK3,
+  PK4,
+  PK5,
+  PK6,
+  PK7,
+  PKM,
+  XDPKM,
+} from '../../types/PKMTypes'
 import { isRestricted } from '../../types/TransferRestrictions'
 import OpenHomeButton from '../components/OpenHomeButton'
 import MetDataMovesDisplay from './MetDataMovesDisplay'
@@ -74,6 +87,10 @@ const getTypeFromString = (type: string) => {
       return PK2
     case 'PK3':
       return PK3
+    case 'COLOPKM':
+      return COLOPKM
+    case 'XDPKM':
+      return XDPKM
     case 'PK4':
       return PK4
     case 'PK5':
@@ -121,8 +138,10 @@ const PokemonDisplay = (props: { mon: PKM; tab: string; setTab: (_: string) => v
               const T = getTypeFromString(e.target.value)
               if (mon.format === e.target.value) {
                 setDisplayMon(mon)
+              } else if (T && mon instanceof OHPKM) {
+                setDisplayMon(new T(undefined, undefined, mon))
               } else if (T) {
-                setDisplayMon(new T(mon))
+                setDisplayMon(new T(undefined, undefined, new OHPKM(undefined, mon)))
               }
             }}
             sx={{
@@ -151,6 +170,18 @@ const PokemonDisplay = (props: { mon: PKM; tab: string; setTab: (_: string) => v
             {mon.format === 'OHPKM' &&
             !isRestricted(GEN3_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) ? (
               <MenuItem value="PK3">PK3</MenuItem>
+            ) : (
+              <div />
+            )}
+            {mon.format === 'OHPKM' &&
+            !isRestricted(GEN3_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) ? (
+              <MenuItem value="COLOPKM">COLOPKM</MenuItem>
+            ) : (
+              <div />
+            )}
+            {mon.format === 'OHPKM' &&
+            !isRestricted(GEN3_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) ? (
+              <MenuItem value="XDPKM">XDPKM</MenuItem>
             ) : (
               <div />
             )}

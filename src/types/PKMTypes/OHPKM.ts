@@ -1,6 +1,18 @@
 import _, { uniq } from 'lodash'
 import Prando from 'prando'
 import {
+  Ball,
+  GameOfOrigin,
+  Gen34ContestRibbons,
+  Gen34TowerRibbons,
+  Languages,
+  NDex,
+  OpenHomeRibbons,
+} from '../../consts'
+import { getLocation } from '../../consts/MetLocation/MetLocation'
+import { ItemFromString, ItemToString } from '../../resources/gen/items/Items'
+import { AbilityFromString, AbilityToString } from '../../resources/gen/other/Abilities'
+import {
   contestStats,
   geolocation,
   hyperTrainStats,
@@ -10,17 +22,6 @@ import {
   stats,
   statsPreSplit,
 } from '../../types/types'
-import {
-  Ball,
-  GameOfOrigin,
-  Gen34ContestRibbons,
-  Gen34TowerRibbons,
-  Languages,
-  NDex,
-  OpenHomeRibbons,
-} from '../../consts'
-import { ItemFromString, ItemToString } from '../../resources/gen/items/Items'
-import { AbilityFromString, AbilityToString } from '../../resources/gen/other/Abilities'
 import {
   bytesToUint16BigEndian,
   bytesToUint16LittleEndian,
@@ -33,6 +34,7 @@ import {
 } from '../../util/ByteLogic'
 import { getHPGen3Onward, getLevelGen3Onward, getStatGen3Onward } from '../../util/StatCalc'
 import { utf16BytesToString, utf16StringToBytes } from '../../util/Strings/StringConverter'
+import { ContestStats, DVs, GVs, GameBoyEVs, ModernEVsIVs } from '../interfaces/stats'
 import { PKM } from './PKM'
 import {
   adjustMovePPBetweenFormats,
@@ -48,29 +50,39 @@ import {
   writeIVsToBuffer,
 } from './util'
 
-export class OHPKM extends PKM {
-  static fileSize = 376
+export class OHPKM implements PKM, ModernEVsIVs, GameBoyEVs, DVs, GVs, ContestStats {
+  public get fileSize() {
+    return 433
+  }
 
-  constructor(...args: any[]) {
-    if (args[0] instanceof Uint8Array) {
-      super(args[0])
-    } else if (args[0] instanceof PKM) {
-      const other = args[0]
-      super(new Uint8Array(420))
+  get markingCount(): number {
+    return 6
+  }
+
+  get markingColors(): number {
+    return 2
+  }
+
+  bytes = new Uint8Array(433)
+
+  constructor(bytes?: Uint8Array, other?: PKM) {
+    if (bytes) {
+      this.bytes = bytes
+    } else if (other) {
       const prng = new Prando(
         other.trainerName
           .concat(other.personalityValue?.toString() ?? JSON.stringify(other.dvs))
           .concat(other.secretID.toString())
           .concat(other.trainerID.toString())
       )
-      this.sanity = other.sanity
+      this.sanity = other.sanity ?? 0
       this.dexNum = other.dexNum
       this.heldItem = other.heldItem
       this.trainerID = other.trainerID
       this.secretID = other.secretID
       this.exp = other.exp
       this.canGigantamax = other.canGigantamax ?? false
-      this.isShadow = other.isShadow
+      this.isShadow = other.isShadow ?? false
       if (other.markings) {
         other.markings?.forEach((value, index) => {
           const temp = this.markings
@@ -86,7 +98,7 @@ export class OHPKM extends PKM {
       this.ability = getAbilityFromNumber(this.dexNum, this.formNum, this.abilityNum)
       this.abilityIndex = AbilityFromString(this.ability)
       this.alphaMove = other.alphaMove ?? 0
-      this.gender = other.gender
+      this.gender = other.gender ?? 0
       if (other.personalityValue !== undefined) {
         this.personalityValue = other.personalityValue
       } else {
@@ -108,14 +120,14 @@ export class OHPKM extends PKM {
         tough: 0,
         sheen: 0,
       }
-      this.pokerusByte = other.pokerusByte
-      this.contestMemoryCount = other.contestMemoryCount
-      this.battleMemoryCount = other.battleMemoryCount
+      this.pokerusByte = other.pokerusByte ?? 0
+      this.contestMemoryCount = other.contestMemoryCount ?? 0
+      this.battleMemoryCount = other.battleMemoryCount ?? 0
       const contestRibbons = _.intersection(other.ribbons, Gen34ContestRibbons)
       this.contestMemoryCount = Math.max(contestRibbons.length, this.contestMemoryCount)
       const battleRibbons = _.intersection(other.ribbons, Gen34TowerRibbons)
       this.battleMemoryCount = Math.max(battleRibbons.length, this.battleMemoryCount)
-      const ribbons = other.ribbons
+      const ribbons = other.ribbons ?? []
       if (this.contestMemoryCount) {
         ribbons.push('Contest Memory')
       }
@@ -124,14 +136,14 @@ export class OHPKM extends PKM {
       }
       this.ribbons = ribbons
       this.sociability = other.sociability ?? 0
-      this.height = other.height
-      this.weight = other.weight
-      this.scale = other.scale
+      this.height = other.height ?? 0
+      this.weight = other.weight ?? 0
+      this.scale = other.scale ?? 0
       this.moves = other.moves
       this.movePP = adjustMovePPBetweenFormats(this, other)
       this.movePPUps = other.movePPUps
       this.nickname = other.nickname
-      this.avs = other.avs
+      this.avs = other.avs ?? { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 }
       this.relearnMoves = other.relearnMoves ?? [0, 0, 0, 0]
       if (other.ivs) {
         this.ivs = other.ivs
@@ -140,8 +152,8 @@ export class OHPKM extends PKM {
       } else {
         this.ivs = generateIVs(prng)
       }
-      this.isEgg = other.isEgg
-      this.isNicknamed = other.isNicknamed
+      this.isEgg = other.isEgg ?? false
+      this.isNicknamed = other.isNicknamed ?? true
       this.dynamaxLevel = other.dynamaxLevel ?? 0
       this.teraTypeOriginal =
         other.teraTypeOriginal ?? generateTeraType(prng, this.dexNum, this.formNum) ?? 0
@@ -172,7 +184,7 @@ export class OHPKM extends PKM {
       this.handlerName = other.handlerName ?? ''
       this.handlerGender = other.handlerGender ?? false
       this.handlerLanguage = other.handlerLanguage ?? 'ENG'
-      this.isCurrentHandler = other.isCurrentHandler
+      this.currentHandler = other.currentHandler ?? 0
       this.handlerID = other.handlerID ?? 0
       this.handlerFriendship = other.handlerFriendship ?? 0
       this.handlerMemory = other.handlerMemory ?? {
@@ -189,6 +201,7 @@ export class OHPKM extends PKM {
       this.secretSuperTrainingComplete = !!other.secretSuperTrainingComplete
       this.trainingBagHits = other.trainingBagHits ?? 0
       this.trainingBag = other.trainingBag ?? 0
+      this.palma = other.palma ?? 0
       this.pokeStarFame = other.pokeStarFame ?? 0
       this.metTimeOfDay = other.metTimeOfDay
       this.isNsPokemon = !!other.isNsPokemon
@@ -196,11 +209,11 @@ export class OHPKM extends PKM {
       this.fullness = other.fullness ?? 0
       this.enjoyment = other.enjoyment ?? 0
       this.gameOfOrigin = other.gameOfOrigin
-      this.gameOfOriginBattle = other.gameOfOriginBattle
+      this.gameOfOriginBattle = other.gameOfOriginBattle ?? this.gameOfOrigin
       this.country = other.country ?? 0
       this.region = other.region ?? 0
       this.consoleRegion = other.consoleRegion ?? 0
-      this.language = other.languageIndex === 0 ? 'ENG' : other.language
+      this.language = other.language ?? 'ENG'
       this.unknownF3 = other.unknownF3 ?? 0
       this.formArgument = other.formArgument ?? 0
       this.affixedRibbon = other.affixedRibbon ?? 0xff
@@ -214,7 +227,7 @@ export class OHPKM extends PKM {
       this.encounterType = other.encounterType ?? 0
       this.performance = other.performance ?? 0
       this.trainerName = other.trainerName
-      this.trainerFriendship = other.trainerFriendship
+      this.trainerFriendship = other.trainerFriendship ?? 0
       this.trainerAffection = other.trainerAffection ?? 0
       this.trainerMemory = other.trainerMemory ?? {
         memory: 0,
@@ -230,7 +243,7 @@ export class OHPKM extends PKM {
         year: now.getFullYear(),
       }
       this.ball = other.ball ?? Ball.Poke
-      this.eggLocationIndex = other.eggLocationIndex
+      this.eggLocationIndex = other.eggLocationIndex ?? 0
       this.metLocationIndex = other.metLocationIndex ?? 0
       this.metLevel = other.metLevel ?? this.level
       this.trainerGender = other.trainerGender
@@ -243,14 +256,12 @@ export class OHPKM extends PKM {
         spe: false,
       }
       this.homeTracker = other.homeTracker ?? new Uint8Array(8)
-      this.TRFlagsSwSh = other.TRFlagsSwSh ?? new Uint8Array(14)
-      this.TMFlagsBDSP = other.TMFlagsBDSP ?? new Uint8Array(14)
-      this.TutorFlagsLA = other.TutorFlagsLA ?? new Uint8Array(8)
+      this.trFlagsSwSh = other.trFlagsSwSh ?? new Uint8Array(14)
+      this.tmFlagsBDSP = other.tmFlagsBDSP ?? new Uint8Array(14)
+      this.tutorFlagsLA = other.tutorFlagsLA ?? new Uint8Array(8)
       this.masterFlagsLA = other.masterFlagsLA ?? new Uint8Array(8)
-      this.TMFlagsSV = other.TMFlagsSV ?? new Uint8Array(26)
+      this.tmFlagsSV = other.tmFlagsSV ?? new Uint8Array(26)
       this.evsG12 = other.evsG12 ?? { hp: 0, atk: 0, def: 0, spc: 0, spe: 0 }
-    } else {
-      super(new Uint8Array())
     }
   }
 
@@ -365,35 +376,43 @@ export class OHPKM extends PKM {
   }
 
   public get favorite() {
-    return !!(this.bytes[0x16] & 8)
+    return getFlag(this.bytes, 0x16, 3)
   }
 
   public set favorite(value: boolean) {
-    this.bytes[0x16] = (this.bytes[0x16] & 0b11110111) | (value ? 8 : 0)
+    setFlag(this.bytes, 0x16, 3, value)
   }
 
   public get canGigantamax() {
-    return !!(this.bytes[0x16] & 16)
+    return getFlag(this.bytes, 0x16, 4)
   }
 
   public set canGigantamax(value: boolean) {
-    this.bytes[0x16] = (this.bytes[0x16] & 0b11101111) | (value ? 16 : 0)
+    setFlag(this.bytes, 0x16, 64, value)
   }
 
   public get isAlpha() {
-    return !!(this.bytes[0x16] & 32)
+    return getFlag(this.bytes, 0x16, 5)
   }
 
   public set isAlpha(value: boolean) {
-    this.bytes[0x16] = (this.bytes[0x16] & ~32) | (value ? 32 : 0)
+    setFlag(this.bytes, 0x16, 5, value)
   }
 
   public get isNoble() {
-    return !!(this.bytes[0x16] & 64)
+    return getFlag(this.bytes, 0x16, 6)
   }
 
   public set isNoble(value: boolean) {
-    this.bytes[0x16] = (this.bytes[0x16] & ~64) | (value ? 64 : 0)
+    setFlag(this.bytes, 0x16, 6, value)
+  }
+
+  public get isShadow() {
+    return getFlag(this.bytes, 0x16, 7)
+  }
+
+  public set isShadow(value: boolean) {
+    setFlag(this.bytes, 0x16, 7, value)
   }
 
   public get markings() {
@@ -578,11 +597,11 @@ export class OHPKM extends PKM {
   }
 
   public get sociability() {
-    return bytesToUint32LittleEndian(this.bytes, 0x4c)
+    return bytesToUint32LittleEndian(this.bytes, 0x48)
   }
 
   public set sociability(value: number) {
-    this.bytes.set(uint32ToBytesLittleEndian(value), 0x4c)
+    this.bytes.set(uint32ToBytesLittleEndian(value), 0x48)
   }
 
   public get height() {
@@ -645,6 +664,26 @@ export class OHPKM extends PKM {
   public set nickname(value: string) {
     const utfBytes = utf16StringToBytes(value, 12)
     this.bytes.set(utfBytes, 0x60)
+  }
+
+  public get avs() {
+    return {
+      hp: bytesToUint16LittleEndian(this.bytes, 0x7a),
+      atk: bytesToUint16LittleEndian(this.bytes, 0x7c),
+      def: bytesToUint16LittleEndian(this.bytes, 0x7e),
+      spe: bytesToUint16LittleEndian(this.bytes, 0x80),
+      spa: bytesToUint16LittleEndian(this.bytes, 0x82),
+      spd: bytesToUint16LittleEndian(this.bytes, 0x84),
+    }
+  }
+
+  public set avs(value: stats) {
+    this.bytes.set(uint16ToBytesLittleEndian(value.hp), 0x7a)
+    this.bytes.set(uint16ToBytesLittleEndian(value.atk), 0x7c)
+    this.bytes.set(uint16ToBytesLittleEndian(value.def), 0x7e)
+    this.bytes.set(uint16ToBytesLittleEndian(value.spe), 0x80)
+    this.bytes.set(uint16ToBytesLittleEndian(value.spa), 0x82)
+    this.bytes.set(uint16ToBytesLittleEndian(value.spd), 0x84)
   }
 
   public get movePPUps() {
@@ -841,6 +880,14 @@ export class OHPKM extends PKM {
     }
   }
 
+  public get currentHandler() {
+    return this.bytes[0xd4]
+  }
+
+  public set currentHandler(value: number) {
+    this.bytes[0xd4] = value
+  }
+
   public get resortEventStatus() {
     return this.bytes[0xd5]
   }
@@ -935,6 +982,14 @@ export class OHPKM extends PKM {
 
   public set trainingBag(value: number) {
     this.bytes[0xe6] = value
+  }
+
+  public get palma() {
+    return bytesToUint32LittleEndian(this.bytes, 0xe7)
+  }
+
+  public set palma(value: number) {
+    this.bytes.set(uint32ToBytesLittleEndian(value), 0xe7)
   }
 
   public get pokeStarFame() {
@@ -1203,12 +1258,22 @@ export class OHPKM extends PKM {
     this.bytes.set(uint16ToBytesLittleEndian(value), 0x138)
   }
 
+  public get eggLocation() {
+    if (!this.eggLocationIndex) return undefined
+    return getLocation(this.gameOfOrigin, this.eggLocationIndex, this.format, true)
+  }
+
   public get metLocationIndex() {
     return bytesToUint16LittleEndian(this.bytes, 0x13a)
   }
 
   public set metLocationIndex(value: number) {
     this.bytes.set(uint16ToBytesLittleEndian(value), 0x13a)
+  }
+
+  public get metLocation() {
+    if (!this.metLocationIndex) return undefined
+    return getLocation(this.gameOfOrigin, this.metLocationIndex, this.format, false)
   }
 
   public get metLevel() {
@@ -1255,35 +1320,35 @@ export class OHPKM extends PKM {
     this.bytes.set(value.slice(0, 8), 0x13f)
   }
 
-  public get TRFlagsSwSh() {
+  public get trFlagsSwSh() {
     return this.bytes.slice(0x146, 0x146 + 8)
   }
 
-  public set TRFlagsSwSh(value: Uint8Array) {
+  public set trFlagsSwSh(value: Uint8Array) {
     this.bytes.set(value.slice(0, 14), 0x146)
   }
 
-  public get TMFlagsBDSP() {
+  public get tmFlagsBDSP() {
     return this.bytes.slice(0x154, 0x154 + 14)
   }
 
-  public set TMFlagsBDSP(value: Uint8Array) {
+  public set tmFlagsBDSP(value: Uint8Array) {
     this.bytes.set(value.slice(0, 14), 0x154)
   }
 
-  public get MoveFlagsLA() {
+  public get moveFlagsLA() {
     return this.bytes.slice(0x162, 0x162 + 14)
   }
 
-  public set MoveFlagsLA(value: Uint8Array) {
+  public set moveFlagsLA(value: Uint8Array) {
     this.bytes.set(value.slice(0, 14), 0x162)
   }
 
-  public get TutorFlagsLA() {
+  public get tutorFlagsLA() {
     return this.bytes.slice(0x170, 0x170 + 8)
   }
 
-  public set TutorFlagsLA(value: Uint8Array) {
+  public set tutorFlagsLA(value: Uint8Array) {
     this.bytes.set(value.slice(0, 8), 0x170)
   }
 
@@ -1295,12 +1360,12 @@ export class OHPKM extends PKM {
     this.bytes.set(value.slice(0, 8), 0x178)
   }
 
-  public get TMFlagsSV() {
-    return this.bytes.slice(0x180, 0x180 + 26)
+  public get tmFlagsSV() {
+    return this.bytes.slice(0x180, 0x180 + 22)
   }
 
-  public set TMFlagsSV(value: Uint8Array) {
-    this.bytes.set(value.slice(0, 26), 0x180)
+  public set tmFlagsSV(value: Uint8Array) {
+    this.bytes.set(value.slice(0, 22), 0x180)
   }
 
   public get evsG12() {
@@ -1321,6 +1386,14 @@ export class OHPKM extends PKM {
     this.bytes.set(uint16ToBytesLittleEndian(value.spc), 0x1a2)
   }
 
+  public get tmFlagsSVDLC() {
+    return this.bytes.slice(0x1a4, 0x1a4 + 13)
+  }
+
+  public set tmFlagsSVDLC(value: Uint8Array) {
+    this.bytes.set(value.slice(0, 13), 0x1a4)
+  }
+
   public get stats(): stats {
     return {
       hp: getHPGen3Onward(this),
@@ -1330,6 +1403,10 @@ export class OHPKM extends PKM {
       spa: getStatGen3Onward('SpA', this),
       spd: getStatGen3Onward('SpD', this),
     }
+  }
+
+  public get currentHP(): number {
+    return this.stats.hp
   }
 
   public get isShiny() {
@@ -1368,7 +1445,10 @@ export class OHPKM extends PKM {
     if (other.secretSuperTrainingComplete) {
       this.secretSuperTrainingComplete = true
     }
-    this.ribbons = uniq([...this.ribbons, ...other.ribbons])
+    if (other.hyperTraining) {
+      this.hyperTraining = other.hyperTraining
+    }
+    this.ribbons = uniq([...this.ribbons, ...(other.ribbons ?? [])])
 
     // memory ribbons need to be updated if new ribbons were earned to add to the count
     const contestRibbons = _.intersection(this.ribbons, Gen34ContestRibbons)
@@ -1403,7 +1483,7 @@ export class OHPKM extends PKM {
     }
     if (isFromOT) {
       this.nickname = other.nickname
-      this.trainerFriendship = other.trainerFriendship
+      this.trainerFriendship = other.trainerFriendship ?? 790
     }
     // other.moves.forEach((move, i) => {
 
