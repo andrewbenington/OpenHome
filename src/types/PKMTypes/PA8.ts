@@ -1,10 +1,10 @@
-import { contestStats, hyperTrainStats, memory, pokedate, stats } from '../../types/types'
 import { Ball, GameOfOrigin, GameOfOriginData, isBDSP } from '../../consts'
 import { Languages } from '../../consts/Languages'
 import LALocations from '../../consts/MetLocation/LA'
 import { Gen9Ribbons } from '../../consts/Ribbons'
 import { ItemFromString, ItemToString } from '../../resources/gen/items/Items'
 import { AbilityFromString, AbilityToString } from '../../resources/gen/other/Abilities'
+import { contestStats, hyperTrainStats, marking, memory, pokedate, stats } from '../../types/types'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -19,23 +19,39 @@ import { OHPKM } from './OHPKM'
 import { PKM } from './PKM'
 import { adjustMovePPBetweenFormats, writeIVsToBuffer } from './util'
 
-export class PA8 extends PKM {
-  static fileSize = 376
+export class PA8 implements PKM {
+  public get fileSize() {
+    return 376
+  }
 
-  constructor(...args: any[]) {
-    if (args[0] instanceof Uint8Array) {
-      super(args[0])
-    } else if (args[0] instanceof OHPKM) {
-      const other = args[0]
-      super(new Uint8Array(376))
+  get markingCount(): number {
+    return 6
+  }
+
+  get markingColors(): number {
+    return 2
+  }
+
+  bytes = new Uint8Array(376)
+
+  constructor(bytes?: Uint8Array, other?: OHPKM) {
+    if (bytes) {
+      this.bytes = bytes
+    } else if (other) {
       this.sanity = other.sanity
       this.dexNum = other.dexNum
       this.trainerID = other.trainerID
       this.secretID = other.secretID
       this.exp = other.exp
       this.heldItemIndex = 0
-      this.canGigantamax = other.canGigantamax
-      this.markings = other.markings
+      this.canGigantamax = other.canGigantamax ?? false
+      if (other.markings) {
+        other.markings?.forEach((value, index) => {
+          const temp = this.markings
+          temp[index] = value
+          this.markings = temp
+        })
+      }
       this.gameOfOrigin = other.gameOfOrigin
       this.ability = other.ability
       this.abilityNum = other.abilityNum
@@ -73,7 +89,7 @@ export class PA8 extends PKM {
       this.handlerName = other.handlerName
       this.handlerGender = other.handlerGender
       this.handlerLanguage = other.handlerLanguage
-      this.isCurrentHandler = other.isCurrentHandler
+      this.currentHandler = other.currentHandler
       this.handlerID = other.handlerID
       this.handlerFriendship = other.handlerFriendship
       this.handlerMemory = other.handlerMemory
@@ -100,8 +116,6 @@ export class PA8 extends PKM {
       this.metLevel = other.metLevel
       this.trainerGender = other.trainerGender
       this.homeTracker = other.homeTracker
-    } else {
-      super(new Uint8Array())
     }
   }
 
@@ -251,6 +265,27 @@ export class PA8 extends PKM {
     this.bytes[0x16] = (this.bytes[0x16] & ~64) | (value ? 64 : 0)
   }
 
+  public get markings() {
+    const markingsValue = bytesToUint16LittleEndian(this.bytes, 0x18)
+    return [
+      markingsValue & 3,
+      (markingsValue >> 2) & 3,
+      (markingsValue >> 4) & 3,
+      (markingsValue >> 6) & 3,
+      (markingsValue >> 8) & 3,
+      (markingsValue >> 10) & 3,
+    ] as any as [marking, marking, marking, marking, marking, marking]
+  }
+
+  public set markings(value: [marking, marking, marking, marking, marking, marking]) {
+    let markingsValue = 0
+    for (let i = 0; i < 6; i++) {
+      const shift = i * 2
+      markingsValue = (markingsValue & (0xffff ^ (3 << shift))) | (value[i] << shift)
+    }
+    this.bytes.set(uint16ToBytesLittleEndian(markingsValue), 0x18)
+  }
+
   public get personalityValue() {
     return bytesToUint32LittleEndian(this.bytes, 0x1c)
   }
@@ -276,19 +311,19 @@ export class PA8 extends PKM {
   }
 
   public get isFatefulEncounter() {
-    return !!(this.bytes[0x22] & 1)
+    return getFlag(this.bytes, 0x22, 0)
   }
 
   public set isFatefulEncounter(value: boolean) {
-    this.bytes[0x22] = (this.bytes[0x22] & ~1) | (value ? 1 : 0)
+    setFlag(this.bytes, 0x22, 0, value)
   }
 
   public get flag2LA() {
-    return getFlag(this.bytes, 0x22, 2)
+    return getFlag(this.bytes, 0x22, 1)
   }
 
   public set flag2LA(value: boolean) {
-    setFlag(this.bytes, 0x22, 2, value)
+    setFlag(this.bytes, 0x22, 1, value)
   }
 
   public get gender() {
@@ -631,11 +666,11 @@ export class PA8 extends PKM {
   }
 
   public get handlerGender() {
-    return getFlag(this.bytes, 0xd2, 7)
+    return getFlag(this.bytes, 0xd2, 0)
   }
 
   public set handlerGender(value: boolean) {
-    setFlag(this.bytes, 0xd2, 7, value)
+    setFlag(this.bytes, 0xd2, 0, value)
   }
 
   public get handlerLanguageIndex() {
@@ -651,6 +686,14 @@ export class PA8 extends PKM {
     if (index > -1) {
       this.bytes[0xd3] = index
     }
+  }
+
+  public get currentHandler() {
+    return this.bytes[0xd4]
+  }
+
+  public set currentHandler(value: number) {
+    this.bytes[0xd4] = value
   }
 
   public get handlerID() {
@@ -715,6 +758,22 @@ export class PA8 extends PKM {
 
   public set gameOfOriginBattle(value: number) {
     this.bytes[0xef] = value
+  }
+
+  public get region() {
+    return this.bytes[0xf0]
+  }
+
+  public set region(value: number) {
+    this.bytes[0xf0] = value
+  }
+
+  public get consoleRegion() {
+    return this.bytes[0xf0]
+  }
+
+  public set consoleRegion(value: number) {
+    this.bytes[0xf0] = value
   }
 
   public get languageIndex() {
@@ -899,11 +958,11 @@ export class PA8 extends PKM {
     setFlag(this.bytes, 0x13e, 5, value.spe)
   }
 
-  public get MoveFlagsLA() {
+  public get moveFlagsLA() {
     return this.bytes.slice(0x13f, 0x13f + 14)
   }
 
-  public set MoveFlagsLA(value: Uint8Array) {
+  public set moveFlagsLA(value: Uint8Array) {
     this.bytes.set(value.slice(0, 14), 0x13f)
   }
 
@@ -915,11 +974,11 @@ export class PA8 extends PKM {
     this.bytes.set(value.slice(0, 8), 0x14d)
   }
 
-  public get TutorFlagsLA() {
+  public get tutorFlagsLA() {
     return this.bytes.slice(0x155, 0x155 + 8)
   }
 
-  public set TutorFlagsLA(value: Uint8Array) {
+  public set tutorFlagsLA(value: Uint8Array) {
     this.bytes.set(value.slice(0, 8), 0x155)
   }
 

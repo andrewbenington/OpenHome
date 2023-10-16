@@ -1,11 +1,11 @@
 import _ from 'lodash'
-import { contestStats, geolocation, marking, memory, pokedate, stats } from '../../types/types'
 import { Ball, GameOfOrigin, GameOfOriginData, isGen6 } from '../../consts'
 import { Languages } from '../../consts/Languages'
 import G6Location from '../../consts/MetLocation/G6'
 import { Gen9Ribbons } from '../../consts/Ribbons'
 import { ItemFromString, ItemToString } from '../../resources/gen/items/Items'
 import { AbilityFromString, AbilityToString } from '../../resources/gen/other/Abilities'
+import { contestStats, geolocation, marking, memory, pokedate, stats } from '../../types/types'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -23,23 +23,30 @@ import { adjustMovePPBetweenFormats, writeIVsToBuffer } from './util'
 export const XY_MOVE_MAX = 617
 export const ORAS_MOVE_MAX = 621
 
-export class PK6 extends PKM {
-  constructor(...args: any[]) {
-    if (args.length >= 1 && args[0] instanceof Uint8Array) {
-      const bytes = args[0]
-      const encrypted = args[1] ?? false
+export class PK6 implements PKM {
+  public get fileSize() {
+    return 232
+  }
+
+  get markingCount(): number {
+    return 4
+  }
+
+  get markingColors(): number {
+    return 1
+  }
+
+  bytes = new Uint8Array(232)
+
+  constructor(bytes?: Uint8Array, encrypted?: boolean, other?: OHPKM) {
+    if (bytes) {
       if (encrypted) {
-        // let unencryptedBytes = decryptByteArrayGen45(bytes);
-        // let unshuffledBytes = unshuffleBlocksGen45(unencryptedBytes);
-        // super(unshuffledBytes);
-        super(bytes)
+        throw new Error('PK6 decryption not implemented')
       } else {
-        super(bytes)
+        this.bytes = bytes
       }
       // this.refreshChecksum();
-    } else if (args.length === 1 && args[0] instanceof OHPKM) {
-      const other = args[0]
-      super(new Uint8Array(232))
+    } else if (other) {
       this.encryptionConstant = other.encryptionConstant
       this.dexNum = other.dexNum
       this.exp = other.exp
@@ -115,8 +122,6 @@ export class PK6 extends PKM {
       this.consoleRegion = other.consoleRegion
       this.language = other.language
       this.currentHP = this.stats.hp
-    } else {
-      super(args[0])
     }
   }
 
@@ -849,4 +854,34 @@ export class PK6 extends PKM {
   //   let shuffledBytes = shuffleBlocksGen45(this.bytes);
   //   return decryptByteArrayGen45(shuffledBytes);
   // }
+
+  public get hasPartyData(): boolean {
+    return this.bytes.length > 0xe8
+  }
+
+  public get statusCondition() {
+    if (!this.hasPartyData) {
+      return 0
+    }
+    return this.bytes[0xe8]
+  }
+
+  public set statusCondition(value: number) {
+    if (this.hasPartyData) {
+      this.bytes[0xe8] = value
+    }
+  }
+
+  public get currentHP() {
+    if (!this.hasPartyData) {
+      return this.stats.hp
+    }
+    return this.bytes[0xf0]
+  }
+
+  public set currentHP(value: number) {
+    if (this.hasPartyData) {
+      this.bytes[0xf0] = value
+    }
+  }
 }
