@@ -1,5 +1,6 @@
 import { NDex, POKEMON_DATA, SWEETS } from '../../consts'
-import { PKM } from '../../types/PKMTypes'
+import { BasePKMData } from '../../types/PKMTypes'
+import { hasGen8OnData } from '../../types/interfaces/gen8'
 import { StringToStringMap } from '../../types/types'
 
 const alolaDex = [
@@ -43,16 +44,15 @@ export const fileToSpriteFolder: StringToStringMap = {
   OHPKM: 'home',
 }
 
-export const getPokemonSpritePath = (mon: PKM, format?: string) => {
+export const getPokemonSpritePath = (mon: BasePKMData, format?: string) => {
   const monFormat = format ?? mon.format
   let spriteName = POKEMON_DATA[mon.dexNum]?.formes[mon.formNum]?.sprite ?? ''
-  if (mon.dexNum === NDex.ALCREMIE) {
+  if (hasGen8OnData(mon) && mon.dexNum === NDex.ALCREMIE) {
     spriteName = `${
       POKEMON_DATA[mon.dexNum]?.formes[mon.formNum]?.formeName?.toLowerCase() ??
       'alcremie-vanilla-cream'
     }-${SWEETS[mon.formArgument ?? 0].toLocaleLowerCase()}`
   }
-  console.log(POKEMON_DATA[mon.dexNum]?.formes[mon.formNum], spriteName)
   let spriteFolder = fileToSpriteFolder[monFormat]
   if (spriteFolder === 'gen7' && !alolaDex.includes(mon.dexNum)) {
     spriteFolder = 'gen6'

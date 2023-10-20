@@ -102,12 +102,13 @@ const HexEditor = ({ data }: HexEditorProps) => {
                     className="disable-select"
                     style={{
                       backgroundColor: currentHover === byteIndex ? '#fffa' : '#0000',
+                      fontFamily: 'monospace',
                     }}
                     onMouseOver={() => {
                       setCurrentHover(byteIndex)
                     }}
                   >
-                    <code>{char}</code>
+                    {char}
                   </div>
                 )
               })}

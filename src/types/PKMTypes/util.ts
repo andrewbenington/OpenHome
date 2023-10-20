@@ -1,8 +1,9 @@
 import bigInt from 'big-integer'
 import { max } from 'lodash'
 import Prando from 'prando'
-import { stats, statsPreSplit } from '../../types/types'
 import { MOVE_DATA, NDex, POKEMON_DATA, Types } from '../../consts'
+import { Nature } from '../../resources/gen/other/Natures'
+import { stats, statsPreSplit } from '../../types/types'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -11,7 +12,9 @@ import {
   writeUint32ToBuffer,
 } from '../../util/ByteLogic'
 import { getGen3To5Gender } from '../../util/GenderCalc'
-import { PKM } from './PKM'
+import { BasePKMData } from '../interfaces/base'
+import { hasGen3OnData } from '../interfaces/gen3'
+import { GamePKM } from './GamePKM'
 
 export const writeIVsToBuffer = (
   ivs: stats,
@@ -59,11 +62,11 @@ export const getUnownLetterGen3 = (personalityValue: number) => {
 
 export const generateTeraType = (prng: Prando, dexNum: number, formNum: number) => {
   if (!POKEMON_DATA[dexNum]?.formes[formNum]) {
-    return undefined
+    return 0
   }
   const { types } = POKEMON_DATA[dexNum].formes[formNum]
   if (!types) {
-    return undefined
+    return 0
   }
   const typeIndex = prng.nextInt(0, types.length - 1)
   return Types.indexOf(types[typeIndex])
@@ -189,7 +192,7 @@ export const formatHasColorMarkings = (format: string) => {
   )
 }
 
-export const getTypes = (mon: PKM) => {
+export const getTypes = (mon: BasePKMData) => {
   let types = POKEMON_DATA[mon.dexNum]?.formes[mon.formNum]?.types
   if (mon.format === 'PK1' && (mon.dexNum === NDex.MAGNEMITE || mon.dexNum === NDex.MAGNETON)) {
     types = ['Electric']
@@ -260,7 +263,10 @@ export const getMoveMaxPP = (moveIndex: number, format: string, ppUps = 0) => {
   return baseMaxPP + Math.floor(ppUps * (baseMaxPP / 5))
 }
 
-export const adjustMovePPBetweenFormats = (destFormatMon: PKM, sourceFormatMon: PKM) => {
+export const adjustMovePPBetweenFormats = (
+  destFormatMon: BasePKMData,
+  sourceFormatMon: BasePKMData
+) => {
   return sourceFormatMon.moves.map((move, i) => {
     const otherMaxPP = getMoveMaxPP(move, sourceFormatMon.format, sourceFormatMon.movePPUps[i]) ?? 0
     const thisMaxPP = getMoveMaxPP(move, destFormatMon.format, sourceFormatMon.movePPUps[i]) ?? 0
@@ -280,15 +286,26 @@ const getIsShinyPreGen6 = (trainerID: number, secretID: number, personalityValue
   (trainerID ^ secretID ^ ((personalityValue >> 16) & 0xffff) ^ (personalityValue & 0xffff)) < 8
 
 export const generatePersonalityValuePreservingAttributes = (
-  mon: PKM,
+  mon: GamePKM,
   prng: Prando = new Prando()
 ) => {
-  const personalityValue = mon.personalityValue ?? prng.nextInt(0, 0xffffffff)
-  const otherNature = mon.statNature ?? mon.nature
+  let personalityValue = 0
+  let otherNature: Nature | undefined
+  let otherAbilityNum = 4
+  if (hasGen3OnData(mon)) {
+    personalityValue = mon.personalityValue
+    otherNature = mon.nature
+    otherAbilityNum = mon.abilityNum
+  } else {
+    personalityValue = prng.nextInt(0, 0xffffffff)
+  }
+
+  if ('statNature' in mon) {
+    otherNature = mon.statNature
+  }
   // xoring the other three values with this to calculate upper half of personality value
   // will ensure shininess or non-shininess depending on original mon
   const otherGender = mon.gender
-  const otherAbilityNum = mon.abilityNum ?? 4
   let i = 0
   let newPersonalityValue = bigInt(personalityValue)
   const shouldCheckUnown = mon.dexNum === NDex.UNOWN
@@ -321,8 +338,7 @@ export const generatePersonalityValuePreservingAttributes = (
       pvUpper16 = bytesToUint16LittleEndian(pvBytes, 2)
       pvLower16 ^= i
       if (mon.isShiny) {
-        const shinyXor = mon.isSquareShiny ? 0 : 1
-        pvUpper16 = mon.trainerID ^ mon.secretID ^ pvLower16 ^ shinyXor
+        pvUpper16 = mon.trainerID ^ mon.secretID ^ pvLower16
       }
     }
     pvBytes.set(uint16ToBytesLittleEndian(pvUpper16), 2)

@@ -16,14 +16,19 @@ import {
 } from '../../util/ByteLogic'
 import { getHPGen3Onward, getLevelGen3Onward, getStatGen3Onward } from '../../util/StatCalc'
 import { utf16BytesToString, utf16StringToBytes } from '../../util/Strings/StringConverter'
+import { BasePKMData } from '../interfaces/base'
+import { SanityChecksum } from '../interfaces/gen3'
+import { Gen4EncounterType } from '../interfaces/gen4'
+import { Gen6OnData, N3DSOnlyData } from '../interfaces/gen6'
 import { OHPKM } from './OHPKM'
-import { PKM } from './PKM'
 import { adjustMovePPBetweenFormats, writeIVsToBuffer } from './util'
 
 export const XY_MOVE_MAX = 617
 export const ORAS_MOVE_MAX = 621
 
-export class PK6 implements PKM {
+export class PK6
+  implements BasePKMData, Gen6OnData, N3DSOnlyData, Gen4EncounterType, SanityChecksum
+{
   public get fileSize() {
     return 232
   }
@@ -135,6 +140,10 @@ export class PK6 implements PKM {
 
   public set encryptionConstant(value: number) {
     this.bytes.set(uint32ToBytesLittleEndian(value), 0x00)
+  }
+
+  public get sanity() {
+    return bytesToUint16LittleEndian(this.bytes, 0x04)
   }
 
   public get checksum() {
@@ -729,11 +738,9 @@ export class PK6 implements PKM {
         ? `in the ${GameOfOriginData[this.gameOfOrigin]?.region} region`
         : 'in a faraway place'
     }
-    const locationBlock = G6Location[Math.floor(this.metLocationIndex / 10000) * 10000]
-    if (locationBlock) {
-      return `in ${locationBlock[this.metLocationIndex % 10000]}`
-    }
-    return undefined
+    const locationBlock =
+      G6Location[Math.floor(this.metLocationIndex / 10000) * 10000] ?? G6Location[0]
+    return `in ${locationBlock[this.metLocationIndex % 10000]}`
   }
 
   public get ball() {

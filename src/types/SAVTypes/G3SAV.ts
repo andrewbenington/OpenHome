@@ -8,20 +8,10 @@ import {
   uint32ToBytesLittleEndian,
 } from '../../util/ByteLogic'
 import { gen3StringToUTF } from '../../util/Strings/StringConverter'
+import { GamePKM } from '../PKMTypes/GamePKM'
 import { PK3 } from '../PKMTypes/PK3'
-import { PKM } from '../PKMTypes/PKM'
 import { SaveType } from '../types'
 import { Box, SAV } from './SAV'
-
-export class G3Box implements Box {
-  name: string
-
-  pokemon: Array<PK3 | OHPKM> = new Array(30)
-
-  constructor(n: string) {
-    this.name = n
-  }
-}
 
 export class G3Sector {
   data: Uint8Array
@@ -96,15 +86,15 @@ export class G3SaveBackup {
 
   currentPCBox: number
 
-  boxNames: string[]
+  boxes = new Array<Box<PK3>>(14)
 
-  boxes: Array<G3Box> = Array(14)
+  boxNames: string[]
 
   saveType: SaveType
 
   firstSectorIndex: number = 0
 
-  constructor(bytes: Uint8Array, metDate?: Date) {
+  constructor(bytes: Uint8Array) {
     this.bytes = bytes
     this.saveIndex = bytesToUint32LittleEndian(bytes, 0xffc)
     this.securityKey = bytesToUint32LittleEndian(bytes, 0xf20)
@@ -128,18 +118,11 @@ export class G3SaveBackup {
     this.currentPCBox = this.pcDataContiguous[0]
     this.boxNames = []
     for (let i = 0; i < 14; i++) {
-      this.boxes[i] = new G3Box(gen3StringToUTF(this.pcDataContiguous, 0x8344 + i * 9, 10))
+      this.boxes[i] = new Box(gen3StringToUTF(this.pcDataContiguous, 0x8344 + i * 9, 10), 30)
     }
     for (let i = 0; i < 420; i++) {
       try {
         const mon = new PK3(this.pcDataContiguous.slice(4 + i * 80, 4 + (i + 1) * 80), true)
-        if (metDate) {
-          mon.metDate = {
-            day: metDate.getDate(),
-            month: metDate.getMonth(),
-            year: metDate.getFullYear(),
-          }
-        }
         if (mon.gameOfOrigin !== 0 && mon.dexNum !== 0) {
           const box = this.boxes[Math.floor(i / 30)]
           box.pokemon[i % 30] = mon
@@ -170,7 +153,7 @@ export class G3SaveBackup {
   }
 }
 
-export class G3SAV extends SAV {
+export class G3SAV extends SAV<PK3> {
   static TRANSFER_RESTRICTIONS = {
     maxDexNum: NDex.DEOXYS,
     excludedForms: { ...RegionalForms, ...CapPikachus },
@@ -194,15 +177,12 @@ export class G3SAV extends SAV {
 
   primarySaveOffset: number
 
-  boxes: Array<G3Box>
+  convertPKM = (mon: GamePKM) => new OHPKM(undefined, mon)
 
-  convertPKM = (mon: PKM) => new OHPKM(mon)
-
-  constructor(path: string, bytes: Uint8Array, fileCreated?: Date) {
+  constructor(path: string, bytes: Uint8Array) {
     super(path, bytes)
-    this.fileCreated = fileCreated
-    const saveOne = new G3SaveBackup(bytes.slice(0, 0xe000), fileCreated)
-    const saveTwo = new G3SaveBackup(bytes.slice(0xe000, 0x1c000), fileCreated)
+    const saveOne = new G3SaveBackup(bytes.slice(0, 0xe000))
+    const saveTwo = new G3SaveBackup(bytes.slice(0xe000, 0x1c000))
     if (saveOne.saveIndex > saveTwo.saveIndex) {
       this.primarySave = saveOne
       this.backupSave = saveTwo
@@ -230,6 +210,7 @@ export class G3SAV extends SAV {
     this.boxes.forEach((box) => {
       box.pokemon.forEach((mon) => {
         if (
+          mon &&
           mon.trainerID === this.tid &&
           mon.secretID === this.tid &&
           mon.trainerName === this.name
@@ -272,8 +253,9 @@ export class G3SAV extends SAV {
       // changedMon will be undefined if pokemon was moved from this slot
       // and the slot was left empty
       if (changedMon) {
+        const slotMon = this.boxes[box].pokemon[index]
         try {
-          const mon = new PK3(this.boxes[box].pokemon[index])
+          const mon = slotMon instanceof PK3 ? slotMon : new PK3(undefined, undefined, slotMon)
           if (mon?.gameOfOrigin && mon?.dexNum) {
             mon.refreshChecksum()
             pcBytes.set(mon.toPCBytes(), 0)

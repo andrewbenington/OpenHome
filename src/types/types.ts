@@ -1,20 +1,4 @@
 import { CSSProperties } from 'react'
-import {
-  COLOPKM,
-  OHPKM,
-  PA8,
-  PB7,
-  PK1,
-  PK2,
-  PK3,
-  PK4,
-  PK5,
-  PK6,
-  PK7,
-  PK8,
-  PK9,
-  XDPKM,
-} from './PKMTypes'
 
 /* eslint-disable no-unused-vars */
 export type StringToStringMap = { [key: string]: string }
@@ -251,19 +235,3 @@ export interface SaveCoordinates {
 }
 
 export type Styles = { [key: string]: CSSProperties }
-
-export type PokemonFile =
-  | OHPKM
-  | PK1
-  | PK2
-  | PK3
-  | COLOPKM
-  | XDPKM
-  | PK4
-  | PK5
-  | PK6
-  | PK7
-  | PB7
-  | PK8
-  | PA8
-  | PK9

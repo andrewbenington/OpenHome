@@ -29,8 +29,8 @@ import { decryptByteArrayGen3, shuffleBlocksGen3, unshuffleBlocksGen3 } from '..
 import { getGen3To5Gender } from '../../util/GenderCalc'
 import { getHPGen3Onward, getLevelGen3Onward, getStatGen3Onward } from '../../util/StatCalc'
 import { gen3StringToUTF, utf16StringToGen3 } from '../../util/Strings/StringConverter'
+import { Gen3OnData } from '../interfaces/gen3'
 import { OHPKM } from './OHPKM'
-import { PKM } from './PKM'
 import {
   adjustMovePPBetweenFormats,
   generatePersonalityValuePreservingAttributes,
@@ -40,7 +40,7 @@ import {
 export const GEN3_MOVE_MAX = 354
 export const GEN3_ABILITY_MAX = 77
 
-export class PK3 implements PKM {
+export class PK3 implements Gen3OnData {
   public get fileSize() {
     return 80
   }

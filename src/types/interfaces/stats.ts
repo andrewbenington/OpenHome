@@ -1,37 +1,22 @@
 import { contestStats, stats, statsPreSplit } from '../types'
 
-export interface ModernEVsIVs {
-  evs: stats
-  ivs: stats
-}
-
-export interface ModernStats {
-  stats: stats
-}
-
-export interface GameBoyEVs {
+export interface GameBoyStats {
   evsG12: statsPreSplit
-}
-
-export interface DVs {
   dvs: statsPreSplit
 }
 
-export interface Gen1Stats {
+export function hasGameBoyData(obj: any): obj is GameBoyStats {
+  return obj && 'evsG12' in obj
+}
+
+export interface Gen1Stats extends GameBoyStats {
   stats: statsPreSplit
 }
 
-export interface LetsGoStats {
-  avs: stats
-  ivs: stats
+export interface Gen2Stats extends GameBoyStats {
+  stats: stats
 }
 
 export interface ContestStats {
   contest: contestStats
 }
-
-export interface GVs {
-  gvs: stats
-}
-
-export interface SpecialSplitStats extends ModernEVsIVs, ModernStats {}

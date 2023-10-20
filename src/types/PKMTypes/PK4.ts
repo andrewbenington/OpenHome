@@ -31,8 +31,10 @@ import {
 } from '../../util/Encryption'
 import { getHPGen3Onward, getLevelGen3Onward, getStatGen3Onward } from '../../util/StatCalc'
 import { gen4StringToUTF, utf16StringToGen4 } from '../../util/Strings/StringConverter'
+import { BasePKMData } from '../interfaces/base'
+import { SanityChecksum } from '../interfaces/gen3'
+import { Gen4EncounterType, Gen4OnData, Gen4OnlyData } from '../interfaces/gen4'
 import { OHPKM } from './OHPKM'
-import { PKM } from './PKM'
 import {
   adjustMovePPBetweenFormats,
   generatePersonalityValuePreservingAttributes,
@@ -42,7 +44,9 @@ import {
 
 export const GEN4_MOVE_MAX = 467
 
-export class PK4 implements PKM {
+export class PK4
+  implements BasePKMData, Gen4OnData, Gen4EncounterType, Gen4OnlyData, SanityChecksum
+{
   public get fileSize() {
     return 136
   }
@@ -538,11 +542,9 @@ export class PK4 implements PKM {
   }
 
   public get metLocation() {
-    const locationBlock = G4Locations[Math.floor(this.metLocationIndex / 1000) * 1000]
-    if (locationBlock) {
-      return `in ${locationBlock[this.metLocationIndex % 1000]}`
-    }
-    return undefined
+    const locationBlock =
+      G4Locations[Math.floor(this.metLocationIndex / 1000) * 1000] ?? G4Locations[0]
+    return `in ${locationBlock[this.metLocationIndex % 1000]}`
   }
 
   public get nickname() {

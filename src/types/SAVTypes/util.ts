@@ -1,6 +1,7 @@
 import { bytesToUint32LittleEndian, bytesToUint64LittleEndian } from '../../util/ByteLogic'
 import { getMonGen12Identifier, getMonGen345Identifier } from '../../util/Lookup'
-import { OHPKM, PKM } from '../PKMTypes'
+import { OHPKM, PK2, PK3, PK4, PK5 } from '../PKMTypes'
+import { GamePKM } from '../PKMTypes/GamePKM'
 import { SaveType, StringToStringMap } from '../types'
 import { DPSAV } from './DPSAV'
 import { G1SAV } from './G1SAV'
@@ -16,9 +17,9 @@ const SIZE_GEN3 = 0x20000
 const SIZE_GEN45 = 0x80000
 
 // check if each pokemon in a save file has OpenHome data associated with it
-const recoverOHPKMData = (
-  saveFile: SAV,
-  getIdentifier: (_: PKM) => string | undefined,
+const recoverOHPKMData = <P extends GamePKM>(
+  saveFile: SAV<P>,
+  getIdentifier: (_: P) => string | undefined,
   homeMonMap?: { [key: string]: OHPKM },
   lookupMap?: { [key: string]: string }
 ) => {
@@ -30,7 +31,7 @@ const recoverOHPKMData = (
       if (mon) {
         // GameBoy PKM files don't have a personality value to track the mons with OpenHome data,
         // so they need to be identified with their IVs and OT
-        const lookupIdentifier = getIdentifier(mon)
+        const lookupIdentifier = getIdentifier(mon as P)
         if (!lookupIdentifier) return
         const homeIdentifier = lookupMap[lookupIdentifier]
         if (!homeIdentifier) return
@@ -120,8 +121,8 @@ export const buildSaveFile = (
     gen345LookupMap?: StringToStringMap
     fileCreatedDate?: Date
   }
-): SAV | undefined => {
-  const { homeMonMap, gen12LookupMap, gen345LookupMap, fileCreatedDate } = lookupMaps
+): SAV<GamePKM> | undefined => {
+  const { homeMonMap, gen12LookupMap, gen345LookupMap } = lookupMaps
   const saveType = getSaveType(fileBytes)
   let saveFile
   switch (saveType) {
@@ -149,7 +150,7 @@ export const buildSaveFile = (
       return saveFile
     case SaveType.C_I:
     case SaveType.GS_I:
-      saveFile = recoverOHPKMData(
+      saveFile = recoverOHPKMData<PK2>(
         new G2SAV(filePath, fileBytes),
         getMonGen12Identifier,
         homeMonMap,
@@ -159,15 +160,15 @@ export const buildSaveFile = (
     case SaveType.RS:
     case SaveType.FRLG:
     case SaveType.E:
-      saveFile = recoverOHPKMData(
-        new G3SAV(filePath, fileBytes, fileCreatedDate),
+      saveFile = recoverOHPKMData<PK3>(
+        new G3SAV(filePath, fileBytes),
         getMonGen345Identifier,
         homeMonMap,
         gen345LookupMap
       )
       break
     case SaveType.DP:
-      saveFile = recoverOHPKMData(
+      saveFile = recoverOHPKMData<PK4>(
         new DPSAV(filePath, fileBytes),
         getMonGen345Identifier,
         homeMonMap,
@@ -175,7 +176,7 @@ export const buildSaveFile = (
       )
       break
     case SaveType.Pt:
-      saveFile = recoverOHPKMData(
+      saveFile = recoverOHPKMData<PK4>(
         new PtSAV(filePath, fileBytes),
         getMonGen345Identifier,
         homeMonMap,
@@ -183,7 +184,7 @@ export const buildSaveFile = (
       )
       break
     case SaveType.HGSS:
-      saveFile = recoverOHPKMData(
+      saveFile = recoverOHPKMData<PK4>(
         new HGSSSAV(filePath, fileBytes),
         getMonGen345Identifier,
         homeMonMap,
@@ -191,7 +192,7 @@ export const buildSaveFile = (
       )
       break
     case SaveType.G5:
-      saveFile = recoverOHPKMData(
+      saveFile = recoverOHPKMData<PK5>(
         new G5SAV(filePath, fileBytes),
         getMonGen345Identifier,
         homeMonMap,

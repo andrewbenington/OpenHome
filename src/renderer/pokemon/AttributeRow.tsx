@@ -23,14 +23,20 @@ const AttributeRow = (props: {
           width: indent ? `calc(33% - ${indent + 1}px)` : '33%',
           height: '100%',
           backgroundColor: '#fff6',
-          display: 'flex',
-          flexDirection: 'row',
-          alignItems: 'center',
           paddingLeft: 10,
-          marginLeft: indent,
+          display: 'grid',
+          alignItems: 'center',
         }}
       >
-        {label}
+        <div
+          style={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {label}
+        </div>
       </div>
       <div
         style={{

@@ -1,6 +1,8 @@
 import { isGameBoy } from '../consts'
-import { OHPKM, PK4, PKM } from '../types/PKMTypes'
+import { BasePKMData, OHPKM, PK4 } from '../types/PKMTypes'
 import { getBaseMon } from '../types/PKMTypes/util'
+import { Gen3OnData, hasGen3OnData } from '../types/interfaces/gen3'
+import { GameBoyStats } from '../types/interfaces/stats'
 import { bytesToString } from './ByteLogic'
 import { gen12StringToUTF, utf16StringToGen12 } from './Strings/StringConverter'
 
@@ -18,18 +20,17 @@ export const getMonFileIdentifier = (mon: OHPKM) => {
   return undefined
 }
 
-export const getMonGen12Identifier = (mon: PKM) => {
+export const getMonGen12Identifier = (mon: BasePKMData & (GameBoyStats | OHPKM)) => {
   const { dvs } = mon
   const convertedTrainerName = gen12StringToUTF(utf16StringToGen12(mon.trainerName, 8, true), 0, 8)
-  if (!dvs) return undefined
   const baseMon = getBaseMon(mon.dexNum, mon.formNum)
-  const TID =
-    isGameBoy(mon.gameOfOrigin) || mon.personalityValue === undefined
-      ? mon.trainerID
-      : mon.personalityValue % 0x10000
+  let tid = mon.trainerID
+  if (mon instanceof OHPKM && !isGameBoy(mon.gameOfOrigin)) {
+    tid = mon.personalityValue % 0x10000
+  }
   if (baseMon) {
     return `${baseMon.dexNumber.toString().padStart(4, '0')}-${bytesToString(
-      TID,
+      tid,
       2
     )}-${convertedTrainerName}-${dvs.atk.toString(16)}-${dvs.def.toString(16)}-${dvs.spc.toString(
       16
@@ -38,7 +39,10 @@ export const getMonGen12Identifier = (mon: PKM) => {
   return undefined
 }
 
-export const getMonGen345Identifier = (mon: PKM) => {
+export const getMonGen345Identifier = (mon: BasePKMData & Gen3OnData) => {
+  if (!hasGen3OnData(mon)) {
+    return undefined
+  }
   let pk345 = mon
   if (mon instanceof OHPKM) {
     pk345 = new PK4(undefined, undefined, mon)

@@ -5,17 +5,7 @@ import { gen4StringToUTF } from '../../util/Strings/StringConverter'
 import { PK4 } from '../PKMTypes/PK4'
 import { Box, SAV } from './SAV'
 
-export class G4Box implements Box {
-  name: string
-
-  pokemon: Array<PK4 | OHPKM> = new Array(30)
-
-  constructor(n: string) {
-    this.name = n
-  }
-}
-
-export class G4SAV extends SAV {
+export class G4SAV extends SAV<PK4> {
   pkmType = PK4
 
   currentSaveStorageBlockOffset: number = 0
@@ -30,8 +20,6 @@ export class G4SAV extends SAV {
 
   footerSize: number = 0x14
 
-  boxes: Array<G4Box>
-
   constructor(path: string, bytes: Uint8Array) {
     super(path, bytes)
     this.origin = bytes[0x80]
@@ -41,7 +29,7 @@ export class G4SAV extends SAV {
   buildBoxes() {
     for (let box = 0; box < 18; box++) {
       const boxLabel = gen4StringToUTF(this.bytes, this.boxNamesOffset + 40 * box, 20)
-      this.boxes[box] = new G4Box(boxLabel)
+      this.boxes[box] = new Box(boxLabel, 30)
     }
 
     for (let box = 0; box < 18; box++) {
@@ -108,8 +96,9 @@ export class G4SAV extends SAV {
       // and the slot was left empty
       if (changedMon) {
         try {
-          const mon = new PK4(changedMon)
-          if (mon?.gameOfOrigin && mon?.dexNum) {
+          const mon =
+            changedMon instanceof OHPKM ? new PK4(undefined, undefined, changedMon) : changedMon
+          if (mon.gameOfOrigin && mon.dexNum) {
             mon.refreshChecksum()
             this.bytes.set(mon.toPCBytes(), writeIndex)
           }

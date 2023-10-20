@@ -14,14 +14,17 @@ import {
 import { natDexToSV, svToNatDex } from '../../util/ConvertPokemonID'
 import { getHPGen3Onward, getLevelGen3Onward, getStatGen3Onward } from '../../util/StatCalc'
 import { utf16BytesToString, utf16StringToBytes } from '../../util/Strings/StringConverter'
+import { BasePKMData } from '../interfaces/base'
+import { SanityChecksum } from '../interfaces/gen3'
+import { Gen8OnData } from '../interfaces/gen8'
+import { Gen9OnlyData } from '../interfaces/gen9'
 import { contestStats, hyperTrainStats, marking, memory, pokedate, stats } from '../types'
 import { OHPKM } from './OHPKM'
-import { PKM } from './PKM'
 import { adjustMovePPBetweenFormats, writeIVsToBuffer } from './util'
 
 const SV_MOVE_MAX = 904
 
-export class PK9 implements PKM {
+export class PK9 implements BasePKMData, Gen8OnData, Gen9OnlyData, SanityChecksum {
   public get fileSize() {
     return 344
   }
@@ -39,13 +42,11 @@ export class PK9 implements PKM {
   constructor(bytes?: Uint8Array, encrypted?: boolean, other?: OHPKM) {
     if (bytes) {
       if (encrypted) {
-        if (encrypted) {
-          throw new Error('PK9 decryption not implemented')
-        } else {
-          this.bytes = bytes
-        }
-        // this.refreshChecksum();
+        throw new Error('PK9 decryption not implemented')
+      } else {
+        this.bytes = bytes
       }
+      // this.refreshChecksum();
     } else if (other) {
       this.encryptionConstant = other.encryptionConstant
       this.dexNum = other.dexNum
@@ -103,7 +104,7 @@ export class PK9 implements PKM {
       this.handlerName = other.handlerName
       this.handlerGender = other.handlerGender
       this.handlerLanguage = other.handlerLanguage
-      this.currentHandler = other.currentHandler
+      this.isCurrentHandler = other.isCurrentHandler
       this.handlerID = other.handlerID
       this.handlerFriendship = other.handlerFriendship
       this.handlerMemory = other.handlerMemory
@@ -566,27 +567,19 @@ export class PK9 implements PKM {
   }
 
   public get teraTypeOriginal() {
-    return bytesToUint32LittleEndian(this.bytes, 0x94)
+    return this.bytes[0x94]
   }
 
   public set teraTypeOriginal(value: number) {
-    this.bytes.set(uint32ToBytesLittleEndian(value), 0x94)
+    this.bytes[0x94] = value
   }
 
   public get teraTypeOverride() {
-    return bytesToUint32LittleEndian(this.bytes, 0x95)
+    return this.bytes[0x95]
   }
 
   public set teraTypeOverride(value: number) {
-    this.bytes.set(uint32ToBytesLittleEndian(value), 0x95)
-  }
-
-  public get handlerNameBytes() {
-    return this.bytes.slice(0xa8, 26)
-  }
-
-  public set handlerNameBytes(value: Uint8Array) {
-    this.bytes.set(value, 0xa8)
+    this.bytes[0x95] = value
   }
 
   public get handlerName() {
@@ -621,12 +614,12 @@ export class PK9 implements PKM {
     }
   }
 
-  public get currentHandler() {
-    return this.bytes[0xc4]
+  public get isCurrentHandler() {
+    return !!this.bytes[0xc4]
   }
 
-  public set currentHandler(value: number) {
-    this.bytes[0xc4] = value
+  public set isCurrentHandler(value: boolean) {
+    this.bytes[0xc4] = value ? 1 : 0
   }
 
   public get handlerID() {
@@ -813,11 +806,9 @@ export class PK9 implements PKM {
         ? `in the ${GameOfOriginData[this.gameOfOrigin]?.region} region`
         : 'in a faraway place'
     }
-    const locationBlock = SVMetLocation[Math.floor(this.metLocationIndex / 10000) * 10000]
-    if (locationBlock) {
-      return `in ${locationBlock[this.metLocationIndex % 10000]}`
-    }
-    return undefined
+    const locationBlock =
+      SVMetLocation[Math.floor(this.metLocationIndex / 10000) * 10000] ?? SVMetLocation[0]
+    return `in ${locationBlock[this.metLocationIndex % 10000]}`
   }
 
   public get ball() {

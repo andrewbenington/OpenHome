@@ -1,7 +1,7 @@
 import { GameOfOrigin, GameOfOriginData, NDex, POKEMON_DATA, isGameBoy } from '../../consts'
 import CrystalLocation from '../../consts/MetLocation/Crystal'
 import { ItemGen2FromString, ItemGen2ToString } from '../../resources/gen/items/Gen2'
-import { statsPreSplit } from '../../types/types'
+import { stats, statsPreSplit } from '../../types/types'
 import {
   bytesToUint16BigEndian,
   bytesToUint24BigEndian,
@@ -12,13 +12,15 @@ import {
 } from '../../util/ByteLogic'
 import { getLevelGen12 } from '../../util/StatCalc'
 import { gen12StringToUTF } from '../../util/Strings/StringConverter'
+import { BasePKMData } from '../interfaces/base'
+import { Gen2OnData, Gen2OnlyData } from '../interfaces/gen2'
+import { Gen2Stats } from '../interfaces/stats'
 import { OHPKM } from './OHPKM'
-import { PKM } from './PKM'
 import { adjustMovePPBetweenFormats } from './util'
 
 export const GEN2_MOVE_MAX = 251
 
-export class PK2 implements PKM {
+export class PK2 implements BasePKMData, Gen2Stats, Gen2OnData, Gen2OnlyData {
   get fileSize(): number {
     return 33
   }
@@ -272,11 +274,18 @@ export class PK2 implements PKM {
     this.bytes[0x1c] = value
   }
 
+  public get metLocation() {
+    if (this.metLocationIndex) {
+      return `in ${CrystalLocation[0][this.metLocationIndex]}`
+    }
+    return undefined
+  }
+
   public get metLocationIndex() {
     return this.bytes[0x1e] & 0x7f
   }
 
-  public set metLocationIndex(value: number | undefined) {
+  public set metLocationIndex(value: number) {
     if (value) {
       this.bytes[0x1e] = (this.bytes[0x1e] & 0x10) | (value & 0x7f)
     } else {
@@ -285,27 +294,19 @@ export class PK2 implements PKM {
   }
 
   public get metTimeOfDay() {
-    return ((this.bytes[0x1d] >> 6) & 0b11) > 0 ? (this.bytes[0x1d] >> 6) & 0b11 : undefined
+    return (this.bytes[0x1d] >> 6) & 0b11
   }
 
-  public set metTimeOfDay(value: number | undefined) {
-    if (value) {
-      this.bytes[0x1d] = (this.bytes[0x1d] & 0x3f) | ((value & 0b11) << 6)
-    } else {
-      this.bytes[0x1d] = this.bytes[0x1d] & 0x3f
-    }
+  public set metTimeOfDay(value: number) {
+    this.bytes[0x1d] = (this.bytes[0x1d] & 0x3f) | ((value & 0b11) << 6)
   }
 
   public get metLevel() {
-    return (this.bytes[0x1d] & 0x3f) > 0 ? this.bytes[0x1d] & 0x3f : undefined
+    return this.bytes[0x1d] & 0x3f
   }
 
-  public set metLevel(value: number | undefined) {
-    if (value) {
-      this.bytes[0x1d] = (this.bytes[0x1d] & 0xc0) | (value & 0x3f)
-    } else {
-      this.bytes[0x1d] = this.bytes[0x1d] & 0xc0
-    }
+  public set metLevel(value: number) {
+    this.bytes[0x1d] = (this.bytes[0x1d] & 0xc0) | (value & 0x3f)
   }
 
   public get trainerGender() {
@@ -351,13 +352,14 @@ export class PK2 implements PKM {
   }
 
   // TODO: gen 2 stat calc
-  public get stats(): statsPreSplit {
+  public get stats(): stats {
     return {
       hp: 0,
       atk: 0,
       def: 0,
       spe: 0,
-      spc: 0,
+      spa: 0,
+      spd: 0,
     }
   }
 

@@ -1,4 +1,4 @@
-import { Ball, GameOfOrigin, GameOfOriginData, isAlola } from '../../consts'
+import { Ball, GameOfOrigin, GameOfOriginData, isAlola, isKanto } from '../../consts'
 import { Languages } from '../../consts/Languages'
 import LGPELocations from '../../consts/MetLocation/LGPE'
 import { ItemFromString, ItemToString } from '../../resources/gen/items/Items'
@@ -13,14 +13,26 @@ import {
 } from '../../util/ByteLogic'
 import { getHPGen3Onward, getLevelGen3Onward, getStatGen3Onward } from '../../util/StatCalc'
 import { utf16BytesToString, utf16StringToBytes } from '../../util/Strings/StringConverter'
+import { BasePKMData } from '../interfaces/base'
+import { SanityChecksum } from '../interfaces/gen3'
+import { Gen7OnData, LetsGoData, Size } from '../interfaces/gen7'
 import { hyperTrainStats, marking, memory, pokedate, stats } from '../types'
 import { OHPKM } from './OHPKM'
-import { PKM } from './PKM'
 import { adjustMovePPBetweenFormats, writeIVsToBuffer } from './util'
 
 export const LGPE_MOVE_MAX = 742
 
-export class PB7 implements PKM {
+export class PB7
+  implements
+    BasePKMData,
+    LetsGoData,
+    Omit<
+      Gen7OnData,
+      'ribbons' | 'contest' | 'contestMemoryCount' | 'battleMemoryCount' | 'trainerMemory'
+    >,
+    SanityChecksum,
+    Size
+{
   public get fileSize() {
     return 232
   }
@@ -124,6 +136,10 @@ export class PB7 implements PKM {
     this.bytes.set(uint32ToBytesLittleEndian(value), 0x00)
   }
 
+  public get sanity() {
+    return bytesToUint16LittleEndian(this.bytes, 0x04)
+  }
+
   public get checksum() {
     return bytesToUint16LittleEndian(this.bytes, 0x06)
   }
@@ -213,11 +229,11 @@ export class PB7 implements PKM {
     this.bytes[0x15] = (this.bytes[0x15] & 0b11111000) | (value & 0b111)
   }
 
-  public get isFavorite() {
+  public get favorite() {
     return getFlag(this.bytes, 0x15, 3)
   }
 
-  public set isFavorite(value: boolean) {
+  public set favorite(value: boolean) {
     setFlag(this.bytes, 0x15, 3, value)
   }
 
@@ -320,6 +336,21 @@ export class PB7 implements PKM {
     this.bytes[0x27] = value.spe
     this.bytes[0x28] = value.spa
     this.bytes[0x29] = value.spd
+  }
+
+  public get contest() {
+    return {
+      cool: 0,
+      beauty: 0,
+      cute: 0,
+      smart: 0,
+      tough: 0,
+      sheen: 0,
+    }
+  }
+
+  public get ribbons(): string[] {
+    return []
   }
 
   public get resortEventStatus() {
@@ -616,17 +647,15 @@ export class PB7 implements PKM {
   }
 
   public get metLocation() {
-    if (!isAlola(this.gameOfOrigin)) {
+    if (!isKanto(this.gameOfOrigin)) {
       return this.gameOfOrigin <= GameOfOrigin.UltraMoon ||
         (this.gameOfOrigin >= GameOfOrigin.Red && this.gameOfOrigin <= GameOfOrigin.Crystal)
         ? `in the ${GameOfOriginData[this.gameOfOrigin]?.region} region`
         : 'in a faraway place'
     }
-    const locationBlock = LGPELocations[Math.floor(this.metLocationIndex / 10000) * 10000]
-    if (locationBlock) {
-      return `in ${locationBlock[this.metLocationIndex % 10000]}`
-    }
-    return undefined
+    const locationBlock =
+      LGPELocations[Math.floor(this.metLocationIndex / 10000) * 10000] ?? LGPELocations[0]
+    return `in ${locationBlock[this.metLocationIndex % 10000]}`
   }
 
   public get ball() {

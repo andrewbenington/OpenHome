@@ -18,10 +18,10 @@ const blazikenOH = bytesToPKM(
 const slowpokeOH = bytesToPKM(
   new Uint8Array(fs.readFileSync(path.join(__dirname, './PKMFiles/OH', 'slowpoke-shiny.ohpkm'))),
   'OHPKM'
-)
+) as OHPKM
 
 test('ohpkm conversion to OHPKM and back is lossless', () => {
-  const ohPKM = new OHPKM(blazikenOH)
+  const ohPKM = new OHPKM(undefined, blazikenOH)
   // gaining cool contest points
   expect(blazikenOH.personalityValue).toEqual(ohPKM.personalityValue)
 })
@@ -29,27 +29,27 @@ test('ohpkm conversion to OHPKM and back is lossless', () => {
 test('converted ohpkm always has the same gen1 lookup key', () => {
   const lookup = getMonGen12Identifier(slowpokeOH)
   for (let i = 0; i < 100; i++) {
-    expect(lookup).toEqual(getMonGen12Identifier(new PK1(slowpokeOH)))
+    expect(lookup).toEqual(getMonGen12Identifier(new PK1(undefined, undefined, slowpokeOH)))
   }
 })
 
 test('converted ohpkm always has the same gen2 lookup key', () => {
   const lookup = getMonGen12Identifier(slowpokeOH)
   for (let i = 0; i < 100; i++) {
-    expect(lookup).toEqual(getMonGen12Identifier(new PK2(slowpokeOH)))
+    expect(lookup).toEqual(getMonGen12Identifier(new PK2(undefined, undefined, slowpokeOH)))
   }
 })
 
 test('converted ohpkm always has the same gen3 lookup key', () => {
   const lookup = getMonGen345Identifier(slowpokeOH)
   for (let i = 0; i < 100; i++) {
-    expect(lookup).toEqual(getMonGen345Identifier(new PK3(slowpokeOH)))
+    expect(lookup).toEqual(getMonGen345Identifier(new PK3(undefined, undefined, slowpokeOH)))
   }
 })
 
 test('converted ohpkm always has the same gen4 lookup key', () => {
   const lookup = getMonGen345Identifier(slowpokeOH)
   for (let i = 0; i < 100; i++) {
-    expect(lookup).toEqual(getMonGen345Identifier(new PK4(slowpokeOH)))
+    expect(lookup).toEqual(getMonGen345Identifier(new PK4(undefined, undefined, slowpokeOH)))
   }
 })

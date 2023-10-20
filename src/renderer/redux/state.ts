@@ -1,4 +1,5 @@
-import { OHPKM, PKM } from '../../types/PKMTypes'
+import { OHPKM } from '../../types/PKMTypes'
+import { GamePKM } from '../../types/PKMTypes/GamePKM'
 import { SAV } from '../../types/SAVTypes'
 import { HomeData } from '../../types/SAVTypes/HomeData'
 import { SaveCoordinates, SaveRefMap, StringToStringMap } from '../../types/types'
@@ -11,9 +12,9 @@ export interface LookupState {
 
 export interface AppState {
   homeData: HomeData
-  saves: SAV[]
+  saves: SAV<GamePKM>[]
   dragSource?: SaveCoordinates
-  dragMon?: PKM
+  dragMon?: GamePKM | OHPKM
   modifiedOHPKMs: { [key: string]: OHPKM }
   monsToRelease: OHPKM[]
   lookup: LookupState

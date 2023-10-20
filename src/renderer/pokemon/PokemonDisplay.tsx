@@ -1,5 +1,6 @@
 /* eslint-disable no-nested-ternary */
 import { Grid, MenuItem, Select } from '@mui/material'
+import { useState } from 'react'
 import {
   BW2_TRANSFER_RESTRICTIONS,
   GEN1_TRANSFER_RESTRICTIONS,
@@ -7,26 +8,13 @@ import {
   GEN3_TRANSFER_RESTRICTIONS,
   HGSS_TRANSFER_RESTRICTIONS,
   LA_TRANSFER_RESTRICTIONS,
+  LGPE_TRANSFER_RESTRICTIONS,
   ORAS_TRANSFER_RESTRICTIONS,
   USUM_TRANSFER_RESTRICTIONS,
 } from '../../consts/TransferRestrictions'
-import { useState } from 'react'
-import { StringToStringMap, Styles } from '../../types/types'
-import {
-  COLOPKM,
-  OHPKM,
-  PA8,
-  PK1,
-  PK2,
-  PK3,
-  PK4,
-  PK5,
-  PK6,
-  PK7,
-  PKM,
-  XDPKM,
-} from '../../types/PKMTypes'
+import { OHPKM } from '../../types/PKMTypes'
 import { isRestricted } from '../../types/TransferRestrictions'
+import { StringToStringMap, Styles } from '../../types/types'
 import OpenHomeButton from '../components/OpenHomeButton'
 import MetDataMovesDisplay from './MetDataMovesDisplay'
 import OtherDisplay from './OtherDisplay'
@@ -34,6 +22,8 @@ import RawDisplay from './RawDisplay'
 import RibbonsDisplay from './RibbonsDisplay'
 import StatsDisplay from './StatsDisplay'
 import SummaryDisplay from './SummaryDisplay'
+import { PKM } from '../../types/PKMTypes/PKM'
+import { fileTypeFromString } from '../../types/PKMTypes/GamePKM'
 
 const styles = {
   tabScrollContainer: {
@@ -77,35 +67,6 @@ const styles = {
   },
 } as Styles
 
-const getTypeFromString = (type: string) => {
-  switch (type) {
-    case 'OHPKM':
-      return OHPKM
-    case 'PK1':
-      return PK1
-    case 'PK2':
-      return PK2
-    case 'PK3':
-      return PK3
-    case 'COLOPKM':
-      return COLOPKM
-    case 'XDPKM':
-      return XDPKM
-    case 'PK4':
-      return PK4
-    case 'PK5':
-      return PK5
-    case 'PK6':
-      return PK6
-    case 'PK7':
-      return PK7
-    case 'PA8':
-      return PA8
-    default:
-      return undefined
-  }
-}
-
 const fileTypeColors: StringToStringMap = {
   OHPKM: '#748fcd',
   PK1: '#b34',
@@ -135,13 +96,22 @@ const PokemonDisplay = (props: { mon: PKM; tab: string; setTab: (_: string) => v
           <Select
             value={displayMon.format}
             onChange={(e) => {
-              const T = getTypeFromString(e.target.value)
               if (mon.format === e.target.value) {
                 setDisplayMon(mon)
-              } else if (T && mon instanceof OHPKM) {
-                setDisplayMon(new T(undefined, undefined, mon))
-              } else if (T) {
-                setDisplayMon(new T(undefined, undefined, new OHPKM(undefined, mon)))
+                return
+              }
+              if (e.target.value === 'OHPKM') {
+                setDisplayMon(new OHPKM(undefined, mon))
+                return
+              }
+              const P = fileTypeFromString(e.target.value)
+              if (!P) {
+                throw `Invalid filetype: ${P}`
+              }
+              if (mon instanceof OHPKM) {
+                setDisplayMon(new P(undefined, undefined, mon))
+              } else {
+                setDisplayMon(new P(undefined, undefined, new OHPKM(undefined, mon)))
               }
             }}
             sx={{
@@ -206,6 +176,23 @@ const PokemonDisplay = (props: { mon: PKM; tab: string; setTab: (_: string) => v
             {mon.format === 'OHPKM' &&
             !isRestricted(USUM_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) ? (
               <MenuItem value="PK7">PK7</MenuItem>
+            ) : (
+              <div />
+            )}
+            {mon.format === 'OHPKM' &&
+            !isRestricted(LGPE_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) ? (
+              <MenuItem value="PB7">PB7</MenuItem>
+            ) : (
+              <div />
+            )}
+            {mon.format === 'OHPKM' && !isRestricted({}, mon.dexNum, mon.formNum) ? (
+              <MenuItem value="PK8">PK8</MenuItem>
+            ) : (
+              <div />
+            )}
+            {mon.format === 'OHPKM' &&
+            !isRestricted(HGSS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) ? (
+              <MenuItem value="PB8">PB8</MenuItem>
             ) : (
               <div />
             )}

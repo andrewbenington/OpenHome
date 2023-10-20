@@ -15,11 +15,13 @@ import {
 } from '../../util/ByteLogic'
 import { getLevelGen3Onward } from '../../util/StatCalc'
 import { utf16BytesToString, utf16StringToBytes } from '../../util/Strings/StringConverter'
+import { SanityChecksum } from '../interfaces/gen3'
+import { Size } from '../interfaces/gen7'
+import { Gen8OnData, PLAData } from '../interfaces/gen8'
 import { OHPKM } from './OHPKM'
-import { PKM } from './PKM'
 import { adjustMovePPBetweenFormats, writeIVsToBuffer } from './util'
 
-export class PA8 implements PKM {
+export class PA8 implements Gen8OnData, PLAData, Size, SanityChecksum {
   public get fileSize() {
     return 376
   }
@@ -34,9 +36,16 @@ export class PA8 implements PKM {
 
   bytes = new Uint8Array(376)
 
-  constructor(bytes?: Uint8Array, other?: OHPKM) {
+  constructor(bytes?: Uint8Array, encrypted?: boolean, other?: OHPKM) {
     if (bytes) {
-      this.bytes = bytes
+      if (encrypted) {
+        if (encrypted) {
+          throw new Error('PA8 decryption not implemented')
+        } else {
+          this.bytes = bytes
+        }
+        // this.refreshChecksum();
+      }
     } else if (other) {
       this.sanity = other.sanity
       this.dexNum = other.dexNum
@@ -89,7 +98,7 @@ export class PA8 implements PKM {
       this.handlerName = other.handlerName
       this.handlerGender = other.handlerGender
       this.handlerLanguage = other.handlerLanguage
-      this.currentHandler = other.currentHandler
+      this.isCurrentHandler = other.isCurrentHandler
       this.handlerID = other.handlerID
       this.handlerFriendship = other.handlerFriendship
       this.handlerMemory = other.handlerMemory
@@ -404,7 +413,7 @@ export class PA8 implements PKM {
 
   public get ribbons() {
     const ribbons: string[] = []
-    for (let i = 0; i <= Gen9Ribbons.indexOf('Hisui'); i++) {
+    for (let i = 0; i <= Gen9Ribbons.length; i++) {
       if (getFlag(this.bytes, i >= 64 ? 0x40 : 0x34, i % 64)) {
         ribbons.push(Gen9Ribbons[i])
       }
@@ -648,14 +657,6 @@ export class PA8 implements PKM {
     return Buffer.from(this.weightAbsoluteBytes).readFloatLE()
   }
 
-  public get handlerNameBytes() {
-    return this.bytes.slice(0xb8, 26)
-  }
-
-  public set handlerNameBytes(value: Uint8Array) {
-    this.bytes.set(value, 0xb8)
-  }
-
   public get handlerName() {
     return utf16BytesToString(this.bytes, 0xb8, 12)
   }
@@ -688,12 +689,12 @@ export class PA8 implements PKM {
     }
   }
 
-  public get currentHandler() {
-    return this.bytes[0xd4]
+  public get isCurrentHandler() {
+    return !!this.bytes[0xd4]
   }
 
-  public set currentHandler(value: number) {
-    this.bytes[0xd4] = value
+  public set isCurrentHandler(value: boolean) {
+    this.bytes[0xd4] = value ? 1 : 0
   }
 
   public get handlerID() {
@@ -915,11 +916,9 @@ export class PA8 implements PKM {
         ? `in the ${GameOfOriginData[this.gameOfOrigin]?.region} region`
         : 'in a faraway place'
     }
-    const locationBlock = LALocations[Math.floor(this.metLocationIndex / 10000) * 10000]
-    if (locationBlock) {
-      return locationBlock[this.metLocationIndex % 10000]
-    }
-    return undefined
+    const locationBlock =
+      LALocations[Math.floor(this.metLocationIndex / 10000) * 10000] ?? LALocations[0]
+    return locationBlock[this.metLocationIndex % 10000]
   }
 
   public get metLevel() {

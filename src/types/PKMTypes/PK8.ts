@@ -1,4 +1,5 @@
-import { Ball, GameOfOrigin, GameOfOriginData, Languages, isGalar } from '../../consts'
+import { Ball, GameOfOrigin, GameOfOriginData, Languages, isBDSP, isGalar } from '../../consts'
+import BDSPLocations from '../../consts/MetLocation/BDSP'
 import SwShLocations from '../../consts/MetLocation/SwSh'
 import { Gen9Ribbons } from '../../consts/Ribbons'
 import { ItemFromString, ItemToString } from '../../resources/gen/items/Items'
@@ -13,14 +14,19 @@ import {
 } from '../../util/ByteLogic'
 import { getHPGen3Onward, getLevelGen3Onward, getStatGen3Onward } from '../../util/StatCalc'
 import { utf16BytesToString, utf16StringToBytes } from '../../util/Strings/StringConverter'
+import { BasePKMData } from '../interfaces/base'
+import { SanityChecksum } from '../interfaces/gen3'
+import { Size } from '../interfaces/gen7'
+import { Gen8OnData, Gen8OnlyData, PK8OnlyData } from '../interfaces/gen8'
 import { contestStats, hyperTrainStats, marking, memory, pokedate, stats } from '../types'
 import { OHPKM } from './OHPKM'
-import { PKM } from './PKM'
 import { adjustMovePPBetweenFormats, writeIVsToBuffer } from './util'
 
 const SWSH_BDSP_MOVE_MAX = 826
 
-export class PK8 implements PKM {
+export class G8PKM
+  implements BasePKMData, Gen8OnData, Gen8OnlyData, PK8OnlyData, Size, SanityChecksum
+{
   public get fileSize() {
     return 344
   }
@@ -38,13 +44,11 @@ export class PK8 implements PKM {
   constructor(bytes?: Uint8Array, encrypted?: boolean, other?: OHPKM) {
     if (bytes) {
       if (encrypted) {
-        if (encrypted) {
-          throw new Error('PK8 decryption not implemented')
-        } else {
-          this.bytes = bytes
-        }
-        // this.refreshChecksum();
+        throw new Error('PK8 decryption not implemented')
+      } else {
+        this.bytes = bytes
       }
+      // this.refreshChecksum();
     } else if (other) {
       this.encryptionConstant = other.encryptionConstant
       this.dexNum = other.dexNum
@@ -107,7 +111,7 @@ export class PK8 implements PKM {
       this.handlerName = other.handlerName
       this.handlerGender = other.handlerGender
       this.handlerLanguage = other.handlerLanguage
-      this.currentHandler = other.currentHandler
+      this.isCurrentHandler = other.isCurrentHandler
       this.handlerID = other.handlerID
       this.handlerFriendship = other.handlerFriendship
       this.handlerMemory = other.handlerMemory
@@ -131,7 +135,6 @@ export class PK8 implements PKM {
       this.metLevel = other.metLevel
       this.trainerGender = other.trainerGender
       this.hyperTraining = other.hyperTraining
-      this.trFlagsSwSh = other.trFlagsSwSh
       this.homeTracker = other.homeTracker
       this.currentHP = other.currentHP
       this.statusCondition = other.statusCondition
@@ -139,7 +142,7 @@ export class PK8 implements PKM {
   }
 
   public get format() {
-    return 'PK8'
+    return 'G8PKM'
   }
 
   public get encryptionConstant() {
@@ -399,7 +402,7 @@ export class PK8 implements PKM {
 
   public get ribbons() {
     const ribbons: string[] = []
-    for (let i = 0; i <= Gen9Ribbons.indexOf('Slump Mark'); i++) {
+    for (let i = 0; i <= Gen9Ribbons.length; i++) {
       if (getFlag(this.bytes, i >= 64 ? 0x40 : 0x34, i % 64)) {
         ribbons.push(Gen9Ribbons[i])
       }
@@ -411,7 +414,7 @@ export class PK8 implements PKM {
     value.forEach((ribbon) => {
       const index = Gen9Ribbons.indexOf(ribbon)
       if (index > 0) {
-        setFlag(this.bytes, index >= 64 ? 0x40 : 0x34, index - 64, true)
+        setFlag(this.bytes, index >= 64 ? 0x40 : 0x34, index % 64, true)
       }
     })
   }
@@ -583,14 +586,6 @@ export class PK8 implements PKM {
     this.bytes.set(uint32ToBytesLittleEndian(value), 0x98)
   }
 
-  public get handlerNameBytes() {
-    return this.bytes.slice(0xa8, 26)
-  }
-
-  public set handlerNameBytes(value: Uint8Array) {
-    this.bytes.set(value, 0xa8)
-  }
-
   public get handlerName() {
     return utf16BytesToString(this.bytes, 0xa8, 12)
   }
@@ -623,12 +618,12 @@ export class PK8 implements PKM {
     }
   }
 
-  public get currentHandler() {
-    return this.bytes[0xc4]
+  public get isCurrentHandler() {
+    return !!this.bytes[0xc4]
   }
 
-  public set currentHandler(value: number) {
-    this.bytes[0xc4] = value
+  public set isCurrentHandler(value: boolean) {
+    this.bytes[0xc4] = value ? 1 : 0
   }
 
   public get handlerID() {
@@ -816,13 +811,19 @@ export class PK8 implements PKM {
     if (!this.eggLocationIndex) {
       return undefined
     }
-    if (!isGalar(this.gameOfOrigin)) {
-      return this.gameOfOrigin < GameOfOrigin.Sword
-        ? `from the ${GameOfOriginData[this.gameOfOrigin]?.region} region`
-        : 'from a faraway place'
+    if (isGalar(this.gameOfOrigin)) {
+      const locationBlock =
+        SwShLocations[Math.floor(this.eggLocationIndex / 10000) * 10000] ?? SwShLocations[0]
+      return `in ${locationBlock[this.eggLocationIndex % 10000]}`
     }
-    const locationBlock = SwShLocations[Math.floor(this.eggLocationIndex / 10000) * 10000]
-    return `from ${locationBlock[this.eggLocationIndex % 10000]}`
+    if (isBDSP(this.gameOfOrigin)) {
+      const locationBlock =
+        BDSPLocations[Math.floor(this.eggLocationIndex / 10000) * 10000] ?? BDSPLocations[0]
+      return `in ${locationBlock[this.eggLocationIndex % 10000]}`
+    }
+    return this.gameOfOrigin < GameOfOrigin.Sword
+      ? `from the ${GameOfOriginData[this.gameOfOrigin]?.region} region`
+      : 'from a faraway place'
   }
 
   public get metLocationIndex() {
@@ -834,16 +835,19 @@ export class PK8 implements PKM {
   }
 
   public get metLocation() {
-    if (!isGalar(this.gameOfOrigin)) {
-      return this.gameOfOrigin <= GameOfOrigin.Sword
-        ? `in the ${GameOfOriginData[this.gameOfOrigin]?.region} region`
-        : 'in a faraway place'
-    }
-    const locationBlock = SwShLocations[Math.floor(this.metLocationIndex / 10000) * 10000]
-    if (locationBlock) {
+    if (isGalar(this.gameOfOrigin)) {
+      const locationBlock =
+        SwShLocations[Math.floor(this.metLocationIndex / 10000) * 10000] ?? SwShLocations[0]
       return `in ${locationBlock[this.metLocationIndex % 10000]}`
     }
-    return undefined
+    if (isBDSP(this.gameOfOrigin)) {
+      const locationBlock =
+        BDSPLocations[Math.floor(this.metLocationIndex / 10000) * 10000] ?? BDSPLocations[0]
+      return `in ${locationBlock[this.metLocationIndex % 10000]}`
+    }
+    return this.gameOfOrigin <= GameOfOrigin.Sword
+      ? `in the ${GameOfOriginData[this.gameOfOrigin]?.region} region`
+      : 'in a faraway place'
   }
 
   public get ball() {
@@ -890,14 +894,6 @@ export class PK8 implements PKM {
     setFlag(this.bytes, 0x126, 5, value.spe)
   }
 
-  public get trFlagsSwSh() {
-    return this.bytes.slice(0x127, 0x127 + 14)
-  }
-
-  public set trFlagsSwSh(value: Uint8Array) {
-    this.bytes.set(value.slice(0, 14), 0x127)
-  }
-
   public get homeTracker() {
     return this.bytes.slice(0x135, 0x135 + 8)
   }
@@ -934,5 +930,47 @@ export class PK8 implements PKM {
       spa: getStatGen3Onward('SpA', this),
       spd: getStatGen3Onward('SpD', this),
     }
+  }
+}
+
+export class PK8 extends G8PKM {
+  constructor(bytes?: Uint8Array, encrypted?: boolean, other?: OHPKM) {
+    super(bytes, encrypted, other)
+    if (other) {
+      this.trFlagsSwSh = other.trFlagsSwSh
+    }
+  }
+
+  public get format() {
+    return 'PK8'
+  }
+
+  public get trFlagsSwSh() {
+    return this.bytes.slice(0x127, 0x127 + 14)
+  }
+
+  public set trFlagsSwSh(value: Uint8Array) {
+    this.bytes.set(value.slice(0, 14), 0x127)
+  }
+}
+
+export class PB8 extends G8PKM {
+  constructor(bytes?: Uint8Array, encrypted?: boolean, other?: OHPKM) {
+    super(bytes, encrypted, other)
+    if (other) {
+      this.tmFlagsBDSP = other.tmFlagsBDSP
+    }
+  }
+
+  public get format() {
+    return 'PB8'
+  }
+
+  public get tmFlagsBDSP() {
+    return this.bytes.slice(0x127, 0x127 + 14)
+  }
+
+  public set tmFlagsBDSP(value: Uint8Array) {
+    this.bytes.set(value.slice(0, 14), 0x127)
   }
 }

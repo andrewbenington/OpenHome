@@ -1,15 +1,18 @@
 import { Card } from '@mui/material'
 import { useMemo } from 'react'
-import Markings from '../components/Markings'
-import { getPublicImageURL } from '../images/images'
-import { getMoveMaxPP } from '../../types/PKMTypes/util'
-import { Styles } from '../../types/types'
-import { GameOfOriginData } from '../../consts'
+import { GameOfOriginData, RibbonTitles, getCharacteristic } from '../../consts'
 import { NatureToString } from '../../resources/gen/other/Natures'
-import { PKM } from '../../types/PKMTypes/PKM'
-import MoveCard from './MoveCard'
+import { getMoveMaxPP } from '../../types/PKMTypes/util'
+import { hasGen2OnData } from '../../types/interfaces/gen2'
+import { hasGen3OnData, hasOrreData } from '../../types/interfaces/gen3'
+import { hasGen4OnData } from '../../types/interfaces/gen4'
+import { Styles } from '../../types/types'
+import Markings from '../components/Markings'
 import { getGameLogo, getOriginMark } from '../images/game'
+import { getPublicImageURL } from '../images/images'
 import { getBallIconPath } from '../images/items'
+import MoveCard from './MoveCard'
+import { PKM } from '../../types/PKMTypes/PKM'
 
 const styles = {
   container: {
@@ -65,23 +68,21 @@ const MetDataMovesDisplay = (props: { mon: PKM }) => {
   const { mon } = props
 
   const eggMessage = useMemo(() => {
-    if (!mon.eggLocation) {
+    if (!hasGen4OnData(mon) || !mon.eggLocation || !mon.eggDate) {
       return undefined
     }
-    return `Egg received ${
-      mon.eggDate ? `on ${mon.eggDate.month}/${mon.eggDate.day}/${mon.eggDate.year}` : ''
-    } ${mon.eggLocation}.`
+    return `Egg received on ${mon.eggDate.month}/${mon.eggDate.day}/${mon.eggDate.year} ${mon.eggLocation}.`
   }, [mon])
 
   const metMessage = useMemo(() => {
-    if (!mon.metLocation) {
+    if (!hasGen2OnData(mon) || !mon.metLocation) {
       return 'Met location unknown.'
     }
     let message = 'Met'
-    if (mon.metTimeOfDay) {
-      message += metTimesOfDay[mon.metTimeOfDay - 1]
+    if ('metTimeOfDay' in mon && mon.metTimeOfDay) {
+      message += ` ${metTimesOfDay[mon.metTimeOfDay - 1]}`
     }
-    if (mon.metDate) {
+    if (hasGen4OnData(mon)) {
       message += ` on ${mon.metDate.month}/${mon.metDate.day}/${mon.metDate.year}`
     }
     if (mon.isFatefulEncounter) {
@@ -95,23 +96,26 @@ const MetDataMovesDisplay = (props: { mon: PKM }) => {
   }, [mon])
 
   const natureMessage = useMemo(() => {
-    if (!mon.nature) {
+    if (!hasGen3OnData(mon)) {
       return undefined
     }
-    const currentNature = mon.statNature ?? mon.nature
+    let currentNature = mon.nature
+    if ('statNature' in mon) {
+      currentNature = mon.statNature
+    }
     let message = 'Has a'
     const vowelStart = ['A', 'E', 'I', 'O', 'U'].includes(
-      (NatureToString(mon.statNature ?? mon.nature) ?? 'Undefined')[0]
+      (NatureToString(currentNature) ?? 'Undefined')[0]
     )
     if (vowelStart) {
       message += 'n'
     }
     message += ` ${NatureToString(currentNature)} nature.`
-    if (mon.statNature && mon.nature !== mon.statNature) {
+    if ('statNature' in mon && mon.nature !== mon.statNature) {
       message += ` (originally ${NatureToString(mon.statNature)})`
     }
     return message
-  }, [mon.nature, mon.statNature])
+  }, [mon])
 
   return (
     <div style={styles.container}>
@@ -124,27 +128,35 @@ const MetDataMovesDisplay = (props: { mon: PKM }) => {
               alignItems: 'center',
             }}
           >
-            {mon.ball ? (
+            {'ball' in mon && mon.ball ? (
               <img
                 draggable={false}
                 alt="poke ball type"
                 style={{ width: 24, height: 24 }}
-                src={getPublicImageURL(getBallIconPath(mon.ball ?? 3))}
+                src={getPublicImageURL(getBallIconPath(mon.ball))}
               />
             ) : (
               <div />
             )}
             <p style={{ fontWeight: 'bold' }}>
               {mon.nickname}
-              {mon.affixedRibbonTitle ? ` ${mon.affixedRibbonTitle}` : ''}
+              {'affixedRibbon' in mon && mon.affixedRibbon
+                ? ` ${RibbonTitles[mon.affixedRibbon]}`
+                : ''}
             </p>
             <Card sx={styles.language}>{mon.language}</Card>
           </div>
           {eggMessage ? <p style={styles.description}>{eggMessage}</p> : <div />}
           <p style={styles.description}>{metMessage}</p>
           {/* check for undefined because 0 nature is Hardy */}
-          {mon.nature !== undefined ? <p style={styles.description}>{natureMessage}</p> : <div />}
-          {mon.ivs ? <p>{mon.characteristic}</p> : <div />}
+          {hasGen3OnData(mon) ? (
+            <div>
+              <p style={styles.description}>{natureMessage}</p>
+              <p>{getCharacteristic(mon)}</p>
+            </div>
+          ) : (
+            <div />
+          )}
         </div>
         <div
           style={{
@@ -161,7 +173,8 @@ const MetDataMovesDisplay = (props: { mon: PKM }) => {
                 getGameLogo(
                   mon.gameOfOrigin,
                   mon.dexNum,
-                  mon.ribbons.includes('National') || mon.isShadow
+                  ('ribbons' in mon && mon.ribbons.includes('National')) ||
+                    (hasOrreData(mon) && mon.isShadow)
                 ) ?? ''
               )}
               style={styles.gameImage}
@@ -179,7 +192,7 @@ const MetDataMovesDisplay = (props: { mon: PKM }) => {
               />
             )}
           </div>
-          {mon.markings ? <Markings markings={mon.markings} /> : <div />}
+          {hasGen3OnData(mon) ? <Markings markings={mon.markings} /> : <div />}
         </div>
       </div>
       <div style={styles.centerFlex}>

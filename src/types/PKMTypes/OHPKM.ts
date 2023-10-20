@@ -10,6 +10,7 @@ import {
   OpenHomeRibbons,
 } from '../../consts'
 import { getLocation } from '../../consts/MetLocation/MetLocation'
+import { ShadowIDsColosseum, ShadowIDsXD } from '../../consts/ShadowIDs'
 import { ItemFromString, ItemToString } from '../../resources/gen/items/Items'
 import { AbilityFromString, AbilityToString } from '../../resources/gen/other/Abilities'
 import {
@@ -34,14 +35,21 @@ import {
 } from '../../util/ByteLogic'
 import { getHPGen3Onward, getLevelGen3Onward, getStatGen3Onward } from '../../util/StatCalc'
 import { utf16BytesToString, utf16StringToBytes } from '../../util/Strings/StringConverter'
-import { ContestStats, DVs, GVs, GameBoyEVs, ModernEVsIVs } from '../interfaces/stats'
-import { PKM } from './PKM'
+import { BasePKMData } from '../interfaces/base'
+import { Gen2OnlyData, hasGen2OnData } from '../interfaces/gen2'
+import { Gen3OrreData, hasGen3OnData, hasOrreData } from '../interfaces/gen3'
+import { Gen4EncounterType, Gen4OnlyData, hasGen4OnData, hasGen4OnlyData } from '../interfaces/gen4'
+import { Gen5OnlyData, hasGen5OnlyData } from '../interfaces/gen5'
+import { hasGen6OnData, hasN3DSOnlyData } from '../interfaces/gen6'
+import { hasGen7OnData } from '../interfaces/gen7'
+import { Gen8OnData, Gen8OnlyData, PLAData, hasGen8OnData, hasPLAData } from '../interfaces/gen8'
+import { Gen9OnlyData, hasGen9OnlyData } from '../interfaces/gen9'
+import { GameBoyStats } from '../interfaces/stats'
+import { GamePKM } from './GamePKM'
 import {
   adjustMovePPBetweenFormats,
   dvsFromIVs,
   formatHasColorMarkings,
-  generateDVs,
-  generateIVs,
   generatePersonalityValuePreservingAttributes,
   generateTeraType,
   getAbilityFromNumber,
@@ -50,7 +58,20 @@ import {
   writeIVsToBuffer,
 } from './util'
 
-export class OHPKM implements PKM, ModernEVsIVs, GameBoyEVs, DVs, GVs, ContestStats {
+export class OHPKM
+  implements
+    BasePKMData,
+    Gen2OnlyData,
+    Gen3OrreData,
+    GameBoyStats,
+    Gen4OnlyData,
+    Gen4EncounterType,
+    Gen5OnlyData,
+    Gen8OnData,
+    Gen8OnlyData,
+    Gen9OnlyData,
+    PLAData
+{
   public get fileSize() {
     return 433
   }
@@ -65,203 +86,264 @@ export class OHPKM implements PKM, ModernEVsIVs, GameBoyEVs, DVs, GVs, ContestSt
 
   bytes = new Uint8Array(433)
 
-  constructor(bytes?: Uint8Array, other?: PKM) {
+  constructor(bytes?: Uint8Array, other?: GamePKM) {
     if (bytes) {
       this.bytes = bytes
     } else if (other) {
-      const prng = new Prando(
-        other.trainerName
-          .concat(other.personalityValue?.toString() ?? JSON.stringify(other.dvs))
-          .concat(other.secretID.toString())
-          .concat(other.trainerID.toString())
-      )
-      this.sanity = other.sanity ?? 0
+      let prng: Prando
+      if ('personalityValue' in other) {
+        prng = new Prando(
+          other.trainerName
+            .concat(other.personalityValue.toString())
+            .concat(other.secretID.toString())
+            .concat(other.trainerID.toString())
+        )
+      } else {
+        prng = new Prando(
+          other.trainerName.concat(JSON.stringify(other.dvs)).concat(other.trainerID.toString())
+        )
+      }
+
       this.dexNum = other.dexNum
       this.formNum = other.formNum
       this.heldItem = other.heldItem
+      this.trainerName = other.trainerName
+      this.trainerGender = other.trainerGender
       this.trainerID = other.trainerID
       this.secretID = other.secretID
       this.exp = other.exp
-      this.canGigantamax = other.canGigantamax ?? false
-      this.isShadow = other.isShadow ?? false
-      if (other.markings) {
-        other.markings?.forEach((value, index) => {
-          const temp = this.markings
-          temp[index] = value
-          this.markings = temp
-        })
-      }
-      if (other.gameOfOrigin >= GameOfOrigin.Red && other.gameOfOrigin <= GameOfOrigin.Crystal) {
-        this.abilityNum = 4
-      } else {
-        this.abilityNum = other.abilityNum ?? (this.personalityValue & 1) + 1
-      }
-      this.ability = getAbilityFromNumber(this.dexNum, this.formNum, this.abilityNum)
-      this.abilityIndex = AbilityFromString(this.ability)
-      this.alphaMove = other.alphaMove ?? 0
-      this.gender = other.gender ?? 0
-      if (other.personalityValue !== undefined) {
-        this.personalityValue = other.personalityValue
-      } else {
-        this.personalityValue = generatePersonalityValuePreservingAttributes(other, prng)
-      }
-      this.encryptionConstant =
-        other.encryptionConstant ?? other.personalityValue ?? prng.nextInt(0, 0xffffffff)
-      this.nature = other.nature ?? this.personalityValue % 25
-      this.statNature = other.statNature ?? this.nature
-      this.isFatefulEncounter = other.isFatefulEncounter
-      this.flag2LA = other.flag2LA ?? false
-      this.evs = other.evs ?? { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 }
-      this.contest = other.contest ?? {
-        smart: 0,
-        cute: 0,
-        beauty: 0,
-        cool: 0,
-        tough: 0,
-        sheen: 0,
-      }
-      this.pokerusByte = other.pokerusByte ?? 0
-      this.contestMemoryCount = other.contestMemoryCount ?? 0
-      this.battleMemoryCount = other.battleMemoryCount ?? 0
-      const contestRibbons = _.intersection(other.ribbons, Gen34ContestRibbons)
-      this.contestMemoryCount = Math.max(contestRibbons.length, this.contestMemoryCount)
-      const battleRibbons = _.intersection(other.ribbons, Gen34TowerRibbons)
-      this.battleMemoryCount = Math.max(battleRibbons.length, this.battleMemoryCount)
-      const ribbons = other.ribbons ?? []
-      if (this.contestMemoryCount) {
-        ribbons.push('Contest Memory')
-      }
-      if (this.battleMemoryCount) {
-        ribbons.push('Battle Memory')
-      }
-      this.ribbons = ribbons
-      this.sociability = other.sociability ?? 0
-      this.height = other.height ?? 0
-      this.weight = other.weight ?? 0
-      this.scale = other.scale ?? 0
+
       this.moves = other.moves
       this.movePP = adjustMovePPBetweenFormats(this, other)
       this.movePPUps = other.movePPUps
       this.nickname = other.nickname
-      this.avs = other.avs ?? { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 }
-      this.relearnMoves = other.relearnMoves ?? [0, 0, 0, 0]
-      if (other.ivs) {
-        this.ivs = other.ivs
-      } else if (other.dvs) {
-        this.ivs = ivsFromDVs(other.dvs)
-      } else {
-        this.ivs = generateIVs(prng)
-      }
-      this.isEgg = other.isEgg ?? false
-      this.isNicknamed = other.isNicknamed ?? true
-      this.dynamaxLevel = other.dynamaxLevel ?? 0
-      this.teraTypeOriginal =
-        other.teraTypeOriginal ?? generateTeraType(prng, this.dexNum, this.formNum) ?? 0
-      this.teraTypeOverride = other.teraTypeOverride ?? 0x13
-      this.unknownA0 = other.unknownA0 ?? 0
-      this.gvs = other.gvs ?? gvsFromIVs(this.ivs)
-      if (other.dvs) {
-        this.dvs = other.dvs
-      } else if (other.dexNum === NDex.UNOWN) {
-        // unown
-        this.dvs = other.ivs
-          ? dvsFromIVs(other.ivs, other.isShiny)
-          : generateDVs(prng, other.isShiny)
-        const letterBits = other.formNum * 10
-        const newDvs = this.dvs
-        newDvs.atk = (newDvs.atk & 0b1001) | (((letterBits >> 6) & 0b11) << 1)
-        newDvs.def = (newDvs.def & 0b1001) | (((letterBits >> 4) & 0b11) << 1)
-        newDvs.spe = (newDvs.spe & 0b1001) | (((letterBits >> 2) & 0b11) << 1)
-        newDvs.spc = (newDvs.spc & 0b1001) | ((letterBits & 0b11) << 1)
-        this.dvs = newDvs
-      } else if (other.ivs) {
-        this.dvs = dvsFromIVs(other.ivs, other.isShiny)
-      } else {
-        this.dvs = generateDVs(prng, other.isShiny)
-      }
-      this.heightAbsoluteBytes = other.heightAbsoluteBytes ?? new Uint8Array(4)
-      this.weightAbsoluteBytes = other.weightAbsoluteBytes ?? new Uint8Array(4)
-      this.handlerName = other.handlerName ?? ''
-      this.handlerGender = other.handlerGender ?? false
-      this.handlerLanguage = other.handlerLanguage ?? 'ENG'
-      this.currentHandler = other.currentHandler ?? 0
-      this.handlerID = other.handlerID ?? 0
-      this.handlerFriendship = other.handlerFriendship ?? 0
-      this.handlerMemory = other.handlerMemory ?? {
-        memory: 0,
-        intensity: 0,
-        textVariables: 0,
-        feeling: 0,
-      }
-      this.handlerAffection = other.handlerAffection ?? 0
-      this.resortEventStatus = other.resortEventStatus ?? 0
-      this.superTrainingFlags = other.superTrainingFlags ?? 0
-      this.superTrainingDistFlags = other.superTrainingDistFlags ?? 0
-      this.secretSuperTrainingUnlocked = !!other.secretSuperTrainingUnlocked
-      this.secretSuperTrainingComplete = !!other.secretSuperTrainingComplete
-      this.trainingBagHits = other.trainingBagHits ?? 0
-      this.trainingBag = other.trainingBag ?? 0
-      this.palma = other.palma ?? 0
-      this.pokeStarFame = other.pokeStarFame ?? 0
-      this.metTimeOfDay = other.metTimeOfDay
-      this.isNsPokemon = !!other.isNsPokemon
-      this.shinyLeaves = other.shinyLeaves ?? 0
-      this.fullness = other.fullness ?? 0
-      this.enjoyment = other.enjoyment ?? 0
+      this.language = other.language
       this.gameOfOrigin = other.gameOfOrigin
-      this.gameOfOriginBattle = other.gameOfOriginBattle ?? this.gameOfOrigin
-      this.country = other.country ?? 0
-      this.region = other.region ?? 0
-      this.consoleRegion = other.consoleRegion ?? 0
-      this.language = other.language ?? 'ENG'
-      this.unknownF3 = other.unknownF3 ?? 0
-      this.formArgument = other.formArgument ?? 0
-      this.affixedRibbon = other.affixedRibbon ?? 0xff
-      this.geolocations = other.geolocations ?? [
-        { country: 0, region: 0 },
-        { country: 0, region: 0 },
-        { country: 0, region: 0 },
-        { country: 0, region: 0 },
-        { country: 0, region: 0 },
-      ]
-      this.encounterType = other.encounterType ?? 0
-      this.performance = other.performance ?? 0
-      this.trainerName = other.trainerName
-      this.trainerFriendship = other.trainerFriendship ?? 0
-      this.trainerAffection = other.trainerAffection ?? 0
-      this.trainerMemory = other.trainerMemory ?? {
-        memory: 0,
-        intensity: 0,
-        textVariables: 0,
-        feeling: 0,
+
+      if (hasGen2OnData(other)) {
+        this.gender = other.gender
+        this.pokerusByte = other.pokerusByte
+        this.isEgg = other.isEgg
+        this.trainerFriendship = other.trainerFriendship
       }
-      this.eggDate = other.eggDate
-      const now = new Date()
-      this.metDate = other.metDate ?? {
-        month: now.getMonth(),
-        day: now.getDate(),
-        year: now.getFullYear(),
+
+      if (hasGen3OnData(other)) {
+        this.personalityValue = other.personalityValue
+        this.isFatefulEncounter = other.isFatefulEncounter
+        this.nature = other.nature
+        this.ivs = other.ivs
+        this.evs = other.evs
+        this.contest = other.contest
+        this.abilityNum = other.abilityNum
+        this.ball = other.ball
+
+        other.markings.forEach((value, index) => {
+          const temp = this.markings
+          temp[index] = value
+          this.markings = temp
+        })
+
+        this.dvs = dvsFromIVs(other.ivs, other.isShiny)
+        if (other.dexNum === NDex.UNOWN) {
+          const letterBits = other.formNum * 10
+          const newDvs = this.dvs
+          newDvs.atk = (newDvs.atk & 0b1001) | (((letterBits >> 6) & 0b11) << 1)
+          newDvs.def = (newDvs.def & 0b1001) | (((letterBits >> 4) & 0b11) << 1)
+          newDvs.spe = (newDvs.spe & 0b1001) | (((letterBits >> 2) & 0b11) << 1)
+          newDvs.spc = (newDvs.spc & 0b1001) | ((letterBits & 0b11) << 1)
+          this.dvs = newDvs
+        }
+        this.metLocationIndex = other.metLocationIndex
+        this.metLevel = other.metLevel
+      } else {
+        this.personalityValue = generatePersonalityValuePreservingAttributes(other, prng)
+        this.nature = this.personalityValue % 25
+        this.ivs = ivsFromDVs(other.dvs)
+        this.evsG12 = other.evsG12
+        this.dvs = other.dvs
+        this.abilityNum = 4
+        this.ball = Ball.Poke
+
+        if ('metTimeOfDay' in other) {
+          this.metTimeOfDay = other.metTimeOfDay
+          this.metLocationIndex = other.metLocationIndex
+          this.metLevel = other.metLevel
+        } else {
+          this.metLevel = 0
+        }
+
+        if (other.dexNum === NDex.MEW || other.dexNum === NDex.CELEBI) {
+          this.isFatefulEncounter = true
+        }
       }
-      this.ball = other.ball ?? Ball.Poke
-      this.eggLocationIndex = other.eggLocationIndex ?? 0
-      this.metLocationIndex = other.metLocationIndex ?? 0
-      this.metLevel = other.metLevel ?? this.level
-      this.trainerGender = other.trainerGender
-      this.hyperTraining = other.hyperTraining ?? {
-        hp: false,
-        atk: false,
-        def: false,
-        spa: false,
-        spd: false,
-        spe: false,
+
+      this.ability = getAbilityFromNumber(this.dexNum, this.formNum, this.abilityNum)
+      this.abilityIndex = AbilityFromString(this.ability)
+
+      if (hasOrreData(other)) this.isShadow = other.isShadow
+
+      if ('encryptionConstant' in other) {
+        this.encryptionConstant = other.encryptionConstant
+      } else if ('personalityValue' in other) {
+        this.encryptionConstant = other.personalityValue
+      } else {
+        this.encryptionConstant = prng.nextInt(0, 0xffffffff)
       }
-      this.homeTracker = other.homeTracker ?? new Uint8Array(8)
-      this.trFlagsSwSh = other.trFlagsSwSh ?? new Uint8Array(14)
-      this.tmFlagsBDSP = other.tmFlagsBDSP ?? new Uint8Array(14)
-      this.tutorFlagsLA = other.tutorFlagsLA ?? new Uint8Array(8)
-      this.masterFlagsLA = other.masterFlagsLA ?? new Uint8Array(8)
-      this.tmFlagsSV = other.tmFlagsSV ?? new Uint8Array(26)
-      this.evsG12 = other.evsG12 ?? { hp: 0, atk: 0, def: 0, spc: 0, spe: 0 }
+
+      if (hasGen4OnData(other)) {
+        this.isNicknamed = other.isNicknamed
+        this.metDate = other.metDate
+        this.eggDate = other.eggDate
+        this.eggLocationIndex = other.eggLocationIndex
+      } else {
+        const now = new Date()
+        this.metDate = {
+          month: now.getMonth(),
+          day: now.getDate(),
+          year: now.getFullYear(),
+        }
+      }
+
+      if ('encounterType' in other) {
+        this.encounterType = other.encounterType
+      }
+
+      if (hasGen4OnlyData(other)) {
+        this.shinyLeaves = other.shinyLeaves
+        this.performance = other.performance
+      }
+
+      if (hasGen5OnlyData(other)) {
+        this.pokeStarFame = other.pokeStarFame
+        this.isNsPokemon = !!other.isNsPokemon
+      }
+
+      if (hasGen6OnData(other)) {
+        this.contestMemoryCount = other.contestMemoryCount
+        this.battleMemoryCount = other.battleMemoryCount
+        this.relearnMoves = other.relearnMoves
+        this.ribbons = other.ribbons
+        this.handlerName = other.handlerName
+        this.handlerGender = other.handlerGender
+        this.isCurrentHandler = other.isCurrentHandler
+        this.handlerFriendship = other.handlerFriendship
+        this.handlerMemory = other.handlerMemory
+        this.trainerMemory = other.trainerMemory
+      } else if ('ribbons' in other) {
+        const contestRibbons = _.intersection(other.ribbons, Gen34ContestRibbons)
+        this.contestMemoryCount = Math.max(contestRibbons.length, this.contestMemoryCount)
+        const battleRibbons = _.intersection(other.ribbons, Gen34TowerRibbons)
+        this.battleMemoryCount = Math.max(battleRibbons.length, this.battleMemoryCount)
+        this.ribbons = other.ribbons
+      }
+
+      if (this.contestMemoryCount) {
+        this.ribbons.push('Contest Memory')
+      }
+      if (this.battleMemoryCount) {
+        this.ribbons.push('Battle Memory')
+      }
+
+      if (hasN3DSOnlyData(other)) {
+        this.handlerAffection = other.handlerAffection
+        this.superTrainingFlags = other.superTrainingFlags
+        this.superTrainingDistFlags = other.superTrainingDistFlags
+        this.secretSuperTrainingUnlocked = other.secretSuperTrainingUnlocked
+        this.secretSuperTrainingComplete = other.secretSuperTrainingComplete
+
+        this.country = other.country
+        this.region = other.region
+        this.consoleRegion = other.consoleRegion
+        this.formArgument = other.formArgument
+        this.geolocations = other.geolocations
+
+        this.trainerAffection = other.trainerAffection
+      }
+
+      if ('trainingBagHits' in other) {
+        this.trainingBagHits = other.trainingBagHits
+        this.trainingBag = other.trainingBag
+      }
+
+      if ('fullness' in other) {
+        this.fullness = other.fullness
+        this.enjoyment = other.enjoyment
+      }
+
+      if (hasGen7OnData(other)) {
+        this.hyperTraining = other.hyperTraining
+      }
+
+      if ('resortEventStatus' in other) {
+        this.resortEventStatus = other.resortEventStatus
+      }
+
+      if ('avs' in other) {
+        this.avs = other.avs
+      }
+
+      if (hasGen8OnData(other)) {
+        this.handlerLanguage = other.handlerLanguage
+        this.handlerID = other.handlerID
+        this.statNature = other.statNature
+        this.affixedRibbon = other.affixedRibbon
+        this.homeTracker = other.homeTracker
+      } else {
+        this.statNature = this.nature
+      }
+
+      if ('dynamaxLevel' in other) {
+        this.dynamaxLevel = other.dynamaxLevel
+        this.sociability = other.sociability
+        this.canGigantamax = other.canGigantamax
+      }
+
+      if ('palma' in other) {
+        this.palma = other.palma
+      }
+
+      if ('trFlagsSwSh' in other) {
+        this.trFlagsSwSh = other.trFlagsSwSh
+      }
+      if ('tmFlagsBDSP' in other) {
+        this.tmFlagsBDSP = other.tmFlagsBDSP
+      }
+
+      if (hasPLAData(other)) {
+        this.isAlpha = other.isAlpha
+        this.isNoble = other.isNoble
+        this.alphaMove = other.alphaMove
+        this.gvs = other.gvs
+        this.moveFlagsLA = other.moveFlagsLA
+        this.tutorFlagsLA = other.tutorFlagsLA
+        this.masterFlagsLA = other.masterFlagsLA
+        this.flag2LA = other.flag2LA
+        this.unknownA0 = other.unknownA0
+        this.unknownF3 = other.unknownF3
+        this.heightAbsoluteBytes = other.heightAbsoluteBytes
+        this.weightAbsoluteBytes = other.weightAbsoluteBytes
+      } else {
+        this.gvs = gvsFromIVs(this.ivs)
+      }
+
+      if ('height' in other) {
+        this.height = other.height
+        this.weight = other.weight
+      }
+
+      if ('scale' in other) {
+        this.scale = other.scale
+      }
+
+      if (hasGen9OnlyData(other)) {
+        this.teraTypeOriginal = other.teraTypeOriginal
+        this.teraTypeOverride = other.teraTypeOverride
+        this.tmFlagsSV = other.tmFlagsSV
+        this.obedienceLevel = other.obedienceLevel
+      } else {
+        this.teraTypeOriginal = generateTeraType(prng, this.dexNum, this.formNum)
+        this.teraTypeOverride = 0x13
+      }
     }
   }
 
@@ -412,7 +494,22 @@ export class OHPKM implements PKM, ModernEVsIVs, GameBoyEVs, DVs, GVs, ContestSt
   }
 
   public set isShadow(value: boolean) {
-    setFlag(this.bytes, 0x16, 7, value)
+    if (this.dexNum in ShadowIDsColosseum || this.dexNum in ShadowIDsXD) {
+      setFlag(this.bytes, 0x16, 7, value)
+      return
+    }
+    setFlag(this.bytes, 0x16, 7, false)
+  }
+
+  public get shadowID() {
+    if (!this.isShadow) return 0
+    if (this.dexNum in ShadowIDsColosseum) {
+      return ShadowIDsColosseum[this.dexNum]
+    }
+    if (this.dexNum in ShadowIDsXD) {
+      return ShadowIDsXD[this.dexNum]
+    }
+    return 0
   }
 
   public get markings() {
@@ -848,14 +945,6 @@ export class OHPKM implements PKM, ModernEVsIVs, GameBoyEVs, DVs, GVs, ContestSt
     return Buffer.from(this.weightAbsoluteBytes).readFloatLE()
   }
 
-  public get handlerNameBytes() {
-    return this.bytes.slice(0xb8, 26)
-  }
-
-  public set handlerNameBytes(value: Uint8Array) {
-    this.bytes.set(value, 0xb8)
-  }
-
   public get handlerName() {
     return utf16BytesToString(this.bytes, 0xb8, 12)
   }
@@ -880,12 +969,12 @@ export class OHPKM implements PKM, ModernEVsIVs, GameBoyEVs, DVs, GVs, ContestSt
     }
   }
 
-  public get currentHandler() {
-    return this.bytes[0xd4]
+  public get isCurrentHandler() {
+    return !!this.bytes[0xd4]
   }
 
-  public set currentHandler(value: number) {
-    this.bytes[0xd4] = value
+  public set isCurrentHandler(value: boolean) {
+    this.bytes[0xd4] = value ? 1 : 0
   }
 
   public get resortEventStatus() {
@@ -1001,10 +1090,10 @@ export class OHPKM implements PKM, ModernEVsIVs, GameBoyEVs, DVs, GVs, ContestSt
   }
 
   public get metTimeOfDay() {
-    return this.bytes[0xe9] > 0 ? this.bytes[0xe9] : undefined
+    return this.bytes[0xe9]
   }
 
-  public set metTimeOfDay(value: number | undefined) {
+  public set metTimeOfDay(value: number) {
     this.bytes[0xe9] = (value ?? 0) & 0b11
   }
 
@@ -1126,11 +1215,11 @@ export class OHPKM implements PKM, ModernEVsIVs, GameBoyEVs, DVs, GVs, ContestSt
   }
 
   public get affixedRibbon() {
-    return this.bytes[0xf8]
+    return this.bytes[0xf8] === 0xff ? undefined : this.bytes[0xf8]
   }
 
-  public set affixedRibbon(value: number) {
-    this.bytes[0xf8] = value
+  public set affixedRibbon(value: number | undefined) {
+    this.bytes[0xf8] = value ?? 0xff
   }
 
   public get geolocations() {
@@ -1272,7 +1361,6 @@ export class OHPKM implements PKM, ModernEVsIVs, GameBoyEVs, DVs, GVs, ContestSt
   }
 
   public get metLocation() {
-    if (!this.metLocationIndex) return undefined
     return getLocation(this.gameOfOrigin, this.metLocationIndex, this.format, false)
   }
 
@@ -1310,6 +1398,14 @@ export class OHPKM implements PKM, ModernEVsIVs, GameBoyEVs, DVs, GVs, ContestSt
     setFlag(this.bytes, 0x13d, 3, value.spa)
     setFlag(this.bytes, 0x13d, 4, value.spd)
     setFlag(this.bytes, 0x13d, 5, value.spe)
+  }
+
+  public get obedienceLevel() {
+    return this.bytes[0x13e]
+  }
+
+  public set obedienceLevel(value: number) {
+    this.bytes[0x13e] = value
   }
 
   public get homeTracker() {
@@ -1429,34 +1525,19 @@ export class OHPKM implements PKM, ModernEVsIVs, GameBoyEVs, DVs, GVs, ContestSt
     )
   }
 
-  public updateData(other: PKM, isFromOT: boolean = false) {
+  public updateData(other: GamePKM, isFromOT: boolean = false) {
     this.exp = other.exp
-    if (other.evs) {
+
+    this.moves = other.moves
+    this.movePP = adjustMovePPBetweenFormats(this, other)
+    this.movePPUps = other.movePPUps
+
+    if ('avs' in other) {
+      this.avs = other.avs
+    } else if (hasGen3OnData(other)) {
       this.evs = other.evs
-    }
-    if (other.evsG12) {
-      this.evsG12 = other.evsG12
-    }
-    this.superTrainingFlags &= other.superTrainingFlags ?? 0
-    this.superTrainingDistFlags &= other.superTrainingDistFlags ?? 0
-    if (other.secretSuperTrainingUnlocked) {
-      this.secretSuperTrainingUnlocked = true
-    }
-    if (other.secretSuperTrainingComplete) {
-      this.secretSuperTrainingComplete = true
-    }
-    if (other.hyperTraining) {
-      this.hyperTraining = other.hyperTraining
-    }
-    this.ribbons = uniq([...this.ribbons, ...(other.ribbons ?? [])])
-
-    // memory ribbons need to be updated if new ribbons were earned to add to the count
-    const contestRibbons = _.intersection(this.ribbons, Gen34ContestRibbons)
-    this.contestMemoryCount = Math.max(contestRibbons.length, this.contestMemoryCount)
-    const battleRibbons = _.intersection(this.ribbons, Gen34TowerRibbons)
-    this.battleMemoryCount = Math.max(battleRibbons.length, this.battleMemoryCount)
-
-    if (other.markings !== undefined) {
+      this.ribbons = uniq([...this.ribbons, ...(other.ribbons ?? [])])
+      this.contest = other.contest
       if (!formatHasColorMarkings(other.format)) {
         for (let i = 0; i < other.markings.length; i++) {
           this.markings[i] = (
@@ -1468,22 +1549,74 @@ export class OHPKM implements PKM, ModernEVsIVs, GameBoyEVs, DVs, GVs, ContestSt
           this.markings[index] = value
         })
       }
+    } else {
+      this.evsG12 = other.evsG12
     }
-    if (other.shinyLeaves !== undefined) {
+
+    // memory ribbons need to be updated if new ribbons were earned to add to the count
+    const contestRibbons = _.intersection(this.ribbons, Gen34ContestRibbons)
+    this.contestMemoryCount = Math.max(contestRibbons.length, this.contestMemoryCount)
+    const battleRibbons = _.intersection(this.ribbons, Gen34TowerRibbons)
+    this.battleMemoryCount = Math.max(battleRibbons.length, this.battleMemoryCount)
+
+    if (hasGen2OnData(other)) {
+      this.pokerusByte = other.pokerusByte
+      this.trainerFriendship = Math.max(other.trainerFriendship, this.trainerFriendship)
+    }
+
+    if (hasGen4OnlyData(other)) {
       this.shinyLeaves = other.shinyLeaves
+      this.performance = other.performance
     }
-    if (other.contest) {
-      this.contest = other.contest
+
+    if (hasGen5OnlyData(other)) {
+      this.pokeStarFame = other.pokeStarFame
+      this.isNsPokemon = !!other.isNsPokemon
     }
-    if (other.statNature !== undefined) {
+
+    if (hasGen6OnData(other)) {
+      this.handlerName = other.handlerName
+      this.handlerGender = other.handlerGender
+      this.isCurrentHandler = other.isCurrentHandler
+      this.handlerFriendship = other.handlerFriendship
+      this.handlerMemory = other.handlerMemory
+      this.trainerMemory = other.trainerMemory
+    }
+
+    if (hasN3DSOnlyData(other)) {
+      this.handlerAffection = other.handlerAffection
+      this.superTrainingFlags = other.superTrainingFlags
+      this.superTrainingDistFlags = other.superTrainingDistFlags
+      this.secretSuperTrainingUnlocked = other.secretSuperTrainingUnlocked
+      this.secretSuperTrainingComplete = other.secretSuperTrainingComplete
+
+      this.country = other.country
+      this.region = other.region
+      this.consoleRegion = other.consoleRegion
+      this.formArgument = other.formArgument
+      this.geolocations = other.geolocations
+
+      this.trainerAffection = other.trainerAffection
+    }
+
+    if ('trainingBagHits' in other) {
+      this.trainingBagHits = other.trainingBagHits
+      this.trainingBag = other.trainingBag
+    }
+
+    if ('statNature' in other) {
       this.statNature = other.statNature
+      this.gameOfOriginBattle = other.gameOfOriginBattle
     }
-    if (other.teraTypeOverride !== undefined) {
+
+    if (hasGen9OnlyData(other)) {
       this.teraTypeOverride = other.teraTypeOverride
+      this.tmFlagsSV = other.tmFlagsSV
+      this.obedienceLevel = other.obedienceLevel
     }
+
     if (isFromOT) {
       this.nickname = other.nickname
-      this.trainerFriendship = other.trainerFriendship ?? 790
     }
     // other.moves.forEach((move, i) => {
 

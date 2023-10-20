@@ -10,8 +10,9 @@ import {
 import { gen1IDToNatDex, natDexToGen1ID } from '../../util/ConvertPokemonID'
 import { getLevelGen12 } from '../../util/StatCalc'
 import { gen12StringToUTF } from '../../util/Strings/StringConverter'
+import { BasePKMData } from '../interfaces/base'
+import { Gen1Stats } from '../interfaces/stats'
 import { OHPKM } from './OHPKM'
-import { PKM } from './PKM'
 import { adjustMovePPBetweenFormats, getTypes } from './util'
 
 const gen1TypeIndices: { [key: string]: number } = {
@@ -34,7 +35,7 @@ const gen1TypeIndices: { [key: string]: number } = {
 
 export const GEN1_MOVE_MAX = 165
 
-export class PK1 implements PKM {
+export class PK1 implements BasePKMData, Gen1Stats {
   get fileSize(): number {
     return 33
   }

@@ -21,12 +21,13 @@ import { gen3ToNational, nationalToGen3 } from '../../util/ConvertPokemonID'
 import { getGen3To5Gender } from '../../util/GenderCalc'
 import { getHPGen3Onward, getLevelGen3Onward, getStatGen3Onward } from '../../util/StatCalc'
 import { utf16BytesToString, utf16StringToBytes } from '../../util/Strings/StringConverter'
+import { BasePKMData } from '../interfaces/base'
+import { Gen3OnData, Gen3OrreData } from '../interfaces/gen3'
 import { OHPKM } from './OHPKM'
 import { GEN3_ABILITY_MAX, GEN3_MOVE_MAX } from './PK3'
-import { PKM } from './PKM'
 import { adjustMovePPBetweenFormats, generatePersonalityValuePreservingAttributes } from './util'
 
-export class XDPKM implements PKM {
+export class XDPKM implements BasePKMData, Gen3OnData, Gen3OrreData {
   public get fileSize() {
     return 196
   }

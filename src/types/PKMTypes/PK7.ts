@@ -24,14 +24,17 @@ import {
 } from '../../util/ByteLogic'
 import { getHPGen3Onward, getLevelGen3Onward, getStatGen3Onward } from '../../util/StatCalc'
 import { utf16BytesToString, utf16StringToBytes } from '../../util/Strings/StringConverter'
+import { BasePKMData } from '../interfaces/base'
+import { SanityChecksum } from '../interfaces/gen3'
+import { N3DSOnlyData } from '../interfaces/gen6'
+import { Gen7OnData } from '../interfaces/gen7'
 import { OHPKM } from './OHPKM'
-import { PKM } from './PKM'
 import { adjustMovePPBetweenFormats, writeIVsToBuffer } from './util'
 
 export const SM_MOVE_MAX = 719
 export const USUM_MOVE_MAX = 728
 
-export class PK7 implements PKM {
+export class PK7 implements BasePKMData, Gen7OnData, N3DSOnlyData, SanityChecksum {
   public get fileSize() {
     return 232
   }
@@ -49,13 +52,11 @@ export class PK7 implements PKM {
   constructor(bytes?: Uint8Array, encrypted?: boolean, other?: OHPKM) {
     if (bytes) {
       if (encrypted) {
-        if (encrypted) {
-          throw new Error('PK7 decryption not implemented')
-        } else {
-          this.bytes = bytes
-        }
-        // this.refreshChecksum();
+        throw new Error('PK7 decryption not implemented')
+      } else {
+        this.bytes = bytes
       }
+      // this.refreshChecksum();
     } else if (other) {
       this.encryptionConstant = other.encryptionConstant
       this.dexNum = other.dexNum
@@ -142,6 +143,10 @@ export class PK7 implements PKM {
 
   public set encryptionConstant(value: number) {
     this.bytes.set(uint32ToBytesLittleEndian(value), 0x00)
+  }
+
+  public get sanity() {
+    return bytesToUint16LittleEndian(this.bytes, 0x04)
   }
 
   public get checksum() {
@@ -727,11 +732,9 @@ export class PK7 implements PKM {
         ? `in the ${GameOfOriginData[this.gameOfOrigin]?.region} region`
         : 'in a faraway place'
     }
-    const locationBlock = SMUSUMLocations[Math.floor(this.metLocationIndex / 10000) * 10000]
-    if (locationBlock) {
-      return `in ${locationBlock[this.metLocationIndex % 10000]}`
-    }
-    return undefined
+    const locationBlock =
+      SMUSUMLocations[Math.floor(this.metLocationIndex / 10000) * 10000] ?? SMUSUMLocations[0]
+    return `in ${locationBlock[this.metLocationIndex % 10000]}`
   }
 
   public get ball() {

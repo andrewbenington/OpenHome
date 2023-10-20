@@ -2,11 +2,17 @@ import { GameOfOrigin } from '../../consts'
 import { OHPKM } from '../../types/PKMTypes/OHPKM'
 import { TransferRestrictions } from '../../types/TransferRestrictions'
 import { SaveRef, SaveType } from '../../types/types'
+import { GamePKM } from '../PKMTypes/GamePKM'
 import { PKM } from '../PKMTypes/PKM'
 
-export interface Box {
+export class Box<P extends PKM> {
   name: string
-  pokemon: Array<PKM | undefined>
+  pokemon: Array<P | OHPKM | undefined>
+
+  constructor(name: string, boxSize: number) {
+    this.name = name
+    this.pokemon = new Array(boxSize)
+  }
 }
 
 export interface BoxCoordinates {
@@ -14,12 +20,10 @@ export interface BoxCoordinates {
   index: number
 }
 
-export class SAV {
+export class SAV<P extends PKM> {
   saveType: SaveType = SaveType.UNKNOWN
 
   origin: GameOfOrigin = 0
-
-  pkmType: typeof PKM = OHPKM
 
   boxRows: number = 5
 
@@ -45,13 +49,13 @@ export class SAV {
 
   boxNames: string[] = []
 
-  boxes: Array<Box> = []
+  boxes: Array<Box<P>> = []
 
   bytes: Uint8Array
 
   invalid: boolean = false
 
-  convertPKM: (_: PKM) => PKM = (mon) => new OHPKM(mon)
+  convertPKM: (_: GamePKM) => GamePKM = (mon) => new OHPKM(undefined, mon)
 
   getSaveRef: () => SaveRef = () => {
     return {

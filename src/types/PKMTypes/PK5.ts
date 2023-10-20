@@ -21,8 +21,11 @@ import {
 } from '../../util/Encryption'
 import { getHPGen3Onward, getLevelGen3Onward, getStatGen3Onward } from '../../util/StatCalc'
 import { gen5StringToUTF, utf16StringToGen5 } from '../../util/Strings/StringConverter'
+import { BasePKMData } from '../interfaces/base'
+import { SanityChecksum } from '../interfaces/gen3'
+import { Gen4EncounterType, Gen4OnData } from '../interfaces/gen4'
+import { Gen5OnlyData } from '../interfaces/gen5'
 import { OHPKM } from './OHPKM'
-import { PKM } from './PKM'
 import {
   adjustMovePPBetweenFormats,
   generatePersonalityValuePreservingAttributes,
@@ -31,7 +34,9 @@ import {
 
 export const GEN5_MOVE_MAX = 559
 
-export class PK5 implements PKM {
+export class PK5
+  implements BasePKMData, Gen4OnData, Gen4EncounterType, Gen5OnlyData, SanityChecksum
+{
   public get fileSize() {
     return 136
   }
@@ -145,6 +150,10 @@ export class PK5 implements PKM {
 
   public set personalityValue(value: number) {
     this.bytes.set(uint32ToBytesLittleEndian(value), 0x00)
+  }
+
+  public get sanity() {
+    return bytesToUint16LittleEndian(this.bytes, 0x04)
   }
 
   public get checksum() {
@@ -505,11 +514,9 @@ export class PK5 implements PKM {
   }
 
   public get metLocation() {
-    const locationBlock = G5Locations[Math.floor(this.metLocationIndex / 10000) * 10000]
-    if (locationBlock) {
-      return `in ${locationBlock[this.metLocationIndex % 10000]}`
-    }
-    return undefined
+    const locationBlock =
+      G5Locations[Math.floor(this.metLocationIndex / 10000) * 10000] ?? G5Locations[0]
+    return `in ${locationBlock[this.metLocationIndex % 10000]}`
   }
 
   public get nickname() {

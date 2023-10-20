@@ -1,5 +1,7 @@
 import { createAsyncThunk, createSlice, current, Draft, PayloadAction } from '@reduxjs/toolkit'
-import { OHPKM, PKM } from '../../../types/PKMTypes'
+import { OHPKM } from '../../../types/PKMTypes'
+import { GamePKM } from '../../../types/PKMTypes/GamePKM'
+import { PKM } from '../../../types/PKMTypes/PKM'
 import { G1SAV, G2SAV, G3SAV, G4SAV, G5SAV, SAV } from '../../../types/SAVTypes'
 import { HomeData } from '../../../types/SAVTypes/HomeData'
 import { SaveCoordinates } from '../../../types/types'
@@ -97,7 +99,7 @@ export const appSlice = createSlice({
       const isHome = saveCoordinates.saveNumber === -1
       const tempSave = isHome ? state.homeData : state.saves[saveCoordinates.saveNumber]
       mons.forEach((mon) => {
-        const homeMon = new OHPKM(mon)
+        const homeMon = new OHPKM(undefined, mon)
         while (
           tempSave.boxes[saveCoordinates.box].pokemon[nextIndex] &&
           nextIndex < tempSave.boxRows * tempSave.boxColumns
@@ -153,7 +155,7 @@ export const appSlice = createSlice({
 
       let mon = state.dragMon
       if (source.saveNumber !== dest.saveNumber) {
-        mon = new OHPKM(mon)
+        mon = new OHPKM(undefined, mon)
         markMonAsModified(state, mon as OHPKM)
       }
 
@@ -162,7 +164,7 @@ export const appSlice = createSlice({
       state.dragMon = undefined
       state.dragSource = undefined
     },
-    addSave: (state, action: PayloadAction<SAV>) => {
+    addSave: (state, action: PayloadAction<SAV<GamePKM>>) => {
       state.saves.push(action.payload)
     },
     removeSaveAt: (state, action: PayloadAction<number>) => {
@@ -305,10 +307,10 @@ export const appSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(loadHomeMons.fulfilled, (state, action) => {
+    builder.addCase(loadHomeMons.fulfilled, (state, action: PayloadAction<Uint8Array[]>) => {
       const homeMons: { [key: string]: OHPKM } = {}
       Object.entries(action.payload).forEach(([id, bytes]) => {
-        homeMons[id] = new OHPKM(bytes)
+        homeMons[id] = new OHPKM(bytes, undefined)
       })
       return {
         ...state,

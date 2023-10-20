@@ -38,7 +38,7 @@ const slowpokeOH = bytesToPKM(
 ) as OHPKM
 
 test('gen 3 EVs are updated', () => {
-  const emeraldPKM = new PK3(blazikenOH)
+  const emeraldPKM = new PK3(undefined, undefined, blazikenOH)
   // mimicking ev reduction berries and ev gain
   emeraldPKM.evs = {
     atk: 252,
@@ -60,7 +60,7 @@ test('gen 3 EVs are updated', () => {
 })
 
 test('gen 3 ribbons are updated', () => {
-  const emeraldPKM = new PK3(blazikenOH)
+  const emeraldPKM = new PK3(undefined, undefined, blazikenOH)
   // gaining Gen 3 ribbons
   emeraldPKM.ribbons = [
     ...emeraldPKM.ribbons,
@@ -78,7 +78,7 @@ test('gen 3 ribbons are updated', () => {
 })
 
 test('gen 3 contest stats are updated', () => {
-  const emeraldPKM = new PK3(blazikenOH)
+  const emeraldPKM = new PK3(undefined, undefined, blazikenOH)
   // gaining cool contest points
   emeraldPKM.contest = {
     cool: 30,
@@ -100,24 +100,24 @@ test('gen 3 contest stats are updated', () => {
 })
 
 test('gen 3 conversion to OHPKM and back is lossless', () => {
-  const ohPKM = new OHPKM(blazikenGen3)
+  const ohPKM = new OHPKM(undefined, blazikenGen3)
   // gaining cool contest points
-  const gen3PKM = new PK3(ohPKM)
+  const gen3PKM = new PK3(undefined, undefined, ohPKM)
   expect(blazikenGen3.bytes).toEqual(gen3PKM.bytes)
 })
 
 test('pk3 and ohpkm have the same gen345Lookup key', () => {
-  const ohPKM = new OHPKM(blazikenGen3)
+  const ohPKM = new OHPKM(undefined, blazikenGen3)
   expect(getMonGen345Identifier(ohPKM)).toEqual(getMonGen345Identifier(blazikenGen3))
 })
 
 test('gen 6+ nickname accuracy', () => {
-  const converted = new PK3(slowpokeOH)
+  const converted = new PK3(undefined, undefined, slowpokeOH)
   expect(converted.nickname).toBe(slowpokeOH.nickname)
 })
 
 test('gen 6+ shiny accuracy', () => {
-  const converted = new PK3(slowpokeOH)
+  const converted = new PK3(undefined, undefined, slowpokeOH)
   if (!slowpokeOH.personalityValue) {
     throw Error('mon has no personality value')
   }
@@ -125,6 +125,6 @@ test('gen 6+ shiny accuracy', () => {
 })
 
 test('gen 6+ nature accuracy', () => {
-  const converted = new PK3(slowpokeOH)
+  const converted = new PK3(undefined, undefined, slowpokeOH)
   expect(converted.nature).toBe(slowpokeOH.nature)
 })

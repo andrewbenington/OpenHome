@@ -114,6 +114,7 @@ export const LegendsArceusExcludedForms: FormRestrictions = {
   [NDex.GOODRA]: [0],
   [NDex.AVALUGG]: [0],
   [NDex.DECIDUEYE]: [0],
+  [NDex.URSALUNA]: [1],
 }
 
 export const Gen89RegionalForms: FormRestrictions = {
