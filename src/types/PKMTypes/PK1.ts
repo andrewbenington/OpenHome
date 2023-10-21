@@ -158,7 +158,7 @@ export class PK1 implements BasePKMData, Gen1Stats {
 
   // catch rate
   public get heldItemIndex() {
-    return this.bytes[0x07]
+    return 0
   }
 
   public set heldItemIndex(value: number) {

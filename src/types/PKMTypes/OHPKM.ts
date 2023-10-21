@@ -40,7 +40,7 @@ import { Gen2OnlyData, hasGen2OnData } from '../interfaces/gen2'
 import { Gen3OrreData, hasGen3OnData, hasOrreData } from '../interfaces/gen3'
 import { Gen4EncounterType, Gen4OnlyData, hasGen4OnData, hasGen4OnlyData } from '../interfaces/gen4'
 import { Gen5OnlyData, hasGen5OnlyData } from '../interfaces/gen5'
-import { hasGen6OnData, hasN3DSOnlyData } from '../interfaces/gen6'
+import { hasGen6OnData, hasMemoryData, hasN3DSOnlyData } from '../interfaces/gen6'
 import { hasGen7OnData } from '../interfaces/gen7'
 import { Gen8OnData, Gen8OnlyData, PLAData, hasGen8OnData, hasPLAData } from '../interfaces/gen8'
 import { Gen9OnlyData, hasGen9OnlyData } from '../interfaces/gen9'
@@ -227,14 +227,17 @@ export class OHPKM
         this.handlerGender = other.handlerGender
         this.isCurrentHandler = other.isCurrentHandler
         this.handlerFriendship = other.handlerFriendship
-        this.handlerMemory = other.handlerMemory
-        this.trainerMemory = other.trainerMemory
       } else if ('ribbons' in other) {
         const contestRibbons = _.intersection(other.ribbons, Gen34ContestRibbons)
         this.contestMemoryCount = Math.max(contestRibbons.length, this.contestMemoryCount)
         const battleRibbons = _.intersection(other.ribbons, Gen34TowerRibbons)
         this.battleMemoryCount = Math.max(battleRibbons.length, this.battleMemoryCount)
         this.ribbons = other.ribbons
+      }
+
+      if (hasMemoryData(other)) {
+        this.handlerMemory = other.handlerMemory
+        this.trainerMemory = other.trainerMemory
       }
 
       if (this.contestMemoryCount) {
@@ -1567,6 +1570,9 @@ export class OHPKM
       this.handlerGender = other.handlerGender
       this.isCurrentHandler = other.isCurrentHandler
       this.handlerFriendship = other.handlerFriendship
+    }
+
+    if (hasMemoryData(other)) {
       this.handlerMemory = other.handlerMemory
       this.trainerMemory = other.trainerMemory
     }

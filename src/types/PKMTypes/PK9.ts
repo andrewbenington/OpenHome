@@ -50,7 +50,7 @@ export class PK9 implements BasePKMData, Gen8OnData, Gen9OnlyData, SanityChecksu
     } else if (other) {
       this.encryptionConstant = other.encryptionConstant
       this.dexNum = other.dexNum
-      this.heldItemIndex = 0
+      this.heldItemIndex = other.heldItemIndex
       this.trainerID = other.trainerID
       this.secretID = other.secretID
       this.exp = other.exp
@@ -679,7 +679,7 @@ export class PK9 implements BasePKMData, Gen8OnData, Gen9OnlyData, SanityChecksu
   }
 
   public get affixedRibbon() {
-    return this.bytes[0xe8] !== 0xff ? this.bytes[0xd4] : undefined
+    return this.bytes[0xd4] !== 0xff ? this.bytes[0xd4] : undefined
   }
 
   public set affixedRibbon(value: number | undefined) {

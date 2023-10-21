@@ -86,6 +86,13 @@ const SummaryDisplay = (props: { mon: PKM }) => {
           <div>{mon.heldItem}</div>
         </AttributeRow>
         <div style={styles.flexRowWrap}>
+          {mon.isShiny && (
+            <AttributeTag
+              icon={getPublicImageURL('icons/Shiny.png')}
+              color="white"
+              backgroundColor="#cc0000"
+            />
+          )}
           {hasGen8OnlyData(mon) && mon.canGigantamax && (
             <AttributeTag
               icon={getPublicImageURL('icons/GMax.png')}
