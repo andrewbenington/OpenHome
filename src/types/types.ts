@@ -221,6 +221,7 @@ export type Move = {
     SMUSUM?: number
     LGPE?: number
     G8?: number
+    LA?: number
   }
   type: string
   id: number

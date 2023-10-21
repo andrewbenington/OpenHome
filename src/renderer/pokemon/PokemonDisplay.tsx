@@ -1,29 +1,18 @@
 /* eslint-disable no-nested-ternary */
-import { Grid, MenuItem, Select } from '@mui/material'
+import { Grid } from '@mui/material'
 import { useState } from 'react'
-import {
-  BW2_TRANSFER_RESTRICTIONS,
-  GEN1_TRANSFER_RESTRICTIONS,
-  GEN2_TRANSFER_RESTRICTIONS,
-  GEN3_TRANSFER_RESTRICTIONS,
-  HGSS_TRANSFER_RESTRICTIONS,
-  LA_TRANSFER_RESTRICTIONS,
-  LGPE_TRANSFER_RESTRICTIONS,
-  ORAS_TRANSFER_RESTRICTIONS,
-  USUM_TRANSFER_RESTRICTIONS,
-} from '../../consts/TransferRestrictions'
 import { OHPKM } from '../../types/PKMTypes'
-import { isRestricted } from '../../types/TransferRestrictions'
-import { StringToStringMap, Styles } from '../../types/types'
+import { fileTypeFromString } from '../../types/PKMTypes/GamePKM'
+import { PKM } from '../../types/PKMTypes/PKM'
+import { Styles } from '../../types/types'
 import OpenHomeButton from '../components/OpenHomeButton'
+import FileTypeSelect from './FileTypeSelect'
 import MetDataMovesDisplay from './MetDataMovesDisplay'
 import OtherDisplay from './OtherDisplay'
 import RawDisplay from './RawDisplay'
 import RibbonsDisplay from './RibbonsDisplay'
 import StatsDisplay from './StatsDisplay'
 import SummaryDisplay from './SummaryDisplay'
-import { PKM } from '../../types/PKMTypes/PKM'
-import { fileTypeFromString } from '../../types/PKMTypes/GamePKM'
 
 const styles = {
   tabScrollContainer: {
@@ -51,10 +40,15 @@ const styles = {
     fontSize: 16,
     padding: '10px 20px 12px 20px',
   },
-  detailsTabRow: {
+  detailsTabCol: {
     display: 'flex',
     flexDirection: 'column',
-    overflowX: 'scroll',
+    height: '100%',
+    overflowY: 'scroll',
+  },
+  displayContainer: {
+    height: '100%',
+    overflowY: 'scroll',
   },
   fileTypeChip: {
     color: 'white',
@@ -67,24 +61,6 @@ const styles = {
   },
 } as Styles
 
-const fileTypeColors: StringToStringMap = {
-  OHPKM: '#748fcd',
-  PK1: '#b34',
-  PK2: '#b6c',
-  PK3: '#9b3',
-  COLOPKM: '#93f',
-  XDPKM: '#53b',
-  PK4: '#f88',
-  PK5: '#484',
-  PK6: 'blue',
-  PK7: 'orange',
-  PB7: '#a75',
-  PK8: '#6bf',
-  PB8: '#6bf',
-  PA8: '#8cc',
-  PK9: '#f52',
-}
-
 const PokemonDisplay = (props: { mon: PKM; tab: string; setTab: (_: string) => void }) => {
   const { mon, tab, setTab } = props
   const [displayMon, setDisplayMon] = useState(mon)
@@ -92,19 +68,21 @@ const PokemonDisplay = (props: { mon: PKM; tab: string; setTab: (_: string) => v
   return (
     <Grid container style={styles.pokemonDisplay}>
       <Grid item xs={3}>
-        <div className="scroll-no-bar" style={styles.detailsTabRow}>
-          <Select
-            value={displayMon.format}
-            onChange={(e) => {
-              if (mon.format === e.target.value) {
+        <div style={styles.detailsTabCol}>
+          <FileTypeSelect
+            baseFormat={mon.format}
+            currentFormat={displayMon.format}
+            formData={mon}
+            onChange={(newFormat) => {
+              if (mon.format === newFormat) {
                 setDisplayMon(mon)
                 return
               }
-              if (e.target.value === 'OHPKM') {
-                setDisplayMon(new OHPKM(undefined, mon))
+              if (newFormat === 'OHPKM') {
+                setDisplayMon(mon instanceof OHPKM ? mon : new OHPKM(undefined, mon))
                 return
               }
-              const P = fileTypeFromString(e.target.value)
+              const P = fileTypeFromString(newFormat)
               if (!P) {
                 throw `Invalid filetype: ${P}`
               }
@@ -114,95 +92,7 @@ const PokemonDisplay = (props: { mon: PKM; tab: string; setTab: (_: string) => v
                 setDisplayMon(new P(undefined, undefined, new OHPKM(undefined, mon)))
               }
             }}
-            sx={{
-              ...styles.fileTypeChip,
-              backgroundColor: fileTypeColors[displayMon.format],
-            }}
-          >
-            <MenuItem value="OHPKM">OpenHome</MenuItem>
-            {mon.format !== 'OHPKM' ? (
-              <MenuItem value={mon.format}>{mon.format}</MenuItem>
-            ) : (
-              <div />
-            )}
-            {mon.format === 'OHPKM' &&
-            !isRestricted(GEN1_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) ? (
-              <MenuItem value="PK1">PK1</MenuItem>
-            ) : (
-              <div />
-            )}
-            {mon.format === 'OHPKM' &&
-            !isRestricted(GEN2_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) ? (
-              <MenuItem value="PK2">PK2</MenuItem>
-            ) : (
-              <div />
-            )}
-            {mon.format === 'OHPKM' &&
-            !isRestricted(GEN3_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) ? (
-              <MenuItem value="PK3">PK3</MenuItem>
-            ) : (
-              <div />
-            )}
-            {mon.format === 'OHPKM' &&
-            !isRestricted(GEN3_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) ? (
-              <MenuItem value="COLOPKM">COLOPKM</MenuItem>
-            ) : (
-              <div />
-            )}
-            {mon.format === 'OHPKM' &&
-            !isRestricted(GEN3_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) ? (
-              <MenuItem value="XDPKM">XDPKM</MenuItem>
-            ) : (
-              <div />
-            )}
-            {mon.format === 'OHPKM' &&
-            !isRestricted(HGSS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) ? (
-              <MenuItem value="PK4">PK4</MenuItem>
-            ) : (
-              <div />
-            )}
-            {mon.format === 'OHPKM' &&
-            !isRestricted(BW2_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) ? (
-              <MenuItem value="PK5">PK5</MenuItem>
-            ) : (
-              <div />
-            )}
-            {mon.format === 'OHPKM' &&
-            !isRestricted(ORAS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) ? (
-              <MenuItem value="PK6">PK6</MenuItem>
-            ) : (
-              <div />
-            )}
-            {mon.format === 'OHPKM' &&
-            !isRestricted(USUM_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) ? (
-              <MenuItem value="PK7">PK7</MenuItem>
-            ) : (
-              <div />
-            )}
-            {mon.format === 'OHPKM' &&
-            !isRestricted(LGPE_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) ? (
-              <MenuItem value="PB7">PB7</MenuItem>
-            ) : (
-              <div />
-            )}
-            {mon.format === 'OHPKM' && !isRestricted({}, mon.dexNum, mon.formNum) ? (
-              <MenuItem value="PK8">PK8</MenuItem>
-            ) : (
-              <div />
-            )}
-            {mon.format === 'OHPKM' &&
-            !isRestricted(HGSS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) ? (
-              <MenuItem value="PB8">PB8</MenuItem>
-            ) : (
-              <div />
-            )}
-            {mon.format === 'OHPKM' &&
-            !isRestricted(LA_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) ? (
-              <MenuItem value="PA8">PA8</MenuItem>
-            ) : (
-              <div />
-            )}
-          </Select>
+          />
           <OpenHomeButton
             style={{
               ...styles.tabButton,
@@ -259,7 +149,7 @@ const PokemonDisplay = (props: { mon: PKM; tab: string; setTab: (_: string) => v
           </OpenHomeButton>
         </div>
       </Grid>
-      <Grid item xs={9}>
+      <Grid item xs={9} style={styles.displayContainer}>
         {tab === 'summary' ? (
           <SummaryDisplay mon={displayMon} />
         ) : tab === 'metDataMoves' ? (

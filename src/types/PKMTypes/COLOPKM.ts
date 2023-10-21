@@ -277,8 +277,8 @@ export class COLOPKM implements Gen3OnData, Gen3OrreData {
   }
 
   public set movePP(value: [number, number, number, number]) {
-    for (let i = 0; i < 4; i += 4) {
-      this.bytes[0x7a + i] = value[i]
+    for (let i = 0; i < 4; i++) {
+      this.bytes[0x7a + 4 * i] = value[i]
     }
   }
 
@@ -287,8 +287,8 @@ export class COLOPKM implements Gen3OnData, Gen3OrreData {
   }
 
   public set movePPUps(value: [number, number, number, number]) {
-    for (let i = 0; i < 4; i += 4) {
-      this.bytes[0x7b + i] = value[i]
+    for (let i = 0; i < 4; i++) {
+      this.bytes[0x7b + 4 * i] = value[i]
     }
   }
 

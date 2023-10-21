@@ -959,6 +959,7 @@ export class PB8 extends G8PKM {
     super(bytes, encrypted, other)
     if (other) {
       this.tmFlagsBDSP = other.tmFlagsBDSP
+      this.ball = other.ball < Ball.Strange ? other.ball : Ball.Strange
     }
   }
 
@@ -972,5 +973,19 @@ export class PB8 extends G8PKM {
 
   public set tmFlagsBDSP(value: Uint8Array) {
     this.bytes.set(value.slice(0, 14), 0x127)
+  }
+
+  public get metLocation() {
+    if (isBDSP(this.gameOfOrigin)) {
+      const locationBlock =
+        BDSPLocations[Math.floor(this.metLocationIndex / 10000) * 10000] ?? BDSPLocations[0]
+      return `in ${locationBlock[this.metLocationIndex % 10000]}`
+    }
+    if (this.gameOfOrigin === GameOfOrigin.LegendsArceus) {
+      return 'in the Sinnoh region of old'
+    }
+    return this.gameOfOrigin <= GameOfOrigin.Sword
+      ? `in the ${GameOfOriginData[this.gameOfOrigin]?.region} region`
+      : 'in a faraway place'
   }
 }

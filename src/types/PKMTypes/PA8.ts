@@ -39,13 +39,11 @@ export class PA8 implements Gen8OnData, PLAData, Size, SanityChecksum {
   constructor(bytes?: Uint8Array, encrypted?: boolean, other?: OHPKM) {
     if (bytes) {
       if (encrypted) {
-        if (encrypted) {
-          throw new Error('PA8 decryption not implemented')
-        } else {
-          this.bytes = bytes
-        }
-        // this.refreshChecksum();
+        throw new Error('PA8 decryption not implemented')
+      } else {
+        this.bytes = bytes
       }
+      // this.refreshChecksum();
     } else if (other) {
       this.sanity = other.sanity
       this.dexNum = other.dexNum

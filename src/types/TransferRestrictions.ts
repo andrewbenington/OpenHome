@@ -1,4 +1,4 @@
-import { LGE_STARTER, LGP_STARTER } from '../consts/Formes'
+import { BASE, BLOOD_MOON, LGE_STARTER, LGP_STARTER } from '../consts/Formes'
 import { NDex } from '../consts/NationalDex'
 
 interface FormRestrictions {
@@ -97,24 +97,24 @@ export const LegendsArceusExcludedForms: FormRestrictions = {
   ...GalarianForms,
   [NDex.VULPIX]: undefined,
   [NDex.NINETALES]: undefined,
-  [NDex.GROWLITHE]: [0],
-  [NDex.ARCANINE]: [0],
-  [NDex.VOLTORB]: [0],
-  [NDex.ELECTRODE]: [0],
-  [NDex.TYPHLOSION]: [0],
-  [NDex.QWILFISH]: [0],
+  [NDex.GROWLITHE]: [BASE],
+  [NDex.ARCANINE]: [BASE],
+  [NDex.VOLTORB]: [BASE],
+  [NDex.ELECTRODE]: [BASE],
+  [NDex.TYPHLOSION]: [BASE],
+  [NDex.QWILFISH]: [BASE],
   [NDex.SNEASEL]: undefined,
-  [NDex.SAMUROTT]: [0],
-  [NDex.LILLIGANT]: [0],
+  [NDex.SAMUROTT]: [BASE],
+  [NDex.LILLIGANT]: [BASE],
   [NDex.BASCULIN]: [0, 1],
-  [NDex.ZORUA]: [0],
-  [NDex.ZOROARK]: [0],
-  [NDex.BRAVIARY]: [0],
-  [NDex.SLIGGOO]: [0],
-  [NDex.GOODRA]: [0],
-  [NDex.AVALUGG]: [0],
-  [NDex.DECIDUEYE]: [0],
-  [NDex.URSALUNA]: [1],
+  [NDex.ZORUA]: [BASE],
+  [NDex.ZOROARK]: [BASE],
+  [NDex.BRAVIARY]: [BASE],
+  [NDex.SLIGGOO]: [BASE],
+  [NDex.GOODRA]: [BASE],
+  [NDex.AVALUGG]: [BASE],
+  [NDex.DECIDUEYE]: [BASE],
+  [NDex.URSALUNA]: [BLOOD_MOON],
 }
 
 export const Gen89RegionalForms: FormRestrictions = {

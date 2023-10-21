@@ -42,7 +42,11 @@ export class PK2 implements BasePKMData, Gen2Stats, Gen2OnData, Gen2OnlyData {
 
   constructor(bytes?: Uint8Array, _?: boolean, other?: OHPKM) {
     if (bytes) {
-      this.bytes = bytes
+      if (bytes[2] === 0xff) {
+        this.bytes = bytes.slice(3)
+      } else {
+        this.bytes = bytes
+      }
       if (this.bytes.length >= 0x46) {
         this.trainerName = gen12StringToUTF(this.bytes, 0x30, 8)
         this.nickname = gen12StringToUTF(this.bytes, 0x3b, 11)

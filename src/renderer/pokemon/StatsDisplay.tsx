@@ -75,7 +75,7 @@ const StatsDisplay = (props: { mon: PKM }) => {
     const createMenuItem = (value: string) => {
       return (
         <MenuItem key={value} value={value}>
-          Stats
+          {value}
         </MenuItem>
       )
     }

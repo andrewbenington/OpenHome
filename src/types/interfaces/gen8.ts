@@ -1,7 +1,8 @@
 import { stats } from '../types'
+import { MemoryData } from './gen6'
 import { Gen7OnData } from './gen7'
 
-export interface Gen8OnData extends Gen7OnData {
+export interface Gen8OnData extends Gen7OnData, MemoryData {
   handlerID: number
   handlerLanguageIndex: number
   handlerLanguage: string

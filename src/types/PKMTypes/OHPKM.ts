@@ -470,7 +470,7 @@ export class OHPKM
   }
 
   public set canGigantamax(value: boolean) {
-    setFlag(this.bytes, 0x16, 64, value)
+    setFlag(this.bytes, 0x16, 4, value)
   }
 
   public get isAlpha() {
@@ -661,30 +661,18 @@ export class OHPKM
     this.bytes[0x35] = value
   }
 
-  public get ribbonBytes() {
-    return this.bytes.slice(0x36, 0x4c)
-  }
-
-  public set ribbonBytes(value: Uint8Array) {
-    this.bytes.set(value.slice(0, 22), 0x36)
-  }
-
   public get ribbons() {
     const ribbons: string[] = []
-    const rBytes = this.ribbonBytes
-    for (let byte = 0; byte < 22; byte++) {
-      const ribbonsUint8 = rBytes[byte]
-      for (let bit = 0; bit < 8; bit++) {
-        if (ribbonsUint8 & (2 ** bit) && 8 * byte + bit < OpenHomeRibbons.length) {
-          ribbons.push(OpenHomeRibbons[8 * byte + bit])
-        }
+    for (let i = 0; i < OpenHomeRibbons.length; i++) {
+      if (getFlag(this.bytes, 0x36, i)) {
+        ribbons.push(OpenHomeRibbons[i])
       }
     }
     return ribbons
   }
 
   public set ribbons(value: string[]) {
-    this.ribbonBytes = new Uint8Array(16)
+    this.bytes.set(new Uint8Array(16), 0x36)
     value.forEach((ribbon) => {
       const index = OpenHomeRibbons.indexOf(ribbon)
       if (index > -1) {
@@ -694,11 +682,11 @@ export class OHPKM
   }
 
   public get sociability() {
-    return bytesToUint32LittleEndian(this.bytes, 0x48)
+    return bytesToUint32LittleEndian(this.bytes, 0x4c)
   }
 
   public set sociability(value: number) {
-    this.bytes.set(uint32ToBytesLittleEndian(value), 0x48)
+    this.bytes.set(uint32ToBytesLittleEndian(value), 0x4c)
   }
 
   public get height() {

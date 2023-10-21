@@ -11,7 +11,7 @@ const AttributeRow = (props: {
       style={{
         minHeight: 30,
         height: 30,
-        borderBottom: '2px solid #bbb0',
+        marginBottom: 2,
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',
@@ -20,16 +20,17 @@ const AttributeRow = (props: {
     >
       <div
         style={{
-          width: indent ? `calc(33% - ${indent + 1}px)` : '33%',
+          width: indent ? `calc(33% - ${indent}px)` : '33%',
           height: '100%',
           backgroundColor: '#fff6',
-          paddingLeft: 10,
+          marginLeft: indent,
           display: 'grid',
           alignItems: 'center',
         }}
       >
         <div
           style={{
+            paddingLeft: 10,
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',

@@ -50,13 +50,11 @@ export class PB7
   constructor(bytes?: Uint8Array, encrypted?: boolean, other?: OHPKM) {
     if (bytes) {
       if (encrypted) {
-        if (encrypted) {
-          throw new Error('PB7 decryption not implemented')
-        } else {
-          this.bytes = bytes
-        }
-        // this.refreshChecksum();
+        throw new Error('PB7 decryption not implemented')
+      } else {
+        this.bytes = bytes
       }
+      // this.refreshChecksum();
     } else if (other) {
       this.encryptionConstant = other.encryptionConstant
       this.dexNum = other.dexNum

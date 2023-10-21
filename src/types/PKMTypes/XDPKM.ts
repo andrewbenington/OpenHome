@@ -483,8 +483,8 @@ export class XDPKM implements BasePKMData, Gen3OnData, Gen3OrreData {
   }
 
   public set movePP(value: [number, number, number, number]) {
-    for (let i = 0; i < 4; i += 4) {
-      this.bytes[0x7a + i] = value[i]
+    for (let i = 0; i < 4; i++) {
+      this.bytes[0x82 + 4 * i] = value[i]
     }
   }
 
@@ -493,8 +493,8 @@ export class XDPKM implements BasePKMData, Gen3OnData, Gen3OrreData {
   }
 
   public set movePPUps(value: [number, number, number, number]) {
-    for (let i = 0; i < 4; i += 4) {
-      this.bytes[0x7b + i] = value[i]
+    for (let i = 0; i < 4; i++) {
+      this.bytes[0x83 + 4 * i] = value[i]
     }
   }
 

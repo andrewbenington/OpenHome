@@ -56,7 +56,11 @@ export class PK1 implements BasePKMData, Gen1Stats {
 
   constructor(bytes?: Uint8Array, _?: boolean, other?: OHPKM) {
     if (bytes) {
-      this.bytes = bytes
+      if (bytes[2] === 0xff) {
+        this.bytes = bytes.slice(3)
+      } else {
+        this.bytes = bytes
+      }
       if (this.bytes.length >= 0x41) {
         this.nickname = gen12StringToUTF(this.bytes, 0x37, 11)
         if (this.bytes[0x2c] === 0x5d) {

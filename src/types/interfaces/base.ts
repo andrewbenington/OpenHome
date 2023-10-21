@@ -1,6 +1,11 @@
 import { stats, statsPreSplit } from '../types'
 
-export interface BasePKMData {
+export interface PKMFormData {
+  dexNum: number
+  formNum: number
+}
+
+export interface BasePKMData extends PKMFormData {
   fileSize: number
 
   markingCount: number
@@ -9,8 +14,6 @@ export interface BasePKMData {
   bytes: Uint8Array
 
   format: string
-
-  dexNum: number
 
   heldItemIndex: number
 
@@ -22,8 +25,6 @@ export interface BasePKMData {
 
   exp: number
   level: number
-
-  formNum: number
 
   height?: number
   weight?: number

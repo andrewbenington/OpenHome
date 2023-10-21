@@ -13,11 +13,8 @@ export interface Gen6OnData extends Gen4OnData {
 
   isCurrentHandler: boolean
   handlerFriendship: number
-  handlerMemory: memory
 
   handlerGender: boolean
-
-  trainerMemory: memory
 
   formArgument: number
 }
@@ -26,7 +23,16 @@ export function hasGen6OnData(obj: any): obj is Gen6OnData {
   return obj && 'encryptionConstant' in obj
 }
 
-export interface N3DSOnlyData {
+export interface MemoryData {
+  trainerMemory: memory
+  handlerMemory: memory
+}
+
+export function hasMemoryData(obj: any): obj is MemoryData {
+  return obj && 'trainerMemory' in obj
+}
+
+export interface N3DSOnlyData extends MemoryData {
   handlerAffection: number
 
   superTrainingFlags: number

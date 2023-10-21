@@ -121,7 +121,7 @@ export class PK9 implements BasePKMData, Gen8OnData, Gen9OnlyData, SanityChecksu
       this.metDate = other.metDate
       this.eggLocationIndex = other.eggLocationIndex
       this.metLocationIndex = other.metLocationIndex
-      this.ball = other.ball < Ball.Strange ? other.ball : Ball.Poke
+      this.ball = other.ball < Ball.Strange ? other.ball : Ball.Strange
       this.metLevel = other.metLevel
       this.trainerGender = other.trainerGender
       this.hyperTraining = other.hyperTraining
@@ -134,7 +134,7 @@ export class PK9 implements BasePKMData, Gen8OnData, Gen9OnlyData, SanityChecksu
   }
 
   public get format() {
-    return 'PK8'
+    return 'PK9'
   }
 
   public get encryptionConstant() {

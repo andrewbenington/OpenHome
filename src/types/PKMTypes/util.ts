@@ -14,7 +14,7 @@ import {
 import { getGen3To5Gender } from '../../util/GenderCalc'
 import { BasePKMData } from '../interfaces/base'
 import { hasGen3OnData } from '../interfaces/gen3'
-import { GamePKM } from './GamePKM'
+import { PKM } from './PKM'
 
 export const writeIVsToBuffer = (
   ivs: stats,
@@ -242,9 +242,11 @@ export const getMoveMaxPP = (moveIndex: number, format: string, ppUps = 0) => {
       baseMaxPP = move.pastGenPP?.LGPE ?? move.pp
       break
     case 'PK8':
-    case 'PA8':
     case 'PB8':
       baseMaxPP = move.pastGenPP?.G8 ?? move.pp
+      break
+    case 'PA8':
+      baseMaxPP = move.pastGenPP?.LA ?? move.pp
       break
     case 'PK9':
       baseMaxPP = move.pp
@@ -286,7 +288,7 @@ const getIsShinyPreGen6 = (trainerID: number, secretID: number, personalityValue
   (trainerID ^ secretID ^ ((personalityValue >> 16) & 0xffff) ^ (personalityValue & 0xffff)) < 8
 
 export const generatePersonalityValuePreservingAttributes = (
-  mon: GamePKM,
+  mon: PKM,
   prng: Prando = new Prando()
 ) => {
   let personalityValue = 0
