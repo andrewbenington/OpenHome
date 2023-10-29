@@ -23,6 +23,8 @@ jobs:
           cache: 'npm'
       - name: install dependencies
         run: npm install
+      - name: build
+        run: npm run build:no-mac
       - name: publish
         env:
           gh_token: ${{ secrets.GITHUB_TOKEN }}
