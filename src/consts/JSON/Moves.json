@@ -66,6 +66,9 @@
     "generation": "generation-i",
     "power": 75,
     "pp": 15,
+    "pastGenPP": {
+      "LA": 10
+    },
     "type": "fire",
     "id": 7
   },
@@ -76,6 +79,9 @@
     "generation": "generation-i",
     "power": 75,
     "pp": 15,
+    "pastGenPP": {
+      "LA": 10
+    },
     "type": "ice",
     "id": 8
   },
@@ -86,6 +92,9 @@
     "generation": "generation-i",
     "power": 75,
     "pp": 15,
+    "pastGenPP": {
+      "LA": 10
+    },
     "type": "electric",
     "id": 9
   },
@@ -163,6 +172,9 @@
     "generation": "generation-i",
     "power": 40,
     "pp": 35,
+    "pastGenPP": {
+      "LA": 25
+    },
     "type": "flying",
     "id": 16
   },
@@ -346,6 +358,9 @@
     "generation": "generation-i",
     "power": 40,
     "pp": 35,
+    "pastGenPP": {
+      "LA": 30
+    },
     "type": "normal",
     "id": 33
   },
@@ -402,6 +417,9 @@
     "generation": "generation-i",
     "power": 120,
     "pp": 15,
+    "pastGenPP": {
+      "LA": 5
+    },
     "type": "normal",
     "id": 38
   },
@@ -422,6 +440,9 @@
     "generation": "generation-i",
     "power": 15,
     "pp": 35,
+    "pastGenPP": {
+      "LA": 20
+    },
     "type": "poison",
     "id": 40
   },
@@ -462,6 +483,9 @@
     "generation": "generation-i",
     "power": 60,
     "pp": 25,
+    "pastGenPP": {
+      "LA": 20
+    },
     "type": "dark",
     "id": 44
   },
@@ -552,6 +576,9 @@
     "generation": "generation-i",
     "power": 90,
     "pp": 15,
+    "pastGenPP": {
+      "LA": 10
+    },
     "type": "fire",
     "id": 53
   },
@@ -744,7 +771,8 @@
       "G1": 20,
       "G2": 20,
       "G3": 20,
-      "LGPE": 15
+      "LGPE": 15,
+      "LA": 20
     },
     "type": "grass",
     "id": 71
@@ -819,6 +847,9 @@
     "generation": "generation-i",
     "power": null,
     "pp": 35,
+    "pastGenPP": {
+      "LA": 20
+    },
     "type": "poison",
     "id": 77
   },
@@ -829,6 +860,9 @@
     "generation": "generation-i",
     "power": null,
     "pp": 30,
+    "pastGenPP": {
+      "LA": 20
+    },
     "type": "grass",
     "id": 78
   },
@@ -839,6 +873,9 @@
     "generation": "generation-i",
     "power": null,
     "pp": 15,
+    "pastGenPP": {
+      "LA": 20
+    },
     "type": "grass",
     "id": 79
   },
@@ -895,6 +932,9 @@
     "generation": "generation-i",
     "power": 40,
     "pp": 30,
+    "pastGenPP": {
+      "LA": 25
+    },
     "type": "electric",
     "id": 84
   },
@@ -905,6 +945,9 @@
     "generation": "generation-i",
     "power": 90,
     "pp": 15,
+    "pastGenPP": {
+      "LA": 10
+    },
     "type": "electric",
     "id": 85
   },
@@ -925,6 +968,9 @@
     "generation": "generation-i",
     "power": 110,
     "pp": 10,
+    "pastGenPP": {
+      "LA": 5
+    },
     "type": "electric",
     "id": 87
   },
@@ -985,6 +1031,9 @@
     "generation": "generation-i",
     "power": 50,
     "pp": 25,
+    "pastGenPP": {
+      "LA": 20
+    },
     "type": "psychic",
     "id": 93
   },
@@ -1035,6 +1084,9 @@
     "generation": "generation-i",
     "power": 40,
     "pp": 30,
+    "pastGenPP": {
+      "LA": 20
+    },
     "type": "normal",
     "id": 98
   },
@@ -1114,7 +1166,8 @@
       "G6": 10,
       "SMUSUM": 10,
       "LGPE": 10,
-      "G8": 10
+      "G8": 10,
+      "LA": 10
     },
     "type": "normal",
     "id": 105
@@ -1240,6 +1293,9 @@
     "generation": "generation-i",
     "power": null,
     "pp": 30,
+    "pastGenPP": {
+      "LA": 20
+    },
     "type": "normal",
     "id": 116
   },
@@ -1452,7 +1508,8 @@
       "G6": 10,
       "SMUSUM": 10,
       "LGPE": 10,
-      "G8": 10
+      "G8": 10,
+      "LA": 10
     },
     "type": "normal",
     "id": 135
@@ -1500,6 +1557,9 @@
     "generation": "generation-i",
     "power": null,
     "pp": 40,
+    "pastGenPP": {
+      "LA": 20
+    },
     "type": "poison",
     "id": 139
   },
@@ -1568,6 +1628,9 @@
     "generation": "generation-i",
     "power": 40,
     "pp": 30,
+    "pastGenPP": {
+      "LA": 25
+    },
     "type": "water",
     "id": 145
   },
@@ -1588,6 +1651,9 @@
     "generation": "generation-i",
     "power": null,
     "pp": 15,
+    "pastGenPP": {
+      "LA": 10
+    },
     "type": "grass",
     "id": 147
   },
@@ -1694,7 +1760,8 @@
       "G6": 10,
       "SMUSUM": 10,
       "LGPE": 10,
-      "G8": 10
+      "G8": 10,
+      "LA": 10
     },
     "type": "psychic",
     "id": 156
@@ -1766,6 +1833,9 @@
     "generation": "generation-i",
     "power": 70,
     "pp": 20,
+    "pastGenPP": {
+      "LA": 15
+    },
     "type": "normal",
     "id": 163
   },
@@ -1865,6 +1935,9 @@
     "generation": "generation-ii",
     "power": 60,
     "pp": 25,
+    "pastGenPP": {
+      "LA": 20
+    },
     "type": "fire",
     "id": 172
   },
@@ -1975,6 +2048,9 @@
     "generation": "generation-ii",
     "power": 40,
     "pp": 30,
+    "pastGenPP": {
+      "LA": 20
+    },
     "type": "fighting",
     "id": 183
   },
@@ -2035,6 +2111,9 @@
     "generation": "generation-ii",
     "power": 20,
     "pp": 10,
+    "pastGenPP": {
+      "LA": 20
+    },
     "type": "ground",
     "id": 189
   },
@@ -2045,6 +2124,9 @@
     "generation": "generation-ii",
     "power": 65,
     "pp": 10,
+    "pastGenPP": {
+      "LA": 15
+    },
     "type": "water",
     "id": 190
   },
@@ -2105,6 +2187,9 @@
     "generation": "generation-ii",
     "power": 55,
     "pp": 15,
+    "pastGenPP": {
+      "LA": 20
+    },
     "type": "ice",
     "id": 196
   },
@@ -2215,6 +2300,9 @@
     "generation": "generation-ii",
     "power": 40,
     "pp": 40,
+    "pastGenPP": {
+      "LA": 30
+    },
     "type": "normal",
     "id": 206
   },
@@ -2406,6 +2494,9 @@
     "generation": "generation-ii",
     "power": 120,
     "pp": 10,
+    "pastGenPP": {
+      "LA": 5
+    },
     "type": "bug",
     "id": 224
   },
@@ -2476,6 +2567,9 @@
     "generation": "generation-ii",
     "power": 100,
     "pp": 15,
+    "pastGenPP": {
+      "LA": 5
+    },
     "type": "steel",
     "id": 231
   },
@@ -2556,6 +2650,9 @@
     "generation": "generation-ii",
     "power": 40,
     "pp": 20,
+    "pastGenPP": {
+      "LA": 25
+    },
     "type": "dragon",
     "id": 239
   },
@@ -2586,6 +2683,9 @@
     "generation": "generation-ii",
     "power": 80,
     "pp": 15,
+    "pastGenPP": {
+      "LA": 10
+    },
     "type": "dark",
     "id": 242
   },
@@ -2626,6 +2726,9 @@
     "generation": "generation-ii",
     "power": 60,
     "pp": 5,
+    "pastGenPP": {
+      "LA": 15
+    },
     "type": "rock",
     "id": 246
   },
@@ -2636,6 +2739,9 @@
     "generation": "generation-ii",
     "power": 80,
     "pp": 15,
+    "pastGenPP": {
+      "LA": 10
+    },
     "type": "ghost",
     "id": 247
   },
@@ -2661,6 +2767,9 @@
     "generation": "generation-ii",
     "power": 40,
     "pp": 15,
+    "pastGenPP": {
+      "LA": 20
+    },
     "type": "fighting",
     "id": 249
   },
@@ -3283,6 +3392,9 @@
     "generation": "generation-iii",
     "power": 30,
     "pp": 15,
+    "pastGenPP": {
+      "LA": 25
+    },
     "type": "ghost",
     "id": 310
   },
@@ -3323,6 +3435,9 @@
     "generation": "generation-iii",
     "power": 60,
     "pp": 25,
+    "pastGenPP": {
+      "LA": 15
+    },
     "type": "flying",
     "id": 314
   },
@@ -3368,6 +3483,9 @@
     "generation": "generation-iii",
     "power": 60,
     "pp": 5,
+    "pastGenPP": {
+      "LA": 15
+    },
     "type": "bug",
     "id": 318
   },
@@ -3453,7 +3571,8 @@
       "G2": 30,
       "G3": 30,
       "G4": 30,
-      "G5": 30
+      "G5": 30,
+      "LA": 15
     },
     "type": "psychic",
     "id": 326
@@ -3535,6 +3654,9 @@
     "generation": "generation-iii",
     "power": null,
     "pp": 15,
+    "pastGenPP": {
+      "LA": 20
+    },
     "type": "steel",
     "id": 334
   },
@@ -3565,6 +3687,9 @@
     "generation": "generation-iii",
     "power": 80,
     "pp": 15,
+    "pastGenPP": {
+      "LA": 10
+    },
     "type": "dragon",
     "id": 337
   },
@@ -3585,6 +3710,9 @@
     "generation": "generation-iii",
     "power": null,
     "pp": 20,
+    "pastGenPP": {
+      "LA": 10
+    },
     "type": "fighting",
     "id": 339
   },
@@ -3642,6 +3770,9 @@
     "generation": "generation-iii",
     "power": 120,
     "pp": 15,
+    "pastGenPP": {
+      "LA": 5
+    },
     "type": "electric",
     "id": 344
   },
@@ -3672,6 +3803,9 @@
     "generation": "generation-iii",
     "power": null,
     "pp": 20,
+    "pastGenPP": {
+      "LA": 10
+    },
     "type": "psychic",
     "id": 347
   },
@@ -3682,6 +3816,9 @@
     "generation": "generation-iii",
     "power": 90,
     "pp": 15,
+    "pastGenPP": {
+      "LA": 10
+    },
     "type": "grass",
     "id": 348
   },
@@ -3758,7 +3895,8 @@
       "G6": 10,
       "SMUSUM": 10,
       "LGPE": 10,
-      "G8": 10
+      "G8": 10,
+      "LA": 10
     },
     "type": "flying",
     "id": 355
@@ -4174,6 +4312,9 @@
     "generation": "generation-iv",
     "power": 80,
     "pp": 20,
+    "pastGenPP": {
+      "LA": 10
+    },
     "type": "fighting",
     "id": 396
   },
@@ -4194,6 +4335,9 @@
     "generation": "generation-iv",
     "power": 80,
     "pp": 20,
+    "pastGenPP": {
+      "LA": 10
+    },
     "type": "poison",
     "id": 398
   },
@@ -4204,6 +4348,9 @@
     "generation": "generation-iv",
     "power": 80,
     "pp": 15,
+    "pastGenPP": {
+      "LA": 10
+    },
     "type": "dark",
     "id": 399
   },
@@ -4249,7 +4396,8 @@
       "G2": 20,
       "G3": 20,
       "G4": 20,
-      "G5": 20
+      "G5": 20,
+      "LA": 10
     },
     "type": "flying",
     "id": 403
@@ -4261,6 +4409,9 @@
     "generation": "generation-iv",
     "power": 80,
     "pp": 15,
+    "pastGenPP": {
+      "LA": 10
+    },
     "type": "bug",
     "id": 404
   },
@@ -4301,6 +4452,9 @@
     "generation": "generation-iv",
     "power": 80,
     "pp": 20,
+    "pastGenPP": {
+      "LA": 10
+    },
     "type": "rock",
     "id": 408
   },
@@ -4354,6 +4508,9 @@
     "generation": "generation-iv",
     "power": 120,
     "pp": 15,
+    "pastGenPP": {
+      "LA": 5
+    },
     "type": "flying",
     "id": 413
   },
@@ -4404,6 +4561,9 @@
     "generation": "generation-iv",
     "power": 40,
     "pp": 30,
+    "pastGenPP": {
+      "LA": 20
+    },
     "type": "steel",
     "id": 418
   },
@@ -4424,6 +4584,9 @@
     "generation": "generation-iv",
     "power": 40,
     "pp": 30,
+    "pastGenPP": {
+      "LA": 20
+    },
     "type": "ice",
     "id": 420
   },
@@ -4474,6 +4637,9 @@
     "generation": "generation-iv",
     "power": 40,
     "pp": 30,
+    "pastGenPP": {
+      "LA": 20
+    },
     "type": "ghost",
     "id": 425
   },
@@ -4484,6 +4650,9 @@
     "generation": "generation-iv",
     "power": 65,
     "pp": 10,
+    "pastGenPP": {
+      "LA": 15
+    },
     "type": "ground",
     "id": 426
   },
@@ -4494,6 +4663,9 @@
     "generation": "generation-iv",
     "power": 70,
     "pp": 20,
+    "pastGenPP": {
+      "LA": 15
+    },
     "type": "psychic",
     "id": 427
   },
@@ -4504,6 +4676,9 @@
     "generation": "generation-iv",
     "power": 80,
     "pp": 15,
+    "pastGenPP": {
+      "LA": 10
+    },
     "type": "psychic",
     "id": 428
   },
@@ -4624,6 +4799,9 @@
     "generation": "generation-iv",
     "power": 70,
     "pp": 20,
+    "pastGenPP": {
+      "LA": 15
+    },
     "type": "poison",
     "id": 440
   },
@@ -4644,6 +4822,9 @@
     "generation": "generation-iv",
     "power": 80,
     "pp": 15,
+    "pastGenPP": {
+      "LA": 10
+    },
     "type": "steel",
     "id": 442
   },
@@ -4714,6 +4895,9 @@
     "generation": "generation-iv",
     "power": 100,
     "pp": 10,
+    "pastGenPP": {
+      "LA": 5
+    },
     "type": "normal",
     "id": 449
   },
@@ -4734,6 +4918,9 @@
     "generation": "generation-iv",
     "power": 50,
     "pp": 10,
+    "pastGenPP": {
+      "LA": 15
+    },
     "type": "electric",
     "id": 451
   },
@@ -4744,6 +4931,9 @@
     "generation": "generation-iv",
     "power": 120,
     "pp": 15,
+    "pastGenPP": {
+      "LA": 5
+    },
     "type": "grass",
     "id": 452
   },
@@ -4884,6 +5074,9 @@
     "generation": "generation-iv",
     "power": 60,
     "pp": 5,
+    "pastGenPP": {
+      "LA": 15
+    },
     "type": "ghost",
     "id": 466
   },
@@ -4964,6 +5157,9 @@
     "generation": "generation-v",
     "power": 65,
     "pp": 10,
+    "pastGenPP": {
+      "LA": 15
+    },
     "type": "poison",
     "id": 474
   },
@@ -5287,6 +5483,9 @@
     "generation": "generation-v",
     "power": 65,
     "pp": 10,
+    "pastGenPP": {
+      "LA": 15
+    },
     "type": "ghost",
     "id": 506
   },
@@ -5507,6 +5706,9 @@
     "generation": "generation-v",
     "power": 90,
     "pp": 15,
+    "pastGenPP": {
+      "LA": 10
+    },
     "type": "electric",
     "id": 528
   },
@@ -5650,6 +5852,9 @@
     "generation": "generation-v",
     "power": 110,
     "pp": 10,
+    "pastGenPP": {
+      "LA": 5
+    },
     "type": "flying",
     "id": 542
   },
@@ -6000,6 +6205,9 @@
     "generation": "generation-vi",
     "power": 50,
     "pp": 10,
+    "pastGenPP": {
+      "LA": 15
+    },
     "type": "fairy",
     "id": 577
   },
@@ -6070,6 +6278,9 @@
     "generation": "generation-vi",
     "power": 40,
     "pp": 30,
+    "pastGenPP": {
+      "LA": 25
+    },
     "type": "fairy",
     "id": 584
   },
@@ -6080,6 +6291,9 @@
     "generation": "generation-vi",
     "power": 95,
     "pp": 15,
+    "pastGenPP": {
+      "LA": 10
+    },
     "type": "fairy",
     "id": 585
   },
@@ -6310,6 +6524,9 @@
     "generation": "generation-vi",
     "power": null,
     "pp": 30,
+    "pastGenPP": {
+      "LA": 20
+    },
     "type": "fairy",
     "id": 608
   },
@@ -6935,6 +7152,9 @@
     "generation": "generation-vii",
     "power": 40,
     "pp": 40,
+    "pastGenPP": {
+      "LA": 25
+    },
     "type": "grass",
     "id": 670
   },

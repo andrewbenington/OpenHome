@@ -1,9 +1,13 @@
-import { POKEMON_DATA } from '../../consts'
 import React, { useEffect, useState } from 'react'
-import { Styles } from '../../types/types'
+import { hasGen3OnData } from 'src/types/interfaces/gen3'
+import { POKEMON_DATA } from '../../consts'
 import { PKM } from '../../types/PKMTypes/PKM'
-import { acceptableExtensions, bytesToPKM } from '../../util/FileImport'
+import { BasePKMData } from '../../types/interfaces/base'
+import { Styles } from '../../types/types'
+import { bytesToPKM } from '../../util/FileImport'
 import BoxIcons from '../images/BoxIcons.png'
+import { getPublicImageURL } from '../images/images'
+import { getItemIconPath } from '../images/items'
 
 const styles = {
   fillContainer: { width: '100%', height: '100%' },
@@ -22,7 +26,7 @@ const styles = {
     imageRendering: 'crisp-edges',
     height: '100%',
     width: '100%',
-    zIndex: 100,
+    zIndex: 1,
     top: 0,
     left: 0,
     position: 'absolute',
@@ -46,14 +50,12 @@ const BoxCell = (props: BoxCellProps) => {
     const importedMons: PKM[] = []
     for (let i = 0; i < files.length; i++) {
       const file = files[i]
-      // eslint-disable-next-line no-await-in-loop
       const bytes = new Uint8Array(await file.arrayBuffer())
-      let [extension] = file.name.split('.').slice(-1)
-      extension = extension.toUpperCase()
-      if (acceptableExtensions.includes(extension)) {
-        importedMons.push(bytesToPKM(bytes, extension))
-      } else {
-        console.error(`invalid extension: ${extension}`)
+      const [extension] = file.name.split('.').slice(-1)
+      try {
+        importedMons.push(bytesToPKM(bytes, extension.toUpperCase()))
+      } catch (e) {
+        console.error(e)
       }
     }
     onDrop(importedMons)
@@ -80,8 +82,8 @@ const BoxCell = (props: BoxCellProps) => {
     }
   }
 
-  const getBackgroundPosition = (mon: PKM) => {
-    if (mon.isEgg || !POKEMON_DATA[mon.dexNum]) {
+  const getBackgroundPosition = (mon: BasePKMData) => {
+    if ((hasGen3OnData(mon) && mon.isEgg) || !POKEMON_DATA[mon.dexNum]) {
       return '0% 0%'
     }
     const [x, y] = POKEMON_DATA[mon.dexNum].formes[mon.formNum].spriteIndex
@@ -128,6 +130,38 @@ const BoxCell = (props: BoxCellProps) => {
               opacity: dragImage ? 0 : 1,
             }}
           />
+          {mon.isShiny && (
+            <img
+              alt="item icon"
+              draggable={false}
+              src={getPublicImageURL('icons/Shiny.png')}
+              style={{
+                position: 'absolute',
+                width: '40%',
+                height: '40%',
+                left: 0,
+                top: 0,
+                zIndex: 2,
+                pointerEvents: 'none',
+              }}
+            />
+          )}
+          {mon.heldItem !== 'None' && (
+            <img
+              alt="item icon"
+              draggable={false}
+              src={getPublicImageURL(getItemIconPath(mon.heldItemIndex, mon.format))}
+              style={{
+                position: 'absolute',
+                width: '50%',
+                height: '50%',
+                right: 0,
+                bottom: 0,
+                zIndex: 2,
+                pointerEvents: 'none',
+              }}
+            />
+          )}
         </div>
       ) : (
         <div

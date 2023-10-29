@@ -20,6 +20,7 @@ export const DAWN_WINGS = 2
 export const ULTRA = 3
 export const LGP_STARTER = 8
 export const LGE_STARTER = 1
+export const BLOOD_MOON = 1
 
 export const BASE = 0
 export const ALOLAN = 1

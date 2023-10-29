@@ -1,45 +1,62 @@
 import _ from 'lodash'
-import { contestStats, geolocation, marking, memory, pokedate, stats } from '../../types/types'
-import { Ball, GameOfOrigin, GameOfOriginData, isGen6 } from '../../consts'
+import { Ball, GameOfOrigin, GameOfOriginData, isGen6, isKanto, isSinnoh } from '../../consts'
 import { Languages } from '../../consts/Languages'
 import G6Location from '../../consts/MetLocation/G6'
 import { Gen9Ribbons } from '../../consts/Ribbons'
 import { ItemFromString, ItemToString } from '../../resources/gen/items/Items'
 import { AbilityFromString, AbilityToString } from '../../resources/gen/other/Abilities'
+import { contestStats, geolocation, marking, memory, pokedate, stats } from '../../types/types'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
+  get16BitChecksumLittleEndian,
   getFlag,
   setFlag,
   uint16ToBytesLittleEndian,
   uint32ToBytesLittleEndian,
 } from '../../util/ByteLogic'
+import { decryptByteArrayGen6, shuffleBlocksGen6, unshuffleBlocksGen6 } from '../../util/Encryption'
 import { getHPGen3Onward, getLevelGen3Onward, getStatGen3Onward } from '../../util/StatCalc'
 import { utf16BytesToString, utf16StringToBytes } from '../../util/Strings/StringConverter'
+import { BasePKMData } from '../interfaces/base'
+import { SanityChecksum } from '../interfaces/gen3'
+import { Gen4EncounterType } from '../interfaces/gen4'
+import { Gen6OnData, N3DSOnlyData } from '../interfaces/gen6'
 import { OHPKM } from './OHPKM'
-import { PKM } from './PKM'
 import { adjustMovePPBetweenFormats, writeIVsToBuffer } from './util'
 
 export const XY_MOVE_MAX = 617
 export const ORAS_MOVE_MAX = 621
 
-export class PK6 extends PKM {
-  constructor(...args: any[]) {
-    if (args.length >= 1 && args[0] instanceof Uint8Array) {
-      const bytes = args[0]
-      const encrypted = args[1] ?? false
+export class PK6
+  implements BasePKMData, Gen6OnData, N3DSOnlyData, Gen4EncounterType, SanityChecksum
+{
+  public get fileSize() {
+    return 232
+  }
+
+  get markingCount(): number {
+    return 4
+  }
+
+  get markingColors(): number {
+    return 1
+  }
+
+  bytes = new Uint8Array(232)
+
+  constructor(bytes?: Uint8Array, encrypted?: boolean, other?: OHPKM) {
+    if (bytes) {
+      encrypted = true
       if (encrypted) {
-        // let unencryptedBytes = decryptByteArrayGen45(bytes);
-        // let unshuffledBytes = unshuffleBlocksGen45(unencryptedBytes);
-        // super(unshuffledBytes);
-        super(bytes)
+        const unencryptedBytes = decryptByteArrayGen6(bytes)
+        const unshuffledBytes = unshuffleBlocksGen6(unencryptedBytes)
+        this.bytes = unshuffledBytes
       } else {
-        super(bytes)
+        this.bytes = bytes
       }
-      // this.refreshChecksum();
-    } else if (args.length === 1 && args[0] instanceof OHPKM) {
-      const other = args[0]
-      super(new Uint8Array(232))
+      this.refreshChecksum()
+    } else if (other) {
       this.encryptionConstant = other.encryptionConstant
       this.dexNum = other.dexNum
       this.exp = other.exp
@@ -103,20 +120,32 @@ export class PK6 extends PKM {
       this.trainerMemory = other.trainerMemory
       this.eggDate = other.eggDate
       this.metDate = other.metDate
-      this.eggLocationIndex = other.eggLocationIndex
-      this.metLocationIndex = other.metLocationIndex
       this.ball = other.ball && other.ball <= Ball.Dream ? other.ball : Ball.Poke
       this.metLevel = other.metLevel ?? this.level
       this.trainerGender = other.trainerGender
       this.encounterType = other.encounterType
       this.gameOfOrigin = other.gameOfOrigin
+      if (other.gameOfOrigin <= GameOfOrigin.OmegaRuby) {
+        this.eggLocationIndex = other.eggLocationIndex
+        this.metLocationIndex = other.metLocationIndex
+      } else if (isKanto(other.gameOfOrigin)) {
+        this.metLocationIndex = 30003
+        this.eggLocationIndex = other.eggLocationIndex ? 30003 : 0
+      } else if (isSinnoh(other.gameOfOrigin)) {
+        this.metLocationIndex = 30006
+        this.eggLocationIndex = other.eggLocationIndex ? 30006 : 0
+      } else if (other.gameOfOrigin === GameOfOrigin.ColosseumXD) {
+        this.metLocationIndex = 30007
+        this.eggLocationIndex = other.eggLocationIndex ? 30007 : 0
+      } else {
+        this.metLocationIndex = 4
+        this.eggLocationIndex = other.eggLocationIndex ? 4 : 0
+      }
       this.country = other.country
       this.region = other.region
       this.consoleRegion = other.consoleRegion
       this.language = other.language
       this.currentHP = this.stats.hp
-    } else {
-      super(args[0])
     }
   }
 
@@ -130,6 +159,10 @@ export class PK6 extends PKM {
 
   public set encryptionConstant(value: number) {
     this.bytes.set(uint32ToBytesLittleEndian(value), 0x00)
+  }
+
+  public get sanity() {
+    return bytesToUint16LittleEndian(this.bytes, 0x04)
   }
 
   public get checksum() {
@@ -724,11 +757,9 @@ export class PK6 extends PKM {
         ? `in the ${GameOfOriginData[this.gameOfOrigin]?.region} region`
         : 'in a faraway place'
     }
-    const locationBlock = G6Location[Math.floor(this.metLocationIndex / 10000) * 10000]
-    if (locationBlock) {
-      return `in ${locationBlock[this.metLocationIndex % 10000]}`
-    }
-    return undefined
+    const locationBlock =
+      G6Location[Math.floor(this.metLocationIndex / 10000) * 10000] ?? G6Location[0]
+    return `in ${locationBlock[this.metLocationIndex % 10000]}`
   }
 
   public get ball() {
@@ -840,13 +871,43 @@ export class PK6 extends PKM {
     }
   }
 
-  // public refreshChecksum() {
-  //   const newChecksum = get16BitChecksumLittleEndian(this.bytes, 0x08, 0x87);
-  //   this.bytes.set(uint16ToBytesLittleEndian(newChecksum), 0x06);
-  // }
+  public refreshChecksum() {
+    const newChecksum = get16BitChecksumLittleEndian(this.bytes, 0x08, 232)
+    this.bytes.set(uint16ToBytesLittleEndian(newChecksum), 0x06)
+  }
 
-  // public toPCBytes() {
-  //   let shuffledBytes = shuffleBlocksGen45(this.bytes);
-  //   return decryptByteArrayGen45(shuffledBytes);
-  // }
+  public toPCBytes() {
+    const shuffledBytes = shuffleBlocksGen6(this.bytes)
+    return decryptByteArrayGen6(shuffledBytes)
+  }
+
+  public get hasPartyData(): boolean {
+    return this.bytes.length > 0xe8
+  }
+
+  public get statusCondition() {
+    if (!this.hasPartyData) {
+      return 0
+    }
+    return this.bytes[0xe8]
+  }
+
+  public set statusCondition(value: number) {
+    if (this.hasPartyData) {
+      this.bytes[0xe8] = value
+    }
+  }
+
+  public get currentHP() {
+    if (!this.hasPartyData) {
+      return this.stats.hp
+    }
+    return this.bytes[0xf0]
+  }
+
+  public set currentHP(value: number) {
+    if (this.hasPartyData) {
+      this.bytes[0xf0] = value
+    }
+  }
 }

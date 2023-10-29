@@ -35,6 +35,14 @@ export const bytesToUint32BigEndian = (bytes: Uint8Array, index: number) => {
   return bytesToNumberBigEndian(bytes.slice(index, index + 4))
 }
 
+export const bytesToInt32BigEndian = (bytes: Uint8Array, index: number) => {
+  const unsigned = bytesToNumberBigEndian(bytes.slice(index, index + 4))
+  if (!(bytes[index] & 0b10000000)) {
+    return unsigned
+  }
+  return -(~(unsigned - 1) & 0xffffffff)
+}
+
 export const uint16ToBytesLittleEndian = (value: number): Uint8Array => {
   return Uint8Array.from([value & 0xff, (value >> 8) & 0xff])
 }
@@ -54,8 +62,15 @@ export const get8BitChecksum = (bytes: Uint8Array, start: number, end: number) =
 
 export const get16BitChecksumLittleEndian = (bytes: Uint8Array, start: number, end: number) => {
   let checksum = 0
+  // console.log(bytes[0x08].toString(16))
   for (let i = start; i < end; i += 2) {
+    // console.log(bytes[i].toString(16), bytes[i + 1].toString(16))
     checksum = (checksum + bytesToUint16LittleEndian(bytes, i)) & 0xffff
+    // console.log(
+    //   `+ 0x${bytesToUint16LittleEndian(bytes, i).toString(16).padStart(4, '0')} = 0x${checksum
+    //     .toString(16)
+    //     .padStart(4, '0')}`
+    // )
   }
   return checksum
 }
@@ -70,6 +85,15 @@ export const uint32ToBytesLittleEndian = (value: number): Uint8Array => {
     (value >> 8) & 0xff,
     (value >> 16) & 0xff,
     (value >> 24) & 0xff,
+  ])
+}
+
+export const uint32ToBytesBigEndian = (value: number): Uint8Array => {
+  return Uint8Array.from([
+    (value >> 24) & 0xff,
+    (value >> 16) & 0xff,
+    (value >> 8) & 0xff,
+    value & 0xff,
   ])
 }
 

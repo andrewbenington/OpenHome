@@ -1,6 +1,6 @@
+import { uniq } from 'lodash'
 import { GameOfOrigin } from '../../consts'
 import { GEN2_TRANSFER_RESTRICTIONS } from '../../consts/TransferRestrictions'
-import { uniq } from 'lodash'
 import { OHPKM } from '../../types/PKMTypes/OHPKM'
 import { PK2 } from '../../types/PKMTypes/PK2'
 import { SaveType } from '../../types/types'
@@ -8,21 +8,8 @@ import { bytesToUint16BigEndian, get8BitChecksum } from '../../util/ByteLogic'
 import { gen12StringToUTF, utf16StringToGen12 } from '../../util/Strings/StringConverter'
 import { Box, SAV } from './SAV'
 
-export class G2Box implements Box {
-  name: string
-
-  pokemon: Array<PK2 | OHPKM | undefined>
-
-  constructor(name: string, boxSize: number) {
-    this.name = name
-    this.pokemon = new Array(boxSize)
-  }
-}
-
-export class G2SAV extends SAV {
+export class G2SAV extends SAV<PK2> {
   boxOffsets: number[]
-
-  boxes: Array<G2Box>
 
   pkmType = PK2
 
@@ -55,12 +42,12 @@ export class G2SAV extends SAV {
         this.invalid = true
         return
     }
-    this.boxes = new Array<G2Box>(this.boxOffsets.length)
+    this.boxes = new Array(this.boxOffsets.length)
     if (this.saveType >= SaveType.GS_I && this.saveType <= SaveType.C_I) {
       const pokemonPerBox = this.boxRows * this.boxColumns
       this.boxOffsets.forEach((offset, boxNumber) => {
         const monCount = bytes[offset]
-        this.boxes[boxNumber] = new G2Box(`Box ${boxNumber + 1}`, pokemonPerBox)
+        this.boxes[boxNumber] = new Box(`Box ${boxNumber + 1}`, pokemonPerBox)
         for (let monIndex = 0; monIndex < monCount; monIndex++) {
           const mon = new PK2(
             this.bytes.slice(
@@ -107,19 +94,19 @@ export class G2SAV extends SAV {
           if (boxMon instanceof OHPKM) {
             changedMonPKMs.push(boxMon)
           }
-          const PK2Mon = boxMon instanceof PK2 ? boxMon : new PK2(boxMon)
+          const pk2Mon = boxMon instanceof PK2 ? boxMon : new PK2(undefined, undefined, boxMon)
           // set the mon's dex number in the box
-          this.bytes[boxByteOffset + 1 + numMons] = PK2Mon.dexNum
+          this.bytes[boxByteOffset + 1 + numMons] = pk2Mon.dexNum
           // set the mon's data in the box
-          this.bytes.set(PK2Mon.bytes, boxByteOffset + 1 + pokemonPerBox + 1 + numMons * 0x20)
+          this.bytes.set(pk2Mon.bytes, boxByteOffset + 1 + pokemonPerBox + 1 + numMons * 0x20)
           // set the mon's OT name in the box
-          const trainerNameBuffer = utf16StringToGen12(PK2Mon.trainerName, 11, true)
+          const trainerNameBuffer = utf16StringToGen12(pk2Mon.trainerName, 11, true)
           this.bytes.set(
             trainerNameBuffer,
             boxByteOffset + 1 + pokemonPerBox + 1 + pokemonPerBox * 0x20 + numMons * 11
           )
           // set the mon's nickname in the box
-          const nicknameBuffer = utf16StringToGen12(PK2Mon.nickname, 11, true)
+          const nicknameBuffer = utf16StringToGen12(pk2Mon.nickname, 11, true)
           this.bytes.set(
             nicknameBuffer,
             boxByteOffset +

@@ -1,4 +1,5 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { PKM } from '../../../types/PKMTypes/PKM'
 import { SAV } from '../../../types/SAVTypes'
 import { SaveRefMap } from '../../../types/types'
 import { RootState } from '../state'
@@ -13,11 +14,12 @@ export const recentSavesSlice = createSlice({
   name: 'recentSaves',
   initialState,
   reducers: {
-    upsertRecentSave: (state, action: PayloadAction<SAV>) => {
+    upsertRecentSave: (state, action: PayloadAction<SAV<PKM>>) => {
       if (!action.payload.filePath) {
         return
       }
       const saveRef = action.payload.getSaveRef()
+      console.log('send add')
       window.electron.ipcRenderer.send('add-recent-save', saveRef)
       state[action.payload.filePath] = saveRef
     },

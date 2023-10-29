@@ -459,7 +459,8 @@ export const utf16StringToGen3 = (
   terminateFill: boolean
 ) => {
   const bufView = new Uint8Array(length)
-  for (let i = 0; i < Math.min(str.length, length); i++) {
+  let i = 0
+  for (; i < Math.min(str.length, length); i++) {
     const gen3Char = Gen3CharacterSet.indexOf(str.charAt(i))
     if (str.charCodeAt(i) === 0) {
       break
@@ -470,12 +471,15 @@ export const utf16StringToGen3 = (
       bufView[i] = gen3Char
     }
   }
+  const terminatorStart = i + 1
+  if (terminatorStart === length) {
+    // no room for terminator
+    return bufView
+  }
   if (terminateFill) {
-    const terminalIndex = Math.min(length - 1, str.length)
-    bufView.set(new Uint8Array(length - terminalIndex).fill(0xff), terminalIndex)
+    bufView.set(new Uint8Array(length - terminatorStart).fill(0xff), terminatorStart)
   } else if (terminate) {
-    const terminalIndex = Math.min(length - 1, str.length)
-    bufView[terminalIndex] = 0xff
+    bufView[terminatorStart] = 0xff
   }
   return bufView
 }
@@ -611,11 +615,16 @@ export const utf16BytesToString = (
  * @param length character length of string
  * @returns UInt8Array of UTF-16 bytes
  */
-export const utf16StringToBytes = (str: string, length: number) => {
+export const utf16StringToBytes = (str: string, length: number, bigEndian: boolean = false) => {
   const buf = new ArrayBuffer(length * 2)
   const bufView = new Uint16Array(buf)
   for (let i = 0; i < Math.min(str.length, length); i++) {
-    bufView[i] = str.charCodeAt(i)
+    if (bigEndian) {
+      const leCode = str.charCodeAt(i)
+      bufView[i] = ((leCode & 0xff) << 8) | ((leCode >> 8) & 0xff)
+    } else {
+      bufView[i] = str.charCodeAt(i)
+    }
   }
   return new Uint8Array(buf)
 }

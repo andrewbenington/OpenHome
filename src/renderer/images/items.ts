@@ -1,6 +1,6 @@
 import { ItemGen2, ItemGen2ToString } from '../../resources/gen/items/Gen2'
 import { ItemGen3, ItemGen3ToString } from '../../resources/gen/items/Gen3'
-import { ItemToString, Item, ItemFromString } from '../../resources/gen/items/Items'
+import { Item, ItemFromString, ItemToString } from '../../resources/gen/items/Items'
 
 const BallIcons: { [key: string]: string } = {
   Master: 'items/index/0001.png',
@@ -29,6 +29,7 @@ const BallIcons: { [key: string]: string } = {
   Sport: 'items/index/0499.png',
   Dream: 'items/index/0576.png',
   Beast: 'items/index/0851.png',
+  Strange: 'items/index/1785.png',
   PokeLA: 'items/index/1710.png',
   GreatLA: 'items/index/1711.png',
   UltraLA: 'items/index/1712.png',
@@ -69,6 +70,7 @@ export const BallsList = [
   BallIcons.Sport,
   BallIcons.Dream,
   BallIcons.Beast,
+  BallIcons.Strange,
   BallIcons.PokeLA,
   BallIcons.GreatLA,
   BallIcons.UltraLA,

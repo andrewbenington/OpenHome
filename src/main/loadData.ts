@@ -18,6 +18,7 @@ const SaveTypeStrings: { [key: string]: SaveType } = {
   Pt: SaveType.Pt,
   HGSS: SaveType.HGSS,
   G5: SaveType.G5,
+  G6: SaveType.G6,
 }
 
 export function loadOHPKMs() {

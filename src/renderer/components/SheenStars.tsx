@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { COLOPKM, PK3, PKM, XDPKM } from '../../types/PKMTypes'
+import { COLOPKM, PK3, BasePKMData, XDPKM } from '../../types/PKMTypes'
 import { Styles } from '../../types/types'
 import { getPublicImageURL } from '../images/images'
 
@@ -24,10 +24,10 @@ const styles = {
 } as Styles
 
 interface SheenStarsProps {
-  mon: PKM
+  mon: BasePKMData
 }
 
-const getSheenStars = (mon: PKM) => {
+const getSheenStars = (mon: BasePKMData) => {
   if (!mon.contest) {
     return 0
   }

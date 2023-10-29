@@ -1,14 +1,20 @@
 import { Card, Grid } from '@mui/material'
 import { useMemo } from 'react'
+import { hasGen5OnlyData } from 'src/types/interfaces/gen5'
+import { hasGen8OnlyData, hasPLAData } from 'src/types/interfaces/gen8'
 import { POKEMON_DATA } from '../../consts'
 import { PKM } from '../../types/PKMTypes/PKM'
 import { getTypes } from '../../types/PKMTypes/util'
+import { hasGen2OnData } from '../../types/interfaces/gen2'
+import { hasGen3OnData, hasOrreData } from '../../types/interfaces/gen3'
 import { Styles } from '../../types/types'
 import TypeIcon from '../components/TypeIcon'
 import { getPublicImageURL } from '../images/images'
-import { getPokemonSpritePath } from '../images/pokemon'
-import AttributeRow from './AttributeRow'
 import { BallsList, getItemIconPath } from '../images/items'
+import { getPokemonSpritePath } from '../images/pokemon'
+import { getTypeColor } from '../util/PokemonSprite'
+import AttributeRow from './AttributeRow'
+import AttributeTag from './AttributeTag'
 
 const styles = {
   column: {
@@ -46,7 +52,7 @@ const SummaryDisplay = (props: { mon: PKM }) => {
 
   return (
     <Grid container>
-      <Grid xs={5}>
+      <Grid item xs={5}>
         <div style={styles.column}>
           <img
             draggable={false}
@@ -56,20 +62,17 @@ const SummaryDisplay = (props: { mon: PKM }) => {
           />
         </div>
         <div style={styles.nicknameRow}>
-          {mon.ball ? (
+          {hasGen3OnData(mon) ? (
             <img
               draggable={false}
               alt="poke ball type"
               style={{ width: 24, height: 24 }}
-              src={BallsList[mon.ball ?? 3]}
+              src={BallsList[mon.ball]}
             />
           ) : (
             <div />
           )}
-          <p style={{ fontWeight: 'bold' }}>
-            {mon.nickname}
-            {mon.affixedRibbonTitle ? ` ${mon.affixedRibbonTitle}` : ''}
-          </p>
+          <p style={{ fontWeight: 'bold' }}>{mon.nickname}</p>
           <Card style={styles.language}>{mon.language}</Card>
         </div>
         <AttributeRow label="Item" justifyEnd>
@@ -82,12 +85,48 @@ const SummaryDisplay = (props: { mon: PKM }) => {
           )}
           <div>{mon.heldItem}</div>
         </AttributeRow>
+        <div style={styles.flexRowWrap}>
+          {mon.isShiny && (
+            <AttributeTag
+              icon={getPublicImageURL('icons/Shiny.png')}
+              color="white"
+              backgroundColor="#cc0000"
+            />
+          )}
+          {hasGen8OnlyData(mon) && mon.canGigantamax && (
+            <AttributeTag
+              icon={getPublicImageURL('icons/GMax.png')}
+              color="white"
+              backgroundColor="#e60040"
+            />
+          )}
+          {hasPLAData(mon) && (
+            <>
+              {mon.isAlpha && (
+                <AttributeTag
+                  icon={getPublicImageURL('icons/Alpha.png')}
+                  color="white"
+                  backgroundColor="#f2352d"
+                />
+              )}
+              {mon.isNoble && (
+                <AttributeTag label="NOBLE" backgroundColor="#cccc00" color="white" />
+              )}
+            </>
+          )}
+          {hasOrreData(mon) && mon.isShadow && (
+            <AttributeTag label="SHADOW" backgroundColor={getTypeColor('shadow')} color="white" />
+          )}
+          {hasGen5OnlyData(mon) && mon.isNsPokemon && (
+            <AttributeTag label="N's Pokémon" backgroundColor="green" color="white" />
+          )}
+        </div>
       </Grid>
-      <Grid xs={7} style={styles.attributesList}>
+      <Grid item xs={7} style={styles.attributesList}>
         <AttributeRow
           label="Name"
           value={`${POKEMON_DATA[mon.dexNum]?.formes[mon.formNum]?.formeName} ${
-            ['♂', '♀', ''][mon.gender]
+            hasGen2OnData(mon) ? ['♂', '♀', ''][mon.gender] : ''
           }`}
         />
         <AttributeRow label="Dex No." value={`${mon.dexNum}`} />
@@ -101,7 +140,7 @@ const SummaryDisplay = (props: { mon: PKM }) => {
             .toString()
             .padStart(['PK7', 'PK8', 'PA8', 'PK9'].includes(mon.format) ? 6 : 5, '0')}`}
         />
-        {mon.ability !== undefined && (
+        {hasGen3OnData(mon) && (
           <AttributeRow
             label="Ability"
             value={`${mon.ability} (${mon.abilityNum === 4 ? 'HA' : mon.abilityNum})`}

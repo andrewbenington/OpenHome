@@ -1,8 +1,11 @@
 import { ArrowBack, ArrowForward, Close } from '@mui/icons-material'
 import { Card, Grid, useTheme } from '@mui/material'
-import { GameOfOriginData } from '../../consts'
 import _ from 'lodash'
 import { useMemo } from 'react'
+import { GameOfOriginData } from '../../consts'
+import { PKM } from '../../types/PKMTypes/PKM'
+import { isRestricted } from '../../types/TransferRestrictions'
+import { SaveCoordinates, getSaveTypeString } from '../../types/types'
 import OpenHomeButton from '../components/OpenHomeButton'
 import { useAppDispatch } from '../redux/hooks'
 import { useDragMon, useSaves } from '../redux/selectors'
@@ -13,9 +16,6 @@ import {
   setSaveBox,
   startDrag,
 } from '../redux/slices/appSlice'
-import { SaveCoordinates, getSaveTypeString } from '../../types/types'
-import { PKM } from '../../types/PKMTypes/PKM'
-import { isRestricted } from '../../types/TransferRestrictions'
 import ArrowButton from './ArrowButton'
 import BoxCell from './BoxCell'
 

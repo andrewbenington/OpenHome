@@ -1,4 +1,3 @@
-import { contestStats, marking, pokedate, stats } from '../../types/types'
 import {
   Ball,
   GameOfOrigin,
@@ -15,6 +14,7 @@ import {
 import G4Locations from '../../consts/MetLocation/G4'
 import { ItemFromString, ItemToString } from '../../resources/gen/items/Items'
 import { AbilityFromString, AbilityToString } from '../../resources/gen/other/Abilities'
+import { contestStats, marking, pokedate, stats } from '../../types/types'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -31,8 +31,10 @@ import {
 } from '../../util/Encryption'
 import { getHPGen3Onward, getLevelGen3Onward, getStatGen3Onward } from '../../util/StatCalc'
 import { gen4StringToUTF, utf16StringToGen4 } from '../../util/Strings/StringConverter'
+import { BasePKMData } from '../interfaces/base'
+import { SanityChecksum } from '../interfaces/gen3'
+import { Gen4EncounterType, Gen4OnData, Gen4OnlyData } from '../interfaces/gen4'
 import { OHPKM } from './OHPKM'
-import { PKM } from './PKM'
 import {
   adjustMovePPBetweenFormats,
   generatePersonalityValuePreservingAttributes,
@@ -42,23 +44,34 @@ import {
 
 export const GEN4_MOVE_MAX = 467
 
-export class PK4 extends PKM {
-  constructor(...args: any[]) {
-    if (args.length >= 1 && args[0] instanceof Uint8Array) {
-      const bytes = args[0]
-      const encrypted = args[1] ?? false
+export class PK4
+  implements BasePKMData, Gen4OnData, Gen4EncounterType, Gen4OnlyData, SanityChecksum
+{
+  public get fileSize() {
+    return 136
+  }
+
+  get markingCount(): number {
+    return 4
+  }
+
+  get markingColors(): number {
+    return 1
+  }
+
+  bytes = new Uint8Array(136)
+
+  constructor(bytes?: Uint8Array, encrypted?: boolean, other?: OHPKM) {
+    if (bytes) {
       if (encrypted) {
         const unencryptedBytes = decryptByteArrayGen45(bytes)
         const unshuffledBytes = unshuffleBlocksGen45(unencryptedBytes)
-        super(unshuffledBytes)
+        this.bytes = unshuffledBytes
       } else {
-        super(bytes)
+        this.bytes = bytes
       }
       this.refreshChecksum()
-    } else if (args.length === 1 && args[0] instanceof OHPKM) {
-      const other = args[0]
-      super(new Uint8Array(136))
-      this.sanity = other.sanity
+    } else if (other) {
       this.dexNum = other.dexNum
       this.formNum = other.formNum
       this.heldItem = other.heldItem
@@ -141,8 +154,6 @@ export class PK4 extends PKM {
       this.metLevel = other.metLevel ?? this.level
       this.trainerGender = other.trainerGender
       this.refreshChecksum()
-    } else {
-      super(args[0])
     }
   }
 
@@ -156,6 +167,10 @@ export class PK4 extends PKM {
 
   public set personalityValue(value: number) {
     this.bytes.set(uint32ToBytesLittleEndian(value), 0x00)
+  }
+
+  public get sanity() {
+    return bytesToUint16LittleEndian(this.bytes, 0x04)
   }
 
   public get checksum() {
@@ -527,11 +542,9 @@ export class PK4 extends PKM {
   }
 
   public get metLocation() {
-    const locationBlock = G4Locations[Math.floor(this.metLocationIndex / 1000) * 1000]
-    if (locationBlock) {
-      return `in ${locationBlock[this.metLocationIndex % 1000]}`
-    }
-    return undefined
+    const locationBlock =
+      G4Locations[Math.floor(this.metLocationIndex / 1000) * 1000] ?? G4Locations[0]
+    return `in ${locationBlock[this.metLocationIndex % 1000]}`
   }
 
   public get nickname() {
@@ -689,5 +702,35 @@ export class PK4 extends PKM {
   public toPCBytes() {
     const shuffledBytes = shuffleBlocksGen45(this.bytes)
     return decryptByteArrayGen45(shuffledBytes)
+  }
+
+  public get hasPartyData(): boolean {
+    return this.bytes.length >= 0x50
+  }
+
+  public get currentHP() {
+    if (!this.hasPartyData) {
+      return this.stats.hp
+    }
+    return this.bytes[0x8e]
+  }
+
+  public set currentHP(value: number) {
+    if (this.hasPartyData) {
+      this.bytes[0x8e] = value
+    }
+  }
+
+  public get statusCondition() {
+    if (!this.hasPartyData) {
+      return 0
+    }
+    return this.bytes[0x88]
+  }
+
+  public set statusCondition(value: number) {
+    if (this.hasPartyData) {
+      this.bytes[0x88] = value
+    }
   }
 }

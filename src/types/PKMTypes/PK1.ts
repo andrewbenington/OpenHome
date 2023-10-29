@@ -1,6 +1,6 @@
-import { statsPreSplit } from '../../types/types'
-import { GameOfOrigin, POKEMON_DATA } from '../../consts'
+import { GameOfOrigin, NDex, POKEMON_DATA, isGameBoy } from '../../consts'
 import { ItemGen2FromString, ItemGen2ToString } from '../../resources/gen/items/Gen2'
+import { statsPreSplit } from '../../types/types'
 import {
   bytesToUint16BigEndian,
   bytesToUint24BigEndian,
@@ -10,8 +10,9 @@ import {
 import { gen1IDToNatDex, natDexToGen1ID } from '../../util/ConvertPokemonID'
 import { getLevelGen12 } from '../../util/StatCalc'
 import { gen12StringToUTF } from '../../util/Strings/StringConverter'
+import { BasePKMData } from '../interfaces/base'
+import { Gen1Stats } from '../interfaces/stats'
 import { OHPKM } from './OHPKM'
-import { PKM } from './PKM'
 import { adjustMovePPBetweenFormats, getTypes } from './util'
 
 const gen1TypeIndices: { [key: string]: number } = {
@@ -34,7 +35,75 @@ const gen1TypeIndices: { [key: string]: number } = {
 
 export const GEN1_MOVE_MAX = 165
 
-export class PK1 extends PKM {
+export class PK1 implements BasePKMData, Gen1Stats {
+  get fileSize(): number {
+    return 33
+  }
+
+  get markingCount(): number {
+    return 0
+  }
+
+  get markingColors(): number {
+    return 0
+  }
+
+  bytes = new Uint8Array(33)
+  nickname = 'NO NAME'
+  trainerName = 'TRAINER'
+  gameOfOrigin = GameOfOrigin.Red
+  language = 'ENG'
+
+  constructor(bytes?: Uint8Array, _?: boolean, other?: OHPKM) {
+    if (bytes) {
+      if (bytes[2] === 0xff) {
+        this.bytes = bytes.slice(3)
+      } else {
+        this.bytes = bytes
+      }
+      if (this.bytes.length >= 0x41) {
+        this.nickname = gen12StringToUTF(this.bytes, 0x37, 11)
+        if (this.bytes[0x2c] === 0x5d) {
+          this.trainerName = 'TRAINER'
+        } else {
+          this.trainerName = gen12StringToUTF(this.bytes, 0x2c, 11)
+        }
+      } else {
+        this.nickname = POKEMON_DATA[this.dexNum].name.toLocaleUpperCase()
+      }
+      this.level = this.dexNum > 0 ? getLevelGen12(this.dexNum, this.exp) : 0
+    } else if (other) {
+      this.dexNum = other.dexNum
+      this.heldItem = other.heldItem
+      this.currentHP = other.currentHP
+      // treated as a tracking number for non-GB origin mons
+      if (!isGameBoy(other.gameOfOrigin) && other.personalityValue !== undefined) {
+        this.trainerID = other.personalityValue % 0x10000
+      } else {
+        this.trainerID = other.trainerID
+      }
+      this.exp = other.exp
+      this.level = this.dexNum > 0 ? getLevelGen12(this.dexNum, this.exp) : 0
+      const validMoves = other.moves.filter((move) => move <= GEN1_MOVE_MAX)
+      const validMovePP = adjustMovePPBetweenFormats(this, other).filter(
+        (_, i) => other.moves[i] <= GEN1_MOVE_MAX
+      )
+      const validMovePPUps = other.movePPUps.filter((_, i) => other.moves[i] <= GEN1_MOVE_MAX)
+      this.moves = [validMoves[0], validMoves[1], validMoves[2], validMoves[3]]
+      this.movePPUps = [validMovePPUps[0], validMovePPUps[1], validMovePPUps[2], validMovePPUps[3]]
+      this.movePP = [validMovePP[0], validMovePP[1], validMovePP[2], validMovePP[3]]
+      this.evsG12 = other.evsG12
+      this.dvs = other.dvs
+      const types = getTypes(this)
+      this.type1 = types[0] in gen1TypeIndices ? gen1TypeIndices[types[0]] : 0
+      this.type2 = types[1] in gen1TypeIndices ? gen1TypeIndices[types[1]] : this.type1
+      this.nickname = other.nickname
+      this.trainerName = other.trainerName
+      this.gameOfOrigin = other.gameOfOrigin
+      this.language = other.language
+    }
+  }
+
   public get format() {
     return 'PK1'
   }
@@ -89,7 +158,7 @@ export class PK1 extends PKM {
 
   // catch rate
   public get heldItemIndex() {
-    return this.bytes[0x07]
+    return 0
   }
 
   public set heldItemIndex(value: number) {
@@ -123,6 +192,10 @@ export class PK1 extends PKM {
 
   public set trainerID(value: number) {
     this.bytes.set(uint16ToBytesBigEndian(value), 0x0c)
+  }
+
+  public get secretID() {
+    return 0
   }
 
   public get displayID() {
@@ -234,54 +307,22 @@ export class PK1 extends PKM {
     )
   }
 
-  constructor(...args: any[]) {
-    if (args[0] instanceof Uint8Array) {
-      super(args[0])
-      if (this.bytes.length >= 0x41) {
-        this.nickname = gen12StringToUTF(this.bytes, 0x37, 11)
-        if (this.bytes[0x2c] === 0x5d) {
-          this.trainerName = 'TRAINER'
-        } else {
-          this.trainerName = gen12StringToUTF(this.bytes, 0x2c, 11)
-        }
-      } else {
-        this.nickname = POKEMON_DATA[this.dexNum].name.toLocaleUpperCase()
-      }
-      this.level = this.dexNum > 0 ? getLevelGen12(this.dexNum, this.exp) : 0
-      this.gameOfOrigin = GameOfOrigin.Red
-    } else if (args[0] instanceof OHPKM) {
-      super(new Uint8Array(33))
-      const other = args[0]
-      this.dexNum = other.dexNum
-      this.heldItem = other.heldItem
-      this.currentHP = other.currentHP
-      // treated as a tracking number for non-GB origin mons
-      if (!other.isGameBoyOrigin && other.personalityValue !== undefined) {
-        this.trainerID = other.personalityValue % 0x10000
-      } else {
-        this.trainerID = other.trainerID
-      }
-      this.exp = other.exp
-      this.level = this.dexNum > 0 ? getLevelGen12(this.dexNum, this.exp) : 0
-      const validMoves = other.moves.filter((move) => move <= GEN1_MOVE_MAX)
-      const validMovePP = adjustMovePPBetweenFormats(this, other).filter(
-        (_, i) => other.moves[i] <= GEN1_MOVE_MAX
-      )
-      const validMovePPUps = other.movePPUps.filter((_, i) => other.moves[i] <= GEN1_MOVE_MAX)
-      this.moves = [validMoves[0], validMoves[1], validMoves[2], validMoves[3]]
-      this.movePPUps = [validMovePPUps[0], validMovePPUps[1], validMovePPUps[2], validMovePPUps[3]]
-      this.movePP = [validMovePP[0], validMovePP[1], validMovePP[2], validMovePP[3]]
-      this.evsG12 = other.evsG12
-      this.dvs = other.dvs
-      const types = getTypes(this)
-      this.type1 = types[0] in gen1TypeIndices ? gen1TypeIndices[types[0]] : 0
-      this.type2 = types[1] in gen1TypeIndices ? gen1TypeIndices[types[1]] : this.type1
-      this.nickname = other.nickname
-      this.trainerName = other.trainerName
-      this.gameOfOrigin = other.gameOfOrigin
-      this.language = other.language
-    } else {
-      super(new Uint8Array())
+  public get isFatefulEncounter(): boolean {
+    return this.dexNum === NDex.MEW
+  }
+
+  public get trainerGender(): number {
+    return 0
+  }
+
+  // TODO: gen 1 stat calc
+  public get stats(): statsPreSplit {
+    return {
+      hp: 0,
+      atk: 0,
+      def: 0,
+      spe: 0,
+      spc: 0,
     }
   }
 }

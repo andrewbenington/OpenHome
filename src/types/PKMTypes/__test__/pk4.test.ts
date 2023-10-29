@@ -38,7 +38,7 @@ const typhlosionGen4 = bytesToPKM(
 ) as PK4
 
 test('gen 4 EVs are updated', () => {
-  const gen4pkm = new PK4(mightyenaOH)
+  const gen4pkm = new PK4(undefined, undefined, mightyenaOH)
   // mimicking ev reduction berries and ev gain
   gen4pkm.evs = {
     atk: 252,
@@ -60,7 +60,7 @@ test('gen 4 EVs are updated', () => {
 })
 
 test('gen 4 ribbons are updated', () => {
-  const gen4pkm = new PK4(mightyenaOH)
+  const gen4pkm = new PK4(undefined, undefined, mightyenaOH)
   // gaining Gen 4 ribbons
   gen4pkm.ribbons = [...gen4pkm.ribbons, 'Winning', 'Beauty (Sinnoh)', 'National']
   mightyenaOH.updateData(gen4pkm)
@@ -73,7 +73,7 @@ test('gen 4 ribbons are updated', () => {
 })
 
 test('gen 4 contest stats are updated', () => {
-  const emeraldPKM = new PK4(mightyenaOH)
+  const emeraldPKM = new PK4(undefined, undefined, mightyenaOH)
   // gaining cool contest points
   emeraldPKM.contest = {
     cool: 30,
@@ -95,24 +95,24 @@ test('gen 4 contest stats are updated', () => {
 })
 
 test('gen 4 conversion to OHPKM and back is lossless', () => {
-  const ohPKM = new OHPKM(typhlosionGen4)
+  const ohPKM = new OHPKM(undefined, typhlosionGen4)
   // gaining cool contest points
-  const gen4PKM = new PK4(ohPKM)
+  const gen4PKM = new PK4(undefined, undefined, ohPKM)
   expect(typhlosionGen4.bytes).toEqual(gen4PKM.bytes)
 })
 
 test('pk4 and ohpkm have the same gen345Lookup key', () => {
-  const ohPKM = new OHPKM(typhlosionGen4)
+  const ohPKM = new OHPKM(undefined, typhlosionGen4)
   expect(getMonGen345Identifier(ohPKM)).toEqual(getMonGen345Identifier(typhlosionGen4))
 })
 
 test('gen 6+ nickname accuracy', () => {
-  const converted = new PK4(slowpokeOH)
+  const converted = new PK4(undefined, undefined, slowpokeOH)
   expect(converted.nickname).toBe(slowpokeOH.nickname)
 })
 
 test('gen 6+ shiny accuracy', () => {
-  const converted = new PK4(slowpokeOH)
+  const converted = new PK4(undefined, undefined, slowpokeOH)
   if (!slowpokeOH.personalityValue) {
     throw Error('mon has no personality value')
   }
@@ -120,6 +120,6 @@ test('gen 6+ shiny accuracy', () => {
 })
 
 test('gen 6+ nature accuracy', () => {
-  const converted = new PK4(slowpokeOH)
+  const converted = new PK4(undefined, undefined, slowpokeOH)
   expect(converted.nature).toBe(slowpokeOH.nature)
 })

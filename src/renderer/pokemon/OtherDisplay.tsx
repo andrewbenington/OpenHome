@@ -2,15 +2,19 @@
 import { ArrowForwardIosSharp } from '@mui/icons-material'
 import Accordion from '@mui/material/Accordion'
 import AccordionSummary from '@mui/material/AccordionSummary'
-import { Countries, NDex, SWEETS, isAlola, isGen6 } from '../../consts'
+import { hasGen3OnData } from 'src/types/interfaces/gen3'
+import { hasGen4OnData, hasGen4OnlyData, shinyLeafValues } from 'src/types/interfaces/gen4'
+import { hasGen6OnData, hasN3DSOnlyData } from 'src/types/interfaces/gen6'
+import { hasGen8OnData, hasGen8OnlyData } from 'src/types/interfaces/gen8'
+import { hasGen9OnlyData } from 'src/types/interfaces/gen9'
+import { Countries, EncounterTypes, NDex, SWEETS, isGen4 } from '../../consts'
 import {
   GEN2_TRANSFER_RESTRICTIONS,
   HGSS_TRANSFER_RESTRICTIONS,
+  SV_TRANSFER_RESTRICTIONS,
+  SWSH_TRANSFER_RESTRICTIONS,
+  USUM_TRANSFER_RESTRICTIONS,
 } from '../../consts/TransferRestrictions'
-import DynamaxLevel from '../components/DynamaxLevel'
-import ShinyLeaves from '../components/ShinyLeaves'
-import TypeIcon from '../components/TypeIcon'
-import { OHPKM, PK1, PK2, PK3, PK4, PK5, PKM } from '../../types/PKMTypes'
 import { isRestricted } from '../../types/TransferRestrictions'
 import { Styles } from '../../types/types'
 import {
@@ -18,10 +22,14 @@ import {
   getMonGen12Identifier,
   getMonGen345Identifier,
 } from '../../util/Lookup'
-import { getTypeColor } from '../util/PokemonSprite'
+import DynamaxLevel from '../components/DynamaxLevel'
+import ShinyLeaves from '../components/ShinyLeaves'
+import TypeIcon from '../components/TypeIcon'
 import AttributeRow from './AttributeRow'
-import AttributeTag from './AttributeTag'
-import { getPublicImageURL } from '../images/images'
+import { PKM } from '../../types/PKMTypes/PKM'
+import { hasGameBoyData } from '../../types/interfaces/stats'
+import { OHPKM } from '../../types/PKMTypes'
+import { get16BitChecksumLittleEndian } from 'src/util/ByteLogic'
 
 const styles = {
   accordion: {
@@ -62,19 +70,15 @@ const OtherDisplay = (props: { mon: PKM }) => {
   const { mon } = props
   return (
     <div style={styles.detailsPaneContent}>
-      {mon.personalityValue !== undefined ? (
+      {'personalityValue' in mon && (
         <AttributeRow label="Personality Value">
           <code>{`0x${mon.personalityValue.toString(16).padStart(8, '0')}`}</code>
         </AttributeRow>
-      ) : (
-        <div />
       )}
-      {mon.encryptionConstant !== undefined ? (
+      {'encryptionConstant' in mon && (
         <AttributeRow label="Encryption Constant">
           <code>{`0x${mon.encryptionConstant.toString(16).padStart(8, '0')}`}</code>
         </AttributeRow>
-      ) : (
-        <div />
       )}
       <Accordion
         disableGutters
@@ -92,26 +96,22 @@ const OtherDisplay = (props: { mon: PKM }) => {
           />
         </AccordionSummary>
         <AttributeRow label="ID" value={mon.displayID.toString()} indent={10} />
-        {mon.secretID !== undefined ? (
+        {mon.secretID !== undefined && (
           <AttributeRow label="Secret ID" indent={10}>
             <code>{`0x${mon.secretID.toString(16).padStart(4, '0')}`}</code>
           </AttributeRow>
-        ) : (
-          <div />
         )}
-        {mon.trainerFriendship !== undefined ? (
+        {'trainerFriendship' in mon && (
           <AttributeRow label="Friendship" value={mon.trainerFriendship.toString()} indent={10} />
-        ) : (
-          <div />
         )}
-        {mon.trainerAffection !== undefined &&
-        (isGen6(mon.gameOfOrigin) || isAlola(mon.gameOfOrigin)) ? (
+        {'trainerAffection' in mon && (
           <AttributeRow label="Affection" value={mon.trainerAffection.toString()} indent={10} />
-        ) : (
-          <div />
+        )}
+        {'isCurrentHandler' in mon && (
+          <AttributeRow label="Trained last" value={`${!mon.isCurrentHandler}`} indent={10} />
         )}
       </Accordion>
-      {mon.handlerName ? (
+      {hasGen6OnData(mon) && mon.handlerName !== '' ? (
         <Accordion
           disableGutters
           elevation={0}
@@ -127,74 +127,67 @@ const OtherDisplay = (props: { mon: PKM }) => {
               value={`${mon.handlerName} ${mon.handlerGender ? '♀' : '♂'}`}
             />
           </AccordionSummary>
-          {mon.handlerID !== undefined ? (
+          {hasGen8OnData(mon) && (
             <AttributeRow label="ID" value={mon.handlerID.toString()} indent={10} />
-          ) : (
-            <div />
           )}
-          {mon.handlerFriendship !== undefined ? (
-            <AttributeRow label="Friendship" value={mon.handlerFriendship.toString()} indent={10} />
-          ) : (
-            <div />
-          )}
-          {mon.handlerAffection !== undefined ? (
+          <AttributeRow label="Friendship" value={mon.handlerFriendship.toString()} indent={10} />
+          {hasN3DSOnlyData(mon) && (
             <AttributeRow label="Affection" value={mon.handlerAffection.toString()} indent={10} />
-          ) : (
-            <div />
           )}
         </Accordion>
       ) : (
         <div />
       )}
-      {mon.dexNum === NDex.WURMPLE ? (
+      {hasGen3OnData(mon) && mon.dexNum === NDex.WURMPLE ? (
         <AttributeRow
           label="Wurmple Evolution"
-          value={(((mon.encryptionConstant ?? 0) >> 16) & 0xffff) % 10 > 4 ? 'Dustox' : 'Beautifly'}
+          value={
+            ((((hasGen6OnData(mon) ? mon.encryptionConstant : mon.personalityValue) ?? 0) >> 16) &
+              0xffff) %
+              10 >
+            4
+              ? 'Dustox'
+              : 'Beautifly'
+          }
         />
       ) : (
         <div />
       )}
-      {mon.dexNum === NDex.ALCREMIE && mon.formArgument ? (
+      {hasGen6OnData(mon) && mon.dexNum === NDex.ALCREMIE ? (
         <AttributeRow label="Sweet" value={SWEETS[mon.formArgument]} />
       ) : (
         <div />
       )}
-      {mon.dexNum === NDex.DUNSPARCE && mon.encryptionConstant ? (
+      {hasGen3OnData(mon) && mon.dexNum === NDex.DUNSPARCE ? (
         <AttributeRow
           label="Dudunsparce"
-          value={mon.encryptionConstant % 100 ? 'Two-Segment' : 'Three-Segment'}
+          value={
+            (hasGen6OnData(mon) ? mon.encryptionConstant : mon.personalityValue) % 100
+              ? 'Two-Segment'
+              : 'Three-Segment'
+          }
         />
       ) : (
         <div />
       )}
-      {mon.dexNum === NDex.TANDEMAUS && mon.encryptionConstant ? (
+      {hasGen6OnData(mon) && mon.dexNum === NDex.TANDEMAUS && (
         <AttributeRow
           label="Maushold"
           value={mon.encryptionConstant % 100 ? 'Family of Four' : 'Family of Three'}
         />
-      ) : (
-        <div />
       )}
-      {mon.encounterTypeLabel ? (
-        <AttributeRow label="Encounter Type" value={mon.encounterTypeLabel} />
-      ) : (
-        <div />
+      {hasGen4OnData(mon) && isGen4(mon.gameOfOrigin) && 'encounterType' in mon && (
+        <AttributeRow label="Gen 4 Encounter Type" value={EncounterTypes[mon.encounterType]} />
       )}
-      {!isRestricted(HGSS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
-      mon.shinyLeafValues !== undefined ? (
-        <AttributeRow label="Shiny Leaves">
-          <ShinyLeaves {...mon.shinyLeafValues} />
-        </AttributeRow>
-      ) : (
-        <div />
-      )}
-      {mon.isShiny ? (
-        <AttributeRow label="SwSh Shiny Type" value={mon.isSquareShiny ? 'Square' : 'Star'} />
-      ) : (
-        <div />
-      )}
-
-      {mon.geolocations && mon.geolocations[0].country ? (
+      {hasGen4OnlyData(mon) &&
+        !isRestricted(HGSS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) && (
+          <AttributeRow label="Shiny Leaves">
+            <ShinyLeaves {...shinyLeafValues(mon)} />
+          </AttributeRow>
+        )}
+      {!isRestricted(USUM_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
+      hasN3DSOnlyData(mon) &&
+      mon.geolocations[0].country ? (
         <Accordion
           disableGutters
           elevation={0}
@@ -223,69 +216,57 @@ const OtherDisplay = (props: { mon: PKM }) => {
       ) : (
         <div />
       )}
-      {mon.dynamaxLevel !== undefined && (
-        <AttributeRow label="Dynamax">
-          <DynamaxLevel level={mon.dynamaxLevel} />
-        </AttributeRow>
-      )}
-      {mon.teraTypeOriginal !== undefined && mon.teraTypeOverride !== undefined ? (
-        <AttributeRow label="Tera Type">
-          <TypeIcon
-            typeIndex={mon.teraTypeOverride <= 18 ? mon.teraTypeOverride : mon.teraTypeOriginal}
-          />
-          {mon.teraTypeOverride <= 18 && (
-            <>
-              <p>(originally </p>
-              <TypeIcon typeIndex={mon.teraTypeOriginal} />
-              <p>)</p>
-            </>
-          )}
-        </AttributeRow>
-      ) : (
-        <div />
+      {!isRestricted(SWSH_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
+        hasGen8OnlyData(mon) && (
+          <>
+            <AttributeRow label="Dynamax">
+              <DynamaxLevel level={mon.dynamaxLevel} />
+            </AttributeRow>
+            <AttributeRow label="Can Gigantimax" value={mon.canGigantamax ? 'true' : 'false'} />
+            {mon.isShiny && (
+              <AttributeRow label="SwSh Shiny Type" value={mon.isSquareShiny ? 'Square' : 'Star'} />
+            )}
+          </>
+        )}
+      {!isRestricted(SV_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) && hasGen9OnlyData(mon) && (
+        <>
+          <AttributeRow label="Tera Type">
+            <TypeIcon
+              typeIndex={mon.teraTypeOverride <= 18 ? mon.teraTypeOverride : mon.teraTypeOriginal}
+            />
+            {mon.teraTypeOverride <= 18 && (
+              <>
+                <p>(originally </p>
+                <TypeIcon typeIndex={mon.teraTypeOriginal} />
+                <p>)</p>
+              </>
+            )}
+          </AttributeRow>
+          <AttributeRow label="Obedience" value={mon.obedienceLevel.toString()} />
+        </>
       )}
       {!isRestricted(GEN2_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
-      (mon instanceof PK1 || mon instanceof PK2 || mon instanceof OHPKM) ? (
-        <AttributeRow label="Gen 1/2 ID" value={getMonGen12Identifier(mon)} />
-      ) : (
-        <div />
-      )}
-      {!isRestricted(HGSS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
-      (mon instanceof PK3 || mon instanceof PK4 || mon instanceof PK5 || mon instanceof OHPKM) ? (
+        hasGameBoyData(mon) && (
+          <AttributeRow label="Gen 1/2 ID" value={getMonGen12Identifier(mon)} />
+        )}
+      {!isRestricted(HGSS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) && hasGen3OnData(mon) && (
         <AttributeRow label="Gen 3/4/5 ID" value={getMonGen345Identifier(mon)} />
-      ) : (
-        <div />
       )}
-      {mon instanceof OHPKM ? (
+      {'checksum' in mon && (
+        <>
+          <AttributeRow label="Checksum">
+            <code>{`0x${mon.checksum.toString(16).padStart(4, '0')}`}</code>
+          </AttributeRow>
+          <AttributeRow label="Calced Checksum">
+            <code>{`0x${get16BitChecksumLittleEndian(mon.bytes, 0x08, mon.bytes.length)
+              .toString(16)
+              .padStart(4, '0')}`}</code>
+          </AttributeRow>
+        </>
+      )}
+      {mon instanceof OHPKM && (
         <AttributeRow label="OpenHome ID" value={getMonFileIdentifier(mon)} />
-      ) : (
-        <div />
       )}
-      <div style={styles.flexRowWrap}>
-        {mon.canGigantamax && (
-          <AttributeTag
-            icon={getPublicImageURL('icons/GMax.png')}
-            color="white"
-            backgroundColor="#e60040"
-          />
-        )}
-        {mon.isAlpha && (
-          <AttributeTag
-            icon={getPublicImageURL('icons/Alpha.png')}
-            color="white"
-            backgroundColor="#f2352d"
-          />
-        )}
-        {mon.isSquareShiny && (
-          <AttributeTag label="SQUARE SHINY" color="white" backgroundColor="black" />
-        )}
-        {mon.isShadow && (
-          <AttributeTag label="SHADOW" backgroundColor={getTypeColor('shadow')} color="white" />
-        )}
-        {mon.isNsPokemon && (
-          <AttributeTag label="N's Pokémon" backgroundColor="green" color="white" />
-        )}
-      </div>
     </div>
   )
 }

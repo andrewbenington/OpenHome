@@ -3,7 +3,7 @@ import { OHPKM } from '../../types/PKMTypes/OHPKM'
 import { getMonFileIdentifier } from '../../util/Lookup'
 import { Box, BoxCoordinates, SAV } from './SAV'
 
-export class HomeBox implements Box {
+export class HomeBox implements Box<OHPKM> {
   name: string
 
   pokemon: Array<OHPKM | undefined> = new Array(120)
@@ -36,7 +36,7 @@ export class HomeBox implements Box {
   }
 }
 
-export class HomeData extends SAV {
+export class HomeData extends SAV<OHPKM> {
   updatedBoxSlots: BoxCoordinates[] = []
 
   boxRows = 10

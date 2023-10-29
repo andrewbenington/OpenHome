@@ -1,7 +1,8 @@
 import { Grid } from '@mui/material'
 import { Buffer } from 'buffer'
 import hexy from 'hexy'
-import { CSSProperties, useEffect, useState } from 'react'
+import _ from 'lodash'
+import { CSSProperties, Fragment, useEffect, useState } from 'react'
 
 interface HexEditorProps {
   data: Uint8Array
@@ -47,7 +48,7 @@ const HexEditor = ({ data }: HexEditorProps) => {
           return <div key={`line_${i}_prefix`} />
         }
         return (
-          <>
+          <Fragment key={`line_${i}`}>
             <Grid item xs={1.5} key={`line_${i}_prefix`} style={{}}>
               <code
                 key={`line_${i}_prefix`}
@@ -61,19 +62,19 @@ const HexEditor = ({ data }: HexEditorProps) => {
                 {prefix.substring(4, 8)}
               </code>
             </Grid>
-            <Grid item xs={7.5} display="flex" flexDirection="row">
+            <Grid item xs={7.5} key={`line_${i}_bytes`} display="flex" flexDirection="row">
               {bytePairs.map((pair, j) => {
                 const byteIndex = 16 * i + 2 * j
                 return (
-                  <>
+                  <Fragment key={`byte_${byteIndex}`}>
                     <div
-                      key={`byte_${byteIndex}`}
                       style={{
                         backgroundColor: currentHover === byteIndex ? 'white' : '#0000',
                       }}
                       onMouseOver={() => {
                         setCurrentHover(byteIndex)
                       }}
+                      title={`0x${byteIndex.toString(16).padStart(4, '0')}`}
                     >
                       <code>{pair.substring(0, 2)}</code>
                     </div>
@@ -86,15 +87,18 @@ const HexEditor = ({ data }: HexEditorProps) => {
                       onMouseOver={() => {
                         setCurrentHover(byteIndex + 1)
                       }}
+                      title={`0x${(byteIndex + 1).toString(16).padStart(4, '0')}`}
                     >
                       <code>{pair.substring(2)}</code>
                     </div>
-                  </>
+                  </Fragment>
                 )
               })}
             </Grid>
-            <Grid item xs={3} display="flex" flexDirection="row">
-              {ascii.split('').map((char, k) => {
+            <Grid item xs={3} key={`line_${i}_ascii`} display="flex" flexDirection="row">
+              {_.range(16).map((k) => {
+                const char =
+                  ascii.charCodeAt(i) >= 32 && ascii.charCodeAt(i) < 127 ? ascii.charAt(k) : '.'
                 const byteIndex = 16 * i + k
                 return (
                   <div
@@ -102,17 +106,19 @@ const HexEditor = ({ data }: HexEditorProps) => {
                     className="disable-select"
                     style={{
                       backgroundColor: currentHover === byteIndex ? '#fffa' : '#0000',
+                      fontFamily: 'monospace',
                     }}
                     onMouseOver={() => {
                       setCurrentHover(byteIndex)
                     }}
+                    title={`0x${byteIndex.toString(16).padStart(4, '0')}`}
                   >
-                    <code>{char}</code>
+                    {char.charCodeAt(0) >= 32 ? char : '.'}
                   </div>
                 )
               })}
             </Grid>
-          </>
+          </Fragment>
         )
       })}
     </Grid>

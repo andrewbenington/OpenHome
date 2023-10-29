@@ -1,26 +1,18 @@
 /* eslint-disable no-nested-ternary */
-import { Grid, MenuItem, Select } from '@mui/material'
-import {
-  BW2_TRANSFER_RESTRICTIONS,
-  GEN1_TRANSFER_RESTRICTIONS,
-  GEN2_TRANSFER_RESTRICTIONS,
-  GEN3_TRANSFER_RESTRICTIONS,
-  HGSS_TRANSFER_RESTRICTIONS,
-  LA_TRANSFER_RESTRICTIONS,
-  ORAS_TRANSFER_RESTRICTIONS,
-  USUM_TRANSFER_RESTRICTIONS,
-} from '../../consts/TransferRestrictions'
+import { Grid } from '@mui/material'
 import { useState } from 'react'
-import { StringToStringMap, Styles } from '../../types/types'
-import { OHPKM, PA8, PK1, PK2, PK3, PK4, PK5, PK6, PK7, PKM } from '../../types/PKMTypes'
-import { isRestricted } from '../../types/TransferRestrictions'
+import { OHPKM } from '../../types/PKMTypes'
+import { PKM } from '../../types/PKMTypes/PKM'
+import { Styles } from '../../types/types'
 import OpenHomeButton from '../components/OpenHomeButton'
+import FileTypeSelect from './FileTypeSelect'
 import MetDataMovesDisplay from './MetDataMovesDisplay'
 import OtherDisplay from './OtherDisplay'
 import RawDisplay from './RawDisplay'
 import RibbonsDisplay from './RibbonsDisplay'
 import StatsDisplay from './StatsDisplay'
 import SummaryDisplay from './SummaryDisplay'
+import { fileTypeFromString } from '../../util/FileImport'
 
 const styles = {
   tabScrollContainer: {
@@ -48,10 +40,15 @@ const styles = {
     fontSize: 16,
     padding: '10px 20px 12px 20px',
   },
-  detailsTabRow: {
+  detailsTabCol: {
     display: 'flex',
     flexDirection: 'column',
-    overflowX: 'scroll',
+    height: '100%',
+    overflowY: 'scroll',
+  },
+  displayContainer: {
+    height: '100%',
+    overflowY: 'scroll',
   },
   fileTypeChip: {
     color: 'white',
@@ -64,49 +61,6 @@ const styles = {
   },
 } as Styles
 
-const getTypeFromString = (type: string) => {
-  switch (type) {
-    case 'OHPKM':
-      return OHPKM
-    case 'PK1':
-      return PK1
-    case 'PK2':
-      return PK2
-    case 'PK3':
-      return PK3
-    case 'PK4':
-      return PK4
-    case 'PK5':
-      return PK5
-    case 'PK6':
-      return PK6
-    case 'PK7':
-      return PK7
-    case 'PA8':
-      return PA8
-    default:
-      return undefined
-  }
-}
-
-const fileTypeColors: StringToStringMap = {
-  OHPKM: '#748fcd',
-  PK1: '#b34',
-  PK2: '#b6c',
-  PK3: '#9b3',
-  COLOPKM: '#93f',
-  XDPKM: '#53b',
-  PK4: '#f88',
-  PK5: '#484',
-  PK6: 'blue',
-  PK7: 'orange',
-  PB7: '#a75',
-  PK8: '#6bf',
-  PB8: '#6bf',
-  PA8: '#8cc',
-  PK9: '#f52',
-}
-
 const PokemonDisplay = (props: { mon: PKM; tab: string; setTab: (_: string) => void }) => {
   const { mon, tab, setTab } = props
   const [displayMon, setDisplayMon] = useState(mon)
@@ -114,77 +68,31 @@ const PokemonDisplay = (props: { mon: PKM; tab: string; setTab: (_: string) => v
   return (
     <Grid container style={styles.pokemonDisplay}>
       <Grid item xs={3}>
-        <div className="scroll-no-bar" style={styles.detailsTabRow}>
-          <Select
-            value={displayMon.format}
-            onChange={(e) => {
-              const T = getTypeFromString(e.target.value)
-              if (mon.format === e.target.value) {
+        <div style={styles.detailsTabCol}>
+          <FileTypeSelect
+            baseFormat={mon.format}
+            currentFormat={displayMon.format}
+            formData={mon}
+            onChange={(newFormat) => {
+              if (mon.format === newFormat) {
                 setDisplayMon(mon)
-              } else if (T) {
-                setDisplayMon(new T(mon))
+                return
+              }
+              if (newFormat === 'OHPKM') {
+                setDisplayMon(mon instanceof OHPKM ? mon : new OHPKM(undefined, mon))
+                return
+              }
+              const P = fileTypeFromString(newFormat)
+              if (!P) {
+                throw `Invalid filetype: ${P}`
+              }
+              if (mon instanceof OHPKM) {
+                setDisplayMon(new P(undefined, undefined, mon))
+              } else {
+                setDisplayMon(new P(undefined, undefined, new OHPKM(undefined, mon)))
               }
             }}
-            sx={{
-              ...styles.fileTypeChip,
-              backgroundColor: fileTypeColors[displayMon.format],
-            }}
-          >
-            <MenuItem value="OHPKM">OpenHome</MenuItem>
-            {mon.format !== 'OHPKM' ? (
-              <MenuItem value={mon.format}>{mon.format}</MenuItem>
-            ) : (
-              <div />
-            )}
-            {mon.format === 'OHPKM' &&
-            !isRestricted(GEN1_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) ? (
-              <MenuItem value="PK1">PK1</MenuItem>
-            ) : (
-              <div />
-            )}
-            {mon.format === 'OHPKM' &&
-            !isRestricted(GEN2_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) ? (
-              <MenuItem value="PK2">PK2</MenuItem>
-            ) : (
-              <div />
-            )}
-            {mon.format === 'OHPKM' &&
-            !isRestricted(GEN3_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) ? (
-              <MenuItem value="PK3">PK3</MenuItem>
-            ) : (
-              <div />
-            )}
-            {mon.format === 'OHPKM' &&
-            !isRestricted(HGSS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) ? (
-              <MenuItem value="PK4">PK4</MenuItem>
-            ) : (
-              <div />
-            )}
-            {mon.format === 'OHPKM' &&
-            !isRestricted(BW2_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) ? (
-              <MenuItem value="PK5">PK5</MenuItem>
-            ) : (
-              <div />
-            )}
-            {mon.format === 'OHPKM' &&
-            !isRestricted(ORAS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) ? (
-              <MenuItem value="PK6">PK6</MenuItem>
-            ) : (
-              <div />
-            )}
-            {mon.format === 'OHPKM' &&
-            !isRestricted(USUM_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) ? (
-              <MenuItem value="PK7">PK7</MenuItem>
-            ) : (
-              <div />
-            )}
-            {mon.format === 'OHPKM' &&
-            !isRestricted(LA_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) ? (
-              <MenuItem value="PA8">PA8</MenuItem>
-            ) : (
-              <div />
-            )}
-          </Select>
+          />
           <OpenHomeButton
             style={{
               ...styles.tabButton,
@@ -241,7 +149,7 @@ const PokemonDisplay = (props: { mon: PKM; tab: string; setTab: (_: string) => v
           </OpenHomeButton>
         </div>
       </Grid>
-      <Grid item xs={9}>
+      <Grid item xs={9} style={styles.displayContainer}>
         {tab === 'summary' ? (
           <SummaryDisplay mon={displayMon} />
         ) : tab === 'metDataMoves' ? (

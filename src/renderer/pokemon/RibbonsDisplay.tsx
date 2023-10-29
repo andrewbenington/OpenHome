@@ -1,9 +1,11 @@
 import { Tooltip } from '@mui/material'
-import { Styles } from '../../types/types'
 import { Gen9Ribbons } from '../../consts/Ribbons'
 import { PKM } from '../../types/PKMTypes/PKM'
-import { getRibbonSpritePath } from '../images/ribbons'
+import { hasGen3OnData } from '../../types/interfaces/gen3'
+import { hasGen6OnData } from '../../types/interfaces/gen6'
+import { Styles } from '../../types/types'
 import { getPublicImageURL } from '../images/images'
+import { getRibbonSpritePath } from '../images/ribbons'
 
 const styles = {
   container: {
@@ -40,6 +42,10 @@ const styles = {
 const RibbonsDisplay = (props: { mon: PKM }) => {
   const { mon } = props
 
+  if (!hasGen3OnData(mon) || mon.ribbons.length === 0) {
+    return <div style={styles.noRibbonsMessage}>This Pokémon has no ribbons.</div>
+  }
+
   const formatRibbon = (ribbon: string) => {
     if (ribbon.endsWith('Mark')) {
       return ribbon
@@ -47,6 +53,9 @@ const RibbonsDisplay = (props: { mon: PKM }) => {
     if (ribbon.includes(' (')) {
       const [contestRibbon, region] = ribbon.split(' (')
       return `${contestRibbon} Ribbon (${region}`
+    }
+    if (!hasGen6OnData(mon)) {
+      return `${ribbon} Ribbon`
     }
     if (ribbon === 'Contest Memory') {
       return `${ribbon} Ribbon (${mon.contestMemoryCount})`
@@ -58,6 +67,9 @@ const RibbonsDisplay = (props: { mon: PKM }) => {
   }
 
   const getRibbonImage = (ribbon: string) => {
+    if (!hasGen6OnData(mon)) {
+      return getPublicImageURL(getRibbonSpritePath(ribbon))
+    }
     if (ribbon === 'Contest Memory' && mon.contestMemoryCount === 40) {
       return getPublicImageURL(getRibbonSpritePath('Contest Memory Gold'))
     }
@@ -67,11 +79,9 @@ const RibbonsDisplay = (props: { mon: PKM }) => {
     return getPublicImageURL(getRibbonSpritePath(ribbon))
   }
 
-  return mon.ribbons.length === 0 ? (
-    <div style={styles.noRibbonsMessage}>This Pokémon has no ribbons.</div>
-  ) : (
+  return (
     <div style={styles.container}>
-      {mon.ribbons.map((ribbon) => {
+      {mon.ribbons?.map((ribbon) => {
         const ribbonDisplay = formatRibbon(ribbon)
         return (
           <Tooltip key={`ribbon_${ribbon}`} title={ribbonDisplay}>
@@ -80,7 +90,7 @@ const RibbonsDisplay = (props: { mon: PKM }) => {
               key={ribbonDisplay}
               alt={ribbonDisplay}
               style={
-                Gen9Ribbons.indexOf(ribbon) === mon.affixedRibbon
+                'affixedRibbon' in mon && Gen9Ribbons.indexOf(ribbon) === mon.affixedRibbon
                   ? styles.affixedRibbon
                   : styles.ribbon
               }
