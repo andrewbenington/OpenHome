@@ -24,6 +24,12 @@ test:
 lint:
 	@npm run lint
 
+.PHONY: check
+check:
+	@npm run typecheck
+	@npm run lint
+	@npm run format
+
 .PHONY: set-version
 set-version:
 	@npm version $(VERSION) --no-git-tag-version --allow-same-version

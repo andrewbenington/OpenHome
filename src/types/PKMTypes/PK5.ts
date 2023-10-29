@@ -1,10 +1,10 @@
-import { contestStats, marking, pokedate, stats } from '../../types/types'
 import { Ball, GameOfOrigin, isGen5, isHoenn, isJohto, isKanto, isSinnoh } from '../../consts'
 import { Languages } from '../../consts/Languages'
 import G5Locations from '../../consts/MetLocation/G5'
 import { Gen4RibbonsPart1, Gen4RibbonsPart2, Gen4RibbonsPart3 } from '../../consts/Ribbons'
 import { ItemFromString, ItemToString } from '../../resources/gen/items/Items'
 import { AbilityFromString, AbilityToString } from '../../resources/gen/other/Abilities'
+import { contestStats, marking, pokedate, stats } from '../../types/types'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -21,8 +21,11 @@ import {
 } from '../../util/Encryption'
 import { getHPGen3Onward, getLevelGen3Onward, getStatGen3Onward } from '../../util/StatCalc'
 import { gen5StringToUTF, utf16StringToGen5 } from '../../util/Strings/StringConverter'
+import { BasePKMData } from '../interfaces/base'
+import { SanityChecksum } from '../interfaces/gen3'
+import { Gen4EncounterType, Gen4OnData } from '../interfaces/gen4'
+import { Gen5OnlyData } from '../interfaces/gen5'
 import { OHPKM } from './OHPKM'
-import { PKM } from './PKM'
 import {
   adjustMovePPBetweenFormats,
   generatePersonalityValuePreservingAttributes,
@@ -31,25 +34,34 @@ import {
 
 export const GEN5_MOVE_MAX = 559
 
-export class PK5 extends PKM {
-  static fileSize = 136
+export class PK5
+  implements BasePKMData, Gen4OnData, Gen4EncounterType, Gen5OnlyData, SanityChecksum
+{
+  public get fileSize() {
+    return 136
+  }
 
-  constructor(...args: any[]) {
-    if (args.length >= 1 && args[0] instanceof Uint8Array) {
-      const bytes = args[0]
-      const encrypted = args[1] ?? false
+  get markingCount(): number {
+    return 4
+  }
+
+  get markingColors(): number {
+    return 1
+  }
+
+  bytes = new Uint8Array(136)
+
+  constructor(bytes?: Uint8Array, encrypted?: boolean, other?: OHPKM) {
+    if (bytes) {
       if (encrypted) {
         const unencryptedBytes = decryptByteArrayGen45(bytes)
         const unshuffledBytes = unshuffleBlocksGen45(unencryptedBytes)
-        super(unshuffledBytes)
+        this.bytes = unshuffledBytes
       } else {
-        super(bytes)
+        this.bytes = bytes
       }
       this.refreshChecksum()
-    } else if (args.length === 1 && args[0] instanceof OHPKM) {
-      const other = args[0]
-      super(new Uint8Array(136))
-      this.sanity = other.sanity
+    } else if (other) {
       this.dexNum = other.dexNum
       this.formNum = other.formNum
       this.heldItem = other.heldItem
@@ -91,7 +103,6 @@ export class PK5 extends PKM {
       this.gameOfOrigin = other.gameOfOrigin
       this.language = other.languageIndex === 0 ? 'ENG' : other.language
       this.encounterType = other.encounterType
-      this.performance = other.performance
       this.trainerName = other.trainerName
       this.trainerFriendship = other.trainerFriendship
       this.eggDate = other.eggDate
@@ -126,8 +137,6 @@ export class PK5 extends PKM {
       this.trainerGender = other.trainerGender
       this.currentHP = this.stats.hp
       this.refreshChecksum()
-    } else {
-      super(args[0])
     }
   }
 
@@ -141,6 +150,10 @@ export class PK5 extends PKM {
 
   public set personalityValue(value: number) {
     this.bytes.set(uint32ToBytesLittleEndian(value), 0x00)
+  }
+
+  public get sanity() {
+    return bytesToUint16LittleEndian(this.bytes, 0x04)
   }
 
   public get checksum() {
@@ -501,11 +514,9 @@ export class PK5 extends PKM {
   }
 
   public get metLocation() {
-    const locationBlock = G5Locations[Math.floor(this.metLocationIndex / 10000) * 10000]
-    if (locationBlock) {
-      return `in ${locationBlock[this.metLocationIndex % 10000]}`
-    }
-    return undefined
+    const locationBlock =
+      G5Locations[Math.floor(this.metLocationIndex / 10000) * 10000] ?? G5Locations[0]
+    return `in ${locationBlock[this.metLocationIndex % 10000]}`
   }
 
   public get nickname() {
@@ -647,5 +658,35 @@ export class PK5 extends PKM {
   public toPCBytes() {
     const shuffledBytes = shuffleBlocksGen45(this.bytes)
     return decryptByteArrayGen45(shuffledBytes)
+  }
+
+  public get hasPartyData(): boolean {
+    return this.bytes.length >= 0x50
+  }
+
+  public get currentHP() {
+    if (!this.hasPartyData) {
+      return this.stats.hp
+    }
+    return this.bytes[0x8e]
+  }
+
+  public set currentHP(value: number) {
+    if (this.hasPartyData) {
+      this.bytes[0x8e] = value
+    }
+  }
+
+  public get statusCondition() {
+    if (!this.hasPartyData) {
+      return 0
+    }
+    return this.bytes[0x88]
+  }
+
+  public set statusCondition(value: number) {
+    if (this.hasPartyData) {
+      this.bytes[0x88] = value
+    }
   }
 }

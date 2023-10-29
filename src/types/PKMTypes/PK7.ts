@@ -5,7 +5,15 @@ import SMUSUMLocations from '../../consts/MetLocation/SMUSUM'
 import { Gen9Ribbons } from '../../consts/Ribbons'
 import { ItemFromString, ItemToString } from '../../resources/gen/items/Items'
 import { AbilityFromString, AbilityToString } from '../../resources/gen/other/Abilities'
-import { contestStats, geolocation, marking, memory, pokedate, stats } from '../../types/types'
+import {
+  contestStats,
+  geolocation,
+  hyperTrainStats,
+  marking,
+  memory,
+  pokedate,
+  stats,
+} from '../../types/types'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -16,30 +24,40 @@ import {
 } from '../../util/ByteLogic'
 import { getHPGen3Onward, getLevelGen3Onward, getStatGen3Onward } from '../../util/StatCalc'
 import { utf16BytesToString, utf16StringToBytes } from '../../util/Strings/StringConverter'
+import { BasePKMData } from '../interfaces/base'
+import { SanityChecksum } from '../interfaces/gen3'
+import { N3DSOnlyData } from '../interfaces/gen6'
+import { Gen7OnData } from '../interfaces/gen7'
 import { OHPKM } from './OHPKM'
-import { PKM } from './PKM'
 import { adjustMovePPBetweenFormats, writeIVsToBuffer } from './util'
 
 export const SM_MOVE_MAX = 719
 export const USUM_MOVE_MAX = 728
 
-export class PK7 extends PKM {
-  constructor(...args: any[]) {
-    if (args.length >= 1 && args[0] instanceof Uint8Array) {
-      const bytes = args[0]
-      const encrypted = args[1] ?? false
+export class PK7 implements BasePKMData, Gen7OnData, N3DSOnlyData, SanityChecksum {
+  public get fileSize() {
+    return 232
+  }
+
+  get markingCount(): number {
+    return 6
+  }
+
+  get markingColors(): number {
+    return 2
+  }
+
+  bytes = new Uint8Array(232)
+
+  constructor(bytes?: Uint8Array, encrypted?: boolean, other?: OHPKM) {
+    if (bytes) {
       if (encrypted) {
-        // let unencryptedBytes = decryptByteArrayGen45(bytes);
-        // let unshuffledBytes = unshuffleBlocksGen45(unencryptedBytes);
-        // super(unshuffledBytes);
-        super(undefined)
+        throw new Error('PK7 decryption not implemented')
       } else {
-        super(bytes)
+        this.bytes = bytes
       }
       // this.refreshChecksum();
-    } else if (args.length === 1 && args[0] instanceof OHPKM) {
-      const other = args[0]
-      super(new Uint8Array(232))
+    } else if (other) {
       this.encryptionConstant = other.encryptionConstant
       this.dexNum = other.dexNum
       this.exp = other.exp
@@ -48,8 +66,6 @@ export class PK7 extends PKM {
       this.secretID = other.secretID
       this.ability = other.ability
       this.abilityNum = other.abilityNum
-      this.trainingBagHits = other.trainingBagHits
-      this.trainingBag = other.trainingBag
       this.personalityValue = other.personalityValue
       this.nature = other.nature
       this.isFatefulEncounter = other.isFatefulEncounter
@@ -60,7 +76,6 @@ export class PK7 extends PKM {
       this.markings = other.markings
       this.pokerusByte = other.pokerusByte
       this.superTrainingFlags = other.superTrainingFlags
-      this.superTrainingDistFlags = other.superTrainingDistFlags
       this.ribbons = other.ribbons
       this.contestMemoryCount = other.contestMemoryCount
       this.battleMemoryCount = other.battleMemoryCount
@@ -108,15 +123,13 @@ export class PK7 extends PKM {
       this.ball = other.ball && other.ball <= Ball.Beast ? other.ball : Ball.Poke
       this.metLevel = other.metLevel ?? this.level
       this.trainerGender = other.trainerGender
-      this.encounterType = other.encounterType
+      this.hyperTraining = other.hyperTraining
       this.gameOfOrigin = other.gameOfOrigin
       this.country = other.country
       this.region = other.region
       this.consoleRegion = other.consoleRegion
       this.language = other.language
       this.currentHP = this.stats.hp
-    } else {
-      super(args[0])
     }
   }
 
@@ -130,6 +143,10 @@ export class PK7 extends PKM {
 
   public set encryptionConstant(value: number) {
     this.bytes.set(uint32ToBytesLittleEndian(value), 0x00)
+  }
+
+  public get sanity() {
+    return bytesToUint16LittleEndian(this.bytes, 0x04)
   }
 
   public get checksum() {
@@ -221,20 +238,25 @@ export class PK7 extends PKM {
     this.bytes[0x15] = value
   }
 
-  public get trainingBagHits() {
-    return this.bytes[0x16]
+  public get markings() {
+    const markingsValue = bytesToUint16LittleEndian(this.bytes, 0x16)
+    return [
+      markingsValue & 3,
+      (markingsValue >> 2) & 3,
+      (markingsValue >> 4) & 3,
+      (markingsValue >> 6) & 3,
+      (markingsValue >> 8) & 3,
+      (markingsValue >> 10) & 3,
+    ] as any as [marking, marking, marking, marking, marking, marking]
   }
 
-  public set trainingBagHits(value: number) {
-    this.bytes[0x16] = value
-  }
-
-  public get trainingBag() {
-    return this.bytes[0x17]
-  }
-
-  public set trainingBag(value: number) {
-    this.bytes[0x17] = value
+  public set markings(value: [marking, marking, marking, marking, marking, marking]) {
+    let markingsValue = 0
+    for (let i = 0; i < 6; i++) {
+      const shift = i * 2
+      markingsValue = (markingsValue & (0xffff ^ (3 << shift))) | (value[i] << shift)
+    }
+    this.bytes.set(uint16ToBytesLittleEndian(markingsValue), 0x16)
   }
 
   public get personalityValue() {
@@ -254,12 +276,19 @@ export class PK7 extends PKM {
   }
 
   public get isFatefulEncounter() {
-    return !!(this.bytes[0x1d] & 1)
+    return getFlag(this.bytes, 0x1d, 0)
   }
 
   public set isFatefulEncounter(value: boolean) {
-    const bit = 0
-    setFlag(this.bytes, 0x1d, bit, value)
+    setFlag(this.bytes, 0x1d, 0, value)
+  }
+
+  public get gender() {
+    return (this.bytes[0x1d] >> 1) & 0b11
+  }
+
+  public set gender(value: number) {
+    this.bytes[0x01d] = (this.bytes[0x01d] & 0b11111001) | ((value & 0b11) << 1)
   }
 
   public get formNum() {
@@ -268,14 +297,6 @@ export class PK7 extends PKM {
 
   public set formNum(value: number) {
     this.bytes[0x1d] = (this.bytes[0x1d] & 0b111) | (value << 3)
-  }
-
-  public get gender() {
-    return (this.bytes[0x1d] >> 1) & 0x3
-  }
-
-  public set gender(value: number) {
-    this.bytes[0x01d] = (this.bytes[0x01d] & 0b11111001) | ((value & 0x3) << 1)
   }
 
   public get evs() {
@@ -318,26 +339,12 @@ export class PK7 extends PKM {
     this.bytes[0x29] = value.sheen
   }
 
-  public get markings() {
-    const markingsValue = this.bytes[0x2a]
-    return [
-      markingsValue & 1,
-      (markingsValue >> 1) & 1,
-      (markingsValue >> 2) & 1,
-      (markingsValue >> 3) & 1,
-      (markingsValue >> 4) & 1,
-      (markingsValue >> 5) & 1,
-    ] as any as [marking, marking, marking, marking, marking, marking]
+  public get resortEventStatus() {
+    return this.bytes[0x2a]
   }
 
-  public set markings(value: [marking, marking, marking, marking, marking, marking]) {
-    let markingsValue = 0
-    for (let i = 0; i < 6; i++) {
-      if (value[i]) {
-        markingsValue = markingsValue | (2 ** i)
-      }
-    }
-    this.bytes[0x2a] = markingsValue
+  public set resortEventStatus(value: number) {
+    this.bytes[0x2a] = value
   }
 
   public get pokerusByte() {
@@ -725,11 +732,9 @@ export class PK7 extends PKM {
         ? `in the ${GameOfOriginData[this.gameOfOrigin]?.region} region`
         : 'in a faraway place'
     }
-    const locationBlock = SMUSUMLocations[Math.floor(this.metLocationIndex / 10000) * 10000]
-    if (locationBlock) {
-      return `in ${locationBlock[this.metLocationIndex % 10000]}`
-    }
-    return undefined
+    const locationBlock =
+      SMUSUMLocations[Math.floor(this.metLocationIndex / 10000) * 10000] ?? SMUSUMLocations[0]
+    return `in ${locationBlock[this.metLocationIndex % 10000]}`
   }
 
   public get ball() {
@@ -756,12 +761,24 @@ export class PK7 extends PKM {
     setFlag(this.bytes, 0xdd, 7, !!value)
   }
 
-  public get encounterType() {
-    return this.bytes[0xde]
+  public get hyperTraining() {
+    return {
+      hp: getFlag(this.bytes, 0xde, 0),
+      atk: getFlag(this.bytes, 0xde, 1),
+      def: getFlag(this.bytes, 0xde, 2),
+      spa: getFlag(this.bytes, 0xde, 3),
+      spd: getFlag(this.bytes, 0xde, 4),
+      spe: getFlag(this.bytes, 0xde, 5),
+    }
   }
 
-  public set encounterType(value: number) {
-    this.bytes[0xde] = value
+  public set hyperTraining(value: hyperTrainStats) {
+    setFlag(this.bytes, 0xde, 0, value.hp)
+    setFlag(this.bytes, 0xde, 1, value.atk)
+    setFlag(this.bytes, 0xde, 2, value.def)
+    setFlag(this.bytes, 0xde, 3, value.spa)
+    setFlag(this.bytes, 0xde, 4, value.spd)
+    setFlag(this.bytes, 0xde, 5, value.spe)
   }
 
   public get gameOfOrigin() {
@@ -838,6 +855,36 @@ export class PK7 extends PKM {
       spe: getStatGen3Onward('Spe', this),
       spa: getStatGen3Onward('SpA', this),
       spd: getStatGen3Onward('SpD', this),
+    }
+  }
+
+  public get hasPartyData(): boolean {
+    return this.bytes.length >= 0xe
+  }
+
+  public get statusCondition() {
+    if (!this.hasPartyData) {
+      return 0
+    }
+    return this.bytes[0xe8]
+  }
+
+  public set statusCondition(value: number) {
+    if (this.hasPartyData) {
+      this.bytes[0xe8] = value
+    }
+  }
+
+  public get currentHP() {
+    if (!this.hasPartyData) {
+      return this.stats.hp
+    }
+    return this.bytes[0xf0]
+  }
+
+  public set currentHP(value: number) {
+    if (this.hasPartyData) {
+      this.bytes[0xf0] = value
     }
   }
 }

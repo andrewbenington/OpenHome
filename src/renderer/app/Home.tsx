@@ -1,16 +1,16 @@
 import { FileOpen } from '@mui/icons-material'
 import { Dialog, Grid, useTheme } from '@mui/material'
-import { POKEMON_DATA } from '../../consts'
 import _ from 'lodash'
 import { useCallback, useEffect, useState } from 'react'
+import { POKEMON_DATA } from '../../consts'
 import OpenHomeButton from '../../renderer/components/OpenHomeButton'
 import { loadRecentSaves } from '../../renderer/redux/slices/recentSavesSlice'
 import { loadResourcesPath } from '../../renderer/redux/slices/resourcesSlice'
 import { OHPKM } from '../../types/PKMTypes'
-import { acceptableExtensions, bytesToPKM } from '../../util/FileImport'
-import { getMonFileIdentifier } from '../../util/Lookup'
 import { PKM } from '../../types/PKMTypes/PKM'
 import { SaveCoordinates } from '../../types/types'
+import { bytesToPKM } from '../../util/FileImport'
+import { getMonFileIdentifier } from '../../util/Lookup'
 import BoxIcons from '../images/BoxIcons.png'
 import PokemonDisplay from '../pokemon/PokemonDisplay'
 import { useAppDispatch } from '../redux/hooks'
@@ -25,12 +25,12 @@ import {
 import {
   cancelDrag,
   clearAllSaves,
-  setMonToRelease,
+  clearMonsToRelease,
   loadGen12Lookup,
   loadGen345Lookup,
   loadHomeBoxes,
   loadHomeMons,
-  clearMonsToRelease,
+  setMonToRelease,
 } from '../redux/slices/appSlice'
 import HomeBoxDisplay from '../saves/HomeBoxDisplay'
 import SaveDisplay from '../saves/SaveDisplay'
@@ -41,9 +41,9 @@ import {
   handleMenuResetAndClose,
   handleMenuSave,
 } from '../util/ipcFunctions'
+import useWindowDimensions from '../util/windowDimensions'
 import Themes, { OpenHomeTheme } from './Themes'
 import { dropAreaStyle } from './styles'
-import useWindowDimensions from '../util/windowDimensions'
 
 const Home = () => {
   const { palette } = useTheme()
@@ -79,13 +79,12 @@ const Home = () => {
       let mon: PKM | undefined = droppedMon
       if (file) {
         const bytes = new Uint8Array(await file.arrayBuffer())
-        let [extension] = file.name.split('.').slice(-1)
-        extension = extension.toUpperCase()
-        if (!acceptableExtensions.includes(extension)) {
-          console.error(`invalid extension: ${extension}`)
-          return
+        const [extension] = file.name.split('.').slice(-1)
+        try {
+          mon = bytesToPKM(bytes, extension.toUpperCase())
+        } catch (e) {
+          console.error(e)
         }
-        mon = bytesToPKM(bytes, extension)
       }
       if (!mon) return
       switch (type) {
@@ -119,6 +118,7 @@ const Home = () => {
     writeAllHomeData()
     handleDeleteOHPKMFiles(filesToDelete)
     setFilesToDelete([])
+    dispatch(loadHomeMons()).then(() => dispatch(loadHomeBoxes()))
   }, [filesToDelete, writeAllHomeData, writeAllSaveFiles])
 
   // listener for menu save
@@ -163,6 +163,7 @@ const Home = () => {
         xs={3.5}
         style={{
           overflowY: 'scroll',
+          height: '100%',
         }}
       >
         {_.range(saves.length).map((i) => (
@@ -171,12 +172,13 @@ const Home = () => {
         <OpenHomeButton
           style={{
             margin: 'auto',
-            backgroundColor: palette.secondary.light,
+            backgroundColor: palette.primary.main,
             color: palette.text.secondary,
             display: 'flex',
             flexDirection: 'row',
             alignItems: 'center',
             marginTop: 10,
+            marginBottom: 10,
           }}
           onClick={() => setOpenSaveDialog(true)}
         >

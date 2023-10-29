@@ -1,26 +1,15 @@
+import _, { uniq } from 'lodash'
 import { GameOfOrigin } from '../../consts'
 import { GEN1_TRANSFER_RESTRICTIONS } from '../../consts/TransferRestrictions'
-import _, { uniq } from 'lodash'
-import { OHPKM } from '../PKMTypes/OHPKM'
-import { PK1 } from '../PKMTypes/PK1'
-import { SaveType } from '../types'
 import { bytesToUint16BigEndian, get8BitChecksum } from '../../util/ByteLogic'
 import { natDexToGen1ID } from '../../util/ConvertPokemonID'
 import { gen12StringToUTF, utf16StringToGen12 } from '../../util/Strings/StringConverter'
+import { OHPKM } from '../PKMTypes/OHPKM'
+import { PK1 } from '../PKMTypes/PK1'
+import { SaveType } from '../types'
 import { Box, SAV } from './SAV'
 
-class G1Box implements Box {
-  name: string
-
-  pokemon: Array<PK1 | OHPKM | undefined>
-
-  constructor(name: string, boxSize: number) {
-    this.name = name
-    this.pokemon = new Array(boxSize)
-  }
-}
-
-export class G1SAV extends SAV {
+export class G1SAV extends SAV<PK1> {
   pkmType = PK1
 
   transferRestrictions = GEN1_TRANSFER_RESTRICTIONS
@@ -40,8 +29,6 @@ export class G1SAV extends SAV {
   BOX_OT_OFFSET = 0x2aa
 
   BOX_NICKNAME_OFFSET = 0x386
-
-  boxes: Array<G1Box>
 
   constructor(path: string, bytes: Uint8Array, fileCreated?: Date) {
     super(path, bytes)
@@ -76,11 +63,11 @@ export class G1SAV extends SAV {
         this.invalid = true
         return
     }
-    this.boxes = new Array<G1Box>(this.NUM_BOXES)
+    this.boxes = new Array(this.NUM_BOXES)
     if (this.saveType > 0 && this.saveType <= 2) {
       const pokemonPerBox = this.boxRows * this.boxColumns
       _.range(this.NUM_BOXES).forEach((boxNumber) => {
-        this.boxes[boxNumber] = new G1Box(`Box ${boxNumber + 1}`, pokemonPerBox)
+        this.boxes[boxNumber] = new Box(`Box ${boxNumber + 1}`, pokemonPerBox)
         let boxByteOffset
         if (boxNumber < 6) {
           boxByteOffset = 0x4000 + boxNumber * this.BOX_SIZE
@@ -132,19 +119,19 @@ export class G1SAV extends SAV {
           if (boxMon instanceof OHPKM) {
             changedMonPKMs.push(boxMon)
           }
-          const PK1Mon = boxMon instanceof PK1 ? boxMon : new PK1(boxMon)
+          const pk1Mon = boxMon instanceof PK1 ? boxMon : new PK1(undefined, undefined, boxMon)
           // set the mon's dex number in the box
-          this.bytes[boxByteOffset + 1 + numMons] = natDexToGen1ID[PK1Mon.dexNum]
+          this.bytes[boxByteOffset + 1 + numMons] = natDexToGen1ID[pk1Mon.dexNum]
           // set the mon's data in the box
           this.bytes.set(
-            PK1Mon.bytes,
+            pk1Mon.bytes,
             boxByteOffset + this.BOX_PKM_OFFSET + numMons * this.BOX_PKM_SIZE
           )
           // set the mon's OT name in the box
-          const trainerNameBuffer = utf16StringToGen12(PK1Mon.trainerName, 11, true)
+          const trainerNameBuffer = utf16StringToGen12(pk1Mon.trainerName, 11, true)
           this.bytes.set(trainerNameBuffer, boxByteOffset + this.BOX_OT_OFFSET + numMons * 11)
           // set the mon's nickname in the box
-          const nicknameBuffer = utf16StringToGen12(PK1Mon.nickname, 11, true)
+          const nicknameBuffer = utf16StringToGen12(pk1Mon.nickname, 11, true)
           this.bytes.set(nicknameBuffer, boxByteOffset + this.BOX_NICKNAME_OFFSET + numMons * 11)
           numMons++
         }

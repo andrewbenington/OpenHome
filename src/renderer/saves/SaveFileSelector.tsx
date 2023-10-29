@@ -169,8 +169,8 @@ const SaveFileSelector = (props: SaveFileSelectorProps) => {
                 textOverflow: 'ellipsis',
                 overflowX: 'hidden',
                 textAlign: 'right',
-                direction: 'rtl',
                 color: '#333',
+                width: '100%',
               }}
             >
               {ref.filePath}

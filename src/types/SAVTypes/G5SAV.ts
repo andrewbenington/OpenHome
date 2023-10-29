@@ -1,7 +1,7 @@
-import { GameOfOrigin, NDex } from '../../consts'
 import _ from 'lodash'
-import { CRC16_CCITT } from '../../util/Encryption'
+import { GameOfOrigin, NDex } from '../../consts'
 import { bytesToUint16LittleEndian, uint16ToBytesLittleEndian } from '../../util/ByteLogic'
+import { CRC16_CCITT } from '../../util/Encryption'
 import { gen5StringToUTF } from '../../util/Strings/StringConverter'
 import { OHPKM } from '../PKMTypes'
 import { PK5 } from '../PKMTypes/PK5'
@@ -14,17 +14,7 @@ const BOX_NAMES_OFFSET: number = 0x04
 const BOX_CHECKSUM_OFFSET: number = 0xff2
 const BOX_SIZE: number = 0x1000
 
-export class G5Box implements Box {
-  name: string
-
-  pokemon: Array<PK5 | OHPKM> = new Array(30)
-
-  constructor(n: string) {
-    this.name = n
-  }
-}
-
-export class G5SAV extends SAV {
+export class G5SAV extends SAV<PK5> {
   static TRANSFER_RESTRICTIONS = {
     maxDexNum: NDex.GENESECT,
     excludedForms: { ...RegionalForms, ...CapPikachus, 483: [1], 484: [1] },
@@ -36,7 +26,7 @@ export class G5SAV extends SAV {
 
   trainerDataOffset: number = 0x19400
 
-  boxes: Array<G5Box>
+  boxes: Array<Box<PK5>>
 
   saveType = SaveType.G5
 
@@ -62,7 +52,7 @@ export class G5SAV extends SAV {
     this.boxes = Array(24)
     for (let box = 0; box < 24; box++) {
       const boxName = gen5StringToUTF(this.bytes, BOX_NAMES_OFFSET + 40 * box, 20)
-      this.boxes[box] = new G5Box(boxName)
+      this.boxes[box] = new Box(boxName, 30)
     }
 
     for (let box = 0; box < 24; box++) {
@@ -129,7 +119,8 @@ export class G5SAV extends SAV {
       // and the slot was left empty
       if (changedMon) {
         try {
-          const mon = new PK5(changedMon)
+          const mon =
+            changedMon instanceof OHPKM ? new PK5(undefined, undefined, changedMon) : changedMon
           if (mon?.gameOfOrigin && mon?.dexNum) {
             mon.refreshChecksum()
             this.bytes.set(mon.toPCBytes(), writeIndex)

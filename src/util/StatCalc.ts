@@ -1,9 +1,10 @@
 /* eslint-disable no-nested-ternary */
-import { PKM } from '../types/PKMTypes/PKM'
-import { Stat } from '../types/types'
 import { LevelUpExp, NDex, POKEMON_DATA, getNatureSummary } from '../consts'
+import { BasePKMData } from '../types/interfaces/base'
+import { Gen3OnData } from '../types/interfaces/gen3'
+import { Stat } from '../types/types'
 
-export const getStatGen3Onward = (stat: Stat, mon: PKM) => {
+export const getStatGen3Onward = (stat: Stat, mon: Gen3OnData & BasePKMData) => {
   if (mon.dexNum < 1 || mon.dexNum > NDex.MAX) {
     return 0
   }
@@ -26,7 +27,7 @@ export const getStatGen3Onward = (stat: Stat, mon: PKM) => {
   return 0
 }
 
-export const getHPGen3Onward = (mon: PKM) => {
+export const getHPGen3Onward = (mon: Gen3OnData & BasePKMData) => {
   if (mon.dexNum < 1 || mon.dexNum > NDex.MAX) {
     return 0
   }
@@ -44,9 +45,6 @@ export const getHPGen3Onward = (mon: PKM) => {
 
 export const getLevelGen3Onward = (dexNum: number, exp: number) => {
   if (dexNum < 1 || dexNum > NDex.MAX) {
-    return 1
-  }
-  if (dexNum === 0) {
     return 1
   }
   const levelUpType = POKEMON_DATA[dexNum].levelUpType

@@ -8,8 +8,9 @@ import {
 
 const GEN3_BLOCKS_OFFSET = 0x20
 const GEN3_BLOCK_SIZE = 12
-const GEN45_BLOCKS_OFFSET = 0x08
+const GEN456_BLOCKS_OFFSET = 0x08
 const GEN45_BLOCK_SIZE = 0x20
+const GEN6_BLOCK_SIZE = 0x38
 
 const shuffleBlockOrders = [
   [0, 1, 2, 3],
@@ -160,20 +161,23 @@ export const decryptByteArrayGen3 = (bytes: Uint8Array) => {
 export const shuffleBlocksGen45 = (bytes: Uint8Array) => {
   const personalityValue = bytesToUint32LittleEndian(bytes, 0x00)
   const shiftValue = ((personalityValue & 0x3e000) >> 0xd) % 24
-  return shuffleBlocks(bytes, shiftValue, GEN45_BLOCK_SIZE, GEN45_BLOCKS_OFFSET)
+  return shuffleBlocks(bytes, shiftValue, GEN45_BLOCK_SIZE, GEN456_BLOCKS_OFFSET)
 }
 
 export const unshuffleBlocksGen45 = (bytes: Uint8Array) => {
   const personalityValue = bytesToUint32LittleEndian(bytes, 0x00)
   const shiftValue = ((personalityValue & 0x3e000) >> 0xd) % 24
-  return unshuffleBlocks(bytes, shiftValue, GEN45_BLOCK_SIZE, GEN45_BLOCKS_OFFSET)
+  return unshuffleBlocks(bytes, shiftValue, GEN45_BLOCK_SIZE, GEN456_BLOCKS_OFFSET)
 }
 
-export const decryptByteArrayGen45 = (bytes: Uint8Array) => {
-  const checksum = bytesToUint16LittleEndian(bytes, 0x06)
+const decryptByteArray = (
+  bytes: Uint8Array,
+  seed: number,
+  blockSize: number,
+  blockOffset: number
+) => {
   const unencryptedBytes = bytes
-  let seed = checksum
-  for (let i = GEN45_BLOCKS_OFFSET; i < GEN45_BLOCKS_OFFSET + 4 * GEN45_BLOCK_SIZE; i += 2) {
+  for (let i = blockOffset; i < blockOffset + 4 * blockSize; i += 2) {
     const bigIntSeed = bigInt(0x41c64e6d).times(seed).plus(0x6073)
     seed = bigIntSeed.and(0xffffffff).toJSNumber()
     const xorValue = (seed >> 16) & 0xffff
@@ -182,6 +186,28 @@ export const decryptByteArrayGen45 = (bytes: Uint8Array) => {
     unencryptedBytes.set(unencryptedWordBytes, i)
   }
   return unencryptedBytes
+}
+
+export const decryptByteArrayGen45 = (bytes: Uint8Array) => {
+  const checksum = bytesToUint16LittleEndian(bytes, 0x06)
+  return decryptByteArray(bytes, checksum, GEN45_BLOCK_SIZE, GEN456_BLOCKS_OFFSET)
+}
+
+export const shuffleBlocksGen6 = (bytes: Uint8Array) => {
+  const encryptionConstant = bytesToUint32LittleEndian(bytes, 0x00)
+  const shiftValue = ((encryptionConstant & 0x3e000) >> 0xd) % 24
+  return shuffleBlocks(bytes, shiftValue, GEN6_BLOCK_SIZE, GEN456_BLOCKS_OFFSET)
+}
+
+export const unshuffleBlocksGen6 = (bytes: Uint8Array) => {
+  const encryptionConstant = bytesToUint32LittleEndian(bytes, 0x00)
+  const shiftValue = ((encryptionConstant & 0x3e000) >> 0xd) % 24
+  return unshuffleBlocks(bytes, shiftValue, GEN6_BLOCK_SIZE, GEN456_BLOCKS_OFFSET)
+}
+
+export const decryptByteArrayGen6 = (bytes: Uint8Array) => {
+  const encryptionConstant = bytesToUint32LittleEndian(bytes, 0x00)
+  return decryptByteArray(bytes, encryptionConstant, GEN6_BLOCK_SIZE, GEN456_BLOCKS_OFFSET)
 }
 
 const SeedTable: number[] = [

@@ -46,6 +46,7 @@ export enum SaveType {
   Pt,
   HGSS,
   G5,
+  G6,
 }
 
 export interface pokedate {
@@ -132,6 +133,8 @@ export const getSaveTypeString = (saveType: SaveType): string => {
       return 'Pokémon HeartGold/SoulSilver'
     case SaveType.G5:
       return 'Pokémon Black/White/Black 2/White 2'
+    case SaveType.G6:
+      return 'Pokémon Omega Ruby/Alpha Sapphire'
     default:
       return 'Unknown Game'
   }
@@ -221,6 +224,7 @@ export type Move = {
     SMUSUM?: number
     LGPE?: number
     G8?: number
+    LA?: number
   }
   type: string
   id: number

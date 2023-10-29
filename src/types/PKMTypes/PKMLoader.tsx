@@ -2,8 +2,25 @@ import { Button, MenuItem, Pagination, Select } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { useFilePicker } from 'use-file-picker'
 import PokemonDisplay from '../../renderer/pokemon/PokemonDisplay'
-import { acceptableExtensions, bytesToPKM } from '../../util/FileImport'
+import { bytesToPKM } from '../../util/FileImport'
 import { PKM } from './PKM'
+
+const acceptableExtensions = [
+  'OHPKM',
+  'PKM',
+  'PK1',
+  'PK2',
+  'COLOPKM',
+  'XDPKM',
+  'PK5',
+  'PK6',
+  'PK7',
+  'PB7',
+  'PK8',
+  'PA8',
+  'PB8',
+  'PK9',
+]
 
 const PKMLoader = () => {
   const [openFileSelector, { filesContent }] = useFilePicker({

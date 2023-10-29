@@ -97,7 +97,7 @@ const hoohGen2 = bytesToPKM(
 // });
 
 test('pk2 and ohpkm have the same gen12lookup key', () => {
-  const ohPKM = new OHPKM(hoohGen2)
+  const ohPKM = new OHPKM(undefined, hoohGen2)
   expect(getMonGen12Identifier(ohPKM)).toEqual(getMonGen12Identifier(hoohGen2))
 })
 
