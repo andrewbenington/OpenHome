@@ -1,4 +1,3 @@
-import { NDex } from '../../consts'
 import { bytesToUint32LittleEndian, bytesToUint64LittleEndian } from '../../util/ByteLogic'
 import {
   getMonFileIdentifier,
@@ -37,23 +36,14 @@ const recoverOHPKMData = <P extends GamePKM>(
   saveFile.boxes.forEach((box) => {
     box.pokemon.forEach((mon, monIndex) => {
       if (mon) {
-        // GameBoy PKM files don't have a personality value to track the mons with OpenHome data,
-        // so they need to be identified with their IVs and OT
         const lookupIdentifier = getIdentifier(mon as P)
         if (!lookupIdentifier) return
         const homeIdentifier = lookupMap ? lookupMap[lookupIdentifier] : lookupIdentifier
         if (!homeIdentifier) return
-        // console.log(identifier.slice(0, identifier.length - 3))
-        if (mon.dexNum === NDex.ZAPDOS) {
-          console.log(homeMonMap)
-          console.log(homeIdentifier)
-        }
         const result = Object.entries(homeMonMap).find((entry) => entry[0] === homeIdentifier)
         if (result) {
-          console.log(result)
           const updatedOHPKM = result[1]
           updatedOHPKM.updateData(mon)
-          console.info('updating home data for', updatedOHPKM.nickname)
           window.electron.ipcRenderer.send('write-ohpkm', updatedOHPKM.bytes)
           box.pokemon[monIndex] = updatedOHPKM
         }
@@ -140,6 +130,7 @@ export const buildSaveFile = (
   const { homeMonMap, gen12LookupMap, gen345LookupMap } = lookupMaps
   const saveType = getSaveType(fileBytes)
   let saveFile
+  console.log(gen12LookupMap)
   switch (saveType) {
     case SaveType.RBY_I:
       saveFile = new G1SAV(filePath, fileBytes)

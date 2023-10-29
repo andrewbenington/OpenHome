@@ -190,16 +190,13 @@ export const appSlice = createSlice({
         ) {
           const changedMons = save.prepareBoxesForSaving()
           if (changedMons && (save instanceof G2SAV || save instanceof G1SAV)) {
-            changedMons.forEach((mon) => {
-              const key = getMonGen12Identifier(mon)
-              const value = getMonFileIdentifier(mon)
-              if (!state.lookup.gen12) {
-                console.error('no gen12 map loaded. cancelling save')
-                return
-              }
-              if (key && value) {
-                state.lookup.gen12[key] = value
-              }
+            if (!state.lookup.gen12) {
+              console.error('no gen12 map loaded. cancelling save')
+              return
+            }
+            appSlice.caseReducers.writeGen12Lookup(state, {
+              type: '',
+              payload: changedMons,
             })
           } else if (
             changedMons &&
@@ -289,7 +286,7 @@ export const appSlice = createSlice({
           newLookupMap[key] = value
         }
       })
-      console.log
+      console.log('send write gen12', newLookupMap)
       window.electron.ipcRenderer.send('write-gen12-lookup', current(newLookupMap))
       state.lookup.gen12 = newLookupMap
     },

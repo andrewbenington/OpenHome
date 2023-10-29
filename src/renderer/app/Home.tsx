@@ -118,6 +118,7 @@ const Home = () => {
     writeAllHomeData()
     handleDeleteOHPKMFiles(filesToDelete)
     setFilesToDelete([])
+    dispatch(loadHomeMons()).then(() => dispatch(loadHomeBoxes()))
   }, [filesToDelete, writeAllHomeData, writeAllSaveFiles])
 
   // listener for menu save
