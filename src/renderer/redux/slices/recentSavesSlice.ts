@@ -19,6 +19,7 @@ export const recentSavesSlice = createSlice({
         return
       }
       const saveRef = action.payload.getSaveRef()
+      console.log('send add')
       window.electron.ipcRenderer.send('add-recent-save', saveRef)
       state[action.payload.filePath] = saveRef
     },

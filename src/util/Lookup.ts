@@ -6,7 +6,7 @@ import { GameBoyStats } from '../types/interfaces/stats'
 import { bytesToString } from './ByteLogic'
 import { gen12StringToUTF, utf16StringToGen12 } from './Strings/StringConverter'
 
-export const getMonFileIdentifier = (mon: OHPKM) => {
+export const getMonFileIdentifier = (mon: BasePKMData & Gen3OnData) => {
   const baseMon = getBaseMon(mon.dexNum, mon.formNum)
   if (baseMon) {
     return `${baseMon.dexNumber.toString().padStart(4, '0')}-${bytesToString(

@@ -2,7 +2,6 @@ import { GameOfOrigin } from '../../consts'
 import { OHPKM } from '../../types/PKMTypes/OHPKM'
 import { TransferRestrictions } from '../../types/TransferRestrictions'
 import { SaveRef, SaveType } from '../../types/types'
-import { GamePKM } from '../PKMTypes/GamePKM'
 import { PKM } from '../PKMTypes/PKM'
 
 export class Box<P extends PKM> {
@@ -54,8 +53,6 @@ export class SAV<P extends PKM> {
   bytes: Uint8Array
 
   invalid: boolean = false
-
-  convertPKM: (_: GamePKM) => GamePKM = (mon) => new OHPKM(undefined, mon)
 
   getSaveRef: () => SaveRef = () => {
     return {

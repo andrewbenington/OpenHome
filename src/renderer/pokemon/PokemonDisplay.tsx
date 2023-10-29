@@ -2,7 +2,6 @@
 import { Grid } from '@mui/material'
 import { useState } from 'react'
 import { OHPKM } from '../../types/PKMTypes'
-import { fileTypeFromString } from '../../types/PKMTypes/GamePKM'
 import { PKM } from '../../types/PKMTypes/PKM'
 import { Styles } from '../../types/types'
 import OpenHomeButton from '../components/OpenHomeButton'
@@ -13,6 +12,7 @@ import RawDisplay from './RawDisplay'
 import RibbonsDisplay from './RibbonsDisplay'
 import StatsDisplay from './StatsDisplay'
 import SummaryDisplay from './SummaryDisplay'
+import { fileTypeFromString } from '../../util/FileImport'
 
 const styles = {
   tabScrollContainer: {

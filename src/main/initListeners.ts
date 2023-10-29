@@ -71,7 +71,7 @@ function initListeners() {
     addRecentSave(saveRef)
   })
 
-  ipcMain.on('remove-recent-save', async (_, saveRef) => {
+  ipcMain.handle('remove-recent-save', async (_, saveRef) => {
     removeRecentSave(saveRef)
   })
 
@@ -95,11 +95,15 @@ function initListeners() {
   })
 
   ipcMain.on('write-home-box', async (_, { boxName, boxString }) => {
-    const appDataPath = app.getPath('appData')
-    fs.writeFileSync(
-      path.join(appDataPath, 'OpenHome', 'storage', 'boxes', `${boxName}.csv`),
-      boxString
-    )
+    try {
+      const appDataPath = app.getPath('appData')
+      fs.writeFileSync(
+        path.join(appDataPath, 'OpenHome', 'storage', 'boxes', `${boxName}.csv`),
+        boxString
+      )
+    } catch (e) {
+      console.error('save home error', e)
+    }
   })
 
   ipcMain.handle('read-save-file', async (_, filePath) => {
@@ -119,7 +123,7 @@ function initListeners() {
     return {}
   })
 
-  ipcMain.on('write-save-file', async (_, { bytes, path }) => {
+  ipcMain.handle('write-save-file', async (_, { bytes, path }) => {
     fs.writeFileSync(path, bytes)
   })
 

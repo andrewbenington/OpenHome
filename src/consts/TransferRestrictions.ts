@@ -126,6 +126,7 @@ export const XY_TRANSFER_RESTRICTIONS: TransferRestrictions = {
   maxDexNum: NDex.VOLCANION,
   excludedForms: {
     ...RegionalForms,
+    ...CapPikachus,
     [NDex.PICHU]: [SPIKY_EAR],
     [NDex.DIALGA]: [ORIGIN],
     [NDex.PALKIA]: [ORIGIN],
@@ -138,6 +139,7 @@ export const ORAS_TRANSFER_RESTRICTIONS: TransferRestrictions = {
   maxDexNum: NDex.VOLCANION,
   excludedForms: {
     ...RegionalForms,
+    ...CapPikachus,
     [NDex.PICHU]: [SPIKY_EAR],
     [NDex.DIALGA]: [ORIGIN],
     [NDex.PALKIA]: [ORIGIN],

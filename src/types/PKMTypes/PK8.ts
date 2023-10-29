@@ -807,25 +807,6 @@ export class G8PKM
     this.bytes.set(uint16ToBytesLittleEndian(value), 0x120)
   }
 
-  public get eggLocation() {
-    if (!this.eggLocationIndex) {
-      return undefined
-    }
-    if (isGalar(this.gameOfOrigin)) {
-      const locationBlock =
-        SwShLocations[Math.floor(this.eggLocationIndex / 10000) * 10000] ?? SwShLocations[0]
-      return `in ${locationBlock[this.eggLocationIndex % 10000]}`
-    }
-    if (isBDSP(this.gameOfOrigin)) {
-      const locationBlock =
-        BDSPLocations[Math.floor(this.eggLocationIndex / 10000) * 10000] ?? BDSPLocations[0]
-      return `in ${locationBlock[this.eggLocationIndex % 10000]}`
-    }
-    return this.gameOfOrigin < GameOfOrigin.Sword
-      ? `from the ${GameOfOriginData[this.gameOfOrigin]?.region} region`
-      : 'from a faraway place'
-  }
-
   public get metLocationIndex() {
     return bytesToUint16LittleEndian(this.bytes, 0x122)
   }
@@ -945,6 +926,31 @@ export class PK8 extends G8PKM {
     return 'PK8'
   }
 
+  public get metLocation() {
+    if (isGalar(this.gameOfOrigin)) {
+      const locationBlock =
+        SwShLocations[Math.floor(this.metLocationIndex / 10000) * 10000] ?? SwShLocations[0]
+      return `in ${locationBlock[this.metLocationIndex % 10000]}`
+    }
+    return this.gameOfOrigin <= GameOfOrigin.Sword
+      ? `in the ${GameOfOriginData[this.gameOfOrigin]?.region} region`
+      : 'in a faraway place'
+  }
+
+  public get eggLocation() {
+    if (!this.eggLocationIndex) {
+      return undefined
+    }
+    if (isGalar(this.gameOfOrigin)) {
+      const locationBlock =
+        SwShLocations[Math.floor(this.eggLocationIndex / 10000) * 10000] ?? SwShLocations[0]
+      return `in ${locationBlock[this.eggLocationIndex % 10000]}`
+    }
+    return this.gameOfOrigin < GameOfOrigin.Sword
+      ? `from the ${GameOfOriginData[this.gameOfOrigin]?.region} region`
+      : 'from a faraway place'
+  }
+
   public get trFlagsSwSh() {
     return this.bytes.slice(0x127, 0x127 + 14)
   }
@@ -975,6 +981,15 @@ export class PB8 extends G8PKM {
     this.bytes.set(value.slice(0, 14), 0x127)
   }
 
+  public get eggLocationIndex() {
+    const value = bytesToUint16LittleEndian(this.bytes, 0x120)
+    return value === 0xffff ? 0 : value
+  }
+
+  public set eggLocationIndex(value: number) {
+    this.bytes.set(uint16ToBytesLittleEndian(value ? value : 0xffff), 0x120)
+  }
+
   public get metLocation() {
     if (isBDSP(this.gameOfOrigin)) {
       const locationBlock =
@@ -987,5 +1002,19 @@ export class PB8 extends G8PKM {
     return this.gameOfOrigin <= GameOfOrigin.Sword
       ? `in the ${GameOfOriginData[this.gameOfOrigin]?.region} region`
       : 'in a faraway place'
+  }
+
+  public get eggLocation() {
+    if (!this.eggLocationIndex) {
+      return undefined
+    }
+    if (isBDSP(this.gameOfOrigin)) {
+      const locationBlock =
+        BDSPLocations[Math.floor(this.eggLocationIndex / 10000) * 10000] ?? BDSPLocations[0]
+      return `in ${locationBlock[this.eggLocationIndex % 10000]}`
+    }
+    return this.gameOfOrigin < GameOfOrigin.Sword
+      ? `from the ${GameOfOriginData[this.gameOfOrigin]?.region} region`
+      : 'from a faraway place'
   }
 }

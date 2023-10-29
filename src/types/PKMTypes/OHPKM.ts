@@ -314,6 +314,9 @@ export class OHPKM
 
       if (hasPLAData(other)) {
         this.isAlpha = other.isAlpha
+        if (other.isAlpha && !this.ribbons.includes('Alpha Mark')) {
+          this.ribbons.push('Alpha Mark')
+        }
         this.isNoble = other.isNoble
         this.alphaMove = other.alphaMove
         this.gvs = other.gvs
@@ -1516,7 +1519,7 @@ export class OHPKM
     )
   }
 
-  public updateData(other: GamePKM, isFromOT: boolean = false) {
+  public updateData(other: GamePKM | OHPKM, isFromOT: boolean = false) {
     this.exp = other.exp
 
     this.moves = other.moves

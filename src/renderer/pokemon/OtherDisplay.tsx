@@ -29,6 +29,7 @@ import AttributeRow from './AttributeRow'
 import { PKM } from '../../types/PKMTypes/PKM'
 import { hasGameBoyData } from '../../types/interfaces/stats'
 import { OHPKM } from '../../types/PKMTypes'
+import { get16BitChecksumLittleEndian } from 'src/util/ByteLogic'
 
 const styles = {
   accordion: {
@@ -250,6 +251,18 @@ const OtherDisplay = (props: { mon: PKM }) => {
         )}
       {!isRestricted(HGSS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) && hasGen3OnData(mon) && (
         <AttributeRow label="Gen 3/4/5 ID" value={getMonGen345Identifier(mon)} />
+      )}
+      {'checksum' in mon && (
+        <>
+          <AttributeRow label="Checksum">
+            <code>{`0x${mon.checksum.toString(16).padStart(4, '0')}`}</code>
+          </AttributeRow>
+          <AttributeRow label="Calced Checksum">
+            <code>{`0x${get16BitChecksumLittleEndian(mon.bytes, 0x08, mon.bytes.length)
+              .toString(16)
+              .padStart(4, '0')}`}</code>
+          </AttributeRow>
+        </>
       )}
       {mon instanceof OHPKM && (
         <AttributeRow label="OpenHome ID" value={getMonFileIdentifier(mon)} />

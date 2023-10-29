@@ -43,38 +43,3 @@ export type GamePKMType =
   | typeof PB8
   | typeof PA8
   | typeof PK9
-
-export function fileTypeFromString(type: string): GamePKMType | undefined {
-  switch (type) {
-    case 'PK1':
-      return PK1
-    case 'PK2':
-      return PK2
-    case 'PK3':
-      return PK3
-    case 'COLOPKM':
-      return COLOPKM
-    case 'XDPKM':
-      return XDPKM
-    case 'PK4':
-      return PK4
-    case 'PK5':
-      return PK5
-    case 'PK6':
-      return PK6
-    case 'PK7':
-      return PK7
-    case 'PB7':
-      return PB7
-    case 'PK8':
-      return PK8
-    case 'PA8':
-      return PA8
-    case 'PB8':
-      return PB8
-    case 'PK9':
-      return PK9
-    default:
-      return undefined
-  }
-}

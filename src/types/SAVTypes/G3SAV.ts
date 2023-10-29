@@ -8,7 +8,6 @@ import {
   uint32ToBytesLittleEndian,
 } from '../../util/ByteLogic'
 import { gen3StringToUTF } from '../../util/Strings/StringConverter'
-import { GamePKM } from '../PKMTypes/GamePKM'
 import { PK3 } from '../PKMTypes/PK3'
 import { SaveType } from '../types'
 import { Box, SAV } from './SAV'
@@ -176,8 +175,6 @@ export class G3SAV extends SAV<PK3> {
   backupSave: G3SaveBackup
 
   primarySaveOffset: number
-
-  convertPKM = (mon: GamePKM) => new OHPKM(undefined, mon)
 
   constructor(path: string, bytes: Uint8Array) {
     super(path, bytes)

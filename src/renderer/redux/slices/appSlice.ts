@@ -3,6 +3,7 @@ import { OHPKM } from '../../../types/PKMTypes'
 import { GamePKM } from '../../../types/PKMTypes/GamePKM'
 import { PKM } from '../../../types/PKMTypes/PKM'
 import { G1SAV, G2SAV, G3SAV, G4SAV, G5SAV, SAV } from '../../../types/SAVTypes'
+import { G6SAV } from '../../../types/SAVTypes/G6SAV'
 import { HomeData } from '../../../types/SAVTypes/HomeData'
 import { SaveCoordinates } from '../../../types/types'
 import {
@@ -31,11 +32,13 @@ const initialState: AppState = {
 }
 
 export const loadHomeBoxes = createAsyncThunk('app/loadHomeBoxes', async () => {
-  return window.electron.ipcRenderer.invoke('read-home-boxes', 'Box 1')
+  const boxes = await window.electron.ipcRenderer.invoke('read-home-boxes', 'Box 1')
+  return boxes
 })
 
 export const loadHomeMons = createAsyncThunk('app/loadHomeMons', async () => {
-  return window.electron.ipcRenderer.invoke('read-home-mons')
+  const mons = await window.electron.ipcRenderer.invoke('read-home-mons')
+  return mons
 })
 
 export const loadGen12Lookup = createAsyncThunk('app/loadGen12Lookup', async () => {
@@ -71,7 +74,10 @@ const updateMonInSave = (
 const markMonAsModified = (state: Draft<AppState>, mon: OHPKM) => {
   const identifier = getMonFileIdentifier(mon)
   if (identifier) {
-    state.modifiedOHPKMs[identifier] = mon
+    state.modifiedOHPKMs = {
+      ...state.modifiedOHPKMs,
+      [identifier]: mon,
+    }
   }
 }
 
@@ -99,7 +105,7 @@ export const appSlice = createSlice({
       const isHome = saveCoordinates.saveNumber === -1
       const tempSave = isHome ? state.homeData : state.saves[saveCoordinates.saveNumber]
       mons.forEach((mon) => {
-        const homeMon = new OHPKM(undefined, mon)
+        const homeMon = mon instanceof OHPKM ? mon : new OHPKM(undefined, mon)
         while (
           tempSave.boxes[saveCoordinates.box].pokemon[nextIndex] &&
           nextIndex < tempSave.boxRows * tempSave.boxColumns
@@ -155,7 +161,7 @@ export const appSlice = createSlice({
 
       let mon = state.dragMon
       if (source.saveNumber !== dest.saveNumber) {
-        mon = new OHPKM(undefined, mon)
+        mon = mon instanceof OHPKM ? mon : new OHPKM(undefined, mon as GamePKM)
         markMonAsModified(state, mon as OHPKM)
       }
 
@@ -179,7 +185,8 @@ export const appSlice = createSlice({
           save instanceof G2SAV ||
           save instanceof G3SAV ||
           save instanceof G4SAV ||
-          save instanceof G5SAV
+          save instanceof G5SAV ||
+          save instanceof G6SAV
         ) {
           const changedMons = save.prepareBoxesForSaving()
           if (changedMons && (save instanceof G2SAV || save instanceof G1SAV)) {
@@ -282,7 +289,8 @@ export const appSlice = createSlice({
           newLookupMap[key] = value
         }
       })
-      window.electron.ipcRenderer.invoke('write-gen12-lookup', current(newLookupMap))
+      console.log
+      window.electron.ipcRenderer.send('write-gen12-lookup', current(newLookupMap))
       state.lookup.gen12 = newLookupMap
     },
     setGen345Lookup: (state, action: PayloadAction<{ [key: string]: string }>) => {
@@ -302,7 +310,7 @@ export const appSlice = createSlice({
           newLookupMap[key] = value
         }
       })
-      window.electron.ipcRenderer.invoke('write-gen345-lookup', current(newLookupMap))
+      window.electron.ipcRenderer.send('write-gen345-lookup', current(newLookupMap))
       state.lookup.gen345 = newLookupMap
     },
   },
