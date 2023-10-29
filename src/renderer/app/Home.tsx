@@ -7,6 +7,7 @@ import OpenHomeButton from '../../renderer/components/OpenHomeButton'
 import { loadRecentSaves } from '../../renderer/redux/slices/recentSavesSlice'
 import { loadResourcesPath } from '../../renderer/redux/slices/resourcesSlice'
 import { OHPKM } from '../../types/PKMTypes'
+import { PKM } from '../../types/PKMTypes/PKM'
 import { SaveCoordinates } from '../../types/types'
 import { bytesToPKM } from '../../util/FileImport'
 import { getMonFileIdentifier } from '../../util/Lookup'
@@ -43,7 +44,6 @@ import {
 import useWindowDimensions from '../util/windowDimensions'
 import Themes, { OpenHomeTheme } from './Themes'
 import { dropAreaStyle } from './styles'
-import { PKM } from '../../types/PKMTypes/PKM'
 
 const Home = () => {
   const { palette } = useTheme()
