@@ -1,6 +1,12 @@
-import { GameOfOrigin, GameOfOriginData, NDex, POKEMON_DATA, isGameBoy } from '../../consts'
-import CrystalLocation from '../../consts/MetLocation/Crystal'
-import { ItemGen2FromString, ItemGen2ToString } from '../../resources/gen/items/Gen2'
+import {
+  GameOfOrigin,
+  GameOfOriginData,
+  Gen2Locations,
+  ItemGen2FromString,
+  ItemGen2ToString,
+  isGameBoy,
+} from 'pokemon-resources'
+import { NDex, POKEMON_DATA } from '../../consts'
 import { stats, statsPreSplit } from '../../types/types'
 import {
   bytesToUint16BigEndian,
@@ -88,7 +94,7 @@ export class PK2 implements BasePKMData, Gen2Stats, Gen2OnData, Gen2OnlyData {
         GameOfOriginData[other.gameOfOrigin]?.region === 'Kanto'
       ) {
         this.metLocationIndex = other.metLocation
-          ? CrystalLocation[0].indexOf(other.metLocation.slice(3))
+          ? Gen2Locations[0].indexOf(other.metLocation.slice(3))
           : 0
       }
       this.metTimeOfDay = other.metTimeOfDay
@@ -280,7 +286,7 @@ export class PK2 implements BasePKMData, Gen2Stats, Gen2OnData, Gen2OnlyData {
 
   public get metLocation() {
     if (this.metLocationIndex) {
-      return `in ${CrystalLocation[0][this.metLocationIndex]}`
+      return `in ${Gen2Locations[0][this.metLocationIndex]}`
     }
     return undefined
   }

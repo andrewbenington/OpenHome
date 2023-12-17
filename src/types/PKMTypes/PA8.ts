@@ -1,9 +1,16 @@
-import { Ball, GameOfOrigin, GameOfOriginData, isBDSP } from '../../consts'
-import { Languages } from '../../consts/Languages'
-import LALocations from '../../consts/MetLocation/LA'
+import {
+  AbilityFromString,
+  AbilityToString,
+  Ball,
+  GameOfOrigin,
+  GameOfOriginData,
+  Gen8HisuiLocations,
+  ItemFromString,
+  ItemToString,
+  Languages,
+  isBDSP,
+} from 'pokemon-resources'
 import { Gen9Ribbons } from '../../consts/Ribbons'
-import { ItemFromString, ItemToString } from '../../resources/gen/items/Items'
-import { AbilityFromString, AbilityToString } from '../../resources/gen/other/Abilities'
 import { contestStats, hyperTrainStats, marking, memory, pokedate, stats } from '../../types/types'
 import {
   bytesToUint16LittleEndian,
@@ -915,7 +922,7 @@ export class PA8 implements Gen8OnData, PLAData, Size, SanityChecksum {
         : 'in a faraway place'
     }
     const locationBlock =
-      LALocations[Math.floor(this.metLocationIndex / 10000) * 10000] ?? LALocations[0]
+      Gen8HisuiLocations[Math.floor(this.metLocationIndex / 10000) * 10000] ?? Gen8HisuiLocations[0]
     return locationBlock[this.metLocationIndex % 10000]
   }
 

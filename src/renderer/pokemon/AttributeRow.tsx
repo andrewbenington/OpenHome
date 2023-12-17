@@ -4,11 +4,13 @@ const AttributeRow = (props: {
   justifyEnd?: boolean
   indent?: number
   children?: any
+  style?: any
 }) => {
-  const { label, value, justifyEnd, indent, children } = props
+  const { label, value, justifyEnd, indent, children, style } = props
   return (
     <div
       style={{
+        ...style,
         minHeight: 30,
         height: 30,
         marginBottom: 2,

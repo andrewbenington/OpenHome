@@ -1,5 +1,14 @@
 import bigInt from 'big-integer'
-import { max } from 'lodash'
+import _, { max } from 'lodash'
+import {
+  AttackCharacteristics,
+  DefenseCharacteristics,
+  HPCharacteristics,
+  HPCharacteristicsPre6,
+  SpecialAtkCharacteristics,
+  SpecialDefCharacteristics,
+  SpeedCharacteristics,
+} from 'pokemon-resources'
 import Prando from 'prando'
 import { MOVE_DATA, NDex, POKEMON_DATA, Types } from '../../consts'
 import { Nature } from '../../resources/gen/other/Natures'
@@ -13,7 +22,8 @@ import {
 } from '../../util/ByteLogic'
 import { getGen3To5Gender } from '../../util/GenderCalc'
 import { BasePKMData } from '../interfaces/base'
-import { hasGen3OnData } from '../interfaces/gen3'
+import { Gen3OnData, hasGen3OnData } from '../interfaces/gen3'
+import { hasGen6OnData } from '../interfaces/gen6'
 import { PKM } from './PKM'
 
 export const writeIVsToBuffer = (
@@ -349,3 +359,37 @@ export const generatePersonalityValuePreservingAttributes = (
   }
   return personalityValue
 }
+
+export function getCharacteristic(mon: Gen3OnData) {
+  const preGen6 = !hasGen6OnData(mon)
+  const tiebreaker = preGen6 ? mon.personalityValue : mon.encryptionConstant
+  if (!mon.ivs || !tiebreaker) return ''
+  const statFields = ['hp', 'atk', 'def', 'spe', 'spa', 'spd']
+  const maxIV = _.max(Object.values(mon.ivs))
+  const lastIndex = tiebreaker % 6 === 0 ? 5 : (tiebreaker % 6) - 1
+  let determiningIV = 'hp'
+  for (let i = tiebreaker % 6; i !== lastIndex; i = (i + 1) % 6) {
+    if ((mon.ivs as any)[statFields[i]] === maxIV) {
+      determiningIV = statFields[i]
+      break
+    }
+  }
+  switch (determiningIV) {
+    case 'hp':
+      return preGen6 ? HPCharacteristicsPre6[maxIV % 5] : HPCharacteristics[maxIV % 5]
+    case 'atk':
+      return AttackCharacteristics[maxIV % 5]
+    case 'def':
+      return DefenseCharacteristics[maxIV % 5]
+    case 'spa':
+      return SpecialAtkCharacteristics[maxIV % 5]
+    case 'spd':
+      return SpecialDefCharacteristics[maxIV % 5]
+    default:
+      return SpeedCharacteristics[maxIV % 5]
+  }
+}
+
+// function getPLAMoveMasteredFlag(mon: PA8 | OHPKM, index: number) {
+//   return getFlag(mon.masterFlagsLA, 0, index);
+// }

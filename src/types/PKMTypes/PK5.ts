@@ -1,9 +1,19 @@
-import { Ball, GameOfOrigin, isGen5, isHoenn, isJohto, isKanto, isSinnoh } from '../../consts'
-import { Languages } from '../../consts/Languages'
-import G5Locations from '../../consts/MetLocation/G5'
+import {
+  AbilityFromString,
+  AbilityToString,
+  Ball,
+  GameOfOrigin,
+  Gen5Locations,
+  ItemFromString,
+  ItemToString,
+  Languages,
+  isGen5,
+  isHoenn,
+  isJohto,
+  isKanto,
+  isSinnoh,
+} from 'pokemon-resources'
 import { Gen4RibbonsPart1, Gen4RibbonsPart2, Gen4RibbonsPart3 } from '../../consts/Ribbons'
-import { ItemFromString, ItemToString } from '../../resources/gen/items/Items'
-import { AbilityFromString, AbilityToString } from '../../resources/gen/other/Abilities'
 import { contestStats, marking, pokedate, stats } from '../../types/types'
 import {
   bytesToUint16LittleEndian,
@@ -501,7 +511,7 @@ export class PK5
     if (!this.eggLocationIndex) {
       return undefined
     }
-    const locationBlock = G5Locations[Math.floor(this.eggLocationIndex / 10000) * 10000]
+    const locationBlock = Gen5Locations[Math.floor(this.eggLocationIndex / 10000) * 10000]
     return `from ${locationBlock[this.eggLocationIndex % 10000]}`
   }
 
@@ -515,7 +525,7 @@ export class PK5
 
   public get metLocation() {
     const locationBlock =
-      G5Locations[Math.floor(this.metLocationIndex / 10000) * 10000] ?? G5Locations[0]
+      Gen5Locations[Math.floor(this.metLocationIndex / 10000) * 10000] ?? Gen5Locations[0]
     return `in ${locationBlock[this.metLocationIndex % 10000]}`
   }
 

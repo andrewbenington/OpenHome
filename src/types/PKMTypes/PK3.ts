@@ -1,19 +1,17 @@
 import {
+  AbilityFromString,
   Ball,
   GameOfOrigin,
-  Gen3ContestRibbons,
-  Gen3StandardRibbons,
+  Gen3GBALocations,
+  Gen3GCNLocations,
+  ItemGen3FromString,
+  ItemGen3ToString,
   Languages,
-  NDex,
-  POKEMON_DATA,
   isGen3,
   isHoenn,
   isKanto,
-} from '../../consts'
-import CXDLocation from '../../consts/MetLocation/CXD'
-import RSEFRLGLocations from '../../consts/MetLocation/RSEFRLG'
-import { ItemGen3FromString, ItemGen3ToString } from '../../resources/gen/items/Gen3'
-import { AbilityFromString } from '../../resources/gen/other/Abilities'
+} from 'pokemon-resources'
+import { Gen3ContestRibbons, Gen3StandardRibbons, NDex, POKEMON_DATA } from '../../consts'
 import { contestStats, marking, stats } from '../../types/types'
 import {
   bytesToUint16LittleEndian,
@@ -117,7 +115,7 @@ export class PK3 implements Gen3OnData {
         this.metLocationIndex = other.metLocationIndex
       } else if (isKanto(other.gameOfOrigin) || isHoenn(other.gameOfOrigin)) {
         let equivalentLocation = other.metLocation
-          ? RSEFRLGLocations[0].indexOf(other.metLocation.slice(3))
+          ? Gen3GBALocations[0].indexOf(other.metLocation.slice(3))
           : -1
         if (other.gameOfOrigin === GameOfOrigin.ColosseumXD) {
           equivalentLocation = 254
@@ -405,9 +403,9 @@ export class PK3 implements Gen3OnData {
 
   public get metLocation() {
     if (this.gameOfOrigin === GameOfOrigin.ColosseumXD) {
-      return `in ${CXDLocation[0][this.metLocationIndex]}`
+      return `in ${Gen3GCNLocations[0][this.metLocationIndex]}`
     }
-    return `in ${RSEFRLGLocations[0][this.metLocationIndex]}`
+    return `in ${Gen3GBALocations[0][this.metLocationIndex]}`
   }
 
   public get metLevel() {

@@ -1,4 +1,4 @@
-import { GameOfOrigin } from '../../consts'
+import { GameOfOrigin } from 'pokemon-resources'
 import {
   ORAS_TRANSFER_RESTRICTIONS,
   XY_TRANSFER_RESTRICTIONS,

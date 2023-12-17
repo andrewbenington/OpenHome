@@ -1,4 +1,4 @@
-import { isGameBoy } from '../consts'
+import { isGameBoy } from 'pokemon-resources'
 import { BasePKMData, OHPKM, PK4 } from '../types/PKMTypes'
 import { getBaseMon } from '../types/PKMTypes/util'
 import { Gen3OnData, hasGen3OnData } from '../types/interfaces/gen3'

@@ -1,5 +1,5 @@
 import { uniq } from 'lodash'
-import { GameOfOrigin } from '../../consts'
+import { GameOfOrigin } from 'pokemon-resources'
 import { GEN2_TRANSFER_RESTRICTIONS } from '../../consts/TransferRestrictions'
 import { OHPKM } from '../../types/PKMTypes/OHPKM'
 import { PK2 } from '../../types/PKMTypes/PK2'

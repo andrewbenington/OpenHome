@@ -1,5 +1,5 @@
-import { GameOfOrigin, NDex, POKEMON_DATA, isGameBoy } from '../../consts'
-import { ItemGen2FromString, ItemGen2ToString } from '../../resources/gen/items/Gen2'
+import { GameOfOrigin, ItemGen2FromString, ItemGen2ToString, isGameBoy } from 'pokemon-resources'
+import { NDex, POKEMON_DATA } from '../../consts'
 import { statsPreSplit } from '../../types/types'
 import {
   bytesToUint16BigEndian,

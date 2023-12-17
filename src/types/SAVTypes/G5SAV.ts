@@ -1,5 +1,6 @@
 import _ from 'lodash'
-import { GameOfOrigin, NDex } from '../../consts'
+import { GameOfOrigin } from 'pokemon-resources'
+import { NDex } from '../../consts'
 import { bytesToUint16LittleEndian, uint16ToBytesLittleEndian } from '../../util/ByteLogic'
 import { CRC16_CCITT } from '../../util/Encryption'
 import { gen5StringToUTF } from '../../util/Strings/StringConverter'

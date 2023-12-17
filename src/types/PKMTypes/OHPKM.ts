@@ -1,18 +1,17 @@
 import _, { uniq } from 'lodash'
-import Prando from 'prando'
 import {
+  AbilityFromString,
+  AbilityToString,
   Ball,
   GameOfOrigin,
-  Gen34ContestRibbons,
-  Gen34TowerRibbons,
+  ItemFromString,
+  ItemToString,
   Languages,
-  NDex,
-  OpenHomeRibbons,
-} from '../../consts'
-import { getLocation } from '../../consts/MetLocation/MetLocation'
+  getMetLocation,
+} from 'pokemon-resources'
+import Prando from 'prando'
+import { Gen34ContestRibbons, Gen34TowerRibbons, NDex, OpenHomeRibbons } from '../../consts'
 import { ShadowIDsColosseum, ShadowIDsXD } from '../../consts/ShadowIDs'
-import { ItemFromString, ItemToString } from '../../resources/gen/items/Items'
-import { AbilityFromString, AbilityToString } from '../../resources/gen/other/Abilities'
 import {
   contestStats,
   geolocation,
@@ -315,7 +314,7 @@ export class OHPKM
       if (hasPLAData(other)) {
         this.isAlpha = other.isAlpha
         if (other.isAlpha && !this.ribbons.includes('Alpha Mark')) {
-          this.ribbons.push('Alpha Mark')
+          this.ribbons = [...this.ribbons, 'Alpha Mark']
         }
         this.isNoble = other.isNoble
         this.alphaMove = other.alphaMove
@@ -1343,7 +1342,7 @@ export class OHPKM
 
   public get eggLocation() {
     if (!this.eggLocationIndex) return undefined
-    return getLocation(this.gameOfOrigin, this.eggLocationIndex, this.format, true)
+    return getMetLocation(this.metLocationIndex, { origin: this.gameOfOrigin })
   }
 
   public get metLocationIndex() {
@@ -1355,7 +1354,7 @@ export class OHPKM
   }
 
   public get metLocation() {
-    return getLocation(this.gameOfOrigin, this.metLocationIndex, this.format, false)
+    return getMetLocation(this.metLocationIndex, { origin: this.gameOfOrigin })
   }
 
   public get metLevel() {

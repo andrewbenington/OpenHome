@@ -9,6 +9,7 @@ import {
   Title,
   Tooltip,
 } from 'chart.js'
+import { getNatureSummary } from 'pokemon-resources'
 import { useEffect, useMemo, useState } from 'react'
 import { Radar } from 'react-chartjs-2'
 import { hasGen8OnData, hasPLAData } from 'src/types/interfaces/gen8'
@@ -18,7 +19,6 @@ import {
   LA_TRANSFER_RESTRICTIONS,
   LGPE_TRANSFER_RESTRICTIONS,
 } from '../../consts/TransferRestrictions'
-import { getNatureSummary } from '../../resources/NatureData'
 import { PKM } from '../../types/PKMTypes/PKM'
 import { isRestricted } from '../../types/TransferRestrictions'
 import { hasGen3OnData } from '../../types/interfaces/gen3'

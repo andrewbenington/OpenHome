@@ -37,7 +37,7 @@ export const fileToSpriteFolder: StringToStringMap = {
   PK5: 'gen5',
   PK6: 'gen6',
   PK7: 'gen7',
-  PB7: 'home',
+  PB7: 'lgpe',
   PK8: 'home',
   PA8: 'gen8a',
   PB8: 'home',

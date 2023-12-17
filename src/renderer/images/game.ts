@@ -1,4 +1,4 @@
-import { GameOfOrigin, colosseumOrXD, ColosseumOrXD, GameOfOriginData } from '../../consts'
+import { ColosseumOrXD, GameOfOrigin, GameOfOriginData, colosseumOrXD } from 'pokemon-resources'
 
 const GameLogos: { [key: string]: string } = {
   AlphaSapphire: `logos/Alpha_Sapphire.png`,

@@ -1,14 +1,21 @@
+import {
+  AbilityFromString,
+  Ball,
+  GameOfOrigin,
+  GameOfOriginData,
+  Gen3GBALocations,
+  Gen3GCNLocations,
+  ItemGen3FromString,
+  ItemGen3ToString,
+  Languages,
+  LanguagesGCN,
+  isKanto,
+} from 'pokemon-resources'
 import { GEN3_ABILITY_MAX, GEN3_MOVE_MAX, OHPKM } from '.'
-import { Ball, NDex } from '../../consts'
-import { GameOfOrigin, GameOfOriginData, isKanto } from '../../consts/GameOfOrigin'
-import { GCLanguages, Languages } from '../../consts/Languages'
-import CXDLocation from '../../consts/MetLocation/CXD'
-import RSEFRLGLocations from '../../consts/MetLocation/RSEFRLG'
+import { NDex } from '../../consts'
 import { POKEMON_DATA } from '../../consts/Mons'
 import { Gen3ContestRibbons, Gen3StandardRibbons } from '../../consts/Ribbons'
 import { ShadowGaugeMax, ShadowIDsColosseum } from '../../consts/ShadowIDs'
-import { ItemGen3FromString, ItemGen3ToString } from '../../resources/gen/items/Gen3'
-import { AbilityFromString } from '../../resources/gen/other/Abilities'
 import { contestStats, marking, stats } from '../../types/types'
 import {
   bytesToInt32BigEndian,
@@ -139,12 +146,12 @@ export class COLOPKM implements Gen3OnData, Gen3OrreData {
   }
 
   public get gameOfOrigin() {
-    const origin = GameOfOriginData.find((game) => game?.gc === this.bytes[0x08]) ?? null
+    const origin = GameOfOriginData.find((game) => game?.gameCubeIndex === this.bytes[0x08]) ?? null
     return GameOfOriginData.indexOf(origin)
   }
 
   public set gameOfOrigin(value: number) {
-    this.bytes[0x08] = GameOfOriginData[value]?.gc ?? 0
+    this.bytes[0x08] = GameOfOriginData[value]?.gameCubeIndex ?? 0
   }
 
   public get languageIndex() {
@@ -152,11 +159,11 @@ export class COLOPKM implements Gen3OnData, Gen3OrreData {
   }
 
   public get language() {
-    return GCLanguages[this.bytes[0x0b]]
+    return LanguagesGCN[this.bytes[0x0b]]
   }
 
   public set language(value) {
-    this.bytes[0x0b] = Math.max(GCLanguages.indexOf(value), 0)
+    this.bytes[0x0b] = Math.max(LanguagesGCN.indexOf(value), 0)
   }
 
   public get metLocationIndex() {
@@ -169,9 +176,9 @@ export class COLOPKM implements Gen3OnData, Gen3OrreData {
 
   public get metLocation() {
     if (this.gameOfOrigin === GameOfOrigin.ColosseumXD) {
-      return `in ${CXDLocation[0][this.metLocationIndex]}`
+      return `in ${Gen3GCNLocations[0][this.metLocationIndex]}`
     }
-    return `in ${RSEFRLGLocations[0][this.metLocationIndex]}`
+    return `in ${Gen3GBALocations[0][this.metLocationIndex]}`
   }
 
   public get metLevel() {
