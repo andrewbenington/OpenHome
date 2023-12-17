@@ -1,8 +1,6 @@
 import { Card } from '@mui/material'
 import { useMemo } from 'react'
-import { GameOfOriginData, RibbonTitles, getCharacteristic } from '../../consts'
-import { NatureToString } from '../../resources/gen/other/Natures'
-import { getMoveMaxPP } from '../../types/PKMTypes/util'
+import { getCharacteristic, getMoveMaxPP } from '../../types/PKMTypes/util'
 import { hasGen2OnData } from '../../types/interfaces/gen2'
 import { hasGen3OnData, hasOrreData } from '../../types/interfaces/gen3'
 import { hasGen4OnData } from '../../types/interfaces/gen4'
@@ -13,6 +11,8 @@ import { getPublicImageURL } from '../images/images'
 import { getBallIconPath } from '../images/items'
 import MoveCard from './MoveCard'
 import { PKM } from '../../types/PKMTypes/PKM'
+import { GameOfOriginData, NatureToString } from 'pokemon-resources'
+import { RibbonTitles } from 'src/consts'
 
 const styles = {
   container: {

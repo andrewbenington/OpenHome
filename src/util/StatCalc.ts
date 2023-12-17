@@ -1,5 +1,6 @@
 /* eslint-disable no-nested-ternary */
-import { LevelUpExp, NDex, POKEMON_DATA, getNatureSummary } from '../consts'
+import { getNatureSummary } from 'pokemon-resources'
+import { LevelUpExp, NDex, POKEMON_DATA } from '../consts'
 import { BasePKMData } from '../types/interfaces/base'
 import { Gen3OnData } from '../types/interfaces/gen3'
 import { Stat } from '../types/types'

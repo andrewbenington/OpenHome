@@ -1,10 +1,19 @@
 import _ from 'lodash'
-import { Ball, GameOfOrigin, GameOfOriginData, isGen6, isKanto, isSinnoh } from '../../consts'
-import { Languages } from '../../consts/Languages'
-import G6Location from '../../consts/MetLocation/G6'
+import {
+  AbilityFromString,
+  AbilityToString,
+  Ball,
+  GameOfOrigin,
+  GameOfOriginData,
+  Gen6Locations,
+  ItemFromString,
+  ItemToString,
+  Languages,
+  isGen6,
+  isKanto,
+  isSinnoh,
+} from 'pokemon-resources'
 import { Gen9Ribbons } from '../../consts/Ribbons'
-import { ItemFromString, ItemToString } from '../../resources/gen/items/Items'
-import { AbilityFromString, AbilityToString } from '../../resources/gen/other/Abilities'
 import { contestStats, geolocation, marking, memory, pokedate, stats } from '../../types/types'
 import {
   bytesToUint16LittleEndian,
@@ -736,7 +745,7 @@ export class PK6
         ? `in the ${GameOfOriginData[this.gameOfOrigin]?.region} region`
         : 'in a faraway place'
     }
-    const locationBlock = G6Location[Math.floor(this.eggLocationIndex / 10000) * 10000]
+    const locationBlock = Gen6Locations[Math.floor(this.eggLocationIndex / 10000) * 10000]
     if (locationBlock) {
       return `from ${locationBlock[this.eggLocationIndex % 10000]}`
     }
@@ -758,7 +767,7 @@ export class PK6
         : 'in a faraway place'
     }
     const locationBlock =
-      G6Location[Math.floor(this.metLocationIndex / 10000) * 10000] ?? G6Location[0]
+      Gen6Locations[Math.floor(this.metLocationIndex / 10000) * 10000] ?? Gen6Locations[0]
     return `in ${locationBlock[this.metLocationIndex % 10000]}`
   }
 

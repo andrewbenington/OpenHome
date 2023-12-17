@@ -1,6 +1,12 @@
-import { ItemGen2, ItemGen2ToString } from '../../resources/gen/items/Gen2'
-import { ItemGen3, ItemGen3ToString } from '../../resources/gen/items/Gen3'
-import { Item, ItemFromString, ItemToString } from '../../resources/gen/items/Items'
+import {
+  Item,
+  ItemFromString,
+  ItemGen2,
+  ItemGen2ToString,
+  ItemGen3,
+  ItemGen3ToString,
+  ItemToString,
+} from 'pokemon-resources'
 
 const BallIcons: { [key: string]: string } = {
   Master: 'items/index/0001.png',

@@ -7,7 +7,7 @@ import { hasGen4OnData, hasGen4OnlyData, shinyLeafValues } from 'src/types/inter
 import { hasGen6OnData, hasN3DSOnlyData } from 'src/types/interfaces/gen6'
 import { hasGen8OnData, hasGen8OnlyData } from 'src/types/interfaces/gen8'
 import { hasGen9OnlyData } from 'src/types/interfaces/gen9'
-import { Countries, EncounterTypes, NDex, SWEETS, isGen4 } from '../../consts'
+import { Countries, EncounterTypes, NDex, SWEETS } from '../../consts'
 import {
   GEN2_TRANSFER_RESTRICTIONS,
   HGSS_TRANSFER_RESTRICTIONS,
@@ -30,6 +30,7 @@ import { PKM } from '../../types/PKMTypes/PKM'
 import { hasGameBoyData } from '../../types/interfaces/stats'
 import { OHPKM } from '../../types/PKMTypes'
 import { get16BitChecksumLittleEndian } from 'src/util/ByteLogic'
+import { isGen4 } from 'pokemon-resources'
 
 const styles = {
   accordion: {
@@ -63,6 +64,7 @@ const styles = {
     flexDirection: 'column' as 'column',
     height: 'calc(100% - 20px)',
     padding: 10,
+    marginBottom: 10,
   },
 } as Styles
 

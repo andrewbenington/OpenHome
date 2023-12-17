@@ -2,7 +2,6 @@ import { ArrowBack, ArrowForward, Close } from '@mui/icons-material'
 import { Card, Grid, useTheme } from '@mui/material'
 import _ from 'lodash'
 import { useMemo } from 'react'
-import { GameOfOriginData } from '../../consts'
 import { PKM } from '../../types/PKMTypes/PKM'
 import { isRestricted } from '../../types/TransferRestrictions'
 import { SaveCoordinates, getSaveTypeString } from '../../types/types'
@@ -18,6 +17,7 @@ import {
 } from '../redux/slices/appSlice'
 import ArrowButton from './ArrowButton'
 import BoxCell from './BoxCell'
+import { GameOfOriginData } from 'pokemon-resources'
 
 interface SaveDisplayProps {
   saveIndex: number

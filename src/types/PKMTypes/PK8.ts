@@ -1,9 +1,18 @@
-import { Ball, GameOfOrigin, GameOfOriginData, Languages, isBDSP, isGalar } from '../../consts'
-import BDSPLocations from '../../consts/MetLocation/BDSP'
-import SwShLocations from '../../consts/MetLocation/SwSh'
+import {
+  AbilityFromString,
+  AbilityToString,
+  Ball,
+  GameOfOrigin,
+  GameOfOriginData,
+  Gen8GalarLocations,
+  Gen8SinnohLocations,
+  ItemFromString,
+  ItemToString,
+  Languages,
+  isBDSP,
+  isGalar,
+} from 'pokemon-resources'
 import { Gen9Ribbons } from '../../consts/Ribbons'
-import { ItemFromString, ItemToString } from '../../resources/gen/items/Items'
-import { AbilityFromString, AbilityToString } from '../../resources/gen/other/Abilities'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -818,12 +827,14 @@ export class G8PKM
   public get metLocation() {
     if (isGalar(this.gameOfOrigin)) {
       const locationBlock =
-        SwShLocations[Math.floor(this.metLocationIndex / 10000) * 10000] ?? SwShLocations[0]
+        Gen8GalarLocations[Math.floor(this.metLocationIndex / 10000) * 10000] ??
+        Gen8GalarLocations[0]
       return `in ${locationBlock[this.metLocationIndex % 10000]}`
     }
     if (isBDSP(this.gameOfOrigin)) {
       const locationBlock =
-        BDSPLocations[Math.floor(this.metLocationIndex / 10000) * 10000] ?? BDSPLocations[0]
+        Gen8SinnohLocations[Math.floor(this.metLocationIndex / 10000) * 10000] ??
+        Gen8SinnohLocations[0]
       return `in ${locationBlock[this.metLocationIndex % 10000]}`
     }
     return this.gameOfOrigin <= GameOfOrigin.Sword
@@ -929,7 +940,8 @@ export class PK8 extends G8PKM {
   public get metLocation() {
     if (isGalar(this.gameOfOrigin)) {
       const locationBlock =
-        SwShLocations[Math.floor(this.metLocationIndex / 10000) * 10000] ?? SwShLocations[0]
+        Gen8GalarLocations[Math.floor(this.metLocationIndex / 10000) * 10000] ??
+        Gen8GalarLocations[0]
       return `in ${locationBlock[this.metLocationIndex % 10000]}`
     }
     return this.gameOfOrigin <= GameOfOrigin.Sword
@@ -943,7 +955,8 @@ export class PK8 extends G8PKM {
     }
     if (isGalar(this.gameOfOrigin)) {
       const locationBlock =
-        SwShLocations[Math.floor(this.eggLocationIndex / 10000) * 10000] ?? SwShLocations[0]
+        Gen8GalarLocations[Math.floor(this.eggLocationIndex / 10000) * 10000] ??
+        Gen8GalarLocations[0]
       return `in ${locationBlock[this.eggLocationIndex % 10000]}`
     }
     return this.gameOfOrigin < GameOfOrigin.Sword
@@ -993,7 +1006,8 @@ export class PB8 extends G8PKM {
   public get metLocation() {
     if (isBDSP(this.gameOfOrigin)) {
       const locationBlock =
-        BDSPLocations[Math.floor(this.metLocationIndex / 10000) * 10000] ?? BDSPLocations[0]
+        Gen8SinnohLocations[Math.floor(this.metLocationIndex / 10000) * 10000] ??
+        Gen8SinnohLocations[0]
       return `in ${locationBlock[this.metLocationIndex % 10000]}`
     }
     if (this.gameOfOrigin === GameOfOrigin.LegendsArceus) {
@@ -1010,7 +1024,8 @@ export class PB8 extends G8PKM {
     }
     if (isBDSP(this.gameOfOrigin)) {
       const locationBlock =
-        BDSPLocations[Math.floor(this.eggLocationIndex / 10000) * 10000] ?? BDSPLocations[0]
+        Gen8SinnohLocations[Math.floor(this.eggLocationIndex / 10000) * 10000] ??
+        Gen8SinnohLocations[0]
       return `in ${locationBlock[this.eggLocationIndex % 10000]}`
     }
     return this.gameOfOrigin < GameOfOrigin.Sword

@@ -1,4 +1,5 @@
-import { GameOfOrigin, NDex } from '../../consts'
+import { GameOfOrigin } from 'pokemon-resources'
+import { NDex } from '../../consts'
 import { OHPKM } from '../../types/PKMTypes/OHPKM'
 import { CapPikachus, RegionalForms } from '../../types/TransferRestrictions'
 import {

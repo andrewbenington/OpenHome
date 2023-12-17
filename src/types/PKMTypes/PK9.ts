@@ -1,8 +1,16 @@
-import { Ball, GameOfOrigin, GameOfOriginData, Languages, isPaldea } from '../../consts'
-import SVMetLocation from '../../consts/MetLocation/SV'
+import {
+  AbilityFromString,
+  AbilityToString,
+  Ball,
+  GameOfOrigin,
+  GameOfOriginData,
+  Gen9Locations,
+  ItemFromString,
+  ItemToString,
+  Languages,
+  isPaldea,
+} from 'pokemon-resources'
 import { Gen9Ribbons } from '../../consts/Ribbons'
-import { ItemFromString, ItemToString } from '../../resources/gen/items/Items'
-import { AbilityFromString, AbilityToString } from '../../resources/gen/other/Abilities'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -788,7 +796,7 @@ export class PK9 implements BasePKMData, Gen8OnData, Gen9OnlyData, SanityChecksu
         ? `from the ${GameOfOriginData[this.gameOfOrigin]?.region} region`
         : 'from a faraway place'
     }
-    const locationBlock = SVMetLocation[Math.floor(this.eggLocationIndex / 10000) * 10000]
+    const locationBlock = Gen9Locations[Math.floor(this.eggLocationIndex / 10000) * 10000]
     return `from ${locationBlock[this.eggLocationIndex % 10000]}`
   }
 
@@ -807,7 +815,7 @@ export class PK9 implements BasePKMData, Gen8OnData, Gen9OnlyData, SanityChecksu
         : 'in a faraway place'
     }
     const locationBlock =
-      SVMetLocation[Math.floor(this.metLocationIndex / 10000) * 10000] ?? SVMetLocation[0]
+      Gen9Locations[Math.floor(this.metLocationIndex / 10000) * 10000] ?? Gen9Locations[0]
     return `in ${locationBlock[this.metLocationIndex % 10000]}`
   }
 

@@ -1,13 +1,20 @@
-import { Ball, GameOfOrigin, NDex, isKanto } from '../../consts'
-import { GameOfOriginData } from '../../consts/GameOfOrigin'
-import { GCLanguages, Languages } from '../../consts/Languages'
-import CXDLocation from '../../consts/MetLocation/CXD'
-import RSEFRLGLocations from '../../consts/MetLocation/RSEFRLG'
+import {
+  AbilityFromString,
+  Ball,
+  GameOfOrigin,
+  GameOfOriginData,
+  Gen3GBALocations,
+  Gen3GCNLocations,
+  ItemGen3FromString,
+  ItemGen3ToString,
+  Languages,
+  LanguagesGCN,
+  isKanto,
+} from 'pokemon-resources'
+import { NDex } from '../../consts'
 import { POKEMON_DATA } from '../../consts/Mons'
 import { Gen3ContestRibbons, Gen3StandardRibbons } from '../../consts/Ribbons'
 import { ShadowIDsXD } from '../../consts/ShadowIDs'
-import { ItemGen3FromString, ItemGen3ToString } from '../../resources/gen/items/Gen3'
-import { AbilityFromString } from '../../resources/gen/other/Abilities'
 import { contestStats, marking, stats } from '../../types/types'
 import {
   bytesToUint16BigEndian,
@@ -192,9 +199,9 @@ export class XDPKM implements BasePKMData, Gen3OnData, Gen3OrreData {
 
   public get metLocation() {
     if (this.gameOfOrigin === GameOfOrigin.ColosseumXD) {
-      return `in ${CXDLocation[0][this.metLocationIndex]}`
+      return `in ${Gen3GCNLocations[0][this.metLocationIndex]}`
     }
-    return `in ${RSEFRLGLocations[0][this.metLocationIndex]}`
+    return `in ${Gen3GBALocations[0][this.metLocationIndex]}`
   }
 
   public get metLevel() {
@@ -340,12 +347,12 @@ export class XDPKM implements BasePKMData, Gen3OnData, Gen3OrreData {
   }
 
   public get gameOfOrigin() {
-    const origin = GameOfOriginData.find((game) => game?.gc === this.bytes[0x34]) ?? null
+    const origin = GameOfOriginData.find((game) => game?.gameCubeIndex === this.bytes[0x34]) ?? null
     return GameOfOriginData.indexOf(origin)
   }
 
   public set gameOfOrigin(value: number) {
-    this.bytes[0x34] = GameOfOriginData[value]?.gc ?? 0
+    this.bytes[0x34] = GameOfOriginData[value]?.gameCubeIndex ?? 0
   }
 
   public get languageIndex() {
@@ -353,11 +360,11 @@ export class XDPKM implements BasePKMData, Gen3OnData, Gen3OrreData {
   }
 
   public get language() {
-    return GCLanguages[this.bytes[0x37]]
+    return LanguagesGCN[this.bytes[0x37]]
   }
 
   public set language(value) {
-    this.bytes[0x37] = Math.max(GCLanguages.indexOf(value), 0)
+    this.bytes[0x37] = Math.max(LanguagesGCN.indexOf(value), 0)
   }
 
   public get trainerName() {

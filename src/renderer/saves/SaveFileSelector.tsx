@@ -1,6 +1,5 @@
 import { MoreVert } from '@mui/icons-material'
 import { IconButton, useTheme } from '@mui/material'
-import { GameOfOriginData } from '../../consts'
 import { useAppDispatch } from '../../renderer/redux/hooks'
 import { useLookupMaps, useRecentSaves } from '../../renderer/redux/selectors'
 import { addSave } from '../../renderer/redux/slices/appSlice'
@@ -9,6 +8,7 @@ import { SaveRef, getSaveTypeString } from '../../types/types'
 import OpenHomeButton from '../components/OpenHomeButton'
 import { getGameLogo } from '../images/game'
 import { getPublicImageURL } from '../images/images'
+import { GameOfOriginData } from 'pokemon-resources'
 
 interface SaveFileSelectorProps {
   onClose: () => void

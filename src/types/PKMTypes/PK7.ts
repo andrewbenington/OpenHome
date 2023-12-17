@@ -1,10 +1,17 @@
 import _ from 'lodash'
-import { Ball, GameOfOrigin, GameOfOriginData, isAlola } from '../../consts'
-import { Languages } from '../../consts/Languages'
-import SMUSUMLocations from '../../consts/MetLocation/SMUSUM'
+import {
+  AbilityFromString,
+  AbilityToString,
+  Ball,
+  GameOfOrigin,
+  GameOfOriginData,
+  Gen7AlolaLocations,
+  ItemFromString,
+  ItemToString,
+  Languages,
+  isAlola,
+} from 'pokemon-resources'
 import { Gen9Ribbons } from '../../consts/Ribbons'
-import { ItemFromString, ItemToString } from '../../resources/gen/items/Items'
-import { AbilityFromString, AbilityToString } from '../../resources/gen/other/Abilities'
 import {
   contestStats,
   geolocation,
@@ -713,7 +720,7 @@ export class PK7 implements BasePKMData, Gen7OnData, N3DSOnlyData, SanityChecksu
         ? `from the ${GameOfOriginData[this.gameOfOrigin]?.region} region`
         : 'from a faraway place'
     }
-    const locationBlock = SMUSUMLocations[Math.floor(this.eggLocationIndex / 10000) * 10000]
+    const locationBlock = Gen7AlolaLocations[Math.floor(this.eggLocationIndex / 10000) * 10000]
     return `from ${locationBlock[this.eggLocationIndex % 10000]}`
   }
 
@@ -733,7 +740,7 @@ export class PK7 implements BasePKMData, Gen7OnData, N3DSOnlyData, SanityChecksu
         : 'in a faraway place'
     }
     const locationBlock =
-      SMUSUMLocations[Math.floor(this.metLocationIndex / 10000) * 10000] ?? SMUSUMLocations[0]
+      Gen7AlolaLocations[Math.floor(this.metLocationIndex / 10000) * 10000] ?? Gen7AlolaLocations[0]
     return `in ${locationBlock[this.metLocationIndex % 10000]}`
   }
 

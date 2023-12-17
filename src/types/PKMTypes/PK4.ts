@@ -1,19 +1,19 @@
 import {
+  AbilityFromString,
+  AbilityToString,
   Ball,
   GameOfOrigin,
-  Gen4RibbonsPart1,
-  Gen4RibbonsPart2,
-  Gen4RibbonsPart3,
+  Gen4Locations,
+  ItemFromString,
+  ItemToString,
   Languages,
   isGen4,
   isHoenn,
   isJohto,
   isKanto,
   isSinnoh,
-} from '../../consts'
-import G4Locations from '../../consts/MetLocation/G4'
-import { ItemFromString, ItemToString } from '../../resources/gen/items/Items'
-import { AbilityFromString, AbilityToString } from '../../resources/gen/other/Abilities'
+} from 'pokemon-resources'
+import { Gen4RibbonsPart1, Gen4RibbonsPart2, Gen4RibbonsPart3 } from '../../consts'
 import { contestStats, marking, pokedate, stats } from '../../types/types'
 import {
   bytesToUint16LittleEndian,
@@ -129,7 +129,7 @@ export class PK4
         this.metLocationIndex = other.metLocationIndex ?? 3002
       } else {
         let equivalentLocation = other.metLocation
-          ? G4Locations[0].indexOf(other.metLocation.slice(3))
+          ? Gen4Locations[0].indexOf(other.metLocation.slice(3))
           : undefined
         if (equivalentLocation !== undefined && equivalentLocation < 0) {
           equivalentLocation = undefined
@@ -522,7 +522,7 @@ export class PK4
     if (!this.eggLocationIndex) {
       return undefined
     }
-    const locationBlock = G4Locations[Math.floor(this.eggLocationIndex / 1000) * 1000]
+    const locationBlock = Gen4Locations[Math.floor(this.eggLocationIndex / 1000) * 1000]
     return `from ${locationBlock[this.eggLocationIndex % 1000]}`
   }
 
@@ -543,7 +543,7 @@ export class PK4
 
   public get metLocation() {
     const locationBlock =
-      G4Locations[Math.floor(this.metLocationIndex / 1000) * 1000] ?? G4Locations[0]
+      Gen4Locations[Math.floor(this.metLocationIndex / 1000) * 1000] ?? Gen4Locations[0]
     return `in ${locationBlock[this.metLocationIndex % 1000]}`
   }
 

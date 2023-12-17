@@ -1,8 +1,16 @@
-import { Ball, GameOfOrigin, GameOfOriginData, isAlola, isKanto } from '../../consts'
-import { Languages } from '../../consts/Languages'
-import LGPELocations from '../../consts/MetLocation/LGPE'
-import { ItemFromString, ItemToString } from '../../resources/gen/items/Items'
-import { AbilityFromString, AbilityToString } from '../../resources/gen/other/Abilities'
+import {
+  AbilityFromString,
+  AbilityToString,
+  Ball,
+  GameOfOrigin,
+  GameOfOriginData,
+  Gen7KantoLocations,
+  ItemFromString,
+  ItemToString,
+  Languages,
+  isAlola,
+  isKanto,
+} from 'pokemon-resources'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -632,7 +640,7 @@ export class PB7
         ? `from the ${GameOfOriginData[this.gameOfOrigin]?.region} region`
         : 'from a faraway place'
     }
-    const locationBlock = LGPELocations[Math.floor(this.eggLocationIndex / 10000) * 10000]
+    const locationBlock = Gen7KantoLocations[Math.floor(this.eggLocationIndex / 10000) * 10000]
     return `from ${locationBlock[this.eggLocationIndex % 10000]}`
   }
 
@@ -652,7 +660,7 @@ export class PB7
         : 'in a faraway place'
     }
     const locationBlock =
-      LGPELocations[Math.floor(this.metLocationIndex / 10000) * 10000] ?? LGPELocations[0]
+      Gen7KantoLocations[Math.floor(this.metLocationIndex / 10000) * 10000] ?? Gen7KantoLocations[0]
     return `in ${locationBlock[this.metLocationIndex % 10000]}`
   }
 

@@ -1,4 +1,4 @@
-import { GameOfOrigin } from '../../consts'
+import { GameOfOrigin } from 'pokemon-resources'
 import { OHPKM } from '../../types/PKMTypes/OHPKM'
 import { TransferRestrictions } from '../../types/TransferRestrictions'
 import { SaveRef, SaveType } from '../../types/types'

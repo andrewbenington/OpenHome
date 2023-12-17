@@ -1,5 +1,5 @@
 import _, { uniq } from 'lodash'
-import { GameOfOrigin } from '../../consts'
+import { GameOfOrigin } from 'pokemon-resources'
 import { GEN1_TRANSFER_RESTRICTIONS } from '../../consts/TransferRestrictions'
 import { bytesToUint16BigEndian, get8BitChecksum } from '../../util/ByteLogic'
 import { natDexToGen1ID } from '../../util/ConvertPokemonID'

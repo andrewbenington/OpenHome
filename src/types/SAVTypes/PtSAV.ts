@@ -1,4 +1,4 @@
-import { GameOfOrigin } from '../../consts'
+import { GameOfOrigin } from 'pokemon-resources'
 import { PT_TRANSFER_RESTRICTIONS } from '../../consts/TransferRestrictions'
 import { SaveType } from '../../types/types'
 import { bytesToUint16LittleEndian, bytesToUint32LittleEndian } from '../../util/ByteLogic'
