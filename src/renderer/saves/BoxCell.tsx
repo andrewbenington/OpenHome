@@ -16,7 +16,6 @@ const styles = {
     width: '100%',
     aspectRatio: 1,
     position: 'relative',
-    border: 'none',
     borderRadius: 3,
     textAlign: 'center',
   },

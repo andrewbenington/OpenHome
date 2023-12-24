@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 
 interface OpenHomeButtonProps {
   onClick?: React.MouseEventHandler<HTMLButtonElement>
@@ -9,19 +9,14 @@ interface OpenHomeButtonProps {
 
 const OpenHomeButton = (props: OpenHomeButtonProps) => {
   const { onClick, style, children, disabled } = props
-  const [hovered, setHovered] = useState(false)
   return (
     <button
       style={{
-        border: 'none',
         borderRadius: 3,
         cursor: 'pointer',
-        filter: hovered ? 'brightness(90%)' : undefined,
         ...style,
       }}
       onClick={onClick}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
       disabled={disabled}
     >
       {children}

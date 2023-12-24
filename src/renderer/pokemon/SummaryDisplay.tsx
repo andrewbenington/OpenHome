@@ -31,7 +31,7 @@ const styles = {
     objectFit: 'contain',
   },
   attributesList: { textAlign: 'left', width: '30%', marginTop: 10 },
-  language: { padding: '5px 10px 5px 10px', marginLeft: 'auto' },
+  language: { padding: '5px 10px 5px 10px', marginLeft: 'auto', color: 'white' },
   nicknameRow: {
     display: 'flex',
     flexDirection: 'row',

@@ -1,5 +1,5 @@
 import { FileOpen } from '@mui/icons-material'
-import { Dialog, Grid, useTheme } from '@mui/material'
+import { Box, Dialog, Grid, useTheme } from '@mui/material'
 import _ from 'lodash'
 import { useCallback, useEffect, useState } from 'react'
 import { POKEMON_DATA } from '../../consts'
@@ -11,6 +11,7 @@ import { PKM } from '../../types/PKMTypes/PKM'
 import { SaveCoordinates } from '../../types/types'
 import { bytesToPKM } from '../../util/FileImport'
 import { getMonFileIdentifier } from '../../util/Lookup'
+import FilterPanel from '../components/FilterPanel'
 import BoxIcons from '../images/BoxIcons.png'
 import PokemonDisplay from '../pokemon/PokemonDisplay'
 import { useAppDispatch } from '../redux/hooks'
@@ -194,9 +195,20 @@ const Home = () => {
         alignItems="center"
         style={{ padding: 10 }}
       >
-        <div style={{ width: height * 0.75 }}>
-          <HomeBoxDisplay setSelectedMon={setSelectedMon} />
-        </div>
+        <Box display="flex" flexDirection="row" style={{ width: '100%' }}>
+          <Box display="flex" flexDirection="row" style={{ width: height * 0.75 }}>
+            <HomeBoxDisplay setSelectedMon={setSelectedMon} />
+          </Box>
+          <Box flex={1}>
+            {/* <IconButton>
+              <FilterAlt />
+            </IconButton>
+            <IconButton>
+              <Sort />
+            </IconButton> */}
+            <FilterPanel />
+          </Box>
+        </Box>
         <Grid container flex={1}>
           <Grid item xs={6} style={dropAreaStyle}>
             <div

@@ -85,10 +85,11 @@ const MetDataMovesDisplay = (props: { mon: PKM }) => {
     if (hasGen4OnData(mon)) {
       message += ` on ${mon.metDate.month}/${mon.metDate.day}/${mon.metDate.year}`
     }
+    message += ` in ${mon.metLocation}`
     if (mon.isFatefulEncounter) {
-      message += ' where it met its trainer in a fateful encounter'
+      message += ', where it met its trainer in a fateful encounter'
     }
-    message += ` ${mon.metLocation}.`
+    message += '.'
     if (mon.metLevel) {
       message += ` At the time, it was level ${mon.metLevel}.`
     }
