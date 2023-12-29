@@ -504,7 +504,7 @@ def download_all_sprites(dex_number, forme, forme_number, forme_name):
     elif dex_number <= 809 and not excludeFormeGen7(dex_number, forme):
         download_sprite_variants_pokemon_db(
             dex_number, forme_number, forme_name, "ultra-sun-ultra-moon", "gen7", dex_number != 133)
-    if dex_number <= 1017 and not exclude_forme_home(dex_number, forme):
+    if dex_number <= 1024 and not exclude_forme_home(dex_number, forme):
         download_sprite_variants_pokemon_db(
             dex_number, forme_number, forme_name, "home", "home")
     if dex_number <= 724 and not excludeFormeLA(dex_number, forme):
