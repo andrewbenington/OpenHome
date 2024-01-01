@@ -1,4 +1,3 @@
-import { MenuItem } from '@mui/material'
 import {
   BW2_TRANSFER_RESTRICTIONS,
   GEN1_TRANSFER_RESTRICTIONS,
@@ -22,9 +21,10 @@ const styles = {
     color: 'white',
     fontWeight: 'bold',
     fontSize: 16,
-    margin: 4,
     boxShadow: 'none',
     '.MuiOutlinedInput-notchedOutline': { border: 0 },
+    flex: 1,
+    margin: 8,
   },
 } as Styles
 
@@ -55,6 +55,7 @@ interface FileTypeSelectProps {
 
 const FileTypeSelect = (props: FileTypeSelectProps) => {
   const { baseFormat, currentFormat, formData, onChange } = props
+  console.log(baseFormat, currentFormat)
   return (
     <select
       value={currentFormat}
@@ -67,7 +68,7 @@ const FileTypeSelect = (props: FileTypeSelectProps) => {
       }}
     >
       <option value="OHPKM">OpenHome</option>
-      {baseFormat !== 'OHPKM' ? <MenuItem value={baseFormat}>{baseFormat}</MenuItem> : <div />}
+      {baseFormat !== 'OHPKM' ? <option value={baseFormat}>{baseFormat}</option> : <div />}
       {baseFormat === 'OHPKM' &&
         !isRestricted(GEN1_TRANSFER_RESTRICTIONS, formData.dexNum, formData.formNum) && (
           <option value="PK1">PK1</option>

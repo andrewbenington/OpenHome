@@ -347,7 +347,7 @@ export class OHPKM
         this.obedienceLevel = other.obedienceLevel
       } else {
         this.teraTypeOriginal = generateTeraType(prng, this.dexNum, this.formNum)
-        this.teraTypeOverride = 0x13
+        this.teraTypeOverride = this.teraTypeOriginal
       }
     }
   }

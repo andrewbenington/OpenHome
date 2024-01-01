@@ -5,17 +5,18 @@ import {
   DefenseCharacteristics,
   HPCharacteristics,
   HPCharacteristicsPre6,
+  Nature,
   SpecialAtkCharacteristics,
   SpecialDefCharacteristics,
   SpeedCharacteristics,
 } from 'pokemon-resources'
 import Prando from 'prando'
 import { MOVE_DATA, NDex, POKEMON_DATA, Types } from '../../consts'
-import { Nature } from '../../resources/gen/other/Natures'
 import { stats, statsPreSplit } from '../../types/types'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
+  getFlag,
   uint16ToBytesLittleEndian,
   uint32ToBytesLittleEndian,
   writeUint32ToBuffer,
@@ -74,7 +75,17 @@ export const generateTeraType = (prng: Prando, dexNum: number, formNum: number) 
   if (!POKEMON_DATA[dexNum]?.formes[formNum]) {
     return 0
   }
-  const { types } = POKEMON_DATA[dexNum].formes[formNum]
+  const { types: monTypes } = POKEMON_DATA[dexNum].formes[formNum]
+  const baseMon = getBaseMon(dexNum, formNum)
+  if (!POKEMON_DATA[baseMon.dexNumber]?.formes[baseMon.formeNumber]) {
+    return 0
+  }
+  const { types: baseMonTypes } = POKEMON_DATA[baseMon.dexNumber].formes[baseMon.formeNumber]
+
+  let types = _.intersection(monTypes, baseMonTypes)
+  if (types.length === 0) {
+    types = baseMonTypes
+  }
   if (!types) {
     return 0
   }
@@ -393,3 +404,15 @@ export function getCharacteristic(mon: Gen3OnData) {
 // function getPLAMoveMasteredFlag(mon: PA8 | OHPKM, index: number) {
 //   return getFlag(mon.masterFlagsLA, 0, index);
 // }
+
+export function getFlagsInRange(bytes: Uint8Array, offset: number, size: number) {
+  const flags: number[] = []
+
+  for (let i = 0; i < size * 8; i++) {
+    if (getFlag(bytes, offset, i)) {
+      flags.push(i)
+    }
+  }
+
+  return flags
+}

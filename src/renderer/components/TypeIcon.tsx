@@ -10,9 +10,15 @@ interface TypeIconProps {
 const typeIconStyle = { height: 24, width: 24, marginRight: 5 }
 
 const TypeIcon = (props: TypeIconProps) => {
-  const type = props.type ?? Types[props.typeIndex ?? 0]
+  let type: string
+  if (props.typeIndex === 99) {
+    type = 'Stellar'
+  } else {
+    type = props.type ?? Types[props.typeIndex ?? 0]
+  }
   return (
     <img
+      title={`${type} type`}
       draggable={false}
       alt={`${type} type`}
       style={typeIconStyle}

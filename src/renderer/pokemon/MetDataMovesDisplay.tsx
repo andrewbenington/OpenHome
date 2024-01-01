@@ -13,6 +13,7 @@ import MoveCard from './MoveCard'
 import { PKM } from '../../types/PKMTypes/PKM'
 import { GameOfOriginData, NatureToString } from 'pokemon-resources'
 import { RibbonTitles } from 'src/consts'
+import { getLocationString } from 'pokemon-resources'
 
 const styles = {
   container: {
@@ -68,14 +69,16 @@ const MetDataMovesDisplay = (props: { mon: PKM }) => {
   const { mon } = props
 
   const eggMessage = useMemo(() => {
-    if (!hasGen4OnData(mon) || !mon.eggLocation || !mon.eggDate) {
+    if (!hasGen4OnData(mon) || !mon.eggLocationIndex || !mon.eggDate) {
       return undefined
     }
-    return `Egg received on ${mon.eggDate.month}/${mon.eggDate.day}/${mon.eggDate.year} ${mon.eggLocation}.`
+    return `Egg received on ${mon.eggDate.month}/${mon.eggDate.day}/${
+      mon.eggDate.year
+    } ${getLocationString(mon.gameOfOrigin, mon.eggLocationIndex, mon.format, true)}.`
   }, [mon])
 
   const metMessage = useMemo(() => {
-    if (!hasGen2OnData(mon) || !mon.metLocation) {
+    if (!hasGen2OnData(mon) || !mon.metLocationIndex) {
       return 'Met location unknown.'
     }
     let message = 'Met'
@@ -85,7 +88,7 @@ const MetDataMovesDisplay = (props: { mon: PKM }) => {
     if (hasGen4OnData(mon)) {
       message += ` on ${mon.metDate.month}/${mon.metDate.day}/${mon.metDate.year}`
     }
-    message += ` in ${mon.metLocation}`
+    message += ` ${getLocationString(mon.gameOfOrigin, mon.metLocationIndex, mon.format)}`
     if (mon.isFatefulEncounter) {
       message += ', where it met its trainer in a fateful encounter'
     }

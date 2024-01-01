@@ -59,6 +59,7 @@ const SaveDisplay = (props: SaveDisplayProps) => {
           style={{
             display: 'flex',
             flexDirection: 'row',
+            justifyContent: 'center',
             marginLeft: 10,
             marginRight: 10,
             backgroundColor: palette.primary.main,
@@ -68,12 +69,13 @@ const SaveDisplay = (props: SaveDisplayProps) => {
           <OpenHomeButton
             style={{
               color: save.updatedBoxSlots.length ? palette.text.disabled : palette.text.secondary,
-              backgroundColor: palette.primary.main,
+              backgroundColor: 'transparent',
               fontWeight: 'bold',
               position: 'absolute',
               left: 0,
               top: 0,
               bottom: 0,
+              padding: '4px 8px',
             }}
             onClick={() => dispatchRemoveSaveAt(saveIndex)}
             disabled={!!save.updatedBoxSlots.length}

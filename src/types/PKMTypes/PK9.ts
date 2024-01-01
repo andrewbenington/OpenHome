@@ -138,6 +138,7 @@ export class PK9 implements BasePKMData, Gen8OnData, Gen9OnlyData, SanityChecksu
       this.statusCondition = other.statusCondition
       this.teraTypeOriginal = other.teraTypeOriginal
       this.teraTypeOverride = other.teraTypeOverride
+      this.obedienceLevel = other.obedienceLevel
     }
   }
 
@@ -506,9 +507,11 @@ export class PK9 implements BasePKMData, Gen8OnData, Gen9OnlyData, SanityChecksu
   }
 
   public set movePPUps(value: [number, number, number, number]) {
+    console.log(value)
     for (let i = 0; i < 4; i++) {
       this.bytes[0x7e + i] = value[i]
     }
+    console.log(this.bytes[0x7f])
   }
 
   public get relearnMoves() {
@@ -864,11 +867,11 @@ export class PK9 implements BasePKMData, Gen8OnData, Gen9OnlyData, SanityChecksu
   }
 
   public get homeTracker() {
-    return this.bytes.slice(127, 0x135 + 8)
+    return this.bytes.slice(0x127, 0x135 + 8)
   }
 
   public set homeTracker(value: Uint8Array) {
-    this.bytes.set(value.slice(0, 8), 127)
+    this.bytes.set(value.slice(0, 8), 0x127)
   }
 
   // only 22 bytes are used of the allocated 25
