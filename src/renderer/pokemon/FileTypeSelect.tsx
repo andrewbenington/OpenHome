@@ -55,7 +55,6 @@ interface FileTypeSelectProps {
 
 const FileTypeSelect = (props: FileTypeSelectProps) => {
   const { baseFormat, currentFormat, formData, onChange } = props
-  console.log(baseFormat, currentFormat)
   return (
     <select
       value={currentFormat}

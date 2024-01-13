@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import React from 'react'
+import './style.css'
 
 interface OpenHomeButtonProps {
   onClick?: React.MouseEventHandler<HTMLButtonElement>
@@ -7,20 +8,9 @@ interface OpenHomeButtonProps {
 }
 
 const ArrowButton = (props: OpenHomeButtonProps) => {
-  const { onClick, style, children } = props
-  const [hovered, setHovered] = useState(false)
+  const { onClick, children } = props
   return (
-    <button
-      style={{
-        border: 'none',
-        background: 'none',
-        color: hovered ? '#FFFF' : '#FFFB',
-        ...style,
-      }}
-      onClick={onClick}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-    >
+    <button className="arrow-button" onClick={onClick}>
       {children}
     </button>
   )

@@ -130,7 +130,6 @@ export const buildSaveFile = (
   const { homeMonMap, gen12LookupMap, gen345LookupMap } = lookupMaps
   const saveType = getSaveType(fileBytes)
   let saveFile
-  console.log(gen12LookupMap)
   switch (saveType) {
     case SaveType.RBY_I:
       saveFile = new G1SAV(filePath, fileBytes)

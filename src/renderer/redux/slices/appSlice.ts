@@ -286,7 +286,6 @@ export const appSlice = createSlice({
           newLookupMap[key] = value
         }
       })
-      console.log('send write gen12', newLookupMap)
       window.electron.ipcRenderer.send('write-gen12-lookup', current(newLookupMap))
       state.lookup.gen12 = newLookupMap
     },

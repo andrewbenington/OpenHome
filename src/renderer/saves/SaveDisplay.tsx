@@ -1,11 +1,11 @@
 import { ArrowBack, ArrowForward, Close } from '@mui/icons-material'
-import { Card, Grid, useTheme } from '@mui/material'
+import { Card, Grid } from '@mui/material'
 import _ from 'lodash'
+import { GameOfOriginData } from 'pokemon-resources'
 import { useMemo } from 'react'
 import { PKM } from '../../types/PKMTypes/PKM'
 import { isRestricted } from '../../types/TransferRestrictions'
 import { SaveCoordinates, getSaveTypeString } from '../../types/types'
-import OpenHomeButton from '../components/OpenHomeButton'
 import { useAppDispatch } from '../redux/hooks'
 import { useDragMon, useSaves } from '../redux/selectors'
 import {
@@ -17,7 +17,6 @@ import {
 } from '../redux/slices/appSlice'
 import ArrowButton from './ArrowButton'
 import BoxCell from './BoxCell'
-import { GameOfOriginData } from 'pokemon-resources'
 
 interface SaveDisplayProps {
   saveIndex: number
@@ -25,7 +24,6 @@ interface SaveDisplayProps {
 }
 
 const SaveDisplay = (props: SaveDisplayProps) => {
-  const { palette } = useTheme()
   const saves = useSaves()
   const dragMon = useDragMon()
   const { saveIndex, setSelectedMon } = props
@@ -48,143 +46,114 @@ const SaveDisplay = (props: SaveDisplayProps) => {
       : false
   }, [save, dragMon])
   return save && save.currentPCBox !== undefined ? (
-    <div style={{ display: 'flex' }}>
-      <div
+    <div style={{ display: 'flex', width: '100%', flexDirection: 'column' }}>
+      <Card className="save-header">
+        <button
+          className="save-close-button"
+          onClick={() => dispatchRemoveSaveAt(saveIndex)}
+          disabled={!!save.updatedBoxSlots.length}
+        >
+          <Close />
+        </button>
+        <div
+          style={{
+            flex: 1,
+          }}
+        >
+          <div style={{ textAlign: 'center', fontWeight: 'bold' }}>
+            {save.origin
+              ? `Pokémon ${GameOfOriginData[save.origin]?.name}`
+              : getSaveTypeString(save.saveType)}
+          </div>
+          <div style={{ textAlign: 'center' }}>
+            {save?.name} ({save?.displayID})
+          </div>
+        </div>
+      </Card>
+      <Card
+        className="box-card"
         style={{
-          width: '100%',
-          margin: 5,
+          backgroundColor: isDisabled ? '#666' : undefined,
         }}
       >
-        <Card
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'center',
-            marginLeft: 10,
-            marginRight: 10,
-            backgroundColor: palette.primary.main,
-            position: 'relative',
-          }}
-        >
-          <OpenHomeButton
-            style={{
-              color: save.updatedBoxSlots.length ? palette.text.disabled : palette.text.secondary,
-              backgroundColor: 'transparent',
-              fontWeight: 'bold',
-              position: 'absolute',
-              left: 0,
-              top: 0,
-              bottom: 0,
-              padding: '4px 8px',
-            }}
-            onClick={() => dispatchRemoveSaveAt(saveIndex)}
-            disabled={!!save.updatedBoxSlots.length}
-          >
-            <Close />
-          </OpenHomeButton>
-          <div
-            style={{
-              flex: 1,
-              color: 'white',
-            }}
-          >
-            <div style={{ textAlign: 'center', fontWeight: 'bold' }}>
-              {save.origin
-                ? `Pokémon ${GameOfOriginData[save.origin]?.name}`
-                : getSaveTypeString(save.saveType)}
-            </div>
-            <div style={{ textAlign: 'center' }}>
-              {save?.name} ({save?.displayID})
-            </div>
-          </div>
-        </Card>
-        <Card
-          style={{
-            padding: 5,
-            margin: 10,
-            backgroundColor: isDisabled ? '#666' : palette.primary.main,
-          }}
-        >
-          <div>
-            <Grid container>
-              <Grid xs={2} display="grid" alignItems="center">
-                <ArrowButton
-                  onClick={() =>
-                    dispatchSetBox(
-                      save.currentPCBox > 0 ? save.currentPCBox - 1 : save.boxes.length - 1
-                    )
-                  }
-                >
-                  <ArrowBack fontSize="small" />
-                </ArrowButton>
-              </Grid>
-              <Grid xs={8} textAlign="center" color="white">
-                {save.boxes[save.currentPCBox]?.name}
-              </Grid>
-              <Grid
-                xs={2}
-                style={{
-                  display: 'grid',
-                  alignItems: 'center',
-                }}
+        <div>
+          <Grid container className="box-navigation">
+            <Grid xs={2} display="grid" alignItems="center">
+              <ArrowButton
+                onClick={() =>
+                  dispatchSetBox(
+                    save.currentPCBox > 0 ? save.currentPCBox - 1 : save.boxes.length - 1
+                  )
+                }
               >
-                <ArrowButton
-                  onClick={() => dispatchSetBox((save.currentPCBox + 1) % save.boxes.length)}
-                >
-                  <ArrowForward fontSize="small" />
-                </ArrowButton>
-              </Grid>
+                <ArrowBack fontSize="small" />
+              </ArrowButton>
             </Grid>
-            {_.range(save.boxRows).map((row: number) => (
-              <Grid container key={`pc_row_${row}`}>
-                {_.range(save.boxColumns).map((rowIndex: number) => {
-                  const mon =
-                    save.boxes[save.currentPCBox].pokemon[row * save.boxColumns + rowIndex]
-                  return (
-                    <Grid
-                      key={`pc_row_${row}_slot_${rowIndex}`}
-                      item
-                      xs={12 / save.boxColumns}
-                      style={{ padding: '2px 2px 0px 2px' }}
-                    >
-                      <BoxCell
-                        onClick={() => {
-                          setSelectedMon(mon)
-                        }}
-                        onDragEvent={() => {
-                          dispatchStartDrag({
+            <Grid xs={8} className="box-name">
+              {save.boxes[save.currentPCBox]?.name}
+            </Grid>
+            <Grid
+              xs={2}
+              style={{
+                display: 'grid',
+                alignItems: 'center',
+              }}
+            >
+              <ArrowButton
+                onClick={() => dispatchSetBox((save.currentPCBox + 1) % save.boxes.length)}
+              >
+                <ArrowForward fontSize="small" />
+              </ArrowButton>
+            </Grid>
+          </Grid>
+          {_.range(save.boxRows).map((row: number) => (
+            <Grid container key={`pc_row_${row}`}>
+              {_.range(save.boxColumns).map((rowIndex: number) => {
+                const mon = save.boxes[save.currentPCBox].pokemon[row * save.boxColumns + rowIndex]
+                return (
+                  <Grid
+                    key={`pc_row_${row}_slot_${rowIndex}`}
+                    item
+                    xs={12 / save.boxColumns}
+                    style={{ padding: '2px 2px 0px 2px' }}
+                  >
+                    <BoxCell
+                      onClick={() => {
+                        setSelectedMon(mon)
+                      }}
+                      onDragEvent={() => {
+                        dispatchStartDrag({
+                          saveNumber: saveIndex,
+                          box: save.currentPCBox,
+                          index: row * save.boxColumns + rowIndex,
+                        })
+                      }}
+                      disabled={isDisabled}
+                      mon={mon}
+                      zIndex={5 - row}
+                      onDrop={(importedMons) => {
+                        if (importedMons) {
+                          dispatchImportMons(importedMons, {
                             saveNumber: saveIndex,
                             box: save.currentPCBox,
                             index: row * save.boxColumns + rowIndex,
                           })
-                        }}
-                        disabled={isDisabled}
-                        mon={mon}
-                        zIndex={5 - row}
-                        onDrop={(importedMons) => {
-                          if (importedMons) {
-                            dispatchImportMons(importedMons, {
-                              saveNumber: saveIndex,
-                              box: save.currentPCBox,
-                              index: row * save.boxColumns + rowIndex,
-                            })
-                          } else {
-                            dispatchCompleteDrag({
-                              saveNumber: saveIndex,
-                              box: save.currentPCBox,
-                              index: row * save.boxColumns + rowIndex,
-                            })
-                          }
-                        }}
-                      />
-                    </Grid>
-                  )
-                })}
-              </Grid>
-            ))}
-          </div>
-        </Card>
-      </div>
+                        } else {
+                          dispatchCompleteDrag({
+                            saveNumber: saveIndex,
+                            box: save.currentPCBox,
+                            index: row * save.boxColumns + rowIndex,
+                          })
+                        }
+                      }}
+                    />
+                  </Grid>
+                )
+              })}
+            </Grid>
+          ))}
+        </div>
+      </Card>
     </div>
   ) : (
     <div />

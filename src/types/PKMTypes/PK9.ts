@@ -507,11 +507,9 @@ export class PK9 implements BasePKMData, Gen8OnData, Gen9OnlyData, SanityChecksu
   }
 
   public set movePPUps(value: [number, number, number, number]) {
-    console.log(value)
     for (let i = 0; i < 4; i++) {
       this.bytes[0x7e + i] = value[i]
     }
-    console.log(this.bytes[0x7f])
   }
 
   public get relearnMoves() {

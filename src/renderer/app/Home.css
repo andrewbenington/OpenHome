@@ -1,0 +1,60 @@
+.card-button {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  width: fit-content;
+  padding: 1em;
+  font-weight: bold;
+  border: 1px solid transparent;
+  transition: border-color 0.25s;
+  box-shadow:
+    0px 2px 1px -1px rgb(0 0 0 / 20%),
+    0px 1px 1px 0px rgb(0 0 0 / 14%),
+    0px 1px 3px 0px rgb(0 0 0 / 12%);
+}
+
+.card-button:hover {
+  border-color: white;
+}
+
+.save-file-column {
+  padding: 16px 4px 16px 16px;
+  width: 30%;
+  overflow-y: scroll;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.save-file-stack {
+  width: 100%;
+}
+
+.home-box-column {
+  padding: 16px 4px;
+  width: 45%;
+}
+
+.right-column {
+  padding: 16px 16px 16px 4px;
+  display: flex;
+  flex-direction: column;
+  width: 25%;
+}
+
+.release-icon-container {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.drop-area {
+  margin: 10px 5px 10px 5px;
+  background-color: #fff4;
+  position: relative;
+  border: none;
+  flex: 1;
+  border-radius: 3px;
+  text-align: center;
+}

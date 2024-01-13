@@ -22,13 +22,14 @@ import {
 } from '../../util/ByteLogic'
 import { getLevelGen3Onward } from '../../util/StatCalc'
 import { utf16BytesToString, utf16StringToBytes } from '../../util/Strings/StringConverter'
+import { BasePKMData } from '../interfaces/base'
 import { SanityChecksum } from '../interfaces/gen3'
 import { Size } from '../interfaces/gen7'
 import { Gen8OnData, PLAData } from '../interfaces/gen8'
 import { OHPKM } from './OHPKM'
 import { adjustMovePPBetweenFormats, writeIVsToBuffer } from './util'
 
-export class PA8 implements Gen8OnData, PLAData, Size, SanityChecksum {
+export class PA8 implements BasePKMData, Gen8OnData, PLAData, Size, SanityChecksum {
   public get fileSize() {
     return 376
   }

@@ -1,5 +1,5 @@
 import { Card, Grid } from '@mui/material'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { hasGen5OnlyData } from 'src/types/interfaces/gen5'
 import { hasGen8OnlyData, hasPLAData } from 'src/types/interfaces/gen8'
 import { POKEMON_DATA } from '../../consts'
@@ -15,6 +15,7 @@ import { getPokemonSpritePath } from '../images/pokemon'
 import { getTypeColor } from '../util/PokemonSprite'
 import AttributeRow from './AttributeRow'
 import AttributeTag from './AttributeTag'
+import PokemonIcon from '../components/PokemonIcon'
 
 const styles = {
   column: {
@@ -31,7 +32,7 @@ const styles = {
     objectFit: 'contain',
   },
   attributesList: { textAlign: 'left', width: '30%', marginTop: 10 },
-  language: { padding: '5px 10px 5px 10px', marginLeft: 'auto', color: 'white' },
+  language: { padding: '5px 10px 5px 10px', marginLeft: 'auto' },
   nicknameRow: {
     display: 'flex',
     flexDirection: 'row',
@@ -43,6 +44,7 @@ const styles = {
 
 const SummaryDisplay = (props: { mon: PKM }) => {
   const { mon } = props
+  const [imageError, setImageError] = useState(false)
 
   const itemAltText = useMemo(() => {
     const monData = POKEMON_DATA[mon.dexNum]?.formes[mon.formNum]
@@ -54,12 +56,21 @@ const SummaryDisplay = (props: { mon: PKM }) => {
     <Grid container>
       <Grid item xs={5}>
         <div style={styles.column}>
-          <img
-            draggable={false}
-            alt={itemAltText}
-            style={styles.image}
-            src={getPublicImageURL(getPokemonSpritePath(mon))}
-          />
+          {imageError ? (
+            <PokemonIcon
+              dexNumber={mon.dexNum}
+              formeNumber={mon.formNum}
+              style={{ width: '90%', height: 0, paddingBottom: '90%' }}
+            />
+          ) : (
+            <img
+              draggable={false}
+              alt={itemAltText}
+              style={styles.image}
+              src={getPublicImageURL(getPokemonSpritePath(mon))}
+              onError={() => setImageError(true)}
+            />
+          )}
         </div>
         <div style={styles.nicknameRow}>
           {hasGen3OnData(mon) ? (

@@ -1,9 +1,8 @@
 import { FileOpen } from '@mui/icons-material'
-import { Box, Dialog, Grid, useTheme } from '@mui/material'
+import { Box, Dialog, Stack, useTheme } from '@mui/material'
 import _ from 'lodash'
 import { useCallback, useEffect, useState } from 'react'
 import { POKEMON_DATA } from '../../consts'
-import OpenHomeButton from '../../renderer/components/OpenHomeButton'
 import { loadRecentSaves } from '../../renderer/redux/slices/recentSavesSlice'
 import { loadResourcesPath } from '../../renderer/redux/slices/resourcesSlice'
 import { OHPKM } from '../../types/PKMTypes'
@@ -11,7 +10,7 @@ import { PKM } from '../../types/PKMTypes/PKM'
 import { SaveCoordinates } from '../../types/types'
 import { bytesToPKM } from '../../util/FileImport'
 import { getMonFileIdentifier } from '../../util/Lookup'
-import FilterPanel from '../components/FilterPanel'
+import FilterPanel from '../components/filter/FilterPanel'
 import BoxIcons from '../images/BoxIcons.png'
 import PokemonDisplay from '../pokemon/PokemonDisplay'
 import { useAppDispatch } from '../redux/hooks'
@@ -43,18 +42,16 @@ import {
   handleMenuSave,
 } from '../util/ipcFunctions'
 import useWindowDimensions from '../util/windowDimensions'
-import Themes, { OpenHomeTheme } from './Themes'
-import { dropAreaStyle } from './styles'
+import './Home.css'
 
 const Home = () => {
-  const { palette } = useTheme()
   const saves = useSaves()
   const homeData = useHomeData()
   const dragMon = useDragMon()
   const dragSource = useDragSource()
   const monsToRelease = useMonsToRelease()
   const [loadingMessage, setLoadingMessage] = useState<string | undefined>('Starting app...')
-  const [currentTheme] = useState<OpenHomeTheme>(Themes[0])
+  const { palette } = useTheme()
   const [selectedMon, setSelectedMon] = useState<PKM>()
   const [tab, setTab] = useState('summary')
   const [openSaveDialog, setOpenSaveDialog] = useState(false)
@@ -152,121 +149,87 @@ const Home = () => {
   return loadingMessage ? (
     <div>{loadingMessage}</div>
   ) : (
-    <Grid
-      container
-      height="100%"
+    <div
+      // container
       style={{
-        backgroundColor: currentTheme.backgroundColor,
+        background: palette.background.gradient,
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'row',
       }}
     >
-      <Grid
-        item
-        xs={3.5}
-        style={{
-          overflowY: 'scroll',
-          height: '100%',
-        }}
-      >
+      <Stack className="save-file-column" spacing={1}>
         {_.range(saves.length).map((i) => (
           <SaveDisplay key={`save_display_${i}`} saveIndex={i} setSelectedMon={setSelectedMon} />
         ))}
-        <OpenHomeButton
-          style={{
-            margin: 'auto',
-            backgroundColor: palette.primary.main,
-            color: palette.text.secondary,
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center',
-            marginTop: 10,
-            marginBottom: 10,
-          }}
+        <button
+          className="card-button"
           onClick={() => setOpenSaveDialog(true)}
+          style={{
+            backgroundColor: palette.primary.main,
+          }}
         >
           <FileOpen />
-          <h2>Open Save</h2>
-        </OpenHomeButton>
-      </Grid>
-      <Grid
-        item
-        xs={8.5}
-        display="flex"
-        flexDirection="column"
-        alignItems="center"
-        style={{ padding: 10 }}
+          Open Save
+        </button>
+      </Stack>
+      <div
+        className="home-box-column"
+        style={{
+          width: '45%',
+        }}
       >
         <Box display="flex" flexDirection="row" style={{ width: '100%' }}>
           <Box display="flex" flexDirection="row" style={{ width: height * 0.75 }}>
             <HomeBoxDisplay setSelectedMon={setSelectedMon} />
           </Box>
-          <Box flex={1}>
-            {/* <IconButton>
-              <FilterAlt />
-            </IconButton>
-            <IconButton>
-              <Sort />
-            </IconButton> */}
-            <FilterPanel />
-          </Box>
+          <Box flex={1}></Box>
         </Box>
-        <Grid container flex={1}>
-          <Grid item xs={6} style={dropAreaStyle}>
-            <div
-              draggable
-              style={{
-                height: '100%',
-                width: '100%',
-                flex: 1,
-              }}
-              onDragOver={(e) => {
-                e.preventDefault()
-              }}
-              onDrop={(e) => onViewDrop(e, 'as is')}
-            >
-              Preview
-            </div>
-          </Grid>
-          <Grid item xs={6} style={dropAreaStyle}>
-            RELEASE
-            <div
-              onDragOver={(e) => {
-                e.preventDefault()
-              }}
-              onDrop={(e) => onViewDrop(e, 'release')}
-              style={{
-                display: 'flex',
-                flexDirection: 'row',
-                flexWrap: 'wrap',
-                height: '100%',
-                width: '100%',
-                position: 'absolute',
-                top: 0,
-              }}
-            >
-              {monsToRelease.map((mon, i) => {
-                if (mon.isEgg || !POKEMON_DATA[mon.dexNum]) {
-                  return '0% 0%'
-                }
-                const [x, y] = POKEMON_DATA[mon.dexNum].formes[mon.formNum].spriteIndex
-                const backgroundPosition = `${(x / 35) * 100}% ${(y / 36) * 100}%`
-                return (
-                  <div key={`delete_mon_${i}`} style={{ width: '10%', aspectRatio: 1 }}>
-                    <div
-                      style={{
-                        background: `url(${BoxIcons}) no-repeat 0.02777% 0.02777%`,
-                        backgroundSize: '3600%',
-                        backgroundPosition,
-                        imageRendering: 'crisp-edges',
-                        aspectRatio: 1,
-                      }}
-                    />
-                  </div>
-                )
-              })}
-            </div>
-          </Grid>
-        </Grid>
-      </Grid>
+      </div>
+      <Stack spacing={1} className="right-column">
+        <FilterPanel />
+        <div
+          className="drop-area"
+          draggable
+          onDragOver={(e) => {
+            e.preventDefault()
+          }}
+          onDrop={(e) => onViewDrop(e, 'as is')}
+        >
+          Preview
+        </div>
+        <div
+          className="drop-area"
+          onDragOver={(e) => {
+            e.preventDefault()
+          }}
+          onDrop={(e) => onViewDrop(e, 'release')}
+        >
+          Release
+          <div className="release-icon-container" style={{ display: 'flex' }}>
+            {monsToRelease.map((mon, i) => {
+              if (mon.isEgg || !POKEMON_DATA[mon.dexNum]) {
+                return '0% 0%'
+              }
+              const [x, y] = POKEMON_DATA[mon.dexNum].formes[mon.formNum].spriteIndex
+              const backgroundPosition = `${(x / 35) * 100}% ${(y / 36) * 100}%`
+              return (
+                <div key={`delete_mon_${i}`} style={{ width: '10%', aspectRatio: 1 }}>
+                  <div
+                    style={{
+                      background: `url(${BoxIcons}) no-repeat 0.02777% 0.02777%`,
+                      backgroundSize: '3600%',
+                      backgroundPosition,
+                      imageRendering: 'crisp-edges',
+                      aspectRatio: 1,
+                    }}
+                  />
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      </Stack>
 
       <Dialog
         open={!!selectedMon}
@@ -290,7 +253,7 @@ const Home = () => {
           }}
         />
       </Dialog>
-    </Grid>
+    </div>
   )
 }
 
