@@ -1,0 +1,6 @@
+.fill-container {
+  min-width: 32px;
+  height: 32px;
+  position: relative;
+  margin-right: 8px;
+}

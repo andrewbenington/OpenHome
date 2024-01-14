@@ -6,11 +6,12 @@ import { hasGen3OnData } from 'src/types/interfaces/gen3'
 import { hasGen4OnData, hasGen4OnlyData, shinyLeafValues } from 'src/types/interfaces/gen4'
 import { hasGen6OnData, hasN3DSOnlyData } from 'src/types/interfaces/gen6'
 import { hasGen8OnData, hasGen8OnlyData } from 'src/types/interfaces/gen8'
-import { hasGen9OnlyData } from 'src/types/interfaces/gen9'
-import { Countries, EncounterTypes, NDex, SWEETS } from '../../consts'
+import { Gen9OnlyData, hasGen9OnlyData } from 'src/types/interfaces/gen9'
+import { Countries, EncounterTypes, MOVE_DATA, NDex, SWEETS } from '../../consts'
 import {
   GEN2_TRANSFER_RESTRICTIONS,
   HGSS_TRANSFER_RESTRICTIONS,
+  LA_TRANSFER_RESTRICTIONS,
   SV_TRANSFER_RESTRICTIONS,
   SWSH_TRANSFER_RESTRICTIONS,
   USUM_TRANSFER_RESTRICTIONS,
@@ -31,6 +32,12 @@ import { hasGameBoyData } from '../../types/interfaces/stats'
 import { OHPKM } from '../../types/PKMTypes'
 import { get16BitChecksumLittleEndian } from 'src/util/ByteLogic'
 import { isGen4 } from 'pokemon-resources'
+import { getFlagsInRange } from 'src/types/PKMTypes/util'
+import { SwShTRMoveIndexes } from 'pokemon-resources'
+import { BDSPTMMoveIndexes } from 'pokemon-resources'
+import { LATutorMoveIndexes } from 'pokemon-resources'
+import { SVTMMoveIndexes } from 'pokemon-resources'
+import { useMemo } from 'react'
 
 const styles = {
   accordion: {
@@ -219,6 +226,116 @@ const OtherDisplay = (props: { mon: PKM }) => {
         <div />
       )}
       {!isRestricted(SWSH_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
+      'trFlagsSwSh' in mon &&
+      getFlagsInRange(mon.trFlagsSwSh, 0, 14).length > 0 ? (
+        <Accordion
+          disableGutters
+          elevation={0}
+          TransitionProps={{ unmountOnExit: true }}
+          sx={styles.accordion}
+        >
+          <AccordionSummary
+            expandIcon={<ArrowForwardIosSharp sx={{ fontSize: '0.9rem' }} />}
+            sx={styles.accordionSummary}
+          >
+            <AttributeRow
+              label="SwSh TRs"
+              value={`${getFlagsInRange(mon.trFlagsSwSh, 0, 14).length} TRs`}
+            />
+          </AccordionSummary>
+          {getFlagsInRange(mon.trFlagsSwSh, 0, 14).map((i) => (
+            <AttributeRow key={`swsh_tr_${i}`} label={`TR ${i}`} indent={10}>
+              {MOVE_DATA[SwShTRMoveIndexes[i]].name}
+            </AttributeRow>
+          ))}
+        </Accordion>
+      ) : (
+        <div />
+      )}
+      {!isRestricted(HGSS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
+      'tmFlagsBDSP' in mon &&
+      getFlagsInRange(mon.tmFlagsBDSP, 0, 14).length > 0 ? (
+        <Accordion
+          disableGutters
+          elevation={0}
+          TransitionProps={{ unmountOnExit: true }}
+          sx={styles.accordion}
+        >
+          <AccordionSummary
+            expandIcon={<ArrowForwardIosSharp sx={{ fontSize: '0.9rem' }} />}
+            sx={styles.accordionSummary}
+          >
+            <AttributeRow
+              label="BDSP TMs"
+              value={`${getFlagsInRange(mon.tmFlagsBDSP, 0, 14).length} TMs`}
+            />
+          </AccordionSummary>
+          {getFlagsInRange(mon.tmFlagsBDSP, 0, 14).map((i) => (
+            <AttributeRow key={`bdsp_tm_${i + 1}`} label={`TM ${i + 1}`} indent={10}>
+              {MOVE_DATA[BDSPTMMoveIndexes[i]].name}
+            </AttributeRow>
+          ))}
+        </Accordion>
+      ) : (
+        <div />
+      )}
+      {!isRestricted(LA_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
+      'tutorFlagsLA' in mon &&
+      getFlagsInRange(mon.tutorFlagsLA, 0, 8).length > 0 ? (
+        <Accordion
+          disableGutters
+          elevation={0}
+          TransitionProps={{ unmountOnExit: true }}
+          sx={styles.accordion}
+        >
+          <AccordionSummary
+            expandIcon={<ArrowForwardIosSharp sx={{ fontSize: '0.9rem' }} />}
+            sx={styles.accordionSummary}
+          >
+            <AttributeRow
+              label="LA Tutor Moves"
+              value={`${getFlagsInRange(mon.tutorFlagsLA, 0, 8).length} Tutor Moves`}
+            />
+          </AccordionSummary>
+          {getFlagsInRange(mon.tutorFlagsLA, 0, 8).map((i) => (
+            <AttributeRow key={`la_tutor_${i + 1}`} label={`Tutor ${i + 1}`} indent={10}>
+              {MOVE_DATA[LATutorMoveIndexes[i]].name}
+            </AttributeRow>
+          ))}
+        </Accordion>
+      ) : (
+        <div />
+      )}
+
+      {!isRestricted(SV_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
+      'tmFlagsSV' in mon &&
+      getFlagsInRange(mon.tmFlagsSV, 0, 22).length > 0 ? (
+        <Accordion
+          disableGutters
+          elevation={0}
+          TransitionProps={{ unmountOnExit: true }}
+          sx={styles.accordion}
+        >
+          <AccordionSummary
+            expandIcon={<ArrowForwardIosSharp sx={{ fontSize: '0.9rem' }} />}
+            sx={styles.accordionSummary}
+          >
+            <AttributeRow
+              label="SV TMs"
+              value={`${getFlagsInRange(mon.tmFlagsSV, 0, 22).length} TMs`}
+            />
+          </AccordionSummary>
+          {getFlagsInRange(mon.tmFlagsSV, 0, 22).map((i) => (
+            <AttributeRow key={`sv_tm_${i}`} label={`TM ${i}`} indent={10}>
+              {MOVE_DATA[SVTMMoveIndexes[i]].name}
+            </AttributeRow>
+          ))}
+        </Accordion>
+      ) : (
+        <div />
+      )}
+
+      {!isRestricted(SWSH_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
         hasGen8OnlyData(mon) && (
           <>
             <AttributeRow label="Dynamax">
@@ -231,21 +348,7 @@ const OtherDisplay = (props: { mon: PKM }) => {
           </>
         )}
       {!isRestricted(SV_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) && hasGen9OnlyData(mon) && (
-        <>
-          <AttributeRow label="Tera Type">
-            <TypeIcon
-              typeIndex={mon.teraTypeOverride <= 18 ? mon.teraTypeOverride : mon.teraTypeOriginal}
-            />
-            {mon.teraTypeOverride <= 18 && (
-              <>
-                <p>(originally </p>
-                <TypeIcon typeIndex={mon.teraTypeOriginal} />
-                <p>)</p>
-              </>
-            )}
-          </AttributeRow>
-          <AttributeRow label="Obedience" value={mon.obedienceLevel.toString()} />
-        </>
+        <ScarletVioletData mon={mon} />
       )}
       {!isRestricted(GEN2_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
         hasGameBoyData(mon) && (
@@ -273,3 +376,33 @@ const OtherDisplay = (props: { mon: PKM }) => {
   )
 }
 export default OtherDisplay
+
+function ScarletVioletData(props: { mon: Gen9OnlyData }) {
+  const { mon } = props
+
+  const currentTeraType = useMemo(
+    () => (mon.teraTypeOverride <= 18 ? mon.teraTypeOverride : mon.teraTypeOriginal),
+    [mon.teraTypeOriginal, mon.teraTypeOverride]
+  )
+
+  const previousTeraType = useMemo(
+    () => (mon.teraTypeOverride <= 18 ? mon.teraTypeOriginal : undefined),
+    [mon.teraTypeOriginal, mon.teraTypeOverride]
+  )
+
+  return (
+    <>
+      <AttributeRow label="Tera Type">
+        <TypeIcon typeIndex={currentTeraType} />
+        {previousTeraType && (
+          <>
+            <p>(originally </p>
+            <TypeIcon typeIndex={previousTeraType} />
+            <p>)</p>
+          </>
+        )}
+      </AttributeRow>
+      <AttributeRow label="Obedience" value={mon.obedienceLevel.toString()} />
+    </>
+  )
+}

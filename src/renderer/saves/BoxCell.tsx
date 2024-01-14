@@ -1,13 +1,11 @@
-import React, { useEffect, useState } from 'react'
-import { hasGen3OnData } from 'src/types/interfaces/gen3'
-import { POKEMON_DATA } from '../../consts'
+import React, { useContext, useEffect, useMemo, useState } from 'react'
+import { filterApplies } from 'src/types/Filter'
 import { PKM } from '../../types/PKMTypes/PKM'
-import { BasePKMData } from '../../types/interfaces/base'
 import { Styles } from '../../types/types'
 import { bytesToPKM } from '../../util/FileImport'
+import PokemonIcon from '../components/PokemonIcon'
 import BoxIcons from '../images/BoxIcons.png'
-import { getPublicImageURL } from '../images/images'
-import { getItemIconPath } from '../images/items'
+import { FilterContext } from '../state/filter'
 
 const styles = {
   fillContainer: { width: '100%', height: '100%' },
@@ -16,7 +14,6 @@ const styles = {
     width: '100%',
     aspectRatio: 1,
     position: 'relative',
-    border: 'none',
     borderRadius: 3,
     textAlign: 'center',
   },
@@ -44,7 +41,16 @@ interface BoxCellProps {
 
 const BoxCell = (props: BoxCellProps) => {
   const { onClick, onDragEvent, onDrop, disabled, zIndex, mon } = props
-  const [dragImage, setDragImage] = useState<Element>()
+  const [isBeingDragged, setIsBeingDragged] = useState(false)
+  const [isDraggedOver, setIsDraggedOver] = useState(false)
+  const [filterState] = useContext(FilterContext)
+
+  const isFilteredOut = useMemo(() => {
+    return (
+      Object.values(filterState).some((val) => val !== undefined) &&
+      (mon === undefined || !filterApplies(filterState, mon))
+    )
+  }, [filterState, mon])
 
   const onDropFromFiles = async (files: FileList) => {
     const importedMons: PKM[] = []
@@ -82,16 +88,8 @@ const BoxCell = (props: BoxCellProps) => {
     }
   }
 
-  const getBackgroundPosition = (mon: BasePKMData) => {
-    if ((hasGen3OnData(mon) && mon.isEgg) || !POKEMON_DATA[mon.dexNum]) {
-      return '0% 0%'
-    }
-    const [x, y] = POKEMON_DATA[mon.dexNum].formes[mon.formNum].spriteIndex
-    return `${(x / 35) * 100}% ${(y / 36) * 100}%`
-  }
-
   useEffect(() => {
-    setDragImage(undefined)
+    setIsBeingDragged(false)
   }, [mon])
 
   return (
@@ -100,73 +98,47 @@ const BoxCell = (props: BoxCellProps) => {
       onClick={onClick}
       style={{
         ...styles.button,
-        backgroundColor: disabled ? '#555' : '#fff4',
+        backgroundColor: disabled || isFilteredOut ? '#555' : '#6662',
+        borderColor: isDraggedOver ? 'red' : undefined,
         zIndex,
       }}
       disabled={disabled}
     >
       {mon ? (
-        <div style={styles.fillContainer}>
-          <div
-            draggable
-            onDragStart={() => {
-              onDragEvent(false)
-            }}
-            onDragEnd={(e: { dataTransfer: any; target: any }) => {
-              if (dragImage) {
-                document.body.removeChild(dragImage)
-              }
-              // if not waiting for mon to show up in other slot, set drag image to
-              // undefined so it shows up in this one again
-              if (e.dataTransfer.dropEffect !== 'copy') {
-                setDragImage(undefined)
-                onDragEvent(true)
-              }
-            }}
-            style={{
-              ...styles.background,
-              backgroundPosition: getBackgroundPosition(mon),
-              ...getBackgroundDetails(),
-              opacity: dragImage ? 0 : 1,
-            }}
-          />
-          {mon.isShiny && (
-            <img
-              alt="item icon"
-              draggable={false}
-              src={getPublicImageURL('icons/Shiny.png')}
-              style={{
-                position: 'absolute',
-                width: '40%',
-                height: '40%',
-                left: 0,
-                top: 0,
-                zIndex: 2,
-                pointerEvents: 'none',
-              }}
-            />
-          )}
-          {mon.heldItem !== 'None' && (
-            <img
-              alt="item icon"
-              draggable={false}
-              src={getPublicImageURL(getItemIconPath(mon.heldItemIndex, mon.format))}
-              style={{
-                position: 'absolute',
-                width: '50%',
-                height: '50%',
-                right: 0,
-                bottom: 0,
-                zIndex: 2,
-                pointerEvents: 'none',
-              }}
-            />
-          )}
-        </div>
+        <PokemonIcon
+          dexNumber={mon.dexNum}
+          formeNumber={mon.formNum}
+          greyedOut={isFilteredOut || disabled}
+          isShiny={mon.isShiny}
+          heldItemIndex={mon.heldItemIndex}
+          heldItemFormat={mon.format}
+          style={{
+            width: '100%',
+            height: '100%',
+            ...getBackgroundDetails(),
+            transition: '0.01s, background-color 0s',
+            transform: isBeingDragged ? 'translateX(-9999px)' : undefined,
+          }}
+          draggable
+          onDragStart={() => {
+            onDragEvent(false)
+            setIsBeingDragged(true)
+          }}
+          onDragEnter={() => setIsDraggedOver(true)}
+          onDragLeave={() => setIsDraggedOver(false)}
+          onDragEnd={(e: { dataTransfer: any; target: any }) => {
+            setIsBeingDragged(false)
+            if (e.dataTransfer.dropEffect !== 'copy') {
+              onDragEvent(true)
+            }
+          }}
+        />
       ) : (
         <div
           className="pokemon_slot"
           style={{ ...styles.fillContainer, ...getBackgroundDetails() }}
+          onDragEnter={() => setIsDraggedOver(true)}
+          onDragLeave={() => setIsDraggedOver(false)}
           onDragOver={
             disabled
               ? undefined
@@ -174,7 +146,10 @@ const BoxCell = (props: BoxCellProps) => {
                   e.preventDefault()
                 }
           }
-          onDrop={handleDrop}
+          onDrop={(e) => {
+            setIsDraggedOver(false)
+            handleDrop(e)
+          }}
         />
       )}
     </button>

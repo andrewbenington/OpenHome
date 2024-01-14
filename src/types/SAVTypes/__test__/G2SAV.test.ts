@@ -2,7 +2,7 @@ import fs from 'fs'
 import { TextDecoder } from 'node:util' // (ESM style imports)
 import path from 'path'
 import { bytesToPKM } from '../../../util/FileImport'
-import { PK2 } from '../../PKMTypes'
+import { OHPKM, PK2 } from '../../PKMTypes'
 import { G2SAV } from '../G2SAV'
 import { buildSaveFile } from '../util'
 ;(global as any).TextDecoder = TextDecoder
@@ -16,7 +16,7 @@ const crystalSaveFile = buildSaveFile(
 const slowpokeOH = bytesToPKM(
   new Uint8Array(fs.readFileSync(path.join(__dirname, './PKMFiles/OH', 'slowpoke-shiny.ohpkm'))),
   'OHPKM'
-)
+) as OHPKM
 
 test('pc box decoded correctly', () => {
   expect(crystalSaveFile.boxes[9].pokemon[0]?.nickname).toEqual('AMPHAROS')
@@ -39,7 +39,7 @@ test('removing mon shifts others in box', () => {
 
 test('inserting mon works', () => {
   const modifiedSaveFile1 = buildSaveFile('', new Uint8Array(crystalSaveFile.bytes), {}) as G2SAV
-  modifiedSaveFile1.boxes[13].pokemon[17] = new PK2(slowpokeOH)
+  modifiedSaveFile1.boxes[13].pokemon[17] = new PK2(undefined, undefined, slowpokeOH)
   modifiedSaveFile1.updatedBoxSlots.push({ box: 13, index: 0 })
   modifiedSaveFile1.prepareBoxesForSaving()
 

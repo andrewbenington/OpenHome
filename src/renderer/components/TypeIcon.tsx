@@ -1,5 +1,4 @@
-import { Types } from '../../consts'
-import { Type } from '../../types/types'
+import { teraTypeFromIndex, Type } from 'pokemon-resources'
 import { getPublicImageURL, getTypeIconPath } from '../images/images'
 
 interface TypeIconProps {
@@ -7,16 +6,17 @@ interface TypeIconProps {
   typeIndex?: number
 }
 
-const typeIconStyle = { height: 24, width: 24, marginRight: 5 }
+const typeIconStyle = { height: 24, width: 24 }
 
 const TypeIcon = (props: TypeIconProps) => {
-  const type = props.type ?? Types[props.typeIndex ?? 0]
+  const type = props.typeIndex ? teraTypeFromIndex(props.typeIndex) : props.type
   return (
     <img
+      title={`${type} type`}
       draggable={false}
       alt={`${type} type`}
       style={typeIconStyle}
-      src={getPublicImageURL(getTypeIconPath(type))}
+      src={type && getPublicImageURL(getTypeIconPath(type))}
     />
   )
 }

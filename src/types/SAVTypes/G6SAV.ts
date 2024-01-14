@@ -73,22 +73,7 @@ export class G6SAV extends SAV<PK6> {
   }
 
   prepareBoxesForSaving() {
-    // for (let i = 0; i < 58; i++) {
-    //   const blockInfoOffset = 0x75e00 + 0x14 + i * 8
-    //   const len = bytesToUint32LittleEndian(this.bytes, blockInfoOffset)
-    //   const id = bytesToUint16LittleEndian(this.bytes, blockInfoOffset + 4)
-    //   const checksum = bytesToUint16LittleEndian(this.bytes, blockInfoOffset + 6)
-    //   console.log({
-    //     i,
-    //     id,
-    //     len,
-    //     checksum: checksum.toString(16),
-    //     checksumOffset: blockInfoOffset,
-    //   })
-    // }
-    // console.log(CRC16_CCITT(this.bytes, 0x000, 0x2c8).toString(16))
     const changedMonPKMs: OHPKM[] = []
-    console.log(this.updatedBoxSlots)
     this.updatedBoxSlots.forEach(({ box, index }) => {
       const changedMon = this.boxes[box].pokemon[index]
       // we don't want to save OHPKM files of mons that didn't leave the save

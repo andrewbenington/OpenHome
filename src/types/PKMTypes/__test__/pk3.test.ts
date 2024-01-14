@@ -30,7 +30,7 @@ const blazikenOH = bytesToPKM(
 const blazikenGen3 = bytesToPKM(
   new Uint8Array(fs.readFileSync(path.join(__dirname, './PKMFiles/Gen3', 'blaziken.pkm'))),
   'PK3'
-) as OHPKM
+) as PK3
 
 const slowpokeOH = bytesToPKM(
   new Uint8Array(fs.readFileSync(path.join(__dirname, './PKMFiles/OH', 'slowpoke-shiny.ohpkm'))),

@@ -36,7 +36,7 @@ import { getHPGen3Onward, getLevelGen3Onward, getStatGen3Onward } from '../../ut
 import { utf16BytesToString, utf16StringToBytes } from '../../util/Strings/StringConverter'
 import { BasePKMData } from '../interfaces/base'
 import { Gen2OnlyData, hasGen2OnData } from '../interfaces/gen2'
-import { Gen3OrreData, hasGen3OnData, hasOrreData } from '../interfaces/gen3'
+import { Gen3OrreData, hasOrreData } from '../interfaces/gen3'
 import { Gen4EncounterType, Gen4OnlyData, hasGen4OnData, hasGen4OnlyData } from '../interfaces/gen4'
 import { Gen5OnlyData, hasGen5OnlyData } from '../interfaces/gen5'
 import { hasGen6OnData, hasMemoryData, hasN3DSOnlyData } from '../interfaces/gen6'
@@ -126,7 +126,7 @@ export class OHPKM
         this.trainerFriendship = other.trainerFriendship
       }
 
-      if (hasGen3OnData(other)) {
+      if ('personalityValue' in other) {
         this.personalityValue = other.personalityValue
         this.isFatefulEncounter = other.isFatefulEncounter
         this.nature = other.nature
@@ -347,7 +347,7 @@ export class OHPKM
         this.obedienceLevel = other.obedienceLevel
       } else {
         this.teraTypeOriginal = generateTeraType(prng, this.dexNum, this.formNum)
-        this.teraTypeOverride = 0x13
+        this.teraTypeOverride = this.teraTypeOriginal
       }
     }
   }
@@ -1527,7 +1527,7 @@ export class OHPKM
 
     if ('avs' in other) {
       this.avs = other.avs
-    } else if (hasGen3OnData(other)) {
+    } else if ('evs' in other) {
       this.evs = other.evs
       this.ribbons = uniq([...this.ribbons, ...(other.ribbons ?? [])])
       this.contest = other.contest

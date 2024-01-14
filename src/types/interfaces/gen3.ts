@@ -34,7 +34,7 @@ export interface SanityChecksum {
 }
 
 export function hasGen3OnData(obj: any): obj is Gen3OnData {
-  return obj && 'nature' in obj
+  return obj && 'personalityValue' in obj
 }
 
 export interface ContestData {

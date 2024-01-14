@@ -1,12 +1,12 @@
 /* eslint-disable no-nested-ternary */
 import { getNatureSummary } from 'pokemon-resources'
-import { LevelUpExp, NDex, POKEMON_DATA } from '../consts'
+import { LevelUpExp, NDex, NationalDexMax, POKEMON_DATA } from '../consts'
 import { BasePKMData } from '../types/interfaces/base'
 import { Gen3OnData } from '../types/interfaces/gen3'
 import { Stat } from '../types/types'
 
 export const getStatGen3Onward = (stat: Stat, mon: Gen3OnData & BasePKMData) => {
-  if (mon.dexNum < 1 || mon.dexNum > NDex.MAX) {
+  if (mon.dexNum < 1 || mon.dexNum > NationalDexMax) {
     return 0
   }
   const natureSummary = getNatureSummary(mon.nature)
@@ -29,7 +29,7 @@ export const getStatGen3Onward = (stat: Stat, mon: Gen3OnData & BasePKMData) => 
 }
 
 export const getHPGen3Onward = (mon: Gen3OnData & BasePKMData) => {
-  if (mon.dexNum < 1 || mon.dexNum > NDex.MAX) {
+  if (mon.dexNum < 1 || mon.dexNum > NationalDexMax) {
     return 0
   }
   if (mon.dexNum === NDex.SHEDINJA) {
@@ -45,7 +45,7 @@ export const getHPGen3Onward = (mon: Gen3OnData & BasePKMData) => {
 }
 
 export const getLevelGen3Onward = (dexNum: number, exp: number) => {
-  if (dexNum < 1 || dexNum > NDex.MAX) {
+  if (dexNum < 1 || dexNum > NationalDexMax) {
     return 1
   }
   const levelUpType = POKEMON_DATA[dexNum].levelUpType
