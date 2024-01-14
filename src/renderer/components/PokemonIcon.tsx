@@ -26,6 +26,7 @@ export default function PokemonIcon(props: PokemonIconProps) {
   } = props
 
   const getBackgroundPosition = (mon: { dexNum: number; formNum: number }) => {
+    console.log(mon.dexNum, mon.formNum, POKEMON_DATA[mon.dexNum].formes[mon.formNum])
     if (!POKEMON_DATA[mon.dexNum].formes[mon.formNum]) {
       return '0% 0%'
     }

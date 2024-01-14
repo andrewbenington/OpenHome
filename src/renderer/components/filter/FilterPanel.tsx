@@ -68,6 +68,7 @@ export default function FilterPanel() {
       <Stack margin={1} spacing={1}>
         <FilterAutocomplete
           options={Object.values(POKEMON_DATA)}
+          groupBy={(option) => `Generation ${option.formes[0].gen}`}
           labelField="name"
           indexField="nationalDex"
           filterField="dexNumber"

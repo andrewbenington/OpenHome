@@ -51,6 +51,8 @@ export default function FilterAutocomplete<OptionType>(props: FilterAutocomplete
 
   return (
     <Autocomplete
+      selectOnFocus
+      clearOnBlur
       size="small"
       value={currentOption ?? null}
       isOptionEqualToValue={(option, value) => {
@@ -63,7 +65,7 @@ export default function FilterAutocomplete<OptionType>(props: FilterAutocomplete
         props.renderOption ??
         ((props, option) => {
           return (
-            <li {...props} key={labelField ? option[labelField] : option}>
+            <li {...props} key={indexField ? option[indexField] : option}>
               {attributes.getOptionLabel
                 ? attributes.getOptionLabel(option)
                 : labelField

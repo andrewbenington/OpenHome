@@ -30,7 +30,7 @@ import { contestStats, hyperTrainStats, marking, memory, pokedate, stats } from 
 import { OHPKM } from './OHPKM'
 import { adjustMovePPBetweenFormats, writeIVsToBuffer } from './util'
 
-const SV_MOVE_MAX = 904
+const SV_MOVE_MAX = 919
 
 export class PK9 implements BasePKMData, Gen8OnData, Gen9OnlyData, SanityChecksum {
   public get fileSize() {

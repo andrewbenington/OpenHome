@@ -25,9 +25,6 @@ const reducer: Reducer<FilterState, FilterAction> = (state: FilterState, action:
         ...state,
         ...payload,
       }
-      if ('dexNumber' in payload && payload.dexNumber === undefined) {
-        delete newState.formeNumber
-      }
       return newState
     }
     case 'clear_fields': {
@@ -35,6 +32,9 @@ const reducer: Reducer<FilterState, FilterAction> = (state: FilterState, action:
       payload.forEach((field) => {
         delete newState[field]
       })
+      if (payload.includes('dexNumber')) {
+        delete newState.formeNumber
+      }
       if (payload.includes('type1') && newState.type2) {
         newState.type1 = newState.type2
         delete newState.type2

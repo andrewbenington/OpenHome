@@ -2276,8 +2276,8 @@
                 "cosmeticForme": false,
                 "sprite": "pikachu",
                 "spriteIndex": [
-                    33,
-                    0
+                    4,
+                    1
                 ]
             },
             {
@@ -48909,7 +48909,7 @@
                 "cosmeticForme": false,
                 "sprite": "greninja-ash",
                 "spriteIndex": [
-                    27,
+                    28,
                     23
                 ]
             }
@@ -48967,7 +48967,7 @@
                 "cosmeticForme": false,
                 "sprite": "bunnelby",
                 "spriteIndex": [
-                    28,
+                    29,
                     23
                 ]
             }
@@ -49025,7 +49025,7 @@
                 "cosmeticForme": false,
                 "sprite": "diggersby",
                 "spriteIndex": [
-                    29,
+                    30,
                     23
                 ]
             }
@@ -49087,7 +49087,7 @@
                 "cosmeticForme": false,
                 "sprite": "fletchling",
                 "spriteIndex": [
-                    30,
+                    31,
                     23
                 ]
             }
@@ -49153,7 +49153,7 @@
                 "cosmeticForme": false,
                 "sprite": "fletchinder",
                 "spriteIndex": [
-                    31,
+                    32,
                     23
                 ]
             }
@@ -49214,7 +49214,7 @@
                 "cosmeticForme": false,
                 "sprite": "talonflame",
                 "spriteIndex": [
-                    32,
+                    33,
                     23
                 ]
             }
@@ -49276,7 +49276,7 @@
                 "cosmeticForme": false,
                 "sprite": "scatterbug",
                 "spriteIndex": [
-                    33,
+                    34,
                     23
                 ]
             },
@@ -49318,7 +49318,7 @@
                 "eggGroups": [
                     "Bug"
                 ],
-                "gem": 9,
+                "gen": 6,
                 "regional": null,
                 "baseFriendship": 50,
                 "evYield": {
@@ -49332,7 +49332,7 @@
                 "cosmeticForme": true,
                 "sprite": "scatterbug",
                 "spriteIndex": [
-                    33,
+                    34,
                     23
                 ]
             },
@@ -49374,7 +49374,7 @@
                 "eggGroups": [
                     "Bug"
                 ],
-                "gem": 9,
+                "gen": 6,
                 "regional": null,
                 "baseFriendship": 50,
                 "evYield": {
@@ -49388,7 +49388,7 @@
                 "cosmeticForme": true,
                 "sprite": "scatterbug",
                 "spriteIndex": [
-                    33,
+                    34,
                     23
                 ]
             },
@@ -49430,7 +49430,7 @@
                 "eggGroups": [
                     "Bug"
                 ],
-                "gem": 9,
+                "gen": 6,
                 "regional": null,
                 "baseFriendship": 50,
                 "evYield": {
@@ -49444,7 +49444,7 @@
                 "cosmeticForme": true,
                 "sprite": "scatterbug",
                 "spriteIndex": [
-                    33,
+                    34,
                     23
                 ]
             },
@@ -49486,7 +49486,7 @@
                 "eggGroups": [
                     "Bug"
                 ],
-                "gem": 9,
+                "gen": 6,
                 "regional": null,
                 "baseFriendship": 50,
                 "evYield": {
@@ -49500,7 +49500,7 @@
                 "cosmeticForme": true,
                 "sprite": "scatterbug",
                 "spriteIndex": [
-                    33,
+                    34,
                     23
                 ]
             },
@@ -49542,7 +49542,7 @@
                 "eggGroups": [
                     "Bug"
                 ],
-                "gem": 9,
+                "gen": 6,
                 "regional": null,
                 "baseFriendship": 50,
                 "evYield": {
@@ -49556,7 +49556,7 @@
                 "cosmeticForme": true,
                 "sprite": "scatterbug",
                 "spriteIndex": [
-                    33,
+                    34,
                     23
                 ]
             },
@@ -49598,7 +49598,7 @@
                 "eggGroups": [
                     "Bug"
                 ],
-                "gem": 9,
+                "gen": 6,
                 "regional": null,
                 "baseFriendship": 50,
                 "evYield": {
@@ -49612,7 +49612,7 @@
                 "cosmeticForme": true,
                 "sprite": "scatterbug",
                 "spriteIndex": [
-                    33,
+                    34,
                     23
                 ]
             },
@@ -49654,7 +49654,7 @@
                 "eggGroups": [
                     "Bug"
                 ],
-                "gem": 9,
+                "gen": 6,
                 "regional": null,
                 "baseFriendship": 50,
                 "evYield": {
@@ -49668,7 +49668,7 @@
                 "cosmeticForme": true,
                 "sprite": "scatterbug",
                 "spriteIndex": [
-                    33,
+                    34,
                     23
                 ]
             },
@@ -49710,7 +49710,7 @@
                 "eggGroups": [
                     "Bug"
                 ],
-                "gem": 9,
+                "gen": 6,
                 "regional": null,
                 "baseFriendship": 50,
                 "evYield": {
@@ -49724,7 +49724,7 @@
                 "cosmeticForme": true,
                 "sprite": "scatterbug",
                 "spriteIndex": [
-                    33,
+                    34,
                     23
                 ]
             },
@@ -49766,7 +49766,7 @@
                 "eggGroups": [
                     "Bug"
                 ],
-                "gem": 9,
+                "gen": 6,
                 "regional": null,
                 "baseFriendship": 50,
                 "evYield": {
@@ -49780,7 +49780,7 @@
                 "cosmeticForme": true,
                 "sprite": "scatterbug",
                 "spriteIndex": [
-                    33,
+                    34,
                     23
                 ]
             },
@@ -49822,7 +49822,7 @@
                 "eggGroups": [
                     "Bug"
                 ],
-                "gem": 9,
+                "gen": 6,
                 "regional": null,
                 "baseFriendship": 50,
                 "evYield": {
@@ -49836,7 +49836,7 @@
                 "cosmeticForme": true,
                 "sprite": "scatterbug",
                 "spriteIndex": [
-                    33,
+                    34,
                     23
                 ]
             },
@@ -49878,7 +49878,7 @@
                 "eggGroups": [
                     "Bug"
                 ],
-                "gem": 9,
+                "gen": 6,
                 "regional": null,
                 "baseFriendship": 50,
                 "evYield": {
@@ -49892,7 +49892,7 @@
                 "cosmeticForme": true,
                 "sprite": "scatterbug",
                 "spriteIndex": [
-                    33,
+                    34,
                     23
                 ]
             },
@@ -49934,7 +49934,7 @@
                 "eggGroups": [
                     "Bug"
                 ],
-                "gem": 9,
+                "gen": 6,
                 "regional": null,
                 "baseFriendship": 50,
                 "evYield": {
@@ -49948,7 +49948,7 @@
                 "cosmeticForme": true,
                 "sprite": "scatterbug",
                 "spriteIndex": [
-                    33,
+                    34,
                     23
                 ]
             },
@@ -49990,7 +49990,7 @@
                 "eggGroups": [
                     "Bug"
                 ],
-                "gem": 9,
+                "gen": 6,
                 "regional": null,
                 "baseFriendship": 50,
                 "evYield": {
@@ -50004,7 +50004,7 @@
                 "cosmeticForme": true,
                 "sprite": "scatterbug",
                 "spriteIndex": [
-                    33,
+                    34,
                     23
                 ]
             },
@@ -50046,7 +50046,7 @@
                 "eggGroups": [
                     "Bug"
                 ],
-                "gem": 9,
+                "gen": 6,
                 "regional": null,
                 "baseFriendship": 50,
                 "evYield": {
@@ -50060,7 +50060,7 @@
                 "cosmeticForme": true,
                 "sprite": "scatterbug",
                 "spriteIndex": [
-                    33,
+                    34,
                     23
                 ]
             },
@@ -50102,7 +50102,7 @@
                 "eggGroups": [
                     "Bug"
                 ],
-                "gem": 9,
+                "gen": 6,
                 "regional": null,
                 "baseFriendship": 50,
                 "evYield": {
@@ -50116,7 +50116,7 @@
                 "cosmeticForme": true,
                 "sprite": "scatterbug",
                 "spriteIndex": [
-                    33,
+                    34,
                     23
                 ]
             },
@@ -50158,7 +50158,7 @@
                 "eggGroups": [
                     "Bug"
                 ],
-                "gem": 9,
+                "gen": 6,
                 "regional": null,
                 "baseFriendship": 50,
                 "evYield": {
@@ -50172,7 +50172,7 @@
                 "cosmeticForme": true,
                 "sprite": "scatterbug",
                 "spriteIndex": [
-                    33,
+                    34,
                     23
                 ]
             },
@@ -50214,7 +50214,7 @@
                 "eggGroups": [
                     "Bug"
                 ],
-                "gem": 9,
+                "gen": 6,
                 "regional": null,
                 "baseFriendship": 50,
                 "evYield": {
@@ -50228,7 +50228,7 @@
                 "cosmeticForme": true,
                 "sprite": "scatterbug",
                 "spriteIndex": [
-                    33,
+                    34,
                     23
                 ]
             },
@@ -50270,7 +50270,7 @@
                 "eggGroups": [
                     "Bug"
                 ],
-                "gem": 9,
+                "gen": 6,
                 "regional": null,
                 "baseFriendship": 50,
                 "evYield": {
@@ -50284,7 +50284,7 @@
                 "cosmeticForme": true,
                 "sprite": "scatterbug",
                 "spriteIndex": [
-                    33,
+                    34,
                     23
                 ]
             },
@@ -50326,7 +50326,7 @@
                 "eggGroups": [
                     "Bug"
                 ],
-                "gem": 9,
+                "gen": 6,
                 "regional": null,
                 "baseFriendship": 50,
                 "evYield": {
@@ -50340,7 +50340,7 @@
                 "cosmeticForme": true,
                 "sprite": "scatterbug",
                 "spriteIndex": [
-                    33,
+                    34,
                     23
                 ]
             }
@@ -50405,7 +50405,7 @@
                 "cosmeticForme": false,
                 "sprite": "spewpa",
                 "spriteIndex": [
-                    34,
+                    35,
                     23
                 ]
             },
@@ -50446,7 +50446,7 @@
                 "eggGroups": [
                     "Bug"
                 ],
-                "gem": 9,
+                "gen": 6,
                 "regional": null,
                 "prevo": {
                     "dexNumber": 664,
@@ -50464,7 +50464,7 @@
                 "cosmeticForme": true,
                 "sprite": "spewpa",
                 "spriteIndex": [
-                    34,
+                    35,
                     23
                 ]
             },
@@ -50505,7 +50505,7 @@
                 "eggGroups": [
                     "Bug"
                 ],
-                "gem": 9,
+                "gen": 6,
                 "regional": null,
                 "prevo": {
                     "dexNumber": 664,
@@ -50523,7 +50523,7 @@
                 "cosmeticForme": true,
                 "sprite": "spewpa",
                 "spriteIndex": [
-                    34,
+                    35,
                     23
                 ]
             },
@@ -50582,7 +50582,7 @@
                 "cosmeticForme": true,
                 "sprite": "spewpa",
                 "spriteIndex": [
-                    34,
+                    35,
                     23
                 ]
             },
@@ -50641,7 +50641,7 @@
                 "cosmeticForme": true,
                 "sprite": "spewpa",
                 "spriteIndex": [
-                    34,
+                    35,
                     23
                 ]
             },
@@ -50700,7 +50700,7 @@
                 "cosmeticForme": true,
                 "sprite": "spewpa",
                 "spriteIndex": [
-                    34,
+                    35,
                     23
                 ]
             },
@@ -50759,7 +50759,7 @@
                 "cosmeticForme": true,
                 "sprite": "spewpa",
                 "spriteIndex": [
-                    34,
+                    35,
                     23
                 ]
             },
@@ -50818,7 +50818,7 @@
                 "cosmeticForme": true,
                 "sprite": "spewpa",
                 "spriteIndex": [
-                    34,
+                    35,
                     23
                 ]
             },
@@ -50877,7 +50877,7 @@
                 "cosmeticForme": true,
                 "sprite": "spewpa",
                 "spriteIndex": [
-                    34,
+                    35,
                     23
                 ]
             },
@@ -50936,7 +50936,7 @@
                 "cosmeticForme": true,
                 "sprite": "spewpa",
                 "spriteIndex": [
-                    34,
+                    35,
                     23
                 ]
             },
@@ -50995,7 +50995,7 @@
                 "cosmeticForme": true,
                 "sprite": "spewpa",
                 "spriteIndex": [
-                    34,
+                    35,
                     23
                 ]
             },
@@ -51054,7 +51054,7 @@
                 "cosmeticForme": true,
                 "sprite": "spewpa",
                 "spriteIndex": [
-                    34,
+                    35,
                     23
                 ]
             },
@@ -51113,7 +51113,7 @@
                 "cosmeticForme": true,
                 "sprite": "spewpa",
                 "spriteIndex": [
-                    34,
+                    35,
                     23
                 ]
             },
@@ -51172,7 +51172,7 @@
                 "cosmeticForme": true,
                 "sprite": "spewpa",
                 "spriteIndex": [
-                    34,
+                    35,
                     23
                 ]
             },
@@ -51231,7 +51231,7 @@
                 "cosmeticForme": true,
                 "sprite": "spewpa",
                 "spriteIndex": [
-                    34,
+                    35,
                     23
                 ]
             },
@@ -51290,7 +51290,7 @@
                 "cosmeticForme": true,
                 "sprite": "spewpa",
                 "spriteIndex": [
-                    34,
+                    35,
                     23
                 ]
             },
@@ -51349,7 +51349,7 @@
                 "cosmeticForme": true,
                 "sprite": "spewpa",
                 "spriteIndex": [
-                    34,
+                    35,
                     23
                 ]
             },
@@ -51408,7 +51408,7 @@
                 "cosmeticForme": true,
                 "sprite": "spewpa",
                 "spriteIndex": [
-                    34,
+                    35,
                     23
                 ]
             },
@@ -51467,7 +51467,7 @@
                 "cosmeticForme": true,
                 "sprite": "spewpa",
                 "spriteIndex": [
-                    34,
+                    35,
                     23
                 ]
             },
@@ -51526,7 +51526,7 @@
                 "cosmeticForme": true,
                 "sprite": "spewpa",
                 "spriteIndex": [
-                    34,
+                    35,
                     23
                 ]
             }
@@ -51591,8 +51591,8 @@
                 "cosmeticForme": false,
                 "sprite": "vivillon",
                 "spriteIndex": [
-                    35,
-                    23
+                    0,
+                    24
                 ]
             },
             {
@@ -51649,7 +51649,7 @@
                 "cosmeticForme": true,
                 "sprite": "vivillon",
                 "spriteIndex": [
-                    0,
+                    1,
                     24
                 ]
             },
@@ -51707,7 +51707,7 @@
                 "cosmeticForme": true,
                 "sprite": "vivillon",
                 "spriteIndex": [
-                    1,
+                    2,
                     24
                 ]
             },
@@ -51765,7 +51765,7 @@
                 "cosmeticForme": true,
                 "sprite": "vivillon",
                 "spriteIndex": [
-                    2,
+                    3,
                     24
                 ]
             },
@@ -51823,7 +51823,7 @@
                 "cosmeticForme": true,
                 "sprite": "vivillon",
                 "spriteIndex": [
-                    3,
+                    4,
                     24
                 ]
             },
@@ -51881,7 +51881,7 @@
                 "cosmeticForme": true,
                 "sprite": "vivillon",
                 "spriteIndex": [
-                    4,
+                    5,
                     24
                 ]
             },
@@ -51939,7 +51939,7 @@
                 "cosmeticForme": true,
                 "sprite": "vivillon",
                 "spriteIndex": [
-                    5,
+                    6,
                     24
                 ]
             },
@@ -51997,7 +51997,7 @@
                 "cosmeticForme": true,
                 "sprite": "vivillon",
                 "spriteIndex": [
-                    6,
+                    7,
                     24
                 ]
             },
@@ -52055,7 +52055,7 @@
                 "cosmeticForme": true,
                 "sprite": "vivillon",
                 "spriteIndex": [
-                    7,
+                    8,
                     24
                 ]
             },
@@ -52113,7 +52113,7 @@
                 "cosmeticForme": true,
                 "sprite": "vivillon",
                 "spriteIndex": [
-                    8,
+                    9,
                     24
                 ]
             },
@@ -52171,7 +52171,7 @@
                 "cosmeticForme": true,
                 "sprite": "vivillon",
                 "spriteIndex": [
-                    9,
+                    10,
                     24
                 ]
             },
@@ -52229,7 +52229,7 @@
                 "cosmeticForme": true,
                 "sprite": "vivillon",
                 "spriteIndex": [
-                    10,
+                    11,
                     24
                 ]
             },
@@ -52287,7 +52287,7 @@
                 "cosmeticForme": true,
                 "sprite": "vivillon",
                 "spriteIndex": [
-                    11,
+                    12,
                     24
                 ]
             },
@@ -52345,7 +52345,7 @@
                 "cosmeticForme": true,
                 "sprite": "vivillon",
                 "spriteIndex": [
-                    12,
+                    13,
                     24
                 ]
             },
@@ -52403,7 +52403,7 @@
                 "cosmeticForme": true,
                 "sprite": "vivillon",
                 "spriteIndex": [
-                    13,
+                    14,
                     24
                 ]
             },
@@ -52461,7 +52461,7 @@
                 "cosmeticForme": true,
                 "sprite": "vivillon",
                 "spriteIndex": [
-                    14,
+                    15,
                     24
                 ]
             },
@@ -52519,7 +52519,7 @@
                 "cosmeticForme": true,
                 "sprite": "vivillon",
                 "spriteIndex": [
-                    15,
+                    16,
                     24
                 ]
             },
@@ -52577,7 +52577,7 @@
                 "cosmeticForme": true,
                 "sprite": "vivillon",
                 "spriteIndex": [
-                    16,
+                    17,
                     24
                 ]
             },
@@ -52635,7 +52635,7 @@
                 "cosmeticForme": false,
                 "sprite": "vivillon-fancy",
                 "spriteIndex": [
-                    17,
+                    18,
                     24
                 ]
             },
@@ -52693,7 +52693,7 @@
                 "cosmeticForme": false,
                 "sprite": "vivillon-pokeball",
                 "spriteIndex": [
-                    18,
+                    19,
                     24
                 ]
             }
@@ -52756,7 +52756,7 @@
                 "cosmeticForme": false,
                 "sprite": "litleo",
                 "spriteIndex": [
-                    19,
+                    20,
                     24
                 ]
             }
@@ -52818,7 +52818,7 @@
                 "cosmeticForme": false,
                 "sprite": "pyroar",
                 "spriteIndex": [
-                    20,
+                    21,
                     24
                 ]
             }
@@ -52879,7 +52879,7 @@
                 "cosmeticForme": true,
                 "sprite": "flabebe-red",
                 "spriteIndex": [
-                    22,
+                    23,
                     24
                 ]
             },
@@ -52933,7 +52933,7 @@
                 "cosmeticForme": true,
                 "sprite": "flabebe-blue",
                 "spriteIndex": [
-                    23,
+                    24,
                     24
                 ]
             },
@@ -52987,7 +52987,7 @@
                 "cosmeticForme": true,
                 "sprite": "flabebe-orange",
                 "spriteIndex": [
-                    24,
+                    25,
                     24
                 ]
             },
@@ -53041,7 +53041,7 @@
                 "cosmeticForme": true,
                 "sprite": "flabebe-white",
                 "spriteIndex": [
-                    25,
+                    26,
                     24
                 ]
             },
@@ -53095,7 +53095,7 @@
                 "cosmeticForme": true,
                 "sprite": "flabebe-yellow",
                 "spriteIndex": [
-                    26,
+                    27,
                     24
                 ]
             }
@@ -53160,7 +53160,7 @@
                 "cosmeticForme": false,
                 "sprite": "floette-red",
                 "spriteIndex": [
-                    27,
+                    28,
                     24
                 ]
             },
@@ -53218,7 +53218,7 @@
                 "cosmeticForme": true,
                 "sprite": "floette-blue",
                 "spriteIndex": [
-                    28,
+                    29,
                     24
                 ]
             },
@@ -53276,7 +53276,7 @@
                 "cosmeticForme": true,
                 "sprite": "floette-orange",
                 "spriteIndex": [
-                    29,
+                    30,
                     24
                 ]
             },
@@ -53334,7 +53334,7 @@
                 "cosmeticForme": true,
                 "sprite": "floette-white",
                 "spriteIndex": [
-                    30,
+                    31,
                     24
                 ]
             },
@@ -53392,7 +53392,7 @@
                 "cosmeticForme": true,
                 "sprite": "floette-yellow",
                 "spriteIndex": [
-                    31,
+                    32,
                     24
                 ]
             },
@@ -53436,7 +53436,7 @@
                 "cosmeticForme": false,
                 "sprite": "floette-eternal",
                 "spriteIndex": [
-                    32,
+                    33,
                     24
                 ]
             }
@@ -53496,7 +53496,7 @@
                 "cosmeticForme": false,
                 "sprite": "florges-red",
                 "spriteIndex": [
-                    33,
+                    34,
                     24
                 ]
             },
@@ -53549,7 +53549,7 @@
                 "cosmeticForme": true,
                 "sprite": "florges-blue",
                 "spriteIndex": [
-                    34,
+                    35,
                     24
                 ]
             },
@@ -53602,8 +53602,8 @@
                 "cosmeticForme": true,
                 "sprite": "florges-orange",
                 "spriteIndex": [
-                    35,
-                    24
+                    0,
+                    25
                 ]
             },
             {
@@ -53655,7 +53655,7 @@
                 "cosmeticForme": true,
                 "sprite": "florges-white",
                 "spriteIndex": [
-                    0,
+                    1,
                     25
                 ]
             },
@@ -53708,7 +53708,7 @@
                 "cosmeticForme": true,
                 "sprite": "florges-yellow",
                 "spriteIndex": [
-                    1,
+                    2,
                     25
                 ]
             }
@@ -53769,7 +53769,7 @@
                 "cosmeticForme": false,
                 "sprite": "skiddo",
                 "spriteIndex": [
-                    2,
+                    3,
                     25
                 ]
             }
@@ -53829,7 +53829,7 @@
                 "cosmeticForme": false,
                 "sprite": "gogoat",
                 "spriteIndex": [
-                    3,
+                    4,
                     25
                 ]
             }
@@ -53888,7 +53888,7 @@
                 "cosmeticForme": false,
                 "sprite": "pancham",
                 "spriteIndex": [
-                    4,
+                    5,
                     25
                 ]
             }
@@ -53947,7 +53947,7 @@
                 "cosmeticForme": false,
                 "sprite": "pangoro",
                 "spriteIndex": [
-                    5,
+                    6,
                     25
                 ]
             }
@@ -53998,7 +53998,7 @@
                 "cosmeticForme": false,
                 "sprite": "furfrou",
                 "spriteIndex": [
-                    6,
+                    7,
                     25
                 ]
             },
@@ -54042,7 +54042,7 @@
                 "cosmeticForme": true,
                 "sprite": "furfrou",
                 "spriteIndex": [
-                    7,
+                    8,
                     25
                 ]
             },
@@ -54086,7 +54086,7 @@
                 "cosmeticForme": true,
                 "sprite": "furfrou",
                 "spriteIndex": [
-                    8,
+                    9,
                     25
                 ]
             },
@@ -54130,7 +54130,7 @@
                 "cosmeticForme": true,
                 "sprite": "furfrou",
                 "spriteIndex": [
-                    9,
+                    10,
                     25
                 ]
             },
@@ -54174,7 +54174,7 @@
                 "cosmeticForme": true,
                 "sprite": "furfrou",
                 "spriteIndex": [
-                    10,
+                    11,
                     25
                 ]
             },
@@ -54218,7 +54218,7 @@
                 "cosmeticForme": true,
                 "sprite": "furfrou",
                 "spriteIndex": [
-                    11,
+                    12,
                     25
                 ]
             },
@@ -54262,7 +54262,7 @@
                 "cosmeticForme": true,
                 "sprite": "furfrou",
                 "spriteIndex": [
-                    12,
+                    13,
                     25
                 ]
             },
@@ -54306,7 +54306,7 @@
                 "cosmeticForme": true,
                 "sprite": "furfrou",
                 "spriteIndex": [
-                    13,
+                    14,
                     25
                 ]
             },
@@ -54350,7 +54350,7 @@
                 "cosmeticForme": true,
                 "sprite": "furfrou",
                 "spriteIndex": [
-                    14,
+                    15,
                     25
                 ]
             },
@@ -54394,7 +54394,7 @@
                 "cosmeticForme": true,
                 "sprite": "furfrou",
                 "spriteIndex": [
-                    15,
+                    16,
                     25
                 ]
             }
@@ -54456,7 +54456,7 @@
                 "cosmeticForme": false,
                 "sprite": "espurr",
                 "spriteIndex": [
-                    16,
+                    17,
                     25
                 ]
             }
@@ -54513,7 +54513,7 @@
                 "cosmeticForme": false,
                 "sprite": "meowstic",
                 "spriteIndex": [
-                    17,
+                    18,
                     25
                 ]
             },
@@ -54563,7 +54563,7 @@
                 "cosmeticForme": false,
                 "sprite": "meowstic-f",
                 "spriteIndex": [
-                    18,
+                    19,
                     25
                 ]
             }
@@ -54620,7 +54620,7 @@
                 "cosmeticForme": false,
                 "sprite": "honedge",
                 "spriteIndex": [
-                    19,
+                    20,
                     25
                 ]
             }
@@ -54681,7 +54681,7 @@
                 "cosmeticForme": false,
                 "sprite": "doublade",
                 "spriteIndex": [
-                    20,
+                    21,
                     25
                 ]
             }
@@ -54737,7 +54737,7 @@
                 "cosmeticForme": false,
                 "sprite": "aegislash",
                 "spriteIndex": [
-                    21,
+                    22,
                     25
                 ]
             },
@@ -54782,7 +54782,7 @@
                 "cosmeticForme": false,
                 "sprite": "aegislash-blade",
                 "spriteIndex": [
-                    22,
+                    23,
                     25
                 ]
             }
@@ -54839,7 +54839,7 @@
                 "cosmeticForme": false,
                 "sprite": "spritzee",
                 "spriteIndex": [
-                    23,
+                    24,
                     25
                 ]
             }
@@ -54895,7 +54895,7 @@
                 "cosmeticForme": false,
                 "sprite": "aromatisse",
                 "spriteIndex": [
-                    24,
+                    25,
                     25
                 ]
             }
@@ -54952,7 +54952,7 @@
                 "cosmeticForme": false,
                 "sprite": "swirlix",
                 "spriteIndex": [
-                    25,
+                    26,
                     25
                 ]
             }
@@ -55008,7 +55008,7 @@
                 "cosmeticForme": false,
                 "sprite": "slurpuff",
                 "spriteIndex": [
-                    26,
+                    27,
                     25
                 ]
             }
@@ -55068,7 +55068,7 @@
                 "cosmeticForme": false,
                 "sprite": "inkay",
                 "spriteIndex": [
-                    27,
+                    28,
                     25
                 ]
             }
@@ -55127,7 +55127,7 @@
                 "cosmeticForme": false,
                 "sprite": "malamar",
                 "spriteIndex": [
-                    28,
+                    29,
                     25
                 ]
             }
@@ -55186,7 +55186,7 @@
                 "cosmeticForme": false,
                 "sprite": "binacle",
                 "spriteIndex": [
-                    29,
+                    30,
                     25
                 ]
             }
@@ -55244,7 +55244,7 @@
                 "cosmeticForme": false,
                 "sprite": "barbaracle",
                 "spriteIndex": [
-                    30,
+                    31,
                     25
                 ]
             }
@@ -55308,7 +55308,7 @@
                 "cosmeticForme": false,
                 "sprite": "skrelp",
                 "spriteIndex": [
-                    31,
+                    32,
                     25
                 ]
             }
@@ -55371,7 +55371,7 @@
                 "cosmeticForme": false,
                 "sprite": "dragalge",
                 "spriteIndex": [
-                    32,
+                    33,
                     25
                 ]
             }
@@ -55432,7 +55432,7 @@
                 "cosmeticForme": false,
                 "sprite": "clauncher",
                 "spriteIndex": [
-                    33,
+                    34,
                     25
                 ]
             }
@@ -55492,7 +55492,7 @@
                 "cosmeticForme": false,
                 "sprite": "clawitzer",
                 "spriteIndex": [
-                    34,
+                    35,
                     25
                 ]
             }
@@ -55552,8 +55552,8 @@
                 "cosmeticForme": false,
                 "sprite": "helioptile",
                 "spriteIndex": [
-                    35,
-                    25
+                    0,
+                    26
                 ]
             }
         ],
@@ -55611,7 +55611,7 @@
                 "cosmeticForme": false,
                 "sprite": "heliolisk",
                 "spriteIndex": [
-                    0,
+                    1,
                     26
                 ]
             }
@@ -55670,7 +55670,7 @@
                 "cosmeticForme": false,
                 "sprite": "tyrunt",
                 "spriteIndex": [
-                    1,
+                    2,
                     26
                 ]
             }
@@ -55728,7 +55728,7 @@
                 "cosmeticForme": false,
                 "sprite": "tyrantrum",
                 "spriteIndex": [
-                    2,
+                    3,
                     26
                 ]
             }
@@ -55786,7 +55786,7 @@
                 "cosmeticForme": false,
                 "sprite": "amaura",
                 "spriteIndex": [
-                    3,
+                    4,
                     26
                 ]
             }
@@ -55843,7 +55843,7 @@
                 "cosmeticForme": false,
                 "sprite": "aurorus",
                 "spriteIndex": [
-                    4,
+                    5,
                     26
                 ]
             }
@@ -55903,7 +55903,7 @@
                 "cosmeticForme": false,
                 "sprite": "sylveon",
                 "spriteIndex": [
-                    5,
+                    6,
                     26
                 ]
             }
@@ -55962,7 +55962,7 @@
                 "cosmeticForme": false,
                 "sprite": "hawlucha",
                 "spriteIndex": [
-                    6,
+                    7,
                     26
                 ]
             }
@@ -56021,7 +56021,7 @@
                 "cosmeticForme": false,
                 "sprite": "dedenne",
                 "spriteIndex": [
-                    7,
+                    8,
                     26
                 ]
             }
@@ -56080,7 +56080,7 @@
                 "cosmeticForme": false,
                 "sprite": "carbink",
                 "spriteIndex": [
-                    8,
+                    9,
                     26
                 ]
             }
@@ -56146,7 +56146,7 @@
                 "cosmeticForme": false,
                 "sprite": "goomy",
                 "spriteIndex": [
-                    9,
+                    10,
                     26
                 ]
             }
@@ -56212,7 +56212,7 @@
                 "cosmeticForme": false,
                 "sprite": "sliggoo",
                 "spriteIndex": [
-                    10,
+                    11,
                     26
                 ]
             },
@@ -56273,7 +56273,7 @@
                 "cosmeticForme": true,
                 "sprite": "sliggoo-hisui",
                 "spriteIndex": [
-                    11,
+                    12,
                     26
                 ]
             }
@@ -56334,7 +56334,7 @@
                 "cosmeticForme": false,
                 "sprite": "goodra",
                 "spriteIndex": [
-                    12,
+                    13,
                     26
                 ]
             },
@@ -56390,7 +56390,7 @@
                 "cosmeticForme": true,
                 "sprite": "goodra-hisui",
                 "spriteIndex": [
-                    13,
+                    14,
                     26
                 ]
             }
@@ -56447,7 +56447,7 @@
                 "cosmeticForme": false,
                 "sprite": "klefki",
                 "spriteIndex": [
-                    14,
+                    15,
                     26
                 ]
             }
@@ -56507,7 +56507,7 @@
                 "cosmeticForme": false,
                 "sprite": "phantump",
                 "spriteIndex": [
-                    15,
+                    16,
                     26
                 ]
             }
@@ -56566,7 +56566,7 @@
                 "cosmeticForme": false,
                 "sprite": "trevenant",
                 "spriteIndex": [
-                    16,
+                    17,
                     26
                 ]
             }
@@ -56625,7 +56625,7 @@
                 "cosmeticForme": false,
                 "sprite": "pumpkaboo",
                 "spriteIndex": [
-                    17,
+                    18,
                     26
                 ]
             },
@@ -56677,7 +56677,7 @@
                 "cosmeticForme": false,
                 "sprite": "pumpkaboo-small",
                 "spriteIndex": [
-                    18,
+                    19,
                     26
                 ]
             },
@@ -56729,7 +56729,7 @@
                 "cosmeticForme": false,
                 "sprite": "pumpkaboo-large",
                 "spriteIndex": [
-                    19,
+                    20,
                     26
                 ]
             },
@@ -56781,7 +56781,7 @@
                 "cosmeticForme": false,
                 "sprite": "pumpkaboo-super",
                 "spriteIndex": [
-                    20,
+                    21,
                     26
                 ]
             }
@@ -56839,7 +56839,7 @@
                 "cosmeticForme": false,
                 "sprite": "gourgeist",
                 "spriteIndex": [
-                    21,
+                    22,
                     26
                 ]
             },
@@ -56890,7 +56890,7 @@
                 "cosmeticForme": false,
                 "sprite": "gourgeist-small",
                 "spriteIndex": [
-                    22,
+                    23,
                     26
                 ]
             },
@@ -56941,7 +56941,7 @@
                 "cosmeticForme": false,
                 "sprite": "gourgeist-large",
                 "spriteIndex": [
-                    23,
+                    24,
                     26
                 ]
             },
@@ -56992,7 +56992,7 @@
                 "cosmeticForme": false,
                 "sprite": "gourgeist-super",
                 "spriteIndex": [
-                    24,
+                    25,
                     26
                 ]
             }
@@ -57059,7 +57059,7 @@
                 "cosmeticForme": false,
                 "sprite": "bergmite",
                 "spriteIndex": [
-                    25,
+                    26,
                     26
                 ]
             }
@@ -57121,7 +57121,7 @@
                 "cosmeticForme": false,
                 "sprite": "avalugg",
                 "spriteIndex": [
-                    26,
+                    27,
                     26
                 ]
             },
@@ -57178,7 +57178,7 @@
                 "cosmeticForme": true,
                 "sprite": "avalugg-hisui",
                 "spriteIndex": [
-                    27,
+                    28,
                     26
                 ]
             }
@@ -57242,7 +57242,7 @@
                 "cosmeticForme": false,
                 "sprite": "noibat",
                 "spriteIndex": [
-                    28,
+                    29,
                     26
                 ]
             }
@@ -57305,7 +57305,7 @@
                 "cosmeticForme": false,
                 "sprite": "noivern",
                 "spriteIndex": [
-                    29,
+                    30,
                     26
                 ]
             }
@@ -57356,7 +57356,7 @@
                 "cosmeticForme": false,
                 "sprite": "xerneas",
                 "spriteIndex": [
-                    30,
+                    31,
                     26
                 ]
             },
@@ -57400,7 +57400,7 @@
                 "cosmeticForme": false,
                 "sprite": "xerneas",
                 "spriteIndex": [
-                    31,
+                    32,
                     26
                 ]
             }
@@ -57452,7 +57452,7 @@
                 "cosmeticForme": false,
                 "sprite": "yveltal",
                 "spriteIndex": [
-                    32,
+                    33,
                     26
                 ]
             }
@@ -57504,7 +57504,7 @@
                 "cosmeticForme": false,
                 "sprite": "zygarde-50",
                 "spriteIndex": [
-                    33,
+                    34,
                     26
                 ]
             },
@@ -57549,7 +57549,7 @@
                 "cosmeticForme": true,
                 "sprite": "zygarde-10",
                 "spriteIndex": [
-                    34,
+                    35,
                     26
                 ]
             },
@@ -57594,7 +57594,7 @@
                 "cosmeticForme": true,
                 "sprite": "zygarde-10",
                 "spriteIndex": [
-                    34,
+                    35,
                     26
                 ]
             },
@@ -57642,8 +57642,8 @@
                 "cosmeticForme": false,
                 "sprite": "zygarde-complete",
                 "spriteIndex": [
-                    33,
-                    26
+                    0,
+                    27
                 ]
             }
         ],
@@ -57699,8 +57699,8 @@
                 "cosmeticForme": false,
                 "sprite": "diancie",
                 "spriteIndex": [
-                    35,
-                    26
+                    1,
+                    27
                 ]
             },
             {
@@ -57744,7 +57744,7 @@
                 "cosmeticForme": false,
                 "sprite": "diancie-mega",
                 "spriteIndex": [
-                    0,
+                    2,
                     27
                 ]
             }
@@ -57800,7 +57800,7 @@
                 "cosmeticForme": false,
                 "sprite": "hoopa",
                 "spriteIndex": [
-                    1,
+                    3,
                     27
                 ]
             },
@@ -57849,7 +57849,7 @@
                 "cosmeticForme": false,
                 "sprite": "hoopa-unbound",
                 "spriteIndex": [
-                    2,
+                    4,
                     27
                 ]
             }
@@ -57905,7 +57905,7 @@
                 "cosmeticForme": false,
                 "sprite": "volcanion",
                 "spriteIndex": [
-                    3,
+                    5,
                     27
                 ]
             }
@@ -57967,7 +57967,7 @@
                 "cosmeticForme": false,
                 "sprite": "rowlet",
                 "spriteIndex": [
-                    4,
+                    6,
                     27
                 ]
             }
@@ -58037,7 +58037,7 @@
                 "cosmeticForme": false,
                 "sprite": "dartrix",
                 "spriteIndex": [
-                    5,
+                    7,
                     27
                 ]
             }
@@ -58098,7 +58098,7 @@
                 "cosmeticForme": false,
                 "sprite": "decidueye",
                 "spriteIndex": [
-                    6,
+                    8,
                     27
                 ]
             },
@@ -58153,7 +58153,7 @@
                 "cosmeticForme": true,
                 "sprite": "decidueye-hisui",
                 "spriteIndex": [
-                    7,
+                    9,
                     27
                 ]
             }
@@ -58210,7 +58210,7 @@
                 "cosmeticForme": false,
                 "sprite": "litten",
                 "spriteIndex": [
-                    8,
+                    10,
                     27
                 ]
             }
@@ -58271,7 +58271,7 @@
                 "cosmeticForme": false,
                 "sprite": "torracat",
                 "spriteIndex": [
-                    9,
+                    11,
                     27
                 ]
             }
@@ -58328,7 +58328,7 @@
                 "cosmeticForme": false,
                 "sprite": "incineroar",
                 "spriteIndex": [
-                    10,
+                    12,
                     27
                 ]
             }
@@ -58386,7 +58386,7 @@
                 "cosmeticForme": false,
                 "sprite": "popplio",
                 "spriteIndex": [
-                    11,
+                    13,
                     27
                 ]
             }
@@ -58448,7 +58448,7 @@
                 "cosmeticForme": false,
                 "sprite": "brionne",
                 "spriteIndex": [
-                    12,
+                    14,
                     27
                 ]
             }
@@ -58506,7 +58506,7 @@
                 "cosmeticForme": false,
                 "sprite": "primarina",
                 "spriteIndex": [
-                    13,
+                    15,
                     27
                 ]
             }
@@ -58565,7 +58565,7 @@
                 "cosmeticForme": false,
                 "sprite": "pikipek",
                 "spriteIndex": [
-                    14,
+                    16,
                     27
                 ]
             }
@@ -58628,7 +58628,7 @@
                 "cosmeticForme": false,
                 "sprite": "trumbeak",
                 "spriteIndex": [
-                    15,
+                    17,
                     27
                 ]
             }
@@ -58686,7 +58686,7 @@
                 "cosmeticForme": false,
                 "sprite": "toucannon",
                 "spriteIndex": [
-                    16,
+                    18,
                     27
                 ]
             }
@@ -58748,7 +58748,7 @@
                 "cosmeticForme": false,
                 "sprite": "yungoos",
                 "spriteIndex": [
-                    17,
+                    19,
                     27
                 ]
             }
@@ -58809,7 +58809,7 @@
                 "cosmeticForme": false,
                 "sprite": "gumshoos",
                 "spriteIndex": [
-                    18,
+                    20,
                     27
                 ]
             },
@@ -58853,7 +58853,7 @@
                 "cosmeticForme": false,
                 "sprite": "gumshoos",
                 "spriteIndex": [
-                    18,
+                    20,
                     27
                 ]
             }
@@ -58909,7 +58909,7 @@
                 "cosmeticForme": false,
                 "sprite": "grubbin",
                 "spriteIndex": [
-                    19,
+                    21,
                     27
                 ]
             }
@@ -58970,7 +58970,7 @@
                 "cosmeticForme": false,
                 "sprite": "charjabug",
                 "spriteIndex": [
-                    20,
+                    22,
                     27
                 ]
             }
@@ -59026,7 +59026,7 @@
                 "cosmeticForme": false,
                 "sprite": "vikavolt",
                 "spriteIndex": [
-                    21,
+                    23,
                     27
                 ]
             },
@@ -59071,7 +59071,7 @@
                 "cosmeticForme": false,
                 "sprite": "vikavolt",
                 "spriteIndex": [
-                    21,
+                    23,
                     27
                 ]
             }
@@ -59133,7 +59133,7 @@
                 "cosmeticForme": false,
                 "sprite": "crabrawler",
                 "spriteIndex": [
-                    22,
+                    24,
                     27
                 ]
             }
@@ -59195,7 +59195,7 @@
                 "cosmeticForme": false,
                 "sprite": "crabominable",
                 "spriteIndex": [
-                    23,
+                    25,
                     27
                 ]
             }
@@ -59251,7 +59251,7 @@
                 "cosmeticForme": false,
                 "sprite": "oricorio-baile",
                 "spriteIndex": [
-                    24,
+                    26,
                     27
                 ]
             },
@@ -59300,7 +59300,7 @@
                 "cosmeticForme": false,
                 "sprite": "oricorio-pom-pom",
                 "spriteIndex": [
-                    25,
+                    27,
                     27
                 ]
             },
@@ -59349,7 +59349,7 @@
                 "cosmeticForme": false,
                 "sprite": "oricorio-pau",
                 "spriteIndex": [
-                    26,
+                    28,
                     27
                 ]
             },
@@ -59398,7 +59398,7 @@
                 "cosmeticForme": false,
                 "sprite": "oricorio-sensu",
                 "spriteIndex": [
-                    27,
+                    29,
                     27
                 ]
             }
@@ -59458,7 +59458,7 @@
                 "cosmeticForme": false,
                 "sprite": "cutiefly",
                 "spriteIndex": [
-                    28,
+                    30,
                     27
                 ]
             }
@@ -59517,7 +59517,7 @@
                 "cosmeticForme": false,
                 "sprite": "ribombee",
                 "spriteIndex": [
-                    29,
+                    31,
                     27
                 ]
             },
@@ -59563,7 +59563,7 @@
                 "cosmeticForme": false,
                 "sprite": "ribombee",
                 "spriteIndex": [
-                    29,
+                    31,
                     27
                 ]
             }
@@ -59629,7 +59629,7 @@
                 "cosmeticForme": false,
                 "sprite": "rockruff",
                 "spriteIndex": [
-                    30,
+                    32,
                     27
                 ]
             },
@@ -59683,7 +59683,7 @@
                 "cosmeticForme": true,
                 "sprite": "rockruff",
                 "spriteIndex": [
-                    30,
+                    32,
                     27
                 ]
             }
@@ -59744,7 +59744,7 @@
                 "cosmeticForme": false,
                 "sprite": "lycanroc-midday",
                 "spriteIndex": [
-                    31,
+                    33,
                     27
                 ]
             },
@@ -59798,7 +59798,7 @@
                 "cosmeticForme": false,
                 "sprite": "lycanroc-midnight",
                 "spriteIndex": [
-                    32,
+                    34,
                     27
                 ]
             },
@@ -59850,7 +59850,7 @@
                 "cosmeticForme": false,
                 "sprite": "lycanroc-dusk",
                 "spriteIndex": [
-                    33,
+                    35,
                     27
                 ]
             }
@@ -59901,8 +59901,8 @@
                 "cosmeticForme": false,
                 "sprite": "wishiwashi-solo",
                 "spriteIndex": [
-                    34,
-                    27
+                    0,
+                    28
                 ]
             },
             {
@@ -59945,8 +59945,8 @@
                 "cosmeticForme": false,
                 "sprite": "wishiwashi-school",
                 "spriteIndex": [
-                    35,
-                    27
+                    1,
+                    28
                 ]
             }
         ],
@@ -60008,7 +60008,7 @@
                 "cosmeticForme": false,
                 "sprite": "mareanie",
                 "spriteIndex": [
-                    0,
+                    2,
                     28
                 ]
             }
@@ -60070,7 +60070,7 @@
                 "cosmeticForme": false,
                 "sprite": "toxapex",
                 "spriteIndex": [
-                    1,
+                    3,
                     28
                 ]
             }
@@ -60132,7 +60132,7 @@
                 "cosmeticForme": false,
                 "sprite": "mudbray",
                 "spriteIndex": [
-                    2,
+                    4,
                     28
                 ]
             }
@@ -60193,7 +60193,7 @@
                 "cosmeticForme": false,
                 "sprite": "mudsdale",
                 "spriteIndex": [
-                    3,
+                    5,
                     28
                 ]
             }
@@ -60252,7 +60252,7 @@
                 "cosmeticForme": false,
                 "sprite": "dewpider",
                 "spriteIndex": [
-                    4,
+                    6,
                     28
                 ]
             }
@@ -60310,7 +60310,7 @@
                 "cosmeticForme": false,
                 "sprite": "araquanid",
                 "spriteIndex": [
-                    5,
+                    7,
                     28
                 ]
             },
@@ -60356,7 +60356,7 @@
                 "cosmeticForme": false,
                 "sprite": "araquanid",
                 "spriteIndex": [
-                    5,
+                    7,
                     28
                 ]
             }
@@ -60417,7 +60417,7 @@
                 "cosmeticForme": false,
                 "sprite": "fomantis",
                 "spriteIndex": [
-                    6,
+                    8,
                     28
                 ]
             }
@@ -60477,7 +60477,7 @@
                 "cosmeticForme": false,
                 "sprite": "lurantis",
                 "spriteIndex": [
-                    7,
+                    9,
                     28
                 ]
             },
@@ -60521,7 +60521,7 @@
                 "cosmeticForme": false,
                 "sprite": "lurantis",
                 "spriteIndex": [
-                    7,
+                    9,
                     28
                 ]
             }
@@ -60580,7 +60580,7 @@
                 "cosmeticForme": false,
                 "sprite": "morelull",
                 "spriteIndex": [
-                    8,
+                    10,
                     28
                 ]
             }
@@ -60638,7 +60638,7 @@
                 "cosmeticForme": false,
                 "sprite": "shiinotic",
                 "spriteIndex": [
-                    9,
+                    11,
                     28
                 ]
             }
@@ -60701,7 +60701,7 @@
                 "cosmeticForme": false,
                 "sprite": "salandit",
                 "spriteIndex": [
-                    10,
+                    12,
                     28
                 ]
             }
@@ -60763,7 +60763,7 @@
                 "cosmeticForme": false,
                 "sprite": "salazzle",
                 "spriteIndex": [
-                    11,
+                    13,
                     28
                 ]
             },
@@ -60809,7 +60809,7 @@
                 "cosmeticForme": false,
                 "sprite": "salazzle",
                 "spriteIndex": [
-                    11,
+                    13,
                     28
                 ]
             }
@@ -60868,7 +60868,7 @@
                 "cosmeticForme": false,
                 "sprite": "stufful",
                 "spriteIndex": [
-                    12,
+                    14,
                     28
                 ]
             }
@@ -60926,7 +60926,7 @@
                 "cosmeticForme": false,
                 "sprite": "bewear",
                 "spriteIndex": [
-                    13,
+                    15,
                     28
                 ]
             }
@@ -60988,7 +60988,7 @@
                 "cosmeticForme": false,
                 "sprite": "bounsweet",
                 "spriteIndex": [
-                    14,
+                    16,
                     28
                 ]
             }
@@ -61054,7 +61054,7 @@
                 "cosmeticForme": false,
                 "sprite": "steenee",
                 "spriteIndex": [
-                    15,
+                    17,
                     28
                 ]
             }
@@ -61115,7 +61115,7 @@
                 "cosmeticForme": false,
                 "sprite": "tsareena",
                 "spriteIndex": [
-                    16,
+                    18,
                     28
                 ]
             }
@@ -61168,7 +61168,7 @@
                 "cosmeticForme": false,
                 "sprite": "comfey",
                 "spriteIndex": [
-                    17,
+                    19,
                     28
                 ]
             }
@@ -61226,7 +61226,7 @@
                 "cosmeticForme": false,
                 "sprite": "oranguru",
                 "spriteIndex": [
-                    18,
+                    20,
                     28
                 ]
             }
@@ -61282,7 +61282,7 @@
                 "cosmeticForme": false,
                 "sprite": "passimian",
                 "spriteIndex": [
-                    19,
+                    21,
                     28
                 ]
             }
@@ -61340,7 +61340,7 @@
                 "cosmeticForme": false,
                 "sprite": "wimpod",
                 "spriteIndex": [
-                    20,
+                    22,
                     28
                 ]
             }
@@ -61397,7 +61397,7 @@
                 "cosmeticForme": false,
                 "sprite": "golisopod",
                 "spriteIndex": [
-                    21,
+                    23,
                     28
                 ]
             }
@@ -61459,7 +61459,7 @@
                 "cosmeticForme": false,
                 "sprite": "sandygast",
                 "spriteIndex": [
-                    22,
+                    24,
                     28
                 ]
             }
@@ -61520,7 +61520,7 @@
                 "cosmeticForme": false,
                 "sprite": "palossand",
                 "spriteIndex": [
-                    23,
+                    25,
                     28
                 ]
             }
@@ -61572,7 +61572,7 @@
                 "cosmeticForme": false,
                 "sprite": "pyukumuku",
                 "spriteIndex": [
-                    24,
+                    26,
                     28
                 ]
             }
@@ -61628,7 +61628,7 @@
                 "cosmeticForme": false,
                 "sprite": "type-null",
                 "spriteIndex": [
-                    25,
+                    27,
                     28
                 ]
             }
@@ -61683,7 +61683,7 @@
                 "cosmeticForme": false,
                 "sprite": "silvally",
                 "spriteIndex": [
-                    26,
+                    28,
                     28
                 ]
             },
@@ -61727,7 +61727,7 @@
                 "cosmeticForme": false,
                 "sprite": "silvally-bug",
                 "spriteIndex": [
-                    26,
+                    28,
                     28
                 ]
             },
@@ -61771,7 +61771,7 @@
                 "cosmeticForme": false,
                 "sprite": "silvally-dark",
                 "spriteIndex": [
-                    26,
+                    28,
                     28
                 ]
             },
@@ -61815,7 +61815,7 @@
                 "cosmeticForme": false,
                 "sprite": "silvally-dragon",
                 "spriteIndex": [
-                    26,
+                    28,
                     28
                 ]
             },
@@ -61859,7 +61859,7 @@
                 "cosmeticForme": false,
                 "sprite": "silvally-electric",
                 "spriteIndex": [
-                    26,
+                    28,
                     28
                 ]
             },
@@ -61903,7 +61903,7 @@
                 "cosmeticForme": false,
                 "sprite": "silvally-fairy",
                 "spriteIndex": [
-                    26,
+                    28,
                     28
                 ]
             },
@@ -61947,7 +61947,7 @@
                 "cosmeticForme": false,
                 "sprite": "silvally-fighting",
                 "spriteIndex": [
-                    26,
+                    28,
                     28
                 ]
             },
@@ -61991,7 +61991,7 @@
                 "cosmeticForme": false,
                 "sprite": "silvally-fire",
                 "spriteIndex": [
-                    26,
+                    28,
                     28
                 ]
             },
@@ -62035,7 +62035,7 @@
                 "cosmeticForme": false,
                 "sprite": "silvally-flying",
                 "spriteIndex": [
-                    26,
+                    28,
                     28
                 ]
             },
@@ -62079,7 +62079,7 @@
                 "cosmeticForme": false,
                 "sprite": "silvally-ghost",
                 "spriteIndex": [
-                    26,
+                    28,
                     28
                 ]
             },
@@ -62123,7 +62123,7 @@
                 "cosmeticForme": false,
                 "sprite": "silvally-grass",
                 "spriteIndex": [
-                    26,
+                    28,
                     28
                 ]
             },
@@ -62167,7 +62167,7 @@
                 "cosmeticForme": false,
                 "sprite": "silvally-ground",
                 "spriteIndex": [
-                    26,
+                    28,
                     28
                 ]
             },
@@ -62211,7 +62211,7 @@
                 "cosmeticForme": false,
                 "sprite": "silvally-ice",
                 "spriteIndex": [
-                    26,
+                    28,
                     28
                 ]
             },
@@ -62255,7 +62255,7 @@
                 "cosmeticForme": false,
                 "sprite": "silvally-poison",
                 "spriteIndex": [
-                    26,
+                    28,
                     28
                 ]
             },
@@ -62299,7 +62299,7 @@
                 "cosmeticForme": false,
                 "sprite": "silvally-psychic",
                 "spriteIndex": [
-                    26,
+                    28,
                     28
                 ]
             },
@@ -62343,7 +62343,7 @@
                 "cosmeticForme": false,
                 "sprite": "silvally-rock",
                 "spriteIndex": [
-                    26,
+                    28,
                     28
                 ]
             },
@@ -62387,7 +62387,7 @@
                 "cosmeticForme": false,
                 "sprite": "silvally-steel",
                 "spriteIndex": [
-                    26,
+                    28,
                     28
                 ]
             },
@@ -62431,7 +62431,7 @@
                 "cosmeticForme": false,
                 "sprite": "silvally-water",
                 "spriteIndex": [
-                    26,
+                    28,
                     28
                 ]
             }
@@ -62483,7 +62483,7 @@
                 "cosmeticForme": false,
                 "sprite": "minior-meteor",
                 "spriteIndex": [
-                    27,
+                    29,
                     28
                 ]
             },
@@ -62528,7 +62528,7 @@
                 "cosmeticForme": false,
                 "sprite": "minior-meteor",
                 "spriteIndex": [
-                    27,
+                    29,
                     28
                 ]
             },
@@ -62573,7 +62573,7 @@
                 "cosmeticForme": false,
                 "sprite": "minior-meteor",
                 "spriteIndex": [
-                    27,
+                    29,
                     28
                 ]
             },
@@ -62618,7 +62618,7 @@
                 "cosmeticForme": false,
                 "sprite": "minior-meteor",
                 "spriteIndex": [
-                    27,
+                    29,
                     28
                 ]
             },
@@ -62663,7 +62663,7 @@
                 "cosmeticForme": false,
                 "sprite": "minior-meteor",
                 "spriteIndex": [
-                    27,
+                    29,
                     28
                 ]
             },
@@ -62708,7 +62708,7 @@
                 "cosmeticForme": false,
                 "sprite": "minior-meteor",
                 "spriteIndex": [
-                    27,
+                    29,
                     28
                 ]
             },
@@ -62753,7 +62753,7 @@
                 "cosmeticForme": false,
                 "sprite": "minior-meteor",
                 "spriteIndex": [
-                    27,
+                    29,
                     28
                 ]
             },
@@ -62798,7 +62798,7 @@
                 "cosmeticForme": false,
                 "sprite": "minior-core-red",
                 "spriteIndex": [
-                    27,
+                    29,
                     28
                 ]
             },
@@ -62843,7 +62843,7 @@
                 "cosmeticForme": true,
                 "sprite": "minior-core-orange",
                 "spriteIndex": [
-                    27,
+                    29,
                     28
                 ]
             },
@@ -62888,7 +62888,7 @@
                 "cosmeticForme": true,
                 "sprite": "minior-core-yellow",
                 "spriteIndex": [
-                    27,
+                    29,
                     28
                 ]
             },
@@ -62933,7 +62933,7 @@
                 "cosmeticForme": true,
                 "sprite": "minior-core-green",
                 "spriteIndex": [
-                    27,
+                    29,
                     28
                 ]
             },
@@ -62978,7 +62978,7 @@
                 "cosmeticForme": true,
                 "sprite": "minior-core-blue",
                 "spriteIndex": [
-                    27,
+                    29,
                     28
                 ]
             },
@@ -63023,7 +63023,7 @@
                 "cosmeticForme": true,
                 "sprite": "minior-core-indigo",
                 "spriteIndex": [
-                    27,
+                    29,
                     28
                 ]
             },
@@ -63068,7 +63068,7 @@
                 "cosmeticForme": true,
                 "sprite": "minior-core-violet",
                 "spriteIndex": [
-                    27,
+                    29,
                     28
                 ]
             }
@@ -63123,7 +63123,7 @@
                 "cosmeticForme": false,
                 "sprite": "komala",
                 "spriteIndex": [
-                    28,
+                    30,
                     28
                 ]
             }
@@ -63176,7 +63176,7 @@
                 "cosmeticForme": false,
                 "sprite": "turtonator",
                 "spriteIndex": [
-                    29,
+                    31,
                     28
                 ]
             }
@@ -63231,7 +63231,7 @@
                 "cosmeticForme": false,
                 "sprite": "togedemaru",
                 "spriteIndex": [
-                    30,
+                    32,
                     28
                 ]
             },
@@ -63277,7 +63277,7 @@
                 "cosmeticForme": false,
                 "sprite": "togedemaru",
                 "spriteIndex": [
-                    30,
+                    32,
                     28
                 ]
             }
@@ -63333,7 +63333,7 @@
                 "cosmeticForme": false,
                 "sprite": "mimikyu",
                 "spriteIndex": [
-                    31,
+                    33,
                     28
                 ]
             },
@@ -63382,7 +63382,7 @@
                 "cosmeticForme": false,
                 "sprite": "mimikyu-busted",
                 "spriteIndex": [
-                    31,
+                    33,
                     28
                 ]
             },
@@ -63427,7 +63427,7 @@
                 "cosmeticForme": false,
                 "sprite": "mimikyu",
                 "spriteIndex": [
-                    31,
+                    33,
                     28
                 ]
             },
@@ -63472,7 +63472,7 @@
                 "cosmeticForme": false,
                 "sprite": "mimikyu-busted",
                 "spriteIndex": [
-                    31,
+                    33,
                     28
                 ]
             }
@@ -63530,7 +63530,7 @@
                 "cosmeticForme": false,
                 "sprite": "bruxish",
                 "spriteIndex": [
-                    32,
+                    34,
                     28
                 ]
             }
@@ -63585,7 +63585,7 @@
                 "cosmeticForme": false,
                 "sprite": "drampa",
                 "spriteIndex": [
-                    33,
+                    35,
                     28
                 ]
             }
@@ -63637,8 +63637,8 @@
                 "cosmeticForme": false,
                 "sprite": "dhelmise",
                 "spriteIndex": [
-                    34,
-                    28
+                    0,
+                    29
                 ]
             }
         ],
@@ -63695,8 +63695,8 @@
                 "cosmeticForme": false,
                 "sprite": "jangmo-o",
                 "spriteIndex": [
-                    35,
-                    28
+                    1,
+                    29
                 ]
             }
         ],
@@ -63758,7 +63758,7 @@
                 "cosmeticForme": false,
                 "sprite": "hakamo-o",
                 "spriteIndex": [
-                    0,
+                    2,
                     29
                 ]
             }
@@ -63816,7 +63816,7 @@
                 "cosmeticForme": false,
                 "sprite": "kommo-o",
                 "spriteIndex": [
-                    1,
+                    3,
                     29
                 ]
             },
@@ -63861,7 +63861,7 @@
                 "cosmeticForme": false,
                 "sprite": "kommo-o",
                 "spriteIndex": [
-                    1,
+                    3,
                     29
                 ]
             }
@@ -63914,7 +63914,7 @@
                 "cosmeticForme": false,
                 "sprite": "tapu-koko",
                 "spriteIndex": [
-                    2,
+                    4,
                     29
                 ]
             }
@@ -63967,7 +63967,7 @@
                 "cosmeticForme": false,
                 "sprite": "tapu-lele",
                 "spriteIndex": [
-                    3,
+                    5,
                     29
                 ]
             }
@@ -64020,7 +64020,7 @@
                 "cosmeticForme": false,
                 "sprite": "tapu-bulu",
                 "spriteIndex": [
-                    4,
+                    6,
                     29
                 ]
             }
@@ -64073,7 +64073,7 @@
                 "cosmeticForme": false,
                 "sprite": "tapu-fini",
                 "spriteIndex": [
-                    5,
+                    7,
                     29
                 ]
             }
@@ -64129,7 +64129,7 @@
                 "cosmeticForme": false,
                 "sprite": "cosmog",
                 "spriteIndex": [
-                    6,
+                    8,
                     29
                 ]
             }
@@ -64193,7 +64193,7 @@
                 "cosmeticForme": false,
                 "sprite": "cosmoem",
                 "spriteIndex": [
-                    7,
+                    9,
                     29
                 ]
             }
@@ -64249,7 +64249,7 @@
                 "cosmeticForme": false,
                 "sprite": "solgaleo",
                 "spriteIndex": [
-                    8,
+                    10,
                     29
                 ]
             }
@@ -64305,7 +64305,7 @@
                 "cosmeticForme": false,
                 "sprite": "lunala",
                 "spriteIndex": [
-                    9,
+                    11,
                     29
                 ]
             }
@@ -64357,7 +64357,7 @@
                 "cosmeticForme": false,
                 "sprite": "nihilego",
                 "spriteIndex": [
-                    10,
+                    12,
                     29
                 ]
             }
@@ -64409,7 +64409,7 @@
                 "cosmeticForme": false,
                 "sprite": "buzzwole",
                 "spriteIndex": [
-                    11,
+                    13,
                     29
                 ]
             }
@@ -64461,7 +64461,7 @@
                 "cosmeticForme": false,
                 "sprite": "pheromosa",
                 "spriteIndex": [
-                    12,
+                    14,
                     29
                 ]
             }
@@ -64512,7 +64512,7 @@
                 "cosmeticForme": false,
                 "sprite": "xurkitree",
                 "spriteIndex": [
-                    13,
+                    15,
                     29
                 ]
             }
@@ -64564,7 +64564,7 @@
                 "cosmeticForme": false,
                 "sprite": "celesteela",
                 "spriteIndex": [
-                    14,
+                    16,
                     29
                 ]
             }
@@ -64616,7 +64616,7 @@
                 "cosmeticForme": false,
                 "sprite": "kartana",
                 "spriteIndex": [
-                    15,
+                    17,
                     29
                 ]
             }
@@ -64668,7 +64668,7 @@
                 "cosmeticForme": false,
                 "sprite": "guzzlord",
                 "spriteIndex": [
-                    16,
+                    18,
                     29
                 ]
             }
@@ -64719,7 +64719,7 @@
                 "cosmeticForme": false,
                 "sprite": "necrozma",
                 "spriteIndex": [
-                    17,
+                    19,
                     29
                 ]
             },
@@ -64764,7 +64764,7 @@
                 "cosmeticForme": false,
                 "sprite": "necrozma-dusk-mane",
                 "spriteIndex": [
-                    18,
+                    20,
                     29
                 ]
             },
@@ -64809,7 +64809,7 @@
                 "cosmeticForme": false,
                 "sprite": "necrozma-dawn-wings",
                 "spriteIndex": [
-                    19,
+                    21,
                     29
                 ]
             },
@@ -64857,7 +64857,7 @@
                 "cosmeticForme": false,
                 "sprite": "necrozma-ultra",
                 "spriteIndex": [
-                    20,
+                    22,
                     29
                 ]
             }
@@ -64913,7 +64913,7 @@
                 "cosmeticForme": false,
                 "sprite": "magearna",
                 "spriteIndex": [
-                    21,
+                    23,
                     29
                 ]
             },
@@ -64962,7 +64962,7 @@
                 "cosmeticForme": false,
                 "sprite": "magearna-original",
                 "spriteIndex": [
-                    22,
+                    24,
                     29
                 ]
             }
@@ -65014,7 +65014,7 @@
                 "cosmeticForme": false,
                 "sprite": "marshadow",
                 "spriteIndex": [
-                    23,
+                    25,
                     29
                 ]
             }
@@ -65070,7 +65070,7 @@
                 "cosmeticForme": false,
                 "sprite": "poipole",
                 "spriteIndex": [
-                    24,
+                    26,
                     29
                 ]
             }
@@ -65126,7 +65126,7 @@
                 "cosmeticForme": false,
                 "sprite": "naganadel",
                 "spriteIndex": [
-                    25,
+                    27,
                     29
                 ]
             }
@@ -65178,7 +65178,7 @@
                 "cosmeticForme": false,
                 "sprite": "stakataka",
                 "spriteIndex": [
-                    26,
+                    28,
                     29
                 ]
             }
@@ -65230,7 +65230,7 @@
                 "cosmeticForme": false,
                 "sprite": "blacephalon",
                 "spriteIndex": [
-                    27,
+                    29,
                     29
                 ]
             }
@@ -65281,7 +65281,7 @@
                 "cosmeticForme": false,
                 "sprite": "zeraora",
                 "spriteIndex": [
-                    28,
+                    30,
                     29
                 ]
             }
@@ -65332,7 +65332,7 @@
                 "cosmeticForme": false,
                 "sprite": "meltan",
                 "spriteIndex": [
-                    29,
+                    31,
                     29
                 ]
             }
@@ -65383,7 +65383,7 @@
                 "cosmeticForme": false,
                 "sprite": "melmetal",
                 "spriteIndex": [
-                    30,
+                    32,
                     29
                 ]
             }
@@ -65445,7 +65445,7 @@
                 "cosmeticForme": false,
                 "sprite": "grookey",
                 "spriteIndex": [
-                    31,
+                    33,
                     29
                 ]
             }
@@ -65511,7 +65511,7 @@
                 "cosmeticForme": false,
                 "sprite": "thwackey",
                 "spriteIndex": [
-                    32,
+                    34,
                     29
                 ]
             }
@@ -65572,7 +65572,7 @@
                 "cosmeticForme": false,
                 "sprite": "rillaboom",
                 "spriteIndex": [
-                    33,
+                    35,
                     29
                 ]
             }
@@ -65634,8 +65634,8 @@
                 "cosmeticForme": false,
                 "sprite": "scorbunny",
                 "spriteIndex": [
-                    34,
-                    29
+                    0,
+                    30
                 ]
             }
         ],
@@ -65700,8 +65700,8 @@
                 "cosmeticForme": false,
                 "sprite": "raboot",
                 "spriteIndex": [
-                    35,
-                    29
+                    1,
+                    30
                 ]
             }
         ],
@@ -65761,7 +65761,7 @@
                 "cosmeticForme": false,
                 "sprite": "cinderace",
                 "spriteIndex": [
-                    0,
+                    2,
                     30
                 ]
             }
@@ -65824,7 +65824,7 @@
                 "cosmeticForme": false,
                 "sprite": "sobble",
                 "spriteIndex": [
-                    1,
+                    3,
                     30
                 ]
             }
@@ -65890,7 +65890,7 @@
                 "cosmeticForme": false,
                 "sprite": "drizzile",
                 "spriteIndex": [
-                    2,
+                    4,
                     30
                 ]
             }
@@ -65951,7 +65951,7 @@
                 "cosmeticForme": false,
                 "sprite": "inteleon",
                 "spriteIndex": [
-                    3,
+                    5,
                     30
                 ]
             }
@@ -66012,7 +66012,7 @@
                 "cosmeticForme": false,
                 "sprite": "skwovet",
                 "spriteIndex": [
-                    4,
+                    6,
                     30
                 ]
             }
@@ -66072,7 +66072,7 @@
                 "cosmeticForme": false,
                 "sprite": "greedent",
                 "spriteIndex": [
-                    5,
+                    7,
                     30
                 ]
             }
@@ -66134,7 +66134,7 @@
                 "cosmeticForme": false,
                 "sprite": "rookidee",
                 "spriteIndex": [
-                    6,
+                    8,
                     30
                 ]
             }
@@ -66200,7 +66200,7 @@
                 "cosmeticForme": false,
                 "sprite": "corvisquire",
                 "spriteIndex": [
-                    7,
+                    9,
                     30
                 ]
             }
@@ -66262,7 +66262,7 @@
                 "cosmeticForme": false,
                 "sprite": "corviknight",
                 "spriteIndex": [
-                    8,
+                    10,
                     30
                 ]
             }
@@ -66320,7 +66320,7 @@
                 "cosmeticForme": false,
                 "sprite": "blipbug",
                 "spriteIndex": [
-                    9,
+                    11,
                     30
                 ]
             }
@@ -66383,7 +66383,7 @@
                 "cosmeticForme": false,
                 "sprite": "dottler",
                 "spriteIndex": [
-                    10,
+                    12,
                     30
                 ]
             }
@@ -66441,7 +66441,7 @@
                 "cosmeticForme": false,
                 "sprite": "orbeetle",
                 "spriteIndex": [
-                    11,
+                    13,
                     30
                 ]
             }
@@ -66499,7 +66499,7 @@
                 "cosmeticForme": false,
                 "sprite": "nickit",
                 "spriteIndex": [
-                    12,
+                    14,
                     30
                 ]
             }
@@ -66556,7 +66556,7 @@
                 "cosmeticForme": false,
                 "sprite": "thievul",
                 "spriteIndex": [
-                    13,
+                    15,
                     30
                 ]
             }
@@ -66614,7 +66614,7 @@
                 "cosmeticForme": false,
                 "sprite": "gossifleur",
                 "spriteIndex": [
-                    14,
+                    16,
                     30
                 ]
             }
@@ -66671,7 +66671,7 @@
                 "cosmeticForme": false,
                 "sprite": "eldegoss",
                 "spriteIndex": [
-                    15,
+                    17,
                     30
                 ]
             }
@@ -66729,7 +66729,7 @@
                 "cosmeticForme": false,
                 "sprite": "wooloo",
                 "spriteIndex": [
-                    16,
+                    18,
                     30
                 ]
             }
@@ -66786,7 +66786,7 @@
                 "cosmeticForme": false,
                 "sprite": "dubwool",
                 "spriteIndex": [
-                    17,
+                    19,
                     30
                 ]
             }
@@ -66849,7 +66849,7 @@
                 "cosmeticForme": false,
                 "sprite": "chewtle",
                 "spriteIndex": [
-                    18,
+                    20,
                     30
                 ]
             }
@@ -66912,7 +66912,7 @@
                 "cosmeticForme": false,
                 "sprite": "drednaw",
                 "spriteIndex": [
-                    19,
+                    21,
                     30
                 ]
             }
@@ -66969,7 +66969,7 @@
                 "cosmeticForme": false,
                 "sprite": "yamper",
                 "spriteIndex": [
-                    20,
+                    22,
                     30
                 ]
             }
@@ -67025,7 +67025,7 @@
                 "cosmeticForme": false,
                 "sprite": "boltund",
                 "spriteIndex": [
-                    21,
+                    23,
                     30
                 ]
             }
@@ -67087,7 +67087,7 @@
                 "cosmeticForme": false,
                 "sprite": "rolycoly",
                 "spriteIndex": [
-                    22,
+                    24,
                     30
                 ]
             }
@@ -67154,7 +67154,7 @@
                 "cosmeticForme": false,
                 "sprite": "carkol",
                 "spriteIndex": [
-                    23,
+                    25,
                     30
                 ]
             }
@@ -67216,7 +67216,7 @@
                 "cosmeticForme": false,
                 "sprite": "coalossal",
                 "spriteIndex": [
-                    24,
+                    26,
                     30
                 ]
             }
@@ -67284,7 +67284,7 @@
                 "cosmeticForme": false,
                 "sprite": "applin",
                 "spriteIndex": [
-                    25,
+                    27,
                     30
                 ]
             }
@@ -67347,7 +67347,7 @@
                 "cosmeticForme": false,
                 "sprite": "flapple",
                 "spriteIndex": [
-                    26,
+                    28,
                     30
                 ]
             }
@@ -67410,7 +67410,7 @@
                 "cosmeticForme": false,
                 "sprite": "appletun",
                 "spriteIndex": [
-                    27,
+                    29,
                     30
                 ]
             }
@@ -67473,7 +67473,7 @@
                 "cosmeticForme": false,
                 "sprite": "silicobra",
                 "spriteIndex": [
-                    28,
+                    30,
                     30
                 ]
             }
@@ -67535,7 +67535,7 @@
                 "cosmeticForme": false,
                 "sprite": "sandaconda",
                 "spriteIndex": [
-                    29,
+                    31,
                     30
                 ]
             }
@@ -67588,7 +67588,7 @@
                 "cosmeticForme": false,
                 "sprite": "cramorant",
                 "spriteIndex": [
-                    30,
+                    32,
                     30
                 ]
             },
@@ -67634,7 +67634,7 @@
                 "cosmeticForme": false,
                 "sprite": "cramorant-gulping",
                 "spriteIndex": [
-                    31,
+                    33,
                     30
                 ]
             },
@@ -67680,7 +67680,7 @@
                 "cosmeticForme": false,
                 "sprite": "cramorant-gorging",
                 "spriteIndex": [
-                    32,
+                    34,
                     30
                 ]
             }
@@ -67741,7 +67741,7 @@
                 "cosmeticForme": false,
                 "sprite": "arrokuda",
                 "spriteIndex": [
-                    33,
+                    35,
                     30
                 ]
             }
@@ -67801,8 +67801,8 @@
                 "cosmeticForme": false,
                 "sprite": "barraskewda",
                 "spriteIndex": [
-                    34,
-                    30
+                    0,
+                    31
                 ]
             }
         ],
@@ -67868,8 +67868,8 @@
                 "cosmeticForme": false,
                 "sprite": "toxel",
                 "spriteIndex": [
-                    35,
-                    30
+                    1,
+                    31
                 ]
             }
         ],
@@ -67930,7 +67930,7 @@
                 "cosmeticForme": false,
                 "sprite": "toxtricity",
                 "spriteIndex": [
-                    0,
+                    2,
                     31
                 ]
             },
@@ -67985,7 +67985,7 @@
                 "cosmeticForme": false,
                 "sprite": "toxtricity-low-key",
                 "spriteIndex": [
-                    1,
+                    3,
                     31
                 ]
             }
@@ -68044,7 +68044,7 @@
                 "cosmeticForme": false,
                 "sprite": "sizzlipede",
                 "spriteIndex": [
-                    2,
+                    4,
                     31
                 ]
             }
@@ -68102,7 +68102,7 @@
                 "cosmeticForme": false,
                 "sprite": "centiskorch",
                 "spriteIndex": [
-                    3,
+                    5,
                     31
                 ]
             }
@@ -68160,7 +68160,7 @@
                 "cosmeticForme": false,
                 "sprite": "clobbopus",
                 "spriteIndex": [
-                    4,
+                    6,
                     31
                 ]
             }
@@ -68217,7 +68217,7 @@
                 "cosmeticForme": false,
                 "sprite": "grapploct",
                 "spriteIndex": [
-                    5,
+                    7,
                     31
                 ]
             }
@@ -68279,7 +68279,7 @@
                 "cosmeticForme": false,
                 "sprite": "sinistea",
                 "spriteIndex": [
-                    6,
+                    8,
                     31
                 ]
             },
@@ -68334,7 +68334,7 @@
                 "cosmeticForme": false,
                 "sprite": "sinistea",
                 "spriteIndex": [
-                    6,
+                    8,
                     31
                 ]
             }
@@ -68395,7 +68395,7 @@
                 "cosmeticForme": false,
                 "sprite": "polteageist",
                 "spriteIndex": [
-                    7,
+                    9,
                     31
                 ]
             },
@@ -68449,7 +68449,7 @@
                 "cosmeticForme": false,
                 "sprite": "polteageist",
                 "spriteIndex": [
-                    7,
+                    9,
                     31
                 ]
             }
@@ -68511,7 +68511,7 @@
                 "cosmeticForme": false,
                 "sprite": "hatenna",
                 "spriteIndex": [
-                    8,
+                    10,
                     31
                 ]
             }
@@ -68577,7 +68577,7 @@
                 "cosmeticForme": false,
                 "sprite": "hattrem",
                 "spriteIndex": [
-                    9,
+                    11,
                     31
                 ]
             }
@@ -68639,7 +68639,7 @@
                 "cosmeticForme": false,
                 "sprite": "hatterene",
                 "spriteIndex": [
-                    10,
+                    12,
                     31
                 ]
             }
@@ -68703,7 +68703,7 @@
                 "cosmeticForme": false,
                 "sprite": "impidimp",
                 "spriteIndex": [
-                    11,
+                    13,
                     31
                 ]
             }
@@ -68771,7 +68771,7 @@
                 "cosmeticForme": false,
                 "sprite": "morgrem",
                 "spriteIndex": [
-                    12,
+                    14,
                     31
                 ]
             }
@@ -68834,7 +68834,7 @@
                 "cosmeticForme": false,
                 "sprite": "grimmsnarl",
                 "spriteIndex": [
-                    13,
+                    15,
                     31
                 ]
             }
@@ -68892,7 +68892,7 @@
                 "cosmeticForme": false,
                 "sprite": "obstagoon",
                 "spriteIndex": [
-                    14,
+                    16,
                     31
                 ]
             }
@@ -68953,7 +68953,7 @@
                 "cosmeticForme": false,
                 "sprite": "perrserker",
                 "spriteIndex": [
-                    15,
+                    17,
                     31
                 ]
             }
@@ -69010,7 +69010,7 @@
                 "cosmeticForme": false,
                 "sprite": "cursola",
                 "spriteIndex": [
-                    16,
+                    18,
                     31
                 ]
             }
@@ -69067,7 +69067,7 @@
                 "cosmeticForme": false,
                 "sprite": "sirfetchd",
                 "spriteIndex": [
-                    17,
+                    19,
                     31
                 ]
             }
@@ -69125,7 +69125,7 @@
                 "cosmeticForme": false,
                 "sprite": "mr-rime",
                 "spriteIndex": [
-                    18,
+                    20,
                     31
                 ]
             }
@@ -69182,7 +69182,7 @@
                 "cosmeticForme": false,
                 "sprite": "runerigus",
                 "spriteIndex": [
-                    19,
+                    21,
                     31
                 ]
             }
@@ -69240,7 +69240,7 @@
                 "cosmeticForme": false,
                 "sprite": "milcery",
                 "spriteIndex": [
-                    20,
+                    22,
                     31
                 ]
             }
@@ -69297,7 +69297,7 @@
                 "cosmeticForme": false,
                 "sprite": "alcremie-vanilla-cream",
                 "spriteIndex": [
-                    21,
+                    23,
                     31
                 ]
             },
@@ -69347,7 +69347,7 @@
                 "cosmeticForme": true,
                 "sprite": "alcremie-ruby-cream",
                 "spriteIndex": [
-                    22,
+                    24,
                     31
                 ]
             },
@@ -69397,7 +69397,7 @@
                 "cosmeticForme": true,
                 "sprite": "alcremie-matcha-cream",
                 "spriteIndex": [
-                    23,
+                    25,
                     31
                 ]
             },
@@ -69447,7 +69447,7 @@
                 "cosmeticForme": true,
                 "sprite": "alcremie-mint-cream",
                 "spriteIndex": [
-                    24,
+                    26,
                     31
                 ]
             },
@@ -69497,7 +69497,7 @@
                 "cosmeticForme": true,
                 "sprite": "alcremie-lemon-cream",
                 "spriteIndex": [
-                    25,
+                    27,
                     31
                 ]
             },
@@ -69547,7 +69547,7 @@
                 "cosmeticForme": true,
                 "sprite": "alcremie-salted-cream",
                 "spriteIndex": [
-                    26,
+                    28,
                     31
                 ]
             },
@@ -69597,7 +69597,7 @@
                 "cosmeticForme": true,
                 "sprite": "alcremie-ruby-swirl",
                 "spriteIndex": [
-                    27,
+                    29,
                     31
                 ]
             },
@@ -69647,7 +69647,7 @@
                 "cosmeticForme": true,
                 "sprite": "alcremie-caramel-swirl",
                 "spriteIndex": [
-                    28,
+                    30,
                     31
                 ]
             },
@@ -69697,7 +69697,7 @@
                 "cosmeticForme": true,
                 "sprite": "alcremie-rainbow-swirl",
                 "spriteIndex": [
-                    29,
+                    31,
                     31
                 ]
             }
@@ -69755,7 +69755,7 @@
                 "cosmeticForme": false,
                 "sprite": "falinks",
                 "spriteIndex": [
-                    30,
+                    32,
                     31
                 ]
             }
@@ -69812,7 +69812,7 @@
                 "cosmeticForme": false,
                 "sprite": "pincurchin",
                 "spriteIndex": [
-                    31,
+                    33,
                     31
                 ]
             }
@@ -69874,7 +69874,7 @@
                 "cosmeticForme": false,
                 "sprite": "snom",
                 "spriteIndex": [
-                    32,
+                    34,
                     31
                 ]
             }
@@ -69935,7 +69935,7 @@
                 "cosmeticForme": false,
                 "sprite": "frosmoth",
                 "spriteIndex": [
-                    33,
+                    35,
                     31
                 ]
             }
@@ -69990,8 +69990,8 @@
                 "cosmeticForme": false,
                 "sprite": "stonjourner",
                 "spriteIndex": [
-                    34,
-                    31
+                    0,
+                    32
                 ]
             }
         ],
@@ -70046,8 +70046,8 @@
                 "cosmeticForme": false,
                 "sprite": "eiscue",
                 "spriteIndex": [
-                    35,
-                    31
+                    1,
+                    32
                 ]
             },
             {
@@ -70095,7 +70095,7 @@
                 "cosmeticForme": false,
                 "sprite": "eiscue-noice",
                 "spriteIndex": [
-                    0,
+                    2,
                     32
                 ]
             }
@@ -70153,7 +70153,7 @@
                 "cosmeticForme": false,
                 "sprite": "indeedee",
                 "spriteIndex": [
-                    1,
+                    3,
                     32
                 ]
             },
@@ -70204,7 +70204,7 @@
                 "cosmeticForme": false,
                 "sprite": "indeedee-f",
                 "spriteIndex": [
-                    2,
+                    4,
                     32
                 ]
             }
@@ -70257,7 +70257,7 @@
                 "cosmeticForme": false,
                 "sprite": "morpeko",
                 "spriteIndex": [
-                    3,
+                    5,
                     32
                 ]
             },
@@ -70303,7 +70303,7 @@
                 "cosmeticForme": false,
                 "sprite": "morpeko-hangry",
                 "spriteIndex": [
-                    4,
+                    6,
                     32
                 ]
             }
@@ -70365,7 +70365,7 @@
                 "cosmeticForme": false,
                 "sprite": "cufant",
                 "spriteIndex": [
-                    5,
+                    7,
                     32
                 ]
             }
@@ -70426,7 +70426,7 @@
                 "cosmeticForme": false,
                 "sprite": "copperajah",
                 "spriteIndex": [
-                    6,
+                    8,
                     32
                 ]
             }
@@ -70480,7 +70480,7 @@
                 "cosmeticForme": false,
                 "sprite": "dracozolt",
                 "spriteIndex": [
-                    7,
+                    9,
                     32
                 ]
             }
@@ -70534,7 +70534,7 @@
                 "cosmeticForme": false,
                 "sprite": "arctozolt",
                 "spriteIndex": [
-                    8,
+                    10,
                     32
                 ]
             }
@@ -70588,7 +70588,7 @@
                 "cosmeticForme": false,
                 "sprite": "dracovish",
                 "spriteIndex": [
-                    9,
+                    11,
                     32
                 ]
             }
@@ -70642,7 +70642,7 @@
                 "cosmeticForme": false,
                 "sprite": "arctovish",
                 "spriteIndex": [
-                    10,
+                    12,
                     32
                 ]
             }
@@ -70697,7 +70697,7 @@
                 "cosmeticForme": false,
                 "sprite": "duraludon",
                 "spriteIndex": [
-                    11,
+                    13,
                     32
                 ]
             }
@@ -70761,7 +70761,7 @@
                 "cosmeticForme": false,
                 "sprite": "dreepy",
                 "spriteIndex": [
-                    12,
+                    14,
                     32
                 ]
             }
@@ -70829,7 +70829,7 @@
                 "cosmeticForme": false,
                 "sprite": "drakloak",
                 "spriteIndex": [
-                    13,
+                    15,
                     32
                 ]
             }
@@ -70892,7 +70892,7 @@
                 "cosmeticForme": false,
                 "sprite": "dragapult",
                 "spriteIndex": [
-                    14,
+                    16,
                     32
                 ]
             }
@@ -70947,7 +70947,7 @@
                 "cosmeticForme": false,
                 "sprite": "zacian",
                 "spriteIndex": [
-                    15,
+                    17,
                     32
                 ]
             },
@@ -70996,7 +70996,7 @@
                 "cosmeticForme": false,
                 "sprite": "zacian-crowned",
                 "spriteIndex": [
-                    16,
+                    18,
                     32
                 ]
             }
@@ -71051,7 +71051,7 @@
                 "cosmeticForme": false,
                 "sprite": "zamazenta",
                 "spriteIndex": [
-                    17,
+                    19,
                     32
                 ]
             },
@@ -71100,7 +71100,7 @@
                 "cosmeticForme": false,
                 "sprite": "zamazenta-crowned",
                 "spriteIndex": [
-                    18,
+                    20,
                     32
                 ]
             }
@@ -71156,7 +71156,7 @@
                 "cosmeticForme": false,
                 "sprite": "eternatus",
                 "spriteIndex": [
-                    19,
+                    21,
                     32
                 ]
             },
@@ -71201,7 +71201,7 @@
                 "cosmeticForme": false,
                 "sprite": "eternatus-eternamax",
                 "spriteIndex": [
-                    20,
+                    22,
                     32
                 ]
             }
@@ -71265,7 +71265,7 @@
                 "cosmeticForme": false,
                 "sprite": "kubfu",
                 "spriteIndex": [
-                    21,
+                    23,
                     32
                 ]
             }
@@ -71325,7 +71325,7 @@
                 "cosmeticForme": false,
                 "sprite": "urshifu",
                 "spriteIndex": [
-                    22,
+                    24,
                     32
                 ]
             },
@@ -71378,7 +71378,7 @@
                 "cosmeticForme": false,
                 "sprite": "urshifu",
                 "spriteIndex": [
-                    22,
+                    24,
                     32
                 ]
             }
@@ -71434,7 +71434,7 @@
                 "cosmeticForme": false,
                 "sprite": "zarude",
                 "spriteIndex": [
-                    23,
+                    25,
                     32
                 ]
             },
@@ -71483,7 +71483,7 @@
                 "cosmeticForme": false,
                 "sprite": "zarude-dada",
                 "spriteIndex": [
-                    24,
+                    26,
                     32
                 ]
             }
@@ -71538,7 +71538,7 @@
                 "cosmeticForme": false,
                 "sprite": "regieleki",
                 "spriteIndex": [
-                    25,
+                    27,
                     32
                 ]
             }
@@ -71593,7 +71593,7 @@
                 "cosmeticForme": false,
                 "sprite": "regidrago",
                 "spriteIndex": [
-                    26,
+                    28,
                     32
                 ]
             }
@@ -71648,7 +71648,7 @@
                 "cosmeticForme": false,
                 "sprite": "glastrier",
                 "spriteIndex": [
-                    27,
+                    29,
                     32
                 ]
             }
@@ -71703,7 +71703,7 @@
                 "cosmeticForme": false,
                 "sprite": "spectrier",
                 "spriteIndex": [
-                    28,
+                    30,
                     32
                 ]
             }
@@ -71759,7 +71759,7 @@
                 "cosmeticForme": false,
                 "sprite": "calyrex",
                 "spriteIndex": [
-                    29,
+                    31,
                     32
                 ]
             },
@@ -71808,7 +71808,7 @@
                 "cosmeticForme": false,
                 "sprite": "calyrex-ice-rider",
                 "spriteIndex": [
-                    30,
+                    32,
                     32
                 ]
             },
@@ -71857,7 +71857,7 @@
                 "cosmeticForme": false,
                 "sprite": "calyrex-shadow-rider",
                 "spriteIndex": [
-                    31,
+                    33,
                     32
                 ]
             }
@@ -71920,7 +71920,7 @@
                 "cosmeticForme": true,
                 "sprite": "wyrdeer",
                 "spriteIndex": [
-                    32,
+                    34,
                     32
                 ]
             }
@@ -71982,7 +71982,7 @@
                 "cosmeticForme": true,
                 "sprite": "kleavor",
                 "spriteIndex": [
-                    33,
+                    35,
                     32
                 ]
             }
@@ -72044,8 +72044,8 @@
                 "cosmeticForme": true,
                 "sprite": "ursaluna",
                 "spriteIndex": [
-                    34,
-                    32
+                    0,
+                    33
                 ],
                 "isBaseForm": true,
                 "isLegendary": false,
@@ -72083,8 +72083,8 @@
                 ],
                 "ability1": "Minds Eye",
                 "spriteIndex": [
-                    35,
-                    32
+                    1,
+                    33
                 ],
                 "sprite": "ursaluna-bloodmoon"
             }
@@ -72146,7 +72146,7 @@
                 "cosmeticForme": true,
                 "sprite": "basculegion",
                 "spriteIndex": [
-                    0,
+                    2,
                     33
                 ]
             },
@@ -72201,7 +72201,7 @@
                 "cosmeticForme": true,
                 "sprite": "basculegion-f",
                 "spriteIndex": [
-                    1,
+                    3,
                     33
                 ]
             }
@@ -72263,7 +72263,7 @@
                 "cosmeticForme": true,
                 "sprite": "sneasler",
                 "spriteIndex": [
-                    2,
+                    4,
                     33
                 ]
             }
@@ -72325,7 +72325,7 @@
                 "cosmeticForme": true,
                 "sprite": "overqwil",
                 "spriteIndex": [
-                    3,
+                    5,
                     33
                 ]
             }
@@ -72382,7 +72382,7 @@
                 "cosmeticForme": true,
                 "sprite": "enamorus",
                 "spriteIndex": [
-                    4,
+                    6,
                     33
                 ]
             },
@@ -72431,7 +72431,7 @@
                 "cosmeticForme": true,
                 "sprite": "enamorus",
                 "spriteIndex": [
-                    5,
+                    7,
                     33
                 ]
             }
@@ -72493,7 +72493,7 @@
                 "cosmeticForme": false,
                 "sprite": "sprigatito",
                 "spriteIndex": [
-                    6,
+                    8,
                     33
                 ]
             }
@@ -72559,7 +72559,7 @@
                 "cosmeticForme": false,
                 "sprite": "floragato",
                 "spriteIndex": [
-                    7,
+                    9,
                     33
                 ]
             }
@@ -72621,7 +72621,7 @@
                 "cosmeticForme": false,
                 "sprite": "meowscarada",
                 "spriteIndex": [
-                    8,
+                    10,
                     33
                 ]
             }
@@ -72682,7 +72682,7 @@
                 "cosmeticForme": false,
                 "sprite": "fuecoco",
                 "spriteIndex": [
-                    9,
+                    11,
                     33
                 ]
             }
@@ -72747,7 +72747,7 @@
                 "cosmeticForme": false,
                 "sprite": "crocalor",
                 "spriteIndex": [
-                    10,
+                    12,
                     33
                 ]
             }
@@ -72808,7 +72808,7 @@
                 "cosmeticForme": false,
                 "sprite": "skeledirge",
                 "spriteIndex": [
-                    11,
+                    13,
                     33
                 ]
             }
@@ -72870,7 +72870,7 @@
                 "cosmeticForme": false,
                 "sprite": "quaxly",
                 "spriteIndex": [
-                    12,
+                    14,
                     33
                 ]
             }
@@ -72936,7 +72936,7 @@
                 "cosmeticForme": false,
                 "sprite": "quaxwell",
                 "spriteIndex": [
-                    13,
+                    15,
                     33
                 ]
             }
@@ -72998,7 +72998,7 @@
                 "cosmeticForme": false,
                 "sprite": "quaquaval",
                 "spriteIndex": [
-                    14,
+                    16,
                     33
                 ]
             }
@@ -73064,7 +73064,7 @@
                 "cosmeticForme": false,
                 "sprite": "lechonk",
                 "spriteIndex": [
-                    15,
+                    17,
                     33
                 ]
             }
@@ -73125,7 +73125,7 @@
                 "cosmeticForme": false,
                 "sprite": "oinkologne",
                 "spriteIndex": [
-                    16,
+                    18,
                     33
                 ]
             },
@@ -73179,7 +73179,7 @@
                 "cosmeticForme": false,
                 "sprite": "oinkologne",
                 "spriteIndex": [
-                    17,
+                    19,
                     33
                 ]
             }
@@ -73240,7 +73240,7 @@
                 "cosmeticForme": false,
                 "sprite": "tarountula",
                 "spriteIndex": [
-                    18,
+                    20,
                     33
                 ]
             }
@@ -73300,7 +73300,7 @@
                 "cosmeticForme": false,
                 "sprite": "spidops",
                 "spriteIndex": [
-                    19,
+                    21,
                     33
                 ]
             }
@@ -73361,7 +73361,7 @@
                 "cosmeticForme": false,
                 "sprite": "nymble",
                 "spriteIndex": [
-                    20,
+                    22,
                     33
                 ]
             }
@@ -73422,7 +73422,7 @@
                 "cosmeticForme": false,
                 "sprite": "lokix",
                 "spriteIndex": [
-                    21,
+                    23,
                     33
                 ]
             }
@@ -73484,7 +73484,7 @@
                 "cosmeticForme": false,
                 "sprite": "pawmi",
                 "spriteIndex": [
-                    22,
+                    24,
                     33
                 ]
             }
@@ -73551,7 +73551,7 @@
                 "cosmeticForme": false,
                 "sprite": "pawmo",
                 "spriteIndex": [
-                    23,
+                    25,
                     33
                 ]
             }
@@ -73613,7 +73613,7 @@
                 "cosmeticForme": false,
                 "sprite": "pawmot",
                 "spriteIndex": [
-                    24,
+                    26,
                     33
                 ]
             }
@@ -73680,7 +73680,7 @@
                 "cosmeticForme": false,
                 "sprite": "tandemaus",
                 "spriteIndex": [
-                    25,
+                    27,
                     33
                 ]
             }
@@ -73742,7 +73742,7 @@
                 "cosmeticForme": false,
                 "sprite": "maushold",
                 "spriteIndex": [
-                    26,
+                    28,
                     33
                 ]
             },
@@ -73797,7 +73797,7 @@
                 "cosmeticForme": false,
                 "sprite": "maushold-four",
                 "spriteIndex": [
-                    27,
+                    29,
                     33
                 ]
             }
@@ -73859,7 +73859,7 @@
                 "cosmeticForme": false,
                 "sprite": "fidough",
                 "spriteIndex": [
-                    28,
+                    30,
                     33
                 ]
             }
@@ -73920,7 +73920,7 @@
                 "cosmeticForme": false,
                 "sprite": "dachsbun",
                 "spriteIndex": [
-                    29,
+                    31,
                     33
                 ]
             }
@@ -73982,7 +73982,7 @@
                 "cosmeticForme": false,
                 "sprite": "smoliv",
                 "spriteIndex": [
-                    30,
+                    32,
                     33
                 ]
             }
@@ -74048,7 +74048,7 @@
                 "cosmeticForme": false,
                 "sprite": "dolliv",
                 "spriteIndex": [
-                    31,
+                    33,
                     33
                 ]
             }
@@ -74109,7 +74109,7 @@
                 "cosmeticForme": false,
                 "sprite": "arboliva",
                 "spriteIndex": [
-                    32,
+                    34,
                     33
                 ]
             }
@@ -74167,7 +74167,7 @@
                 "cosmeticForme": false,
                 "sprite": "squawkabilly",
                 "spriteIndex": [
-                    33,
+                    35,
                     33
                 ]
             },
@@ -74218,8 +74218,8 @@
                 "cosmeticForme": false,
                 "sprite": "squawkabilly-blue",
                 "spriteIndex": [
-                    34,
-                    33
+                    0,
+                    34
                 ]
             },
             {
@@ -74269,8 +74269,8 @@
                 "cosmeticForme": false,
                 "sprite": "squawkabilly-white",
                 "spriteIndex": [
-                    35,
-                    33
+                    1,
+                    34
                 ]
             },
             {
@@ -74320,7 +74320,7 @@
                 "cosmeticForme": false,
                 "sprite": "squawkabilly-yellow",
                 "spriteIndex": [
-                    0,
+                    2,
                     34
                 ]
             }
@@ -74382,7 +74382,7 @@
                 "cosmeticForme": false,
                 "sprite": "nacli",
                 "spriteIndex": [
-                    1,
+                    3,
                     34
                 ]
             }
@@ -74448,7 +74448,7 @@
                 "cosmeticForme": false,
                 "sprite": "naclstack",
                 "spriteIndex": [
-                    2,
+                    4,
                     34
                 ]
             }
@@ -74509,7 +74509,7 @@
                 "cosmeticForme": false,
                 "sprite": "garganacl",
                 "spriteIndex": [
-                    3,
+                    5,
                     34
                 ]
             }
@@ -74574,7 +74574,7 @@
                 "cosmeticForme": false,
                 "sprite": "charcadet",
                 "spriteIndex": [
-                    4,
+                    6,
                     34
                 ]
             }
@@ -74635,7 +74635,7 @@
                 "cosmeticForme": false,
                 "sprite": "armarouge",
                 "spriteIndex": [
-                    5,
+                    7,
                     34
                 ]
             }
@@ -74696,7 +74696,7 @@
                 "cosmeticForme": false,
                 "sprite": "ceruledge",
                 "spriteIndex": [
-                    6,
+                    8,
                     34
                 ]
             }
@@ -74758,7 +74758,7 @@
                 "cosmeticForme": false,
                 "sprite": "tadbulb",
                 "spriteIndex": [
-                    7,
+                    9,
                     34
                 ]
             }
@@ -74819,7 +74819,7 @@
                 "cosmeticForme": false,
                 "sprite": "bellibolt",
                 "spriteIndex": [
-                    8,
+                    10,
                     34
                 ]
             }
@@ -74883,7 +74883,7 @@
                 "cosmeticForme": false,
                 "sprite": "wattrel",
                 "spriteIndex": [
-                    9,
+                    11,
                     34
                 ]
             }
@@ -74946,7 +74946,7 @@
                 "cosmeticForme": false,
                 "sprite": "kilowattrel",
                 "spriteIndex": [
-                    10,
+                    12,
                     34
                 ]
             }
@@ -75008,7 +75008,7 @@
                 "cosmeticForme": false,
                 "sprite": "maschiff",
                 "spriteIndex": [
-                    11,
+                    13,
                     34
                 ]
             }
@@ -75069,7 +75069,7 @@
                 "cosmeticForme": false,
                 "sprite": "mabosstiff",
                 "spriteIndex": [
-                    12,
+                    14,
                     34
                 ]
             }
@@ -75132,7 +75132,7 @@
                 "cosmeticForme": false,
                 "sprite": "shroodle",
                 "spriteIndex": [
-                    13,
+                    15,
                     34
                 ]
             }
@@ -75194,7 +75194,7 @@
                 "cosmeticForme": false,
                 "sprite": "grafaiai",
                 "spriteIndex": [
-                    14,
+                    16,
                     34
                 ]
             }
@@ -75256,7 +75256,7 @@
                 "cosmeticForme": false,
                 "sprite": "bramblin",
                 "spriteIndex": [
-                    15,
+                    17,
                     34
                 ]
             }
@@ -75317,7 +75317,7 @@
                 "cosmeticForme": false,
                 "sprite": "brambleghast",
                 "spriteIndex": [
-                    16,
+                    18,
                     34
                 ]
             }
@@ -75378,7 +75378,7 @@
                 "cosmeticForme": false,
                 "sprite": "toedscool",
                 "spriteIndex": [
-                    17,
+                    19,
                     34
                 ]
             }
@@ -75438,7 +75438,7 @@
                 "cosmeticForme": false,
                 "sprite": "toedscruel",
                 "spriteIndex": [
-                    18,
+                    20,
                     34
                 ]
             }
@@ -75495,7 +75495,7 @@
                 "cosmeticForme": false,
                 "sprite": "klawf",
                 "spriteIndex": [
-                    19,
+                    21,
                     34
                 ]
             }
@@ -75557,7 +75557,7 @@
                 "cosmeticForme": false,
                 "sprite": "capsakid",
                 "spriteIndex": [
-                    20,
+                    22,
                     34
                 ]
             }
@@ -75619,7 +75619,7 @@
                 "cosmeticForme": false,
                 "sprite": "scovillain",
                 "spriteIndex": [
-                    21,
+                    23,
                     34
                 ]
             }
@@ -75680,7 +75680,7 @@
                 "cosmeticForme": false,
                 "sprite": "rellor",
                 "spriteIndex": [
-                    22,
+                    24,
                     34
                 ]
             }
@@ -75741,7 +75741,7 @@
                 "cosmeticForme": false,
                 "sprite": "rabsca",
                 "spriteIndex": [
-                    23,
+                    25,
                     34
                 ]
             }
@@ -75803,7 +75803,7 @@
                 "cosmeticForme": false,
                 "sprite": "flittle",
                 "spriteIndex": [
-                    24,
+                    26,
                     34
                 ]
             }
@@ -75864,7 +75864,7 @@
                 "cosmeticForme": false,
                 "sprite": "espathra",
                 "spriteIndex": [
-                    25,
+                    27,
                     34
                 ]
             }
@@ -75927,7 +75927,7 @@
                 "cosmeticForme": false,
                 "sprite": "tinkatink",
                 "spriteIndex": [
-                    26,
+                    28,
                     34
                 ]
             }
@@ -75994,7 +75994,7 @@
                 "cosmeticForme": false,
                 "sprite": "tinkatuff",
                 "spriteIndex": [
-                    27,
+                    29,
                     34
                 ]
             }
@@ -76056,7 +76056,7 @@
                 "cosmeticForme": false,
                 "sprite": "tinkaton",
                 "spriteIndex": [
-                    28,
+                    30,
                     34
                 ]
             }
@@ -76118,7 +76118,7 @@
                 "cosmeticForme": false,
                 "sprite": "wiglett",
                 "spriteIndex": [
-                    29,
+                    31,
                     34
                 ]
             }
@@ -76179,7 +76179,7 @@
                 "cosmeticForme": false,
                 "sprite": "wugtrio",
                 "spriteIndex": [
-                    30,
+                    32,
                     34
                 ]
             }
@@ -76237,7 +76237,7 @@
                 "cosmeticForme": false,
                 "sprite": "bombirdier",
                 "spriteIndex": [
-                    31,
+                    33,
                     34
                 ]
             }
@@ -76298,7 +76298,7 @@
                 "cosmeticForme": false,
                 "sprite": "finizen",
                 "spriteIndex": [
-                    32,
+                    34,
                     34
                 ]
             }
@@ -76358,7 +76358,7 @@
                 "cosmeticForme": false,
                 "sprite": "palafin",
                 "spriteIndex": [
-                    33,
+                    35,
                     34
                 ]
             },
@@ -76407,8 +76407,8 @@
                 "cosmeticForme": false,
                 "sprite": "palafin-hero",
                 "spriteIndex": [
-                    34,
-                    34
+                    0,
+                    35
                 ]
             }
         ],
@@ -76469,8 +76469,8 @@
                 "cosmeticForme": false,
                 "sprite": "varoom",
                 "spriteIndex": [
-                    35,
-                    34
+                    1,
+                    35
                 ]
             }
         ],
@@ -76530,7 +76530,7 @@
                 "cosmeticForme": false,
                 "sprite": "revavroom",
                 "spriteIndex": [
-                    0,
+                    2,
                     35
                 ]
             }
@@ -76587,7 +76587,7 @@
                 "cosmeticForme": false,
                 "sprite": "cyclizar",
                 "spriteIndex": [
-                    1,
+                    3,
                     35
                 ]
             }
@@ -76643,7 +76643,7 @@
                 "cosmeticForme": false,
                 "sprite": "orthworm",
                 "spriteIndex": [
-                    2,
+                    4,
                     35
                 ]
             }
@@ -76705,7 +76705,7 @@
                 "cosmeticForme": false,
                 "sprite": "glimmet",
                 "spriteIndex": [
-                    3,
+                    5,
                     35
                 ]
             }
@@ -76766,7 +76766,7 @@
                 "cosmeticForme": false,
                 "sprite": "glimmora",
                 "spriteIndex": [
-                    4,
+                    6,
                     35
                 ]
             }
@@ -76827,7 +76827,7 @@
                 "cosmeticForme": false,
                 "sprite": "greavard",
                 "spriteIndex": [
-                    5,
+                    7,
                     35
                 ]
             }
@@ -76887,7 +76887,7 @@
                 "cosmeticForme": false,
                 "sprite": "houndstone",
                 "spriteIndex": [
-                    6,
+                    8,
                     35
                 ]
             }
@@ -76945,7 +76945,7 @@
                 "cosmeticForme": false,
                 "sprite": "flamigo",
                 "spriteIndex": [
-                    7,
+                    9,
                     35
                 ]
             }
@@ -77007,7 +77007,7 @@
                 "cosmeticForme": false,
                 "sprite": "cetoddle",
                 "spriteIndex": [
-                    8,
+                    10,
                     35
                 ]
             }
@@ -77068,7 +77068,7 @@
                 "cosmeticForme": false,
                 "sprite": "cetitan",
                 "spriteIndex": [
-                    9,
+                    11,
                     35
                 ]
             }
@@ -77125,7 +77125,7 @@
                 "cosmeticForme": false,
                 "sprite": "veluza",
                 "spriteIndex": [
-                    10,
+                    12,
                     35
                 ]
             }
@@ -77182,7 +77182,7 @@
                 "cosmeticForme": false,
                 "sprite": "dondozo",
                 "spriteIndex": [
-                    11,
+                    13,
                     35
                 ]
             }
@@ -77239,7 +77239,7 @@
                 "cosmeticForme": false,
                 "sprite": "tatsugiri",
                 "spriteIndex": [
-                    12,
+                    14,
                     35
                 ]
             },
@@ -77289,7 +77289,7 @@
                 "cosmeticForme": false,
                 "sprite": "tatsugiri-droopy",
                 "spriteIndex": [
-                    13,
+                    15,
                     35
                 ]
             },
@@ -77339,7 +77339,7 @@
                 "cosmeticForme": false,
                 "sprite": "tatsugiri-stretchy",
                 "spriteIndex": [
-                    14,
+                    16,
                     35
                 ]
             }
@@ -77401,7 +77401,7 @@
                 "cosmeticForme": false,
                 "sprite": "annihilape",
                 "spriteIndex": [
-                    15,
+                    17,
                     35
                 ]
             }
@@ -77464,7 +77464,7 @@
                 "cosmeticForme": false,
                 "sprite": "clodsire",
                 "spriteIndex": [
-                    16,
+                    18,
                     35
                 ]
             }
@@ -77526,7 +77526,7 @@
                 "cosmeticForme": false,
                 "sprite": "farigiraf",
                 "spriteIndex": [
-                    17,
+                    19,
                     35
                 ]
             }
@@ -77587,7 +77587,7 @@
                 "cosmeticForme": false,
                 "sprite": "dudunsparce",
                 "spriteIndex": [
-                    18,
+                    20,
                     35
                 ]
             },
@@ -77641,7 +77641,7 @@
                 "cosmeticForme": false,
                 "sprite": "dudunsparce-three-segment",
                 "spriteIndex": [
-                    18,
+                    20,
                     35
                 ]
             }
@@ -77703,7 +77703,7 @@
                 "cosmeticForme": false,
                 "sprite": "kingambit",
                 "spriteIndex": [
-                    19,
+                    21,
                     35
                 ]
             }
@@ -77759,7 +77759,7 @@
                 "cosmeticForme": false,
                 "sprite": "great-tusk",
                 "spriteIndex": [
-                    20,
+                    22,
                     35
                 ]
             }
@@ -77815,7 +77815,7 @@
                 "cosmeticForme": false,
                 "sprite": "scream-tail",
                 "spriteIndex": [
-                    21,
+                    23,
                     35
                 ]
             }
@@ -77871,7 +77871,7 @@
                 "cosmeticForme": false,
                 "sprite": "brute-bonnet",
                 "spriteIndex": [
-                    22,
+                    24,
                     35
                 ]
             }
@@ -77929,7 +77929,7 @@
                 "cosmeticForme": false,
                 "sprite": "flutter-mane",
                 "spriteIndex": [
-                    23,
+                    25,
                     35
                 ]
             }
@@ -77985,7 +77985,7 @@
                 "cosmeticForme": false,
                 "sprite": "slither-wing",
                 "spriteIndex": [
-                    24,
+                    26,
                     35
                 ]
             }
@@ -78041,7 +78041,7 @@
                 "cosmeticForme": false,
                 "sprite": "sandy-shocks",
                 "spriteIndex": [
-                    25,
+                    27,
                     35
                 ]
             }
@@ -78097,7 +78097,7 @@
                 "cosmeticForme": false,
                 "sprite": "iron-treads",
                 "spriteIndex": [
-                    26,
+                    28,
                     35
                 ]
             }
@@ -78153,7 +78153,7 @@
                 "cosmeticForme": false,
                 "sprite": "iron-bundle",
                 "spriteIndex": [
-                    27,
+                    29,
                     35
                 ]
             }
@@ -78209,7 +78209,7 @@
                 "cosmeticForme": false,
                 "sprite": "iron-hands",
                 "spriteIndex": [
-                    28,
+                    30,
                     35
                 ]
             }
@@ -78265,7 +78265,7 @@
                 "cosmeticForme": false,
                 "sprite": "iron-jugulis",
                 "spriteIndex": [
-                    29,
+                    31,
                     35
                 ]
             }
@@ -78321,7 +78321,7 @@
                 "cosmeticForme": false,
                 "sprite": "iron-moth",
                 "spriteIndex": [
-                    30,
+                    32,
                     35
                 ]
             }
@@ -78377,7 +78377,7 @@
                 "cosmeticForme": false,
                 "sprite": "iron-thorns",
                 "spriteIndex": [
-                    31,
+                    33,
                     35
                 ]
             }
@@ -78440,7 +78440,7 @@
                 "cosmeticForme": false,
                 "sprite": "frigibax",
                 "spriteIndex": [
-                    32,
+                    34,
                     35
                 ]
             }
@@ -78507,7 +78507,7 @@
                 "cosmeticForme": false,
                 "sprite": "arctibax",
                 "spriteIndex": [
-                    33,
+                    35,
                     35
                 ]
             }
@@ -78569,8 +78569,8 @@
                 "cosmeticForme": false,
                 "sprite": "baxcalibur",
                 "spriteIndex": [
-                    34,
-                    35
+                    0,
+                    36
                 ]
             }
         ],
@@ -78629,8 +78629,8 @@
                 "cosmeticForme": false,
                 "sprite": "gimmighoul",
                 "spriteIndex": [
-                    35,
-                    35
+                    1,
+                    36
                 ]
             },
             {
@@ -78682,7 +78682,7 @@
                 "cosmeticForme": false,
                 "sprite": "gimmighoul-roaming",
                 "spriteIndex": [
-                    0,
+                    2,
                     36
                 ]
             }
@@ -78742,7 +78742,7 @@
                 "cosmeticForme": false,
                 "sprite": "gholdengo",
                 "spriteIndex": [
-                    1,
+                    3,
                     36
                 ]
             }
@@ -78798,7 +78798,7 @@
                 "cosmeticForme": false,
                 "sprite": "wo-chien",
                 "spriteIndex": [
-                    2,
+                    4,
                     36
                 ]
             }
@@ -78854,7 +78854,7 @@
                 "cosmeticForme": false,
                 "sprite": "chien-pao",
                 "spriteIndex": [
-                    3,
+                    5,
                     36
                 ]
             }
@@ -78910,7 +78910,7 @@
                 "cosmeticForme": false,
                 "sprite": "ting-lu",
                 "spriteIndex": [
-                    4,
+                    6,
                     36
                 ]
             }
@@ -78966,7 +78966,7 @@
                 "cosmeticForme": false,
                 "sprite": "chi-yu",
                 "spriteIndex": [
-                    5,
+                    7,
                     36
                 ]
             }
@@ -79022,7 +79022,7 @@
                 "cosmeticForme": false,
                 "sprite": "roaring-moon",
                 "spriteIndex": [
-                    6,
+                    8,
                     36
                 ]
             }
@@ -79078,7 +79078,7 @@
                 "cosmeticForme": false,
                 "sprite": "iron-valiant",
                 "spriteIndex": [
-                    7,
+                    9,
                     36
                 ]
             }
@@ -79134,7 +79134,7 @@
                 "cosmeticForme": false,
                 "sprite": "koraidon",
                 "spriteIndex": [
-                    8,
+                    10,
                     36
                 ]
             },
@@ -79183,7 +79183,7 @@
                 "cosmeticForme": false,
                 "sprite": "koraidon",
                 "spriteIndex": [
-                    8,
+                    11,
                     36
                 ]
             },
@@ -79232,7 +79232,7 @@
                 "cosmeticForme": false,
                 "sprite": "koraidon",
                 "spriteIndex": [
-                    8,
+                    11,
                     36
                 ]
             },
@@ -79281,7 +79281,7 @@
                 "cosmeticForme": false,
                 "sprite": "koraidon",
                 "spriteIndex": [
-                    8,
+                    11,
                     36
                 ]
             },
@@ -79330,7 +79330,7 @@
                 "cosmeticForme": false,
                 "sprite": "koraidon",
                 "spriteIndex": [
-                    8,
+                    11,
                     36
                 ]
             }
@@ -79386,7 +79386,7 @@
                 "cosmeticForme": false,
                 "sprite": "miraidon",
                 "spriteIndex": [
-                    9,
+                    12,
                     36
                 ]
             },
@@ -79435,7 +79435,7 @@
                 "cosmeticForme": false,
                 "sprite": "miraidon",
                 "spriteIndex": [
-                    9,
+                    13,
                     36
                 ]
             },
@@ -79484,7 +79484,7 @@
                 "cosmeticForme": false,
                 "sprite": "miraidon",
                 "spriteIndex": [
-                    9,
+                    13,
                     36
                 ]
             },
@@ -79533,7 +79533,7 @@
                 "cosmeticForme": false,
                 "sprite": "miraidon",
                 "spriteIndex": [
-                    9,
+                    13,
                     36
                 ]
             },
@@ -79582,7 +79582,7 @@
                 "cosmeticForme": false,
                 "sprite": "miraidon",
                 "spriteIndex": [
-                    9,
+                    13,
                     36
                 ]
             }
@@ -79638,7 +79638,7 @@
                 "cosmeticForme": false,
                 "sprite": "walking-wake",
                 "spriteIndex": [
-                    10,
+                    14,
                     36
                 ]
             }
@@ -79694,7 +79694,7 @@
                 "cosmeticForme": false,
                 "sprite": "iron-leaves",
                 "spriteIndex": [
-                    11,
+                    15,
                     36
                 ]
             }
@@ -79748,7 +79748,7 @@
                 "ability2": "Gluttony",
                 "abilityH": "Sticky Hold",
                 "spriteIndex": [
-                    12,
+                    16,
                     36
                 ],
                 "sprite": "dipplin"
@@ -79803,7 +79803,7 @@
                 "ability1": "Hospitality",
                 "abilityH": "Heatproof",
                 "spriteIndex": [
-                    13,
+                    17,
                     36
                 ],
                 "sprite": "poltchageist"
@@ -79851,7 +79851,7 @@
                 "ability1": "Hospitality",
                 "abilityH": "Heatproof",
                 "spriteIndex": [
-                    13,
+                    17,
                     36
                 ],
                 "sprite": "poltchageist-masterpiece"
@@ -79905,7 +79905,7 @@
                 "ability1": "Hospitality",
                 "abilityH": "Heatproof",
                 "spriteIndex": [
-                    14,
+                    18,
                     36
                 ],
                 "sprite": "sinistcha"
@@ -79952,7 +79952,7 @@
                 "ability1": "Hospitality",
                 "abilityH": "Heatproof",
                 "spriteIndex": [
-                    14,
+                    18,
                     36
                 ],
                 "sprite": "sinistcha-masterpiece"
@@ -80001,7 +80001,7 @@
                 "ability1": "Toxic Chain",
                 "abilityH": "Guard Dog",
                 "spriteIndex": [
-                    15,
+                    19,
                     36
                 ],
                 "sprite": "okidogi"
@@ -80050,7 +80050,7 @@
                 "ability1": "Toxic Chain",
                 "abilityH": "Frisk",
                 "spriteIndex": [
-                    16,
+                    20,
                     36
                 ],
                 "sprite": "munkidori"
@@ -80099,7 +80099,7 @@
                 "ability1": "Toxic Chain",
                 "abilityH": "Technician",
                 "spriteIndex": [
-                    17,
+                    21,
                     36
                 ],
                 "sprite": "fezandipiti"
@@ -80146,7 +80146,7 @@
                 ],
                 "ability1": "Defiant",
                 "spriteIndex": [
-                    18,
+                    22,
                     36
                 ],
                 "sprite": "ogerpon"
@@ -80183,7 +80183,7 @@
                 ],
                 "ability1": "Water Absorb",
                 "spriteIndex": [
-                    19,
+                    23,
                     36
                 ],
                 "sprite": "ogerpon-wellspring-mask"
@@ -80220,7 +80220,7 @@
                 ],
                 "ability1": "Mold Breaker",
                 "spriteIndex": [
-                    20,
+                    24,
                     36
                 ],
                 "sprite": "ogerpon-hearthflame-mask"
@@ -80257,7 +80257,7 @@
                 ],
                 "ability1": "Sturdy",
                 "spriteIndex": [
-                    21,
+                    25,
                     36
                 ],
                 "sprite": "ogerpon-cornerstone-mask"
@@ -80308,11 +80308,12 @@
                 "ability2": "Sturdy",
                 "abilityH": "Stalwart",
                 "spriteIndex": [
-                    22,
+                    26,
                     36
                 ]
             }
-        ]
+        ],
+        "levelUpType": "Medium Fast"
     },
     "1019": {
         "name": "Hydrapple",
@@ -80357,11 +80358,12 @@
                 "ability2": "Regenerator",
                 "abilityH": "Sticky Hold",
                 "spriteIndex": [
-                    23,
+                    27,
                     36
                 ]
             }
-        ]
+        ],
+        "levelUpType": "Erratic"
     },
     "1020": {
         "name": "Gouging Fire",
@@ -80400,11 +80402,12 @@
                 ],
                 "ability1": "Protosynthesis",
                 "spriteIndex": [
-                    24,
+                    28,
                     36
                 ]
             }
-        ]
+        ],
+        "levelUpType": "Slow"
     },
     "1021": {
         "name": "Raging Bolt",
@@ -80443,11 +80446,12 @@
                 ],
                 "ability1": "Protosynthesis",
                 "spriteIndex": [
-                    25,
+                    29,
                     36
                 ]
             }
-        ]
+        ],
+        "levelUpType": "Slow"
     },
     "1022": {
         "name": "Iron Boulder",
@@ -80486,11 +80490,12 @@
                 ],
                 "ability1": "Quark Drive",
                 "spriteIndex": [
-                    26,
+                    30,
                     36
                 ]
             }
-        ]
+        ],
+        "levelUpType": "Slow"
     },
     "1023": {
         "name": "Iron Crown",
@@ -80529,11 +80534,12 @@
                 ],
                 "ability1": "Quark Drive",
                 "spriteIndex": [
-                    27,
+                    31,
                     36
                 ]
             }
-        ]
+        ],
+        "levelUpType": "Slow"
     },
     "1024": {
         "name": "Terapagos",
@@ -80571,7 +80577,7 @@
                 ],
                 "ability1": "Tera Shift",
                 "spriteIndex": [
-                    28,
+                    32,
                     36
                 ]
             },
@@ -80607,7 +80613,7 @@
                 ],
                 "ability1": "Tera Shell",
                 "spriteIndex": [
-                    28,
+                    32,
                     36
                 ]
             },
@@ -80643,10 +80649,55 @@
                 ],
                 "ability1": "Teraform Zero",
                 "spriteIndex": [
-                    28,
+                    32,
                     36
                 ]
             }
-        ]
+        ],
+        "levelUpType": "Slow"
+    },
+    "1025": {
+        "name": "Pecharunt",
+        "nationalDex": 1025,
+        "formes": [
+            {
+                "formeNumber": 0,
+                "name": "Pecharunt",
+                "formeName": "Pecharunt",
+                "alias": "pecharunt",
+                "sprite": "pecharunt",
+                "isBaseForm": true,
+                "isMega": false,
+                "isBattleOnly": false,
+                "isLegendary": false,
+                "isMythical": true,
+                "height": 0.3,
+                "weight": 0.3,
+                "baseFriendship": 0,
+                "genderRatio": {
+                    "M": 0,
+                    "F": 0
+                },
+                "gen": 9,
+                "baseStats": {
+                    "hp": 88,
+                    "atk": 88,
+                    "def": 160,
+                    "spa": 88,
+                    "spd": 88,
+                    "spe": 88
+                },
+                "types": [
+                    "Poison",
+                    "Ghost"
+                ],
+                "ability1": "Poison Puppeteer",
+                "spriteIndex": [
+                    33,
+                    36
+                ]
+            }
+        ],
+        "levelUpType": "Slow"
     }
 }
