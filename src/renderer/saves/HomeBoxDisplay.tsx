@@ -14,7 +14,6 @@ interface HomeBoxDisplayProps {
 const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
   const data = useHomeData()
   const { setSelectedMon } = props
-  const { palette } = useTheme()
 
   const dispatch = useAppDispatch()
   const dispatchStartDrag = (source: SaveCoordinates) => dispatch(startDrag(source))
@@ -30,7 +29,6 @@ const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
           padding: 2,
           width: '100%',
           height: 'fit-content',
-          backgroundColor: palette.primary.main,
         }}
       >
         {_.range(10).map((row: number) => (

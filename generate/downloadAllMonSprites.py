@@ -343,7 +343,7 @@ sv_transferrable = [
     992, 993, 994, 995, 996, 997, 998, 999, 1000, 1001, 1002, 1003, 1004, 1005,
     1006, 1007, 1008, 1009, 1010,
     4, 5, 6, 144, 145, 146, 150, 151, 155, 156, 157, 195, 382, 383, 384, 480,
-    481, 482, 483, 484, 485, 487, 488, 493, 501, 502, 503, 641, 642, 645, 648,
+    481, 482, 483, 484, 485, 487, 488, 492, 493, 501, 502, 503, 641, 642, 645, 648,
     650, 651, 652, 653, 654, 655, 656, 657, 658, 703, 719, 720, 721, 722, 723,
     724, 801, 810, 811, 812, 813, 814, 815, 816, 817, 818, 863, 888, 889, 890,
     891, 892, 893, 894, 895, 896, 897, 898, 899, 900, 901, 902, 903, 904, 905,
@@ -352,7 +352,14 @@ sv_transferrable = [
     313,314,342,349,350,355,356,358,387,388,389,390,391,392,393,394,395,424,433,
     446,469,472,473,477,532,533,534,540,541,542,580,581,607,608,609,619,620,629,
     630,708,709,736,737,738,742,742,782,783,784,845,1011,1012,1013,1014,1015,1016,
-    1017
+    1017, 1018, 1019, 1020, 1021, 1022, 1023, 1024, 1025, 1026, 1, 2, 3, 7, 8, 9, 43, 44, 45, 72, 73, 84, 85, 86, 87, 102,
+    103, 106, 107, 111, 112, 116, 117, 125, 126, 131, 137, 152, 153, 154, 158, 159, 160, 170, 171,
+    182, 209, 210, 227, 230, 233, 235, 236, 237, 239, 240, 243, 244, 245, 249, 250, 252, 253, 254,
+    255, 256, 257, 258, 259, 260, 311, 312, 328, 329, 330, 374, 375, 376, 377, 378, 379, 380, 381,
+    386, 408, 409, 410, 411, 464, 466, 467, 474, 486, 495, 496, 497, 498, 499, 500, 522, 523, 529,
+    530, 546, 547, 559, 560, 572, 573, 577, 578, 579, 595, 596, 622, 623, 638, 639, 640, 643, 644,
+    646, 647, 677, 678, 686, 687, 725, 726, 727, 728, 729, 730, 731, 732, 733, 751, 752, 764, 774,
+    789, 790, 791, 792, 800, 868, 869, 884,
 ]
 
 
@@ -504,15 +511,15 @@ def download_all_sprites(dex_number, forme, forme_number, forme_name):
     elif dex_number <= 809 and not excludeFormeGen7(dex_number, forme):
         download_sprite_variants_pokemon_db(
             dex_number, forme_number, forme_name, "ultra-sun-ultra-moon", "gen7", dex_number != 133)
-    if dex_number <= 1017 and not exclude_forme_home(dex_number, forme):
+    if dex_number <= 1024 and not exclude_forme_home(dex_number, forme):
         download_sprite_variants_pokemon_db(
             dex_number, forme_number, forme_name, "home", "home")
     if dex_number <= 724 and not excludeFormeLA(dex_number, forme):
         download_sprite_variants_pokemon_db(
             dex_number, forme_number, forme_name, "legends-arceus", "gen8a")
-    # if dex_number <= 1017 and not exclude_forme_gen9(dex_number, forme):
-    #     download_sprite_variants_pokemon_db(
-    #         dex_number, forme_number, forme_name, "scarlet-violet", "gen9")
+    if dex_number <= 1026 and not exclude_forme_gen9(dex_number, forme):
+        download_sprite_variants_pokemon_db(
+            dex_number, forme_number, forme_name, "scarlet-violet", "gen9")
 
 def download_sprite_variants_pokemon_db(dex_number, forme_number, forme_name, game, folder, includeFemale=True):
     if "-totem" in forme_name:
@@ -520,7 +527,7 @@ def download_sprite_variants_pokemon_db(dex_number, forme_number, forme_name, ga
     extension = ".gif" if "anim" in game else ".png"
     download_png(get_pokemon_db_sprite(dex_number, forme_number, False,
                                        game, False, forme_name), "src/renderer/public/sprites/" + folder, forme_name + extension)
-    if game == "red-blue":
+    if game == "red-blue" or game == 'scarlet-violet':
         return
     download_png(get_pokemon_db_sprite(dex_number, forme_number, True,
                                        game, False, forme_name), "src/renderer/public/sprites/" + folder + "/shiny", forme_name + extension)

@@ -9522,184 +9522,154 @@
     "type": "grass",
     "id": 904
   },
-  "10001": {
-    "name": "Shadow Rush",
-    "accuracy": 100,
-    "class": "physical",
-    "generation": "generation-iii",
-    "power": 55,
-    "pp": null,
-    "type": "shadow",
-    "id": 10001
-  },
-  "10002": {
-    "name": "Shadow Blast",
-    "accuracy": 100,
-    "class": "physical",
-    "generation": "generation-iii",
-    "power": 80,
-    "pp": null,
-    "type": "shadow",
-    "id": 10002
-  },
-  "10003": {
-    "name": "Shadow Blitz",
-    "accuracy": 100,
-    "class": "physical",
-    "generation": "generation-iii",
-    "power": 40,
-    "pp": null,
-    "type": "shadow",
-    "id": 10003
-  },
-  "10004": {
-    "name": "Shadow Bolt",
+  "905": {
+    "name": "Electro Shot",
     "accuracy": 100,
     "class": "special",
-    "generation": "generation-iii",
-    "power": 75,
-    "pp": null,
-    "type": "shadow",
-    "id": 10004
+    "generation": "generation-ix",
+    "power": 130,
+    "pp": 10,
+    "type": "electric",
+    "id": 905
   },
-  "10005": {
-    "name": "Shadow Break",
-    "accuracy": 100,
-    "class": "physical",
-    "generation": "generation-iii",
-    "power": 75,
-    "pp": null,
-    "type": "shadow",
-    "id": 10005
-  },
-  "10006": {
-    "name": "Shadow Chill",
+  "906": {
+    "name": "Tera Starstorm",
     "accuracy": 100,
     "class": "special",
-    "generation": "generation-iii",
-    "power": 75,
-    "pp": null,
-    "type": "shadow",
-    "id": 10006
-  },
-  "10007": {
-    "name": "Shadow End",
-    "accuracy": 60,
-    "class": "physical",
-    "generation": "generation-iii",
+    "generation": "generation-ix",
     "power": 120,
-    "pp": null,
-    "type": "shadow",
-    "id": 10007
+    "pp": 5,
+    "type": "normal",
+    "id": 906
   },
-  "10008": {
-    "name": "Shadow Fire",
+  "907": {
+    "name": "Fickle Beam",
     "accuracy": 100,
     "class": "special",
-    "generation": "generation-iii",
-    "power": 75,
-    "pp": null,
-    "type": "shadow",
-    "id": 10008
+    "generation": "generation-ix",
+    "power": 80,
+    "pp": 5,
+    "type": "dragon",
+    "id": 907
   },
-  "10009": {
-    "name": "Shadow Rave",
+  "908": {
+    "name": "Burning Bulwark",
+    "accuracy": null,
+    "class": "status",
+    "generation": "generation-ix",
+    "power": null,
+    "pp": 10,
+    "type": "fire",
+    "id": 908
+  },
+  "909": {
+    "name": "Thunderclap",
     "accuracy": 100,
     "class": "special",
-    "generation": "generation-iii",
+    "generation": "generation-ix",
     "power": 70,
-    "pp": null,
-    "type": "shadow",
-    "id": 10009
+    "pp": 5,
+    "type": "electric",
+    "id": 909
   },
-  "10010": {
-    "name": "Shadow Storm",
+  "910": {
+    "name": "Mighty Cleave",
     "accuracy": 100,
-    "class": "special",
-    "generation": "generation-iii",
+    "class": "physical",
+    "generation": "generation-ix",
     "power": 95,
-    "pp": null,
-    "type": "shadow",
-    "id": 10010
+    "pp": 5,
+    "type": "rock",
+    "id": 910
   },
-  "10011": {
-    "name": "Shadow Wave",
+  "911": {
+    "name": "Tachyon Cutter",
     "accuracy": 100,
     "class": "special",
-    "generation": "generation-iii",
+    "generation": "generation-ix",
     "power": 50,
-    "pp": null,
-    "type": "shadow",
-    "id": 10011
+    "pp": 10,
+    "type": "steel",
+    "id": 911
   },
-  "10012": {
-    "name": "Shadow Down",
+  "912": {
+    "name": "Hard Press",
     "accuracy": 100,
-    "class": "status",
-    "generation": "generation-iii",
+    "class": "physical",
+    "generation": "generation-ix",
     "power": null,
-    "pp": null,
-    "type": "shadow",
-    "id": 10012
+    "pp": 10,
+    "type": "steel",
+    "id": 912
   },
-  "10013": {
-    "name": "Shadow Half",
+  "913": {
+    "name": "Dragon Cheer",
+    "accuracy": null,
+    "class": "status",
+    "generation": "generation-ix",
+    "power": null,
+    "pp": 15,
+    "type": "dragon",
+    "id": 913
+  },
+  "914": {
+    "name": "Alluring Voice",
     "accuracy": 100,
     "class": "special",
-    "generation": "generation-iii",
-    "power": null,
-    "pp": null,
-    "type": "shadow",
-    "id": 10013
+    "generation": "generation-ix",
+    "power": 80,
+    "pp": 10,
+    "type": "fairy",
+    "id": 914
   },
-  "10014": {
-    "name": "Shadow Hold",
-    "accuracy": null,
-    "class": "status",
-    "generation": "generation-iii",
-    "power": null,
-    "pp": null,
-    "type": "shadow",
-    "id": 10014
-  },
-  "10015": {
-    "name": "Shadow Mist",
+  "915": {
+    "name": "Temper Flare",
     "accuracy": 100,
-    "class": "status",
-    "generation": "generation-iii",
-    "power": null,
-    "pp": null,
-    "type": "shadow",
-    "id": 10015
+    "class": "physical",
+    "generation": "generation-ix",
+    "power": 75,
+    "pp": 10,
+    "type": "fire",
+    "id": 915
   },
-  "10016": {
-    "name": "Shadow Panic",
-    "accuracy": 90,
-    "class": "status",
-    "generation": "generation-iii",
-    "power": null,
-    "pp": null,
-    "type": "shadow",
-    "id": 10016
+  "916": {
+    "name": "Supercell Slam",
+    "accuracy": 95,
+    "class": "physical",
+    "generation": "generation-ix",
+    "power": 100,
+    "pp": 15,
+    "type": "electric",
+    "id": 916
   },
-  "10017": {
-    "name": "Shadow Shed",
-    "accuracy": null,
-    "class": "status",
-    "generation": "generation-iii",
-    "power": null,
-    "pp": null,
-    "type": "shadow",
-    "id": 10017
+  "917": {
+    "name": "Psychic Noise",
+    "accuracy": 100,
+    "class": "special",
+    "generation": "generation-ix",
+    "power": 75,
+    "pp": 15,
+    "type": "electric",
+    "id": 917
   },
-  "10018": {
-    "name": "Shadow Sky",
-    "accuracy": null,
-    "class": "status",
-    "generation": "generation-iii",
-    "power": null,
-    "pp": null,
-    "type": "shadow",
-    "id": 10018
+  "918": {
+    "name": "Upper Hand",
+    "accuracy": 100,
+    "class": "physical",
+    "generation": "generation-ix",
+    "power": 65,
+    "pp": 15,
+    "type": "fighting",
+    "id": 918
+  },
+  "919": {
+    "name": "Malignant Chain",
+    "accuracy": 100,
+    "class": "special",
+    "generation": "generation-ix",
+    "power": 100,
+    "pp": 5,
+    "type": "poison",
+    "id": 919
   }
 }

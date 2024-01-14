@@ -1,4 +1,3 @@
-import { MenuItem, Select } from '@mui/material'
 import {
   BW2_TRANSFER_RESTRICTIONS,
   GEN1_TRANSFER_RESTRICTIONS,
@@ -22,10 +21,10 @@ const styles = {
     color: 'white',
     fontWeight: 'bold',
     fontSize: 16,
-    border: 0,
-    margin: 1,
     boxShadow: 'none',
     '.MuiOutlinedInput-notchedOutline': { border: 0 },
+    flex: 1,
+    margin: 8,
   },
 } as Styles
 
@@ -57,75 +56,75 @@ interface FileTypeSelectProps {
 const FileTypeSelect = (props: FileTypeSelectProps) => {
   const { baseFormat, currentFormat, formData, onChange } = props
   return (
-    <Select
+    <select
       value={currentFormat}
       onChange={(e) => {
         onChange(e.target.value)
       }}
-      sx={{
+      style={{
         ...styles.fileTypeChip,
         backgroundColor: fileTypeColors[currentFormat],
       }}
     >
-      <MenuItem value="OHPKM">OpenHome</MenuItem>
-      {baseFormat !== 'OHPKM' ? <MenuItem value={baseFormat}>{baseFormat}</MenuItem> : <div />}
+      <option value="OHPKM">OpenHome</option>
+      {baseFormat !== 'OHPKM' ? <option value={baseFormat}>{baseFormat}</option> : <div />}
       {baseFormat === 'OHPKM' &&
         !isRestricted(GEN1_TRANSFER_RESTRICTIONS, formData.dexNum, formData.formNum) && (
-          <MenuItem value="PK1">PK1</MenuItem>
+          <option value="PK1">PK1</option>
         )}
       {baseFormat === 'OHPKM' &&
         !isRestricted(GEN2_TRANSFER_RESTRICTIONS, formData.dexNum, formData.formNum) && (
-          <MenuItem value="PK2">PK2</MenuItem>
+          <option value="PK2">PK2</option>
         )}
       {baseFormat === 'OHPKM' &&
         !isRestricted(GEN3_TRANSFER_RESTRICTIONS, formData.dexNum, formData.formNum) && (
-          <MenuItem value="PK3">PK3</MenuItem>
+          <option value="PK3">PK3</option>
         )}
       {baseFormat === 'OHPKM' &&
         !isRestricted(GEN3_TRANSFER_RESTRICTIONS, formData.dexNum, formData.formNum) && (
-          <MenuItem value="COLOPKM">COLOPKM</MenuItem>
+          <option value="COLOPKM">COLOPKM</option>
         )}
       {baseFormat === 'OHPKM' &&
         !isRestricted(GEN3_TRANSFER_RESTRICTIONS, formData.dexNum, formData.formNum) && (
-          <MenuItem value="XDPKM">XDPKM</MenuItem>
+          <option value="XDPKM">XDPKM</option>
         )}
       {baseFormat === 'OHPKM' &&
         !isRestricted(HGSS_TRANSFER_RESTRICTIONS, formData.dexNum, formData.formNum) && (
-          <MenuItem value="PK4">PK4</MenuItem>
+          <option value="PK4">PK4</option>
         )}
       {baseFormat === 'OHPKM' &&
         !isRestricted(BW2_TRANSFER_RESTRICTIONS, formData.dexNum, formData.formNum) && (
-          <MenuItem value="PK5">PK5</MenuItem>
+          <option value="PK5">PK5</option>
         )}
       {baseFormat === 'OHPKM' &&
         !isRestricted(ORAS_TRANSFER_RESTRICTIONS, formData.dexNum, formData.formNum) && (
-          <MenuItem value="PK6">PK6</MenuItem>
+          <option value="PK6">PK6</option>
         )}
       {baseFormat === 'OHPKM' &&
         !isRestricted(USUM_TRANSFER_RESTRICTIONS, formData.dexNum, formData.formNum) && (
-          <MenuItem value="PK7">PK7</MenuItem>
+          <option value="PK7">PK7</option>
         )}
       {baseFormat === 'OHPKM' &&
         !isRestricted(LGPE_TRANSFER_RESTRICTIONS, formData.dexNum, formData.formNum) && (
-          <MenuItem value="PB7">PB7</MenuItem>
+          <option value="PB7">PB7</option>
         )}
       {baseFormat === 'OHPKM' &&
         !isRestricted(SWSH_TRANSFER_RESTRICTIONS, formData.dexNum, formData.formNum) && (
-          <MenuItem value="PK8">PK8</MenuItem>
+          <option value="PK8">PK8</option>
         )}
       {baseFormat === 'OHPKM' &&
         !isRestricted(PT_TRANSFER_RESTRICTIONS, formData.dexNum, formData.formNum) && (
-          <MenuItem value="PB8">PB8</MenuItem>
+          <option value="PB8">PB8</option>
         )}
       {baseFormat === 'OHPKM' &&
         !isRestricted(LA_TRANSFER_RESTRICTIONS, formData.dexNum, formData.formNum) && (
-          <MenuItem value="PA8">PA8</MenuItem>
+          <option value="PA8">PA8</option>
         )}
       {baseFormat === 'OHPKM' &&
         !isRestricted(SV_TRANSFER_RESTRICTIONS, formData.dexNum, formData.formNum) && (
-          <MenuItem value="PK9">PK9</MenuItem>
+          <option value="PK9">PK9</option>
         )}
-    </Select>
+    </select>
   )
 }
 

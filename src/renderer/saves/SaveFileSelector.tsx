@@ -113,19 +113,20 @@ const SaveFileSelector = (props: SaveFileSelectorProps) => {
       {Object.values(recentSaves)
         .sort((a, b) => (b.lastOpened ?? 0) - (a.lastOpened ?? 0))
         .map((ref, i) => (
-          <OpenHomeButton
+          <button
             key={`save_file_${i}`}
             onClick={() => openSaveFile(ref.filePath)}
+            className="card-button"
             style={{
               width: 'calc(50% - 10px)',
-              height: 150,
+              height: 180,
               margin: 5,
               padding: 10,
               position: 'relative',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between',
-              backgroundColor: palette.primary.light,
+              backgroundColor: palette.background.paper,
               color: palette.text.secondary,
               boxShadow:
                 '0px 2px 1px -1px rgb(0 0 0 / 20%), 0px 1px 1px 0px rgb(0 0 0 / 14%), 0px 1px 3px 0px rgb(0 0 0 / 12%)',
@@ -169,8 +170,12 @@ const SaveFileSelector = (props: SaveFileSelectorProps) => {
                 textOverflow: 'ellipsis',
                 overflowX: 'hidden',
                 textAlign: 'right',
-                color: '#333',
+                color: '#fff',
                 width: '100%',
+                backgroundColor: '#3336',
+                borderRadius: 3,
+                padding: 3,
+                height: 'fit-content'
               }}
             >
               {ref.filePath}
@@ -189,7 +194,7 @@ const SaveFileSelector = (props: SaveFileSelectorProps) => {
             >
               <MoreVert />
             </IconButton>
-          </OpenHomeButton>
+          </button>
         ))}
     </div>
   )

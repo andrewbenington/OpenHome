@@ -1,9 +1,11 @@
 /* eslint-disable no-nested-ternary */
-import { Grid } from '@mui/material'
-import { useState } from 'react'
+import { Download } from '@mui/icons-material'
+import { Box, Grid } from '@mui/material'
+import { useMemo, useState } from 'react'
 import { OHPKM } from '../../types/PKMTypes'
 import { PKM } from '../../types/PKMTypes/PKM'
 import { Styles } from '../../types/types'
+import { fileTypeFromString } from '../../util/FileImport'
 import OpenHomeButton from '../components/OpenHomeButton'
 import FileTypeSelect from './FileTypeSelect'
 import MetDataMovesDisplay from './MetDataMovesDisplay'
@@ -12,7 +14,6 @@ import RawDisplay from './RawDisplay'
 import RibbonsDisplay from './RibbonsDisplay'
 import StatsDisplay from './StatsDisplay'
 import SummaryDisplay from './SummaryDisplay'
-import { fileTypeFromString } from '../../util/FileImport'
 
 const styles = {
   tabScrollContainer: {
@@ -64,35 +65,46 @@ const styles = {
 const PokemonDisplay = (props: { mon: PKM; tab: string; setTab: (_: string) => void }) => {
   const { mon, tab, setTab } = props
   const [displayMon, setDisplayMon] = useState(mon)
+  const url = useMemo(() => window.URL.createObjectURL(new Blob([displayMon.bytes])), [displayMon])
 
   return (
     <Grid container style={styles.pokemonDisplay}>
       <Grid item xs={3}>
         <div style={styles.detailsTabCol}>
-          <FileTypeSelect
-            baseFormat={mon.format}
-            currentFormat={displayMon.format}
-            formData={mon}
-            onChange={(newFormat) => {
-              if (mon.format === newFormat) {
-                setDisplayMon(mon)
-                return
-              }
-              if (newFormat === 'OHPKM') {
-                setDisplayMon(mon instanceof OHPKM ? mon : new OHPKM(undefined, mon))
-                return
-              }
-              const P = fileTypeFromString(newFormat)
-              if (!P) {
-                throw `Invalid filetype: ${P}`
-              }
-              if (mon instanceof OHPKM) {
-                setDisplayMon(new P(undefined, undefined, mon))
-              } else {
-                setDisplayMon(new P(undefined, undefined, new OHPKM(undefined, mon)))
-              }
-            }}
-          />
+          <Box display="flex">
+            <FileTypeSelect
+              baseFormat={mon.format}
+              currentFormat={displayMon.format}
+              formData={mon}
+              onChange={(newFormat) => {
+                if (mon.format === newFormat) {
+                  setDisplayMon(mon)
+                  return
+                }
+                if (newFormat === 'OHPKM') {
+                  setDisplayMon(mon instanceof OHPKM ? mon : new OHPKM(undefined, mon))
+                  return
+                }
+                const P = fileTypeFromString(newFormat)
+                if (!P) {
+                  throw `Invalid filetype: ${P}`
+                }
+                if (mon instanceof OHPKM) {
+                  setDisplayMon(new P(undefined, undefined, mon))
+                } else {
+                  setDisplayMon(new P(undefined, undefined, new OHPKM(undefined, mon)))
+                }
+              }}
+            />
+            <button style={{ margin: '8px 0px', padding: '4px 6px' }}>
+              <a
+                href={url}
+                download={`${displayMon.nickname}.${displayMon.format.toLocaleLowerCase()}`}
+              >
+                <Download sx={{ color: 'white' }} />
+              </a>
+            </button>
+          </Box>
           <OpenHomeButton
             style={{
               ...styles.tabButton,

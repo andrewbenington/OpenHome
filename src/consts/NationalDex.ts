@@ -1017,6 +1017,14 @@ export enum NDex {
   MUNKIDORI = 1015,
   FEZANDIPITI = 1016,
   OGERPON = 1017,
-
-  MAX = 1018,
+  ARCHALUDON = 1018,
+  HYDRAPPLE = 1019,
+  GOUGING_FIRE = 1020,
+  RAGING_BOLT = 1021,
+  IRON_BOULDER = 1022,
+  IRON_CROWN = 1023,
+  TERAPAGOS = 1024,
+  PECHARUNT = 1025,
 }
+
+export const NationalDexMax = Object.values(NDex).length
