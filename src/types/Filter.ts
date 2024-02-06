@@ -1,5 +1,5 @@
 import { Type } from 'pokemon-resources'
-import { POKEMON_DATA } from '../consts'
+import { PokemonData } from 'pokemon-species-data'
 import { OHPKM } from './PKMTypes'
 import { GamePKM } from './PKMTypes/GamePKM'
 
@@ -60,13 +60,13 @@ export function filterApplies(filter: Filter, mon: GamePKM | OHPKM) {
   }
 
   if (
-    !(`${mon.dexNum}` in POKEMON_DATA) ||
-    POKEMON_DATA[`${mon.dexNum}`].formes.length < mon.formNum
+    !(`${mon.dexNum}` in PokemonData) ||
+    PokemonData[`${mon.dexNum}`].formes.length < mon.formNum
   ) {
     return false
   }
 
-  const forme = POKEMON_DATA[`${mon.dexNum}`].formes[mon.formNum]
+  const forme = PokemonData[`${mon.dexNum}`].formes[mon.formNum]
   if (filter.type1 !== undefined && !forme.types.includes(filter.type1)) {
     return false
   }

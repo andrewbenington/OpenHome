@@ -1,5 +1,5 @@
 import { HTMLAttributes } from 'react'
-import { POKEMON_DATA } from '../../consts'
+import { PokemonData } from 'pokemon-species-data'
 import BoxIcons from '../images/BoxIcons.png'
 import './components.css'
 import { getPublicImageURL } from '../images/images'
@@ -26,11 +26,10 @@ export default function PokemonIcon(props: PokemonIconProps) {
   } = props
 
   const getBackgroundPosition = (mon: { dexNum: number; formNum: number }) => {
-    console.log(mon.dexNum, mon.formNum, POKEMON_DATA[mon.dexNum].formes[mon.formNum])
-    if (!POKEMON_DATA[mon.dexNum].formes[mon.formNum]) {
+    if (!PokemonData[mon.dexNum]?.formes[mon.formNum]) {
       return '0% 0%'
     }
-    const [x, y] = POKEMON_DATA[mon.dexNum].formes[mon.formNum].spriteIndex
+    const [x, y] = PokemonData[mon.dexNum].formes[mon.formNum].spriteIndex
     return `${(x / 35) * 100}% ${(y / 36) * 100}%`
   }
 

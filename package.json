@@ -46,6 +46,7 @@
     "@emotion/styled": "^11.10.5",
     "@mui/icons-material": "^5.11.0",
     "@mui/material": "^5.11.8",
+    "@mui/x-data-grid": "^6.19.3",
     "@reduxjs/toolkit": "^1.9.3",
     "big-integer": "^1.6.51",
     "buffer": "^6.0.3",
@@ -56,6 +57,7 @@
     "js-hex-editor": "^0.1.0",
     "lodash": "^4.17.21",
     "pokemon-resources": "^1.0.6",
+    "pokemon-species-data": "^0.1.0",
     "prando": "^6.0.1",
     "react-chartjs-2": "^5.2.0",
     "use-file-picker": "^1.5.2"

@@ -3,6 +3,7 @@ import { SaveType } from '../../types/types'
 import { bytesToUint16LittleEndian, bytesToUint32LittleEndian } from '../../util/ByteLogic'
 import { gen4StringToUTF } from '../../util/Strings/StringConverter'
 import { G4SAV } from './G4SAV'
+import { ParsedPath } from './path'
 
 export class HGSSSAV extends G4SAV {
   saveType = SaveType.HGSS
@@ -35,7 +36,7 @@ export class HGSSSAV extends G4SAV {
 
   footerSize: number = HGSSSAV.BLOCK_FOOTER_SIZE
 
-  constructor(path: string, bytes: Uint8Array) {
+  constructor(path: ParsedPath, bytes: Uint8Array) {
     super(path, bytes)
     // current storage block could be either the first or second one,
     // depending on save count

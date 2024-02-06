@@ -269,7 +269,7 @@ export class G8PKM
   }
 
   public set favorite(value: boolean) {
-    this.bytes[0x16] = (this.bytes[0x16] & ~8) | (value ? 8 : 0)
+    setFlag(this.bytes, 0x16, 3, value)
   }
 
   public get canGigantamax() {
@@ -277,7 +277,7 @@ export class G8PKM
   }
 
   public set canGigantamax(value: boolean) {
-    this.bytes[0x16] = (this.bytes[0x16] & ~16) | (value ? 16 : 0)
+    setFlag(this.bytes, 0x16, 4, value)
   }
 
   public get markings() {

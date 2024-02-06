@@ -6,7 +6,7 @@ import {
   ItemGen2ToString,
   isGameBoy,
 } from 'pokemon-resources'
-import { NDex, POKEMON_DATA } from '../../consts'
+import { NationalDex, PokemonData, getGenderRatio } from 'pokemon-species-data'
 import { stats, statsPreSplit } from '../../types/types'
 import {
   bytesToUint16BigEndian,
@@ -57,7 +57,7 @@ export class PK2 implements BasePKMData, Gen2Stats, Gen2OnData, Gen2OnlyData {
         this.trainerName = gen12StringToUTF(this.bytes, 0x30, 8)
         this.nickname = gen12StringToUTF(this.bytes, 0x3b, 11)
       } else {
-        this.nickname = POKEMON_DATA[this.dexNum].name.toLocaleUpperCase()
+        this.nickname = PokemonData[this.dexNum].name.toLocaleUpperCase()
       }
       this.gameOfOrigin = this.metLocationIndex === 0 ? GameOfOrigin.Gold : GameOfOrigin.Crystal
     } else if (other) {
@@ -152,11 +152,8 @@ export class PK2 implements BasePKMData, Gen2Stats, Gen2OnData, Gen2OnlyData {
   }
 
   public get gender() {
-    const maleRatio =
-      POKEMON_DATA[this.dexNum].formes[0].genderRatio.M > 0 ||
-      POKEMON_DATA[this.dexNum].formes[0].genderRatio.F > 0
-        ? POKEMON_DATA[this.dexNum].formes[0].genderRatio.M
-        : -1
+    const genderRatio = getGenderRatio(this.dexNum, this.formNum)
+    const maleRatio = genderRatio.male > 0 || genderRatio.female > 0 ? genderRatio.male : -1
     if (maleRatio === -1) {
       return 2
     }
@@ -164,7 +161,7 @@ export class PK2 implements BasePKMData, Gen2Stats, Gen2OnData, Gen2OnlyData {
   }
 
   public get formNum() {
-    if (this.dexNum === NDex.UNOWN) {
+    if (this.dexNum === NationalDex.Unown) {
       let ivCombinationVal = ((this.dvs.atk >> 1) & 0b11) << 6
       ivCombinationVal += ((this.dvs.def >> 1) & 0b11) << 4
       ivCombinationVal += ((this.dvs.spe >> 1) & 0b11) << 2
@@ -358,7 +355,7 @@ export class PK2 implements BasePKMData, Gen2Stats, Gen2OnData, Gen2OnlyData {
   }
 
   public get isFatefulEncounter(): boolean {
-    return this.dexNum === NDex.MEW
+    return this.dexNum === NationalDex.Mew || this.dexNum === NationalDex.Celebi
   }
 
   // TODO: gen 2 stat calc

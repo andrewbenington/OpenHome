@@ -22,7 +22,6 @@ const styles = {
     fontWeight: 'bold',
     fontSize: 16,
     boxShadow: 'none',
-    '.MuiOutlinedInput-notchedOutline': { border: 0 },
     flex: 1,
     margin: 8,
   },

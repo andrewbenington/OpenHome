@@ -9,9 +9,12 @@ import {
   SpecialAtkCharacteristics,
   SpecialDefCharacteristics,
   SpeedCharacteristics,
+  Type,
+  Types,
 } from 'pokemon-resources'
+import { NationalDex, PokemonData } from 'pokemon-species-data'
 import Prando from 'prando'
-import { MOVE_DATA, NDex, POKEMON_DATA, Types } from '../../consts'
+import { MOVE_DATA } from '../../consts'
 import { stats, statsPreSplit } from '../../types/types'
 import {
   bytesToUint16LittleEndian,
@@ -47,20 +50,20 @@ export const writeIVsToBuffer = (
 }
 
 export const getAbilityFromNumber = (dexNum: number, formNum: number, abilityNum: number) => {
-  if (!POKEMON_DATA[dexNum]?.formes[formNum]) {
+  if (!PokemonData[dexNum]?.formes[formNum]) {
     return 'None'
   }
   if (abilityNum === 4) {
     return (
-      POKEMON_DATA[dexNum].formes[formNum].abilityH ?? POKEMON_DATA[dexNum].formes[formNum].ability1
+      PokemonData[dexNum].formes[formNum].abilityH ?? PokemonData[dexNum].formes[formNum].ability1
     )
   }
   if (abilityNum === 2) {
     return (
-      POKEMON_DATA[dexNum].formes[formNum].ability2 ?? POKEMON_DATA[dexNum].formes[formNum].ability1
+      PokemonData[dexNum].formes[formNum].ability2 ?? PokemonData[dexNum].formes[formNum].ability1
     )
   }
-  return POKEMON_DATA[dexNum].formes[formNum].ability1
+  return PokemonData[dexNum].formes[formNum].ability1
 }
 
 export const getUnownLetterGen3 = (personalityValue: number) => {
@@ -72,17 +75,17 @@ export const getUnownLetterGen3 = (personalityValue: number) => {
 }
 
 export const generateTeraType = (prng: Prando, dexNum: number, formNum: number) => {
-  if (!POKEMON_DATA[dexNum]?.formes[formNum]) {
+  if (!PokemonData[dexNum]?.formes[formNum]) {
     return 0
   }
-  const { types: monTypes } = POKEMON_DATA[dexNum].formes[formNum]
+  const { types: monTypes } = PokemonData[dexNum].formes[formNum]
   const baseMon = getBaseMon(dexNum, formNum)
-  if (!POKEMON_DATA[baseMon.dexNumber]?.formes[baseMon.formeNumber]) {
+  if (!PokemonData[baseMon.dexNumber]?.formes[baseMon.formeNumber]) {
     return 0
   }
-  const { types: baseMonTypes } = POKEMON_DATA[baseMon.dexNumber].formes[baseMon.formeNumber]
+  const { types: baseMonTypes } = PokemonData[baseMon.dexNumber].formes[baseMon.formeNumber]
 
-  let types = _.intersection(monTypes, baseMonTypes)
+  let types: readonly Type[] = _.intersection(monTypes, baseMonTypes)
   if (types.length === 0) {
     types = baseMonTypes
   }
@@ -198,10 +201,10 @@ export const generatePersonalityValue = () => {
 // recursively returns prevo
 export const getBaseMon = (dexNum: number, forme: number) => {
   let mon = { dexNumber: dexNum, formeNumber: forme }
-  let prevo = POKEMON_DATA[dexNum]?.formes[forme]?.prevo
+  let prevo = PokemonData[dexNum]?.formes[forme]?.prevo
   while (prevo) {
     mon = prevo
-    prevo = POKEMON_DATA[mon.dexNumber]?.formes[mon.formeNumber]?.prevo
+    prevo = PokemonData[mon.dexNumber]?.formes[mon.formeNumber]?.prevo
   }
   return mon
 }
@@ -214,8 +217,11 @@ export const formatHasColorMarkings = (format: string) => {
 }
 
 export const getTypes = (mon: BasePKMData) => {
-  let types = POKEMON_DATA[mon.dexNum]?.formes[mon.formNum]?.types
-  if (mon.format === 'PK1' && (mon.dexNum === NDex.MAGNEMITE || mon.dexNum === NDex.MAGNETON)) {
+  let types = PokemonData[mon.dexNum]?.formes[mon.formNum]?.types
+  if (
+    mon.format === 'PK1' &&
+    (mon.dexNum === NationalDex.Magnemite || mon.dexNum === NationalDex.Magneton)
+  ) {
     types = ['Electric']
   } else if (['PK1', 'PK2', 'PK3', 'COLOPKM', 'XDPKM', 'PK4', 'PK5'].includes(mon.format)) {
     if (types?.includes('Fairy')) {
@@ -331,7 +337,7 @@ export const generatePersonalityValuePreservingAttributes = (
   const otherGender = mon.gender
   let i = 0
   let newPersonalityValue = bigInt(personalityValue)
-  const shouldCheckUnown = mon.dexNum === NDex.UNOWN
+  const shouldCheckUnown = mon.dexNum === NationalDex.Unown
   while (i < 0x10000) {
     const newGender = getGen3To5Gender(newPersonalityValue.toJSNumber(), mon.dexNum)
     const newNature = newPersonalityValue.mod(25).toJSNumber()
@@ -350,7 +356,7 @@ export const generatePersonalityValuePreservingAttributes = (
     i++
     const pvBytes = uint32ToBytesLittleEndian(personalityValue)
     let pvLower16, pvUpper16
-    if (mon.dexNum === NDex.UNOWN) {
+    if (mon.dexNum === NationalDex.Unown) {
       pvLower16 = prng.nextInt(0, 0xffff)
       pvUpper16 = prng.nextInt(0, 0xffff)
       if (mon.isShiny) {
@@ -415,4 +421,66 @@ export function getFlagsInRange(bytes: Uint8Array, offset: number, size: number)
   }
 
   return flags
+}
+
+const hpTypes: Type[] = [
+  'Fighting',
+  'Flying',
+  'Poison',
+  'Ground',
+  'Rock',
+  'Bug',
+  'Ghost',
+  'Steel',
+  'Fire',
+  'Water',
+  'Grass',
+  'Electric',
+  'Psychic',
+  'Ice',
+  'Dragon',
+  'Dark',
+]
+
+export type HiddenPowerWithBP = {
+  type: Type
+  power: number
+}
+
+export function getHiddenPowerGen2(dvs: statsPreSplit): HiddenPowerWithBP {
+  const typeIndex = ((dvs.atk & 0b11) << 2) + (dvs.def & 0b11)
+
+  const v = mostSignificantBit(dvs.spc)
+  const w = mostSignificantBit(dvs.spe)
+  const x = mostSignificantBit(dvs.def)
+  const z = mostSignificantBit(dvs.atk)
+
+  const numerator = 5 * ((z << 3) + (x << 2) + (w << 1) + v + (dvs.spc & 0x11))
+  const basePower = Math.floor(numerator / 2) + 31
+  return {
+    type: hpTypes[typeIndex],
+    power: basePower,
+  }
+}
+
+function mostSignificantBit(value: number) {
+  return value & 0b1000 ? 1 : 0
+}
+
+export function getHiddenPowerType(ivs: stats): Type {
+  const numerator =
+    [0, ivs.spd, ivs.spa, ivs.spe, ivs.def, ivs.atk, ivs.hp].reduce(
+      (prev, value) => (prev << 1) + (value & 1)
+    ) * 15
+
+  return hpTypes[Math.floor(numerator / 63)]
+}
+
+export function getHiddenPowerPower(ivs: stats): number {
+  const numerator =
+    [0, ivs.spd, ivs.spa, ivs.spe, ivs.def, ivs.atk, ivs.hp].reduce(
+      (prev, value) => (prev << 1) + ((value >> 1) & 1)
+    ) * 40
+
+  return Math.floor(numerator / 63) + 30
 }

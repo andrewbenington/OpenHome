@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import { NationalDex } from 'pokemon-species-data'
 import {
   CapPikachus,
   Gen89RegionalForms,
@@ -30,146 +31,149 @@ import {
   UNBOUND,
   WASH,
 } from './Formes'
-import { NDex } from './NationalDex'
 
 export const GEN1_TRANSFER_RESTRICTIONS: TransferRestrictions = {
-  maxDexNum: NDex.MEW,
+  maxDexNum: NationalDex.Mew,
   excludedForms: { ...RegionalForms, ...CapPikachus },
 }
 
 export const GEN2_TRANSFER_RESTRICTIONS: TransferRestrictions = {
-  maxDexNum: NDex.CELEBI,
+  maxDexNum: NationalDex.Celebi,
   excludedForms: {
     ...RegionalForms,
     ...CapPikachus,
-    [NDex.PICHU]: [SPIKY_EAR],
-    [NDex.UNOWN]: [EXCLAMATION, QUESTION],
+    [NationalDex.Pichu]: [SPIKY_EAR],
+    [NationalDex.Unown]: [EXCLAMATION, QUESTION],
   },
 }
 
 export const GEN3_TRANSFER_RESTRICTIONS: TransferRestrictions = {
-  maxDexNum: NDex.DEOXYS,
+  maxDexNum: NationalDex.Deoxys,
   excludedForms: {
     ...RegionalForms,
     ...CapPikachus,
-    [NDex.PICHU]: [SPIKY_EAR],
+    [NationalDex.Pichu]: [SPIKY_EAR],
   },
 }
 
 export const DP_TRANSFER_RESTRICTIONS: TransferRestrictions = {
-  maxDexNum: NDex.ARCEUS,
+  maxDexNum: NationalDex.Arceus,
   excludedForms: {
     ...RegionalForms,
     ...CapPikachus,
-    [NDex.PICHU]: [SPIKY_EAR],
-    [NDex.ROTOM]: [HEAT, WASH, FROST, FAN, MOW],
-    [NDex.DIALGA]: [ORIGIN],
-    [NDex.PALKIA]: [ORIGIN],
-    [NDex.GIRATINA]: [ORIGIN],
-    [NDex.SHAYMIN]: [SKY],
-    [NDex.ARCEUS]: [FAIRY],
+    [NationalDex.Pichu]: [SPIKY_EAR],
+    [NationalDex.Rotom]: [HEAT, WASH, FROST, FAN, MOW],
+    [NationalDex.Dialga]: [ORIGIN],
+    [NationalDex.Palkia]: [ORIGIN],
+    [NationalDex.Giratina]: [ORIGIN],
+    [NationalDex.Shaymin]: [SKY],
+    [NationalDex.Arceus]: [FAIRY],
   },
 }
 
 export const PT_TRANSFER_RESTRICTIONS: TransferRestrictions = {
-  maxDexNum: NDex.ARCEUS,
+  maxDexNum: NationalDex.Arceus,
   excludedForms: {
     ...RegionalForms,
     ...CapPikachus,
-    [NDex.PICHU]: [SPIKY_EAR],
-    [NDex.DIALGA]: [ORIGIN],
-    [NDex.PALKIA]: [ORIGIN],
-    [NDex.ARCEUS]: [FAIRY],
+    [NationalDex.Pichu]: [SPIKY_EAR],
+    [NationalDex.Dialga]: [ORIGIN],
+    [NationalDex.Palkia]: [ORIGIN],
+    [NationalDex.Arceus]: [FAIRY],
   },
 }
 
 export const HGSS_TRANSFER_RESTRICTIONS: TransferRestrictions = {
-  maxDexNum: NDex.ARCEUS,
+  maxDexNum: NationalDex.Arceus,
   excludedForms: {
     ...RegionalForms,
     ...CapPikachus,
-    [NDex.DIALGA]: [ORIGIN],
-    [NDex.PALKIA]: [ORIGIN],
-    [NDex.ARCEUS]: [FAIRY],
+    [NationalDex.Dialga]: [ORIGIN],
+    [NationalDex.Palkia]: [ORIGIN],
+    [NationalDex.Arceus]: [FAIRY],
   },
 }
 
 export const BW_TRANSFER_RESTRICTIONS: TransferRestrictions = {
-  maxDexNum: NDex.GENESECT,
+  maxDexNum: NationalDex.Genesect,
   excludedForms: {
     ...RegionalForms,
     ...CapPikachus,
-    [NDex.PICHU]: [SPIKY_EAR],
-    [NDex.DIALGA]: [ORIGIN],
-    [NDex.PALKIA]: [ORIGIN],
-    [NDex.ARCEUS]: [FAIRY],
-    [NDex.TORNADUS]: [THERIAN],
-    [NDex.THUNDURUS]: [THERIAN],
-    [NDex.LANDORUS]: [THERIAN],
-    [NDex.KELDEO]: [RESOLUTE],
+    [NationalDex.Pichu]: [SPIKY_EAR],
+    [NationalDex.Dialga]: [ORIGIN],
+    [NationalDex.Palkia]: [ORIGIN],
+    [NationalDex.Arceus]: [FAIRY],
+    [NationalDex.Tornadus]: [THERIAN],
+    [NationalDex.Thundurus]: [THERIAN],
+    [NationalDex.Landorus]: [THERIAN],
+    [NationalDex.Keldeo]: [RESOLUTE],
   },
 }
 
 export const BW2_TRANSFER_RESTRICTIONS: TransferRestrictions = {
-  maxDexNum: NDex.GENESECT,
+  maxDexNum: NationalDex.Genesect,
   excludedForms: {
     ...RegionalForms,
     ...CapPikachus,
-    [NDex.PICHU]: [SPIKY_EAR],
-    [NDex.DIALGA]: [ORIGIN],
-    [NDex.PALKIA]: [ORIGIN],
-    [NDex.ARCEUS]: [FAIRY],
+    [NationalDex.Pichu]: [SPIKY_EAR],
+    [NationalDex.Dialga]: [ORIGIN],
+    [NationalDex.Palkia]: [ORIGIN],
+    [NationalDex.Arceus]: [FAIRY],
   },
 }
 
 export const XY_TRANSFER_RESTRICTIONS: TransferRestrictions = {
-  maxDexNum: NDex.VOLCANION,
+  maxDexNum: NationalDex.Volcanion,
   excludedForms: {
     ...RegionalForms,
     ...CapPikachus,
-    [NDex.PICHU]: [SPIKY_EAR],
-    [NDex.DIALGA]: [ORIGIN],
-    [NDex.PALKIA]: [ORIGIN],
-    [NDex.ZYGARDE]: [TEN_PCT, TEN_PCT_PC, COMPLETE],
-    [NDex.HOOPA]: [UNBOUND],
+    [NationalDex.Pichu]: [SPIKY_EAR],
+    [NationalDex.Dialga]: [ORIGIN],
+    [NationalDex.Palkia]: [ORIGIN],
+    [NationalDex.Zygarde]: [TEN_PCT, TEN_PCT_PC, COMPLETE],
+    [NationalDex.Hoopa]: [UNBOUND],
   },
 }
 
 export const ORAS_TRANSFER_RESTRICTIONS: TransferRestrictions = {
-  maxDexNum: NDex.VOLCANION,
+  maxDexNum: NationalDex.Volcanion,
   excludedForms: {
     ...RegionalForms,
     ...CapPikachus,
-    [NDex.PICHU]: [SPIKY_EAR],
-    [NDex.DIALGA]: [ORIGIN],
-    [NDex.PALKIA]: [ORIGIN],
-    [NDex.ZYGARDE]: [TEN_PCT, TEN_PCT_PC, COMPLETE],
+    [NationalDex.Pichu]: [SPIKY_EAR],
+    [NationalDex.Dialga]: [ORIGIN],
+    [NationalDex.Palkia]: [ORIGIN],
+    [NationalDex.Zygarde]: [TEN_PCT, TEN_PCT_PC, COMPLETE],
   },
 }
 
 export const SM_TRANSFER_RESTRICTIONS: TransferRestrictions = {
-  maxDexNum: NDex.MARSHADOW,
+  maxDexNum: NationalDex.Marshadow,
   excludedForms: {
     ...Gen89RegionalForms,
-    [NDex.PICHU]: [SPIKY_EAR],
-    [NDex.DIALGA]: [ORIGIN],
-    [NDex.PALKIA]: [ORIGIN],
-    [NDex.NECROZMA]: [DUSK_MANE, DAWN_WINGS, ULTRA],
+    [NationalDex.Pichu]: [SPIKY_EAR],
+    [NationalDex.Dialga]: [ORIGIN],
+    [NationalDex.Palkia]: [ORIGIN],
+    [NationalDex.Necrozma]: [DUSK_MANE, DAWN_WINGS, ULTRA],
   },
 }
 
 export const USUM_TRANSFER_RESTRICTIONS: TransferRestrictions = {
-  maxDexNum: NDex.ZERAORA,
+  maxDexNum: NationalDex.Zeraora,
   excludedForms: {
     ...Gen89RegionalForms,
-    [NDex.PICHU]: [SPIKY_EAR],
-    [NDex.DIALGA]: [ORIGIN],
-    [NDex.PALKIA]: [ORIGIN],
+    [NationalDex.Pichu]: [SPIKY_EAR],
+    [NationalDex.Dialga]: [ORIGIN],
+    [NationalDex.Palkia]: [ORIGIN],
   },
 }
 
 export const LGPE_TRANSFER_RESTRICTIONS: TransferRestrictions = {
-  transferableDexNums: [..._.range(NDex.BULBASAUR, NDex.CHIKORITA), NDex.MELTAN, NDex.MELMETAL],
+  transferableDexNums: [
+    ..._.range(NationalDex.Bulbasaur, NationalDex.Chikorita),
+    NationalDex.Meltan,
+    NationalDex.Melmetal,
+  ],
   excludedForms: Gen89RegionalForms,
 }
 
@@ -214,9 +218,9 @@ export const SWSH_TRANSFER_RESTRICTIONS: TransferRestrictions = {
   excludedForms: {
     ...HisuianForms,
     ...PaldeanForms,
-    [NDex.PICHU]: [SPIKY_EAR],
-    [NDex.DIALGA]: [ORIGIN],
-    [NDex.PALKIA]: [ORIGIN],
+    [NationalDex.Pichu]: [SPIKY_EAR],
+    [NationalDex.Dialga]: [ORIGIN],
+    [NationalDex.Palkia]: [ORIGIN],
   },
 }
 
@@ -262,7 +266,7 @@ export const SV_TRANSFER_RESTRICTIONS: TransferRestrictions = {
     752, 764, 774, 789, 790, 791, 792, 800, 868, 869, 884,
   ],
   excludedForms: {
-    [NDex.PICHU]: [SPIKY_EAR],
+    [NationalDex.Pichu]: [SPIKY_EAR],
   },
 }
 

@@ -3,6 +3,7 @@ import { OHPKM } from '../../types/PKMTypes/OHPKM'
 import { TransferRestrictions } from '../../types/TransferRestrictions'
 import { SaveRef, SaveType } from '../../types/types'
 import { PKM } from '../PKMTypes/PKM'
+import { ParsedPath } from './path'
 
 export class Box<P extends PKM> {
   name: string
@@ -30,7 +31,7 @@ export class SAV<P extends PKM> {
 
   transferRestrictions: TransferRestrictions = {}
 
-  filePath: string
+  filePath: ParsedPath
 
   fileCreated?: Date
 
@@ -54,6 +55,8 @@ export class SAV<P extends PKM> {
 
   invalid: boolean = false
 
+  tooEarlyToOpen: boolean = false
+
   getSaveRef: () => SaveRef = () => {
     return {
       filePath: this.filePath,
@@ -67,7 +70,7 @@ export class SAV<P extends PKM> {
 
   updatedBoxSlots: BoxCoordinates[] = []
 
-  constructor(path: string, bytes: Uint8Array) {
+  constructor(path: ParsedPath, bytes: Uint8Array) {
     this.filePath = path
     this.bytes = bytes
   }

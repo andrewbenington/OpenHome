@@ -9,6 +9,7 @@ import { utf16BytesToString } from '../../util/Strings/StringConverter'
 import { OHPKM, PK6 } from '../PKMTypes'
 import { SaveType } from '../types'
 import { Box, SAV } from './SAV'
+import { ParsedPath } from './path'
 
 const XY_PC_OFFSET = 0x22600
 const XY_PC_CHECKSUM_OFFSET = 0x655c2
@@ -29,7 +30,7 @@ export class G6SAV extends SAV<PK6> {
   pcOffset = XY_PC_OFFSET
   pcChecksumOffset = XY_PC_CHECKSUM_OFFSET
 
-  constructor(path: string, bytes: Uint8Array) {
+  constructor(path: ParsedPath, bytes: Uint8Array) {
     super(path, bytes)
     this.name = utf16BytesToString(this.bytes, this.trainerDataOffset + 72, 0x10)
     this.tid = bytesToUint16LittleEndian(this.bytes, this.trainerDataOffset)
@@ -90,7 +91,6 @@ export class G6SAV extends SAV<PK6> {
             changedMon instanceof OHPKM ? new PK6(undefined, undefined, changedMon) : changedMon
           if (mon?.gameOfOrigin && mon?.dexNum) {
             mon.refreshChecksum()
-            console.log(`setting ${writeIndex.toString(16)}`)
             this.bytes.set(mon.toPCBytes(), writeIndex)
           }
         } catch (e) {

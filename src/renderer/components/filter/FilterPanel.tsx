@@ -10,15 +10,16 @@ import {
   Types,
 } from 'pokemon-resources'
 import { useContext, useMemo } from 'react'
-import { OpenHomeRibbons, POKEMON_DATA } from 'src/consts'
+import { OpenHomeRibbons } from 'src/consts'
+import { PokemonData } from 'pokemon-species-data'
 import { getOriginMark } from 'src/renderer/images/game'
 import { getRibbonSpritePath } from 'src/renderer/images/ribbons'
 import { getPublicImageURL } from '../../images/images'
 import { BallsList, getItemIconPath } from '../../images/items'
-import { FilterContext } from '../../state/filter'
 import PokemonIcon from '../PokemonIcon'
 import TypeIcon from '../TypeIcon'
 import FilterAutocomplete from './FilterAutocomplete'
+import { FilterContext } from 'src/renderer/state/filter'
 
 type SelectOption = {
   label: string
@@ -29,7 +30,7 @@ export default function FilterPanel() {
   const [filterState, dispatchFilterState] = useContext(FilterContext)
 
   const currentMon = useMemo(
-    () => (filterState.dexNumber ? POKEMON_DATA[filterState.dexNumber] : undefined),
+    () => (filterState.dexNumber ? PokemonData[filterState.dexNumber] : undefined),
     [filterState.dexNumber]
   )
 
@@ -67,7 +68,7 @@ export default function FilterPanel() {
       </div>
       <Stack margin={1} spacing={1}>
         <FilterAutocomplete
-          options={Object.values(POKEMON_DATA)}
+          options={Object.values(PokemonData)}
           groupBy={(option) => `Generation ${option.formes[0].gen}`}
           labelField="name"
           indexField="nationalDex"

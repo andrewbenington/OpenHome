@@ -11,7 +11,8 @@ import {
   isHoenn,
   isKanto,
 } from 'pokemon-resources'
-import { Gen3ContestRibbons, Gen3StandardRibbons, NDex, POKEMON_DATA } from '../../consts'
+import { NationalDex, PokemonData } from 'pokemon-species-data'
+import { Gen3ContestRibbons, Gen3StandardRibbons } from '../../consts'
 import { contestStats, marking, stats } from '../../types/types'
 import {
   bytesToUint16LittleEndian,
@@ -221,7 +222,7 @@ export class PK3 implements Gen3OnData {
   }
 
   public get formNum() {
-    if (this.dexNum === NDex.UNOWN) {
+    if (this.dexNum === NationalDex.Unown) {
       let letterValue = (this.personalityValue >> 24) & 0x3
       letterValue = ((this.personalityValue >> 16) & 0x3) | (letterValue << 2)
       letterValue = ((this.personalityValue >> 8) & 0x3) | (letterValue << 2)
@@ -304,8 +305,8 @@ export class PK3 implements Gen3OnData {
   }
 
   public get ability() {
-    const ability1 = POKEMON_DATA[this.dexNum]?.formes[0].ability1
-    const ability2 = POKEMON_DATA[this.dexNum]?.formes[0].ability2
+    const ability1 = PokemonData[this.dexNum]?.formes[0].ability1
+    const ability2 = PokemonData[this.dexNum]?.formes[0].ability2
     if (this.abilityNum === 2 && ability2 && AbilityFromString(ability2) <= GEN3_ABILITY_MAX) {
       return ability2
     }

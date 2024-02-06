@@ -58,7 +58,6 @@ const styles = {
     border: 0,
     margin: 1,
     boxShadow: 'none',
-    '.MuiOutlinedInput-notchedOutline': { border: 0 },
   },
 } as Styles
 

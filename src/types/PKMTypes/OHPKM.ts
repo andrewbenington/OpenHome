@@ -9,8 +9,9 @@ import {
   Languages,
   getMetLocation,
 } from 'pokemon-resources'
+import { NationalDex } from 'pokemon-species-data'
 import Prando from 'prando'
-import { Gen34ContestRibbons, Gen34TowerRibbons, NDex, OpenHomeRibbons } from '../../consts'
+import { Gen34ContestRibbons, Gen34TowerRibbons, OpenHomeRibbons } from '../../consts'
 import { ShadowIDsColosseum, ShadowIDsXD } from '../../consts/ShadowIDs'
 import {
   contestStats,
@@ -143,7 +144,7 @@ export class OHPKM
         })
 
         this.dvs = dvsFromIVs(other.ivs, other.isShiny)
-        if (other.dexNum === NDex.UNOWN) {
+        if (other.dexNum === NationalDex.Unown) {
           const letterBits = other.formNum * 10
           const newDvs = this.dvs
           newDvs.atk = (newDvs.atk & 0b1001) | (((letterBits >> 6) & 0b11) << 1)
@@ -171,7 +172,7 @@ export class OHPKM
           this.metLevel = 0
         }
 
-        if (other.dexNum === NDex.MEW || other.dexNum === NDex.CELEBI) {
+        if (other.dexNum === NationalDex.Mew || other.dexNum === NationalDex.Celebi) {
           this.isFatefulEncounter = true
         }
       }

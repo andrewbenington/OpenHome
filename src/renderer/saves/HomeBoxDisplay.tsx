@@ -1,10 +1,18 @@
-import { Grid, Paper, useTheme } from '@mui/material'
+import { ArrowBack, ArrowForward } from '@mui/icons-material'
+import { Grid, Paper } from '@mui/material'
 import _ from 'lodash'
 import { PKM } from '../../types/PKMTypes/PKM'
 import { SaveCoordinates } from '../../types/types'
 import { useAppDispatch } from '../redux/hooks'
 import { useHomeData } from '../redux/selectors'
-import { cancelDrag, completeDrag, importMons, startDrag } from '../redux/slices/appSlice'
+import {
+  cancelDrag,
+  completeDrag,
+  importMons,
+  setHomeBox,
+  startDrag,
+} from '../redux/slices/appSlice'
+import ArrowButton from './ArrowButton'
 import BoxCell from './BoxCell'
 
 interface HomeBoxDisplayProps {
@@ -16,6 +24,7 @@ const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
   const { setSelectedMon } = props
 
   const dispatch = useAppDispatch()
+  const dispatchSetBox = (box: number) => dispatch(setHomeBox({ box }))
   const dispatchStartDrag = (source: SaveCoordinates) => dispatch(startDrag(source))
   const dispatchCancelDrag = () => dispatch(cancelDrag())
   const dispatchCompleteDrag = (dest: SaveCoordinates) => dispatch(completeDrag(dest))
@@ -31,6 +40,41 @@ const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
           height: 'fit-content',
         }}
       >
+        <Grid container>
+          <Grid
+            xs={2}
+            style={{
+              display: 'grid',
+              alignItems: 'center',
+            }}
+          >
+            <ArrowButton
+              onClick={() =>
+                dispatchSetBox(
+                  data.currentPCBox > 0 ? data.currentPCBox - 1 : data.boxes.length - 1
+                )
+              }
+            >
+              <ArrowBack fontSize="small" />
+            </ArrowButton>
+          </Grid>
+          <Grid xs={8} className="box-name">
+            {data.boxes[data.currentPCBox]?.name}
+          </Grid>
+          <Grid
+            xs={2}
+            style={{
+              display: 'grid',
+              alignItems: 'center',
+            }}
+          >
+            <ArrowButton
+              onClick={() => dispatchSetBox((data.currentPCBox + 1) % data.boxes.length)}
+            >
+              <ArrowForward fontSize="small" />
+            </ArrowButton>
+          </Grid>
+        </Grid>
         {_.range(10).map((row: number) => (
           <Grid container key={`pc_row_${row}`}>
             {_.range(12).map((rowIndex: number) => {

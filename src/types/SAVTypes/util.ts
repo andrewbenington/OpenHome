@@ -16,6 +16,7 @@ import { G6SAV } from './G6SAV'
 import { HGSSSAV } from './HGSSSAV'
 import { PtSAV } from './PtSAV'
 import { SAV } from './SAV'
+import { ParsedPath, emptyParsedPath } from './path'
 
 const SIZE_GEN12 = 0x8000
 const SIZE_GEN3 = 0x20000
@@ -65,17 +66,14 @@ export const getSaveType = (bytes: Uint8Array): SaveType => {
     return date === DATE_INT || date === DATE_KO
   }
   // const validGen5Footer = (mainSize: number, infoLength: number) => {
-  //   const footer = bytes.slice(
-  //     mainSize - 0x100,
-  //     mainSize - 0x100 + infoLength + 0x10
-  //   )
+  //   const footer = bytes.slice(mainSize - 0x100, mainSize - 0x100 + infoLength + 0x10)
   //   const stored = bytesToUint16LittleEndian(footer, 2)
   //   const actual = 0 // Checksums.CRC16_CCITT(footer[..infoLength]);
   //   return stored === actual
   // }
   if (bytes.length === SIZE_XY || bytes.length === SIZE_ORAS) {
     return SaveType.G6
-  } else if (bytes.length >= SIZE_GEN45) {
+  } else if (bytes.length >= SIZE_GEN45 && bytes.length <= SIZE_GEN45 + 1000) {
     if (validGen4DateAndSize(0x4c100)) {
       return SaveType.DP
     }
@@ -87,7 +85,7 @@ export const getSaveType = (bytes: Uint8Array): SaveType => {
     }
     return SaveType.G5
   }
-  if (bytes.length >= SIZE_GEN3) {
+  if (bytes.length >= SIZE_GEN3 && bytes.length <= SIZE_GEN3 + 1000) {
     const valueAtAC = bytesToUint32LittleEndian(bytes, 0xac)
     switch (valueAtAC) {
       case 1:
@@ -100,16 +98,16 @@ export const getSaveType = (bytes: Uint8Array): SaveType => {
         }
         return SaveType.RS
     }
-  } else if (bytes.length >= SIZE_GEN12) {
+  } else if (bytes.length >= SIZE_GEN12 && bytes.length <= SIZE_GEN12 + 1000) {
     // hacky
-    const g2save = new G2SAV('', bytes)
+    const g2save = new G2SAV(emptyParsedPath, bytes)
     if (g2save.areCrystalInternationalChecksumsValid()) {
       return SaveType.C_I
     }
     if (g2save.areGoldSilverChecksumsValid()) {
       return SaveType.GS_I
     }
-    const g1save = new G1SAV('', bytes)
+    const g1save = new G1SAV(emptyParsedPath, bytes)
     if (!g1save.invalid) {
       return SaveType.RBY_I
     }
@@ -118,7 +116,7 @@ export const getSaveType = (bytes: Uint8Array): SaveType => {
 }
 
 export const buildSaveFile = (
-  filePath: string,
+  filePath: ParsedPath,
   fileBytes: Uint8Array,
   lookupMaps: {
     homeMonMap?: { [key: string]: OHPKM }
@@ -143,7 +141,6 @@ export const buildSaveFile = (
             if (!gen12identifier) return
             const homeIdentifier = gen12LookupMap[gen12identifier]
             if (!homeIdentifier) return
-            // console.log(identifier.slice(0, identifier.length - 3))
             const result = Object.entries(homeMonMap).find((entry) => entry[0] === homeIdentifier)
             if (result) {
               console.info('home mon found:', result[1])

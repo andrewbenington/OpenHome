@@ -1,4 +1,5 @@
 import { CSSProperties } from 'react'
+import { ParsedPath } from './SAVTypes/path'
 
 /* eslint-disable no-unused-vars */
 export type StringToStringMap = { [key: string]: string }
@@ -141,7 +142,7 @@ export const getSaveTypeString = (saveType: SaveType): string => {
 }
 
 export interface SaveRef {
-  filePath: string
+  filePath: ParsedPath
   saveType: SaveType
   game?: string
   trainerName?: string

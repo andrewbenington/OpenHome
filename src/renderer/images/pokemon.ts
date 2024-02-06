@@ -1,4 +1,5 @@
-import { NDex, POKEMON_DATA, SWEETS } from '../../consts'
+import { NationalDex, PokemonData } from 'pokemon-species-data'
+import { SWEETS } from '../../consts'
 import { BasePKMData } from '../../types/PKMTypes'
 import { hasGen8OnData } from '../../types/interfaces/gen8'
 import { StringToStringMap } from '../../types/types'
@@ -47,10 +48,10 @@ export const fileToSpriteFolder: StringToStringMap = {
 
 export const getPokemonSpritePath = (mon: BasePKMData, format?: string) => {
   const monFormat = format ?? mon.format
-  let spriteName = POKEMON_DATA[mon.dexNum]?.formes[mon.formNum]?.sprite ?? ''
-  if (hasGen8OnData(mon) && mon.dexNum === NDex.ALCREMIE) {
+  let spriteName = PokemonData[mon.dexNum]?.formes[mon.formNum]?.sprite ?? ''
+  if (hasGen8OnData(mon) && mon.dexNum === NationalDex.Alcremie) {
     spriteName = `${
-      POKEMON_DATA[mon.dexNum]?.formes[mon.formNum]?.formeName?.toLowerCase() ??
+      PokemonData[mon.dexNum]?.formes[mon.formNum]?.formeName?.toLowerCase() ??
       'alcremie-vanilla-cream'
     }-${SWEETS[mon.formArgument ?? 0].toLocaleLowerCase()}`
   }

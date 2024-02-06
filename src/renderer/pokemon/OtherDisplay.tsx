@@ -7,7 +7,7 @@ import { hasGen4OnData, hasGen4OnlyData, shinyLeafValues } from 'src/types/inter
 import { hasGen6OnData, hasN3DSOnlyData } from 'src/types/interfaces/gen6'
 import { hasGen8OnData, hasGen8OnlyData } from 'src/types/interfaces/gen8'
 import { Gen9OnlyData, hasGen9OnlyData } from 'src/types/interfaces/gen9'
-import { Countries, EncounterTypes, MOVE_DATA, NDex, SWEETS } from '../../consts'
+import { Countries, EncounterTypes, MOVE_DATA, SWEETS } from '../../consts'
 import {
   GEN2_TRANSFER_RESTRICTIONS,
   HGSS_TRANSFER_RESTRICTIONS,
@@ -32,12 +32,18 @@ import { hasGameBoyData } from '../../types/interfaces/stats'
 import { OHPKM } from '../../types/PKMTypes'
 import { get16BitChecksumLittleEndian } from 'src/util/ByteLogic'
 import { isGen4 } from 'pokemon-resources'
-import { getFlagsInRange } from 'src/types/PKMTypes/util'
+import {
+  getFlagsInRange,
+  getHiddenPowerGen2,
+  getHiddenPowerPower,
+  getHiddenPowerType,
+} from 'src/types/PKMTypes/util'
 import { SwShTRMoveIndexes } from 'pokemon-resources'
 import { BDSPTMMoveIndexes } from 'pokemon-resources'
 import { LATutorMoveIndexes } from 'pokemon-resources'
 import { SVTMMoveIndexes } from 'pokemon-resources'
 import { useMemo } from 'react'
+import { NationalDex } from 'pokemon-species-data'
 
 const styles = {
   accordion: {
@@ -147,7 +153,8 @@ const OtherDisplay = (props: { mon: PKM }) => {
       ) : (
         <div />
       )}
-      {hasGen3OnData(mon) && mon.dexNum === NDex.WURMPLE ? (
+      <HiddenPowerDisplay mon={mon} />
+      {hasGen3OnData(mon) && mon.dexNum === NationalDex.Wurmple ? (
         <AttributeRow
           label="Wurmple Evolution"
           value={
@@ -162,12 +169,12 @@ const OtherDisplay = (props: { mon: PKM }) => {
       ) : (
         <div />
       )}
-      {hasGen6OnData(mon) && mon.dexNum === NDex.ALCREMIE ? (
+      {hasGen6OnData(mon) && mon.dexNum === NationalDex.Alcremie ? (
         <AttributeRow label="Sweet" value={SWEETS[mon.formArgument]} />
       ) : (
         <div />
       )}
-      {hasGen3OnData(mon) && mon.dexNum === NDex.DUNSPARCE ? (
+      {hasGen3OnData(mon) && mon.dexNum === NationalDex.Dunsparce ? (
         <AttributeRow
           label="Dudunsparce"
           value={
@@ -179,7 +186,7 @@ const OtherDisplay = (props: { mon: PKM }) => {
       ) : (
         <div />
       )}
-      {hasGen6OnData(mon) && mon.dexNum === NDex.TANDEMAUS && (
+      {hasGen6OnData(mon) && mon.dexNum === NationalDex.Tandemaus && (
         <AttributeRow
           label="Maushold"
           value={mon.encryptionConstant % 100 ? 'Family of Four' : 'Family of Three'}
@@ -404,5 +411,53 @@ function ScarletVioletData(props: { mon: Gen9OnlyData }) {
       </AttributeRow>
       <AttributeRow label="Obedience" value={mon.obedienceLevel.toString()} />
     </>
+  )
+}
+
+function HiddenPowerDisplay(props: { mon: PKM }) {
+  const { mon } = props
+  if (!('dvs' in mon)) {
+    return (
+      <AttributeRow label="Hidden Power">
+        <TypeIcon type={getHiddenPowerType(mon.ivs)} />{' '}
+        <p style={{ paddingLeft: 8 }}>{` ${getHiddenPowerPower(mon.ivs).toString()} Base Power`}</p>
+      </AttributeRow>
+    )
+  }
+
+  const { type: g2type, power: g2power } = getHiddenPowerGen2(mon.dvs)
+
+  if (mon instanceof OHPKM) {
+    return (
+      <Accordion
+        disableGutters
+        elevation={0}
+        TransitionProps={{ unmountOnExit: true }}
+        sx={styles.accordion}
+      >
+        <AccordionSummary
+          expandIcon={<ArrowForwardIosSharp sx={{ fontSize: '0.9rem' }} />}
+          sx={styles.accordionSummary}
+        >
+          <AttributeRow label="Hidden Power">
+            <TypeIcon type={getHiddenPowerType(mon.ivs)} />
+          </AttributeRow>
+        </AccordionSummary>
+        <AttributeRow label="Gen 2" indent={10}>
+          <TypeIcon type={g2type} /> <p style={{ paddingLeft: 8 }}>{` ${g2power} Base Power`}</p>
+        </AttributeRow>
+        <AttributeRow
+          label="Power (Gen 3-5)"
+          value={getHiddenPowerPower(mon.ivs).toString()}
+          indent={10}
+        />
+      </Accordion>
+    )
+  }
+
+  return (
+    <AttributeRow label="Hidden Power">
+      <TypeIcon type={g2type} /> <p style={{ paddingLeft: 8 }}>{` ${g2power} Base Power`}</p>
+    </AttributeRow>
   )
 }

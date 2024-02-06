@@ -1,6 +1,7 @@
 import { dialog } from 'electron'
 import fs from 'fs'
 import _ from 'lodash'
+import path from 'path'
 
 export function initializeFolders(appDataPath: string) {
   if (!fs.existsSync(`${appDataPath}/OpenHome/storage/boxes`)) {
@@ -85,3 +86,85 @@ export function writeStringToFile(path: string, content: string) {
 export function writeBytesToPath(path: string, bytes: Uint8Array) {
   fs.writeFileSync(path, bytes)
 }
+
+export function recursivelyFindCitraSaves(currentPath: string) {
+  const files = fs.readdirSync(currentPath)
+  if (files.includes('data')) {
+    if (fs.existsSync(path.join(currentPath, 'data', '00000001', 'main'))) {
+      return [path.join(currentPath, 'data', '00000001', 'main')]
+    }
+    return []
+  }
+  const foundSaves: string[] = []
+  files.forEach((file) => {
+    const newPath = path.join(currentPath, file)
+    if (fs.lstatSync(newPath).isDirectory()) {
+      foundSaves.push(...recursivelyFindCitraSaves(path.join(currentPath, file)))
+    }
+  })
+  return foundSaves
+}
+export function recursivelyFindOpenEmuSaves(currentPath: string) {
+  const files = fs.readdirSync(currentPath)
+  if (files.includes('data')) {
+    if (fs.existsSync(path.join(currentPath, 'data', '00000001', 'main'))) {
+      return [path.join(currentPath, 'data', '00000001', 'main')]
+    }
+    return []
+  }
+  const foundSaves: string[] = []
+  files.forEach((file) => {
+    const newPath = path.join(currentPath, file)
+    if (fs.lstatSync(newPath).isDirectory()) {
+      foundSaves.push(...recursivelyFindCitraSaves(path.join(currentPath, file)))
+    }
+  })
+  return foundSaves
+}
+
+export function recursivelyFindDeSamuMESaves(currentPath: string) {
+  const files = fs.readdirSync(currentPath)
+  if (files.includes('Battery Saves')) {
+    return fs
+      .readdirSync(path.join(currentPath, 'Battery Saves'))
+      .filter((file) => file.endsWith('.dsv'))
+      .map((file) => path.join(currentPath, 'Battery Saves', file))
+  }
+  if (files.includes('Battery')) {
+    return fs
+      .readdirSync(path.join(currentPath, 'Battery'))
+      .filter((file) => file.endsWith('.dsv'))
+      .map((file) => path.join(currentPath, 'Battery', file))
+  }
+  const foundSaves: string[] = []
+  files.forEach((file) => {
+    const newPath = path.join(currentPath, file)
+    if (fs.lstatSync(newPath).isDirectory()) {
+      foundSaves.push(...recursivelyFindDeSamuMESaves(path.join(currentPath, file)))
+    }
+  })
+  return foundSaves
+}
+
+export function recursivelyFindMGBASaves(currentPath: string) {
+  const files = fs.readdirSync(currentPath)
+  if (files.includes('Battery Saves')) {
+    return fs
+      .readdirSync(path.join(currentPath, 'Battery Saves'))
+      .filter((file) => file.endsWith('.sav'))
+      .map((file) => path.join(currentPath, 'Battery Saves', file))
+  }
+  const foundSaves: string[] = []
+  files.forEach((file) => {
+    const newPath = path.join(currentPath, file)
+    if (fs.lstatSync(newPath).isDirectory()) {
+      foundSaves.push(...recursivelyFindMGBASaves(path.join(currentPath, file)))
+    }
+  })
+  return foundSaves
+}
+// export function findSaveFilesInDataFolder(path: string) {
+//   const files = fs.readdirSync(
+//     path.join(os.homedir(), '.local', 'share', 'citra-emu', 'sdmc', 'Nintendo 3DS')
+//   )
+// }

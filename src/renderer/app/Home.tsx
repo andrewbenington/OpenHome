@@ -2,7 +2,6 @@ import { FileOpen } from '@mui/icons-material'
 import { Box, Dialog, Stack, useTheme } from '@mui/material'
 import _ from 'lodash'
 import { useCallback, useEffect, useState } from 'react'
-import { POKEMON_DATA } from '../../consts'
 import { loadRecentSaves } from '../../renderer/redux/slices/recentSavesSlice'
 import { loadResourcesPath } from '../../renderer/redux/slices/resourcesSlice'
 import { OHPKM } from '../../types/PKMTypes'
@@ -10,8 +9,8 @@ import { PKM } from '../../types/PKMTypes/PKM'
 import { SaveCoordinates } from '../../types/types'
 import { bytesToPKM } from '../../util/FileImport'
 import { getMonFileIdentifier } from '../../util/Lookup'
+import PokemonIcon from '../components/PokemonIcon'
 import FilterPanel from '../components/filter/FilterPanel'
-import BoxIcons from '../images/BoxIcons.png'
 import PokemonDisplay from '../pokemon/PokemonDisplay'
 import { useAppDispatch } from '../redux/hooks'
 import {
@@ -208,23 +207,13 @@ const Home = () => {
           Release
           <div className="release-icon-container" style={{ display: 'flex' }}>
             {monsToRelease.map((mon, i) => {
-              if (mon.isEgg || !POKEMON_DATA[mon.dexNum]) {
-                return '0% 0%'
-              }
-              const [x, y] = POKEMON_DATA[mon.dexNum].formes[mon.formNum].spriteIndex
-              const backgroundPosition = `${(x / 35) * 100}% ${(y / 36) * 100}%`
               return (
-                <div key={`delete_mon_${i}`} style={{ width: '10%', aspectRatio: 1 }}>
-                  <div
-                    style={{
-                      background: `url(${BoxIcons}) no-repeat 0.02777% 0.02777%`,
-                      backgroundSize: '3600%',
-                      backgroundPosition,
-                      imageRendering: 'crisp-edges',
-                      aspectRatio: 1,
-                    }}
-                  />
-                </div>
+                <PokemonIcon
+                  key={`delete_mon_${i}`}
+                  dexNumber={mon.dexNum}
+                  formeNumber={mon.formNum}
+                  style={{ height: 32, width: 32 }}
+                />
               )
             })}
           </div>
@@ -245,7 +234,7 @@ const Home = () => {
         onClose={() => setOpenSaveDialog(false)}
         fullWidth
         maxWidth="lg"
-        PaperProps={{ sx: { height: 400 } }}
+        PaperProps={{ sx: { height: 800 } }}
       >
         <SaveFileSelector
           onClose={() => {

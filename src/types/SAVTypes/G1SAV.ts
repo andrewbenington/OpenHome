@@ -8,6 +8,7 @@ import { OHPKM } from '../PKMTypes/OHPKM'
 import { PK1 } from '../PKMTypes/PK1'
 import { SaveType } from '../types'
 import { Box, SAV } from './SAV'
+import { ParsedPath } from './path'
 
 export class G1SAV extends SAV<PK1> {
   pkmType = PK1
@@ -30,7 +31,7 @@ export class G1SAV extends SAV<PK1> {
 
   BOX_NICKNAME_OFFSET = 0x386
 
-  constructor(path: string, bytes: Uint8Array, fileCreated?: Date) {
+  constructor(path: ParsedPath, bytes: Uint8Array, fileCreated?: Date) {
     super(path, bytes)
     this.fileCreated = fileCreated
     this.tid = bytesToUint16BigEndian(this.bytes, 0x2605)

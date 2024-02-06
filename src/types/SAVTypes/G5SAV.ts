@@ -1,7 +1,11 @@
 import _ from 'lodash'
 import { GameOfOrigin } from 'pokemon-resources'
-import { NDex } from '../../consts'
-import { bytesToUint16LittleEndian, uint16ToBytesLittleEndian } from '../../util/ByteLogic'
+import { NationalDex } from 'pokemon-species-data'
+import {
+  bytesToUint16LittleEndian,
+  bytesToUint32LittleEndian,
+  uint16ToBytesLittleEndian,
+} from '../../util/ByteLogic'
 import { CRC16_CCITT } from '../../util/Encryption'
 import { gen5StringToUTF } from '../../util/Strings/StringConverter'
 import { OHPKM } from '../PKMTypes'
@@ -9,6 +13,7 @@ import { PK5 } from '../PKMTypes/PK5'
 import { CapPikachus, RegionalForms } from '../TransferRestrictions'
 import { SaveType } from '../types'
 import { Box, SAV } from './SAV'
+import { ParsedPath } from './path'
 
 const PC_OFFSET = 0x400
 const BOX_NAMES_OFFSET: number = 0x04
@@ -17,7 +22,7 @@ const BOX_SIZE: number = 0x1000
 
 export class G5SAV extends SAV<PK5> {
   static TRANSFER_RESTRICTIONS = {
-    maxDexNum: NDex.GENESECT,
+    maxDexNum: NationalDex.Genesect,
     excludedForms: { ...RegionalForms, ...CapPikachus, 483: [1], 484: [1] },
   }
 
@@ -37,8 +42,13 @@ export class G5SAV extends SAV<PK5> {
 
   checksumMirrorsChecksumOffset: number = 0x23f9a
 
-  constructor(path: string, bytes: Uint8Array) {
+  constructor(path: ParsedPath, bytes: Uint8Array) {
     super(path, bytes)
+    this.boxes = Array(24)
+    if (bytesToUint32LittleEndian(bytes, 0) === 0xffffffff) {
+      this.tooEarlyToOpen = true
+      return
+    }
     this.name = gen5StringToUTF(this.bytes, this.trainerDataOffset + 0x04, 0x10)
     this.tid = bytesToUint16LittleEndian(this.bytes, this.trainerDataOffset + 0x14)
     this.sid = bytesToUint16LittleEndian(this.bytes, this.trainerDataOffset + 0x16)
@@ -50,7 +60,6 @@ export class G5SAV extends SAV<PK5> {
       this.checksumMirrorsSize = 0x94
       this.checksumMirrorsChecksumOffset = 0x25fa2
     }
-    this.boxes = Array(24)
     for (let box = 0; box < 24; box++) {
       const boxName = gen5StringToUTF(this.bytes, BOX_NAMES_OFFSET + 40 * box, 20)
       this.boxes[box] = new Box(boxName, 30)

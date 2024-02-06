@@ -11,9 +11,8 @@ import {
   LanguagesGCN,
   isKanto,
 } from 'pokemon-resources'
+import { NationalDex, PokemonData } from 'pokemon-species-data'
 import { GEN3_ABILITY_MAX, GEN3_MOVE_MAX, OHPKM } from '.'
-import { NDex } from '../../consts'
-import { POKEMON_DATA } from '../../consts/Mons'
 import { Gen3ContestRibbons, Gen3StandardRibbons } from '../../consts/Ribbons'
 import { ShadowGaugeMax, ShadowIDsColosseum } from '../../consts/ShadowIDs'
 import { contestStats, marking, stats } from '../../types/types'
@@ -127,7 +126,7 @@ export class COLOPKM implements Gen3OnData, Gen3OrreData {
   }
 
   public get formNum() {
-    if (this.dexNum === NDex.UNOWN) {
+    if (this.dexNum === NationalDex.Unown) {
       let letterValue = (this.personalityValue >> 24) & 0x3
       letterValue = ((this.personalityValue >> 16) & 0x3) | (letterValue << 2)
       letterValue = ((this.personalityValue >> 8) & 0x3) | (letterValue << 2)
@@ -520,8 +519,8 @@ export class COLOPKM implements Gen3OnData, Gen3OrreData {
   }
 
   public get ability() {
-    const ability1 = POKEMON_DATA[this.dexNum]?.formes[0].ability1
-    const ability2 = POKEMON_DATA[this.dexNum]?.formes[0].ability2
+    const ability1 = PokemonData[this.dexNum]?.formes[0].ability1
+    const ability2 = PokemonData[this.dexNum]?.formes[0].ability2
     if (this.abilityNum === 2 && ability2 && AbilityFromString(ability2) <= GEN3_ABILITY_MAX) {
       return ability2
     }

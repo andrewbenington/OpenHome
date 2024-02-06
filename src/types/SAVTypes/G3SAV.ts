@@ -1,5 +1,5 @@
 import { GameOfOrigin } from 'pokemon-resources'
-import { NDex } from '../../consts'
+import { NationalDex } from 'pokemon-species-data'
 import { OHPKM } from '../../types/PKMTypes/OHPKM'
 import { CapPikachus, RegionalForms } from '../../types/TransferRestrictions'
 import {
@@ -12,6 +12,7 @@ import { gen3StringToUTF } from '../../util/Strings/StringConverter'
 import { PK3 } from '../PKMTypes/PK3'
 import { SaveType } from '../types'
 import { Box, SAV } from './SAV'
+import { ParsedPath, splitPath } from './path'
 
 export class G3Sector {
   data: Uint8Array
@@ -155,7 +156,7 @@ export class G3SaveBackup {
 
 export class G3SAV extends SAV<PK3> {
   static TRANSFER_RESTRICTIONS = {
-    maxDexNum: NDex.DEOXYS,
+    maxDexNum: NationalDex.Deoxys,
     excludedForms: { ...RegionalForms, ...CapPikachus },
   }
 
@@ -177,7 +178,7 @@ export class G3SAV extends SAV<PK3> {
 
   primarySaveOffset: number
 
-  constructor(path: string, bytes: Uint8Array) {
+  constructor(path: ParsedPath, bytes: Uint8Array) {
     super(path, bytes)
     const saveOne = new G3SaveBackup(bytes.slice(0, 0xe000))
     const saveTwo = new G3SaveBackup(bytes.slice(0xe000, 0x1c000))
@@ -217,7 +218,7 @@ export class G3SAV extends SAV<PK3> {
         }
       })
     })
-    const filePathElements = this.filePath.split('/')
+    const filePathElements = splitPath(this.filePath)
     let fileName = filePathElements[filePathElements.length - 1]
     fileName = fileName.replace(/\s+/g, '')
     if (fileName.includes('Ruby')) {

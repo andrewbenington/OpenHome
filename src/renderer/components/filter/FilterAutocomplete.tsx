@@ -5,12 +5,12 @@ import {
   TextField,
 } from '@mui/material'
 import { useContext, useMemo } from 'react'
-import { FilterContext } from 'src/renderer/state/filter'
 import './style.css'
+import { FilterContext } from 'src/renderer/state/filter'
 
 export interface FilterAutocompleteProps<OptionType>
   extends Omit<AutocompleteProps<OptionType, false, false, false, 'div'>, 'renderInput'> {
-  options: OptionType[]
+  options: readonly OptionType[]
   labelField?: string
   indexField?: string
   filterField: string

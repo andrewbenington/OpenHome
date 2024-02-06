@@ -62,6 +62,14 @@ function writeLookup(fileName: string, lookupMap: StringToStringMap) {
   fs.writeFileSync(path.join(appDataPath, 'OpenHome', 'storage', 'lookup', fileName), newCSVString)
 }
 
+export function loadBoxNames() {
+  const appDataPath = app.getPath('appData')
+  const boxNameFileString = fs
+    .readFileSync(path.join(appDataPath, 'OpenHome', 'storage', 'boxNames.json'))
+    .toString()
+  return JSON.parse(boxNameFileString)
+}
+
 export function loadGen12Lookup() {
   return loadLookup('gen12Lookup.csv')
 }
@@ -91,7 +99,7 @@ export function loadRecentSaves() {
     const saveType = SaveTypeStrings[saveTypeString]
     if (filePath && saveType) {
       recentSaves[filePath] = {
-        filePath,
+        filePath: { ...path.parse(filePath), separator: path.sep, raw: filePath },
         saveType,
         game,
         trainerName,
@@ -107,7 +115,7 @@ function writeRecentSaves(recentSaves: SaveRefMap) {
   const appDataPath = app.getPath('appData')
   const newCSVString = Object.values(recentSaves)
     .map((saveRef) => {
-      return `${encodeURIComponent(saveRef.filePath)},${SaveType[saveRef.saveType]},${
+      return `${encodeURIComponent(saveRef.filePath.raw)},${SaveType[saveRef.saveType]},${
         saveRef.game ?? ''
       },${saveRef.trainerName},${saveRef.trainerID},${saveRef.lastOpened ?? Date.now()}\n`
     })
@@ -117,7 +125,7 @@ function writeRecentSaves(recentSaves: SaveRefMap) {
 
 export function addRecentSave(save: SaveRef) {
   const saveRefMap = loadRecentSaves()
-  saveRefMap[save.filePath] = save
+  saveRefMap[save.filePath.raw] = save
   writeRecentSaves(saveRefMap)
 }
 

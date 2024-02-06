@@ -7,6 +7,7 @@ import { SaveType } from '../../types/types'
 import { bytesToUint16BigEndian, get8BitChecksum } from '../../util/ByteLogic'
 import { gen12StringToUTF, utf16StringToGen12 } from '../../util/Strings/StringConverter'
 import { Box, SAV } from './SAV'
+import { ParsedPath } from './path'
 
 export class G2SAV extends SAV<PK2> {
   boxOffsets: number[]
@@ -15,7 +16,7 @@ export class G2SAV extends SAV<PK2> {
 
   transferRestrictions = GEN2_TRANSFER_RESTRICTIONS
 
-  constructor(path: string, bytes: Uint8Array, fileCreated?: Date) {
+  constructor(path: ParsedPath, bytes: Uint8Array, fileCreated?: Date) {
     super(path, bytes)
     this.fileCreated = fileCreated
     this.tid = bytesToUint16BigEndian(this.bytes, 0x2009)

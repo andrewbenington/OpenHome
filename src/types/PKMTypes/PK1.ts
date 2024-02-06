@@ -1,5 +1,5 @@
 import { GameOfOrigin, ItemGen2FromString, ItemGen2ToString, isGameBoy } from 'pokemon-resources'
-import { NDex, POKEMON_DATA } from '../../consts'
+import { NationalDex, PokemonData, getGenderRatio } from 'pokemon-species-data'
 import { statsPreSplit } from '../../types/types'
 import {
   bytesToUint16BigEndian,
@@ -69,7 +69,7 @@ export class PK1 implements BasePKMData, Gen1Stats {
           this.trainerName = gen12StringToUTF(this.bytes, 0x2c, 11)
         }
       } else {
-        this.nickname = POKEMON_DATA[this.dexNum].name.toLocaleUpperCase()
+        this.nickname = PokemonData[this.dexNum].name.toLocaleUpperCase()
       }
       this.level = this.dexNum > 0 ? getLevelGen12(this.dexNum, this.exp) : 0
     } else if (other) {
@@ -203,12 +203,9 @@ export class PK1 implements BasePKMData, Gen1Stats {
   }
 
   public get gender() {
-    if (!POKEMON_DATA[this.dexNum]) return 2
-    const maleRatio =
-      POKEMON_DATA[this.dexNum].formes[0].genderRatio.M > 0 ||
-      POKEMON_DATA[this.dexNum].formes[0].genderRatio.F > 0
-        ? POKEMON_DATA[this.dexNum].formes[0].genderRatio.M
-        : -1
+    if (!PokemonData[this.dexNum]) return 2
+    const genderRatio = getGenderRatio(this.dexNum, this.formNum)
+    const maleRatio = genderRatio.male > 0 || genderRatio.female > 0 ? genderRatio.male : -1
     if (maleRatio === -1) {
       return 2
     }
@@ -308,7 +305,7 @@ export class PK1 implements BasePKMData, Gen1Stats {
   }
 
   public get isFatefulEncounter(): boolean {
-    return this.dexNum === NDex.MEW
+    return this.dexNum === NationalDex.Mew
   }
 
   public get trainerGender(): number {

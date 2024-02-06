@@ -2,6 +2,7 @@ import _ from 'lodash'
 import { OHPKM } from '../../types/PKMTypes/OHPKM'
 import { getMonFileIdentifier } from '../../util/Lookup'
 import { Box, BoxCoordinates, SAV } from './SAV'
+import { emptyParsedPath } from './path'
 
 export class HomeBox implements Box<OHPKM> {
   name: string
@@ -45,8 +46,10 @@ export class HomeData extends SAV<OHPKM> {
 
   boxes: Array<HomeBox>
 
+  currentPCBox: number = 0
+
   constructor() {
-    super('', new Uint8Array())
+    super(emptyParsedPath, new Uint8Array())
     this.boxNames = _.range(36).map((i) => `Box ${i + 1}`)
     this.boxes = this.boxNames.map((name) => new HomeBox(name))
   }

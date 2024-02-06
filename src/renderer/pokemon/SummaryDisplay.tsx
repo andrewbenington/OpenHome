@@ -2,7 +2,6 @@ import { Card, Grid } from '@mui/material'
 import { useMemo, useState } from 'react'
 import { hasGen5OnlyData } from 'src/types/interfaces/gen5'
 import { hasGen8OnlyData, hasPLAData } from 'src/types/interfaces/gen8'
-import { POKEMON_DATA } from '../../consts'
 import { PKM } from '../../types/PKMTypes/PKM'
 import { getTypes } from '../../types/PKMTypes/util'
 import { hasGen2OnData } from '../../types/interfaces/gen2'
@@ -16,6 +15,7 @@ import { getTypeColor } from '../util/PokemonSprite'
 import AttributeRow from './AttributeRow'
 import AttributeTag from './AttributeTag'
 import PokemonIcon from '../components/PokemonIcon'
+import { PokemonData } from 'pokemon-species-data'
 
 const styles = {
   column: {
@@ -47,7 +47,7 @@ const SummaryDisplay = (props: { mon: PKM }) => {
   const [imageError, setImageError] = useState(false)
 
   const itemAltText = useMemo(() => {
-    const monData = POKEMON_DATA[mon.dexNum]?.formes[mon.formNum]
+    const monData = PokemonData[mon.dexNum]?.formes[mon.formNum]
     if (!monData) return 'pokemon sprite'
     return `${monData.formeName}${mon.isShiny ? '-shiny' : ''} sprite`
   }, [mon])
@@ -136,7 +136,7 @@ const SummaryDisplay = (props: { mon: PKM }) => {
       <Grid item xs={7} style={styles.attributesList}>
         <AttributeRow
           label="Name"
-          value={`${POKEMON_DATA[mon.dexNum]?.formes[mon.formNum]?.formeName} ${
+          value={`${PokemonData[mon.dexNum]?.formes[mon.formNum]?.formeName} ${
             hasGen2OnData(mon) ? ['♂', '♀', ''][mon.gender] : ''
           }`}
         />

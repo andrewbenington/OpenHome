@@ -22,6 +22,9 @@ export interface SetSaveBoxParams {
   saveNumber: number
   box: number
 }
+export interface SetHomeBoxParams {
+  box: number
+}
 
 const initialState: AppState = {
   homeData: new HomeData(),
@@ -32,7 +35,8 @@ const initialState: AppState = {
 }
 
 export const loadHomeBoxes = createAsyncThunk('app/loadHomeBoxes', async () => {
-  const boxes = await window.electron.ipcRenderer.invoke('read-home-boxes', 'Box 1')
+  const boxes: { [key: string]: BoxData } =
+    await window.electron.ipcRenderer.invoke('read-home-boxes')
   return boxes
 })
 
@@ -48,6 +52,12 @@ export const loadGen12Lookup = createAsyncThunk('app/loadGen12Lookup', async () 
 export const loadGen345Lookup = createAsyncThunk('app/loadGen345Lookup', async () => {
   return window.electron.ipcRenderer.invoke('read-gen345-lookup')
 })
+
+type BoxData = {
+  index: number
+  name: string
+  mons: string
+}
 
 const updateMonInSave = (
   state: Draft<AppState>,
@@ -136,6 +146,11 @@ export const appSlice = createSlice({
         tempSaves[saveNumber].currentPCBox = box
         state.saves = tempSaves
       }
+    },
+    setHomeBox: (state, action: PayloadAction<SetHomeBoxParams>) => {
+      const { box } = action.payload
+      const tempHomeData = { ...state.homeData, currentPCBox: box }
+      state.homeData = tempHomeData
     },
     startDrag: (state, action: PayloadAction<SaveCoordinates>) => {
       const { box, index, saveNumber } = action.payload
@@ -331,9 +346,9 @@ export const appSlice = createSlice({
       const homeMonMap = state.lookup.homeMons
       if (homeMonMap) {
         const newHomeData = new HomeData()
-        Object.entries(action.payload).forEach(([, boxString], i) => {
-          newHomeData.boxes[i].getMonsFromString(
-            boxString as string,
+        Object.values(action.payload).forEach((box) => {
+          newHomeData.boxes[box.index].getMonsFromString(
+            box.mons as string,
             homeMonMap as { [key: string]: OHPKM }
           )
         })
@@ -350,6 +365,7 @@ export const {
   clearMonsToRelease,
   importMons,
   setSaveBox,
+  setHomeBox,
   startDrag,
   cancelDrag,
   completeDrag,
