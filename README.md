@@ -16,14 +16,13 @@ OpenHome is an open source tool for moving Pokémon between games losslessly, mu
 <img width="200" alt="Screenshot 2024-01-14 at 1 24 39 PM" src="https://github.com/andrewbenington/OpenHome/assets/42848290/d9de03a5-41ae-41e5-baba-876e7bac461e">
 <img width="200" alt="Screenshot 2024-01-14 at 1 25 22 PM" src="https://github.com/andrewbenington/OpenHome/assets/42848290/992ddb5f-2c6d-45e9-9b99-83c3f644e7a8">
 
-
 ## Downloading and Installing
 
 On Linux, download OpenHome-x.x.x.AppImage from the [latest release](https://github.com/andrewbenington/OpenHome/releases). This should work out of the box for most Linux distributions.
 
-On Windows and MacOS, you can also download an installer from that location, but the app will not be signed. Your operating system will give you warnings about running or even downloading the app. If you (understandably) have concerns about that, jump to the [Building App Locally](#building-app-locally) section.
+On Windows and macOS, you can also download an installer from that location, but the app will not be signed. Your operating system will give you warnings about running or even downloading the app. If you (understandably) have concerns about that, jump to the [Building App Locally](#building-app-locally) section.
 
-On MacOS visit the [latest release](https://github.com/andrewbenington/OpenHome/releases), and download and open OpenHome-x.x.x-macos-x64.dmg (for Intel Macs) or OpenHome-x.x.x-macos-arm64.dmg (for Apple Silicon Macs). If you don't know whether you have an Intel Mac or an Apple Silicon Mac, go to  > About This Mac and check whether your Chip is Apple or Intel.
+On macOS visit the [latest release](https://github.com/andrewbenington/OpenHome/releases), and download and open OpenHome-x.x.x-macos-x64.dmg (for Intel Macs) or OpenHome-x.x.x-macos-arm64.dmg (for Apple Silicon Macs). If you don't know whether you have an Intel Mac or an Apple Silicon Mac, go to  > About This Mac and check whether your Chip is Apple or Intel.
 
 Follow the instructions to move the application to your Applications folder if you'd like. If you run the app by double clicking, it will give you a security error. To bypass this, ctrl + click the app, select "Open", and the click "Open" again.
 
@@ -35,7 +34,7 @@ If you don't want to bypass your security restrictions to download the app, you 
 
 For [Windows](./docs/BUILD_WINDOWS.md)
 
-For [MacOS](./docs/BUILD_MAC.md)
+For [macOS](./docs/BUILD_MAC.md)
 
 ## Moving Between Saves
 
@@ -66,7 +65,6 @@ Development is ongoing. While I do my best to make conversion of Pokemon to/from
 - PB8
 - PK9
 
-
 ### Supported save file formats
 
 - Pokémon Red/Blue/Yellow (international)
@@ -93,4 +91,4 @@ A Pokémon transferred into Generation 1 or 2 will have it's Original Trainer's 
 
 ## Credits
 
-This application would not have been possible without the research done at https://projectpokemon.org/, the work done by the [PKHeX](https://github.com/kwsch/PKHeX) developers, and the sprites archived by https://pokemondb.net/ and https://www.bulbagarden.net/. 
+This application would not have been possible without the research done at https://projectpokemon.org/, the work done by the [PKHeX](https://github.com/kwsch/PKHeX) developers, and the sprites archived by https://pokemondb.net/ and https://www.bulbagarden.net/.
