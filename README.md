@@ -4,7 +4,7 @@
 
 # OpenHome
 
-OpenHome is an open source tool for moving Pokémon between games losslessly, much like Pokémon Home on the Nintendo Switch. Unlike Pokémon Home, OpenHome allows for moving pokémon to past generations from future ones. Even when a Pokémon is moved into a save file, its data is saved locally, so nothing is lost when transferring to past generations. You can move your Kalos Champion Sceptile from Pokémon X to Pokémon Ruby, get the Artist Ribbon, and it will have both the Kalos Champion and Artist ribbons when moved back to Pokémon X.
+OpenHome is an open source tool for moving Pokémon between games losslessly, much like Pokémon Home on the Nintendo Switch. Unlike Pokémon Home, OpenHome also allows for moving Pokémon to past generations from future ones. When a Pokémon is moved into a save file, its data from other games is saved locally, so nothing is lost when transferring to past generations. For example, you can move your Kalos Champion Sceptile from Pokémon X to Pokémon Ruby, earn it the Artist Ribbon, and it will have both the Kalos Champion and Artist ribbons when moved back to Pokémon X.
 
 ## Screenshots
 
@@ -83,7 +83,7 @@ Development is ongoing. While I do my best to make conversion of Pokemon to/from
 
 ## Alterations to transferred pokémon
 
-When moving Pokémon to an older game, some compromises have to be made. OpenHome will try its best to preserve aspects of a Pokémon such as its nature, ability, gender, and shininess, all of which are usually possible minus some specific cases in the GameBoy games.
+When moving Pokémon to an older game, some compromises have to be made. OpenHome will try its best to preserve aspects of a Pokémon such as its nature, ability, gender, and shininess, all of which are usually possible minus some specific cases in the GameBoy games. These compromises will be reverted when moving back to a future game.
 
 For example, a Pokémon originating in Generation 6 being moved into a Generation 3 game will have its personality value altered to preserve its nature, ability (if possible), gender, and shininess.
 
