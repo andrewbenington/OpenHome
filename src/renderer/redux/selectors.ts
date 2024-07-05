@@ -1,5 +1,5 @@
-import { OHPKM } from '../../types/PKMTypes'
-import { GamePKM } from '../../types/PKMTypes/GamePKM'
+import { PKM } from 'pokemon-files'
+import { OHPKM } from '../../types/pkm'
 import { SAV } from '../../types/SAVTypes'
 import { SaveRefMap, StringToStringMap } from '../../types/types'
 import { useAppDispatch, useAppSelector } from './hooks'
@@ -35,7 +35,7 @@ export const useSaveFunctions = (): [() => void, () => void] => {
   const dispatch = useAppDispatch()
   return [() => dispatch(writeAllSaveFiles()), () => dispatch(writeAllHomeData())]
 }
-export const useRecentSaves = (): [SaveRefMap, (_: SAV<GamePKM>) => void, (_: string) => void] => {
+export const useRecentSaves = (): [SaveRefMap, (_: SAV<PKM>) => void, (_: string) => void] => {
   const dispatch = useAppDispatch()
   return [
     useAppSelector(selectRecentSaves),

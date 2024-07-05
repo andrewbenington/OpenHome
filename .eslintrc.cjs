@@ -9,6 +9,7 @@ module.exports = {
   rules: {
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
+    'no-fallthrough': 'off',
     '@typescript-eslint/prefer-as-const': 'off',
     'react/react-in-jsx-scope': 'off',
   },

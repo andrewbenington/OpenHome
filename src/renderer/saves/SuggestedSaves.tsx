@@ -1,13 +1,13 @@
+import { Stack } from '@mui/material'
 import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid'
 import { useEffect, useState } from 'react'
-import { GamePKM } from 'src/types/PKMTypes/GamePKM'
-import { PKM } from 'src/types/PKMTypes/PKM'
+import { GamePKM } from 'src/types/pkm/GamePKM'
+import { PKM } from 'src/types/pkm/PKM'
 import { SAV } from 'src/types/SAVTypes'
 import { buildSaveFile } from 'src/types/SAVTypes/util'
 import { ParsedPath, PossibleSaves, splitPath } from '../../types/SAVTypes/path'
 import { useLookupMaps } from '../redux/selectors'
 import { filterEmpty, getSaveLogo } from './util'
-import { Stack } from '@mui/material'
 
 interface SaveFileSelectorProps {
   onOpen: (path: ParsedPath) => void

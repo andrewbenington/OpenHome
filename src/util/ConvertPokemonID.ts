@@ -1,4 +1,4 @@
-const svToNatMap: { [key: number]: number } = {
+export const svToNatMap: { [key: number]: number } = {
   917: 982,
   918: 917,
   919: 918,
@@ -107,7 +107,7 @@ const svToNatMap: { [key: number]: number } = {
   1022: 1025,
 }
 
-const natToSVMap: { [key: number]: number } = {
+export const natToSVMap: { [key: number]: number } = {
   917: 918,
   918: 919,
   919: 920,

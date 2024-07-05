@@ -1,7 +1,6 @@
 import { Type } from 'pokemon-resources'
 import { PokemonData } from 'pokemon-species-data'
-import { OHPKM } from './PKMTypes'
-import { GamePKM } from './PKMTypes/GamePKM'
+import { PKMFile } from './pkm/util'
 
 export interface Filter {
   dexNumber?: number
@@ -16,11 +15,11 @@ export interface Filter {
   ball?: number
 }
 
-export function filterApplies(filter: Filter, mon: GamePKM | OHPKM) {
+export function filterApplies(filter: Filter, mon: PKMFile) {
   if (filter.dexNumber && mon.dexNum !== filter.dexNumber) {
     return false
   }
-  if (filter.formeNumber !== undefined && mon.formNum !== filter.formeNumber) {
+  if (filter.formeNumber !== undefined && mon.formeNum !== filter.formeNumber) {
     return false
   }
   if (filter.heldItemIndex !== undefined && mon.heldItemIndex !== filter.heldItemIndex) {
@@ -55,18 +54,18 @@ export function filterApplies(filter: Filter, mon: GamePKM | OHPKM) {
       case 'Square Shiny':
         return 'isSquareShiny' in mon && mon.isSquareShiny
       case 'Star Shiny':
-        return 'isSquareShiny' in mon && mon.isShiny && !mon.isSquareShiny
+        return 'isSquareShiny' in mon && mon.isShiny() && !mon.isSquareShiny
     }
   }
 
   if (
     !(`${mon.dexNum}` in PokemonData) ||
-    PokemonData[`${mon.dexNum}`].formes.length < mon.formNum
+    PokemonData[`${mon.dexNum}`].formes.length < mon.formeNum
   ) {
     return false
   }
 
-  const forme = PokemonData[`${mon.dexNum}`].formes[mon.formNum]
+  const forme = PokemonData[`${mon.dexNum}`].formes[mon.formeNum]
   if (filter.type1 !== undefined && !forme.types.includes(filter.type1)) {
     return false
   }

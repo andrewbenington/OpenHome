@@ -1,7 +1,6 @@
 import { createAsyncThunk, createSlice, current, Draft, PayloadAction } from '@reduxjs/toolkit'
-import { OHPKM } from '../../../types/PKMTypes'
-import { GamePKM } from '../../../types/PKMTypes/GamePKM'
-import { PKM } from '../../../types/PKMTypes/PKM'
+import { OHPKM } from '../../../types/pkm'
+import { PKMFile } from '../../../types/pkm/util'
 import { G1SAV, G2SAV, G3SAV, G4SAV, G5SAV, SAV } from '../../../types/SAVTypes'
 import { G6SAV } from '../../../types/SAVTypes/G6SAV'
 import { HomeData } from '../../../types/SAVTypes/HomeData'
@@ -14,7 +13,7 @@ import {
 import { AppState, RootState } from '../state'
 
 export interface ImportMonsParams {
-  mons: PKM[]
+  mons: PKMFile[]
   saveCoordinates: SaveCoordinates
 }
 
@@ -61,7 +60,7 @@ type BoxData = {
 
 const updateMonInSave = (
   state: Draft<AppState>,
-  mon: PKM | Draft<PKM> | undefined,
+  mon: PKMFile | Draft<PKMFile> | undefined,
   saveCoordinates: SaveCoordinates
 ) => {
   let replacedMon
@@ -115,7 +114,7 @@ export const appSlice = createSlice({
       const isHome = saveCoordinates.saveNumber === -1
       const tempSave = isHome ? state.homeData : state.saves[saveCoordinates.saveNumber]
       mons.forEach((mon) => {
-        const homeMon = mon instanceof OHPKM ? mon : new OHPKM(undefined, mon)
+        const homeMon = mon instanceof OHPKM ? mon : new OHPKM(mon)
         while (
           tempSave.boxes[saveCoordinates.box].pokemon[nextIndex] &&
           nextIndex < tempSave.boxRows * tempSave.boxColumns
@@ -175,8 +174,8 @@ export const appSlice = createSlice({
       const dest = action.payload
 
       let mon = state.dragMon
-      if (source.saveNumber !== dest.saveNumber) {
-        mon = mon instanceof OHPKM ? mon : new OHPKM(undefined, mon as GamePKM)
+      if (source.saveNumber !== dest.saveNumber && mon) {
+        mon = mon instanceof OHPKM ? mon : new OHPKM(mon)
         markMonAsModified(state, mon as OHPKM)
       }
 
@@ -185,7 +184,7 @@ export const appSlice = createSlice({
       state.dragMon = undefined
       state.dragSource = undefined
     },
-    addSave: (state, action: PayloadAction<SAV<GamePKM>>) => {
+    addSave: (state, action: PayloadAction<SAV<PKMFile>>) => {
       state.saves.push(action.payload)
     },
     removeSaveAt: (state, action: PayloadAction<number>) => {
@@ -256,7 +255,7 @@ export const appSlice = createSlice({
       state.modifiedOHPKMs = {}
       state.homeData.updatedBoxSlots = []
       state.monsToRelease.forEach((mon) => {
-        const gen345Identifier = getMonGen345Identifier(mon as OHPKM)
+        const gen345Identifier = getMonGen345Identifier(mon)
         if (state.lookup.gen345 && gen345Identifier && gen345Identifier in state.lookup.gen345) {
           delete state.lookup.gen345[gen345Identifier]
           appSlice.caseReducers.writeGen345Lookup(state, {
@@ -264,7 +263,7 @@ export const appSlice = createSlice({
             payload: [],
           })
         }
-        const gen12Identifier = getMonGen12Identifier(mon as OHPKM)
+        const gen12Identifier = getMonGen12Identifier(mon)
         if (state.lookup.gen12 && gen12Identifier && gen12Identifier in state.lookup.gen12) {
           delete state.lookup.gen12[gen12Identifier]
           appSlice.caseReducers.writeGen12Lookup(state, {
@@ -329,7 +328,7 @@ export const appSlice = createSlice({
     builder.addCase(loadHomeMons.fulfilled, (state, action: PayloadAction<Uint8Array[]>) => {
       const homeMons: { [key: string]: OHPKM } = {}
       Object.entries(action.payload).forEach(([id, bytes]) => {
-        homeMons[id] = new OHPKM(bytes, undefined)
+        homeMons[id] = new OHPKM(bytes.buffer)
       })
       return {
         ...state,

@@ -1,13 +1,12 @@
 /* eslint-disable no-nested-ternary */
+import { AllPKMFields } from 'pokemon-files'
 import { getNatureSummary } from 'pokemon-resources'
 import { NationalDex, NationalDexMax, PokemonData } from 'pokemon-species-data'
 import { LevelUpExp } from '../consts'
-import { BasePKMData } from '../types/interfaces/base'
-import { Gen3OnData } from '../types/interfaces/gen3'
 import { Stat } from '../types/types'
 
-export const getStatGen3Onward = (stat: Stat, mon: Gen3OnData & BasePKMData) => {
-  if (mon.dexNum < 1 || mon.dexNum > NationalDexMax) {
+export const getStatGen3Onward = (stat: Stat, mon: AllPKMFields) => {
+  if (!('ivs' in mon) || mon.dexNum < 1 || mon.dexNum > NationalDexMax) {
     return 0
   }
   const natureSummary = getNatureSummary(mon.nature)
@@ -16,7 +15,7 @@ export const getStatGen3Onward = (stat: Stat, mon: Gen3OnData & BasePKMData) => 
     : natureSummary?.includes(`-${stat}`)
     ? 0.9
     : 1
-  const baseStats = PokemonData[mon.dexNum]?.formes[mon.formNum]?.baseStats
+  const baseStats = PokemonData[mon.dexNum]?.formes[mon.formeNum]?.baseStats
   if (baseStats) {
     const baseStat = (baseStats as any)[stat.toLowerCase()]
     const iv = (mon.ivs as any)[stat.toLowerCase()]
@@ -29,14 +28,14 @@ export const getStatGen3Onward = (stat: Stat, mon: Gen3OnData & BasePKMData) => 
   return 0
 }
 
-export const getHPGen3Onward = (mon: Gen3OnData & BasePKMData) => {
-  if (mon.dexNum < 1 || mon.dexNum > NationalDexMax) {
+export const getHPGen3Onward = (mon: AllPKMFields) => {
+  if (!('ivs' in mon) || mon.dexNum < 1 || mon.dexNum > NationalDexMax) {
     return 0
   }
   if (mon.dexNum === NationalDex.Shedinja) {
     return 1
   }
-  const baseHP = PokemonData[mon.dexNum]?.formes[mon.formNum]?.baseStats?.hp
+  const baseHP = PokemonData[mon.dexNum]?.formes[mon.formeNum]?.baseStats?.hp
   if (baseHP) {
     const iv = (mon.ivs as any).hp
     const ev = (mon.evs as any).hp

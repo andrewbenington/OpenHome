@@ -1,11 +1,11 @@
-import _, { uniq } from 'lodash'
+import lodash from 'lodash'
 import { GameOfOrigin } from 'pokemon-resources'
 import { GEN1_TRANSFER_RESTRICTIONS } from '../../consts/TransferRestrictions'
 import { bytesToUint16BigEndian, get8BitChecksum } from '../../util/ByteLogic'
 import { natDexToGen1ID } from '../../util/ConvertPokemonID'
 import { gen12StringToUTF, utf16StringToGen12 } from '../../util/Strings/StringConverter'
-import { OHPKM } from '../PKMTypes/OHPKM'
-import { PK1 } from '../PKMTypes/PK1'
+import { OHPKM } from '../OHPKM'
+import { PK1 } from '../pkm/PK1'
 import { SaveType } from '../types'
 import { Box, SAV } from './SAV'
 import { ParsedPath } from './path'
@@ -67,7 +67,7 @@ export class G1SAV extends SAV<PK1> {
     this.boxes = new Array(this.NUM_BOXES)
     if (this.saveType > 0 && this.saveType <= 2) {
       const pokemonPerBox = this.boxRows * this.boxColumns
-      _.range(this.NUM_BOXES).forEach((boxNumber) => {
+      lodash.range(this.NUM_BOXES).forEach((boxNumber) => {
         this.boxes[boxNumber] = new Box(`Box ${boxNumber + 1}`, pokemonPerBox)
         let boxByteOffset
         if (boxNumber < 6) {
@@ -104,7 +104,7 @@ export class G1SAV extends SAV<PK1> {
 
   prepareBoxesForSaving() {
     const changedMonPKMs: OHPKM[] = []
-    const changedBoxes: number[] = uniq(this.updatedBoxSlots.map((coords) => coords.box))
+    const changedBoxes: number[] = lodash.uniq(this.updatedBoxSlots.map((coords) => coords.box))
     const pokemonPerBox = this.boxRows * this.boxColumns
     changedBoxes.forEach((boxNumber) => {
       let boxByteOffset: number

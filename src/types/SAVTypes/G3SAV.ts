@@ -1,6 +1,5 @@
 import { GameOfOrigin } from 'pokemon-resources'
 import { NationalDex } from 'pokemon-species-data'
-import { OHPKM } from '../../types/PKMTypes/OHPKM'
 import { CapPikachus, RegionalForms } from '../../types/TransferRestrictions'
 import {
   bytesToUint16LittleEndian,
@@ -9,7 +8,8 @@ import {
   uint32ToBytesLittleEndian,
 } from '../../util/ByteLogic'
 import { gen3StringToUTF } from '../../util/Strings/StringConverter'
-import { PK3 } from '../PKMTypes/PK3'
+import { OHPKM } from '../OHPKM'
+import { PK3 } from '../pkm/PK3'
 import { SaveType } from '../types'
 import { Box, SAV } from './SAV'
 import { ParsedPath, splitPath } from './path'

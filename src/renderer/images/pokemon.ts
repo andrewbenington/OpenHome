@@ -1,7 +1,7 @@
 import { NationalDex, PokemonData } from 'pokemon-species-data'
 import { SWEETS } from '../../consts'
-import { BasePKMData } from '../../types/PKMTypes'
 import { hasGen8OnData } from '../../types/interfaces/gen8'
+import { PKMFile } from '../../types/pkm/util'
 import { StringToStringMap } from '../../types/types'
 
 const alolaDex = [
@@ -46,12 +46,12 @@ export const fileToSpriteFolder: StringToStringMap = {
   OHPKM: 'home',
 }
 
-export const getPokemonSpritePath = (mon: BasePKMData, format?: string) => {
+export const getPokemonSpritePath = (mon: PKMFile, format?: string) => {
   const monFormat = format ?? mon.format
-  let spriteName = PokemonData[mon.dexNum]?.formes[mon.formNum]?.sprite ?? ''
+  let spriteName = PokemonData[mon.dexNum]?.formes[mon.formeNum]?.sprite ?? ''
   if (hasGen8OnData(mon) && mon.dexNum === NationalDex.Alcremie) {
     spriteName = `${
-      PokemonData[mon.dexNum]?.formes[mon.formNum]?.formeName?.toLowerCase() ??
+      PokemonData[mon.dexNum]?.formes[mon.formeNum]?.formeName?.toLowerCase() ??
       'alcremie-vanilla-cream'
     }-${SWEETS[mon.formArgument ?? 0].toLocaleLowerCase()}`
   }
@@ -60,6 +60,6 @@ export const getPokemonSpritePath = (mon: BasePKMData, format?: string) => {
     spriteFolder = 'gen6'
   }
   return `sprites/${spriteFolder}${
-    mon.isShiny && spriteFolder !== 'gen1' && spriteFolder !== 'gen9' ? '/shiny/' : '/'
+    mon.isShiny() && spriteFolder !== 'gen1' && spriteFolder !== 'gen9' ? '/shiny/' : '/'
   }${spriteName}.${spriteFolder === 'gen5' || spriteFolder === 'gen3gc' ? 'gif' : 'png'}`
 }

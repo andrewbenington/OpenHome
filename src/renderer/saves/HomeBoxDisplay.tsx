@@ -1,7 +1,7 @@
 import { ArrowBack, ArrowForward } from '@mui/icons-material'
 import { Grid, Paper } from '@mui/material'
-import _ from 'lodash'
-import { PKM } from '../../types/PKMTypes/PKM'
+import lodash from 'lodash'
+import { PKMFile } from 'src/types/pkm/util'
 import { SaveCoordinates } from '../../types/types'
 import { useAppDispatch } from '../redux/hooks'
 import { useHomeData } from '../redux/selectors'
@@ -16,7 +16,7 @@ import ArrowButton from './ArrowButton'
 import BoxCell from './BoxCell'
 
 interface HomeBoxDisplayProps {
-  setSelectedMon: (_: PKM | undefined) => void
+  setSelectedMon: (_: PKMFile | undefined) => void
 }
 
 const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
@@ -28,7 +28,7 @@ const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
   const dispatchStartDrag = (source: SaveCoordinates) => dispatch(startDrag(source))
   const dispatchCancelDrag = () => dispatch(cancelDrag())
   const dispatchCompleteDrag = (dest: SaveCoordinates) => dispatch(completeDrag(dest))
-  const dispatchImportMons = (mons: PKM[], saveCoordinates: SaveCoordinates) =>
+  const dispatchImportMons = (mons: PKMFile[], saveCoordinates: SaveCoordinates) =>
     dispatch(importMons({ mons, saveCoordinates }))
 
   return (
@@ -75,9 +75,9 @@ const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
             </ArrowButton>
           </Grid>
         </Grid>
-        {_.range(10).map((row: number) => (
+        {lodash.range(10).map((row: number) => (
           <Grid container key={`pc_row_${row}`}>
-            {_.range(12).map((rowIndex: number) => {
+            {lodash.range(12).map((rowIndex: number) => {
               const mon = data.boxes[data.currentPCBox].pokemon[row * 12 + rowIndex]
               return (
                 <Grid
@@ -101,6 +101,7 @@ const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
                     zIndex={10 - row}
                     onDrop={(importedMons) => {
                       if (importedMons) {
+                        console.log(importedMons)
                         dispatchImportMons(importedMons, {
                           saveNumber: -1,
                           box: data.currentPCBox,

@@ -1,9 +1,9 @@
 import { ArrowBack, ArrowForward, Close } from '@mui/icons-material'
 import { Card, Grid } from '@mui/material'
-import _ from 'lodash'
+import lodash from 'lodash'
 import { GameOfOriginData } from 'pokemon-resources'
 import { useMemo } from 'react'
-import { PKM } from '../../types/PKMTypes/PKM'
+import { PKMFile } from 'src/types/pkm/util'
 import { isRestricted } from '../../types/TransferRestrictions'
 import { SaveCoordinates, getSaveTypeString } from '../../types/types'
 import { useAppDispatch } from '../redux/hooks'
@@ -20,7 +20,7 @@ import BoxCell from './BoxCell'
 
 interface SaveDisplayProps {
   saveIndex: number
-  setSelectedMon: (_: PKM | undefined) => void
+  setSelectedMon: (_: PKMFile | undefined) => void
 }
 
 const SaveDisplay = (props: SaveDisplayProps) => {
@@ -33,7 +33,7 @@ const SaveDisplay = (props: SaveDisplayProps) => {
   const dispatchStartDrag = (source: SaveCoordinates) => dispatch(startDrag(source))
   const dispatchCompleteDrag = (dest: SaveCoordinates) => dispatch(completeDrag(dest))
   const dispatchRemoveSaveAt = (index: number) => dispatch(removeSaveAt(index))
-  const dispatchImportMons = (mons: PKM[], saveCoordinates: SaveCoordinates) =>
+  const dispatchImportMons = (mons: PKMFile[], saveCoordinates: SaveCoordinates) =>
     dispatch(importMons({ mons, saveCoordinates }))
 
   const save = useMemo(() => {
@@ -42,7 +42,7 @@ const SaveDisplay = (props: SaveDisplayProps) => {
 
   const isDisabled = useMemo(() => {
     return dragMon
-      ? isRestricted(save.transferRestrictions, dragMon.dexNum, dragMon.formNum)
+      ? isRestricted(save.transferRestrictions, dragMon.dexNum, dragMon.formeNum)
       : false
   }, [save, dragMon])
   return save && save.currentPCBox !== undefined ? (
@@ -106,9 +106,9 @@ const SaveDisplay = (props: SaveDisplayProps) => {
               </ArrowButton>
             </Grid>
           </Grid>
-          {_.range(save.boxRows).map((row: number) => (
+          {lodash.range(save.boxRows).map((row: number) => (
             <Grid container key={`pc_row_${row}`}>
-              {_.range(save.boxColumns).map((rowIndex: number) => {
+              {lodash.range(save.boxColumns).map((rowIndex: number) => {
                 const mon = save.boxes[save.currentPCBox].pokemon[row * save.boxColumns + rowIndex]
                 return (
                   <Grid

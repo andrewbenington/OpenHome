@@ -1,13 +1,14 @@
 import { FileOpen } from '@mui/icons-material'
 import { Box, Dialog, Stack, useTheme } from '@mui/material'
-import _ from 'lodash'
+import lodash from 'lodash'
+import { bytesToPKMInterface } from 'pokemon-files'
 import { useCallback, useEffect, useState } from 'react'
+import { OHPKM } from 'src/types/pkm'
+import { PKMFile } from 'src/types/pkm/util'
 import { loadRecentSaves } from '../../renderer/redux/slices/recentSavesSlice'
 import { loadResourcesPath } from '../../renderer/redux/slices/resourcesSlice'
-import { OHPKM } from '../../types/PKMTypes'
-import { PKM } from '../../types/PKMTypes/PKM'
+import { bytesToPKM } from '../../types/pkm/FileImport'
 import { SaveCoordinates } from '../../types/types'
-import { bytesToPKM } from '../../util/FileImport'
 import { getMonFileIdentifier } from '../../util/Lookup'
 import PokemonIcon from '../components/PokemonIcon'
 import FilterPanel from '../components/filter/FilterPanel'
@@ -51,7 +52,7 @@ const Home = () => {
   const monsToRelease = useMonsToRelease()
   const [loadingMessage, setLoadingMessage] = useState<string | undefined>('Starting app...')
   const { palette } = useTheme()
-  const [selectedMon, setSelectedMon] = useState<PKM>()
+  const [selectedMon, setSelectedMon] = useState<PKMFile>()
   const [tab, setTab] = useState('summary')
   const [openSaveDialog, setOpenSaveDialog] = useState(false)
   const [filesToDelete, setFilesToDelete] = useState<string[]>([])
@@ -72,13 +73,52 @@ const Home = () => {
   }, [saves, homeData])
 
   const onViewDrop = (e: any, type: string) => {
-    const processDroppedData = async (file?: File, droppedMon?: PKM) => {
-      let mon: PKM | undefined = droppedMon
+    const processDroppedData = async (file?: File, droppedMon?: PKMFile) => {
+      let mon: PKMFile | undefined = droppedMon
       if (file) {
         const bytes = new Uint8Array(await file.arrayBuffer())
         const [extension] = file.name.split('.').slice(-1)
         try {
           mon = bytesToPKM(bytes, extension.toUpperCase())
+        } catch (e) {
+          console.error(e)
+        }
+      }
+      if (!mon) return
+      switch (type) {
+        case 'as is':
+          setSelectedMon(mon)
+          break
+      }
+    }
+    const file = e.dataTransfer.files[0]
+    const mon = dragMon
+    if (!file && dragSource) {
+      if (mon && type === 'release') {
+        dispatchReleaseMon(dragSource)
+        if (mon instanceof OHPKM) {
+          const identifier = getMonFileIdentifier(mon)
+          if (identifier) {
+            setFilesToDelete([...filesToDelete, identifier])
+          }
+        }
+      }
+      dispatchCancelDrag()
+      processDroppedData(file, mon)
+      e.nativeEvent.preventDefault()
+    } else if (file) {
+      processDroppedData(file, undefined)
+    }
+  }
+
+  const onViewDropInterface = (e: React.DragEvent<HTMLDivElement>, type: string) => {
+    const processDroppedData = async (file?: File, droppedMon?: PKMFile) => {
+      let mon: PKMFile | undefined = droppedMon
+      if (file) {
+        const buffer = await file.arrayBuffer()
+        const [extension] = file.name.split('.').slice(-1)
+        try {
+          mon = bytesToPKMInterface(buffer, extension.toUpperCase())
         } catch (e) {
           console.error(e)
         }
@@ -158,7 +198,7 @@ const Home = () => {
       }}
     >
       <Stack className="save-file-column" spacing={1}>
-        {_.range(saves.length).map((i) => (
+        {lodash.range(saves.length).map((i) => (
           <SaveDisplay key={`save_display_${i}`} saveIndex={i} setSelectedMon={setSelectedMon} />
         ))}
         <button
@@ -199,6 +239,16 @@ const Home = () => {
         </div>
         <div
           className="drop-area"
+          draggable
+          onDragOver={(e) => {
+            e.preventDefault()
+          }}
+          onDrop={(e) => onViewDropInterface(e, 'as is')}
+        >
+          Preview Interface
+        </div>
+        <div
+          className="drop-area"
           onDragOver={(e) => {
             e.preventDefault()
           }}
@@ -211,7 +261,7 @@ const Home = () => {
                 <PokemonIcon
                   key={`delete_mon_${i}`}
                   dexNumber={mon.dexNum}
-                  formeNumber={mon.formNum}
+                  formeNumber={mon.formeNum}
                   style={{ height: 32, width: 32 }}
                 />
               )

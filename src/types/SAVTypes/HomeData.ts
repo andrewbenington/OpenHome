@@ -1,6 +1,6 @@
-import _ from 'lodash'
-import { OHPKM } from '../../types/PKMTypes/OHPKM'
+import lodash from 'lodash'
 import { getMonFileIdentifier } from '../../util/Lookup'
+import { OHPKM } from '../OHPKM'
 import { Box, BoxCoordinates, SAV } from './SAV'
 import { emptyParsedPath } from './path'
 
@@ -50,7 +50,7 @@ export class HomeData extends SAV<OHPKM> {
 
   constructor() {
     super(emptyParsedPath, new Uint8Array())
-    this.boxNames = _.range(36).map((i) => `Box ${i + 1}`)
+    this.boxNames = lodash.range(36).map((i) => `Box ${i + 1}`)
     this.boxes = this.boxNames.map((name) => new HomeBox(name))
   }
 }

@@ -1,8 +1,8 @@
 import fs from 'fs'
 import { TextDecoder } from 'node:util' // (ESM style imports)
 import path from 'path'
-import { bytesToPKM } from '../../../util/FileImport'
-import { OHPKM, PK1 } from '../../PKMTypes'
+import { OHPKM, PK1 } from '../../pkm'
+import { bytesToPKM } from '../../pkm/FileImport'
 import { G1SAV } from '../G1SAV'
 import { emptyParsedPath } from '../path'
 import { buildSaveFile } from '../util'

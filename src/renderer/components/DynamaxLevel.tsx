@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import lodash from 'lodash'
 
 interface DynamaxLevelProps {
   level: number
@@ -20,7 +20,7 @@ const DynamaxLevel = (props: DynamaxLevelProps) => {
   const { level } = props
   return (
     <div style={dynamaxRowStyle}>
-      {_.range(10).map((index: number) => (
+      {lodash.range(10).map((index: number) => (
         <div
           key={`dynamax_meter_${index}`}
           style={{

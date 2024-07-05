@@ -1,8 +1,8 @@
-import _ from 'lodash'
+import lodash from 'lodash'
 import { ContestData } from 'src/types/interfaces/gen3'
-import { COLOPKM, PK3, XDPKM } from '../../types/PKMTypes'
 import { Styles } from '../../types/types'
 import { getPublicImageURL } from '../images/images'
+import { COLOPKM, PK3, XDPKM } from 'pokemon-files'
 
 const styles = {
   container: {
@@ -86,7 +86,7 @@ const SheenStars = (props: SheenStarsProps) => {
           width: mon instanceof PK3 || mon instanceof COLOPKM || mon instanceof XDPKM ? 300 : 360,
         }}
       >
-        {_.range(getSheenStars(mon)).map((level: number) => (
+        {lodash.range(getSheenStars(mon)).map((level: number) => (
           <img
             key={`sheen_star_${level}`}
             alt={`sheen star ${level}`}

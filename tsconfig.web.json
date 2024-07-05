@@ -15,5 +15,6 @@
     "jsx": "react-jsx",
     "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
+    "target": "es2021"
   }
 }

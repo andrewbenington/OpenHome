@@ -1,5 +1,6 @@
-import { OHPKM } from '../../types/PKMTypes'
-import { GamePKM } from '../../types/PKMTypes/GamePKM'
+import { AllPKMFields } from 'pokemon-files'
+import { OHPKM } from '../../types/pkm'
+import { PKMFile } from '../../types/pkm/util'
 import { SAV } from '../../types/SAVTypes'
 import { HomeData } from '../../types/SAVTypes/HomeData'
 import { SaveCoordinates, SaveRefMap, StringToStringMap } from '../../types/types'
@@ -12,11 +13,11 @@ export interface LookupState {
 
 export interface AppState {
   homeData: HomeData
-  saves: SAV<GamePKM>[]
+  saves: SAV<PKMFile>[]
   dragSource?: SaveCoordinates
-  dragMon?: GamePKM | OHPKM
+  dragMon?: PKMFile
   modifiedOHPKMs: { [key: string]: OHPKM }
-  monsToRelease: OHPKM[]
+  monsToRelease: AllPKMFields[]
   lookup: LookupState
 }
 

@@ -4,8 +4,8 @@ import {
   getMonGen12Identifier,
   getMonGen345Identifier,
 } from '../../util/Lookup'
-import { OHPKM, PK2, PK3, PK4, PK5, PK6 } from '../PKMTypes'
-import { GamePKM } from '../PKMTypes/GamePKM'
+import { OHPKM, PK2, PK3, PK4, PK5, PK6 } from '../pkm'
+import { GamePKM } from '../pkm/GamePKM'
 import { SaveType, StringToStringMap } from '../types'
 import { DPSAV } from './DPSAV'
 import { G1SAV } from './G1SAV'

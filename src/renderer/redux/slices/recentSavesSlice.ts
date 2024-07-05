@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { PKM } from '../../../types/PKMTypes/PKM'
+import { PKM } from 'pokemon-files'
 import { SAV } from '../../../types/SAVTypes'
 import { joinPath } from '../../../types/SAVTypes/path'
 import { SaveRefMap } from '../../../types/types'

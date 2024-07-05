@@ -1,8 +1,8 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react'
 import { filterApplies } from 'src/types/Filter'
-import { PKM } from '../../types/PKMTypes/PKM'
+import { PKMFile } from 'src/types/pkm/util'
+import { bytesToPKM } from '../../types/pkm/FileImport'
 import { Styles } from '../../types/types'
-import { bytesToPKM } from '../../util/FileImport'
 import PokemonIcon from '../components/PokemonIcon'
 import BoxIcons from '../images/BoxIcons.png'
 import { FilterContext } from '../state/filter'
@@ -33,10 +33,10 @@ const styles = {
 interface BoxCellProps {
   onClick: () => void
   onDragEvent: (_: boolean) => void
-  onDrop: (_: PKM[] | undefined) => void
+  onDrop: (_: PKMFile[] | undefined) => void
   disabled: boolean
   zIndex: number
-  mon: PKM | undefined
+  mon: PKMFile | undefined
 }
 
 const BoxCell = (props: BoxCellProps) => {
@@ -53,7 +53,7 @@ const BoxCell = (props: BoxCellProps) => {
   }, [filterState, mon])
 
   const onDropFromFiles = async (files: FileList) => {
-    const importedMons: PKM[] = []
+    const importedMons: PKMFile[] = []
     for (let i = 0; i < files.length; i++) {
       const file = files[i]
       const bytes = new Uint8Array(await file.arrayBuffer())
@@ -107,9 +107,9 @@ const BoxCell = (props: BoxCellProps) => {
       {mon ? (
         <PokemonIcon
           dexNumber={mon.dexNum}
-          formeNumber={mon.formNum}
+          formeNumber={mon.formeNum}
           greyedOut={isFilteredOut || disabled}
-          isShiny={mon.isShiny}
+          isShiny={mon.isShiny()}
           heldItemIndex={mon.heldItemIndex}
           heldItemFormat={mon.format}
           style={{

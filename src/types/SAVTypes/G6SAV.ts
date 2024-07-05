@@ -6,7 +6,7 @@ import {
 import { bytesToUint16LittleEndian, uint16ToBytesLittleEndian } from '../../util/ByteLogic'
 import { CRC16_CCITT } from '../../util/Encryption'
 import { utf16BytesToString } from '../../util/Strings/StringConverter'
-import { OHPKM, PK6 } from '../PKMTypes'
+import { OHPKM, PK6 } from '../pkm'
 import { SaveType } from '../types'
 import { Box, SAV } from './SAV'
 import { ParsedPath } from './path'

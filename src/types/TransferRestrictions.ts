@@ -132,7 +132,7 @@ export const RegionalForms: FormRestrictions = {
 export const isRestricted = (
   restrictions: TransferRestrictions,
   dexNum: number,
-  formNum: number
+  formeNum?: number
 ) => {
   const { maxDexNum, transferableDexNums, excludedForms } = restrictions
   if (maxDexNum && dexNum > maxDexNum) {
@@ -141,7 +141,7 @@ export const isRestricted = (
   if (transferableDexNums && !transferableDexNums.includes(dexNum)) {
     return true
   }
-  if (excludedForms && excludedForms[dexNum] && excludedForms[dexNum]?.includes(formNum)) {
+  if (excludedForms && excludedForms[dexNum] && excludedForms[dexNum]?.includes(formeNum ?? 0)) {
     return true
   }
   return false

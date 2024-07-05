@@ -25,11 +25,11 @@ export default function PokemonIcon(props: PokemonIconProps) {
     ...attributes
   } = props
 
-  const getBackgroundPosition = (mon: { dexNum: number; formNum: number }) => {
-    if (!PokemonData[mon.dexNum]?.formes[mon.formNum]) {
+  const getBackgroundPosition = (mon: { dexNum: number; formeNum: number }) => {
+    if (!PokemonData[mon.dexNum]?.formes[mon.formeNum]) {
       return '0% 0%'
     }
-    const [x, y] = PokemonData[mon.dexNum].formes[mon.formNum].spriteIndex
+    const [x, y] = PokemonData[mon.dexNum].formes[mon.formeNum].spriteIndex
     return `${(x / 35) * 100}% ${(y / 36) * 100}%`
   }
 
@@ -49,7 +49,7 @@ export default function PokemonIcon(props: PokemonIconProps) {
           backgroundImage: `url(${BoxIcons})`,
           backgroundPosition: getBackgroundPosition({
             dexNum: dexNumber,
-            formNum: formeNumber ?? 0,
+            formeNum: formeNumber ?? 0,
           }),
         }}
       />

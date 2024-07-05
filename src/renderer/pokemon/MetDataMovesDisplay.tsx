@@ -1,19 +1,16 @@
 import { Card } from '@mui/material'
+import { AllPKMFields } from 'pokemon-files'
+import { GameOfOriginData, getLocationString, NatureToString } from 'pokemon-resources'
 import { useMemo } from 'react'
-import { getCharacteristic, getMoveMaxPP } from '../../types/PKMTypes/util'
-import { hasGen2OnData } from '../../types/interfaces/gen2'
+import { RibbonTitles } from 'src/consts'
 import { hasGen3OnData, hasOrreData } from '../../types/interfaces/gen3'
-import { hasGen4OnData } from '../../types/interfaces/gen4'
+import { getCharacteristic, getMoveMaxPP } from '../../types/pkm/util'
 import { Styles } from '../../types/types'
 import Markings from '../components/Markings'
 import { getGameLogo, getOriginMark } from '../images/game'
 import { getPublicImageURL } from '../images/images'
 import { getBallIconPath } from '../images/items'
 import MoveCard from './MoveCard'
-import { PKM } from '../../types/PKMTypes/PKM'
-import { GameOfOriginData, NatureToString } from 'pokemon-resources'
-import { RibbonTitles } from 'src/consts'
-import { getLocationString } from 'pokemon-resources'
 
 const styles = {
   container: {
@@ -65,11 +62,11 @@ const styles = {
 
 const metTimesOfDay = ['in the morning', 'during the daytime', 'in the evening']
 
-const MetDataMovesDisplay = (props: { mon: PKM }) => {
+const MetDataMovesDisplay = (props: { mon: AllPKMFields }) => {
   const { mon } = props
 
   const eggMessage = useMemo(() => {
-    if (!hasGen4OnData(mon) || !mon.eggLocationIndex || !mon.eggDate) {
+    if (!mon.eggLocationIndex || !mon.eggDate || !mon.gameOfOrigin) {
       return undefined
     }
     return `Egg received on ${mon.eggDate.month}/${mon.eggDate.day}/${
@@ -78,18 +75,21 @@ const MetDataMovesDisplay = (props: { mon: PKM }) => {
   }, [mon])
 
   const metMessage = useMemo(() => {
-    if (!hasGen2OnData(mon) || !mon.metLocationIndex) {
+    if (!mon.metLocationIndex) {
       return 'Met location unknown.'
     }
     let message = 'Met'
-    if ('metTimeOfDay' in mon && mon.metTimeOfDay) {
+    if (mon.metTimeOfDay) {
       message += ` ${metTimesOfDay[mon.metTimeOfDay - 1]}`
     }
-    if (hasGen4OnData(mon)) {
+    if (mon.metDate) {
       message += ` on ${mon.metDate.month}/${mon.metDate.day}/${mon.metDate.year}`
     }
-    message += ` ${getLocationString(mon.gameOfOrigin, mon.metLocationIndex, mon.format)}`
-    if (mon.isFatefulEncounter) {
+    if (mon.gameOfOrigin) {
+      message += ` ${getLocationString(mon.gameOfOrigin, mon.metLocationIndex, mon.format)}`
+    }
+
+    if ('isFatefulEncounter' in mon && mon.isFatefulEncounter) {
       message += ', where it met its trainer in a fateful encounter'
     }
     message += '.'
@@ -100,13 +100,7 @@ const MetDataMovesDisplay = (props: { mon: PKM }) => {
   }, [mon])
 
   const natureMessage = useMemo(() => {
-    if (!hasGen3OnData(mon)) {
-      return undefined
-    }
-    let currentNature = mon.nature
-    if ('statNature' in mon) {
-      currentNature = mon.statNature
-    }
+    const currentNature = mon.statNature ?? mon.nature ?? 0
     let message = 'Has a'
     const vowelStart = ['A', 'E', 'I', 'O', 'U'].includes(
       (NatureToString(currentNature) ?? 'Undefined')[0]
@@ -115,7 +109,7 @@ const MetDataMovesDisplay = (props: { mon: PKM }) => {
       message += 'n'
     }
     message += ` ${NatureToString(currentNature)} nature.`
-    if ('statNature' in mon && mon.nature !== mon.statNature) {
+    if (mon.statNature && mon.nature !== mon.statNature) {
       message += ` (originally ${NatureToString(mon.statNature)})`
     }
     return message
@@ -170,20 +164,21 @@ const MetDataMovesDisplay = (props: { mon: PKM }) => {
           }}
         >
           <div style={styles.gameContainer}>
-            <img
-              draggable={false}
-              alt={`${GameOfOriginData[mon.gameOfOrigin]?.name} logo`}
-              src={getPublicImageURL(
-                getGameLogo(
-                  mon.gameOfOrigin,
-                  mon.dexNum,
-                  ('ribbons' in mon && mon.ribbons.includes('National')) ||
-                    (hasOrreData(mon) && mon.isShadow)
-                ) ?? ''
-              )}
-              style={styles.gameImage}
-            />
-            {(GameOfOriginData[mon.gameOfOrigin]?.mark || mon.gameOfOrigin === -1) && (
+            {mon.gameOfOrigin && (
+              <img
+                draggable={false}
+                alt={`${GameOfOriginData[mon.gameOfOrigin]?.name} logo`}
+                src={getPublicImageURL(
+                  getGameLogo(
+                    mon.gameOfOrigin,
+                    mon.dexNum,
+                    mon.ribbons?.includes('National') || (hasOrreData(mon) && mon.isShadow)
+                  ) ?? ''
+                )}
+                style={styles.gameImage}
+              />
+            )}
+            {mon.gameOfOrigin && GameOfOriginData[mon.gameOfOrigin]?.mark && (
               <img
                 draggable={false}
                 alt="origin mark"

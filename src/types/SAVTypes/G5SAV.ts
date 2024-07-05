@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { uniq } from 'lodash'
 import { GameOfOrigin } from 'pokemon-resources'
 import { NationalDex } from 'pokemon-species-data'
 import {
@@ -8,9 +8,9 @@ import {
 } from '../../util/ByteLogic'
 import { CRC16_CCITT } from '../../util/Encryption'
 import { gen5StringToUTF } from '../../util/Strings/StringConverter'
-import { OHPKM } from '../PKMTypes'
-import { PK5 } from '../PKMTypes/PK5'
 import { CapPikachus, RegionalForms } from '../TransferRestrictions'
+import { OHPKM } from '../pkm'
+import { PK5 } from '../pkm/PK5'
 import { SaveType } from '../types'
 import { Box, SAV } from './SAV'
 import { ParsedPath } from './path'
@@ -142,7 +142,7 @@ export class G5SAV extends SAV<PK5> {
         this.bytes.set(new Uint8Array(136), writeIndex)
       }
     })
-    _.uniq(this.updatedBoxSlots.map((coords) => coords.box)).forEach((boxIndex) =>
+    uniq(this.updatedBoxSlots.map((coords) => coords.box)).forEach((boxIndex) =>
       this.updateBoxChecksum(boxIndex)
     )
     this.updateMirrorsChecksum()

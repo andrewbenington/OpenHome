@@ -1,13 +1,15 @@
 /* eslint-disable no-nested-ternary */
 import { Download } from '@mui/icons-material'
 import { Box, Grid } from '@mui/material'
+import { PKM } from 'pokemon-files'
 import { useMemo, useState } from 'react'
-import { OHPKM } from '../../types/PKMTypes'
-import { PKM } from '../../types/PKMTypes/PKM'
+import { ErrorBoundary, FallbackProps } from 'react-error-boundary'
+import { OHPKM } from '../../types/pkm'
+import { fileTypeFromString } from '../../types/pkm/FileImport'
 import { Styles } from '../../types/types'
-import { fileTypeFromString } from '../../util/FileImport'
 import OpenHomeButton from '../components/OpenHomeButton'
 import FileTypeSelect from './FileTypeSelect'
+import JSONDisplay from './JSONDisplay'
 import MetDataMovesDisplay from './MetDataMovesDisplay'
 import OtherDisplay from './OtherDisplay'
 import RawDisplay from './RawDisplay'
@@ -61,10 +63,13 @@ const styles = {
   },
 } as Styles
 
-const PokemonDisplay = (props: { mon: PKM; tab: string; setTab: (_: string) => void }) => {
+const PokemonDisplay = (props: { mon: PKM | OHPKM; tab: string; setTab: (_: string) => void }) => {
   const { mon, tab, setTab } = props
   const [displayMon, setDisplayMon] = useState(mon)
-  const url = useMemo(() => window.URL.createObjectURL(new Blob([displayMon.bytes])), [displayMon])
+  const url = useMemo(
+    () => window.URL.createObjectURL(new Blob([displayMon.toBytes()])),
+    [displayMon]
+  )
 
   return (
     <Grid container style={styles.pokemonDisplay}>
@@ -81,7 +86,7 @@ const PokemonDisplay = (props: { mon: PKM; tab: string; setTab: (_: string) => v
                   return
                 }
                 if (newFormat === 'OHPKM') {
-                  setDisplayMon(mon instanceof OHPKM ? mon : new OHPKM(undefined, mon))
+                  setDisplayMon(mon instanceof OHPKM ? mon : new OHPKM(mon))
                   return
                 }
                 const P = fileTypeFromString(newFormat)
@@ -89,9 +94,9 @@ const PokemonDisplay = (props: { mon: PKM; tab: string; setTab: (_: string) => v
                   throw `Invalid filetype: ${P}`
                 }
                 if (mon instanceof OHPKM) {
-                  setDisplayMon(new P(undefined, undefined, mon))
+                  setDisplayMon(new P(mon as any))
                 } else {
-                  setDisplayMon(new P(undefined, undefined, new OHPKM(undefined, mon)))
+                  setDisplayMon(new P(new OHPKM(mon) as any))
                 }
               }}
             />
@@ -152,6 +157,15 @@ const PokemonDisplay = (props: { mon: PKM; tab: string; setTab: (_: string) => v
           <OpenHomeButton
             style={{
               ...styles.tabButton,
+              backgroundColor: tab === 'json' ? '#fff4' : '#0000',
+            }}
+            onClick={() => setTab('json')}
+          >
+            JSON
+          </OpenHomeButton>
+          <OpenHomeButton
+            style={{
+              ...styles.tabButton,
               backgroundColor: tab === 'raw' ? '#fff4' : '#0000',
             }}
             onClick={() => setTab('raw')}
@@ -161,22 +175,41 @@ const PokemonDisplay = (props: { mon: PKM; tab: string; setTab: (_: string) => v
         </div>
       </Grid>
       <Grid item xs={9} style={styles.displayContainer}>
-        {tab === 'summary' ? (
-          <SummaryDisplay mon={displayMon} />
-        ) : tab === 'metDataMoves' ? (
-          <MetDataMovesDisplay mon={displayMon} />
-        ) : tab === 'stats' ? (
-          <StatsDisplay mon={displayMon} />
-        ) : tab === 'ribbons' ? (
-          <RibbonsDisplay mon={displayMon} />
-        ) : tab === 'other' ? (
-          <OtherDisplay mon={displayMon} />
-        ) : (
-          <RawDisplay bytes={displayMon.bytes} />
-        )}
+        <ErrorBoundary FallbackComponent={FallbackComponent}>
+          {tab === 'summary' ? (
+            <SummaryDisplay mon={displayMon} />
+          ) : tab === 'metDataMoves' ? (
+            <MetDataMovesDisplay mon={displayMon} />
+          ) : tab === 'stats' ? (
+            <StatsDisplay mon={displayMon} />
+          ) : tab === 'ribbons' ? (
+            <RibbonsDisplay mon={displayMon} />
+          ) : tab === 'other' ? (
+            <OtherDisplay mon={displayMon} />
+          ) : tab === 'json' ? (
+            <JSONDisplay mon={displayMon} />
+          ) : (
+            <RawDisplay
+              bytes={
+                'bytes' in displayMon ? displayMon.bytes : new Uint8Array(displayMon.toBytes())
+              }
+            />
+          )}
+        </ErrorBoundary>
       </Grid>
     </Grid>
   )
 }
 
 export default PokemonDisplay
+function FallbackComponent(props: FallbackProps) {
+  const { error, resetErrorBoundary } = props
+  return (
+    <div role="alert">
+      <p>Something went wrong:</p>
+      <pre>{error.message}</pre>
+      <p>{JSON.stringify(Object.getPrototypeOf(error))}</p>
+      <button onClick={resetErrorBoundary}>Try again</button>
+    </div>
+  )
+}

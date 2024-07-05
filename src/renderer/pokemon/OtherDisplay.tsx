@@ -2,21 +2,37 @@
 import { ArrowForwardIosSharp } from '@mui/icons-material'
 import Accordion from '@mui/material/Accordion'
 import AccordionSummary from '@mui/material/AccordionSummary'
+import { AllPKMFields, getDisplayID } from 'pokemon-files'
+import {
+  BDSPTMMoveIndexes,
+  LATutorMoveIndexes,
+  SVTMMoveIndexes,
+  SwShTRMoveIndexes,
+  isGen4,
+} from 'pokemon-resources'
+import { NationalDex } from 'pokemon-species-data'
+import { useMemo } from 'react'
 import { hasGen3OnData } from 'src/types/interfaces/gen3'
-import { hasGen4OnData, hasGen4OnlyData, shinyLeafValues } from 'src/types/interfaces/gen4'
+import { shinyLeafValues } from 'src/types/interfaces/gen4'
 import { hasGen6OnData, hasN3DSOnlyData } from 'src/types/interfaces/gen6'
 import { hasGen8OnData, hasGen8OnlyData } from 'src/types/interfaces/gen8'
 import { Gen9OnlyData, hasGen9OnlyData } from 'src/types/interfaces/gen9'
-import { Countries, EncounterTypes, MOVE_DATA, SWEETS } from '../../consts'
+import { get16BitChecksumLittleEndian } from 'src/util/ByteLogic'
+import { Countries, EncounterTypes, SWEETS } from '../../consts'
+import { MOVE_DATA } from '../../consts/Moves'
 import {
   GEN2_TRANSFER_RESTRICTIONS,
   HGSS_TRANSFER_RESTRICTIONS,
   LA_TRANSFER_RESTRICTIONS,
+  ORAS_TRANSFER_RESTRICTIONS,
   SV_TRANSFER_RESTRICTIONS,
   SWSH_TRANSFER_RESTRICTIONS,
   USUM_TRANSFER_RESTRICTIONS,
 } from '../../consts/TransferRestrictions'
 import { isRestricted } from '../../types/TransferRestrictions'
+import { hasGameBoyData } from '../../types/interfaces/stats'
+import { OHPKM } from '../../types/pkm'
+import { getHiddenPowerGen2, getHiddenPowerPower, getHiddenPowerType } from '../../types/pkm/util'
 import { Styles } from '../../types/types'
 import {
   getMonFileIdentifier,
@@ -26,24 +42,8 @@ import {
 import DynamaxLevel from '../components/DynamaxLevel'
 import ShinyLeaves from '../components/ShinyLeaves'
 import TypeIcon from '../components/TypeIcon'
+import { getFlagsInRange } from '../util/byteLogic'
 import AttributeRow from './AttributeRow'
-import { PKM } from '../../types/PKMTypes/PKM'
-import { hasGameBoyData } from '../../types/interfaces/stats'
-import { OHPKM } from '../../types/PKMTypes'
-import { get16BitChecksumLittleEndian } from 'src/util/ByteLogic'
-import { isGen4 } from 'pokemon-resources'
-import {
-  getFlagsInRange,
-  getHiddenPowerGen2,
-  getHiddenPowerPower,
-  getHiddenPowerType,
-} from 'src/types/PKMTypes/util'
-import { SwShTRMoveIndexes } from 'pokemon-resources'
-import { BDSPTMMoveIndexes } from 'pokemon-resources'
-import { LATutorMoveIndexes } from 'pokemon-resources'
-import { SVTMMoveIndexes } from 'pokemon-resources'
-import { useMemo } from 'react'
-import { NationalDex } from 'pokemon-species-data'
 
 const styles = {
   accordion: {
@@ -81,16 +81,16 @@ const styles = {
   },
 } as Styles
 
-const OtherDisplay = (props: { mon: PKM }) => {
+const OtherDisplay = (props: { mon: AllPKMFields }) => {
   const { mon } = props
   return (
     <div style={styles.detailsPaneContent}>
-      {'personalityValue' in mon && (
+      {mon.personalityValue && (
         <AttributeRow label="Personality Value">
           <code>{`0x${mon.personalityValue.toString(16).padStart(8, '0')}`}</code>
         </AttributeRow>
       )}
-      {'encryptionConstant' in mon && (
+      {mon.encryptionConstant && (
         <AttributeRow label="Encryption Constant">
           <code>{`0x${mon.encryptionConstant.toString(16).padStart(8, '0')}`}</code>
         </AttributeRow>
@@ -110,16 +110,16 @@ const OtherDisplay = (props: { mon: PKM }) => {
             value={`${mon.trainerName} ${mon.trainerGender ? '♀' : '♂'}`}
           />
         </AccordionSummary>
-        <AttributeRow label="ID" value={mon.displayID.toString()} indent={10} />
+        <AttributeRow label="ID" value={getDisplayID(mon as any)} indent={10} />
         {mon.secretID !== undefined && (
           <AttributeRow label="Secret ID" indent={10}>
             <code>{`0x${mon.secretID.toString(16).padStart(4, '0')}`}</code>
           </AttributeRow>
         )}
-        {'trainerFriendship' in mon && (
+        {mon.trainerFriendship && (
           <AttributeRow label="Friendship" value={mon.trainerFriendship.toString()} indent={10} />
         )}
-        {'trainerAffection' in mon && (
+        {mon.trainerAffection && (
           <AttributeRow label="Affection" value={mon.trainerAffection.toString()} indent={10} />
         )}
         {'isCurrentHandler' in mon && (
@@ -154,7 +154,7 @@ const OtherDisplay = (props: { mon: PKM }) => {
         <div />
       )}
       <HiddenPowerDisplay mon={mon} />
-      {hasGen3OnData(mon) && mon.dexNum === NationalDex.Wurmple ? (
+      {'personalityValue' in mon && mon.dexNum === NationalDex.Wurmple ? (
         <AttributeRow
           label="Wurmple Evolution"
           value={
@@ -169,12 +169,12 @@ const OtherDisplay = (props: { mon: PKM }) => {
       ) : (
         <div />
       )}
-      {hasGen6OnData(mon) && mon.dexNum === NationalDex.Alcremie ? (
+      {mon.formArgument && mon.dexNum === NationalDex.Alcremie ? (
         <AttributeRow label="Sweet" value={SWEETS[mon.formArgument]} />
       ) : (
         <div />
       )}
-      {hasGen3OnData(mon) && mon.dexNum === NationalDex.Dunsparce ? (
+      {mon.personalityValue && mon.dexNum === NationalDex.Dunsparce ? (
         <AttributeRow
           label="Dudunsparce"
           value={
@@ -186,23 +186,23 @@ const OtherDisplay = (props: { mon: PKM }) => {
       ) : (
         <div />
       )}
-      {hasGen6OnData(mon) && mon.dexNum === NationalDex.Tandemaus && (
+      {mon.encryptionConstant !== undefined && mon.dexNum === NationalDex.Tandemaus && (
         <AttributeRow
           label="Maushold"
           value={mon.encryptionConstant % 100 ? 'Family of Four' : 'Family of Three'}
         />
       )}
-      {hasGen4OnData(mon) && isGen4(mon.gameOfOrigin) && 'encounterType' in mon && (
+      {mon.gameOfOrigin && isGen4(mon.gameOfOrigin) && mon.encounterType !== undefined && (
         <AttributeRow label="Gen 4 Encounter Type" value={EncounterTypes[mon.encounterType]} />
       )}
-      {hasGen4OnlyData(mon) &&
-        !isRestricted(HGSS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) && (
+      {mon.shinyLeaves !== undefined &&
+        !isRestricted(HGSS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) && (
           <AttributeRow label="Shiny Leaves">
-            <ShinyLeaves {...shinyLeafValues(mon)} />
+            <ShinyLeaves {...shinyLeafValues(mon.shinyLeaves)} />
           </AttributeRow>
         )}
-      {!isRestricted(USUM_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
-      hasN3DSOnlyData(mon) &&
+      {!isRestricted(USUM_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
+      mon.geolocations &&
       mon.geolocations[0].country ? (
         <Accordion
           disableGutters
@@ -216,7 +216,7 @@ const OtherDisplay = (props: { mon: PKM }) => {
           >
             <AttributeRow
               label="Geolocations"
-              value={mon.geolocations.filter((geo) => geo.country).length.toString()}
+              value={mon.geolocations?.filter((geo) => geo.country).length.toString()}
             />
           </AccordionSummary>
           {mon.geolocations?.map((geo, i) =>
@@ -232,8 +232,8 @@ const OtherDisplay = (props: { mon: PKM }) => {
       ) : (
         <div />
       )}
-      {!isRestricted(SWSH_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
-      'trFlagsSwSh' in mon &&
+      {!isRestricted(SWSH_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
+      mon.trFlagsSwSh &&
       getFlagsInRange(mon.trFlagsSwSh, 0, 14).length > 0 ? (
         <Accordion
           disableGutters
@@ -259,8 +259,8 @@ const OtherDisplay = (props: { mon: PKM }) => {
       ) : (
         <div />
       )}
-      {!isRestricted(HGSS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
-      'tmFlagsBDSP' in mon &&
+      {!isRestricted(HGSS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
+      mon.tmFlagsBDSP &&
       getFlagsInRange(mon.tmFlagsBDSP, 0, 14).length > 0 ? (
         <Accordion
           disableGutters
@@ -286,8 +286,8 @@ const OtherDisplay = (props: { mon: PKM }) => {
       ) : (
         <div />
       )}
-      {!isRestricted(LA_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
-      'tutorFlagsLA' in mon &&
+      {!isRestricted(LA_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
+      mon.tutorFlagsLA &&
       getFlagsInRange(mon.tutorFlagsLA, 0, 8).length > 0 ? (
         <Accordion
           disableGutters
@@ -314,8 +314,8 @@ const OtherDisplay = (props: { mon: PKM }) => {
         <div />
       )}
 
-      {!isRestricted(SV_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
-      'tmFlagsSV' in mon &&
+      {!isRestricted(SV_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
+      mon.tmFlagsSV &&
       getFlagsInRange(mon.tmFlagsSV, 0, 22).length > 0 ? (
         <Accordion
           disableGutters
@@ -342,35 +342,100 @@ const OtherDisplay = (props: { mon: PKM }) => {
         <div />
       )}
 
-      {!isRestricted(SWSH_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
+      {(!isRestricted(SWSH_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) ||
+        !isRestricted(ORAS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum)) &&
+        mon.trainerMemory && (
+          <Accordion
+            disableGutters
+            elevation={0}
+            TransitionProps={{ unmountOnExit: true }}
+            sx={styles.accordion}
+          >
+            <AccordionSummary
+              expandIcon={<ArrowForwardIosSharp sx={{ fontSize: '0.9rem' }} />}
+              sx={styles.accordionSummary}
+            >
+              <AttributeRow label="Trainer Memory" value={mon.trainerName} />
+            </AccordionSummary>
+            <AttributeRow
+              indent={10}
+              label="Intensity"
+              value={mon.trainerMemory.intensity.toString()}
+            />
+            <AttributeRow indent={10} label="Memory" value={mon.trainerMemory.memory.toString()} />
+            <AttributeRow
+              indent={10}
+              label="Feeling"
+              value={mon.trainerMemory.feeling.toString()}
+            />
+            <AttributeRow indent={10} label="Text Variables">
+              <code>{`0x${mon.trainerMemory.textVariables.toString(16).padStart(4, '0')}`}</code>
+            </AttributeRow>
+          </Accordion>
+        )}
+      {(!isRestricted(SWSH_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) ||
+        !isRestricted(ORAS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum)) &&
+        mon.handlerMemory && (
+          <Accordion
+            disableGutters
+            elevation={0}
+            TransitionProps={{ unmountOnExit: true }}
+            sx={styles.accordion}
+          >
+            <AccordionSummary
+              expandIcon={<ArrowForwardIosSharp sx={{ fontSize: '0.9rem' }} />}
+              sx={styles.accordionSummary}
+            >
+              <AttributeRow label="Handler Memory" value={mon.handlerName} />
+            </AccordionSummary>
+            <AttributeRow
+              indent={10}
+              label="Intensity"
+              value={mon.handlerMemory.intensity.toString()}
+            />
+            <AttributeRow indent={10} label="Memory" value={mon.handlerMemory.memory.toString()} />
+            <AttributeRow
+              indent={10}
+              label="Feeling"
+              value={mon.handlerMemory.feeling.toString()}
+            />
+            <AttributeRow indent={10} label="Text Variables">
+              <code>{`0x${mon.handlerMemory.textVariables.toString(16).padStart(4, '0')}`}</code>
+            </AttributeRow>
+          </Accordion>
+        )}
+      {!isRestricted(SWSH_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
         hasGen8OnlyData(mon) && (
           <>
             <AttributeRow label="Dynamax">
               <DynamaxLevel level={mon.dynamaxLevel} />
             </AttributeRow>
             <AttributeRow label="Can Gigantimax" value={mon.canGigantamax ? 'true' : 'false'} />
-            {mon.isShiny && (
-              <AttributeRow label="SwSh Shiny Type" value={mon.isSquareShiny ? 'Square' : 'Star'} />
+            {mon.isShiny() && (
+              <AttributeRow
+                label="SwSh Shiny Type"
+                value={mon.isSquareShiny() ? 'Square' : 'Star'}
+              />
             )}
           </>
         )}
-      {!isRestricted(SV_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) && hasGen9OnlyData(mon) && (
-        <ScarletVioletData mon={mon} />
-      )}
-      {!isRestricted(GEN2_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
+      {!isRestricted(SV_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
+        hasGen9OnlyData(mon) && <ScarletVioletData mon={mon} />}
+      {!isRestricted(GEN2_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
         hasGameBoyData(mon) && (
           <AttributeRow label="Gen 1/2 ID" value={getMonGen12Identifier(mon)} />
         )}
-      {!isRestricted(HGSS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) && hasGen3OnData(mon) && (
-        <AttributeRow label="Gen 3/4/5 ID" value={getMonGen345Identifier(mon)} />
-      )}
-      {'checksum' in mon && (
+      {!isRestricted(HGSS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
+        hasGen3OnData(mon) && (
+          <AttributeRow label="Gen 3/4/5 ID" value={getMonGen345Identifier(mon)} />
+        )}
+      {mon.checksum !== undefined && (
         <>
           <AttributeRow label="Checksum">
             <code>{`0x${mon.checksum.toString(16).padStart(4, '0')}`}</code>
           </AttributeRow>
           <AttributeRow label="Calced Checksum">
-            <code>{`0x${get16BitChecksumLittleEndian(mon.bytes, 0x08, mon.bytes.length)
+            <code>{`0x${get16BitChecksumLittleEndian(mon.toBytes(), 0x08, mon.toBytes().byteLength)
               .toString(16)
               .padStart(4, '0')}`}</code>
           </AttributeRow>
@@ -414,9 +479,9 @@ function ScarletVioletData(props: { mon: Gen9OnlyData }) {
   )
 }
 
-function HiddenPowerDisplay(props: { mon: PKM }) {
+function HiddenPowerDisplay(props: { mon: AllPKMFields }) {
   const { mon } = props
-  if (!('dvs' in mon)) {
+  if (mon.ivs) {
     return (
       <AttributeRow label="Hidden Power">
         <TypeIcon type={getHiddenPowerType(mon.ivs)} />{' '}
@@ -424,6 +489,8 @@ function HiddenPowerDisplay(props: { mon: PKM }) {
       </AttributeRow>
     )
   }
+
+  if (!mon.dvs) return undefined
 
   const { type: g2type, power: g2power } = getHiddenPowerGen2(mon.dvs)
 

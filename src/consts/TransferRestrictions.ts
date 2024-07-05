@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { range } from 'lodash'
 import { NationalDex } from 'pokemon-species-data'
 import {
   CapPikachus,
@@ -170,7 +170,7 @@ export const USUM_TRANSFER_RESTRICTIONS: TransferRestrictions = {
 
 export const LGPE_TRANSFER_RESTRICTIONS: TransferRestrictions = {
   transferableDexNums: [
-    ..._.range(NationalDex.Bulbasaur, NationalDex.Chikorita),
+    ...range(NationalDex.Bulbasaur, NationalDex.Chikorita),
     NationalDex.Meltan,
     NationalDex.Melmetal,
   ],

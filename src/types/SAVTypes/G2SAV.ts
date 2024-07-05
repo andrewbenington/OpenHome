@@ -1,11 +1,11 @@
 import { uniq } from 'lodash'
 import { GameOfOrigin } from 'pokemon-resources'
 import { GEN2_TRANSFER_RESTRICTIONS } from '../../consts/TransferRestrictions'
-import { OHPKM } from '../../types/PKMTypes/OHPKM'
-import { PK2 } from '../../types/PKMTypes/PK2'
 import { SaveType } from '../../types/types'
 import { bytesToUint16BigEndian, get8BitChecksum } from '../../util/ByteLogic'
 import { gen12StringToUTF, utf16StringToGen12 } from '../../util/Strings/StringConverter'
+import { OHPKM } from '../OHPKM'
+import { PK2 } from '../pkm/PK2'
 import { Box, SAV } from './SAV'
 import { ParsedPath } from './path'
 

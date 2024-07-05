@@ -1,13 +1,13 @@
 import { dialog } from 'electron'
 import fs from 'fs'
-import _ from 'lodash'
+import lodash from 'lodash'
 import path from 'path'
 
 export function initializeFolders(appDataPath: string) {
   if (!fs.existsSync(`${appDataPath}/OpenHome/storage/boxes`)) {
     fs.mkdirSync(`${appDataPath}/OpenHome/storage/boxes`, { recursive: true })
   }
-  _.range(36).forEach((boxNum) => {
+  lodash.range(36).forEach((boxNum) => {
     if (
       !fs.existsSync(`${appDataPath}/OpenHome/storage/boxes/Box ${(boxNum + 1).toString()}.csv`)
     ) {

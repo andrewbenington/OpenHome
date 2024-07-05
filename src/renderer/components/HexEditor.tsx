@@ -1,7 +1,7 @@
 import { Grid } from '@mui/material'
 import { Buffer } from 'buffer'
 import hexy from 'hexy'
-import _ from 'lodash'
+import lodash from 'lodash'
 import { CSSProperties, Fragment, useEffect, useState } from 'react'
 
 interface HexEditorProps {
@@ -74,7 +74,11 @@ const HexEditor = ({ data }: HexEditorProps) => {
                       onMouseOver={() => {
                         setCurrentHover(byteIndex)
                       }}
-                      title={`0x${byteIndex.toString(16).padStart(4, '0')}`}
+                      title={`0x${byteIndex
+                        .toString(16)
+                        .padStart(4, '0')}\nBin Value:\n${binaryFromHexString(
+                        pair.substring(0, 2)
+                      )}`}
                     >
                       <code>{pair.substring(0, 2)}</code>
                     </div>
@@ -87,7 +91,9 @@ const HexEditor = ({ data }: HexEditorProps) => {
                       onMouseOver={() => {
                         setCurrentHover(byteIndex + 1)
                       }}
-                      title={`0x${(byteIndex + 1).toString(16).padStart(4, '0')}`}
+                      title={`0x${(byteIndex + 1)
+                        .toString(16)
+                        .padStart(4, '0')}\nBin Value:\n${binaryFromHexString(pair.substring(2))}`}
                     >
                       <code>{pair.substring(2)}</code>
                     </div>
@@ -96,7 +102,7 @@ const HexEditor = ({ data }: HexEditorProps) => {
               })}
             </Grid>
             <Grid item xs={3} key={`line_${i}_ascii`} display="flex" flexDirection="row">
-              {_.range(16).map((k) => {
+              {lodash.range(16).map((k) => {
                 const char =
                   ascii.charCodeAt(i) >= 32 && ascii.charCodeAt(i) < 127 ? ascii.charAt(k) : '.'
                 const byteIndex = 16 * i + k
@@ -123,6 +129,10 @@ const HexEditor = ({ data }: HexEditorProps) => {
       })}
     </Grid>
   )
+}
+
+function binaryFromHexString(str: string) {
+  return '0b' + parseInt(str, 16).toString(2).padStart(8, '0')
 }
 
 export default HexEditor
