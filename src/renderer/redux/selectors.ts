@@ -1,5 +1,5 @@
 import { PKM } from 'pokemon-files'
-import { OHPKM } from '../../types/pkm'
+import { OHPKM } from '../../types/pkm/OHPKM'
 import { SAV } from '../../types/SAVTypes'
 import { SaveRefMap, StringToStringMap } from '../../types/types'
 import { useAppDispatch, useAppSelector } from './hooks'

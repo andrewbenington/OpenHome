@@ -15,7 +15,6 @@ import { useEffect, useMemo, useState } from 'react'
 import { Radar } from 'react-chartjs-2'
 import { hasGen8OnData, hasPLAData } from 'src/types/interfaces/gen8'
 import { hasGameBoyData } from 'src/types/interfaces/stats'
-import { PKMFile } from 'src/types/pkm/util'
 import {
   GEN2_TRANSFER_RESTRICTIONS,
   LA_TRANSFER_RESTRICTIONS,
@@ -24,6 +23,7 @@ import {
 import { isRestricted } from '../../types/TransferRestrictions'
 import { hasGen3OnData } from '../../types/interfaces/gen3'
 import { hasLetsGoData } from '../../types/interfaces/gen7'
+import { PKMFile } from '../../types/pkm/util'
 import { Styles } from '../../types/types'
 import SheenStars from '../components/SheenStars'
 const styles = {

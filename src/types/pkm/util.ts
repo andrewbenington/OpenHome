@@ -27,8 +27,8 @@ import {
 import { getGen3To5Gender } from '../../util/GenderCalc'
 import { Gen3OnData, hasGen3OnData } from '../interfaces/gen3'
 import { hasGen6OnData } from '../interfaces/gen6'
-import { OHPKM } from '../OHPKM'
 import { stats, statsPreSplit } from '../types'
+import { OHPKM } from './OHPKM'
 
 export const writeIVsToBuffer = (
   ivs: stats,

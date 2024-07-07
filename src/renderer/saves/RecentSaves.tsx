@@ -1,10 +1,8 @@
-import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid'
-import { GameOfOriginData } from 'pokemon-resources'
+import { ParsedPath } from 'src/types/SAVTypes/path'
 import { SaveRef } from 'src/types/types'
+import OHDataGrid, { SortableColumn } from '../components/OHDataGrid'
 import { useRecentSaves } from '../redux/selectors'
-import { filterEmpty, formatTimeSince, getSaveLogo } from './util'
-import { ParsedPath, splitPath } from 'src/types/SAVTypes/path'
-import { Stack } from '@mui/material'
+import { formatTimeSince, getSaveLogo } from './util'
 
 interface SaveFileSelectorProps {
   onOpen: (path: ParsedPath) => void
@@ -14,12 +12,12 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
   const { onOpen } = props
   const [recentSaves] = useRecentSaves()
 
-  const columns: GridColDef<SaveRef>[] = [
+  console.log(Object.values(recentSaves).map((save, i) => ({ ...save, index: i })))
+  const columns: SortableColumn<SaveRef>[] = [
     {
-      field: 'open',
-      headerName: 'Open',
+      key: 'open',
+      name: 'Open',
       width: 80,
-      align: 'center',
 
       renderCell: (params) => (
         <button
@@ -33,91 +31,84 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
       ),
     },
     {
-      field: 'game',
-      headerName: 'Game',
+      key: 'game',
+      name: 'Game',
       width: 130,
-      align: 'center',
-      renderCell: (params) => <img alt="save logo" height={50} src={getSaveLogo(params.value)} />,
-      type: 'singleSelect',
-      valueOptions: Object.values(GameOfOriginData)
-        .filter(filterEmpty)
-        .filter((origin) =>
-          Object.values(recentSaves).some((save) => save.game == origin.index.toString())
-        ),
-      getOptionValue: (value: any) => value?.index?.toString(),
-      getOptionLabel: (value: any) => value?.name,
+      // renderCell: (params) => <img alt="save logo" height={50} src={getSaveLogo(params.value)} />,
+      // valueOptions: Object.values(GameOfOriginData)
+      //   .filter(filterEmpty)
+      //   .filter((origin) =>
+      //     Object.values(recentSaves).some((save) => save.game == origin.index.toString())
+      //   ),
+      // getOptionValue: (value: any) => value?.index?.toString(),
+      renderValue: (value) => <img alt="save logo" height={50} src={getSaveLogo(value.game)} />,
     },
     {
-      field: 'trainerDetails',
-      headerName: 'Trainer',
+      key: 'trainerDetails',
+      name: 'Trainer',
       width: 160,
-      type: 'singleSelect',
-      valueOptions: Object.values(recentSaves).map(
-        (save) => `${save.trainerName} (${save.trainerID})`
-      ),
-      valueGetter: (params: GridValueGetterParams<SaveRef>) =>
-        `${params.row.trainerName} (${params.row.trainerID})`,
+      renderValue: (save) => `${save.trainerName} (${save.trainerID})`,
     },
     {
-      field: 'lastOpened',
-      headerName: 'Last Opened',
+      key: 'lastOpened',
+      name: 'Last Opened',
       width: 160,
-      valueFormatter: (params) => formatTimeSince(params.value),
+      renderValue: (save) => formatTimeSince(save.lastOpened),
     },
-    {
-      field: 'filePath',
-      headerName: 'Path',
-      width: 500,
-      renderCell: (params) => (
-        <Stack
-          display="flex"
-          flexWrap="wrap"
-          direction="row"
-          spacing={0.5}
-          useFlexGap
-          title={params.value.raw}
-          minHeight={'fit-content'}
-          margin={1}
-        >
-          {splitPath(params.value).map((segment, i) => (
-            <div key={`${params.value}_${i}`}>
-              <span
-                style={{
-                  backgroundColor: '#3336',
-                  borderRadius: 3,
-                  padding: 3,
-                  fontSize: segment === params.value.name ? 12 : 10,
-                  color: 'white',
-                  fontWeight: segment === params.value.name ? 'bold' : 'normal',
-                }}
-              >
-                {segment}
-              </span>
-              {segment !== params.value.name && ' >'}
-            </div>
-          ))}
-        </Stack>
-      ),
-    },
+    // {
+    //   key: 'filePath',
+    //   name: 'Path',
+    //   width: 500,
+    //   renderValue: (save) => (
+    //     <Stack
+    //       display="flex"
+    //       flexWrap="wrap"
+    //       direction="row"
+    //       spacing={0.5}
+    //       useFlexGap
+    //       title={save.filePath.raw}
+    //       minHeight={'fit-content'}
+    //       margin={1}
+    //     >
+    //       {splitPath(save.filePath).map((segment, i) => (
+    //         <div key={`${save.filePath.raw}_${i}`}>
+    //           <span
+    //             style={{
+    //               backgroundColor: '#3336',
+    //               borderRadius: 3,
+    //               padding: 3,
+    //               fontSize: segment === save.filePath.name ? 12 : 10,
+    //               color: 'white',
+    //               fontWeight: segment === save.filePath.name ? 'bold' : 'normal',
+    //             }}
+    //           >
+    //             {segment}
+    //           </span>
+    //           {segment !== save.filePath.name && ' >'}
+    //         </div>
+    //       ))}
+    //     </Stack>
+    //   ),
+    // },
   ]
 
   return (
-    <DataGrid
-      rows={Object.values(recentSaves)}
+    <OHDataGrid
+      rows={Object.values(recentSaves).map((save, i) => ({ ...save, index: i }))}
       columns={columns}
-      initialState={{
-        pagination: {
-          paginationModel: { page: 0, pageSize: 20 },
-        },
-        sorting: {
-          sortModel: [{ field: 'lastOpened', sort: 'desc' }],
-        },
-      }}
-      getRowId={(row) => row.filePath.raw}
-      pageSizeOptions={[20, 50, 100]}
-      rowSelection={false}
+      // initialState={{
+      //   pagination: {
+      //     paginationModel: { page: 0, pageSize: 20 },
+      //   },
+      //   sorting: {
+      //     sortModel: [{ field: 'lastOpened', sort: 'desc' }],
+      //   },
+      // }}
+      // getRowId={(row) => `${row.filePath.raw}-${row.index}`}
+      // pageSizeOptions={[20, 50, 100]}
+      // rowSelection={false}
       // autoHeight={true}
-      getRowHeight={() => 'auto'}
+      // getRowHeight={() => 'auto'}
     />
   )
 }

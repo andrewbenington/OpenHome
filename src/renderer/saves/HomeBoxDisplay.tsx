@@ -1,7 +1,7 @@
 import { ArrowBack, ArrowForward } from '@mui/icons-material'
 import { Grid, Paper } from '@mui/material'
 import lodash from 'lodash'
-import { PKMFile } from 'src/types/pkm/util'
+import { PKMFile } from '../../types/pkm/util'
 import { SaveCoordinates } from '../../types/types'
 import { useAppDispatch } from '../redux/hooks'
 import { useHomeData } from '../redux/selectors'

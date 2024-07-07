@@ -1,11 +1,11 @@
+import { PK2, PK3, PK4, PK5, PK6, PKM } from 'pokemon-files'
 import { bytesToUint32LittleEndian, bytesToUint64LittleEndian } from '../../util/ByteLogic'
 import {
   getMonFileIdentifier,
   getMonGen12Identifier,
   getMonGen345Identifier,
 } from '../../util/Lookup'
-import { OHPKM, PK2, PK3, PK4, PK5, PK6 } from '../pkm'
-import { GamePKM } from '../pkm/GamePKM'
+import { OHPKM } from '../pkm/OHPKM'
 import { SaveType, StringToStringMap } from '../types'
 import { DPSAV } from './DPSAV'
 import { G1SAV } from './G1SAV'
@@ -25,7 +25,7 @@ const SIZE_XY = 0x65600
 const SIZE_ORAS = 0x76000
 
 // check if each pokemon in a save file has OpenHome data associated with it
-const recoverOHPKMData = <P extends GamePKM>(
+const recoverOHPKMData = <P extends PKM>(
   saveFile: SAV<P>,
   getIdentifier: (_: P) => string | undefined,
   homeMonMap?: { [key: string]: OHPKM },
@@ -124,7 +124,7 @@ export const buildSaveFile = (
     gen345LookupMap?: StringToStringMap
     fileCreatedDate?: Date
   }
-): SAV<GamePKM> | undefined => {
+): SAV<PKM> | undefined => {
   const { homeMonMap, gen12LookupMap, gen345LookupMap } = lookupMaps
   const saveType = getSaveType(fileBytes)
   let saveFile

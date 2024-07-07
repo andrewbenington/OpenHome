@@ -2,7 +2,7 @@ import { AllPKMFields } from 'pokemon-files'
 import { GameOfOrigin } from 'pokemon-resources'
 import { TransferRestrictions } from '../../types/TransferRestrictions'
 import { SaveRef, SaveType } from '../../types/types'
-import { OHPKM } from '../OHPKM'
+import { OHPKM } from '../pkm/OHPKM'
 import { ParsedPath } from './path'
 
 export class Box<P extends AllPKMFields> {

@@ -1,8 +1,7 @@
 import { Stack } from '@mui/material'
 import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid'
+import { PKM } from 'pokemon-files'
 import { useEffect, useState } from 'react'
-import { GamePKM } from 'src/types/pkm/GamePKM'
-import { PKM } from 'src/types/pkm/PKM'
 import { SAV } from 'src/types/SAVTypes'
 import { buildSaveFile } from 'src/types/SAVTypes/util'
 import { ParsedPath, PossibleSaves, splitPath } from '../../types/SAVTypes/path'
@@ -19,6 +18,7 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
   const [homeMonMap, gen12LookupMap, gen345LookupMap] = useLookupMaps()
 
   const loadSaveData = async (savePath: ParsedPath) => {
+    console.log(savePath)
     const { fileBytes, createdDate } = await window.electron.ipcRenderer.invoke('read-save-file', [
       savePath,
     ])
@@ -84,7 +84,7 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
       // valueOptions: Object.values(suggestedSaves).map(
       //   (save) => `${save.trainerName} (${save.trainerID})`
       // ),
-      valueGetter: (params: GridValueGetterParams<SAV<GamePKM>>) =>
+      valueGetter: (params: GridValueGetterParams<SAV<PKM>>) =>
         `${params.row.name} (${params.row.tid})`,
     },
     // {

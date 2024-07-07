@@ -1,11 +1,11 @@
 import lodash from 'lodash'
-import { GameOfOrigin } from 'pokemon-resources'
+import { PK1 } from 'pokemon-files'
+import { GameOfOrigin, Languages } from 'pokemon-resources'
 import { GEN1_TRANSFER_RESTRICTIONS } from '../../consts/TransferRestrictions'
 import { bytesToUint16BigEndian, get8BitChecksum } from '../../util/ByteLogic'
 import { natDexToGen1ID } from '../../util/ConvertPokemonID'
 import { gen12StringToUTF, utf16StringToGen12 } from '../../util/Strings/StringConverter'
-import { OHPKM } from '../OHPKM'
-import { PK1 } from '../pkm/PK1'
+import { OHPKM } from '../pkm/OHPKM'
 import { SaveType } from '../types'
 import { Box, SAV } from './SAV'
 import { ParsedPath } from './path'
@@ -81,7 +81,7 @@ export class G1SAV extends SAV<PK1> {
               this.bytes.slice(
                 boxByteOffset + this.BOX_PKM_OFFSET + monIndex * this.BOX_PKM_SIZE,
                 boxByteOffset + this.BOX_PKM_OFFSET + (monIndex + 1) * this.BOX_PKM_SIZE
-              )
+              ).buffer
             )
             mon.trainerName = gen12StringToUTF(
               this.bytes,
@@ -94,7 +94,7 @@ export class G1SAV extends SAV<PK1> {
               11
             )
             mon.gameOfOrigin = GameOfOrigin.Red
-            mon.language = 'ENG'
+            mon.languageIndex = Languages.indexOf('ENG')
             this.boxes[boxNumber].pokemon[monIndex] = mon
           }
         }
@@ -120,12 +120,12 @@ export class G1SAV extends SAV<PK1> {
           if (boxMon instanceof OHPKM) {
             changedMonPKMs.push(boxMon)
           }
-          const pk1Mon = boxMon instanceof PK1 ? boxMon : new PK1(undefined, undefined, boxMon)
+          const pk1Mon = boxMon instanceof PK1 ? boxMon : new PK1(boxMon)
           // set the mon's dex number in the box
           this.bytes[boxByteOffset + 1 + numMons] = natDexToGen1ID[pk1Mon.dexNum]
           // set the mon's data in the box
           this.bytes.set(
-            pk1Mon.bytes,
+            new Uint8Array(pk1Mon.toBytes()),
             boxByteOffset + this.BOX_PKM_OFFSET + numMons * this.BOX_PKM_SIZE
           )
           // set the mon's OT name in the box

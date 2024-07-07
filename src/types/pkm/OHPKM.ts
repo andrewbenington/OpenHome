@@ -21,8 +21,8 @@ import {
 } from 'pokemon-resources'
 import { NationalDex } from 'pokemon-species-data'
 import Prando from 'prando'
-import { Gen34ContestRibbons, Gen34TowerRibbons, OpenHomeRibbons } from '../consts'
-import { ShadowIDsColosseum, ShadowIDsXD } from '../consts/ShadowIDs'
+import { Gen34ContestRibbons, Gen34TowerRibbons, OpenHomeRibbons } from '../../consts'
+import { ShadowIDsColosseum, ShadowIDsXD } from '../../consts/ShadowIDs'
 import {
   bytesToUint16BigEndian,
   bytesToUint16LittleEndian,
@@ -32,18 +32,27 @@ import {
   uint16ToBytesBigEndian,
   uint16ToBytesLittleEndian,
   uint32ToBytesLittleEndian,
-} from '../util/ByteLogic'
-import { getHPGen3Onward, getLevelGen3Onward, getStatGen3Onward } from '../util/StatCalc'
-import { utf16BytesToString, utf16StringToBytes } from '../util/Strings/StringConverter'
-import { hasGen2OnData } from './interfaces/gen2'
-import { hasGen3OnData, hasOrreData } from './interfaces/gen3'
-import { hasGen4OnData } from './interfaces/gen4'
-import { hasGen5OnlyData } from './interfaces/gen5'
-import { hasGen6OnData, hasMemoryData, hasN3DSOnlyData } from './interfaces/gen6'
-import { hasGen7OnData } from './interfaces/gen7'
-import { hasGen8OnData, hasPLAData } from './interfaces/gen8'
-import { hasGen9OnlyData } from './interfaces/gen9'
-import { hasGameBoyData } from './interfaces/stats'
+} from '../../util/ByteLogic'
+import { getHPGen3Onward, getLevelGen3Onward, getStatGen3Onward } from '../../util/StatCalc'
+import { utf16BytesToString, utf16StringToBytes } from '../../util/Strings/StringConverter'
+import { hasGen2OnData } from '../interfaces/gen2'
+import { hasGen3OnData, hasOrreData } from '../interfaces/gen3'
+import { hasGen4OnData } from '../interfaces/gen4'
+import { hasGen5OnlyData } from '../interfaces/gen5'
+import { hasGen6OnData, hasMemoryData, hasN3DSOnlyData } from '../interfaces/gen6'
+import { hasGen7OnData } from '../interfaces/gen7'
+import { hasGen8OnData, hasPLAData } from '../interfaces/gen8'
+import { hasGen9OnlyData } from '../interfaces/gen9'
+import { hasGameBoyData } from '../interfaces/stats'
+import {
+  contestStats,
+  geolocation,
+  hyperTrainStats,
+  memory,
+  pokedate,
+  stats,
+  statsPreSplit,
+} from '../types'
 import {
   adjustMovePPBetweenFormats,
   dvsFromIVs,
@@ -53,16 +62,7 @@ import {
   gvsFromIVs,
   ivsFromDVs,
   writeIVsToBuffer,
-} from './pkm/util'
-import {
-  contestStats,
-  geolocation,
-  hyperTrainStats,
-  memory,
-  pokedate,
-  stats,
-  statsPreSplit,
-} from './types'
+} from './util'
 
 export class OHPKM {
   static fromBytes(bytes: ArrayBuffer) {
@@ -125,9 +125,13 @@ export class OHPKM {
 
       if (hasGen2OnData(other)) {
         this.gender = other.gender
-        this.pokerusByte = other.pokerusByte
-        this.isEgg = other.isEgg
-        this.trainerFriendship = other.trainerFriendship
+        if ('pokerusByte' in other) {
+          this.pokerusByte = other.pokerusByte
+          this.trainerFriendship = other.trainerFriendship
+        }
+        if ('isEgg' in other) {
+          this.isEgg = other.isEgg
+        }
       }
 
       if (hasGen3OnData(other)) {
@@ -1554,8 +1558,12 @@ export class OHPKM {
     this.battleMemoryCount = Math.max(battleRibbons.length, this.battleMemoryCount)
 
     if (hasGen2OnData(other)) {
-      this.pokerusByte = other.pokerusByte
-      this.trainerFriendship = Math.max(other.trainerFriendship, this.trainerFriendship)
+      if ('pokerusByte' in other) {
+        this.pokerusByte = other.pokerusByte
+      }
+      if ('trainerFriendship' in other) {
+        this.trainerFriendship = Math.max(other.trainerFriendship, this.trainerFriendship)
+      }
     }
 
     if ('shinyLeaves' in other) {

@@ -15,8 +15,8 @@ import {
   PKMType,
   XDPKM,
 } from 'pokemon-files'
-import { OHPKM } from '../OHPKM'
-import { PKMFile } from './util'
+import { OHPKM } from './pkm/OHPKM'
+import { PKMFile } from './pkm/util'
 
 function fileTypeFromBytes(bytes: Uint8Array): PKMType | undefined {
   switch (bytes.length) {

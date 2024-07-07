@@ -1,6 +1,6 @@
 import lodash from 'lodash'
 import { getMonFileIdentifier } from '../../util/Lookup'
-import { OHPKM } from '../OHPKM'
+import { OHPKM } from '../pkm/OHPKM'
 import { Box, BoxCoordinates, SAV } from './SAV'
 import { emptyParsedPath } from './path'
 

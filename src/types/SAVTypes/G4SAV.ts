@@ -1,3 +1,4 @@
+import { PK4 } from 'pokemon-files'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -5,8 +6,7 @@ import {
 } from '../../util/ByteLogic'
 import { CRC16_CCITT } from '../../util/Encryption'
 import { gen4StringToUTF } from '../../util/Strings/StringConverter'
-import { OHPKM } from '../OHPKM'
-import { PK4 } from '../pkm/PK4'
+import { OHPKM } from '../pkm/OHPKM'
 import { Box, SAV } from './SAV'
 import { ParsedPath } from './path'
 
@@ -52,7 +52,7 @@ export class G4SAV extends SAV<PK4> {
           const startByte = this.currentSaveBoxStartOffset + this.boxSize * box + 136 * monIndex
           const endByte = this.currentSaveBoxStartOffset + this.boxSize * box + 136 * (monIndex + 1)
           const monData = this.bytes.slice(startByte, endByte)
-          const mon = new PK4(monData, true)
+          const mon = new PK4(monData.buffer, true)
           if (mon.dexNum !== 0 && mon.gameOfOrigin !== 0) {
             if (
               this.origin === 0 &&
@@ -110,11 +110,10 @@ export class G4SAV extends SAV<PK4> {
       // and the slot was left empty
       if (changedMon) {
         try {
-          const mon =
-            changedMon instanceof OHPKM ? new PK4(undefined, undefined, changedMon) : changedMon
+          const mon = changedMon instanceof OHPKM ? new PK4(changedMon) : changedMon
           if (mon.gameOfOrigin && mon.dexNum) {
             mon.refreshChecksum()
-            this.bytes.set(mon.toPCBytes(), writeIndex)
+            this.bytes.set(new Uint8Array(mon.toPCBytes()), writeIndex)
           }
         } catch (e) {
           console.error(e)

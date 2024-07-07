@@ -1,4 +1,5 @@
 import { uniq } from 'lodash'
+import { PK5 } from 'pokemon-files'
 import { GameOfOrigin } from 'pokemon-resources'
 import { NationalDex } from 'pokemon-species-data'
 import {
@@ -9,8 +10,7 @@ import {
 import { CRC16_CCITT } from '../../util/Encryption'
 import { gen5StringToUTF } from '../../util/Strings/StringConverter'
 import { CapPikachus, RegionalForms } from '../TransferRestrictions'
-import { OHPKM } from '../pkm'
-import { PK5 } from '../pkm/PK5'
+import { OHPKM } from '../pkm/OHPKM'
 import { SaveType } from '../types'
 import { Box, SAV } from './SAV'
 import { ParsedPath } from './path'
@@ -71,7 +71,7 @@ export class G5SAV extends SAV<PK5> {
           const startByte = PC_OFFSET + BOX_SIZE * box + 136 * monIndex
           const endByte = PC_OFFSET + BOX_SIZE * box + 136 * (monIndex + 1)
           const monData = bytes.slice(startByte, endByte)
-          const mon = new PK5(monData, true)
+          const mon = new PK5(monData.buffer, true)
           if (mon.gameOfOrigin !== 0 && mon.dexNum !== 0) {
             this.boxes[box].pokemon[monIndex] = mon
           }
@@ -129,11 +129,10 @@ export class G5SAV extends SAV<PK5> {
       // and the slot was left empty
       if (changedMon) {
         try {
-          const mon =
-            changedMon instanceof OHPKM ? new PK5(undefined, undefined, changedMon) : changedMon
+          const mon = changedMon instanceof OHPKM ? new PK5(changedMon) : changedMon
           if (mon?.gameOfOrigin && mon?.dexNum) {
             mon.refreshChecksum()
-            this.bytes.set(mon.toPCBytes(), writeIndex)
+            this.bytes.set(new Uint8Array(mon.toPCBytes()), writeIndex)
           }
         } catch (e) {
           console.error(e)

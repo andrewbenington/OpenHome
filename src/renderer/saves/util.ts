@@ -8,7 +8,8 @@ export function getSaveLogo(game?: string) {
   return getPublicImageURL(getGameLogo(parseInt(game)))
 }
 
-export function formatTimeSince(timestamp: number) {
+export function formatTimeSince(timestamp?: number) {
+  if (!timestamp) return ''
   const now = Date.now()
   const seconds = Math.floor((now - timestamp) / 1000)
   let interval = seconds / 31536000

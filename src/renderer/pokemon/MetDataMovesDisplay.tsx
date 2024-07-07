@@ -147,10 +147,10 @@ const MetDataMovesDisplay = (props: { mon: AllPKMFields }) => {
           {eggMessage ? <p style={styles.description}>{eggMessage}</p> : <div />}
           <p style={styles.description}>{metMessage}</p>
           {/* check for undefined because 0 nature is Hardy */}
-          {hasGen3OnData(mon) ? (
+          {hasGen3OnData(mon as any) ? (
             <div>
               <p style={styles.description}>{natureMessage}</p>
-              <p>{getCharacteristic(mon)}</p>
+              <p>{getCharacteristic(mon as any)}</p>
             </div>
           ) : (
             <div />
@@ -191,7 +191,7 @@ const MetDataMovesDisplay = (props: { mon: AllPKMFields }) => {
               />
             )}
           </div>
-          {hasGen3OnData(mon) ? <Markings markings={mon.markings} /> : <div />}
+          {'markings' in mon && mon.markings ? <Markings markings={mon.markings} /> : <div />}
         </div>
       </div>
       <div style={styles.centerFlex}>

@@ -161,7 +161,7 @@ function initListeners() {
       const fileBytes = readBytesFromFile(filePaths[0])
       const createdDate = getFileCreatedDate(filePaths[0])
       return {
-        path: filePaths[0],
+        path: { ...path.parse(filePaths[0]), separator: path.sep, raw: filePath },
         fileBytes,
         createdDate,
       }

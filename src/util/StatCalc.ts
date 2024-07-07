@@ -22,7 +22,7 @@ export const getStatGen3Onward = (stat: Stat, mon: AllPKMFields) => {
     const ev = (mon.evs as any)[stat.toLowerCase()]
     return Math.floor(
       natureMultiplier *
-        (Math.floor((mon.level * (2 * baseStat + iv + Math.floor(ev / 4))) / 100) + 5)
+        (Math.floor((mon.getLevel() * (2 * baseStat + iv + Math.floor(ev / 4))) / 100) + 5)
     )
   }
   return 0
@@ -39,7 +39,11 @@ export const getHPGen3Onward = (mon: AllPKMFields) => {
   if (baseHP) {
     const iv = (mon.ivs as any).hp
     const ev = (mon.evs as any).hp
-    return Math.floor((mon.level * (2 * baseHP + iv + Math.floor(ev / 4))) / 100) + mon.level + 10
+    return (
+      Math.floor((mon.getLevel() * (2 * baseHP + iv + Math.floor(ev / 4))) / 100) +
+      mon.getLevel() +
+      10
+    )
   }
   return 0
 }

@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice, current, Draft, PayloadAction } from '@reduxjs/toolkit'
-import { OHPKM } from '../../../types/pkm'
+import { OHPKM } from '../../../types/pkm/OHPKM'
 import { PKMFile } from '../../../types/pkm/util'
 import { G1SAV, G2SAV, G3SAV, G4SAV, G5SAV, SAV } from '../../../types/SAVTypes'
 import { G6SAV } from '../../../types/SAVTypes/G6SAV'

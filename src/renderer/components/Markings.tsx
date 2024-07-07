@@ -1,12 +1,9 @@
+import { MarkingColorValue, Markings } from 'pokemon-files'
 import { CSSProperties } from 'react'
-import { markingColorValue, markings } from 'src/types/PKMInterfaces/types'
 import { marking } from '../../types/types'
 
 interface MarkingsProps {
-  markings:
-    | [marking, marking, marking, marking, marking, marking]
-    | [marking, marking, marking, marking]
-    | markings
+  markings: Markings
 }
 
 const markingsContainerStyle = {
@@ -23,13 +20,13 @@ const getMarkingColorByNumber = (value: marking) => {
   return ['grey', 'blue', 'red'][value]
 }
 
-const getMarkingColor = (value: boolean | markingColorValue) => {
+const getMarkingColor = (value: boolean | MarkingColorValue) => {
   if (!value) return 'grey'
   if (value === true) return 'blue'
   return value
 }
 
-const Markings = (props: MarkingsProps) => {
+const MarkingsDisplay = (props: MarkingsProps) => {
   const { markings } = props
   if (!('length' in markings)) {
     return (
@@ -95,4 +92,4 @@ const Markings = (props: MarkingsProps) => {
   )
 }
 
-export default Markings
+export default MarkingsDisplay

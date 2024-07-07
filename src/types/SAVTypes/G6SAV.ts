@@ -1,3 +1,4 @@
+import { PK6 } from 'pokemon-files'
 import { GameOfOrigin } from 'pokemon-resources'
 import {
   ORAS_TRANSFER_RESTRICTIONS,
@@ -6,7 +7,7 @@ import {
 import { bytesToUint16LittleEndian, uint16ToBytesLittleEndian } from '../../util/ByteLogic'
 import { CRC16_CCITT } from '../../util/Encryption'
 import { utf16BytesToString } from '../../util/Strings/StringConverter'
-import { OHPKM, PK6 } from '../pkm'
+import { OHPKM } from '../pkm/OHPKM'
 import { SaveType } from '../types'
 import { Box, SAV } from './SAV'
 import { ParsedPath } from './path'
@@ -62,7 +63,7 @@ export class G6SAV extends SAV<PK6> {
           const startByte = this.pcOffset + BOX_SIZE * box + 232 * monIndex
           const endByte = this.pcOffset + BOX_SIZE * box + 232 * (monIndex + 1)
           const monData = bytes.slice(startByte, endByte)
-          const mon = new PK6(monData, true)
+          const mon = new PK6(monData.buffer, true)
           if (mon.gameOfOrigin !== 0 && mon.dexNum !== 0) {
             this.boxes[box].pokemon[monIndex] = mon
           }
@@ -87,18 +88,17 @@ export class G6SAV extends SAV<PK6> {
       // and the slot was left empty
       if (changedMon) {
         try {
-          const mon =
-            changedMon instanceof OHPKM ? new PK6(undefined, undefined, changedMon) : changedMon
+          const mon = changedMon instanceof OHPKM ? new PK6(changedMon) : changedMon
           if (mon?.gameOfOrigin && mon?.dexNum) {
             mon.refreshChecksum()
-            this.bytes.set(mon.toPCBytes(), writeIndex)
+            this.bytes.set(new Uint8Array(mon.toPCBytes()), writeIndex)
           }
         } catch (e) {
           console.error(e)
         }
       } else {
         const mon = new PK6(new Uint8Array(232))
-        this.bytes.set(mon.toPCBytes(), writeIndex)
+        this.bytes.set(new Uint8Array(mon.toPCBytes()), writeIndex)
       }
     })
     this.bytes.set(

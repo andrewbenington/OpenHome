@@ -1,12 +1,13 @@
 import { Grid } from '@mui/material'
 import { useMemo, useState } from 'react'
+import 'react-data-grid/lib/styles.css'
+import { ParsedPath } from 'src/types/SAVTypes/path'
 import { useAppDispatch } from '../../renderer/redux/hooks'
 import { useLookupMaps, useRecentSaves } from '../../renderer/redux/selectors'
 import { addSave } from '../../renderer/redux/slices/appSlice'
 import { buildSaveFile } from '../../types/SAVTypes/util'
 import RecentSaves from './RecentSaves'
 import SuggestedSaves from './SuggestedSaves'
-import { ParsedPath } from 'src/types/SAVTypes/path'
 
 interface SaveFileSelectorProps {
   onClose: () => void
@@ -20,10 +21,13 @@ const SaveFileSelector = (props: SaveFileSelectorProps) => {
   const [tab, setTab] = useState('recents')
 
   const openSaveFile = async (filePath?: ParsedPath) => {
-    const { fileBytes, createdDate } = await window.electron.ipcRenderer.invoke(
+    const { path, fileBytes, createdDate } = await window.electron.ipcRenderer.invoke(
       'read-save-file',
       filePath && [filePath]
     )
+    if (!filePath) {
+      filePath = path
+    }
     if (filePath && fileBytes && homeMonMap) {
       const saveFile = buildSaveFile(filePath, fileBytes, {
         homeMonMap,

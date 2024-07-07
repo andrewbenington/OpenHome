@@ -1,10 +1,9 @@
-import { useTheme } from '@emotion/react'
-import { Box } from '@mui/material'
+import { Box, useTheme } from '@mui/material'
 import { JSONTree } from 'react-json-tree'
-import { PKM } from 'src/types/PKMInterfaces/pkm'
+import { PKMFile } from '../../types/pkm/util'
 
 interface JSONDisplayProps {
-  mon: PKM
+  mon: PKMFile
 }
 
 export default function JSONDisplay(props: JSONDisplayProps) {

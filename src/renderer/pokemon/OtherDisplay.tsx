@@ -15,7 +15,7 @@ import { useMemo } from 'react'
 import { hasGen3OnData } from 'src/types/interfaces/gen3'
 import { shinyLeafValues } from 'src/types/interfaces/gen4'
 import { hasGen6OnData, hasN3DSOnlyData } from 'src/types/interfaces/gen6'
-import { hasGen8OnData, hasGen8OnlyData } from 'src/types/interfaces/gen8'
+import { hasGen8OnlyData } from 'src/types/interfaces/gen8'
 import { Gen9OnlyData, hasGen9OnlyData } from 'src/types/interfaces/gen9'
 import { get16BitChecksumLittleEndian } from 'src/util/ByteLogic'
 import { Countries, EncounterTypes, SWEETS } from '../../consts'
@@ -31,7 +31,7 @@ import {
 } from '../../consts/TransferRestrictions'
 import { isRestricted } from '../../types/TransferRestrictions'
 import { hasGameBoyData } from '../../types/interfaces/stats'
-import { OHPKM } from '../../types/pkm'
+import { OHPKM } from '../../types/pkm/OHPKM'
 import { getHiddenPowerGen2, getHiddenPowerPower, getHiddenPowerType } from '../../types/pkm/util'
 import { Styles } from '../../types/types'
 import {
@@ -142,8 +142,8 @@ const OtherDisplay = (props: { mon: AllPKMFields }) => {
               value={`${mon.handlerName} ${mon.handlerGender ? '♀' : '♂'}`}
             />
           </AccordionSummary>
-          {hasGen8OnData(mon) && (
-            <AttributeRow label="ID" value={mon.handlerID.toString()} indent={10} />
+          {'handlerID' in mon && (
+            <AttributeRow label="ID" value={mon.handlerID?.toString()} indent={10} />
           )}
           <AttributeRow label="Friendship" value={mon.handlerFriendship.toString()} indent={10} />
           {hasN3DSOnlyData(mon) && (
@@ -422,12 +422,12 @@ const OtherDisplay = (props: { mon: AllPKMFields }) => {
       {!isRestricted(SV_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
         hasGen9OnlyData(mon) && <ScarletVioletData mon={mon} />}
       {!isRestricted(GEN2_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
-        hasGameBoyData(mon) && (
+        hasGameBoyData(mon as any) && (
           <AttributeRow label="Gen 1/2 ID" value={getMonGen12Identifier(mon)} />
         )}
       {!isRestricted(HGSS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
-        hasGen3OnData(mon) && (
-          <AttributeRow label="Gen 3/4/5 ID" value={getMonGen345Identifier(mon)} />
+        hasGen3OnData(mon as any) && (
+          <AttributeRow label="Gen 3/4/5 ID" value={getMonGen345Identifier(mon as any)} />
         )}
       {mon.checksum !== undefined && (
         <>

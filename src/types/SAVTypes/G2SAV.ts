@@ -1,11 +1,11 @@
 import { uniq } from 'lodash'
-import { GameOfOrigin } from 'pokemon-resources'
+import { PK2 } from 'pokemon-files'
+import { GameOfOrigin, Languages } from 'pokemon-resources'
 import { GEN2_TRANSFER_RESTRICTIONS } from '../../consts/TransferRestrictions'
 import { SaveType } from '../../types/types'
 import { bytesToUint16BigEndian, get8BitChecksum } from '../../util/ByteLogic'
 import { gen12StringToUTF, utf16StringToGen12 } from '../../util/Strings/StringConverter'
-import { OHPKM } from '../OHPKM'
-import { PK2 } from '../pkm/PK2'
+import { OHPKM } from '../pkm/OHPKM'
 import { Box, SAV } from './SAV'
 import { ParsedPath } from './path'
 
@@ -54,7 +54,7 @@ export class G2SAV extends SAV<PK2> {
             this.bytes.slice(
               offset + 1 + pokemonPerBox + 1 + monIndex * 0x20,
               offset + 1 + pokemonPerBox + 1 + (monIndex + 1) * 0x20
-            )
+            ).buffer
           )
           mon.trainerName = gen12StringToUTF(
             this.bytes,
@@ -74,7 +74,7 @@ export class G2SAV extends SAV<PK2> {
           )
           mon.gameOfOrigin =
             this.saveType === SaveType.GS_I ? GameOfOrigin.Silver : GameOfOrigin.Crystal
-          mon.language = 'ENG'
+          mon.languageIndex = Languages.indexOf('ENG')
           this.boxes[boxNumber].pokemon[monIndex] = mon
         }
       })
@@ -95,11 +95,14 @@ export class G2SAV extends SAV<PK2> {
           if (boxMon instanceof OHPKM) {
             changedMonPKMs.push(boxMon)
           }
-          const pk2Mon = boxMon instanceof PK2 ? boxMon : new PK2(undefined, undefined, boxMon)
+          const pk2Mon = boxMon instanceof PK2 ? boxMon : new PK2(boxMon)
           // set the mon's dex number in the box
           this.bytes[boxByteOffset + 1 + numMons] = pk2Mon.dexNum
           // set the mon's data in the box
-          this.bytes.set(pk2Mon.bytes, boxByteOffset + 1 + pokemonPerBox + 1 + numMons * 0x20)
+          this.bytes.set(
+            new Uint8Array(pk2Mon.toBytes()),
+            boxByteOffset + 1 + pokemonPerBox + 1 + numMons * 0x20
+          )
           // set the mon's OT name in the box
           const trainerNameBuffer = utf16StringToGen12(pk2Mon.trainerName, 11, true)
           this.bytes.set(

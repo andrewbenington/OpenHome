@@ -1,3 +1,5 @@
+import { PKMFile } from '../pkm/util'
+
 export interface Gen2OnData {
   gender: number
   pokerusByte: number
@@ -10,9 +12,10 @@ export interface Gen2OnData {
   trainerFriendship: number
 }
 
-export function hasGen2OnData(obj: any): obj is Gen2OnData {
-  return obj && 'pokerusByte' in obj
+export function hasGen2OnData<T extends PKMFile>(obj: T): obj is WithGender<T> {
+  return obj && 'gender' in obj
 }
+export type WithGender<T> = T extends { gender: number } ? T : never
 
 export interface Gen2OnlyData {
   metTimeOfDay: number
