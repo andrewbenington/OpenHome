@@ -100,7 +100,7 @@ export class G2SAV extends SAV<PK2> {
           this.bytes[boxByteOffset + 1 + numMons] = pk2Mon.dexNum
           // set the mon's data in the box
           this.bytes.set(
-            new Uint8Array(pk2Mon.toBytes()),
+            new Uint8Array(pk2Mon.toBytes().slice(0, 32)),
             boxByteOffset + 1 + pokemonPerBox + 1 + numMons * 0x20
           )
           // set the mon's OT name in the box
@@ -188,7 +188,7 @@ export class G2SAV extends SAV<PK2> {
     checksum += get8BitChecksum(this.bytes, 0x0c6b, 0x10e7)
     checksum += get8BitChecksum(this.bytes, 0x7e39, 0x7e6c)
     checksum += get8BitChecksum(this.bytes, 0x10e8, 0x15c6)
-    return checksum
+    return checksum & 0xff
   }
 
   getCrystalInternationalChecksum1() {

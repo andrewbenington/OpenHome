@@ -9,6 +9,7 @@ import {
   readBytesFromFile,
   recursivelyFindCitraSaves,
   recursivelyFindDeSamuMESaves,
+  recursivelyFindGambatteSaves,
   recursivelyFindMGBASaves,
   selectFile,
 } from './fileHandlers'
@@ -102,6 +103,9 @@ function initListeners() {
           })
         )
       )
+      possibleSaves.openEmu = recursivelyFindGambatteSaves(
+        path.join(app.getPath('appData'), 'OpenEmu', 'Gambatte')
+      ).map((p) => ({ ...path.parse(p), separator: path.sep, raw: p }))
     }
     if (fs.existsSync(path.join(app.getPath('appData'), 'DeSmuME'))) {
       possibleSaves.desamume = recursivelyFindDeSamuMESaves(

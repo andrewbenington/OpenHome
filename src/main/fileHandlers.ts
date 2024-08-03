@@ -146,6 +146,24 @@ export function recursivelyFindDeSamuMESaves(currentPath: string) {
   return foundSaves
 }
 
+export function recursivelyFindGambatteSaves(currentPath: string) {
+  const files = fs.readdirSync(currentPath)
+  if (files.includes('Battery Saves')) {
+    return fs
+      .readdirSync(path.join(currentPath, 'Battery Saves'))
+      .filter((file) => file.endsWith('.sav') || file.endsWith('.rtc'))
+      .map((file) => path.join(currentPath, 'Battery Saves', file))
+  }
+  const foundSaves: string[] = []
+  files.forEach((file) => {
+    const newPath = path.join(currentPath, file)
+    if (fs.lstatSync(newPath).isDirectory()) {
+      foundSaves.push(...recursivelyFindGambatteSaves(path.join(currentPath, file)))
+    }
+  })
+  return foundSaves
+}
+
 export function recursivelyFindMGBASaves(currentPath: string) {
   const files = fs.readdirSync(currentPath)
   if (files.includes('Battery Saves')) {

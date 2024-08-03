@@ -101,7 +101,6 @@ const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
                     zIndex={10 - row}
                     onDrop={(importedMons) => {
                       if (importedMons) {
-                        console.log(importedMons)
                         dispatchImportMons(importedMons, {
                           saveNumber: -1,
                           box: data.currentPCBox,

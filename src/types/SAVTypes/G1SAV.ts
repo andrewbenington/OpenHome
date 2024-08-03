@@ -64,6 +64,9 @@ export class G1SAV extends SAV<PK1> {
         this.invalid = true
         return
     }
+    if (this.bytes[0x271c] > 0) {
+      this.origin = GameOfOrigin.Yellow
+    }
     this.boxes = new Array(this.NUM_BOXES)
     if (this.saveType > 0 && this.saveType <= 2) {
       const pokemonPerBox = this.boxRows * this.boxColumns
@@ -77,25 +80,29 @@ export class G1SAV extends SAV<PK1> {
         }
         for (let monIndex = 0; monIndex < pokemonPerBox; monIndex++) {
           if (this.bytes[boxByteOffset + this.BOX_PKM_OFFSET + monIndex * this.BOX_PKM_SIZE]) {
-            const mon = new PK1(
-              this.bytes.slice(
-                boxByteOffset + this.BOX_PKM_OFFSET + monIndex * this.BOX_PKM_SIZE,
-                boxByteOffset + this.BOX_PKM_OFFSET + (monIndex + 1) * this.BOX_PKM_SIZE
-              ).buffer
-            )
-            mon.trainerName = gen12StringToUTF(
-              this.bytes,
-              boxByteOffset + this.BOX_OT_OFFSET + monIndex * 11,
-              11
-            )
-            mon.nickname = gen12StringToUTF(
-              this.bytes,
-              boxByteOffset + this.BOX_NICKNAME_OFFSET + monIndex * 11,
-              11
-            )
-            mon.gameOfOrigin = GameOfOrigin.Red
-            mon.languageIndex = Languages.indexOf('ENG')
-            this.boxes[boxNumber].pokemon[monIndex] = mon
+            try {
+              const mon = new PK1(
+                this.bytes.slice(
+                  boxByteOffset + this.BOX_PKM_OFFSET + monIndex * this.BOX_PKM_SIZE,
+                  boxByteOffset + this.BOX_PKM_OFFSET + (monIndex + 1) * this.BOX_PKM_SIZE
+                ).buffer
+              )
+              mon.trainerName = gen12StringToUTF(
+                this.bytes,
+                boxByteOffset + this.BOX_OT_OFFSET + monIndex * 11,
+                11
+              )
+              mon.nickname = gen12StringToUTF(
+                this.bytes,
+                boxByteOffset + this.BOX_NICKNAME_OFFSET + monIndex * 11,
+                11
+              )
+              mon.gameOfOrigin = GameOfOrigin.Red
+              mon.languageIndex = Languages.indexOf('ENG')
+              this.boxes[boxNumber].pokemon[monIndex] = mon
+            } catch (e) {
+              console.error(e)
+            }
           }
         }
       })

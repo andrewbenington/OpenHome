@@ -148,6 +148,7 @@ export interface SaveRef {
   trainerName?: string
   trainerID?: string
   lastOpened?: number
+  valid?: boolean
 }
 export type SaveRefMap = { [key: string]: SaveRef }
 

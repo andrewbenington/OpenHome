@@ -21,7 +21,9 @@ export const recentSavesSlice = createSlice({
       }
       const saveRef = action.payload.getSaveRef()
       window.electron.ipcRenderer.send('add-recent-save', saveRef)
-      state[joinPath(action.payload.filePath)] = saveRef
+      const fullPath = joinPath(action.payload.filePath)
+      saveRef.valid = fullPath in state ? state[fullPath].valid : false
+      state[fullPath] = saveRef
     },
     removeRecentSave: (state, action: PayloadAction<string>) => {
       const filePath = action.payload

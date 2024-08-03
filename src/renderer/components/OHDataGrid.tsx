@@ -1,6 +1,7 @@
 import { ReactNode, RefAttributes, useEffect, useMemo, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, DataGridProps, SortColumn } from 'react-data-grid'
 import 'react-data-grid/lib/styles.css'
+import './components.css'
 
 function sortRows<T>(rows: readonly T[], columns: SortableColumn<T>[], sortColumns: SortColumn[]) {
   if (sortColumns.length === 0) return rows
@@ -64,7 +65,7 @@ export default function OHDataGrid<R>(props: OHDataGridProps<R>) {
     <DataGrid
       className="datagrid"
       rowHeight={45}
-      // style={{ fontSize: 12, height: 'inherit', display: 'grid' }}
+      style={{ fontSize: 12, height: 'inherit' }}
       {...otherProps}
       rows={sortedRows}
       columns={reorderedColumns.map(sortableColumnToDGColumn)}

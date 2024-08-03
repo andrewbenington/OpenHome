@@ -1,4 +1,4 @@
-import { AllPKMFields } from 'pokemon-files'
+import { AllPKMFields, PKM } from 'pokemon-files'
 import { GameOfOrigin } from 'pokemon-resources'
 import { TransferRestrictions } from '../../types/TransferRestrictions'
 import { SaveRef, SaveType } from '../../types/types'
@@ -20,7 +20,7 @@ export interface BoxCoordinates {
   index: number
 }
 
-export class SAV<P extends AllPKMFields> {
+export class SAV<P extends AllPKMFields = PKM> {
   saveType: SaveType = SaveType.UNKNOWN
 
   origin: GameOfOrigin = 0

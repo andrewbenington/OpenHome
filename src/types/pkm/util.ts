@@ -425,7 +425,6 @@ export function getCharacteristic(mon: Gen3OnData) {
 
 export function getFlagsInRange(bytes: Uint8Array, offset: number, size: number) {
   const flags: number[] = []
-  console.log(bytes)
 
   for (let i = 0; i < size * 8; i++) {
     if (getFlag(bytes, offset, i)) {

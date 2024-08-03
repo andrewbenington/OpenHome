@@ -97,7 +97,7 @@ export class G6SAV extends SAV<PK6> {
           console.error(e)
         }
       } else {
-        const mon = new PK6(new Uint8Array(232))
+        const mon = new PK6(new Uint8Array(232).buffer)
         this.bytes.set(new Uint8Array(mon.toPCBytes()), writeIndex)
       }
     })

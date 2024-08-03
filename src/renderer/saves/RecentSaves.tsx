@@ -1,5 +1,7 @@
-import { ParsedPath } from 'src/types/SAVTypes/path'
+import { Stack } from '@mui/material'
+import { ParsedPath, splitPath } from 'src/types/SAVTypes/path'
 import { SaveRef } from 'src/types/types'
+import { numericSorter } from '../../util/Sort'
 import OHDataGrid, { SortableColumn } from '../components/OHDataGrid'
 import { useRecentSaves } from '../redux/selectors'
 import { formatTimeSince, getSaveLogo } from './util'
@@ -12,36 +14,31 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
   const { onOpen } = props
   const [recentSaves] = useRecentSaves()
 
-  console.log(Object.values(recentSaves).map((save, i) => ({ ...save, index: i })))
   const columns: SortableColumn<SaveRef>[] = [
     {
       key: 'open',
       name: 'Open',
       width: 80,
-
       renderCell: (params) => (
         <button
           onClick={(e) => {
             e.preventDefault()
             onOpen(params.row.filePath)
           }}
+          disabled={!params.row.valid}
         >
           Open
         </button>
       ),
+      cellClass: 'centered-cell',
     },
     {
       key: 'game',
       name: 'Game',
       width: 130,
-      // renderCell: (params) => <img alt="save logo" height={50} src={getSaveLogo(params.value)} />,
-      // valueOptions: Object.values(GameOfOriginData)
-      //   .filter(filterEmpty)
-      //   .filter((origin) =>
-      //     Object.values(recentSaves).some((save) => save.game == origin.index.toString())
-      //   ),
-      // getOptionValue: (value: any) => value?.index?.toString(),
-      renderValue: (value) => <img alt="save logo" height={50} src={getSaveLogo(value.game)} />,
+      renderValue: (value) => <img alt="save logo" height={40} src={getSaveLogo(value.game)} />,
+      sortFunction: numericSorter((val) => (val.game ? parseInt(val.game) : undefined)),
+      cellClass: 'centered-cell',
     },
     {
       key: 'trainerDetails',
@@ -54,48 +51,47 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
       name: 'Last Opened',
       width: 160,
       renderValue: (save) => formatTimeSince(save.lastOpened),
+      sortFunction: numericSorter((val) => val.lastOpened),
     },
-    // {
-    //   key: 'filePath',
-    //   name: 'Path',
-    //   width: 500,
-    //   renderValue: (save) => (
-    //     <Stack
-    //       display="flex"
-    //       flexWrap="wrap"
-    //       direction="row"
-    //       spacing={0.5}
-    //       useFlexGap
-    //       title={save.filePath.raw}
-    //       minHeight={'fit-content'}
-    //       margin={1}
-    //     >
-    //       {splitPath(save.filePath).map((segment, i) => (
-    //         <div key={`${save.filePath.raw}_${i}`}>
-    //           <span
-    //             style={{
-    //               backgroundColor: '#3336',
-    //               borderRadius: 3,
-    //               padding: 3,
-    //               fontSize: segment === save.filePath.name ? 12 : 10,
-    //               color: 'white',
-    //               fontWeight: segment === save.filePath.name ? 'bold' : 'normal',
-    //             }}
-    //           >
-    //             {segment}
-    //           </span>
-    //           {segment !== save.filePath.name && ' >'}
-    //         </div>
-    //       ))}
-    //     </Stack>
-    //   ),
-    // },
+    {
+      key: 'filePath',
+      name: 'Path',
+      minWidth: 300,
+      renderValue: (save) => (
+        <Stack
+          flexWrap="wrap"
+          direction="row"
+          spacing={0.5}
+          useFlexGap
+          title={save.filePath.raw}
+          alignItems="start"
+          paddingTop={0.5}
+        >
+          {splitPath(save.filePath).map((segment, i) => (
+            <div
+              key={`${save.filePath.raw}_${i}`}
+              style={{
+                borderRadius: 3,
+                fontSize: segment === save.filePath.name ? 12 : 10,
+                fontWeight: segment === save.filePath.name ? 'bold' : 'normal',
+                lineHeight: 1,
+              }}
+            >
+              {segment}
+              {segment !== save.filePath.name && ' >'}
+            </div>
+          ))}
+        </Stack>
+      ),
+    },
   ]
 
   return (
     <OHDataGrid
       rows={Object.values(recentSaves).map((save, i) => ({ ...save, index: i }))}
       columns={columns}
+      defaultSort="lastOpened"
+      defaultSortDir="DESC"
       // initialState={{
       //   pagination: {
       //     paginationModel: { page: 0, pageSize: 20 },

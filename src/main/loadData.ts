@@ -97,6 +97,12 @@ export function loadRecentSaves() {
     let [filePath, saveTypeString, game, trainerName, trainerID, lastOpened] = entry.split(',')
     filePath = decodeURIComponent(filePath)
     const saveType = SaveTypeStrings[saveTypeString]
+    let fileExists = true
+    try {
+      fs.accessSync(filePath, fs.constants.F_OK)
+    } catch (err) {
+      fileExists = false
+    }
     if (filePath && saveType) {
       recentSaves[filePath] = {
         filePath: { ...path.parse(filePath), separator: path.sep, raw: filePath },
@@ -105,6 +111,7 @@ export function loadRecentSaves() {
         trainerName,
         trainerID,
         lastOpened: parseInt(lastOpened),
+        valid: fileExists,
       }
     }
   })

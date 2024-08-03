@@ -67,7 +67,7 @@ const PokemonDisplay = (props: { mon: PKM | OHPKM; tab: string; setTab: (_: stri
   const { mon, tab, setTab } = props
   const [displayMon, setDisplayMon] = useState(mon)
   const url = useMemo(
-    () => window.URL.createObjectURL(new Blob([displayMon.toBytes()])),
+    () => window.URL.createObjectURL(new Blob([displayMon.toBytes({ includeExtraFields: true })])),
     [displayMon]
   )
 
@@ -189,11 +189,7 @@ const PokemonDisplay = (props: { mon: PKM | OHPKM; tab: string; setTab: (_: stri
           ) : tab === 'json' ? (
             <JSONDisplay mon={displayMon} />
           ) : (
-            <RawDisplay
-              bytes={
-                'bytes' in displayMon ? displayMon.bytes : new Uint8Array(displayMon.toBytes())
-              }
-            />
+            <RawDisplay bytes={new Uint8Array(displayMon.toBytes({ includeExtraFields: true }))} />
           )}
         </ErrorBoundary>
       </Grid>

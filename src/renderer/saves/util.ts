@@ -1,11 +1,11 @@
 import { getGameLogo, getOriginMark } from '../images/game'
 import { getPublicImageURL } from '../images/images'
 
-export function getSaveLogo(game?: string) {
+export function getSaveLogo(game?: string | number) {
   if (!game) {
     return getPublicImageURL(getOriginMark('GB'))
   }
-  return getPublicImageURL(getGameLogo(parseInt(game)))
+  return getPublicImageURL(getGameLogo(typeof game === 'string' ? parseInt(game) : game))
 }
 
 export function formatTimeSince(timestamp?: number) {

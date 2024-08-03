@@ -1,6 +1,6 @@
 import { Card, Grid } from '@mui/material'
 import { getDisplayID } from 'pokemon-files'
-import { Ability, Languages } from 'pokemon-resources'
+import { AbilityToString, Languages } from 'pokemon-resources'
 import { PokemonData } from 'pokemon-species-data'
 import { useMemo, useState } from 'react'
 import { hasGen5OnlyData } from 'src/types/interfaces/gen5'
@@ -153,7 +153,9 @@ const SummaryDisplay = (props: { mon: PKMFile }) => {
         {hasGen3OnData(mon) && (
           <AttributeRow
             label="Ability"
-            value={`${Ability[mon.abilityNum]} (${mon.abilityNum === 4 ? 'HA' : mon.abilityNum})`}
+            value={`${AbilityToString(mon.abilityIndex)} (${
+              mon.abilityNum === 4 ? 'HA' : mon.abilityNum
+            })`}
           />
         )}
         <AttributeRow label="Level" justifyEnd>

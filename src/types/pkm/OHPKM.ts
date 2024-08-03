@@ -94,7 +94,6 @@ export class OHPKM {
       const other = arg
       let prng: Prando
       if ('personalityValue' in other) {
-        console.log(other)
         prng = new Prando(
           other.trainerName
             .concat((other.personalityValue ?? 0).toString())
@@ -202,18 +201,21 @@ export class OHPKM {
         this.encryptionConstant = prng.nextInt(0, 0xffffffff)
       }
 
-      if (hasGen4OnData(other)) {
-        this.isNicknamed = other.isNicknamed
+      if ('metDate' in other && other.metDate) {
         this.metDate = other.metDate
-        this.eggDate = other.eggDate
-        this.eggLocationIndex = other.eggLocationIndex
       } else {
         const now = new Date()
         this.metDate = {
-          month: now.getMonth(),
+          month: now.getMonth() + 1,
           day: now.getDate(),
           year: now.getFullYear(),
         }
+      }
+
+      if (hasGen4OnData(other)) {
+        this.isNicknamed = other.isNicknamed
+        this.eggDate = other.eggDate
+        this.eggLocationIndex = other.eggLocationIndex
       }
 
       if ('encounterType' in other) {

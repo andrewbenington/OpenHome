@@ -7,7 +7,7 @@ interface RawDisplayProps {
 const RawDisplay = (props: RawDisplayProps) => {
   const { bytes } = props
   return (
-    <div>
+    <div onDoubleClick={(e) => console.log(e)}>
       <HexEditor data={bytes} />
     </div>
   )

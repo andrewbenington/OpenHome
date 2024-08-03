@@ -1,10 +1,11 @@
 import { Stack } from '@mui/material'
-import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid'
 import { PKM } from 'pokemon-files'
 import { useEffect, useState } from 'react'
 import { SAV } from 'src/types/SAVTypes'
 import { buildSaveFile } from 'src/types/SAVTypes/util'
 import { ParsedPath, PossibleSaves, splitPath } from '../../types/SAVTypes/path'
+import { numericSorter } from '../../util/Sort'
+import OHDataGrid, { SortableColumn } from '../components/OHDataGrid'
 import { useLookupMaps } from '../redux/selectors'
 import { filterEmpty, getSaveLogo } from './util'
 
@@ -42,12 +43,19 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
     })
   }, [])
 
-  const columns: GridColDef[] = [
+  const columns: SortableColumn<SAV>[] = [
+    // {
+    //   key: 'display',
+    //   name: 'Display',
+    //   width: 80,
+
+    //   renderCell: (params) => <DevDataDisplay data={params.row} />,
+    //   cellClass: 'centered-cell',
+    // },
     {
-      field: 'open',
-      headerName: 'Open',
+      key: 'open',
+      name: 'Open',
       width: 80,
-      align: 'center',
 
       renderCell: (params) => (
         <button
@@ -60,69 +68,48 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
           Open
         </button>
       ),
+      cellClass: 'centered-cell',
     },
     {
-      field: 'origin',
-      headerName: 'Game',
+      key: 'game',
+      name: 'Game',
       width: 130,
-      align: 'center',
-      renderCell: (params) => <img alt="save logo" height={50} src={getSaveLogo(params.value)} />,
-      // type: 'singleSelect',
-      // valueOptions: Object.values(GameOfOriginData)
-      //   .filter(filterEmpty)
-      //   .filter((origin) =>
-      //     Object.values(suggestedSaves).some((save) => save.game == origin.index.toString())
-      //   ),
-      // getOptionValue: (value: any) => value?.index?.toString(),
-      // getOptionLabel: (value: any) => value?.name,
+      renderValue: (value) => <img alt="save logo" height={40} src={getSaveLogo(value.origin)} />,
+      sortFunction: numericSorter((val) => val.origin),
+      cellClass: 'centered-cell',
     },
     {
-      field: 'trainerDetails',
-      headerName: 'Trainer',
+      key: 'trainerDetails',
+      name: 'Trainer',
       width: 160,
-      // type: 'singleSelect',
-      // valueOptions: Object.values(suggestedSaves).map(
-      //   (save) => `${save.trainerName} (${save.trainerID})`
-      // ),
-      valueGetter: (params: GridValueGetterParams<SAV<PKM>>) =>
-        `${params.row.name} (${params.row.tid})`,
+      renderValue: (params) => `${params.name} (${params.tid})`,
     },
-    // {
-    //   field: 'lastOpened',
-    //   headerName: 'Last Opened',
-    //   width: 160,
-    //   valueFormatter: (params) => formatTimeSince(params.value),
-    // },
     {
-      field: 'filePath',
-      headerName: 'Path',
-      width: 500,
-      renderCell: (params) => (
+      key: 'filePath',
+      name: 'Path',
+      minWidth: 300,
+      renderValue: (save) => (
         <Stack
-          display="flex"
           flexWrap="wrap"
           direction="row"
           spacing={0.5}
           useFlexGap
-          title={params.value.raw}
-          minHeight={'fit-content'}
-          margin={1}
+          title={save.filePath.raw}
+          alignItems="start"
+          paddingTop={0.5}
         >
-          {splitPath(params.value).map((segment, i) => (
-            <div key={`${params.value}_${i}`}>
-              <span
-                style={{
-                  backgroundColor: '#3336',
-                  borderRadius: 3,
-                  padding: 3,
-                  fontSize: segment === params.value.name ? 12 : 10,
-                  color: 'white',
-                  fontWeight: segment === params.value.name ? 'bold' : 'normal',
-                }}
-              >
-                {segment}
-              </span>
-              {segment !== params.value.name && ' >'}
+          {splitPath(save.filePath).map((segment, i) => (
+            <div
+              key={`${save.filePath.raw}_${i}`}
+              style={{
+                borderRadius: 3,
+                fontSize: segment === save.filePath.name ? 12 : 10,
+                fontWeight: segment === save.filePath.name ? 'bold' : 'normal',
+                lineHeight: 1,
+              }}
+            >
+              {segment}
+              {segment !== save.filePath.name && ' >'}
             </div>
           ))}
         </Stack>
@@ -130,21 +117,5 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
     },
   ]
 
-  return (
-    <DataGrid
-      rows={suggestedSaves ?? []}
-      columns={columns}
-      initialState={{
-        pagination: {
-          paginationModel: { page: 0, pageSize: 20 },
-        },
-      }}
-      getRowId={(row) => row.filePath.raw}
-      pageSizeOptions={[20, 50, 100]}
-      rowSelection={false}
-      // autoHeight={true}
-      getRowHeight={() => 'auto'}
-      loading={suggestedSaves === undefined}
-    />
-  )
+  return <OHDataGrid rows={suggestedSaves ?? []} columns={columns} />
 }

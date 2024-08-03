@@ -1,5 +1,5 @@
 import { FileOpen } from '@mui/icons-material'
-import { Box, Dialog, Stack, useTheme } from '@mui/material'
+import { Box, Button, Card, Dialog, Stack, useTheme } from '@mui/material'
 import lodash from 'lodash'
 import { bytesToPKMInterface } from 'pokemon-files'
 import { useCallback, useEffect, useState } from 'react'
@@ -11,6 +11,7 @@ import { PKMFile } from '../../types/pkm/util'
 import { SaveCoordinates } from '../../types/types'
 import { getMonFileIdentifier } from '../../util/Lookup'
 import PokemonIcon from '../components/PokemonIcon'
+import Gen12Lookup from '../components/display/Gen12Lookup'
 import FilterPanel from '../components/filter/FilterPanel'
 import PokemonDisplay from '../pokemon/PokemonDisplay'
 import { useAppDispatch } from '../redux/hooks'
@@ -55,6 +56,7 @@ const Home = () => {
   const [selectedMon, setSelectedMon] = useState<PKMFile>()
   const [tab, setTab] = useState('summary')
   const [openSaveDialog, setOpenSaveDialog] = useState(false)
+  const [lookupDialog, setLookupDialog] = useState<'gen12' | 'gen345' | undefined>()
   const [filesToDelete, setFilesToDelete] = useState<string[]>([])
   const { height } = useWindowDimensions()
   const dispatch = useAppDispatch()
@@ -188,88 +190,93 @@ const Home = () => {
   return loadingMessage ? (
     <div>{loadingMessage}</div>
   ) : (
-    <div
-      // container
-      style={{
-        background: palette.background.gradient,
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'row',
-      }}
-    >
-      <Stack className="save-file-column" spacing={1}>
-        {lodash.range(saves.length).map((i) => (
-          <SaveDisplay key={`save_display_${i}`} saveIndex={i} setSelectedMon={setSelectedMon} />
-        ))}
-        <button
-          className="card-button"
-          onClick={() => setOpenSaveDialog(true)}
-          style={{
-            backgroundColor: palette.primary.main,
-          }}
-        >
-          <FileOpen />
-          Open Save
-        </button>
-      </Stack>
+    <Stack style={{ height: '100%', width: '100%', background: palette.background.gradient }}>
       <div
-        className="home-box-column"
+        // container
         style={{
-          width: '45%',
+          background: palette.background.gradient,
+          flex: 1,
+          height: 0,
+          display: 'flex',
+          flexDirection: 'row',
         }}
       >
-        <Box display="flex" flexDirection="row" style={{ width: '100%' }}>
-          <Box display="flex" flexDirection="row" style={{ width: height * 0.75 }}>
-            <HomeBoxDisplay setSelectedMon={setSelectedMon} />
+        <Stack className="save-file-column" spacing={1}>
+          {lodash.range(saves.length).map((i) => (
+            <SaveDisplay key={`save_display_${i}`} saveIndex={i} setSelectedMon={setSelectedMon} />
+          ))}
+          <button
+            className="card-button"
+            onClick={() => setOpenSaveDialog(true)}
+            style={{
+              backgroundColor: palette.primary.main,
+            }}
+          >
+            <FileOpen />
+            Open Save
+          </button>
+        </Stack>
+        <div
+          className="home-box-column"
+          style={{
+            width: '45%',
+          }}
+        >
+          <Box display="flex" flexDirection="row" style={{ width: '100%' }}>
+            <Box display="flex" flexDirection="row" style={{ width: height * 0.75 }}>
+              <HomeBoxDisplay setSelectedMon={setSelectedMon} />
+            </Box>
+            <Box flex={1}></Box>
           </Box>
-          <Box flex={1}></Box>
-        </Box>
-      </div>
-      <Stack spacing={1} className="right-column">
-        <FilterPanel />
-        <div
-          className="drop-area"
-          draggable
-          onDragOver={(e) => {
-            e.preventDefault()
-          }}
-          onDrop={(e) => onViewDrop(e, 'as is')}
-        >
-          Preview
         </div>
-        <div
-          className="drop-area"
-          draggable
-          onDragOver={(e) => {
-            e.preventDefault()
-          }}
-          onDrop={(e) => onViewDropInterface(e, 'as is')}
-        >
-          Preview Interface
-        </div>
-        <div
-          className="drop-area"
-          onDragOver={(e) => {
-            e.preventDefault()
-          }}
-          onDrop={(e) => onViewDrop(e, 'release')}
-        >
-          Release
-          <div className="release-icon-container" style={{ display: 'flex' }}>
-            {monsToRelease.map((mon, i) => {
-              return (
-                <PokemonIcon
-                  key={`delete_mon_${i}`}
-                  dexNumber={mon.dexNum}
-                  formeNumber={mon.formeNum}
-                  style={{ height: 32, width: 32 }}
-                />
-              )
-            })}
+        <Stack spacing={1} className="right-column">
+          <FilterPanel />
+          <div
+            className="drop-area"
+            draggable
+            onDragOver={(e) => {
+              e.preventDefault()
+            }}
+            onDrop={(e) => onViewDrop(e, 'as is')}
+          >
+            Preview
           </div>
-        </div>
-      </Stack>
-
+          <div
+            className="drop-area"
+            draggable
+            onDragOver={(e) => {
+              e.preventDefault()
+            }}
+            onDrop={(e) => onViewDropInterface(e, 'as is')}
+          >
+            Preview Interface
+          </div>
+          <div
+            className="drop-area"
+            onDragOver={(e) => {
+              e.preventDefault()
+            }}
+            onDrop={(e) => onViewDrop(e, 'release')}
+          >
+            Release
+            <div className="release-icon-container" style={{ display: 'flex' }}>
+              {monsToRelease.map((mon, i) => {
+                return (
+                  <PokemonIcon
+                    key={`delete_mon_${i}`}
+                    dexNumber={mon.dexNum}
+                    formeNumber={mon.formeNum}
+                    style={{ height: 32, width: 32 }}
+                  />
+                )
+              })}
+            </div>
+          </div>
+        </Stack>
+      </div>
+      <Card style={{ width: 'calc(100% - 16px)', height: 30 }}>
+        <Button onClick={() => setLookupDialog('gen12')}>Gen 1/2</Button>
+      </Card>
       <Dialog
         open={!!selectedMon}
         onClose={() => setSelectedMon(undefined)}
@@ -292,7 +299,16 @@ const Home = () => {
           }}
         />
       </Dialog>
-    </div>
+      <Dialog
+        open={lookupDialog === 'gen12'}
+        onClose={() => setLookupDialog(undefined)}
+        fullWidth
+        maxWidth="lg"
+        PaperProps={{ sx: { height: 800 } }}
+      >
+        <Gen12Lookup />
+      </Dialog>
+    </Stack>
   )
 }
 

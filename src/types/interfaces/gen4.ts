@@ -1,3 +1,4 @@
+import { PKMFile } from '../pkm/util'
 import { pokedate } from '../types'
 import { Gen3OnData } from './gen3'
 
@@ -10,9 +11,10 @@ export interface Gen4OnData extends Gen3OnData {
   isNicknamed: boolean
 }
 
-export function hasGen4OnData(obj: any): obj is Gen4OnData {
+export function hasGen4OnData<T extends PKMFile>(obj: T): obj is WithMetDate<T> {
   return obj && 'metDate' in obj
 }
+export type WithMetDate<T> = T extends { metDate: pokedate } ? T : never
 
 export function shinyLeafValues(shinyLeafNumber: number) {
   return {

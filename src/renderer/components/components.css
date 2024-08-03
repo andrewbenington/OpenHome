@@ -14,3 +14,9 @@
   left: 0;
   position: absolute;
 }
+
+.centered-cell {
+  display: grid;
+  align-items: center;
+  justify-content: center;
+}

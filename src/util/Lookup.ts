@@ -1,4 +1,4 @@
-import { AllPKMFields, PK6 } from 'pokemon-files'
+import { AllPKMFields, PK3, PK6 } from 'pokemon-files'
 import { isGameBoy } from 'pokemon-resources'
 import { hasGen3OnData } from '../types/interfaces/gen3'
 import { OHPKM } from '../types/pkm/OHPKM'
@@ -44,11 +44,17 @@ export const getMonGen345Identifier = (mon: PKMFile) => {
     return undefined
   }
   const baseMon = getBaseMon(mon.dexNum, mon.formeNum)
-  if (baseMon) {
-    return `${baseMon.dexNumber.toString().padStart(4, '0')}-${bytesToString(
-      mon.trainerID,
-      2
-    ).concat(bytesToString(mon.secretID ?? 0, 2))}-${bytesToString(mon.personalityValue!, 4)}`
+  try {
+    const pk3 = new PK3(new OHPKM(mon))
+    if (baseMon) {
+      return `${baseMon.dexNumber.toString().padStart(4, '0')}-${bytesToString(
+        pk3.trainerID,
+        2
+      ).concat(bytesToString(pk3.secretID ?? 0, 2))}-${bytesToString(pk3.personalityValue!, 4)}`
+    }
+    return undefined
+  } catch (error) {
+    console.log(mon)
+    console.error(error)
   }
-  return undefined
 }
