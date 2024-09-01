@@ -1,5 +1,5 @@
 import { FileOpen } from '@mui/icons-material'
-import { Box, Button, Card, Dialog, Stack, useTheme } from '@mui/material'
+import { Box, Button, Card, Dialog, Stack, Typography, useTheme } from '@mui/material'
 import lodash from 'lodash'
 import { bytesToPKMInterface } from 'pokemon-files'
 import { useCallback, useEffect, useState } from 'react'
@@ -42,7 +42,6 @@ import {
   handleMenuResetAndClose,
   handleMenuSave,
 } from '../util/ipcFunctions'
-import useWindowDimensions from '../util/windowDimensions'
 import './Home.css'
 
 const Home = () => {
@@ -58,7 +57,6 @@ const Home = () => {
   const [openSaveDialog, setOpenSaveDialog] = useState(false)
   const [lookupDialog, setLookupDialog] = useState<'gen12' | 'gen345' | undefined>()
   const [filesToDelete, setFilesToDelete] = useState<string[]>([])
-  const { height } = useWindowDimensions()
   const dispatch = useAppDispatch()
   const dispatchReleaseMon = (saveCoordinates: SaveCoordinates) =>
     dispatch(setMonToRelease(saveCoordinates))
@@ -188,9 +186,16 @@ const Home = () => {
   }, [dispatch])
 
   return loadingMessage ? (
-    <div>{loadingMessage}</div>
+    <Box width="100%" height="100%" display="grid">
+      <Typography margin="auto" fontSize={40} fontWeight="bold">
+        OpenHome
+      </Typography>
+    </Box>
   ) : (
-    <Stack style={{ height: '100%', width: '100%', background: palette.background.gradient }}>
+    <Stack
+      style={{ height: '100%', width: '100%', background: palette.background.gradient }}
+      spacing={0}
+    >
       <div
         // container
         style={{
@@ -199,9 +204,10 @@ const Home = () => {
           height: 0,
           display: 'flex',
           flexDirection: 'row',
+          minHeight: 500,
         }}
       >
-        <Stack className="save-file-column" spacing={1}>
+        <Stack className="save-file-column" spacing={1} width={280} minWidth={280}>
           {lodash.range(saves.length).map((i) => (
             <OpenSaveDisplay
               key={`save_display_${i}`}
@@ -223,13 +229,14 @@ const Home = () => {
         <div
           className="home-box-column"
           style={{
-            width: '45%',
+            width: 0,
+            flex: 1,
+            minWidth: 480,
+            maxWidth: 600,
           }}
         >
-          <Box display="flex" flexDirection="row" style={{ width: '100%' }}>
-            <Box display="flex" flexDirection="row" style={{ width: height * 0.75 }}>
-              <HomeBoxDisplay setSelectedMon={setSelectedMon} />
-            </Box>
+          <Box display="flex" flexDirection="row" width="100%" alignItems="center">
+            <HomeBoxDisplay setSelectedMon={setSelectedMon} />
             <Box flex={1}></Box>
           </Box>
         </div>
