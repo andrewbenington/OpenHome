@@ -1,9 +1,10 @@
 import { Stack } from '@mui/material'
+import { useMemo } from 'react'
 import { ParsedPath, splitPath } from 'src/types/SAVTypes/path'
 import { SaveRef } from 'src/types/types'
 import { numericSorter } from '../../util/Sort'
 import OHDataGrid, { SortableColumn } from '../components/OHDataGrid'
-import { useRecentSaves } from '../redux/selectors'
+import { useOpenSaves, useRecentSaves } from '../redux/selectors'
 import { formatTimeSince, getSaveLogo } from './util'
 
 interface SaveFileSelectorProps {
@@ -13,6 +14,12 @@ interface SaveFileSelectorProps {
 export default function RecentSaves(props: SaveFileSelectorProps) {
   const { onOpen } = props
   const [recentSaves] = useRecentSaves()
+  const openSaves = useOpenSaves()
+
+  const openSavePaths = useMemo(
+    () => Object.fromEntries(openSaves.map((save) => [save.filePath.raw, true])),
+    [openSaves]
+  )
 
   const columns: SortableColumn<SaveRef>[] = [
     {
@@ -25,7 +32,7 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
             e.preventDefault()
             onOpen(params.row.filePath)
           }}
-          disabled={!params.row.valid}
+          disabled={!params.row.valid || params.row.filePath.raw in openSavePaths}
         >
           Open
         </button>
@@ -92,19 +99,6 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
       columns={columns}
       defaultSort="lastOpened"
       defaultSortDir="DESC"
-      // initialState={{
-      //   pagination: {
-      //     paginationModel: { page: 0, pageSize: 20 },
-      //   },
-      //   sorting: {
-      //     sortModel: [{ field: 'lastOpened', sort: 'desc' }],
-      //   },
-      // }}
-      // getRowId={(row) => `${row.filePath.raw}-${row.index}`}
-      // pageSizeOptions={[20, 50, 100]}
-      // rowSelection={false}
-      // autoHeight={true}
-      // getRowHeight={() => 'auto'}
     />
   )
 }

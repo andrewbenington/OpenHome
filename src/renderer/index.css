@@ -64,7 +64,7 @@ select {
 }
 
 button {
-  padding: 0.6em 0.6em;
+  padding: 0.3em 0.3em;
 }
 
 button:hover,
@@ -98,4 +98,9 @@ fieldset:focus,
 fieldset:focus-visible {
   border-color: white;
   outline: none;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
 }

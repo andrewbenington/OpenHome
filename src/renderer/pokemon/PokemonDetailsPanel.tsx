@@ -1,6 +1,6 @@
 /* eslint-disable no-nested-ternary */
 import { Download } from '@mui/icons-material'
-import { Box, Grid } from '@mui/material'
+import { Box, Grid, useTheme } from '@mui/material'
 import { PKM } from 'pokemon-files'
 import { useMemo, useState } from 'react'
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary'
@@ -63,16 +63,24 @@ const styles = {
   },
 } as Styles
 
-const PokemonDisplay = (props: { mon: PKM | OHPKM; tab: string; setTab: (_: string) => void }) => {
+const PokemonDetailsPanel = (props: {
+  mon: PKM | OHPKM
+  tab: string
+  setTab: (_: string) => void
+}) => {
   const { mon, tab, setTab } = props
   const [displayMon, setDisplayMon] = useState(mon)
   const url = useMemo(
     () => window.URL.createObjectURL(new Blob([displayMon.toBytes({ includeExtraFields: true })])),
     [displayMon]
   )
+  const theme = useTheme()
 
   return (
-    <Grid container style={styles.pokemonDisplay}>
+    <Grid
+      container
+      style={{ ...styles.pokemonDisplay, background: theme.palette.background.gradient }}
+    >
       <Grid item xs={3}>
         <div style={styles.detailsTabCol}>
           <Box display="flex">
@@ -197,7 +205,7 @@ const PokemonDisplay = (props: { mon: PKM | OHPKM; tab: string; setTab: (_: stri
   )
 }
 
-export default PokemonDisplay
+export default PokemonDetailsPanel
 function FallbackComponent(props: FallbackProps) {
   const { error, resetErrorBoundary } = props
   return (

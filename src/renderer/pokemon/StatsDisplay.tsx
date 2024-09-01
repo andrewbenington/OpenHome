@@ -9,7 +9,6 @@ import {
   Title,
   Tooltip,
 } from 'chart.js'
-import { getStats } from 'pokemon-files'
 import { getNatureSummary } from 'pokemon-resources'
 import { useEffect, useMemo, useState } from 'react'
 import { Radar } from 'react-chartjs-2'
@@ -71,7 +70,7 @@ const StatsDisplay = (props: { mon: PKMFile }) => {
     setEVType(hasGen3OnData(mon) ? 'Modern' : 'Game Boy')
   }, [mon])
 
-  const stats = useMemo(() => (mon.format === 'OHPKM' ? mon.stats : getStats(mon)), [mon])
+  const stats = useMemo(() => (mon.format === 'OHPKM' ? mon.stats : mon.getStats()), [mon])
 
   const menuItems = useMemo(() => {
     const createMenuItem = (value: string) => {
@@ -92,10 +91,10 @@ const StatsDisplay = (props: { mon: PKMFile }) => {
       items.push(createMenuItem('DVs'))
     }
     items.push(createMenuItem('EVs'))
-    if (hasLetsGoData(mon) && !isRestricted(LGPE_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum)) {
+    if ('avs' in mon && !isRestricted(LGPE_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum)) {
       items.push(createMenuItem('AVs'))
     }
-    if (hasPLAData(mon) && !isRestricted(LA_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum)) {
+    if ('gvs' in mon && !isRestricted(LA_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum)) {
       items.push(createMenuItem('GVs'))
     }
     if (hasGen3OnData(mon)) {

@@ -2,7 +2,6 @@ import { NationalDex, PokemonData } from 'pokemon-species-data'
 import { SWEETS } from '../../consts'
 import { hasGen8OnData } from '../../types/interfaces/gen8'
 import { PKMFile } from '../../types/pkm/util'
-import { StringToStringMap } from '../../types/types'
 
 const alolaDex = [
   10, 11, 12, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 35, 36, 37, 38, 39, 40, 41, 42, 46, 47, 50,
@@ -28,7 +27,7 @@ const alolaDex = [
   798, 799, 800, 801, 802, 803, 804, 805, 806, 807,
 ]
 
-export const fileToSpriteFolder: StringToStringMap = {
+export const fileToSpriteFolder: Record<string, string> = {
   PK1: 'gen1',
   PK2: 'gen2',
   PK3: 'gen3',

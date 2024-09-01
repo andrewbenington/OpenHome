@@ -1,17 +1,17 @@
 import { ArrowBack, ArrowForward } from '@mui/icons-material'
 import { Grid, Paper } from '@mui/material'
 import lodash from 'lodash'
-import { PKMFile } from '../../types/pkm/util'
-import { SaveCoordinates } from '../../types/types'
-import { useAppDispatch } from '../redux/hooks'
-import { useHomeData } from '../redux/selectors'
+import { PKMFile } from '../../../types/pkm/util'
+import { SaveCoordinates } from '../../../types/types'
+import { useAppDispatch } from '../../redux/hooks'
+import { useHomeData } from '../../redux/selectors'
 import {
   cancelDrag,
   completeDrag,
   importMons,
   setHomeBox,
   startDrag,
-} from '../redux/slices/appSlice'
+} from '../../redux/slices/appSlice'
 import ArrowButton from './ArrowButton'
 import BoxCell from './BoxCell'
 

@@ -1,8 +1,10 @@
 import { BrowserWindow, IpcMainInvokeEvent, app, ipcMain } from 'electron'
 import fs from 'fs'
+import { uniqBy } from 'lodash'
 import os from 'os'
 import path from 'path'
 import { ParsedPath, PossibleSaves } from '../types/SAVTypes/path'
+import { StoredBoxData } from '../types/storage'
 import {
   getFileCreatedDate,
   initializeFolders,
@@ -11,19 +13,26 @@ import {
   recursivelyFindDeSamuMESaves,
   recursivelyFindGambatteSaves,
   recursivelyFindMGBASaves,
+  selectDirectory,
   selectFile,
 } from './fileHandlers'
 import {
-  addRecentSave,
-  loadBoxNames,
+  loadBoxData,
   loadGen12Lookup,
   loadGen345Lookup,
   loadOHPKMs,
-  loadRecentSaves,
   registerGen12Lookup,
   registerGen345Lookup,
-  removeRecentSave,
+  writeBoxData,
 } from './loadData'
+import {
+  addRecentSave,
+  addSaveFileFolder,
+  loadRecentSaves,
+  loadSaveFileFolders,
+  removeRecentSave,
+  removeSaveFileFolder,
+} from './saves'
 import writePKMToFile, { deleteOHPKMFile } from './writePKMToFile'
 
 function initListeners() {
@@ -81,37 +90,36 @@ function initListeners() {
     removeRecentSave(saveRef)
   })
 
+  function parsedPathFromString(p: string): ParsedPath {
+    return {
+      ...path.parse(p),
+      separator: path.sep,
+      raw: p,
+    }
+  }
+
   ipcMain.handle('find-saves', async () => {
-    const possibleSaves: Partial<PossibleSaves> = {}
+    const possibleSaves: PossibleSaves = { citra: [], desamume: [], openEmu: [] }
+    const saveFolders = loadSaveFileFolders()
     if (
       fs.existsSync(path.join(os.homedir(), '.local', 'share', 'citra-emu', 'sdmc', 'Nintendo 3DS'))
     ) {
-      possibleSaves.citra = recursivelyFindCitraSaves(
-        path.join(os.homedir(), '.local', 'share', 'citra-emu', 'sdmc', 'Nintendo 3DS')
-      ).map((p) => ({ ...path.parse(p), separator: path.sep, raw: p }))
-    }
-    if (fs.existsSync(path.join(app.getPath('appData'), 'OpenEmu'))) {
-      possibleSaves.openEmu = recursivelyFindDeSamuMESaves(
-        path.join(app.getPath('appData'), 'OpenEmu', 'DeSmuME')
-      ).map((p) => ({ ...path.parse(p), separator: path.sep, raw: p }))
-      possibleSaves.openEmu.push(
-        ...recursivelyFindMGBASaves(path.join(app.getPath('appData'), 'OpenEmu', 'mGBA')).map(
-          (p) => ({
-            ...path.parse(p),
-            separator: path.sep,
-            raw: p,
-          })
-        )
+      possibleSaves.citra.push(
+        ...recursivelyFindCitraSaves(
+          path.join(os.homedir(), '.local', 'share', 'citra-emu', 'sdmc', 'Nintendo 3DS')
+        ).map((p) => ({ ...path.parse(p), separator: path.sep, raw: p }))
       )
-      possibleSaves.openEmu = recursivelyFindGambatteSaves(
-        path.join(app.getPath('appData'), 'OpenEmu', 'Gambatte')
-      ).map((p) => ({ ...path.parse(p), separator: path.sep, raw: p }))
     }
-    if (fs.existsSync(path.join(app.getPath('appData'), 'DeSmuME'))) {
-      possibleSaves.desamume = recursivelyFindDeSamuMESaves(
-        path.join(app.getPath('appData'), 'DeSmuME')
-      ).map((p) => ({ ...path.parse(p), separator: path.sep, raw: p }))
+    for (const folder of saveFolders) {
+      possibleSaves.citra.push(...recursivelyFindCitraSaves(folder.path).map(parsedPathFromString))
+      possibleSaves.openEmu.push(
+        ...recursivelyFindMGBASaves(folder.path).map(parsedPathFromString),
+        ...recursivelyFindDeSamuMESaves(folder.path).map(parsedPathFromString),
+        ...recursivelyFindGambatteSaves(folder.path).map(parsedPathFromString)
+      )
     }
+    possibleSaves.citra = uniqBy(possibleSaves.citra, (parsedPath) => parsedPath.raw)
+    possibleSaves.openEmu = uniqBy(possibleSaves.openEmu, (parsedPath) => parsedPath.raw)
     return possibleSaves
   })
 
@@ -122,37 +130,14 @@ function initListeners() {
   })
 
   ipcMain.handle('read-home-boxes', async () => {
-    const appDataPath = app.getPath('appData')
-    const boxFiles = fs.readdirSync(path.join(appDataPath, 'OpenHome', 'storage', 'boxes'))
-    const boxNameList = loadBoxNames()
-    const boxesMap = {}
-    boxNameList.forEach((boxName, i) => {
-      boxesMap[boxName] = {
-        index: i,
-        name: boxName,
-      }
-    })
-    boxFiles.forEach((fileName) => {
-      const boxString = fs.readFileSync(
-        path.join(appDataPath, 'OpenHome', 'storage', 'boxes', fileName),
-        {
-          encoding: 'utf8',
-        }
-      )
-      boxesMap[fileName.replace('.csv', '')].mons = boxString
-    })
-    return boxesMap
+    return loadBoxData()
   })
 
-  ipcMain.on('write-home-box', async (_, { boxName, boxString }) => {
+  ipcMain.on('write-home-boxes', async (_, boxData: StoredBoxData[]) => {
     try {
-      const appDataPath = app.getPath('appData')
-      fs.writeFileSync(
-        path.join(appDataPath, 'OpenHome', 'storage', 'boxes', `${boxName}.csv`),
-        boxString
-      )
+      writeBoxData(boxData)
     } catch (e) {
-      console.error('save home error', e)
+      console.error('save home boxes error', e)
     }
   })
 
@@ -177,6 +162,22 @@ function initListeners() {
     fs.writeFileSync(path.raw, bytes)
   })
 
+  ipcMain.handle('pick-save-folder', async () => {
+    const dirPaths = await selectDirectory()
+
+    return dirPaths.length ? dirPaths[0] : undefined
+  })
+
+  ipcMain.handle('read-save-folders', async () => {
+    return loadSaveFileFolders()
+  })
+  ipcMain.handle('remove-save-folder', async (_, path) => {
+    removeSaveFileFolder(path)
+  })
+
+  ipcMain.handle('upsert-save-folder', async (_, folderPath: string, label: string) => {
+    addSaveFileFolder(folderPath, label)
+  })
   ipcMain.handle('get-resources-path', () => {
     return app.isPackaged
       ? path.join(process.resourcesPath, 'resources')

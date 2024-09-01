@@ -14,7 +14,7 @@ import {
 } from 'src/consts/TransferRestrictions'
 import { isRestricted } from 'src/types/TransferRestrictions'
 import { PKMFormData } from 'src/types/interfaces/base'
-import { StringToStringMap, Styles } from 'src/types/types'
+import { Styles } from 'src/types/types'
 
 const styles = {
   fileTypeChip: {
@@ -27,7 +27,7 @@ const styles = {
   },
 } as Styles
 
-const fileTypeColors: StringToStringMap = {
+const fileTypeColors: Record<string, string> = {
   OHPKM: '#748fcd',
   PK1: '#b34',
   PK2: '#b6c',

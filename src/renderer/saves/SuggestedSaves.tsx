@@ -1,12 +1,12 @@
 import { Stack } from '@mui/material'
 import { PKM } from 'pokemon-files'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { SAV } from 'src/types/SAVTypes'
 import { buildSaveFile } from 'src/types/SAVTypes/util'
 import { ParsedPath, PossibleSaves, splitPath } from '../../types/SAVTypes/path'
 import { numericSorter } from '../../util/Sort'
 import OHDataGrid, { SortableColumn } from '../components/OHDataGrid'
-import { useLookupMaps } from '../redux/selectors'
+import { useLookupMaps, useOpenSaves } from '../redux/selectors'
 import { filterEmpty, getSaveLogo } from './util'
 
 interface SaveFileSelectorProps {
@@ -17,9 +17,14 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
   const { onOpen } = props
   const [suggestedSaves, setSuggestedSaves] = useState<SAV<PKM>[]>()
   const [homeMonMap, gen12LookupMap, gen345LookupMap] = useLookupMaps()
+  const openSaves = useOpenSaves()
+
+  const openSavePaths = useMemo(
+    () => Object.fromEntries(openSaves.map((save) => [save.filePath.raw, true])),
+    [openSaves]
+  )
 
   const loadSaveData = async (savePath: ParsedPath) => {
-    console.log(savePath)
     const { fileBytes, createdDate } = await window.electron.ipcRenderer.invoke('read-save-file', [
       savePath,
     ])
@@ -37,8 +42,10 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
         .concat(possibleSaves.openEmu)
         .concat(possibleSaves.desamume)
       if (allPaths.length > 0) {
-        const saves = await Promise.all(allPaths.map((path) => loadSaveData(path)))
-        setSuggestedSaves(saves.filter(filterEmpty))
+        const saves = (await Promise.all(allPaths.map((path) => loadSaveData(path)))).filter(
+          filterEmpty
+        )
+        setSuggestedSaves(saves)
       }
     })
   }, [])
@@ -63,7 +70,7 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
             e.preventDefault()
             onOpen(params.row.filePath)
           }}
-          disabled={params.row.tooEarlyToOpen}
+          disabled={params.row.tooEarlyToOpen || params.row.filePath.raw in openSavePaths}
         >
           Open
         </button>

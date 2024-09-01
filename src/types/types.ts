@@ -2,7 +2,6 @@ import { CSSProperties } from 'react'
 import { ParsedPath } from './SAVTypes/path'
 
 /* eslint-disable no-unused-vars */
-export type StringToStringMap = { [key: string]: string }
 export type KeyValuePairList = { key: string; value: string }[]
 export type Stat = 'HP' | 'Atk' | 'Def' | 'SpA' | 'SpD' | 'Spe' | 'Sp'
 export type Type =

@@ -1,3 +1,5 @@
+import useIsDarkMode from '../hooks/dark-mode'
+
 const AttributeRow = (props: {
   label: string
   value?: string
@@ -7,6 +9,7 @@ const AttributeRow = (props: {
   style?: any
 }) => {
   const { label, value, justifyEnd, indent, children, style } = props
+  const isDarkMode = useIsDarkMode()
   return (
     <div
       style={{
@@ -46,7 +49,7 @@ const AttributeRow = (props: {
           width: '67%',
           height: '100%',
           padding: '0px 10px',
-          backgroundColor: '#6662',
+          backgroundColor: isDarkMode ? '#ddd3' : '#fff4',
           display: 'flex',
           flexDirection: 'row',
           alignItems: 'center',

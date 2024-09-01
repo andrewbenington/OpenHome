@@ -4,6 +4,7 @@ import { PKMFile } from '../../../types/pkm/util'
 import { G1SAV, G2SAV, G3SAV, G4SAV, G5SAV, SAV } from '../../../types/SAVTypes'
 import { G6SAV } from '../../../types/SAVTypes/G6SAV'
 import { HomeData } from '../../../types/SAVTypes/HomeData'
+import { StoredBoxData } from '../../../types/storage'
 import { SaveCoordinates } from '../../../types/types'
 import {
   getMonFileIdentifier,
@@ -34,8 +35,7 @@ const initialState: AppState = {
 }
 
 export const loadHomeBoxes = createAsyncThunk('app/loadHomeBoxes', async () => {
-  const boxes: { [key: string]: BoxData } =
-    await window.electron.ipcRenderer.invoke('read-home-boxes')
+  const boxes: StoredBoxData[] = await window.electron.ipcRenderer.invoke('read-home-boxes')
   return boxes
 })
 
@@ -51,12 +51,6 @@ export const loadGen12Lookup = createAsyncThunk('app/loadGen12Lookup', async () 
 export const loadGen345Lookup = createAsyncThunk('app/loadGen345Lookup', async () => {
   return window.electron.ipcRenderer.invoke('read-gen345-lookup')
 })
-
-type BoxData = {
-  index: number
-  name: string
-  mons: string
-}
 
 const updateMonInSave = (
   state: Draft<AppState>,
@@ -241,12 +235,13 @@ export const appSlice = createSlice({
       state.homeData = action.payload
     },
     writeAllHomeData: (state) => {
-      state.homeData.boxes.forEach((b) => {
-        window.electron.ipcRenderer.send('write-home-box', {
-          boxName: b.name,
-          boxString: b.writeMonsToString(),
-        })
-      })
+      const allStoredBoxData: StoredBoxData[] = state.homeData.boxes.map((box, index) => ({
+        index,
+        name: box.name,
+        monIdentifiersByIndex: box.getIdentifierMapping(),
+      }))
+      window.electron.ipcRenderer.send('write-home-boxes', allStoredBoxData)
+
       Object.values(state.modifiedOHPKMs).forEach((mon) => {
         if (mon) {
           window.electron.ipcRenderer.send('write-ohpkm', mon.bytes)
@@ -346,9 +341,9 @@ export const appSlice = createSlice({
       if (homeMonMap) {
         const newHomeData = new HomeData()
         Object.values(action.payload).forEach((box) => {
-          newHomeData.boxes[box.index].getMonsFromString(
-            box.mons as string,
-            homeMonMap as { [key: string]: OHPKM }
+          newHomeData.boxes[box.index].loadMonsFromIdentifiers(
+            box.monIdentifiersByIndex,
+            homeMonMap
           )
         })
         return { ...state, homeData: newHomeData }
@@ -380,7 +375,7 @@ export const {
   writeGen345Lookup,
 } = appSlice.actions
 
-export const selectSaves = (state: RootState) => state.app.saves
+export const selectOpenSaves = (state: RootState) => state.app.saves
 export const selectHomeData = (state: RootState) => state.app.homeData
 export const selectHomeMons = (state: RootState) => state.app.lookup.homeMons
 export const selectDragSource = (state: RootState) => state.app.dragSource

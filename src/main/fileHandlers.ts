@@ -1,36 +1,11 @@
 import { dialog } from 'electron'
 import fs from 'fs'
-import lodash from 'lodash'
 import path from 'path'
+import { getStoragePath } from './loadData'
 
 export function initializeFolders(appDataPath: string) {
-  if (!fs.existsSync(`${appDataPath}/OpenHome/storage/boxes`)) {
-    fs.mkdirSync(`${appDataPath}/OpenHome/storage/boxes`, { recursive: true })
-  }
-  lodash.range(36).forEach((boxNum) => {
-    if (
-      !fs.existsSync(`${appDataPath}/OpenHome/storage/boxes/Box ${(boxNum + 1).toString()}.csv`)
-    ) {
-      fs.writeFileSync(
-        `${appDataPath}/OpenHome/storage/boxes/Box ${(boxNum + 1).toString()}.csv`,
-        ''
-      )
-    }
-  })
   if (!fs.existsSync(`${appDataPath}/OpenHome/storage/mons`)) {
     fs.mkdirSync(`${appDataPath}/OpenHome/storage/mons`, { recursive: true })
-  }
-  if (!fs.existsSync(`${appDataPath}/OpenHome/storage/lookup`)) {
-    fs.mkdirSync(`${appDataPath}/OpenHome/storage/lookup`, { recursive: true })
-  }
-  if (!fs.existsSync(`${appDataPath}/OpenHome/storage/lookup/gen12Lookup.csv`)) {
-    fs.writeFileSync(`${appDataPath}/OpenHome/storage/lookup/gen12Lookup.csv`, '')
-  }
-  if (!fs.existsSync(`${appDataPath}/OpenHome/storage/lookup/gen345Lookup.csv`)) {
-    fs.writeFileSync(`${appDataPath}/OpenHome/storage/lookup/gen345Lookup.csv`, '')
-  }
-  if (!fs.existsSync(`${appDataPath}/OpenHome/storage/saveFiles.csv`)) {
-    fs.writeFileSync(`${appDataPath}/OpenHome/storage/saveFiles.csv`, '')
   }
   fs.opendir('../', (err, dir) => {
     if (err) console.error('Error:', err)
@@ -57,6 +32,14 @@ export async function selectFiles() {
   return result.filePaths
 }
 
+export async function selectDirectory() {
+  // Open file picker
+  const result = await dialog.showOpenDialog({
+    properties: ['openDirectory'],
+  })
+  return result.filePaths
+}
+
 export function getFileCreatedDate(path: string) {
   const { birthtime } = fs.statSync(path)
   return birthtime
@@ -68,23 +51,6 @@ export function readBytesFromFile(path: string) {
     return new Uint8Array(fileBytes)
   }
   return undefined
-}
-
-export function readStringFromFile(path: string) {
-  try {
-    return fs.readFileSync(path, { encoding: 'utf8' })
-  } catch (e) {
-    console.error(`error reading ${path}: ${e}`)
-  }
-  return ''
-}
-
-export function writeStringToFile(path: string, content: string) {
-  return fs.writeFileSync(path, content)
-}
-
-export function writeBytesToPath(path: string, bytes: Uint8Array) {
-  fs.writeFileSync(path, bytes)
 }
 
 export function recursivelyFindCitraSaves(currentPath: string) {
@@ -122,67 +88,110 @@ export function recursivelyFindOpenEmuSaves(currentPath: string) {
   return foundSaves
 }
 
-export function recursivelyFindDeSamuMESaves(currentPath: string) {
-  const files = fs.readdirSync(currentPath)
-  if (files.includes('Battery Saves')) {
-    return fs
-      .readdirSync(path.join(currentPath, 'Battery Saves'))
-      .filter((file) => file.endsWith('.dsv'))
-      .map((file) => path.join(currentPath, 'Battery Saves', file))
-  }
-  if (files.includes('Battery')) {
-    return fs
-      .readdirSync(path.join(currentPath, 'Battery'))
-      .filter((file) => file.endsWith('.dsv'))
-      .map((file) => path.join(currentPath, 'Battery', file))
-  }
-  const foundSaves: string[] = []
-  files.forEach((file) => {
-    const newPath = path.join(currentPath, file)
-    if (fs.lstatSync(newPath).isDirectory()) {
-      foundSaves.push(...recursivelyFindDeSamuMESaves(path.join(currentPath, file)))
+export function recursivelyFindDeSamuMESaves(currentPath: string): string[] {
+  try {
+    const files = fs.readdirSync(currentPath)
+    if (files.includes('Battery Saves')) {
+      return fs
+        .readdirSync(path.join(currentPath, 'Battery Saves'))
+        .filter((file) => file.endsWith('.dsv'))
+        .map((file) => path.join(currentPath, 'Battery Saves', file))
     }
-  })
-  return foundSaves
+    if (files.includes('Battery')) {
+      return fs
+        .readdirSync(path.join(currentPath, 'Battery'))
+        .filter((file) => file.endsWith('.dsv'))
+        .map((file) => path.join(currentPath, 'Battery', file))
+    }
+    const foundSaves: string[] = []
+    files.forEach((file) => {
+      const newPath = path.join(currentPath, file)
+      if (fs.lstatSync(newPath).isDirectory()) {
+        foundSaves.push(...recursivelyFindDeSamuMESaves(path.join(currentPath, file)))
+      }
+    })
+    return foundSaves
+  } catch (e) {
+    return []
+  }
 }
 
 export function recursivelyFindGambatteSaves(currentPath: string) {
-  const files = fs.readdirSync(currentPath)
-  if (files.includes('Battery Saves')) {
-    return fs
-      .readdirSync(path.join(currentPath, 'Battery Saves'))
-      .filter((file) => file.endsWith('.sav') || file.endsWith('.rtc'))
-      .map((file) => path.join(currentPath, 'Battery Saves', file))
-  }
-  const foundSaves: string[] = []
-  files.forEach((file) => {
-    const newPath = path.join(currentPath, file)
-    if (fs.lstatSync(newPath).isDirectory()) {
-      foundSaves.push(...recursivelyFindGambatteSaves(path.join(currentPath, file)))
+  try {
+    const files = fs.readdirSync(currentPath)
+    if (files.includes('Battery Saves')) {
+      return fs
+        .readdirSync(path.join(currentPath, 'Battery Saves'))
+        .filter((file) => file.endsWith('.sav') || file.endsWith('.rtc'))
+        .map((file) => path.join(currentPath, 'Battery Saves', file))
     }
-  })
-  return foundSaves
+    const foundSaves: string[] = []
+    files.forEach((file) => {
+      const newPath = path.join(currentPath, file)
+      if (fs.lstatSync(newPath).isDirectory()) {
+        foundSaves.push(...recursivelyFindGambatteSaves(path.join(currentPath, file)))
+      }
+    })
+    return foundSaves
+  } catch (e) {
+    return []
+  }
 }
 
 export function recursivelyFindMGBASaves(currentPath: string) {
-  const files = fs.readdirSync(currentPath)
-  if (files.includes('Battery Saves')) {
-    return fs
-      .readdirSync(path.join(currentPath, 'Battery Saves'))
-      .filter((file) => file.endsWith('.sav'))
-      .map((file) => path.join(currentPath, 'Battery Saves', file))
-  }
-  const foundSaves: string[] = []
-  files.forEach((file) => {
-    const newPath = path.join(currentPath, file)
-    if (fs.lstatSync(newPath).isDirectory()) {
-      foundSaves.push(...recursivelyFindMGBASaves(path.join(currentPath, file)))
+  try {
+    const files = fs.readdirSync(currentPath)
+    if (files.includes('Battery Saves')) {
+      return fs
+        .readdirSync(path.join(currentPath, 'Battery Saves'))
+        .filter((file) => file.endsWith('.sav'))
+        .map((file) => path.join(currentPath, 'Battery Saves', file))
     }
-  })
-  return foundSaves
+    const foundSaves: string[] = []
+    files.forEach((file) => {
+      const newPath = path.join(currentPath, file)
+      if (fs.lstatSync(newPath).isDirectory()) {
+        foundSaves.push(...recursivelyFindMGBASaves(path.join(currentPath, file)))
+      }
+    })
+
+    return foundSaves
+  } catch (e) {
+    return []
+  }
 }
 // export function findSaveFilesInDataFolder(path: string) {
 //   const files = fs.readdirSync(
 //     path.join(os.homedir(), '.local', 'share', 'citra-emu', 'sdmc', 'Nintendo 3DS')
 //   )
 // }
+
+export function loadStoredObject<T>(filename: string): T {
+  const fullPath = path.join(getStoragePath(), filename)
+  if (!fs.existsSync(fullPath)) {
+    fs.writeFileSync(fullPath, '{}')
+    return {} as T
+  }
+  const fileString = fs.readFileSync(path.join(getStoragePath(), filename)).toString()
+  return JSON.parse(fileString) as T
+}
+
+export function updateStoredObject<T>(filename: string, val: T) {
+  const fullPath = path.join(getStoragePath(), filename)
+  fs.writeFileSync(fullPath, JSON.stringify(val, undefined, 2))
+}
+
+export function loadStoredList<T>(filename: string): T[] {
+  const fullPath = path.join(getStoragePath(), filename)
+  if (!fs.existsSync(fullPath)) {
+    fs.writeFileSync(fullPath, '[]')
+    return []
+  }
+  const fileString = fs.readFileSync(path.join(getStoragePath(), filename)).toString()
+  return JSON.parse(fileString) as T[]
+}
+
+export function updateStoredList<T>(filename: string, val: T[]) {
+  const fullPath = path.join(getStoragePath(), filename)
+  fs.writeFileSync(fullPath, JSON.stringify(val, undefined, 2))
+}

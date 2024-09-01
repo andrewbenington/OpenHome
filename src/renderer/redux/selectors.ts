@@ -1,7 +1,7 @@
 import { PKM } from 'pokemon-files'
 import { OHPKM } from '../../types/pkm/OHPKM'
 import { SAV } from '../../types/SAVTypes'
-import { SaveRefMap, StringToStringMap } from '../../types/types'
+import { SaveRefMap } from '../../types/types'
 import { useAppDispatch, useAppSelector } from './hooks'
 import {
   selectDragMon,
@@ -12,7 +12,7 @@ import {
   selectHomeMons,
   selectModifiedOHPKMs,
   selectMonsToRelease,
-  selectSaves,
+  selectOpenSaves,
   writeAllHomeData,
   writeAllSaveFiles,
 } from './slices/appSlice'
@@ -21,11 +21,11 @@ import { selectResourcesPath } from './slices/resourcesSlice'
 
 type LookupMapsHook = [
   { [key: string]: OHPKM } | undefined,
-  StringToStringMap | undefined,
-  StringToStringMap | undefined,
+  Record<string, string> | undefined,
+  Record<string, string> | undefined,
 ]
 
-export const useSaves = () => useAppSelector(selectSaves)
+export const useOpenSaves = () => useAppSelector(selectOpenSaves)
 export const useHomeData = () => useAppSelector(selectHomeData)
 export const useDragMon = () => useAppSelector(selectDragMon)
 export const useDragSource = () => useAppSelector(selectDragSource)

@@ -1,6 +1,7 @@
 import lodash from 'lodash'
 import { getMonFileIdentifier } from '../../util/Lookup'
 import { OHPKM } from '../pkm/OHPKM'
+import { BoxMonIdentifiers } from '../storage'
 import { Box, BoxCoordinates, SAV } from './SAV'
 import { emptyParsedPath } from './path'
 
@@ -13,22 +14,20 @@ export class HomeBox implements Box<OHPKM> {
     this.name = n
   }
 
-  writeMonsToString() {
-    return this.pokemon
-      .map((mon, i) => {
-        if (mon) {
-          return `${i.toString()},${getMonFileIdentifier(mon) ?? ''}\n`
-        }
-        return ''
-      })
-      .join('')
+  getIdentifierMapping(): BoxMonIdentifiers {
+    const entries = this.pokemon
+      .map(
+        (mon, i) => [i, mon ? getMonFileIdentifier(mon) : undefined] as [number, string | undefined]
+      )
+      .filter(([, identifier]) => !!identifier) as [number, string][]
+
+    return Object.fromEntries(entries)
   }
 
-  getMonsFromString(fileString: string, monMap: { [key: string]: OHPKM }) {
+  loadMonsFromIdentifiers(boxIdentifers: BoxMonIdentifiers, monMap: { [key: string]: OHPKM }) {
     this.pokemon = new Array(120)
-    fileString.split('\n').forEach((monAndIndex) => {
-      const [indexStr, monRef] = monAndIndex.split(',')
-      const mon = monMap[monRef]
+    Object.entries(boxIdentifers).forEach(([indexStr, identifier]) => {
+      const mon = monMap[identifier]
       const index = parseInt(indexStr)
       if (!Number.isNaN(index) && mon) {
         this.pokemon[index] = mon

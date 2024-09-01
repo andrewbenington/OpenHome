@@ -331,7 +331,7 @@ export const generatePersonalityValuePreservingAttributes = (
   let personalityValue = 0
   let otherNature: Nature | undefined
   let otherAbilityNum = 4
-  if (hasGen3OnData(mon)) {
+  if (mon.format !== 'PK1' && hasGen3OnData(mon)) {
     personalityValue = mon.personalityValue
     otherNature = mon.nature
     otherAbilityNum = mon.abilityNum

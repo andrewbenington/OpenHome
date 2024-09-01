@@ -52,9 +52,8 @@ export const getMonGen345Identifier = (mon: PKMFile) => {
         2
       ).concat(bytesToString(pk3.secretID ?? 0, 2))}-${bytesToString(pk3.personalityValue!, 4)}`
     }
-    return undefined
   } catch (error) {
-    console.log(mon)
     console.error(error)
   }
+  return undefined
 }

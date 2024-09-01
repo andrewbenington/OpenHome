@@ -5,7 +5,7 @@ import useIsDarkMode from '../hooks/dark-mode'
 import { FilterProvider } from '../state/filter'
 import './App.css'
 import Home from './Home'
-import { darkTheme, lightTheme } from './themes'
+import { darkTheme, lightTheme } from './Themes'
 
 // const teal = '#53B4A5'
 // const lightTeal = '#7DCEAB'

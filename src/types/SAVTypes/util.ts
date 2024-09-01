@@ -6,7 +6,7 @@ import {
   getMonGen345Identifier,
 } from '../../util/Lookup'
 import { OHPKM } from '../pkm/OHPKM'
-import { SaveType, StringToStringMap } from '../types'
+import { SaveType } from '../types'
 import { DPSAV } from './DPSAV'
 import { G1SAV } from './G1SAV'
 import { G2SAV } from './G2SAV'
@@ -120,8 +120,8 @@ export const buildSaveFile = (
   fileBytes: Uint8Array,
   lookupMaps: {
     homeMonMap?: { [key: string]: OHPKM }
-    gen12LookupMap?: StringToStringMap
-    gen345LookupMap?: StringToStringMap
+    gen12LookupMap?: Record<string, string>
+    gen345LookupMap?: Record<string, string>
     fileCreatedDate?: Date
   }
 ): SAV<PKM> | undefined => {

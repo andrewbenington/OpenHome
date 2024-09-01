@@ -133,10 +133,10 @@ export class OHPKM {
         }
       }
 
-      if (hasGen3OnData(other)) {
+      if (other.format !== 'PK1' && hasGen3OnData(other)) {
         this.personalityValue = other.personalityValue
-        this.isFatefulEncounter = other.isFatefulEncounter
-        this.nature = other.nature ?? 0
+        this.isFatefulEncounter = 'isFatefulEncounter' in other && other.isFatefulEncounter
+        this.nature = 'nature' in other ? other.nature : 0
         this.ivs = other.ivs
         this.evs = other.evs
         this.contest =
@@ -236,12 +236,12 @@ export class OHPKM {
         this.contestMemoryCount = other.contestMemoryCount
         this.battleMemoryCount = other.battleMemoryCount
         this.relearnMoves = other.relearnMoves
-        this.ribbons = other.ribbons
         this.handlerName = other.handlerName
         this.handlerGender = other.handlerGender
         this.isCurrentHandler = other.isCurrentHandler
         this.handlerFriendship = other.handlerFriendship
-      } else if ('ribbons' in other) {
+      }
+      if ('ribbons' in other) {
         const contestRibbons = lodash.intersection(other.ribbons, Gen34ContestRibbons)
         this.contestMemoryCount = Math.max(contestRibbons.length, this.contestMemoryCount)
         const battleRibbons = lodash.intersection(other.ribbons, Gen34TowerRibbons)

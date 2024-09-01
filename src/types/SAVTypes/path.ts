@@ -19,7 +19,7 @@ export const emptyParsedPath: ParsedPath = {
 }
 
 export function joinPath(path: ParsedPath) {
-  return [path.dir, path.name].join(path.separator)
+  return [path.dir, path.name].join(path.separator) + path.ext
 }
 
 export function splitPath(path: ParsedPath) {

@@ -1,11 +1,11 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react'
+import PokemonIcon from 'src/renderer/components/PokemonIcon'
+import { FilterContext } from 'src/renderer/state/filter'
+import { bytesToPKM } from 'src/types/FileImport'
 import { filterApplies } from 'src/types/Filter'
-import { bytesToPKM } from '../../types/FileImport'
-import { PKMFile } from '../../types/pkm/util'
-import { Styles } from '../../types/types'
-import PokemonIcon from '../components/PokemonIcon'
-import BoxIcons from '../images/BoxIcons.png'
-import { FilterContext } from '../state/filter'
+import { PKMFile } from 'src/types/pkm/util'
+import { Styles } from 'src/types/types'
+import BoxIcons from '../../images/BoxIcons.png'
 
 const styles = {
   fillContainer: { width: '100%', height: '100%' },

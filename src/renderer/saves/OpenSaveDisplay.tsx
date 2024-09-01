@@ -7,7 +7,7 @@ import { PKMFile } from '../../types/pkm/util'
 import { isRestricted } from '../../types/TransferRestrictions'
 import { SaveCoordinates, getSaveTypeString } from '../../types/types'
 import { useAppDispatch } from '../redux/hooks'
-import { useDragMon, useSaves } from '../redux/selectors'
+import { useDragMon, useOpenSaves } from '../redux/selectors'
 import {
   completeDrag,
   importMons,
@@ -15,16 +15,16 @@ import {
   setSaveBox,
   startDrag,
 } from '../redux/slices/appSlice'
-import ArrowButton from './ArrowButton'
-import BoxCell from './BoxCell'
+import ArrowButton from './boxes/ArrowButton'
+import BoxCell from './boxes/BoxCell'
 
-interface SaveDisplayProps {
+interface OpenSaveDisplayProps {
   saveIndex: number
   setSelectedMon: (_: PKMFile | undefined) => void
 }
 
-const SaveDisplay = (props: SaveDisplayProps) => {
-  const saves = useSaves()
+const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
+  const saves = useOpenSaves()
   const dragMon = useDragMon()
   const { saveIndex, setSelectedMon } = props
   const dispatch = useAppDispatch()
@@ -160,4 +160,4 @@ const SaveDisplay = (props: SaveDisplayProps) => {
   )
 }
 
-export default SaveDisplay
+export default OpenSaveDisplay

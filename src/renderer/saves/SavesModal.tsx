@@ -1,19 +1,20 @@
-import { Grid } from '@mui/material'
+import { Grid, List, ListItemButton } from '@mui/material'
 import { useMemo, useState } from 'react'
 import 'react-data-grid/lib/styles.css'
 import { ParsedPath } from 'src/types/SAVTypes/path'
-import { useAppDispatch } from '../../renderer/redux/hooks'
-import { useLookupMaps, useRecentSaves } from '../../renderer/redux/selectors'
-import { addSave } from '../../renderer/redux/slices/appSlice'
 import { buildSaveFile } from '../../types/SAVTypes/util'
+import { useAppDispatch } from '../redux/hooks'
+import { useLookupMaps, useRecentSaves } from '../redux/selectors'
+import { addSave } from '../redux/slices/appSlice'
 import RecentSaves from './RecentSaves'
+import SaveFolders from './SaveFolders'
 import SuggestedSaves from './SuggestedSaves'
 
-interface SaveFileSelectorProps {
+interface SavesModalProps {
   onClose: () => void
 }
 
-const SaveFileSelector = (props: SaveFileSelectorProps) => {
+const SavesModal = (props: SavesModalProps) => {
   const { onClose } = props
   const [, upsertRecentSave] = useRecentSaves()
   const [homeMonMap, gen12LookupMap, gen345LookupMap] = useLookupMaps()
@@ -50,41 +51,29 @@ const SaveFileSelector = (props: SaveFileSelectorProps) => {
       case 'suggested':
         return <SuggestedSaves onOpen={openSaveFile} />
       case 'recents':
-      default:
         return <RecentSaves onOpen={openSaveFile} />
+      default:
+        return <SaveFolders />
     }
   }, [tab, openSaveFile])
 
   return (
     <Grid container style={{ height: '100%' }}>
       <Grid item xs={2}>
-        <button onClick={() => openSaveFile()} style={{ margin: 8, width: 'calc(100% - 16px)' }}>
-          Open File
-        </button>
-        <button
-          style={{
-            // ...styles.tabButton,
-            backgroundColor: tab === 'recents' ? '#fff4' : '#0000',
-            width: '100%',
-            borderRadius: 0,
-            textAlign: 'start',
-          }}
-          onClick={() => setTab('recents')}
-        >
-          Recents
-        </button>
-        <button
-          style={{
-            // ...styles.tabButton,
-            backgroundColor: tab === 'suggested' ? '#fff4' : '#0000',
-            width: '100%',
-            borderRadius: 0,
-            textAlign: 'start',
-          }}
-          onClick={() => setTab('suggested')}
-        >
-          Suggested
-        </button>
+        <List>
+          <button onClick={() => openSaveFile()} style={{ margin: 8, width: 'calc(100% - 16px)' }}>
+            Open File
+          </button>
+          <ListItemButton selected={tab === 'recents'} onClick={() => setTab('recents')}>
+            Recents
+          </ListItemButton>
+          <ListItemButton selected={tab === 'suggested'} onClick={() => setTab('suggested')}>
+            Suggested
+          </ListItemButton>
+          <ListItemButton selected={tab === 'save-folders'} onClick={() => setTab('save-folders')}>
+            Save Folders
+          </ListItemButton>
+        </List>
       </Grid>
       <Grid item xs={10} style={{ height: '100%' }}>
         <div
@@ -102,4 +91,4 @@ const SaveFileSelector = (props: SaveFileSelectorProps) => {
   )
 }
 
-export default SaveFileSelector
+export default SavesModal

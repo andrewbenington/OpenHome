@@ -1,16 +1,26 @@
-import { PokemonData } from 'pokemon-species-data'
 import { useLookupMaps } from 'src/renderer/redux/selectors'
-import { stringSorter } from 'src/util/Sort'
+import { getSaveLogo } from 'src/renderer/saves/util'
+import { OHPKM } from 'src/types/pkm/OHPKM'
+import { numericSorter, stringSorter } from 'src/util/Sort'
 import OHDataGrid, { SortableColumn } from '../OHDataGrid'
 import PokemonIcon from '../PokemonIcon'
 
-function pokemonFromLookupID(id: string) {
-  return PokemonData[parseInt(id.split('-')[0])]
+type G12LookupRow = {
+  gen12ID: string
+  homeID: string
+  homeMon?: OHPKM
 }
 
 export default function Gen12Lookup() {
-  const [, lookupMap] = useLookupMaps()
-  const columns: SortableColumn<[string, string]>[] = [
+  const [homeMons, gen12LookupMap] = useLookupMaps()
+
+  function pokemonFromLookupID(id: string) {
+    if (!homeMons) return undefined
+    return homeMons[id]
+    // return PokemonData[parseInt(id.split('-')[0])]
+  }
+
+  const columns: SortableColumn<G12LookupRow>[] = [
     // {
     //   key: 'display',
     //   name: 'Display',
@@ -20,30 +30,53 @@ export default function Gen12Lookup() {
     //   cellClass: 'centered-cell',
     // },
     {
-      key: 'Base Pokémon',
-      name: 'Base Pokémon',
+      key: 'Pokémon',
+      name: 'Pokémon',
       width: 100,
-      renderValue: (value) => {
-        const baseMon = pokemonFromLookupID(value[1])
-        return <PokemonIcon dexNumber={baseMon.nationalDex} style={{ width: 30, height: 30 }} />
-      },
-      sortFunction: stringSorter((val) => val[1]),
+      renderValue: (value) =>
+        value.homeMon && (
+          <PokemonIcon
+            dexNumber={value.homeMon.dexNum}
+            formeNumber={value.homeMon.formeNum}
+            style={{ width: 30, height: 30 }}
+          />
+        ),
       cellClass: 'centered-cell',
     },
     {
-      key: 'Gen 1/2',
-      name: 'Gen 1/2',
-      minWidth: 180,
-      renderValue: (value) => value[0],
-      sortFunction: stringSorter((val) => val[0]),
+      key: 'game',
+      name: 'Original Game',
+      width: 130,
+      renderValue: (value) =>
+        value.homeMon && (
+          <img alt="save logo" height={40} src={getSaveLogo(value.homeMon.gameOfOrigin)} />
+        ),
+      sortFunction: numericSorter((val) => val.homeMon?.gameOfOrigin),
+      cellClass: 'centered-cell',
     },
     {
-      key: 'OpenHome',
+      key: 'gen12ID',
+      name: 'Gen 1/2',
+      minWidth: 180,
+      sortFunction: stringSorter((val) => val[0]),
+      cellClass: 'mono-cell',
+    },
+    {
+      key: 'homeID',
       name: 'OpenHome',
       minWidth: 180,
-      renderValue: (value) => value[1],
       sortFunction: stringSorter((val) => val[1]),
+      cellClass: 'mono-cell',
     },
   ]
-  return <OHDataGrid rows={Object.entries(lookupMap ?? {})} columns={columns} />
+  return (
+    <OHDataGrid
+      rows={Object.entries(gen12LookupMap ?? {}).map(([gen12ID, homeID]) => ({
+        gen12ID,
+        homeID,
+        homeMon: pokemonFromLookupID(homeID),
+      }))}
+      columns={columns}
+    />
+  )
 }

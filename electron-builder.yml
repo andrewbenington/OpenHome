@@ -21,7 +21,7 @@ nsis:
 mac:
   target:
     target: default
-    arch: 
+    arch:
       - x64
       - arm64
   entitlementsInherit: build/entitlements.mac.plist
@@ -36,6 +36,9 @@ linux:
     - AppImage
     - snap
     - deb
+  arch:
+    - x64
+    - arm64
   maintainer: electronjs.org
   category: Utility
 appImage:

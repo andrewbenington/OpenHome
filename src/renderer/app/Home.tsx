@@ -10,18 +10,18 @@ import { OHPKM } from '../../types/pkm/OHPKM'
 import { PKMFile } from '../../types/pkm/util'
 import { SaveCoordinates } from '../../types/types'
 import { getMonFileIdentifier } from '../../util/Lookup'
-import PokemonIcon from '../components/PokemonIcon'
 import Gen12Lookup from '../components/display/Gen12Lookup'
 import FilterPanel from '../components/filter/FilterPanel'
-import PokemonDisplay from '../pokemon/PokemonDisplay'
+import PokemonIcon from '../components/PokemonIcon'
+import PokemonDetailsPanel from '../pokemon/PokemonDetailsPanel'
 import { useAppDispatch } from '../redux/hooks'
 import {
   useDragMon,
   useDragSource,
   useHomeData,
   useMonsToRelease,
+  useOpenSaves,
   useSaveFunctions,
-  useSaves,
 } from '../redux/selectors'
 import {
   cancelDrag,
@@ -33,9 +33,9 @@ import {
   loadHomeMons,
   setMonToRelease,
 } from '../redux/slices/appSlice'
-import HomeBoxDisplay from '../saves/HomeBoxDisplay'
-import SaveDisplay from '../saves/SaveDisplay'
-import SaveFileSelector from '../saves/SaveFileSelector'
+import HomeBoxDisplay from '../saves/boxes/HomeBoxDisplay'
+import OpenSaveDisplay from '../saves/boxes/SaveBoxDisplay'
+import SavesModal from '../saves/SavesModal'
 import { initializeDragImage } from '../util/initializeDragImage'
 import {
   handleDeleteOHPKMFiles,
@@ -46,7 +46,7 @@ import useWindowDimensions from '../util/windowDimensions'
 import './Home.css'
 
 const Home = () => {
-  const saves = useSaves()
+  const saves = useOpenSaves()
   const homeData = useHomeData()
   const dragMon = useDragMon()
   const dragSource = useDragSource()
@@ -203,7 +203,11 @@ const Home = () => {
       >
         <Stack className="save-file-column" spacing={1}>
           {lodash.range(saves.length).map((i) => (
-            <SaveDisplay key={`save_display_${i}`} saveIndex={i} setSelectedMon={setSelectedMon} />
+            <OpenSaveDisplay
+              key={`save_display_${i}`}
+              saveIndex={i}
+              setSelectedMon={setSelectedMon}
+            />
           ))}
           <button
             className="card-button"
@@ -284,7 +288,7 @@ const Home = () => {
         maxWidth="md"
         PaperProps={{ sx: { height: 400, maxWidth: 800 } }}
       >
-        {selectedMon && <PokemonDisplay mon={selectedMon} tab={tab} setTab={setTab} />}
+        {selectedMon && <PokemonDetailsPanel mon={selectedMon} tab={tab} setTab={setTab} />}
       </Dialog>
       <Dialog
         open={openSaveDialog}
@@ -293,7 +297,7 @@ const Home = () => {
         maxWidth="lg"
         PaperProps={{ sx: { height: 800 } }}
       >
-        <SaveFileSelector
+        <SavesModal
           onClose={() => {
             setOpenSaveDialog(false)
           }}

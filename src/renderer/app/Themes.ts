@@ -7,6 +7,7 @@ const red2 = '#e45454'
 // const green = '#84DD63'
 // const yellow = '#FFC31F'
 const tealGradient = 'linear-gradient(355deg, rgba(83,180,165,1) 0%, rgba(125,206,171,1) 85%)'
+const darkTealGradient = 'linear-gradient(310deg, rgba(54,69,78,1) 0%, rgba(1,83,84,1) 85%)'
 // const oldBackground = '#A9CEF4'
 
 const components: Components<Omit<Theme, 'components'>> = {
@@ -51,6 +52,7 @@ const components: Components<Omit<Theme, 'components'>> = {
         ':hover': {
           boxShadow: 'none',
         },
+        padding: 0,
       },
     },
     variants: [
@@ -99,9 +101,9 @@ const components: Components<Omit<Theme, 'components'>> = {
       root: {
         overflowY: 'hidden',
       },
-      paper: {
-        background: tealGradient,
-      },
+      // paper: {
+      //   background: tealGradient,
+      // },
     },
   },
   // MuiDivider: {
@@ -122,16 +124,16 @@ export const darkTheme: ThemeOptions = {
       main: red,
     },
     primary: {
-      main: red2,
+      main: '#780600',
     },
     background: {
-      default: lightTeal,
-      gradient: tealGradient,
-      paper: '#dfd',
+      default: '#2c313a',
+      gradient: darkTealGradient,
+      paper: '#081721',
     },
     text: {
-      primary: '#333',
-      secondary: '#000',
+      primary: '#fff',
+      secondary: '#ccc',
     },
   },
   components,
