@@ -1,4 +1,4 @@
-import { Grid, List, ListItemButton } from '@mui/material'
+import { Grid, List, ListItemButton } from '@mui/joy'
 import { useMemo, useState } from 'react'
 import 'react-data-grid/lib/styles.css'
 import { ParsedPath } from 'src/types/SAVTypes/path'
@@ -59,7 +59,7 @@ const SavesModal = (props: SavesModalProps) => {
 
   return (
     <Grid container style={{ height: '100%' }}>
-      <Grid item xs={2}>
+      <Grid xs={2}>
         <List>
           <button onClick={() => openSaveFile()} style={{ margin: 8, width: 'calc(100% - 16px)' }}>
             Open File
@@ -75,7 +75,7 @@ const SavesModal = (props: SavesModalProps) => {
           </ListItemButton>
         </List>
       </Grid>
-      <Grid item xs={10} style={{ height: '100%' }}>
+      <Grid xs={10} style={{ height: '100%' }}>
         <div
           style={{
             height: 'calc(100% - 16px)',

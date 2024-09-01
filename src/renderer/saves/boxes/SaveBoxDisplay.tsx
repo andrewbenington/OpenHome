@@ -1,8 +1,8 @@
-import { ArrowBack, ArrowForward, Close } from '@mui/icons-material'
-import { Card, Grid } from '@mui/material'
+import { Card, Grid } from '@mui/joy'
 import lodash from 'lodash'
 import { GameOfOriginData } from 'pokemon-resources'
 import { useMemo } from 'react'
+import { MdArrowBack, MdArrowForward, MdClose } from 'react-icons/md'
 import { PKMFile } from '../../../types/pkm/util'
 import { isRestricted } from '../../../types/TransferRestrictions'
 import { SaveCoordinates, getSaveTypeString } from '../../../types/types'
@@ -53,7 +53,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
           onClick={() => dispatchRemoveSaveAt(saveIndex)}
           disabled={!!save.updatedBoxSlots.length}
         >
-          <Close />
+          <MdClose />
         </button>
         <div
           style={{
@@ -86,7 +86,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                   )
                 }
               >
-                <ArrowBack fontSize="small" />
+                <MdArrowBack fontSize="small" />
               </ArrowButton>
             </Grid>
             <Grid xs={8} className="box-name">
@@ -102,7 +102,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
               <ArrowButton
                 onClick={() => dispatchSetBox((save.currentPCBox + 1) % save.boxes.length)}
               >
-                <ArrowForward fontSize="small" />
+                <MdArrowForward fontSize="small" />
               </ArrowButton>
             </Grid>
           </Grid>
@@ -113,7 +113,6 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                 return (
                   <Grid
                     key={`pc_row_${row}_slot_${rowIndex}`}
-                    item
                     xs={12 / save.boxColumns}
                     style={{ padding: '2px 2px 0px 2px' }}
                   >

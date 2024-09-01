@@ -1,9 +1,9 @@
 /* eslint-disable no-nested-ternary */
-import { Download } from '@mui/icons-material'
-import { Box, Grid, useTheme } from '@mui/material'
+import { Box, Stack, useTheme } from '@mui/joy'
 import { PKM } from 'pokemon-files'
 import { useMemo, useState } from 'react'
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary'
+import { MdDownload } from 'react-icons/md'
 import { fileTypeFromString } from '../../types/FileImport'
 import { OHPKM } from '../../types/pkm/OHPKM'
 import { Styles } from '../../types/types'
@@ -77,11 +77,11 @@ const PokemonDetailsPanel = (props: {
   const theme = useTheme()
 
   return (
-    <Grid
-      container
+    <Stack
+      direction="row"
       style={{ ...styles.pokemonDisplay, background: theme.palette.background.gradient }}
     >
-      <Grid item xs={3}>
+      <Box flex={0.25}>
         <div style={styles.detailsTabCol}>
           <Box display="flex">
             <FileTypeSelect
@@ -113,7 +113,7 @@ const PokemonDetailsPanel = (props: {
                 href={url}
                 download={`${displayMon.nickname}.${displayMon.format.toLocaleLowerCase()}`}
               >
-                <Download sx={{ color: 'white' }} />
+                <MdDownload style={{ color: 'white' }} />
               </a>
             </button>
           </Box>
@@ -181,8 +181,8 @@ const PokemonDetailsPanel = (props: {
             Raw
           </OpenHomeButton>
         </div>
-      </Grid>
-      <Grid item xs={9} style={styles.displayContainer}>
+      </Box>
+      <Box flex={0.75} style={styles.displayContainer}>
         <ErrorBoundary FallbackComponent={FallbackComponent}>
           {tab === 'summary' ? (
             <SummaryDisplay mon={displayMon} />
@@ -200,8 +200,8 @@ const PokemonDetailsPanel = (props: {
             <RawDisplay bytes={new Uint8Array(displayMon.toBytes({ includeExtraFields: true }))} />
           )}
         </ErrorBoundary>
-      </Grid>
-    </Grid>
+      </Box>
+    </Stack>
   )
 }
 

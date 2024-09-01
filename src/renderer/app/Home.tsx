@@ -1,8 +1,8 @@
-import { FileOpen } from '@mui/icons-material'
-import { Box, Button, Card, Dialog, Stack, Typography, useTheme } from '@mui/material'
+import { Box, Button, Card, Modal, ModalDialog, Stack, Typography, useTheme } from '@mui/joy'
 import lodash from 'lodash'
 import { bytesToPKMInterface } from 'pokemon-files'
 import { useCallback, useEffect, useState } from 'react'
+import { MdFileOpen } from 'react-icons/md'
 import { loadRecentSaves } from '../../renderer/redux/slices/recentSavesSlice'
 import { loadResourcesPath } from '../../renderer/redux/slices/resourcesSlice'
 import { bytesToPKM } from '../../types/FileImport'
@@ -219,10 +219,10 @@ const Home = () => {
             className="card-button"
             onClick={() => setOpenSaveDialog(true)}
             style={{
-              backgroundColor: palette.primary.main,
+              backgroundColor: palette.primary.mainChannel,
             }}
           >
-            <FileOpen />
+            <MdFileOpen />
             Open Save
           </button>
         </Stack>
@@ -288,37 +288,35 @@ const Home = () => {
       <Card style={{ width: 'calc(100% - 16px)', height: 30 }}>
         <Button onClick={() => setLookupDialog('gen12')}>Gen 1/2</Button>
       </Card>
-      <Dialog
+      <Modal
         open={!!selectedMon}
         onClose={() => setSelectedMon(undefined)}
-        fullWidth
-        maxWidth="md"
-        PaperProps={{ sx: { height: 400, maxWidth: 800 } }}
+        // maxWidth="md"
+        // PaperProps={{ sx: { height: 400, maxWidth: 800 } }}
       >
-        {selectedMon && <PokemonDetailsPanel mon={selectedMon} tab={tab} setTab={setTab} />}
-      </Dialog>
-      <Dialog
+        <Card style={{ width: 800, height: 400, padding: 0, overflow: 'hidden' }}>
+          {selectedMon && <PokemonDetailsPanel mon={selectedMon} tab={tab} setTab={setTab} />}
+        </Card>
+      </Modal>
+      <Modal
         open={openSaveDialog}
         onClose={() => setOpenSaveDialog(false)}
-        fullWidth
-        maxWidth="lg"
-        PaperProps={{ sx: { height: 800 } }}
+        // fullWidth
+        // PaperProps={{ sx: { height: 800 } }}
       >
-        <SavesModal
-          onClose={() => {
-            setOpenSaveDialog(false)
-          }}
-        />
-      </Dialog>
-      <Dialog
-        open={lookupDialog === 'gen12'}
-        onClose={() => setLookupDialog(undefined)}
-        fullWidth
-        maxWidth="lg"
-        PaperProps={{ sx: { height: 800 } }}
-      >
-        <Gen12Lookup />
-      </Dialog>
+        <ModalDialog sx={{ minHeight: 400, height: 600, width: 1000 }}>
+          <SavesModal
+            onClose={() => {
+              setOpenSaveDialog(false)
+            }}
+          />
+        </ModalDialog>
+      </Modal>
+      <Modal open={lookupDialog === 'gen12'} onClose={() => setLookupDialog(undefined)}>
+        <ModalDialog maxWidth="lg">
+          <Gen12Lookup />
+        </ModalDialog>
+      </Modal>
     </Stack>
   )
 }

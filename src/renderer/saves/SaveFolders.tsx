@@ -1,6 +1,6 @@
-import { Delete } from '@mui/icons-material'
-import { Card, Dialog, DialogActions, Stack, Typography } from '@mui/material'
+import { Card, DialogActions, Modal, ModalDialog, Stack, Typography } from '@mui/joy'
 import { useCallback, useEffect, useState } from 'react'
+import { MdDelete } from 'react-icons/md'
 import { SaveFolder } from 'src/types/storage'
 
 async function loadSaveFolders(): Promise<SaveFolder[]> {
@@ -64,7 +64,7 @@ export default function SaveFolders() {
                 }}
                 onClick={() => removeFolder(folder.path)}
               >
-                <Delete />
+                <MdDelete />
               </button>
             </Stack>
           </Card>
@@ -96,16 +96,18 @@ function FolderLabelDialog(props: FolderLabelDialogProps) {
   const { open, submitLabel, onClose } = props
   const [label, setLabel] = useState('')
   return (
-    <Dialog open={open} onClose={() => onClose()}>
-      <label style={{ margin: 8 }}>
-        Folder Label
-        <input value={label} onChange={(e) => setLabel(e.target.value)}></input>
-      </label>
+    <Modal open={open} onClose={() => onClose()}>
+      <ModalDialog>
+        <label style={{ margin: 8 }}>
+          Folder Label
+          <input value={label} onChange={(e) => setLabel(e.target.value)}></input>
+        </label>
 
-      <DialogActions>
-        <button onClick={() => onClose()}>Cancel</button>
-        <button onClick={() => submitLabel(label)}>Save</button>
-      </DialogActions>
-    </Dialog>
+        <DialogActions>
+          <button onClick={() => onClose()}>Cancel</button>
+          <button onClick={() => submitLabel(label)}>Save</button>
+        </DialogActions>
+      </ModalDialog>
+    </Modal>
   )
 }

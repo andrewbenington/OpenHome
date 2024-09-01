@@ -1,4 +1,4 @@
-import { Grid } from '@mui/material'
+import { Grid } from '@mui/joy'
 import { Buffer } from 'buffer'
 import hexy from 'hexy'
 import lodash from 'lodash'
@@ -49,7 +49,7 @@ const HexEditor = ({ data }: HexEditorProps) => {
         }
         return (
           <Fragment key={`line_${i}`}>
-            <Grid item xs={1.5} key={`line_${i}_prefix`} style={{}}>
+            <Grid xs={1.5} key={`line_${i}_prefix`} style={{}}>
               <code
                 key={`line_${i}_prefix`}
                 className="disable-select"
@@ -62,7 +62,7 @@ const HexEditor = ({ data }: HexEditorProps) => {
                 {prefix.substring(4, 8)}
               </code>
             </Grid>
-            <Grid item xs={7.5} key={`line_${i}_bytes`} display="flex" flexDirection="row">
+            <Grid xs={7.5} key={`line_${i}_bytes`} display="flex" flexDirection="row">
               {bytePairs.map((pair, j) => {
                 const byteIndex = 16 * i + 2 * j
                 return (
@@ -101,7 +101,7 @@ const HexEditor = ({ data }: HexEditorProps) => {
                 )
               })}
             </Grid>
-            <Grid item xs={3} key={`line_${i}_ascii`} display="flex" flexDirection="row">
+            <Grid xs={3} key={`line_${i}_ascii`} display="flex" flexDirection="row">
               {lodash.range(16).map((k) => {
                 const char =
                   ascii.charCodeAt(i) >= 32 && ascii.charCodeAt(i) < 127 ? ascii.charAt(k) : '.'

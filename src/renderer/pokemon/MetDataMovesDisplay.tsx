@@ -1,4 +1,4 @@
-import { Card } from '@mui/material'
+import { Card } from '@mui/joy'
 import { AllPKMFields } from 'pokemon-files'
 import { GameOfOriginData, getLocationString, NatureToString } from 'pokemon-resources'
 import { useMemo } from 'react'

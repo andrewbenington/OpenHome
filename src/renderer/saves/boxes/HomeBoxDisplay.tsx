@@ -1,6 +1,6 @@
-import { ArrowBack, ArrowForward } from '@mui/icons-material'
-import { Grid, Paper } from '@mui/material'
+import { Card, Grid } from '@mui/joy'
 import lodash from 'lodash'
+import { MdArrowBack, MdArrowForward } from 'react-icons/md'
 import { PKMFile } from '../../../types/pkm/util'
 import { SaveCoordinates } from '../../../types/types'
 import { useAppDispatch } from '../../redux/hooks'
@@ -33,11 +33,12 @@ const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
 
   return (
     data.boxes[0] && (
-      <Paper
+      <Card
         style={{
           padding: 2,
           width: '100%',
           height: 'fit-content',
+          gap: 0,
         }}
       >
         <Grid container>
@@ -55,7 +56,7 @@ const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
                 )
               }
             >
-              <ArrowBack fontSize="small" />
+              <MdArrowBack fontSize="small" />
             </ArrowButton>
           </Grid>
           <Grid xs={8} className="box-name">
@@ -71,7 +72,7 @@ const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
             <ArrowButton
               onClick={() => dispatchSetBox((data.currentPCBox + 1) % data.boxes.length)}
             >
-              <ArrowForward fontSize="small" />
+              <MdArrowForward fontSize="small" />
             </ArrowButton>
           </Grid>
         </Grid>
@@ -81,7 +82,6 @@ const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
               const mon = data.boxes[data.currentPCBox].pokemon[row * 12 + rowIndex]
               return (
                 <Grid
-                  item
                   key={`home_box_row_${rowIndex}`}
                   xs={1}
                   style={{ padding: '2px 2px 0px 2px' }}
@@ -121,7 +121,7 @@ const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
             })}
           </Grid>
         ))}
-      </Paper>
+      </Card>
     )
   )
 }

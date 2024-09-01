@@ -1,4 +1,4 @@
-import { MenuItem, Select } from '@mui/material'
+import { Option, Select } from '@mui/joy'
 import {
   Chart as ChartJS,
   Filler,
@@ -75,9 +75,9 @@ const StatsDisplay = (props: { mon: PKMFile }) => {
   const menuItems = useMemo(() => {
     const createMenuItem = (value: string) => {
       return (
-        <MenuItem key={value} value={value}>
+        <Option key={value} value={value}>
           {value}
-        </MenuItem>
+        </Option>
       )
     }
     const items = [createMenuItem('Stats')]
@@ -107,13 +107,13 @@ const StatsDisplay = (props: { mon: PKMFile }) => {
   return (
     <div style={styles.container}>
       <div style={styles.selectors}>
-        <Select value={display} onChange={(e) => setDisplay(e.target.value)}>
+        <Select value={display} onChange={(_, val) => val && setDisplay(val)}>
           {menuItems}
         </Select>
         {display === 'EVs' && 'evs' in mon && 'evsG12' in mon ? (
-          <Select value={evType} onChange={(e) => setEVType(e.target.value)}>
-            <MenuItem value="Modern">Modern</MenuItem>
-            <MenuItem value="Game Boy">Game Boy</MenuItem>
+          <Select value={evType} onChange={(_, val) => val && setEVType(val)} variant="outlined">
+            <Option value="Modern">Modern</Option>
+            <Option value="Game Boy">Game Boy</Option>
           </Select>
         ) : (
           <div />
@@ -174,7 +174,7 @@ const StatsDisplay = (props: { mon: PKMFile }) => {
                   borderRadius: display === 'Contest' ? 12 : 0,
                   backdropPadding: display === 'Contest' ? 4 : 0,
                   callback: (value) => {
-                    if (!hasGen3OnData(mon)) {
+                    if (!('nature' in mon)) {
                       return value
                     }
                     let natureSummary: string
@@ -215,7 +215,7 @@ const StatsDisplay = (props: { mon: PKMFile }) => {
                     pointHoverBackgroundColor: '#fff',
                     pointHoverBorderColor: 'rgb(132, 99, 255)',
                   }
-                : display === 'IVs' && hasGen3OnData(mon)
+                : display === 'IVs' && 'ivs' in mon
                 ? {
                     label: 'IVs',
                     data: [
@@ -246,7 +246,7 @@ const StatsDisplay = (props: { mon: PKMFile }) => {
                     pointHoverBackgroundColor: '#fff',
                     pointHoverBorderColor: 'rgb(255, 99, 132)',
                   }
-                : display === 'EVs' && evType === 'Modern' && hasGen3OnData(mon)
+                : display === 'EVs' && evType === 'Modern' && 'evs' in mon
                 ? {
                     label: 'EVs',
                     data: [

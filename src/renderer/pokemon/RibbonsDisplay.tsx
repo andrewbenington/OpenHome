@@ -1,4 +1,4 @@
-import { Tooltip } from '@mui/material'
+import { Tooltip } from '@mui/joy'
 import { Gen9Ribbons } from '../../consts/Ribbons'
 import { hasGen3OnData } from '../../types/interfaces/gen3'
 import { hasGen6OnData } from '../../types/interfaces/gen6'

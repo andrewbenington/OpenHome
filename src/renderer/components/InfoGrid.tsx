@@ -1,4 +1,4 @@
-import { Card, Grid } from '@mui/material'
+import { Card, Grid } from '@mui/joy'
 import { Dayjs } from 'dayjs'
 import { useMemo } from 'react'
 
@@ -31,13 +31,12 @@ export function InfoGrid(props: InfoGridProps) {
   }, [labelBreakpoints])
 
   return (
-    <Card variant="elevation" style={{ overflowY: 'auto' }}>
+    <Card style={{ overflowY: 'auto' }}>
       <Grid container rowSpacing={1}>
         {Object.entries(data)
           .filter(([, value]) => value !== undefined && value !== null)
           .map(([key, value], index) => [
             <Grid
-              item
               key={`info-row-${index}-label`}
               {...(typeof value === 'object' && !('$isDayjsObject' in value)
                 ? { xs: 12 }
@@ -48,11 +47,11 @@ export function InfoGrid(props: InfoGridProps) {
             </Grid>,
             typeof value === 'object' ? (
               '$isDayjsObject' in value ? (
-                <Grid item {...dataBreakpoints} key={`info-row-${index}-value`}>
+                <Grid {...dataBreakpoints} key={`info-row-${index}-value`}>
                   Dayjs({(value as Dayjs).format('YYYY-MM-DD HH:mm')})
                 </Grid>
               ) : (
-                <Grid item xs={12} key={`info-row-${index}-value`}>
+                <Grid xs={12} key={`info-row-${index}-value`}>
                   {'props' in value ? (
                     value
                   ) : (
@@ -61,7 +60,7 @@ export function InfoGrid(props: InfoGridProps) {
                 </Grid>
               )
             ) : (
-              <Grid item {...dataBreakpoints} key={`info-row-${index}-value`}>
+              <Grid {...dataBreakpoints} key={`info-row-${index}-value`}>
                 {value.toString()}
               </Grid>
             ),

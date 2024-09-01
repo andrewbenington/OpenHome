@@ -1,7 +1,5 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import { ArrowForwardIosSharp } from '@mui/icons-material'
-import Accordion from '@mui/material/Accordion'
-import AccordionSummary from '@mui/material/AccordionSummary'
+import { Accordion, AccordionDetails, AccordionSummary } from '@mui/joy'
 import { AllPKMFields, getDisplayID } from 'pokemon-files'
 import {
   BDSPTMMoveIndexes,
@@ -12,6 +10,7 @@ import {
 } from 'pokemon-resources'
 import { NationalDex } from 'pokemon-species-data'
 import { useMemo } from 'react'
+import { MdArrowForwardIos } from 'react-icons/md'
 import { hasGen3OnData } from 'src/types/interfaces/gen3'
 import { shinyLeafValues } from 'src/types/interfaces/gen4'
 import { hasGen6OnData, hasN3DSOnlyData } from 'src/types/interfaces/gen6'
@@ -33,7 +32,6 @@ import { isRestricted } from '../../types/TransferRestrictions'
 import { hasGameBoyData } from '../../types/interfaces/stats'
 import { OHPKM } from '../../types/pkm/OHPKM'
 import { getHiddenPowerGen2, getHiddenPowerPower, getHiddenPowerType } from '../../types/pkm/util'
-import { Styles } from '../../types/types'
 import {
   getMonFileIdentifier,
   getMonGen12Identifier,
@@ -46,25 +44,21 @@ import { getFlagsInRange } from '../util/byteLogic'
 import AttributeRow from './AttributeRow'
 
 const styles = {
-  accordion: {
-    backgroundColor: '#0000',
-    '&:before': {
-      display: 'none',
-    },
-  },
   accordionSummary: {
-    backgroundColor: '#0000',
+    border: 0,
     padding: 0,
-    minHeight: 'fit-content',
-    '& .MuiAccordionSummary-content': {
-      margin: 0,
+    margin: 0,
+    '& .MuiAccordionSummary-button': {
+      border: 0,
     },
-    '& .MuiAccordionSummary-expandIconWrapper': {
+    '& .MuiAccordionSummary-indicator': {
       position: 'absolute',
       right: 10,
     },
-    '& .MuiAccordionSummary-expandIconWrapper.Mui-expanded': {
-      transform: 'rotate(90deg)',
+    '& .Mui-expanded': {
+      '& .MuiAccordionSummary-indicator': {
+        transform: 'rotate(90deg)',
+      },
     },
   },
   flexRowWrap: {
@@ -79,7 +73,7 @@ const styles = {
     padding: 10,
     marginBottom: 10,
   },
-} as Styles
+}
 
 const OtherDisplay = (props: { mon: AllPKMFields }) => {
   const { mon } = props
@@ -95,46 +89,39 @@ const OtherDisplay = (props: { mon: AllPKMFields }) => {
           <code>{`0x${mon.encryptionConstant.toString(16).padStart(8, '0')}`}</code>
         </AttributeRow>
       )}
-      <Accordion
-        disableGutters
-        elevation={0}
-        TransitionProps={{ unmountOnExit: true }}
-        sx={styles.accordion}
-      >
+      <Accordion>
         <AccordionSummary
-          expandIcon={<ArrowForwardIosSharp sx={{ fontSize: '0.9rem' }} />}
+          indicator={<MdArrowForwardIos style={{ fontSize: '0.9rem' }} />}
           sx={styles.accordionSummary}
+          style={{ height: 32, margin: 0 }}
         >
           <AttributeRow
             label="Original Trainer"
             value={`${mon.trainerName} ${mon.trainerGender ? '♀' : '♂'}`}
           />
         </AccordionSummary>
-        <AttributeRow label="ID" value={getDisplayID(mon as any)} indent={10} />
-        {mon.secretID !== undefined && (
-          <AttributeRow label="Secret ID" indent={10}>
-            <code>{`0x${mon.secretID.toString(16).padStart(4, '0')}`}</code>
-          </AttributeRow>
-        )}
-        {mon.trainerFriendship && (
-          <AttributeRow label="Friendship" value={mon.trainerFriendship.toString()} indent={10} />
-        )}
-        {mon.trainerAffection && (
-          <AttributeRow label="Affection" value={mon.trainerAffection.toString()} indent={10} />
-        )}
-        {'isCurrentHandler' in mon && (
-          <AttributeRow label="Trained last" value={`${!mon.isCurrentHandler}`} indent={10} />
-        )}
+        <AccordionDetails>
+          <AttributeRow label="ID" value={getDisplayID(mon as any)} indent={10} />
+          {mon.secretID !== undefined && (
+            <AttributeRow label="Secret ID" indent={10}>
+              <code>{`0x${mon.secretID.toString(16).padStart(4, '0')}`}</code>
+            </AttributeRow>
+          )}
+          {!!mon.trainerFriendship && (
+            <AttributeRow label="Friendship" value={mon.trainerFriendship.toString()} indent={10} />
+          )}
+          {!!mon.trainerAffection && (
+            <AttributeRow label="Affection" value={mon.trainerAffection.toString()} indent={10} />
+          )}
+          {'isCurrentHandler' in mon && (
+            <AttributeRow label="Trained last" value={`${!mon.isCurrentHandler}`} indent={10} />
+          )}
+        </AccordionDetails>
       </Accordion>
       {hasGen6OnData(mon) && mon.handlerName !== '' ? (
-        <Accordion
-          disableGutters
-          elevation={0}
-          TransitionProps={{ unmountOnExit: true }}
-          sx={styles.accordion}
-        >
+        <Accordion>
           <AccordionSummary
-            expandIcon={<ArrowForwardIosSharp sx={{ fontSize: '0.9rem' }} />}
+            indicator={<MdArrowForwardIos style={{ fontSize: '0.9rem' }} />}
             sx={styles.accordionSummary}
           >
             <AttributeRow
@@ -142,13 +129,15 @@ const OtherDisplay = (props: { mon: AllPKMFields }) => {
               value={`${mon.handlerName} ${mon.handlerGender ? '♀' : '♂'}`}
             />
           </AccordionSummary>
-          {'handlerID' in mon && (
-            <AttributeRow label="ID" value={mon.handlerID?.toString()} indent={10} />
-          )}
-          <AttributeRow label="Friendship" value={mon.handlerFriendship.toString()} indent={10} />
-          {hasN3DSOnlyData(mon) && (
-            <AttributeRow label="Affection" value={mon.handlerAffection.toString()} indent={10} />
-          )}
+          <AccordionDetails>
+            {'handlerID' in mon && (
+              <AttributeRow label="ID" value={mon.handlerID?.toString()} indent={10} />
+            )}
+            <AttributeRow label="Friendship" value={mon.handlerFriendship.toString()} indent={10} />
+            {hasN3DSOnlyData(mon) && (
+              <AttributeRow label="Affection" value={mon.handlerAffection.toString()} indent={10} />
+            )}
+          </AccordionDetails>
         </Accordion>
       ) : (
         <div />
@@ -204,14 +193,9 @@ const OtherDisplay = (props: { mon: AllPKMFields }) => {
       {!isRestricted(USUM_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
       mon.geolocations &&
       mon.geolocations[0].country ? (
-        <Accordion
-          disableGutters
-          elevation={0}
-          TransitionProps={{ unmountOnExit: true }}
-          sx={styles.accordion}
-        >
+        <Accordion>
           <AccordionSummary
-            expandIcon={<ArrowForwardIosSharp sx={{ fontSize: '0.9rem' }} />}
+            indicator={<MdArrowForwardIos style={{ fontSize: '0.9rem' }} />}
             sx={styles.accordionSummary}
           >
             <AttributeRow
@@ -219,15 +203,17 @@ const OtherDisplay = (props: { mon: AllPKMFields }) => {
               value={mon.geolocations?.filter((geo) => geo.country).length.toString()}
             />
           </AccordionSummary>
-          {mon.geolocations?.map((geo, i) =>
-            geo.country ? (
-              <AttributeRow key={`geo_${i + 1}`} label={`Geolocation ${i + 1}`} indent={10}>
-                {Countries[geo.country]}, Region {geo.region}
-              </AttributeRow>
-            ) : (
-              <div key={`geo_${i + 1}`} />
-            )
-          )}
+          <AccordionDetails>
+            {mon.geolocations?.map((geo, i) =>
+              geo.country ? (
+                <AttributeRow key={`geo_${i + 1}`} label={`Geolocation ${i + 1}`} indent={10}>
+                  {Countries[geo.country]}, Region {geo.region}
+                </AttributeRow>
+              ) : (
+                <div key={`geo_${i + 1}`} />
+              )
+            )}
+          </AccordionDetails>
         </Accordion>
       ) : (
         <div />
@@ -235,14 +221,9 @@ const OtherDisplay = (props: { mon: AllPKMFields }) => {
       {!isRestricted(SWSH_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
       mon.trFlagsSwSh &&
       getFlagsInRange(mon.trFlagsSwSh, 0, 14).length > 0 ? (
-        <Accordion
-          disableGutters
-          elevation={0}
-          TransitionProps={{ unmountOnExit: true }}
-          sx={styles.accordion}
-        >
+        <Accordion>
           <AccordionSummary
-            expandIcon={<ArrowForwardIosSharp sx={{ fontSize: '0.9rem' }} />}
+            indicator={<MdArrowForwardIos style={{ fontSize: '0.9rem' }} />}
             sx={styles.accordionSummary}
           >
             <AttributeRow
@@ -250,11 +231,13 @@ const OtherDisplay = (props: { mon: AllPKMFields }) => {
               value={`${getFlagsInRange(mon.trFlagsSwSh, 0, 14).length} TRs`}
             />
           </AccordionSummary>
-          {getFlagsInRange(mon.trFlagsSwSh, 0, 14).map((i) => (
-            <AttributeRow key={`swsh_tr_${i}`} label={`TR ${i}`} indent={10}>
-              {MOVE_DATA[SwShTRMoveIndexes[i]].name}
-            </AttributeRow>
-          ))}
+          <AccordionDetails>
+            {getFlagsInRange(mon.trFlagsSwSh, 0, 14).map((i) => (
+              <AttributeRow key={`swsh_tr_${i}`} label={`TR ${i}`} indent={10}>
+                {MOVE_DATA[SwShTRMoveIndexes[i]].name}
+              </AttributeRow>
+            ))}
+          </AccordionDetails>
         </Accordion>
       ) : (
         <div />
@@ -262,14 +245,9 @@ const OtherDisplay = (props: { mon: AllPKMFields }) => {
       {!isRestricted(HGSS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
       mon.tmFlagsBDSP &&
       getFlagsInRange(mon.tmFlagsBDSP, 0, 14).length > 0 ? (
-        <Accordion
-          disableGutters
-          elevation={0}
-          TransitionProps={{ unmountOnExit: true }}
-          sx={styles.accordion}
-        >
+        <Accordion>
           <AccordionSummary
-            expandIcon={<ArrowForwardIosSharp sx={{ fontSize: '0.9rem' }} />}
+            indicator={<MdArrowForwardIos style={{ fontSize: '0.9rem' }} />}
             sx={styles.accordionSummary}
           >
             <AttributeRow
@@ -277,11 +255,13 @@ const OtherDisplay = (props: { mon: AllPKMFields }) => {
               value={`${getFlagsInRange(mon.tmFlagsBDSP, 0, 14).length} TMs`}
             />
           </AccordionSummary>
-          {getFlagsInRange(mon.tmFlagsBDSP, 0, 14).map((i) => (
-            <AttributeRow key={`bdsp_tm_${i + 1}`} label={`TM ${i + 1}`} indent={10}>
-              {MOVE_DATA[BDSPTMMoveIndexes[i]].name}
-            </AttributeRow>
-          ))}
+          <AccordionDetails>
+            {getFlagsInRange(mon.tmFlagsBDSP, 0, 14).map((i) => (
+              <AttributeRow key={`bdsp_tm_${i + 1}`} label={`TM ${i + 1}`} indent={10}>
+                {MOVE_DATA[BDSPTMMoveIndexes[i]].name}
+              </AttributeRow>
+            ))}
+          </AccordionDetails>
         </Accordion>
       ) : (
         <div />
@@ -289,14 +269,9 @@ const OtherDisplay = (props: { mon: AllPKMFields }) => {
       {!isRestricted(LA_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
       mon.tutorFlagsLA &&
       getFlagsInRange(mon.tutorFlagsLA, 0, 8).length > 0 ? (
-        <Accordion
-          disableGutters
-          elevation={0}
-          TransitionProps={{ unmountOnExit: true }}
-          sx={styles.accordion}
-        >
+        <Accordion>
           <AccordionSummary
-            expandIcon={<ArrowForwardIosSharp sx={{ fontSize: '0.9rem' }} />}
+            indicator={<MdArrowForwardIos style={{ fontSize: '0.9rem' }} />}
             sx={styles.accordionSummary}
           >
             <AttributeRow
@@ -304,11 +279,13 @@ const OtherDisplay = (props: { mon: AllPKMFields }) => {
               value={`${getFlagsInRange(mon.tutorFlagsLA, 0, 8).length} Tutor Moves`}
             />
           </AccordionSummary>
-          {getFlagsInRange(mon.tutorFlagsLA, 0, 8).map((i) => (
-            <AttributeRow key={`la_tutor_${i + 1}`} label={`Tutor ${i + 1}`} indent={10}>
-              {MOVE_DATA[LATutorMoveIndexes[i]].name}
-            </AttributeRow>
-          ))}
+          <AccordionDetails>
+            {getFlagsInRange(mon.tutorFlagsLA, 0, 8).map((i) => (
+              <AttributeRow key={`la_tutor_${i + 1}`} label={`Tutor ${i + 1}`} indent={10}>
+                {MOVE_DATA[LATutorMoveIndexes[i]].name}
+              </AttributeRow>
+            ))}
+          </AccordionDetails>
         </Accordion>
       ) : (
         <div />
@@ -317,14 +294,9 @@ const OtherDisplay = (props: { mon: AllPKMFields }) => {
       {!isRestricted(SV_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
       mon.tmFlagsSV &&
       getFlagsInRange(mon.tmFlagsSV, 0, 22).length > 0 ? (
-        <Accordion
-          disableGutters
-          elevation={0}
-          TransitionProps={{ unmountOnExit: true }}
-          sx={styles.accordion}
-        >
+        <Accordion>
           <AccordionSummary
-            expandIcon={<ArrowForwardIosSharp sx={{ fontSize: '0.9rem' }} />}
+            indicator={<MdArrowForwardIos style={{ fontSize: '0.9rem' }} />}
             sx={styles.accordionSummary}
           >
             <AttributeRow
@@ -332,11 +304,13 @@ const OtherDisplay = (props: { mon: AllPKMFields }) => {
               value={`${getFlagsInRange(mon.tmFlagsSV, 0, 22).length} TMs`}
             />
           </AccordionSummary>
-          {getFlagsInRange(mon.tmFlagsSV, 0, 22).map((i) => (
-            <AttributeRow key={`sv_tm_${i}`} label={`TM ${i}`} indent={10}>
-              {MOVE_DATA[SVTMMoveIndexes[i]].name}
-            </AttributeRow>
-          ))}
+          <AccordionDetails>
+            {getFlagsInRange(mon.tmFlagsSV, 0, 22).map((i) => (
+              <AttributeRow key={`sv_tm_${i}`} label={`TM ${i}`} indent={10}>
+                {MOVE_DATA[SVTMMoveIndexes[i]].name}
+              </AttributeRow>
+            ))}
+          </AccordionDetails>
         </Accordion>
       ) : (
         <div />
@@ -345,63 +319,65 @@ const OtherDisplay = (props: { mon: AllPKMFields }) => {
       {(!isRestricted(SWSH_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) ||
         !isRestricted(ORAS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum)) &&
         mon.trainerMemory && (
-          <Accordion
-            disableGutters
-            elevation={0}
-            TransitionProps={{ unmountOnExit: true }}
-            sx={styles.accordion}
-          >
+          <Accordion>
             <AccordionSummary
-              expandIcon={<ArrowForwardIosSharp sx={{ fontSize: '0.9rem' }} />}
+              indicator={<MdArrowForwardIos style={{ fontSize: '0.9rem' }} />}
               sx={styles.accordionSummary}
             >
               <AttributeRow label="Trainer Memory" value={mon.trainerName} />
             </AccordionSummary>
-            <AttributeRow
-              indent={10}
-              label="Intensity"
-              value={mon.trainerMemory.intensity.toString()}
-            />
-            <AttributeRow indent={10} label="Memory" value={mon.trainerMemory.memory.toString()} />
-            <AttributeRow
-              indent={10}
-              label="Feeling"
-              value={mon.trainerMemory.feeling.toString()}
-            />
-            <AttributeRow indent={10} label="Text Variables">
-              <code>{`0x${mon.trainerMemory.textVariables.toString(16).padStart(4, '0')}`}</code>
-            </AttributeRow>
+            <AccordionDetails>
+              <AttributeRow
+                indent={10}
+                label="Intensity"
+                value={mon.trainerMemory.intensity.toString()}
+              />
+              <AttributeRow
+                indent={10}
+                label="Memory"
+                value={mon.trainerMemory.memory.toString()}
+              />
+              <AttributeRow
+                indent={10}
+                label="Feeling"
+                value={mon.trainerMemory.feeling.toString()}
+              />
+              <AttributeRow indent={10} label="Text Variables">
+                <code>{`0x${mon.trainerMemory.textVariables.toString(16).padStart(4, '0')}`}</code>
+              </AttributeRow>
+            </AccordionDetails>
           </Accordion>
         )}
       {(!isRestricted(SWSH_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) ||
         !isRestricted(ORAS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum)) &&
         mon.handlerMemory && (
-          <Accordion
-            disableGutters
-            elevation={0}
-            TransitionProps={{ unmountOnExit: true }}
-            sx={styles.accordion}
-          >
+          <Accordion>
             <AccordionSummary
-              expandIcon={<ArrowForwardIosSharp sx={{ fontSize: '0.9rem' }} />}
+              indicator={<MdArrowForwardIos style={{ fontSize: '0.9rem' }} />}
               sx={styles.accordionSummary}
             >
               <AttributeRow label="Handler Memory" value={mon.handlerName} />
             </AccordionSummary>
-            <AttributeRow
-              indent={10}
-              label="Intensity"
-              value={mon.handlerMemory.intensity.toString()}
-            />
-            <AttributeRow indent={10} label="Memory" value={mon.handlerMemory.memory.toString()} />
-            <AttributeRow
-              indent={10}
-              label="Feeling"
-              value={mon.handlerMemory.feeling.toString()}
-            />
-            <AttributeRow indent={10} label="Text Variables">
-              <code>{`0x${mon.handlerMemory.textVariables.toString(16).padStart(4, '0')}`}</code>
-            </AttributeRow>
+            <AccordionDetails>
+              <AttributeRow
+                indent={10}
+                label="Intensity"
+                value={mon.handlerMemory.intensity.toString()}
+              />
+              <AttributeRow
+                indent={10}
+                label="Memory"
+                value={mon.handlerMemory.memory.toString()}
+              />
+              <AttributeRow
+                indent={10}
+                label="Feeling"
+                value={mon.handlerMemory.feeling.toString()}
+              />
+              <AttributeRow indent={10} label="Text Variables">
+                <code>{`0x${mon.handlerMemory.textVariables.toString(16).padStart(4, '0')}`}</code>
+              </AttributeRow>
+            </AccordionDetails>
           </Accordion>
         )}
       {!isRestricted(SWSH_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
@@ -496,14 +472,9 @@ function HiddenPowerDisplay(props: { mon: AllPKMFields }) {
 
   if (mon instanceof OHPKM) {
     return (
-      <Accordion
-        disableGutters
-        elevation={0}
-        TransitionProps={{ unmountOnExit: true }}
-        sx={styles.accordion}
-      >
+      <Accordion>
         <AccordionSummary
-          expandIcon={<ArrowForwardIosSharp sx={{ fontSize: '0.9rem' }} />}
+          indicator={<MdArrowForwardIos style={{ fontSize: '0.9rem' }} />}
           sx={styles.accordionSummary}
         >
           <AttributeRow label="Hidden Power">

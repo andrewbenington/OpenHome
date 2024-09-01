@@ -1,4 +1,4 @@
-import { Stack } from '@mui/material'
+import { Stack } from '@mui/joy'
 import { PKM } from 'pokemon-files'
 import { useEffect, useMemo, useState } from 'react'
 import { SAV } from 'src/types/SAVTypes'

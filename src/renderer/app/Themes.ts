@@ -1,4 +1,5 @@
-import { Components, Theme, ThemeOptions } from '@mui/material'
+import { Components, Theme } from '@mui/joy'
+import { ColorSystemOptions, CssVarsThemeOptions } from '@mui/joy/styles/extendTheme'
 
 // const teal = '#53B4A5'
 const lightTeal = '#7DCEAB'
@@ -10,13 +11,8 @@ const tealGradient = 'linear-gradient(355deg, rgba(83,180,165,1) 0%, rgba(125,20
 const darkTealGradient = 'linear-gradient(310deg, rgba(54,69,78,1) 0%, rgba(1,83,84,1) 85%)'
 // const oldBackground = '#A9CEF4'
 
-const components: Components<Omit<Theme, 'components'>> = {
-  MuiButtonBase: {
-    defaultProps: {
-      disableRipple: true,
-    },
-  },
-  MuiChip: {
+export const components: Components<Omit<Theme, 'components'>> = {
+  JoyChip: {
     styleOverrides: {
       root: {
         transition: 'border 0.25s',
@@ -28,24 +24,19 @@ const components: Components<Omit<Theme, 'components'>> = {
   //     variant: 'h5',
   //   },
   // },
-  MuiTextField: {
-    defaultProps: {
-      size: 'small',
-    },
-  },
-  MuiCard: {
+  JoyCard: {
     defaultProps: {
       sx: {
         padding: 1,
       },
     },
   },
-  MuiStack: {
+  JoyStack: {
     defaultProps: {
       spacing: 1,
     },
   },
-  MuiButton: {
+  JoyButton: {
     styleOverrides: {
       root: {
         boxShadow: 'none',
@@ -55,17 +46,17 @@ const components: Components<Omit<Theme, 'components'>> = {
         padding: 0,
       },
     },
-    variants: [
-      {
-        props: { variant: 'contained' },
-        style: {
-          border: '1px solid transparent',
-          boxShadow: 'none',
-        },
-      },
-    ],
+    // variants: [
+    //   {
+    //     props: { variant: 'contained' },
+    //     style: {
+    //       border: '1px solid transparent',
+    //       boxShadow: 'none',
+    //     },
+    //   },
+    // ],
   },
-  MuiTab: {
+  JoyTab: {
     styleOverrides: {
       root: {
         border: 'none',
@@ -81,7 +72,7 @@ const components: Components<Omit<Theme, 'components'>> = {
       },
     },
   },
-  MuiListItemIcon: {
+  JoyListItemDecorator: {
     defaultProps: {
       style: {
         minWidth: 'fit-content',
@@ -89,21 +80,31 @@ const components: Components<Omit<Theme, 'components'>> = {
       },
     },
   },
-  MuiListSubheader: {
+  JoyListSubheader: {
     defaultProps: {
       sx: {
         backgroundColor: 'transparent',
       },
     },
   },
-  MuiDialog: {
+  JoyModal: {
     styleOverrides: {
       root: {
         overflowY: 'hidden',
+        display: 'grid',
+        alignItems: 'center',
+        justifyContent: 'center',
       },
       // paper: {
       //   background: tealGradient,
       // },
+    },
+  },
+  JoyModalDialog: {
+    styleOverrides: {
+      root: {
+        padding: 0,
+      },
     },
   },
   // MuiDivider: {
@@ -117,45 +118,55 @@ const components: Components<Omit<Theme, 'components'>> = {
   // },
 }
 
-export const darkTheme: ThemeOptions = {
+export const darkTheme: ColorSystemOptions = {
   palette: {
     mode: 'dark',
     secondary: {
-      main: red,
+      mainChannel: red,
     },
     primary: {
-      main: '#780600',
+      mainChannel: '#780600',
     },
     background: {
-      default: '#2c313a',
+      body: '#2c313a',
       gradient: darkTealGradient,
-      paper: '#081721',
+      surface: '#081721',
     },
     text: {
       primary: '#fff',
       secondary: '#ccc',
     },
+    neutral: {
+      outlinedColor: '#fff',
+      plainHoverBg: '#fff3',
+    },
   },
-  components,
 }
 
-export const lightTheme: ThemeOptions = {
+export const lightTheme: ColorSystemOptions = {
   palette: {
     secondary: {
-      main: red,
+      mainChannel: red,
     },
     primary: {
-      main: red2,
+      mainChannel: red2,
     },
     background: {
-      default: lightTeal,
+      body: lightTeal,
       gradient: tealGradient,
-      paper: '#dfd',
+      surface: '#dfd',
     },
     text: {
       primary: '#333',
       secondary: '#000',
     },
+  },
+}
+
+export const defaultTheme: CssVarsThemeOptions = {
+  colorSchemes: {
+    dark: darkTheme,
+    light: lightTheme,
   },
   components,
 }

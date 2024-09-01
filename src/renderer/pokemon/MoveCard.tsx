@@ -1,4 +1,4 @@
-import { Card } from '@mui/material'
+import { Card } from '@mui/joy'
 import { MOVE_DATA } from '../../consts/Moves'
 import { getTypeColor } from '../util/PokemonSprite'
 import { moveCardStyle } from './styles'

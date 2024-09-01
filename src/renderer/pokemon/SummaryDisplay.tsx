@@ -1,4 +1,4 @@
-import { Card, Grid } from '@mui/material'
+import { Card, Grid } from '@mui/joy'
 import { getDisplayID } from 'pokemon-files'
 import { AbilityToString, Languages } from 'pokemon-resources'
 import { PokemonData } from 'pokemon-species-data'
@@ -7,7 +7,7 @@ import { hasGen5OnlyData } from 'src/types/interfaces/gen5'
 import { hasGen8OnlyData, hasPLAData } from 'src/types/interfaces/gen8'
 import { getLevelGen12, getLevelGen3Onward } from 'src/util/StatCalc'
 import { hasGen2OnData } from '../../types/interfaces/gen2'
-import { hasGen3OnData, hasOrreData } from '../../types/interfaces/gen3'
+import { hasOrreData } from '../../types/interfaces/gen3'
 import { getTypes, PKMFile } from '../../types/pkm/util'
 import { Styles } from '../../types/types'
 import PokemonIcon from '../components/PokemonIcon'
@@ -33,7 +33,7 @@ const styles = {
     imageRendering: 'pixelated',
     objectFit: 'contain',
   },
-  attributesList: { textAlign: 'left', width: '30%', marginTop: 10 },
+  attributesList: { textAlign: 'left', marginTop: 10 },
   language: { padding: '5px 10px 5px 10px', marginLeft: 'auto' },
   nicknameRow: {
     display: 'flex',
@@ -56,7 +56,7 @@ const SummaryDisplay = (props: { mon: PKMFile }) => {
 
   return (
     <Grid container>
-      <Grid item xs={5}>
+      <Grid xs={6}>
         <div style={styles.column}>
           {imageError ? (
             <PokemonIcon
@@ -75,7 +75,7 @@ const SummaryDisplay = (props: { mon: PKMFile }) => {
           )}
         </div>
         <div style={styles.nicknameRow}>
-          {hasGen3OnData(mon) ? (
+          {'ball' in mon ? (
             <img
               draggable={false}
               alt="poke ball type"
@@ -137,7 +137,7 @@ const SummaryDisplay = (props: { mon: PKMFile }) => {
           )}
         </div>
       </Grid>
-      <Grid item xs={7} style={styles.attributesList}>
+      <Grid xs={6} style={styles.attributesList}>
         <AttributeRow
           label="Name"
           value={`${PokemonData[mon.dexNum]?.formes[mon.formeNum]?.formeName} ${
@@ -150,7 +150,7 @@ const SummaryDisplay = (props: { mon: PKMFile }) => {
         </AttributeRow>
         <AttributeRow label="OT" value={`${mon.trainerName} ${mon.trainerGender ? '♀' : '♂'}`} />
         <AttributeRow label="Trainer ID" value={getDisplayID(mon as any)} />
-        {hasGen3OnData(mon) && (
+        {'abilityNum' in mon && (
           <AttributeRow
             label="Ability"
             value={`${AbilityToString(mon.abilityIndex)} (${
