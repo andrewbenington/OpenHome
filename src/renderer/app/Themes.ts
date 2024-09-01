@@ -73,6 +73,13 @@ export const components: Components<Theme> = {
       },
     },
   },
+  JoyTabPanel: {
+    styleOverrides: {
+      root: ({ theme }) => ({
+        background: theme.palette.background.gradient,
+      }),
+    },
+  },
   JoyModal: {
     styleOverrides: {
       root: {
@@ -161,7 +168,8 @@ export const darkTheme: ColorSystemOptions = {
       plainColor: '#fff',
       outlinedHoverBg: '#fff3',
       plainHoverColor: '#fff',
-      plainActiveBg: '#0000',
+      plainActiveBg: '#fff6',
+      plainActiveBorder: '#fff6',
     },
   },
 }
