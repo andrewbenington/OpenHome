@@ -58,12 +58,18 @@ export default function FilterPanel() {
 
   return (
     <Card sx={{ marginLeft: 1 }}>
-      <div style={{ display: 'flex', padding: 8 }}>
+      <div style={{ display: 'flex', paddingTop: 4 }}>
         <Typography fontSize={20} marginLeft={0.5} flex={1}>
           Filter
         </Typography>
-        <Button variant="outlined" onClick={() => dispatchFilterState({ type: 'clear_all' })}>
-          <Typography>Clear</Typography>
+        <Button
+          variant="outlined"
+          disabled={Object.values(filterState).length === 0}
+          color="danger"
+          onClick={() => dispatchFilterState({ type: 'clear_all' })}
+          style={{ padding: 4 }}
+        >
+          Clear All
         </Button>
       </div>
       <Stack margin={1} spacing={1}>
@@ -73,12 +79,12 @@ export default function FilterPanel() {
           labelField="name"
           indexField="nationalDex"
           filterField="dexNumber"
-          label="Species"
+          placeholder="Species"
           getOptionLabel={(option) => option.name}
           getIconComponent={(currentMon) => (
             <PokemonIcon
               dexNumber={currentMon.nationalDex}
-              style={{ width: 32, height: 32, marginLeft: 0, marginRight: -4 }}
+              style={{ width: 32, height: 32, marginLeft: -4 }}
             />
           )}
         />
@@ -88,7 +94,7 @@ export default function FilterPanel() {
             labelField="formeName"
             indexField="formeNumber"
             filterField="formeNumber"
-            label="Forme"
+            placeholder="Forme"
             getOptionLabel={(option) => option.formeName}
             getIconComponent={(currentForme) =>
               filterState.dexNumber ? (
@@ -106,7 +112,7 @@ export default function FilterPanel() {
           labelField="label"
           indexField="id"
           filterField="heldItemIndex"
-          label="Held Item"
+          placeholder="Held Item"
           getIconComponent={(currentItem) =>
             currentItem && (
               <img
@@ -125,19 +131,19 @@ export default function FilterPanel() {
           labelField="label"
           indexField="id"
           filterField="abilityIndex"
-          label="Ability"
+          placeholder="Ability"
         />
         <FilterAutocomplete
           options={Types}
           filterField="type1"
-          label="Type 1"
+          placeholder="Type 1"
           getIconComponent={(type) => <TypeIcon type={type} />}
         />
         {filterState.type1 && (
           <FilterAutocomplete
             options={Types.filter((type) => type !== filterState.type1)}
             filterField="type2"
-            label="Type 2"
+            placeholder="Type 2"
             getIconComponent={(type: Type) => <TypeIcon type={type} />}
           />
         )}
@@ -146,7 +152,7 @@ export default function FilterPanel() {
           filterField="gameOfOrigin"
           labelField="name"
           indexField="index"
-          label="Game Of Origin"
+          placeholder="Game Of Origin"
           getOptionLabel={(option) => `Pokémon ${option?.name}`}
           getIconComponent={(origin) =>
             origin?.mark ? (
@@ -167,7 +173,7 @@ export default function FilterPanel() {
           filterField="ball"
           labelField="label"
           indexField="id"
-          label="Ball"
+          placeholder="Ball"
           getIconComponent={(ball) => (
             <img
               draggable={false}
@@ -180,7 +186,7 @@ export default function FilterPanel() {
         <FilterAutocomplete
           options={['Any', 'None', ...OpenHomeRibbons]}
           filterField="ribbon"
-          label="Ribbon"
+          placeholder="Ribbon"
           getIconComponent={(ribbon) =>
             ribbon !== 'Any' && ribbon !== 'None' ? (
               <img
@@ -194,7 +200,7 @@ export default function FilterPanel() {
         <FilterAutocomplete
           options={['Shiny', 'Not Shiny', 'Square Shiny', 'Star Shiny']}
           filterField="shiny"
-          label="Shiny"
+          placeholder="Shiny"
           getIconComponent={(value) =>
             value !== 'Not Shiny' ? (
               <img

@@ -11,7 +11,7 @@ const tealGradient = 'linear-gradient(355deg, rgba(83,180,165,1) 0%, rgba(125,20
 const darkTealGradient = 'linear-gradient(310deg, rgba(54,69,78,1) 0%, rgba(1,83,84,1) 85%)'
 // const oldBackground = '#A9CEF4'
 
-export const components: Components<Omit<Theme, 'components'>> = {
+export const components: Components<Theme> = {
   JoyChip: {
     styleOverrides: {
       root: {
@@ -25,9 +25,10 @@ export const components: Components<Omit<Theme, 'components'>> = {
   //   },
   // },
   JoyCard: {
-    defaultProps: {
-      sx: {
-        padding: 1,
+    styleOverrides: {
+      root: {
+        padding: 8,
+        borderRadius: 5,
       },
     },
   },
@@ -72,32 +73,13 @@ export const components: Components<Omit<Theme, 'components'>> = {
       },
     },
   },
-  JoyListItemDecorator: {
-    defaultProps: {
-      style: {
-        minWidth: 'fit-content',
-        maxWidth: 'fit-content',
-      },
-    },
-  },
-  JoyListSubheader: {
-    defaultProps: {
-      sx: {
-        backgroundColor: 'transparent',
-      },
-    },
-  },
   JoyModal: {
     styleOverrides: {
       root: {
-        overflowY: 'hidden',
         display: 'grid',
         alignItems: 'center',
         justifyContent: 'center',
       },
-      // paper: {
-      //   background: tealGradient,
-      // },
     },
   },
   JoyModalDialog: {
@@ -107,15 +89,50 @@ export const components: Components<Omit<Theme, 'components'>> = {
       },
     },
   },
-  // MuiDivider: {
-  //   styleOverrides: {
-  //     root: {
-  //       height: 16,
-  //       marginBottom: 16,
-  //       paddingBottom: 16,
-  //     },
-  //   },
-  // },
+  JoyTypography: {
+    styleOverrides: {
+      root: {
+        color: 'inherit',
+      },
+    },
+  },
+  JoyAccordionSummary: {
+    defaultProps: {
+      style: {
+        // marginBottom: 0,
+        marginInline: 0,
+      },
+    },
+  },
+  JoyAccordionDetails: {
+    defaultProps: {
+      style: {
+        padding: 0,
+        margin: 0,
+      },
+      sx: {
+        '& .MuiAccordionDetails-content': {
+          padding: 0,
+          // paddingBlock: 0,
+        },
+      },
+    },
+  },
+  JoyAccordion: {
+    defaultProps: {
+      sx: {
+        padding: 0,
+      },
+    },
+  },
+  JoyAccordionGroup: {
+    defaultProps: {
+      style: {
+        flex: 0,
+      },
+      transition: '0.2s ease',
+    },
+  },
 }
 
 export const darkTheme: ColorSystemOptions = {
@@ -134,11 +151,17 @@ export const darkTheme: ColorSystemOptions = {
     },
     text: {
       primary: '#fff',
+      icon: '#fff',
       secondary: '#ccc',
     },
     neutral: {
       outlinedColor: '#fff',
       plainHoverBg: '#fff3',
+      outlinedBg: '#081721',
+      plainColor: '#fff',
+      outlinedHoverBg: '#fff3',
+      plainHoverColor: '#fff',
+      plainActiveBg: '#0000',
     },
   },
 }

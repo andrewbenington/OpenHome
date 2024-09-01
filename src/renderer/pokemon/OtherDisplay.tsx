@@ -1,12 +1,12 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import { Accordion, AccordionDetails, AccordionSummary } from '@mui/joy'
+import { Accordion, AccordionDetails, AccordionGroup, AccordionSummary } from '@mui/joy'
 import { AllPKMFields, getDisplayID } from 'pokemon-files'
 import {
   BDSPTMMoveIndexes,
+  isGen4,
   LATutorMoveIndexes,
   SVTMMoveIndexes,
   SwShTRMoveIndexes,
-  isGen4,
 } from 'pokemon-resources'
 import { NationalDex } from 'pokemon-species-data'
 import { useMemo } from 'react'
@@ -47,9 +47,12 @@ const styles = {
   accordionSummary: {
     border: 0,
     padding: 0,
-    margin: 0,
     '& .MuiAccordionSummary-button': {
       border: 0,
+      margin: '1px 0px 0px 0px',
+      padding: 0,
+      maxHeight: 32,
+      minBlockSize: 0,
     },
     '& .MuiAccordionSummary-indicator': {
       position: 'absolute',
@@ -89,56 +92,71 @@ const OtherDisplay = (props: { mon: AllPKMFields }) => {
           <code>{`0x${mon.encryptionConstant.toString(16).padStart(8, '0')}`}</code>
         </AttributeRow>
       )}
-      <Accordion>
-        <AccordionSummary
-          indicator={<MdArrowForwardIos style={{ fontSize: '0.9rem' }} />}
-          sx={styles.accordionSummary}
-          style={{ height: 32, margin: 0 }}
-        >
-          <AttributeRow
-            label="Original Trainer"
-            value={`${mon.trainerName} ${mon.trainerGender ? '♀' : '♂'}`}
-          />
-        </AccordionSummary>
-        <AccordionDetails>
-          <AttributeRow label="ID" value={getDisplayID(mon as any)} indent={10} />
-          {mon.secretID !== undefined && (
-            <AttributeRow label="Secret ID" indent={10}>
-              <code>{`0x${mon.secretID.toString(16).padStart(4, '0')}`}</code>
-            </AttributeRow>
-          )}
-          {!!mon.trainerFriendship && (
-            <AttributeRow label="Friendship" value={mon.trainerFriendship.toString()} indent={10} />
-          )}
-          {!!mon.trainerAffection && (
-            <AttributeRow label="Affection" value={mon.trainerAffection.toString()} indent={10} />
-          )}
-          {'isCurrentHandler' in mon && (
-            <AttributeRow label="Trained last" value={`${!mon.isCurrentHandler}`} indent={10} />
-          )}
-        </AccordionDetails>
-      </Accordion>
-      {hasGen6OnData(mon) && mon.handlerName !== '' ? (
+      <AccordionGroup transition="0.2s ease">
         <Accordion>
           <AccordionSummary
             indicator={<MdArrowForwardIos style={{ fontSize: '0.9rem' }} />}
             sx={styles.accordionSummary}
           >
             <AttributeRow
-              label="Recent Trainer"
-              value={`${mon.handlerName} ${mon.handlerGender ? '♀' : '♂'}`}
+              label="Original Trainer"
+              value={`${mon.trainerName} ${mon.trainerGender ? '♀' : '♂'}`}
             />
           </AccordionSummary>
           <AccordionDetails>
-            {'handlerID' in mon && (
-              <AttributeRow label="ID" value={mon.handlerID?.toString()} indent={10} />
+            <AttributeRow label="ID" value={getDisplayID(mon as any)} indent={10} />
+            {mon.secretID !== undefined && (
+              <AttributeRow label="Secret ID" indent={10}>
+                <code>{`0x${mon.secretID.toString(16).padStart(4, '0')}`}</code>
+              </AttributeRow>
             )}
-            <AttributeRow label="Friendship" value={mon.handlerFriendship.toString()} indent={10} />
-            {hasN3DSOnlyData(mon) && (
-              <AttributeRow label="Affection" value={mon.handlerAffection.toString()} indent={10} />
+            {!!mon.trainerFriendship && (
+              <AttributeRow
+                label="Friendship"
+                value={mon.trainerFriendship.toString()}
+                indent={10}
+              />
+            )}
+            {!!mon.trainerAffection && (
+              <AttributeRow label="Affection" value={mon.trainerAffection.toString()} indent={10} />
+            )}
+            {'isCurrentHandler' in mon && (
+              <AttributeRow label="Trained last" value={`${!mon.isCurrentHandler}`} indent={10} />
             )}
           </AccordionDetails>
         </Accordion>
+      </AccordionGroup>
+      {hasGen6OnData(mon) && mon.handlerName !== '' ? (
+        <AccordionGroup transition="0.2s ease">
+          <Accordion>
+            <AccordionSummary
+              indicator={<MdArrowForwardIos style={{ fontSize: '0.9rem' }} />}
+              sx={styles.accordionSummary}
+            >
+              <AttributeRow
+                label="Recent Trainer"
+                value={`${mon.handlerName} ${mon.handlerGender ? '♀' : '♂'}`}
+              />
+            </AccordionSummary>
+            <AccordionDetails>
+              {'handlerID' in mon && (
+                <AttributeRow label="ID" value={mon.handlerID?.toString()} indent={10} />
+              )}
+              <AttributeRow
+                label="Friendship"
+                value={mon.handlerFriendship.toString()}
+                indent={10}
+              />
+              {hasN3DSOnlyData(mon) && (
+                <AttributeRow
+                  label="Affection"
+                  value={mon.handlerAffection.toString()}
+                  indent={10}
+                />
+              )}
+            </AccordionDetails>
+          </Accordion>
+        </AccordionGroup>
       ) : (
         <div />
       )}
@@ -319,66 +337,74 @@ const OtherDisplay = (props: { mon: AllPKMFields }) => {
       {(!isRestricted(SWSH_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) ||
         !isRestricted(ORAS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum)) &&
         mon.trainerMemory && (
-          <Accordion>
-            <AccordionSummary
-              indicator={<MdArrowForwardIos style={{ fontSize: '0.9rem' }} />}
-              sx={styles.accordionSummary}
-            >
-              <AttributeRow label="Trainer Memory" value={mon.trainerName} />
-            </AccordionSummary>
-            <AccordionDetails>
-              <AttributeRow
-                indent={10}
-                label="Intensity"
-                value={mon.trainerMemory.intensity.toString()}
-              />
-              <AttributeRow
-                indent={10}
-                label="Memory"
-                value={mon.trainerMemory.memory.toString()}
-              />
-              <AttributeRow
-                indent={10}
-                label="Feeling"
-                value={mon.trainerMemory.feeling.toString()}
-              />
-              <AttributeRow indent={10} label="Text Variables">
-                <code>{`0x${mon.trainerMemory.textVariables.toString(16).padStart(4, '0')}`}</code>
-              </AttributeRow>
-            </AccordionDetails>
-          </Accordion>
+          <AccordionGroup transition="0.2s ease">
+            <Accordion>
+              <AccordionSummary
+                indicator={<MdArrowForwardIos style={{ fontSize: '0.9rem' }} />}
+                sx={styles.accordionSummary}
+              >
+                <AttributeRow label="Trainer Memory" value={mon.trainerName} />
+              </AccordionSummary>
+              <AccordionDetails>
+                <AttributeRow
+                  indent={10}
+                  label="Intensity"
+                  value={mon.trainerMemory.intensity.toString()}
+                />
+                <AttributeRow
+                  indent={10}
+                  label="Memory"
+                  value={mon.trainerMemory.memory.toString()}
+                />
+                <AttributeRow
+                  indent={10}
+                  label="Feeling"
+                  value={mon.trainerMemory.feeling.toString()}
+                />
+                <AttributeRow indent={10} label="Text Variables">
+                  <code>{`0x${mon.trainerMemory.textVariables
+                    .toString(16)
+                    .padStart(4, '0')}`}</code>
+                </AttributeRow>
+              </AccordionDetails>
+            </Accordion>
+          </AccordionGroup>
         )}
       {(!isRestricted(SWSH_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) ||
         !isRestricted(ORAS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum)) &&
         mon.handlerMemory && (
-          <Accordion>
-            <AccordionSummary
-              indicator={<MdArrowForwardIos style={{ fontSize: '0.9rem' }} />}
-              sx={styles.accordionSummary}
-            >
-              <AttributeRow label="Handler Memory" value={mon.handlerName} />
-            </AccordionSummary>
-            <AccordionDetails>
-              <AttributeRow
-                indent={10}
-                label="Intensity"
-                value={mon.handlerMemory.intensity.toString()}
-              />
-              <AttributeRow
-                indent={10}
-                label="Memory"
-                value={mon.handlerMemory.memory.toString()}
-              />
-              <AttributeRow
-                indent={10}
-                label="Feeling"
-                value={mon.handlerMemory.feeling.toString()}
-              />
-              <AttributeRow indent={10} label="Text Variables">
-                <code>{`0x${mon.handlerMemory.textVariables.toString(16).padStart(4, '0')}`}</code>
-              </AttributeRow>
-            </AccordionDetails>
-          </Accordion>
+          <AccordionGroup transition="0.2s ease">
+            <Accordion>
+              <AccordionSummary
+                indicator={<MdArrowForwardIos style={{ fontSize: '0.9rem' }} />}
+                sx={styles.accordionSummary}
+              >
+                <AttributeRow label="Handler Memory" value={mon.handlerName} />
+              </AccordionSummary>
+              <AccordionDetails>
+                <AttributeRow
+                  indent={10}
+                  label="Intensity"
+                  value={mon.handlerMemory.intensity.toString()}
+                />
+                <AttributeRow
+                  indent={10}
+                  label="Memory"
+                  value={mon.handlerMemory.memory.toString()}
+                />
+                <AttributeRow
+                  indent={10}
+                  label="Feeling"
+                  value={mon.handlerMemory.feeling.toString()}
+                />
+                <AttributeRow indent={10} label="Text Variables">
+                  <code>{`0x${mon.handlerMemory.textVariables
+                    .toString(16)
+                    .padStart(4, '0')}`}</code>
+                </AttributeRow>
+              </AccordionDetails>
+            </Accordion>
+          </AccordionGroup>
         )}
       {!isRestricted(SWSH_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
         hasGen8OnlyData(mon) && (

@@ -15,6 +15,7 @@ const AttributeRow = (props: {
       style={{
         ...style,
         height: 32,
+        minHeight: 32,
         marginBottom: 2,
         display: 'flex',
         flexDirection: 'row',

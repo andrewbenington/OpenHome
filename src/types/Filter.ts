@@ -48,13 +48,13 @@ export function filterApplies(filter: Filter, mon: PKMFile) {
   if (filter.shiny) {
     switch (filter.shiny) {
       case 'Shiny':
-        return mon.isShiny
+        return mon.isShiny()
       case 'Not Shiny':
-        return !mon.isShiny
+        return !mon.isShiny()
       case 'Square Shiny':
-        return 'isSquareShiny' in mon && mon.isSquareShiny
+        return 'isSquareShiny' in mon && mon.isSquareShiny()
       case 'Star Shiny':
-        return 'isSquareShiny' in mon && mon.isShiny() && !mon.isSquareShiny
+        return 'isSquareShiny' in mon && mon.isShiny() && !mon.isSquareShiny()
     }
   }
 

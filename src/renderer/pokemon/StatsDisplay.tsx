@@ -111,7 +111,7 @@ const StatsDisplay = (props: { mon: PKMFile }) => {
           {menuItems}
         </Select>
         {display === 'EVs' && 'evs' in mon && 'evsG12' in mon ? (
-          <Select value={evType} onChange={(_, val) => val && setEVType(val)} variant="outlined">
+          <Select value={evType} onChange={(_, val) => val && setEVType(val)}>
             <Option value="Modern">Modern</Option>
             <Option value="Game Boy">Game Boy</Option>
           </Select>

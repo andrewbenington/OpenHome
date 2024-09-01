@@ -1,4 +1,10 @@
-import { Autocomplete, AutocompleteProps } from '@mui/joy'
+import {
+  Autocomplete,
+  AutocompleteOption,
+  AutocompleteProps,
+  ListItemContent,
+  ListItemDecorator,
+} from '@mui/joy'
 import { useContext, useMemo } from 'react'
 import { FilterContext } from 'src/renderer/state/filter'
 import './style.css'
@@ -22,7 +28,7 @@ export default function FilterAutocomplete<OptionType>(props: FilterAutocomplete
     filterField,
     // label,
     // renderInput,
-    // getIconComponent,
+    getIconComponent,
     ...attributes
   } = props
   const [filterState, dispatchFilterState] = useContext(FilterContext)
@@ -55,17 +61,25 @@ export default function FilterAutocomplete<OptionType>(props: FilterAutocomplete
         }
         return option[filterField] === value[filterField]
       }}
+      startDecorator={currentOption && getIconComponent && getIconComponent(currentOption)}
       renderOption={
         props.renderOption ??
         ((props, option) => {
           return (
-            <li {...props} key={indexField ? option[indexField] : option}>
-              {attributes.getOptionLabel
-                ? attributes.getOptionLabel(option)
-                : labelField
-                ? option[labelField]
-                : option}
-            </li>
+            <AutocompleteOption {...props} key={indexField ? option[indexField] : option}>
+              {getIconComponent && (
+                <ListItemDecorator style={{ marginRight: -16 }}>
+                  {getIconComponent(option)}
+                </ListItemDecorator>
+              )}
+              <ListItemContent sx={{ fontSize: 'sm' }}>
+                {attributes.getOptionLabel
+                  ? attributes.getOptionLabel(option)
+                  : labelField
+                  ? option[labelField]
+                  : option}
+              </ListItemContent>
+            </AutocompleteOption>
           )
         })
       }
@@ -83,35 +97,6 @@ export default function FilterAutocomplete<OptionType>(props: FilterAutocomplete
           payload: { [filterField]: indexField ? newValue[indexField] : newValue },
         })
       }}
-      // renderTags={
-      //   renderInput ??
-      //   ((params) => {
-      //     if (getIconComponent && currentOption !== undefined) {
-      //       const icon = getIconComponent(currentOption)
-      //       params.InputProps.startAdornment = (
-      //         <div
-      //           style={{
-      //             marginLeft: 4,
-      //             marginRight: 0,
-      //             display: 'grid',
-      //             ...icon?.props.style,
-      //           }}
-      //         >
-      //           {icon}
-      //         </div>
-      //       )
-      //     }
-      //     return (
-      //       <TextField
-      //         value={currentValue}
-      //         color="secondary"
-      //         {...params}
-      //         label={label}
-      //         sx={{ '& input': { transition: 'border-color 0.25s' }, color: 'green' }}
-      //       />
-      //     )
-      //   })
-      // }
       {...attributes}
     />
   )
