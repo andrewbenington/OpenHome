@@ -108,7 +108,7 @@ export class OHPKM {
 
       this.dexNum = other.dexNum
       this.formeNum = other.formeNum ?? 0
-      this.heldItemIndex = other.heldItemIndex
+      this.heldItemIndex = ItemFromString(other.heldItemName)
       this.trainerName = other.trainerName
       this.trainerGender = other.trainerGender
       this.trainerID = other.trainerID
@@ -1530,6 +1530,10 @@ export class OHPKM {
     this.moves = other.moves as [number, number, number, number]
     this.movePP = adjustMovePPBetweenFormats(this, other)
     this.movePPUps = other.movePPUps as [number, number, number, number]
+
+    if ('heldItemName' in other) {
+      this.heldItemIndex = ItemFromString(other.heldItemName)
+    }
 
     if ('avs' in other) {
       this.avs = other.avs

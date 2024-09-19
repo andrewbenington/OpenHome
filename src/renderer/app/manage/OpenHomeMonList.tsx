@@ -1,12 +1,10 @@
-import { Stack } from '@mui/joy'
-import { PokemonData } from 'pokemon-species-data'
 import { useLookupMaps } from 'src/renderer/redux/selectors'
 import { getSaveLogo } from 'src/renderer/saves/util'
 import { OHPKM } from 'src/types/pkm/OHPKM'
 import { numericSorter, stringSorter } from 'src/util/Sort'
 import { getMonFileIdentifier } from '../../../util/Lookup'
-import OHDataGrid, { SortableColumn } from '../OHDataGrid'
-import PokemonIcon from '../PokemonIcon'
+import OHDataGrid, { SortableColumn } from '../../components/OHDataGrid'
+import PokemonIcon from '../../components/PokemonIcon'
 
 export default function OpenHomeMonList() {
   const [homeMons] = useLookupMaps()
@@ -22,18 +20,16 @@ export default function OpenHomeMonList() {
     // },
     {
       key: 'Pokémon',
-      name: 'Pokémon',
-      width: 120,
+      name: '',
+      width: 60,
       renderValue: (value) => (
-        <Stack direction="row">
-          <PokemonIcon
-            dexNumber={value.dexNum}
-            formeNumber={value.formeNum}
-            style={{ width: 30, height: 30 }}
-          />
-          <div>{PokemonData[value.dexNum].name}</div>
-        </Stack>
+        <PokemonIcon
+          dexNumber={value.dexNum}
+          formeNumber={value.formeNum}
+          style={{ width: 30, height: 30 }}
+        />
       ),
+      cellClass: 'centered-cell',
     },
     {
       key: 'nickname',

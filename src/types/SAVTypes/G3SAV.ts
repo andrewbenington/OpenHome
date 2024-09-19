@@ -211,7 +211,7 @@ export class G3SAV extends SAV<PK3> {
         if (
           mon &&
           mon.trainerID === this.tid &&
-          mon.secretID === this.tid &&
+          mon.secretID === this.sid &&
           mon.trainerName === this.name
         ) {
           this.origin = mon.gameOfOrigin

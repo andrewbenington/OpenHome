@@ -16,6 +16,7 @@ const styles = {
     position: 'relative',
     borderRadius: 3,
     textAlign: 'center',
+    borderWidth: 1,
   },
   background: {
     background: `url(${BoxIcons}) no-repeat 0.02777% 0.02777%`,
@@ -37,10 +38,11 @@ interface BoxCellProps {
   disabled: boolean
   zIndex: number
   mon: PKMFile | undefined
+  borderColor?: string
 }
 
 const BoxCell = (props: BoxCellProps) => {
-  const { onClick, onDragEvent, onDrop, disabled, zIndex, mon } = props
+  const { onClick, onDragEvent, onDrop, disabled, zIndex, mon, borderColor } = props
   const [isBeingDragged, setIsBeingDragged] = useState(false)
   const [isDraggedOver, setIsDraggedOver] = useState(false)
   const [filterState] = useContext(FilterContext)
@@ -92,6 +94,15 @@ const BoxCell = (props: BoxCellProps) => {
     setIsBeingDragged(false)
   }, [mon])
 
+  function getIsShiny(mon: PKMFile) {
+    try {
+      return mon.isShiny()
+    } catch {
+      console.log(mon)
+      return false
+    }
+  }
+
   return (
     <button
       type="button"
@@ -99,7 +110,7 @@ const BoxCell = (props: BoxCellProps) => {
       style={{
         ...styles.button,
         backgroundColor: disabled || isFilteredOut ? '#555' : '#6662',
-        borderColor: isDraggedOver ? 'red' : undefined,
+        borderColor: borderColor ?? (isDraggedOver ? 'red' : undefined),
         zIndex,
       }}
       disabled={disabled}
@@ -109,7 +120,7 @@ const BoxCell = (props: BoxCellProps) => {
           dexNumber={mon.dexNum}
           formeNumber={mon.formeNum}
           greyedOut={isFilteredOut || disabled}
-          isShiny={mon.isShiny()}
+          isShiny={getIsShiny(mon)}
           heldItemIndex={mon.heldItemIndex}
           heldItemFormat={mon.format}
           style={{

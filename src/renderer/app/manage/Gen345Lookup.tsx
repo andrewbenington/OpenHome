@@ -2,17 +2,17 @@ import { useLookupMaps } from 'src/renderer/redux/selectors'
 import { getSaveLogo } from 'src/renderer/saves/util'
 import { OHPKM } from 'src/types/pkm/OHPKM'
 import { numericSorter, stringSorter } from 'src/util/Sort'
-import OHDataGrid, { SortableColumn } from '../OHDataGrid'
-import PokemonIcon from '../PokemonIcon'
+import OHDataGrid, { SortableColumn } from '../../components/OHDataGrid'
+import PokemonIcon from '../../components/PokemonIcon'
 
-type G12LookupRow = {
-  gen12ID: string
+type G345LookupRow = {
+  gen345ID: string
   homeID: string
   homeMon?: OHPKM
 }
 
-export default function Gen12Lookup() {
-  const [homeMons, gen12LookupMap] = useLookupMaps()
+export default function Gen345Lookup() {
+  const [homeMons, , gen345LookupMap] = useLookupMaps()
 
   function pokemonFromLookupID(id: string) {
     if (!homeMons) return undefined
@@ -20,7 +20,7 @@ export default function Gen12Lookup() {
     // return PokemonData[parseInt(id.split('-')[0])]
   }
 
-  const columns: SortableColumn<G12LookupRow>[] = [
+  const columns: SortableColumn<G345LookupRow>[] = [
     // {
     //   key: 'display',
     //   name: 'Display',
@@ -55,8 +55,8 @@ export default function Gen12Lookup() {
       cellClass: 'centered-cell',
     },
     {
-      key: 'gen12ID',
-      name: 'Gen 1/2',
+      key: 'gen345ID',
+      name: 'Gen 3/4/5',
       minWidth: 180,
       sortFunction: stringSorter((val) => val[0]),
       cellClass: 'mono-cell',
@@ -71,8 +71,8 @@ export default function Gen12Lookup() {
   ]
   return (
     <OHDataGrid
-      rows={Object.entries(gen12LookupMap ?? {}).map(([gen12ID, homeID]) => ({
-        gen12ID,
+      rows={Object.entries(gen345LookupMap ?? {}).map(([gen345ID, homeID]) => ({
+        gen345ID,
         homeID,
         homeMon: pokemonFromLookupID(homeID),
       }))}

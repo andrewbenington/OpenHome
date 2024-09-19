@@ -133,11 +133,13 @@ function initListeners() {
     return loadBoxData()
   })
 
-  ipcMain.on('write-home-boxes', async (_, boxData: StoredBoxData[]) => {
+  ipcMain.handle('write-home-boxes', async (_, boxData: StoredBoxData[]) => {
     try {
       writeBoxData(boxData)
+      return undefined
     } catch (e) {
       console.error('save home boxes error', e)
+      return `Error saving: ${e}`
     }
   })
 
@@ -147,10 +149,11 @@ function initListeners() {
       filePaths = await selectFile()
     }
     if (filePaths) {
+      console.error(filePaths, filePath)
       const fileBytes = readBytesFromFile(filePaths[0])
       const createdDate = getFileCreatedDate(filePaths[0])
       return {
-        path: { ...path.parse(filePaths[0]), separator: path.sep, raw: filePath },
+        path: { ...path.parse(filePaths[0]), separator: path.sep, raw: filePaths[0] },
         fileBytes,
         createdDate,
       }

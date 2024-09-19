@@ -47,6 +47,7 @@ export enum SaveType {
   HGSS,
   G5,
   G6,
+  G7,
 }
 
 export interface pokedate {
@@ -147,6 +148,7 @@ export interface SaveRef {
   trainerName?: string
   trainerID?: string
   lastOpened?: number
+  lastModified?: number
   valid?: boolean
 }
 export type SaveRefMap = { [key: string]: SaveRef }

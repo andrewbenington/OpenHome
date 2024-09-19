@@ -3,6 +3,7 @@ import { ColorSystemOptions, CssVarsThemeOptions } from '@mui/joy/styles/extendT
 
 // const teal = '#53B4A5'
 const lightTeal = '#7DCEAB'
+const lightTealSelected = '#aedac3'
 const red = '#BC4749'
 const red2 = '#e45454'
 // const green = '#84DD63'
@@ -30,6 +31,9 @@ export const components: Components<Theme> = {
         padding: 8,
         borderRadius: 5,
       },
+    },
+    defaultProps: {
+      variant: 'plain',
     },
   },
   JoyStack: {
@@ -140,6 +144,15 @@ export const components: Components<Theme> = {
       transition: '0.2s ease',
     },
   },
+  JoyTabs: {
+    styleOverrides: {
+      root: {
+        '& .MuiTabPanel-root': {
+          overflowY: 'auto',
+        },
+      },
+    },
+  },
 }
 
 export const darkTheme: ColorSystemOptions = {
@@ -150,6 +163,13 @@ export const darkTheme: ColorSystemOptions = {
     },
     primary: {
       mainChannel: '#780600',
+      plainColor: red2,
+      plainActiveBg: '#433',
+      solidBg: '#466',
+      solidColor: '#fff',
+      solidHoverBg: '#688',
+      solidActiveBg: '#8EAEB0',
+      solidActiveColor: '#333',
     },
     background: {
       body: '#2c313a',
@@ -178,14 +198,29 @@ export const lightTheme: ColorSystemOptions = {
   palette: {
     secondary: {
       mainChannel: red,
+      plainColor: '#fff',
+      plainHoverColor: '#333',
+      plainActiveColor: '#333',
     },
     primary: {
       mainChannel: red2,
+      plainColor: red2,
+      plainActiveBg: '#bee7d5',
+      solidBg: '#466',
+      solidColor: '#fff',
+      solidHoverBg: '#688',
+      solidActiveBg: '#dfd',
+      solidActiveColor: '#333',
+      // plainHoverBg: lightTealSelected,
+    },
+    neutral: {
+      plainHoverBg: lightTealSelected,
     },
     background: {
       body: lightTeal,
       gradient: tealGradient,
       surface: '#dfd',
+      level2: lightTealSelected,
     },
     text: {
       primary: '#333',

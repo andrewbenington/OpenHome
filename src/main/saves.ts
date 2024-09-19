@@ -38,12 +38,19 @@ function fileCanOpen(filePath: string): boolean {
   }
 }
 
+function fileLastModified(filePath: string): number | undefined {
+  return fs.statSync(filePath, { throwIfNoEntry: false })?.mtimeMs
+}
+
 export function loadRecentSaves() {
   const recentSaves = loadStoredObject<SaveRefMap>(RECENT_SAVES_FILE)
   const uniqEntries = uniqBy(Object.entries(recentSaves), ([path]) => path)
 
   return Object.fromEntries(
-    uniqEntries.map(([path, saveRef]) => [path, { ...saveRef, valid: fileCanOpen(path) }])
+    uniqEntries.map(([path, saveRef]) => [
+      path,
+      { ...saveRef, valid: fileCanOpen(path), lastModified: fileLastModified(path) },
+    ])
   ) as SaveRefMap
 }
 

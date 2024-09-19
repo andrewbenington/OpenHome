@@ -2,10 +2,12 @@ import { Grid } from '@mui/joy'
 import { Buffer } from 'buffer'
 import hexy from 'hexy'
 import lodash from 'lodash'
-import { CSSProperties, Fragment, useEffect, useState } from 'react'
+import { FileSchemas } from 'pokemon-files'
+import { CSSProperties, Fragment, useEffect, useMemo, useState } from 'react'
 
 interface HexEditorProps {
   data: Uint8Array
+  format: keyof typeof FileSchemas
 }
 
 const styles: { [key: string]: CSSProperties } = {
@@ -22,9 +24,10 @@ const styles: { [key: string]: CSSProperties } = {
   },
 }
 
-const HexEditor = ({ data }: HexEditorProps) => {
+const HexEditor = ({ data, format }: HexEditorProps) => {
   const [hexyText, setHexyText] = useState<string>()
   const [currentHover, setCurrentHover] = useState<number>()
+  const schema = FileSchemas[format]
 
   useEffect(() => {
     if (data) {
@@ -34,6 +37,19 @@ const HexEditor = ({ data }: HexEditorProps) => {
       setHexyText(h)
     }
   }, [data])
+
+  const hoveredField = useMemo(
+    () =>
+      currentHover
+        ? schema.fields.find(
+            (f) =>
+              f.byteOffset !== undefined &&
+              f.byteOffset <= currentHover &&
+              currentHover < f.byteOffset + (f.numBytes ?? 1)
+          )
+        : undefined,
+    [schema, currentHover]
+  )
 
   if (!hexyText) {
     return <div />
@@ -69,7 +85,13 @@ const HexEditor = ({ data }: HexEditorProps) => {
                   <Fragment key={`byte_${byteIndex}`}>
                     <div
                       style={{
-                        backgroundColor: currentHover === byteIndex ? 'white' : '#0000',
+                        backgroundColor:
+                          currentHover === byteIndex ||
+                          (hoveredField?.byteOffset &&
+                            byteIndex >= hoveredField.byteOffset &&
+                            byteIndex < hoveredField.byteOffset + (hoveredField.numBytes ?? 1))
+                            ? 'white'
+                            : '#0000',
                       }}
                       onMouseOver={() => {
                         setCurrentHover(byteIndex)
@@ -78,14 +100,25 @@ const HexEditor = ({ data }: HexEditorProps) => {
                         .toString(16)
                         .padStart(4, '0')}\nBin Value:\n${binaryFromHexString(
                         pair.substring(0, 2)
-                      )}`}
+                      )}\n${schema.fields.find(
+                        (f) =>
+                          f.byteOffset !== undefined &&
+                          f.byteOffset <= byteIndex &&
+                          byteIndex < f.byteOffset + (f.numBytes ?? 1)
+                      )?.name}`}
                     >
                       <code>{pair.substring(0, 2)}</code>
                     </div>
                     <div
                       key={`byte_${byteIndex + 1}`}
                       style={{
-                        backgroundColor: currentHover === byteIndex + 1 ? 'white' : '#0000',
+                        backgroundColor:
+                          currentHover === byteIndex + 1 ||
+                          (hoveredField?.byteOffset &&
+                            byteIndex + 1 >= hoveredField.byteOffset &&
+                            byteIndex + 1 < hoveredField.byteOffset + (hoveredField.numBytes ?? 1))
+                            ? 'white'
+                            : '#0000',
                         marginRight: 10,
                       }}
                       onMouseOver={() => {
@@ -93,7 +126,14 @@ const HexEditor = ({ data }: HexEditorProps) => {
                       }}
                       title={`0x${(byteIndex + 1)
                         .toString(16)
-                        .padStart(4, '0')}\nBin Value:\n${binaryFromHexString(pair.substring(2))}`}
+                        .padStart(4, '0')}\nBin Value:\n${binaryFromHexString(
+                        pair.substring(2)
+                      )}\n${schema.fields.find(
+                        (f) =>
+                          f.byteOffset !== undefined &&
+                          f.byteOffset <= byteIndex + 1 &&
+                          byteIndex + 1 < f.byteOffset + (f.numBytes ?? 1)
+                      )?.name}`}
                     >
                       <code>{pair.substring(2)}</code>
                     </div>

@@ -1,13 +1,11 @@
 /* eslint-disable no-nested-ternary */
-import { Box, Stack, useTheme } from '@mui/joy'
+import { Stack, Tab, tabClasses, TabList, TabPanel, Tabs } from '@mui/joy'
 import { PKM } from 'pokemon-files'
 import { useMemo, useState } from 'react'
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary'
 import { MdDownload } from 'react-icons/md'
 import { fileTypeFromString } from '../../types/FileImport'
 import { OHPKM } from '../../types/pkm/OHPKM'
-import { Styles } from '../../types/types'
-import OpenHomeButton from '../components/OpenHomeButton'
 import FileTypeSelect from './FileTypeSelect'
 import JSONDisplay from './JSONDisplay'
 import MetDataMovesDisplay from './MetDataMovesDisplay'
@@ -17,56 +15,10 @@ import RibbonsDisplay from './RibbonsDisplay'
 import StatsDisplay from './StatsDisplay'
 import SummaryDisplay from './SummaryDisplay'
 
-const styles = {
-  tabScrollContainer: {
-    backgroundColor: '#fff4',
-    height: '100%',
-    overflow: 'scroll',
-  },
-  detailsPane: {
-    width: '50%',
-    height: '100%',
-    borderTopRightRadius: 0,
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  pokemonDisplay: {
-    display: 'flex',
-    flexDirection: 'row',
-    width: '100%',
-    height: '100%',
-  },
-  pokemonSprite: { width: 24, height: 24, marginRight: 5 },
-  tabButton: {
-    margin: 0,
-    borderRadius: 0,
-    fontSize: 16,
-    padding: '10px 20px 12px 20px',
-  },
-  detailsTabCol: {
-    display: 'flex',
-    flexDirection: 'column',
-    height: '100%',
-    overflowY: 'scroll',
-  },
-  displayContainer: {
-    height: '100%',
-    overflowY: 'scroll',
-  },
-  fileTypeChip: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 16,
-    border: 0,
-    margin: 1,
-    boxShadow: 'none',
-  },
-} as Styles
-
 const PokemonDetailsPanel = (props: {
   mon: PKM | OHPKM
-  tab: string
-  setTab: (_: string) => void
+  tab?: string
+  setTab?: (_: string) => void
 }) => {
   const { mon, tab, setTab } = props
   const [displayMon, setDisplayMon] = useState(mon)
@@ -74,138 +26,119 @@ const PokemonDetailsPanel = (props: {
     () => window.URL.createObjectURL(new Blob([displayMon.toBytes({ includeExtraFields: true })])),
     [displayMon]
   )
-  const theme = useTheme()
 
   return (
-    <Stack
-      direction="row"
-      style={{ ...styles.pokemonDisplay, background: theme.palette.background.gradient }}
+    <Tabs
+      orientation="vertical"
+      color="primary"
+      value={tab ?? 'summary'}
+      style={{ height: '100%', width: '100%' }}
+      onChange={(_, val) => setTab && setTab(val as string)}
     >
-      <Box flex={0.25}>
-        <div style={styles.detailsTabCol}>
-          <Box display="flex">
-            <FileTypeSelect
-              baseFormat={mon.format}
-              currentFormat={displayMon.format}
-              formData={mon}
-              onChange={(newFormat) => {
-                if (mon.format === newFormat) {
-                  setDisplayMon(mon)
-                  return
-                }
-                if (newFormat === 'OHPKM') {
-                  setDisplayMon(mon instanceof OHPKM ? mon : new OHPKM(mon))
-                  return
-                }
-                const P = fileTypeFromString(newFormat)
-                if (!P) {
-                  throw `Invalid filetype: ${P}`
-                }
-                if (mon instanceof OHPKM) {
-                  setDisplayMon(new P(mon as any))
-                } else {
-                  setDisplayMon(new P(new OHPKM(mon) as any))
-                }
-              }}
-            />
-            <button style={{ margin: '8px 0px', padding: '4px 6px' }}>
-              <a
-                href={url}
-                download={`${displayMon.nickname}.${displayMon.format.toLocaleLowerCase()}`}
-              >
-                <MdDownload style={{ color: 'white' }} />
-              </a>
-            </button>
-          </Box>
-          <OpenHomeButton
-            style={{
-              ...styles.tabButton,
-              backgroundColor: tab === 'summary' ? '#fff4' : '#0000',
+      <TabList
+        disableUnderline
+        sx={{
+          whiteSpace: 'nowrap',
+          p: 0.8,
+          gap: 0.5,
+          [`& .${tabClasses.root}`]: {
+            borderRadius: 'lg',
+          },
+          [`& .${tabClasses.root}[aria-selected="true"]`]: {
+            boxShadow: 'sm',
+          },
+        }}
+        variant="solid"
+        color="primary"
+      >
+        <Stack direction="row">
+          <FileTypeSelect
+            baseFormat={mon.format}
+            currentFormat={displayMon.format}
+            formData={mon}
+            onChange={(newFormat) => {
+              if (mon.format === newFormat) {
+                setDisplayMon(mon)
+                return
+              }
+              if (newFormat === 'OHPKM') {
+                setDisplayMon(mon instanceof OHPKM ? mon : new OHPKM(mon))
+                return
+              }
+              const P = fileTypeFromString(newFormat)
+              if (!P) {
+                throw `Invalid filetype: ${P}`
+              }
+              if (mon instanceof OHPKM) {
+                setDisplayMon(new P(mon as any))
+              } else {
+                setDisplayMon(new P(new OHPKM(mon) as any))
+              }
             }}
-            onClick={() => setTab('summary')}
-          >
-            Summary
-          </OpenHomeButton>
-          <OpenHomeButton
-            style={{
-              ...styles.tabButton,
-              backgroundColor: tab === 'metDataMoves' ? '#fff4' : '#0000',
-            }}
-            onClick={() => setTab('metDataMoves')}
-          >
-            Moves/Met Data
-          </OpenHomeButton>
-          <OpenHomeButton
-            style={{
-              ...styles.tabButton,
-              backgroundColor: tab === 'stats' ? '#fff4' : '#0000',
-            }}
-            onClick={() => setTab('stats')}
-          >
-            Stats
-          </OpenHomeButton>
-          <OpenHomeButton
-            style={{
-              ...styles.tabButton,
-              backgroundColor: tab === 'ribbons' ? '#fff4' : '#0000',
-            }}
-            onClick={() => setTab('ribbons')}
-          >
-            Ribbons
-          </OpenHomeButton>
-          <OpenHomeButton
-            style={{
-              ...styles.tabButton,
-              backgroundColor: tab === 'other' ? '#fff4' : '#0000',
-            }}
-            onClick={() => setTab('other')}
-          >
-            Other
-          </OpenHomeButton>
-          <OpenHomeButton
-            style={{
-              ...styles.tabButton,
-              backgroundColor: tab === 'json' ? '#fff4' : '#0000',
-            }}
-            onClick={() => setTab('json')}
-          >
-            JSON
-          </OpenHomeButton>
-          <OpenHomeButton
-            style={{
-              ...styles.tabButton,
-              backgroundColor: tab === 'raw' ? '#fff4' : '#0000',
-            }}
-            onClick={() => setTab('raw')}
-          >
-            Raw
-          </OpenHomeButton>
-        </div>
-      </Box>
-      <Box flex={0.75} style={styles.displayContainer}>
-        <ErrorBoundary FallbackComponent={FallbackComponent}>
-          {tab === 'summary' ? (
-            <SummaryDisplay mon={displayMon} />
-          ) : tab === 'metDataMoves' ? (
-            <MetDataMovesDisplay mon={displayMon} />
-          ) : tab === 'stats' ? (
-            <StatsDisplay mon={displayMon} />
-          ) : tab === 'ribbons' ? (
-            <RibbonsDisplay mon={displayMon} />
-          ) : tab === 'other' ? (
-            <OtherDisplay mon={displayMon} />
-          ) : tab === 'json' ? (
-            <JSONDisplay mon={displayMon} />
-          ) : (
-            <RawDisplay bytes={new Uint8Array(displayMon.toBytes({ includeExtraFields: true }))} />
-          )}
-        </ErrorBoundary>
-      </Box>
-    </Stack>
+          />
+          <button style={{ margin: '8px 0px', padding: '4px 6px' }}>
+            <a
+              href={url}
+              download={`${displayMon.nickname}.${displayMon.format.toLocaleLowerCase()}`}
+            >
+              <MdDownload style={{ color: 'white' }} />
+            </a>
+          </button>
+        </Stack>
+        <Tab value="summary" disableIndicator color="primary" variant="solid">
+          Summary
+        </Tab>
+        <Tab value="moves_met_data" disableIndicator color="primary" variant="solid">
+          Moves/Met Data
+        </Tab>
+        <Tab value="stats" disableIndicator color="primary" variant="solid">
+          Stats
+        </Tab>
+        <Tab value="ribbons" disableIndicator color="primary" variant="solid">
+          Ribbons
+        </Tab>
+        <Tab value="other" disableIndicator color="primary" variant="solid">
+          Other
+        </Tab>
+        <Tab value="json" disableIndicator color="primary" variant="solid">
+          JSON
+        </Tab>
+        <Tab value="raw" disableIndicator color="primary" variant="solid">
+          Raw
+        </Tab>
+      </TabList>
+      <ErrorBoundary FallbackComponent={FallbackComponent}>
+        <TabPanel value="summary">
+          <SummaryDisplay mon={displayMon} />
+        </TabPanel>
+        <TabPanel value="moves_met_data">
+          <MetDataMovesDisplay mon={displayMon} />
+        </TabPanel>
+        <TabPanel value="stats">
+          <StatsDisplay mon={displayMon} />
+        </TabPanel>
+        <TabPanel value="ribbons">
+          <RibbonsDisplay mon={displayMon} />
+        </TabPanel>
+        <TabPanel value="other">
+          <OtherDisplay mon={displayMon} />
+        </TabPanel>
+        <TabPanel value="json">
+          <JSONDisplay mon={displayMon} />
+        </TabPanel>
+        <TabPanel value="raw">
+          <RawDisplay
+            bytes={new Uint8Array(displayMon.toBytes({ includeExtraFields: true }))}
+            format={displayMon.format}
+          />
+        </TabPanel>
+      </ErrorBoundary>
+    </Tabs>
   )
 }
 
 export default PokemonDetailsPanel
+
 function FallbackComponent(props: FallbackProps) {
   const { error, resetErrorBoundary } = props
   return (

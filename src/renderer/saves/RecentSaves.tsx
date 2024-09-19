@@ -5,7 +5,7 @@ import { SaveRef } from 'src/types/types'
 import { numericSorter } from '../../util/Sort'
 import OHDataGrid, { SortableColumn } from '../components/OHDataGrid'
 import { useOpenSaves, useRecentSaves } from '../redux/selectors'
-import { formatTimeSince, getSaveLogo } from './util'
+import { formatTime, formatTimeSince, getSaveLogo } from './util'
 
 interface SaveFileSelectorProps {
   onOpen: (path: ParsedPath) => void
@@ -59,6 +59,13 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
       width: 160,
       renderValue: (save) => formatTimeSince(save.lastOpened),
       sortFunction: numericSorter((val) => val.lastOpened),
+    },
+    {
+      key: 'lastModified',
+      name: 'Last Modified',
+      width: 240,
+      renderValue: (save) => formatTime(save.lastModified),
+      sortFunction: numericSorter((val) => val.lastModified),
     },
     {
       key: 'filePath',

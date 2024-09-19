@@ -2,11 +2,13 @@ import { Box, Tab, TabList, TabPanel, Tabs, Typography } from '@mui/joy'
 import { extendTheme, ThemeProvider } from '@mui/joy/styles'
 import { useMemo } from 'react'
 import 'react-data-grid/lib/styles.css'
-import ManagePokemon from '../components/manage/ManagePokemon'
 import useIsDarkMode from '../hooks/dark-mode'
 import { FilterProvider } from '../state/filter'
 import './App.css'
+import { FileStructurePage } from './file_structure/FileStructure'
 import Home from './Home'
+import ManagePokemon from './manage/ManagePokemon'
+import SortPokemon from './sort/SortPokemon'
 import { components, darkTheme, lightTheme } from './Themes'
 
 function App() {
@@ -33,23 +35,35 @@ function App() {
             </Typography>
           </Box>
         ) : (
-          <Tabs defaultValue="home" style={{ height: '100%', width: '100%' }}>
+          <Tabs defaultValue="home" style={{ height: '100vh', width: '100%' }} color="primary">
             <TabPanel
-              sx={{ '--Tabs-spacing': 0 }}
+              sx={{ '--Tabs-spacing': 0, height: 0 }}
               value="home"
               // container
             >
               <Home />
             </TabPanel>
-            <TabPanel sx={{ '--Tabs-spacing': 0 }} value="manage">
+            <TabPanel sx={{ '--Tabs-spacing': 0, height: 0 }} value="manage">
               <ManagePokemon />
             </TabPanel>
-            <TabList>
-              <Tab indicatorPlacement="top" value="home">
+            <TabPanel sx={{ '--Tabs-spacing': 0, height: 0 }} value="sort">
+              <SortPokemon />
+            </TabPanel>
+            <TabPanel sx={{ '--Tabs-spacing': 0, height: 0 }} value="schemas">
+              <FileStructurePage />
+            </TabPanel>
+            <TabList color="primary">
+              <Tab indicatorPlacement="top" value="home" color="primary">
                 Home
               </Tab>
-              <Tab indicatorPlacement="top" value="manage">
+              <Tab indicatorPlacement="top" value="manage" color="primary">
                 Manage Pokémon
+              </Tab>
+              <Tab indicatorPlacement="top" value="sort" color="primary">
+                Sort Pokémon
+              </Tab>
+              <Tab indicatorPlacement="top" value="schemas" color="primary">
+                File Structures
               </Tab>
             </TabList>
           </Tabs>

@@ -240,7 +240,7 @@ export const appSlice = createSlice({
         name: box.name,
         monIdentifiersByIndex: box.getIdentifierMapping(),
       }))
-      window.electron.ipcRenderer.send('write-home-boxes', allStoredBoxData)
+      window.electron.ipcRenderer.invoke('write-home-boxes', allStoredBoxData)
 
       Object.values(state.modifiedOHPKMs).forEach((mon) => {
         if (mon) {

@@ -1,3 +1,4 @@
+import dayjs from 'dayjs'
 import { getGameLogo, getOriginMark } from '../images/game'
 import { getPublicImageURL } from '../images/images'
 
@@ -34,6 +35,24 @@ export function formatTimeSince(timestamp?: number) {
     return `${Math.floor(interval)} minute${Math.floor(interval) > 1 ? 's' : ''} ago`
   }
   return `${Math.floor(seconds)} second${Math.floor(seconds) > 1 ? 's' : ''} ago`
+}
+
+export function formatTime(timestamp?: number) {
+  if (!timestamp) return ''
+
+  const now = dayjs()
+  const todayString = now.format('MM/DD/YYYY')
+  const yesterdayString = now.add(-1, 'day').format('MM/DD/YYYY')
+  const date = dayjs.unix(timestamp / 1000)
+  const dateString = date.format('MM/DD/YYYY')
+
+  if (dateString === todayString) {
+    return date.format('[Today at] h:mm:ss a')
+  } else if (dateString === yesterdayString) {
+    return date.format('[Yesterday at] h:mm:ss a')
+  } else {
+    return date.format('MMM D YYYY [at] h:mm:ss a')
+  }
 }
 
 export function filterEmpty<T>(value: T | null | undefined): value is T {

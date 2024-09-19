@@ -5,7 +5,6 @@ import { useCallback, useEffect, useState } from 'react'
 import { MdFileOpen } from 'react-icons/md'
 import { loadRecentSaves } from '../../renderer/redux/slices/recentSavesSlice'
 import { loadResourcesPath } from '../../renderer/redux/slices/resourcesSlice'
-import { bytesToPKM } from '../../types/FileImport'
 import { OHPKM } from '../../types/pkm/OHPKM'
 import { PKMFile } from '../../types/pkm/util'
 import { SaveCoordinates } from '../../types/types'
@@ -51,7 +50,7 @@ const Home = () => {
   const monsToRelease = useMonsToRelease()
   const { palette } = useTheme()
   const [selectedMon, setSelectedMon] = useState<PKMFile>()
-  const [pokemonDisplayTab, setPokemonDisplayTab] = useState('summary')
+  const [tab, setTab] = useState('summary')
   const [openSaveDialog, setOpenSaveDialog] = useState(false)
   const [filesToDelete, setFilesToDelete] = useState<string[]>([])
   const dispatch = useAppDispatch()
@@ -69,46 +68,7 @@ const Home = () => {
     window.electron.ipcRenderer.invoke('set-document-edited', edited)
   }, [saves, homeData])
 
-  const onViewDrop = (e: any, type: string) => {
-    const processDroppedData = async (file?: File, droppedMon?: PKMFile) => {
-      let mon: PKMFile | undefined = droppedMon
-      if (file) {
-        const bytes = new Uint8Array(await file.arrayBuffer())
-        const [extension] = file.name.split('.').slice(-1)
-        try {
-          mon = bytesToPKM(bytes, extension.toUpperCase())
-        } catch (e) {
-          console.error(e)
-        }
-      }
-      if (!mon) return
-      switch (type) {
-        case 'as is':
-          setSelectedMon(mon)
-          break
-      }
-    }
-    const file = e.dataTransfer.files[0]
-    const mon = dragMon
-    if (!file && dragSource) {
-      if (mon && type === 'release') {
-        dispatchReleaseMon(dragSource)
-        if (mon instanceof OHPKM) {
-          const identifier = getMonFileIdentifier(mon)
-          if (identifier) {
-            setFilesToDelete([...filesToDelete, identifier])
-          }
-        }
-      }
-      dispatchCancelDrag()
-      processDroppedData(file, mon)
-      e.nativeEvent.preventDefault()
-    } else if (file) {
-      processDroppedData(file, undefined)
-    }
-  }
-
-  const onViewDropInterface = (e: React.DragEvent<HTMLDivElement>, type: string) => {
+  const onViewDrop = (e: React.DragEvent<HTMLDivElement>, type: string) => {
     const processDroppedData = async (file?: File, droppedMon?: PKMFile) => {
       let mon: PKMFile | undefined = droppedMon
       if (file) {
@@ -238,16 +198,6 @@ const Home = () => {
         </div>
         <div
           className="drop-area"
-          draggable
-          onDragOver={(e) => {
-            e.preventDefault()
-          }}
-          onDrop={(e) => onViewDropInterface(e, 'as is')}
-        >
-          Preview Interface
-        </div>
-        <div
-          className="drop-area"
           onDragOver={(e) => {
             e.preventDefault()
           }}
@@ -268,20 +218,9 @@ const Home = () => {
           </div>
         </div>
       </Stack>
-      <Modal
-        open={!!selectedMon}
-        onClose={() => setSelectedMon(undefined)}
-        // maxWidth="md"
-        // PaperProps={{ sx: { height: 400, maxWidth: 800 } }}
-      >
+      <Modal open={!!selectedMon} onClose={() => setSelectedMon(undefined)}>
         <Card style={{ width: 800, height: 400, padding: 0, overflow: 'hidden' }}>
-          {selectedMon && (
-            <PokemonDetailsPanel
-              mon={selectedMon}
-              tab={pokemonDisplayTab}
-              setTab={setPokemonDisplayTab}
-            />
-          )}
+          {selectedMon && <PokemonDetailsPanel mon={selectedMon} tab={tab} setTab={setTab} />}
         </Card>
       </Modal>
       <Modal
