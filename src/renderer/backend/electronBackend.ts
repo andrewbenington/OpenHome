@@ -1,3 +1,4 @@
+import { createContext } from 'react'
 import { OHPKM } from '../../types/pkm/OHPKM'
 import { ParsedPath } from '../../types/SAVTypes/path'
 import { StoredBoxData } from '../../types/storage'
@@ -20,7 +21,7 @@ export const ElectronBackend: BackendInterface = {
   },
 
   /* OHPKM management */
-  loadHomeMonLookup: function (): Promise<Errorable<Record<string, OHPKM>>> {
+  loadHomeMonLookup: function (): Promise<Errorable<Record<string, Uint8Array>>> {
     return window.electron.ipcRenderer.invoke('load-home-mons')
   },
   deleteHomeMons: (identifiers: string[]): Promise<Errorable<null>> =>
@@ -44,4 +45,11 @@ export const ElectronBackend: BackendInterface = {
   writeSaveFile: (path: string, bytes: Uint8Array) => {
     return window.electron.ipcRenderer.invoke('write-save-file', { path, bytes })
   },
+
+  /* application */
+  setHasChanges: (hasChanges: boolean): Promise<void> => {
+    return window.electron.ipcRenderer.invoke('set-document-edited', hasChanges)
+  },
 }
+
+export const ElectronBackendContext = createContext(ElectronBackend)

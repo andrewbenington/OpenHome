@@ -65,7 +65,7 @@ import {
 } from './util'
 
 export class OHPKM {
-  static fromBytes(bytes: ArrayBuffer) {
+  static fromBytes(bytes: Uint8Array) {
     return new OHPKM(bytes)
   }
 
@@ -87,9 +87,9 @@ export class OHPKM {
 
   bytes = new Uint8Array(433)
 
-  constructor(arg: PKM | OHPKM | ArrayBuffer) {
-    if (arg instanceof ArrayBuffer) {
-      this.bytes = new Uint8Array(arg)
+  constructor(arg: PKM | OHPKM | Uint8Array) {
+    if (arg instanceof Uint8Array) {
+      this.bytes = arg
     } else {
       const other = arg
       let prng: Prando

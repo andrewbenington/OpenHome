@@ -1,14 +1,17 @@
 import { Box, Card, Modal, ModalDialog, Stack, useTheme } from '@mui/joy'
+import * as E from 'fp-ts/lib/Either'
 import lodash from 'lodash'
 import { bytesToPKMInterface } from 'pokemon-files'
-import { useCallback, useEffect, useState } from 'react'
-import { MdFileOpen } from 'react-icons/md'
+import { useCallback, useContext, useEffect, useState } from 'react'
+import { MdBook, MdFileOpen, MdSave } from 'react-icons/md'
 import { loadRecentSaves } from '../../renderer/redux/slices/recentSavesSlice'
 import { loadResourcesPath } from '../../renderer/redux/slices/resourcesSlice'
 import { OHPKM } from '../../types/pkm/OHPKM'
 import { PKMFile } from '../../types/pkm/util'
 import { SaveCoordinates } from '../../types/types'
 import { getMonFileIdentifier } from '../../util/Lookup'
+import { BackendContext } from '../backend/backendProvider'
+import { DevDataDisplay } from '../components/DevDataDisplay'
 import FilterPanel from '../components/filter/FilterPanel'
 import PokemonIcon from '../components/PokemonIcon'
 import PokemonDetailsPanel from '../pokemon/PokemonDetailsPanel'
@@ -18,15 +21,12 @@ import {
   useDragSource,
   useHomeData,
   useMonsToRelease,
-  useOpenSaves,
   useSaveFunctions,
 } from '../redux/selectors'
 import {
   cancelDrag,
   clearAllSaves,
   clearMonsToRelease,
-  loadGen12Lookup,
-  loadGen345Lookup,
   loadHomeBoxes,
   loadHomeMons,
   setMonToRelease,
@@ -34,6 +34,8 @@ import {
 import HomeBoxDisplay from '../saves/boxes/HomeBoxDisplay'
 import OpenSaveDisplay from '../saves/boxes/SaveBoxDisplay'
 import SavesModal from '../saves/SavesModal'
+import { LookupContext } from '../state/lookup'
+import { OpenSavesContext } from '../state/saves'
 import { initializeDragImage } from '../util/initializeDragImage'
 import {
   handleDeleteOHPKMFiles,
@@ -43,7 +45,9 @@ import {
 import './Home.css'
 
 const Home = () => {
-  const saves = useOpenSaves()
+  const [openSavesState, openSavesDispatch, allOpenSaves] = useContext(OpenSavesContext)
+  const [lookupState, lookupDispatch] = useContext(LookupContext)
+  const backend = useContext(BackendContext)
   const homeData = useHomeData()
   const dragMon = useDragMon()
   const dragSource = useDragSource()
@@ -64,9 +68,9 @@ const Home = () => {
   useEffect(() => {
     const edited =
       homeData.updatedBoxSlots.length > 0 ||
-      !saves.every((save) => save.updatedBoxSlots.length === 0)
-    window.electron.ipcRenderer.invoke('set-document-edited', edited)
-  }, [saves, homeData])
+      allOpenSaves.every((save) => save.updatedBoxSlots.length === 0)
+    backend.setHasChanges(edited)
+  }, [allOpenSaves, backend, homeData.updatedBoxSlots])
 
   const onViewDrop = (e: React.DragEvent<HTMLDivElement>, type: string) => {
     const processDroppedData = async (file?: File, droppedMon?: PKMFile) => {
@@ -128,15 +132,73 @@ const Home = () => {
       dispatch(loadHomeMons()).then(() => dispatch(loadHomeBoxes()))
     }, dispatchClearAllSaves)
     return () => callback()
-  }, [dispatch, dispatchClearAllSaves, saves])
+  }, [dispatch, dispatchClearAllSaves, allOpenSaves, dispatchClearMonsToRelease])
+
+  const loadAllLookups = useCallback(async () => {
+    const onLoadError = (message: string) => {
+      console.error(message)
+      lookupDispatch({ type: 'set_error', payload: message })
+    }
+    const [homeResult, gen12Result, gen345Result] = await Promise.all([
+      backend.loadHomeMonLookup(),
+      backend.loadGen12Lookup(),
+      backend.loadGen345Lookup(),
+    ])
+    if (E.isLeft(homeResult)) {
+      onLoadError(homeResult.left)
+      return
+    } else if (E.isLeft(gen12Result)) {
+      onLoadError(gen12Result.left)
+      return
+    } else if (E.isLeft(gen345Result)) {
+      onLoadError(gen345Result.left)
+      return
+    }
+    console.log([homeResult, gen12Result, gen345Result])
+
+    lookupDispatch({ type: 'load_home_mons', payload: homeResult.right })
+    lookupDispatch({ type: 'load_gen12', payload: gen12Result.right })
+    lookupDispatch({ type: 'load_gen345', payload: gen345Result.right })
+  }, [backend, lookupDispatch])
+
+  useEffect(() => {
+    console.log(lookupState.loaded, openSavesState.homeData)
+    if (lookupState.loaded && !openSavesState.homeData) {
+      console.log('LOADING HOME')
+      backend.loadHomeBoxes().then(
+        E.match(
+          (err) => openSavesDispatch({ type: 'set_error', payload: err }),
+          (boxes) =>
+            openSavesDispatch({
+              type: 'set_home_boxes',
+              payload: { boxes, homeLookup: lookupState.homeMons },
+            })
+        )
+      )
+    }
+  }, [
+    backend,
+    lookupState.homeMons,
+    lookupState.loaded,
+    openSavesDispatch,
+    openSavesState.homeData,
+  ])
+
+  // load lookups
+  useEffect(() => {
+    if (!lookupState.loaded && !lookupState.error) {
+      loadAllLookups()
+    }
+  }, [lookupState.loaded, lookupState.error, loadAllLookups])
 
   // load all data when app starts
   useEffect(() => {
     initializeDragImage()
+
     Promise.all([
-      dispatch(loadHomeMons()).then(() => dispatch(loadHomeBoxes())),
-      dispatch(loadGen12Lookup()),
-      dispatch(loadGen345Lookup()),
+      // dispatch(loadHomeMons()).then(() => dispatch(loadHomeBoxes())),
+      // dispatch(loadGen12Lookup()),
+      // dispatch(loadGen345Lookup()),
       dispatch(loadRecentSaves()),
       dispatch(loadResourcesPath()),
     ])
@@ -152,7 +214,7 @@ const Home = () => {
       }}
     >
       <Stack className="save-file-column" spacing={1} width={280} minWidth={280}>
-        {lodash.range(saves.length).map((i) => (
+        {lodash.range(allOpenSaves.length).map((i) => (
           <OpenSaveDisplay
             key={`save_display_${i}`}
             saveIndex={i}
@@ -183,6 +245,8 @@ const Home = () => {
           <HomeBoxDisplay setSelectedMon={setSelectedMon} />
           <Box flex={1}></Box>
         </Box>
+        <DevDataDisplay data={openSavesState} icon={MdSave} />
+        <DevDataDisplay data={lookupState} icon={MdBook} />
       </div>
       <Stack spacing={1} className="right-column" width={300}>
         <FilterPanel />
@@ -216,7 +280,7 @@ const Home = () => {
               )
             })}
           </div>
-        </div>
+        </div>{' '}
       </Stack>
       <Modal open={!!selectedMon} onClose={() => setSelectedMon(undefined)}>
         <Card style={{ width: 800, height: 400, padding: 0, overflow: 'hidden' }}>

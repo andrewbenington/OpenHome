@@ -3,6 +3,6 @@
   "include": ["electron.vite.config.*", "src/main/*", "src/main/*.wasm", "src/preload/*", "src/renderer/app/index.d.ts"],
   "compilerOptions": {
     "types": ["electron-vite/node"],
-    "target": "es2021"
+    "target": "ESNext"
   }
 }

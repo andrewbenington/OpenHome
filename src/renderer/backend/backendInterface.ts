@@ -11,7 +11,7 @@ export default interface BackendInterface {
   writeGen345Lookup: (lookup: LookupMap) => Promise<Errorable<null>>
 
   /* OHPKM management */
-  loadHomeMonLookup: () => Promise<Errorable<Record<string, OHPKM>>>
+  loadHomeMonLookup: () => Promise<Errorable<Record<string, Uint8Array>>>
   writeHomeMon: (mon: OHPKM) => Promise<Errorable<null>>
   deleteHomeMons: (identifiers: string[]) => Promise<Errorable<null>>
 
@@ -22,4 +22,7 @@ export default interface BackendInterface {
   /* game saves */
   loadSaveFile: (filePath?: ParsedPath) => Promise<Errorable<LoadSaveResponse>>
   writeSaveFile: (path: string, bytes: Uint8Array) => Promise<Errorable<null>>
+
+  /* application */
+  setHasChanges: (hasChanges: boolean) => Promise<void>
 }

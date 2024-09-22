@@ -1,10 +1,11 @@
 import { Card, Grid } from '@mui/joy'
 import lodash from 'lodash'
+import { useContext } from 'react'
 import { MdArrowBack, MdArrowForward } from 'react-icons/md'
+import { OpenSavesContext } from 'src/renderer/state/saves'
 import { PKMFile } from '../../../types/pkm/util'
 import { SaveCoordinates } from '../../../types/types'
 import { useAppDispatch } from '../../redux/hooks'
-import { useHomeData } from '../../redux/selectors'
 import {
   cancelDrag,
   completeDrag,
@@ -20,7 +21,7 @@ interface HomeBoxDisplayProps {
 }
 
 const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
-  const data = useHomeData()
+  const [{ homeData: data }] = useContext(OpenSavesContext)
   const { setSelectedMon } = props
 
   const dispatch = useAppDispatch()
@@ -32,7 +33,7 @@ const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
     dispatch(importMons({ mons, saveCoordinates }))
 
   return (
-    data.boxes[0] && (
+    data?.boxes[data.currentPCBox] && (
       <Card
         style={{
           padding: 2,
