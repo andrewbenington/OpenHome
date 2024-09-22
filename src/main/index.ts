@@ -4,6 +4,7 @@ import { join } from 'path'
 import icon from '../../resources/icon.png?asset'
 import initListeners from './initListeners'
 import MenuBuilder from './menu'
+import { migrateAll } from './migrateStorage'
 
 function createWindow(): void {
   // Create the browser window.
@@ -73,6 +74,7 @@ app.whenReady().then(() => {
 
   createWindow()
   initListeners()
+  migrateAll()
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the

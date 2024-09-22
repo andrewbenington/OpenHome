@@ -16,6 +16,20 @@ export function initializeFolders(appDataPath: string) {
   })
 }
 
+export function fileCanOpen(filePath: string): boolean {
+  try {
+    fs.accessSync(filePath, fs.constants.F_OK)
+    return true
+  } catch (err) {
+    console.log(`Can't open ${filePath}: ${err}`)
+    return false
+  }
+}
+
+export function fileLastModified(filePath: string): number | undefined {
+  return fs.statSync(filePath, { throwIfNoEntry: false })?.mtimeMs
+}
+
 export async function selectFile() {
   // Open file picker
   const result = await dialog.showOpenDialog({

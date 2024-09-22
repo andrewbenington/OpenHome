@@ -1,46 +1,16 @@
-import fs from 'fs'
 import { uniqBy } from 'lodash'
 import { SaveFolder } from '../types/storage'
 import { SaveRef, SaveRefMap } from '../types/types'
 import {
+  fileCanOpen,
+  fileLastModified,
   loadStoredList,
   loadStoredObject,
   updateStoredList,
   updateStoredObject,
 } from './fileHandlers'
 
-// const SaveTypeStrings: { [key: string]: SaveType } = {
-//   RGBY_J: SaveType.RGBY_J,
-//   RBY_I: SaveType.RBY_I,
-//   GS_J: SaveType.GS_J,
-//   GS_I: SaveType.GS_I,
-//   C_J: SaveType.C_J,
-//   C_I: SaveType.C_I,
-//   RS: SaveType.RS,
-//   FRLG: SaveType.FRLG,
-//   E: SaveType.E,
-//   DP: SaveType.DP,
-//   Pt: SaveType.Pt,
-//   HGSS: SaveType.HGSS,
-//   G5: SaveType.G5,
-//   G6: SaveType.G6,
-// }
-
 const RECENT_SAVES_FILE = 'recent_saves.json'
-
-function fileCanOpen(filePath: string): boolean {
-  try {
-    fs.accessSync(filePath, fs.constants.F_OK)
-    return true
-  } catch (err) {
-    console.log(`Can't open ${filePath}: ${err}`)
-    return false
-  }
-}
-
-function fileLastModified(filePath: string): number | undefined {
-  return fs.statSync(filePath, { throwIfNoEntry: false })?.mtimeMs
-}
 
 export function loadRecentSaves() {
   const recentSaves = loadStoredObject<SaveRefMap>(RECENT_SAVES_FILE)

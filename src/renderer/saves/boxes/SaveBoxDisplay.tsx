@@ -90,7 +90,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
               </ArrowButton>
             </Grid>
             <Grid xs={8} className="box-name">
-              {save.boxes[save.currentPCBox]?.name}
+              {save.boxes[save.currentPCBox < save.boxes.length ? save.currentPCBox : 0]?.name}
             </Grid>
             <Grid
               xs={2}
@@ -109,7 +109,10 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
           {lodash.range(save.boxRows).map((row: number) => (
             <Grid container key={`pc_row_${row}`}>
               {lodash.range(save.boxColumns).map((rowIndex: number) => {
-                const mon = save.boxes[save.currentPCBox].pokemon[row * save.boxColumns + rowIndex]
+                const mon =
+                  save.boxes[save.currentPCBox < save.boxes.length ? save.currentPCBox : 0].pokemon[
+                    row * save.boxColumns + rowIndex
+                  ]
                 return (
                   <Grid
                     key={`pc_row_${row}_slot_${rowIndex}`}

@@ -40,7 +40,6 @@ export default function SortPokemon() {
   const [selectedMon, setSelectedMon] = useState<PKMFile>()
   const [tab, setTab] = useState('summary')
   const [sort, setSort] = useState('')
-  // const [indexes, setIndexes] = useState<[number, number]>([0, 100])
   const saves = useOpenSaves()
 
   const allMonsWithSaves = useMemo(() => {
