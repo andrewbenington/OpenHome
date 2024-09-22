@@ -2,6 +2,7 @@ import lodash from 'lodash'
 import { getMonFileIdentifier } from '../../util/Lookup'
 import { OHPKM } from '../pkm/OHPKM'
 import { BoxMonIdentifiers } from '../storage'
+import { SaveType } from '../types'
 import { Box, BoxCoordinates, SAV } from './SAV'
 import { emptyParsedPath } from './path'
 
@@ -38,6 +39,8 @@ export class HomeBox implements Box<OHPKM> {
 
 export class HomeData extends SAV<OHPKM> {
   updatedBoxSlots: BoxCoordinates[] = []
+
+  saveType = SaveType.OPENHOME
 
   boxRows = 10
 
