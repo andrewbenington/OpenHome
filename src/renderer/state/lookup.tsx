@@ -36,6 +36,10 @@ export type LookupAction =
       type: 'set_error'
       payload: string | undefined
     }
+  | {
+      type: 'clear'
+      payload?: undefined
+    }
 
 const reducer: Reducer<LookupState, LookupAction> = (state: LookupState, action: LookupAction) => {
   const { type, payload } = action
@@ -71,6 +75,9 @@ const reducer: Reducer<LookupState, LookupAction> = (state: LookupState, action:
         newState.loaded = true
       }
       return newState
+    }
+    case 'clear': {
+      return { loaded: false }
     }
   }
 }

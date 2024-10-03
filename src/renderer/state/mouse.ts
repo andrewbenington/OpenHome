@@ -1,9 +1,19 @@
-import { Dispatch, Reducer, createContext, useReducer } from 'react'
+import { Dispatch, Reducer, createContext } from 'react'
+import { SAV } from 'src/types/SAVTypes'
+import { PKMFile } from '../../types/pkm/util'
+
+export type DragSource = {
+  save: SAV
+  box: number
+  boxPos: number
+  mon: PKMFile
+}
 
 export type MouseState = {
   shift: boolean
   saveIndex?: number
   boxCell?: number
+  dragSource?: DragSource
 }
 
 export type MouseAction =
@@ -19,9 +29,17 @@ export type MouseAction =
       type: 'set_save_index'
       payload?: number | undefined
     }
+  | {
+      type: 'set_drag_source'
+      payload: DragSource | undefined
+    }
 
-const reducer: Reducer<MouseState, MouseAction> = (state: MouseState, action: MouseAction) => {
+export const mouseReducer: Reducer<MouseState, MouseAction> = (
+  state: MouseState,
+  action: MouseAction
+) => {
   const { type, payload } = action
+  console.log('mouseState:', type, payload)
   switch (type) {
     case 'set_shift': {
       const newState = {
@@ -44,6 +62,9 @@ const reducer: Reducer<MouseState, MouseAction> = (state: MouseState, action: Mo
       }
       return newState
     }
+    case 'set_drag_source': {
+      return { ...state, dragSource: payload }
+    }
   }
 }
 
@@ -53,9 +74,3 @@ export const MouseContext = createContext<[MouseState, Dispatch<MouseAction>]>([
   initialState,
   () => null,
 ])
-
-export const MouseProvider = ({ children }: { children: JSX.Element | JSX.Element[] }) => {
-  const [state, dispatch] = useReducer<Reducer<MouseState, MouseAction>>(reducer, initialState)
-
-  return <MouseContext.Provider value={[state, dispatch]}>{children}</MouseContext.Provider>
-}

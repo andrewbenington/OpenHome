@@ -35,7 +35,7 @@ interface BoxCellProps {
   onClick: () => void
   onDragEvent: (_: boolean) => void
   onDrop: (_: PKMFile[] | undefined) => void
-  disabled: boolean
+  disabled?: boolean
   zIndex: number
   mon: PKMFile | undefined
   borderColor?: string
@@ -142,6 +142,18 @@ const BoxCell = (props: BoxCellProps) => {
             if (e.dataTransfer.dropEffect !== 'copy') {
               onDragEvent(true)
             }
+          }}
+          onDragOver={
+            disabled
+              ? undefined
+              : (e) => {
+                  e.preventDefault()
+                }
+          }
+          onDrop={(e) => {
+            console.log('ON DROP')
+            setIsDraggedOver(false)
+            handleDrop(e)
           }}
         />
       ) : (

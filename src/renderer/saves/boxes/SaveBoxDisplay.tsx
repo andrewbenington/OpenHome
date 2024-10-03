@@ -1,20 +1,13 @@
 import { Card, Grid } from '@mui/joy'
 import lodash from 'lodash'
 import { GameOfOriginData } from 'pokemon-resources'
-import { useMemo } from 'react'
+import { useCallback, useContext, useMemo } from 'react'
 import { MdArrowBack, MdArrowForward, MdClose } from 'react-icons/md'
+import { MouseContext } from 'src/renderer/state/mouse'
+import { MonLocation, OpenSavesContext } from 'src/renderer/state/openSaves'
 import { PKMFile } from '../../../types/pkm/util'
 import { isRestricted } from '../../../types/TransferRestrictions'
-import { SaveCoordinates, getSaveTypeString } from '../../../types/types'
-import { useAppDispatch } from '../../redux/hooks'
-import { useDragMon, useOpenSaves } from '../../redux/selectors'
-import {
-  completeDrag,
-  importMons,
-  removeSaveAt,
-  setSaveBox,
-  startDrag,
-} from '../../redux/slices/appSlice'
+import { getSaveTypeString } from '../../../types/types'
 import ArrowButton from './ArrowButton'
 import BoxCell from './BoxCell'
 
@@ -24,33 +17,67 @@ interface OpenSaveDisplayProps {
 }
 
 const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
-  const saves = useOpenSaves()
-  const dragMon = useDragMon()
+  const [, openSavesDispatch, openSaves] = useContext(OpenSavesContext)
+  const [mouseState, mouseDispatch] = useContext(MouseContext)
   const { saveIndex, setSelectedMon } = props
-  const dispatch = useAppDispatch()
+  const save = openSaves[saveIndex]
 
-  const dispatchSetBox = (box: number) => dispatch(setSaveBox({ saveNumber: saveIndex, box }))
-  const dispatchStartDrag = (source: SaveCoordinates) => dispatch(startDrag(source))
-  const dispatchCompleteDrag = (dest: SaveCoordinates) => dispatch(completeDrag(dest))
-  const dispatchRemoveSaveAt = (index: number) => dispatch(removeSaveAt(index))
-  const dispatchImportMons = (mons: PKMFile[], saveCoordinates: SaveCoordinates) =>
-    dispatch(importMons({ mons, saveCoordinates }))
+  const dispatchStartDrag = useCallback(
+    (boxPos: number) => {
+      const mon = save.getCurrentBox().pokemon[boxPos]
+      if (mon) {
+        mouseDispatch({
+          type: 'set_drag_source',
+          payload: { save, box: save.currentPCBox, boxPos, mon },
+        })
+      }
+    },
+    [mouseDispatch, save]
+  )
 
-  const save = useMemo(() => {
-    return saves[saveIndex]
-  }, [saves, saveIndex])
+  const dispatchCompleteDrag = useCallback(
+    (boxPosition: number) => {
+      console.log(mouseState.dragSource, boxPosition)
+      mouseState.dragSource &&
+        openSavesDispatch({
+          type: 'move_mon',
+          payload: {
+            dest: { save, box: save.currentPCBox, boxPos: boxPosition },
+            source: mouseState.dragSource,
+          },
+        })
+      mouseDispatch({
+        type: 'set_drag_source',
+        payload: undefined,
+      })
+    },
+    [mouseDispatch, mouseState.dragSource, openSavesDispatch, save]
+  )
+
+  const dispatchImportMons = (mons: PKMFile[], location: MonLocation) =>
+    openSavesDispatch({ type: 'import_mons', payload: { mons, dest: location } })
 
   const isDisabled = useMemo(() => {
-    return dragMon
-      ? isRestricted(save.transferRestrictions, dragMon.dexNum, dragMon.formeNum)
+    return mouseState.dragSource
+      ? isRestricted(
+          save.transferRestrictions,
+          mouseState.dragSource.mon.dexNum,
+          mouseState.dragSource.mon.formeNum
+        )
       : false
-  }, [save, dragMon])
+  }, [save, mouseState.dragSource])
+
   return save && save.currentPCBox !== undefined ? (
     <div style={{ display: 'flex', width: '100%', flexDirection: 'column' }}>
       <Card className="save-header">
         <button
           className="save-close-button"
-          onClick={() => dispatchRemoveSaveAt(saveIndex)}
+          onClick={() =>
+            openSavesDispatch({
+              type: 'remove_save',
+              payload: save,
+            })
+          }
           disabled={!!save.updatedBoxSlots.length}
         >
           <MdClose />
@@ -81,16 +108,20 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
             <Grid xs={2} display="grid" alignItems="center">
               <ArrowButton
                 onClick={() =>
-                  dispatchSetBox(
-                    save.currentPCBox > 0 ? save.currentPCBox - 1 : save.boxes.length - 1
-                  )
+                  openSavesDispatch({
+                    type: 'set_save_box',
+                    payload: {
+                      boxNum: save.currentPCBox > 0 ? save.currentPCBox - 1 : save.boxes.length - 1,
+                      save,
+                    },
+                  })
                 }
               >
                 <MdArrowBack fontSize="small" />
               </ArrowButton>
             </Grid>
             <Grid xs={8} className="box-name">
-              {save.boxes[save.currentPCBox < save.boxes.length ? save.currentPCBox : 0]?.name}
+              {save.boxes[save.currentPCBox]?.name}
             </Grid>
             <Grid
               xs={2}
@@ -100,7 +131,15 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
               }}
             >
               <ArrowButton
-                onClick={() => dispatchSetBox((save.currentPCBox + 1) % save.boxes.length)}
+                onClick={() =>
+                  openSavesDispatch({
+                    type: 'set_save_box',
+                    payload: {
+                      boxNum: (save.currentPCBox + 1) % save.boxes.length,
+                      save,
+                    },
+                  })
+                }
               >
                 <MdArrowForward fontSize="small" />
               </ArrowButton>
@@ -109,10 +148,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
           {lodash.range(save.boxRows).map((row: number) => (
             <Grid container key={`pc_row_${row}`}>
               {lodash.range(save.boxColumns).map((rowIndex: number) => {
-                const mon =
-                  save.boxes[save.currentPCBox < save.boxes.length ? save.currentPCBox : 0].pokemon[
-                    row * save.boxColumns + rowIndex
-                  ]
+                const mon = save.boxes[save.currentPCBox].pokemon[row * save.boxColumns + rowIndex]
                 return (
                   <Grid
                     key={`pc_row_${row}_slot_${rowIndex}`}
@@ -124,11 +160,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                         setSelectedMon(mon)
                       }}
                       onDragEvent={() => {
-                        dispatchStartDrag({
-                          saveNumber: saveIndex,
-                          box: save.currentPCBox,
-                          index: row * save.boxColumns + rowIndex,
-                        })
+                        dispatchStartDrag(row * save.boxColumns + rowIndex)
                       }}
                       disabled={isDisabled}
                       mon={mon}
@@ -136,16 +168,12 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                       onDrop={(importedMons) => {
                         if (importedMons) {
                           dispatchImportMons(importedMons, {
-                            saveNumber: saveIndex,
+                            save,
                             box: save.currentPCBox,
-                            index: row * save.boxColumns + rowIndex,
+                            boxPos: row * save.boxColumns + rowIndex,
                           })
                         } else {
-                          dispatchCompleteDrag({
-                            saveNumber: saveIndex,
-                            box: save.currentPCBox,
-                            index: row * save.boxColumns + rowIndex,
-                          })
+                          dispatchCompleteDrag(row * save.boxColumns + rowIndex)
                         }
                       }}
                     />

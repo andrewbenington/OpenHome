@@ -21,8 +21,18 @@ const DummyBackend: BackendInterface = {
   loadSaveFile: async () => E.left('no backend in use'),
   writeSaveFile: async () => E.left('no backend in use'),
 
+  /* game save management */
+  getRecentSaves: async () => E.left('no backend in use'),
+  addRecentSave: async () => E.left('no backend in use'),
+  removeRecentSave: async () => E.left('no backend in use'),
+  findSuggestedSaves: async () => E.left('no backend in use'),
+  getSaveFolders: async () => E.left('no backend in use'),
+  removeSaveFolder: async () => E.left('no backend in use'),
+  upsertSaveFolder: async () => E.left('no backend in use'),
+
   /* application */
   setHasChanges: async () => {},
+  pickFolder: async () => E.left('no backend in use'),
 }
 
 export default DummyBackend

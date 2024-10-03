@@ -319,70 +319,19 @@ export const appSlice = createSlice({
       state.lookup.gen345 = newLookupMap
     },
   },
-  extraReducers: (builder) => {
-    builder.addCase(loadHomeMons.fulfilled, (state, action: PayloadAction<Uint8Array[]>) => {
-      const homeMons: { [key: string]: OHPKM } = {}
-      Object.entries(action.payload).forEach(([id, bytes]) => {
-        homeMons[id] = new OHPKM(bytes.buffer)
-      })
-      return {
-        ...state,
-        lookup: { ...state.lookup, homeMons },
-      }
-    })
-    builder.addCase(loadGen12Lookup.fulfilled, (state, action) => {
-      return { ...state, lookup: { ...state.lookup, gen12: action.payload } }
-    })
-    builder.addCase(loadGen345Lookup.fulfilled, (state, action) => {
-      return { ...state, lookup: { ...state.lookup, gen345: action.payload } }
-    })
-    builder.addCase(loadHomeBoxes.fulfilled, (state, action) => {
-      const homeMonMap = state.lookup.homeMons
-      if (homeMonMap) {
-        const newHomeData = new HomeData()
-        Object.values(action.payload).forEach((box) => {
-          newHomeData.boxes[box.index].loadMonsFromIdentifiers(
-            box.monIdentifiersByIndex,
-            homeMonMap
-          )
-        })
-        return { ...state, homeData: newHomeData }
-      }
-      console.error('box loaded before home lookup map')
-      return state
-    })
-  },
 })
 
 export const {
   setMonToRelease,
   clearMonsToRelease,
   importMons,
-  setSaveBox,
-  setHomeBox,
-  startDrag,
-  cancelDrag,
-  completeDrag,
-  addSave,
-  removeSaveAt,
   writeAllSaveFiles,
   setHomeData,
   writeAllHomeData,
   clearAllSaves,
-  setGen12Lookup,
-  updateGen12Lookup,
-  setGen345Lookup,
-  writeGen345Lookup,
 } = appSlice.actions
 
-export const selectOpenSaves = (state: RootState) => state.app.saves
-export const selectHomeData = (state: RootState) => state.app.homeData
-export const selectHomeMons = (state: RootState) => state.app.lookup.homeMons
-export const selectDragSource = (state: RootState) => state.app.dragSource
-export const selectDragMon = (state: RootState) => state.app.dragMon
 export const selectModifiedOHPKMs = (state: RootState) => state.app.modifiedOHPKMs
-export const selectGen12Lookup = (state: RootState) => state.app.lookup.gen12
-export const selectGen345Lookup = (state: RootState) => state.app.lookup.gen345
 export const selectMonsToRelease = (state: RootState) => state.app.monsToRelease
 
 export const selectCount = (state: RootState) => state.app.saves.length

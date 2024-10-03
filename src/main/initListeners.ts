@@ -3,7 +3,7 @@ import * as E from 'fp-ts/Either'
 import fs from 'fs'
 import path from 'path'
 import { ParsedPath, PossibleSaves } from '../types/SAVTypes/path'
-import { StoredBoxData } from '../types/storage'
+import { SaveFolder, StoredBoxData } from '../types/storage'
 import { Errorable, LoadSaveResponse, LookupMap, SaveRef } from '../types/types'
 import { getFileCreatedDate, readBytesFromFile, selectDirectory, selectFile } from './fileHandlers'
 import {
@@ -170,10 +170,10 @@ async function loadSaveFile(
 
 async function writeSaveFile(
   _: IpcMainInvokeEvent,
-  { bytes, path }: { bytes: Uint8Array; path: ParsedPath }
+  { bytes, path }: { bytes: Uint8Array; path: string }
 ): Promise<Errorable<null>> {
   try {
-    fs.writeFileSync(path.raw, bytes)
+    fs.writeFileSync(path, bytes)
     return E.right(null)
   } catch (e) {
     return E.left(`Error saving: ${e}`)
@@ -184,6 +184,36 @@ async function pickFolder(): Promise<Errorable<string | undefined>> {
   try {
     const dirs = await selectDirectory()
     return E.right(dirs.length ? dirs[0] : undefined)
+  } catch (e) {
+    return E.left(`${e}`)
+  }
+}
+
+async function getSaveFolders(): Promise<Errorable<SaveFolder[]>> {
+  try {
+    return E.right(loadSaveFileFolders())
+  } catch (e) {
+    return E.left(`${e}`)
+  }
+}
+
+async function removeSaveFolder(_: IpcMainInvokeEvent, path: string): Promise<Errorable<null>> {
+  try {
+    removeSaveFileFolder(path)
+    return E.right(null)
+  } catch (e) {
+    return E.left(`${e}`)
+  }
+}
+
+async function upsertSaveFolder(
+  _: IpcMainInvokeEvent,
+  folderPath: string,
+  label: string
+): Promise<Errorable<null>> {
+  try {
+    addSaveFileFolder(folderPath, label)
+    return E.right(null)
   } catch (e) {
     return E.left(`${e}`)
   }
@@ -205,29 +235,22 @@ function initListeners() {
   ipcMain.handle('load-save-file', loadSaveFile)
   ipcMain.handle('write-save-file', writeSaveFile)
 
-  ipcMain.handle('load-recent-saves', loadRecentSaves)
+  ipcMain.handle('get-recent-saves', loadRecentSaves)
   ipcMain.handle('add-recent-save', addRecentSave)
   ipcMain.handle('remove-recent-save', removeRecentSave)
-  ipcMain.handle('find-saves', findSaves)
+  ipcMain.handle('find-suggested-saves', findSaves)
 
-  ipcMain.handle('pick-folder', pickFolder)
+  ipcMain.handle('get-save-folders', getSaveFolders)
+  ipcMain.handle('remove-save-folder', removeSaveFolder)
+  ipcMain.handle('upsert-save-folder', upsertSaveFolder)
 
-  ipcMain.handle('read-save-folders', async () => {
-    return loadSaveFileFolders()
-  })
-  ipcMain.handle('remove-save-folder', async (_, path) => {
-    removeSaveFileFolder(path)
-  })
-
-  ipcMain.handle('upsert-save-folder', async (_, folderPath: string, label: string) => {
-    addSaveFileFolder(folderPath, label)
-  })
   ipcMain.handle('get-resources-path', () => {
     return app.isPackaged
       ? path.join(process.resourcesPath, 'resources')
       : path.join(`${app.getAppPath()}resources`)
   })
 
+  ipcMain.handle('pick-folder', pickFolder)
   ipcMain.handle('set-document-edited', (event: IpcMainInvokeEvent, edited: boolean) => {
     const window = BrowserWindow.getAllWindows().find(
       (win) => win.webContents.id === event.sender.id

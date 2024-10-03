@@ -1,11 +1,12 @@
 import { Grid, List, ListItemButton } from '@mui/joy'
-import { useMemo, useState } from 'react'
+import * as E from 'fp-ts/lib/Either'
+import { useCallback, useContext, useMemo, useState } from 'react'
 import 'react-data-grid/lib/styles.css'
 import { ParsedPath } from 'src/types/SAVTypes/path'
 import { buildSaveFile } from '../../types/SAVTypes/util'
-import { useAppDispatch } from '../redux/hooks'
-import { useLookupMaps, useRecentSaves } from '../redux/selectors'
-import { addSave } from '../redux/slices/appSlice'
+import { BackendContext } from '../backend/backendProvider'
+import { LookupContext } from '../state/lookup'
+import { OpenSavesContext } from '../state/openSaves'
 import RecentSaves from './RecentSaves'
 import SaveFolders from './SaveFolders'
 import SuggestedSaves from './SuggestedSaves'
@@ -16,35 +17,41 @@ interface SavesModalProps {
 
 const SavesModal = (props: SavesModalProps) => {
   const { onClose } = props
-  const [, upsertRecentSave] = useRecentSaves()
-  const [homeMonMap, gen12LookupMap, gen345LookupMap] = useLookupMaps()
-  const dispatch = useAppDispatch()
+  const backend = useContext(BackendContext)
+  const [, dispatchOpenSaves] = useContext(OpenSavesContext)
+  const [lookupState] = useContext(LookupContext)
   const [tab, setTab] = useState('recents')
 
-  const openSaveFile = async (filePath?: ParsedPath) => {
-    const { path, fileBytes, createdDate } = await window.electron.ipcRenderer.invoke(
-      'read-save-file',
-      filePath && [filePath]
-    )
-    if (!filePath) {
-      filePath = path
-    }
-    if (filePath && fileBytes && homeMonMap) {
-      const saveFile = buildSaveFile(filePath, fileBytes, {
-        homeMonMap,
-        gen12LookupMap,
-        gen345LookupMap,
-        fileCreatedDate: createdDate,
-      })
-      if (!saveFile) {
-        onClose()
-        return
-      }
-      onClose()
-      upsertRecentSave(saveFile)
-      dispatch(addSave(saveFile))
-    }
-  }
+  const openSaveFile = useCallback(
+    async (filePath?: ParsedPath) => {
+      backend.loadSaveFile(filePath).then(
+        E.match(
+          (err) => console.error(err),
+          ({ path, fileBytes, createdDate }) => {
+            if (!filePath) {
+              filePath = path
+            }
+            if (filePath && fileBytes && lookupState.loaded) {
+              const saveFile = buildSaveFile(filePath, fileBytes, {
+                homeMonMap: lookupState.homeMons,
+                gen12LookupMap: lookupState.gen12,
+                gen345LookupMap: lookupState.gen345,
+                fileCreatedDate: createdDate,
+              })
+              if (!saveFile) {
+                onClose()
+                return
+              }
+              onClose()
+              backend.addRecentSave(saveFile.getSaveRef())
+              dispatchOpenSaves({ type: 'add_save', payload: saveFile })
+            }
+          }
+        )
+      )
+    },
+    [backend, dispatchOpenSaves, lookupState, onClose]
+  )
 
   const gridComponent = useMemo(() => {
     switch (tab) {

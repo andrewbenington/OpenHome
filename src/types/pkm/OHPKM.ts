@@ -65,8 +65,8 @@ import {
 } from './util'
 
 export class OHPKM {
-  static fromBytes(bytes: Uint8Array) {
-    return new OHPKM(bytes)
+  static fromBytes(bytes: ArrayBuffer) {
+    return new OHPKM(new Uint8Array(bytes))
   }
 
   public get fileSize() {
@@ -339,10 +339,13 @@ export class OHPKM {
         this.flag2LA = other.flag2LA
         this.unknownA0 = other.unknownA0
         this.unknownF3 = other.unknownF3
-        this.heightAbsoluteBytes = other.heightAbsoluteBytes
-        this.weightAbsoluteBytes = other.weightAbsoluteBytes
       } else {
         this.gvs = gvsFromIVs(this.ivs)
+      }
+
+      if ('heightAbsoluteBytes' in other) {
+        this.heightAbsoluteBytes = other.heightAbsoluteBytes
+        this.weightAbsoluteBytes = other.weightAbsoluteBytes
       }
 
       if ('weight' in other) {

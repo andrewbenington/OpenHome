@@ -1,9 +1,10 @@
-import { useLookupMaps } from 'src/renderer/redux/selectors'
+import { useContext } from 'react'
 import { getSaveLogo } from 'src/renderer/saves/util'
 import { OHPKM } from 'src/types/pkm/OHPKM'
 import { numericSorter, stringSorter } from 'src/util/Sort'
 import OHDataGrid, { SortableColumn } from '../../components/OHDataGrid'
 import PokemonIcon from '../../components/PokemonIcon'
+import { LookupContext } from '../../state/lookup'
 
 type G345LookupRow = {
   gen345ID: string
@@ -12,7 +13,7 @@ type G345LookupRow = {
 }
 
 export default function Gen345Lookup() {
-  const [homeMons, , gen345LookupMap] = useLookupMaps()
+  const [{ homeMons, gen345 }] = useContext(LookupContext)
 
   function pokemonFromLookupID(id: string) {
     if (!homeMons) return undefined
@@ -71,7 +72,7 @@ export default function Gen345Lookup() {
   ]
   return (
     <OHDataGrid
-      rows={Object.entries(gen345LookupMap ?? {}).map(([gen345ID, homeID]) => ({
+      rows={Object.entries(gen345 ?? {}).map(([gen345ID, homeID]) => ({
         gen345ID,
         homeID,
         homeMon: pokemonFromLookupID(homeID),

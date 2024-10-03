@@ -1,13 +1,14 @@
 import { Card, Chip, Input, Modal, ModalDialog, Stack } from '@mui/joy'
 import { GameOfOrigin } from 'pokemon-resources'
-import { useMemo, useState } from 'react'
+import { useContext, useMemo, useState } from 'react'
 import { MdAdd } from 'react-icons/md'
 import PokemonDetailsPanel from 'src/renderer/pokemon/PokemonDetailsPanel'
-import { useHomeData, useLookupMaps, useOpenSaves } from 'src/renderer/redux/selectors'
 import BoxCell from 'src/renderer/saves/boxes/BoxCell'
 import SavesModal from 'src/renderer/saves/SavesModal'
 import { PKMFile } from 'src/types/pkm/util'
 import { filterUndefined } from 'src/util/Sort'
+import { LookupContext } from '../../state/lookup'
+import { OpenSavesContext } from '../../state/openSaves'
 
 function getSortFunction(
   sortStr: string | undefined
@@ -34,31 +35,29 @@ function getSortFunction(
 }
 
 export default function SortPokemon() {
-  const [homeMons] = useLookupMaps()
-  const homeData = useHomeData()
+  const [{ homeMons }] = useContext(LookupContext)
+  const [{ homeData }, , openSaves] = useContext(OpenSavesContext)
   const [openSaveDialog, setOpenSaveDialog] = useState(false)
   const [selectedMon, setSelectedMon] = useState<PKMFile>()
   const [tab, setTab] = useState('summary')
   const [sort, setSort] = useState('')
-  const saves = useOpenSaves()
 
   const allMonsWithSaves = useMemo(() => {
-    const all: { mon: PKMFile; saveGame: GameOfOrigin }[] = saves
+    const all: { mon: PKMFile; saveGame: GameOfOrigin }[] = openSaves
       .flatMap((save) =>
         save.boxes.flatMap((box) =>
           box.pokemon.flatMap((mon) => (mon ? { mon, saveGame: save.origin } : undefined))
         )
       )
       .concat(
-        Object.values(homeData.boxes.flatMap((box) => box.pokemon) ?? {}).map((mon) =>
+        Object.values(homeData?.boxes.flatMap((box) => box.pokemon) ?? {}).map((mon) =>
           mon ? { mon, saveGame: 0 } : undefined
         )
       )
       .filter(filterUndefined)
-    // .slice(...indexes)
 
     return all
-  }, [saves, homeMons])
+  }, [openSaves, homeData?.boxes])
 
   if (!homeMons) return <div />
   return (
@@ -66,7 +65,7 @@ export default function SortPokemon() {
       <Card sx={{ position: 'sticky', left: 0, top: 0 }}>
         <Stack style={{ width: 120, flex: 0 }}>
           <Chip>OpenHome</Chip>
-          {saves.map((save) => (
+          {openSaves.map((save) => (
             <Chip key={save.tid}>
               {save.name} ({save.tid})
             </Chip>

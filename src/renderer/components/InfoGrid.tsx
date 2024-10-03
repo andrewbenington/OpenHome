@@ -1,6 +1,8 @@
 import { Card, Divider, Grid, Stack } from '@mui/joy'
 import { isDayjs } from 'dayjs'
+import { PKM } from 'pokemon-files'
 import { useMemo } from 'react'
+import { SAV } from '../../types/SAVTypes'
 type Breakpoint = 'xs' | 'sm' | 'md' | 'lg' | 'xl'
 
 const primitiveTypes = ['number', 'bigint', 'boolean', 'string', 'undefined', 'null']
@@ -24,6 +26,10 @@ function onlyPrimitiveValues(obj: object) {
 
 function isArray(obj: object): obj is (object | Primitive)[] {
   return Object.prototype.toString.call(obj) === '[object Array]'
+}
+
+function isPKM(obj: object): obj is PKM {
+  return 'format' in obj
 }
 
 export function InfoGrid(props: InfoGridProps) {
@@ -121,6 +127,14 @@ function InfoGridElement(props: InfoGridElementProps) {
           <Grid {...dataBreakpoints} key={`info-row-value`}>
             Dayjs(
             {value.format('YYYY-MM-DD HH:mm')})
+          </Grid>
+        ) : value instanceof SAV ? (
+          <Grid {...dataBreakpoints} key={`info-row-value`}>
+            SAV({value.name}, {value.tid})
+          </Grid>
+        ) : isPKM(value) ? (
+          <Grid {...dataBreakpoints} key={`info-row-value`}>
+            PKM({value.nickname})
           </Grid>
         ) : isArray(value) ? (
           <Grid xs={12} key={`info-row-value`} marginBottom={1}>
