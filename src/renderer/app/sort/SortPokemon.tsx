@@ -61,12 +61,12 @@ export default function SortPokemon() {
 
   if (!homeMons) return <div />
   return (
-    <Stack direction="row" flexWrap="wrap">
-      <Card sx={{ position: 'sticky', left: 0, top: 0 }}>
+    <Stack direction="row" flexWrap="wrap" padding={1} overflow="hidden" height="calc(100% - 16px)">
+      <Card style={{ height: 'calc(100% - 16px)' }}>
         <Stack style={{ width: 120, flex: 0 }}>
-          <Chip>OpenHome</Chip>
+          <Chip variant="solid">OpenHome</Chip>
           {openSaves.map((save) => (
-            <Chip key={save.tid}>
+            <Chip key={save.tid} variant="solid">
               {save.name} ({save.tid})
             </Chip>
           ))}
@@ -75,11 +75,11 @@ export default function SortPokemon() {
           </Chip>
         </Stack>
       </Card>
-      <Stack style={{ flex: 1 }}>
+      <Stack style={{ flex: 1, height: '100%' }}>
         <Card>
           <Input placeholder="Sort" value={sort} onChange={(e) => setSort(e.target.value)} />
         </Card>
-        <Card>
+        <Card style={{ overflowY: 'auto' }}>
           <Stack direction="row" flexWrap="wrap" justifyContent="center">
             {Object.values(allMonsWithSaves)
               .sort(getSortFunction(sort))

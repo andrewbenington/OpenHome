@@ -6,7 +6,7 @@ import Gen12Lookup from './Gen12Lookup'
 import Gen345Lookup from './Gen345Lookup'
 import OpenHomeMonList from './OpenHomeMonList'
 
-export default function ManagePokemon() {
+export default function TrackedPokemon() {
   const [selectedMon, setSelectedMon] = useState<PKMFile>()
   const [pokemonDisplayTab, setPokemonDisplayTab] = useState('summary')
 

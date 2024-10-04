@@ -12,9 +12,8 @@ import { LookupProvider } from '../state/lookup'
 import { MouseContext, mouseReducer } from '../state/mouse'
 import { OpenSavesContext, openSavesReducer } from '../state/openSaves'
 import './App.css'
-import { FileStructurePage } from './file_structure/FileStructure'
 import Home from './Home'
-import ManagePokemon from './manage/ManagePokemon'
+import TrackedPokemon from './manage/TrackedPokemon'
 import SortPokemon from './sort/SortPokemon'
 import { components, darkTheme, lightTheme } from './Themes'
 
@@ -79,26 +78,23 @@ function App() {
                         <Home />
                       </TabPanel>
                       <TabPanel sx={{ '--Tabs-spacing': 0, height: 0 }} value="manage">
-                        <ManagePokemon />
+                        <TrackedPokemon />
                       </TabPanel>
-                      <TabPanel sx={{ '--Tabs-spacing': 0, height: 0 }} value="sort">
+                      <TabPanel
+                        sx={{ '--Tabs-spacing': 0, height: 0, overflowY: 'hidden' }}
+                        value="sort"
+                      >
                         <SortPokemon />
-                      </TabPanel>
-                      <TabPanel sx={{ '--Tabs-spacing': 0, height: 0 }} value="schemas">
-                        <FileStructurePage />
                       </TabPanel>
                       <TabList color="primary">
                         <Tab indicatorPlacement="top" value="home" color="primary">
                           Home
                         </Tab>
                         <Tab indicatorPlacement="top" value="manage" color="primary">
-                          Manage Pokémon
+                          Tracked Pokémon
                         </Tab>
                         <Tab indicatorPlacement="top" value="sort" color="primary">
                           Sort Pokémon
-                        </Tab>
-                        <Tab indicatorPlacement="top" value="schemas" color="primary">
-                          File Structures
                         </Tab>
                       </TabList>
                     </Tabs>

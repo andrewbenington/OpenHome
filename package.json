@@ -46,7 +46,6 @@
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
     "@mui/joy": "^5.0.0-beta.48",
-    "@reduxjs/toolkit": "^1.9.3",
     "big-integer": "^1.6.51",
     "buffer": "^6.0.3",
     "chart.js": "^4.2.0",
@@ -92,7 +91,6 @@
     "eslint-plugin-react-refresh": "^0.4.12",
     "prettier": "^3.0.2",
     "react-dom": "^18.2.0",
-    "react-redux": "^8.0.5",
     "typescript": "^5.1.6",
     "vite": "^4.5.3"
   }

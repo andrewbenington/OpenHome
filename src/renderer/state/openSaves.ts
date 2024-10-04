@@ -85,6 +85,10 @@ export type OpenSavesAction =
       payload?: undefined
     }
   | {
+      type: 'clear_updated_box_slots'
+      payload?: undefined
+    }
+  | {
       type: 'set_error'
       payload: string | undefined
     }
@@ -255,6 +259,15 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
         state.monsToRelease.push(replacedMon)
       }
       return { ...state }
+    }
+    case 'clear_updated_box_slots': {
+      if (state.homeData) {
+        state.homeData.updatedBoxSlots = []
+      }
+      for (const data of Object.values(state.openSaves)) {
+        data.save.updatedBoxSlots = []
+      }
+      return { ...state, openSaves: { ...state.openSaves } }
     }
     case 'clear_mons_to_release': {
       return { ...state, monsToRelease: [] }

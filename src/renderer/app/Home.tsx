@@ -40,7 +40,7 @@ const Home = () => {
   useEffect(() => {
     const edited =
       (homeData?.updatedBoxSlots.length ?? 0) > 0 ||
-      allOpenSaves.every((save) => save.updatedBoxSlots.length === 0)
+      !allOpenSaves.every((save) => save.updatedBoxSlots.length === 0)
     backend.setHasChanges(edited)
   }, [allOpenSaves, backend, homeData?.updatedBoxSlots])
 
@@ -148,7 +148,9 @@ const Home = () => {
     const results = await Promise.all(promises)
     console.log(results)
 
-    console.log('setting lookup loaded to false')
+    openSavesDispatch({ type: 'clear_updated_box_slots' })
+    openSavesDispatch({ type: 'clear_mons_to_release' })
+
     lookupDispatch({ type: 'clear' })
     await loadAllLookups().then(
       E.match(
@@ -190,7 +192,6 @@ const Home = () => {
 
   useEffect(() => {
     if (lookupState.loaded && !openSavesState.homeData) {
-      console.log('LOADING HOME')
       loadAllHomeData(lookupState.homeMons)
     }
   }, [loadAllHomeData, lookupState.homeMons, lookupState.loaded, openSavesState.homeData])
@@ -208,6 +209,7 @@ const Home = () => {
     backend
       .getResourcesPath()
       .then((path) => appInfoDispatch({ type: 'set_resources_path', payload: path }))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   console.log('Home render')
