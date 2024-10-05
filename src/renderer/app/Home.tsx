@@ -3,13 +3,12 @@ import * as E from 'fp-ts/lib/Either'
 import lodash from 'lodash'
 import { bytesToPKMInterface } from 'pokemon-files'
 import { useCallback, useContext, useEffect, useState } from 'react'
-import { MdBook, MdFileOpen, MdMouse, MdSave } from 'react-icons/md'
+import { MdFileOpen } from 'react-icons/md'
 import { Errorable } from 'src/types/types'
 import { OHPKM } from '../../types/pkm/OHPKM'
 import { PKMFile } from '../../types/pkm/util'
 import { getMonFileIdentifier } from '../../util/Lookup'
 import { BackendContext } from '../backend/backendProvider'
-import { DevDataDisplay } from '../components/DevDataDisplay'
 import FilterPanel from '../components/filter/FilterPanel'
 import PokemonIcon from '../components/PokemonIcon'
 import PokemonDetailsPanel from '../pokemon/PokemonDetailsPanel'
@@ -255,9 +254,6 @@ const Home = () => {
           <HomeBoxDisplay setSelectedMon={setSelectedMon} />
           <Box flex={1}></Box>
         </Box>
-        <DevDataDisplay data={openSavesState} icon={MdSave} />
-        <DevDataDisplay data={lookupState} icon={MdBook} />
-        <DevDataDisplay data={mouseState} icon={MdMouse} />
       </div>
       <Stack spacing={1} className="right-column" width={300}>
         <FilterPanel />
