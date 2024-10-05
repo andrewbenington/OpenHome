@@ -60,17 +60,10 @@ export const get8BitChecksum = (bytes: Uint8Array, start: number, end: number) =
   return checksum
 }
 
-export const get16BitChecksumLittleEndian = (bytes: Uint8Array, start: number, end: number) => {
+export const get16BitChecksumLittleEndian = (bytes: ArrayBuffer, start: number, end: number) => {
   let checksum = 0
-  // console.log(bytes[0x08].toString(16))
   for (let i = start; i < end; i += 2) {
-    // console.log(bytes[i].toString(16), bytes[i + 1].toString(16))
-    checksum = (checksum + bytesToUint16LittleEndian(bytes, i)) & 0xffff
-    // console.log(
-    //   `+ 0x${bytesToUint16LittleEndian(bytes, i).toString(16).padStart(4, '0')} = 0x${checksum
-    //     .toString(16)
-    //     .padStart(4, '0')}`
-    // )
+    checksum = (checksum + bytesToUint16LittleEndian(new Uint8Array(bytes), i)) & 0xffff
   }
   return checksum
 }

@@ -1,4 +1,4 @@
-import { Card } from '@mui/material'
+import { Card } from '@mui/joy'
 
 const AttributeTag = (props: {
   color: string

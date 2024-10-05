@@ -1,7 +1,8 @@
+import { Either } from 'fp-ts/Either'
 import { CSSProperties } from 'react'
+import { ParsedPath } from './SAVTypes/path'
 
 /* eslint-disable no-unused-vars */
-export type StringToStringMap = { [key: string]: string }
 export type KeyValuePairList = { key: string; value: string }[]
 export type Stat = 'HP' | 'Atk' | 'Def' | 'SpA' | 'SpD' | 'Spe' | 'Sp'
 export type Type =
@@ -33,6 +34,7 @@ export type levelUpType =
 
 export enum SaveType {
   UNKNOWN,
+  OPENHOME,
   RGBY_J,
   RBY_I,
   GS_J,
@@ -47,6 +49,7 @@ export enum SaveType {
   HGSS,
   G5,
   G6,
+  G7,
 }
 
 export interface pokedate {
@@ -141,12 +144,14 @@ export const getSaveTypeString = (saveType: SaveType): string => {
 }
 
 export interface SaveRef {
-  filePath: string
+  filePath: ParsedPath
   saveType: SaveType
   game?: string
   trainerName?: string
   trainerID?: string
   lastOpened?: number
+  lastModified?: number
+  valid?: boolean
 }
 export type SaveRefMap = { [key: string]: SaveRef }
 
@@ -239,3 +244,9 @@ export interface SaveCoordinates {
 }
 
 export type Styles = { [key: string]: CSSProperties }
+
+export type Errorable<T> = Either<string, T>
+
+export type LookupMap = Record<string, string>
+
+export type LoadSaveResponse = { path: ParsedPath; fileBytes: Uint8Array; createdDate: Date }

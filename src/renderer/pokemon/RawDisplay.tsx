@@ -1,15 +1,12 @@
+import { FileSchemas } from 'pokemon-files'
 import HexEditor from '../components/HexEditor'
 
 interface RawDisplayProps {
   bytes: Uint8Array
+  format: keyof typeof FileSchemas
 }
 
-const RawDisplay = (props: RawDisplayProps) => {
-  const { bytes } = props
-  return (
-    <div>
-      <HexEditor data={bytes} />
-    </div>
-  )
+const RawDisplay = ({ bytes, format }: RawDisplayProps) => {
+  return <HexEditor data={bytes} format={format} />
 }
 export default RawDisplay

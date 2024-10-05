@@ -1,8 +1,8 @@
-import { Tooltip } from '@mui/material'
+import { Tooltip } from '@mui/joy'
 import { Gen9Ribbons } from '../../consts/Ribbons'
-import { PKM } from '../../types/PKMTypes/PKM'
 import { hasGen3OnData } from '../../types/interfaces/gen3'
 import { hasGen6OnData } from '../../types/interfaces/gen6'
+import { PKMFile } from '../../types/pkm/util'
 import { Styles } from '../../types/types'
 import { getPublicImageURL } from '../images/images'
 import { getRibbonSpritePath } from '../images/ribbons'
@@ -39,10 +39,10 @@ const styles = {
   },
 } as Styles
 
-const RibbonsDisplay = (props: { mon: PKM }) => {
+const RibbonsDisplay = (props: { mon: PKMFile }) => {
   const { mon } = props
 
-  if (!hasGen3OnData(mon) || mon.ribbons.length === 0) {
+  if (!('ribbons' in mon) || !hasGen3OnData(mon) || mon.ribbons.length === 0) {
     return <div style={styles.noRibbonsMessage}>This Pokémon has no ribbons.</div>
   }
 

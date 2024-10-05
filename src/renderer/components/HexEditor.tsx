@@ -1,11 +1,13 @@
-import { Grid } from '@mui/material'
+import { Grid } from '@mui/joy'
 import { Buffer } from 'buffer'
 import hexy from 'hexy'
-import _ from 'lodash'
-import { CSSProperties, Fragment, useEffect, useState } from 'react'
+import lodash from 'lodash'
+import { FileSchemas } from 'pokemon-files'
+import { CSSProperties, Fragment, useEffect, useMemo, useState } from 'react'
 
 interface HexEditorProps {
   data: Uint8Array
+  format: keyof typeof FileSchemas
 }
 
 const styles: { [key: string]: CSSProperties } = {
@@ -22,9 +24,10 @@ const styles: { [key: string]: CSSProperties } = {
   },
 }
 
-const HexEditor = ({ data }: HexEditorProps) => {
+const HexEditor = ({ data, format }: HexEditorProps) => {
   const [hexyText, setHexyText] = useState<string>()
   const [currentHover, setCurrentHover] = useState<number>()
+  const schema = FileSchemas[format]
 
   useEffect(() => {
     if (data) {
@@ -34,6 +37,19 @@ const HexEditor = ({ data }: HexEditorProps) => {
       setHexyText(h)
     }
   }, [data])
+
+  const hoveredField = useMemo(
+    () =>
+      currentHover
+        ? schema.fields.find(
+            (f) =>
+              f.byteOffset !== undefined &&
+              f.byteOffset <= currentHover &&
+              currentHover < f.byteOffset + (f.numBytes ?? 1)
+          )
+        : undefined,
+    [schema, currentHover]
+  )
 
   if (!hexyText) {
     return <div />
@@ -49,7 +65,7 @@ const HexEditor = ({ data }: HexEditorProps) => {
         }
         return (
           <Fragment key={`line_${i}`}>
-            <Grid item xs={1.5} key={`line_${i}_prefix`} style={{}}>
+            <Grid xs={1.5} key={`line_${i}_prefix`} style={{}}>
               <code
                 key={`line_${i}_prefix`}
                 className="disable-select"
@@ -62,32 +78,62 @@ const HexEditor = ({ data }: HexEditorProps) => {
                 {prefix.substring(4, 8)}
               </code>
             </Grid>
-            <Grid item xs={7.5} key={`line_${i}_bytes`} display="flex" flexDirection="row">
+            <Grid xs={7.5} key={`line_${i}_bytes`} display="flex" flexDirection="row">
               {bytePairs.map((pair, j) => {
                 const byteIndex = 16 * i + 2 * j
                 return (
                   <Fragment key={`byte_${byteIndex}`}>
                     <div
                       style={{
-                        backgroundColor: currentHover === byteIndex ? 'white' : '#0000',
+                        backgroundColor:
+                          currentHover === byteIndex ||
+                          (hoveredField?.byteOffset &&
+                            byteIndex >= hoveredField.byteOffset &&
+                            byteIndex < hoveredField.byteOffset + (hoveredField.numBytes ?? 1))
+                            ? 'white'
+                            : '#0000',
                       }}
                       onMouseOver={() => {
                         setCurrentHover(byteIndex)
                       }}
-                      title={`0x${byteIndex.toString(16).padStart(4, '0')}`}
+                      title={`0x${byteIndex
+                        .toString(16)
+                        .padStart(4, '0')}\nBin Value:\n${binaryFromHexString(
+                        pair.substring(0, 2)
+                      )}\n${schema.fields.find(
+                        (f) =>
+                          f.byteOffset !== undefined &&
+                          f.byteOffset <= byteIndex &&
+                          byteIndex < f.byteOffset + (f.numBytes ?? 1)
+                      )?.name}`}
                     >
                       <code>{pair.substring(0, 2)}</code>
                     </div>
                     <div
                       key={`byte_${byteIndex + 1}`}
                       style={{
-                        backgroundColor: currentHover === byteIndex + 1 ? 'white' : '#0000',
+                        backgroundColor:
+                          currentHover === byteIndex + 1 ||
+                          (hoveredField?.byteOffset &&
+                            byteIndex + 1 >= hoveredField.byteOffset &&
+                            byteIndex + 1 < hoveredField.byteOffset + (hoveredField.numBytes ?? 1))
+                            ? 'white'
+                            : '#0000',
                         marginRight: 10,
                       }}
                       onMouseOver={() => {
                         setCurrentHover(byteIndex + 1)
                       }}
-                      title={`0x${(byteIndex + 1).toString(16).padStart(4, '0')}`}
+                      title={`0x${(byteIndex + 1)
+                        .toString(16)
+                        .padStart(4, '0')}\nBin Value:\n${binaryFromHexString(
+                        pair.substring(2)
+                      )}\n${schema.fields.find(
+                        (f) =>
+                          f.byteOffset !== undefined &&
+                          f.byteOffset <= byteIndex + 1 &&
+                          byteIndex + 1 < f.byteOffset + (f.numBytes ?? 1)
+                      )?.name}`}
                     >
                       <code>{pair.substring(2)}</code>
                     </div>
@@ -95,8 +141,8 @@ const HexEditor = ({ data }: HexEditorProps) => {
                 )
               })}
             </Grid>
-            <Grid item xs={3} key={`line_${i}_ascii`} display="flex" flexDirection="row">
-              {_.range(16).map((k) => {
+            <Grid xs={3} key={`line_${i}_ascii`} display="flex" flexDirection="row">
+              {lodash.range(16).map((k) => {
                 const char =
                   ascii.charCodeAt(i) >= 32 && ascii.charCodeAt(i) < 127 ? ascii.charAt(k) : '.'
                 const byteIndex = 16 * i + k
@@ -123,6 +169,10 @@ const HexEditor = ({ data }: HexEditorProps) => {
       })}
     </Grid>
   )
+}
+
+function binaryFromHexString(str: string) {
+  return '0b' + parseInt(str, 16).toString(2).padStart(8, '0')
 }
 
 export default HexEditor

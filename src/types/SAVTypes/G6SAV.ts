@@ -1,3 +1,4 @@
+import { PK6 } from 'pokemon-files'
 import { GameOfOrigin } from 'pokemon-resources'
 import {
   ORAS_TRANSFER_RESTRICTIONS,
@@ -6,9 +7,10 @@ import {
 import { bytesToUint16LittleEndian, uint16ToBytesLittleEndian } from '../../util/ByteLogic'
 import { CRC16_CCITT } from '../../util/Encryption'
 import { utf16BytesToString } from '../../util/Strings/StringConverter'
-import { OHPKM, PK6 } from '../PKMTypes'
+import { OHPKM } from '../pkm/OHPKM'
 import { SaveType } from '../types'
 import { Box, SAV } from './SAV'
+import { ParsedPath } from './path'
 
 const XY_PC_OFFSET = 0x22600
 const XY_PC_CHECKSUM_OFFSET = 0x655c2
@@ -29,7 +31,7 @@ export class G6SAV extends SAV<PK6> {
   pcOffset = XY_PC_OFFSET
   pcChecksumOffset = XY_PC_CHECKSUM_OFFSET
 
-  constructor(path: string, bytes: Uint8Array) {
+  constructor(path: ParsedPath, bytes: Uint8Array) {
     super(path, bytes)
     this.name = utf16BytesToString(this.bytes, this.trainerDataOffset + 72, 0x10)
     this.tid = bytesToUint16LittleEndian(this.bytes, this.trainerDataOffset)
@@ -61,7 +63,7 @@ export class G6SAV extends SAV<PK6> {
           const startByte = this.pcOffset + BOX_SIZE * box + 232 * monIndex
           const endByte = this.pcOffset + BOX_SIZE * box + 232 * (monIndex + 1)
           const monData = bytes.slice(startByte, endByte)
-          const mon = new PK6(monData, true)
+          const mon = new PK6(monData.buffer, true)
           if (mon.gameOfOrigin !== 0 && mon.dexNum !== 0) {
             this.boxes[box].pokemon[monIndex] = mon
           }
@@ -86,19 +88,17 @@ export class G6SAV extends SAV<PK6> {
       // and the slot was left empty
       if (changedMon) {
         try {
-          const mon =
-            changedMon instanceof OHPKM ? new PK6(undefined, undefined, changedMon) : changedMon
+          const mon = changedMon instanceof OHPKM ? new PK6(changedMon) : changedMon
           if (mon?.gameOfOrigin && mon?.dexNum) {
             mon.refreshChecksum()
-            console.log(`setting ${writeIndex.toString(16)}`)
-            this.bytes.set(mon.toPCBytes(), writeIndex)
+            this.bytes.set(new Uint8Array(mon.toPCBytes()), writeIndex)
           }
         } catch (e) {
           console.error(e)
         }
       } else {
-        const mon = new PK6(new Uint8Array(232))
-        this.bytes.set(mon.toPCBytes(), writeIndex)
+        const mon = new PK6(new Uint8Array(232).buffer)
+        this.bytes.set(new Uint8Array(mon.toPCBytes()), writeIndex)
       }
     })
     this.bytes.set(

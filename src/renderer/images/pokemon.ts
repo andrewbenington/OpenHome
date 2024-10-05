@@ -1,7 +1,7 @@
-import { NDex, POKEMON_DATA, SWEETS } from '../../consts'
-import { BasePKMData } from '../../types/PKMTypes'
+import { NationalDex, PokemonData } from 'pokemon-species-data'
+import { SWEETS } from '../../consts'
 import { hasGen8OnData } from '../../types/interfaces/gen8'
-import { StringToStringMap } from '../../types/types'
+import { PKMFile } from '../../types/pkm/util'
 
 const alolaDex = [
   10, 11, 12, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 35, 36, 37, 38, 39, 40, 41, 42, 46, 47, 50,
@@ -27,7 +27,7 @@ const alolaDex = [
   798, 799, 800, 801, 802, 803, 804, 805, 806, 807,
 ]
 
-export const fileToSpriteFolder: StringToStringMap = {
+export const fileToSpriteFolder: Record<string, string> = {
   PK1: 'gen1',
   PK2: 'gen2',
   PK3: 'gen3',
@@ -45,12 +45,12 @@ export const fileToSpriteFolder: StringToStringMap = {
   OHPKM: 'home',
 }
 
-export const getPokemonSpritePath = (mon: BasePKMData, format?: string) => {
+export const getPokemonSpritePath = (mon: PKMFile, format?: string) => {
   const monFormat = format ?? mon.format
-  let spriteName = POKEMON_DATA[mon.dexNum]?.formes[mon.formNum]?.sprite ?? ''
-  if (hasGen8OnData(mon) && mon.dexNum === NDex.ALCREMIE) {
+  let spriteName = PokemonData[mon.dexNum]?.formes[mon.formeNum]?.sprite ?? ''
+  if (hasGen8OnData(mon) && mon.dexNum === NationalDex.Alcremie) {
     spriteName = `${
-      POKEMON_DATA[mon.dexNum]?.formes[mon.formNum]?.formeName?.toLowerCase() ??
+      PokemonData[mon.dexNum]?.formes[mon.formeNum]?.formeName?.toLowerCase() ??
       'alcremie-vanilla-cream'
     }-${SWEETS[mon.formArgument ?? 0].toLocaleLowerCase()}`
   }
@@ -59,6 +59,6 @@ export const getPokemonSpritePath = (mon: BasePKMData, format?: string) => {
     spriteFolder = 'gen6'
   }
   return `sprites/${spriteFolder}${
-    mon.isShiny && spriteFolder !== 'gen1' && spriteFolder !== 'gen9' ? '/shiny/' : '/'
+    mon.isShiny() && spriteFolder !== 'gen1' && spriteFolder !== 'gen9' ? '/shiny/' : '/'
   }${spriteName}.${spriteFolder === 'gen5' || spriteFolder === 'gen3gc' ? 'gif' : 'png'}`
 }

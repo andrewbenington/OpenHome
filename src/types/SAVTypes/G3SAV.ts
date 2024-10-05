@@ -1,6 +1,6 @@
+import { PK3 } from 'pokemon-files'
 import { GameOfOrigin } from 'pokemon-resources'
-import { NDex } from '../../consts'
-import { OHPKM } from '../../types/PKMTypes/OHPKM'
+import { NationalDex } from 'pokemon-species-data'
 import { CapPikachus, RegionalForms } from '../../types/TransferRestrictions'
 import {
   bytesToUint16LittleEndian,
@@ -9,9 +9,10 @@ import {
   uint32ToBytesLittleEndian,
 } from '../../util/ByteLogic'
 import { gen3StringToUTF } from '../../util/Strings/StringConverter'
-import { PK3 } from '../PKMTypes/PK3'
+import { OHPKM } from '../pkm/OHPKM'
 import { SaveType } from '../types'
 import { Box, SAV } from './SAV'
+import { ParsedPath, splitPath } from './path'
 
 export class G3Sector {
   data: Uint8Array
@@ -122,7 +123,7 @@ export class G3SaveBackup {
     }
     for (let i = 0; i < 420; i++) {
       try {
-        const mon = new PK3(this.pcDataContiguous.slice(4 + i * 80, 4 + (i + 1) * 80), true)
+        const mon = new PK3(this.pcDataContiguous.slice(4 + i * 80, 4 + (i + 1) * 80).buffer, true)
         if (mon.gameOfOrigin !== 0 && mon.dexNum !== 0) {
           const box = this.boxes[Math.floor(i / 30)]
           box.pokemon[i % 30] = mon
@@ -155,7 +156,7 @@ export class G3SaveBackup {
 
 export class G3SAV extends SAV<PK3> {
   static TRANSFER_RESTRICTIONS = {
-    maxDexNum: NDex.DEOXYS,
+    maxDexNum: NationalDex.Deoxys,
     excludedForms: { ...RegionalForms, ...CapPikachus },
   }
 
@@ -177,7 +178,7 @@ export class G3SAV extends SAV<PK3> {
 
   primarySaveOffset: number
 
-  constructor(path: string, bytes: Uint8Array) {
+  constructor(path: ParsedPath, bytes: Uint8Array) {
     super(path, bytes)
     const saveOne = new G3SaveBackup(bytes.slice(0, 0xe000))
     const saveTwo = new G3SaveBackup(bytes.slice(0xe000, 0x1c000))
@@ -210,14 +211,14 @@ export class G3SAV extends SAV<PK3> {
         if (
           mon &&
           mon.trainerID === this.tid &&
-          mon.secretID === this.tid &&
+          mon.secretID === this.sid &&
           mon.trainerName === this.name
         ) {
           this.origin = mon.gameOfOrigin
         }
       })
     })
-    const filePathElements = this.filePath.split('/')
+    const filePathElements = splitPath(this.filePath)
     let fileName = filePathElements[filePathElements.length - 1]
     fileName = fileName.replace(/\s+/g, '')
     if (fileName.includes('Ruby')) {
@@ -250,13 +251,13 @@ export class G3SAV extends SAV<PK3> {
       }
       // changedMon will be undefined if pokemon was moved from this slot
       // and the slot was left empty
-      if (changedMon) {
-        const slotMon = this.boxes[box].pokemon[index]
+      const slotMon = this.boxes[box].pokemon[index]
+      if (changedMon && slotMon) {
         try {
-          const mon = slotMon instanceof PK3 ? slotMon : new PK3(undefined, undefined, slotMon)
+          const mon = slotMon instanceof PK3 ? slotMon : new PK3(slotMon)
           if (mon?.gameOfOrigin && mon?.dexNum) {
             mon.refreshChecksum()
-            pcBytes.set(mon.toPCBytes(), 0)
+            pcBytes.set(new Uint8Array(mon.toPCBytes()), 0)
           }
         } catch (e) {
           console.error(e)

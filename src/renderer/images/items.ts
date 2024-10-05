@@ -120,6 +120,20 @@ export const getItemIconPath = (item: Item | ItemGen3 | ItemGen2, format?: strin
   } else {
     itemName = ItemToString(item as Item)
   }
+  if (
+    (item > 1057 && item < 1074) ||
+    (item > 1639 && item < 1651) ||
+    (item > 1651 && item < 1678) ||
+    (item > 1786 && item < 1808) ||
+    (item > 1843 && item < 1857) ||
+    (item > 1946 && item < 2160) ||
+    (item > 2231 && item < 2344) ||
+    (item > 2345 && item < 2401) ||
+    (item > 2416 && item < 2479) ||
+    (item > 2483 && item < 2522)
+  ) {
+    return `items/index/0000.png`
+  }
   if (item > 0) {
     if (itemName.startsWith('HM') || (itemName.startsWith('TM') && itemName.charAt(2) !== 'V')) {
       return 'items/tm/normal.png'

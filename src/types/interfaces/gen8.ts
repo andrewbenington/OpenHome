@@ -1,23 +1,24 @@
+import { PKMFile } from '../pkm/util'
 import { stats } from '../types'
 import { MemoryData } from './gen6'
 import { Gen7OnData } from './gen7'
 
 export interface Gen8OnData extends Gen7OnData, MemoryData {
   handlerID: number
-  handlerLanguageIndex: number
-  handlerLanguage: string
+  handlerLanguage: number
 
   favorite: boolean
 
   statNature: number
   gameOfOriginBattle: number
   affixedRibbon?: number
-  homeTracker: Uint8Array
+  homeTracker: ArrayBuffer
 }
 
-export function hasGen8OnData(obj: any): obj is Gen8OnData {
+export function hasGen8OnData<T extends PKMFile>(obj: T): obj is WithHomeTracker<T> {
   return obj && 'homeTracker' in obj
 }
+export type WithHomeTracker<T> = T extends { homeTracker: ArrayBuffer } ? T : never
 
 export interface Gen8OnlyData extends Gen7OnData {
   canGigantamax: boolean

@@ -1,13 +1,14 @@
-import _, { uniq } from 'lodash'
-import { GameOfOrigin } from 'pokemon-resources'
+import lodash from 'lodash'
+import { PK1 } from 'pokemon-files'
+import { GameOfOrigin, Languages } from 'pokemon-resources'
 import { GEN1_TRANSFER_RESTRICTIONS } from '../../consts/TransferRestrictions'
 import { bytesToUint16BigEndian, get8BitChecksum } from '../../util/ByteLogic'
 import { natDexToGen1ID } from '../../util/ConvertPokemonID'
 import { gen12StringToUTF, utf16StringToGen12 } from '../../util/Strings/StringConverter'
-import { OHPKM } from '../PKMTypes/OHPKM'
-import { PK1 } from '../PKMTypes/PK1'
+import { OHPKM } from '../pkm/OHPKM'
 import { SaveType } from '../types'
 import { Box, SAV } from './SAV'
+import { ParsedPath } from './path'
 
 export class G1SAV extends SAV<PK1> {
   pkmType = PK1
@@ -30,7 +31,7 @@ export class G1SAV extends SAV<PK1> {
 
   BOX_NICKNAME_OFFSET = 0x386
 
-  constructor(path: string, bytes: Uint8Array, fileCreated?: Date) {
+  constructor(path: ParsedPath, bytes: Uint8Array, fileCreated?: Date) {
     super(path, bytes)
     this.fileCreated = fileCreated
     this.tid = bytesToUint16BigEndian(this.bytes, 0x2605)
@@ -63,10 +64,13 @@ export class G1SAV extends SAV<PK1> {
         this.invalid = true
         return
     }
+    if (this.bytes[0x271c] > 0) {
+      this.origin = GameOfOrigin.Yellow
+    }
     this.boxes = new Array(this.NUM_BOXES)
     if (this.saveType > 0 && this.saveType <= 2) {
       const pokemonPerBox = this.boxRows * this.boxColumns
-      _.range(this.NUM_BOXES).forEach((boxNumber) => {
+      lodash.range(this.NUM_BOXES).forEach((boxNumber) => {
         this.boxes[boxNumber] = new Box(`Box ${boxNumber + 1}`, pokemonPerBox)
         let boxByteOffset
         if (boxNumber < 6) {
@@ -76,25 +80,29 @@ export class G1SAV extends SAV<PK1> {
         }
         for (let monIndex = 0; monIndex < pokemonPerBox; monIndex++) {
           if (this.bytes[boxByteOffset + this.BOX_PKM_OFFSET + monIndex * this.BOX_PKM_SIZE]) {
-            const mon = new PK1(
-              this.bytes.slice(
-                boxByteOffset + this.BOX_PKM_OFFSET + monIndex * this.BOX_PKM_SIZE,
-                boxByteOffset + this.BOX_PKM_OFFSET + (monIndex + 1) * this.BOX_PKM_SIZE
+            try {
+              const mon = new PK1(
+                this.bytes.slice(
+                  boxByteOffset + this.BOX_PKM_OFFSET + monIndex * this.BOX_PKM_SIZE,
+                  boxByteOffset + this.BOX_PKM_OFFSET + (monIndex + 1) * this.BOX_PKM_SIZE
+                ).buffer
               )
-            )
-            mon.trainerName = gen12StringToUTF(
-              this.bytes,
-              boxByteOffset + this.BOX_OT_OFFSET + monIndex * 11,
-              11
-            )
-            mon.nickname = gen12StringToUTF(
-              this.bytes,
-              boxByteOffset + this.BOX_NICKNAME_OFFSET + monIndex * 11,
-              11
-            )
-            mon.gameOfOrigin = GameOfOrigin.Red
-            mon.language = 'ENG'
-            this.boxes[boxNumber].pokemon[monIndex] = mon
+              mon.trainerName = gen12StringToUTF(
+                this.bytes,
+                boxByteOffset + this.BOX_OT_OFFSET + monIndex * 11,
+                11
+              )
+              mon.nickname = gen12StringToUTF(
+                this.bytes,
+                boxByteOffset + this.BOX_NICKNAME_OFFSET + monIndex * 11,
+                11
+              )
+              mon.gameOfOrigin = GameOfOrigin.Red
+              mon.languageIndex = Languages.indexOf('ENG')
+              this.boxes[boxNumber].pokemon[monIndex] = mon
+            } catch (e) {
+              console.error(e)
+            }
           }
         }
       })
@@ -103,7 +111,7 @@ export class G1SAV extends SAV<PK1> {
 
   prepareBoxesForSaving() {
     const changedMonPKMs: OHPKM[] = []
-    const changedBoxes: number[] = uniq(this.updatedBoxSlots.map((coords) => coords.box))
+    const changedBoxes: number[] = lodash.uniq(this.updatedBoxSlots.map((coords) => coords.box))
     const pokemonPerBox = this.boxRows * this.boxColumns
     changedBoxes.forEach((boxNumber) => {
       let boxByteOffset: number
@@ -119,12 +127,12 @@ export class G1SAV extends SAV<PK1> {
           if (boxMon instanceof OHPKM) {
             changedMonPKMs.push(boxMon)
           }
-          const pk1Mon = boxMon instanceof PK1 ? boxMon : new PK1(undefined, undefined, boxMon)
+          const pk1Mon = boxMon instanceof PK1 ? boxMon : new PK1(boxMon)
           // set the mon's dex number in the box
           this.bytes[boxByteOffset + 1 + numMons] = natDexToGen1ID[pk1Mon.dexNum]
           // set the mon's data in the box
           this.bytes.set(
-            pk1Mon.bytes,
+            new Uint8Array(pk1Mon.toBytes()),
             boxByteOffset + this.BOX_PKM_OFFSET + numMons * this.BOX_PKM_SIZE
           )
           // set the mon's OT name in the box

@@ -2,16 +2,17 @@ import { electronApp, is, optimizer } from '@electron-toolkit/utils'
 import { BrowserWindow, app, dialog, shell } from 'electron'
 import { join } from 'path'
 import icon from '../../resources/icon.png?asset'
+import { initializeFolders } from './fileHandlers'
 import initListeners from './initListeners'
 import MenuBuilder from './menu'
+import { migrateAll } from './migrateStorage'
 
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 900,
-    height: 670,
+    width: 1200,
+    height: 720,
     show: false,
-    autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
@@ -73,7 +74,9 @@ app.whenReady().then(() => {
   })
 
   createWindow()
+  initializeFolders()
   initListeners()
+  migrateAll()
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the

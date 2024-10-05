@@ -44,12 +44,14 @@ export interface N3DSOnlyData extends MemoryData {
   region: number
   consoleRegion: number
 
-  geolocations: [geolocation, geolocation, geolocation, geolocation, geolocation] | undefined
+  geolocations: [geolocation, geolocation, geolocation, geolocation, geolocation]
 
   trainerAffection: number
 
   fullness: number
   enjoyment: number
+
+  formArgument: number
 }
 
 export function hasN3DSOnlyData(obj: any): obj is N3DSOnlyData {

@@ -1,13 +1,16 @@
-import { Card, Grid } from '@mui/material'
+import { Card, Grid } from '@mui/joy'
+import { getDisplayID } from 'pokemon-files'
+import { AbilityToString, Languages } from 'pokemon-resources'
+import { PokemonData } from 'pokemon-species-data'
 import { useMemo, useState } from 'react'
 import { hasGen5OnlyData } from 'src/types/interfaces/gen5'
 import { hasGen8OnlyData, hasPLAData } from 'src/types/interfaces/gen8'
-import { POKEMON_DATA } from '../../consts'
-import { PKM } from '../../types/PKMTypes/PKM'
-import { getTypes } from '../../types/PKMTypes/util'
+import { getLevelGen12, getLevelGen3Onward } from 'src/util/StatCalc'
 import { hasGen2OnData } from '../../types/interfaces/gen2'
-import { hasGen3OnData, hasOrreData } from '../../types/interfaces/gen3'
+import { hasOrreData } from '../../types/interfaces/gen3'
+import { getTypes, PKMFile } from '../../types/pkm/util'
 import { Styles } from '../../types/types'
+import PokemonIcon from '../components/PokemonIcon'
 import TypeIcon from '../components/TypeIcon'
 import { getPublicImageURL } from '../images/images'
 import { BallsList, getItemIconPath } from '../images/items'
@@ -15,7 +18,6 @@ import { getPokemonSpritePath } from '../images/pokemon'
 import { getTypeColor } from '../util/PokemonSprite'
 import AttributeRow from './AttributeRow'
 import AttributeTag from './AttributeTag'
-import PokemonIcon from '../components/PokemonIcon'
 
 const styles = {
   column: {
@@ -31,7 +33,7 @@ const styles = {
     imageRendering: 'pixelated',
     objectFit: 'contain',
   },
-  attributesList: { textAlign: 'left', width: '30%', marginTop: 10 },
+  attributesList: { textAlign: 'left', marginTop: 10 },
   language: { padding: '5px 10px 5px 10px', marginLeft: 'auto' },
   nicknameRow: {
     display: 'flex',
@@ -42,24 +44,24 @@ const styles = {
   },
 } as Styles
 
-const SummaryDisplay = (props: { mon: PKM }) => {
+const SummaryDisplay = (props: { mon: PKMFile }) => {
   const { mon } = props
   const [imageError, setImageError] = useState(false)
 
   const itemAltText = useMemo(() => {
-    const monData = POKEMON_DATA[mon.dexNum]?.formes[mon.formNum]
+    const monData = PokemonData[mon.dexNum]?.formes[mon.formeNum]
     if (!monData) return 'pokemon sprite'
-    return `${monData.formeName}${mon.isShiny ? '-shiny' : ''} sprite`
+    return `${monData.formeName}${mon.isShiny() ? '-shiny' : ''} sprite`
   }, [mon])
 
   return (
     <Grid container>
-      <Grid item xs={5}>
+      <Grid xs={6}>
         <div style={styles.column}>
           {imageError ? (
             <PokemonIcon
               dexNumber={mon.dexNum}
-              formeNumber={mon.formNum}
+              formeNumber={mon.formeNum}
               style={{ width: '90%', height: 0, paddingBottom: '90%' }}
             />
           ) : (
@@ -73,7 +75,7 @@ const SummaryDisplay = (props: { mon: PKM }) => {
           )}
         </div>
         <div style={styles.nicknameRow}>
-          {hasGen3OnData(mon) ? (
+          {'ball' in mon ? (
             <img
               draggable={false}
               alt="poke ball type"
@@ -84,20 +86,22 @@ const SummaryDisplay = (props: { mon: PKM }) => {
             <div />
           )}
           <p style={{ fontWeight: 'bold' }}>{mon.nickname}</p>
-          <Card style={styles.language}>{mon.language}</Card>
+          {'languageIndex' in mon && (
+            <Card style={styles.language}>{Languages[mon.languageIndex]}</Card>
+          )}
         </div>
         <AttributeRow label="Item" justifyEnd>
-          {mon.heldItem !== 'None' && (
+          {mon.heldItemName !== 'None' && (
             <img
               alt="item icon"
               src={getPublicImageURL(getItemIconPath(mon.heldItemIndex, mon.format))}
               style={{ width: 24, height: 24, marginRight: 5 }}
             />
           )}
-          <div>{mon.heldItem}</div>
+          <div>{mon.heldItemName}</div>
         </AttributeRow>
         <div style={styles.flexRowWrap}>
-          {mon.isShiny && (
+          {mon.isShiny() && (
             <AttributeTag
               icon={getPublicImageURL('icons/Shiny.png')}
               color="white"
@@ -133,10 +137,10 @@ const SummaryDisplay = (props: { mon: PKM }) => {
           )}
         </div>
       </Grid>
-      <Grid item xs={7} style={styles.attributesList}>
+      <Grid xs={6} style={styles.attributesList}>
         <AttributeRow
           label="Name"
-          value={`${POKEMON_DATA[mon.dexNum]?.formes[mon.formNum]?.formeName} ${
+          value={`${PokemonData[mon.dexNum]?.formes[mon.formeNum]?.formeName} ${
             hasGen2OnData(mon) ? ['♂', '♀', ''][mon.gender] : ''
           }`}
         />
@@ -145,20 +149,19 @@ const SummaryDisplay = (props: { mon: PKM }) => {
           {getTypes(mon)?.map((type) => <TypeIcon type={type} key={`${type}_type_icon`} />)}
         </AttributeRow>
         <AttributeRow label="OT" value={`${mon.trainerName} ${mon.trainerGender ? '♀' : '♂'}`} />
-        <AttributeRow
-          label="Trainer ID"
-          value={`${mon.displayID
-            .toString()
-            .padStart(['PK7', 'PK8', 'PA8', 'PK9'].includes(mon.format) ? 6 : 5, '0')}`}
-        />
-        {hasGen3OnData(mon) && (
+        <AttributeRow label="Trainer ID" value={getDisplayID(mon as any)} />
+        {'abilityNum' in mon && (
           <AttributeRow
             label="Ability"
-            value={`${mon.ability} (${mon.abilityNum === 4 ? 'HA' : mon.abilityNum})`}
+            value={`${AbilityToString(mon.abilityIndex)} (${
+              mon.abilityNum === 4 ? 'HA' : mon.abilityNum
+            })`}
           />
         )}
         <AttributeRow label="Level" justifyEnd>
-          {mon.level}
+          {['PK1', 'PK2'].includes(mon.format)
+            ? getLevelGen12(mon.dexNum, mon.exp)
+            : getLevelGen3Onward(mon.dexNum, mon.exp)}
         </AttributeRow>
         <AttributeRow label="EXP" justifyEnd>
           {mon.exp}

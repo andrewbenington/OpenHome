@@ -1,4 +1,4 @@
-import { MenuItem, Select } from '@mui/material'
+import { Option, Select } from '@mui/joy'
 import {
   Chart as ChartJS,
   Filler,
@@ -19,13 +19,12 @@ import {
   LA_TRANSFER_RESTRICTIONS,
   LGPE_TRANSFER_RESTRICTIONS,
 } from '../../consts/TransferRestrictions'
-import { PKM } from '../../types/PKMTypes/PKM'
 import { isRestricted } from '../../types/TransferRestrictions'
 import { hasGen3OnData } from '../../types/interfaces/gen3'
 import { hasLetsGoData } from '../../types/interfaces/gen7'
+import { PKMFile } from '../../types/pkm/util'
 import { Styles } from '../../types/types'
 import SheenStars from '../components/SheenStars'
-
 const styles = {
   container: {
     display: 'flex',
@@ -62,7 +61,7 @@ const getMaxValue = (stat: string, evType?: string): number | undefined => {
   }
 }
 
-const StatsDisplay = (props: { mon: PKM }) => {
+const StatsDisplay = (props: { mon: PKMFile }) => {
   const { mon } = props
   const [display, setDisplay] = useState('Stats')
   const [evType, setEVType] = useState(hasGen3OnData(mon) ? 'Modern' : 'Game Boy')
@@ -71,26 +70,31 @@ const StatsDisplay = (props: { mon: PKM }) => {
     setEVType(hasGen3OnData(mon) ? 'Modern' : 'Game Boy')
   }, [mon])
 
+  const stats = useMemo(() => (mon.format === 'OHPKM' ? mon.stats : mon.getStats()), [mon])
+
   const menuItems = useMemo(() => {
     const createMenuItem = (value: string) => {
       return (
-        <MenuItem key={value} value={value}>
+        <Option key={value} value={value}>
           {value}
-        </MenuItem>
+        </Option>
       )
     }
     const items = [createMenuItem('Stats')]
     if (hasGen3OnData(mon) || hasLetsGoData(mon)) {
       items.push(createMenuItem('IVs'))
     }
-    if (hasGameBoyData(mon) && !isRestricted(GEN2_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum)) {
+    if (
+      hasGameBoyData(mon) &&
+      !isRestricted(GEN2_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum)
+    ) {
       items.push(createMenuItem('DVs'))
     }
     items.push(createMenuItem('EVs'))
-    if (hasLetsGoData(mon) && !isRestricted(LGPE_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum)) {
+    if ('avs' in mon && !isRestricted(LGPE_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum)) {
       items.push(createMenuItem('AVs'))
     }
-    if (hasPLAData(mon) && !isRestricted(LA_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum)) {
+    if ('gvs' in mon && !isRestricted(LA_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum)) {
       items.push(createMenuItem('GVs'))
     }
     if (hasGen3OnData(mon)) {
@@ -103,13 +107,13 @@ const StatsDisplay = (props: { mon: PKM }) => {
   return (
     <div style={styles.container}>
       <div style={styles.selectors}>
-        <Select value={display} onChange={(e) => setDisplay(e.target.value)}>
+        <Select value={display} onChange={(_, val) => val && setDisplay(val)}>
           {menuItems}
         </Select>
-        {display === 'EVs' && mon.format === 'OHPKM' ? (
-          <Select value={evType} onChange={(e) => setEVType(e.target.value)}>
-            <MenuItem value="Modern">Modern</MenuItem>
-            <MenuItem value="Game Boy">Game Boy</MenuItem>
+        {display === 'EVs' && 'evs' in mon && 'evsG12' in mon ? (
+          <Select value={evType} onChange={(_, val) => val && setEVType(val)}>
+            <Option value="Modern">Modern</Option>
+            <Option value="Game Boy">Game Boy</Option>
           </Select>
         ) : (
           <div />
@@ -170,7 +174,7 @@ const StatsDisplay = (props: { mon: PKM }) => {
                   borderRadius: display === 'Contest' ? 12 : 0,
                   backdropPadding: display === 'Contest' ? 4 : 0,
                   callback: (value) => {
-                    if (!hasGen3OnData(mon)) {
+                    if (!('nature' in mon)) {
                       return value
                     }
                     let natureSummary: string
@@ -199,17 +203,10 @@ const StatsDisplay = (props: { mon: PKM }) => {
                 ? ['HP', 'Atk', 'Def', 'Spe', 'Spc']
                 : ['HP', 'Atk', 'Def', 'Spe', 'SpD', 'SpA'],
             datasets: [
-              display === 'Stats' && !('spc' in mon.stats)
+              display === 'Stats' && !('spc' in stats)
                 ? {
                     label: 'Stats',
-                    data: [
-                      mon.stats.hp,
-                      mon.stats.atk,
-                      mon.stats.def,
-                      mon.stats.spe,
-                      mon.stats.spd,
-                      mon.stats.spa,
-                    ],
+                    data: [stats.hp, stats.atk, stats.def, stats.spe, stats.spd, stats.spa],
                     fill: true,
                     backgroundColor: 'rgba(132, 99, 255, 0.2)',
                     borderColor: 'rgb(132, 99, 255)',
@@ -218,7 +215,7 @@ const StatsDisplay = (props: { mon: PKM }) => {
                     pointHoverBackgroundColor: '#fff',
                     pointHoverBorderColor: 'rgb(132, 99, 255)',
                   }
-                : display === 'IVs' && hasGen3OnData(mon)
+                : display === 'IVs' && 'ivs' in mon
                 ? {
                     label: 'IVs',
                     data: [
@@ -249,7 +246,7 @@ const StatsDisplay = (props: { mon: PKM }) => {
                     pointHoverBackgroundColor: '#fff',
                     pointHoverBorderColor: 'rgb(255, 99, 132)',
                   }
-                : display === 'EVs' && evType === 'Modern' && hasGen3OnData(mon)
+                : display === 'EVs' && evType === 'Modern' && 'evs' in mon
                 ? {
                     label: 'EVs',
                     data: [
@@ -326,15 +323,16 @@ const StatsDisplay = (props: { mon: PKM }) => {
                   }
                 : {
                     label: 'Contest',
-                    data: hasGen3OnData(mon)
-                      ? [
-                          mon.contest.cool,
-                          mon.contest.beauty,
-                          mon.contest.cute,
-                          mon.contest.smart,
-                          mon.contest.tough,
-                        ]
-                      : [],
+                    data:
+                      'contest' in mon
+                        ? [
+                            mon.contest.cool,
+                            mon.contest.beauty,
+                            mon.contest.cute,
+                            mon.contest.smart,
+                            mon.contest.tough,
+                          ]
+                        : [],
                     fill: true,
                     backgroundColor: 'rgba(132, 99, 255, 0.2)',
                     borderColor: 'rgb(132, 99, 255)',
@@ -347,7 +345,7 @@ const StatsDisplay = (props: { mon: PKM }) => {
           }}
         />
       </div>
-      {display === 'Contest' && hasGen3OnData(mon) && (
+      {display === 'Contest' && 'contest' in mon && (
         <div style={styles.sheenStars}>
           <SheenStars mon={mon} />
         </div>

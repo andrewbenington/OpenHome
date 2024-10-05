@@ -1,10 +1,12 @@
+import { AllPKMFields } from 'pokemon-files'
 import { GameOfOrigin } from 'pokemon-resources'
-import { OHPKM } from '../../types/PKMTypes/OHPKM'
 import { TransferRestrictions } from '../../types/TransferRestrictions'
 import { SaveRef, SaveType } from '../../types/types'
-import { PKM } from '../PKMTypes/PKM'
+import { OHPKM } from '../pkm/OHPKM'
+import { PKMFile } from '../pkm/util'
+import { ParsedPath } from './path'
 
-export class Box<P extends PKM> {
+export class Box<P extends AllPKMFields> {
   name: string
   pokemon: Array<P | OHPKM | undefined>
 
@@ -19,7 +21,7 @@ export interface BoxCoordinates {
   index: number
 }
 
-export class SAV<P extends PKM> {
+export class SAV<P extends AllPKMFields = PKMFile> {
   saveType: SaveType = SaveType.UNKNOWN
 
   origin: GameOfOrigin = 0
@@ -30,7 +32,7 @@ export class SAV<P extends PKM> {
 
   transferRestrictions: TransferRestrictions = {}
 
-  filePath: string
+  filePath: ParsedPath
 
   fileCreated?: Date
 
@@ -54,6 +56,8 @@ export class SAV<P extends PKM> {
 
   invalid: boolean = false
 
+  tooEarlyToOpen: boolean = false
+
   getSaveRef: () => SaveRef = () => {
     return {
       filePath: this.filePath,
@@ -67,8 +71,15 @@ export class SAV<P extends PKM> {
 
   updatedBoxSlots: BoxCoordinates[] = []
 
-  constructor(path: string, bytes: Uint8Array) {
+  constructor(path: ParsedPath, bytes: Uint8Array) {
     this.filePath = path
     this.bytes = bytes
   }
+
+  getCurrentBox() {
+    return this.boxes[this.currentPCBox]
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  prepareBoxesForSaving() {}
 }

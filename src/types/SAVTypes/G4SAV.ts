@@ -1,9 +1,14 @@
-import { OHPKM } from '../../types/PKMTypes/OHPKM'
-import { bytesToUint16LittleEndian, uint16ToBytesLittleEndian } from '../../util/ByteLogic'
+import { PK4 } from 'pokemon-files'
+import {
+  bytesToUint16LittleEndian,
+  bytesToUint32LittleEndian,
+  uint16ToBytesLittleEndian,
+} from '../../util/ByteLogic'
 import { CRC16_CCITT } from '../../util/Encryption'
 import { gen4StringToUTF } from '../../util/Strings/StringConverter'
-import { PK4 } from '../PKMTypes/PK4'
+import { OHPKM } from '../pkm/OHPKM'
 import { Box, SAV } from './SAV'
+import { ParsedPath } from './path'
 
 export class G4SAV extends SAV<PK4> {
   pkmType = PK4
@@ -20,13 +25,22 @@ export class G4SAV extends SAV<PK4> {
 
   footerSize: number = 0x14
 
-  constructor(path: string, bytes: Uint8Array) {
+  constructor(path: ParsedPath, bytes: Uint8Array) {
     super(path, bytes)
+    if (bytesToUint32LittleEndian(bytes, 0) === 0xffffffff) {
+      this.tooEarlyToOpen = true
+      return
+    }
     this.origin = bytes[0x80]
     this.boxes = Array(18)
   }
 
   buildBoxes() {
+    if (bytesToUint32LittleEndian(this.bytes, this.currentSaveBoxStartOffset) === 0xffffffff) {
+      this.tooEarlyToOpen = true
+      return
+    }
+
     for (let box = 0; box < 18; box++) {
       const boxLabel = gen4StringToUTF(this.bytes, this.boxNamesOffset + 40 * box, 20)
       this.boxes[box] = new Box(boxLabel, 30)
@@ -38,7 +52,7 @@ export class G4SAV extends SAV<PK4> {
           const startByte = this.currentSaveBoxStartOffset + this.boxSize * box + 136 * monIndex
           const endByte = this.currentSaveBoxStartOffset + this.boxSize * box + 136 * (monIndex + 1)
           const monData = this.bytes.slice(startByte, endByte)
-          const mon = new PK4(monData, true)
+          const mon = new PK4(monData.buffer, true)
           if (mon.dexNum !== 0 && mon.gameOfOrigin !== 0) {
             if (
               this.origin === 0 &&
@@ -96,11 +110,10 @@ export class G4SAV extends SAV<PK4> {
       // and the slot was left empty
       if (changedMon) {
         try {
-          const mon =
-            changedMon instanceof OHPKM ? new PK4(undefined, undefined, changedMon) : changedMon
+          const mon = changedMon instanceof OHPKM ? new PK4(changedMon) : changedMon
           if (mon.gameOfOrigin && mon.dexNum) {
             mon.refreshChecksum()
-            this.bytes.set(mon.toPCBytes(), writeIndex)
+            this.bytes.set(new Uint8Array(mon.toPCBytes()), writeIndex)
           }
         } catch (e) {
           console.error(e)
