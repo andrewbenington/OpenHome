@@ -15,6 +15,7 @@ import {
 } from './fileHandlers'
 
 const RECENT_SAVES_FILE = 'recent_saves.json'
+const MAX_SEARCH_DEPTH = 2
 
 export function recentSavesFromFile() {
   const recentSaves = loadStoredObject<SaveRefMap>(RECENT_SAVES_FILE)
@@ -75,16 +76,17 @@ export async function findPossibleSaves() {
   ) {
     possibleSaves.citra.push(
       ...recursivelyFindCitraSaves(
-        path.join(os.homedir(), '.local', 'share', 'citra-emu', 'sdmc', 'Nintendo 3DS')
+        path.join(os.homedir(), '.local', 'share', 'citra-emu', 'sdmc', 'Nintendo 3DS'),
+        0
       ).map((p) => ({ ...path.parse(p), separator: path.sep, raw: p }))
     )
   }
   for (const folder of saveFolders) {
-    possibleSaves.citra.push(...recursivelyFindCitraSaves(folder.path).map(parsedPathFromString))
+    possibleSaves.citra.push(...recursivelyFindCitraSaves(folder.path, 0).map(parsedPathFromString))
     possibleSaves.openEmu.push(
-      ...recursivelyFindMGBASaves(folder.path).map(parsedPathFromString),
-      ...recursivelyFindDeSamuMESaves(folder.path).map(parsedPathFromString),
-      ...recursivelyFindGambatteSaves(folder.path).map(parsedPathFromString)
+      ...recursivelyFindMGBASaves(folder.path, 0).map(parsedPathFromString),
+      ...recursivelyFindDeSamuMESaves(folder.path, 0).map(parsedPathFromString),
+      ...recursivelyFindGambatteSaves(folder.path, 0).map(parsedPathFromString)
     )
   }
   possibleSaves.citra = uniqBy(possibleSaves.citra, (parsedPath) => parsedPath.raw)
@@ -92,7 +94,9 @@ export async function findPossibleSaves() {
   return possibleSaves
 }
 
-export function recursivelyFindCitraSaves(currentPath: string) {
+export function recursivelyFindCitraSaves(currentPath: string, depth: number): string[] {
+  if (depth >= MAX_SEARCH_DEPTH) return []
+
   const files = fs.readdirSync(currentPath)
   if (files.includes('data')) {
     if (fs.existsSync(path.join(currentPath, 'data', '00000001', 'main'))) {
@@ -104,13 +108,15 @@ export function recursivelyFindCitraSaves(currentPath: string) {
   files.forEach((file) => {
     const newPath = path.join(currentPath, file)
     if (fs.lstatSync(newPath).isDirectory()) {
-      foundSaves.push(...recursivelyFindCitraSaves(path.join(currentPath, file)))
+      foundSaves.push(...recursivelyFindCitraSaves(path.join(currentPath, file), depth + 1))
     }
   })
   return foundSaves
 }
 
-export function recursivelyFindOpenEmuSaves(currentPath: string) {
+export function recursivelyFindOpenEmuSaves(currentPath: string, depth: number) {
+  if (depth >= MAX_SEARCH_DEPTH) return []
+
   const files = fs.readdirSync(currentPath)
   if (files.includes('data')) {
     if (fs.existsSync(path.join(currentPath, 'data', '00000001', 'main'))) {
@@ -122,13 +128,15 @@ export function recursivelyFindOpenEmuSaves(currentPath: string) {
   files.forEach((file) => {
     const newPath = path.join(currentPath, file)
     if (fs.lstatSync(newPath).isDirectory()) {
-      foundSaves.push(...recursivelyFindCitraSaves(path.join(currentPath, file)))
+      foundSaves.push(...recursivelyFindOpenEmuSaves(path.join(currentPath, file), depth + 1))
     }
   })
   return foundSaves
 }
 
-export function recursivelyFindDeSamuMESaves(currentPath: string): string[] {
+export function recursivelyFindDeSamuMESaves(currentPath: string, depth: number): string[] {
+  if (depth >= MAX_SEARCH_DEPTH) return []
+
   try {
     const files = fs.readdirSync(currentPath)
     if (files.includes('Battery Saves')) {
@@ -147,7 +155,7 @@ export function recursivelyFindDeSamuMESaves(currentPath: string): string[] {
     files.forEach((file) => {
       const newPath = path.join(currentPath, file)
       if (fs.lstatSync(newPath).isDirectory()) {
-        foundSaves.push(...recursivelyFindDeSamuMESaves(path.join(currentPath, file)))
+        foundSaves.push(...recursivelyFindDeSamuMESaves(path.join(currentPath, file), depth + 1))
       }
     })
     return foundSaves
@@ -156,7 +164,9 @@ export function recursivelyFindDeSamuMESaves(currentPath: string): string[] {
   }
 }
 
-export function recursivelyFindGambatteSaves(currentPath: string) {
+export function recursivelyFindGambatteSaves(currentPath: string, depth: number) {
+  if (depth >= MAX_SEARCH_DEPTH) return []
+
   try {
     const files = fs.readdirSync(currentPath)
     if (files.includes('Battery Saves')) {
@@ -169,7 +179,7 @@ export function recursivelyFindGambatteSaves(currentPath: string) {
     files.forEach((file) => {
       const newPath = path.join(currentPath, file)
       if (fs.lstatSync(newPath).isDirectory()) {
-        foundSaves.push(...recursivelyFindGambatteSaves(path.join(currentPath, file)))
+        foundSaves.push(...recursivelyFindGambatteSaves(path.join(currentPath, file), depth + 1))
       }
     })
     return foundSaves
@@ -178,7 +188,9 @@ export function recursivelyFindGambatteSaves(currentPath: string) {
   }
 }
 
-export function recursivelyFindMGBASaves(currentPath: string) {
+export function recursivelyFindMGBASaves(currentPath: string, depth: number) {
+  if (depth >= MAX_SEARCH_DEPTH) return []
+
   try {
     const files = fs.readdirSync(currentPath)
     if (files.includes('Battery Saves')) {
@@ -191,7 +203,7 @@ export function recursivelyFindMGBASaves(currentPath: string) {
     files.forEach((file) => {
       const newPath = path.join(currentPath, file)
       if (fs.lstatSync(newPath).isDirectory()) {
-        foundSaves.push(...recursivelyFindMGBASaves(path.join(currentPath, file)))
+        foundSaves.push(...recursivelyFindMGBASaves(path.join(currentPath, file), depth + 1))
       }
     })
 

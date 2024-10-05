@@ -1,4 +1,5 @@
-import { Card, Chip, Input, Modal, ModalDialog, Stack } from '@mui/joy'
+import { Autocomplete, Card, Chip, Modal, ModalDialog, Stack } from '@mui/joy'
+import dayjs from 'dayjs'
 import { GameOfOrigin } from 'pokemon-resources'
 import { useContext, useMemo, useState } from 'react'
 import { MdAdd } from 'react-icons/md'
@@ -23,6 +24,18 @@ function getSortFunction(
       return (a, b) => b.mon.getLevel() - a.mon.getLevel()
     case 'species':
       return (a, b) => a.mon.dexNum - b.mon.dexNum
+    case 'met_date':
+      return (a, b) => {
+        const aDate =
+          'metDate' in a.mon && a.mon.metDate
+            ? dayjs(new Date(a.mon.metDate.year, a.mon.metDate.month, a.mon.metDate.day)).unix()
+            : 0
+        const bDate =
+          'metDate' in b.mon && b.mon.metDate
+            ? dayjs(new Date(b.mon.metDate.year, b.mon.metDate.month, b.mon.metDate.day)).unix()
+            : 0
+        return bDate - aDate
+      }
     case 'ribbons':
       return (a, b) => {
         const aCount = 'ribbons' in a.mon ? a.mon.ribbons.length : 0
@@ -77,7 +90,11 @@ export default function SortPokemon() {
       </Card>
       <Stack style={{ flex: 1, height: '100%' }}>
         <Card>
-          <Input placeholder="Sort" value={sort} onChange={(e) => setSort(e.target.value)} />
+          <Autocomplete
+            options={['nickname', 'level', 'species', 'ribbon', 'met_date']}
+            onChange={(_, value) => setSort(value ?? '')}
+            placeholder="Sort"
+          />
         </Card>
         <Card style={{ overflowY: 'auto' }}>
           <Stack direction="row" flexWrap="wrap" justifyContent="center">
