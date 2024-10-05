@@ -535,6 +535,16 @@ export const utf16StringToGen4 = (str: string, length: number, terminate: boolea
   return new Uint8Array(buf)
 }
 
+const gen5Conversion = {
+  0x247e: 0x263a,
+  0x2480: 0x2639,
+  0x247f: 0x263b,
+  0x2482: 0x2197,
+  0x2483: 0x2198,
+  0x2479: 0x266a,
+  0x2474: 0x2609,
+}
+
 /**
  * Convert Gen 5 encoded bytes to string. Equivalent to UTF-16, except
  * terminated with 0xffff character
@@ -549,6 +559,10 @@ export const gen5StringToUTF = (bytes: Uint8Array, offset: number, length: numbe
     const value = bytesToUint16LittleEndian(bytes, offset + 2 * i)
     if (value === 0xffff) {
       return str
+    }
+    if (value in gen5Conversion) {
+      str += String.fromCharCode(gen5Conversion[value])
+      continue
     }
     str += String.fromCharCode(value)
   }

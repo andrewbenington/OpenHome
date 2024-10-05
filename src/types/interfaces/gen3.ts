@@ -1,3 +1,4 @@
+import { PKMFile } from '../pkm/util'
 import { contestStats, marking, stats } from '../types'
 import { Gen2OnData } from './gen2'
 
@@ -33,7 +34,7 @@ export interface SanityChecksum {
   checksum: number
 }
 
-export function hasGen3OnData(obj: any): obj is Gen3OnData {
+export function hasGen3OnData<T extends PKMFile>(obj: T): obj is WithPersonalityValue<T> {
   return obj && 'personalityValue' in obj
 }
 
@@ -49,3 +50,5 @@ export interface Gen3OrreData {
 export function hasOrreData(obj: any): obj is Gen3OrreData {
   return obj && 'shadowID' in obj
 }
+
+export type WithPersonalityValue<T> = T extends { personalityValue: number } ? T : never

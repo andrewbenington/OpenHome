@@ -20,8 +20,7 @@
 }
 
 .save-file-column {
-  padding: 16px 4px 16px 16px;
-  width: 30%;
+  padding: 8px 6px 8px 8px;
   overflow-y: scroll;
   display: flex;
   flex-direction: column;
@@ -33,15 +32,15 @@
 }
 
 .home-box-column {
-  padding: 16px 4px;
-  width: 45%;
+  padding: 8px 6px;
 }
 
 .right-column {
-  padding: 16px 16px 16px 4px;
+  padding: 8px 8px 8px 4px;
   display: flex;
   flex-direction: column;
-  width: 25%;
+  width: 300px;
+  margin-left: auto;
 }
 
 .release-icon-container {

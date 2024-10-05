@@ -17,7 +17,3 @@ export const handleMenuResetAndClose = (onReset: () => void, onClose: () => void
     callback2()
   }
 }
-
-export const handleDeleteOHPKMFiles = (filenames: string[]) => {
-  window.electron.ipcRenderer.send('delete-ohpkm-files', filenames)
-}

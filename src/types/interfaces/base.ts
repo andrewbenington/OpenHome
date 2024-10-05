@@ -2,7 +2,7 @@ import { stats, statsPreSplit } from '../types'
 
 export interface PKMFormData {
   dexNum: number
-  formNum: number
+  formeNum: number
 }
 
 export interface BasePKMData extends PKMFormData {

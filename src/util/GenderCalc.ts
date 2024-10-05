@@ -1,4 +1,4 @@
-import { POKEMON_DATA } from '../consts/Mons'
+import { getGenderRatio } from 'pokemon-species-data'
 
 const gen3To5MaleThreshold: { [key: number]: number } = {
   0: 254,
@@ -14,11 +14,8 @@ export const getGen3To5Gender = (PID: number, dexNum: number) => {
   if (dexNum === 0) {
     return 2
   }
-  const maleRatio =
-    POKEMON_DATA[dexNum].formes[0].genderRatio.M > 0 ||
-    POKEMON_DATA[dexNum].formes[0].genderRatio.F > 0
-      ? POKEMON_DATA[dexNum].formes[0].genderRatio.M
-      : -1
+  const genderRatio = getGenderRatio(dexNum, 0)
+  const maleRatio = genderRatio.male > 0 || genderRatio.female > 0 ? genderRatio.male : -1
   if (maleRatio === -1) {
     return 2
   }

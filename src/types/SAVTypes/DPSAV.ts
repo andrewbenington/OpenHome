@@ -1,15 +1,16 @@
-import { NDex } from '../../consts'
-import { CapPikachus, RegionalForms } from '../TransferRestrictions'
-import { SaveType } from '../types'
+import { NationalDex } from 'pokemon-species-data'
 import { bytesToUint16LittleEndian, bytesToUint32LittleEndian } from '../../util/ByteLogic'
 import { gen4StringToUTF } from '../../util/Strings/StringConverter'
+import { CapPikachus, RegionalForms } from '../TransferRestrictions'
+import { SaveType } from '../types'
 import { G4SAV } from './G4SAV'
+import { ParsedPath } from './path'
 
 export class DPSAV extends G4SAV {
   saveType = SaveType.DP
 
   transferRestrictions = {
-    maxDexNum: NDex.ARCEUS,
+    maxDexNum: NationalDex.Arceus,
     excludedForms: {
       ...RegionalForms,
       ...CapPikachus,
@@ -50,7 +51,7 @@ export class DPSAV extends G4SAV {
 
   boxNamesOffset: number
 
-  constructor(path: string, bytes: Uint8Array) {
+  constructor(path: ParsedPath, bytes: Uint8Array) {
     super(path, bytes)
     // current storage block could be either the first or second one,
     // depending on save count

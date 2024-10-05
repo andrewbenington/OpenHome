@@ -1,12 +1,12 @@
 /* eslint-disable no-nested-ternary */
+import { AllPKMFields } from 'pokemon-files'
 import { getNatureSummary } from 'pokemon-resources'
-import { LevelUpExp, NDex, NationalDexMax, POKEMON_DATA } from '../consts'
-import { BasePKMData } from '../types/interfaces/base'
-import { Gen3OnData } from '../types/interfaces/gen3'
+import { NationalDex, NationalDexMax, PokemonData } from 'pokemon-species-data'
+import { LevelUpExp } from '../consts'
 import { Stat } from '../types/types'
 
-export const getStatGen3Onward = (stat: Stat, mon: Gen3OnData & BasePKMData) => {
-  if (mon.dexNum < 1 || mon.dexNum > NationalDexMax) {
+export const getStatGen3Onward = (stat: Stat, mon: AllPKMFields) => {
+  if (!('ivs' in mon) || mon.dexNum < 1 || mon.dexNum > NationalDexMax) {
     return 0
   }
   const natureSummary = getNatureSummary(mon.nature)
@@ -15,31 +15,35 @@ export const getStatGen3Onward = (stat: Stat, mon: Gen3OnData & BasePKMData) => 
     : natureSummary?.includes(`-${stat}`)
     ? 0.9
     : 1
-  const baseStats = POKEMON_DATA[mon.dexNum]?.formes[mon.formNum]?.baseStats
+  const baseStats = PokemonData[mon.dexNum]?.formes[mon.formeNum]?.baseStats
   if (baseStats) {
     const baseStat = (baseStats as any)[stat.toLowerCase()]
     const iv = (mon.ivs as any)[stat.toLowerCase()]
     const ev = (mon.evs as any)[stat.toLowerCase()]
     return Math.floor(
       natureMultiplier *
-        (Math.floor((mon.level * (2 * baseStat + iv + Math.floor(ev / 4))) / 100) + 5)
+        (Math.floor((mon.getLevel() * (2 * baseStat + iv + Math.floor(ev / 4))) / 100) + 5)
     )
   }
   return 0
 }
 
-export const getHPGen3Onward = (mon: Gen3OnData & BasePKMData) => {
-  if (mon.dexNum < 1 || mon.dexNum > NationalDexMax) {
+export const getHPGen3Onward = (mon: AllPKMFields) => {
+  if (!('ivs' in mon) || mon.dexNum < 1 || mon.dexNum > NationalDexMax) {
     return 0
   }
-  if (mon.dexNum === NDex.SHEDINJA) {
+  if (mon.dexNum === NationalDex.Shedinja) {
     return 1
   }
-  const baseHP = POKEMON_DATA[mon.dexNum]?.formes[mon.formNum]?.baseStats?.hp
+  const baseHP = PokemonData[mon.dexNum]?.formes[mon.formeNum]?.baseStats?.hp
   if (baseHP) {
     const iv = (mon.ivs as any).hp
     const ev = (mon.evs as any).hp
-    return Math.floor((mon.level * (2 * baseHP + iv + Math.floor(ev / 4))) / 100) + mon.level + 10
+    return (
+      Math.floor((mon.getLevel() * (2 * baseHP + iv + Math.floor(ev / 4))) / 100) +
+      mon.getLevel() +
+      10
+    )
   }
   return 0
 }
@@ -48,7 +52,7 @@ export const getLevelGen3Onward = (dexNum: number, exp: number) => {
   if (dexNum < 1 || dexNum > NationalDexMax) {
     return 1
   }
-  const levelUpType = POKEMON_DATA[dexNum].levelUpType
+  const levelUpType = PokemonData[dexNum].levelUpType
   const cutoffList = LevelUpExp[levelUpType]
   return cutoffList.findIndex((minExp) => exp <= minExp) + 1
 }
@@ -57,7 +61,7 @@ export const getLevelGen12 = (dexNum: number, exp: number) => {
   if (dexNum > 251) {
     return 1
   }
-  const levelUpType = POKEMON_DATA[dexNum].levelUpType
+  const levelUpType = PokemonData[dexNum].levelUpType
   for (let level = 100; level > 0; level--) {
     switch (levelUpType) {
       case 'Fast':

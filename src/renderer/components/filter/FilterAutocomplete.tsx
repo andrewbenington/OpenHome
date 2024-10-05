@@ -1,22 +1,23 @@
 import {
   Autocomplete,
+  AutocompleteOption,
   AutocompleteProps,
-  AutocompleteRenderInputParams,
-  TextField,
-} from '@mui/material'
+  ListItemContent,
+  ListItemDecorator,
+} from '@mui/joy'
 import { useContext, useMemo } from 'react'
 import { FilterContext } from 'src/renderer/state/filter'
 import './style.css'
 
 export interface FilterAutocompleteProps<OptionType>
-  extends Omit<AutocompleteProps<OptionType, false, false, false, 'div'>, 'renderInput'> {
-  options: OptionType[]
+  extends Omit<AutocompleteProps<OptionType, false, false, false>, 'renderInput'> {
+  options: readonly OptionType[]
   labelField?: string
   indexField?: string
   filterField: string
   label?: string
   getIconComponent?: (selected: OptionType) => JSX.Element | undefined
-  renderInput?: ((params: AutocompleteRenderInputParams) => React.ReactNode) | undefined
+  renderInput?: ((params: any) => React.ReactNode) | undefined
 }
 
 export default function FilterAutocomplete<OptionType>(props: FilterAutocompleteProps<OptionType>) {
@@ -25,8 +26,8 @@ export default function FilterAutocomplete<OptionType>(props: FilterAutocomplete
     labelField,
     indexField,
     filterField,
-    label,
-    renderInput,
+    // label,
+    // renderInput,
     getIconComponent,
     ...attributes
   } = props
@@ -43,17 +44,16 @@ export default function FilterAutocomplete<OptionType>(props: FilterAutocomplete
     return undefined
   }, [filterField, filterState])
 
-  const currentValue: string | null = useMemo(() => {
-    if (typeof currentOption === 'string') return currentOption
-    if (!currentOption) return null
-    return labelField ? currentOption[labelField] : JSON.stringify(currentOption)
-  }, [currentOption])
+  // const currentValue: string | null = useMemo(() => {
+  //   if (typeof currentOption === 'string') return currentOption
+  //   if (!currentOption) return null
+  //   return labelField ? currentOption[labelField] : JSON.stringify(currentOption)
+  // }, [currentOption])
 
   return (
     <Autocomplete
       selectOnFocus
       clearOnBlur
-      size="small"
       value={currentOption ?? null}
       isOptionEqualToValue={(option, value) => {
         if (typeof option === 'string') {
@@ -61,17 +61,25 @@ export default function FilterAutocomplete<OptionType>(props: FilterAutocomplete
         }
         return option[filterField] === value[filterField]
       }}
+      startDecorator={currentOption && getIconComponent && getIconComponent(currentOption)}
       renderOption={
         props.renderOption ??
         ((props, option) => {
           return (
-            <li {...props} key={indexField ? option[indexField] : option}>
-              {attributes.getOptionLabel
-                ? attributes.getOptionLabel(option)
-                : labelField
-                ? option[labelField]
-                : option}
-            </li>
+            <AutocompleteOption {...props} key={indexField ? option[indexField] : option}>
+              {getIconComponent && (
+                <ListItemDecorator style={{ marginRight: -16 }}>
+                  {getIconComponent(option)}
+                </ListItemDecorator>
+              )}
+              <ListItemContent sx={{ fontSize: 'sm' }}>
+                {attributes.getOptionLabel
+                  ? attributes.getOptionLabel(option)
+                  : labelField
+                  ? option[labelField]
+                  : option}
+              </ListItemContent>
+            </AutocompleteOption>
           )
         })
       }
@@ -89,35 +97,6 @@ export default function FilterAutocomplete<OptionType>(props: FilterAutocomplete
           payload: { [filterField]: indexField ? newValue[indexField] : newValue },
         })
       }}
-      renderInput={
-        renderInput ??
-        ((params) => {
-          if (getIconComponent && currentOption !== undefined) {
-            const icon = getIconComponent(currentOption)
-            params.InputProps.startAdornment = (
-              <div
-                style={{
-                  marginLeft: 4,
-                  marginRight: 0,
-                  display: 'grid',
-                  ...icon?.props.style,
-                }}
-              >
-                {icon}
-              </div>
-            )
-          }
-          return (
-            <TextField
-              value={currentValue}
-              color="secondary"
-              {...params}
-              label={label}
-              sx={{ '& input': { transition: 'border-color 0.25s' }, color: 'green' }}
-            />
-          )
-        })
-      }
       {...attributes}
     />
   )

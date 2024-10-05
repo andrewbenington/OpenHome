@@ -1,3 +1,4 @@
+import { PKMFile } from '../pkm/util'
 import { contestStats, stats, statsPreSplit } from '../types'
 
 export interface GameBoyStats {
@@ -5,9 +6,10 @@ export interface GameBoyStats {
   dvs: statsPreSplit
 }
 
-export function hasGameBoyData(obj: any): obj is GameBoyStats {
+export function hasGameBoyData<T extends PKMFile>(obj: T): obj is WithG12EVs<T> {
   return obj && 'evsG12' in obj
 }
+export type WithG12EVs<T> = T extends { evsG12: statsPreSplit } ? T : never
 
 export interface Gen1Stats extends GameBoyStats {
   stats: statsPreSplit

@@ -1,131 +1,248 @@
 import { BrowserWindow, IpcMainInvokeEvent, app, ipcMain } from 'electron'
+import * as E from 'fp-ts/Either'
 import fs from 'fs'
 import path from 'path'
-import { StringToStringMap } from '../types/types'
+import { ParsedPath, PossibleSaves } from '../types/SAVTypes/path'
+import { SaveFolder, StoredBoxData } from '../types/storage'
+import { Errorable, LoadSaveResponse, LookupMap, SaveRef } from '../types/types'
+import { getFileCreatedDate, readBytesFromFile, selectDirectory, selectFile } from './fileHandlers'
 import {
-  getFileCreatedDate,
-  initializeFolders,
-  readBytesFromFile,
-  selectFile,
-} from './fileHandlers'
-import {
-  addRecentSave,
+  loadBoxData,
   loadGen12Lookup,
   loadGen345Lookup,
   loadOHPKMs,
-  loadRecentSaves,
   registerGen12Lookup,
   registerGen345Lookup,
-  removeRecentSave,
+  writeBoxData,
 } from './loadData'
+import {
+  addRecentSaveToFile,
+  addSaveFileFolder,
+  findPossibleSaves,
+  loadSaveFileFolders,
+  recentSavesFromFile,
+  removeRecentSaveFromFile,
+  removeSaveFileFolder,
+} from './saves'
 import writePKMToFile, { deleteOHPKMFile } from './writePKMToFile'
 
-function initListeners() {
-  ipcMain.on('write-ohpkm', async (_, bytes: Uint8Array) => {
+async function writeHomeMon(_: IpcMainInvokeEvent, bytes: Uint8Array): Promise<Errorable<null>> {
+  try {
     writePKMToFile(bytes)
-  })
+    return E.right(null)
+  } catch (e) {
+    return E.left(`${e}`)
+  }
+}
 
-  ipcMain.on('delete-ohpkm-files', async (_, fileNames: string[]) => {
-    fileNames.forEach((fn) => deleteOHPKMFile(fn))
-  })
+async function deleteOHPKMFiles(
+  _: IpcMainInvokeEvent,
+  identifiers: string[]
+): Promise<Errorable<null>> {
+  try {
+    identifiers.forEach((fn) => deleteOHPKMFile(fn))
+    return E.right(null)
+  } catch (e) {
+    return E.left(`${e}`)
+  }
+}
 
-  ipcMain.handle('read-gen12-lookup', async () => {
-    let lookupMap
-    try {
-      lookupMap = loadGen12Lookup()
-    } catch (e) {
-      console.error('no gen12 lookup file')
-    }
-    return lookupMap
-  })
+async function readGen12Lookup() {
+  try {
+    return E.right(loadGen12Lookup())
+  } catch (e) {
+    return E.left(`${e}`)
+  }
+}
 
-  ipcMain.on('write-gen12-lookup', async (_, lookupMap) => {
+async function writeGen12Lookup(
+  _: IpcMainInvokeEvent,
+  lookupMap: LookupMap
+): Promise<Errorable<null>> {
+  try {
     registerGen12Lookup(lookupMap)
-  })
+    return E.right(null)
+  } catch (e) {
+    return E.left(`${e}`)
+  }
+}
 
-  ipcMain.handle('read-gen345-lookup', async () => {
-    let lookupMap
-    try {
-      lookupMap = loadGen345Lookup()
-    } catch (e) {
-      console.error('no gen345 lookup file')
-    }
-    return lookupMap
-  })
+async function readGen345Lookup() {
+  try {
+    return E.right(loadGen345Lookup())
+  } catch (e) {
+    return E.left(`${e}`)
+  }
+}
 
-  ipcMain.on('write-gen345-lookup', async (_, lookupMap) => {
+async function writeGen345Lookup(
+  _: IpcMainInvokeEvent,
+  lookupMap: LookupMap
+): Promise<Errorable<null>> {
+  try {
     registerGen345Lookup(lookupMap)
-  })
+    return E.right(null)
+  } catch (e) {
+    return E.left(`${e}`)
+  }
+}
 
-  ipcMain.handle('read-recent-saves', async () => {
-    let recentSaves
-    try {
-      recentSaves = loadRecentSaves()
-    } catch (e) {
-      console.error('no save refs file')
+async function loadRecentSaves(): Promise<Errorable<Record<string, SaveRef>>> {
+  try {
+    return E.right(recentSavesFromFile())
+  } catch (e) {
+    return E.left(`${e}`)
+  }
+}
+
+async function addRecentSave(_: IpcMainInvokeEvent, saveRef: SaveRef): Promise<Errorable<null>> {
+  try {
+    addRecentSaveToFile(saveRef)
+    return E.right(null)
+  } catch (e) {
+    return E.left(`${e}`)
+  }
+}
+
+async function removeRecentSave(_: IpcMainInvokeEvent, filePath: string): Promise<Errorable<null>> {
+  try {
+    removeRecentSaveFromFile(filePath)
+    return E.right(null)
+  } catch (e) {
+    return E.left(`${e}`)
+  }
+}
+
+async function findSaves(): Promise<Errorable<PossibleSaves>> {
+  try {
+    return E.right(await findPossibleSaves())
+  } catch (e) {
+    return E.left(`${e}`)
+  }
+}
+
+async function loadHomeMons(): Promise<Errorable<Record<string, Uint8Array>>> {
+  try {
+    return E.right(loadOHPKMs())
+  } catch (e) {
+    return E.left(`${e}`)
+  }
+}
+
+async function loadHomeBoxes(): Promise<Errorable<StoredBoxData[]>> {
+  try {
+    return E.right(loadBoxData())
+  } catch (e) {
+    return E.left(`${e}`)
+  }
+}
+
+async function writeHomeBoxes(
+  _: IpcMainInvokeEvent,
+  boxData: StoredBoxData[]
+): Promise<Errorable<null>> {
+  try {
+    writeBoxData(boxData)
+    return E.right(null)
+  } catch (e) {
+    return E.left(`Error saving: ${e}`)
+  }
+}
+
+async function loadSaveFile(
+  _: IpcMainInvokeEvent,
+  filePath?: ParsedPath
+): Promise<Errorable<LoadSaveResponse>> {
+  try {
+    const rawPath = filePath?.raw ?? (await selectFile())[0]
+    const fileBytes = readBytesFromFile(rawPath)
+    const createdDate = getFileCreatedDate(rawPath)
+    const response: LoadSaveResponse = {
+      path: { ...path.parse(rawPath), separator: path.sep, raw: rawPath },
+      fileBytes,
+      createdDate,
     }
-    return recentSaves
-  })
+    return E.right(response)
+  } catch (e) {
+    return E.left(`${e}`)
+  }
+}
 
-  ipcMain.on('add-recent-save', async (_, saveRef) => {
-    addRecentSave(saveRef)
-  })
-
-  ipcMain.handle('remove-recent-save', async (_, saveRef) => {
-    removeRecentSave(saveRef)
-  })
-
-  ipcMain.handle('read-home-mons', async () => {
-    const appDataPath = app.getPath('appData')
-    initializeFolders(appDataPath)
-    return loadOHPKMs()
-  })
-
-  ipcMain.handle('read-home-boxes', async (_, boxName) => {
-    const appDataPath = app.getPath('appData')
-    const boxString = fs.readFileSync(
-      path.join(appDataPath, 'OpenHome', 'storage', 'boxes', `${boxName}.csv`),
-      {
-        encoding: 'utf8',
-      }
-    )
-    const boxesMap: StringToStringMap = {}
-    boxesMap[`${boxName}`] = boxString
-    return boxesMap
-  })
-
-  ipcMain.on('write-home-box', async (_, { boxName, boxString }) => {
-    try {
-      const appDataPath = app.getPath('appData')
-      fs.writeFileSync(
-        path.join(appDataPath, 'OpenHome', 'storage', 'boxes', `${boxName}.csv`),
-        boxString
-      )
-    } catch (e) {
-      console.error('save home error', e)
-    }
-  })
-
-  ipcMain.handle('read-save-file', async (_, filePath) => {
-    let filePaths = filePath
-    if (!filePaths) {
-      filePaths = await selectFile()
-    }
-    if (filePaths) {
-      const fileBytes = readBytesFromFile(filePaths[0])
-      const createdDate = getFileCreatedDate(filePaths[0])
-      return {
-        path: filePaths[0],
-        fileBytes,
-        createdDate,
-      }
-    }
-    return {}
-  })
-
-  ipcMain.handle('write-save-file', async (_, { bytes, path }) => {
+async function writeSaveFile(
+  _: IpcMainInvokeEvent,
+  { bytes, path }: { bytes: Uint8Array; path: string }
+): Promise<Errorable<null>> {
+  try {
     fs.writeFileSync(path, bytes)
-  })
+    return E.right(null)
+  } catch (e) {
+    return E.left(`Error saving: ${e}`)
+  }
+}
+
+async function pickFolder(): Promise<Errorable<string | undefined>> {
+  try {
+    const dirs = await selectDirectory()
+    return E.right(dirs.length ? dirs[0] : undefined)
+  } catch (e) {
+    return E.left(`${e}`)
+  }
+}
+
+async function getSaveFolders(): Promise<Errorable<SaveFolder[]>> {
+  try {
+    return E.right(loadSaveFileFolders())
+  } catch (e) {
+    return E.left(`${e}`)
+  }
+}
+
+async function removeSaveFolder(_: IpcMainInvokeEvent, path: string): Promise<Errorable<null>> {
+  try {
+    removeSaveFileFolder(path)
+    return E.right(null)
+  } catch (e) {
+    return E.left(`${e}`)
+  }
+}
+
+async function upsertSaveFolder(
+  _: IpcMainInvokeEvent,
+  folderPath: string,
+  label: string
+): Promise<Errorable<null>> {
+  try {
+    addSaveFileFolder(folderPath, label)
+    return E.right(null)
+  } catch (e) {
+    return E.left(`${e}`)
+  }
+}
+
+function initListeners() {
+  ipcMain.handle('load-gen12-lookup', readGen12Lookup)
+  ipcMain.handle('load-gen345-lookup', readGen345Lookup)
+  ipcMain.handle('write-gen12-lookup', writeGen12Lookup)
+  ipcMain.handle('write-gen345-lookup', writeGen345Lookup)
+
+  ipcMain.handle('load-home-mons', loadHomeMons)
+  ipcMain.handle('write-home-mon', writeHomeMon)
+  ipcMain.handle('delete-home-mons', deleteOHPKMFiles)
+
+  ipcMain.handle('load-home-boxes', loadHomeBoxes)
+  ipcMain.handle('write-home-boxes', writeHomeBoxes)
+
+  ipcMain.handle('load-save-file', loadSaveFile)
+  ipcMain.handle('write-save-file', writeSaveFile)
+
+  ipcMain.handle('get-recent-saves', loadRecentSaves)
+  ipcMain.handle('add-recent-save', addRecentSave)
+  ipcMain.handle('remove-recent-save', removeRecentSave)
+  ipcMain.handle('find-suggested-saves', findSaves)
+
+  ipcMain.handle('get-save-folders', getSaveFolders)
+  ipcMain.handle('remove-save-folder', removeSaveFolder)
+  ipcMain.handle('upsert-save-folder', upsertSaveFolder)
 
   ipcMain.handle('get-resources-path', () => {
     return app.isPackaged
@@ -133,6 +250,7 @@ function initListeners() {
       : path.join(`${app.getAppPath()}resources`)
   })
 
+  ipcMain.handle('pick-folder', pickFolder)
   ipcMain.handle('set-document-edited', (event: IpcMainInvokeEvent, edited: boolean) => {
     const window = BrowserWindow.getAllWindows().find(
       (win) => win.webContents.id === event.sender.id

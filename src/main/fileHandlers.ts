@@ -1,35 +1,12 @@
-import { dialog } from 'electron'
+import { app, dialog } from 'electron'
 import fs from 'fs'
-import _ from 'lodash'
+import path from 'path'
+import { getStoragePath } from './loadData'
 
-export function initializeFolders(appDataPath: string) {
-  if (!fs.existsSync(`${appDataPath}/OpenHome/storage/boxes`)) {
-    fs.mkdirSync(`${appDataPath}/OpenHome/storage/boxes`, { recursive: true })
-  }
-  _.range(36).forEach((boxNum) => {
-    if (
-      !fs.existsSync(`${appDataPath}/OpenHome/storage/boxes/Box ${(boxNum + 1).toString()}.csv`)
-    ) {
-      fs.writeFileSync(
-        `${appDataPath}/OpenHome/storage/boxes/Box ${(boxNum + 1).toString()}.csv`,
-        ''
-      )
-    }
-  })
+export function initializeFolders() {
+  const appDataPath = app.getPath('appData')
   if (!fs.existsSync(`${appDataPath}/OpenHome/storage/mons`)) {
     fs.mkdirSync(`${appDataPath}/OpenHome/storage/mons`, { recursive: true })
-  }
-  if (!fs.existsSync(`${appDataPath}/OpenHome/storage/lookup`)) {
-    fs.mkdirSync(`${appDataPath}/OpenHome/storage/lookup`, { recursive: true })
-  }
-  if (!fs.existsSync(`${appDataPath}/OpenHome/storage/lookup/gen12Lookup.csv`)) {
-    fs.writeFileSync(`${appDataPath}/OpenHome/storage/lookup/gen12Lookup.csv`, '')
-  }
-  if (!fs.existsSync(`${appDataPath}/OpenHome/storage/lookup/gen345Lookup.csv`)) {
-    fs.writeFileSync(`${appDataPath}/OpenHome/storage/lookup/gen345Lookup.csv`, '')
-  }
-  if (!fs.existsSync(`${appDataPath}/OpenHome/storage/saveFiles.csv`)) {
-    fs.writeFileSync(`${appDataPath}/OpenHome/storage/saveFiles.csv`, '')
   }
   fs.opendir('../', (err, dir) => {
     if (err) console.error('Error:', err)
@@ -38,6 +15,20 @@ export function initializeFolders(appDataPath: string) {
       dir.closeSync()
     }
   })
+}
+
+export function fileCanOpen(filePath: string): boolean {
+  try {
+    fs.accessSync(filePath, fs.constants.F_OK)
+    return true
+  } catch (err) {
+    console.log(`Can't open ${filePath}: ${err}`)
+    return false
+  }
+}
+
+export function fileLastModified(filePath: string): number | undefined {
+  return fs.statSync(filePath, { throwIfNoEntry: false })?.mtimeMs
 }
 
 export async function selectFile() {
@@ -56,6 +47,14 @@ export async function selectFiles() {
   return result.filePaths
 }
 
+export async function selectDirectory() {
+  // Open file picker
+  const result = await dialog.showOpenDialog({
+    properties: ['openDirectory'],
+  })
+  return result.filePaths
+}
+
 export function getFileCreatedDate(path: string) {
   const { birthtime } = fs.statSync(path)
   return birthtime
@@ -63,25 +62,41 @@ export function getFileCreatedDate(path: string) {
 
 export function readBytesFromFile(path: string) {
   const fileBytes = fs.readFileSync(path)
-  if (fileBytes) {
-    return new Uint8Array(fileBytes)
+  return new Uint8Array(fileBytes)
+}
+
+// export function findSaveFilesInDataFolder(path: string) {
+//   const files = fs.readdirSync(
+//     path.join(os.homedir(), '.local', 'share', 'citra-emu', 'sdmc', 'Nintendo 3DS')
+//   )
+// }
+
+export function loadStoredObject<T>(filename: string): T {
+  const fullPath = path.join(getStoragePath(), filename)
+  if (!fs.existsSync(fullPath)) {
+    fs.writeFileSync(fullPath, '{}')
+    return {} as T
   }
-  return undefined
+  const fileString = fs.readFileSync(path.join(getStoragePath(), filename)).toString()
+  return JSON.parse(fileString) as T
 }
 
-export function readStringFromFile(path: string) {
-  try {
-    return fs.readFileSync(path, { encoding: 'utf8' })
-  } catch (e) {
-    console.error(`error reading ${path}: ${e}`)
+export function updateStoredObject<T>(filename: string, val: T) {
+  const fullPath = path.join(getStoragePath(), filename)
+  fs.writeFileSync(fullPath, JSON.stringify(val, undefined, 2))
+}
+
+export function loadStoredList<T>(filename: string): T[] {
+  const fullPath = path.join(getStoragePath(), filename)
+  if (!fs.existsSync(fullPath)) {
+    fs.writeFileSync(fullPath, '[]')
+    return []
   }
-  return ''
+  const fileString = fs.readFileSync(path.join(getStoragePath(), filename)).toString()
+  return JSON.parse(fileString) as T[]
 }
 
-export function writeStringToFile(path: string, content: string) {
-  return fs.writeFileSync(path, content)
-}
-
-export function writeBytesToPath(path: string, bytes: Uint8Array) {
-  fs.writeFileSync(path, bytes)
+export function updateStoredList<T>(filename: string, val: T[]) {
+  const fullPath = path.join(getStoragePath(), filename)
+  fs.writeFileSync(fullPath, JSON.stringify(val, undefined, 2))
 }

@@ -16,7 +16,7 @@
     "type": "git",
     "url": "git+https://github.com/andrewbenington/OpenHome.git"
   },
-  "license": "MIT",
+  "license": "GPL-3.0-only",
   "author": {
     "name": "Andrew Benington",
     "email": "andrewbenington57@gmail.com"
@@ -37,28 +37,39 @@
     "build:linux": "electron-vite build && electron-builder --linux --config",
     "build:no-mac": "electron-vite build && electron-builder --linux  --win --config",
     "build:all": "electron-vite build && electron-builder --linux --mac --win --config",
-    "release": "electron-builder -wl"
+    "release": "electron-builder -wl",
+    "compare": "ts-node src/types/pkm_old/__test__/all.test.ts"
   },
   "dependencies": {
     "@electron-toolkit/preload": "^2.0.0",
     "@electron-toolkit/utils": "^2.0.0",
-    "@emotion/react": "^11.10.5",
-    "@emotion/styled": "^11.10.5",
-    "@mui/icons-material": "^5.11.0",
-    "@mui/material": "^5.11.8",
-    "@reduxjs/toolkit": "^1.9.3",
+    "@emotion/react": "^11.13.3",
+    "@emotion/styled": "^11.13.0",
+    "@mui/joy": "^5.0.0-beta.48",
     "big-integer": "^1.6.51",
     "buffer": "^6.0.3",
     "chart.js": "^4.2.0",
+    "dayjs": "^1.11.12",
     "electron-updater": "^6.3.0",
+    "fp-ts": "^2.16.9",
     "hex-editor-react": "^0.1.0",
     "hexy": "^0.3.5",
     "js-hex-editor": "^0.1.0",
     "lodash": "^4.17.21",
-    "pokemon-resources": "^1.0.6",
+    "pokemon-files": "^0.3.1",
+    "pokemon-resources": "^1.0.10",
+    "pokemon-species-data": "^0.4.2",
     "prando": "^6.0.1",
+    "react": "^18.2.0",
     "react-chartjs-2": "^5.2.0",
+    "react-data-grid": "^7.0.0-beta.44",
+    "react-error-boundary": "^4.0.12",
+    "react-icons": "^5.3.0",
+    "react-json-tree": "^0.18.0",
     "use-file-picker": "^1.5.2"
+  },
+  "resolutions": {
+    "@mui/material": "npm:@mui/joy@latest"
   },
   "devDependencies": {
     "@electron-toolkit/eslint-config-prettier": "^1.0.1",
@@ -70,15 +81,16 @@
     "@types/react": "^18.2.20",
     "@types/react-dom": "^18.2.7",
     "@vitejs/plugin-react": "^4.0.4",
-    "electron": "^25.6.0",
+    "electron": "^31.1.0",
     "electron-builder": "^24.13.3",
     "electron-vite": "^1.0.27",
     "eslint": "^8.47.0",
+    "eslint-plugin-prettier": "^5.2.1",
     "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.2",
+    "eslint-plugin-react-refresh": "^0.4.12",
     "prettier": "^3.0.2",
-    "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-redux": "^8.0.5",
     "typescript": "^5.1.6",
     "vite": "^4.5.5"
   }
