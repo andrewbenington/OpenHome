@@ -18,15 +18,15 @@ OpenHome is an open source tool for moving Pokémon between games losslessly, mu
 
 ## Downloading and Installing
 
-On Linux, download OpenHome-x.x.x.AppImage from the [latest release](https://github.com/andrewbenington/OpenHome/releases). This should work out of the box for most Linux distributions.
+On **Linux**, you can either download the rpm, deb, or AppImage file from the [latest release](https://github.com/andrewbenington/OpenHome/releases) depending on your architecture and distribution.
 
-On Windows and macOS, you can also download an installer from that location, but the app will not be signed. Your operating system will give you warnings about running or even downloading the app. If you (understandably) have concerns about that, jump to the [Building App Locally](#building-app-locally) section.
+On **Windows** and **macOS**, you can also download an installer from that location, but the app will not be signed. Your operating system will give you warnings about running or even downloading the app. If you (understandably) have concerns about that, jump to the [Building App Locally](#building-app-locally) section.
 
-On macOS visit the [latest release](https://github.com/andrewbenington/OpenHome/releases), and download and open OpenHome-x.x.x-macos-x64.dmg (for Intel Macs) or OpenHome-x.x.x-macos-arm64.dmg (for Apple Silicon Macs). If you don't know whether you have an Intel Mac or an Apple Silicon Mac, go to  > About This Mac and check whether your Chip is Apple or Intel.
+On **macOS** visit the [latest release](https://github.com/andrewbenington/OpenHome/releases), and download and open OpenHome-x.x.x-macos-x64.dmg (for Intel Macs) or OpenHome-x.x.x-macos-arm64.dmg (for Apple Silicon Macs). If you don't know whether you have an Intel Mac or an Apple Silicon Mac, go to  > About This Mac and check whether your Chip is Apple or Intel.
 
 Follow the instructions to move the application to your Applications folder if you'd like. If you run the app by double clicking, it will give you a security error. To bypass this, ctrl + click the app, select "Open", and the click "Open" again.
 
-On Windows visit the [latest release](https://github.com/andrewbenington/OpenHome/releases) and download and open OpenHome-Setup-x.x.x.exe. If you're using Edge, go to the Privacy settings and turn off Windows Defender SmartScreen. Once the file is downloaded, make sure to turn it back on.
+On **Windows** visit the [latest release](https://github.com/andrewbenington/OpenHome/releases) and download and open OpenHome-Setup-x.x.x.exe. If you're using Edge, go to the Privacy settings and turn off Windows Defender SmartScreen. Once the file is downloaded, make sure to turn it back on.
 
 ## Building App Locally
 
@@ -46,7 +46,14 @@ The extra Champion Ribbon in Emerald, 0hp in Blue, and HeartGold/SoulSilver save
 
 ## Current Support
 
-Development is ongoing. While I do my best to make conversion of Pokemon to/from the OpenHome format lossless, there are sometimes mistakes that I continuously find and fix. It's always a good idea to back up your save files.
+Development is ongoing. While OpenHome does its best to convert Pokemon between
+formats losslessly, there are sometimes mistakes. It's always a good idea to back up
+your save files. If you come across a bug, create an [issue](https://github.com/andrewbenington/OpenHome/issues) to bring it to my attention.
+
+All PKM formats from Generations I-IX are currently supported, including from Pokémon
+Colosseum and Pokémon XD. All game save files from Generations I-VI (Red/Blue through
+OmegaRuby/AlphaSapphire) are supported, except for the Japanese versions of Pokémon
+Red/Green/Blue/Yellow. Support for Generation VII (3DS) is coming soon.
 
 ### Supported PKM import formats
 
@@ -81,13 +88,20 @@ Development is ongoing. While I do my best to make conversion of Pokemon to/from
 - Pokémon X/Y
 - Pokémon Omega Ruby/Alpha Sapphire
 
-## Alterations to transferred pokémon
+## Alterations to transferred Pokémon
 
-When moving Pokémon to an older game, some compromises have to be made. OpenHome will try its best to preserve aspects of a Pokémon such as its nature, ability, gender, and shininess, all of which are usually possible minus some specific cases in the GameBoy games. These compromises will be reverted when moving back to a future game.
+When moving Pokémon to an older game, some compromises have to be made. OpenHome will
+try its best to preserve aspects of a Pokémon such as its nature, ability, gender, and
+shininess, all of which are usually possible minus some specific cases in the GameBoy
+games. These compromises will be reverted when moving back to a future game.
 
-For example, a Pokémon originating in Generation 6 being moved into a Generation 3 game will have its personality value altered to preserve its nature, ability (if possible), gender, and shininess.
+For example, a Pokémon originating in Generation VI being moved into a Generation III
+game will have its personality value altered to preserve its nature, ability (if
+possible), gender, and shininess.
 
-A Pokémon transferred into Generation 1 or 2 will have it's Original Trainer's ID changed to a "tracking number" of sorts due to the lack of a Personality Value in those games.
+A Pokémon transferred into Generation I or II will have it's Original Trainer's ID
+changed to a "tracking number" of sorts due to the lack of a Personality Value in
+those games.
 
 ## Credits
 
