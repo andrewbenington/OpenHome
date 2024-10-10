@@ -1,10 +1,12 @@
 <p>
-  OpenHome uses <a href="https://electron.atom.io/">Electron</a>, <a href="https://facebook.github.io/react/">React</a>, <a href="https://webpack.js.org/">Webpack</a> and <a href="https://www.npmjs.com/package/react-refresh">React Fast Refresh</a>.
+  OpenHome uses <a href="https://electron.atom.io/">Electron</a>, <a href="https://facebook.github.io/react/">React</a>, and <a href="https://vite.dev/">Vite</a>.
 </p>
 
 # OpenHome
 
-OpenHome is an open source tool for moving Pokémon between games losslessly, much like Pokémon Home on the Nintendo Switch. Unlike Pokémon Home, OpenHome also allows for moving Pokémon to past generations from future ones. When a Pokémon is moved into a save file, its data from other games is saved locally, so nothing is lost when transferring to past generations. For example, you can move your Kalos Champion Sceptile from Pokémon X to Pokémon Ruby, earn it the Artist Ribbon, and it will have both the Kalos Champion and Artist ribbons when moved back to Pokémon X.
+OpenHome is an open source, cross-platform tool for moving Pokémon between games losslessly, much like Pokémon Home on the Nintendo Switch. Unlike Pokémon Home, OpenHome also allows for moving Pokémon to past generations from future ones. When a Pokémon is moved into a save file, its data from other games is saved locally, so nothing is lost when transferring to past generations. For example, you can move your Kalos Champion Sceptile from Pokémon X to Pokémon Ruby, earn it the Artist Ribbon, and it will have both the Kalos Champion and Artist ribbons when moved back to Pokémon X.
+
+Visit the [GitHub Pages site](https://andrewbenington.github.io/OpenHome/) for easy download links and more information.
 
 ## Screenshots
 
@@ -17,6 +19,8 @@ OpenHome is an open source tool for moving Pokémon between games losslessly, mu
 <img width="200" alt="Screenshot 2024-01-14 at 1 25 22 PM" src="https://github.com/andrewbenington/OpenHome/assets/42848290/992ddb5f-2c6d-45e9-9b99-83c3f644e7a8">
 
 ## Downloading and Installing
+
+For quick access to downloads, visit the [downloads page](https://andrewbenington.github.io/OpenHome/download).
 
 On **Linux**, you can either download the rpm, deb, or AppImage file from the [latest release](https://github.com/andrewbenington/OpenHome/releases) depending on your architecture and distribution.
 
