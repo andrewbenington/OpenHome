@@ -1,10 +1,10 @@
-# Building the application (MacOS)
+# Building the application (macOS)
 
 Open the Terminal application. Is is located in the Utilities folder, under Applications.
 
 ## Install Homebrew
 
-Homebrew is a package manager for MacOS, and it streamlines the process of installing packages. Paste and execute the following command in Terminal:
+Homebrew is a package manager for macOS, and it streamlines the process of installing packages. Paste and execute the following command in Terminal:
 
 ```zsh
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -46,4 +46,4 @@ These will take a bit. When they're finished, execute the following command to o
 open ./release/build
 ```
 
-A Finder window should open, and in it will be multiple files including two disk images. Open `OpenHome-x.x.x-arm64.dmg` if you have an ARM (Apple Silicon) Mac, otherwise open `OpenHome-x.x.x.dmg`. Drag the app to the Applications folder, and now you can open it!
+A Finder window should open, and in it will be multiple files including two disk images. Open `OpenHome-x.x.x-arm64.dmg` if you have an Apple Silicon Mac, otherwise open `OpenHome-x.x.x.dmg`. Drag the app to the Applications folder, and now you can open it!
