@@ -1,72 +1,46 @@
 import { Box, Card, Modal, ModalDialog, Stack, useTheme } from '@mui/joy'
+import * as E from 'fp-ts/lib/Either'
 import lodash from 'lodash'
 import { bytesToPKMInterface } from 'pokemon-files'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useContext, useEffect, useState } from 'react'
 import { MdFileOpen } from 'react-icons/md'
-import { loadRecentSaves } from '../../renderer/redux/slices/recentSavesSlice'
-import { loadResourcesPath } from '../../renderer/redux/slices/resourcesSlice'
+import { Errorable } from 'src/types/types'
 import { OHPKM } from '../../types/pkm/OHPKM'
 import { PKMFile } from '../../types/pkm/util'
-import { SaveCoordinates } from '../../types/types'
 import { getMonFileIdentifier } from '../../util/Lookup'
+import { BackendContext } from '../backend/backendProvider'
 import FilterPanel from '../components/filter/FilterPanel'
-import PokemonIcon from '../components/PokemonIcon'
 import PokemonDetailsPanel from '../pokemon/PokemonDetailsPanel'
-import { useAppDispatch } from '../redux/hooks'
-import {
-  useDragMon,
-  useDragSource,
-  useHomeData,
-  useMonsToRelease,
-  useOpenSaves,
-  useSaveFunctions,
-} from '../redux/selectors'
-import {
-  cancelDrag,
-  clearAllSaves,
-  clearMonsToRelease,
-  loadGen12Lookup,
-  loadGen345Lookup,
-  loadHomeBoxes,
-  loadHomeMons,
-  setMonToRelease,
-} from '../redux/slices/appSlice'
 import HomeBoxDisplay from '../saves/boxes/HomeBoxDisplay'
 import OpenSaveDisplay from '../saves/boxes/SaveBoxDisplay'
 import SavesModal from '../saves/SavesModal'
+import { AppInfoContext } from '../state/appInfo'
+import { LookupContext } from '../state/lookup'
+import { MouseContext } from '../state/mouse'
+import { OpenSavesContext } from '../state/openSaves'
 import { initializeDragImage } from '../util/initializeDragImage'
-import {
-  handleDeleteOHPKMFiles,
-  handleMenuResetAndClose,
-  handleMenuSave,
-} from '../util/ipcFunctions'
+import { handleMenuResetAndClose, handleMenuSave } from '../util/ipcFunctions'
 import './Home.css'
 
 const Home = () => {
-  const saves = useOpenSaves()
-  const homeData = useHomeData()
-  const dragMon = useDragMon()
-  const dragSource = useDragSource()
-  const monsToRelease = useMonsToRelease()
+  const [openSavesState, openSavesDispatch, allOpenSaves] = useContext(OpenSavesContext)
+  const [lookupState, lookupDispatch] = useContext(LookupContext)
+  const backend = useContext(BackendContext)
+  const [mouseState, mouseDispatch] = useContext(MouseContext)
+  const [, appInfoDispatch] = useContext(AppInfoContext)
+  const homeData = openSavesState.homeData
   const { palette } = useTheme()
   const [selectedMon, setSelectedMon] = useState<PKMFile>()
   const [tab, setTab] = useState('summary')
   const [openSaveDialog, setOpenSaveDialog] = useState(false)
   const [filesToDelete, setFilesToDelete] = useState<string[]>([])
-  const dispatch = useAppDispatch()
-  const dispatchReleaseMon = (saveCoordinates: SaveCoordinates) =>
-    dispatch(setMonToRelease(saveCoordinates))
-  const dispatchClearMonsToRelease = useCallback(() => dispatch(clearMonsToRelease()), [dispatch])
-  const [writeAllSaveFiles, writeAllHomeData] = useSaveFunctions()
-  const dispatchClearAllSaves = useCallback(() => dispatch(clearAllSaves()), [dispatch])
-  const dispatchCancelDrag = () => dispatch(cancelDrag())
 
   useEffect(() => {
     const edited =
-      homeData.updatedBoxSlots.length > 0 ||
-      !saves.every((save) => save.updatedBoxSlots.length === 0)
-    window.electron.ipcRenderer.invoke('set-document-edited', edited)
-  }, [saves, homeData])
+      (homeData?.updatedBoxSlots.length ?? 0) > 0 ||
+      !allOpenSaves.every((save) => save.updatedBoxSlots.length === 0)
+    backend.setHasChanges(edited)
+  }, [allOpenSaves, backend, homeData?.updatedBoxSlots])
 
   const onViewDrop = (e: React.DragEvent<HTMLDivElement>, type: string) => {
     const processDroppedData = async (file?: File, droppedMon?: PKMFile) => {
@@ -88,10 +62,11 @@ const Home = () => {
       }
     }
     const file = e.dataTransfer.files[0]
-    const mon = dragMon
-    if (!file && dragSource) {
+    const mon = mouseState.dragSource?.mon
+    if (!file && mouseState.dragSource) {
       if (mon && type === 'release') {
-        dispatchReleaseMon(dragSource)
+        openSavesDispatch({ type: 'add_mon_to_release', payload: mouseState.dragSource })
+        mouseDispatch({ type: 'set_drag_source', payload: undefined })
         if (mon instanceof OHPKM) {
           const identifier = getMonFileIdentifier(mon)
           if (identifier) {
@@ -99,7 +74,7 @@ const Home = () => {
           }
         }
       }
-      dispatchCancelDrag()
+      mouseDispatch({ type: 'set_drag_source', payload: undefined })
       processDroppedData(file, mon)
       e.nativeEvent.preventDefault()
     } else if (file) {
@@ -107,13 +82,91 @@ const Home = () => {
     }
   }
 
-  const saveChanges = useCallback(() => {
-    writeAllSaveFiles()
-    writeAllHomeData()
-    handleDeleteOHPKMFiles(filesToDelete)
+  const loadAllLookups = useCallback(async (): Promise<Errorable<Record<string, OHPKM>>> => {
+    const onLoadError = (message: string) => {
+      console.error(message)
+      lookupDispatch({ type: 'set_error', payload: message })
+    }
+    const [homeResult, gen12Result, gen345Result] = await Promise.all([
+      backend.loadHomeMonLookup(),
+      backend.loadGen12Lookup(),
+      backend.loadGen345Lookup(),
+    ])
+    if (E.isLeft(homeResult)) {
+      onLoadError(homeResult.left)
+      return E.left(homeResult.left)
+    } else if (E.isLeft(gen12Result)) {
+      onLoadError(gen12Result.left)
+      return E.left(gen12Result.left)
+    } else if (E.isLeft(gen345Result)) {
+      onLoadError(gen345Result.left)
+      return E.left(gen345Result.left)
+    }
+
+    lookupDispatch({ type: 'load_home_mons', payload: homeResult.right })
+    lookupDispatch({ type: 'load_gen12', payload: gen12Result.right })
+    lookupDispatch({ type: 'load_gen345', payload: gen345Result.right })
+
+    const homeMons: Record<string, OHPKM> = {}
+    for (const [identifier, buffer] of Object.entries(homeResult.right)) {
+      homeMons[identifier] = new OHPKM(buffer)
+    }
+
+    return E.right(homeMons)
+  }, [backend, lookupDispatch])
+
+  const loadAllHomeData = useCallback(
+    async (homeMonLookup: Record<string, OHPKM>) => {
+      await backend.loadHomeBoxes().then(
+        E.match(
+          (err) => openSavesDispatch({ type: 'set_error', payload: err }),
+          (boxes) =>
+            openSavesDispatch({
+              type: 'set_home_boxes',
+              payload: { boxes, homeLookup: homeMonLookup },
+            })
+        )
+      )
+    },
+    [backend, openSavesDispatch]
+  )
+
+  const saveChanges = useCallback(async () => {
+    if (!openSavesState.homeData) return
+    const promises = [
+      backend.writeAllSaveFiles(allOpenSaves),
+      backend.writeAllHomeData(
+        openSavesState.homeData,
+        Object.values(openSavesState.modifiedOHPKMs)
+      ),
+      backend.deleteHomeMons(filesToDelete),
+    ]
+
     setFilesToDelete([])
-    dispatch(loadHomeMons()).then(() => dispatch(loadHomeBoxes()))
-  }, [filesToDelete, writeAllHomeData, writeAllSaveFiles])
+    const results = await Promise.all(promises)
+    console.log(results)
+
+    openSavesDispatch({ type: 'clear_updated_box_slots' })
+    openSavesDispatch({ type: 'clear_mons_to_release' })
+
+    lookupDispatch({ type: 'clear' })
+    await loadAllLookups().then(
+      E.match(
+        (err) => openSavesDispatch({ type: 'set_error', payload: err }),
+        (homeLookup) => loadAllHomeData(homeLookup)
+      )
+    )
+  }, [
+    allOpenSaves,
+    backend,
+    filesToDelete,
+    loadAllHomeData,
+    loadAllLookups,
+    lookupDispatch,
+    openSavesDispatch,
+    openSavesState.homeData,
+    openSavesState.modifiedOHPKMs,
+  ])
 
   // listener for menu save
   useEffect(() => {
@@ -123,24 +176,41 @@ const Home = () => {
 
   // listener for menu reset + close
   useEffect(() => {
-    const callback = handleMenuResetAndClose(() => {
-      dispatchClearMonsToRelease()
-      dispatch(loadHomeMons()).then(() => dispatch(loadHomeBoxes()))
-    }, dispatchClearAllSaves)
+    const callback = handleMenuResetAndClose(
+      () => {
+        openSavesDispatch({ type: 'clear_mons_to_release' })
+        if (lookupState.loaded) {
+          loadAllHomeData(lookupState.homeMons)
+        }
+      },
+      () => openSavesDispatch({ type: 'close_all_saves' })
+    )
     return () => callback()
-  }, [dispatch, dispatchClearAllSaves, saves])
+  }, [openSavesDispatch, loadAllHomeData, lookupState])
+
+  useEffect(() => {
+    if (lookupState.loaded && !openSavesState.homeData) {
+      loadAllHomeData(lookupState.homeMons)
+    }
+  }, [loadAllHomeData, lookupState.homeMons, lookupState.loaded, openSavesState.homeData])
+
+  // load lookups
+  useEffect(() => {
+    if (!lookupState.loaded && !lookupState.error) {
+      loadAllLookups()
+    }
+  }, [lookupState.loaded, lookupState.error, loadAllLookups])
 
   // load all data when app starts
   useEffect(() => {
     initializeDragImage()
-    Promise.all([
-      dispatch(loadHomeMons()).then(() => dispatch(loadHomeBoxes())),
-      dispatch(loadGen12Lookup()),
-      dispatch(loadGen345Lookup()),
-      dispatch(loadRecentSaves()),
-      dispatch(loadResourcesPath()),
-    ])
-  }, [dispatch])
+    backend
+      .getResourcesPath()
+      .then((path) => appInfoDispatch({ type: 'set_resources_path', payload: path }))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  console.log('Home render')
 
   return (
     <div
@@ -152,7 +222,7 @@ const Home = () => {
       }}
     >
       <Stack className="save-file-column" spacing={1} width={280} minWidth={280}>
-        {lodash.range(saves.length).map((i) => (
+        {lodash.range(allOpenSaves.length).map((i) => (
           <OpenSaveDisplay
             key={`save_display_${i}`}
             saveIndex={i}
@@ -198,25 +268,14 @@ const Home = () => {
         </div>
         <div
           className="drop-area"
-          onDragOver={(e) => {
-            e.preventDefault()
-          }}
+          onDragOver={(e) => e.preventDefault()}
           onDrop={(e) => onViewDrop(e, 'release')}
         >
           Release
           <div className="release-icon-container" style={{ display: 'flex' }}>
-            {monsToRelease.map((mon, i) => {
-              return (
-                <PokemonIcon
-                  key={`delete_mon_${i}`}
-                  dexNumber={mon.dexNum}
-                  formeNumber={mon.formeNum}
-                  style={{ height: 32, width: 32 }}
-                />
-              )
-            })}
+            {openSavesState.monsToRelease.map((mon, i) => {})}
           </div>
-        </div>
+        </div>{' '}
       </Stack>
       <Modal open={!!selectedMon} onClose={() => setSelectedMon(undefined)}>
         <Card style={{ width: 800, height: 400, padding: 0, overflow: 'hidden' }}>

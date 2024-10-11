@@ -1,3 +1,4 @@
+import { Either } from 'fp-ts/Either'
 import { CSSProperties } from 'react'
 import { ParsedPath } from './SAVTypes/path'
 
@@ -33,6 +34,7 @@ export type levelUpType =
 
 export enum SaveType {
   UNKNOWN,
+  OPENHOME,
   RGBY_J,
   RBY_I,
   GS_J,
@@ -242,3 +244,9 @@ export interface SaveCoordinates {
 }
 
 export type Styles = { [key: string]: CSSProperties }
+
+export type Errorable<T> = Either<string, T>
+
+export type LookupMap = Record<string, string>
+
+export type LoadSaveResponse = { path: ParsedPath; fileBytes: Uint8Array; createdDate: Date }

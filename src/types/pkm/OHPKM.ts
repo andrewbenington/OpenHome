@@ -66,7 +66,7 @@ import {
 
 export class OHPKM {
   static fromBytes(bytes: ArrayBuffer) {
-    return new OHPKM(bytes)
+    return new OHPKM(new Uint8Array(bytes))
   }
 
   public get fileSize() {
@@ -87,9 +87,9 @@ export class OHPKM {
 
   bytes = new Uint8Array(433)
 
-  constructor(arg: PKM | OHPKM | ArrayBuffer) {
-    if (arg instanceof ArrayBuffer) {
-      this.bytes = new Uint8Array(arg)
+  constructor(arg: PKM | OHPKM | Uint8Array) {
+    if (arg instanceof Uint8Array) {
+      this.bytes = arg
     } else {
       const other = arg
       let prng: Prando
@@ -339,10 +339,13 @@ export class OHPKM {
         this.flag2LA = other.flag2LA
         this.unknownA0 = other.unknownA0
         this.unknownF3 = other.unknownF3
-        this.heightAbsoluteBytes = other.heightAbsoluteBytes
-        this.weightAbsoluteBytes = other.weightAbsoluteBytes
       } else {
         this.gvs = gvsFromIVs(this.ivs)
+      }
+
+      if ('heightAbsoluteBytes' in other) {
+        this.heightAbsoluteBytes = other.heightAbsoluteBytes
+        this.weightAbsoluteBytes = other.weightAbsoluteBytes
       }
 
       if ('weight' in other) {

@@ -1,9 +1,8 @@
 name: Build
 
 on:
-  push:
-    branches:
-      - 'main'
+  release:
+    types: [published]
 
 env:
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

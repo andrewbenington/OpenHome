@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="index.css" />
+    <title>OpenHome</title>
+    <!-- Google tag (to check traffic) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-7CH9XZN759"></script>
+    <script>
+      window.dataLayer = window.dataLayer || []
+      function gtag() {
+        dataLayer.push(arguments)
+      }
+      gtag('js', new Date())
+
+      gtag('config', 'G-7CH9XZN759')
+    </script>
+  </head>
+  <body>
+    <div class="page">
+      <div id="header" class="header">
+        <ul class="header-links">
+          <li><h1 class="header-title">OpenHome</h1></li>
+          <li><a class="active">Home</a></li>
+          <!-- <li><a href="docs.html">Docs</a></li> -->
+          <li><a href="download.html">Download</a></li>
+          <div class="spacer"></div>
+          <a href="https://github.com/andrewbenington/OpenHome" class="github-button">
+            <img src="./github-mark-white.svg" />
+            <img src="./GitHub_Logo_White.png" />
+          </a>
+        </ul>
+      </div>
+      <div class="container">
+        <p class="larger-font">
+          <span class="openhome-name">OpenHome</span> is an open source tool for moving Pokémon
+          between game save files, including forwards and backwards through generations, without
+          data loss.
+        </p>
+        <div class="image-flex">
+          <img src="./image1.png" width="600px" />
+          <div>
+            <p>
+              When a Pokémon is moved into a save file, its data from other games is saved locally,
+              so nothing is lost when transferring to past generations.
+            </p>
+            <p>
+              For example, a Sceptile with the Kalos Champion ribbon can be moved from Pokémon X to
+              Pokémon Ruby, earn the Artist Ribbon, and it will have both the Kalos Champion and
+              Artist ribbons when moved back to Pokémon X.
+            </p>
+          </div>
+        </div>
+        <div class="image-flex">
+          <div>
+            <p dir="auto">
+              When moving Pokémon to an older game, some compromises have to be made. OpenHome will
+              try its best to preserve aspects of a Pokémon such as its nature, ability, gender, and
+              shininess, all of which are usually possible minus some specific cases in the GameBoy
+              games. These compromises will be reverted when moving back to a future game.
+            </p>
+            <p>
+              For example, a Pokémon originating in Generation 6 being moved into a Generation 3
+              game will have its personality value altered to preserve its nature, ability (if
+              possible), gender, and shininess.
+            </p>
+            <p>
+              A Pokémon transferred into Generation 1 or 2 will have it's Original Trainer's ID
+              changed to a "tracking number" of sorts due to the lack of a Personality Value in
+              those games.
+            </p>
+          </div>
+          <img src="./image2.png" width="600px" />
+        </div>
+        <div class="image-flex">
+          <img src="./image3.png" width="600px" />
+          <div>
+            <p>
+              Development is ongoing. While OpenHome does its best to convert Pokemon between
+              formats losslessly, there are sometimes mistakes. It's always a good idea to back up
+              your save files. If you come across a bug, create a
+              <a href="https://github.com/andrewbenington/OpenHome/issues">GitHub Issue</a> to bring
+              it to my attention.
+            </p>
+            <p>
+              All PKM formats from Generations I-IX are currently supported, including from Pokémon
+              Colosseum and Pokémon XD. All game save files from Generations I-VI (Red/Blue through
+              Omega Ruby/Alpha Sapphire) are supported, except for the Japanese versions of
+              Generations I and II. Support for Generation VII (3DS) is coming soon.
+            </p>
+          </div>
+        </div>
+        <p class="larger-font">
+          This application would not have been possible without the research done at
+          <a href="https://projectpokemon.org/" rel="nofollow">https://projectpokemon.org/</a>, the
+          work done by the <a href="https://github.com/kwsch/PKHeX">PKHeX</a> developers, and the
+          sprites archived by
+          <a href="https://pokemondb.net/" rel="nofollow">https://pokemondb.net/</a> and
+          <a href="https://www.bulbagarden.net/" rel="nofollow">https://www.bulbagarden.net/</a>.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>

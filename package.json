@@ -1,7 +1,7 @@
 {
   "productName": "OpenHome",
   "name": "openhome",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "A tool for moving Pokémon between game saves",
   "keywords": [
     "pokemon",
@@ -16,7 +16,7 @@
     "type": "git",
     "url": "git+https://github.com/andrewbenington/OpenHome.git"
   },
-  "license": "MIT",
+  "license": "GPL-3.0-only",
   "author": {
     "name": "Andrew Benington",
     "email": "andrewbenington57@gmail.com"
@@ -46,19 +46,19 @@
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
     "@mui/joy": "^5.0.0-beta.48",
-    "@reduxjs/toolkit": "^1.9.3",
     "big-integer": "^1.6.51",
     "buffer": "^6.0.3",
     "chart.js": "^4.2.0",
     "dayjs": "^1.11.12",
-    "electron-updater": "^6.1.1",
+    "electron-updater": "^6.3.0",
+    "fp-ts": "^2.16.9",
     "hex-editor-react": "^0.1.0",
     "hexy": "^0.3.5",
     "js-hex-editor": "^0.1.0",
     "lodash": "^4.17.21",
-    "pokemon-files": "../pokemon-files",
-    "pokemon-resources": "^1.0.8",
-    "pokemon-species-data": "^0.1.0",
+    "pokemon-files": "^0.3.1",
+    "pokemon-resources": "^1.0.10",
+    "pokemon-species-data": "^0.4.2",
     "prando": "^6.0.1",
     "react": "^18.2.0",
     "react-chartjs-2": "^5.2.0",
@@ -85,11 +85,13 @@
     "electron-builder": "^24.13.3",
     "electron-vite": "^1.0.27",
     "eslint": "^8.47.0",
+    "eslint-plugin-prettier": "^5.2.1",
     "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.2",
+    "eslint-plugin-react-refresh": "^0.4.12",
     "prettier": "^3.0.2",
     "react-dom": "^18.2.0",
-    "react-redux": "^8.0.5",
     "typescript": "^5.1.6",
-    "vite": "^4.5.3"
+    "vite": "^4.5.5"
   }
 }

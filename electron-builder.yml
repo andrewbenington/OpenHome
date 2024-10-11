@@ -36,9 +36,7 @@ linux:
     - AppImage
     - snap
     - deb
-  arch:
-    - x64
-    - arm64
+    - rpm
   maintainer: electronjs.org
   category: Utility
 appImage:

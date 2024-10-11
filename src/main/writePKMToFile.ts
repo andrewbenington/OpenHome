@@ -5,14 +5,10 @@ import { OHPKM } from '../types/pkm/OHPKM'
 import { getMonFileIdentifier } from '../util/Lookup'
 
 export default function writePKMToFile(bytes: Uint8Array) {
-  try {
-    const mon = bytesToPKM(bytes, 'OHPKM') as OHPKM
-    const appDataPath = app.getPath('appData')
-    const fileName = getMonFileIdentifier(mon)
-    fs.writeFileSync(`${appDataPath}/OpenHome/storage/mons/${fileName}.ohpkm`, mon.bytes)
-  } catch (e) {
-    console.error('write ohpkm:', e)
-  }
+  const mon = bytesToPKM(bytes, 'OHPKM') as OHPKM
+  const appDataPath = app.getPath('appData')
+  const fileName = getMonFileIdentifier(mon)
+  fs.writeFileSync(`${appDataPath}/OpenHome/storage/mons/${fileName}.ohpkm`, mon.bytes)
 }
 
 export function deleteOHPKMFile(fileName: string) {

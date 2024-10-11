@@ -1,13 +1,14 @@
-import { useLookupMaps } from 'src/renderer/redux/selectors'
+import { useContext } from 'react'
 import { getSaveLogo } from 'src/renderer/saves/util'
 import { OHPKM } from 'src/types/pkm/OHPKM'
 import { numericSorter, stringSorter } from 'src/util/Sort'
 import { getMonFileIdentifier } from '../../../util/Lookup'
 import OHDataGrid, { SortableColumn } from '../../components/OHDataGrid'
 import PokemonIcon from '../../components/PokemonIcon'
+import { LookupContext } from '../../state/lookup'
 
 export default function OpenHomeMonList() {
-  const [homeMons] = useLookupMaps()
+  const [{ homeMons }] = useContext(LookupContext)
 
   const columns: SortableColumn<OHPKM>[] = [
     // {

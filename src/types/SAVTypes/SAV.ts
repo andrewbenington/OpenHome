@@ -1,8 +1,9 @@
-import { AllPKMFields, PKM } from 'pokemon-files'
+import { AllPKMFields } from 'pokemon-files'
 import { GameOfOrigin } from 'pokemon-resources'
 import { TransferRestrictions } from '../../types/TransferRestrictions'
 import { SaveRef, SaveType } from '../../types/types'
 import { OHPKM } from '../pkm/OHPKM'
+import { PKMFile } from '../pkm/util'
 import { ParsedPath } from './path'
 
 export class Box<P extends AllPKMFields> {
@@ -20,7 +21,7 @@ export interface BoxCoordinates {
   index: number
 }
 
-export class SAV<P extends AllPKMFields = PKM> {
+export class SAV<P extends AllPKMFields = PKMFile> {
   saveType: SaveType = SaveType.UNKNOWN
 
   origin: GameOfOrigin = 0
@@ -74,4 +75,11 @@ export class SAV<P extends AllPKMFields = PKM> {
     this.filePath = path
     this.bytes = bytes
   }
+
+  getCurrentBox() {
+    return this.boxes[this.currentPCBox]
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  prepareBoxesForSaving() {}
 }

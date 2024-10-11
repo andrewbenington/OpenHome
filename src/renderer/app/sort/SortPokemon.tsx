@@ -1,13 +1,15 @@
-import { Card, Chip, Input, Modal, ModalDialog, Stack } from '@mui/joy'
+import { Autocomplete, Card, Chip, Modal, ModalDialog, Stack } from '@mui/joy'
+import dayjs from 'dayjs'
 import { GameOfOrigin } from 'pokemon-resources'
-import { useMemo, useState } from 'react'
+import { useContext, useMemo, useState } from 'react'
 import { MdAdd } from 'react-icons/md'
 import PokemonDetailsPanel from 'src/renderer/pokemon/PokemonDetailsPanel'
-import { useHomeData, useLookupMaps, useOpenSaves } from 'src/renderer/redux/selectors'
 import BoxCell from 'src/renderer/saves/boxes/BoxCell'
 import SavesModal from 'src/renderer/saves/SavesModal'
 import { PKMFile } from 'src/types/pkm/util'
 import { filterUndefined } from 'src/util/Sort'
+import { LookupContext } from '../../state/lookup'
+import { OpenSavesContext } from '../../state/openSaves'
 
 function getSortFunction(
   sortStr: string | undefined
@@ -22,6 +24,18 @@ function getSortFunction(
       return (a, b) => b.mon.getLevel() - a.mon.getLevel()
     case 'species':
       return (a, b) => a.mon.dexNum - b.mon.dexNum
+    case 'met_date':
+      return (a, b) => {
+        const aDate =
+          'metDate' in a.mon && a.mon.metDate
+            ? dayjs(new Date(a.mon.metDate.year, a.mon.metDate.month, a.mon.metDate.day)).unix()
+            : 0
+        const bDate =
+          'metDate' in b.mon && b.mon.metDate
+            ? dayjs(new Date(b.mon.metDate.year, b.mon.metDate.month, b.mon.metDate.day)).unix()
+            : 0
+        return bDate - aDate
+      }
     case 'ribbons':
       return (a, b) => {
         const aCount = 'ribbons' in a.mon ? a.mon.ribbons.length : 0
@@ -34,41 +48,38 @@ function getSortFunction(
 }
 
 export default function SortPokemon() {
-  const [homeMons] = useLookupMaps()
-  const homeData = useHomeData()
+  const [{ homeMons }] = useContext(LookupContext)
+  const [{ homeData }, , openSaves] = useContext(OpenSavesContext)
   const [openSaveDialog, setOpenSaveDialog] = useState(false)
   const [selectedMon, setSelectedMon] = useState<PKMFile>()
   const [tab, setTab] = useState('summary')
   const [sort, setSort] = useState('')
-  // const [indexes, setIndexes] = useState<[number, number]>([0, 100])
-  const saves = useOpenSaves()
 
   const allMonsWithSaves = useMemo(() => {
-    const all: { mon: PKMFile; saveGame: GameOfOrigin }[] = saves
+    const all: { mon: PKMFile; saveGame: GameOfOrigin }[] = openSaves
       .flatMap((save) =>
         save.boxes.flatMap((box) =>
           box.pokemon.flatMap((mon) => (mon ? { mon, saveGame: save.origin } : undefined))
         )
       )
       .concat(
-        Object.values(homeData.boxes.flatMap((box) => box.pokemon) ?? {}).map((mon) =>
+        Object.values(homeData?.boxes.flatMap((box) => box.pokemon) ?? {}).map((mon) =>
           mon ? { mon, saveGame: 0 } : undefined
         )
       )
       .filter(filterUndefined)
-    // .slice(...indexes)
 
     return all
-  }, [saves, homeMons])
+  }, [openSaves, homeData?.boxes])
 
   if (!homeMons) return <div />
   return (
-    <Stack direction="row" flexWrap="wrap">
-      <Card sx={{ position: 'sticky', left: 0, top: 0 }}>
+    <Stack direction="row" flexWrap="wrap" padding={1} overflow="hidden" height="calc(100% - 16px)">
+      <Card style={{ height: 'calc(100% - 16px)' }}>
         <Stack style={{ width: 120, flex: 0 }}>
-          <Chip>OpenHome</Chip>
-          {saves.map((save) => (
-            <Chip key={save.tid}>
+          <Chip variant="solid">OpenHome</Chip>
+          {openSaves.map((save) => (
+            <Chip key={save.tid} variant="solid">
               {save.name} ({save.tid})
             </Chip>
           ))}
@@ -77,11 +88,15 @@ export default function SortPokemon() {
           </Chip>
         </Stack>
       </Card>
-      <Stack style={{ flex: 1 }}>
+      <Stack style={{ flex: 1, height: '100%' }}>
         <Card>
-          <Input placeholder="Sort" value={sort} onChange={(e) => setSort(e.target.value)} />
+          <Autocomplete
+            options={['nickname', 'level', 'species', 'ribbon', 'met_date']}
+            onChange={(_, value) => setSort(value ?? '')}
+            placeholder="Sort"
+          />
         </Card>
-        <Card>
+        <Card style={{ overflowY: 'auto' }}>
           <Stack direction="row" flexWrap="wrap" justifyContent="center">
             {Object.values(allMonsWithSaves)
               .sort(getSortFunction(sort))

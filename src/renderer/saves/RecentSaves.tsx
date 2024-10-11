@@ -1,10 +1,12 @@
 import { Stack } from '@mui/joy'
-import { useMemo } from 'react'
+import * as E from 'fp-ts/lib/Either'
+import { useContext, useEffect, useMemo, useState } from 'react'
 import { ParsedPath, splitPath } from 'src/types/SAVTypes/path'
 import { SaveRef } from 'src/types/types'
 import { numericSorter } from '../../util/Sort'
+import { BackendContext } from '../backend/backendProvider'
 import OHDataGrid, { SortableColumn } from '../components/OHDataGrid'
-import { useOpenSaves, useRecentSaves } from '../redux/selectors'
+import { OpenSavesContext } from '../state/openSaves'
 import { formatTime, formatTimeSince, getSaveLogo } from './util'
 
 interface SaveFileSelectorProps {
@@ -13,13 +15,25 @@ interface SaveFileSelectorProps {
 
 export default function RecentSaves(props: SaveFileSelectorProps) {
   const { onOpen } = props
-  const [recentSaves] = useRecentSaves()
-  const openSaves = useOpenSaves()
+  const backend = useContext(BackendContext)
+  const [recentSaves, setRecentSaves] = useState<Record<string, SaveRef>>()
+  const [, , openSaves] = useContext(OpenSavesContext)
 
   const openSavePaths = useMemo(
     () => Object.fromEntries(openSaves.map((save) => [save.filePath.raw, true])),
     [openSaves]
   )
+
+  useEffect(() => {
+    if (!recentSaves) {
+      backend.getRecentSaves().then(
+        E.match(
+          (err) => console.error(err),
+          (recents) => setRecentSaves(recents)
+        )
+      )
+    }
+  }, [backend, recentSaves])
 
   const columns: SortableColumn<SaveRef>[] = [
     {
@@ -102,7 +116,7 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
 
   return (
     <OHDataGrid
-      rows={Object.values(recentSaves).map((save, i) => ({ ...save, index: i }))}
+      rows={Object.values(recentSaves ?? {}).map((save, i) => ({ ...save, index: i }))}
       columns={columns}
       defaultSort="lastOpened"
       defaultSortDir="DESC"

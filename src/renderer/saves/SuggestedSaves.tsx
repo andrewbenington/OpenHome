@@ -1,12 +1,15 @@
 import { Stack } from '@mui/joy'
+import * as E from 'fp-ts/lib/Either'
 import { PKM } from 'pokemon-files'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { SAV } from 'src/types/SAVTypes'
 import { buildSaveFile } from 'src/types/SAVTypes/util'
-import { ParsedPath, PossibleSaves, splitPath } from '../../types/SAVTypes/path'
+import { ParsedPath, splitPath } from '../../types/SAVTypes/path'
 import { numericSorter } from '../../util/Sort'
+import { BackendContext } from '../backend/backendProvider'
 import OHDataGrid, { SortableColumn } from '../components/OHDataGrid'
-import { useLookupMaps, useOpenSaves } from '../redux/selectors'
+import { LookupContext } from '../state/lookup'
+import { OpenSavesContext } from '../state/openSaves'
 import { filterEmpty, getSaveLogo } from './util'
 
 interface SaveFileSelectorProps {
@@ -15,40 +18,52 @@ interface SaveFileSelectorProps {
 
 export default function SuggestedSaves(props: SaveFileSelectorProps) {
   const { onOpen } = props
+  const backend = useContext(BackendContext)
   const [suggestedSaves, setSuggestedSaves] = useState<SAV<PKM>[]>()
-  const [homeMonMap, gen12LookupMap, gen345LookupMap] = useLookupMaps()
-  const openSaves = useOpenSaves()
+  const [{ homeMons: homeMonMap, gen12: gen12LookupMap, gen345: gen345LookupMap }] =
+    useContext(LookupContext)
+  const [, , openSaves] = useContext(OpenSavesContext)
 
   const openSavePaths = useMemo(
-    () => Object.fromEntries(openSaves.map((save) => [save.filePath.raw, true])),
+    () => Object.fromEntries(Object.values(openSaves).map((save) => [save.filePath.raw, true])),
     [openSaves]
   )
 
-  const loadSaveData = async (savePath: ParsedPath) => {
-    const { fileBytes, createdDate } = await window.electron.ipcRenderer.invoke('read-save-file', [
-      savePath,
-    ])
-    return buildSaveFile(savePath, fileBytes, {
-      homeMonMap,
-      gen12LookupMap,
-      gen345LookupMap,
-      fileCreatedDate: createdDate,
-    })
-  }
+  const loadSaveData = useCallback(
+    async (savePath: ParsedPath) => {
+      const response = await backend.loadSaveFile(savePath)
+      if (E.isRight(response)) {
+        const { fileBytes, createdDate } = response.right
+        return buildSaveFile(savePath, fileBytes, {
+          homeMonMap,
+          gen12LookupMap,
+          gen345LookupMap,
+          fileCreatedDate: createdDate,
+        })
+      }
+      return undefined
+    },
+    [backend, gen12LookupMap, gen345LookupMap, homeMonMap]
+  )
 
   useEffect(() => {
-    window.electron.ipcRenderer.invoke('find-saves').then(async (possibleSaves: PossibleSaves) => {
-      const allPaths = possibleSaves.citra
-        .concat(possibleSaves.openEmu)
-        .concat(possibleSaves.desamume)
-      if (allPaths.length > 0) {
-        const saves = (await Promise.all(allPaths.map((path) => loadSaveData(path)))).filter(
-          filterEmpty
-        )
-        setSuggestedSaves(saves)
-      }
-    })
-  }, [])
+    backend.findSuggestedSaves().then(
+      E.match(
+        (err) => console.error(err),
+        async (possibleSaves) => {
+          const allPaths = possibleSaves.citra
+            .concat(possibleSaves.openEmu)
+            .concat(possibleSaves.desamume)
+          if (allPaths.length > 0) {
+            const saves = (await Promise.all(allPaths.map((path) => loadSaveData(path)))).filter(
+              filterEmpty
+            )
+            setSuggestedSaves(saves)
+          }
+        }
+      )
+    )
+  }, [backend, loadSaveData])
 
   const columns: SortableColumn<SAV>[] = [
     // {
