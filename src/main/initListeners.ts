@@ -244,22 +244,6 @@ function initListeners() {
   ipcMain.handle('remove-save-folder', removeSaveFolder)
   ipcMain.handle('upsert-save-folder', upsertSaveFolder)
 
-  ipcMain.handle('pick-save-folder', async () => {
-    const dirPaths = await selectDirectory()
-
-    return dirPaths.length ? dirPaths[0] : undefined
-  })
-
-  ipcMain.handle('read-save-folders', async () => {
-    return loadSaveFileFolders()
-  })
-  ipcMain.handle('remove-save-folder', async (_, path) => {
-    removeSaveFileFolder(path)
-  })
-
-  ipcMain.handle('upsert-save-folder', async (_, folderPath: string, label: string) => {
-    addSaveFileFolder(folderPath, label)
-  })
   ipcMain.handle('get-resources-path', () => {
     return app.isPackaged
       ? path.join(process.resourcesPath, 'resources')

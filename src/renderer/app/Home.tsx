@@ -10,6 +10,7 @@ import { PKMFile } from '../../types/pkm/util'
 import { getMonFileIdentifier } from '../../util/Lookup'
 import { BackendContext } from '../backend/backendProvider'
 import FilterPanel from '../components/filter/FilterPanel'
+import PokemonIcon from '../components/PokemonIcon'
 import PokemonDetailsPanel from '../pokemon/PokemonDetailsPanel'
 import HomeBoxDisplay from '../saves/boxes/HomeBoxDisplay'
 import OpenSaveDisplay from '../saves/boxes/SaveBoxDisplay'
@@ -273,7 +274,16 @@ const Home = () => {
         >
           Release
           <div className="release-icon-container" style={{ display: 'flex' }}>
-            {openSavesState.monsToRelease.map((mon, i) => {})}
+            {openSavesState.monsToRelease.map((mon, i) => {
+              return (
+                <PokemonIcon
+                  key={`delete_mon_${i}`}
+                  dexNumber={mon.dexNum}
+                  formeNumber={mon.formeNum}
+                  style={{ height: 32, width: 32 }}
+                />
+              )
+            })}
           </div>
         </div>{' '}
       </Stack>
