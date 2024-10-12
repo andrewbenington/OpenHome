@@ -81,5 +81,7 @@ export class SAV<P extends AllPKMFields = PKMFile> {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  prepareBoxesForSaving() {}
+  prepareBoxesForSaving(): OHPKM[] {
+    return []
+  }
 }
