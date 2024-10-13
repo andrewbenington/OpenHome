@@ -2,12 +2,17 @@ import { Box, Card, Modal, ModalDialog, Stack, useTheme } from '@mui/joy'
 import * as E from 'fp-ts/lib/Either'
 import lodash from 'lodash'
 import { bytesToPKMInterface } from 'pokemon-files'
+import { GameOfOrigin, isGameBoy, isGen3, isGen4, isGen5 } from 'pokemon-resources'
 import { useCallback, useContext, useEffect, useState } from 'react'
 import { MdFileOpen } from 'react-icons/md'
 import { Errorable } from 'src/types/types'
 import { OHPKM } from '../../types/pkm/OHPKM'
 import { PKMFile } from '../../types/pkm/util'
-import { getMonFileIdentifier } from '../../util/Lookup'
+import {
+  getMonFileIdentifier,
+  getMonGen12Identifier,
+  getMonGen345Identifier,
+} from '../../util/Lookup'
 import { BackendContext } from '../backend/backendProvider'
 import FilterPanel from '../components/filter/FilterPanel'
 import PokemonIcon from '../components/PokemonIcon'
@@ -133,8 +138,33 @@ const Home = () => {
   )
 
   const saveChanges = useCallback(async () => {
-    if (!openSavesState.homeData) return
+    if (!openSavesState.homeData || !lookupState.loaded) return
+
+    const { gen12, gen345 } = lookupState
+    const saveTypesAndChangedMons = allOpenSaves.map(
+      (save) => [save.origin, save.prepareBoxesForSaving()] as [GameOfOrigin, OHPKM[]]
+    )
+    for (const [saveOrigin, changedMons] of saveTypesAndChangedMons) {
+      if (isGameBoy(saveOrigin)) {
+        changedMons.forEach((mon) => {
+          const openHomeIdentifier = getMonFileIdentifier(mon)
+          if (openHomeIdentifier !== undefined) {
+            gen12[getMonGen12Identifier(mon)] = openHomeIdentifier
+          }
+        })
+      } else if (isGen3(saveOrigin) || isGen4(saveOrigin) || isGen5(saveOrigin)) {
+        changedMons.forEach((mon) => {
+          const openHomeIdentifier = getMonFileIdentifier(mon)
+          if (openHomeIdentifier !== undefined) {
+            gen345[getMonGen345Identifier(mon)] = openHomeIdentifier
+          }
+        })
+      }
+    }
+
     const promises = [
+      backend.writeGen12Lookup(gen12),
+      backend.writeGen345Lookup(gen345),
       backend.writeAllSaveFiles(allOpenSaves),
       backend.writeAllHomeData(
         openSavesState.homeData,

@@ -13,14 +13,16 @@ asarUnpack:
   - resources/**
 win:
   executableName: openhome
+  icon: build/icon.ico
+  target: [nsis:x64, nsis:arm64]
 nsis:
-  artifactName: ${name}-${version}-setup.${ext}
+  artifactName: ${name}-${version}-${arch}-setup.${ext}
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always
 mac:
   target:
-    target: default
+    target: dmg
     arch:
       - x64
       - arm64
@@ -33,15 +35,20 @@ dmg:
   artifactName: ${name}-${version}-${arch}.${ext}
 linux:
   target:
-    - AppImage
-    - deb
-    - rpm
+    - AppImage:x64
+    - AppImage:arm64
+    - deb:x64
+    - deb:arm64
+    - rpm:x64
+    - rpm:arm64
   maintainer: electronjs.org
   category: Utility
 appImage:
-  artifactName: ${name}-${version}.${ext}
+  artifactName: ${name}-${version}-${arch}.${ext}
 npmRebuild: false
 publish:
   provider: github
+  releaseType: release
   owner: andrewbenington
   repo: OpenHome
+  publishAutoUpdate: 'true'
