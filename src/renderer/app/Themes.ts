@@ -198,6 +198,7 @@ export const lightTheme: ColorSystemOptions = {
   palette: {
     secondary: {
       mainChannel: red,
+      solidBg: red,
       plainColor: '#fff',
       plainHoverColor: '#333',
       plainActiveColor: '#333',

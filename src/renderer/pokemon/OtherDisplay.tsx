@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-props-no-spreading */
 import { Accordion, AccordionDetails, AccordionGroup, AccordionSummary } from '@mui/joy'
 import { AllPKMFields, getDisplayID } from 'pokemon-files'
 import {
@@ -69,64 +68,31 @@ const styles = {
     flexDirection: 'row' as 'row',
     flexWrap: 'wrap' as 'wrap',
   },
-  detailsPaneContent: {
-    display: 'flex',
-    flexDirection: 'column' as 'column',
-    height: 'calc(100% - 20px)',
-    padding: 10,
-    marginBottom: 10,
-  },
 }
 
 const OtherDisplay = (props: { mon: AllPKMFields }) => {
   const { mon } = props
   return (
-    <div style={styles.detailsPaneContent}>
-      {mon.personalityValue !== undefined && (
-        <AttributeRow label="Personality Value">
-          <code>{`0x${mon.personalityValue.toString(16).padStart(8, '0')}`}</code>
-        </AttributeRow>
-      )}
-      {mon.encryptionConstant !== undefined && (
-        <AttributeRow label="Encryption Constant">
-          <code>{`0x${mon.encryptionConstant.toString(16).padStart(8, '0')}`}</code>
-        </AttributeRow>
-      )}
-      <AccordionGroup>
-        <Accordion>
-          <AccordionSummary
-            indicator={<MdArrowForwardIos style={{ fontSize: '0.9rem' }} />}
-            sx={styles.accordionSummary}
-          >
-            <AttributeRow
-              label="Original Trainer"
-              value={`${mon.trainerName} ${mon.trainerGender ? '♀' : '♂'}`}
-            />
-          </AccordionSummary>
-          <AccordionDetails>
-            <AttributeRow label="ID" value={getDisplayID(mon as any)} indent={10} />
-            {mon.secretID !== undefined && (
-              <AttributeRow label="Secret ID" indent={10}>
-                <code>{`0x${mon.secretID.toString(16).padStart(4, '0')}`}</code>
-              </AttributeRow>
-            )}
-            {!!mon.trainerFriendship && (
-              <AttributeRow
-                label="Friendship"
-                value={mon.trainerFriendship.toString()}
-                indent={10}
-              />
-            )}
-            {!!mon.trainerAffection && (
-              <AttributeRow label="Affection" value={mon.trainerAffection.toString()} indent={10} />
-            )}
-            {'isCurrentHandler' in mon && (
-              <AttributeRow label="Trained last" value={`${!mon.isCurrentHandler}`} indent={10} />
-            )}
-          </AccordionDetails>
-        </Accordion>
-      </AccordionGroup>
-      {hasGen6OnData(mon) && mon.handlerName !== '' ? (
+    <div style={{ overflow: 'hidden', height: '100%' }}>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column' as 'column',
+          height: '100%',
+          marginBottom: 10,
+          overflowY: 'auto',
+        }}
+      >
+        {mon.personalityValue !== undefined && (
+          <AttributeRow label="Personality Value">
+            <code>{`0x${mon.personalityValue.toString(16).padStart(8, '0')}`}</code>
+          </AttributeRow>
+        )}
+        {mon.encryptionConstant !== undefined && (
+          <AttributeRow label="Encryption Constant">
+            <code>{`0x${mon.encryptionConstant.toString(16).padStart(8, '0')}`}</code>
+          </AttributeRow>
+        )}
         <AccordionGroup>
           <Accordion>
             <AccordionSummary
@@ -134,328 +100,372 @@ const OtherDisplay = (props: { mon: AllPKMFields }) => {
               sx={styles.accordionSummary}
             >
               <AttributeRow
-                label="Recent Trainer"
-                value={`${mon.handlerName} ${mon.handlerGender ? '♀' : '♂'}`}
+                label="Original Trainer"
+                value={`${mon.trainerName} ${mon.trainerGender ? '♀' : '♂'}`}
               />
             </AccordionSummary>
             <AccordionDetails>
-              {'handlerID' in mon && (
-                <AttributeRow label="ID" value={mon.handlerID?.toString()} indent={10} />
+              <AttributeRow label="ID" value={getDisplayID(mon as any)} indent={10} />
+              {mon.secretID !== undefined && (
+                <AttributeRow label="Secret ID" indent={10}>
+                  <code>{`0x${mon.secretID.toString(16).padStart(4, '0')}`}</code>
+                </AttributeRow>
               )}
-              <AttributeRow
-                label="Friendship"
-                value={mon.handlerFriendship.toString()}
-                indent={10}
-              />
-              {hasN3DSOnlyData(mon) && (
+              {!!mon.trainerFriendship && (
+                <AttributeRow
+                  label="Friendship"
+                  value={mon.trainerFriendship.toString()}
+                  indent={10}
+                />
+              )}
+              {!!mon.trainerAffection && (
                 <AttributeRow
                   label="Affection"
-                  value={mon.handlerAffection.toString()}
+                  value={mon.trainerAffection.toString()}
                   indent={10}
                 />
               )}
-            </AccordionDetails>
-          </Accordion>
-        </AccordionGroup>
-      ) : (
-        <div />
-      )}
-      <HiddenPowerDisplay mon={mon} />
-      {'personalityValue' in mon && mon.dexNum === NationalDex.Wurmple ? (
-        <AttributeRow
-          label="Wurmple Evolution"
-          value={
-            ((((hasGen6OnData(mon) ? mon.encryptionConstant : mon.personalityValue) ?? 0) >> 16) &
-              0xffff) %
-              10 >
-            4
-              ? 'Dustox'
-              : 'Beautifly'
-          }
-        />
-      ) : (
-        <div />
-      )}
-      {mon.formArgument && mon.dexNum === NationalDex.Alcremie ? (
-        <AttributeRow label="Sweet" value={SWEETS[mon.formArgument]} />
-      ) : (
-        <div />
-      )}
-      {mon.personalityValue && mon.dexNum === NationalDex.Dunsparce ? (
-        <AttributeRow
-          label="Dudunsparce"
-          value={
-            (hasGen6OnData(mon) ? mon.encryptionConstant : mon.personalityValue) % 100
-              ? 'Two-Segment'
-              : 'Three-Segment'
-          }
-        />
-      ) : (
-        <div />
-      )}
-      {mon.encryptionConstant !== undefined && mon.dexNum === NationalDex.Tandemaus && (
-        <AttributeRow
-          label="Maushold"
-          value={mon.encryptionConstant % 100 ? 'Family of Four' : 'Family of Three'}
-        />
-      )}
-      {mon.gameOfOrigin && isGen4(mon.gameOfOrigin) && mon.encounterType !== undefined && (
-        <AttributeRow label="Gen 4 Encounter Type" value={EncounterTypes[mon.encounterType]} />
-      )}
-      {mon.shinyLeaves !== undefined &&
-        !isRestricted(HGSS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) && (
-          <AttributeRow label="Shiny Leaves">
-            <ShinyLeaves {...shinyLeafValues(mon.shinyLeaves)} />
-          </AttributeRow>
-        )}
-      {!isRestricted(USUM_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
-      mon.geolocations &&
-      mon.geolocations[0].country ? (
-        <AccordionGroup>
-          <Accordion>
-            <AccordionSummary
-              indicator={<MdArrowForwardIos style={{ fontSize: '0.9rem' }} />}
-              sx={styles.accordionSummary}
-            >
-              <AttributeRow
-                label="Geolocations"
-                value={mon.geolocations?.filter((geo) => geo.country).length.toString()}
-              />
-            </AccordionSummary>
-            <AccordionDetails>
-              {mon.geolocations?.map((geo, i) =>
-                geo.country ? (
-                  <AttributeRow key={`geo_${i + 1}`} label={`Geolocation ${i + 1}`} indent={10}>
-                    {Countries[geo.country]}, Region {geo.region}
-                  </AttributeRow>
-                ) : (
-                  <div key={`geo_${i + 1}`} />
-                )
+              {'isCurrentHandler' in mon && (
+                <AttributeRow label="Trained last" value={`${!mon.isCurrentHandler}`} indent={10} />
               )}
             </AccordionDetails>
           </Accordion>
         </AccordionGroup>
-      ) : (
-        <div />
-      )}
-      {!isRestricted(SWSH_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
-      mon.trFlagsSwSh &&
-      getFlagsInRange(mon.trFlagsSwSh, 0, 14).length > 0 ? (
-        <AccordionGroup>
-          <Accordion>
-            <AccordionSummary
-              indicator={<MdArrowForwardIos style={{ fontSize: '0.9rem' }} />}
-              sx={styles.accordionSummary}
-            >
-              <AttributeRow
-                label="SwSh TRs"
-                value={`${getFlagsInRange(mon.trFlagsSwSh, 0, 14).length} TRs`}
-              />
-            </AccordionSummary>
-            <AccordionDetails>
-              {getFlagsInRange(mon.trFlagsSwSh, 0, 14).map((i) => (
-                <AttributeRow key={`swsh_tr_${i}`} label={`TR ${i}`} indent={10}>
-                  {MOVE_DATA[SwShTRMoveIndexes[i]].name}
-                </AttributeRow>
-              ))}
-            </AccordionDetails>
-          </Accordion>
-        </AccordionGroup>
-      ) : (
-        <div />
-      )}
-      {!isRestricted(HGSS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
-      mon.tmFlagsBDSP &&
-      getFlagsInRange(mon.tmFlagsBDSP, 0, 14).length > 0 ? (
-        <AccordionGroup>
-          <Accordion>
-            <AccordionSummary
-              indicator={<MdArrowForwardIos style={{ fontSize: '0.9rem' }} />}
-              sx={styles.accordionSummary}
-            >
-              <AttributeRow
-                label="BDSP TMs"
-                value={`${getFlagsInRange(mon.tmFlagsBDSP, 0, 14).length} TMs`}
-              />
-            </AccordionSummary>
-            <AccordionDetails>
-              {getFlagsInRange(mon.tmFlagsBDSP, 0, 14).map((i) => (
-                <AttributeRow key={`bdsp_tm_${i + 1}`} label={`TM ${i + 1}`} indent={10}>
-                  {MOVE_DATA[BDSPTMMoveIndexes[i]].name}
-                </AttributeRow>
-              ))}
-            </AccordionDetails>
-          </Accordion>
-        </AccordionGroup>
-      ) : (
-        <div />
-      )}
-      {!isRestricted(LA_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
-      mon.tutorFlagsLA &&
-      getFlagsInRange(mon.tutorFlagsLA, 0, 8).length > 0 ? (
-        <AccordionGroup>
-          <Accordion>
-            <AccordionSummary
-              indicator={<MdArrowForwardIos style={{ fontSize: '0.9rem' }} />}
-              sx={styles.accordionSummary}
-            >
-              <AttributeRow
-                label="LA Tutor Moves"
-                value={`${getFlagsInRange(mon.tutorFlagsLA, 0, 8).length} Tutor Moves`}
-              />
-            </AccordionSummary>
-            <AccordionDetails>
-              {getFlagsInRange(mon.tutorFlagsLA, 0, 8).map((i) => (
-                <AttributeRow key={`la_tutor_${i + 1}`} label={`Tutor ${i + 1}`} indent={10}>
-                  {MOVE_DATA[LATutorMoveIndexes[i]].name}
-                </AttributeRow>
-              ))}
-            </AccordionDetails>
-          </Accordion>
-        </AccordionGroup>
-      ) : (
-        <div />
-      )}
-
-      {!isRestricted(SV_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
-      mon.tmFlagsSV &&
-      getFlagsInRange(mon.tmFlagsSV, 0, 22).length > 0 ? (
-        <AccordionGroup>
-          <Accordion>
-            <AccordionSummary
-              indicator={<MdArrowForwardIos style={{ fontSize: '0.9rem' }} />}
-              sx={styles.accordionSummary}
-            >
-              <AttributeRow
-                label="SV TMs"
-                value={`${getFlagsInRange(mon.tmFlagsSV, 0, 22).length} TMs`}
-              />
-            </AccordionSummary>
-            <AccordionDetails>
-              {getFlagsInRange(mon.tmFlagsSV, 0, 22).map((i) => (
-                <AttributeRow key={`sv_tm_${i}`} label={`TM ${i}`} indent={10}>
-                  {MOVE_DATA[SVTMMoveIndexes[i]].name}
-                </AttributeRow>
-              ))}
-            </AccordionDetails>
-          </Accordion>
-        </AccordionGroup>
-      ) : (
-        <div />
-      )}
-
-      {(!isRestricted(SWSH_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) ||
-        !isRestricted(ORAS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum)) &&
-        mon.trainerMemory && (
+        {hasGen6OnData(mon) && mon.handlerName !== '' ? (
           <AccordionGroup>
             <Accordion>
               <AccordionSummary
                 indicator={<MdArrowForwardIos style={{ fontSize: '0.9rem' }} />}
                 sx={styles.accordionSummary}
               >
-                <AttributeRow label="Trainer Memory" value={mon.trainerName} />
+                <AttributeRow
+                  label="Recent Trainer"
+                  value={`${mon.handlerName} ${mon.handlerGender ? '♀' : '♂'}`}
+                />
               </AccordionSummary>
               <AccordionDetails>
+                {'handlerID' in mon && (
+                  <AttributeRow label="ID" value={mon.handlerID?.toString()} indent={10} />
+                )}
                 <AttributeRow
+                  label="Friendship"
+                  value={mon.handlerFriendship.toString()}
                   indent={10}
-                  label="Intensity"
-                  value={mon.trainerMemory.intensity.toString()}
                 />
-                <AttributeRow
-                  indent={10}
-                  label="Memory"
-                  value={mon.trainerMemory.memory.toString()}
-                />
-                <AttributeRow
-                  indent={10}
-                  label="Feeling"
-                  value={mon.trainerMemory.feeling.toString()}
-                />
-                <AttributeRow indent={10} label="Text Variables">
-                  <code>{`0x${mon.trainerMemory.textVariables
-                    .toString(16)
-                    .padStart(4, '0')}`}</code>
-                </AttributeRow>
+                {hasN3DSOnlyData(mon) && (
+                  <AttributeRow
+                    label="Affection"
+                    value={mon.handlerAffection.toString()}
+                    indent={10}
+                  />
+                )}
               </AccordionDetails>
             </Accordion>
           </AccordionGroup>
+        ) : (
+          <div />
         )}
-      {(!isRestricted(SWSH_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) ||
-        !isRestricted(ORAS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum)) &&
-        mon.handlerMemory && (
-          <AccordionGroup>
-            <Accordion>
-              <AccordionSummary
-                indicator={<MdArrowForwardIos style={{ fontSize: '0.9rem' }} />}
-                sx={styles.accordionSummary}
-              >
-                <AttributeRow label="Handler Memory" value={mon.handlerName} />
-              </AccordionSummary>
-              <AccordionDetails>
-                <AttributeRow
-                  indent={10}
-                  label="Intensity"
-                  value={mon.handlerMemory.intensity.toString()}
-                />
-                <AttributeRow
-                  indent={10}
-                  label="Memory"
-                  value={mon.handlerMemory.memory.toString()}
-                />
-                <AttributeRow
-                  indent={10}
-                  label="Feeling"
-                  value={mon.handlerMemory.feeling.toString()}
-                />
-                <AttributeRow indent={10} label="Text Variables">
-                  <code>{`0x${mon.handlerMemory.textVariables
-                    .toString(16)
-                    .padStart(4, '0')}`}</code>
-                </AttributeRow>
-              </AccordionDetails>
-            </Accordion>
-          </AccordionGroup>
+        <HiddenPowerDisplay mon={mon} />
+        {'personalityValue' in mon && mon.dexNum === NationalDex.Wurmple ? (
+          <AttributeRow
+            label="Wurmple Evolution"
+            value={
+              ((((hasGen6OnData(mon) ? mon.encryptionConstant : mon.personalityValue) ?? 0) >> 16) &
+                0xffff) %
+                10 >
+              4
+                ? 'Dustox'
+                : 'Beautifly'
+            }
+          />
+        ) : (
+          <div />
         )}
-      {!isRestricted(SWSH_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
-        hasGen8OnlyData(mon) && (
-          <>
-            <AttributeRow label="Dynamax">
-              <DynamaxLevel level={mon.dynamaxLevel} />
+        {mon.formArgument && mon.dexNum === NationalDex.Alcremie ? (
+          <AttributeRow label="Sweet" value={SWEETS[mon.formArgument]} />
+        ) : (
+          <div />
+        )}
+        {mon.personalityValue && mon.dexNum === NationalDex.Dunsparce ? (
+          <AttributeRow
+            label="Dudunsparce"
+            value={
+              (hasGen6OnData(mon) ? mon.encryptionConstant : mon.personalityValue) % 100
+                ? 'Two-Segment'
+                : 'Three-Segment'
+            }
+          />
+        ) : (
+          <div />
+        )}
+        {mon.encryptionConstant !== undefined && mon.dexNum === NationalDex.Tandemaus && (
+          <AttributeRow
+            label="Maushold"
+            value={mon.encryptionConstant % 100 ? 'Family of Four' : 'Family of Three'}
+          />
+        )}
+        {mon.gameOfOrigin && isGen4(mon.gameOfOrigin) && mon.encounterType !== undefined && (
+          <AttributeRow label="Gen 4 Encounter Type" value={EncounterTypes[mon.encounterType]} />
+        )}
+        {mon.shinyLeaves !== undefined &&
+          !isRestricted(HGSS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) && (
+            <AttributeRow label="Shiny Leaves">
+              <ShinyLeaves {...shinyLeafValues(mon.shinyLeaves)} />
             </AttributeRow>
-            <AttributeRow label="Can Gigantimax" value={mon.canGigantamax ? 'true' : 'false'} />
-            {mon.isShiny() && (
-              <AttributeRow
-                label="SwSh Shiny Type"
-                value={mon.isSquareShiny() ? 'Square' : 'Star'}
-              />
-            )}
+          )}
+        {!isRestricted(USUM_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
+        mon.geolocations &&
+        mon.geolocations[0].country ? (
+          <AccordionGroup>
+            <Accordion>
+              <AccordionSummary
+                indicator={<MdArrowForwardIos style={{ fontSize: '0.9rem' }} />}
+                sx={styles.accordionSummary}
+              >
+                <AttributeRow
+                  label="Geolocations"
+                  value={mon.geolocations?.filter((geo) => geo.country).length.toString()}
+                />
+              </AccordionSummary>
+              <AccordionDetails>
+                {mon.geolocations?.map((geo, i) =>
+                  geo.country ? (
+                    <AttributeRow key={`geo_${i + 1}`} label={`Geolocation ${i + 1}`} indent={10}>
+                      {Countries[geo.country]}, Region {geo.region}
+                    </AttributeRow>
+                  ) : (
+                    <div key={`geo_${i + 1}`} />
+                  )
+                )}
+              </AccordionDetails>
+            </Accordion>
+          </AccordionGroup>
+        ) : (
+          <div />
+        )}
+        {!isRestricted(SWSH_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
+        mon.trFlagsSwSh &&
+        getFlagsInRange(mon.trFlagsSwSh, 0, 14).length > 0 ? (
+          <AccordionGroup>
+            <Accordion>
+              <AccordionSummary
+                indicator={<MdArrowForwardIos style={{ fontSize: '0.9rem' }} />}
+                sx={styles.accordionSummary}
+              >
+                <AttributeRow
+                  label="SwSh TRs"
+                  value={`${getFlagsInRange(mon.trFlagsSwSh, 0, 14).length} TRs`}
+                />
+              </AccordionSummary>
+              <AccordionDetails>
+                {getFlagsInRange(mon.trFlagsSwSh, 0, 14).map((i) => (
+                  <AttributeRow key={`swsh_tr_${i}`} label={`TR ${i}`} indent={10}>
+                    {MOVE_DATA[SwShTRMoveIndexes[i]].name}
+                  </AttributeRow>
+                ))}
+              </AccordionDetails>
+            </Accordion>
+          </AccordionGroup>
+        ) : (
+          <div />
+        )}
+        {!isRestricted(HGSS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
+        mon.tmFlagsBDSP &&
+        getFlagsInRange(mon.tmFlagsBDSP, 0, 14).length > 0 ? (
+          <AccordionGroup>
+            <Accordion>
+              <AccordionSummary
+                indicator={<MdArrowForwardIos style={{ fontSize: '0.9rem' }} />}
+                sx={styles.accordionSummary}
+              >
+                <AttributeRow
+                  label="BDSP TMs"
+                  value={`${getFlagsInRange(mon.tmFlagsBDSP, 0, 14).length} TMs`}
+                />
+              </AccordionSummary>
+              <AccordionDetails>
+                {getFlagsInRange(mon.tmFlagsBDSP, 0, 14).map((i) => (
+                  <AttributeRow key={`bdsp_tm_${i + 1}`} label={`TM ${i + 1}`} indent={10}>
+                    {MOVE_DATA[BDSPTMMoveIndexes[i]].name}
+                  </AttributeRow>
+                ))}
+              </AccordionDetails>
+            </Accordion>
+          </AccordionGroup>
+        ) : (
+          <div />
+        )}
+        {!isRestricted(LA_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
+        mon.tutorFlagsLA &&
+        getFlagsInRange(mon.tutorFlagsLA, 0, 8).length > 0 ? (
+          <AccordionGroup>
+            <Accordion>
+              <AccordionSummary
+                indicator={<MdArrowForwardIos style={{ fontSize: '0.9rem' }} />}
+                sx={styles.accordionSummary}
+              >
+                <AttributeRow
+                  label="LA Tutor Moves"
+                  value={`${getFlagsInRange(mon.tutorFlagsLA, 0, 8).length} Tutor Moves`}
+                />
+              </AccordionSummary>
+              <AccordionDetails>
+                {getFlagsInRange(mon.tutorFlagsLA, 0, 8).map((i) => (
+                  <AttributeRow key={`la_tutor_${i + 1}`} label={`Tutor ${i + 1}`} indent={10}>
+                    {MOVE_DATA[LATutorMoveIndexes[i]].name}
+                  </AttributeRow>
+                ))}
+              </AccordionDetails>
+            </Accordion>
+          </AccordionGroup>
+        ) : (
+          <div />
+        )}
+
+        {!isRestricted(SV_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
+        mon.tmFlagsSV &&
+        getFlagsInRange(mon.tmFlagsSV, 0, 22).length > 0 ? (
+          <AccordionGroup>
+            <Accordion>
+              <AccordionSummary
+                indicator={<MdArrowForwardIos style={{ fontSize: '0.9rem' }} />}
+                sx={styles.accordionSummary}
+              >
+                <AttributeRow
+                  label="SV TMs"
+                  value={`${getFlagsInRange(mon.tmFlagsSV, 0, 22).length} TMs`}
+                />
+              </AccordionSummary>
+              <AccordionDetails>
+                {getFlagsInRange(mon.tmFlagsSV, 0, 22).map((i) => (
+                  <AttributeRow key={`sv_tm_${i}`} label={`TM ${i}`} indent={10}>
+                    {MOVE_DATA[SVTMMoveIndexes[i]].name}
+                  </AttributeRow>
+                ))}
+              </AccordionDetails>
+            </Accordion>
+          </AccordionGroup>
+        ) : (
+          <div />
+        )}
+
+        {(!isRestricted(SWSH_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) ||
+          !isRestricted(ORAS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum)) &&
+          mon.trainerMemory && (
+            <AccordionGroup>
+              <Accordion>
+                <AccordionSummary
+                  indicator={<MdArrowForwardIos style={{ fontSize: '0.9rem' }} />}
+                  sx={styles.accordionSummary}
+                >
+                  <AttributeRow label="Trainer Memory" value={mon.trainerName} />
+                </AccordionSummary>
+                <AccordionDetails>
+                  <AttributeRow
+                    indent={10}
+                    label="Intensity"
+                    value={mon.trainerMemory.intensity.toString()}
+                  />
+                  <AttributeRow
+                    indent={10}
+                    label="Memory"
+                    value={mon.trainerMemory.memory.toString()}
+                  />
+                  <AttributeRow
+                    indent={10}
+                    label="Feeling"
+                    value={mon.trainerMemory.feeling.toString()}
+                  />
+                  <AttributeRow indent={10} label="Text Variables">
+                    <code>{`0x${mon.trainerMemory.textVariables
+                      .toString(16)
+                      .padStart(4, '0')}`}</code>
+                  </AttributeRow>
+                </AccordionDetails>
+              </Accordion>
+            </AccordionGroup>
+          )}
+        {(!isRestricted(SWSH_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) ||
+          !isRestricted(ORAS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum)) &&
+          mon.handlerMemory && (
+            <AccordionGroup>
+              <Accordion>
+                <AccordionSummary
+                  indicator={<MdArrowForwardIos style={{ fontSize: '0.9rem' }} />}
+                  sx={styles.accordionSummary}
+                >
+                  <AttributeRow label="Handler Memory" value={mon.handlerName} />
+                </AccordionSummary>
+                <AccordionDetails>
+                  <AttributeRow
+                    indent={10}
+                    label="Intensity"
+                    value={mon.handlerMemory.intensity.toString()}
+                  />
+                  <AttributeRow
+                    indent={10}
+                    label="Memory"
+                    value={mon.handlerMemory.memory.toString()}
+                  />
+                  <AttributeRow
+                    indent={10}
+                    label="Feeling"
+                    value={mon.handlerMemory.feeling.toString()}
+                  />
+                  <AttributeRow indent={10} label="Text Variables">
+                    <code>{`0x${mon.handlerMemory.textVariables
+                      .toString(16)
+                      .padStart(4, '0')}`}</code>
+                  </AttributeRow>
+                </AccordionDetails>
+              </Accordion>
+            </AccordionGroup>
+          )}
+        {!isRestricted(SWSH_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
+          hasGen8OnlyData(mon) && (
+            <>
+              <AttributeRow label="Dynamax">
+                <DynamaxLevel level={mon.dynamaxLevel} />
+              </AttributeRow>
+              <AttributeRow label="Can Gigantimax" value={mon.canGigantamax ? 'true' : 'false'} />
+              {mon.isShiny() && (
+                <AttributeRow
+                  label="SwSh Shiny Type"
+                  value={mon.isSquareShiny() ? 'Square' : 'Star'}
+                />
+              )}
+            </>
+          )}
+        {!isRestricted(SV_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
+          hasGen9OnlyData(mon) && <ScarletVioletData mon={mon} />}
+        {!isRestricted(GEN2_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
+          hasGameBoyData(mon as any) && (
+            <AttributeRow label="Gen 1/2 ID" value={getMonGen12Identifier(mon)} />
+          )}
+        {!isRestricted(HGSS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
+          hasGen3OnData(mon as any) && (
+            <AttributeRow label="Gen 3/4/5 ID" value={getMonGen345Identifier(mon as any)} />
+          )}
+        {mon.checksum !== undefined && (
+          <>
+            <AttributeRow label="Checksum">
+              <code>{`0x${mon.checksum.toString(16).padStart(4, '0')}`}</code>
+            </AttributeRow>
+            <AttributeRow label="Calced Checksum">
+              <code>{`0x${get16BitChecksumLittleEndian(
+                mon.toBytes(),
+                0x08,
+                mon.toBytes().byteLength
+              )
+                .toString(16)
+                .padStart(4, '0')}`}</code>
+            </AttributeRow>
           </>
         )}
-      {!isRestricted(SV_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
-        hasGen9OnlyData(mon) && <ScarletVioletData mon={mon} />}
-      {!isRestricted(GEN2_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
-        hasGameBoyData(mon as any) && (
-          <AttributeRow label="Gen 1/2 ID" value={getMonGen12Identifier(mon)} />
+        {mon instanceof OHPKM && (
+          <AttributeRow label="OpenHome ID" value={getMonFileIdentifier(mon)} />
         )}
-      {!isRestricted(HGSS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
-        hasGen3OnData(mon as any) && (
-          <AttributeRow label="Gen 3/4/5 ID" value={getMonGen345Identifier(mon as any)} />
-        )}
-      {mon.checksum !== undefined && (
-        <>
-          <AttributeRow label="Checksum">
-            <code>{`0x${mon.checksum.toString(16).padStart(4, '0')}`}</code>
-          </AttributeRow>
-          <AttributeRow label="Calced Checksum">
-            <code>{`0x${get16BitChecksumLittleEndian(mon.toBytes(), 0x08, mon.toBytes().byteLength)
-              .toString(16)
-              .padStart(4, '0')}`}</code>
-          </AttributeRow>
-        </>
-      )}
-      {mon instanceof OHPKM && (
-        <AttributeRow label="OpenHome ID" value={getMonFileIdentifier(mon)} />
-      )}
+      </div>
     </div>
   )
 }
