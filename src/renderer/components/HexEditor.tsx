@@ -13,6 +13,7 @@ interface HexEditorProps {
 const styles: { [key: string]: CSSProperties } = {
   grid: {
     width: '100%',
+    maxWidth: 600,
     overflowY: 'scroll',
     fontSize: 14,
   },

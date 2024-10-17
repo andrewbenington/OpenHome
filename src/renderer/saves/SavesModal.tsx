@@ -1,6 +1,6 @@
-import { Grid, List, ListItemButton } from '@mui/joy'
+import { Button, Tab, tabClasses, TabList, TabPanel, Tabs } from '@mui/joy'
 import * as E from 'fp-ts/lib/Either'
-import { useCallback, useContext, useMemo, useState } from 'react'
+import { useCallback, useContext } from 'react'
 import 'react-data-grid/lib/styles.css'
 import { ParsedPath } from 'src/types/SAVTypes/path'
 import { buildSaveFile } from '../../types/SAVTypes/util'
@@ -20,7 +20,6 @@ const SavesModal = (props: SavesModalProps) => {
   const backend = useContext(BackendContext)
   const [, dispatchOpenSaves] = useContext(OpenSavesContext)
   const [lookupState] = useContext(LookupContext)
-  const [tab, setTab] = useState('recents')
 
   const openSaveFile = useCallback(
     async (filePath?: ParsedPath) => {
@@ -53,48 +52,58 @@ const SavesModal = (props: SavesModalProps) => {
     [backend, dispatchOpenSaves, lookupState, onClose]
   )
 
-  const gridComponent = useMemo(() => {
-    switch (tab) {
-      case 'suggested':
-        return <SuggestedSaves onOpen={openSaveFile} />
-      case 'recents':
-        return <RecentSaves onOpen={openSaveFile} />
-      default:
-        return <SaveFolders />
-    }
-  }, [tab, openSaveFile])
-
   return (
-    <Grid container style={{ height: '100%' }}>
-      <Grid xs={2}>
-        <List>
-          <button onClick={() => openSaveFile()} style={{ margin: 8, width: 'calc(100% - 16px)' }}>
-            Open File
-          </button>
-          <ListItemButton selected={tab === 'recents'} onClick={() => setTab('recents')}>
-            Recents
-          </ListItemButton>
-          <ListItemButton selected={tab === 'suggested'} onClick={() => setTab('suggested')}>
-            Suggested
-          </ListItemButton>
-          <ListItemButton selected={tab === 'save-folders'} onClick={() => setTab('save-folders')}>
-            Save Folders
-          </ListItemButton>
-        </List>
-      </Grid>
-      <Grid xs={10} style={{ height: '100%' }}>
-        <div
-          style={{
-            height: 'calc(100% - 16px)',
-            overflowY: 'scroll',
-            paddingTop: 8,
-            paddingBottom: 8,
-          }}
+    <Tabs
+      defaultValue="recents"
+      orientation="vertical"
+      sx={{ height: '100%', borderTopLeftRadius: 8, borderBottomLeftRadius: 8 }}
+    >
+      <TabList
+        variant="solid"
+        color="primary"
+        disableUnderline
+        sx={{
+          whiteSpace: 'nowrap',
+          p: 0.8,
+          gap: 0.5,
+          [`& .${tabClasses.root}`]: {
+            borderRadius: 'lg',
+          },
+          [`& .${tabClasses.root}[aria-selected="true"]`]: {
+            boxShadow: 'sm',
+          },
+          borderTopLeftRadius: 8,
+          borderBottomLeftRadius: 8,
+        }}
+      >
+        <Button
+          onClick={() => openSaveFile()}
+          style={{ margin: 8, width: 'calc(100% - 16px)' }}
+          color="primary"
+          variant="soft"
         >
-          {gridComponent}
-        </div>
-      </Grid>
-    </Grid>
+          Open File
+        </Button>
+        <Tab disableIndicator value={'recents'} variant="solid" color="primary">
+          Recents
+        </Tab>
+        <Tab disableIndicator value={'suggested'} variant="solid" color="primary">
+          Suggested
+        </Tab>
+        <Tab disableIndicator value={'folders'} variant="solid" color="primary">
+          Save Folders
+        </Tab>
+      </TabList>
+      <TabPanel value="recents">
+        <RecentSaves onOpen={openSaveFile} />
+      </TabPanel>
+      <TabPanel value="suggested">
+        <SuggestedSaves onOpen={openSaveFile} />
+      </TabPanel>
+      <TabPanel value="folders">
+        <SaveFolders />
+      </TabPanel>
+    </Tabs>
   )
 }
 

@@ -30,7 +30,7 @@ export default function JSONDisplay(props: JSONDisplayProps) {
   }
 
   return (
-    <Box display="flex" flexDirection="column" width="100%" marginLeft={2}>
+    <Box display="flex" flexDirection="column" width="calc(100% - 16px)" marginLeft={2}>
       <JSONTree theme={jsonTheme} data={mon} />
     </Box>
   )
