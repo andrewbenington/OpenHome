@@ -1,15 +1,10 @@
-import { Card, DialogActions, Modal, ModalDialog, Stack, Typography } from '@mui/joy'
-import { useCallback, useEffect, useState } from 'react'
+import { Button, Card, DialogActions, Modal, ModalDialog, Stack, Typography } from '@mui/joy'
+import * as E from 'fp-ts/lib/Either'
+import { useCallback, useContext, useEffect, useState } from 'react'
 import { MdDelete } from 'react-icons/md'
 import { SaveFolder } from 'src/types/storage'
-
-async function loadSaveFolders(): Promise<SaveFolder[]> {
-  return await window.electron.ipcRenderer.invoke('read-save-folders')
-}
-
-async function pickFolder(): Promise<string | undefined> {
-  return await window.electron.ipcRenderer.invoke('pick-save-folder')
-}
+import { BackendContext } from '../backend/backendProvider'
+import { AddFolderIcon } from '../components/Icons'
 
 async function upsertFolder(folderPath: string, label: string) {
   await window.electron.ipcRenderer.invoke('upsert-save-folder', folderPath, label)
@@ -22,33 +17,60 @@ async function invokeRemoveFolder(folderPath: string) {
 export default function SaveFolders() {
   const [saveFolders, setSaveFolders] = useState<SaveFolder[]>()
   const [pendingDirPath, setPendingDirPath] = useState<string>()
+  const backend = useContext(BackendContext)
+  const [error, setError] = useState<string>()
 
   useEffect(() => {
-    loadSaveFolders().then((folders) => setSaveFolders(folders))
-  }, [])
+    backend.getSaveFolders().then(
+      E.match(
+        (err) => setError(err),
+        (folders) => setSaveFolders(folders)
+      )
+    )
+  }, [backend])
 
   const refreshFolders = useCallback(
-    () => loadSaveFolders().then((folders) => setSaveFolders(folders)),
-    []
+    () =>
+      backend.getSaveFolders().then(
+        E.match(
+          (err) => setError(err),
+          (folders) => setSaveFolders(folders)
+        )
+      ),
+    [backend]
   )
 
   const addFolder = useCallback(
-    () => pickFolder().then((path) => path && setPendingDirPath(path)),
-    []
+    () =>
+      backend.pickFolder().then(
+        E.match(
+          (err) => setError(err),
+          (dir) => setPendingDirPath(dir)
+        )
+      ),
+    [backend]
   )
 
   const removeFolder = useCallback(
     (path: string) => invokeRemoveFolder(path).then(() => refreshFolders()),
-    []
+    [refreshFolders]
   )
 
   return (
     <div>
-      <Typography>Save Folders</Typography>
-      <button onClick={addFolder}>Add Folder</button>
+      <div style={{ width: '100%', display: 'grid', justifyContent: 'right', marginBottom: 8 }}>
+        <Button
+          onClick={addFolder}
+          color="secondary"
+          variant="solid"
+          sx={{ padding: 1, '& svg': { width: 20, height: 20 } }}
+        >
+          <AddFolderIcon style={{ marginRight: 8 }} /> Add Folder
+        </Button>
+      </div>
       <Stack>
         {saveFolders?.map((folder) => (
-          <Card key={folder.path}>
+          <Card key={folder.path} color="primary" variant="soft">
             <Stack direction="row">
               <div>{folder.label ?? folder.path}</div>
               <div style={{ color: '#666' }}>{folder.path}</div>
@@ -82,6 +104,14 @@ export default function SaveFolders() {
           }
         }}
       />
+      <Modal open={!!error} onClose={() => setError(undefined)}>
+        <ModalDialog>
+          <Typography>{error}</Typography>
+          <DialogActions>
+            <button onClick={() => setError(undefined)}>OK</button>
+          </DialogActions>
+        </ModalDialog>
+      </Modal>
     </div>
   )
 }
