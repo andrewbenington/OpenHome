@@ -148,15 +148,17 @@ const Home = () => {
       if (isGameBoy(saveOrigin)) {
         changedMons.forEach((mon) => {
           const openHomeIdentifier = getMonFileIdentifier(mon)
-          if (openHomeIdentifier !== undefined) {
-            gen12[getMonGen12Identifier(mon)] = openHomeIdentifier
+          const gen12Identifier = getMonGen12Identifier(mon)
+          if (openHomeIdentifier !== undefined && gen12Identifier) {
+            gen12[gen12Identifier] = openHomeIdentifier
           }
         })
       } else if (isGen3(saveOrigin) || isGen4(saveOrigin) || isGen5(saveOrigin)) {
         changedMons.forEach((mon) => {
           const openHomeIdentifier = getMonFileIdentifier(mon)
-          if (openHomeIdentifier !== undefined) {
-            gen345[getMonGen345Identifier(mon)] = openHomeIdentifier
+          const gen345Identifier = getMonGen345Identifier(mon)
+          if (openHomeIdentifier !== undefined && gen345Identifier) {
+            gen345[gen345Identifier] = openHomeIdentifier
           }
         })
       }
@@ -318,7 +320,17 @@ const Home = () => {
         </div>{' '}
       </Stack>
       <Modal open={!!selectedMon} onClose={() => setSelectedMon(undefined)}>
-        <Card style={{ width: 800, height: 400, padding: 0, overflow: 'hidden' }}>
+        <Card
+          style={{
+            minWidth: 800,
+            width: 'fit-content',
+            maxWidth: '80%',
+            maxHeight: 'fit-content',
+            height: '95%',
+            padding: 0,
+            overflow: 'hidden',
+          }}
+        >
           {selectedMon && <PokemonDetailsPanel mon={selectedMon} tab={tab} setTab={setTab} />}
         </Card>
       </Modal>
@@ -328,7 +340,16 @@ const Home = () => {
         // fullWidth
         // PaperProps={{ sx: { height: 800 } }}
       >
-        <ModalDialog sx={{ minHeight: 400, height: 600, width: 1000 }}>
+        <ModalDialog
+          sx={{
+            minWidth: 800,
+            width: 'fit-content',
+            maxWidth: '80%',
+            maxHeight: 'fit-content',
+            height: '95%',
+            overflow: 'hidden',
+          }}
+        >
           <SavesModal
             onClose={() => {
               setOpenSaveDialog(false)

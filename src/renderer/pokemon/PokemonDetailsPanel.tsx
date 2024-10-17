@@ -1,9 +1,10 @@
 /* eslint-disable no-nested-ternary */
 import { Stack, Tab, tabClasses, TabList, TabPanel, Tabs } from '@mui/joy'
-import { PKM } from 'pokemon-files'
+import { AllPKMFields } from 'pokemon-files'
 import { useMemo, useState } from 'react'
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary'
 import { MdDownload } from 'react-icons/md'
+import { PKMFile } from 'src/types/pkm/util'
 import { fileTypeFromString } from '../../types/FileImport'
 import { OHPKM } from '../../types/pkm/OHPKM'
 import FileTypeSelect from './FileTypeSelect'
@@ -16,7 +17,7 @@ import StatsDisplay from './StatsDisplay'
 import SummaryDisplay from './SummaryDisplay'
 
 const PokemonDetailsPanel = (props: {
-  mon: PKM | OHPKM
+  mon: PKMFile
   tab?: string
   setTab?: (_: string) => void
 }) => {
@@ -112,7 +113,7 @@ const PokemonDetailsPanel = (props: {
           <SummaryDisplay mon={displayMon} />
         </TabPanel>
         <TabPanel value="moves_met_data">
-          <MetDataMovesDisplay mon={displayMon} />
+          <MetDataMovesDisplay mon={displayMon as AllPKMFields} />
         </TabPanel>
         <TabPanel value="stats">
           <StatsDisplay mon={displayMon} />
@@ -121,7 +122,7 @@ const PokemonDetailsPanel = (props: {
           <RibbonsDisplay mon={displayMon} />
         </TabPanel>
         <TabPanel value="other">
-          <OtherDisplay mon={displayMon} />
+          <OtherDisplay mon={displayMon as AllPKMFields} />
         </TabPanel>
         <TabPanel value="json">
           <JSONDisplay mon={displayMon} />

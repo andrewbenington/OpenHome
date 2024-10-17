@@ -58,7 +58,14 @@ export default function SaveFolders() {
 
   return (
     <div>
-      <div style={{ width: '100%', display: 'grid', justifyContent: 'right', marginBottom: 8 }}>
+      <div
+        style={{
+          width: '100%',
+          display: 'grid',
+          justifyContent: 'right',
+          marginBottom: 8,
+        }}
+      >
         <Button
           onClick={addFolder}
           color="secondary"
@@ -68,7 +75,7 @@ export default function SaveFolders() {
           <AddFolderIcon style={{ marginRight: 8 }} /> Add Folder
         </Button>
       </div>
-      <Stack>
+      <Stack style={{ overflowY: 'auto', height: '100%' }}>
         {saveFolders?.map((folder) => (
           <Card key={folder.path} color="primary" variant="soft">
             <Stack direction="row">
