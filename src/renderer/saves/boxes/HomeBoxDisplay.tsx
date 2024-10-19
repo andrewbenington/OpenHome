@@ -53,8 +53,6 @@ const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
   const dispatchImportMons = (mons: PKMFile[], location: MonLocation) =>
     openSavesDispatch({ type: 'import_mons', payload: { mons, dest: location } })
 
-  console.log('homebox render', props)
-
   return (
     homeData?.boxes[homeData.currentPCBox] && (
       <Card

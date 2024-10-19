@@ -41,8 +41,7 @@ import { hasGen4OnData } from '../interfaces/gen4'
 import { hasGen5OnlyData } from '../interfaces/gen5'
 import { hasGen6OnData, hasMemoryData, hasN3DSOnlyData } from '../interfaces/gen6'
 import { hasGen7OnData } from '../interfaces/gen7'
-import { hasGen8OnData, hasPLAData } from '../interfaces/gen8'
-import { hasGen9OnlyData } from '../interfaces/gen9'
+import { hasGen8OnData } from '../interfaces/gen8'
 import { hasGameBoyData } from '../interfaces/stats'
 import {
   contestStats,
@@ -87,7 +86,7 @@ export class OHPKM {
 
   bytes = new Uint8Array(433)
 
-  constructor(arg: PKM | OHPKM | Uint8Array) {
+  constructor(arg: PKM | OHPKM | Uint8Array<ArrayBuffer>) {
     if (arg instanceof Uint8Array) {
       this.bytes = arg
     } else {
@@ -325,7 +324,7 @@ export class OHPKM {
         this.tmFlagsBDSP = other.tmFlagsBDSP
       }
 
-      if (hasPLAData(other)) {
+      if ('gvs' in other) {
         this.isAlpha = other.isAlpha
         if (other.isAlpha && !this.ribbons.includes('Alpha Mark')) {
           this.ribbons = [...this.ribbons, 'Alpha Mark']
@@ -357,7 +356,7 @@ export class OHPKM {
         this.scale = other.scale ?? 0
       }
 
-      if (hasGen9OnlyData(other)) {
+      if ('teraTypeOriginal' in other) {
         this.teraTypeOriginal = other.teraTypeOriginal
         this.teraTypeOverride = other.teraTypeOverride
         this.tmFlagsSV = other.tmFlagsSV
@@ -1477,11 +1476,11 @@ export class OHPKM {
   }
 
   public get tmFlagsSVDLC() {
-    return this.bytes.slice(0x1a4, 0x1a4 + 13)
+    return this.bytes.slice(0x1a4, 0x1a4 + 13).buffer
   }
 
-  public set tmFlagsSVDLC(value: Uint8Array) {
-    this.bytes.set(value.slice(0, 13), 0x1a4)
+  public set tmFlagsSVDLC(value: ArrayBuffer) {
+    this.bytes.set(new Uint8Array(value).slice(0, 13), 0x1a4)
   }
 
   public get stats(): stats {
@@ -1623,7 +1622,7 @@ export class OHPKM {
       this.gameOfOriginBattle = other.gameOfOriginBattle
     }
 
-    if (hasGen9OnlyData(other)) {
+    if ('teraTypeOriginal' in other) {
       this.teraTypeOverride = other.teraTypeOverride
       this.tmFlagsSV = other.tmFlagsSV
       this.obedienceLevel = other.obedienceLevel

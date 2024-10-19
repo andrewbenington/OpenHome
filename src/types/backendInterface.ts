@@ -10,7 +10,7 @@ export default interface BackendInterface {
   writeGen345Lookup: (lookup: LookupMap) => Promise<Errorable<null>>
 
   /* OHPKM management */
-  loadHomeMonLookup: () => Promise<Errorable<Record<string, Uint8Array>>>
+  loadHomeMonLookup: () => Promise<Errorable<Record<string, Uint8Array<ArrayBuffer>>>>
   writeHomeMon: (monBytes: Uint8Array) => Promise<Errorable<null>>
   deleteHomeMons: (identifiers: string[]) => Promise<Errorable<null>>
 
@@ -30,6 +30,11 @@ export default interface BackendInterface {
   getSaveFolders: () => Promise<Errorable<SaveFolder[]>>
   removeSaveFolder: (path: string) => Promise<Errorable<null>>
   upsertSaveFolder: (folderPath: string, label: string) => Promise<Errorable<null>>
+
+  /* transactions */
+  startTransaction: () => Promise<Errorable<null>>
+  commitTransaction: () => Promise<Errorable<null>>
+  rollbackTransaction: () => Promise<Errorable<null>>
 
   /* application */
   setHasChanges: (hasChanges: boolean) => Promise<void>

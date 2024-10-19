@@ -1,38 +1,46 @@
-import { Card } from '@mui/joy'
+import { Type } from 'pokemon-resources'
+import { useMemo } from 'react'
 import { MOVE_DATA } from '../../consts/Moves'
+import TypeIcon from '../components/TypeIcon'
 import { getTypeColor } from '../util/PokemonSprite'
-import { moveCardStyle } from './styles'
+import './style.css'
 
 interface MoveCardProps {
   move: number
   movePP?: number
   maxPP?: number
+  typeOverride?: Type
 }
 
-const MoveCard = ({ move, movePP, maxPP }: MoveCardProps) => {
+const MoveCard = ({ move, movePP, maxPP, typeOverride }: MoveCardProps) => {
+  const type = useMemo(() => typeOverride ?? (MOVE_DATA[move]?.type as Type), [typeOverride, move])
+
   return (
-    <Card
+    <div
+      className="move-card"
       style={{
-        ...moveCardStyle,
-        backgroundColor: getTypeColor(MOVE_DATA[move]?.type),
+        backgroundColor: getTypeColor(type),
       }}
     >
-      <div
-        style={{
-          color: 'white',
-          fontWeight: 'bold',
-        }}
-      >
-        {MOVE_DATA[move]?.name}
-      </div>
-      <div
-        style={{
-          color: 'white',
-        }}
-      >
-        {movePP ?? '--'}/{maxPP ?? '--'} PP
-      </div>
-    </Card>
+      {type && (
+        <>
+          <div className="type-icon-container">
+            <TypeIcon type={type} key={`${type}_type_icon`} size={32} border />
+          </div>
+
+          <div className="move-card-vert">
+            <div className="move-name">{MOVE_DATA[move]?.name}</div>
+            <div
+              style={{
+                color: 'white',
+              }}
+            >
+              {movePP ?? '--'}/{maxPP ?? '--'} PP
+            </div>
+          </div>
+        </>
+      )}
+    </div>
   )
 }
 
