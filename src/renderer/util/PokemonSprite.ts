@@ -1,7 +1,7 @@
 export const getTypeColor = (type: string) => {
   switch (type) {
     case 'normal':
-      return '#A8A878'
+      return 'rgb(146,153,160)'
     case 'fire':
       return '#F08030'
     case 'fighting':
@@ -39,6 +39,6 @@ export const getTypeColor = (type: string) => {
     case 'shadow':
       return '#604E82'
     default:
-      return '#888'
+      return '#555'
   }
 }

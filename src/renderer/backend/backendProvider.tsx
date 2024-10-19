@@ -1,4 +1,4 @@
-import { isLeft } from 'fp-ts/lib/Either'
+import * as E from 'fp-ts/lib/Either'
 import { PokemonData } from 'pokemon-species-data'
 import { createContext, PropsWithChildren } from 'react'
 import { OHPKM } from 'src/types/pkm/OHPKM'
@@ -6,7 +6,7 @@ import { SAV } from 'src/types/SAVTypes'
 import { HomeData } from 'src/types/SAVTypes/HomeData'
 import { StoredBoxData } from 'src/types/storage'
 import { Errorable } from 'src/types/types'
-import BackendInterface from './backendInterface'
+import BackendInterface from '../../types/backendInterface'
 import DummyBackend from './dummyBackend'
 
 export type BackendProviderProps = { backend: BackendInterface } & PropsWithChildren
@@ -29,7 +29,7 @@ export interface BackendWithHelpersInterface extends BackendInterface {
   writeAllSaveFiles: (saveFiles: SAV[]) => Promise<Errorable<null>[]>
 
   /* home data */
-  writeAllHomeData: (homeData: HomeData, mons: OHPKM[]) => Promise<string[]>
+  writeAllHomeData: (homeData: HomeData, mons: OHPKM[]) => Promise<Errorable<null>[]>
 }
 
 async function writeAllSaveFiles(
@@ -46,31 +46,29 @@ async function writeAllHomeData(
   backend: BackendInterface,
   homeData: HomeData,
   mons: OHPKM[]
-): Promise<string[]> {
+): Promise<Errorable<null>[]> {
   const allStoredBoxData: StoredBoxData[] = homeData.boxes.map((box, index) => ({
     index,
     name: box.name,
     monIdentifiersByIndex: box.getIdentifierMapping(),
   }))
   const boxesResult = await backend.writeHomeBoxes(allStoredBoxData)
-  if (isLeft(boxesResult)) {
-    return [boxesResult.left]
+  if (E.isLeft(boxesResult)) {
+    return [boxesResult]
   }
 
-  const errors: string[] = []
+  const results: Errorable<null>[] = []
   for (const mon of mons) {
     try {
       const bytes = new Uint8Array(mon.toBytes())
       const result = await backend.writeHomeMon(bytes)
-      if (isLeft(result)) {
-        errors.push(result.left)
-      }
+      results.push(result)
     } catch (e) {
       const species = mon.dexNum in PokemonData ? PokemonData[mon.dexNum].name : 'Unknown Species'
-      errors.push(`Error encoding ${mon.nickname} (${species})`)
+      results.push(E.left(`Error encoding ${mon.nickname} (${species})`))
     }
   }
-  return errors
+  return results
 }
 
 export function BackendProvider({ backend, children }: BackendProviderProps) {

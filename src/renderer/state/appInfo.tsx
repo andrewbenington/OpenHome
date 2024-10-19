@@ -14,7 +14,6 @@ export const appInfoReducer: Reducer<AppInfoState, AppInfoAction> = (
   action: AppInfoAction
 ) => {
   const { type, payload } = action
-  console.log('appinfo state:', type, payload)
   switch (type) {
     case 'set_resources_path': {
       return {

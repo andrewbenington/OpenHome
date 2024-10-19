@@ -22,7 +22,6 @@ export function fileCanOpen(filePath: string): boolean {
     fs.accessSync(filePath, fs.constants.F_OK)
     return true
   } catch (err) {
-    console.log(`Can't open ${filePath}: ${err}`)
     return false
   }
 }
@@ -35,14 +34,6 @@ export async function selectFile() {
   // Open file picker
   const result = await dialog.showOpenDialog({
     properties: ['openFile'],
-  })
-  return result.filePaths
-}
-
-export async function selectFiles() {
-  // Open file picker
-  const result = await dialog.showOpenDialog({
-    properties: ['openFile', 'multiSelections'],
   })
   return result.filePaths
 }

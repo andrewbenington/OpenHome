@@ -116,11 +116,9 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
   action: OpenSavesAction
 ) => {
   const { type, payload } = action
-  console.log('openSaves reducer:', type, payload)
   switch (type) {
     case 'set_home_boxes': {
       const { boxes, homeLookup } = payload
-      console.log(boxes, homeLookup)
       const newHomeData = state.homeData ?? new HomeData()
       Object.values(boxes).forEach((box) => {
         newHomeData.boxes[box.index].loadMonsFromIdentifiers(box.monIdentifiersByIndex, homeLookup)
@@ -216,7 +214,6 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
       const mons = action.payload.mons.filter(
         (mon) => !((getMonFileIdentifier(new OHPKM(mon)) ?? '') in state.modifiedOHPKMs)
       )
-      console.log(action.payload.mons.map((mon) => getMonFileIdentifier(new OHPKM(mon))))
 
       let nextIndex = dest.boxPos
       const isHome = dest.save instanceof HomeData
@@ -246,7 +243,6 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
         state.openSaves[saveToStringIdentifier(tempSave)].save = tempSave
       }
       addedMons.forEach((mon) => (state.modifiedOHPKMs[getMonFileIdentifier(mon) ?? ''] = mon))
-      console.log(state)
       return { ...state }
     }
     case 'add_mon_to_release': {

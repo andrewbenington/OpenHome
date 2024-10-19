@@ -1,4 +1,4 @@
-import { Grid } from '@mui/joy'
+import { Grid, useTheme } from '@mui/joy'
 import { Buffer } from 'buffer'
 import hexy from 'hexy'
 import lodash from 'lodash'
@@ -29,6 +29,7 @@ const HexEditor = ({ data, format }: HexEditorProps) => {
   const [hexyText, setHexyText] = useState<string>()
   const [currentHover, setCurrentHover] = useState<number>()
   const schema = FileSchemas[format]
+  const theme = useTheme()
 
   useEffect(() => {
     if (data) {
@@ -73,7 +74,9 @@ const HexEditor = ({ data, format }: HexEditorProps) => {
                 style={{
                   ...styles.prefix,
                   backgroundColor:
-                    currentHover && Math.floor(currentHover / 16) === i ? '#fffa' : '#ccc',
+                    currentHover && Math.floor(currentHover / 16) === i
+                      ? theme.palette.background.surface
+                      : undefined,
                 }}
               >
                 {prefix.substring(4, 8)}
@@ -83,7 +86,7 @@ const HexEditor = ({ data, format }: HexEditorProps) => {
               {bytePairs.map((pair, j) => {
                 const byteIndex = 16 * i + 2 * j
                 return (
-                  <Fragment key={`byte_${byteIndex}`}>
+                  <div key={`byte_${byteIndex}`} style={{ display: 'flex' }}>
                     <div
                       style={{
                         backgroundColor:
@@ -91,8 +94,9 @@ const HexEditor = ({ data, format }: HexEditorProps) => {
                           (hoveredField?.byteOffset &&
                             byteIndex >= hoveredField.byteOffset &&
                             byteIndex < hoveredField.byteOffset + (hoveredField.numBytes ?? 1))
-                            ? 'white'
-                            : '#0000',
+                            ? theme.palette.background.surface
+                            : undefined,
+                        paddingLeft: 5,
                       }}
                       onMouseOver={() => {
                         setCurrentHover(byteIndex)
@@ -118,9 +122,9 @@ const HexEditor = ({ data, format }: HexEditorProps) => {
                           (hoveredField?.byteOffset &&
                             byteIndex + 1 >= hoveredField.byteOffset &&
                             byteIndex + 1 < hoveredField.byteOffset + (hoveredField.numBytes ?? 1))
-                            ? 'white'
-                            : '#0000',
-                        marginRight: 10,
+                            ? theme.palette.background.surface
+                            : undefined,
+                        paddingRight: 5,
                       }}
                       onMouseOver={() => {
                         setCurrentHover(byteIndex + 1)
@@ -134,11 +138,11 @@ const HexEditor = ({ data, format }: HexEditorProps) => {
                           f.byteOffset !== undefined &&
                           f.byteOffset <= byteIndex + 1 &&
                           byteIndex + 1 < f.byteOffset + (f.numBytes ?? 1)
-                      )?.name}`}
+                      )?.name}\n${byteIndex % 16}`}
                     >
                       <code>{pair.substring(2)}</code>
                     </div>
-                  </Fragment>
+                  </div>
                 )
               })}
             </Grid>
