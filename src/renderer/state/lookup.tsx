@@ -30,7 +30,7 @@ export type LookupAction =
     }
   | {
       type: 'load_home_mons'
-      payload: Record<string, Uint8Array>
+      payload: Record<string, Uint8Array<ArrayBuffer>>
     }
   | {
       type: 'set_error'
@@ -43,7 +43,6 @@ export type LookupAction =
 
 const reducer: Reducer<LookupState, LookupAction> = (state: LookupState, action: LookupAction) => {
   const { type, payload } = action
-  console.log('LOOKUP STATE:', action)
   switch (type) {
     case 'set_error': {
       return {

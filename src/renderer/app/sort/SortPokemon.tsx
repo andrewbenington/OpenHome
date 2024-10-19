@@ -1,4 +1,4 @@
-import { Autocomplete, Card, Chip, Modal, ModalDialog, Stack } from '@mui/joy'
+import { Autocomplete, Card, Chip, Modal, ModalDialog, ModalOverflow, Stack } from '@mui/joy'
 import dayjs from 'dayjs'
 import { GameOfOrigin } from 'pokemon-resources'
 import { useContext, useMemo, useState } from 'react'
@@ -91,7 +91,7 @@ export default function SortPokemon() {
       <Stack style={{ flex: 1, height: '100%' }}>
         <Card>
           <Autocomplete
-            options={['nickname', 'level', 'species', 'ribbon', 'met_date']}
+            options={['nickname', 'level', 'species', 'ribbons', 'met_date']}
             onChange={(_, value) => setSort(value ?? '')}
             placeholder="Sort"
           />
@@ -134,9 +134,19 @@ export default function SortPokemon() {
         </ModalDialog>
       </Modal>
       <Modal open={!!selectedMon} onClose={() => setSelectedMon(undefined)}>
-        <Card style={{ width: 800, height: 400, padding: 0, overflow: 'hidden' }}>
-          {selectedMon && <PokemonDetailsPanel mon={selectedMon} tab={tab} setTab={setTab} />}
-        </Card>
+        <ModalOverflow>
+          <ModalDialog
+            style={{
+              width: 800,
+              maxWidth: '80%',
+              padding: 0,
+              maxHeight: '95%',
+              overflow: 'hidden',
+            }}
+          >
+            {selectedMon && <PokemonDetailsPanel mon={selectedMon} tab={tab} setTab={setTab} />}
+          </ModalDialog>
+        </ModalOverflow>
       </Modal>
     </Stack>
   )

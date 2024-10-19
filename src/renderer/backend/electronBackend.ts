@@ -1,8 +1,8 @@
 import { createContext } from 'react'
+import BackendInterface from '../../types/backendInterface'
 import { ParsedPath, PossibleSaves } from '../../types/SAVTypes/path'
 import { SaveFolder, StoredBoxData } from '../../types/storage'
 import { Errorable, LoadSaveResponse, LookupMap, SaveRef } from '../../types/types'
-import BackendInterface from './backendInterface'
 
 export const ElectronBackend: BackendInterface = {
   /* past gen identifier lookups */
@@ -20,7 +20,7 @@ export const ElectronBackend: BackendInterface = {
   },
 
   /* OHPKM management */
-  loadHomeMonLookup: function (): Promise<Errorable<Record<string, Uint8Array>>> {
+  loadHomeMonLookup: function (): Promise<Errorable<Record<string, Uint8Array<ArrayBuffer>>>> {
     return window.electron.ipcRenderer.invoke('load-home-mons')
   },
   deleteHomeMons: (identifiers: string[]): Promise<Errorable<null>> =>
@@ -42,7 +42,7 @@ export const ElectronBackend: BackendInterface = {
     return window.electron.ipcRenderer.invoke('load-save-file', filePath)
   },
   writeSaveFile: (path: string, bytes: Uint8Array) => {
-    return window.electron.ipcRenderer.invoke('write-save-file', { path, bytes })
+    return window.electron.ipcRenderer.invoke('write-save-file', path, bytes)
   },
 
   /* game save management */
@@ -65,7 +65,18 @@ export const ElectronBackend: BackendInterface = {
     return window.electron.ipcRenderer.invoke('remove-save-folder', path)
   },
   upsertSaveFolder: (folderPath: string, label: string): Promise<Errorable<null>> => {
-    return window.electron.ipcRenderer.invoke('remove-save-folder', folderPath, label)
+    return window.electron.ipcRenderer.invoke('upsert-save-folder', folderPath, label)
+  },
+
+  /* transactions */
+  startTransaction: (): Promise<Errorable<null>> => {
+    return window.electron.ipcRenderer.invoke('start-transaction')
+  },
+  commitTransaction: (): Promise<Errorable<null>> => {
+    return window.electron.ipcRenderer.invoke('commit-transaction')
+  },
+  rollbackTransaction: (): Promise<Errorable<null>> => {
+    return window.electron.ipcRenderer.invoke('rollback-transaction')
   },
 
   /* application */

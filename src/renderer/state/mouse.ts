@@ -39,7 +39,6 @@ export const mouseReducer: Reducer<MouseState, MouseAction> = (
   action: MouseAction
 ) => {
   const { type, payload } = action
-  console.log('mouseState:', type, payload)
   switch (type) {
     case 'set_shift': {
       const newState = {

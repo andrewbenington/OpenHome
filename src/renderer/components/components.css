@@ -24,3 +24,8 @@
 .mono-cell {
   font-family: monospace;
 }
+
+.type-icon-border {
+  /* border: 2px solid white; */
+  border-radius: 16px;
+}

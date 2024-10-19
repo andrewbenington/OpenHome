@@ -1,9 +1,9 @@
 import { electronApp, is, optimizer } from '@electron-toolkit/utils'
-import { BrowserWindow, app, dialog, shell } from 'electron'
+import { app, BrowserWindow, dialog, shell } from 'electron'
 import { join } from 'path'
 import icon from '../../resources/icon.ico?asset'
 import { initializeFolders } from './fileHandlers'
-import initListeners from './initListeners'
+import { initListeners, OpenHomeAppBackend } from './initListeners'
 import MenuBuilder from './menu'
 import { migrateAll } from './migrateStorage'
 
@@ -75,7 +75,8 @@ app.whenReady().then(() => {
 
   createWindow()
   initializeFolders()
-  initListeners()
+  const backend = new OpenHomeAppBackend()
+  initListeners(backend)
   migrateAll()
 
   app.on('activate', function () {

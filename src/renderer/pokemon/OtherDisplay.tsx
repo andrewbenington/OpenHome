@@ -78,8 +78,8 @@ const OtherDisplay = (props: { mon: AllPKMFields }) => {
         style={{
           display: 'flex',
           flexDirection: 'column' as 'column',
-          height: '100%',
-          marginBottom: 10,
+          height: 'calc(100% - 16px)',
+          padding: 8,
           overflowY: 'auto',
         }}
       >

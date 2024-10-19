@@ -1,18 +1,19 @@
-import { Button, Card, DialogActions, Modal, ModalDialog, Stack, Typography } from '@mui/joy'
+import {
+  Button,
+  Card,
+  DialogActions,
+  DialogTitle,
+  Modal,
+  ModalDialog,
+  Stack,
+  Typography,
+} from '@mui/joy'
 import * as E from 'fp-ts/lib/Either'
 import { useCallback, useContext, useEffect, useState } from 'react'
 import { MdDelete } from 'react-icons/md'
 import { SaveFolder } from 'src/types/storage'
 import { BackendContext } from '../backend/backendProvider'
 import { AddFolderIcon } from '../components/Icons'
-
-async function upsertFolder(folderPath: string, label: string) {
-  await window.electron.ipcRenderer.invoke('upsert-save-folder', folderPath, label)
-}
-
-async function invokeRemoveFolder(folderPath: string) {
-  await window.electron.ipcRenderer.invoke('remove-save-folder', folderPath)
-}
 
 export default function SaveFolders() {
   const [saveFolders, setSaveFolders] = useState<SaveFolder[]>()
@@ -52,12 +53,35 @@ export default function SaveFolders() {
   )
 
   const removeFolder = useCallback(
-    (path: string) => invokeRemoveFolder(path).then(() => refreshFolders()),
-    [refreshFolders]
+    (path: string) =>
+      backend.removeSaveFolder(path).then(
+        E.match(
+          async (err) => {
+            setError(err)
+          },
+          () => refreshFolders()
+        )
+      ),
+    [backend, refreshFolders]
   )
 
+  const upsertFolder = useCallback(
+    (path: string, label: string) =>
+      backend.upsertSaveFolder(path, label).then(
+        E.match(
+          async (err) => {
+            setError(err)
+          },
+          () => {
+            setPendingDirPath(undefined)
+            refreshFolders()
+          }
+        )
+      ),
+    [backend, refreshFolders]
+  )
   return (
-    <div>
+    <div style={{ padding: 8 }}>
       <div
         style={{
           width: '100%',
@@ -79,7 +103,7 @@ export default function SaveFolders() {
         {saveFolders?.map((folder) => (
           <Card key={folder.path} color="primary" variant="soft">
             <Stack direction="row">
-              <div>{folder.label ?? folder.path}</div>
+              <b>{folder.label ?? folder.path}</b>
               <div style={{ color: '#666' }}>{folder.path}</div>
               <button
                 style={{
@@ -132,17 +156,34 @@ type FolderLabelDialogProps = {
 function FolderLabelDialog(props: FolderLabelDialogProps) {
   const { open, submitLabel, onClose } = props
   const [label, setLabel] = useState('')
+
   return (
     <Modal open={open} onClose={() => onClose()}>
-      <ModalDialog>
-        <label style={{ margin: 8 }}>
-          Folder Label
-          <input value={label} onChange={(e) => setLabel(e.target.value)}></input>
-        </label>
-
+      <ModalDialog style={{ padding: 8 }}>
+        <DialogTitle>Set Folder Label</DialogTitle>
+        <input placeholder="Label" value={label} onChange={(e) => setLabel(e.target.value)} />
         <DialogActions>
-          <button onClick={() => onClose()}>Cancel</button>
-          <button onClick={() => submitLabel(label)}>Save</button>
+          <Button
+            color="secondary"
+            style={{ padding: '0px 16px' }}
+            onClick={() => {
+              submitLabel(label)
+              setLabel('')
+            }}
+          >
+            Save
+          </Button>
+          <Button
+            style={{ padding: '0px 16px' }}
+            variant="outlined"
+            color="neutral"
+            onClick={() => {
+              setLabel('')
+              onClose()
+            }}
+          >
+            Cancel
+          </Button>
         </DialogActions>
       </ModalDialog>
     </Modal>

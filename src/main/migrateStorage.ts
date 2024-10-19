@@ -96,7 +96,7 @@ function recentSavesFromCSV(csvPath: string): SaveRefMap {
   return recentSaves
 }
 
-export function migrateRecentSavesCSV() {
+export function migrateAll() {
   const appDataPath = app.getPath('appData')
   const savesPath = path.join(appDataPath, 'OpenHome', 'storage', 'saveFiles.csv')
   if (fileCanOpen(savesPath)) {
@@ -131,8 +131,4 @@ export function migrateRecentSavesCSV() {
     updateStoredList<StoredBoxData>('box-data.json', boxData)
     fs.rmSync(oldBoxFolderPath, { recursive: true, force: true })
   }
-}
-
-export function migrateAll() {
-  migrateRecentSavesCSV()
 }
