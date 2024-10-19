@@ -1,6 +1,6 @@
 import { Chip, Grid } from '@mui/joy'
 import { getDisplayID } from 'pokemon-files'
-import { AbilityToString, Languages } from 'pokemon-resources'
+import { AbilityToString } from 'pokemon-resources'
 import { PokemonData } from 'pokemon-species-data'
 import { useMemo, useState } from 'react'
 import { hasGen5OnlyData } from 'src/types/interfaces/gen5'
@@ -86,9 +86,7 @@ const SummaryDisplay = (props: { mon: PKMFile }) => {
             <div />
           )}
           <div style={{ fontWeight: 'bold' }}>{mon.nickname}</div>
-          {'languageIndex' in mon && (
-            <Chip style={styles.language}>{Languages[mon.languageIndex]}</Chip>
-          )}
+          {'languageIndex' in mon && <Chip style={styles.language}>{mon.language}</Chip>}
         </div>
         <AttributeRow label="Item" justifyEnd>
           {mon.heldItemName !== 'None' && (
@@ -159,14 +157,12 @@ const SummaryDisplay = (props: { mon: PKMFile }) => {
             })`}
           />
         )}
-        <AttributeRow label="Level" justifyEnd>
+        <AttributeRow label="Level">
           {['PK1', 'PK2'].includes(mon.format)
             ? getLevelGen12(mon.dexNum, mon.exp)
             : getLevelGen3Onward(mon.dexNum, mon.exp)}
         </AttributeRow>
-        <AttributeRow label="EXP" justifyEnd>
-          {mon.exp}
-        </AttributeRow>
+        <AttributeRow label="EXP">{mon.exp}</AttributeRow>
       </Grid>
     </Grid>
   )

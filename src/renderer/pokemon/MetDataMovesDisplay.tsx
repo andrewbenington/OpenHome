@@ -1,4 +1,4 @@
-import { Card } from '@mui/joy'
+import { Chip } from '@mui/joy'
 import { AllPKMFields } from 'pokemon-files'
 import { GameOfOriginData, getLocationString, NatureToString } from 'pokemon-resources'
 import { useMemo } from 'react'
@@ -144,7 +144,7 @@ const MetDataMovesDisplay = (props: { mon: AllPKMFields }) => {
                 ? ` ${RibbonTitles[mon.affixedRibbon]}`
                 : ''}
             </p>
-            <Card sx={styles.language}>{mon.language}</Card>
+            <Chip style={styles.language}>{mon.language}</Chip>
           </div>
           {eggMessage ? <p style={styles.description}>{eggMessage}</p> : <div />}
           <p style={styles.description}>{metMessage}</p>
