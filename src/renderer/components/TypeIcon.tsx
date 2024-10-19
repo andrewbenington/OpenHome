@@ -6,9 +6,8 @@ interface TypeIconProps {
   type?: Type
   typeIndex?: number
   border?: boolean
+  size?: number
 }
-
-const typeIconStyle = { height: 24, width: 24 }
 
 const TypeIcon = (props: TypeIconProps) => {
   const type = props.typeIndex ? teraTypeFromIndex(props.typeIndex) : props.type
@@ -18,7 +17,7 @@ const TypeIcon = (props: TypeIconProps) => {
       title={`${type} type`}
       draggable={false}
       alt={`${type} type`}
-      style={typeIconStyle}
+      style={{ height: props.size ?? 24, width: props.size ?? 24 }}
       src={type && getPublicImageURL(getTypeIconPath(type))}
     />
   )
