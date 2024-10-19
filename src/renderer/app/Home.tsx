@@ -155,6 +155,7 @@ const Home = () => {
 
     const result = await backend.startTransaction()
     if (E.isLeft(result)) {
+      setErrorMessages([result.left])
       return
     }
 
