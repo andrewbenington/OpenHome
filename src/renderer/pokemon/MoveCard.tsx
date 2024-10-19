@@ -25,7 +25,7 @@ const MoveCard = ({ move, movePP, maxPP, typeOverride }: MoveCardProps) => {
       {type && (
         <>
           <div className="type-icon-container">
-            <TypeIcon type={type} key={`${type}_type_icon`} border />
+            <TypeIcon type={type} key={`${type}_type_icon`} size={32} border />
           </div>
 
           <div className="move-card-vert">

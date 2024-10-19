@@ -24,6 +24,7 @@ const styles = {
     flex: 1,
     flexDirection: 'row',
     height: 'fit-content',
+    padding: 4,
   },
   language: { padding: '5px 10px 5px 10px', marginLeft: 10 },
   gameContainer: {
