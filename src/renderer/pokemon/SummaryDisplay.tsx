@@ -1,4 +1,4 @@
-import { Card, Grid } from '@mui/joy'
+import { Chip, Grid } from '@mui/joy'
 import { getDisplayID } from 'pokemon-files'
 import { AbilityToString, Languages } from 'pokemon-resources'
 import { PokemonData } from 'pokemon-species-data'
@@ -39,8 +39,8 @@ const styles = {
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
-    paddingLeft: 10,
-    paddingRight: 10,
+    fontSize: 20,
+    marginBottom: 8,
   },
 } as Styles
 
@@ -55,7 +55,7 @@ const SummaryDisplay = (props: { mon: PKMFile }) => {
   }, [mon])
 
   return (
-    <Grid container>
+    <Grid container spacing={1} width="100%" paddingLeft={1}>
       <Grid xs={6}>
         <div style={styles.column}>
           {imageError ? (
@@ -85,9 +85,9 @@ const SummaryDisplay = (props: { mon: PKMFile }) => {
           ) : (
             <div />
           )}
-          <p style={{ fontWeight: 'bold' }}>{mon.nickname}</p>
+          <div style={{ fontWeight: 'bold' }}>{mon.nickname}</div>
           {'languageIndex' in mon && (
-            <Card style={styles.language}>{Languages[mon.languageIndex]}</Card>
+            <Chip style={styles.language}>{Languages[mon.languageIndex]}</Chip>
           )}
         </div>
         <AttributeRow label="Item" justifyEnd>
@@ -138,8 +138,9 @@ const SummaryDisplay = (props: { mon: PKMFile }) => {
         </div>
       </Grid>
       <Grid xs={6} style={styles.attributesList}>
+        <AttributeRow label="Nickname" value={mon.nickname} />
         <AttributeRow
-          label="Name"
+          label="Species"
           value={`${PokemonData[mon.dexNum]?.formes[mon.formeNum]?.formeName} ${
             hasGen2OnData(mon) ? ['♂', '♀', ''][mon.gender] : ''
           }`}

@@ -86,7 +86,8 @@ const MetDataMovesDisplay = (props: { mon: AllPKMFields }) => {
       message += ` on ${mon.metDate.month}/${mon.metDate.day}/${mon.metDate.year}`
     }
     if (mon.gameOfOrigin) {
-      message += ` ${getLocationString(mon.gameOfOrigin, mon.metLocationIndex, mon.format)}`
+      const location = getLocationString(mon.gameOfOrigin, mon.metLocationIndex, mon.format)
+      message += ` ${location}`
     }
 
     if ('isFatefulEncounter' in mon && mon.isFatefulEncounter) {

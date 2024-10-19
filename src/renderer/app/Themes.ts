@@ -51,15 +51,6 @@ export const components: Components<Theme> = {
         padding: 0,
       },
     },
-    // variants: [
-    //   {
-    //     props: { variant: 'contained' },
-    //     style: {
-    //       border: '1px solid transparent',
-    //       boxShadow: 'none',
-    //     },
-    //   },
-    // ],
   },
   JoyTab: {
     styleOverrides: {
@@ -81,6 +72,8 @@ export const components: Components<Theme> = {
     styleOverrides: {
       root: ({ theme }) => ({
         background: theme.palette.background.gradient,
+        padding: 0,
+        height: '100%',
       }),
     },
   },
@@ -153,6 +146,13 @@ export const components: Components<Theme> = {
       },
     },
   },
+  JoyModalOverflow: {
+    styleOverrides: {
+      root: {
+        padding: 0,
+      },
+    },
+  },
 }
 
 export const darkTheme: ColorSystemOptions = {
@@ -160,6 +160,10 @@ export const darkTheme: ColorSystemOptions = {
     mode: 'dark',
     secondary: {
       mainChannel: red,
+      solidBg: red,
+      plainColor: '#fff',
+      plainHoverColor: '#333',
+      plainActiveColor: '#333',
     },
     primary: {
       mainChannel: '#780600',

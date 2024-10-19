@@ -1,5 +1,5 @@
 import * as E from 'fp-ts/lib/Either'
-import BackendInterface from './backendInterface'
+import BackendInterface from '../../types/backendInterface'
 
 const DummyBackend: BackendInterface = {
   /* past gen identifier lookups */
@@ -29,6 +29,10 @@ const DummyBackend: BackendInterface = {
   getSaveFolders: async () => E.left('no backend in use'),
   removeSaveFolder: async () => E.left('no backend in use'),
   upsertSaveFolder: async () => E.left('no backend in use'),
+  /* transactions */
+  startTransaction: async () => E.left('no backend in use'),
+  commitTransaction: async () => E.left('no backend in use'),
+  rollbackTransaction: async () => E.left('no backend in use'),
 
   /* application */
   setHasChanges: async () => {},
