@@ -37,6 +37,10 @@ check:
 set-version:
 	@npm version $(VERSION) --no-git-tag-version --allow-same-version
 
+.PHONY: release-mac
+release-mac:
+	@source .env && npm run release-mac
+
 generate/out/generate.js: generate/generate.ts generate/syncPKHexResources.ts generate/enums.ts generate/parseFunctions/*
 	@echo "compiling generate/*.ts..."
 	@cd generate && tsc
