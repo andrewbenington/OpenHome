@@ -38,6 +38,7 @@
     "build:no-mac": "electron-vite build && electron-builder --linux  --win --config",
     "build:all": "electron-vite build && electron-builder --linux --mac --win --config",
     "release": "electron-vite build && electron-builder -wl",
+    "release-mac": "electron-vite build && electron-builder --mac -p always",
     "compare": "ts-node src/types/pkm_old/__test__/all.test.ts"
   },
   "dependencies": {
