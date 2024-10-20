@@ -1,7 +1,7 @@
 {
   "productName": "OpenHome",
   "name": "openhome",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "A tool for moving Pokémon between game saves",
   "keywords": [
     "pokemon",
@@ -37,7 +37,7 @@
     "build:linux": "electron-vite build && electron-builder --linux --config",
     "build:no-mac": "electron-vite build && electron-builder --linux  --win --config",
     "build:all": "electron-vite build && electron-builder --linux --mac --win --config",
-    "release": "electron-builder -wl",
+    "release": "electron-vite build && electron-builder -wl",
     "compare": "ts-node src/types/pkm_old/__test__/all.test.ts"
   },
   "dependencies": {
