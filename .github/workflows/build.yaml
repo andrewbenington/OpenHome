@@ -3,6 +3,7 @@ name: Build
 on:
   release:
     types: [published]
+  workflow_dispatch
 
 env:
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
