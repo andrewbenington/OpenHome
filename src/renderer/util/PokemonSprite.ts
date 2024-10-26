@@ -1,44 +1,44 @@
 export const getTypeColor = (type: string) => {
   switch (type) {
     case 'normal':
-      return '#A8A878'
+      return 'rgb(144,153,161)'
     case 'fire':
-      return '#F08030'
+      return 'rgb(255, 156, 84)'
     case 'fighting':
-      return '#C03028'
+      return 'rgb(206, 64, 105)'
     case 'water':
-      return '#6890F0'
+      return 'rgb(76, 144, 214)'
     case 'flying':
-      return '#A890F0'
+      return 'rgb(143, 168, 221)'
     case 'grass':
-      return '#78C850'
+      return 'rgb(99, 187, 91)'
     case 'poison':
-      return '#A040A0'
+      return 'rgb(171, 106, 200)'
     case 'electric':
-      return '#F8D030'
+      return 'rgb(244, 210, 59)'
     case 'ground':
-      return '#E0C068'
+      return 'rgb(217, 119, 70)'
     case 'psychic':
-      return '#F85888'
+      return 'rgb(249, 113, 119)'
     case 'rock':
-      return '#B8A038'
+      return 'rgb(199, 183, 139)'
     case 'ice':
-      return '#98D8D8'
+      return 'rgb(116, 206, 192)'
     case 'bug':
-      return '#A8B820'
+      return 'rgb(144, 193, 44)'
     case 'dragon':
-      return '#7038F8'
+      return 'rgb(10, 109, 196)'
     case 'ghost':
-      return '#705898'
+      return 'rgb(83, 105, 172)'
     case 'dark':
-      return '#705848'
+      return 'rgb(90, 83, 102)'
     case 'steel':
-      return '#B8B8D0'
+      return 'rgb(90, 142, 161)'
     case 'fairy':
-      return '#EE99AC'
+      return 'rgb(236, 143, 230)'
     case 'shadow':
       return '#604E82'
     default:
-      return '#888'
+      return '#555'
   }
 }

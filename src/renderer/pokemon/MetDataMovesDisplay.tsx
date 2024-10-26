@@ -1,4 +1,4 @@
-import { Card } from '@mui/joy'
+import { Chip } from '@mui/joy'
 import { AllPKMFields } from 'pokemon-files'
 import { GameOfOriginData, getLocationString, NatureToString } from 'pokemon-resources'
 import { useMemo } from 'react'
@@ -24,6 +24,7 @@ const styles = {
     flex: 1,
     flexDirection: 'row',
     height: 'fit-content',
+    padding: 4,
   },
   language: { padding: '5px 10px 5px 10px', marginLeft: 10 },
   gameContainer: {
@@ -86,7 +87,8 @@ const MetDataMovesDisplay = (props: { mon: AllPKMFields }) => {
       message += ` on ${mon.metDate.month}/${mon.metDate.day}/${mon.metDate.year}`
     }
     if (mon.gameOfOrigin) {
-      message += ` ${getLocationString(mon.gameOfOrigin, mon.metLocationIndex, mon.format)}`
+      const location = getLocationString(mon.gameOfOrigin, mon.metLocationIndex, mon.format)
+      message += ` ${location}`
     }
 
     if ('isFatefulEncounter' in mon && mon.isFatefulEncounter) {
@@ -142,7 +144,7 @@ const MetDataMovesDisplay = (props: { mon: AllPKMFields }) => {
                 ? ` ${RibbonTitles[mon.affixedRibbon]}`
                 : ''}
             </p>
-            <Card sx={styles.language}>{mon.language}</Card>
+            <Chip style={styles.language}>{mon.language}</Chip>
           </div>
           {eggMessage ? <p style={styles.description}>{eggMessage}</p> : <div />}
           <p style={styles.description}>{metMessage}</p>

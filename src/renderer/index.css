@@ -79,7 +79,7 @@ select:focus-visible {
 
 input,
 fieldset {
-  border-radius: 8px;
+  border-radius: 5px;
   border: 1px solid transparent;
   margin: 0.2em;
   padding: 0.2em;
@@ -87,6 +87,8 @@ fieldset {
   font-weight: 500;
   font-family: inherit;
   transition: border-color 0.25s;
+  background-color: white;
+  color: #333;
 }
 input:hover,
 fieldset:hover {

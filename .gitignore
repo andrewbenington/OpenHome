@@ -25,6 +25,7 @@
 __pycache__/
 
 *.log*
+.env
 
 # js
 generate/out/

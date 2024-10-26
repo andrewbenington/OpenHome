@@ -1,4 +1,4 @@
-VERSION=0.4.1
+VERSION=0.4.2
 .PHONY: help
 help: # Display this help.
 	@awk 'BEGIN {FS = ":.*#"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z_0-9-]+:.*?#/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^#@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
@@ -36,6 +36,10 @@ check:
 .PHONY: set-version
 set-version:
 	@npm version $(VERSION) --no-git-tag-version --allow-same-version
+
+.PHONY: release-mac
+release-mac:
+	@source .env && npm run release-mac
 
 generate/out/generate.js: generate/generate.ts generate/syncPKHexResources.ts generate/enums.ts generate/parseFunctions/*
 	@echo "compiling generate/*.ts..."

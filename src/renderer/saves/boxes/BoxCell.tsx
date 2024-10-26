@@ -98,7 +98,6 @@ const BoxCell = (props: BoxCellProps) => {
     try {
       return mon.isShiny()
     } catch {
-      console.log(mon)
       return false
     }
   }
@@ -151,7 +150,6 @@ const BoxCell = (props: BoxCellProps) => {
                 }
           }
           onDrop={(e) => {
-            console.log('ON DROP')
             setIsDraggedOver(false)
             handleDrop(e)
           }}

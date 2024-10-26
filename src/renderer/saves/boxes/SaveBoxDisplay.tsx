@@ -37,7 +37,6 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
 
   const dispatchCompleteDrag = useCallback(
     (boxPosition: number) => {
-      console.log(mouseState.dragSource, boxPosition)
       mouseState.dragSource &&
         openSavesDispatch({
           type: 'move_mon',

@@ -1,6 +1,18 @@
-import { Box, Card, Modal, ModalDialog, Stack, useTheme } from '@mui/joy'
+import {
+  Alert,
+  Box,
+  DialogContent,
+  DialogTitle,
+  Divider,
+  Modal,
+  ModalClose,
+  ModalDialog,
+  ModalOverflow,
+  Stack,
+  useTheme,
+} from '@mui/joy'
 import * as E from 'fp-ts/lib/Either'
-import lodash from 'lodash'
+import lodash, { flatten } from 'lodash'
 import { bytesToPKMInterface } from 'pokemon-files'
 import { GameOfOrigin, isGameBoy, isGen3, isGen4, isGen5 } from 'pokemon-resources'
 import { useCallback, useContext, useEffect, useState } from 'react'
@@ -39,6 +51,7 @@ const Home = () => {
   const [selectedMon, setSelectedMon] = useState<PKMFile>()
   const [tab, setTab] = useState('summary')
   const [openSaveDialog, setOpenSaveDialog] = useState(false)
+  const [errorMessages, setErrorMessages] = useState<string[]>()
   const [filesToDelete, setFilesToDelete] = useState<string[]>([])
 
   useEffect(() => {
@@ -140,6 +153,12 @@ const Home = () => {
   const saveChanges = useCallback(async () => {
     if (!openSavesState.homeData || !lookupState.loaded) return
 
+    const result = await backend.startTransaction()
+    if (E.isLeft(result)) {
+      setErrorMessages([result.left])
+      return
+    }
+
     const { gen12, gen345 } = lookupState
     const saveTypesAndChangedMons = allOpenSaves.map(
       (save) => [save.origin, save.prepareBoxesForSaving()] as [GameOfOrigin, OHPKM[]]
@@ -148,15 +167,17 @@ const Home = () => {
       if (isGameBoy(saveOrigin)) {
         changedMons.forEach((mon) => {
           const openHomeIdentifier = getMonFileIdentifier(mon)
-          if (openHomeIdentifier !== undefined) {
-            gen12[getMonGen12Identifier(mon)] = openHomeIdentifier
+          const gen12Identifier = getMonGen12Identifier(mon)
+          if (openHomeIdentifier !== undefined && gen12Identifier) {
+            gen12[gen12Identifier] = openHomeIdentifier
           }
         })
       } else if (isGen3(saveOrigin) || isGen4(saveOrigin) || isGen5(saveOrigin)) {
         changedMons.forEach((mon) => {
           const openHomeIdentifier = getMonFileIdentifier(mon)
-          if (openHomeIdentifier !== undefined) {
-            gen345[getMonGen345Identifier(mon)] = openHomeIdentifier
+          const gen345Identifier = getMonGen345Identifier(mon)
+          if (openHomeIdentifier !== undefined && gen345Identifier) {
+            gen345[gen345Identifier] = openHomeIdentifier
           }
         })
       }
@@ -174,8 +195,15 @@ const Home = () => {
     ]
 
     setFilesToDelete([])
-    const results = await Promise.all(promises)
-    console.log(results)
+    const results = flatten(await Promise.all(promises))
+    const errors = results.filter(E.isLeft).map((err) => err.left)
+    if (errors.length) {
+      setErrorMessages(errors)
+      backend.rollbackTransaction()
+      return
+    }
+    backend.commitTransaction()
+    // backend.rollbackTransaction()
 
     openSavesDispatch({ type: 'clear_updated_box_slots' })
     openSavesDispatch({ type: 'clear_mons_to_release' })
@@ -241,8 +269,6 @@ const Home = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  console.log('Home render')
-
   return (
     <div
       style={{
@@ -274,13 +300,18 @@ const Home = () => {
       <div
         className="home-box-column"
         style={{
-          width: 0,
           flex: 1,
           minWidth: 480,
-          maxWidth: 600,
         }}
       >
-        <Box display="flex" flexDirection="row" width="100%" alignItems="center">
+        <Box
+          display="flex"
+          flexDirection="row"
+          width="100%"
+          maxWidth={600}
+          minWidth={480}
+          alignItems="center"
+        >
           <HomeBoxDisplay setSelectedMon={setSelectedMon} />
           <Box flex={1}></Box>
         </Box>
@@ -315,25 +346,53 @@ const Home = () => {
               )
             })}
           </div>
-        </div>{' '}
+        </div>
       </Stack>
       <Modal open={!!selectedMon} onClose={() => setSelectedMon(undefined)}>
-        <Card style={{ width: 800, height: 400, padding: 0, overflow: 'hidden' }}>
-          {selectedMon && <PokemonDetailsPanel mon={selectedMon} tab={tab} setTab={setTab} />}
-        </Card>
+        <ModalOverflow>
+          <ModalDialog
+            style={{
+              minWidth: 800,
+              width: 'fit-content',
+              maxWidth: '80%',
+              maxHeight: '95%',
+              padding: 0,
+              overflow: 'hidden',
+            }}
+          >
+            {selectedMon && <PokemonDetailsPanel mon={selectedMon} tab={tab} setTab={setTab} />}
+          </ModalDialog>
+        </ModalOverflow>
       </Modal>
-      <Modal
-        open={openSaveDialog}
-        onClose={() => setOpenSaveDialog(false)}
-        // fullWidth
-        // PaperProps={{ sx: { height: 800 } }}
-      >
-        <ModalDialog sx={{ minHeight: 400, height: 600, width: 1000 }}>
+      <Modal open={openSaveDialog} onClose={() => setOpenSaveDialog(false)}>
+        <ModalDialog
+          sx={{
+            minWidth: 800,
+            width: '80%',
+            maxHeight: 'fit-content',
+            height: '95%',
+            overflow: 'hidden',
+          }}
+        >
           <SavesModal
             onClose={() => {
               setOpenSaveDialog(false)
             }}
           />
+        </ModalDialog>
+      </Modal>
+      <Modal open={!!errorMessages} onClose={() => setErrorMessages(undefined)}>
+        <ModalDialog style={{ padding: 8 }}>
+          <ModalClose />
+          <DialogTitle>Error(s) saving</DialogTitle>
+          <Divider />
+          <DialogContent>
+            {errorMessages?.map((msg) => (
+              <Alert color="danger" variant="solid">
+                {msg}
+              </Alert>
+            ))}
+          </DialogContent>
         </ModalDialog>
       </Modal>
     </div>

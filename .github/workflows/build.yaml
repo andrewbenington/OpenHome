@@ -3,6 +3,7 @@ name: Build
 on:
   release:
     types: [published]
+  workflow_dispatch:
 
 env:
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -22,8 +23,6 @@ jobs:
           cache: 'npm'
       - name: install dependencies
         run: npm install
-      - name: build
-        run: npm run build:no-mac
       - name: publish
         env:
           gh_token: ${{ secrets.GITHUB_TOKEN }}
