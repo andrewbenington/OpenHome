@@ -2,6 +2,7 @@ import { PK7 } from 'pokemon-files';
 import { GameOfOrigin } from 'pokemon-resources';
 import {
   SM_TRANSFER_RESTRICTIONS
+  USUM_TRANSFER_RESTRICTIONS
 } from '../../consts/TransferRestrictions';
 import {
   bytesToUint16LittleEndian,
@@ -58,7 +59,7 @@ export class G7SAV extends SAV<PK7> {
         break;
       case GameOfOrigin.UltraSun:
       case GameOfOrigin.UltraMoon:
-        this.transferRestrictions = SM_TRANSFER_RESTRICTIONS;
+        this.transferRestrictions = USUM_TRANSFER_RESTRICTIONS;
     }
 
     this.boxes = Array(32);
