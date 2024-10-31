@@ -1,6 +1,12 @@
 import { PK7 } from 'pokemon-files';
 import { GameOfOrigin } from 'pokemon-resources';
-import { bytesToUint16LittleEndian, uint16ToBytesLittleEndian } from '../../util/ByteLogic';
+import {
+  SM_TRANSFER_RESTRICTIONS
+} from '../../consts/TransferRestrictions';
+import {
+  bytesToUint16LittleEndian,
+  uint16ToBytesLittleEndian
+} from '../../util/ByteLogic';
 import { CRC16_CCITT } from '../../util/Encryption';
 import { utf16BytesToString } from '../../util/Strings/StringConverter';
 import { OHPKM } from '../pkm/OHPKM';
@@ -8,10 +14,13 @@ import { SaveType } from '../types';
 import { Box, SAV } from './SAV';
 import { ParsedPath } from './path';
 
-const SM_PC_OFFSET = 0x4E00; // Box start offset for Gen 7
-const SM_PC_CHECKSUM_OFFSET = 0x656C2; // Gen 7 checksum offset for boxes
-const BOX_NAMES_OFFSET: number = 0x04800; // Box names offset for Gen 7
-const BOX_SIZE: number = 232 * 30; // Each box has 30 slots, each Pokémon slot is 232 bytes
+const SM_PC_OFFSET = 0x4E00;
+const SM_PC_CHECKSUM_OFFSET = 0x656C2;
+const BOX_NAMES_OFFSET: number = 0x04800;
+
+// Box size doesn't change from GEN 7
+// https://github.com/kwsch/PKHeX/blob/c666183e6c19430667cc854716cce4f0d2293504/PKHeX.Core/PKM/PK7.cs#L14C7-L15C25
+const BOX_SIZE: number = 232 * 30;
 
 export class G7SAV extends SAV<PK7> {
   trainerDataOffset: number = 0x14000;
@@ -27,20 +36,29 @@ export class G7SAV extends SAV<PK7> {
 
   constructor(path: ParsedPath, bytes: Uint8Array) {
     super(path, bytes);
+
+    // https://github.com/kwsch/PKHeX/blob/c666183e6c19430667cc854716cce4f0d2293504/PKHeX.Core/Saves/SAV7.cs#L423C1-L427C10
     this.name = utf16BytesToString(this.bytes, this.trainerDataOffset + 0x38, 0x12);
+
+    // https://github.com/kwsch/PKHeX/blob/c666183e6c19430667cc854716cce4f0d2293504/PKHeX.Core/Saves/SAV7.cs#L339C1-L353
     this.tid = bytesToUint16LittleEndian(this.bytes, this.trainerDataOffset);
     this.sid = bytesToUint16LittleEndian(this.bytes, this.trainerDataOffset + 2);
-    this.currentPCBox = this.bytes[0];
-    this.displayID = this.tid.toString().padStart(5, '0');
     this.origin = this.bytes[this.trainerDataOffset + 4];
 
-    // Set up for Game Version Sun (30) or Moon (31) specifics if needed
+    this.currentPCBox = this.bytes[0]; // ?
+    this.displayID = this.tid.toString().padStart(5, '0');
+
+    this.pcOffset = SM_PC_OFFSET;
+    this.pcChecksumOffset = SM_PC_CHECKSUM_OFFSET;
+
     switch (this.origin) {
       case GameOfOrigin.Sun:
       case GameOfOrigin.Moon:
-        this.pcOffset = SM_PC_OFFSET;
-        this.pcChecksumOffset = SM_PC_CHECKSUM_OFFSET;
+        this.transferRestrictions = SM_TRANSFER_RESTRICTIONS;
         break;
+      case GameOfOrigin.UltraSun:
+      case GameOfOrigin.UltraMoon:
+        this.transferRestrictions = SM_TRANSFER_RESTRICTIONS;
     }
 
     this.boxes = Array(32);
@@ -70,7 +88,6 @@ export class G7SAV extends SAV<PK7> {
     const changedMonPKMs: OHPKM[] = [];
     this.updatedBoxSlots.forEach(({ box, index }) => {
       const changedMon = this.boxes[box].pokemon[index];
-      // Only save changed OHPKM slots
       if (changedMon instanceof OHPKM) {
         changedMonPKMs.push(changedMon);
       }
