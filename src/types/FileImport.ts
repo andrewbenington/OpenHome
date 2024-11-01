@@ -6,6 +6,7 @@ import {
   PK1,
   PK2,
   PK3,
+  PK3RR,
   PK4,
   PK5,
   PK6,
@@ -27,6 +28,8 @@ function fileTypeFromBytes(bytes: Uint8Array): PKMType | undefined {
     case 80:
     case 100:
       return PK3
+    case 58:
+      return PK3RR
     case 136:
       return bytes[0x5f] < 20 ? PK4 : PK5
     case 236:
@@ -46,6 +49,8 @@ export function fileTypeFromString(type: string): PKMType | typeof OHPKM | undef
       return PK2
     case 'PK3':
       return PK3
+    case 'PK3RR':
+      return PK3RR
     case 'COLOPKM':
       return COLOPKM
     case 'XDPKM':
