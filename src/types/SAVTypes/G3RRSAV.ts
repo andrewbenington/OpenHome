@@ -254,13 +254,17 @@ export class G3RRSAV extends SAV<PK3RR> {
       this.primarySave.pcDataContiguous.set(pcBytes, 4 + monOffset * 58)
     })
 
-    // Slice pcData into section Datas.
-    this.primarySave.sectors.slice(5).forEach((sector, i) => {
+    // Slice pcData into Section Datas.
+    // The first 14 boxes of data are stored in the first 6 section of PC data.
+    // I am unsure where the rest of the data is stashed (ie: boxes 15-25)
+    // So its just easier to only look at the first 6 sections of PC Data.
+    // Each section of PC data is 4080 bytes.
+    this.primarySave.sectors.slice(5, 11).forEach((sector, i) => {
       const pcData = this.primarySave.pcDataContiguous.slice(
         // 4080 times sector offset
         i * 0xFF0,
         // 4080 ahead of that, or 0x450 ahead of that if box 13 zero indexed
-        i * 0xFF0 + (i + 5 === 13 ? 0x450 : 0xFF0)
+        // i * 0xFF0 + (i + 5 === 13 ? 0x450 : 0xFF0)
       )
       sector.data.set(pcData)
       sector.writeToBuffer(this.primarySave.bytes, i + 5, this.primarySave.firstSectorIndex)
