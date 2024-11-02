@@ -22,13 +22,19 @@
 .save-close-button {
   position: absolute;
   left: 8px;
-  padding: 4px 6px;
+  padding: 0px;
+  display: grid;
+  aspect-ratio: 1;
+  align-items: center;
 }
 
 .save-menu-button {
   position: absolute;
   right: 8px;
-  padding: 4px 6px;
+  padding: 0px;
+  display: grid;
+  aspect-ratio: 1;
+  align-items: center;
 }
 
 .box-card {

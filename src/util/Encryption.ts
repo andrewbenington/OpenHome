@@ -1,4 +1,5 @@
 import bigInt from 'big-integer'
+import crypto from 'crypto'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -283,4 +284,15 @@ export const CRC16_Invert = (bytes: Uint8Array, start: number, size: number) => 
   }
 
   return not16Bit(chk)
+}
+
+const SHA1_LEN = 20
+
+export const SignMemeDataInPlace = (bytes: Uint8Array, start: number, size: number) => {
+  const payload = bytes.slice(0, bytes.length - 8)
+  const hash = bytes.slice(bytes.length - 8)
+
+  const shasum = crypto.createHash('sha1')
+  shasum.update(payload)
+  shasum.digest()
 }

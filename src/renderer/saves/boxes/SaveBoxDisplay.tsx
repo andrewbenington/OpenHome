@@ -201,7 +201,9 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
           }}
         >
           <AttributeRow label="Trainer">{save.name}</AttributeRow>
-          <AttributeRow label="File">{save.filePath.raw}</AttributeRow>
+          <AttributeRow label="File">
+            <div style={{ overflowWrap: 'break-word', width: '100%' }}>{save.filePath.raw}</div>
+          </AttributeRow>
           {'pcChecksumOffset' in save && 'pcOffset' in save && save.pcChecksumOffset && (
             <>
               <AttributeRow label="PC Offset">
