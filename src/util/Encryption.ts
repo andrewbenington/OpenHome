@@ -1,12 +1,14 @@
 import bigInt from 'big-integer'
-import crypto from 'crypto'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
   uint16ToBytesLittleEndian,
   uint32ToBytesLittleEndian,
 } from './ByteLogic'
+import { MemeKey, pokedexAndSaveFileMemeKey } from './MemeKey'
 
+import crypto from 'crypto'
+import { SIZE_SM, SIZE_USUM } from '../types/SAVTypes/util'
 const GEN3_BLOCKS_OFFSET = 0x20
 const GEN3_BLOCK_SIZE = 12
 const GEN456_BLOCKS_OFFSET = 0x08
@@ -288,11 +290,52 @@ export const CRC16_Invert = (bytes: Uint8Array, start: number, size: number) => 
 
 const SHA1_LEN = 20
 
-export const SignMemeDataInPlace = (bytes: Uint8Array, start: number, size: number) => {
-  const payload = bytes.slice(0, bytes.length - 8)
-  const hash = bytes.slice(bytes.length - 8)
+export const SignMemeDataInPlace = (data: Uint8Array) => {
+  console.log(`SignMemeDataInPlace: ${bytesToHex(data)} ${data.length}`)
+  const key = new MemeKey(pokedexAndSaveFileMemeKey)
+
+  const payload = data.slice(0, data.length - 8)
 
   const shasum = crypto.createHash('sha1')
   shasum.update(payload)
-  shasum.digest()
+  const tmp = shasum.digest()
+
+  data.set(tmp.subarray(0, 8), data.length - 8)
+
+  key.AesEncrypt(data)
+}
+
+const SaveFileSignatureOffset = 0x100
+const SaveFileSignatureLength = 0x80
+
+export function SignInPlace(bytes: Uint8Array) {
+  if (bytes.length !== SIZE_USUM && bytes.length !== SIZE_SM) {
+    console.error('invalid save size')
+    return
+  }
+
+  const isUSUM = bytes.length === SIZE_USUM
+
+  const checksumTableOffset = bytes.length - 0x200
+  const checksumSignatureLength = isUSUM ? 0x150 : 0x140
+  const memeCryptoOffset = (isUSUM ? 0x6c000 : 0x6ba00) + SaveFileSignatureOffset
+
+  const sigSpan = bytes.slice(memeCryptoOffset, memeCryptoOffset + SaveFileSignatureLength)
+  const chkBlockSpan = bytes.slice(
+    checksumTableOffset,
+    checksumTableOffset + checksumSignatureLength
+  )
+
+  // SignInPlace(sigSpan, chkBlockSpan) in PKHeX
+  const hash = crypto.createHash('sha256')
+  hash.update(chkBlockSpan)
+  sigSpan.set(hash.digest(), 0)
+
+  SignMemeDataInPlace(sigSpan)
+}
+
+function bytesToHex(bytes: Uint8Array) {
+  return Array.from(bytes)
+    .map((byte) => byte.toString(16).toUpperCase().padStart(2, '0')) // Convert to hex and pad with '0'
+    .join('')
 }

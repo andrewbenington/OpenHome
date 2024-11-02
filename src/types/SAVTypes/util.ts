@@ -24,7 +24,7 @@ const SIZE_GEN3 = 0x20000
 const SIZE_GEN45 = 0x80000
 const SIZE_XY = 0x65600
 const SIZE_ORAS = 0x76000
-const SIZE_SM = 0x6be00
+export const SIZE_SM = 0x6be00
 export const SIZE_USUM = 0x6cc00
 
 // check if each pokemon in a save file has OpenHome data associated with it

@@ -1,16 +1,65 @@
+import crypto from 'crypto'
+const SIGNATURE_LENGTH = 0x60
+const AES_CHUNK_LENGTH = 0x10
 export class MemeKey {
+  private DER: Uint8Array
   private privateKey: bigint
   private publicKey: bigint
   private mod: bigint
 
   constructor(bytes: Uint8Array) {
+    this.DER = bytes
     this.mod = bytesToBigIntBE(bytes.slice(0x18, 0x79))
     this.publicKey = bytesToBigIntBE(bytes.slice(0x7b, 0x7e))
     this.privateKey = bytesToBigIntBE(signingKey)
+    console.log('public key:', this.publicKey)
+    console.log('private key:', this.privateKey)
+    console.log('mod:', this.mod)
+  }
+
+  public AesEncrypt(data: Uint8Array) {
+    const payload = data.slice(0, data.length - SIGNATURE_LENGTH)
+    console.log(`AesEncrypt payload: ${bytesToHex(payload)} ${payload.length}`)
+    const signature = data.slice(data.length - SIGNATURE_LENGTH)
+    console.log(`AesEncrypt signature: ${bytesToHex(signature)} ${signature.length}`)
+
+    // GetAesImp in PKHeX
+    const key = this.GetAesKey(payload)
+
+    const cipher = crypto.createCipheriv('aes-128-ecb', new Uint8Array(key.subarray(0, 16)), '')
+
+    // TODO: is this necessary?
+    cipher.setAutoPadding(false)
+
+    // AesDecrypt(data, sig) in PKHeX
+    let temp = new Uint8Array(AES_CHUNK_LENGTH)
+
+    for (let i = 0; i < signature.length; i += AES_CHUNK_LENGTH) {
+      console.log(`AesEncrypt temp: ${bytesToHex(temp)} ${temp.length}`)
+      let slice = signature.slice(i, i + AES_CHUNK_LENGTH)
+      slice = xorBytes(slice, temp)
+      const encryptedSlice = cipher.update(slice)
+      temp = new Uint8Array(encryptedSlice)
+      signature.set(temp, i)
+      console.log(`AesEncrypt temp: ${bytesToHex(temp)} ${temp.length}`)
+      console.log()
+    }
+    console.log(`AesEncrypt signature: ${bytesToHex(signature)} ${signature.length}`)
+
+    temp = xorBytes(temp, signature.slice(0, AES_CHUNK_LENGTH))
+  }
+
+  public GetAesKey(bytes: Uint8Array) {
+    const hash = crypto.createHash('sha1')
+
+    hash.update(this.DER)
+    hash.update(bytes)
+
+    return hash.digest().subarray(0, AES_CHUNK_LENGTH)
   }
 }
 
-const pokedexAndSaveFileMemeKey = new Uint8Array([
+export const pokedexAndSaveFileMemeKey = new Uint8Array([
   0x30, 0x7c, 0x30, 0x0d, 0x06, 0x09, 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01, 0x01, 0x05,
   0x00, 0x03, 0x6b, 0x00, 0x30, 0x68, 0x02, 0x61, 0x00, 0xb6, 0x1e, 0x19, 0x20, 0x91, 0xf9, 0x0a,
   0x8f, 0x76, 0xa6, 0xea, 0xaa, 0x9a, 0x3c, 0xe5, 0x8c, 0x86, 0x3f, 0x39, 0xae, 0x25, 0x3f, 0x03,
@@ -37,4 +86,18 @@ function bytesToBigIntBE(bytes: Uint8Array) {
     result = (result << 8n) | BigInt(byte)
   }
   return result
+}
+
+function xorBytes(b1: Uint8Array, b2: Uint8Array): Uint8Array<ArrayBuffer> {
+  const result = new Uint8Array(b1.length)
+  for (let i = 0; i < result.length; i++) {
+    result[i] = b1[i] ^ b2[i]
+  }
+  return result
+}
+
+function bytesToHex(bytes: Uint8Array) {
+  return Array.from(bytes)
+    .map((byte) => byte.toString(16).toUpperCase().padStart(2, '0')) // Convert to hex and pad with '0'
+    .join('')
 }

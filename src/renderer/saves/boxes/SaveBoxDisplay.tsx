@@ -1,4 +1,4 @@
-import { Card, Grid, Modal, ModalDialog } from '@mui/joy'
+import { Button, Card, Grid, Modal, ModalDialog } from '@mui/joy'
 import lodash from 'lodash'
 import { GameOfOriginData } from 'pokemon-resources'
 import { useCallback, useContext, useMemo, useState } from 'react'
@@ -8,6 +8,8 @@ import AttributeRow from 'src/renderer/pokemon/AttributeRow'
 import { MouseContext } from 'src/renderer/state/mouse'
 import { MonLocation, OpenSavesContext } from 'src/renderer/state/openSaves'
 import { bytesToUint16LittleEndian } from 'src/util/ByteLogic'
+import { SignInPlace } from 'src/util/Encryption'
+import { MemeKey, pokedexAndSaveFileMemeKey } from 'src/util/MemeKey'
 import { PKMFile } from '../../../types/pkm/util'
 import { isRestricted } from '../../../types/TransferRestrictions'
 import { getSaveTypeString } from '../../../types/types'
@@ -222,6 +224,14 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
               )}
             </>
           )}
+          <Button
+            onClick={() => {
+              const key = new MemeKey(pokedexAndSaveFileMemeKey)
+              SignInPlace(save.bytes)
+            }}
+          >
+            MemeEncrypt
+          </Button>
         </ModalDialog>
       </Modal>
     </div>
