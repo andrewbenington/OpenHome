@@ -7,7 +7,7 @@ import {
   markingsSixShapesWithColorFromBytes,
   markingsSixShapesWithColorFromOther,
   markingsSixShapesWithColorToBytes,
-} from 'pokemon-files'
+} from '../../../../pokemon-files-js/src'
 import {
   AbilityFromString,
   AbilityToString,
@@ -1540,10 +1540,10 @@ export class OHPKM {
     if ('avs' in other) { // Pokemon Let's GO
       this.avs = other.avs
     } else if ('evs' in other) { // All other pokemon games Gen 3 and up
-      this.evs = other.evs
+      this.evs = other.evs 
       if ('ribbons' in other) { // Exclude radical red
-      this.ribbons = lodash.uniq([...this.ribbons, ...(other.ribbons ?? [])])
-      this.contest = other.contest
+        this.ribbons = lodash.uniq([...this.ribbons, ...(other.ribbons ?? [])])
+        this.contest = other.contest
       }
       const otherMarkings = other.markings
       if (markingsHaveColor(otherMarkings)) {

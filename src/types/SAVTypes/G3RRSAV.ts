@@ -1,4 +1,4 @@
-import { PK3RR } from 'pokemon-files'
+import { PK3RR } from '../../../../pokemon-files-js/src'
 import { GameOfOrigin } from 'pokemon-resources'
 import { NationalDex } from 'pokemon-species-data'
 import { CapPikachus, RegionalForms } from '../TransferRestrictions'
