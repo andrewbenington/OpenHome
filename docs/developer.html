@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="favicon.ico" />
+    <link rel="stylesheet" href="index.css" />
+    <title>Developer Information - OpenHome</title>
+    <!-- Google tag (to monitor traffic volume) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-7CH9XZN759"></script>
+    <script>
+      window.dataLayer = window.dataLayer || []
+      function gtag() {
+        dataLayer.push(arguments)
+      }
+      gtag('js', new Date())
+
+      gtag('config', 'G-7CH9XZN759')
+    </script>
+  </head>
+  <body>
+    <div class="page">
+      <div id="header" class="header">
+        <ul class="header-links">
+          <li><h1 class="header-title">OpenHome</h1></li>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="download.html">Download</a></li>
+          <li><a class="active">Developer</a></li>
+          <div class="spacer"></div>
+          <a href="https://github.com/andrewbenington/OpenHome" class="github-button">
+            <img src="./github-mark-white.svg" />
+            <img src="./GitHub_Logo_White.png" />
+          </a>
+        </ul>
+      </div>
+      <div class="container">
+        <h1>Technical Information for Developers</h1>
+        <h2>Electron Framework</h2>
+        <p>
+          OpenHome is built with <a href="https://www.electronjs.org/">Electron</a> to allow for
+          compatibility with Linux, macOS, and Windows devices. Electron also provides the ability
+          to prompt for updates, and to use a Node.js "backend" to interact with the operating
+          system. The TypeScript codebase
+        </p>
+        <p>
+          Electron apps have the downside of taking up more space than native apps, as they are
+          complete web browsers under the hood. The benefits of full Linux/macOS/Windows support
+          currently outweighs the downsides of Electron, as I don't want non-macOS users to deal
+          with the issues non-Windows users of PKHeX have to deal with.
+        </p>
+        <p>
+          If the app gains enough users, I plan to migrate to React Native at some point in the
+          future, which would not only provide a smaller app size and better performance, but would
+          also make a mobile app version possible, all while keeping the TypeScript codebase.
+        </p>
+        <h2>TypeScript</h2>
+        <p>
+          TypeScript is a superset of JavaScript, adding static typing and a type checker.
+          TypeScript code transpiles to JavaScript and is not run by itself with rare exception. The
+          reason I and many others use TypeScript instead of pure JavaScript is because static
+          typing adds many desirable features to a codebase:
+        </p>
+        <ul>
+          <li>
+            More mistakes can be caught during development that would otherwise occur at runtime
+          </li>
+          <li>
+            Code is self-documenting. Without the need for comments, a developer knows what to
+            expect a function will receive and return.
+          </li>
+          <li>
+            Refactoring is safer and easier. If, for example, a function's arguments or return types
+            are changed, TypeScript will alert the developer to any code where the old type
+            signature is still expected, and that should be updated
+          </li>
+        </ul>
+        <p>
+          People much smarter than me have debated the merits of static typing since before I was
+          born. Ultimately, I believe TypeScript saves more time down the line than it requires
+          upfront by avoiding bugs that would have been caught with a static type system.
+        </p>
+        <h2>JavaScript/TypeScript Modules</h2>
+        <p>
+          Some parts of the code have been split into their own modules. This is to promote better
+          code structure, with low
+          <a href="https://en.wikipedia.org/wiki/Coupling_(computer_programming)">coupling</a> and a
+          smaller codebase for the application itself. These modules are also available for
+          developers of other Pokémon-related JavaScript and TypeScript projects who might want to
+          interface with Pokémon files and data.
+        </p>
+        <h3 class="module-header">
+          pokemon-resources
+          <a href="https://github.com/andrewbenington/pokemon-resources-js" class="github-button">
+            <img src="./github-mark-white.svg" />
+            <img src="./GitHub_Logo_White.png" />
+          </a>
+          <a class="npm-button" href="https://www.npmjs.com/package/pokemon-resources"
+            ><svg viewBox="0 0 780 250" aria-hidden="true">
+              <path
+                fill="#ffffff"
+                d="M240,250h100v-50h100V0H240V250z M340,50h50v100h-50V50z M480,0v200h100V50h50v150h50V50h50v150h50V0H480z M0,200h100V50h50v150h50V0H0V200z"
+              ></path></svg
+          ></a>
+        </h3>
+        <p>
+          pokemon-resources provides data on resources like items, balls, met locations, etc. All
+          data has been pulled from Bulbapedia, Serebii, and/or PKHeX.
+        </p>
+        <h3 class="module-header">
+          pokemon-files
+          <a href="https://github.com/andrewbenington/pokemon-files-js" class="github-button">
+            <img src="./github-mark-white.svg" />
+            <img src="./GitHub_Logo_White.png" />
+          </a>
+          <a class="npm-button" href="https://www.npmjs.com/package/pokemon-files"
+            ><svg viewBox="0 0 780 250" aria-hidden="true">
+              <path
+                fill="#ffffff"
+                d="M240,250h100v-50h100V0H240V250z M340,50h50v100h-50V50z M480,0v200h100V50h50v150h50V50h50v150h50V0H480z M0,200h100V50h50v150h50V0H0V200z"
+              ></path></svg
+          ></a>
+        </h3>
+        <p>
+          pokemon-files includes code for reading and writing pokemon data files (*.pkm, *.pk9,
+          etc). All data structure information is from the research done by the developers of PKHeX.
+        </p>
+        <h3 class="module-header">
+          pokemon-species-data
+          <a href="https://github.com/andrewbenington/pokemon-species-data" class="github-button">
+            <img src="./github-mark-white.svg" />
+            <img src="./GitHub_Logo_White.png" />
+          </a>
+          <a class="npm-button" href="https://www.npmjs.com/package/pokemon-species-data"
+            ><svg viewBox="0 0 780 250" aria-hidden="true">
+              <path
+                fill="#ffffff"
+                d="M240,250h100v-50h100V0H240V250z M340,50h50v100h-50V50z M480,0v200h100V50h50v150h50V50h50v150h50V0H480z M0,200h100V50h50v150h50V0H0V200z"
+              ></path></svg
+          ></a>
+        </h3>
+        <p>
+          pokemon-species-data includes data on all Pokémon species and forms, including stats,
+          typing, evolutions, gender ratios, abilities, etc. This module also includes information
+          on Pokémon moves, including typing, power, accuracy, etc across all generations. All data
+          is has been pulled from Bulbapedia, Serebii, and/or PKHeX.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>
