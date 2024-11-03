@@ -20,11 +20,6 @@ export const components: Components<Theme> = {
       },
     },
   },
-  // MuiTypography: {
-  //   defaultProps: {
-  //     variant: 'h5',
-  //   },
-  // },
   JoyCard: {
     styleOverrides: {
       root: {

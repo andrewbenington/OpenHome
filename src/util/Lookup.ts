@@ -1,4 +1,4 @@
-import { AllPKMFields, PK3, PK6 } from 'pokemon-files'
+import { AllPKMFields, PK3, PK6, PK7 } from 'pokemon-files'
 import { isGameBoy } from 'pokemon-resources'
 import { hasGen3OnData } from '../types/interfaces/gen3'
 import { OHPKM } from '../types/pkm/OHPKM'
@@ -6,7 +6,7 @@ import { getBaseMon, PKMFile } from '../types/pkm/util'
 import { bytesToString } from './ByteLogic'
 import { gen12StringToUTF, utf16StringToGen12 } from './Strings/StringConverter'
 
-export const getMonFileIdentifier = (mon: OHPKM | PK6) => {
+export const getMonFileIdentifier = (mon: OHPKM | PK6 | PK7) => {
   const baseMon = getBaseMon(mon.dexNum, mon.formeNum)
   if (baseMon) {
     return `${baseMon.dexNumber.toString().padStart(4, '0')}-${bytesToString(

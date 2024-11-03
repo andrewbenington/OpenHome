@@ -57,7 +57,7 @@
     "hexy": "^0.3.5",
     "js-hex-editor": "^0.1.0",
     "lodash": "^4.17.21",
-    "pokemon-files": "^0.3.1",
+    "pokemon-files": "^0.3.2",
     "pokemon-resources": "^1.0.10",
     "pokemon-species-data": "^0.4.2",
     "prando": "^6.0.1",
@@ -67,7 +67,8 @@
     "react-error-boundary": "^4.0.12",
     "react-icons": "^5.3.0",
     "react-json-tree": "^0.18.0",
-    "use-file-picker": "^1.5.2"
+    "use-file-picker": "^1.5.2",
+    "vite-plugin-node-polyfills": "^0.22.0"
   },
   "resolutions": {
     "@mui/material": "npm:@mui/joy@latest"

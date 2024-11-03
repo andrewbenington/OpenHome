@@ -1,4 +1,4 @@
-import { PK2, PK3, PK4, PK5, PK6, PKM } from 'pokemon-files'
+import { PK2, PK3, PK4, PK5, PK6, PK7, PKM } from 'pokemon-files'
 import { bytesToUint32LittleEndian, bytesToUint64LittleEndian } from '../../util/ByteLogic'
 import {
   getMonFileIdentifier,
@@ -13,6 +13,7 @@ import { G2SAV } from './G2SAV'
 import { G3SAV } from './G3SAV'
 import { G5SAV } from './G5SAV'
 import { G6SAV } from './G6SAV'
+import { G7SAV } from './G7SAV'
 import { HGSSSAV } from './HGSSSAV'
 import { PtSAV } from './PtSAV'
 import { SAV } from './SAV'
@@ -23,6 +24,8 @@ const SIZE_GEN3 = 0x20000
 const SIZE_GEN45 = 0x80000
 const SIZE_XY = 0x65600
 const SIZE_ORAS = 0x76000
+export const SIZE_SM = 0x6be00
+export const SIZE_USUM = 0x6cc00
 
 // check if each pokemon in a save file has OpenHome data associated with it
 const recoverOHPKMData = <P extends PKM>(
@@ -71,7 +74,9 @@ export const getSaveType = (bytes: Uint8Array): SaveType => {
   //   const actual = 0 // Checksums.CRC16_CCITT(footer[..infoLength]);
   //   return stored === actual
   // }
-  if (bytes.length === SIZE_XY || bytes.length === SIZE_ORAS) {
+  if (bytes.length === SIZE_SM || bytes.length === SIZE_USUM) {
+    return SaveType.G7
+  } else if (bytes.length === SIZE_XY || bytes.length === SIZE_ORAS) {
     return SaveType.G6
   } else if (bytes.length >= SIZE_GEN45 && bytes.length <= SIZE_GEN45 + 1000) {
     if (validGen4DateAndSize(0x4c100)) {
@@ -204,6 +209,13 @@ export const buildSaveFile = (
     case SaveType.G6:
       saveFile = recoverOHPKMData<PK6>(
         new G6SAV(filePath, fileBytes),
+        getMonFileIdentifier,
+        homeMonMap
+      )
+      break
+    case SaveType.G7:
+      saveFile = recoverOHPKMData<PK7>(
+        new G7SAV(filePath, fileBytes),
         getMonFileIdentifier,
         homeMonMap
       )
