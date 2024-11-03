@@ -15,6 +15,7 @@ function display_mon(mon: PK3RR | OHPKM) {
     languageIndex: mon.languageIndex,
     dexNum: mon.dexNum,
     moves: mon.moves,
+    gameOfOrigin: mon.gameOfOrigin,
   });
 }
 
@@ -77,7 +78,7 @@ describe('G3SAV - Radical Red Save Tests', () => {
     if (sevii_lokix) {
       display_mon(sevii_lokix)
 
-      expect(sevii_lokix.nickname).toBe("Cin");
+      expect(sevii_lokix.nickname).toBe("Lokix");
       expect(sevii_lokix.trainerID).toBe(10334);
       expect(sevii_lokix.trainerName).toBe("Radical")
     } else {
