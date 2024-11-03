@@ -5,7 +5,7 @@ import {
   uint16ToBytesLittleEndian,
   uint32ToBytesLittleEndian,
 } from './ByteLogic'
-import { MemeKey, pokedexAndSaveFileMemeKey } from './MemeKey'
+import { MemeKey, pokedexAndSaveFileMemeKey, SIGNATURE_LENGTH } from './MemeKey'
 
 import crypto from 'crypto'
 import { SIZE_SM, SIZE_USUM } from '../types/SAVTypes/util'
@@ -288,10 +288,7 @@ export const CRC16_Invert = (bytes: Uint8Array, start: number, size: number) => 
   return not16Bit(chk)
 }
 
-const SHA1_LEN = 20
-
 export const SignMemeDataInPlace = (data: Uint8Array) => {
-  console.log(`SignMemeDataInPlace: ${bytesToHex(data)} ${data.length}`)
   const key = new MemeKey(pokedexAndSaveFileMemeKey)
 
   const payload = data.slice(0, data.length - 8)
@@ -302,16 +299,25 @@ export const SignMemeDataInPlace = (data: Uint8Array) => {
 
   data.set(tmp.subarray(0, 8), data.length - 8)
 
-  key.AesEncrypt(data)
+  const aesEncrypted = key.AesEncrypt(data)
+  const sigBuffer = aesEncrypted.slice(aesEncrypted.length - SIGNATURE_LENGTH)
+  sigBuffer[0] &= 0x7f
+
+  const rsaEncrypted = key.RSAPrivate(sigBuffer)
+
+  const signedData = new Uint8Array(data.length)
+  signedData.set(data.slice(0, data.length - SIGNATURE_LENGTH), 0)
+  signedData.set(rsaEncrypted, data.length - SIGNATURE_LENGTH)
+  return signedData
 }
 
 const SaveFileSignatureOffset = 0x100
 const SaveFileSignatureLength = 0x80
 
-export function SignInPlace(bytes: Uint8Array) {
+export function SignWithMemeCrypto(bytes: Uint8Array<ArrayBuffer>): Uint8Array<ArrayBuffer> {
   if (bytes.length !== SIZE_USUM && bytes.length !== SIZE_SM) {
     console.error('invalid save size')
-    return
+    return new Uint8Array()
   }
 
   const isUSUM = bytes.length === SIZE_USUM
@@ -331,11 +337,8 @@ export function SignInPlace(bytes: Uint8Array) {
   hash.update(chkBlockSpan)
   sigSpan.set(hash.digest(), 0)
 
-  SignMemeDataInPlace(sigSpan)
-}
+  const signed = SignMemeDataInPlace(sigSpan)
+  bytes.set(signed, memeCryptoOffset)
 
-function bytesToHex(bytes: Uint8Array) {
-  return Array.from(bytes)
-    .map((byte) => byte.toString(16).toUpperCase().padStart(2, '0')) // Convert to hex and pad with '0'
-    .join('')
+  return bytes
 }

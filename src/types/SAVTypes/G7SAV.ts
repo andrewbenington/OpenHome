@@ -9,7 +9,7 @@ import {
   bytesToUint32LittleEndian,
   uint16ToBytesLittleEndian,
 } from '../../util/ByteLogic'
-import { CRC16_Invert } from '../../util/Encryption'
+import { CRC16_Invert, SignWithMemeCrypto } from '../../util/Encryption'
 import { utf16BytesToString } from '../../util/Strings/StringConverter'
 import { OHPKM } from '../pkm/OHPKM'
 import { SaveType } from '../types'
@@ -119,6 +119,7 @@ export class G7SAV extends SAV<PK7> {
       }
     })
     this.bytes.set(uint16ToBytesLittleEndian(this.calculateChecksum()), this.pcChecksumOffset)
+    this.bytes = SignWithMemeCrypto(this.bytes as Uint8Array<ArrayBuffer>)
     return changedMonPKMs
   }
 

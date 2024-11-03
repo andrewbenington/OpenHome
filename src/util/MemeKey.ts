@@ -1,5 +1,5 @@
 import crypto from 'crypto'
-const SIGNATURE_LENGTH = 0x60
+export const SIGNATURE_LENGTH = 0x60
 const AES_CHUNK_LENGTH = 0x10
 export class MemeKey {
   private DER: Uint8Array
@@ -12,41 +12,50 @@ export class MemeKey {
     this.mod = bytesToBigIntBE(bytes.slice(0x18, 0x79))
     this.publicKey = bytesToBigIntBE(bytes.slice(0x7b, 0x7e))
     this.privateKey = bytesToBigIntBE(signingKey)
-    console.log('public key:', this.publicKey)
-    console.log('private key:', this.privateKey)
-    console.log('mod:', this.mod)
   }
 
   public AesEncrypt(data: Uint8Array) {
     const payload = data.slice(0, data.length - SIGNATURE_LENGTH)
-    console.log(`AesEncrypt payload: ${bytesToHex(payload)} ${payload.length}`)
     const signature = data.slice(data.length - SIGNATURE_LENGTH)
-    console.log(`AesEncrypt signature: ${bytesToHex(signature)} ${signature.length}`)
 
     // GetAesImp in PKHeX
     const key = this.GetAesKey(payload)
 
     const cipher = crypto.createCipheriv('aes-128-ecb', new Uint8Array(key.subarray(0, 16)), '')
 
-    // TODO: is this necessary?
     cipher.setAutoPadding(false)
 
     // AesDecrypt(data, sig) in PKHeX
-    let temp = new Uint8Array(AES_CHUNK_LENGTH)
+    let nextXor = new Uint8Array(AES_CHUNK_LENGTH)
 
     for (let i = 0; i < signature.length; i += AES_CHUNK_LENGTH) {
-      console.log(`AesEncrypt temp: ${bytesToHex(temp)} ${temp.length}`)
       let slice = signature.slice(i, i + AES_CHUNK_LENGTH)
-      slice = xorBytes(slice, temp)
+      slice = xorBytes(slice, nextXor)
       const encryptedSlice = cipher.update(slice)
-      temp = new Uint8Array(encryptedSlice)
-      signature.set(temp, i)
-      console.log(`AesEncrypt temp: ${bytesToHex(temp)} ${temp.length}`)
-      console.log()
+      nextXor = new Uint8Array(encryptedSlice)
+      signature.set(nextXor, i)
     }
-    console.log(`AesEncrypt signature: ${bytesToHex(signature)} ${signature.length}`)
 
-    temp = xorBytes(temp, signature.slice(0, AES_CHUNK_LENGTH))
+    nextXor = xorBytes(nextXor, signature.slice(0, AES_CHUNK_LENGTH))
+    const subKey = this.GetSubKey(nextXor)
+
+    for (let i = 0; i < signature.length; i += AES_CHUNK_LENGTH) {
+      const xorResult = xorBytes(signature.slice(i, i + AES_CHUNK_LENGTH), subKey)
+      signature.set(xorResult, i)
+    }
+
+    nextXor = new Uint8Array(AES_CHUNK_LENGTH)
+    for (let i = signature.length - AES_CHUNK_LENGTH; i >= 0; i -= AES_CHUNK_LENGTH) {
+      const temp = signature.slice(i, i + AES_CHUNK_LENGTH)
+      const encryptedSlice = cipher.update(temp)
+      signature.set(xorBytes(new Uint8Array(encryptedSlice), nextXor), i)
+      nextXor = temp
+    }
+
+    const encrypted = new Uint8Array(data.length)
+    encrypted.set(payload, 0)
+    encrypted.set(signature, data.length - SIGNATURE_LENGTH)
+    return encrypted
   }
 
   public GetAesKey(bytes: Uint8Array) {
@@ -56,6 +65,39 @@ export class MemeKey {
     hash.update(bytes)
 
     return hash.digest().subarray(0, AES_CHUNK_LENGTH)
+  }
+
+  public GetSubKey(temp: Uint8Array): Uint8Array {
+    const subKey = new Uint8Array(AES_CHUNK_LENGTH)
+    for (let i = 0; i < temp.length; i += 2) {
+      const b1 = temp[i]
+      const b2 = temp[i + 1]
+
+      subKey[i] = truncByte(2 * b1 + truncByte(b2 >> 7))
+      subKey[i + 1] = truncByte(2 * b2)
+
+      if (i + 2 < temp.length) {
+        subKey[i + 1] = truncByte(subKey[i + 1] + truncByte(temp[i + 2] >> 7))
+      }
+    }
+
+    if ((temp[0] & 0x80) != 0) {
+      subKey[0xf] ^= 0x87
+    }
+
+    return subKey
+  }
+
+  public RSAPublic(data: Uint8Array) {
+    const M = bytesToBigIntBE(data)
+    const result = modPow(M, this.publicKey, this.mod)
+    return bigIntToBytesBE(result)
+  }
+
+  public RSAPrivate(data: Uint8Array) {
+    const M = bytesToBigIntBE(data)
+    const result = modPow(M, this.privateKey, this.mod)
+    return bigIntToBytesBE(result)
   }
 }
 
@@ -80,12 +122,29 @@ const signingKey = new Uint8Array([
   0x51,
 ])
 
+function truncByte(val: number): number {
+  return val & 0xff
+}
+
 function bytesToBigIntBE(bytes: Uint8Array) {
   let result = 0n
   for (const byte of bytes) {
     result = (result << 8n) | BigInt(byte)
   }
   return result
+}
+function bigIntToBytesBE(value: bigint): Uint8Array {
+  // Calculate the number of bytes needed to represent the bigint
+  const byteLength = (value.toString(2).length + 7) >> 3 // Equivalent to Math.ceil(value.toString(2).length / 8)
+  const byteArray = new Uint8Array(byteLength)
+
+  // Fill the byte array with the bytes of the bigint in big-endian order
+  for (let i = byteLength - 1; i >= 0; i--) {
+    byteArray[i] = Number(value & 0xffn) // Extract the least significant byte
+    value >>= 8n // Shift right by 8 bits (1 byte)
+  }
+
+  return byteArray
 }
 
 function xorBytes(b1: Uint8Array, b2: Uint8Array): Uint8Array<ArrayBuffer> {
@@ -96,8 +155,26 @@ function xorBytes(b1: Uint8Array, b2: Uint8Array): Uint8Array<ArrayBuffer> {
   return result
 }
 
-function bytesToHex(bytes: Uint8Array) {
-  return Array.from(bytes)
-    .map((byte) => byte.toString(16).toUpperCase().padStart(2, '0')) // Convert to hex and pad with '0'
-    .join('')
+function modPow(base: bigint, exponent: bigint, modulus: bigint): bigint {
+  if (modulus <= 0n) {
+    throw new Error('Modulus must be greater than 0')
+  }
+
+  let result = 1n // Initialize result to 1
+  base = base % modulus // Handle cases where base is greater than modulus
+
+  while (exponent > 0n) {
+    // If exponent is odd, multiply base with result
+    if (exponent % 2n === 1n) {
+      result = (result * base) % modulus
+    }
+
+    // exponent = exponent / 2
+    exponent = exponent >> 1n // Equivalent to exponent / 2
+
+    // base = base * base % modulus
+    base = (base * base) % modulus
+  }
+
+  return result
 }
