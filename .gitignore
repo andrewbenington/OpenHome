@@ -31,3 +31,5 @@ __pycache__/
 generate/out/
 
 planning.md
+
+src/consts/JSON/version.json

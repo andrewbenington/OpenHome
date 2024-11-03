@@ -21,6 +21,8 @@ jobs:
         with:
           node-version: 20
           cache: 'npm'
+      - name: build version json
+        run: ./buildVersionJSON.sh
       - name: install dependencies
         run: npm install
       - name: publish
