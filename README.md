@@ -55,9 +55,10 @@ formats losslessly, there are sometimes mistakes. It's always a good idea to bac
 your save files. If you come across a bug, create an [issue](https://github.com/andrewbenington/OpenHome/issues) to bring it to my attention.
 
 All PKM formats from Generations I-IX are currently supported, including from Pokémon
-Colosseum and Pokémon XD. All game save files from Generations I-VI (Red/Blue through
-OmegaRuby/AlphaSapphire) are supported, except for the Japanese versions of Pokémon
-Red/Green/Blue/Yellow. Support for Generation VII (3DS) is coming soon.
+Colosseum and Pokémon XD. All game save files from Generations I-VII are supported,
+except for Pokémon Lets Go Pikachu/Eevee and the Japanese versions of Pokémon
+Red/Green/Blue/Yellow. Support for Switch game save files will come at some point in
+the future.
 
 ### Supported PKM import formats
 
@@ -91,6 +92,8 @@ Red/Green/Blue/Yellow. Support for Generation VII (3DS) is coming soon.
 - Pokémon Black 2/White 2
 - Pokémon X/Y
 - Pokémon Omega Ruby/Alpha Sapphire
+- Pokémon Sun/Moon
+- Pokémon Ultra Sun/Ultra Moon
 
 ## Alterations to transferred Pokémon
 
