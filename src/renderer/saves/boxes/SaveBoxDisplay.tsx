@@ -1,8 +1,10 @@
-import { Card, Grid } from '@mui/joy'
+import { Card, Grid, Modal, ModalDialog } from '@mui/joy'
 import lodash from 'lodash'
 import { GameOfOriginData } from 'pokemon-resources'
-import { useCallback, useContext, useMemo } from 'react'
+import { useCallback, useContext, useMemo, useState } from 'react'
 import { MdArrowBack, MdArrowForward, MdClose } from 'react-icons/md'
+import { MenuIcon } from 'src/renderer/components/Icons'
+import AttributeRow from 'src/renderer/pokemon/AttributeRow'
 import { MouseContext } from 'src/renderer/state/mouse'
 import { MonLocation, OpenSavesContext } from 'src/renderer/state/openSaves'
 import { PKMFile } from '../../../types/pkm/util'
@@ -19,6 +21,7 @@ interface OpenSaveDisplayProps {
 const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   const [, openSavesDispatch, openSaves] = useContext(OpenSavesContext)
   const [mouseState, mouseDispatch] = useContext(MouseContext)
+  const [detailsModal, setDetailsModal] = useState(false)
   const { saveIndex, setSelectedMon } = props
   const save = openSaves[saveIndex]
 
@@ -95,6 +98,9 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
             {save?.name} ({save?.displayID})
           </div>
         </div>
+        <button className="save-menu-button" onClick={() => setDetailsModal(true)}>
+          <MenuIcon />
+        </button>
       </Card>
       <Card
         className="box-card"
@@ -183,6 +189,46 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
           ))}
         </div>
       </Card>
+      <Modal open={detailsModal} onClose={() => setDetailsModal(false)}>
+        <ModalDialog
+          sx={{
+            minWidth: 800,
+            width: '80%',
+            maxHeight: 'fit-content',
+            height: '95%',
+            overflow: 'hidden',
+            gap: 0,
+          }}
+        >
+          <AttributeRow label="Game">
+            {save.origin
+              ? `Pokémon ${GameOfOriginData[save.origin]?.name}`
+              : getSaveTypeString(save.saveType)}
+          </AttributeRow>
+          <AttributeRow label="Trainer Name">{save.name}</AttributeRow>
+          <AttributeRow label="Trainer ID">{save.displayID}</AttributeRow>
+          {save.sid && (
+            <AttributeRow label="Secret ID">
+              <code>0x{save.sid.toString(16)}</code>
+            </AttributeRow>
+          )}
+          <AttributeRow label="File">
+            <div style={{ overflowWrap: 'break-word', width: '100%' }}>{save.filePath.raw}</div>
+          </AttributeRow>
+          {save.fileCreated && (
+            <AttributeRow label="File">
+              <div style={{ overflowWrap: 'break-word', width: '100%' }}>
+                {save.fileCreated.toDateString()}
+              </div>
+            </AttributeRow>
+          )}
+          {save.calculateChecksum() !== -1 && (
+            <AttributeRow label="Checksum">
+              <code>0x{save.calculateChecksum().toString(16)}</code>
+            </AttributeRow>
+          )}
+        </ModalDialog>
+      </Modal>
     </div>
   ) : (
     <div />

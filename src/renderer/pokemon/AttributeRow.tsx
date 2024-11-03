@@ -14,7 +14,7 @@ const AttributeRow = (props: {
     <div
       style={{
         ...style,
-        height: 32,
+        height: 'fit-content',
         minHeight: 32,
         marginBottom: 2,
         display: 'flex',
@@ -25,8 +25,9 @@ const AttributeRow = (props: {
     >
       <div
         style={{
-          width: indent ? `calc(33% - ${indent}px)` : '33%',
+          minWidth: indent ? `calc(33% - ${indent}px)` : '33%',
           height: '100%',
+          minHeight: 32,
           backgroundColor: '#fff6',
           marginLeft: indent,
           display: 'grid',
@@ -46,8 +47,10 @@ const AttributeRow = (props: {
       </div>
       <div
         style={{
-          width: '67%',
+          maxWidth: 'calc(67% - 10px)',
+          width: 'calc(67% - 10px)',
           height: '100%',
+          minHeight: 32,
           padding: '0px 10px',
           backgroundColor: isDarkMode ? '#ddd3' : '#fff4',
           display: 'flex',
@@ -55,6 +58,8 @@ const AttributeRow = (props: {
           alignItems: 'center',
           justifyContent: justifyEnd ? 'end' : 'start',
           textAlign: justifyEnd ? 'end' : 'start',
+          overflowWrap: 'break-word',
+          overflow: 'hidden',
         }}
       >
         {value ?? children}

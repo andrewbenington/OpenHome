@@ -13,21 +13,28 @@
 .save-header {
   display: flex;
   flex-direction: row;
-  justify-content: center;
+  justify-content: start;
+  align-items: center;
   position: relative;
-  padding: 8px 0px;
   margin-bottom: 8px;
 }
 
 .save-close-button {
-  color: inherit;
-  background-color: transparent;
-  font-weight: bold;
   position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  padding: 4px 8px;
+  left: 8px;
+  padding: 0px;
+  display: grid;
+  aspect-ratio: 1;
+  align-items: center;
+}
+
+.save-menu-button {
+  position: absolute;
+  right: 8px;
+  padding: 0px;
+  display: grid;
+  aspect-ratio: 1;
+  align-items: center;
 }
 
 .box-card {
