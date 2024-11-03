@@ -7,7 +7,6 @@ import { MenuIcon } from 'src/renderer/components/Icons'
 import AttributeRow from 'src/renderer/pokemon/AttributeRow'
 import { MouseContext } from 'src/renderer/state/mouse'
 import { MonLocation, OpenSavesContext } from 'src/renderer/state/openSaves'
-import { bytesToUint16LittleEndian } from 'src/util/ByteLogic'
 import { PKMFile } from '../../../types/pkm/util'
 import { isRestricted } from '../../../types/TransferRestrictions'
 import { getSaveTypeString } from '../../../types/types'
@@ -198,29 +197,35 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
             maxHeight: 'fit-content',
             height: '95%',
             overflow: 'hidden',
+            gap: 0,
           }}
         >
-          <AttributeRow label="Trainer">{save.name}</AttributeRow>
+          <AttributeRow label="Game">
+            {save.origin
+              ? `Pokémon ${GameOfOriginData[save.origin]?.name}`
+              : getSaveTypeString(save.saveType)}
+          </AttributeRow>
+          <AttributeRow label="Trainer Name">{save.name}</AttributeRow>
+          <AttributeRow label="Trainer ID">{save.displayID}</AttributeRow>
+          {save.sid && (
+            <AttributeRow label="Secret ID">
+              <code>0x{save.sid.toString(16)}</code>
+            </AttributeRow>
+          )}
           <AttributeRow label="File">
             <div style={{ overflowWrap: 'break-word', width: '100%' }}>{save.filePath.raw}</div>
           </AttributeRow>
-          {'pcChecksumOffset' in save && 'pcOffset' in save && save.pcChecksumOffset && (
-            <>
-              <AttributeRow label="PC Offset">
-                <code>0x{save.pcOffset?.toString(16)}</code>
-              </AttributeRow>
-              <AttributeRow label="PC Checksum Offset">
-                <code>0x{save.pcChecksumOffset.toString(16)}</code>
-              </AttributeRow>
-              <AttributeRow label="PC Checksum">
-                {bytesToUint16LittleEndian(save.bytes, save.pcChecksumOffset).toString(16)}
-              </AttributeRow>
-              {save.calculateChecksum() !== -1 && (
-                <AttributeRow label="PC Checksum (Calced)">
-                  {save.calculateChecksum().toString(16)}
-                </AttributeRow>
-              )}
-            </>
+          {save.fileCreated && (
+            <AttributeRow label="File">
+              <div style={{ overflowWrap: 'break-word', width: '100%' }}>
+                {save.fileCreated.toDateString()}
+              </div>
+            </AttributeRow>
+          )}
+          {save.calculateChecksum() !== -1 && (
+            <AttributeRow label="Checksum">
+              <code>0x{save.calculateChecksum().toString(16)}</code>
+            </AttributeRow>
           )}
         </ModalDialog>
       </Modal>
