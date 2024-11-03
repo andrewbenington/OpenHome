@@ -40,13 +40,14 @@
           OpenHome is built with <a href="https://www.electronjs.org/">Electron</a> to allow for
           compatibility with Linux, macOS, and Windows devices. Electron also provides the ability
           to prompt for updates, and to use a Node.js "backend" to interact with the operating
-          system. The TypeScript codebase
+          system.
         </p>
         <p>
           Electron apps have the downside of taking up more space than native apps, as they are
           complete web browsers under the hood. The benefits of full Linux/macOS/Windows support
-          currently outweighs the downsides of Electron, as I don't want non-macOS users to deal
-          with the issues non-Windows users of PKHeX have to deal with.
+          currently outweighs the downsides of Electron, as I don't want users to be restricted to a
+          signal platform, and native development for three operating systems would take more time
+          than I have.
         </p>
         <p>
           If the app gains enough users, I plan to migrate to React Native at some point in the
@@ -56,8 +57,8 @@
         <h2>TypeScript</h2>
         <p>
           TypeScript is a superset of JavaScript, adding static typing and a type checker.
-          TypeScript code transpiles to JavaScript and is not run by itself with rare exception. The
-          reason I and many others use TypeScript instead of pure JavaScript is because static
+          TypeScript code transpiles to JavaScript and is not run by itself (with rare exception).
+          The reason I and many others use TypeScript instead of pure JavaScript is because static
           typing adds many desirable features to a codebase:
         </p>
         <ul>
@@ -71,7 +72,7 @@
           <li>
             Refactoring is safer and easier. If, for example, a function's arguments or return types
             are changed, TypeScript will alert the developer to any code where the old type
-            signature is still expected, and that should be updated
+            signature is still expected and will cause issues.
           </li>
         </ul>
         <p>
