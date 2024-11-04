@@ -156,6 +156,9 @@ export const darkTheme: ColorSystemOptions = {
     secondary: {
       mainChannel: red,
       solidBg: red,
+      solidColor: '#fff',
+      softBorder: '#999',
+      softActiveBg: red,
       plainColor: '#fff',
       plainHoverColor: '#333',
       plainActiveColor: '#333',
@@ -185,6 +188,7 @@ export const darkTheme: ColorSystemOptions = {
       plainHoverBg: '#fff3',
       outlinedBg: '#081721',
       plainColor: '#fff',
+      plainBg: '#081721',
       outlinedHoverBg: '#fff3',
       plainHoverColor: '#fff',
       plainActiveBg: '#fff6',
@@ -198,9 +202,12 @@ export const lightTheme: ColorSystemOptions = {
     secondary: {
       mainChannel: red,
       solidBg: red,
+      solidColor: '#fff',
       plainColor: '#fff',
       plainHoverColor: '#333',
       plainActiveColor: '#333',
+      softBorder: '#999',
+      softActiveBg: red,
     },
     primary: {
       mainChannel: red2,
@@ -214,7 +221,10 @@ export const lightTheme: ColorSystemOptions = {
       // plainHoverBg: lightTealSelected,
     },
     neutral: {
-      plainHoverBg: lightTealSelected,
+      plainHoverBg: '#fff',
+      plainBg: '#dfd',
+      softBg: '#888',
+      softColor: '#fff',
     },
     background: {
       body: lightTeal,

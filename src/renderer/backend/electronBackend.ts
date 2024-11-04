@@ -87,6 +87,10 @@ export const ElectronBackend: BackendInterface = {
     return window.electron.ipcRenderer.invoke('pick-folder')
   },
   getResourcesPath: () => window.electron.ipcRenderer.invoke('get-resources-path'),
+  openDirectory: (directory: string): Promise<Errorable<null>> => {
+    return window.electron.ipcRenderer.invoke('open-directory', directory)
+  },
+  getPlatform: () => window.electron.ipcRenderer.invoke('get-platform'),
 }
 
 export const ElectronBackendContext = createContext(ElectronBackend)

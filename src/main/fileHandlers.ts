@@ -1,5 +1,7 @@
+import child_process from 'child_process'
 import { app, dialog } from 'electron'
 import fs from 'fs'
+import os from 'os'
 import path from 'path'
 import { getStoragePath } from './loadData'
 
@@ -90,4 +92,26 @@ export function loadStoredList<T>(filename: string): T[] {
 export function updateStoredList<T>(filename: string, val: T[]) {
   const fullPath = path.join(getStoragePath(), filename)
   fs.writeFileSync(fullPath, JSON.stringify(val, undefined, 2))
+}
+
+export function openDirectory(directory: string) {
+  let command = ''
+  switch (os.platform()) {
+    case 'linux':
+      command = 'xdg-open'
+      break
+    case 'darwin':
+      command = 'open'
+      break
+    case 'win32':
+      command = 'explorer'
+      break
+    default:
+      return
+  }
+
+  console.log(`${command} ${directory}`)
+  const process = child_process.exec(`${command} '${directory}'`)
+  console.log(process)
+  console.log(process.exitCode)
 }

@@ -40,4 +40,6 @@ export default interface BackendInterface {
   setHasChanges: (hasChanges: boolean) => Promise<void>
   pickFolder: () => Promise<Errorable<string | undefined>>
   getResourcesPath: () => Promise<string>
+  openDirectory: (directory: string) => Promise<Errorable<null>>
+  getPlatform: () => Promise<string>
 }

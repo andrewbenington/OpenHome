@@ -1,15 +1,17 @@
-import { Button, Tab, tabClasses, TabList, TabPanel, Tabs } from '@mui/joy'
+import { Button, Tab, tabClasses, TabList, TabPanel, Tabs, ToggleButtonGroup } from '@mui/joy'
 import * as E from 'fp-ts/lib/Either'
-import { useCallback, useContext } from 'react'
+import { useCallback, useContext, useState } from 'react'
 import 'react-data-grid/lib/styles.css'
 import { ParsedPath } from 'src/types/SAVTypes/path'
 import { buildSaveFile } from '../../types/SAVTypes/util'
 import { BackendContext } from '../backend/backendProvider'
+import { CardsIcon, GridIcon } from '../components/Icons'
 import { LookupContext } from '../state/lookup'
 import { OpenSavesContext } from '../state/openSaves'
 import RecentSaves from './RecentSaves'
 import SaveFolders from './SaveFolders'
 import SuggestedSaves from './SuggestedSaves'
+import { SaveViewMode } from './util'
 
 interface SavesModalProps {
   onClose: () => void
@@ -20,6 +22,7 @@ const SavesModal = (props: SavesModalProps) => {
   const backend = useContext(BackendContext)
   const [, dispatchOpenSaves] = useContext(OpenSavesContext)
   const [lookupState] = useContext(LookupContext)
+  const [viewMode, setViewMode] = useState<SaveViewMode>('cards')
 
   const openSaveFile = useCallback(
     async (filePath?: ParsedPath) => {
@@ -93,12 +96,27 @@ const SavesModal = (props: SavesModalProps) => {
         <Tab disableIndicator value={'folders'} variant="solid" color="primary">
           Save Folders
         </Tab>
+        <div style={{ flex: 1 }} />
+        <ToggleButtonGroup
+          value={viewMode}
+          onChange={(_, newValue) => setViewMode(newValue as SaveViewMode)}
+          color="secondary"
+          variant="soft"
+          style={{ width: '100%' }}
+        >
+          <Button value="cards" color="secondary" variant="soft" fullWidth size="sm">
+            <CardsIcon />
+          </Button>
+          <Button value="grid" color="secondary" variant="soft" fullWidth size="sm">
+            <GridIcon />
+          </Button>
+        </ToggleButtonGroup>
       </TabList>
       <TabPanel value="recents">
-        <RecentSaves onOpen={openSaveFile} />
+        <RecentSaves onOpen={openSaveFile} view={viewMode} />
       </TabPanel>
       <TabPanel value="suggested">
-        <SuggestedSaves onOpen={openSaveFile} />
+        <SuggestedSaves onOpen={openSaveFile} view={viewMode} />
       </TabPanel>
       <TabPanel value="folders">
         <SaveFolders />
