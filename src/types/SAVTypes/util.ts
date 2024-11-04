@@ -1,4 +1,4 @@
-import { PK2, PK3, PK4, PK5, PK6, PKM } from 'pokemon-files'
+import { PK2, PK3, PK3RR, PK4, PK5, PK6, PKM } from '../../../../pokemon-files-js/src'
 import { bytesToUint32LittleEndian, bytesToUint64LittleEndian } from '../../util/ByteLogic'
 import {
   getMonFileIdentifier,
@@ -11,6 +11,7 @@ import { DPSAV } from './DPSAV'
 import { G1SAV } from './G1SAV'
 import { G2SAV } from './G2SAV'
 import { G3SAV } from './G3SAV'
+import { G3RRSAV } from './G3RRSAV'
 import { G5SAV } from './G5SAV'
 import { G6SAV } from './G6SAV'
 import { HGSSSAV } from './HGSSSAV'
@@ -92,6 +93,8 @@ export const getSaveType = (bytes: Uint8Array): SaveType => {
         return SaveType.FRLG
       case 0:
         return SaveType.RS
+      case 0xFF:
+        return SaveType.RR
       default:
         for (let i = 0x890; i < 0xf2c; i += 4) {
           if (bytesToUint64LittleEndian(bytes, i) !== 0) return SaveType.E
@@ -169,6 +172,13 @@ export const buildSaveFile = (
         gen345LookupMap
       )
       break
+    case SaveType.RR:
+      saveFile = recoverOHPKMData<PK3RR>(
+        new G3RRSAV(filePath, fileBytes),
+        getMonGen345Identifier,
+        homeMonMap,
+        gen345LookupMap
+      )
     case SaveType.DP:
       saveFile = recoverOHPKMData<PK4>(
         new DPSAV(filePath, fileBytes),

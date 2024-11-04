@@ -1,4 +1,4 @@
-import { readFileSync } from 'fs';
+import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { resolve } from 'path';
 import { G3RRSAV } from '../G3RRSAV';
 import { ParsedPath } from '../path';
@@ -19,7 +19,7 @@ function display_mon(mon: PK3RR | OHPKM) {
   });
 }
 
-describe('G3SAV - Radical Red Save Tests', () => {
+describe('G3RRSAV - Radical Red Save File Read Test', () => {
   let radicalRedSave: G3RRSAV;
   let saveBytes: Uint8Array;
 
@@ -96,5 +96,76 @@ describe('G3SAV - Radical Red Save Tests', () => {
     } else {
       console.log('No Pokémon found in the second box, second slot.');
     }
+  });
+});
+
+
+describe('G3RRSAV - Radical Red Save File Write Test', () => {
+  let radicalRedSave: G3RRSAV;
+  let saveBytes: Uint8Array;
+
+  beforeAll(() => {
+    const savePath = resolve(__dirname, './SAVFILES/radicalred.sav');
+    saveBytes = new Uint8Array(readFileSync(savePath));
+    
+    const parsedPath: ParsedPath = {
+      raw: './SAVFILES/radicalred.sav',
+      base: '.SAVFILES/radicalred.sav',
+      name: 'radical red',
+      dir: './SAVFILES',
+      ext: '.sav',
+      root: '/',
+      separator: '/'
+    };
+
+    radicalRedSave = new G3RRSAV(parsedPath, saveBytes);
+  });
+
+  test('should modify a Pokémon and save changes to a new file', () => {
+    // Modify the nickname, held item, or other properties of the first Pokémon in the first box
+    const firstPokemon = radicalRedSave.boxes[0].pokemon[0];
+    
+    if (radicalRedSave.boxes[0].pokemon[0]) {
+      radicalRedSave.boxes[0].pokemon[0] = new OHPKM(firstPokemon);
+      radicalRedSave.boxes[0].pokemon[0].nickname = "ModTest";
+      radicalRedSave.boxes[0].pokemon[0].heldItemIndex = 123;
+      radicalRedSave.boxes[0].pokemon[0].moves[0] = 101;
+
+      radicalRedSave.prepareBoxesForSaving();
+
+      const newSavePath = resolve(__dirname, './SAVFILES/radicalred_modified.sav');
+      writeFileSync(newSavePath, radicalRedSave.bytes);
+
+      const fileExists = existsSync(newSavePath);
+      expect(fileExists).toBe(true);
+      console.log("Saved file to ./SAVFILES/radicalred_modified.sav")
+    } else {
+      console.log('No Pokémon found in the first box, first slot.');
+    }
+  });
+
+  test('should check if modifications were made', () => {
+    const parsedPath: ParsedPath = {
+      raw: './SAVFILES/radicalred_modified.sav',
+      base: '.SAVFILES/radicalred_modified.sav',
+      name: 'radical red',
+      dir: './SAVFILES',
+      ext: '.sav',
+      root: '/',
+      separator: '/'
+    };
+
+    const newSavePath = resolve(__dirname, './SAVFILES/radicalred_modified.sav');
+    const fileExists = existsSync(newSavePath);
+    expect(fileExists).toBe(true);
+
+    const modifiedSaveBytes = new Uint8Array(readFileSync(newSavePath));
+    const modifiedRadicalRedSave = new G3RRSAV(parsedPath, modifiedSaveBytes);
+
+    const modifiedFirstPokemon = modifiedRadicalRedSave.boxes[0].pokemon[0];
+
+    expect(modifiedFirstPokemon.nickname).toBe("ModTest");
+    expect(modifiedFirstPokemon.heldItemIndex).toBe(123);
+    expect(modifiedFirstPokemon.moves[0]).toBe(101);
   });
 });
