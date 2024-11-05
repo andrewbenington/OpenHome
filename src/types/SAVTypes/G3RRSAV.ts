@@ -13,6 +13,7 @@ import { OHPKM } from '../pkm/OHPKM'
 import { SaveType } from '../types'
 import { Box, SAV } from './SAV'
 import { ParsedPath, splitPath } from './path'
+import { strictEqual } from 'assert'
 
 export class G3RRSector {
   data: Uint8Array
@@ -45,7 +46,7 @@ export class G3RRSector {
 
   refreshChecksum() {
     let checksum = 0
-    let byteLength = 3968
+    let byteLength = 0xFF0
     if (this.sectionID === 0) {
       byteLength = 3884
     } else if (this.sectionID === 13) {
@@ -229,9 +230,7 @@ export class G3RRSAV extends SAV<PK3RR> {
           // If mon is a OHPKM then convert to PK3RR
           const mon = slotMon instanceof PK3RR ? slotMon : new PK3RR(slotMon)
 
-          if (mon?.gameOfOrigin && mon?.dexNum) {
-            pcBytes.set(new Uint8Array(mon.toPCBytes()), 0)
-          }
+          if (mon?.gameOfOrigin && mon?.dexNum) pcBytes.set(new Uint8Array(mon.toPCBytes()), 0)
 
         } catch (e) {
           console.error(e)
@@ -252,9 +251,14 @@ export class G3RRSAV extends SAV<PK3RR> {
         // 4080 ahead of that, or 0x450 ahead of that if box 13 zero indexed
         i * 0xFF0 + (i + 5 === 13 ? 3964 : 0xFF0)
       )
-      console.log(i, sector.data.length, pcData.length)
-      sector.data.slice(0, pcData.length).set(pcData)
+      sector.data.set(pcData)
+
       sector.writeToBuffer(this.primarySave.bytes, i + 5, this.primarySave.firstSectorIndex)
+
+      // const nicknameInSector = gen3StringToUTF(sector.data, 8+4, 10);
+      // console.log("NICKNAME", nicknameInSector)
+      // strictEqual(nicknameInSector.trim(), changedMonPKMs[0].nickname, "Nickname should match in sector data");
+
     })
     this.bytes.set(this.primarySave.bytes, this.primarySaveOffset)
     return changedMonPKMs
