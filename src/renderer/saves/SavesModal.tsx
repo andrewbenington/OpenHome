@@ -1,4 +1,13 @@
-import { Button, Tab, tabClasses, TabList, TabPanel, Tabs, ToggleButtonGroup } from '@mui/joy'
+import {
+  Button,
+  Slider,
+  Tab,
+  tabClasses,
+  TabList,
+  TabPanel,
+  Tabs,
+  ToggleButtonGroup,
+} from '@mui/joy'
 import * as E from 'fp-ts/lib/Either'
 import { useCallback, useContext, useState } from 'react'
 import 'react-data-grid/lib/styles.css'
@@ -23,6 +32,7 @@ const SavesModal = (props: SavesModalProps) => {
   const [, dispatchOpenSaves] = useContext(OpenSavesContext)
   const [lookupState] = useContext(LookupContext)
   const [viewMode, setViewMode] = useState<SaveViewMode>('cards')
+  const [cardSize, setCardSize] = useState<number>(180)
 
   const openSaveFile = useCallback(
     async (filePath?: ParsedPath) => {
@@ -97,6 +107,19 @@ const SavesModal = (props: SavesModalProps) => {
           Save Folders
         </Tab>
         <div style={{ flex: 1 }} />
+        {viewMode === 'cards' && (
+          <label>
+            Icon Size
+            <Slider
+              value={cardSize}
+              onChange={(_, newSize) => setCardSize(newSize as number)}
+              valueLabelDisplay="auto"
+              min={100}
+              max={500}
+              style={{ paddingTop: 0, paddingBottom: 30 }}
+            />
+          </label>
+        )}
         <ToggleButtonGroup
           value={viewMode}
           onChange={(_, newValue) => setViewMode(newValue as SaveViewMode)}
@@ -104,19 +127,19 @@ const SavesModal = (props: SavesModalProps) => {
           variant="soft"
           style={{ width: '100%' }}
         >
-          <Button value="cards" color="secondary" variant="soft" fullWidth size="sm">
+          <Button value="cards" color="secondary" variant="soft" fullWidth>
             <CardsIcon />
           </Button>
-          <Button value="grid" color="secondary" variant="soft" fullWidth size="sm">
+          <Button value="grid" color="secondary" variant="soft" fullWidth>
             <GridIcon />
           </Button>
         </ToggleButtonGroup>
       </TabList>
       <TabPanel value="recents">
-        <RecentSaves onOpen={openSaveFile} view={viewMode} />
+        <RecentSaves onOpen={openSaveFile} view={viewMode} cardSize={cardSize} />
       </TabPanel>
       <TabPanel value="suggested">
-        <SuggestedSaves onOpen={openSaveFile} view={viewMode} />
+        <SuggestedSaves onOpen={openSaveFile} view={viewMode} cardSize={cardSize} />
       </TabPanel>
       <TabPanel value="folders">
         <SaveFolders />

@@ -225,7 +225,7 @@ export const buildSaveFile = (
 }
 
 export const GameColors: Record<GameOfOrigin, string> = {
-  [0]: '#00000000',
+  [0]: '#666666',
   [GameOfOrigin.INVALID_6]: '#000000',
   [GameOfOrigin.INVALID_9]: '#000000',
   [GameOfOrigin.INVALID_13]: '#000000',

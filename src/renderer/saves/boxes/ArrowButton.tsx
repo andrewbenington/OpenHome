@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import './style.css'
+import '../style.css'
 
 interface OpenHomeButtonProps {
   onClick?: (e?: any) => void

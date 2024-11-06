@@ -10,7 +10,7 @@ export default interface BackendInterface {
   writeGen345Lookup: (lookup: LookupMap) => Promise<Errorable<null>>
 
   /* OHPKM management */
-  loadHomeMonLookup: () => Promise<Errorable<Record<string, Uint8Array<ArrayBuffer>>>>
+  loadHomeMonLookup: () => Promise<Errorable<Record<string, Uint8Array>>>
   writeHomeMon: (monBytes: Uint8Array) => Promise<Errorable<null>>
   deleteHomeMons: (identifiers: string[]) => Promise<Errorable<null>>
 

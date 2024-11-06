@@ -20,7 +20,7 @@ export const ElectronBackend: BackendInterface = {
   },
 
   /* OHPKM management */
-  loadHomeMonLookup: function (): Promise<Errorable<Record<string, Uint8Array<ArrayBuffer>>>> {
+  loadHomeMonLookup: function (): Promise<Errorable<Record<string, Uint8Array>>> {
     return window.electron.ipcRenderer.invoke('load-home-mons')
   },
   deleteHomeMons: (identifiers: string[]): Promise<Errorable<null>> =>

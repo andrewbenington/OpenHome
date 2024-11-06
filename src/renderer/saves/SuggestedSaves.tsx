@@ -16,10 +16,11 @@ import { filterEmpty, getSaveLogo, SaveViewMode } from './util'
 interface SaveFileSelectorProps {
   onOpen: (path: ParsedPath) => void
   view: SaveViewMode
+  cardSize: number
 }
 
 export default function SuggestedSaves(props: SaveFileSelectorProps) {
-  const { onOpen, view } = props
+  const { onOpen, view, cardSize } = props
   const backend = useContext(BackendContext)
   const [suggestedSaves, setSuggestedSaves] = useState<SAV<PKM>[]>()
   const [{ homeMons: homeMonMap, gen12: gen12LookupMap, gen345: gen345LookupMap }] =
@@ -151,6 +152,7 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
           onOpen={() => {
             onOpen(save.filePath)
           }}
+          size={cardSize}
         />
       ))}
     </Stack>

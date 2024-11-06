@@ -14,10 +14,11 @@ import { formatTime, formatTimeSince, getSaveLogo, SaveViewMode } from './util'
 interface SaveFileSelectorProps {
   onOpen: (path: ParsedPath) => void
   view: SaveViewMode
+  cardSize: number
 }
 
 export default function RecentSaves(props: SaveFileSelectorProps) {
-  const { onOpen, view } = props
+  const { onOpen, view, cardSize } = props
   const backend = useContext(BackendContext)
   const [recentSaves, setRecentSaves] = useState<Record<string, SaveRef>>()
   const [, , openSaves] = useContext(OpenSavesContext)
@@ -178,6 +179,7 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
                   onOpen(save.filePath)
                 }}
                 onRemove={() => removeRecentSave(save.filePath.raw)}
+                size={cardSize}
               />
             ))}
         </Stack>

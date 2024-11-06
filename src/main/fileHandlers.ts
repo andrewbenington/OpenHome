@@ -7,8 +7,9 @@ import { getStoragePath } from './loadData'
 
 export function initializeFolders() {
   const appDataPath = app.getPath('appData')
-  if (!fs.existsSync(`${appDataPath}/OpenHome/storage/mons`)) {
-    fs.mkdirSync(`${appDataPath}/OpenHome/storage/mons`, { recursive: true })
+  const monsDir = path.join(appDataPath, 'OpenHome', 'storage', 'mons')
+  if (!fs.existsSync(monsDir)) {
+    fs.mkdirSync(monsDir, { recursive: true })
   }
   fs.opendir('../', (err, dir) => {
     if (err) console.error('Error:', err)
@@ -29,7 +30,11 @@ export function fileCanOpen(filePath: string): boolean {
 }
 
 export function fileLastModified(filePath: string): number | undefined {
-  return fs.statSync(filePath, { throwIfNoEntry: false })?.mtimeMs
+  try {
+    return fs.statSync(filePath, { throwIfNoEntry: false })?.mtimeMs
+  } catch {
+    return undefined
+  }
 }
 
 export async function selectFile() {
@@ -110,8 +115,5 @@ export function openDirectory(directory: string) {
       return
   }
 
-  console.log(`${command} ${directory}`)
-  const process = child_process.exec(`${command} '${directory}'`)
-  console.log(process)
-  console.log(process.exitCode)
+  child_process.exec(`${command} "${directory}"`)
 }

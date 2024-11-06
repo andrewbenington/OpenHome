@@ -226,7 +226,6 @@ export class OpenHomeAppBackend implements BackendInterface {
 
   public async removeRecentSave(filePath: string): Promise<Errorable<null>> {
     try {
-      console.log('removing', filePath)
       removeRecentSaveFromFile(filePath)
       return E.right(null)
     } catch (e) {
@@ -242,7 +241,7 @@ export class OpenHomeAppBackend implements BackendInterface {
     }
   }
 
-  public async loadHomeMonLookup(): Promise<Errorable<Record<string, Uint8Array<ArrayBuffer>>>> {
+  public async loadHomeMonLookup(): Promise<Errorable<Record<string, Uint8Array>>> {
     try {
       return E.right(loadOHPKMs())
     } catch (e) {
