@@ -12,7 +12,7 @@ const AttributeTag = (props: {
       style={{
         marginLeft: 5,
         marginTop: 5,
-        padding: icon ? '5px 5px 0px' : 5,
+        padding: 5,
         width: 'fit-content',
         fontWeight: 'bold',
         color,

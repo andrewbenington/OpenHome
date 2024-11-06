@@ -42,7 +42,7 @@ export function addRecentSaveToFile(save: SaveRef) {
 
 export function removeRecentSaveFromFile(filePath: string) {
   const saveRefMap = recentSavesFromFile()
-  delete saveRefMap[encodeURIComponent(filePath)]
+  delete saveRefMap[filePath]
   writeRecentSaves(saveRefMap)
 }
 export function loadSaveFileFolders() {

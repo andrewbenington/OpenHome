@@ -1,4 +1,4 @@
-import { Card, Grid, Modal, ModalDialog } from '@mui/joy'
+import { Button, Card, Grid, Modal, ModalDialog, Stack } from '@mui/joy'
 import lodash from 'lodash'
 import { GameOfOriginData } from 'pokemon-resources'
 import { useCallback, useContext, useMemo, useState } from 'react'
@@ -70,37 +70,47 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   }, [save, mouseState.dragSource])
 
   return save && save.currentPCBox !== undefined ? (
-    <div style={{ display: 'flex', width: '100%', flexDirection: 'column' }}>
-      <Card className="save-header">
-        <button
-          className="save-close-button"
-          onClick={() =>
-            openSavesDispatch({
-              type: 'remove_save',
-              payload: save,
-            })
-          }
-          disabled={!!save.updatedBoxSlots.length}
-        >
-          <MdClose />
-        </button>
-        <div
-          style={{
-            flex: 1,
-          }}
-        >
-          <div style={{ textAlign: 'center', fontWeight: 'bold' }}>
-            {save.origin
-              ? `Pokémon ${GameOfOriginData[save.origin]?.name}`
-              : getSaveTypeString(save.saveType)}
+    <Stack style={{ width: '100%' }}>
+      <Card style={{ padding: '8px 0px 0px' }}>
+        <div className="save-header">
+          <Button
+            className="save-close-button"
+            onClick={() =>
+              openSavesDispatch({
+                type: 'remove_save',
+                payload: save,
+              })
+            }
+            disabled={!!save.updatedBoxSlots.length}
+            color="danger"
+            size="sm"
+          >
+            <MdClose />
+          </Button>{' '}
+          <div
+            style={{
+              flex: 1,
+            }}
+          >
+            <div style={{ textAlign: 'center', fontWeight: 'bold' }}>
+              {save.origin
+                ? `Pokémon ${GameOfOriginData[save.origin]?.name}`
+                : getSaveTypeString(save.saveType)}
+            </div>
+            <div style={{ textAlign: 'center' }}>
+              {save?.name} ({save?.displayID})
+            </div>
           </div>
-          <div style={{ textAlign: 'center' }}>
-            {save?.name} ({save?.displayID})
-          </div>
+          <Button
+            className="save-menu-button"
+            onClick={() => setDetailsModal(true)}
+            variant="plain"
+            color="neutral"
+            size="sm"
+          >
+            <MenuIcon />
+          </Button>
         </div>
-        <button className="save-menu-button" onClick={() => setDetailsModal(true)}>
-          <MenuIcon />
-        </button>
       </Card>
       <Card
         className="box-card"
@@ -229,7 +239,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
           )}
         </ModalDialog>
       </Modal>
-    </div>
+    </Stack>
   ) : (
     <div />
   )

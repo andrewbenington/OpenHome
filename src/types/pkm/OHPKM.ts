@@ -83,10 +83,9 @@ export class OHPKM {
   static maxValidMove() {
     return 919
   }
+  bytes: Uint8Array = new Uint8Array(433)
 
-  bytes = new Uint8Array(433)
-
-  constructor(arg: PKM | OHPKM | Uint8Array<ArrayBuffer>) {
+  constructor(arg: PKM | OHPKM | Uint8Array) {
     if (arg instanceof Uint8Array) {
       this.bytes = arg
     } else {
@@ -1522,8 +1521,8 @@ export class OHPKM {
     )
   }
 
-  public toBytes() {
-    return this.bytes.buffer
+  public toBytes(): ArrayBuffer {
+    return this.bytes.buffer as ArrayBuffer
   }
 
   public updateData(other: PKM | OHPKM, isFromOT: boolean = false) {

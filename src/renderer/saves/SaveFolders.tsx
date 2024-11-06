@@ -10,10 +10,9 @@ import {
 } from '@mui/joy'
 import * as E from 'fp-ts/lib/Either'
 import { useCallback, useContext, useEffect, useState } from 'react'
-import { MdDelete } from 'react-icons/md'
 import { SaveFolder } from 'src/types/storage'
 import { BackendContext } from '../backend/backendProvider'
-import { AddFolderIcon } from '../components/Icons'
+import { AddFolderIcon, RemoveIcon } from '../components/Icons'
 
 export default function SaveFolders() {
   const [saveFolders, setSaveFolders] = useState<SaveFolder[]>()
@@ -117,7 +116,7 @@ export default function SaveFolders() {
                 }}
                 onClick={() => removeFolder(folder.path)}
               >
-                <MdDelete />
+                <RemoveIcon />
               </button>
             </Stack>
           </Card>

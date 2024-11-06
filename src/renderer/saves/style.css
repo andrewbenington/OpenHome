@@ -13,8 +13,6 @@
 .save-header {
   display: flex;
   flex-direction: row;
-  justify-content: start;
-  align-items: center;
   position: relative;
   margin-bottom: 8px;
 }
@@ -49,4 +47,42 @@
   display: grid;
   align-items: center;
   text-align: center;
+}
+
+.details-button {
+  aspect-ratio: 1;
+  border-radius: 6px;
+  height: 30px;
+  background-color: #fff3;
+  transition: 0.15s;
+  position: absolute;
+  right: 0px;
+}
+
+.details-button:hover {
+  background-color: #fff6;
+}
+
+.save-card:hover::after {
+  content: '';
+  width: inherit;
+  height: inherit;
+  background-color: #fff3;
+  position: absolute;
+  left: 0;
+  top: 0;
+  border-radius: inherit;
+  transition: background-color 0.2s;
+}
+
+.save-card::after {
+  content: '';
+  width: inherit;
+  height: inherit;
+  position: absolute;
+  left: 0;
+  top: 0;
+  border-radius: inherit;
+  transition: background-color 0.2s;
+  pointer-events: none;
 }

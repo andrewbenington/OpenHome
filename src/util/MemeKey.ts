@@ -26,10 +26,10 @@ export class MemeKey {
     cipher.setAutoPadding(false)
 
     // AesDecrypt(data, sig) in PKHeX
-    let nextXor = new Uint8Array(AES_CHUNK_LENGTH)
+    let nextXor: Uint8Array = new Uint8Array(AES_CHUNK_LENGTH)
 
     for (let i = 0; i < signature.length; i += AES_CHUNK_LENGTH) {
-      let slice = signature.slice(i, i + AES_CHUNK_LENGTH)
+      let slice: Uint8Array = signature.slice(i, i + AES_CHUNK_LENGTH)
       slice = xorBytes(slice, nextXor)
       const encryptedSlice = cipher.update(slice)
       nextXor = new Uint8Array(encryptedSlice)
@@ -147,7 +147,7 @@ function bigIntToBytesBE(value: bigint): Uint8Array {
   return byteArray
 }
 
-function xorBytes(b1: Uint8Array, b2: Uint8Array): Uint8Array<ArrayBuffer> {
+function xorBytes(b1: Uint8Array, b2: Uint8Array): Uint8Array {
   const result = new Uint8Array(b1.length)
   for (let i = 0; i < result.length; i++) {
     result[i] = b1[i] ^ b2[i]
