@@ -38,6 +38,8 @@ const DummyBackend: BackendInterface = {
   setHasChanges: async () => {},
   pickFolder: async () => E.left('no backend in use'),
   getResourcesPath: async () => '',
+  openDirectory: async () => E.left('no backend in use'),
+  getPlatform: async () => 'none',
 }
 
 export default DummyBackend

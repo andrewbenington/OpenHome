@@ -119,7 +119,7 @@ export class G7SAV extends SAV<PK7> {
       }
     })
     this.bytes.set(uint16ToBytesLittleEndian(this.calculateChecksum()), this.pcChecksumOffset)
-    this.bytes = SignWithMemeCrypto(this.bytes as Uint8Array<ArrayBuffer>)
+    this.bytes = SignWithMemeCrypto(this.bytes)
     return changedMonPKMs
   }
 

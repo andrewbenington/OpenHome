@@ -1,12 +1,15 @@
+import child_process from 'child_process'
 import { app, dialog } from 'electron'
 import fs from 'fs'
+import os from 'os'
 import path from 'path'
 import { getStoragePath } from './loadData'
 
 export function initializeFolders() {
   const appDataPath = app.getPath('appData')
-  if (!fs.existsSync(`${appDataPath}/OpenHome/storage/mons`)) {
-    fs.mkdirSync(`${appDataPath}/OpenHome/storage/mons`, { recursive: true })
+  const monsDir = path.join(appDataPath, 'OpenHome', 'storage', 'mons')
+  if (!fs.existsSync(monsDir)) {
+    fs.mkdirSync(monsDir, { recursive: true })
   }
   fs.opendir('../', (err, dir) => {
     if (err) console.error('Error:', err)
@@ -27,7 +30,11 @@ export function fileCanOpen(filePath: string): boolean {
 }
 
 export function fileLastModified(filePath: string): number | undefined {
-  return fs.statSync(filePath, { throwIfNoEntry: false })?.mtimeMs
+  try {
+    return fs.statSync(filePath, { throwIfNoEntry: false })?.mtimeMs
+  } catch {
+    return undefined
+  }
 }
 
 export async function selectFile() {
@@ -90,4 +97,23 @@ export function loadStoredList<T>(filename: string): T[] {
 export function updateStoredList<T>(filename: string, val: T[]) {
   const fullPath = path.join(getStoragePath(), filename)
   fs.writeFileSync(fullPath, JSON.stringify(val, undefined, 2))
+}
+
+export function openDirectory(directory: string) {
+  let command = ''
+  switch (os.platform()) {
+    case 'linux':
+      command = 'xdg-open'
+      break
+    case 'darwin':
+      command = 'open'
+      break
+    case 'win32':
+      command = 'explorer'
+      break
+    default:
+      return
+  }
+
+  child_process.exec(`${command} "${directory}"`)
 }

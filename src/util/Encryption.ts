@@ -314,7 +314,7 @@ export const SignMemeDataInPlace = (data: Uint8Array) => {
 const SaveFileSignatureOffset = 0x100
 const SaveFileSignatureLength = 0x80
 
-export function SignWithMemeCrypto(bytes: Uint8Array<ArrayBuffer>): Uint8Array<ArrayBuffer> {
+export function SignWithMemeCrypto(bytes: Uint8Array): Uint8Array {
   if (bytes.length !== SIZE_USUM && bytes.length !== SIZE_SM) {
     console.error('invalid save size')
     return new Uint8Array()

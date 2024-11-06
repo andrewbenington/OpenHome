@@ -7,6 +7,7 @@ import PokemonDetailsPanel from 'src/renderer/pokemon/PokemonDetailsPanel'
 import BoxCell from 'src/renderer/saves/boxes/BoxCell'
 import SavesModal from 'src/renderer/saves/SavesModal'
 import { PKMFile } from 'src/types/pkm/util'
+import { GameColors } from 'src/types/SAVTypes/util'
 import { filterUndefined } from 'src/util/Sort'
 import { LookupContext } from '../../state/lookup'
 import { OpenSavesContext } from '../../state/openSaves'
@@ -119,12 +120,7 @@ export default function SortPokemon() {
           </Stack>
         </Card>
       </Stack>
-      <Modal
-        open={openSaveDialog}
-        onClose={() => setOpenSaveDialog(false)}
-        // fullWidth
-        // PaperProps={{ sx: { height: 800 } }}
-      >
+      <Modal open={openSaveDialog} onClose={() => setOpenSaveDialog(false)}>
         <ModalDialog sx={{ minHeight: 400, height: 600, width: 1000 }}>
           <SavesModal
             onClose={() => {
@@ -150,59 +146,4 @@ export default function SortPokemon() {
       </Modal>
     </Stack>
   )
-}
-
-const GameColors: Record<GameOfOrigin, string> = {
-  [0]: '#00000000',
-  [GameOfOrigin.INVALID_6]: '#000000',
-  [GameOfOrigin.INVALID_9]: '#000000',
-  [GameOfOrigin.INVALID_13]: '#000000',
-  [GameOfOrigin.INVALID_14]: '#000000',
-  [GameOfOrigin.INVALID_16]: '#000000',
-  [GameOfOrigin.INVALID_17]: '#000000',
-  [GameOfOrigin.INVALID_18]: '#000000',
-  [GameOfOrigin.INVALID_19]: '#000000',
-  [GameOfOrigin.INVALID_28]: '#000000',
-  [GameOfOrigin.INVALID_29]: '#000000',
-  [GameOfOrigin.INVALID_46]: '#000000',
-  [GameOfOrigin.Red]: '#DA3914',
-  [GameOfOrigin.BlueGreen]: '#2E50D8',
-  [GameOfOrigin.BlueJapan]: '#2E50D8',
-  [GameOfOrigin.Yellow]: '#FFD733',
-  [GameOfOrigin.Gold]: '#DAA520',
-  [GameOfOrigin.Silver]: '#C0C0C0 ',
-  [GameOfOrigin.Crystal]: '#3D51A7',
-  [GameOfOrigin.Ruby]: '#CD2236',
-  [GameOfOrigin.Sapphire]: '#009652',
-  [GameOfOrigin.Emerald]: '#009652',
-  [GameOfOrigin.ColosseumXD]: '#604E82',
-  [GameOfOrigin.FireRed]: '#F15C01 ',
-  [GameOfOrigin.LeafGreen]: '#9FDC00',
-  [GameOfOrigin.Diamond]: '#90BEED',
-  [GameOfOrigin.Pearl]: '#DD7CB1',
-  [GameOfOrigin.Platinum]: '#A0A08D',
-  [GameOfOrigin.HeartGold]: '#E8B502',
-  [GameOfOrigin.SoulSilver]: '#AAB9CF',
-  [GameOfOrigin.Black]: '#444444',
-  [GameOfOrigin.White]: '#E1E1E1',
-  [GameOfOrigin.Black2]: '#303E51',
-  [GameOfOrigin.White2]: '#EBC5C3',
-  [GameOfOrigin.X]: '#025DA6',
-  [GameOfOrigin.Y]: '#EA1A3E',
-  [GameOfOrigin.OmegaRuby]: '#AB2813',
-  [GameOfOrigin.AlphaSapphire]: '#26649C',
-  [GameOfOrigin.GO]: '#000000',
-  [GameOfOrigin.Sun]: '#F1912B',
-  [GameOfOrigin.Moon]: '#5599CA',
-  [GameOfOrigin.UltraSun]: '#E95B2B',
-  [GameOfOrigin.UltraMoon]: '#226DB5',
-  [GameOfOrigin.LetsGoPikachu]: '#F5DA26',
-  [GameOfOrigin.LetsGoEevee]: '#D4924B',
-  [GameOfOrigin.Sword]: '#00A1E9',
-  [GameOfOrigin.Shield]: '#BF004F',
-  [GameOfOrigin.BrilliantDiamond]: '#44BAE5',
-  [GameOfOrigin.ShiningPearl]: '#DA7D99',
-  [GameOfOrigin.LegendsArceus]: '#36597B',
-  [GameOfOrigin.Scarlet]: '#F34134',
-  [GameOfOrigin.Violet]: '#8334B7',
 }
