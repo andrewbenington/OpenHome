@@ -11,7 +11,7 @@ import { OHPKM } from '../pkm/OHPKM'
 import { SaveType } from '../types'
 import { Box, SAV } from './SAV'
 import { ParsedPath, splitPath } from './path'
-import { RR_TRANSFER_RESTRICTIONS } from '../../consts/TransferRestrictions'
+import { RR_TRANSFER_RESTRICTIONS } from 'src/consts/TransferRestrictions'
 
 export class G3RRSector {
   data: Uint8Array
