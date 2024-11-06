@@ -14,6 +14,7 @@ function display_mon(mon: PK3RR | OHPKM) {
     heldItemIndex: mon.heldItemIndex,
     languageIndex: mon.languageIndex,
     dexNum: mon.dexNum,
+    formeNum: mon.formeNum,
     moves: mon.moves,
     gameOfOrigin: mon.gameOfOrigin,
   });
@@ -93,6 +94,18 @@ describe('G3RRSAV - Radical Red Save File Read Test', () => {
       expect(lastpokemon.nickname).toBe("Crabrawler");
       expect(lastpokemon.trainerID).toBe(10334);
       expect(lastpokemon.trainerName).toBe("Radical")
+    } else {
+      console.log('No Pokémon found in the second box, second slot.');
+    }
+
+    const slowbroG = radicalRedSave.boxes[1].pokemon[5];
+
+    if (slowbroG) {
+      display_mon(slowbroG)
+
+      expect(slowbroG.nickname).toBe("Nobo");
+      expect(slowbroG.trainerID).toBe(10334);
+      expect(slowbroG.trainerName).toBe("Radical")
     } else {
       console.log('No Pokémon found in the second box, second slot.');
     }
