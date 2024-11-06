@@ -4,6 +4,7 @@ import { G3RRSAV } from '../G3RRSAV';
 import { ParsedPath } from '../path';
 import { PK3RR } from '../../../../../pokemon-files-js/src';
 import { OHPKM } from '../../pkm/OHPKM';
+import { PokemonData } from 'pokemon-species-data';
 
 function display_mon(mon: PK3RR | OHPKM) {
   console.log('Boxmon:', {
@@ -17,6 +18,7 @@ function display_mon(mon: PK3RR | OHPKM) {
     formeNum: mon.formeNum,
     moves: mon.moves,
     gameOfOrigin: mon.gameOfOrigin,
+    species: PokemonData[mon.dexNum].name,
   });
 }
 
@@ -58,6 +60,7 @@ describe('G3RRSAV - Radical Red Save File Read Test', () => {
       expect(firstPokemon.moves[0]).toBe(33); // Tackle
       expect(firstPokemon.moves[1]).toBe(336); // Howl
       expect(firstPokemon.dexNum).toBe(261);
+      expect(PokemonData[firstPokemon.dexNum].name).toBe("Poochyena");
     } else {
       console.log('No Pokémon found in the first box, first slot.');
     }
@@ -179,8 +182,6 @@ describe('G3RRSAV - Radical Red Save File Write Test', () => {
     const modifiedSaveBytes = new Uint8Array(readFileSync(newSavePath));
     const modifiedRadicalRedSave = new G3RRSAV(parsedPath, modifiedSaveBytes);
 
-    const modifiedFirstPokemon = modifiedRadicalRedSave.boxes[0].pokemon[0];
-
-    expect(modifiedFirstPokemon.nickname).toBe("ModTest");
+    expect(modifiedRadicalRedSave.boxes[0].pokemon[0].nickname).toBe("ModTest");
   });
 });

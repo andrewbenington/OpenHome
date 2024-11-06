@@ -7,7 +7,7 @@ import {
   markingsSixShapesWithColorFromBytes,
   markingsSixShapesWithColorFromOther,
   markingsSixShapesWithColorToBytes,
-} from 'pokemon-files'
+} from '../../../../pokemon-files-js/src'
 import {
   AbilityFromString,
   AbilityToString,
@@ -86,7 +86,7 @@ export class OHPKM {
 
   bytes = new Uint8Array(433)
 
-  constructor(arg: PKM | OHPKM | Uint8Array<ArrayBuffer>) {
+  constructor(arg: PKM | OHPKM | Uint8Array) {
     if (arg instanceof Uint8Array) {
       this.bytes = arg
     } else {
@@ -362,7 +362,7 @@ export class OHPKM {
         this.tmFlagsSV = other.tmFlagsSV
         this.obedienceLevel = other.obedienceLevel
       } else {
-        this.teraTypeOriginal = generateTeraType(prng, this.dexNum, this.formeNum)
+        this.teraTypeOriginal = 2 // generateTeraType(prng, this.dexNum, this.formeNum)
         this.teraTypeOverride = this.teraTypeOriginal
       }
     }

@@ -1,7 +1,5 @@
 import { PK3RR } from '../../../../pokemon-files-js/src'
 import { GameOfOrigin } from 'pokemon-resources'
-import { NationalDex } from 'pokemon-species-data'
-import { CapPikachus, RegionalForms } from '../TransferRestrictions'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -13,7 +11,7 @@ import { OHPKM } from '../pkm/OHPKM'
 import { SaveType } from '../types'
 import { Box, SAV } from './SAV'
 import { ParsedPath, splitPath } from './path'
-import { strictEqual } from 'assert'
+import { RR_TRANSFER_RESTRICTIONS } from '../../consts/TransferRestrictions'
 
 export class G3RRSector {
   data: Uint8Array
@@ -127,10 +125,7 @@ export class G3RRSaveBackup {
 }
 
 export class G3RRSAV extends SAV<PK3RR> {
-  static TRANSFER_RESTRICTIONS = {
-    maxDexNum: NationalDex.Deoxys,
-    excludedForms: { ...RegionalForms, ...CapPikachus },
-  }
+  static TRANSFER_RESTRICTIONS = RR_TRANSFER_RESTRICTIONS;
 
   static TRAINER_OFFSET = 0x0FF4 * 0
   static TEAM_ITEMS_OFFSET = 0x0FF4 * 1
@@ -254,11 +249,7 @@ export class G3RRSAV extends SAV<PK3RR> {
       sector.data.set(pcData)
 
       sector.writeToBuffer(this.primarySave.bytes, i + 5, this.primarySave.firstSectorIndex)
-
-      // const nicknameInSector = gen3StringToUTF(sector.data, 8+4, 10);
-      // console.log("NICKNAME", nicknameInSector)
-      // strictEqual(nicknameInSector.trim(), changedMonPKMs[0].nickname, "Nickname should match in sector data");
-
+      
     })
     this.bytes.set(this.primarySave.bytes, this.primarySaveOffset)
     return changedMonPKMs
