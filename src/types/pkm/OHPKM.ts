@@ -362,7 +362,7 @@ export class OHPKM {
         this.tmFlagsSV = other.tmFlagsSV
         this.obedienceLevel = other.obedienceLevel
       } else {
-        this.teraTypeOriginal = 2 // generateTeraType(prng, this.dexNum, this.formeNum)
+        this.teraTypeOriginal = 2// generateTeraType(prng, this.dexNum, this.formeNum)
         this.teraTypeOverride = this.teraTypeOriginal
       }
     }
