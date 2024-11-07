@@ -8,8 +8,7 @@
     "src/resources/**/*",
     "src/types/**/*",
     "src/util/**/*",
-    "src/preload/*.d.ts",
-    "../pokemon-files-js/src/**/*.ts"
+    "src/preload/*.d.ts"
   ],
   "compilerOptions": {
     "composite": true,

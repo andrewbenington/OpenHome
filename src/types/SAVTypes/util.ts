@@ -1,4 +1,4 @@
-import { PK2, PK3, PK3RR, PK4, PK5, PK6, PKM } from '../../../../pokemon-files-js/src'
+import { PK2, PK3, PK3RR, PK4, PK5, PK6, PKM } from 'pokemon-files'
 import { bytesToUint32LittleEndian, bytesToUint64LittleEndian } from '../../util/ByteLogic'
 import {
   getMonFileIdentifier,

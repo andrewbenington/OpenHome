@@ -7,7 +7,7 @@ import {
   markingsSixShapesWithColorFromBytes,
   markingsSixShapesWithColorFromOther,
   markingsSixShapesWithColorToBytes,
-} from '../../../../pokemon-files-js/src'
+} from 'pokemon-files'
 import {
   AbilityFromString,
   AbilityToString,
@@ -362,7 +362,7 @@ export class OHPKM {
         this.tmFlagsSV = other.tmFlagsSV
         this.obedienceLevel = other.obedienceLevel
       } else {
-        this.teraTypeOriginal = 2// generateTeraType(prng, this.dexNum, this.formeNum)
+        this.teraTypeOriginal = generateTeraType(prng, this.dexNum, this.formeNum)
         this.teraTypeOverride = this.teraTypeOriginal
       }
     }

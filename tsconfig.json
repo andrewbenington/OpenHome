@@ -8,6 +8,7 @@
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
+    "noUnusedParameters": false,
     "noEmit": true,
     "jsx": "react-jsx",
     "paths": {
