@@ -4,6 +4,5 @@
   "compilerOptions": {
     "types": ["electron-vite/node"],
     "target": "ESNext"
-  },
-  "noUnusedParameters": false,
+  }
 }

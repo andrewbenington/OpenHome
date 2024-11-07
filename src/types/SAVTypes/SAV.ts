@@ -1,4 +1,4 @@
-import { AllPKMFields } from 'pokemon-files'
+import { AllPKMFields } from '../../../../pokemon-files-js/src'
 import { GameOfOrigin } from 'pokemon-resources'
 import { TransferRestrictions } from '../../types/TransferRestrictions'
 import { SaveRef, SaveType } from '../../types/types'

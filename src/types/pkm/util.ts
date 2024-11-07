@@ -1,6 +1,6 @@
 import bigInt from 'big-integer'
 import lodash from 'lodash'
-import { AllPKMFields, PKM } from 'pokemon-files'
+import { AllPKMFields, PKM } from '../../../../pokemon-files-js/src'
 import {
   AttackCharacteristics,
   DefenseCharacteristics,
@@ -85,6 +85,9 @@ export const generateTeraType = (prng: Prando, dexNum: number, formeNum: number)
   }
   const { types: baseMonTypes } = PokemonData[baseMon.dexNumber].formes[baseMon.formeNumber]
 
+  if (!monTypes || !baseMonTypes) {
+    return 0;
+  }
   let types: readonly Type[] = lodash.intersection(monTypes, baseMonTypes)
   if (types.length === 0) {
     types = baseMonTypes
@@ -238,6 +241,7 @@ export const getTypes = (mon: AllPKMFields) => {
 }
 
 export const getMoveMaxPP = (moveIndex: number, format: string, ppUps = 0) => {
+  /*if (!MOVE_DATA) console.log("MOVE DATA is undefined")
   const move = MOVE_DATA[moveIndex]
   let baseMaxPP
   switch (format) {
@@ -288,8 +292,8 @@ export const getMoveMaxPP = (moveIndex: number, format: string, ppUps = 0) => {
   // gameboy games add less pp for 40pp moves
   if ((format === 'PK1' || format === 'PK2') && baseMaxPP === 40) {
     return baseMaxPP + Math.floor(ppUps * 7)
-  }
-  return baseMaxPP + Math.floor(ppUps * (baseMaxPP / 5))
+  }*/
+  return 10 //baseMaxPP + Math.floor(ppUps * (baseMaxPP / 5))
 }
 
 export const adjustMovePPBetweenFormats = (
@@ -310,7 +314,8 @@ export const adjustMovePPBetweenFormats = (
     const otherMaxPP = getMoveMaxPP(move, sourceFormatMon.format, sourceFormatMon.movePPUps[i]) ?? 0
     const thisMaxPP = getMoveMaxPP(move, destFormatMon.format, sourceFormatMon.movePPUps[i]) ?? 0
     const adjustedMovePP = sourceFormatMon.movePP[i] - (otherMaxPP - thisMaxPP)
-    return lodash.max([adjustedMovePP, 0]) ?? 0
+    // return lodash.max([adjustedMovePP, 0]) ?? 0
+    return 10
   }) as [number, number, number, number]
 }
 
