@@ -2,7 +2,7 @@ import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { resolve } from 'path';
 import { G3RRSAV } from '../G3RRSAV';
 import { ParsedPath } from '../path';
-import { PK3RR } from '../../../../../pokemon-files-js/src';
+import { PK3RR } from 'pokemon-files';
 import { OHPKM } from '../../pkm/OHPKM';
 import { PokemonData } from 'pokemon-species-data';
 
