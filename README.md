@@ -87,6 +87,7 @@ the future.
 - PK1
 - PK2
 - PK3
+- PK3RR (NEW: Supports importing pokemon from Radical Red!)
 - PK4
 - PK5
 - PK6
@@ -107,6 +108,7 @@ the future.
 - Pokémon Ruby/Sapphire
 - Pokémon Emerald
 - Pokémon FireRed/LeafGreen
+- Pokémon Radical Red
 - Pokémon Diamond/Pearl
 - Pokémon Platinum
 - Pokémon HeartGold/SoulSilver
