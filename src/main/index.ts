@@ -2,6 +2,7 @@ import { electronApp, is, optimizer } from '@electron-toolkit/utils'
 import { app, BrowserWindow, dialog, shell } from 'electron'
 import { join } from 'path'
 import icon from '../../resources/icon.ico?asset'
+import version from '../consts/JSON/version.json'
 import { initializeFolders } from './fileHandlers'
 import { initListeners, OpenHomeAppBackend } from './initListeners'
 import MenuBuilder from './menu'
@@ -95,5 +96,10 @@ app.on('window-all-closed', () => {
   }
 })
 
-// In this file you can include the rest of your app"s specific main process
-// code. You can also put them in separate files and require them here.
+app.setAboutPanelOptions({
+  applicationName: 'OpenHome',
+  applicationVersion: version.version,
+  version: `Build Date ${version.build_date}`,
+  website: 'https://andrewbenington.github.io/OpenHome',
+  authors: ['Andrew Benington'],
+})

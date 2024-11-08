@@ -1,39 +1,61 @@
-import { Stack } from '@mui/joy'
+import { DialogActions, Modal, ModalDialog, Stack, Typography } from '@mui/joy'
 import * as E from 'fp-ts/lib/Either'
-import { useContext, useEffect, useMemo, useState } from 'react'
+import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { ParsedPath, splitPath } from 'src/types/SAVTypes/path'
 import { SaveRef } from 'src/types/types'
 import { numericSorter } from '../../util/Sort'
 import { BackendContext } from '../backend/backendProvider'
+import { RemoveIcon } from '../components/Icons'
 import OHDataGrid, { SortableColumn } from '../components/OHDataGrid'
 import { OpenSavesContext } from '../state/openSaves'
-import { formatTime, formatTimeSince, getSaveLogo } from './util'
+import SaveCard from './SaveCard'
+import { formatTime, formatTimeSince, getSaveLogo, SaveViewMode } from './util'
 
 interface SaveFileSelectorProps {
   onOpen: (path: ParsedPath) => void
+  view: SaveViewMode
+  cardSize: number
 }
 
 export default function RecentSaves(props: SaveFileSelectorProps) {
-  const { onOpen } = props
+  const { onOpen, view, cardSize } = props
   const backend = useContext(BackendContext)
   const [recentSaves, setRecentSaves] = useState<Record<string, SaveRef>>()
   const [, , openSaves] = useContext(OpenSavesContext)
+  const [error, setError] = useState<string>()
 
   const openSavePaths = useMemo(
     () => Object.fromEntries(openSaves.map((save) => [save.filePath.raw, true])),
     [openSaves]
   )
 
+  const getRecentSaves = useCallback(() => {
+    backend.getRecentSaves().then(
+      E.match(
+        (err) => console.error(err),
+        (recents) => setRecentSaves(recents)
+      )
+    )
+  }, [backend])
+
+  const removeRecentSave = useCallback(
+    (path: string) =>
+      backend.removeRecentSave(path).then(
+        E.match(
+          async (err) => {
+            setError(err)
+          },
+          () => getRecentSaves()
+        )
+      ),
+    [backend, getRecentSaves]
+  )
+
   useEffect(() => {
     if (!recentSaves) {
-      backend.getRecentSaves().then(
-        E.match(
-          (err) => console.error(err),
-          (recents) => setRecentSaves(recents)
-        )
-      )
+      getRecentSaves()
     }
-  }, [backend, recentSaves])
+  }, [getRecentSaves, recentSaves])
 
   const columns: SortableColumn<SaveRef>[] = [
     {
@@ -49,6 +71,29 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
           disabled={!params.row.valid || params.row.filePath.raw in openSavePaths}
         >
           Open
+        </button>
+      ),
+      cellClass: 'centered-cell',
+    },
+    {
+      key: 'remove',
+      name: '',
+      width: 40,
+      renderCell: (params) => (
+        <button
+          style={{
+            padding: 0,
+            display: 'grid',
+            marginLeft: 'auto',
+            marginTop: 'auto',
+            marginBottom: 'auto',
+            backgroundColor: '#990000',
+            height: 'fit-content',
+            borderRadius: 16,
+          }}
+          onClick={() => removeRecentSave(params.row.filePath.raw)}
+        >
+          <RemoveIcon />
         </button>
       ),
       cellClass: 'centered-cell',
@@ -115,11 +160,38 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
   ]
 
   return (
-    <OHDataGrid
-      rows={Object.values(recentSaves ?? {}).map((save, i) => ({ ...save, index: i }))}
-      columns={columns}
-      defaultSort="lastOpened"
-      defaultSortDir="DESC"
-    />
+    <>
+      {view === 'grid' ? (
+        <OHDataGrid
+          rows={Object.values(recentSaves ?? {}).map((save, i) => ({ ...save, index: i }))}
+          columns={columns}
+          defaultSort="lastOpened"
+          defaultSortDir="DESC"
+        />
+      ) : (
+        <Stack flexWrap="wrap" direction="row" useFlexGap justifyContent="center" margin={2}>
+          {Object.values(recentSaves ?? {})
+            .sort((a, b) => (b.lastOpened ?? 0) - (a.lastOpened ?? 0))
+            .map((save) => (
+              <SaveCard
+                save={save}
+                onOpen={() => {
+                  onOpen(save.filePath)
+                }}
+                onRemove={() => removeRecentSave(save.filePath.raw)}
+                size={cardSize}
+              />
+            ))}
+        </Stack>
+      )}
+      <Modal open={!!error} onClose={() => setError(undefined)}>
+        <ModalDialog>
+          <Typography>{error}</Typography>
+          <DialogActions>
+            <button onClick={() => setError(undefined)}>OK</button>
+          </DialogActions>
+        </ModalDialog>
+      </Modal>
+    </>
   )
 }

@@ -2,6 +2,8 @@ import dayjs from 'dayjs'
 import { getGameLogo, getOriginMark } from '../images/game'
 import { getPublicImageURL } from '../images/images'
 
+export type SaveViewMode = 'cards' | 'grid'
+
 export function getSaveLogo(game?: string | number) {
   if (!game) {
     return getPublicImageURL(getOriginMark('GB'))

@@ -58,6 +58,9 @@ export class SAV<P extends AllPKMFields = PKMFile> {
 
   tooEarlyToOpen: boolean = false
 
+  pcChecksumOffset?: number
+  pcOffset?: number
+
   getSaveRef: () => SaveRef = () => {
     return {
       filePath: this.filePath,
@@ -83,5 +86,9 @@ export class SAV<P extends AllPKMFields = PKMFile> {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   prepareBoxesForSaving(): OHPKM[] {
     return []
+  }
+
+  calculateChecksum(): number {
+    return -1
   }
 }

@@ -1,6 +1,7 @@
 import { BrowserWindow, IpcMainInvokeEvent, app, ipcMain } from 'electron'
 import * as E from 'fp-ts/Either'
 import fs from 'fs'
+import os from 'os'
 import path from 'path'
 import BackendInterface from '../types/backendInterface'
 import { bytesToPKM } from '../types/FileImport'
@@ -9,7 +10,13 @@ import { ParsedPath, PossibleSaves } from '../types/SAVTypes/path'
 import { SaveFolder, StoredBoxData } from '../types/storage'
 import { Errorable, LoadSaveResponse, LookupMap, SaveRef } from '../types/types'
 import { getMonFileIdentifier } from '../util/Lookup'
-import { getFileCreatedDate, readBytesFromFile, selectDirectory, selectFile } from './fileHandlers'
+import {
+  getFileCreatedDate,
+  openDirectory,
+  readBytesFromFile,
+  selectDirectory,
+  selectFile,
+} from './fileHandlers'
 import {
   getStoragePath,
   loadBoxData,
@@ -63,6 +70,8 @@ export function initListeners(backend: OpenHomeAppBackend) {
 
   ipcMain.handle('pick-folder', bindToInstance(backend.pickFolder, backend))
   ipcMain.handle('set-document-edited', withEvent(bindToInstance(backend.setHasChanges, backend)))
+  ipcMain.handle('open-directory', withEvent(bindToInstance(backend.openDirectory, backend)))
+  ipcMain.handle('get-platform', bindToInstance(backend.getPlatform, backend))
 }
 
 export class OpenHomeAppBackend implements BackendInterface {
@@ -232,7 +241,7 @@ export class OpenHomeAppBackend implements BackendInterface {
     }
   }
 
-  public async loadHomeMonLookup(): Promise<Errorable<Record<string, Uint8Array<ArrayBuffer>>>> {
+  public async loadHomeMonLookup(): Promise<Errorable<Record<string, Uint8Array>>> {
     try {
       return E.right(loadOHPKMs())
     } catch (e) {
@@ -316,6 +325,27 @@ export class OpenHomeAppBackend implements BackendInterface {
     return app.isPackaged
       ? path.join(process.resourcesPath, 'resources')
       : path.join(`${app.getAppPath()}resources`)
+  }
+
+  public async openDirectory(directory: string): Promise<Errorable<null>> {
+    try {
+      openDirectory(directory)
+      return E.right(null)
+    } catch (e) {
+      return E.left(`${e}`)
+    }
+  }
+
+  public async getPlatform() {
+    const platform = os.platform()
+    switch (platform) {
+      case 'darwin':
+        return 'macos'
+      case 'win32':
+        return 'windows'
+      default:
+        return platform
+    }
   }
 }
 

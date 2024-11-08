@@ -10,14 +10,17 @@ import { BackendContext } from '../backend/backendProvider'
 import OHDataGrid, { SortableColumn } from '../components/OHDataGrid'
 import { LookupContext } from '../state/lookup'
 import { OpenSavesContext } from '../state/openSaves'
-import { filterEmpty, getSaveLogo } from './util'
+import SaveCard from './SaveCard'
+import { filterEmpty, getSaveLogo, SaveViewMode } from './util'
 
 interface SaveFileSelectorProps {
   onOpen: (path: ParsedPath) => void
+  view: SaveViewMode
+  cardSize: number
 }
 
 export default function SuggestedSaves(props: SaveFileSelectorProps) {
-  const { onOpen } = props
+  const { onOpen, view, cardSize } = props
   const backend = useContext(BackendContext)
   const [suggestedSaves, setSuggestedSaves] = useState<SAV<PKM>[]>()
   const [{ homeMons: homeMonMap, gen12: gen12LookupMap, gen345: gen345LookupMap }] =
@@ -139,5 +142,19 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
     },
   ]
 
-  return <OHDataGrid rows={suggestedSaves ?? []} columns={columns} />
+  return view === 'grid' ? (
+    <OHDataGrid rows={suggestedSaves ?? []} columns={columns} />
+  ) : (
+    <Stack flexWrap="wrap" direction="row" useFlexGap justifyContent="center" margin={2}>
+      {suggestedSaves?.map((save) => (
+        <SaveCard
+          save={save.getSaveRef()}
+          onOpen={() => {
+            onOpen(save.filePath)
+          }}
+          size={cardSize}
+        />
+      ))}
+    </Stack>
+  )
 }

@@ -490,9 +490,9 @@ function ScarletVioletData(props: { mon: Gen9OnlyData }) {
         <TypeIcon typeIndex={currentTeraType} />
         {previousTeraType && (
           <>
-            <p>(originally </p>
+            <div>(originally </div>
             <TypeIcon typeIndex={previousTeraType} />
-            <p>)</p>
+            <div>)</div>
           </>
         )}
       </AttributeRow>
@@ -507,7 +507,9 @@ function HiddenPowerDisplay(props: { mon: AllPKMFields }) {
     return (
       <AttributeRow label="Hidden Power">
         <TypeIcon type={getHiddenPowerType(mon.ivs)} />{' '}
-        <p style={{ paddingLeft: 8 }}>{` ${getHiddenPowerPower(mon.ivs).toString()} Base Power`}</p>
+        <div style={{ paddingLeft: 8 }}>{` ${getHiddenPowerPower(
+          mon.ivs
+        ).toString()} Base Power`}</div>
       </AttributeRow>
     )
   }

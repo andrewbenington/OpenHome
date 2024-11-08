@@ -20,11 +20,6 @@ export const components: Components<Theme> = {
       },
     },
   },
-  // MuiTypography: {
-  //   defaultProps: {
-  //     variant: 'h5',
-  //   },
-  // },
   JoyCard: {
     styleOverrides: {
       root: {
@@ -43,13 +38,15 @@ export const components: Components<Theme> = {
   },
   JoyButton: {
     styleOverrides: {
-      root: {
+      root: ({ ownerState }) => ({
         boxShadow: 'none',
         ':hover': {
           boxShadow: 'none',
         },
         padding: 0,
-      },
+        minHeight: ownerState.size === 'sm' ? 0 : undefined,
+        height: 'fit-content',
+      }),
     },
   },
   JoyTab: {
@@ -153,6 +150,30 @@ export const components: Components<Theme> = {
       },
     },
   },
+  JoyMenu: {
+    styleOverrides: {
+      root: {
+        paddingBlock: 0,
+      },
+    },
+  },
+  JoyMenuItem: {
+    styleOverrides: {
+      root: {
+        minBlockSize: 0,
+        paddingBlock: 2,
+        paddingInline: 4,
+      },
+    },
+  },
+  JoyMenuButton: {
+    styleOverrides: {
+      root: {
+        padding: 0,
+        paddingBlock: 0,
+      },
+    },
+  },
 }
 
 export const darkTheme: ColorSystemOptions = {
@@ -161,9 +182,10 @@ export const darkTheme: ColorSystemOptions = {
     secondary: {
       mainChannel: red,
       solidBg: red,
+      solidColor: '#fff',
+      softBorder: '#999',
+      softActiveBg: red,
       plainColor: '#fff',
-      plainHoverColor: '#333',
-      plainActiveColor: '#333',
     },
     primary: {
       mainChannel: '#780600',
@@ -179,6 +201,7 @@ export const darkTheme: ColorSystemOptions = {
       body: '#2c313a',
       gradient: darkTealGradient,
       surface: '#081721',
+      popup: '#081721',
     },
     text: {
       primary: '#fff',
@@ -187,13 +210,11 @@ export const darkTheme: ColorSystemOptions = {
     },
     neutral: {
       outlinedColor: '#fff',
-      plainHoverBg: '#fff3',
-      outlinedBg: '#081721',
       plainColor: '#fff',
       outlinedHoverBg: '#fff3',
-      plainHoverColor: '#fff',
       plainActiveBg: '#fff6',
-      plainActiveBorder: '#fff6',
+      plainHoverBg: '#333438',
+      plainHoverColor: '#fff',
     },
   },
 }
@@ -203,9 +224,13 @@ export const lightTheme: ColorSystemOptions = {
     secondary: {
       mainChannel: red,
       solidBg: red,
-      plainColor: '#fff',
-      plainHoverColor: '#333',
+      solidColor: '#fff',
+      plainColor: '#333',
+      plainHoverBg: red2,
+      plainHoverColor: '#fff',
       plainActiveColor: '#333',
+      softBorder: '#999',
+      softActiveBg: red,
     },
     primary: {
       mainChannel: red2,
@@ -219,7 +244,8 @@ export const lightTheme: ColorSystemOptions = {
       // plainHoverBg: lightTealSelected,
     },
     neutral: {
-      plainHoverBg: lightTealSelected,
+      softBg: '#888',
+      softColor: '#fff',
     },
     background: {
       body: lightTeal,
