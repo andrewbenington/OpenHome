@@ -222,7 +222,7 @@ export type Move = {
   generation: string
   power?: number
   pp: number
-  pastGenPP?: {
+  pastGenPP: {
     G1?: number
     G2?: number
     G3?: number
