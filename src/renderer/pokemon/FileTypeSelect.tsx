@@ -3,6 +3,7 @@ import {
   GEN1_TRANSFER_RESTRICTIONS,
   GEN2_TRANSFER_RESTRICTIONS,
   GEN3_TRANSFER_RESTRICTIONS,
+  RR_TRANSFER_RESTRICTIONS,
   HGSS_TRANSFER_RESTRICTIONS,
   LA_TRANSFER_RESTRICTIONS,
   LGPE_TRANSFER_RESTRICTIONS,
@@ -86,6 +87,10 @@ const FileTypeSelect = (props: FileTypeSelectProps) => {
       {baseFormat === 'OHPKM' &&
         !isRestricted(GEN3_TRANSFER_RESTRICTIONS, formData.dexNum, formData.formeNum) && (
           <option value="XDPKM">XDPKM</option>
+        )}
+      {baseFormat === 'OHPKM' &&
+        !isRestricted(RR_TRANSFER_RESTRICTIONS, formData.dexNum, formData.formeNum) && (
+          <option value="PK3RR">PK3RR</option>
         )}
       {baseFormat === 'OHPKM' &&
         !isRestricted(HGSS_TRANSFER_RESTRICTIONS, formData.dexNum, formData.formeNum) && (

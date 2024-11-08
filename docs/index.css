@@ -139,15 +139,56 @@ td:nth-child(1) {
 }
 
 .header-links a {
-  display: inline-block;
   box-sizing: border-box;
   padding: 8px;
   border-radius: 8px;
   text-decoration: none;
 }
 
+.header-links a:not(.github-button) {
+  display: inline-block;
+}
+
 .header-links a:hover:not(.active):not(.github-button) {
   background-color: #688;
+}
+
+.github-button {
+  img {
+    height: 24px;
+  }
+  color: white;
+  background-color: #333;
+  height: fit-content;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+  box-sizing: border-box;
+  padding: 8px;
+  border-radius: 8px;
+  text-decoration: none;
+}
+
+.npm-button {
+  svg {
+    height: 24px;
+  }
+  color: white;
+  background-color: #333;
+  height: fit-content;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+  box-sizing: border-box;
+  padding: 8px;
+  border-radius: 8px;
+  text-decoration: none;
+}
+
+.github-button:hover {
+  background-color: #444;
 }
 
 .header-title {
@@ -238,14 +279,22 @@ img {
   flex: 1;
 }
 
-.github-button {
+.module-header {
   img {
-    height: 24px;
+    height: 16px;
   }
-  background-color: #333;
-  height: fit-content;
+  svg {
+    height: 16px;
+  }
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 5px;
+  a {
+    padding: 5px;
+  }
 }
 
-.github-button:hover {
-  background-color: #444;
+.module-header > a:first-child {
+  margin-left: 16px;
 }

@@ -30,7 +30,7 @@ export type LookupAction =
     }
   | {
       type: 'load_home_mons'
-      payload: Record<string, Uint8Array<ArrayBuffer>>
+      payload: Record<string, Uint8Array>
     }
   | {
       type: 'set_error'

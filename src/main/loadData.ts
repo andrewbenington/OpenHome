@@ -17,7 +17,7 @@ export function getStoragePath(): string {
 export function loadOHPKMs() {
   const monsPath = path.join(getStoragePath(), 'mons')
   const files = fs.readdirSync(monsPath)
-  const monMap: { [key: string]: Uint8Array<ArrayBuffer> } = {}
+  const monMap: { [key: string]: Uint8Array } = {}
   files.forEach((file) => {
     if (file.endsWith('.ohpkm')) {
       const bytes = readBytesFromFile(path.join(monsPath, file))

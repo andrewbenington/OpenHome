@@ -120,12 +120,9 @@ export default class MenuBuilder {
     const subMenuEdit: DarwinMenuItemConstructorOptions = {
       label: 'Edit',
       submenu: [
-        { role: 'cut' },
         { role: 'copy' },
-        { role: 'paste' },
         ...(isMac
           ? ([
-              { role: 'pasteAndMatchStyle' },
               { type: 'separator' },
               {
                 label: 'Speech',

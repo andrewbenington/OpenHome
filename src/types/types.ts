@@ -44,6 +44,7 @@ export enum SaveType {
   RS,
   FRLG,
   E,
+  RR,
   DP,
   Pt,
   HGSS,
@@ -128,6 +129,8 @@ export const getSaveTypeString = (saveType: SaveType): string => {
       return 'Pokémon FireRed/LeafGreen'
     case SaveType.E:
       return 'Pokémon Emerald'
+    case SaveType.RR:
+      return 'Pokémon Radical Red'
     case SaveType.DP:
       return 'Pokémon Diamond/Pearl'
     case SaveType.Pt:

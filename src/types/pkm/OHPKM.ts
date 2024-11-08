@@ -7,7 +7,7 @@ import {
   markingsSixShapesWithColorFromBytes,
   markingsSixShapesWithColorFromOther,
   markingsSixShapesWithColorToBytes,
-} from 'pokemon-files'
+} from '../../../../pokemon-files-js/src'
 import {
   AbilityFromString,
   AbilityToString,
@@ -83,10 +83,10 @@ export class OHPKM {
   static maxValidMove() {
     return 919
   }
-
-  bytes = new Uint8Array(433)
-
-  constructor(arg: PKM | OHPKM | Uint8Array<ArrayBuffer>) {
+  
+  bytes: Uint8Array = new Uint8Array(433)
+  
+  constructor(arg: PKM | OHPKM | Uint8Array) {
     if (arg instanceof Uint8Array) {
       this.bytes = arg
     } else {
@@ -362,7 +362,7 @@ export class OHPKM {
         this.tmFlagsSV = other.tmFlagsSV
         this.obedienceLevel = other.obedienceLevel
       } else {
-        this.teraTypeOriginal = generateTeraType(prng, this.dexNum, this.formeNum)
+        this.teraTypeOriginal = 2// generateTeraType(prng, this.dexNum, this.formeNum)
         this.teraTypeOverride = this.teraTypeOriginal
       }
     }
@@ -1522,8 +1522,8 @@ export class OHPKM {
     )
   }
 
-  public toBytes() {
-    return this.bytes.buffer
+  public toBytes(): ArrayBuffer {
+    return this.bytes.buffer as ArrayBuffer
   }
 
   public updateData(other: PKM | OHPKM, isFromOT: boolean = false) {
@@ -1537,12 +1537,14 @@ export class OHPKM {
       this.heldItemIndex = ItemFromString(other.heldItemName)
     }
 
-    if ('avs' in other) {
+    if ('avs' in other) { // Pokemon Let's GO
       this.avs = other.avs
-    } else if ('evs' in other) {
-      this.evs = other.evs
-      this.ribbons = lodash.uniq([...this.ribbons, ...(other.ribbons ?? [])])
-      this.contest = other.contest
+    } else if ('evs' in other) { // All other pokemon games Gen 3 and up
+      this.evs = other.evs 
+      if ('ribbons' in other) { // Exclude radical red
+        this.ribbons = lodash.uniq([...this.ribbons, ...(other.ribbons ?? [])])
+        this.contest = other.contest
+      }
       const otherMarkings = other.markings
       if (markingsHaveColor(otherMarkings)) {
         this.markings = otherMarkings
