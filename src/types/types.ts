@@ -217,12 +217,12 @@ export type Origin = {
 
 export type Move = {
   name: string
-  accuracy?: number
+  accuracy?: number | null
   class: 'physical' | 'status' | 'special'
   generation: string
-  power?: number
+  power?: number | null
   pp: number
-  pastGenPP: {
+  pastGenPP?: {
     G1?: number
     G2?: number
     G3?: number
