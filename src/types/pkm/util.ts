@@ -1,6 +1,6 @@
 import bigInt from 'big-integer'
 import lodash from 'lodash'
-import { AllPKMFields, PKM } from '../../../../pokemon-files-js/src'
+import { AllPKMFields, PKM } from 'pokemon-files'
 import {
   AttackCharacteristics,
   DefenseCharacteristics,
