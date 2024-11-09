@@ -76,29 +76,6 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
       cellClass: 'centered-cell',
     },
     {
-      key: 'remove',
-      name: '',
-      width: 40,
-      renderCell: (params) => (
-        <button
-          style={{
-            padding: 0,
-            display: 'grid',
-            marginLeft: 'auto',
-            marginTop: 'auto',
-            marginBottom: 'auto',
-            backgroundColor: '#990000',
-            height: 'fit-content',
-            borderRadius: 16,
-          }}
-          onClick={() => removeRecentSave(params.row.filePath.raw)}
-        >
-          <RemoveIcon />
-        </button>
-      ),
-      cellClass: 'centered-cell',
-    },
-    {
       key: 'game',
       name: 'Game',
       width: 130,
@@ -125,6 +102,29 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
       width: 240,
       renderValue: (save) => formatTime(save.lastModified),
       sortFunction: numericSorter((val) => val.lastModified),
+    },
+    {
+      key: 'remove',
+      name: '',
+      width: 40,
+      renderCell: (params) => (
+        <button
+          style={{
+            padding: 0,
+            display: 'grid',
+            marginLeft: 'auto',
+            marginTop: 'auto',
+            marginBottom: 'auto',
+            // backgroundColor: '#990000',
+            height: 'fit-content',
+            borderRadius: 16,
+          }}
+          onClick={() => removeRecentSave(params.row.filePath.raw)}
+        >
+          <RemoveIcon />
+        </button>
+      ),
+      cellClass: 'centered-cell',
     },
     {
       key: 'filePath',
