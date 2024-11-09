@@ -2,6 +2,7 @@ import { NationalDex, PokemonData } from 'pokemon-species-data'
 import { SWEETS } from '../../consts'
 import { hasGen8OnData } from '../../types/interfaces/gen8'
 import { PKMFile } from '../../types/pkm/util'
+import { toGen3RRPokemonIndex } from 'pokemon-files'
 
 const alolaDex = [
   10, 11, 12, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 35, 36, 37, 38, 39, 40, 41, 42, 46, 47, 50,
@@ -33,7 +34,7 @@ export const fileToSpriteFolder: Record<string, string> = {
   PK3: 'gen3',
   COLOPKM: 'gen3gc',
   XDPKM: 'gen3gc',
-  PK3RR: 'home',
+  PK3RR: 'rr',
   PK4: 'gen4',
   PK5: 'gen5',
   PK6: 'gen6',
@@ -58,6 +59,10 @@ export const getPokemonSpritePath = (mon: PKMFile, format?: string) => {
   let spriteFolder = fileToSpriteFolder[monFormat]
   if (spriteFolder === 'gen7' && !alolaDex.includes(mon.dexNum)) {
     spriteFolder = 'gen6'
+  }
+  else if (spriteFolder == 'rr') {
+    const gen3RRindex = toGen3RRPokemonIndex(mon.dexNum, mon.formeNum)
+    return `sprites/${spriteFolder}/${gen3RRindex}.png`
   }
   return `sprites/${spriteFolder}${
     mon.isShiny() && spriteFolder !== 'gen1' && spriteFolder !== 'gen9' ? '/shiny/' : '/'
