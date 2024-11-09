@@ -2,7 +2,7 @@ import { Card, Divider, Grid, Stack } from '@mui/joy'
 import { isDayjs } from 'dayjs'
 import { PKM } from 'pokemon-files'
 import { useMemo } from 'react'
-import { SAV } from '../../types/SAVTypes'
+import { SAV } from '../../types/SAVTypes/SAV'
 type Breakpoint = 'xs' | 'sm' | 'md' | 'lg' | 'xl'
 
 const primitiveTypes = ['number', 'bigint', 'boolean', 'string', 'undefined', 'null']

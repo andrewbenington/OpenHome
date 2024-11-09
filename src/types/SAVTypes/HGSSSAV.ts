@@ -1,3 +1,4 @@
+import { PK4 } from 'pokemon-files'
 import { HGSS_TRANSFER_RESTRICTIONS } from '../../consts/TransferRestrictions'
 import { SaveType } from '../../types/types'
 import { bytesToUint16LittleEndian, bytesToUint32LittleEndian } from '../../util/ByteLogic'
@@ -7,8 +8,9 @@ import { ParsedPath } from './path'
 
 export class HGSSSAV extends G4SAV {
   saveType = SaveType.HGSS
+  static pkmType = PK4
 
-  transferRestrictions = HGSS_TRANSFER_RESTRICTIONS
+  static transferRestrictions = HGSS_TRANSFER_RESTRICTIONS
 
   static TRAINER_NAME_OFFSET = 0x64
 

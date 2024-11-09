@@ -21,8 +21,9 @@ export interface BoxCoordinates {
   index: number
 }
 
-export class SAV<P extends AllPKMFields = PKMFile> {
+export abstract class SAV<P extends AllPKMFields = PKMFile> {
   saveType: SaveType = SaveType.UNKNOWN
+  static pkmType
 
   origin: GameOfOrigin = 0
 

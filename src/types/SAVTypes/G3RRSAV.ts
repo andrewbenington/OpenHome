@@ -1,5 +1,6 @@
 import { PK3RR } from 'pokemon-files'
 import { GameOfOrigin } from 'pokemon-resources'
+import { RR_TRANSFER_RESTRICTIONS } from '../../consts/TransferRestrictions'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -11,7 +12,6 @@ import { OHPKM } from '../pkm/OHPKM'
 import { SaveType } from '../types'
 import { Box, SAV } from './SAV'
 import { ParsedPath, splitPath } from './path'
-import { RR_TRANSFER_RESTRICTIONS } from '../../consts/TransferRestrictions'
 
 export class G3RRSector {
   data: Uint8Array
@@ -44,7 +44,7 @@ export class G3RRSector {
 
   refreshChecksum() {
     let checksum = 0
-    let byteLength = 0xFF0
+    let byteLength = 0xff0
     if (this.sectionID === 0) {
       byteLength = 3884
     } else if (this.sectionID === 13) {
@@ -89,18 +89,18 @@ export class G3RRSaveBackup {
     this.name = gen3StringToUTF(this.sectors[0].data, 0, 10)
 
     // Concatenate pc data from all sectors
-    this.pcDataContiguous = new Uint8Array(4080 * 5 + 3964); // 144 // 24,504
+    this.pcDataContiguous = new Uint8Array(4080 * 5 + 3964) // 144 // 24,504
     this.sectors.slice(5, 11).forEach((sector, i) => {
-      const startOffset = i * 4080;
-      const length = i < 5 ? 4080 : 3964;
-      this.pcDataContiguous.set(sector.data.slice(0, length), startOffset);
-    });
+      const startOffset = i * 4080
+      const length = i < 5 ? 4080 : 3964
+      this.pcDataContiguous.set(sector.data.slice(0, length), startOffset)
+    })
 
     this.currentPCBox = this.pcDataContiguous[0]
     this.boxNames = []
     for (let i = 0; i < 14; i++) {
       // TODO: More research into where BOX names are located
-      this.boxes[i] = new Box("Box" + (i + 1), 30)
+      this.boxes[i] = new Box('Box' + (i + 1), 30)
     }
     for (let i = 0; i < 420; i++) {
       try {
@@ -125,15 +125,15 @@ export class G3RRSaveBackup {
 }
 
 export class G3RRSAV extends SAV<PK3RR> {
-  static TRANSFER_RESTRICTIONS = RR_TRANSFER_RESTRICTIONS;
-
-  static TRAINER_OFFSET = 0x0FF4 * 0
-  static TEAM_ITEMS_OFFSET = 0x0FF4 * 1
-  static PC_OFFSET = 0x0FF4 * 5
-
   saveType: SaveType
-  pkmType = PK3RR
-  transferRestrictions = G3RRSAV.TRANSFER_RESTRICTIONS
+  static pkmType = PK3RR
+
+  static transferRestrictions = RR_TRANSFER_RESTRICTIONS
+
+  static TRAINER_OFFSET = 0x0ff4 * 0
+  static TEAM_ITEMS_OFFSET = 0x0ff4 * 1
+  static PC_OFFSET = 0x0ff4 * 5
+
   primarySave: G3RRSaveBackup
   backupSave: G3RRSaveBackup
   primarySaveOffset: number
@@ -141,8 +141,8 @@ export class G3RRSAV extends SAV<PK3RR> {
   constructor(path: ParsedPath, bytes: Uint8Array) {
     super(path, bytes)
 
-    const saveOne = new G3RRSaveBackup(bytes.slice(0, 0xE000))
-    const saveTwo = new G3RRSaveBackup(bytes.slice(0xE000, 0x1C000))
+    const saveOne = new G3RRSaveBackup(bytes.slice(0, 0xe000))
+    const saveTwo = new G3RRSaveBackup(bytes.slice(0xe000, 0x1c000))
 
     if (saveOne.saveIndex > saveTwo.saveIndex) {
       this.primarySave = saveOne
@@ -153,7 +153,7 @@ export class G3RRSAV extends SAV<PK3RR> {
       this.backupSave = saveOne
       this.primarySaveOffset = 0xe000
     }
-    
+
     this.saveType = this.primarySave.saveType
     this.currentPCBox = this.primarySave.currentPCBox
     this.money = this.primarySave.money
@@ -210,7 +210,7 @@ export class G3RRSAV extends SAV<PK3RR> {
     this.updatedBoxSlots.forEach(({ box, index }) => {
       const monOffset = 30 * box + index
       const pcBytes = new Uint8Array(58) // Per pokemon bytes
-      
+
       // Current Mon in loop
       const changedMon = this.boxes[box].pokemon[index]
 
@@ -228,7 +228,6 @@ export class G3RRSAV extends SAV<PK3RR> {
           const mon = slotMon instanceof PK3RR ? slotMon : new PK3RR(slotMon)
 
           if (mon?.gameOfOrigin && mon?.dexNum) pcBytes.set(new Uint8Array(mon.toPCBytes()), 0)
-
         } catch (e) {
           console.error(e)
         }
@@ -244,14 +243,13 @@ export class G3RRSAV extends SAV<PK3RR> {
     this.primarySave.sectors.slice(5, 11).forEach((sector, i) => {
       const pcData = this.primarySave.pcDataContiguous.slice(
         // 4080 times sector offset
-        i * 0xFF0,
+        i * 0xff0,
         // 4080 ahead of that, or 0x450 ahead of that if box 13 zero indexed
-        i * 0xFF0 + (i + 5 === 13 ? 3964 : 0xFF0)
+        i * 0xff0 + (i + 5 === 13 ? 3964 : 0xff0)
       )
       sector.data.set(pcData)
 
       sector.writeToBuffer(this.primarySave.bytes, i + 5, this.primarySave.firstSectorIndex)
-      
     })
     this.bytes.set(this.primarySave.bytes, this.primarySaveOffset)
     return changedMonPKMs

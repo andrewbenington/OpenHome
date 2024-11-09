@@ -3,7 +3,7 @@ import HexEditor from '../components/HexEditor'
 
 interface RawDisplayProps {
   bytes: Uint8Array
-  format: keyof typeof FileSchemas
+  format?: keyof typeof FileSchemas
 }
 
 const RawDisplay = ({ bytes, format }: RawDisplayProps) => {

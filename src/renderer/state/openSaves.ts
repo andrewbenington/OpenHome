@@ -1,8 +1,8 @@
 import { createContext, Dispatch, Reducer } from 'react'
 import { OHPKM } from 'src/types/pkm/OHPKM'
 import { PKMFile } from 'src/types/pkm/util'
-import { SAV } from 'src/types/SAVTypes'
 import { HomeData } from 'src/types/SAVTypes/HomeData'
+import { SAV } from 'src/types/SAVTypes/SAV'
 import { StoredBoxData } from 'src/types/storage'
 import { getMonFileIdentifier } from 'src/util/Lookup'
 

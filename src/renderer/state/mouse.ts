@@ -1,5 +1,5 @@
 import { Dispatch, Reducer, createContext } from 'react'
-import { SAV } from 'src/types/SAVTypes'
+import { SAV } from 'src/types/SAVTypes/SAV'
 import { PKMFile } from '../../types/pkm/util'
 
 export type DragSource = {

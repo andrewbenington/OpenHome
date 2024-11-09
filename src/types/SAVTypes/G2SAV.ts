@@ -10,11 +10,10 @@ import { Box, SAV } from './SAV'
 import { ParsedPath } from './path'
 
 export class G2SAV extends SAV<PK2> {
+  static pkmType = PK2
   boxOffsets: number[]
 
-  pkmType = PK2
-
-  transferRestrictions = GEN2_TRANSFER_RESTRICTIONS
+  static transferRestrictions = GEN2_TRANSFER_RESTRICTIONS
 
   constructor(path: ParsedPath, bytes: Uint8Array, fileCreated?: Date) {
     super(path, bytes)
