@@ -1,4 +1,4 @@
-import { PK3RR } from '../../../../pokemon-files-js/src'
+import { PK3RR } from 'pokemon-files'
 import { GameOfOrigin } from 'pokemon-resources'
 import {
   bytesToUint16LittleEndian,

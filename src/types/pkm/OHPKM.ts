@@ -7,7 +7,7 @@ import {
   markingsSixShapesWithColorFromBytes,
   markingsSixShapesWithColorFromOther,
   markingsSixShapesWithColorToBytes,
-} from '../../../../pokemon-files-js/src'
+} from 'pokemon-files'
 import {
   AbilityFromString,
   AbilityToString,
