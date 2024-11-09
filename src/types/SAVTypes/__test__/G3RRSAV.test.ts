@@ -182,6 +182,6 @@ describe('G3RRSAV - Radical Red Save File Write Test', () => {
     const modifiedSaveBytes = new Uint8Array(readFileSync(newSavePath));
     const modifiedRadicalRedSave = new G3RRSAV(parsedPath, modifiedSaveBytes);
 
-    expect(modifiedRadicalRedSave.boxes[0].pokemon[0].nickname).toBe("ModTest");
+    expect(modifiedRadicalRedSave.boxes[0].pokemon[0]?.nickname).toBe("ModTest");
   });
 });

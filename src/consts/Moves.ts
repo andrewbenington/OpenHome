@@ -9676,4 +9676,4 @@ const Moves: Record<number, Move> = {
     }
 }
 
-export const MOVE_DATA: Move[] = Object.values(Moves);
+export const MOVE_DATA: Move[] = [null, ...Object.values(Moves)] as unknown as Move[];

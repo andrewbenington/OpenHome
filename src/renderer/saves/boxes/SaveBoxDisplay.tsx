@@ -1,6 +1,6 @@
 import { Button, Card, Grid, Modal, ModalDialog, Stack } from '@mui/joy'
 import lodash from 'lodash'
-import { GameOfOriginData } from 'pokemon-resources'
+import { GameOfOriginData } from '../../../../../pokemon-resources-js/src'
 import { useCallback, useContext, useMemo, useState } from 'react'
 import { MdArrowBack, MdArrowForward, MdClose } from 'react-icons/md'
 import { MenuIcon } from 'src/renderer/components/Icons'

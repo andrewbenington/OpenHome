@@ -1,6 +1,6 @@
 import { PK2, PK3, PK3RR, PK4, PK5, PK6, PK7, PKM } from 'pokemon-files'
 import { GameOfOrigin } from 'pokemon-resources'
-import { bytesToUint32LittleEndian, bytesToUint64LittleEndian } from '../../util/ByteLogic'
+import { bytesToUint16LittleEndian, bytesToUint32LittleEndian, bytesToUint64LittleEndian } from '../../util/ByteLogic'
 import {
   getMonFileIdentifier,
   getMonGen12Identifier,
@@ -59,6 +59,21 @@ const recoverOHPKMData = <P extends PKM>(
   return saveFile
 }
 
+const findFirstSaveIndexZero = (bytes: Uint8Array): number => {
+  const SECTION_SIZE = 0x1000; // Each section is 4 KB
+  const SAVE_INDEX_OFFSET = 0xFF4; // Save index location within each section
+
+  for (let i = 0; i < 14; i++) {
+    const sectionStart = i * SECTION_SIZE;
+    const saveIndex = bytesToUint16LittleEndian(bytes, sectionStart + SAVE_INDEX_OFFSET);
+
+    if (saveIndex === 0) {
+      return sectionStart
+    }
+  }
+  return 0
+};
+
 export const getSaveType = (bytes: Uint8Array): SaveType => {
   // Gen 4 saves include a size and hex "date" that can identify save type
   const validGen4DateAndSize = (offset: number) => {
@@ -70,6 +85,7 @@ export const getSaveType = (bytes: Uint8Array): SaveType => {
     const DATE_KO = 0x20070903
     return date === DATE_INT || date === DATE_KO
   }
+
   // const validGen5Footer = (mainSize: number, infoLength: number) => {
   //   const footer = bytes.slice(mainSize - 0x100, mainSize - 0x100 + infoLength + 0x10)
   //   const stored = bytesToUint16LittleEndian(footer, 2)
@@ -88,19 +104,24 @@ export const getSaveType = (bytes: Uint8Array): SaveType => {
       return SaveType.Pt
     }
     if (validGen4DateAndSize(0x4f628)) {
+      console.info("Opened HGSS save")
       return SaveType.HGSS
     }
     return SaveType.G5
   }
   if (bytes.length >= SIZE_GEN3 && bytes.length <= SIZE_GEN3 + 1000) {
+
     const valueAtAC = bytesToUint32LittleEndian(bytes, 0xac)
     switch (valueAtAC) {
       case 1:
         return SaveType.FRLG
       case 0:
+        if (bytesToUint32LittleEndian(bytes, findFirstSaveIndexZero(bytes) + 0xAC)) {
+          return SaveType.RR
+        }
+        console.info("Opened RS save", valueAtAC)
+        // return SaveType.RR
         return SaveType.RS
-      case 0xFF:
-        return SaveType.RR
       default:
         for (let i = 0x890; i < 0xf2c; i += 4) {
           if (bytesToUint64LittleEndian(bytes, i) !== 0) return SaveType.E
@@ -136,23 +157,23 @@ export const buildSaveFile = (
 ): SAV<PKM> | undefined => {
   const { homeMonMap, gen12LookupMap, gen345LookupMap } = lookupMaps
   const saveType = getSaveType(fileBytes)
+  console.info("Detected save type:", saveType)
   let saveFile
   switch (saveType) {
     case SaveType.RBY_I:
+      console.info("Loading Gen 1 Save File (RBY_I)")
       saveFile = new G1SAV(filePath, fileBytes)
       if (homeMonMap && gen12LookupMap) {
         saveFile.boxes.forEach((box) => {
           box.pokemon.forEach((mon, monIndex) => {
             if (!mon) return
-            // GameBoy PKM files don't have a personality value to track the mons with OpenHome data,
-            // so they need to be identified with their IVs and OT
             const gen12identifier = getMonGen12Identifier(mon)
             if (!gen12identifier) return
             const homeIdentifier = gen12LookupMap[gen12identifier]
             if (!homeIdentifier) return
             const result = Object.entries(homeMonMap).find((entry) => entry[0] === homeIdentifier)
             if (result) {
-              console.info('home mon found:', result[1])
+              console.info('Home mon found:', result[1])
               box.pokemon[monIndex] = result[1]
             }
           })
@@ -161,6 +182,7 @@ export const buildSaveFile = (
       return saveFile
     case SaveType.C_I:
     case SaveType.GS_I:
+      console.info("Loading Gen 2 Save File")
       saveFile = recoverOHPKMData<PK2>(
         new G2SAV(filePath, fileBytes),
         getMonGen12Identifier,
@@ -171,6 +193,7 @@ export const buildSaveFile = (
     case SaveType.RS:
     case SaveType.FRLG:
     case SaveType.E:
+      console.info("Loading Gen 3 Save File")
       saveFile = recoverOHPKMData<PK3>(
         new G3SAV(filePath, fileBytes),
         getMonGen345Identifier,
@@ -179,13 +202,16 @@ export const buildSaveFile = (
       )
       break
     case SaveType.RR:
+      console.info("Loading Radical Red Save File")
       saveFile = recoverOHPKMData<PK3RR>(
         new G3RRSAV(filePath, fileBytes),
         getMonGen345Identifier,
         homeMonMap,
         gen345LookupMap
       )
+      break
     case SaveType.DP:
+      console.info("Loading Gen 4 Save File (DP)")
       saveFile = recoverOHPKMData<PK4>(
         new DPSAV(filePath, fileBytes),
         getMonGen345Identifier,
@@ -194,6 +220,7 @@ export const buildSaveFile = (
       )
       break
     case SaveType.Pt:
+      console.info("Loading Gen 4 Save File (Pt)")
       saveFile = recoverOHPKMData<PK4>(
         new PtSAV(filePath, fileBytes),
         getMonGen345Identifier,
@@ -202,6 +229,7 @@ export const buildSaveFile = (
       )
       break
     case SaveType.HGSS:
+      console.info("Loading Gen 4 Save File (HGSS)")
       saveFile = recoverOHPKMData<PK4>(
         new HGSSSAV(filePath, fileBytes),
         getMonGen345Identifier,
@@ -210,6 +238,7 @@ export const buildSaveFile = (
       )
       break
     case SaveType.G5:
+      console.info("Loading Gen 5 Save File")
       saveFile = recoverOHPKMData<PK5>(
         new G5SAV(filePath, fileBytes),
         getMonGen345Identifier,
@@ -218,6 +247,7 @@ export const buildSaveFile = (
       )
       break
     case SaveType.G6:
+      console.info("Loading Gen 6 Save File")
       saveFile = recoverOHPKMData<PK6>(
         new G6SAV(filePath, fileBytes),
         getMonFileIdentifier,
@@ -225,14 +255,17 @@ export const buildSaveFile = (
       )
       break
     case SaveType.G7:
+      console.info("Loading Gen 7 Save File")
       saveFile = recoverOHPKMData<PK7>(
         new G7SAV(filePath, fileBytes),
         getMonFileIdentifier,
         homeMonMap
       )
   }
+  console.info("Returning save file:", saveFile, "for save type:", saveType)
   return saveFile
 }
+
 
 export const GameColors: Record<GameOfOrigin, string> = {
   [0]: '#666666',

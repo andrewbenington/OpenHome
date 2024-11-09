@@ -236,6 +236,7 @@ export class G3SAV extends SAV<PK3> {
     if (fileName.includes('LeafGreen')) {
       this.origin = GameOfOrigin.LeafGreen
     }
+    console.log(this.boxes)
   }
 
   prepareBoxesForSaving() {

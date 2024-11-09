@@ -1,4 +1,4 @@
-import { PK3RR } from 'pokemon-files'
+import { PK3RR } from '../../../../pokemon-files-js/src'
 import { GameOfOrigin } from 'pokemon-resources'
 import {
   bytesToUint16LittleEndian,
@@ -100,11 +100,11 @@ export class G3RRSaveBackup {
     this.boxNames = []
     for (let i = 0; i < 14; i++) {
       // TODO: More research into where BOX names are located
-      this.boxes[i] = new Box("Box {i}" /* gen3StringToUTF(this.pcDataContiguous, 0x8344 + i * 9, 10) */, 30)
+      this.boxes[i] = new Box("Box" + (i + 1), 30)
     }
     for (let i = 0; i < 420; i++) {
       try {
-        const mon = new PK3RR(this.pcDataContiguous.slice(4 + i * 58, 4 + (i + 1) * 58).buffer, true)
+        const mon = new PK3RR(this.pcDataContiguous.slice(4 + i * 58, 4 + (i + 1) * 58).buffer)
         if (mon.gameOfOrigin !== 0 && mon.dexNum !== 0) {
           const box = this.boxes[Math.floor(i / 30)]
           box.pokemon[i % 30] = mon
@@ -201,6 +201,8 @@ export class G3RRSAV extends SAV<PK3RR> {
     if (fileName.includes('LeafGreen')) {
       this.origin = GameOfOrigin.LeafGreen
     }
+
+    console.log(this.boxes)
   }
 
   prepareBoxesForSaving() {

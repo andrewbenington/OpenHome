@@ -248,6 +248,7 @@ export const getTypes = (mon: AllPKMFields) => {
 
 export const getMoveMaxPP = (moveIndex: number, format: string, ppUps = 0) => {
   const move = MOVE_DATA[moveIndex]
+  if (!move) return undefined
   let baseMaxPP
   switch (format) {
     case 'PK1':
@@ -257,10 +258,9 @@ export const getMoveMaxPP = (moveIndex: number, format: string, ppUps = 0) => {
       baseMaxPP = move.pastGenPP?.G2 ?? move.pp
       break
     case 'PK3':
-    case 'PK3RR':
     case 'COLOPKM':
     case 'XDPKM':
-      baseMaxPP = move.pastGenPP?.G3 ?? move.pp
+      baseMaxPP = move?.pastGenPP?.G3 ?? move?.pp
       break
     case 'PK4':
       baseMaxPP = move.pastGenPP?.G4 ?? move.pp
@@ -279,6 +279,7 @@ export const getMoveMaxPP = (moveIndex: number, format: string, ppUps = 0) => {
       break
     case 'PK8':
     case 'PB8':
+    case 'PK3RR':
       baseMaxPP = move.pastGenPP?.G8 ?? move.pp
       break
     case 'PA8':
@@ -298,7 +299,7 @@ export const getMoveMaxPP = (moveIndex: number, format: string, ppUps = 0) => {
   if ((format === 'PK1' || format === 'PK2') && baseMaxPP === 40) {
     return baseMaxPP + Math.floor(ppUps * 7)
   }
-  return baseMaxPP + Math.floor(ppUps * (baseMaxPP / 5))
+  return move.pp // baseMaxPP + Math.floor(ppUps * (baseMaxPP / 5))
 }
 
 export const adjustMovePPBetweenFormats = (
