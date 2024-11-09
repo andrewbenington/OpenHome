@@ -11,9 +11,9 @@ import { Box, SAV } from './SAV'
 import { ParsedPath } from './path'
 
 export class G1SAV extends SAV<PK1> {
-  pkmType = PK1
+  static pkmType = PK1
 
-  transferRestrictions = GEN1_TRANSFER_RESTRICTIONS
+  static transferRestrictions = GEN1_TRANSFER_RESTRICTIONS
 
   NUM_BOXES = 14
 

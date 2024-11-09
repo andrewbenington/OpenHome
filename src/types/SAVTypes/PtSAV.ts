@@ -1,3 +1,4 @@
+import { PK4 } from 'pokemon-files'
 import { GameOfOrigin } from 'pokemon-resources'
 import { PT_TRANSFER_RESTRICTIONS } from '../../consts/TransferRestrictions'
 import { SaveType } from '../../types/types'
@@ -8,10 +9,11 @@ import { ParsedPath } from './path'
 
 export class PtSAV extends G4SAV {
   saveType = SaveType.Pt
+  static pkmType = PK4
 
   origin = GameOfOrigin.Platinum
 
-  transferRestrictions = PT_TRANSFER_RESTRICTIONS
+  static transferRestrictions = PT_TRANSFER_RESTRICTIONS
 
   static TRAINER_NAME_OFFSET = 0x68
 

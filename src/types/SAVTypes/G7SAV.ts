@@ -12,7 +12,6 @@ import {
 import { CRC16_Invert, SignWithMemeCrypto } from '../../util/Encryption'
 import { utf16BytesToString } from '../../util/Strings/StringConverter'
 import { OHPKM } from '../pkm/OHPKM'
-import { SaveType } from '../types'
 import { Box, SAV } from './SAV'
 import { ParsedPath } from './path'
 import { SIZE_USUM } from './util'
@@ -28,12 +27,12 @@ const USUM_BOX_NAMES_OFFSET: number = 0x04c00
 const BOX_SIZE: number = 232 * 30
 const BOX_COUNT = 32
 
-export class G7SAV extends SAV<PK7> {
+export abstract class G7SAV extends SAV<PK7> {
+  static pkmType = PK7
+
   trainerDataOffset: number = 0x1200
 
   boxes: Array<Box<PK7>>
-
-  saveType = SaveType.G7
 
   boxChecksumOffset: number = 0x75fda
 

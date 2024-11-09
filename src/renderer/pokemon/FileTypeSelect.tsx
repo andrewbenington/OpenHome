@@ -1,21 +1,17 @@
-import {
-  BW2_TRANSFER_RESTRICTIONS,
-  GEN1_TRANSFER_RESTRICTIONS,
-  GEN2_TRANSFER_RESTRICTIONS,
-  GEN3_TRANSFER_RESTRICTIONS,
-  RR_TRANSFER_RESTRICTIONS,
-  HGSS_TRANSFER_RESTRICTIONS,
-  LA_TRANSFER_RESTRICTIONS,
-  LGPE_TRANSFER_RESTRICTIONS,
-  ORAS_TRANSFER_RESTRICTIONS,
-  PT_TRANSFER_RESTRICTIONS,
-  SV_TRANSFER_RESTRICTIONS,
-  SWSH_TRANSFER_RESTRICTIONS,
-  USUM_TRANSFER_RESTRICTIONS,
-} from 'src/consts/TransferRestrictions'
+import { uniq } from 'lodash'
+import { useMemo } from 'react'
+import { ALL_SAVE_TYPES } from 'src/types/SAVTypes/util'
 import { isRestricted } from 'src/types/TransferRestrictions'
 import { PKMFormData } from 'src/types/interfaces/base'
 import { Styles } from 'src/types/types'
+import {
+  BDSP_TRANSFER_RESTRICTIONS,
+  LA_TRANSFER_RESTRICTIONS,
+  LGPE_TRANSFER_RESTRICTIONS,
+  SV_TRANSFER_RESTRICTIONS,
+  SWSH_TRANSFER_RESTRICTIONS,
+} from '../../consts/TransferRestrictions'
+import { filterUndefined } from '../../util/Sort'
 
 const styles = {
   fileTypeChip: {
@@ -55,6 +51,35 @@ interface FileTypeSelectProps {
 
 const FileTypeSelect = (props: FileTypeSelectProps) => {
   const { baseFormat, currentFormat, formData, onChange } = props
+
+  const supportedFormats = useMemo(() => {
+    const supportedFormats = uniq(
+      ALL_SAVE_TYPES.map((saveType) =>
+        !isRestricted(saveType.transferRestrictions, formData.dexNum, formData.formeNum)
+          ? saveType.pkmType.name.slice(1) // hack to get the class name (slice(1) removes the underscore prefix)
+          : undefined
+      )
+    ).filter(filterUndefined)
+
+    // These should be removed when support is added for their corresponding saves
+    if (!isRestricted(LGPE_TRANSFER_RESTRICTIONS, formData.dexNum, formData.formeNum)) {
+      supportedFormats.push('PB7')
+    }
+    if (!isRestricted(SWSH_TRANSFER_RESTRICTIONS, formData.dexNum, formData.formeNum)) {
+      supportedFormats.push('PK8')
+    }
+    if (!isRestricted(BDSP_TRANSFER_RESTRICTIONS, formData.dexNum, formData.formeNum)) {
+      supportedFormats.push('PB8')
+    }
+    if (!isRestricted(LA_TRANSFER_RESTRICTIONS, formData.dexNum, formData.formeNum)) {
+      supportedFormats.push('PA8')
+    }
+    if (!isRestricted(SV_TRANSFER_RESTRICTIONS, formData.dexNum, formData.formeNum)) {
+      supportedFormats.push('PK9')
+    }
+    return supportedFormats
+  }, [formData])
+
   return (
     <select
       value={currentFormat}
@@ -67,67 +92,10 @@ const FileTypeSelect = (props: FileTypeSelectProps) => {
       }}
     >
       <option value="OHPKM">OpenHome</option>
+      {supportedFormats.map((format) => (
+        <option value={format}>{format}</option>
+      ))}
       {baseFormat !== 'OHPKM' && <option value={baseFormat}>{baseFormat}</option>}
-      {baseFormat === 'OHPKM' &&
-        !isRestricted(GEN1_TRANSFER_RESTRICTIONS, formData.dexNum, formData.formeNum) && (
-          <option value="PK1">PK1</option>
-        )}
-      {baseFormat === 'OHPKM' &&
-        !isRestricted(GEN2_TRANSFER_RESTRICTIONS, formData.dexNum, formData.formeNum) && (
-          <option value="PK2">PK2</option>
-        )}
-      {baseFormat === 'OHPKM' &&
-        !isRestricted(GEN3_TRANSFER_RESTRICTIONS, formData.dexNum, formData.formeNum) && (
-          <option value="PK3">PK3</option>
-        )}
-      {baseFormat === 'OHPKM' &&
-        !isRestricted(GEN3_TRANSFER_RESTRICTIONS, formData.dexNum, formData.formeNum) && (
-          <option value="COLOPKM">COLOPKM</option>
-        )}
-      {baseFormat === 'OHPKM' &&
-        !isRestricted(GEN3_TRANSFER_RESTRICTIONS, formData.dexNum, formData.formeNum) && (
-          <option value="XDPKM">XDPKM</option>
-        )}
-      {baseFormat === 'OHPKM' &&
-        !isRestricted(RR_TRANSFER_RESTRICTIONS, formData.dexNum, formData.formeNum) && (
-          <option value="PK3RR">PK3RR</option>
-        )}
-      {baseFormat === 'OHPKM' &&
-        !isRestricted(HGSS_TRANSFER_RESTRICTIONS, formData.dexNum, formData.formeNum) && (
-          <option value="PK4">PK4</option>
-        )}
-      {baseFormat === 'OHPKM' &&
-        !isRestricted(BW2_TRANSFER_RESTRICTIONS, formData.dexNum, formData.formeNum) && (
-          <option value="PK5">PK5</option>
-        )}
-      {baseFormat === 'OHPKM' &&
-        !isRestricted(ORAS_TRANSFER_RESTRICTIONS, formData.dexNum, formData.formeNum) && (
-          <option value="PK6">PK6</option>
-        )}
-      {baseFormat === 'OHPKM' &&
-        !isRestricted(USUM_TRANSFER_RESTRICTIONS, formData.dexNum, formData.formeNum) && (
-          <option value="PK7">PK7</option>
-        )}
-      {baseFormat === 'OHPKM' &&
-        !isRestricted(LGPE_TRANSFER_RESTRICTIONS, formData.dexNum, formData.formeNum) && (
-          <option value="PB7">PB7</option>
-        )}
-      {baseFormat === 'OHPKM' &&
-        !isRestricted(SWSH_TRANSFER_RESTRICTIONS, formData.dexNum, formData.formeNum) && (
-          <option value="PK8">PK8</option>
-        )}
-      {baseFormat === 'OHPKM' &&
-        !isRestricted(PT_TRANSFER_RESTRICTIONS, formData.dexNum, formData.formeNum) && (
-          <option value="PB8">PB8</option>
-        )}
-      {baseFormat === 'OHPKM' &&
-        !isRestricted(LA_TRANSFER_RESTRICTIONS, formData.dexNum, formData.formeNum) && (
-          <option value="PA8">PA8</option>
-        )}
-      {baseFormat === 'OHPKM' &&
-        !isRestricted(SV_TRANSFER_RESTRICTIONS, formData.dexNum, formData.formeNum) && (
-          <option value="PK9">PK9</option>
-        )}
     </select>
   )
 }
