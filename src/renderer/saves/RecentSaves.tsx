@@ -115,7 +115,7 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
             marginLeft: 'auto',
             marginTop: 'auto',
             marginBottom: 'auto',
-            // backgroundColor: '#990000',
+            backgroundColor: '#990000',
             height: 'fit-content',
             borderRadius: 16,
           }}

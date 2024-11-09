@@ -83,9 +83,9 @@ export class OHPKM {
   static maxValidMove() {
     return 919
   }
-  
+
   bytes: Uint8Array = new Uint8Array(433)
-  
+
   constructor(arg: PKM | OHPKM | Uint8Array) {
     if (arg instanceof Uint8Array) {
       this.bytes = arg
