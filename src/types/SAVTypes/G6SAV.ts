@@ -8,7 +8,6 @@ import { bytesToUint16LittleEndian, uint16ToBytesLittleEndian } from '../../util
 import { CRC16_CCITT } from '../../util/Encryption'
 import { utf16BytesToString } from '../../util/Strings/StringConverter'
 import { OHPKM } from '../pkm/OHPKM'
-import { SaveType } from '../types'
 import { Box, SAV } from './SAV'
 import { ParsedPath } from './path'
 
@@ -21,11 +20,11 @@ const BOX_SIZE: number = 232 * 30
 const BOX_DATA_SIZE: number = 0x34ad0
 
 export class G6SAV extends SAV<PK6> {
+  static pkmType = PK6
+
   trainerDataOffset: number = 0x14000
 
   boxes: Array<Box<PK6>>
-
-  saveType = SaveType.G6
 
   boxChecksumOffset: number = 0x75fda
 

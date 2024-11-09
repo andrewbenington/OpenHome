@@ -47,9 +47,12 @@ export enum SaveType {
   DP,
   Pt,
   HGSS,
-  G5,
-  G6,
-  G7,
+  BW,
+  BW2,
+  XY,
+  ORAS,
+  SM,
+  USUM,
 }
 
 export interface pokedate {
@@ -134,10 +137,18 @@ export const getSaveTypeString = (saveType: SaveType): string => {
       return 'Pokémon Platinum'
     case SaveType.HGSS:
       return 'Pokémon HeartGold/SoulSilver'
-    case SaveType.G5:
-      return 'Pokémon Black/White/Black 2/White 2'
-    case SaveType.G6:
+    case SaveType.BW:
+      return 'Pokémon Black/White'
+    case SaveType.BW2:
+      return 'Pokémon Black 2/White 2'
+    case SaveType.XY:
+      return 'Pokémon X/Y'
+    case SaveType.ORAS:
       return 'Pokémon Omega Ruby/Alpha Sapphire'
+    case SaveType.SM:
+      return 'Pokémon Omega Ruby/Alpha Sapphire'
+    case SaveType.USUM:
+      return 'Pokémon Ultra Sun/Ultra Moon'
     default:
       return 'Unknown Game'
   }
@@ -145,7 +156,6 @@ export const getSaveTypeString = (saveType: SaveType): string => {
 
 export interface SaveRef {
   filePath: ParsedPath
-  saveType: SaveType
   game?: string
   trainerName?: string
   trainerID?: string

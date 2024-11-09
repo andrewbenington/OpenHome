@@ -10,8 +10,8 @@ import { OHPKM } from '../pkm/OHPKM'
 import { Box, SAV } from './SAV'
 import { ParsedPath } from './path'
 
-export class G4SAV extends SAV<PK4> {
-  pkmType = PK4
+export abstract class G4SAV extends SAV<PK4> {
+  static pkmType = PK4
 
   currentSaveStorageBlockOffset: number = 0
 

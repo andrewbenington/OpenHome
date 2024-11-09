@@ -8,17 +8,21 @@ import {
 } from '../../util/Lookup'
 import { OHPKM } from '../pkm/OHPKM'
 import { SaveType } from '../types'
+import { BW2SAV } from './BW2SAV'
+import { BWSAV } from './BWSAV'
 import { DPSAV } from './DPSAV'
 import { G1SAV } from './G1SAV'
 import { G2SAV } from './G2SAV'
 import { G3SAV } from './G3SAV'
 import { G5SAV } from './G5SAV'
-import { G6SAV } from './G6SAV'
-import { G7SAV } from './G7SAV'
 import { HGSSSAV } from './HGSSSAV'
+import { ORASSAV } from './ORASSAV'
+import { ParsedPath, emptyParsedPath } from './path'
 import { PtSAV } from './PtSAV'
 import { SAV } from './SAV'
-import { ParsedPath, emptyParsedPath } from './path'
+import { SMSAV } from './SMSAV'
+import { USUMSAV } from './USUMSAV'
+import { XYSAV } from './XYSAV'
 
 const SIZE_GEN12 = 0x8000
 const SIZE_GEN3 = 0x20000
@@ -75,50 +79,58 @@ export const getSaveType = (bytes: Uint8Array): SaveType => {
   //   const actual = 0 // Checksums.CRC16_CCITT(footer[..infoLength]);
   //   return stored === actual
   // }
-  if (bytes.length === SIZE_SM || bytes.length === SIZE_USUM) {
-    return SaveType.G7
-  } else if (bytes.length === SIZE_XY || bytes.length === SIZE_ORAS) {
-    return SaveType.G6
-  } else if (bytes.length >= SIZE_GEN45 && bytes.length <= SIZE_GEN45 + 1000) {
-    if (validGen4DateAndSize(0x4c100)) {
-      return SaveType.DP
-    }
-    if (validGen4DateAndSize(0x4cf2c)) {
-      return SaveType.Pt
-    }
-    if (validGen4DateAndSize(0x4f628)) {
-      return SaveType.HGSS
-    }
-    return SaveType.G5
-  }
-  if (bytes.length >= SIZE_GEN3 && bytes.length <= SIZE_GEN3 + 1000) {
-    const valueAtAC = bytesToUint32LittleEndian(bytes, 0xac)
-    switch (valueAtAC) {
-      case 1:
-        return SaveType.FRLG
-      case 0:
-        return SaveType.RS
-      default:
-        for (let i = 0x890; i < 0xf2c; i += 4) {
-          if (bytesToUint64LittleEndian(bytes, i) !== 0) return SaveType.E
+  switch (bytes.length) {
+    case SIZE_XY:
+      return SaveType.XY
+    case SIZE_ORAS:
+      return SaveType.ORAS
+    case SIZE_SM:
+      return SaveType.SM
+    case SIZE_USUM:
+      return SaveType.USUM
+    default:
+      if (bytes.length >= SIZE_GEN45 && bytes.length <= SIZE_GEN45 + 1000) {
+        if (validGen4DateAndSize(0x4c100)) {
+          return SaveType.DP
         }
-        return SaveType.RS
-    }
-  } else if (bytes.length >= SIZE_GEN12 && bytes.length <= SIZE_GEN12 + 1000) {
-    // hacky
-    const g2save = new G2SAV(emptyParsedPath, bytes)
-    if (g2save.areCrystalInternationalChecksumsValid()) {
-      return SaveType.C_I
-    }
-    if (g2save.areGoldSilverChecksumsValid()) {
-      return SaveType.GS_I
-    }
-    const g1save = new G1SAV(emptyParsedPath, bytes)
-    if (!g1save.invalid) {
-      return SaveType.RBY_I
-    }
+        if (validGen4DateAndSize(0x4cf2c)) {
+          return SaveType.Pt
+        }
+        if (validGen4DateAndSize(0x4f628)) {
+          return SaveType.HGSS
+        }
+        const g5Origin = bytes[G5SAV.originOffset]
+        return g5Origin <= GameOfOrigin.Black ? SaveType.BW : SaveType.BW2
+      } else if (bytes.length >= SIZE_GEN3 && bytes.length <= SIZE_GEN3 + 1000) {
+        const valueAtAC = bytesToUint32LittleEndian(bytes, 0xac)
+        switch (valueAtAC) {
+          case 1:
+            return SaveType.FRLG
+          case 0:
+            // return SaveType.RR
+            return SaveType.RS
+          default:
+            for (let i = 0x890; i < 0xf2c; i += 4) {
+              if (bytesToUint64LittleEndian(bytes, i) !== 0) return SaveType.E
+            }
+            return SaveType.RS
+        }
+      } else if (bytes.length >= SIZE_GEN12 && bytes.length <= SIZE_GEN12 + 1000) {
+        // hacky
+        const g2save = new G2SAV(emptyParsedPath, bytes)
+        if (g2save.areCrystalInternationalChecksumsValid()) {
+          return SaveType.C_I
+        }
+        if (g2save.areGoldSilverChecksumsValid()) {
+          return SaveType.GS_I
+        }
+        const g1save = new G1SAV(emptyParsedPath, bytes)
+        if (!g1save.invalid) {
+          return SaveType.RBY_I
+        }
+      }
+      return SaveType.UNKNOWN
   }
-  return SaveType.UNKNOWN
 }
 
 export const buildSaveFile = (
@@ -158,6 +170,7 @@ export const buildSaveFile = (
       return saveFile
     case SaveType.C_I:
     case SaveType.GS_I:
+      console.info('Loading Gen 2 Save File')
       saveFile = recoverOHPKMData<PK2>(
         new G2SAV(filePath, fileBytes),
         getMonGen12Identifier,
@@ -168,6 +181,7 @@ export const buildSaveFile = (
     case SaveType.RS:
     case SaveType.FRLG:
     case SaveType.E:
+      console.info('Loading Gen 3 Save File')
       saveFile = recoverOHPKMData<PK3>(
         new G3SAV(filePath, fileBytes),
         getMonGen345Identifier,
@@ -176,6 +190,7 @@ export const buildSaveFile = (
       )
       break
     case SaveType.DP:
+      console.info('Loading Gen 4 Save File (DP)')
       saveFile = recoverOHPKMData<PK4>(
         new DPSAV(filePath, fileBytes),
         getMonGen345Identifier,
@@ -184,6 +199,7 @@ export const buildSaveFile = (
       )
       break
     case SaveType.Pt:
+      console.info('Loading Gen 4 Save File (Pt)')
       saveFile = recoverOHPKMData<PK4>(
         new PtSAV(filePath, fileBytes),
         getMonGen345Identifier,
@@ -192,6 +208,7 @@ export const buildSaveFile = (
       )
       break
     case SaveType.HGSS:
+      console.info('Loading Gen 4 Save File (HGSS)')
       saveFile = recoverOHPKMData<PK4>(
         new HGSSSAV(filePath, fileBytes),
         getMonGen345Identifier,
@@ -199,27 +216,56 @@ export const buildSaveFile = (
         gen345LookupMap
       )
       break
-    case SaveType.G5:
+    case SaveType.BW:
+      console.info('Loading Gen 5 Save File (BW)')
       saveFile = recoverOHPKMData<PK5>(
-        new G5SAV(filePath, fileBytes),
+        new BWSAV(filePath, fileBytes),
         getMonGen345Identifier,
         homeMonMap,
         gen345LookupMap
       )
       break
-    case SaveType.G6:
+    case SaveType.BW2:
+      console.info('Loading Gen 5 Save File (BW2)')
+      saveFile = recoverOHPKMData<PK5>(
+        new BW2SAV(filePath, fileBytes),
+        getMonGen345Identifier,
+        homeMonMap,
+        gen345LookupMap
+      )
+      break
+    case SaveType.XY:
+      console.info('Loading Gen 6 Save File (XY)')
       saveFile = recoverOHPKMData<PK6>(
-        new G6SAV(filePath, fileBytes),
+        new XYSAV(filePath, fileBytes),
         getMonFileIdentifier,
         homeMonMap
       )
       break
-    case SaveType.G7:
-      saveFile = recoverOHPKMData<PK7>(
-        new G7SAV(filePath, fileBytes),
+    case SaveType.ORAS:
+      console.info('Loading Gen 6 Save File (ORAS)')
+      saveFile = recoverOHPKMData<PK6>(
+        new ORASSAV(filePath, fileBytes),
         getMonFileIdentifier,
         homeMonMap
       )
+      break
+    case SaveType.SM:
+      console.info('Loading Gen 7 Save File (SM)')
+      saveFile = recoverOHPKMData<PK7>(
+        new SMSAV(filePath, fileBytes),
+        getMonFileIdentifier,
+        homeMonMap
+      )
+      break
+    case SaveType.USUM:
+      console.info('Loading Gen 7 Save File (USUM)')
+      saveFile = recoverOHPKMData<PK7>(
+        new USUMSAV(filePath, fileBytes),
+        getMonFileIdentifier,
+        homeMonMap
+      )
+      break
   }
   return saveFile
 }
@@ -278,3 +324,22 @@ export const GameColors: Record<GameOfOrigin, string> = {
   [GameOfOrigin.Scarlet]: '#F34134',
   [GameOfOrigin.Violet]: '#8334B7',
 }
+
+export const ALL_SAVE_TYPES = [
+  G1SAV,
+  G2SAV,
+  G3SAV,
+  DPSAV,
+  PtSAV,
+  HGSSSAV,
+  BWSAV,
+  BW2SAV,
+  XYSAV,
+  ORASSAV,
+  SMSAV,
+  USUMSAV,
+]
+
+export type SupportedSave = (typeof ALL_SAVE_TYPES)[number]
+
+export type PKMTypeOf<Type> = Type extends SAV<infer X> ? X : never
