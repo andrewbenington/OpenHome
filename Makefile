@@ -13,7 +13,7 @@ package:
 
 .PHONY: start
 start:
-	@npm run dev
+	@npm run dev:unix
 
 .PHONY: preview
 preview:

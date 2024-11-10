@@ -24,6 +24,7 @@ export interface BoxCoordinates {
 export abstract class SAV<P extends AllPKMFields = PKMFile> {
   saveType: SaveType = SaveType.UNKNOWN
   static pkmType
+  static transferRestrictions: TransferRestrictions
 
   origin: GameOfOrigin = 0
 
@@ -74,7 +75,6 @@ export abstract class SAV<P extends AllPKMFields = PKMFile> {
   }
 
   updatedBoxSlots: BoxCoordinates[] = []
-
   constructor(path: ParsedPath, bytes: Uint8Array) {
     this.filePath = path
     this.bytes = bytes

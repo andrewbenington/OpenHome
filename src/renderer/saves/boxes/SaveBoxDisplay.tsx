@@ -8,6 +8,7 @@ import AttributeRow from 'src/renderer/pokemon/AttributeRow'
 import { MouseContext } from 'src/renderer/state/mouse'
 import { MonLocation, OpenSavesContext } from 'src/renderer/state/openSaves'
 import { PKMFile } from '../../../types/pkm/util'
+import { SAV } from '../../../types/SAVTypes/SAV'
 import { isRestricted } from '../../../types/TransferRestrictions'
 import { getSaveTypeString } from '../../../types/types'
 import ArrowButton from './ArrowButton'
@@ -62,7 +63,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   const isDisabled = useMemo(() => {
     return mouseState.dragSource
       ? isRestricted(
-          save.transferRestrictions,
+          (save.constructor as typeof SAV).transferRestrictions, // disgusting but temporarily necessary
           mouseState.dragSource.mon.dexNum,
           mouseState.dragSource.mon.formeNum
         )
