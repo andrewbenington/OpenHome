@@ -1,6 +1,7 @@
 import { PK3 } from 'pokemon-files'
 import { GameOfOrigin } from 'pokemon-resources'
-import { GEN3_TRANSFER_RESTRICTIONS } from '../../consts/TransferRestrictions'
+import { NationalDex } from 'pokemon-species-data'
+import { CapPikachus, RegionalForms } from '../../types/TransferRestrictions'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -154,16 +155,22 @@ export class G3SaveBackup {
 }
 
 export class G3SAV extends SAV<PK3> {
-  saveType: SaveType
-  static pkmType = PK3
-
-  static transferRestrictions = GEN3_TRANSFER_RESTRICTIONS
+  static TRANSFER_RESTRICTIONS = {
+    maxDexNum: NationalDex.Deoxys,
+    excludedForms: { ...RegionalForms, ...CapPikachus },
+  }
 
   static TRAINER_OFFSET = 0x0ff4 * 0
 
   static TEAM_ITEMS_OFFSET = 0x0ff4 * 1
 
   static PC_OFFSET = 0x0ff4 * 5
+
+  saveType: SaveType
+
+  pkmType = PK3
+
+  transferRestrictions = G3SAV.TRANSFER_RESTRICTIONS
 
   primarySave: G3SaveBackup
 
@@ -229,7 +236,6 @@ export class G3SAV extends SAV<PK3> {
     if (fileName.includes('LeafGreen')) {
       this.origin = GameOfOrigin.LeafGreen
     }
-    console.log(this.boxes)
   }
 
   prepareBoxesForSaving() {
