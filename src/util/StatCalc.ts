@@ -1,8 +1,7 @@
 /* eslint-disable no-nested-ternary */
-import { AllPKMFields } from 'pokemon-files'
+import { AllPKMFields, LevelUpExp } from 'pokemon-files'
 import { getNatureSummary } from 'pokemon-resources'
 import { NationalDex, NationalDexMax, PokemonData } from 'pokemon-species-data'
-import { LevelUpExp } from '../consts'
 import { Stat } from '../types/types'
 
 export const getStatGen3Onward = (stat: Stat, mon: AllPKMFields) => {

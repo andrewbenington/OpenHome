@@ -5,6 +5,7 @@ import { ParsedPath } from './path'
 
 const PC_OFFSET = 0x33000
 const PC_CHECKSUM_OFFSET = 0x75fda
+const SAVE_SIZE_BYTES = 0x76000
 
 export class ORASSAV extends G6SAV {
   static transferRestrictions = ORAS_TRANSFER_RESTRICTIONS
@@ -15,5 +16,9 @@ export class ORASSAV extends G6SAV {
 
   supportsMon(dexNumber: number, formeNumber: number): boolean {
     return !isRestricted(ORAS_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)
+  }
+
+  static fileIsSave(bytes: Uint8Array): boolean {
+    return bytes.length === SAVE_SIZE_BYTES
   }
 }

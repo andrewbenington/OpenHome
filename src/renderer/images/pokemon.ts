@@ -1,5 +1,5 @@
 import { NationalDex, PokemonData } from 'pokemon-species-data'
-import { SWEETS } from '../../consts'
+import { SWEETS } from '../../consts/Formes'
 import { hasGen8OnData } from '../../types/interfaces/gen8'
 import { PKMFile } from '../../types/pkm/util'
 

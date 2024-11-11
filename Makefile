@@ -68,3 +68,6 @@ download-item-sprites:
 .PHONY: test-interfaces
 test-interfaces:
 	@ts-node --project tsconfig.json src/types/pkm_old/__test__/all.test.ts
+
+%:
+	@npm run $@

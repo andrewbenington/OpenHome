@@ -1,8 +1,12 @@
 import { Chip } from '@mui/joy'
 import { AllPKMFields } from 'pokemon-files'
-import { GameOfOriginData, getLocationString, NatureToString } from 'pokemon-resources'
+import {
+  GameOfOriginData,
+  getLocationString,
+  NatureToString,
+  RibbonTitles,
+} from 'pokemon-resources'
 import { useMemo } from 'react'
-import { RibbonTitles } from 'src/consts'
 import { hasGen3OnData, hasOrreData } from '../../types/interfaces/gen3'
 import { getCharacteristic, getMoveMaxPP } from '../../types/pkm/util'
 import { Styles } from '../../types/types'

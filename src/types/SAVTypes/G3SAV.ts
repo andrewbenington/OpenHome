@@ -5,6 +5,7 @@ import { GEN3_TRANSFER_RESTRICTIONS } from '../../consts/TransferRestrictions'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
+  bytesToUint64LittleEndian,
   uint16ToBytesLittleEndian,
   uint32ToBytesLittleEndian,
 } from '../../util/ByteLogic'
@@ -12,6 +13,9 @@ import { gen3StringToUTF } from '../../util/Strings/StringConverter'
 import { OHPKM } from '../pkm/OHPKM'
 import { Box, BoxCoordinates, SAV } from './SAV'
 import { ParsedPath, splitPath } from './path'
+import { LOOKUP_TYPE } from './util'
+
+const SAVE_SIZE_BYTES = 0x20000
 
 export class G3Sector {
   data: Uint8Array
@@ -153,6 +157,7 @@ export class G3SAV implements SAV<PK3> {
   static pkmType = PK3
 
   static transferRestrictions = GEN3_TRANSFER_RESTRICTIONS
+  static lookupType: LOOKUP_TYPE = 'gen345'
 
   static TRAINER_OFFSET = 0x0ff4 * 0
 
@@ -298,5 +303,19 @@ export class G3SAV implements SAV<PK3> {
 
   getCurrentBox() {
     return this.boxes[this.currentPCBox]
+  }
+
+  static fileIsSave(bytes: Uint8Array): boolean {
+    if (bytes.length !== SAVE_SIZE_BYTES) {
+      return false
+    }
+    const valueAtAC = bytesToUint32LittleEndian(bytes, 0xac)
+    if (valueAtAC === 1 || valueAtAC === 0) {
+      return true
+    }
+    for (let i = 0x890; i < 0xf2c; i += 4) {
+      if (bytesToUint64LittleEndian(bytes, i) !== 0) return true
+    }
+    return false
   }
 }

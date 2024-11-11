@@ -10,10 +10,13 @@ import { gen4StringToUTF } from '../../util/Strings/StringConverter'
 import { OHPKM } from '../pkm/OHPKM'
 import { Box, BoxCoordinates, SAV } from './SAV'
 import { ParsedPath } from './path'
+import { LOOKUP_TYPE } from './util'
 
 export abstract class G4SAV implements SAV<PK4> {
   static BOX_COUNT = 18
   static pkmType = PK4
+  static SAVE_SIZE_BYTES = 0x80000
+  static lookupType: LOOKUP_TYPE = 'gen345'
 
   origin: GameOfOrigin = 0
 
@@ -159,5 +162,16 @@ export abstract class G4SAV implements SAV<PK4> {
 
   getCurrentBox() {
     return this.boxes[this.currentPCBox]
+  }
+
+  // Gen 4 saves include a size and hex "date" that can identify save type
+  static validDateAndSize(bytes: Uint8Array, offset: number) {
+    const size = bytesToUint32LittleEndian(bytes, offset - 0xc)
+    if (size !== (offset & 0xffff)) return false
+    const date = bytesToUint32LittleEndian(bytes, offset - 0x8)
+
+    const DATE_INT = 0x20060623
+    const DATE_KO = 0x20070903
+    return date === DATE_INT || date === DATE_KO
   }
 }

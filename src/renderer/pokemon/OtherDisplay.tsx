@@ -16,7 +16,9 @@ import { hasGen6OnData, hasN3DSOnlyData } from 'src/types/interfaces/gen6'
 import { hasGen8OnlyData } from 'src/types/interfaces/gen8'
 import { Gen9OnlyData, hasGen9OnlyData } from 'src/types/interfaces/gen9'
 import { get16BitChecksumLittleEndian } from 'src/util/ByteLogic'
-import { Countries, EncounterTypes, SWEETS } from '../../consts'
+import { Countries } from '../../consts/Countries'
+import { EncounterTypes } from '../../consts/EncounterTypes'
+import { SWEETS } from '../../consts/Formes'
 import { MOVE_DATA } from '../../consts/Moves'
 import {
   GEN2_TRANSFER_RESTRICTIONS,

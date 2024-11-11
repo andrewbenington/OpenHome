@@ -11,6 +11,7 @@ import { gen5StringToUTF } from '../../util/Strings/StringConverter'
 import { OHPKM } from '../pkm/OHPKM'
 import { Box, BoxCoordinates, SAV } from './SAV'
 import { ParsedPath } from './path'
+import { hasDesamumeFooter, LOOKUP_TYPE } from './util'
 
 const PC_OFFSET = 0x400
 const BOX_NAMES_OFFSET: number = 0x04
@@ -20,6 +21,8 @@ const BOX_SIZE: number = 0x1000
 export abstract class G5SAV implements SAV<PK5> {
   static BOX_COUNT = 24
   static pkmType = PK5
+  static SAVE_SIZE_BYTES = 0x80000
+  static lookupType: LOOKUP_TYPE = 'gen345'
 
   origin: GameOfOrigin = 0
 
@@ -164,5 +167,29 @@ export abstract class G5SAV implements SAV<PK5> {
 
   getCurrentBox() {
     return this.boxes[this.currentPCBox]
+  }
+
+  static gen4ValidDateAndSize(bytes: Uint8Array, offset: number) {
+    const size = bytesToUint32LittleEndian(bytes, offset - 0xc)
+    if (size !== (offset & 0xffff)) return false
+    const date = bytesToUint32LittleEndian(bytes, offset - 0x8)
+
+    const DATE_INT = 0x20060623
+    const DATE_KO = 0x20070903
+    return date === DATE_INT || date === DATE_KO
+  }
+
+  static fileIsSave(bytes: Uint8Array): boolean {
+    if (bytes.length < G5SAV.SAVE_SIZE_BYTES) {
+      return false
+    }
+    if (bytes.length > G5SAV.SAVE_SIZE_BYTES) {
+      if (!hasDesamumeFooter(bytes, G5SAV.SAVE_SIZE_BYTES)) {
+        return false
+      }
+    }
+
+    const g5Origin = bytes[G5SAV.originOffset]
+    return g5Origin >= GameOfOrigin.White && g5Origin <= GameOfOrigin.Black2
   }
 }

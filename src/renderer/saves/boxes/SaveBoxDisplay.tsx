@@ -58,9 +58,8 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
     openSavesDispatch({ type: 'import_mons', payload: { mons, dest: location } })
 
   const isDisabled = useMemo(() => {
-    return mouseState.dragSource
-      ? save.supportsMon(mouseState.dragSource.mon.dexNum, mouseState.dragSource.mon.formeNum)
-      : false
+    if (!mouseState.dragSource) return false
+    return !save.supportsMon(mouseState.dragSource.mon.dexNum, mouseState.dragSource.mon.formeNum)
   }, [save, mouseState.dragSource])
 
   return save && save.currentPCBox !== undefined ? (

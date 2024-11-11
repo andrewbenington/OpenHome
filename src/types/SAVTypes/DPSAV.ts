@@ -5,6 +5,7 @@ import { gen4StringToUTF } from '../../util/Strings/StringConverter'
 import { isRestricted } from '../TransferRestrictions'
 import { G4SAV } from './G4SAV'
 import { ParsedPath } from './path'
+import { hasDesamumeFooter } from './util'
 
 export class DPSAV extends G4SAV {
   static pkmType = PK4
@@ -68,5 +69,18 @@ export class DPSAV extends G4SAV {
 
   supportsMon(dexNumber: number, formeNumber: number) {
     return !isRestricted(DP_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)
+  }
+
+  static fileIsSave(bytes: Uint8Array): boolean {
+    if (bytes.length < G4SAV.SAVE_SIZE_BYTES) {
+      return false
+    }
+    if (bytes.length > G4SAV.SAVE_SIZE_BYTES) {
+      if (!hasDesamumeFooter(bytes, G4SAV.SAVE_SIZE_BYTES)) {
+        return false
+      }
+    }
+
+    return G4SAV.validDateAndSize(bytes, 0x4c100)
   }
 }

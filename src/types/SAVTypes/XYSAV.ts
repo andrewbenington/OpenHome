@@ -5,6 +5,7 @@ import { ParsedPath } from './path'
 
 const PC_OFFSET = 0x22600
 const PC_CHECKSUM_OFFSET = 0x655c2
+const SAVE_SIZE_BYTES = 0x65600
 
 export class XYSAV extends G6SAV {
   static transferRestrictions = XY_TRANSFER_RESTRICTIONS
@@ -15,5 +16,9 @@ export class XYSAV extends G6SAV {
 
   supportsMon(dexNumber: number, formeNumber: number): boolean {
     return !isRestricted(XY_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)
+  }
+
+  static fileIsSave(bytes: Uint8Array): boolean {
+    return bytes.length === SAVE_SIZE_BYTES
   }
 }

@@ -12,8 +12,6 @@ import { Box, BoxCoordinates, SAV } from './SAV'
 import { ParsedPath } from './path'
 import { SIZE_USUM } from './util'
 
-const SM_BOX_NAMES_OFFSET: number = 0x04800
-const USUM_BOX_NAMES_OFFSET: number = 0x04c00
 const BOX_SIZE: number = 232 * 30
 const BOX_COUNT = 32
 
@@ -52,9 +50,14 @@ export abstract class G7SAV implements SAV<PK7> {
   pcOffset: number
   pcSize = 0x36600
   pcChecksumOffset: number
-  boxNamesOffset = SM_BOX_NAMES_OFFSET
 
-  constructor(path: ParsedPath, bytes: Uint8Array, pcOffset: number, pcChecksumOffset: number) {
+  constructor(
+    path: ParsedPath,
+    bytes: Uint8Array,
+    pcOffset: number,
+    pcChecksumOffset: number,
+    boxNamesOffset: number
+  ) {
     this.bytes = bytes
     this.filePath = path
     if (bytes.length === SIZE_USUM) {
@@ -73,7 +76,7 @@ export abstract class G7SAV implements SAV<PK7> {
 
     this.boxes = Array(BOX_COUNT)
     for (let box = 0; box < BOX_COUNT; box++) {
-      const boxName = utf16BytesToString(this.bytes, this.boxNamesOffset + 34 * box, 17)
+      const boxName = utf16BytesToString(this.bytes, boxNamesOffset + 34 * box, 17)
       this.boxes[box] = new Box(boxName, 30)
     }
 

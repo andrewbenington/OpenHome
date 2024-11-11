@@ -9,11 +9,13 @@ import { gen12StringToUTF, utf16StringToGen12 } from '../../util/Strings/StringC
 import { OHPKM } from '../pkm/OHPKM'
 import { Box, BoxCoordinates, SAV } from './SAV'
 import { ParsedPath } from './path'
+import { LOOKUP_TYPE } from './util'
 
 export class G1SAV implements SAV<PK1> {
   static pkmType = PK1
 
   static transferRestrictions = GEN1_TRANSFER_RESTRICTIONS
+  static lookupType: LOOKUP_TYPE = 'gen12'
 
   NUM_BOXES = 14
 
@@ -215,5 +217,9 @@ export class G1SAV implements SAV<PK1> {
 
   getCurrentBox() {
     return this.boxes[this.currentPCBox]
+  }
+
+  static fileIsSave(_: Uint8Array): boolean {
+    return false
   }
 }

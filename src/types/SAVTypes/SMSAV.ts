@@ -6,13 +6,19 @@ import { ParsedPath } from './path'
 const PC_OFFSET = 0x04e00
 const METADATA_OFFSET = 0x6be00 - 0x200
 const PC_CHECKSUM_OFFSET = METADATA_OFFSET + 0x14 + 14 * 8 + 6
+const BOX_NAMES_OFFSET: number = 0x04800
+const SAVE_SIZE_BYTES = 0x6be00
 
 export class SMSAV extends G7SAV {
   constructor(path: ParsedPath, bytes: Uint8Array) {
-    super(path, bytes, PC_OFFSET, PC_CHECKSUM_OFFSET)
+    super(path, bytes, PC_OFFSET, PC_CHECKSUM_OFFSET, BOX_NAMES_OFFSET)
   }
 
   supportsMon(dexNumber: number, formeNumber: number): boolean {
     return !isRestricted(SM_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)
+  }
+
+  static fileIsSave(bytes: Uint8Array): boolean {
+    return bytes.length === SAVE_SIZE_BYTES
   }
 }

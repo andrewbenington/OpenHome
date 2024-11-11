@@ -2,22 +2,25 @@ import { uniq } from 'lodash'
 import { PK2 } from 'pokemon-files'
 import { GameOfOrigin, Languages } from 'pokemon-resources'
 import { NationalDex } from 'pokemon-species-data'
-import { EXCLAMATION } from '../../consts'
+import { EXCLAMATION } from '../../consts/Formes'
 import { GEN2_TRANSFER_RESTRICTIONS } from '../../consts/TransferRestrictions'
 import { bytesToUint16BigEndian, get8BitChecksum } from '../../util/ByteLogic'
 import { gen12StringToUTF, utf16StringToGen12 } from '../../util/Strings/StringConverter'
 import { OHPKM } from '../pkm/OHPKM'
 import { Box, BoxCoordinates, SAV } from './SAV'
-import { ParsedPath } from './path'
+import { emptyParsedPath, ParsedPath } from './path'
+import { LOOKUP_TYPE } from './util'
 
 const CURRENT_BOX_OFFSET_GS_INTL = 0x2724
 const CURRENT_BOX_OFFSET_C_INTL = 0x2700
+const SAVE_SIZE_BYTES = 0x8000
 
 export class G2SAV implements SAV<PK2> {
   static pkmType = PK2
   boxOffsets: number[]
 
   static transferRestrictions = GEN2_TRANSFER_RESTRICTIONS
+  static lookupType: LOOKUP_TYPE = 'gen12'
 
   origin: GameOfOrigin = 0
 
@@ -237,5 +240,17 @@ export class G2SAV implements SAV<PK2> {
 
   getCurrentBox() {
     return this.boxes[this.currentPCBox]
+  }
+
+  static fileIsSave(bytes: Uint8Array): boolean {
+    if (bytes.length != SAVE_SIZE_BYTES) {
+      return false
+    }
+    try {
+      const g2Save = new G2SAV(emptyParsedPath, bytes)
+      return g2Save.areCrystalInternationalChecksumsValid() || g2Save.areGoldSilverChecksumsValid()
+    } catch {
+      return false
+    }
   }
 }

@@ -55,7 +55,7 @@ export class HomeData implements SAV<OHPKM> {
   sid?: number = 575757
   displayID: string = '575757'
 
-  currentPCBox: number = 1
+  currentPCBox: number = 0
   boxNames: string[]
   boxes: Array<HomeBox>
 

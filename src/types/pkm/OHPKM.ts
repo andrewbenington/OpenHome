@@ -13,6 +13,8 @@ import {
   AbilityToString,
   Ball,
   GameOfOrigin,
+  Gen34ContestRibbons,
+  Gen34TowerRibbons,
   ItemFromString,
   ItemToString,
   Languages,
@@ -21,7 +23,7 @@ import {
 } from 'pokemon-resources'
 import { NationalDex } from 'pokemon-species-data'
 import Prando from 'prando'
-import { Gen34ContestRibbons, Gen34TowerRibbons, OpenHomeRibbons } from '../../consts'
+import { OpenHomeRibbons } from '../../consts/Ribbons'
 import { ShadowIDsColosseum, ShadowIDsXD } from '../../consts/ShadowIDs'
 import {
   bytesToUint16BigEndian,
