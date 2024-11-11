@@ -161,7 +161,7 @@ const Home = () => {
 
     const { gen12, gen345 } = lookupState
     const saveTypesAndChangedMons = allOpenSaves.map(
-      (save) => [save.origin, save.prepareBoxesForSaving()] as [GameOfOrigin, OHPKM[]]
+      (save) => [save.origin, save.prepareBoxesAndGetModified()] as [GameOfOrigin, OHPKM[]]
     )
     for (const [saveOrigin, changedMons] of saveTypesAndChangedMons) {
       if (isGameBoy(saveOrigin)) {

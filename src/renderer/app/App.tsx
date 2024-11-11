@@ -2,7 +2,7 @@ import { Box, Tab, TabList, TabPanel, Tabs, Typography } from '@mui/joy'
 import { extendTheme, ThemeProvider } from '@mui/joy/styles'
 import { useMemo, useReducer } from 'react'
 import 'react-data-grid/lib/styles.css'
-import { SaveType } from 'src/types/types'
+import { HomeData } from '../../types/SAVTypes/HomeData'
 import { BackendProvider } from '../backend/backendProvider'
 import { ElectronBackend } from '../backend/electronBackend'
 import useIsDarkMode from '../hooks/dark-mode'
@@ -52,7 +52,7 @@ function App() {
                   openSavesDispatch,
                   Object.values(openSavesState.openSaves)
                     .filter((data) => !!data)
-                    .filter((data) => data.save.saveType !== SaveType.OPENHOME)
+                    .filter((data) => !(data.save instanceof HomeData))
                     .sort((a, b) => a.index - b.index)
                     .map((data) => data.save),
                 ]}

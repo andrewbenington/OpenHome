@@ -352,5 +352,5 @@ export interface SAVClass {
 export type PKMTypeOf<Type> = Type extends SAV<infer X> ? X : never
 
 export function supportsMon(saveType: SAVClass, dexNumber: number, formeNumber: number): boolean {
-  return new saveType(emptyParsedPath, new Uint8Array()).supportsMon(dexNumber, formeNumber)
+  return saveType.prototype.supportsMon(dexNumber, formeNumber)
 }
