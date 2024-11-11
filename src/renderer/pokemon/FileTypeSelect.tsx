@@ -1,6 +1,6 @@
 import { uniq } from 'lodash'
 import { useMemo } from 'react'
-import { ALL_SAVE_TYPES } from 'src/types/SAVTypes/util'
+import { ALL_SAVE_TYPES, supportsMon } from 'src/types/SAVTypes/util'
 import { isRestricted } from 'src/types/TransferRestrictions'
 import { PKMFormData } from 'src/types/interfaces/base'
 import { Styles } from 'src/types/types'
@@ -55,7 +55,7 @@ const FileTypeSelect = (props: FileTypeSelectProps) => {
   const supportedFormats = useMemo(() => {
     const supportedFormats = uniq(
       ALL_SAVE_TYPES.map((saveType) =>
-        !isRestricted(saveType.transferRestrictions, formData.dexNum, formData.formeNum)
+        supportsMon(saveType, formData.dexNum, formData.formeNum)
           ? saveType.pkmType.name.slice(1) // hack to get the class name (slice(1) removes the underscore prefix)
           : undefined
       )

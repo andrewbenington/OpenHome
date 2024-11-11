@@ -1,10 +1,6 @@
 import { PK7 } from 'pokemon-files'
 import { GameOfOrigin } from 'pokemon-resources'
 import {
-  SM_TRANSFER_RESTRICTIONS,
-  USUM_TRANSFER_RESTRICTIONS,
-} from '../../consts/TransferRestrictions'
-import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
   uint16ToBytesLittleEndian,
@@ -12,60 +8,69 @@ import {
 import { CRC16_Invert, SignWithMemeCrypto } from '../../util/Encryption'
 import { utf16BytesToString } from '../../util/Strings/StringConverter'
 import { OHPKM } from '../pkm/OHPKM'
-import { Box, SAV } from './SAV'
+import { Box, BoxCoordinates, SAV } from './SAV'
 import { ParsedPath } from './path'
 import { SIZE_USUM } from './util'
 
-const SM_PC_OFFSET = 0x04e00
-const SM_METADATA_OFFSET = 0x6be00 - 0x200
-const SM_PC_CHECKSUM_OFFSET = SM_METADATA_OFFSET + 0x14 + 14 * 8 + 6
-const USUM_PC_OFFSET = 0x05200
-const USUM_METADATA_OFFSET = 0x6cc00 - 0x200
-const USUM_PC_CHECKSUM_OFFSET = USUM_METADATA_OFFSET + 0x14 + 14 * 8 + 6
 const SM_BOX_NAMES_OFFSET: number = 0x04800
 const USUM_BOX_NAMES_OFFSET: number = 0x04c00
 const BOX_SIZE: number = 232 * 30
 const BOX_COUNT = 32
 
-export abstract class G7SAV extends SAV<PK7> {
+export abstract class G7SAV implements SAV<PK7> {
   static pkmType = PK7
 
-  trainerDataOffset: number = 0x1200
+  origin: GameOfOrigin = 0
+
+  boxRows = 5
+  boxColumns = 6
+
+  filePath: ParsedPath
+  fileCreated?: Date
+
+  money: number = 0 // TODO: Gen 6 money
+  name: string = ''
+  tid: number = 0
+  sid: number = 0
+  displayID: string = ''
+
+  currentPCBox: number = 0 // TODO: Gen 6 current box
 
   boxes: Array<Box<PK7>>
 
+  bytes: Uint8Array
+
+  invalid: boolean = false
+  tooEarlyToOpen: boolean = false
+
+  updatedBoxSlots: BoxCoordinates[] = []
+
+  trainerDataOffset: number = 0x1200
+
   boxChecksumOffset: number = 0x75fda
 
-  pcOffset = SM_PC_OFFSET
+  pcOffset: number
   pcSize = 0x36600
-  pcChecksumOffset = SM_PC_CHECKSUM_OFFSET
+  pcChecksumOffset: number
   boxNamesOffset = SM_BOX_NAMES_OFFSET
 
-  constructor(path: ParsedPath, bytes: Uint8Array) {
-    super(path, bytes)
+  constructor(path: ParsedPath, bytes: Uint8Array, pcOffset: number, pcChecksumOffset: number) {
+    this.bytes = bytes
+    this.filePath = path
     if (bytes.length === SIZE_USUM) {
       this.trainerDataOffset = 0x1400
     }
     this.name = utf16BytesToString(this.bytes, this.trainerDataOffset + 0x38, 0x10)
+
     const fullTrainerID = bytesToUint32LittleEndian(this.bytes, this.trainerDataOffset)
     this.tid = fullTrainerID % 1000000
     this.sid = bytesToUint16LittleEndian(this.bytes, this.trainerDataOffset + 2)
     this.currentPCBox = this.bytes[0] < 32 ? this.bytes[0] : 0
     this.displayID = this.tid.toString().padStart(6, '0')
     this.origin = this.bytes[this.trainerDataOffset + 4]
-    switch (this.origin) {
-      case GameOfOrigin.Sun:
-      case GameOfOrigin.Moon:
-        this.transferRestrictions = SM_TRANSFER_RESTRICTIONS
-        break
-      case GameOfOrigin.UltraMoon:
-      case GameOfOrigin.UltraSun:
-        this.transferRestrictions = USUM_TRANSFER_RESTRICTIONS
-        this.pcOffset = USUM_PC_OFFSET
-        this.pcChecksumOffset = USUM_PC_CHECKSUM_OFFSET
-        this.boxNamesOffset = USUM_BOX_NAMES_OFFSET
-        break
-    }
+    this.pcOffset = pcOffset
+    this.pcChecksumOffset = pcChecksumOffset
+
     this.boxes = Array(BOX_COUNT)
     for (let box = 0; box < BOX_COUNT; box++) {
       const boxName = utf16BytesToString(this.bytes, this.boxNamesOffset + 34 * box, 17)
@@ -89,7 +94,7 @@ export abstract class G7SAV extends SAV<PK7> {
     }
   }
 
-  prepareBoxesForSaving() {
+  prepareBoxesAndGetModified() {
     const changedMonPKMs: OHPKM[] = []
     this.updatedBoxSlots.forEach(({ box, index }) => {
       const changedMon = this.boxes[box].pokemon[index]
@@ -122,7 +127,13 @@ export abstract class G7SAV extends SAV<PK7> {
     return changedMonPKMs
   }
 
+  abstract supportsMon(dexNumber: number, formeNumber: number): boolean
+
   calculateChecksum(): number {
     return CRC16_Invert(this.bytes, this.pcOffset, this.pcSize)
+  }
+
+  getCurrentBox() {
+    return this.boxes[this.currentPCBox]
   }
 }

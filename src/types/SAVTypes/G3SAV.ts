@@ -1,5 +1,6 @@
 import { PK3 } from 'pokemon-files'
 import { GameOfOrigin } from 'pokemon-resources'
+import { NationalDex } from 'pokemon-species-data'
 import { GEN3_TRANSFER_RESTRICTIONS } from '../../consts/TransferRestrictions'
 import {
   bytesToUint16LittleEndian,
@@ -9,8 +10,7 @@ import {
 } from '../../util/ByteLogic'
 import { gen3StringToUTF } from '../../util/Strings/StringConverter'
 import { OHPKM } from '../pkm/OHPKM'
-import { SaveType } from '../types'
-import { Box, SAV } from './SAV'
+import { Box, BoxCoordinates, SAV } from './SAV'
 import { ParsedPath, splitPath } from './path'
 
 export class G3Sector {
@@ -88,10 +88,6 @@ export class G3SaveBackup {
 
   boxes = new Array<Box<PK3>>(14)
 
-  boxNames: string[]
-
-  saveType: SaveType
-
   firstSectorIndex: number = 0
 
   constructor(bytes: Uint8Array) {
@@ -116,7 +112,7 @@ export class G3SaveBackup {
       }
     })
     this.currentPCBox = this.pcDataContiguous[0]
-    this.boxNames = []
+
     for (let i = 0; i < 14; i++) {
       this.boxes[i] = new Box(gen3StringToUTF(this.pcDataContiguous, 0x8344 + i * 9, 10), 30)
     }
@@ -133,16 +129,16 @@ export class G3SaveBackup {
     }
     switch (bytesToUint32LittleEndian(this.sectors[0].data, 0xac)) {
       case 0:
-        this.saveType = SaveType.RS
+        this.origin = GameOfOrigin.Ruby
         this.money = bytesToUint32LittleEndian(this.sectors[1].data, 0x490)
         break
       case 1:
-        this.saveType = SaveType.FRLG
+        this.origin = GameOfOrigin.FireRed
         this.securityKey = bytesToUint32LittleEndian(this.sectors[0].data, 0xaf8)
         this.money = bytesToUint32LittleEndian(this.sectors[1].data, 0x290) ^ this.securityKey
         break
       default:
-        this.saveType = SaveType.E
+        this.origin = GameOfOrigin.Emerald
         this.securityKey = bytesToUint32LittleEndian(this.sectors[0].data, 0xac)
         this.money = bytesToUint32LittleEndian(this.sectors[1].data, 0x490) ^ this.securityKey
         break
@@ -153,8 +149,7 @@ export class G3SaveBackup {
   }
 }
 
-export class G3SAV extends SAV<PK3> {
-  saveType: SaveType
+export class G3SAV implements SAV<PK3> {
   static pkmType = PK3
 
   static transferRestrictions = GEN3_TRANSFER_RESTRICTIONS
@@ -171,8 +166,33 @@ export class G3SAV extends SAV<PK3> {
 
   primarySaveOffset: number
 
+  origin: GameOfOrigin
+
+  boxRows = 5
+  boxColumns = 6
+
+  filePath: ParsedPath
+  fileCreated?: Date
+
+  money: number
+  name: string
+  tid: number
+  sid: number
+  displayID: string
+
+  currentPCBox: number
+  boxes: Array<Box<PK3>>
+
+  bytes: Uint8Array
+
+  invalid: boolean = false
+  tooEarlyToOpen: boolean = false
+
+  updatedBoxSlots: BoxCoordinates[] = []
+
   constructor(path: ParsedPath, bytes: Uint8Array) {
-    super(path, bytes)
+    this.bytes = bytes
+    this.filePath = path
     const saveOne = new G3SaveBackup(bytes.slice(0, 0xe000))
     const saveTwo = new G3SaveBackup(bytes.slice(0xe000, 0x1c000))
     if (saveOne.saveIndex > saveTwo.saveIndex) {
@@ -184,7 +204,6 @@ export class G3SAV extends SAV<PK3> {
       this.backupSave = saveOne
       this.primarySaveOffset = 0xe000
     }
-    this.saveType = this.primarySave.saveType
     this.currentPCBox = this.primarySave.currentPCBox
     this.money = this.primarySave.money
     this.name = this.primarySave.name
@@ -193,45 +212,46 @@ export class G3SAV extends SAV<PK3> {
     this.sid = this.primarySave.sid
     this.currentPCBox = this.primarySave.currentPCBox
     this.boxes = this.primarySave.boxes
-    this.boxNames = this.primarySave.boxNames
-    if (this.saveType === SaveType.E) {
-      this.origin = GameOfOrigin.Emerald
-      return
-    }
+
     // hacky way to detect save version
-    this.boxes.forEach((box) => {
-      box.pokemon.forEach((mon) => {
-        if (
+    // TODO: make more robust
+    const trainerMon = this.boxes
+      .flatMap((box) => box.pokemon)
+      .find(
+        (mon) =>
           mon &&
           mon.trainerID === this.tid &&
           mon.secretID === this.sid &&
           mon.trainerName === this.name
-        ) {
-          this.origin = mon.gameOfOrigin
-        }
-      })
-    })
-    const filePathElements = splitPath(this.filePath)
-    let fileName = filePathElements[filePathElements.length - 1]
-    fileName = fileName.replace(/\s+/g, '')
-    if (fileName.includes('Ruby')) {
-      this.origin = GameOfOrigin.Ruby
-      return
-    }
-    if (fileName.includes('Sapphire')) {
-      this.origin = GameOfOrigin.Sapphire
-      return
-    }
-    if (fileName.includes('FireRed')) {
-      this.origin = GameOfOrigin.FireRed
-      return
-    }
-    if (fileName.includes('LeafGreen')) {
-      this.origin = GameOfOrigin.LeafGreen
+      )
+
+    if (trainerMon) {
+      this.origin = trainerMon?.gameOfOrigin
+    } else {
+      const filePathElements = splitPath(this.filePath)
+      let fileName = filePathElements[filePathElements.length - 1]
+      fileName = fileName.replace(/\s+/g, '')
+      if (fileName.includes('Ruby')) {
+        this.origin = GameOfOrigin.Ruby
+        return
+      }
+      if (fileName.includes('Sapphire')) {
+        this.origin = GameOfOrigin.Sapphire
+        return
+      }
+      if (fileName.includes('FireRed')) {
+        this.origin = GameOfOrigin.FireRed
+        return
+      }
+      if (fileName.includes('LeafGreen')) {
+        this.origin = GameOfOrigin.LeafGreen
+      } else {
+        this.origin = this.primarySave.origin
+      }
     }
   }
 
-  prepareBoxesForSaving() {
+  prepareBoxesAndGetModified() {
     const changedMonPKMs: OHPKM[] = []
     this.updatedBoxSlots.forEach(({ box, index }) => {
       const monOffset = 30 * box + index
@@ -270,5 +290,13 @@ export class G3SAV extends SAV<PK3> {
     })
     this.bytes.set(this.primarySave.bytes, this.primarySaveOffset)
     return changedMonPKMs
+  }
+
+  supportsMon(dexNumber: number, formeNumber: number) {
+    return dexNumber <= NationalDex.Deoxys && (formeNumber == 0 || dexNumber === NationalDex.Unown)
+  }
+
+  getCurrentBox() {
+    return this.boxes[this.currentPCBox]
   }
 }

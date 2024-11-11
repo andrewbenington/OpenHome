@@ -8,8 +8,6 @@ import AttributeRow from 'src/renderer/pokemon/AttributeRow'
 import { MouseContext } from 'src/renderer/state/mouse'
 import { MonLocation, OpenSavesContext } from 'src/renderer/state/openSaves'
 import { PKMFile } from '../../../types/pkm/util'
-import { isRestricted } from '../../../types/TransferRestrictions'
-import { getSaveTypeString } from '../../../types/types'
 import ArrowButton from './ArrowButton'
 import BoxCell from './BoxCell'
 
@@ -61,11 +59,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
 
   const isDisabled = useMemo(() => {
     return mouseState.dragSource
-      ? isRestricted(
-          save.transferRestrictions,
-          mouseState.dragSource.mon.dexNum,
-          mouseState.dragSource.mon.formeNum
-        )
+      ? save.supportsMon(mouseState.dragSource.mon.dexNum, mouseState.dragSource.mon.formeNum)
       : false
   }, [save, mouseState.dragSource])
 
@@ -93,9 +87,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
             }}
           >
             <div style={{ textAlign: 'center', fontWeight: 'bold' }}>
-              {save.origin
-                ? `Pokémon ${GameOfOriginData[save.origin]?.name}`
-                : getSaveTypeString(save.saveType)}
+              Pokémon {GameOfOriginData[save.origin]?.name}
             </div>
             <div style={{ textAlign: 'center' }}>
               {save?.name} ({save?.displayID})
@@ -210,11 +202,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
             gap: 0,
           }}
         >
-          <AttributeRow label="Game">
-            {save.origin
-              ? `Pokémon ${GameOfOriginData[save.origin]?.name}`
-              : getSaveTypeString(save.saveType)}
-          </AttributeRow>
+          <AttributeRow label="Game">Pokémon {GameOfOriginData[save.origin]?.name}</AttributeRow>
           <AttributeRow label="Trainer Name">{save.name}</AttributeRow>
           <AttributeRow label="Trainer ID">{save.displayID}</AttributeRow>
           {save.sid && (
@@ -232,7 +220,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
               </div>
             </AttributeRow>
           )}
-          {save.calculateChecksum() !== -1 && (
+          {save.calculateChecksum && (
             <AttributeRow label="Checksum">
               <code>0x{save.calculateChecksum().toString(16)}</code>
             </AttributeRow>

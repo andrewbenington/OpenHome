@@ -1,22 +1,50 @@
 import { uniq } from 'lodash'
 import { PK2 } from 'pokemon-files'
 import { GameOfOrigin, Languages } from 'pokemon-resources'
+import { NationalDex } from 'pokemon-species-data'
+import { EXCLAMATION } from '../../consts'
 import { GEN2_TRANSFER_RESTRICTIONS } from '../../consts/TransferRestrictions'
-import { SaveType } from '../../types/types'
 import { bytesToUint16BigEndian, get8BitChecksum } from '../../util/ByteLogic'
 import { gen12StringToUTF, utf16StringToGen12 } from '../../util/Strings/StringConverter'
 import { OHPKM } from '../pkm/OHPKM'
-import { Box, SAV } from './SAV'
+import { Box, BoxCoordinates, SAV } from './SAV'
 import { ParsedPath } from './path'
 
-export class G2SAV extends SAV<PK2> {
+const CURRENT_BOX_OFFSET_GS_INTL = 0x2724
+const CURRENT_BOX_OFFSET_C_INTL = 0x2700
+
+export class G2SAV implements SAV<PK2> {
   static pkmType = PK2
   boxOffsets: number[]
 
   static transferRestrictions = GEN2_TRANSFER_RESTRICTIONS
 
+  origin: GameOfOrigin = 0
+
+  boxRows = 4
+  boxColumns = 5
+
+  filePath: ParsedPath
+  fileCreated?: Date
+
+  money: number = 0 // TODO: set money for gen 2 saves
+  name: string
+  tid: number
+  displayID: string
+
+  currentPCBox: number
+  boxes: Array<Box<PK2>>
+
+  bytes: Uint8Array
+
+  invalid: boolean = false
+  tooEarlyToOpen: boolean = false
+
+  updatedBoxSlots: BoxCoordinates[] = []
+
   constructor(path: ParsedPath, bytes: Uint8Array, fileCreated?: Date) {
-    super(path, bytes)
+    this.bytes = bytes
+    this.filePath = path
     this.fileCreated = fileCreated
     this.tid = bytesToUint16BigEndian(this.bytes, 0x2009)
     this.displayID = this.tid.toString().padStart(5, '0')
@@ -27,60 +55,52 @@ export class G2SAV extends SAV<PK2> {
     ]
     this.boxes = []
     if (this.areGoldSilverChecksumsValid()) {
-      this.saveType = SaveType.GS_I
+      this.origin = GameOfOrigin.Silver // TODO: detect gold vs silver
     } else if (this.areCrystalInternationalChecksumsValid()) {
-      this.saveType = SaveType.C_I
       this.origin = GameOfOrigin.Crystal
     }
-    switch (this.saveType) {
-      case SaveType.GS_I:
-      case SaveType.C_I:
-        this.boxRows = 4
-        this.boxColumns = 5
-        break
-      default:
-        this.invalid = true
-        return
-    }
-    this.boxes = new Array(this.boxOffsets.length)
-    if (this.saveType >= SaveType.GS_I && this.saveType <= SaveType.C_I) {
-      const pokemonPerBox = this.boxRows * this.boxColumns
-      this.boxOffsets.forEach((offset, boxNumber) => {
-        const monCount = bytes[offset]
-        this.boxes[boxNumber] = new Box(`Box ${boxNumber + 1}`, pokemonPerBox)
-        for (let monIndex = 0; monIndex < monCount; monIndex++) {
-          const mon = new PK2(
-            this.bytes.slice(
-              offset + 1 + pokemonPerBox + 1 + monIndex * 0x20,
-              offset + 1 + pokemonPerBox + 1 + (monIndex + 1) * 0x20
-            ).buffer
-          )
-          mon.trainerName = gen12StringToUTF(
-            this.bytes,
-            offset + 1 + pokemonPerBox + 1 + pokemonPerBox * 0x20 + monIndex * 11,
-            11
-          )
-          mon.nickname = gen12StringToUTF(
-            this.bytes,
-            offset +
-              1 +
-              pokemonPerBox +
-              1 +
-              pokemonPerBox * 0x20 +
-              pokemonPerBox * 11 +
-              monIndex * 11,
-            11
-          )
-          mon.gameOfOrigin =
-            this.saveType === SaveType.GS_I ? GameOfOrigin.Silver : GameOfOrigin.Crystal
-          mon.languageIndex = Languages.indexOf('ENG')
-          this.boxes[boxNumber].pokemon[monIndex] = mon
-        }
-      })
-    }
+
+    this.currentPCBox =
+      this.origin === GameOfOrigin.Crystal
+        ? this.bytes[CURRENT_BOX_OFFSET_C_INTL]
+        : this.bytes[CURRENT_BOX_OFFSET_GS_INTL]
+
+    this.boxes = new Array<Box<PK2>>(this.boxOffsets.length)
+
+    const pokemonPerBox = this.boxRows * this.boxColumns
+    this.boxOffsets.forEach((offset, boxNumber) => {
+      const monCount = bytes[offset]
+      this.boxes[boxNumber] = new Box(`Box ${boxNumber + 1}`, pokemonPerBox)
+      for (let monIndex = 0; monIndex < monCount; monIndex++) {
+        const mon = new PK2(
+          this.bytes.slice(
+            offset + 1 + pokemonPerBox + 1 + monIndex * 0x20,
+            offset + 1 + pokemonPerBox + 1 + (monIndex + 1) * 0x20
+          ).buffer
+        )
+        mon.trainerName = gen12StringToUTF(
+          this.bytes,
+          offset + 1 + pokemonPerBox + 1 + pokemonPerBox * 0x20 + monIndex * 11,
+          11
+        )
+        mon.nickname = gen12StringToUTF(
+          this.bytes,
+          offset +
+            1 +
+            pokemonPerBox +
+            1 +
+            pokemonPerBox * 0x20 +
+            pokemonPerBox * 11 +
+            monIndex * 11,
+          11
+        )
+        mon.languageIndex = Languages.indexOf('ENG')
+        this.boxes[boxNumber].pokemon[monIndex] = mon
+      }
+    })
   }
 
-  prepareBoxesForSaving() {
+  prepareBoxesAndGetModified() {
     const changedMonPKMs: OHPKM[] = []
     const changedBoxes = uniq(this.updatedBoxSlots.map((coords) => coords.box))
     const pokemonPerBox = this.boxRows * this.boxColumns
@@ -153,12 +173,13 @@ export class G2SAV extends SAV<PK2> {
       // add terminator
       this.bytes[boxByteOffset + 1 + numMons] = 0xff
     })
-    switch (this.saveType) {
-      case SaveType.GS_I:
+    switch (this.origin) {
+      case GameOfOrigin.Gold:
+      case GameOfOrigin.Silver:
         this.bytes[0x2d69] = this.getGoldSilverInternationalChecksum1()
         this.bytes[0x7e6d] = this.getGoldSilverInternationalChecksum2()
         break
-      case SaveType.C_I:
+      case GameOfOrigin.Crystal:
         this.bytes.set(this.bytes.slice(0x2009, 0x2b82), 0x1209)
         this.bytes[0x2d0d] = this.getCrystalInternationalChecksum1()
         this.bytes[0x1f0d] = this.getCrystalInternationalChecksum2()
@@ -205,5 +226,16 @@ export class G2SAV extends SAV<PK2> {
     }
     const checksum2 = this.getCrystalInternationalChecksum2()
     return checksum2 === this.bytes[0x1f0d]
+  }
+
+  supportsMon(dexNumber: number, formeNumber: number) {
+    return (
+      (dexNumber <= NationalDex.Celebi && formeNumber == 0) ||
+      (dexNumber === NationalDex.Unown && formeNumber < EXCLAMATION)
+    )
+  }
+
+  getCurrentBox() {
+    return this.boxes[this.currentPCBox]
   }
 }

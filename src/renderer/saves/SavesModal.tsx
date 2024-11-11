@@ -12,6 +12,7 @@ import * as E from 'fp-ts/lib/Either'
 import { useCallback, useContext, useState } from 'react'
 import 'react-data-grid/lib/styles.css'
 import { ParsedPath } from 'src/types/SAVTypes/path'
+import { getSaveRef } from '../../types/SAVTypes/SAV'
 import { buildSaveFile } from '../../types/SAVTypes/util'
 import { BackendContext } from '../backend/backendProvider'
 import { CardsIcon, GridIcon } from '../components/Icons'
@@ -55,7 +56,7 @@ const SavesModal = (props: SavesModalProps) => {
                 return
               }
               onClose()
-              backend.addRecentSave(saveFile.getSaveRef())
+              backend.addRecentSave(getSaveRef(saveFile))
               dispatchOpenSaves({ type: 'add_save', payload: saveFile })
             }
           }

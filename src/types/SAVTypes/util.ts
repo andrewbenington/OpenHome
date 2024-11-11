@@ -1,4 +1,4 @@
-import { PK2, PK3, PK4, PK5, PK6, PK7, PKM } from 'pokemon-files'
+import { AllPKMFields, PK2, PK3, PK4, PK5, PK6, PK7, PKM } from 'pokemon-files'
 import { GameOfOrigin } from 'pokemon-resources'
 import { bytesToUint32LittleEndian, bytesToUint64LittleEndian } from '../../util/ByteLogic'
 import {
@@ -325,7 +325,7 @@ export const GameColors: Record<GameOfOrigin, string> = {
   [GameOfOrigin.Violet]: '#8334B7',
 }
 
-export const ALL_SAVE_TYPES = [
+export const ALL_SAVE_TYPES: SAVClass[] = [
   G1SAV,
   G2SAV,
   G3SAV,
@@ -340,6 +340,17 @@ export const ALL_SAVE_TYPES = [
   USUMSAV,
 ]
 
-export type SupportedSave = (typeof ALL_SAVE_TYPES)[number]
+export interface PKMClass {
+  new (arg: ArrayBuffer | AllPKMFields, encrypted?: boolean): PKM
+}
+
+export interface SAVClass {
+  new (path: ParsedPath, bytes: Uint8Array): SAV
+  pkmType: PKMClass
+}
 
 export type PKMTypeOf<Type> = Type extends SAV<infer X> ? X : never
+
+export function supportsMon(saveType: SAVClass, dexNumber: number, formeNumber: number): boolean {
+  return new saveType(emptyParsedPath, new Uint8Array()).supportsMon(dexNumber, formeNumber)
+}

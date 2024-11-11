@@ -1,15 +1,22 @@
 import { PK4 } from 'pokemon-files'
 import { GameOfOrigin } from 'pokemon-resources'
 import { PT_TRANSFER_RESTRICTIONS } from '../../consts/TransferRestrictions'
-import { SaveType } from '../../types/types'
 import { bytesToUint16LittleEndian, bytesToUint32LittleEndian } from '../../util/ByteLogic'
 import { gen4StringToUTF } from '../../util/Strings/StringConverter'
+import { isRestricted } from '../TransferRestrictions'
 import { G4SAV } from './G4SAV'
 import { ParsedPath } from './path'
 
 export class PtSAV extends G4SAV {
-  saveType = SaveType.Pt
   static pkmType = PK4
+
+  name: string
+  tid: number
+  sid: number
+  displayID: string
+
+  invalid: boolean = false
+  tooEarlyToOpen: boolean = false
 
   origin = GameOfOrigin.Platinum
 
@@ -60,5 +67,9 @@ export class PtSAV extends G4SAV {
 
   getCurrentSaveCount(blockOffset: number, blockSize: number) {
     return bytesToUint32LittleEndian(this.bytes, blockOffset + blockSize - this.footerSize)
+  }
+
+  supportsMon(dexNumber: number, formeNumber: number) {
+    return !isRestricted(PT_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)
   }
 }

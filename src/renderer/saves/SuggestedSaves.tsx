@@ -2,7 +2,7 @@ import { Stack } from '@mui/joy'
 import * as E from 'fp-ts/lib/Either'
 import { PKM } from 'pokemon-files'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
-import { SAV } from 'src/types/SAVTypes/SAV'
+import { getSaveRef, SAV } from 'src/types/SAVTypes/SAV'
 import { buildSaveFile } from 'src/types/SAVTypes/util'
 import { ParsedPath, splitPath } from '../../types/SAVTypes/path'
 import { numericSorter } from '../../util/Sort'
@@ -148,7 +148,7 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
     <Stack flexWrap="wrap" direction="row" useFlexGap justifyContent="center" margin={2}>
       {suggestedSaves?.map((save) => (
         <SaveCard
-          save={save.getSaveRef()}
+          save={getSaveRef(save)}
           onOpen={() => {
             onOpen(save.filePath)
           }}

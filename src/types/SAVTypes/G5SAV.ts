@@ -9,7 +9,7 @@ import {
 import { CRC16_CCITT } from '../../util/Encryption'
 import { gen5StringToUTF } from '../../util/Strings/StringConverter'
 import { OHPKM } from '../pkm/OHPKM'
-import { Box, SAV } from './SAV'
+import { Box, BoxCoordinates, SAV } from './SAV'
 import { ParsedPath } from './path'
 
 const PC_OFFSET = 0x400
@@ -17,13 +17,36 @@ const BOX_NAMES_OFFSET: number = 0x04
 const BOX_CHECKSUM_OFFSET: number = 0xff2
 const BOX_SIZE: number = 0x1000
 
-export abstract class G5SAV extends SAV<PK5> {
+export abstract class G5SAV implements SAV<PK5> {
+  static BOX_COUNT = 24
   static pkmType = PK5
+
+  origin: GameOfOrigin = 0
+
+  boxRows = 5
+  boxColumns = 6
+
+  filePath: ParsedPath
+  fileCreated?: Date
+
+  money: number = 0 // TODO: Gen 5 money
+  name: string = ''
+  tid: number = 0
+  sid: number = 0
+  displayID: string = ''
+
+  currentPCBox: number = 0 // TODO: Gen 5 current box
+  boxes: Array<Box<PK5>>
+
+  bytes: Uint8Array
+
+  invalid: boolean = false
+  tooEarlyToOpen: boolean = false
+
+  updatedBoxSlots: BoxCoordinates[] = []
 
   trainerDataOffset: number = 0x19400
   static originOffset = 0x1941f
-
-  boxes: Array<Box<PK5>>
 
   checksumMirrorsOffset: number = 0x23f00
 
@@ -32,17 +55,21 @@ export abstract class G5SAV extends SAV<PK5> {
   checksumMirrorsChecksumOffset: number = 0x23f9a
 
   constructor(path: ParsedPath, bytes: Uint8Array) {
-    super(path, bytes)
-    this.boxes = Array(24)
+    this.bytes = bytes
+    this.filePath = path
+    this.boxes = new Array(G5SAV.BOX_COUNT)
+
     if (bytesToUint32LittleEndian(bytes, 0) === 0xffffffff) {
       this.tooEarlyToOpen = true
       return
     }
+
     this.name = gen5StringToUTF(this.bytes, this.trainerDataOffset + 0x04, 0x10)
     this.tid = bytesToUint16LittleEndian(this.bytes, this.trainerDataOffset + 0x14)
     this.sid = bytesToUint16LittleEndian(this.bytes, this.trainerDataOffset + 0x16)
     this.currentPCBox = this.bytes[0]
     this.displayID = this.tid.toString().padStart(5, '0')
+
     this.origin = this.bytes[this.trainerDataOffset + 0x1f]
     if (this.origin >= GameOfOrigin.White2) {
       this.checksumMirrorsOffset = 0x25f00
@@ -92,10 +119,6 @@ export abstract class G5SAV extends SAV<PK5> {
   }
 
   updateMirrorsChecksum = () => {
-    // const oldChecksum = bytesToUint16LittleEndian(
-    //   this.bytes,
-    //   this.checksumMirrorsChecksumOffset
-    // );
     const newChecksum = CRC16_CCITT(
       this.bytes,
       this.checksumMirrorsOffset,
@@ -104,7 +127,7 @@ export abstract class G5SAV extends SAV<PK5> {
     this.bytes.set(uint16ToBytesLittleEndian(newChecksum), this.checksumMirrorsChecksumOffset)
   }
 
-  prepareBoxesForSaving() {
+  prepareBoxesAndGetModified() {
     const changedMonPKMs: OHPKM[] = []
     this.updatedBoxSlots.forEach(({ box, index }) => {
       const changedMon = this.boxes[box].pokemon[index]
@@ -135,5 +158,11 @@ export abstract class G5SAV extends SAV<PK5> {
     )
     this.updateMirrorsChecksum()
     return changedMonPKMs
+  }
+
+  abstract supportsMon(dexNumber: number, formeNumber: number): boolean
+
+  getCurrentBox() {
+    return this.boxes[this.currentPCBox]
   }
 }

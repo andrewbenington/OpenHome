@@ -1,10 +1,11 @@
 import lodash from 'lodash'
+import { GameOfOrigin } from 'pokemon-resources'
 import { getMonFileIdentifier } from '../../util/Lookup'
+import { TransferRestrictions } from '../TransferRestrictions'
 import { OHPKM } from '../pkm/OHPKM'
 import { BoxMonIdentifiers } from '../storage'
-import { SaveType } from '../types'
 import { Box, BoxCoordinates, SAV } from './SAV'
-import { emptyParsedPath } from './path'
+import { emptyParsedPath, ParsedPath } from './path'
 
 export class HomeBox implements Box<OHPKM> {
   name: string
@@ -37,22 +38,48 @@ export class HomeBox implements Box<OHPKM> {
   }
 }
 
-export class HomeData extends SAV<OHPKM> {
-  updatedBoxSlots: BoxCoordinates[] = []
-
-  saveType = SaveType.OPENHOME
+export class HomeData implements SAV<OHPKM> {
+  origin: GameOfOrigin = 0
 
   boxRows = 10
-
   boxColumns = 12
 
+  transferRestrictions: TransferRestrictions = {}
+
+  filePath: ParsedPath = emptyParsedPath
+  fileCreated?: Date
+
+  money: number = 0
+  name: string = 'OpenHome'
+  tid: number = 575757
+  sid?: number = 575757
+  displayID: string = '575757'
+
+  currentPCBox: number = 1
+  boxNames: string[]
   boxes: Array<HomeBox>
 
-  currentPCBox: number = 0
+  bytes: Uint8Array = new Uint8Array()
+
+  invalid: boolean = false
+  tooEarlyToOpen: boolean = false
+
+  updatedBoxSlots: BoxCoordinates[] = []
 
   constructor() {
-    super(emptyParsedPath, new Uint8Array())
     this.boxNames = lodash.range(36).map((i) => `Box ${i + 1}`)
     this.boxes = this.boxNames.map((name) => new HomeBox(name))
+  }
+
+  getCurrentBox() {
+    return this.boxes[this.currentPCBox]
+  }
+
+  prepareBoxesAndGetModified() {
+    return []
+  }
+
+  supportsMon() {
+    return true
   }
 }

@@ -1,4 +1,5 @@
 import { PK4 } from 'pokemon-files'
+import { GameOfOrigin } from 'pokemon-resources'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -7,11 +8,37 @@ import {
 import { CRC16_CCITT } from '../../util/Encryption'
 import { gen4StringToUTF } from '../../util/Strings/StringConverter'
 import { OHPKM } from '../pkm/OHPKM'
-import { Box, SAV } from './SAV'
+import { Box, BoxCoordinates, SAV } from './SAV'
 import { ParsedPath } from './path'
 
-export abstract class G4SAV extends SAV<PK4> {
+export abstract class G4SAV implements SAV<PK4> {
+  static BOX_COUNT = 18
   static pkmType = PK4
+
+  origin: GameOfOrigin = 0
+
+  boxRows = 5
+  boxColumns = 6
+
+  filePath: ParsedPath
+  fileCreated?: Date
+
+  money: number = 0 // TODO: Gen 4 money
+  abstract name: string
+  abstract tid: number
+  abstract sid: number
+  abstract displayID: string
+
+  currentPCBox: number = 0 // TODO: Gen 4 current box
+
+  boxes: Array<Box<PK4>>
+
+  bytes: Uint8Array
+
+  invalid: boolean = false
+  tooEarlyToOpen: boolean = false
+
+  updatedBoxSlots: BoxCoordinates[] = []
 
   currentSaveStorageBlockOffset: number = 0
 
@@ -26,13 +53,14 @@ export abstract class G4SAV extends SAV<PK4> {
   footerSize: number = 0x14
 
   constructor(path: ParsedPath, bytes: Uint8Array) {
-    super(path, bytes)
+    this.bytes = bytes
+    this.filePath = path
+    this.boxes = Array(G4SAV.BOX_COUNT)
     if (bytesToUint32LittleEndian(bytes, 0) === 0xffffffff) {
       this.tooEarlyToOpen = true
       return
     }
     this.origin = bytes[0x80]
-    this.boxes = Array(18)
   }
 
   buildBoxes() {
@@ -96,7 +124,7 @@ export abstract class G4SAV extends SAV<PK4> {
     )
   }
 
-  prepareBoxesForSaving() {
+  prepareBoxesAndGetModified() {
     const changedMonPKMs: OHPKM[] = []
     this.updatedBoxSlots.forEach(({ box, index }) => {
       const changedMon = this.boxes[box].pokemon[index]
@@ -125,5 +153,11 @@ export abstract class G4SAV extends SAV<PK4> {
     this.updateStorageChecksum()
 
     return changedMonPKMs
+  }
+
+  abstract supportsMon(dexNumber: number, formeNumber: number): boolean
+
+  getCurrentBox() {
+    return this.boxes[this.currentPCBox]
   }
 }

@@ -130,7 +130,7 @@ const PokemonDetailsPanel = (props: {
         <TabPanel value="raw">
           <RawDisplay
             bytes={new Uint8Array(displayMon.toBytes({ includeExtraFields: true }))}
-            format={displayMon.format === 'PK3RR' ? undefined : displayMon.format}
+            format={displayMon.format}
           />
         </TabPanel>
       </ErrorBoundary>
