@@ -288,7 +288,7 @@ export class OHPKM implements PKMInterface {
       this.handlerID = other.handlerID ?? 0
       this.statNature = other.statNature !== undefined ? other.statNature : this.nature
       this.affixedRibbon = other.affixedRibbon
-      this.homeTracker = other.homeTracker ?? new ArrayBuffer(8)
+      this.homeTracker = other.homeTracker ?? new Uint8Array(8)
       this.statNature = this.nature
 
       this.dynamaxLevel = other.dynamaxLevel ?? 0
@@ -344,7 +344,7 @@ export class OHPKM implements PKMInterface {
 
       this.teraTypeOriginal =
         other.teraTypeOriginal ?? generateTeraType(prng, this.dexNum, this.formeNum)
-      this.teraTypeOverride = other.teraTypeOverride ?? 0
+      this.teraTypeOverride = other.teraTypeOverride ?? 19
       if (other.tmFlagsSV) {
         this.tmFlagsSV = other.tmFlagsSV
       }
@@ -1383,58 +1383,58 @@ export class OHPKM implements PKMInterface {
   }
 
   public get homeTracker() {
-    return this.bytes.slice(0x13f, 0x14d + 8).buffer
+    return this.bytes.slice(0x13f, 0x14d + 8)
   }
 
-  public set homeTracker(value: ArrayBuffer) {
+  public set homeTracker(value: Uint8Array) {
     this.bytes.set(new Uint8Array(value.slice(0, 8)), 0x13f)
   }
 
   public get trFlagsSwSh() {
-    return this.bytes.slice(0x146, 0x146 + 8).buffer
+    return this.bytes.slice(0x146, 0x146 + 8)
   }
 
-  public set trFlagsSwSh(value: ArrayBuffer) {
+  public set trFlagsSwSh(value: Uint8Array) {
     this.bytes.set(new Uint8Array(value).slice(0, 14), 0x146)
   }
 
   public get tmFlagsBDSP() {
-    return this.bytes.slice(0x154, 0x154 + 14).buffer
+    return this.bytes.slice(0x154, 0x154 + 14)
   }
 
-  public set tmFlagsBDSP(value: ArrayBuffer) {
+  public set tmFlagsBDSP(value: Uint8Array) {
     this.bytes.set(new Uint8Array(value), 0x154)
   }
 
   public get moveFlagsLA() {
-    return this.bytes.slice(0x162, 0x162 + 14).buffer
+    return this.bytes.slice(0x162, 0x162 + 14)
   }
 
-  public set moveFlagsLA(value: ArrayBuffer) {
+  public set moveFlagsLA(value: Uint8Array) {
     this.bytes.set(new Uint8Array(value).slice(0, 14), 0x162)
   }
 
   public get tutorFlagsLA() {
-    return this.bytes.slice(0x170, 0x170 + 8).buffer
+    return this.bytes.slice(0x170, 0x170 + 8)
   }
 
-  public set tutorFlagsLA(value: ArrayBuffer) {
+  public set tutorFlagsLA(value: Uint8Array) {
     this.bytes.set(new Uint8Array(value).slice(0, 8), 0x170)
   }
 
   public get masterFlagsLA() {
-    return this.bytes.slice(0x178, 0x178 + 8).buffer
+    return this.bytes.slice(0x178, 0x178 + 8)
   }
 
-  public set masterFlagsLA(value: ArrayBuffer) {
+  public set masterFlagsLA(value: Uint8Array) {
     this.bytes.set(new Uint8Array(value).slice(0, 8), 0x178)
   }
 
   public get tmFlagsSV() {
-    return this.bytes.slice(0x180, 0x180 + 22).buffer
+    return this.bytes.slice(0x180, 0x180 + 22)
   }
 
-  public set tmFlagsSV(value: ArrayBuffer) {
+  public set tmFlagsSV(value: Uint8Array) {
     this.bytes.set(new Uint8Array(value).slice(0, 22), 0x180)
   }
 
@@ -1457,10 +1457,10 @@ export class OHPKM implements PKMInterface {
   }
 
   public get tmFlagsSVDLC() {
-    return this.bytes.slice(0x1a4, 0x1a4 + 13).buffer
+    return this.bytes.slice(0x1a4, 0x1a4 + 13)
   }
 
-  public set tmFlagsSVDLC(value: ArrayBuffer) {
+  public set tmFlagsSVDLC(value: Uint8Array) {
     this.bytes.set(new Uint8Array(value).slice(0, 13), 0x1a4)
   }
 
