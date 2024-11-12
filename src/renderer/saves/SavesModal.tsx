@@ -58,7 +58,8 @@ const SavesModal = (props: SavesModalProps) => {
                 },
                 appInfo.settings.allSaveTypes.filter(
                   (saveType) => appInfo.settings.enabledSaveTypes[saveType.name]
-                )
+                ),
+                (updatedMon) => backend.writeHomeMon(updatedMon.bytes)
               )
               if (!saveFile) {
                 onClose()

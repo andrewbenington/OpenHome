@@ -14,7 +14,8 @@ const recoverOHPKMData = (
   saveFile: SAV,
   getIdentifier: (_: PKMInterface) => string | undefined,
   homeMonMap?: { [key: string]: OHPKM },
-  lookupMap?: { [key: string]: string }
+  lookupMap?: { [key: string]: string },
+  updateMonCallback?: (mon: OHPKM) => void
 ): SAV => {
   if (!homeMonMap || !getIdentifier) {
     return saveFile
@@ -30,7 +31,9 @@ const recoverOHPKMData = (
         if (result) {
           const updatedOHPKM = result[1]
           updatedOHPKM.updateData(mon)
-          window.electron.ipcRenderer.send('write-ohpkm', updatedOHPKM.bytes)
+          if (updateMonCallback) {
+            updateMonCallback(updatedOHPKM)
+          }
           box.pokemon[monIndex] = updatedOHPKM
         }
       }
@@ -60,7 +63,8 @@ export const buildSaveFile = (
     gen345LookupMap?: Record<string, string>
     fileCreatedDate?: Date
   },
-  supportedSaveTypes: SAVClass[]
+  supportedSaveTypes: SAVClass[],
+  updateMonCallback?: (mon: OHPKM) => void
 ): SAV | undefined => {
   const { homeMonMap, gen12LookupMap, gen345LookupMap } = lookupMaps
   const saveType = getSaveType(fileBytes, supportedSaveTypes)
@@ -84,7 +88,8 @@ export const buildSaveFile = (
     new saveType(filePath, fileBytes),
     getIdentifier as (_: PKMInterface) => string | undefined,
     homeMonMap,
-    lookupMap
+    lookupMap,
+    updateMonCallback
   )
   return saveFile
 }
