@@ -33,7 +33,7 @@ export type AppInfoAction =
   | {
       type: 'set_savetype_enabled'
       payload: {
-        savetype: SAVClass
+        saveType: SAVClass
         enabled: boolean
       }
     }
@@ -53,9 +53,9 @@ export const appInfoReducer: Reducer<AppInfoState, AppInfoAction> = (
     case 'set_savetype_enabled': {
       const enabled = state.settings.enabledSaveTypes
       if (payload.enabled) {
-        enabled[payload.savetype.name] = true
+        enabled[payload.saveType.name] = true
       } else {
-        enabled[payload.savetype.name] = false
+        enabled[payload.saveType.name] = false
       }
       return { ...state, settings: { ...state.settings, enabledSaveTypes: enabled } }
     }

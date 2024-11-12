@@ -21,4 +21,6 @@ export class ORASSAV extends G6SAV {
   static fileIsSave(bytes: Uint8Array): boolean {
     return bytes.length === SAVE_SIZE_BYTES
   }
+
+  static saveTypeName = 'Pokémon Omega Ruby/Alpha Sapphire'
 }

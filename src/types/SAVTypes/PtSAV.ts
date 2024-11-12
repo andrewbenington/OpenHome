@@ -86,4 +86,6 @@ export class PtSAV extends G4SAV {
 
     return G4SAV.validDateAndSize(bytes, 0x4cf2c)
   }
+
+  static saveTypeName = 'Pokémon Platinum'
 }

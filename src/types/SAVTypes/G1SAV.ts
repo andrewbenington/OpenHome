@@ -228,6 +228,8 @@ export class G1SAV implements SAV<PK1> {
     return gameOfOrigin ? `Pokémon ${gameOfOrigin.name}` : '(Unknown Game)'
   }
 
+  static saveTypeName = 'Pokémon Red/Blue/Yellow (INT)'
+
   static fileIsSave(bytes: Uint8Array): boolean {
     return bytes.length === SAVE_SIZE_BYTES
   }

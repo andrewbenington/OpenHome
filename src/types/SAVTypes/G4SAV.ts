@@ -172,6 +172,8 @@ export abstract class G4SAV implements SAV<PK4> {
     return gameOfOrigin ? `Pokémon ${gameOfOrigin.name}` : '(Unknown Game)'
   }
 
+  static saveTypeName = 'Pokémon Diamond/Pearl/Platinum/HeartGold/SoulSilver'
+
   // Gen 4 saves include a size and hex "date" that can identify save type
   static validDateAndSize(bytes: Uint8Array, offset: number) {
     const size = bytesToUint32LittleEndian(bytes, offset - 0xc)

@@ -26,4 +26,6 @@ export class BWSAV extends G5SAV {
       bytes[G5SAV.originOffset] === GameOfOrigin.Black
     )
   }
+
+  static saveTypeName = 'Pokémon Black/White'
 }

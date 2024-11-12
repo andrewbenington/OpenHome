@@ -21,4 +21,6 @@ export class XYSAV extends G6SAV {
   static fileIsSave(bytes: Uint8Array): boolean {
     return bytes.length === SAVE_SIZE_BYTES
   }
+
+  static saveTypeName = 'Pokémon X/Y'
 }

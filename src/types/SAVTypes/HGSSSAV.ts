@@ -73,6 +73,8 @@ export class HGSSSAV extends G4SAV {
     return !isRestricted(HGSS_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)
   }
 
+  static saveTypeName = 'Pokémon HeartGold/SoulSilver'
+
   static fileIsSave(bytes: Uint8Array): boolean {
     if (bytes.length < G4SAV.SAVE_SIZE_BYTES) {
       return false

@@ -23,4 +23,6 @@ export class USUMSAV extends G7SAV {
   static fileIsSave(bytes: Uint8Array): boolean {
     return bytes.length === SAVE_SIZE_BYTES
   }
+
+  static saveTypeName = 'Pokémon Ultra Sun/Ultra Moon'
 }

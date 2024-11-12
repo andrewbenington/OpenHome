@@ -311,6 +311,8 @@ export class G3SAV implements SAV<PK3> {
     return gameOfOrigin ? `Pokémon ${gameOfOrigin.name}` : '(Unknown Game)'
   }
 
+  static saveTypeName = 'Pokémon Ruby/Sapphire/Emerald/FireRed/LeafGreen'
+
   static fileIsSave(bytes: Uint8Array): boolean {
     if (bytes.length !== SAVE_SIZE_BYTES) {
       return false

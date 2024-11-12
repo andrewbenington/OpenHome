@@ -21,4 +21,6 @@ export class SMSAV extends G7SAV {
   static fileIsSave(bytes: Uint8Array): boolean {
     return bytes.length === SAVE_SIZE_BYTES
   }
+
+  static saveTypeName: string = 'Pokémon Sun/Moon'
 }

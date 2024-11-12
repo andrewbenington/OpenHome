@@ -74,6 +74,7 @@ export interface SAVClass {
   pkmType: PKMClass
   fileIsSave: (bytes: Uint8Array) => boolean
   lookupType?: 'gen12' | 'gen345'
+  saveTypeName: string
 }
 
 export type PKMTypeOf<Type> = Type extends SAV<infer X> ? X : never

@@ -252,6 +252,8 @@ export class G2SAV implements SAV<PK2> {
     return gameOfOrigin ? `Pokémon ${gameOfOrigin.name}` : '(Unknown Game)'
   }
 
+  static saveTypeName = 'Pokémon Gold/Silver/Crystal (INT)'
+
   static fileIsSave(bytes: Uint8Array): boolean {
     if (bytes.length != SAVE_SIZE_BYTES) {
       return false

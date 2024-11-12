@@ -285,6 +285,8 @@ export class G3RRSAV implements SAV<PK3RR> {
     return 'Pokémon Radical Red'
   }
 
+  static saveTypeName = 'Pokémon Radical Red'
+
   static fileIsSave(bytes: Uint8Array): boolean {
     if (bytes.length !== SAVE_SIZE_BYTES) {
       return false
