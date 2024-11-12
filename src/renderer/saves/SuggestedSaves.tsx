@@ -1,13 +1,13 @@
 import { Stack } from '@mui/joy'
 import * as E from 'fp-ts/lib/Either'
-import { PKM } from 'pokemon-files'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
-import { SAV } from 'src/types/SAVTypes'
-import { buildSaveFile } from 'src/types/SAVTypes/util'
+import { getSaveRef, SAV } from 'src/types/SAVTypes/SAV'
+import { buildSaveFile } from 'src/types/SAVTypes/load'
 import { ParsedPath, splitPath } from '../../types/SAVTypes/path'
 import { numericSorter } from '../../util/Sort'
 import { BackendContext } from '../backend/backendProvider'
 import OHDataGrid, { SortableColumn } from '../components/OHDataGrid'
+import { AppInfoContext } from '../state/appInfo'
 import { LookupContext } from '../state/lookup'
 import { OpenSavesContext } from '../state/openSaves'
 import SaveCard from './SaveCard'
@@ -22,7 +22,8 @@ interface SaveFileSelectorProps {
 export default function SuggestedSaves(props: SaveFileSelectorProps) {
   const { onOpen, view, cardSize } = props
   const backend = useContext(BackendContext)
-  const [suggestedSaves, setSuggestedSaves] = useState<SAV<PKM>[]>()
+  const [appInfo] = useContext(AppInfoContext)
+  const [suggestedSaves, setSuggestedSaves] = useState<SAV[]>()
   const [{ homeMons: homeMonMap, gen12: gen12LookupMap, gen345: gen345LookupMap }] =
     useContext(LookupContext)
   const [, , openSaves] = useContext(OpenSavesContext)
@@ -37,12 +38,19 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
       const response = await backend.loadSaveFile(savePath)
       if (E.isRight(response)) {
         const { fileBytes, createdDate } = response.right
-        return buildSaveFile(savePath, fileBytes, {
-          homeMonMap,
-          gen12LookupMap,
-          gen345LookupMap,
-          fileCreatedDate: createdDate,
-        })
+        return buildSaveFile(
+          savePath,
+          fileBytes,
+          {
+            homeMonMap,
+            gen12LookupMap,
+            gen345LookupMap,
+            fileCreatedDate: createdDate,
+          },
+          appInfo.settings.allSaveTypes.filter(
+            (saveType) => appInfo.settings.enabledSaveTypes[saveType.name]
+          )
+        )
       }
       return undefined
     },
@@ -148,7 +156,7 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
     <Stack flexWrap="wrap" direction="row" useFlexGap justifyContent="center" margin={2}>
       {suggestedSaves?.map((save) => (
         <SaveCard
-          save={save.getSaveRef()}
+          save={getSaveRef(save)}
           onOpen={() => {
             onOpen(save.filePath)
           }}

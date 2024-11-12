@@ -1,13 +1,13 @@
 import { Card, Modal, Tab, tabClasses, TabList, TabPanel, Tabs } from '@mui/joy'
 import { useState } from 'react'
-import { PKMFile } from '../../../types/pkm/util'
+import { PKMInterface } from '../../../types/interfaces'
 import PokemonDetailsPanel from '../../pokemon/PokemonDetailsPanel'
 import Gen12Lookup from './Gen12Lookup'
 import Gen345Lookup from './Gen345Lookup'
 import OpenHomeMonList from './OpenHomeMonList'
 
 export default function TrackedPokemon() {
-  const [selectedMon, setSelectedMon] = useState<PKMFile>()
+  const [selectedMon, setSelectedMon] = useState<PKMInterface>()
   const [pokemonDisplayTab, setPokemonDisplayTab] = useState('summary')
 
   return (

@@ -12,9 +12,11 @@ import * as E from 'fp-ts/lib/Either'
 import { useCallback, useContext, useState } from 'react'
 import 'react-data-grid/lib/styles.css'
 import { ParsedPath } from 'src/types/SAVTypes/path'
-import { buildSaveFile } from '../../types/SAVTypes/util'
+import { getSaveRef } from '../../types/SAVTypes/SAV'
+import { buildSaveFile } from '../../types/SAVTypes/load'
 import { BackendContext } from '../backend/backendProvider'
 import { CardsIcon, GridIcon } from '../components/Icons'
+import { AppInfoContext } from '../state/appInfo'
 import { LookupContext } from '../state/lookup'
 import { OpenSavesContext } from '../state/openSaves'
 import RecentSaves from './RecentSaves'
@@ -31,6 +33,7 @@ const SavesModal = (props: SavesModalProps) => {
   const backend = useContext(BackendContext)
   const [, dispatchOpenSaves] = useContext(OpenSavesContext)
   const [lookupState] = useContext(LookupContext)
+  const [appInfo] = useContext(AppInfoContext)
   const [viewMode, setViewMode] = useState<SaveViewMode>('cards')
   const [cardSize, setCardSize] = useState<number>(180)
 
@@ -44,18 +47,26 @@ const SavesModal = (props: SavesModalProps) => {
               filePath = path
             }
             if (filePath && fileBytes && lookupState.loaded) {
-              const saveFile = buildSaveFile(filePath, fileBytes, {
-                homeMonMap: lookupState.homeMons,
-                gen12LookupMap: lookupState.gen12,
-                gen345LookupMap: lookupState.gen345,
-                fileCreatedDate: createdDate,
-              })
+              const saveFile = buildSaveFile(
+                filePath,
+                fileBytes,
+                {
+                  homeMonMap: lookupState.homeMons,
+                  gen12LookupMap: lookupState.gen12,
+                  gen345LookupMap: lookupState.gen345,
+                  fileCreatedDate: createdDate,
+                },
+                appInfo.settings.allSaveTypes.filter(
+                  (saveType) => appInfo.settings.enabledSaveTypes[saveType.name]
+                ),
+                (updatedMon) => backend.writeHomeMon(updatedMon.bytes)
+              )
               if (!saveFile) {
                 onClose()
                 return
               }
               onClose()
-              backend.addRecentSave(saveFile.getSaveRef())
+              backend.addRecentSave(getSaveRef(saveFile))
               dispatchOpenSaves({ type: 'add_save', payload: saveFile })
             }
           }

@@ -1,19 +1,22 @@
 import lodash from 'lodash'
 import { PK1 } from 'pokemon-files'
 import { GameOfOrigin, Languages } from 'pokemon-resources'
+import { NationalDex } from 'pokemon-species-data'
 import { GEN1_TRANSFER_RESTRICTIONS } from '../../consts/TransferRestrictions'
 import { bytesToUint16BigEndian, get8BitChecksum } from '../../util/ByteLogic'
 import { natDexToGen1ID } from '../../util/ConvertPokemonID'
 import { gen12StringToUTF, utf16StringToGen12 } from '../../util/Strings/StringConverter'
 import { OHPKM } from '../pkm/OHPKM'
-import { SaveType } from '../types'
-import { Box, SAV } from './SAV'
+import { Box, BoxCoordinates, SAV } from './SAV'
 import { ParsedPath } from './path'
+import { LOOKUP_TYPE } from './util'
 
-export class G1SAV extends SAV<PK1> {
-  pkmType = PK1
+const SAVE_SIZE_BYTES = 0x8000
+export class G1SAV implements SAV<PK1> {
+  static pkmType = PK1
 
-  transferRestrictions = GEN1_TRANSFER_RESTRICTIONS
+  static transferRestrictions = GEN1_TRANSFER_RESTRICTIONS
+  static lookupType: LOOKUP_TYPE = 'gen12'
 
   NUM_BOXES = 14
 
@@ -31,20 +34,44 @@ export class G1SAV extends SAV<PK1> {
 
   BOX_NICKNAME_OFFSET = 0x386
 
+  origin: GameOfOrigin = GameOfOrigin.Red // TODO: game detection
+
+  boxRows = 4
+  boxColumns = 5
+
+  filePath: ParsedPath
+  fileCreated?: Date
+
+  money: number = 0 // TODO: set money for gen 1 saves
+  name: string
+  tid: number
+  displayID: string
+
+  currentPCBox: number
+  boxes: Array<Box<PK1>>
+
+  bytes: Uint8Array
+
+  invalid: boolean = false
+  tooEarlyToOpen: boolean = false
+
+  updatedBoxSlots: BoxCoordinates[] = []
+
   constructor(path: ParsedPath, bytes: Uint8Array, fileCreated?: Date) {
-    super(path, bytes)
+    this.bytes = bytes
+    this.filePath = path
     this.fileCreated = fileCreated
     this.tid = bytesToUint16BigEndian(this.bytes, 0x2605)
     this.displayID = this.tid.toString().padStart(5, '0')
     this.name = gen12StringToUTF(this.bytes, 0x2598, 11)
+
     this.currentPCBox = this.bytes[this.CURRENT_BOX_NUM_OFFSET] & 0x7f
-    this.boxes = []
+    this.boxes = new Array(this.NUM_BOXES)
+
     if (this.currentPCBox > this.NUM_BOXES) {
       this.invalid = true
       return
     }
-    this.saveType = SaveType.RBY_I
-
     let currenBoxByteOffset
     if (this.currentPCBox < 6) {
       currenBoxByteOffset = 0x4000 + this.currentPCBox * this.BOX_SIZE
@@ -55,64 +82,60 @@ export class G1SAV extends SAV<PK1> {
       this.bytes.slice(this.CURRENT_BOX_DATA_OFFSET, this.CURRENT_BOX_DATA_OFFSET + this.BOX_SIZE),
       currenBoxByteOffset
     )
-    switch (this.saveType) {
-      case SaveType.RBY_I:
-        this.boxRows = 4
-        this.boxColumns = 5
-        break
-      default:
-        this.invalid = true
-        return
-    }
-    if (this.bytes[0x271c] > 0) {
+
+    if (this.bytes[0x271c] > 0 || path.name.toLowerCase().includes('yellow')) {
+      // pikachu friendship
       this.origin = GameOfOrigin.Yellow
+    } else if (path.name.toLowerCase().includes('blue')) {
+      this.origin = GameOfOrigin.BlueGreen
+    } else {
+      this.origin = GameOfOrigin.Red
     }
-    this.boxes = new Array(this.NUM_BOXES)
-    if (this.saveType > 0 && this.saveType <= 2) {
-      const pokemonPerBox = this.boxRows * this.boxColumns
-      lodash.range(this.NUM_BOXES).forEach((boxNumber) => {
-        this.boxes[boxNumber] = new Box(`Box ${boxNumber + 1}`, pokemonPerBox)
-        let boxByteOffset
-        if (boxNumber < 6) {
-          boxByteOffset = 0x4000 + boxNumber * this.BOX_SIZE
-        } else {
-          boxByteOffset = 0x6000 + (boxNumber - 6) * this.BOX_SIZE
-        }
-        for (let monIndex = 0; monIndex < pokemonPerBox; monIndex++) {
-          if (this.bytes[boxByteOffset + this.BOX_PKM_OFFSET + monIndex * this.BOX_PKM_SIZE]) {
-            try {
-              const mon = new PK1(
-                this.bytes.slice(
-                  boxByteOffset + this.BOX_PKM_OFFSET + monIndex * this.BOX_PKM_SIZE,
-                  boxByteOffset + this.BOX_PKM_OFFSET + (monIndex + 1) * this.BOX_PKM_SIZE
-                ).buffer
-              )
-              mon.trainerName = gen12StringToUTF(
-                this.bytes,
-                boxByteOffset + this.BOX_OT_OFFSET + monIndex * 11,
-                11
-              )
-              mon.nickname = gen12StringToUTF(
-                this.bytes,
-                boxByteOffset + this.BOX_NICKNAME_OFFSET + monIndex * 11,
-                11
-              )
-              mon.gameOfOrigin = GameOfOrigin.Red
-              mon.languageIndex = Languages.indexOf('ENG')
-              this.boxes[boxNumber].pokemon[monIndex] = mon
-            } catch (e) {
-              console.error(e)
-            }
+    const pokemonPerBox = this.boxRows * this.boxColumns
+
+    lodash.range(this.NUM_BOXES).forEach((boxNumber) => {
+      this.boxes[boxNumber] = new Box(`Box ${boxNumber + 1}`, pokemonPerBox)
+      let boxByteOffset
+      if (boxNumber < 6) {
+        boxByteOffset = 0x4000 + boxNumber * this.BOX_SIZE
+      } else {
+        boxByteOffset = 0x6000 + (boxNumber - 6) * this.BOX_SIZE
+      }
+      for (let monIndex = 0; monIndex < pokemonPerBox; monIndex++) {
+        if (this.bytes[boxByteOffset + this.BOX_PKM_OFFSET + monIndex * this.BOX_PKM_SIZE]) {
+          try {
+            const mon = new PK1(
+              this.bytes.slice(
+                boxByteOffset + this.BOX_PKM_OFFSET + monIndex * this.BOX_PKM_SIZE,
+                boxByteOffset + this.BOX_PKM_OFFSET + (monIndex + 1) * this.BOX_PKM_SIZE
+              ).buffer
+            )
+            mon.trainerName = gen12StringToUTF(
+              this.bytes,
+              boxByteOffset + this.BOX_OT_OFFSET + monIndex * 11,
+              11
+            )
+            mon.nickname = gen12StringToUTF(
+              this.bytes,
+              boxByteOffset + this.BOX_NICKNAME_OFFSET + monIndex * 11,
+              11
+            )
+            mon.gameOfOrigin = this.origin
+            mon.languageIndex = Languages.indexOf('ENG')
+            this.boxes[boxNumber].pokemon[monIndex] = mon
+          } catch (e) {
+            console.error(e)
           }
         }
-      })
-    }
+      }
+    })
   }
 
-  prepareBoxesForSaving() {
+  prepareBoxesAndGetModified() {
     const changedMonPKMs: OHPKM[] = []
     const changedBoxes: number[] = lodash.uniq(this.updatedBoxSlots.map((coords) => coords.box))
     const pokemonPerBox = this.boxRows * this.boxColumns
+
     changedBoxes.forEach((boxNumber) => {
       let boxByteOffset: number
       if (boxNumber < 6) {
@@ -122,6 +145,7 @@ export class G1SAV extends SAV<PK1> {
       }
       const box = this.boxes[boxNumber]
       let numMons = 0
+
       box.pokemon.forEach((boxMon) => {
         if (boxMon) {
           if (boxMon instanceof OHPKM) {
@@ -144,6 +168,7 @@ export class G1SAV extends SAV<PK1> {
           numMons++
         }
       })
+
       this.bytes[boxByteOffset] = numMons
       const remainingSlots = pokemonPerBox - numMons
       if (remainingSlots) {
@@ -188,5 +213,17 @@ export class G1SAV extends SAV<PK1> {
     const wholeSaveChecksum = get8BitChecksum(this.bytes, 0x2598, 0x3521) ^ 0xff
     this.bytes[0x3523] = wholeSaveChecksum
     return changedMonPKMs
+  }
+
+  supportsMon(dexNumber: number, formeNumber: number) {
+    return dexNumber <= NationalDex.Mew && formeNumber == 0
+  }
+
+  getCurrentBox() {
+    return this.boxes[this.currentPCBox]
+  }
+
+  static fileIsSave(bytes: Uint8Array): boolean {
+    return bytes.length === SAVE_SIZE_BYTES
   }
 }

@@ -6,17 +6,17 @@ import { MdAdd } from 'react-icons/md'
 import PokemonDetailsPanel from 'src/renderer/pokemon/PokemonDetailsPanel'
 import BoxCell from 'src/renderer/saves/boxes/BoxCell'
 import SavesModal from 'src/renderer/saves/SavesModal'
-import { PKMFile } from 'src/types/pkm/util'
 import { GameColors } from 'src/types/SAVTypes/util'
 import { filterUndefined } from 'src/util/Sort'
+import { PKMInterface } from '../../../types/interfaces'
 import { LookupContext } from '../../state/lookup'
 import { OpenSavesContext } from '../../state/openSaves'
 
 function getSortFunction(
   sortStr: string | undefined
 ): (
-  a: { mon: PKMFile; saveGame: GameOfOrigin },
-  b: { mon: PKMFile; saveGame: GameOfOrigin }
+  a: { mon: PKMInterface; saveGame: GameOfOrigin },
+  b: { mon: PKMInterface; saveGame: GameOfOrigin }
 ) => number {
   switch (sortStr?.toLowerCase()) {
     case 'nickname':
@@ -39,8 +39,8 @@ function getSortFunction(
       }
     case 'ribbons':
       return (a, b) => {
-        const aCount = 'ribbons' in a.mon ? a.mon.ribbons.length : 0
-        const bCount = 'ribbons' in b.mon ? b.mon.ribbons.length : 0
+        const aCount = a.mon.ribbons ? a.mon.ribbons.length : 0
+        const bCount = b.mon.ribbons ? b.mon.ribbons.length : 0
         return bCount - aCount
       }
     default:
@@ -52,12 +52,12 @@ export default function SortPokemon() {
   const [{ homeMons }] = useContext(LookupContext)
   const [{ homeData }, , openSaves] = useContext(OpenSavesContext)
   const [openSaveDialog, setOpenSaveDialog] = useState(false)
-  const [selectedMon, setSelectedMon] = useState<PKMFile>()
+  const [selectedMon, setSelectedMon] = useState<PKMInterface>()
   const [tab, setTab] = useState('summary')
   const [sort, setSort] = useState('')
 
   const allMonsWithSaves = useMemo(() => {
-    const all: { mon: PKMFile; saveGame: GameOfOrigin }[] = openSaves
+    const all: { mon: PKMInterface; saveGame: GameOfOrigin }[] = openSaves
       .flatMap((save) =>
         save.boxes.flatMap((box) =>
           box.pokemon.flatMap((mon) => (mon ? { mon, saveGame: save.origin } : undefined))

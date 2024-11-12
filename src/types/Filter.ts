@@ -1,6 +1,6 @@
 import { Type } from 'pokemon-resources'
 import { PokemonData } from 'pokemon-species-data'
-import { PKMFile } from './pkm/util'
+import { PKMInterface } from './interfaces'
 
 export interface Filter {
   dexNumber?: number
@@ -15,7 +15,7 @@ export interface Filter {
   ball?: number
 }
 
-export function filterApplies(filter: Filter, mon: PKMFile) {
+export function filterApplies(filter: Filter, mon: PKMInterface) {
   if (filter.dexNumber && mon.dexNum !== filter.dexNumber) {
     return false
   }
@@ -38,7 +38,7 @@ export function filterApplies(filter: Filter, mon: PKMFile) {
     return false
   }
   if (filter.ribbon !== undefined) {
-    if (!('ribbons' in mon)) return false
+    if (!mon.ribbons) return false
     if (filter.ribbon === 'Any') {
       if (mon.ribbons.length === 0) return false
     } else if (filter.ribbon === 'None') {
