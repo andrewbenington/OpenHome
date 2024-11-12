@@ -1,11 +1,11 @@
 /* eslint-disable no-nested-ternary */
-import { AllPKMFields } from 'pokemon-files'
+import { LevelUpExp } from 'pokemon-files'
 import { getNatureSummary } from 'pokemon-resources'
 import { NationalDex, NationalDexMax, PokemonData } from 'pokemon-species-data'
-import { LevelUpExp } from '../consts'
+import { PKMInterface } from '../types/interfaces'
 import { Stat } from '../types/types'
 
-export const getStatGen3Onward = (stat: Stat, mon: AllPKMFields) => {
+export const getStatGen3Onward = (stat: Stat, mon: PKMInterface) => {
   if (!('ivs' in mon) || mon.dexNum < 1 || mon.dexNum > NationalDexMax) {
     return 0
   }
@@ -28,7 +28,7 @@ export const getStatGen3Onward = (stat: Stat, mon: AllPKMFields) => {
   return 0
 }
 
-export const getHPGen3Onward = (mon: AllPKMFields) => {
+export const getHPGen3Onward = (mon: PKMInterface) => {
   if (!('ivs' in mon) || mon.dexNum < 1 || mon.dexNum > NationalDexMax) {
     return 0
   }

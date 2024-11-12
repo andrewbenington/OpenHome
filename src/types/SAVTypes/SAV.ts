@@ -1,12 +1,10 @@
-import { AllPKMFields } from 'pokemon-files'
 import { GameOfOrigin } from 'pokemon-resources'
-import { TransferRestrictions } from '../../types/TransferRestrictions'
-import { SaveRef, SaveType } from '../../types/types'
+import { SaveRef } from '../../types/types'
+import { PKMInterface } from '../interfaces'
 import { OHPKM } from '../pkm/OHPKM'
-import { PKMFile } from '../pkm/util'
 import { ParsedPath } from './path'
 
-export class Box<P extends AllPKMFields> {
+export class Box<P extends PKMInterface> {
   name: string
   pokemon: Array<P | OHPKM | undefined>
 
@@ -21,75 +19,49 @@ export interface BoxCoordinates {
   index: number
 }
 
-export abstract class SAV<P extends AllPKMFields = PKMFile> {
-  saveType: SaveType = SaveType.UNKNOWN
-  static pkmType
-  static transferRestrictions: TransferRestrictions
+export interface SAV<P extends PKMInterface = PKMInterface> {
+  origin: GameOfOrigin
 
-  origin: GameOfOrigin = 0
-
-  boxRows: number = 5
-
-  boxColumns: number = 6
-
-  transferRestrictions: TransferRestrictions = {}
+  boxRows: number
+  boxColumns: number
 
   filePath: ParsedPath
-
   fileCreated?: Date
 
-  money: number = 0
-
-  name: string = ''
-
-  tid: number = 0
-
+  money: number
+  name: string
+  tid: number
   sid?: number
+  displayID: string
 
-  displayID: string = '000000'
-
-  currentPCBox: number = 0
-
-  boxNames: string[] = []
-
-  boxes: Array<Box<P>> = []
+  currentPCBox: number
+  boxes: Array<Box<P>>
 
   bytes: Uint8Array
 
-  invalid: boolean = false
-
-  tooEarlyToOpen: boolean = false
+  invalid: boolean
+  tooEarlyToOpen: boolean
 
   pcChecksumOffset?: number
   pcOffset?: number
 
-  getSaveRef: () => SaveRef = () => {
-    return {
-      filePath: this.filePath,
-      saveType: this.saveType,
-      game: this.origin ? this.origin.toString() : undefined,
-      trainerName: this.name ? this.name : undefined,
-      trainerID: this.displayID,
-      lastOpened: Date.now(),
-    }
-  }
+  updatedBoxSlots: BoxCoordinates[]
 
-  updatedBoxSlots: BoxCoordinates[] = []
-  constructor(path: ParsedPath, bytes: Uint8Array) {
-    this.filePath = path
-    this.bytes = bytes
-  }
-
-  getCurrentBox() {
-    return this.boxes[this.currentPCBox]
-  }
+  getCurrentBox: () => Box<P>
+  supportsMon: (dexNumber: number, formeNumber: number) => boolean
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  prepareBoxesForSaving(): OHPKM[] {
-    return []
-  }
+  prepareBoxesAndGetModified: () => OHPKM[]
 
-  calculateChecksum(): number {
-    return -1
+  calculateChecksum?: () => number
+}
+
+export function getSaveRef(save: SAV): SaveRef {
+  return {
+    filePath: save.filePath,
+    game: save.origin ? save.origin.toString() : undefined,
+    trainerName: save.name ? save.name : undefined,
+    trainerID: save.displayID,
+    lastOpened: Date.now(),
   }
 }

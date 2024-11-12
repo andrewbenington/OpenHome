@@ -1,8 +1,8 @@
 import { NationalDex, PokemonData } from 'pokemon-species-data'
-import { SWEETS } from '../../consts'
-import { hasGen8OnData } from '../../types/interfaces/gen8'
-import { PKMFile } from '../../types/pkm/util'
+
 import { toGen3RRPokemonIndex } from 'pokemon-files'
+import { SWEETS } from '../../consts/Formes'
+import { PKMInterface } from '../../types/interfaces'
 
 const alolaDex = [
   10, 11, 12, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 35, 36, 37, 38, 39, 40, 41, 42, 46, 47, 50,
@@ -47,10 +47,10 @@ export const fileToSpriteFolder: Record<string, string> = {
   OHPKM: 'home',
 }
 
-export const getPokemonSpritePath = (mon: PKMFile, format?: string) => {
+export const getPokemonSpritePath = (mon: PKMInterface, format?: string) => {
   const monFormat = format ?? mon.format
   let spriteName = PokemonData[mon.dexNum]?.formes[mon.formeNum]?.sprite ?? ''
-  if (hasGen8OnData(mon) && mon.dexNum === NationalDex.Alcremie) {
+  if (mon.dexNum === NationalDex.Alcremie) {
     spriteName = `${
       PokemonData[mon.dexNum]?.formes[mon.formeNum]?.formeName?.toLowerCase() ??
       'alcremie-vanilla-cream'
@@ -59,8 +59,7 @@ export const getPokemonSpritePath = (mon: PKMFile, format?: string) => {
   let spriteFolder = fileToSpriteFolder[monFormat]
   if (spriteFolder === 'gen7' && !alolaDex.includes(mon.dexNum)) {
     spriteFolder = 'gen6'
-  }
-  else if (spriteFolder == 'rr') {
+  } else if (spriteFolder == 'rr') {
     const gen3RRindex = toGen3RRPokemonIndex(mon.dexNum, mon.formeNum)
     return `sprites/${spriteFolder}/${gen3RRindex}.png`
   }

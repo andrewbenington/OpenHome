@@ -1,10 +1,11 @@
-// jest.config.js
 module.exports = {
-    preset: 'ts-jest',
-    testEnvironment: 'node',
-    transform: {
-      '^.+\\.tsx?$': 'ts-jest',
-    },
-    moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
-  };
-  
+  transform: {
+    '^.+\\.[tj]sx?$': [
+      'babel-jest',
+      { presets: ['@babel/preset-env', '@babel/preset-typescript'] },
+    ],
+  },
+  testEnvironment: 'node',
+  testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.[tj]sx?$',
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
+}

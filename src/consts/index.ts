@@ -1,6 +1,0 @@
-export * from './Countries'
-export * from './EncounterTypes'
-export * from './Formes'
-export * from './LevelUpExp'
-export * from './Moves'
-export * from './Ribbons'

@@ -3,12 +3,9 @@ import { getDisplayID } from 'pokemon-files'
 import { AbilityToString } from 'pokemon-resources'
 import { PokemonData } from 'pokemon-species-data'
 import { useMemo, useState } from 'react'
-import { hasGen5OnlyData } from 'src/types/interfaces/gen5'
-import { hasGen8OnlyData, hasPLAData } from 'src/types/interfaces/gen8'
 import { getLevelGen12, getLevelGen3Onward } from 'src/util/StatCalc'
-import { hasGen2OnData } from '../../types/interfaces/gen2'
-import { hasOrreData } from '../../types/interfaces/gen3'
-import { getTypes, PKMFile } from '../../types/pkm/util'
+import { PKMInterface } from '../../types/interfaces'
+import { getTypes } from '../../types/pkm/util'
 import { Styles } from '../../types/types'
 import PokemonIcon from '../components/PokemonIcon'
 import TypeIcon from '../components/TypeIcon'
@@ -44,7 +41,7 @@ const styles = {
   },
 } as Styles
 
-const SummaryDisplay = (props: { mon: PKMFile }) => {
+const SummaryDisplay = (props: { mon: PKMInterface }) => {
   const { mon } = props
   const [imageError, setImageError] = useState(false)
 
@@ -75,7 +72,7 @@ const SummaryDisplay = (props: { mon: PKMFile }) => {
           )}
         </div>
         <div style={styles.nicknameRow}>
-          {'ball' in mon ? (
+          {mon.ball ? (
             <img
               draggable={false}
               alt="poke ball type"
@@ -86,7 +83,7 @@ const SummaryDisplay = (props: { mon: PKMFile }) => {
             <div />
           )}
           <div style={{ fontWeight: 'bold' }}>{mon.nickname}</div>
-          {'languageIndex' in mon && <Chip style={styles.language}>{mon.language}</Chip>}
+          {mon.languageIndex !== undefined && <Chip style={styles.language}>{mon.language}</Chip>}
         </div>
         <AttributeRow label="Item" justifyEnd>
           {mon.heldItemName !== 'None' && (
@@ -106,31 +103,25 @@ const SummaryDisplay = (props: { mon: PKMFile }) => {
               backgroundColor="#cc0000"
             />
           )}
-          {hasGen8OnlyData(mon) && mon.canGigantamax && (
+          {mon.canGigantamax && (
             <AttributeTag
               icon={getPublicImageURL('icons/GMax.png')}
               color="white"
               backgroundColor="#e60040"
             />
           )}
-          {hasPLAData(mon) && (
-            <>
-              {mon.isAlpha && (
-                <AttributeTag
-                  icon={getPublicImageURL('icons/Alpha.png')}
-                  color="white"
-                  backgroundColor="#f2352d"
-                />
-              )}
-              {mon.isNoble && (
-                <AttributeTag label="NOBLE" backgroundColor="#cccc00" color="white" />
-              )}
-            </>
+          {mon.isAlpha && (
+            <AttributeTag
+              icon={getPublicImageURL('icons/Alpha.png')}
+              color="white"
+              backgroundColor="#f2352d"
+            />
           )}
-          {hasOrreData(mon) && mon.isShadow && (
+          {mon.isNoble && <AttributeTag label="NOBLE" backgroundColor="#cccc00" color="white" />}
+          {'isShadow' in mon && (mon.isShadow as boolean) && (
             <AttributeTag label="SHADOW" backgroundColor={getTypeColor('shadow')} color="white" />
           )}
-          {hasGen5OnlyData(mon) && mon.isNsPokemon && (
+          {mon.isNsPokemon && (
             <AttributeTag label="N's Pokémon" backgroundColor="green" color="white" />
           )}
         </div>
@@ -140,7 +131,7 @@ const SummaryDisplay = (props: { mon: PKMFile }) => {
         <AttributeRow
           label="Species"
           value={`${PokemonData[mon.dexNum]?.formes[mon.formeNum]?.formeName} ${
-            hasGen2OnData(mon) ? ['♂', '♀', ''][mon.gender] : ''
+            mon.gender !== undefined ? ['♂', '♀', ''][mon.gender] : ''
           }`}
         />
         <AttributeRow label="Dex No." value={`${mon.dexNum}`} />
@@ -149,7 +140,7 @@ const SummaryDisplay = (props: { mon: PKMFile }) => {
         </AttributeRow>
         <AttributeRow label="OT" value={`${mon.trainerName} ${mon.trainerGender ? '♀' : '♂'}`} />
         <AttributeRow label="Trainer ID" value={getDisplayID(mon as any)} />
-        {'abilityNum' in mon && (
+        {mon.abilityIndex !== undefined && (
           <AttributeRow
             label="Ability"
             value={`${AbilityToString(mon.abilityIndex)} (${

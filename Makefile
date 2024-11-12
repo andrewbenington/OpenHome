@@ -19,10 +19,6 @@ start:
 preview:
 	@npm run start
 
-.PHONY: test
-test:
-	@npm run test
-
 .PHONY: lint
 lint:
 	@npm run lint
@@ -65,6 +61,9 @@ sync-resources: generate/out
 download-item-sprites:
 	@python3 generate/downloadAllItems.py
 
-.PHONY: test-interfaces
-test-interfaces:
-	@ts-node --project tsconfig.json src/types/pkm_old/__test__/all.test.ts
+.PHONY: test
+test:
+	@ts-node --project tsconfig.node.json src/types/SAVTypes/__test__/G1SAV.test.ts
+
+%:
+	@npm run $@

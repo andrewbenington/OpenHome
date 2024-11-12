@@ -12,17 +12,13 @@ import {
 import { getNatureSummary } from 'pokemon-resources'
 import { useEffect, useMemo, useState } from 'react'
 import { Radar } from 'react-chartjs-2'
-import { hasGen8OnData, hasPLAData } from 'src/types/interfaces/gen8'
-import { hasGameBoyData } from 'src/types/interfaces/stats'
 import {
   GEN2_TRANSFER_RESTRICTIONS,
   LA_TRANSFER_RESTRICTIONS,
   LGPE_TRANSFER_RESTRICTIONS,
 } from '../../consts/TransferRestrictions'
 import { isRestricted } from '../../types/TransferRestrictions'
-import { hasGen3OnData } from '../../types/interfaces/gen3'
-import { hasLetsGoData } from '../../types/interfaces/gen7'
-import { PKMFile } from '../../types/pkm/util'
+import { PKMInterface } from '../../types/interfaces'
 import { Styles } from '../../types/types'
 import SheenStars from '../components/SheenStars'
 const styles = {
@@ -61,16 +57,16 @@ const getMaxValue = (stat: string, evType?: string): number | undefined => {
   }
 }
 
-const StatsDisplay = (props: { mon: PKMFile }) => {
+const StatsDisplay = (props: { mon: PKMInterface }) => {
   const { mon } = props
   const [display, setDisplay] = useState('Stats')
-  const [evType, setEVType] = useState(hasGen3OnData(mon) ? 'Modern' : 'Game Boy')
+  const [evType, setEVType] = useState(mon.evs ? 'Modern' : 'Game Boy')
 
   useEffect(() => {
-    setEVType(hasGen3OnData(mon) ? 'Modern' : 'Game Boy')
+    setEVType(mon.evs ? 'Modern' : 'Game Boy')
   }, [mon])
 
-  const stats = useMemo(() => (mon.format === 'OHPKM' ? mon.stats : mon.getStats()), [mon])
+  const stats = useMemo(() => mon.getStats(), [mon])
 
   const menuItems = useMemo(() => {
     const createMenuItem = (value: string) => {
@@ -81,13 +77,10 @@ const StatsDisplay = (props: { mon: PKMFile }) => {
       )
     }
     const items = [createMenuItem('Stats')]
-    if (hasGen3OnData(mon) || hasLetsGoData(mon)) {
+    if (mon.ivs) {
       items.push(createMenuItem('IVs'))
     }
-    if (
-      hasGameBoyData(mon) &&
-      !isRestricted(GEN2_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum)
-    ) {
+    if (mon.dvs && !isRestricted(GEN2_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum)) {
       items.push(createMenuItem('DVs'))
     }
     items.push(createMenuItem('EVs'))
@@ -97,7 +90,7 @@ const StatsDisplay = (props: { mon: PKMFile }) => {
     if ('gvs' in mon && !isRestricted(LA_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum)) {
       items.push(createMenuItem('GVs'))
     }
-    if (hasGen3OnData(mon)) {
+    if (mon.contest) {
       items.push(createMenuItem('Contest'))
     }
     return items
@@ -178,7 +171,7 @@ const StatsDisplay = (props: { mon: PKMFile }) => {
                       return value
                     }
                     let natureSummary: string
-                    if (hasGen8OnData(mon) && mon.statNature !== mon.nature) {
+                    if (mon.statNature !== mon.nature) {
                       natureSummary = getNatureSummary(mon.statNature)
                     } else {
                       natureSummary = getNatureSummary(mon.nature)
@@ -215,7 +208,7 @@ const StatsDisplay = (props: { mon: PKMFile }) => {
                     pointHoverBackgroundColor: '#fff',
                     pointHoverBorderColor: 'rgb(132, 99, 255)',
                   }
-                : display === 'IVs' && 'ivs' in mon
+                : display === 'IVs' && mon.ivs
                 ? {
                     label: 'IVs',
                     data: [
@@ -234,7 +227,7 @@ const StatsDisplay = (props: { mon: PKMFile }) => {
                     pointHoverBackgroundColor: '#fff',
                     pointHoverBorderColor: 'rgb(255, 99, 132)',
                   }
-                : display === 'DVs' && hasGameBoyData(mon)
+                : display === 'DVs' && mon.dvs
                 ? {
                     label: 'DVs',
                     data: [mon.dvs.hp, mon.dvs.atk, mon.dvs.def, mon.dvs.spe, mon.dvs.spc],
@@ -246,7 +239,7 @@ const StatsDisplay = (props: { mon: PKMFile }) => {
                     pointHoverBackgroundColor: '#fff',
                     pointHoverBorderColor: 'rgb(255, 99, 132)',
                   }
-                : display === 'EVs' && evType === 'Modern' && 'evs' in mon
+                : display === 'EVs' && evType === 'Modern' && mon.evs
                 ? {
                     label: 'EVs',
                     data: [
@@ -265,7 +258,7 @@ const StatsDisplay = (props: { mon: PKMFile }) => {
                     pointHoverBackgroundColor: '#fff',
                     pointHoverBorderColor: 'rgb(132, 99, 255)',
                   }
-                : display === 'EVs' && evType === 'Game Boy' && hasGameBoyData(mon)
+                : display === 'EVs' && evType === 'Game Boy' && mon.evsG12
                 ? {
                     label: 'EVs',
                     data: [
@@ -283,7 +276,7 @@ const StatsDisplay = (props: { mon: PKMFile }) => {
                     pointHoverBackgroundColor: '#fff',
                     pointHoverBorderColor: 'rgb(132, 99, 255)',
                   }
-                : display === 'AVs' && hasLetsGoData(mon)
+                : display === 'AVs' && mon.avs
                 ? {
                     label: 'AVs',
                     data: [
@@ -302,7 +295,7 @@ const StatsDisplay = (props: { mon: PKMFile }) => {
                     pointHoverBackgroundColor: '#fff',
                     pointHoverBorderColor: 'rgb(132, 99, 255)',
                   }
-                : display === 'GVs' && hasPLAData(mon)
+                : display === 'GVs' && mon.gvs
                 ? {
                     label: 'GVs',
                     data: [
@@ -323,16 +316,15 @@ const StatsDisplay = (props: { mon: PKMFile }) => {
                   }
                 : {
                     label: 'Contest',
-                    data:
-                      'contest' in mon
-                        ? [
-                            mon.contest.cool,
-                            mon.contest.beauty,
-                            mon.contest.cute,
-                            mon.contest.smart,
-                            mon.contest.tough,
-                          ]
-                        : [],
+                    data: mon.contest
+                      ? [
+                          mon.contest.cool,
+                          mon.contest.beauty,
+                          mon.contest.cute,
+                          mon.contest.smart,
+                          mon.contest.tough,
+                        ]
+                      : [],
                     fill: true,
                     backgroundColor: 'rgba(132, 99, 255, 0.2)',
                     borderColor: 'rgb(132, 99, 255)',

@@ -1,57 +1,64 @@
 import { PK6 } from 'pokemon-files'
 import { GameOfOrigin } from 'pokemon-resources'
-import {
-  ORAS_TRANSFER_RESTRICTIONS,
-  XY_TRANSFER_RESTRICTIONS,
-} from '../../consts/TransferRestrictions'
 import { bytesToUint16LittleEndian, uint16ToBytesLittleEndian } from '../../util/ByteLogic'
 import { CRC16_CCITT } from '../../util/Encryption'
 import { utf16BytesToString } from '../../util/Strings/StringConverter'
 import { OHPKM } from '../pkm/OHPKM'
-import { Box, SAV } from './SAV'
+import { Box, BoxCoordinates, SAV } from './SAV'
 import { ParsedPath } from './path'
 
-const XY_PC_OFFSET = 0x22600
-const XY_PC_CHECKSUM_OFFSET = 0x655c2
-const ORAS_PC_OFFSET = 0x33000
-const ORAS_PC_CHECKSUM_OFFSET = 0x75fda
 const BOX_NAMES_OFFSET: number = 0x04400
 const BOX_SIZE: number = 232 * 30
 const BOX_DATA_SIZE: number = 0x34ad0
 
-export class G6SAV extends SAV<PK6> {
+export abstract class G6SAV implements SAV<PK6> {
   static pkmType = PK6
 
-  trainerDataOffset: number = 0x14000
+  origin: GameOfOrigin = 0
+
+  boxRows = 5
+  boxColumns = 6
+
+  filePath: ParsedPath
+  fileCreated?: Date
+
+  money: number = 0 // TODO: Gen 5 money
+  name: string = ''
+  tid: number = 0
+  sid: number = 0
+  displayID: string = ''
+
+  currentPCBox: number = 0 // TODO: Gen 5 current box
 
   boxes: Array<Box<PK6>>
 
+  bytes: Uint8Array
+
+  invalid: boolean = false
+  tooEarlyToOpen: boolean = false
+
+  updatedBoxSlots: BoxCoordinates[] = []
+
+  trainerDataOffset: number = 0x14000
+
   boxChecksumOffset: number = 0x75fda
 
-  pcOffset = XY_PC_OFFSET
+  pcOffset: number
   pcDataSize = BOX_DATA_SIZE
-  pcChecksumOffset = XY_PC_CHECKSUM_OFFSET
+  pcChecksumOffset: number
 
-  constructor(path: ParsedPath, bytes: Uint8Array) {
-    super(path, bytes)
+  constructor(path: ParsedPath, bytes: Uint8Array, pcOffset: number, pcChecksumOffset: number) {
+    this.bytes = bytes
+    this.filePath = path
     this.name = utf16BytesToString(this.bytes, this.trainerDataOffset + 72, 0x10)
     this.tid = bytesToUint16LittleEndian(this.bytes, this.trainerDataOffset)
     this.sid = bytesToUint16LittleEndian(this.bytes, this.trainerDataOffset + 2)
     this.currentPCBox = this.bytes[0]
     this.displayID = this.tid.toString().padStart(5, '0')
     this.origin = this.bytes[this.trainerDataOffset + 4]
-    switch (this.origin) {
-      case GameOfOrigin.X:
-      case GameOfOrigin.Y:
-        this.transferRestrictions = XY_TRANSFER_RESTRICTIONS
-        break
-      case GameOfOrigin.OmegaRuby:
-      case GameOfOrigin.AlphaSapphire:
-        this.transferRestrictions = ORAS_TRANSFER_RESTRICTIONS
-        this.pcOffset = ORAS_PC_OFFSET
-        this.pcChecksumOffset = ORAS_PC_CHECKSUM_OFFSET
-        break
-    }
+    this.pcOffset = pcOffset
+    this.pcChecksumOffset = pcChecksumOffset
+
     this.boxes = Array(31)
     for (let box = 0; box < 31; box++) {
       const boxName = utf16BytesToString(this.bytes, BOX_NAMES_OFFSET + 34 * box, 17)
@@ -75,7 +82,7 @@ export class G6SAV extends SAV<PK6> {
     }
   }
 
-  prepareBoxesForSaving() {
+  prepareBoxesAndGetModified() {
     const changedMonPKMs: OHPKM[] = []
     this.updatedBoxSlots.forEach(({ box, index }) => {
       const changedMon = this.boxes[box].pokemon[index]
@@ -106,7 +113,13 @@ export class G6SAV extends SAV<PK6> {
     return changedMonPKMs
   }
 
+  abstract supportsMon(dexNumber: number, formeNumber: number): boolean
+
   calculateChecksum(): number {
     return CRC16_CCITT(this.bytes, this.pcOffset, this.pcDataSize)
+  }
+
+  getCurrentBox() {
+    return this.boxes[this.currentPCBox]
   }
 }

@@ -1,9 +1,8 @@
 import { uniq } from 'lodash'
-import { useMemo } from 'react'
-import { ALL_SAVE_TYPES } from 'src/types/SAVTypes/util'
+import { useContext, useMemo } from 'react'
+import { supportsMon } from 'src/types/SAVTypes/util'
 import { isRestricted } from 'src/types/TransferRestrictions'
-import { PKMFormData } from 'src/types/interfaces/base'
-import { Styles } from 'src/types/types'
+import { PKMFormData, Styles } from 'src/types/types'
 import {
   BDSP_TRANSFER_RESTRICTIONS,
   LA_TRANSFER_RESTRICTIONS,
@@ -12,6 +11,7 @@ import {
   SWSH_TRANSFER_RESTRICTIONS,
 } from '../../consts/TransferRestrictions'
 import { filterUndefined } from '../../util/Sort'
+import { AppInfoContext } from '../state/appInfo'
 
 const styles = {
   fileTypeChip: {
@@ -51,14 +51,17 @@ interface FileTypeSelectProps {
 
 const FileTypeSelect = (props: FileTypeSelectProps) => {
   const { baseFormat, currentFormat, formData, onChange } = props
+  const [appInfo] = useContext(AppInfoContext)
 
   const supportedFormats = useMemo(() => {
     const supportedFormats = uniq(
-      ALL_SAVE_TYPES.map((saveType) =>
-        !isRestricted(saveType.transferRestrictions, formData.dexNum, formData.formeNum)
-          ? saveType.pkmType.name.slice(1) // hack to get the class name (slice(1) removes the underscore prefix)
-          : undefined
-      )
+      appInfo.settings.allSaveTypes
+        .filter((saveType) => appInfo.settings.enabledSaveTypes[saveType.name])
+        .map((saveType) =>
+          supportsMon(saveType, formData.dexNum, formData.formeNum)
+            ? saveType.pkmType.name.slice(1) // get class name workaround
+            : undefined
+        )
     ).filter(filterUndefined)
 
     // These should be removed when support is added for their corresponding saves
@@ -92,9 +95,11 @@ const FileTypeSelect = (props: FileTypeSelectProps) => {
       }}
     >
       <option value="OHPKM">OpenHome</option>
-      {baseFormat !== 'OHPKM'
-        ? [<option value={baseFormat}>{baseFormat}</option>]
-        : supportedFormats.map((format) => <option value={format}>{format}</option>)}
+      {baseFormat === 'OHPKM' ? (
+        supportedFormats.map((format) => <option value={format}>{format}</option>)
+      ) : (
+        <option value={baseFormat}>{baseFormat}</option>
+      )}
     </select>
   )
 }

@@ -36,7 +36,7 @@ async function writeAllSaveFiles(
   backend: BackendInterface,
   saveFiles: SAV[]
 ): Promise<Errorable<null>[]> {
-  saveFiles.forEach((save) => save.prepareBoxesForSaving())
+  saveFiles.forEach((save) => save.prepareBoxesAndGetModified())
   return Promise.all(
     saveFiles.map((saveFile) => backend.writeSaveFile(saveFile.filePath.raw, saveFile.bytes))
   )
