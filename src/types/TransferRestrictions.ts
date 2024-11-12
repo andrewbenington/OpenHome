@@ -146,16 +146,3 @@ export const isRestricted = (
   }
   return false
 }
-
-export interface AllowedMons {
-  // games up to USUM (and BDSP) include all up to one number
-  maxDexNum?: number
-  // games LGPE and on (besides BDSP) have noncontiguous dex numbers transferable
-  allowedDexNums?: number[]
-  // e.g. Alolan forms in BDSP
-  allowedFormes?: AllowedFormes
-}
-
-interface AllowedFormes {
-  [dexNum: number]: number[] | undefined
-}

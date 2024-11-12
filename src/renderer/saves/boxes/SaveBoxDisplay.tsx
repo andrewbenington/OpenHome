@@ -7,13 +7,13 @@ import { MenuIcon } from 'src/renderer/components/Icons'
 import AttributeRow from 'src/renderer/pokemon/AttributeRow'
 import { MouseContext } from 'src/renderer/state/mouse'
 import { MonLocation, OpenSavesContext } from 'src/renderer/state/openSaves'
-import { PKMFile } from '../../../types/pkm/util'
+import { PKMInterface } from '../../../types/interfaces'
 import ArrowButton from './ArrowButton'
 import BoxCell from './BoxCell'
 
 interface OpenSaveDisplayProps {
   saveIndex: number
-  setSelectedMon: (_: PKMFile | undefined) => void
+  setSelectedMon: (_: PKMInterface | undefined) => void
 }
 
 const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
@@ -54,7 +54,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
     [mouseDispatch, mouseState.dragSource, openSavesDispatch, save]
   )
 
-  const dispatchImportMons = (mons: PKMFile[], location: MonLocation) =>
+  const dispatchImportMons = (mons: PKMInterface[], location: MonLocation) =>
     openSavesDispatch({ type: 'import_mons', payload: { mons, dest: location } })
 
   const isDisabled = useMemo(() => {

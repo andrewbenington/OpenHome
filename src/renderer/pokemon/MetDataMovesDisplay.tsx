@@ -1,5 +1,4 @@
 import { Chip } from '@mui/joy'
-import { AllPKMFields } from 'pokemon-files'
 import {
   GameOfOriginData,
   getLocationString,
@@ -7,7 +6,7 @@ import {
   RibbonTitles,
 } from 'pokemon-resources'
 import { useMemo } from 'react'
-import { hasGen3OnData, hasOrreData } from '../../types/interfaces/gen3'
+import { PKMInterface } from '../../types/interfaces'
 import { getCharacteristic, getMoveMaxPP } from '../../types/pkm/util'
 import { Styles } from '../../types/types'
 import Markings from '../components/Markings'
@@ -67,7 +66,7 @@ const styles = {
 
 const metTimesOfDay = ['in the morning', 'during the daytime', 'in the evening']
 
-const MetDataMovesDisplay = (props: { mon: AllPKMFields }) => {
+const MetDataMovesDisplay = (props: { mon: PKMInterface }) => {
   const { mon } = props
 
   const eggMessage = useMemo(() => {
@@ -153,7 +152,7 @@ const MetDataMovesDisplay = (props: { mon: AllPKMFields }) => {
           {eggMessage ? <p style={styles.description}>{eggMessage}</p> : <div />}
           <p style={styles.description}>{metMessage}</p>
           {/* check for undefined because 0 nature is Hardy */}
-          {hasGen3OnData(mon as any) ? (
+          {'nature' in mon ? (
             <div>
               <p style={styles.description}>{natureMessage}</p>
               <p>{getCharacteristic(mon as any)}</p>
@@ -178,7 +177,8 @@ const MetDataMovesDisplay = (props: { mon: AllPKMFields }) => {
                   getGameLogo(
                     mon.gameOfOrigin,
                     mon.dexNum,
-                    mon.ribbons?.includes('National') || (hasOrreData(mon) && mon.isShadow)
+                    mon.ribbons?.includes('National') ||
+                      ('isShadow' in mon && (mon.isShadow as boolean))
                   ) ?? ''
                 )}
                 style={styles.gameImage}

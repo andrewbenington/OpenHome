@@ -18,8 +18,8 @@ import { GameOfOrigin, isGameBoy, isGen3, isGen4, isGen5 } from 'pokemon-resourc
 import { useCallback, useContext, useEffect, useState } from 'react'
 import { MdFileOpen } from 'react-icons/md'
 import { Errorable } from 'src/types/types'
+import { PKMInterface } from '../../types/interfaces'
 import { OHPKM } from '../../types/pkm/OHPKM'
-import { PKMFile } from '../../types/pkm/util'
 import {
   getMonFileIdentifier,
   getMonGen12Identifier,
@@ -48,7 +48,7 @@ const Home = () => {
   const [, appInfoDispatch] = useContext(AppInfoContext)
   const homeData = openSavesState.homeData
   const { palette } = useTheme()
-  const [selectedMon, setSelectedMon] = useState<PKMFile>()
+  const [selectedMon, setSelectedMon] = useState<PKMInterface>()
   const [tab, setTab] = useState('summary')
   const [openSaveDialog, setOpenSaveDialog] = useState(false)
   const [errorMessages, setErrorMessages] = useState<string[]>()
@@ -62,8 +62,8 @@ const Home = () => {
   }, [allOpenSaves, backend, homeData?.updatedBoxSlots])
 
   const onViewDrop = (e: React.DragEvent<HTMLDivElement>, type: string) => {
-    const processDroppedData = async (file?: File, droppedMon?: PKMFile) => {
-      let mon: PKMFile | undefined = droppedMon
+    const processDroppedData = async (file?: File, droppedMon?: PKMInterface) => {
+      let mon: PKMInterface | undefined = droppedMon
       if (file) {
         const buffer = await file.arrayBuffer()
         const [extension] = file.name.split('.').slice(-1)

@@ -1,6 +1,5 @@
 import { Stack } from '@mui/joy'
 import * as E from 'fp-ts/lib/Either'
-import { PKM } from 'pokemon-files'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { getSaveRef, SAV } from 'src/types/SAVTypes/SAV'
 import { buildSaveFile } from 'src/types/SAVTypes/load'
@@ -24,7 +23,7 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
   const { onOpen, view, cardSize } = props
   const backend = useContext(BackendContext)
   const [appInfo] = useContext(AppInfoContext)
-  const [suggestedSaves, setSuggestedSaves] = useState<SAV<PKM>[]>()
+  const [suggestedSaves, setSuggestedSaves] = useState<SAV[]>()
   const [{ homeMons: homeMonMap, gen12: gen12LookupMap, gen345: gen345LookupMap }] =
     useContext(LookupContext)
   const [, , openSaves] = useContext(OpenSavesContext)

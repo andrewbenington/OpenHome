@@ -2,8 +2,7 @@ import { uniq } from 'lodash'
 import { useContext, useMemo } from 'react'
 import { supportsMon } from 'src/types/SAVTypes/util'
 import { isRestricted } from 'src/types/TransferRestrictions'
-import { PKMFormData } from 'src/types/interfaces/base'
-import { Styles } from 'src/types/types'
+import { PKMFormData, Styles } from 'src/types/types'
 import {
   BDSP_TRANSFER_RESTRICTIONS,
   LA_TRANSFER_RESTRICTIONS,
@@ -60,7 +59,7 @@ const FileTypeSelect = (props: FileTypeSelectProps) => {
         .filter((saveType) => appInfo.settings.enabledSaveTypes[saveType.name])
         .map((saveType) =>
           supportsMon(saveType, formData.dexNum, formData.formeNum)
-            ? saveType.pkmType.name.slice(1) // hack to get the class name (slice(1) removes the underscore prefix)
+            ? saveType.pkmType.name
             : undefined
         )
     ).filter(filterUndefined)

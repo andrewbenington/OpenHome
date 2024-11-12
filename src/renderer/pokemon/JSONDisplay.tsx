@@ -1,9 +1,9 @@
 import { Box, useTheme } from '@mui/joy'
 import { JSONTree } from 'react-json-tree'
-import { PKMFile } from '../../types/pkm/util'
+import { PKMInterface } from '../../types/interfaces'
 
 interface JSONDisplayProps {
-  mon: PKMFile
+  mon: PKMInterface
 }
 
 export default function JSONDisplay(props: JSONDisplayProps) {

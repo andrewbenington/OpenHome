@@ -1,11 +1,10 @@
-import { AllPKMFields } from 'pokemon-files'
 import { GameOfOrigin } from 'pokemon-resources'
 import { SaveRef } from '../../types/types'
+import { PKMInterface } from '../interfaces'
 import { OHPKM } from '../pkm/OHPKM'
-import { PKMFile } from '../pkm/util'
 import { ParsedPath } from './path'
 
-export class Box<P extends AllPKMFields> {
+export class Box<P extends PKMInterface> {
   name: string
   pokemon: Array<P | OHPKM | undefined>
 
@@ -20,7 +19,7 @@ export interface BoxCoordinates {
   index: number
 }
 
-export interface SAV<P extends AllPKMFields = PKMFile> {
+export interface SAV<P extends PKMInterface = PKMInterface> {
   origin: GameOfOrigin
 
   boxRows: number

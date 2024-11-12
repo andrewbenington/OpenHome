@@ -1,5 +1,5 @@
-import { AllPKMFields, PKM } from 'pokemon-files'
 import { GameOfOrigin } from 'pokemon-resources'
+import { PKMInterface } from '../interfaces'
 import { ParsedPath } from './path'
 import { SAV } from './SAV'
 
@@ -66,7 +66,7 @@ export const GameColors: Record<GameOfOrigin, string> = {
 }
 
 export interface PKMClass {
-  new (arg: ArrayBuffer | AllPKMFields, encrypted?: boolean): PKM
+  new (arg: ArrayBuffer | PKMInterface, encrypted?: boolean): PKMInterface
 }
 
 export interface SAVClass {
