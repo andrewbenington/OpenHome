@@ -22,7 +22,7 @@ interface SaveFileSelectorProps {
 export default function SuggestedSaves(props: SaveFileSelectorProps) {
   const { onOpen, view, cardSize } = props
   const backend = useContext(BackendContext)
-  const [appInfo] = useContext(AppInfoContext)
+  const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
   const [suggestedSaves, setSuggestedSaves] = useState<SAV[]>()
   const [{ homeMons: homeMonMap, gen12: gen12LookupMap, gen345: gen345LookupMap }] =
     useContext(LookupContext)
@@ -47,9 +47,7 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
             gen345LookupMap,
             fileCreatedDate: createdDate,
           },
-          appInfo.settings.allSaveTypes.filter(
-            (saveType) => appInfo.settings.enabledSaveTypes[saveType.name]
-          )
+          getEnabledSaveTypes()
         )
       }
       return undefined

@@ -1,6 +1,6 @@
 import { uniq } from 'lodash'
 import { PK5 } from 'pokemon-files'
-import { GameOfOrigin } from 'pokemon-resources'
+import { GameOfOrigin, GameOfOriginData } from 'pokemon-resources'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -167,6 +167,11 @@ export abstract class G5SAV implements SAV<PK5> {
 
   getCurrentBox() {
     return this.boxes[this.currentPCBox]
+  }
+
+  getGameName() {
+    const gameOfOrigin = GameOfOriginData[this.origin]
+    return gameOfOrigin ? `Pokémon ${gameOfOrigin.name}` : '(Unknown Game)'
   }
 
   static gen4ValidDateAndSize(bytes: Uint8Array, offset: number) {

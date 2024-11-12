@@ -54,6 +54,8 @@ export interface SAV<P extends PKMInterface = PKMInterface> {
   prepareBoxesAndGetModified: () => OHPKM[]
 
   calculateChecksum?: () => number
+
+  getGameName: () => string
 }
 
 export function getSaveRef(save: SAV): SaveRef {

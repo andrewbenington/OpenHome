@@ -1,5 +1,5 @@
 import { PK6 } from 'pokemon-files'
-import { GameOfOrigin } from 'pokemon-resources'
+import { GameOfOrigin, GameOfOriginData } from 'pokemon-resources'
 import { bytesToUint16LittleEndian, uint16ToBytesLittleEndian } from '../../util/ByteLogic'
 import { CRC16_CCITT } from '../../util/Encryption'
 import { utf16BytesToString } from '../../util/Strings/StringConverter'
@@ -121,5 +121,10 @@ export abstract class G6SAV implements SAV<PK6> {
 
   getCurrentBox() {
     return this.boxes[this.currentPCBox]
+  }
+
+  getGameName() {
+    const gameOfOrigin = GameOfOriginData[this.origin]
+    return gameOfOrigin ? `Pokémon ${gameOfOrigin.name}` : '(Unknown Game)'
   }
 }

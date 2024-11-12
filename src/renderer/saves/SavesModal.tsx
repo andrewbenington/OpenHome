@@ -33,7 +33,7 @@ const SavesModal = (props: SavesModalProps) => {
   const backend = useContext(BackendContext)
   const [, dispatchOpenSaves] = useContext(OpenSavesContext)
   const [lookupState] = useContext(LookupContext)
-  const [appInfo] = useContext(AppInfoContext)
+  const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
   const [viewMode, setViewMode] = useState<SaveViewMode>('cards')
   const [cardSize, setCardSize] = useState<number>(180)
 
@@ -56,9 +56,7 @@ const SavesModal = (props: SavesModalProps) => {
                   gen345LookupMap: lookupState.gen345,
                   fileCreatedDate: createdDate,
                 },
-                appInfo.settings.allSaveTypes.filter(
-                  (saveType) => appInfo.settings.enabledSaveTypes[saveType.name]
-                ),
+                getEnabledSaveTypes(),
                 (updatedMon) => backend.writeHomeMon(updatedMon.bytes)
               )
               if (!saveFile) {

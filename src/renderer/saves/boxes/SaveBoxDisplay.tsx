@@ -85,9 +85,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
               flex: 1,
             }}
           >
-            <div style={{ textAlign: 'center', fontWeight: 'bold' }}>
-              Pokémon {GameOfOriginData[save.origin]?.name}
-            </div>
+            <div style={{ textAlign: 'center', fontWeight: 'bold' }}>{save.getGameName()}</div>
             <div style={{ textAlign: 'center' }}>
               {save?.name} ({save?.displayID})
             </div>

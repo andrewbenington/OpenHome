@@ -1,6 +1,6 @@
 import lodash from 'lodash'
 import { PK1 } from 'pokemon-files'
-import { GameOfOrigin, Languages } from 'pokemon-resources'
+import { GameOfOrigin, GameOfOriginData, Languages } from 'pokemon-resources'
 import { NationalDex } from 'pokemon-species-data'
 import { GEN1_TRANSFER_RESTRICTIONS } from '../../consts/TransferRestrictions'
 import { bytesToUint16BigEndian, get8BitChecksum } from '../../util/ByteLogic'
@@ -221,6 +221,11 @@ export class G1SAV implements SAV<PK1> {
 
   getCurrentBox() {
     return this.boxes[this.currentPCBox]
+  }
+
+  getGameName() {
+    const gameOfOrigin = GameOfOriginData[this.origin]
+    return gameOfOrigin ? `Pokémon ${gameOfOrigin.name}` : '(Unknown Game)'
   }
 
   static fileIsSave(bytes: Uint8Array): boolean {

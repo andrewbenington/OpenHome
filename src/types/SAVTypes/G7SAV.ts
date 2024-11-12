@@ -1,5 +1,5 @@
 import { PK7 } from 'pokemon-files'
-import { GameOfOrigin } from 'pokemon-resources'
+import { GameOfOrigin, GameOfOriginData } from 'pokemon-resources'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -138,5 +138,10 @@ export abstract class G7SAV implements SAV<PK7> {
 
   getCurrentBox() {
     return this.boxes[this.currentPCBox]
+  }
+
+  getGameName() {
+    const gameOfOrigin = GameOfOriginData[this.origin]
+    return gameOfOrigin ? `Pokémon ${gameOfOrigin.name}` : '(Unknown Game)'
   }
 }

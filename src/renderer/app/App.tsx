@@ -44,7 +44,16 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <BackendProvider backend={ElectronBackend}>
-        <AppInfoContext.Provider value={[appInfoState, appInfoDispatch]}>
+        <AppInfoContext.Provider
+          value={[
+            appInfoState,
+            appInfoDispatch,
+            () =>
+              appInfoState.settings.extraSaveTypes
+                .concat(appInfoState.settings.officialSaveTypes)
+                .filter((saveType) => appInfoState.settings.enabledSaveTypes[saveType.name]),
+          ]}
+        >
           <MouseContext.Provider value={[mouseState, mouseDispatch]}>
             <LookupProvider>
               <OpenSavesContext.Provider

@@ -75,6 +75,10 @@ export class HomeData implements SAV<OHPKM> {
     return this.boxes[this.currentPCBox]
   }
 
+  getGameName() {
+    return 'OpenHome'
+  }
+
   prepareBoxesAndGetModified() {
     return []
   }

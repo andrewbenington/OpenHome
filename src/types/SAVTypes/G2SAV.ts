@@ -1,6 +1,6 @@
 import { uniq } from 'lodash'
 import { PK2 } from 'pokemon-files'
-import { GameOfOrigin, Languages } from 'pokemon-resources'
+import { GameOfOrigin, GameOfOriginData, Languages } from 'pokemon-resources'
 import { NationalDex } from 'pokemon-species-data'
 import { EXCLAMATION } from '../../consts/Formes'
 import { GEN2_TRANSFER_RESTRICTIONS } from '../../consts/TransferRestrictions'
@@ -103,6 +103,10 @@ export class G2SAV implements SAV<PK2> {
       }
     })
   }
+  sid?: number | undefined
+  pcChecksumOffset?: number | undefined
+  pcOffset?: number | undefined
+  calculateChecksum?: (() => number) | undefined
 
   prepareBoxesAndGetModified() {
     const changedMonPKMs: OHPKM[] = []
@@ -241,6 +245,11 @@ export class G2SAV implements SAV<PK2> {
 
   getCurrentBox() {
     return this.boxes[this.currentPCBox]
+  }
+
+  getGameName() {
+    const gameOfOrigin = GameOfOriginData[this.origin]
+    return gameOfOrigin ? `Pokémon ${gameOfOrigin.name}` : '(Unknown Game)'
   }
 
   static fileIsSave(bytes: Uint8Array): boolean {

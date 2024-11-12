@@ -51,17 +51,15 @@ interface FileTypeSelectProps {
 
 const FileTypeSelect = (props: FileTypeSelectProps) => {
   const { baseFormat, currentFormat, formData, onChange } = props
-  const [appInfo] = useContext(AppInfoContext)
+  const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
 
   const supportedFormats = useMemo(() => {
     const supportedFormats = uniq(
-      appInfo.settings.allSaveTypes
-        .filter((saveType) => appInfo.settings.enabledSaveTypes[saveType.name])
-        .map((saveType) =>
-          supportsMon(saveType, formData.dexNum, formData.formeNum)
-            ? saveType.pkmType.name.slice(1) // get class name workaround
-            : undefined
-        )
+      getEnabledSaveTypes().map((saveType) =>
+        supportsMon(saveType, formData.dexNum, formData.formeNum)
+          ? saveType.pkmType.name.slice(1) // get class name workaround
+          : undefined
+      )
     ).filter(filterUndefined)
 
     // These should be removed when support is added for their corresponding saves

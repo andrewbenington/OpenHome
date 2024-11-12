@@ -1,5 +1,5 @@
 import { PK3 } from 'pokemon-files'
-import { GameOfOrigin } from 'pokemon-resources'
+import { GameOfOrigin, GameOfOriginData } from 'pokemon-resources'
 import { NationalDex } from 'pokemon-species-data'
 import { GEN3_TRANSFER_RESTRICTIONS } from '../../consts/TransferRestrictions'
 import {
@@ -304,6 +304,11 @@ export class G3SAV implements SAV<PK3> {
 
   getCurrentBox() {
     return this.boxes[this.currentPCBox]
+  }
+
+  getGameName() {
+    const gameOfOrigin = GameOfOriginData[this.origin]
+    return gameOfOrigin ? `Pokémon ${gameOfOrigin.name}` : '(Unknown Game)'
   }
 
   static fileIsSave(bytes: Uint8Array): boolean {

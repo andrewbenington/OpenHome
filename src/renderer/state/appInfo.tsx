@@ -4,6 +4,7 @@ import { BWSAV } from '../../types/SAVTypes/BWSAV'
 import { DPSAV } from '../../types/SAVTypes/DPSAV'
 import { G1SAV } from '../../types/SAVTypes/G1SAV'
 import { G2SAV } from '../../types/SAVTypes/G2SAV'
+import { G3RRSAV } from '../../types/SAVTypes/G3RRSAV'
 import { G3SAV } from '../../types/SAVTypes/G3SAV'
 import { HGSSSAV } from '../../types/SAVTypes/HGSSSAV'
 import { ORASSAV } from '../../types/SAVTypes/ORASSAV'
@@ -15,7 +16,8 @@ import { XYSAV } from '../../types/SAVTypes/XYSAV'
 
 export type Settings = {
   enabledSaveTypes: Record<string, boolean>
-  allSaveTypes: SAVClass[]
+  officialSaveTypes: SAVClass[]
+  extraSaveTypes: SAVClass[]
 }
 
 export type AppInfoState = {
@@ -62,7 +64,7 @@ export const appInfoReducer: Reducer<AppInfoState, AppInfoAction> = (
 
 export const appInfoInitialState: AppInfoState = {
   settings: {
-    allSaveTypes: [
+    officialSaveTypes: [
       G1SAV,
       G2SAV,
       G3SAV,
@@ -76,6 +78,7 @@ export const appInfoInitialState: AppInfoState = {
       SMSAV,
       USUMSAV,
     ],
+    extraSaveTypes: [G3RRSAV],
     enabledSaveTypes: Object.fromEntries(
       [
         G1SAV,
@@ -90,12 +93,12 @@ export const appInfoInitialState: AppInfoState = {
         ORASSAV,
         SMSAV,
         USUMSAV,
+        G3RRSAV,
       ].map((savetype) => [savetype.name, true])
     ),
   },
 }
 
-export const AppInfoContext = createContext<[AppInfoState, Dispatch<AppInfoAction>]>([
-  appInfoInitialState,
-  () => null,
-])
+export const AppInfoContext = createContext<
+  [AppInfoState, Dispatch<AppInfoAction>, () => SAVClass[]]
+>([appInfoInitialState, () => null, () => []])
