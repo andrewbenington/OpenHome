@@ -124,7 +124,7 @@ export class G3SaveBackup {
     for (let i = 0; i < 420; i++) {
       try {
         const mon = new PK3(this.pcDataContiguous.slice(4 + i * 80, 4 + (i + 1) * 80).buffer, true)
-        if (mon.gameOfOrigin !== 0 && mon.dexNum !== 0) {
+        if (mon.isValid()) {
           const box = this.boxes[Math.floor(i / 30)]
           box.pokemon[i % 30] = mon
         }
