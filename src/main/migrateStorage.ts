@@ -2,25 +2,8 @@ import { app } from 'electron'
 import fs from 'fs'
 import path from 'path'
 import { StoredBoxData } from '../types/storage'
-import { SaveRefMap, SaveType } from '../types/types'
+import { SaveRefMap } from '../types/types'
 import { fileCanOpen, fileLastModified, updateStoredList, updateStoredObject } from './fileHandlers'
-
-const SaveTypeStrings: { [key: string]: SaveType } = {
-  RGBY_J: SaveType.RGBY_J,
-  RBY_I: SaveType.RBY_I,
-  GS_J: SaveType.GS_J,
-  GS_I: SaveType.GS_I,
-  C_J: SaveType.C_J,
-  C_I: SaveType.C_I,
-  RS: SaveType.RS,
-  FRLG: SaveType.FRLG,
-  E: SaveType.E,
-  DP: SaveType.DP,
-  Pt: SaveType.Pt,
-  HGSS: SaveType.HGSS,
-  G5: SaveType.G5,
-  G6: SaveType.G6,
-}
 
 function boxDataFromCSV(oldBoxFolderPath: string) {
   const boxFiles = fs.readdirSync(oldBoxFolderPath)
@@ -76,14 +59,12 @@ function recentSavesFromCSV(csvPath: string): SaveRefMap {
   const recentSaves: SaveRefMap = {}
   csvFileString.split(/\r?\n/).forEach((entry) => {
     // eslint-disable-next-line prefer-const
-    let [filePathRaw, saveTypeString, game, trainerName, trainerID, lastOpened] = entry.split(',')
+    let [filePathRaw, _, game, trainerName, trainerID, lastOpened] = entry.split(',')
     filePathRaw = decodeURIComponent(filePathRaw)
     const filePath = { ...path.parse(filePathRaw), separator: path.sep, raw: filePathRaw }
-    const saveType = SaveTypeStrings[saveTypeString]
-    if (filePath && saveType) {
+    if (filePath) {
       recentSaves[filePathRaw] = {
         filePath,
-        saveType,
         game,
         trainerName,
         trainerID,

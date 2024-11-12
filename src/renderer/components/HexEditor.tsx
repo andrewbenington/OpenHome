@@ -7,7 +7,7 @@ import { CSSProperties, Fragment, useEffect, useMemo, useState } from 'react'
 
 interface HexEditorProps {
   data: Uint8Array
-  format: keyof typeof FileSchemas
+  format?: keyof typeof FileSchemas
 }
 
 const styles: { [key: string]: CSSProperties } = {
@@ -28,7 +28,7 @@ const styles: { [key: string]: CSSProperties } = {
 const HexEditor = ({ data, format }: HexEditorProps) => {
   const [hexyText, setHexyText] = useState<string>()
   const [currentHover, setCurrentHover] = useState<number>()
-  const schema = FileSchemas[format]
+  const schema = format ? FileSchemas[format] : undefined
   const theme = useTheme()
 
   useEffect(() => {
@@ -43,7 +43,7 @@ const HexEditor = ({ data, format }: HexEditorProps) => {
   const hoveredField = useMemo(
     () =>
       currentHover
-        ? schema.fields.find(
+        ? schema?.fields.find(
             (f) =>
               f.byteOffset !== undefined &&
               f.byteOffset <= currentHover &&
@@ -105,12 +105,14 @@ const HexEditor = ({ data, format }: HexEditorProps) => {
                         .toString(16)
                         .padStart(4, '0')}\nBin Value:\n${binaryFromHexString(
                         pair.substring(0, 2)
-                      )}\n${schema.fields.find(
-                        (f) =>
-                          f.byteOffset !== undefined &&
-                          f.byteOffset <= byteIndex &&
-                          byteIndex < f.byteOffset + (f.numBytes ?? 1)
-                      )?.name}`}
+                      )}\n${
+                        schema?.fields.find(
+                          (f) =>
+                            f.byteOffset !== undefined &&
+                            f.byteOffset <= byteIndex &&
+                            byteIndex < f.byteOffset + (f.numBytes ?? 1)
+                        )?.name ?? ''
+                      }`}
                     >
                       <code>{pair.substring(0, 2)}</code>
                     </div>
@@ -133,12 +135,14 @@ const HexEditor = ({ data, format }: HexEditorProps) => {
                         .toString(16)
                         .padStart(4, '0')}\nBin Value:\n${binaryFromHexString(
                         pair.substring(2)
-                      )}\n${schema.fields.find(
-                        (f) =>
-                          f.byteOffset !== undefined &&
-                          f.byteOffset <= byteIndex + 1 &&
-                          byteIndex + 1 < f.byteOffset + (f.numBytes ?? 1)
-                      )?.name}\n${byteIndex % 16}`}
+                      )}\n${
+                        schema?.fields.find(
+                          (f) =>
+                            f.byteOffset !== undefined &&
+                            f.byteOffset <= byteIndex + 1 &&
+                            byteIndex + 1 < f.byteOffset + (f.numBytes ?? 1)
+                        )?.name ?? ''
+                      }\n${byteIndex % 16}`}
                     >
                       <code>{pair.substring(2)}</code>
                     </div>

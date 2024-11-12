@@ -2,11 +2,11 @@ import { Box, Tab, TabList, TabPanel, Tabs, Typography } from '@mui/joy'
 import { extendTheme, ThemeProvider } from '@mui/joy/styles'
 import { useMemo, useReducer } from 'react'
 import 'react-data-grid/lib/styles.css'
-import { SaveType } from 'src/types/types'
+import { HomeData } from '../../types/SAVTypes/HomeData'
 import { BackendProvider } from '../backend/backendProvider'
 import { ElectronBackend } from '../backend/electronBackend'
 import useIsDarkMode from '../hooks/dark-mode'
-import { AppInfoContext, appInfoReducer } from '../state/appInfo'
+import { AppInfoContext, appInfoInitialState, appInfoReducer } from '../state/appInfo'
 import { FilterProvider } from '../state/filter'
 import { LookupProvider } from '../state/lookup'
 import { MouseContext, mouseReducer } from '../state/mouse'
@@ -14,6 +14,7 @@ import { OpenSavesContext, openSavesReducer } from '../state/openSaves'
 import './App.css'
 import Home from './Home'
 import TrackedPokemon from './manage/TrackedPokemon'
+import Settings from './Settings'
 import SortPokemon from './sort/SortPokemon'
 import { components, darkTheme, lightTheme } from './Themes'
 
@@ -31,7 +32,7 @@ function App() {
     [isDarkMode]
   )
   const [mouseState, mouseDispatch] = useReducer(mouseReducer, { shift: false })
-  const [appInfoState, appInfoDispatch] = useReducer(appInfoReducer, {})
+  const [appInfoState, appInfoDispatch] = useReducer(appInfoReducer, appInfoInitialState)
   const [openSavesState, openSavesDispatch] = useReducer(openSavesReducer, {
     modifiedOHPKMs: {},
     monsToRelease: [],
@@ -52,7 +53,7 @@ function App() {
                   openSavesDispatch,
                   Object.values(openSavesState.openSaves)
                     .filter((data) => !!data)
-                    .filter((data) => data.save.saveType !== SaveType.OPENHOME)
+                    .filter((data) => !(data.save instanceof HomeData))
                     .sort((a, b) => a.index - b.index)
                     .map((data) => data.save),
                 ]}
@@ -86,6 +87,12 @@ function App() {
                       >
                         <SortPokemon />
                       </TabPanel>
+                      <TabPanel
+                        sx={{ '--Tabs-spacing': 0, height: 0, overflowY: 'hidden' }}
+                        value="settings"
+                      >
+                        <Settings />
+                      </TabPanel>
                       <TabList color="primary">
                         <Tab indicatorPlacement="top" value="home" color="primary">
                           Home
@@ -95,6 +102,9 @@ function App() {
                         </Tab>
                         <Tab indicatorPlacement="top" value="sort" color="primary">
                           Sort Pokémon
+                        </Tab>
+                        <Tab indicatorPlacement="top" value="settings" color="primary">
+                          Settings
                         </Tab>
                       </TabList>
                     </Tabs>

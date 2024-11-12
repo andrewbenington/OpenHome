@@ -1,31 +1,24 @@
-import { NationalDex } from 'pokemon-species-data'
+import { PK4 } from 'pokemon-files'
+import { DP_TRANSFER_RESTRICTIONS } from '../../consts/TransferRestrictions'
 import { bytesToUint16LittleEndian, bytesToUint32LittleEndian } from '../../util/ByteLogic'
 import { gen4StringToUTF } from '../../util/Strings/StringConverter'
-import { CapPikachus, RegionalForms } from '../TransferRestrictions'
-import { SaveType } from '../types'
+import { isRestricted } from '../TransferRestrictions'
 import { G4SAV } from './G4SAV'
 import { ParsedPath } from './path'
+import { hasDesamumeFooter } from './util'
 
 export class DPSAV extends G4SAV {
-  saveType = SaveType.DP
+  static pkmType = PK4
 
-  transferRestrictions = {
-    maxDexNum: NationalDex.Arceus,
-    excludedForms: {
-      ...RegionalForms,
-      ...CapPikachus,
-      // rotom appliances
-      479: [1, 2, 3, 4, 5],
-      // origin formes
-      483: [1],
-      484: [1],
-      487: [1],
-      // shaymin sky
-      492: [1],
-      // arceus fairy
-      493: [17],
-    },
-  }
+  name: string
+  tid: number
+  sid: number
+  displayID: string
+
+  invalid: boolean = false
+  tooEarlyToOpen: boolean = false
+
+  static transferRestrictions = DP_TRANSFER_RESTRICTIONS
 
   static TRAINER_NAME_OFFSET = 0x64
 
@@ -72,5 +65,22 @@ export class DPSAV extends G4SAV {
 
   getCurrentSaveCount(blockOffset: number, blockSize: number) {
     return bytesToUint32LittleEndian(this.bytes, blockOffset + blockSize - this.footerSize)
+  }
+
+  supportsMon(dexNumber: number, formeNumber: number) {
+    return !isRestricted(DP_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)
+  }
+
+  static fileIsSave(bytes: Uint8Array): boolean {
+    if (bytes.length < G4SAV.SAVE_SIZE_BYTES) {
+      return false
+    }
+    if (bytes.length > G4SAV.SAVE_SIZE_BYTES) {
+      if (!hasDesamumeFooter(bytes, G4SAV.SAVE_SIZE_BYTES)) {
+        return false
+      }
+    }
+
+    return G4SAV.validDateAndSize(bytes, 0x4c100)
   }
 }

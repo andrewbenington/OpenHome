@@ -1,8 +1,7 @@
 import { Card, Divider, Grid, Stack } from '@mui/joy'
 import { isDayjs } from 'dayjs'
 import { PKM } from 'pokemon-files'
-import { useMemo } from 'react'
-import { SAV } from '../../types/SAVTypes'
+import { ReactNode, useMemo } from 'react'
 type Breakpoint = 'xs' | 'sm' | 'md' | 'lg' | 'xl'
 
 const primitiveTypes = ['number', 'bigint', 'boolean', 'string', 'undefined', 'null']
@@ -128,7 +127,10 @@ function InfoGridElement(props: InfoGridElementProps) {
             Dayjs(
             {value.format('YYYY-MM-DD HH:mm')})
           </Grid>
-        ) : value instanceof SAV ? (
+        ) : 'name' in value &&
+          typeof value.name === 'string' &&
+          'tid' in value &&
+          typeof value.tid === 'number' ? (
           <Grid {...dataBreakpoints} key={`info-row-value`}>
             SAV({value.name}, {value.tid})
           </Grid>
@@ -156,7 +158,7 @@ function InfoGridElement(props: InfoGridElementProps) {
         ) : (
           <Grid xs={12} key={`info-row-value`} marginBottom={1}>
             {'props' in value ? (
-              value
+              (value as ReactNode)
             ) : (
               <Card variant="outlined">
                 <InfoGrid data={value} labelBreakpoints={labelBreakpoints} />

@@ -2,8 +2,8 @@ import * as E from 'fp-ts/lib/Either'
 import { PokemonData } from 'pokemon-species-data'
 import { createContext, PropsWithChildren } from 'react'
 import { OHPKM } from 'src/types/pkm/OHPKM'
-import { SAV } from 'src/types/SAVTypes'
 import { HomeData } from 'src/types/SAVTypes/HomeData'
+import { SAV } from 'src/types/SAVTypes/SAV'
 import { StoredBoxData } from 'src/types/storage'
 import { Errorable } from 'src/types/types'
 import BackendInterface from '../../types/backendInterface'
@@ -36,7 +36,7 @@ async function writeAllSaveFiles(
   backend: BackendInterface,
   saveFiles: SAV[]
 ): Promise<Errorable<null>[]> {
-  saveFiles.forEach((save) => save.prepareBoxesForSaving())
+  saveFiles.forEach((save) => save.prepareBoxesAndGetModified())
   return Promise.all(
     saveFiles.map((saveFile) => backend.writeSaveFile(saveFile.filePath.raw, saveFile.bytes))
   )

@@ -1,12 +1,12 @@
 import { Dispatch, Reducer, createContext } from 'react'
-import { SAV } from 'src/types/SAVTypes'
-import { PKMFile } from '../../types/pkm/util'
+import { SAV } from 'src/types/SAVTypes/SAV'
+import { PKMInterface } from '../../types/interfaces'
 
 export type DragSource = {
   save: SAV
   box: number
   boxPos: number
-  mon: PKMFile
+  mon: PKMInterface
 }
 
 export type MouseState = {

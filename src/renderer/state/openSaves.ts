@@ -1,10 +1,10 @@
 import { createContext, Dispatch, Reducer } from 'react'
 import { OHPKM } from 'src/types/pkm/OHPKM'
-import { PKMFile } from 'src/types/pkm/util'
-import { SAV } from 'src/types/SAVTypes'
 import { HomeData } from 'src/types/SAVTypes/HomeData'
+import { SAV } from 'src/types/SAVTypes/SAV'
 import { StoredBoxData } from 'src/types/storage'
 import { getMonFileIdentifier } from 'src/util/Lookup'
+import { PKMInterface } from '../../types/interfaces'
 
 export type OpenSave = {
   index: number
@@ -17,7 +17,7 @@ function saveToStringIdentifier(save: SAV): string {
 
 export type OpenSavesState = {
   modifiedOHPKMs: { [key: string]: OHPKM }
-  monsToRelease: PKMFile[]
+  monsToRelease: PKMInterface[]
   openSaves: Record<string, OpenSave>
   homeData?: HomeData
   error?: string
@@ -59,7 +59,7 @@ export type OpenSavesAction =
   | {
       type: 'import_mons'
       payload: {
-        mons: PKMFile[]
+        mons: PKMInterface[]
         dest: MonLocation
       }
     }
@@ -67,7 +67,7 @@ export type OpenSavesAction =
       type: 'move_mon'
       payload: {
         source: MonLocation & {
-          mon: PKMFile
+          mon: PKMInterface
         }
         dest: MonLocation
       }
@@ -93,7 +93,11 @@ export type OpenSavesAction =
       payload: string | undefined
     }
 
-const updateMonInSave = (state: OpenSavesState, mon: PKMFile | undefined, dest: MonLocation) => {
+const updateMonInSave = (
+  state: OpenSavesState,
+  mon: PKMInterface | undefined,
+  dest: MonLocation
+) => {
   let replacedMon
   const { save, box, boxPos } = dest
   const saveID = saveToStringIdentifier(save)
@@ -189,7 +193,7 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
           }
           const identifier = getMonFileIdentifier(sourceMon)
           if (identifier) {
-            state.modifiedOHPKMs[identifier] = sourceMon
+            state.modifiedOHPKMs[identifier] = sourceMon as OHPKM
           }
         }
         if (destMon) {
@@ -198,7 +202,7 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
           }
           const identifier = getMonFileIdentifier(destMon)
           if (identifier) {
-            state.modifiedOHPKMs[identifier] = destMon
+            state.modifiedOHPKMs[identifier] = destMon as OHPKM
           }
         }
       }
