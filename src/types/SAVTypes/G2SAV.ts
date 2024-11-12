@@ -97,6 +97,7 @@ export class G2SAV implements SAV<PK2> {
             monIndex * 11,
           11
         )
+        mon.gameOfOrigin = mon.metLevel ? GameOfOrigin.Crystal : this.origin
         mon.languageIndex = Languages.indexOf('ENG')
         this.boxes[boxNumber].pokemon[monIndex] = mon
       }
@@ -118,7 +119,7 @@ export class G2SAV implements SAV<PK2> {
             changedMonPKMs.push(boxMon)
           }
           const pk2Mon = boxMon instanceof PK2 ? boxMon : new PK2(boxMon)
-          // set the mon's dex number in the box
+          // set the mon's dex number in the box (separate location)
           this.bytes[boxByteOffset + 1 + numMons] = pk2Mon.dexNum
           // set the mon's data in the box
           this.bytes.set(

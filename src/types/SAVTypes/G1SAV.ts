@@ -83,11 +83,14 @@ export class G1SAV implements SAV<PK1> {
       currenBoxByteOffset
     )
 
-    if (this.bytes[0x271c] > 0) {
+    if (this.bytes[0x271c] > 0 || path.name.toLowerCase().includes('yellow')) {
       // pikachu friendship
       this.origin = GameOfOrigin.Yellow
+    } else if (path.name.toLowerCase().includes('blue')) {
+      this.origin = GameOfOrigin.BlueGreen
+    } else {
+      this.origin = GameOfOrigin.Red
     }
-
     const pokemonPerBox = this.boxRows * this.boxColumns
 
     lodash.range(this.NUM_BOXES).forEach((boxNumber) => {
@@ -117,7 +120,7 @@ export class G1SAV implements SAV<PK1> {
               boxByteOffset + this.BOX_NICKNAME_OFFSET + monIndex * 11,
               11
             )
-            mon.gameOfOrigin = GameOfOrigin.Red
+            mon.gameOfOrigin = this.origin
             mon.languageIndex = Languages.indexOf('ENG')
             this.boxes[boxNumber].pokemon[monIndex] = mon
           } catch (e) {
