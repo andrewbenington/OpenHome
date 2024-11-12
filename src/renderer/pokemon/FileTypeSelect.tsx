@@ -59,7 +59,7 @@ const FileTypeSelect = (props: FileTypeSelectProps) => {
         .filter((saveType) => appInfo.settings.enabledSaveTypes[saveType.name])
         .map((saveType) =>
           supportsMon(saveType, formData.dexNum, formData.formeNum)
-            ? saveType.pkmType.name
+            ? saveType.pkmType.name.slice(1) // get class name workaround
             : undefined
         )
     ).filter(filterUndefined)
