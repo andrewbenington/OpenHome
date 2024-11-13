@@ -10,6 +10,11 @@ function extractSuffixFromFilename(filename) {
     return match ? match[1] : null;
 }
 
+function formatSuffix(suffix) {
+    if (suffix.length === 0) return suffix;
+    return suffix[0].toUpperCase() + suffix.slice(1).toLowerCase(); // Capitalize first letter, lowercase the rest
+}
+
 function removeBackgroundBasedOnTopLeftPixel(sourcePath, destinationPath) {
     sharp(sourcePath)
         .ensureAlpha()
@@ -56,8 +61,9 @@ function processImages() {
     files.forEach(file => {
         const suffix = extractSuffixFromFilename(file);
         if (suffix) {
+            const formattedSuffix = formatSuffix(suffix); // Format the suffix
             const sourcePath = path.join(sourceFolder, file);
-            const destinationPath = path.join(destinationFolder, `${suffix}.png`);
+            const destinationPath = path.join(destinationFolder, `${formattedSuffix}.png`);
             removeBackgroundBasedOnTopLeftPixel(sourcePath, destinationPath);
         } else {
             console.log(`Skipped file (no suffix found): ${file}`);
