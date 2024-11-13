@@ -7,6 +7,7 @@ import { PKMFile } from 'src/types/pkm/util'
 import { Styles } from 'src/types/types'
 import BoxIcons from '../../images/BoxIcons.png'
 import { ItemFromString } from 'pokemon-resources'
+import { Bag } from '../Bag'
 
 const styles = {
   fillContainer: { width: '100%', height: '100%' },
@@ -41,11 +42,11 @@ interface BoxCellProps {
   mon: PKMFile | undefined
   borderColor?: string
   setDraggedMon: React.Dispatch<React.SetStateAction<PKMFile | null>>
-  removeItemFromBag: (itemName: string) => void 
+  updateBag: () => void 
 }
 
 const BoxCell = (props: BoxCellProps) => {
-  const { onClick, onDragEvent, onDrop, disabled, zIndex, mon, borderColor, setDraggedMon, removeItemFromBag } = props
+  const { onClick, onDragEvent, onDrop, disabled, zIndex, mon, borderColor, setDraggedMon, updateBag } = props
   const [isBeingDragged, setIsBeingDragged] = useState(false)
   const [isDraggedOver, setIsDraggedOver] = useState(false)
   const [filterState] = useContext(FilterContext)
@@ -83,7 +84,8 @@ const BoxCell = (props: BoxCellProps) => {
         mon.heldItemIndex = itemId
         console.log(`Assigned item "${droppedData}" to Pokémon`)
 
-        removeItemFromBag(droppedData)
+        Bag.popItem(droppedData)
+        updateBag()
         console.log(`Removed item "${droppedData}" from Bag`)
 
       } else if (itemId && mon?.heldItemIndex) {

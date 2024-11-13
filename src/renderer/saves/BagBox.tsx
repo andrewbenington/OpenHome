@@ -3,19 +3,21 @@ import { useMemo } from 'react'
 import { RemoveIcon } from '../components/Icons'
 import { ItemFromString } from 'pokemon-resources'
 import { PKMFile } from '../../types/pkm/util'
+import { Bag } from './Bag'
 
 interface BagBoxProps {
-  items: { name: string }[]  
   onClose: () => void
-  addItemToBag: (itemName: string) => void
   removeItemFromPokemon: (itemName: string) => void
-  removeItemFromBag: (itemName: string) => void
   draggedMon: PKMFile | null
   setDraggedItem: React.Dispatch<React.SetStateAction<string | null>>
+  items: { name: string; count: number }[];
+  updateBag: () => void
 }
 
-const BagBox = ({ items, onClose, addItemToBag, removeItemFromPokemon, removeItemFromBag, draggedMon, setDraggedItem}: BagBoxProps) => {
+const BagBox = ({ onClose, removeItemFromPokemon, draggedMon, setDraggedItem, updateBag }: BagBoxProps) => {
   const backgroundColor = useMemo(() => '#f5f5f5', [])
+
+  let items = Bag.getItems()
 
   const getItemIconPath = (itemName: string) => {
     const itemId = ItemFromString(itemName)?.toString().padStart(4, '0')
@@ -31,7 +33,7 @@ const BagBox = ({ items, onClose, addItemToBag, removeItemFromPokemon, removeIte
     e.preventDefault()
 
     if (draggedMon?.heldItemIndex) {
-      addItemToBag(draggedMon.heldItemName)
+      Bag.addItem(draggedMon.heldItemName)
       removeItemFromPokemon(draggedMon.heldItemName)
       console.log(`Transferred "${draggedMon.heldItemIndex}" from Pokémon to the bag`)
     }
@@ -45,8 +47,11 @@ const BagBox = ({ items, onClose, addItemToBag, removeItemFromPokemon, removeIte
   const handleDragEnd = (e: React.DragEvent) => {
     const itemName = e.dataTransfer.getData('ItemTransfer')
     if (itemName) {
-      removeItemFromBag(itemName)
+      Bag.popItem(itemName)
+      updateBag()
     }
+    items = Bag.getItems()
+    console.info(items)
   }
 
   return (

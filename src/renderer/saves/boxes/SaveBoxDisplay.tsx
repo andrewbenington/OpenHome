@@ -17,14 +17,14 @@ interface OpenSaveDisplayProps {
   saveIndex: number
   setSelectedMon: (_: PKMFile | undefined) => void
   setDraggedMon: React.Dispatch<React.SetStateAction<PKMFile | null>>
-  removeItemFromBag: (itemName: string) => void 
+  updateBag: () => void
 }
 
 const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   const [, openSavesDispatch, openSaves] = useContext(OpenSavesContext)
   const [mouseState, mouseDispatch] = useContext(MouseContext)
   const [detailsModal, setDetailsModal] = useState(false)
-  const { saveIndex, setSelectedMon, setDraggedMon, removeItemFromBag } = props
+  const { saveIndex, setSelectedMon, setDraggedMon, updateBag } = props
   const save = openSaves[saveIndex]
 
   const dispatchStartDrag = useCallback(
@@ -194,7 +194,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                         }
                       }}
                       setDraggedMon={setDraggedMon}
-                      removeItemFromBag={removeItemFromBag}
+                      updateBag={updateBag}
                     />
                   </Grid>
                 )

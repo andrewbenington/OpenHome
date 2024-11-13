@@ -40,6 +40,7 @@ import { initializeDragImage } from '../util/initializeDragImage'
 import { handleMenuResetAndClose, handleMenuSave } from '../util/ipcFunctions'
 import './Home.css'
 import BagBox from '../saves/BagBox'
+import { Bag } from '../saves/Bag'
 
 const Home = () => {
   const [openSavesState, openSavesDispatch, allOpenSaves] = useContext(OpenSavesContext)
@@ -57,11 +58,10 @@ const Home = () => {
   const [openBagDialog, setOpenBagDialog] = useState(false)
   const [errorMessages, setErrorMessages] = useState<string[]>()
   const [filesToDelete, setFilesToDelete] = useState<string[]>([])
-  const [bagItems, setBagItems] = useState([{ name: 'Potion' }, { name: 'Ultra Ball' }])
+  const [bagItems, setBagItems] = useState(Bag.getItems());
 
-
-  const addItemToBag = (itemName: string) => {
-    setBagItems((prevItems) => [...prevItems, { name: itemName }])
+  const updateBag = () => {
+    setBagItems(Bag.getItems())
   }
 
   const removeItemFromPokemon = () => {
@@ -69,10 +69,6 @@ const Home = () => {
       draggedMon.heldItemIndex = 0
       console.log(`Removed item from dragged Pokémon`)
     }
-  }
-
-  const removeItemFromBag = (itemName: string) => {
-    setBagItems((prevItems) => prevItems.filter((item) => item.name !== itemName))
   }
 
   useEffect(() => {
@@ -306,7 +302,7 @@ const Home = () => {
           saveIndex={i}
           setSelectedMon={setSelectedMon}
           setDraggedMon={setDraggedMon}
-          removeItemFromBag={removeItemFromBag}
+          updateBag={updateBag}
         />
       ))}
 
@@ -338,13 +334,12 @@ const Home = () => {
       {/* Conditionally render BagBox */}
       {openBagDialog && (
         <BagBox
-          items={bagItems}
           onClose={() => setOpenBagDialog(false)}
-          addItemToBag={addItemToBag}
           removeItemFromPokemon={removeItemFromPokemon}
-          removeItemFromBag={removeItemFromBag}
           draggedMon={draggedMon}
           setDraggedItem={setDraggedItem}
+          items={bagItems}
+          updateBag={updateBag}
         />
       )}
     </Stack>
@@ -364,7 +359,7 @@ const Home = () => {
           minWidth={480}
           alignItems="center"
         >
-          <HomeBoxDisplay setSelectedMon={setSelectedMon} setDraggedMon={setDraggedMon} removeItemFromBag={removeItemFromBag} />
+          <HomeBoxDisplay setSelectedMon={setSelectedMon} setDraggedMon={setDraggedMon} updateBag={updateBag} />
           <Box flex={1}></Box>
         </Box>
       </div>
