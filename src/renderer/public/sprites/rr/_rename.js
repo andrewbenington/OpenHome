@@ -5,9 +5,9 @@ const sharp = require('sharp');
 const sourceFolder = 'rr'; 
 const destinationFolder = __dirname;
 
-function extractIdFromFilename(filename) {
-    const match = filename.match(/gFrontSprite(\d+)/);
-    return match ? match[1].replace(/^0+/, '') : null;
+function extractSuffixFromFilename(filename) {
+    const match = filename.match(/gFrontSprite\d+(.*)\.png$/i); // Match the part after gFrontSprite### until .png
+    return match ? match[1] : null;
 }
 
 function removeBackgroundBasedOnTopLeftPixel(sourcePath, destinationPath) {
@@ -54,13 +54,13 @@ function processImages() {
 
     const files = fs.readdirSync(sourceFolder);
     files.forEach(file => {
-        const id = extractIdFromFilename(file);
-        if (id) {
+        const suffix = extractSuffixFromFilename(file);
+        if (suffix) {
             const sourcePath = path.join(sourceFolder, file);
-            const destinationPath = path.join(destinationFolder, `${id}.png`);
+            const destinationPath = path.join(destinationFolder, `${suffix}.png`);
             removeBackgroundBasedOnTopLeftPixel(sourcePath, destinationPath);
         } else {
-            console.log(`Skipped file (no ID found): ${file}`);
+            console.log(`Skipped file (no suffix found): ${file}`);
         }
     });
 }
