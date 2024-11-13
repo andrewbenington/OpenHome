@@ -127,4 +127,8 @@ export abstract class G6SAV implements SAV<PK6> {
     const gameOfOrigin = GameOfOriginData[this.origin]
     return gameOfOrigin ? `Pokémon ${gameOfOrigin.name}` : '(Unknown Game)'
   }
+
+  isPlugin() {
+    return false
+  }
 }

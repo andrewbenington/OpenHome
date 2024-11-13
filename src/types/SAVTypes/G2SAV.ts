@@ -265,4 +265,8 @@ export class G2SAV implements SAV<PK2> {
       return false
     }
   }
+
+  isPlugin() {
+    return false
+  }
 }

@@ -130,6 +130,10 @@ export class G1SAV implements SAV<PK1> {
       }
     })
   }
+  sid?: number | undefined
+  pcChecksumOffset?: number | undefined
+  pcOffset?: number | undefined
+  calculateChecksum?: (() => number) | undefined
 
   prepareBoxesAndGetModified() {
     const changedMonPKMs: OHPKM[] = []
@@ -232,5 +236,9 @@ export class G1SAV implements SAV<PK1> {
 
   static fileIsSave(bytes: Uint8Array): boolean {
     return bytes.length === SAVE_SIZE_BYTES
+  }
+
+  isPlugin() {
+    return false
   }
 }

@@ -1,7 +1,10 @@
-import { AllPKMFields, Stats, ToBytesOptions } from 'pokemon-files'
+import { AllPKMFields, Stats } from 'pokemon-files'
 
 export type PKMInterface = AllPKMFields & {
-  isShiny(): boolean
-  toBytes(options?: ToBytesOptions): ArrayBuffer
   getStats(): Stats
+  pluginName?: undefined
+}
+
+export type PluginPKMInterface = PKMInterface & {
+  pluginName: string
 }

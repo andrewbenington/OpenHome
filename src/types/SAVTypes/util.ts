@@ -77,6 +77,14 @@ export interface SAVClass {
   saveTypeName: string
 }
 
+export type AlphaUnderscore<T extends string = string> = T extends `${infer First}${infer Rest}`
+  ? First extends '_' | Lowercase<First> | Uppercase<First>
+    ? Rest extends ''
+      ? T
+      : AlphaUnderscore<Rest>
+    : never
+  : T
+
 export type PKMTypeOf<Type> = Type extends SAV<infer X> ? X : never
 
 export function supportsMon(saveType: SAVClass, dexNumber: number, formeNumber: number): boolean {

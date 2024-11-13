@@ -56,6 +56,13 @@ export interface SAV<P extends PKMInterface = PKMInterface> {
   calculateChecksum?: () => number
 
   getGameName: () => string
+
+  isPlugin: () => boolean
+}
+
+export type PluginSAV<P extends PKMInterface = PKMInterface> = SAV<P> & {
+  getPluginID: () => string
+  isPlugin: () => true
 }
 
 export function getSaveRef(save: SAV): SaveRef {

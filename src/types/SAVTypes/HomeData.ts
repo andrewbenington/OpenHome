@@ -70,6 +70,9 @@ export class HomeData implements SAV<OHPKM> {
     this.boxNames = lodash.range(36).map((i) => `Box ${i + 1}`)
     this.boxes = this.boxNames.map((name) => new HomeBox(name))
   }
+  pcChecksumOffset?: number | undefined
+  pcOffset?: number | undefined
+  calculateChecksum?: (() => number) | undefined
 
   getCurrentBox() {
     return this.boxes[this.currentPCBox]
@@ -85,5 +88,9 @@ export class HomeData implements SAV<OHPKM> {
 
   supportsMon() {
     return true
+  }
+
+  isPlugin() {
+    return false
   }
 }

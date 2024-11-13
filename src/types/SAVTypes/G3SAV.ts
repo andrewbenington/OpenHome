@@ -326,4 +326,8 @@ export class G3SAV implements SAV<PK3> {
     }
     return false
   }
+
+  isPlugin() {
+    return false
+  }
 }

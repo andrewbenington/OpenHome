@@ -1,17 +1,17 @@
-import { PK3RR } from 'pokemon-files'
 import { GameOfOrigin } from 'pokemon-resources'
-import { RR_TRANSFER_RESTRICTIONS } from '../../consts/TransferRestrictions'
+import { RR_TRANSFER_RESTRICTIONS } from '../../../consts/TransferRestrictions'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
   uint16ToBytesLittleEndian,
   uint32ToBytesLittleEndian,
-} from '../../util/ByteLogic'
-import { gen3StringToUTF } from '../../util/Strings/StringConverter'
-import { isRestricted } from '../TransferRestrictions'
-import { OHPKM } from '../pkm/OHPKM'
-import { Box, BoxCoordinates, SAV } from './SAV'
-import { ParsedPath, splitPath } from './path'
+} from '../../../util/ByteLogic'
+import { gen3StringToUTF } from '../../../util/Strings/StringConverter'
+import { isRestricted } from '../../TransferRestrictions'
+import { OHPKM } from '../../pkm/OHPKM'
+import { Box, BoxCoordinates, PluginSAV } from '../SAV'
+import { ParsedPath, splitPath } from '../path'
+import PK3RR from './PK3RR'
 
 const SAVE_SIZE_BYTES = 0x20000
 
@@ -111,7 +111,7 @@ export class G3RRSaveBackup {
           box.pokemon[i % 30] = mon
         }
         if (mon.trainerID == this.tid) {
-          mon.gameOfOrigin = GameOfOrigin.RadicalRed
+          mon.gameOfOrigin = GameOfOrigin.FireRed
         }
       } catch (e) {
         console.error(e)
@@ -127,7 +127,7 @@ export class G3RRSaveBackup {
   }
 }
 
-export class G3RRSAV implements SAV<PK3RR> {
+export class G3RRSAV implements PluginSAV<PK3RR> {
   static pkmType = PK3RR
 
   static transferRestrictions = RR_TRANSFER_RESTRICTIONS
@@ -207,7 +207,7 @@ export class G3RRSAV implements SAV<PK3RR> {
     const filePathElements = splitPath(this.filePath)
     let fileName = filePathElements[filePathElements.length - 1]
     fileName = fileName.replace(/\s+/g, '')
-    this.origin = GameOfOrigin.RadicalRed
+    this.origin = GameOfOrigin.FireRed
 
     console.log(this.boxes)
   }
@@ -272,6 +272,14 @@ export class G3RRSAV implements SAV<PK3RR> {
 
   getGameName() {
     return 'Pokémon Radical Red'
+  }
+
+  getPluginID() {
+    return 'radical_red'
+  }
+
+  isPlugin(): true {
+    return true
   }
 
   static saveTypeName = 'Pokémon Radical Red'

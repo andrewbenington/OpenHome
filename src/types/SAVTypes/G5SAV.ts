@@ -197,4 +197,8 @@ export abstract class G5SAV implements SAV<PK5> {
     const g5Origin = bytes[G5SAV.originOffset]
     return g5Origin >= GameOfOrigin.White && g5Origin <= GameOfOrigin.Black2
   }
+
+  isPlugin() {
+    return false
+  }
 }
