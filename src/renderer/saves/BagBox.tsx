@@ -59,7 +59,7 @@ const BagBox = ({ onClose, removeItemFromPokemon, draggedMon, setDraggedItem, up
       <Card
         onClick={handleOpenBag}
         sx={{
-          padding: 2,
+          padding: 1,
           cursor: 'pointer',
           display: 'flex',
           flexDirection: 'column',
