@@ -15,9 +15,9 @@ interface BagBoxProps {
 }
 
 const BagBox = ({ onClose, removeItemFromPokemon, draggedMon, setDraggedItem, updateBag }: BagBoxProps) => {
-  const backgroundColor = useMemo(() => '#f5f5f5', [])
-
   let items = Bag.getItems()
+
+  const totalSlots = Math.max(6 * 1, Math.ceil(items.length / 6) * 6)
 
   const getItemIconPath = (itemName: string) => {
     const itemId = ItemFromString(itemName)?.toString().padStart(4, '0')
@@ -59,7 +59,6 @@ const BagBox = ({ onClose, removeItemFromPokemon, draggedMon, setDraggedItem, up
       <Card
         onClick={handleOpenBag}
         sx={{
-          backgroundColor,
           padding: 2,
           cursor: 'pointer',
           display: 'flex',
@@ -87,35 +86,42 @@ const BagBox = ({ onClose, removeItemFromPokemon, draggedMon, setDraggedItem, up
       {/* Grid for Displaying Items */}
       <Card sx={{ marginTop: 1, padding: 1 }}>
         <Grid container spacing={1} component="div">
-          {items.map((item, index) => (
-            <Grid
-              xs={2}
-              key={index}
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: 1,
-                border: '1px solid #ddd',
-              }}
-              onDrop={handlePokemonDrop}
-              onDragOver={(e) => e.preventDefault()}
-            >
-              {getItemIconPath(item.name) ? (
-                <img
-                  src={getItemIconPath(item.name)}
-                  alt={item.name}
-                  draggable
-                  onDragStart={(e) => handleDragStart(e, item.name)}
-                  onDragEnd={handleDragEnd}
-                  style={{ width: 24, height: 24 }}
-                  onError={(e) => ((e.target as HTMLImageElement).style.display = 'none')}
-                />
-              ) : (
-                <Typography sx={{ fontSize: 12 }}>{item.name}</Typography>
-              )}
-            </Grid>
-          ))}
+        {Array.from({ length: totalSlots }, (_, index) => {
+            const item = items[index]
+            return (
+              <Grid
+                xs={2}
+                key={index}
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: 1,
+                  border: '3px solid #e0fcdc',
+                  background: '#6662',
+                  borderRadius: '5px'
+                }}
+                onDrop={handlePokemonDrop}
+                onDragOver={(e) => e.preventDefault()}
+              >
+                {item ? (
+                  getItemIconPath(item.name) ? (
+                    <img
+                      src={getItemIconPath(item.name)}
+                      alt={item.name}
+                      draggable
+                      onDragStart={(e) => handleDragStart(e, item.name)}
+                      onDragEnd={handleDragEnd}
+                      style={{ width: 24, height: 24 }}
+                      onError={(e) => ((e.target as HTMLImageElement).style.display = 'none')}
+                    />
+                  ) : (
+                    <Typography sx={{ fontSize: 12 }}>{item.name}</Typography>
+                  )
+                ) : null}
+              </Grid>
+            )
+          })}
         </Grid>
       </Card>
     </Stack>
