@@ -110,6 +110,9 @@ export class G3RRSaveBackup {
           const box = this.boxes[Math.floor(i / 30)]
           box.pokemon[i % 30] = mon
         }
+        if (mon.trainerID == this.tid) {
+          mon.gameOfOrigin = GameOfOrigin.RadicalRed
+        }
       } catch (e) {
         console.error(e)
       }
@@ -204,21 +207,7 @@ export class G3RRSAV implements SAV<PK3RR> {
     const filePathElements = splitPath(this.filePath)
     let fileName = filePathElements[filePathElements.length - 1]
     fileName = fileName.replace(/\s+/g, '')
-    if (fileName.includes('Ruby')) {
-      this.origin = GameOfOrigin.Ruby
-      return
-    }
-    if (fileName.includes('Sapphire')) {
-      this.origin = GameOfOrigin.Sapphire
-      return
-    }
-    if (fileName.includes('FireRed')) {
-      this.origin = GameOfOrigin.FireRed
-      return
-    }
-    if (fileName.includes('LeafGreen')) {
-      this.origin = GameOfOrigin.LeafGreen
-    }
+    this.origin = GameOfOrigin.RadicalRed
 
     console.log(this.boxes)
   }
