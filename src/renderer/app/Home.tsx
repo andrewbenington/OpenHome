@@ -39,6 +39,7 @@ import { OpenSavesContext } from '../state/openSaves'
 import { initializeDragImage } from '../util/initializeDragImage'
 import { handleMenuResetAndClose, handleMenuSave } from '../util/ipcFunctions'
 import './Home.css'
+import BagBox from '../saves/BagBox'
 
 const Home = () => {
   const [openSavesState, openSavesDispatch, allOpenSaves] = useContext(OpenSavesContext)
@@ -49,10 +50,30 @@ const Home = () => {
   const homeData = openSavesState.homeData
   const { palette } = useTheme()
   const [selectedMon, setSelectedMon] = useState<PKMFile>()
+  const [draggedMon, setDraggedMon] = useState<PKMFile | null>(null)
+  const [draggedItem, setDraggedItem] = useState<string | null>(null)
   const [tab, setTab] = useState('summary')
   const [openSaveDialog, setOpenSaveDialog] = useState(false)
+  const [openBagDialog, setOpenBagDialog] = useState(false)
   const [errorMessages, setErrorMessages] = useState<string[]>()
   const [filesToDelete, setFilesToDelete] = useState<string[]>([])
+  const [bagItems, setBagItems] = useState([{ name: 'Potion' }, { name: 'Ultra Ball' }])
+
+
+  const addItemToBag = (itemName: string) => {
+    setBagItems((prevItems) => [...prevItems, { name: itemName }])
+  }
+
+  const removeItemFromPokemon = () => {
+    if (draggedMon && draggedMon.heldItemIndex) {
+      draggedMon.heldItemIndex = 0
+      console.log(`Removed item from dragged Pokémon`)
+    }
+  }
+
+  const removeItemFromBag = (itemName: string) => {
+    setBagItems((prevItems) => prevItems.filter((item) => item.name !== itemName))
+  }
 
   useEffect(() => {
     const edited =
@@ -278,25 +299,56 @@ const Home = () => {
         flexDirection: 'row',
       }}
     >
-      <Stack className="save-file-column" spacing={1} width={280} minWidth={280}>
-        {lodash.range(allOpenSaves.length).map((i) => (
-          <OpenSaveDisplay
-            key={`save_display_${i}`}
-            saveIndex={i}
-            setSelectedMon={setSelectedMon}
-          />
-        ))}
+    <Stack className="save-file-column" spacing={1} width={280} minWidth={280}>
+      {lodash.range(allOpenSaves.length).map((i) => (
+        <OpenSaveDisplay
+          key={`save_display_${i}`}
+          saveIndex={i}
+          setSelectedMon={setSelectedMon}
+          setDraggedMon={setDraggedMon}
+          removeItemFromBag={removeItemFromBag}
+        />
+      ))}
+
+      {/* Open Save Button */}
+      <button
+        className="card-button"
+        onClick={() => setOpenSaveDialog(true)}
+        style={{
+          backgroundColor: palette.primary.mainChannel,
+        }}
+      >
+        <MdFileOpen />
+        Open Save
+      </button>
+
+      {!openBagDialog && (
         <button
           className="card-button"
-          onClick={() => setOpenSaveDialog(true)}
+          onClick={() => setOpenBagDialog(true)}
           style={{
             backgroundColor: palette.primary.mainChannel,
+            marginBottom: 8,
           }}
         >
-          <MdFileOpen />
-          Open Save
+          Open Bag
         </button>
-      </Stack>
+      )}
+
+      {/* Conditionally render BagBox */}
+      {openBagDialog && (
+        <BagBox
+          items={bagItems}
+          onClose={() => setOpenBagDialog(false)}
+          addItemToBag={addItemToBag}
+          removeItemFromPokemon={removeItemFromPokemon}
+          removeItemFromBag={removeItemFromBag}
+          draggedMon={draggedMon}
+          setDraggedItem={setDraggedItem}
+        />
+      )}
+    </Stack>
+
       <div
         className="home-box-column"
         style={{
@@ -312,7 +364,7 @@ const Home = () => {
           minWidth={480}
           alignItems="center"
         >
-          <HomeBoxDisplay setSelectedMon={setSelectedMon} />
+          <HomeBoxDisplay setSelectedMon={setSelectedMon} setDraggedMon={setDraggedMon} removeItemFromBag={removeItemFromBag} />
           <Box flex={1}></Box>
         </Box>
       </div>

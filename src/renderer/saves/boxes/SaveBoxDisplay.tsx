@@ -16,13 +16,15 @@ import BoxCell from './BoxCell'
 interface OpenSaveDisplayProps {
   saveIndex: number
   setSelectedMon: (_: PKMFile | undefined) => void
+  setDraggedMon: React.Dispatch<React.SetStateAction<PKMFile | null>>
+  removeItemFromBag: (itemName: string) => void 
 }
 
 const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   const [, openSavesDispatch, openSaves] = useContext(OpenSavesContext)
   const [mouseState, mouseDispatch] = useContext(MouseContext)
   const [detailsModal, setDetailsModal] = useState(false)
-  const { saveIndex, setSelectedMon } = props
+  const { saveIndex, setSelectedMon, setDraggedMon, removeItemFromBag } = props
   const save = openSaves[saveIndex]
 
   const dispatchStartDrag = useCallback(
@@ -191,6 +193,8 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                           dispatchCompleteDrag(row * save.boxColumns + rowIndex)
                         }
                       }}
+                      setDraggedMon={setDraggedMon}
+                      removeItemFromBag={removeItemFromBag}
                     />
                   </Grid>
                 )

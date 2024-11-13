@@ -6,6 +6,7 @@ import { filterApplies } from 'src/types/Filter'
 import { PKMFile } from 'src/types/pkm/util'
 import { Styles } from 'src/types/types'
 import BoxIcons from '../../images/BoxIcons.png'
+import { ItemFromString } from 'pokemon-resources'
 
 const styles = {
   fillContainer: { width: '100%', height: '100%' },
@@ -39,10 +40,12 @@ interface BoxCellProps {
   zIndex: number
   mon: PKMFile | undefined
   borderColor?: string
+  setDraggedMon: React.Dispatch<React.SetStateAction<PKMFile | null>>
+  removeItemFromBag: (itemName: string) => void 
 }
 
 const BoxCell = (props: BoxCellProps) => {
-  const { onClick, onDragEvent, onDrop, disabled, zIndex, mon, borderColor } = props
+  const { onClick, onDragEvent, onDrop, disabled, zIndex, mon, borderColor, setDraggedMon, removeItemFromBag } = props
   const [isBeingDragged, setIsBeingDragged] = useState(false)
   const [isDraggedOver, setIsDraggedOver] = useState(false)
   const [filterState] = useContext(FilterContext)
@@ -70,7 +73,23 @@ const BoxCell = (props: BoxCellProps) => {
   }
 
   const handleDrop: React.DragEventHandler<HTMLDivElement> = (e) => {
-    if (e.dataTransfer.files[0]) {
+    e.preventDefault()
+    setIsDraggedOver(false)
+    const droppedData = e.dataTransfer.getData('ItemTransfer')
+
+    if (droppedData) {
+      const itemId = ItemFromString(droppedData)
+      if (itemId && mon && !mon.heldItemIndex) {
+        mon.heldItemIndex = itemId
+        console.log(`Assigned item "${droppedData}" to Pokémon`)
+
+        removeItemFromBag(droppedData)
+        console.log(`Removed item "${droppedData}" from Bag`)
+
+      } else if (itemId && mon?.heldItemIndex) {
+        console.log('Pokémon already holds an item!')
+      }
+    } else if (e.dataTransfer.files[0]) { // dropped data is files
       onDropFromFiles(e.dataTransfer.files)
     } else {
       onDrop(undefined)
@@ -133,11 +152,16 @@ const BoxCell = (props: BoxCellProps) => {
           onDragStart={() => {
             onDragEvent(false)
             setIsBeingDragged(true)
+            
+            if (mon?.heldItemIndex) {
+              setDraggedMon(mon)
+            }
           }}
           onDragEnter={() => setIsDraggedOver(true)}
           onDragLeave={() => setIsDraggedOver(false)}
           onDragEnd={(e: { dataTransfer: any; target: any }) => {
             setIsBeingDragged(false)
+            setDraggedMon(null)
             if (e.dataTransfer.dropEffect !== 'copy') {
               onDragEvent(true)
             }

@@ -10,12 +10,13 @@ import BoxCell from './BoxCell'
 
 interface HomeBoxDisplayProps {
   setSelectedMon: (_: PKMFile | undefined) => void
+  setDraggedMon: React.Dispatch<React.SetStateAction<PKMFile | null>>
+  removeItemFromBag: (itemName: string) => void
 }
-
 const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
   const [{ homeData }, openSavesDispatch] = useContext(OpenSavesContext)
   const [mouseState, mouseDispatch] = useContext(MouseContext)
-  const { setSelectedMon } = props
+  const { setSelectedMon, setDraggedMon, removeItemFromBag} = props
 
   const dispatchStartDrag = useCallback(
     (boxPos: number) => {
@@ -141,6 +142,8 @@ const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
                         dispatchCompleteDrag(row * 12 + rowIndex)
                       }
                     }}
+                    setDraggedMon={ setDraggedMon }
+                    removeItemFromBag={removeItemFromBag}
                   />
                 </Grid>
               )
