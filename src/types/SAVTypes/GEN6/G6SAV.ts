@@ -3,14 +3,13 @@ import { GameOfOrigin } from 'pokemon-resources'
 import {
   ORAS_TRANSFER_RESTRICTIONS,
   XY_TRANSFER_RESTRICTIONS,
-} from '../../consts/TransferRestrictions'
-import { bytesToUint16LittleEndian, uint16ToBytesLittleEndian } from '../../util/ByteLogic'
-import { CRC16_CCITT } from '../../util/Encryption'
-import { utf16BytesToString } from '../../util/Strings/StringConverter'
-import { OHPKM } from '../pkm/OHPKM'
-import { SaveType } from '../types'
-import { Box, SAV } from './SAV'
-import { ParsedPath } from './path'
+} from '../../../consts/TransferRestrictions'
+import { bytesToUint16LittleEndian, uint16ToBytesLittleEndian } from '../../../util/ByteLogic'
+import { CRC16_CCITT } from '../../../util/Encryption'
+import { utf16BytesToString } from '../../../util/Strings/StringConverter'
+import { OHPKM } from '../../pkm/OHPKM'
+import { Box, SAV } from '../SAV'
+import { ParsedPath } from '../path'
 
 const XY_PC_OFFSET = 0x22600
 const XY_PC_CHECKSUM_OFFSET = 0x655c2
@@ -18,17 +17,19 @@ const ORAS_PC_OFFSET = 0x33000
 const ORAS_PC_CHECKSUM_OFFSET = 0x75fda
 const BOX_NAMES_OFFSET: number = 0x04400
 const BOX_SIZE: number = 232 * 30
+const BOX_DATA_SIZE: number = 0x34ad0
 
 export class G6SAV extends SAV<PK6> {
+  static pkmType = PK6
+
   trainerDataOffset: number = 0x14000
 
   boxes: Array<Box<PK6>>
 
-  saveType = SaveType.G6
-
   boxChecksumOffset: number = 0x75fda
 
   pcOffset = XY_PC_OFFSET
+  pcDataSize = BOX_DATA_SIZE
   pcChecksumOffset = XY_PC_CHECKSUM_OFFSET
 
   constructor(path: ParsedPath, bytes: Uint8Array) {
@@ -101,10 +102,11 @@ export class G6SAV extends SAV<PK6> {
         this.bytes.set(new Uint8Array(mon.toPCBytes()), writeIndex)
       }
     })
-    this.bytes.set(
-      uint16ToBytesLittleEndian(CRC16_CCITT(this.bytes, this.pcOffset, 0x34ad0)),
-      this.pcChecksumOffset
-    )
+    this.bytes.set(uint16ToBytesLittleEndian(this.calculateChecksum()), this.pcChecksumOffset)
     return changedMonPKMs
+  }
+
+  calculateChecksum(): number {
+    return CRC16_CCITT(this.bytes, this.pcOffset, this.pcDataSize)
   }
 }

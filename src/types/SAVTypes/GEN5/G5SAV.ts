@@ -1,40 +1,29 @@
 import { uniq } from 'lodash'
 import { PK5 } from 'pokemon-files'
 import { GameOfOrigin } from 'pokemon-resources'
-import { NationalDex } from 'pokemon-species-data'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
   uint16ToBytesLittleEndian,
-} from '../../util/ByteLogic'
-import { CRC16_CCITT } from '../../util/Encryption'
-import { gen5StringToUTF } from '../../util/Strings/StringConverter'
-import { CapPikachus, RegionalForms } from '../TransferRestrictions'
-import { OHPKM } from '../pkm/OHPKM'
-import { SaveType } from '../types'
-import { Box, SAV } from './SAV'
-import { ParsedPath } from './path'
+} from '../../../util/ByteLogic'
+import { CRC16_CCITT } from '../../../util/Encryption'
+import { gen5StringToUTF } from '../../../util/Strings/StringConverter'
+import { OHPKM } from '../../pkm/OHPKM'
+import { Box, SAV } from '../SAV'
+import { ParsedPath } from '../path'
 
 const PC_OFFSET = 0x400
 const BOX_NAMES_OFFSET: number = 0x04
 const BOX_CHECKSUM_OFFSET: number = 0xff2
 const BOX_SIZE: number = 0x1000
 
-export class G5SAV extends SAV<PK5> {
-  static TRANSFER_RESTRICTIONS = {
-    maxDexNum: NationalDex.Genesect,
-    excludedForms: { ...RegionalForms, ...CapPikachus, 483: [1], 484: [1] },
-  }
-
-  transferRestrictions = G5SAV.TRANSFER_RESTRICTIONS
-
-  pkmType = PK5
+export abstract class G5SAV extends SAV<PK5> {
+  static pkmType = PK5
 
   trainerDataOffset: number = 0x19400
+  static originOffset = 0x1941f
 
   boxes: Array<Box<PK5>>
-
-  saveType = SaveType.G5
 
   checksumMirrorsOffset: number = 0x23f00
 

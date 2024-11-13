@@ -1,31 +1,16 @@
-import { NationalDex } from 'pokemon-species-data'
-import { bytesToUint16LittleEndian, bytesToUint32LittleEndian } from '../../util/ByteLogic'
-import { gen4StringToUTF } from '../../util/Strings/StringConverter'
-import { CapPikachus, RegionalForms } from '../TransferRestrictions'
-import { SaveType } from '../types'
+import { PK4 } from 'pokemon-files'
+import { DP_TRANSFER_RESTRICTIONS } from '../../../consts/TransferRestrictions'
+import { bytesToUint16LittleEndian, bytesToUint32LittleEndian } from '../../../util/ByteLogic'
+import { gen4StringToUTF } from '../../../util/Strings/StringConverter'
+import { SaveType } from '../../types'
 import { G4SAV } from './G4SAV'
-import { ParsedPath } from './path'
+import { ParsedPath } from '../path'
 
 export class DPSAV extends G4SAV {
-  saveType = SaveType.DP
+  static saveType = SaveType.DP
+  static pkmType = PK4
 
-  transferRestrictions = {
-    maxDexNum: NationalDex.Arceus,
-    excludedForms: {
-      ...RegionalForms,
-      ...CapPikachus,
-      // rotom appliances
-      479: [1, 2, 3, 4, 5],
-      // origin formes
-      483: [1],
-      484: [1],
-      487: [1],
-      // shaymin sky
-      492: [1],
-      // arceus fairy
-      493: [17],
-    },
-  }
+  static transferRestrictions = DP_TRANSFER_RESTRICTIONS
 
   static TRAINER_NAME_OFFSET = 0x64
 

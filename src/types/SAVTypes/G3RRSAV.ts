@@ -201,8 +201,6 @@ export class G3RRSAV extends SAV<PK3RR> {
     if (fileName.includes('LeafGreen')) {
       this.origin = GameOfOrigin.LeafGreen
     }
-
-    console.log(this.boxes)
   }
 
   prepareBoxesForSaving() {
