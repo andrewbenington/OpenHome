@@ -1,6 +1,6 @@
 import { GameOfOrigin } from 'pokemon-resources'
 import { PKMInterface } from '../interfaces'
-import { emptyParsedPath, ParsedPath } from './path'
+import { ParsedPath } from './path'
 import { SAV } from './SAV'
 
 export const SIZE_SM = 0x6be00
@@ -38,14 +38,6 @@ export interface SAVClass {
   saveTypeName: string
 }
 
-export type AlphaUnderscore<T extends string = string> = T extends `${infer First}${infer Rest}`
-  ? First extends '_' | Lowercase<First> | Uppercase<First>
-    ? Rest extends ''
-      ? T
-      : AlphaUnderscore<Rest>
-    : never
-  : T
-
 export type PKMTypeOf<Type> = Type extends SAV<infer X> ? X : never
 
 export function supportsMon(saveType: SAVClass, dexNumber: number, formeNumber: number): boolean {
@@ -53,10 +45,7 @@ export function supportsMon(saveType: SAVClass, dexNumber: number, formeNumber: 
 }
 
 export function getGameColor(saveType: SAVClass | undefined, origin: GameOfOrigin): string {
-  if (!saveType) return '#666666'
-  const dummySave = new saveType(emptyParsedPath, new Uint8Array(100000))
-  dummySave.origin = origin
-  return dummySave.gameColor() ?? '#666666'
+  return saveType?.prototype.gameColor.call({ origin })
 }
 
 export function hasDesamumeFooter(bytes: Uint8Array, expectedOffset: number): boolean {

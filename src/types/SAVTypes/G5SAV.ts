@@ -216,4 +216,8 @@ export abstract class G5SAV implements SAV<PK5> {
         return '#666666'
     }
   }
+
+  getPluginIdentifier() {
+    return undefined
+  }
 }

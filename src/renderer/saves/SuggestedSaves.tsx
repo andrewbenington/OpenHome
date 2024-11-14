@@ -1,5 +1,6 @@
 import { Stack } from '@mui/joy'
 import * as E from 'fp-ts/lib/Either'
+import { GameOfOrigin } from 'pokemon-resources'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { getSaveRef, SAV } from 'src/types/SAVTypes/SAV'
 import { buildSaveFile } from 'src/types/SAVTypes/load'
@@ -74,6 +75,14 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
     )
   }, [backend, loadSaveData])
 
+  const saveTypeFromOrigin = useCallback(
+    (origin: number | undefined) =>
+      origin
+        ? getEnabledSaveTypes().find((s) => s.includesOrigin(origin as GameOfOrigin))
+        : undefined,
+    [getEnabledSaveTypes]
+  )
+
   const columns: SortableColumn<SAV>[] = [
     // {
     //   key: 'display',
@@ -105,7 +114,13 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
       key: 'game',
       name: 'Game',
       width: 130,
-      renderValue: (value) => <img alt="save logo" height={40} src={getSaveLogo(value.origin)} />,
+      renderValue: (value) => (
+        <img
+          alt="save logo"
+          height={40}
+          src={getSaveLogo(saveTypeFromOrigin(value.origin), value.origin as GameOfOrigin)}
+        />
+      ),
       sortFunction: numericSorter((val) => val.origin),
       cellClass: 'centered-cell',
     },

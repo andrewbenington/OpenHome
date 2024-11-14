@@ -153,3 +153,12 @@ export interface PKMFormData {
   dexNum: number
   formeNum: number
 }
+
+export type ImageSource =
+  | {
+      publicDirPath: string
+    }
+  | {
+      rawImageBase64: string
+    }
+  | undefined

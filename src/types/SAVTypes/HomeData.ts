@@ -95,4 +95,8 @@ export class HomeData implements SAV<OHPKM> {
   gameColor() {
     return '#7DCEAB'
   }
+
+  getPluginIdentifier() {
+    return undefined
+  }
 }

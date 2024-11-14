@@ -257,10 +257,6 @@ export class G3SAV implements SAV<PK3> {
     }
     console.log(this.boxes)
   }
-  pcChecksumOffset?: number | undefined
-  pcOffset?: number | undefined
-  pluginIdentifier?: string | undefined
-  calculateChecksum?: (() => number) | undefined
 
   prepareBoxesAndGetModified() {
     const changedMonPKMs: OHPKM[] = []
@@ -351,5 +347,9 @@ export class G3SAV implements SAV<PK3> {
 
   static includesOrigin(origin: GameOfOrigin) {
     return origin >= GameOfOrigin.Sapphire && origin <= GameOfOrigin.LeafGreen
+  }
+
+  getPluginIdentifier() {
+    return undefined
   }
 }

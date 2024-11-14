@@ -49,7 +49,7 @@ export interface SAV<P extends PKMInterface = PKMInterface> {
 
   gameColor: () => string
   isPlugin: boolean
-  pluginIdentifier?: string
+  getPluginIdentifier: () => string | undefined
 
   getCurrentBox: () => Box<P>
   supportsMon: (dexNumber: number, formeNumber: number) => boolean
@@ -61,7 +61,6 @@ export interface SAV<P extends PKMInterface = PKMInterface> {
 
   getGameName: () => string
 }
-
 
 export type PluginSAV<P extends PKMInterface = PKMInterface> = SAV<P> & {
   pluginIdentifier: string
@@ -75,6 +74,6 @@ export function getSaveRef(save: SAV): SaveRef {
     trainerName: save.name ? save.name : undefined,
     trainerID: save.displayID,
     lastOpened: Date.now(),
-    pluginIdentifier: save.pluginIdentifier,
+    pluginIdentifier: save.getPluginIdentifier(),
   }
 }

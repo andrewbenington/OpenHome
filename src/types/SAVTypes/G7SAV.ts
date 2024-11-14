@@ -160,4 +160,8 @@ export abstract class G7SAV implements SAV<PK7> {
         return '#666666'
     }
   }
+
+  getPluginIdentifier() {
+    return undefined
+  }
 }

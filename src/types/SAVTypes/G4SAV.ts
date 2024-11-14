@@ -210,4 +210,8 @@ export abstract class G4SAV implements SAV<PK4> {
       (origin >= GameOfOrigin.HeartGold && origin <= GameOfOrigin.SoulSilver)
     )
   }
+
+  getPluginIdentifier() {
+    return undefined
+  }
 }

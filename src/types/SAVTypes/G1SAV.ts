@@ -257,4 +257,8 @@ export class G1SAV implements SAV<PK1> {
   static includesOrigin(origin: GameOfOrigin) {
     return origin >= GameOfOrigin.Red && origin <= GameOfOrigin.Yellow
   }
+
+  getPluginIdentifier() {
+    return undefined
+  }
 }

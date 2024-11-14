@@ -213,7 +213,10 @@ export class G3RRSAV implements PluginSAV<PK3RR> {
 
     console.log(this.boxes)
   }
-  
+  pcChecksumOffset?: number | undefined
+  pcOffset?: number | undefined
+  calculateChecksum?: (() => number) | undefined
+
   prepareBoxesAndGetModified() {
     const changedMonPKMs: OHPKM[] = []
     this.updatedBoxSlots.forEach(({ box, index }) => {
@@ -276,8 +279,9 @@ export class G3RRSAV implements PluginSAV<PK3RR> {
     return 'Pokémon Radical Red'
   }
 
-  
-  gameColor() {return '#F15C01'}
+  gameColor() {
+    return '#F15C01'
+  }
 
   static includesOrigin(origin: GameOfOrigin) {
     return origin === GameOfOrigin.FireRed
@@ -294,6 +298,10 @@ export class G3RRSAV implements PluginSAV<PK3RR> {
       bytesToUint32LittleEndian(bytes, 0xac) === 0 &&
       bytesToUint32LittleEndian(bytes, findFirstSaveIndexZero(bytes) + 0xac) > 0
     )
+  }
+
+  getPluginIdentifier() {
+    return 'radical_red'
   }
 }
 

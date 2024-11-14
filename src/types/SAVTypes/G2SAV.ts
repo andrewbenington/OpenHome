@@ -284,4 +284,8 @@ export class G2SAV implements SAV<PK2> {
   static includesOrigin(origin: GameOfOrigin) {
     return origin >= GameOfOrigin.Gold && origin <= GameOfOrigin.Crystal
   }
+
+  getPluginIdentifier() {
+    return undefined
+  }
 }
