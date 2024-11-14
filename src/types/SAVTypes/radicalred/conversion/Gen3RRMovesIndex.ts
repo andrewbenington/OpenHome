@@ -1002,9 +1002,9 @@ export const Gen3RRMoves = [
     "One Blow",
 ]
 
-import { Moves } from 'pokemon-resources'
+import { Moves } from 'pokemon-resources';
 
-const dne_moves = [89, 538, 526, 659]
+// const dne_moves = [89, 538, 526, 659]
 
 
 export function fromGen3RRMoveIndex(moveIndex: number): number {

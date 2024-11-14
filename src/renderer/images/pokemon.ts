@@ -1,9 +1,9 @@
 import { NationalDex, PokemonData } from 'pokemon-species-data'
 
-import { toGen3RRPokemonIndex } from 'pokemon-files'
 import { SWEETS } from '../../consts/Formes'
-import { PKMInterface } from '../../types/interfaces'
 import { RRSprites } from '../../consts/RadicalRedSprites'
+import { PKMInterface } from '../../types/interfaces'
+import { toGen3RRPokemonIndex } from '../../types/SAVTypes/radicalred/conversion/Gen3RRPokemonIndex'
 
 const alolaDex = [
   10, 11, 12, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 35, 36, 37, 38, 39, 40, 41, 42, 46, 47, 50,

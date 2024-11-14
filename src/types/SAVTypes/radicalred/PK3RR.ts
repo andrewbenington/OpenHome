@@ -14,7 +14,6 @@ import {
   getFlag,
   getLevelGen3Onward,
   getMoveMaxPP,
-  getStats,
   MarkingsFourShapes,
   markingsFourShapesFromBytes,
   markingsFourShapesFromOther,
@@ -28,8 +27,9 @@ import {
   uIntToBufferBits,
   write30BitIVsToBytes,
   writeGen3StringToBytes,
-  writeStatsToBytes,
+  writeStatsToBytes
 } from 'pokemon-files'
+import { getHPGen3Onward, getStatGen3Onward } from '../../../util/StatCalc'
 import { ItemGen3RRFromString, ItemGen3RRToString } from './conversion/Gen3RRItems'
 import { fromGen3RRMoveIndex, toGen3RRMoveIndex } from './conversion/Gen3RRMovesIndex'
 import {
@@ -309,7 +309,14 @@ export class PK3RR {
   }
 
   public getStats() {
-    return getStats(this)
+    return {
+      hp: getHPGen3Onward(this),
+      atk: getStatGen3Onward('Atk', this),
+      def: getStatGen3Onward('Def', this),
+      spe: getStatGen3Onward('Spe', this),
+      spa: getStatGen3Onward('SpA', this),
+      spd: getStatGen3Onward('SpD', this),
+    }
   }
 
   public get gender() {

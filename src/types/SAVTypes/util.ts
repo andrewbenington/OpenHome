@@ -67,6 +67,7 @@ export const GameColors: Record<GameOfOrigin, string> = {
 
 export interface PKMClass {
   new (arg: ArrayBuffer | PKMInterface, encrypted?: boolean): PKMInterface
+  fromBytes(bytes: ArrayBuffer): PKMInterface
 }
 
 export interface SAVClass {

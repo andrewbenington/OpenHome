@@ -1,8 +1,8 @@
 import lodash from 'lodash'
-import { ContestData } from 'src/types/interfaces/gen3'
+import { COLOPKM, PK3, XDPKM } from 'pokemon-files'
+import { PKMInterface } from '../../types/interfaces'
 import { Styles } from '../../types/types'
 import { getPublicImageURL } from '../images/images'
-import { COLOPKM, PK3, XDPKM } from 'pokemon-files'
 
 const styles = {
   container: {
@@ -25,10 +25,10 @@ const styles = {
 } as Styles
 
 interface SheenStarsProps {
-  mon: ContestData
+  mon: PKMInterface
 }
 
-const getSheenStars = (mon: ContestData) => {
+const getSheenStars = (mon: PKMInterface) => {
   if (!mon.contest) {
     return 0
   }

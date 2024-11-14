@@ -6,20 +6,20 @@ import {
   PK1,
   PK2,
   PK3,
-  PK3RR,
   PK4,
   PK5,
   PK6,
   PK7,
   PK8,
   PK9,
-  PKMType,
   XDPKM,
 } from 'pokemon-files'
+import { PKMInterface } from './interfaces'
 import { OHPKM } from './pkm/OHPKM'
-import { PKMFile } from './pkm/util'
+import { PK3RR } from './SAVTypes/radicalred/PK3RR'
+import { PKMClass } from './SAVTypes/util'
 
-function fileTypeFromBytes(bytes: Uint8Array): PKMType | undefined {
+function fileTypeFromBytes(bytes: Uint8Array): PKMClass | undefined {
   switch (bytes.length) {
     case 69:
       return PK1
@@ -41,7 +41,7 @@ function fileTypeFromBytes(bytes: Uint8Array): PKMType | undefined {
   }
 }
 
-export function fileTypeFromString(type: string): PKMType | typeof OHPKM | undefined {
+export function fileTypeFromString(type: string): PKMClass | typeof OHPKM | undefined {
   switch (type) {
     case 'PK1':
       return PK1
@@ -80,8 +80,8 @@ export function fileTypeFromString(type: string): PKMType | typeof OHPKM | undef
   }
 }
 
-export const bytesToPKM = (bytes: Uint8Array, extension: string): PKMFile => {
-  let T: PKMType | typeof OHPKM | undefined
+export const bytesToPKM = (bytes: Uint8Array, extension: string): PKMInterface => {
+  let T: PKMClass | typeof OHPKM | undefined
   if (extension === '' || extension === 'PKM') {
     T = fileTypeFromBytes(bytes)
   } else {
@@ -90,5 +90,6 @@ export const bytesToPKM = (bytes: Uint8Array, extension: string): PKMFile => {
   if (!T) {
     throw `Unrecognized file`
   }
-  return T.fromBytes(bytes.buffer as ArrayBuffer)
+  const buffer = bytes.buffer.slice(bytes.byteOffset, bytes.byteLength + bytes.byteOffset)
+  return T.fromBytes(buffer as ArrayBuffer)
 }

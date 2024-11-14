@@ -1,10 +1,10 @@
 import { existsSync, readFileSync, writeFileSync } from 'fs'
 import { resolve } from 'path'
-import { PK3RR } from 'pokemon-files'
 import { PokemonData } from 'pokemon-species-data'
 import { OHPKM } from '../../pkm/OHPKM'
 import { ParsedPath } from '../path'
 import { G3RRSAV } from '../radicalred/G3RRSAV'
+import PK3RR from '../radicalred/PK3RR'
 
 function display_mon(mon: PK3RR | OHPKM) {
   console.log('Boxmon:', {
@@ -141,7 +141,7 @@ describe('G3RRSAV - Radical Red Save File Write Test', () => {
       // radicalRedSave.boxes[0].pokemon[0].moves[0] = 101;
 
       radicalRedSave.updatedBoxSlots.push({ box: 0, index: 0 })
-      radicalRedSave.prepareBoxesForSaving()
+      radicalRedSave.prepareBoxesAndGetModified()
     }
   })
 
