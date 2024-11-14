@@ -20,6 +20,8 @@ function getSortFunction(
       return (a, b) => b.mon.getLevel() - a.mon.getLevel()
     case 'species':
       return (a, b) => a.mon.dexNum - b.mon.dexNum
+    case 'origin':
+      return (a, b) => a.mon.gameOfOrigin - b.mon.gameOfOrigin
     case 'met_date':
       return (a, b) => {
         const aDate =
@@ -88,7 +90,7 @@ export default function SortPokemon() {
       <Stack style={{ flex: 1, height: '100%' }}>
         <Card>
           <Autocomplete
-            options={['nickname', 'level', 'species', 'ribbons', 'met_date']}
+            options={['nickname', 'level', 'species', 'ribbons', 'met_date', 'origin']}
             onChange={(_, value) => setSort(value ?? '')}
             placeholder="Sort"
           />

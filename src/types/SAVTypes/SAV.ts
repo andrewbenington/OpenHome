@@ -63,7 +63,7 @@ export interface SAV<P extends PKMInterface = PKMInterface> {
 }
 
 export type PluginSAV<P extends PKMInterface = PKMInterface> = SAV<P> & {
-  pluginIdentifier: string
+  getPluginIdentifier: () => string
   isPlugin: true
 }
 
