@@ -1,6 +1,6 @@
 import { GameOfOrigin } from 'pokemon-resources'
 import { PKMInterface } from '../interfaces'
-import { emptyParsedPath, ParsedPath } from './path'
+import { ParsedPath } from './path'
 import { SAV } from './SAV'
 
 export const SIZE_SM = 0x6be00
@@ -26,6 +26,7 @@ export const DESAMUME_FOOTER_START =
 
 export interface PKMClass {
   new (arg: ArrayBuffer | PKMInterface, encrypted?: boolean): PKMInterface
+  fromBytes(bytes: ArrayBuffer): PKMInterface
 }
 
 export interface SAVClass {
@@ -44,9 +45,9 @@ export function supportsMon(saveType: SAVClass, dexNumber: number, formeNumber: 
 
 export function getGameColor(saveType: SAVClass | undefined, origin: GameOfOrigin): string {
   if (!saveType) return '#666666'
-  const dummySave = new saveType(emptyParsedPath, new Uint8Array(100000))
-  dummySave.origin = origin
-  return dummySave.gameColor() ?? '#666666'
+  // yucky javascript hack, but it works. this lets us call the instance method
+  // gameColor() on a fake save file with only the origin field
+  return saveType.prototype.gameColor.call({ origin })
 }
 
 export function hasDesamumeFooter(bytes: Uint8Array, expectedOffset: number): boolean {
