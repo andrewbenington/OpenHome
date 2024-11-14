@@ -139,4 +139,19 @@ export abstract class G7SAV implements SAV<PK7> {
   getCurrentBox() {
     return this.boxes[this.currentPCBox]
   }
+
+  gameColor() {
+    switch (this.origin) {
+      case GameOfOrigin.Sun:
+        return '#F1912B'
+      case GameOfOrigin.Moon:
+        return '#5599CA'
+      case GameOfOrigin.UltraSun:
+        return '#E95B2B'
+      case GameOfOrigin.UltraMoon:
+        return '#226DB5'
+      default:
+        return '#666666'
+    }
+  }
 }

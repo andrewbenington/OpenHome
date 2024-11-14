@@ -82,4 +82,8 @@ export class HomeData implements SAV<OHPKM> {
   supportsMon() {
     return true
   }
+
+  gameColor() {
+    return '#7DCEAB'
+  }
 }

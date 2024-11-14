@@ -12,6 +12,7 @@ import { ParsedPath } from './path'
 import { LOOKUP_TYPE } from './util'
 
 const SAVE_SIZE_BYTES = 0x8000
+
 export class G1SAV implements SAV<PK1> {
   static pkmType = PK1
 
@@ -225,5 +226,19 @@ export class G1SAV implements SAV<PK1> {
 
   static fileIsSave(bytes: Uint8Array): boolean {
     return bytes.length === SAVE_SIZE_BYTES
+  }
+
+  gameColor() {
+    switch (this.origin) {
+      case GameOfOrigin.Red:
+        return '#DA3914'
+      case GameOfOrigin.BlueGreen:
+      case GameOfOrigin.BlueJapan:
+        return '#2E50D8'
+      case GameOfOrigin.Yellow:
+        return '#FFD733'
+      default:
+        return '#666666'
+    }
   }
 }

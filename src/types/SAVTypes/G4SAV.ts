@@ -174,4 +174,21 @@ export abstract class G4SAV implements SAV<PK4> {
     const DATE_KO = 0x20070903
     return date === DATE_INT || date === DATE_KO
   }
+
+  gameColor() {
+    switch (this.origin) {
+      case GameOfOrigin.Diamond:
+        return '#90BEED'
+      case GameOfOrigin.Pearl:
+        return '#DD7CB1'
+      case GameOfOrigin.Platinum:
+        return '#A0A08D'
+      case GameOfOrigin.HeartGold:
+        return '#E8B502'
+      case GameOfOrigin.SoulSilver:
+        return '#AAB9CF'
+      default:
+        return '#666666'
+    }
+  }
 }

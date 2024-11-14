@@ -318,4 +318,21 @@ export class G3SAV implements SAV<PK3> {
     }
     return false
   }
+
+  gameColor() {
+    switch (this.origin) {
+      case GameOfOrigin.Ruby:
+        return '#CD2236'
+      case GameOfOrigin.Sapphire:
+        return '#009652'
+      case GameOfOrigin.Emerald:
+        return '#009652'
+      case GameOfOrigin.FireRed:
+        return '#F15C01'
+      case GameOfOrigin.LeafGreen:
+        return '#9FDC00'
+      default:
+        return '#666666'
+    }
+  }
 }

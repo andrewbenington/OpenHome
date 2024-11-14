@@ -192,4 +192,19 @@ export abstract class G5SAV implements SAV<PK5> {
     const g5Origin = bytes[G5SAV.originOffset]
     return g5Origin >= GameOfOrigin.White && g5Origin <= GameOfOrigin.Black2
   }
+
+  gameColor() {
+    switch (this.origin) {
+      case GameOfOrigin.Black:
+        return '#444444'
+      case GameOfOrigin.White:
+        return '#E1E1E1'
+      case GameOfOrigin.Black2:
+        return '#303E51'
+      case GameOfOrigin.White2:
+        return '#EBC5C3'
+      default:
+        return '#666666'
+    }
+  }
 }
