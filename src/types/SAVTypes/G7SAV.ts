@@ -19,6 +19,7 @@ export abstract class G7SAV implements SAV<PK7> {
   static pkmType = PK7
 
   origin: GameOfOrigin = 0
+  isPlugin = false
 
   boxRows = 5
   boxColumns = 6
@@ -26,13 +27,13 @@ export abstract class G7SAV implements SAV<PK7> {
   filePath: ParsedPath
   fileCreated?: Date
 
-  money: number = 0 // TODO: Gen 6 money
+  money: number = 0 // TODO: Gen 7 money
   name: string = ''
   tid: number = 0
   sid: number = 0
   displayID: string = ''
 
-  currentPCBox: number = 0 // TODO: Gen 6 current box
+  currentPCBox: number = 0 // TODO: Gen 7 current box
 
   boxes: Array<Box<PK7>>
 

@@ -48,6 +48,8 @@ export interface SAV<P extends PKMInterface = PKMInterface> {
   updatedBoxSlots: BoxCoordinates[]
 
   gameColor: () => string
+  isPlugin: boolean
+  pluginIdentifier?: string
 
   getCurrentBox: () => Box<P>
   supportsMon: (dexNumber: number, formeNumber: number) => boolean
@@ -58,12 +60,18 @@ export interface SAV<P extends PKMInterface = PKMInterface> {
   calculateChecksum?: () => number
 }
 
+export type PluginSAV<P extends PKMInterface = PKMInterface> = SAV<P> & {
+  pluginIdentifier: string
+  isPlugin: true
+}
+
 export function getSaveRef(save: SAV): SaveRef {
   return {
     filePath: save.filePath,
-    game: save.origin ? save.origin.toString() : undefined,
+    game: save.origin,
     trainerName: save.name ? save.name : undefined,
     trainerID: save.displayID,
     lastOpened: Date.now(),
+    pluginIdentifier: save.pluginIdentifier,
   }
 }

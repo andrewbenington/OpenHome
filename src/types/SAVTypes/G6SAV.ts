@@ -15,6 +15,7 @@ export abstract class G6SAV implements SAV<PK6> {
   static pkmType = PK6
 
   origin: GameOfOrigin = 0
+  isPlugin: false = false
 
   boxRows = 5
   boxColumns = 6

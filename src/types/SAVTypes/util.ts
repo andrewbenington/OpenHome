@@ -1,5 +1,6 @@
+import { GameOfOrigin } from 'pokemon-resources'
 import { PKMInterface } from '../interfaces'
-import { ParsedPath } from './path'
+import { emptyParsedPath, ParsedPath } from './path'
 import { SAV } from './SAV'
 
 export const SIZE_SM = 0x6be00
@@ -31,6 +32,7 @@ export interface SAVClass {
   new (path: ParsedPath, bytes: Uint8Array): SAV
   pkmType: PKMClass
   fileIsSave: (bytes: Uint8Array) => boolean
+  includesOrigin: (origin: GameOfOrigin) => boolean
   lookupType?: 'gen12' | 'gen345'
 }
 
@@ -38,6 +40,13 @@ export type PKMTypeOf<Type> = Type extends SAV<infer X> ? X : never
 
 export function supportsMon(saveType: SAVClass, dexNumber: number, formeNumber: number): boolean {
   return saveType.prototype.supportsMon(dexNumber, formeNumber)
+}
+
+export function getGameColor(saveType: SAVClass | undefined, origin: GameOfOrigin): string {
+  if (!saveType) return '#666666'
+  const dummySave = new saveType(emptyParsedPath, new Uint8Array(100000))
+  dummySave.origin = origin
+  return dummySave.gameColor() ?? '#666666'
 }
 
 export function hasDesamumeFooter(bytes: Uint8Array, expectedOffset: number): boolean {

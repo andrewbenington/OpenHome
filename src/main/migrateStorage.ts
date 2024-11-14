@@ -65,7 +65,7 @@ function recentSavesFromCSV(csvPath: string): SaveRefMap {
     if (filePath) {
       recentSaves[filePathRaw] = {
         filePath,
-        game,
+        game: game ? parseInt(game) : undefined,
         trainerName,
         trainerID,
         lastOpened: parseInt(lastOpened),

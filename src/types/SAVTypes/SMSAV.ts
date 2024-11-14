@@ -1,3 +1,4 @@
+import { GameOfOrigin } from 'pokemon-resources'
 import { SM_TRANSFER_RESTRICTIONS } from '../../consts/TransferRestrictions'
 import { isRestricted } from '../TransferRestrictions'
 import { G7SAV } from './G7SAV'
@@ -20,5 +21,9 @@ export class SMSAV extends G7SAV {
 
   static fileIsSave(bytes: Uint8Array): boolean {
     return bytes.length === SAVE_SIZE_BYTES
+  }
+
+  static includesOrigin(origin: GameOfOrigin) {
+    return origin === GameOfOrigin.Sun || origin === GameOfOrigin.Moon
   }
 }

@@ -25,6 +25,7 @@ export abstract class G5SAV implements SAV<PK5> {
   static lookupType: LOOKUP_TYPE = 'gen345'
 
   origin: GameOfOrigin = 0
+  isPlugin: false = false
 
   boxRows = 5
   boxColumns = 6
@@ -100,6 +101,9 @@ export abstract class G5SAV implements SAV<PK5> {
       }
     }
   }
+  pcChecksumOffset?: number | undefined
+  pcOffset?: number | undefined
+  calculateChecksum?: (() => number) | undefined
 
   updateBoxChecksum = (boxIndex: number) => {
     // const oldChecksum = bytesToUint16LittleEndian(

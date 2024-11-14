@@ -40,6 +40,7 @@ export class HomeBox implements Box<OHPKM> {
 
 export class HomeData implements SAV<OHPKM> {
   origin: GameOfOrigin = 0
+  isPlugin = false
 
   boxRows = 10
   boxColumns = 12
