@@ -1,3 +1,4 @@
+import { GameOfOrigin } from 'pokemon-resources'
 import { XY_TRANSFER_RESTRICTIONS } from '../../consts/TransferRestrictions'
 import { isRestricted } from '../TransferRestrictions'
 import { G6SAV } from './G6SAV'
@@ -20,5 +21,9 @@ export class XYSAV extends G6SAV {
 
   static fileIsSave(bytes: Uint8Array): boolean {
     return bytes.length === SAVE_SIZE_BYTES
+  }
+
+  static includesOrigin(origin: GameOfOrigin) {
+    return origin === GameOfOrigin.X || origin === GameOfOrigin.Y
   }
 }

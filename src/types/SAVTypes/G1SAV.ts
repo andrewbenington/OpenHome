@@ -36,6 +36,7 @@ export class G1SAV implements SAV<PK1> {
   BOX_NICKNAME_OFFSET = 0x386
 
   origin: GameOfOrigin = GameOfOrigin.Red // TODO: game detection
+  isPlugin: false = false
 
   boxRows = 4
   boxColumns = 5
@@ -240,5 +241,9 @@ export class G1SAV implements SAV<PK1> {
       default:
         return '#666666'
     }
+  }
+
+  static includesOrigin(origin: GameOfOrigin) {
+    return origin >= GameOfOrigin.Red && origin <= GameOfOrigin.Yellow
   }
 }

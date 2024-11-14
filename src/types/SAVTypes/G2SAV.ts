@@ -23,6 +23,7 @@ export class G2SAV implements SAV<PK2> {
   static lookupType: LOOKUP_TYPE = 'gen12'
 
   origin: GameOfOrigin = 0
+  isPlugin: false = false
 
   boxRows = 4
   boxColumns = 5
@@ -266,5 +267,9 @@ export class G2SAV implements SAV<PK2> {
       default:
         return '#666666'
     }
+  }
+
+  static includesOrigin(origin: GameOfOrigin) {
+    return origin >= GameOfOrigin.Gold && origin <= GameOfOrigin.Crystal
   }
 }

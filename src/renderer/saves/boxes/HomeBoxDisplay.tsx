@@ -4,12 +4,12 @@ import { useCallback, useContext } from 'react'
 import { MdArrowBack, MdArrowForward } from 'react-icons/md'
 import { MouseContext } from 'src/renderer/state/mouse'
 import { MonLocation, OpenSavesContext } from 'src/renderer/state/openSaves'
-import { PKMFile } from '../../../types/pkm/util'
+import { PKMInterface } from '../../../types/interfaces'
 import ArrowButton from './ArrowButton'
 import BoxCell from './BoxCell'
 
 interface HomeBoxDisplayProps {
-  setSelectedMon: (_: PKMFile | undefined) => void
+  setSelectedMon: (_: PKMInterface | undefined) => void
 }
 
 const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
@@ -50,7 +50,7 @@ const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
     },
     [mouseState.dragSource, homeData, openSavesDispatch, mouseDispatch]
   )
-  const dispatchImportMons = (mons: PKMFile[], location: MonLocation) =>
+  const dispatchImportMons = (mons: PKMInterface[], location: MonLocation) =>
     openSavesDispatch({ type: 'import_mons', payload: { mons, dest: location } })
 
   return (

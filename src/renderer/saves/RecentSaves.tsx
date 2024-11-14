@@ -80,7 +80,7 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
       name: 'Game',
       width: 130,
       renderValue: (value) => <img alt="save logo" height={40} src={getSaveLogo(value.game)} />,
-      sortFunction: numericSorter((val) => (val.game ? parseInt(val.game) : undefined)),
+      sortFunction: numericSorter((val) => val.game),
       cellClass: 'centered-cell',
     },
     {

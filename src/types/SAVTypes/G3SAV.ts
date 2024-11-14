@@ -172,6 +172,7 @@ export class G3SAV implements SAV<PK3> {
   primarySaveOffset: number
 
   origin: GameOfOrigin
+  isPlugin: false = false
 
   boxRows = 5
   boxColumns = 6
@@ -334,5 +335,9 @@ export class G3SAV implements SAV<PK3> {
       default:
         return '#666666'
     }
+  }
+
+  static includesOrigin(origin: GameOfOrigin) {
+    return origin >= GameOfOrigin.Sapphire && origin <= GameOfOrigin.LeafGreen
   }
 }

@@ -26,4 +26,8 @@ export class BW2SAV extends G5SAV {
       bytes[G5SAV.originOffset] === GameOfOrigin.Black2
     )
   }
+
+  static includesOrigin(origin: GameOfOrigin) {
+    return origin === GameOfOrigin.Black2 || origin === GameOfOrigin.White2
+  }
 }

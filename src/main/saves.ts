@@ -28,6 +28,7 @@ export function recentSavesFromFile() {
         ...saveRef,
         valid: fileCanOpen(path),
         lastModified: fileLastModified(path),
+        game: saveRef.game ? parseInt(saveRef.game as unknown as string) : undefined,
       },
     ])
   ) as SaveRefMap

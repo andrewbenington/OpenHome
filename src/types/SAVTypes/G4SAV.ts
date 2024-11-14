@@ -19,6 +19,7 @@ export abstract class G4SAV implements SAV<PK4> {
   static lookupType: LOOKUP_TYPE = 'gen345'
 
   origin: GameOfOrigin = 0
+  isPlugin: false = false
 
   boxRows = 5
   boxColumns = 6
@@ -190,5 +191,12 @@ export abstract class G4SAV implements SAV<PK4> {
       default:
         return '#666666'
     }
+  }
+
+  static includesOrigin(origin: GameOfOrigin) {
+    return (
+      (origin >= GameOfOrigin.Diamond && origin <= GameOfOrigin.Platinum) ||
+      (origin >= GameOfOrigin.HeartGold && origin <= GameOfOrigin.SoulSilver)
+    )
   }
 }
