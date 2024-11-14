@@ -25,6 +25,8 @@ export class USUMSAV extends G7SAV {
     return bytes.length === SAVE_SIZE_BYTES
   }
 
+  static saveTypeName = 'Pokémon Ultra Sun/Ultra Moon'
+  
   static includesOrigin(origin: GameOfOrigin) {
     return origin === GameOfOrigin.UltraSun || origin === GameOfOrigin.UltraMoon
   }

@@ -23,7 +23,7 @@ const standardViewMinSize = 180
 export default function SaveCard({ save, onOpen, onRemove, size = 240 }: SaveCardProps) {
   const [expanded, setExpanded] = useState(false)
   const backend = useContext(BackendContext)
-  const [appInfo] = useContext(AppInfoContext)
+  const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
   const [platform, setPlatform] = useState('')
 
   const gbBackground = useMemo(() => (save.game ? isGameBoy(save.game) : false), [save.game])
@@ -33,9 +33,9 @@ export default function SaveCard({ save, onOpen, onRemove, size = 240 }: SaveCar
     if (origin === undefined) return '#666666'
     if (save.pluginIdentifier) return '#666666'
 
-    const saveType = appInfo.settings.allSaveTypes.find((s) => s.includesOrigin(origin))
+    const saveType = getEnabledSaveTypes().find((s) => s.includesOrigin(origin))
     return getGameColor(saveType, origin)
-  }, [appInfo.settings, save])
+  }, [getEnabledSaveTypes, save])
 
   useEffect(() => {
     backend.getPlatform().then(setPlatform)

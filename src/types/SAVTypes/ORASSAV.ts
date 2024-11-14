@@ -23,6 +23,8 @@ export class ORASSAV extends G6SAV {
     return bytes.length === SAVE_SIZE_BYTES
   }
 
+  static saveTypeName = 'Pokémon Omega Ruby/Alpha Sapphire'
+  
   static includesOrigin(origin: GameOfOrigin) {
     return origin === GameOfOrigin.OmegaRuby || origin === GameOfOrigin.AlphaSapphire
   }
