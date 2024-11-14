@@ -4,19 +4,19 @@ import { useCallback, useContext } from 'react'
 import { MdArrowBack, MdArrowForward } from 'react-icons/md'
 import { MouseContext } from 'src/renderer/state/mouse'
 import { MonLocation, OpenSavesContext } from 'src/renderer/state/openSaves'
-import { PKMFile } from '../../../types/pkm/util'
+import { PKMInterface } from '../../../types/interfaces'
 import ArrowButton from './ArrowButton'
 import BoxCell from './BoxCell'
 
 interface HomeBoxDisplayProps {
-  setSelectedMon: (_: PKMFile | undefined) => void
-  setDraggedMon: React.Dispatch<React.SetStateAction<PKMFile | null>>
+  setSelectedMon: (_: PKMInterface | undefined) => void
+  setDraggedMon: React.Dispatch<React.SetStateAction<PKMInterface | null>>
   updateBag: () => void
 }
 const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
   const [{ homeData }, openSavesDispatch] = useContext(OpenSavesContext)
   const [mouseState, mouseDispatch] = useContext(MouseContext)
-  const { setSelectedMon, setDraggedMon, updateBag} = props
+  const { setSelectedMon, setDraggedMon, updateBag } = props
 
   const dispatchStartDrag = useCallback(
     (boxPos: number) => {
@@ -51,7 +51,7 @@ const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
     },
     [mouseState.dragSource, homeData, openSavesDispatch, mouseDispatch]
   )
-  const dispatchImportMons = (mons: PKMFile[], location: MonLocation) =>
+  const dispatchImportMons = (mons: PKMInterface[], location: MonLocation) =>
     openSavesDispatch({ type: 'import_mons', payload: { mons, dest: location } })
 
   return (
@@ -142,7 +142,7 @@ const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
                         dispatchCompleteDrag(row * 12 + rowIndex)
                       }
                     }}
-                    setDraggedMon={ setDraggedMon }
+                    setDraggedMon={setDraggedMon}
                     updateBag={updateBag}
                   />
                 </Grid>

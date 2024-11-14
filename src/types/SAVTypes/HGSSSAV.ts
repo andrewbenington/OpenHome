@@ -1,14 +1,25 @@
+import { PK4 } from 'pokemon-files'
+import { GameOfOrigin } from 'pokemon-resources'
 import { HGSS_TRANSFER_RESTRICTIONS } from '../../consts/TransferRestrictions'
-import { SaveType } from '../../types/types'
 import { bytesToUint16LittleEndian, bytesToUint32LittleEndian } from '../../util/ByteLogic'
 import { gen4StringToUTF } from '../../util/Strings/StringConverter'
+import { isRestricted } from '../TransferRestrictions'
 import { G4SAV } from './G4SAV'
 import { ParsedPath } from './path'
+import { hasDesamumeFooter } from './util'
 
 export class HGSSSAV extends G4SAV {
-  saveType = SaveType.HGSS
+  static pkmType = PK4
 
-  transferRestrictions = HGSS_TRANSFER_RESTRICTIONS
+  name: string
+  tid: number
+  sid: number
+  displayID: string
+
+  invalid: boolean = false
+  tooEarlyToOpen: boolean = false
+
+  static transferRestrictions = HGSS_TRANSFER_RESTRICTIONS
 
   static TRAINER_NAME_OFFSET = 0x64
 
@@ -57,5 +68,26 @@ export class HGSSSAV extends G4SAV {
 
   getCurrentSaveCount(blockOffset: number, blockSize: number) {
     return bytesToUint32LittleEndian(this.bytes, blockOffset + blockSize - this.footerSize)
+  }
+
+  supportsMon(dexNumber: number, formeNumber: number) {
+    return !isRestricted(HGSS_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)
+  }
+
+  static fileIsSave(bytes: Uint8Array): boolean {
+    if (bytes.length < G4SAV.SAVE_SIZE_BYTES) {
+      return false
+    }
+    if (bytes.length > G4SAV.SAVE_SIZE_BYTES) {
+      if (!hasDesamumeFooter(bytes, G4SAV.SAVE_SIZE_BYTES)) {
+        return false
+      }
+    }
+
+    return G4SAV.validDateAndSize(bytes, 0x4f628)
+  }
+
+  static includesOrigin(origin: GameOfOrigin) {
+    return origin === GameOfOrigin.HeartGold || origin === GameOfOrigin.SoulSilver
   }
 }

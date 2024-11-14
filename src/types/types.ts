@@ -32,139 +32,24 @@ export type levelUpType =
   | 'Erratic'
   | 'Fluctuating'
 
-export enum SaveType {
-  UNKNOWN,
-  OPENHOME,
-  RGBY_J,
-  RBY_I,
-  GS_J,
-  GS_I,
-  C_J,
-  C_I,
-  RS,
-  FRLG,
-  E,
-  RR,
-  DP,
-  Pt,
-  HGSS,
-  BW,
-  BW2,
-  XY,
-  ORAS,
-  SM,
-  USUM,
-}
-
 export interface pokedate {
   month: number
   day: number
   year: number
 }
 
-export interface memory {
-  intensity: number
-  memory: number
-  feeling: number
-  textVariables: number
-}
-
-export interface stats {
-  hp: number
-  atk: number
-  def: number
-  spa: number
-  spd: number
-  spe: number
-}
-
-export interface statsPreSplit {
-  hp: number
-  atk: number
-  def: number
-  spc: number
-  spe: number
-}
-
-export interface hyperTrainStats {
-  hp: boolean
-  atk: boolean
-  def: boolean
-  spa: boolean
-  spd: boolean
-  spe: boolean
-}
-
-export interface contestStats {
-  cool: number
-  beauty: number
-  cute: number
-  smart: number
-  tough: number
-  sheen: number
-}
-
-export interface geolocation {
-  region: number
-  country: number
-}
-
 // 1 = blue/black, 2 = red
 export type marking = 0 | 1 | 2
 
-export const getSaveTypeString = (saveType: SaveType): string => {
-  switch (saveType) {
-    case SaveType.RGBY_J:
-      return 'Pokémon Red/Blue/Green/Yellow (JP)'
-    case SaveType.RBY_I:
-      return 'Pokémon Red/Blue/Yellow (INT)'
-    case SaveType.GS_J:
-      return 'Pokémon Gold/Silver (JP)'
-    case SaveType.GS_I:
-      return 'Pokémon Gold/Silver (INT)'
-    case SaveType.C_J:
-      return 'Pokémon Crystal (JP)'
-    case SaveType.C_I:
-      return 'Pokémon Crystal'
-    case SaveType.RS:
-      return 'Pokémon Ruby/Sapphire'
-    case SaveType.FRLG:
-      return 'Pokémon FireRed/LeafGreen'
-    case SaveType.E:
-      return 'Pokémon Emerald'
-    case SaveType.RR:
-      return 'Pokémon Radical Red'
-    case SaveType.DP:
-      return 'Pokémon Diamond/Pearl'
-    case SaveType.Pt:
-      return 'Pokémon Platinum'
-    case SaveType.HGSS:
-      return 'Pokémon HeartGold/SoulSilver'
-    case SaveType.BW:
-      return 'Pokémon Black/White'
-    case SaveType.BW2:
-      return 'Pokémon Black 2/White 2'
-    case SaveType.XY:
-      return 'Pokémon X/Y'
-    case SaveType.ORAS:
-      return 'Pokémon Omega Ruby/Alpha Sapphire'
-    case SaveType.SM:
-      return 'Pokémon Omega Ruby/Alpha Sapphire'
-    case SaveType.USUM:
-      return 'Pokémon Ultra Sun/Ultra Moon'
-    default:
-      return 'Unknown Game'
-  }
-}
-
 export interface SaveRef {
   filePath: ParsedPath
-  game?: string
+  game?: number
   trainerName?: string
   trainerID?: string
   lastOpened?: number
   lastModified?: number
   valid?: boolean
+  pluginIdentifier?: string
 }
 export type SaveRefMap = { [key: string]: SaveRef }
 
@@ -263,3 +148,8 @@ export type Errorable<T> = Either<string, T>
 export type LookupMap = Record<string, string>
 
 export type LoadSaveResponse = { path: ParsedPath; fileBytes: Uint8Array; createdDate: Date }
+
+export interface PKMFormData {
+  dexNum: number
+  formeNum: number
+}

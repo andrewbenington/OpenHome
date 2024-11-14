@@ -1,7 +1,6 @@
 import { uniq } from 'lodash'
 import { PK5 } from 'pokemon-files'
 import { GameOfOrigin } from 'pokemon-resources'
-import { NationalDex } from 'pokemon-species-data'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -9,32 +8,49 @@ import {
 } from '../../util/ByteLogic'
 import { CRC16_CCITT } from '../../util/Encryption'
 import { gen5StringToUTF } from '../../util/Strings/StringConverter'
-import { CapPikachus, RegionalForms } from '../TransferRestrictions'
 import { OHPKM } from '../pkm/OHPKM'
-import { SaveType } from '../types'
-import { Box, SAV } from './SAV'
+import { Box, BoxCoordinates, SAV } from './SAV'
 import { ParsedPath } from './path'
+import { hasDesamumeFooter, LOOKUP_TYPE } from './util'
 
 const PC_OFFSET = 0x400
 const BOX_NAMES_OFFSET: number = 0x04
 const BOX_CHECKSUM_OFFSET: number = 0xff2
 const BOX_SIZE: number = 0x1000
 
-export class G5SAV extends SAV<PK5> {
-  static TRANSFER_RESTRICTIONS = {
-    maxDexNum: NationalDex.Genesect,
-    excludedForms: { ...RegionalForms, ...CapPikachus, 483: [1], 484: [1] },
-  }
+export abstract class G5SAV implements SAV<PK5> {
+  static BOX_COUNT = 24
+  static pkmType = PK5
+  static SAVE_SIZE_BYTES = 0x80000
+  static lookupType: LOOKUP_TYPE = 'gen345'
 
-  transferRestrictions = G5SAV.TRANSFER_RESTRICTIONS
+  origin: GameOfOrigin = 0
+  isPlugin: false = false
 
-  pkmType = PK5
+  boxRows = 5
+  boxColumns = 6
 
-  trainerDataOffset: number = 0x19400
+  filePath: ParsedPath
+  fileCreated?: Date
 
+  money: number = 0 // TODO: Gen 5 money
+  name: string = ''
+  tid: number = 0
+  sid: number = 0
+  displayID: string = ''
+
+  currentPCBox: number = 0 // TODO: Gen 5 current box
   boxes: Array<Box<PK5>>
 
-  saveType = SaveType.G5
+  bytes: Uint8Array
+
+  invalid: boolean = false
+  tooEarlyToOpen: boolean = false
+
+  updatedBoxSlots: BoxCoordinates[] = []
+
+  trainerDataOffset: number = 0x19400
+  static originOffset = 0x1941f
 
   checksumMirrorsOffset: number = 0x23f00
 
@@ -43,17 +59,21 @@ export class G5SAV extends SAV<PK5> {
   checksumMirrorsChecksumOffset: number = 0x23f9a
 
   constructor(path: ParsedPath, bytes: Uint8Array) {
-    super(path, bytes)
-    this.boxes = Array(24)
+    this.bytes = bytes
+    this.filePath = path
+    this.boxes = new Array(G5SAV.BOX_COUNT)
+
     if (bytesToUint32LittleEndian(bytes, 0) === 0xffffffff) {
       this.tooEarlyToOpen = true
       return
     }
+
     this.name = gen5StringToUTF(this.bytes, this.trainerDataOffset + 0x04, 0x10)
     this.tid = bytesToUint16LittleEndian(this.bytes, this.trainerDataOffset + 0x14)
     this.sid = bytesToUint16LittleEndian(this.bytes, this.trainerDataOffset + 0x16)
     this.currentPCBox = this.bytes[0]
     this.displayID = this.tid.toString().padStart(5, '0')
+
     this.origin = this.bytes[this.trainerDataOffset + 0x1f]
     if (this.origin >= GameOfOrigin.White2) {
       this.checksumMirrorsOffset = 0x25f00
@@ -81,6 +101,9 @@ export class G5SAV extends SAV<PK5> {
       }
     }
   }
+  pcChecksumOffset?: number | undefined
+  pcOffset?: number | undefined
+  calculateChecksum?: (() => number) | undefined
 
   updateBoxChecksum = (boxIndex: number) => {
     // const oldChecksum = bytesToUint16LittleEndian(
@@ -103,10 +126,6 @@ export class G5SAV extends SAV<PK5> {
   }
 
   updateMirrorsChecksum = () => {
-    // const oldChecksum = bytesToUint16LittleEndian(
-    //   this.bytes,
-    //   this.checksumMirrorsChecksumOffset
-    // );
     const newChecksum = CRC16_CCITT(
       this.bytes,
       this.checksumMirrorsOffset,
@@ -115,7 +134,7 @@ export class G5SAV extends SAV<PK5> {
     this.bytes.set(uint16ToBytesLittleEndian(newChecksum), this.checksumMirrorsChecksumOffset)
   }
 
-  prepareBoxesForSaving() {
+  prepareBoxesAndGetModified() {
     const changedMonPKMs: OHPKM[] = []
     this.updatedBoxSlots.forEach(({ box, index }) => {
       const changedMon = this.boxes[box].pokemon[index]
@@ -146,5 +165,50 @@ export class G5SAV extends SAV<PK5> {
     )
     this.updateMirrorsChecksum()
     return changedMonPKMs
+  }
+
+  abstract supportsMon(dexNumber: number, formeNumber: number): boolean
+
+  getCurrentBox() {
+    return this.boxes[this.currentPCBox]
+  }
+
+  static gen4ValidDateAndSize(bytes: Uint8Array, offset: number) {
+    const size = bytesToUint32LittleEndian(bytes, offset - 0xc)
+    if (size !== (offset & 0xffff)) return false
+    const date = bytesToUint32LittleEndian(bytes, offset - 0x8)
+
+    const DATE_INT = 0x20060623
+    const DATE_KO = 0x20070903
+    return date === DATE_INT || date === DATE_KO
+  }
+
+  static fileIsSave(bytes: Uint8Array): boolean {
+    if (bytes.length < G5SAV.SAVE_SIZE_BYTES) {
+      return false
+    }
+    if (bytes.length > G5SAV.SAVE_SIZE_BYTES) {
+      if (!hasDesamumeFooter(bytes, G5SAV.SAVE_SIZE_BYTES)) {
+        return false
+      }
+    }
+
+    const g5Origin = bytes[G5SAV.originOffset]
+    return g5Origin >= GameOfOrigin.White && g5Origin <= GameOfOrigin.Black2
+  }
+
+  gameColor() {
+    switch (this.origin) {
+      case GameOfOrigin.Black:
+        return '#444444'
+      case GameOfOrigin.White:
+        return '#E1E1E1'
+      case GameOfOrigin.Black2:
+        return '#303E51'
+      case GameOfOrigin.White2:
+        return '#EBC5C3'
+      default:
+        return '#666666'
+    }
   }
 }

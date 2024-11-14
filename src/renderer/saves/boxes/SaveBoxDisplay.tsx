@@ -7,16 +7,14 @@ import { MenuIcon } from 'src/renderer/components/Icons'
 import AttributeRow from 'src/renderer/pokemon/AttributeRow'
 import { MouseContext } from 'src/renderer/state/mouse'
 import { MonLocation, OpenSavesContext } from 'src/renderer/state/openSaves'
-import { PKMFile } from '../../../types/pkm/util'
-import { isRestricted } from '../../../types/TransferRestrictions'
-import { getSaveTypeString } from '../../../types/types'
+import { PKMInterface } from '../../../types/interfaces'
 import ArrowButton from './ArrowButton'
 import BoxCell from './BoxCell'
 
 interface OpenSaveDisplayProps {
   saveIndex: number
-  setSelectedMon: (_: PKMFile | undefined) => void
-  setDraggedMon: React.Dispatch<React.SetStateAction<PKMFile | null>>
+  setSelectedMon: (_: PKMInterface | undefined) => void
+  setDraggedMon: React.Dispatch<React.SetStateAction<PKMInterface | null>>
   updateBag: () => void
 }
 
@@ -58,17 +56,12 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
     [mouseDispatch, mouseState.dragSource, openSavesDispatch, save]
   )
 
-  const dispatchImportMons = (mons: PKMFile[], location: MonLocation) =>
+  const dispatchImportMons = (mons: PKMInterface[], location: MonLocation) =>
     openSavesDispatch({ type: 'import_mons', payload: { mons, dest: location } })
 
   const isDisabled = useMemo(() => {
-    return mouseState.dragSource
-      ? isRestricted(
-          save.transferRestrictions,
-          mouseState.dragSource.mon.dexNum,
-          mouseState.dragSource.mon.formeNum
-        )
-      : false
+    if (!mouseState.dragSource) return false
+    return !save.supportsMon(mouseState.dragSource.mon.dexNum, mouseState.dragSource.mon.formeNum)
   }, [save, mouseState.dragSource])
 
   return save && save.currentPCBox !== undefined ? (
@@ -95,9 +88,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
             }}
           >
             <div style={{ textAlign: 'center', fontWeight: 'bold' }}>
-              {save.origin
-                ? `Pokémon ${GameOfOriginData[save.origin]?.name}`
-                : getSaveTypeString(save.saveType)}
+              Pokémon {GameOfOriginData[save.origin]?.name}
             </div>
             <div style={{ textAlign: 'center' }}>
               {save?.name} ({save?.displayID})
@@ -214,11 +205,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
             gap: 0,
           }}
         >
-          <AttributeRow label="Game">
-            {save.origin
-              ? `Pokémon ${GameOfOriginData[save.origin]?.name}`
-              : getSaveTypeString(save.saveType)}
-          </AttributeRow>
+          <AttributeRow label="Game">Pokémon {GameOfOriginData[save.origin]?.name}</AttributeRow>
           <AttributeRow label="Trainer Name">{save.name}</AttributeRow>
           <AttributeRow label="Trainer ID">{save.displayID}</AttributeRow>
           {save.sid && (
@@ -236,7 +223,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
               </div>
             </AttributeRow>
           )}
-          {save.calculateChecksum() !== -1 && (
+          {save.calculateChecksum && (
             <AttributeRow label="Checksum">
               <code>0x{save.calculateChecksum().toString(16)}</code>
             </AttributeRow>

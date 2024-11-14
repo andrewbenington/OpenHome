@@ -1,33 +1,34 @@
 import { Card } from '@mui/joy'
-import { useContext } from 'react'
-import { AppInfoContext } from '../state/appInfo'
+import { useState } from 'react'
+
+const romHackSaveTypes = ['PK3RR']
 
 export default function Settings() {
-  const [appInfoState, dispatchAppInfoState] = useContext(AppInfoContext)
+  const [disabledSaveTypes, setDisabledSaveTypes] = useState<string[]>([])
 
   return (
     <div>
-      <Card variant="outlined" sx={{ m: 1, maxWidth: 400 }}>
+      <Card variant="outlined" sx={{ m: 1, maxWidth: 300 }}>
         <div>
           <b>Enabled ROM Hack Formats</b>
         </div>
-        <div>
-          {appInfoState.settings.extraSaveTypes.map((saveType) => (
+        <ul>
+          {romHackSaveTypes.map((format) => (
             <label style={{ display: 'flex', flexDirection: 'row' }}>
               <input
                 type="checkbox"
                 onChange={(e) =>
-                  dispatchAppInfoState({
-                    type: 'set_savetype_enabled',
-                    payload: { saveType, enabled: e.target.checked },
-                  })
+                  setDisabledSaveTypes(
+                    e.target.checked
+                      ? disabledSaveTypes?.filter((other) => other !== format)
+                      : [...disabledSaveTypes, format]
+                  )
                 }
-                checked={appInfoState.settings.enabledSaveTypes[saveType.name]}
               />
-              {saveType.saveTypeName}
+              {format}
             </label>
           ))}
-        </div>
+        </ul>
       </Card>
     </div>
   )

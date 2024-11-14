@@ -1,10 +1,11 @@
 import { Button, Card, Chip, Dropdown, Menu, MenuButton, MenuItem, Stack } from '@mui/joy'
 import { isGameBoy } from 'pokemon-resources'
 import { useContext, useEffect, useMemo, useState } from 'react'
-import { GameColors } from 'src/types/SAVTypes/util'
 import { SaveRef } from 'src/types/types'
+import { getGameColor } from '../../types/SAVTypes/util'
 import { BackendContext } from '../backend/backendProvider'
 import { MenuIcon } from '../components/Icons'
+import { AppInfoContext } from '../state/appInfo'
 import './style.css'
 import { formatTimeSince, getSaveLogo } from './util'
 
@@ -22,17 +23,19 @@ const standardViewMinSize = 180
 export default function SaveCard({ save, onOpen, onRemove, size = 240 }: SaveCardProps) {
   const [expanded, setExpanded] = useState(false)
   const backend = useContext(BackendContext)
+  const [appInfo] = useContext(AppInfoContext)
   const [platform, setPlatform] = useState('')
 
-  const gbBackground = useMemo(
-    () => (save.game ? isGameBoy(parseInt(save.game)) : false),
-    [save.game]
-  )
+  const gbBackground = useMemo(() => (save.game ? isGameBoy(save.game) : false), [save.game])
 
-  const backgroundColor = useMemo(
-    () => GameColors[save.game ? parseInt(save.game) : 0],
-    [save.game]
-  )
+  const backgroundColor = useMemo(() => {
+    const origin = save.game
+    if (origin === undefined) return '#666666'
+    if (save.pluginIdentifier) return '#666666'
+
+    const saveType = appInfo.settings.allSaveTypes.find((s) => s.includesOrigin(origin))
+    return getGameColor(saveType, origin)
+  }, [appInfo.settings, save])
 
   useEffect(() => {
     backend.getPlatform().then(setPlatform)

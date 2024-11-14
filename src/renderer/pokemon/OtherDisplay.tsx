@@ -1,5 +1,5 @@
 import { Accordion, AccordionDetails, AccordionGroup, AccordionSummary } from '@mui/joy'
-import { AllPKMFields, getDisplayID } from 'pokemon-files'
+import { AllPKMFields, getDisplayID, StatsPreSplit } from 'pokemon-files'
 import {
   BDSPTMMoveIndexes,
   isGen4,
@@ -10,13 +10,10 @@ import {
 import { NationalDex } from 'pokemon-species-data'
 import { useMemo } from 'react'
 import { MdArrowForwardIos } from 'react-icons/md'
-import { hasGen3OnData } from 'src/types/interfaces/gen3'
-import { shinyLeafValues } from 'src/types/interfaces/gen4'
-import { hasGen6OnData, hasN3DSOnlyData } from 'src/types/interfaces/gen6'
-import { hasGen8OnlyData } from 'src/types/interfaces/gen8'
-import { Gen9OnlyData, hasGen9OnlyData } from 'src/types/interfaces/gen9'
 import { get16BitChecksumLittleEndian } from 'src/util/ByteLogic'
-import { Countries, EncounterTypes, SWEETS } from '../../consts'
+import { Countries } from '../../consts/Countries'
+import { EncounterTypes } from '../../consts/EncounterTypes'
+import { SWEETS } from '../../consts/Formes'
 import { MOVE_DATA } from '../../consts/Moves'
 import {
   GEN2_TRANSFER_RESTRICTIONS,
@@ -28,9 +25,14 @@ import {
   USUM_TRANSFER_RESTRICTIONS,
 } from '../../consts/TransferRestrictions'
 import { isRestricted } from '../../types/TransferRestrictions'
-import { hasGameBoyData } from '../../types/interfaces/stats'
+import { PKMInterface } from '../../types/interfaces'
 import { OHPKM } from '../../types/pkm/OHPKM'
-import { getHiddenPowerGen2, getHiddenPowerPower, getHiddenPowerType } from '../../types/pkm/util'
+import {
+  getHiddenPowerGen2,
+  getHiddenPowerPower,
+  getHiddenPowerType,
+  shinyLeafValues,
+} from '../../types/pkm/util'
 import {
   getMonFileIdentifier,
   getMonGen12Identifier,
@@ -70,7 +72,7 @@ const styles = {
   },
 }
 
-const OtherDisplay = (props: { mon: AllPKMFields }) => {
+const OtherDisplay = (props: { mon: PKMInterface }) => {
   const { mon } = props
   return (
     <div style={{ overflow: 'hidden', height: '100%' }}>
@@ -131,7 +133,7 @@ const OtherDisplay = (props: { mon: AllPKMFields }) => {
             </AccordionDetails>
           </Accordion>
         </AccordionGroup>
-        {hasGen6OnData(mon) && mon.handlerName !== '' ? (
+        {mon.handlerName && (
           <AccordionGroup>
             <Accordion>
               <AccordionSummary
@@ -147,12 +149,14 @@ const OtherDisplay = (props: { mon: AllPKMFields }) => {
                 {'handlerID' in mon && (
                   <AttributeRow label="ID" value={mon.handlerID?.toString()} indent={10} />
                 )}
-                <AttributeRow
-                  label="Friendship"
-                  value={mon.handlerFriendship.toString()}
-                  indent={10}
-                />
-                {hasN3DSOnlyData(mon) && (
+                {mon.handlerFriendship !== undefined && (
+                  <AttributeRow
+                    label="Friendship"
+                    value={mon.handlerFriendship.toString()}
+                    indent={10}
+                  />
+                )}
+                {mon.handlerAffection !== undefined && (
                   <AttributeRow
                     label="Affection"
                     value={mon.handlerAffection.toString()}
@@ -162,15 +166,16 @@ const OtherDisplay = (props: { mon: AllPKMFields }) => {
               </AccordionDetails>
             </Accordion>
           </AccordionGroup>
-        ) : (
-          <div />
         )}
         <HiddenPowerDisplay mon={mon} />
         {'personalityValue' in mon && mon.dexNum === NationalDex.Wurmple ? (
           <AttributeRow
             label="Wurmple Evolution"
             value={
-              ((((hasGen6OnData(mon) ? mon.encryptionConstant : mon.personalityValue) ?? 0) >> 16) &
+              ((((mon.encryptionConstant !== undefined
+                ? mon.encryptionConstant
+                : mon.personalityValue) ?? 0) >>
+                16) &
                 0xffff) %
                 10 >
               4
@@ -190,7 +195,9 @@ const OtherDisplay = (props: { mon: AllPKMFields }) => {
           <AttributeRow
             label="Dudunsparce"
             value={
-              (hasGen6OnData(mon) ? mon.encryptionConstant : mon.personalityValue) % 100
+              (mon.encryptionConstant !== undefined
+                ? mon.encryptionConstant
+                : mon.personalityValue) % 100
                 ? 'Two-Segment'
                 : 'Three-Segment'
             }
@@ -422,7 +429,7 @@ const OtherDisplay = (props: { mon: AllPKMFields }) => {
             </AccordionGroup>
           )}
         {!isRestricted(SWSH_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
-          hasGen8OnlyData(mon) && (
+          mon.dynamaxLevel !== undefined && (
             <>
               <AttributeRow label="Dynamax">
                 <DynamaxLevel level={mon.dynamaxLevel} />
@@ -436,15 +443,23 @@ const OtherDisplay = (props: { mon: AllPKMFields }) => {
               )}
             </>
           )}
+        {!isRestricted(SV_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) && hasTeraTypes(mon) && (
+          <TeraTypeData mon={mon} />
+        )}
         {!isRestricted(SV_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
-          hasGen9OnlyData(mon) && <ScarletVioletData mon={mon} />}
+          mon.obedienceLevel !== undefined && (
+            <AttributeRow label="Obedience" value={mon.obedienceLevel.toString()} />
+          )}
         {!isRestricted(GEN2_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
-          hasGameBoyData(mon as any) && (
-            <AttributeRow label="Gen 1/2 ID" value={getMonGen12Identifier(mon)} />
+          mon.dvs !== undefined && (
+            <AttributeRow
+              label="Gen 1/2 ID"
+              value={getMonGen12Identifier(mon as PKMInterface & { dvs: StatsPreSplit })}
+            />
           )}
         {!isRestricted(HGSS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
-          hasGen3OnData(mon as any) && (
-            <AttributeRow label="Gen 3/4/5 ID" value={getMonGen345Identifier(mon as any)} />
+          mon.personalityValue !== undefined && (
+            <AttributeRow label="Gen 3/4/5 ID" value={getMonGen345Identifier(mon)} />
           )}
         {mon.checksum !== undefined && (
           <>
@@ -471,7 +486,13 @@ const OtherDisplay = (props: { mon: AllPKMFields }) => {
 }
 export default OtherDisplay
 
-function ScarletVioletData(props: { mon: Gen9OnlyData }) {
+type PKMInterfaceTera = PKMInterface & { teraTypeOriginal: number; teraTypeOverride: number }
+
+function hasTeraTypes(mon: PKMInterface): mon is PKMInterfaceTera {
+  return mon.teraTypeOriginal !== undefined && mon.teraTypeOverride !== undefined
+}
+
+function TeraTypeData(props: { mon: PKMInterfaceTera }) {
   const { mon } = props
 
   const currentTeraType = useMemo(
@@ -485,19 +506,16 @@ function ScarletVioletData(props: { mon: Gen9OnlyData }) {
   )
 
   return (
-    <>
-      <AttributeRow label="Tera Type">
-        <TypeIcon typeIndex={currentTeraType} />
-        {previousTeraType && (
-          <>
-            <div>(originally </div>
-            <TypeIcon typeIndex={previousTeraType} />
-            <div>)</div>
-          </>
-        )}
-      </AttributeRow>
-      <AttributeRow label="Obedience" value={mon.obedienceLevel.toString()} />
-    </>
+    <AttributeRow label="Tera Type">
+      <TypeIcon typeIndex={currentTeraType} />
+      {previousTeraType && (
+        <>
+          <div>(originally </div>
+          <TypeIcon typeIndex={previousTeraType} />
+          <div>)</div>
+        </>
+      )}
+    </AttributeRow>
   )
 }
 

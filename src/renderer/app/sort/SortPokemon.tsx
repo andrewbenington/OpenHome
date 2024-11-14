@@ -1,23 +1,18 @@
 import { Autocomplete, Card, Chip, Modal, ModalDialog, ModalOverflow, Stack } from '@mui/joy'
 import dayjs from 'dayjs'
-import { GameOfOrigin } from 'pokemon-resources'
 import { useContext, useMemo, useState } from 'react'
 import { MdAdd } from 'react-icons/md'
 import PokemonDetailsPanel from 'src/renderer/pokemon/PokemonDetailsPanel'
 import BoxCell from 'src/renderer/saves/boxes/BoxCell'
 import SavesModal from 'src/renderer/saves/SavesModal'
-import { PKMFile } from 'src/types/pkm/util'
-import { GameColors } from 'src/types/SAVTypes/util'
 import { filterUndefined } from 'src/util/Sort'
+import { PKMInterface } from '../../../types/interfaces'
 import { LookupContext } from '../../state/lookup'
 import { OpenSavesContext } from '../../state/openSaves'
 
 function getSortFunction(
   sortStr: string | undefined
-): (
-  a: { mon: PKMFile; saveGame: GameOfOrigin },
-  b: { mon: PKMFile; saveGame: GameOfOrigin }
-) => number {
+): (a: { mon: PKMInterface }, b: { mon: PKMInterface }) => number {
   switch (sortStr?.toLowerCase()) {
     case 'nickname':
       return (a, b) => a.mon.nickname.localeCompare(b.mon.nickname)
@@ -39,8 +34,8 @@ function getSortFunction(
       }
     case 'ribbons':
       return (a, b) => {
-        const aCount = 'ribbons' in a.mon ? a.mon.ribbons.length : 0
-        const bCount = 'ribbons' in b.mon ? b.mon.ribbons.length : 0
+        const aCount = a.mon.ribbons ? a.mon.ribbons.length : 0
+        const bCount = b.mon.ribbons ? b.mon.ribbons.length : 0
         return bCount - aCount
       }
     default:
@@ -52,20 +47,21 @@ export default function SortPokemon() {
   const [{ homeMons }] = useContext(LookupContext)
   const [{ homeData }, , openSaves] = useContext(OpenSavesContext)
   const [openSaveDialog, setOpenSaveDialog] = useState(false)
-  const [selectedMon, setSelectedMon] = useState<PKMFile>()
+  const [selectedMon, setSelectedMon] = useState<PKMInterface>()
   const [tab, setTab] = useState('summary')
   const [sort, setSort] = useState('')
 
-  const allMonsWithSaves = useMemo(() => {
-    const all: { mon: PKMFile; saveGame: GameOfOrigin }[] = openSaves
+  const allMonsWithColors = useMemo(() => {
+    if (!homeData) return []
+    const all: { mon: PKMInterface; color: string }[] = openSaves
       .flatMap((save) =>
         save.boxes.flatMap((box) =>
-          box.pokemon.flatMap((mon) => (mon ? { mon, saveGame: save.origin } : undefined))
+          box.pokemon.flatMap((mon) => (mon ? { mon, color: save.gameColor() } : undefined))
         )
       )
       .concat(
-        Object.values(homeData?.boxes.flatMap((box) => box.pokemon) ?? {}).map((mon) =>
-          mon ? { mon, saveGame: 0 } : undefined
+        Object.values(homeData.boxes.flatMap((box) => box.pokemon) ?? {}).map((mon) =>
+          mon ? { mon, color: homeData.gameColor() } : undefined
         )
       )
       .filter(filterUndefined)
@@ -99,7 +95,7 @@ export default function SortPokemon() {
         </Card>
         <Card style={{ overflowY: 'auto' }}>
           <Stack direction="row" flexWrap="wrap" justifyContent="center">
-            {Object.values(allMonsWithSaves)
+            {Object.values(allMonsWithColors)
               .sort(getSortFunction(sort))
               .map((monWithSave, i) => (
                 <div style={{ width: 36, height: 36, margin: 4 }} key={`mon_${i}`}>
@@ -107,13 +103,10 @@ export default function SortPokemon() {
                     onClick={() => setSelectedMon(monWithSave.mon)}
                     onDragEvent={() => {}}
                     onDrop={() => {}}
-                    key=""
                     mon={monWithSave.mon}
                     disabled={false}
                     zIndex={2}
-                    borderColor={
-                      monWithSave.saveGame ? GameColors[monWithSave.saveGame] : GameColors[0]
-                    }
+                    borderColor={monWithSave.color}
                   />
                 </div>
               ))}

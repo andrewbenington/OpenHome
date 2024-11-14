@@ -1,3 +1,4 @@
+import { GameOfOrigin } from 'pokemon-resources'
 import { ORAS_TRANSFER_RESTRICTIONS } from '../../consts/TransferRestrictions'
 import { isRestricted } from '../TransferRestrictions'
 import { G6SAV } from './G6SAV'
@@ -23,4 +24,8 @@ export class ORASSAV extends G6SAV {
   }
 
   static saveTypeName = 'Pokémon Omega Ruby/Alpha Sapphire'
+
+  static includesOrigin(origin: GameOfOrigin) {
+    return origin === GameOfOrigin.OmegaRuby || origin === GameOfOrigin.AlphaSapphire
+  }
 }

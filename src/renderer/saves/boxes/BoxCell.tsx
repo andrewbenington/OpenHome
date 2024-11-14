@@ -3,8 +3,8 @@ import PokemonIcon from 'src/renderer/components/PokemonIcon'
 import { FilterContext } from 'src/renderer/state/filter'
 import { bytesToPKM } from 'src/types/FileImport'
 import { filterApplies } from 'src/types/Filter'
-import { PKMFile } from 'src/types/pkm/util'
 import { Styles } from 'src/types/types'
+import { PKMInterface } from '../../../types/interfaces'
 import BoxIcons from '../../images/BoxIcons.png'
 import { ItemFromString } from 'pokemon-resources'
 import { Bag } from '../Bag'
@@ -36,10 +36,10 @@ const styles = {
 interface BoxCellProps {
   onClick: () => void
   onDragEvent: (_: boolean) => void
-  onDrop: (_: PKMFile[] | undefined) => void
+  onDrop: (_: PKMInterface[] | undefined) => void
   disabled?: boolean
   zIndex: number
-  mon: PKMFile | undefined
+  mon: PKMInterface | undefined
   borderColor?: string
   setDraggedMon: React.Dispatch<React.SetStateAction<PKMFile | null>>
   updateBag: () => void 
@@ -59,7 +59,7 @@ const BoxCell = (props: BoxCellProps) => {
   }, [filterState, mon])
 
   const onDropFromFiles = async (files: FileList) => {
-    const importedMons: PKMFile[] = []
+    const importedMons: PKMInterface[] = []
     for (let i = 0; i < files.length; i++) {
       const file = files[i]
       const bytes = new Uint8Array(await file.arrayBuffer())
@@ -115,14 +115,6 @@ const BoxCell = (props: BoxCellProps) => {
     setIsBeingDragged(false)
   }, [mon])
 
-  function getIsShiny(mon: PKMFile) {
-    try {
-      return mon.isShiny()
-    } catch {
-      return false
-    }
-  }
-
   return (
     <button
       type="button"
@@ -140,7 +132,7 @@ const BoxCell = (props: BoxCellProps) => {
           dexNumber={mon.dexNum}
           formeNumber={mon.formeNum}
           greyedOut={isFilteredOut || disabled}
-          isShiny={getIsShiny(mon)}
+          isShiny={mon.isShiny()}
           heldItemIndex={mon.heldItemIndex}
           heldItemFormat={mon.format}
           style={{

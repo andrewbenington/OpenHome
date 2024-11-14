@@ -1,8 +1,6 @@
 import { Tooltip } from '@mui/joy'
 import { Gen9Ribbons } from '../../consts/Ribbons'
-import { hasGen3OnData } from '../../types/interfaces/gen3'
-import { hasGen6OnData } from '../../types/interfaces/gen6'
-import { PKMFile } from '../../types/pkm/util'
+import { PKMInterface } from '../../types/interfaces'
 import { Styles } from '../../types/types'
 import { getPublicImageURL } from '../images/images'
 import { getRibbonSpritePath } from '../images/ribbons'
@@ -39,10 +37,10 @@ const styles = {
   },
 } as Styles
 
-const RibbonsDisplay = (props: { mon: PKMFile }) => {
+const RibbonsDisplay = (props: { mon: PKMInterface }) => {
   const { mon } = props
 
-  if (!('ribbons' in mon) || !hasGen3OnData(mon) || mon.ribbons.length === 0) {
+  if (!mon.ribbons || mon.ribbons.length === 0) {
     return <div style={styles.noRibbonsMessage}>This Pokémon has no ribbons.</div>
   }
 
@@ -54,9 +52,6 @@ const RibbonsDisplay = (props: { mon: PKMFile }) => {
       const [contestRibbon, region] = ribbon.split(' (')
       return `${contestRibbon} Ribbon (${region}`
     }
-    if (!hasGen6OnData(mon)) {
-      return `${ribbon} Ribbon`
-    }
     if (ribbon === 'Contest Memory') {
       return `${ribbon} Ribbon (${mon.contestMemoryCount})`
     }
@@ -67,9 +62,6 @@ const RibbonsDisplay = (props: { mon: PKMFile }) => {
   }
 
   const getRibbonImage = (ribbon: string) => {
-    if (!hasGen6OnData(mon)) {
-      return getPublicImageURL(getRibbonSpritePath(ribbon))
-    }
     if (ribbon === 'Contest Memory' && mon.contestMemoryCount === 40) {
       return getPublicImageURL(getRibbonSpritePath('Contest Memory Gold'))
     }

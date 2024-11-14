@@ -7,9 +7,9 @@ export const getFlag = (dataView: DataView, offset: number, index: number) => {
   return false
 }
 
-export function getFlagsInRange(buffer: ArrayBuffer, offset: number, size: number) {
+export function getFlagsInRange(bytes: Uint8Array, offset: number, size: number) {
   const flags: number[] = []
-  const dataView = new DataView(buffer)
+  const dataView = new DataView(bytes.buffer)
 
   for (let i = 0; i < size * 8; i++) {
     if (getFlag(dataView, offset, i)) {

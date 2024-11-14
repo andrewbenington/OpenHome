@@ -90,5 +90,5 @@ export const bytesToPKM = (bytes: Uint8Array, extension: string): PKMFile => {
   if (!T) {
     throw `Unrecognized file`
   }
-  return T.fromBytes(bytes.buffer)
+  return T.fromBytes(bytes.buffer as ArrayBuffer)
 }

@@ -1,4 +1,5 @@
 import { PK4 } from 'pokemon-files'
+import { GameOfOrigin } from 'pokemon-resources'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -7,11 +8,41 @@ import {
 import { CRC16_CCITT } from '../../util/Encryption'
 import { gen4StringToUTF } from '../../util/Strings/StringConverter'
 import { OHPKM } from '../pkm/OHPKM'
-import { Box, SAV } from './SAV'
+import { Box, BoxCoordinates, SAV } from './SAV'
 import { ParsedPath } from './path'
+import { LOOKUP_TYPE } from './util'
 
-export class G4SAV extends SAV<PK4> {
-  pkmType = PK4
+export abstract class G4SAV implements SAV<PK4> {
+  static BOX_COUNT = 18
+  static pkmType = PK4
+  static SAVE_SIZE_BYTES = 0x80000
+  static lookupType: LOOKUP_TYPE = 'gen345'
+
+  origin: GameOfOrigin = 0
+  isPlugin: false = false
+
+  boxRows = 5
+  boxColumns = 6
+
+  filePath: ParsedPath
+  fileCreated?: Date
+
+  money: number = 0 // TODO: Gen 4 money
+  abstract name: string
+  abstract tid: number
+  abstract sid: number
+  abstract displayID: string
+
+  currentPCBox: number = 0 // TODO: Gen 4 current box
+
+  boxes: Array<Box<PK4>>
+
+  bytes: Uint8Array
+
+  invalid: boolean = false
+  tooEarlyToOpen: boolean = false
+
+  updatedBoxSlots: BoxCoordinates[] = []
 
   currentSaveStorageBlockOffset: number = 0
 
@@ -26,13 +57,14 @@ export class G4SAV extends SAV<PK4> {
   footerSize: number = 0x14
 
   constructor(path: ParsedPath, bytes: Uint8Array) {
-    super(path, bytes)
+    this.bytes = bytes
+    this.filePath = path
+    this.boxes = Array(G4SAV.BOX_COUNT)
     if (bytesToUint32LittleEndian(bytes, 0) === 0xffffffff) {
       this.tooEarlyToOpen = true
       return
     }
     this.origin = bytes[0x80]
-    this.boxes = Array(18)
   }
 
   buildBoxes() {
@@ -96,7 +128,7 @@ export class G4SAV extends SAV<PK4> {
     )
   }
 
-  prepareBoxesForSaving() {
+  prepareBoxesAndGetModified() {
     const changedMonPKMs: OHPKM[] = []
     this.updatedBoxSlots.forEach(({ box, index }) => {
       const changedMon = this.boxes[box].pokemon[index]
@@ -125,5 +157,46 @@ export class G4SAV extends SAV<PK4> {
     this.updateStorageChecksum()
 
     return changedMonPKMs
+  }
+
+  abstract supportsMon(dexNumber: number, formeNumber: number): boolean
+
+  getCurrentBox() {
+    return this.boxes[this.currentPCBox]
+  }
+
+  // Gen 4 saves include a size and hex "date" that can identify save type
+  static validDateAndSize(bytes: Uint8Array, offset: number) {
+    const size = bytesToUint32LittleEndian(bytes, offset - 0xc)
+    if (size !== (offset & 0xffff)) return false
+    const date = bytesToUint32LittleEndian(bytes, offset - 0x8)
+
+    const DATE_INT = 0x20060623
+    const DATE_KO = 0x20070903
+    return date === DATE_INT || date === DATE_KO
+  }
+
+  gameColor() {
+    switch (this.origin) {
+      case GameOfOrigin.Diamond:
+        return '#90BEED'
+      case GameOfOrigin.Pearl:
+        return '#DD7CB1'
+      case GameOfOrigin.Platinum:
+        return '#A0A08D'
+      case GameOfOrigin.HeartGold:
+        return '#E8B502'
+      case GameOfOrigin.SoulSilver:
+        return '#AAB9CF'
+      default:
+        return '#666666'
+    }
+  }
+
+  static includesOrigin(origin: GameOfOrigin) {
+    return (
+      (origin >= GameOfOrigin.Diamond && origin <= GameOfOrigin.Platinum) ||
+      (origin >= GameOfOrigin.HeartGold && origin <= GameOfOrigin.SoulSilver)
+    )
   }
 }

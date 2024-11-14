@@ -1,6 +1,6 @@
 import bigInt from 'big-integer'
 import lodash from 'lodash'
-import { AllPKMFields, PKM } from 'pokemon-files'
+import { PKM, Stats, StatsPreSplit } from 'pokemon-files'
 import {
   AttackCharacteristics,
   DefenseCharacteristics,
@@ -25,13 +25,11 @@ import {
   writeUint32ToBuffer,
 } from '../../util/ByteLogic'
 import { getGen3To5Gender } from '../../util/GenderCalc'
-import { Gen3OnData, hasGen3OnData } from '../interfaces/gen3'
-import { hasGen6OnData } from '../interfaces/gen6'
-import { stats, statsPreSplit } from '../types'
+import { PKMInterface } from '../interfaces'
 import { OHPKM } from './OHPKM'
 
 export const writeIVsToBuffer = (
-  ivs: stats,
+  ivs: Stats,
   buffer: Uint8Array,
   offset: number,
   isEgg: boolean,
@@ -105,7 +103,7 @@ export const generateTeraType = (prng: Prando, dexNum: number, formeNum: number)
   return Types.indexOf(types[typeIndex])
 }
 
-export const ivsFromDVs = (dvs: statsPreSplit) => {
+export const ivsFromDVs = (dvs: StatsPreSplit) => {
   return {
     hp: dvs.hp * 2 + 1,
     atk: dvs.atk * 2 + 1,
@@ -129,7 +127,7 @@ const gvFromIV = (iv: number) => {
   return 3
 }
 
-export const gvsFromIVs = (ivs: stats) => {
+export const gvsFromIVs = (ivs: Stats) => {
   return {
     hp: gvFromIV(ivs.hp),
     atk: gvFromIV(ivs.atk),
@@ -140,7 +138,7 @@ export const gvsFromIVs = (ivs: stats) => {
   }
 }
 
-export const dvsFromIVs = (ivs: stats, isShiny: boolean) => {
+export const dvsFromIVs = (ivs: Stats, isShiny: boolean) => {
   if (isShiny) {
     let atkDV = Math.ceil((ivs.atk - 1) / 2)
     if ((atkDV & 0b11) === 0b01) {
@@ -225,7 +223,7 @@ export const formatHasColorMarkings = (format: string) => {
   )
 }
 
-export const getTypes = (mon: AllPKMFields) => {
+export const getTypes = (mon: PKMInterface) => {
   let types = PokemonData[mon.dexNum]?.formes[mon.formeNum ?? 0]?.types
   if (
     mon.format === 'PK1' &&
@@ -335,18 +333,14 @@ const getIsShinyPreGen6 = (trainerID: number, secretID: number, personalityValue
   (trainerID ^ secretID ^ ((personalityValue >> 16) & 0xffff) ^ (personalityValue & 0xffff)) < 8
 
 export const generatePersonalityValuePreservingAttributes = (
-  mon: PKM,
+  mon: PKMInterface,
   prng: Prando = new Prando()
 ) => {
-  let personalityValue = 0
-  let otherNature: Nature | undefined
+  let personalityValue = mon.personalityValue ?? prng.nextInt(0, 0xffffffff)
+  let otherNature: Nature | undefined = mon.nature
   let otherAbilityNum = 4
-  if (mon.format !== 'PK1' && hasGen3OnData(mon)) {
-    personalityValue = mon.personalityValue
-    otherNature = mon.nature
+  if (mon.abilityNum !== undefined) {
     otherAbilityNum = mon.abilityNum
-  } else {
-    personalityValue = prng.nextInt(0, 0xffffffff)
   }
 
   if ('statNature' in mon) {
@@ -399,8 +393,8 @@ export const generatePersonalityValuePreservingAttributes = (
   return personalityValue
 }
 
-export function getCharacteristic(mon: Gen3OnData) {
-  const preGen6 = !hasGen6OnData(mon)
+export function getCharacteristic(mon: PKMInterface) {
+  const preGen6 = mon.encryptionConstant === undefined
   const tiebreaker = preGen6 ? mon.personalityValue : mon.encryptionConstant
   if (!mon.ivs || !tiebreaker) return ''
   const statFields = ['hp', 'atk', 'def', 'spe', 'spa', 'spd']
@@ -469,7 +463,7 @@ export type HiddenPowerWithBP = {
   power: number
 }
 
-export function getHiddenPowerGen2(dvs: statsPreSplit): HiddenPowerWithBP {
+export function getHiddenPowerGen2(dvs: StatsPreSplit): HiddenPowerWithBP {
   const typeIndex = ((dvs.atk & 0b11) << 2) + (dvs.def & 0b11)
 
   const v = mostSignificantBit(dvs.spc)
@@ -489,7 +483,7 @@ function mostSignificantBit(value: number) {
   return value & 0b1000 ? 1 : 0
 }
 
-export function getHiddenPowerType(ivs: stats): Type {
+export function getHiddenPowerType(ivs: Stats): Type {
   const numerator =
     [0, ivs.spd, ivs.spa, ivs.spe, ivs.def, ivs.atk, ivs.hp].reduce(
       (prev, value) => (prev << 1) + (value & 1)
@@ -498,7 +492,7 @@ export function getHiddenPowerType(ivs: stats): Type {
   return hpTypes[Math.floor(numerator / 63)]
 }
 
-export function getHiddenPowerPower(ivs: stats): number {
+export function getHiddenPowerPower(ivs: Stats): number {
   const numerator =
     [0, ivs.spd, ivs.spa, ivs.spe, ivs.def, ivs.atk, ivs.hp].reduce(
       (prev, value) => (prev << 1) + ((value >> 1) & 1)
@@ -508,3 +502,14 @@ export function getHiddenPowerPower(ivs: stats): number {
 }
 
 export type PKMFile = PKM | OHPKM
+
+export function shinyLeafValues(shinyLeafNumber: number) {
+  return {
+    first: !!(shinyLeafNumber & 1),
+    second: !!(shinyLeafNumber & 2),
+    third: !!(shinyLeafNumber & 4),
+    fourth: !!(shinyLeafNumber & 8),
+    fifth: !!(shinyLeafNumber & 16),
+    crown: !!(shinyLeafNumber & 32),
+  }
+}

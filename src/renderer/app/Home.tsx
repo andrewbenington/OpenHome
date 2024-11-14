@@ -22,8 +22,8 @@ import { GameOfOrigin, isGameBoy, isGen3, isGen4, isGen5 } from 'pokemon-resourc
 import { useCallback, useContext, useEffect, useState } from 'react'
 import { MdFileOpen } from 'react-icons/md'
 import { Errorable } from 'src/types/types'
+import { PKMInterface } from '../../types/interfaces'
 import { OHPKM } from '../../types/pkm/OHPKM'
-import { PKMFile } from '../../types/pkm/util'
 import {
   getMonFileIdentifier,
   getMonGen12Identifier,
@@ -33,6 +33,8 @@ import { BackendContext } from '../backend/backendProvider'
 import FilterPanel from '../components/filter/FilterPanel'
 import PokemonIcon from '../components/PokemonIcon'
 import PokemonDetailsPanel from '../pokemon/PokemonDetailsPanel'
+import { Bag } from '../saves/Bag'
+import BagBox from '../saves/BagBox'
 import HomeBoxDisplay from '../saves/boxes/HomeBoxDisplay'
 import OpenSaveDisplay from '../saves/boxes/SaveBoxDisplay'
 import SavesModal from '../saves/SavesModal'
@@ -43,8 +45,6 @@ import { OpenSavesContext } from '../state/openSaves'
 import { initializeDragImage } from '../util/initializeDragImage'
 import { handleMenuResetAndClose, handleMenuSave } from '../util/ipcFunctions'
 import './Home.css'
-import BagBox from '../saves/BagBox'
-import { Bag } from '../saves/Bag'
 
 const Home = () => {
   const [openSavesState, openSavesDispatch, allOpenSaves] = useContext(OpenSavesContext)
@@ -54,17 +54,16 @@ const Home = () => {
   const [, appInfoDispatch] = useContext(AppInfoContext)
   const homeData = openSavesState.homeData
   const { palette } = useTheme()
-  const [selectedMon, setSelectedMon] = useState<PKMFile>()
-  const [draggedMon, setDraggedMon] = useState<PKMFile | null>(null)
+  const [selectedMon, setSelectedMon] = useState<PKMInterface>()
+  const [draggedMon, setDraggedMon] = useState<PKMInterface | null>(null)
   const [draggedItem, setDraggedItem] = useState<string | null>(null)
   const [tab, setTab] = useState('summary')
   const [openSaveDialog, setOpenSaveDialog] = useState(false)
   const [openBagDialog, setOpenBagDialog] = useState(false)
   const [errorMessages, setErrorMessages] = useState<string[]>()
   const [filesToDelete, setFilesToDelete] = useState<string[]>([])
-  const [bagItems, setBagItems] = useState(Bag.getItems());
+  const [bagItems, setBagItems] = useState(Bag.getItems())
   const [activeTab, setActiveTab] = useState(0)
-
 
   const updateBag = () => {
     setBagItems(Bag.getItems())
@@ -85,8 +84,8 @@ const Home = () => {
   }, [allOpenSaves, backend, homeData?.updatedBoxSlots])
 
   const onViewDrop = (e: React.DragEvent<HTMLDivElement>, type: string) => {
-    const processDroppedData = async (file?: File, droppedMon?: PKMFile) => {
-      let mon: PKMFile | undefined = droppedMon
+    const processDroppedData = async (file?: File, droppedMon?: PKMInterface) => {
+      let mon: PKMInterface | undefined = droppedMon
       if (file) {
         const buffer = await file.arrayBuffer()
         const [extension] = file.name.split('.').slice(-1)
@@ -184,7 +183,7 @@ const Home = () => {
 
     const { gen12, gen345 } = lookupState
     const saveTypesAndChangedMons = allOpenSaves.map(
-      (save) => [save.origin, save.prepareBoxesForSaving()] as [GameOfOrigin, OHPKM[]]
+      (save) => [save.origin, save.prepareBoxesAndGetModified()] as [GameOfOrigin, OHPKM[]]
     )
     for (const [saveOrigin, changedMons] of saveTypesAndChangedMons) {
       if (isGameBoy(saveOrigin)) {
@@ -312,7 +311,7 @@ const Home = () => {
             updateBag={updateBag}
           />
         ))}
-  
+
         {/* Open Save Button */}
         <button
           className="card-button"
@@ -324,7 +323,7 @@ const Home = () => {
           <MdFileOpen />
           Open Save
         </button>
-  
+
         {/* Open Bag Button */}
         {!openBagDialog && (
           <button
@@ -338,7 +337,7 @@ const Home = () => {
             Open Bag
           </button>
         )}
-  
+
         {/* Conditionally render BagBox */}
         {openBagDialog && (
           <BagBox
@@ -351,7 +350,7 @@ const Home = () => {
           />
         )}
       </Stack>
-  
+
       <div
         className="home-box-column"
         style={{
@@ -368,11 +367,15 @@ const Home = () => {
           minWidth={480}
           alignItems="center"
         >
-          <HomeBoxDisplay setSelectedMon={setSelectedMon} setDraggedMon={setDraggedMon} updateBag={updateBag} />
+          <HomeBoxDisplay
+            setSelectedMon={setSelectedMon}
+            setDraggedMon={setDraggedMon}
+            updateBag={updateBag}
+          />
           <Box flex={1}></Box>
         </Box>
       </div>
-  
+
       {/* Right-hand side (RHS) with Tabs for Filter and Bag */}
       <Stack spacing={1} className="right-column" width={300}>
         <Tabs
@@ -387,11 +390,11 @@ const Home = () => {
             <Tab>Filter</Tab>
             <Tab>Bag</Tab>
           </TabList>
-  
+
           <TabPanel value={0} sx={{ padding: 0 }}>
             <FilterPanel />
           </TabPanel>
-  
+
           <TabPanel value={1} sx={{ padding: 0 }}>
             <BagBox
               onClose={() => setOpenBagDialog(false)}
@@ -403,7 +406,7 @@ const Home = () => {
             />
           </TabPanel>
         </Tabs>
-  
+
         {/* Drop areas for 'Preview' and 'Release' */}
         <div
           className="drop-area"
@@ -413,7 +416,7 @@ const Home = () => {
         >
           Preview
         </div>
-  
+
         <div
           className="drop-area"
           onDragOver={(e) => e.preventDefault()}
@@ -432,7 +435,7 @@ const Home = () => {
           </div>
         </div>
       </Stack>
-  
+
       {/* Modals */}
       <Modal open={!!selectedMon} onClose={() => setSelectedMon(undefined)}>
         <ModalOverflow>
@@ -450,7 +453,7 @@ const Home = () => {
           </ModalDialog>
         </ModalOverflow>
       </Modal>
-  
+
       <Modal open={openSaveDialog} onClose={() => setOpenSaveDialog(false)}>
         <ModalDialog
           sx={{
@@ -468,7 +471,7 @@ const Home = () => {
           />
         </ModalDialog>
       </Modal>
-  
+
       <Modal open={!!errorMessages} onClose={() => setErrorMessages(undefined)}>
         <ModalDialog style={{ padding: 8 }}>
           <ModalClose />
@@ -486,6 +489,5 @@ const Home = () => {
     </div>
   )
 }
-  
 
 export default Home
