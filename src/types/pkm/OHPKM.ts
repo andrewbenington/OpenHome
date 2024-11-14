@@ -194,6 +194,7 @@ export class OHPKM implements PKMInterface {
       this.abilityIndex = AbilityFromString(this.ability)
 
       this.isShadow = other.isShadow ?? false
+      
       this.encryptionConstant =
         other.encryptionConstant ?? other.personalityValue ?? prng.nextInt(0, 0xffffffff)
 

@@ -4,9 +4,9 @@ import { useCallback, useContext } from 'react'
 import { MdArrowBack, MdArrowForward } from 'react-icons/md'
 import { MouseContext } from 'src/renderer/state/mouse'
 import { MonLocation, OpenSavesContext } from 'src/renderer/state/openSaves'
+import { PKMInterface } from 'src/types/interfaces'
 import ArrowButton from './ArrowButton'
 import BoxCell from './BoxCell'
-import { PKMInterface } from 'src/types/interfaces'
 
 interface HomeBoxDisplayProps {
   setSelectedMon: (_: PKMInterface | undefined) => void

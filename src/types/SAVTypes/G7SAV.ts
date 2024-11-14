@@ -19,6 +19,7 @@ export abstract class G7SAV implements SAV<PK7> {
   static pkmType = PK7
 
   origin: GameOfOrigin = 0
+  isPlugin = false
 
   boxRows = 5
   boxColumns = 6
@@ -26,13 +27,13 @@ export abstract class G7SAV implements SAV<PK7> {
   filePath: ParsedPath
   fileCreated?: Date
 
-  money: number = 0 // TODO: Gen 6 money
+  money: number = 0 // TODO: Gen 7 money
   name: string = ''
   tid: number = 0
   sid: number = 0
   displayID: string = ''
 
-  currentPCBox: number = 0 // TODO: Gen 6 current box
+  currentPCBox: number = 0 // TODO: Gen 7 current box
 
   boxes: Array<Box<PK7>>
 
@@ -145,7 +146,18 @@ export abstract class G7SAV implements SAV<PK7> {
     return gameOfOrigin ? `Pokémon ${gameOfOrigin.name}` : '(Unknown Game)'
   }
 
-  isPlugin() {
-    return false
+  gameColor() {
+    switch (this.origin) {
+      case GameOfOrigin.Sun:
+        return '#F1912B'
+      case GameOfOrigin.Moon:
+        return '#5599CA'
+      case GameOfOrigin.UltraSun:
+        return '#E95B2B'
+      case GameOfOrigin.UltraMoon:
+        return '#226DB5'
+      default:
+        return '#666666'
+    }
   }
 }

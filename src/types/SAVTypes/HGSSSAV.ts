@@ -1,4 +1,5 @@
 import { PK4 } from 'pokemon-files'
+import { GameOfOrigin } from 'pokemon-resources'
 import { HGSS_TRANSFER_RESTRICTIONS } from '../../consts/TransferRestrictions'
 import { bytesToUint16LittleEndian, bytesToUint32LittleEndian } from '../../util/ByteLogic'
 import { gen4StringToUTF } from '../../util/Strings/StringConverter'
@@ -86,5 +87,9 @@ export class HGSSSAV extends G4SAV {
     }
 
     return G4SAV.validDateAndSize(bytes, 0x4f628)
+  }
+
+  static includesOrigin(origin: GameOfOrigin) {
+    return origin === GameOfOrigin.HeartGold || origin === GameOfOrigin.SoulSilver
   }
 }

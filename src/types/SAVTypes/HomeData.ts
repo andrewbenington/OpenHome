@@ -40,6 +40,7 @@ export class HomeBox implements Box<OHPKM> {
 
 export class HomeData implements SAV<OHPKM> {
   origin: GameOfOrigin = 0
+  isPlugin = false
 
   boxRows = 10
   boxColumns = 12
@@ -70,6 +71,7 @@ export class HomeData implements SAV<OHPKM> {
     this.boxNames = lodash.range(36).map((i) => `Box ${i + 1}`)
     this.boxes = this.boxNames.map((name) => new HomeBox(name))
   }
+  pluginIdentifier?: string | undefined
   pcChecksumOffset?: number | undefined
   pcOffset?: number | undefined
   calculateChecksum?: (() => number) | undefined
@@ -90,7 +92,7 @@ export class HomeData implements SAV<OHPKM> {
     return true
   }
 
-  isPlugin() {
-    return false
+  gameColor() {
+    return '#7DCEAB'
   }
 }

@@ -172,6 +172,7 @@ export class G3SAV implements SAV<PK3> {
   primarySaveOffset: number
 
   origin: GameOfOrigin
+  isPlugin: false = false
 
   boxRows = 5
   boxColumns = 6
@@ -256,6 +257,10 @@ export class G3SAV implements SAV<PK3> {
     }
     console.log(this.boxes)
   }
+  pcChecksumOffset?: number | undefined
+  pcOffset?: number | undefined
+  pluginIdentifier?: string | undefined
+  calculateChecksum?: (() => number) | undefined
 
   prepareBoxesAndGetModified() {
     const changedMonPKMs: OHPKM[] = []
@@ -327,7 +332,24 @@ export class G3SAV implements SAV<PK3> {
     return false
   }
 
-  isPlugin() {
-    return false
+  gameColor() {
+    switch (this.origin) {
+      case GameOfOrigin.Ruby:
+        return '#CD2236'
+      case GameOfOrigin.Sapphire:
+        return '#009652'
+      case GameOfOrigin.Emerald:
+        return '#009652'
+      case GameOfOrigin.FireRed:
+        return '#F15C01'
+      case GameOfOrigin.LeafGreen:
+        return '#9FDC00'
+      default:
+        return '#666666'
+    }
+  }
+
+  static includesOrigin(origin: GameOfOrigin) {
+    return origin >= GameOfOrigin.Sapphire && origin <= GameOfOrigin.LeafGreen
   }
 }

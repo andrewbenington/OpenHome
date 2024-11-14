@@ -25,6 +25,7 @@ export abstract class G5SAV implements SAV<PK5> {
   static lookupType: LOOKUP_TYPE = 'gen345'
 
   origin: GameOfOrigin = 0
+  isPlugin: false = false
 
   boxRows = 5
   boxColumns = 6
@@ -100,6 +101,9 @@ export abstract class G5SAV implements SAV<PK5> {
       }
     }
   }
+  pcChecksumOffset?: number | undefined
+  pcOffset?: number | undefined
+  calculateChecksum?: (() => number) | undefined
 
   updateBoxChecksum = (boxIndex: number) => {
     // const oldChecksum = bytesToUint16LittleEndian(
@@ -198,7 +202,18 @@ export abstract class G5SAV implements SAV<PK5> {
     return g5Origin >= GameOfOrigin.White && g5Origin <= GameOfOrigin.Black2
   }
 
-  isPlugin() {
-    return false
+  gameColor() {
+    switch (this.origin) {
+      case GameOfOrigin.Black:
+        return '#444444'
+      case GameOfOrigin.White:
+        return '#E1E1E1'
+      case GameOfOrigin.Black2:
+        return '#303E51'
+      case GameOfOrigin.White2:
+        return '#EBC5C3'
+      default:
+        return '#666666'
+    }
   }
 }

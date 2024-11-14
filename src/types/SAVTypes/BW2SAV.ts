@@ -28,4 +28,8 @@ export class BW2SAV extends G5SAV {
   }
 
   static saveTypeName = 'Pokémon Black 2/White 2'
+  
+  static includesOrigin(origin: GameOfOrigin) {
+    return origin === GameOfOrigin.Black2 || origin === GameOfOrigin.White2
+  }
 }

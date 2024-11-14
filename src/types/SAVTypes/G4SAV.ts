@@ -19,6 +19,7 @@ export abstract class G4SAV implements SAV<PK4> {
   static lookupType: LOOKUP_TYPE = 'gen345'
 
   origin: GameOfOrigin = 0
+  isPlugin: false = false
 
   boxRows = 5
   boxColumns = 6
@@ -65,6 +66,7 @@ export abstract class G4SAV implements SAV<PK4> {
     }
     this.origin = bytes[0x80]
   }
+  pluginIdentifier?: string | undefined
   pcChecksumOffset?: number | undefined
   pcOffset?: number | undefined
   calculateChecksum?: (() => number) | undefined
@@ -185,7 +187,27 @@ export abstract class G4SAV implements SAV<PK4> {
     return date === DATE_INT || date === DATE_KO
   }
 
-  isPlugin() {
-    return false
+  gameColor() {
+    switch (this.origin) {
+      case GameOfOrigin.Diamond:
+        return '#90BEED'
+      case GameOfOrigin.Pearl:
+        return '#DD7CB1'
+      case GameOfOrigin.Platinum:
+        return '#A0A08D'
+      case GameOfOrigin.HeartGold:
+        return '#E8B502'
+      case GameOfOrigin.SoulSilver:
+        return '#AAB9CF'
+      default:
+        return '#666666'
+    }
+  }
+
+  static includesOrigin(origin: GameOfOrigin) {
+    return (
+      (origin >= GameOfOrigin.Diamond && origin <= GameOfOrigin.Platinum) ||
+      (origin >= GameOfOrigin.HeartGold && origin <= GameOfOrigin.SoulSilver)
+    )
   }
 }

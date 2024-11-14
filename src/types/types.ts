@@ -43,12 +43,13 @@ export type marking = 0 | 1 | 2
 
 export interface SaveRef {
   filePath: ParsedPath
-  game?: string
+  game?: number
   trainerName?: string
   trainerID?: string
   lastOpened?: number
   lastModified?: number
   valid?: boolean
+  pluginIdentifier?: string
 }
 export type SaveRefMap = { [key: string]: SaveRef }
 

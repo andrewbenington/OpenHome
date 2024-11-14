@@ -24,7 +24,12 @@ export function recentSavesFromFile() {
   return Object.fromEntries(
     uniqEntries.map(([path, saveRef]) => [
       path,
-      { ...saveRef, valid: fileCanOpen(path), lastModified: fileLastModified(path) },
+      {
+        ...saveRef,
+        valid: fileCanOpen(path),
+        lastModified: fileLastModified(path),
+        game: saveRef.game ? parseInt(saveRef.game as unknown as string) : undefined,
+      },
     ])
   ) as SaveRefMap
 }

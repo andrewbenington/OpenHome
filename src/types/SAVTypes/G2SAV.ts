@@ -23,6 +23,7 @@ export class G2SAV implements SAV<PK2> {
   static lookupType: LOOKUP_TYPE = 'gen12'
 
   origin: GameOfOrigin = 0
+  isPlugin: false = false
 
   boxRows = 4
   boxColumns = 5
@@ -103,6 +104,7 @@ export class G2SAV implements SAV<PK2> {
       }
     })
   }
+  pluginIdentifier?: string | undefined
   sid?: number | undefined
   pcChecksumOffset?: number | undefined
   pcOffset?: number | undefined
@@ -266,7 +268,20 @@ export class G2SAV implements SAV<PK2> {
     }
   }
 
-  isPlugin() {
-    return false
+  gameColor() {
+    switch (this.origin) {
+      case GameOfOrigin.Gold:
+        return '#DAA520'
+      case GameOfOrigin.Silver:
+        return '#C0C0C0'
+      case GameOfOrigin.Crystal:
+        return '#3D51A7'
+      default:
+        return '#666666'
+    }
+  }
+
+  static includesOrigin(origin: GameOfOrigin) {
+    return origin >= GameOfOrigin.Gold && origin <= GameOfOrigin.Crystal
   }
 }
