@@ -1,19 +1,25 @@
-import { Card, Grid, Stack, Typography, IconButton } from '@mui/joy'
-import { RemoveIcon } from '../components/Icons'
+import { Card, Grid, IconButton, Stack, Typography } from '@mui/joy'
 import { ItemFromString } from 'pokemon-resources'
-import { PKMFile } from '../../types/pkm/util'
+import { PKMInterface } from '../../types/interfaces'
+import { RemoveIcon } from '../components/Icons'
 import { Bag } from './Bag'
 
 interface BagBoxProps {
   onClose: () => void
   removeItemFromPokemon: (itemName: string) => void
-  draggedMon: PKMFile | null
+  draggedMon: PKMInterface | null
   setDraggedItem: React.Dispatch<React.SetStateAction<string | null>>
-  items: { name: string; count: number }[];
+  items: { name: string; count: number }[]
   updateBag: () => void
 }
 
-const BagBox = ({ onClose, removeItemFromPokemon, draggedMon, setDraggedItem, updateBag }: BagBoxProps) => {
+const BagBox = ({
+  onClose,
+  removeItemFromPokemon,
+  draggedMon,
+  setDraggedItem,
+  updateBag,
+}: BagBoxProps) => {
   let items = Bag.getItems()
 
   const totalSlots = Math.max(6 * 1, Math.ceil(items.length / 6) * 6)
@@ -24,7 +30,7 @@ const BagBox = ({ onClose, removeItemFromPokemon, draggedMon, setDraggedItem, up
   }
 
   const handleOpenBag = () => {
-    console.log("Bag Contents:", items)
+    console.log('Bag Contents:', items)
     onClose()
   }
 
@@ -40,7 +46,7 @@ const BagBox = ({ onClose, removeItemFromPokemon, draggedMon, setDraggedItem, up
 
   const handleDragStart = (e: React.DragEvent, itemName: string) => {
     e.dataTransfer.setData('ItemTransfer', itemName)
-    setDraggedItem(itemName);
+    setDraggedItem(itemName)
   }
 
   const handleDragEnd = (e: React.DragEvent) => {
@@ -69,14 +75,13 @@ const BagBox = ({ onClose, removeItemFromPokemon, draggedMon, setDraggedItem, up
         }}
         variant="outlined"
       >
-
         <IconButton
-        //   onClick={onClose}
+          //   onClick={onClose}
           color="danger"
           size="sm"
           sx={{ position: 'absolute', left: 8 }}
-        >          
-        <RemoveIcon />
+        >
+          <RemoveIcon />
         </IconButton>
 
         <Typography sx={{ fontWeight: 'bold' }}>Bag</Typography>
@@ -85,7 +90,7 @@ const BagBox = ({ onClose, removeItemFromPokemon, draggedMon, setDraggedItem, up
       {/* Grid for Displaying Items */}
       <Card sx={{ marginTop: 1, padding: 1 }}>
         <Grid container spacing={1} component="div">
-        {Array.from({ length: totalSlots }, (_, index) => {
+          {Array.from({ length: totalSlots }, (_, index) => {
             const item = items[index]
             return (
               <Grid
@@ -98,7 +103,7 @@ const BagBox = ({ onClose, removeItemFromPokemon, draggedMon, setDraggedItem, up
                   padding: 1,
                   border: '3px solid #e0fcdc',
                   background: '#6662',
-                  borderRadius: '5px'
+                  borderRadius: '5px',
                 }}
                 onDrop={handlePokemonDrop}
                 onDragOver={(e) => e.preventDefault()}
