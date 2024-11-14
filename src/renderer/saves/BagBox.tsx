@@ -1,5 +1,4 @@
 import { Card, Grid, Stack, Typography, IconButton } from '@mui/joy'
-import { useMemo } from 'react'
 import { RemoveIcon } from '../components/Icons'
 import { ItemFromString } from 'pokemon-resources'
 import { PKMFile } from '../../types/pkm/util'

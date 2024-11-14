@@ -9,6 +9,10 @@ import {
   ModalDialog,
   ModalOverflow,
   Stack,
+  Tab,
+  TabList,
+  TabPanel,
+  Tabs,
   useTheme,
 } from '@mui/joy'
 import * as E from 'fp-ts/lib/Either'
@@ -59,6 +63,8 @@ const Home = () => {
   const [errorMessages, setErrorMessages] = useState<string[]>()
   const [filesToDelete, setFilesToDelete] = useState<string[]>([])
   const [bagItems, setBagItems] = useState(Bag.getItems());
+  const [activeTab, setActiveTab] = useState(0)
+
 
   const updateBag = () => {
     setBagItems(Bag.getItems())
@@ -295,55 +301,57 @@ const Home = () => {
         flexDirection: 'row',
       }}
     >
-    <Stack className="save-file-column" spacing={1} width={280} minWidth={280}>
-      {lodash.range(allOpenSaves.length).map((i) => (
-        <OpenSaveDisplay
-          key={`save_display_${i}`}
-          saveIndex={i}
-          setSelectedMon={setSelectedMon}
-          setDraggedMon={setDraggedMon}
-          updateBag={updateBag}
-        />
-      ))}
-
-      {/* Open Save Button */}
-      <button
-        className="card-button"
-        onClick={() => setOpenSaveDialog(true)}
-        style={{
-          backgroundColor: palette.primary.mainChannel,
-        }}
-      >
-        <MdFileOpen />
-        Open Save
-      </button>
-
-      {!openBagDialog && (
+      <Stack className="save-file-column" spacing={1} width={280} minWidth={280}>
+        {/* Displaying open save files and action buttons */}
+        {lodash.range(allOpenSaves.length).map((i) => (
+          <OpenSaveDisplay
+            key={`save_display_${i}`}
+            saveIndex={i}
+            setSelectedMon={setSelectedMon}
+            setDraggedMon={setDraggedMon}
+            updateBag={updateBag}
+          />
+        ))}
+  
+        {/* Open Save Button */}
         <button
           className="card-button"
-          onClick={() => setOpenBagDialog(true)}
+          onClick={() => setOpenSaveDialog(true)}
           style={{
             backgroundColor: palette.primary.mainChannel,
-            marginBottom: 8,
           }}
         >
-          Open Bag
+          <MdFileOpen />
+          Open Save
         </button>
-      )}
-
-      {/* Conditionally render BagBox */}
-      {openBagDialog && (
-        <BagBox
-          onClose={() => setOpenBagDialog(false)}
-          removeItemFromPokemon={removeItemFromPokemon}
-          draggedMon={draggedMon}
-          setDraggedItem={setDraggedItem}
-          items={bagItems}
-          updateBag={updateBag}
-        />
-      )}
-    </Stack>
-
+  
+        {/* Open Bag Button */}
+        {!openBagDialog && (
+          <button
+            className="card-button"
+            onClick={() => setOpenBagDialog(true)}
+            style={{
+              backgroundColor: palette.primary.mainChannel,
+              marginBottom: 8,
+            }}
+          >
+            Open Bag
+          </button>
+        )}
+  
+        {/* Conditionally render BagBox */}
+        {openBagDialog && (
+          <BagBox
+            onClose={() => setOpenBagDialog(false)}
+            removeItemFromPokemon={removeItemFromPokemon}
+            draggedMon={draggedMon}
+            setDraggedItem={setDraggedItem}
+            items={bagItems}
+            updateBag={updateBag}
+          />
+        )}
+      </Stack>
+  
       <div
         className="home-box-column"
         style={{
@@ -351,6 +359,7 @@ const Home = () => {
           minWidth: 480,
         }}
       >
+        {/* Central Home Box Display */}
         <Box
           display="flex"
           flexDirection="row"
@@ -363,18 +372,48 @@ const Home = () => {
           <Box flex={1}></Box>
         </Box>
       </div>
+  
+      {/* Right-hand side (RHS) with Tabs for Filter and Bag */}
       <Stack spacing={1} className="right-column" width={300}>
-        <FilterPanel />
+        <Tabs
+          value={activeTab}
+          onChange={(e, newValue) => {
+            if (typeof newValue === 'number') {
+              setActiveTab(newValue)
+            }
+          }}
+        >
+          <TabList>
+            <Tab>Filter</Tab>
+            <Tab>Bag</Tab>
+          </TabList>
+  
+          <TabPanel value={0} sx={{ padding: 0 }}>
+            <FilterPanel />
+          </TabPanel>
+  
+          <TabPanel value={1} sx={{ padding: 0 }}>
+            <BagBox
+              onClose={() => setOpenBagDialog(false)}
+              removeItemFromPokemon={removeItemFromPokemon}
+              draggedMon={draggedMon}
+              setDraggedItem={setDraggedItem}
+              items={bagItems}
+              updateBag={updateBag}
+            />
+          </TabPanel>
+        </Tabs>
+  
+        {/* Drop areas for 'Preview' and 'Release' */}
         <div
           className="drop-area"
           draggable
-          onDragOver={(e) => {
-            e.preventDefault()
-          }}
+          onDragOver={(e) => e.preventDefault()}
           onDrop={(e) => onViewDrop(e, 'as is')}
         >
           Preview
         </div>
+  
         <div
           className="drop-area"
           onDragOver={(e) => e.preventDefault()}
@@ -382,19 +421,19 @@ const Home = () => {
         >
           Release
           <div className="release-icon-container" style={{ display: 'flex' }}>
-            {openSavesState.monsToRelease.map((mon, i) => {
-              return (
-                <PokemonIcon
-                  key={`delete_mon_${i}`}
-                  dexNumber={mon.dexNum}
-                  formeNumber={mon.formeNum}
-                  style={{ height: 32, width: 32 }}
-                />
-              )
-            })}
+            {openSavesState.monsToRelease.map((mon, i) => (
+              <PokemonIcon
+                key={`delete_mon_${i}`}
+                dexNumber={mon.dexNum}
+                formeNumber={mon.formeNum}
+                style={{ height: 32, width: 32 }}
+              />
+            ))}
           </div>
         </div>
       </Stack>
+  
+      {/* Modals */}
       <Modal open={!!selectedMon} onClose={() => setSelectedMon(undefined)}>
         <ModalOverflow>
           <ModalDialog
@@ -411,6 +450,7 @@ const Home = () => {
           </ModalDialog>
         </ModalOverflow>
       </Modal>
+  
       <Modal open={openSaveDialog} onClose={() => setOpenSaveDialog(false)}>
         <ModalDialog
           sx={{
@@ -428,14 +468,15 @@ const Home = () => {
           />
         </ModalDialog>
       </Modal>
+  
       <Modal open={!!errorMessages} onClose={() => setErrorMessages(undefined)}>
         <ModalDialog style={{ padding: 8 }}>
           <ModalClose />
           <DialogTitle>Error(s) saving</DialogTitle>
           <Divider />
           <DialogContent>
-            {errorMessages?.map((msg) => (
-              <Alert color="danger" variant="solid">
+            {errorMessages?.map((msg, index) => (
+              <Alert key={index} color="danger" variant="solid">
                 {msg}
               </Alert>
             ))}
@@ -445,5 +486,6 @@ const Home = () => {
     </div>
   )
 }
+  
 
 export default Home

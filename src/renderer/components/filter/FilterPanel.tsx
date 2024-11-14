@@ -57,7 +57,7 @@ export default function FilterPanel() {
   )
 
   return (
-    <Card sx={{ marginLeft: 1 }}>
+    <Card sx={{ marginLeft: 0 }}>
       <div style={{ display: 'flex', paddingTop: 4 }}>
         <Typography fontSize={20} marginLeft={0.5} flex={1}>
           Filter
