@@ -122,4 +122,19 @@ export abstract class G6SAV implements SAV<PK6> {
   getCurrentBox() {
     return this.boxes[this.currentPCBox]
   }
+
+  gameColor() {
+    switch (this.origin) {
+      case GameOfOrigin.X:
+        return '#025DA6'
+      case GameOfOrigin.Y:
+        return '#EA1A3E'
+      case GameOfOrigin.OmegaRuby:
+        return '#AB2813'
+      case GameOfOrigin.AlphaSapphire:
+        return '#26649C'
+      default:
+        return '#666666'
+    }
+  }
 }

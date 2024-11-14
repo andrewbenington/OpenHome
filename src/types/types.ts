@@ -49,6 +49,7 @@ export interface SaveRef {
   lastOpened?: number
   lastModified?: number
   valid?: boolean
+  pluginIdentifier?: string
 }
 export type SaveRefMap = { [key: string]: SaveRef }
 

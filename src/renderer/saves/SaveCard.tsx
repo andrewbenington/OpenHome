@@ -1,7 +1,6 @@
 import { Button, Card, Chip, Dropdown, Menu, MenuButton, MenuItem, Stack } from '@mui/joy'
 import { isGameBoy } from 'pokemon-resources'
 import { useContext, useEffect, useMemo, useState } from 'react'
-import { GameColors } from 'src/types/SAVTypes/util'
 import { SaveRef } from 'src/types/types'
 import { BackendContext } from '../backend/backendProvider'
 import { MenuIcon } from '../components/Icons'
@@ -29,10 +28,7 @@ export default function SaveCard({ save, onOpen, onRemove, size = 240 }: SaveCar
     [save.game]
   )
 
-  const backgroundColor = useMemo(
-    () => GameColors[save.game ? parseInt(save.game) : 0],
-    [save.game]
-  )
+  const backgroundColor = useMemo(() => '#000000', [save.game])
 
   useEffect(() => {
     backend.getPlatform().then(setPlatform)

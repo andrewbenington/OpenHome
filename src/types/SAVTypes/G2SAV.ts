@@ -254,4 +254,17 @@ export class G2SAV implements SAV<PK2> {
       return false
     }
   }
+
+  gameColor() {
+    switch (this.origin) {
+      case GameOfOrigin.Gold:
+        return '#DAA520'
+      case GameOfOrigin.Silver:
+        return '#C0C0C0'
+      case GameOfOrigin.Crystal:
+        return '#3D51A7'
+      default:
+        return '#666666'
+    }
+  }
 }

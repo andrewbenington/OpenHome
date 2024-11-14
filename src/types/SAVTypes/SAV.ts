@@ -47,6 +47,8 @@ export interface SAV<P extends PKMInterface = PKMInterface> {
 
   updatedBoxSlots: BoxCoordinates[]
 
+  gameColor: () => string
+
   getCurrentBox: () => Box<P>
   supportsMon: (dexNumber: number, formeNumber: number) => boolean
 
