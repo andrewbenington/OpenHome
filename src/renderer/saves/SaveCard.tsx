@@ -2,7 +2,7 @@ import { Button, Card, Chip, Dropdown, Menu, MenuButton, MenuItem, Stack } from 
 import { GameOfOrigin, isGameBoy } from 'pokemon-resources'
 import { useContext, useEffect, useMemo, useState } from 'react'
 import { SaveRef } from 'src/types/types'
-import { getGameColor } from '../../types/SAVTypes/util'
+import { getGameColor, getPluginIdentifier } from '../../types/SAVTypes/util'
 import { BackendContext } from '../backend/backendProvider'
 import { MenuIcon } from '../components/Icons'
 import { AppInfoContext } from '../state/appInfo'
@@ -31,7 +31,12 @@ export default function SaveCard({ save, onOpen, onRemove, size = 240 }: SaveCar
   const saveType = useMemo(
     () =>
       save.game
-        ? getEnabledSaveTypes().find((s) => s.includesOrigin(save.game as GameOfOrigin))
+        ? getEnabledSaveTypes().find((s) => {
+            if (save.pluginIdentifier || getPluginIdentifier(s)) {
+              return save.pluginIdentifier === getPluginIdentifier(s)
+            }
+            return s.includesOrigin(save.game as GameOfOrigin)
+          })
         : undefined,
     [origin]
   )

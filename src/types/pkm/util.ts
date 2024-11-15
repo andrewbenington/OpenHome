@@ -6,6 +6,7 @@ import {
   DefenseCharacteristics,
   HPCharacteristics,
   HPCharacteristicsPre6,
+  Moves,
   Nature,
   SpecialAtkCharacteristics,
   SpecialDefCharacteristics,
@@ -15,7 +16,6 @@ import {
 } from 'pokemon-resources'
 import { NationalDex, PokemonData } from 'pokemon-species-data'
 import Prando from 'prando'
-import { MOVE_DATA } from '../../consts/Moves'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -84,14 +84,14 @@ export const generateTeraType = (prng: Prando, dexNum: number, formeNum: number)
   const { types: baseMonTypes } = PokemonData[baseMon.dexNumber].formes[baseMon.formeNumber]
 
   if (!monTypes || !baseMonTypes) {
-    return 0;
+    return 0
   }
 
-  const areTypesIdentical = 
+  const areTypesIdentical =
     monTypes.length === baseMonTypes.length &&
-    monTypes.every((type, index) => type === baseMonTypes[index]);
+    monTypes.every((type, index) => type === baseMonTypes[index])
 
-  let types = areTypesIdentical ? monTypes : lodash.intersection(monTypes, baseMonTypes);
+  let types = areTypesIdentical ? monTypes : lodash.intersection(monTypes, baseMonTypes)
 
   if (types.length === 0) {
     types = baseMonTypes
@@ -230,7 +230,9 @@ export const getTypes = (mon: PKMInterface) => {
     (mon.dexNum === NationalDex.Magnemite || mon.dexNum === NationalDex.Magneton)
   ) {
     types = ['Electric']
-  } else if (['PK1', 'PK2', 'PK3', 'PK3RR', 'COLOPKM', 'XDPKM', 'PK4', 'PK5'].includes(mon.format)) {
+  } else if (
+    ['PK1', 'PK2', 'PK3', 'PK3RR', 'COLOPKM', 'XDPKM', 'PK4', 'PK5'].includes(mon.format)
+  ) {
     if (types?.includes('Fairy')) {
       if (types.length === 1 || types.includes('Flying')) {
         types = types.map((type) => (type === 'Fairy' ? 'Normal' : type))
@@ -245,7 +247,7 @@ export const getTypes = (mon: PKMInterface) => {
 }
 
 export const getMoveMaxPP = (moveIndex: number, format: string, ppUps = 0) => {
-  const move = MOVE_DATA[moveIndex]
+  const move = Moves[moveIndex]
   if (!move) return undefined
   let baseMaxPP
   switch (format) {
