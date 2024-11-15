@@ -67,6 +67,14 @@ export class PK3RR {
   nickname: string
   trainerName: string
   trainerGender: boolean
+  restricted_mons: number[] = [
+    1186,
+    1200,
+    1274, 1275, 1276, 1277, 1278, 1279,
+    1282, 1283, 1284, 1285, 1286, 1287, 1288, 1289, 1290, 1291, 1292, 1293, 1294,
+    1375,
+  ]
+  isLocked: boolean = false
 
   constructor(arg: ArrayBuffer | AllPKMFields) {
     if (arg instanceof ArrayBuffer) {
@@ -112,6 +120,11 @@ export class PK3RR {
       } else {
         this.dexNum = ret.NationalDexIndex
         this.formeNum = ret.FormIndex
+      }
+
+      this.isLocked = this.restricted_mons.includes(speciesIndex)
+      if (this.isLocked) {
+        console.warn("The species is locked. Species: ", Gen3RRSpecies[speciesIndex], ", RR Dex Number: ", speciesIndex)
       }
 
       // Held Item 30:32

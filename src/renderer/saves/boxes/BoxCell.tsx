@@ -41,11 +41,12 @@ interface BoxCellProps {
   borderColor?: string
 }
 
-const BoxCell = (props: BoxCellProps) => {
-  const { onClick, onDragEvent, onDrop, disabled, zIndex, mon, borderColor } = props
+const BoxCell = ({ onClick, onDragEvent, onDrop, disabled, zIndex, mon, borderColor }: BoxCellProps) => {
   const [isBeingDragged, setIsBeingDragged] = useState(false)
   const [isDraggedOver, setIsDraggedOver] = useState(false)
   const [filterState] = useContext(FilterContext)
+
+  disabled = disabled || (mon?.isLocked ?? false);
 
   const isFilteredOut = useMemo(() => {
     return (
@@ -121,7 +122,7 @@ const BoxCell = (props: BoxCellProps) => {
             transition: '0.01s, background-color 0s',
             transform: isBeingDragged ? 'translateX(-9999px)' : undefined,
           }}
-          draggable
+          draggable={!mon.isLocked}
           onDragStart={() => {
             onDragEvent(false)
             setIsBeingDragged(true)
