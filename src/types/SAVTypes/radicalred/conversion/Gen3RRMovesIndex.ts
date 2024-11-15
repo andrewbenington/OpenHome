@@ -1019,7 +1019,7 @@ export function fromGen3RRMoveIndex(moveIndex: number): number {
             return move.id - 1;
         }
     }
-    console.info("Cannot find move", Gen3RRMoves[moveIndex])
+    console.warn("Cannot find move", Gen3RRMoves[moveIndex])
     return -1;
 }
 

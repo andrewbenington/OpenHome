@@ -122,7 +122,7 @@ const BoxCell = ({ onClick, onDragEvent, onDrop, disabled, zIndex, mon, borderCo
             transition: '0.01s, background-color 0s',
             transform: isBeingDragged ? 'translateX(-9999px)' : undefined,
           }}
-          draggable={!mon.isLocked}
+          draggable={!(mon?.isLocked ?? false)}
           onDragStart={() => {
             onDragEvent(false)
             setIsBeingDragged(true)
