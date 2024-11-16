@@ -11,4 +11,5 @@ export interface PluginPKMInterface extends PKMInterface {
 export type PKMInterface = AllPKMFields & {
   getStats(): Stats
   pluginName?: string
+  isLocked?: boolean
 }
