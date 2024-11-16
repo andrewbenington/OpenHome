@@ -11,7 +11,7 @@ import {
 import * as E from 'fp-ts/lib/Either'
 import { useCallback, useContext, useState } from 'react'
 import 'react-data-grid/lib/styles.css'
-import { ParsedPath } from 'src/types/SAVTypes/path'
+import { PathData } from 'src/types/SAVTypes/path'
 import { getSaveRef } from '../../types/SAVTypes/SAV'
 import { buildSaveFile } from '../../types/SAVTypes/load'
 import { BackendContext } from '../backend/backendProvider'
@@ -38,7 +38,7 @@ const SavesModal = (props: SavesModalProps) => {
   const [cardSize, setCardSize] = useState<number>(180)
 
   const openSaveFile = useCallback(
-    async (filePath?: ParsedPath) => {
+    async (filePath?: PathData) => {
       backend.loadSaveFile(filePath).then(
         E.match(
           (err) => console.error(err),

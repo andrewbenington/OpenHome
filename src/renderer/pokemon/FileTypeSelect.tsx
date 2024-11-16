@@ -57,7 +57,7 @@ const FileTypeSelect = (props: FileTypeSelectProps) => {
     const supportedFormats = uniq(
       getEnabledSaveTypes().map((saveType) =>
         supportsMon(saveType, formData.dexNum, formData.formeNum)
-          ? saveType.pkmType.name.slice(1) // get class name workaround
+          ? saveType.pkmType.name.replace('_', '') // get class name workaround
           : undefined
       )
     ).filter(filterUndefined)

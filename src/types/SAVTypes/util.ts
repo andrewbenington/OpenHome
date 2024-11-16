@@ -1,6 +1,6 @@
 import { GameOfOrigin } from 'pokemon-resources'
 import { PKMInterface } from '../interfaces'
-import { ParsedPath } from './path'
+import { PathData } from './path'
 import { SAV } from './SAV'
 
 export const SIZE_SM = 0x6be00
@@ -30,17 +30,19 @@ export interface PKMClass {
 }
 
 export interface SAVClass {
-  new (path: ParsedPath, bytes: Uint8Array): SAV
+  new (path: PathData, bytes: Uint8Array): SAV
   pkmType: PKMClass
   fileIsSave: (bytes: Uint8Array) => boolean
   includesOrigin: (origin: GameOfOrigin) => boolean
   lookupType?: 'gen12' | 'gen345'
   saveTypeName: string
+  saveTypeAbbreviation: string
 }
 
 export type PKMTypeOf<Type> = Type extends SAV<infer X> ? X : never
 
 export function supportsMon(saveType: SAVClass, dexNumber: number, formeNumber: number): boolean {
+  console.log(saveType, dexNumber, saveType.prototype.supportsMon(dexNumber, formeNumber))
   return saveType.prototype.supportsMon(dexNumber, formeNumber)
 }
 

@@ -5,7 +5,7 @@ import { CRC16_CCITT } from '../../util/Encryption'
 import { utf16BytesToString } from '../../util/Strings/StringConverter'
 import { OHPKM } from '../pkm/OHPKM'
 import { Box, BoxCoordinates, SAV } from './SAV'
-import { ParsedPath } from './path'
+import { PathData } from './path'
 
 const BOX_NAMES_OFFSET: number = 0x04400
 const BOX_SIZE: number = 232 * 30
@@ -13,6 +13,7 @@ const BOX_DATA_SIZE: number = 0x34ad0
 
 export abstract class G6SAV implements SAV<PK6> {
   static pkmType = PK6
+  static saveTypeAbbreviation = 'XY/ORAS'
 
   origin: GameOfOrigin = 0
   isPlugin: false = false
@@ -20,7 +21,7 @@ export abstract class G6SAV implements SAV<PK6> {
   boxRows = 5
   boxColumns = 6
 
-  filePath: ParsedPath
+  filePath: PathData
   fileCreated?: Date
 
   money: number = 0 // TODO: Gen 5 money
@@ -48,7 +49,7 @@ export abstract class G6SAV implements SAV<PK6> {
   pcDataSize = BOX_DATA_SIZE
   pcChecksumOffset: number
 
-  constructor(path: ParsedPath, bytes: Uint8Array, pcOffset: number, pcChecksumOffset: number) {
+  constructor(path: PathData, bytes: Uint8Array, pcOffset: number, pcChecksumOffset: number) {
     this.bytes = bytes
     this.filePath = path
     this.name = utf16BytesToString(this.bytes, this.trainerDataOffset + 72, 0x10)

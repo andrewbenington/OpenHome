@@ -5,7 +5,7 @@ import {
 } from '../../util/Lookup'
 import { PKMInterface } from '../interfaces'
 import { OHPKM } from '../pkm/OHPKM'
-import { ParsedPath } from './path'
+import { PathData } from './path'
 import { SAV } from './SAV'
 import { SAVClass } from './util'
 
@@ -55,10 +55,10 @@ export const getSaveType = (
 }
 
 export const buildSaveFile = (
-  filePath: ParsedPath,
+  filePath: PathData,
   fileBytes: Uint8Array,
   lookupMaps: {
-    homeMonMap?: { [key: string]: OHPKM }
+    homeMonMap?: Record<string, OHPKM>
     gen12LookupMap?: Record<string, string>
     gen345LookupMap?: Record<string, string>
     fileCreatedDate?: Date

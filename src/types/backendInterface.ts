@@ -1,4 +1,4 @@
-import { ParsedPath, PossibleSaves } from './SAVTypes/path'
+import { PathData, PossibleSaves } from './SAVTypes/path'
 import { SaveFolder, StoredBoxData } from './storage'
 import { Errorable, LoadSaveResponse, LookupMap, SaveRef } from './types'
 
@@ -19,7 +19,7 @@ export default interface BackendInterface {
   writeHomeBoxes: (boxData: StoredBoxData[]) => Promise<Errorable<null>>
 
   /* game saves */
-  loadSaveFile: (filePath?: ParsedPath) => Promise<Errorable<LoadSaveResponse>>
+  loadSaveFile: (filePath?: PathData) => Promise<Errorable<LoadSaveResponse>>
   writeSaveFile: (path: string, bytes: Uint8Array) => Promise<Errorable<null>>
 
   /* game save management */

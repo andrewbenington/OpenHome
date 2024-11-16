@@ -2,7 +2,7 @@ import { GameOfOrigin } from 'pokemon-resources'
 import { XY_TRANSFER_RESTRICTIONS } from '../../consts/TransferRestrictions'
 import { isRestricted } from '../TransferRestrictions'
 import { G6SAV } from './G6SAV'
-import { ParsedPath } from './path'
+import { PathData } from './path'
 
 const PC_OFFSET = 0x22600
 const PC_CHECKSUM_OFFSET = 0x655c2
@@ -11,7 +11,7 @@ const SAVE_SIZE_BYTES = 0x65600
 export class XYSAV extends G6SAV {
   static transferRestrictions = XY_TRANSFER_RESTRICTIONS
 
-  constructor(path: ParsedPath, bytes: Uint8Array) {
+  constructor(path: PathData, bytes: Uint8Array) {
     super(path, bytes, PC_OFFSET, PC_CHECKSUM_OFFSET)
   }
 
@@ -24,7 +24,7 @@ export class XYSAV extends G6SAV {
   }
 
   static saveTypeName = 'Pokémon X/Y'
-  
+
   static includesOrigin(origin: GameOfOrigin) {
     return origin === GameOfOrigin.X || origin === GameOfOrigin.Y
   }

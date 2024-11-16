@@ -10,7 +10,7 @@ import { gen3StringToUTF } from '../../../util/Strings/StringConverter'
 import { isRestricted } from '../../TransferRestrictions'
 import { OHPKM } from '../../pkm/OHPKM'
 import { Box, BoxCoordinates, PluginSAV } from '../SAV'
-import { ParsedPath, splitPath } from '../path'
+import { PathData, splitPath } from '../path'
 import PK3RR from './PK3RR'
 
 const SAVE_SIZE_BYTES = 0x20000
@@ -147,7 +147,7 @@ export class G3RRSAV implements PluginSAV<PK3RR> {
   boxRows = 5
   boxColumns = 6
 
-  filePath: ParsedPath
+  filePath: PathData
   fileCreated?: Date
 
   money: number
@@ -166,7 +166,7 @@ export class G3RRSAV implements PluginSAV<PK3RR> {
   tooEarlyToOpen: boolean = false
   updatedBoxSlots: BoxCoordinates[] = []
 
-  constructor(path: ParsedPath, bytes: Uint8Array) {
+  constructor(path: PathData, bytes: Uint8Array) {
     this.bytes = bytes
     this.filePath = path
 

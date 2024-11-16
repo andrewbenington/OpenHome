@@ -12,7 +12,7 @@ import {
 import { gen3StringToUTF } from '../../util/Strings/StringConverter'
 import { OHPKM } from '../pkm/OHPKM'
 import { Box, BoxCoordinates, SAV } from './SAV'
-import { ParsedPath, splitPath } from './path'
+import { PathData, splitPath } from './path'
 import { LOOKUP_TYPE } from './util'
 
 const SAVE_SIZE_BYTES = 0x20000
@@ -177,7 +177,7 @@ export class G3SAV implements SAV<PK3> {
   boxRows = 5
   boxColumns = 6
 
-  filePath: ParsedPath
+  filePath: PathData
   fileCreated?: Date
 
   money: number
@@ -196,7 +196,7 @@ export class G3SAV implements SAV<PK3> {
 
   updatedBoxSlots: BoxCoordinates[] = []
 
-  constructor(path: ParsedPath, bytes: Uint8Array) {
+  constructor(path: PathData, bytes: Uint8Array) {
     this.bytes = bytes
     this.filePath = path
     const saveOne = new G3SaveBackup(bytes.slice(0, 0xe000))
@@ -312,6 +312,7 @@ export class G3SAV implements SAV<PK3> {
     return gameOfOrigin ? `Pokémon ${gameOfOrigin.name}` : '(Unknown Game)'
   }
 
+  static saveTypeAbbreviation = 'RSE/FRLG'
   static saveTypeName = 'Pokémon Ruby/Sapphire/Emerald/FireRed/LeafGreen'
 
   static fileIsSave(bytes: Uint8Array): boolean {

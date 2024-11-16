@@ -5,7 +5,7 @@ import { TransferRestrictions } from '../TransferRestrictions'
 import { OHPKM } from '../pkm/OHPKM'
 import { BoxMonIdentifiers } from '../storage'
 import { Box, BoxCoordinates, SAV } from './SAV'
-import { emptyParsedPath, ParsedPath } from './path'
+import { emptyPathData, PathData } from './path'
 
 export class HomeBox implements Box<OHPKM> {
   name: string
@@ -47,7 +47,7 @@ export class HomeData implements SAV<OHPKM> {
 
   transferRestrictions: TransferRestrictions = {}
 
-  filePath: ParsedPath = emptyParsedPath
+  filePath: PathData = emptyPathData
   fileCreated?: Date
 
   money: number = 0

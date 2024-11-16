@@ -2,7 +2,7 @@ import { existsSync, readFileSync, writeFileSync } from 'fs'
 import { resolve } from 'path'
 import { PokemonData } from 'pokemon-species-data'
 import { OHPKM } from '../../pkm/OHPKM'
-import { ParsedPath } from '../path'
+import { PathData } from '../path'
 import { G3RRSAV } from '../radicalred/G3RRSAV'
 import PK3RR from '../radicalred/PK3RR'
 
@@ -30,7 +30,7 @@ describe('G3RRSAV - Radical Red Save File Read Test', () => {
     const savePath = resolve(__dirname, './SAVFILES/radicalred.sav')
     saveBytes = new Uint8Array(readFileSync(savePath))
 
-    const parsedPath: ParsedPath = {
+    const parsedPath: PathData = {
       raw: './SAVFILES/radicalred.sav',
       base: '.SAVFILES/radical red.sav',
       name: 'radical red',
@@ -122,7 +122,7 @@ describe('G3RRSAV - Radical Red Save File Write Test', () => {
     const savePath = resolve(__dirname, './SAVFILES/radicalred.sav')
     saveBytes = new Uint8Array(readFileSync(savePath))
 
-    const parsedPath: ParsedPath = {
+    const parsedPath: PathData = {
       raw: './SAVFILES/radicalred.sav',
       base: '.SAVFILES/radicalred.sav',
       name: 'radical red',
@@ -162,7 +162,7 @@ describe('G3RRSAV - Radical Red Save File Write Test', () => {
   })
 
   test('should check if modifications were made', () => {
-    const parsedPath: ParsedPath = {
+    const parsedPath: PathData = {
       raw: './SAVFILES/radicalred_modified.sav',
       base: '.SAVFILES/radicalred_modified.sav',
       name: 'radical red',

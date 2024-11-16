@@ -2,7 +2,7 @@ import { GameOfOrigin } from 'pokemon-resources'
 import { SaveRef } from '../../types/types'
 import { PKMInterface } from '../interfaces'
 import { OHPKM } from '../pkm/OHPKM'
-import { ParsedPath } from './path'
+import { PathData } from './path'
 
 export class Box<P extends PKMInterface> {
   name: string
@@ -25,7 +25,7 @@ export interface SAV<P extends PKMInterface = PKMInterface> {
   boxRows: number
   boxColumns: number
 
-  filePath: ParsedPath
+  filePath: PathData
   fileCreated?: Date
 
   money: number

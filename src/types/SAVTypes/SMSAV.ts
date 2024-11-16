@@ -2,7 +2,7 @@ import { GameOfOrigin } from 'pokemon-resources'
 import { SM_TRANSFER_RESTRICTIONS } from '../../consts/TransferRestrictions'
 import { isRestricted } from '../TransferRestrictions'
 import { G7SAV } from './G7SAV'
-import { ParsedPath } from './path'
+import { PathData } from './path'
 
 const PC_OFFSET = 0x04e00
 const METADATA_OFFSET = 0x6be00 - 0x200
@@ -11,7 +11,7 @@ const BOX_NAMES_OFFSET: number = 0x04800
 const SAVE_SIZE_BYTES = 0x6be00
 
 export class SMSAV extends G7SAV {
-  constructor(path: ParsedPath, bytes: Uint8Array) {
+  constructor(path: PathData, bytes: Uint8Array) {
     super(path, bytes, PC_OFFSET, PC_CHECKSUM_OFFSET, BOX_NAMES_OFFSET)
   }
 
@@ -24,7 +24,7 @@ export class SMSAV extends G7SAV {
   }
 
   static saveTypeName: string = 'Pokémon Sun/Moon'
-  
+
   static includesOrigin(origin: GameOfOrigin) {
     return origin === GameOfOrigin.Sun || origin === GameOfOrigin.Moon
   }

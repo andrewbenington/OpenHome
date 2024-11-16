@@ -10,7 +10,7 @@ import { CRC16_CCITT } from '../../util/Encryption'
 import { gen5StringToUTF } from '../../util/Strings/StringConverter'
 import { OHPKM } from '../pkm/OHPKM'
 import { Box, BoxCoordinates, SAV } from './SAV'
-import { ParsedPath } from './path'
+import { PathData } from './path'
 import { hasDesamumeFooter, LOOKUP_TYPE } from './util'
 
 const PC_OFFSET = 0x400
@@ -24,13 +24,15 @@ export abstract class G5SAV implements SAV<PK5> {
   static SAVE_SIZE_BYTES = 0x80000
   static lookupType: LOOKUP_TYPE = 'gen345'
 
+  static saveTypeAbbreviation = 'BW/BW2'
+
   origin: GameOfOrigin = 0
   isPlugin: false = false
 
   boxRows = 5
   boxColumns = 6
 
-  filePath: ParsedPath
+  filePath: PathData
   fileCreated?: Date
 
   money: number = 0 // TODO: Gen 5 money
@@ -58,7 +60,7 @@ export abstract class G5SAV implements SAV<PK5> {
 
   checksumMirrorsChecksumOffset: number = 0x23f9a
 
-  constructor(path: ParsedPath, bytes: Uint8Array) {
+  constructor(path: PathData, bytes: Uint8Array) {
     this.bytes = bytes
     this.filePath = path
     this.boxes = new Array(G5SAV.BOX_COUNT)

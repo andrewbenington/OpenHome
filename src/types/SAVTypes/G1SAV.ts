@@ -8,7 +8,7 @@ import { natDexToGen1ID } from '../../util/ConvertPokemonID'
 import { gen12StringToUTF, utf16StringToGen12 } from '../../util/Strings/StringConverter'
 import { OHPKM } from '../pkm/OHPKM'
 import { Box, BoxCoordinates, SAV } from './SAV'
-import { ParsedPath } from './path'
+import { PathData } from './path'
 import { LOOKUP_TYPE } from './util'
 
 const SAVE_SIZE_BYTES = 0x8000
@@ -41,7 +41,7 @@ export class G1SAV implements SAV<PK1> {
   boxRows = 4
   boxColumns = 5
 
-  filePath: ParsedPath
+  filePath: PathData
   fileCreated?: Date
 
   money: number = 0 // TODO: set money for gen 1 saves
@@ -59,7 +59,7 @@ export class G1SAV implements SAV<PK1> {
 
   updatedBoxSlots: BoxCoordinates[] = []
 
-  constructor(path: ParsedPath, bytes: Uint8Array, fileCreated?: Date) {
+  constructor(path: PathData, bytes: Uint8Array, fileCreated?: Date) {
     this.bytes = bytes
     this.filePath = path
     this.fileCreated = fileCreated
@@ -234,6 +234,7 @@ export class G1SAV implements SAV<PK1> {
     return gameOfOrigin ? `Pokémon ${gameOfOrigin.name}` : '(Unknown Game)'
   }
 
+  static saveTypeAbbreviation = 'RBY (Int)'
   static saveTypeName = 'Pokémon Red/Blue/Yellow (INT)'
 
   static fileIsSave(bytes: Uint8Array): boolean {

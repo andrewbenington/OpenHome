@@ -4,7 +4,7 @@ import { GameOfOrigin } from 'pokemon-resources'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { getSaveRef, SAV } from 'src/types/SAVTypes/SAV'
 import { buildSaveFile } from 'src/types/SAVTypes/load'
-import { ParsedPath, splitPath } from '../../types/SAVTypes/path'
+import { PathData, splitPath } from '../../types/SAVTypes/path'
 import { numericSorter } from '../../util/Sort'
 import { BackendContext } from '../backend/backendProvider'
 import OHDataGrid, { SortableColumn } from '../components/OHDataGrid'
@@ -15,7 +15,7 @@ import SaveCard from './SaveCard'
 import { filterEmpty, getSaveLogo, SaveViewMode } from './util'
 
 interface SaveFileSelectorProps {
-  onOpen: (path: ParsedPath) => void
+  onOpen: (path: PathData) => void
   view: SaveViewMode
   cardSize: number
 }
@@ -35,7 +35,7 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
   )
 
   const loadSaveData = useCallback(
-    async (savePath: ParsedPath) => {
+    async (savePath: PathData) => {
       const response = await backend.loadSaveFile(savePath)
       if (E.isRight(response)) {
         const { fileBytes, createdDate } = response.right

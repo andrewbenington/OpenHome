@@ -2,7 +2,7 @@ import { DialogActions, Modal, ModalDialog, Stack, Typography } from '@mui/joy'
 import * as E from 'fp-ts/lib/Either'
 import { GameOfOrigin } from 'pokemon-resources'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
-import { ParsedPath, splitPath } from 'src/types/SAVTypes/path'
+import { PathData, splitPath } from 'src/types/SAVTypes/path'
 import { SaveRef } from 'src/types/types'
 import { numericSorter } from '../../util/Sort'
 import { BackendContext } from '../backend/backendProvider'
@@ -14,7 +14,7 @@ import SaveCard from './SaveCard'
 import { formatTime, formatTimeSince, getSaveLogo, SaveViewMode } from './util'
 
 interface SaveFileSelectorProps {
-  onOpen: (path: ParsedPath) => void
+  onOpen: (path: PathData) => void
   view: SaveViewMode
   cardSize: number
 }

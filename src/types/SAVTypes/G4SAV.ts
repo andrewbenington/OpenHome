@@ -9,7 +9,7 @@ import { CRC16_CCITT } from '../../util/Encryption'
 import { gen4StringToUTF } from '../../util/Strings/StringConverter'
 import { OHPKM } from '../pkm/OHPKM'
 import { Box, BoxCoordinates, SAV } from './SAV'
-import { ParsedPath } from './path'
+import { PathData } from './path'
 import { LOOKUP_TYPE } from './util'
 
 export abstract class G4SAV implements SAV<PK4> {
@@ -24,7 +24,7 @@ export abstract class G4SAV implements SAV<PK4> {
   boxRows = 5
   boxColumns = 6
 
-  filePath: ParsedPath
+  filePath: PathData
   fileCreated?: Date
 
   money: number = 0 // TODO: Gen 4 money
@@ -56,7 +56,7 @@ export abstract class G4SAV implements SAV<PK4> {
 
   footerSize: number = 0x14
 
-  constructor(path: ParsedPath, bytes: Uint8Array) {
+  constructor(path: PathData, bytes: Uint8Array) {
     this.bytes = bytes
     this.filePath = path
     this.boxes = Array(G4SAV.BOX_COUNT)
@@ -174,6 +174,7 @@ export abstract class G4SAV implements SAV<PK4> {
     return gameOfOrigin ? `Pokémon ${gameOfOrigin.name}` : '(Unknown Game)'
   }
 
+  static saveTypeAbbreviation = 'DPPt/HGSS'
   static saveTypeName = 'Pokémon Diamond/Pearl/Platinum/HeartGold/SoulSilver'
 
   // Gen 4 saves include a size and hex "date" that can identify save type
