@@ -25,7 +25,7 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
   const backend = useContext(BackendContext)
   const [recentSaves, setRecentSaves] = useState<Record<string, SaveRef>>()
   const [, , openSaves] = useContext(OpenSavesContext)
-  const [appInfo, , getEnabledSaveTypes] = useContext(AppInfoContext)
+  const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
   const [error, setError] = useState<string>()
 
   const openSavePaths = useMemo(
@@ -51,7 +51,7 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
         }
       )
     )
-  }, [backend, appInfo])
+  }, [backend, getEnabledSaveTypes])
 
   const removeRecentSave = useCallback(
     (path: string) =>
