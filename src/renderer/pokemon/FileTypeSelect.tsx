@@ -94,7 +94,9 @@ const FileTypeSelect = (props: FileTypeSelectProps) => {
     >
       <option value="OHPKM">OpenHome</option>
       {baseFormat === 'OHPKM' ? (
-        supportedFormats.map((format) => <option value={format}>{format}</option>)
+        supportedFormats.map((format) => (
+          <option key={format} value={format}>{format}</option>
+        ))
       ) : (
         <option value={baseFormat}>{baseFormat}</option>
       )}
