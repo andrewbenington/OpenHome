@@ -3,8 +3,9 @@ import * as E from 'fp-ts/lib/Either'
 import { GameOfOrigin } from 'pokemon-resources'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { PathData, splitPath } from 'src/types/SAVTypes/path'
+import { getPluginIdentifier } from 'src/types/SAVTypes/util'
 import { SaveRef } from 'src/types/types'
-import { numericSorter } from '../../util/Sort'
+import { filterUndefined, numericSorter } from '../../util/Sort'
 import { BackendContext } from '../backend/backendProvider'
 import { RemoveIcon } from '../components/Icons'
 import OHDataGrid, { SortableColumn } from '../components/OHDataGrid'
@@ -24,7 +25,7 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
   const backend = useContext(BackendContext)
   const [recentSaves, setRecentSaves] = useState<Record<string, SaveRef>>()
   const [, , openSaves] = useContext(OpenSavesContext)
-  const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
+  const [appInfo, , getEnabledSaveTypes] = useContext(AppInfoContext)
   const [error, setError] = useState<string>()
 
   const openSavePaths = useMemo(
@@ -36,10 +37,21 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
     backend.getRecentSaves().then(
       E.match(
         (err) => console.error(err),
-        (recents) => setRecentSaves(recents)
+        (recents) => {
+          const extraSaveIdentifiers = getEnabledSaveTypes()
+            .map(getPluginIdentifier)
+            .filter(filterUndefined)
+          // filter out saves from plugins that aren't enabled
+          const filteredRecents = Object.entries(recents).filter(
+            ([, ref]) =>
+              ref.pluginIdentifier === undefined ||
+              extraSaveIdentifiers.includes(ref.pluginIdentifier)
+          )
+          setRecentSaves(Object.fromEntries(filteredRecents))
+        }
       )
     )
-  }, [backend])
+  }, [backend, appInfo])
 
   const removeRecentSave = useCallback(
     (path: string) =>

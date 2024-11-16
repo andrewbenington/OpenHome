@@ -7,17 +7,6 @@ import { getPublicImageURL } from '../images/images'
 
 export type SaveViewMode = 'cards' | 'grid'
 
-// export function getSaveLogo(
-//   gameOfOrigin: number,
-//   saveTypes: SAVClass[],
-//   extraData?: { pluginIdentifier?: string; dexNum?: number; hasNationalRibbon?: boolean }
-// ) {
-//   if (!gameOfOrigin) {
-//     return getPublicImageURL(getOriginMark('GB'))
-//   }
-//   return getPublicImageURL(getGameLogo(gameOfOrigin, saveTypes, extraData))
-// }
-
 export function getMonSaveLogo(mon: PKMInterface, supportedSaves: SAVClass[]) {
   if (mon.pluginName) {
     const pluginIdentifier = supportedSaves.find((s) => s.prototype.getPluginIdentifier.call({}))
