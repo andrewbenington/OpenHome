@@ -1,9 +1,9 @@
 import { NationalDex, PokemonData } from 'pokemon-species-data'
 
 import { SWEETS } from '../../consts/Formes'
-import { RRSprites } from '../../consts/RadicalRedSprites'
 import { PKMInterface } from '../../types/interfaces'
 import { toGen3RRPokemonIndex } from '../../types/SAVTypes/radicalred/conversion/Gen3RRPokemonIndex'
+import { RRSprites } from '../../types/SAVTypes/radicalred/conversion/RadicalRedSprites'
 
 const alolaDex = [
   10, 11, 12, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 35, 36, 37, 38, 39, 40, 41, 42, 46, 47, 50,
@@ -62,8 +62,8 @@ export const getPokemonSpritePath = (mon: PKMInterface, format?: string) => {
     spriteFolder = 'gen6'
   } else if (spriteFolder == 'rr') {
     let gen3RRname = RRSprites[toGen3RRPokemonIndex(mon.dexNum, mon.formeNum)]
-    if (gen3RRname.length === 0) return gen3RRname;
-    gen3RRname = gen3RRname[0].toUpperCase() + gen3RRname.slice(1).toLowerCase();
+    if (gen3RRname.length === 0) return gen3RRname
+    gen3RRname = gen3RRname[0].toUpperCase() + gen3RRname.slice(1).toLowerCase()
     return `sprites/${spriteFolder}/${gen3RRname}`
   }
   return `sprites/${spriteFolder}${

@@ -31,7 +31,6 @@ import {
   UNBOUND,
   WASH,
 } from './Formes'
-import { RRTransferMon } from './RRTransferMons'
 
 export const GEN1_TRANSFER_RESTRICTIONS: TransferRestrictions = {
   maxDexNum: NationalDex.Mew,
@@ -50,15 +49,6 @@ export const GEN2_TRANSFER_RESTRICTIONS: TransferRestrictions = {
 
 export const GEN3_TRANSFER_RESTRICTIONS: TransferRestrictions = {
   maxDexNum: NationalDex.Deoxys,
-  excludedForms: {
-    ...RegionalForms,
-    ...CapPikachus,
-    [NationalDex.Pichu]: [SPIKY_EAR],
-  },
-}
-
-export const RR_TRANSFER_RESTRICTIONS: TransferRestrictions = {
-  transferableDexNums: RRTransferMon,
   excludedForms: {
     ...RegionalForms,
     ...CapPikachus,
