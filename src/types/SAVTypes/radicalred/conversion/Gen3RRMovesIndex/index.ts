@@ -1,4 +1,5 @@
 export const Gen3RRMoves = [
+    "None",
     "Pound",
     "Karate Chop",
     "Double Slap",
@@ -1003,37 +1004,18 @@ export const Gen3RRMoves = [
 ]
 
 import { Moves } from 'pokemon-resources';
+import { NationalToRRMap } from './NationalToRRMap';
+import { RRToNationalMap } from './RRToNationalMap';
 
 // const dne_moves = [89, 538, 526, 659]
 
-
-export function fromGen3RRMoveIndex(moveIndex: number): number {
-    if (moveIndex < 0 || moveIndex >= Gen3RRMoves.length) {
-        return -2;
-    }
-    
-    const moveName = Gen3RRMoves[moveIndex];
-
-    for (const move of Object.values(Moves || {})) {
-        if (move.name === moveName) {
-            return move.id - 1;
-        }
-    }
-    console.warn("Cannot find move", Gen3RRMoves[moveIndex])
-    return -1;
+export function fromGen3RRMoveIndex(rrIndex: number): number {
+    if (rrIndex === 0) return 0;
+    const key = Gen3RRMoves[rrIndex]
+    return key ? RRToNationalMap[key] : -1;
 }
 
-export function toGen3RRMoveIndex(moveId: number): number {
-    const moveEntry = Object.values(Moves || {}).find(move => move.id === moveId);
-    if (!moveEntry) return -2;
-
-    const moveName = moveEntry.name;
-
-    for (let i = 0; i < Gen3RRMoves.length; i++) {
-        if (Gen3RRMoves[i] === moveName) {
-            return i;
-        }
-    }
-
-    return -1;
+export function toGen3RRMoveIndex(nationalMoveId: number): number {
+    const key = Moves[nationalMoveId]?.name
+    return key ? NationalToRRMap[key][0] : -1
 }
