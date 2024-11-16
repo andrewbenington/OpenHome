@@ -287,6 +287,7 @@ export class G3RRSAV implements PluginSAV<PK3RR> {
     return origin === GameOfOrigin.FireRed
   }
 
+  static saveTypeAbbreviation = 'Radical Red'
   static saveTypeName = 'Pokémon Radical Red'
 
   static fileIsSave(bytes: Uint8Array): boolean {
