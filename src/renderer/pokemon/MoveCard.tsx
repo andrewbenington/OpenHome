@@ -15,6 +15,40 @@ const MoveCard = ({ move, movePP, maxPP, typeOverride }: MoveCardProps) => {
   const moveData = useMemo(() => Moves[move], [move])
   const type = useMemo(() => typeOverride ?? (moveData?.type as Type), [typeOverride, moveData])
 
+  let content;
+
+  if (move === 0) {
+    // mon knows less than 4 moves
+    content = null;
+  } else if (!moveData) {
+    // move is unknown
+    content = (
+      <>
+        <div className="type-icon-container"></div>
+        <div className="unknown-move-name">(Unknown Move)</div>
+      </>
+    );
+  } else {
+    // move is known
+    content = (
+      <>
+        <div className="type-icon-container">
+          <TypeIcon type={type} key={`${type}_type_icon`} size={32} border />
+        </div>
+        <div className="move-card-vert">
+          <div className="move-name">{moveData.name}</div>
+          <div
+            style={{
+              color: 'white',
+            }}
+          >
+            {movePP ?? '--'}/{maxPP ?? '--'} PP
+          </div>
+        </div>
+      </>
+    )
+  }
+
   return (
     <div
       className="move-card"
@@ -22,29 +56,7 @@ const MoveCard = ({ move, movePP, maxPP, typeOverride }: MoveCardProps) => {
         backgroundColor: getTypeColor(type),
       }}
     >
-      {moveData ? (
-        <>
-          <div className="type-icon-container">
-            <TypeIcon type={type} key={`${type}_type_icon`} size={32} border />
-          </div>
-
-          <div className="move-card-vert">
-            <div className="move-name">{Moves[move]?.name}</div>
-            <div
-              style={{
-                color: 'white',
-              }}
-            >
-              {movePP ?? '--'}/{maxPP ?? '--'} PP
-            </div>
-          </div>
-        </>
-      ) : (
-        <>
-          <div className="type-icon-container"></div>
-          <div className="unknown-move-name">(Unknown Move)</div>
-        </>
-      )}
+      {content}
     </div>
   )
 }
