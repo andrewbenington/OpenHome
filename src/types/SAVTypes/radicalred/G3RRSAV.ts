@@ -211,7 +211,7 @@ export class G3RRSAV implements PluginSAV<PK3RR> {
     fileName = fileName.replace(/\s+/g, '')
     this.origin = GameOfOrigin.FireRed
 
-    console.log(this.boxes)
+    // console.log(this.boxes)
   }
   pcChecksumOffset?: number | undefined
   pcOffset?: number | undefined

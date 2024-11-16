@@ -191,6 +191,7 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
             .sort((a, b) => (b.lastOpened ?? 0) - (a.lastOpened ?? 0))
             .map((save) => (
               <SaveCard
+                key={save.filePath.raw}
                 save={save}
                 onOpen={() => {
                   onOpen(save.filePath)
