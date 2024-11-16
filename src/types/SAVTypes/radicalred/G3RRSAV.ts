@@ -89,21 +89,27 @@ export class G3RRSaveBackup {
     this.sectors.sort((sector1, sector2) => sector1.sectionID - sector2.sectionID)
     this.name = gen3StringToUTF(this.sectors[0].data, 0, 10)
 
+    const boxes: number = 19;
+    const nBytes: number = boxes * 58 * 30
+    const nMons: number = boxes * 30
+    const fullSectionsUsed: number = Math.floor(nBytes / 4080)
+    const leftoverBytes: number = nBytes % 4080
+
     // Concatenate pc data from all sectors
-    this.pcDataContiguous = new Uint8Array(4080 * 5 + 3964) // 144 // 24,504
-    this.sectors.slice(5, 11).forEach((sector, i) => {
+    this.pcDataContiguous = new Uint8Array(4080 * fullSectionsUsed + leftoverBytes + 4) // 144 // 24,504
+    this.sectors.slice(5, 5 + fullSectionsUsed + 1).forEach((sector, i) => {
       const startOffset = i * 4080
-      const length = i < 5 ? 4080 : 3964
+      const length = i < fullSectionsUsed ? 4080 : leftoverBytes + 4
       this.pcDataContiguous.set(sector.data.slice(0, length), startOffset)
     })
 
     this.currentPCBox = this.pcDataContiguous[0]
     this.boxNames = []
-    for (let i = 0; i < 14; i++) {
+    for (let i = 0; i < boxes; i++) {
       // TODO: More research into where BOX names are located
       this.boxes[i] = new Box('Box' + (i + 1), 30)
     }
-    for (let i = 0; i < 420; i++) {
+    for (let i = 0; i < nMons; i++) {
       try {
         const mon = new PK3RR(this.pcDataContiguous.slice(4 + i * 58, 4 + (i + 1) * 58).buffer)
         if (mon.gameOfOrigin !== 0 && mon.dexNum !== 0) {
@@ -211,8 +217,9 @@ export class G3RRSAV implements PluginSAV<PK3RR> {
     fileName = fileName.replace(/\s+/g, '')
     this.origin = GameOfOrigin.FireRed
 
-    // console.log(this.boxes)
+    console.log(this.boxes)
   }
+  
   pcChecksumOffset?: number | undefined
   pcOffset?: number | undefined
   calculateChecksum?: (() => number) | undefined
