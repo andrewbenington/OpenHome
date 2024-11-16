@@ -1,6 +1,6 @@
 import { NationalDex, PokemonData } from 'pokemon-species-data'
 
-import { SWEETS } from '../../consts/Formes'
+import { BLOOD_MOON, SWEETS } from '../../consts/Formes'
 import { PKMInterface } from '../../types/interfaces'
 import { toGen3RRPokemonIndex } from '../../types/SAVTypes/radicalred/conversion/Gen3RRPokemonIndex'
 import { RRSprites } from '../../types/SAVTypes/radicalred/conversion/RadicalRedSprites'
@@ -61,6 +61,9 @@ export const getPokemonSpritePath = (mon: PKMInterface, format?: string) => {
   if (spriteFolder === 'gen7' && !alolaDex.includes(mon.dexNum)) {
     spriteFolder = 'gen6'
   } else if (spriteFolder == 'rr') {
+    if (mon.dexNum === NationalDex.Ursaluna && mon.formeNum === BLOOD_MOON) {
+      return 'sprites/home/ursaluna-bloodmoon.png'
+    }
     let gen3RRname = RRSprites[toGen3RRPokemonIndex(mon.dexNum, mon.formeNum)]
     if (gen3RRname.length === 0) return gen3RRname
     gen3RRname = gen3RRname[0].toUpperCase() + gen3RRname.slice(1).toLowerCase()
