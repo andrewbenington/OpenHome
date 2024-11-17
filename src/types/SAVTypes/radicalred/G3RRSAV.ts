@@ -89,7 +89,7 @@ export class G3RRSaveBackup {
     this.sectors.sort((sector1, sector2) => sector1.sectionID - sector2.sectionID)
     this.name = gen3StringToUTF(this.sectors[0].data, 0, 10)
 
-    const boxes: number = 19;
+    const boxes: number = 18;
     const nBytes: number = boxes * 58 * 30
     const nMons: number = boxes * 30
     const fullSectionsUsed: number = Math.floor(nBytes / 4080)
