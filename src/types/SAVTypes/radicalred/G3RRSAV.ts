@@ -8,25 +8,19 @@ import {
   uint32ToBytesLittleEndian,
 } from '../../../util/ByteLogic'
 import { gen3StringToUTF } from '../../../util/Strings/StringConverter'
-import {
-  CapPikachus,
-  isRestricted,
-  RegionalForms,
-  TransferRestrictions,
-} from '../../TransferRestrictions'
+import { CapPikachus, isRestricted, TransferRestrictions } from '../../TransferRestrictions'
 import { OHPKM } from '../../pkm/OHPKM'
+import { isG3 } from '../G3SAV'
 import { Box, BoxCoordinates, PluginSAV } from '../SAV'
 import { PathData, splitPath } from '../path'
 import PK3RR from './PK3RR'
 import { RRTransferMon } from './conversion/RRTransferMons'
-import { isG3 } from '../G3SAV'
 
 const SAVE_SIZE_BYTES = 0x20000
 
 const RR_TRANSFER_RESTRICTIONS: TransferRestrictions = {
   transferableDexNums: RRTransferMon,
   excludedForms: {
-    ...RegionalForms,
     ...CapPikachus,
     [NationalDex.Pichu]: [SPIKY_EAR],
   },
@@ -140,7 +134,6 @@ export class G3RRSaveBackup {
             mon.gameOfOrigin = GameOfOrigin.FireRed
           }
         }
-
       } catch (e) {
         console.error(e)
       }
@@ -321,12 +314,9 @@ export class G3RRSAV implements PluginSAV<PK3RR> {
     }
 
     return (
-      (
-        bytesToUint32LittleEndian(bytes, 0xac) === 0 &&
-        bytesToUint32LittleEndian(bytes, findFirstSaveIndexZero(bytes) + 0xac) > 0
-      ) || (
-        isRR(bytes)
-      )
+      (bytesToUint32LittleEndian(bytes, 0xac) === 0 &&
+        bytesToUint32LittleEndian(bytes, findFirstSaveIndexZero(bytes) + 0xac) > 0) ||
+      isRR(bytes)
     )
   }
 
@@ -359,4 +349,6 @@ const findFirstSaveIndexZero = (bytes: Uint8Array): number => {
 // or that there are no pokemon in the first box. The result
 // of both checks failing can&should be a prompt to specify
 // which game the Save belongs too.
-export function isRR(bytes: Uint8Array): boolean { return isG3(bytes, 4080, 58) }
+export function isRR(bytes: Uint8Array): boolean {
+  return isG3(bytes, 4080, 58)
+}
