@@ -354,3 +354,32 @@ export class G3SAV implements SAV<PK3> {
     return undefined
   }
 }
+
+export function isG3(data: Uint8Array, SECTION_DATA_SIZE: number = 3968, MON_ENTRY_SIZE: number = 80): boolean {
+  const SECTION_COUNT = 14;
+  const SECTION_SIZE = 0x1000;
+  const MON_START_OFFSET = 4;
+  const NUM_POKEMON = 30;
+  const TID_OFFSET = 0x0A;
+
+  // Extract and sort sections by Section ID
+  const sections = Array.from({ length: SECTION_COUNT }, (_, i) => {
+    const offset = i * SECTION_SIZE;
+    const sectionData = data.slice(offset, offset + SECTION_DATA_SIZE);
+    const sectionID = data[offset + 0xff4] | (data[offset + 0xff5] << 8);
+    return { sectionID, data: sectionData };
+  }).sort((a, b) => a.sectionID - b.sectionID).map((section) => section.data);
+
+  // Extract save file Trainer ID from the first section
+  const saveTID = sections[0][TID_OFFSET] | (sections[0][TID_OFFSET + 1] << 8);
+
+  // Extract Trainer IDs for Pokémon 1 and onwards from Section 5
+  const section5 = sections[5];
+  const pokemonTIDs = Array.from({ length: NUM_POKEMON - 1 }, (_, i) => {
+    const pokemonOffset = MON_START_OFFSET + (i + 1) * MON_ENTRY_SIZE;
+    return section5[pokemonOffset + 0x0c] | (section5[pokemonOffset + 0x0d] << 8);
+  });
+
+  // Check if any Pokémon TID matches the save file TID
+  return pokemonTIDs.some((tid) => tid === saveTID);
+}

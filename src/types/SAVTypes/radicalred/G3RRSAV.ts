@@ -19,6 +19,7 @@ import { Box, BoxCoordinates, PluginSAV } from '../SAV'
 import { PathData, splitPath } from '../path'
 import PK3RR from './PK3RR'
 import { RRTransferMon } from './conversion/RRTransferMons'
+import { isG3 } from '../G3SAV'
 
 const SAVE_SIZE_BYTES = 0x20000
 
@@ -75,6 +76,7 @@ export class G3RRSector {
     this.checksum = ((checksum & 0xffff) + ((checksum >> 16) & 0xffff)) & 0xffff
   }
 }
+
 export class G3RRSaveBackup {
   origin: GameOfOrigin = GameOfOrigin.INVALID_0
   bytes: Uint8Array
@@ -330,8 +332,8 @@ export class G3RRSAV implements PluginSAV<PK3RR> {
 }
 
 const findFirstSaveIndexZero = (bytes: Uint8Array): number => {
-  const SECTION_SIZE = 0x1000 // Each section is 4 KB
-  const SAVE_INDEX_OFFSET = 0xff4 // Save index location within each section
+  const SECTION_SIZE = 0x1000
+  const SAVE_INDEX_OFFSET = 0xff4
 
   for (let i = 0; i < 14; i++) {
     const sectionStart = i * SECTION_SIZE
@@ -343,3 +345,14 @@ const findFirstSaveIndexZero = (bytes: Uint8Array): number => {
   }
   return 0
 }
+
+// Checks if file is a RR save by looping through
+// first 2-30 mons in box 1 and checking if the TID id
+// matches the save file TID.
+// Similar process can&should be done for G3
+// If this check and the G3 check both fail then
+// that means that there are no native pokemon in the SAVE
+// or that there are no pokemon in the first box. The result
+// of both checks failing can&should be a prompt to specify
+// which game the Save belongs too.
+export function isRR(data: Uint8Array): boolean { return isG3(data, 4080, 58) }
