@@ -90,7 +90,7 @@ const MetDataMovesDisplay = (props: { mon: PKMInterface }) => {
       return `Met in ${saveType ? getGameName(saveType) : '(unknown game)'}`
     }
     if (!mon.metLocationIndex) {
-      return 'Met location unknown.' + mon.pluginIdentifier
+      return 'Met location unknown.'
     }
     let message = 'Met'
     if (mon.metTimeOfDay) {

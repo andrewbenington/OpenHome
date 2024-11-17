@@ -30,6 +30,7 @@ import {
   writeStatsToBytes,
 } from 'pokemon-files'
 import { getHPGen3Onward, getStatGen3Onward } from '../../../util/StatCalc'
+import { PluginPKMInterface } from '../../interfaces'
 import { ItemGen3RRFromString, ItemGen3RRToString } from './conversion/Gen3RRItems'
 import { fromGen3RRMoveIndex, toGen3RRMoveIndex } from './conversion/Gen3RRMovesIndex'
 import {
@@ -43,9 +44,10 @@ const FAKEMON_INDEXES = [
   1290, 1291, 1292, 1293, 1294, 1375,
 ]
 
-export class PK3RR {
+export class PK3RR implements PluginPKMInterface {
   format: 'PK3RR' = 'PK3RR'
   pluginIdentifier = 'radical_red'
+  pluginOrigin?: string
   personalityValue: number
   trainerID: number
   secretID: number
@@ -81,6 +83,7 @@ export class PK3RR {
       const dataView = new DataView(buffer)
 
       // https://github.com/Skeli789/Complete-Fire-Red-Upgrade/blob/master/include/new/pokemon_storage_system.h
+      // https://github.com/Skeli789/Complete-Fire-Red-Upgrade/blob/master/include/pokemon.h
 
       // Personality 0:4
       this.personalityValue = dataView.getUint32(0x0, true)
@@ -177,9 +180,14 @@ export class PK3RR {
       // 51:53
       this.metLevel = uIntFromBufferBits(dataView, 0x33, 0, 7, true)
 
-      // More research must be done into how the Game of orgigin is stored
+      // More research must be done into how the Game of origin is stored
       const gor = uIntFromBufferBits(dataView, 0x33, 7, 4, true)
-      this.gameOfOrigin = gor === 8 || gor === 0 ? 6 : gor // Radical Red uses the 8 to represent pokemon from Radical Red
+      this.gameOfOrigin = gor === 8 || gor === 0 ? 6 : gor // Radical Red seems to use values from 1-15 for this field; this need more investigation
+
+      // Until RR's handling of game of origin is better understood, set this by default. OHPKM will not update this field
+      // if the mon was already being tracked before being transferred to Radical Red
+      this.pluginOrigin = 'radical_red'
+
       this.trainerGender = getFlag(dataView, 0x33, 15)
 
       // 53:57

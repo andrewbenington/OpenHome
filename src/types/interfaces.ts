@@ -7,7 +7,6 @@ export interface OfficialPKMInterface extends PKMInterface {
 
 export interface PluginPKMInterface extends PKMInterface {
   pluginIdentifier: string
-  pluginOrigin: string
 }
 
 export type PKMInterface = AllPKMFields & {
