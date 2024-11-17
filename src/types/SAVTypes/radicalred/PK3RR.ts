@@ -45,7 +45,7 @@ const FAKEMON_INDEXES = [
 
 export class PK3RR {
   format: 'PK3RR' = 'PK3RR'
-  pluginName = 'radical_red'
+  pluginIdentifier = 'radical_red'
   personalityValue: number
   trainerID: number
   secretID: number

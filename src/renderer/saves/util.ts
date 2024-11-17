@@ -1,15 +1,15 @@
 import dayjs from 'dayjs'
 import { colosseumOrXD, ColosseumOrXD, GameOfOrigin, GameOfOriginData } from 'pokemon-resources'
 import { PKMInterface } from '../../types/interfaces'
-import { SAVClass } from '../../types/SAVTypes/util'
+import { getPluginIdentifier, SAVClass } from '../../types/SAVTypes/util'
 import { GameLogos, getOriginMark } from '../images/game'
 import { getPublicImageURL } from '../images/images'
 
 export type SaveViewMode = 'cards' | 'grid'
 
 export function getMonSaveLogo(mon: PKMInterface, supportedSaves: SAVClass[]) {
-  if (mon.pluginName) {
-    const pluginIdentifier = supportedSaves.find((s) => s.prototype.getPluginIdentifier.call({}))
+  if (mon.pluginOrigin) {
+    const pluginIdentifier = supportedSaves.find((s) => getPluginIdentifier(s) === mon.pluginOrigin)
     return getPublicImageURL(`logos/${pluginIdentifier}.png`)
   }
   if (!mon.gameOfOrigin) {

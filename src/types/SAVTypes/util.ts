@@ -54,6 +54,10 @@ export function getPluginIdentifier(saveType: SAVClass | undefined): string | un
   return saveType?.prototype.getPluginIdentifier()
 }
 
+export function getGameName(saveType: SAVClass | undefined): string | undefined {
+  return saveType?.prototype.getGameName()
+}
+
 export function hasDesamumeFooter(bytes: Uint8Array, expectedOffset: number): boolean {
   const possibleFooter = new TextDecoder().decode(bytes.slice(expectedOffset))
   return possibleFooter.startsWith(DESAMUME_FOOTER_START)

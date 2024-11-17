@@ -8,6 +8,7 @@ import {
 import { useContext, useMemo } from 'react'
 import { PKMInterface } from '../../types/interfaces'
 import { getCharacteristic, getMoveMaxPP } from '../../types/pkm/util'
+import { getGameName, getPluginIdentifier } from '../../types/SAVTypes/util'
 import { Styles } from '../../types/types'
 import Markings from '../components/Markings'
 import { getOriginMark } from '../images/game'
@@ -82,8 +83,14 @@ const MetDataMovesDisplay = (props: { mon: PKMInterface }) => {
   }, [mon])
 
   const metMessage = useMemo(() => {
+    if (mon.pluginOrigin) {
+      const saveType = getEnabledSaveTypes().find(
+        (saveType) => mon.pluginOrigin === getPluginIdentifier(saveType)
+      )
+      return `Met in ${saveType ? getGameName(saveType) : '(unknown game)'}`
+    }
     if (!mon.metLocationIndex) {
-      return 'Met location unknown.'
+      return 'Met location unknown.' + mon.pluginIdentifier
     }
     let message = 'Met'
     if (mon.metTimeOfDay) {

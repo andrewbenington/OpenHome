@@ -57,7 +57,7 @@ import {
   writeIVsToBuffer,
 } from './util'
 
-const FILE_SIZE = 455
+const FILE_SIZE = 497
 
 export class OHPKM implements PKMInterface {
   static fromBytes(bytes: ArrayBuffer) {
@@ -65,7 +65,7 @@ export class OHPKM implements PKMInterface {
   }
 
   public get fileSize() {
-    return 433
+    return FILE_SIZE
   }
 
   get markingCount(): number {
@@ -81,7 +81,7 @@ export class OHPKM implements PKMInterface {
   }
 
   bytes: Uint8Array = new Uint8Array(FILE_SIZE)
-  pluginName: undefined
+  pluginIdentifier: undefined
 
   constructor(arg: PKMInterface | PluginPKMInterface | OHPKM | Uint8Array) {
     if (arg instanceof Uint8Array) {
@@ -119,8 +119,8 @@ export class OHPKM implements PKMInterface {
       this.nickname = other.nickname
       this.language = other.language
       this.gameOfOrigin = other.gameOfOrigin
-      if (other.pluginName) {
-        this.pluginOrigin = other.pluginName
+      if (other.pluginIdentifier) {
+        this.pluginOrigin = other.pluginIdentifier
       }
       this.isEgg = other.isEgg ?? false
       this.pokerusByte = other.pokerusByte ?? 0
@@ -194,7 +194,7 @@ export class OHPKM implements PKMInterface {
       this.abilityIndex = AbilityFromString(this.ability)
 
       this.isShadow = other.isShadow ?? false
-      
+
       this.encryptionConstant =
         other.encryptionConstant ?? other.personalityValue ?? prng.nextInt(0, 0xffffffff)
 
@@ -1145,7 +1145,8 @@ export class OHPKM implements PKMInterface {
 
   public set pluginOrigin(value: string) {
     const utfBytes = utf16StringToBytes(value, 32)
-    this.bytes.set(utfBytes, 0x1b1)
+    console.log(utfBytes.length, this.bytes.length, this.bytes.length - 433)
+    this.bytes.set(utfBytes, 433)
   }
 
   public get country() {
