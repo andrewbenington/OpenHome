@@ -8,6 +8,7 @@ import AttributeRow from 'src/renderer/pokemon/AttributeRow'
 import { MouseContext } from 'src/renderer/state/mouse'
 import { MonLocation, OpenSavesContext } from 'src/renderer/state/openSaves'
 import { PKMInterface } from '../../../types/interfaces'
+import { InfoGrid } from '../../components/InfoGrid'
 import ArrowButton from './ArrowButton'
 import BoxCell from './BoxCell'
 
@@ -222,6 +223,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
               <code>0x{save.calculateChecksum().toString(16)}</code>
             </AttributeRow>
           )}
+          {save.getExtraData && <InfoGrid data={save.getExtraData()} />}
         </ModalDialog>
       </Modal>
     </Stack>

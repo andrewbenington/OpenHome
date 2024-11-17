@@ -60,6 +60,8 @@ export interface SAV<P extends PKMInterface = PKMInterface> {
   calculateChecksum?: () => number
 
   getGameName: () => string
+
+  getExtraData?: () => object
 }
 
 export type PluginSAV<P extends PKMInterface = PKMInterface> = SAV<P> & {

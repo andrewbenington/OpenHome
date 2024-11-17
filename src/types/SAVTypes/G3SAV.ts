@@ -5,17 +5,20 @@ import { GEN3_TRANSFER_RESTRICTIONS } from '../../consts/TransferRestrictions'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
-  bytesToUint64LittleEndian,
   uint16ToBytesLittleEndian,
   uint32ToBytesLittleEndian,
 } from '../../util/ByteLogic'
 import { gen3StringToUTF } from '../../util/Strings/StringConverter'
 import { OHPKM } from '../pkm/OHPKM'
 import { Box, BoxCoordinates, SAV } from './SAV'
-import { PathData, splitPath } from './path'
+import { emptyPathData, PathData, splitPath } from './path'
 import { LOOKUP_TYPE } from './util'
 
-const SAVE_SIZE_BYTES = 0x20000
+export const SAVE_SIZE_BYTES = 0x20000
+export const EMERALD_SECURITY_OFFSET = 0xac
+export const EMERALD_SECURITY_COPY_OFFSET = 0x01f4
+export const FRLG_SECURITY_OFFSET = 0x0af8
+export const FRLG_SECURITY_COPY_OFFSET = 0x0f20
 
 export class G3Sector {
   data: Uint8Array
@@ -74,7 +77,9 @@ export class G3SaveBackup {
 
   isFirstSave: boolean = false
 
+  gameCode: number = 0
   securityKey: number = 0
+  securityKeyCopy?: number
 
   money: number = -1
 
@@ -97,14 +102,39 @@ export class G3SaveBackup {
   constructor(bytes: Uint8Array) {
     this.bytes = bytes
     this.saveIndex = bytesToUint32LittleEndian(bytes, 0xffc)
-    this.securityKey = bytesToUint32LittleEndian(bytes, 0xf20)
-    this.money = bytesToUint32LittleEndian(bytes, 0x290) ^ this.securityKey
     this.sectors = []
     for (let i = 0; i < 14; i++) {
       this.sectors.push(new G3Sector(bytes, i))
       this.firstSectorIndex = this.sectors[0].sectionID
     }
     this.sectors.sort((sector1, sector2) => sector1.sectionID - sector2.sectionID)
+
+    this.gameCode = bytes[0xac]
+    switch (this.gameCode) {
+      case 0:
+        this.origin = GameOfOrigin.Ruby
+        this.money = bytesToUint32LittleEndian(this.sectors[1].data, 0x490)
+        break
+      case 1:
+        this.origin = GameOfOrigin.FireRed
+        this.securityKey = bytesToUint32LittleEndian(this.sectors[0].data, FRLG_SECURITY_OFFSET)
+        this.securityKeyCopy = bytesToUint32LittleEndian(
+          this.sectors[0].data,
+          FRLG_SECURITY_COPY_OFFSET
+        )
+        this.money = bytesToUint32LittleEndian(this.sectors[1].data, 0x290) ^ this.securityKey
+        break
+      default:
+        this.origin = GameOfOrigin.Emerald
+        this.securityKey = bytesToUint32LittleEndian(this.sectors[0].data, EMERALD_SECURITY_OFFSET)
+        this.securityKeyCopy = bytesToUint32LittleEndian(
+          this.sectors[0].data,
+          EMERALD_SECURITY_COPY_OFFSET
+        )
+        this.money = bytesToUint32LittleEndian(this.sectors[1].data, 0x490) ^ this.securityKey
+        break
+    }
+
     this.name = gen3StringToUTF(this.sectors[0].data, 0, 10)
     // concatenate pc data from all sectors
     this.pcDataContiguous = new Uint8Array(33744)
@@ -131,22 +161,7 @@ export class G3SaveBackup {
         console.error(e)
       }
     }
-    switch (bytesToUint32LittleEndian(this.sectors[0].data, 0xac)) {
-      case 0:
-        this.origin = GameOfOrigin.Ruby
-        this.money = bytesToUint32LittleEndian(this.sectors[1].data, 0x490)
-        break
-      case 1:
-        this.origin = GameOfOrigin.FireRed
-        this.securityKey = bytesToUint32LittleEndian(this.sectors[0].data, 0xaf8)
-        this.money = bytesToUint32LittleEndian(this.sectors[1].data, 0x290) ^ this.securityKey
-        break
-      default:
-        this.origin = GameOfOrigin.Emerald
-        this.securityKey = bytesToUint32LittleEndian(this.sectors[0].data, 0xac)
-        this.money = bytesToUint32LittleEndian(this.sectors[1].data, 0x490) ^ this.securityKey
-        break
-    }
+
     this.name = gen3StringToUTF(this.sectors[0].data, 0x00, 7)
     this.tid = bytesToUint16LittleEndian(this.sectors[0].data, 0x0a)
     this.sid = bytesToUint16LittleEndian(this.sectors[0].data, 0x0c)
@@ -319,14 +334,15 @@ export class G3SAV implements SAV<PK3> {
     if (bytes.length !== SAVE_SIZE_BYTES) {
       return false
     }
-    const valueAtAC = bytesToUint32LittleEndian(bytes, 0xac)
-    if (valueAtAC === 1 || valueAtAC === 0) {
-      return true
+    try {
+      const save = new G3SAV(emptyPathData, bytes)
+      if (save.primarySave.gameCode === 0) {
+        return true
+      }
+      return save.primarySave.securityKey === save.primarySave.securityKeyCopy
+    } catch {
+      return false
     }
-    for (let i = 0x890; i < 0xf2c; i += 4) {
-      if (bytesToUint64LittleEndian(bytes, i) !== 0) return true
-    }
-    return false
   }
 
   gameColor() {
@@ -353,33 +369,53 @@ export class G3SAV implements SAV<PK3> {
   getPluginIdentifier() {
     return undefined
   }
+
+  getExtraData(): object {
+    return {
+      securityKey: this.primarySave.securityKey,
+      securityKeyCopyEmerald: new DataView(
+        this.primarySave.sectors[0].data.buffer as ArrayBuffer
+      ).getUint32(0x1f4, true),
+      securityKeyCopyFRLG: new DataView(
+        this.primarySave.sectors[0].data.buffer as ArrayBuffer
+      ).getUint32(0xf20, true),
+      rivalName: gen3StringToUTF(this.primarySave.sectors[3].data, 0x0bcc, 8),
+      gameCode: this.primarySave.gameCode,
+    }
+  }
 }
 
-export function isG3(data: Uint8Array, SECTION_DATA_SIZE: number = 3968, MON_ENTRY_SIZE: number = 80): boolean {
-  const SECTION_COUNT = 14;
-  const SECTION_SIZE = 0x1000;
-  const MON_START_OFFSET = 4;
-  const NUM_POKEMON = 30;
-  const TID_OFFSET = 0x0A;
+export function isG3(
+  data: Uint8Array,
+  SECTION_DATA_SIZE: number = 3968,
+  MON_ENTRY_SIZE: number = 80
+): boolean {
+  const SECTION_COUNT = 14
+  const SECTION_SIZE = 0x1000
+  const MON_START_OFFSET = 4
+  const NUM_POKEMON = 30
+  const TID_OFFSET = 0x0a
 
   // Extract and sort sections by Section ID
   const sections = Array.from({ length: SECTION_COUNT }, (_, i) => {
-    const offset = i * SECTION_SIZE;
-    const sectionData = data.slice(offset, offset + SECTION_DATA_SIZE);
-    const sectionID = data[offset + 0xff4] | (data[offset + 0xff5] << 8);
-    return { sectionID, data: sectionData };
-  }).sort((a, b) => a.sectionID - b.sectionID).map((section) => section.data);
+    const offset = i * SECTION_SIZE
+    const sectionData = data.slice(offset, offset + SECTION_DATA_SIZE)
+    const sectionID = data[offset + 0xff4] | (data[offset + 0xff5] << 8)
+    return { sectionID, data: sectionData }
+  })
+    .sort((a, b) => a.sectionID - b.sectionID)
+    .map((section) => section.data)
 
   // Extract save file Trainer ID from the first section
-  const saveTID = sections[0][TID_OFFSET] | (sections[0][TID_OFFSET + 1] << 8);
+  const saveTID = sections[0][TID_OFFSET] | (sections[0][TID_OFFSET + 1] << 8)
 
   // Extract Trainer IDs for Pokémon 1 and onwards from Section 5
-  const section5 = sections[5];
+  const section5 = sections[5]
   const pokemonTIDs = Array.from({ length: NUM_POKEMON - 1 }, (_, i) => {
-    const pokemonOffset = MON_START_OFFSET + (i + 1) * MON_ENTRY_SIZE;
-    return section5[pokemonOffset + 0x0c] | (section5[pokemonOffset + 0x0d] << 8);
-  });
+    const pokemonOffset = MON_START_OFFSET + (i + 1) * MON_ENTRY_SIZE
+    return section5[pokemonOffset + 0x0c] | (section5[pokemonOffset + 0x0d] << 8)
+  })
 
   // Check if any Pokémon TID matches the save file TID
-  return pokemonTIDs.some((tid) => tid === saveTID);
+  return pokemonTIDs.some((tid) => tid === saveTID)
 }

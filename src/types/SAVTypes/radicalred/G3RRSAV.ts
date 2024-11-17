@@ -1,6 +1,6 @@
 import { GameOfOrigin } from 'pokemon-resources'
 import { NationalDex } from 'pokemon-species-data'
-import { SPIKY_EAR } from '../../../consts/Formes'
+import { ORIGIN, ORIGINAL, SPIKY_EAR } from '../../../consts/Formes'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -10,7 +10,7 @@ import {
 import { gen3StringToUTF } from '../../../util/Strings/StringConverter'
 import { CapPikachus, isRestricted, TransferRestrictions } from '../../TransferRestrictions'
 import { OHPKM } from '../../pkm/OHPKM'
-import { isG3 } from '../G3SAV'
+import { FRLG_SECURITY_COPY_OFFSET, FRLG_SECURITY_OFFSET, isG3 } from '../G3SAV'
 import { Box, BoxCoordinates, PluginSAV } from '../SAV'
 import { PathData, splitPath } from '../path'
 import PK3RR from './PK3RR'
@@ -18,11 +18,15 @@ import { RRTransferMon } from './conversion/RRTransferMons'
 
 const SAVE_SIZE_BYTES = 0x20000
 
+// https://docs.google.com/spreadsheets/d/15mUFUcN8250hRL7iUOJPX0s1rMcgVuJPuHANioL4o2o/edit?gid=45654363#gid=962831839
 const RR_TRANSFER_RESTRICTIONS: TransferRestrictions = {
   transferableDexNums: RRTransferMon,
   excludedForms: {
     ...CapPikachus,
     [NationalDex.Pichu]: [SPIKY_EAR],
+    [NationalDex.Dialga]: [ORIGIN],
+    [NationalDex.Palkia]: [ORIGIN],
+    [NationalDex.Magearna]: [ORIGINAL],
   },
 }
 
@@ -313,11 +317,18 @@ export class G3RRSAV implements PluginSAV<PK3RR> {
       return false
     }
 
-    return (
-      (bytesToUint32LittleEndian(bytes, 0xac) === 0 &&
-        bytesToUint32LittleEndian(bytes, findFirstSaveIndexZero(bytes) + 0xac) > 0) ||
-      isRR(bytes)
-    )
+    const firstSectionBytesIndex = findFirstSectionOffset(bytes)
+    const firstSectionBytes = bytes.slice(firstSectionBytesIndex, firstSectionBytesIndex + 0x1000)
+
+    const gameCode = firstSectionBytes[0xac]
+    if (gameCode !== 1) return false
+
+    const securityKey = bytesToUint32LittleEndian(firstSectionBytes, FRLG_SECURITY_OFFSET)
+    const securityKeyCopy = bytesToUint32LittleEndian(firstSectionBytes, FRLG_SECURITY_COPY_OFFSET)
+
+    // Radical Red seems to have the security key set to 0, which has a 1 in 4.2 billion
+    // chance to happen in vanilla FireRed (if it can even be 0 at all)
+    return securityKey === 0 || securityKey !== securityKeyCopy
   }
 
   getPluginIdentifier() {
@@ -325,7 +336,7 @@ export class G3RRSAV implements PluginSAV<PK3RR> {
   }
 }
 
-const findFirstSaveIndexZero = (bytes: Uint8Array): number => {
+const findFirstSectionOffset = (bytes: Uint8Array): number => {
   const SECTION_SIZE = 0x1000
   const SAVE_INDEX_OFFSET = 0xff4
 
