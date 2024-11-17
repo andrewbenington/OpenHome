@@ -321,8 +321,12 @@ export class G3RRSAV implements PluginSAV<PK3RR> {
     }
 
     return (
-      bytesToUint32LittleEndian(bytes, 0xac) === 0 &&
-      bytesToUint32LittleEndian(bytes, findFirstSaveIndexZero(bytes) + 0xac) > 0
+      (
+        bytesToUint32LittleEndian(bytes, 0xac) === 0 &&
+        bytesToUint32LittleEndian(bytes, findFirstSaveIndexZero(bytes) + 0xac) > 0
+      ) || (
+        isRR(bytes)
+      )
     )
   }
 
@@ -355,4 +359,4 @@ const findFirstSaveIndexZero = (bytes: Uint8Array): number => {
 // or that there are no pokemon in the first box. The result
 // of both checks failing can&should be a prompt to specify
 // which game the Save belongs too.
-export function isRR(data: Uint8Array): boolean { return isG3(data, 4080, 58) }
+export function isRR(bytes: Uint8Array): boolean { return isG3(bytes, 4080, 58) }
