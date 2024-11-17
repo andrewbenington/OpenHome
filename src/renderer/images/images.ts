@@ -13,7 +13,7 @@ export const getTypeIconPath = (type: string): string => {
 
 export function useMonSaveLogo(mon: PKMInterface) {
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
-  if (mon.pluginName) {
+  if (mon.pluginIdentifier) {
     getEnabledSaveTypes().find((saveType) => saveType)
   }
 }

@@ -27,7 +27,7 @@ import {
   uIntToBufferBits,
   write30BitIVsToBytes,
   writeGen3StringToBytes,
-  writeStatsToBytes
+  writeStatsToBytes,
 } from 'pokemon-files'
 import { getHPGen3Onward, getStatGen3Onward } from '../../../util/StatCalc'
 import { ItemGen3RRFromString, ItemGen3RRToString } from './conversion/Gen3RRItems'
@@ -38,8 +38,14 @@ import {
   toGen3RRPokemonIndex,
 } from './conversion/Gen3RRPokemonIndex'
 
+const FAKEMON_INDEXES = [
+  1186, 1200, 1274, 1275, 1276, 1277, 1278, 1279, 1282, 1283, 1284, 1285, 1286, 1287, 1288, 1289,
+  1290, 1291, 1292, 1293, 1294, 1375,
+]
+
 export class PK3RR {
   format: 'PK3RR' = 'PK3RR'
+  pluginIdentifier = 'radical_red'
   personalityValue: number
   trainerID: number
   secretID: number
@@ -67,13 +73,6 @@ export class PK3RR {
   nickname: string
   trainerName: string
   trainerGender: boolean
-  restricted_mons: number[] = [
-    1186,
-    1200,
-    1274, 1275, 1276, 1277, 1278, 1279,
-    1282, 1283, 1284, 1285, 1286, 1287, 1288, 1289, 1290, 1291, 1292, 1293, 1294,
-    1375,
-  ]
   isLocked: boolean = false
 
   constructor(arg: ArrayBuffer | AllPKMFields) {
@@ -107,8 +106,8 @@ export class PK3RR {
 
       // Species 28:30
       const speciesIndex: number = dataView.getUint16(0x1c, true)
-      const ret = fromGen3RRPokemonIndex(speciesIndex)
-      if (ret.NationalDexIndex < 0) {
+      const speciesData = fromGen3RRPokemonIndex(speciesIndex)
+      if (speciesData.NationalDexIndex < 0) {
         this.dexNum = 0
         this.formeNum = 0
         console.warn(
@@ -118,13 +117,18 @@ export class PK3RR {
           speciesIndex
         )
       } else {
-        this.dexNum = ret.NationalDexIndex
-        this.formeNum = ret.FormIndex
+        this.dexNum = speciesData.NationalDexIndex
+        this.formeNum = speciesData.FormIndex
       }
 
-      this.isLocked = this.restricted_mons.includes(speciesIndex)
+      this.isLocked = FAKEMON_INDEXES.includes(speciesIndex)
       if (this.isLocked) {
-        console.warn("The species is locked. Species: ", Gen3RRSpecies[speciesIndex], ", RR Dex Number: ", speciesIndex)
+        console.warn(
+          'The species is locked. Species: ',
+          Gen3RRSpecies[speciesIndex],
+          ', RR Dex Number: ',
+          speciesIndex
+        )
       }
 
       // Held Item 30:32

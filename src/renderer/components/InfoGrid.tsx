@@ -1,7 +1,6 @@
 import { Card, Divider, Grid, Stack } from '@mui/joy'
 import { isDayjs } from 'dayjs'
 import { PKM } from 'pokemon-files'
-import { PluginPKM } from 'src/types/interfaces'
 import { ReactNode, useMemo } from 'react'
 type Breakpoint = 'xs' | 'sm' | 'md' | 'lg' | 'xl'
 
@@ -28,7 +27,7 @@ function isArray(obj: object): obj is (object | Primitive)[] {
   return Object.prototype.toString.call(obj) === '[object Array]'
 }
 
-function isPKM(obj: object): obj is (PKM | PluginPKM) {
+function isPKM(obj: object): obj is PKM {
   return 'format' in obj
 }
 
