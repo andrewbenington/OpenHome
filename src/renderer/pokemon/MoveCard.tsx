@@ -15,22 +15,24 @@ const MoveCard = ({ move, movePP, maxPP, typeOverride }: MoveCardProps) => {
   const moveData = useMemo(() => Moves[move], [move])
   const type = useMemo(() => typeOverride ?? (moveData?.type as Type), [typeOverride, moveData])
 
-  let content;
+  const content = useMemo(() => {
+    if (move === 0) {
+      // mon knows less than 4 moves
+      return undefined
+    }
 
-  if (move === 0) {
-    // mon knows less than 4 moves
-    content = null;
-  } else if (!moveData) {
-    // move is unknown
-    content = (
-      <>
-        <div className="type-icon-container"></div>
-        <div className="unknown-move-name">(Unknown Move)</div>
-      </>
-    );
-  } else {
+    if (!moveData) {
+      // move is unknown
+      return (
+        <>
+          <div className="type-icon-container"></div>
+          <div className="unknown-move-name">(Unknown Move)</div>
+        </>
+      )
+    }
+
     // move is known
-    content = (
+    return (
       <>
         <div className="type-icon-container">
           <TypeIcon type={type} key={`${type}_type_icon`} size={32} border />
@@ -47,7 +49,7 @@ const MoveCard = ({ move, movePP, maxPP, typeOverride }: MoveCardProps) => {
         </div>
       </>
     )
-  }
+  }, [move, moveData])
 
   return (
     <div

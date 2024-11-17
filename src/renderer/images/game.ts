@@ -13,7 +13,6 @@ export const GameLogos: { [key: string]: string } = {
   Diamond: `logos/Diamond.png`,
   Emerald: `logos/Emerald.png`,
   FireRed: `logos/FireRed.png`,
-  RadicalRed: `logos/RadicalRed.png`,
   GB: `logos/GB.png`,
   GO: `logos/GO.png`,
   Gold: `logos/Gold.png`,

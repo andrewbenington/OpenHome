@@ -1,5 +1,6 @@
 import { GameOfOrigin } from 'pokemon-resources'
-import { RR_TRANSFER_RESTRICTIONS } from '../../../consts/TransferRestrictions'
+import { NationalDex } from 'pokemon-species-data'
+import { SPIKY_EAR } from '../../../consts/Formes'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -7,13 +8,28 @@ import {
   uint32ToBytesLittleEndian,
 } from '../../../util/ByteLogic'
 import { gen3StringToUTF } from '../../../util/Strings/StringConverter'
-import { isRestricted } from '../../TransferRestrictions'
+import {
+  CapPikachus,
+  isRestricted,
+  RegionalForms,
+  TransferRestrictions,
+} from '../../TransferRestrictions'
 import { OHPKM } from '../../pkm/OHPKM'
 import { Box, BoxCoordinates, PluginSAV } from '../SAV'
 import { PathData, splitPath } from '../path'
 import PK3RR from './PK3RR'
+import { RRTransferMon } from './conversion/RRTransferMons'
 
 const SAVE_SIZE_BYTES = 0x20000
+
+const RR_TRANSFER_RESTRICTIONS: TransferRestrictions = {
+  transferableDexNums: RRTransferMon,
+  excludedForms: {
+    ...RegionalForms,
+    ...CapPikachus,
+    [NationalDex.Pichu]: [SPIKY_EAR],
+  },
+}
 
 export class G3RRSector {
   data: Uint8Array
@@ -89,7 +105,7 @@ export class G3RRSaveBackup {
     this.sectors.sort((sector1, sector2) => sector1.sectionID - sector2.sectionID)
     this.name = gen3StringToUTF(this.sectors[0].data, 0, 10)
 
-    const boxes: number = 18;
+    const boxes: number = 18
     const nBytes: number = boxes * 58 * 30
     const nMons: number = boxes * 30
     const fullSectionsUsed: number = Math.floor(nBytes / 4080)
@@ -219,7 +235,7 @@ export class G3RRSAV implements PluginSAV<PK3RR> {
 
     console.log(this.boxes)
   }
-  
+
   pcChecksumOffset?: number | undefined
   pcOffset?: number | undefined
   calculateChecksum?: (() => number) | undefined
