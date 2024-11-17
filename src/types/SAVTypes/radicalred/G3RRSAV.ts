@@ -103,7 +103,10 @@ export class G3RRSaveBackup {
       this.firstSectorIndex = this.sectors[0].sectionID
     }
     this.sectors.sort((sector1, sector2) => sector1.sectionID - sector2.sectionID)
-    this.name = gen3StringToUTF(this.sectors[0].data, 0, 10)
+
+    this.name = gen3StringToUTF(this.sectors[0].data, 0x00, 7)
+    this.tid = bytesToUint16LittleEndian(this.sectors[0].data, 0x0a)
+    this.sid = bytesToUint16LittleEndian(this.sectors[0].data, 0x0c)
 
     const boxes: number = 18
     const nBytes: number = boxes * 58 * 30
@@ -128,13 +131,14 @@ export class G3RRSaveBackup {
     for (let i = 0; i < nMons; i++) {
       try {
         const mon = new PK3RR(this.pcDataContiguous.slice(4 + i * 58, 4 + (i + 1) * 58).buffer)
-        if (mon.gameOfOrigin !== 0 && mon.dexNum !== 0) {
+        if (mon.dexNum !== 0 && mon.trainerID !== 0) {
           const box = this.boxes[Math.floor(i / 30)]
           box.pokemon[i % 30] = mon
+          if (mon.trainerID == this.tid) {
+            mon.gameOfOrigin = GameOfOrigin.FireRed
+          }
         }
-        if (mon.trainerID == this.tid) {
-          mon.gameOfOrigin = GameOfOrigin.FireRed
-        }
+
       } catch (e) {
         console.error(e)
       }
@@ -142,10 +146,6 @@ export class G3RRSaveBackup {
 
     this.securityKey = bytesToUint32LittleEndian(this.sectors[0].data, 0xaf8)
     this.money = bytesToUint32LittleEndian(this.sectors[1].data, 0x290) ^ this.securityKey
-
-    this.name = gen3StringToUTF(this.sectors[0].data, 0x00, 7)
-    this.tid = bytesToUint16LittleEndian(this.sectors[0].data, 0x0a)
-    this.sid = bytesToUint16LittleEndian(this.sectors[0].data, 0x0c)
   }
 }
 
