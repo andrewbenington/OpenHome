@@ -78,7 +78,7 @@ export class PK3RR implements PluginPKMInterface {
   trainerName: string
   trainerGender: boolean
   isLocked: boolean = false
-  originalBytes?: Uint8Array<ArrayBufferLike>
+  originalBytes?: Uint8Array
 
   constructor(arg: ArrayBuffer | AllPKMFields) {
     if (arg instanceof ArrayBuffer) {
@@ -212,7 +212,6 @@ export class PK3RR implements PluginPKMInterface {
       this.dexNum = other.dexNum
       this.formeNum = other.formeNum
       this.privateHeldItemIndex = ItemGen3RRFromString(other.heldItemName)
-      console.log("ITEM", this.privateHeldItemIndex, other.heldItemName)
       this.heldItemIndex = ItemFromString(other.heldItemName)
       this.exp = other.exp
       this.movePPUps = other.movePPUps
