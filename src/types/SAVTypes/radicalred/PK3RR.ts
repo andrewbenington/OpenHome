@@ -196,6 +196,7 @@ export class PK3RR implements PluginPKMInterface {
       this.ivs = read30BitIVsFromBytes(dataView, 0x35)
       this.isEgg = getFlag(dataView, 0x35, 30)
       this.isNicknamed = getFlag(dataView, 0x35, 31)
+      
     } else {
       const other = arg
       this.personalityValue = generatePersonalityValuePreservingAttributes(other) ?? 0
@@ -213,9 +214,11 @@ export class PK3RR implements PluginPKMInterface {
       this.privateHeldItemIndex = ItemGen3RRFromString(other.heldItemName)
       this.heldItemIndex = ItemFromString(other.heldItemName)
       this.exp = other.exp
-      this.movePPUps = other.movePPUps.filter((_, i) => other.moves[i] <= PK3RR.maxValidMove())
+      this.movePPUps = other.movePPUps
       this.trainerFriendship = other.trainerFriendship ?? 0
-      this.moves = other.moves.filter((_, i) => other.moves[i] <= PK3RR.maxValidMove())
+      this.moves = other.moves
+        .map(toGen3RRMoveIndex)
+        .map(fromGen3RRMoveIndex)
 
       for (let i = 0; i < 4; i++) {
         const pp = getMoveMaxPP(this.moves[i], this.format, this.movePPUps[i])
