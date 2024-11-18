@@ -112,7 +112,7 @@ export class PK3RR implements PluginPKMInterface {
   trainerName: string
   trainerGender: boolean
   isLocked: boolean = false
-  originalBytes?: Uint8Array<ArrayBufferLike>
+  originalBytes?: Uint8Array
 
   constructor(arg: ArrayBuffer | PKMInterface) {
     if (arg instanceof ArrayBuffer) {
@@ -413,6 +413,7 @@ export class PK3RR implements PluginPKMInterface {
   public get language() {
     return Languages[this.languageIndex]
   }
+
   public get heldItemName() {
     return ItemGen3RRToString(this.privateHeldItemIndex)
   }
