@@ -71,7 +71,8 @@ export class PK3RR implements PluginPKMInterface {
   canGigantamax: boolean
   ivs: Stats
   isEgg: boolean
-  isNicknamed: boolean
+  hasHiddenAbility: boolean
+  isNicknamed: boolean = true
   currentHP: number = 0
   nickname: string
   trainerName: string
@@ -193,9 +194,9 @@ export class PK3RR implements PluginPKMInterface {
       this.trainerGender = getFlag(dataView, 0x34, 15)
 
       // 53:57
-      this.ivs = read30BitIVsFromBytes(dataView, 0x35)
-      this.isEgg = getFlag(dataView, 0x35, 30)
-      this.isNicknamed = getFlag(dataView, 0x35, 31)
+      this.ivs = read30BitIVsFromBytes(dataView, 0x36)
+      this.isEgg = getFlag(dataView, 0x36, 30)
+      this.hasHiddenAbility = getFlag(dataView, 0x36, 31)
     } else {
       const other = arg
       this.personalityValue = generatePersonalityValuePreservingAttributes(other) ?? 0
@@ -248,6 +249,7 @@ export class PK3RR implements PluginPKMInterface {
         spd: 0,
       }
       this.isEgg = other.isEgg ?? false
+      this.hasHiddenAbility = other.abilityNum === 4
       this.isNicknamed = other.isNicknamed ?? false
       this.currentHP = other.currentHP
       this.nickname = other.nickname
@@ -330,9 +332,9 @@ export class PK3RR implements PluginPKMInterface {
     setFlag(dataView, 0x34, 15, this.trainerGender)
 
     // 53:57 IVs and Flags (30-bit IVs + 2 bits for flags)
-    write30BitIVsToBytes(dataView, 0x35, this.ivs)
-    setFlag(dataView, 0x35, 30, this.isEgg)
-    setFlag(dataView, 0x35, 31, this.isNicknamed)
+    write30BitIVsToBytes(dataView, 0x36, this.ivs)
+    setFlag(dataView, 0x36, 30, this.isEgg)
+    setFlag(dataView, 0x36, 31, this.hasHiddenAbility)
 
     return buffer
   }
@@ -364,7 +366,7 @@ export class PK3RR implements PluginPKMInterface {
   }
 
   public get abilityNum() {
-    return ((this.personalityValue >> 0) & 1) + 1
+    return this.hasHiddenAbility ? 4 : ((this.personalityValue >> 0) & 1) + 1
   }
 
   public get abilityIndex() {
@@ -372,11 +374,19 @@ export class PK3RR implements PluginPKMInterface {
   }
 
   public get ability() {
-    const ability1 = PokemonData[this.dexNum]?.formes[0].ability1
-    const ability2 = PokemonData[this.dexNum]?.formes[0].ability2
-    if (this.abilityNum === 2 && ability2 && AbilityFromString(ability2) <= 77) {
+    const pokemonData = PokemonData[this.dexNum]
+    if (!pokemonData) return '—'
+
+    const forme = pokemonData.formes[this.formeNum]
+    if (!forme) return '—'
+
+    const { ability1, ability2, abilityH } = forme
+
+    if (this.hasHiddenAbility && abilityH) return abilityH
+    if (this.abilityNum === 2 && ability2) {
       return ability2
     }
+
     return ability1
   }
 
