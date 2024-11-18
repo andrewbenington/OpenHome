@@ -4299,7 +4299,7 @@ export const RadicalRedToNationalDexMap: Record<string, RadicalRedToNationalDexE
   },
   '1073': {
     NationalDexIndex: 801,
-    FormIndex: 0,
+    FormIndex: 1,
   },
   '1074': {
     NationalDexIndex: 803,

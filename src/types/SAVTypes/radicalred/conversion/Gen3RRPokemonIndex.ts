@@ -1072,7 +1072,7 @@ export const Gen3RRSpecies = [
   'Minior',
   'Minior',
   'Mimikyu-Busted',
-  'Magearna',
+  'Magearna-Original',
   'Poipole',
   'Naganadel',
   'Stakataka',
