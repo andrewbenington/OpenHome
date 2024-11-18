@@ -76,11 +76,13 @@ export class PK3RR implements PluginPKMInterface {
   trainerName: string
   trainerGender: boolean
   isLocked: boolean = false
+  originalBytes?: Uint8Array<ArrayBufferLike>
 
   constructor(arg: ArrayBuffer | AllPKMFields) {
     if (arg instanceof ArrayBuffer) {
       let buffer = arg
       const dataView = new DataView(buffer)
+      this.originalBytes = new Uint8Array(arg)
 
       // https://github.com/Skeli789/Complete-Fire-Red-Upgrade/blob/master/include/new/pokemon_storage_system.h
       // https://github.com/Skeli789/Complete-Fire-Red-Upgrade/blob/master/include/pokemon.h
@@ -153,7 +155,7 @@ export class PK3RR implements PluginPKMInterface {
       this.trainerFriendship = dataView.getUint8(0x25)
 
       // Pokeball 38
-      this.ball = uIntFromBufferBits(dataView, 0x26, 11, 4, true)
+      this.ball = dataView.getUint8(0x26) + 1
 
       // Moves 38:43 (5 bytes total for 4 moves with 10 bits each)
       this.moves = [
@@ -306,7 +308,7 @@ export class PK3RR implements PluginPKMInterface {
     dataView.setUint8(0x25, this.trainerFriendship)
 
     // 38 Ball (Pokeball)
-    dataView.setUint8(0x26, this.ball)
+    dataView.setUint8(0x26, this.ball - 1)
 
     // Moves (5 bytes total for 10-bit moves)
     uIntToBufferBits(dataView, toGen3RRMoveIndex(this.moves[0]), 0x27, 0, 10, true)

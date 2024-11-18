@@ -14,4 +14,5 @@ export type PKMInterface = AllPKMFields & {
   pluginIdentifier?: string
   pluginOrigin?: string
   isLocked?: boolean
+  originalBytes?: Uint8Array
 }
