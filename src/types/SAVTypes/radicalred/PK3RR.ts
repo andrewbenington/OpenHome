@@ -1,6 +1,7 @@
 import {
   AbilityFromString,
   Ball,
+  GameOfOrigin,
   ItemFromString,
   Languages,
   NatureToString,
@@ -8,7 +9,6 @@ import {
 import { PokemonData } from 'pokemon-species-data'
 
 import {
-  AllPKMFields,
   genderFromPID,
   generatePersonalityValuePreservingAttributes,
   getFlag,
@@ -30,7 +30,7 @@ import {
   writeStatsToBytes,
 } from 'pokemon-files'
 import { getHPGen3Onward, getStatGen3Onward } from '../../../util/StatCalc'
-import { PluginPKMInterface } from '../../interfaces'
+import { PKMInterface, PluginPKMInterface } from '../../interfaces'
 import { ItemGen3RRFromString, ItemGen3RRToString } from './conversion/Gen3RRItems'
 import { fromGen3RRMoveIndex, toGen3RRMoveIndex } from './conversion/Gen3RRMovesIndex'
 import {
@@ -42,6 +42,40 @@ import {
 const FAKEMON_INDEXES = [
   1186, 1200, 1274, 1275, 1276, 1277, 1278, 1279, 1282, 1283, 1284, 1285, 1286, 1287, 1288, 1289,
   1290, 1291, 1292, 1293, 1294, 1375,
+]
+
+const INTERNAL_ORIGIN_NON_RR = GameOfOrigin.INVALID_6
+const INTERNAL_ORIGIN_FROM_RR = GameOfOrigin.FireRed
+const FIRERED_IN_GAME_TRADE = 255
+
+const RR_BALLS: Ball[] = [
+  Ball.Master,
+  Ball.Ultra,
+  Ball.Great,
+  Ball.Poke,
+  Ball.Safari,
+  Ball.Net,
+  Ball.Dive,
+  Ball.Nest,
+  Ball.Repeat,
+  Ball.Timer,
+  Ball.Luxury,
+  Ball.Premier,
+  Ball.Dusk,
+  Ball.Heal,
+  Ball.Quick,
+  Ball.Cherish,
+  Ball.INVALID,
+  Ball.Fast,
+  Ball.Level,
+  Ball.Lure,
+  Ball.Heavy,
+  Ball.Love,
+  Ball.Friend,
+  Ball.Moon,
+  Ball.PokeHisui,
+  Ball.Beast,
+  Ball.Dream,
 ]
 
 export class PK3RR implements PluginPKMInterface {
@@ -80,7 +114,7 @@ export class PK3RR implements PluginPKMInterface {
   isLocked: boolean = false
   originalBytes?: Uint8Array<ArrayBufferLike>
 
-  constructor(arg: ArrayBuffer | AllPKMFields) {
+  constructor(arg: ArrayBuffer | PKMInterface) {
     if (arg instanceof ArrayBuffer) {
       let buffer = arg
       const dataView = new DataView(buffer)
@@ -157,7 +191,8 @@ export class PK3RR implements PluginPKMInterface {
       this.trainerFriendship = dataView.getUint8(0x25)
 
       // Pokeball 38
-      this.ball = dataView.getUint8(0x26) + 1
+      const ballIndex = dataView.getUint8(0x26)
+      this.ball = ballIndex < RR_BALLS.length ? RR_BALLS[ballIndex] : Ball.Poke
 
       // Moves 38:43 (5 bytes total for 4 moves with 10 bits each)
       this.moves = [
@@ -173,7 +208,7 @@ export class PK3RR implements PluginPKMInterface {
       }
 
       // EVs 43:49
-      this.evs = readStatsFromBytes(dataView, 0x2b)
+      this.evs = readStatsFromBytes(dataView, 0x2c)
 
       // 49
       this.pokerusByte = dataView.getUint8(0x32)
@@ -188,7 +223,7 @@ export class PK3RR implements PluginPKMInterface {
 
       // Until RR's handling of game of origin is better understood, set this by default. OHPKM will not update this field
       // if the mon was already being tracked before being transferred to Radical Red
-      this.pluginOrigin = 'radical_red'
+      this.pluginOrigin = this.gameOfOrigin === INTERNAL_ORIGIN_FROM_RR ? 'radical_red' : undefined
 
       this.canGigantamax = getFlag(dataView, 0x34, 11)
       this.trainerGender = getFlag(dataView, 0x34, 15)
@@ -233,12 +268,27 @@ export class PK3RR implements PluginPKMInterface {
       this.pokerusByte = other.pokerusByte ?? 0
       this.metLocationIndex = other.metLocationIndex ?? 0
       this.metLevel = other.metLevel ?? 0
-      this.gameOfOrigin = other.gameOfOrigin
-      if (other.ball && PK3RR.maxValidBall() >= other.ball) {
-        this.ball = other.ball
+
+      const fromRadicalRed = other.pluginOrigin === 'radical_red'
+      if (fromRadicalRed) {
+        this.gameOfOrigin = INTERNAL_ORIGIN_FROM_RR
+        this.metLocationIndex = other.metLocationIndex ?? FIRERED_IN_GAME_TRADE
+      } else {
+        this.gameOfOrigin = INTERNAL_ORIGIN_NON_RR
+        this.metLocationIndex = FIRERED_IN_GAME_TRADE
+      }
+
+      if (other.ball) {
+        this.ball =
+          other.ball >= Ball.PokeHisui && other.ball <= Ball.Origin
+            ? Ball.PokeHisui
+            : other.ball === Ball.Sport
+            ? Ball.Poke
+            : other.ball
       } else {
         this.ball = Ball.Poke
       }
+
       this.canGigantamax = !!other.canGigantamax
       this.ivs = other.ivs ?? {
         hp: 0,
@@ -283,7 +333,7 @@ export class PK3RR implements PluginPKMInterface {
     // dataView.setUint8(0x13, SANITY VALUE IDK);
 
     // 20:27 OT Name (7 bytes)
-    writeGen3StringToBytes(dataView, this.trainerName, 0x14, 7, true)
+    writeGen3StringToBytes(dataView, this.trainerName, 0x14, 7, false)
 
     // 27 Markings
     markingsFourShapesToBytes(dataView, 0x1b, this.markings)
@@ -308,7 +358,13 @@ export class PK3RR implements PluginPKMInterface {
     dataView.setUint8(0x25, this.trainerFriendship)
 
     // 38 Ball (Pokeball)
-    dataView.setUint8(0x26, this.ball - 1)
+    const ballIndex =
+      this.ball in RR_BALLS
+        ? RR_BALLS.indexOf(this.ball)
+        : this.ball >= Ball.PokeHisui && this.ball <= Ball.Origin
+        ? Ball.PokeHisui
+        : Ball.Poke
+    dataView.setUint8(0x26, ballIndex)
 
     // Moves (5 bytes total for 10-bit moves)
     uIntToBufferBits(dataView, toGen3RRMoveIndex(this.moves[0]), 0x27, 0, 10, true)
@@ -317,7 +373,7 @@ export class PK3RR implements PluginPKMInterface {
     uIntToBufferBits(dataView, toGen3RRMoveIndex(this.moves[3]), 0x2a, 6, 10, true)
 
     // EVs
-    writeStatsToBytes(dataView, 0x2b, this.evs)
+    writeStatsToBytes(dataView, 0x2c, this.evs)
 
     // 49 Pokerus
     dataView.setUint8(0x32, this.pokerusByte)
@@ -426,7 +482,7 @@ export class PK3RR implements PluginPKMInterface {
   }
 
   static maxValidBall() {
-    return 12
+    return Ball.Beast
   }
 
   static allowedBalls() {

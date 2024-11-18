@@ -17,7 +17,7 @@ import { LOOKUP_TYPE } from '../util'
 import PK3RR from './PK3RR'
 import { RRTransferMon } from './conversion/RRTransferMons'
 
-const SAVE_SIZE_BYTES = 0x20000
+const SAVE_SIZES_BYTES = [0x20000, 0x20010]
 
 // https://docs.google.com/spreadsheets/d/15mUFUcN8250hRL7iUOJPX0s1rMcgVuJPuHANioL4o2o/edit?gid=45654363#gid=962831839
 const RR_TRANSFER_RESTRICTIONS: TransferRestrictions = {
@@ -315,7 +315,7 @@ export class G3RRSAV implements PluginSAV<PK3RR> {
   static saveTypeName = 'Pokémon Radical Red'
 
   static fileIsSave(bytes: Uint8Array): boolean {
-    if (bytes.length !== SAVE_SIZE_BYTES) {
+    if (!SAVE_SIZES_BYTES.includes(bytes.length)) {
       return false
     }
 
