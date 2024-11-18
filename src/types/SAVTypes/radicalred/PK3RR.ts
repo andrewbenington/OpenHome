@@ -68,9 +68,11 @@ export class PK3RR implements PluginPKMInterface {
   metLevel: number
   gameOfOrigin: number
   ball: number
+  canGigantamax: boolean
   ivs: Stats
   isEgg: boolean
-  isNicknamed: boolean
+  hasHiddenAbility: boolean
+  isNicknamed: boolean = true
   currentHP: number = 0
   nickname: string
   trainerName: string
@@ -174,28 +176,27 @@ export class PK3RR implements PluginPKMInterface {
       this.evs = readStatsFromBytes(dataView, 0x2b)
 
       // 49
-      this.pokerusByte = dataView.getUint8(0x31)
+      this.pokerusByte = dataView.getUint8(0x32)
 
       // 50
       this.metLocationIndex = dataView.getUint8(0x33)
 
       // 51:53
-      this.metLevel = dataView.getUint8(0x34)
+      this.metLevel = uIntFromBufferBits(dataView, 0x34, 0, 7, true)
 
-      // More research must be done into how the Game of origin is stored
-      const gor = uIntFromBufferBits(dataView, 0x33, 7, 4, true)
-      this.gameOfOrigin = gor === 8 || gor === 0 ? 6 : gor // Radical Red seems to use values from 1-15 for this field; this need more investigation
+      this.gameOfOrigin = uIntFromBufferBits(dataView, 0x34, 7, 4, true)
 
       // Until RR's handling of game of origin is better understood, set this by default. OHPKM will not update this field
       // if the mon was already being tracked before being transferred to Radical Red
       this.pluginOrigin = 'radical_red'
 
-      this.trainerGender = getFlag(dataView, 0x33, 15)
+      this.canGigantamax = getFlag(dataView, 0x34, 11)
+      this.trainerGender = getFlag(dataView, 0x34, 15)
 
       // 53:57
-      this.ivs = read30BitIVsFromBytes(dataView, 0x35)
-      this.isEgg = getFlag(dataView, 0x35, 30)
-      this.isNicknamed = getFlag(dataView, 0x35, 31)
+      this.ivs = read30BitIVsFromBytes(dataView, 0x36)
+      this.isEgg = getFlag(dataView, 0x36, 30)
+      this.hasHiddenAbility = getFlag(dataView, 0x36, 31)
     } else {
       const other = arg
       this.personalityValue = generatePersonalityValuePreservingAttributes(other) ?? 0
@@ -239,6 +240,7 @@ export class PK3RR implements PluginPKMInterface {
       } else {
         this.ball = Ball.Poke
       }
+      this.canGigantamax = !!other.canGigantamax
       this.ivs = other.ivs ?? {
         hp: 0,
         atk: 0,
@@ -248,6 +250,7 @@ export class PK3RR implements PluginPKMInterface {
         spd: 0,
       }
       this.isEgg = other.isEgg ?? false
+      this.hasHiddenAbility = other.abilityNum === 4
       this.isNicknamed = other.isNicknamed ?? false
       this.currentHP = other.currentHP
       this.nickname = other.nickname
@@ -318,20 +321,21 @@ export class PK3RR implements PluginPKMInterface {
     writeStatsToBytes(dataView, 0x2b, this.evs)
 
     // 49 Pokerus
-    dataView.setUint8(0x31, this.pokerusByte)
+    dataView.setUint8(0x32, this.pokerusByte)
 
     // 50 Met Location
     dataView.setUint8(0x33, this.metLocationIndex)
 
     // 51:52 Met Info (packed: Met level, Game of Origin, Trainer Gender)
-    dataView.setUint8(0x34, this.metLevel)
-    uIntToBufferBits(dataView, this.gameOfOrigin == 6 ? 8 : this.gameOfOrigin, 0x33, 7, 4, true)
-    setFlag(dataView, 0x33, 15, this.trainerGender)
+    uIntToBufferBits(dataView, this.metLevel, 0x34, 0, 7, true)
+    uIntToBufferBits(dataView, this.gameOfOrigin, 0x34, 7, 4, true)
+    setFlag(dataView, 0x34, 11, this.canGigantamax)
+    setFlag(dataView, 0x34, 15, this.trainerGender)
 
     // 53:57 IVs and Flags (30-bit IVs + 2 bits for flags)
-    write30BitIVsToBytes(dataView, 0x35, this.ivs)
-    setFlag(dataView, 0x35, 30, this.isEgg)
-    setFlag(dataView, 0x35, 31, this.isNicknamed)
+    write30BitIVsToBytes(dataView, 0x36, this.ivs)
+    setFlag(dataView, 0x36, 30, this.isEgg)
+    setFlag(dataView, 0x36, 31, this.hasHiddenAbility)
 
     return buffer
   }
@@ -364,7 +368,7 @@ export class PK3RR implements PluginPKMInterface {
   }
 
   public get abilityNum() {
-    return ((this.personalityValue >> 0) & 1) + 1
+    return this.hasHiddenAbility ? 4 : ((this.personalityValue >> 0) & 1) + 1
   }
 
   public get abilityIndex() {
@@ -372,11 +376,19 @@ export class PK3RR implements PluginPKMInterface {
   }
 
   public get ability() {
-    const ability1 = PokemonData[this.dexNum]?.formes[0].ability1
-    const ability2 = PokemonData[this.dexNum]?.formes[0].ability2
-    if (this.abilityNum === 2 && ability2 && AbilityFromString(ability2) <= 77) {
+    const pokemonData = PokemonData[this.dexNum]
+    if (!pokemonData) return '—'
+
+    const forme = pokemonData.formes[this.formeNum]
+    if (!forme) return '—'
+
+    const { ability1, ability2, abilityH } = forme
+
+    if (this.hasHiddenAbility && abilityH) return abilityH
+    if (this.abilityNum === 2 && ability2) {
       return ability2
     }
+
     return ability1
   }
 

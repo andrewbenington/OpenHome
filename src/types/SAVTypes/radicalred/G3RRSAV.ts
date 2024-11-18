@@ -13,6 +13,7 @@ import { OHPKM } from '../../pkm/OHPKM'
 import { FRLG_SECURITY_COPY_OFFSET, FRLG_SECURITY_OFFSET } from '../G3SAV'
 import { Box, BoxCoordinates, PluginSAV } from '../SAV'
 import { PathData, splitPath } from '../path'
+import { LOOKUP_TYPE } from '../util'
 import PK3RR from './PK3RR'
 import { RRTransferMon } from './conversion/RRTransferMons'
 
@@ -155,6 +156,8 @@ export class G3RRSAV implements PluginSAV<PK3RR> {
   static TRAINER_OFFSET = 0x0ff4 * 0
   static TEAM_ITEMS_OFFSET = 0x0ff4 * 1
   static PC_OFFSET = 0x0ff4 * 5
+
+  static lookupType: LOOKUP_TYPE = 'gen345'
 
   primarySave: G3RRSaveBackup
   backupSave: G3RRSaveBackup
