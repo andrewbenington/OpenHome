@@ -68,6 +68,7 @@ export class PK3RR implements PluginPKMInterface {
   metLevel: number
   gameOfOrigin: number
   ball: number
+  canGigantamax: boolean
   ivs: Stats
   isEgg: boolean
   isNicknamed: boolean
@@ -174,23 +175,22 @@ export class PK3RR implements PluginPKMInterface {
       this.evs = readStatsFromBytes(dataView, 0x2b)
 
       // 49
-      this.pokerusByte = dataView.getUint8(0x31)
+      this.pokerusByte = dataView.getUint8(0x32)
 
       // 50
       this.metLocationIndex = dataView.getUint8(0x33)
 
       // 51:53
-      this.metLevel = dataView.getUint8(0x34)
+      this.metLevel = uIntFromBufferBits(dataView, 0x34, 0, 7, true)
 
-      // More research must be done into how the Game of origin is stored
-      const gor = uIntFromBufferBits(dataView, 0x33, 7, 4, true)
-      this.gameOfOrigin = gor === 8 || gor === 0 ? 6 : gor // Radical Red seems to use values from 1-15 for this field; this need more investigation
+      this.gameOfOrigin = uIntFromBufferBits(dataView, 0x34, 7, 4, true)
 
       // Until RR's handling of game of origin is better understood, set this by default. OHPKM will not update this field
       // if the mon was already being tracked before being transferred to Radical Red
       this.pluginOrigin = 'radical_red'
 
-      this.trainerGender = getFlag(dataView, 0x33, 15)
+      this.canGigantamax = getFlag(dataView, 0x34, 11)
+      this.trainerGender = getFlag(dataView, 0x34, 15)
 
       // 53:57
       this.ivs = read30BitIVsFromBytes(dataView, 0x35)
@@ -238,6 +238,7 @@ export class PK3RR implements PluginPKMInterface {
       } else {
         this.ball = Ball.Poke
       }
+      this.canGigantamax = !!other.canGigantamax
       this.ivs = other.ivs ?? {
         hp: 0,
         atk: 0,
@@ -317,15 +318,16 @@ export class PK3RR implements PluginPKMInterface {
     writeStatsToBytes(dataView, 0x2b, this.evs)
 
     // 49 Pokerus
-    dataView.setUint8(0x31, this.pokerusByte)
+    dataView.setUint8(0x32, this.pokerusByte)
 
     // 50 Met Location
     dataView.setUint8(0x33, this.metLocationIndex)
 
     // 51:52 Met Info (packed: Met level, Game of Origin, Trainer Gender)
-    dataView.setUint8(0x34, this.metLevel)
-    uIntToBufferBits(dataView, this.gameOfOrigin == 6 ? 8 : this.gameOfOrigin, 0x33, 7, 4, true)
-    setFlag(dataView, 0x33, 15, this.trainerGender)
+    uIntToBufferBits(dataView, this.metLevel, 0x34, 0, 7, true)
+    uIntToBufferBits(dataView, this.gameOfOrigin, 0x34, 7, 4, true)
+    setFlag(dataView, 0x34, 11, this.canGigantamax)
+    setFlag(dataView, 0x34, 15, this.trainerGender)
 
     // 53:57 IVs and Flags (30-bit IVs + 2 bits for flags)
     write30BitIVsToBytes(dataView, 0x35, this.ivs)
