@@ -533,8 +533,8 @@ const Gen3RRItems = [
   'PurpleNectar',
   'Necrozium Z',
   'Venusaurite',
-  'Charzardite X',
-  'Charzardite Y',
+  'Charizardite X',
+  'Charizardite Y',
   'Blastoisnite',
   'Beedrillite',
   'Pidgeotite',
@@ -753,7 +753,7 @@ const Gen3RRItems = [
 
 export function ItemGen3RRToString(index: number): string {
   if (index < 0 || index >= Gen3RRItems.length) {
-    return 'Index out of range'
+    return `Index ${index} out of range`
   }
   return Gen3RRItems[index]
 }

@@ -211,6 +211,7 @@ export class PK3RR implements PluginPKMInterface {
       this.dexNum = other.dexNum
       this.formeNum = other.formeNum
       this.privateHeldItemIndex = ItemGen3RRFromString(other.heldItemName)
+      console.log("ITEM", this.privateHeldItemIndex, other.heldItemName)
       this.heldItemIndex = ItemFromString(other.heldItemName)
       this.exp = other.exp
       this.movePPUps = other.movePPUps
@@ -353,6 +354,7 @@ export class PK3RR implements PluginPKMInterface {
   public get language() {
     return Languages[this.languageIndex]
   }
+
   public get heldItemName() {
     return ItemGen3RRToString(this.privateHeldItemIndex)
   }
