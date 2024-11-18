@@ -1,6 +1,6 @@
 import { GameOfOrigin } from 'pokemon-resources'
 import { NationalDex } from 'pokemon-species-data'
-import { BLOOD_MOON, ORIGIN, SPIKY_EAR } from '../../../consts/Formes'
+import { ORIGIN, SPIKY_EAR } from '../../../consts/Formes'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -26,7 +26,6 @@ const RR_TRANSFER_RESTRICTIONS: TransferRestrictions = {
     [NationalDex.Pichu]: [SPIKY_EAR],
     [NationalDex.Dialga]: [ORIGIN],
     [NationalDex.Palkia]: [ORIGIN],
-    [NationalDex.Ursaluna]: [BLOOD_MOON],
   },
 }
 

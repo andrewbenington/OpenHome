@@ -5436,7 +5436,7 @@ export const RadicalRedToNationalDexMap: Record<string, RadicalRedToNationalDexE
   },
   '1356': {
     NationalDexIndex: 901,
-    FormIndex: 0,
+    FormIndex: 1,
   },
   '1357': {
     NationalDexIndex: 1017,
