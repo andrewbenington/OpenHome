@@ -177,10 +177,10 @@ export class PK3RR implements PluginPKMInterface {
       this.pokerusByte = dataView.getUint8(0x31)
 
       // 50
-      this.metLocationIndex = dataView.getUint8(0x32)
+      this.metLocationIndex = dataView.getUint8(0x33)
 
       // 51:53
-      this.metLevel = uIntFromBufferBits(dataView, 0x33, 0, 7, true)
+      this.metLevel = dataView.getUint8(0x34)
 
       // More research must be done into how the Game of origin is stored
       const gor = uIntFromBufferBits(dataView, 0x33, 7, 4, true)
@@ -196,7 +196,6 @@ export class PK3RR implements PluginPKMInterface {
       this.ivs = read30BitIVsFromBytes(dataView, 0x35)
       this.isEgg = getFlag(dataView, 0x35, 30)
       this.isNicknamed = getFlag(dataView, 0x35, 31)
-      
     } else {
       const other = arg
       this.personalityValue = generatePersonalityValuePreservingAttributes(other) ?? 0
@@ -216,9 +215,7 @@ export class PK3RR implements PluginPKMInterface {
       this.exp = other.exp
       this.movePPUps = other.movePPUps
       this.trainerFriendship = other.trainerFriendship ?? 0
-      this.moves = other.moves
-        .map(toGen3RRMoveIndex)
-        .map(fromGen3RRMoveIndex)
+      this.moves = other.moves.map(toGen3RRMoveIndex).map(fromGen3RRMoveIndex)
 
       for (let i = 0; i < 4; i++) {
         const pp = getMoveMaxPP(this.moves[i], this.format, this.movePPUps[i])
@@ -323,10 +320,10 @@ export class PK3RR implements PluginPKMInterface {
     dataView.setUint8(0x31, this.pokerusByte)
 
     // 50 Met Location
-    dataView.setUint8(0x32, this.metLocationIndex)
+    dataView.setUint8(0x33, this.metLocationIndex)
 
     // 51:52 Met Info (packed: Met level, Game of Origin, Trainer Gender)
-    uIntToBufferBits(dataView, this.metLevel, 0x33, 0, 7, true)
+    dataView.setUint8(0x34, this.metLevel)
     uIntToBufferBits(dataView, this.gameOfOrigin == 6 ? 8 : this.gameOfOrigin, 0x33, 7, 4, true)
     setFlag(dataView, 0x33, 15, this.trainerGender)
 

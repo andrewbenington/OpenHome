@@ -83,23 +83,25 @@ const MetDataMovesDisplay = (props: { mon: PKMInterface }) => {
   }, [mon])
 
   const metMessage = useMemo(() => {
+    if (!mon.metLocationIndex) {
+      return 'Met location unknown.'
+    }
+
+    let message = 'Met'
     if (mon.pluginOrigin) {
       const saveType = getEnabledSaveTypes().find(
         (saveType) => mon.pluginOrigin === getPluginIdentifier(saveType)
       )
-      return `Met in ${saveType ? getGameName(saveType) : '(unknown game)'}`
+      message += ` in ${saveType ? getGameName(saveType) : '(unknown game)'}`
     }
-    if (!mon.metLocationIndex) {
-      return 'Met location unknown.'
-    }
-    let message = 'Met'
+
     if (mon.metTimeOfDay) {
       message += ` ${metTimesOfDay[mon.metTimeOfDay - 1]}`
     }
     if (mon.metDate) {
       message += ` on ${mon.metDate.month}/${mon.metDate.day}/${mon.metDate.year}`
     }
-    if (mon.gameOfOrigin) {
+    if (mon.gameOfOrigin && mon.metLocationIndex) {
       const location = getLocationString(mon.gameOfOrigin, mon.metLocationIndex, mon.format)
       message += ` ${location}`
     }
