@@ -114,6 +114,8 @@ export class PK3RR implements PluginPKMInterface {
   isLocked: boolean = false
   originalBytes?: Uint8Array
 
+  selectColor = '#660000'
+
   constructor(arg: ArrayBuffer | PKMInterface) {
     if (arg instanceof ArrayBuffer) {
       let buffer = arg

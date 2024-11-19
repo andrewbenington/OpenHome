@@ -7,6 +7,7 @@ export interface OfficialPKMInterface extends PKMInterface {
 
 export interface PluginPKMInterface extends PKMInterface {
   pluginIdentifier: string
+  selectColor: string
 }
 
 export type PKMInterface = AllPKMFields & {
@@ -15,4 +16,5 @@ export type PKMInterface = AllPKMFields & {
   pluginOrigin?: string
   isLocked?: boolean
   originalBytes?: Uint8Array
+  selectColor?: string
 }

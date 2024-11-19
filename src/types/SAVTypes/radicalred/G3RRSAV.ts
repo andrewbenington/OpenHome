@@ -236,6 +236,7 @@ export class G3RRSAV implements PluginSAV<PK3RR> {
 
     console.log(this.boxes)
   }
+  getExtraData?: (() => object) | undefined
 
   pcChecksumOffset?: number | undefined
   pcOffset?: number | undefined
@@ -304,7 +305,7 @@ export class G3RRSAV implements PluginSAV<PK3RR> {
   }
 
   gameColor() {
-    return '#F15C01'
+    return '#660000'
   }
 
   static includesOrigin(origin: GameOfOrigin) {

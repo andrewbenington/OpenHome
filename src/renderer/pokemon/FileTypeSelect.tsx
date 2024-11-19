@@ -45,12 +45,13 @@ const fileTypeColors: Record<string, string> = {
 interface FileTypeSelectProps {
   baseFormat: string
   currentFormat: string
+  color?: string
   formData: PKMFormData
   onChange: (selectedFormat: string) => void
 }
 
 const FileTypeSelect = (props: FileTypeSelectProps) => {
-  const { baseFormat, currentFormat, formData, onChange } = props
+  const { baseFormat, currentFormat, color, formData, onChange } = props
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
 
   const supportedFormats = useMemo(() => {
@@ -89,13 +90,15 @@ const FileTypeSelect = (props: FileTypeSelectProps) => {
       }}
       style={{
         ...styles.fileTypeChip,
-        backgroundColor: fileTypeColors[currentFormat],
+        backgroundColor: color ?? fileTypeColors[currentFormat],
       }}
     >
       <option value="OHPKM">OpenHome</option>
       {baseFormat === 'OHPKM' ? (
         supportedFormats.map((format) => (
-          <option key={format} value={format}>{format}</option>
+          <option key={format} value={format}>
+            {format}
+          </option>
         ))
       ) : (
         <option value={baseFormat}>{baseFormat}</option>

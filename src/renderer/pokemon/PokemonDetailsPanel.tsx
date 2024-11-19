@@ -55,6 +55,7 @@ const PokemonDetailsPanel = (props: {
           <FileTypeSelect
             baseFormat={mon.format}
             currentFormat={displayMon.format}
+            color={displayMon.selectColor}
             formData={mon}
             onChange={(newFormat) => {
               if (mon.format === newFormat) {
