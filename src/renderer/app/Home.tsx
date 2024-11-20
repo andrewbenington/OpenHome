@@ -59,7 +59,6 @@ const Home = () => {
   const [draggedItem, setDraggedItem] = useState<string | null>(null)
   const [tab, setTab] = useState('summary')
   const [openSaveDialog, setOpenSaveDialog] = useState(false)
-  const [openBagDialog, setOpenBagDialog] = useState(false)
   const [errorMessages, setErrorMessages] = useState<string[]>()
   const [filesToDelete, setFilesToDelete] = useState<string[]>([])
   const [bagItems, setBagItems] = useState(Bag.getItems())
@@ -323,32 +322,6 @@ const Home = () => {
           <MdFileOpen />
           Open Save
         </button>
-
-        {/* Open Bag Button */}
-        {!openBagDialog && (
-          <button
-            className="card-button"
-            onClick={() => setOpenBagDialog(true)}
-            style={{
-              backgroundColor: palette.primary.mainChannel,
-              marginBottom: 8,
-            }}
-          >
-            Open Bag
-          </button>
-        )}
-
-        {/* Conditionally render BagBox */}
-        {openBagDialog && (
-          <BagBox
-            onClose={() => setOpenBagDialog(false)}
-            removeItemFromPokemon={removeItemFromPokemon}
-            draggedMon={draggedMon}
-            setDraggedItem={setDraggedItem}
-            items={bagItems}
-            updateBag={updateBag}
-          />
-        )}
       </Stack>
 
       <div
@@ -380,7 +353,7 @@ const Home = () => {
       <Stack spacing={1} className="right-column" width={300}>
         <Tabs
           value={activeTab}
-          onChange={(e, newValue) => {
+          onChange={(_, newValue) => {
             if (typeof newValue === 'number') {
               setActiveTab(newValue)
             }
@@ -397,7 +370,6 @@ const Home = () => {
 
           <TabPanel value={1} sx={{ padding: 0 }}>
             <BagBox
-              onClose={() => setOpenBagDialog(false)}
               removeItemFromPokemon={removeItemFromPokemon}
               draggedMon={draggedMon}
               setDraggedItem={setDraggedItem}

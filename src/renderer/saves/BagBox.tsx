@@ -1,11 +1,9 @@
-import { Card, Grid, IconButton, Stack, Typography } from '@mui/joy'
+import { Card, Grid, Stack, Typography } from '@mui/joy'
 import { ItemFromString } from 'pokemon-resources'
 import { PKMInterface } from '../../types/interfaces'
-import { RemoveIcon } from '../components/Icons'
 import { Bag } from './Bag'
 
 interface BagBoxProps {
-  onClose: () => void
   removeItemFromPokemon: (itemName: string) => void
   draggedMon: PKMInterface | null
   setDraggedItem: React.Dispatch<React.SetStateAction<string | null>>
@@ -14,7 +12,6 @@ interface BagBoxProps {
 }
 
 const BagBox = ({
-  onClose,
   removeItemFromPokemon,
   draggedMon,
   setDraggedItem,
@@ -27,11 +24,6 @@ const BagBox = ({
   const getItemIconPath = (itemName: string) => {
     const itemId = ItemFromString(itemName)?.toString().padStart(4, '0')
     return itemId ? `/items/index/${itemId}.png` : ''
-  }
-
-  const handleOpenBag = () => {
-    console.log('Bag Contents:', items)
-    onClose()
   }
 
   const handlePokemonDrop = (e: React.DragEvent) => {
@@ -61,32 +53,6 @@ const BagBox = ({
 
   return (
     <Stack style={{ width: '100%' }}>
-      <Card
-        onClick={handleOpenBag}
-        sx={{
-          padding: 1,
-          cursor: 'pointer',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          minHeight: 40,
-          textAlign: 'center',
-        }}
-        variant="outlined"
-      >
-        <IconButton
-          //   onClick={onClose}
-          color="danger"
-          size="sm"
-          sx={{ position: 'absolute', left: 8 }}
-        >
-          <RemoveIcon />
-        </IconButton>
-
-        <Typography sx={{ fontWeight: 'bold' }}>Bag</Typography>
-      </Card>
-
       {/* Grid for Displaying Items */}
       <Card sx={{ marginTop: 1, padding: 1 }}>
         <Grid container spacing={1} component="div">
