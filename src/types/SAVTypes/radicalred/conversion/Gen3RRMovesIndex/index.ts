@@ -1016,6 +1016,7 @@ export function fromGen3RRMoveIndex(rrIndex: number): number {
 }
 
 export function toGen3RRMoveIndex(nationalMoveId: number): number {
+  if (nationalMoveId === 0) return 0
   const key = Moves[nationalMoveId]?.name
   return key ? NationalToRRMap[key][0] : -1
 }
