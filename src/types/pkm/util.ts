@@ -230,9 +230,7 @@ export const getTypes = (mon: PKMInterface) => {
     (mon.dexNum === NationalDex.Magnemite || mon.dexNum === NationalDex.Magneton)
   ) {
     types = ['Electric']
-  } else if (
-    ['PK1', 'PK2', 'PK3', 'PK3RR', 'COLOPKM', 'XDPKM', 'PK4', 'PK5'].includes(mon.format)
-  ) {
+  } else if (['PK1', 'PK2', 'PK3', 'COLOPKM', 'XDPKM', 'PK4', 'PK5'].includes(mon.format)) {
     if (types?.includes('Fairy')) {
       if (types.length === 1 || types.includes('Flying')) {
         types = types.map((type) => (type === 'Fairy' ? 'Normal' : type))

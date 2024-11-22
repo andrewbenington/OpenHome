@@ -119,9 +119,8 @@ export class OHPKM implements PKMInterface {
       this.nickname = other.nickname
       this.language = other.language
       this.gameOfOrigin = other.gameOfOrigin
-      if (other.pluginIdentifier) {
-        this.pluginOrigin = other.pluginIdentifier
-      }
+      this.pluginOrigin = other.pluginOrigin
+
       this.isEgg = other.isEgg ?? false
       this.pokerusByte = other.pokerusByte ?? 0
       this.trainerFriendship = other.trainerFriendship ?? 40
@@ -1140,10 +1139,12 @@ export class OHPKM implements PKMInterface {
   }
 
   public get pluginOrigin() {
+    if (this.bytes[0x1b1] === 0) return undefined
     return utf16BytesToString(this.bytes, 0x1b1, 32)
   }
 
-  public set pluginOrigin(value: string) {
+  public set pluginOrigin(value: string | undefined) {
+    if (value === undefined) return
     const utfBytes = utf16StringToBytes(value, 32)
     console.log(utfBytes.length, this.bytes.length, this.bytes.length - 433)
     this.bytes.set(utfBytes, 433)

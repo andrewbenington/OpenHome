@@ -55,6 +55,7 @@ const PokemonDetailsPanel = (props: {
           <FileTypeSelect
             baseFormat={mon.format}
             currentFormat={displayMon.format}
+            color={displayMon.selectColor}
             formData={mon}
             onChange={(newFormat) => {
               if (mon.format === newFormat) {
@@ -133,7 +134,7 @@ const PokemonDetailsPanel = (props: {
                 ? displayMon.originalBytes
                 : new Uint8Array(displayMon.toBytes({ includeExtraFields: true }))
             }
-            format={displayMon.format === 'PK3RR' ? undefined : displayMon.format}
+            format={displayMon.pluginIdentifier ? undefined : displayMon.format}
           />
         </TabPanel>
       </ErrorBoundary>
