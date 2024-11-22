@@ -9,8 +9,6 @@ files:
   - '!{.eslintignore,.eslintrc.cjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}'
   - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
-asarUnpack:
-  - resources/**
 win:
   executableName: openhome
   icon: build/icon.ico
@@ -41,7 +39,7 @@ linux:
     - deb:arm64
     - rpm:x64
     - rpm:arm64
-  maintainer: electronjs.org
+  maintainer: andrewbenington.dev
   category: Utility
 appImage:
   artifactName: ${name}-${version}-${arch}.${ext}
@@ -51,4 +49,4 @@ publish:
   releaseType: release
   owner: andrewbenington
   repo: OpenHome
-  publishAutoUpdate: 'true'
+  # publishAutoUpdate: 'true'
