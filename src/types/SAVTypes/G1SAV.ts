@@ -226,6 +226,10 @@ export class G1SAV implements SAV<PK1> {
   }
 
   static fileIsSave(bytes: Uint8Array): boolean {
+    // Gen 1 and Gen 2 saves are the same size, so assume it's Gen 2 if the Gen 2 checksums are valid
+    if (areCrystalInternationalChecksumsValid(bytes) || areGoldSilverChecksumsValid(bytes)) {
+      return false
+    }
     return bytes.length === SAVE_SIZE_BYTES
   }
 
@@ -246,4 +250,44 @@ export class G1SAV implements SAV<PK1> {
   static includesOrigin(origin: GameOfOrigin) {
     return origin >= GameOfOrigin.Red && origin <= GameOfOrigin.Yellow
   }
+}
+
+function areGoldSilverChecksumsValid(bytes: Uint8Array) {
+  const checksum1 = getGoldSilverInternationalChecksum1(bytes)
+  if (checksum1 !== bytes[0x2d69]) {
+    return false
+  }
+  const checksum2 = getGoldSilverInternationalChecksum2(bytes)
+  return checksum2 === bytes[0x7e6d]
+}
+
+function getGoldSilverInternationalChecksum1(bytes: Uint8Array) {
+  return get8BitChecksum(bytes, 0x2009, 0x2d68)
+}
+
+function getGoldSilverInternationalChecksum2(bytes: Uint8Array) {
+  let checksum = 0
+  checksum += get8BitChecksum(bytes, 0x15c7, 0x17ec)
+  checksum += get8BitChecksum(bytes, 0x3d96, 0x3f3f)
+  checksum += get8BitChecksum(bytes, 0x0c6b, 0x10e7)
+  checksum += get8BitChecksum(bytes, 0x7e39, 0x7e6c)
+  checksum += get8BitChecksum(bytes, 0x10e8, 0x15c6)
+  return checksum & 0xff
+}
+
+function getCrystalInternationalChecksum1(bytes: Uint8Array) {
+  return get8BitChecksum(bytes, 0x2009, 0x2b82)
+}
+
+function getCrystalInternationalChecksum2(bytes: Uint8Array) {
+  return get8BitChecksum(bytes, 0x1209, 0x1d82)
+}
+
+function areCrystalInternationalChecksumsValid(bytes: Uint8Array) {
+  const checksum1 = getCrystalInternationalChecksum1(bytes)
+  if (checksum1 !== bytes[0x2d0d]) {
+    return false
+  }
+  const checksum2 = getCrystalInternationalChecksum2(bytes)
+  return checksum2 === bytes[0x1f0d]
 }
