@@ -227,8 +227,8 @@ export class PK3RR implements PluginPKMInterface {
       this.gameOfOrigin = uIntFromBufferBits(dataView, 0x34, 7, 4, true)
       this.internalGameOfOrigin = this.gameOfOrigin
 
-      // Until RR's handling of game of origin is better understood, set this by default. OHPKM will not update this field
-      // if the mon was already being tracked before being transferred to Radical Red
+      // OHPKM will not copy this field if the mon was already being tracked before being
+      // transferred to Radical Red
       this.pluginOrigin = this.gameOfOrigin === INTERNAL_ORIGIN_FROM_RR ? 'radical_red' : undefined
 
       this.canGigantamax = getFlag(dataView, 0x34, 11)
@@ -282,7 +282,6 @@ export class PK3RR implements PluginPKMInterface {
 
         this.metLocationIndex = other.metLocationIndex ?? FIRERED_IN_GAME_TRADE
         this.internalMetLocationIndex = this.metLocationIndex
-      
       } else {
         this.gameOfOrigin = other.gameOfOrigin ?? INTERNAL_ORIGIN_NON_RR
         this.internalGameOfOrigin = INTERNAL_ORIGIN_NON_RR
@@ -290,7 +289,6 @@ export class PK3RR implements PluginPKMInterface {
         this.metLocationIndex = other.metLocationIndex ?? FIRERED_IN_GAME_TRADE
         this.internalMetLocationIndex = FIRERED_IN_GAME_TRADE
       }
-
 
       if (other.ball) {
         this.ball =
