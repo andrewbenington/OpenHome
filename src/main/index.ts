@@ -1,7 +1,6 @@
 import { electronApp, is, optimizer } from '@electron-toolkit/utils'
 import { app, BrowserWindow, dialog, shell } from 'electron'
 import { join } from 'path'
-import icon from '../../resources/icon.ico?asset'
 import version from '../consts/JSON/version.json'
 import { initializeFolders } from './fileHandlers'
 import { initListeners, OpenHomeAppBackend } from './initListeners'
@@ -14,7 +13,6 @@ function createWindow(): void {
     width: 1200,
     height: 720,
     show: false,
-    ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false,
