@@ -8,12 +8,12 @@ import { getPublicImageURL } from '../images/images'
 export type SaveViewMode = 'cards' | 'grid'
 
 export function getMonSaveLogo(mon: PKMInterface, supportedSaves: SAVClass[]) {
-  // if (mon.pluginOrigin) {
-  //   const pluginIdentifier = supportedSaves.find((s) => getPluginIdentifier(s) === mon.pluginOrigin)
-  //   return getPublicImageURL(`logos/${pluginIdentifier}.png`)
-  // }
+  if (mon.pluginOrigin) {
+    const pluginSave = supportedSaves.find((s) => getPluginIdentifier(s) === mon.pluginOrigin)
+    return `logos/${getPluginIdentifier(pluginSave)}.png`
+  }
   if (!mon.gameOfOrigin) {
-    return getPublicImageURL(getOriginMark('GB'))
+    return getOriginMark('GB')
   }
   if (mon.gameOfOrigin === GameOfOrigin.ColosseumXD) {
     switch (colosseumOrXD(mon.dexNum, mon.ribbons?.includes('National Ribbon') || mon.isShadow)) {

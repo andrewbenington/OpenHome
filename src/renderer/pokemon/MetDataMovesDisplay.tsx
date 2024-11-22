@@ -184,7 +184,9 @@ const MetDataMovesDisplay = (props: { mon: PKMInterface }) => {
             {mon.gameOfOrigin && (
               <img
                 draggable={false}
-                alt={`${GameOfOriginData[mon.gameOfOrigin]?.name} logo`}
+                alt={`${
+                  mon.pluginOrigin ? mon.pluginOrigin : GameOfOriginData[mon.gameOfOrigin]?.name
+                } logo`}
                 src={getPublicImageURL(getMonSaveLogo(mon, getEnabledSaveTypes()) ?? '')}
                 style={styles.gameImage}
               />

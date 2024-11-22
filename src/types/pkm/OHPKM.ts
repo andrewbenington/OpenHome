@@ -81,7 +81,6 @@ export class OHPKM implements PKMInterface {
   }
 
   bytes: Uint8Array = new Uint8Array(FILE_SIZE)
-  pluginIdentifier: undefined
 
   constructor(arg: PKMInterface | PluginPKMInterface | OHPKM | Uint8Array) {
     if (arg instanceof Uint8Array) {
@@ -1138,6 +1137,7 @@ export class OHPKM implements PKMInterface {
     this.bytes[0xee] = value
   }
 
+  // If met in a plugin save, this will be the save's plugin_identifier. otherwise this is empty
   public get pluginOrigin() {
     if (this.bytes[0x1b1] === 0) return undefined
     return utf16BytesToString(this.bytes, 0x1b1, 32)
