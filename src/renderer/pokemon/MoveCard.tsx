@@ -22,6 +22,7 @@ const MoveCard = ({ move, movePP, maxPP, typeOverride }: MoveCardProps) => {
     }
 
     if (!moveData) {
+      console.warn(`An unknown move has been detected. The move index is ${move}.`)
       // move is unknown
       return (
         <>
