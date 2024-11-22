@@ -98,8 +98,10 @@ export class PK3RR implements PluginPKMInterface {
   moves: number[]
   evs: Stats
   pokerusByte: number
+  internalMetLocationIndex: number
   metLocationIndex: number
   metLevel: number
+  internalGameOfOrigin: number
   gameOfOrigin: number
   ball: number
   canGigantamax: boolean
@@ -217,11 +219,13 @@ export class PK3RR implements PluginPKMInterface {
 
       // 50
       this.metLocationIndex = dataView.getUint8(0x33)
+      this.internalMetLocationIndex = this.metLocationIndex
 
       // 51:53
       this.metLevel = uIntFromBufferBits(dataView, 0x34, 0, 7, true)
 
       this.gameOfOrigin = uIntFromBufferBits(dataView, 0x34, 7, 4, true)
+      this.internalGameOfOrigin = this.gameOfOrigin
 
       // Until RR's handling of game of origin is better understood, set this by default. OHPKM will not update this field
       // if the mon was already being tracked before being transferred to Radical Red
@@ -274,11 +278,19 @@ export class PK3RR implements PluginPKMInterface {
       const fromRadicalRed = other.pluginOrigin === 'radical_red'
       if (fromRadicalRed) {
         this.gameOfOrigin = INTERNAL_ORIGIN_FROM_RR
+        this.internalGameOfOrigin = this.gameOfOrigin
+
         this.metLocationIndex = other.metLocationIndex ?? FIRERED_IN_GAME_TRADE
+        this.internalMetLocationIndex = this.metLocationIndex
+      
       } else {
-        this.gameOfOrigin = INTERNAL_ORIGIN_NON_RR
-        this.metLocationIndex = FIRERED_IN_GAME_TRADE
+        this.gameOfOrigin = other.gameOfOrigin ?? INTERNAL_ORIGIN_NON_RR
+        this.internalGameOfOrigin = INTERNAL_ORIGIN_NON_RR
+
+        this.metLocationIndex = other.metLocationIndex ?? FIRERED_IN_GAME_TRADE
+        this.internalMetLocationIndex = FIRERED_IN_GAME_TRADE
       }
+
 
       if (other.ball) {
         this.ball =
@@ -385,7 +397,7 @@ export class PK3RR implements PluginPKMInterface {
 
     // 51:52 Met Info (packed: Met level, Game of Origin, Trainer Gender)
     uIntToBufferBits(dataView, this.metLevel, 0x34, 0, 7, true)
-    uIntToBufferBits(dataView, this.gameOfOrigin, 0x34, 7, 4, true)
+    uIntToBufferBits(dataView, this.internalGameOfOrigin, 0x34, 7, 4, true)
     setFlag(dataView, 0x34, 11, this.canGigantamax)
     setFlag(dataView, 0x34, 15, this.trainerGender)
 
