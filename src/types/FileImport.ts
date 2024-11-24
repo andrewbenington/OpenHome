@@ -12,13 +12,14 @@ import {
   PK7,
   PK8,
   PK9,
-  PKMType,
   XDPKM,
 } from 'pokemon-files'
+import { PKMInterface } from './interfaces'
 import { OHPKM } from './pkm/OHPKM'
-import { PKMFile } from './pkm/util'
+import { PK3RR } from './SAVTypes/radicalred/PK3RR'
+import { PKMClass } from './SAVTypes/util'
 
-function fileTypeFromBytes(bytes: Uint8Array): PKMType | undefined {
+function fileTypeFromBytes(bytes: Uint8Array): PKMClass | undefined {
   switch (bytes.length) {
     case 69:
       return PK1
@@ -27,6 +28,8 @@ function fileTypeFromBytes(bytes: Uint8Array): PKMType | undefined {
     case 80:
     case 100:
       return PK3
+    case 58:
+      return PK3RR
     case 136:
       return bytes[0x5f] < 20 ? PK4 : PK5
     case 236:
@@ -38,7 +41,7 @@ function fileTypeFromBytes(bytes: Uint8Array): PKMType | undefined {
   }
 }
 
-export function fileTypeFromString(type: string): PKMType | typeof OHPKM | undefined {
+export function fileTypeFromString(type: string): PKMClass | typeof OHPKM | undefined {
   switch (type) {
     case 'PK1':
       return PK1
@@ -46,6 +49,8 @@ export function fileTypeFromString(type: string): PKMType | typeof OHPKM | undef
       return PK2
     case 'PK3':
       return PK3
+    case 'PK3RR':
+      return PK3RR
     case 'COLOPKM':
       return COLOPKM
     case 'XDPKM':
@@ -75,8 +80,8 @@ export function fileTypeFromString(type: string): PKMType | typeof OHPKM | undef
   }
 }
 
-export const bytesToPKM = (bytes: Uint8Array, extension: string): PKMFile => {
-  let T: PKMType | typeof OHPKM | undefined
+export const bytesToPKM = (bytes: Uint8Array, extension: string): PKMInterface => {
+  let T: PKMClass | typeof OHPKM | undefined
   if (extension === '' || extension === 'PKM') {
     T = fileTypeFromBytes(bytes)
   } else {
@@ -85,5 +90,6 @@ export const bytesToPKM = (bytes: Uint8Array, extension: string): PKMFile => {
   if (!T) {
     throw `Unrecognized file`
   }
-  return T.fromBytes(bytes.buffer as ArrayBuffer)
+  const buffer = bytes.buffer.slice(bytes.byteOffset, bytes.byteLength + bytes.byteOffset)
+  return T.fromBytes(buffer as ArrayBuffer)
 }

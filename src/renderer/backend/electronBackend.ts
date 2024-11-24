@@ -1,6 +1,6 @@
 import { createContext } from 'react'
 import BackendInterface from '../../types/backendInterface'
-import { ParsedPath, PossibleSaves } from '../../types/SAVTypes/path'
+import { PathData, PossibleSaves } from '../../types/SAVTypes/path'
 import { SaveFolder, StoredBoxData } from '../../types/storage'
 import { Errorable, LoadSaveResponse, LookupMap, SaveRef } from '../../types/types'
 
@@ -38,7 +38,7 @@ export const ElectronBackend: BackendInterface = {
   },
 
   /* game saves */
-  loadSaveFile: (filePath?: ParsedPath): Promise<Errorable<LoadSaveResponse>> => {
+  loadSaveFile: (filePath?: PathData): Promise<Errorable<LoadSaveResponse>> => {
     return window.electron.ipcRenderer.invoke('load-save-file', filePath)
   },
   writeSaveFile: (path: string, bytes: Uint8Array) => {

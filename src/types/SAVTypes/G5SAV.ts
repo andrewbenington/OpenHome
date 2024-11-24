@@ -1,6 +1,6 @@
 import { uniq } from 'lodash'
 import { PK5 } from 'pokemon-files'
-import { GameOfOrigin } from 'pokemon-resources'
+import { GameOfOrigin, GameOfOriginData } from 'pokemon-resources'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -10,7 +10,7 @@ import { CRC16_CCITT } from '../../util/Encryption'
 import { gen5StringToUTF } from '../../util/Strings/StringConverter'
 import { OHPKM } from '../pkm/OHPKM'
 import { Box, BoxCoordinates, SAV } from './SAV'
-import { ParsedPath } from './path'
+import { PathData } from './path'
 import { hasDesamumeFooter, LOOKUP_TYPE } from './util'
 
 const PC_OFFSET = 0x400
@@ -24,13 +24,15 @@ export abstract class G5SAV implements SAV<PK5> {
   static SAVE_SIZE_BYTES = 0x80000
   static lookupType: LOOKUP_TYPE = 'gen345'
 
+  static saveTypeAbbreviation = 'BW/BW2'
+
   origin: GameOfOrigin = 0
   isPlugin: false = false
 
   boxRows = 5
   boxColumns = 6
 
-  filePath: ParsedPath
+  filePath: PathData
   fileCreated?: Date
 
   money: number = 0 // TODO: Gen 5 money
@@ -58,7 +60,7 @@ export abstract class G5SAV implements SAV<PK5> {
 
   checksumMirrorsChecksumOffset: number = 0x23f9a
 
-  constructor(path: ParsedPath, bytes: Uint8Array) {
+  constructor(path: PathData, bytes: Uint8Array) {
     this.bytes = bytes
     this.filePath = path
     this.boxes = new Array(G5SAV.BOX_COUNT)
@@ -173,6 +175,11 @@ export abstract class G5SAV implements SAV<PK5> {
     return this.boxes[this.currentPCBox]
   }
 
+  getGameName() {
+    const gameOfOrigin = GameOfOriginData[this.origin]
+    return gameOfOrigin ? `Pokémon ${gameOfOrigin.name}` : '(Unknown Game)'
+  }
+
   static gen4ValidDateAndSize(bytes: Uint8Array, offset: number) {
     const size = bytesToUint32LittleEndian(bytes, offset - 0xc)
     if (size !== (offset & 0xffff)) return false
@@ -210,5 +217,9 @@ export abstract class G5SAV implements SAV<PK5> {
       default:
         return '#666666'
     }
+  }
+
+  getPluginIdentifier() {
+    return undefined
   }
 }

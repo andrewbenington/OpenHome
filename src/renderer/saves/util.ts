@@ -1,14 +1,50 @@
 import dayjs from 'dayjs'
-import { getGameLogo, getOriginMark } from '../images/game'
+import { colosseumOrXD, ColosseumOrXD, GameOfOrigin, GameOfOriginData } from 'pokemon-resources'
+import { PKMInterface } from '../../types/interfaces'
+import { getPluginIdentifier, SAVClass } from '../../types/SAVTypes/util'
+import { GameLogos, getOriginMark } from '../images/game'
 import { getPublicImageURL } from '../images/images'
 
 export type SaveViewMode = 'cards' | 'grid'
 
-export function getSaveLogo(game?: string | number) {
-  if (!game) {
+export function getMonSaveLogo(mon: PKMInterface, supportedSaves: SAVClass[]) {
+  if (mon.pluginOrigin) {
+    const pluginSave = supportedSaves.find((s) => getPluginIdentifier(s) === mon.pluginOrigin)
+    return `logos/${getPluginIdentifier(pluginSave)}.png`
+  }
+  if (!mon.gameOfOrigin) {
+    return getOriginMark('GB')
+  }
+  if (mon.gameOfOrigin === GameOfOrigin.ColosseumXD) {
+    switch (colosseumOrXD(mon.dexNum, mon.ribbons?.includes('National Ribbon') || mon.isShadow)) {
+      case ColosseumOrXD.Colosseum:
+        return GameLogos.Colosseum
+      case ColosseumOrXD.XD:
+        return GameLogos.XD
+      case ColosseumOrXD.NotDeterminable:
+        return GameLogos.ColosseumXD
+    }
+  }
+  if (mon.gameOfOrigin === -1) {
+    return GameLogos.GB
+  }
+  return GameLogos[
+    GameOfOriginData[mon.gameOfOrigin]?.logo ??
+      GameOfOriginData[mon.gameOfOrigin]?.name.replace(' ', '') ??
+      ''
+  ]
+}
+
+export function getSaveLogo(saveType: SAVClass | undefined, origin: GameOfOrigin): string {
+  if (saveType?.prototype.getPluginIdentifier.call({})) {
+    return getPublicImageURL(`logos/${saveType.prototype.getPluginIdentifier.call({})}.png`)
+  }
+  if (!origin) {
     return getPublicImageURL(getOriginMark('GB'))
   }
-  return getPublicImageURL(getGameLogo(typeof game === 'string' ? parseInt(game) : game))
+  return GameLogos[
+    GameOfOriginData[origin]?.logo ?? GameOfOriginData[origin]?.name.replace(' ', '') ?? ''
+  ]
 }
 
 export function formatTimeSince(timestamp?: number) {

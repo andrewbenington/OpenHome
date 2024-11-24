@@ -2,7 +2,7 @@ import { GameOfOrigin } from 'pokemon-resources'
 import { SaveRef } from '../../types/types'
 import { PKMInterface } from '../interfaces'
 import { OHPKM } from '../pkm/OHPKM'
-import { ParsedPath } from './path'
+import { PathData } from './path'
 
 export class Box<P extends PKMInterface> {
   name: string
@@ -25,7 +25,7 @@ export interface SAV<P extends PKMInterface = PKMInterface> {
   boxRows: number
   boxColumns: number
 
-  filePath: ParsedPath
+  filePath: PathData
   fileCreated?: Date
 
   money: number
@@ -49,7 +49,7 @@ export interface SAV<P extends PKMInterface = PKMInterface> {
 
   gameColor: () => string
   isPlugin: boolean
-  pluginIdentifier?: string
+  getPluginIdentifier: () => string | undefined
 
   getCurrentBox: () => Box<P>
   supportsMon: (dexNumber: number, formeNumber: number) => boolean
@@ -58,10 +58,14 @@ export interface SAV<P extends PKMInterface = PKMInterface> {
   prepareBoxesAndGetModified: () => OHPKM[]
 
   calculateChecksum?: () => number
+
+  getGameName: () => string
+
+  getExtraData?: () => object
 }
 
 export type PluginSAV<P extends PKMInterface = PKMInterface> = SAV<P> & {
-  pluginIdentifier: string
+  getPluginIdentifier: () => string
   isPlugin: true
 }
 
@@ -72,6 +76,6 @@ export function getSaveRef(save: SAV): SaveRef {
     trainerName: save.name ? save.name : undefined,
     trainerID: save.displayID,
     lastOpened: Date.now(),
-    pluginIdentifier: save.pluginIdentifier,
+    pluginIdentifier: save.getPluginIdentifier(),
   }
 }
