@@ -9,8 +9,19 @@ files:
   - '!{.eslintignore,.eslintrc.cjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}'
   - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
-asarUnpack:
-  - resources/**
+fileAssociations:
+  - ext: 'pkm'
+    name: 'Pokémon Data File'
+    mimeType: 'application/pokemon'
+  - ext: 'pk6'
+    name: 'Pokémon Data File (XY/ORAS)'
+    mimeType: 'application/pokemon.xy_oras'
+  - ext: 'pk7'
+    name: 'Pokémon Data File (SM/USUM)'
+    mimeType: 'application/pokemon.sm_usum'
+  - ext: 'pk8'
+    name: 'Pokémon Data File (SwSh)'
+    mimeType: 'application/pokemon.swsh'
 win:
   executableName: openhome
   icon: build/icon.ico
@@ -41,7 +52,7 @@ linux:
     - deb:arm64
     - rpm:x64
     - rpm:arm64
-  maintainer: electronjs.org
+  maintainer: andrewbenington.dev
   category: Utility
 appImage:
   artifactName: ${name}-${version}-${arch}.${ext}
@@ -51,4 +62,4 @@ publish:
   releaseType: release
   owner: andrewbenington
   repo: OpenHome
-  publishAutoUpdate: 'true'
+  # publishAutoUpdate: 'true'

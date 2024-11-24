@@ -6,11 +6,8 @@ interface RawDisplayProps {
   format?: string
 }
 
-const RawDisplay = ({ bytes, format }: RawDisplayProps) => {
-  return format && format in FileSchemas ? (
-    <HexEditor data={bytes} format={format as keyof typeof FileSchemas} />
-  ) : (
-    <div />
-  )
-}
+const RawDisplay = ({ bytes, format }: RawDisplayProps) => (
+  <HexEditor data={bytes} format={format as keyof typeof FileSchemas | undefined} />
+)
+
 export default RawDisplay

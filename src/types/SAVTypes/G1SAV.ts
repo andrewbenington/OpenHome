@@ -1,6 +1,6 @@
 import lodash from 'lodash'
 import { PK1 } from 'pokemon-files'
-import { GameOfOrigin, Languages } from 'pokemon-resources'
+import { GameOfOrigin, GameOfOriginData, Languages } from 'pokemon-resources'
 import { NationalDex } from 'pokemon-species-data'
 import { GEN1_TRANSFER_RESTRICTIONS } from '../../consts/TransferRestrictions'
 import { bytesToUint16BigEndian, get8BitChecksum } from '../../util/ByteLogic'
@@ -8,7 +8,7 @@ import { natDexToGen1ID } from '../../util/ConvertPokemonID'
 import { gen12StringToUTF, utf16StringToGen12 } from '../../util/Strings/StringConverter'
 import { OHPKM } from '../pkm/OHPKM'
 import { Box, BoxCoordinates, SAV } from './SAV'
-import { ParsedPath } from './path'
+import { PathData } from './path'
 import { LOOKUP_TYPE } from './util'
 
 const SAVE_SIZE_BYTES = 0x8000
@@ -41,7 +41,7 @@ export class G1SAV implements SAV<PK1> {
   boxRows = 4
   boxColumns = 5
 
-  filePath: ParsedPath
+  filePath: PathData
   fileCreated?: Date
 
   money: number = 0 // TODO: set money for gen 1 saves
@@ -59,7 +59,7 @@ export class G1SAV implements SAV<PK1> {
 
   updatedBoxSlots: BoxCoordinates[] = []
 
-  constructor(path: ParsedPath, bytes: Uint8Array, fileCreated?: Date) {
+  constructor(path: PathData, bytes: Uint8Array, fileCreated?: Date) {
     this.bytes = bytes
     this.filePath = path
     this.fileCreated = fileCreated
@@ -132,6 +132,10 @@ export class G1SAV implements SAV<PK1> {
       }
     })
   }
+  sid?: number | undefined
+  pcChecksumOffset?: number | undefined
+  pcOffset?: number | undefined
+  calculateChecksum?: (() => number) | undefined
 
   prepareBoxesAndGetModified() {
     const changedMonPKMs: OHPKM[] = []
@@ -225,7 +229,19 @@ export class G1SAV implements SAV<PK1> {
     return this.boxes[this.currentPCBox]
   }
 
+  getGameName() {
+    const gameOfOrigin = GameOfOriginData[this.origin]
+    return gameOfOrigin ? `Pokémon ${gameOfOrigin.name}` : '(Unknown Game)'
+  }
+
+  static saveTypeAbbreviation = 'RBY (Int)'
+  static saveTypeName = 'Pokémon Red/Blue/Yellow (INT)'
+
   static fileIsSave(bytes: Uint8Array): boolean {
+    // Gen 1 and Gen 2 saves are the same size, so assume it's Gen 2 if the Gen 2 checksums are valid
+    if (areCrystalInternationalChecksumsValid(bytes) || areGoldSilverChecksumsValid(bytes)) {
+      return false
+    }
     return bytes.length === SAVE_SIZE_BYTES
   }
 
@@ -246,4 +262,48 @@ export class G1SAV implements SAV<PK1> {
   static includesOrigin(origin: GameOfOrigin) {
     return origin >= GameOfOrigin.Red && origin <= GameOfOrigin.Yellow
   }
+
+  getPluginIdentifier() {
+    return undefined
+  }
+}
+
+function areGoldSilverChecksumsValid(bytes: Uint8Array) {
+  const checksum1 = getGoldSilverInternationalChecksum1(bytes)
+  if (checksum1 !== bytes[0x2d69]) {
+    return false
+  }
+  const checksum2 = getGoldSilverInternationalChecksum2(bytes)
+  return checksum2 === bytes[0x7e6d]
+}
+
+function getGoldSilverInternationalChecksum1(bytes: Uint8Array) {
+  return get8BitChecksum(bytes, 0x2009, 0x2d68)
+}
+
+function getGoldSilverInternationalChecksum2(bytes: Uint8Array) {
+  let checksum = 0
+  checksum += get8BitChecksum(bytes, 0x15c7, 0x17ec)
+  checksum += get8BitChecksum(bytes, 0x3d96, 0x3f3f)
+  checksum += get8BitChecksum(bytes, 0x0c6b, 0x10e7)
+  checksum += get8BitChecksum(bytes, 0x7e39, 0x7e6c)
+  checksum += get8BitChecksum(bytes, 0x10e8, 0x15c6)
+  return checksum & 0xff
+}
+
+function getCrystalInternationalChecksum1(bytes: Uint8Array) {
+  return get8BitChecksum(bytes, 0x2009, 0x2b82)
+}
+
+function getCrystalInternationalChecksum2(bytes: Uint8Array) {
+  return get8BitChecksum(bytes, 0x1209, 0x1d82)
+}
+
+function areCrystalInternationalChecksumsValid(bytes: Uint8Array) {
+  const checksum1 = getCrystalInternationalChecksum1(bytes)
+  if (checksum1 !== bytes[0x2d0d]) {
+    return false
+  }
+  const checksum2 = getCrystalInternationalChecksum2(bytes)
+  return checksum2 === bytes[0x1f0d]
 }

@@ -8,7 +8,7 @@
     "src/resources/**/*",
     "src/types/**/*",
     "src/util/**/*",
-    "src/preload/*.d.ts",
+    "src/preload/*.d.ts", "generate/_rename.js",
   ],
   "compilerOptions": {
     "composite": true,

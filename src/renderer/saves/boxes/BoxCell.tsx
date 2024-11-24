@@ -1,3 +1,4 @@
+import { ItemFromString } from 'pokemon-resources'
 import React, { useContext, useEffect, useMemo, useState } from 'react'
 import PokemonIcon from 'src/renderer/components/PokemonIcon'
 import { FilterContext } from 'src/renderer/state/filter'
@@ -6,7 +7,6 @@ import { filterApplies } from 'src/types/Filter'
 import { Styles } from 'src/types/types'
 import { PKMInterface } from '../../../types/interfaces'
 import BoxIcons from '../../images/BoxIcons.png'
-import { ItemFromString } from 'pokemon-resources'
 import { Bag } from '../Bag'
 
 const styles = {
@@ -41,15 +41,27 @@ interface BoxCellProps {
   zIndex: number
   mon: PKMInterface | undefined
   borderColor?: string
-  setDraggedMon: React.Dispatch<React.SetStateAction<PKMFile | null>>
-  updateBag: () => void 
+  setDraggedMon: React.Dispatch<React.SetStateAction<PKMInterface | null>>
+  updateBag: () => void
 }
 
 const BoxCell = (props: BoxCellProps) => {
-  const { onClick, onDragEvent, onDrop, disabled, zIndex, mon, borderColor, setDraggedMon, updateBag } = props
+  const {
+    onClick,
+    onDragEvent,
+    onDrop,
+    disabled: disabledProp,
+    zIndex,
+    mon,
+    borderColor,
+    setDraggedMon,
+    updateBag,
+  } = props
   const [isBeingDragged, setIsBeingDragged] = useState(false)
   const [isDraggedOver, setIsDraggedOver] = useState(false)
   const [filterState] = useContext(FilterContext)
+
+  const disabled = disabledProp || (mon?.isLocked ?? false)
 
   const isFilteredOut = useMemo(() => {
     return (
@@ -87,11 +99,11 @@ const BoxCell = (props: BoxCellProps) => {
         Bag.popItem(droppedData)
         updateBag()
         console.log(`Removed item "${droppedData}" from Bag`)
-
       } else if (itemId && mon?.heldItemIndex) {
         console.log('Pokémon already holds an item!')
       }
-    } else if (e.dataTransfer.files[0]) { // dropped data is files
+    } else if (e.dataTransfer.files[0]) {
+      // dropped data is files
       onDropFromFiles(e.dataTransfer.files)
     } else {
       onDrop(undefined)
@@ -142,11 +154,11 @@ const BoxCell = (props: BoxCellProps) => {
             transition: '0.01s, background-color 0s',
             transform: isBeingDragged ? 'translateX(-9999px)' : undefined,
           }}
-          draggable
+          draggable={!(mon?.isLocked ?? false)}
           onDragStart={() => {
             onDragEvent(false)
             setIsBeingDragged(true)
-            
+
             if (mon?.heldItemIndex) {
               setDraggedMon(mon)
             }

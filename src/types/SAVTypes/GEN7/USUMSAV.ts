@@ -1,7 +1,7 @@
 import { GameOfOrigin } from 'pokemon-resources'
 import { USUM_TRANSFER_RESTRICTIONS } from '../../../consts/TransferRestrictions'
 import { isRestricted } from '../../TransferRestrictions'
-import { ParsedPath } from '../path'
+import { PathData } from '../path'
 import { G7SAV } from './G7SAV'
 
 const PC_OFFSET = 0x05200
@@ -13,7 +13,7 @@ const SAVE_SIZE_BYTES = 0x6cc00
 export class USUMSAV extends G7SAV {
   boxNamesOffset: number = BOX_NAMES_OFFSET
 
-  constructor(path: ParsedPath, bytes: Uint8Array) {
+  constructor(path: PathData, bytes: Uint8Array) {
     super(path, bytes, PC_OFFSET, PC_CHECKSUM_OFFSET, BOX_NAMES_OFFSET)
   }
 

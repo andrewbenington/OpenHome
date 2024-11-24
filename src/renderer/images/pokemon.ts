@@ -1,6 +1,9 @@
 import { NationalDex, PokemonData } from 'pokemon-species-data'
-import { SWEETS } from '../../consts/Formes'
+
+import { BLOOD_MOON, SWEETS } from '../../consts/Formes'
 import { PKMInterface } from '../../types/interfaces'
+import { toGen3RRPokemonIndex } from '../../types/SAVTypes/radicalred/conversion/Gen3RRPokemonIndex'
+import { RRSprites } from '../../types/SAVTypes/radicalred/conversion/RadicalRedSprites'
 
 const alolaDex = [
   10, 11, 12, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 35, 36, 37, 38, 39, 40, 41, 42, 46, 47, 50,
@@ -58,8 +61,13 @@ export const getPokemonSpritePath = (mon: PKMInterface, format?: string) => {
   if (spriteFolder === 'gen7' && !alolaDex.includes(mon.dexNum)) {
     spriteFolder = 'gen6'
   } else if (spriteFolder == 'rr') {
-    const gen3RRindex = toGen3RRPokemonIndex(mon.dexNum, mon.formeNum)
-    return `sprites/${spriteFolder}/${gen3RRindex}.png`
+    if (mon.dexNum === NationalDex.Ursaluna && mon.formeNum === BLOOD_MOON) {
+      return 'sprites/home/ursaluna-bloodmoon.png'
+    }
+    let gen3RRname = RRSprites[toGen3RRPokemonIndex(mon.dexNum, mon.formeNum)]
+    if (gen3RRname.length === 0) return gen3RRname
+    gen3RRname = gen3RRname[0].toUpperCase() + gen3RRname.slice(1).toLowerCase()
+    return `sprites/${spriteFolder}/${gen3RRname}`
   }
   return `sprites/${spriteFolder}${
     mon.isShiny() && spriteFolder !== 'gen1' && spriteFolder !== 'gen9' ? '/shiny/' : '/'

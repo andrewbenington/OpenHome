@@ -119,6 +119,10 @@ the future.
 - Pokémon Sun/Moon
 - Pokémon Ultra Sun/Ultra Moon
 
+### Supported ROM Hack formats
+
+- Pokémon Radical Red
+
 ## Alterations to transferred Pokémon
 
 When moving Pokémon to an older game, some compromises have to be made. OpenHome will

@@ -1,5 +1,5 @@
 import { PK4 } from 'pokemon-files'
-import { GameOfOrigin } from 'pokemon-resources'
+import { GameOfOrigin, GameOfOriginData } from 'pokemon-resources'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -8,7 +8,7 @@ import {
 import { CRC16_CCITT } from '../../../util/Encryption'
 import { gen4StringToUTF } from '../../../util/Strings/StringConverter'
 import { OHPKM } from '../../pkm/OHPKM'
-import { ParsedPath } from '../path'
+import { PathData } from '../path'
 import { Box, BoxCoordinates, SAV } from '../SAV'
 import { LOOKUP_TYPE } from '../util'
 
@@ -24,7 +24,7 @@ export abstract class G4SAV implements SAV<PK4> {
   boxRows = 5
   boxColumns = 6
 
-  filePath: ParsedPath
+  filePath: PathData
   fileCreated?: Date
 
   money: number = 0 // TODO: Gen 4 money
@@ -56,7 +56,7 @@ export abstract class G4SAV implements SAV<PK4> {
 
   footerSize: number = 0x14
 
-  constructor(path: ParsedPath, bytes: Uint8Array) {
+  constructor(path: PathData, bytes: Uint8Array) {
     this.bytes = bytes
     this.filePath = path
     this.boxes = Array(G4SAV.BOX_COUNT)
@@ -66,6 +66,10 @@ export abstract class G4SAV implements SAV<PK4> {
     }
     this.origin = bytes[0x80]
   }
+  pluginIdentifier?: string | undefined
+  pcChecksumOffset?: number | undefined
+  pcOffset?: number | undefined
+  calculateChecksum?: (() => number) | undefined
 
   buildBoxes() {
     if (bytesToUint32LittleEndian(this.bytes, this.currentSaveBoxStartOffset) === 0xffffffff) {
@@ -165,6 +169,14 @@ export abstract class G4SAV implements SAV<PK4> {
     return this.boxes[this.currentPCBox]
   }
 
+  getGameName() {
+    const gameOfOrigin = GameOfOriginData[this.origin]
+    return gameOfOrigin ? `Pokémon ${gameOfOrigin.name}` : '(Unknown Game)'
+  }
+
+  static saveTypeAbbreviation = 'DPPt/HGSS'
+  static saveTypeName = 'Pokémon Diamond/Pearl/Platinum/HeartGold/SoulSilver'
+
   // Gen 4 saves include a size and hex "date" that can identify save type
   static validDateAndSize(bytes: Uint8Array, offset: number) {
     const size = bytesToUint32LittleEndian(bytes, offset - 0xc)
@@ -198,5 +210,9 @@ export abstract class G4SAV implements SAV<PK4> {
       (origin >= GameOfOrigin.Diamond && origin <= GameOfOrigin.Platinum) ||
       (origin >= GameOfOrigin.HeartGold && origin <= GameOfOrigin.SoulSilver)
     )
+  }
+
+  getPluginIdentifier() {
+    return undefined
   }
 }

@@ -5,7 +5,7 @@ import { TransferRestrictions } from '../TransferRestrictions'
 import { OHPKM } from '../pkm/OHPKM'
 import { BoxMonIdentifiers } from '../storage'
 import { Box, BoxCoordinates, SAV } from './SAV'
-import { emptyParsedPath, ParsedPath } from './path'
+import { emptyPathData, PathData } from './path'
 
 export class HomeBox implements Box<OHPKM> {
   name: string
@@ -47,7 +47,7 @@ export class HomeData implements SAV<OHPKM> {
 
   transferRestrictions: TransferRestrictions = {}
 
-  filePath: ParsedPath = emptyParsedPath
+  filePath: PathData = emptyPathData
   fileCreated?: Date
 
   money: number = 0
@@ -71,9 +71,17 @@ export class HomeData implements SAV<OHPKM> {
     this.boxNames = lodash.range(36).map((i) => `Box ${i + 1}`)
     this.boxes = this.boxNames.map((name) => new HomeBox(name))
   }
+  pluginIdentifier?: string | undefined
+  pcChecksumOffset?: number | undefined
+  pcOffset?: number | undefined
+  calculateChecksum?: (() => number) | undefined
 
   getCurrentBox() {
     return this.boxes[this.currentPCBox]
+  }
+
+  getGameName() {
+    return 'OpenHome'
   }
 
   prepareBoxesAndGetModified() {
@@ -86,5 +94,9 @@ export class HomeData implements SAV<OHPKM> {
 
   gameColor() {
     return '#7DCEAB'
+  }
+
+  getPluginIdentifier() {
+    return undefined
   }
 }

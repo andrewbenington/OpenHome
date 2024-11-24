@@ -1,5 +1,7 @@
 import { useContext } from 'react'
-import { getSaveLogo } from 'src/renderer/saves/util'
+import { getPublicImageURL } from 'src/renderer/images/images'
+import { getMonSaveLogo } from 'src/renderer/saves/util'
+import { AppInfoContext } from 'src/renderer/state/appInfo'
 import { OHPKM } from 'src/types/pkm/OHPKM'
 import { numericSorter, stringSorter } from 'src/util/Sort'
 import OHDataGrid, { SortableColumn } from '../../components/OHDataGrid'
@@ -14,6 +16,7 @@ type G345LookupRow = {
 
 export default function Gen345Lookup() {
   const [{ homeMons, gen345 }] = useContext(LookupContext)
+  const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
 
   function pokemonFromLookupID(id: string) {
     if (!homeMons) return undefined
@@ -50,7 +53,11 @@ export default function Gen345Lookup() {
       width: 130,
       renderValue: (value) =>
         value.homeMon && (
-          <img alt="save logo" height={40} src={getSaveLogo(value.homeMon.gameOfOrigin)} />
+          <img
+            alt="save logo"
+            height={40}
+            src={getPublicImageURL(getMonSaveLogo(value.homeMon, getEnabledSaveTypes()))}
+          />
         ),
       sortFunction: numericSorter((val) => val.homeMon?.gameOfOrigin),
       cellClass: 'centered-cell',

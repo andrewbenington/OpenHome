@@ -5,14 +5,17 @@ import {
   NatureToString,
   RibbonTitles,
 } from 'pokemon-resources'
-import { useMemo } from 'react'
+import { useContext, useMemo } from 'react'
 import { PKMInterface } from '../../types/interfaces'
 import { getCharacteristic, getMoveMaxPP } from '../../types/pkm/util'
+import { getGameName, getPluginIdentifier } from '../../types/SAVTypes/util'
 import { Styles } from '../../types/types'
 import Markings from '../components/Markings'
-import { getGameLogo, getOriginMark } from '../images/game'
+import { getOriginMark } from '../images/game'
 import { getPublicImageURL } from '../images/images'
 import { getBallIconPath } from '../images/items'
+import { getMonSaveLogo } from '../saves/util'
+import { AppInfoContext } from '../state/appInfo'
 import MoveCard from './MoveCard'
 
 const styles = {
@@ -68,6 +71,7 @@ const metTimesOfDay = ['in the morning', 'during the daytime', 'in the evening']
 
 const MetDataMovesDisplay = (props: { mon: PKMInterface }) => {
   const { mon } = props
+  const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
 
   const eggMessage = useMemo(() => {
     if (!mon.eggLocationIndex || !mon.eggDate || !mon.gameOfOrigin) {
@@ -82,14 +86,22 @@ const MetDataMovesDisplay = (props: { mon: PKMInterface }) => {
     if (!mon.metLocationIndex) {
       return 'Met location unknown.'
     }
+
     let message = 'Met'
+    if (mon.pluginOrigin) {
+      const saveType = getEnabledSaveTypes().find(
+        (saveType) => mon.pluginOrigin === getPluginIdentifier(saveType)
+      )
+      message += ` in ${saveType ? getGameName(saveType) : '(unknown game)'}`
+    }
+
     if (mon.metTimeOfDay) {
       message += ` ${metTimesOfDay[mon.metTimeOfDay - 1]}`
     }
     if (mon.metDate) {
       message += ` on ${mon.metDate.month}/${mon.metDate.day}/${mon.metDate.year}`
     }
-    if (mon.gameOfOrigin) {
+    if (mon.gameOfOrigin && mon.metLocationIndex) {
       const location = getLocationString(mon.gameOfOrigin, mon.metLocationIndex, mon.format)
       message += ` ${location}`
     }
@@ -172,15 +184,10 @@ const MetDataMovesDisplay = (props: { mon: PKMInterface }) => {
             {mon.gameOfOrigin && (
               <img
                 draggable={false}
-                alt={`${GameOfOriginData[mon.gameOfOrigin]?.name} logo`}
-                src={getPublicImageURL(
-                  getGameLogo(
-                    mon.gameOfOrigin,
-                    mon.dexNum,
-                    mon.ribbons?.includes('National') ||
-                      ('isShadow' in mon && (mon.isShadow as boolean))
-                  ) ?? ''
-                )}
+                alt={`${
+                  mon.pluginOrigin ? mon.pluginOrigin : GameOfOriginData[mon.gameOfOrigin]?.name
+                } logo`}
+                src={getPublicImageURL(getMonSaveLogo(mon, getEnabledSaveTypes()) ?? '')}
                 style={styles.gameImage}
               />
             )}

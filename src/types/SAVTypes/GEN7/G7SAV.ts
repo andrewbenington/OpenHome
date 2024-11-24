@@ -8,8 +8,8 @@ import {
 import { CRC16_Invert, SignWithMemeCrypto } from '../../../util/Encryption'
 import { utf16BytesToString } from '../../../util/Strings/StringConverter'
 import { OHPKM } from '../../pkm/OHPKM'
+import { PathData } from '../path'
 import { Box, BoxCoordinates, SAV } from '../SAV'
-import { ParsedPath } from '../path'
 import { SIZE_USUM } from '../util'
 
 const BOX_SIZE: number = 232 * 30
@@ -17,6 +17,7 @@ const BOX_COUNT = 32
 
 export abstract class G7SAV implements SAV<PK7> {
   static pkmType = PK7
+  static saveTypeAbbreviation = 'SM/USUM'
 
   origin: GameOfOrigin = 0
   isPlugin = false
@@ -24,7 +25,7 @@ export abstract class G7SAV implements SAV<PK7> {
   boxRows = 5
   boxColumns = 6
 
-  filePath: ParsedPath
+  filePath: PathData
   fileCreated?: Date
 
   money: number = 0 // TODO: Gen 7 money
@@ -53,7 +54,7 @@ export abstract class G7SAV implements SAV<PK7> {
   pcChecksumOffset: number
 
   constructor(
-    path: ParsedPath,
+    path: PathData,
     bytes: Uint8Array,
     pcOffset: number,
     pcChecksumOffset: number,
@@ -159,5 +160,9 @@ export abstract class G7SAV implements SAV<PK7> {
       default:
         return '#666666'
     }
+  }
+
+  getPluginIdentifier() {
+    return undefined
   }
 }

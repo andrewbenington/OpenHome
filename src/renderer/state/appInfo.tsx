@@ -1,4 +1,5 @@
 import { Dispatch, Reducer, createContext } from 'react'
+import { G3RRSAV } from 'src/types/SAVTypes/radicalred/G3RRSAV'
 import { G1SAV } from '../../types/SAVTypes/G1SAV'
 import { G2SAV } from '../../types/SAVTypes/G2SAV'
 import { G3SAV } from '../../types/SAVTypes/G3SAV'
@@ -15,7 +16,8 @@ import { SAVClass } from '../../types/SAVTypes/util'
 
 export type Settings = {
   enabledSaveTypes: Record<string, boolean>
-  allSaveTypes: SAVClass[]
+  officialSaveTypes: SAVClass[]
+  extraSaveTypes: SAVClass[]
 }
 
 export type AppInfoState = {
@@ -31,7 +33,7 @@ export type AppInfoAction =
   | {
       type: 'set_savetype_enabled'
       payload: {
-        savetype: SAVClass
+        saveType: SAVClass
         enabled: boolean
       }
     }
@@ -51,9 +53,9 @@ export const appInfoReducer: Reducer<AppInfoState, AppInfoAction> = (
     case 'set_savetype_enabled': {
       const enabled = state.settings.enabledSaveTypes
       if (payload.enabled) {
-        enabled[payload.savetype.name] = true
+        enabled[payload.saveType.name] = true
       } else {
-        enabled[payload.savetype.name] = false
+        enabled[payload.saveType.name] = false
       }
       return { ...state, settings: { ...state.settings, enabledSaveTypes: enabled } }
     }
@@ -62,7 +64,7 @@ export const appInfoReducer: Reducer<AppInfoState, AppInfoAction> = (
 
 export const appInfoInitialState: AppInfoState = {
   settings: {
-    allSaveTypes: [
+    officialSaveTypes: [
       G1SAV,
       G2SAV,
       G3SAV,
@@ -76,6 +78,7 @@ export const appInfoInitialState: AppInfoState = {
       SMSAV,
       USUMSAV,
     ],
+    extraSaveTypes: [G3RRSAV],
     enabledSaveTypes: Object.fromEntries(
       [
         G1SAV,
@@ -90,12 +93,12 @@ export const appInfoInitialState: AppInfoState = {
         ORASSAV,
         SMSAV,
         USUMSAV,
+        G3RRSAV,
       ].map((savetype) => [savetype.name, true])
     ),
   },
 }
 
-export const AppInfoContext = createContext<[AppInfoState, Dispatch<AppInfoAction>]>([
-  appInfoInitialState,
-  () => null,
-])
+export const AppInfoContext = createContext<
+  [AppInfoState, Dispatch<AppInfoAction>, () => SAVClass[]]
+>([appInfoInitialState, () => null, () => []])

@@ -4,7 +4,7 @@ import { PT_TRANSFER_RESTRICTIONS } from '../../../consts/TransferRestrictions'
 import { bytesToUint16LittleEndian, bytesToUint32LittleEndian } from '../../../util/ByteLogic'
 import { gen4StringToUTF } from '../../../util/Strings/StringConverter'
 import { isRestricted } from '../../TransferRestrictions'
-import { ParsedPath } from '../path'
+import { PathData } from '../path'
 import { hasDesamumeFooter } from '../util'
 import { G4SAV } from './G4SAV'
 
@@ -47,7 +47,7 @@ export class PtSAV extends G4SAV {
 
   boxNamesOffset: number
 
-  constructor(path: ParsedPath, bytes: Uint8Array) {
+  constructor(path: PathData, bytes: Uint8Array) {
     super(path, bytes)
     // current storage block could be either the first or second one,
     // depending on save count

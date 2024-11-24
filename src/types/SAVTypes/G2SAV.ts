@@ -1,6 +1,6 @@
 import { uniq } from 'lodash'
 import { PK2 } from 'pokemon-files'
-import { GameOfOrigin, Languages } from 'pokemon-resources'
+import { GameOfOrigin, GameOfOriginData, Languages } from 'pokemon-resources'
 import { NationalDex } from 'pokemon-species-data'
 import { EXCLAMATION } from '../../consts/Formes'
 import { GEN2_TRANSFER_RESTRICTIONS } from '../../consts/TransferRestrictions'
@@ -8,7 +8,7 @@ import { bytesToUint16BigEndian, get8BitChecksum } from '../../util/ByteLogic'
 import { gen12StringToUTF, utf16StringToGen12 } from '../../util/Strings/StringConverter'
 import { OHPKM } from '../pkm/OHPKM'
 import { Box, BoxCoordinates, SAV } from './SAV'
-import { emptyParsedPath, ParsedPath } from './path'
+import { emptyPathData, PathData } from './path'
 import { LOOKUP_TYPE } from './util'
 
 const CURRENT_BOX_OFFSET_GS_INTL = 0x2724
@@ -28,7 +28,7 @@ export class G2SAV implements SAV<PK2> {
   boxRows = 4
   boxColumns = 5
 
-  filePath: ParsedPath
+  filePath: PathData
   fileCreated?: Date
 
   money: number = 0 // TODO: set money for gen 2 saves
@@ -46,7 +46,7 @@ export class G2SAV implements SAV<PK2> {
 
   updatedBoxSlots: BoxCoordinates[] = []
 
-  constructor(path: ParsedPath, bytes: Uint8Array, fileCreated?: Date) {
+  constructor(path: PathData, bytes: Uint8Array, fileCreated?: Date) {
     this.bytes = bytes
     this.filePath = path
     this.fileCreated = fileCreated
@@ -104,6 +104,11 @@ export class G2SAV implements SAV<PK2> {
       }
     })
   }
+  pluginIdentifier?: string | undefined
+  sid?: number | undefined
+  pcChecksumOffset?: number | undefined
+  pcOffset?: number | undefined
+  calculateChecksum?: (() => number) | undefined
 
   prepareBoxesAndGetModified() {
     const changedMonPKMs: OHPKM[] = []
@@ -244,12 +249,20 @@ export class G2SAV implements SAV<PK2> {
     return this.boxes[this.currentPCBox]
   }
 
+  getGameName() {
+    const gameOfOrigin = GameOfOriginData[this.origin]
+    return gameOfOrigin ? `Pokémon ${gameOfOrigin.name}` : '(Unknown Game)'
+  }
+
+  static saveTypeAbbreviation = 'GSC (Int)'
+  static saveTypeName = 'Pokémon Gold/Silver/Crystal (INT)'
+
   static fileIsSave(bytes: Uint8Array): boolean {
     if (bytes.length != SAVE_SIZE_BYTES) {
       return false
     }
     try {
-      const g2Save = new G2SAV(emptyParsedPath, bytes)
+      const g2Save = new G2SAV(emptyPathData, bytes)
       return g2Save.areCrystalInternationalChecksumsValid() || g2Save.areGoldSilverChecksumsValid()
     } catch {
       return false
@@ -271,5 +284,9 @@ export class G2SAV implements SAV<PK2> {
 
   static includesOrigin(origin: GameOfOrigin) {
     return origin >= GameOfOrigin.Gold && origin <= GameOfOrigin.Crystal
+  }
+
+  getPluginIdentifier() {
+    return undefined
   }
 }
