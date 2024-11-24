@@ -1,4 +1,4 @@
-import { Card, Grid, Stack, Typography } from '@mui/joy'
+import { Grid, Stack, Typography, useTheme } from '@mui/joy'
 import { ItemFromString } from 'pokemon-resources'
 import { PKMInterface } from '../../types/interfaces'
 import { Bag } from './Bag'
@@ -11,12 +11,8 @@ interface BagBoxProps {
   updateBag: () => void
 }
 
-const BagBox = ({
-  removeItemFromPokemon,
-  draggedMon,
-  setDraggedItem,
-  updateBag,
-}: BagBoxProps) => {
+const BagBox = ({ removeItemFromPokemon, draggedMon, setDraggedItem, updateBag }: BagBoxProps) => {
+  const theme = useTheme()
   let items = Bag.getItems()
 
   const totalSlots = Math.max(6 * 1, Math.ceil(items.length / 6) * 6)
@@ -54,46 +50,43 @@ const BagBox = ({
   return (
     <Stack style={{ width: '100%' }}>
       {/* Grid for Displaying Items */}
-      <Card sx={{ marginTop: 1, padding: 1 }}>
-        <Grid container spacing={1} component="div">
-          {Array.from({ length: totalSlots }, (_, index) => {
-            const item = items[index]
-            return (
-              <Grid
-                xs={2}
-                key={index}
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  padding: 1,
-                  border: '3px solid #e0fcdc',
-                  background: '#6662',
-                  borderRadius: '5px',
-                }}
-                onDrop={handlePokemonDrop}
-                onDragOver={(e) => e.preventDefault()}
-              >
-                {item ? (
-                  getItemIconPath(item.name) ? (
-                    <img
-                      src={getItemIconPath(item.name)}
-                      alt={item.name}
-                      draggable
-                      onDragStart={(e) => handleDragStart(e, item.name)}
-                      onDragEnd={handleDragEnd}
-                      style={{ width: 24, height: 24 }}
-                      onError={(e) => ((e.target as HTMLImageElement).style.display = 'none')}
-                    />
-                  ) : (
-                    <Typography sx={{ fontSize: 12 }}>{item.name}</Typography>
-                  )
-                ) : null}
-              </Grid>
-            )
-          })}
-        </Grid>
-      </Card>
+      <Grid container spacing={1} component="div">
+        {Array.from({ length: totalSlots }, (_, index) => {
+          const item = items[index]
+          return (
+            <Grid
+              xs={2}
+              key={index}
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: 1,
+                aspectRatio: 1,
+                background: theme.palette.background.surface,
+              }}
+              onDrop={handlePokemonDrop}
+              onDragOver={(e) => e.preventDefault()}
+            >
+              {item ? (
+                getItemIconPath(item.name) ? (
+                  <img
+                    src={getItemIconPath(item.name)}
+                    alt={item.name}
+                    draggable
+                    onDragStart={(e) => handleDragStart(e, item.name)}
+                    onDragEnd={handleDragEnd}
+                    style={{ width: 24, height: 24 }}
+                    onError={(e) => ((e.target as HTMLImageElement).style.display = 'none')}
+                  />
+                ) : (
+                  <Typography sx={{ fontSize: 12 }}>{item.name}</Typography>
+                )
+              ) : null}
+            </Grid>
+          )
+        })}
+      </Grid>
     </Stack>
   )
 }

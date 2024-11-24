@@ -1,6 +1,7 @@
 import {
   Alert,
   Box,
+  Card,
   DialogContent,
   DialogTitle,
   Divider,
@@ -348,36 +349,37 @@ const Home = () => {
           <Box flex={1}></Box>
         </Box>
       </div>
-
       {/* Right-hand side (RHS) with Tabs for Filter and Bag */}
       <Stack spacing={1} className="right-column" width={300}>
-        <Tabs
-          value={activeTab}
-          onChange={(_, newValue) => {
-            if (typeof newValue === 'number') {
-              setActiveTab(newValue)
-            }
-          }}
-        >
-          <TabList>
-            <Tab>Filter</Tab>
-            <Tab>Bag</Tab>
-          </TabList>
+        <Card sx={{ padding: 0, overflow: 'hidden' }}>
+          <Tabs
+            value={activeTab}
+            onChange={(_, newValue) => {
+              if (typeof newValue === 'number') {
+                setActiveTab(newValue)
+              }
+            }}
+          >
+            <TabList>
+              <Tab>Filter</Tab>
+              <Tab>Bag</Tab>
+            </TabList>
 
-          <TabPanel value={0} sx={{ padding: 0 }}>
-            <FilterPanel />
-          </TabPanel>
+            <TabPanel value={0} sx={{ padding: 0 }}>
+              <FilterPanel />
+            </TabPanel>
 
-          <TabPanel value={1} sx={{ padding: 0 }}>
-            <BagBox
-              removeItemFromPokemon={removeItemFromPokemon}
-              draggedMon={draggedMon}
-              setDraggedItem={setDraggedItem}
-              items={bagItems}
-              updateBag={updateBag}
-            />
-          </TabPanel>
-        </Tabs>
+            <TabPanel value={1} sx={{ padding: 0 }}>
+              <BagBox
+                removeItemFromPokemon={removeItemFromPokemon}
+                draggedMon={draggedMon}
+                setDraggedItem={setDraggedItem}
+                items={bagItems}
+                updateBag={updateBag}
+              />
+            </TabPanel>
+          </Tabs>
+        </Card>
 
         {/* Drop areas for 'Preview' and 'Release' */}
         <div
@@ -407,7 +409,6 @@ const Home = () => {
           </div>
         </div>
       </Stack>
-
       {/* Modals */}
       <Modal open={!!selectedMon} onClose={() => setSelectedMon(undefined)}>
         <ModalOverflow>

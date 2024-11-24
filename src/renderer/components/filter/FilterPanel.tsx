@@ -1,4 +1,4 @@
-import { Button, Card, Stack, Typography } from '@mui/joy'
+import { Button, Card, Stack } from '@mui/joy'
 import {
   Ability,
   AbilityToString,
@@ -57,21 +57,7 @@ export default function FilterPanel() {
   )
 
   return (
-    <Card sx={{ marginLeft: 0 }}>
-      <div style={{ display: 'flex', paddingTop: 4 }}>
-        <Typography fontSize={20} marginLeft={0.5} flex={1}>
-          Filter
-        </Typography>
-        <Button
-          variant="outlined"
-          disabled={Object.values(filterState).length === 0}
-          color="danger"
-          onClick={() => dispatchFilterState({ type: 'clear_all' })}
-          style={{ padding: 4 }}
-        >
-          Clear All
-        </Button>
-      </div>
+    <Card sx={{ padding: 0 }}>
       <Stack margin={1} spacing={1}>
         <FilterAutocomplete
           options={Object.values(PokemonData)}
@@ -212,6 +198,15 @@ export default function FilterPanel() {
             ) : undefined
           }
         />
+        <Button
+          variant="outlined"
+          disabled={Object.values(filterState).length === 0}
+          color="danger"
+          onClick={() => dispatchFilterState({ type: 'clear_all' })}
+          style={{ padding: 4 }}
+        >
+          Clear All
+        </Button>
       </Stack>
     </Card>
   )
