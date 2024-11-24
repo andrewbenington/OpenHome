@@ -9,6 +9,19 @@ files:
   - '!{.eslintignore,.eslintrc.cjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}'
   - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
+fileAssociations:
+  - ext: 'pkm'
+    name: 'Pokémon Data File'
+    mimeType: 'application/pokemon'
+  - ext: 'pk6'
+    name: 'Pokémon Data File (XY/ORAS)'
+    mimeType: 'application/pokemon.xy_oras'
+  - ext: 'pk7'
+    name: 'Pokémon Data File (SM/USUM)'
+    mimeType: 'application/pokemon.sm_usum'
+  - ext: 'pk8'
+    name: 'Pokémon Data File (SwSh)'
+    mimeType: 'application/pokemon.swsh'
 win:
   executableName: openhome
   icon: build/icon.ico
