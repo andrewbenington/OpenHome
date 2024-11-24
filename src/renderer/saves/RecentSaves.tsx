@@ -1,18 +1,21 @@
 import { DialogActions, Modal, ModalDialog, Stack, Typography } from '@mui/joy'
 import * as E from 'fp-ts/lib/Either'
+import { GameOfOrigin } from 'pokemon-resources'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
-import { ParsedPath, splitPath } from 'src/types/SAVTypes/path'
+import { PathData, splitPath } from 'src/types/SAVTypes/path'
+import { getPluginIdentifier } from 'src/types/SAVTypes/util'
 import { SaveRef } from 'src/types/types'
-import { numericSorter } from '../../util/Sort'
+import { filterUndefined, numericSorter } from '../../util/Sort'
 import { BackendContext } from '../backend/backendProvider'
 import { RemoveIcon } from '../components/Icons'
 import OHDataGrid, { SortableColumn } from '../components/OHDataGrid'
+import { AppInfoContext } from '../state/appInfo'
 import { OpenSavesContext } from '../state/openSaves'
 import SaveCard from './SaveCard'
 import { formatTime, formatTimeSince, getSaveLogo, SaveViewMode } from './util'
 
 interface SaveFileSelectorProps {
-  onOpen: (path: ParsedPath) => void
+  onOpen: (path: PathData) => void
   view: SaveViewMode
   cardSize: number
 }
@@ -22,6 +25,7 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
   const backend = useContext(BackendContext)
   const [recentSaves, setRecentSaves] = useState<Record<string, SaveRef>>()
   const [, , openSaves] = useContext(OpenSavesContext)
+  const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
   const [error, setError] = useState<string>()
 
   const openSavePaths = useMemo(
@@ -33,10 +37,21 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
     backend.getRecentSaves().then(
       E.match(
         (err) => console.error(err),
-        (recents) => setRecentSaves(recents)
+        (recents) => {
+          const extraSaveIdentifiers = getEnabledSaveTypes()
+            .map(getPluginIdentifier)
+            .filter(filterUndefined)
+          // filter out saves from plugins that aren't enabled
+          const filteredRecents = Object.entries(recents).filter(
+            ([, ref]) =>
+              ref.pluginIdentifier === undefined ||
+              extraSaveIdentifiers.includes(ref.pluginIdentifier)
+          )
+          setRecentSaves(Object.fromEntries(filteredRecents))
+        }
       )
     )
-  }, [backend])
+  }, [backend, getEnabledSaveTypes])
 
   const removeRecentSave = useCallback(
     (path: string) =>
@@ -49,6 +64,14 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
         )
       ),
     [backend, getRecentSaves]
+  )
+
+  const saveTypeFromOrigin = useCallback(
+    (origin: number | undefined) =>
+      origin
+        ? getEnabledSaveTypes().find((s) => s.includesOrigin(origin as GameOfOrigin))
+        : undefined,
+    [getEnabledSaveTypes]
   )
 
   useEffect(() => {
@@ -79,7 +102,13 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
       key: 'game',
       name: 'Game',
       width: 130,
-      renderValue: (value) => <img alt="save logo" height={40} src={getSaveLogo(value.game)} />,
+      renderValue: (value) => (
+        <img
+          alt="save logo"
+          height={40}
+          src={getSaveLogo(saveTypeFromOrigin(value.game), value.game as GameOfOrigin)}
+        />
+      ),
       sortFunction: numericSorter((val) => val.game),
       cellClass: 'centered-cell',
     },
@@ -174,6 +203,7 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
             .sort((a, b) => (b.lastOpened ?? 0) - (a.lastOpened ?? 0))
             .map((save) => (
               <SaveCard
+                key={save.filePath.raw}
                 save={save}
                 onOpen={() => {
                   onOpen(save.filePath)

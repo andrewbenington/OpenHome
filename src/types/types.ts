@@ -1,6 +1,6 @@
 import { Either } from 'fp-ts/Either'
 import { CSSProperties } from 'react'
-import { ParsedPath } from './SAVTypes/path'
+import { PathData } from './SAVTypes/path'
 
 /* eslint-disable no-unused-vars */
 export type KeyValuePairList = { key: string; value: string }[]
@@ -42,7 +42,7 @@ export interface pokedate {
 export type marking = 0 | 1 | 2
 
 export interface SaveRef {
-  filePath: ParsedPath
+  filePath: PathData
   game?: number
   trainerName?: string
   trainerID?: string
@@ -112,12 +112,12 @@ export type Origin = {
 
 export type Move = {
   name: string
-  accuracy?: number
+  accuracy?: number | null
   class: 'physical' | 'status' | 'special'
   generation: string
-  power?: number
+  power?: number | null
   pp: number
-  pastGenPP: {
+  pastGenPP?: {
     G1?: number
     G2?: number
     G3?: number
@@ -147,9 +147,18 @@ export type Errorable<T> = Either<string, T>
 
 export type LookupMap = Record<string, string>
 
-export type LoadSaveResponse = { path: ParsedPath; fileBytes: Uint8Array; createdDate: Date }
+export type LoadSaveResponse = { path: PathData; fileBytes: Uint8Array; createdDate: Date }
 
 export interface PKMFormData {
   dexNum: number
   formeNum: number
 }
+
+export type ImageSource =
+  | {
+      publicDirPath: string
+    }
+  | {
+      rawImageBase64: string
+    }
+  | undefined

@@ -11,7 +11,7 @@ import {
 import * as E from 'fp-ts/lib/Either'
 import { useCallback, useContext, useState } from 'react'
 import 'react-data-grid/lib/styles.css'
-import { ParsedPath } from 'src/types/SAVTypes/path'
+import { PathData } from 'src/types/SAVTypes/path'
 import { getSaveRef } from '../../types/SAVTypes/SAV'
 import { buildSaveFile } from '../../types/SAVTypes/load'
 import { BackendContext } from '../backend/backendProvider'
@@ -33,12 +33,12 @@ const SavesModal = (props: SavesModalProps) => {
   const backend = useContext(BackendContext)
   const [, dispatchOpenSaves] = useContext(OpenSavesContext)
   const [lookupState] = useContext(LookupContext)
-  const [appInfo] = useContext(AppInfoContext)
+  const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
   const [viewMode, setViewMode] = useState<SaveViewMode>('cards')
   const [cardSize, setCardSize] = useState<number>(180)
 
   const openSaveFile = useCallback(
-    async (filePath?: ParsedPath) => {
+    async (filePath?: PathData) => {
       backend.loadSaveFile(filePath).then(
         E.match(
           (err) => console.error(err),
@@ -56,9 +56,7 @@ const SavesModal = (props: SavesModalProps) => {
                   gen345LookupMap: lookupState.gen345,
                   fileCreatedDate: createdDate,
                 },
-                appInfo.settings.allSaveTypes.filter(
-                  (saveType) => appInfo.settings.enabledSaveTypes[saveType.name]
-                ),
+                getEnabledSaveTypes(),
                 (updatedMon) => backend.writeHomeMon(updatedMon.bytes)
               )
               if (!saveFile) {

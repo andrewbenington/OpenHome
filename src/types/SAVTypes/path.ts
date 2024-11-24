@@ -1,4 +1,4 @@
-export type ParsedPath = {
+export type PathData = {
   raw: string
   base: string
   name: string
@@ -8,7 +8,7 @@ export type ParsedPath = {
   separator: '\\' | '/'
 }
 
-export const emptyParsedPath: ParsedPath = {
+export const emptyPathData: PathData = {
   raw: '',
   base: '',
   dir: '',
@@ -18,16 +18,16 @@ export const emptyParsedPath: ParsedPath = {
   root: '',
 }
 
-export function joinPath(path: ParsedPath) {
+export function joinPath(path: PathData) {
   return [path.dir, path.name].join(path.separator) + path.ext
 }
 
-export function splitPath(path: ParsedPath) {
+export function splitPath(path: PathData) {
   return [path.root, ...path.dir.split(path.separator).filter((seg) => seg !== ''), path.name]
 }
 
 export type PossibleSaves = {
-  citra: ParsedPath[]
-  desamume: ParsedPath[]
-  openEmu: ParsedPath[]
+  citra: PathData[]
+  desamume: PathData[]
+  openEmu: PathData[]
 }
