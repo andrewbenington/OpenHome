@@ -1,9 +1,10 @@
 import { Stack } from '@mui/joy'
 import * as E from 'fp-ts/lib/Either'
+import { GameOfOrigin } from 'pokemon-resources'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { getSaveRef, SAV } from 'src/types/SAVTypes/SAV'
 import { buildSaveFile } from 'src/types/SAVTypes/load'
-import { ParsedPath, splitPath } from '../../types/SAVTypes/path'
+import { PathData, splitPath } from '../../types/SAVTypes/path'
 import { numericSorter } from '../../util/Sort'
 import { BackendContext } from '../backend/backendProvider'
 import OHDataGrid, { SortableColumn } from '../components/OHDataGrid'
@@ -14,7 +15,7 @@ import SaveCard from './SaveCard'
 import { filterEmpty, getSaveLogo, SaveViewMode } from './util'
 
 interface SaveFileSelectorProps {
-  onOpen: (path: ParsedPath) => void
+  onOpen: (path: PathData) => void
   view: SaveViewMode
   cardSize: number
 }
@@ -22,7 +23,7 @@ interface SaveFileSelectorProps {
 export default function SuggestedSaves(props: SaveFileSelectorProps) {
   const { onOpen, view, cardSize } = props
   const backend = useContext(BackendContext)
-  const [appInfo] = useContext(AppInfoContext)
+  const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
   const [suggestedSaves, setSuggestedSaves] = useState<SAV[]>()
   const [{ homeMons: homeMonMap, gen12: gen12LookupMap, gen345: gen345LookupMap }] =
     useContext(LookupContext)
@@ -34,7 +35,7 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
   )
 
   const loadSaveData = useCallback(
-    async (savePath: ParsedPath) => {
+    async (savePath: PathData) => {
       const response = await backend.loadSaveFile(savePath)
       if (E.isRight(response)) {
         const { fileBytes, createdDate } = response.right
@@ -47,9 +48,7 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
             gen345LookupMap,
             fileCreatedDate: createdDate,
           },
-          appInfo.settings.allSaveTypes.filter(
-            (saveType) => appInfo.settings.enabledSaveTypes[saveType.name]
-          )
+          getEnabledSaveTypes()
         )
       }
       return undefined
@@ -75,6 +74,14 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
       )
     )
   }, [backend, loadSaveData])
+
+  const saveTypeFromOrigin = useCallback(
+    (origin: number | undefined) =>
+      origin
+        ? getEnabledSaveTypes().find((s) => s.includesOrigin(origin as GameOfOrigin))
+        : undefined,
+    [getEnabledSaveTypes]
+  )
 
   const columns: SortableColumn<SAV>[] = [
     // {
@@ -107,7 +114,13 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
       key: 'game',
       name: 'Game',
       width: 130,
-      renderValue: (value) => <img alt="save logo" height={40} src={getSaveLogo(value.origin)} />,
+      renderValue: (value) => (
+        <img
+          alt="save logo"
+          height={40}
+          src={getSaveLogo(saveTypeFromOrigin(value.origin), value.origin as GameOfOrigin)}
+        />
+      ),
       sortFunction: numericSorter((val) => val.origin),
       cellClass: 'centered-cell',
     },

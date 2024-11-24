@@ -6,7 +6,7 @@ import path from 'path'
 import BackendInterface from '../types/backendInterface'
 import { bytesToPKM } from '../types/FileImport'
 import { OHPKM } from '../types/pkm/OHPKM'
-import { ParsedPath, PossibleSaves } from '../types/SAVTypes/path'
+import { PathData, PossibleSaves } from '../types/SAVTypes/path'
 import { SaveFolder, StoredBoxData } from '../types/storage'
 import { Errorable, LoadSaveResponse, LookupMap, SaveRef } from '../types/types'
 import { getMonFileIdentifier } from '../util/Lookup'
@@ -261,7 +261,7 @@ export class OpenHomeAppBackend implements BackendInterface {
     return this.updateStoredList<StoredBoxData>('box-data.json', boxData)
   }
 
-  public async loadSaveFile(filePath?: ParsedPath): Promise<Errorable<LoadSaveResponse>> {
+  public async loadSaveFile(filePath?: PathData): Promise<Errorable<LoadSaveResponse>> {
     try {
       const rawPath = filePath?.raw ?? (await selectFile())[0]
       const fileBytes = readBytesFromFile(rawPath)

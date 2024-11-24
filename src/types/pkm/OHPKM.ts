@@ -44,7 +44,8 @@ import {
 } from '../../util/ByteLogic'
 import { getHPGen3Onward, getLevelGen3Onward, getStatGen3Onward } from '../../util/StatCalc'
 import { utf16BytesToString, utf16StringToBytes } from '../../util/Strings/StringConverter'
-import { PKMInterface } from '../interfaces'
+import { PKMInterface, PluginPKMInterface } from '../interfaces'
+import schema from './OHPKM.json'
 import {
   adjustMovePPBetweenFormats,
   dvsFromIVs,
@@ -57,13 +58,17 @@ import {
   writeIVsToBuffer,
 } from './util'
 
+const FILE_SIZE = 497
+
 export class OHPKM implements PKMInterface {
   static fromBytes(bytes: ArrayBuffer) {
     return new OHPKM(new Uint8Array(bytes))
   }
 
+  static schema = schema
+
   public get fileSize() {
-    return 433
+    return FILE_SIZE
   }
 
   get markingCount(): number {
@@ -77,11 +82,14 @@ export class OHPKM implements PKMInterface {
   static maxValidMove() {
     return 919
   }
-  bytes: Uint8Array = new Uint8Array(433)
 
-  constructor(arg: PKMInterface | OHPKM | Uint8Array) {
+  bytes: Uint8Array = new Uint8Array(FILE_SIZE)
+
+  constructor(arg: PKMInterface | PluginPKMInterface | OHPKM | Uint8Array) {
     if (arg instanceof Uint8Array) {
-      this.bytes = arg
+      // If OHPKM format has expanded, we want to increase the size of older files to
+      // make room for new fields
+      this.bytes = extendUint8Array(arg, FILE_SIZE)
     } else {
       const other = arg
       let prng: Prando
@@ -113,6 +121,8 @@ export class OHPKM implements PKMInterface {
       this.nickname = other.nickname
       this.language = other.language
       this.gameOfOrigin = other.gameOfOrigin
+      this.pluginOrigin = other.pluginOrigin
+
       this.isEgg = other.isEgg ?? false
       this.pokerusByte = other.pokerusByte ?? 0
       this.trainerFriendship = other.trainerFriendship ?? 40
@@ -184,7 +194,8 @@ export class OHPKM implements PKMInterface {
       this.ability = getAbilityFromNumber(this.dexNum, this.formeNum, this.abilityNum)
       this.abilityIndex = AbilityFromString(this.ability)
 
-      if (other.isShadow) this.isShadow = true
+      this.isShadow = other.isShadow ?? false
+
       this.encryptionConstant =
         other.encryptionConstant ?? other.personalityValue ?? prng.nextInt(0, 0xffffffff)
 
@@ -1129,6 +1140,19 @@ export class OHPKM implements PKMInterface {
     this.bytes[0xee] = value
   }
 
+  // If met in a plugin save, this will be the save's plugin_identifier. otherwise this is empty
+  public get pluginOrigin() {
+    if (this.bytes[0x1b1] === 0) return undefined
+    return utf16BytesToString(this.bytes, 0x1b1, 32)
+  }
+
+  public set pluginOrigin(value: string | undefined) {
+    if (value === undefined) return
+    const utfBytes = utf16StringToBytes(value, 32)
+    console.log(utfBytes.length, this.bytes.length, this.bytes.length - 433)
+    this.bytes.set(utfBytes, 433)
+  }
+
   public get country() {
     return this.bytes[0xef]
   }
@@ -1655,4 +1679,16 @@ export class OHPKM implements PKMInterface {
       this.nickname = other.nickname
     }
   }
+}
+
+function extendUint8Array(array: Uint8Array, minLength: number) {
+  if (array.length >= minLength) {
+    return array
+  }
+
+  const extendedArray = new Uint8Array(minLength)
+
+  extendedArray.set(array)
+
+  return extendedArray
 }

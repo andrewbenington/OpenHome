@@ -6,11 +6,11 @@ import { bytesToPKM } from '../../FileImport'
 import { OHPKM } from '../../pkm/OHPKM'
 import { G1SAV } from '../G1SAV'
 import { buildSaveFile } from '../load'
-import { emptyParsedPath } from '../path'
+import { emptyPathData } from '../path'
 // ;(global as any).TextDecoder = TextDecoder
 
 const blueSaveFile = buildSaveFile(
-  emptyParsedPath,
+  emptyPathData,
   new Uint8Array(fs.readFileSync(path.join(__dirname, './SAVFiles', 'blue.sav'))),
   {},
   [G1SAV]
@@ -29,7 +29,7 @@ test('pc box decoded correctly', () => {
 })
 
 test('removing mon shifts others in box', () => {
-  const modifiedSaveFile1 = buildSaveFile(emptyParsedPath, new Uint8Array(blueSaveFile.bytes), {}, [
+  const modifiedSaveFile1 = buildSaveFile(emptyPathData, new Uint8Array(blueSaveFile.bytes), {}, [
     G1SAV,
   ]) as G1SAV
   modifiedSaveFile1.boxes[7].pokemon[0] = undefined
@@ -37,7 +37,7 @@ test('removing mon shifts others in box', () => {
   modifiedSaveFile1.prepareBoxesAndGetModified()
 
   const modifiedSaveFile2 = buildSaveFile(
-    emptyParsedPath,
+    emptyPathData,
     new Uint8Array(modifiedSaveFile1.bytes),
     {},
     [G1SAV]
@@ -48,7 +48,7 @@ test('removing mon shifts others in box', () => {
 })
 
 test('inserting mon works', () => {
-  const modifiedSaveFile1 = buildSaveFile(emptyParsedPath, new Uint8Array(blueSaveFile.bytes), {}, [
+  const modifiedSaveFile1 = buildSaveFile(emptyPathData, new Uint8Array(blueSaveFile.bytes), {}, [
     G1SAV,
   ]) as G1SAV
   modifiedSaveFile1.boxes[7].pokemon[11] = new PK1(slowpokeOH)
@@ -56,7 +56,7 @@ test('inserting mon works', () => {
   modifiedSaveFile1.prepareBoxesAndGetModified()
 
   const modifiedSaveFile2 = buildSaveFile(
-    emptyParsedPath,
+    emptyPathData,
     new Uint8Array(modifiedSaveFile1.bytes),
     {},
     [G1SAV]

@@ -1,5 +1,7 @@
 import { useContext } from 'react'
-import { getSaveLogo } from 'src/renderer/saves/util'
+import { getPublicImageURL } from 'src/renderer/images/images'
+import { getMonSaveLogo } from 'src/renderer/saves/util'
+import { AppInfoContext } from 'src/renderer/state/appInfo'
 import { OHPKM } from 'src/types/pkm/OHPKM'
 import { numericSorter, stringSorter } from 'src/util/Sort'
 import { getMonFileIdentifier } from '../../../util/Lookup'
@@ -9,6 +11,7 @@ import { LookupContext } from '../../state/lookup'
 
 export default function OpenHomeMonList() {
   const [{ homeMons }] = useContext(LookupContext)
+  const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
 
   const columns: SortableColumn<OHPKM>[] = [
     // {
@@ -47,7 +50,11 @@ export default function OpenHomeMonList() {
       name: 'Original Game',
       width: 130,
       renderValue: (value) => (
-        <img alt="save logo" height={40} src={getSaveLogo(value.gameOfOrigin)} />
+        <img
+          alt="save logo"
+          height={40}
+          src={getPublicImageURL(getMonSaveLogo(value, getEnabledSaveTypes()))}
+        />
       ),
       sortFunction: numericSorter((val) => val?.gameOfOrigin),
       cellClass: 'centered-cell',

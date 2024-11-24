@@ -4,6 +4,7 @@ import {
   BDSPTMMoveIndexes,
   isGen4,
   LATutorMoveIndexes,
+  Moves,
   SVTMMoveIndexes,
   SwShTRMoveIndexes,
 } from 'pokemon-resources'
@@ -14,7 +15,6 @@ import { get16BitChecksumLittleEndian } from 'src/util/ByteLogic'
 import { Countries } from '../../consts/Countries'
 import { EncounterTypes } from '../../consts/EncounterTypes'
 import { SWEETS } from '../../consts/Formes'
-import { MOVE_DATA } from '../../consts/Moves'
 import {
   GEN2_TRANSFER_RESTRICTIONS,
   HGSS_TRANSFER_RESTRICTIONS,
@@ -267,7 +267,7 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
               <AccordionDetails>
                 {getFlagsInRange(mon.trFlagsSwSh, 0, 14).map((i) => (
                   <AttributeRow key={`swsh_tr_${i}`} label={`TR ${i}`} indent={10}>
-                    {MOVE_DATA[SwShTRMoveIndexes[i]].name}
+                    {Moves[SwShTRMoveIndexes[i]].name}
                   </AttributeRow>
                 ))}
               </AccordionDetails>
@@ -293,7 +293,7 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
               <AccordionDetails>
                 {getFlagsInRange(mon.tmFlagsBDSP, 0, 14).map((i) => (
                   <AttributeRow key={`bdsp_tm_${i + 1}`} label={`TM ${i + 1}`} indent={10}>
-                    {MOVE_DATA[BDSPTMMoveIndexes[i]].name}
+                    {Moves[BDSPTMMoveIndexes[i]].name}
                   </AttributeRow>
                 ))}
               </AccordionDetails>
@@ -319,7 +319,7 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
               <AccordionDetails>
                 {getFlagsInRange(mon.tutorFlagsLA, 0, 8).map((i) => (
                   <AttributeRow key={`la_tutor_${i + 1}`} label={`Tutor ${i + 1}`} indent={10}>
-                    {MOVE_DATA[LATutorMoveIndexes[i]].name}
+                    {Moves[LATutorMoveIndexes[i]].name}
                   </AttributeRow>
                 ))}
               </AccordionDetails>
@@ -346,7 +346,7 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
               <AccordionDetails>
                 {getFlagsInRange(mon.tmFlagsSV, 0, 22).map((i) => (
                   <AttributeRow key={`sv_tm_${i}`} label={`TM ${i}`} indent={10}>
-                    {MOVE_DATA[SVTMMoveIndexes[i]].name}
+                    {Moves[SVTMMoveIndexes[i]].name}
                   </AttributeRow>
                 ))}
               </AccordionDetails>
