@@ -1,6 +1,6 @@
 import { Box, Tab, TabList, TabPanel, Tabs, Typography } from '@mui/joy'
 import { extendTheme, ThemeProvider } from '@mui/joy/styles'
-import { useMemo, useReducer } from 'react'
+import { useCallback, useMemo, useReducer } from 'react'
 import 'react-data-grid/lib/styles.css'
 import { HomeData } from '../../types/SAVTypes/HomeData'
 import { BackendProvider } from '../backend/backendProvider'
@@ -39,12 +39,18 @@ function App() {
     openSaves: {},
   })
 
+  const getEnabledSaveTypes = useCallback(() => {
+    return appInfoState.settings.extraSaveTypes
+      .concat(appInfoState.settings.officialSaveTypes)
+      .filter((saveType) => appInfoState.settings.enabledSaveTypes[saveType.name])
+  }, [appInfoState.settings])
+
   const loading = false
 
   return (
     <ThemeProvider theme={theme}>
       <BackendProvider backend={ElectronBackend}>
-        <AppInfoContext.Provider value={[appInfoState, appInfoDispatch]}>
+        <AppInfoContext.Provider value={[appInfoState, appInfoDispatch, getEnabledSaveTypes]}>
           <MouseContext.Provider value={[mouseState, mouseDispatch]}>
             <LookupProvider>
               <OpenSavesContext.Provider

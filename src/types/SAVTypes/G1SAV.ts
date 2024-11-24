@@ -1,6 +1,6 @@
 import lodash from 'lodash'
 import { PK1 } from 'pokemon-files'
-import { GameOfOrigin, Languages } from 'pokemon-resources'
+import { GameOfOrigin, GameOfOriginData, Languages } from 'pokemon-resources'
 import { NationalDex } from 'pokemon-species-data'
 import { GEN1_TRANSFER_RESTRICTIONS } from '../../consts/TransferRestrictions'
 import { bytesToUint16BigEndian, get8BitChecksum } from '../../util/ByteLogic'
@@ -8,7 +8,7 @@ import { natDexToGen1ID } from '../../util/ConvertPokemonID'
 import { gen12StringToUTF, utf16StringToGen12 } from '../../util/Strings/StringConverter'
 import { OHPKM } from '../pkm/OHPKM'
 import { Box, BoxCoordinates, SAV } from './SAV'
-import { ParsedPath } from './path'
+import { PathData } from './path'
 import { LOOKUP_TYPE } from './util'
 
 const SAVE_SIZE_BYTES = 0x8000
@@ -41,7 +41,7 @@ export class G1SAV implements SAV<PK1> {
   boxRows = 4
   boxColumns = 5
 
-  filePath: ParsedPath
+  filePath: PathData
   fileCreated?: Date
 
   money: number = 0 // TODO: set money for gen 1 saves
@@ -59,7 +59,7 @@ export class G1SAV implements SAV<PK1> {
 
   updatedBoxSlots: BoxCoordinates[] = []
 
-  constructor(path: ParsedPath, bytes: Uint8Array, fileCreated?: Date) {
+  constructor(path: PathData, bytes: Uint8Array, fileCreated?: Date) {
     this.bytes = bytes
     this.filePath = path
     this.fileCreated = fileCreated
@@ -132,6 +132,10 @@ export class G1SAV implements SAV<PK1> {
       }
     })
   }
+  sid?: number | undefined
+  pcChecksumOffset?: number | undefined
+  pcOffset?: number | undefined
+  calculateChecksum?: (() => number) | undefined
 
   prepareBoxesAndGetModified() {
     const changedMonPKMs: OHPKM[] = []
@@ -225,6 +229,14 @@ export class G1SAV implements SAV<PK1> {
     return this.boxes[this.currentPCBox]
   }
 
+  getGameName() {
+    const gameOfOrigin = GameOfOriginData[this.origin]
+    return gameOfOrigin ? `Pokémon ${gameOfOrigin.name}` : '(Unknown Game)'
+  }
+
+  static saveTypeAbbreviation = 'RBY (Int)'
+  static saveTypeName = 'Pokémon Red/Blue/Yellow (INT)'
+
   static fileIsSave(bytes: Uint8Array): boolean {
     // Gen 1 and Gen 2 saves are the same size, so assume it's Gen 2 if the Gen 2 checksums are valid
     if (areCrystalInternationalChecksumsValid(bytes) || areGoldSilverChecksumsValid(bytes)) {
@@ -249,6 +261,10 @@ export class G1SAV implements SAV<PK1> {
 
   static includesOrigin(origin: GameOfOrigin) {
     return origin >= GameOfOrigin.Red && origin <= GameOfOrigin.Yellow
+  }
+
+  getPluginIdentifier() {
+    return undefined
   }
 }
 

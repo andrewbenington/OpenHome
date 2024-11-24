@@ -1,8 +1,8 @@
 import { Button, Card, Chip, Dropdown, Menu, MenuButton, MenuItem, Stack } from '@mui/joy'
-import { isGameBoy } from 'pokemon-resources'
+import { GameOfOrigin, isGameBoy } from 'pokemon-resources'
 import { useContext, useEffect, useMemo, useState } from 'react'
 import { SaveRef } from 'src/types/types'
-import { getGameColor } from '../../types/SAVTypes/util'
+import { getGameColor, getPluginIdentifier } from '../../types/SAVTypes/util'
 import { BackendContext } from '../backend/backendProvider'
 import { MenuIcon } from '../components/Icons'
 import { AppInfoContext } from '../state/appInfo'
@@ -23,19 +23,27 @@ const standardViewMinSize = 180
 export default function SaveCard({ save, onOpen, onRemove, size = 240 }: SaveCardProps) {
   const [expanded, setExpanded] = useState(false)
   const backend = useContext(BackendContext)
-  const [appInfo] = useContext(AppInfoContext)
+  const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
   const [platform, setPlatform] = useState('')
 
   const gbBackground = useMemo(() => (save.game ? isGameBoy(save.game) : false), [save.game])
 
-  const backgroundColor = useMemo(() => {
-    const origin = save.game
-    if (origin === undefined) return '#666666'
-    if (save.pluginIdentifier) return '#666666'
+  const saveType = useMemo(
+    () =>
+      save.game
+        ? getEnabledSaveTypes().find((s) => {
+            if (save.pluginIdentifier || getPluginIdentifier(s)) {
+              return save.pluginIdentifier === getPluginIdentifier(s)
+            }
+            return s.includesOrigin(save.game as GameOfOrigin)
+          })
+        : undefined,
+    [origin]
+  )
 
-    const saveType = appInfo.settings.allSaveTypes.find((s) => s.includesOrigin(origin))
-    return getGameColor(saveType, origin)
-  }, [appInfo.settings, save])
+  const backgroundColor = useMemo(() => {
+    return getGameColor(saveType, save.game as GameOfOrigin)
+  }, [getEnabledSaveTypes, save])
 
   useEffect(() => {
     backend.getPlatform().then(setPlatform)
@@ -47,7 +55,9 @@ export default function SaveCard({ save, onOpen, onRemove, size = 240 }: SaveCar
       sx={{
         width: size,
         height: size,
-        backgroundImage: `url(${getSaveLogo(save.game)})`,
+        backgroundImage: saveType
+          ? `url(${getSaveLogo(saveType, save.game as GameOfOrigin)})`
+          : undefined,
         backgroundSize: gbBackground ? size : size * 0.9,
         backgroundRepeat: 'no-repeat',
         backgroundPosition: 'center',

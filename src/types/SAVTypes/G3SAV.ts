@@ -1,21 +1,24 @@
 import { PK3 } from 'pokemon-files'
-import { GameOfOrigin } from 'pokemon-resources'
+import { GameOfOrigin, GameOfOriginData } from 'pokemon-resources'
 import { NationalDex } from 'pokemon-species-data'
 import { GEN3_TRANSFER_RESTRICTIONS } from '../../consts/TransferRestrictions'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
-  bytesToUint64LittleEndian,
   uint16ToBytesLittleEndian,
   uint32ToBytesLittleEndian,
 } from '../../util/ByteLogic'
 import { gen3StringToUTF } from '../../util/Strings/StringConverter'
 import { OHPKM } from '../pkm/OHPKM'
 import { Box, BoxCoordinates, SAV } from './SAV'
-import { ParsedPath, splitPath } from './path'
+import { emptyPathData, PathData, splitPath } from './path'
 import { LOOKUP_TYPE } from './util'
 
-const SAVE_SIZE_BYTES = 0x20000
+export const SAVE_SIZE_BYTES = 0x20000
+export const EMERALD_SECURITY_OFFSET = 0xac
+export const EMERALD_SECURITY_COPY_OFFSET = 0x01f4
+export const FRLG_SECURITY_OFFSET = 0x0af8
+export const FRLG_SECURITY_COPY_OFFSET = 0x0f20
 
 export class G3Sector {
   data: Uint8Array
@@ -74,7 +77,9 @@ export class G3SaveBackup {
 
   isFirstSave: boolean = false
 
+  gameCode: number = 0
   securityKey: number = 0
+  securityKeyCopy?: number
 
   money: number = -1
 
@@ -97,14 +102,39 @@ export class G3SaveBackup {
   constructor(bytes: Uint8Array) {
     this.bytes = bytes
     this.saveIndex = bytesToUint32LittleEndian(bytes, 0xffc)
-    this.securityKey = bytesToUint32LittleEndian(bytes, 0xf20)
-    this.money = bytesToUint32LittleEndian(bytes, 0x290) ^ this.securityKey
     this.sectors = []
     for (let i = 0; i < 14; i++) {
       this.sectors.push(new G3Sector(bytes, i))
       this.firstSectorIndex = this.sectors[0].sectionID
     }
     this.sectors.sort((sector1, sector2) => sector1.sectionID - sector2.sectionID)
+
+    this.gameCode = this.sectors[0].data[0xac]
+    switch (this.gameCode) {
+      case 0:
+        this.origin = GameOfOrigin.Ruby
+        this.money = bytesToUint32LittleEndian(this.sectors[1].data, 0x490)
+        break
+      case 1:
+        this.origin = GameOfOrigin.FireRed
+        this.securityKey = bytesToUint32LittleEndian(this.sectors[0].data, FRLG_SECURITY_OFFSET)
+        this.securityKeyCopy = bytesToUint32LittleEndian(
+          this.sectors[0].data,
+          FRLG_SECURITY_COPY_OFFSET
+        )
+        this.money = bytesToUint32LittleEndian(this.sectors[1].data, 0x290) ^ this.securityKey
+        break
+      default:
+        this.origin = GameOfOrigin.Emerald
+        this.securityKey = bytesToUint32LittleEndian(this.sectors[0].data, EMERALD_SECURITY_OFFSET)
+        this.securityKeyCopy = bytesToUint32LittleEndian(
+          this.sectors[0].data,
+          EMERALD_SECURITY_COPY_OFFSET
+        )
+        this.money = bytesToUint32LittleEndian(this.sectors[1].data, 0x490) ^ this.securityKey
+        break
+    }
+
     this.name = gen3StringToUTF(this.sectors[0].data, 0, 10)
     // concatenate pc data from all sectors
     this.pcDataContiguous = new Uint8Array(33744)
@@ -131,22 +161,7 @@ export class G3SaveBackup {
         console.error(e)
       }
     }
-    switch (bytesToUint32LittleEndian(this.sectors[0].data, 0xac)) {
-      case 0:
-        this.origin = GameOfOrigin.Ruby
-        this.money = bytesToUint32LittleEndian(this.sectors[1].data, 0x490)
-        break
-      case 1:
-        this.origin = GameOfOrigin.FireRed
-        this.securityKey = bytesToUint32LittleEndian(this.sectors[0].data, 0xaf8)
-        this.money = bytesToUint32LittleEndian(this.sectors[1].data, 0x290) ^ this.securityKey
-        break
-      default:
-        this.origin = GameOfOrigin.Emerald
-        this.securityKey = bytesToUint32LittleEndian(this.sectors[0].data, 0xac)
-        this.money = bytesToUint32LittleEndian(this.sectors[1].data, 0x490) ^ this.securityKey
-        break
-    }
+
     this.name = gen3StringToUTF(this.sectors[0].data, 0x00, 7)
     this.tid = bytesToUint16LittleEndian(this.sectors[0].data, 0x0a)
     this.sid = bytesToUint16LittleEndian(this.sectors[0].data, 0x0c)
@@ -177,7 +192,7 @@ export class G3SAV implements SAV<PK3> {
   boxRows = 5
   boxColumns = 6
 
-  filePath: ParsedPath
+  filePath: PathData
   fileCreated?: Date
 
   money: number
@@ -196,7 +211,7 @@ export class G3SAV implements SAV<PK3> {
 
   updatedBoxSlots: BoxCoordinates[] = []
 
-  constructor(path: ParsedPath, bytes: Uint8Array) {
+  constructor(path: PathData, bytes: Uint8Array) {
     this.bytes = bytes
     this.filePath = path
     const saveOne = new G3SaveBackup(bytes.slice(0, 0xe000))
@@ -255,6 +270,7 @@ export class G3SAV implements SAV<PK3> {
         this.origin = this.primarySave.origin
       }
     }
+    console.log(this.boxes)
   }
 
   prepareBoxesAndGetModified() {
@@ -306,18 +322,30 @@ export class G3SAV implements SAV<PK3> {
     return this.boxes[this.currentPCBox]
   }
 
+  getGameName() {
+    const gameOfOrigin = GameOfOriginData[this.origin]
+    return gameOfOrigin ? `Pokémon ${gameOfOrigin.name}` : '(Unknown Game)'
+  }
+
+  static saveTypeAbbreviation = 'RSE/FRLG'
+  static saveTypeName = 'Pokémon Ruby/Sapphire/Emerald/FireRed/LeafGreen'
+
   static fileIsSave(bytes: Uint8Array): boolean {
     if (bytes.length !== SAVE_SIZE_BYTES) {
       return false
     }
-    const valueAtAC = bytesToUint32LittleEndian(bytes, 0xac)
-    if (valueAtAC === 1 || valueAtAC === 0) {
-      return true
+    try {
+      const save = new G3SAV(emptyPathData, bytes)
+      if (save.primarySave.gameCode === 0) {
+        return true
+      }
+      return (
+        save.primarySave.securityKey > 0 &&
+        save.primarySave.securityKey === save.primarySave.securityKeyCopy
+      )
+    } catch {
+      return false
     }
-    for (let i = 0x890; i < 0xf2c; i += 4) {
-      if (bytesToUint64LittleEndian(bytes, i) !== 0) return true
-    }
-    return false
   }
 
   gameColor() {
@@ -339,5 +367,23 @@ export class G3SAV implements SAV<PK3> {
 
   static includesOrigin(origin: GameOfOrigin) {
     return origin >= GameOfOrigin.Sapphire && origin <= GameOfOrigin.LeafGreen
+  }
+
+  getPluginIdentifier() {
+    return undefined
+  }
+
+  getExtraData(): object {
+    return {
+      securityKey: this.primarySave.securityKey,
+      securityKeyCopyEmerald: new DataView(
+        this.primarySave.sectors[0].data.buffer as ArrayBuffer
+      ).getUint32(0x1f4, true),
+      securityKeyCopyFRLG: new DataView(
+        this.primarySave.sectors[0].data.buffer as ArrayBuffer
+      ).getUint32(0xf20, true),
+      rivalName: gen3StringToUTF(this.primarySave.sectors[3].data, 0x0bcc, 8),
+      gameCode: this.primarySave.gameCode,
+    }
   }
 }

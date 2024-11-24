@@ -2,7 +2,7 @@ import fs from 'fs'
 import { uniqBy } from 'lodash'
 import os from 'os'
 import path from 'path'
-import { ParsedPath, PossibleSaves } from '../types/SAVTypes/path'
+import { PathData, PossibleSaves } from '../types/SAVTypes/path'
 import { SaveFolder } from '../types/storage'
 import { SaveRef, SaveRefMap } from '../types/types'
 import {
@@ -65,7 +65,7 @@ export function removeSaveFileFolder(folderPath: string) {
   updateStoredList('save-folders.json', saveFolders)
 }
 
-function parsedPathFromString(p: string): ParsedPath {
+function parsedPathFromString(p: string): PathData {
   return {
     ...path.parse(p),
     separator: path.sep,

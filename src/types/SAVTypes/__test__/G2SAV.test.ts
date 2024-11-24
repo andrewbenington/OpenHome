@@ -5,10 +5,10 @@ import { bytesToPKM } from '../../FileImport'
 import { OHPKM } from '../../pkm/OHPKM'
 import { G2SAV } from '../G2SAV'
 import { buildSaveFile } from '../load'
-import { emptyParsedPath } from '../path'
+import { emptyPathData } from '../path'
 
 const crystalSaveFile = buildSaveFile(
-  emptyParsedPath,
+  emptyPathData,
   new Uint8Array(fs.readFileSync(path.join(__dirname, './SAVFiles', 'crystal.sav'))),
   {},
   [G2SAV]
@@ -28,7 +28,7 @@ test('pc box decoded correctly', () => {
 
 test('removing mon shifts others in box', () => {
   const modifiedSaveFile1 = buildSaveFile(
-    emptyParsedPath,
+    emptyPathData,
     new Uint8Array(crystalSaveFile.bytes),
     {},
     [G2SAV]
@@ -38,7 +38,7 @@ test('removing mon shifts others in box', () => {
   modifiedSaveFile1.prepareBoxesAndGetModified()
 
   const modifiedSaveFile2 = buildSaveFile(
-    emptyParsedPath,
+    emptyPathData,
     new Uint8Array(modifiedSaveFile1.bytes),
     {},
     [G2SAV]
@@ -50,7 +50,7 @@ test('removing mon shifts others in box', () => {
 
 test('inserting mon works', () => {
   const modifiedSaveFile1 = buildSaveFile(
-    emptyParsedPath,
+    emptyPathData,
     new Uint8Array(crystalSaveFile.bytes),
     {},
     [G2SAV]
@@ -60,7 +60,7 @@ test('inserting mon works', () => {
   modifiedSaveFile1.prepareBoxesAndGetModified()
 
   const modifiedSaveFile2 = buildSaveFile(
-    emptyParsedPath,
+    emptyPathData,
     new Uint8Array(modifiedSaveFile1.bytes),
     {},
     [G2SAV]
