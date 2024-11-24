@@ -45,6 +45,7 @@ import {
 import { getHPGen3Onward, getLevelGen3Onward, getStatGen3Onward } from '../../util/StatCalc'
 import { utf16BytesToString, utf16StringToBytes } from '../../util/Strings/StringConverter'
 import { PKMInterface, PluginPKMInterface } from '../interfaces'
+import schema from './OHPKM.json'
 import {
   adjustMovePPBetweenFormats,
   dvsFromIVs,
@@ -63,6 +64,8 @@ export class OHPKM implements PKMInterface {
   static fromBytes(bytes: ArrayBuffer) {
     return new OHPKM(new Uint8Array(bytes))
   }
+
+  static schema = schema
 
   public get fileSize() {
     return FILE_SIZE

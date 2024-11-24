@@ -4,6 +4,7 @@ import hexy from 'hexy'
 import lodash from 'lodash'
 import { FileSchemas } from 'pokemon-files'
 import { CSSProperties, Fragment, useEffect, useMemo, useState } from 'react'
+import { OHPKM } from 'src/types/pkm/OHPKM'
 
 interface HexEditorProps {
   data: Uint8Array
@@ -28,7 +29,12 @@ const styles: { [key: string]: CSSProperties } = {
 const HexEditor = ({ data, format }: HexEditorProps) => {
   const [hexyText, setHexyText] = useState<string>()
   const [currentHover, setCurrentHover] = useState<number>()
-  const schema = format ? FileSchemas[format] : undefined
+  const schema = useMemo(() => {
+    if (format === 'OHPKM') {
+      return OHPKM.schema
+    }
+    return format ? FileSchemas[format] : undefined
+  }, [format])
   const theme = useTheme()
 
   useEffect(() => {
