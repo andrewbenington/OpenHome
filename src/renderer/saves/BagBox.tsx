@@ -15,8 +15,9 @@ const BagBox = ({ removeItemFromPokemon, draggedMon, setDraggedItem, updateBag }
   const theme = useTheme()
   let items = Bag.getItems()
 
-  const totalSlots = Math.max(6 * 1, Math.ceil(items.length / 6) * 6)
-
+  const rowsNeeded = Math.ceil(items.length / 6) + (items.length % 6 === 0 ? 1 : 0)
+  const totalSlots = rowsNeeded * 6
+  
   const getItemIconPath = (itemName: string) => {
     const itemId = ItemFromString(itemName)?.toString().padStart(4, '0')
     return itemId ? `/items/index/${itemId}.png` : ''
