@@ -70,19 +70,33 @@ const BagBox = ({ removeItemFromPokemon, draggedMon, setDraggedItem, updateBag }
               onDragOver={(e) => e.preventDefault()}
             >
               {item ? (
-                getItemIconPath(item.name) ? (
-                  <img
-                    src={getItemIconPath(item.name)}
-                    alt={item.name}
-                    draggable
-                    onDragStart={(e) => handleDragStart(e, item.name)}
-                    onDragEnd={handleDragEnd}
-                    style={{ width: 24, height: 24 }}
-                    onError={(e) => ((e.target as HTMLImageElement).style.display = 'none')}
-                  />
-                ) : (
-                  <Typography sx={{ fontSize: 12 }}>{item.name}</Typography>
-                )
+                <div style={{ position: 'relative', width: 24, height: 24 }}>
+                  {getItemIconPath(item.name) ? (
+                    <img
+                      src={getItemIconPath(item.name)}
+                      alt={item.name}
+                      draggable
+                      onDragStart={(e) => handleDragStart(e, item.name)}
+                      onDragEnd={handleDragEnd}
+                      style={{ width: '100%', height: '100%' }}
+                      onError={(e) => ((e.target as HTMLImageElement).style.display = 'none')}
+                    />
+                  ) : (
+                    <Typography sx={{ fontSize: 12 }}>{item.name}</Typography>
+                  )}
+                  {/* Item Count */}
+                  <Typography // NOTE THIS WILL NEED TO BE ADJUSTED
+                    sx={{
+                      fontSize: 10,
+                      fontWeight: 'bold',
+                      position: 'absolute',
+                      bottom: -6,
+                      right: -6,
+                    }}
+                  >
+                    {item.count}
+                  </Typography>
+                </div>
               ) : null}
             </Grid>
           )
