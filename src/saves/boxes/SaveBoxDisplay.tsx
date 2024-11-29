@@ -1,3 +1,4 @@
+import { useDraggable } from '@dnd-kit/core'
 import { Button, Card, Grid, Modal, ModalDialog, Stack } from '@mui/joy'
 import lodash from 'lodash'
 import { GameOfOriginData } from 'pokemon-resources'
@@ -6,9 +7,9 @@ import { MdArrowBack, MdArrowForward, MdClose } from 'react-icons/md'
 import { MenuIcon } from 'src/components/Icons'
 import AttributeRow from 'src/pokemon/AttributeRow'
 import { MouseContext } from 'src/state/mouse'
-import { MonLocation, OpenSavesContext } from 'src/state/openSaves'
-import { PKMInterface } from '../../types/interfaces'
-import { InfoGrid } from 'src/components/InfoGrid'
+import { MonLocation, MonWithLocation, OpenSavesContext } from 'src/state/openSaves'
+import { PKMInterface } from 'src/types/interfaces'
+import { InfoGrid } from '../../components/InfoGrid'
 import ArrowButton from './ArrowButton'
 import BoxCell from './BoxCell'
 
@@ -23,6 +24,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   const [detailsModal, setDetailsModal] = useState(false)
   const { saveIndex, setSelectedMon } = props
   const save = openSaves[saveIndex]
+  const { active } = useDraggable({ id: '' })
 
   const dispatchStartDrag = useCallback(
     (boxPos: number) => {
@@ -56,15 +58,13 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   )
 
   const dispatchImportMons = (mons: PKMInterface[], location: MonLocation) =>
-    openSavesDispatch({
-      type: 'import_mons',
-      payload: { mons, dest: location },
-    })
+    openSavesDispatch({ type: 'import_mons', payload: { mons, dest: location } })
 
   const isDisabled = useMemo(() => {
-    if (!mouseState.dragSource) return false
-    return !save.supportsMon(mouseState.dragSource.mon.dexNum, mouseState.dragSource.mon.formeNum)
-  }, [save, mouseState.dragSource])
+    const dragData = active?.data.current as MonWithLocation | undefined
+    if (!dragData) return false
+    return !save.supportsMon(dragData.mon.dexNum, dragData.mon.formeNum)
+  }, [save, active])
 
   return save && save.currentPCBox !== undefined ? (
     <Stack style={{ width: '100%' }}>
@@ -169,6 +169,14 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                       }}
                       onDragEvent={() => {
                         dispatchStartDrag(row * save.boxColumns + rowIndex)
+                      }}
+                      dragID={`${save.tid}_${save.sid}_${save.currentPCBox}_${
+                        row * save.boxColumns + rowIndex
+                      }`}
+                      dragData={{
+                        box: save.currentPCBox,
+                        boxPos: row * save.boxColumns + rowIndex,
+                        save,
                       }}
                       disabled={isDisabled}
                       mon={mon}

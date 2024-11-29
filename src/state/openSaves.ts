@@ -29,6 +29,10 @@ export type MonLocation = {
   boxPos: number
 }
 
+export type MonWithLocation = MonLocation & {
+  mon: PKMInterface
+}
+
 export type OpenSavesAction =
   | {
       type: 'set_home_boxes'
@@ -66,9 +70,7 @@ export type OpenSavesAction =
   | {
       type: 'move_mon'
       payload: {
-        source: MonLocation & {
-          mon: PKMInterface
-        }
+        source: MonWithLocation
         dest: MonLocation
       }
     }
@@ -120,7 +122,6 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
   action: OpenSavesAction
 ) => {
   const { type, payload } = action
-  console.log(type, payload)
   switch (type) {
     case 'set_home_boxes': {
       const { boxes, homeLookup } = payload
@@ -185,6 +186,7 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
 
       let sourceMon = sourceBox.pokemon[source.boxPos]
       let destMon = destBox.pokemon[dest.boxPos]
+      console.log(sourceMon?.nickname, destMon?.nickname)
 
       if (sourceMon !== source.mon) return state // necessary in strict mode, otherwise the swap will happen twice and revert
       if (sourceIdentifier !== destIdentifier) {

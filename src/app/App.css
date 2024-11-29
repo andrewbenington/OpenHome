@@ -4,6 +4,13 @@ body {
     'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  user-select: none;
+  -webkit-user-select: none !important;
+}
+
+div {
+  user-select: none;
+  -webkit-user-select: none !important;
 }
 
 code {
@@ -14,6 +21,9 @@ html,
 body,
 #root {
   height: 100%;
+  user-select: none;
+  -webkit-user-select: none !important;
+  -webkit-user-drag: none !important;
 }
 
 :root {

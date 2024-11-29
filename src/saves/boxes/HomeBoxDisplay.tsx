@@ -128,6 +128,12 @@ const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
                     onDragEvent={(cancel: boolean) =>
                       cancel ? dispatchCancelDrag() : dispatchStartDrag(row * 12 + rowIndex)
                     }
+                    dragID={`home_${homeData.currentPCBox}_${row * 12 + rowIndex}`}
+                    dragData={{
+                      box: homeData.currentPCBox,
+                      boxPos: row * 12 + rowIndex,
+                      save: homeData,
+                    }}
                     mon={mon}
                     zIndex={10 - row}
                     onDrop={(importedMons) => {

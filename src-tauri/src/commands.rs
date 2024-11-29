@@ -204,12 +204,6 @@ pub fn write_storage_file_text(
 ) -> Result<(), String> {
     let full_path = prepend_appdata_storage_to_path(&app_handle, &relative_path)?;
 
-    // Open the file, and return any error up the call stack
-    println!(
-        "writing {}: {}",
-        full_path.to_str().unwrap_or("(no path)"),
-        text
-    );
     let mut file = File::create(full_path).map_err(|e| e.to_string())?;
     return file.write_all(text.as_bytes()).map_err(|e| e.to_string());
 }

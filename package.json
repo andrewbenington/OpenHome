@@ -36,6 +36,8 @@
     "tauri": "tauri"
   },
   "dependencies": {
+    "@dnd-kit/core": "^6.2.0",
+    "@dnd-kit/modifiers": "^8.0.0",
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
     "@mui/joy": "^5.0.0-beta.48",
