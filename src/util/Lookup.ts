@@ -3,7 +3,7 @@ import { isGameBoy } from 'pokemon-resources'
 import { PKMInterface } from '../types/interfaces'
 import { OHPKM } from '../types/pkm/OHPKM'
 import { getBaseMon } from '../types/pkm/util'
-import { bytesToString } from './ByteLogic'
+import { bytesToString } from './byteLogic'
 import { gen12StringToUTF, utf16StringToGen12 } from './Strings/StringConverter'
 
 export const getMonFileIdentifier = (mon: PKMInterface) => {

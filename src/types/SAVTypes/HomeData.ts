@@ -1,6 +1,6 @@
 import lodash from 'lodash'
 import { GameOfOrigin } from 'pokemon-resources'
-import { getMonFileIdentifier } from '../../util/Lookup'
+import { getMonFileIdentifier } from 'src/util/Lookup'
 import { TransferRestrictions } from '../TransferRestrictions'
 import { OHPKM } from '../pkm/OHPKM'
 import { BoxMonIdentifiers } from '../storage'

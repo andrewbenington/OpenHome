@@ -2,7 +2,7 @@ import {
   getMonFileIdentifier,
   getMonGen12Identifier,
   getMonGen345Identifier,
-} from '../../util/Lookup'
+} from 'src/util/Lookup'
 import { PKMInterface } from '../interfaces'
 import { OHPKM } from '../pkm/OHPKM'
 import { PathData } from './path'
@@ -74,15 +74,15 @@ export const buildSaveFile = (
     saveType.lookupType === 'gen12'
       ? gen12LookupMap
       : saveType.lookupType === 'gen345'
-      ? gen345LookupMap
-      : undefined
+        ? gen345LookupMap
+        : undefined
 
   const getIdentifier =
     saveType.lookupType === 'gen12'
       ? getMonGen12Identifier
       : saveType.lookupType === 'gen345'
-      ? getMonGen345Identifier
-      : getMonFileIdentifier
+        ? getMonGen345Identifier
+        : getMonFileIdentifier
 
   const saveFile = recoverOHPKMData(
     new saveType(filePath, fileBytes),

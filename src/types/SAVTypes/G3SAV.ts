@@ -1,17 +1,17 @@
 import { PK3 } from 'pokemon-files'
 import { GameOfOrigin, GameOfOriginData } from 'pokemon-resources'
 import { NationalDex } from 'pokemon-species-data'
-import { GEN3_TRANSFER_RESTRICTIONS } from '../../consts/TransferRestrictions'
+import { GEN3_TRANSFER_RESTRICTIONS } from 'src/consts/TransferRestrictions'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
   uint16ToBytesLittleEndian,
   uint32ToBytesLittleEndian,
-} from '../../util/ByteLogic'
-import { gen3StringToUTF } from '../../util/Strings/StringConverter'
+} from 'src/util/byteLogic'
+import { gen3StringToUTF } from 'src/util/Strings/StringConverter'
 import { OHPKM } from '../pkm/OHPKM'
-import { Box, BoxCoordinates, SAV } from './SAV'
 import { emptyPathData, PathData, splitPath } from './path'
+import { Box, BoxCoordinates, SAV } from './SAV'
 import { LOOKUP_TYPE } from './util'
 
 export const SAVE_SIZE_BYTES = 0x20000
