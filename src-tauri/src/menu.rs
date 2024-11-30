@@ -3,34 +3,33 @@ use tauri::{menu::*, AppHandle, Wry};
 pub fn create_menu(handle: &AppHandle) -> Result<Menu<Wry>, Box<dyn std::error::Error>> {
     let menu = Menu::new(handle)?;
 
-    // I don't why there is a new item command submenu. What will be created with this?
-    // let new_item = MenuItem::with_id(handle, "new", "New", true, Some("CmdOrCtrl+N"))?;
     let open_item = MenuItem::with_id(handle, "open", "Open", true, Some("CmdOrCtrl+O"))?;
     let save_item = MenuItem::with_id(handle, "save", "Save", true, Some("CmdOrCtrl+S"))?;
+    let reset_item = MenuItem::with_id(handle, "reset", "Reset", true, Some("CmdOrCtrl+X"))?;
     let exit_item = MenuItem::with_id(handle, "exit", "Exit", true, Some("CmdOrCtrl+Q"))?;
 
     let file_submenu = SubmenuBuilder::new(handle, "File")
-        // .item(&new_item)
         .item(&open_item)
         .item(&save_item)
+        .item(&reset_item)
         .separator()
         .item(&exit_item)
         .build()?;
 
     menu.append(&file_submenu)?;
 
-    let undo_item = MenuItem::with_id(handle, "undo", "Undo", true, Some("CmdOrCtrl+Z"))?;
-    let redo_item = MenuItem::with_id(handle, "redo", "Redo", true, Some("CmdOrCtrl+Y"))?;
-    let cut_item = MenuItem::with_id(handle, "cut", "Cut", true, Some("CmdOrCtrl+X"))?;
+    // let undo_item = MenuItem::with_id(handle, "undo", "Undo", true, Some("CmdOrCtrl+Z"))?;
+    // let redo_item = MenuItem::with_id(handle, "redo", "Redo", true, Some("CmdOrCtrl+Y"))?;
+    // let cut_item = MenuItem::with_id(handle, "cut", "Cut", true, Some("CmdOrCtrl+X"))?;
     let copy_item = MenuItem::with_id(handle, "copy", "Copy", true, Some("CmdOrCtrl+C"))?;
-    let paste_item = MenuItem::with_id(handle, "paste", "Paste", true, Some("CmdOrCtrl+V"))?;
+    // let paste_item = MenuItem::with_id(handle, "paste", "Paste", true, Some("CmdOrCtrl+V"))?;
 
     let edit_submenu = SubmenuBuilder::new(handle, "Edit")
-        .item(&undo_item)
-        .item(&redo_item)
-        .item(&cut_item)
+        // .item(&undo_item)
+        // .item(&redo_item)
+        // .item(&cut_item)
         .item(&copy_item)
-        .item(&paste_item)
+        // .item(&paste_item)
         .build()?;
 
     menu.append(&edit_submenu)?;     
@@ -47,12 +46,15 @@ pub fn create_menu(handle: &AppHandle) -> Result<Menu<Wry>, Box<dyn std::error::
 
     menu.append(&view_submenu)?;
 
-    let about_item = MenuItem::with_id(handle, "about", "About", true, None::<&str>)?;
-    let check_updates_item = MenuItem::with_id(handle, "check_updates", "Check for Updates", true, None::<&str>)?;
+    // let about_item = MenuItem::with_id(handle, "about", "About", true, None::<&str>)?;
+    // let check_updates_item = MenuItem::with_id(handle, "check_updates", "Check for Updates", true, None::<&str>)?;
+    let visit_github_item = MenuItem::with_id(handle, "visit_github", "Visit Github", true, None::<&str>)?;
+
 
     let help_submenu = SubmenuBuilder::new(handle, "Help")
-        .item(&about_item)
-        .item(&check_updates_item)
+        // .item(&about_item)
+        // .item(&check_updates_item)
+        .item(&visit_github_item)
         .build()?;
 
     menu.append(&help_submenu)?;
@@ -85,6 +87,7 @@ pub fn handle_menu_event(event: MenuEvent) {
         // Help menu actions
         "about" => println!("About action triggered!"),
         "check_updates" => println!("Check for updates action triggered!"),
+        "visit_github" => println!("Github visited action triggered!"),
 
         _ => println!("Nothing triggered!"),
     }
