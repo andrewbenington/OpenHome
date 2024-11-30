@@ -126,11 +126,30 @@ export const TauriBackend: BackendInterface = {
   getSaveFolders: async (): Promise<Errorable<SaveFolder[]>> => {
     return TauriInvoker.getStorageFileJSON('save-folders.json') as Promise<Errorable<SaveFolder[]>>
   },
-  removeSaveFolder: async (_path: string): Promise<Errorable<null>> => {
-    return E.left('Not implemented')
+  removeSaveFolder: async (pathToRemove: string): Promise<Errorable<null>> => {
+    const saveFoldersResult = await (TauriInvoker.getStorageFileJSON(
+      'save-folders.json'
+    ) as Promise<Errorable<SaveFolder[]>>)
+
+    if (E.isLeft(saveFoldersResult)) {
+      return saveFoldersResult
+    }
+
+    const saveFolders = saveFoldersResult.right.filter((folder) => folder.path !== pathToRemove)
+    return TauriInvoker.writeStorageFileJSON('save-folders.json', saveFolders)
   },
-  upsertSaveFolder: async (_folderPath: string, _label: string): Promise<Errorable<null>> => {
-    return E.left('Not implemented')
+  upsertSaveFolder: async (folderPath: string, label: string): Promise<Errorable<null>> => {
+    const saveFoldersResult = await (TauriInvoker.getStorageFileJSON(
+      'save-folders.json'
+    ) as Promise<Errorable<SaveFolder[]>>)
+
+    if (E.isLeft(saveFoldersResult)) {
+      return saveFoldersResult
+    }
+
+    const saveFolders = saveFoldersResult.right.filter((folder) => folder.path !== folderPath)
+    saveFolders.push({ label, path: folderPath })
+    return TauriInvoker.writeStorageFileJSON('save-folders.json', saveFolders)
   },
 
   /* transactions */
