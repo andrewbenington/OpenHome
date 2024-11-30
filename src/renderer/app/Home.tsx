@@ -1,6 +1,7 @@
 import {
   Alert,
   Box,
+  Card,
   DialogContent,
   DialogTitle,
   Divider,
@@ -9,6 +10,10 @@ import {
   ModalDialog,
   ModalOverflow,
   Stack,
+  Tab,
+  TabList,
+  TabPanel,
+  Tabs,
   useTheme,
 } from '@mui/joy'
 import * as E from 'fp-ts/lib/Either'
@@ -29,6 +34,8 @@ import { BackendContext } from '../backend/backendProvider'
 import FilterPanel from '../components/filter/FilterPanel'
 import PokemonIcon from '../components/PokemonIcon'
 import PokemonDetailsPanel from '../pokemon/PokemonDetailsPanel'
+import { Bag } from '../saves/Bag'
+import BagBox from '../saves/BagBox'
 import HomeBoxDisplay from '../saves/boxes/HomeBoxDisplay'
 import OpenSaveDisplay from '../saves/boxes/SaveBoxDisplay'
 import SavesModal from '../saves/SavesModal'
@@ -49,10 +56,25 @@ const Home = () => {
   const homeData = openSavesState.homeData
   const { palette } = useTheme()
   const [selectedMon, setSelectedMon] = useState<PKMInterface>()
+  const [draggedMon, setDraggedMon] = useState<PKMInterface | null>(null)
+  const [draggedItem, setDraggedItem] = useState<string | null>(null)
   const [tab, setTab] = useState('summary')
   const [openSaveDialog, setOpenSaveDialog] = useState(false)
   const [errorMessages, setErrorMessages] = useState<string[]>()
   const [filesToDelete, setFilesToDelete] = useState<string[]>([])
+  const [bagItems, setBagItems] = useState(Bag.getItems())
+  const [activeTab, setActiveTab] = useState(0)
+
+  const updateBag = () => {
+    setBagItems(Bag.getItems())
+  }
+
+  const removeItemFromPokemon = () => {
+    if (draggedMon && draggedMon.heldItemIndex) {
+      draggedMon.heldItemIndex = 0
+      console.log(`Removed item from dragged Pokémon`)
+    }
+  }
 
   useEffect(() => {
     const edited =
@@ -279,13 +301,18 @@ const Home = () => {
       }}
     >
       <Stack className="save-file-column" spacing={1} width={280} minWidth={280}>
+        {/* Displaying open save files and action buttons */}
         {lodash.range(allOpenSaves.length).map((i) => (
           <OpenSaveDisplay
             key={`save_display_${i}`}
             saveIndex={i}
             setSelectedMon={setSelectedMon}
+            setDraggedMon={setDraggedMon}
+            updateBag={updateBag}
           />
         ))}
+
+        {/* Open Save Button */}
         <button
           className="card-button"
           onClick={() => setOpenSaveDialog(true)}
@@ -297,6 +324,7 @@ const Home = () => {
           Open Save
         </button>
       </Stack>
+
       <div
         className="home-box-column"
         style={{
@@ -304,6 +332,7 @@ const Home = () => {
           minWidth: 480,
         }}
       >
+        {/* Central Home Box Display */}
         <Box
           display="flex"
           flexDirection="row"
@@ -312,22 +341,56 @@ const Home = () => {
           minWidth={480}
           alignItems="center"
         >
-          <HomeBoxDisplay setSelectedMon={setSelectedMon} />
+          <HomeBoxDisplay
+            setSelectedMon={setSelectedMon}
+            setDraggedMon={setDraggedMon}
+            updateBag={updateBag}
+          />
           <Box flex={1}></Box>
         </Box>
       </div>
+      {/* Right-hand side (RHS) with Tabs for Filter and Bag */}
       <Stack spacing={1} className="right-column" width={300}>
-        <FilterPanel />
+        <Card sx={{ padding: 0, overflow: 'hidden' }}>
+          <Tabs
+            value={activeTab}
+            onChange={(_, newValue) => {
+              if (typeof newValue === 'number') {
+                setActiveTab(newValue)
+              }
+            }}
+          >
+            <TabList>
+              <Tab>Filter</Tab>
+              <Tab>Bag</Tab>
+            </TabList>
+
+            <TabPanel value={0} sx={{ padding: 0 }}>
+              <FilterPanel />
+            </TabPanel>
+
+            <TabPanel value={1} sx={{ padding: 0 }}>
+              <BagBox
+                removeItemFromPokemon={removeItemFromPokemon}
+                draggedMon={draggedMon}
+                setDraggedItem={setDraggedItem}
+                items={bagItems}
+                updateBag={updateBag}
+              />
+            </TabPanel>
+          </Tabs>
+        </Card>
+
+        {/* Drop areas for 'Preview' and 'Release' */}
         <div
           className="drop-area"
           draggable
-          onDragOver={(e) => {
-            e.preventDefault()
-          }}
+          onDragOver={(e) => e.preventDefault()}
           onDrop={(e) => onViewDrop(e, 'as is')}
         >
           Preview
         </div>
+
         <div
           className="drop-area"
           onDragOver={(e) => e.preventDefault()}
@@ -335,19 +398,18 @@ const Home = () => {
         >
           Release
           <div className="release-icon-container" style={{ display: 'flex' }}>
-            {openSavesState.monsToRelease.map((mon, i) => {
-              return (
-                <PokemonIcon
-                  key={`delete_mon_${i}`}
-                  dexNumber={mon.dexNum}
-                  formeNumber={mon.formeNum}
-                  style={{ height: 32, width: 32 }}
-                />
-              )
-            })}
+            {openSavesState.monsToRelease.map((mon, i) => (
+              <PokemonIcon
+                key={`delete_mon_${i}`}
+                dexNumber={mon.dexNum}
+                formeNumber={mon.formeNum}
+                style={{ height: 32, width: 32 }}
+              />
+            ))}
           </div>
         </div>
       </Stack>
+      {/* Modals */}
       <Modal open={!!selectedMon} onClose={() => setSelectedMon(undefined)}>
         <ModalOverflow>
           <ModalDialog
@@ -364,6 +426,7 @@ const Home = () => {
           </ModalDialog>
         </ModalOverflow>
       </Modal>
+
       <Modal open={openSaveDialog} onClose={() => setOpenSaveDialog(false)}>
         <ModalDialog
           sx={{
@@ -381,14 +444,15 @@ const Home = () => {
           />
         </ModalDialog>
       </Modal>
+
       <Modal open={!!errorMessages} onClose={() => setErrorMessages(undefined)}>
         <ModalDialog style={{ padding: 8 }}>
           <ModalClose />
           <DialogTitle>Error(s) saving</DialogTitle>
           <Divider />
           <DialogContent>
-            {errorMessages?.map((msg) => (
-              <Alert color="danger" variant="solid">
+            {errorMessages?.map((msg, index) => (
+              <Alert key={index} color="danger" variant="solid">
                 {msg}
               </Alert>
             ))}

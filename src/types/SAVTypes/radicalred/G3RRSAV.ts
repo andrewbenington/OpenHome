@@ -74,7 +74,6 @@ export class G3RRSector {
     this.checksum = ((checksum & 0xffff) + ((checksum >> 16) & 0xffff)) & 0xffff
   }
 }
-
 export class G3RRSaveBackup {
   origin: GameOfOrigin = GameOfOrigin.INVALID_0
   bytes: Uint8Array
@@ -236,11 +235,6 @@ export class G3RRSAV implements PluginSAV<PK3RR> {
 
     console.log(this.boxes)
   }
-  getExtraData?: (() => object) | undefined
-
-  pcChecksumOffset?: number | undefined
-  pcOffset?: number | undefined
-  calculateChecksum?: (() => number) | undefined
 
   prepareBoxesAndGetModified() {
     const changedMonPKMs: OHPKM[] = []

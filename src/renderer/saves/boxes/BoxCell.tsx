@@ -1,3 +1,4 @@
+import { ItemFromString } from 'pokemon-resources'
 import React, { useContext, useEffect, useMemo, useState } from 'react'
 import PokemonIcon from 'src/renderer/components/PokemonIcon'
 import { FilterContext } from 'src/renderer/state/filter'
@@ -6,6 +7,7 @@ import { filterApplies } from 'src/types/Filter'
 import { Styles } from 'src/types/types'
 import { PKMInterface } from '../../../types/interfaces'
 import BoxIcons from '../../images/BoxIcons.png'
+import { Bag } from '../Bag'
 
 const styles = {
   fillContainer: { width: '100%', height: '100%' },
@@ -39,14 +41,27 @@ interface BoxCellProps {
   zIndex: number
   mon: PKMInterface | undefined
   borderColor?: string
+  setDraggedMon: React.Dispatch<React.SetStateAction<PKMInterface | null>>
+  updateBag: () => void
 }
 
-const BoxCell = ({ onClick, onDragEvent, onDrop, disabled, zIndex, mon, borderColor }: BoxCellProps) => {
+const BoxCell = (props: BoxCellProps) => {
+  const {
+    onClick,
+    onDragEvent,
+    onDrop,
+    disabled: disabledProp,
+    zIndex,
+    mon,
+    borderColor,
+    setDraggedMon,
+    updateBag,
+  } = props
   const [isBeingDragged, setIsBeingDragged] = useState(false)
   const [isDraggedOver, setIsDraggedOver] = useState(false)
   const [filterState] = useContext(FilterContext)
 
-  disabled = disabled || (mon?.isLocked ?? false);
+  const disabled = disabledProp || (mon?.isLocked ?? false)
 
   const isFilteredOut = useMemo(() => {
     return (
@@ -71,7 +86,24 @@ const BoxCell = ({ onClick, onDragEvent, onDrop, disabled, zIndex, mon, borderCo
   }
 
   const handleDrop: React.DragEventHandler<HTMLDivElement> = (e) => {
-    if (e.dataTransfer.files[0]) {
+    e.preventDefault()
+    setIsDraggedOver(false)
+    const droppedData = e.dataTransfer.getData('ItemTransfer')
+
+    if (droppedData) {
+      const itemId = ItemFromString(droppedData)
+      if (itemId && mon && !mon.heldItemIndex) {
+        mon.heldItemIndex = itemId
+        console.log(`Assigned item "${droppedData}" to Pokémon`)
+
+        Bag.popItem(droppedData)
+        updateBag()
+        console.log(`Removed item "${droppedData}" from Bag`)
+      } else if (itemId && mon?.heldItemIndex) {
+        console.log('Pokémon already holds an item!')
+      }
+    } else if (e.dataTransfer.files[0]) {
+      // dropped data is files
       onDropFromFiles(e.dataTransfer.files)
     } else {
       onDrop(undefined)
@@ -126,11 +158,16 @@ const BoxCell = ({ onClick, onDragEvent, onDrop, disabled, zIndex, mon, borderCo
           onDragStart={() => {
             onDragEvent(false)
             setIsBeingDragged(true)
+
+            if (mon?.heldItemIndex) {
+              setDraggedMon(mon)
+            }
           }}
           onDragEnter={() => setIsDraggedOver(true)}
           onDragLeave={() => setIsDraggedOver(false)}
           onDragEnd={(e: { dataTransfer: any; target: any }) => {
             setIsBeingDragged(false)
+            setDraggedMon(null)
             if (e.dataTransfer.dropEffect !== 'copy') {
               onDragEvent(true)
             }

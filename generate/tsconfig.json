@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "outDir": "out",
+    "rootDir": ".",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "moduleResolution": "node",
+    "lib": ["dom", "es2021"],
+    "types": ["node"]
+  },
+  "include": ["./**/*.ts", "./**/*.mts"]
+}

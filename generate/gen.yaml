@@ -1,0 +1,25 @@
+enums:
+  - name: Item
+    source: text/items/items.txt
+    dest: items/Items.ts
+  - name: ItemGen1
+    source: text/items/gen1.txt
+    dest: items/Gen1.ts
+  - name: ItemGen2
+    source: text/items/gen2.txt
+    dest: items/Gen2.ts
+  - name: ItemGen3
+    source: text/items/gen3.txt
+    dest: items/Gen3.ts
+  - name: ItemGen3Col
+    source: text/items/gen3col.txt
+    dest: items/Gen3Col.ts
+  - name: ItemsGen3XD
+    source: text/items/gen3xd.txt
+    dest: items/Gen3XD.ts
+  - name: Ability
+    source: text/other/abilities.txt
+    dest: other/Abilities.ts
+  - name: Nature
+    source: text/other/natures.txt
+    dest: other/Natures.ts

@@ -425,7 +425,6 @@ export class PK3RR implements PluginPKMInterface {
   public get language() {
     return Languages[this.languageIndex]
   }
-
   public get heldItemName() {
     return ItemGen3RRToString(this.privateHeldItemIndex)
   }
