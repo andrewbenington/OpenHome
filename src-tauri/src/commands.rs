@@ -2,39 +2,11 @@ use serde_json::Value;
 use std::collections::HashMap;
 use std::fs;
 use std::fs::File;
-use std::io::{Error, ErrorKind, Write, Read};
+use std::io::{Error, ErrorKind, Read, Write};
 use std::path::PathBuf;
 use std::time::SystemTime;
-use tauri::Manager;
 
-fn prepend_appdata_storage_to_path(
-    app_handle: &tauri::AppHandle,
-    path: &PathBuf,
-) -> Result<PathBuf, String> {
-    let appdata_dir = get_appdata_dir(app_handle)?;
-    let mut full_path = PathBuf::new();
-
-    full_path.push(&appdata_dir);
-    full_path.push("storage".to_owned());
-    full_path.push(path);
-    return Ok(full_path);
-}
-
-pub fn get_storage_file_text(
-    app_handle: tauri::AppHandle,
-    relative_path: &PathBuf,
-) -> Result<String, String> {
-    let full_path = prepend_appdata_storage_to_path(&app_handle, relative_path)?;
-
-    // Open the file, and return any error up the call stack
-    let mut file = File::open(full_path).map_err(|e| e.to_string())?;
-
-    let mut contents = String::new();
-    file.read_to_string(&mut contents)
-        .map_err(|e| e.to_string())?;
-
-    return Ok(contents);
-}
+use crate::util;
 
 #[tauri::command]
 pub fn get_file_bytes(absolute_path: PathBuf) -> Result<Vec<u8>, String> {
@@ -63,21 +35,9 @@ pub fn get_file_created(absolute_path: PathBuf) -> Result<u128, String> {
     return Ok(unix_duration.as_millis());
 }
 
-pub fn get_appdata_dir(app_handle: &tauri::AppHandle) -> Result<String, String> {
-    // Open the file, and return any error up the call stack
-    let path_buf = app_handle
-        .path()
-        .app_data_dir()
-        .map_err(|e| e.to_string())?;
-
-    return Ok(path_buf
-        .to_str()
-        .map_or("uhoh".to_owned(), |f| f.to_owned()));
-}
-
 #[tauri::command]
 pub fn get_ohpkm_files(app_handle: tauri::AppHandle) -> Result<HashMap<String, Vec<u8>>, String> {
-    let mons_path = prepend_appdata_storage_to_path(&app_handle, &PathBuf::from("mons"))?;
+    let mons_path = util::prepend_appdata_storage_to_path(&app_handle, &PathBuf::from("mons"))?;
     let mon_files = fs::read_dir(mons_path).map_err(|e| e.to_string())?;
 
     let mut map = HashMap::new();
@@ -111,7 +71,7 @@ pub fn delete_storage_files(
 ) -> HashMap<PathBuf, Result<(), String>> {
     let mut result = HashMap::new();
     for relative_path in relative_paths {
-        let full_path_r = prepend_appdata_storage_to_path(&app_handle, &relative_path);
+        let full_path_r = util::prepend_appdata_storage_to_path(&app_handle, &relative_path);
 
         result.insert(
             relative_path,
@@ -165,7 +125,7 @@ pub fn write_storage_file_bytes(
     relative_path: PathBuf,
     bytes: Vec<u8>,
 ) -> Result<(), String> {
-    let full_path = prepend_appdata_storage_to_path(&app_handle, &relative_path)?;
+    let full_path = util::prepend_appdata_storage_to_path(&app_handle, &relative_path)?;
 
     let mut file = File::create(full_path).map_err(|e| {
         format!(
@@ -202,7 +162,7 @@ pub fn write_storage_file_text(
     relative_path: PathBuf,
     text: String,
 ) -> Result<(), String> {
-    let full_path = prepend_appdata_storage_to_path(&app_handle, &relative_path)?;
+    let full_path = util::prepend_appdata_storage_to_path(&app_handle, &relative_path)?;
 
     let mut file = File::create(full_path).map_err(|e| e.to_string())?;
     return file.write_all(text.as_bytes()).map_err(|e| e.to_string());
@@ -213,7 +173,7 @@ pub fn get_storage_file_json(
     app_handle: tauri::AppHandle,
     relative_path: PathBuf,
 ) -> Result<Value, String> {
-    let json_data = get_storage_file_text(app_handle, &relative_path)
+    let json_data = util::get_storage_file_text(app_handle, &relative_path)
         .map_err(|e| format!("error opening {:#?}: {e}", &relative_path))?;
     let value = serde_json::from_str(json_data.as_str())
         .map_err(|e| format!("error opening {:#?}: {e}", relative_path));
