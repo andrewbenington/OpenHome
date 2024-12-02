@@ -154,7 +154,7 @@ export const TauriBackend: BackendInterface = {
 
   /* transactions */
   startTransaction: async (): Promise<Errorable<null>> => {
-    return E.left('Not implemented')
+    return TauriInvoker.startTransaction()
   },
   commitTransaction: async (): Promise<Errorable<null>> => {
     return E.left('Not implemented')

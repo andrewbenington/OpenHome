@@ -6,6 +6,7 @@ use std::io::{Error, ErrorKind, Read, Write};
 use std::path::PathBuf;
 use std::time::SystemTime;
 
+use crate::state::{self, AppState};
 use crate::util;
 
 #[tauri::command]
@@ -85,18 +86,15 @@ pub fn delete_storage_files(
     return result;
 }
 
-// #[derive(Default)]
-// struct MyState {
-//   s: std::sync::Mutex<String>,
-//   t: std::sync::Mutex<std::collections::HashMap<String, String>>,
-// }
 // remember to call `.manage(MyState::default())`
-// #[tauri::command]
-// async fn command_name(state: tauri::State<'_, MyState>) -> Result<(), String> {
-//   *state.s.lock().unwrap() = "new string".into();
-//   state.t.lock().unwrap().insert("key".into(), "value".into());
-//   Ok(())
-// }]
+#[tauri::command]
+pub fn start_transaction(state: tauri::State<'_, AppState>) -> Result<(), String> {
+    if *state.open_transaction.lock().unwrap() {
+        return Err("Previous transaction is still open".to_owned());
+    }
+    *state.open_transaction.lock().unwrap() = true;
+    Ok(())
+}
 
 #[tauri::command]
 pub fn write_file_bytes(absolute_path: PathBuf, bytes: Vec<u8>) -> Result<(), String> {
