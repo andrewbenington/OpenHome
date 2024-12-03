@@ -45,6 +45,7 @@ export default interface BackendInterface {
 
   /* application */
   setHasChanges: (hasChanges: boolean) => Promise<void>;
+  pickFile: () => Promise<Errorable<string | undefined>>;
   pickFolder: () => Promise<Errorable<string | undefined>>;
   getResourcesPath: () => Promise<string>;
   openDirectory: (directory: string) => Promise<Errorable<null>>;

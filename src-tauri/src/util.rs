@@ -7,6 +7,7 @@ pub fn prepend_appdata_storage_to_path(
     path: &PathBuf,
 ) -> Result<PathBuf, String> {
     let appdata_dir = get_appdata_dir(app_handle)?;
+    println!("{}", appdata_dir);
     let mut full_path = PathBuf::new();
 
     full_path.push(&appdata_dir);

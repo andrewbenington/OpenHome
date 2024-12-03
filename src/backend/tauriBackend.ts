@@ -167,6 +167,11 @@ export const TauriBackend: BackendInterface = {
   setHasChanges: async (_hasChanges: boolean): Promise<void> => {
     console.error('Not implemented')
   },
+  pickFile: (): Promise<Errorable<string | undefined>> => {
+    return fileDialog({ directory: false, title: 'Select File' }).then((path) =>
+      E.right(path ?? undefined)
+    )
+  },
   pickFolder: (): Promise<Errorable<string | undefined>> => {
     return fileDialog({ directory: true, title: 'Select Folder' }).then((path) =>
       E.right(path ?? undefined)

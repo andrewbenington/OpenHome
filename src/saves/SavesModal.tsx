@@ -12,18 +12,18 @@ import * as E from 'fp-ts/lib/Either'
 import { useCallback, useContext, useState } from 'react'
 import 'react-data-grid/lib/styles.css'
 import { PathData } from 'src/types/SAVTypes/path'
-import { getSaveRef } from '../types/SAVTypes/SAV'
-import { buildSaveFile } from '../types/SAVTypes/load'
+import { getMonFileIdentifier } from 'src/util/Lookup'
 import { BackendContext } from '../backend/backendProvider'
 import { CardsIcon, GridIcon } from '../components/Icons'
 import { AppInfoContext } from '../state/appInfo'
 import { LookupContext } from '../state/lookup'
 import { OpenSavesContext } from '../state/openSaves'
+import { getSaveRef } from '../types/SAVTypes/SAV'
+import { buildSaveFile } from '../types/SAVTypes/load'
 import RecentSaves from './RecentSaves'
 import SaveFolders from './SaveFolders'
 import SuggestedSaves from './SuggestedSaves'
 import { SaveViewMode } from './util'
-import { getMonFileIdentifier } from 'src/util/Lookup'
 
 interface SavesModalProps {
   onClose: () => void
@@ -38,10 +38,17 @@ const SavesModal = (props: SavesModalProps) => {
   const [viewMode, setViewMode] = useState<SaveViewMode>('cards')
   const [cardSize, setCardSize] = useState<number>(180)
 
-  console.log('SavesModal')
 
   const openSaveFile = useCallback(
     async (filePath?: PathData) => {
+      if (!filePath) {
+        const pickedFile = await backend.pickFile()
+        if (E.isLeft(pickedFile)) {
+          console.error(pickedFile.left)
+          return
+        }
+        filePath = { raw: pickedFile.right } as PathData
+      }
       backend.loadSaveFile(filePath).then(
         E.match(
           (err) => console.error(err),
