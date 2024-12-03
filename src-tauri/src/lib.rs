@@ -27,14 +27,15 @@ pub fn run() {
                 }
             }
         })
-        .on_menu_event(|_, event| {
-            menu::handle_menu_event(event);
+        .on_menu_event(|app_handle, event| {
+            menu::handle_menu_event(&app_handle, event);
         })
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_shell::init())
         .manage(state::AppState::default())
         .invoke_handler(tauri::generate_handler![
+            commands::get_state,
             commands::get_file_bytes,
             commands::get_file_created,
             commands::get_storage_file_json,

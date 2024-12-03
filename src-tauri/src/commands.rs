@@ -6,8 +6,18 @@ use std::io::{Error, ErrorKind, Read, Write};
 use std::path::PathBuf;
 use std::time::SystemTime;
 
-use crate::state::{self, AppState};
+use crate::state::{AppState, AppStateSnapshot};
 use crate::util;
+
+#[tauri::command]
+pub fn get_state(state: tauri::State<'_, AppState>) -> AppStateSnapshot {
+    let temp_files = state.temp_files.lock().unwrap().clone();
+    let open_transaction = state.open_transaction.lock().unwrap().clone();
+    AppStateSnapshot {
+        temp_files,
+        open_transaction,
+    }
+}
 
 #[tauri::command]
 pub fn get_file_bytes(absolute_path: PathBuf) -> Result<Vec<u8>, String> {
@@ -97,24 +107,12 @@ pub fn start_transaction(state: tauri::State<'_, AppState>) -> Result<(), String
 }
 
 #[tauri::command]
-pub fn write_file_bytes(absolute_path: PathBuf, bytes: Vec<u8>) -> Result<(), String> {
-    let mut file = File::create(&absolute_path).map_err(|e| {
-        format!(
-            "Create/open file {}: {}",
-            absolute_path.to_str().unwrap_or("Non-UTF Path"),
-            e
-        )
-    })?;
-
-    file.write_all(&bytes).map_err(|e| {
-        format!(
-            "Write file {}: {}",
-            absolute_path.to_str().unwrap_or("Non-UTF Path"),
-            e
-        )
-    })?;
-
-    return Ok(());
+pub fn write_file_bytes(
+    state: tauri::State<'_, AppState>,
+    absolute_path: PathBuf,
+    bytes: Vec<u8>,
+) -> Result<(), String> {
+    return state.write_file_bytes(absolute_path, bytes);
 }
 
 #[tauri::command]

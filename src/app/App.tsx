@@ -1,13 +1,15 @@
 import { closestCenter, DragOverlay, PointerSensor, useSensor } from '@dnd-kit/core'
 import { restrictToWindowEdges } from '@dnd-kit/modifiers'
-import { Box, Tab, TabList, TabPanel, Tabs, Typography } from '@mui/joy'
+import { Box, Card, Tab, TabList, TabPanel, Tabs, Typography } from '@mui/joy'
 import { extendTheme, ThemeProvider } from '@mui/joy/styles'
-import { useCallback, useEffect, useMemo, useReducer, useState } from 'react'
+import { useCallback, useContext, useEffect, useMemo, useReducer, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { TauriBackend } from 'src/backend/tauriBackend'
 import { PKMInterface } from 'src/types/interfaces'
 import { HomeData } from 'src/types/SAVTypes/HomeData'
-import { BackendProvider } from '../backend/backendProvider'
+import { BackendContext, BackendProvider } from '../backend/backendProvider'
+import { TauriInvoker } from '../backend/tauri/tauriInvoker'
+import { InfoGrid } from '../components/InfoGrid'
 import PokemonIcon from '../components/PokemonIcon'
 import useIsDarkMode from '../hooks/dark-mode'
 import { AppInfoContext, appInfoInitialState, appInfoReducer } from '../state/appInfo'
@@ -160,6 +162,12 @@ export default function App() {
                         >
                           <Settings />
                         </TabPanel>
+                        <TabPanel
+                          sx={{ '--Tabs-spacing': 0, height: 0, overflowY: 'hidden' }}
+                          value="state"
+                        >
+                          <AppState />
+                        </TabPanel>
                         <TabList color="primary">
                           <Tab indicatorPlacement="top" value="home" color="primary">
                             Home
@@ -173,6 +181,9 @@ export default function App() {
                           <Tab indicatorPlacement="top" value="settings" color="primary">
                             Settings
                           </Tab>
+                          <Tab indicatorPlacement="top" value="state" color="primary">
+                            App State
+                          </Tab>
                         </TabList>
                       </Tabs>
                     )}
@@ -184,5 +195,23 @@ export default function App() {
         </AppInfoContext.Provider>
       </BackendProvider>
     </ThemeProvider>
+  )
+}
+
+function AppState() {
+  const [appState, setAppState] = useState<object>()
+  const backend = useContext(BackendContext)
+
+  useEffect(() => {
+    TauriInvoker.getState().then(setAppState)
+  })
+
+  return (
+    <div>
+      <Card>
+        <InfoGrid data={appState ?? {}} />
+      </Card>
+      <button onClick={() => backend.startTransaction()}>TX</button>
+    </div>
   )
 }

@@ -1,13 +1,31 @@
-use tauri::{menu::*, AppHandle, Wry};
+use tauri::{menu::*, AppHandle, Emitter, Wry};
 
 pub fn create_menu(handle: &AppHandle) -> Result<Menu<Wry>, Box<dyn std::error::Error>> {
     let menu = Menu::new(handle)?;
+
+    if cfg!(target_os = "macos") {
+        let app_submenu_r = SubmenuBuilder::new(handle, "OpenHome")
+            .about(Some(
+                AboutMetadataBuilder::new().name(Some("OpenHome")).build(),
+            ))
+            .separator()
+            .services()
+            .separator()
+            .hide()
+            .hide_others()
+            .show_all()
+            .separator()
+            .quit()
+            .build();
+        if let Ok(app_submenu) = app_submenu_r {
+            menu.append(&app_submenu)?;
+        }
+    }
 
     let open_item = MenuItem::with_id(handle, "open", "Open", true, Some("CmdOrCtrl+O"))?;
     let save_item = MenuItem::with_id(handle, "save", "Save", true, Some("CmdOrCtrl+S"))?;
     let reset_item = MenuItem::with_id(handle, "reset", "Reset", true, Some("CmdOrCtrl+X"))?;
     let exit_item = MenuItem::with_id(handle, "exit", "Exit", true, Some("CmdOrCtrl+Q"))?;
-
     let file_submenu = SubmenuBuilder::new(handle, "File")
         .item(&open_item)
         .item(&save_item)
@@ -32,11 +50,12 @@ pub fn create_menu(handle: &AppHandle) -> Result<Menu<Wry>, Box<dyn std::error::
         // .item(&paste_item)
         .build()?;
 
-    menu.append(&edit_submenu)?;     
-    
+    menu.append(&edit_submenu)?;
+
     let zoom_in_item = MenuItem::with_id(handle, "zoom_in", "Zoom In", true, None::<&str>)?;
     let zoom_out_item = MenuItem::with_id(handle, "zoom_out", "Zoom Out", true, None::<&str>)?;
-    let show_toolbar_item = MenuItem::with_id(handle, "show_toolbar", "Show Toolbar", true, None::<&str>)?;
+    let show_toolbar_item =
+        MenuItem::with_id(handle, "show_toolbar", "Show Toolbar", true, None::<&str>)?;
 
     let view_submenu = SubmenuBuilder::new(handle, "View")
         .item(&zoom_in_item)
@@ -48,8 +67,8 @@ pub fn create_menu(handle: &AppHandle) -> Result<Menu<Wry>, Box<dyn std::error::
 
     // let about_item = MenuItem::with_id(handle, "about", "About", true, None::<&str>)?;
     // let check_updates_item = MenuItem::with_id(handle, "check_updates", "Check for Updates", true, None::<&str>)?;
-    let visit_github_item = MenuItem::with_id(handle, "visit_github", "Visit Github", true, None::<&str>)?;
-
+    let visit_github_item =
+        MenuItem::with_id(handle, "visit_github", "Visit Github", true, None::<&str>)?;
 
     let help_submenu = SubmenuBuilder::new(handle, "Help")
         // .item(&about_item)
@@ -60,16 +79,23 @@ pub fn create_menu(handle: &AppHandle) -> Result<Menu<Wry>, Box<dyn std::error::
     menu.append(&help_submenu)?;
 
     Ok(menu)
-
 }
 
-pub fn handle_menu_event(event: MenuEvent) {
+pub fn handle_menu_event(app_handle: &AppHandle, event: MenuEvent) {
     println!("Triggered menu event ID: {}", event.id.as_ref());
     match event.id.as_ref() {
         // File menu actions
         "new" => println!("New file action triggered!"),
         "open" => println!("Open file action triggered!"),
-        "save" => println!("Save file action triggered!"),
+        "save" => {
+            let result = app_handle.emit("menu_save", ());
+            if let Err(error) = result {
+                println!("Error saving: {}", error);
+            } else {
+                println!("Save successful");
+            }
+            return ();
+        }
         "exit" => std::process::exit(0),
 
         // Edit menu actions

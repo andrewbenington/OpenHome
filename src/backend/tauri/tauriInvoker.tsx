@@ -8,6 +8,10 @@ function rustResultToEither<T, E>(result: RustResult<T, E>): E.Either<E, T> {
 }
 
 export const TauriInvoker = {
+  getState() {
+    return invoke('get_state') as Promise<object>
+  },
+
   getFileBytes(absolutePath: string): Promise<Errorable<Uint8Array>> {
     const promise: Promise<number[]> = invoke('get_file_bytes', {
       absolutePath,
