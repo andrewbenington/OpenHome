@@ -96,14 +96,14 @@ pub fn delete_storage_files(
     return result;
 }
 
-// remember to call `.manage(MyState::default())`
 #[tauri::command]
 pub fn start_transaction(state: tauri::State<'_, AppState>) -> Result<(), String> {
-    if *state.open_transaction.lock().unwrap() {
-        return Err("Previous transaction is still open".to_owned());
-    }
-    *state.open_transaction.lock().unwrap() = true;
-    Ok(())
+    return state.start_transaction();
+}
+
+#[tauri::command]
+pub fn commit_transaction(state: tauri::State<'_, AppState>) -> Result<(), String> {
+    return state.commit_transaction();
 }
 
 #[tauri::command]

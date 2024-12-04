@@ -1,8 +1,8 @@
 [package]
-name = "openhome"
-version = "0.1.0"
-description = "A Tauri App"
-authors = ["you"]
+name = "OpenHome"
+version = "0.5.2"
+description = "A tool for moving Pokémon between game saves"
+authors = ["Andrew Benington"]
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -23,5 +23,5 @@ tauri-plugin-shell = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 tauri-plugin-os = "2"
-tauri-plugin-dialog = "2"
+tauri-plugin-dialog = "2.0.4"
 

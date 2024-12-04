@@ -221,6 +221,19 @@ const Home = () => {
     openSavesState.modifiedOHPKMs,
   ])
 
+  useEffect(() => {
+    // returns a function to stop listening
+    const stopListening = backend.registerListeners({
+      onSave: () => saveChanges(),
+    })
+
+    // the "stop listening" function should be called when the effect returns,
+    // otherwise duplicate listeners will exist
+    return () => {
+      stopListening()
+    }
+  }, [backend, saveChanges])
+
   // listener for menu save
   useEffect(() => {
     const callback = handleMenuSave(saveChanges)

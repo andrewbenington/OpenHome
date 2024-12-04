@@ -1,4 +1,5 @@
 import { path } from '@tauri-apps/api'
+import { listen } from '@tauri-apps/api/event'
 import { open as fileDialog } from '@tauri-apps/plugin-dialog'
 import { platform } from '@tauri-apps/plugin-os'
 import { open } from '@tauri-apps/plugin-shell'
@@ -157,7 +158,7 @@ export const TauriBackend: BackendInterface = {
     return TauriInvoker.startTransaction()
   },
   commitTransaction: async (): Promise<Errorable<null>> => {
-    return E.left('Not implemented')
+    return TauriInvoker.commitTransaction()
   },
   rollbackTransaction: async (): Promise<Errorable<null>> => {
     return E.left('Not implemented')
@@ -167,15 +168,13 @@ export const TauriBackend: BackendInterface = {
   setHasChanges: async (_hasChanges: boolean): Promise<void> => {
     console.error('Not implemented')
   },
-  pickFile: (): Promise<Errorable<string | undefined>> => {
-    return fileDialog({ directory: false, title: 'Select File' }).then((path) =>
-      E.right(path ?? undefined)
-    )
+  pickFile: async (): Promise<Errorable<string | undefined>> => {
+    const path = await fileDialog({ directory: false, title: 'Select File' })
+    return E.right(path ?? undefined)
   },
-  pickFolder: (): Promise<Errorable<string | undefined>> => {
-    return fileDialog({ directory: true, title: 'Select Folder' }).then((path) =>
-      E.right(path ?? undefined)
-    )
+  pickFolder: async (): Promise<Errorable<string | undefined>> => {
+    const path = await fileDialog({ directory: true, title: 'Select Folder' })
+    return E.right(path ?? undefined)
   },
   getResourcesPath: () => {
     console.log(path.resourceDir())
@@ -186,6 +185,11 @@ export const TauriBackend: BackendInterface = {
     return E.right(null)
   },
   getPlatform: async () => platform(),
+
+  registerListeners: (listeners) => {
+    const unlistenPromise = listen('save', listeners.onSave)
+    return () => unlistenPromise.then((unlisten) => unlisten())
+  },
 }
 
 // export const ElectronBackendContext = createContext(ElectronBackend);

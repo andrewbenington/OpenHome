@@ -88,7 +88,7 @@ pub fn handle_menu_event(app_handle: &AppHandle, event: MenuEvent) {
         "new" => println!("New file action triggered!"),
         "open" => println!("Open file action triggered!"),
         "save" => {
-            let result = app_handle.emit("menu_save", ());
+            let result = app_handle.emit("save", ());
             if let Err(error) = result {
                 println!("Error saving: {}", error);
             } else {

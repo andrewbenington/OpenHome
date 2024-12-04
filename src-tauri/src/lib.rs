@@ -45,6 +45,7 @@ pub fn run() {
             commands::get_ohpkm_files,
             commands::delete_storage_files,
             commands::start_transaction,
+            commands::commit_transaction,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

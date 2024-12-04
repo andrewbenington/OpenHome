@@ -1,4 +1,8 @@
-use std::{fs::File, io::Write, path::PathBuf};
+use std::{
+    fs::{rename, File},
+    io::Write,
+    path::PathBuf,
+};
 
 use serde::Serialize;
 
@@ -6,6 +10,16 @@ fn add_tmp(mut path: PathBuf) -> PathBuf {
     if let Some(stem) = path.file_name().and_then(|name| name.to_str()) {
         let new_name = format!("{}.tmp", stem);
         path.set_file_name(new_name);
+    }
+    return path;
+}
+
+fn remove_tmp(mut path: PathBuf) -> PathBuf {
+    if let Some(stem) = path.clone().file_name().and_then(|name| name.to_str()) {
+        let new_name_o = stem.strip_suffix(".tmp");
+        if let Some(new_name) = new_name_o {
+            path.set_file_name(new_name);
+        }
     }
     return path;
 }
@@ -23,11 +37,53 @@ pub struct AppStateSnapshot {
 }
 
 impl AppState {
-    pub fn start_transaction(&mut self) -> Result<(), String> {
+    pub fn start_transaction(&self) -> Result<(), String> {
         if *self.open_transaction.lock().unwrap() {
             return Err("Previous transaction is still open".to_owned());
         }
         *self.open_transaction.lock().unwrap() = true;
+        return Ok(());
+    }
+
+    pub fn rollback_transaction(&self) -> Result<(), String> {
+        if !*self.open_transaction.lock().unwrap() {
+            return Ok(());
+        }
+
+        let temp_files = self.temp_files.lock().unwrap();
+        for temp_file in temp_files.iter() {
+            let real_file = remove_tmp(temp_file.clone());
+            rename(temp_file.clone(), real_file.clone()).map_err(|e| {
+                format!(
+                    "Rename file {} to {}: {}",
+                    temp_file.to_str().unwrap_or("(unknown)"),
+                    real_file.to_str().unwrap_or("(unknown)"),
+                    e
+                )
+            })?;
+        }
+        *self.open_transaction.lock().unwrap() = false;
+        return Ok(());
+    }
+
+    pub fn commit_transaction(&self) -> Result<(), String> {
+        if !*self.open_transaction.lock().unwrap() {
+            return Ok(());
+        }
+
+        let temp_files = self.temp_files.lock().unwrap();
+        for temp_file in temp_files.iter() {
+            let real_file = remove_tmp(temp_file.clone());
+            rename(temp_file.clone(), real_file.clone()).map_err(|e| {
+                format!(
+                    "Rename file {} to {}: {}",
+                    temp_file.to_str().unwrap_or("(unknown)"),
+                    real_file.to_str().unwrap_or("(unknown)"),
+                    e
+                )
+            })?;
+        }
+        *self.open_transaction.lock().unwrap() = false;
         return Ok(());
     }
 

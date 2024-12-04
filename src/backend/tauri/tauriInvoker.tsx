@@ -96,4 +96,14 @@ export const TauriInvoker = {
     const promise: Promise<null> = invoke('start_transaction')
     return promise.then(E.right).catch(E.left)
   },
+
+  rollbackTransaction(): Promise<Errorable<null>> {
+    const promise: Promise<null> = invoke('rollback_transaction')
+    return promise.then(E.right).catch(E.left)
+  },
+
+  commitTransaction(): Promise<Errorable<null>> {
+    const promise: Promise<null> = invoke('commit_transaction')
+    return promise.then(E.right).catch(E.left)
+  },
 }
