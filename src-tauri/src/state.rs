@@ -50,7 +50,7 @@ impl AppState {
             return Ok(());
         }
 
-        let temp_files = self.temp_files.lock().unwrap();
+        let mut temp_files = self.temp_files.lock().unwrap();
         for temp_file in temp_files.iter() {
             let real_file = remove_tmp(temp_file.clone());
             rename(temp_file.clone(), real_file.clone()).map_err(|e| {
@@ -63,6 +63,7 @@ impl AppState {
             })?;
         }
         *self.open_transaction.lock().unwrap() = false;
+        temp_files.clear();
         return Ok(());
     }
 
@@ -71,7 +72,7 @@ impl AppState {
             return Ok(());
         }
 
-        let temp_files = self.temp_files.lock().unwrap();
+        let mut temp_files = self.temp_files.lock().unwrap();
         for temp_file in temp_files.iter() {
             let real_file = remove_tmp(temp_file.clone());
             rename(temp_file.clone(), real_file.clone()).map_err(|e| {
@@ -84,6 +85,7 @@ impl AppState {
             })?;
         }
         *self.open_transaction.lock().unwrap() = false;
+        temp_files.clear();
         return Ok(());
     }
 
