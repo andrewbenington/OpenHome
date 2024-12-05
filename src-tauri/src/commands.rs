@@ -1,5 +1,7 @@
+use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use std::collections::HashMap;
+use dirs;
+use std::collections::{HashSet, HashMap};
 use std::fs;
 use std::fs::File;
 use std::io::{Error, ErrorKind, Read, Write};
@@ -175,4 +177,127 @@ pub fn get_storage_file_json(
         .map_err(|e| format!("error opening {:#?}: {e}", relative_path));
 
     return value;
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct PathData {
+    raw: String,
+    base: String,
+    name: String,
+    dir: String,
+    ext: String,
+    root: String,
+    separator: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct PossibleSaves {
+    citra: Vec<PathData>,
+    desamume: Vec<PathData>,
+    openEmu: Vec<PathData>,
+}
+
+const MAX_SEARCH_DEPTH: usize = 2;
+
+#[tauri::command]
+pub fn find_suggested_saves(save_folders: Vec<PathBuf>) -> Result<PossibleSaves, String> {
+    let mut possible_saves = PossibleSaves {
+        citra: Vec::new(),
+        desamume: Vec::new(),
+        openEmu: Vec::new(),
+    };
+
+    // Citra saves
+    let citra_path = dirs::home_dir()
+        .map(|home| home.join(".local/share/citra-emu/sdmc/Nintendo 3DS"));
+    if let Some(citra_dir) = citra_path {
+        if citra_dir.exists() {
+            possible_saves.citra.extend(recursively_find_citra_saves(&citra_dir, 0)?);
+        }
+    }
+
+    for folder in save_folders {
+        if folder.exists() {
+            possible_saves.citra.extend(recursively_find_citra_saves(&folder, 0)?);
+            possible_saves.openEmu.extend(recursively_find_open_emu_saves(&folder, 0)?);
+        }
+    }
+
+    // Remove dupes paths
+    possible_saves.citra = deduplicate_paths(possible_saves.citra);
+    possible_saves.openEmu = deduplicate_paths(possible_saves.openEmu);
+
+    Ok(possible_saves)
+}
+
+fn recursively_find_citra_saves(path: &PathBuf, depth: usize) -> Result<Vec<PathData>, String> {
+    if depth >= MAX_SEARCH_DEPTH {
+        return Ok(vec![]);
+    }
+
+    let mut found_saves = Vec::new();
+    if path.is_dir() {
+        let entries = fs::read_dir(path).map_err(|e| e.to_string())?;
+        for entry in entries {
+            let entry = entry.map_err(|e| e.to_string())?;
+            let entry_path = entry.path();
+
+            if entry_path.is_dir() {
+                found_saves.extend(recursively_find_citra_saves(&entry_path, depth + 1)?);
+            } else if entry_path.ends_with("main") {
+                found_saves.push(parse_path_data(&entry_path));
+            }
+        }
+    }
+
+    Ok(found_saves)
+}
+
+fn recursively_find_open_emu_saves(path: &PathBuf, depth: usize) -> Result<Vec<PathData>, String> {
+    if depth >= MAX_SEARCH_DEPTH {
+        return Ok(vec![]);
+    }
+
+    let mut found_saves = Vec::new();
+    if path.is_dir() {
+        let entries = fs::read_dir(path).map_err(|e| e.to_string())?;
+        for entry in entries {
+            let entry = entry.map_err(|e| e.to_string())?;
+            let entry_path = entry.path();
+
+            if entry_path.is_dir() {
+                found_saves.extend(recursively_find_open_emu_saves(&entry_path, depth + 1)?);
+            } else if entry_path.extension().is_some_and(|ext| ext == "sav") {
+                found_saves.push(parse_path_data(&entry_path));
+            }
+        }
+    }
+
+    Ok(found_saves)
+}
+
+fn parse_path_data(path: &PathBuf) -> PathData {
+    let raw = path.to_string_lossy().to_string();
+    let base = path.file_name().unwrap_or_default().to_string_lossy().to_string();
+    let name = path.file_stem().unwrap_or_default().to_string_lossy().to_string();
+    let ext = path.extension().unwrap_or_default().to_string_lossy().to_string();
+    let dir = path.parent().map(|p| p.to_string_lossy().to_string()).unwrap_or_else(|| String::new());
+    let separator = std::path::MAIN_SEPARATOR.to_string();
+    PathData {
+        raw,
+        base,
+        name,
+        dir,
+        ext,
+        root: String::new(),
+        separator,
+    }
+}
+
+fn deduplicate_paths(paths: Vec<PathData>) -> Vec<PathData> {
+    let mut seen = HashSet::new();
+    paths
+        .into_iter()
+        .filter(|path| seen.insert(path.raw.clone()))
+        .collect()
 }
