@@ -2,6 +2,8 @@ mod commands;
 mod menu;
 mod state;
 mod util;
+mod saves;
+
 use std::{
     env,
     fs::{create_dir_all, File},
