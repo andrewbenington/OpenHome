@@ -1,7 +1,7 @@
+use dirs;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use dirs;
-use std::collections::{HashSet, HashMap};
+use std::collections::{HashMap, HashSet};
 use std::fs;
 use std::fs::File;
 use std::io::{Error, ErrorKind, Read, Write};
@@ -194,7 +194,7 @@ pub struct PathData {
 pub struct PossibleSaves {
     citra: Vec<PathData>,
     desamume: Vec<PathData>,
-    openEmu: Vec<PathData>,
+    open_emu: Vec<PathData>,
 }
 
 const MAX_SEARCH_DEPTH: usize = 2;
@@ -204,28 +204,34 @@ pub fn find_suggested_saves(save_folders: Vec<PathBuf>) -> Result<PossibleSaves,
     let mut possible_saves = PossibleSaves {
         citra: Vec::new(),
         desamume: Vec::new(),
-        openEmu: Vec::new(),
+        open_emu: Vec::new(),
     };
 
     // Citra saves
-    let citra_path = dirs::home_dir()
-        .map(|home| home.join(".local/share/citra-emu/sdmc/Nintendo 3DS"));
+    let citra_path =
+        dirs::home_dir().map(|home| home.join(".local/share/citra-emu/sdmc/Nintendo 3DS"));
     if let Some(citra_dir) = citra_path {
         if citra_dir.exists() {
-            possible_saves.citra.extend(recursively_find_citra_saves(&citra_dir, 0)?);
+            possible_saves
+                .citra
+                .extend(recursively_find_citra_saves(&citra_dir, 0)?);
         }
     }
 
     for folder in save_folders {
         if folder.exists() {
-            possible_saves.citra.extend(recursively_find_citra_saves(&folder, 0)?);
-            possible_saves.openEmu.extend(recursively_find_open_emu_saves(&folder, 0)?);
+            possible_saves
+                .citra
+                .extend(recursively_find_citra_saves(&folder, 0)?);
+            possible_saves
+                .open_emu
+                .extend(recursively_find_open_emu_saves(&folder, 0)?);
         }
     }
 
     // Remove dupes paths
     possible_saves.citra = deduplicate_paths(possible_saves.citra);
-    possible_saves.openEmu = deduplicate_paths(possible_saves.openEmu);
+    possible_saves.open_emu = deduplicate_paths(possible_saves.open_emu);
 
     Ok(possible_saves)
 }
@@ -278,10 +284,25 @@ fn recursively_find_open_emu_saves(path: &PathBuf, depth: usize) -> Result<Vec<P
 
 fn parse_path_data(path: &PathBuf) -> PathData {
     let raw = path.to_string_lossy().to_string();
-    let base = path.file_name().unwrap_or_default().to_string_lossy().to_string();
-    let name = path.file_stem().unwrap_or_default().to_string_lossy().to_string();
-    let ext = path.extension().unwrap_or_default().to_string_lossy().to_string();
-    let dir = path.parent().map(|p| p.to_string_lossy().to_string()).unwrap_or_else(|| String::new());
+    let base = path
+        .file_name()
+        .unwrap_or_default()
+        .to_string_lossy()
+        .to_string();
+    let name = path
+        .file_stem()
+        .unwrap_or_default()
+        .to_string_lossy()
+        .to_string();
+    let ext = path
+        .extension()
+        .unwrap_or_default()
+        .to_string_lossy()
+        .to_string();
+    let dir = path
+        .parent()
+        .map(|p| p.to_string_lossy().to_string())
+        .unwrap_or_else(|| String::new());
     let separator = std::path::MAIN_SEPARATOR.to_string();
     PathData {
         raw,

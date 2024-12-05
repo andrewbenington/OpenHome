@@ -1,6 +1,7 @@
 import { invoke } from '@tauri-apps/api/core'
 import * as E from 'fp-ts/lib/Either'
 import { Errorable, JSONArray, JSONObject, JSONValue } from 'src/types/types'
+import { PossibleSaves } from '../../types/SAVTypes/path'
 import { RustResult } from './types'
 
 function rustResultToEither<T, E>(result: RustResult<T, E>): E.Either<E, T> {
@@ -103,6 +104,11 @@ export const TauriInvoker = {
   },
 
   commitTransaction(): Promise<Errorable<null>> {
+    const promise: Promise<null> = invoke('commit_transaction')
+    return promise.then(E.right).catch(E.left)
+  },
+
+  findSuggestedSaves(): Promise<Errorable<PossibleSaves>> {
     const promise: Promise<null> = invoke('commit_transaction')
     return promise.then(E.right).catch(E.left)
   },
