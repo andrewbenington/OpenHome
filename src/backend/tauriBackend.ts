@@ -161,7 +161,7 @@ export const TauriBackend: BackendInterface = {
     return TauriInvoker.commitTransaction()
   },
   rollbackTransaction: async (): Promise<Errorable<null>> => {
-    return E.left('Not implemented')
+    return TauriInvoker.rollbackTransaction()
   },
 
   /* application */
