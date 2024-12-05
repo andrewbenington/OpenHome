@@ -18,5 +18,7 @@
     "source.organizeImports": "explicit",
     "source.fixAll": "explicit",
     "source.removeUnusedImports": "explicit"
-  }
+  },
+  "makefile.configureOnOpen": false,
+  "python.languageServer": "Pylance"
 }
