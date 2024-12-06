@@ -186,7 +186,6 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
 
       let sourceMon = sourceBox.pokemon[source.boxPos]
       let destMon = destBox.pokemon[dest.boxPos]
-      console.log(sourceMon?.nickname, destMon?.nickname)
 
       if (sourceMon !== source.mon) return state // necessary in strict mode, otherwise the swap will happen twice and revert
       if (sourceIdentifier !== destIdentifier) {

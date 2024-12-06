@@ -38,15 +38,15 @@ export default interface BackendInterface {
   rollbackTransaction: () => Promise<Errorable<null>>
 
   /* application */
-  setHasChanges: (hasChanges: boolean) => Promise<void>
   pickFile: () => Promise<Errorable<string | undefined>>
   pickFolder: () => Promise<Errorable<string | undefined>>
   getResourcesPath: () => Promise<string>
   openDirectory: (directory: string) => Promise<Errorable<null>>
   getPlatform: () => Promise<string>
-  registerListeners: (listeners: BackendListeners) => () => {}
+  registerListeners: (listeners: BackendListeners) => () => void
 }
 
 export interface BackendListeners {
   onSave: () => void
+  onReset: () => void
 }

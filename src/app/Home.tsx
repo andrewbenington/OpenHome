@@ -32,7 +32,6 @@ import { OpenSavesContext } from '../state/openSaves'
 import { PKMInterface } from '../types/interfaces'
 import { OHPKM } from '../types/pkm/OHPKM'
 import { initializeDragImage } from '../util/initializeDragImage'
-import { handleMenuResetAndClose, handleMenuSave } from '../util/ipcFunctions'
 import { getMonFileIdentifier, getMonGen12Identifier, getMonGen345Identifier } from '../util/Lookup'
 import './Home.css'
 
@@ -42,20 +41,12 @@ const Home = () => {
   const backend = useContext(BackendContext)
   const [mouseState, mouseDispatch] = useContext(MouseContext)
   const [, appInfoDispatch] = useContext(AppInfoContext)
-  const homeData = openSavesState.homeData
   const { palette } = useTheme()
   const [selectedMon, setSelectedMon] = useState<PKMInterface>()
   const [tab, setTab] = useState('summary')
   const [openSaveDialog, setOpenSaveDialog] = useState(false)
   const [errorMessages, setErrorMessages] = useState<string[]>()
   const [filesToDelete, setFilesToDelete] = useState<string[]>([])
-
-  useEffect(() => {
-    const edited =
-      (homeData?.updatedBoxSlots.length ?? 0) > 0 ||
-      !allOpenSaves.every((save) => save.updatedBoxSlots.length === 0)
-    backend.setHasChanges(edited)
-  }, [allOpenSaves, backend, homeData?.updatedBoxSlots])
 
   const onViewDrop = (e: React.DragEvent<HTMLDivElement>, type: string) => {
     const processDroppedData = async (file?: File, droppedMon?: PKMInterface) => {
@@ -225,6 +216,13 @@ const Home = () => {
     // returns a function to stop listening
     const stopListening = backend.registerListeners({
       onSave: () => saveChanges(),
+      onReset: () => {
+        openSavesDispatch({ type: 'clear_mons_to_release' })
+        if (lookupState.loaded) {
+          loadAllHomeData(lookupState.homeMons)
+        }
+        openSavesDispatch({ type: 'close_all_saves' })
+      },
     })
 
     // the "stop listening" function should be called when the effect returns,
@@ -232,27 +230,7 @@ const Home = () => {
     return () => {
       stopListening()
     }
-  }, [backend, saveChanges])
-
-  // listener for menu save
-  useEffect(() => {
-    const callback = handleMenuSave(saveChanges)
-    return () => callback()
-  }, [saveChanges])
-
-  // listener for menu reset + close
-  useEffect(() => {
-    const callback = handleMenuResetAndClose(
-      () => {
-        openSavesDispatch({ type: 'clear_mons_to_release' })
-        if (lookupState.loaded) {
-          loadAllHomeData(lookupState.homeMons)
-        }
-      },
-      () => openSavesDispatch({ type: 'close_all_saves' })
-    )
-    return () => callback()
-  }, [openSavesDispatch, loadAllHomeData, lookupState])
+  }, [backend, saveChanges, lookupState, openSavesDispatch, loadAllHomeData])
 
   useEffect(() => {
     if (lookupState.loaded && !openSavesState.homeData) {

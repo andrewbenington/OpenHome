@@ -61,7 +61,6 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
       E.match(
         (err) => console.error(err),
         async (possibleSaves) => {
-          console.log(possibleSaves)
           const allPaths = (possibleSaves?.citra ?? [])
             .concat(possibleSaves?.open_emu ?? [])
             .concat(possibleSaves?.desamume ?? [])

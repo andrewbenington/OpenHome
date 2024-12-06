@@ -171,9 +171,6 @@ export const TauriBackend: BackendInterface = {
   },
 
   /* application */
-  setHasChanges: async (_hasChanges: boolean): Promise<void> => {
-    console.error('Not implemented')
-  },
   pickFile: async (): Promise<Errorable<string | undefined>> => {
     const path = await fileDialog({ directory: false, title: 'Select File' })
     return E.right(path ?? undefined)
@@ -193,8 +190,17 @@ export const TauriBackend: BackendInterface = {
   getPlatform: async () => platform(),
 
   registerListeners: (listeners) => {
-    const unlistenPromise = listen('save', listeners.onSave)
-    return () => unlistenPromise.then((unlisten) => unlisten())
+    const unlistenPromise = Promise.all([
+      listen('save', listeners.onSave),
+      listen('reset', listeners.onReset),
+    ])
+
+    return () =>
+      unlistenPromise.then((unlistenFunctions) => {
+        for (const unlistenFunction of unlistenFunctions) {
+          unlistenFunction()
+        }
+      })
   },
 }
 
