@@ -1,6 +1,5 @@
 use crate::util::{parse_path_data, PathData};
 use serde;
-use std::collections::HashSet;
 use std::fs;
 use std::path::{Path, PathBuf};
 
@@ -127,14 +126,6 @@ pub fn recursively_find_mgba_saves(
     }
 
     Ok(found_saves)
-}
-
-pub fn dedupe_paths(paths: Vec<PathData>) -> Vec<PathData> {
-    let mut seen = HashSet::new();
-    paths
-        .into_iter()
-        .filter(|path| seen.insert(path.raw.clone()))
-        .collect()
 }
 
 pub fn recursively_find_citra_saves(path: &PathBuf, depth: usize) -> Result<Vec<PathData>, String> {

@@ -221,8 +221,9 @@ pub fn find_suggested_saves(save_folders: Vec<PathBuf>) -> Result<saves::Possibl
     }
 
     // Deduplicate paths
-    possible_saves.citra = saves::dedupe_paths(possible_saves.citra);
-    possible_saves.open_emu = saves::dedupe_paths(possible_saves.open_emu);
+    possible_saves.citra = util::dedupe_paths(possible_saves.citra);
+    possible_saves.open_emu = util::dedupe_paths(possible_saves.open_emu);
+    possible_saves.desamume = util::dedupe_paths(possible_saves.desamume);
 
     Ok(possible_saves)
 }

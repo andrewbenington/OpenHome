@@ -1,4 +1,4 @@
-use std::{fs::File, io::Read, path::PathBuf};
+use std::{collections::HashSet, fs::File, io::Read, path::PathBuf};
 use serde;
 use tauri::Manager;
 
@@ -71,4 +71,12 @@ pub fn get_appdata_dir(app_handle: &tauri::AppHandle) -> Result<String, String> 
         Some(path_buf) => Ok(path_buf.to_owned()),
         None => Err("Invalid appdata path".to_owned()),
     };
+}
+
+pub fn dedupe_paths(paths: Vec<PathData>) -> Vec<PathData> {
+    let mut seen = HashSet::new();
+    paths
+        .into_iter()
+        .filter(|path| seen.insert(path.raw.clone()))
+        .collect()
 }
