@@ -63,7 +63,7 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
         async (possibleSaves) => {
           console.log(possibleSaves)
           const allPaths = (possibleSaves?.citra ?? [])
-            .concat(possibleSaves?.openEmu ?? [])
+            .concat(possibleSaves?.open_emu ?? [])
             .concat(possibleSaves?.desamume ?? [])
           if (allPaths.length > 0) {
             const saves = (await Promise.all(allPaths.map((path) => loadSaveData(path)))).filter(

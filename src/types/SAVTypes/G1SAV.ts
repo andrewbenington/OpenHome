@@ -242,6 +242,12 @@ export class G1SAV implements SAV<PK1> {
     if (areCrystalInternationalChecksumsValid(bytes) || areGoldSilverChecksumsValid(bytes)) {
       return false
     }
+    const decodedFirst64 = new TextDecoder('utf-8').decode(bytes.slice(0, 64))
+
+    if (decodedFirst64.includes('Metroid') || decodedFirst64.includes('ZeroMission')) {
+      // lol
+      return false
+    }
     return bytes.length === SAVE_SIZE_BYTES
   }
 

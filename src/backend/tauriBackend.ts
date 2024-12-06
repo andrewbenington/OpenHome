@@ -122,7 +122,13 @@ export const TauriBackend: BackendInterface = {
     return TauriInvoker.writeStorageFileJSON('recent_saves.json', recentSaves)
   },
   findSuggestedSaves: async (): Promise<Errorable<PossibleSaves>> => {
-    return TauriInvoker.findSuggestedSaves()
+    const saveFolders = (await TauriInvoker.getStorageFileJSON('save-folders.json')) as Errorable<
+      SaveFolder[]
+    >
+    if (E.isLeft(saveFolders)) {
+      return saveFolders
+    }
+    return TauriInvoker.findSuggestedSaves(saveFolders.right.map((sf) => sf.path))
   },
   getSaveFolders: async (): Promise<Errorable<SaveFolder[]>> => {
     return TauriInvoker.getStorageFileJSON('save-folders.json') as Promise<Errorable<SaveFolder[]>>

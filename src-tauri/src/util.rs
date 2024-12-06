@@ -1,6 +1,35 @@
 use std::{fs::File, io::Read, path::PathBuf};
-
+use serde;
 use tauri::Manager;
+
+#[derive(serde::Serialize, serde::Deserialize, Debug)]
+pub struct PathData {
+    pub raw: String,
+    pub base: String,
+    pub name: String,
+    pub dir: String,
+    pub ext: String,
+    pub root: String,
+    pub separator: String,
+}
+
+pub fn parse_path_data(path: &PathBuf) -> PathData {
+    let raw = path.to_string_lossy().to_string();
+    let base = path.file_name().unwrap_or_default().to_string_lossy().to_string();
+    let name = path.file_stem().unwrap_or_default().to_string_lossy().to_string();
+    let ext = path.extension().unwrap_or_default().to_string_lossy().to_string();
+    let dir = path.parent().map(|p| p.to_string_lossy().to_string()).unwrap_or_else(|| String::new());
+    let separator = std::path::MAIN_SEPARATOR.to_string();
+    PathData {
+        raw,
+        base,
+        name,
+        dir,
+        ext,
+        root: String::new(),
+        separator,
+    }
+}
 
 pub fn prepend_appdata_storage_to_path(
     app_handle: &tauri::AppHandle,
