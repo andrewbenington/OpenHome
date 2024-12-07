@@ -18,6 +18,7 @@ pub fn get_state(state: tauri::State<'_, AppState>) -> AppStateSnapshot {
     AppStateSnapshot {
         temp_files,
         open_transaction,
+        is_dev: cfg!(debug_assertions),
     }
 }
 

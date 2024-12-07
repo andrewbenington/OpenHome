@@ -34,6 +34,7 @@ pub struct AppState {
 pub struct AppStateSnapshot {
     pub open_transaction: bool,
     pub temp_files: Vec<PathBuf>,
+    pub is_dev: bool,
 }
 
 impl AppState {
