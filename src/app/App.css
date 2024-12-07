@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-@import 'react-data-grid/lib/styles.css';
-=======
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
@@ -134,7 +131,6 @@ button > svg {
   height: 24px;
 }
 
->>>>>>> tauri
 .App {
   text-align: center;
 }

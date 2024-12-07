@@ -1,12 +1,3 @@
-<<<<<<< HEAD
-import React, { useContext, useEffect, useMemo, useState } from 'react'
-import PokemonIcon from 'src/renderer/components/PokemonIcon'
-import { FilterContext } from 'src/renderer/state/filter'
-import { bytesToPKM } from 'src/types/FileImport'
-import { filterApplies } from 'src/types/Filter'
-import { Styles } from 'src/types/types'
-import { PKMInterface } from '../../../types/interfaces'
-=======
 import { useDraggable, useDroppable } from '@dnd-kit/core'
 import { useContext, useMemo } from 'react'
 import PokemonIcon from 'src/components/PokemonIcon'
@@ -15,7 +6,6 @@ import { MonLocation, MonWithLocation } from 'src/state/openSaves'
 import { filterApplies } from 'src/types/Filter'
 import { PKMInterface } from 'src/types/interfaces'
 import { Styles } from 'src/types/types'
->>>>>>> tauri
 import BoxIcons from '../../images/BoxIcons.png'
 
 const styles = {
@@ -50,17 +40,6 @@ interface BoxCellProps {
   zIndex: number
   mon: PKMInterface | undefined
   borderColor?: string
-<<<<<<< HEAD
-}
-
-const BoxCell = ({ onClick, onDragEvent, onDrop, disabled, zIndex, mon, borderColor }: BoxCellProps) => {
-  const [isBeingDragged, setIsBeingDragged] = useState(false)
-  const [isDraggedOver, setIsDraggedOver] = useState(false)
-  const [filterState] = useContext(FilterContext)
-
-  disabled = disabled || (mon?.isLocked ?? false);
-
-=======
   dragID?: string
   dragData?: MonLocation
 }
@@ -76,7 +55,6 @@ const BoxCell = ({
 }: BoxCellProps) => {
   const [filterState] = useContext(FilterContext)
 
->>>>>>> tauri
   const isFilteredOut = useMemo(() => {
     return (
       Object.values(filterState).some((val) => val !== undefined) &&
@@ -84,31 +62,6 @@ const BoxCell = ({
     )
   }, [filterState, mon])
 
-<<<<<<< HEAD
-  const onDropFromFiles = async (files: FileList) => {
-    const importedMons: PKMInterface[] = []
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i]
-      const bytes = new Uint8Array(await file.arrayBuffer())
-      const [extension] = file.name.split('.').slice(-1)
-      try {
-        importedMons.push(bytesToPKM(bytes, extension.toUpperCase()))
-      } catch (e) {
-        console.error(e)
-      }
-    }
-    onDrop(importedMons)
-  }
-
-  const handleDrop: React.DragEventHandler<HTMLDivElement> = (e) => {
-    if (e.dataTransfer.files[0]) {
-      onDropFromFiles(e.dataTransfer.files)
-    } else {
-      onDrop(undefined)
-    }
-    e.nativeEvent.preventDefault()
-  }
-=======
   // const onDropFromFiles = async (files: FileList) => {
   //   const importedMons: PKMInterface[] = []
   //   for (let i = 0; i < files.length; i++) {
@@ -123,7 +76,6 @@ const BoxCell = ({
   //   }
   //   onDrop(importedMons)
   // }
->>>>>>> tauri
 
   const getBackgroundDetails = () => {
     if (disabled) {
@@ -137,32 +89,6 @@ const BoxCell = ({
     }
   }
 
-<<<<<<< HEAD
-  useEffect(() => {
-    setIsBeingDragged(false)
-  }, [mon])
-
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      style={{
-        ...styles.button,
-        backgroundColor: disabled || isFilteredOut ? '#555' : '#6662',
-        borderColor: borderColor ?? (isDraggedOver ? 'red' : undefined),
-        zIndex,
-      }}
-      disabled={disabled}
-    >
-      {mon ? (
-        <PokemonIcon
-          dexNumber={mon.dexNum}
-          formeNumber={mon.formeNum}
-          greyedOut={isFilteredOut || disabled}
-          isShiny={mon.isShiny()}
-          heldItemIndex={mon.heldItemIndex}
-          heldItemFormat={mon.format}
-=======
   const { setNodeRef } = useDroppable({
     id: dragID ?? '',
     data: dragData,
@@ -183,61 +109,10 @@ const BoxCell = ({
         <DraggableMon
           onClick={onClick}
           mon={mon}
->>>>>>> tauri
           style={{
             width: '100%',
             height: '100%',
             ...getBackgroundDetails(),
-<<<<<<< HEAD
-            transition: '0.01s, background-color 0s',
-            transform: isBeingDragged ? 'translateX(-9999px)' : undefined,
-          }}
-          draggable={!(mon?.isLocked ?? false)}
-          onDragStart={() => {
-            onDragEvent(false)
-            setIsBeingDragged(true)
-          }}
-          onDragEnter={() => setIsDraggedOver(true)}
-          onDragLeave={() => setIsDraggedOver(false)}
-          onDragEnd={(e: { dataTransfer: any; target: any }) => {
-            setIsBeingDragged(false)
-            if (e.dataTransfer.dropEffect !== 'copy') {
-              onDragEvent(true)
-            }
-          }}
-          onDragOver={
-            disabled
-              ? undefined
-              : (e) => {
-                  e.preventDefault()
-                }
-          }
-          onDrop={(e) => {
-            setIsDraggedOver(false)
-            handleDrop(e)
-          }}
-        />
-      ) : (
-        <div
-          className="pokemon_slot"
-          style={{ ...styles.fillContainer, ...getBackgroundDetails() }}
-          onDragEnter={() => setIsDraggedOver(true)}
-          onDragLeave={() => setIsDraggedOver(false)}
-          onDragOver={
-            disabled
-              ? undefined
-              : (e) => {
-                  e.preventDefault()
-                }
-          }
-          onDrop={(e) => {
-            setIsDraggedOver(false)
-            handleDrop(e)
-          }}
-        />
-      )}
-    </button>
-=======
           }}
           dragData={dragData ? { ...dragData, mon } : undefined}
           dragID={dragID}
@@ -247,13 +122,10 @@ const BoxCell = ({
         <DroppableSpace dropID={dragID} dropData={dragData} disabled={disabled} />
       )}
     </div>
->>>>>>> tauri
   )
 }
 
 export default BoxCell
-<<<<<<< HEAD
-=======
 
 interface DraggableMonProps {
   onClick: () => void
@@ -333,4 +205,3 @@ const DroppableSpace = ({ dropID, dropData, disabled }: DroppableSpaceProps) => 
     />
   )
 }
->>>>>>> tauri
