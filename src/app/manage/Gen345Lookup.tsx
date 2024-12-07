@@ -1,11 +1,11 @@
 import { useContext } from 'react'
-import { getPublicImageURL } from 'src/renderer/images/images'
-import { getMonSaveLogo } from 'src/renderer/saves/util'
-import { AppInfoContext } from 'src/renderer/state/appInfo'
+import { getPublicImageURL } from 'src/images/images'
+import { getMonSaveLogo } from 'src/saves/util'
+import { AppInfoContext } from 'src/state/appInfo'
 import { OHPKM } from 'src/types/pkm/OHPKM'
 import { numericSorter, stringSorter } from 'src/util/Sort'
-import OHDataGrid, { SortableColumn } from '../../components/OHDataGrid'
-import PokemonIcon from '../../components/PokemonIcon'
+import OHDataGrid, { SortableColumn } from 'src/components/OHDataGrid'
+import PokemonIcon from 'src/components/PokemonIcon'
 import { LookupContext } from '../../state/lookup'
 
 type G345LookupRow = {

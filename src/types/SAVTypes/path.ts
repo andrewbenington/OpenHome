@@ -27,7 +27,7 @@ export function splitPath(path: PathData) {
 }
 
 export type PossibleSaves = {
-  citra: PathData[]
-  desamume: PathData[]
-  openEmu: PathData[]
+  citra?: PathData[]
+  desamume?: PathData[]
+  open_emu?: PathData[]
 }

@@ -1,12 +1,12 @@
 import { GameOfOrigin } from 'pokemon-resources'
 import { NationalDex } from 'pokemon-species-data'
-import { ORIGIN, SPIKY_EAR } from '../../../consts/Formes'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
   uint16ToBytesLittleEndian,
   uint32ToBytesLittleEndian,
-} from '../../../util/ByteLogic'
+} from 'src/util/byteLogic'
+import { ORIGIN, SPIKY_EAR } from '../../../consts/Formes'
 import { gen3StringToUTF } from '../../../util/Strings/StringConverter'
 import { CapPikachus, isRestricted, TransferRestrictions } from '../../TransferRestrictions'
 import { OHPKM } from '../../pkm/OHPKM'
@@ -233,8 +233,6 @@ export class G3RRSAV implements PluginSAV<PK3RR> {
     let fileName = filePathElements[filePathElements.length - 1]
     fileName = fileName.replace(/\s+/g, '')
     this.origin = GameOfOrigin.FireRed
-
-    console.log(this.boxes)
   }
   getExtraData?: (() => object) | undefined
 

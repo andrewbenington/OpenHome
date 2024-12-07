@@ -1,5 +1,5 @@
-import { NationalDex } from 'pokemon-species-data'
-export const ShadowIDsColosseum = {
+import { NationalDex } from "pokemon-species-data";
+export const ShadowIDsColosseum: Record<number, number> = {
   [NationalDex.Makuhita]: 1,
   [NationalDex.Bayleef]: 2,
   [NationalDex.Quilava]: 3,
@@ -48,9 +48,9 @@ export const ShadowIDsColosseum = {
   [NationalDex.Ursaring]: 56,
   [NationalDex.Shuckle]: 57,
   [NationalDex.Togetic]: 67,
-}
+};
 
-export const ShadowIDsXD = {
+export const ShadowIDsXD: Record<number, number> = {
   [NationalDex.Teddiursa]: 1,
   [NationalDex.Vulpix]: 2,
   [NationalDex.Spheal]: 3,
@@ -133,7 +133,7 @@ export const ShadowIDsXD = {
   [NationalDex.Togepi]: 81,
   [NationalDex.Poochyena]: 82,
   [NationalDex.Ledyba]: 83,
-}
+};
 
 export const ShadowGaugeMax = {
   [NationalDex.Makuhita]: 3000,
@@ -184,4 +184,4 @@ export const ShadowGaugeMax = {
   [NationalDex.Ursaring]: 7000,
   [NationalDex.Shuckle]: 7000,
   [NationalDex.Togetic]: 5000,
-}
+};

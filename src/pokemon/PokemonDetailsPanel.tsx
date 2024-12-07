@@ -1,51 +1,54 @@
 /* eslint-disable no-nested-ternary */
-import { Stack, Tab, tabClasses, TabList, TabPanel, Tabs } from '@mui/joy'
-import { useMemo, useState } from 'react'
-import { ErrorBoundary, FallbackProps } from 'react-error-boundary'
-import { MdDownload } from 'react-icons/md'
-import { fileTypeFromString } from '../../types/FileImport'
-import { PKMInterface } from '../../types/interfaces'
-import { OHPKM } from '../../types/pkm/OHPKM'
-import FileTypeSelect from './FileTypeSelect'
-import JSONDisplay from './JSONDisplay'
-import MetDataMovesDisplay from './MetDataMovesDisplay'
-import OtherDisplay from './OtherDisplay'
-import RawDisplay from './RawDisplay'
-import RibbonsDisplay from './RibbonsDisplay'
-import StatsDisplay from './StatsDisplay'
-import SummaryDisplay from './SummaryDisplay'
+import { Stack, Tab, tabClasses, TabList, TabPanel, Tabs } from "@mui/joy";
+import { useMemo, useState } from "react";
+import { ErrorBoundary, FallbackProps } from "react-error-boundary";
+import { MdDownload } from "react-icons/md";
+import { fileTypeFromString } from "../types/FileImport";
+import { PKMInterface } from "../types/interfaces";
+import { OHPKM } from "../types/pkm/OHPKM";
+import FileTypeSelect from "./FileTypeSelect";
+import JSONDisplay from "./JSONDisplay";
+import MetDataMovesDisplay from "./MetDataMovesDisplay";
+import OtherDisplay from "./OtherDisplay";
+import RawDisplay from "./RawDisplay";
+import RibbonsDisplay from "./RibbonsDisplay";
+import StatsDisplay from "./StatsDisplay";
+import SummaryDisplay from "./SummaryDisplay";
 
 const PokemonDetailsPanel = (props: {
-  mon: PKMInterface
-  tab?: string
-  setTab?: (_: string) => void
+  mon: PKMInterface;
+  tab?: string;
+  setTab?: (_: string) => void;
 }) => {
-  const { mon, tab, setTab } = props
-  const [displayMon, setDisplayMon] = useState(mon)
+  const { mon, tab, setTab } = props;
+  const [displayMon, setDisplayMon] = useState(mon);
   const url = useMemo(
-    () => window.URL.createObjectURL(new Blob([displayMon.toBytes({ includeExtraFields: true })])),
+    () =>
+      window.URL.createObjectURL(
+        new Blob([displayMon.toBytes({ includeExtraFields: true })])
+      ),
     [displayMon]
-  )
+  );
 
   return (
     <Tabs
       orientation="vertical"
       color="primary"
-      value={tab ?? 'summary'}
-      style={{ height: '100%', width: '100%' }}
+      value={tab ?? "summary"}
+      style={{ height: "100%", width: "100%" }}
       onChange={(_, val) => setTab && setTab(val as string)}
     >
       <TabList
         disableUnderline
         sx={{
-          whiteSpace: 'nowrap',
+          whiteSpace: "nowrap",
           p: 0.8,
           gap: 0.5,
           [`& .${tabClasses.root}`]: {
-            borderRadius: 'lg',
+            borderRadius: "lg",
           },
           [`& .${tabClasses.root}[aria-selected="true"]`]: {
-            boxShadow: 'sm',
+            boxShadow: "sm",
           },
         }}
         variant="solid"
@@ -59,37 +62,42 @@ const PokemonDetailsPanel = (props: {
             formData={mon}
             onChange={(newFormat) => {
               if (mon.format === newFormat) {
-                setDisplayMon(mon)
-                return
+                setDisplayMon(mon);
+                return;
               }
-              if (newFormat === 'OHPKM') {
-                setDisplayMon(mon instanceof OHPKM ? mon : new OHPKM(mon))
-                return
+              if (newFormat === "OHPKM") {
+                setDisplayMon(mon instanceof OHPKM ? mon : new OHPKM(mon));
+                return;
               }
-              const P = fileTypeFromString(newFormat)
+              const P = fileTypeFromString(newFormat);
               if (!P) {
-                throw `Invalid filetype: ${P}`
+                throw `Invalid filetype: ${P}`;
               }
               if (mon instanceof OHPKM) {
-                setDisplayMon(new P(mon as any))
+                setDisplayMon(new P(mon as any));
               } else {
-                setDisplayMon(new P(new OHPKM(mon) as any))
+                setDisplayMon(new P(new OHPKM(mon) as any));
               }
             }}
           />
-          <button style={{ margin: '8px 0px', padding: '4px 6px' }}>
+          <button style={{ margin: "8px 0px", padding: "4px 6px" }}>
             <a
               href={url}
               download={`${displayMon.nickname}.${displayMon.format.toLocaleLowerCase()}`}
             >
-              <MdDownload style={{ color: 'white' }} />
+              <MdDownload style={{ color: "white" }} />
             </a>
           </button>
         </Stack>
         <Tab value="summary" disableIndicator color="primary" variant="solid">
           Summary
         </Tab>
-        <Tab value="moves_met_data" disableIndicator color="primary" variant="solid">
+        <Tab
+          value="moves_met_data"
+          disableIndicator
+          color="primary"
+          variant="solid"
+        >
           Moves/Met Data
         </Tab>
         <Tab value="stats" disableIndicator color="primary" variant="solid">
@@ -132,20 +140,22 @@ const PokemonDetailsPanel = (props: {
             bytes={
               displayMon.originalBytes
                 ? displayMon.originalBytes
-                : new Uint8Array(displayMon.toBytes({ includeExtraFields: true }))
+                : new Uint8Array(
+                    displayMon.toBytes({ includeExtraFields: true })
+                  )
             }
             format={displayMon.pluginIdentifier ? undefined : displayMon.format}
           />
         </TabPanel>
       </ErrorBoundary>
     </Tabs>
-  )
-}
+  );
+};
 
-export default PokemonDetailsPanel
+export default PokemonDetailsPanel;
 
 function FallbackComponent(props: FallbackProps) {
-  const { error, resetErrorBoundary } = props
+  const { error, resetErrorBoundary } = props;
   return (
     <div role="alert">
       <p>Something went wrong:</p>
@@ -153,5 +163,5 @@ function FallbackComponent(props: FallbackProps) {
       <p>{JSON.stringify(Object.getPrototypeOf(error))}</p>
       <button onClick={resetErrorBoundary}>Try again</button>
     </div>
-  )
+  );
 }

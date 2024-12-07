@@ -6,10 +6,13 @@ import { HomeData } from 'src/types/SAVTypes/HomeData'
 import { SAV } from 'src/types/SAVTypes/SAV'
 import { StoredBoxData } from 'src/types/storage'
 import { Errorable } from 'src/types/types'
-import BackendInterface from '../../types/backendInterface'
+import { getMonFileIdentifier } from 'src/util/Lookup'
+import BackendInterface from '../types/backendInterface'
 import DummyBackend from './dummyBackend'
 
-export type BackendProviderProps = { backend: BackendInterface } & PropsWithChildren
+export type BackendProviderProps = {
+  backend: BackendInterface
+} & PropsWithChildren
 
 function addHelpersToBackend(backend: BackendInterface): BackendWithHelpersInterface {
   return {
@@ -61,7 +64,7 @@ async function writeAllHomeData(
   for (const mon of mons) {
     try {
       const bytes = new Uint8Array(mon.toBytes())
-      const result = await backend.writeHomeMon(bytes)
+      const result = await backend.writeHomeMon(getMonFileIdentifier(mon), bytes)
       results.push(result)
     } catch (e) {
       const species = mon.dexNum in PokemonData ? PokemonData[mon.dexNum].name : 'Unknown Species'

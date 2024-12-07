@@ -5,7 +5,7 @@ import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { PathData, splitPath } from 'src/types/SAVTypes/path'
 import { getPluginIdentifier } from 'src/types/SAVTypes/util'
 import { SaveRef } from 'src/types/types'
-import { filterUndefined, numericSorter } from '../../util/Sort'
+import { filterUndefined, numericSorter } from 'src/util/Sort'
 import { BackendContext } from '../backend/backendProvider'
 import { RemoveIcon } from '../components/Icons'
 import OHDataGrid, { SortableColumn } from '../components/OHDataGrid'
@@ -192,7 +192,10 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
     <>
       {view === 'grid' ? (
         <OHDataGrid
-          rows={Object.values(recentSaves ?? {}).map((save, i) => ({ ...save, index: i }))}
+          rows={Object.values(recentSaves ?? {}).map((save, i) => ({
+            ...save,
+            index: i,
+          }))}
           columns={columns}
           defaultSort="lastOpened"
           defaultSortDir="DESC"

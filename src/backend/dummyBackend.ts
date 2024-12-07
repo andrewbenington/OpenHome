@@ -1,5 +1,5 @@
 import * as E from 'fp-ts/lib/Either'
-import BackendInterface from '../../types/backendInterface'
+import BackendInterface, { BackendListeners } from '../types/backendInterface'
 
 const DummyBackend: BackendInterface = {
   /* past gen identifier lookups */
@@ -35,11 +35,13 @@ const DummyBackend: BackendInterface = {
   rollbackTransaction: async () => E.left('no backend in use'),
 
   /* application */
-  setHasChanges: async () => {},
+  pickFile: async () => E.left('no backend in use'),
   pickFolder: async () => E.left('no backend in use'),
   getResourcesPath: async () => '',
   openDirectory: async () => E.left('no backend in use'),
   getPlatform: async () => 'none',
+  registerListeners: (_: BackendListeners) => () => {},
+  getState: async () => E.left('no backend in use'),
 }
 
 export default DummyBackend

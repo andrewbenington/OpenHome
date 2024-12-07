@@ -9,8 +9,8 @@ import {
   LGPE_TRANSFER_RESTRICTIONS,
   SV_TRANSFER_RESTRICTIONS,
   SWSH_TRANSFER_RESTRICTIONS,
-} from '../../consts/TransferRestrictions'
-import { filterUndefined } from '../../util/Sort'
+} from 'src/consts/TransferRestrictions'
+import { filterUndefined } from 'src/util/Sort'
 import { AppInfoContext } from '../state/appInfo'
 
 const styles = {

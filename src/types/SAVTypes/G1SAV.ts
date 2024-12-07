@@ -2,13 +2,13 @@ import lodash from 'lodash'
 import { PK1 } from 'pokemon-files'
 import { GameOfOrigin, GameOfOriginData, Languages } from 'pokemon-resources'
 import { NationalDex } from 'pokemon-species-data'
-import { GEN1_TRANSFER_RESTRICTIONS } from '../../consts/TransferRestrictions'
-import { bytesToUint16BigEndian, get8BitChecksum } from '../../util/ByteLogic'
-import { natDexToGen1ID } from '../../util/ConvertPokemonID'
-import { gen12StringToUTF, utf16StringToGen12 } from '../../util/Strings/StringConverter'
+import { GEN1_TRANSFER_RESTRICTIONS } from 'src/consts/TransferRestrictions'
+import { bytesToUint16BigEndian, get8BitChecksum } from 'src/util/byteLogic'
+import { natDexToGen1ID } from 'src/util/ConvertPokemonID'
+import { gen12StringToUTF, utf16StringToGen12 } from 'src/util/Strings/StringConverter'
 import { OHPKM } from '../pkm/OHPKM'
-import { Box, BoxCoordinates, SAV } from './SAV'
 import { PathData } from './path'
+import { Box, BoxCoordinates, SAV } from './SAV'
 import { LOOKUP_TYPE } from './util'
 
 const SAVE_SIZE_BYTES = 0x8000
@@ -240,6 +240,12 @@ export class G1SAV implements SAV<PK1> {
   static fileIsSave(bytes: Uint8Array): boolean {
     // Gen 1 and Gen 2 saves are the same size, so assume it's Gen 2 if the Gen 2 checksums are valid
     if (areCrystalInternationalChecksumsValid(bytes) || areGoldSilverChecksumsValid(bytes)) {
+      return false
+    }
+    const decodedFirst64 = new TextDecoder('utf-8').decode(bytes.slice(0, 64))
+
+    if (decodedFirst64.includes('Metroid') || decodedFirst64.includes('ZeroMission')) {
+      // lol
       return false
     }
     return bytes.length === SAVE_SIZE_BYTES

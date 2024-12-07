@@ -18,13 +18,6 @@ import { GameOfOrigin, isGameBoy, isGen3, isGen4, isGen5 } from 'pokemon-resourc
 import { useCallback, useContext, useEffect, useState } from 'react'
 import { MdFileOpen } from 'react-icons/md'
 import { Errorable } from 'src/types/types'
-import { PKMInterface } from '../../types/interfaces'
-import { OHPKM } from '../../types/pkm/OHPKM'
-import {
-  getMonFileIdentifier,
-  getMonGen12Identifier,
-  getMonGen345Identifier,
-} from '../../util/Lookup'
 import { BackendContext } from '../backend/backendProvider'
 import FilterPanel from '../components/filter/FilterPanel'
 import PokemonIcon from '../components/PokemonIcon'
@@ -36,8 +29,10 @@ import { AppInfoContext } from '../state/appInfo'
 import { LookupContext } from '../state/lookup'
 import { MouseContext } from '../state/mouse'
 import { OpenSavesContext } from '../state/openSaves'
+import { PKMInterface } from '../types/interfaces'
+import { OHPKM } from '../types/pkm/OHPKM'
 import { initializeDragImage } from '../util/initializeDragImage'
-import { handleMenuResetAndClose, handleMenuSave } from '../util/ipcFunctions'
+import { getMonFileIdentifier, getMonGen12Identifier, getMonGen345Identifier } from '../util/Lookup'
 import './Home.css'
 
 const Home = () => {
@@ -46,20 +41,12 @@ const Home = () => {
   const backend = useContext(BackendContext)
   const [mouseState, mouseDispatch] = useContext(MouseContext)
   const [, appInfoDispatch] = useContext(AppInfoContext)
-  const homeData = openSavesState.homeData
   const { palette } = useTheme()
   const [selectedMon, setSelectedMon] = useState<PKMInterface>()
   const [tab, setTab] = useState('summary')
   const [openSaveDialog, setOpenSaveDialog] = useState(false)
   const [errorMessages, setErrorMessages] = useState<string[]>()
   const [filesToDelete, setFilesToDelete] = useState<string[]>([])
-
-  useEffect(() => {
-    const edited =
-      (homeData?.updatedBoxSlots.length ?? 0) > 0 ||
-      !allOpenSaves.every((save) => save.updatedBoxSlots.length === 0)
-    backend.setHasChanges(edited)
-  }, [allOpenSaves, backend, homeData?.updatedBoxSlots])
 
   const onViewDrop = (e: React.DragEvent<HTMLDivElement>, type: string) => {
     const processDroppedData = async (file?: File, droppedMon?: PKMInterface) => {
@@ -84,7 +71,10 @@ const Home = () => {
     const mon = mouseState.dragSource?.mon
     if (!file && mouseState.dragSource) {
       if (mon && type === 'release') {
-        openSavesDispatch({ type: 'add_mon_to_release', payload: mouseState.dragSource })
+        openSavesDispatch({
+          type: 'add_mon_to_release',
+          payload: mouseState.dragSource,
+        })
         mouseDispatch({ type: 'set_drag_source', payload: undefined })
         if (mon instanceof OHPKM) {
           const identifier = getMonFileIdentifier(mon)
@@ -126,12 +116,7 @@ const Home = () => {
     lookupDispatch({ type: 'load_gen12', payload: gen12Result.right })
     lookupDispatch({ type: 'load_gen345', payload: gen345Result.right })
 
-    const homeMons: Record<string, OHPKM> = {}
-    for (const [identifier, buffer] of Object.entries(homeResult.right)) {
-      homeMons[identifier] = new OHPKM(buffer)
-    }
-
-    return E.right(homeMons)
+    return homeResult
   }, [backend, lookupDispatch])
 
   const loadAllHomeData = useCallback(
@@ -227,25 +212,25 @@ const Home = () => {
     openSavesState.modifiedOHPKMs,
   ])
 
-  // listener for menu save
   useEffect(() => {
-    const callback = handleMenuSave(saveChanges)
-    return () => callback()
-  }, [saveChanges])
-
-  // listener for menu reset + close
-  useEffect(() => {
-    const callback = handleMenuResetAndClose(
-      () => {
+    // returns a function to stop listening
+    const stopListening = backend.registerListeners({
+      onSave: () => saveChanges(),
+      onReset: () => {
         openSavesDispatch({ type: 'clear_mons_to_release' })
         if (lookupState.loaded) {
           loadAllHomeData(lookupState.homeMons)
         }
+        openSavesDispatch({ type: 'close_all_saves' })
       },
-      () => openSavesDispatch({ type: 'close_all_saves' })
-    )
-    return () => callback()
-  }, [openSavesDispatch, loadAllHomeData, lookupState])
+    })
+
+    // the "stop listening" function should be called when the effect returns,
+    // otherwise duplicate listeners will exist
+    return () => {
+      stopListening()
+    }
+  }, [backend, saveChanges, lookupState, openSavesDispatch, loadAllHomeData])
 
   useEffect(() => {
     if (lookupState.loaded && !openSavesState.homeData) {
@@ -364,13 +349,17 @@ const Home = () => {
           </ModalDialog>
         </ModalOverflow>
       </Modal>
-      <Modal open={openSaveDialog} onClose={() => setOpenSaveDialog(false)}>
+      <Modal
+        open={openSaveDialog}
+        onClose={() => setOpenSaveDialog(false)}
+        sx={{ height: '100vh' }}
+      >
         <ModalDialog
           sx={{
             minWidth: 800,
             width: '80%',
             maxHeight: 'fit-content',
-            height: '95%',
+            height: '95vh',
             overflow: 'hidden',
           }}
         >

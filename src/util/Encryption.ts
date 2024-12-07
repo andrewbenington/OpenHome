@@ -4,7 +4,7 @@ import {
   bytesToUint32LittleEndian,
   uint16ToBytesLittleEndian,
   uint32ToBytesLittleEndian,
-} from './ByteLogic'
+} from './byteLogic'
 import { MemeKey, pokedexAndSaveFileMemeKey, SIGNATURE_LENGTH } from './MemeKey'
 
 import crypto from 'crypto'

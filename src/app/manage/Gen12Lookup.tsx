@@ -1,12 +1,13 @@
 import { useContext } from 'react'
-import { getPublicImageURL } from 'src/renderer/images/images'
-import { getMonSaveLogo } from 'src/renderer/saves/util'
-import { AppInfoContext } from 'src/renderer/state/appInfo'
+import { getPublicImageURL } from 'src/images/images'
+import { getMonSaveLogo } from 'src/saves/util'
+import { AppInfoContext } from 'src/state/appInfo'
 import { OHPKM } from 'src/types/pkm/OHPKM'
 import { numericSorter, stringSorter } from 'src/util/Sort'
-import OHDataGrid, { SortableColumn } from '../../components/OHDataGrid'
-import PokemonIcon from '../../components/PokemonIcon'
+import OHDataGrid, { SortableColumn } from 'src/components/OHDataGrid'
+import PokemonIcon from 'src/components/PokemonIcon'
 import { LookupContext } from '../../state/lookup'
+import { BackendContext } from 'src/backend/backendProvider'
 
 type G12LookupRow = {
   gen12ID: string
@@ -17,6 +18,8 @@ type G12LookupRow = {
 export default function Gen12Lookup() {
   const [{ homeMons, gen12 }] = useContext(LookupContext)
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
+  const backend = useContext(BackendContext)
+  backend.getResourcesPath().then(console.info)
 
   function pokemonFromLookupID(id: string) {
     if (!homeMons) return undefined

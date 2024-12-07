@@ -4,13 +4,13 @@ import { GameOfOrigin } from 'pokemon-resources'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { getSaveRef, SAV } from 'src/types/SAVTypes/SAV'
 import { buildSaveFile } from 'src/types/SAVTypes/load'
-import { PathData, splitPath } from '../../types/SAVTypes/path'
-import { numericSorter } from '../../util/Sort'
+import { numericSorter } from 'src/util/Sort'
 import { BackendContext } from '../backend/backendProvider'
 import OHDataGrid, { SortableColumn } from '../components/OHDataGrid'
 import { AppInfoContext } from '../state/appInfo'
 import { LookupContext } from '../state/lookup'
 import { OpenSavesContext } from '../state/openSaves'
+import { PathData, splitPath } from '../types/SAVTypes/path'
 import SaveCard from './SaveCard'
 import { filterEmpty, getSaveLogo, SaveViewMode } from './util'
 
@@ -61,9 +61,9 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
       E.match(
         (err) => console.error(err),
         async (possibleSaves) => {
-          const allPaths = possibleSaves.citra
-            .concat(possibleSaves.openEmu)
-            .concat(possibleSaves.desamume)
+          const allPaths = (possibleSaves?.citra ?? [])
+            .concat(possibleSaves?.open_emu ?? [])
+            .concat(possibleSaves?.desamume ?? [])
           if (allPaths.length > 0) {
             const saves = (await Promise.all(allPaths.map((path) => loadSaveData(path)))).filter(
               filterEmpty

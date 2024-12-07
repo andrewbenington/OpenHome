@@ -6,7 +6,6 @@
 .pokemon-icon-image {
   background-size: 3600%;
   background-repeat: no-repeat;
-  image-rendering: crisp-edges;
   height: 100%;
   width: 100%;
   z-index: 1;

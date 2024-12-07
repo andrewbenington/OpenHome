@@ -1,13 +1,13 @@
 import { useContext } from 'react'
-import { getPublicImageURL } from 'src/renderer/images/images'
-import { getMonSaveLogo } from 'src/renderer/saves/util'
-import { AppInfoContext } from 'src/renderer/state/appInfo'
+import { getPublicImageURL } from 'src/images/images'
+import { getMonSaveLogo } from 'src/saves/util'
+import { AppInfoContext } from 'src/state/appInfo'
 import { OHPKM } from 'src/types/pkm/OHPKM'
 import { numericSorter, stringSorter } from 'src/util/Sort'
-import { getMonFileIdentifier } from '../../../util/Lookup'
-import OHDataGrid, { SortableColumn } from '../../components/OHDataGrid'
-import PokemonIcon from '../../components/PokemonIcon'
-import { LookupContext } from '../../state/lookup'
+import { getMonFileIdentifier } from 'src/util/Lookup'
+import OHDataGrid, { SortableColumn } from 'src/components/OHDataGrid'
+import PokemonIcon from 'src/components/PokemonIcon'
+import { LookupContext } from 'src/state/lookup'
 
 export default function OpenHomeMonList() {
   const [{ homeMons }] = useContext(LookupContext)

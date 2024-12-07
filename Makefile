@@ -13,7 +13,7 @@ package:
 
 .PHONY: start
 start:
-	@npm run dev:unix
+	@npm run tauri dev
 
 .PHONY: preview
 preview:

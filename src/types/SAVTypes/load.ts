@@ -2,7 +2,7 @@ import {
   getMonFileIdentifier,
   getMonGen12Identifier,
   getMonGen345Identifier,
-} from '../../util/Lookup'
+} from 'src/util/Lookup'
 import { PKMInterface } from '../interfaces'
 import { OHPKM } from '../pkm/OHPKM'
 import { PathData } from './path'

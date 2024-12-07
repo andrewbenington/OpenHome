@@ -4,12 +4,12 @@ import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
   uint16ToBytesLittleEndian,
-} from '../../util/ByteLogic'
-import { CRC16_Invert, SignWithMemeCrypto } from '../../util/Encryption'
-import { utf16BytesToString } from '../../util/Strings/StringConverter'
+} from 'src/util/byteLogic'
+import { CRC16_Invert, SignWithMemeCrypto } from 'src/util/Encryption'
+import { utf16BytesToString } from 'src/util/Strings/StringConverter'
 import { OHPKM } from '../pkm/OHPKM'
-import { Box, BoxCoordinates, SAV } from './SAV'
 import { PathData } from './path'
+import { Box, BoxCoordinates, SAV } from './SAV'
 import { SIZE_USUM } from './util'
 
 const BOX_SIZE: number = 232 * 30

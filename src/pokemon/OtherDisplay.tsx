@@ -11,10 +11,9 @@ import {
 import { NationalDex } from 'pokemon-species-data'
 import { useMemo } from 'react'
 import { MdArrowForwardIos } from 'react-icons/md'
-import { get16BitChecksumLittleEndian } from 'src/util/ByteLogic'
-import { Countries } from '../../consts/Countries'
-import { EncounterTypes } from '../../consts/EncounterTypes'
-import { SWEETS } from '../../consts/Formes'
+import { Countries } from 'src/consts/Countries'
+import { EncounterTypes } from 'src/consts/EncounterTypes'
+import { SWEETS } from 'src/consts/Formes'
 import {
   GEN2_TRANSFER_RESTRICTIONS,
   HGSS_TRANSFER_RESTRICTIONS,
@@ -23,24 +22,25 @@ import {
   SV_TRANSFER_RESTRICTIONS,
   SWSH_TRANSFER_RESTRICTIONS,
   USUM_TRANSFER_RESTRICTIONS,
-} from '../../consts/TransferRestrictions'
-import { isRestricted } from '../../types/TransferRestrictions'
-import { PKMInterface } from '../../types/interfaces'
-import { OHPKM } from '../../types/pkm/OHPKM'
+} from 'src/consts/TransferRestrictions'
+import {
+  getMonFileIdentifier,
+  getMonGen12Identifier,
+  getMonGen345Identifier,
+} from 'src/util/Lookup'
+import { get16BitChecksumLittleEndian } from 'src/util/byteLogic'
+import DynamaxLevel from '../components/DynamaxLevel'
+import ShinyLeaves from '../components/ShinyLeaves'
+import TypeIcon from '../components/TypeIcon'
+import { isRestricted } from '../types/TransferRestrictions'
+import { PKMInterface } from '../types/interfaces'
+import { OHPKM } from '../types/pkm/OHPKM'
 import {
   getHiddenPowerGen2,
   getHiddenPowerPower,
   getHiddenPowerType,
   shinyLeafValues,
-} from '../../types/pkm/util'
-import {
-  getMonFileIdentifier,
-  getMonGen12Identifier,
-  getMonGen345Identifier,
-} from '../../util/Lookup'
-import DynamaxLevel from '../components/DynamaxLevel'
-import ShinyLeaves from '../components/ShinyLeaves'
-import TypeIcon from '../components/TypeIcon'
+} from '../types/pkm/util'
 import { getFlagsInRange } from '../util/byteLogic'
 import AttributeRow from './AttributeRow'
 
@@ -486,7 +486,10 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
 }
 export default OtherDisplay
 
-type PKMInterfaceTera = PKMInterface & { teraTypeOriginal: number; teraTypeOverride: number }
+type PKMInterfaceTera = PKMInterface & {
+  teraTypeOriginal: number
+  teraTypeOverride: number
+}
 
 function hasTeraTypes(mon: PKMInterface): mon is PKMInterfaceTera {
   return mon.teraTypeOriginal !== undefined && mon.teraTypeOverride !== undefined

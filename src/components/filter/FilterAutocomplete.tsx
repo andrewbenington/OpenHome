@@ -6,8 +6,8 @@ import {
   ListItemDecorator,
 } from '@mui/joy'
 import { useContext, useMemo } from 'react'
-import { FilterContext } from 'src/renderer/state/filter'
 import './style.css'
+import { FilterContext } from 'src/state/filter'
 
 export interface FilterAutocompleteProps<OptionType>
   extends Omit<AutocompleteProps<OptionType, false, false, false>, 'renderInput'> {
@@ -76,8 +76,8 @@ export default function FilterAutocomplete<OptionType>(props: FilterAutocomplete
                 {attributes.getOptionLabel
                   ? attributes.getOptionLabel(option)
                   : labelField
-                  ? option[labelField]
-                  : option}
+                    ? option[labelField]
+                    : option}
               </ListItemContent>
             </AutocompleteOption>
           )

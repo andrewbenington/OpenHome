@@ -30,8 +30,8 @@ import {
 } from 'pokemon-resources'
 import { NationalDex } from 'pokemon-species-data'
 import Prando from 'prando'
-import { OpenHomeRibbons } from '../../consts/Ribbons'
-import { ShadowIDsColosseum, ShadowIDsXD } from '../../consts/ShadowIDs'
+import { OpenHomeRibbons } from 'src/consts/Ribbons'
+import { ShadowIDsColosseum, ShadowIDsXD } from 'src/consts/ShadowIDs'
 import {
   bytesToUint16BigEndian,
   bytesToUint16LittleEndian,
@@ -41,9 +41,9 @@ import {
   uint16ToBytesBigEndian,
   uint16ToBytesLittleEndian,
   uint32ToBytesLittleEndian,
-} from '../../util/ByteLogic'
-import { getHPGen3Onward, getLevelGen3Onward, getStatGen3Onward } from '../../util/StatCalc'
-import { utf16BytesToString, utf16StringToBytes } from '../../util/Strings/StringConverter'
+} from 'src/util/byteLogic'
+import { getHPGen3Onward, getLevelGen3Onward, getStatGen3Onward } from 'src/util/StatCalc'
+import { utf16BytesToString, utf16StringToBytes } from 'src/util/Strings/StringConverter'
 import { PKMInterface, PluginPKMInterface } from '../interfaces'
 import schema from './OHPKM.json'
 import {
@@ -1149,7 +1149,6 @@ export class OHPKM implements PKMInterface {
   public set pluginOrigin(value: string | undefined) {
     if (value === undefined) return
     const utfBytes = utf16StringToBytes(value, 32)
-    console.log(utfBytes.length, this.bytes.length, this.bytes.length - 433)
     this.bytes.set(utfBytes, 433)
   }
 

@@ -1,40 +1,48 @@
-import { Card, Modal, Tab, tabClasses, TabList, TabPanel, Tabs } from '@mui/joy'
-import { useState } from 'react'
-import { PKMInterface } from '../../../types/interfaces'
-import PokemonDetailsPanel from '../../pokemon/PokemonDetailsPanel'
-import Gen12Lookup from './Gen12Lookup'
-import Gen345Lookup from './Gen345Lookup'
-import OpenHomeMonList from './OpenHomeMonList'
+import {
+  Card,
+  Modal,
+  Tab,
+  tabClasses,
+  TabList,
+  TabPanel,
+  Tabs,
+} from "@mui/joy";
+import { useState } from "react";
+import { PKMInterface } from "../../types/interfaces";
+import PokemonDetailsPanel from "../../pokemon/PokemonDetailsPanel";
+import Gen12Lookup from "./Gen12Lookup";
+import Gen345Lookup from "./Gen345Lookup";
+import OpenHomeMonList from "./OpenHomeMonList";
 
 export default function TrackedPokemon() {
-  const [selectedMon, setSelectedMon] = useState<PKMInterface>()
-  const [pokemonDisplayTab, setPokemonDisplayTab] = useState('summary')
+  const [selectedMon, setSelectedMon] = useState<PKMInterface>();
+  const [pokemonDisplayTab, setPokemonDisplayTab] = useState("summary");
 
   return (
-    <Tabs defaultValue="all" orientation="vertical" style={{ height: '100%' }}>
+    <Tabs defaultValue="all" orientation="vertical" style={{ height: "100%" }}>
       <TabList
         variant="solid"
         color="primary"
         disableUnderline
         sx={{
-          whiteSpace: 'nowrap',
+          whiteSpace: "nowrap",
           p: 0.8,
           gap: 0.5,
           [`& .${tabClasses.root}`]: {
-            borderRadius: 'lg',
+            borderRadius: "lg",
           },
           [`& .${tabClasses.root}[aria-selected="true"]`]: {
-            boxShadow: 'sm',
+            boxShadow: "sm",
           },
         }}
       >
-        <Tab disableIndicator value={'all'} variant="solid" color="primary">
+        <Tab disableIndicator value={"all"} variant="solid" color="primary">
           All Pokémon
         </Tab>
-        <Tab disableIndicator value={'gen12'} variant="solid" color="primary">
+        <Tab disableIndicator value={"gen12"} variant="solid" color="primary">
           Gen 1/2 IDs
         </Tab>
-        <Tab disableIndicator value={'gen345'} variant="solid" color="primary">
+        <Tab disableIndicator value={"gen345"} variant="solid" color="primary">
           Gen 3/4/5 IDs
         </Tab>
       </TabList>
@@ -53,7 +61,9 @@ export default function TrackedPokemon() {
         // maxWidth="md"
         // PaperProps={{ sx: { height: 400, maxWidth: 800 } }}
       >
-        <Card style={{ width: 800, height: 400, padding: 0, overflow: 'hidden' }}>
+        <Card
+          style={{ width: 800, height: 400, padding: 0, overflow: "hidden" }}
+        >
           {selectedMon && (
             <PokemonDetailsPanel
               mon={selectedMon}
@@ -64,5 +74,5 @@ export default function TrackedPokemon() {
         </Card>
       </Modal>
     </Tabs>
-  )
+  );
 }

@@ -4,7 +4,7 @@ import { HomeData } from 'src/types/SAVTypes/HomeData'
 import { SAV } from 'src/types/SAVTypes/SAV'
 import { StoredBoxData } from 'src/types/storage'
 import { getMonFileIdentifier } from 'src/util/Lookup'
-import { PKMInterface } from '../../types/interfaces'
+import { PKMInterface } from '../types/interfaces'
 
 export type OpenSave = {
   index: number
@@ -27,6 +27,10 @@ export type MonLocation = {
   save: SAV
   box: number
   boxPos: number
+}
+
+export type MonWithLocation = MonLocation & {
+  mon: PKMInterface
 }
 
 export type OpenSavesAction =
@@ -66,9 +70,7 @@ export type OpenSavesAction =
   | {
       type: 'move_mon'
       payload: {
-        source: MonLocation & {
-          mon: PKMInterface
-        }
+        source: MonWithLocation
         dest: MonLocation
       }
     }
@@ -101,9 +103,9 @@ const updateMonInSave = (
   let replacedMon
   const { save, box, boxPos } = dest
   const saveID = saveToStringIdentifier(save)
-  if (save instanceof HomeData && state.homeData && (!mon || mon instanceof OHPKM)) {
+  if (save instanceof HomeData && state.homeData && (mon === undefined || mon instanceof OHPKM)) {
     replacedMon = state.homeData.boxes[box].pokemon[boxPos]
-    state.homeData.boxes[box].pokemon[boxPos] = mon
+    state.homeData.boxes[box].pokemon[boxPos] = mon as OHPKM
     state.homeData.updatedBoxSlots.push({ box, index: boxPos })
   } else if (saveID in state.openSaves) {
     const tempSaves = { ...state.openSaves }

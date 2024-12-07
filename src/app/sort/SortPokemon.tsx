@@ -2,13 +2,13 @@ import { Autocomplete, Card, Chip, Modal, ModalDialog, ModalOverflow, Stack } fr
 import dayjs from 'dayjs'
 import { useContext, useMemo, useState } from 'react'
 import { MdAdd } from 'react-icons/md'
-import PokemonDetailsPanel from 'src/renderer/pokemon/PokemonDetailsPanel'
-import BoxCell from 'src/renderer/saves/boxes/BoxCell'
-import SavesModal from 'src/renderer/saves/SavesModal'
+import PokemonDetailsPanel from 'src/pokemon/PokemonDetailsPanel'
+import BoxCell from 'src/saves/boxes/BoxCell'
+import SavesModal from 'src/saves/SavesModal'
 import { filterUndefined } from 'src/util/Sort'
-import { PKMInterface } from '../../../types/interfaces'
 import { LookupContext } from '../../state/lookup'
 import { OpenSavesContext } from '../../state/openSaves'
+import { PKMInterface } from '../../types/interfaces'
 
 function getSortFunction(
   sortStr: string | undefined
@@ -91,7 +91,7 @@ export default function SortPokemon() {
         <Card>
           <Autocomplete
             options={['nickname', 'level', 'species', 'ribbons', 'met_date', 'origin']}
-            onChange={(_, value) => setSort(value ?? '')}
+            onChange={(_, value) => setSort(value[0] ?? '')}
             placeholder="Sort"
           />
         </Card>
