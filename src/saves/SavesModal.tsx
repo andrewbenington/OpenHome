@@ -38,7 +38,6 @@ const SavesModal = (props: SavesModalProps) => {
   const [viewMode, setViewMode] = useState<SaveViewMode>('cards')
   const [cardSize, setCardSize] = useState<number>(180)
 
-
   const openSaveFile = useCallback(
     async (filePath?: PathData) => {
       if (!filePath) {
@@ -137,6 +136,8 @@ const SavesModal = (props: SavesModalProps) => {
               min={100}
               max={500}
               style={{ paddingTop: 0, paddingBottom: 30 }}
+              variant="soft"
+              color="neutral"
             />
           </label>
         )}
