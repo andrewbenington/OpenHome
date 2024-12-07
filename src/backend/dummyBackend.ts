@@ -41,6 +41,7 @@ const DummyBackend: BackendInterface = {
   openDirectory: async () => E.left('no backend in use'),
   getPlatform: async () => 'none',
   registerListeners: (_: BackendListeners) => () => {},
+  getState: async () => E.left('no backend in use'),
 }
 
 export default DummyBackend

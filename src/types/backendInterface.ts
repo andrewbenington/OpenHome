@@ -3,6 +3,12 @@ import { PathData, PossibleSaves } from './SAVTypes/path'
 import { SaveFolder, StoredBoxData } from './storage'
 import { Errorable, LoadSaveResponse, LookupMap, SaveRef } from './types'
 
+export type AppState = {
+  open_transaction: boolean
+  temp_files: string[]
+  is_dev: boolean
+}
+
 export default interface BackendInterface {
   /* past gen identifier lookups */
   loadGen12Lookup: () => Promise<Errorable<LookupMap>>
@@ -44,6 +50,7 @@ export default interface BackendInterface {
   openDirectory: (directory: string) => Promise<Errorable<null>>
   getPlatform: () => Promise<string>
   registerListeners: (listeners: BackendListeners) => () => void
+  getState: () => Promise<Errorable<AppState>>
 }
 
 export interface BackendListeners {

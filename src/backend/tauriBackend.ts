@@ -188,6 +188,7 @@ export const TauriBackend: BackendInterface = {
     return E.right(null)
   },
   getPlatform: async () => platform(),
+  getState: async () => TauriInvoker.getState(),
 
   registerListeners: (listeners) => {
     const unlistenPromise = Promise.all([

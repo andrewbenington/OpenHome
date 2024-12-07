@@ -1,6 +1,7 @@
 import { invoke } from '@tauri-apps/api/core'
 import * as E from 'fp-ts/lib/Either'
 import { Errorable, JSONArray, JSONObject, JSONValue } from 'src/types/types'
+import { AppState } from '../../types/backendInterface'
 import { PossibleSaves } from '../../types/SAVTypes/path'
 import { RustResult } from './types'
 
@@ -10,7 +11,8 @@ function rustResultToEither<T, E>(result: RustResult<T, E>): E.Either<E, T> {
 
 export const TauriInvoker = {
   getState() {
-    return invoke('get_state') as Promise<object>
+    const promise = invoke('get_state') as Promise<AppState>
+    return promise.then(E.right).catch(E.left)
   },
 
   getFileBytes(absolutePath: string): Promise<Errorable<Uint8Array>> {
