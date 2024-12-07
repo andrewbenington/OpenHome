@@ -105,6 +105,11 @@ pub fn start_transaction(state: tauri::State<'_, AppState>) -> Result<(), String
 }
 
 #[tauri::command]
+pub fn rollback_transaction(state: tauri::State<'_, AppState>) -> Result<(), String> {
+    return state.rollback_transaction();
+}
+
+#[tauri::command]
 pub fn commit_transaction(state: tauri::State<'_, AppState>) -> Result<(), String> {
     return state.commit_transaction();
 }

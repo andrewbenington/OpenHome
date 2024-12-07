@@ -97,7 +97,7 @@ pub fn handle_menu_event(app_handle: &AppHandle, event: MenuEvent) {
             return ();
         }
         "reset" => {
-            app_handle.emit("reset", ());
+            let _ = app_handle.emit("reset", ());
             return ();
         }
         "exit" => std::process::exit(0),

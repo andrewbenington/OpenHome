@@ -1,8 +1,8 @@
 mod commands;
 mod menu;
+mod saves;
 mod state;
 mod util;
-mod saves;
 
 use std::{
     env,
@@ -47,6 +47,7 @@ pub fn run() {
             commands::get_ohpkm_files,
             commands::delete_storage_files,
             commands::start_transaction,
+            commands::rollback_transaction,
             commands::commit_transaction,
             commands::find_suggested_saves,
         ])
