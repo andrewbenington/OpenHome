@@ -65,9 +65,10 @@ body,
 select {
   -webkit-appearance: none;
   appearance: none;
-  background: url('data:image/svg+xml;utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>')
+  background: url('data:image/svg+xml;utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path fill="white" d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>')
     100% 50% no-repeat transparent;
   padding-left: 4px;
+  padding-right: 24px;
 }
 
 button,
