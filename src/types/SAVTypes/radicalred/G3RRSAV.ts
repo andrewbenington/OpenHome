@@ -233,8 +233,6 @@ export class G3RRSAV implements PluginSAV<PK3RR> {
     let fileName = filePathElements[filePathElements.length - 1]
     fileName = fileName.replace(/\s+/g, '')
     this.origin = GameOfOrigin.FireRed
-
-    console.log(this.boxes)
   }
   getExtraData?: (() => object) | undefined
 

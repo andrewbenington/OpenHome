@@ -1149,7 +1149,6 @@ export class OHPKM implements PKMInterface {
   public set pluginOrigin(value: string | undefined) {
     if (value === undefined) return
     const utfBytes = utf16StringToBytes(value, 32)
-    console.log(utfBytes.length, this.bytes.length, this.bytes.length - 433)
     this.bytes.set(utfBytes, 433)
   }
 

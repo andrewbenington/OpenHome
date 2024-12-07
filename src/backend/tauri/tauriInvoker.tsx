@@ -37,10 +37,6 @@ export const TauriInvoker = {
   },
 
   writeStorageFileJSON(relativePath: string, data: JSONValue): Promise<Errorable<null>> {
-    console.log({
-      relativePath,
-      data,
-    })
     const promise: Promise<null> = invoke('write_storage_file_json', {
       relativePath,
       data,

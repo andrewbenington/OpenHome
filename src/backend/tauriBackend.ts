@@ -180,7 +180,6 @@ export const TauriBackend: BackendInterface = {
     return E.right(path ?? undefined)
   },
   getResourcesPath: () => {
-    console.log(path.resourceDir())
     return path.resourceDir()
   },
   openDirectory: async (directory: string): Promise<Errorable<null>> => {

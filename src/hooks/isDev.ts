@@ -7,9 +7,7 @@ export default function useIsDev(): boolean {
   const backend = useContext(BackendContext)
 
   useEffect(() => {
-    console.log(backend)
     backend.getState().then((state) => {
-      console.log(state)
       if (E.isRight(state)) {
         setIsDev(state.right.is_dev)
       }

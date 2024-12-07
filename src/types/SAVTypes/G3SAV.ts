@@ -270,7 +270,6 @@ export class G3SAV implements SAV<PK3> {
         this.origin = this.primarySave.origin
       }
     }
-    console.log(this.boxes)
   }
 
   prepareBoxesAndGetModified() {

@@ -62,7 +62,6 @@ export default function App() {
               onDragEnd={(e) => {
                 const source = e.active.data.current
                 const dest = e.over?.data.current
-                console.log(dest)
                 if (
                   dragMon &&
                   source &&
@@ -74,12 +73,10 @@ export default function App() {
                 setDragData(e.over?.data.current as MonLocation)
                 let d = e.over?.data.current
                 setDragMon(d?.save.boxes[d.box].pokemon[d.boxPos])
-                console.log(d?.save.boxes[d.box].pokemon[d.boxPos]?.nickname)
               }}
               onDragStart={(e) => {
                 setDragData(e.active.data.current)
                 setDragMon(e.active.data.current?.mon)
-                console.log(e.active.data.current?.mon)
               }}
               sensors={[
                 useSensor(PointerSensor, {
