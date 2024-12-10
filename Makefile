@@ -5,7 +5,7 @@ help: # Display this help.
 
 .PHONY: build
 build:
-	@npm run build
+	@npm run tauri build
 
 .PHONY: package
 package:
