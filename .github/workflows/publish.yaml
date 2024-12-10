@@ -3,6 +3,9 @@ name: 'publish'
 on:
   release:
     types: [published]
+  push:
+    branches:
+      - dev
   workflow_dispatch:
 
 jobs:
