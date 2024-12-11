@@ -46,7 +46,7 @@ jobs:
       - name: install Rust stable
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || matrix.platform == 'windows-latest' && matrix.target = 'aarch64-pc-windows-msvc' && 'aarch64-pc-windows-msvc' || matrix.platform == 'ubuntu-22.04' && matrix.target = 'aarch64-unknown-linux-gnu' && 'aarch64-unknown-linux-gnu' || '' }}
+          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || matrix.platform == 'windows-latest' && matrix.target == 'aarch64-pc-windows-msvc' && 'aarch64-pc-windows-msvc' || matrix.platform == 'ubuntu-22.04' && matrix.target == 'aarch64-unknown-linux-gnu' && 'aarch64-unknown-linux-gnu' || '' }}
 
       - name: install dependencies (ubuntu only)
         if: matrix.platform == 'ubuntu-22.04' # This must match the platform value defined above.
