@@ -21,10 +21,13 @@ jobs:
           # - platform: 'macos-latest' # for Intel based macs.
           #   args: '--target x86_64-apple-darwin'
           - platform: 'ubuntu-22.04'
-            args: '--target x86_64-unknown-linux-gnu,aarch64-unknown-linux-gnu'
-          # temporarily removed for testing
+            args: ''
+          - platform: 'ubuntu-22.04'
+            args: '--target aarch64-unknown-linux-gnu'
           - platform: 'windows-latest'
-            args: '--target x86_64-pc-windows-msvc,aarch64-pc-windows-msvc'
+            args: ''
+          - platform: 'windows-latest'
+            args: '--target aarch64-pc-windows-msvc'
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -38,7 +41,7 @@ jobs:
       - name: install Rust stable
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || matrix.platform == 'windows-latest' && 'x86_64-pc-windows-msvc,aarch64-pc-windows-msvc' || matrix.platform == 'ubuntu-22.04' && 'x86_64-unknown-linux-gnu,aarch64-unknown-linux-gnu' || '' }}
+          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || matrix.platform == 'windows-latest' && 'aarch64-pc-windows-msvc' || matrix.platform == 'ubuntu-22.04' && 'aarch64-unknown-linux-gnu' || '' }}
 
       - name: install dependencies (ubuntu only)
         if: matrix.platform == 'ubuntu-22.04' # This must match the platform value defined above.
@@ -51,7 +54,7 @@ jobs:
       - name: install frontend dependencies
         run: npm install # change this to npm, pnpm or bun depending on which one you use.
 
-      - uses: tauri-apps/tauri-action@v0
+      - uses: tauri-apps/tauri-action@v0.5.16
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
