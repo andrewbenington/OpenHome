@@ -18,5 +18,10 @@
     "source.organizeImports": "explicit",
     "source.fixAll": "explicit",
     "source.removeUnusedImports": "explicit"
+  },
+  "makefile.configureOnOpen": false,
+  "python.languageServer": "Pylance",
+  "rust-analyzer.cargo.extraEnv": {
+    "MACOSX_DEPLOYMENT_TARGET": "14.6"
   }
 }

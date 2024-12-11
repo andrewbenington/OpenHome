@@ -1,6 +1,13 @@
+import { OHPKM } from './pkm/OHPKM'
 import { PathData, PossibleSaves } from './SAVTypes/path'
 import { SaveFolder, StoredBoxData } from './storage'
 import { Errorable, LoadSaveResponse, LookupMap, SaveRef } from './types'
+
+export type AppState = {
+  open_transaction: boolean
+  temp_files: string[]
+  is_dev: boolean
+}
 
 export default interface BackendInterface {
   /* past gen identifier lookups */
@@ -10,8 +17,8 @@ export default interface BackendInterface {
   writeGen345Lookup: (lookup: LookupMap) => Promise<Errorable<null>>
 
   /* OHPKM management */
-  loadHomeMonLookup: () => Promise<Errorable<Record<string, Uint8Array>>>
-  writeHomeMon: (monBytes: Uint8Array) => Promise<Errorable<null>>
+  loadHomeMonLookup: () => Promise<Errorable<Record<string, OHPKM>>>
+  writeHomeMon: (identifier: string, monBytes: Uint8Array) => Promise<Errorable<null>>
   deleteHomeMons: (identifiers: string[]) => Promise<Errorable<null>>
 
   /* openhome boxes */
@@ -37,9 +44,16 @@ export default interface BackendInterface {
   rollbackTransaction: () => Promise<Errorable<null>>
 
   /* application */
-  setHasChanges: (hasChanges: boolean) => Promise<void>
+  pickFile: () => Promise<Errorable<string | undefined>>
   pickFolder: () => Promise<Errorable<string | undefined>>
   getResourcesPath: () => Promise<string>
   openDirectory: (directory: string) => Promise<Errorable<null>>
   getPlatform: () => Promise<string>
+  registerListeners: (listeners: BackendListeners) => () => void
+  getState: () => Promise<Errorable<AppState>>
+}
+
+export interface BackendListeners {
+  onSave: () => void
+  onReset: () => void
 }

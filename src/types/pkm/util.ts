@@ -23,8 +23,8 @@ import {
   uint16ToBytesLittleEndian,
   uint32ToBytesLittleEndian,
   writeUint32ToBuffer,
-} from '../../util/ByteLogic'
-import { getGen3To5Gender } from '../../util/GenderCalc'
+} from 'src/util/byteLogic'
+import { getGen3To5Gender } from 'src/util/GenderCalc'
 import { PKMInterface } from '../interfaces'
 import { OHPKM } from './OHPKM'
 

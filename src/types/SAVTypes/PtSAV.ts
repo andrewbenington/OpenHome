@@ -1,8 +1,8 @@
 import { PK4 } from 'pokemon-files'
 import { GameOfOrigin } from 'pokemon-resources'
-import { PT_TRANSFER_RESTRICTIONS } from '../../consts/TransferRestrictions'
-import { bytesToUint16LittleEndian, bytesToUint32LittleEndian } from '../../util/ByteLogic'
-import { gen4StringToUTF } from '../../util/Strings/StringConverter'
+import { PT_TRANSFER_RESTRICTIONS } from 'src/consts/TransferRestrictions'
+import { bytesToUint16LittleEndian, bytesToUint32LittleEndian } from 'src/util/byteLogic'
+import { gen4StringToUTF } from 'src/util/Strings/StringConverter'
 import { isRestricted } from '../TransferRestrictions'
 import { G4SAV } from './G4SAV'
 import { PathData } from './path'
@@ -44,8 +44,6 @@ export class PtSAV extends G4SAV {
   storageBlockSize: number = PtSAV.STORAGE_BLOCK_SIZE
 
   boxSize: number = PtSAV.BOX_SIZE
-
-  boxNamesOffset: number
 
   constructor(path: PathData, bytes: Uint8Array) {
     super(path, bytes)

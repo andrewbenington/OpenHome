@@ -5,12 +5,12 @@ import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
   uint16ToBytesLittleEndian,
-} from '../../util/ByteLogic'
-import { CRC16_CCITT } from '../../util/Encryption'
-import { gen5StringToUTF } from '../../util/Strings/StringConverter'
+} from 'src/util/byteLogic'
+import { CRC16_CCITT } from 'src/util/Encryption'
+import { gen5StringToUTF } from 'src/util/Strings/StringConverter'
 import { OHPKM } from '../pkm/OHPKM'
-import { Box, BoxCoordinates, SAV } from './SAV'
 import { PathData } from './path'
+import { Box, BoxCoordinates, SAV } from './SAV'
 import { hasDesamumeFooter, LOOKUP_TYPE } from './util'
 
 const PC_OFFSET = 0x400

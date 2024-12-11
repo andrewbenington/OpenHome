@@ -1,11 +1,11 @@
 import { PK6 } from 'pokemon-files'
 import { GameOfOrigin, GameOfOriginData } from 'pokemon-resources'
-import { bytesToUint16LittleEndian, uint16ToBytesLittleEndian } from '../../util/ByteLogic'
-import { CRC16_CCITT } from '../../util/Encryption'
-import { utf16BytesToString } from '../../util/Strings/StringConverter'
+import { bytesToUint16LittleEndian, uint16ToBytesLittleEndian } from 'src/util/byteLogic'
+import { CRC16_CCITT } from 'src/util/Encryption'
+import { utf16BytesToString } from 'src/util/Strings/StringConverter'
 import { OHPKM } from '../pkm/OHPKM'
-import { Box, BoxCoordinates, SAV } from './SAV'
 import { PathData } from './path'
+import { Box, BoxCoordinates, SAV } from './SAV'
 
 const BOX_NAMES_OFFSET: number = 0x04400
 const BOX_SIZE: number = 232 * 30
