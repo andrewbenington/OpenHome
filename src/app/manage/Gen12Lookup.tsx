@@ -1,13 +1,13 @@
 import { useContext } from 'react'
+import { BackendContext } from 'src/backend/backendProvider'
+import OHDataGrid, { SortableColumn } from 'src/components/OHDataGrid'
+import PokemonIcon from 'src/components/PokemonIcon'
 import { getPublicImageURL } from 'src/images/images'
 import { getMonSaveLogo } from 'src/saves/util'
 import { AppInfoContext } from 'src/state/appInfo'
 import { OHPKM } from 'src/types/pkm/OHPKM'
 import { numericSorter, stringSorter } from 'src/util/Sort'
-import OHDataGrid, { SortableColumn } from 'src/components/OHDataGrid'
-import PokemonIcon from 'src/components/PokemonIcon'
 import { LookupContext } from '../../state/lookup'
-import { BackendContext } from 'src/backend/backendProvider'
 
 type G12LookupRow = {
   gen12ID: string
@@ -68,14 +68,14 @@ export default function Gen12Lookup() {
       key: 'gen12ID',
       name: 'Gen 1/2',
       minWidth: 180,
-      sortFunction: stringSorter((val) => val[0]),
+      sortFunction: stringSorter((val) => val.gen12ID),
       cellClass: 'mono-cell',
     },
     {
       key: 'homeID',
       name: 'OpenHome',
       minWidth: 180,
-      sortFunction: stringSorter((val) => val[1]),
+      sortFunction: stringSorter((val) => val.homeID),
       cellClass: 'mono-cell',
     },
   ]

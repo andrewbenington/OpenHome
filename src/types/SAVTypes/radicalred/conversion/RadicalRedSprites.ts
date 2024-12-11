@@ -1,4 +1,4 @@
-export const RRSprites = {
+export const RRSprites: Record<string, string> = {
   '0': 'None.png',
   '1': 'Bulbasaur.png',
   '2': 'Ivysaur.png',

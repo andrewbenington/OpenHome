@@ -3,10 +3,10 @@ import { SaveRef } from '../../types/types'
 import { PKMInterface } from '../interfaces'
 import { OHPKM } from '../pkm/OHPKM'
 import { PathData } from './path'
-
+type SparseArray<T> = (T | undefined)[]
 export class Box<P extends PKMInterface> {
   name: string
-  pokemon: Array<P | OHPKM | undefined>
+  pokemon: SparseArray<P | OHPKM>
 
   constructor(name: string, boxSize: number) {
     this.name = name

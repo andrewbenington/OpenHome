@@ -23,16 +23,12 @@ jobs:
           - platform: 'ubuntu-22.04'
             target: 'x86_64-unknown-linux-gnu'
             args: ''
-          - platform: 'ubuntu-22.04'
-            target: 'aarch64-unknown-linux-gnu'
-            args: '--target aarch64-unknown-linux-gnu'
-          # disabling for testing
-          # - platform: 'windows-latest'
-          #   target: 'x86_64-pc-windows-msvc'
-          #   args: ''
-          # - platform: 'windows-latest'
-          #   target: 'aarch64-pc-windows-msvc'
-          #   args: '--target aarch64-pc-windows-msvc'
+          - platform: 'windows-latest'
+            target: 'x86_64-pc-windows-msvc'
+            args: ''
+          - platform: 'windows-latest'
+            target: 'aarch64-pc-windows-msvc'
+            args: '--target aarch64-pc-windows-msvc'
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -53,17 +49,6 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
-
-      - name: Install ARM-specific dependencies (ubuntu only)
-        if: matrix.platform == 'ubuntu-22.04' && matrix.target == 'aarch64-unknown-linux-gnu'
-        run: |
-          sudo apt-get install -y pkg-config
-          export PKG_CONFIG_SYSROOT_DIR=/usr/aarch64-linux-gnu
-          export PKG_CONFIG_PATH=/usr/aarch64-linux-gnu/lib/pkgconfig:/usr/aarch64-linux-gnu/share/pkgconfig
-          export PKG_CONFIG=pkg-config
-          sudo apt-get -y install pkg-config-aarch64-linux-gnu
-          sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
-          sudo apt-get install -y libglib2.0-dev
 
       - name: install frontend dependencies
         run: npm install # change this to npm, pnpm or bun depending on which one you use.

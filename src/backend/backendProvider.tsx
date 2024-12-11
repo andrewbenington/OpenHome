@@ -64,7 +64,16 @@ async function writeAllHomeData(
   for (const mon of mons) {
     try {
       const bytes = new Uint8Array(mon.toBytes())
-      const result = await backend.writeHomeMon(getMonFileIdentifier(mon), bytes)
+      const identifier = getMonFileIdentifier(mon)
+      if (identifier === undefined) {
+        results.push(
+          E.left(
+            `Could not get identifier for mon: ${mon.nickname} (${PokemonData[mon.dexNum].name})`
+          )
+        )
+        continue
+      }
+      const result = await backend.writeHomeMon(identifier, bytes)
       results.push(result)
     } catch (e) {
       const species = mon.dexNum in PokemonData ? PokemonData[mon.dexNum].name : 'Unknown Species'

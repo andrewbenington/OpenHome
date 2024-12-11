@@ -535,7 +535,7 @@ export const utf16StringToGen4 = (str: string, length: number, terminate: boolea
   return new Uint8Array(buf)
 }
 
-const gen5Conversion = {
+const gen5Conversion: Record<number, number> = {
   0x247e: 0x263a,
   0x2480: 0x2639,
   0x247f: 0x263b,

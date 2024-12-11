@@ -150,7 +150,7 @@ const getBackgroundDetails = (disabled?: boolean) => {
 
 const DraggableMon = ({ mon, onClick, disabled, dragData, dragID }: DraggableMonProps) => {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
-    id: dragID + mon.personalityValue?.toString(),
+    id: (dragID ?? '') + mon.personalityValue?.toString(),
     data: dragData,
     disabled: disabled || !dragID,
   })

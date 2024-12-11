@@ -8,7 +8,7 @@ import { PathData, PossibleSaves } from 'src/types/SAVTypes/path'
 import BackendInterface from 'src/types/backendInterface'
 import { SaveFolder, StoredBoxData } from 'src/types/storage'
 import { OHPKM } from '../types/pkm/OHPKM'
-import { Errorable, LoadSaveResponse, LookupMap, SaveRef } from '../types/types'
+import { Errorable, JSONObject, LoadSaveResponse, LookupMap, SaveRef } from '../types/types'
 import { TauriInvoker } from './tauri/tauriInvoker'
 
 export const TauriBackend: BackendInterface = {
@@ -107,7 +107,7 @@ export const TauriBackend: BackendInterface = {
 
     const recentSaves = recentSavesResult.right
     recentSaves[saveRef.filePath.raw] = saveRef
-    return TauriInvoker.writeStorageFileJSON('recent_saves.json', recentSaves)
+    return TauriInvoker.writeStorageFileJSON('recent_saves.json', recentSaves as JSONObject)
   },
   removeRecentSave: async (filePath: string): Promise<Errorable<null>> => {
     const recentSavesResult = await (TauriInvoker.getStorageFileJSON(
@@ -119,7 +119,7 @@ export const TauriBackend: BackendInterface = {
 
     const recentSaves = recentSavesResult.right
     delete recentSaves[filePath]
-    return TauriInvoker.writeStorageFileJSON('recent_saves.json', recentSaves)
+    return TauriInvoker.writeStorageFileJSON('recent_saves.json', recentSaves as JSONObject)
   },
   findSuggestedSaves: async (): Promise<Errorable<PossibleSaves>> => {
     const saveFolders = (await TauriInvoker.getStorageFileJSON('save-folders.json')) as Errorable<

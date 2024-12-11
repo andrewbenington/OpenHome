@@ -107,7 +107,7 @@ export const TauriInvoker = {
   },
 
   findSuggestedSaves(saveFolders: string[]): Promise<Errorable<PossibleSaves>> {
-    const promise: Promise<null> = invoke('find_suggested_saves', { saveFolders })
+    const promise: Promise<PossibleSaves> = invoke('find_suggested_saves', { saveFolders })
     return promise.then(E.right).catch(E.left)
   },
 }

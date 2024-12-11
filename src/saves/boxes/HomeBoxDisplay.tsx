@@ -1,9 +1,10 @@
+import { useDraggable } from '@dnd-kit/core'
 import { Card, Grid } from '@mui/joy'
 import lodash from 'lodash'
-import { useCallback, useContext } from 'react'
+import { useCallback, useContext, useMemo } from 'react'
 import { MdArrowBack, MdArrowForward } from 'react-icons/md'
 import { MouseContext } from 'src/state/mouse'
-import { MonLocation, OpenSavesContext } from 'src/state/openSaves'
+import { MonLocation, MonWithLocation, OpenSavesContext } from 'src/state/openSaves'
 import { PKMInterface } from 'src/types/interfaces'
 import ArrowButton from './ArrowButton'
 import BoxCell from './BoxCell'
@@ -16,6 +17,7 @@ const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
   const [{ homeData }, openSavesDispatch] = useContext(OpenSavesContext)
   const [mouseState, mouseDispatch] = useContext(MouseContext)
   const { setSelectedMon } = props
+  const { active } = useDraggable({ id: '' })
 
   const dispatchStartDrag = useCallback(
     (boxPos: number) => {
@@ -52,6 +54,11 @@ const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
   )
   const dispatchImportMons = (mons: PKMInterface[], location: MonLocation) =>
     openSavesDispatch({ type: 'import_mons', payload: { mons, dest: location } })
+
+  const dragData: MonWithLocation | undefined = useMemo(
+    () => active?.data.current as MonWithLocation | undefined,
+    [active]
+  )
 
   return (
     homeData?.boxes[homeData.currentPCBox] && (
@@ -117,6 +124,7 @@ const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
           <Grid container key={`pc_row_${row}`}>
             {lodash.range(12).map((rowIndex: number) => {
               const mon = homeData.boxes[homeData.currentPCBox].pokemon[row * 12 + rowIndex]
+
               return (
                 <Grid
                   key={`home_box_row_${rowIndex}`}
@@ -147,6 +155,7 @@ const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
                         dispatchCompleteDrag(row * 12 + rowIndex)
                       }
                     }}
+                    disabled={mon && !dragData?.save?.supportsMon(mon.dexNum, mon.formeNum)}
                   />
                 </Grid>
               )

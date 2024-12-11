@@ -17,7 +17,9 @@ const markingsContainerStyle = {
 } as CSSProperties
 
 const getMarkingColorByNumber = (value: marking) => {
-  return ['grey', 'blue', 'red'][value]
+  if (value === 'blue' || value === true) return 'blue'
+  if (value === 'red') return 'red'
+  return 'grey'
 }
 
 const getMarkingColor = (value: boolean | MarkingColorValue) => {
@@ -62,27 +64,27 @@ const MarkingsDisplay = (props: MarkingsProps) => {
   }
   return (
     <div style={markingsContainerStyle}>
-      <span className="No-Select" style={{ color: getMarkingColorByNumber(markings[0]) }}>
+      <span className="No-Select" style={{ color: getMarkingColorByNumber(markings.circle) }}>
         ●
       </span>
-      <span className="No-Select" style={{ color: getMarkingColorByNumber(markings[1]) }}>
+      <span className="No-Select" style={{ color: getMarkingColorByNumber(markings.square) }}>
         ■
       </span>
-      <span className="No-Select" style={{ color: getMarkingColorByNumber(markings[2]) }}>
+      <span className="No-Select" style={{ color: getMarkingColorByNumber(markings.triangle) }}>
         ▲
       </span>
-      <span className="No-Select" style={{ color: getMarkingColorByNumber(markings[3]) }}>
+      <span className="No-Select" style={{ color: getMarkingColorByNumber(markings.heart) }}>
         ♥
       </span>
-      {markings[4] !== undefined ? (
-        <span className="No-Select" style={{ color: getMarkingColorByNumber(markings[4]) }}>
+      {'star' in markings ? (
+        <span className="No-Select" style={{ color: getMarkingColorByNumber(markings.star) }}>
           ★
         </span>
       ) : (
         <div />
       )}
-      {markings[5] !== undefined ? (
-        <span className="No-Select" style={{ color: getMarkingColorByNumber(markings[5]) }}>
+      {'diamond' in markings ? (
+        <span className="No-Select" style={{ color: getMarkingColorByNumber(markings.diamond) }}>
           ◆
         </span>
       ) : (

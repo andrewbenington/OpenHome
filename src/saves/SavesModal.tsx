@@ -66,8 +66,13 @@ const SavesModal = (props: SavesModalProps) => {
                   fileCreatedDate: createdDate,
                 },
                 getEnabledSaveTypes(),
-                (updatedMon) =>
-                  backend.writeHomeMon(getMonFileIdentifier(updatedMon), updatedMon.bytes)
+                (updatedMon) => {
+                  const identifier = getMonFileIdentifier(updatedMon)
+                  if (identifier === undefined) {
+                    return E.left(`Could not get identifier for mon: ${updatedMon.nickname}`)
+                  }
+                  backend.writeHomeMon(identifier, updatedMon.bytes)
+                }
               )
               if (!saveFile) {
                 onClose()

@@ -1564,10 +1564,10 @@ export class OHPKM implements PKMInterface {
       this.markings = otherMarkings
     } else if (otherMarkings) {
       for (const [markingType, markingVal] of Object.entries(otherMarkings)) {
-        if (markingVal && this.markings[markingType] === null) {
-          this.markings[markingType] = 'blue'
-        } else if (!markingVal && this.markings[markingType]) {
-          this.markings[markingType] = null
+        if (markingVal && this.markings[markingType as MarkingShape] === null) {
+          this.markings[markingType as MarkingShape] = 'blue'
+        } else if (!markingVal && this.markings[markingType as MarkingShape]) {
+          this.markings[markingType as MarkingShape] = null
         }
       }
     }
@@ -1691,3 +1691,5 @@ function extendUint8Array(array: Uint8Array, minLength: number) {
 
   return extendedArray
 }
+
+type MarkingShape = keyof MarkingsSixShapesWithColor

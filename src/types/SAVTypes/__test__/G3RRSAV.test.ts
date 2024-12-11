@@ -133,10 +133,11 @@ describe('G3RRSAV - Radical Red Save File Write Test', () => {
     }
 
     radicalRedSave = new G3RRSAV(parsedPath, saveBytes)
-
-    if (radicalRedSave.boxes[0].pokemon[0]) {
-      radicalRedSave.boxes[0].pokemon[0] = new OHPKM(radicalRedSave.boxes[0].pokemon[0])
-      radicalRedSave.boxes[0].pokemon[0].nickname = 'ModTest'
+    const firstMon = radicalRedSave.boxes[0].pokemon[0]
+    if (firstMon) {
+      const newMon = new OHPKM(firstMon)
+      newMon.nickname = 'ModTest'
+      radicalRedSave.boxes[0].pokemon[0] = newMon
       // radicalRedSave.boxes[0].pokemon[0].heldItemIndex = 123;
       // radicalRedSave.boxes[0].pokemon[0].moves[0] = 101;
 

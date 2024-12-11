@@ -1,14 +1,5 @@
 import { Button, Card, Stack, Typography } from '@mui/joy'
-import {
-  Ability,
-  AbilityToString,
-  Balls,
-  GameOfOriginData,
-  Item,
-  ItemToString,
-  Type,
-  Types,
-} from 'pokemon-resources'
+import { Ability, Balls, GameOfOriginData, Item, Type, Types } from 'pokemon-resources'
 import { PokemonData } from 'pokemon-species-data'
 import { useContext, useMemo } from 'react'
 import { OpenHomeRibbons } from 'src/consts/Ribbons'
@@ -39,7 +30,7 @@ export default function FilterPanel() {
       Object.keys(Item)
         .filter((item) => isNaN(Number(item)))
         .map((item, id) => ({
-          label: ItemToString(Item[item]),
+          label: item,
           id,
         })),
     []
@@ -50,7 +41,7 @@ export default function FilterPanel() {
       Object.keys(Ability)
         .filter((ability) => isNaN(Number(ability)))
         .map((ability, id) => ({
-          label: AbilityToString(Ability[ability]),
+          label: ability,
           id,
         })),
     []

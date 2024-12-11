@@ -91,7 +91,7 @@ export default function SortPokemon() {
         <Card>
           <Autocomplete
             options={['nickname', 'level', 'species', 'ribbons', 'met_date', 'origin']}
-            onChange={(_, value) => setSort(value[0] ?? '')}
+            onChange={(_, value) => setSort(value?.at(0) ?? '')}
             placeholder="Sort"
           />
         </Card>

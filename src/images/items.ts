@@ -91,7 +91,7 @@ export const BallsList = [
 
 const SharedItemSpritePrefixes = ['Data Card', 'Lost Satchel', 'Old Verse', 'Lost Satchel']
 
-const itemEquivalents = {
+const itemEquivalents: Record<string, string> = {
   'Parlyz Heal': 'Paralyze Heal',
   Bicycle: 'Bike',
   'Devon Goods': 'Devon Parts',

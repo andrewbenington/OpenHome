@@ -10,7 +10,7 @@ export type FilterAction =
     }
   | {
       type: 'clear_fields'
-      payload: string[]
+      payload: (keyof Filter)[]
     }
   | {
       type: 'clear_all'

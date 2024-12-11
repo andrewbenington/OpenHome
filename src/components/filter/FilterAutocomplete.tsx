@@ -6,21 +6,24 @@ import {
   ListItemDecorator,
 } from '@mui/joy'
 import { useContext, useMemo } from 'react'
-import './style.css'
 import { FilterContext } from 'src/state/filter'
+import { Filter } from 'src/types/Filter'
+import './style.css'
 
 export interface FilterAutocompleteProps<OptionType>
   extends Omit<AutocompleteProps<OptionType, false, false, false>, 'renderInput'> {
   options: readonly OptionType[]
-  labelField?: string
-  indexField?: string
-  filterField: string
+  labelField?: keyof OptionType
+  indexField?: keyof OptionType
+  filterField: keyof Filter
   label?: string
   getIconComponent?: (selected: OptionType) => JSX.Element | undefined
   renderInput?: ((params: any) => React.ReactNode) | undefined
 }
 
-export default function FilterAutocomplete<OptionType>(props: FilterAutocompleteProps<OptionType>) {
+export default function FilterAutocomplete<
+  OptionType extends Partial<Record<keyof OptionType, OptionType[keyof OptionType]>>,
+>(props: FilterAutocompleteProps<OptionType>) {
   const {
     options,
     labelField,
@@ -35,11 +38,11 @@ export default function FilterAutocomplete<OptionType>(props: FilterAutocomplete
 
   const currentOption: OptionType | undefined = useMemo(() => {
     if (options.length === 0) return undefined
-    if (typeof options[0] === 'string') {
-      return filterState[filterField]
-    }
+    // if (typeof options[0] === 'string') {
+    //   return filterState[filterField]
+    // }
     if (filterField in filterState && filterState[filterField] !== undefined) {
-      return options.find((option) => option[indexField ?? 'id'] === filterState[filterField])
+      return options.find((option) => indexField && option[indexField] === filterState[filterField])
     }
     return undefined
   }, [filterField, filterState])
@@ -59,14 +62,14 @@ export default function FilterAutocomplete<OptionType>(props: FilterAutocomplete
         if (typeof option === 'string') {
           return option === value
         }
-        return option[filterField] === value[filterField]
+        return (option as any)[filterField] === (value as any)[filterField]
       }}
       startDecorator={currentOption && getIconComponent && getIconComponent(currentOption)}
       renderOption={
         props.renderOption ??
         ((props, option) => {
           return (
-            <AutocompleteOption {...props} key={indexField ? option[indexField] : option}>
+            <AutocompleteOption {...props} key={indexField ? (option as any)[indexField] : option}>
               {getIconComponent && (
                 <ListItemDecorator style={{ marginRight: -16 }}>
                   {getIconComponent(option)}
@@ -76,8 +79,8 @@ export default function FilterAutocomplete<OptionType>(props: FilterAutocomplete
                 {attributes.getOptionLabel
                   ? attributes.getOptionLabel(option)
                   : labelField
-                    ? option[labelField]
-                    : option}
+                  ? (option as any)[labelField]
+                  : option}
               </ListItemContent>
             </AutocompleteOption>
           )

@@ -1,13 +1,13 @@
 import { useContext } from 'react'
+import OHDataGrid, { SortableColumn } from 'src/components/OHDataGrid'
+import PokemonIcon from 'src/components/PokemonIcon'
 import { getPublicImageURL } from 'src/images/images'
 import { getMonSaveLogo } from 'src/saves/util'
 import { AppInfoContext } from 'src/state/appInfo'
-import { OHPKM } from 'src/types/pkm/OHPKM'
-import { numericSorter, stringSorter } from 'src/util/Sort'
-import { getMonFileIdentifier } from 'src/util/Lookup'
-import OHDataGrid, { SortableColumn } from 'src/components/OHDataGrid'
-import PokemonIcon from 'src/components/PokemonIcon'
 import { LookupContext } from 'src/state/lookup'
+import { OHPKM } from 'src/types/pkm/OHPKM'
+import { getMonFileIdentifier } from 'src/util/Lookup'
+import { numericSorter, stringSorter } from 'src/util/Sort'
 
 export default function OpenHomeMonList() {
   const [{ homeMons }] = useContext(LookupContext)
@@ -68,7 +68,7 @@ export default function OpenHomeMonList() {
       key: 'homeID',
       name: 'OpenHome ID',
       minWidth: 180,
-      sortFunction: stringSorter((val) => val[1]),
+      sortFunction: stringSorter((val) => getMonFileIdentifier(val)),
       renderValue: (value) => getMonFileIdentifier(value),
       cellClass: 'mono-cell',
     },

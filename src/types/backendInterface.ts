@@ -26,7 +26,7 @@ export default interface BackendInterface {
   writeHomeBoxes: (boxData: StoredBoxData[]) => Promise<Errorable<null>>
 
   /* game saves */
-  loadSaveFile: (filePath?: PathData) => Promise<Errorable<LoadSaveResponse>>
+  loadSaveFile: (filePath: PathData) => Promise<Errorable<LoadSaveResponse>>
   writeSaveFile: (path: string, bytes: Uint8Array) => Promise<Errorable<null>>
 
   /* game save management */
