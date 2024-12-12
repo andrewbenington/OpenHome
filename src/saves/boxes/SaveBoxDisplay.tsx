@@ -3,7 +3,7 @@ import { Button, Card, Grid, Modal, ModalDialog, Stack } from '@mui/joy'
 import lodash from 'lodash'
 import { GameOfOriginData } from 'pokemon-resources'
 import { useCallback, useContext, useMemo, useState } from 'react'
-import { MdArrowBack, MdArrowForward, MdClose } from 'react-icons/md'
+import { MdClose } from 'react-icons/md'
 import { MenuIcon } from 'src/components/Icons'
 import AttributeRow from 'src/pokemon/AttributeRow'
 import { MouseContext } from 'src/state/mouse'
@@ -62,7 +62,8 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
 
   const isDisabled = useMemo(() => {
     const dragData = active?.data.current as MonWithLocation | undefined
-    if (!dragData) return false
+    if (!dragData || Object.entries(dragData).length === 0) return false
+    console.log(dragData)
     return !save.supportsMon(dragData.mon.dexNum, dragData.mon.formeNum)
   }, [save, active])
 
@@ -124,9 +125,9 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                     },
                   })
                 }
-              >
-                <MdArrowBack fontSize="small" />
-              </ArrowButton>
+                dragID={`arrow_left_${save.tid}_${save.sid}_${save.currentPCBox}`}
+                direction="left"
+              />
             </Grid>
             <Grid xs={8} className="box-name">
               {save.boxes[save.currentPCBox]?.name}
@@ -148,9 +149,9 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                     },
                   })
                 }
-              >
-                <MdArrowForward fontSize="small" />
-              </ArrowButton>
+                dragID={`arrow_right_${save.tid}_${save.sid}_${save.currentPCBox}`}
+                direction="right"
+              />
             </Grid>
           </Grid>
           {lodash.range(save.boxRows).map((row: number) => (

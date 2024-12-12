@@ -2,7 +2,6 @@ import { useDraggable } from '@dnd-kit/core'
 import { Card, Grid } from '@mui/joy'
 import lodash from 'lodash'
 import { useCallback, useContext, useMemo } from 'react'
-import { MdArrowBack, MdArrowForward } from 'react-icons/md'
 import { MouseContext } from 'src/state/mouse'
 import { MonLocation, MonWithLocation, OpenSavesContext } from 'src/state/openSaves'
 import { PKMInterface } from 'src/types/interfaces'
@@ -72,10 +71,11 @@ const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
       >
         <Grid container>
           <Grid
-            xs={2}
+            xs={4}
             style={{
               display: 'grid',
               alignItems: 'center',
+              justifyContent: 'end',
             }}
           >
             <ArrowButton
@@ -91,18 +91,19 @@ const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
                   },
                 })
               }
-            >
-              <MdArrowBack fontSize="small" />
-            </ArrowButton>
+              dragID="home-arrow-left"
+              direction="left"
+            />
           </Grid>
-          <Grid xs={8} className="box-name">
+          <Grid xs={4} className="box-name">
             {homeData.boxes[homeData.currentPCBox]?.name}
           </Grid>
           <Grid
-            xs={2}
+            xs={4}
             style={{
               display: 'grid',
               alignItems: 'center',
+              justifyContent: 'start',
             }}
           >
             <ArrowButton
@@ -115,9 +116,9 @@ const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
                   },
                 })
               }
-            >
-              <MdArrowForward fontSize="small" />
-            </ArrowButton>
+              dragID="home-arrow-right"
+              direction="right"
+            />
           </Grid>
         </Grid>
         {lodash.range(10).map((row: number) => (
@@ -143,7 +144,7 @@ const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
                       save: homeData,
                     }}
                     mon={mon}
-                    zIndex={10 - row}
+                    zIndex={0}
                     onDrop={(importedMons) => {
                       if (importedMons) {
                         dispatchImportMons(importedMons, {

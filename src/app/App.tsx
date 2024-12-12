@@ -14,7 +14,7 @@ import { AppInfoContext, appInfoInitialState, appInfoReducer } from '../state/ap
 import { FilterProvider } from '../state/filter'
 import { LookupProvider } from '../state/lookup'
 import { MouseContext, mouseReducer } from '../state/mouse'
-import { MonLocation, OpenSavesContext, openSavesReducer } from '../state/openSaves'
+import { MonWithLocation, OpenSavesContext, openSavesReducer } from '../state/openSaves'
 import './App.css'
 import AppTabs from './AppTabs'
 import { PokemonDragContext } from './PokemonDrag'
@@ -40,7 +40,7 @@ export default function App() {
     monsToRelease: [],
     openSaves: {},
   })
-  const [dragData, setDragData] = useState<MonLocation>()
+  const [dragData, setDragData] = useState<MonWithLocation>()
   const [dragMon, setDragMon] = useState<PKMInterface>()
 
   const getEnabledSaveTypes = useCallback(() => {
@@ -62,26 +62,32 @@ export default function App() {
               onDragEnd={(e) => {
                 const source = e.active.data.current
                 const dest = e.over?.data.current
+                console.log('DRAG END', source, e.over)
                 if (
                   dragMon &&
-                  source &&
+                  dragData &&
                   dest &&
                   dest.save.supportsMon(dragMon.dexNum, dragMon.formeNum)
                 ) {
-                  openSavesDispatch({ type: 'move_mon', payload: { source, dest } })
+                  openSavesDispatch({ type: 'move_mon', payload: { source: dragData, dest } })
                 }
-                setDragData(e.over?.data.current as MonLocation)
+                console.log(dragData, e.over?.data.current)
+                setDragData(e.over?.data.current as MonWithLocation)
                 let d = e.over?.data.current
                 setDragMon(d?.save.boxes[d.box].pokemon[d.boxPos])
               }}
               onDragStart={(e) => {
+                console.log(e.active.data.current)
                 setDragData(e.active.data.current)
                 setDragMon(e.active.data.current?.mon)
+              }}
+              onDragOver={(e) => {
+                console.log('onDragOver', e)
               }}
               sensors={[
                 useSensor(PointerSensor, {
                   activationConstraint: {
-                    distance: 3, // Set a small distance threshold
+                    distance: 0, // Set a small distance threshold
                   },
                 }),
               ]}

@@ -1,5 +1,5 @@
 import { useDraggable, useDroppable } from '@dnd-kit/core'
-import { useContext, useMemo } from 'react'
+import { ReactNode, useCallback, useContext, useEffect, useMemo } from 'react'
 import PokemonIcon from 'src/components/PokemonIcon'
 import { FilterContext } from 'src/state/filter'
 import { MonLocation, MonWithLocation } from 'src/state/openSaves'
@@ -95,9 +95,17 @@ const BoxCell = ({
     disabled,
   })
 
+  const setNodeRefLog = useCallback(
+    (element: HTMLElement | null) => {
+      console.log('setNodeRefLog', element)
+      setNodeRef(element)
+    },
+    [setNodeRef]
+  )
+
   return (
     <div
-      ref={setNodeRef}
+      ref={setNodeRefLog}
       style={{
         ...styles.button,
         backgroundColor: disabled || isFilteredOut ? '#555' : '#6662',
@@ -188,20 +196,47 @@ interface DroppableSpaceProps {
   dropID?: string
   dropData?: MonLocation
   disabled?: boolean
+  onOver?: () => void
+  children?: ReactNode
 }
 
-const DroppableSpace = ({ dropID, dropData, disabled }: DroppableSpaceProps) => {
-  const { setNodeRef } = useDroppable({
+export const DroppableSpace = ({
+  dropID,
+  dropData,
+  disabled,
+  onOver,
+  children,
+}: DroppableSpaceProps) => {
+  const { setNodeRef, isOver } = useDroppable({
     id: dropID ?? '',
     data: dropData,
     disabled: !dropID,
   })
 
+  useEffect(() => {
+    if (isOver) {
+      onOver && onOver()
+    }
+  }, [isOver, onOver])
+
   return (
     <div
       className="pokemon_slot"
-      style={{ ...styles.fillContainer, ...getBackgroundDetails(disabled) }}
+      style={{
+        ...styles.fillContainer,
+        ...getBackgroundDetails(disabled),
+        outlineStyle: 'solid',
+        outlineWidth: 1,
+        outlineColor: isOver ? 'white' : 'transparent',
+        borderRadius: 3,
+        transition: 'outline 0.2s',
+        display: 'grid',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
       ref={setNodeRef}
-    />
+    >
+      {children}
+    </div>
   )
 }

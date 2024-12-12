@@ -1,9 +1,11 @@
 .arrow-button {
-  padding: 0.4em;
   color: inherit;
   background-color: transparent;
   border: none;
   transition: color 0.25s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .arrow-button:hover {
