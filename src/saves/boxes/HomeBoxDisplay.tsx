@@ -155,7 +155,10 @@ const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
                         dispatchCompleteDrag(row * 12 + rowIndex)
                       }
                     }}
-                    disabled={mon && !dragData?.save?.supportsMon(mon.dexNum, mon.formeNum)}
+                    disabled={
+                      // don't allow a swap with a pokémon not supported by the source save
+                      mon && dragData && !dragData?.save?.supportsMon(mon.dexNum, mon.formeNum)
+                    }
                   />
                 </Grid>
               )
