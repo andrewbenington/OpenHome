@@ -1,4 +1,3 @@
-import bigInt from 'big-integer'
 import lodash from 'lodash'
 import { PKM, Stats, StatsPreSplit } from 'pokemon-files'
 import {
@@ -350,23 +349,22 @@ export const generatePersonalityValuePreservingAttributes = (
   // will ensure shininess or non-shininess depending on original mon
   const otherGender = mon.gender
   let i = 0
-  let newPersonalityValue = bigInt(personalityValue)
+  let newPersonalityValue = BigInt(personalityValue)
   const shouldCheckUnown = mon.dexNum === NationalDex.Unown
   while (i < 0x10000) {
-    const newGender = getGen3To5Gender(newPersonalityValue.toJSNumber(), mon.dexNum)
-    const newNature = newPersonalityValue.mod(25).toJSNumber()
+    const newGender = getGen3To5Gender(Number(newPersonalityValue), mon.dexNum)
+    const newNature = Number(newPersonalityValue % 25n)
     if (
-      (!shouldCheckUnown ||
-        getUnownLetterGen3(newPersonalityValue.toJSNumber()) === mon.formeNum) &&
+      (!shouldCheckUnown || getUnownLetterGen3(Number(newPersonalityValue)) === mon.formeNum) &&
       newGender === otherGender &&
       (otherAbilityNum === 4 ||
         shouldCheckUnown ||
-        newPersonalityValue.and(1).add(1).toJSNumber() === otherAbilityNum) &&
+        Number((newPersonalityValue & 1n) + 1n) === otherAbilityNum) &&
       (otherNature === undefined || newNature === otherNature) &&
-      getIsShinyPreGen6(mon.trainerID, mon.secretID ?? 0, newPersonalityValue.toJSNumber()) ===
+      getIsShinyPreGen6(mon.trainerID, mon.secretID ?? 0, Number(newPersonalityValue)) ===
         mon.isShiny()
     ) {
-      return newPersonalityValue.toJSNumber()
+      return Number(newPersonalityValue)
     }
     i++
     const pvBytes = uint32ToBytesLittleEndian(personalityValue)
@@ -388,7 +386,7 @@ export const generatePersonalityValuePreservingAttributes = (
     }
     pvBytes.set(uint16ToBytesLittleEndian(pvUpper16), 2)
     pvBytes.set(uint16ToBytesLittleEndian(pvLower16), 0)
-    newPersonalityValue = bigInt(bytesToUint32LittleEndian(pvBytes, 0))
+    newPersonalityValue = BigInt(bytesToUint32LittleEndian(pvBytes, 0))
   }
   return personalityValue
 }

@@ -10,6 +10,7 @@
     "paths": {
       "src/*": ["./src/*"],
       "src/types/*": ["./src/types/*"],
+      "src/consts/*": ["./src/consts/*"],
       "util/*": ["./util/*"]
     },
 
@@ -20,6 +21,7 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
+    "esModuleInterop": true,
 
     /* Linting */
     // enable eventually?

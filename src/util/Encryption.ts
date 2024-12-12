@@ -1,13 +1,13 @@
-import bigInt from 'big-integer'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
   uint16ToBytesLittleEndian,
   uint32ToBytesLittleEndian,
+  wordsToUint8Array,
 } from './byteLogic'
 import { MemeKey, pokedexAndSaveFileMemeKey, SIGNATURE_LENGTH } from './MemeKey'
 
-import crypto from 'crypto'
+import { lib as cryptolib, SHA1, SHA256 } from 'crypto-js'
 import { SIZE_SM, SIZE_USUM } from '../types/SAVTypes/util'
 const GEN3_BLOCKS_OFFSET = 0x20
 const GEN3_BLOCK_SIZE = 12
@@ -181,8 +181,8 @@ const decryptByteArray = (
 ) => {
   const unencryptedBytes = bytes
   for (let i = blockOffset; i < blockOffset + 4 * blockSize; i += 2) {
-    const bigIntSeed = bigInt(0x41c64e6d).times(seed).plus(0x6073)
-    seed = bigIntSeed.and(0xffffffff).toJSNumber()
+    const bigIntSeed = 0x41c64e6dn * BigInt(seed) + 0x6073n
+    seed = Number(bigIntSeed & 0xffffffffn)
     const xorValue = (seed >> 16) & 0xffff
     const unencryptedWord = bytesToUint16LittleEndian(bytes, i) ^ xorValue
     const unencryptedWordBytes = uint16ToBytesLittleEndian(unencryptedWord)
@@ -293,11 +293,11 @@ export const SignMemeDataInPlace = (data: Uint8Array) => {
 
   const payload = data.slice(0, data.length - 8)
 
-  const shasum = crypto.createHash('sha1')
-  shasum.update(payload)
-  const tmp = shasum.digest()
+  const payloadWords = cryptolib.WordArray.create(payload)
+  const shasum = SHA1(payloadWords)
+  const digest = wordsToUint8Array(shasum.words, shasum.sigBytes)
 
-  data.set(tmp.subarray(0, 8), data.length - 8)
+  data.set(digest.subarray(0, 8), data.length - 8)
 
   const aesEncrypted = key.AesEncrypt(data)
   const sigBuffer = aesEncrypted.slice(aesEncrypted.length - SIGNATURE_LENGTH)
@@ -333,12 +333,30 @@ export function SignWithMemeCrypto(bytes: Uint8Array): Uint8Array {
   )
 
   // SignInPlace(sigSpan, chkBlockSpan) in PKHeX
-  const hash = crypto.createHash('sha256')
-  hash.update(chkBlockSpan)
-  sigSpan.set(hash.digest(), 0)
+  const hash = SHA256(cryptolib.WordArray.create(chkBlockSpan))
+  // const hash = crypto.createHash('sha256')
+  // hash.update(chkBlockSpan)
+  const digest = wordsToUint8Array(hash.words, hash.sigBytes)
+  sigSpan.set(digest, 0)
 
   const signed = SignMemeDataInPlace(sigSpan)
   bytes.set(signed, memeCryptoOffset)
 
   return bytes
+}
+
+function wordArrayToUint8Array(wordArray: cryptolib.WordArray): Uint8Array {
+  const words = wordArray.words
+  const sigBytes = wordArray.sigBytes
+  const result = new Uint8Array(sigBytes)
+  for (let i = 0; i < sigBytes; i++) {
+    result[i] = (words[i >>> 2] >>> (24 - (i % 4) * 8)) & 0xff
+  }
+  return result
+}
+
+export function sha1Digest(data: Uint8Array) {
+  const payloadWords = cryptolib.WordArray.create(data)
+  const shasum = SHA1(payloadWords)
+  return wordArrayToUint8Array(shasum)
 }

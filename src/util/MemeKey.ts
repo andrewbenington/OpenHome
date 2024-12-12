@@ -1,6 +1,26 @@
-import crypto from 'crypto'
+import CryptoJS from 'crypto-js'
+
 export const SIGNATURE_LENGTH = 0x60
 const AES_CHUNK_LENGTH = 0x10
+
+function wordArrayToUint8Array(wordArray: CryptoJS.lib.WordArray): Uint8Array {
+  const words = wordArray.words
+  const sigBytes = wordArray.sigBytes
+  const result = new Uint8Array(sigBytes)
+  for (let i = 0; i < sigBytes; i++) {
+    result[i] = (words[i >>> 2] >>> (24 - (i % 4) * 8)) & 0xff
+  }
+  return result
+}
+
+function uint8ArrayToWordArray(u8arr: Uint8Array): CryptoJS.lib.WordArray {
+  const words = []
+  for (let i = 0; i < u8arr.length; i += 4) {
+    words.push((u8arr[i] << 24) | (u8arr[i + 1] << 16) | (u8arr[i + 2] << 8) | u8arr[i + 3])
+  }
+  return CryptoJS.lib.WordArray.create(words, u8arr.length)
+}
+
 export class MemeKey {
   private DER: Uint8Array
   private privateKey: bigint
@@ -20,10 +40,13 @@ export class MemeKey {
 
     // GetAesImp in PKHeX
     const key = this.GetAesKey(payload)
+    const keyWordArray = uint8ArrayToWordArray(key)
 
-    const cipher = crypto.createCipheriv('aes-128-ecb', new Uint8Array(key.subarray(0, 16)), '')
-
-    cipher.setAutoPadding(false)
+    // Initialize AES-128-ECB cipher
+    const cipher = CryptoJS.algo.AES.createEncryptor(keyWordArray, {
+      mode: CryptoJS.mode.ECB,
+      padding: CryptoJS.pad.NoPadding,
+    })
 
     // AesDecrypt(data, sig) in PKHeX
     let nextXor: Uint8Array = new Uint8Array(AES_CHUNK_LENGTH)
@@ -31,7 +54,10 @@ export class MemeKey {
     for (let i = 0; i < signature.length; i += AES_CHUNK_LENGTH) {
       let slice: Uint8Array = signature.slice(i, i + AES_CHUNK_LENGTH)
       slice = xorBytes(slice, nextXor)
-      const encryptedSlice = cipher.update(slice)
+
+      const encryptedSliceWordArray = cipher.process(uint8ArrayToWordArray(slice))
+      const encryptedSlice = wordArrayToUint8Array(encryptedSliceWordArray)
+
       nextXor = new Uint8Array(encryptedSlice)
       signature.set(nextXor, i)
     }
@@ -47,7 +73,10 @@ export class MemeKey {
     nextXor = new Uint8Array(AES_CHUNK_LENGTH)
     for (let i = signature.length - AES_CHUNK_LENGTH; i >= 0; i -= AES_CHUNK_LENGTH) {
       const temp = signature.slice(i, i + AES_CHUNK_LENGTH)
-      const encryptedSlice = cipher.update(temp)
+
+      const encryptedSliceWordArray = cipher.process(uint8ArrayToWordArray(temp))
+      const encryptedSlice = wordArrayToUint8Array(encryptedSliceWordArray)
+
       signature.set(xorBytes(new Uint8Array(encryptedSlice), nextXor), i)
       nextXor = temp
     }
@@ -59,12 +88,11 @@ export class MemeKey {
   }
 
   public GetAesKey(bytes: Uint8Array) {
-    const hash = crypto.createHash('sha1')
+    const payload = new Uint8Array(this.DER.length + bytes.length)
+    payload.set(this.DER, 0)
+    payload.set(bytes, this.DER.length)
 
-    hash.update(this.DER)
-    hash.update(bytes)
-
-    return hash.digest().subarray(0, AES_CHUNK_LENGTH)
+    return sha1Digest(payload).subarray(0, AES_CHUNK_LENGTH)
   }
 
   public GetSubKey(temp: Uint8Array): Uint8Array {
@@ -177,4 +205,10 @@ function modPow(base: bigint, exponent: bigint, modulus: bigint): bigint {
   }
 
   return result
+}
+
+function sha1Digest(data: Uint8Array) {
+  const payloadWords = CryptoJS.lib.WordArray.create(data)
+  const shasum = CryptoJS.SHA1(payloadWords)
+  return wordArrayToUint8Array(shasum)
 }
