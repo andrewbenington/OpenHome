@@ -69,15 +69,8 @@ const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
           gap: 0,
         }}
       >
-        <Grid container>
-          <Grid
-            xs={4}
-            style={{
-              display: 'grid',
-              alignItems: 'center',
-              justifyContent: 'end',
-            }}
-          >
+        <Grid container style={{ padding: 4 }}>
+          <Grid xs={4} display="grid" alignItems="center" justifyContent="end">
             <ArrowButton
               onClick={() =>
                 openSavesDispatch({
@@ -98,14 +91,7 @@ const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
           <Grid xs={4} className="box-name">
             {homeData.boxes[homeData.currentPCBox]?.name}
           </Grid>
-          <Grid
-            xs={4}
-            style={{
-              display: 'grid',
-              alignItems: 'center',
-              justifyContent: 'start',
-            }}
-          >
+          <Grid xs={4} display="grid" alignItems="center">
             <ArrowButton
               onClick={() =>
                 openSavesDispatch({

@@ -215,6 +215,7 @@ export const darkTheme: ColorSystemOptions = {
       plainActiveBg: '#fff6',
       plainHoverBg: '#333438',
       plainHoverColor: '#fff',
+      solidBg: '#505555',
     },
   },
 }
@@ -246,6 +247,8 @@ export const lightTheme: ColorSystemOptions = {
     neutral: {
       softBg: '#888',
       softColor: '#fff',
+      solidBg: '#6a9',
+      solidColor: '#fff',
     },
     background: {
       body: lightTeal,

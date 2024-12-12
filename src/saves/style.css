@@ -7,6 +7,10 @@
   justify-content: center;
   align-items: center;
 }
+.arrow-button div svg {
+  width: 20px;
+  height: 20px;
+}
 
 .arrow-button:hover {
   opacity: 0.8;
@@ -42,7 +46,7 @@
 }
 
 .box-navigation {
-  margin-bottom: 5px;
+  padding-bottom: 5px;
 }
 
 .box-name {

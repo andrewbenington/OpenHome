@@ -1,12 +1,14 @@
-import { useDraggable, useDroppable } from '@dnd-kit/core'
-import { ReactNode, useCallback, useContext, useEffect, useMemo } from 'react'
-import PokemonIcon from 'src/components/PokemonIcon'
+import { useDroppable } from '@dnd-kit/core'
+import { useCallback, useContext, useMemo } from 'react'
 import { FilterContext } from 'src/state/filter'
-import { MonLocation, MonWithLocation } from 'src/state/openSaves'
+import { MonLocation } from 'src/state/openSaves'
 import { filterApplies } from 'src/types/Filter'
 import { PKMInterface } from 'src/types/interfaces'
 import { Styles } from 'src/types/types'
 import BoxIcons from '../../images/BoxIcons.png'
+import '../style.css'
+import DraggableMon from './DraggableMon'
+import DroppableSpace from './DroppableSpace'
 
 const styles = {
   fillContainer: { width: '100%', height: '100%' },
@@ -134,109 +136,3 @@ const BoxCell = ({
 }
 
 export default BoxCell
-
-interface DraggableMonProps {
-  onClick: () => void
-  disabled?: boolean
-  mon: PKMInterface
-  style: any
-  dragID?: string
-  dragData?: MonWithLocation
-}
-
-const getBackgroundDetails = (disabled?: boolean) => {
-  if (disabled) {
-    return {
-      backgroundBlendMode: 'multiply',
-      backgroundColor: '#555',
-    }
-  }
-  return {
-    backgroundColor: '#0000',
-  }
-}
-
-const DraggableMon = ({ mon, onClick, disabled, dragData, dragID }: DraggableMonProps) => {
-  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
-    id: (dragID ?? '') + mon.personalityValue?.toString(),
-    data: dragData,
-    disabled: disabled || !dragID,
-  })
-
-  return (
-    <div
-      ref={setNodeRef}
-      style={{
-        width: '100%',
-        height: '100%',
-        ...getBackgroundDetails(),
-        cursor: 'pointer',
-      }}
-      {...listeners}
-      {...attributes}
-      onClick={onClick}
-    >
-      <PokemonIcon
-        dexNumber={mon.dexNum}
-        formeNumber={mon.formeNum}
-        isShiny={mon.isShiny()}
-        heldItemIndex={mon.heldItemIndex}
-        style={{
-          width: '100%',
-          height: '100%',
-          visibility: isDragging ? 'hidden' : undefined,
-        }}
-        greyedOut={disabled}
-      />
-    </div>
-  )
-}
-
-interface DroppableSpaceProps {
-  dropID?: string
-  dropData?: MonLocation
-  disabled?: boolean
-  onOver?: () => void
-  children?: ReactNode
-}
-
-export const DroppableSpace = ({
-  dropID,
-  dropData,
-  disabled,
-  onOver,
-  children,
-}: DroppableSpaceProps) => {
-  const { setNodeRef, isOver } = useDroppable({
-    id: dropID ?? '',
-    data: dropData,
-    disabled: !dropID,
-  })
-
-  useEffect(() => {
-    if (isOver) {
-      onOver && onOver()
-    }
-  }, [isOver, onOver])
-
-  return (
-    <div
-      className="pokemon_slot"
-      style={{
-        ...styles.fillContainer,
-        ...getBackgroundDetails(disabled),
-        outlineStyle: 'solid',
-        outlineWidth: 1,
-        outlineColor: isOver ? 'white' : 'transparent',
-        borderRadius: 3,
-        transition: 'outline 0.2s',
-        display: 'grid',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-      ref={setNodeRef}
-    >
-      {children}
-    </div>
-  )
-}

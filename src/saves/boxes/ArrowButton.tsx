@@ -1,7 +1,8 @@
+import { useTheme } from '@mui/joy'
 import { useCallback, useState } from 'react'
 import { ArrowLeftIcon, ArrowRightIcon } from 'src/components/Icons'
 import '../style.css'
-import { DroppableSpace } from './BoxCell'
+import DroppableSpace from './DroppableSpace'
 
 interface OpenHomeButtonProps {
   onClick?: (e?: any) => void
@@ -13,6 +14,7 @@ const DRAG_OVER_COOLDOWN_MS = 250
 const ArrowButton = (props: OpenHomeButtonProps) => {
   const { dragID, onClick, direction } = props
   const [hoverCooldown, setHoverCooldown] = useState(false)
+  const { palette } = useTheme()
 
   const onDragOver = useCallback(() => {
     if (hoverCooldown || !onClick) {
@@ -32,7 +34,13 @@ const ArrowButton = (props: OpenHomeButtonProps) => {
     <button
       className="arrow-button"
       onClick={onClick}
-      style={{ backgroundColor: 'grey', padding: 0, width: 24, height: 20 }}
+      style={{
+        backgroundColor: palette.neutral.solidBg,
+        color: palette.neutral.solidColor,
+        padding: 0,
+        width: 32,
+        height: 24,
+      }}
     >
       <DroppableSpace dropID={`${dragID}-drop`} onOver={onDragOver}>
         {direction === 'left' ? <ArrowLeftIcon /> : <ArrowRightIcon />}

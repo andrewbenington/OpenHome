@@ -114,7 +114,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
       >
         <div>
           <Grid container className="box-navigation">
-            <Grid xs={2} display="grid" alignItems="center">
+            <Grid xs={4} display="grid" alignItems="center" justifyContent="end">
               <ArrowButton
                 onClick={() =>
                   openSavesDispatch({
@@ -129,16 +129,10 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                 direction="left"
               />
             </Grid>
-            <Grid xs={8} className="box-name">
+            <Grid xs={4} className="box-name">
               {save.boxes[save.currentPCBox]?.name}
             </Grid>
-            <Grid
-              xs={2}
-              style={{
-                display: 'grid',
-                alignItems: 'center',
-              }}
-            >
+            <Grid xs={4} display="grid" alignItems="center" justifyContent="start">
               <ArrowButton
                 onClick={() =>
                   openSavesDispatch({
