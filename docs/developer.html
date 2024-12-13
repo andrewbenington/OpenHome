@@ -35,24 +35,13 @@
       </div>
       <div class="container">
         <h1>Technical Information for Developers</h1>
-        <h2>Electron Framework</h2>
+        <h2>Tauri Framework</h2>
         <p>
-          OpenHome is built with <a href="https://www.electronjs.org/">Electron</a> to allow for
-          compatibility with Linux, macOS, and Windows devices. Electron also provides the ability
-          to prompt for updates, and to use a Node.js "backend" to interact with the operating
-          system.
+          OpenHome is built with <a href="https://tauri.app//">Tauri</a> to allow for
+          compatibility with Linux, macOS, and Windows devices. Tauri uses a Rust "backend" to interact with the operating system. Other Tauri features that might be used by the app in the future include in-app updates and the possibility of a mobile app
         </p>
         <p>
-          Electron apps have the downside of taking up more space than native apps, as they are
-          complete web browsers under the hood. The benefits of full Linux/macOS/Windows support
-          currently outweighs the downsides of Electron, as I don't want users to be restricted to a
-          single platform, and native development for three operating systems would take more time
-          than I have.
-        </p>
-        <p>
-          If the app gains enough users, I plan to migrate to React Native at some point in the
-          future, which would not only provide a smaller app size and better performance, but would
-          also make a mobile app version possible, all while keeping the TypeScript codebase.
+          OpenHome previously used Electron, which provided more consistency across platforms with the drawback of a larger app size and slightly worse performance. Electron also doesn't support mobile app releases, which is a future goal for OpenHome.
         </p>
         <h2>TypeScript</h2>
         <p>
