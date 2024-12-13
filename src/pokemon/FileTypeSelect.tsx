@@ -1,8 +1,5 @@
 import { uniq } from 'lodash'
 import { useContext, useMemo } from 'react'
-import { supportsMon } from 'src/types/SAVTypes/util'
-import { isRestricted } from 'src/types/TransferRestrictions'
-import { PKMFormData, Styles } from 'src/types/types'
 import {
   BDSP_TRANSFER_RESTRICTIONS,
   LA_TRANSFER_RESTRICTIONS,
@@ -10,6 +7,9 @@ import {
   SV_TRANSFER_RESTRICTIONS,
   SWSH_TRANSFER_RESTRICTIONS,
 } from 'src/consts/TransferRestrictions'
+import { supportsMon } from 'src/types/SAVTypes/util'
+import { isRestricted } from 'src/types/TransferRestrictions'
+import { PKMFormData, Styles } from 'src/types/types'
 import { filterUndefined } from 'src/util/Sort'
 import { AppInfoContext } from '../state/appInfo'
 
@@ -58,7 +58,7 @@ const FileTypeSelect = (props: FileTypeSelectProps) => {
     const supportedFormats = uniq(
       getEnabledSaveTypes().map((saveType) =>
         supportsMon(saveType, formData.dexNum, formData.formeNum)
-          ? saveType.pkmType.name.replace('_', '') // get class name workaround
+          ? saveType.pkmType.getName()
           : undefined
       )
     ).filter(filterUndefined)

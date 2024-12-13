@@ -367,6 +367,10 @@ export class OHPKM implements PKMInterface {
     }
   }
 
+  static getName() {
+    return 'OHPKM'
+  }
+
   public get format(): 'OHPKM' {
     return 'OHPKM'
   }

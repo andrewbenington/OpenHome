@@ -27,6 +27,7 @@ export const DESAMUME_FOOTER_START =
 export interface PKMClass {
   new (arg: ArrayBuffer | PKMInterface, encrypted?: boolean): PKMInterface
   fromBytes(bytes: ArrayBuffer): PKMInterface
+  getName(): string
 }
 
 export interface SAVClass {

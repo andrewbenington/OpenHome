@@ -79,6 +79,9 @@ const RR_BALLS: Ball[] = [
 ]
 
 export class PK3RR implements PluginPKMInterface {
+  static getName() {
+    return 'PK3RR'
+  }
   format: 'PK3RR' = 'PK3RR'
   pluginIdentifier = 'radical_red'
   pluginOrigin?: string
