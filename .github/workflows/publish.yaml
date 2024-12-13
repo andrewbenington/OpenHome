@@ -50,6 +50,14 @@ jobs:
       - name: install frontend dependencies
         run: npm install # change this to npm, pnpm or bun depending on which one you use.
 
+      - name: build version.json (unix)
+        if: matrix.platform != 'windows-latest'
+        run: ./buildVersionJSON.sh
+
+      - name: build version.json (windows)
+        if: matrix.platform == 'windows-latest'
+        run: powershell -ExecutionPolicy Bypass -File ./buildVersionJSON.ps1
+
       - uses: tauri-apps/tauri-action@v0.5.16
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
