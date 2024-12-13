@@ -1,5 +1,5 @@
 <p>
-  OpenHome uses <a href="https://electron.atom.io/">Electron</a>, <a href="https://facebook.github.io/react/">React</a>, and <a href="https://vite.dev/">Vite</a>.
+  OpenHome uses <a href="https://tauri.app//">Tauri</a>, <a href="https://facebook.github.io/react/">React</a>, and <a href="https://vite.dev/">Vite</a>.
 </p>
 
 # OpenHome
