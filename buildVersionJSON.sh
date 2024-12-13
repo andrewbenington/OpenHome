@@ -8,4 +8,5 @@ GIT_BRANCH=$(git branch --show-current)
 
 GIT_STATUS="$GIT_BRANCH-$GIT_COMMIT$GIT_TREE"
 
+mkdir -p ./src/consts/JSON
 echo {\"version\": \"${OPENHOME_VERSION}\", \"commit\": \"${GIT_STATUS}\", \"build_date\": \"${BUILD_DATE}\"} > src/consts/JSON/version.json
