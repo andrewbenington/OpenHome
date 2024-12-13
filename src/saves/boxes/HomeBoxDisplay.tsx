@@ -10,13 +10,15 @@ import BoxCell from './BoxCell'
 
 interface HomeBoxDisplayProps {
   setSelectedMon: (_: PKMInterface | undefined) => void
+  setDraggedMon: React.Dispatch<React.SetStateAction<PKMInterface | null>>
+  updateBag: () => void
 }
 
 const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
   const [{ homeData }, openSavesDispatch] = useContext(OpenSavesContext)
   const [mouseState, mouseDispatch] = useContext(MouseContext)
-  const { setSelectedMon } = props
   const { active } = useDraggable({ id: '' })
+  const { setSelectedMon, setDraggedMon, updateBag } = props
 
   const dispatchStartDrag = useCallback(
     (boxPos: number) => {
@@ -147,6 +149,8 @@ const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
                       // don't allow a swap with a pokémon not supported by the source save
                       mon && dragData && !dragData?.save?.supportsMon(mon.dexNum, mon.formeNum)
                     }
+                    setDraggedMon={setDraggedMon}
+                    updateBag={updateBag}
                   />
                 </Grid>
               )

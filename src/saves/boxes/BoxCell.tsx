@@ -44,17 +44,26 @@ interface BoxCellProps {
   borderColor?: string
   dragID?: string
   dragData?: MonLocation
+  setDraggedMon: React.Dispatch<React.SetStateAction<PKMInterface | null>>
+  updateBag: () => void
 }
 
-const BoxCell = ({
-  onClick,
-  disabled,
-  zIndex,
-  mon,
-  borderColor,
-  dragID,
-  dragData,
-}: BoxCellProps) => {
+const BoxCell = (props: BoxCellProps) => {
+  const {
+    onClick,
+    onDragEvent,
+    onDrop,
+    disabled,
+    zIndex,
+    mon,
+    borderColor,
+    dragID,
+    dragData,
+    setDraggedMon,
+    updateBag,
+  } = props
+
+
   const [filterState] = useContext(FilterContext)
 
   const isFilteredOut = useMemo(() => {

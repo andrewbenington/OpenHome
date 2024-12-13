@@ -16,13 +16,15 @@ import BoxCell from './BoxCell'
 interface OpenSaveDisplayProps {
   saveIndex: number
   setSelectedMon: (_: PKMInterface | undefined) => void
+  setDraggedMon: React.Dispatch<React.SetStateAction<PKMInterface | null>>
+  updateBag: () => void
 }
 
 const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   const [, openSavesDispatch, openSaves] = useContext(OpenSavesContext)
   const [mouseState, mouseDispatch] = useContext(MouseContext)
   const [detailsModal, setDetailsModal] = useState(false)
-  const { saveIndex, setSelectedMon } = props
+  const { saveIndex, setSelectedMon, setDraggedMon, updateBag } = props
   const save = openSaves[saveIndex]
   const { active } = useDraggable({ id: '' })
 
@@ -190,6 +192,8 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                           dispatchCompleteDrag(row * save.boxColumns + rowIndex)
                         }
                       }}
+                      setDraggedMon={setDraggedMon}
+                      updateBag={updateBag}
                     />
                   </Grid>
                 )
