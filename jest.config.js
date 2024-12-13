@@ -1,11 +1,11 @@
 module.exports = {
   transform: {
-    '^.+\\.[tj]sx?$': [
-      'babel-jest',
-      { presets: ['@babel/preset-env', '@babel/preset-typescript'] },
-    ],
+    '^.+\\.tsx?$': ['ts-jest', { tsconfig: './tsconfig.json' }],
   },
   testEnvironment: 'node',
   testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.[tj]sx?$',
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
+  moduleNameMapper: {
+    '^src/(.*)$': '<rootDir>/src/$1',
+  },
 }

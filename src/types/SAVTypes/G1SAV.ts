@@ -2,13 +2,13 @@ import lodash from 'lodash'
 import { PK1 } from 'pokemon-files'
 import { GameOfOrigin, GameOfOriginData, Languages } from 'pokemon-resources'
 import { NationalDex } from 'pokemon-species-data'
-import { GEN1_TRANSFER_RESTRICTIONS } from '../../consts/TransferRestrictions'
-import { bytesToUint16BigEndian, get8BitChecksum } from '../../util/ByteLogic'
-import { natDexToGen1ID } from '../../util/ConvertPokemonID'
-import { gen12StringToUTF, utf16StringToGen12 } from '../../util/Strings/StringConverter'
+import { GEN1_TRANSFER_RESTRICTIONS } from 'src/consts/TransferRestrictions'
+import { bytesToUint16BigEndian, get8BitChecksum } from 'src/util/byteLogic'
+import { natDexToGen1ID } from 'src/util/ConvertPokemonID'
+import { gen12StringToUTF, utf16StringToGen12 } from 'src/util/Strings/StringConverter'
 import { OHPKM } from '../pkm/OHPKM'
-import { Box, BoxCoordinates, SAV } from './SAV'
 import { PathData } from './path'
+import { Box, BoxCoordinates, SAV } from './SAV'
 import { LOOKUP_TYPE } from './util'
 
 const SAVE_SIZE_BYTES = 0x8000
@@ -75,6 +75,7 @@ export class G1SAV implements SAV<PK1> {
       return
     }
     let currenBoxByteOffset
+
     if (this.currentPCBox < 6) {
       currenBoxByteOffset = 0x4000 + this.currentPCBox * this.BOX_SIZE
     } else {
@@ -98,6 +99,7 @@ export class G1SAV implements SAV<PK1> {
     lodash.range(this.NUM_BOXES).forEach((boxNumber) => {
       this.boxes[boxNumber] = new Box(`Box ${boxNumber + 1}`, pokemonPerBox)
       let boxByteOffset
+
       if (boxNumber < 6) {
         boxByteOffset = 0x4000 + boxNumber * this.BOX_SIZE
       } else {
@@ -112,6 +114,7 @@ export class G1SAV implements SAV<PK1> {
                 boxByteOffset + this.BOX_PKM_OFFSET + (monIndex + 1) * this.BOX_PKM_SIZE
               ).buffer
             )
+
             mon.trainerName = gen12StringToUTF(
               this.bytes,
               boxByteOffset + this.BOX_OT_OFFSET + monIndex * 11,
@@ -144,6 +147,7 @@ export class G1SAV implements SAV<PK1> {
 
     changedBoxes.forEach((boxNumber) => {
       let boxByteOffset: number
+
       if (boxNumber < 6) {
         boxByteOffset = 0x4000 + boxNumber * this.BOX_SIZE
       } else {
@@ -158,6 +162,7 @@ export class G1SAV implements SAV<PK1> {
             changedMonPKMs.push(boxMon)
           }
           const pk1Mon = boxMon instanceof PK1 ? boxMon : new PK1(boxMon)
+
           // set the mon's dex number in the box
           this.bytes[boxByteOffset + 1 + numMons] = natDexToGen1ID[pk1Mon.dexNum]
           // set the mon's data in the box
@@ -167,9 +172,11 @@ export class G1SAV implements SAV<PK1> {
           )
           // set the mon's OT name in the box
           const trainerNameBuffer = utf16StringToGen12(pk1Mon.trainerName, 11, true)
+
           this.bytes.set(trainerNameBuffer, boxByteOffset + this.BOX_OT_OFFSET + numMons * 11)
           // set the mon's nickname in the box
           const nicknameBuffer = utf16StringToGen12(pk1Mon.nickname, 11, true)
+
           this.bytes.set(nicknameBuffer, boxByteOffset + this.BOX_NICKNAME_OFFSET + numMons * 11)
           numMons++
         }
@@ -177,6 +184,7 @@ export class G1SAV implements SAV<PK1> {
 
       this.bytes[boxByteOffset] = numMons
       const remainingSlots = pokemonPerBox - numMons
+
       if (remainingSlots) {
         // set all mon data to all 0s
         this.bytes.set(
@@ -197,6 +205,7 @@ export class G1SAV implements SAV<PK1> {
       // set all dex numbers to 0xFF or add terminator
       this.bytes.set(new Uint8Array(remainingSlots + 1).fill(0xff), boxByteOffset + 1 + numMons)
       let boxChecksumOffset
+
       if (boxNumber < 6) {
         boxChecksumOffset = 0x5a4d + boxNumber
       } else {
@@ -204,6 +213,7 @@ export class G1SAV implements SAV<PK1> {
       }
       const boxChecksum =
         get8BitChecksum(this.bytes, boxByteOffset, boxByteOffset + this.BOX_SIZE) ^ 0xff
+
       this.bytes[boxChecksumOffset] = boxChecksum
       if (boxNumber === this.currentPCBox) {
         this.bytes.set(
@@ -213,16 +223,19 @@ export class G1SAV implements SAV<PK1> {
       }
     })
     const bank2Checksum = get8BitChecksum(this.bytes, 0x4000, 0x5a4c) ^ 0xff
+
     this.bytes[0x5a4c] = bank2Checksum
     const bank3Checksum = get8BitChecksum(this.bytes, 0x6000, 0x7a4c) ^ 0xff
+
     this.bytes[0x7a4c] = bank3Checksum
     const wholeSaveChecksum = get8BitChecksum(this.bytes, 0x2598, 0x3521) ^ 0xff
+
     this.bytes[0x3523] = wholeSaveChecksum
     return changedMonPKMs
   }
 
   supportsMon(dexNumber: number, formeNumber: number) {
-    return dexNumber <= NationalDex.Mew && formeNumber == 0
+    return dexNumber <= NationalDex.Mew && formeNumber === 0
   }
 
   getCurrentBox() {
@@ -231,6 +244,7 @@ export class G1SAV implements SAV<PK1> {
 
   getGameName() {
     const gameOfOrigin = GameOfOriginData[this.origin]
+
     return gameOfOrigin ? `Pokémon ${gameOfOrigin.name}` : '(Unknown Game)'
   }
 
@@ -240,6 +254,12 @@ export class G1SAV implements SAV<PK1> {
   static fileIsSave(bytes: Uint8Array): boolean {
     // Gen 1 and Gen 2 saves are the same size, so assume it's Gen 2 if the Gen 2 checksums are valid
     if (areCrystalInternationalChecksumsValid(bytes) || areGoldSilverChecksumsValid(bytes)) {
+      return false
+    }
+    const decodedFirst64 = new TextDecoder('utf-8').decode(bytes.slice(0, 64))
+
+    if (decodedFirst64.includes('Metroid') || decodedFirst64.includes('ZeroMission')) {
+      // lol
       return false
     }
     return bytes.length === SAVE_SIZE_BYTES
@@ -270,10 +290,12 @@ export class G1SAV implements SAV<PK1> {
 
 function areGoldSilverChecksumsValid(bytes: Uint8Array) {
   const checksum1 = getGoldSilverInternationalChecksum1(bytes)
+
   if (checksum1 !== bytes[0x2d69]) {
     return false
   }
   const checksum2 = getGoldSilverInternationalChecksum2(bytes)
+
   return checksum2 === bytes[0x7e6d]
 }
 
@@ -283,6 +305,7 @@ function getGoldSilverInternationalChecksum1(bytes: Uint8Array) {
 
 function getGoldSilverInternationalChecksum2(bytes: Uint8Array) {
   let checksum = 0
+
   checksum += get8BitChecksum(bytes, 0x15c7, 0x17ec)
   checksum += get8BitChecksum(bytes, 0x3d96, 0x3f3f)
   checksum += get8BitChecksum(bytes, 0x0c6b, 0x10e7)
@@ -301,9 +324,11 @@ function getCrystalInternationalChecksum2(bytes: Uint8Array) {
 
 function areCrystalInternationalChecksumsValid(bytes: Uint8Array) {
   const checksum1 = getCrystalInternationalChecksum1(bytes)
+
   if (checksum1 !== bytes[0x2d0d]) {
     return false
   }
   const checksum2 = getCrystalInternationalChecksum2(bytes)
+
   return checksum2 === bytes[0x1f0d]
 }

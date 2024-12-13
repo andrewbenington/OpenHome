@@ -30,8 +30,8 @@ import {
 } from 'pokemon-resources'
 import { NationalDex } from 'pokemon-species-data'
 import Prando from 'prando'
-import { OpenHomeRibbons } from '../../consts/Ribbons'
-import { ShadowIDsColosseum, ShadowIDsXD } from '../../consts/ShadowIDs'
+import { OpenHomeRibbons } from 'src/consts/Ribbons'
+import { ShadowIDsColosseum, ShadowIDsXD } from 'src/consts/ShadowIDs'
 import {
   bytesToUint16BigEndian,
   bytesToUint16LittleEndian,
@@ -41,9 +41,9 @@ import {
   uint16ToBytesBigEndian,
   uint16ToBytesLittleEndian,
   uint32ToBytesLittleEndian,
-} from '../../util/ByteLogic'
-import { getHPGen3Onward, getLevelGen3Onward, getStatGen3Onward } from '../../util/StatCalc'
-import { utf16BytesToString, utf16StringToBytes } from '../../util/Strings/StringConverter'
+} from 'src/util/byteLogic'
+import { getHPGen3Onward, getLevelGen3Onward, getStatGen3Onward } from 'src/util/StatCalc'
+import { utf16BytesToString, utf16StringToBytes } from 'src/util/Strings/StringConverter'
 import { PKMInterface, PluginPKMInterface } from '../interfaces'
 import schema from './OHPKM.json'
 import {
@@ -93,6 +93,7 @@ export class OHPKM implements PKMInterface {
     } else {
       const other = arg
       let prng: Prando
+
       if ('personalityValue' in other) {
         prng = new Prando(
           other.trainerName
@@ -179,6 +180,7 @@ export class OHPKM implements PKMInterface {
       if (other.format === 'PK2' && other.dexNum === NationalDex.Unown) {
         const letterBits = (other.formeNum ?? 0) * 10
         const newDvs = this.dvs
+
         newDvs.atk = (newDvs.atk & 0b1001) | (((letterBits >> 6) & 0b11) << 1)
         newDvs.def = (newDvs.def & 0b1001) | (((letterBits >> 4) & 0b11) << 1)
         newDvs.spe = (newDvs.spe & 0b1001) | (((letterBits >> 2) & 0b11) << 1)
@@ -203,6 +205,7 @@ export class OHPKM implements PKMInterface {
         this.metDate = other.metDate
       } else {
         const now = new Date()
+
         this.metDate = {
           month: now.getMonth() + 1,
           day: now.getDate(),
@@ -235,8 +238,10 @@ export class OHPKM implements PKMInterface {
 
       if ('ribbons' in other) {
         const contestRibbons = lodash.intersection(other.ribbons, Gen34ContestRibbons)
+
         this.contestMemoryCount = Math.max(contestRibbons.length, this.contestMemoryCount)
         const battleRibbons = lodash.intersection(other.ribbons, Gen34TowerRibbons)
+
         this.battleMemoryCount = Math.max(battleRibbons.length, this.battleMemoryCount)
         this.ribbons = other.ribbons ?? []
       }
@@ -412,6 +417,7 @@ export class OHPKM implements PKMInterface {
 
   public set heldItemName(value: string) {
     const itemIndex = ItemFromString(value)
+
     if (itemIndex > -1) {
       this.heldItemIndex = itemIndex
     }
@@ -459,6 +465,7 @@ export class OHPKM implements PKMInterface {
 
   public set ability(value: string) {
     const abilityIndex = AbilityFromString(value)
+
     if (abilityIndex > -1) {
       this.abilityIndex = abilityIndex
     }
@@ -669,6 +676,7 @@ export class OHPKM implements PKMInterface {
 
   public get ribbons() {
     const ribbons: string[] = []
+
     for (let i = 0; i < OpenHomeRibbons.length; i++) {
       if (getFlag(this.bytes, 0x36, i)) {
         ribbons.push(OpenHomeRibbons[i])
@@ -681,6 +689,7 @@ export class OHPKM implements PKMInterface {
     this.bytes.set(new Uint8Array(16), 0x36)
     value.forEach((ribbon) => {
       const index = OpenHomeRibbons.indexOf(ribbon)
+
       if (index > -1) {
         setFlag(this.bytes, 0x36, index, true)
       }
@@ -754,6 +763,7 @@ export class OHPKM implements PKMInterface {
 
   public set nickname(value: string) {
     const utfBytes = utf16StringToBytes(value, 12)
+
     this.bytes.set(utfBytes, 0x60)
   }
 
@@ -804,6 +814,7 @@ export class OHPKM implements PKMInterface {
 
   public get ivs() {
     const ivBytes = bytesToUint32LittleEndian(this.bytes, 0x94)
+
     return {
       hp: ivBytes & 0x1f,
       atk: (ivBytes >> 5) & 0x1f,
@@ -893,6 +904,7 @@ export class OHPKM implements PKMInterface {
   public get dvs() {
     // big endian to be the same as gameboy games (ugh)
     const dvBytes = bytesToUint16BigEndian(this.bytes, 0xaa)
+
     return {
       spc: dvBytes & 0x0f,
       spe: (dvBytes >> 4) & 0x0f,
@@ -908,6 +920,7 @@ export class OHPKM implements PKMInterface {
 
   public set dvs(value: StatsPreSplit) {
     let dvBytes = value.atk & 0x0f
+
     dvBytes = (dvBytes << 4) | (value.def & 0x0f)
     dvBytes = (dvBytes << 4) | (value.spe & 0x0f)
     dvBytes = (dvBytes << 4) | (value.spc & 0x0f)
@@ -945,6 +958,7 @@ export class OHPKM implements PKMInterface {
 
   public set handlerName(value: string) {
     const utfBytes = utf16StringToBytes(value, 12)
+
     this.bytes.set(utfBytes, 0xb8)
   }
 
@@ -1149,7 +1163,7 @@ export class OHPKM implements PKMInterface {
   public set pluginOrigin(value: string | undefined) {
     if (value === undefined) return
     const utfBytes = utf16StringToBytes(value, 32)
-    console.log(utfBytes.length, this.bytes.length, this.bytes.length - 433)
+
     this.bytes.set(utfBytes, 433)
   }
 
@@ -1193,6 +1207,7 @@ export class OHPKM implements PKMInterface {
 
   public set language(value: string) {
     const index = Languages.indexOf(value)
+
     if (index > -1) {
       this.bytes[0xf2] = index
     }
@@ -1258,6 +1273,7 @@ export class OHPKM implements PKMInterface {
 
   public set trainerName(value: string) {
     const utfBytes = utf16StringToBytes(value, 12)
+
     this.bytes.set(utfBytes, 0x110)
   }
 
@@ -1561,22 +1577,25 @@ export class OHPKM implements PKMInterface {
     }
 
     const otherMarkings = other.markings
+
     if (otherMarkings && markingsHaveColor(otherMarkings)) {
       this.markings = otherMarkings
     } else if (otherMarkings) {
       for (const [markingType, markingVal] of Object.entries(otherMarkings)) {
-        if (markingVal && this.markings[markingType] === null) {
-          this.markings[markingType] = 'blue'
-        } else if (!markingVal && this.markings[markingType]) {
-          this.markings[markingType] = null
+        if (markingVal && this.markings[markingType as MarkingShape] === null) {
+          this.markings[markingType as MarkingShape] = 'blue'
+        } else if (!markingVal && this.markings[markingType as MarkingShape]) {
+          this.markings[markingType as MarkingShape] = null
         }
       }
     }
 
     // memory ribbons need to be updated if new ribbons were earned to add to the count
     const contestRibbons = lodash.intersection(this.ribbons, Gen34ContestRibbons)
+
     this.contestMemoryCount = Math.max(contestRibbons.length, this.contestMemoryCount)
     const battleRibbons = lodash.intersection(this.ribbons, Gen34TowerRibbons)
+
     this.battleMemoryCount = Math.max(battleRibbons.length, this.battleMemoryCount)
 
     if (other.pokerusByte) {
@@ -1692,3 +1711,5 @@ function extendUint8Array(array: Uint8Array, minLength: number) {
 
   return extendedArray
 }
+
+type MarkingShape = keyof MarkingsSixShapesWithColor

@@ -1,5 +1,5 @@
 import { GameOfOrigin } from 'pokemon-resources'
-import { XY_TRANSFER_RESTRICTIONS } from '../../consts/TransferRestrictions'
+import { XY_TRANSFER_RESTRICTIONS } from 'src/consts/TransferRestrictions'
 import { isRestricted } from '../TransferRestrictions'
 import { G6SAV } from './G6SAV'
 import { PathData } from './path'

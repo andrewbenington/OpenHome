@@ -4,3 +4,7 @@ pnpm-lock.yaml
 LICENSE.md
 tsconfig.json
 tsconfig.*.json
+public
+src/public
+src-tauri/target
+src-tauri/icons

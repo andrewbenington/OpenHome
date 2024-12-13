@@ -2,7 +2,6 @@ import { Either } from 'fp-ts/Either'
 import { CSSProperties } from 'react'
 import { PathData } from './SAVTypes/path'
 
-/* eslint-disable no-unused-vars */
 export type KeyValuePairList = { key: string; value: string }[]
 export type Stat = 'HP' | 'Atk' | 'Def' | 'SpA' | 'SpD' | 'Spe' | 'Sp'
 export type Type =
@@ -39,9 +38,9 @@ export interface pokedate {
 }
 
 // 1 = blue/black, 2 = red
-export type marking = 0 | 1 | 2
+export type marking = boolean | 'blue' | 'red' | null
 
-export interface SaveRef {
+export interface SaveRef extends Partial<JSONObject> {
   filePath: PathData
   game?: number
   trainerName?: string
@@ -147,7 +146,11 @@ export type Errorable<T> = Either<string, T>
 
 export type LookupMap = Record<string, string>
 
-export type LoadSaveResponse = { path: PathData; fileBytes: Uint8Array; createdDate: Date }
+export type LoadSaveResponse = {
+  path: PathData
+  fileBytes: Uint8Array
+  createdDate: Date
+}
 
 export interface PKMFormData {
   dexNum: number
@@ -162,3 +165,9 @@ export type ImageSource =
       rawImageBase64: string
     }
   | undefined
+
+export type JSONValue = string | number | boolean | null | JSONArray | JSONObject
+
+export interface JSONObject extends Record<string, JSONValue> {}
+
+export interface JSONArray extends Array<JSONValue> {}

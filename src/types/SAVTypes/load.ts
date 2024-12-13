@@ -2,7 +2,7 @@ import {
   getMonFileIdentifier,
   getMonGen12Identifier,
   getMonGen345Identifier,
-} from '../../util/Lookup'
+} from 'src/util/Lookup'
 import { PKMInterface } from '../interfaces'
 import { OHPKM } from '../pkm/OHPKM'
 import { PathData } from './path'
@@ -24,12 +24,16 @@ const recoverOHPKMData = (
     box.pokemon.forEach((mon, monIndex) => {
       if (mon) {
         const lookupIdentifier = getIdentifier(mon)
+
         if (!lookupIdentifier) return
         const homeIdentifier = lookupMap ? lookupMap[lookupIdentifier] : lookupIdentifier
+
         if (!homeIdentifier) return
         const result = Object.entries(homeMonMap).find((entry) => entry[0] === homeIdentifier)
+
         if (result) {
           const updatedOHPKM = result[1]
+
           updatedOHPKM.updateData(mon)
           if (updateMonCallback) {
             updateMonCallback(updatedOHPKM)
@@ -68,21 +72,22 @@ export const buildSaveFile = (
 ): SAV | undefined => {
   const { homeMonMap, gen12LookupMap, gen345LookupMap } = lookupMaps
   const saveType = getSaveType(fileBytes, supportedSaveTypes)
+
   if (!saveType) return undefined
 
   const lookupMap =
     saveType.lookupType === 'gen12'
       ? gen12LookupMap
       : saveType.lookupType === 'gen345'
-      ? gen345LookupMap
-      : undefined
+        ? gen345LookupMap
+        : undefined
 
   const getIdentifier =
     saveType.lookupType === 'gen12'
       ? getMonGen12Identifier
       : saveType.lookupType === 'gen345'
-      ? getMonGen345Identifier
-      : getMonFileIdentifier
+        ? getMonGen345Identifier
+        : getMonFileIdentifier
 
   const saveFile = recoverOHPKMData(
     new saveType(filePath, fileBytes),
@@ -91,5 +96,6 @@ export const buildSaveFile = (
     lookupMap,
     updateMonCallback
   )
+
   return saveFile
 }

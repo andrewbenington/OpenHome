@@ -1,4 +1,4 @@
-export const RRToNationalMap = {
+export const RRToNationalMap: Record<string, number> = {
   Pound: 1,
   'Karate Chop': 2,
   'Double Slap': 3,
