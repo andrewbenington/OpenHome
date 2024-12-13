@@ -29,7 +29,7 @@
     "start": "./buildVersionJSON.sh && tauri preview",
     "dev:unix": "./buildVersionJSON.sh && tauri dev",
     "dev:win": "powershell -ExecutionPolicy Bypass -File ./buildVersionJSON.ps1 && tauri dev",
-    "build": "./buildVersionJSON.sh && tsc && vite build",
+    "build": "tsc && vite build",
     "dev": "vite",
     "tauri": "tauri",
     "test": "jest"
