@@ -31,7 +31,6 @@ import { MouseContext } from '../state/mouse'
 import { OpenSavesContext } from '../state/openSaves'
 import { PKMInterface } from '../types/interfaces'
 import { OHPKM } from '../types/pkm/OHPKM'
-import { initializeDragImage } from '../util/initializeDragImage'
 import { getMonFileIdentifier, getMonGen12Identifier, getMonGen345Identifier } from '../util/Lookup'
 import './Home.css'
 
@@ -247,7 +246,6 @@ const Home = () => {
 
   // load all data when app starts
   useEffect(() => {
-    initializeDragImage()
     backend
       .getResourcesPath()
       .then((path) => appInfoDispatch({ type: 'set_resources_path', payload: path }))
