@@ -35,6 +35,7 @@ export const writeIVsToBuffer = (
   isNicknamed: boolean
 ) => {
   let ivsValue = 0
+
   ivsValue = (ivsValue + (isNicknamed ? 1 : 0)) << 1
   ivsValue = (ivsValue + (isEgg ? 1 : 0)) << 5
   ivsValue = (ivsValue + (ivs.spd & 0x1f)) << 5
@@ -65,6 +66,7 @@ export const getAbilityFromNumber = (dexNum: number, formeNum: number, abilityNu
 
 export const getUnownLetterGen3 = (personalityValue: number) => {
   let letterValue = (personalityValue >> 24) & 0x3
+
   letterValue = ((personalityValue >> 16) & 0x3) | (letterValue << 2)
   letterValue = ((personalityValue >> 8) & 0x3) | (letterValue << 2)
   letterValue = (personalityValue & 0x3) | (letterValue << 2)
@@ -77,6 +79,7 @@ export const generateTeraType = (prng: Prando, dexNum: number, formeNum: number)
   }
   const { types: monTypes } = PokemonData[dexNum].formes[formeNum]
   const baseMon = getBaseMon(dexNum, formeNum)
+
   if (!PokemonData[baseMon.dexNumber]?.formes[baseMon.formeNumber]) {
     return 0
   }
@@ -99,6 +102,7 @@ export const generateTeraType = (prng: Prando, dexNum: number, formeNum: number)
     return 0
   }
   const typeIndex = prng.nextInt(0, types.length - 1)
+
   return Types.indexOf(types[typeIndex])
 }
 
@@ -140,12 +144,14 @@ export const gvsFromIVs = (ivs: Stats) => {
 export const dvsFromIVs = (ivs: Stats, isShiny: boolean) => {
   if (isShiny) {
     let atkDV = Math.ceil((ivs.atk - 1) / 2)
+
     if ((atkDV & 0b11) === 0b01) {
       atkDV += 1
     } else if (atkDV % 4 === 0) {
       atkDV += 2
     }
     const hpDV = (atkDV & 1) << 3
+
     return {
       hp: hpDV,
       atk: atkDV,
@@ -177,12 +183,14 @@ export const generateIVs = (prng: Prando) => {
 export const generateDVs = (prng: Prando, isShiny: boolean) => {
   if (isShiny) {
     let atkDV = prng.nextInt(0, 15)
+
     if ((atkDV & 0b11) === 0b01) {
       atkDV += 1
     } else if (atkDV % 4 === 0) {
       atkDV += 2
     }
     const hpDV = (atkDV & 1) << 3
+
     return {
       hp: hpDV,
       atk: atkDV,
@@ -208,6 +216,7 @@ export const generatePersonalityValue = () => {
 export const getBaseMon = (dexNum: number, forme?: number) => {
   let mon = { dexNumber: dexNum, formeNumber: forme ?? 0 }
   let prevo = PokemonData[dexNum]?.formes[forme ?? 0]?.prevo
+
   while (prevo) {
     mon = prevo
     prevo = PokemonData[mon.dexNumber]?.formes[mon.formeNumber]?.prevo
@@ -224,6 +233,7 @@ export const formatHasColorMarkings = (format: string) => {
 
 export const getTypes = (mon: PKMInterface) => {
   let types = PokemonData[mon.dexNum]?.formes[mon.formeNum ?? 0]?.types
+
   if (
     mon.format === 'PK1' &&
     (mon.dexNum === NationalDex.Magnemite || mon.dexNum === NationalDex.Magneton)
@@ -245,8 +255,10 @@ export const getTypes = (mon: PKMInterface) => {
 
 export const getMoveMaxPP = (moveIndex: number, format: string, ppUps = 0) => {
   const move = Moves[moveIndex]
+
   if (!move) return undefined
   let baseMaxPP
+
   switch (format) {
     case 'PK1':
       baseMaxPP = move.pastGenPP?.G1 ?? move.pp
@@ -317,12 +329,14 @@ export const adjustMovePPBetweenFormats = (
     const otherMaxPP = getMoveMaxPP(move, sourceFormatMon.format, sourceFormatMon.movePPUps[i]) ?? 0
     const thisMaxPP = getMoveMaxPP(move, destFormatMon.format, sourceFormatMon.movePPUps[i]) ?? 0
     const adjustedMovePP = sourceFormatMon.movePP[i] - (otherMaxPP - thisMaxPP)
+
     return adjustedMovePP // lodash.max([adjustedMovePP, 0]) ?? 0
   }) as [number, number, number, number]
 }
 
 export const getSixDigitTID = (tid: number, sid: number) => {
   const bytes = new Uint8Array(4)
+
   bytes.set(uint16ToBytesLittleEndian(tid), 0)
   bytes.set(uint16ToBytesLittleEndian(sid), 2)
   return bytesToUint32LittleEndian(bytes, 0x0c) % 1000000
@@ -338,6 +352,7 @@ export const generatePersonalityValuePreservingAttributes = (
   let personalityValue = mon.personalityValue ?? prng.nextInt(0, 0xffffffff)
   let otherNature: Nature | undefined = mon.nature
   let otherAbilityNum = 4
+
   if (mon.abilityNum !== undefined) {
     otherAbilityNum = mon.abilityNum
   }
@@ -351,9 +366,11 @@ export const generatePersonalityValuePreservingAttributes = (
   let i = 0
   let newPersonalityValue = BigInt(personalityValue)
   const shouldCheckUnown = mon.dexNum === NationalDex.Unown
+
   while (i < 0x10000) {
     const newGender = getGen3To5Gender(Number(newPersonalityValue), mon.dexNum)
     const newNature = Number(newPersonalityValue % 25n)
+
     if (
       (!shouldCheckUnown || getUnownLetterGen3(Number(newPersonalityValue)) === mon.formeNum) &&
       newGender === otherGender &&
@@ -369,6 +386,7 @@ export const generatePersonalityValuePreservingAttributes = (
     i++
     const pvBytes = uint32ToBytesLittleEndian(personalityValue)
     let pvLower16, pvUpper16
+
     if (mon.dexNum === NationalDex.Unown) {
       pvLower16 = prng.nextInt(0, 0xffff)
       pvUpper16 = prng.nextInt(0, 0xffff)
@@ -394,11 +412,13 @@ export const generatePersonalityValuePreservingAttributes = (
 export function getCharacteristic(mon: PKMInterface) {
   const preGen6 = mon.encryptionConstant === undefined
   const tiebreaker = preGen6 ? mon.personalityValue : mon.encryptionConstant
+
   if (!mon.ivs || !tiebreaker) return ''
   const statFields = ['hp', 'atk', 'def', 'spe', 'spa', 'spd']
   const maxIV = lodash.max(Object.values(mon.ivs))
   const lastIndex = tiebreaker % 6 === 0 ? 5 : (tiebreaker % 6) - 1
   let determiningIV = 'hp'
+
   for (let i = tiebreaker % 6; i !== lastIndex; i = (i + 1) % 6) {
     if ((mon.ivs as any)[statFields[i]] === maxIV) {
       determiningIV = statFields[i]
@@ -471,6 +491,7 @@ export function getHiddenPowerGen2(dvs: StatsPreSplit): HiddenPowerWithBP {
 
   const numerator = 5 * ((z << 3) + (x << 2) + (w << 1) + v + (dvs.spc & 0x11))
   const basePower = Math.floor(numerator / 2) + 31
+
   return {
     type: hpTypes[typeIndex],
     power: basePower,

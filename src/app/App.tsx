@@ -60,9 +60,8 @@ export default function App() {
               collisionDetection={closestCenter}
               modifiers={[restrictToWindowEdges]}
               onDragEnd={(e) => {
-                const source = e.active.data.current
                 const dest = e.over?.data.current
-                console.log('DRAG END', source, e.over)
+
                 if (
                   dragMon &&
                   dragData &&
@@ -71,18 +70,14 @@ export default function App() {
                 ) {
                   openSavesDispatch({ type: 'move_mon', payload: { source: dragData, dest } })
                 }
-                console.log(dragData, e.over?.data.current)
                 setDragData(e.over?.data.current as MonWithLocation)
                 let d = e.over?.data.current
+
                 setDragMon(d?.save.boxes[d.box].pokemon[d.boxPos])
               }}
               onDragStart={(e) => {
-                console.log(e.active.data.current)
                 setDragData(e.active.data.current)
                 setDragMon(e.active.data.current?.mon)
-              }}
-              onDragOver={(e) => {
-                console.log('onDragOver', e)
               }}
               sensors={[
                 useSensor(PointerSensor, {

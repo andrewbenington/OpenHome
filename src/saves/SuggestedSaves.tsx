@@ -37,8 +37,10 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
   const loadSaveData = useCallback(
     async (savePath: PathData) => {
       const response = await backend.loadSaveFile(savePath)
+
       if (E.isRight(response)) {
         const { fileBytes, createdDate } = response.right
+
         return buildSaveFile(
           savePath,
           fileBytes,
@@ -64,10 +66,12 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
           const allPaths = (possibleSaves?.citra ?? [])
             .concat(possibleSaves?.open_emu ?? [])
             .concat(possibleSaves?.desamume ?? [])
+
           if (allPaths.length > 0) {
             const saves = (await Promise.all(allPaths.map((path) => loadSaveData(path)))).filter(
               filterEmpty
             )
+
             setSuggestedSaves(saves)
           }
         }
@@ -169,6 +173,7 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
     <Stack flexWrap="wrap" direction="row" useFlexGap justifyContent="center" margin={2}>
       {suggestedSaves?.map((save) => (
         <SaveCard
+          key={save.filePath.raw}
           save={getSaveRef(save)}
           onOpen={() => {
             onOpen(save.filePath)

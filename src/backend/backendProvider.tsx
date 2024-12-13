@@ -56,15 +56,18 @@ async function writeAllHomeData(
     monIdentifiersByIndex: box.getIdentifierMapping(),
   }))
   const boxesResult = await backend.writeHomeBoxes(allStoredBoxData)
+
   if (E.isLeft(boxesResult)) {
     return [boxesResult]
   }
 
   const results: Errorable<null>[] = []
+
   for (const mon of mons) {
     try {
       const bytes = new Uint8Array(mon.toBytes())
       const identifier = getMonFileIdentifier(mon)
+
       if (identifier === undefined) {
         results.push(
           E.left(
@@ -74,9 +77,11 @@ async function writeAllHomeData(
         continue
       }
       const result = await backend.writeHomeMon(identifier, bytes)
+
       results.push(result)
     } catch (e) {
       const species = mon.dexNum in PokemonData ? PokemonData[mon.dexNum].name : 'Unknown Species'
+
       results.push(E.left(`Error encoding ${mon.nickname} (${species})`))
     }
   }

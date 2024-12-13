@@ -24,30 +24,13 @@
     "esModuleInterop": true,
 
     /* Linting */
-    // enable eventually?
-    // "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
   "include": [
     "src",
-    "src/app/**/*",
-    "src/backend/**/*",
-    "src/env.d.ts",
-    "src/components/**/*",
-    "src/consts/**/*",
-    "src/consts/**/*.json",
-    "src/**/*",
-    "src/state/*",
-    "src/resources/**/*",
-    "src/types/pkm/**/*",
-    "src/types/pkm/**/*.json",
-    "src/types/**/*",
-    "src/types/SAVTypes/**/*",
-    "src/util/**/*",
-    "src/preload/*.d.ts",
     "generate/_rename.js"
-  ],
+, "generate/generateMoveMap.ts"  ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

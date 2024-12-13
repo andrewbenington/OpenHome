@@ -9,6 +9,7 @@ describe('gen 7 save files', () => {
 
   beforeAll(() => {
     const savePath = resolve(__dirname, './SAVFILES/ultrasun')
+
     saveBytes = new Uint8Array(readFileSync(savePath))
 
     const parsedPath: PathData = {

@@ -19,16 +19,19 @@ export type FilterAction =
 
 const reducer: Reducer<FilterState, FilterAction> = (state: FilterState, action: FilterAction) => {
   const { type, payload } = action
+
   switch (type) {
     case 'set_filter': {
       const newState = {
         ...state,
         ...payload,
       }
+
       return newState
     }
     case 'clear_fields': {
       const newState = { ...state }
+
       payload.forEach((field) => {
         delete newState[field]
       })

@@ -12,6 +12,7 @@ export function getFlagsInRange(bytes: Uint8Array, offset: number, size: number)
 
 const bytesToNumberBigEndian = (bytes: Uint8Array) => {
   let value = 0
+
   bytes.forEach((byte) => {
     value *= 256
     value += byte
@@ -49,6 +50,7 @@ export const bytesToUint32BigEndian = (bytes: Uint8Array, index: number) => {
 
 export const bytesToInt32BigEndian = (bytes: Uint8Array, index: number) => {
   const unsigned = bytesToNumberBigEndian(bytes.slice(index, index + 4))
+
   if (!(bytes[index] & 0b10000000)) {
     return unsigned
   }
@@ -65,6 +67,7 @@ export const uint16ToBytesBigEndian = (value: number): Uint8Array => {
 
 export const get8BitChecksum = (bytes: Uint8Array, start: number, end: number) => {
   let checksum = 0
+
   for (let i = start; i <= end; i += 1) {
     checksum += bytes[i]
     checksum = checksum & 0xff
@@ -74,6 +77,7 @@ export const get8BitChecksum = (bytes: Uint8Array, start: number, end: number) =
 
 export const get16BitChecksumLittleEndian = (bytes: ArrayBuffer, start: number, end: number) => {
   let checksum = 0
+
   for (let i = start; i < end; i += 2) {
     checksum = (checksum + bytesToUint16LittleEndian(new Uint8Array(bytes), i)) & 0xffff
   }
@@ -113,6 +117,7 @@ export const writeUint16ToBuffer = (value: number, buffer: Uint8Array, offset: n
 export const setFlag = (buffer: Uint8Array, offset: number, index: number, value: boolean) => {
   const byteIndex = offset + Math.floor(index / 8)
   const bitIndex = index % 8
+
   if (byteIndex < buffer.length) {
     buffer[byteIndex] = (buffer[byteIndex] & (0xff - 2 ** bitIndex)) | (value ? 2 ** bitIndex : 0)
   }
@@ -121,6 +126,7 @@ export const setFlag = (buffer: Uint8Array, offset: number, index: number, value
 export const getFlag = (buffer: Uint8Array, offset: number, index: number) => {
   const byteIndex = offset + Math.floor(index / 8)
   const bitIndex = index % 8
+
   if (byteIndex < buffer.length) {
     return !!((buffer[byteIndex] >> bitIndex) & 0x1)
   }
@@ -137,6 +143,7 @@ export function wordsToUint8Array(words: number[], sigBytes: number) {
 
   for (let wordIndex = 0; wordIndex < words.length; wordIndex++) {
     let word = words[wordIndex]
+
     for (let byteOffset = 3; byteOffset >= 0; byteOffset--) {
       if (byteIndex < sigBytes) {
         byteArray[byteIndex++] = (word >> (8 * byteOffset)) & 0xff

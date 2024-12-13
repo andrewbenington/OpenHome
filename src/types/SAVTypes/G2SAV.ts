@@ -72,8 +72,10 @@ export class G2SAV implements SAV<PK2> {
     this.boxes = new Array<Box<PK2>>(this.boxOffsets.length)
 
     const pokemonPerBox = this.boxRows * this.boxColumns
+
     this.boxOffsets.forEach((offset, boxNumber) => {
       const monCount = bytes[offset]
+
       this.boxes[boxNumber] = new Box(`Box ${boxNumber + 1}`, pokemonPerBox)
       for (let monIndex = 0; monIndex < monCount; monIndex++) {
         const mon = new PK2(
@@ -82,6 +84,7 @@ export class G2SAV implements SAV<PK2> {
             offset + 1 + pokemonPerBox + 1 + (monIndex + 1) * 0x20
           ).buffer
         )
+
         mon.trainerName = gen12StringToUTF(
           this.bytes,
           offset + 1 + pokemonPerBox + 1 + pokemonPerBox * 0x20 + monIndex * 11,
@@ -114,17 +117,20 @@ export class G2SAV implements SAV<PK2> {
     const changedMonPKMs: OHPKM[] = []
     const changedBoxes = uniq(this.updatedBoxSlots.map((coords) => coords.box))
     const pokemonPerBox = this.boxRows * this.boxColumns
+
     changedBoxes.forEach((boxNumber) => {
       const boxByteOffset = this.boxOffsets[boxNumber]
       const box = this.boxes[boxNumber]
       // functions as an index, to skip empty slots
       let numMons = 0
+
       box.pokemon.forEach((boxMon) => {
         if (boxMon) {
           if (boxMon instanceof OHPKM) {
             changedMonPKMs.push(boxMon)
           }
           const pk2Mon = boxMon instanceof PK2 ? boxMon : new PK2(boxMon)
+
           // set the mon's dex number in the box (separate location)
           this.bytes[boxByteOffset + 1 + numMons] = pk2Mon.dexNum
           // set the mon's data in the box
@@ -134,12 +140,14 @@ export class G2SAV implements SAV<PK2> {
           )
           // set the mon's OT name in the box
           const trainerNameBuffer = utf16StringToGen12(pk2Mon.trainerName, 11, true)
+
           this.bytes.set(
             trainerNameBuffer,
             boxByteOffset + 1 + pokemonPerBox + 1 + pokemonPerBox * 0x20 + numMons * 11
           )
           // set the mon's nickname in the box
           const nicknameBuffer = utf16StringToGen12(pk2Mon.nickname, 11, true)
+
           this.bytes.set(
             nicknameBuffer,
             boxByteOffset +
@@ -155,6 +163,7 @@ export class G2SAV implements SAV<PK2> {
       })
       this.bytes[boxByteOffset] = numMons
       const remainingSlots = pokemonPerBox - numMons
+
       if (remainingSlots) {
         // set all dex numbers to 0
         this.bytes.set(new Uint8Array(remainingSlots + 1), boxByteOffset + 1 + numMons)
@@ -200,10 +209,12 @@ export class G2SAV implements SAV<PK2> {
 
   areGoldSilverChecksumsValid() {
     const checksum1 = this.getGoldSilverInternationalChecksum1()
+
     if (checksum1 !== this.bytes[0x2d69]) {
       return false
     }
     const checksum2 = this.getGoldSilverInternationalChecksum2()
+
     return checksum2 === this.bytes[0x7e6d]
   }
 
@@ -213,6 +224,7 @@ export class G2SAV implements SAV<PK2> {
 
   getGoldSilverInternationalChecksum2() {
     let checksum = 0
+
     checksum += get8BitChecksum(this.bytes, 0x15c7, 0x17ec)
     checksum += get8BitChecksum(this.bytes, 0x3d96, 0x3f3f)
     checksum += get8BitChecksum(this.bytes, 0x0c6b, 0x10e7)
@@ -231,16 +243,18 @@ export class G2SAV implements SAV<PK2> {
 
   areCrystalInternationalChecksumsValid() {
     const checksum1 = this.getCrystalInternationalChecksum1()
+
     if (checksum1 !== this.bytes[0x2d0d]) {
       return false
     }
     const checksum2 = this.getCrystalInternationalChecksum2()
+
     return checksum2 === this.bytes[0x1f0d]
   }
 
   supportsMon(dexNumber: number, formeNumber: number) {
     return (
-      (dexNumber <= NationalDex.Celebi && formeNumber == 0) ||
+      (dexNumber <= NationalDex.Celebi && formeNumber === 0) ||
       (dexNumber === NationalDex.Unown && formeNumber < EXCLAMATION)
     )
   }
@@ -251,6 +265,7 @@ export class G2SAV implements SAV<PK2> {
 
   getGameName() {
     const gameOfOrigin = GameOfOriginData[this.origin]
+
     return gameOfOrigin ? `Pokémon ${gameOfOrigin.name}` : '(Unknown Game)'
   }
 
@@ -258,11 +273,12 @@ export class G2SAV implements SAV<PK2> {
   static saveTypeName = 'Pokémon Gold/Silver/Crystal (INT)'
 
   static fileIsSave(bytes: Uint8Array): boolean {
-    if (bytes.length != SAVE_SIZE_BYTES) {
+    if (bytes.length !== SAVE_SIZE_BYTES) {
       return false
     }
     try {
       const g2Save = new G2SAV(emptyPathData, bytes)
+
       return g2Save.areCrystalInternationalChecksumsValid() || g2Save.areGoldSilverChecksumsValid()
     } catch {
       return false

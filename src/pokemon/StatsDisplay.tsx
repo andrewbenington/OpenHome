@@ -77,6 +77,7 @@ const StatsDisplay = (props: { mon: PKMInterface }) => {
       )
     }
     const items = [createMenuItem('Stats')]
+
     if (mon.ivs) {
       items.push(createMenuItem('IVs'))
     }
@@ -142,8 +143,8 @@ const StatsDisplay = (props: { mon: PKMInterface }) => {
                     return ctx.label.includes('▲')
                       ? '#F58'
                       : ctx.label.includes('▼')
-                      ? '#78F'
-                      : 'black'
+                        ? '#78F'
+                        : 'black'
                   },
                   backdropColor: (ctx: ScriptableScalePointLabelContext) => {
                     if (display !== 'Contest') {
@@ -171,6 +172,7 @@ const StatsDisplay = (props: { mon: PKMInterface }) => {
                       return value
                     }
                     let natureSummary: string
+
                     if (mon.statNature !== mon.nature) {
                       natureSummary = getNatureSummary(mon.statNature)
                     } else {
@@ -193,8 +195,8 @@ const StatsDisplay = (props: { mon: PKMInterface }) => {
               display === 'Contest'
                 ? ['Cool', 'Beauty', 'Cute', 'Smart', 'Tough']
                 : (display === 'EVs' && evType === 'Game Boy') || display === 'DVs'
-                ? ['HP', 'Atk', 'Def', 'Spe', 'Spc']
-                : ['HP', 'Atk', 'Def', 'Spe', 'SpD', 'SpA'],
+                  ? ['HP', 'Atk', 'Def', 'Spe', 'Spc']
+                  : ['HP', 'Atk', 'Def', 'Spe', 'SpD', 'SpA'],
             datasets: [
               display === 'Stats' && !('spc' in stats)
                 ? {
@@ -209,130 +211,130 @@ const StatsDisplay = (props: { mon: PKMInterface }) => {
                     pointHoverBorderColor: 'rgb(132, 99, 255)',
                   }
                 : display === 'IVs' && mon.ivs
-                ? {
-                    label: 'IVs',
-                    data: [
-                      mon.ivs.hp,
-                      mon.ivs.atk,
-                      mon.ivs.def,
-                      mon.ivs.spe,
-                      mon.ivs.spd,
-                      mon.ivs.spa,
-                    ],
-                    fill: true,
-                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                    borderColor: 'rgb(255, 99, 132)',
-                    pointBackgroundColor: 'rgb(255, 99, 132)',
-                    pointBorderColor: '#fff',
-                    pointHoverBackgroundColor: '#fff',
-                    pointHoverBorderColor: 'rgb(255, 99, 132)',
-                  }
-                : display === 'DVs' && mon.dvs
-                ? {
-                    label: 'DVs',
-                    data: [mon.dvs.hp, mon.dvs.atk, mon.dvs.def, mon.dvs.spe, mon.dvs.spc],
-                    fill: true,
-                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                    borderColor: 'rgb(255, 99, 132)',
-                    pointBackgroundColor: 'rgb(255, 99, 132)',
-                    pointBorderColor: '#fff',
-                    pointHoverBackgroundColor: '#fff',
-                    pointHoverBorderColor: 'rgb(255, 99, 132)',
-                  }
-                : display === 'EVs' && evType === 'Modern' && mon.evs
-                ? {
-                    label: 'EVs',
-                    data: [
-                      mon.evs.hp,
-                      mon.evs.atk,
-                      mon.evs.def,
-                      mon.evs.spe,
-                      mon.evs.spd,
-                      mon.evs.spa,
-                    ],
-                    fill: true,
-                    backgroundColor: 'rgba(132, 99, 255, 0.2)',
-                    borderColor: 'rgb(132, 99, 255)',
-                    pointBackgroundColor: 'rgb(132, 99, 255)',
-                    pointBorderColor: '#fff',
-                    pointHoverBackgroundColor: '#fff',
-                    pointHoverBorderColor: 'rgb(132, 99, 255)',
-                  }
-                : display === 'EVs' && evType === 'Game Boy' && mon.evsG12
-                ? {
-                    label: 'EVs',
-                    data: [
-                      mon.evsG12.hp,
-                      mon.evsG12.atk,
-                      mon.evsG12.def,
-                      mon.evsG12.spe,
-                      mon.evsG12.spc,
-                    ],
-                    fill: true,
-                    backgroundColor: 'rgba(132, 99, 255, 0.2)',
-                    borderColor: 'rgb(132, 99, 255)',
-                    pointBackgroundColor: 'rgb(132, 99, 255)',
-                    pointBorderColor: '#fff',
-                    pointHoverBackgroundColor: '#fff',
-                    pointHoverBorderColor: 'rgb(132, 99, 255)',
-                  }
-                : display === 'AVs' && mon.avs
-                ? {
-                    label: 'AVs',
-                    data: [
-                      mon.avs.hp,
-                      mon.avs.atk,
-                      mon.avs.def,
-                      mon.avs.spe,
-                      mon.avs.spd,
-                      mon.avs.spa,
-                    ],
-                    fill: true,
-                    backgroundColor: 'rgba(132, 99, 255, 0.2)',
-                    borderColor: 'rgb(132, 99, 255)',
-                    pointBackgroundColor: 'rgb(132, 99, 255)',
-                    pointBorderColor: '#fff',
-                    pointHoverBackgroundColor: '#fff',
-                    pointHoverBorderColor: 'rgb(132, 99, 255)',
-                  }
-                : display === 'GVs' && mon.gvs
-                ? {
-                    label: 'GVs',
-                    data: [
-                      mon.gvs.hp,
-                      mon.gvs.atk,
-                      mon.gvs.def,
-                      mon.gvs.spe,
-                      mon.gvs.spd,
-                      mon.gvs.spa,
-                    ],
-                    fill: true,
-                    backgroundColor: 'rgba(132, 99, 255, 0.2)',
-                    borderColor: 'rgb(132, 99, 255)',
-                    pointBackgroundColor: 'rgb(132, 99, 255)',
-                    pointBorderColor: '#fff',
-                    pointHoverBackgroundColor: '#fff',
-                    pointHoverBorderColor: 'rgb(132, 99, 255)',
-                  }
-                : {
-                    label: 'Contest',
-                    data: mon.contest
-                      ? [
-                          mon.contest.cool,
-                          mon.contest.beauty,
-                          mon.contest.cute,
-                          mon.contest.smart,
-                          mon.contest.tough,
-                        ]
-                      : [],
-                    fill: true,
-                    backgroundColor: 'rgba(132, 99, 255, 0.2)',
-                    borderColor: 'rgb(132, 99, 255)',
-                    pointBackgroundColor: 'rgb(132, 99, 255)',
-                    pointBorderColor: '#fff',
-                    pointHoverBackgroundColor: '#fff',
-                    pointHoverBorderColor: 'rgb(132, 99, 255)',
-                  },
+                  ? {
+                      label: 'IVs',
+                      data: [
+                        mon.ivs.hp,
+                        mon.ivs.atk,
+                        mon.ivs.def,
+                        mon.ivs.spe,
+                        mon.ivs.spd,
+                        mon.ivs.spa,
+                      ],
+                      fill: true,
+                      backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                      borderColor: 'rgb(255, 99, 132)',
+                      pointBackgroundColor: 'rgb(255, 99, 132)',
+                      pointBorderColor: '#fff',
+                      pointHoverBackgroundColor: '#fff',
+                      pointHoverBorderColor: 'rgb(255, 99, 132)',
+                    }
+                  : display === 'DVs' && mon.dvs
+                    ? {
+                        label: 'DVs',
+                        data: [mon.dvs.hp, mon.dvs.atk, mon.dvs.def, mon.dvs.spe, mon.dvs.spc],
+                        fill: true,
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        borderColor: 'rgb(255, 99, 132)',
+                        pointBackgroundColor: 'rgb(255, 99, 132)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgb(255, 99, 132)',
+                      }
+                    : display === 'EVs' && evType === 'Modern' && mon.evs
+                      ? {
+                          label: 'EVs',
+                          data: [
+                            mon.evs.hp,
+                            mon.evs.atk,
+                            mon.evs.def,
+                            mon.evs.spe,
+                            mon.evs.spd,
+                            mon.evs.spa,
+                          ],
+                          fill: true,
+                          backgroundColor: 'rgba(132, 99, 255, 0.2)',
+                          borderColor: 'rgb(132, 99, 255)',
+                          pointBackgroundColor: 'rgb(132, 99, 255)',
+                          pointBorderColor: '#fff',
+                          pointHoverBackgroundColor: '#fff',
+                          pointHoverBorderColor: 'rgb(132, 99, 255)',
+                        }
+                      : display === 'EVs' && evType === 'Game Boy' && mon.evsG12
+                        ? {
+                            label: 'EVs',
+                            data: [
+                              mon.evsG12.hp,
+                              mon.evsG12.atk,
+                              mon.evsG12.def,
+                              mon.evsG12.spe,
+                              mon.evsG12.spc,
+                            ],
+                            fill: true,
+                            backgroundColor: 'rgba(132, 99, 255, 0.2)',
+                            borderColor: 'rgb(132, 99, 255)',
+                            pointBackgroundColor: 'rgb(132, 99, 255)',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: 'rgb(132, 99, 255)',
+                          }
+                        : display === 'AVs' && mon.avs
+                          ? {
+                              label: 'AVs',
+                              data: [
+                                mon.avs.hp,
+                                mon.avs.atk,
+                                mon.avs.def,
+                                mon.avs.spe,
+                                mon.avs.spd,
+                                mon.avs.spa,
+                              ],
+                              fill: true,
+                              backgroundColor: 'rgba(132, 99, 255, 0.2)',
+                              borderColor: 'rgb(132, 99, 255)',
+                              pointBackgroundColor: 'rgb(132, 99, 255)',
+                              pointBorderColor: '#fff',
+                              pointHoverBackgroundColor: '#fff',
+                              pointHoverBorderColor: 'rgb(132, 99, 255)',
+                            }
+                          : display === 'GVs' && mon.gvs
+                            ? {
+                                label: 'GVs',
+                                data: [
+                                  mon.gvs.hp,
+                                  mon.gvs.atk,
+                                  mon.gvs.def,
+                                  mon.gvs.spe,
+                                  mon.gvs.spd,
+                                  mon.gvs.spa,
+                                ],
+                                fill: true,
+                                backgroundColor: 'rgba(132, 99, 255, 0.2)',
+                                borderColor: 'rgb(132, 99, 255)',
+                                pointBackgroundColor: 'rgb(132, 99, 255)',
+                                pointBorderColor: '#fff',
+                                pointHoverBackgroundColor: '#fff',
+                                pointHoverBorderColor: 'rgb(132, 99, 255)',
+                              }
+                            : {
+                                label: 'Contest',
+                                data: mon.contest
+                                  ? [
+                                      mon.contest.cool,
+                                      mon.contest.beauty,
+                                      mon.contest.cute,
+                                      mon.contest.smart,
+                                      mon.contest.tough,
+                                    ]
+                                  : [],
+                                fill: true,
+                                backgroundColor: 'rgba(132, 99, 255, 0.2)',
+                                borderColor: 'rgb(132, 99, 255)',
+                                pointBackgroundColor: 'rgb(132, 99, 255)',
+                                pointBorderColor: '#fff',
+                                pointHoverBackgroundColor: '#fff',
+                                pointHoverBorderColor: 'rgb(132, 99, 255)',
+                              },
             ],
           }}
         />

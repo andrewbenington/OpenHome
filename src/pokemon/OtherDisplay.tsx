@@ -74,6 +74,7 @@ const styles = {
 
 const OtherDisplay = (props: { mon: PKMInterface }) => {
   const { mon } = props
+
   return (
     <div style={{ overflow: 'hidden', height: '100%' }}>
       <div
@@ -484,6 +485,7 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
     </div>
   )
 }
+
 export default OtherDisplay
 
 type PKMInterfaceTera = PKMInterface & {
@@ -524,6 +526,7 @@ function TeraTypeData(props: { mon: PKMInterfaceTera }) {
 
 function HiddenPowerDisplay(props: { mon: AllPKMFields }) {
   const { mon } = props
+
   if (mon.ivs) {
     return (
       <AttributeRow label="Hidden Power">

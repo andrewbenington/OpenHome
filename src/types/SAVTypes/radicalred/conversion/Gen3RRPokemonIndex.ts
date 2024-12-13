@@ -1385,6 +1385,7 @@ import {
 
 export function fromGen3RRPokemonIndex(radicalRedIndex: number): RadicalRedToNationalDexEntry {
   const entry = RadicalRedToNationalDexMap[String(radicalRedIndex)]
+
   if (entry) {
     return {
       NationalDexIndex: entry.NationalDexIndex,
@@ -1398,6 +1399,7 @@ export function fromGen3RRPokemonIndex(radicalRedIndex: number): RadicalRedToNat
 export function toGen3RRPokemonIndex(nationalDexNumber: number, formIndex: number): number {
   const key = `${nationalDexNumber}_${formIndex}`
   const radicalRedIndex = globalThis.Number(NationalDexToRadicalRedMap[key])
+
   if (radicalRedIndex !== undefined) {
     return radicalRedIndex
   } else {

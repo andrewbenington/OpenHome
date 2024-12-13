@@ -10,6 +10,7 @@ export type SaveViewMode = 'cards' | 'grid'
 export function getMonSaveLogo(mon: PKMInterface, supportedSaves: SAVClass[]) {
   if (mon.pluginOrigin) {
     const pluginSave = supportedSaves.find((s) => getPluginIdentifier(s) === mon.pluginOrigin)
+
     return `logos/${getPluginIdentifier(pluginSave)}.png`
   }
   if (!mon.gameOfOrigin) {

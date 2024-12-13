@@ -13,7 +13,7 @@ export default function Settings() {
         </div>
         <div>
           {appInfoState.settings.extraSaveTypes.map((saveType) => (
-            <label style={{ display: 'flex', flexDirection: 'row' }}>
+            <label style={{ display: 'flex', flexDirection: 'row' }} key={saveType.saveTypeName}>
               <input
                 type="checkbox"
                 onChange={(e) =>

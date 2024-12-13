@@ -1012,11 +1012,13 @@ import { RRToNationalMap } from './RRToNationalMap'
 export function fromGen3RRMoveIndex(rrIndex: number): number {
   if (rrIndex === 0) return 0
   const key = Gen3RRMoves[rrIndex]
+
   return key ? RRToNationalMap[key] : -1
 }
 
 export function toGen3RRMoveIndex(nationalMoveId: number): number {
   if (nationalMoveId === 0) return 0
   const key = Moves[nationalMoveId]?.name
+
   return key ? NationalToRRMap[key][0] : -1
 }

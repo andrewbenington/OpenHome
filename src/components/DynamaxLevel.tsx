@@ -13,11 +13,13 @@ const dynamaxLevelStyle = {
 
 function dynamaxLevelColor(index: number): string {
   const greenHex = (40 + index * 20)?.toString(16).padStart(2, '0')
+
   return `#FF${greenHex}00`
 }
 
 const DynamaxLevel = (props: DynamaxLevelProps) => {
   const { level } = props
+
   return (
     <div style={dynamaxRowStyle}>
       {lodash.range(10).map((index: number) => (

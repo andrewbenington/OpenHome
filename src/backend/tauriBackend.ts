@@ -29,6 +29,7 @@ export const TauriBackend: BackendInterface = {
   // /* OHPKM management */
   loadHomeMonLookup: async function (): Promise<Errorable<Record<string, OHPKM>>> {
     const bytesByFilename = await TauriInvoker.getOHPKMFiles()
+
     if (E.isLeft(bytesByFilename)) return bytesByFilename
     return E.right(
       Object.fromEntries(
@@ -44,6 +45,7 @@ export const TauriBackend: BackendInterface = {
     const deletionResults = await TauriInvoker.deleteStorageFiles(
       identifiers.map((identifier) => `mons/${identifier}.ohpkm`)
     )
+
     if (E.isLeft(deletionResults)) {
       return deletionResults
     }
@@ -51,6 +53,7 @@ export const TauriBackend: BackendInterface = {
     const errors = Object.entries(deletionResults.right).filter(([, fileResult]) =>
       E.isLeft(fileResult)
     ) as [string, E.Left<string>][]
+
     for (const [file, error] of errors) {
       console.error(`Could not delete ${file}: ${error.left}`)
     }
@@ -60,6 +63,7 @@ export const TauriBackend: BackendInterface = {
 
   writeHomeMon: async (identifier: string, bytes: Uint8Array): Promise<Errorable<null>> => {
     const relativePath = await path.join('mons', `${identifier}.ohpkm`)
+
     return TauriInvoker.writeStorageFileBytes(relativePath, bytes)
   },
 
@@ -74,10 +78,12 @@ export const TauriBackend: BackendInterface = {
   /* game saves */
   loadSaveFile: async (pathData: PathData): Promise<Errorable<LoadSaveResponse>> => {
     const bytesResult = await TauriInvoker.getFileBytes(pathData.raw)
+
     if (E.isLeft(bytesResult)) {
       return bytesResult
     }
     const createdUnixResult = await TauriInvoker.getFileCreated(pathData.raw)
+
     if (E.isLeft(createdUnixResult)) {
       return createdUnixResult
     }
@@ -101,11 +107,13 @@ export const TauriBackend: BackendInterface = {
     const recentSavesResult = await (TauriInvoker.getStorageFileJSON(
       'recent_saves.json'
     ) as Promise<Errorable<Record<string, SaveRef>>>)
+
     if (E.isLeft(recentSavesResult)) {
       return recentSavesResult
     }
 
     const recentSaves = recentSavesResult.right
+
     recentSaves[saveRef.filePath.raw] = saveRef
     return TauriInvoker.writeStorageFileJSON('recent_saves.json', recentSaves as JSONObject)
   },
@@ -113,11 +121,13 @@ export const TauriBackend: BackendInterface = {
     const recentSavesResult = await (TauriInvoker.getStorageFileJSON(
       'recent_saves.json'
     ) as Promise<Errorable<Record<string, SaveRef>>>)
+
     if (E.isLeft(recentSavesResult)) {
       return recentSavesResult
     }
 
     const recentSaves = recentSavesResult.right
+
     delete recentSaves[filePath]
     return TauriInvoker.writeStorageFileJSON('recent_saves.json', recentSaves as JSONObject)
   },
@@ -125,6 +135,7 @@ export const TauriBackend: BackendInterface = {
     const saveFolders = (await TauriInvoker.getStorageFileJSON('save-folders.json')) as Errorable<
       SaveFolder[]
     >
+
     if (E.isLeft(saveFolders)) {
       return saveFolders
     }
@@ -143,6 +154,7 @@ export const TauriBackend: BackendInterface = {
     }
 
     const saveFolders = saveFoldersResult.right.filter((folder) => folder.path !== pathToRemove)
+
     return TauriInvoker.writeStorageFileJSON('save-folders.json', saveFolders)
   },
   upsertSaveFolder: async (folderPath: string, label: string): Promise<Errorable<null>> => {
@@ -155,6 +167,7 @@ export const TauriBackend: BackendInterface = {
     }
 
     const saveFolders = saveFoldersResult.right.filter((folder) => folder.path !== folderPath)
+
     saveFolders.push({ label, path: folderPath })
     return TauriInvoker.writeStorageFileJSON('save-folders.json', saveFolders)
   },
@@ -173,10 +186,12 @@ export const TauriBackend: BackendInterface = {
   /* application */
   pickFile: async (): Promise<Errorable<string | undefined>> => {
     const path = await fileDialog({ directory: false, title: 'Select File' })
+
     return E.right(path ?? undefined)
   },
   pickFolder: async (): Promise<Errorable<string | undefined>> => {
     const path = await fileDialog({ directory: true, title: 'Select Folder' })
+
     return E.right(path ?? undefined)
   },
   getResourcesPath: () => {

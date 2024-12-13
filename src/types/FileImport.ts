@@ -82,6 +82,7 @@ export function fileTypeFromString(type: string): PKMClass | typeof OHPKM | unde
 
 export const bytesToPKM = (bytes: Uint8Array, extension: string): PKMInterface => {
   let T: PKMClass | typeof OHPKM | undefined
+
   if (extension === '' || extension === 'PKM') {
     T = fileTypeFromBytes(bytes)
   } else {
@@ -91,5 +92,6 @@ export const bytesToPKM = (bytes: Uint8Array, extension: string): PKMInterface =
     throw `Unrecognized file`
   }
   const buffer = bytes.buffer.slice(bytes.byteOffset, bytes.byteLength + bytes.byteOffset)
+
   return T.fromBytes(buffer as ArrayBuffer)
 }

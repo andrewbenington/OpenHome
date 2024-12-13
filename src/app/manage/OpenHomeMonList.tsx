@@ -73,5 +73,6 @@ export default function OpenHomeMonList() {
       cellClass: 'mono-cell',
     },
   ]
+
   return <OHDataGrid rows={Object.values(homeMons ?? {})} columns={columns} />
 }

@@ -50,9 +50,11 @@ const Home = () => {
   const onViewDrop = (e: React.DragEvent<HTMLDivElement>, type: string) => {
     const processDroppedData = async (file?: File, droppedMon?: PKMInterface) => {
       let mon: PKMInterface | undefined = droppedMon
+
       if (file) {
         const buffer = await file.arrayBuffer()
         const [extension] = file.name.split('.').slice(-1)
+
         try {
           mon = bytesToPKMInterface(buffer, extension.toUpperCase())
         } catch (e) {
@@ -68,6 +70,7 @@ const Home = () => {
     }
     const file = e.dataTransfer.files[0]
     const mon = mouseState.dragSource?.mon
+
     if (!file && mouseState.dragSource) {
       if (mon && type === 'release') {
         openSavesDispatch({
@@ -77,6 +80,7 @@ const Home = () => {
         mouseDispatch({ type: 'set_drag_source', payload: undefined })
         if (mon instanceof OHPKM) {
           const identifier = getMonFileIdentifier(mon)
+
           if (identifier) {
             setFilesToDelete([...filesToDelete, identifier])
           }
@@ -100,6 +104,7 @@ const Home = () => {
       backend.loadGen12Lookup(),
       backend.loadGen345Lookup(),
     ])
+
     if (E.isLeft(homeResult)) {
       onLoadError(homeResult.left)
       return E.left(homeResult.left)
@@ -138,6 +143,7 @@ const Home = () => {
     if (!openSavesState.homeData || !lookupState.loaded) return
 
     const result = await backend.startTransaction()
+
     if (E.isLeft(result)) {
       setErrorMessages([result.left])
       return
@@ -147,11 +153,13 @@ const Home = () => {
     const saveTypesAndChangedMons = allOpenSaves.map(
       (save) => [save.origin, save.prepareBoxesAndGetModified()] as [GameOfOrigin, OHPKM[]]
     )
+
     for (const [saveOrigin, changedMons] of saveTypesAndChangedMons) {
       if (isGameBoy(saveOrigin)) {
         changedMons.forEach((mon) => {
           const openHomeIdentifier = getMonFileIdentifier(mon)
           const gen12Identifier = getMonGen12Identifier(mon)
+
           if (openHomeIdentifier !== undefined && gen12Identifier) {
             gen12[gen12Identifier] = openHomeIdentifier
           }
@@ -160,6 +168,7 @@ const Home = () => {
         changedMons.forEach((mon) => {
           const openHomeIdentifier = getMonFileIdentifier(mon)
           const gen345Identifier = getMonGen345Identifier(mon)
+
           if (openHomeIdentifier !== undefined && gen345Identifier) {
             gen345[gen345Identifier] = openHomeIdentifier
           }
@@ -181,6 +190,7 @@ const Home = () => {
     setFilesToDelete([])
     const results = flatten(await Promise.all(promises))
     const errors = results.filter(E.isLeft).map((err) => err.left)
+
     if (errors.length) {
       setErrorMessages(errors)
       backend.rollbackTransaction()
@@ -206,6 +216,7 @@ const Home = () => {
     loadAllHomeData,
     loadAllLookups,
     lookupDispatch,
+    lookupState,
     openSavesDispatch,
     openSavesState.homeData,
     openSavesState.modifiedOHPKMs,
@@ -296,7 +307,7 @@ const Home = () => {
           alignItems="center"
         >
           <HomeBoxDisplay setSelectedMon={setSelectedMon} />
-          <Box flex={1}></Box>
+          <Box flex={1} />
         </Box>
       </div>
       <Stack spacing={1} className="right-column" width={300}>
@@ -374,8 +385,8 @@ const Home = () => {
           <DialogTitle>Error(s) saving</DialogTitle>
           <Divider />
           <DialogContent>
-            {errorMessages?.map((msg) => (
-              <Alert color="danger" variant="solid">
+            {errorMessages?.map((msg, i) => (
+              <Alert color="danger" variant="solid" key={`alert_${i}`}>
                 {msg}
               </Alert>
             ))}

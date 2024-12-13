@@ -12,6 +12,7 @@ function rustResultToEither<T, E>(result: RustResult<T, E>): E.Either<E, T> {
 export const TauriInvoker = {
   getState() {
     const promise = invoke('get_state') as Promise<AppState>
+
     return promise.then(E.right).catch(E.left)
   },
 
@@ -19,6 +20,7 @@ export const TauriInvoker = {
     const promise: Promise<number[]> = invoke('get_file_bytes', {
       absolutePath,
     })
+
     return promise.then((u8s) => E.right(new Uint8Array(u8s))).catch(E.left)
   },
 
@@ -26,6 +28,7 @@ export const TauriInvoker = {
     const promise: Promise<number> = invoke('get_file_created', {
       absolutePath,
     })
+
     return promise.then((unixMillis) => E.right(new Date(unixMillis))).catch(E.left)
   },
 
@@ -33,6 +36,7 @@ export const TauriInvoker = {
     const promise: Promise<JSONObject | JSONArray> = invoke('get_storage_file_json', {
       relativePath,
     })
+
     return promise.then(E.right).catch(E.left)
   },
 
@@ -41,6 +45,7 @@ export const TauriInvoker = {
       relativePath,
       data,
     })
+
     return promise.then(E.right).catch(E.left)
   },
 
@@ -49,6 +54,7 @@ export const TauriInvoker = {
       absolutePath,
       bytes,
     })
+
     return promise.then(E.right).catch(E.left)
   },
 
@@ -57,11 +63,13 @@ export const TauriInvoker = {
       relativePath,
       bytes,
     })
+
     return promise.then(E.right).catch(E.left)
   },
 
   async getOHPKMFiles(): Promise<Errorable<Record<string, Uint8Array>>> {
     const promise: Promise<Record<string, number[]>> = invoke('get_ohpkm_files')
+
     return promise
       .then((result) => {
         return E.right(
@@ -80,6 +88,7 @@ export const TauriInvoker = {
       'delete_storage_files',
       { relativePaths }
     )
+
     return promise
       .then((result) => {
         return E.right(
@@ -93,21 +102,25 @@ export const TauriInvoker = {
 
   startTransaction(): Promise<Errorable<null>> {
     const promise: Promise<null> = invoke('start_transaction')
+
     return promise.then(E.right).catch(E.left)
   },
 
   rollbackTransaction(): Promise<Errorable<null>> {
     const promise: Promise<null> = invoke('rollback_transaction')
+
     return promise.then(E.right).catch(E.left)
   },
 
   commitTransaction(): Promise<Errorable<null>> {
     const promise: Promise<null> = invoke('commit_transaction')
+
     return promise.then(E.right).catch(E.left)
   },
 
   findSuggestedSaves(saveFolders: string[]): Promise<Errorable<PossibleSaves>> {
     const promise: Promise<PossibleSaves> = invoke('find_suggested_saves', { saveFolders })
+
     return promise.then(E.right).catch(E.left)
   },
 }

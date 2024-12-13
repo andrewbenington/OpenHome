@@ -43,6 +43,7 @@ export type LookupAction =
 
 const reducer: Reducer<LookupState, LookupAction> = (state: LookupState, action: LookupAction) => {
   const { type, payload } = action
+
   switch (type) {
     case 'set_error': {
       return {
@@ -52,6 +53,7 @@ const reducer: Reducer<LookupState, LookupAction> = (state: LookupState, action:
     }
     case 'load_gen12': {
       const newState: LookupState = { ...state, gen12: payload }
+
       if (newState.gen345 && newState.homeMons && newState.gen12) {
         newState.loaded = true
       }
@@ -59,6 +61,7 @@ const reducer: Reducer<LookupState, LookupAction> = (state: LookupState, action:
     }
     case 'load_gen345': {
       const newState: LookupState = { ...state, gen345: payload }
+
       if (newState.gen345 && newState.homeMons && newState.gen12) {
         newState.loaded = true
       }
@@ -67,6 +70,7 @@ const reducer: Reducer<LookupState, LookupAction> = (state: LookupState, action:
     case 'load_home_mons': {
       const homeMons: Record<string, OHPKM> = payload
       const newState: LookupState = { ...state, homeMons }
+
       if (newState.gen345 && newState.homeMons && newState.gen12) {
         newState.loaded = true
       }

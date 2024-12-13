@@ -103,12 +103,14 @@ const updateMonInSave = (
   let replacedMon
   const { save, box, boxPos } = dest
   const saveID = saveToStringIdentifier(save)
+
   if (save instanceof HomeData && state.homeData && (mon === undefined || mon instanceof OHPKM)) {
     replacedMon = state.homeData.boxes[box].pokemon[boxPos]
     state.homeData.boxes[box].pokemon[boxPos] = mon as OHPKM
     state.homeData.updatedBoxSlots.push({ box, index: boxPos })
   } else if (saveID in state.openSaves) {
     const tempSaves = { ...state.openSaves }
+
     replacedMon = tempSaves[saveID].save.boxes[box].pokemon[boxPos]
     tempSaves[saveID].save.boxes[box].pokemon[boxPos] = mon
     tempSaves[saveID].save.updatedBoxSlots.push({ box, index: boxPos })
@@ -122,10 +124,12 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
   action: OpenSavesAction
 ) => {
   const { type, payload } = action
+
   switch (type) {
     case 'set_home_boxes': {
       const { boxes, homeLookup } = payload
       const newHomeData = state.homeData ?? new HomeData()
+
       Object.values(boxes).forEach((box) => {
         newHomeData.boxes[box.index].loadMonsFromIdentifiers(box.monIdentifiersByIndex, homeLookup)
       })
@@ -134,6 +138,7 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
     }
     case 'add_save': {
       const saveIdentifier = saveToStringIdentifier(payload)
+
       return {
         ...state,
         openSaves: {
@@ -163,6 +168,7 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
     case 'set_save_box': {
       const { save } = payload
       const identifier = saveToStringIdentifier(payload.save)
+
       save.currentPCBox = payload.boxNum
       const newState: OpenSavesState = {
         ...state,
@@ -174,6 +180,7 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
           },
         },
       }
+
       return newState
     }
     case 'move_mon': {
@@ -194,6 +201,7 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
             sourceMon = new OHPKM(sourceMon)
           }
           const identifier = getMonFileIdentifier(sourceMon)
+
           if (identifier) {
             state.modifiedOHPKMs[identifier] = sourceMon as OHPKM
           }
@@ -203,6 +211,7 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
             destMon = new OHPKM(destMon)
           }
           const identifier = getMonFileIdentifier(destMon)
+
           if (identifier) {
             state.modifiedOHPKMs[identifier] = destMon as OHPKM
           }
@@ -227,6 +236,7 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
 
       mons.forEach((mon) => {
         const homeMon = mon instanceof OHPKM ? mon : new OHPKM(mon)
+
         while (
           tempSave.boxes[dest.box].pokemon[nextIndex] &&
           nextIndex < tempSave.boxRows * tempSave.boxColumns
@@ -253,8 +263,10 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
     }
     case 'add_mon_to_release': {
       const replacedMon = updateMonInSave(state, undefined, action.payload)
+
       if (replacedMon && replacedMon instanceof OHPKM) {
         const identifier = getMonFileIdentifier(replacedMon)
+
         if (identifier) {
           delete state.modifiedOHPKMs[identifier]
         }

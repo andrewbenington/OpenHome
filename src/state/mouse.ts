@@ -39,12 +39,14 @@ export const mouseReducer: Reducer<MouseState, MouseAction> = (
   action: MouseAction
 ) => {
   const { type, payload } = action
+
   switch (type) {
     case 'set_shift': {
       const newState = {
         ...state,
         shift: payload,
       }
+
       return newState
     }
     case 'set_box_cell': {
@@ -52,6 +54,7 @@ export const mouseReducer: Reducer<MouseState, MouseAction> = (
         ...state,
         boxCell: payload,
       }
+
       return newState
     }
     case 'set_save_index': {
@@ -59,6 +62,7 @@ export const mouseReducer: Reducer<MouseState, MouseAction> = (
         ...state,
         boxCell: payload,
       }
+
       return newState
     }
     case 'set_drag_source': {

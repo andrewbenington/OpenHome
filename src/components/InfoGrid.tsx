@@ -2,6 +2,7 @@ import { Card, Divider, Grid, Stack } from '@mui/joy'
 import { isDayjs } from 'dayjs'
 import { PKM } from 'pokemon-files'
 import { ReactNode, useMemo } from 'react'
+
 type Breakpoint = 'xs' | 'sm' | 'md' | 'lg' | 'xl'
 
 const primitiveTypes = ['number', 'bigint', 'boolean', 'string', 'undefined', 'null']

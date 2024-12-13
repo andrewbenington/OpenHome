@@ -12,7 +12,7 @@ import { CapPikachus, isRestricted, TransferRestrictions } from '../../TransferR
 import { OHPKM } from '../../pkm/OHPKM'
 import { FRLG_SECURITY_COPY_OFFSET, FRLG_SECURITY_OFFSET } from '../G3SAV'
 import { Box, BoxCoordinates, PluginSAV } from '../SAV'
-import { PathData, splitPath } from '../path'
+import { PathData } from '../path'
 import { LOOKUP_TYPE } from '../util'
 import PK3RR from './PK3RR'
 import { RRTransferMon } from './conversion/RRTransferMons'
@@ -47,11 +47,13 @@ export class G3RRSector {
 
   writeToBuffer(bytes: Uint8Array, thisIndex: number, firstIndex: number) {
     const oldChecksum = this.checksum
+
     this.refreshChecksum()
     if (oldChecksum !== this.checksum) {
       console.info('checksum changed for', thisIndex)
     }
     const index = (thisIndex + 14 - firstIndex) % 14
+
     bytes.set(this.data, index * 0x1000)
     bytes.set(uint16ToBytesLittleEndian(this.sectionID), index * 0x1000 + 0xff4)
     bytes.set(uint16ToBytesLittleEndian(this.checksum), index * 0x1000 + 0xff6)
@@ -62,6 +64,7 @@ export class G3RRSector {
   refreshChecksum() {
     let checksum = 0
     let byteLength = 0xff0
+
     if (this.sectionID === 0) {
       byteLength = 3884
     } else if (this.sectionID === 13) {
@@ -119,6 +122,7 @@ export class G3RRSaveBackup {
     this.sectors.slice(5, 5 + fullSectionsUsed + 1).forEach((sector, i) => {
       const startOffset = i * 4080
       const length = i < fullSectionsUsed ? 4080 : leftoverBytes + 4
+
       this.pcDataContiguous.set(sector.data.slice(0, length), startOffset)
     })
 
@@ -131,10 +135,12 @@ export class G3RRSaveBackup {
     for (let i = 0; i < nMons; i++) {
       try {
         const mon = new PK3RR(this.pcDataContiguous.slice(4 + i * 58, 4 + (i + 1) * 58).buffer)
+
         if (mon.dexNum !== 0 && mon.trainerID !== 0) {
           const box = this.boxes[Math.floor(i / 30)]
+
           box.pokemon[i % 30] = mon
-          if (mon.trainerID == this.tid) {
+          if (mon.trainerID === this.tid) {
             mon.gameOfOrigin = GameOfOrigin.FireRed
           }
         }
@@ -229,9 +235,7 @@ export class G3RRSAV implements PluginSAV<PK3RR> {
         }
       })
     })
-    const filePathElements = splitPath(this.filePath)
-    let fileName = filePathElements[filePathElements.length - 1]
-    fileName = fileName.replace(/\s+/g, '')
+
     this.origin = GameOfOrigin.FireRed
   }
   getExtraData?: (() => object) | undefined
@@ -242,6 +246,7 @@ export class G3RRSAV implements PluginSAV<PK3RR> {
 
   prepareBoxesAndGetModified() {
     const changedMonPKMs: OHPKM[] = []
+
     this.updatedBoxSlots.forEach(({ box, index }) => {
       const monOffset = 30 * box + index
       const pcBytes = new Uint8Array(58) // Per pokemon bytes
@@ -257,6 +262,7 @@ export class G3RRSAV implements PluginSAV<PK3RR> {
       // changedMon will be undefined if pokemon was moved from this slot
       //  and the slot was left empty
       const slotMon = this.boxes[box].pokemon[index]
+
       if (changedMon && slotMon) {
         try {
           // If mon is a OHPKM then convert to PK3RR
@@ -282,6 +288,7 @@ export class G3RRSAV implements PluginSAV<PK3RR> {
         // 4080 ahead of that, or 0x450 ahead of that if box 13 zero indexed
         i * 0xff0 + (i + 5 === 13 ? 3964 : 0xff0)
       )
+
       sector.data.set(pcData)
 
       sector.writeToBuffer(this.primarySave.bytes, i + 5, this.primarySave.firstSectorIndex)
@@ -322,6 +329,7 @@ export class G3RRSAV implements PluginSAV<PK3RR> {
     const firstSectionBytes = bytes.slice(firstSectionBytesIndex, firstSectionBytesIndex + 0x1000)
 
     const gameCode = firstSectionBytes[0xac]
+
     if (gameCode !== 1) return false
 
     const securityKey = bytesToUint32LittleEndian(firstSectionBytes, FRLG_SECURITY_OFFSET)
@@ -381,6 +389,7 @@ export function isG3(
     const offset = i * SECTION_SIZE
     const sectionData = data.slice(offset, offset + SECTION_DATA_SIZE)
     const sectionID = data[offset + 0xff4] | (data[offset + 0xff5] << 8)
+
     return { sectionID, data: sectionData }
   })
     .sort((a, b) => a.sectionID - b.sectionID)
@@ -393,6 +402,7 @@ export function isG3(
   const section5 = sections[5]
   const pokemonTIDs = Array.from({ length: NUM_POKEMON - 1 }, (_, i) => {
     const pokemonOffset = MON_START_OFFSET + (i + 1) * MON_ENTRY_SIZE
+
     return section5[pokemonOffset + 0x0c] | (section5[pokemonOffset + 0x0d] << 8)
   })
 

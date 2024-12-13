@@ -9,6 +9,7 @@ interface OpenHomeButtonProps {
 
 const OpenHomeButton = (props: OpenHomeButtonProps) => {
   const { onClick, style, children, disabled } = props
+
   return (
     <button
       style={{

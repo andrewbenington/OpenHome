@@ -32,12 +32,14 @@ function getSortFunction(
           'metDate' in b.mon && b.mon.metDate
             ? dayjs(new Date(b.mon.metDate.year, b.mon.metDate.month, b.mon.metDate.day)).unix()
             : 0
+
         return bDate - aDate
       }
     case 'ribbons':
       return (a, b) => {
         const aCount = a.mon.ribbons ? a.mon.ribbons.length : 0
         const bCount = b.mon.ribbons ? b.mon.ribbons.length : 0
+
         return bCount - aCount
       }
     default:
@@ -69,7 +71,7 @@ export default function SortPokemon() {
       .filter(filterUndefined)
 
     return all
-  }, [openSaves, homeData?.boxes])
+  }, [openSaves, homeData])
 
   if (!homeMons) return <div />
   return (

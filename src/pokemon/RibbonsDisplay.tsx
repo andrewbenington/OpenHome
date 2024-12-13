@@ -50,6 +50,7 @@ const RibbonsDisplay = (props: { mon: PKMInterface }) => {
     }
     if (ribbon.includes(' (')) {
       const [contestRibbon, region] = ribbon.split(' (')
+
       return `${contestRibbon} Ribbon (${region}`
     }
     if (ribbon === 'Contest Memory') {
@@ -75,6 +76,7 @@ const RibbonsDisplay = (props: { mon: PKMInterface }) => {
     <div style={styles.container}>
       {mon.ribbons?.map((ribbon) => {
         const ribbonDisplay = formatRibbon(ribbon)
+
         return (
           <Tooltip key={`ribbon_${ribbon}`} title={ribbonDisplay}>
             <img

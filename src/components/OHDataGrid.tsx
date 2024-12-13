@@ -7,9 +7,11 @@ function sortRows<T>(rows: readonly T[], columns: SortableColumn<T>[], sortColum
   if (sortColumns.length === 0) return rows
   const sortColumn = sortColumns[0]
   const colComparer = columns.find((col) => col.key === sortColumn.columnKey)?.sortFunction
+
   if (!colComparer) return rows
   const comparer =
     sortColumn.direction === 'ASC' ? colComparer : (a: T, b: T) => colComparer(a, b) * -1
+
   return comparer ? [...rows].sort(comparer) : rows
 }
 
@@ -27,6 +29,7 @@ export type OHDataGridProps<R> = {
 
 function sortableColumnToDGColumn<T>(col: SortableColumn<T>): Column<T> {
   const { renderValue } = col
+
   return {
     ...col,
     resizable: true,

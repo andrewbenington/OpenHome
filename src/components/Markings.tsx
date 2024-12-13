@@ -30,6 +30,7 @@ const getMarkingColor = (value: boolean | MarkingColorValue) => {
 
 const MarkingsDisplay = (props: MarkingsProps) => {
   const { markings } = props
+
   if (!('length' in markings)) {
     return (
       <div style={markingsContainerStyle}>

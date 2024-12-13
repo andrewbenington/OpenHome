@@ -77,6 +77,7 @@ export default function Gen345Lookup() {
       cellClass: 'mono-cell',
     },
   ]
+
   return (
     <OHDataGrid
       rows={Object.entries(gen345 ?? {}).map(([gen345ID, homeID]) => ({

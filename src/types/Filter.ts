@@ -66,6 +66,7 @@ export function filterApplies(filter: Filter, mon: PKMInterface) {
   }
 
   const forme = PokemonData[`${mon.dexNum}`].formes[mon.formeNum]
+
   if (filter.type1 !== undefined && !forme.types.includes(filter.type1)) {
     return false
   }

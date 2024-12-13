@@ -30,6 +30,7 @@ export default function PokemonIcon(props: PokemonIconProps) {
       return '0% 0%'
     }
     const [x, y] = PokemonData[mon.dexNum].formes[mon.formeNum].spriteIndex
+
     return `${(x / 35) * 100}% ${(y / 36) * 100}%`
   }
 

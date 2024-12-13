@@ -4,23 +4,22 @@ import { PokemonData } from 'pokemon-species-data'
 import { OHPKM } from '../../pkm/OHPKM'
 import { PathData } from '../path'
 import { G3RRSAV } from '../radicalred/G3RRSAV'
-import PK3RR from '../radicalred/PK3RR'
 
-function display_mon(mon: PK3RR | OHPKM) {
-  console.log('Boxmon:', {
-    nickname: mon.nickname,
-    // level: firstPokemon.level,
-    trainerName: mon.trainerName,
-    // trainerID: firstPokemon.trainerID,
-    heldItemIndex: mon.heldItemIndex,
-    languageIndex: mon.languageIndex,
-    dexNum: mon.dexNum,
-    formeNum: mon.formeNum,
-    moves: mon.moves,
-    gameOfOrigin: mon.gameOfOrigin,
-    species: PokemonData[mon.dexNum].name,
-  })
-}
+// function display_mon(mon: PK3RR | OHPKM) {
+//   console.log('Boxmon:', {
+//     nickname: mon.nickname,
+//     // level: firstPokemon.level,
+//     trainerName: mon.trainerName,
+//     // trainerID: firstPokemon.trainerID,
+//     heldItemIndex: mon.heldItemIndex,
+//     languageIndex: mon.languageIndex,
+//     dexNum: mon.dexNum,
+//     formeNum: mon.formeNum,
+//     moves: mon.moves,
+//     gameOfOrigin: mon.gameOfOrigin,
+//     species: PokemonData[mon.dexNum].name,
+//   })
+// }
 
 describe('G3RRSAV - Radical Red Save File Read Test', () => {
   let radicalRedSave: G3RRSAV
@@ -28,6 +27,7 @@ describe('G3RRSAV - Radical Red Save File Read Test', () => {
 
   beforeAll(() => {
     const savePath = resolve(__dirname, './SAVFILES/radicalred.sav')
+
     saveBytes = new Uint8Array(readFileSync(savePath))
 
     const parsedPath: PathData = {
@@ -51,7 +51,7 @@ describe('G3RRSAV - Radical Red Save File Read Test', () => {
     const firstPokemon = radicalRedSave.boxes[0].pokemon[0]
 
     if (firstPokemon) {
-      display_mon(firstPokemon)
+      // display_mon(firstPokemon)
 
       expect(firstPokemon.nickname).toBe('Von')
       expect(firstPokemon.trainerID).toBe(10334)
@@ -61,55 +61,55 @@ describe('G3RRSAV - Radical Red Save File Read Test', () => {
       expect(firstPokemon.dexNum).toBe(261)
       expect(PokemonData[firstPokemon.dexNum].name).toBe('Poochyena')
     } else {
-      console.log('No Pokémon found in the first box, first slot.')
+      fail('No Pokémon found in the first box, first slot.')
     }
 
     const secondPokemon = radicalRedSave.boxes[1].pokemon[1]
 
     if (secondPokemon) {
-      display_mon(secondPokemon)
+      // display_mon(secondPokemon)
 
       expect(secondPokemon.nickname).toBe('Cin')
       expect(secondPokemon.trainerID).toBe(10334)
       expect(secondPokemon.trainerName).toBe('Radical')
     } else {
-      console.log('No Pokémon found in the second box, second slot.')
+      fail('No Pokémon found in the second box, second slot.')
     }
 
     const sevii_lokix = radicalRedSave.boxes[0].pokemon[3]
 
     if (sevii_lokix) {
-      display_mon(sevii_lokix)
+      // display_mon(sevii_lokix)
 
       expect(sevii_lokix.nickname).toBe('Lokix')
       expect(sevii_lokix.trainerID).toBe(10334)
       expect(sevii_lokix.trainerName).toBe('Radical')
     } else {
-      console.log('Sevii Lokix not found.')
+      fail('Sevii Lokix not found.')
     }
 
     const lastpokemon = radicalRedSave.boxes[0].pokemon[29]
 
     if (lastpokemon) {
-      display_mon(lastpokemon)
+      // display_mon(lastpokemon)
 
       expect(lastpokemon.nickname).toBe('Crabrawler')
       expect(lastpokemon.trainerID).toBe(10334)
       expect(lastpokemon.trainerName).toBe('Radical')
     } else {
-      console.log('No Pokémon found in the second box, second slot.')
+      fail('No Pokémon found in the second box, second slot.')
     }
 
     const slowbroG = radicalRedSave.boxes[1].pokemon[5]
 
     if (slowbroG) {
-      display_mon(slowbroG)
+      // display_mon(slowbroG)
 
       expect(slowbroG.nickname).toBe('Nobo')
       expect(slowbroG.trainerID).toBe(10334)
       expect(slowbroG.trainerName).toBe('Radical')
     } else {
-      console.log('No Pokémon found in the second box, second slot.')
+      fail('No Pokémon found in the second box, second slot.')
     }
   })
 })
@@ -120,6 +120,7 @@ describe('G3RRSAV - Radical Red Save File Write Test', () => {
 
   beforeAll(() => {
     const savePath = resolve(__dirname, './SAVFILES/radicalred.sav')
+
     saveBytes = new Uint8Array(readFileSync(savePath))
 
     const parsedPath: PathData = {
@@ -134,8 +135,10 @@ describe('G3RRSAV - Radical Red Save File Write Test', () => {
 
     radicalRedSave = new G3RRSAV(parsedPath, saveBytes)
     const firstMon = radicalRedSave.boxes[0].pokemon[0]
+
     if (firstMon) {
       const newMon = new OHPKM(firstMon)
+
       newMon.nickname = 'ModTest'
       radicalRedSave.boxes[0].pokemon[0] = newMon
       // radicalRedSave.boxes[0].pokemon[0].heldItemIndex = 123;
@@ -151,14 +154,14 @@ describe('G3RRSAV - Radical Red Save File Write Test', () => {
 
     if (radicalRedSave.boxes[0].pokemon[0]) {
       const newSavePath = resolve(__dirname, './SAVFILES/radicalred_modified.sav')
+
       writeFileSync(newSavePath, radicalRedSave.bytes)
 
       const fileExists = existsSync(newSavePath)
-      expect(fileExists).toBe(true)
 
-      console.log('Saved file to ./SAVFILES/radicalred_modified.sav')
+      expect(fileExists).toBe(true)
     } else {
-      console.log('No Pokémon found in the first box, first slot.')
+      fail('No Pokémon found in the first box, first slot.')
     }
   })
 
@@ -175,6 +178,7 @@ describe('G3RRSAV - Radical Red Save File Write Test', () => {
 
     const newSavePath = resolve(__dirname, './SAVFILES/radicalred_modified.sav')
     const fileExists = existsSync(newSavePath)
+
     expect(fileExists).toBe(true)
 
     const modifiedSaveBytes = new Uint8Array(readFileSync(newSavePath))

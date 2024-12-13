@@ -8,6 +8,7 @@ import SortPokemon from './sort/SortPokemon'
 
 export default function AppTabs() {
   const isDev = useIsDev()
+
   return (
     <Tabs defaultValue="home" style={{ height: '100vh', width: '100%' }} color="primary">
       <TabPanel

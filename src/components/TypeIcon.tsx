@@ -11,6 +11,7 @@ interface TypeIconProps {
 
 const TypeIcon = (props: TypeIconProps) => {
   const type = props.typeIndex ? teraTypeFromIndex(props.typeIndex) : props.type
+
   return (
     <img
       className={props.border ? 'type-icon-border' : ''}

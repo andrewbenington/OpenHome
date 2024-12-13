@@ -42,6 +42,7 @@ const HexEditor = ({ data, format }: HexEditorProps) => {
       const h = hexy.hexy(Buffer.from(data), {
         caps: 'upper',
       })
+
       setHexyText(h)
     }
   }, [data])
@@ -68,6 +69,7 @@ const HexEditor = ({ data, format }: HexEditorProps) => {
         const [prefix, ...rest] = line.split(' ')
         const bytePairs = rest.slice(0, -1)
         const ascii = rest[rest.length - 1]
+
         if (bytePairs.length === 0) {
           return <div key={`line_${i}_prefix`} />
         }
@@ -91,6 +93,7 @@ const HexEditor = ({ data, format }: HexEditorProps) => {
             <Grid xs={7.5} key={`line_${i}_bytes`} display="flex" flexDirection="row">
               {bytePairs.map((pair, j) => {
                 const byteIndex = 16 * i + 2 * j
+
                 return (
                   <div key={`byte_${byteIndex}`} style={{ display: 'flex' }}>
                     <div
@@ -161,6 +164,7 @@ const HexEditor = ({ data, format }: HexEditorProps) => {
                 const char =
                   ascii.charCodeAt(i) >= 32 && ascii.charCodeAt(i) < 127 ? ascii.charAt(k) : '.'
                 const byteIndex = 16 * i + k
+
                 return (
                   <div
                     key={`byte_ascii_${byteIndex}`}

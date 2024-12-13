@@ -1,5 +1,5 @@
 import { useDroppable } from '@dnd-kit/core'
-import { useCallback, useContext, useMemo } from 'react'
+import { useContext, useMemo } from 'react'
 import { FilterContext } from 'src/state/filter'
 import { MonLocation } from 'src/state/openSaves'
 import { filterApplies } from 'src/types/Filter'
@@ -97,17 +97,9 @@ const BoxCell = ({
     disabled,
   })
 
-  const setNodeRefLog = useCallback(
-    (element: HTMLElement | null) => {
-      console.log('setNodeRefLog', element)
-      setNodeRef(element)
-    },
-    [setNodeRef]
-  )
-
   return (
     <div
-      ref={setNodeRefLog}
+      ref={setNodeRef}
       style={{
         ...styles.button,
         backgroundColor: disabled || isFilteredOut ? '#555' : '#6662',

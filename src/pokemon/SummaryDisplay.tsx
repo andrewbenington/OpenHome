@@ -47,6 +47,7 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
 
   const itemAltText = useMemo(() => {
     const monData = PokemonData[mon.dexNum]?.formes[mon.formeNum]
+
     if (!monData) return 'pokemon sprite'
     return `${monData.formeName}${mon.isShiny() ? '-shiny' : ''} sprite`
   }, [mon])
@@ -158,4 +159,5 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
     </Grid>
   )
 }
+
 export default SummaryDisplay

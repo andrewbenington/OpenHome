@@ -29,6 +29,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   const dispatchStartDrag = useCallback(
     (boxPos: number) => {
       const mon = save.getCurrentBox().pokemon[boxPos]
+
       if (mon) {
         mouseDispatch({
           type: 'set_drag_source',
@@ -62,8 +63,9 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
 
   const isDisabled = useMemo(() => {
     const dragData = active?.data.current as MonWithLocation | undefined
+
     if (!dragData || Object.entries(dragData).length === 0) return false
-    console.log(dragData)
+
     return !save.supportsMon(dragData.mon.dexNum, dragData.mon.formeNum)
   }, [save, active])
 
@@ -152,6 +154,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
             <Grid container key={`pc_row_${row}`}>
               {lodash.range(save.boxColumns).map((rowIndex: number) => {
                 const mon = save.boxes[save.currentPCBox].pokemon[row * save.boxColumns + rowIndex]
+
                 return (
                   <Grid
                     key={`pc_row_${row}_slot_${rowIndex}`}

@@ -3,6 +3,7 @@ import { SaveRef } from '../../types/types'
 import { PKMInterface } from '../interfaces'
 import { OHPKM } from '../pkm/OHPKM'
 import { PathData } from './path'
+
 type SparseArray<T> = (T | undefined)[]
 export class Box<P extends PKMInterface> {
   name: string
@@ -54,7 +55,6 @@ export interface SAV<P extends PKMInterface = PKMInterface> {
   getCurrentBox: () => Box<P>
   supportsMon: (dexNumber: number, formeNumber: number) => boolean
 
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
   prepareBoxesAndGetModified: () => OHPKM[]
 
   calculateChecksum?: () => number

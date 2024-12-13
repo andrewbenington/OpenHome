@@ -18,14 +18,12 @@ const ArrowButton = (props: OpenHomeButtonProps) => {
 
   const onDragOver = useCallback(() => {
     if (hoverCooldown || !onClick) {
-      console.log('cooldown active; ignoring')
       return
     }
     setHoverCooldown(true)
     onClick()
 
     setTimeout(() => {
-      console.log('ending cooldown')
       setHoverCooldown(false)
     }, DRAG_OVER_COOLDOWN_MS)
   }, [hoverCooldown, onClick])

@@ -42,6 +42,7 @@ const SavesModal = (props: SavesModalProps) => {
     async (filePath?: PathData) => {
       if (!filePath) {
         const pickedFile = await backend.pickFile()
+
         if (E.isLeft(pickedFile)) {
           console.error(pickedFile.left)
           return
@@ -68,12 +69,14 @@ const SavesModal = (props: SavesModalProps) => {
                 getEnabledSaveTypes(),
                 (updatedMon) => {
                   const identifier = getMonFileIdentifier(updatedMon)
+
                   if (identifier === undefined) {
                     return E.left(`Could not get identifier for mon: ${updatedMon.nickname}`)
                   }
                   backend.writeHomeMon(identifier, updatedMon.bytes)
                 }
               )
+
               if (!saveFile) {
                 onClose()
                 return

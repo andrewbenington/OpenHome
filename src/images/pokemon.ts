@@ -51,6 +51,7 @@ export const fileToSpriteFolder: Record<string, string> = {
 export const getPokemonSpritePath = (mon: PKMInterface, format?: string) => {
   const monFormat = format ?? mon.format
   let spriteName = PokemonData[mon.dexNum]?.formes[mon.formeNum]?.sprite ?? ''
+
   if (mon.dexNum === NationalDex.Alcremie) {
     spriteName = `${
       PokemonData[mon.dexNum]?.formes[mon.formeNum]?.formeName?.toLowerCase() ??
@@ -58,13 +59,15 @@ export const getPokemonSpritePath = (mon: PKMInterface, format?: string) => {
     }-${SWEETS[mon.formArgument ?? 0].toLocaleLowerCase()}`
   }
   let spriteFolder = fileToSpriteFolder[monFormat]
+
   if (spriteFolder === 'gen7' && !alolaDex.includes(mon.dexNum)) {
     spriteFolder = 'gen6'
-  } else if (spriteFolder == 'rr') {
+  } else if (spriteFolder === 'rr') {
     if (mon.dexNum === NationalDex.Ursaluna && mon.formeNum === BLOOD_MOON) {
       return 'sprites/home/ursaluna-bloodmoon.png'
     }
     let gen3RRname = RRSprites[toGen3RRPokemonIndex(mon.dexNum, mon.formeNum)]
+
     if (gen3RRname.length === 0) return gen3RRname
     gen3RRname = gen3RRname[0].toUpperCase() + gen3RRname.slice(1).toLowerCase()
     return `sprites/${spriteFolder}/${gen3RRname}`

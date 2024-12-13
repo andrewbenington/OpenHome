@@ -19,6 +19,7 @@ export default function Gen12Lookup() {
   const [{ homeMons, gen12 }] = useContext(LookupContext)
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
   const backend = useContext(BackendContext)
+
   backend.getResourcesPath().then(console.info)
 
   function pokemonFromLookupID(id: string) {

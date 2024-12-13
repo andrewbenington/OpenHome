@@ -7,6 +7,7 @@ const AttributeTag = (props: {
   icon?: string
 }) => {
   const { color, backgroundColor, label, icon } = props
+
   return (
     <Card
       style={{
@@ -29,9 +30,10 @@ const AttributeTag = (props: {
           }}
         />
       ) : (
-        label ?? ''
+        (label ?? '')
       )}
     </Card>
   )
 }
+
 export default AttributeTag

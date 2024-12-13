@@ -33,6 +33,7 @@ test('removing mon shifts others in box', () => {
     {},
     [G2SAV]
   ) as G2SAV
+
   modifiedSaveFile1.boxes[9].pokemon[0] = undefined
   modifiedSaveFile1.updatedBoxSlots.push({ box: 9, index: 0 })
   modifiedSaveFile1.prepareBoxesAndGetModified()
@@ -43,6 +44,7 @@ test('removing mon shifts others in box', () => {
     {},
     [G2SAV]
   ) as G2SAV
+
   expect(modifiedSaveFile2.boxes[9].pokemon[0]?.nickname).toEqual('BELLOSSOM')
   expect(modifiedSaveFile2.boxes[9].pokemon[18]?.nickname).toEqual('MISDREAVUS')
   expect(modifiedSaveFile2.boxes[9].pokemon[19]).toEqual(undefined)
@@ -55,6 +57,7 @@ test('inserting mon works', () => {
     {},
     [G2SAV]
   ) as G2SAV
+
   modifiedSaveFile1.boxes[13].pokemon[17] = new PK2(slowpokeOH)
   modifiedSaveFile1.updatedBoxSlots.push({ box: 13, index: 0 })
   modifiedSaveFile1.prepareBoxesAndGetModified()
@@ -65,6 +68,7 @@ test('inserting mon works', () => {
     {},
     [G2SAV]
   ) as G2SAV
+
   expect(modifiedSaveFile2.boxes[13].pokemon[0]?.nickname).toEqual('UNOWN')
   expect(modifiedSaveFile2.boxes[13].pokemon[16]?.nickname).toEqual('WIGGLYTUFF')
   expect(modifiedSaveFile2.boxes[13].pokemon[17]?.nickname).toEqual('Slowpoke')

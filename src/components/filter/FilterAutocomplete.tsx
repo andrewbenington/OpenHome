@@ -79,8 +79,8 @@ export default function FilterAutocomplete<
                 {attributes.getOptionLabel
                   ? attributes.getOptionLabel(option)
                   : labelField
-                  ? (option as any)[labelField]
-                  : option}
+                    ? (option as any)[labelField]
+                    : option}
               </ListItemContent>
             </AutocompleteOption>
           )

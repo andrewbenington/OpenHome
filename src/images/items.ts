@@ -105,6 +105,7 @@ const itemEquivalents: Record<string, string> = {
 
 export const getItemIconPath = (item: Item | ItemGen3 | ItemGen2, format?: string): string => {
   let itemName: string
+
   if (format === 'PK3' || format === 'COLOPKM' || format === 'XDPKM') {
     itemName = ItemGen3ToString(item as ItemGen3)
     if (itemName in itemEquivalents) {
@@ -152,6 +153,7 @@ export const getItemIconPath = (item: Item | ItemGen3 | ItemGen2, format?: strin
     }
     for (let i = 0; i < SharedItemSpritePrefixes.length; i++) {
       const prefix = SharedItemSpritePrefixes[i]
+
       if (itemName.startsWith(prefix)) {
         return `items/shared/${prefix.toLocaleLowerCase().replaceAll(' ', '-')}`
       }

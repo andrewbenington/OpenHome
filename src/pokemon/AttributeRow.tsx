@@ -10,6 +10,7 @@ const AttributeRow = (props: {
 }) => {
   const { label, value, justifyEnd, indent, children, style } = props
   const isDarkMode = useIsDarkMode()
+
   return (
     <div
       style={{

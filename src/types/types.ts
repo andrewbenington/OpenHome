@@ -2,7 +2,6 @@ import { Either } from 'fp-ts/Either'
 import { CSSProperties } from 'react'
 import { PathData } from './SAVTypes/path'
 
-/* eslint-disable no-unused-vars */
 export type KeyValuePairList = { key: string; value: string }[]
 export type Stat = 'HP' | 'Atk' | 'Def' | 'SpA' | 'SpD' | 'Spe' | 'Sp'
 export type Type =

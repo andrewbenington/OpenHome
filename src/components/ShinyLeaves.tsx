@@ -30,6 +30,7 @@ interface ShinyLeafIconProps {
 
 const ShinyLeafIcon = (props: ShinyLeafIconProps) => {
   const { full, index } = props
+
   return (
     <img
       alt={`shiny leaf ${index + 1} (${full ? 'full' : 'empty'})`}
@@ -54,6 +55,7 @@ interface ShinyLeavesProps {
 
 const ShinyLeaves = (props: ShinyLeavesProps) => {
   const { first, second, third, fourth, fifth, crown } = props
+
   return crown ? (
     <img
       alt="shiny_leaf_crown"

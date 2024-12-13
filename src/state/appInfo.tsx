@@ -43,6 +43,7 @@ export const appInfoReducer: Reducer<AppInfoState, AppInfoAction> = (
   action: AppInfoAction
 ) => {
   const { type, payload } = action
+
   switch (type) {
     case 'set_resources_path': {
       return {
@@ -52,6 +53,7 @@ export const appInfoReducer: Reducer<AppInfoState, AppInfoAction> = (
     }
     case 'set_savetype_enabled': {
       const enabled = state.settings.enabledSaveTypes
+
       if (payload.enabled) {
         enabled[payload.saveType.name] = true
       } else {

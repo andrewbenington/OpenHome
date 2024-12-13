@@ -99,6 +99,7 @@ export const unshuffleBlocks = (
     startIndex + (blockOrder[3] + 1) * blockSize
   )
   const unshuffledBytes = bytes
+
   unshuffledBytes.set(growthBlock, startIndex)
   unshuffledBytes.set(attackBlock, startIndex + blockSize)
   unshuffledBytes.set(statsBlock, startIndex + 2 * blockSize)
@@ -130,6 +131,7 @@ export const shuffleBlocks = (
     startIndex + (blockOrder[3] + 1) * blockSize
   )
   const unshuffledBytes = bytes
+
   unshuffledBytes.set(firstBlock, startIndex)
   unshuffledBytes.set(secondBlock, startIndex + blockSize)
   unshuffledBytes.set(thirdBlock, startIndex + 2 * blockSize)
@@ -140,12 +142,14 @@ export const shuffleBlocks = (
 export const shuffleBlocksGen3 = (bytes: Uint8Array) => {
   const personalityValue = bytesToUint32LittleEndian(bytes, 0x00)
   const shiftValue = personalityValue % 24
+
   return shuffleBlocks(bytes, shiftValue, GEN3_BLOCK_SIZE, GEN3_BLOCKS_OFFSET)
 }
 
 export const unshuffleBlocksGen3 = (bytes: Uint8Array) => {
   const personalityValue = bytesToUint32LittleEndian(bytes, 0x00)
   const shiftValue = personalityValue % 24
+
   return unshuffleBlocks(bytes, shiftValue, GEN3_BLOCK_SIZE, GEN3_BLOCKS_OFFSET)
 }
 
@@ -153,8 +157,10 @@ export const decryptByteArrayGen3 = (bytes: Uint8Array) => {
   const unencryptedBytes = bytes
   const encryptionKey =
     bytesToUint32LittleEndian(bytes, 0x00) ^ bytesToUint32LittleEndian(bytes, 0x04)
+
   for (let i = GEN3_BLOCKS_OFFSET; i < GEN3_BLOCKS_OFFSET + 4 * GEN3_BLOCK_SIZE; i += 4) {
     let value = bytesToUint32LittleEndian(unencryptedBytes, i)
+
     value = value ^ encryptionKey
     unencryptedBytes.set(uint32ToBytesLittleEndian(value), i)
   }
@@ -164,12 +170,14 @@ export const decryptByteArrayGen3 = (bytes: Uint8Array) => {
 export const shuffleBlocksGen45 = (bytes: Uint8Array) => {
   const personalityValue = bytesToUint32LittleEndian(bytes, 0x00)
   const shiftValue = ((personalityValue & 0x3e000) >> 0xd) % 24
+
   return shuffleBlocks(bytes, shiftValue, GEN45_BLOCK_SIZE, GEN456_BLOCKS_OFFSET)
 }
 
 export const unshuffleBlocksGen45 = (bytes: Uint8Array) => {
   const personalityValue = bytesToUint32LittleEndian(bytes, 0x00)
   const shiftValue = ((personalityValue & 0x3e000) >> 0xd) % 24
+
   return unshuffleBlocks(bytes, shiftValue, GEN45_BLOCK_SIZE, GEN456_BLOCKS_OFFSET)
 }
 
@@ -180,12 +188,15 @@ const decryptByteArray = (
   blockOffset: number
 ) => {
   const unencryptedBytes = bytes
+
   for (let i = blockOffset; i < blockOffset + 4 * blockSize; i += 2) {
     const bigIntSeed = 0x41c64e6dn * BigInt(seed) + 0x6073n
+
     seed = Number(bigIntSeed & 0xffffffffn)
     const xorValue = (seed >> 16) & 0xffff
     const unencryptedWord = bytesToUint16LittleEndian(bytes, i) ^ xorValue
     const unencryptedWordBytes = uint16ToBytesLittleEndian(unencryptedWord)
+
     unencryptedBytes.set(unencryptedWordBytes, i)
   }
   return unencryptedBytes
@@ -193,23 +204,27 @@ const decryptByteArray = (
 
 export const decryptByteArrayGen45 = (bytes: Uint8Array) => {
   const checksum = bytesToUint16LittleEndian(bytes, 0x06)
+
   return decryptByteArray(bytes, checksum, GEN45_BLOCK_SIZE, GEN456_BLOCKS_OFFSET)
 }
 
 export const shuffleBlocksGen6 = (bytes: Uint8Array) => {
   const encryptionConstant = bytesToUint32LittleEndian(bytes, 0x00)
   const shiftValue = ((encryptionConstant & 0x3e000) >> 0xd) % 24
+
   return shuffleBlocks(bytes, shiftValue, GEN6_BLOCK_SIZE, GEN456_BLOCKS_OFFSET)
 }
 
 export const unshuffleBlocksGen6 = (bytes: Uint8Array) => {
   const encryptionConstant = bytesToUint32LittleEndian(bytes, 0x00)
   const shiftValue = ((encryptionConstant & 0x3e000) >> 0xd) % 24
+
   return unshuffleBlocks(bytes, shiftValue, GEN6_BLOCK_SIZE, GEN456_BLOCKS_OFFSET)
 }
 
 export const decryptByteArrayGen6 = (bytes: Uint8Array) => {
   const encryptionConstant = bytesToUint32LittleEndian(bytes, 0x00)
+
   return decryptByteArray(bytes, encryptionConstant, GEN6_BLOCK_SIZE, GEN456_BLOCKS_OFFSET)
 }
 
@@ -282,6 +297,7 @@ export const CRC16_Invert = (bytes: Uint8Array, start: number, size: number) => 
 
   for (let i = start; i < start + size; i++) {
     const b = bytes[i]
+
     chk = (SeedTableInvert[b ^ (chk & 0xff)] ^ (chk >> 8)) & 0xffff
   }
 
@@ -301,11 +317,13 @@ export const SignMemeDataInPlace = (data: Uint8Array) => {
 
   const aesEncrypted = key.AesEncrypt(data)
   const sigBuffer = aesEncrypted.slice(aesEncrypted.length - SIGNATURE_LENGTH)
+
   sigBuffer[0] &= 0x7f
 
   const rsaEncrypted = key.RSAPrivate(sigBuffer)
 
   const signedData = new Uint8Array(data.length)
+
   signedData.set(data.slice(0, data.length - SIGNATURE_LENGTH), 0)
   signedData.set(rsaEncrypted, data.length - SIGNATURE_LENGTH)
   return signedData
@@ -337,9 +355,11 @@ export function SignWithMemeCrypto(bytes: Uint8Array): Uint8Array {
   // const hash = crypto.createHash('sha256')
   // hash.update(chkBlockSpan)
   const digest = wordsToUint8Array(hash.words, hash.sigBytes)
+
   sigSpan.set(digest, 0)
 
   const signed = SignMemeDataInPlace(sigSpan)
+
   bytes.set(signed, memeCryptoOffset)
 
   return bytes
@@ -349,6 +369,7 @@ function wordArrayToUint8Array(wordArray: cryptolib.WordArray): Uint8Array {
   const words = wordArray.words
   const sigBytes = wordArray.sigBytes
   const result = new Uint8Array(sigBytes)
+
   for (let i = 0; i < sigBytes; i++) {
     result[i] = (words[i >>> 2] >>> (24 - (i % 4) * 8)) & 0xff
   }
@@ -358,5 +379,6 @@ function wordArrayToUint8Array(wordArray: cryptolib.WordArray): Uint8Array {
 export function sha1Digest(data: Uint8Array) {
   const payloadWords = cryptolib.WordArray.create(data)
   const shasum = SHA1(payloadWords)
+
   return wordArrayToUint8Array(shasum)
 }

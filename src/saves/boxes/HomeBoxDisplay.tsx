@@ -22,6 +22,7 @@ const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
     (boxPos: number) => {
       if (!homeData) return
       const mon = homeData.getCurrentBox().pokemon[boxPos]
+
       if (mon) {
         mouseDispatch({
           type: 'set_drag_source',

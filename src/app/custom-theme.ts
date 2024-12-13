@@ -5,6 +5,7 @@ declare module '@mui/joy/styles' {
   interface PaletteBackground {
     gradient: string
   }
+
   interface Palette {
     secondary: DefaultPaletteRange & PaletteVariant
   }

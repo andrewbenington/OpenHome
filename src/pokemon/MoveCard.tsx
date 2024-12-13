@@ -26,7 +26,7 @@ const MoveCard = ({ move, movePP, maxPP, typeOverride }: MoveCardProps) => {
       // move is unknown
       return (
         <>
-          <div className="type-icon-container"></div>
+          <div className="type-icon-container" />
           <div className="unknown-move-name">(Unknown Move)</div>
         </>
       )
@@ -50,7 +50,7 @@ const MoveCard = ({ move, movePP, maxPP, typeOverride }: MoveCardProps) => {
         </div>
       </>
     )
-  }, [move, moveData])
+  }, [maxPP, move, moveData, movePP, type])
 
   return (
     <div

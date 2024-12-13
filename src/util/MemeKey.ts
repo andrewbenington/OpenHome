@@ -7,6 +7,7 @@ function wordArrayToUint8Array(wordArray: CryptoJS.lib.WordArray): Uint8Array {
   const words = wordArray.words
   const sigBytes = wordArray.sigBytes
   const result = new Uint8Array(sigBytes)
+
   for (let i = 0; i < sigBytes; i++) {
     result[i] = (words[i >>> 2] >>> (24 - (i % 4) * 8)) & 0xff
   }
@@ -15,6 +16,7 @@ function wordArrayToUint8Array(wordArray: CryptoJS.lib.WordArray): Uint8Array {
 
 function uint8ArrayToWordArray(u8arr: Uint8Array): CryptoJS.lib.WordArray {
   const words = []
+
   for (let i = 0; i < u8arr.length; i += 4) {
     words.push((u8arr[i] << 24) | (u8arr[i + 1] << 16) | (u8arr[i + 2] << 8) | u8arr[i + 3])
   }
@@ -53,6 +55,7 @@ export class MemeKey {
 
     for (let i = 0; i < signature.length; i += AES_CHUNK_LENGTH) {
       let slice: Uint8Array = signature.slice(i, i + AES_CHUNK_LENGTH)
+
       slice = xorBytes(slice, nextXor)
 
       const encryptedSliceWordArray = cipher.process(uint8ArrayToWordArray(slice))
@@ -67,6 +70,7 @@ export class MemeKey {
 
     for (let i = 0; i < signature.length; i += AES_CHUNK_LENGTH) {
       const xorResult = xorBytes(signature.slice(i, i + AES_CHUNK_LENGTH), subKey)
+
       signature.set(xorResult, i)
     }
 
@@ -82,6 +86,7 @@ export class MemeKey {
     }
 
     const encrypted = new Uint8Array(data.length)
+
     encrypted.set(payload, 0)
     encrypted.set(signature, data.length - SIGNATURE_LENGTH)
     return encrypted
@@ -89,6 +94,7 @@ export class MemeKey {
 
   public GetAesKey(bytes: Uint8Array) {
     const payload = new Uint8Array(this.DER.length + bytes.length)
+
     payload.set(this.DER, 0)
     payload.set(bytes, this.DER.length)
 
@@ -97,6 +103,7 @@ export class MemeKey {
 
   public GetSubKey(temp: Uint8Array): Uint8Array {
     const subKey = new Uint8Array(AES_CHUNK_LENGTH)
+
     for (let i = 0; i < temp.length; i += 2) {
       const b1 = temp[i]
       const b2 = temp[i + 1]
@@ -109,7 +116,7 @@ export class MemeKey {
       }
     }
 
-    if ((temp[0] & 0x80) != 0) {
+    if ((temp[0] & 0x80) !== 0) {
       subKey[0xf] ^= 0x87
     }
 
@@ -119,12 +126,14 @@ export class MemeKey {
   public RSAPublic(data: Uint8Array) {
     const M = bytesToBigIntBE(data)
     const result = modPow(M, this.publicKey, this.mod)
+
     return bigIntToBytesBE(result)
   }
 
   public RSAPrivate(data: Uint8Array) {
     const M = bytesToBigIntBE(data)
     const result = modPow(M, this.privateKey, this.mod)
+
     return bigIntToBytesBE(result)
   }
 }
@@ -156,6 +165,7 @@ function truncByte(val: number): number {
 
 function bytesToBigIntBE(bytes: Uint8Array) {
   let result = 0n
+
   for (const byte of bytes) {
     result = (result << 8n) | BigInt(byte)
   }
@@ -177,6 +187,7 @@ function bigIntToBytesBE(value: bigint): Uint8Array {
 
 function xorBytes(b1: Uint8Array, b2: Uint8Array): Uint8Array {
   const result = new Uint8Array(b1.length)
+
   for (let i = 0; i < result.length; i++) {
     result[i] = b1[i] ^ b2[i]
   }
@@ -189,6 +200,7 @@ function modPow(base: bigint, exponent: bigint, modulus: bigint): bigint {
   }
 
   let result = 1n // Initialize result to 1
+
   base = base % modulus // Handle cases where base is greater than modulus
 
   while (exponent > 0n) {
@@ -210,5 +222,6 @@ function modPow(base: bigint, exponent: bigint, modulus: bigint): bigint {
 function sha1Digest(data: Uint8Array) {
   const payloadWords = CryptoJS.lib.WordArray.create(data)
   const shasum = CryptoJS.SHA1(payloadWords)
+
   return wordArrayToUint8Array(shasum)
 }

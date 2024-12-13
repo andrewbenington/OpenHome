@@ -47,6 +47,7 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
               ref.pluginIdentifier === undefined ||
               extraSaveIdentifiers.includes(ref.pluginIdentifier)
           )
+
           setRecentSaves(Object.fromEntries(filteredRecents))
         }
       )

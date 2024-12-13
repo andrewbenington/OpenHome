@@ -41,11 +41,13 @@ export class G3Sector {
 
   writeToBuffer(bytes: Uint8Array, thisIndex: number, firstIndex: number) {
     const oldChecksum = this.checksum
+
     this.refreshChecksum()
     if (oldChecksum !== this.checksum) {
       console.info('checksum changed for', thisIndex)
     }
     const index = (thisIndex + 14 - firstIndex) % 14
+
     bytes.set(this.data, index * 0x1000)
     bytes.set(uint16ToBytesLittleEndian(this.sectionID), index * 0x1000 + 0xff4)
     bytes.set(uint16ToBytesLittleEndian(this.checksum), index * 0x1000 + 0xff6)
@@ -56,6 +58,7 @@ export class G3Sector {
   refreshChecksum() {
     let checksum = 0
     let byteLength = 3968
+
     if (this.sectionID === 0) {
       byteLength = 3884
     } else if (this.sectionID === 13) {
@@ -153,8 +156,10 @@ export class G3SaveBackup {
     for (let i = 0; i < 420; i++) {
       try {
         const mon = new PK3(this.pcDataContiguous.slice(4 + i * 80, 4 + (i + 1) * 80).buffer, true)
+
         if (mon.isValid()) {
           const box = this.boxes[Math.floor(i / 30)]
+
           box.pokemon[i % 30] = mon
         }
       } catch (e) {
@@ -216,6 +221,7 @@ export class G3SAV implements SAV<PK3> {
     this.filePath = path
     const saveOne = new G3SaveBackup(bytes.slice(0, 0xe000))
     const saveTwo = new G3SaveBackup(bytes.slice(0xe000, 0x1c000))
+
     if (saveOne.saveIndex > saveTwo.saveIndex) {
       this.primarySave = saveOne
       this.backupSave = saveTwo
@@ -251,6 +257,7 @@ export class G3SAV implements SAV<PK3> {
     } else {
       const filePathElements = splitPath(this.filePath)
       let fileName = filePathElements[filePathElements.length - 1]
+
       fileName = fileName.replace(/\s+/g, '')
       if (fileName.includes('Ruby')) {
         this.origin = GameOfOrigin.Ruby
@@ -274,10 +281,12 @@ export class G3SAV implements SAV<PK3> {
 
   prepareBoxesAndGetModified() {
     const changedMonPKMs: OHPKM[] = []
+
     this.updatedBoxSlots.forEach(({ box, index }) => {
       const monOffset = 30 * box + index
       const pcBytes = new Uint8Array(80)
       const changedMon = this.boxes[box].pokemon[index]
+
       // we don't want to save OHPKM files of mons that didn't leave the save
       // (and would still be PK3s)
       if (changedMon instanceof OHPKM) {
@@ -286,9 +295,11 @@ export class G3SAV implements SAV<PK3> {
       // changedMon will be undefined if pokemon was moved from this slot
       // and the slot was left empty
       const slotMon = this.boxes[box].pokemon[index]
+
       if (changedMon && slotMon) {
         try {
           const mon = slotMon instanceof PK3 ? slotMon : new PK3(slotMon)
+
           if (mon?.gameOfOrigin && mon?.dexNum) {
             mon.refreshChecksum()
             pcBytes.set(new Uint8Array(mon.toPCBytes()), 0)
@@ -306,6 +317,7 @@ export class G3SAV implements SAV<PK3> {
         // 3968 ahead of that, or 2000 ahead of that if box 13 zero indexed
         i * 3968 + (i + 5 === 13 ? 2000 : 3968)
       )
+
       sector.data.set(pcData)
       sector.writeToBuffer(this.primarySave.bytes, i + 5, this.primarySave.firstSectorIndex)
     })
@@ -314,7 +326,7 @@ export class G3SAV implements SAV<PK3> {
   }
 
   supportsMon(dexNumber: number, formeNumber: number) {
-    return dexNumber <= NationalDex.Deoxys && (formeNumber == 0 || dexNumber === NationalDex.Unown)
+    return dexNumber <= NationalDex.Deoxys && (formeNumber === 0 || dexNumber === NationalDex.Unown)
   }
 
   getCurrentBox() {
@@ -323,6 +335,7 @@ export class G3SAV implements SAV<PK3> {
 
   getGameName() {
     const gameOfOrigin = GameOfOriginData[this.origin]
+
     return gameOfOrigin ? `Pokémon ${gameOfOrigin.name}` : '(Unknown Game)'
   }
 
@@ -335,6 +348,7 @@ export class G3SAV implements SAV<PK3> {
     }
     try {
       const save = new G3SAV(emptyPathData, bytes)
+
       if (save.primarySave.gameCode === 0) {
         return true
       }
