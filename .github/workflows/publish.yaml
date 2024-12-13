@@ -52,7 +52,7 @@ jobs:
 
       - name: build version.json (unix)
         if: matrix.platform != 'windows-latest'
-        run: mkdir src/consts/JSON && ./buildVersionJSON.sh
+        run: ./buildVersionJSON.sh
 
       - name: build version.json (windows)
         if: matrix.platform == 'windows-latest'
