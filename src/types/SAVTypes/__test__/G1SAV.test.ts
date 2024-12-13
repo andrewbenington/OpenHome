@@ -32,6 +32,7 @@ test('removing mon shifts others in box', () => {
   const modifiedSaveFile1 = buildSaveFile(emptyPathData, new Uint8Array(blueSaveFile.bytes), {}, [
     G1SAV,
   ]) as G1SAV
+
   modifiedSaveFile1.boxes[7].pokemon[0] = undefined
   modifiedSaveFile1.updatedBoxSlots.push({ box: 7, index: 0 })
   modifiedSaveFile1.prepareBoxesAndGetModified()
@@ -42,6 +43,7 @@ test('removing mon shifts others in box', () => {
     {},
     [G1SAV]
   ) as G1SAV
+
   expect(modifiedSaveFile2.boxes[7].pokemon[0]?.nickname).toEqual('AERODACTYL')
   expect(modifiedSaveFile2.boxes[7].pokemon[9]?.nickname).toEqual('MEW')
   expect(modifiedSaveFile2.boxes[7].pokemon[10]).toEqual(undefined)
@@ -51,6 +53,7 @@ test('inserting mon works', () => {
   const modifiedSaveFile1 = buildSaveFile(emptyPathData, new Uint8Array(blueSaveFile.bytes), {}, [
     G1SAV,
   ]) as G1SAV
+
   modifiedSaveFile1.boxes[7].pokemon[11] = new PK1(slowpokeOH)
   modifiedSaveFile1.updatedBoxSlots.push({ box: 7, index: 0 })
   modifiedSaveFile1.prepareBoxesAndGetModified()
@@ -61,6 +64,7 @@ test('inserting mon works', () => {
     {},
     [G1SAV]
   ) as G1SAV
+
   expect(modifiedSaveFile2.boxes[7].pokemon[0]?.nickname).toEqual('KABUTOPS')
   expect(modifiedSaveFile2.boxes[7].pokemon[10]?.nickname).toEqual('MEW')
   expect(modifiedSaveFile2.boxes[7].pokemon[11]?.nickname).toEqual('Slowpoke')

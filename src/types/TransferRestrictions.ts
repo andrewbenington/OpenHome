@@ -1,5 +1,6 @@
 import { NationalDex } from 'pokemon-species-data'
 import { BASE, BLOOD_MOON, LGE_STARTER, LGP_STARTER } from '../consts/Formes'
+
 interface FormRestrictions {
   [dexNum: number]: number[] | undefined
 }
@@ -135,6 +136,7 @@ export const isRestricted = (
   formeNum?: number
 ) => {
   const { maxDexNum, transferableDexNums, excludedForms } = restrictions
+
   if (maxDexNum && dexNum > maxDexNum) {
     return true
   }

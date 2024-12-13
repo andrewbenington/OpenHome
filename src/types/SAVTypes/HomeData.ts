@@ -1,6 +1,6 @@
 import lodash from 'lodash'
 import { GameOfOrigin } from 'pokemon-resources'
-import { getMonFileIdentifier } from '../../util/Lookup'
+import { getMonFileIdentifier } from 'src/util/Lookup'
 import { TransferRestrictions } from '../TransferRestrictions'
 import { OHPKM } from '../pkm/OHPKM'
 import { BoxMonIdentifiers } from '../storage'
@@ -31,6 +31,7 @@ export class HomeBox implements Box<OHPKM> {
     Object.entries(boxIdentifers).forEach(([indexStr, identifier]) => {
       const mon = monMap[identifier]
       const index = parseInt(indexStr)
+
       if (!Number.isNaN(index) && mon) {
         this.pokemon[index] = mon
       }

@@ -4,12 +4,12 @@ import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
   uint16ToBytesLittleEndian,
-} from '../../util/ByteLogic'
-import { CRC16_CCITT } from '../../util/Encryption'
-import { gen4StringToUTF } from '../../util/Strings/StringConverter'
+} from 'src/util/byteLogic'
+import { CRC16_CCITT } from 'src/util/Encryption'
+import { gen4StringToUTF } from 'src/util/Strings/StringConverter'
 import { OHPKM } from '../pkm/OHPKM'
-import { Box, BoxCoordinates, SAV } from './SAV'
 import { PathData } from './path'
+import { Box, BoxCoordinates, SAV } from './SAV'
 import { LOOKUP_TYPE } from './util'
 
 export abstract class G4SAV implements SAV<PK4> {
@@ -79,6 +79,7 @@ export abstract class G4SAV implements SAV<PK4> {
 
     for (let box = 0; box < 18; box++) {
       const boxLabel = gen4StringToUTF(this.bytes, this.boxNamesOffset + 40 * box, 20)
+
       this.boxes[box] = new Box(boxLabel, 30)
     }
 
@@ -89,6 +90,7 @@ export abstract class G4SAV implements SAV<PK4> {
           const endByte = this.currentSaveBoxStartOffset + this.boxSize * box + 136 * (monIndex + 1)
           const monData = this.bytes.slice(startByte, endByte)
           const mon = new PK4(monData.buffer, true)
+
           if (mon.dexNum !== 0 && mon.gameOfOrigin !== 0) {
             if (
               this.origin === 0 &&
@@ -120,12 +122,7 @@ export abstract class G4SAV implements SAV<PK4> {
       this.currentSaveStorageBlockOffset,
       this.storageBlockSize - this.footerSize
     )
-    console.info(
-      'updating gen 4 checksum at',
-      `0x${(this.currentSaveStorageBlockOffset + this.storageBlockSize - 2)
-        .toString(16)
-        .padStart(4, '0')}`
-    )
+
     this.bytes.set(
       uint16ToBytesLittleEndian(newChecksum),
       this.currentSaveStorageBlockOffset + this.storageBlockSize - 2
@@ -134,19 +131,23 @@ export abstract class G4SAV implements SAV<PK4> {
 
   prepareBoxesAndGetModified() {
     const changedMonPKMs: OHPKM[] = []
+
     this.updatedBoxSlots.forEach(({ box, index }) => {
       const changedMon = this.boxes[box].pokemon[index]
+
       // we don't want to save OHPKM files of mons that didn't leave the save
       // (and would still be PK4s)
       if (changedMon instanceof OHPKM) {
         changedMonPKMs.push(changedMon)
       }
       const writeIndex = this.currentSaveBoxStartOffset + this.boxSize * box + 136 * index
+
       // changedMon will be undefined if pokemon was moved from this slot
       // and the slot was left empty
       if (changedMon) {
         try {
           const mon = changedMon instanceof OHPKM ? new PK4(changedMon) : changedMon
+
           if (mon.gameOfOrigin && mon.dexNum) {
             mon.refreshChecksum()
             this.bytes.set(new Uint8Array(mon.toPCBytes()), writeIndex)
@@ -171,6 +172,7 @@ export abstract class G4SAV implements SAV<PK4> {
 
   getGameName() {
     const gameOfOrigin = GameOfOriginData[this.origin]
+
     return gameOfOrigin ? `Pokémon ${gameOfOrigin.name}` : '(Unknown Game)'
   }
 
@@ -180,11 +182,13 @@ export abstract class G4SAV implements SAV<PK4> {
   // Gen 4 saves include a size and hex "date" that can identify save type
   static validDateAndSize(bytes: Uint8Array, offset: number) {
     const size = bytesToUint32LittleEndian(bytes, offset - 0xc)
+
     if (size !== (offset & 0xffff)) return false
     const date = bytesToUint32LittleEndian(bytes, offset - 0x8)
 
     const DATE_INT = 0x20060623
     const DATE_KO = 0x20070903
+
     return date === DATE_INT || date === DATE_KO
   }
 

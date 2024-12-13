@@ -1,5 +1,5 @@
 import { NationalDex } from 'pokemon-species-data'
-export const ShadowIDsColosseum = {
+export const ShadowIDsColosseum: Record<number, number> = {
   [NationalDex.Makuhita]: 1,
   [NationalDex.Bayleef]: 2,
   [NationalDex.Quilava]: 3,
@@ -50,7 +50,7 @@ export const ShadowIDsColosseum = {
   [NationalDex.Togetic]: 67,
 }
 
-export const ShadowIDsXD = {
+export const ShadowIDsXD: Record<number, number> = {
   [NationalDex.Teddiursa]: 1,
   [NationalDex.Vulpix]: 2,
   [NationalDex.Spheal]: 3,

@@ -3,7 +3,7 @@ import { isGameBoy } from 'pokemon-resources'
 import { PKMInterface } from '../types/interfaces'
 import { OHPKM } from '../types/pkm/OHPKM'
 import { getBaseMon } from '../types/pkm/util'
-import { bytesToString } from './ByteLogic'
+import { bytesToString } from './byteLogic'
 import { gen12StringToUTF, utf16StringToGen12 } from './Strings/StringConverter'
 
 export const getMonFileIdentifier = (mon: PKMInterface) => {
@@ -11,6 +11,7 @@ export const getMonFileIdentifier = (mon: PKMInterface) => {
     return undefined
   }
   const baseMon = getBaseMon(mon.dexNum, mon.formeNum)
+
   if (baseMon) {
     return `${baseMon.dexNumber.toString().padStart(4, '0')}-${bytesToString(
       mon.trainerID,
@@ -28,6 +29,7 @@ export const getMonGen12Identifier = (mon: PKMInterface & { dvs: StatsPreSplit }
   const convertedTrainerName = gen12StringToUTF(utf16StringToGen12(mon.trainerName, 8, true), 0, 8)
   const baseMon = getBaseMon(mon.dexNum, mon.formeNum)
   let tid = mon.trainerID
+
   if (mon instanceof OHPKM && !isGameBoy(mon.gameOfOrigin)) {
     tid = mon.personalityValue % 0x10000
   }
@@ -47,8 +49,10 @@ export const getMonGen345Identifier = (mon: PKMInterface) => {
   //   return undefined
   // }
   const baseMon = getBaseMon(mon.dexNum, mon.formeNum)
+
   try {
     const pk3 = new PK3(new OHPKM(mon))
+
     if (baseMon) {
       return `${baseMon.dexNumber.toString().padStart(4, '0')}-${bytesToString(
         pk3.trainerID,

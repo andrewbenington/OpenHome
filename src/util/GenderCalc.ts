@@ -16,6 +16,7 @@ export const getGen3To5Gender = (PID: number, dexNum: number) => {
   }
   const genderRatio = getGenderRatio(dexNum, 0)
   const maleRatio = genderRatio.male > 0 || genderRatio.female > 0 ? genderRatio.male : -1
+
   if (maleRatio === -1) {
     return 2
   }

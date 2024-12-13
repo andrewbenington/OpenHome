@@ -1,5 +1,5 @@
 import { GameOfOrigin } from 'pokemon-resources'
-import { BW2_TRANSFER_RESTRICTIONS } from '../../consts/TransferRestrictions'
+import { BW2_TRANSFER_RESTRICTIONS } from 'src/consts/TransferRestrictions'
 import { isRestricted } from '../TransferRestrictions'
 import { G5SAV } from './G5SAV'
 import { hasDesamumeFooter } from './util'
@@ -28,7 +28,7 @@ export class BW2SAV extends G5SAV {
   }
 
   static saveTypeName = 'Pokémon Black 2/White 2'
-  
+
   static includesOrigin(origin: GameOfOrigin) {
     return origin === GameOfOrigin.Black2 || origin === GameOfOrigin.White2
   }

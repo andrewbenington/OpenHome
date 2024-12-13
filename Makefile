@@ -1,11 +1,11 @@
-VERSION=0.5.1
+VERSION=1.0.0
 .PHONY: help
 help: # Display this help.
 	@awk 'BEGIN {FS = ":.*#"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z_0-9-]+:.*?#/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^#@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
 
 .PHONY: build
 build:
-	@npm run build
+	@npm run tauri build
 
 .PHONY: package
 package:
@@ -13,7 +13,7 @@ package:
 
 .PHONY: start
 start:
-	@npm run dev:unix
+	@npm run tauri dev
 
 .PHONY: preview
 preview:

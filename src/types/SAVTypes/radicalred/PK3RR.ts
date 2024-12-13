@@ -122,6 +122,7 @@ export class PK3RR implements PluginPKMInterface {
     if (arg instanceof ArrayBuffer) {
       let buffer = arg
       const dataView = new DataView(buffer)
+
       this.originalBytes = new Uint8Array(arg)
 
       // https://github.com/Skeli789/Complete-Fire-Red-Upgrade/blob/master/include/new/pokemon_storage_system.h
@@ -152,6 +153,7 @@ export class PK3RR implements PluginPKMInterface {
       // Species 28:30
       const speciesIndex: number = dataView.getUint16(0x1c, true)
       const speciesData = fromGen3RRPokemonIndex(speciesIndex)
+
       if (speciesData.NationalDexIndex < 0) {
         this.dexNum = 0
         this.formeNum = 0
@@ -196,6 +198,7 @@ export class PK3RR implements PluginPKMInterface {
 
       // Pokeball 38
       const ballIndex = dataView.getUint8(0x26)
+
       this.ball = ballIndex < RR_BALLS.length ? RR_BALLS[ballIndex] : Ball.Poke
 
       // Moves 38:43 (5 bytes total for 4 moves with 10 bits each)
@@ -208,6 +211,7 @@ export class PK3RR implements PluginPKMInterface {
 
       for (let i = 0; i < 4; i++) {
         const pp = getMoveMaxPP(this.moves[i], this.format, this.movePPUps[i])
+
         if (pp) this.movePP[i] = pp
       }
 
@@ -240,6 +244,7 @@ export class PK3RR implements PluginPKMInterface {
       this.hasHiddenAbility = getFlag(dataView, 0x36, 31)
     } else {
       const other = arg
+
       this.personalityValue = generatePersonalityValuePreservingAttributes(other) ?? 0
       this.trainerID = other.trainerID
       this.secretID = other.secretID
@@ -261,6 +266,7 @@ export class PK3RR implements PluginPKMInterface {
 
       for (let i = 0; i < 4; i++) {
         const pp = getMoveMaxPP(this.moves[i], this.format, this.movePPUps[i])
+
         if (pp) this.movePP[i] = pp
       }
       this.evs = other.evs ?? {
@@ -276,6 +282,7 @@ export class PK3RR implements PluginPKMInterface {
       this.metLevel = other.metLevel ?? 0
 
       const fromRadicalRed = other.pluginOrigin === 'radical_red'
+
       if (fromRadicalRed) {
         this.gameOfOrigin = INTERNAL_ORIGIN_FROM_RR
         this.internalGameOfOrigin = this.gameOfOrigin
@@ -295,8 +302,8 @@ export class PK3RR implements PluginPKMInterface {
           other.ball >= Ball.PokeHisui && other.ball <= Ball.Origin
             ? Ball.PokeHisui
             : other.ball === Ball.Sport
-            ? Ball.Poke
-            : other.ball
+              ? Ball.Poke
+              : other.ball
       } else {
         this.ball = Ball.Poke
       }
@@ -374,8 +381,9 @@ export class PK3RR implements PluginPKMInterface {
       this.ball in RR_BALLS
         ? RR_BALLS.indexOf(this.ball)
         : this.ball >= Ball.PokeHisui && this.ball <= Ball.Origin
-        ? Ball.PokeHisui
-        : Ball.Poke
+          ? Ball.PokeHisui
+          : Ball.Poke
+
     dataView.setUint8(0x26, ballIndex)
 
     // Moves (5 bytes total for 10-bit moves)
@@ -444,9 +452,11 @@ export class PK3RR implements PluginPKMInterface {
 
   public get ability() {
     const pokemonData = PokemonData[this.dexNum]
+
     if (!pokemonData) return '—'
 
     const forme = pokemonData.formes[this.formeNum]
+
     if (!forme) return '—'
 
     const { ability1, ability2, abilityH } = forme
