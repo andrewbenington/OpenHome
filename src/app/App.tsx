@@ -2,9 +2,10 @@ import { closestCenter, DragOverlay, PointerSensor, useSensor } from '@dnd-kit/c
 import { restrictToWindowEdges } from '@dnd-kit/modifiers'
 import { Box, Typography } from '@mui/joy'
 import { extendTheme, ThemeProvider } from '@mui/joy/styles'
-import { useCallback, useMemo, useReducer, useState } from 'react'
+import * as E from 'fp-ts/lib/Either'
+import { useCallback, useEffect, useMemo, useReducer, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { TauriBackend } from 'src/backend/tauriBackend'
+import { TauriBackend } from 'src/backend/tauri/tauriBackend'
 import { PKMInterface } from 'src/types/interfaces'
 import { HomeData } from 'src/types/SAVTypes/HomeData'
 import { BackendProvider } from '../backend/backendProvider'
@@ -22,6 +23,7 @@ import { components, darkTheme, lightTheme } from './Themes'
 
 export default function App() {
   const isDarkMode = useIsDarkMode()
+  const backend = TauriBackend
   const theme = useMemo(
     () =>
       extendTheme({
@@ -42,18 +44,32 @@ export default function App() {
   })
   const [dragData, setDragData] = useState<MonWithLocation>()
   const [dragMon, setDragMon] = useState<PKMInterface>()
+  const [loading, setLoading] = useState(true)
 
   const getEnabledSaveTypes = useCallback(() => {
-    return appInfoState.settings.extraSaveTypes
-      .concat(appInfoState.settings.officialSaveTypes)
+    return appInfoState.extraSaveTypes
+      .concat(appInfoState.officialSaveTypes)
       .filter((saveType) => appInfoState.settings.enabledSaveTypes[saveType.name])
-  }, [appInfoState.settings])
+  }, [appInfoState])
 
-  const loading = false
+  // only on app start
+  useEffect(() => {
+    backend
+      .getSettings()
+      .then(
+        E.match(
+          async (err) => {
+            console.error(err)
+          },
+          async (settings) => appInfoDispatch({ type: 'load_settings', payload: settings })
+        )
+      )
+      .finally(() => setLoading(false))
+  }, [backend])
 
   return (
     <ThemeProvider theme={theme}>
-      <BackendProvider backend={TauriBackend}>
+      <BackendProvider backend={backend}>
         <AppInfoContext.Provider value={[appInfoState, appInfoDispatch, getEnabledSaveTypes]}>
           <MouseContext.Provider value={[mouseState, mouseDispatch]}>
             <PokemonDragContext

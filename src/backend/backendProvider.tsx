@@ -7,7 +7,7 @@ import { SAV } from 'src/types/SAVTypes/SAV'
 import { StoredBoxData } from 'src/types/storage'
 import { Errorable } from 'src/types/types'
 import { getMonFileIdentifier } from 'src/util/Lookup'
-import BackendInterface from '../types/backendInterface'
+import BackendInterface from './backendInterface'
 import DummyBackend from './dummyBackend'
 
 export type BackendProviderProps = {

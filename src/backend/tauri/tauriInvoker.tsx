@@ -1,8 +1,8 @@
 import { invoke } from '@tauri-apps/api/core'
 import * as E from 'fp-ts/lib/Either'
 import { Errorable, JSONArray, JSONObject, JSONValue } from 'src/types/types'
-import { AppState } from '../../types/backendInterface'
 import { PossibleSaves } from '../../types/SAVTypes/path'
+import { AppState } from '../backendInterface'
 import { RustResult } from './types'
 
 function rustResultToEither<T, E>(result: RustResult<T, E>): E.Either<E, T> {

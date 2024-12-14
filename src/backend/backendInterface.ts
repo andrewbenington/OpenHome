@@ -1,7 +1,8 @@
-import { OHPKM } from './pkm/OHPKM'
-import { PathData, PossibleSaves } from './SAVTypes/path'
-import { SaveFolder, StoredBoxData } from './storage'
-import { Errorable, LoadSaveResponse, LookupMap, SaveRef } from './types'
+import { Settings } from '../state/appInfo'
+import { OHPKM } from '../types/pkm/OHPKM'
+import { PathData, PossibleSaves } from '../types/SAVTypes/path'
+import { SaveFolder, StoredBoxData } from '../types/storage'
+import { Errorable, LoadSaveResponse, LookupMap, SaveRef } from '../types/types'
 
 export type AppState = {
   open_transaction: boolean
@@ -51,6 +52,8 @@ export default interface BackendInterface {
   getPlatform: () => Promise<string>
   registerListeners: (listeners: BackendListeners) => () => void
   getState: () => Promise<Errorable<AppState>>
+  getSettings: () => Promise<Errorable<Settings>>
+  updateSettings: (settings: Settings) => Promise<Errorable<null>>
 }
 
 export interface BackendListeners {

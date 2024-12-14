@@ -16,13 +16,13 @@ import { XYSAV } from '../types/SAVTypes/XYSAV'
 
 export type Settings = {
   enabledSaveTypes: Record<string, boolean>
-  officialSaveTypes: SAVClass[]
-  extraSaveTypes: SAVClass[]
 }
 
 export type AppInfoState = {
   resourcesPath?: string
   settings: Settings
+  officialSaveTypes: SAVClass[]
+  extraSaveTypes: SAVClass[]
 }
 
 export type AppInfoAction =
@@ -37,12 +37,17 @@ export type AppInfoAction =
         enabled: boolean
       }
     }
+  | {
+      type: 'load_settings'
+      payload: Settings
+    }
 
 export const appInfoReducer: Reducer<AppInfoState, AppInfoAction> = (
   state: AppInfoState,
   action: AppInfoAction
 ) => {
   const { type, payload } = action
+  console.log({ type, payload })
 
   switch (type) {
     case 'set_resources_path': {
@@ -64,26 +69,14 @@ export const appInfoReducer: Reducer<AppInfoState, AppInfoAction> = (
         settings: { ...state.settings, enabledSaveTypes: enabled },
       }
     }
+    case 'load_settings': {
+      return { ...state, settings: payload }
+    }
   }
 }
 
 export const appInfoInitialState: AppInfoState = {
   settings: {
-    officialSaveTypes: [
-      G1SAV,
-      G2SAV,
-      G3SAV,
-      DPSAV,
-      PtSAV,
-      HGSSSAV,
-      BWSAV,
-      BW2SAV,
-      XYSAV,
-      ORASSAV,
-      SMSAV,
-      USUMSAV,
-    ],
-    extraSaveTypes: [G3RRSAV],
     enabledSaveTypes: Object.fromEntries(
       [
         G1SAV,
@@ -102,6 +95,22 @@ export const appInfoInitialState: AppInfoState = {
       ].map((savetype) => [savetype.name, true])
     ),
   },
+
+  officialSaveTypes: [
+    G1SAV,
+    G2SAV,
+    G3SAV,
+    DPSAV,
+    PtSAV,
+    HGSSSAV,
+    BWSAV,
+    BW2SAV,
+    XYSAV,
+    ORASSAV,
+    SMSAV,
+    USUMSAV,
+  ],
+  extraSaveTypes: [G3RRSAV],
 }
 
 export const AppInfoContext = createContext<

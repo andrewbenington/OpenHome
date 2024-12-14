@@ -4,12 +4,13 @@ import { open as fileDialog } from '@tauri-apps/plugin-dialog'
 import { platform } from '@tauri-apps/plugin-os'
 import { open } from '@tauri-apps/plugin-shell'
 import * as E from 'fp-ts/lib/Either'
+import BackendInterface from 'src/backend/backendInterface'
+import { OHPKM } from 'src/types/pkm/OHPKM'
 import { PathData, PossibleSaves } from 'src/types/SAVTypes/path'
-import BackendInterface from 'src/types/backendInterface'
 import { SaveFolder, StoredBoxData } from 'src/types/storage'
-import { OHPKM } from '../types/pkm/OHPKM'
-import { Errorable, JSONObject, LoadSaveResponse, LookupMap, SaveRef } from '../types/types'
-import { TauriInvoker } from './tauri/tauriInvoker'
+import { Errorable, JSONObject, LoadSaveResponse, LookupMap, SaveRef } from 'src/types/types'
+import { Settings } from '../../state/appInfo'
+import { TauriInvoker } from './tauriInvoker'
 
 export const TauriBackend: BackendInterface = {
   /* past gen identifier lookups */
@@ -203,6 +204,21 @@ export const TauriBackend: BackendInterface = {
   },
   getPlatform: async () => platform(),
   getState: async () => TauriInvoker.getState(),
+  getSettings: async () => {
+    const promise = TauriInvoker.getStorageFileJSON('settings.json') as Promise<
+      Errorable<Partial<Settings>>
+    >
+
+    return promise.then(
+      E.match(
+        (err) => E.left(err),
+        (partialSettings) => E.right({ enabledSaveTypes: {}, ...partialSettings })
+      )
+    )
+  },
+  updateSettings: async (settings: Settings) => {
+    return TauriInvoker.writeStorageFileJSON('settings.json', settings as JSONObject)
+  },
 
   registerListeners: (listeners) => {
     const unlistenPromise = Promise.all([

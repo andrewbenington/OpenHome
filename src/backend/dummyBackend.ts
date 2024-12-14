@@ -1,5 +1,5 @@
 import * as E from 'fp-ts/lib/Either'
-import BackendInterface, { BackendListeners } from '../types/backendInterface'
+import BackendInterface, { BackendListeners } from './backendInterface'
 
 const DummyBackend: BackendInterface = {
   /* past gen identifier lookups */
@@ -42,6 +42,8 @@ const DummyBackend: BackendInterface = {
   getPlatform: async () => 'none',
   registerListeners: (_: BackendListeners) => () => {},
   getState: async () => E.left('no backend in use'),
+  getSettings: async () => E.left('no backend in use'),
+  updateSettings: async () => E.left('no backend in use'),
 }
 
 export default DummyBackend
