@@ -32,7 +32,8 @@
     "build": "tsc && vite build",
     "dev": "vite",
     "tauri": "tauri",
-    "test": "jest"
+    "test": "jest",
+    "precommit": "prettier --write . && eslint src --report-unused-disable-directives -c eslint.config.mjs --fix"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
