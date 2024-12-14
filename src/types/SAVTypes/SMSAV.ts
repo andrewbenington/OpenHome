@@ -24,6 +24,7 @@ export class SMSAV extends G7SAV {
   }
 
   static saveTypeName: string = 'Pokémon Sun/Moon'
+  static saveTypeID = 'SMSAV'
 
   static includesOrigin(origin: GameOfOrigin) {
     return origin === GameOfOrigin.Sun || origin === GameOfOrigin.Moon

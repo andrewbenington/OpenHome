@@ -6,6 +6,7 @@ import { hasDesamumeFooter } from './util'
 
 export class BW2SAV extends G5SAV {
   static transferRestrictions = BW2_TRANSFER_RESTRICTIONS
+  static saveTypeID = 'BW2SAV'
 
   supportsMon(dexNumber: number, formeNumber: number) {
     return !isRestricted(BW2_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)

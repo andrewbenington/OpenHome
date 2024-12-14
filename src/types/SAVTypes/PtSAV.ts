@@ -10,6 +10,7 @@ import { hasDesamumeFooter } from './util'
 
 export class PtSAV extends G4SAV {
   static pkmType = PK4
+  static saveTypeID = 'PtSAV'
 
   name: string
   tid: number

@@ -49,7 +49,7 @@ export default function App() {
   const getEnabledSaveTypes = useCallback(() => {
     return appInfoState.extraSaveTypes
       .concat(appInfoState.officialSaveTypes)
-      .filter((saveType) => appInfoState.settings.enabledSaveTypes[saveType.name])
+      .filter((saveType) => appInfoState.settings.enabledSaveTypes[saveType.saveTypeID])
   }, [appInfoState])
 
   // only on app start

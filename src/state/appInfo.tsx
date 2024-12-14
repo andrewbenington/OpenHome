@@ -59,9 +59,9 @@ export const appInfoReducer: Reducer<AppInfoState, AppInfoAction> = (
       const enabled = state.settings.enabledSaveTypes
 
       if (payload.enabled) {
-        enabled[payload.saveType.name] = true
+        enabled[payload.saveType.saveTypeID] = true
       } else {
-        enabled[payload.saveType.name] = false
+        enabled[payload.saveType.saveTypeID] = false
       }
       return {
         ...state,
@@ -91,7 +91,7 @@ export const appInfoInitialState: AppInfoState = {
         SMSAV,
         USUMSAV,
         G3RRSAV,
-      ].map((savetype) => [savetype.name, true])
+      ].map((savetype) => [savetype.saveTypeID, true])
     ),
   },
 

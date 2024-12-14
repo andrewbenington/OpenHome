@@ -178,6 +178,7 @@ export abstract class G4SAV implements SAV<PK4> {
 
   static saveTypeAbbreviation = 'DPPt/HGSS'
   static saveTypeName = 'Pokémon Diamond/Pearl/Platinum/HeartGold/SoulSilver'
+  static saveTypeID = 'G4SAV'
 
   // Gen 4 saves include a size and hex "date" that can identify save type
   static validDateAndSize(bytes: Uint8Array, offset: number) {

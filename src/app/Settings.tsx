@@ -28,7 +28,7 @@ export default function Settings() {
                     payload: { saveType, enabled: e.target.checked },
                   })
                 }
-                checked={appInfoState.settings.enabledSaveTypes[saveType.name]}
+                checked={appInfoState.settings.enabledSaveTypes[saveType.saveTypeID]}
               />
               {saveType.saveTypeName}
             </label>

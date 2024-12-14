@@ -24,6 +24,7 @@ export class XYSAV extends G6SAV {
   }
 
   static saveTypeName = 'Pokémon X/Y'
+  static saveTypeID = 'XYSAV'
 
   static includesOrigin(origin: GameOfOrigin) {
     return origin === GameOfOrigin.X || origin === GameOfOrigin.Y

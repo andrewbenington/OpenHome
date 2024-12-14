@@ -12,6 +12,7 @@ const SAVE_SIZE_BYTES = 0x6cc00
 
 export class USUMSAV extends G7SAV {
   boxNamesOffset: number = BOX_NAMES_OFFSET
+  static saveTypeID = 'USUMSAV'
 
   constructor(path: PathData, bytes: Uint8Array) {
     super(path, bytes, PC_OFFSET, PC_CHECKSUM_OFFSET, BOX_NAMES_OFFSET)

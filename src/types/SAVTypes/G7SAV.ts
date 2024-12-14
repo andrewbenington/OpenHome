@@ -18,6 +18,7 @@ const BOX_COUNT = 32
 export abstract class G7SAV implements SAV<PK7> {
   static pkmType = PK7
   static saveTypeAbbreviation = 'SM/USUM'
+  static saveTypeID = 'G7SAV'
 
   origin: GameOfOrigin = 0
   isPlugin = false
