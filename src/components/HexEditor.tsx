@@ -8,7 +8,7 @@ import { OHPKM } from 'src/types/pkm/OHPKM'
 
 interface HexEditorProps {
   data: Uint8Array
-  format?: keyof typeof FileSchemas
+  format?: keyof typeof FileSchemas | 'OHPKM'
 }
 
 const styles: { [key: string]: CSSProperties } = {
