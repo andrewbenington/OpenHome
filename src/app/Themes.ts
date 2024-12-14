@@ -46,6 +46,7 @@ export const components: Components<Theme> = {
         padding: 0,
         minHeight: ownerState.size === 'sm' ? 0 : undefined,
         height: 'fit-content',
+        borderRadius: 3,
       }),
     },
   },

@@ -94,6 +94,10 @@ export type OpenSavesAction =
       type: 'set_error'
       payload: string | undefined
     }
+  | {
+      type: 'set_box_name'
+      payload: { name: string | undefined; index: number }
+    }
 
 const updateMonInSave = (
   state: OpenSavesState,
@@ -128,7 +132,7 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
   switch (type) {
     case 'set_home_boxes': {
       const { boxes, homeLookup } = payload
-      const newHomeData = state.homeData ?? new HomeData()
+      const newHomeData = state.homeData ?? new HomeData(boxes)
 
       Object.values(boxes).forEach((box) => {
         newHomeData.boxes[box.index].loadMonsFromIdentifiers(box.monIdentifiersByIndex, homeLookup)
@@ -288,6 +292,15 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
     }
     case 'close_all_saves': {
       return { ...state, openSaves: {} }
+    }
+    case 'set_box_name': {
+      const newState = { ...state }
+      const box = newState.homeData?.boxes[payload.index]
+
+      if (box) {
+        box.name = payload.name
+      }
+      return newState
     }
   }
 }
