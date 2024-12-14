@@ -61,11 +61,17 @@ export default function App() {
           async (err) => {
             console.error(err)
           },
-          async (settings) => appInfoDispatch({ type: 'load_settings', payload: settings })
+          async (settings) => {
+            appInfoDispatch({ type: 'load_settings', payload: settings })
+          }
         )
       )
       .finally(() => setLoading(false))
   }, [backend])
+
+  useEffect(() => {
+    backend.updateSettings(appInfoState.settings).catch(console.error)
+  }, [appInfoState.settings, backend])
 
   return (
     <ThemeProvider theme={theme}>

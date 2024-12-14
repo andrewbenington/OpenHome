@@ -69,7 +69,16 @@ export const appInfoReducer: Reducer<AppInfoState, AppInfoAction> = (
       }
     }
     case 'load_settings': {
-      return { ...state, settings: payload }
+      const officialSaveTypeIDs = state.officialSaveTypes.map((st) => st.saveTypeID)
+      const extraSaveTypeIDs = state.extraSaveTypes.map((st) => st.saveTypeID)
+      const enabled = Object.fromEntries(
+        Object.entries(payload.enabledSaveTypes).filter(
+          ([saveTypeID]) =>
+            officialSaveTypeIDs.includes(saveTypeID) || extraSaveTypeIDs.includes(saveTypeID)
+        )
+      )
+
+      return { ...state, settings: { ...payload, enabledSaveTypes: enabled } }
     }
   }
 }
