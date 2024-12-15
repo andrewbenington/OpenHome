@@ -14,6 +14,7 @@ const BOX_DATA_SIZE: number = 0x34ad0
 export abstract class G6SAV implements SAV<PK6> {
   static pkmType = PK6
   static saveTypeAbbreviation = 'XY/ORAS'
+  static saveTypeID = 'G6SAV'
 
   origin: GameOfOrigin = 0
   isPlugin: false = false

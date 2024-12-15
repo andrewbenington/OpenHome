@@ -37,6 +37,7 @@ export interface SAVClass {
   includesOrigin: (origin: GameOfOrigin) => boolean
   lookupType?: 'gen12' | 'gen345'
   saveTypeName: string
+  saveTypeID: string
   saveTypeAbbreviation: string
 }
 

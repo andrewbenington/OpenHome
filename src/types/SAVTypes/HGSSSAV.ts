@@ -75,6 +75,7 @@ export class HGSSSAV extends G4SAV {
   }
 
   static saveTypeName = 'Pokémon HeartGold/SoulSilver'
+  static saveTypeID = 'HGSSSAV'
 
   static fileIsSave(bytes: Uint8Array): boolean {
     if (bytes.length < G4SAV.SAVE_SIZE_BYTES) {

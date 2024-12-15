@@ -341,6 +341,7 @@ export class G3SAV implements SAV<PK3> {
 
   static saveTypeAbbreviation = 'RSE/FRLG'
   static saveTypeName = 'Pokémon Ruby/Sapphire/Emerald/FireRed/LeafGreen'
+  static saveTypeID = 'G3SAV'
 
   static fileIsSave(bytes: Uint8Array): boolean {
     if (bytes.length !== SAVE_SIZE_BYTES) {

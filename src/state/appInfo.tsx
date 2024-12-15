@@ -59,9 +59,9 @@ export const appInfoReducer: Reducer<AppInfoState, AppInfoAction> = (
       const enabled = state.settings.enabledSaveTypes
 
       if (payload.enabled) {
-        enabled[payload.saveType.name] = true
+        enabled[payload.saveType.saveTypeID] = true
       } else {
-        enabled[payload.saveType.name] = false
+        enabled[payload.saveType.saveTypeID] = false
       }
       return {
         ...state,
@@ -69,7 +69,16 @@ export const appInfoReducer: Reducer<AppInfoState, AppInfoAction> = (
       }
     }
     case 'load_settings': {
-      return { ...state, settings: payload }
+      const officialSaveTypeIDs = state.officialSaveTypes.map((st) => st.saveTypeID)
+      const extraSaveTypeIDs = state.extraSaveTypes.map((st) => st.saveTypeID)
+      const enabled = Object.fromEntries(
+        Object.entries(payload.enabledSaveTypes).filter(
+          ([saveTypeID]) =>
+            officialSaveTypeIDs.includes(saveTypeID) || extraSaveTypeIDs.includes(saveTypeID)
+        )
+      )
+
+      return { ...state, settings: { ...payload, enabledSaveTypes: enabled } }
     }
   }
 }
@@ -91,7 +100,7 @@ export const appInfoInitialState: AppInfoState = {
         SMSAV,
         USUMSAV,
         G3RRSAV,
-      ].map((savetype) => [savetype.name, true])
+      ].map((savetype) => [savetype.saveTypeID, true])
     ),
   },
 

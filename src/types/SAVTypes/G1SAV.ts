@@ -250,6 +250,7 @@ export class G1SAV implements SAV<PK1> {
 
   static saveTypeAbbreviation = 'RBY (Int)'
   static saveTypeName = 'Pokémon Red/Blue/Yellow (INT)'
+  static saveTypeID = 'G1SAV'
 
   static fileIsSave(bytes: Uint8Array): boolean {
     // Gen 1 and Gen 2 saves are the same size, so assume it's Gen 2 if the Gen 2 checksums are valid

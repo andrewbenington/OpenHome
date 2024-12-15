@@ -71,6 +71,7 @@ export class DPSAV extends G4SAV {
   }
 
   static saveTypeName = 'Pokémon Diamond/Pearl'
+  static saveTypeID = 'DPSAV'
 
   static fileIsSave(bytes: Uint8Array): boolean {
     if (bytes.length < G4SAV.SAVE_SIZE_BYTES) {

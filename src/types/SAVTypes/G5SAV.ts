@@ -25,6 +25,7 @@ export abstract class G5SAV implements SAV<PK5> {
   static lookupType: LOOKUP_TYPE = 'gen345'
 
   static saveTypeAbbreviation = 'BW/BW2'
+  static saveTypeID = 'G5SAV'
 
   origin: GameOfOrigin = 0
   isPlugin: false = false
