@@ -2,10 +2,10 @@ import { Button, Card, Chip, Dropdown, Menu, MenuButton, MenuItem, Stack } from 
 import { GameOfOrigin, isGameBoy } from 'pokemon-resources'
 import { useContext, useEffect, useMemo, useState } from 'react'
 import { SaveRef } from 'src/types/types'
-import { getGameColor, getPluginIdentifier } from '../types/SAVTypes/util'
 import { BackendContext } from '../backend/backendProvider'
 import { MenuIcon } from '../components/Icons'
 import { AppInfoContext } from '../state/appInfo'
+import { getGameColor, getPluginIdentifier } from '../types/SAVTypes/util'
 import './style.css'
 import { formatTimeSince, getSaveLogo } from './util'
 

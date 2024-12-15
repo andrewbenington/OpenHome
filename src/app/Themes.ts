@@ -229,6 +229,7 @@ export const lightTheme: ColorSystemOptions = {
     secondary: {
       mainChannel: red,
       solidBg: red,
+      solidColor: '#fff',
       plainColor: '#333',
       plainHoverBg: red2,
       plainHoverColor: '#fff',
@@ -247,12 +248,10 @@ export const lightTheme: ColorSystemOptions = {
       solidColor: '#fff',
       solidHoverBg: '#799',
       solidActiveBg: '#688',
-      // plainHoverBg: lightTealSelected,
     },
     neutral: {
       softBg: '#888',
       softColor: '#fff',
-      // solidBg: '#6a9',
       solidColor: '#fff',
       outlinedHoverBg: '#ccc',
       outlinedColor: '#000',
