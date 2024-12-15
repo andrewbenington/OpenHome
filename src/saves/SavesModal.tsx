@@ -90,7 +90,16 @@ const SavesModal = (props: SavesModalProps) => {
         )
       )
     },
-    [backend, dispatchOpenSaves, lookupState, onClose]
+    [
+      backend,
+      dispatchOpenSaves,
+      getEnabledSaveTypes,
+      lookupState.gen12,
+      lookupState.gen345,
+      lookupState.homeMons,
+      lookupState.loaded,
+      onClose,
+    ]
   )
 
   return (

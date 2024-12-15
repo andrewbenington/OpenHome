@@ -59,7 +59,12 @@ export class G2SAV implements SAV<PK2> {
     ]
     this.boxes = []
     if (this.areGoldSilverChecksumsValid()) {
-      this.origin = GameOfOrigin.Silver // TODO: detect gold vs silver
+      // hacky but unavoidable
+      if (this.filePath.name.toUpperCase().includes('SILVER')) {
+        this.origin = GameOfOrigin.Silver
+      } else {
+        this.origin = GameOfOrigin.Gold
+      }
     } else if (this.areCrystalInternationalChecksumsValid()) {
       this.origin = GameOfOrigin.Crystal
     }
@@ -274,7 +279,7 @@ export class G2SAV implements SAV<PK2> {
   static saveTypeID = 'G2SAV'
 
   static fileIsSave(bytes: Uint8Array): boolean {
-    if (bytes.length !== SAVE_SIZE_BYTES) {
+    if (bytes.length < SAVE_SIZE_BYTES) {
       return false
     }
     try {
