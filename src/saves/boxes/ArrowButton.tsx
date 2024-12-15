@@ -33,7 +33,7 @@ const ArrowButton = (props: OpenHomeButtonProps) => {
       className="arrow-button"
       onClick={onClick}
       style={{
-        backgroundColor: palette.neutral.solidBg,
+        backgroundColor: palette.primary.solidBg,
         color: palette.neutral.solidColor,
         padding: 0,
         width: 32,

@@ -68,8 +68,8 @@ export default function OHDataGrid<R>(props: OHDataGridProps<R>) {
     <DataGrid
       className="datagrid"
       rowHeight={45}
-      style={{ fontSize: 12, height: 'inherit' }}
       {...otherProps}
+      style={{ fontSize: 12, height: 'inherit', ...otherProps.style }}
       rows={sortedRows}
       columns={reorderedColumns.map(sortableColumnToDGColumn)}
       sortColumns={sortColumns}

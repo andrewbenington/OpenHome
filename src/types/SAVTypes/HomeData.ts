@@ -1,19 +1,24 @@
 import lodash from 'lodash'
 import { GameOfOrigin } from 'pokemon-resources'
 import { getMonFileIdentifier } from 'src/util/Lookup'
+import { numericSorter } from '../../util/Sort'
 import { TransferRestrictions } from '../TransferRestrictions'
 import { OHPKM } from '../pkm/OHPKM'
-import { BoxMonIdentifiers } from '../storage'
+import { BoxMonIdentifiers, StoredBoxData } from '../storage'
 import { Box, BoxCoordinates, SAV } from './SAV'
 import { emptyPathData, PathData } from './path'
 
 export class HomeBox implements Box<OHPKM> {
-  name: string
+  name: string | undefined
+  index: number
 
   pokemon: Array<OHPKM | undefined> = new Array(120)
 
-  constructor(n: string) {
-    this.name = n
+  constructor(name: string, index: number) {
+    if (name !== `Box ${index + 1}`) {
+      this.name = name
+    }
+    this.index = index
   }
 
   getIdentifierMapping(): BoxMonIdentifiers {
@@ -68,9 +73,17 @@ export class HomeData implements SAV<OHPKM> {
 
   updatedBoxSlots: BoxCoordinates[] = []
 
-  constructor() {
-    this.boxNames = lodash.range(36).map((i) => `Box ${i + 1}`)
-    this.boxes = this.boxNames.map((name) => new HomeBox(name))
+  constructor(boxData?: Partial<StoredBoxData>[]) {
+    const sortedBoxData = boxData?.sort(
+      numericSorter((box) => (box.index === undefined ? Number.NEGATIVE_INFINITY : box.index))
+    )
+
+    if (sortedBoxData) {
+      this.boxNames = sortedBoxData?.map((box, i) => box.name ?? `Box ${i + 1}`)
+    } else {
+      this.boxNames = lodash.range(36).map((i) => `Box ${i + 1}`)
+    }
+    this.boxes = this.boxNames.map((name, i) => new HomeBox(name, i))
   }
   pluginIdentifier?: string | undefined
   pcChecksumOffset?: number | undefined

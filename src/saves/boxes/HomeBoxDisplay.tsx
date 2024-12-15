@@ -1,7 +1,9 @@
 import { useDraggable } from '@dnd-kit/core'
 import { Card, Grid } from '@mui/joy'
 import lodash from 'lodash'
-import { useCallback, useContext, useMemo } from 'react'
+import { useCallback, useContext, useMemo, useState } from 'react'
+import { EditIcon } from 'src/components/Icons'
+import MiniButton from 'src/components/MiniButton'
 import { MouseContext } from 'src/state/mouse'
 import { MonLocation, MonWithLocation, OpenSavesContext } from 'src/state/openSaves'
 import { PKMInterface } from 'src/types/interfaces'
@@ -17,6 +19,7 @@ const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
   const [mouseState, mouseDispatch] = useContext(MouseContext)
   const { setSelectedMon } = props
   const { active } = useDraggable({ id: '' })
+  const [editing, setEditing] = useState(false)
 
   const dispatchStartDrag = useCallback(
     (boxPos: number) => {
@@ -60,8 +63,14 @@ const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
     [active]
   )
 
+  const currentBox = useMemo(
+    () => homeData?.boxes[homeData.currentPCBox],
+    [homeData?.boxes, homeData?.currentPCBox]
+  )
+
   return (
-    homeData?.boxes[homeData.currentPCBox] && (
+    homeData &&
+    currentBox && (
       <Card
         style={{
           padding: 2,
@@ -70,7 +79,7 @@ const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
           gap: 0,
         }}
       >
-        <Grid container style={{ padding: 4 }}>
+        <Grid container style={{ padding: 4, minHeight: 48 }}>
           <Grid xs={4} display="grid" alignItems="center" justifyContent="end">
             <ArrowButton
               onClick={() =>
@@ -90,15 +99,30 @@ const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
             />
           </Grid>
           <Grid xs={4} className="box-name">
-            {homeData.boxes[homeData.currentPCBox]?.name}
+            {editing ? (
+              <input
+                value={currentBox.name || ''}
+                style={{ minWidth: 0, textAlign: 'center' }}
+                placeholder={`Box ${currentBox.index + 1}`}
+                onChange={(e) =>
+                  openSavesDispatch({
+                    type: 'set_box_name',
+                    payload: { name: e.target.value ?? undefined, index: currentBox.index },
+                  })
+                }
+                autoFocus
+              />
+            ) : (
+              <div>{currentBox.name?.trim() || `Box ${currentBox.index + 1}`}</div>
+            )}
           </Grid>
-          <Grid xs={4} display="grid" alignItems="center">
+          <Grid xs={3} display="grid" alignItems="center">
             <ArrowButton
               onClick={() =>
                 openSavesDispatch({
                   type: 'set_save_box',
                   payload: {
-                    boxNum: (homeData.currentPCBox + 1) % homeData.boxes.length,
+                    boxNum: (currentBox.index + 1) % homeData.boxes.length,
                     save: homeData,
                   },
                 })
@@ -107,11 +131,26 @@ const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
               direction="right"
             />
           </Grid>
+          <Grid xs={1} display="grid" alignItems="center" justifyContent="end">
+            <MiniButton
+              icon={EditIcon}
+              style={{
+                margin: 0,
+                borderWidth: 1,
+                borderStyle: 'solid',
+                borderColor: editing ? 'transparent' : undefined,
+                transition: 'none',
+              }}
+              color={editing ? 'secondary' : 'neutral'}
+              variant={editing ? 'solid' : 'outlined'}
+              onClick={() => setEditing(!editing)}
+            />
+          </Grid>
         </Grid>
         {lodash.range(10).map((row: number) => (
           <Grid container key={`pc_row_${row}`}>
             {lodash.range(12).map((rowIndex: number) => {
-              const mon = homeData.boxes[homeData.currentPCBox].pokemon[row * 12 + rowIndex]
+              const mon = currentBox.pokemon[row * 12 + rowIndex]
 
               return (
                 <Grid

@@ -6,7 +6,7 @@ import { PathData } from './path'
 
 type SparseArray<T> = (T | undefined)[]
 export class Box<P extends PKMInterface> {
-  name: string
+  name: string | undefined
   pokemon: SparseArray<P | OHPKM>
 
   constructor(name: string, boxSize: number) {

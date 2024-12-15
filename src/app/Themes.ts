@@ -46,23 +46,18 @@ export const components: Components<Theme> = {
         padding: 0,
         minHeight: ownerState.size === 'sm' ? 0 : undefined,
         height: 'fit-content',
+        borderRadius: 3,
       }),
     },
   },
   JoyTab: {
     styleOverrides: {
       root: {
-        border: 'none',
-        textTransform: 'none',
-        fontSize: 14,
-        ':hover': {
-          border: 'none',
-        },
-        ':focus': {
-          border: 'none',
-        },
         fontWeight: 'bold',
       },
+    },
+    defaultProps: {
+      variant: 'solid',
     },
   },
   JoyTabPanel: {
@@ -143,6 +138,13 @@ export const components: Components<Theme> = {
       },
     },
   },
+  JoyTabList: {
+    styleOverrides: {
+      root: {
+        paddingBottom: 0,
+      },
+    },
+  },
   JoyModalOverflow: {
     styleOverrides: {
       root: {
@@ -189,13 +191,14 @@ export const darkTheme: ColorSystemOptions = {
     },
     primary: {
       mainChannel: '#780600',
-      plainColor: red2,
-      plainActiveBg: '#433',
+      plainColor: 'white',
+      plainHoverBg: 'none',
+      plainActiveBg: '#9993',
+      plainHoverColor: red2,
+      plainActiveColor: red2,
       solidBg: '#466',
-      solidColor: '#fff',
       solidHoverBg: '#688',
       solidActiveBg: '#8EAEB0',
-      solidActiveColor: '#333',
     },
     background: {
       body: '#2c313a',
@@ -212,6 +215,7 @@ export const darkTheme: ColorSystemOptions = {
       outlinedColor: '#fff',
       plainColor: '#fff',
       outlinedHoverBg: '#fff3',
+      outlinedActiveBg: '#fff6',
       plainActiveBg: '#fff6',
       plainHoverBg: '#333438',
       plainHoverColor: '#fff',
@@ -225,30 +229,33 @@ export const lightTheme: ColorSystemOptions = {
     secondary: {
       mainChannel: red,
       solidBg: red,
-      solidColor: '#fff',
       plainColor: '#333',
       plainHoverBg: red2,
       plainHoverColor: '#fff',
-      plainActiveColor: '#333',
+      plainActiveBg: '#9993',
       softBorder: '#999',
       softActiveBg: red,
     },
     primary: {
       mainChannel: red2,
-      plainColor: red2,
+      plainColor: '#000',
+      plainActiveColor: red2,
+      plainHoverColor: red2,
+      plainHoverBg: 'transparent',
       plainActiveBg: '#bee7d5',
       solidBg: '#466',
       solidColor: '#fff',
-      solidHoverBg: '#688',
-      solidActiveBg: '#dfd',
-      solidActiveColor: '#333',
+      solidHoverBg: '#799',
+      solidActiveBg: '#688',
       // plainHoverBg: lightTealSelected,
     },
     neutral: {
       softBg: '#888',
       softColor: '#fff',
-      solidBg: '#6a9',
+      // solidBg: '#6a9',
       solidColor: '#fff',
+      outlinedHoverBg: '#ccc',
+      outlinedColor: '#000',
     },
     background: {
       body: lightTeal,

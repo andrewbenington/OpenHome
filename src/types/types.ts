@@ -166,7 +166,7 @@ export type ImageSource =
     }
   | undefined
 
-export type JSONValue = string | number | boolean | null | JSONArray | JSONObject
+export type JSONValue = string | number | boolean | null | undefined | JSONArray | JSONObject
 
 export interface JSONObject extends Record<string, JSONValue> {}
 

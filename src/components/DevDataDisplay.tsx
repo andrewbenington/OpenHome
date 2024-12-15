@@ -3,13 +3,13 @@ import { CSSProperties, useState } from 'react'
 import { IconType } from 'react-icons'
 import { MdDataObject } from 'react-icons/md'
 import { InfoGrid } from './InfoGrid'
-import MiniButton from './MiniButton'
+import MiniButton, { MiniButtonProps } from './MiniButton'
 
 type DevDataDisplayProps = {
   data?: object
   icon?: IconType
   style?: CSSProperties
-}
+} & MiniButtonProps
 
 export function DevDataDisplay(props: DevDataDisplayProps) {
   const [debugModal, setDebugModal] = useState(false)
@@ -21,6 +21,7 @@ export function DevDataDisplay(props: DevDataDisplayProps) {
         icon={props.icon ?? MdDataObject}
         style={props.style}
         tabIndex={-1}
+        {...props}
       />
       <Modal open={debugModal} onClose={() => setDebugModal(false)}>
         <ModalOverflow>

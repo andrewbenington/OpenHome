@@ -16,10 +16,10 @@ export default function MiniButton(props: MiniButtonProps) {
   return (
     <Button
       style={{
-        padding: 2,
+        padding: 0,
         minWidth: 0,
         minHeight: 0,
-        // height: 'fit-content',
+        width: 'fit-content',
         marginTop: 'auto',
         marginBottom: 'auto',
         borderWidth: 1,
