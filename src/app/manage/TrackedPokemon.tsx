@@ -1,7 +1,7 @@
 import { Card, Modal, Tab, tabClasses, TabList, TabPanel, Tabs } from '@mui/joy'
 import { useState } from 'react'
-import { PKMInterface } from '../../types/interfaces'
 import PokemonDetailsPanel from '../../pokemon/PokemonDetailsPanel'
+import { PKMInterface } from '../../types/interfaces'
 import Gen12Lookup from './Gen12Lookup'
 import Gen345Lookup from './Gen345Lookup'
 import OpenHomeMonList from './OpenHomeMonList'
@@ -15,7 +15,6 @@ export default function TrackedPokemon() {
       <TabList
         variant="solid"
         color="primary"
-        disableUnderline
         sx={{
           whiteSpace: 'nowrap',
           p: 0.8,

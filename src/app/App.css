@@ -31,7 +31,6 @@ body,
   font-weight: 400;
 
   color-scheme: dark;
-  /* color: rgba(255, 255, 255, 0.87); */
   background-color: #5d707f;
 
   font-synthesis: none;
@@ -84,11 +83,6 @@ select {
 
 button {
   padding: 0.3em 0.3em;
-}
-
-button:hover,
-select:hover {
-  border-color: #e45454;
 }
 
 select:focus,
@@ -183,4 +177,10 @@ button > svg {
 .scroll-no-bar {
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
+}
+
+.tab-row {
+  box-shadow:
+    rgba(0, 0, 0, 0.3) 0px 3px 12px,
+    rgba(0, 0, 0, 0.23) 0px 3px 6px !important;
 }

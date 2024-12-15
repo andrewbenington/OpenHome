@@ -74,5 +74,11 @@ export default function OpenHomeMonList() {
     },
   ]
 
-  return <OHDataGrid rows={Object.values(homeMons ?? {})} columns={columns} />
+  return (
+    <OHDataGrid
+      rows={Object.values(homeMons ?? {})}
+      columns={columns}
+      style={{ borderLeft: 'none', borderBottom: 'none' }}
+    />
+  )
 }
