@@ -1,4 +1,5 @@
-use std::{collections::HashSet, fs::File, io::Read, path::PathBuf};
+use std::{collections::HashSet, io::Read, path::PathBuf};
+use std::fs::{File, create_dir_all};
 use serde;
 use tauri::Manager;
 
@@ -79,4 +80,16 @@ pub fn dedupe_paths(paths: Vec<PathData>) -> Vec<PathData> {
         .into_iter()
         .filter(|path| seen.insert(path.raw.clone()))
         .collect()
+}
+
+pub fn create_openhome_directory(app_handle: &tauri::AppHandle) -> Result<(), String> {
+    
+    let appdata_dir = get_appdata_dir(app_handle)?;
+    let mut full_path = PathBuf::new();
+
+    full_path.push(appdata_dir);
+    full_path.push("storage".to_owned());
+
+    create_dir_all(full_path).unwrap();
+    Ok(())
 }

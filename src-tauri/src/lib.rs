@@ -89,6 +89,7 @@ fn init_storage_json_file(
 ) -> Result<(), String> {
     let absolute_path = util::prepend_appdata_storage_to_path(app_handle, &relative_path)?;
     if !Path::new(&absolute_path).exists() {
+        util::create_openhome_directory(app_handle)?;
         let mut file = File::create(&absolute_path).map_err(|e| e.to_string())?;
         if is_array {
             file.write_all(b"[]").map_err(|e| e.to_string())?;
