@@ -126,11 +126,17 @@ export const TauriBackend: BackendInterface = {
 
     const validatedSaves: Record<string, SaveRef> = {}
 
+    let modified = false
+
     for (let [rawPath, saveRef] of Object.entries(result.right)) {
       if (!saveRef.filePath.dir) {
         saveRef.filePath = await pathDataFromRaw(rawPath)
+        modified = true
       }
 
+      if (modified) {
+        TauriInvoker.writeStorageFileJSON('recent_saves.json', validatedSaves)
+      }
       validatedSaves[rawPath] = saveRef
     }
 
