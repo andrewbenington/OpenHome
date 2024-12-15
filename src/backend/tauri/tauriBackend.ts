@@ -116,9 +116,25 @@ export const TauriBackend: BackendInterface = {
 
   // /* game save management */
   getRecentSaves: async (): Promise<Errorable<Record<string, SaveRef>>> => {
-    return TauriInvoker.getStorageFileJSON('recent_saves.json') as Promise<
+    const result = await (TauriInvoker.getStorageFileJSON('recent_saves.json') as Promise<
       Errorable<Record<string, SaveRef>>
-    >
+    >)
+
+    if (E.isLeft(result)) {
+      return result
+    }
+
+    const validatedSaves: Record<string, SaveRef> = {}
+
+    for (let [rawPath, saveRef] of Object.entries(result.right)) {
+      if (!saveRef.filePath.dir) {
+        saveRef.filePath = await pathDataFromRaw(rawPath)
+      }
+
+      validatedSaves[rawPath] = saveRef
+    }
+
+    return E.right(validatedSaves)
   },
   addRecentSave: async (saveRef: SaveRef): Promise<Errorable<null>> => {
     const recentSavesResult = await (TauriInvoker.getStorageFileJSON(
