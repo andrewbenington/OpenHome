@@ -90,6 +90,6 @@ pub fn create_openhome_directory(app_handle: &tauri::AppHandle) -> Result<(), St
     full_path.push(appdata_dir);
     full_path.push("storage".to_owned());
 
-    create_dir_all(full_path).unwrap();
+    create_dir_all(full_path).map_err(|e| e.to_string())?;
     Ok(())
 }
