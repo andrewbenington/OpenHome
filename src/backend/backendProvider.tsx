@@ -82,7 +82,7 @@ async function writeAllHomeData(
     } catch (e) {
       const species = mon.dexNum in PokemonData ? PokemonData[mon.dexNum].name : 'Unknown Species'
 
-      results.push(E.left(`Error encoding ${mon.nickname} (${species})`))
+      results.push(E.left(`Error encoding ${mon.nickname} (${species}): ${e}`))
     }
   }
   return results
