@@ -32,11 +32,9 @@ describe('G3RRSAV - Radical Red Save File Read Test', () => {
 
     const parsedPath: PathData = {
       raw: './SAVFILES/radicalred.sav',
-      base: '.SAVFILES/radical red.sav',
       name: 'radical red',
       dir: './SAVFILES',
       ext: '.sav',
-      root: '/',
       separator: '/',
     }
 
@@ -125,11 +123,9 @@ describe('G3RRSAV - Radical Red Save File Write Test', () => {
 
     const parsedPath: PathData = {
       raw: './SAVFILES/radicalred.sav',
-      base: '.SAVFILES/radicalred.sav',
       name: 'radical red',
       dir: './SAVFILES',
       ext: '.sav',
-      root: '/',
       separator: '/',
     }
 
@@ -168,11 +164,9 @@ describe('G3RRSAV - Radical Red Save File Write Test', () => {
   test('should check if modifications were made', () => {
     const parsedPath: PathData = {
       raw: './SAVFILES/radicalred_modified.sav',
-      base: '.SAVFILES/radicalred_modified.sav',
       name: 'radical red',
       dir: './SAVFILES',
       ext: '.sav',
-      root: '/',
       separator: '/',
     }
 

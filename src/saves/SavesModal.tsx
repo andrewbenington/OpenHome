@@ -47,7 +47,8 @@ const SavesModal = (props: SavesModalProps) => {
           console.error(pickedFile.left)
           return
         }
-        filePath = { raw: pickedFile.right } as PathData
+        if (!pickedFile.right) return
+        filePath = pickedFile.right
       }
       backend.loadSaveFile(filePath).then(
         E.match(

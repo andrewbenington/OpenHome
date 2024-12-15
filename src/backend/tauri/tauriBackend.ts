@@ -12,6 +12,22 @@ import { Errorable, JSONObject, LoadSaveResponse, LookupMap, SaveRef } from 'src
 import { Settings } from '../../state/appInfo'
 import { TauriInvoker } from './tauriInvoker'
 
+async function pathDataFromRaw(raw: string): Promise<PathData> {
+  const filename = await path.basename(raw)
+  const dir = await path.dirname(raw)
+  const ext = await path.extname(raw)
+
+  const pathData: PathData = {
+    raw,
+    name: filename,
+    separator: path.sep(),
+    dir,
+    ext,
+  }
+
+  return pathData
+}
+
 export const TauriBackend: BackendInterface = {
   /* past gen identifier lookups */
   loadGen12Lookup: function (): Promise<Errorable<LookupMap>> {
@@ -185,10 +201,11 @@ export const TauriBackend: BackendInterface = {
   },
 
   /* application */
-  pickFile: async (): Promise<Errorable<string | undefined>> => {
-    const path = await fileDialog({ directory: false, title: 'Select File' })
+  pickFile: async (): Promise<Errorable<PathData | undefined>> => {
+    const filePath = await fileDialog({ directory: false, title: 'Select File' })
 
-    return E.right(path ?? undefined)
+    if (!filePath) return E.right(undefined)
+    return E.right(await pathDataFromRaw(filePath))
   },
   pickFolder: async (): Promise<Errorable<string | undefined>> => {
     const path = await fileDialog({ directory: true, title: 'Select Folder' })
