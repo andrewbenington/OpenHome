@@ -12,6 +12,22 @@ import { Errorable, JSONObject, LoadSaveResponse, LookupMap, SaveRef } from 'src
 import { Settings } from '../../state/appInfo'
 import { TauriInvoker } from './tauriInvoker'
 
+async function pathDataFromRaw(raw: string): Promise<PathData> {
+  const filename = await path.basename(raw)
+  const dir = await path.dirname(raw)
+  const ext = await path.extname(raw)
+
+  const pathData: PathData = {
+    raw,
+    name: filename,
+    separator: path.sep(),
+    dir,
+    ext,
+  }
+
+  return pathData
+}
+
 export const TauriBackend: BackendInterface = {
   /* past gen identifier lookups */
   loadGen12Lookup: function (): Promise<Errorable<LookupMap>> {
@@ -100,9 +116,31 @@ export const TauriBackend: BackendInterface = {
 
   // /* game save management */
   getRecentSaves: async (): Promise<Errorable<Record<string, SaveRef>>> => {
-    return TauriInvoker.getStorageFileJSON('recent_saves.json') as Promise<
+    const result = await (TauriInvoker.getStorageFileJSON('recent_saves.json') as Promise<
       Errorable<Record<string, SaveRef>>
-    >
+    >)
+
+    if (E.isLeft(result)) {
+      return result
+    }
+
+    const validatedSaves: Record<string, SaveRef> = {}
+
+    let modified = false
+
+    for (let [rawPath, saveRef] of Object.entries(result.right)) {
+      if (!saveRef.filePath.dir) {
+        saveRef.filePath = await pathDataFromRaw(rawPath)
+        modified = true
+      }
+
+      if (modified) {
+        TauriInvoker.writeStorageFileJSON('recent_saves.json', validatedSaves)
+      }
+      validatedSaves[rawPath] = saveRef
+    }
+
+    return E.right(validatedSaves)
   },
   addRecentSave: async (saveRef: SaveRef): Promise<Errorable<null>> => {
     const recentSavesResult = await (TauriInvoker.getStorageFileJSON(
@@ -185,10 +223,11 @@ export const TauriBackend: BackendInterface = {
   },
 
   /* application */
-  pickFile: async (): Promise<Errorable<string | undefined>> => {
-    const path = await fileDialog({ directory: false, title: 'Select File' })
+  pickFile: async (): Promise<Errorable<PathData | undefined>> => {
+    const filePath = await fileDialog({ directory: false, title: 'Select File' })
 
-    return E.right(path ?? undefined)
+    if (!filePath) return E.right(undefined)
+    return E.right(await pathDataFromRaw(filePath))
   },
   pickFolder: async (): Promise<Errorable<string | undefined>> => {
     const path = await fileDialog({ directory: true, title: 'Select Folder' })

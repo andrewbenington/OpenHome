@@ -10,7 +10,7 @@ import {
 } from 'src/util/byteLogic'
 import { gen3StringToUTF } from 'src/util/Strings/StringConverter'
 import { OHPKM } from '../pkm/OHPKM'
-import { emptyPathData, PathData, splitPath } from './path'
+import { emptyPathData, PathData } from './path'
 import { Box, BoxCoordinates, SAV } from './SAV'
 import { LOOKUP_TYPE } from './util'
 
@@ -255,8 +255,7 @@ export class G3SAV implements SAV<PK3> {
     if (trainerMon) {
       this.origin = trainerMon?.gameOfOrigin
     } else {
-      const filePathElements = splitPath(this.filePath)
-      let fileName = filePathElements[filePathElements.length - 1]
+      let fileName = this.filePath.name
 
       fileName = fileName.replace(/\s+/g, '')
       if (fileName.includes('Ruby')) {

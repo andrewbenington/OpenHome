@@ -45,7 +45,7 @@ export default interface BackendInterface {
   rollbackTransaction: () => Promise<Errorable<null>>
 
   /* application */
-  pickFile: () => Promise<Errorable<string | undefined>>
+  pickFile: () => Promise<Errorable<PathData | undefined>>
   pickFolder: () => Promise<Errorable<string | undefined>>
   getResourcesPath: () => Promise<string>
   openDirectory: (directory: string) => Promise<Errorable<null>>

@@ -14,11 +14,9 @@ describe('gen 7 save files', () => {
 
     const parsedPath: PathData = {
       raw: './SAVFILES/ultrasun',
-      base: '.SAVFILES/ultrasun',
       name: 'ultrasun',
       dir: './SAVFILES',
       ext: '',
-      root: '/',
       separator: '/',
     }
 
