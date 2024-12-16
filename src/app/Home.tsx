@@ -17,6 +17,7 @@ import { bytesToPKMInterface } from 'pokemon-files'
 import { GameOfOrigin, isGameBoy, isGen3, isGen4, isGen5 } from 'pokemon-resources'
 import { useCallback, useContext, useEffect, useState } from 'react'
 import { MdFileOpen } from 'react-icons/md'
+import DroppableSpace from 'src/saves/boxes/DroppableSpace'
 import { Errorable } from 'src/types/types'
 import { BackendContext } from '../backend/backendProvider'
 import FilterPanel from '../components/filter/FilterPanel'
@@ -48,6 +49,7 @@ const Home = () => {
   const [filesToDelete, setFilesToDelete] = useState<string[]>([])
 
   const onViewDrop = (e: React.DragEvent<HTMLDivElement>, type: string) => {
+    console.log('onViewDrop', e)
     const processDroppedData = async (file?: File, droppedMon?: PKMInterface) => {
       let mon: PKMInterface | undefined = droppedMon
 
@@ -328,18 +330,20 @@ const Home = () => {
           onDrop={(e) => onViewDrop(e, 'release')}
         >
           Release
-          <div className="release-icon-container" style={{ display: 'flex' }}>
-            {openSavesState.monsToRelease.map((mon, i) => {
-              return (
-                <PokemonIcon
-                  key={`delete_mon_${i}`}
-                  dexNumber={mon.dexNum}
-                  formeNumber={mon.formeNum}
-                  style={{ height: 32, width: 32 }}
-                />
-              )
-            })}
-          </div>
+          <DroppableSpace onOver={() => console.log('TO RELEASE OVER')} dropID={`to_release`}>
+            <div className="release-icon-container" style={{ display: 'flex' }}>
+              {openSavesState.monsToRelease.map((mon, i) => {
+                return (
+                  <PokemonIcon
+                    key={`delete_mon_${i}`}
+                    dexNumber={mon.dexNum}
+                    formeNumber={mon.formeNum}
+                    style={{ height: 32, width: 32 }}
+                  />
+                )
+              })}
+            </div>
+          </DroppableSpace>
         </div>
       </Stack>
       <Modal open={!!selectedMon} onClose={() => setSelectedMon(undefined)}>
