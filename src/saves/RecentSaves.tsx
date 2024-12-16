@@ -12,7 +12,7 @@ import OHDataGrid, { SortableColumn } from '../components/OHDataGrid'
 import { AppInfoContext } from '../state/appInfo'
 import { OpenSavesContext } from '../state/openSaves'
 import SaveCard from './SaveCard'
-import { formatTime, formatTimeSince, getSaveLogo, SaveViewMode } from "./util"
+import { formatTime, formatTimeSince, getSaveLogo, SaveViewMode } from './util'
 
 interface SaveFileSelectorProps {
   onOpen: (path: PathData) => void
