@@ -2,6 +2,7 @@ use std::process::Command;
 
 use tauri::{menu::*, AppHandle, Emitter, Manager, Wry};
 
+#[cfg(target_os = "macos")]
 const OPEN_CMD: &str = "open";
 #[cfg(target_os = "linux")]
 const OPEN_CMD: &str = "xdg-open";
@@ -110,7 +111,6 @@ pub fn create_menu(handle: &AppHandle) -> Result<Menu<Wry>, Box<dyn std::error::
 }
 
 fn command_open(target: &str) {
-    #[cfg(target_os = "macos")]
     let child = Command::new(OPEN_CMD)
         .arg(target) // <- Specify the directory you'd like to open.
         .spawn();
