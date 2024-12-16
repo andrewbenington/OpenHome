@@ -85,14 +85,14 @@ pub fn create_menu(handle: &AppHandle) -> Result<Menu<Wry>, Box<dyn std::error::
     // let about_item = MenuItem::with_id(handle, "about", "About", true, None::<&str>)?;
     let check_updates_item = MenuItem::with_id(
         handle,
-        "check_updates",
+        "check-updates",
         "Check for Updates",
         true,
         Some("CmdOrCtrl+U"),
     )?;
     let visit_github_item = MenuItem::with_id(
         handle,
-        "visit_github",
+        "visit-github",
         "Visit Github",
         true,
         Some("CmdOrCtrl+G"),
@@ -124,8 +124,8 @@ pub fn handle_menu_event(app_handle: &AppHandle, event: MenuEvent) {
     println!("Triggered menu event ID: {}", event.id.as_ref());
     match event.id.as_ref() {
         // File menu actions
-        "new" => println!("New file action triggered!"),
-        "open" => println!("Open file action triggered!"),
+        // "new" => println!("New file action triggered!"),
+        // "open" => println!("Open file action triggered!"),
         "save" => {
             let result = app_handle.emit("save", ());
             if let Err(error) = result {
@@ -161,9 +161,9 @@ pub fn handle_menu_event(app_handle: &AppHandle, event: MenuEvent) {
 
         // Help menu actions
         // "about" => println!("About action triggered!"),
-        // "check_updates" => println!("Check for updates action triggered!"),
-        "visit_github" => command_open("https://github.com/andrewbenington/OpenHome"),
+        "check-updates" => command_open("https://andrewbenington.github.io/OpenHome/download.html"),
+        "visit-github" => command_open("https://github.com/andrewbenington/OpenHome"),
 
-        _ => println!("Nothing triggered!"),
+        _ => (),
     }
 }
