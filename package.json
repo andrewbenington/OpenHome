@@ -25,6 +25,7 @@
   "scripts": {
     "format": "prettier --write .",
     "lint": "eslint src --report-unused-disable-directives -c eslint.config.mjs --fix",
+    "lint:ci": "eslint src --report-unused-disable-directives -c eslint.config.mjs",
     "typecheck": "tsc",
     "start": "./buildVersionJSON.sh && tauri preview",
     "dev:unix": "./buildVersionJSON.sh && tauri dev",
