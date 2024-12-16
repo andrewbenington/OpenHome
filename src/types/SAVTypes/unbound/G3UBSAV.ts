@@ -25,11 +25,16 @@ export class G3UBSAV implements PluginSAV<PK3UB> {
   updatedBoxSlots: BoxCoordinates[] = []
   gameColor!: () => string
   isPlugin: true = true
-  getPluginIdentifier!: (() => string | undefined) & (() => string)
   getCurrentBox!: () => Box<PK3UB>
   supportsMon!: (dexNumber: number, formeNumber: number) => boolean
   prepareBoxesAndGetModified!: () => OHPKM[]
   calculateChecksum?: (() => number) | undefined
   getGameName!: () => string
   getExtraData?: (() => object) | undefined
+
+  getPluginIdentifier() {
+    return 'unbound'
+  }
+
+  static saveTypeID = 'G3UBSAV'
 }

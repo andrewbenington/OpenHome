@@ -12,6 +12,7 @@ import * as E from 'fp-ts/lib/Either'
 import { useCallback, useContext, useState } from 'react'
 import 'react-data-grid/lib/styles.css'
 import { PathData } from 'src/types/SAVTypes/path'
+import { SAVClass } from 'src/types/SAVTypes/util'
 import { getMonFileIdentifier } from 'src/util/Lookup'
 import { BackendContext } from '../backend/backendProvider'
 import { CardsIcon, GridIcon } from '../components/Icons'
@@ -19,19 +20,25 @@ import { AppInfoContext } from '../state/appInfo'
 import { LookupContext } from '../state/lookup'
 import { OpenSavesContext } from '../state/openSaves'
 import { getSaveRef } from '../types/SAVTypes/SAV'
-import { buildSaveFile } from '../types/SAVTypes/load'
+import { buildSaveFile, getSaveType } from '../types/SAVTypes/load'
 import RecentSaves from './RecentSaves'
 import SaveFolders from './SaveFolders'
+import { waitForPluginSelection } from './SelectPlugin'
 import SuggestedSaves from './SuggestedSaves'
 import { SaveViewMode } from './util'
 
 interface SavesModalProps {
   onClose: () => void,
-  setSaveFound: React.Dispatch<React.SetStateAction<boolean>>
+  setSaveFound: React.Dispatch<React.SetStateAction<boolean>>,
+  setSpecifySave: React.Dispatch<React.SetStateAction<{
+    supportedSaveTypes: SAVClass[];
+    plugins: string[];
+    onSelect?: (plugin: string) => void;
+  } | null>>
 }
 
 const SavesModal = (props: SavesModalProps) => {
-  const { onClose, setSaveFound } = props
+  const { onClose, setSaveFound, setSpecifySave } = props
   const backend = useContext(BackendContext)
   const [, dispatchOpenSaves] = useContext(OpenSavesContext)
   const [lookupState] = useContext(LookupContext)
@@ -54,11 +61,31 @@ const SavesModal = (props: SavesModalProps) => {
       backend.loadSaveFile(filePath).then(
         E.match(
           (err) => console.error(err),
-          ({ path, fileBytes, createdDate }) => {
+          async ({ path, fileBytes, createdDate }) => {
             if (!filePath) {
               filePath = path
             }
             if (filePath && fileBytes && lookupState.loaded) {
+              let saveType = getSaveType(fileBytes, getEnabledSaveTypes())
+
+              console.log(saveType)
+
+              const complementaryPlugins = saveType?.getComplementaryPlugins?.() ?? [];
+
+              if (complementaryPlugins.length > 0) {
+                setSpecifySave({
+                  supportedSaveTypes: getEnabledSaveTypes(),
+                  plugins: complementaryPlugins,
+                });
+          
+                // Wait for user selection
+                saveType = await waitForPluginSelection(setSpecifySave);
+                if (!saveType) {
+                  console.error("No save type selected.");
+                  return;
+                }
+              }
+              
               const saveFile = buildSaveFile(
                 filePath,
                 fileBytes,
@@ -68,7 +95,8 @@ const SavesModal = (props: SavesModalProps) => {
                   gen345LookupMap: lookupState.gen345,
                   fileCreatedDate: createdDate,
                 },
-                getEnabledSaveTypes(),
+                undefined, // supported saves
+                saveType,
                 (updatedMon) => {
                   const identifier = getMonFileIdentifier(updatedMon)
 

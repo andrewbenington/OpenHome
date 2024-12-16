@@ -18,6 +18,8 @@ import { GameOfOrigin, isGameBoy, isGen3, isGen4, isGen5 } from 'pokemon-resourc
 import { useCallback, useContext, useEffect, useState } from 'react'
 import { MdFileOpen } from 'react-icons/md'
 import SaveNotFoundError from 'src/saves/SaveNotFoundError'
+import { SelectPlugin } from 'src/saves/SelectPlugin'
+import { SAVClass } from 'src/types/SAVTypes/util'
 import { Errorable } from 'src/types/types'
 import { BackendContext } from '../backend/backendProvider'
 import FilterPanel from '../components/filter/FilterPanel'
@@ -48,11 +50,11 @@ const Home = () => {
   const [errorMessages, setErrorMessages] = useState<string[]>()
   const [filesToDelete, setFilesToDelete] = useState<string[]>([])
   const [saveFound, setSaveFound] = useState<boolean>(false);
-  // const [saveFound, setSaveFound] = useState<{
-  //   filePath: PathData;
-  //   fileBytes: Uint8Array;
-  //   createdDate: Date;
-  // } | null>();
+  const [specifySave, setSpecifySave] = useState<{
+    supportedSaveTypes: SAVClass[];
+    plugins: string[];
+    onSelect?: (plugin: string) => void;
+  } | null>(null);
 
   const onViewDrop = (e: React.DragEvent<HTMLDivElement>, type: string) => {
     const processDroppedData = async (file?: File, droppedMon?: PKMInterface) => {
@@ -384,9 +386,20 @@ const Home = () => {
               setOpenSaveDialog(false)
             }}
             setSaveFound={setSaveFound}
+            setSpecifySave={setSpecifySave}
           />
         </ModalDialog>  
       </Modal>
+      {specifySave && (
+        <SelectPlugin
+          plugins={specifySave.plugins}
+          onPluginClick={(selectedPlugin) => {
+            console.log(`Selected plugin: ${selectedPlugin}`);
+            specifySave.onSelect?.(selectedPlugin);
+            setSpecifySave(null);
+          }}
+        />
+      )}
       {saveFound && (
         <SaveNotFoundError
           onClose={() => setSaveFound(false)}

@@ -67,11 +67,15 @@ export const buildSaveFile = (
     gen345LookupMap?: Record<string, string>
     fileCreatedDate?: Date
   },
-  supportedSaveTypes: SAVClass[],
+  supportedSaveTypes?: SAVClass[],
+  saveType?: SAVClass | undefined,
   updateMonCallback?: (mon: OHPKM) => void
 ): SAV | undefined => {
   const { homeMonMap, gen12LookupMap, gen345LookupMap } = lookupMaps
-  const saveType = getSaveType(fileBytes, supportedSaveTypes)
+
+  if (!saveType && supportedSaveTypes) {
+    saveType = getSaveType(fileBytes, supportedSaveTypes)
+  }
 
   if (!saveType) return undefined
 
