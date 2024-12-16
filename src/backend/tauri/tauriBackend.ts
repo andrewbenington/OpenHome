@@ -95,7 +95,9 @@ export const TauriBackend: BackendInterface = {
     let boxData = result.right
 
     if (boxData.length === 0) {
-      boxData = [{ index: 0, monIdentifiersByIndex: {}, name: undefined }]
+      for (let i = 0; i < 36; i++) {
+        boxData.push({ index: i, monIdentifiersByIndex: {}, name: undefined })
+      }
       TauriInvoker.writeStorageFileJSON('box-data.json', boxData)
     }
 
