@@ -85,8 +85,21 @@ export const TauriBackend: BackendInterface = {
   },
 
   /* openhome boxes */
-  loadHomeBoxes: function (): Promise<Errorable<StoredBoxData[]>> {
-    return TauriInvoker.getStorageFileJSON('box-data.json') as Promise<Errorable<StoredBoxData[]>>
+  loadHomeBoxes: async function (): Promise<Errorable<StoredBoxData[]>> {
+    const result = await (TauriInvoker.getStorageFileJSON('box-data.json') as Promise<
+      Errorable<StoredBoxData[]>
+    >)
+
+    if (E.isLeft(result)) return result
+
+    let boxData = result.right
+
+    if (boxData.length === 0) {
+      boxData = [{ index: 0, monIdentifiersByIndex: {}, name: undefined }]
+      TauriInvoker.writeStorageFileJSON('box-data.json', boxData)
+    }
+
+    return E.right(boxData)
   },
   writeHomeBoxes: (boxData: StoredBoxData[]): Promise<Errorable<null>> => {
     return TauriInvoker.writeStorageFileJSON('box-data.json', boxData)
