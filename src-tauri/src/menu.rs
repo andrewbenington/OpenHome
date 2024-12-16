@@ -41,35 +41,20 @@ pub fn create_menu(handle: &AppHandle) -> Result<Menu<Wry>, Box<dyn std::error::
         true,
         Some("CmdOrCtrl+D"),
     )?;
-    let exit_item = MenuItem::with_id(handle, "exit", "Exit", true, Some("CmdOrCtrl+Q"))?;
-    let file_submenu = SubmenuBuilder::new(handle, "File")
+    let file_submenu_items = SubmenuBuilder::new(handle, "File")
         .item(&open_item)
         .item(&save_item)
         .item(&reset_item)
         .separator()
-        .item(&open_appdata_item)
-        .separator()
-        .item(&exit_item)
-        .build()?;
+        .item(&open_appdata_item);
+
+    let exit_item = MenuItem::with_id(handle, "exit", "Exit", true, Some("CmdOrCtrl+Q"))?;
+    let file_submenu = match cfg!(target_os = "macos") {
+        true => file_submenu_items.build(),
+        false => file_submenu_items.separator().item(&exit_item).build(),
+    }?;
 
     menu.append(&file_submenu)?;
-
-    // let undo_item = MenuItem::with_id(handle, "undo", "Undo", true, Some("CmdOrCtrl+Z"))?;
-    // let redo_item = MenuItem::with_id(handle, "redo", "Redo", true, Some("CmdOrCtrl+Y"))?;
-    // let cut_item = MenuItem::with_id(handle, "cut", "Cut", true, Some("CmdOrCtrl+X"))?;
-    let copy_item = MenuItem::with_id(handle, "copy", "Copy", true, Some("CmdOrCtrl+C"))?;
-    // let paste_item = MenuItem::with_id(handle, "paste", "Paste", true, Some("CmdOrCtrl+V"))?;
-
-    let edit_submenu = SubmenuBuilder::new(handle, "Edit")
-        // .item(&undo_item)
-        // .item(&redo_item)
-        // .item(&cut_item)
-        .item(&copy_item)
-        // .item(&paste_item)
-        .build()?;
-
-    menu.append(&edit_submenu)?;
-
     let zoom_in_item = MenuItem::with_id(handle, "zoom_in", "Zoom In", true, None::<&str>)?;
     let zoom_out_item = MenuItem::with_id(handle, "zoom_out", "Zoom Out", true, None::<&str>)?;
     let show_toolbar_item =
@@ -148,8 +133,6 @@ pub fn handle_menu_event(app_handle: &AppHandle, event: MenuEvent) {
         "exit" => std::process::exit(0),
 
         // Edit menu actions
-        // "undo" => println!("Undo action triggered!"),
-        // "redo" => println!("Redo action triggered!"),
         // "cut" => println!("Cut action triggered!"),
         // "copy" => println!("Copy action triggered!"),
         // "paste" => println!("Paste action triggered!"),
