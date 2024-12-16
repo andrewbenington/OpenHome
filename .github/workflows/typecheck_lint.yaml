@@ -1,6 +1,5 @@
-name: Enforce Linting/Formatting
+name: Enforce Types + Linting
 
-# This action works with pull requests and pushes
 on:
   pull_request:
   push:
@@ -23,8 +22,8 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
+      - name: Type Check
+        run: npm run typecheck
+
       - name: ESLint
         run: npm run lint:ci
-
-      - name: Prettier
-        run: npx prettier .
