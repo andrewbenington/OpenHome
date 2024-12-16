@@ -17,6 +17,7 @@ import { bytesToPKMInterface } from 'pokemon-files'
 import { GameOfOrigin, isGameBoy, isGen3, isGen4, isGen5 } from 'pokemon-resources'
 import { useCallback, useContext, useEffect, useState } from 'react'
 import { MdFileOpen } from 'react-icons/md'
+import SaveNotFoundError from 'src/saves/SaveNotFoundError'
 import { Errorable } from 'src/types/types'
 import { BackendContext } from '../backend/backendProvider'
 import FilterPanel from '../components/filter/FilterPanel'
@@ -46,6 +47,12 @@ const Home = () => {
   const [openSaveDialog, setOpenSaveDialog] = useState(false)
   const [errorMessages, setErrorMessages] = useState<string[]>()
   const [filesToDelete, setFilesToDelete] = useState<string[]>([])
+  const [saveFound, setSaveFound] = useState<boolean>(false);
+  // const [saveFound, setSaveFound] = useState<{
+  //   filePath: PathData;
+  //   fileBytes: Uint8Array;
+  //   createdDate: Date;
+  // } | null>();
 
   const onViewDrop = (e: React.DragEvent<HTMLDivElement>, type: string) => {
     const processDroppedData = async (file?: File, droppedMon?: PKMInterface) => {
@@ -376,9 +383,16 @@ const Home = () => {
             onClose={() => {
               setOpenSaveDialog(false)
             }}
+            setSaveFound={setSaveFound}
           />
-        </ModalDialog>
+        </ModalDialog>  
       </Modal>
+      {saveFound && (
+        <SaveNotFoundError
+          onClose={() => setSaveFound(false)}
+        />
+      )}
+
       <Modal open={!!errorMessages} onClose={() => setErrorMessages(undefined)}>
         <ModalDialog style={{ padding: 8 }}>
           <ModalClose />
@@ -393,6 +407,12 @@ const Home = () => {
           </DialogContent>
         </ModalDialog>
       </Modal>
+      {/* <ManualSaveSelection
+        open={!!manualSaveData}
+        onClose={() => setManualSaveData(null)}
+      } */}
+      {/* /> */}
+
     </div>
   )
 }

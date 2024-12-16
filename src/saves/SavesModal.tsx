@@ -26,11 +26,12 @@ import SuggestedSaves from './SuggestedSaves'
 import { SaveViewMode } from './util'
 
 interface SavesModalProps {
-  onClose: () => void
+  onClose: () => void,
+  setSaveFound: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 const SavesModal = (props: SavesModalProps) => {
-  const { onClose } = props
+  const { onClose, setSaveFound } = props
   const backend = useContext(BackendContext)
   const [, dispatchOpenSaves] = useContext(OpenSavesContext)
   const [lookupState] = useContext(LookupContext)
@@ -79,7 +80,8 @@ const SavesModal = (props: SavesModalProps) => {
               )
 
               if (!saveFile) {
-                onClose()
+                setSaveFound(true)
+                // onClose()
                 return
               }
               onClose()
