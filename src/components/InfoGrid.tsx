@@ -2,6 +2,9 @@ import { Card, Divider, Grid, Stack } from '@mui/joy'
 import { isDayjs } from 'dayjs'
 import { PKM } from 'pokemon-files'
 import { ReactNode, useMemo } from 'react'
+import { OHPKM } from 'src/types/pkm/OHPKM'
+import { getMonFileIdentifier } from 'src/util/Lookup'
+import PokemonIcon from './PokemonIcon'
 
 type Breakpoint = 'xs' | 'sm' | 'md' | 'lg' | 'xl'
 
@@ -29,7 +32,7 @@ function isArray(obj: object): obj is (object | Primitive)[] {
 }
 
 function isPKM(obj: object): obj is PKM {
-  return 'format' in obj
+  return 'format' in obj && 'dexNum' in obj && 'formeNum' in obj && 'nickname' in obj
 }
 
 export function InfoGrid(props: InfoGridProps) {
@@ -128,6 +131,10 @@ function InfoGridElement(props: InfoGridElementProps) {
             Dayjs(
             {value.format('YYYY-MM-DD HH:mm')})
           </Grid>
+        ) : isPKM(value) ? (
+          <Grid {...dataBreakpoints} key={`info-row-value`}>
+            PKM({value.nickname})
+          </Grid>
         ) : 'name' in value &&
           typeof value.name === 'string' &&
           'tid' in value &&
@@ -135,21 +142,33 @@ function InfoGridElement(props: InfoGridElementProps) {
           <Grid {...dataBreakpoints} key={`info-row-value`}>
             SAV({value.name}, {value.tid})
           </Grid>
-        ) : isPKM(value) ? (
-          <Grid {...dataBreakpoints} key={`info-row-value`}>
-            PKM({value.nickname})
-          </Grid>
         ) : isArray(value) ? (
           <Grid xs={12} key={`info-row-value`} marginBottom={1}>
             <Stack spacing={1}>
               {value.map((item, arrayIndex) =>
                 typeof item === 'object' ? (
-                  <Card variant="outlined" key={`info-row-array[${arrayIndex}]`}>
-                    <details open>
-                      <summary style={{ float: 'left', marginRight: 16 }}>{arrayIndex}</summary>
-                      <InfoGrid data={item} labelBreakpoints={labelBreakpoints} />
-                    </details>
-                  </Card>
+                  isPKM(item) ? (
+                    <Card variant="outlined">
+                      <Stack direction="row" alignItems="center">
+                        <PokemonIcon
+                          dexNumber={item.dexNum}
+                          formeNumber={item.formeNum}
+                          style={{ width: 30, height: 30 }}
+                        />
+                        <div>
+                          {item.nickname} • {item.format}
+                          {item instanceof OHPKM ? ` • ${getMonFileIdentifier(item)}` : ''}
+                        </div>
+                      </Stack>
+                    </Card>
+                  ) : (
+                    <Card variant="outlined" key={`info-row-array[${arrayIndex}]`}>
+                      <details open>
+                        <summary style={{ float: 'left', marginRight: 16 }}>{arrayIndex}</summary>
+                        <InfoGrid data={item} labelBreakpoints={labelBreakpoints} />
+                      </details>
+                    </Card>
+                  )
                 ) : (
                   <div key={`info-row-array[${arrayIndex}]`}>{item}</div>
                 )

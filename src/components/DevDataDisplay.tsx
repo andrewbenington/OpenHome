@@ -25,7 +25,7 @@ export function DevDataDisplay(props: DevDataDisplayProps) {
       />
       <Modal open={debugModal} onClose={() => setDebugModal(false)}>
         <ModalOverflow>
-          <ModalDialog minWidth="lg">
+          <ModalDialog minWidth="lg" sx={{ padding: 1 }}>
             <ModalClose />
             <InfoGrid labelBreakpoints={{ xs: 4 }} data={props.data ?? {}} />
           </ModalDialog>
