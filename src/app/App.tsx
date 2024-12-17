@@ -84,7 +84,14 @@ export default function App() {
               onDragEnd={(e) => {
                 const dest = e.over?.data.current
 
-                if (
+                if (e.over?.id === 'to_release') {
+                  if (dragData) {
+                    openSavesDispatch({
+                      type: 'add_mon_to_release',
+                      payload: dragData,
+                    })
+                  }
+                } else if (
                   dragMon &&
                   dragData &&
                   dest &&
@@ -92,6 +99,7 @@ export default function App() {
                 ) {
                   openSavesDispatch({ type: 'move_mon', payload: { source: dragData, dest } })
                 }
+
                 setDragData(e.over?.data.current as MonWithLocation)
                 let d = e.over?.data.current
 

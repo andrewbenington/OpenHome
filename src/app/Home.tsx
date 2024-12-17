@@ -17,11 +17,10 @@ import { bytesToPKMInterface } from 'pokemon-files'
 import { GameOfOrigin, isGameBoy, isGen3, isGen4, isGen5 } from 'pokemon-resources'
 import { useCallback, useContext, useEffect, useState } from 'react'
 import { MdFileOpen } from 'react-icons/md'
-import DroppableSpace from 'src/saves/boxes/DroppableSpace'
 import { Errorable } from 'src/types/types'
+import { filterUndefined } from 'src/util/Sort'
 import { BackendContext } from '../backend/backendProvider'
 import FilterPanel from '../components/filter/FilterPanel'
-import PokemonIcon from '../components/PokemonIcon'
 import PokemonDetailsPanel from '../pokemon/PokemonDetailsPanel'
 import HomeBoxDisplay from '../saves/boxes/HomeBoxDisplay'
 import OpenSaveDisplay from '../saves/boxes/SaveBoxDisplay'
@@ -34,6 +33,7 @@ import { PKMInterface } from '../types/interfaces'
 import { OHPKM } from '../types/pkm/OHPKM'
 import { getMonFileIdentifier, getMonGen12Identifier, getMonGen345Identifier } from '../util/Lookup'
 import './Home.css'
+import ReleaseArea from './home/ReleaseArea'
 
 const Home = () => {
   const [openSavesState, openSavesDispatch, allOpenSaves] = useContext(OpenSavesContext)
@@ -46,10 +46,8 @@ const Home = () => {
   const [tab, setTab] = useState('summary')
   const [openSaveDialog, setOpenSaveDialog] = useState(false)
   const [errorMessages, setErrorMessages] = useState<string[]>()
-  const [filesToDelete, setFilesToDelete] = useState<string[]>([])
 
-  const onViewDrop = (e: React.DragEvent<HTMLDivElement>, type: string) => {
-    console.log('onViewDrop', e)
+  const onViewDrop = (e: React.DragEvent<HTMLDivElement>) => {
     const processDroppedData = async (file?: File, droppedMon?: PKMInterface) => {
       let mon: PKMInterface | undefined = droppedMon
 
@@ -64,30 +62,12 @@ const Home = () => {
         }
       }
       if (!mon) return
-      switch (type) {
-        case 'as is':
-          setSelectedMon(mon)
-          break
-      }
+      setSelectedMon(mon)
     }
     const file = e.dataTransfer.files[0]
     const mon = mouseState.dragSource?.mon
 
     if (!file && mouseState.dragSource) {
-      if (mon && type === 'release') {
-        openSavesDispatch({
-          type: 'add_mon_to_release',
-          payload: mouseState.dragSource,
-        })
-        mouseDispatch({ type: 'set_drag_source', payload: undefined })
-        if (mon instanceof OHPKM) {
-          const identifier = getMonFileIdentifier(mon)
-
-          if (identifier) {
-            setFilesToDelete([...filesToDelete, identifier])
-          }
-        }
-      }
       mouseDispatch({ type: 'set_drag_source', payload: undefined })
       processDroppedData(file, mon)
       e.nativeEvent.preventDefault()
@@ -186,10 +166,14 @@ const Home = () => {
         openSavesState.homeData,
         Object.values(openSavesState.modifiedOHPKMs)
       ),
-      backend.deleteHomeMons(filesToDelete),
+      backend.deleteHomeMons(
+        openSavesState.monsToRelease
+          .filter((mon) => mon instanceof OHPKM)
+          .map(getMonFileIdentifier)
+          .filter(filterUndefined)
+      ),
     ]
 
-    setFilesToDelete([])
     const results = flatten(await Promise.all(promises))
     const errors = results.filter(E.isLeft).map((err) => err.left)
 
@@ -214,14 +198,12 @@ const Home = () => {
   }, [
     allOpenSaves,
     backend,
-    filesToDelete,
     loadAllHomeData,
     loadAllLookups,
     lookupDispatch,
     lookupState,
     openSavesDispatch,
-    openSavesState.homeData,
-    openSavesState.modifiedOHPKMs,
+    openSavesState,
   ])
 
   useEffect(() => {
@@ -320,31 +302,11 @@ const Home = () => {
           onDragOver={(e) => {
             e.preventDefault()
           }}
-          onDrop={(e) => onViewDrop(e, 'as is')}
+          onDrop={(e) => onViewDrop(e)}
         >
           Preview
         </div>
-        <div
-          className="drop-area"
-          onDragOver={(e) => e.preventDefault()}
-          onDrop={(e) => onViewDrop(e, 'release')}
-        >
-          Release
-          <DroppableSpace onOver={() => console.log('TO RELEASE OVER')} dropID={`to_release`}>
-            <div className="release-icon-container" style={{ display: 'flex' }}>
-              {openSavesState.monsToRelease.map((mon, i) => {
-                return (
-                  <PokemonIcon
-                    key={`delete_mon_${i}`}
-                    dexNumber={mon.dexNum}
-                    formeNumber={mon.formeNum}
-                    style={{ height: 32, width: 32 }}
-                  />
-                )
-              })}
-            </div>
-          </DroppableSpace>
-        </div>
+        <ReleaseArea />
       </Stack>
       <Modal open={!!selectedMon} onClose={() => setSelectedMon(undefined)}>
         <ModalOverflow>
