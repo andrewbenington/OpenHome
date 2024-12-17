@@ -82,6 +82,7 @@ export const appInfoReducer: Reducer<AppInfoState, AppInfoAction> = (
             officialSaveTypeIDs.includes(saveTypeID) || extraSaveTypeIDs.includes(saveTypeID)
         )
       )
+
       return { ...state, settings: { ...payload, enabledSaveTypes: enabled } }
     }
     case 'set_icon_size': {
@@ -112,7 +113,7 @@ export const appInfoInitialState: AppInfoState = {
         G3RRSAV,
       ].map((savetype) => [savetype.saveTypeID, true])
     ),
-    saveCardSize: 180
+    saveCardSize: 180,
   },
 
   officialSaveTypes: [

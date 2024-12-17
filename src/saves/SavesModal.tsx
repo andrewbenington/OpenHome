@@ -28,13 +28,15 @@ import SuggestedSaves from './SuggestedSaves'
 import { SaveViewMode } from './util'
 
 interface SavesModalProps {
-  onClose: () => void,
-  setSaveFound: React.Dispatch<React.SetStateAction<boolean>>,
-  setSpecifySave: React.Dispatch<React.SetStateAction<{
-    supportedSaveTypes: SAVClass[];
-    plugins: string[];
-    onSelect?: (plugin: string) => void;
-  } | null>>
+  onClose: () => void
+  setSaveFound: React.Dispatch<React.SetStateAction<boolean>>
+  setSpecifySave: React.Dispatch<
+    React.SetStateAction<{
+      supportedSaveTypes: SAVClass[]
+      plugins: string[]
+      onSelect?: (plugin: string) => void
+    } | null>
+  >
 }
 
 const SavesModal = (props: SavesModalProps) => {
@@ -69,22 +71,22 @@ const SavesModal = (props: SavesModalProps) => {
             }
             if (filePath && fileBytes && lookupState.loaded) {
               let saveType = getSaveType(fileBytes, getEnabledSaveTypes())
-              const complementaryPlugins = saveType?.getComplementaryPlugins?.() ?? [];
+              const complementaryPlugins = saveType?.getComplementaryPlugins?.() ?? []
 
               if (complementaryPlugins.length > 0) {
                 setSpecifySave({
                   supportedSaveTypes: getEnabledSaveTypes(),
                   plugins: complementaryPlugins,
-                });
-          
+                })
+
                 // Wait for user selection
-                saveType = await waitForPluginSelection(setSpecifySave);
+                saveType = await waitForPluginSelection(setSpecifySave)
                 if (!saveType) {
-                  console.error("No save type selected.");
-                  return;
+                  console.error('No save type selected.')
+                  return
                 }
               }
-              
+
               const saveFile = buildSaveFile(
                 filePath,
                 fileBytes,
@@ -123,11 +125,10 @@ const SavesModal = (props: SavesModalProps) => {
       backend,
       dispatchOpenSaves,
       getEnabledSaveTypes,
-      lookupState.gen12,
-      lookupState.gen345,
-      lookupState.homeMons,
-      lookupState.loaded,
+      lookupState,
       onClose,
+      setSaveFound,
+      setSpecifySave,
     ]
   )
 
@@ -178,13 +179,14 @@ const SavesModal = (props: SavesModalProps) => {
             Icon Size
             <Slider
               value={cardSize}
+              step={50}
               onChange={(_, newSize) => {
                 // setCardSize(newSize as number)
                 dispatchAppInfoState({ type: 'set_icon_size', payload: newSize as number }) // Dispatch to context
               }}
               valueLabelDisplay="auto"
               min={100}
-              max={500}
+              max={350}
               style={{ paddingTop: 0, paddingBottom: 30 }}
               variant="soft"
               color="neutral"

@@ -49,12 +49,12 @@ const Home = () => {
   const [openSaveDialog, setOpenSaveDialog] = useState(false)
   const [errorMessages, setErrorMessages] = useState<string[]>()
   const [filesToDelete, setFilesToDelete] = useState<string[]>([])
-  const [saveFound, setSaveFound] = useState<boolean>(false);
+  const [saveFound, setSaveFound] = useState<boolean>(false)
   const [specifySave, setSpecifySave] = useState<{
-    supportedSaveTypes: SAVClass[];
-    plugins: string[];
-    onSelect?: (plugin: string) => void;
-  } | null>(null);
+    supportedSaveTypes: SAVClass[]
+    plugins: string[]
+    onSelect?: (plugin: string) => void
+  } | null>(null)
 
   const onViewDrop = (e: React.DragEvent<HTMLDivElement>, type: string) => {
     const processDroppedData = async (file?: File, droppedMon?: PKMInterface) => {
@@ -388,23 +388,19 @@ const Home = () => {
             setSaveFound={setSaveFound}
             setSpecifySave={setSpecifySave}
           />
-        </ModalDialog>  
+        </ModalDialog>
       </Modal>
       {specifySave && (
         <SelectPlugin
           plugins={specifySave.plugins}
           onPluginClick={(selectedPlugin) => {
-            console.log(`Selected plugin: ${selectedPlugin}`);
-            specifySave.onSelect?.(selectedPlugin);
-            setSpecifySave(null);
+            console.log(`Selected plugin: ${selectedPlugin}`)
+            specifySave.onSelect?.(selectedPlugin)
+            setSpecifySave(null)
           }}
         />
       )}
-      {saveFound && (
-        <SaveNotFoundError
-          onClose={() => setSaveFound(false)}
-        />
-      )}
+      {saveFound && <SaveNotFoundError onClose={() => setSaveFound(false)} />}
 
       <Modal open={!!errorMessages} onClose={() => setErrorMessages(undefined)}>
         <ModalDialog style={{ padding: 8 }}>
@@ -425,7 +421,6 @@ const Home = () => {
         onClose={() => setManualSaveData(null)}
       } */}
       {/* /> */}
-
     </div>
   )
 }
