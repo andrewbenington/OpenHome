@@ -67,9 +67,6 @@ const SavesModal = (props: SavesModalProps) => {
             }
             if (filePath && fileBytes && lookupState.loaded) {
               let saveType = getSaveType(fileBytes, getEnabledSaveTypes())
-
-              console.log(saveType)
-
               const complementaryPlugins = saveType?.getComplementaryPlugins?.() ?? [];
 
               if (complementaryPlugins.length > 0) {
