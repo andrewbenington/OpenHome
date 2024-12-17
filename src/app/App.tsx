@@ -24,7 +24,6 @@ import { PokemonDragContext } from './PokemonDrag'
 import { components, darkTheme, lightTheme } from './Themes'
 
 const debouncedUpdateSettings = debounce((backend: BackendInterface, settings: Settings) => {
-  console.log('debounce happening')
   backend.updateSettings(settings).catch(console.error)
 }, 500)
 
