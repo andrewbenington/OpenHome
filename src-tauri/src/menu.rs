@@ -1,6 +1,8 @@
 use std::process::Command;
 
-use tauri::{menu::*, App, AppHandle, Emitter, Manager, Wry};
+use tauri::{image::Image, include_image, menu::*, App, AppHandle, Emitter, Manager, Wry};
+
+const APP_ICON: Image<'_> = include_image!("icons/128x128.png");
 
 #[cfg(target_os = "macos")]
 const OPEN_CMD: &str = "open";
@@ -17,7 +19,7 @@ pub fn create_menu(app: &App) -> Result<Menu<Wry>, Box<dyn std::error::Error>> {
         .name(Some("OpenHome"))
         .version(Some(app.package_info().version.to_string()))
         .authors(Some(vec![app.package_info().authors.to_string()]))
-        .icon(app.default_window_icon().cloned())
+        .icon(Some(APP_ICON))
         .build();
 
     if cfg!(target_os = "macos") {
