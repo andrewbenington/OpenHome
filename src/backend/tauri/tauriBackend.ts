@@ -2,6 +2,7 @@ import { path } from '@tauri-apps/api'
 import { PhysicalPosition } from '@tauri-apps/api/dpi'
 import { Event, listen } from '@tauri-apps/api/event'
 import { open as fileDialog } from '@tauri-apps/plugin-dialog'
+import { readFile, stat } from '@tauri-apps/plugin-fs'
 import { platform } from '@tauri-apps/plugin-os'
 import { open } from '@tauri-apps/plugin-shell'
 import * as E from 'fp-ts/lib/Either'
@@ -279,17 +280,31 @@ export const TauriBackend: BackendInterface = {
     const unlistenPromise = Promise.all([
       listen('save', listeners.onSave),
       listen('reset', listeners.onReset),
-      listen('tauri://drag-drop', (e: Event<{ position: PhysicalPosition; files: string[] }>) => {
-        console.log('file drop:', e.payload)
-        console.log(
-          'dropped on:',
+      listen('tauri://drag-drop', (e: Event<{ position: PhysicalPosition; paths: string[] }>) => {
+        const allFilesPromise = e.payload.paths.map(async (filePath) => ({
+          filePath,
+          stat: await stat(filePath),
+          bytes: await readFile(filePath),
+        }))
+
+        Promise.all(allFilesPromise).then((fileData) => {
+          const filesWithData = fileData.map(
+            ({ filePath, stat, bytes }) =>
+              new File([bytes], filePath, { lastModified: stat.mtime?.getUTCMilliseconds() })
+          )
+          const dataTransfer = new DataTransfer()
+
+          for (const file of filesWithData) {
+            dataTransfer.items.add(file)
+          }
           document.elementFromPoint(e.payload.position.x, e.payload.position.y)?.dispatchEvent(
             new DragEvent('drop', {
               bubbles: true,
               cancelable: true,
+              dataTransfer,
             })
           )
-        )
+        })
       }),
     ])
 
