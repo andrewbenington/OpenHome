@@ -16,10 +16,10 @@ def rearrange(dict_1, dict_2, list_l):
 
     return list_R
 
-# dict_1 = {"a": 0, "b": 1, "c": 2, "e": 4}
-# list_l = ["L0", "L1", "L2", "L4", "L5"]
-# dict_2 = {"b": 0, "c": 2, "d": 5, "h": 4}
-# print("Reordered List R:", rearrange(dict_1, dict_2, list_l))
+dict_1 = {"a": 0, "b": 1, "c": 2, "e": 4}
+list_l = ["L0", "L1", "L2", "L4", "L5"]
+dict_2 = {"b": 0, "c": 2, "d": 5, "h": 4}
+print(rearrange(dict_1, dict_2, list_l))
 
 def extract_constants(content: str) -> tuple[set[str], dict[str, str]]:
     mapping: dict[str, str] = {}
@@ -33,7 +33,7 @@ def extract_constants(content: str) -> tuple[set[str], dict[str, str]]:
 ub_mapping = extract_constants(unbound_species)
 rr_mapping = extract_constants(rr_species)
 
-ub_species = rearrange(ub_mapping, rr_mapping, rr_species_list)
+ub_species = rearrange(rr_mapping, ub_mapping, rr_species_list)
 
 with open('./src/types/SAVTypes/unbound/ub_species.txt', 'w') as f:
     for species in ub_species:
