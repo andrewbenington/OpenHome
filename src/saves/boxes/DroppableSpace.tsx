@@ -21,9 +21,17 @@ export interface DroppableSpaceProps {
   disabled?: boolean
   onOver?: () => void
   children?: ReactNode
+  onFileDrop?: () => void
 }
 
-const DroppableSpace = ({ dropID, dropData, disabled, onOver, children }: DroppableSpaceProps) => {
+const DroppableSpace = ({
+  dropID,
+  dropData,
+  disabled,
+  onOver,
+  children,
+  onFileDrop,
+}: DroppableSpaceProps) => {
   const { setNodeRef, isOver } = useDroppable({
     id: dropID ?? '',
     data: dropData,
@@ -53,6 +61,7 @@ const DroppableSpace = ({ dropID, dropData, disabled, onOver, children }: Droppa
         height: '100%',
       }}
       ref={setNodeRef}
+      onDrop={(e) => console.log(e)}
     >
       {children}
     </div>

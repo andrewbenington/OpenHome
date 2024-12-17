@@ -2,37 +2,12 @@ import { useDroppable } from '@dnd-kit/core'
 import { useContext, useMemo } from 'react'
 import { FilterContext } from 'src/state/filter'
 import { MonLocation } from 'src/state/openSaves'
+import { bytesToPKM } from 'src/types/FileImport'
 import { filterApplies } from 'src/types/Filter'
 import { PKMInterface } from 'src/types/interfaces'
-import { Styles } from 'src/types/types'
-import BoxIcons from '../../images/BoxIcons.png'
 import '../style.css'
 import DraggableMon from './DraggableMon'
 import DroppableSpace from './DroppableSpace'
-
-const styles = {
-  fillContainer: { width: '100%', height: '100%' },
-  button: {
-    padding: 0,
-    width: '100%',
-    aspectRatio: 1,
-    position: 'relative',
-    borderRadius: 3,
-    textAlign: 'center',
-    borderWidth: 1,
-  },
-  background: {
-    background: `url(${BoxIcons}) no-repeat 0.02777% 0.02777%`,
-    backgroundSize: '3600%',
-    imageRendering: 'crisp-edges',
-    height: '100%',
-    width: '100%',
-    zIndex: 1,
-    top: 0,
-    left: 0,
-    position: 'absolute',
-  },
-} as Styles
 
 interface BoxCellProps {
   onClick: () => void
@@ -54,6 +29,7 @@ const BoxCell = ({
   borderColor,
   dragID,
   dragData,
+  onDrop,
 }: BoxCellProps) => {
   const [filterState] = useContext(FilterContext)
 
@@ -64,20 +40,22 @@ const BoxCell = ({
     )
   }, [filterState, mon])
 
-  // const onDropFromFiles = async (files: FileList) => {
-  //   const importedMons: PKMInterface[] = []
-  //   for (let i = 0; i < files.length; i++) {
-  //     const file = files[i]
-  //     const bytes = new Uint8Array(await file.arrayBuffer())
-  //     const [extension] = file.name.split('.').slice(-1)
-  //     try {
-  //       importedMons.push(bytesToPKM(bytes, extension.toUpperCase()))
-  //     } catch (e) {
-  //       console.error(e)
-  //     }
-  //   }
-  //   onDrop(importedMons)
-  // }
+  const onDropFromFiles = async (files: FileList) => {
+    const importedMons: PKMInterface[] = []
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i]
+      const bytes = new Uint8Array(await file.arrayBuffer())
+      const [extension] = file.name.split('.').slice(-1)
+
+      try {
+        importedMons.push(bytesToPKM(bytes, extension.toUpperCase()))
+      } catch (e) {
+        console.error(e)
+      }
+    }
+    onDrop(importedMons)
+  }
 
   const getBackgroundDetails = () => {
     if (disabled) {
@@ -101,10 +79,19 @@ const BoxCell = ({
     <div
       ref={setNodeRef}
       style={{
-        ...styles.button,
+        padding: 0,
+        width: '100%',
+        aspectRatio: 1,
+        borderRadius: 3,
+        borderWidth: 1,
         backgroundColor: disabled || isFilteredOut ? '#555' : '#6662',
         borderColor: borderColor,
         zIndex,
+      }}
+      onDrop={(e) => {
+        e.preventDefault()
+        e.stopPropagation()
+        console.log(e)
       }}
     >
       {mon ? (

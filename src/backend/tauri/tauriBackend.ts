@@ -1,5 +1,6 @@
 import { path } from '@tauri-apps/api'
-import { listen } from '@tauri-apps/api/event'
+import { PhysicalPosition } from '@tauri-apps/api/dpi'
+import { Event, listen } from '@tauri-apps/api/event'
 import { open as fileDialog } from '@tauri-apps/plugin-dialog'
 import { platform } from '@tauri-apps/plugin-os'
 import { open } from '@tauri-apps/plugin-shell'
@@ -278,6 +279,18 @@ export const TauriBackend: BackendInterface = {
     const unlistenPromise = Promise.all([
       listen('save', listeners.onSave),
       listen('reset', listeners.onReset),
+      listen('tauri://drag-drop', (e: Event<{ position: PhysicalPosition; files: string[] }>) => {
+        console.log('file drop:', e.payload)
+        console.log(
+          'dropped on:',
+          document.elementFromPoint(e.payload.position.x, e.payload.position.y)?.dispatchEvent(
+            new DragEvent('drop', {
+              bubbles: true,
+              cancelable: true,
+            })
+          )
+        )
+      }),
     ])
 
     return () =>
