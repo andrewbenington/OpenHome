@@ -16,6 +16,7 @@ import { XYSAV } from '../types/SAVTypes/XYSAV'
 
 export type Settings = {
   enabledSaveTypes: Record<string, boolean>
+  saveCardSize: number
 }
 
 export type AppInfoState = {
@@ -40,6 +41,10 @@ export type AppInfoAction =
   | {
       type: 'load_settings'
       payload: Settings
+    }
+  | {
+      type: 'set_icon_size'
+      payload: number
     }
 
 export const appInfoReducer: Reducer<AppInfoState, AppInfoAction> = (
@@ -77,8 +82,13 @@ export const appInfoReducer: Reducer<AppInfoState, AppInfoAction> = (
             officialSaveTypeIDs.includes(saveTypeID) || extraSaveTypeIDs.includes(saveTypeID)
         )
       )
-
       return { ...state, settings: { ...payload, enabledSaveTypes: enabled } }
+    }
+    case 'set_icon_size': {
+      return {
+        ...state,
+        settings: { ...state.settings, saveCardSize: payload },
+      }
     }
   }
 }
@@ -102,6 +112,7 @@ export const appInfoInitialState: AppInfoState = {
         G3RRSAV,
       ].map((savetype) => [savetype.saveTypeID, true])
     ),
+    saveCardSize: 180
   },
 
   officialSaveTypes: [

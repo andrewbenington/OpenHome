@@ -266,7 +266,8 @@ export const TauriBackend: BackendInterface = {
     return promise.then(
       E.match(
         (err) => E.left(err),
-        (partialSettings) => E.right({ enabledSaveTypes: {}, ...partialSettings })
+        (partialSettings) =>
+          E.right({ enabledSaveTypes: {}, saveCardSize: 180, ...partialSettings })
       )
     )
   },

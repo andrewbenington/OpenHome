@@ -44,7 +44,9 @@ const SavesModal = (props: SavesModalProps) => {
   const [lookupState] = useContext(LookupContext)
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
   const [viewMode, setViewMode] = useState<SaveViewMode>('cards')
-  const [cardSize, setCardSize] = useState<number>(180)
+  const [, dispatchAppInfoState] = useContext(AppInfoContext)
+  const [appInfoState] = useContext(AppInfoContext)
+  const cardSize = appInfoState.settings.saveCardSize
 
   const openSaveFile = useCallback(
     async (filePath?: PathData) => {
@@ -176,7 +178,10 @@ const SavesModal = (props: SavesModalProps) => {
             Icon Size
             <Slider
               value={cardSize}
-              onChange={(_, newSize) => setCardSize(newSize as number)}
+              onChange={(_, newSize) => {
+                // setCardSize(newSize as number)
+                dispatchAppInfoState({ type: 'set_icon_size', payload: newSize as number }) // Dispatch to context
+              }}
               valueLabelDisplay="auto"
               min={100}
               max={500}
