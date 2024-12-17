@@ -18,7 +18,7 @@ pub fn run() {
             let handle = app.handle();
             init_files(handle)?;
 
-            match menu::create_menu(&handle) {
+            match menu::create_menu(&app) {
                 Ok(menu) => {
                     let _ = app.set_menu(menu);
                     Ok(())

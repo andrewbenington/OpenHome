@@ -1,6 +1,6 @@
 use std::process::Command;
 
-use tauri::{menu::*, AppHandle, Emitter, Manager, Wry};
+use tauri::{menu::*, App, AppHandle, Emitter, Manager, Wry};
 
 #[cfg(target_os = "macos")]
 const OPEN_CMD: &str = "open";
@@ -9,14 +9,20 @@ const OPEN_CMD: &str = "xdg-open";
 #[cfg(target_os = "windows")]
 const OPEN_CMD: &str = "explorer";
 
-pub fn create_menu(handle: &AppHandle) -> Result<Menu<Wry>, Box<dyn std::error::Error>> {
+pub fn create_menu(app: &App) -> Result<Menu<Wry>, Box<dyn std::error::Error>> {
+    let handle = app.handle();
     let menu = Menu::new(handle)?;
+
+    let about = AboutMetadataBuilder::new()
+        .name(Some("OpenHome"))
+        .version(Some(app.package_info().version.to_string()))
+        .authors(Some(vec![app.package_info().authors.to_string()]))
+        .icon(app.default_window_icon().cloned())
+        .build();
 
     if cfg!(target_os = "macos") {
         let app_submenu_r = SubmenuBuilder::new(handle, "OpenHome")
-            .about(Some(
-                AboutMetadataBuilder::new().name(Some("OpenHome")).build(),
-            ))
+            .about(Some(about.clone()))
             .separator()
             .services()
             .separator()
@@ -51,7 +57,11 @@ pub fn create_menu(handle: &AppHandle) -> Result<Menu<Wry>, Box<dyn std::error::
     let exit_item = MenuItem::with_id(handle, "exit", "Exit", true, Some("CmdOrCtrl+Q"))?;
     let file_submenu = match cfg!(target_os = "macos") {
         true => file_submenu_items.build(),
-        false => file_submenu_items.separator().item(&exit_item).build(),
+        false => file_submenu_items
+            .separator()
+            .about(Some(about))
+            .item(&exit_item)
+            .build(),
     }?;
 
     menu.append(&file_submenu)?;
