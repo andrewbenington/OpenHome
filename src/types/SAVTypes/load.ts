@@ -1,3 +1,4 @@
+import * as E from 'fp-ts/lib/Either'
 import {
   getMonFileIdentifier,
   getMonGen12Identifier,
@@ -70,14 +71,14 @@ export const buildSaveFile = (
   supportedSaveTypes?: SAVClass[],
   saveType?: SAVClass | undefined,
   updateMonCallback?: (mon: OHPKM) => void
-): SAV | undefined => {
+): E.Either<string, SAV | undefined> => {
   const { homeMonMap, gen12LookupMap, gen345LookupMap } = lookupMaps
 
   if (!saveType && supportedSaveTypes) {
     saveType = getSaveType(fileBytes, supportedSaveTypes)
   }
 
-  if (!saveType) return undefined
+  if (!saveType) return E.right(undefined)
 
   const lookupMap =
     saveType.lookupType === 'gen12'
@@ -93,13 +94,17 @@ export const buildSaveFile = (
         ? getMonGen345Identifier
         : getMonFileIdentifier
 
-  const saveFile = recoverOHPKMData(
-    new saveType(filePath, fileBytes),
-    getIdentifier as (_: PKMInterface) => string | undefined,
-    homeMonMap,
-    lookupMap,
-    updateMonCallback
-  )
+  try {
+    const saveFile = recoverOHPKMData(
+      new saveType(filePath, fileBytes),
+      getIdentifier as (_: PKMInterface) => string | undefined,
+      homeMonMap,
+      lookupMap,
+      updateMonCallback
+    )
 
-  return saveFile
+    return E.right(saveFile)
+  } catch (e) {
+    return E.left(`${e}`)
+  }
 }

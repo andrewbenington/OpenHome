@@ -11,6 +11,7 @@ import {
 import * as E from 'fp-ts/lib/Either'
 import { useCallback, useContext, useState } from 'react'
 import 'react-data-grid/lib/styles.css'
+import { ErrorContext } from 'src/state/error'
 import { PathData } from 'src/types/SAVTypes/path'
 import { SAVClass } from 'src/types/SAVTypes/util'
 import { getMonFileIdentifier } from 'src/util/Lookup'
@@ -23,25 +24,52 @@ import { getSaveRef } from '../types/SAVTypes/SAV'
 import { buildSaveFile, getSaveType } from '../types/SAVTypes/load'
 import RecentSaves from './RecentSaves'
 import SaveFolders from './SaveFolders'
-import { waitForPluginSelection } from './SelectPlugin'
 import SuggestedSaves from './SuggestedSaves'
 import { SaveViewMode } from './util'
 
 interface SavesModalProps {
-  onClose: () => void,
-  setSaveFound: React.Dispatch<React.SetStateAction<boolean>>,
-  setSpecifySave: React.Dispatch<React.SetStateAction<{
-    supportedSaveTypes: SAVClass[];
-    plugins: string[];
-    onSelect?: (plugin: string) => void;
-  } | null>>
+  onClose: () => void
+  setSpecifySave: React.Dispatch<
+    React.SetStateAction<{
+      supportedSaveTypes: SAVClass[]
+      plugins: string[]
+      onSelect?: (plugin: string) => void
+    } | null>
+  >
+}
+
+function waitForPluginSelection(
+  setSpecifySave: React.Dispatch<
+    React.SetStateAction<{
+      supportedSaveTypes: SAVClass[]
+      plugins: string[]
+      onSelect?: (plugin: string) => void
+    } | null>
+  >
+): Promise<SAVClass | undefined> {
+  return new Promise((resolve) => {
+    setSpecifySave((prevState) => {
+      if (!prevState) {
+        throw new Error('SpecifySave state is unexpectedly null.')
+      }
+
+      return {
+        ...prevState,
+        onSelect: (selectedPlugin: string) => {
+          resolve(prevState.supportedSaveTypes.find((item) => item.saveTypeID === selectedPlugin))
+          setSpecifySave(null) // Close the modal after selection
+        },
+      }
+    })
+  })
 }
 
 const SavesModal = (props: SavesModalProps) => {
-  const { onClose, setSaveFound, setSpecifySave } = props
+  const { onClose, setSpecifySave } = props
   const backend = useContext(BackendContext)
   const [, dispatchOpenSaves] = useContext(OpenSavesContext)
   const [lookupState] = useContext(LookupContext)
+  const [, dispatchError] = useContext(ErrorContext)
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
   const [viewMode, setViewMode] = useState<SaveViewMode>('cards')
   const [cardSize, setCardSize] = useState<number>(180)
@@ -52,7 +80,10 @@ const SavesModal = (props: SavesModalProps) => {
         const pickedFile = await backend.pickFile()
 
         if (E.isLeft(pickedFile)) {
-          console.error(pickedFile.left)
+          dispatchError({
+            type: 'set_message',
+            payload: { title: 'Error Selecting File', messages: [pickedFile.left] },
+          })
           return
         }
         if (!pickedFile.right) return
@@ -67,23 +98,22 @@ const SavesModal = (props: SavesModalProps) => {
             }
             if (filePath && fileBytes && lookupState.loaded) {
               let saveType = getSaveType(fileBytes, getEnabledSaveTypes())
-              const complementaryPlugins = saveType?.getComplementaryPlugins?.() ?? [];
+              const complementaryPlugins = saveType?.getComplementaryPlugins?.() ?? []
 
               if (complementaryPlugins.length > 0) {
                 setSpecifySave({
                   supportedSaveTypes: getEnabledSaveTypes(),
                   plugins: complementaryPlugins,
-                });
-          
+                })
+
                 // Wait for user selection
-                saveType = await waitForPluginSelection(setSpecifySave);
+                saveType = await waitForPluginSelection(setSpecifySave)
                 if (!saveType) {
-                  console.error("No save type selected.");
-                  return;
+                  return
                 }
               }
-              
-              const saveFile = buildSaveFile(
+
+              const result = buildSaveFile(
                 filePath,
                 fileBytes,
                 {
@@ -104,14 +134,31 @@ const SavesModal = (props: SavesModalProps) => {
                 }
               )
 
-              if (!saveFile) {
-                setSaveFound(true)
-                // onClose()
+              if (E.isLeft(result)) {
+                dispatchError({
+                  type: 'set_message',
+                  payload: {
+                    title: 'Error Loading Save',
+                    messages: [result.left],
+                  },
+                })
                 return
               }
-              onClose()
-              backend.addRecentSave(getSaveRef(saveFile))
-              dispatchOpenSaves({ type: 'add_save', payload: saveFile })
+              const saveFile = result.right
+
+              if (!saveFile) {
+                dispatchError({
+                  type: 'set_message',
+                  payload: {
+                    title: 'Error Identifying Save',
+                    messages: ['Make sure you opened a supported save file.'],
+                  },
+                })
+              } else {
+                backend.addRecentSave(getSaveRef(saveFile))
+                dispatchOpenSaves({ type: 'add_save', payload: saveFile })
+                onClose()
+              }
             }
           }
         )
@@ -119,13 +166,12 @@ const SavesModal = (props: SavesModalProps) => {
     },
     [
       backend,
+      dispatchError,
       dispatchOpenSaves,
       getEnabledSaveTypes,
-      lookupState.gen12,
-      lookupState.gen345,
-      lookupState.homeMons,
-      lookupState.loaded,
+      lookupState,
       onClose,
+      setSpecifySave,
     ]
   )
 

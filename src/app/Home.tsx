@@ -1,23 +1,10 @@
-import {
-  Alert,
-  Box,
-  DialogContent,
-  DialogTitle,
-  Divider,
-  Modal,
-  ModalClose,
-  ModalDialog,
-  ModalOverflow,
-  Stack,
-  useTheme,
-} from '@mui/joy'
+import { Box, Modal, ModalDialog, ModalOverflow, Stack, useTheme } from '@mui/joy'
 import * as E from 'fp-ts/lib/Either'
 import lodash, { flatten } from 'lodash'
 import { bytesToPKMInterface } from 'pokemon-files'
 import { GameOfOrigin, isGameBoy, isGen3, isGen4, isGen5 } from 'pokemon-resources'
 import { useCallback, useContext, useEffect, useState } from 'react'
 import { MdFileOpen } from 'react-icons/md'
-import SaveNotFoundError from 'src/saves/SaveNotFoundError'
 import { SelectPlugin } from 'src/saves/SelectPlugin'
 import { SAVClass } from 'src/types/SAVTypes/util'
 import { Errorable } from 'src/types/types'
@@ -47,8 +34,6 @@ const Home = () => {
   const [selectedMon, setSelectedMon] = useState<PKMInterface>()
   const [tab, setTab] = useState('summary')
   const [openSaveDialog, setOpenSaveDialog] = useState(false)
-  const [errorMessages, setErrorMessages] = useState<string[]>()
-  const [saveFound, setSaveFound] = useState<boolean>(false)
   const [specifySave, setSpecifySave] = useState<{
     supportedSaveTypes: SAVClass[]
     plugins: string[]
@@ -355,7 +340,6 @@ const Home = () => {
             onClose={() => {
               setOpenSaveDialog(false)
             }}
-            setSaveFound={setSaveFound}
             setSpecifySave={setSpecifySave}
           />
         </ModalDialog>
@@ -364,33 +348,11 @@ const Home = () => {
         <SelectPlugin
           plugins={specifySave.plugins}
           onPluginClick={(selectedPlugin) => {
-            console.log(`Selected plugin: ${selectedPlugin}`)
             specifySave.onSelect?.(selectedPlugin)
             setSpecifySave(null)
           }}
         />
       )}
-      {saveFound && <SaveNotFoundError onClose={() => setSaveFound(false)} />}
-
-      <Modal open={!!errorMessages} onClose={() => setErrorMessages(undefined)}>
-        <ModalDialog style={{ padding: 8 }}>
-          <ModalClose />
-          <DialogTitle>Error(s) saving</DialogTitle>
-          <Divider />
-          <DialogContent>
-            {errorMessages?.map((msg, i) => (
-              <Alert color="danger" variant="solid" key={`alert_${i}`}>
-                {msg}
-              </Alert>
-            ))}
-          </DialogContent>
-        </ModalDialog>
-      </Modal>
-      {/* <ManualSaveSelection
-        open={!!manualSaveData}
-        onClose={() => setManualSaveData(null)}
-      } */}
-      {/* /> */}
     </div>
   )
 }

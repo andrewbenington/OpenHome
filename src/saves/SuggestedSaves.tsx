@@ -4,7 +4,7 @@ import { GameOfOrigin } from 'pokemon-resources'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { getSaveRef, SAV } from 'src/types/SAVTypes/SAV'
 import { buildSaveFile } from 'src/types/SAVTypes/load'
-import { numericSorter } from 'src/util/Sort'
+import { filterUndefined, numericSorter } from 'src/util/Sort'
 import { BackendContext } from '../backend/backendProvider'
 import OHDataGrid, { SortableColumn } from '../components/OHDataGrid'
 import { AppInfoContext } from '../state/appInfo'
@@ -55,7 +55,7 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
       }
       return undefined
     },
-    [backend, gen12LookupMap, gen345LookupMap, homeMonMap]
+    [backend, gen12LookupMap, gen345LookupMap, getEnabledSaveTypes, homeMonMap]
   )
 
   useEffect(() => {
@@ -72,7 +72,14 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
               filterEmpty
             )
 
-            setSuggestedSaves(saves)
+            saves.filter(E.isLeft).forEach((s) => console.warn(`Suggested save error: ${s.left}`))
+
+            setSuggestedSaves(
+              saves
+                .filter(E.isRight)
+                .map((s) => s.right)
+                .filter(filterUndefined)
+            )
           }
         }
       )
