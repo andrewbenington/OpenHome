@@ -115,10 +115,7 @@ const Home = () => {
     const result = await backend.startTransaction()
 
     if (E.isLeft(result)) {
-      dispatchErrorState({
-        type: 'set_message',
-        payload: { title: 'Error Starting Save Transaction', messages: [result.left] },
-      })
+      setErrorMessage({ title: 'Error Starting Save Transaction', messages: [result.left] })
       return
     }
 
@@ -169,10 +166,7 @@ const Home = () => {
     const errors = results.filter(E.isLeft).map((err) => err.left)
 
     if (errors.length) {
-      dispatchErrorState({
-        type: 'set_message',
-        payload: { title: 'Error Saving', messages: errors },
-      })
+      setErrorMessage({ title: 'Error Saving', messages: errors })
       backend.rollbackTransaction()
       return
     }
@@ -185,20 +179,23 @@ const Home = () => {
     lookupDispatch({ type: 'clear' })
     await loadAllLookups().then(
       E.match(
-        (err) => openSavesDispatch({ type: 'set_error', payload: err }),
+        (err) => {
+          openSavesDispatch({ type: 'set_error', payload: err })
+          setErrorMessage({ title: 'Error Loading Lookup Data', messages: [err] })
+        },
         (homeLookup) => loadAllHomeData(homeLookup)
       )
     )
   }, [
     allOpenSaves,
     backend,
-    dispatchErrorState,
     loadAllHomeData,
     loadAllLookups,
     lookupDispatch,
     lookupState,
     openSavesDispatch,
     openSavesState,
+    setErrorMessage,
   ])
 
   useEffect(() => {

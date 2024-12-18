@@ -1,4 +1,4 @@
-import { Sheet, Tab, TabList, TabPanel, Tabs, useTheme } from '@mui/joy'
+import { Sheet, Tab, TabList, TabPanel, Tabs } from '@mui/joy'
 import useIsDev from '../hooks/isDev'
 import AppStateDisplay from './dev/AppStateDisplay'
 import ThemeDisplay from './dev/ThemeDisplay'
@@ -9,18 +9,9 @@ import SortPokemon from './sort/SortPokemon'
 
 export default function AppTabs() {
   const isDev = useIsDev()
-  const { palette } = useTheme()
 
   return (
-    <Tabs
-      defaultValue="home"
-      style={{
-        height: '100vh',
-        width: '100%',
-        background: palette.background.gradient,
-      }}
-      color="primary"
-    >
+    <Tabs defaultValue="home" style={{ height: '100vh', width: '100%' }} color="primary">
       <TabPanel sx={{ '--Tabs-spacing': 0, height: 0 }} value="home">
         <Home />
       </TabPanel>

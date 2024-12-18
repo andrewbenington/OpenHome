@@ -55,9 +55,6 @@ export default function App() {
       .filter((saveType) => appInfoState.settings.enabledSaveTypes[saveType.saveTypeID])
   }, [appInfoState])
 
-  // when using `"withGlobalTauri": true`, you may use
-  // const { getCurrentWindow } = window.__TAURI__.window;
-
   // only on app start
   useEffect(() => {
     backend
