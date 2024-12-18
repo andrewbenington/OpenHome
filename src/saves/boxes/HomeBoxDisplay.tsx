@@ -1,12 +1,15 @@
 import { useDraggable } from '@dnd-kit/core'
 import { Card, Grid } from '@mui/joy'
 import lodash from 'lodash'
-import { useCallback, useContext, useMemo, useState } from 'react'
+import { useContext, useMemo, useState } from 'react'
 import { EditIcon } from 'src/components/Icons'
 import MiniButton from 'src/components/MiniButton'
-import { MouseContext } from 'src/state/mouse'
+import { ErrorContext } from 'src/state/error'
+import { LookupContext } from 'src/state/lookup'
 import { MonLocation, MonWithLocation, OpenSavesContext } from 'src/state/openSaves'
 import { PKMInterface } from 'src/types/interfaces'
+import { OHPKM } from 'src/types/pkm/OHPKM'
+import { getMonFileIdentifier } from 'src/util/Lookup'
 import ArrowButton from './ArrowButton'
 import BoxCell from './BoxCell'
 
@@ -16,47 +19,54 @@ interface HomeBoxDisplayProps {
 
 const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
   const [{ homeData }, openSavesDispatch] = useContext(OpenSavesContext)
-  const [mouseState, mouseDispatch] = useContext(MouseContext)
+  const [{ homeMons }] = useContext(LookupContext)
+  const [, dispatchError] = useContext(ErrorContext)
   const { setSelectedMon } = props
   const { active } = useDraggable({ id: '' })
   const [editing, setEditing] = useState(false)
 
-  const dispatchStartDrag = useCallback(
-    (boxPos: number) => {
-      if (!homeData) return
-      const mon = homeData.getCurrentBox().pokemon[boxPos]
+  const attemptImportMons = (mons: PKMInterface[], location: MonLocation) => {
+    if (!homeData || !homeMons) {
+      dispatchError({
+        type: 'set_message',
+        payload: {
+          title: 'Import Failed',
+          messages: ['Home data is not loaded. Something went wrong.'],
+        },
+      })
+      return
+    }
+    for (const mon of mons) {
+      try {
+        const identifier = getMonFileIdentifier(new OHPKM(mon))
 
-      if (mon) {
-        mouseDispatch({
-          type: 'set_drag_source',
-          payload: { save: homeData, box: homeData.currentPCBox, boxPos, mon },
+        if (!identifier) continue
+
+        const inCurrentBox = homeData.boxes[homeData.currentPCBox].pokemon.some(
+          (mon) => mon && getMonFileIdentifier(mon) === identifier
+        )
+
+        if (identifier in homeMons || inCurrentBox) {
+          const message =
+            mons.length === 1
+              ? 'This Pokémon has been moved into OpenHome before.'
+              : 'One or more of these Pokémon has been moved into OpenHome before.'
+
+          dispatchError({
+            type: 'set_message',
+            payload: { title: 'Import Failed', messages: [message] },
+          })
+          return
+        }
+      } catch (e) {
+        dispatchError({
+          type: 'set_message',
+          payload: { title: 'Import Failed', messages: [`${e}`] },
         })
       }
-    },
-    [mouseDispatch, homeData]
-  )
-
-  const dispatchCancelDrag = () => mouseDispatch({ type: 'set_drag_source', payload: undefined })
-  const dispatchCompleteDrag = useCallback(
-    (boxPos: number) => {
-      mouseState.dragSource &&
-        homeData &&
-        openSavesDispatch({
-          type: 'move_mon',
-          payload: {
-            dest: { save: homeData, box: homeData.currentPCBox, boxPos },
-            source: mouseState.dragSource,
-          },
-        })
-      mouseDispatch({
-        type: 'set_drag_source',
-        payload: undefined,
-      })
-    },
-    [mouseState.dragSource, homeData, openSavesDispatch, mouseDispatch]
-  )
-  const dispatchImportMons = (mons: PKMInterface[], location: MonLocation) =>
+    }
     openSavesDispatch({ type: 'import_mons', payload: { mons, dest: location } })
+  }
 
   const dragData: MonWithLocation | undefined = useMemo(
     () => active?.data.current as MonWithLocation | undefined,
@@ -71,14 +81,7 @@ const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
   return (
     homeData &&
     currentBox && (
-      <Card
-        style={{
-          padding: 2,
-          width: '100%',
-          height: 'fit-content',
-          gap: 0,
-        }}
-      >
+      <Card style={{ padding: 2, width: '100%', height: 'fit-content', gap: 0 }}>
         <Grid container style={{ padding: 4, minHeight: 48 }}>
           <Grid xs={4} display="grid" alignItems="center" justifyContent="end">
             <ArrowButton
@@ -160,9 +163,6 @@ const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
                 >
                   <BoxCell
                     onClick={() => setSelectedMon(mon)}
-                    onDragEvent={(cancel: boolean) =>
-                      cancel ? dispatchCancelDrag() : dispatchStartDrag(row * 12 + rowIndex)
-                    }
                     dragID={`home_${homeData.currentPCBox}_${row * 12 + rowIndex}`}
                     dragData={{
                       box: homeData.currentPCBox,
@@ -173,13 +173,11 @@ const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
                     zIndex={0}
                     onDrop={(importedMons) => {
                       if (importedMons) {
-                        dispatchImportMons(importedMons, {
+                        attemptImportMons(importedMons, {
                           box: homeData.currentPCBox,
                           boxPos: row * 12 + rowIndex,
                           save: homeData,
                         })
-                      } else {
-                        dispatchCompleteDrag(row * 12 + rowIndex)
                       }
                     }}
                     disabled={

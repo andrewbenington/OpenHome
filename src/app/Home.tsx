@@ -21,44 +21,48 @@ import SaveNotFoundError from 'src/saves/SaveNotFoundError'
 import { SelectPlugin } from 'src/saves/SelectPlugin'
 import { SAVClass } from 'src/types/SAVTypes/util'
 import { Errorable } from 'src/types/types'
+import { filterUndefined } from 'src/util/Sort'
 import { BackendContext } from '../backend/backendProvider'
 import FilterPanel from '../components/filter/FilterPanel'
-import PokemonIcon from '../components/PokemonIcon'
 import PokemonDetailsPanel from '../pokemon/PokemonDetailsPanel'
 import HomeBoxDisplay from '../saves/boxes/HomeBoxDisplay'
 import OpenSaveDisplay from '../saves/boxes/SaveBoxDisplay'
 import SavesModal from '../saves/SavesModal'
 import { AppInfoContext } from '../state/appInfo'
+import { ErrorContext, ErrorMessageData } from '../state/error'
 import { LookupContext } from '../state/lookup'
-import { MouseContext } from '../state/mouse'
 import { OpenSavesContext } from '../state/openSaves'
 import { PKMInterface } from '../types/interfaces'
 import { OHPKM } from '../types/pkm/OHPKM'
 import { getMonFileIdentifier, getMonGen12Identifier, getMonGen345Identifier } from '../util/Lookup'
 import './Home.css'
+import ReleaseArea from './home/ReleaseArea'
 
 const Home = () => {
   const [openSavesState, openSavesDispatch, allOpenSaves] = useContext(OpenSavesContext)
   const [lookupState, lookupDispatch] = useContext(LookupContext)
   const backend = useContext(BackendContext)
-  const [mouseState, mouseDispatch] = useContext(MouseContext)
   const [, appInfoDispatch] = useContext(AppInfoContext)
   const { palette } = useTheme()
   const [selectedMon, setSelectedMon] = useState<PKMInterface>()
   const [tab, setTab] = useState('summary')
   const [openSaveDialog, setOpenSaveDialog] = useState(false)
   const [errorMessages, setErrorMessages] = useState<string[]>()
-  const [filesToDelete, setFilesToDelete] = useState<string[]>([])
-  const [saveFound, setSaveFound] = useState<boolean>(false);
+  const [saveFound, setSaveFound] = useState<boolean>(false)
   const [specifySave, setSpecifySave] = useState<{
-    supportedSaveTypes: SAVClass[];
-    plugins: string[];
-    onSelect?: (plugin: string) => void;
-  } | null>(null);
+    supportedSaveTypes: SAVClass[]
+    plugins: string[]
+    onSelect?: (plugin: string) => void
+  } | null>(null)
+  const [, dispatchErrorState] = useContext(ErrorContext)
+  const setErrorMessage = useCallback(
+    (payload: ErrorMessageData) => dispatchErrorState({ type: 'set_message', payload }),
+    [dispatchErrorState]
+  )
 
-  const onViewDrop = (e: React.DragEvent<HTMLDivElement>, type: string) => {
-    const processDroppedData = async (file?: File, droppedMon?: PKMInterface) => {
-      let mon: PKMInterface | undefined = droppedMon
+  const previewFile = useCallback(
+    async (file: File) => {
+      let mon: PKMInterface | undefined
 
       if (file) {
         const buffer = await file.arrayBuffer()
@@ -67,41 +71,20 @@ const Home = () => {
         try {
           mon = bytesToPKMInterface(buffer, extension.toUpperCase())
         } catch (e) {
-          console.error(e)
+          setErrorMessage({
+            title: 'Import Error',
+            messages: [`Could not read Pokémon file: ${e}`],
+          })
         }
       }
-      if (!mon) return
-      switch (type) {
-        case 'as is':
-          setSelectedMon(mon)
-          break
+      if (!mon) {
+        setErrorMessage({ title: 'Import Error', messages: ['Not a valid Pokémon file format'] })
+        return
       }
-    }
-    const file = e.dataTransfer.files[0]
-    const mon = mouseState.dragSource?.mon
-
-    if (!file && mouseState.dragSource) {
-      if (mon && type === 'release') {
-        openSavesDispatch({
-          type: 'add_mon_to_release',
-          payload: mouseState.dragSource,
-        })
-        mouseDispatch({ type: 'set_drag_source', payload: undefined })
-        if (mon instanceof OHPKM) {
-          const identifier = getMonFileIdentifier(mon)
-
-          if (identifier) {
-            setFilesToDelete([...filesToDelete, identifier])
-          }
-        }
-      }
-      mouseDispatch({ type: 'set_drag_source', payload: undefined })
-      processDroppedData(file, mon)
-      e.nativeEvent.preventDefault()
-    } else if (file) {
-      processDroppedData(file, undefined)
-    }
-  }
+      setSelectedMon(mon)
+    },
+    [setErrorMessage]
+  )
 
   const loadAllLookups = useCallback(async (): Promise<Errorable<Record<string, OHPKM>>> => {
     const onLoadError = (message: string) => {
@@ -154,7 +137,7 @@ const Home = () => {
     const result = await backend.startTransaction()
 
     if (E.isLeft(result)) {
-      setErrorMessages([result.left])
+      setErrorMessage({ title: 'Error Starting Save Transaction', messages: [result.left] })
       return
     }
 
@@ -193,15 +176,19 @@ const Home = () => {
         openSavesState.homeData,
         Object.values(openSavesState.modifiedOHPKMs)
       ),
-      backend.deleteHomeMons(filesToDelete),
+      backend.deleteHomeMons(
+        openSavesState.monsToRelease
+          .filter((mon) => mon instanceof OHPKM)
+          .map(getMonFileIdentifier)
+          .filter(filterUndefined)
+      ),
     ]
 
-    setFilesToDelete([])
     const results = flatten(await Promise.all(promises))
     const errors = results.filter(E.isLeft).map((err) => err.left)
 
     if (errors.length) {
-      setErrorMessages(errors)
+      setErrorMessage({ title: 'Error Saving', messages: errors })
       backend.rollbackTransaction()
       return
     }
@@ -214,21 +201,23 @@ const Home = () => {
     lookupDispatch({ type: 'clear' })
     await loadAllLookups().then(
       E.match(
-        (err) => openSavesDispatch({ type: 'set_error', payload: err }),
+        (err) => {
+          openSavesDispatch({ type: 'set_error', payload: err })
+          setErrorMessage({ title: 'Error Loading Lookup Data', messages: [err] })
+        },
         (homeLookup) => loadAllHomeData(homeLookup)
       )
     )
   }, [
     allOpenSaves,
     backend,
-    filesToDelete,
     loadAllHomeData,
     loadAllLookups,
     lookupDispatch,
     lookupState,
     openSavesDispatch,
-    openSavesState.homeData,
-    openSavesState.modifiedOHPKMs,
+    openSavesState,
+    setErrorMessage,
   ])
 
   useEffect(() => {
@@ -275,7 +264,6 @@ const Home = () => {
   return (
     <div
       style={{
-        background: palette.background.gradient,
         height: '100%',
         display: 'flex',
         flexDirection: 'row',
@@ -327,29 +315,11 @@ const Home = () => {
           onDragOver={(e) => {
             e.preventDefault()
           }}
-          onDrop={(e) => onViewDrop(e, 'as is')}
+          onDrop={(e) => e.dataTransfer.files.length && previewFile(e.dataTransfer.files[0])}
         >
           Preview
         </div>
-        <div
-          className="drop-area"
-          onDragOver={(e) => e.preventDefault()}
-          onDrop={(e) => onViewDrop(e, 'release')}
-        >
-          Release
-          <div className="release-icon-container" style={{ display: 'flex' }}>
-            {openSavesState.monsToRelease.map((mon, i) => {
-              return (
-                <PokemonIcon
-                  key={`delete_mon_${i}`}
-                  dexNumber={mon.dexNum}
-                  formeNumber={mon.formeNum}
-                  style={{ height: 32, width: 32 }}
-                />
-              )
-            })}
-          </div>
-        </div>
+        <ReleaseArea />
       </Stack>
       <Modal open={!!selectedMon} onClose={() => setSelectedMon(undefined)}>
         <ModalOverflow>
@@ -388,23 +358,19 @@ const Home = () => {
             setSaveFound={setSaveFound}
             setSpecifySave={setSpecifySave}
           />
-        </ModalDialog>  
+        </ModalDialog>
       </Modal>
       {specifySave && (
         <SelectPlugin
           plugins={specifySave.plugins}
           onPluginClick={(selectedPlugin) => {
-            console.log(`Selected plugin: ${selectedPlugin}`);
-            specifySave.onSelect?.(selectedPlugin);
-            setSpecifySave(null);
+            console.log(`Selected plugin: ${selectedPlugin}`)
+            specifySave.onSelect?.(selectedPlugin)
+            setSpecifySave(null)
           }}
         />
       )}
-      {saveFound && (
-        <SaveNotFoundError
-          onClose={() => setSaveFound(false)}
-        />
-      )}
+      {saveFound && <SaveNotFoundError onClose={() => setSaveFound(false)} />}
 
       <Modal open={!!errorMessages} onClose={() => setErrorMessages(undefined)}>
         <ModalDialog style={{ padding: 8 }}>
@@ -425,7 +391,6 @@ const Home = () => {
         onClose={() => setManualSaveData(null)}
       } */}
       {/* /> */}
-
     </div>
   )
 }

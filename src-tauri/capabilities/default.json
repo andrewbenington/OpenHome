@@ -3,5 +3,12 @@
   "identifier": "default",
   "description": "Capability for the main window",
   "windows": ["main"],
-  "permissions": ["core:default", "shell:allow-open", "os:default", "dialog:default"]
+  "permissions": [
+    "core:default",
+    "shell:allow-open",
+    "os:default",
+    "dialog:default",
+    "fs:default",
+    "fs:allow-app-meta"
+  ]
 }

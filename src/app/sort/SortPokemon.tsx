@@ -105,7 +105,6 @@ export default function SortPokemon() {
                 <div style={{ width: 36, height: 36, margin: 4 }} key={`mon_${i}`}>
                   <BoxCell
                     onClick={() => setSelectedMon(monWithSave.mon)}
-                    onDragEvent={() => {}}
                     onDrop={() => {}}
                     mon={monWithSave.mon}
                     disabled={false}

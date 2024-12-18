@@ -1,4 +1,4 @@
-import { Tab, TabList, TabPanel, Tabs } from '@mui/joy'
+import { Sheet, Tab, TabList, TabPanel, Tabs } from '@mui/joy'
 import useIsDev from '../hooks/isDev'
 import AppStateDisplay from './dev/AppStateDisplay'
 import ThemeDisplay from './dev/ThemeDisplay'
@@ -12,11 +12,7 @@ export default function AppTabs() {
 
   return (
     <Tabs defaultValue="home" style={{ height: '100vh', width: '100%' }} color="primary">
-      <TabPanel
-        sx={{ '--Tabs-spacing': 0, height: 0 }}
-        value="home"
-        // container
-      >
+      <TabPanel sx={{ '--Tabs-spacing': 0, height: 0 }} value="home">
         <Home />
       </TabPanel>
       <TabPanel sx={{ '--Tabs-spacing': 0, height: 0 }} value="manage">
@@ -38,30 +34,32 @@ export default function AppTabs() {
           </TabPanel>
         </>
       )}
-      <TabList className="tab-row" color="primary" variant="plain">
-        <Tab indicatorPlacement="top" value="home" color="primary" variant="plain">
-          Home
-        </Tab>
-        <Tab indicatorPlacement="top" value="manage" color="primary" variant="plain">
-          Tracked Pokémon
-        </Tab>
-        <Tab indicatorPlacement="top" value="sort" color="primary" variant="plain">
-          Sort Pokémon
-        </Tab>
-        <Tab indicatorPlacement="top" value="settings" color="primary" variant="plain">
-          Settings
-        </Tab>
-        {isDev && (
-          <>
-            <Tab indicatorPlacement="top" value="state" color="neutral" variant="plain">
-              App State
-            </Tab>
-            <Tab indicatorPlacement="top" value="theme" color="neutral" variant="plain">
-              Themes Display
-            </Tab>
-          </>
-        )}
-      </TabList>
+      <Sheet>
+        <TabList className="tab-row" color="primary" variant="plain">
+          <Tab indicatorPlacement="top" value="home" color="primary" variant="plain">
+            Home
+          </Tab>
+          <Tab indicatorPlacement="top" value="manage" color="primary" variant="plain">
+            Tracked Pokémon
+          </Tab>
+          <Tab indicatorPlacement="top" value="sort" color="primary" variant="plain">
+            Sort Pokémon
+          </Tab>
+          <Tab indicatorPlacement="top" value="settings" color="primary" variant="plain">
+            Settings
+          </Tab>
+          {isDev && (
+            <>
+              <Tab indicatorPlacement="top" value="state" color="neutral" variant="plain">
+                App State
+              </Tab>
+              <Tab indicatorPlacement="top" value="theme" color="neutral" variant="plain">
+                Themes Display
+              </Tab>
+            </>
+          )}
+        </TabList>
+      </Sheet>
     </Tabs>
   )
 }

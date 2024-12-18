@@ -39,7 +39,7 @@ const DroppableSpace = ({ dropID, dropData, disabled, onOver, children }: Droppa
 
   return (
     <div
-      className="pokemon_slot"
+      className="pokemon-slot"
       style={{
         ...getBackgroundDetails(disabled),
         outlineStyle: 'solid',
