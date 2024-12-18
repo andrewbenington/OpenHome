@@ -1,6 +1,7 @@
 import { path } from '@tauri-apps/api'
 import { PhysicalPosition } from '@tauri-apps/api/dpi'
 import { Event, listen } from '@tauri-apps/api/event'
+import { getCurrentWindow } from '@tauri-apps/api/window'
 import { open as fileDialog } from '@tauri-apps/plugin-dialog'
 import { readFile, stat } from '@tauri-apps/plugin-fs'
 import { platform } from '@tauri-apps/plugin-os'
@@ -287,28 +288,33 @@ export const TauriBackend: BackendInterface = {
           bytes: await readFile(filePath),
         }))
 
-        Promise.all(allFilesPromise).then((fileData) => {
+        Promise.all(allFilesPromise).then(async (fileData) => {
           const filesWithData = fileData.map(
             ({ filePath, stat, bytes }) =>
               new File([bytes], filePath, { lastModified: stat.mtime?.getUTCMilliseconds() })
           )
           const dataTransfer = new DataTransfer()
 
+          const scaleFactor = window.navigator.userAgent.includes('Windows')
+            ? await getCurrentWindow().scaleFactor()
+            : 1
+
           for (const file of filesWithData) {
             dataTransfer.items.add(file)
           }
 
-          const dropCoordinates: Coordinates = [e.payload.position.x, e.payload.position.y]
-
-          addDotToDOM(dropCoordinates, 'green')
-
-          document.elementFromPoint(e.payload.position.x, e.payload.position.y)?.dispatchEvent(
-            new DragEvent('drop', {
-              bubbles: true,
-              cancelable: true,
-              dataTransfer,
-            })
-          )
+          document
+            .elementFromPoint(
+              e.payload.position.x / scaleFactor,
+              e.payload.position.y / scaleFactor
+            )
+            ?.dispatchEvent(
+              new DragEvent('drop', {
+                bubbles: true,
+                cancelable: true,
+                dataTransfer,
+              })
+            )
         })
       }),
     ])
@@ -320,32 +326,4 @@ export const TauriBackend: BackendInterface = {
         }
       })
   },
-}
-
-type Coordinates = [number, number]
-
-function getDistance(coord1: Coordinates, coord2: Coordinates) {
-  const [x1, y1] = coord1
-  const [x2, y2] = coord2
-
-  return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
-}
-function addDotToDOM(coords: Coordinates, color: string) {
-  const [x, y] = coords
-  // Create a new div element
-  const dot = document.createElement('div')
-
-  // Style the dot as a circle
-  dot.style.width = '10px'
-  dot.style.height = '10px'
-  dot.style.backgroundColor = color
-  dot.style.borderRadius = '50%' // Makes it circular
-
-  // Position the dot absolutely at the given coordinates
-  dot.style.position = 'absolute'
-  dot.style.left = `${x}px`
-  dot.style.top = `${y}px`
-
-  // Add the dot to the body
-  document.body.appendChild(dot)
 }
