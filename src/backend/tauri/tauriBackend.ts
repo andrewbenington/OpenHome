@@ -301,38 +301,6 @@ export const TauriBackend: BackendInterface = {
           const dropCoordinates: Coordinates = [e.payload.position.x, e.payload.position.y]
 
           addDotToDOM(dropCoordinates, 'green')
-          let closestSlot: Element | undefined
-          let closestSlotDistance: number = Number.POSITIVE_INFINITY
-
-          // Row is off by one for some reason, so subtract height of one cell
-          for (const slot of document.getElementsByClassName('pokemon-slot')) {
-            const boundingRect = slot.getBoundingClientRect()
-            const center: Coordinates = [
-              (boundingRect.x + boundingRect.right) / 2,
-              (boundingRect.y + boundingRect.bottom) / 2,
-            ]
-
-            const distance = Math.abs(getDistance(center, dropCoordinates))
-
-            if (distance < 100) {
-              console.log(slot, distance)
-            }
-
-            if (distance < closestSlotDistance) {
-              closestSlot = slot
-              closestSlotDistance = distance
-            }
-          }
-
-          if (closestSlot) {
-            const boundingRect = closestSlot.getBoundingClientRect()
-            const center: Coordinates = [
-              (boundingRect.x + boundingRect.right) / 2,
-              (boundingRect.y + boundingRect.bottom) / 2,
-            ]
-
-            addDotToDOM(center, 'red')
-          }
 
           document.elementFromPoint(e.payload.position.x, e.payload.position.y)?.dispatchEvent(
             new DragEvent('drop', {
