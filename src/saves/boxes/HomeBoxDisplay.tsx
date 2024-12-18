@@ -81,15 +81,7 @@ const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
   return (
     homeData &&
     currentBox && (
-      <Card
-        data-tauri-drag-region
-        style={{
-          padding: 2,
-          width: '100%',
-          height: 'fit-content',
-          gap: 0,
-        }}
-      >
+      <Card style={{ padding: 2, width: '100%', height: 'fit-content', gap: 0 }}>
         <Grid container style={{ padding: 4, minHeight: 48 }}>
           <Grid xs={4} display="grid" alignItems="center" justifyContent="end">
             <ArrowButton

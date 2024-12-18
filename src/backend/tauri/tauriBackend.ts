@@ -1,5 +1,4 @@
 import { path } from '@tauri-apps/api'
-import { PhysicalPosition } from '@tauri-apps/api/dpi'
 import { Event, listen } from '@tauri-apps/api/event'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { open as fileDialog } from '@tauri-apps/plugin-dialog'
@@ -30,6 +29,8 @@ async function pathDataFromRaw(raw: string): Promise<PathData> {
 
   return pathData
 }
+
+type OnDropEvent = Event<{ position: { x: number; y: number }; paths: string[] }>
 
 export const TauriBackend: BackendInterface = {
   /* past gen identifier lookups */
@@ -281,7 +282,7 @@ export const TauriBackend: BackendInterface = {
     const unlistenPromise = Promise.all([
       listen('save', listeners.onSave),
       listen('reset', listeners.onReset),
-      listen('tauri://drag-drop', (e: Event<{ position: PhysicalPosition; paths: string[] }>) => {
+      listen('tauri://drag-drop', (e: OnDropEvent) => {
         const allFilesPromise = e.payload.paths.map(async (filePath) => ({
           filePath,
           stat: await stat(filePath),
@@ -293,13 +294,13 @@ export const TauriBackend: BackendInterface = {
             ({ filePath, stat, bytes }) =>
               new File([bytes], filePath, { lastModified: stat.mtime?.getUTCMilliseconds() })
           )
-          const dataTransfer = new DataTransfer()
-
           // account for Windows pixel density variance
           const scaleFactor = platform() === 'windows' ? await getCurrentWindow().scaleFactor() : 1
 
           // account for macOS title bar
           const verticalOffset = platform() === 'macos' ? 28 : 0
+
+          const dataTransfer = new DataTransfer()
 
           for (const file of filesWithData) {
             dataTransfer.items.add(file)
@@ -310,13 +311,7 @@ export const TauriBackend: BackendInterface = {
               e.payload.position.x / scaleFactor,
               e.payload.position.y / scaleFactor - verticalOffset
             )
-            ?.dispatchEvent(
-              new DragEvent('drop', {
-                bubbles: true,
-                cancelable: true,
-                dataTransfer,
-              })
-            )
+            ?.dispatchEvent(new DragEvent('drop', { bubbles: true, dataTransfer }))
         })
       }),
     ])

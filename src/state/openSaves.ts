@@ -119,8 +119,6 @@ const updateMonInSave = (
     tempSaves[saveID].save.boxes[box].pokemon[boxPos] = mon
     tempSaves[saveID].save.updatedBoxSlots.push({ box, index: boxPos })
     state.openSaves = tempSaves
-  } else {
-    console.error(`Save ${saveID} not found`)
   }
   return replacedMon
 }
