@@ -21,17 +21,9 @@ export interface DroppableSpaceProps {
   disabled?: boolean
   onOver?: () => void
   children?: ReactNode
-  onFileDrop?: () => void
 }
 
-const DroppableSpace = ({
-  dropID,
-  dropData,
-  disabled,
-  onOver,
-  children,
-  onFileDrop,
-}: DroppableSpaceProps) => {
+const DroppableSpace = ({ dropID, dropData, disabled, onOver, children }: DroppableSpaceProps) => {
   const { setNodeRef, isOver } = useDroppable({
     id: dropID ?? '',
     data: dropData,
@@ -47,7 +39,7 @@ const DroppableSpace = ({
 
   return (
     <div
-      className="pokemon_slot"
+      className="pokemon-slot"
       style={{
         ...getBackgroundDetails(disabled),
         outlineStyle: 'solid',
@@ -61,7 +53,6 @@ const DroppableSpace = ({
         height: '100%',
       }}
       ref={setNodeRef}
-      onDrop={(e) => console.log(e)}
     >
       {children}
     </div>

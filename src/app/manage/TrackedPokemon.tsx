@@ -13,6 +13,7 @@ export default function TrackedPokemon() {
   return (
     <Tabs defaultValue="all" orientation="vertical" style={{ height: '100%' }}>
       <TabList
+        className="padding-on-macos"
         variant="solid"
         color="primary"
         sx={{

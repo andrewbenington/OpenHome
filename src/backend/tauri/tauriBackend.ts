@@ -297,6 +297,43 @@ export const TauriBackend: BackendInterface = {
           for (const file of filesWithData) {
             dataTransfer.items.add(file)
           }
+
+          const dropCoordinates: Coordinates = [e.payload.position.x, e.payload.position.y]
+
+          addDotToDOM(dropCoordinates, 'green')
+          let closestSlot: Element | undefined
+          let closestSlotDistance: number = Number.POSITIVE_INFINITY
+
+          // Row is off by one for some reason, so subtract height of one cell
+          for (const slot of document.getElementsByClassName('pokemon-slot')) {
+            const boundingRect = slot.getBoundingClientRect()
+            const center: Coordinates = [
+              (boundingRect.x + boundingRect.right) / 2,
+              (boundingRect.y + boundingRect.bottom) / 2,
+            ]
+
+            const distance = Math.abs(getDistance(center, dropCoordinates))
+
+            if (distance < 100) {
+              console.log(slot, distance)
+            }
+
+            if (distance < closestSlotDistance) {
+              closestSlot = slot
+              closestSlotDistance = distance
+            }
+          }
+
+          if (closestSlot) {
+            const boundingRect = closestSlot.getBoundingClientRect()
+            const center: Coordinates = [
+              (boundingRect.x + boundingRect.right) / 2,
+              (boundingRect.y + boundingRect.bottom) / 2,
+            ]
+
+            addDotToDOM(center, 'red')
+          }
+
           document.elementFromPoint(e.payload.position.x, e.payload.position.y)?.dispatchEvent(
             new DragEvent('drop', {
               bubbles: true,
@@ -317,4 +354,30 @@ export const TauriBackend: BackendInterface = {
   },
 }
 
-// export const ElectronBackendContext = createContext(ElectronBackend);
+type Coordinates = [number, number]
+
+function getDistance(coord1: Coordinates, coord2: Coordinates) {
+  const [x1, y1] = coord1
+  const [x2, y2] = coord2
+
+  return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
+}
+function addDotToDOM(coords: Coordinates, color: string) {
+  const [x, y] = coords
+  // Create a new div element
+  const dot = document.createElement('div')
+
+  // Style the dot as a circle
+  dot.style.width = '10px'
+  dot.style.height = '10px'
+  dot.style.backgroundColor = color
+  dot.style.borderRadius = '50%' // Makes it circular
+
+  // Position the dot absolutely at the given coordinates
+  dot.style.position = 'absolute'
+  dot.style.left = `${x}px`
+  dot.style.top = `${y}px`
+
+  // Add the dot to the body
+  document.body.appendChild(dot)
+}

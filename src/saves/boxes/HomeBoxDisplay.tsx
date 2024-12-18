@@ -1,10 +1,9 @@
 import { useDraggable } from '@dnd-kit/core'
 import { Card, Grid } from '@mui/joy'
 import lodash from 'lodash'
-import { useCallback, useContext, useMemo, useState } from 'react'
+import { useContext, useMemo, useState } from 'react'
 import { EditIcon } from 'src/components/Icons'
 import MiniButton from 'src/components/MiniButton'
-import { MouseContext } from 'src/state/mouse'
 import { MonLocation, MonWithLocation, OpenSavesContext } from 'src/state/openSaves'
 import { PKMInterface } from 'src/types/interfaces'
 import ArrowButton from './ArrowButton'
@@ -16,45 +15,10 @@ interface HomeBoxDisplayProps {
 
 const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
   const [{ homeData }, openSavesDispatch] = useContext(OpenSavesContext)
-  const [mouseState, mouseDispatch] = useContext(MouseContext)
   const { setSelectedMon } = props
   const { active } = useDraggable({ id: '' })
   const [editing, setEditing] = useState(false)
 
-  const dispatchStartDrag = useCallback(
-    (boxPos: number) => {
-      if (!homeData) return
-      const mon = homeData.getCurrentBox().pokemon[boxPos]
-
-      if (mon) {
-        mouseDispatch({
-          type: 'set_drag_source',
-          payload: { save: homeData, box: homeData.currentPCBox, boxPos, mon },
-        })
-      }
-    },
-    [mouseDispatch, homeData]
-  )
-
-  const dispatchCancelDrag = () => mouseDispatch({ type: 'set_drag_source', payload: undefined })
-  const dispatchCompleteDrag = useCallback(
-    (boxPos: number) => {
-      mouseState.dragSource &&
-        homeData &&
-        openSavesDispatch({
-          type: 'move_mon',
-          payload: {
-            dest: { save: homeData, box: homeData.currentPCBox, boxPos },
-            source: mouseState.dragSource,
-          },
-        })
-      mouseDispatch({
-        type: 'set_drag_source',
-        payload: undefined,
-      })
-    },
-    [mouseState.dragSource, homeData, openSavesDispatch, mouseDispatch]
-  )
   const dispatchImportMons = (mons: PKMInterface[], location: MonLocation) =>
     openSavesDispatch({ type: 'import_mons', payload: { mons, dest: location } })
 
@@ -160,9 +124,6 @@ const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
                 >
                   <BoxCell
                     onClick={() => setSelectedMon(mon)}
-                    onDragEvent={(cancel: boolean) =>
-                      cancel ? dispatchCancelDrag() : dispatchStartDrag(row * 12 + rowIndex)
-                    }
                     dragID={`home_${homeData.currentPCBox}_${row * 12 + rowIndex}`}
                     dragData={{
                       box: homeData.currentPCBox,
@@ -178,8 +139,6 @@ const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
                           boxPos: row * 12 + rowIndex,
                           save: homeData,
                         })
-                      } else {
-                        dispatchCompleteDrag(row * 12 + rowIndex)
                       }
                     }}
                     disabled={

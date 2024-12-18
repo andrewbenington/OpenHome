@@ -250,13 +250,12 @@ const Home = () => {
   return (
     <div
       style={{
-        background: palette.background.gradient,
         height: '100%',
         display: 'flex',
         flexDirection: 'row',
       }}
     >
-      <Stack className="save-file-column" spacing={1} width={280} minWidth={280}>
+      <Stack className="save-file-column lower-on-macos" spacing={1} width={280} minWidth={280}>
         {lodash.range(allOpenSaves.length).map((i) => (
           <OpenSaveDisplay
             key={`save_display_${i}`}

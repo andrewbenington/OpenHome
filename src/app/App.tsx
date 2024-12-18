@@ -20,6 +20,9 @@ import './App.css'
 import AppTabs from './AppTabs'
 import { PokemonDragContext } from './PokemonDrag'
 import { components, darkTheme, lightTheme } from './Themes'
+function isMacOS() {
+  return navigator.userAgent.includes('Mac OS')
+}
 
 export default function App() {
   const isDarkMode = useIsDarkMode()
@@ -72,6 +75,11 @@ export default function App() {
   useEffect(() => {
     backend.updateSettings(appInfoState.settings).catch(console.error)
   }, [appInfoState.settings, backend])
+
+  if (isMacOS()) {
+    document.documentElement.style.setProperty('--macos-top-margin', '20px')
+    document.documentElement.style.setProperty('--macos-top-padding', '28px')
+  }
 
   return (
     <ThemeProvider theme={theme}>

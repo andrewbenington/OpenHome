@@ -76,7 +76,7 @@ export default function SortPokemon() {
   if (!homeMons) return <div />
   return (
     <Stack direction="row" flexWrap="wrap" padding={1} overflow="hidden" height="calc(100% - 16px)">
-      <Card style={{ height: 'calc(100% - 16px)' }}>
+      <Card className="lower-on-macos" style={{ height: 'calc(100% - 16px)' }}>
         <Stack style={{ width: 120, flex: 0 }}>
           <Chip variant="solid">OpenHome</Chip>
           {openSaves.map((save) => (
@@ -105,7 +105,6 @@ export default function SortPokemon() {
                 <div style={{ width: 36, height: 36, margin: 4 }} key={`mon_${i}`}>
                   <BoxCell
                     onClick={() => setSelectedMon(monWithSave.mon)}
-                    onDragEvent={() => {}}
                     onDrop={() => {}}
                     mon={monWithSave.mon}
                     disabled={false}

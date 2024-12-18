@@ -11,8 +11,7 @@ import DroppableSpace from './DroppableSpace'
 
 interface BoxCellProps {
   onClick: () => void
-  onDragEvent: (_: boolean) => void
-  onDrop: (_: PKMInterface[] | undefined) => void
+  onDrop: (_: PKMInterface[]) => void
   disabled?: boolean
   zIndex: number
   mon: PKMInterface | undefined
@@ -23,13 +22,13 @@ interface BoxCellProps {
 
 const BoxCell = ({
   onClick,
+  onDrop,
   disabled,
   zIndex,
   mon,
   borderColor,
   dragID,
   dragData,
-  onDrop,
 }: BoxCellProps) => {
   const [filterState] = useContext(FilterContext)
 
@@ -91,7 +90,7 @@ const BoxCell = ({
       onDrop={(e) => {
         e.preventDefault()
         e.stopPropagation()
-        console.log(e)
+        onDropFromFiles(e.dataTransfer.files)
       }}
     >
       {mon ? (

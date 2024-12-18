@@ -2,11 +2,10 @@ import { useDraggable } from '@dnd-kit/core'
 import { Button, Card, Grid, Modal, ModalDialog, Stack } from '@mui/joy'
 import lodash from 'lodash'
 import { GameOfOriginData } from 'pokemon-resources'
-import { useCallback, useContext, useMemo, useState } from 'react'
+import { useContext, useMemo, useState } from 'react'
 import { MdClose } from 'react-icons/md'
 import { MenuIcon } from 'src/components/Icons'
 import AttributeRow from 'src/pokemon/AttributeRow'
-import { MouseContext } from 'src/state/mouse'
 import { MonLocation, MonWithLocation, OpenSavesContext } from 'src/state/openSaves'
 import { PKMInterface } from 'src/types/interfaces'
 import { InfoGrid } from '../../components/InfoGrid'
@@ -20,43 +19,10 @@ interface OpenSaveDisplayProps {
 
 const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   const [, openSavesDispatch, openSaves] = useContext(OpenSavesContext)
-  const [mouseState, mouseDispatch] = useContext(MouseContext)
   const [detailsModal, setDetailsModal] = useState(false)
   const { saveIndex, setSelectedMon } = props
   const save = openSaves[saveIndex]
   const { active } = useDraggable({ id: '' })
-
-  const dispatchStartDrag = useCallback(
-    (boxPos: number) => {
-      const mon = save.getCurrentBox().pokemon[boxPos]
-
-      if (mon) {
-        mouseDispatch({
-          type: 'set_drag_source',
-          payload: { save, box: save.currentPCBox, boxPos, mon },
-        })
-      }
-    },
-    [mouseDispatch, save]
-  )
-
-  const dispatchCompleteDrag = useCallback(
-    (boxPosition: number) => {
-      mouseState.dragSource &&
-        openSavesDispatch({
-          type: 'move_mon',
-          payload: {
-            dest: { save, box: save.currentPCBox, boxPos: boxPosition },
-            source: mouseState.dragSource,
-          },
-        })
-      mouseDispatch({
-        type: 'set_drag_source',
-        payload: undefined,
-      })
-    },
-    [mouseDispatch, mouseState.dragSource, openSavesDispatch, save]
-  )
 
   const dispatchImportMons = (mons: PKMInterface[], location: MonLocation) =>
     openSavesDispatch({ type: 'import_mons', payload: { mons, dest: location } })
@@ -165,9 +131,6 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                       onClick={() => {
                         setSelectedMon(mon)
                       }}
-                      onDragEvent={() => {
-                        dispatchStartDrag(row * save.boxColumns + rowIndex)
-                      }}
                       dragID={`${save.tid}_${save.sid}_${save.currentPCBox}_${
                         row * save.boxColumns + rowIndex
                       }`}
@@ -186,8 +149,6 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                             box: save.currentPCBox,
                             boxPos: row * save.boxColumns + rowIndex,
                           })
-                        } else {
-                          dispatchCompleteDrag(row * save.boxColumns + rowIndex)
                         }
                       }}
                     />
