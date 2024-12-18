@@ -4,8 +4,12 @@ import lodash from 'lodash'
 import { useContext, useMemo, useState } from 'react'
 import { EditIcon } from 'src/components/Icons'
 import MiniButton from 'src/components/MiniButton'
+import { ErrorContext } from 'src/state/error'
+import { LookupContext } from 'src/state/lookup'
 import { MonLocation, MonWithLocation, OpenSavesContext } from 'src/state/openSaves'
 import { PKMInterface } from 'src/types/interfaces'
+import { OHPKM } from 'src/types/pkm/OHPKM'
+import { getMonFileIdentifier } from 'src/util/Lookup'
 import ArrowButton from './ArrowButton'
 import BoxCell from './BoxCell'
 
@@ -15,12 +19,54 @@ interface HomeBoxDisplayProps {
 
 const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
   const [{ homeData }, openSavesDispatch] = useContext(OpenSavesContext)
+  const [{ homeMons }] = useContext(LookupContext)
+  const [, dispatchError] = useContext(ErrorContext)
   const { setSelectedMon } = props
   const { active } = useDraggable({ id: '' })
   const [editing, setEditing] = useState(false)
 
-  const dispatchImportMons = (mons: PKMInterface[], location: MonLocation) =>
+  const attemptImportMons = (mons: PKMInterface[], location: MonLocation) => {
+    if (!homeData || !homeMons) {
+      dispatchError({
+        type: 'set_message',
+        payload: {
+          title: 'Import Failed',
+          messages: ['Home data is not loaded. Something went wrong.'],
+        },
+      })
+      return
+    }
+    for (const mon of mons) {
+      try {
+        const identifier = getMonFileIdentifier(new OHPKM(mon))
+
+        if (!identifier) continue
+
+        const inCurrentBox = homeData.boxes[homeData.currentPCBox].pokemon.some(
+          (mon) => mon && getMonFileIdentifier(mon) === identifier
+        )
+
+        if (identifier in homeMons || inCurrentBox) {
+          const message =
+            mons.length === 1
+              ? 'This Pokémon has been moved into OpenHome before.'
+              : 'One or more of these Pokémon has been moved into OpenHome before.'
+
+          dispatchError({
+            type: 'set_message',
+            payload: { title: 'Import Failed', messages: [message] },
+          })
+          return
+        }
+      } catch (e) {
+        dispatchError({
+          type: 'set_message',
+          payload: { title: 'Import Failed', messages: [`${e}`] },
+        })
+      }
+    }
     openSavesDispatch({ type: 'import_mons', payload: { mons, dest: location } })
+  }
 
   const dragData: MonWithLocation | undefined = useMemo(
     () => active?.data.current as MonWithLocation | undefined,
@@ -36,6 +82,7 @@ const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
     homeData &&
     currentBox && (
       <Card
+        data-tauri-drag-region
         style={{
           padding: 2,
           width: '100%',
@@ -134,7 +181,7 @@ const HomeBoxDisplay = (props: HomeBoxDisplayProps) => {
                     zIndex={0}
                     onDrop={(importedMons) => {
                       if (importedMons) {
-                        dispatchImportMons(importedMons, {
+                        attemptImportMons(importedMons, {
                           box: homeData.currentPCBox,
                           boxPos: row * 12 + rowIndex,
                           save: homeData,

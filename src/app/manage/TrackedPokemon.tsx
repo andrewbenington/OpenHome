@@ -13,7 +13,6 @@ export default function TrackedPokemon() {
   return (
     <Tabs defaultValue="all" orientation="vertical" style={{ height: '100%' }}>
       <TabList
-        className="padding-on-macos"
         variant="solid"
         color="primary"
         sx={{
@@ -47,12 +46,7 @@ export default function TrackedPokemon() {
       <TabPanel value="gen345">
         <Gen345Lookup />
       </TabPanel>
-      <Modal
-        open={!!selectedMon}
-        onClose={() => setSelectedMon(undefined)}
-        // maxWidth="md"
-        // PaperProps={{ sx: { height: 400, maxWidth: 800 } }}
-      >
+      <Modal open={!!selectedMon} onClose={() => setSelectedMon(undefined)}>
         <Card style={{ width: 800, height: 400, padding: 0, overflow: 'hidden' }}>
           {selectedMon && (
             <PokemonDetailsPanel

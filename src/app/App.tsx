@@ -12,17 +12,16 @@ import { BackendProvider } from '../backend/backendProvider'
 import PokemonIcon from '../components/PokemonIcon'
 import useIsDarkMode from '../hooks/dark-mode'
 import { AppInfoContext, appInfoInitialState, appInfoReducer } from '../state/appInfo'
+import { ErrorContext, errorReducer } from '../state/error'
 import { FilterProvider } from '../state/filter'
 import { LookupProvider } from '../state/lookup'
 import { MouseContext, mouseReducer } from '../state/mouse'
 import { MonWithLocation, OpenSavesContext, openSavesReducer } from '../state/openSaves'
 import './App.css'
 import AppTabs from './AppTabs'
+import ErrorMessageModal from './ErrorMessage'
 import { PokemonDragContext } from './PokemonDrag'
 import { components, darkTheme, lightTheme } from './Themes'
-function isMacOS() {
-  return navigator.userAgent.includes('Mac OS')
-}
 
 export default function App() {
   const isDarkMode = useIsDarkMode()
@@ -45,6 +44,7 @@ export default function App() {
     monsToRelease: [],
     openSaves: {},
   })
+  const [errorState, errorDispatch] = useReducer(errorReducer, {})
   const [dragData, setDragData] = useState<MonWithLocation>()
   const [dragMon, setDragMon] = useState<PKMInterface>()
   const [loading, setLoading] = useState(true)
@@ -54,6 +54,9 @@ export default function App() {
       .concat(appInfoState.officialSaveTypes)
       .filter((saveType) => appInfoState.settings.enabledSaveTypes[saveType.saveTypeID])
   }, [appInfoState])
+
+  // when using `"withGlobalTauri": true`, you may use
+  // const { getCurrentWindow } = window.__TAURI__.window;
 
   // only on app start
   useEffect(() => {
@@ -76,101 +79,99 @@ export default function App() {
     backend.updateSettings(appInfoState.settings).catch(console.error)
   }, [appInfoState.settings, backend])
 
-  if (isMacOS()) {
-    document.documentElement.style.setProperty('--macos-top-margin', '20px')
-    document.documentElement.style.setProperty('--macos-top-padding', '28px')
-  }
-
   return (
     <ThemeProvider theme={theme}>
       <BackendProvider backend={backend}>
         <AppInfoContext.Provider value={[appInfoState, appInfoDispatch, getEnabledSaveTypes]}>
           <MouseContext.Provider value={[mouseState, mouseDispatch]}>
-            <PokemonDragContext
-              collisionDetection={closestCenter}
-              modifiers={[restrictToWindowEdges]}
-              onDragEnd={(e) => {
-                const dest = e.over?.data.current
+            <ErrorContext.Provider value={[errorState, errorDispatch]}>
+              <PokemonDragContext
+                collisionDetection={closestCenter}
+                modifiers={[restrictToWindowEdges]}
+                onDragEnd={(e) => {
+                  const dest = e.over?.data.current
 
-                if (e.over?.id === 'to_release') {
-                  if (dragData) {
-                    openSavesDispatch({
-                      type: 'add_mon_to_release',
-                      payload: dragData,
-                    })
+                  if (e.over?.id === 'to_release') {
+                    if (dragData) {
+                      openSavesDispatch({
+                        type: 'add_mon_to_release',
+                        payload: dragData,
+                      })
+                    }
+                  } else if (
+                    dragMon &&
+                    dragData &&
+                    dest &&
+                    dest.save.supportsMon(dragMon.dexNum, dragMon.formeNum)
+                  ) {
+                    openSavesDispatch({ type: 'move_mon', payload: { source: dragData, dest } })
                   }
-                } else if (
-                  dragMon &&
-                  dragData &&
-                  dest &&
-                  dest.save.supportsMon(dragMon.dexNum, dragMon.formeNum)
-                ) {
-                  openSavesDispatch({ type: 'move_mon', payload: { source: dragData, dest } })
-                }
 
-                setDragData(e.over?.data.current as MonWithLocation)
-                let d = e.over?.data.current
+                  setDragData(e.over?.data.current as MonWithLocation)
+                  let d = e.over?.data.current
 
-                setDragMon(d?.save.boxes[d.box].pokemon[d.boxPos])
-              }}
-              onDragStart={(e) => {
-                setDragData(e.active.data.current)
-                setDragMon(e.active.data.current?.mon)
-              }}
-              sensors={[
-                useSensor(PointerSensor, {
-                  activationConstraint: {
-                    distance: 0, // Set a small distance threshold
-                  },
-                }),
-              ]}
-            >
-              {createPortal(
-                <DragOverlay dropAnimation={{ duration: 300 }} style={{ cursor: 'grabbing' }}>
-                  {dragData && (
-                    <PokemonIcon
-                      dexNumber={dragMon?.dexNum ?? 0}
-                      formeNumber={
-                        dragData.save.boxes[dragData.box].pokemon[dragData.boxPos]?.formeNum ?? 0
-                      }
-                      isShiny={dragData.save.boxes[dragData.box].pokemon[
-                        dragData.boxPos
-                      ]?.isShiny()}
-                      heldItemIndex={
-                        dragData.save.boxes[dragData.box].pokemon[dragData.boxPos]?.heldItemIndex
-                      }
-                      style={{ width: '100%', height: '100%' }}
-                    />
-                  )}
-                </DragOverlay>,
-                document.body
-              )}
-              <LookupProvider>
-                <OpenSavesContext.Provider
-                  value={[
-                    openSavesState,
-                    openSavesDispatch,
-                    Object.values(openSavesState.openSaves)
-                      .filter((data) => !!data)
-                      .filter((data) => !(data.save instanceof HomeData))
-                      .sort((a, b) => a.index - b.index)
-                      .map((data) => data.save),
-                  ]}
-                >
-                  <FilterProvider>
-                    {loading ? (
-                      <Box width="100%" height="100%" display="grid">
-                        <Typography margin="auto" fontSize={40} fontWeight="bold">
-                          OpenHome
-                        </Typography>
-                      </Box>
-                    ) : (
-                      <AppTabs />
+                  setDragMon(d?.save.boxes[d.box].pokemon[d.boxPos])
+                }}
+                onDragStart={(e) => {
+                  setDragData(e.active.data.current)
+                  setDragMon(e.active.data.current?.mon)
+                }}
+                sensors={[
+                  useSensor(PointerSensor, {
+                    activationConstraint: {
+                      distance: 0, // Set a small distance threshold
+                    },
+                  }),
+                ]}
+              >
+                {createPortal(
+                  <DragOverlay dropAnimation={{ duration: 300 }} style={{ cursor: 'grabbing' }}>
+                    {dragData && (
+                      <PokemonIcon
+                        dexNumber={dragMon?.dexNum ?? 0}
+                        formeNumber={
+                          dragData.save.boxes[dragData.box].pokemon[dragData.boxPos]?.formeNum ?? 0
+                        }
+                        isShiny={dragData.save.boxes[dragData.box].pokemon[
+                          dragData.boxPos
+                        ]?.isShiny()}
+                        heldItemIndex={
+                          dragData.save.boxes[dragData.box].pokemon[dragData.boxPos]?.heldItemIndex
+                        }
+                        style={{ width: '100%', height: '100%' }}
+                      />
                     )}
-                  </FilterProvider>
-                </OpenSavesContext.Provider>
-              </LookupProvider>
-            </PokemonDragContext>
+                  </DragOverlay>,
+                  document.body
+                )}
+                <LookupProvider>
+                  <OpenSavesContext.Provider
+                    value={[
+                      openSavesState,
+                      openSavesDispatch,
+                      Object.values(openSavesState.openSaves)
+                        .filter((data) => !!data)
+                        .filter((data) => !(data.save instanceof HomeData))
+                        .sort((a, b) => a.index - b.index)
+                        .map((data) => data.save),
+                    ]}
+                  >
+                    <FilterProvider>
+                      {loading ? (
+                        <Box width="100%" height="100%" display="grid">
+                          <Typography margin="auto" fontSize={40} fontWeight="bold">
+                            OpenHome
+                          </Typography>
+                        </Box>
+                      ) : (
+                        <AppTabs />
+                      )}
+                      <ErrorMessageModal />
+                    </FilterProvider>
+                  </OpenSavesContext.Provider>
+                </LookupProvider>
+              </PokemonDragContext>
+            </ErrorContext.Provider>
           </MouseContext.Provider>
         </AppInfoContext.Provider>
       </BackendProvider>

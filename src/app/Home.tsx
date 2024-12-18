@@ -1,16 +1,4 @@
-import {
-  Alert,
-  Box,
-  DialogContent,
-  DialogTitle,
-  Divider,
-  Modal,
-  ModalClose,
-  ModalDialog,
-  ModalOverflow,
-  Stack,
-  useTheme,
-} from '@mui/joy'
+import { Box, Modal, ModalDialog, ModalOverflow, Stack, useTheme } from '@mui/joy'
 import * as E from 'fp-ts/lib/Either'
 import lodash, { flatten } from 'lodash'
 import { bytesToPKMInterface } from 'pokemon-files'
@@ -26,8 +14,8 @@ import HomeBoxDisplay from '../saves/boxes/HomeBoxDisplay'
 import OpenSaveDisplay from '../saves/boxes/SaveBoxDisplay'
 import SavesModal from '../saves/SavesModal'
 import { AppInfoContext } from '../state/appInfo'
+import { ErrorContext, ErrorMessageData } from '../state/error'
 import { LookupContext } from '../state/lookup'
-import { MouseContext } from '../state/mouse'
 import { OpenSavesContext } from '../state/openSaves'
 import { PKMInterface } from '../types/interfaces'
 import { OHPKM } from '../types/pkm/OHPKM'
@@ -39,17 +27,20 @@ const Home = () => {
   const [openSavesState, openSavesDispatch, allOpenSaves] = useContext(OpenSavesContext)
   const [lookupState, lookupDispatch] = useContext(LookupContext)
   const backend = useContext(BackendContext)
-  const [mouseState, mouseDispatch] = useContext(MouseContext)
   const [, appInfoDispatch] = useContext(AppInfoContext)
   const { palette } = useTheme()
   const [selectedMon, setSelectedMon] = useState<PKMInterface>()
   const [tab, setTab] = useState('summary')
   const [openSaveDialog, setOpenSaveDialog] = useState(false)
-  const [errorMessages, setErrorMessages] = useState<string[]>()
+  const [, dispatchErrorState] = useContext(ErrorContext)
+  const setErrorMessage = useCallback(
+    (payload: ErrorMessageData) => dispatchErrorState({ type: 'set_message', payload }),
+    [dispatchErrorState]
+  )
 
-  const onViewDrop = (e: React.DragEvent<HTMLDivElement>) => {
-    const processDroppedData = async (file?: File, droppedMon?: PKMInterface) => {
-      let mon: PKMInterface | undefined = droppedMon
+  const previewFile = useCallback(
+    async (file: File) => {
+      let mon: PKMInterface | undefined
 
       if (file) {
         const buffer = await file.arrayBuffer()
@@ -58,23 +49,20 @@ const Home = () => {
         try {
           mon = bytesToPKMInterface(buffer, extension.toUpperCase())
         } catch (e) {
-          console.error(e)
+          setErrorMessage({
+            title: 'Import Error',
+            messages: [`Could not read Pokémon file: ${e}`],
+          })
         }
       }
-      if (!mon) return
+      if (!mon) {
+        setErrorMessage({ title: 'Import Error', messages: ['Not a valid Pokémon file format'] })
+        return
+      }
       setSelectedMon(mon)
-    }
-    const file = e.dataTransfer.files[0]
-    const mon = mouseState.dragSource?.mon
-
-    if (!file && mouseState.dragSource) {
-      mouseDispatch({ type: 'set_drag_source', payload: undefined })
-      processDroppedData(file, mon)
-      e.nativeEvent.preventDefault()
-    } else if (file) {
-      processDroppedData(file, undefined)
-    }
-  }
+    },
+    [setErrorMessage]
+  )
 
   const loadAllLookups = useCallback(async (): Promise<Errorable<Record<string, OHPKM>>> => {
     const onLoadError = (message: string) => {
@@ -127,7 +115,10 @@ const Home = () => {
     const result = await backend.startTransaction()
 
     if (E.isLeft(result)) {
-      setErrorMessages([result.left])
+      dispatchErrorState({
+        type: 'set_message',
+        payload: { title: 'Error Starting Save Transaction', messages: [result.left] },
+      })
       return
     }
 
@@ -178,7 +169,10 @@ const Home = () => {
     const errors = results.filter(E.isLeft).map((err) => err.left)
 
     if (errors.length) {
-      setErrorMessages(errors)
+      dispatchErrorState({
+        type: 'set_message',
+        payload: { title: 'Error Saving', messages: errors },
+      })
       backend.rollbackTransaction()
       return
     }
@@ -198,6 +192,7 @@ const Home = () => {
   }, [
     allOpenSaves,
     backend,
+    dispatchErrorState,
     loadAllHomeData,
     loadAllLookups,
     lookupDispatch,
@@ -255,7 +250,7 @@ const Home = () => {
         flexDirection: 'row',
       }}
     >
-      <Stack className="save-file-column lower-on-macos" spacing={1} width={280} minWidth={280}>
+      <Stack className="save-file-column" spacing={1} width={280} minWidth={280}>
         {lodash.range(allOpenSaves.length).map((i) => (
           <OpenSaveDisplay
             key={`save_display_${i}`}
@@ -301,7 +296,7 @@ const Home = () => {
           onDragOver={(e) => {
             e.preventDefault()
           }}
-          onDrop={(e) => onViewDrop(e)}
+          onDrop={(e) => e.dataTransfer.files.length && previewFile(e.dataTransfer.files[0])}
         >
           Preview
         </div>
@@ -342,20 +337,6 @@ const Home = () => {
               setOpenSaveDialog(false)
             }}
           />
-        </ModalDialog>
-      </Modal>
-      <Modal open={!!errorMessages} onClose={() => setErrorMessages(undefined)}>
-        <ModalDialog style={{ padding: 8 }}>
-          <ModalClose />
-          <DialogTitle>Error(s) saving</DialogTitle>
-          <Divider />
-          <DialogContent>
-            {errorMessages?.map((msg, i) => (
-              <Alert color="danger" variant="solid" key={`alert_${i}`}>
-                {msg}
-              </Alert>
-            ))}
-          </DialogContent>
         </ModalDialog>
       </Modal>
     </div>

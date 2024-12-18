@@ -184,11 +184,3 @@ button > svg {
     rgba(0, 0, 0, 0.3) 0px 3px 12px,
     rgba(0, 0, 0, 0.23) 0px 3px 6px !important;
 }
-
-.lower-on-macos {
-  margin-top: var(--macos-top-margin) !important;
-}
-
-.padding-on-macos {
-  padding-top: var(--macos-top-padding) !important;
-}

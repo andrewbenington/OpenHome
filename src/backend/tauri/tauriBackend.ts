@@ -295,9 +295,11 @@ export const TauriBackend: BackendInterface = {
           )
           const dataTransfer = new DataTransfer()
 
-          const scaleFactor = window.navigator.userAgent.includes('Windows')
-            ? await getCurrentWindow().scaleFactor()
-            : 1
+          // account for Windows pixel density variance
+          const scaleFactor = platform() === 'windows' ? await getCurrentWindow().scaleFactor() : 1
+
+          // account for macOS title bar
+          const verticalOffset = platform() === 'macos' ? 28 : 0
 
           for (const file of filesWithData) {
             dataTransfer.items.add(file)
@@ -306,7 +308,7 @@ export const TauriBackend: BackendInterface = {
           document
             .elementFromPoint(
               e.payload.position.x / scaleFactor,
-              e.payload.position.y / scaleFactor
+              e.payload.position.y / scaleFactor - verticalOffset
             )
             ?.dispatchEvent(
               new DragEvent('drop', {

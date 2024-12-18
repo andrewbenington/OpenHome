@@ -5,6 +5,7 @@ import { MonLocation } from 'src/state/openSaves'
 import { bytesToPKM } from 'src/types/FileImport'
 import { filterApplies } from 'src/types/Filter'
 import { PKMInterface } from 'src/types/interfaces'
+import { ErrorContext } from '../../state/error'
 import '../style.css'
 import DraggableMon from './DraggableMon'
 import DroppableSpace from './DroppableSpace'
@@ -31,6 +32,7 @@ const BoxCell = ({
   dragData,
 }: BoxCellProps) => {
   const [filterState] = useContext(FilterContext)
+  const [, dispatchErrorState] = useContext(ErrorContext)
 
   const isFilteredOut = useMemo(() => {
     return (
@@ -50,7 +52,10 @@ const BoxCell = ({
       try {
         importedMons.push(bytesToPKM(bytes, extension.toUpperCase()))
       } catch (e) {
-        console.error(e)
+        dispatchErrorState({
+          type: 'set_message',
+          payload: { title: 'Error Importing Pokémon', messages: [`${e}`] },
+        })
       }
     }
     onDrop(importedMons)

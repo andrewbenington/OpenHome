@@ -21,11 +21,7 @@ export default function AppTabs() {
       }}
       color="primary"
     >
-      <TabPanel
-        sx={{ '--Tabs-spacing': 0, height: 0 }}
-        value="home"
-        // container
-      >
+      <TabPanel sx={{ '--Tabs-spacing': 0, height: 0 }} value="home">
         <Home />
       </TabPanel>
       <TabPanel sx={{ '--Tabs-spacing': 0, height: 0 }} value="manage">

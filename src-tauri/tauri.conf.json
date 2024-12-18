@@ -15,8 +15,7 @@
         "title": "OpenHome",
         "width": 1200,
         "height": 720,
-        "dragDropEnabled": true,
-        "titleBarStyle": "Overlay"
+        "dragDropEnabled": true
       }
     ],
     "security": {
