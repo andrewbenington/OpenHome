@@ -268,14 +268,16 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
     case 'add_mon_to_release': {
       const replacedMon = updateMonInSave(state, undefined, action.payload)
 
-      if (replacedMon && replacedMon instanceof OHPKM) {
+      if (!replacedMon) return { ...state }
+
+      if (replacedMon instanceof OHPKM) {
         const identifier = getMonFileIdentifier(replacedMon)
 
         if (identifier) {
           delete state.modifiedOHPKMs[identifier]
         }
-        state.monsToRelease.push(replacedMon)
       }
+      state.monsToRelease.push(replacedMon)
       return { ...state }
     }
     case 'clear_updated_box_slots': {

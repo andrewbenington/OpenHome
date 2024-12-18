@@ -1,13 +1,30 @@
-use tauri::{menu::*, AppHandle, Emitter, Wry};
+use std::process::Command;
 
-pub fn create_menu(handle: &AppHandle) -> Result<Menu<Wry>, Box<dyn std::error::Error>> {
+use tauri::{image::Image, include_image, menu::*, App, AppHandle, Emitter, Manager, Wry};
+
+const APP_ICON: Image<'_> = include_image!("icons/128x128.png");
+
+#[cfg(target_os = "macos")]
+const OPEN_CMD: &str = "open";
+#[cfg(target_os = "linux")]
+const OPEN_CMD: &str = "xdg-open";
+#[cfg(target_os = "windows")]
+const OPEN_CMD: &str = "explorer";
+
+pub fn create_menu(app: &App) -> Result<Menu<Wry>, Box<dyn std::error::Error>> {
+    let handle = app.handle();
     let menu = Menu::new(handle)?;
+
+    let about = AboutMetadataBuilder::new()
+        .name(Some("OpenHome"))
+        .version(Some(app.package_info().version.to_string()))
+        .authors(Some(vec![app.package_info().authors.to_string()]))
+        .icon(Some(APP_ICON))
+        .build();
 
     if cfg!(target_os = "macos") {
         let app_submenu_r = SubmenuBuilder::new(handle, "OpenHome")
-            .about(Some(
-                AboutMetadataBuilder::new().name(Some("OpenHome")).build(),
-            ))
+            .about(Some(about.clone()))
             .separator()
             .services()
             .separator()
@@ -25,33 +42,31 @@ pub fn create_menu(handle: &AppHandle) -> Result<Menu<Wry>, Box<dyn std::error::
     let open_item = MenuItem::with_id(handle, "open", "Open", true, Some("CmdOrCtrl+O"))?;
     let save_item = MenuItem::with_id(handle, "save", "Save", true, Some("CmdOrCtrl+S"))?;
     let reset_item = MenuItem::with_id(handle, "reset", "Reset", true, Some("CmdOrCtrl+X"))?;
-    let exit_item = MenuItem::with_id(handle, "exit", "Exit", true, Some("CmdOrCtrl+Q"))?;
-    let file_submenu = SubmenuBuilder::new(handle, "File")
+    let open_appdata_item = MenuItem::with_id(
+        handle,
+        "open-appdata",
+        "Open Data Folder",
+        true,
+        Some("CmdOrCtrl+D"),
+    )?;
+    let file_submenu_items = SubmenuBuilder::new(handle, "File")
         .item(&open_item)
         .item(&save_item)
         .item(&reset_item)
         .separator()
-        .item(&exit_item)
-        .build()?;
+        .item(&open_appdata_item);
+
+    let exit_item = MenuItem::with_id(handle, "exit", "Exit", true, Some("CmdOrCtrl+Q"))?;
+    let file_submenu = match cfg!(target_os = "macos") {
+        true => file_submenu_items.build(),
+        false => file_submenu_items
+            .separator()
+            .about(Some(about))
+            .item(&exit_item)
+            .build(),
+    }?;
 
     menu.append(&file_submenu)?;
-
-    // let undo_item = MenuItem::with_id(handle, "undo", "Undo", true, Some("CmdOrCtrl+Z"))?;
-    // let redo_item = MenuItem::with_id(handle, "redo", "Redo", true, Some("CmdOrCtrl+Y"))?;
-    // let cut_item = MenuItem::with_id(handle, "cut", "Cut", true, Some("CmdOrCtrl+X"))?;
-    let copy_item = MenuItem::with_id(handle, "copy", "Copy", true, Some("CmdOrCtrl+C"))?;
-    // let paste_item = MenuItem::with_id(handle, "paste", "Paste", true, Some("CmdOrCtrl+V"))?;
-
-    let edit_submenu = SubmenuBuilder::new(handle, "Edit")
-        // .item(&undo_item)
-        // .item(&redo_item)
-        // .item(&cut_item)
-        .item(&copy_item)
-        // .item(&paste_item)
-        .build()?;
-
-    menu.append(&edit_submenu)?;
-
     let zoom_in_item = MenuItem::with_id(handle, "zoom_in", "Zoom In", true, None::<&str>)?;
     let zoom_out_item = MenuItem::with_id(handle, "zoom_out", "Zoom Out", true, None::<&str>)?;
     let show_toolbar_item =
@@ -66,13 +81,24 @@ pub fn create_menu(handle: &AppHandle) -> Result<Menu<Wry>, Box<dyn std::error::
     menu.append(&view_submenu)?;
 
     // let about_item = MenuItem::with_id(handle, "about", "About", true, None::<&str>)?;
-    // let check_updates_item = MenuItem::with_id(handle, "check_updates", "Check for Updates", true, None::<&str>)?;
-    let visit_github_item =
-        MenuItem::with_id(handle, "visit_github", "Visit Github", true, None::<&str>)?;
+    let check_updates_item = MenuItem::with_id(
+        handle,
+        "check-updates",
+        "Check for Updates",
+        true,
+        Some("CmdOrCtrl+U"),
+    )?;
+    let visit_github_item = MenuItem::with_id(
+        handle,
+        "visit-github",
+        "Visit Github",
+        true,
+        Some("CmdOrCtrl+G"),
+    )?;
 
     let help_submenu = SubmenuBuilder::new(handle, "Help")
         // .item(&about_item)
-        // .item(&check_updates_item)
+        .item(&check_updates_item)
         .item(&visit_github_item)
         .build()?;
 
@@ -81,12 +107,22 @@ pub fn create_menu(handle: &AppHandle) -> Result<Menu<Wry>, Box<dyn std::error::
     Ok(menu)
 }
 
+fn command_open(target: &str) {
+    let child = Command::new(OPEN_CMD)
+        .arg(target) // <- Specify the directory you'd like to open.
+        .spawn();
+
+    if let Err(err) = child {
+        println!("{}", err)
+    }
+}
+
 pub fn handle_menu_event(app_handle: &AppHandle, event: MenuEvent) {
     println!("Triggered menu event ID: {}", event.id.as_ref());
     match event.id.as_ref() {
         // File menu actions
-        "new" => println!("New file action triggered!"),
-        "open" => println!("Open file action triggered!"),
+        // "new" => println!("New file action triggered!"),
+        // "open" => println!("Open file action triggered!"),
         "save" => {
             let result = app_handle.emit("save", ());
             if let Err(error) = result {
@@ -100,25 +136,29 @@ pub fn handle_menu_event(app_handle: &AppHandle, event: MenuEvent) {
             let _ = app_handle.emit("reset", ());
             return ();
         }
+        "open-appdata" => match app_handle.path().app_data_dir() {
+            Err(err) => {
+                println!["Error getting data directory: {}", err];
+            }
+            Ok(dir) => command_open(dir.to_str().unwrap_or_default()),
+        },
         "exit" => std::process::exit(0),
 
         // Edit menu actions
-        "undo" => println!("Undo action triggered!"),
-        "redo" => println!("Redo action triggered!"),
-        "cut" => println!("Cut action triggered!"),
-        "copy" => println!("Copy action triggered!"),
-        "paste" => println!("Paste action triggered!"),
+        // "cut" => println!("Cut action triggered!"),
+        // "copy" => println!("Copy action triggered!"),
+        // "paste" => println!("Paste action triggered!"),
 
         // View menu actions
-        "zoom_in" => println!("Zoom In action triggered!"),
-        "zoom_out" => println!("Zoom Out action triggered!"),
-        "show_toolbar" => println!("Show Toolbar action triggered!"),
+        // "zoom_in" => println!("Zoom In action triggered!"),
+        // "zoom_out" => println!("Zoom Out action triggered!"),
+        // "show_toolbar" => println!("Show Toolbar action triggered!"),
 
         // Help menu actions
-        "about" => println!("About action triggered!"),
-        "check_updates" => println!("Check for updates action triggered!"),
-        "visit_github" => println!("Github visited action triggered!"),
+        // "about" => println!("About action triggered!"),
+        "check-updates" => command_open("https://andrewbenington.github.io/OpenHome/download.html"),
+        "visit-github" => command_open("https://github.com/andrewbenington/OpenHome"),
 
-        _ => println!("Nothing triggered!"),
+        _ => (),
     }
 }
