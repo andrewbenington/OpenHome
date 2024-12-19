@@ -5,7 +5,7 @@ import { getPublicImageURL } from '../images/images'
 import { PKMInterface } from '../types/interfaces'
 import { getPluginIdentifier, SAVClass } from '../types/SAVTypes/util'
 
-export type SaveViewMode = 'cards' | 'grid'
+export type SaveViewMode = 'card' | 'grid'
 
 export function getMonSaveLogo(mon: PKMInterface, supportedSaves: SAVClass[]) {
   if (mon.pluginOrigin) {
