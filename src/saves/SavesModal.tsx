@@ -16,6 +16,7 @@ import {
   Typography,
 } from '@mui/joy'
 import * as E from 'fp-ts/lib/Either'
+import { debounce } from 'lodash'
 import { useCallback, useContext, useState } from 'react'
 import 'react-data-grid/lib/styles.css'
 import { ErrorContext } from 'src/state/error'
@@ -24,7 +25,7 @@ import { SAVClass } from 'src/types/SAVTypes/util'
 import { getMonFileIdentifier } from 'src/util/Lookup'
 import { BackendContext } from '../backend/backendContext'
 import { CardsIcon, GridIcon } from '../components/Icons'
-import { AppInfoContext } from '../state/appInfo'
+import { AppInfoAction, AppInfoContext } from '../state/appInfo'
 import { LookupContext } from '../state/lookup'
 import { OpenSavesContext } from '../state/openSaves'
 import { getSaveRef } from '../types/SAVTypes/SAV'
@@ -44,6 +45,13 @@ type AmbiguousOpenState = {
   fileBytes: Uint8Array
 }
 
+const debouncedUpdateCardSize = debounce(
+  (size: number, dispatch: React.Dispatch<AppInfoAction>) => {
+    dispatch({ type: 'set_icon_size', payload: size })
+  },
+  500
+)
+
 const SavesModal = (props: SavesModalProps) => {
   const { onClose } = props
   const backend = useContext(BackendContext)
@@ -52,8 +60,11 @@ const SavesModal = (props: SavesModalProps) => {
   const [, dispatchError] = useContext(ErrorContext)
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
   const [{ settings }, dispatchAppInfoState] = useContext(AppInfoContext)
-  const { saveCardSize, saveViewMode } = settings
   const [unknownSaveData, setUnknownSaveData] = useState<AmbiguousOpenState>()
+
+  // these are kept as a local state to reduce lag
+  const [cardSize, setCardSize] = useState(settings.saveCardSize)
+  const [viewMode, setViewMode] = useState<SaveViewMode>(settings.saveViewMode)
 
   const buildAndOpenSave = useCallback(
     (saveType: SAVClass, filePath: PathData, fileBytes: Uint8Array) => {
@@ -195,15 +206,16 @@ const SavesModal = (props: SavesModalProps) => {
             Save Folders
           </Tab>
           <div style={{ flex: 1 }} />
-          {saveViewMode === 'card' && (
+          {viewMode === 'card' && (
             <label style={{ margin: 4 }}>
               Icon Size
               <Slider
-                value={saveCardSize}
-                step={50}
-                onChange={(_, newSize) =>
-                  dispatchAppInfoState({ type: 'set_icon_size', payload: newSize as number })
-                }
+                value={cardSize}
+                step={20}
+                onChange={(_, newSize) => {
+                  setCardSize(newSize as number)
+                  debouncedUpdateCardSize(newSize as number, dispatchAppInfoState)
+                }}
                 valueLabelDisplay="auto"
                 min={100}
                 max={350}
@@ -214,10 +226,13 @@ const SavesModal = (props: SavesModalProps) => {
             </label>
           )}
           <ToggleButtonGroup
-            value={saveViewMode}
-            onChange={(_, newValue) =>
-              dispatchAppInfoState({ type: 'set_save_view', payload: newValue as SaveViewMode })
-            }
+            value={viewMode}
+            onChange={(_, newValue) => {
+              if (newValue) {
+                setViewMode(newValue)
+                dispatchAppInfoState({ type: 'set_save_view', payload: newValue as SaveViewMode })
+              }
+            }}
             color="secondary"
             style={{ width: '95%', marginLeft: 'auto', marginRight: 'auto', marginBottom: 4 }}
           >
@@ -242,10 +257,10 @@ const SavesModal = (props: SavesModalProps) => {
           </ToggleButtonGroup>
         </TabList>
         <TabPanel value="recents">
-          <RecentSaves onOpen={pickSaveFile} view={saveViewMode} cardSize={saveCardSize} />
+          <RecentSaves onOpen={pickSaveFile} view={viewMode} cardSize={cardSize} />
         </TabPanel>
         <TabPanel value="suggested">
-          <SuggestedSaves onOpen={pickSaveFile} view={saveViewMode} cardSize={saveCardSize} />
+          <SuggestedSaves onOpen={pickSaveFile} view={viewMode} cardSize={cardSize} />
         </TabPanel>
         <TabPanel value="folders">
           <SaveFolders />
