@@ -8,13 +8,12 @@ import {
 import { gen3StringToUTF } from '../../../util/Strings/StringConverter'
 import { PluginPKMInterface } from '../../interfaces'
 import { OHPKM } from '../../pkm/OHPKM'
-import { FRLG_SECURITY_COPY_OFFSET, FRLG_SECURITY_OFFSET } from '../G3SAV'
 import { Box, BoxCoordinates, PluginSAV } from '../SAV'
 import { PathData } from '../path'
 import { LOOKUP_TYPE } from '../util'
 // import { RRTransferMon } from './conversion/RRTransferMons'
 
-const SAVE_SIZES_BYTES = [0x20000, 0x20010]
+export const SAVE_SIZES_BYTES = [0x20000, 0x20010]
 
 class G3CFRUSector {
   data: Uint8Array
@@ -308,33 +307,12 @@ export abstract class G3CFRUSAV<T extends PluginPKMInterface> implements PluginS
   static saveTypeName = 'Pokémon Radical Red'
   static saveTypeID = 'G3RRSAV'
 
-  static fileIsSave(bytes: Uint8Array): boolean {
-    if (!SAVE_SIZES_BYTES.includes(bytes.length)) {
-      return false
-    }
-
-    const firstSectionBytesIndex = findFirstSectionOffset(bytes)
-    const firstSectionBytes = bytes.slice(firstSectionBytesIndex, firstSectionBytesIndex + 0x1000)
-
-    const gameCode = firstSectionBytes[0xac]
-
-    if (gameCode !== 1) return false
-
-    const securityKey = bytesToUint32LittleEndian(firstSectionBytes, FRLG_SECURITY_OFFSET)
-    const securityKeyCopy = bytesToUint32LittleEndian(firstSectionBytes, FRLG_SECURITY_COPY_OFFSET)
-
-    console.log('UNBOUND SEC KEY', securityKey)
-    // Radical Red seems to have the security key set to 0, which has a 1 in 4.2 billion
-    // chance to happen in vanilla FireRed (if it can even be 0 at all)
-    return securityKey === 0 || securityKey !== securityKeyCopy
-  }
-
   getPluginIdentifier() {
     return 'radical_red'
   }
 }
 
-const findFirstSectionOffset = (bytes: Uint8Array): number => {
+export const findFirstSectionOffset = (bytes: Uint8Array): number => {
   const SECTION_SIZE = 0x1000
   const SAVE_INDEX_OFFSET = 0xff4
 

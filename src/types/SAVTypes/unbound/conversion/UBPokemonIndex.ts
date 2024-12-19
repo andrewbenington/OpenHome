@@ -867,7 +867,7 @@ export const Gen3UBSpecies = [
   'Furfrou-Matron',
   'Furfrou-Dandy',
   'Furfrou-Debutante',
-  'SPECIES_VIVILLON_FANCY',
+  'Vivillon-Fancy',
   'Venusaur-Mega',
   'Charizard-Mega-X',
   'Charizard-Mega-Y',

@@ -869,7 +869,7 @@ export const UnboundToNationalDexMap: Record<string, GameToNationalDexEntry | nu
   '865': { NationalDexIndex: 676, FormIndex: 5 }, // Furfrou-Matron
   '866': { NationalDexIndex: 676, FormIndex: 6 }, // Furfrou-Dandy
   '867': { NationalDexIndex: 676, FormIndex: 4 }, // Furfrou-Debutante
-  '868': null, // SPECIES_VIVILLON_FANCY (not found)
+  '868': { NationalDexIndex: 666, FormIndex: 18 }, // Vivillon-Fancy
   '869': { NationalDexIndex: 3, FormIndex: 1 }, // Venusaur-Mega
   '870': { NationalDexIndex: 6, FormIndex: 1 }, // Charizard-Mega-X
   '871': { NationalDexIndex: 6, FormIndex: 2 }, // Charizard-Mega-Y
@@ -1297,4 +1297,5 @@ export const UnboundToNationalDexMap: Record<string, GameToNationalDexEntry | nu
   '1293': null, // SPECIES_URSHIFU_RAPID_GIGA (not found)
 }
 
-export const NationalDexToUnboundMap = makeNationalDexToGameMap(UnboundToNationalDexMap)
+  export const NationalDexToUnboundMap = makeNationalDexToGameMap(UnboundToNationalDexMap)
+  

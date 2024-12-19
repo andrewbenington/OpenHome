@@ -1,4 +1,4 @@
-import { G3CFRUSAV } from '../cfru/G3CFRUSAV'
+import { findFirstSectionOffset, G3CFRUSAV, SAVE_SIZES_BYTES } from '../cfru/G3CFRUSAV'
 import { PathData } from '../path'
 import { PluginSAV } from '../SAV'
 import PK3UB from './PK3UB'
@@ -6,7 +6,7 @@ import PK3UB from './PK3UB'
 export class G3UBSAV extends G3CFRUSAV<PK3UB> implements PluginSAV<PK3UB> {
   //   static transferRestrictions: TransferRestrictions = RR_TRANSFER_RESTRICTIONS
 
-  pluginIdentifier = 'radical_red'
+  pluginIdentifier = 'unbound'
 
   static saveTypeAbbreviation = 'Unbound'
   static saveTypeName = 'Pokémon Unbound'
@@ -17,11 +17,11 @@ export class G3UBSAV extends G3CFRUSAV<PK3UB> implements PluginSAV<PK3UB> {
   }
 
   getPluginIdentifier() {
-    return 'radical_red'
+    return 'unbound'
   }
 
   getGameName() {
-    return 'Pokémon Radical Red'
+    return 'Pokémon Unbound'
   }
 
   constructor(path: PathData, bytes: Uint8Array) {
@@ -29,4 +29,32 @@ export class G3UBSAV extends G3CFRUSAV<PK3UB> implements PluginSAV<PK3UB> {
   }
 
   static pkmType = PK3UB
+
+  static fileIsSave(bytes: Uint8Array): boolean {
+    console.log('YOLO')
+    if (!SAVE_SIZES_BYTES.includes(bytes.length)) {
+      console.log('UNBOUNDED')
+      return false
+    }
+
+    const firstSectionBytesIndex = findFirstSectionOffset(bytes)
+    const firstSectionBytes = bytes.slice(firstSectionBytesIndex, firstSectionBytesIndex + 0x1000)
+
+    const gameCode = firstSectionBytes[0xac]
+
+    console.log(gameCode)
+
+    // if (gameCode === 255) return true
+
+    return gameCode === 255
+
+    // const securityKey = bytesToUint32LittleEndian(firstSectionBytes, FRLG_SECURITY_OFFSET)
+    // const securityKeyCopy = bytesToUint32LittleEndian(firstSectionBytes, FRLG_SECURITY_COPY_OFFSET)
+
+    // console.log('UNBOUND SEC KEY', securityKey, securityKey === 0, securityKey !== securityKeyCopy)
+
+    // // Radical Red seems to have the security key set to 0, which has a 1 in 4.2 billion
+    // // chance to happen in vanilla FireRed (if it can even be 0 at all)
+    // return securityKey === 0 || securityKey !== securityKeyCopy
+  }
 }

@@ -1389,7 +1389,12 @@ export function fromGen3RRPokemonIndex(radicalRedIndex: number): GameToNationalD
       FormIndex: entry.FormIndex,
     }
   } else {
-    throw new Error(`Radical Red index ${radicalRedIndex} not found.`)
+    console.warn(`Radical Red index ${radicalRedIndex} not found.`)
+    return {
+      NationalDexIndex: 0,
+      FormIndex: 0,
+    }
+    // throw new Error(`Radical Red index ${radicalRedIndex} not found.`)
   }
 }
 
