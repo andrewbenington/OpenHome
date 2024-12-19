@@ -10,6 +10,7 @@ export function makeNationalDexToGameMap(
 
   for (const key in GameToNationalDexMap) {
     const entry = GameToNationalDexMap[key]
+
     if (entry) {
       const newKey = `${entry.NationalDexIndex}_${entry.FormIndex}`
 
