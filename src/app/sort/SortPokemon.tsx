@@ -43,7 +43,10 @@ function getSortFunction(
         return bCount - aCount
       }
     default:
-      return () => 0
+      return () => {
+        console.error('unrecognized sort term:', sortStr)
+        return 0
+      }
   }
 }
 
@@ -93,7 +96,7 @@ export default function SortPokemon() {
         <Card>
           <Autocomplete
             options={['nickname', 'level', 'species', 'ribbons', 'met_date', 'origin']}
-            onChange={(_, value) => setSort(value?.at(0) ?? '')}
+            onChange={(_, value) => setSort(value ?? '')}
             placeholder="Sort"
           />
         </Card>
