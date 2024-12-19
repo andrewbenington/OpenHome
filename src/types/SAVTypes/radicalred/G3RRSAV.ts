@@ -18,7 +18,7 @@ const RR_TRANSFER_RESTRICTIONS: TransferRestrictions = {
   },
 }
 
-class G3RRSAV extends G3CFRUSAV<PK3RR> implements PluginSAV<PK3RR> {
+export class G3RRSAV extends G3CFRUSAV<PK3RR> implements PluginSAV<PK3RR> {
   static transferRestrictions: TransferRestrictions = RR_TRANSFER_RESTRICTIONS
 
   pluginIdentifier = 'radical_red'
@@ -31,5 +31,3 @@ class G3RRSAV extends G3CFRUSAV<PK3RR> implements PluginSAV<PK3RR> {
     super(path, bytes, PK3RR)
   }
 }
-
-export default G3RRSAV

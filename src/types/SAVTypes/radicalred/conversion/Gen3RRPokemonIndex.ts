@@ -1377,13 +1377,10 @@ export const Gen3RRSpecies = [
   'Chillet',
 ]
 
-import {
-  NationalDexToRadicalRedMap,
-  RadicalRedToNationalDexEntry,
-  RadicalRedToNationalDexMap,
-} from './RadicalRedSpeciesMap'
+import { GameToNationalDexEntry } from '../../cfru/conversion/util'
+import { NationalDexToRadicalRedMap, RadicalRedToNationalDexMap } from './RadicalRedSpeciesMap'
 
-export function fromGen3RRPokemonIndex(radicalRedIndex: number): RadicalRedToNationalDexEntry {
+export function fromGen3RRPokemonIndex(radicalRedIndex: number): GameToNationalDexEntry | null {
   const entry = RadicalRedToNationalDexMap[String(radicalRedIndex)]
 
   if (entry) {
