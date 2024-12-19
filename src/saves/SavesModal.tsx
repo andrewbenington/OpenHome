@@ -51,10 +51,8 @@ const SavesModal = (props: SavesModalProps) => {
   const [lookupState] = useContext(LookupContext)
   const [, dispatchError] = useContext(ErrorContext)
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
-  const [viewMode, setViewMode] = useState<SaveViewMode>('cards')
-  const [, dispatchAppInfoState] = useContext(AppInfoContext)
-  const [appInfoState] = useContext(AppInfoContext)
-  const cardSize = appInfoState.settings.saveCardSize
+  const [{ settings }, dispatchAppInfoState] = useContext(AppInfoContext)
+  const { saveCardSize, saveViewMode } = settings
   const [unknownSaveData, setUnknownSaveData] = useState<AmbiguousOpenState>()
 
   const buildAndOpenSave = useCallback(
@@ -197,11 +195,11 @@ const SavesModal = (props: SavesModalProps) => {
             Save Folders
           </Tab>
           <div style={{ flex: 1 }} />
-          {viewMode === 'cards' && (
-            <label>
+          {saveViewMode === 'card' && (
+            <label style={{ margin: 4 }}>
               Icon Size
               <Slider
-                value={cardSize}
+                value={saveCardSize}
                 step={50}
                 onChange={(_, newSize) =>
                   dispatchAppInfoState({ type: 'set_icon_size', payload: newSize as number })
@@ -216,25 +214,38 @@ const SavesModal = (props: SavesModalProps) => {
             </label>
           )}
           <ToggleButtonGroup
-            value={viewMode}
-            onChange={(_, newValue) => setViewMode(newValue as SaveViewMode)}
+            value={saveViewMode}
+            onChange={(_, newValue) =>
+              dispatchAppInfoState({ type: 'set_save_view', payload: newValue as SaveViewMode })
+            }
             color="secondary"
-            variant="soft"
-            style={{ width: '100%' }}
+            style={{ width: '95%', marginLeft: 'auto', marginRight: 'auto', marginBottom: 4 }}
           >
-            <Button value="cards" color="secondary" variant="soft" fullWidth>
+            <Button
+              value="card"
+              color="secondary"
+              variant="soft"
+              fullWidth
+              style={{ borderTopRightRadius: 0, borderBottomRightRadius: 0 }}
+            >
               <CardsIcon />
             </Button>
-            <Button value="grid" color="secondary" variant="soft" fullWidth>
+            <Button
+              value="grid"
+              color="secondary"
+              variant="soft"
+              fullWidth
+              style={{ borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }}
+            >
               <GridIcon />
             </Button>
           </ToggleButtonGroup>
         </TabList>
         <TabPanel value="recents">
-          <RecentSaves onOpen={pickSaveFile} view={viewMode} cardSize={cardSize} />
+          <RecentSaves onOpen={pickSaveFile} view={saveViewMode} cardSize={saveCardSize} />
         </TabPanel>
         <TabPanel value="suggested">
-          <SuggestedSaves onOpen={pickSaveFile} view={viewMode} cardSize={cardSize} />
+          <SuggestedSaves onOpen={pickSaveFile} view={saveViewMode} cardSize={saveCardSize} />
         </TabPanel>
         <TabPanel value="folders">
           <SaveFolders />

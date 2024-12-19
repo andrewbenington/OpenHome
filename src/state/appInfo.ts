@@ -1,4 +1,5 @@
 import { Dispatch, Reducer, createContext } from 'react'
+import { SaveViewMode } from '../saves/util'
 import { BW2SAV } from '../types/SAVTypes/BW2SAV'
 import { BWSAV } from '../types/SAVTypes/BWSAV'
 import { DPSAV } from '../types/SAVTypes/DPSAV'
@@ -14,9 +15,32 @@ import { USUMSAV } from '../types/SAVTypes/USUMSAV'
 import { SAVClass } from '../types/SAVTypes/util'
 import { XYSAV } from '../types/SAVTypes/XYSAV'
 
+export const defaultSettings: Settings = {
+  enabledSaveTypes: Object.fromEntries(
+    [
+      G1SAV,
+      G2SAV,
+      G3SAV,
+      DPSAV,
+      PtSAV,
+      HGSSSAV,
+      BWSAV,
+      BW2SAV,
+      XYSAV,
+      ORASSAV,
+      SMSAV,
+      USUMSAV,
+      G3RRSAV,
+    ].map((savetype) => [savetype.saveTypeID, true])
+  ),
+  saveCardSize: 180,
+  saveViewMode: 'card',
+}
+
 export type Settings = {
   enabledSaveTypes: Record<string, boolean>
   saveCardSize: number
+  saveViewMode: SaveViewMode
 }
 
 export type AppInfoState = {
@@ -45,6 +69,10 @@ export type AppInfoAction =
   | {
       type: 'set_icon_size'
       payload: number
+    }
+  | {
+      type: 'set_save_view'
+      payload: SaveViewMode
     }
 
 export const appInfoReducer: Reducer<AppInfoState, AppInfoAction> = (
@@ -91,30 +119,17 @@ export const appInfoReducer: Reducer<AppInfoState, AppInfoAction> = (
         settings: { ...state.settings, saveCardSize: payload },
       }
     }
+    case 'set_save_view': {
+      return {
+        ...state,
+        settings: { ...state.settings, saveViewMode: payload },
+      }
+    }
   }
 }
 
 export const appInfoInitialState: AppInfoState = {
-  settings: {
-    enabledSaveTypes: Object.fromEntries(
-      [
-        G1SAV,
-        G2SAV,
-        G3SAV,
-        DPSAV,
-        PtSAV,
-        HGSSSAV,
-        BWSAV,
-        BW2SAV,
-        XYSAV,
-        ORASSAV,
-        SMSAV,
-        USUMSAV,
-        G3RRSAV,
-      ].map((savetype) => [savetype.saveTypeID, true])
-    ),
-    saveCardSize: 180,
-  },
+  settings: defaultSettings,
 
   officialSaveTypes: [
     G1SAV,
