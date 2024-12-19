@@ -17,7 +17,7 @@ import { TauriInvoker } from './tauriInvoker'
 async function pathDataFromRaw(raw: string): Promise<PathData> {
   const filename = await path.basename(raw)
   const dir = await path.dirname(raw)
-  const ext = await path.extname(raw)
+  const ext = '.' in path ? await path.extname(raw) : ''
 
   const pathData: PathData = {
     raw,

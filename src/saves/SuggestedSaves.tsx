@@ -3,8 +3,8 @@ import * as E from 'fp-ts/lib/Either'
 import { GameOfOrigin } from 'pokemon-resources'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { getSaveRef, SAV } from 'src/types/SAVTypes/SAV'
-import { buildSaveFile } from 'src/types/SAVTypes/load'
-import { numericSorter } from 'src/util/Sort'
+import { buildUnknownSaveFile } from 'src/types/SAVTypes/load'
+import { filterUndefined, numericSorter } from 'src/util/Sort'
 import { BackendContext } from '../backend/backendProvider'
 import OHDataGrid, { SortableColumn } from '../components/OHDataGrid'
 import { AppInfoContext } from '../state/appInfo'
@@ -39,23 +39,22 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
       const response = await backend.loadSaveFile(savePath)
 
       if (E.isRight(response)) {
-        const { fileBytes, createdDate } = response.right
+        const { fileBytes } = response.right
 
-        return buildSaveFile(
+        return buildUnknownSaveFile(
           savePath,
           fileBytes,
           {
             homeMonMap,
             gen12LookupMap,
             gen345LookupMap,
-            fileCreatedDate: createdDate,
           },
           getEnabledSaveTypes()
         )
       }
       return undefined
     },
-    [backend, gen12LookupMap, gen345LookupMap, homeMonMap]
+    [backend, gen12LookupMap, gen345LookupMap, getEnabledSaveTypes, homeMonMap]
   )
 
   useEffect(() => {
@@ -72,7 +71,14 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
               filterEmpty
             )
 
-            setSuggestedSaves(saves)
+            saves.filter(E.isLeft).forEach((s) => console.warn(`Suggested save error: ${s.left}`))
+
+            setSuggestedSaves(
+              saves
+                .filter(E.isRight)
+                .map((s) => s.right)
+                .filter(filterUndefined)
+            )
           }
         }
       )

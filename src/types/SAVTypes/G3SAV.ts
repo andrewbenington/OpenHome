@@ -157,13 +157,15 @@ export class G3SaveBackup {
       try {
         const mon = new PK3(this.pcDataContiguous.slice(4 + i * 80, 4 + (i + 1) * 80).buffer, true)
 
-        if (mon.isValid()) {
-          const box = this.boxes[Math.floor(i / 30)]
+        const box = this.boxes[Math.floor(i / 30)]
 
+        if (mon.isValid()) {
           box.pokemon[i % 30] = mon
+        } else {
+          box.pokemon[i % 30] = undefined
         }
       } catch (e) {
-        console.error(e)
+        throw Error(`File does not have valid Pokémon data: ${e}`)
       }
     }
 

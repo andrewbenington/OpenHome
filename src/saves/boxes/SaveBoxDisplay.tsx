@@ -185,7 +185,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
           {lodash.range(save.boxRows).map((row: number) => (
             <Grid container key={`pc_row_${row}`}>
               {lodash.range(save.boxColumns).map((rowIndex: number) => {
-                const mon = save.boxes[save.currentPCBox].pokemon[row * save.boxColumns + rowIndex]
+                const mon = save.boxes[save.currentPCBox]?.pokemon[row * save.boxColumns + rowIndex]
 
                 return (
                   <Grid

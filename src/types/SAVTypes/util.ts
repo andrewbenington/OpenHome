@@ -39,6 +39,7 @@ export interface SAVClass {
   saveTypeName: string
   saveTypeID: string
   saveTypeAbbreviation: string
+  getPluginIdentifier?: () => string
 }
 
 export type PKMTypeOf<Type> = Type extends SAV<infer X> ? X : never

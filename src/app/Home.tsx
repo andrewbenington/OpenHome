@@ -289,10 +289,6 @@ const Home = () => {
         <FilterPanel />
         <div
           className="drop-area"
-          draggable
-          onDragOver={(e) => {
-            e.preventDefault()
-          }}
           onDrop={(e) => e.dataTransfer.files.length && previewFile(e.dataTransfer.files[0])}
         >
           Preview

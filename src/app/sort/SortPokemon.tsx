@@ -118,11 +118,7 @@ export default function SortPokemon() {
       </Stack>
       <Modal open={openSaveDialog} onClose={() => setOpenSaveDialog(false)}>
         <ModalDialog sx={{ minHeight: 400, height: 600, width: 1000 }}>
-          <SavesModal
-            onClose={() => {
-              setOpenSaveDialog(false)
-            }}
-          />
+          <SavesModal onClose={() => setOpenSaveDialog(false)} />
         </ModalDialog>
       </Modal>
       <Modal open={!!selectedMon} onClose={() => setSelectedMon(undefined)}>
