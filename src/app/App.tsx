@@ -77,8 +77,9 @@ export default function App() {
   }, [backend])
 
   useEffect(() => {
+    if (!appInfoState.settingsLoaded) return
     backend.updateSettings(appInfoState.settings).catch(console.error)
-  }, [appInfoState.settings, backend])
+  }, [appInfoState.settings, appInfoState.settingsLoaded, backend])
 
   return (
     <ThemeProvider theme={theme}>

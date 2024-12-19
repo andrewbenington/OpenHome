@@ -97,13 +97,11 @@ pub fn create_menu(app: &App) -> Result<Menu<Wry>, Box<dyn std::error::Error>> {
     )?;
 
     let help_submenu = SubmenuBuilder::new(handle, "Help")
-        // .item(&about_item)
         .item(&check_updates_item)
         .item(&visit_github_item)
         .build()?;
 
     menu.append(&help_submenu)?;
-
     Ok(menu)
 }
 

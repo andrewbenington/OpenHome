@@ -11,6 +11,8 @@ use std::{
     path::{Path, PathBuf},
 };
 
+use tauri::{App, Manager};
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -18,6 +20,11 @@ pub fn run() {
         .setup(|app| {
             let handle = app.handle();
             init_files(handle)?;
+
+            let result = set_theme_from_settings(&app);
+            if let Err(error) = result {
+                eprintln!("{}", error)
+            }
 
             match menu::create_menu(&app) {
                 Ok(menu) => {
@@ -51,6 +58,7 @@ pub fn run() {
             commands::rollback_transaction,
             commands::commit_transaction,
             commands::find_suggested_saves,
+            commands::set_app_theme,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
@@ -99,4 +107,37 @@ fn init_storage_json_file(
         }
     }
     Ok(())
+}
+
+fn set_theme_from_settings(app: &App) -> Result<(), String> {
+    let settings_result =
+        util::get_storage_file_json(app.app_handle(), &"settings.json".to_string().into());
+    if let Err(error) = settings_result {
+        return Err(format!("Error getting settings: {}", error));
+    }
+
+    let settings_json = settings_result.unwrap();
+
+    let theme_option: Option<tauri::Theme>;
+    if let Some(string_value) = settings_json["appTheme"].as_str() {
+        if string_value == "dark" {
+            theme_option = Some(tauri::Theme::Dark);
+        } else if string_value == "light" {
+            theme_option = Some(tauri::Theme::Light);
+        } else if string_value == "system" {
+            theme_option = None::<tauri::Theme>;
+        } else {
+            return Err(format!("Unknown app theme: {}", string_value));
+        }
+    } else {
+        return Err("No appTheme in settings.json".to_string());
+    }
+
+    let main_window = app
+        .get_webview_window("main")
+        .ok_or("Main window not found")?;
+
+    return main_window
+        .set_theme(theme_option)
+        .map_err(|e| e.to_string());
 }

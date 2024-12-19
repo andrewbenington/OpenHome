@@ -16,11 +16,13 @@ import { XYSAV } from '../types/SAVTypes/XYSAV'
 
 export type Settings = {
   enabledSaveTypes: Record<string, boolean>
+  appTheme: 'light' | 'dark' | 'system'
 }
 
 export type AppInfoState = {
   resourcesPath?: string
   settings: Settings
+  settingsLoaded: boolean
   officialSaveTypes: SAVClass[]
   extraSaveTypes: SAVClass[]
 }
@@ -40,6 +42,10 @@ export type AppInfoAction =
   | {
       type: 'load_settings'
       payload: Settings
+    }
+  | {
+      type: 'set_app_theme'
+      payload: 'light' | 'dark' | 'system'
     }
 
 export const appInfoReducer: Reducer<AppInfoState, AppInfoAction> = (
@@ -80,6 +86,9 @@ export const appInfoReducer: Reducer<AppInfoState, AppInfoAction> = (
 
       return { ...state, settings: { ...payload, enabledSaveTypes: enabled } }
     }
+    case 'set_app_theme': {
+      return { ...state, settings: { ...state.settings, appTheme: payload }, settingsLoaded: true }
+    }
   }
 }
 
@@ -102,7 +111,9 @@ export const appInfoInitialState: AppInfoState = {
         G3RRSAV,
       ].map((savetype) => [savetype.saveTypeID, true])
     ),
+    appTheme: 'system',
   },
+  settingsLoaded: false,
 
   officialSaveTypes: [
     G1SAV,

@@ -270,13 +270,16 @@ export const TauriBackend: BackendInterface = {
     return promise.then(
       E.match(
         (err) => E.left(err),
-        (partialSettings) => E.right({ enabledSaveTypes: {}, ...partialSettings })
+        (partialSettings) =>
+          E.right({ enabledSaveTypes: {}, appTheme: 'system', ...partialSettings })
       )
     )
   },
   updateSettings: async (settings: Settings) => {
     return TauriInvoker.writeStorageFileJSON('settings.json', settings as JSONObject)
   },
+  setTheme: (appTheme: 'light' | 'dark' | 'system'): Promise<Errorable<null>> =>
+    TauriInvoker.setTheme(appTheme),
 
   registerListeners: (listeners) => {
     const unlistenPromise = Promise.all([
