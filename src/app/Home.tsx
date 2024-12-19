@@ -344,15 +344,15 @@ const Home = () => {
           />
         </ModalDialog>
       </Modal>
-      {specifySave && (
+      <Modal open={!!specifySave} onClose={() => setSpecifySave(null)}>
         <SelectPlugin
-          plugins={specifySave.plugins}
+          plugins={specifySave?.plugins ?? []}
           onPluginClick={(selectedPlugin) => {
-            specifySave.onSelect?.(selectedPlugin)
+            specifySave?.onSelect?.(selectedPlugin)
             setSpecifySave(null)
           }}
         />
-      )}
+      </Modal>
     </div>
   )
 }

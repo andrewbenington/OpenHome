@@ -21,7 +21,7 @@ import { AppInfoContext } from '../state/appInfo'
 import { LookupContext } from '../state/lookup'
 import { OpenSavesContext } from '../state/openSaves'
 import { getSaveRef } from '../types/SAVTypes/SAV'
-import { buildSaveFile, getSaveType } from '../types/SAVTypes/load'
+import { buildSaveFile, getSaveTypes } from '../types/SAVTypes/load'
 import RecentSaves from './RecentSaves'
 import SaveFolders from './SaveFolders'
 import SuggestedSaves from './SuggestedSaves'
@@ -97,13 +97,25 @@ const SavesModal = (props: SavesModalProps) => {
               filePath = path
             }
             if (filePath && fileBytes && lookupState.loaded) {
-              let saveType = getSaveType(fileBytes, getEnabledSaveTypes())
-              const complementaryPlugins = saveType?.getComplementaryPlugins?.() ?? []
+              let saveTypes = getSaveTypes(fileBytes, getEnabledSaveTypes())
 
-              if (complementaryPlugins.length > 0) {
+              if (saveTypes.length === 0) {
+                dispatchError({
+                  type: 'set_message',
+                  payload: {
+                    title: 'Error Identifying Save',
+                    messages: ['Make sure you opened a supported save file.'],
+                  },
+                })
+                return
+              }
+
+              let saveType: SAVClass | undefined = saveTypes[0]
+
+              if (saveTypes.length > 1) {
                 setSpecifySave({
                   supportedSaveTypes: getEnabledSaveTypes(),
-                  plugins: complementaryPlugins,
+                  plugins: saveTypes.map((st) => st.saveTypeName),
                 })
 
                 // Wait for user selection

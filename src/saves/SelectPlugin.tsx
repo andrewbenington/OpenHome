@@ -21,7 +21,6 @@ export const SelectPlugin = ({ plugins, onPluginClick }: SelectPluginProps) => {
         maxWidth: '80%',
         borderRadius: 'lg',
         padding: 2,
-        zIndex: 2000, // High zIndex to overlay it over everything
       }}
     >
       <ModalClose />

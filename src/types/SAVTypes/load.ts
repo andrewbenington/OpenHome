@@ -47,16 +47,8 @@ const recoverOHPKMData = (
   return saveFile
 }
 
-export const getSaveType = (
-  bytes: Uint8Array,
-  supportedSaveTypes: SAVClass[]
-): SAVClass | undefined => {
-  for (const saveType of supportedSaveTypes) {
-    if (saveType.fileIsSave(bytes)) {
-      return saveType
-    }
-  }
-  return undefined
+export const getSaveTypes = (bytes: Uint8Array, supportedSaveTypes: SAVClass[]): SAVClass[] => {
+  return supportedSaveTypes.filter((saveType) => saveType.fileIsSave(bytes))
 }
 
 export const buildSaveFile = (
@@ -75,7 +67,14 @@ export const buildSaveFile = (
   const { homeMonMap, gen12LookupMap, gen345LookupMap } = lookupMaps
 
   if (!saveType && supportedSaveTypes) {
-    saveType = getSaveType(fileBytes, supportedSaveTypes)
+    const saveTypes = getSaveTypes(fileBytes, supportedSaveTypes)
+
+    if (saveTypes.length > 1) {
+      return E.left('Could not distinguish between multiple possible save types')
+    } else if (saveTypes.length === 0) {
+      return E.left('Could not detect save type')
+    }
+    saveType = saveTypes[0]
   }
 
   if (!saveType) return E.right(undefined)

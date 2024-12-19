@@ -39,7 +39,6 @@ export interface SAVClass {
   saveTypeName: string
   saveTypeID: string
   saveTypeAbbreviation: string
-  getComplementaryPlugins?: () => string[]
   getPluginIdentifier?: () => string
 }
 
