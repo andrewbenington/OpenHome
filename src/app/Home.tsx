@@ -5,8 +5,6 @@ import { bytesToPKMInterface } from 'pokemon-files'
 import { GameOfOrigin, isGameBoy, isGen3, isGen4, isGen5 } from 'pokemon-resources'
 import { useCallback, useContext, useEffect, useState } from 'react'
 import { MdFileOpen } from 'react-icons/md'
-import { SelectPlugin } from 'src/saves/SelectPlugin'
-import { SAVClass } from 'src/types/SAVTypes/util'
 import { Errorable } from 'src/types/types'
 import { filterUndefined } from 'src/util/Sort'
 import { BackendContext } from '../backend/backendProvider'
@@ -34,11 +32,6 @@ const Home = () => {
   const [selectedMon, setSelectedMon] = useState<PKMInterface>()
   const [tab, setTab] = useState('summary')
   const [openSaveDialog, setOpenSaveDialog] = useState(false)
-  const [specifySave, setSpecifySave] = useState<{
-    supportedSaveTypes: SAVClass[]
-    plugins: string[]
-    onSelect?: (plugin: string) => void
-  } | null>(null)
   const [, dispatchErrorState] = useContext(ErrorContext)
   const setErrorMessage = useCallback(
     (payload: ErrorMessageData) => dispatchErrorState({ type: 'set_message', payload }),
@@ -296,10 +289,6 @@ const Home = () => {
         <FilterPanel />
         <div
           className="drop-area"
-          draggable
-          onDragOver={(e) => {
-            e.preventDefault()
-          }}
           onDrop={(e) => e.dataTransfer.files.length && previewFile(e.dataTransfer.files[0])}
         >
           Preview
@@ -340,18 +329,8 @@ const Home = () => {
             onClose={() => {
               setOpenSaveDialog(false)
             }}
-            setSpecifySave={setSpecifySave}
           />
         </ModalDialog>
-      </Modal>
-      <Modal open={!!specifySave} onClose={() => setSpecifySave(null)}>
-        <SelectPlugin
-          plugins={specifySave?.plugins ?? []}
-          onPluginClick={(selectedPlugin) => {
-            specifySave?.onSelect?.(selectedPlugin)
-            setSpecifySave(null)
-          }}
-        />
       </Modal>
     </div>
   )

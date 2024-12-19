@@ -1,12 +1,19 @@
 import {
   Button,
+  DialogContent,
+  DialogTitle,
+  Modal,
+  ModalClose,
+  ModalDialog,
   Slider,
+  Stack,
   Tab,
   tabClasses,
   TabList,
   TabPanel,
   Tabs,
   ToggleButtonGroup,
+  Typography,
 } from '@mui/joy'
 import * as E from 'fp-ts/lib/Either'
 import { useCallback, useContext, useState } from 'react'
@@ -29,43 +36,17 @@ import { SaveViewMode } from './util'
 
 interface SavesModalProps {
   onClose: () => void
-  setSpecifySave: React.Dispatch<
-    React.SetStateAction<{
-      supportedSaveTypes: SAVClass[]
-      plugins: string[]
-      onSelect?: (plugin: string) => void
-    } | null>
-  >
 }
 
-function waitForPluginSelection(
-  setSpecifySave: React.Dispatch<
-    React.SetStateAction<{
-      supportedSaveTypes: SAVClass[]
-      plugins: string[]
-      onSelect?: (plugin: string) => void
-    } | null>
-  >
-): Promise<SAVClass | undefined> {
-  return new Promise((resolve) => {
-    setSpecifySave((prevState) => {
-      if (!prevState) {
-        throw new Error('SpecifySave state is unexpectedly null.')
-      }
-
-      return {
-        ...prevState,
-        onSelect: (selectedPlugin: string) => {
-          resolve(prevState.supportedSaveTypes.find((item) => item.saveTypeID === selectedPlugin))
-          setSpecifySave(null) // Close the modal after selection
-        },
-      }
-    })
-  })
+type AmbiguousOpenState = {
+  possibleSaveTypes: SAVClass[]
+  filePath: PathData
+  fileBytes: Uint8Array
+  fileCreated: Date | undefined
 }
 
 const SavesModal = (props: SavesModalProps) => {
-  const { onClose, setSpecifySave } = props
+  const { onClose } = props
   const backend = useContext(BackendContext)
   const [, dispatchOpenSaves] = useContext(OpenSavesContext)
   const [lookupState] = useContext(LookupContext)
@@ -73,8 +54,65 @@ const SavesModal = (props: SavesModalProps) => {
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
   const [viewMode, setViewMode] = useState<SaveViewMode>('cards')
   const [cardSize, setCardSize] = useState<number>(180)
+  const [unknownSaveData, setUnknownSaveData] = useState<AmbiguousOpenState>()
 
-  const openSaveFile = useCallback(
+  const buildAndOpenSave = useCallback(
+    (
+      saveType: SAVClass,
+      filePath: PathData,
+      fileBytes: Uint8Array,
+      createdDate: Date | undefined
+    ) => {
+      const result = buildSaveFile(
+        filePath,
+        fileBytes,
+        {
+          homeMonMap: lookupState.homeMons,
+          gen12LookupMap: lookupState.gen12,
+          gen345LookupMap: lookupState.gen345,
+          fileCreatedDate: createdDate,
+        },
+        saveType,
+        (updatedMon) => {
+          const identifier = getMonFileIdentifier(updatedMon)
+
+          if (identifier === undefined) {
+            return E.left(`Could not get identifier for mon: ${updatedMon.nickname}`)
+          }
+          backend.writeHomeMon(identifier, updatedMon.bytes)
+        }
+      )
+
+      if (E.isLeft(result)) {
+        dispatchError({
+          type: 'set_message',
+          payload: {
+            title: 'Error Loading Save',
+            messages: [result.left],
+          },
+        })
+        return
+      }
+      const saveFile = result.right
+
+      if (!saveFile) {
+        dispatchError({
+          type: 'set_message',
+          payload: {
+            title: 'Error Identifying Save',
+            messages: ['Make sure you opened a supported save file.'],
+          },
+        })
+      } else {
+        backend.addRecentSave(getSaveRef(saveFile))
+        dispatchOpenSaves({ type: 'add_save', payload: saveFile })
+        onClose()
+      }
+    },
+    [backend, dispatchError, dispatchOpenSaves, lookupState, onClose]
+  )
+
+  const pickSaveFile = useCallback(
     async (filePath?: PathData) => {
       if (!filePath) {
         const pickedFile = await backend.pickFile()
@@ -93,11 +131,14 @@ const SavesModal = (props: SavesModalProps) => {
         E.match(
           (err) => console.error(err),
           async ({ path, fileBytes, createdDate }) => {
-            if (!filePath) {
-              filePath = path
-            }
+            filePath = path
             if (filePath && fileBytes && lookupState.loaded) {
               let saveTypes = getSaveTypes(fileBytes, getEnabledSaveTypes())
+
+              if (saveTypes.length === 1) {
+                buildAndOpenSave(saveTypes[0], filePath, fileBytes, createdDate)
+                return
+              }
 
               if (saveTypes.length === 0) {
                 dispatchError({
@@ -110,166 +151,155 @@ const SavesModal = (props: SavesModalProps) => {
                 return
               }
 
-              let saveType: SAVClass | undefined = saveTypes[0]
-
-              if (saveTypes.length > 1) {
-                setSpecifySave({
-                  supportedSaveTypes: getEnabledSaveTypes(),
-                  plugins: saveTypes.map((st) => st.saveTypeName),
-                })
-
-                // Wait for user selection
-                saveType = await waitForPluginSelection(setSpecifySave)
-                if (!saveType) {
-                  return
-                }
-              }
-
-              const result = buildSaveFile(
+              setUnknownSaveData({
+                possibleSaveTypes: saveTypes,
                 filePath,
                 fileBytes,
-                {
-                  homeMonMap: lookupState.homeMons,
-                  gen12LookupMap: lookupState.gen12,
-                  gen345LookupMap: lookupState.gen345,
-                  fileCreatedDate: createdDate,
-                },
-                undefined, // supported saves
-                saveType,
-                (updatedMon) => {
-                  const identifier = getMonFileIdentifier(updatedMon)
-
-                  if (identifier === undefined) {
-                    return E.left(`Could not get identifier for mon: ${updatedMon.nickname}`)
-                  }
-                  backend.writeHomeMon(identifier, updatedMon.bytes)
-                }
-              )
-
-              if (E.isLeft(result)) {
-                dispatchError({
-                  type: 'set_message',
-                  payload: {
-                    title: 'Error Loading Save',
-                    messages: [result.left],
-                  },
-                })
-                return
-              }
-              const saveFile = result.right
-
-              if (!saveFile) {
-                dispatchError({
-                  type: 'set_message',
-                  payload: {
-                    title: 'Error Identifying Save',
-                    messages: ['Make sure you opened a supported save file.'],
-                  },
-                })
-              } else {
-                backend.addRecentSave(getSaveRef(saveFile))
-                dispatchOpenSaves({ type: 'add_save', payload: saveFile })
-                onClose()
-              }
+                fileCreated: createdDate,
+              })
             }
           }
         )
       )
     },
-    [
-      backend,
-      dispatchError,
-      dispatchOpenSaves,
-      getEnabledSaveTypes,
-      lookupState,
-      onClose,
-      setSpecifySave,
-    ]
+    [backend, buildAndOpenSave, dispatchError, getEnabledSaveTypes, lookupState.loaded]
   )
 
   return (
-    <Tabs
-      defaultValue="recents"
-      orientation="vertical"
-      sx={{ height: '100%', borderTopLeftRadius: 8, borderBottomLeftRadius: 8 }}
-    >
-      <TabList
-        variant="solid"
-        color="primary"
-        disableUnderline
-        sx={{
-          whiteSpace: 'nowrap',
-          p: 0.8,
-          gap: 0.5,
-          [`& .${tabClasses.root}`]: {
-            borderRadius: 'lg',
-          },
-          [`& .${tabClasses.root}[aria-selected="true"]`]: {
-            boxShadow: 'sm',
-          },
-          borderTopLeftRadius: 8,
-          borderBottomLeftRadius: 8,
-        }}
+    <>
+      <Tabs
+        defaultValue="recents"
+        orientation="vertical"
+        sx={{ height: '100%', borderTopLeftRadius: 8, borderBottomLeftRadius: 8 }}
       >
-        <Button
-          onClick={() => openSaveFile()}
-          style={{ margin: 8, width: 'calc(100% - 16px)' }}
+        <TabList
+          variant="solid"
           color="primary"
-          variant="soft"
+          disableUnderline
+          sx={{
+            whiteSpace: 'nowrap',
+            p: 0.8,
+            gap: 0.5,
+            [`& .${tabClasses.root}`]: {
+              borderRadius: 'lg',
+            },
+            [`& .${tabClasses.root}[aria-selected="true"]`]: {
+              boxShadow: 'sm',
+            },
+            borderTopLeftRadius: 8,
+            borderBottomLeftRadius: 8,
+          }}
         >
-          Open File
-        </Button>
-        <Tab disableIndicator value={'recents'} variant="solid" color="primary">
-          Recents
-        </Tab>
-        <Tab disableIndicator value={'suggested'} variant="solid" color="primary">
-          Suggested
-        </Tab>
-        <Tab disableIndicator value={'folders'} variant="solid" color="primary">
-          Save Folders
-        </Tab>
-        <div style={{ flex: 1 }} />
-        {viewMode === 'cards' && (
-          <label>
-            Icon Size
-            <Slider
-              value={cardSize}
-              onChange={(_, newSize) => setCardSize(newSize as number)}
-              valueLabelDisplay="auto"
-              min={100}
-              max={500}
-              style={{ paddingTop: 0, paddingBottom: 30 }}
-              variant="soft"
-              color="neutral"
-            />
-          </label>
-        )}
-        <ToggleButtonGroup
-          value={viewMode}
-          onChange={(_, newValue) => setViewMode(newValue as SaveViewMode)}
-          color="secondary"
-          variant="soft"
-          style={{ width: '100%' }}
-        >
-          <Button value="cards" color="secondary" variant="soft" fullWidth>
-            <CardsIcon />
+          <Button
+            onClick={() => pickSaveFile()}
+            style={{ margin: 8, width: 'calc(100% - 16px)' }}
+            color="primary"
+            variant="soft"
+          >
+            Open File
           </Button>
-          <Button value="grid" color="secondary" variant="soft" fullWidth>
-            <GridIcon />
-          </Button>
-        </ToggleButtonGroup>
-      </TabList>
-      <TabPanel value="recents">
-        <RecentSaves onOpen={openSaveFile} view={viewMode} cardSize={cardSize} />
-      </TabPanel>
-      <TabPanel value="suggested">
-        <SuggestedSaves onOpen={openSaveFile} view={viewMode} cardSize={cardSize} />
-      </TabPanel>
-      <TabPanel value="folders">
-        <SaveFolders />
-      </TabPanel>
-    </Tabs>
+          <Tab disableIndicator value={'recents'} variant="solid" color="primary">
+            Recents
+          </Tab>
+          <Tab disableIndicator value={'suggested'} variant="solid" color="primary">
+            Suggested
+          </Tab>
+          <Tab disableIndicator value={'folders'} variant="solid" color="primary">
+            Save Folders
+          </Tab>
+          <div style={{ flex: 1 }} />
+          {viewMode === 'cards' && (
+            <label>
+              Icon Size
+              <Slider
+                value={cardSize}
+                onChange={(_, newSize) => setCardSize(newSize as number)}
+                valueLabelDisplay="auto"
+                min={100}
+                max={500}
+                style={{ paddingTop: 0, paddingBottom: 30 }}
+                variant="soft"
+                color="neutral"
+              />
+            </label>
+          )}
+          <ToggleButtonGroup
+            value={viewMode}
+            onChange={(_, newValue) => setViewMode(newValue as SaveViewMode)}
+            color="secondary"
+            variant="soft"
+            style={{ width: '100%' }}
+          >
+            <Button value="cards" color="secondary" variant="soft" fullWidth>
+              <CardsIcon />
+            </Button>
+            <Button value="grid" color="secondary" variant="soft" fullWidth>
+              <GridIcon />
+            </Button>
+          </ToggleButtonGroup>
+        </TabList>
+        <TabPanel value="recents">
+          <RecentSaves onOpen={pickSaveFile} view={viewMode} cardSize={cardSize} />
+        </TabPanel>
+        <TabPanel value="suggested">
+          <SuggestedSaves onOpen={pickSaveFile} view={viewMode} cardSize={cardSize} />
+        </TabPanel>
+        <TabPanel value="folders">
+          <SaveFolders />
+        </TabPanel>
+      </Tabs>
+      <SelectSaveType
+        open={!!unknownSaveData}
+        saveTypes={unknownSaveData?.possibleSaveTypes}
+        onSelect={(selected) => {
+          if (!unknownSaveData || !selected) return
+          const data = unknownSaveData
+
+          buildAndOpenSave(selected, data.filePath, data.fileBytes, data.fileCreated)
+          setUnknownSaveData(undefined)
+        }}
+      />
+    </>
   )
 }
 
 export default SavesModal
+
+interface SelectSaveTypeProps {
+  open: boolean
+  saveTypes?: SAVClass[]
+  onSelect: (saveType?: SAVClass) => void
+}
+
+function SelectSaveType({ open, saveTypes, onSelect }: SelectSaveTypeProps) {
+  return (
+    <Modal open={open} onClose={() => onSelect()}>
+      <ModalDialog
+        sx={{
+          minWidth: 400,
+          maxWidth: '80%',
+          borderRadius: 'lg',
+          padding: 2,
+        }}
+      >
+        <ModalClose />
+        <DialogTitle>Ambiguous Save Type</DialogTitle>
+        <DialogContent>
+          <Typography>Select a save type to proceed:</Typography>
+          <Stack spacing={2} mt={2}>
+            {saveTypes?.map((saveType) => (
+              <Button
+                key={saveType.saveTypeID}
+                onClick={() => onSelect(saveType)}
+                variant="soft"
+                color="primary"
+              >
+                {saveType.saveTypeName}
+              </Button>
+            ))}
+          </Stack>
+        </DialogContent>
+      </ModalDialog>
+    </Modal>
+  )
+}

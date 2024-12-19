@@ -7,10 +7,10 @@ import { PK1 } from 'pokemon-files'
 import { bytesToPKM } from '../../FileImport'
 import { OHPKM } from '../../pkm/OHPKM'
 import { G1SAV } from '../G1SAV'
-import { buildSaveFile } from '../load'
+import { buildUnknownSaveFile } from '../load'
 import { emptyPathData } from '../path'
 
-const result = buildSaveFile(
+const result = buildUnknownSaveFile(
   emptyPathData,
   new Uint8Array(fs.readFileSync(path.join(__dirname, './SAVFiles', 'blue.sav'))),
   {},
@@ -34,7 +34,9 @@ test('pc box decoded correctly', () => {
 })
 
 test('removing mon shifts others in box', () => {
-  const result1 = buildSaveFile(emptyPathData, new Uint8Array(blueSaveFile.bytes), {}, [G1SAV])
+  const result1 = buildUnknownSaveFile(emptyPathData, new Uint8Array(blueSaveFile.bytes), {}, [
+    G1SAV,
+  ])
 
   if (E.isLeft(result1)) {
     fail(result1.left)
@@ -46,7 +48,9 @@ test('removing mon shifts others in box', () => {
   modifiedSaveFile1.updatedBoxSlots.push({ box: 7, index: 0 })
   modifiedSaveFile1.prepareBoxesAndGetModified()
 
-  const result2 = buildSaveFile(emptyPathData, new Uint8Array(modifiedSaveFile1.bytes), {}, [G1SAV])
+  const result2 = buildUnknownSaveFile(emptyPathData, new Uint8Array(modifiedSaveFile1.bytes), {}, [
+    G1SAV,
+  ])
 
   if (E.isLeft(result2)) {
     fail(result2.left)
@@ -60,7 +64,9 @@ test('removing mon shifts others in box', () => {
 })
 
 test('inserting mon works', () => {
-  const result1 = buildSaveFile(emptyPathData, new Uint8Array(blueSaveFile.bytes), {}, [G1SAV])
+  const result1 = buildUnknownSaveFile(emptyPathData, new Uint8Array(blueSaveFile.bytes), {}, [
+    G1SAV,
+  ])
 
   if (E.isLeft(result1)) {
     fail(result1.left)
@@ -71,7 +77,9 @@ test('inserting mon works', () => {
   modifiedSaveFile1.updatedBoxSlots.push({ box: 7, index: 0 })
   modifiedSaveFile1.prepareBoxesAndGetModified()
 
-  const result2 = buildSaveFile(emptyPathData, new Uint8Array(modifiedSaveFile1.bytes), {}, [G1SAV])
+  const result2 = buildUnknownSaveFile(emptyPathData, new Uint8Array(modifiedSaveFile1.bytes), {}, [
+    G1SAV,
+  ])
 
   if (E.isLeft(result2)) {
     fail(result2.left)

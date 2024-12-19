@@ -5,8 +5,6 @@ import { MdAdd } from 'react-icons/md'
 import PokemonDetailsPanel from 'src/pokemon/PokemonDetailsPanel'
 import BoxCell from 'src/saves/boxes/BoxCell'
 import SavesModal from 'src/saves/SavesModal'
-import { SelectPlugin } from 'src/saves/SelectPlugin'
-import { SAVClass } from 'src/types/SAVTypes/util'
 import { filterUndefined } from 'src/util/Sort'
 import { LookupContext } from '../../state/lookup'
 import { OpenSavesContext } from '../../state/openSaves'
@@ -56,11 +54,6 @@ export default function SortPokemon() {
   const [selectedMon, setSelectedMon] = useState<PKMInterface>()
   const [tab, setTab] = useState('summary')
   const [sort, setSort] = useState('')
-  const [specifySave, setSpecifySave] = useState<{
-    supportedSaveTypes: SAVClass[]
-    plugins: string[]
-    onSelect?: (plugin: string) => void
-  } | null>(null)
 
   const allMonsWithColors = useMemo(() => {
     if (!homeData) return []
@@ -125,12 +118,7 @@ export default function SortPokemon() {
       </Stack>
       <Modal open={openSaveDialog} onClose={() => setOpenSaveDialog(false)}>
         <ModalDialog sx={{ minHeight: 400, height: 600, width: 1000 }}>
-          <SavesModal
-            onClose={() => {
-              setOpenSaveDialog(false)
-            }}
-            setSpecifySave={setSpecifySave}
-          />
+          <SavesModal onClose={() => setOpenSaveDialog(false)} />
         </ModalDialog>
       </Modal>
       <Modal open={!!selectedMon} onClose={() => setSelectedMon(undefined)}>
@@ -148,16 +136,6 @@ export default function SortPokemon() {
           </ModalDialog>
         </ModalOverflow>
       </Modal>
-      {specifySave && (
-        <SelectPlugin
-          plugins={specifySave.plugins}
-          onPluginClick={(selectedPlugin) => {
-            // console.log(`Selected plugin: ${selectedPlugin}`)
-            specifySave.onSelect?.(selectedPlugin)
-            setSpecifySave(null)
-          }}
-        />
-      )}
     </Stack>
   )
 }

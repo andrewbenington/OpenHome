@@ -51,33 +51,42 @@ export const getSaveTypes = (bytes: Uint8Array, supportedSaveTypes: SAVClass[]):
   return supportedSaveTypes.filter((saveType) => saveType.fileIsSave(bytes))
 }
 
+export type LookupMaps = {
+  homeMonMap?: Record<string, OHPKM>
+  gen12LookupMap?: Record<string, string>
+  gen345LookupMap?: Record<string, string>
+  fileCreatedDate?: Date
+}
+
+export const buildUnknownSaveFile = (
+  filePath: PathData,
+  fileBytes: Uint8Array,
+  lookupMaps: LookupMaps,
+  supportedSaveTypes: SAVClass[],
+  updateMonCallback?: (mon: OHPKM) => void
+): E.Either<string, SAV | undefined> => {
+  const saveTypes = getSaveTypes(fileBytes, supportedSaveTypes)
+
+  if (saveTypes.length > 1) {
+    return E.left('Could not distinguish between multiple possible save types')
+  } else if (saveTypes.length === 0) {
+    return E.left('Could not detect save type')
+  }
+  const saveType = saveTypes[0]
+
+  if (!saveType) return E.right(undefined)
+
+  return buildSaveFile(filePath, fileBytes, lookupMaps, saveType, updateMonCallback)
+}
+
 export const buildSaveFile = (
   filePath: PathData,
   fileBytes: Uint8Array,
-  lookupMaps: {
-    homeMonMap?: Record<string, OHPKM>
-    gen12LookupMap?: Record<string, string>
-    gen345LookupMap?: Record<string, string>
-    fileCreatedDate?: Date
-  },
-  supportedSaveTypes?: SAVClass[],
-  saveType?: SAVClass | undefined,
+  lookupMaps: LookupMaps,
+  saveType: SAVClass,
   updateMonCallback?: (mon: OHPKM) => void
 ): E.Either<string, SAV | undefined> => {
   const { homeMonMap, gen12LookupMap, gen345LookupMap } = lookupMaps
-
-  if (!saveType && supportedSaveTypes) {
-    const saveTypes = getSaveTypes(fileBytes, supportedSaveTypes)
-
-    if (saveTypes.length > 1) {
-      return E.left('Could not distinguish between multiple possible save types')
-    } else if (saveTypes.length === 0) {
-      return E.left('Could not detect save type')
-    }
-    saveType = saveTypes[0]
-  }
-
-  if (!saveType) return E.right(undefined)
 
   const lookupMap =
     saveType.lookupType === 'gen12'
