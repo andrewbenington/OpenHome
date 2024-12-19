@@ -38,12 +38,12 @@ export default function SaveCard({ save, onOpen, onRemove, size = 240 }: SaveCar
             return s.includesOrigin(save.game as GameOfOrigin)
           })
         : undefined,
-    [origin]
+    [getEnabledSaveTypes, save.game, save.pluginIdentifier]
   )
 
   const backgroundColor = useMemo(() => {
     return getGameColor(saveType, save.game as GameOfOrigin)
-  }, [getEnabledSaveTypes, save])
+  }, [save.game, saveType])
 
   useEffect(() => {
     backend.getPlatform().then(setPlatform)
