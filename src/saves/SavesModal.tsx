@@ -203,10 +203,9 @@ const SavesModal = (props: SavesModalProps) => {
               <Slider
                 value={cardSize}
                 step={50}
-                onChange={(_, newSize) => {
-                  // setCardSize(newSize as number)
-                  dispatchAppInfoState({ type: 'set_icon_size', payload: newSize as number }) // Dispatch to context
-                }}
+                onChange={(_, newSize) =>
+                  dispatchAppInfoState({ type: 'set_icon_size', payload: newSize as number })
+                }
                 valueLabelDisplay="auto"
                 min={100}
                 max={350}
