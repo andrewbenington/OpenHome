@@ -39,7 +39,7 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
       const response = await backend.loadSaveFile(savePath)
 
       if (E.isRight(response)) {
-        const { fileBytes, createdDate } = response.right
+        const { fileBytes } = response.right
 
         return buildUnknownSaveFile(
           savePath,
@@ -48,7 +48,6 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
             homeMonMap,
             gen12LookupMap,
             gen345LookupMap,
-            fileCreatedDate: createdDate,
           },
           getEnabledSaveTypes()
         )

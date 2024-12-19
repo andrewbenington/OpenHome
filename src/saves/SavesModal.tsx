@@ -42,7 +42,6 @@ type AmbiguousOpenState = {
   possibleSaveTypes: SAVClass[]
   filePath: PathData
   fileBytes: Uint8Array
-  fileCreated: Date | undefined
 }
 
 const SavesModal = (props: SavesModalProps) => {
@@ -57,12 +56,7 @@ const SavesModal = (props: SavesModalProps) => {
   const [unknownSaveData, setUnknownSaveData] = useState<AmbiguousOpenState>()
 
   const buildAndOpenSave = useCallback(
-    (
-      saveType: SAVClass,
-      filePath: PathData,
-      fileBytes: Uint8Array,
-      createdDate: Date | undefined
-    ) => {
+    (saveType: SAVClass, filePath: PathData, fileBytes: Uint8Array) => {
       const result = buildSaveFile(
         filePath,
         fileBytes,
@@ -70,16 +64,14 @@ const SavesModal = (props: SavesModalProps) => {
           homeMonMap: lookupState.homeMons,
           gen12LookupMap: lookupState.gen12,
           gen345LookupMap: lookupState.gen345,
-          fileCreatedDate: createdDate,
         },
         saveType,
         (updatedMon) => {
           const identifier = getMonFileIdentifier(updatedMon)
 
-          if (identifier === undefined) {
-            return E.left(`Could not get identifier for mon: ${updatedMon.nickname}`)
+          if (identifier !== undefined) {
+            backend.writeHomeMon(identifier, updatedMon.bytes)
           }
-          backend.writeHomeMon(identifier, updatedMon.bytes)
         }
       )
 
@@ -130,13 +122,13 @@ const SavesModal = (props: SavesModalProps) => {
       backend.loadSaveFile(filePath).then(
         E.match(
           (err) => console.error(err),
-          async ({ path, fileBytes, createdDate }) => {
+          async ({ path, fileBytes }) => {
             filePath = path
-            if (filePath && fileBytes && lookupState.loaded) {
+            if (filePath && fileBytes) {
               let saveTypes = getSaveTypes(fileBytes, getEnabledSaveTypes())
 
               if (saveTypes.length === 1) {
-                buildAndOpenSave(saveTypes[0], filePath, fileBytes, createdDate)
+                buildAndOpenSave(saveTypes[0], filePath, fileBytes)
                 return
               }
 
@@ -151,18 +143,13 @@ const SavesModal = (props: SavesModalProps) => {
                 return
               }
 
-              setUnknownSaveData({
-                possibleSaveTypes: saveTypes,
-                filePath,
-                fileBytes,
-                fileCreated: createdDate,
-              })
+              setUnknownSaveData({ possibleSaveTypes: saveTypes, filePath, fileBytes })
             }
           }
         )
       )
     },
-    [backend, buildAndOpenSave, dispatchError, getEnabledSaveTypes, lookupState.loaded]
+    [backend, buildAndOpenSave, dispatchError, getEnabledSaveTypes]
   )
 
   return (
@@ -255,7 +242,7 @@ const SavesModal = (props: SavesModalProps) => {
           if (!unknownSaveData || !selected) return
           const data = unknownSaveData
 
-          buildAndOpenSave(selected, data.filePath, data.fileBytes, data.fileCreated)
+          buildAndOpenSave(selected, data.filePath, data.fileBytes)
           setUnknownSaveData(undefined)
         }}
       />

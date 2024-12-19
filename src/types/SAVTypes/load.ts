@@ -55,7 +55,6 @@ export type LookupMaps = {
   homeMonMap?: Record<string, OHPKM>
   gen12LookupMap?: Record<string, string>
   gen345LookupMap?: Record<string, string>
-  fileCreatedDate?: Date
 }
 
 export const buildUnknownSaveFile = (
