@@ -1009,14 +1009,14 @@ import { NationalToCFRUMap } from './NationalToCFRUMap'
 
 // const dne_moves = [89, 538, 526, 659]
 
-export function fromGen3RRMoveIndex(rrIndex: number): number {
+export function fromGen3CFRUMoveIndex(rrIndex: number): number {
   if (rrIndex === 0) return 0
   const key = Gen3CFRUMoves[rrIndex]
 
   return key ? CFRUToNationalMap[key] : -1
 }
 
-export function toGen3RRMoveIndex(nationalMoveId: number): number {
+export function toGen3CFRUMoveIndex(nationalMoveId: number): number {
   if (nationalMoveId === 0) return 0
   const key = Moves[nationalMoveId]?.name
 
