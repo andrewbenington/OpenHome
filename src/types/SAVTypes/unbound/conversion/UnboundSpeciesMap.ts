@@ -1297,5 +1297,4 @@ export const UnboundToNationalDexMap: Record<string, GameToNationalDexEntry | nu
   '1293': null, // SPECIES_URSHIFU_RAPID_GIGA (not found)
 }
 
-  export const NationalDexToUnboundMap = makeNationalDexToGameMap(UnboundToNationalDexMap)
-  
+export const NationalDexToUnboundMap = makeNationalDexToGameMap(UnboundToNationalDexMap)

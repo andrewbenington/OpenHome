@@ -36,10 +36,7 @@ export class G3RRSAV extends G3CFRUSAV<PK3RR> implements PluginSAV<PK3RR> {
   static pkmType = PK3RR
 
   static fileIsSave(bytes: Uint8Array): boolean {
-    // return true
-    console.log('YOLO')
     if (!SAVE_SIZES_BYTES.includes(bytes.length)) {
-      console.log('UNBOUNDED')
       return false
     }
 
@@ -48,14 +45,10 @@ export class G3RRSAV extends G3CFRUSAV<PK3RR> implements PluginSAV<PK3RR> {
 
     const gameCode = firstSectionBytes[0xac]
 
-    console.log(gameCode)
-
     if (gameCode !== 1) return false
 
     const securityKey = bytesToUint32LittleEndian(firstSectionBytes, FRLG_SECURITY_OFFSET)
     const securityKeyCopy = bytesToUint32LittleEndian(firstSectionBytes, FRLG_SECURITY_COPY_OFFSET)
-
-    console.log('UNBOUND SEC KEY', securityKey)
 
     // Radical Red seems to have the security key set to 0, which has a 1 in 4.2 billion
     // chance to happen in vanilla FireRed (if it can even be 0 at all)

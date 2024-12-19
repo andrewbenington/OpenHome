@@ -31,9 +31,7 @@ export class G3UBSAV extends G3CFRUSAV<PK3UB> implements PluginSAV<PK3UB> {
   static pkmType = PK3UB
 
   static fileIsSave(bytes: Uint8Array): boolean {
-    console.log('YOLO')
     if (!SAVE_SIZES_BYTES.includes(bytes.length)) {
-      console.log('UNBOUNDED')
       return false
     }
 
@@ -41,10 +39,6 @@ export class G3UBSAV extends G3CFRUSAV<PK3UB> implements PluginSAV<PK3UB> {
     const firstSectionBytes = bytes.slice(firstSectionBytesIndex, firstSectionBytesIndex + 0x1000)
 
     const gameCode = firstSectionBytes[0xac]
-
-    console.log(gameCode)
-
-    // if (gameCode === 255) return true
 
     return gameCode === 255
 
