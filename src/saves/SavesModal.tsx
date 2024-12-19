@@ -122,7 +122,7 @@ const SavesModal = (props: SavesModalProps) => {
       backend.loadSaveFile(filePath).then(
         E.match(
           (err) => console.error(err),
-          async ({ path, fileBytes }) => {
+          ({ path, fileBytes }) => {
             filePath = path
             if (filePath && fileBytes) {
               let saveTypes = getSaveTypes(fileBytes, getEnabledSaveTypes())
