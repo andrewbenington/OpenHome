@@ -80,7 +80,7 @@ const FileTypeSelect = (props: FileTypeSelectProps) => {
       supportedFormats.push('PK9')
     }
     return supportedFormats
-  }, [formData])
+  }, [formData, getEnabledSaveTypes])
 
   return (
     <select
