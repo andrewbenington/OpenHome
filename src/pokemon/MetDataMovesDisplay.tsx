@@ -6,16 +6,16 @@ import {
   RibbonTitles,
 } from 'pokemon-resources'
 import { useContext, useMemo } from 'react'
-import { PKMInterface } from '../types/interfaces'
-import { getCharacteristic, getMoveMaxPP } from '../types/pkm/util'
-import { getGameName, getPluginIdentifier } from '../types/SAVTypes/util'
-import { Styles } from '../types/types'
 import Markings from '../components/Markings'
 import { getOriginMark } from '../images/game'
 import { getPublicImageURL } from '../images/images'
 import { getBallIconPath } from '../images/items'
 import { getMonSaveLogo } from '../saves/util'
 import { AppInfoContext } from '../state/appInfo'
+import { PKMInterface } from '../types/interfaces'
+import { getCharacteristic, getMoveMaxPP } from '../types/pkm/util'
+import { getGameName, getPluginIdentifier } from '../types/SAVTypes/util'
+import { Styles } from '../types/types'
 import MoveCard from './MoveCard'
 
 const styles = {
@@ -117,7 +117,7 @@ const MetDataMovesDisplay = (props: { mon: PKMInterface }) => {
       message += ` At the time, it was level ${mon.metLevel}.`
     }
     return message
-  }, [mon])
+  }, [getEnabledSaveTypes, mon])
 
   const natureMessage = useMemo(() => {
     const currentNature = mon.statNature ?? mon.nature ?? 0

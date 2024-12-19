@@ -1,5 +1,5 @@
 import { useContext } from 'react'
-import { BackendContext } from 'src/backend/backendProvider'
+import { BackendContext } from 'src/backend/backendContext'
 import OHDataGrid, { SortableColumn } from 'src/components/OHDataGrid'
 import PokemonIcon from 'src/components/PokemonIcon'
 import { getPublicImageURL } from 'src/images/images'

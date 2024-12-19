@@ -1,14 +1,14 @@
 import * as E from 'fp-ts/lib/Either'
 import { PokemonData } from 'pokemon-species-data'
-import { createContext, PropsWithChildren } from 'react'
+import { PropsWithChildren } from 'react'
 import { OHPKM } from 'src/types/pkm/OHPKM'
 import { HomeData } from 'src/types/SAVTypes/HomeData'
 import { SAV } from 'src/types/SAVTypes/SAV'
 import { StoredBoxData } from 'src/types/storage'
 import { Errorable } from 'src/types/types'
 import { getMonFileIdentifier } from 'src/util/Lookup'
+import { BackendContext } from './backendContext'
 import BackendInterface from './backendInterface'
-import DummyBackend from './dummyBackend'
 
 export type BackendProviderProps = {
   backend: BackendInterface
@@ -22,10 +22,6 @@ function addHelpersToBackend(backend: BackendInterface): BackendWithHelpersInter
       writeAllHomeData(backend, homeData, mons),
   }
 }
-
-export const BackendContext = createContext<BackendWithHelpersInterface>(
-  addHelpersToBackend(DummyBackend)
-)
 
 export interface BackendWithHelpersInterface extends BackendInterface {
   /* game saves */
