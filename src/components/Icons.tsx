@@ -5,6 +5,7 @@ import {
   MdArrowForward,
   MdClose,
   MdCreateNewFolder,
+  MdError,
   MdGrid4X4,
   MdMoreVert,
 } from 'react-icons/md'
@@ -19,3 +20,5 @@ export const CardsIcon = IoGrid
 
 export const ArrowLeftIcon = MdArrowBack
 export const ArrowRightIcon = MdArrowForward
+
+export const ErrorIcon = MdError

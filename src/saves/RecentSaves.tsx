@@ -10,6 +10,7 @@ import { BackendContext } from '../backend/backendProvider'
 import { RemoveIcon } from '../components/Icons'
 import OHDataGrid, { SortableColumn } from '../components/OHDataGrid'
 import { AppInfoContext } from '../state/appInfo'
+import { ErrorContext } from '../state/error'
 import { OpenSavesContext } from '../state/openSaves'
 import SaveCard from './SaveCard'
 import { formatTime, formatTimeSince, getSaveLogo, SaveViewMode } from './util'
@@ -27,6 +28,7 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
   const [, , openSaves] = useContext(OpenSavesContext)
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
   const [error, setError] = useState<string>()
+  const [, dispatchErrorState] = useContext(ErrorContext)
 
   const openSavePaths = useMemo(
     () => Object.fromEntries(openSaves.map((save) => [save.filePath.raw, true])),
@@ -36,7 +38,11 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
   const getRecentSaves = useCallback(() => {
     backend.getRecentSaves().then(
       E.match(
-        (err) => console.error(err),
+        (err) =>
+          dispatchErrorState({
+            type: 'set_message',
+            payload: { title: 'Error Getting Recents', messages: [err] },
+          }),
         (recents) => {
           const extraSaveIdentifiers = getEnabledSaveTypes()
             .map(getPluginIdentifier)
@@ -52,7 +58,7 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
         }
       )
     )
-  }, [backend, getEnabledSaveTypes])
+  }, [backend, dispatchErrorState, getEnabledSaveTypes])
 
   const removeRecentSave = useCallback(
     (path: string) =>

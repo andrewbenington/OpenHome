@@ -1,6 +1,8 @@
 import { path } from '@tauri-apps/api'
-import { listen } from '@tauri-apps/api/event'
+import { Event, listen } from '@tauri-apps/api/event'
+import { getCurrentWindow } from '@tauri-apps/api/window'
 import { open as fileDialog } from '@tauri-apps/plugin-dialog'
+import { readFile, stat } from '@tauri-apps/plugin-fs'
 import { platform } from '@tauri-apps/plugin-os'
 import { open } from '@tauri-apps/plugin-shell'
 import * as E from 'fp-ts/lib/Either'
@@ -15,7 +17,7 @@ import { TauriInvoker } from './tauriInvoker'
 async function pathDataFromRaw(raw: string): Promise<PathData> {
   const filename = await path.basename(raw)
   const dir = await path.dirname(raw)
-  const ext = await path.extname(raw)
+  const ext = '.' in path ? await path.extname(raw) : ''
 
   const pathData: PathData = {
     raw,
@@ -27,6 +29,8 @@ async function pathDataFromRaw(raw: string): Promise<PathData> {
 
   return pathData
 }
+
+type OnDropEvent = Event<{ position: { x: number; y: number }; paths: string[] }>
 
 export const TauriBackend: BackendInterface = {
   /* past gen identifier lookups */
@@ -278,6 +282,38 @@ export const TauriBackend: BackendInterface = {
     const unlistenPromise = Promise.all([
       listen('save', listeners.onSave),
       listen('reset', listeners.onReset),
+      listen('tauri://drag-drop', (e: OnDropEvent) => {
+        const allFilesPromise = e.payload.paths.map(async (filePath) => ({
+          filePath,
+          stat: await stat(filePath),
+          bytes: await readFile(filePath),
+        }))
+
+        Promise.all(allFilesPromise).then(async (fileData) => {
+          const filesWithData = fileData.map(
+            ({ filePath, stat, bytes }) =>
+              new File([bytes], filePath, { lastModified: stat.mtime?.getUTCMilliseconds() })
+          )
+          // account for Windows pixel density variance
+          const scaleFactor = platform() === 'windows' ? await getCurrentWindow().scaleFactor() : 1
+
+          // account for macOS title bar
+          const verticalOffset = platform() === 'macos' ? 28 : 0
+
+          const dataTransfer = new DataTransfer()
+
+          for (const file of filesWithData) {
+            dataTransfer.items.add(file)
+          }
+
+          document
+            .elementFromPoint(
+              e.payload.position.x / scaleFactor,
+              e.payload.position.y / scaleFactor - verticalOffset
+            )
+            ?.dispatchEvent(new DragEvent('drop', { bubbles: true, dataTransfer }))
+        })
+      }),
     ])
 
     return () =>
@@ -288,5 +324,3 @@ export const TauriBackend: BackendInterface = {
       })
   },
 }
-
-// export const ElectronBackendContext = createContext(ElectronBackend);

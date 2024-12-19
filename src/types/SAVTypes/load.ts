@@ -1,3 +1,4 @@
+import * as E from 'fp-ts/lib/Either'
 import {
   getMonFileIdentifier,
   getMonGen12Identifier,
@@ -46,34 +47,45 @@ const recoverOHPKMData = (
   return saveFile
 }
 
-export const getSaveType = (
-  bytes: Uint8Array,
-  supportedSaveTypes: SAVClass[]
-): SAVClass | undefined => {
-  for (const saveType of supportedSaveTypes) {
-    if (saveType.fileIsSave(bytes)) {
-      return saveType
-    }
+export const getSaveTypes = (bytes: Uint8Array, supportedSaveTypes: SAVClass[]): SAVClass[] => {
+  return supportedSaveTypes.filter((saveType) => saveType.fileIsSave(bytes))
+}
+
+export type LookupMaps = {
+  homeMonMap?: Record<string, OHPKM>
+  gen12LookupMap?: Record<string, string>
+  gen345LookupMap?: Record<string, string>
+}
+
+export const buildUnknownSaveFile = (
+  filePath: PathData,
+  fileBytes: Uint8Array,
+  lookupMaps: LookupMaps,
+  supportedSaveTypes: SAVClass[],
+  updateMonCallback?: (mon: OHPKM) => void
+): E.Either<string, SAV | undefined> => {
+  const saveTypes = getSaveTypes(fileBytes, supportedSaveTypes)
+
+  if (saveTypes.length > 1) {
+    return E.left('Could not distinguish between multiple possible save types')
+  } else if (saveTypes.length === 0) {
+    return E.left('Could not detect save type')
   }
-  return undefined
+  const saveType = saveTypes[0]
+
+  if (!saveType) return E.right(undefined)
+
+  return buildSaveFile(filePath, fileBytes, lookupMaps, saveType, updateMonCallback)
 }
 
 export const buildSaveFile = (
   filePath: PathData,
   fileBytes: Uint8Array,
-  lookupMaps: {
-    homeMonMap?: Record<string, OHPKM>
-    gen12LookupMap?: Record<string, string>
-    gen345LookupMap?: Record<string, string>
-    fileCreatedDate?: Date
-  },
-  supportedSaveTypes: SAVClass[],
+  lookupMaps: LookupMaps,
+  saveType: SAVClass,
   updateMonCallback?: (mon: OHPKM) => void
-): SAV | undefined => {
+): E.Either<string, SAV | undefined> => {
   const { homeMonMap, gen12LookupMap, gen345LookupMap } = lookupMaps
-  const saveType = getSaveType(fileBytes, supportedSaveTypes)
-
-  if (!saveType) return undefined
 
   const lookupMap =
     saveType.lookupType === 'gen12'
@@ -89,13 +101,17 @@ export const buildSaveFile = (
         ? getMonGen345Identifier
         : getMonFileIdentifier
 
-  const saveFile = recoverOHPKMData(
-    new saveType(filePath, fileBytes),
-    getIdentifier as (_: PKMInterface) => string | undefined,
-    homeMonMap,
-    lookupMap,
-    updateMonCallback
-  )
+  try {
+    const saveFile = recoverOHPKMData(
+      new saveType(filePath, fileBytes),
+      getIdentifier as (_: PKMInterface) => string | undefined,
+      homeMonMap,
+      lookupMap,
+      updateMonCallback
+    )
 
-  return saveFile
+    return E.right(saveFile)
+  } catch (e) {
+    return E.left(`${e}`)
+  }
 }
