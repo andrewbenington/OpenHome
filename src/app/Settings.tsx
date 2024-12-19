@@ -1,6 +1,6 @@
 import { Card } from '@mui/joy'
 import { useContext, useEffect } from 'react'
-import { BackendContext } from '../backend/backendProvider'
+import { BackendContext } from '../backend/backendContext'
 import { AppInfoContext } from '../state/appInfo'
 
 export default function Settings() {

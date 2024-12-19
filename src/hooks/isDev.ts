@@ -1,6 +1,6 @@
 import * as E from 'fp-ts/lib/Either'
 import { useContext, useEffect, useState } from 'react'
-import { BackendContext } from '../backend/backendProvider'
+import { BackendContext } from '../backend/backendContext'
 
 export default function useIsDev(): boolean {
   const [isDev, setIsDev] = useState<boolean>(false)
