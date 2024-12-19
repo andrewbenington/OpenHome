@@ -239,11 +239,11 @@ const SavesModal = (props: SavesModalProps) => {
         open={!!unknownSaveData}
         saveTypes={unknownSaveData?.possibleSaveTypes}
         onSelect={(selected) => {
+          setUnknownSaveData(undefined)
           if (!unknownSaveData || !selected) return
           const data = unknownSaveData
 
           buildAndOpenSave(selected, data.filePath, data.fileBytes)
-          setUnknownSaveData(undefined)
         }}
       />
     </>
