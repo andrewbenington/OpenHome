@@ -13,8 +13,8 @@ import PokemonIcon from '../components/PokemonIcon'
 import useIsDarkMode from '../hooks/dark-mode'
 import { AppInfoContext, appInfoInitialState, appInfoReducer } from '../state/appInfo'
 import { ErrorContext, errorReducer } from '../state/error'
-import { FilterProvider } from '../state/filter'
-import { LookupProvider } from '../state/lookup'
+import { FilterContext, filterReducer } from '../state/filter'
+import { LookupContext, lookupReducer } from '../state/lookup'
 import { MouseContext, mouseReducer } from '../state/mouse'
 import { MonWithLocation, OpenSavesContext, openSavesReducer } from '../state/openSaves'
 import './App.css'
@@ -37,6 +37,7 @@ export default function App() {
       }),
     [isDarkMode]
   )
+
   const [mouseState, mouseDispatch] = useReducer(mouseReducer, { shift: false })
   const [appInfoState, appInfoDispatch] = useReducer(appInfoReducer, appInfoInitialState)
   const [openSavesState, openSavesDispatch] = useReducer(openSavesReducer, {
@@ -45,6 +46,9 @@ export default function App() {
     openSaves: {},
   })
   const [errorState, errorDispatch] = useReducer(errorReducer, {})
+  const [lookupState, lookupDispatch] = useReducer(lookupReducer, { loaded: false })
+  const [filterState, filterDispatch] = useReducer(filterReducer, {})
+
   const [dragData, setDragData] = useState<MonWithLocation>()
   const [dragMon, setDragMon] = useState<PKMInterface>()
   const [loading, setLoading] = useState(true)
@@ -141,7 +145,7 @@ export default function App() {
                   </DragOverlay>,
                   document.body
                 )}
-                <LookupProvider>
+                <LookupContext.Provider value={[lookupState, lookupDispatch]}>
                   <OpenSavesContext.Provider
                     value={[
                       openSavesState,
@@ -153,7 +157,7 @@ export default function App() {
                         .map((data) => data.save),
                     ]}
                   >
-                    <FilterProvider>
+                    <FilterContext.Provider value={[filterState, filterDispatch]}>
                       {loading ? (
                         <Box width="100%" height="100%" display="grid">
                           <Typography margin="auto" fontSize={40} fontWeight="bold">
@@ -164,9 +168,9 @@ export default function App() {
                         <AppTabs />
                       )}
                       <ErrorMessageModal />
-                    </FilterProvider>
+                    </FilterContext.Provider>
                   </OpenSavesContext.Provider>
-                </LookupProvider>
+                </LookupContext.Provider>
               </PokemonDragContext>
             </ErrorContext.Provider>
           </MouseContext.Provider>

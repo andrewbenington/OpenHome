@@ -1,4 +1,4 @@
-import { createContext, Dispatch, PropsWithChildren, Reducer, useReducer } from 'react'
+import { createContext, Dispatch, Reducer } from 'react'
 import { OHPKM } from 'src/types/pkm/OHPKM'
 import { LookupMap } from '../types/types'
 
@@ -41,7 +41,10 @@ export type LookupAction =
       payload?: undefined
     }
 
-const reducer: Reducer<LookupState, LookupAction> = (state: LookupState, action: LookupAction) => {
+export const lookupReducer: Reducer<LookupState, LookupAction> = (
+  state: LookupState,
+  action: LookupAction
+) => {
   const { type, payload } = action
 
   switch (type) {
@@ -88,9 +91,3 @@ export const LookupContext = createContext<[LookupState, Dispatch<LookupAction>]
   initialState,
   () => {},
 ])
-
-export function LookupProvider({ children }: PropsWithChildren) {
-  const [state, dispatch] = useReducer<Reducer<LookupState, LookupAction>>(reducer, initialState)
-
-  return <LookupContext.Provider value={[state, dispatch]}>{children}</LookupContext.Provider>
-}
