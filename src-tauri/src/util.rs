@@ -1,6 +1,6 @@
-use std::{collections::HashSet, io::Read, path::PathBuf};
-use std::fs::{File, create_dir_all};
 use serde;
+use std::fs::{create_dir_all, File};
+use std::{collections::HashSet, io::Read, path::PathBuf};
 use tauri::Manager;
 
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
@@ -16,10 +16,25 @@ pub struct PathData {
 
 pub fn parse_path_data(path: &PathBuf) -> PathData {
     let raw = path.to_string_lossy().to_string();
-    let base = path.file_name().unwrap_or_default().to_string_lossy().to_string();
-    let name = path.file_stem().unwrap_or_default().to_string_lossy().to_string();
-    let ext = path.extension().unwrap_or_default().to_string_lossy().to_string();
-    let dir = path.parent().map(|p| p.to_string_lossy().to_string()).unwrap_or_else(|| String::new());
+    let base = path
+        .file_name()
+        .unwrap_or_default()
+        .to_string_lossy()
+        .to_string();
+    let name = path
+        .file_stem()
+        .unwrap_or_default()
+        .to_string_lossy()
+        .to_string();
+    let ext = path
+        .extension()
+        .unwrap_or_default()
+        .to_string_lossy()
+        .to_string();
+    let dir = path
+        .parent()
+        .map(|p| p.to_string_lossy().to_string())
+        .unwrap_or_else(|| String::new());
     let separator = std::path::MAIN_SEPARATOR.to_string();
     PathData {
         raw,
@@ -83,7 +98,6 @@ pub fn dedupe_paths(paths: Vec<PathData>) -> Vec<PathData> {
 }
 
 pub fn create_openhome_directory(app_handle: &tauri::AppHandle) -> Result<(), String> {
-    
     let appdata_dir = get_appdata_dir(app_handle)?;
     let mut full_path = PathBuf::new();
 

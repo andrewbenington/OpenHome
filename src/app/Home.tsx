@@ -1,25 +1,10 @@
-import {
-  Alert,
-  Box,
-  DialogContent,
-  DialogTitle,
-  Divider,
-  Modal,
-  ModalClose,
-  ModalDialog,
-  ModalOverflow,
-  Stack,
-  useTheme,
-} from '@mui/joy'
+import { Box, Modal, ModalDialog, ModalOverflow, Stack, useTheme } from '@mui/joy'
 import * as E from 'fp-ts/lib/Either'
 import lodash, { flatten } from 'lodash'
 import { bytesToPKMInterface } from 'pokemon-files'
 import { GameOfOrigin, isGameBoy, isGen3, isGen4, isGen5 } from 'pokemon-resources'
 import { useCallback, useContext, useEffect, useState } from 'react'
 import { MdFileOpen } from 'react-icons/md'
-import SaveNotFoundError from 'src/saves/SaveNotFoundError'
-import { SelectPlugin } from 'src/saves/SelectPlugin'
-import { SAVClass } from 'src/types/SAVTypes/util'
 import { Errorable } from 'src/types/types'
 import { filterUndefined } from 'src/util/Sort'
 import { BackendContext } from '../backend/backendProvider'
@@ -29,8 +14,8 @@ import HomeBoxDisplay from '../saves/boxes/HomeBoxDisplay'
 import OpenSaveDisplay from '../saves/boxes/SaveBoxDisplay'
 import SavesModal from '../saves/SavesModal'
 import { AppInfoContext } from '../state/appInfo'
+import { ErrorContext, ErrorMessageData } from '../state/error'
 import { LookupContext } from '../state/lookup'
-import { MouseContext } from '../state/mouse'
 import { OpenSavesContext } from '../state/openSaves'
 import { PKMInterface } from '../types/interfaces'
 import { OHPKM } from '../types/pkm/OHPKM'
@@ -42,23 +27,20 @@ const Home = () => {
   const [openSavesState, openSavesDispatch, allOpenSaves] = useContext(OpenSavesContext)
   const [lookupState, lookupDispatch] = useContext(LookupContext)
   const backend = useContext(BackendContext)
-  const [mouseState, mouseDispatch] = useContext(MouseContext)
   const [, appInfoDispatch] = useContext(AppInfoContext)
   const { palette } = useTheme()
   const [selectedMon, setSelectedMon] = useState<PKMInterface>()
   const [tab, setTab] = useState('summary')
   const [openSaveDialog, setOpenSaveDialog] = useState(false)
-  const [errorMessages, setErrorMessages] = useState<string[]>()
-  const [saveFound, setSaveFound] = useState<boolean>(false)
-  const [specifySave, setSpecifySave] = useState<{
-    supportedSaveTypes: SAVClass[]
-    plugins: string[]
-    onSelect?: (plugin: string) => void
-  } | null>(null)
+  const [, dispatchErrorState] = useContext(ErrorContext)
+  const setErrorMessage = useCallback(
+    (payload: ErrorMessageData) => dispatchErrorState({ type: 'set_message', payload }),
+    [dispatchErrorState]
+  )
 
-  const onViewDrop = (e: React.DragEvent<HTMLDivElement>) => {
-    const processDroppedData = async (file?: File, droppedMon?: PKMInterface) => {
-      let mon: PKMInterface | undefined = droppedMon
+  const previewFile = useCallback(
+    async (file: File) => {
+      let mon: PKMInterface | undefined
 
       if (file) {
         const buffer = await file.arrayBuffer()
@@ -67,23 +49,20 @@ const Home = () => {
         try {
           mon = bytesToPKMInterface(buffer, extension.toUpperCase())
         } catch (e) {
-          console.error(e)
+          setErrorMessage({
+            title: 'Import Error',
+            messages: [`Could not read Pokémon file: ${e}`],
+          })
         }
       }
-      if (!mon) return
+      if (!mon) {
+        setErrorMessage({ title: 'Import Error', messages: ['Not a valid Pokémon file format'] })
+        return
+      }
       setSelectedMon(mon)
-    }
-    const file = e.dataTransfer.files[0]
-    const mon = mouseState.dragSource?.mon
-
-    if (!file && mouseState.dragSource) {
-      mouseDispatch({ type: 'set_drag_source', payload: undefined })
-      processDroppedData(file, mon)
-      e.nativeEvent.preventDefault()
-    } else if (file) {
-      processDroppedData(file, undefined)
-    }
-  }
+    },
+    [setErrorMessage]
+  )
 
   const loadAllLookups = useCallback(async (): Promise<Errorable<Record<string, OHPKM>>> => {
     const onLoadError = (message: string) => {
@@ -136,7 +115,7 @@ const Home = () => {
     const result = await backend.startTransaction()
 
     if (E.isLeft(result)) {
-      setErrorMessages([result.left])
+      setErrorMessage({ title: 'Error Starting Save Transaction', messages: [result.left] })
       return
     }
 
@@ -187,7 +166,7 @@ const Home = () => {
     const errors = results.filter(E.isLeft).map((err) => err.left)
 
     if (errors.length) {
-      setErrorMessages(errors)
+      setErrorMessage({ title: 'Error Saving', messages: errors })
       backend.rollbackTransaction()
       return
     }
@@ -200,7 +179,10 @@ const Home = () => {
     lookupDispatch({ type: 'clear' })
     await loadAllLookups().then(
       E.match(
-        (err) => openSavesDispatch({ type: 'set_error', payload: err }),
+        (err) => {
+          openSavesDispatch({ type: 'set_error', payload: err })
+          setErrorMessage({ title: 'Error Loading Lookup Data', messages: [err] })
+        },
         (homeLookup) => loadAllHomeData(homeLookup)
       )
     )
@@ -213,6 +195,7 @@ const Home = () => {
     lookupState,
     openSavesDispatch,
     openSavesState,
+    setErrorMessage,
   ])
 
   useEffect(() => {
@@ -259,7 +242,6 @@ const Home = () => {
   return (
     <div
       style={{
-        background: palette.background.gradient,
         height: '100%',
         display: 'flex',
         flexDirection: 'row',
@@ -307,11 +289,7 @@ const Home = () => {
         <FilterPanel />
         <div
           className="drop-area"
-          draggable
-          onDragOver={(e) => {
-            e.preventDefault()
-          }}
-          onDrop={(e) => onViewDrop(e)}
+          onDrop={(e) => e.dataTransfer.files.length && previewFile(e.dataTransfer.files[0])}
         >
           Preview
         </div>
@@ -351,42 +329,9 @@ const Home = () => {
             onClose={() => {
               setOpenSaveDialog(false)
             }}
-            setSaveFound={setSaveFound}
-            setSpecifySave={setSpecifySave}
           />
         </ModalDialog>
       </Modal>
-      {specifySave && (
-        <SelectPlugin
-          plugins={specifySave.plugins}
-          onPluginClick={(selectedPlugin) => {
-            console.log(`Selected plugin: ${selectedPlugin}`)
-            specifySave.onSelect?.(selectedPlugin)
-            setSpecifySave(null)
-          }}
-        />
-      )}
-      {saveFound && <SaveNotFoundError onClose={() => setSaveFound(false)} />}
-
-      <Modal open={!!errorMessages} onClose={() => setErrorMessages(undefined)}>
-        <ModalDialog style={{ padding: 8 }}>
-          <ModalClose />
-          <DialogTitle>Error(s) saving</DialogTitle>
-          <Divider />
-          <DialogContent>
-            {errorMessages?.map((msg, i) => (
-              <Alert color="danger" variant="solid" key={`alert_${i}`}>
-                {msg}
-              </Alert>
-            ))}
-          </DialogContent>
-        </ModalDialog>
-      </Modal>
-      {/* <ManualSaveSelection
-        open={!!manualSaveData}
-        onClose={() => setManualSaveData(null)}
-      } */}
-      {/* /> */}
     </div>
   )
 }

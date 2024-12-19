@@ -24,6 +24,7 @@ body,
   user-select: none;
   -webkit-user-select: none !important;
   -webkit-user-drag: none !important;
+  overflow: hidden;
 }
 
 :root {

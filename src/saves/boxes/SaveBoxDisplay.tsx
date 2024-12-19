@@ -2,13 +2,17 @@ import { useDraggable } from '@dnd-kit/core'
 import { Button, Card, Grid, Modal, ModalDialog, Stack } from '@mui/joy'
 import lodash from 'lodash'
 import { GameOfOriginData } from 'pokemon-resources'
-import { useCallback, useContext, useMemo, useState } from 'react'
+import { PokemonData } from 'pokemon-species-data'
+import { useContext, useMemo, useState } from 'react'
 import { MdClose } from 'react-icons/md'
 import { MenuIcon } from 'src/components/Icons'
 import AttributeRow from 'src/pokemon/AttributeRow'
-import { MouseContext } from 'src/state/mouse'
+import { ErrorContext } from 'src/state/error'
+import { LookupContext } from 'src/state/lookup'
 import { MonLocation, MonWithLocation, OpenSavesContext } from 'src/state/openSaves'
 import { PKMInterface } from 'src/types/interfaces'
+import { OHPKM } from 'src/types/pkm/OHPKM'
+import { getMonFileIdentifier } from 'src/util/Lookup'
 import { InfoGrid } from '../../components/InfoGrid'
 import ArrowButton from './ArrowButton'
 import BoxCell from './BoxCell'
@@ -20,46 +24,74 @@ interface OpenSaveDisplayProps {
 
 const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   const [, openSavesDispatch, openSaves] = useContext(OpenSavesContext)
-  const [mouseState, mouseDispatch] = useContext(MouseContext)
+  const [{ homeMons }] = useContext(LookupContext)
+  const [, dispatchError] = useContext(ErrorContext)
   const [detailsModal, setDetailsModal] = useState(false)
   const { saveIndex, setSelectedMon } = props
   const save = openSaves[saveIndex]
   const { active } = useDraggable({ id: '' })
 
-  const dispatchStartDrag = useCallback(
-    (boxPos: number) => {
-      const mon = save.getCurrentBox().pokemon[boxPos]
+  const attemptImportMons = (mons: PKMInterface[], location: MonLocation) => {
+    if (!homeMons) {
+      dispatchError({
+        type: 'set_message',
+        payload: {
+          title: 'Import Failed',
+          messages: ['Home data is not loaded. Something went wrong.'],
+        },
+      })
+      return
+    }
 
-      if (mon) {
-        mouseDispatch({
-          type: 'set_drag_source',
-          payload: { save, box: save.currentPCBox, boxPos, mon },
+    const unsupportedMons = mons.filter((mon) => !save.supportsMon(mon.dexNum, mon.formeNum))
+
+    if (unsupportedMons.length) {
+      const saveName = save.getGameName()
+
+      dispatchError({
+        type: 'set_message',
+        payload: {
+          title: 'Import Failed',
+          messages: unsupportedMons.map(
+            (mon) =>
+              `${PokemonData[mon.dexNum]?.formes[mon.formeNum]?.formeName} cannot be moved into ${saveName}`
+          ),
+        },
+      })
+      return
+    }
+
+    for (const mon of mons) {
+      try {
+        const identifier = getMonFileIdentifier(new OHPKM(mon))
+
+        if (!identifier) continue
+
+        const inCurrentBox = save.boxes[save.currentPCBox].pokemon.some(
+          (mon) => mon && getMonFileIdentifier(mon) === identifier
+        )
+
+        if (identifier in homeMons || inCurrentBox) {
+          const message =
+            mons.length === 1
+              ? 'This Pokémon has been moved into OpenHome before.'
+              : 'One or more of these Pokémon has been moved into OpenHome before.'
+
+          dispatchError({
+            type: 'set_message',
+            payload: { title: 'Import Failed', messages: [message] },
+          })
+          return
+        }
+      } catch (e) {
+        dispatchError({
+          type: 'set_message',
+          payload: { title: 'Import Failed', messages: [`${e}`] },
         })
       }
-    },
-    [mouseDispatch, save]
-  )
-
-  const dispatchCompleteDrag = useCallback(
-    (boxPosition: number) => {
-      mouseState.dragSource &&
-        openSavesDispatch({
-          type: 'move_mon',
-          payload: {
-            dest: { save, box: save.currentPCBox, boxPos: boxPosition },
-            source: mouseState.dragSource,
-          },
-        })
-      mouseDispatch({
-        type: 'set_drag_source',
-        payload: undefined,
-      })
-    },
-    [mouseDispatch, mouseState.dragSource, openSavesDispatch, save]
-  )
-
-  const dispatchImportMons = (mons: PKMInterface[], location: MonLocation) =>
+    }
     openSavesDispatch({ type: 'import_mons', payload: { mons, dest: location } })
+  }
 
   const isDisabled = useMemo(() => {
     const dragData = active?.data.current as MonWithLocation | undefined
@@ -153,7 +185,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
           {lodash.range(save.boxRows).map((row: number) => (
             <Grid container key={`pc_row_${row}`}>
               {lodash.range(save.boxColumns).map((rowIndex: number) => {
-                const mon = save.boxes[save.currentPCBox].pokemon[row * save.boxColumns + rowIndex]
+                const mon = save.boxes[save.currentPCBox]?.pokemon[row * save.boxColumns + rowIndex]
 
                 return (
                   <Grid
@@ -164,9 +196,6 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                     <BoxCell
                       onClick={() => {
                         setSelectedMon(mon)
-                      }}
-                      onDragEvent={() => {
-                        dispatchStartDrag(row * save.boxColumns + rowIndex)
                       }}
                       dragID={`${save.tid}_${save.sid}_${save.currentPCBox}_${
                         row * save.boxColumns + rowIndex
@@ -181,13 +210,11 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                       zIndex={5 - row}
                       onDrop={(importedMons) => {
                         if (importedMons) {
-                          dispatchImportMons(importedMons, {
+                          attemptImportMons(importedMons, {
                             save,
                             box: save.currentPCBox,
                             boxPos: row * save.boxColumns + rowIndex,
                           })
-                        } else {
-                          dispatchCompleteDrag(row * save.boxColumns + rowIndex)
                         }
                       }}
                     />

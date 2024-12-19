@@ -344,10 +344,6 @@ export class G3RRSAV implements PluginSAV<PK3RR> {
   getPluginIdentifier() {
     return 'radical_red'
   }
-
-  static getComplementaryPlugins() {
-    return [] // ['G3RRSAV', 'G3UBSAV']
-  }
 }
 
 const findFirstSectionOffset = (bytes: Uint8Array): number => {
