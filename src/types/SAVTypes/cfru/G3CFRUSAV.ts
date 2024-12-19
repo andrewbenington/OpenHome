@@ -295,9 +295,7 @@ export abstract class G3CFRUSAV<T extends PluginPKMInterface> implements PluginS
     return 'Pokémon Radical Red'
   }
 
-  gameColor() {
-    return '#660000'
-  }
+  abstract gameColor(): string
 
   static includesOrigin(origin: GameOfOrigin) {
     return origin === GameOfOrigin.FireRed

@@ -54,4 +54,8 @@ export class G3RRSAV extends G3CFRUSAV<PK3RR> implements PluginSAV<PK3RR> {
     // chance to happen in vanilla FireRed (if it can even be 0 at all)
     return securityKey === 0 || securityKey !== securityKeyCopy
   }
+
+  gameColor(): string {
+    return '#660000'
+  }
 }

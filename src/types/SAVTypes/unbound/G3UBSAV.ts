@@ -51,4 +51,8 @@ export class G3UBSAV extends G3CFRUSAV<PK3UB> implements PluginSAV<PK3UB> {
     // // chance to happen in vanilla FireRed (if it can even be 0 at all)
     // return securityKey === 0 || securityKey !== securityKeyCopy
   }
+
+  gameColor(): string {
+    return '#ca5be8'
+  }
 }
