@@ -18,6 +18,10 @@ export class PK3RR extends PK3CFRU implements PluginPKMInterface {
   format: 'PK3RR' = 'PK3RR'
   pluginIdentifier: string = 'radical_red'
 
+  static getName() {
+    return 'PK3RR'
+  }
+
   itemFromString(itemName: string): number {
     return ItemGen3CFRUFromString(itemName)
   }

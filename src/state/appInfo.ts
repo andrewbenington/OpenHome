@@ -10,6 +10,7 @@ import { ORASSAV } from '../types/SAVTypes/ORASSAV'
 import { PtSAV } from '../types/SAVTypes/PtSAV'
 import { G3RRSAV } from '../types/SAVTypes/radicalred/G3RRSAV'
 import { SMSAV } from '../types/SAVTypes/SMSAV'
+import { G3UBSAV } from '../types/SAVTypes/unbound/G3UBSAV'
 import { USUMSAV } from '../types/SAVTypes/USUMSAV'
 import { SAVClass } from '../types/SAVTypes/util'
 import { XYSAV } from '../types/SAVTypes/XYSAV'
@@ -100,6 +101,7 @@ export const appInfoInitialState: AppInfoState = {
         SMSAV,
         USUMSAV,
         G3RRSAV,
+        G3UBSAV,
       ].map((savetype) => [savetype.saveTypeID, true])
     ),
   },
@@ -118,7 +120,7 @@ export const appInfoInitialState: AppInfoState = {
     SMSAV,
     USUMSAV,
   ],
-  extraSaveTypes: [G3RRSAV],
+  extraSaveTypes: [G3RRSAV, G3UBSAV],
 }
 
 export const AppInfoContext = createContext<

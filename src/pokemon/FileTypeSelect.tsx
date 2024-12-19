@@ -55,6 +55,8 @@ const FileTypeSelect = (props: FileTypeSelectProps) => {
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
 
   const supportedFormats = useMemo(() => {
+    console.log(getEnabledSaveTypes())
+
     const supportedFormats = uniq(
       getEnabledSaveTypes().map((saveType) =>
         supportsMon(saveType, formData.dexNum, formData.formeNum)

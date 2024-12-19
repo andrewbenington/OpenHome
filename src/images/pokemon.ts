@@ -36,6 +36,7 @@ export const fileToSpriteFolder: Record<string, string> = {
   COLOPKM: 'gen3gc',
   XDPKM: 'gen3gc',
   PK3RR: 'rr',
+  PK3UB: 'rr',
   PK4: 'gen4',
   PK5: 'home',
   PK6: 'gen6',

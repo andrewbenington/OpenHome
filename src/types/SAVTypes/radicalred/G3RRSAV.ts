@@ -30,4 +30,6 @@ export class G3RRSAV extends G3CFRUSAV<PK3RR> implements PluginSAV<PK3RR> {
   constructor(path: PathData, bytes: Uint8Array) {
     super(path, bytes, PK3RR)
   }
+
+  static pkmType = PK3RR
 }

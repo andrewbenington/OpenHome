@@ -8,8 +8,8 @@ export class G3UBSAV extends G3CFRUSAV<PK3UB> implements PluginSAV<PK3UB> {
 
   pluginIdentifier = 'radical_red'
 
-  static saveTypeAbbreviation = 'Radical Red'
-  static saveTypeName = 'Pokémon Radical Red'
+  static saveTypeAbbreviation = 'Unbound'
+  static saveTypeName = 'Pokémon Unbound'
   static saveTypeID = 'G3RRSAV'
 
   supportsMon(_dexNumber: number, _formeNumber: number) {
@@ -27,4 +27,6 @@ export class G3UBSAV extends G3CFRUSAV<PK3UB> implements PluginSAV<PK3UB> {
   constructor(path: PathData, bytes: Uint8Array) {
     super(path, bytes, PK3UB)
   }
+
+  static pkmType = PK3UB
 }

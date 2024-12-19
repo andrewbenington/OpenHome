@@ -16,6 +16,10 @@ export class PK3UB extends PK3CFRU implements PluginPKMInterface {
   format: 'PK3UB' = 'PK3UB'
   pluginIdentifier: string = 'unbound'
 
+  static getName() {
+    return 'PK3UB'
+  }
+
   itemFromString(itemName: string): number {
     return ItemGen3CFRUFromString(itemName)
   }
