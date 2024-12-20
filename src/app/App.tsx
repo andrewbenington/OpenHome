@@ -3,15 +3,17 @@ import { restrictToWindowEdges } from '@dnd-kit/modifiers'
 import { Box, Typography } from '@mui/joy'
 import { extendTheme, ThemeProvider } from '@mui/joy/styles'
 import * as E from 'fp-ts/lib/Either'
+import { debounce } from 'lodash'
 import { useCallback, useEffect, useMemo, useReducer, useState } from 'react'
 import { createPortal } from 'react-dom'
+import BackendInterface from 'src/backend/backendInterface'
 import { TauriBackend } from 'src/backend/tauri/tauriBackend'
 import { PKMInterface } from 'src/types/interfaces'
 import { HomeData } from 'src/types/SAVTypes/HomeData'
 import { BackendProvider } from '../backend/backendProvider'
 import PokemonIcon from '../components/PokemonIcon'
 import useIsDarkMode from '../hooks/dark-mode'
-import { AppInfoContext, appInfoInitialState, appInfoReducer } from '../state/appInfo'
+import { AppInfoContext, appInfoInitialState, appInfoReducer, Settings } from '../state/appInfo'
 import { ErrorContext, errorReducer } from '../state/error'
 import { FilterContext, filterReducer } from '../state/filter'
 import { LookupContext, lookupReducer } from '../state/lookup'
@@ -22,6 +24,10 @@ import AppTabs from './AppTabs'
 import ErrorMessageModal from './ErrorMessage'
 import { PokemonDragContext } from './PokemonDrag'
 import { components, darkTheme, lightTheme } from './Themes'
+
+const debouncedUpdateSettings = debounce((backend: BackendInterface, settings: Settings) => {
+  backend.updateSettings(settings).catch(console.error)
+}, 500)
 
 export default function App() {
   const isDarkMode = useIsDarkMode()
@@ -78,8 +84,8 @@ export default function App() {
 
   useEffect(() => {
     if (!appInfoState.settingsLoaded) return
-    backend.updateSettings(appInfoState.settings).catch(console.error)
-  }, [appInfoState.settings, appInfoState.settingsLoaded, backend])
+    debouncedUpdateSettings(backend, appInfoState.settings)
+  }, [backend, appInfoState.settings, appInfoState.settingsLoaded])
 
   return (
     <ThemeProvider theme={theme}>
