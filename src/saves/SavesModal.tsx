@@ -236,22 +236,10 @@ const SavesModal = (props: SavesModalProps) => {
             color="secondary"
             style={{ width: '95%', marginLeft: 'auto', marginRight: 'auto', marginBottom: 4 }}
           >
-            <Button
-              value="card"
-              color="secondary"
-              variant="soft"
-              fullWidth
-              style={{ borderTopRightRadius: 0, borderBottomRightRadius: 0 }}
-            >
+            <Button value="card" color="secondary" variant="soft" fullWidth>
               <CardsIcon />
             </Button>
-            <Button
-              value="grid"
-              color="secondary"
-              variant="soft"
-              fullWidth
-              style={{ borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }}
-            >
+            <Button value="grid" color="secondary" variant="soft" fullWidth>
               <GridIcon />
             </Button>
           </ToggleButtonGroup>
