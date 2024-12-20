@@ -251,3 +251,10 @@ pub fn set_app_theme(app_handle: tauri::AppHandle, app_theme: String) -> Result<
         .set_theme(theme_option)
         .map_err(|e| e.to_string());
 }
+
+#[tauri::command]
+pub fn validate_recent_saves(
+    app_handle: tauri::AppHandle,
+) -> Result<HashMap<String, saves::SaveRef>, String> {
+    return saves::validate_recent_saves(app_handle);
+}

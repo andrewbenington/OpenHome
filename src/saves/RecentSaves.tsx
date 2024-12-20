@@ -50,8 +50,7 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
           // filter out saves from plugins that aren't enabled
           const filteredRecents = Object.entries(recents).filter(
             ([, ref]) =>
-              ref.pluginIdentifier === undefined ||
-              extraSaveIdentifiers.includes(ref.pluginIdentifier)
+              ref.pluginIdentifier === null || extraSaveIdentifiers.includes(ref.pluginIdentifier)
           )
 
           setRecentSaves(Object.fromEntries(filteredRecents))
@@ -113,10 +112,10 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
         <img
           alt="save logo"
           height={40}
-          src={getSaveLogo(saveTypeFromOrigin(value.game), value.game as GameOfOrigin)}
+          src={getSaveLogo(saveTypeFromOrigin(value.game ?? 0), value.game as GameOfOrigin)}
         />
       ),
-      sortFunction: numericSorter((val) => val.game),
+      sortFunction: numericSorter((val) => val.game ?? 0),
       cellClass: 'centered-cell',
     },
     {
@@ -129,15 +128,15 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
       key: 'lastOpened',
       name: 'Last Opened',
       width: 160,
-      renderValue: (save) => formatTimeSince(save.lastOpened),
-      sortFunction: numericSorter((val) => val.lastOpened),
+      renderValue: (save) => formatTimeSince(save.lastOpened ?? 0),
+      sortFunction: numericSorter((val) => val.lastOpened ?? 0),
     },
     {
       key: 'lastModified',
       name: 'Last Modified',
       width: 240,
-      renderValue: (save) => formatTime(save.lastModified),
-      sortFunction: numericSorter((val) => val.lastModified),
+      renderValue: (save) => formatTime(save.lastModified ?? 0),
+      sortFunction: numericSorter((val) => val.lastModified ?? 0),
     },
     {
       key: 'remove',

@@ -1,6 +1,6 @@
 import { invoke } from '@tauri-apps/api/core'
 import * as E from 'fp-ts/lib/Either'
-import { Errorable, JSONArray, JSONObject, JSONValue } from 'src/types/types'
+import { Errorable, JSONArray, JSONObject, JSONValue, SaveRef } from 'src/types/types'
 import { PossibleSaves } from '../../types/SAVTypes/path'
 import { AppState } from '../backendInterface'
 import { RustResult } from './types'
@@ -126,6 +126,12 @@ export const TauriInvoker = {
 
   setTheme(appTheme: 'light' | 'dark' | 'system'): Promise<Errorable<null>> {
     const promise: Promise<null> = invoke('set_app_theme', { appTheme })
+
+    return promise.then(E.right).catch(E.left)
+  },
+
+  getRecentSaves(): Promise<Errorable<Record<string, SaveRef>>> {
+    const promise: Promise<Record<string, SaveRef>> = invoke('validate_recent_saves')
 
     return promise.then(E.right).catch(E.left)
   },

@@ -1,7 +1,9 @@
-use crate::util::{parse_path_data, PathData};
+use crate::util::{self, parse_path_data, PathData};
 use serde;
+use std::collections::HashMap;
 use std::fs;
 use std::path::{Path, PathBuf};
+use std::time::UNIX_EPOCH;
 
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
 pub struct PossibleSaves {
@@ -154,4 +156,53 @@ pub fn recursively_find_citra_saves(path: &PathBuf, depth: usize) -> Result<Vec<
     }
 
     Ok(found_saves)
+}
+
+#[derive(serde::Serialize, serde::Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct SaveRef {
+    pub file_path: PathData,
+    pub game: Option<u32>,
+    pub trainer_name: Option<String>,
+    #[serde(alias = "trainerID")]
+    pub trainer_id: Option<String>,
+    pub last_opened: Option<f64>,
+    pub last_modified: Option<f64>,
+    pub valid: Option<bool>,
+    pub plugin_identifier: Option<String>,
+}
+
+pub fn validate_recent_saves(
+    app_handle: tauri::AppHandle,
+) -> Result<HashMap<String, SaveRef>, String> {
+    let file_path: PathBuf = "recent_saves.json".to_string().into();
+    let mut recent_saves: HashMap<String, SaveRef> =
+        util::get_storage_file_json(&app_handle, &file_path)
+            .map_err(|e| format!("Error getting settings: {}", e))?;
+
+    for (raw, save) in recent_saves.iter_mut() {
+        let path = Path::new(&raw);
+        save.valid = Some(path.exists());
+        let modified_r = get_modified_time_ms(path);
+        if let Ok(millis) = modified_r {
+            save.last_modified = Some(millis);
+        }
+    }
+
+    return Ok(recent_saves);
+}
+
+fn get_modified_time_ms(path: &Path) -> Result<f64, String> {
+    return path
+        .metadata()
+        .map_err(|e| format!("Error getting metadata: {}", e))
+        .and_then(|m| {
+            m.modified()
+                .map_err(|e| format!("Error getting modified time: {}", e))
+        })
+        .and_then(|st| {
+            st.duration_since(UNIX_EPOCH)
+                .map_err(|e| format!("Invalid modified time: {}", e))
+        })
+        .map(|dur| dur.as_millis() as f64);
 }
