@@ -6,6 +6,7 @@ use std::fs::File;
 use std::io::{Error, ErrorKind, Read, Write};
 use std::path::PathBuf;
 use std::time::SystemTime;
+use tauri::Manager;
 
 use crate::saves;
 use crate::state::{AppState, AppStateSnapshot};
@@ -177,12 +178,7 @@ pub fn get_storage_file_json(
     app_handle: tauri::AppHandle,
     relative_path: PathBuf,
 ) -> Result<Value, String> {
-    let json_data = util::get_storage_file_text(app_handle, &relative_path)
-        .map_err(|e| format!("error opening {:#?}: {e}", &relative_path))?;
-    let value = serde_json::from_str(json_data.as_str())
-        .map_err(|e| format!("error opening {:#?}: {e}", relative_path));
-
-    return value;
+    return util::get_storage_file_json(&app_handle, &relative_path);
 }
 
 #[tauri::command]
@@ -232,4 +228,26 @@ pub fn find_suggested_saves(save_folders: Vec<PathBuf>) -> Result<saves::Possibl
     possible_saves.desamume = util::dedupe_paths(possible_saves.desamume);
 
     Ok(possible_saves)
+}
+
+#[tauri::command]
+pub fn set_app_theme(app_handle: tauri::AppHandle, app_theme: String) -> Result<(), String> {
+    let main_window = app_handle
+        .get_webview_window("main")
+        .ok_or("Main window not found")?;
+
+    let theme_option: Option<tauri::Theme>;
+    if app_theme == "dark" {
+        theme_option = Some(tauri::Theme::Dark)
+    } else if app_theme == "light" {
+        theme_option = Some(tauri::Theme::Light)
+    } else if app_theme == "system" {
+        theme_option = None::<tauri::Theme>;
+    } else {
+        return Err(format!("Invalid theme: {}", app_theme));
+    }
+
+    return main_window
+        .set_theme(theme_option)
+        .map_err(|e| e.to_string());
 }
