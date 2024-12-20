@@ -11,7 +11,7 @@ import { OHPKM } from 'src/types/pkm/OHPKM'
 import { PathData, PossibleSaves } from 'src/types/SAVTypes/path'
 import { SaveFolder, StoredBoxData } from 'src/types/storage'
 import { Errorable, JSONObject, LoadSaveResponse, LookupMap, SaveRef } from 'src/types/types'
-import { Settings } from '../../state/appInfo'
+import { defaultSettings, Settings } from '../../state/appInfo'
 import { TauriInvoker } from './tauriInvoker'
 
 async function pathDataFromRaw(raw: string): Promise<PathData> {
@@ -270,8 +270,7 @@ export const TauriBackend: BackendInterface = {
     return promise.then(
       E.match(
         (err) => E.left(err),
-        (partialSettings) =>
-          E.right({ enabledSaveTypes: {}, appTheme: 'system', ...partialSettings })
+        (partialSettings) => E.right({ ...defaultSettings, ...partialSettings })
       )
     )
   },
