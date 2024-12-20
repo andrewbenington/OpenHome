@@ -44,6 +44,7 @@ const DummyBackend: BackendInterface = {
   getState: async () => E.left('no backend in use'),
   getSettings: async () => E.left('no backend in use'),
   updateSettings: async () => E.left('no backend in use'),
+  setTheme: async () => E.left('no backend in use'),
 }
 
 export default DummyBackend

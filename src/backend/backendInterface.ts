@@ -54,6 +54,7 @@ export default interface BackendInterface {
   getState: () => Promise<Errorable<AppState>>
   getSettings: () => Promise<Errorable<Settings>>
   updateSettings: (settings: Settings) => Promise<Errorable<null>>
+  setTheme(appTheme: 'light' | 'dark' | 'system'): Promise<Errorable<null>>
 }
 
 export interface BackendListeners {

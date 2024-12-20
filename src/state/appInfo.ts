@@ -35,17 +35,20 @@ export const defaultSettings: Settings = {
   ),
   saveCardSize: 180,
   saveViewMode: 'card',
+  appTheme: 'system',
 }
 
 export type Settings = {
   enabledSaveTypes: Record<string, boolean>
   saveCardSize: number
   saveViewMode: SaveViewMode
+  appTheme: 'light' | 'dark' | 'system'
 }
 
 export type AppInfoState = {
   resourcesPath?: string
   settings: Settings
+  settingsLoaded: boolean
   officialSaveTypes: SAVClass[]
   extraSaveTypes: SAVClass[]
 }
@@ -73,6 +76,10 @@ export type AppInfoAction =
   | {
       type: 'set_save_view'
       payload: SaveViewMode
+    }
+  | {
+      type: 'set_app_theme'
+      payload: 'light' | 'dark' | 'system'
     }
 
 export const appInfoReducer: Reducer<AppInfoState, AppInfoAction> = (
@@ -125,12 +132,15 @@ export const appInfoReducer: Reducer<AppInfoState, AppInfoAction> = (
         settings: { ...state.settings, saveViewMode: payload },
       }
     }
+    case 'set_app_theme': {
+      return { ...state, settings: { ...state.settings, appTheme: payload }, settingsLoaded: true }
+    }
   }
 }
 
 export const appInfoInitialState: AppInfoState = {
   settings: defaultSettings,
-
+  settingsLoaded: false,
   officialSaveTypes: [
     G1SAV,
     G2SAV,

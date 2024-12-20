@@ -83,8 +83,9 @@ export default function App() {
   }, [backend])
 
   useEffect(() => {
+    if (!appInfoState.settingsLoaded) return
     debouncedUpdateSettings(backend, appInfoState.settings)
-  }, [backend, appInfoState.settings])
+  }, [backend, appInfoState.settings, appInfoState.settingsLoaded])
 
   return (
     <ThemeProvider theme={theme}>

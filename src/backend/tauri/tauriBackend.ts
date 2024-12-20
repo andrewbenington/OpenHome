@@ -277,6 +277,8 @@ export const TauriBackend: BackendInterface = {
   updateSettings: async (settings: Settings) => {
     return TauriInvoker.writeStorageFileJSON('settings.json', settings as JSONObject)
   },
+  setTheme: (appTheme: 'light' | 'dark' | 'system'): Promise<Errorable<null>> =>
+    TauriInvoker.setTheme(appTheme),
 
   registerListeners: (listeners) => {
     const unlistenPromise = Promise.all([
