@@ -56,17 +56,24 @@
 }
 
 .details-button {
-  aspect-ratio: 1;
-  border-radius: 6px;
-  height: 30px;
-  background-color: #fff3;
-  transition: 0.15s;
+  --svg-size: 26px;
+  border-radius: 15px !important;
+  height: var(--svg-size);
+  width: var(--svg-size);
+  background-color: #fff0;
   position: absolute;
   right: 0px;
+  min-height: 0px !important;
+  margin-bottom: 3px;
+  & svg {
+    height: var(--svg-size);
+    width: var(--svg-size);
+  }
 }
 
 .details-button:hover {
-  background-color: #fff6;
+  background-color: #6663;
+  /* border: 1px solid white; */
 }
 
 .save-card:hover::after {
@@ -91,4 +98,20 @@
   border-radius: inherit;
   transition: background-color 0.2s;
   pointer-events: none;
+}
+
+.save-grid-error-button {
+  background-color: rgb(213, 18, 18);
+  color: white;
+  height: 26px;
+  width: 56px;
+  padding: 0;
+  display: grid;
+  align-items: center;
+  justify-content: center;
+}
+
+.save-grid-open-button {
+  height: 26px;
+  width: 56px;
 }

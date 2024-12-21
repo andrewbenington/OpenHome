@@ -7,12 +7,13 @@ import { getPluginIdentifier } from 'src/types/SAVTypes/util'
 import { SaveRef } from 'src/types/types'
 import { filterUndefined, numericSorter } from 'src/util/Sort'
 import { BackendContext } from '../backend/backendContext'
-import { RemoveIcon } from '../components/Icons'
+import { ErrorIcon } from '../components/Icons'
 import OHDataGrid, { SortableColumn } from '../components/OHDataGrid'
 import { AppInfoContext } from '../state/appInfo'
 import { ErrorContext } from '../state/error'
 import { OpenSavesContext } from '../state/openSaves'
 import SaveCard from './SaveCard'
+import SaveDetailsMenu from './SaveDetailsMenu'
 import { formatTime, formatTimeSince, getSaveLogo, SaveViewMode } from './util'
 
 interface SaveFileSelectorProps {
@@ -47,11 +48,11 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
           const extraSaveIdentifiers = getEnabledSaveTypes()
             .map(getPluginIdentifier)
             .filter(filterUndefined)
+
           // filter out saves from plugins that aren't enabled
           const filteredRecents = Object.entries(recents).filter(
             ([, ref]) =>
-              ref.pluginIdentifier === undefined ||
-              extraSaveIdentifiers.includes(ref.pluginIdentifier)
+              ref.pluginIdentifier === null || extraSaveIdentifiers.includes(ref.pluginIdentifier)
           )
 
           setRecentSaves(Object.fromEntries(filteredRecents))
@@ -89,34 +90,67 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
 
   const columns: SortableColumn<SaveRef>[] = [
     {
-      key: 'open',
-      name: 'Open',
-      width: 80,
+      key: 'menu',
+      name: '',
+      width: 50,
       renderCell: (params) => (
-        <button
-          onClick={(e) => {
-            e.preventDefault()
-            onOpen(params.row.filePath)
-          }}
-          disabled={!params.row.valid || params.row.filePath.raw in openSavePaths}
-        >
-          Open
-        </button>
+        <SaveDetailsMenu
+          save={params.row}
+          onRemove={() => removeRecentSave(params.row.filePath.raw)}
+        />
       ),
+      cellClass: 'centered-cell',
+    },
+    {
+      key: 'open',
+      name: '',
+      width: 80,
+      renderCell: (params) =>
+        params.row.valid ? (
+          <button
+            className="save-grid-open-button"
+            onClick={(e) => {
+              e.preventDefault()
+              onOpen(params.row.filePath)
+            }}
+            disabled={params.row.filePath.raw in openSavePaths}
+            title={params.row.filePath.raw in openSavePaths ? 'Save is already open' : undefined}
+          >
+            Open
+          </button>
+        ) : (
+          <button
+            className="save-grid-error-button"
+            onClick={() =>
+              dispatchErrorState({
+                type: 'set_message',
+                payload: {
+                  title: 'Invalid Save',
+                  messages: ['File is missing, renamed, or inaccessbile'],
+                },
+              })
+            }
+          >
+            <ErrorIcon style={{ width: 20, height: 20 }} />
+          </button>
+        ),
       cellClass: 'centered-cell',
     },
     {
       key: 'game',
       name: 'Game',
       width: 130,
-      renderValue: (value) => (
-        <img
-          alt="save logo"
-          height={40}
-          src={getSaveLogo(saveTypeFromOrigin(value.game), value.game as GameOfOrigin)}
-        />
-      ),
-      sortFunction: numericSorter((val) => val.game),
+      renderValue: (value) =>
+        value.game ? (
+          <img
+            alt="save logo"
+            height={40}
+            src={getSaveLogo(saveTypeFromOrigin(value.game), value.game as GameOfOrigin)}
+          />
+        ) : (
+          ''
+        ),
+      sortFunction: numericSorter((val) => val.game ?? -1),
       cellClass: 'centered-cell',
     },
     {
@@ -129,38 +163,15 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
       key: 'lastOpened',
       name: 'Last Opened',
       width: 160,
-      renderValue: (save) => formatTimeSince(save.lastOpened),
-      sortFunction: numericSorter((val) => val.lastOpened),
+      renderValue: (save) => (save.lastOpened ? formatTimeSince(save.lastOpened) : ''),
+      sortFunction: numericSorter((val) => val.lastOpened ?? -1),
     },
     {
       key: 'lastModified',
       name: 'Last Modified',
       width: 240,
-      renderValue: (save) => formatTime(save.lastModified),
-      sortFunction: numericSorter((val) => val.lastModified),
-    },
-    {
-      key: 'remove',
-      name: '',
-      width: 40,
-      renderCell: (params) => (
-        <button
-          style={{
-            padding: 0,
-            display: 'grid',
-            marginLeft: 'auto',
-            marginTop: 'auto',
-            marginBottom: 'auto',
-            backgroundColor: '#990000',
-            height: 'fit-content',
-            borderRadius: 16,
-          }}
-          onClick={() => removeRecentSave(params.row.filePath.raw)}
-        >
-          <RemoveIcon />
-        </button>
-      ),
-      cellClass: 'centered-cell',
+      renderValue: (save) => (save.lastModified ? formatTime(save.lastModified) : ''),
+      sortFunction: numericSorter((val) => val.lastModified ?? -1),
     },
     {
       key: 'filePath',
@@ -206,6 +217,7 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
           columns={columns}
           defaultSort="lastOpened"
           defaultSortDir="DESC"
+          rowClass={(row) => (row.valid ? undefined : 'datagrid-error-row')}
         />
       ) : (
         <Stack flexWrap="wrap" direction="row" useFlexGap justifyContent="center" margin={2}>
