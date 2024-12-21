@@ -124,7 +124,10 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
             onClick={() =>
               dispatchErrorState({
                 type: 'set_message',
-                payload: { title: 'Invalid Save', messages: ['File is missing or inaccessbile'] },
+                payload: {
+                  title: 'Invalid Save',
+                  messages: ['File is missing, renamed, or inaccessbile'],
+                },
               })
             }
           >

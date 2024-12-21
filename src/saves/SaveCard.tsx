@@ -151,7 +151,10 @@ export default function SaveCard({ save, onOpen, onRemove, size = 240 }: SaveCar
             onClick={() =>
               dispatchErrorState({
                 type: 'set_message',
-                payload: { title: 'Invalid Save', messages: ['File is missing or inaccessbile'] },
+                payload: {
+                  title: 'Invalid Save',
+                  messages: ['File is missing, renamed, or inaccessbile'],
+                },
               })
             }
             style={{
