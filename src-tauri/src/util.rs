@@ -61,10 +61,10 @@ pub fn prepend_appdata_storage_to_path(
 }
 
 pub fn get_storage_file_text(
-    app_handle: tauri::AppHandle,
+    app_handle: &tauri::AppHandle,
     relative_path: &PathBuf,
 ) -> Result<String, String> {
-    let full_path = prepend_appdata_storage_to_path(&app_handle, relative_path)?;
+    let full_path = prepend_appdata_storage_to_path(app_handle, relative_path)?;
 
     // Open the file, and return any error up the call stack
     let mut file = File::open(full_path).map_err(|e| e.to_string())?;
@@ -74,6 +74,15 @@ pub fn get_storage_file_text(
         .map_err(|e| e.to_string())?;
 
     return Ok(contents);
+}
+
+pub fn get_storage_file_json(
+    app_handle: &tauri::AppHandle,
+    relative_path: &PathBuf,
+) -> Result<serde_json::Value, String> {
+    let json_data = get_storage_file_text(app_handle, relative_path)?;
+    return serde_json::from_str(json_data.as_str())
+        .map_err(|e| format!("error opening {:#?}: {e}", relative_path));
 }
 
 pub fn get_appdata_dir(app_handle: &tauri::AppHandle) -> Result<String, String> {

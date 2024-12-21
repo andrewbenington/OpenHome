@@ -22,7 +22,7 @@ export default [
     },
     files: ['src/**/*.{js,mjs,cjs,ts,mts,jsx,tsx}'],
     rules: {
-      'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
+      'react-refresh/only-export-components': ['error', { allowConstantExport: true }],
       '@typescript-eslint/no-unused-vars': [
         'warn',
         {
@@ -51,7 +51,7 @@ export default [
         },
       ],
       'react-hooks/rules-of-hooks': 'error',
-      'react-hooks/exhaustive-deps': 'warn',
+      'react-hooks/exhaustive-deps': 'error',
       'react/jsx-key': 'error',
       'prettier/prettier': [
         'error',

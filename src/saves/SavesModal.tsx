@@ -16,15 +16,16 @@ import {
   Typography,
 } from '@mui/joy'
 import * as E from 'fp-ts/lib/Either'
+import { debounce } from 'lodash'
 import { useCallback, useContext, useState } from 'react'
 import 'react-data-grid/lib/styles.css'
 import { ErrorContext } from 'src/state/error'
 import { PathData } from 'src/types/SAVTypes/path'
 import { SAVClass } from 'src/types/SAVTypes/util'
 import { getMonFileIdentifier } from 'src/util/Lookup'
-import { BackendContext } from '../backend/backendProvider'
+import { BackendContext } from '../backend/backendContext'
 import { CardsIcon, GridIcon } from '../components/Icons'
-import { AppInfoContext } from '../state/appInfo'
+import { AppInfoAction, AppInfoContext } from '../state/appInfo'
 import { LookupContext } from '../state/lookup'
 import { OpenSavesContext } from '../state/openSaves'
 import { getSaveRef } from '../types/SAVTypes/SAV'
@@ -44,6 +45,13 @@ type AmbiguousOpenState = {
   fileBytes: Uint8Array
 }
 
+const debouncedUpdateCardSize = debounce(
+  (size: number, dispatch: React.Dispatch<AppInfoAction>) => {
+    dispatch({ type: 'set_icon_size', payload: size })
+  },
+  500
+)
+
 const SavesModal = (props: SavesModalProps) => {
   const { onClose } = props
   const backend = useContext(BackendContext)
@@ -51,9 +59,12 @@ const SavesModal = (props: SavesModalProps) => {
   const [lookupState] = useContext(LookupContext)
   const [, dispatchError] = useContext(ErrorContext)
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
-  const [viewMode, setViewMode] = useState<SaveViewMode>('cards')
-  const [cardSize, setCardSize] = useState<number>(180)
+  const [{ settings }, dispatchAppInfoState] = useContext(AppInfoContext)
   const [unknownSaveData, setUnknownSaveData] = useState<AmbiguousOpenState>()
+
+  // these are kept as a local state to reduce lag
+  const [cardSize, setCardSize] = useState(settings.saveCardSize)
+  const [viewMode, setViewMode] = useState<SaveViewMode>(settings.saveViewMode)
 
   const buildAndOpenSave = useCallback(
     (saveType: SAVClass, filePath: PathData, fileBytes: Uint8Array) => {
@@ -195,15 +206,19 @@ const SavesModal = (props: SavesModalProps) => {
             Save Folders
           </Tab>
           <div style={{ flex: 1 }} />
-          {viewMode === 'cards' && (
-            <label>
+          {viewMode === 'card' && (
+            <label style={{ margin: 4 }}>
               Icon Size
               <Slider
                 value={cardSize}
-                onChange={(_, newSize) => setCardSize(newSize as number)}
+                step={20}
+                onChange={(_, newSize) => {
+                  setCardSize(newSize as number)
+                  debouncedUpdateCardSize(newSize as number, dispatchAppInfoState)
+                }}
                 valueLabelDisplay="auto"
                 min={100}
-                max={500}
+                max={350}
                 style={{ paddingTop: 0, paddingBottom: 30 }}
                 variant="soft"
                 color="neutral"
@@ -212,12 +227,16 @@ const SavesModal = (props: SavesModalProps) => {
           )}
           <ToggleButtonGroup
             value={viewMode}
-            onChange={(_, newValue) => setViewMode(newValue as SaveViewMode)}
+            onChange={(_, newValue) => {
+              if (newValue) {
+                setViewMode(newValue)
+                dispatchAppInfoState({ type: 'set_save_view', payload: newValue as SaveViewMode })
+              }
+            }}
             color="secondary"
-            variant="soft"
-            style={{ width: '100%' }}
+            style={{ width: '95%', marginLeft: 'auto', marginRight: 'auto', marginBottom: 4 }}
           >
-            <Button value="cards" color="secondary" variant="soft" fullWidth>
+            <Button value="card" color="secondary" variant="soft" fullWidth>
               <CardsIcon />
             </Button>
             <Button value="grid" color="secondary" variant="soft" fullWidth>
@@ -239,11 +258,11 @@ const SavesModal = (props: SavesModalProps) => {
         open={!!unknownSaveData}
         saveTypes={unknownSaveData?.possibleSaveTypes}
         onSelect={(selected) => {
+          setUnknownSaveData(undefined)
           if (!unknownSaveData || !selected) return
           const data = unknownSaveData
 
           buildAndOpenSave(selected, data.filePath, data.fileBytes)
-          setUnknownSaveData(undefined)
         }}
       />
     </>

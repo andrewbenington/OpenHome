@@ -1,4 +1,4 @@
-import { Dispatch, Reducer, createContext, useReducer } from 'react'
+import { Dispatch, Reducer, createContext } from 'react'
 import { Filter } from 'src/types/Filter'
 
 export type FilterState = Filter
@@ -17,7 +17,10 @@ export type FilterAction =
       payload?: undefined
     }
 
-const reducer: Reducer<FilterState, FilterAction> = (state: FilterState, action: FilterAction) => {
+export const filterReducer: Reducer<FilterState, FilterAction> = (
+  state: FilterState,
+  action: FilterAction
+) => {
   const { type, payload } = action
 
   switch (type) {
@@ -56,9 +59,3 @@ export const FilterContext = createContext<[FilterState, Dispatch<FilterAction>]
   initialState,
   () => null,
 ])
-
-export const FilterProvider = ({ children }: { children: JSX.Element | JSX.Element[] }) => {
-  const [state, dispatch] = useReducer<Reducer<FilterState, FilterAction>>(reducer, initialState)
-
-  return <FilterContext.Provider value={[state, dispatch]}>{children}</FilterContext.Provider>
-}

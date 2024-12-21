@@ -11,7 +11,7 @@ import {
 import * as E from 'fp-ts/lib/Either'
 import { useCallback, useContext, useEffect, useState } from 'react'
 import { SaveFolder } from 'src/types/storage'
-import { BackendContext } from '../backend/backendProvider'
+import { BackendContext } from '../backend/backendContext'
 import { AddFolderIcon, RemoveIcon } from '../components/Icons'
 
 export default function SaveFolders() {

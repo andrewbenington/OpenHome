@@ -1,4 +1,5 @@
 import { Dispatch, Reducer, createContext } from 'react'
+import { SaveViewMode } from '../saves/util'
 import { BW2SAV } from '../types/SAVTypes/BW2SAV'
 import { BWSAV } from '../types/SAVTypes/BWSAV'
 import { DPSAV } from '../types/SAVTypes/DPSAV'
@@ -15,13 +16,40 @@ import { USUMSAV } from '../types/SAVTypes/USUMSAV'
 import { SAVClass } from '../types/SAVTypes/util'
 import { XYSAV } from '../types/SAVTypes/XYSAV'
 
+export const defaultSettings: Settings = {
+  enabledSaveTypes: Object.fromEntries(
+    [
+      G1SAV,
+      G2SAV,
+      G3SAV,
+      DPSAV,
+      PtSAV,
+      HGSSSAV,
+      BWSAV,
+      BW2SAV,
+      XYSAV,
+      ORASSAV,
+      SMSAV,
+      USUMSAV,
+      G3RRSAV,
+    ].map((savetype) => [savetype.saveTypeID, true])
+  ),
+  saveCardSize: 180,
+  saveViewMode: 'card',
+  appTheme: 'system',
+}
+
 export type Settings = {
   enabledSaveTypes: Record<string, boolean>
+  saveCardSize: number
+  saveViewMode: SaveViewMode
+  appTheme: 'light' | 'dark' | 'system'
 }
 
 export type AppInfoState = {
   resourcesPath?: string
   settings: Settings
+  settingsLoaded: boolean
   officialSaveTypes: SAVClass[]
   extraSaveTypes: SAVClass[]
 }
@@ -41,6 +69,18 @@ export type AppInfoAction =
   | {
       type: 'load_settings'
       payload: Settings
+    }
+  | {
+      type: 'set_icon_size'
+      payload: number
+    }
+  | {
+      type: 'set_save_view'
+      payload: SaveViewMode
+    }
+  | {
+      type: 'set_app_theme'
+      payload: 'light' | 'dark' | 'system'
     }
 
 export const appInfoReducer: Reducer<AppInfoState, AppInfoAction> = (
@@ -81,31 +121,27 @@ export const appInfoReducer: Reducer<AppInfoState, AppInfoAction> = (
 
       return { ...state, settings: { ...payload, enabledSaveTypes: enabled } }
     }
+    case 'set_icon_size': {
+      return {
+        ...state,
+        settings: { ...state.settings, saveCardSize: payload },
+      }
+    }
+    case 'set_save_view': {
+      return {
+        ...state,
+        settings: { ...state.settings, saveViewMode: payload },
+      }
+    }
+    case 'set_app_theme': {
+      return { ...state, settings: { ...state.settings, appTheme: payload }, settingsLoaded: true }
+    }
   }
 }
 
 export const appInfoInitialState: AppInfoState = {
-  settings: {
-    enabledSaveTypes: Object.fromEntries(
-      [
-        G1SAV,
-        G2SAV,
-        G3SAV,
-        DPSAV,
-        PtSAV,
-        HGSSSAV,
-        BWSAV,
-        BW2SAV,
-        XYSAV,
-        ORASSAV,
-        SMSAV,
-        USUMSAV,
-        G3RRSAV,
-        G3UBSAV,
-      ].map((savetype) => [savetype.saveTypeID, true])
-    ),
-  },
-
+  settings: defaultSettings,
+  settingsLoaded: false,
   officialSaveTypes: [
     G1SAV,
     G2SAV,

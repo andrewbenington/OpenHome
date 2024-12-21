@@ -45,7 +45,7 @@ export default function FilterAutocomplete<
       return options.find((option) => indexField && option[indexField] === filterState[filterField])
     }
     return undefined
-  }, [filterField, filterState])
+  }, [filterField, filterState, indexField, options])
 
   // const currentValue: string | null = useMemo(() => {
   //   if (typeof currentOption === 'string') return currentOption

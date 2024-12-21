@@ -123,4 +123,10 @@ export const TauriInvoker = {
 
     return promise.then(E.right).catch(E.left)
   },
+
+  setTheme(appTheme: 'light' | 'dark' | 'system'): Promise<Errorable<null>> {
+    const promise: Promise<null> = invoke('set_app_theme', { appTheme })
+
+    return promise.then(E.right).catch(E.left)
+  },
 }
