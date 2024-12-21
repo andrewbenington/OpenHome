@@ -4,6 +4,9 @@ import { BLOOD_MOON, SWEETS } from 'src/consts/Formes'
 import { PKMInterface } from 'src/types/interfaces'
 import { toGen3RRPokemonIndex } from 'src/types/SAVTypes/radicalred/conversion/Gen3RRPokemonIndex'
 import { RRSprites } from 'src/types/SAVTypes/radicalred/conversion/RadicalRedSprites'
+import { toGen3CRFUPokemonIndex } from '../types/SAVTypes/cfru/conversion/util'
+import { NationalDexToUnboundMap } from '../types/SAVTypes/unbound/conversion/UnboundSpeciesMap'
+import { UBSprites } from '../types/SAVTypes/unbound/conversion/UnboundSprites'
 
 const alolaDex = [
   10, 11, 12, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 35, 36, 37, 38, 39, 40, 41, 42, 46, 47, 50,
@@ -72,6 +75,16 @@ export const getPokemonSpritePath = (mon: PKMInterface, format?: string) => {
     if (gen3RRname.length === 0) return gen3RRname
     gen3RRname = gen3RRname[0].toUpperCase() + gen3RRname.slice(1).toLowerCase()
     return `sprites/${spriteFolder}/${gen3RRname}`
+  } else if (spriteFolder == 'unbound') {
+    if (mon.dexNum === NationalDex.Ursaluna && mon.formeNum === BLOOD_MOON) {
+      return 'sprites/home/ursaluna-bloodmoon.png'
+    }
+    let gen3UBname =
+      UBSprites[toGen3CRFUPokemonIndex(mon.dexNum, mon.formeNum, NationalDexToUnboundMap)]
+
+    if (gen3UBname.length === 0) return gen3UBname
+    gen3UBname = gen3UBname[0].toUpperCase() + gen3UBname.slice(1).toLowerCase()
+    return `sprites/${spriteFolder}/${gen3UBname}`
   }
   return `sprites/${spriteFolder}${
     mon.isShiny() && spriteFolder !== 'gen1' && spriteFolder !== 'gen9' ? '/shiny/' : '/'
