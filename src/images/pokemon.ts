@@ -70,6 +70,9 @@ export const getPokemonSpritePath = (mon: PKMInterface, format?: string) => {
     if (mon.dexNum === NationalDex.Ursaluna && mon.formeNum === BLOOD_MOON) {
       return 'sprites/home/ursaluna-bloodmoon.png'
     }
+    if (mon.dexNum === NationalDex.Terapagos) {
+      return 'sprites/home/terapagos-terastal.png'
+    }
     let gen3RRname = RRSprites[toGen3RRPokemonIndex(mon.dexNum, mon.formeNum)]
 
     if (gen3RRname.length === 0) return gen3RRname
