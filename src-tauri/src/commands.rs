@@ -256,5 +256,5 @@ pub fn set_app_theme(app_handle: tauri::AppHandle, app_theme: String) -> Result<
 pub fn validate_recent_saves(
     app_handle: tauri::AppHandle,
 ) -> Result<HashMap<String, saves::SaveRef>, String> {
-    return saves::validate_recent_saves(app_handle);
+    return saves::get_recent_saves(app_handle);
 }

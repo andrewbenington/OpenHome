@@ -7,12 +7,13 @@ import { getPluginIdentifier } from 'src/types/SAVTypes/util'
 import { SaveRef } from 'src/types/types'
 import { filterUndefined, numericSorter } from 'src/util/Sort'
 import { BackendContext } from '../backend/backendContext'
-import { RemoveIcon } from '../components/Icons'
+import { ErrorIcon } from '../components/Icons'
 import OHDataGrid, { SortableColumn } from '../components/OHDataGrid'
 import { AppInfoContext } from '../state/appInfo'
 import { ErrorContext } from '../state/error'
 import { OpenSavesContext } from '../state/openSaves'
 import SaveCard from './SaveCard'
+import SaveDetailsMenu from './SaveDetailsMenu'
 import { formatTime, formatTimeSince, getSaveLogo, SaveViewMode } from './util'
 
 interface SaveFileSelectorProps {
@@ -47,6 +48,7 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
           const extraSaveIdentifiers = getEnabledSaveTypes()
             .map(getPluginIdentifier)
             .filter(filterUndefined)
+
           // filter out saves from plugins that aren't enabled
           const filteredRecents = Object.entries(recents).filter(
             ([, ref]) =>
@@ -88,20 +90,47 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
 
   const columns: SortableColumn<SaveRef>[] = [
     {
-      key: 'open',
-      name: 'Open',
-      width: 80,
+      key: 'menu',
+      name: '',
+      width: 50,
       renderCell: (params) => (
-        <button
-          onClick={(e) => {
-            e.preventDefault()
-            onOpen(params.row.filePath)
-          }}
-          disabled={!params.row.valid || params.row.filePath.raw in openSavePaths}
-        >
-          Open
-        </button>
+        <SaveDetailsMenu
+          save={params.row}
+          onRemove={() => removeRecentSave(params.row.filePath.raw)}
+        />
       ),
+      cellClass: 'centered-cell',
+    },
+    {
+      key: 'open',
+      name: '',
+      width: 80,
+      renderCell: (params) =>
+        params.row.valid ? (
+          <button
+            className="save-grid-open-button"
+            onClick={(e) => {
+              e.preventDefault()
+              onOpen(params.row.filePath)
+            }}
+            disabled={params.row.filePath.raw in openSavePaths}
+            title={params.row.filePath.raw in openSavePaths ? 'Save is already open' : undefined}
+          >
+            Open
+          </button>
+        ) : (
+          <button
+            className="save-grid-error-button"
+            onClick={() =>
+              dispatchErrorState({
+                type: 'set_message',
+                payload: { title: 'Invalid Save', messages: ['File is missing or inaccessbile'] },
+              })
+            }
+          >
+            <ErrorIcon style={{ width: 20, height: 20 }} />
+          </button>
+        ),
       cellClass: 'centered-cell',
     },
     {
@@ -137,29 +166,6 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
       width: 240,
       renderValue: (save) => formatTime(save.lastModified ?? 0),
       sortFunction: numericSorter((val) => val.lastModified ?? 0),
-    },
-    {
-      key: 'remove',
-      name: '',
-      width: 40,
-      renderCell: (params) => (
-        <button
-          style={{
-            padding: 0,
-            display: 'grid',
-            marginLeft: 'auto',
-            marginTop: 'auto',
-            marginBottom: 'auto',
-            backgroundColor: '#990000',
-            height: 'fit-content',
-            borderRadius: 16,
-          }}
-          onClick={() => removeRecentSave(params.row.filePath.raw)}
-        >
-          <RemoveIcon />
-        </button>
-      ),
-      cellClass: 'centered-cell',
     },
     {
       key: 'filePath',
@@ -205,6 +211,7 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
           columns={columns}
           defaultSort="lastOpened"
           defaultSortDir="DESC"
+          rowClass={(row) => (row.valid ? undefined : 'datagrid-error-row')}
         />
       ) : (
         <Stack flexWrap="wrap" direction="row" useFlexGap justifyContent="center" margin={2}>
