@@ -1,9 +1,9 @@
 import { PluginPKMInterface } from '../../interfaces'
 import PK3CFRU, { CFRUToNationalDexEntry } from '../cfru/PK3CFRU'
 
-import { ItemGen3CFRUFromString, ItemGen3CFRUToString } from '../cfru/conversion/Gen3CFRUItems'
 import { fromGen3CFRUMoveIndex, toGen3CFRUMoveIndex } from '../cfru/conversion/Gen3CFRUMovesIndex'
 import { fromGen3CRFUPokemonIndex, toGen3CRFUPokemonIndex } from '../cfru/conversion/util'
+import { ItemGen3UnboundFromString, ItemGen3UnboundToString } from './conversion/Gen3UnboundItems'
 import { NationalDexToUnboundMap, UnboundToNationalDexMap } from './conversion/UnboundSpeciesMap'
 
 // const FAKEMON_INDEXES = [
@@ -21,11 +21,11 @@ export class PK3UB extends PK3CFRU implements PluginPKMInterface {
   }
 
   itemFromString(itemName: string): number {
-    return ItemGen3CFRUFromString(itemName)
+    return ItemGen3UnboundFromString(itemName)
   }
 
   itemToString(index: number): string {
-    return ItemGen3CFRUToString(index)
+    return ItemGen3UnboundToString(index)
   }
 
   moveFromGameIndex(gameIndex: number): number {

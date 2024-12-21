@@ -1,4 +1,4 @@
-const Gen3CFRUItems = [
+const Gen3RRItems = [
   'None',
   'Master Ball',
   'Ultra Ball',
@@ -751,13 +751,13 @@ const Gen3CFRUItems = [
   'Free Space22',
 ]
 
-export function ItemGen3CFRUToString(index: number): string {
-  if (index < 0 || index >= Gen3CFRUItems.length) {
+export function ItemGen3RRToString(index: number): string {
+  if (index < 0 || index >= Gen3RRItems.length) {
     return `Index ${index} out of range`
   }
-  return Gen3CFRUItems[index]
+  return Gen3RRItems[index]
 }
 
-export function ItemGen3CFRUFromString(itemName: string): number {
-  return Gen3CFRUItems.findIndex((item) => item === itemName)
+export function ItemGen3RRFromString(itemName: string): number {
+  return Gen3RRItems.findIndex((item) => item === itemName)
 }

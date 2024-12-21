@@ -1,8 +1,8 @@
 import { PluginPKMInterface } from '../../interfaces'
 import PK3CFRU, { CFRUToNationalDexEntry } from '../cfru/PK3CFRU'
 
-import { ItemGen3CFRUFromString, ItemGen3CFRUToString } from '../cfru/conversion/Gen3CFRUItems'
 import { fromGen3CRFUPokemonIndex, toGen3CRFUPokemonIndex } from '../cfru/conversion/util'
+import { ItemGen3RRFromString, ItemGen3RRToString } from './conversion/Gen3RRItems'
 import { fromGen3RRMoveIndex, toGen3RRMoveIndex } from './conversion/Gen3RRMovesIndex'
 import {
   NationalDexToRadicalRedMap,
@@ -23,11 +23,11 @@ export class PK3RR extends PK3CFRU implements PluginPKMInterface {
   }
 
   itemFromString(itemName: string): number {
-    return ItemGen3CFRUFromString(itemName)
+    return ItemGen3RRFromString(itemName)
   }
 
   itemToString(index: number): string {
-    return ItemGen3CFRUToString(index)
+    return ItemGen3RRToString(index)
   }
 
   moveFromGameIndex(gameIndex: number): number {

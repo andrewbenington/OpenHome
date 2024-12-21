@@ -1,3 +1,4 @@
+#type: ignore
 """
 Convert the RR species list to the UB species list.
 """
