@@ -1,4 +1,9 @@
 # type: ignore
+
+"""
+This file removes the background of sprites. Created for CFRU style hacks.
+"""
+
 import os
 from PIL import Image
 
@@ -32,7 +37,7 @@ def process_images_in_folder(folder_path):
                 remove_upper_left_color(image_path)
 
 def main():
-    folder_b = r".\generate\ubSprites"
+    folder_b = r".\public\sprites\unbound"
 
     if os.path.exists(folder_b):
         process_images_in_folder(folder_b)

@@ -38,8 +38,8 @@ export const fileToSpriteFolder: Record<string, string> = {
   PK3: 'gen3',
   COLOPKM: 'gen3gc',
   XDPKM: 'gen3gc',
-  PK3RR: 'rr',
-  PK3UB: 'rr',
+  PK3RR: 'cfru',
+  PK3UB: 'cfru',
   PK4: 'gen4',
   PK5: 'home',
   PK6: 'gen6',
@@ -63,10 +63,11 @@ export const getPokemonSpritePath = (mon: PKMInterface, format?: string) => {
     }-${SWEETS[mon.formArgument ?? 0].toLocaleLowerCase()}`
   }
   let spriteFolder = fileToSpriteFolder[monFormat]
+  console.log('JERE', spriteFolder, spriteName)
 
   if (spriteFolder === 'gen7' && !alolaDex.includes(mon.dexNum)) {
     spriteFolder = 'gen6'
-  } else if (spriteFolder === 'rr') {
+  } else if (monFormat === 'PK3RR') {
     if (mon.dexNum === NationalDex.Ursaluna && mon.formeNum === BLOOD_MOON) {
       return 'sprites/home/ursaluna-bloodmoon.png'
     }
@@ -75,7 +76,7 @@ export const getPokemonSpritePath = (mon: PKMInterface, format?: string) => {
     if (gen3RRname.length === 0) return gen3RRname
     gen3RRname = gen3RRname[0].toUpperCase() + gen3RRname.slice(1).toLowerCase()
     return `sprites/${spriteFolder}/${gen3RRname}`
-  } else if (spriteFolder == 'unbound') {
+  } else if (monFormat == 'PK3UB') {
     if (mon.dexNum === NationalDex.Ursaluna && mon.formeNum === BLOOD_MOON) {
       return 'sprites/home/ursaluna-bloodmoon.png'
     }
@@ -84,6 +85,7 @@ export const getPokemonSpritePath = (mon: PKMInterface, format?: string) => {
 
     if (gen3UBname.length === 0) return gen3UBname
     gen3UBname = gen3UBname[0].toUpperCase() + gen3UBname.slice(1).toLowerCase()
+    console.log('HERe', gen3UBname)
     return `sprites/${spriteFolder}/${gen3UBname}`
   }
   return `sprites/${spriteFolder}${
