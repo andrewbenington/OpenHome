@@ -140,14 +140,17 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
       key: 'game',
       name: 'Game',
       width: 130,
-      renderValue: (value) => (
-        <img
-          alt="save logo"
-          height={40}
-          src={getSaveLogo(saveTypeFromOrigin(value.game ?? 0), value.game as GameOfOrigin)}
-        />
-      ),
-      sortFunction: numericSorter((val) => val.game ?? 0),
+      renderValue: (value) =>
+        value.game ? (
+          <img
+            alt="save logo"
+            height={40}
+            src={getSaveLogo(saveTypeFromOrigin(value.game), value.game as GameOfOrigin)}
+          />
+        ) : (
+          ''
+        ),
+      sortFunction: numericSorter((val) => val.game ?? -1),
       cellClass: 'centered-cell',
     },
     {
@@ -160,15 +163,15 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
       key: 'lastOpened',
       name: 'Last Opened',
       width: 160,
-      renderValue: (save) => formatTimeSince(save.lastOpened ?? 0),
-      sortFunction: numericSorter((val) => val.lastOpened ?? 0),
+      renderValue: (save) => (save.lastOpened ? formatTimeSince(save.lastOpened) : ''),
+      sortFunction: numericSorter((val) => val.lastOpened ?? -1),
     },
     {
       key: 'lastModified',
       name: 'Last Modified',
       width: 240,
-      renderValue: (save) => formatTime(save.lastModified ?? 0),
-      sortFunction: numericSorter((val) => val.lastModified ?? 0),
+      renderValue: (save) => (save.lastModified ? formatTime(save.lastModified) : ''),
+      sortFunction: numericSorter((val) => val.lastModified ?? -1),
     },
     {
       key: 'filePath',
