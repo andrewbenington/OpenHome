@@ -38,7 +38,10 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
   const getRecentSaves = useCallback(() => {
     backend.getRecentSaves().then(
       E.match(
-        (err) => displayError('Error Getting Recents', err),
+        (err) => {
+          displayError('Error Getting Recents', err)
+          setRecentSaves({})
+        },
         (recents) => {
           const extraSaveIdentifiers = getEnabledSaveTypes()
             .map(getPluginIdentifier)
