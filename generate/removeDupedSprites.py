@@ -57,7 +57,7 @@ def remove_matching_files(source_folder, target_folder):
         else:
             print(f"Skipped: {target_path} (no match found in source folder)")
 
-source_folder = "./public/sprites/unbound/"
-target_folder = "./public/sprites/rr/"
+source_folder = "./public/sprites/rr/"
+target_folder = "./public/sprites/unbound/"
 
 remove_matching_files(source_folder, target_folder)
