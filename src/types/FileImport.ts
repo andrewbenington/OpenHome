@@ -17,6 +17,7 @@ import {
 import { PKMInterface } from './interfaces'
 import { OHPKM } from './pkm/OHPKM'
 import { PK3RR } from './SAVTypes/radicalred/PK3RR'
+import { PK3UB } from './SAVTypes/unbound/PK3UB'
 import { PKMClass } from './SAVTypes/util'
 
 function fileTypeFromBytes(bytes: Uint8Array): PKMClass | undefined {
@@ -51,6 +52,8 @@ export function fileTypeFromString(type: string): PKMClass | typeof OHPKM | unde
       return PK3
     case 'PK3RR':
       return PK3RR
+    case 'PK3UB':
+      return PK3UB
     case 'COLOPKM':
       return COLOPKM
     case 'XDPKM':

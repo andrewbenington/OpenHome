@@ -289,6 +289,7 @@ export const getMoveMaxPP = (moveIndex: number, format: string, ppUps = 0) => {
     case 'PK8':
     case 'PB8':
     case 'PK3RR':
+    case 'PK3UB':
       baseMaxPP = move.pastGenPP?.G8 ?? move.pp
       break
     case 'PA8':
