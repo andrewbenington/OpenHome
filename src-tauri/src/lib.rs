@@ -59,7 +59,6 @@ pub fn run() {
             commands::commit_transaction,
             commands::find_suggested_saves,
             commands::set_app_theme,
-            commands::validate_recent_saves,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
@@ -117,7 +116,7 @@ fn set_theme_from_settings(app: &App) -> Result<(), String> {
         return Err(format!("Error getting settings: {}", error));
     }
 
-    let settings_json: serde_json::Value = settings_result.unwrap();
+    let settings_json = settings_result.unwrap();
 
     let theme_option: Option<tauri::Theme>;
     if let Some(string_value) = settings_json["appTheme"].as_str() {

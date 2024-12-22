@@ -185,19 +185,3 @@ button > svg {
     rgba(0, 0, 0, 0.3) 0px 3px 12px,
     rgba(0, 0, 0, 0.23) 0px 3px 6px !important;
 }
-
-@media (prefers-color-scheme: light) {
-  .MuiTabPanel-root {
-    ::-webkit-scrollbar-thumb {
-      background-color: #7dceab;
-    }
-  }
-}
-
-.datagrid {
-  border: none;
-}
-
-.datagrid-error-row {
-  background-color: #f004;
-}
