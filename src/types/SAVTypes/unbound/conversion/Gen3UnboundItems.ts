@@ -1,4 +1,5 @@
 const Gen3UnboundItems: Record<string, number> = {
+  None: 0,
   'Master Ball': 1,
   'Ultra Ball': 2,
   'Great Ball': 3,
