@@ -195,7 +195,7 @@ pub fn get_recent_saves(app_handle: tauri::AppHandle) -> Result<HashMap<String, 
     let mut validated_recents: HashMap<String, SaveRef> = HashMap::new();
     for (raw, save) in recent_saves {
         let path = Path::new(&raw);
-        let save_u32 = match save.game {
+        let game_u32 = match save.game {
             None => 0,
             Some(val) => match val {
                 StringOrU32::String(str) => str.parse().unwrap_or(0),
@@ -207,7 +207,7 @@ pub fn get_recent_saves(app_handle: tauri::AppHandle) -> Result<HashMap<String, 
             raw.to_owned(),
             SaveRef {
                 file_path: save.file_path,
-                game: save_u32,
+                game: game_u32,
                 trainer_name: save.trainer_name.unwrap_or_default(),
                 trainer_id: save.trainer_id.unwrap_or_default(),
                 last_opened: save.last_opened,
