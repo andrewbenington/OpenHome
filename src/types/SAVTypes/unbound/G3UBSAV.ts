@@ -22,7 +22,7 @@ export class G3UBSAV extends G3CFRUSAV<PK3UB> implements PluginSAV<PK3UB> {
 
   static saveTypeAbbreviation = 'Unbound'
   static saveTypeName = 'Pokémon Unbound'
-  static saveTypeID = 'G3RRSAV'
+  static saveTypeID = 'G3UBSAV'
 
   supportsMon(dexNumber: number, formeNumber: number) {
     return !isRestricted(UB_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)
