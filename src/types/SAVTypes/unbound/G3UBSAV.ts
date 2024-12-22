@@ -47,7 +47,7 @@ export class G3UBSAV extends G3CFRUSAV<PK3UB> implements PluginSAV<PK3UB> {
     const gameCode = firstSectionBytes[0xac]
 
     return gameCode === 255
-
+  }
 
   gameColor(): string {
     return '#c127fe'
