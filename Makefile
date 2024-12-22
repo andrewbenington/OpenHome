@@ -36,6 +36,8 @@ ifeq ($(shell cargo install --list | grep cargo-edit), )
 	@cargo install cargo-edit --locked
 	@echo "cargo-edit installed"
 endif
+	@jq --arg new_version "$(VERSION)" '.version = "$(VERSION)"' "src-tauri/tauri.conf.json" > version.tmp.json && mv version.tmp.json src-tauri/tauri.conf.json
+	@npx prettier --write src-tauri/tauri.conf.json
 	@cd src-tauri && cargo set-version $(VERSION)
 	@npm version $(VERSION) --no-git-tag-version --allow-same-version
 
