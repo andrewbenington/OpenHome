@@ -48,15 +48,6 @@ export class G3UBSAV extends G3CFRUSAV<PK3UB> implements PluginSAV<PK3UB> {
 
     return gameCode === 255
 
-    // const securityKey = bytesToUint32LittleEndian(firstSectionBytes, FRLG_SECURITY_OFFSET)
-    // const securityKeyCopy = bytesToUint32LittleEndian(firstSectionBytes, FRLG_SECURITY_COPY_OFFSET)
-
-    // console.log('UNBOUND SEC KEY', securityKey, securityKey === 0, securityKey !== securityKeyCopy)
-
-    // // Radical Red seems to have the security key set to 0, which has a 1 in 4.2 billion
-    // // chance to happen in vanilla FireRed (if it can even be 0 at all)
-    // return securityKey === 0 || securityKey !== securityKeyCopy
-  }
 
   gameColor(): string {
     return '#c127fe'
