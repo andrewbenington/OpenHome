@@ -49,6 +49,10 @@ export class PK3UB extends PK3CFRU implements PluginPKMInterface {
   isFakemon(speciesIndex: number): boolean {
     return FAKEMON_INDEXES.includes(speciesIndex)
   }
+
+  getPluginIdentifier(): string {
+    return 'unbound'
+  }
 }
 
 export default PK3UB

@@ -38,7 +38,7 @@ export interface CFRUToNationalDexEntry {
 }
 
 const INTERNAL_ORIGIN_NON_RR = GameOfOrigin.INVALID_6
-const INTERNAL_ORIGIN_FROM_RR = GameOfOrigin.FireRed
+const INTERNAL_ORIGIN_FROM_CFRU = GameOfOrigin.FireRed
 const FIRERED_IN_GAME_TRADE = 255
 
 const CFRU_BALLS: Ball[] = [
@@ -230,7 +230,8 @@ export abstract class PK3CFRU implements PluginPKMInterface {
 
       // OHPKM will not copy this field if the mon was already being tracked before being
       // transferred to Radical Red
-      this.pluginOrigin = this.gameOfOrigin === INTERNAL_ORIGIN_FROM_RR ? 'radical_red' : undefined
+      this.pluginOrigin =
+        this.gameOfOrigin === INTERNAL_ORIGIN_FROM_CFRU ? this.getPluginIdentifier() : undefined
 
       this.canGigantamax = getFlag(dataView, 0x34, 11)
       this.trainerGender = getFlag(dataView, 0x34, 15)
@@ -281,7 +282,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
       const fromRadicalRed = other.pluginOrigin === 'radical_red'
 
       if (fromRadicalRed) {
-        this.gameOfOrigin = INTERNAL_ORIGIN_FROM_RR
+        this.gameOfOrigin = INTERNAL_ORIGIN_FROM_CFRU
         this.internalGameOfOrigin = this.gameOfOrigin
 
         this.metLocationIndex = other.metLocationIndex ?? FIRERED_IN_GAME_TRADE
@@ -522,6 +523,8 @@ export abstract class PK3CFRU implements PluginPKMInterface {
   static allowedBalls() {
     return []
   }
+
+  abstract getPluginIdentifier(): string
 }
 
 export default PK3CFRU

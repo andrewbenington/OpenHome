@@ -51,6 +51,10 @@ export class PK3RR extends PK3CFRU implements PluginPKMInterface {
   isFakemon(speciesIndex: number): boolean {
     return FAKEMON_INDEXES.includes(speciesIndex)
   }
+
+  getPluginIdentifier(): string {
+    return 'radical_red'
+  }
 }
 
 export default PK3RR
