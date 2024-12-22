@@ -113,7 +113,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
   isLocked: boolean = false
   originalBytes?: Uint8Array
 
-  selectColor = '#660000'
+  abstract selectColor: string
 
   constructor(arg: ArrayBuffer | PKMInterface) {
     if (arg instanceof ArrayBuffer) {

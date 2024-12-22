@@ -16,6 +16,8 @@ export class PK3UB extends PK3CFRU implements PluginPKMInterface {
   format: 'PK3UB' = 'PK3UB'
   pluginIdentifier: string = 'unbound'
 
+  selectColor: string = '#c127fe'
+
   static getName() {
     return 'PK3UB'
   }

@@ -18,6 +18,8 @@ export class PK3RR extends PK3CFRU implements PluginPKMInterface {
   format: 'PK3RR' = 'PK3RR'
   pluginIdentifier: string = 'radical_red'
 
+  selectColor = '#660000'
+
   static getName() {
     return 'PK3RR'
   }

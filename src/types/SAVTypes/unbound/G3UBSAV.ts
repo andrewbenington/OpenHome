@@ -65,6 +65,6 @@ export class G3UBSAV extends G3CFRUSAV<PK3UB> implements PluginSAV<PK3UB> {
   }
 
   gameColor(): string {
-    return '#ca5be8'
+    return '#c127fe'
   }
 }
