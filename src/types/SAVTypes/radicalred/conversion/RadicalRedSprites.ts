@@ -1,4 +1,4 @@
-export const RRSprites: Record<string, string> = {
+const _RRSprites: Record<string, string> = {
   '0': 'None.png',
   '1': 'Bulbasaur.png',
   '2': 'Ivysaur.png',
@@ -1331,3 +1331,10 @@ export const RRSprites: Record<string, string> = {
   '1354': 'Walkingwake.png',
   '1355': 'Squawkabilly2.png',
 }
+
+export const RRSprites = Object.fromEntries(
+  Object.entries(_RRSprites).map(([key, value]) => [
+    key,
+    value.replace(/\w+/g, (match) => match.charAt(0).toUpperCase() + match.slice(1).toLowerCase()),
+  ])
+)
