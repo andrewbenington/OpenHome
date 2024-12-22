@@ -9,12 +9,12 @@ import { Errorable } from 'src/types/types'
 import { filterUndefined } from 'src/util/Sort'
 import { BackendContext } from '../backend/backendContext'
 import FilterPanel from '../components/filter/FilterPanel'
+import useDisplayError from '../hooks/displayError'
 import PokemonDetailsPanel from '../pokemon/PokemonDetailsPanel'
 import HomeBoxDisplay from '../saves/boxes/HomeBoxDisplay'
 import OpenSaveDisplay from '../saves/boxes/SaveBoxDisplay'
 import SavesModal from '../saves/SavesModal'
 import { AppInfoContext } from '../state/appInfo'
-import { ErrorContext, ErrorMessageData } from '../state/error'
 import { LookupContext } from '../state/lookup'
 import { OpenSavesContext } from '../state/openSaves'
 import { PKMInterface } from '../types/interfaces'
@@ -32,11 +32,7 @@ const Home = () => {
   const [selectedMon, setSelectedMon] = useState<PKMInterface>()
   const [tab, setTab] = useState('summary')
   const [openSaveDialog, setOpenSaveDialog] = useState(false)
-  const [, dispatchErrorState] = useContext(ErrorContext)
-  const setErrorMessage = useCallback(
-    (payload: ErrorMessageData) => dispatchErrorState({ type: 'set_message', payload }),
-    [dispatchErrorState]
-  )
+  const displayError = useDisplayError()
 
   const previewFile = useCallback(
     async (file: File) => {
@@ -49,19 +45,16 @@ const Home = () => {
         try {
           mon = bytesToPKMInterface(buffer, extension.toUpperCase())
         } catch (e) {
-          setErrorMessage({
-            title: 'Import Error',
-            messages: [`Could not read Pokémon file: ${e}`],
-          })
+          displayError('Import Error', `Could not read Pokémon file: ${e}`)
         }
       }
       if (!mon) {
-        setErrorMessage({ title: 'Import Error', messages: ['Not a valid Pokémon file format'] })
+        displayError('Import Error', 'Not a valid Pokémon file format')
         return
       }
       setSelectedMon(mon)
     },
-    [setErrorMessage]
+    [displayError]
   )
 
   const loadAllLookups = useCallback(async (): Promise<Errorable<Record<string, OHPKM>>> => {
@@ -115,7 +108,7 @@ const Home = () => {
     const result = await backend.startTransaction()
 
     if (E.isLeft(result)) {
-      setErrorMessage({ title: 'Error Starting Save Transaction', messages: [result.left] })
+      displayError('Error Starting Save Transaction', result.left)
       return
     }
 
@@ -166,7 +159,7 @@ const Home = () => {
     const errors = results.filter(E.isLeft).map((err) => err.left)
 
     if (errors.length) {
-      setErrorMessage({ title: 'Error Saving', messages: errors })
+      displayError('Error Saving', errors)
       backend.rollbackTransaction()
       return
     }
@@ -181,7 +174,7 @@ const Home = () => {
       E.match(
         (err) => {
           openSavesDispatch({ type: 'set_error', payload: err })
-          setErrorMessage({ title: 'Error Loading Lookup Data', messages: [err] })
+          displayError('Error Loading Lookup Data', err)
         },
         (homeLookup) => loadAllHomeData(homeLookup)
       )
@@ -195,7 +188,7 @@ const Home = () => {
     lookupState,
     openSavesDispatch,
     openSavesState,
-    setErrorMessage,
+    displayError,
   ])
 
   useEffect(() => {

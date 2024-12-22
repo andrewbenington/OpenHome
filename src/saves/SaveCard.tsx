@@ -1,9 +1,9 @@
 import { Button, Card, Chip, Stack } from '@mui/joy'
 import { GameOfOrigin, isGameBoy } from 'pokemon-resources'
 import { useContext, useMemo, useState } from 'react'
-import { ErrorContext } from 'src/state/error'
 import { SaveRef } from 'src/types/types'
 import { ErrorIcon } from '../components/Icons'
+import useDisplayError from '../hooks/displayError'
 import { AppInfoContext } from '../state/appInfo'
 import { getGameColor, getPluginIdentifier } from '../types/SAVTypes/util'
 import SaveDetailsMenu from './SaveDetailsMenu'
@@ -23,7 +23,7 @@ const standardViewMinSize = 180
 
 export default function SaveCard({ save, onOpen, onRemove, size = 240 }: SaveCardProps) {
   const [expanded, setExpanded] = useState(false)
-  const [, dispatchErrorState] = useContext(ErrorContext)
+  const displayError = useDisplayError()
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
 
   const gbBackground = useMemo(() => (save.game ? isGameBoy(save.game) : false), [save.game])
@@ -149,13 +149,7 @@ export default function SaveCard({ save, onOpen, onRemove, size = 240 }: SaveCar
           <button
             className="save-grid-error-button"
             onClick={() =>
-              dispatchErrorState({
-                type: 'set_message',
-                payload: {
-                  title: 'Invalid Save',
-                  messages: ['File is missing, renamed, or inaccessbile'],
-                },
-              })
+              displayError('Invalid Save', 'File is missing, renamed, or inaccessbile')
             }
             style={{
               filter: 'none',

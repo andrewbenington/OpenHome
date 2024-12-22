@@ -1,4 +1,4 @@
-import { DialogActions, Modal, ModalDialog, Stack, Typography } from '@mui/joy'
+import { Stack } from '@mui/joy'
 import * as E from 'fp-ts/lib/Either'
 import { GameOfOrigin } from 'pokemon-resources'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
@@ -9,8 +9,8 @@ import { filterUndefined, numericSorter } from 'src/util/Sort'
 import { BackendContext } from '../backend/backendContext'
 import { ErrorIcon } from '../components/Icons'
 import OHDataGrid, { SortableColumn } from '../components/OHDataGrid'
+import useDisplayError from '../hooks/displayError'
 import { AppInfoContext } from '../state/appInfo'
-import { ErrorContext } from '../state/error'
 import { OpenSavesContext } from '../state/openSaves'
 import SaveCard from './SaveCard'
 import SaveDetailsMenu from './SaveDetailsMenu'
@@ -28,8 +28,7 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
   const [recentSaves, setRecentSaves] = useState<Record<string, SaveRef>>()
   const [, , openSaves] = useContext(OpenSavesContext)
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
-  const [error, setError] = useState<string>()
-  const [, dispatchErrorState] = useContext(ErrorContext)
+  const displayError = useDisplayError()
 
   const openSavePaths = useMemo(
     () => Object.fromEntries(openSaves.map((save) => [save.filePath.raw, true])),
@@ -39,11 +38,10 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
   const getRecentSaves = useCallback(() => {
     backend.getRecentSaves().then(
       E.match(
-        (err) =>
-          dispatchErrorState({
-            type: 'set_message',
-            payload: { title: 'Error Getting Recents', messages: [err] },
-          }),
+        (err) => {
+          displayError('Error Getting Recents', err)
+          setRecentSaves({})
+        },
         (recents) => {
           const extraSaveIdentifiers = getEnabledSaveTypes()
             .map(getPluginIdentifier)
@@ -59,19 +57,19 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
         }
       )
     )
-  }, [backend, dispatchErrorState, getEnabledSaveTypes])
+  }, [backend, displayError, getEnabledSaveTypes])
 
   const removeRecentSave = useCallback(
     (path: string) =>
       backend.removeRecentSave(path).then(
         E.match(
           async (err) => {
-            setError(err)
+            displayError('Could Not Remove Save', err)
           },
           () => getRecentSaves()
         )
       ),
-    [backend, getRecentSaves]
+    [backend, getRecentSaves, displayError]
   )
 
   const saveTypeFromOrigin = useCallback(
@@ -122,13 +120,7 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
           <button
             className="save-grid-error-button"
             onClick={() =>
-              dispatchErrorState({
-                type: 'set_message',
-                payload: {
-                  title: 'Invalid Save',
-                  messages: ['File is missing, renamed, or inaccessbile'],
-                },
-              })
+              displayError('Invalid Save', 'File is missing, renamed, or inaccessbile')
             }
           >
             <ErrorIcon style={{ width: 20, height: 20 }} />
@@ -206,44 +198,32 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
     },
   ]
 
-  return (
-    <>
-      {view === 'grid' ? (
-        <OHDataGrid
-          rows={Object.values(recentSaves ?? {}).map((save, i) => ({
-            ...save,
-            index: i,
-          }))}
-          columns={columns}
-          defaultSort="lastOpened"
-          defaultSortDir="DESC"
-          rowClass={(row) => (row.valid ? undefined : 'datagrid-error-row')}
-        />
-      ) : (
-        <Stack flexWrap="wrap" direction="row" useFlexGap justifyContent="center" margin={2}>
-          {Object.values(recentSaves ?? {})
-            .sort((a, b) => (b.lastOpened ?? 0) - (a.lastOpened ?? 0))
-            .map((save) => (
-              <SaveCard
-                key={save.filePath.raw}
-                save={save}
-                onOpen={() => {
-                  onOpen(save.filePath)
-                }}
-                onRemove={() => removeRecentSave(save.filePath.raw)}
-                size={cardSize}
-              />
-            ))}
-        </Stack>
-      )}
-      <Modal open={!!error} onClose={() => setError(undefined)}>
-        <ModalDialog>
-          <Typography>{error}</Typography>
-          <DialogActions>
-            <button onClick={() => setError(undefined)}>OK</button>
-          </DialogActions>
-        </ModalDialog>
-      </Modal>
-    </>
+  return view === 'grid' ? (
+    <OHDataGrid
+      rows={Object.values(recentSaves ?? {}).map((save, i) => ({
+        ...save,
+        index: i,
+      }))}
+      columns={columns}
+      defaultSort="lastOpened"
+      defaultSortDir="DESC"
+      rowClass={(row) => (row.valid ? undefined : 'datagrid-error-row')}
+    />
+  ) : (
+    <Stack flexWrap="wrap" direction="row" useFlexGap justifyContent="center" margin={2}>
+      {Object.values(recentSaves ?? {})
+        .sort((a, b) => (b.lastOpened ?? 0) - (a.lastOpened ?? 0))
+        .map((save) => (
+          <SaveCard
+            key={save.filePath.raw}
+            save={save}
+            onOpen={() => {
+              onOpen(save.filePath)
+            }}
+            onRemove={() => removeRecentSave(save.filePath.raw)}
+            size={cardSize}
+          />
+        ))}
+    </Stack>
   )
 }
