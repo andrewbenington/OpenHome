@@ -1,11 +1,12 @@
-import { Button, Card, Chip, Dropdown, Menu, MenuButton, MenuItem, Stack } from '@mui/joy'
+import { Button, Card, Chip, Stack } from '@mui/joy'
 import { GameOfOrigin, isGameBoy } from 'pokemon-resources'
-import { useContext, useEffect, useMemo, useState } from 'react'
+import { useContext, useMemo, useState } from 'react'
 import { SaveRef } from 'src/types/types'
-import { BackendContext } from '../backend/backendContext'
-import { MenuIcon } from '../components/Icons'
+import { ErrorIcon } from '../components/Icons'
+import useDisplayError from '../hooks/displayError'
 import { AppInfoContext } from '../state/appInfo'
 import { getGameColor, getPluginIdentifier } from '../types/SAVTypes/util'
+import SaveDetailsMenu from './SaveDetailsMenu'
 import './style.css'
 import { formatTimeSince, getSaveLogo } from './util'
 
@@ -22,9 +23,8 @@ const standardViewMinSize = 180
 
 export default function SaveCard({ save, onOpen, onRemove, size = 240 }: SaveCardProps) {
   const [expanded, setExpanded] = useState(false)
-  const backend = useContext(BackendContext)
+  const displayError = useDisplayError()
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
-  const [platform, setPlatform] = useState('')
 
   const gbBackground = useMemo(() => (save.game ? isGameBoy(save.game) : false), [save.game])
 
@@ -45,133 +45,121 @@ export default function SaveCard({ save, onOpen, onRemove, size = 240 }: SaveCar
     return getGameColor(saveType, save.game as GameOfOrigin)
   }, [save.game, saveType])
 
-  useEffect(() => {
-    backend.getPlatform().then(setPlatform)
-  }, [backend])
-
   return (
-    <Card
-      className="save-card"
-      sx={{
-        width: size,
-        height: size,
-        backgroundImage: saveType
-          ? `url(${getSaveLogo(saveType, save.game as GameOfOrigin)})`
-          : undefined,
-        backgroundSize: gbBackground ? size : size * 0.9,
-        backgroundRepeat: 'no-repeat',
-        backgroundPosition: 'center',
-        backgroundColor,
-        display: 'flex',
-        flexDirection: 'column',
-        transition: 'background-color 0.2s',
-        padding: 0,
-        cursor: 'pointer',
-        position: 'relative',
-      }}
-      color="neutral"
-      variant="plain"
-      onClick={onOpen}
-    >
-      <Stack direction="row" margin={1} width="calc(100% - 16px)" justifyContent="start">
-        {size >= standardViewMinSize && (
-          <Chip color="secondary" variant="solid" sx={{ zIndex: 1 }}>
-            <b>{save.trainerName}</b>
-          </Chip>
-        )}
-        {size >= expandedViewMinSize && (
-          <Chip variant="soft" color="neutral" sx={{ zIndex: 1 }}>
-            <b>{formatTimeSince(save.lastOpened)}</b>
-          </Chip>
-        )}
+    <div style={{ position: 'relative' }}>
+      <Card
+        className="save-card"
+        sx={{
+          width: size,
+          height: size,
+          backgroundImage: saveType
+            ? `url(${getSaveLogo(saveType, save.game as GameOfOrigin)})`
+            : undefined,
+          backgroundSize: gbBackground ? size : size * 0.9,
+          backgroundRepeat: 'no-repeat',
+          backgroundPosition: 'center',
+          backgroundColor,
+          display: 'flex',
+          flexDirection: 'column',
+          transition: 'background-color 0.2s',
+          padding: 0,
+          cursor: 'pointer',
+          position: 'relative',
+          filter: save.valid ? undefined : 'grayscale(1)',
+        }}
+        color="neutral"
+        variant="plain"
+        onClick={onOpen}
+      >
+        <Stack direction="row" padding="6px" width="calc(100% - 12px)" justifyContent="start">
+          {size >= standardViewMinSize && (
+            <Chip color="secondary" variant="solid" sx={{ zIndex: 1 }}>
+              <b>{save.trainerName}</b>
+            </Chip>
+          )}
+          {save.lastOpened && size >= expandedViewMinSize && (
+            <Chip variant="soft" color="neutral" sx={{ zIndex: 1 }}>
+              <b>{formatTimeSince(save.lastOpened)}</b>
+            </Chip>
+          )}
+          <div style={{ flex: 1 }} />
+          <SaveDetailsMenu
+            save={save}
+            backgroundColor={backgroundColor}
+            onRemove={onRemove}
+            backgroundAlwaysPresent={save.game ? isGameBoy(save.game) : false}
+          />
+        </Stack>
         <div style={{ flex: 1 }} />
-        <Dropdown>
-          <MenuButton
-            className="details-button"
+        {size >= expandedViewMinSize && save.valid ? (
+          <Button
             sx={{
-              padding: 0,
-              height: 28,
-              minHeight: 0,
-              backgroundColor,
-              filter: 'brightness(1.2)',
-              ':hover': { backgroundColor, border: '0.5px solid white' },
-              '& svg': { color: '#ffffff' },
-              zIndex: 1,
-            }}
-            onClick={(e) => {
-              e.stopPropagation()
-            }}
-            variant="soft"
-          >
-            <MenuIcon />
-          </MenuButton>
-          <Menu style={{ zIndex: 3000 }} placement="bottom-end">
-            {onRemove && (
-              <MenuItem
-                onClick={(e) => {
-                  e.stopPropagation()
-                  onRemove()
-                }}
-              >
-                Remove
-              </MenuItem>
-            )}
-            <MenuItem
-              onClick={(e) => {
-                e.stopPropagation()
-                backend.openDirectory(save.filePath.dir)
-              }}
-            >
-              Reveal in {platform === 'macos' ? 'Finder' : 'File Explorer'}
-            </MenuItem>
-          </Menu>
-        </Dropdown>
-      </Stack>
-      <div style={{ flex: 1 }} />
-      {size >= expandedViewMinSize ? (
-        <Button
-          sx={{
-            overflowWrap: 'anywhere',
-            width: 'calc(100% - 16px)',
-            fontSize: 12,
-            maxHeight: expanded ? size / 2 : size / 5,
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            margin: 1,
-            lineHeight: 1.2,
-            transition: 'max-height 0.3s',
-            cursor: 'pointer',
-            textAlign: 'start',
-            display: 'flex',
-            flexDirection: 'column-reverse',
-            padding: '0px 3px 3px',
-            zIndex: 1,
-          }}
-          variant="solid"
-          onClick={(e) => {
-            e.stopPropagation()
-            setExpanded(!expanded)
-          }}
-        >
-          <div
-            style={{
+              overflowWrap: 'anywhere',
+              width: 'calc(100% - 12px)',
+              fontSize: 12,
+              maxHeight: expanded ? size / 2 : size / 5,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              margin: '6px',
+              lineHeight: 1.2,
+              transition: 'max-height 0.3s',
+              cursor: 'pointer',
+              textAlign: 'start',
               display: 'flex',
               flexDirection: 'column-reverse',
-              width: '100%',
-              maxHeight: '100%',
-              overflow: 'hidden',
+              padding: '0px 3px 3px',
+              zIndex: 1,
+            }}
+            variant="solid"
+            onClick={(e) => {
+              e.stopPropagation()
+              setExpanded(!expanded)
             }}
           >
-            {save.filePath.raw}
-          </div>
-        </Button>
-      ) : size < standardViewMinSize ? (
-        <Chip color="secondary" variant="solid" sx={{ margin: '8px', zIndex: 1 }}>
-          <b>{save.trainerName}</b>
-        </Chip>
-      ) : (
-        <div />
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column-reverse',
+                width: '100%',
+                maxHeight: '100%',
+                overflow: 'hidden',
+              }}
+            >
+              {save.filePath.raw}
+            </div>
+          </Button>
+        ) : size < standardViewMinSize ? (
+          <Chip color="secondary" variant="solid" sx={{ margin: '8px', zIndex: 1 }}>
+            <b>{save.trainerName}</b>
+          </Chip>
+        ) : (
+          <div />
+        )}
+      </Card>
+      {!save.valid && (
+        <div
+          style={{
+            width: '100%',
+            position: 'absolute',
+            bottom: 8,
+            display: 'grid',
+            justifyContent: 'center',
+          }}
+        >
+          <button
+            className="save-grid-error-button"
+            onClick={() =>
+              displayError('Invalid Save', 'File is missing, renamed, or inaccessbile')
+            }
+            style={{
+              filter: 'none',
+              alignSelf: 'center',
+            }}
+          >
+            <ErrorIcon style={{ width: 20 }} />
+          </button>
+        </div>
       )}
-    </Card>
+    </div>
   )
 }

@@ -42,13 +42,13 @@ export type marking = boolean | 'blue' | 'red' | null
 
 export interface SaveRef extends Partial<JSONObject> {
   filePath: PathData
-  game?: number
-  trainerName?: string
-  trainerID?: string
-  lastOpened?: number
-  lastModified?: number
-  valid?: boolean
-  pluginIdentifier?: string
+  game: number | null
+  trainerName: string | null
+  trainerID: string | null
+  lastOpened: number | null
+  lastModified: number | null
+  valid: boolean | null
+  pluginIdentifier: string | null
 }
 export type SaveRefMap = { [key: string]: SaveRef }
 

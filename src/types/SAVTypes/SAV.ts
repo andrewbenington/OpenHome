@@ -73,9 +73,11 @@ export function getSaveRef(save: SAV): SaveRef {
   return {
     filePath: save.filePath,
     game: save.origin,
-    trainerName: save.name ? save.name : undefined,
+    trainerName: save.name ? save.name : null,
     trainerID: save.displayID,
-    lastOpened: Date.now(),
-    pluginIdentifier: save.getPluginIdentifier(),
+    lastOpened: null,
+    lastModified: null,
+    pluginIdentifier: save.getPluginIdentifier() ?? null,
+    valid: true,
   }
 }
