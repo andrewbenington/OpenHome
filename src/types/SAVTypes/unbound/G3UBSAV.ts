@@ -7,12 +7,6 @@ import PK3UB from './PK3UB'
 
 const UB_TRANSFER_RESTRICTIONS: TransferRestrictions = {
   maxDexNum: NationalDex.Enamorus,
-  // excludedForms: {
-  // ...CapPikachus,
-  // [NationalDex.Pichu]: [SPIKY_EAR],
-  // [NationalDex.Dialga]: [ORIGIN],
-  // [NationalDex.Palkia]: [ORIGIN],
-  // },
 }
 
 export class G3UBSAV extends G3CFRUSAV<PK3UB> implements PluginSAV<PK3UB> {
