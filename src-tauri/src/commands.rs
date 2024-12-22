@@ -10,7 +10,10 @@ use tauri::Manager;
 
 use crate::saves;
 use crate::state::{AppState, AppStateSnapshot};
-use crate::util;
+use crate::util::{
+    self, create_openhome_directory, download_images_from_github_folder,
+    prepend_appdata_storage_to_path,
+};
 
 #[tauri::command]
 pub fn get_state(state: tauri::State<'_, AppState>) -> AppStateSnapshot {
@@ -257,4 +260,47 @@ pub fn validate_recent_saves(
     app_handle: tauri::AppHandle,
 ) -> Result<HashMap<String, saves::SaveRef>, String> {
     return saves::get_recent_saves(app_handle);
+}
+
+#[tauri::command]
+pub fn download_sprite_pack(
+    app_handle: tauri::AppHandle,
+    github_folder_url: String,
+    target_folder: String,
+) -> Result<(), String> {
+    create_openhome_directory(&app_handle)?;
+
+    let sprites_dir = prepend_appdata_storage_to_path(&app_handle, &PathBuf::from("sprites"))?;
+    fs::create_dir_all(&sprites_dir)
+        .map_err(|e| format!("Failed to create sprites directory: {}", e))?;
+
+    let target_path = sprites_dir.join(&target_folder);
+
+    let save_dir = target_path
+        .to_str()
+        .ok_or_else(|| "Couldn't convert the target path to a string".to_owned())?;
+
+    println!("{}", save_dir);
+
+    download_images_from_github_folder(&github_folder_url, save_dir)
+        .map_err(|e| format!("Failed to download images: {}", e))?;
+
+    println!("Images downloaded to: {}", save_dir);
+    Ok(())
+}
+
+#[tauri::command]
+pub fn delete_sprite_pack(app_handle: tauri::AppHandle, folder_name: String) -> Result<(), String> {
+    let sprites_dir = prepend_appdata_storage_to_path(&app_handle, &PathBuf::from("sprites"))?;
+    let folder_path = sprites_dir.join(&folder_name);
+
+    // Make sure folder exists
+    if !folder_path.exists() {
+        return Err(format!("Folder does not exist: {}", folder_path.display()));
+    }
+
+    fs::remove_dir_all(&folder_path).map_err(|e| format!("Failed to delete folder: {}", e))?;
+
+    println!("Deleted folder: {}", folder_path.display());
+    Ok(())
 }

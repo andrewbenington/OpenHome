@@ -1,6 +1,13 @@
+use reqwest::blocking::Client;
+use reqwest::Url;
 use serde;
+use std::fs;
 use std::fs::{create_dir_all, File};
-use std::{collections::HashSet, io::Read, path::PathBuf};
+use std::{
+    collections::HashSet,
+    io::{Read, Write},
+    path::PathBuf,
+};
 use tauri::Manager;
 
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
@@ -108,5 +115,52 @@ pub fn create_openhome_directory(app_handle: &tauri::AppHandle) -> Result<(), St
     full_path.push("storage".to_owned());
 
     create_dir_all(full_path).map_err(|e| e.to_string())?;
+    Ok(())
+}
+
+pub fn download_images_from_github_folder(
+    folder_url: &str,
+    save_dir: &str,
+) -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new();
+
+    let response = client
+        .get(folder_url)
+        .header("User-Agent", "OpenHome")
+        .send()?
+        .text()?;
+
+    let files: serde_json::Value = serde_json::from_str(&response)?;
+    let file_urls: Vec<&str> = files
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter_map(|file| {
+            if let Some(file_name) = file.get("name") {
+                // makes sure non image don't sneak in and are downloaded
+                if file_name.as_str()?.ends_with(".png") {
+                    return file.get("download_url")?.as_str();
+                }
+            }
+            None
+        })
+        .collect();
+
+    fs::create_dir_all(save_dir)?;
+
+    for url in file_urls {
+        let parsed_url = Url::parse(url)?;
+        let image_name = parsed_url
+            .path_segments()
+            .and_then(|segments| segments.last())
+            .unwrap();
+
+        let response = client.get(url).send()?;
+        let mut file = fs::File::create(format!("{}/{}", save_dir, image_name))?;
+        file.write_all(&response.bytes()?)?;
+        println!("Downloaded: {}", image_name);
+    }
+
+    println!("All images downloaded successfully!");
     Ok(())
 }

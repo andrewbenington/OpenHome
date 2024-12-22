@@ -60,6 +60,8 @@ pub fn run() {
             commands::find_suggested_saves,
             commands::set_app_theme,
             commands::validate_recent_saves,
+            commands::download_sprite_pack,
+            commands::delete_sprite_pack,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
