@@ -137,6 +137,7 @@ export const TauriInvoker = {
   },
 
   downloadSpritePack(targetSpritePack: string): Promise<Errorable<null>> {
+    // TODO: For zips this url will be https://raw.githubusercontent.com/repos/andrewbenington/OpenHomeZIPS/${targetSpritePack}.zip
     const githubFolderUrl: String = `https://api.github.com/repos/andrewbenington/OpenHome/contents/public/sprites/${targetSpritePack}`
     const promise: Promise<null> = invoke('download_sprite_pack', {
       githubFolderUrl,

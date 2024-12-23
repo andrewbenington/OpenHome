@@ -11,7 +11,7 @@ use tauri::Manager;
 use crate::saves;
 use crate::state::{AppState, AppStateSnapshot};
 use crate::util::{
-    self, create_openhome_directory, download_images_from_github_folder,
+    self, create_openhome_directory, download_and_unpack_zip, download_images_from_github_folder,
     prepend_appdata_storage_to_path,
 };
 
@@ -282,7 +282,7 @@ pub fn download_sprite_pack(
 
     println!("{}", save_dir);
 
-    download_images_from_github_folder(&github_folder_url, save_dir)
+    download_and_unpack_zip(&github_folder_url, save_dir)
         .map_err(|e| format!("Failed to download images: {}", e))?;
 
     println!("Images downloaded to: {}", save_dir);

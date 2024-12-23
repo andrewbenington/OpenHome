@@ -5,10 +5,11 @@ use std::fs;
 use std::fs::{create_dir_all, File};
 use std::{
     collections::HashSet,
-    io::{Read, Write},
-    path::PathBuf,
+    io::{self, Read, Write},
+    path::{Path, PathBuf},
 };
 use tauri::Manager;
+use zip::ZipArchive;
 
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
 pub struct PathData {
@@ -154,5 +155,49 @@ pub fn download_images_from_github_folder(
     }
 
     println!("All images downloaded successfully!");
+    Ok(())
+}
+
+pub fn download_and_unpack_zip(
+    zip_url: &str,
+    save_dir: &str,
+) -> Result<(), Box<dyn std::error::Error>> {
+    println!("Downloading zip file from: {}", zip_url);
+    let response = Client::new()
+        .get(zip_url)
+        .header("User-Agent", "OpenHome")
+        .send()?
+        .bytes()?;
+
+    let zip_path = format!("{}/temp_sprites.zip", save_dir);
+    fs::create_dir_all(save_dir)?;
+    let mut zip_file = File::create(&zip_path)?;
+    zip_file.write_all(&response)?;
+
+    println!("Zip saved to: {}. Unzipping now...", zip_path);
+
+    let zip_file = File::open(&zip_path)?;
+    let mut zip_archive = ZipArchive::new(zip_file)?;
+
+    for i in 0..zip_archive.len() {
+        let mut file = zip_archive.by_index(i)?;
+        let out_path = Path::new(save_dir).join(file.name());
+
+        if file.is_dir() {
+            fs::create_dir_all(&out_path)?;
+        } else {
+            if let Some(parent) = out_path.parent() {
+                fs::create_dir_all(parent)?;
+            }
+            let mut out_file = File::create(&out_path)?;
+            io::copy(&mut file, &mut out_file)?;
+        }
+        println!("Extracted: {}", out_path.display());
+    }
+
+    fs::remove_file(zip_path)?;
+
+    println!("Expanded into {}", save_dir);
+
     Ok(())
 }
