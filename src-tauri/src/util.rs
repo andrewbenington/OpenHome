@@ -131,20 +131,12 @@ pub fn download_images_from_github_folder(
         .text()?;
 
     let files: serde_json::Value = serde_json::from_str(&response)?;
-    let file_urls: Vec<&str> = files
+    let file_urls = files
         .as_array()
         .unwrap()
         .iter()
-        .filter_map(|file| {
-            if let Some(file_name) = file.get("name") {
-                // makes sure non image don't sneak in and are downloaded
-                if file_name.as_str()?.ends_with(".png") {
-                    return file.get("download_url")?.as_str();
-                }
-            }
-            None
-        })
-        .collect();
+        .filter_map(|file| file.get("download_url")?.as_str())
+        .filter(|url| url.ends_with(".png"));
 
     fs::create_dir_all(save_dir)?;
 
