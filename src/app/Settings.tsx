@@ -15,20 +15,22 @@ export default function Settings() {
   }, [appInfoState.settings, backend])
 
   const handleDownload = async () => {
-    setFeedback("Downloading sprite pack...")
+    setFeedback('Downloading sprite pack...')
     const result = await backend.downloadSpritePack('gen1')
+
     if (result._tag === 'Right') {
-      setFeedback("Sprite pack downloaded successfully!")
+      setFeedback('Sprite pack downloaded successfully!')
     } else {
       setFeedback(`Error downloading sprite pack: ${result.left}`)
     }
   }
 
   const handleDelete = async () => {
-    setFeedback("Deleting sprite pack...")
+    setFeedback('Deleting sprite pack...')
     const result = await backend.deleteSpritePack('gen1')
+
     if (result._tag === 'Right') {
-      setFeedback("Sprite pack deleted successfully!")
+      setFeedback('Sprite pack deleted successfully!')
     } else {
       setFeedback(`Error deleting sprite pack: ${result.left}`)
     }
