@@ -135,4 +135,19 @@ export const TauriInvoker = {
 
     return promise.then(E.right).catch(E.left)
   },
+
+  downloadSpritePack(githubFolderUrl: string, targetFolder: string): Promise<Errorable<null>> {
+    const promise: Promise<null> = invoke('download_sprite_pack', {
+      githubFolderUrl,
+      targetFolder,
+    });
+
+    return promise.then(E.right).catch(E.left);
+  },
+
+  deleteSpritePack(folderName: string): Promise<Errorable<null>> {
+    const promise: Promise<null> = invoke('delete_sprite_pack', { folderName });
+
+    return promise.then(E.right).catch(E.left);
+  },
 }
