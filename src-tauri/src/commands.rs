@@ -266,7 +266,7 @@ pub fn validate_recent_saves(
 pub fn download_sprite_pack(
     app_handle: tauri::AppHandle,
     github_folder_url: String,
-    target_folder: String,
+    target_sprite_pack: String,
 ) -> Result<(), String> {
     create_openhome_directory(&app_handle)?;
 
@@ -274,7 +274,7 @@ pub fn download_sprite_pack(
     fs::create_dir_all(&sprites_dir)
         .map_err(|e| format!("Failed to create sprites directory: {}", e))?;
 
-    let target_path = sprites_dir.join(&target_folder);
+    let target_path = sprites_dir.join(&target_sprite_pack);
 
     let save_dir = target_path
         .to_str()
@@ -290,9 +290,12 @@ pub fn download_sprite_pack(
 }
 
 #[tauri::command]
-pub fn delete_sprite_pack(app_handle: tauri::AppHandle, folder_name: String) -> Result<(), String> {
+pub fn delete_sprite_pack(
+    app_handle: tauri::AppHandle,
+    target_sprite_pack: String,
+) -> Result<(), String> {
     let sprites_dir = prepend_appdata_storage_to_path(&app_handle, &PathBuf::from("sprites"))?;
-    let folder_path = sprites_dir.join(&folder_name);
+    let folder_path = sprites_dir.join(&target_sprite_pack);
 
     // Make sure folder exists
     if !folder_path.exists() {

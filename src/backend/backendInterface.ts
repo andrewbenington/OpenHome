@@ -55,6 +55,10 @@ export default interface BackendInterface {
   getSettings: () => Promise<Errorable<Settings>>
   updateSettings: (settings: Settings) => Promise<Errorable<null>>
   setTheme(appTheme: 'light' | 'dark' | 'system'): Promise<Errorable<null>>
+
+  /* sprite packs */
+  downloadSpritePack: (targetSpritePack: string) => Promise<Errorable<null>>
+  deleteSpritePack: (targetSpritePack: string) => Promise<Errorable<null>>
 }
 
 export interface BackendListeners {

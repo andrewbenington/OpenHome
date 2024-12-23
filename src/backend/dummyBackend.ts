@@ -29,6 +29,7 @@ const DummyBackend: BackendInterface = {
   getSaveFolders: async () => E.left('no backend in use'),
   removeSaveFolder: async () => E.left('no backend in use'),
   upsertSaveFolder: async () => E.left('no backend in use'),
+
   /* transactions */
   startTransaction: async () => E.left('no backend in use'),
   commitTransaction: async () => E.left('no backend in use'),
@@ -45,6 +46,9 @@ const DummyBackend: BackendInterface = {
   getSettings: async () => E.left('no backend in use'),
   updateSettings: async () => E.left('no backend in use'),
   setTheme: async () => E.left('no backend in use'),
+
+  downloadSpritePack: async () => E.left('no backend in use'),
+  deleteSpritePack: async () => E.left('no backend in use'),
 }
 
 export default DummyBackend

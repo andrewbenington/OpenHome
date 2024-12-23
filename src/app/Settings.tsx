@@ -1,5 +1,5 @@
 import { Button, Card, ToggleButtonGroup } from '@mui/joy'
-import { useContext, useEffect } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { BackendContext } from '../backend/backendContext'
 import { AppInfoContext } from '../state/appInfo'
 
@@ -7,9 +7,32 @@ export default function Settings() {
   const [appInfoState, dispatchAppInfoState] = useContext(AppInfoContext)
   const backend = useContext(BackendContext)
 
+  // Feedback
+  const [feedback, setFeedback] = useState<string | null>(null)
+
   useEffect(() => {
     backend.updateSettings(appInfoState.settings).catch(console.error)
   }, [appInfoState.settings, backend])
+
+  const handleDownload = async () => {
+    setFeedback("Downloading sprite pack...")
+    const result = await backend.downloadSpritePack('gen1')
+    if (result._tag === 'Right') {
+      setFeedback("Sprite pack downloaded successfully!")
+    } else {
+      setFeedback(`Error downloading sprite pack: ${result.left}`)
+    }
+  }
+
+  const handleDelete = async () => {
+    setFeedback("Deleting sprite pack...")
+    const result = await backend.deleteSpritePack('gen1')
+    if (result._tag === 'Right') {
+      setFeedback("Sprite pack deleted successfully!")
+    } else {
+      setFeedback(`Error deleting sprite pack: ${result.left}`)
+    }
+  }
 
   return (
     <div>
@@ -54,6 +77,17 @@ export default function Settings() {
             Dark
           </Button>
         </ToggleButtonGroup>
+
+        <div style={{ marginTop: '16px' }}>
+          <Button onClick={handleDownload} color="success" sx={{ marginRight: '8px' }}>
+            Download Sprite Pack
+          </Button>
+          <Button onClick={handleDelete} color="danger">
+            Delete Sprite Pack
+          </Button>
+        </div>
+
+        {feedback && <p style={{ marginTop: '16px' }}>{feedback}</p>}
       </Card>
     </div>
   )

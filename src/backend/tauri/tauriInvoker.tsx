@@ -136,17 +136,20 @@ export const TauriInvoker = {
     return promise.then(E.right).catch(E.left)
   },
 
-  downloadSpritePack(githubFolderUrl: string, targetFolder: string): Promise<Errorable<null>> {
+  downloadSpritePack(targetSpritePack: string): Promise<Errorable<null>> {
+    const githubFolderUrl: String = `https://api.github.com/repos/andrewbenington/OpenHome/contents/public/sprites/${targetSpritePack}`
     const promise: Promise<null> = invoke('download_sprite_pack', {
       githubFolderUrl,
-      targetFolder,
+      targetSpritePack,
     });
+    console.log(promise)
+
 
     return promise.then(E.right).catch(E.left);
   },
 
-  deleteSpritePack(folderName: string): Promise<Errorable<null>> {
-    const promise: Promise<null> = invoke('delete_sprite_pack', { folderName });
+  deleteSpritePack(targetSpritePack: string): Promise<Errorable<null>> {
+    const promise: Promise<null> = invoke('delete_sprite_pack', { targetSpritePack });
 
     return promise.then(E.right).catch(E.left);
   },

@@ -33,6 +33,15 @@ async function pathDataFromRaw(raw: string): Promise<PathData> {
 type OnDropEvent = Event<{ position: { x: number; y: number }; paths: string[] }>
 
 export const TauriBackend: BackendInterface = {
+  // TODO: move to bottom of file
+  downloadSpritePack: function (targetSpritePack: string): Promise<Errorable<null>> {
+    return TauriInvoker.downloadSpritePack(targetSpritePack) as Promise<Errorable<null>>
+  },
+
+  deleteSpritePack: function (targetSpritePack: string): Promise<Errorable<null>> {
+    return TauriInvoker.deleteSpritePack(targetSpritePack) as Promise<Errorable<null>>
+  },
+
   /* past gen identifier lookups */
   loadGen12Lookup: function (): Promise<Errorable<LookupMap>> {
     return TauriInvoker.getStorageFileJSON('gen12_lookup.json') as Promise<Errorable<LookupMap>>
