@@ -73,3 +73,13 @@ export const getGameLogo = (
 export const getOriginMark = (originMark: string) => {
   return `origin_marks/${originMark}.png`
 }
+
+export const getRelevantGameLogos = (saveTypeName: string): string[] => {
+  const gameNames = saveTypeName.split('/').map((name) => name.trim())
+  const logos = gameNames.map((gameName) => {
+    const logoKey = gameName.replace(' ', '')
+    return GameLogos[logoKey] ?? null
+  })
+  console.log(logos.filter((logo): logo is string => logo !== null))
+  return logos.filter((logo): logo is string => logo !== null)
+}

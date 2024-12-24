@@ -36,6 +36,23 @@ export const defaultSettings: Settings = {
   saveCardSize: 180,
   saveViewMode: 'card',
   appTheme: 'system',
+  spritePacksDownloaded: Object.fromEntries(
+    [
+      G1SAV,
+      G2SAV,
+      G3SAV,
+      DPSAV,
+      PtSAV,
+      HGSSSAV,
+      BWSAV,
+      BW2SAV,
+      XYSAV,
+      ORASSAV,
+      SMSAV,
+      USUMSAV,
+      G3RRSAV,
+    ].map((savetype) => [savetype.saveTypeID, true])
+  ),
 }
 
 export type Settings = {
@@ -43,6 +60,7 @@ export type Settings = {
   saveCardSize: number
   saveViewMode: SaveViewMode
   appTheme: 'light' | 'dark' | 'system'
+  spritePacksDownloaded: Record<string, boolean>
 }
 
 export type AppInfoState = {
@@ -80,6 +98,13 @@ export type AppInfoAction =
   | {
       type: 'set_app_theme'
       payload: 'light' | 'dark' | 'system'
+    }
+  | {
+      type: 'set_sprite_pack_downloaded'
+      payload: {
+        saveType: SAVClass
+        downloaded: boolean
+      }
     }
 
 export const appInfoReducer: Reducer<AppInfoState, AppInfoAction> = (
@@ -134,6 +159,19 @@ export const appInfoReducer: Reducer<AppInfoState, AppInfoAction> = (
     }
     case 'set_app_theme': {
       return { ...state, settings: { ...state.settings, appTheme: payload }, settingsLoaded: true }
+    }
+    case 'set_sprite_pack_downloaded': {
+      const downloaded = state.settings.spritePacksDownloaded
+
+      if (payload.downloaded) {
+        downloaded[payload.saveType.saveTypeID] = true
+      } else {
+        downloaded[payload.saveType.saveTypeID] = false
+      }
+      return {
+        ...state,
+        settings: { ...state.settings, spritePacksDownloaded: downloaded },
+      }
     }
   }
 }

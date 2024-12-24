@@ -1,10 +1,8 @@
 use reqwest::blocking::Client;
-use reqwest::Url;
 use serde;
-use std::fs;
-use std::fs::{create_dir_all, File};
 use std::{
     collections::HashSet,
+    fs::{self, create_dir_all, File},
     io::{self, Read, Write},
     path::{Path, PathBuf},
 };
@@ -119,44 +117,44 @@ pub fn create_openhome_directory(app_handle: &tauri::AppHandle) -> Result<(), St
     Ok(())
 }
 
-pub fn download_images_from_github_folder(
-    folder_url: &str,
-    save_dir: &str,
-) -> Result<(), Box<dyn std::error::Error>> {
-    let client = Client::new();
+// pub fn download_images_from_github_folder(
+//     folder_url: &str,
+//     save_dir: &str,
+// ) -> Result<(), Box<dyn std::error::Error>> {
+//     let client = Client::new();
 
-    let response = client
-        .get(folder_url)
-        .header("User-Agent", "OpenHome")
-        .send()?
-        .text()?;
+//     let response = client
+//         .get(folder_url)
+//         .header("User-Agent", "OpenHome")
+//         .send()?
+//         .text()?;
 
-    let files: serde_json::Value = serde_json::from_str(&response)?;
-    let file_urls = files
-        .as_array()
-        .unwrap()
-        .iter()
-        .filter_map(|file| file.get("download_url")?.as_str())
-        .filter(|url| url.ends_with(".png"));
+//     let files: serde_json::Value = serde_json::from_str(&response)?;
+//     let file_urls = files
+//         .as_array()
+//         .unwrap()
+//         .iter()
+//         .filter_map(|file| file.get("download_url")?.as_str())
+//         .filter(|url| url.ends_with(".png"));
 
-    fs::create_dir_all(save_dir)?;
+//     fs::create_dir_all(save_dir)?;
 
-    for url in file_urls {
-        let parsed_url = Url::parse(url)?;
-        let image_name = parsed_url
-            .path_segments()
-            .and_then(|segments| segments.last())
-            .unwrap();
+//     for url in file_urls {
+//         let parsed_url = Url::parse(url)?;
+//         let image_name = parsed_url
+//             .path_segments()
+//             .and_then(|segments| segments.last())
+//             .unwrap();
 
-        let response = client.get(url).send()?;
-        let mut file = fs::File::create(format!("{}/{}", save_dir, image_name))?;
-        file.write_all(&response.bytes()?)?;
-        println!("Downloaded: {}", image_name);
-    }
+//         let response = client.get(url).send()?;
+//         let mut file = fs::File::create(format!("{}/{}", save_dir, image_name))?;
+//         file.write_all(&response.bytes()?)?;
+//         println!("Downloaded: {}", image_name);
+//     }
 
-    println!("All images downloaded successfully!");
-    Ok(())
-}
+//     println!("All images downloaded successfully!");
+//     Ok(())
+// }
 
 pub fn download_and_unpack_zip(
     zip_url: &str,

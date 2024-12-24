@@ -11,7 +11,8 @@ use tauri::Manager;
 use crate::saves;
 use crate::state::{AppState, AppStateSnapshot};
 use crate::util::{
-    self, create_openhome_directory, download_and_unpack_zip, download_images_from_github_folder,
+    self, create_openhome_directory,
+    download_and_unpack_zip, /*download_images_from_github_folder,*/
     prepend_appdata_storage_to_path,
 };
 
