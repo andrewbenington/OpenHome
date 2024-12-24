@@ -142,11 +142,6 @@ pub fn recursively_find_citra_saves(path: &PathBuf, depth: usize) -> Result<Vec<
             let entry = entry.map_err(|e| e.to_string())?;
             let entry_path = entry.path();
 
-            // println!(
-            //     "entry_path citra: {}",
-            //     entry_path.to_str().unwrap_or("(no path)")
-            // );
-
             if entry_path.is_dir() {
                 found_saves.extend(recursively_find_citra_saves(&entry_path, depth + 1)?);
             } else if entry_path.ends_with("main") {
@@ -173,10 +168,17 @@ pub struct SaveRef {
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
+#[serde(untagged)]
+pub enum StringOrU32 {
+    String(String),
+    U32(u32),
+}
+
+#[derive(serde::Serialize, serde::Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct StoredSaveRef {
     pub file_path: PathData,
-    pub game: Option<u32>,
+    pub game: Option<StringOrU32>,
     pub trainer_name: Option<String>,
     #[serde(rename = "trainerID")]
     pub trainer_id: Option<String>,
@@ -193,11 +195,19 @@ pub fn get_recent_saves(app_handle: tauri::AppHandle) -> Result<HashMap<String, 
     let mut validated_recents: HashMap<String, SaveRef> = HashMap::new();
     for (raw, save) in recent_saves {
         let path = Path::new(&raw);
+        let game_u32 = match save.game {
+            None => 0,
+            Some(val) => match val {
+                StringOrU32::String(str) => str.parse().unwrap_or(0),
+                StringOrU32::U32(num) => num,
+            },
+        };
+
         validated_recents.insert(
             raw.to_owned(),
             SaveRef {
                 file_path: save.file_path,
-                game: save.game.unwrap_or(0),
+                game: game_u32,
                 trainer_name: save.trainer_name.unwrap_or_default(),
                 trainer_id: save.trainer_id.unwrap_or_default(),
                 last_opened: save.last_opened,
