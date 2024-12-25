@@ -1,8 +1,7 @@
 import { Chip, CircularProgress, Switch } from '@mui/joy'
 import * as E from 'fp-ts/lib/Either'
-import { useContext, useEffect, useMemo, useState } from 'react'
+import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { BackendContext } from 'src/backend/backendContext'
-import { DevDataDisplay } from 'src/components/DevDataDisplay'
 import useDisplayError from 'src/hooks/displayError'
 import useIsDev from 'src/hooks/isDev'
 import { PluginContext } from 'src/state/plugin'
@@ -14,11 +13,10 @@ const LOCAL_REPO = 'http://127.0.0.1:5500'
 
 export default function PluginsPage() {
   const displayError = useDisplayError()
-  const [pluginState] = useContext(PluginContext)
   const [installedPlugins, setInstalledPlugins] = useState<PluginMetadataWithIcon[]>()
   const [availablePlugins, setAvailablePlugins] = useState<Record<string, string>>()
   const [loading, setLoading] = useState(false)
-  const [useDevRepo, setUseDevRepo] = useState(false)
+  const [useDevRepo, setUseDevRepo] = useState(true)
   const backend = useContext(BackendContext)
   const isDev = useIsDev()
 
@@ -44,52 +42,72 @@ export default function PluginsPage() {
       .finally(() => setLoading(false))
   }, [displayError, useDevRepo])
 
+  const loadInstalled = useCallback(
+    async () =>
+      backend.listInstalledPlugins().then(
+        E.match(
+          (err) => displayError('Error Getting Installed Plugins', err),
+          (plugins) => setInstalledPlugins(plugins)
+        )
+      ),
+    [backend, displayError]
+  )
+
   useEffect(() => {
-    backend.listInstalledPlugins().then(
-      E.match(
-        (err) => displayError('Error Getting Installed Plugins', err),
-        (plugins) => setInstalledPlugins(plugins)
-      )
-    )
-  }, [backend, displayError, useDevRepo])
+    loadInstalled()
+  }, [loadInstalled])
 
   return loading ? (
     <CircularProgress />
   ) : (
     <div style={{ padding: '0px 32px' }}>
       {isDev && (
-        <div>
-          <label style={{ display: 'flex', flexDirection: 'row' }}>
-            Use Local Repo
-            <Switch
-              checked={useDevRepo}
-              onChange={(e) => {
-                setAvailablePlugins({})
-                setUseDevRepo(e.target.checked)
-              }}
-            />
-          </label>
-
-          <DevDataDisplay data={availablePlugins} label="Available" />
-          <DevDataDisplay data={pluginState} label="State" />
-        </div>
+        <label style={{ display: 'flex', flexDirection: 'row' }}>
+          Use Local Repo
+          <Switch
+            checked={useDevRepo}
+            onChange={(e) => {
+              setAvailablePlugins({})
+              setUseDevRepo(e.target.checked)
+            }}
+          />
+        </label>
       )}
       <h2>Installed Plugins</h2>
-      {installedPlugins &&
-        Object.entries(installedPlugins).map(([, metadata]) => (
-          <InstalledPluginCard key={metadata.id} metadata={metadata} />
-        ))}
+      <div style={{ gap: 8, display: 'flex', flexWrap: 'wrap' }}>
+        {installedPlugins &&
+          Object.entries(installedPlugins).map(([, metadata]) => (
+            <InstalledPluginCard key={metadata.id} metadata={metadata} />
+          ))}
+      </div>
       <h2>Add Plugins</h2>
-      {availablePlugins &&
-        Object.entries(availablePlugins).map(([name, location]) => (
-          <AvailablePluginCard key={name} name={name} location={location} useDevRepo={useDevRepo} />
-        ))}
+      <div style={{ gap: 8, display: 'flex', flexWrap: 'wrap' }}>
+        {availablePlugins &&
+          Object.entries(availablePlugins).map(([name, location]) => (
+            <AvailablePluginCard
+              key={name}
+              name={name}
+              location={location}
+              useDevRepo={useDevRepo}
+              reloadInstalled={loadInstalled}
+              installed={installedPlugins?.some((plugin) => plugin.name === name) ?? false}
+            />
+          ))}
+      </div>
     </div>
   )
 }
 
-function AvailablePluginCard(props: { name: string; location: string; useDevRepo?: boolean }) {
-  const { name, location, useDevRepo } = props
+type AvailablePluginCardProps = {
+  name: string
+  location: string
+  useDevRepo?: boolean
+  reloadInstalled: () => void
+  installed: boolean
+}
+
+function AvailablePluginCard(props: AvailablePluginCardProps) {
+  const { name, location, useDevRepo, reloadInstalled, installed } = props
   const [metadata, setMetadata] = useState<PluginMetadata>()
   const [isError, setIsError] = useState(false)
   const displayError = useDisplayError()
@@ -120,7 +138,15 @@ function AvailablePluginCard(props: { name: string; location: string; useDevRepo
 
   return (
     <button
-      style={{ width: 180, height: 180, padding: '0px 8px' }}
+      style={{
+        width: 200,
+        height: 200,
+        padding: '0px',
+        backdropFilter: installed ? 'greyscale(1)' : undefined,
+        cursor: installed ? 'default' : 'pointer',
+        position: 'relative',
+      }}
+      disabled={installed}
       onClick={() => {
         backend
           .downloadPlugin(location)
@@ -132,6 +158,7 @@ function AvailablePluginCard(props: { name: string; location: string; useDevRepo
               (code) => {
                 try {
                   dispatchPlugins({ type: 'register_plugin', payload: loadPlugin(code) })
+                  reloadInstalled()
                 } catch (e) {
                   displayError('Error Installing Plugin', [name, `${e}`])
                 }
@@ -144,8 +171,19 @@ function AvailablePluginCard(props: { name: string; location: string; useDevRepo
           })
       }}
     >
-      <img src={`${location}/${metadata?.icon}`} style={{ imageRendering: 'pixelated' }} />
-      <div>{name}</div>
+      {installed && (
+        <Chip style={{ position: 'absolute', top: 4, right: 4 }} color="success" variant="solid">
+          Installed
+        </Chip>
+      )}
+      <img
+        src={`${location}/${metadata?.icon}`}
+        style={{
+          height: 150,
+          imageRendering: 'pixelated',
+        }}
+      />
+      <Chip style={{ width: '100%' }}>{name}</Chip>
     </button>
   )
 }
@@ -162,7 +200,7 @@ function InstalledPluginCard(props: { metadata: PluginMetadataWithIcon }) {
 
   return (
     <button
-      style={{ width: 180, height: 180, padding: '0px 8px', position: 'relative' }}
+      style={{ width: 200, height: 200, position: 'relative' }}
       onClick={() => {
         if (enabled) {
           dispatchPluginState({ type: 'disable_plugin', payload: metadata.id })
@@ -193,10 +231,10 @@ function InstalledPluginCard(props: { metadata: PluginMetadataWithIcon }) {
       {metadata.icon_image && (
         <img
           src={`data:image/${metadata.icon_image.extension};base64,${metadata.icon_image.base64}`}
-          style={{ imageRendering: 'pixelated' }}
+          style={{ imageRendering: 'pixelated', height: 150 }}
         />
       )}
-      <div>{metadata.name}</div>
+      <Chip style={{ width: '100%' }}>{metadata.name}</Chip>
     </button>
   )
 }
