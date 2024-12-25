@@ -1,8 +1,9 @@
 import { invoke } from '@tauri-apps/api/core'
 import * as E from 'fp-ts/lib/Either'
 import { Errorable, JSONArray, JSONObject, JSONValue, SaveRef } from 'src/types/types'
+import { PluginMetadataWithIcon } from 'src/util/Plugin'
 import { PossibleSaves } from '../../types/SAVTypes/path'
-import { AppState } from '../backendInterface'
+import { AppState, ImageResponse } from '../backendInterface'
 import { RustResult } from './types'
 
 function rustResultToEither<T, E>(result: RustResult<T, E>): E.Either<E, T> {
@@ -136,18 +137,26 @@ export const TauriInvoker = {
     return promise.then(E.right).catch(E.left)
   },
 
-  downloadSpritePack(targetSpritePack: string): Promise<Errorable<null>> {
-    const githubFolderUrl: String = `https://api.github.com/repos/andrewbenington/OpenHome/contents/public/sprites/${targetSpritePack}`
-    const promise: Promise<null> = invoke('download_sprite_pack', {
-      githubFolderUrl,
-      targetSpritePack,
-    })
+  getImageData(absolutePath: string): Promise<Errorable<ImageResponse>> {
+    const promise: Promise<ImageResponse> = invoke('get_image_data', { absolutePath })
 
     return promise.then(E.right).catch(E.left)
   },
 
-  deleteSpritePack(targetSpritePack: string): Promise<Errorable<null>> {
-    const promise: Promise<null> = invoke('delete_sprite_pack', { targetSpritePack })
+  downloadPlugin(remoteUrl: string): Promise<Errorable<string>> {
+    const promise: Promise<string> = invoke('download_plugin', { remoteUrl })
+
+    return promise.then(E.right).catch(E.left)
+  },
+
+  listInstalledPlugins(): Promise<Errorable<PluginMetadataWithIcon[]>> {
+    const promise: Promise<PluginMetadataWithIcon[]> = invoke('list_installed_plugins')
+
+    return promise.then(E.right).catch(E.left)
+  },
+
+  loadPluginCode(pluginId: string): Promise<Errorable<string>> {
+    const promise: Promise<string> = invoke('load_plugin_code', { pluginId })
 
     return promise.then(E.right).catch(E.left)
   },

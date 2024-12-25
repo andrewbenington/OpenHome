@@ -1,5 +1,6 @@
 mod commands;
 mod menu;
+mod plugin;
 mod saves;
 mod state;
 mod util;
@@ -48,6 +49,7 @@ pub fn run() {
             commands::get_state,
             commands::get_file_bytes,
             commands::get_file_created,
+            commands::get_image_data,
             commands::get_storage_file_json,
             commands::write_storage_file_json,
             commands::write_file_bytes,
@@ -60,8 +62,9 @@ pub fn run() {
             commands::find_suggested_saves,
             commands::set_app_theme,
             commands::validate_recent_saves,
-            commands::download_sprite_pack,
-            commands::delete_sprite_pack,
+            commands::download_plugin,
+            commands::list_installed_plugins,
+            commands::load_plugin_code,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

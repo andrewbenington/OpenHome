@@ -28,3 +28,6 @@ tauri-plugin-fs = "2"
 dirs = "5.0.1"
 reqwest = { version = "0.12", features = ["blocking"] }
 tokio = { version = "1", features = ["full"] }
+base64 = "0.22.1"
+zip = "2.2.2"
+bytes = "1.9.0"

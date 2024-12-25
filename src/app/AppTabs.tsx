@@ -4,6 +4,7 @@ import AppStateDisplay from './dev/AppStateDisplay'
 import ThemeDisplay from './dev/ThemeDisplay'
 import Home from './Home'
 import TrackedPokemon from './manage/TrackedPokemon'
+import PluginsPage from './Plugins'
 import Settings from './Settings'
 import SortPokemon from './sort/SortPokemon'
 
@@ -20,6 +21,9 @@ export default function AppTabs() {
       </TabPanel>
       <TabPanel sx={{ '--Tabs-spacing': 0, height: 0, overflowY: 'hidden' }} value="sort">
         <SortPokemon />
+      </TabPanel>
+      <TabPanel sx={{ '--Tabs-spacing': 0, height: 0, overflowY: 'hidden' }} value="plugins">
+        <PluginsPage />
       </TabPanel>
       <TabPanel sx={{ '--Tabs-spacing': 0, height: 0, overflowY: 'hidden' }} value="settings">
         <Settings />
@@ -44,6 +48,9 @@ export default function AppTabs() {
           </Tab>
           <Tab indicatorPlacement="top" value="sort" color="primary" variant="plain">
             Sort Pokémon
+          </Tab>
+          <Tab indicatorPlacement="top" value="plugins" color="primary" variant="plain">
+            Plugins
           </Tab>
           <Tab indicatorPlacement="top" value="settings" color="primary" variant="plain">
             Settings

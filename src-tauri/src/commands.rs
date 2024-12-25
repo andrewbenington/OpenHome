@@ -8,12 +8,10 @@ use std::path::PathBuf;
 use std::time::SystemTime;
 use tauri::Manager;
 
-use crate::saves;
+use crate::plugin::{list_plugins, PluginMetadata, PluginMetadataWithIcon};
 use crate::state::{AppState, AppStateSnapshot};
-use crate::util::{
-    self, create_openhome_directory, download_images_from_github_folder,
-    prepend_appdata_storage_to_path,
-};
+use crate::util::ImageResponse;
+use crate::{saves, util};
 
 #[tauri::command]
 pub fn get_state(state: tauri::State<'_, AppState>) -> AppStateSnapshot {
@@ -263,47 +261,73 @@ pub fn validate_recent_saves(
 }
 
 #[tauri::command]
-pub fn download_sprite_pack(
-    app_handle: tauri::AppHandle,
-    github_folder_url: String,
-    target_sprite_pack: String,
-) -> Result<(), String> {
-    create_openhome_directory(&app_handle)?;
-
-    let sprites_dir = prepend_appdata_storage_to_path(&app_handle, &PathBuf::from("sprites"))?;
-    fs::create_dir_all(&sprites_dir)
-        .map_err(|e| format!("Failed to create sprites directory: {}", e))?;
-
-    let target_path = sprites_dir.join(&target_sprite_pack);
-
-    let save_dir = target_path
-        .to_str()
-        .ok_or_else(|| "Couldn't convert the target path to a string".to_owned())?;
-
-    println!("{}", save_dir);
-
-    download_images_from_github_folder(&github_folder_url, save_dir)
-        .map_err(|e| format!("Failed to download images: {}", e))?;
-
-    println!("Images downloaded to: {}", save_dir);
-    Ok(())
+pub fn get_image_data(absolute_path: String) -> Result<ImageResponse, String> {
+    return util::get_image_data(absolute_path);
 }
 
 #[tauri::command]
-pub fn delete_sprite_pack(
-    app_handle: tauri::AppHandle,
-    target_sprite_pack: String,
-) -> Result<(), String> {
-    let sprites_dir = prepend_appdata_storage_to_path(&app_handle, &PathBuf::from("sprites"))?;
-    let folder_path = sprites_dir.join(&target_sprite_pack);
+pub fn download_plugin(app_handle: tauri::AppHandle, remote_url: String) -> Result<String, String> {
+    let plugins_dir = util::prepend_appdata_to_path(&app_handle, &PathBuf::from("plugins"))?;
 
-    // Make sure folder exists
-    if !folder_path.exists() {
-        return Err(format!("Folder does not exist: {}", folder_path.display()));
+    let metadata_url = format!("{}/plugin.json", remote_url);
+
+    let plugin_metadata: PluginMetadata =
+        util::download_json_file(metadata_url).map_err(|e| e.to_string())?;
+
+    let new_plugin_dir = plugins_dir.join(plugin_metadata.id.clone());
+    let dist_dir = new_plugin_dir.join("dist");
+    fs::create_dir_all(&dist_dir).map_err(|e| e.to_string())?;
+
+    let metadata_path = new_plugin_dir.join("plugin.json");
+    let index_js_path = dist_dir.join("index.js");
+    let icon_path = new_plugin_dir.join(&plugin_metadata.icon);
+
+    let metadata_string =
+        serde_json::to_string_pretty(&plugin_metadata).map_err(|e| e.to_string())?;
+    let mut metadata_file = File::create(&metadata_path).map_err(|e| e.to_string())?;
+    metadata_file
+        .write(metadata_string.as_bytes())
+        .map_err(|e| e.to_string())?;
+
+    let index_js_url = format!("{}/dist/index.js", remote_url);
+    let mut index_js_file = File::create(&index_js_path).map_err(|e| e.to_string())?;
+    let index_js_body = util::download_text_file(index_js_url).map_err(|e| e.to_string())?;
+    write!(index_js_file, "{}", index_js_body).map_err(|e| e.to_string())?;
+
+    for (dir, zip_file) in plugin_metadata.assets {
+        let zip_file_url = format!("{}/{}", remote_url, zip_file);
+
+        let output_path = new_plugin_dir.join(&dir);
+        let output_dir_o = output_path.to_str();
+        if let Some(output_dir) = output_dir_o {
+            util::download_extract_zip_file(&zip_file_url, output_dir)
+                .map_err(|e| e.to_string())?;
+        }
     }
 
-    fs::remove_dir_all(&folder_path).map_err(|e| format!("Failed to delete folder: {}", e))?;
+    let icon_url = format!("{}/{}", remote_url, plugin_metadata.icon);
+    let icon_body = util::download_binary_file(&icon_url).map_err(|e| e.to_string())?;
+    let mut icon_file = File::create(&icon_path).map_err(|e| e.to_string())?;
+    icon_file.write(&icon_body).map_err(|e| e.to_string())?;
 
-    println!("Deleted folder: {}", folder_path.display());
-    Ok(())
+    println!("Wrote to {}", index_js_path.to_string_lossy().to_owned());
+    return Ok(index_js_body);
+}
+
+#[tauri::command]
+pub fn list_installed_plugins(
+    app_handle: tauri::AppHandle,
+) -> Result<Vec<PluginMetadataWithIcon>, String> {
+    return Ok(list_plugins(&app_handle).map_err(|e| format!("Error listing plugins: {}", e))?);
+}
+
+#[tauri::command]
+pub fn load_plugin_code(app_handle: tauri::AppHandle, plugin_id: String) -> Result<String, String> {
+    let relative_path = &PathBuf::from("plugins")
+        .join(plugin_id)
+        .join("dist")
+        .join("index.js");
+
+    let plugin_code = util::get_appdata_file_text(&app_handle, relative_path)?;
+    return Ok(plugin_code);
 }

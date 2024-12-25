@@ -47,8 +47,12 @@ const DummyBackend: BackendInterface = {
   updateSettings: async () => E.left('no backend in use'),
   setTheme: async () => E.left('no backend in use'),
 
-  downloadSpritePack: async () => E.left('no backend in use'),
-  deleteSpritePack: async () => E.left('no backend in use'),
+  /* plugins */
+  getImageData: async () => E.left('no backend in use'),
+  listInstalledPlugins: async () => E.left('no backend in use'),
+  getPluginPath: async () => '',
+  downloadPlugin: async () => E.left('no backend in use'),
+  loadPluginCode: async () => E.left('no backend in use'),
 }
 
 export default DummyBackend

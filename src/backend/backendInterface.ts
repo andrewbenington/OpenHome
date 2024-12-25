@@ -3,11 +3,17 @@ import { OHPKM } from '../types/pkm/OHPKM'
 import { PathData, PossibleSaves } from '../types/SAVTypes/path'
 import { SaveFolder, StoredBoxData } from '../types/storage'
 import { Errorable, LoadSaveResponse, LookupMap, SaveRef } from '../types/types'
+import { PluginMetadataWithIcon } from '../util/Plugin'
 
 export type AppState = {
   open_transaction: boolean
   temp_files: string[]
   is_dev: boolean
+}
+
+export type ImageResponse = {
+  base64: string
+  extension: string
 }
 
 export default interface BackendInterface {
@@ -56,9 +62,12 @@ export default interface BackendInterface {
   updateSettings: (settings: Settings) => Promise<Errorable<null>>
   setTheme(appTheme: 'light' | 'dark' | 'system'): Promise<Errorable<null>>
 
-  /* sprite packs */
-  downloadSpritePack: (targetSpritePack: string) => Promise<Errorable<null>>
-  deleteSpritePack: (targetSpritePack: string) => Promise<Errorable<null>>
+  /* plugins */
+  getImageData: (absolutePath: string) => Promise<Errorable<ImageResponse>>
+  listInstalledPlugins: () => Promise<Errorable<PluginMetadataWithIcon[]>>
+  getPluginPath: (pluginId: string) => Promise<string>
+  downloadPlugin(remoteUrl: string): Promise<Errorable<string>>
+  loadPluginCode(pluginId: string): Promise<Errorable<string>>
 }
 
 export interface BackendListeners {

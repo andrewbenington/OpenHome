@@ -33,15 +33,6 @@ async function pathDataFromRaw(raw: string): Promise<PathData> {
 type OnDropEvent = Event<{ position: { x: number; y: number }; paths: string[] }>
 
 export const TauriBackend: BackendInterface = {
-  // TODO: move to bottom of file
-  downloadSpritePack: function (targetSpritePack: string): Promise<Errorable<null>> {
-    return TauriInvoker.downloadSpritePack(targetSpritePack) as Promise<Errorable<null>>
-  },
-
-  deleteSpritePack: function (targetSpritePack: string): Promise<Errorable<null>> {
-    return TauriInvoker.deleteSpritePack(targetSpritePack) as Promise<Errorable<null>>
-  },
-
   /* past gen identifier lookups */
   loadGen12Lookup: function (): Promise<Errorable<LookupMap>> {
     return TauriInvoker.getStorageFileJSON('gen12_lookup.json') as Promise<Errorable<LookupMap>>
@@ -241,6 +232,11 @@ export const TauriBackend: BackendInterface = {
   getResourcesPath: () => {
     return path.resourceDir()
   },
+  getPluginPath: async (pluginId: string) => {
+    const dir = await path.appDataDir()
+
+    return `${dir}/plugins/${pluginId}`
+  },
   openDirectory: async (directory: string): Promise<Errorable<null>> => {
     open(directory)
     return E.right(null)
@@ -264,6 +260,11 @@ export const TauriBackend: BackendInterface = {
   },
   setTheme: (appTheme: 'light' | 'dark' | 'system'): Promise<Errorable<null>> =>
     TauriInvoker.setTheme(appTheme),
+
+  getImageData: TauriInvoker.getImageData,
+  listInstalledPlugins: TauriInvoker.listInstalledPlugins,
+  downloadPlugin: TauriInvoker.downloadPlugin,
+  loadPluginCode: TauriInvoker.loadPluginCode,
 
   registerListeners: (listeners) => {
     const unlistenPromise = Promise.all([

@@ -1,4 +1,4 @@
-import { Chip, Grid } from '@mui/joy'
+import { Chip, CircularProgress, Grid } from '@mui/joy'
 import { getDisplayID } from 'pokemon-files'
 import { AbilityToString } from 'pokemon-resources'
 import { PokemonData } from 'pokemon-species-data'
@@ -8,13 +8,13 @@ import PokemonIcon from '../components/PokemonIcon'
 import TypeIcon from '../components/TypeIcon'
 import { getPublicImageURL } from '../images/images'
 import { BallsList, getItemIconPath } from '../images/items'
-import { getPokemonSpritePath } from '../images/pokemon'
 import { PKMInterface } from '../types/interfaces'
 import { getTypes } from '../types/pkm/util'
 import { Styles } from '../types/types'
 import { getTypeColor } from '../util/PokemonSprite'
 import AttributeRow from './AttributeRow'
 import AttributeTag from './AttributeTag'
+import useMonSprite from './useMonSprite'
 
 const styles = {
   column: {
@@ -44,6 +44,7 @@ const styles = {
 const SummaryDisplay = (props: { mon: PKMInterface }) => {
   const { mon } = props
   const [imageError, setImageError] = useState(false)
+  const spritePath = useMonSprite(mon)
 
   const itemAltText = useMemo(() => {
     const monData = PokemonData[mon.dexNum]?.formes[mon.formeNum]
@@ -62,14 +63,16 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
               formeNumber={mon.formeNum}
               style={{ width: '90%', height: 0, paddingBottom: '90%' }}
             />
-          ) : (
+          ) : spritePath ? (
             <img
               draggable={false}
               alt={itemAltText}
               style={styles.image}
-              src={getPublicImageURL(getPokemonSpritePath(mon))}
+              src={spritePath}
               onError={() => setImageError(true)}
             />
+          ) : (
+            <CircularProgress />
           )}
         </div>
         <div style={styles.nicknameRow}>
