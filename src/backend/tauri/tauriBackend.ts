@@ -1,5 +1,5 @@
 import { path } from '@tauri-apps/api'
-import { Event, listen } from '@tauri-apps/api/event'
+import { Event, listen, UnlistenFn } from '@tauri-apps/api/event'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { open as fileDialog } from '@tauri-apps/plugin-dialog'
 import { readFile, stat } from '@tauri-apps/plugin-fs'
@@ -267,9 +267,7 @@ export const TauriBackend: BackendInterface = {
   loadPluginCode: TauriInvoker.loadPluginCode,
 
   registerListeners: (listeners) => {
-    const unlistenPromise = Promise.all([
-      listen('save', listeners.onSave),
-      listen('reset', listeners.onReset),
+    const unlistenPromises: Promise<UnlistenFn>[] = [
       listen('tauri://drag-drop', (e: OnDropEvent) => {
         const allFilesPromise = e.payload.paths.map(async (filePath) => ({
           filePath,
@@ -302,7 +300,22 @@ export const TauriBackend: BackendInterface = {
             ?.dispatchEvent(new DragEvent('drop', { bubbles: true, dataTransfer }))
         })
       }),
-    ])
+    ]
+
+    if (listeners.onSave) {
+      unlistenPromises.push(listen('save', listeners.onSave))
+    }
+    if (listeners.onReset) {
+      unlistenPromises.push(listen('save', listeners.onReset))
+    }
+    if (listeners.onPluginDownloadProgress) {
+      const [pluginID, listener] = listeners.onPluginDownloadProgress
+
+      unlistenPromises.push(
+        listen<number>(`plugin:download-progress:${pluginID}`, (event) => listener(event.payload))
+      )
+    }
+    const unlistenPromise = Promise.all(unlistenPromises)
 
     return () =>
       unlistenPromise.then((unlistenFunctions) => {

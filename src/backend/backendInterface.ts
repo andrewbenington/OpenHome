@@ -16,6 +16,11 @@ export type ImageResponse = {
   extension: string
 }
 
+export type PluginDownloadProgress = {
+  pluginId: string
+  progress: number
+}
+
 export default interface BackendInterface {
   /* past gen identifier lookups */
   loadGen12Lookup: () => Promise<Errorable<LookupMap>>
@@ -56,7 +61,7 @@ export default interface BackendInterface {
   getResourcesPath: () => Promise<string>
   openDirectory: (directory: string) => Promise<Errorable<null>>
   getPlatform: () => Promise<string>
-  registerListeners: (listeners: BackendListeners) => () => void
+  registerListeners: (listeners: Partial<BackendListeners>) => () => void
   getState: () => Promise<Errorable<AppState>>
   getSettings: () => Promise<Errorable<Settings>>
   updateSettings: (settings: Settings) => Promise<Errorable<null>>
@@ -73,4 +78,5 @@ export default interface BackendInterface {
 export interface BackendListeners {
   onSave: () => void
   onReset: () => void
+  onPluginDownloadProgress: [string, (_progress_pct: number) => void]
 }

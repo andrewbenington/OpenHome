@@ -1,8 +1,11 @@
 use std::{
     collections::HashMap,
     fs::{self, File},
+    io::Write,
     path::PathBuf,
 };
+
+use tauri::Emitter;
 
 use crate::util::{self, ImageResponse};
 
@@ -109,4 +112,106 @@ pub fn list_plugins(
     }
 
     return Ok(plugins);
+}
+
+#[derive(serde::Serialize, serde::Deserialize, Clone, Debug)]
+pub struct DownloadProgress {
+    pub plugin_id: String,
+    pub progress: usize,
+}
+
+fn emit_download_progress(app_handle: &tauri::AppHandle, plugin_id: String, progress: f64) {
+    let result = app_handle.emit(
+        format!("plugin:download-progress:{}", plugin_id).as_str(),
+        progress,
+    );
+    if let Err(err) = result {
+        eprintln!("error emitting download progress: {}", err)
+    }
+}
+
+pub async fn download_async(
+    app_handle: tauri::AppHandle,
+    remote_url: String,
+    plugin_metadata: PluginMetadata,
+) -> Result<String, String> {
+    let plugins_dir = util::prepend_appdata_to_path(&app_handle, &PathBuf::from("plugins"))
+        .map_err(|err| format!("get plugins directory: {}", err))?;
+
+    let new_plugin_dir = plugins_dir.join(plugin_metadata.id.clone());
+    let dist_dir = new_plugin_dir.join("dist");
+    fs::create_dir_all(&dist_dir).map_err(|err| format!("create plugin directory: {}", err))?;
+
+    let metadata_path = new_plugin_dir.join("plugin.json");
+    let index_js_path = dist_dir.join("index.js");
+    let icon_path = new_plugin_dir.join(&plugin_metadata.icon);
+
+    let metadata_string = serde_json::to_string_pretty(&plugin_metadata)
+        .map_err(|err| format!("download metadata: {}", err))?;
+
+    let mut metadata_file =
+        File::create(&metadata_path).map_err(|err| format!("create metadata file: {}", err))?;
+
+    metadata_file
+        .write(metadata_string.as_bytes())
+        .map_err(|err| format!("write metadata file: {}", err))?;
+
+    let index_js_url = format!("{}/dist/index.js", remote_url);
+    let mut index_js_file =
+        File::create(&index_js_path).map_err(|err| format!("create index.js file: {}", err))?;
+
+    let index_js_body = util::download_text_file(index_js_url)
+        .await
+        .map_err(|err| format!("download index.js file: {}", err))?;
+    emit_download_progress(&app_handle, plugin_metadata.id.clone(), 10.0);
+
+    write!(index_js_file, "{}", index_js_body)
+        .map_err(|err| format!("write index.js file: {}", err))?;
+
+    let per_asset_percent: f64 = 80.0 / (plugin_metadata.assets.len() as f64);
+    let mut asset_number = 1;
+    for (dir, zip_file) in plugin_metadata.assets {
+        let zip_file_url = format!("{}/{}", remote_url, zip_file);
+
+        let output_path = new_plugin_dir.join(&dir);
+        let asset_pct_chunk = (asset_number as f64) * per_asset_percent;
+        match output_path.to_str() {
+            Some(output_dir) => util::download_extract_zip_file(&zip_file_url, output_dir, |pct| {
+                emit_download_progress(
+                    &app_handle,
+                    plugin_metadata.id.clone(),
+                    10.0 + (asset_pct_chunk * (pct / 100.0)),
+                )
+            })
+            .await
+            .map_err(|err| format!("extract {}: {}", zip_file, err)),
+            None => Err(format!(
+                "could not convert extracted directory name '{}'",
+                dir
+            )),
+        }?;
+
+        emit_download_progress(
+            &app_handle,
+            plugin_metadata.id.clone(),
+            10.0 + asset_pct_chunk,
+        );
+        asset_number += 1;
+    }
+
+    let icon_url = format!("{}/{}", remote_url, plugin_metadata.icon);
+    let icon_body = util::download_binary_file(&icon_url)
+        .await
+        .map_err(|err| format!("download icon file: {}", err))?;
+
+    let mut icon_file =
+        File::create(&icon_path).map_err(|err| format!("create icon file: {}", err))?;
+    icon_file
+        .write(&icon_body)
+        .map_err(|err| format!("write icon file: {}", err))?;
+
+    emit_download_progress(&app_handle, plugin_metadata.id.clone(), 100.0);
+
+    println!("Wrote to {}", index_js_path.to_string_lossy().to_owned());
+    return Ok(index_js_body);
 }

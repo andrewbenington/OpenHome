@@ -41,7 +41,7 @@ const DummyBackend: BackendInterface = {
   getResourcesPath: async () => '',
   openDirectory: async () => E.left('no backend in use'),
   getPlatform: async () => 'none',
-  registerListeners: (_: BackendListeners) => () => {},
+  registerListeners: (_: Partial<BackendListeners>) => () => {},
   getState: async () => E.left('no backend in use'),
   getSettings: async () => E.left('no backend in use'),
   updateSettings: async () => E.left('no backend in use'),

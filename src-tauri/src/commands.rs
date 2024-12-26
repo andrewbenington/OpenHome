@@ -1,3 +1,7 @@
+use crate::plugin::{self, list_plugins, PluginMetadata, PluginMetadataWithIcon};
+use crate::state::{AppState, AppStateSnapshot};
+use crate::util::ImageResponse;
+use crate::{saves, util};
 use dirs;
 use serde_json::Value;
 use std::collections::HashMap;
@@ -7,11 +11,6 @@ use std::io::{Error, ErrorKind, Read, Write};
 use std::path::PathBuf;
 use std::time::SystemTime;
 use tauri::Manager;
-
-use crate::plugin::{list_plugins, PluginMetadata, PluginMetadataWithIcon};
-use crate::state::{AppState, AppStateSnapshot};
-use crate::util::ImageResponse;
-use crate::{saves, util};
 
 #[tauri::command]
 pub fn get_state(state: tauri::State<'_, AppState>) -> AppStateSnapshot {
@@ -266,52 +265,18 @@ pub fn get_image_data(absolute_path: String) -> Result<ImageResponse, String> {
 }
 
 #[tauri::command]
-pub fn download_plugin(app_handle: tauri::AppHandle, remote_url: String) -> Result<String, String> {
-    let plugins_dir = util::prepend_appdata_to_path(&app_handle, &PathBuf::from("plugins"))?;
-
+pub async fn download_plugin(
+    app_handle: tauri::AppHandle,
+    remote_url: String,
+) -> Result<String, String> {
     let metadata_url = format!("{}/plugin.json", remote_url);
+    println!("Got metadata url");
 
-    let plugin_metadata: PluginMetadata =
-        util::download_json_file(metadata_url).map_err(|e| e.to_string())?;
-
-    let new_plugin_dir = plugins_dir.join(plugin_metadata.id.clone());
-    let dist_dir = new_plugin_dir.join("dist");
-    fs::create_dir_all(&dist_dir).map_err(|e| e.to_string())?;
-
-    let metadata_path = new_plugin_dir.join("plugin.json");
-    let index_js_path = dist_dir.join("index.js");
-    let icon_path = new_plugin_dir.join(&plugin_metadata.icon);
-
-    let metadata_string =
-        serde_json::to_string_pretty(&plugin_metadata).map_err(|e| e.to_string())?;
-    let mut metadata_file = File::create(&metadata_path).map_err(|e| e.to_string())?;
-    metadata_file
-        .write(metadata_string.as_bytes())
+    let plugin_metadata: PluginMetadata = util::download_json_file(metadata_url)
+        .await
         .map_err(|e| e.to_string())?;
 
-    let index_js_url = format!("{}/dist/index.js", remote_url);
-    let mut index_js_file = File::create(&index_js_path).map_err(|e| e.to_string())?;
-    let index_js_body = util::download_text_file(index_js_url).map_err(|e| e.to_string())?;
-    write!(index_js_file, "{}", index_js_body).map_err(|e| e.to_string())?;
-
-    for (dir, zip_file) in plugin_metadata.assets {
-        let zip_file_url = format!("{}/{}", remote_url, zip_file);
-
-        let output_path = new_plugin_dir.join(&dir);
-        let output_dir_o = output_path.to_str();
-        if let Some(output_dir) = output_dir_o {
-            util::download_extract_zip_file(&zip_file_url, output_dir)
-                .map_err(|e| e.to_string())?;
-        }
-    }
-
-    let icon_url = format!("{}/{}", remote_url, plugin_metadata.icon);
-    let icon_body = util::download_binary_file(&icon_url).map_err(|e| e.to_string())?;
-    let mut icon_file = File::create(&icon_path).map_err(|e| e.to_string())?;
-    icon_file.write(&icon_body).map_err(|e| e.to_string())?;
-
-    println!("Wrote to {}", index_js_path.to_string_lossy().to_owned());
-    return Ok(index_js_body);
+    return plugin::download_async(app_handle, remote_url, plugin_metadata).await;
 }
 
 #[tauri::command]

@@ -1,0 +1,51 @@
+.plugin-display {
+  width: 200px;
+  height: 200px;
+  padding: 0px;
+  position: relative;
+}
+
+.plugin-icon {
+  image-rendering: pixelated;
+  width: 180px;
+  height: 180px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  object-fit: contain;
+}
+
+.status-chip {
+  position: absolute !important;
+  bottom: 4px;
+  right: 4px;
+  height: fit-content;
+}
+
+.name-chip {
+  position: absolute !important;
+  top: 4px;
+  width: 96% !important;
+  left: 2%;
+  padding: 4px 0px;
+  background-color: #666;
+  border-radius: 3px;
+}
+
+.plugin-progress {
+  position: absolute !important;
+  bottom: 4px;
+  width: 96% !important;
+  left: 2%;
+}
+
+.error-icon-button {
+  color: #f33;
+  background-color: transparent;
+  height: 50px;
+  width: 50px;
+  & svg {
+    height: 38px;
+    width: 38px;
+  }
+}

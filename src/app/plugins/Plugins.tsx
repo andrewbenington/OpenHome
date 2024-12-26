@@ -1,4 +1,4 @@
-import { Chip, CircularProgress, Switch } from '@mui/joy'
+import { Chip, CircularProgress, LinearProgress, Switch } from '@mui/joy'
 import * as E from 'fp-ts/lib/Either'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { BackendContext } from 'src/backend/backendContext'
@@ -6,6 +6,8 @@ import useDisplayError from 'src/hooks/displayError'
 import useIsDev from 'src/hooks/isDev'
 import { PluginContext } from 'src/state/plugin'
 import { loadPlugin, PluginMetadata, PluginMetadataWithIcon } from 'src/util/Plugin'
+import { ErrorIcon } from '../../components/Icons'
+import './style.css'
 
 const GITHUB_REPO =
   'https://raw.githubusercontent.com/andrewbenington/OpenHome-Plugins/refs/heads/main'
@@ -109,15 +111,35 @@ type AvailablePluginCardProps = {
 function AvailablePluginCard(props: AvailablePluginCardProps) {
   const { name, location, useDevRepo, reloadInstalled, installed } = props
   const [metadata, setMetadata] = useState<PluginMetadata>()
-  const [isError, setIsError] = useState(false)
+  const [error, setError] = useState<string>()
   const displayError = useDisplayError()
   const [, dispatchPlugins] = useContext(PluginContext)
+  const [progressPercent, setProgressPercent] = useState<number>()
   const backend = useContext(BackendContext)
 
-  useEffect(() => setIsError(false), [location])
+  useEffect(() => {
+    if (!metadata?.id) return
+    // returns a function to stop listening
+    const stopListening = backend.registerListeners({
+      onPluginDownloadProgress: [
+        metadata.id,
+        (percent) => {
+          setProgressPercent(percent)
+        },
+      ],
+    })
+
+    // the "stop listening" function should be called when the effect returns,
+    // otherwise duplicate listeners will exist
+    return () => {
+      stopListening()
+    }
+  }, [backend, metadata])
+
+  useEffect(() => setError(undefined), [location])
 
   useEffect(() => {
-    if (isError) return
+    if (error) return
 
     fetch(`${location}/plugin.json`)
       .then(async (p) => {
@@ -127,38 +149,33 @@ function AvailablePluginCard(props: AvailablePluginCardProps) {
       })
       .catch((e) => {
         console.error(e)
-        setIsError(true)
-        displayError('Error Installing Plugin', [
-          `Plugin name: ${name}`,
-          `Plugin location: ${location}/plugin.json`,
-          `${e}`,
-        ])
+        setError(`${e}`)
       })
-  }, [displayError, location, name, isError, useDevRepo])
+  }, [displayError, location, name, error, useDevRepo])
 
   return (
     <button
-      style={{
-        width: 200,
-        height: 200,
-        padding: '0px',
-        backdropFilter: installed ? 'greyscale(1)' : undefined,
-        cursor: installed ? 'default' : 'pointer',
-        position: 'relative',
-      }}
-      disabled={installed}
+      className="plugin-display"
       onClick={() => {
+        if (error) {
+          displayError('Could not load plugin data', error)
+          return
+        }
+
         backend
           .downloadPlugin(location)
           .then(
             E.match(
-              (err) => {
-                displayError('Load Plugin Code', err)
-              },
+              (err) => displayError('Load Plugin Code', err),
               (code) => {
                 try {
+                  setProgressPercent(100)
                   dispatchPlugins({ type: 'register_plugin', payload: loadPlugin(code) })
                   reloadInstalled()
+                  setTimeout(() => {
+                    // show full progress bar for 200s before hiding
+                    setProgressPercent(undefined)
+                  }, 200)
                 } catch (e) {
                   displayError('Error Installing Plugin', [name, `${e}`])
                 }
@@ -171,19 +188,28 @@ function AvailablePluginCard(props: AvailablePluginCardProps) {
           })
       }}
     >
-      {installed && (
-        <Chip style={{ position: 'absolute', top: 4, right: 4 }} color="success" variant="solid">
+      {installed && progressPercent === undefined && (
+        <Chip className="status-chip" color="success" variant="solid">
           Installed
         </Chip>
       )}
-      <img
-        src={`${location}/${metadata?.icon}`}
-        style={{
-          height: 150,
-          imageRendering: 'pixelated',
-        }}
-      />
-      <Chip style={{ width: '100%' }}>{name}</Chip>
+      {error ? (
+        <ErrorIcon className="error-icon-button" />
+      ) : (
+        <img className="plugin-icon" src={`${location}/${metadata?.icon}`} />
+      )}
+      {progressPercent !== undefined && (
+        <LinearProgress
+          className="plugin-progress"
+          value={progressPercent}
+          determinate
+          color="secondary"
+          variant="soft"
+        />
+      )}
+      <div className="name-chip" style={{ width: '100%' }}>
+        {name}
+      </div>
     </button>
   )
 }
@@ -200,7 +226,7 @@ function InstalledPluginCard(props: { metadata: PluginMetadataWithIcon }) {
 
   return (
     <button
-      style={{ width: 200, height: 200, position: 'relative' }}
+      className="plugin-display"
       onClick={() => {
         if (enabled) {
           dispatchPluginState({ type: 'disable_plugin', payload: metadata.id })
@@ -222,19 +248,16 @@ function InstalledPluginCard(props: { metadata: PluginMetadataWithIcon }) {
         }
       }}
     >
-      <Chip
-        style={{ position: 'absolute', top: 4, right: 4 }}
-        color={enabled ? 'success' : 'warning'}
-      >
+      <Chip className="status-chip" color={enabled ? 'success' : 'warning'}>
         {enabled ? 'Enabled' : 'Disabled'}
       </Chip>
       {metadata.icon_image && (
         <img
+          className="plugin-icon"
           src={`data:image/${metadata.icon_image.extension};base64,${metadata.icon_image.base64}`}
-          style={{ imageRendering: 'pixelated', height: 150 }}
         />
       )}
-      <Chip style={{ width: '100%' }}>{metadata.name}</Chip>
+      <div className="name-chip">{metadata.name}</div>
     </button>
   )
 }

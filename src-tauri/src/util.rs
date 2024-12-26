@@ -1,7 +1,6 @@
 use base64::engine::general_purpose;
 use base64::Engine;
 use reqwest;
-use reqwest::blocking::Client;
 use serde;
 use std::fs;
 use std::fs::{create_dir_all, File};
@@ -151,35 +150,51 @@ pub fn create_openhome_directory(app_handle: &tauri::AppHandle) -> Result<(), St
     Ok(())
 }
 
-pub fn download_text_file(url: String) -> Result<String, Box<dyn std::error::Error>> {
-    let client = Client::new();
+pub async fn download_text_file(url: String) -> Result<String, Box<dyn std::error::Error>> {
+    let client = reqwest::Client::new();
 
     return Ok(client
         .get(url)
         .header("User-Agent", "OpenHome")
-        .send()?
-        .text()?);
+        .send()
+        .await?
+        .text()
+        .await?);
 }
 
-pub fn download_binary_file(url: &str) -> Result<bytes::Bytes, Box<dyn std::error::Error>> {
-    let client = reqwest::blocking::Client::new();
-    let response = client.get(url).header("User-Agent", "OpenHome").send()?;
+pub async fn download_binary_file(url: &str) -> Result<bytes::Bytes, Box<dyn std::error::Error>> {
+    let client = reqwest::Client::new();
+    let response = client
+        .get(url)
+        .header("User-Agent", "OpenHome")
+        .send()
+        .await?;
 
-    return Ok(response.bytes()?);
+    return Ok(response.bytes().await?);
 }
 
-pub fn download_extract_zip_file(
+pub async fn download_extract_zip_file<F>(
     url: &str,
     output_dir: &str,
-) -> Result<(), Box<dyn std::error::Error>> {
-    let client = reqwest::blocking::Client::new();
-    let response = client.get(url).header("User-Agent", "OpenHome").send()?;
+    progress_callback: F,
+) -> Result<(), Box<dyn std::error::Error>>
+where
+    F: Fn(f64) -> (),
+{
+    let client = reqwest::Client::new();
+    let response = client
+        .get(url)
+        .header("User-Agent", "OpenHome")
+        .send()
+        .await?;
 
-    let bytes = response.bytes()?; // Read the entire body as bytes
+    let bytes = response.bytes().await?; // Read the entire body as bytes
     let cursor = Cursor::new(bytes); // Create an in-memory cursor
     let mut zip = ZipArchive::new(cursor)?;
+    let file_count = zip.len();
 
-    for i in 0..zip.len() {
+    for i in 0..file_count {
+        progress_callback(50.0 + (i as f64 / file_count as f64) * 50.0);
         let mut file = zip.by_index(i)?; // Get file by index
         let outpath = Path::new(output_dir).join(file.name());
 
@@ -192,23 +207,32 @@ pub fn download_extract_zip_file(
             let mut outfile = fs::File::create(&outpath)?;
             std::io::copy(&mut file, &mut outfile)?;
         }
-
-        println!("Extracted: {}", outpath.display());
     }
     return Ok(());
 }
 
-pub fn download_json_file<T>(url: String) -> Result<T, Box<dyn std::error::Error>>
+pub async fn download_json_file<T>(url: String) -> Result<T, Box<dyn std::error::Error>>
 where
     T: serde::de::DeserializeOwned,
+    T: serde::ser::Serialize,
 {
-    let client = reqwest::blocking::Client::new();
+    let client = reqwest::Client::new();
 
-    let body: T = client
+    let response = client
         .get(url)
         .header("User-Agent", "OpenHome")
-        .send()?
-        .json()?;
+        .send()
+        .await?;
+
+    let body_text = response.text().await?;
+    println!("body text: {}", body_text);
+
+    let body: T = serde_json::from_str(&body_text)?;
+    println!(
+        "body json: {}",
+        serde_json::to_string_pretty(&body)
+            .unwrap_or_else(|err| format!("deserialize metadata: {}", err))
+    );
 
     return Ok(body);
 }
