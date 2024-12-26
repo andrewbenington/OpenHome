@@ -29,6 +29,10 @@ pub fn list_plugins(
     let plugins_path = util::prepend_appdata_to_path(&app_handle, &PathBuf::from("plugins"))
         .map_err(|e| format!("Error building plugin path: {}", e))?;
 
+    if !plugins_path.exists() {
+        return Ok(vec![]);
+    }
+
     let plugin_dirs = fs::read_dir(&plugins_path).map_err(|e| {
         format!(
             "Error reading directory {}: {}",
