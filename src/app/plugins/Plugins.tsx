@@ -64,8 +64,7 @@ export default function PluginsPage() {
   ) : (
     <div style={{ padding: '0px 32px' }}>
       {isDev && (
-        <label style={{ display: 'flex', flexDirection: 'row' }}>
-          Use Local Repo
+        <label style={{ display: 'flex', flexDirection: 'row', gap: 8, marginTop: 18 }}>
           <Switch
             checked={useDevRepo}
             onChange={(e) => {
@@ -73,6 +72,7 @@ export default function PluginsPage() {
               setUseDevRepo(e.target.checked)
             }}
           />
+          Use Local Repo
         </label>
       )}
       <h2>Installed Plugins</h2>

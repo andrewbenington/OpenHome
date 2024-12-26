@@ -13,7 +13,7 @@ export default function AppTabs() {
 
   return (
     <Tabs defaultValue="home" style={{ height: '100vh', width: '100%' }} color="primary">
-      <TabPanel sx={{ '--Tabs-spacing': 0, height: 0 }} value="home">
+      <TabPanel sx={{ '--Tabs-spacing': 0, height: 0 }} value="home" keepMounted>
         <Home />
       </TabPanel>
       <TabPanel sx={{ '--Tabs-spacing': 0, height: 0 }} value="manage">
