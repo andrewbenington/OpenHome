@@ -4,6 +4,9 @@ import { BLOOD_MOON, SWEETS } from 'src/consts/Formes'
 import { PKMInterface } from 'src/types/interfaces'
 import { toGen3RRPokemonIndex } from 'src/types/SAVTypes/radicalred/conversion/Gen3RRPokemonIndex'
 import { RRSprites } from 'src/types/SAVTypes/radicalred/conversion/RadicalRedSprites'
+import { toGen3CRFUPokemonIndex } from '../types/SAVTypes/cfru/conversion/util'
+import { NationalDexToUnboundMap } from '../types/SAVTypes/unbound/conversion/UnboundSpeciesMap'
+import { UBSprites } from '../types/SAVTypes/unbound/conversion/UnboundSprites'
 
 export const fileToSpriteFolder: Record<string, string> = {
   PK1: 'gen1',
@@ -12,6 +15,7 @@ export const fileToSpriteFolder: Record<string, string> = {
   COLOPKM: 'gen3gc',
   XDPKM: 'gen3gc',
   PK3RR: 'rr',
+  PK3UB: 'rr',
   PK4: 'gen4',
   PK5: 'home',
   PK6: 'gen6',
@@ -36,15 +40,28 @@ export const getPokemonSpritePath = (mon: PKMInterface, format?: string) => {
   }
   let spriteFolder = fileToSpriteFolder[monFormat]
 
-  if (spriteFolder === 'rr') {
+  if (monFormat === 'PK3RR') {
     if (mon.dexNum === NationalDex.Ursaluna && mon.formeNum === BLOOD_MOON) {
       return 'sprites/home/ursaluna-bloodmoon.png'
+    }
+    if (mon.dexNum === NationalDex.Terapagos) {
+      return 'sprites/home/terapagos-terastal.png'
     }
     let gen3RRname = RRSprites[toGen3RRPokemonIndex(mon.dexNum, mon.formeNum)]
 
     if (gen3RRname.length === 0) return gen3RRname
     gen3RRname = gen3RRname[0].toUpperCase() + gen3RRname.slice(1).toLowerCase()
     return `sprites/${spriteFolder}/${gen3RRname}`
+  } else if (monFormat === 'PK3UB') {
+    if (mon.dexNum === NationalDex.Ursaluna && mon.formeNum === BLOOD_MOON) {
+      return 'sprites/home/ursaluna-bloodmoon.png'
+    }
+    let gen3UBname =
+      UBSprites[toGen3CRFUPokemonIndex(mon.dexNum, mon.formeNum, NationalDexToUnboundMap)]
+
+    if (gen3UBname.length === 0) return gen3UBname
+    gen3UBname = gen3UBname[0].toUpperCase() + gen3UBname.slice(1).toLowerCase()
+    return `sprites/${spriteFolder}/${gen3UBname}`
   }
   return `sprites/${spriteFolder}${
     mon.isShiny() && spriteFolder !== 'gen1' && spriteFolder !== 'gen9' ? '/shiny/' : '/'
