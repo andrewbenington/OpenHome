@@ -4,6 +4,7 @@ import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { BackendContext } from 'src/backend/backendContext'
 import useDisplayError from 'src/hooks/displayError'
 import useIsDev from 'src/hooks/isDev'
+import { AppInfoContext } from 'src/state/appInfo'
 import { PluginContext } from 'src/state/plugin'
 import { loadPlugin, PluginMetadata, PluginMetadataWithIcon } from 'src/util/Plugin'
 import { ErrorIcon } from '../../components/Icons'
@@ -18,7 +19,7 @@ export default function PluginsPage() {
   const [installedPlugins, setInstalledPlugins] = useState<PluginMetadataWithIcon[]>()
   const [availablePlugins, setAvailablePlugins] = useState<Record<string, string>>()
   const [loading, setLoading] = useState(false)
-  const [useDevRepo, setUseDevRepo] = useState(true)
+  const [useDevRepo, setUseDevRepo] = useState(false)
   const backend = useContext(BackendContext)
   const isDev = useIsDev()
 
@@ -216,13 +217,33 @@ function AvailablePluginCard(props: AvailablePluginCardProps) {
 
 function InstalledPluginCard(props: { metadata: PluginMetadataWithIcon }) {
   const { metadata } = props
-  const [pluginState, dispatchPluginState] = useContext(PluginContext)
+  const [, dispatchPluginState] = useContext(PluginContext)
+  const [{ settings }, dispatchAppInfoState] = useContext(AppInfoContext)
   const backend = useContext(BackendContext)
   const displayError = useDisplayError()
 
   const enabled = useMemo(() => {
-    return pluginState.plugins.some((plugin) => plugin.pluginID === metadata.id)
-  }, [metadata.id, pluginState.plugins])
+    return settings.enabledPlugins[metadata.id]
+  }, [metadata.id, settings.enabledPlugins])
+
+  const enablePlugin = useCallback(() => {
+    backend.loadPluginCode(metadata.id).then(
+      E.match(
+        (err) => displayError('Load Plugin Code', err),
+        (code) => {
+          try {
+            dispatchPluginState({ type: 'register_plugin', payload: loadPlugin(code) })
+            dispatchAppInfoState({
+              type: 'set_plugin_enabled',
+              payload: { pluginID: metadata.id, enabled: true },
+            })
+          } catch (e) {
+            displayError('Error Loading Plugin', `${e}`)
+          }
+        }
+      )
+    )
+  }, [backend, dispatchAppInfoState, dispatchPluginState, displayError, metadata.id])
 
   return (
     <button
@@ -230,21 +251,12 @@ function InstalledPluginCard(props: { metadata: PluginMetadataWithIcon }) {
       onClick={() => {
         if (enabled) {
           dispatchPluginState({ type: 'disable_plugin', payload: metadata.id })
+          dispatchAppInfoState({
+            type: 'set_plugin_enabled',
+            payload: { pluginID: metadata.id, enabled: false },
+          })
         } else {
-          backend.loadPluginCode(metadata.id).then(
-            E.match(
-              (err) => {
-                displayError('Load Plugin Code', err)
-              },
-              (code) => {
-                try {
-                  dispatchPluginState({ type: 'register_plugin', payload: loadPlugin(code) })
-                } catch (e) {
-                  displayError('Error Loading Plugin', `${e}`)
-                }
-              }
-            )
-          )
+          enablePlugin()
         }
       }}
     >

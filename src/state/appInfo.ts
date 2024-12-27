@@ -33,6 +33,7 @@ export const defaultSettings: Settings = {
       G3RRSAV,
     ].map((savetype) => [savetype.saveTypeID, true])
   ),
+  enabledPlugins: {},
   saveCardSize: 180,
   saveViewMode: 'card',
   appTheme: 'system',
@@ -40,6 +41,7 @@ export const defaultSettings: Settings = {
 
 export type Settings = {
   enabledSaveTypes: Record<string, boolean>
+  enabledPlugins: Record<string, boolean>
   saveCardSize: number
   saveViewMode: SaveViewMode
   appTheme: 'light' | 'dark' | 'system'
@@ -62,6 +64,13 @@ export type AppInfoAction =
       type: 'set_savetype_enabled'
       payload: {
         saveType: SAVClass
+        enabled: boolean
+      }
+    }
+  | {
+      type: 'set_plugin_enabled'
+      payload: {
+        pluginID: string
         enabled: boolean
       }
     }
@@ -96,16 +105,21 @@ export const appInfoReducer: Reducer<AppInfoState, AppInfoAction> = (
       }
     }
     case 'set_savetype_enabled': {
-      const enabled = state.settings.enabledSaveTypes
+      const enabled = { ...state.settings.enabledSaveTypes }
 
-      if (payload.enabled) {
-        enabled[payload.saveType.saveTypeID] = true
-      } else {
-        enabled[payload.saveType.saveTypeID] = false
-      }
+      enabled[payload.saveType.saveTypeID] = payload.enabled
       return {
         ...state,
         settings: { ...state.settings, enabledSaveTypes: enabled },
+      }
+    }
+    case 'set_plugin_enabled': {
+      const enabled = { ...state.settings.enabledPlugins }
+
+      enabled[payload.pluginID] = payload.enabled
+      return {
+        ...state,
+        settings: { ...state.settings, enabledPlugins: enabled },
       }
     }
     case 'load_settings': {

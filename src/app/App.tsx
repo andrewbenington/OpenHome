@@ -59,12 +59,8 @@ export default function App() {
       .getSettings()
       .then(
         E.match(
-          async (err) => {
-            console.error(err)
-          },
-          async (settings) => {
-            appInfoDispatch({ type: 'load_settings', payload: settings })
-          }
+          async (err) => console.error(err),
+          async (settings) => appInfoDispatch({ type: 'load_settings', payload: settings })
         )
       )
       .finally(() => setLoading(false))
