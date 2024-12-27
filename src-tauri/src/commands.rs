@@ -195,8 +195,7 @@ pub fn find_suggested_saves(
     let citra_dir_r = app_handle
         .path()
         .home_dir()
-        .map(|home| home.join(".local/share/citra-emu/sdmc/Nintendo 3DS"))
-        .map_err(|e| e.to_string());
+        .map(|home| home.join(".local/share/citra-emu/sdmc/Nintendo 3DS"));
 
     if let Ok(citra_dir) = citra_dir_r {
         if citra_dir.exists() {
