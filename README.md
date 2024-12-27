@@ -120,6 +120,7 @@ the future.
 ### Supported ROM Hack formats
 
 - Pokémon Radical Red
+- Pokémon Unbound
 
 ## Alterations to transferred Pokémon
 
