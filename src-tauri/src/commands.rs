@@ -1,4 +1,3 @@
-use dirs;
 use serde_json::Value;
 use std::collections::HashMap;
 use std::fs;
@@ -182,7 +181,10 @@ pub fn get_storage_file_json(
 }
 
 #[tauri::command]
-pub fn find_suggested_saves(save_folders: Vec<PathBuf>) -> Result<saves::PossibleSaves, String> {
+pub fn find_suggested_saves(
+    app_handle: tauri::AppHandle,
+    save_folders: Vec<PathBuf>,
+) -> Result<saves::PossibleSaves, String> {
     println!("Finding possible saves");
     let mut possible_saves = saves::PossibleSaves {
         citra: Vec::new(),
@@ -190,9 +192,13 @@ pub fn find_suggested_saves(save_folders: Vec<PathBuf>) -> Result<saves::Possibl
         open_emu: Vec::new(),
     };
 
-    let citra_path =
-        dirs::home_dir().map(|home| home.join(".local/share/citra-emu/sdmc/Nintendo 3DS"));
-    if let Some(citra_dir) = citra_path {
+    let citra_dir_r = app_handle
+        .path()
+        .home_dir()
+        .map(|home| home.join(".local/share/citra-emu/sdmc/Nintendo 3DS"))
+        .map_err(|e| e.to_string());
+
+    if let Ok(citra_dir) = citra_dir_r {
         if citra_dir.exists() {
             possible_saves
                 .citra
