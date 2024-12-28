@@ -14,7 +14,6 @@ import PokemonDetailsPanel from '../pokemon/PokemonDetailsPanel'
 import HomeBoxDisplay from '../saves/boxes/HomeBoxDisplay'
 import OpenSaveDisplay from '../saves/boxes/SaveBoxDisplay'
 import SavesModal from '../saves/SavesModal'
-import { AppInfoContext } from '../state/appInfo'
 import { LookupContext } from '../state/lookup'
 import { OpenSavesContext } from '../state/openSaves'
 import { PKMInterface } from '../types/interfaces'
@@ -27,7 +26,6 @@ const Home = () => {
   const [openSavesState, openSavesDispatch, allOpenSaves] = useContext(OpenSavesContext)
   const [lookupState, lookupDispatch] = useContext(LookupContext)
   const backend = useContext(BackendContext)
-  const [, appInfoDispatch] = useContext(AppInfoContext)
   const { palette } = useTheme()
   const [selectedMon, setSelectedMon] = useState<PKMInterface>()
   const [tab, setTab] = useState('summary')
@@ -223,14 +221,6 @@ const Home = () => {
       loadAllLookups()
     }
   }, [lookupState.loaded, lookupState.error, loadAllLookups])
-
-  // load all data when app starts
-  useEffect(() => {
-    backend
-      .getResourcesPath()
-      .then((path) => appInfoDispatch({ type: 'set_resources_path', payload: path }))
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
 
   return (
     <div

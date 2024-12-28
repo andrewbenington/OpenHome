@@ -48,10 +48,37 @@ export default function App() {
       }),
     [isDarkMode]
   )
-  const [loading, setLoading] = useState(true)
-
-  const [appInfoState, appInfoDispatch] = useReducer(appInfoReducer, appInfoInitialState)
   const [errorState, errorDispatch] = useReducer(errorReducer, {})
+
+  return (
+    <ThemeProvider theme={theme}>
+      <BackendProvider backend={backend}>
+        <ErrorContext.Provider value={[errorState, errorDispatch]}>
+          <AppWithBackend />
+        </ErrorContext.Provider>
+      </BackendProvider>
+    </ThemeProvider>
+  )
+}
+
+function AppWithBackend() {
+  const [mouseState, mouseDispatch] = useReducer(mouseReducer, { shift: false })
+  const [appInfoState, appInfoDispatch] = useReducer(appInfoReducer, appInfoInitialState)
+  const [openSavesState, openSavesDispatch] = useReducer(openSavesReducer, {
+    modifiedOHPKMs: {},
+    monsToRelease: [],
+    openSaves: {},
+  })
+  const [lookupState, lookupDispatch] = useReducer(lookupReducer, { loaded: false })
+  const [filterState, filterDispatch] = useReducer(filterReducer, {})
+  const [pluginState, pluginDispatch] = useReducer(pluginReducer, { plugins: [], loaded: false })
+  const [loading, setLoading] = useState(false)
+
+  const backend = useContext(BackendContext)
+  const displayError = useDisplayError()
+
+  const [dragData, setDragData] = useState<MonWithLocation>()
+  const [dragMon, setDragMon] = useState<PKMInterface>()
 
   // only on app start
   useEffect(() => {
@@ -71,43 +98,6 @@ export default function App() {
     debouncedUpdateSettings(backend, appInfoState.settings)
   }, [backend, appInfoState.settings, appInfoState.settingsLoaded])
 
-  return (
-    <ThemeProvider theme={theme}>
-      <BackendProvider backend={backend}>
-        <ErrorContext.Provider value={[errorState, errorDispatch]}>
-          {loading ? (
-            <Box width="100%" height="100%" display="grid">
-              <Typography margin="auto" fontSize={40} fontWeight="bold">
-                OpenHome
-              </Typography>
-            </Box>
-          ) : (
-            <AppWithBackend />
-          )}
-        </ErrorContext.Provider>
-      </BackendProvider>
-    </ThemeProvider>
-  )
-}
-
-function AppWithBackend() {
-  const [mouseState, mouseDispatch] = useReducer(mouseReducer, { shift: false })
-  const [appInfoState, appInfoDispatch] = useReducer(appInfoReducer, appInfoInitialState)
-  const [openSavesState, openSavesDispatch] = useReducer(openSavesReducer, {
-    modifiedOHPKMs: {},
-    monsToRelease: [],
-    openSaves: {},
-  })
-  const [lookupState, lookupDispatch] = useReducer(lookupReducer, { loaded: false })
-  const [filterState, filterDispatch] = useReducer(filterReducer, {})
-  const [pluginState, pluginDispatch] = useReducer(pluginReducer, { plugins: [], loaded: false })
-
-  const backend = useContext(BackendContext)
-  const displayError = useDisplayError()
-
-  const [dragData, setDragData] = useState<MonWithLocation>()
-  const [dragMon, setDragMon] = useState<PKMInterface>()
-
   const getEnabledSaveTypes = useCallback(() => {
     return appInfoState.extraSaveTypes
       .concat(appInfoState.officialSaveTypes)
@@ -115,12 +105,14 @@ function AppWithBackend() {
   }, [appInfoState])
 
   useEffect(() => {
-    if (pluginState.loaded) return
+    if (pluginState.loaded || !appInfoState.settingsLoaded) return
     backend.listInstalledPlugins().then(
       E.match(
         (err) => displayError('Error Getting Installed Plugins', err),
         (plugins) => {
-          const promises = plugins.map((plugin) => backend.loadPluginCode(plugin.id))
+          const promises = plugins
+            .filter((plugin) => appInfoState.settings.enabledPlugins[plugin.id])
+            .map((plugin) => backend.loadPluginCode(plugin.id))
 
           Promise.all(promises).then((results) => {
             const { failures, successes } = partitionResults(results)
@@ -137,7 +129,13 @@ function AppWithBackend() {
         }
       )
     )
-  }, [backend, displayError, pluginState])
+  }, [
+    backend,
+    displayError,
+    pluginState,
+    appInfoState.settingsLoaded,
+    appInfoState.settings.enabledPlugins,
+  ])
 
   return (
     <PluginContext.Provider value={[pluginState, pluginDispatch]}>
@@ -213,7 +211,15 @@ function AppWithBackend() {
                 ]}
               >
                 <FilterContext.Provider value={[filterState, filterDispatch]}>
-                  <AppTabs />
+                  {loading ? (
+                    <Box width="100%" height="100%" display="grid">
+                      <Typography margin="auto" fontSize={40} fontWeight="bold">
+                        OpenHome
+                      </Typography>
+                    </Box>
+                  ) : (
+                    <AppTabs />
+                  )}
                   <ErrorMessageModal />
                 </FilterContext.Provider>
               </OpenSavesContext.Provider>

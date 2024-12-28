@@ -49,7 +49,6 @@ export type Settings = {
 }
 
 export type AppInfoState = {
-  resourcesPath?: string
   settings: Settings
   settingsLoaded: boolean
   officialSaveTypes: SAVClass[]
@@ -57,10 +56,6 @@ export type AppInfoState = {
 }
 
 export type AppInfoAction =
-  | {
-      type: 'set_resources_path'
-      payload: string
-    }
   | {
       type: 'set_savetype_enabled'
       payload: {
@@ -99,12 +94,6 @@ export const appInfoReducer: Reducer<AppInfoState, AppInfoAction> = (
   const { type, payload } = action
 
   switch (type) {
-    case 'set_resources_path': {
-      return {
-        ...state,
-        resourcesPath: payload,
-      }
-    }
     case 'set_savetype_enabled': {
       const enabled = { ...state.settings.enabledSaveTypes }
 
@@ -133,7 +122,7 @@ export const appInfoReducer: Reducer<AppInfoState, AppInfoAction> = (
         )
       )
 
-      return { ...state, settings: { ...payload, enabledSaveTypes: enabled } }
+      return { ...state, settings: { ...payload, enabledSaveTypes: enabled }, settingsLoaded: true }
     }
     case 'set_icon_size': {
       return {
@@ -148,7 +137,7 @@ export const appInfoReducer: Reducer<AppInfoState, AppInfoAction> = (
       }
     }
     case 'set_app_theme': {
-      return { ...state, settings: { ...state.settings, appTheme: payload }, settingsLoaded: true }
+      return { ...state, settings: { ...state.settings, appTheme: payload } }
     }
   }
 }

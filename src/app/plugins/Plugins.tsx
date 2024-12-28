@@ -20,8 +20,13 @@ export default function PluginsPage() {
   const [availablePlugins, setAvailablePlugins] = useState<Record<string, string>>()
   const [loading, setLoading] = useState(false)
   const [useDevRepo, setUseDevRepo] = useState(false)
+  const [{ settings }] = useContext(AppInfoContext)
   const backend = useContext(BackendContext)
   const isDev = useIsDev()
+
+  useEffect(() => {
+    backend.updateSettings(settings).catch(console.error)
+  }, [settings, backend])
 
   useEffect(() => {
     setLoading(true)
@@ -196,8 +201,10 @@ function AvailablePluginCard(props: AvailablePluginCardProps) {
       )}
       {error ? (
         <ErrorIcon className="error-icon-button" />
+      ) : metadata ? (
+        <img className="plugin-icon" src={`${location}/${metadata.icon}`} />
       ) : (
-        <img className="plugin-icon" src={`${location}/${metadata?.icon}`} />
+        <CircularProgress />
       )}
       {progressPercent !== undefined && (
         <LinearProgress
