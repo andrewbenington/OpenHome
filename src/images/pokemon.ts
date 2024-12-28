@@ -18,7 +18,7 @@ export const fileToSpriteFolder: Record<string, string> = {
   PK3UB: 'rr',
   PK4: 'gen4',
   PK5: 'home',
-  PK6: 'gen6',
+  PK6: 'home',
   PK7: 'home',
   PB7: 'home',
   PK8: 'home',

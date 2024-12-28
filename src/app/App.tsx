@@ -36,7 +36,6 @@ const debouncedUpdateSettings = debounce((backend: BackendInterface, settings: S
 
 export default function App() {
   const isDarkMode = useIsDarkMode()
-  const backend = TauriBackend
   const theme = useMemo(
     () =>
       extendTheme({
@@ -52,7 +51,7 @@ export default function App() {
 
   return (
     <ThemeProvider theme={theme}>
-      <BackendProvider backend={backend}>
+      <BackendProvider backend={TauriBackend}>
         <ErrorContext.Provider value={[errorState, errorDispatch]}>
           <AppWithBackend />
         </ErrorContext.Provider>
@@ -147,20 +146,15 @@ function AppWithBackend() {
             onDragEnd={(e) => {
               const dest = e.over?.data.current
 
-              if (e.over?.id === 'to_release') {
-                if (dragData) {
+              if (dragData) {
+                if (e.over?.id === 'to_release') {
                   openSavesDispatch({
                     type: 'add_mon_to_release',
                     payload: dragData,
                   })
+                } else if (dragMon && dest?.save.supportsMon(dragMon.dexNum, dragMon.formeNum)) {
+                  openSavesDispatch({ type: 'move_mon', payload: { source: dragData, dest } })
                 }
-              } else if (
-                dragMon &&
-                dragData &&
-                dest &&
-                dest.save.supportsMon(dragMon.dexNum, dragMon.formeNum)
-              ) {
-                openSavesDispatch({ type: 'move_mon', payload: { source: dragData, dest } })
               }
 
               setDragData(e.over?.data.current as MonWithLocation)
