@@ -188,6 +188,5 @@ pub async fn download_async(
 
     emit_download_progress(&app_handle, plugin_metadata.id.clone(), 100.0);
 
-    println!("Wrote to {}", index_js_path.to_string_lossy().to_owned());
     return Ok(index_js_body);
 }

@@ -202,7 +202,7 @@ function AvailablePluginCard(props: AvailablePluginCardProps) {
       {error ? (
         <ErrorIcon className="error-icon-button" />
       ) : metadata ? (
-        <img className="plugin-icon" src={`${location}/${metadata.icon}`} />
+        <img className="plugin-icon" src={`${location}/icon.png`} />
       ) : (
         <CircularProgress />
       )}

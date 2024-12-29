@@ -275,7 +275,6 @@ pub async fn download_plugin(
     remote_url: String,
 ) -> Result<String, String> {
     let metadata_url = format!("{}/plugin.json", remote_url);
-    println!("Got metadata url");
 
     let plugin_metadata: PluginMetadata = util::download_json_file(metadata_url)
         .await

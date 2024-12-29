@@ -1,8 +1,11 @@
-import { PokemonData } from 'pokemon-species-data'
+import { NationalDex, PokemonData } from 'pokemon-species-data'
 import { ImageResponse } from '../backend/backendInterface'
 import { OpenHomePlugin } from '../state/plugin'
 
-type PluginBuilder = (pdata: typeof PokemonData) => { plugin: OpenHomePlugin }
+type PluginBuilder = (
+  pdata: typeof PokemonData,
+  ndex: typeof NationalDex
+) => { plugin: OpenHomePlugin }
 
 export function loadPlugin(pluginCode: string): OpenHomePlugin {
   // doesn't ensure isolation but should prevent direct window access
@@ -18,11 +21,12 @@ export function loadPlugin(pluginCode: string): OpenHomePlugin {
 
   const buildPlugin = new Function(
     'PokemonData',
+    'NationalDex',
     ...shadowedGlobals,
     pluginCode + '; return buildPlugin;'
   ) as PluginBuilder
 
-  const { plugin } = buildPlugin(PokemonData)
+  const { plugin } = buildPlugin(PokemonData, NationalDex)
 
   return plugin
 }
@@ -30,8 +34,7 @@ export function loadPlugin(pluginCode: string): OpenHomePlugin {
 export interface PluginMetadata {
   id: string
   name: string
-  icon: string
-  assets: Record<string, string>
+  version: string
 }
 
 export interface PluginMetadataWithIcon {
