@@ -266,7 +266,7 @@ pub fn validate_recent_saves(
 
 #[tauri::command]
 pub fn get_image_data(absolute_path: String) -> Result<ImageResponse, String> {
-    return util::get_image_data(absolute_path);
+    return util::get_image_data(&absolute_path);
 }
 
 #[tauri::command]

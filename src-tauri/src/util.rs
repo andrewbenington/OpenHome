@@ -237,7 +237,7 @@ where
     return Ok(body);
 }
 
-pub fn get_image_data(absolute_path: String) -> Result<ImageResponse, String> {
+pub fn get_image_data(absolute_path: &String) -> Result<ImageResponse, String> {
     let absolute_path_pb = PathBuf::from(&absolute_path);
 
     // Make sure folder exists
