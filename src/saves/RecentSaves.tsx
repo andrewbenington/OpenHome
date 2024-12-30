@@ -48,14 +48,10 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
             .filter(filterUndefined)
 
           // filter out saves from plugins that aren't enabled
-          const filteredRecents = Object.entries(recents)
-            .filter(
-              ([, ref]) =>
-                ref.pluginIdentifier === null || extraSaveIdentifiers.includes(ref.pluginIdentifier)
-            )
-            .sort(([, saveA], [, saveB]) => {
-              return (saveB.lastModified ?? 0) - (saveA.lastModified ?? 0)
-            })
+          const filteredRecents = Object.entries(recents).filter(
+            ([, ref]) =>
+              ref.pluginIdentifier === null || extraSaveIdentifiers.includes(ref.pluginIdentifier)
+          )
 
           setRecentSaves(Object.fromEntries(filteredRecents))
         }
@@ -216,7 +212,7 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
   ) : (
     <Stack flexWrap="wrap" direction="row" useFlexGap justifyContent="center" margin={2}>
       {Object.values(recentSaves ?? {})
-        .sort((a, b) => (b.lastOpened ?? 0) - (a.lastOpened ?? 0))
+        .sort((a, b) => (b.lastModified ?? 0) - (a.lastModified ?? 0))
         .map((save) => (
           <SaveCard
             key={save.filePath.raw}
