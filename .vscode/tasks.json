@@ -7,12 +7,7 @@
       "command": "npm",
       "args": ["run", "dev"],
       "isBackground": true,
-    },
-    {
-      "label": "frontend:build",
-      "type": "shell",
-      "command": "npm",
-      "args": ["run", "build"]
+      "problemMatcher": "$tsc"
     },
     {
       "label": "backend:build:debug",
@@ -21,25 +16,11 @@
       "args": ["build", "--manifest-path=./src-tauri/Cargo.toml", "--no-default-features"]
     },
     {
-      "label": "backend:build:release",
-      "type": "shell",
-      "command": "cargo",
-      "args": ["build", "--release", "--manifest-path=./src-tauri/Cargo.toml"]
-    },
-    {
       "label": "dev",
       "dependsOn": ["frontend:dev", "backend:build:debug"],
       "group": {
         "kind": "build",
         "isDefault": true
-      }
-    },
-    {
-      "label": "build",
-      "dependsOn": ["frontend:build", "backend:build:release"],
-      "group": {
-        "kind": "build",
-        "isDefault": false
       }
     }
   ]

@@ -7,15 +7,7 @@
       "request": "launch",
       "program": "${workspaceRoot}/src-tauri/target/debug/OpenHome.exe",
       "cwd": "${workspaceRoot}",
-      "preLaunchTask": "dev"
+      "preLaunchTask": "frontend:dev"
     },
-    {
-      "name": "Tauri Production Debug (MSVC)",
-      "type": "cppvsdbg",
-      "request": "launch",
-      "program": "${workspaceRoot}/src-tauri/target/release/OpenHome.exe",
-      "cwd": "${workspaceRoot}",
-      "preLaunchTask": "build"
-    }
   ],
 }
