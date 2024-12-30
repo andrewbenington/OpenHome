@@ -1,4 +1,4 @@
-import { Chip } from '@mui/joy'
+import { Chip, Dropdown, Menu, MenuButton, MenuItem } from '@mui/joy'
 import * as E from 'fp-ts/lib/Either'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { BackendContext } from 'src/backend/backendContext'
@@ -47,6 +47,7 @@ function InstalledPluginCard(props: { metadata: PluginMetadataWithIcon }) {
   const { metadata } = props
   const [, dispatchPluginState] = useContext(PluginContext)
   const [{ settings }, dispatchAppInfoState] = useContext(AppInfoContext)
+  const [menuOpen, setMenuOpen] = useState(false)
   const backend = useContext(BackendContext)
   const displayError = useDisplayError()
 
@@ -74,20 +75,7 @@ function InstalledPluginCard(props: { metadata: PluginMetadataWithIcon }) {
   }, [backend, dispatchAppInfoState, dispatchPluginState, displayError, metadata.id])
 
   return (
-    <button
-      className="plugin-display"
-      onClick={() => {
-        if (enabled) {
-          dispatchPluginState({ type: 'disable_plugin', payload: metadata.id })
-          dispatchAppInfoState({
-            type: 'set_plugin_enabled',
-            payload: { pluginID: metadata.id, enabled: false },
-          })
-        } else {
-          enablePlugin()
-        }
-      }}
-    >
+    <div className="plugin-display">
       <Chip className="status-chip" color={enabled ? 'success' : 'warning'}>
         {enabled ? 'Enabled' : 'Disabled'}
       </Chip>
@@ -97,7 +85,29 @@ function InstalledPluginCard(props: { metadata: PluginMetadataWithIcon }) {
           src={`data:image/${metadata.icon_image.extension};base64,${metadata.icon_image.base64}`}
         />
       )}
-      <div className="name-chip">{metadata.name}</div>
-    </button>
+      <Dropdown>
+        <MenuButton className="name-chip" variant="solid">
+          {metadata.name}
+        </MenuButton>
+        <Menu onClose={() => setMenuOpen(false)} placement="top-end">
+          <MenuItem
+            onClick={() => {
+              if (enabled) {
+                dispatchPluginState({ type: 'disable_plugin', payload: metadata.id })
+                dispatchAppInfoState({
+                  type: 'set_plugin_enabled',
+                  payload: { pluginID: metadata.id, enabled: false },
+                })
+              } else {
+                enablePlugin()
+              }
+            }}
+          >
+            {enabled ? 'Disable' : 'Enable'}
+          </MenuItem>
+          <MenuItem disabled>Delete</MenuItem>
+        </Menu>
+      </Dropdown>
+    </div>
   )
 }
