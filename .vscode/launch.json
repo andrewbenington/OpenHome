@@ -2,12 +2,20 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Debug Tauri (MSVC)",
+      "name": "Tauri Development Debug (MSVC)",
       "type": "cppvsdbg",
       "request": "launch",
-      "program": "${workspaceRoot}/src-tauri/target/debug/openhome.exe",
+      "program": "${workspaceRoot}/src-tauri/target/debug/OpenHome.exe",
       "cwd": "${workspaceRoot}",
-      "preLaunchTask": "ui:dev"
+      "preLaunchTask": "dev"
     },
-  ]
+    {
+      "name": "Tauri Production Debug (MSVC)",
+      "type": "cppvsdbg",
+      "request": "launch",
+      "program": "${workspaceRoot}/src-tauri/target/release/OpenHome.exe",
+      "cwd": "${workspaceRoot}",
+      "preLaunchTask": "build"
+    }
+  ],
 }

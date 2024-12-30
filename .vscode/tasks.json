@@ -2,25 +2,61 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "build:debug",
-      "type": "cargo",
-      "command": "build"
-    },
-    {
       "label": "ui:dev",
       "type": "shell",
-      "isBackground": true,
       "command": "npm",
       "args": ["run", "dev"],
-      "problemMatcher": ["$rustc"]
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "custom",
+        "pattern": [
+          {
+            "regexp": ".",
+            "file": 1,
+            "location": 2,
+            "message": 3
+          }
+        ],
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".",
+          "endsPattern": "."
+        }
+      }
+    },
+    {
+      "label": "ui:build",
+      "type": "shell",
+      "command": "npm",
+      "args": ["run", "build"]
+    },
+    {
+      "label": "backend:build:debug",
+      "type": "shell",
+      "command": "cargo",
+      "args": ["build", "--manifest-path=./src-tauri/Cargo.toml", "--no-default-features"]
+    },
+    {
+      "label": "backend:build:release",
+      "type": "shell",
+      "command": "cargo",
+      "args": ["build", "--release", "--manifest-path=./src-tauri/Cargo.toml"]
     },
     {
       "label": "dev",
-      "dependsOn": ["build:debug", "ui:dev"],
+      "dependsOn": ["ui:dev", "backend:build:debug"],
       "group": {
         "kind": "build",
         "isDefault": true
       }
     },
+    {
+      "label": "build",
+      "dependsOn": ["ui:build", "backend:build:release"],
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      }
+    }
   ]
 }
