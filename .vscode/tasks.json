@@ -1,0 +1,27 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "frontend:dev",
+      "type": "shell",
+      "command": "npm",
+      "args": ["run", "dev"],
+      "isBackground": true,
+      "problemMatcher": "$tsc"
+    },
+    {
+      "label": "backend:build:debug",
+      "type": "shell",
+      "command": "cargo",
+      "args": ["build", "--manifest-path=./src-tauri/Cargo.toml", "--no-default-features"]
+    },
+    {
+      "label": "dev",
+      "dependsOn": ["frontend:dev", "backend:build:debug"],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    }
+  ]
+}
