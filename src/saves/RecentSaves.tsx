@@ -48,10 +48,14 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
             .filter(filterUndefined)
 
           // filter out saves from plugins that aren't enabled
-          const filteredRecents = Object.entries(recents).filter(
-            ([, ref]) =>
-              ref.pluginIdentifier === null || extraSaveIdentifiers.includes(ref.pluginIdentifier)
-          )
+          const filteredRecents = Object.entries(recents)
+            .filter(
+              ([, ref]) =>
+                ref.pluginIdentifier === null || extraSaveIdentifiers.includes(ref.pluginIdentifier)
+            )
+            .sort(([, saveA], [, saveB]) => {
+              return (saveB.lastModified ?? 0) - (saveA.lastModified ?? 0)
+            })
 
           setRecentSaves(Object.fromEntries(filteredRecents))
         }
