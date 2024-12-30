@@ -2,7 +2,7 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "ui:dev",
+      "label": "frontend:dev",
       "type": "shell",
       "command": "npm",
       "args": ["run", "dev"],
@@ -25,7 +25,7 @@
       }
     },
     {
-      "label": "ui:build",
+      "label": "frontend:build",
       "type": "shell",
       "command": "npm",
       "args": ["run", "build"]
@@ -44,7 +44,7 @@
     },
     {
       "label": "dev",
-      "dependsOn": ["ui:dev", "backend:build:debug"],
+      "dependsOn": ["frontend:dev", "backend:build:debug"],
       "group": {
         "kind": "build",
         "isDefault": true
@@ -52,7 +52,7 @@
     },
     {
       "label": "build",
-      "dependsOn": ["ui:build", "backend:build:release"],
+      "dependsOn": ["frontend:build", "backend:build:release"],
       "group": {
         "kind": "build",
         "isDefault": false
