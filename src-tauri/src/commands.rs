@@ -300,3 +300,24 @@ pub fn load_plugin_code(app_handle: tauri::AppHandle, plugin_id: String) -> Resu
     let plugin_code = util::get_appdata_file_text(&app_handle, relative_path)?;
     return Ok(plugin_code);
 }
+
+#[tauri::command]
+pub fn delete_plugin(app_handle: tauri::AppHandle, plugin_id: String) -> Result<(), String> {
+    let plugins_dir = util::prepend_appdata_to_path(&app_handle, &PathBuf::from("plugins"))
+        .map_err(|err| format!("Error finding the plugins directory: {}", err))?;
+    let plugin_dir = plugins_dir.join(&plugin_id);
+
+    if !plugin_dir.exists() {
+        return Err(format!("Plugin is not downloaded: {}", plugin_id));
+    }
+
+    fs::remove_dir_all(&plugin_dir).map_err(|err| {
+        format!(
+            "Failed to delete the plugin located at {}: {}",
+            plugin_dir.to_string_lossy(),
+            err
+        )
+    })?;
+
+    Ok(())
+}
