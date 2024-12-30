@@ -47,7 +47,6 @@ function InstalledPluginCard(props: { metadata: PluginMetadataWithIcon }) {
   const { metadata } = props
   const [, dispatchPluginState] = useContext(PluginContext)
   const [{ settings }, dispatchAppInfoState] = useContext(AppInfoContext)
-  const [menuOpen, setMenuOpen] = useState(false)
   const backend = useContext(BackendContext)
   const displayError = useDisplayError()
 
@@ -89,7 +88,7 @@ function InstalledPluginCard(props: { metadata: PluginMetadataWithIcon }) {
         <MenuButton className="name-chip" variant="solid">
           {metadata.name}
         </MenuButton>
-        <Menu onClose={() => setMenuOpen(false)} placement="top-end">
+        <Menu placement="top-end">
           <MenuItem
             onClick={() => {
               if (enabled) {
