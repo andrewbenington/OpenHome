@@ -266,6 +266,7 @@ export const TauriBackend: BackendInterface = {
   listInstalledPlugins: TauriInvoker.listInstalledPlugins,
   downloadPlugin: TauriInvoker.downloadPlugin,
   loadPluginCode: TauriInvoker.loadPluginCode,
+  deletePlugin: TauriInvoker.deletePlugin,
 
   registerListeners: (listeners) => {
     const unlistenPromises: Promise<UnlistenFn>[] = [

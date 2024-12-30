@@ -73,6 +73,7 @@ export default interface BackendInterface {
   getPluginPath: (pluginId: string) => Promise<string>
   downloadPlugin(remoteUrl: string): Promise<Errorable<string>>
   loadPluginCode(pluginId: string): Promise<Errorable<string>>
+  deletePlugin(pluginId: string): Promise<Errorable<string>>
 }
 
 export interface BackendListeners {

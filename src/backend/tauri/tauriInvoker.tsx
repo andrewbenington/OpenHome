@@ -162,7 +162,8 @@ export const TauriInvoker = {
   },
 
   deletePlugin(pluginId: string): Promise<Errorable<string>> {
-    const promise: Promise<string> = invoke('delete_plugin', {pluginId})
+    const promise: Promise<string> = invoke('delete_plugin', { pluginId })
+
     return promise.then(E.right).catch(E.left)
-  }
+  },
 }
