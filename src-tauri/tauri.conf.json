@@ -33,6 +33,7 @@
       "icons/icon.ico"
     ],
     "macOS": {
+      "signingIdentity": "9MGK3X58YN",
       "minimumSystemVersion": "14.6"
     }
   }

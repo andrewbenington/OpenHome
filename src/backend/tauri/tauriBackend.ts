@@ -5,6 +5,7 @@ import { open as fileDialog } from '@tauri-apps/plugin-dialog'
 import { readFile, stat } from '@tauri-apps/plugin-fs'
 import { platform } from '@tauri-apps/plugin-os'
 import { open } from '@tauri-apps/plugin-shell'
+import dayjs from 'dayjs'
 import * as E from 'fp-ts/lib/Either'
 import BackendInterface from 'src/backend/backendInterface'
 import { OHPKM } from 'src/types/pkm/OHPKM'
@@ -148,7 +149,7 @@ export const TauriBackend: BackendInterface = {
 
     const recentSaves = recentSavesResult.right
 
-    recentSaves[saveRef.filePath.raw] = saveRef
+    recentSaves[saveRef.filePath.raw] = { ...saveRef, lastOpened: dayjs().unix() * 1000 }
     return TauriInvoker.writeStorageFileJSON('recent_saves.json', recentSaves as JSONObject)
   },
   removeRecentSave: async (filePath: string): Promise<Errorable<null>> => {
