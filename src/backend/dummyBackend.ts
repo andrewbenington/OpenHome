@@ -53,6 +53,7 @@ const DummyBackend: BackendInterface = {
   getPluginPath: async () => '',
   downloadPlugin: async () => E.left('no backend in use'),
   loadPluginCode: async () => E.left('no backend in use'),
+  deletePlugin: async () => E.left('no backend in use'),
 }
 
 export default DummyBackend
