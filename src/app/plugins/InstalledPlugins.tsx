@@ -1,7 +1,7 @@
 import { Chip } from '@mui/joy'
 import * as E from 'fp-ts/lib/Either'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
-import { MdDelete } from "react-icons/md"
+import { MdDelete } from 'react-icons/md'
 import { BackendContext } from 'src/backend/backendContext'
 import useDisplayError from 'src/hooks/displayError'
 import { AppInfoContext } from 'src/state/appInfo'
@@ -37,20 +37,27 @@ export default function InstalledPlugins() {
   const handleDeletePlugin = (pluginID: string) => {
     setInstalledPlugins((prevPlugins) =>
       prevPlugins ? prevPlugins.filter((plugin) => plugin.id !== pluginID) : []
-    );
-  };
+    )
+  }
 
   return (
     <div style={{ gap: 8, display: 'flex', flexWrap: 'wrap', padding: 16 }}>
       {installedPlugins &&
         Object.entries(installedPlugins).map(([, metadata]) => (
-          <InstalledPluginCard key={metadata.id} metadata={metadata} onDelete={handleDeletePlugin} />
+          <InstalledPluginCard
+            key={metadata.id}
+            metadata={metadata}
+            onDelete={handleDeletePlugin}
+          />
         ))}
     </div>
   )
 }
 
-function InstalledPluginCard(props: { metadata: PluginMetadataWithIcon; onDelete: (id: string) => void }) {
+function InstalledPluginCard(props: {
+  metadata: PluginMetadataWithIcon
+  onDelete: (id: string) => void
+}) {
   const { metadata, onDelete } = props
   const [, dispatchPluginState] = useContext(PluginContext)
   const [{ settings }, dispatchAppInfoState] = useContext(AppInfoContext)
@@ -86,7 +93,7 @@ function InstalledPluginCard(props: { metadata: PluginMetadataWithIcon; onDelete
       return
     }
 
-    if (enabled) {                
+    if (enabled) {
       dispatchPluginState({ type: 'disable_plugin', payload: metadata.id })
       dispatchAppInfoState({
         type: 'set_plugin_enabled',
@@ -116,28 +123,26 @@ function InstalledPluginCard(props: { metadata: PluginMetadataWithIcon; onDelete
         {metadata.name}
       </div>
       <MdDelete
-  className="delete-icon"
-  style={{
-    position: 'absolute',
-    bottom: 8,
-    left: 8,
-    cursor: 'pointer',
-    transition: 'color 0.3s',
-  }}
-  onClick={(e) => {
-    e.stopPropagation(); // Prevent card click
-    backend.deletePlugin(metadata.id).then(
-      () => {
-        console.log(`Deleted plugin: ${metadata.id}`);
-        onDelete(metadata.id);
-      },
-      (err) => {
-        displayError('Error Deleting Plugin', err);
-      }
-    );
-  }}
-/>
-
+        className="delete-icon"
+        style={{
+          position: 'absolute',
+          bottom: 8,
+          left: 8,
+          cursor: 'pointer',
+          transition: 'color 0.3s',
+        }}
+        onClick={(e) => {
+          e.stopPropagation() // Prevent card click
+          backend.deletePlugin(metadata.id).then(
+            () => {
+              onDelete(metadata.id)
+            },
+            (err) => {
+              displayError('Error Deleting Plugin', err)
+            }
+          )
+        }}
+      />
     </div>
   )
 }
