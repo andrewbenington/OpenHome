@@ -307,17 +307,5 @@ pub fn delete_plugin(app_handle: tauri::AppHandle, plugin_id: String) -> Result<
         .map_err(|err| format!("Error finding the plugins directory: {}", err))?;
     let plugin_dir = plugins_dir.join(&plugin_id);
 
-    if !plugin_dir.exists() {
-        return Err(format!("Plugin is not downloaded: {}", plugin_id));
-    }
-
-    fs::remove_dir_all(&plugin_dir).map_err(|err| {
-        format!(
-            "Failed to delete the plugin located at {}: {}",
-            plugin_dir.to_string_lossy(),
-            err
-        )
-    })?;
-
-    Ok(())
+    util::delete_folder(plugin_dir)
 }

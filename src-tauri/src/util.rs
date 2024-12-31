@@ -272,3 +272,20 @@ pub fn get_image_data(absolute_path: &String) -> Result<ImageResponse, String> {
 
     return Ok(response);
 }
+
+pub fn delete_folder(folder_path: PathBuf) -> Result<(), String> {
+    if !folder_path.exists() {
+        return Err(format!(
+            "Folder does not exist: {}",
+            folder_path.to_string_lossy()
+        ));
+    }
+
+    fs::remove_dir_all(&folder_path).map_err(|err| {
+        format!(
+            "Failed to delete the folder located at {}: {}",
+            folder_path.to_string_lossy(),
+            err
+        )
+    })
+}
