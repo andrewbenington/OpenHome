@@ -186,17 +186,17 @@ function AvailablePluginCard(props: AvailablePluginCardProps) {
           })
       }}
     >
-      {installed && progressPercent === undefined && (
-        <Chip className="status-chip" color="success" variant="solid">
-          Installed
-        </Chip>
-      )}
       {error ? (
         <ErrorIcon className="error-icon-button" />
       ) : metadata ? (
         <img className="plugin-icon" src={`${location}/icon.png`} />
       ) : (
         <CircularProgress />
+      )}
+      {installed && progressPercent === undefined && (
+        <Chip className="status-chip" color="success" variant="solid">
+          Installed
+        </Chip>
       )}
       {progressPercent !== undefined && (
         <LinearProgress

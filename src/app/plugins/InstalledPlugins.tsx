@@ -101,15 +101,16 @@ function InstalledPluginCard(props: {
 
   return (
     <button className="plugin-display" style={{ cursor: 'pointer' }} onClick={handleCardClick}>
-      <Chip className="status-chip" color={enabled ? 'success' : 'warning'}>
-        {enabled ? 'Enabled' : 'Disabled'}
-      </Chip>
+
       {metadata.icon_image && (
         <img
           className="plugin-icon"
           src={`data:image/${metadata.icon_image.extension};base64,${metadata.icon_image.base64}`}
         />
       )}
+      <Chip className="status-chip" color={enabled ? 'success' : 'warning'}>
+        {enabled ? 'Enabled' : 'Disabled'}
+      </Chip>
       <div className="name-chip" style={{ width: '100%' }}>
         {metadata.name}
       </div>
