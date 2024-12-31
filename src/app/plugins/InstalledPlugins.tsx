@@ -87,12 +87,7 @@ function InstalledPluginCard(props: {
     )
   }, [backend, dispatchAppInfoState, dispatchPluginState, displayError, metadata.id])
 
-  const handleCardClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    // Ignore clicks on the delete button
-    if ((event.target as HTMLElement).closest('.delete-icon')) {
-      return
-    }
-
+  const handleCardClick = () => {
     if (enabled) {
       dispatchPluginState({ type: 'disable_plugin', payload: metadata.id })
       dispatchAppInfoState({
@@ -105,11 +100,7 @@ function InstalledPluginCard(props: {
   }
 
   return (
-    <div
-      className="plugin-display"
-      style={{ cursor: 'pointer' }} // Change cursor on hover
-      onClick={handleCardClick}
-    >
+    <button className="plugin-display" style={{ cursor: 'pointer' }} onClick={handleCardClick}>
       <Chip className="status-chip" color={enabled ? 'success' : 'warning'}>
         {enabled ? 'Enabled' : 'Disabled'}
       </Chip>
@@ -132,7 +123,8 @@ function InstalledPluginCard(props: {
           transition: 'color 0.3s',
         }}
         onClick={(e) => {
-          e.stopPropagation() // Prevent card click
+          // Prevent card click (enable/disable) when clicking the delete icon
+          e.stopPropagation()
           backend.deletePlugin(metadata.id).then(
             () => {
               onDelete(metadata.id)
@@ -143,6 +135,6 @@ function InstalledPluginCard(props: {
           )
         }}
       />
-    </div>
+    </button>
   )
 }
