@@ -1,6 +1,7 @@
-import { Chip, Dropdown, Menu, MenuButton, MenuItem } from '@mui/joy'
+import { Chip } from '@mui/joy'
 import * as E from 'fp-ts/lib/Either'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { MdDelete } from "react-icons/md"
 import { BackendContext } from 'src/backend/backendContext'
 import useDisplayError from 'src/hooks/displayError'
 import { AppInfoContext } from 'src/state/appInfo'
@@ -73,8 +74,29 @@ function InstalledPluginCard(props: { metadata: PluginMetadataWithIcon }) {
     )
   }, [backend, dispatchAppInfoState, dispatchPluginState, displayError, metadata.id])
 
+  const handleCardClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    // Ignore clicks on the delete button
+    if ((event.target as HTMLElement).closest('.delete-icon')) {
+      return
+    }
+
+    if (enabled) {                
+      dispatchPluginState({ type: 'disable_plugin', payload: metadata.id })
+      dispatchAppInfoState({
+        type: 'set_plugin_enabled',
+        payload: { pluginID: metadata.id, enabled: false },
+      })
+    } else {
+      enablePlugin()
+    }
+  }
+
   return (
-    <div className="plugin-display">
+    <div
+      className="plugin-display"
+      style={{ cursor: 'pointer' }} // Change cursor on hover
+      onClick={handleCardClick}
+    >
       <Chip className="status-chip" color={enabled ? 'success' : 'warning'}>
         {enabled ? 'Enabled' : 'Disabled'}
       </Chip>
@@ -84,29 +106,23 @@ function InstalledPluginCard(props: { metadata: PluginMetadataWithIcon }) {
           src={`data:image/${metadata.icon_image.extension};base64,${metadata.icon_image.base64}`}
         />
       )}
-      <Dropdown>
-        <MenuButton className="name-chip" variant="solid">
-          {metadata.name}
-        </MenuButton>
-        <Menu placement="top-end">
-          <MenuItem
-            onClick={() => {
-              if (enabled) {
-                dispatchPluginState({ type: 'disable_plugin', payload: metadata.id })
-                dispatchAppInfoState({
-                  type: 'set_plugin_enabled',
-                  payload: { pluginID: metadata.id, enabled: false },
-                })
-              } else {
-                enablePlugin()
-              }
-            }}
-          >
-            {enabled ? 'Disable' : 'Enable'}
-          </MenuItem>
-          <MenuItem disabled>Delete</MenuItem>
-        </Menu>
-      </Dropdown>
+      <div className="name-chip" style={{ width: '100%' }}>
+        {metadata.name}
+      </div>
+      <MdDelete
+        className="delete-icon"
+        style={{
+          position: 'absolute',
+          bottom: 8,
+          left: 8,
+          cursor: 'pointer',
+          transition: 'color 0.3s',
+        }}
+        onClick={(e) => {
+          e.stopPropagation() // Prevent the card click from triggering
+          console.log(`Delete plugin: ${metadata.id}`)
+        }}
+      />
     </div>
   )
 }
