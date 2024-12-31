@@ -75,6 +75,11 @@ export const getPokemonSpritePath = (mon: PKMInterface, format?: string) => {
     }
     let gen3RRname = RRSprites[toGen3RRPokemonIndex(mon.dexNum, mon.formeNum)]
 
+    if (!gen3RRname) {
+      console.error(`missing Radical Red sprite for ${spriteName}`)
+      return `sprites/home/${spriteName}.png`
+    }
+
     if (gen3RRname.length === 0) return gen3RRname
     gen3RRname = gen3RRname[0].toUpperCase() + gen3RRname.slice(1).toLowerCase()
     return `sprites/${spriteFolder}/${gen3RRname}`
@@ -84,6 +89,11 @@ export const getPokemonSpritePath = (mon: PKMInterface, format?: string) => {
     }
     let gen3UBname =
       UBSprites[toGen3CRFUPokemonIndex(mon.dexNum, mon.formeNum, NationalDexToUnboundMap)]
+
+    if (!gen3UBname) {
+      console.error(`missing Unbound sprite for ${spriteName}`)
+      return `sprites/home/${spriteName}.png`
+    }
 
     if (gen3UBname.length === 0) return gen3UBname
     gen3UBname = gen3UBname[0].toUpperCase() + gen3UBname.slice(1).toLowerCase()

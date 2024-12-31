@@ -5,11 +5,15 @@ import threading
 import time
 import urllib.request
 
-if not os.path.isdir('src/renderer/public'):
-    print("current directory must be project source. aborting")
+if not os.path.isdir('public'):
+    print("current directory must be project source. exiting")
     exit(1)
 
-with open('src/consts/JSON/Pokemon.json') as f:
+if not (pokemon_json_path := os.getenv("POKEMON_JSON_PATH")):
+    print("POKEMON_JSON_PATH must be present. exiting")
+    exit(1)
+
+with open(pokemon_json_path) as f:
     POKEMON_DATA = json.load(f)
 
 def format_pokemon_db_forme(dex_num: int, form_num: int) -> str:
@@ -451,18 +455,18 @@ def exclude_forme_home(dex_number, forme):
 
 
 def download_all_sprites_all_mons():
-    os.makedirs("src/renderer/public/sprites/home/shiny", exist_ok=True)
-    os.makedirs("src/renderer/public/sprites/gen1", exist_ok=True)
-    os.makedirs("src/renderer/public/sprites/gen2/shiny", exist_ok=True)
-    os.makedirs("src/renderer/public/sprites/gen3/shiny", exist_ok=True)
-    os.makedirs("src/renderer/public/sprites/gen3gc/shiny", exist_ok=True)
-    os.makedirs("src/renderer/public/sprites/gen4/shiny", exist_ok=True)
-    os.makedirs("src/renderer/public/sprites/gen5/shiny", exist_ok=True)
-    os.makedirs("src/renderer/public/sprites/gen6/shiny", exist_ok=True)
-    os.makedirs("src/renderer/public/sprites/gen7/shiny", exist_ok=True)
-    os.makedirs("src/renderer/public/sprites/gen8/shiny", exist_ok=True)
-    os.makedirs("src/renderer/public/sprites/gen8a/shiny", exist_ok=True)
-    os.makedirs("src/renderer/public/sprites/gen9/shiny", exist_ok=True)
+    os.makedirs("public/sprites/home/shiny", exist_ok=True)
+    os.makedirs("public/sprites/gen1", exist_ok=True)
+    os.makedirs("public/sprites/gen2/shiny", exist_ok=True)
+    os.makedirs("public/sprites/gen3/shiny", exist_ok=True)
+    os.makedirs("public/sprites/gen3gc/shiny", exist_ok=True)
+    os.makedirs("public/sprites/gen4/shiny", exist_ok=True)
+    # os.makedirs("public/sprites/gen5/shiny", exist_ok=True)
+    # os.makedirs("public/sprites/gen6/shiny", exist_ok=True)
+    # os.makedirs("public/sprites/gen7/shiny", exist_ok=True)
+    # os.makedirs("public/sprites/gen8/shiny", exist_ok=True)
+    # os.makedirs("public/sprites/gen8a/shiny", exist_ok=True)
+    os.makedirs("public/sprites/gen9/shiny", exist_ok=True)
     for dex_num_str, mon in POKEMON_DATA.items():
         dex_number = int(dex_num_str)
         for forme_number, forme in enumerate(mon["formes"]):
@@ -499,25 +503,25 @@ def download_all_sprites(dex_number, forme, forme_number, forme_name):
         download_sprite_variants_pokemon_db(
             dex_number, forme_number, forme_name,
             "heartgold-soulsilver", "gen4", dex_number != 133 and dex_number != 419)
-    if dex_number <= 649 and not excludeFormeGen5(dex_number, forme):
-        download_sprite_variants_pokemon_db(
-            dex_number, forme_number, forme_name, "black-white/anim", "gen5", dex_number != 133)
-    if dex_number <= 721 and not excludeFormeGen456(dex_number, forme):
-        download_sprite_variants_pokemon_db(
-            dex_number, forme_number, forme_name, "bank", "gen6", dex_number != 133)
-    if dex_number == 774:
-        download_sprite_variants_pokemon_db(
-            dex_number, forme_number, forme_name, "sun-moon", "gen7")
-    elif dex_number <= 809 and not excludeFormeGen7(dex_number, forme):
-        download_sprite_variants_pokemon_db(
-            dex_number, forme_number, forme_name, "ultra-sun-ultra-moon", "gen7", dex_number != 133)
-    if dex_number <= 1024 and not exclude_forme_home(dex_number, forme):
+    # if dex_number <= 649 and not excludeFormeGen5(dex_number, forme):
+    #     download_sprite_variants_pokemon_db(
+    #         dex_number, forme_number, forme_name, "black-white/anim", "gen5", dex_number != 133)
+    # if dex_number <= 721 and not excludeFormeGen456(dex_number, forme):
+    #     download_sprite_variants_pokemon_db(
+    #         dex_number, forme_number, forme_name, "bank", "gen6", dex_number != 133)
+    # if dex_number == 774:
+    #     download_sprite_variants_pokemon_db(
+    #         dex_number, forme_number, forme_name, "sun-moon", "gen7")
+    # elif dex_number <= 809 and not excludeFormeGen7(dex_number, forme):
+    #     download_sprite_variants_pokemon_db(
+    #         dex_number, forme_number, forme_name, "ultra-sun-ultra-moon", "gen7", dex_number != 133)
+    if dex_number <= 1025 and not exclude_forme_home(dex_number, forme):
         download_sprite_variants_pokemon_db(
             dex_number, forme_number, forme_name, "home", "home")
-    if dex_number <= 724 and not excludeFormeLA(dex_number, forme):
-        download_sprite_variants_pokemon_db(
-            dex_number, forme_number, forme_name, "legends-arceus", "gen8a")
-    if dex_number <= 1026 and not exclude_forme_gen9(dex_number, forme):
+    # if dex_number <= 724 and not excludeFormeLA(dex_number, forme):
+    #     download_sprite_variants_pokemon_db(
+    #         dex_number, forme_number, forme_name, "legends-arceus", "gen8a")
+    if dex_number <= 1025 and not exclude_forme_gen9(dex_number, forme):
         download_sprite_variants_pokemon_db(
             dex_number, forme_number, forme_name, "scarlet-violet", "gen9")
 
@@ -526,22 +530,22 @@ def download_sprite_variants_pokemon_db(dex_number, forme_number, forme_name, ga
         return
     extension = ".gif" if "anim" in game else ".png"
     download_png(get_pokemon_db_sprite(dex_number, forme_number, False,
-                                       game, False, forme_name), "src/renderer/public/sprites/" + folder, forme_name + extension)
+                                       game, False, forme_name), "public/sprites/" + folder, forme_name + extension)
     if game == "red-blue" or game == 'scarlet-violet':
         return
     download_png(get_pokemon_db_sprite(dex_number, forme_number, True,
-                                       game, False, forme_name), "src/renderer/public/sprites/" + folder + "/shiny", forme_name + extension)
+                                       game, False, forme_name), "public/sprites/" + folder + "/shiny", forme_name + extension)
     if includeFemale and dex_number in gender_differences and forme_number == 0 and dex_number != 255 and dex_number != 418:
         download_png(get_pokemon_db_sprite(dex_number, forme_number, False,
-                                           game, is_female=True), "src/renderer/public/sprites/" + folder, forme_name + "-f" + extension)
+                                           game, is_female=True), "public/sprites/" + folder, forme_name + "-f" + extension)
         download_png(get_pokemon_db_sprite(dex_number, forme_number, True,
-                                           game, is_female=True), "src/renderer/public/sprites/" + folder + "/shiny", forme_name + "-f" + extension)
+                                           game, is_female=True), "public/sprites/" + folder + "/shiny", forme_name + "-f" + extension)
 
 def download_sprite_variants_pokencyclopedia_coloxd(dex_number, forme_number, forme_name):
     gen3_forme = None
     if forme_number > 0 or dex_number == 201:
         gen3_forme = forme_name.split('-')[1]
-    download_png(get_pokencyclopedia_coloxd_sprite(dex_number, False, gen3_forme), "src/renderer/public/sprites/gen3gc", forme_name + ".gif")
-    download_png(get_pokencyclopedia_coloxd_sprite(dex_number, True, gen3_forme), "src/renderer/public/sprites/gen3gc/shiny", forme_name + ".gif")
+    download_png(get_pokencyclopedia_coloxd_sprite(dex_number, False, gen3_forme), "public/sprites/gen3gc", forme_name + ".gif")
+    download_png(get_pokencyclopedia_coloxd_sprite(dex_number, True, gen3_forme), "public/sprites/gen3gc/shiny", forme_name + ".gif")
 
 download_all_sprites_all_mons()
