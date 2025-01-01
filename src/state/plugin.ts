@@ -25,10 +25,6 @@ export type PluginAction =
       payload: OpenHomePlugin[]
     }
   | {
-      type: 'disable_plugin'
-      payload: string
-    }
-  | {
       type: 'remove_plugin'
       payload: string
     }
@@ -59,12 +55,6 @@ export const pluginReducer: Reducer<PluginState, PluginAction> = (
           ),
           ...payload,
         ],
-      }
-    }
-    case 'disable_plugin': {
-      return {
-        ...state,
-        plugins: state.plugins.filter((plugin) => plugin.id !== payload),
       }
     }
     case 'remove_plugin': {

@@ -91,7 +91,7 @@ function InstalledPluginCard(props: {
 
   const handleCardClick = () => {
     if (enabled) {
-      dispatchPluginState({ type: 'disable_plugin', payload: metadata.id })
+      dispatchPluginState({ type: 'remove_plugin', payload: metadata.id })
       dispatchAppInfoState({
         type: 'set_plugin_enabled',
         payload: { pluginID: metadata.id, enabled: false },
