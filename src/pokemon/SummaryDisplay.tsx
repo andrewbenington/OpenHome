@@ -24,7 +24,7 @@ const styles = {
     alignItems: 'center',
   },
   image: {
-    maxWidth: 100,
+    maxWidth: 140,
     maxHeight: 100,
     transform: 'scale(2)',
     imageRendering: 'pixelated',

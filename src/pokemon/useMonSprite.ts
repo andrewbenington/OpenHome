@@ -39,10 +39,11 @@ export default function useMonSprite(mon: PKMInterface) {
             E.match(
               (err) => {
                 setLoadError(true)
-                displayError('Plugin Sprite Error', [
+                console.warn(
+                  'Plugin Sprite Error',
                   `Plugin '${plugin.id}' failed to load a sprite`,
-                  err,
-                ])
+                  err
+                )
               },
               (imageData) =>
                 setSpritePath(`data:image/${imageData.extension};base64,${imageData.base64}`)
