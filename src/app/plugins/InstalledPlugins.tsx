@@ -13,6 +13,7 @@ export default function InstalledPlugins() {
   const displayError = useDisplayError()
   const [installedPlugins, setInstalledPlugins] = useState<PluginMetadataWithIcon[]>()
   const [{ settings }] = useContext(AppInfoContext)
+  const [, dispatchPluginState] = useContext(PluginContext)
   const backend = useContext(BackendContext)
 
   useEffect(() => {
@@ -38,6 +39,7 @@ export default function InstalledPlugins() {
     setInstalledPlugins((prevPlugins) =>
       prevPlugins ? prevPlugins.filter((plugin) => plugin.id !== pluginID) : []
     )
+    dispatchPluginState({ type: 'remove_plugin', payload: pluginID })
   }
 
   return (

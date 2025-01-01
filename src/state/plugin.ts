@@ -29,6 +29,10 @@ export type PluginAction =
       payload: string
     }
   | {
+      type: 'remove_plugin'
+      payload: string
+    }
+  | {
       type: 'set_loaded'
       payload: boolean
     }
@@ -58,6 +62,12 @@ export const pluginReducer: Reducer<PluginState, PluginAction> = (
       }
     }
     case 'disable_plugin': {
+      return {
+        ...state,
+        plugins: state.plugins.filter((plugin) => plugin.id !== payload),
+      }
+    }
+    case 'remove_plugin': {
       return {
         ...state,
         plugins: state.plugins.filter((plugin) => plugin.id !== payload),
