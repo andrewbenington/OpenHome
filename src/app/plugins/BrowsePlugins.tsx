@@ -21,6 +21,7 @@ export default function BrowsePlugins() {
   const [loading, setLoading] = useState(false)
   const [useDevRepo, setUseDevRepo] = useState(false)
   const [{ settings }] = useContext(AppInfoContext)
+  const [pluginState, dispatchPluginState] = useContext(PluginContext)
   const backend = useContext(BackendContext)
   const isDev = useIsDev()
 
@@ -43,12 +44,11 @@ export default function BrowsePlugins() {
           displayError('Error Finding Available Plugins', `${e}`)
         }
       })
-      .catch((e) => {
-        console.error(e)
-        displayError('Error Getting Plugins', [`${e}`])
+      .finally(() => {
+        dispatchPluginState({ type: 'set_loaded', payload: true })
+        setLoading(false)
       })
-      .finally(() => setLoading(false))
-  }, [displayError, useDevRepo])
+  }, [displayError, useDevRepo, dispatchPluginState])
 
   const loadInstalled = useCallback(
     async () =>
@@ -62,8 +62,9 @@ export default function BrowsePlugins() {
   )
 
   useEffect(() => {
+    if (installedPlugins && pluginState.loaded) return
     loadInstalled()
-  }, [loadInstalled])
+  }, [installedPlugins, loadInstalled, pluginState.loaded])
 
   return loading ? (
     <CircularProgress style={{ margin: 'auto', width: '100%', height: '100%' }} color="secondary" />

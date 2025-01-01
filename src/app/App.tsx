@@ -107,7 +107,10 @@ function AppWithBackend() {
     if (pluginState.loaded || !appInfoState.settingsLoaded) return
     backend.listInstalledPlugins().then(
       E.match(
-        (err) => displayError('Error Getting Installed Plugins', err),
+        (err) => {
+          pluginDispatch({ type: 'set_loaded', payload: true })
+          displayError('Error Getting Installed Plugins', err)
+        },
         (plugins) => {
           const promises = plugins
             .filter((plugin) => appInfoState.settings.enabledPlugins[plugin.id])

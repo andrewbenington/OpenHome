@@ -12,12 +12,16 @@ use crate::util::{self, ImageResponse};
 pub struct PluginMetadata {
     pub id: String,
     pub name: String,
+    pub version: String,
+    pub api_version: u32,
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
 pub struct PluginMetadataWithIcon {
     pub id: String,
     pub name: String,
+    pub version: String,
+    pub api_version: u32,
     pub icon_image: Option<ImageResponse>,
 }
 
@@ -64,7 +68,13 @@ pub fn list_plugins(
             continue;
         }
 
-        let metadata: PluginMetadata = serde_json::from_reader(file_r.unwrap())?;
+        let metadata_r: Result<PluginMetadata, serde_json::Error> =
+            serde_json::from_reader(file_r.unwrap());
+        if let Err(err) = metadata_r {
+            eprintln!("Broken plugin entry: {}", err);
+            continue;
+        }
+        let metadata = metadata_r.unwrap();
 
         let icon_path = plugin_dir_path
             .join("icon.png")
@@ -78,6 +88,8 @@ pub fn list_plugins(
             let metadata_with_icon = PluginMetadataWithIcon {
                 id: metadata.id,
                 name: metadata.name,
+                version: metadata.version,
+                api_version: metadata.api_version,
                 icon_image: None,
             };
 
@@ -88,6 +100,8 @@ pub fn list_plugins(
         let metadata_with_icon = PluginMetadataWithIcon {
             id: metadata.id,
             name: metadata.name,
+            version: metadata.version,
+            api_version: metadata.api_version,
             icon_image: image_response_r.ok(),
         };
 

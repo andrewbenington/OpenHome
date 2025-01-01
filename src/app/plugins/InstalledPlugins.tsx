@@ -13,7 +13,7 @@ export default function InstalledPlugins() {
   const displayError = useDisplayError()
   const [installedPlugins, setInstalledPlugins] = useState<PluginMetadataWithIcon[]>()
   const [{ settings }] = useContext(AppInfoContext)
-  const [, dispatchPluginState] = useContext(PluginContext)
+  const [pluginState, dispatchPluginState] = useContext(PluginContext)
   const backend = useContext(BackendContext)
 
   useEffect(() => {
@@ -22,18 +22,25 @@ export default function InstalledPlugins() {
 
   const loadInstalled = useCallback(
     async () =>
-      backend.listInstalledPlugins().then(
-        E.match(
-          (err) => displayError('Error Getting Installed Plugins', err),
-          (plugins) => setInstalledPlugins(plugins)
+      backend
+        .listInstalledPlugins()
+        .then(
+          E.match(
+            (err) => {
+              dispatchPluginState({ type: 'set_loaded', payload: true })
+              displayError('Error Getting Installed Plugins', err)
+            },
+            (plugins) => setInstalledPlugins(plugins)
+          )
         )
-      ),
-    [backend, displayError]
+        .finally(() => dispatchPluginState({ type: 'set_loaded', payload: true })),
+    [backend, displayError, dispatchPluginState]
   )
 
   useEffect(() => {
+    if (installedPlugins && pluginState.loaded) return
     loadInstalled()
-  }, [loadInstalled])
+  }, [loadInstalled, installedPlugins, pluginState.loaded])
 
   const handleDeletePlugin = (pluginID: string) => {
     setInstalledPlugins((prevPlugins) =>
@@ -112,9 +119,7 @@ function InstalledPluginCard(props: {
       <Chip className="status-chip" color={enabled ? 'success' : 'warning'}>
         {enabled ? 'Enabled' : 'Disabled'}
       </Chip>
-      <div className="name-chip" style={{ width: '100%' }}>
-        {metadata.name}
-      </div>
+      <div className="name-chip">{metadata.name}</div>
       <MdDelete
         className="delete-icon"
         onClick={(e) => {

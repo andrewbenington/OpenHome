@@ -1,10 +1,11 @@
 .plugin-display {
   width: 200px;
   height: 200px;
-  padding: 0px;
   position: relative;
   background-color: #fff6;
   border-radius: 8px;
+  border-width: 0px;
+  overflow: hidden;
 }
 
 .plugin-icon {
@@ -25,14 +26,14 @@
 }
 
 .name-chip {
-  position: absolute !important;
-  top: 6px;
-  width: 94% !important;
-  left: 3%;
-  background-color: #666;
-  border-radius: 5px !important;
-  min-height: 0px !important;
-  padding: 4px 0px !important;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 5px 0px !important;
+  font-weight: bold;
+  color: #000;
+  background-color: #eff;
 }
 
 .plugin-progress {
