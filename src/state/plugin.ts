@@ -9,8 +9,8 @@ interface MonData {
 }
 
 export interface OpenHomePlugin {
-  pluginID: string
-  pluginName: string
+  id: string
+  name: string
   getMonSpritePath?: (params: MonData) => string | null
 }
 
@@ -43,10 +43,7 @@ export const pluginReducer: Reducer<PluginState, PluginAction> = (
     case 'register_plugin': {
       return {
         ...state,
-        plugins: [
-          ...state.plugins.filter((plugin) => plugin.pluginID !== payload.pluginID),
-          payload,
-        ],
+        plugins: [...state.plugins.filter((plugin) => plugin.id !== payload.id), payload],
       }
     }
     case 'register_plugins': {
@@ -54,7 +51,7 @@ export const pluginReducer: Reducer<PluginState, PluginAction> = (
         ...state,
         plugins: [
           ...state.plugins.filter(
-            (plugin) => !payload.some((toRegister) => toRegister.pluginID === plugin.pluginID)
+            (plugin) => !payload.some((toRegister) => toRegister.id === plugin.id)
           ),
           ...payload,
         ],
@@ -63,7 +60,7 @@ export const pluginReducer: Reducer<PluginState, PluginAction> = (
     case 'disable_plugin': {
       return {
         ...state,
-        plugins: state.plugins.filter((plugin) => plugin.pluginID !== payload),
+        plugins: state.plugins.filter((plugin) => plugin.id !== payload),
       }
     }
     case 'set_loaded': {

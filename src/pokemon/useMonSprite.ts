@@ -32,7 +32,7 @@ export default function useMonSprite(mon: PKMInterface) {
       const spritePath = plugin.getMonSpritePath({ ...mon, isShiny: mon.isShiny() })
 
       if (spritePath !== null) {
-        backend.getPluginPath(plugin.pluginID).then((pluginPath) => {
+        backend.getPluginPath(plugin.id).then((pluginPath) => {
           const absolutePath = `${pluginPath}/${spritePath}`
 
           backend.getImageData(absolutePath).then(
@@ -40,7 +40,7 @@ export default function useMonSprite(mon: PKMInterface) {
               (err) => {
                 setLoadError(true)
                 displayError('Plugin Sprite Error', [
-                  `Plugin '${plugin.pluginID}' failed to load a sprite`,
+                  `Plugin '${plugin.id}' failed to load a sprite`,
                   err,
                 ])
               },
