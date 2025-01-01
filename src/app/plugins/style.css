@@ -52,3 +52,19 @@
     width: 38px;
   }
 }
+
+.delete-icon {
+  position: absolute;
+  bottom: 4px;
+  left: 4px;
+  cursor: pointer;
+  background-color: transparent;
+  transition: background-color 0.08s;
+  color: #aa0000;
+  border-radius: 16px;
+  padding: 4px;
+}
+
+.delete-icon:hover {
+  background-color: #6666;
+}

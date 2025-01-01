@@ -101,7 +101,6 @@ function InstalledPluginCard(props: {
 
   return (
     <button className="plugin-display" style={{ cursor: 'pointer' }} onClick={handleCardClick}>
-
       {metadata.icon_image && (
         <img
           className="plugin-icon"
@@ -116,23 +115,12 @@ function InstalledPluginCard(props: {
       </div>
       <MdDelete
         className="delete-icon"
-        style={{
-          position: 'absolute',
-          bottom: 8,
-          left: 8,
-          cursor: 'pointer',
-          transition: 'color 0.3s',
-        }}
         onClick={(e) => {
           // Prevent card click (enable/disable) when clicking the delete icon
           e.stopPropagation()
           backend.deletePlugin(metadata.id).then(
-            () => {
-              onDelete(metadata.id)
-            },
-            (err) => {
-              displayError('Error Deleting Plugin', err)
-            }
+            () => onDelete(metadata.id),
+            (err) => displayError('Error Deleting Plugin', err)
           )
         }}
       />
