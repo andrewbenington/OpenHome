@@ -1,4 +1,4 @@
-import { Box, Modal, ModalDialog, ModalOverflow, Stack, useTheme } from '@mui/joy'
+import { Box, Modal, ModalDialog, Stack, useTheme } from '@mui/joy'
 import * as E from 'fp-ts/lib/Either'
 import lodash, { flatten } from 'lodash'
 import { bytesToPKMInterface } from 'pokemon-files'
@@ -10,7 +10,7 @@ import { filterUndefined } from 'src/util/Sort'
 import { BackendContext } from '../backend/backendContext'
 import FilterPanel from '../components/filter/FilterPanel'
 import useDisplayError from '../hooks/displayError'
-import PokemonDetailsPanel from '../pokemon/PokemonDetailsPanel'
+import PokemonDetailsPanel from '../pokemon/PokemonDetailsModal'
 import HomeBoxDisplay from '../saves/boxes/HomeBoxDisplay'
 import OpenSaveDisplay from '../saves/boxes/SaveBoxDisplay'
 import SavesModal from '../saves/SavesModal'
@@ -288,22 +288,12 @@ const Home = () => {
         </div>
         <ReleaseArea />
       </Stack>
-      <Modal open={!!selectedMon} onClose={() => setSelectedMon(undefined)}>
-        <ModalOverflow>
-          <ModalDialog
-            style={{
-              minWidth: 800,
-              width: 'fit-content',
-              maxWidth: '80%',
-              maxHeight: '95%',
-              padding: 0,
-              overflow: 'hidden',
-            }}
-          >
-            {selectedMon && <PokemonDetailsPanel mon={selectedMon} tab={tab} setTab={setTab} />}
-          </ModalDialog>
-        </ModalOverflow>
-      </Modal>
+      <PokemonDetailsPanel
+        mon={selectedMon}
+        tab={tab}
+        setTab={setTab}
+        onClose={() => setSelectedMon(undefined)}
+      />
       <Modal
         open={openSaveDialog}
         onClose={() => setOpenSaveDialog(false)}

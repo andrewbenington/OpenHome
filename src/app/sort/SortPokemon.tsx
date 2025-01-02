@@ -1,8 +1,8 @@
-import { Autocomplete, Card, Chip, Modal, ModalDialog, ModalOverflow, Stack } from '@mui/joy'
+import { Autocomplete, Card, Chip, Modal, ModalDialog, Stack } from '@mui/joy'
 import dayjs from 'dayjs'
 import { useContext, useMemo, useState } from 'react'
 import { MdAdd } from 'react-icons/md'
-import PokemonDetailsPanel from 'src/pokemon/PokemonDetailsPanel'
+import PokemonDetailsPanel from 'src/pokemon/PokemonDetailsModal'
 import BoxCell from 'src/saves/boxes/BoxCell'
 import SavesModal from 'src/saves/SavesModal'
 import { filterUndefined } from 'src/util/Sort'
@@ -124,21 +124,12 @@ export default function SortPokemon() {
           <SavesModal onClose={() => setOpenSaveDialog(false)} />
         </ModalDialog>
       </Modal>
-      <Modal open={!!selectedMon} onClose={() => setSelectedMon(undefined)}>
-        <ModalOverflow>
-          <ModalDialog
-            style={{
-              width: 800,
-              maxWidth: '80%',
-              padding: 0,
-              maxHeight: '95%',
-              overflow: 'hidden',
-            }}
-          >
-            {selectedMon && <PokemonDetailsPanel mon={selectedMon} tab={tab} setTab={setTab} />}
-          </ModalDialog>
-        </ModalOverflow>
-      </Modal>
+      <PokemonDetailsPanel
+        mon={selectedMon}
+        tab={tab}
+        setTab={setTab}
+        onClose={() => setSelectedMon(undefined)}
+      />
     </Stack>
   )
 }

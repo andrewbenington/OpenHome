@@ -1,6 +1,6 @@
 import { Card, Modal, Tab, tabClasses, TabList, TabPanel, Tabs } from '@mui/joy'
 import { useState } from 'react'
-import PokemonDetailsPanel from '../../pokemon/PokemonDetailsPanel'
+import PokemonDetailsPanel from '../../pokemon/PokemonDetailsModal'
 import { PKMInterface } from '../../types/interfaces'
 import Gen12Lookup from './Gen12Lookup'
 import Gen345Lookup from './Gen345Lookup'
@@ -51,6 +51,7 @@ export default function TrackedPokemon() {
           {selectedMon && (
             <PokemonDetailsPanel
               mon={selectedMon}
+              onClose={() => setSelectedMon(undefined)}
               tab={pokemonDisplayTab}
               setTab={setPokemonDisplayTab}
             />
