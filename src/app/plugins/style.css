@@ -1,0 +1,71 @@
+.plugin-display {
+  width: 200px;
+  height: 200px;
+  position: relative;
+  background-color: #fff6;
+  border-radius: 8px;
+  border-width: 0px;
+  overflow: hidden;
+}
+
+.plugin-icon {
+  image-rendering: pixelated;
+  width: 180px;
+  height: 180px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  object-fit: contain;
+}
+
+.status-chip {
+  position: absolute !important;
+  bottom: 4px;
+  right: 4px;
+  height: fit-content;
+}
+
+.name-chip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 5px 0px !important;
+  font-weight: bold;
+  color: #000;
+  background-color: #eff;
+}
+
+.plugin-progress {
+  position: absolute !important;
+  bottom: 4px;
+  width: 96% !important;
+  left: 2%;
+}
+
+.error-icon-button {
+  color: #f33;
+  background-color: transparent;
+  height: 50px;
+  width: 50px;
+  & svg {
+    height: 38px;
+    width: 38px;
+  }
+}
+
+.delete-icon {
+  position: absolute;
+  bottom: 4px;
+  left: 4px;
+  cursor: pointer;
+  background-color: transparent;
+  transition: background-color 0.08s;
+  color: #aa0000;
+  border-radius: 16px;
+  padding: 4px;
+}
+
+.delete-icon:hover {
+  background-color: #6666;
+}

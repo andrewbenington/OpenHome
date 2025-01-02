@@ -1,3 +1,7 @@
+use crate::plugin::{self, list_plugins, PluginMetadata, PluginMetadataWithIcon};
+use crate::state::{AppState, AppStateSnapshot};
+use crate::util::ImageResponse;
+use crate::{saves, util};
 use serde_json::Value;
 use std::collections::HashMap;
 use std::fs;
@@ -6,10 +10,6 @@ use std::io::{Error, ErrorKind, Read, Write};
 use std::path::PathBuf;
 use std::time::SystemTime;
 use tauri::Manager;
-
-use crate::saves;
-use crate::state::{AppState, AppStateSnapshot};
-use crate::util;
 
 #[tauri::command]
 pub fn get_state(state: tauri::State<'_, AppState>) -> AppStateSnapshot {
@@ -262,4 +262,50 @@ pub fn validate_recent_saves(
     app_handle: tauri::AppHandle,
 ) -> Result<HashMap<String, saves::SaveRef>, String> {
     return saves::get_recent_saves(app_handle);
+}
+
+#[tauri::command]
+pub fn get_image_data(absolute_path: String) -> Result<ImageResponse, String> {
+    return util::get_image_data(&absolute_path);
+}
+
+#[tauri::command]
+pub async fn download_plugin(
+    app_handle: tauri::AppHandle,
+    remote_url: String,
+) -> Result<String, String> {
+    let metadata_url = format!("{}/plugin.json", remote_url);
+
+    let plugin_metadata: PluginMetadata = util::download_json_file(metadata_url)
+        .await
+        .map_err(|e| e.to_string())?;
+
+    return plugin::download_async(app_handle, remote_url, plugin_metadata).await;
+}
+
+#[tauri::command]
+pub fn list_installed_plugins(
+    app_handle: tauri::AppHandle,
+) -> Result<Vec<PluginMetadataWithIcon>, String> {
+    return Ok(list_plugins(&app_handle).map_err(|e| format!("Error listing plugins: {}", e))?);
+}
+
+#[tauri::command]
+pub fn load_plugin_code(app_handle: tauri::AppHandle, plugin_id: String) -> Result<String, String> {
+    let relative_path = &PathBuf::from("plugins")
+        .join(plugin_id)
+        .join("dist")
+        .join("index.js");
+
+    let plugin_code = util::get_appdata_file_text(&app_handle, relative_path)?;
+    return Ok(plugin_code);
+}
+
+#[tauri::command]
+pub fn delete_plugin(app_handle: tauri::AppHandle, plugin_id: String) -> Result<(), String> {
+    let plugins_dir = util::prepend_appdata_to_path(&app_handle, &PathBuf::from("plugins"))
+        .map_err(|err| format!("Error finding the plugins directory: {}", err))?;
+    let plugin_dir = plugins_dir.join(&plugin_id);
+
+    util::delete_folder(plugin_dir)
 }

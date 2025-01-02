@@ -8,6 +8,6 @@
       "program": "${workspaceRoot}/src-tauri/target/debug/OpenHome.exe",
       "cwd": "${workspaceRoot}",
       "preLaunchTask": "frontend:dev"
-    },
-  ],
+    }
+  ]
 }

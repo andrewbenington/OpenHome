@@ -29,6 +29,7 @@ const DummyBackend: BackendInterface = {
   getSaveFolders: async () => E.left('no backend in use'),
   removeSaveFolder: async () => E.left('no backend in use'),
   upsertSaveFolder: async () => E.left('no backend in use'),
+
   /* transactions */
   startTransaction: async () => E.left('no backend in use'),
   commitTransaction: async () => E.left('no backend in use'),
@@ -40,11 +41,19 @@ const DummyBackend: BackendInterface = {
   getResourcesPath: async () => '',
   openDirectory: async () => E.left('no backend in use'),
   getPlatform: async () => 'none',
-  registerListeners: (_: BackendListeners) => () => {},
+  registerListeners: (_: Partial<BackendListeners>) => () => {},
   getState: async () => E.left('no backend in use'),
   getSettings: async () => E.left('no backend in use'),
   updateSettings: async () => E.left('no backend in use'),
   setTheme: async () => E.left('no backend in use'),
+
+  /* plugins */
+  getImageData: async () => E.left('no backend in use'),
+  listInstalledPlugins: async () => E.left('no backend in use'),
+  getPluginPath: async () => '',
+  downloadPlugin: async () => E.left('no backend in use'),
+  loadPluginCode: async () => E.left('no backend in use'),
+  deletePlugin: async () => E.left('no backend in use'),
 }
 
 export default DummyBackend

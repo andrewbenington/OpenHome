@@ -1,9 +1,9 @@
-import { HTMLAttributes } from 'react'
 import { PokemonData } from 'pokemon-species-data'
+import { HTMLAttributes } from 'react'
 import BoxIcons from '../images/BoxIcons.png'
-import './components.css'
 import { getPublicImageURL } from '../images/images'
 import { getItemIconPath } from '../images/items'
+import './components.css'
 
 interface PokemonIconProps extends HTMLAttributes<HTMLDivElement> {
   dexNumber: number
