@@ -1,8 +1,9 @@
 import { invoke } from '@tauri-apps/api/core'
 import * as E from 'fp-ts/lib/Either'
 import { Errorable, JSONArray, JSONObject, JSONValue, SaveRef } from 'src/types/types'
+import { PluginMetadataWithIcon } from 'src/util/Plugin'
 import { PossibleSaves } from '../../types/SAVTypes/path'
-import { AppState } from '../backendInterface'
+import { AppState, ImageResponse } from '../backendInterface'
 import { RustResult } from './types'
 
 function rustResultToEither<T, E>(result: RustResult<T, E>): E.Either<E, T> {
@@ -132,6 +133,36 @@ export const TauriInvoker = {
 
   getRecentSaves(): Promise<Errorable<Record<string, SaveRef>>> {
     const promise: Promise<Record<string, SaveRef>> = invoke('validate_recent_saves')
+
+    return promise.then(E.right).catch(E.left)
+  },
+
+  getImageData(absolutePath: string): Promise<Errorable<ImageResponse>> {
+    const promise: Promise<ImageResponse> = invoke('get_image_data', { absolutePath })
+
+    return promise.then(E.right).catch(E.left)
+  },
+
+  downloadPlugin(remoteUrl: string): Promise<Errorable<string>> {
+    const promise: Promise<string> = invoke('download_plugin', { remoteUrl })
+
+    return promise.then(E.right).catch(E.left)
+  },
+
+  listInstalledPlugins(): Promise<Errorable<PluginMetadataWithIcon[]>> {
+    const promise: Promise<PluginMetadataWithIcon[]> = invoke('list_installed_plugins')
+
+    return promise.then(E.right).catch(E.left)
+  },
+
+  loadPluginCode(pluginId: string): Promise<Errorable<string>> {
+    const promise: Promise<string> = invoke('load_plugin_code', { pluginId })
+
+    return promise.then(E.right).catch(E.left)
+  },
+
+  deletePlugin(pluginId: string): Promise<Errorable<string>> {
+    const promise: Promise<string> = invoke('delete_plugin', { pluginId })
 
     return promise.then(E.right).catch(E.left)
   },

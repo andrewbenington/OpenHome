@@ -34,6 +34,7 @@ export const defaultSettings: Settings = {
       G3RRSAV,
     ].map((savetype) => [savetype.saveTypeID, true])
   ),
+  enabledPlugins: {},
   saveCardSize: 180,
   saveViewMode: 'card',
   appTheme: 'system',
@@ -41,13 +42,13 @@ export const defaultSettings: Settings = {
 
 export type Settings = {
   enabledSaveTypes: Record<string, boolean>
+  enabledPlugins: Record<string, boolean>
   saveCardSize: number
   saveViewMode: SaveViewMode
   appTheme: 'light' | 'dark' | 'system'
 }
 
 export type AppInfoState = {
-  resourcesPath?: string
   settings: Settings
   settingsLoaded: boolean
   officialSaveTypes: SAVClass[]
@@ -56,13 +57,16 @@ export type AppInfoState = {
 
 export type AppInfoAction =
   | {
-      type: 'set_resources_path'
-      payload: string
-    }
-  | {
       type: 'set_savetype_enabled'
       payload: {
         saveType: SAVClass
+        enabled: boolean
+      }
+    }
+  | {
+      type: 'set_plugin_enabled'
+      payload: {
+        pluginID: string
         enabled: boolean
       }
     }
@@ -90,23 +94,22 @@ export const appInfoReducer: Reducer<AppInfoState, AppInfoAction> = (
   const { type, payload } = action
 
   switch (type) {
-    case 'set_resources_path': {
-      return {
-        ...state,
-        resourcesPath: payload,
-      }
-    }
     case 'set_savetype_enabled': {
-      const enabled = state.settings.enabledSaveTypes
+      const enabled = { ...state.settings.enabledSaveTypes }
 
-      if (payload.enabled) {
-        enabled[payload.saveType.saveTypeID] = true
-      } else {
-        enabled[payload.saveType.saveTypeID] = false
-      }
+      enabled[payload.saveType.saveTypeID] = payload.enabled
       return {
         ...state,
         settings: { ...state.settings, enabledSaveTypes: enabled },
+      }
+    }
+    case 'set_plugin_enabled': {
+      const enabled = { ...state.settings.enabledPlugins }
+
+      enabled[payload.pluginID] = payload.enabled
+      return {
+        ...state,
+        settings: { ...state.settings, enabledPlugins: enabled },
       }
     }
     case 'load_settings': {
@@ -119,7 +122,7 @@ export const appInfoReducer: Reducer<AppInfoState, AppInfoAction> = (
         )
       )
 
-      return { ...state, settings: { ...payload, enabledSaveTypes: enabled } }
+      return { ...state, settings: { ...payload, enabledSaveTypes: enabled }, settingsLoaded: true }
     }
     case 'set_icon_size': {
       return {
@@ -134,7 +137,7 @@ export const appInfoReducer: Reducer<AppInfoState, AppInfoAction> = (
       }
     }
     case 'set_app_theme': {
-      return { ...state, settings: { ...state.settings, appTheme: payload }, settingsLoaded: true }
+      return { ...state, settings: { ...state.settings, appTheme: payload } }
     }
   }
 }

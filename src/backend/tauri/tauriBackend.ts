@@ -1,5 +1,5 @@
 import { path } from '@tauri-apps/api'
-import { Event, listen } from '@tauri-apps/api/event'
+import { Event, listen, UnlistenFn } from '@tauri-apps/api/event'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { open as fileDialog } from '@tauri-apps/plugin-dialog'
 import { readFile, stat } from '@tauri-apps/plugin-fs'
@@ -233,6 +233,11 @@ export const TauriBackend: BackendInterface = {
   getResourcesPath: () => {
     return path.resourceDir()
   },
+  getPluginPath: async (pluginId: string) => {
+    const dir = await path.appDataDir()
+
+    return `${dir}/plugins/${pluginId}`
+  },
   openDirectory: async (directory: string): Promise<Errorable<null>> => {
     open(directory)
     return E.right(null)
@@ -257,10 +262,14 @@ export const TauriBackend: BackendInterface = {
   setTheme: (appTheme: 'light' | 'dark' | 'system'): Promise<Errorable<null>> =>
     TauriInvoker.setTheme(appTheme),
 
+  getImageData: TauriInvoker.getImageData,
+  listInstalledPlugins: TauriInvoker.listInstalledPlugins,
+  downloadPlugin: TauriInvoker.downloadPlugin,
+  loadPluginCode: TauriInvoker.loadPluginCode,
+  deletePlugin: TauriInvoker.deletePlugin,
+
   registerListeners: (listeners) => {
-    const unlistenPromise = Promise.all([
-      listen('save', listeners.onSave),
-      listen('reset', listeners.onReset),
+    const unlistenPromises: Promise<UnlistenFn>[] = [
       listen('tauri://drag-drop', (e: OnDropEvent) => {
         const allFilesPromise = e.payload.paths.map(async (filePath) => ({
           filePath,
@@ -293,7 +302,22 @@ export const TauriBackend: BackendInterface = {
             ?.dispatchEvent(new DragEvent('drop', { bubbles: true, dataTransfer }))
         })
       }),
-    ])
+    ]
+
+    if (listeners.onSave) {
+      unlistenPromises.push(listen('save', listeners.onSave))
+    }
+    if (listeners.onReset) {
+      unlistenPromises.push(listen('save', listeners.onReset))
+    }
+    if (listeners.onPluginDownloadProgress) {
+      const [pluginID, listener] = listeners.onPluginDownloadProgress
+
+      unlistenPromises.push(
+        listen<number>(`plugin:download-progress:${pluginID}`, (event) => listener(event.payload))
+      )
+    }
+    const unlistenPromise = Promise.all(unlistenPromises)
 
     return () =>
       unlistenPromise.then((unlistenFunctions) => {

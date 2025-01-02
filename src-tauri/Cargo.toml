@@ -25,3 +25,7 @@ serde_json = "1.0.134"
 tauri-plugin-os = "2.2.0"
 tauri-plugin-dialog = "2.2.0"
 tauri-plugin-fs = "2.2.0"
+reqwest = { version = "0.12.10", features = ["blocking"] }
+base64 = "0.22.1"
+zip = "2.2.2"
+bytes = "1.9.0"
