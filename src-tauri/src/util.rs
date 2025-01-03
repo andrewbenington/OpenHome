@@ -16,7 +16,7 @@ pub struct ImageResponse {
     pub extension: String,
 }
 
-#[derive(serde::Serialize, serde::Deserialize, Debug)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Hash)]
 pub struct PathData {
     pub raw: String,
     pub name: String,
@@ -24,6 +24,13 @@ pub struct PathData {
     pub ext: String,
     pub separator: String,
 }
+
+impl PartialEq for PathData {
+    fn eq(&self, other: &Self) -> bool {
+        self.raw == other.raw
+    }
+}
+impl Eq for PathData {}
 
 pub fn parse_path_data(path: &PathBuf) -> PathData {
     let raw = path.to_string_lossy().to_string();
@@ -115,95 +122,66 @@ where
 {
     let json_str = get_storage_file_text(app_handle, relative_path)?;
     return serde_json::from_str(json_str.as_str())
-        .map_err(|e| format!("error opening {:#?}: {e}", relative_path));
+        .map_err(|e| format!("error opening {:?}: {e}", relative_path));
 }
 
 pub fn get_appdata_dir(app_handle: &tauri::AppHandle) -> Result<String, String> {
     // Open the file, and return any error up the call stack
-    let path_buf_o = app_handle
+    let path_buf = app_handle
         .path()
         .app_data_dir()
         .map_err(|e| e.to_string())?;
 
-    return match path_buf_o.to_str() {
-        Some(path_buf) => Ok(path_buf.to_owned()),
-        None => Err("Invalid appdata path".to_owned()),
-    };
+    return Ok(path_buf.to_string_lossy().into_owned());
 }
 
 pub fn dedupe_paths(paths: Vec<PathData>) -> Vec<PathData> {
-    let mut seen = HashSet::new();
-    paths
-        .into_iter()
-        .filter(|path| seen.insert(path.raw.clone()))
-        .collect()
+    let set: HashSet<PathData> = paths.into_iter().collect();
+    return set.into_iter().collect();
 }
 
 pub fn create_openhome_directory(app_handle: &tauri::AppHandle) -> Result<(), String> {
     let appdata_dir = get_appdata_dir(app_handle)?;
-    let mut full_path = PathBuf::new();
+    let full_path = PathBuf::from(appdata_dir).join("storage");
 
-    full_path.push(appdata_dir);
-    full_path.push("storage".to_owned());
-
-    create_dir_all(full_path).map_err(|e| e.to_string())?;
-    Ok(())
+    return create_dir_all(full_path).map_err(|e| e.to_string());
 }
 
 pub async fn download_text_file(url: String) -> Result<String, Box<dyn std::error::Error>> {
-    let client = reqwest::Client::new();
+    let response = reqwest::Client::new().get(url).send().await?;
 
-    return Ok(client
-        .get(url)
-        .header("User-Agent", "OpenHome")
-        .send()
-        .await?
-        .text()
-        .await?);
+    return Ok(response.text().await?);
 }
 
 pub async fn download_binary_file(url: &str) -> Result<bytes::Bytes, Box<dyn std::error::Error>> {
-    let client = reqwest::Client::new();
-    let response = client
-        .get(url)
-        .header("User-Agent", "OpenHome")
-        .send()
-        .await?;
+    let response = reqwest::Client::new().get(url).send().await?;
 
     return Ok(response.bytes().await?);
 }
 
 pub async fn download_extract_zip_file<F>(
     url: &str,
-    output_dir: &str,
+    output_dir: &Path,
     progress_callback: F,
 ) -> Result<(), Box<dyn std::error::Error>>
 where
     F: Fn(f64) -> (),
 {
-    let client = reqwest::Client::new();
-    let response = client
-        .get(url)
-        .header("User-Agent", "OpenHome")
-        .send()
-        .await?;
+    let bytes = download_binary_file(url).await?;
 
-    let bytes = response.bytes().await?; // Read the entire body as bytes
-    let cursor = Cursor::new(bytes); // Create an in-memory cursor
-    let mut zip = ZipArchive::new(cursor)?;
+    let mut zip = ZipArchive::new(Cursor::new(bytes))?;
     let file_count = zip.len();
+
+    fs::create_dir_all(output_dir)?;
 
     for i in 0..file_count {
         progress_callback(50.0 + (i as f64 / file_count as f64) * 50.0);
-        let mut file = zip.by_index(i)?; // Get file by index
+        let mut file = zip.by_index(i)?;
         let outpath = Path::new(output_dir).join(file.name());
 
         if file.is_dir() {
             fs::create_dir_all(&outpath)?;
         } else {
-            if let Some(parent) = outpath.parent() {
-                fs::create_dir_all(parent)?;
-            }
             let mut outfile = fs::File::create(&outpath)?;
             std::io::copy(&mut file, &mut outfile)?;
         }
@@ -216,33 +194,16 @@ where
     T: serde::de::DeserializeOwned,
     T: serde::ser::Serialize,
 {
-    let client = reqwest::Client::new();
-
-    let response = client
-        .get(url)
-        .header("User-Agent", "OpenHome")
-        .send()
-        .await?;
-
-    let body_text = response.text().await?;
-    println!("body text: {}", body_text);
+    let body_text = download_text_file(url).await?;
 
     let body: T = serde_json::from_str(&body_text)?;
-    println!(
-        "body json: {}",
-        serde_json::to_string_pretty(&body)
-            .unwrap_or_else(|err| format!("deserialize metadata: {}", err))
-    );
 
     return Ok(body);
 }
 
-pub fn get_image_data(absolute_path: &String) -> Result<ImageResponse, String> {
-    let absolute_path_pb = PathBuf::from(&absolute_path);
-
-    // Make sure folder exists
-    if !absolute_path_pb.exists() {
-        return Err(format!("File does not exist: {}", absolute_path));
+pub fn get_image_data(absolute_path: &Path) -> Result<ImageResponse, String> {
+    if !absolute_path.exists() {
+        return Err(format!("File does not exist: {:?}", absolute_path));
     }
 
     let mut file = File::open(&absolute_path).map_err(|e| e.to_string())?;
@@ -250,19 +211,18 @@ pub fn get_image_data(absolute_path: &String) -> Result<ImageResponse, String> {
     let mut bytes = Vec::new();
     file.read_to_end(&mut bytes).map_err(|e| e.to_string())?;
 
-    let extension = absolute_path_pb.extension();
-    if extension.is_none() {
-        return Err("Image format not supported".to_owned());
-    }
+    let extension = absolute_path
+        .extension()
+        .ok_or("Image format not supported")?;
 
-    let extension_lower = extension.unwrap().to_string_lossy().to_lowercase();
+    let extension_lower = extension.to_string_lossy().to_lowercase();
 
     if extension_lower != "png"
         && extension_lower != "gif"
         && extension_lower != "jpg"
         && extension_lower != "jpeg"
     {
-        return Err(format!("Image format not supported: {}", extension_lower).to_owned());
+        return Err(format!("Image format not supported: {}", extension_lower));
     }
 
     let response = ImageResponse {
@@ -273,7 +233,7 @@ pub fn get_image_data(absolute_path: &String) -> Result<ImageResponse, String> {
     return Ok(response);
 }
 
-pub fn delete_folder(folder_path: PathBuf) -> Result<(), String> {
+pub fn delete_folder(folder_path: &Path) -> Result<(), String> {
     if !folder_path.exists() {
         return Err(format!(
             "Folder does not exist: {}",
