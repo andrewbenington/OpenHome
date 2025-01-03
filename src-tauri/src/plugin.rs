@@ -1,7 +1,7 @@
 use std::{
     fs::{self, File},
     io::Write,
-    path::PathBuf,
+    path::{Path, PathBuf},
 };
 
 use tauri::Emitter;
@@ -14,6 +14,18 @@ pub struct PluginMetadata {
     pub name: String,
     pub version: String,
     pub api_version: u32,
+}
+
+impl PluginMetadata {
+    pub fn with_icon_bytes(&self, path: &Path) -> PluginMetadataWithIcon {
+        return PluginMetadataWithIcon {
+            id: self.id.clone(),
+            name: self.name.clone(),
+            version: self.version.clone(),
+            api_version: self.api_version.clone(),
+            icon_image: util::get_image_data(path).ok(),
+        };
+    }
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
@@ -70,42 +82,13 @@ pub fn list_plugins(
 
         let metadata_r: Result<PluginMetadata, serde_json::Error> =
             serde_json::from_reader(file_r.unwrap());
-        if let Err(err) = metadata_r {
-            eprintln!("Broken plugin entry: {}", err);
-            continue;
+
+        match metadata_r {
+            Err(err) => eprintln!("Broken plugin entry: {}", err),
+            Ok(metadata) => {
+                plugins.push(metadata.with_icon_bytes(&plugin_dir_path.join("icon.png")))
+            }
         }
-        let metadata = metadata_r.unwrap();
-
-        let icon_path = plugin_dir_path
-            .join("icon.png")
-            .to_string_lossy()
-            .to_string();
-        let image_response_r = util::get_image_data(&icon_path);
-
-        if let Err(err) = image_response_r {
-            eprintln!("Bad image response for {}: {}", &icon_path, err);
-
-            let metadata_with_icon = PluginMetadataWithIcon {
-                id: metadata.id,
-                name: metadata.name,
-                version: metadata.version,
-                api_version: metadata.api_version,
-                icon_image: None,
-            };
-
-            plugins.push(metadata_with_icon);
-            continue;
-        }
-
-        let metadata_with_icon = PluginMetadataWithIcon {
-            id: metadata.id,
-            name: metadata.name,
-            version: metadata.version,
-            api_version: metadata.api_version,
-            icon_image: image_response_r.ok(),
-        };
-
-        plugins.push(metadata_with_icon);
     }
 
     return Ok(plugins);
@@ -127,6 +110,21 @@ fn emit_download_progress(app_handle: &tauri::AppHandle, plugin_id: String, prog
     }
 }
 
+async fn download_to_file(source: &str, dest: &Path) -> Result<(), String> {
+    let body = util::download_binary_file(source)
+        .await
+        .map_err(|err| format!("download {:?}: {}", dest, err))?;
+
+    File::create(dest)
+        .map_err(|err| format!("create {:?}: {}", dest, err))
+        .and_then(|mut f| {
+            f.write(&body)
+                .map_err(|err| format!("write {:?}: {}", dest, err))
+        })?;
+
+    return Ok(());
+}
+
 const ASSETS_PCT: f64 = 80.0;
 
 pub async fn download_async(
@@ -134,71 +132,50 @@ pub async fn download_async(
     remote_url: String,
     plugin_metadata: PluginMetadata,
 ) -> Result<String, String> {
-    let plugins_dir = util::prepend_appdata_to_path(&app_handle, &PathBuf::from("plugins"))
-        .map_err(|err| format!("get plugins directory: {}", err))?;
+    let new_plugin_dir =
+        util::prepend_appdata_to_path(&app_handle, &Path::new("plugins").join(&plugin_metadata.id))
+            .map_err(|err| format!("get plugins directory: {}", err))?;
 
-    let new_plugin_dir = plugins_dir.join(plugin_metadata.id.clone());
-    let dist_dir = new_plugin_dir.join("dist");
-    fs::create_dir_all(&dist_dir).map_err(|err| format!("create plugin directory: {}", err))?;
+    fs::create_dir_all(&new_plugin_dir.join("dist"))
+        .map_err(|err| format!("create plugin directory: {}", err))?;
 
-    let metadata_path = new_plugin_dir.join("plugin.json");
-    let index_js_path = dist_dir.join("index.js");
-    let icon_path = new_plugin_dir.join("icon.png");
+    download_to_file(
+        &format!("{}/plugin.json", remote_url),
+        &new_plugin_dir.join("plugin.json"),
+    )
+    .await?;
 
-    let metadata_string = serde_json::to_string_pretty(&plugin_metadata)
-        .map_err(|err| format!("download metadata: {}", err))?;
-
-    let mut metadata_file =
-        File::create(&metadata_path).map_err(|err| format!("create metadata file: {}", err))?;
-
-    metadata_file
-        .write(metadata_string.as_bytes())
-        .map_err(|err| format!("write metadata file: {}", err))?;
-
-    let index_js_url = format!("{}/dist/index.js", remote_url);
-    let mut index_js_file =
-        File::create(&index_js_path).map_err(|err| format!("create index.js file: {}", err))?;
-
-    let index_js_body = util::download_text_file(index_js_url)
+    let index_js_body = util::download_text_file(format!("{}/dist/index.js", remote_url))
         .await
         .map_err(|err| format!("download index.js file: {}", err))?;
-    emit_download_progress(&app_handle, plugin_metadata.id.clone(), 10.0);
 
-    write!(index_js_file, "{}", index_js_body)
-        .map_err(|err| format!("write index.js file: {}", err))?;
+    File::create(&new_plugin_dir.join("dist").join("index.js"))
+        .map_err(|err| format!("create index.js file: {}", err))
+        .and_then(|mut f| {
+            write!(f, "{}", index_js_body).map_err(|err| format!("write index.js file: {}", err))
+        })?;
+    emit_download_progress(&app_handle, plugin_metadata.id.clone(), 10.0);
 
     let zip_file_url = format!("{}/assets.zip", remote_url);
 
     // Decompress assets directory
-    let output_path = new_plugin_dir.join("assets");
-    match output_path.to_str() {
-        Some(output_dir) => util::download_extract_zip_file(&zip_file_url, output_dir, |pct| {
-            emit_download_progress(
-                &app_handle,
-                plugin_metadata.id.clone(),
-                10.0 + ((pct / 100.0) * ASSETS_PCT),
-            )
-        })
-        .await
-        .map_err(|err| format!("extract assets.zip: {}", err)),
-        None => Err(format!(
-            "could not get local assets directory path ({:?})",
-            output_path
-        )),
-    }?;
+    util::download_extract_zip_file(&zip_file_url, &new_plugin_dir.join("assets"), |pct| {
+        emit_download_progress(
+            &app_handle,
+            plugin_metadata.id.clone(),
+            10.0 + ((pct / 100.0) * ASSETS_PCT),
+        )
+    })
+    .await
+    .map_err(|err| format!("extract assets.zip: {}", err))?;
 
     emit_download_progress(&app_handle, plugin_metadata.id.clone(), 10.0 + ASSETS_PCT);
 
-    let icon_url = format!("{}/icon.png", remote_url);
-    let icon_body = util::download_binary_file(&icon_url)
-        .await
-        .map_err(|err| format!("download icon file: {}", err))?;
-
-    let mut icon_file =
-        File::create(&icon_path).map_err(|err| format!("create icon file: {}", err))?;
-    icon_file
-        .write(&icon_body)
-        .map_err(|err| format!("write icon file: {}", err))?;
+    download_to_file(
+        &format!("{}/icon.png", remote_url),
+        &new_plugin_dir.join("icon.png"),
+    )
+    .await?;
 
     emit_download_progress(&app_handle, plugin_metadata.id.clone(), 100.0);
 

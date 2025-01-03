@@ -7,7 +7,7 @@ use std::collections::HashMap;
 use std::fs;
 use std::fs::File;
 use std::io::{Error, ErrorKind, Read, Write};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::time::SystemTime;
 use tauri::Manager;
 
@@ -106,18 +106,20 @@ pub fn start_transaction(state: tauri::State<'_, AppState>) -> Result<(), String
 
 #[tauri::command]
 pub fn rollback_transaction(state: tauri::State<'_, AppState>) -> Result<(), String> {
+    println!("Rolling back transaction");
     return state.rollback_transaction();
 }
 
 #[tauri::command]
 pub fn commit_transaction(state: tauri::State<'_, AppState>) -> Result<(), String> {
+    println!("Committing transaction");
     return state.commit_transaction();
 }
 
 #[tauri::command]
 pub fn write_file_bytes(
     state: tauri::State<'_, AppState>,
-    absolute_path: PathBuf,
+    absolute_path: &Path,
     bytes: Vec<u8>,
 ) -> Result<(), String> {
     return state.write_file_bytes(absolute_path, bytes);
@@ -131,21 +133,11 @@ pub fn write_storage_file_bytes(
 ) -> Result<(), String> {
     let full_path = util::prepend_appdata_storage_to_path(&app_handle, &relative_path)?;
 
-    let mut file = File::create(full_path).map_err(|e| {
-        format!(
-            "Create/open file {}: {}",
-            relative_path.to_str().unwrap_or("Non-UTF Path"),
-            e
-        )
-    })?;
+    let mut file = File::create(full_path)
+        .map_err(|e| format!("create/open file {:?}: {}", relative_path, e))?;
 
-    file.write_all(&bytes).map_err(|e| {
-        format!(
-            "Write file {}: {}",
-            relative_path.to_str().unwrap_or("Non-UTF Path"),
-            e
-        )
-    })?;
+    file.write_all(&bytes)
+        .map_err(|e| format!("write file {:?}: {}", relative_path, e))?;
 
     return Ok(());
 }
@@ -266,7 +258,7 @@ pub fn validate_recent_saves(
 
 #[tauri::command]
 pub fn get_image_data(absolute_path: String) -> Result<ImageResponse, String> {
-    return util::get_image_data(&absolute_path);
+    return util::get_image_data(&PathBuf::from(absolute_path));
 }
 
 #[tauri::command]
@@ -307,5 +299,5 @@ pub fn delete_plugin(app_handle: tauri::AppHandle, plugin_id: String) -> Result<
         .map_err(|err| format!("Error finding the plugins directory: {}", err))?;
     let plugin_dir = plugins_dir.join(&plugin_id);
 
-    util::delete_folder(plugin_dir)
+    util::delete_folder(&plugin_dir)
 }
