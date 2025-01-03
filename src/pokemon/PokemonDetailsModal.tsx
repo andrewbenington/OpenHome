@@ -9,6 +9,7 @@ import {
   TabPanel,
   Tabs,
 } from '@mui/joy'
+import { range } from 'lodash'
 import { useCallback, useEffect, useState } from 'react'
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary'
 import { MdDownload } from 'react-icons/md'
@@ -35,8 +36,13 @@ const PokemonDetailsModal = (props: {
   onClose?: () => void
   navigateLeft?: () => void
   navigateRight?: () => void
+  positionDisplay?: {
+    index: number
+    columns: number
+    total: number
+  }
 }) => {
-  const { mon, onClose, navigateLeft, navigateRight } = props
+  const { mon, onClose, navigateLeft, navigateRight, positionDisplay } = props
   const [displayMon, setDisplayMon] = useState(mon)
   const [tab, setTab] = useState('summary')
 
@@ -189,6 +195,20 @@ const PokemonDetailsModal = (props: {
           <button className="modal-arrow modal-arrow-right" onClick={navigateRight}>
             <ArrowRightIcon />
           </button>
+        )}
+        {positionDisplay && (
+          <div className="position-display-container">
+            {range(positionDisplay.columns).map((i) => (
+              <div className="position-display-col" key={`pos-display-col-${i}`}>
+                {range(positionDisplay.total / positionDisplay.columns).map((j) => (
+                  <div
+                    className={`position-display-cell ${positionDisplay.index === j * positionDisplay.columns + i ? 'position-display-cell-active' : ''}`}
+                    key={`pos-display-cell-${i}-${j}`}
+                  />
+                ))}
+              </div>
+            ))}
+          </div>
         )}
       </ModalOverflow>
     </Modal>

@@ -294,6 +294,15 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
         onClose={() => setSelectedIndex(undefined)}
         navigateRight={navigateRight}
         navigateLeft={navigateLeft}
+        positionDisplay={
+          selectedIndex !== undefined
+            ? {
+                index: selectedIndex,
+                columns: save.boxColumns,
+                total: save.boxColumns * save.boxRows,
+              }
+            : undefined
+        }
       />
     </>
   ) : (
