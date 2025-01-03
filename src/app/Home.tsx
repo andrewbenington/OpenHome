@@ -1,16 +1,16 @@
-import { Box, Modal, ModalDialog, ModalOverflow, Stack, useTheme } from '@mui/joy'
+import { Box, Modal, ModalDialog, Stack, useTheme } from '@mui/joy'
 import * as E from 'fp-ts/lib/Either'
 import lodash, { flatten } from 'lodash'
 import { bytesToPKMInterface } from 'pokemon-files'
 import { GameOfOrigin, isGameBoy, isGen3, isGen4, isGen5 } from 'pokemon-resources'
 import { useCallback, useContext, useEffect, useState } from 'react'
 import { MdFileOpen } from 'react-icons/md'
+import PokemonDetailsModal from 'src/pokemon/PokemonDetailsModal'
 import { Errorable } from 'src/types/types'
 import { filterUndefined } from 'src/util/Sort'
 import { BackendContext } from '../backend/backendContext'
 import FilterPanel from '../components/filter/FilterPanel'
 import useDisplayError from '../hooks/displayError'
-import PokemonDetailsPanel from '../pokemon/PokemonDetailsPanel'
 import HomeBoxDisplay from '../saves/boxes/HomeBoxDisplay'
 import OpenSaveDisplay from '../saves/boxes/SaveBoxDisplay'
 import SavesModal from '../saves/SavesModal'
@@ -28,7 +28,6 @@ const Home = () => {
   const backend = useContext(BackendContext)
   const { palette } = useTheme()
   const [selectedMon, setSelectedMon] = useState<PKMInterface>()
-  const [tab, setTab] = useState('summary')
   const [openSaveDialog, setOpenSaveDialog] = useState(false)
   const displayError = useDisplayError()
 
@@ -232,11 +231,7 @@ const Home = () => {
     >
       <Stack className="save-file-column" spacing={1} width={280} minWidth={280}>
         {lodash.range(allOpenSaves.length).map((i) => (
-          <OpenSaveDisplay
-            key={`save_display_${i}`}
-            saveIndex={i}
-            setSelectedMon={setSelectedMon}
-          />
+          <OpenSaveDisplay key={`save_display_${i}`} saveIndex={i} />
         ))}
         <button
           className="card-button"
@@ -264,7 +259,7 @@ const Home = () => {
           minWidth={480}
           alignItems="center"
         >
-          <HomeBoxDisplay setSelectedMon={setSelectedMon} />
+          <HomeBoxDisplay />
           <Box flex={1} />
         </Box>
       </div>
@@ -278,22 +273,7 @@ const Home = () => {
         </div>
         <ReleaseArea />
       </Stack>
-      <Modal open={!!selectedMon} onClose={() => setSelectedMon(undefined)}>
-        <ModalOverflow>
-          <ModalDialog
-            style={{
-              minWidth: 800,
-              width: 'fit-content',
-              maxWidth: '80%',
-              maxHeight: '95%',
-              padding: 0,
-              overflow: 'hidden',
-            }}
-          >
-            {selectedMon && <PokemonDetailsPanel mon={selectedMon} tab={tab} setTab={setTab} />}
-          </ModalDialog>
-        </ModalOverflow>
-      </Modal>
+      <PokemonDetailsModal mon={selectedMon} onClose={() => setSelectedMon(undefined)} />
       <Modal
         open={openSaveDialog}
         onClose={() => setOpenSaveDialog(false)}

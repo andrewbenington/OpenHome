@@ -38,3 +38,62 @@
   margin: 0px 8px;
   width: 30px;
 }
+
+.modal-arrow {
+  position: absolute;
+  top: calc(50% - 28px);
+  height: 56px;
+  width: 56px;
+  border-radius: 28px;
+  display: grid;
+  align-items: center;
+  justify-content: center;
+  background-color: rgb(68, 102, 102);
+  transition: background-color 0.1s;
+}
+
+.modal-arrow:hover {
+  background-color: rgb(96, 144, 144);
+}
+
+.modal-arrow-left {
+  left: 5%;
+}
+
+.modal-arrow-right {
+  right: 5%;
+}
+
+.position-display-container {
+  position: absolute;
+  left: calc(50% - 60px);
+  bottom: 8px;
+  width: 120px;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  background-color: rgb(68, 102, 102);
+  padding: 3px;
+  gap: 3px;
+}
+
+.position-display-col {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  flex: 1;
+  background-color: rgb(68, 102, 102);
+  gap: 3px;
+}
+
+.position-display-cell {
+  aspect-ratio: 1;
+  border-radius: 2px;
+  background-color: #fff;
+}
+
+.position-display-cell-active {
+  background-color: #f55;
+}

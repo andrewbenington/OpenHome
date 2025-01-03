@@ -3,7 +3,9 @@ import { colosseumOrXD, ColosseumOrXD, GameOfOrigin, GameOfOriginData } from 'po
 import { GameLogos, getOriginMark } from '../images/game'
 import { getPublicImageURL } from '../images/images'
 import { PKMInterface } from '../types/interfaces'
+import { Box, SAV } from '../types/SAVTypes/SAV'
 import { getPluginIdentifier, SAVClass } from '../types/SAVTypes/util'
+import { filterUndefined } from '../util/Sort'
 
 export type SaveViewMode = 'card' | 'grid'
 
@@ -96,4 +98,87 @@ export function formatTime(timestamp?: number) {
 
 export function filterEmpty<T>(value: T | null | undefined): value is T {
   return value !== null && value !== undefined
+}
+
+/**
+ *
+ * Iterates through the box, updating the index with 'incrementFunction'. Returns
+ * undefined if the first non-empty slot is at 'index', otherwise returns the index of the
+ * first non-empty box slot
+ */
+export function getFollowingMon(
+  currentBox: Box<PKMInterface>,
+  incrementFunction: (index: number) => number,
+  index: number
+) {
+  let prevIndex = index
+
+  do {
+    prevIndex = incrementFunction(prevIndex)
+  } while (prevIndex !== index && currentBox.pokemon[prevIndex] === undefined)
+
+  if (prevIndex !== index) {
+    return prevIndex
+  }
+}
+
+export function buildNavigator(
+  incrementFunction: (index: number) => number,
+  save: SAV,
+  currentIndex?: number,
+  callback?: (index?: number) => void
+) {
+  if (currentIndex === undefined) return undefined
+  const currentBox =
+    save.currentPCBox < save.boxes.length ? save.boxes[save.currentPCBox] : undefined
+
+  if (!currentBox || currentBox?.pokemon.filter(filterUndefined).length < 2) {
+    return undefined
+  }
+
+  return callback
+    ? () => callback(getFollowingMon(currentBox, incrementFunction, currentIndex))
+    : () => getFollowingMon(currentBox, incrementFunction, currentIndex)
+}
+
+/**
+ *
+ * If there are at least two Pokémon in the save's current box, returns a function
+ * that gives the next index of a Pokémon (wrapping end to start if necessary).
+ * Otherwise returns undefined
+ */
+export function buildForwardNavigator(
+  save: SAV,
+  currentIndex?: number,
+  callback?: (index?: number) => void
+) {
+  if (!save || currentIndex === undefined) return undefined
+  const currentBox =
+    save.currentPCBox < save.boxes.length ? save.boxes[save.currentPCBox] : undefined
+
+  if (!currentBox || currentBox?.pokemon.filter(filterUndefined).length < 2) {
+    return undefined
+  }
+
+  const boxSize = save.boxColumns * save.boxRows
+  const getNext = (index: number) => (index + 1) % boxSize
+
+  return buildNavigator(getNext, save, currentIndex, callback)
+}
+
+/**
+ *
+ * If there are at least two Pokémon in the save's current box, returns a function
+ * that gives the previous index of a Pokémon (wrapping start to end if necessary).
+ * Otherwise returns undefined
+ */
+export function buildBackwardNavigator(
+  save: SAV,
+  index?: number,
+  callback?: (index?: number) => void
+) {
+  const boxSize = save.boxColumns * save.boxRows
+  const getPrevious = (index: number) => (index === 0 ? boxSize - 1 : index - 1)
+
+  return buildNavigator(getPrevious, save, index, callback)
 }
