@@ -9,9 +9,10 @@ import {
   TabPanel,
   Tabs,
 } from '@mui/joy'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary'
 import { MdDownload } from 'react-icons/md'
+import { ArrowLeftIcon, ArrowRightIcon } from 'src/components/Icons'
 import { fileTypeFromString } from '../types/FileImport'
 import { PKMInterface } from '../types/interfaces'
 import { OHPKM } from '../types/pkm/OHPKM'
@@ -23,26 +24,36 @@ import RawDisplay from './RawDisplay'
 import RibbonsDisplay from './RibbonsDisplay'
 import StatsDisplay from './StatsDisplay'
 import SummaryDisplay from './SummaryDisplay'
+import './style.css'
 
 function buildURL(mon: PKMInterface) {
   return window.URL.createObjectURL(new Blob([mon.toBytes({ includeExtraFields: true })]))
 }
 
-const PokemonDetailsPanel = (props: {
+const PokemonDetailsModal = (props: {
   mon?: PKMInterface
-  tab?: string
-  setTab?: (_: string) => void
   onClose?: () => void
   navigateLeft?: () => void
   navigateRight?: () => void
 }) => {
-  const { mon, tab, setTab, onClose } = props
+  const { mon, onClose, navigateLeft, navigateRight } = props
   const [displayMon, setDisplayMon] = useState(mon)
+  const [tab, setTab] = useState('summary')
 
   useEffect(() => setDisplayMon(mon), [mon])
+  const handleArrows = useCallback(
+    (e: React.KeyboardEvent<HTMLDivElement>) => {
+      if (navigateLeft && e.key === 'ArrowLeft') {
+        navigateLeft()
+      } else if (navigateRight && e.key === 'ArrowRight') {
+        navigateRight()
+      }
+    },
+    [navigateLeft, navigateRight]
+  )
 
   return (
-    <Modal open={!!mon} onClose={onClose}>
+    <Modal open={!!mon} onClose={onClose} onKeyDown={handleArrows}>
       <ModalOverflow>
         <ModalDialog
           style={{
@@ -169,12 +180,22 @@ const PokemonDetailsPanel = (props: {
             </Tabs>
           )}
         </ModalDialog>
+        {navigateLeft && (
+          <button className="modal-arrow modal-arrow-left" onClick={navigateLeft}>
+            <ArrowLeftIcon />
+          </button>
+        )}
+        {navigateRight && (
+          <button className="modal-arrow modal-arrow-right" onClick={navigateRight}>
+            <ArrowRightIcon />
+          </button>
+        )}
       </ModalOverflow>
     </Modal>
   )
 }
 
-export default PokemonDetailsPanel
+export default PokemonDetailsModal
 
 function FallbackComponent(props: FallbackProps) {
   const { error, resetErrorBoundary } = props
