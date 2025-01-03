@@ -17,12 +17,12 @@ pub struct PluginMetadata {
 }
 
 impl PluginMetadata {
-    pub fn with_icon_bytes(&self, path: &Path) -> PluginMetadataWithIcon {
+    pub fn with_icon_bytes(self, path: &Path) -> PluginMetadataWithIcon {
         return PluginMetadataWithIcon {
-            id: self.id.clone(),
-            name: self.name.clone(),
-            version: self.version.clone(),
-            api_version: self.api_version.clone(),
+            id: self.id,
+            name: self.name,
+            version: self.version,
+            api_version: self.api_version,
             icon_image: util::get_image_data(path).ok(),
         };
     }
