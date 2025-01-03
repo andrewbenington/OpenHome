@@ -1,17 +1,16 @@
 use std::{
-    fs::{rename, File},
+    fs::{remove_file, rename, File},
     io::Write,
-    path::PathBuf,
+    path::{Path, PathBuf},
 };
 
 use serde::Serialize;
 
-fn add_tmp(mut path: PathBuf) -> PathBuf {
-    if let Some(stem) = path.file_name().and_then(|name| name.to_str()) {
-        let new_name = format!("{}.tmp", stem);
-        path.set_file_name(new_name);
+fn add_tmp(path: &Path) -> PathBuf {
+    if let Some(stem) = path.file_name() {
+        return path.with_file_name(format!("{}.tmp", stem.to_string_lossy().to_owned()));
     }
-    return path;
+    return path.to_path_buf();
 }
 
 fn remove_tmp(mut path: PathBuf) -> PathBuf {
@@ -53,16 +52,10 @@ impl AppState {
 
         let mut temp_files = self.temp_files.lock().unwrap();
         for temp_file in temp_files.iter() {
-            let real_file = remove_tmp(temp_file.clone());
-            rename(temp_file.clone(), real_file.clone()).map_err(|e| {
-                format!(
-                    "Rename file {} to {}: {}",
-                    temp_file.to_str().unwrap_or("(unknown)"),
-                    real_file.to_str().unwrap_or("(unknown)"),
-                    e
-                )
-            })?;
+            remove_file(temp_file)
+                .unwrap_or_else(|e| eprintln!("delete temp file {:?}: {}", temp_file, e));
         }
+
         *self.open_transaction.lock().unwrap() = false;
         temp_files.clear();
         return Ok(());
@@ -70,50 +63,35 @@ impl AppState {
 
     pub fn commit_transaction(&self) -> Result<(), String> {
         if !*self.open_transaction.lock().unwrap() {
+            println!("no transaction open");
             return Ok(());
         }
 
+        // overwrite original files with the .tmp versions, deleting the temps
         let mut temp_files = self.temp_files.lock().unwrap();
         for temp_file in temp_files.iter() {
-            let real_file = remove_tmp(temp_file.clone());
-            rename(temp_file.clone(), real_file.clone()).map_err(|e| {
-                format!(
-                    "Rename file {} to {}: {}",
-                    temp_file.to_str().unwrap_or("(unknown)"),
-                    real_file.to_str().unwrap_or("(unknown)"),
-                    e
-                )
-            })?;
+            println!("un-temping {}", temp_file.to_string_lossy().to_owned());
+            rename(&temp_file, &remove_tmp(temp_file.clone()))
+                .map_err(|e| format!("Un-Temp file {:?}: {}", temp_file, e))?;
         }
         *self.open_transaction.lock().unwrap() = false;
         temp_files.clear();
         return Ok(());
     }
 
-    pub fn write_file_bytes(&self, absolute_path: PathBuf, bytes: Vec<u8>) -> Result<(), String> {
-        let mut path = absolute_path.clone();
+    pub fn write_file_bytes(&self, absolute_path: &Path, bytes: Vec<u8>) -> Result<(), String> {
+        let mut path = absolute_path.to_path_buf();
         if *self.open_transaction.lock().unwrap() {
-            path = add_tmp(path);
             let mut temp_files = self.temp_files.lock().unwrap();
+            path = add_tmp(&path);
             temp_files.push(path.clone());
         }
 
-        let mut file = File::create(&path).map_err(|e| {
-            format!(
-                "Create/open file {}: {}",
-                path.to_str().unwrap_or("Non-UTF Path"),
-                e
-            )
-        })?;
+        let mut file =
+            File::create(&path).map_err(|e| format!("Create/open file {:?}: {}", path, e))?;
 
-        file.write_all(&bytes).map_err(|e| {
-            format!(
-                "Write file {}: {}",
-                path.to_str().unwrap_or("Non-UTF Path"),
-                e
-            )
-        })?;
-
-        return Ok(());
+        return file
+            .write_all(&bytes)
+            .map_err(|e| format!("Write file {:?}: {}", path, e));
     }
 }
