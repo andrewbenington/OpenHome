@@ -1,0 +1,32 @@
+.position-display-container {
+  margin: auto;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: row;
+  background-color: rgb(68, 102, 102);
+  padding: 3px;
+  gap: 3px;
+  width: 180px;
+}
+
+.position-display-col {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.position-display-cell {
+  min-width: 12px;
+  aspect-ratio: 1;
+  border-radius: 3px;
+  background-color: #fff;
+}
+
+.position-display-cell-empty {
+  background-color: #fff3;
+}
+
+.position-display-cell-active {
+  background-color: #f55;
+}

@@ -9,11 +9,11 @@ import {
   TabPanel,
   Tabs,
 } from '@mui/joy'
-import { range } from 'lodash'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary'
 import { MdDownload } from 'react-icons/md'
 import { ArrowLeftIcon, ArrowRightIcon } from 'src/components/Icons'
+import MiniBoxIndicator, { MiniBoxIndicatorProps } from 'src/saves/boxes/MiniBoxIndicator'
 import { fileTypeFromString } from '../types/FileImport'
 import { PKMInterface } from '../types/interfaces'
 import { OHPKM } from '../types/pkm/OHPKM'
@@ -36,17 +36,54 @@ const PokemonDetailsModal = (props: {
   onClose?: () => void
   navigateLeft?: () => void
   navigateRight?: () => void
-  positionDisplay?: {
-    index: number
-    columns: number
-    total: number
-  }
+  boxIndicatorProps?: MiniBoxIndicatorProps
 }) => {
-  const { mon, onClose, navigateLeft, navigateRight, positionDisplay } = props
+  const {
+    mon,
+    onClose,
+    navigateLeft: navigateLeftProp,
+    navigateRight: navigateRightProp,
+    boxIndicatorProps,
+  } = props
   const [displayMon, setDisplayMon] = useState(mon)
   const [tab, setTab] = useState('summary')
+  const [boxIndicatorVisible, setBoxIndicatorVisible] = useState(false)
+  const [boxIndicatorTimeout, setBoxIndicatorTimeout] = useState<NodeJS.Timeout>()
 
   useEffect(() => setDisplayMon(mon), [mon])
+
+  const showTemporaryBoxIndicator = useCallback(() => {
+    setBoxIndicatorVisible(true)
+    if (boxIndicatorTimeout) {
+      clearTimeout(boxIndicatorTimeout)
+    }
+    const timeout = setTimeout(() => setBoxIndicatorVisible(false), 1000)
+
+    setBoxIndicatorTimeout(timeout)
+  }, [boxIndicatorTimeout])
+
+  const navigateLeft = useMemo(
+    () =>
+      navigateLeftProp
+        ? () => {
+            navigateLeftProp()
+            showTemporaryBoxIndicator()
+          }
+        : undefined,
+    [showTemporaryBoxIndicator, navigateLeftProp]
+  )
+
+  const navigateRight = useMemo(
+    () =>
+      navigateRightProp
+        ? () => {
+            navigateRightProp()
+            showTemporaryBoxIndicator()
+          }
+        : undefined,
+    [showTemporaryBoxIndicator, navigateRightProp]
+  )
+
   const handleArrows = useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
       if (navigateLeft && e.key === 'ArrowLeft') {
@@ -68,7 +105,6 @@ const PokemonDetailsModal = (props: {
             maxWidth: '80%',
             maxHeight: '95%',
             padding: 0,
-            overflow: 'hidden',
           }}
         >
           {displayMon && mon && (
@@ -76,7 +112,7 @@ const PokemonDetailsModal = (props: {
               orientation="vertical"
               color="primary"
               value={tab ?? 'summary'}
-              style={{ height: '100%', width: '100%' }}
+              style={{ height: '100%', width: '100%', borderRadius: 7, overflow: 'hidden' }}
               onChange={(_, val) => setTab && setTab(val as string)}
             >
               <TabList
@@ -196,18 +232,12 @@ const PokemonDetailsModal = (props: {
             <ArrowRightIcon />
           </button>
         )}
-        {positionDisplay && (
-          <div className="position-display-container">
-            {range(positionDisplay.columns).map((i) => (
-              <div className="position-display-col" key={`pos-display-col-${i}`}>
-                {range(positionDisplay.total / positionDisplay.columns).map((j) => (
-                  <div
-                    className={`position-display-cell ${positionDisplay.index === j * positionDisplay.columns + i ? 'position-display-cell-active' : ''}`}
-                    key={`pos-display-cell-${i}-${j}`}
-                  />
-                ))}
-              </div>
-            ))}
+        {boxIndicatorProps && (
+          <div
+            className="modal-box-indicator-wrapper"
+            style={{ opacity: boxIndicatorVisible ? 1 : 0 }}
+          >
+            <MiniBoxIndicator {...boxIndicatorProps} />
           </div>
         )}
       </ModalOverflow>

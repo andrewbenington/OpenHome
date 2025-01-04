@@ -1,6 +1,6 @@
 import { useDraggable } from '@dnd-kit/core'
 import { Card, Grid } from '@mui/joy'
-import lodash from 'lodash'
+import lodash, { range } from 'lodash'
 import { useContext, useMemo, useState } from 'react'
 import { EditIcon } from 'src/components/Icons'
 import MiniButton from 'src/components/MiniButton'
@@ -213,6 +213,18 @@ const HomeBoxDisplay = () => {
           onClose={() => setSelectedIndex(undefined)}
           navigateRight={navigateRight}
           navigateLeft={navigateLeft}
+          boxIndicatorProps={
+            selectedIndex !== undefined
+              ? {
+                  currentIndex: selectedIndex,
+                  columns: homeData.boxColumns,
+                  rows: homeData.boxRows,
+                  emptyIndexes: range(homeData.boxColumns * homeData.boxRows).filter(
+                    (index) => !currentBox?.pokemon?.[index]
+                  ),
+                }
+              : undefined
+          }
         />
       </>
     )

@@ -50,6 +50,7 @@
   justify-content: center;
   background-color: rgb(68, 102, 102);
   transition: background-color 0.1s;
+  z-index: 1;
 }
 
 .modal-arrow:hover {
@@ -64,36 +65,11 @@
   right: 5%;
 }
 
-.position-display-container {
+.modal-box-indicator-wrapper {
   position: absolute;
-  left: calc(50% - 60px);
   bottom: 8px;
-  width: 120px;
-  border-radius: 5px;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  background-color: rgb(68, 102, 102);
-  padding: 3px;
-  gap: 3px;
-}
-
-.position-display-col {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  flex: 1;
-  background-color: rgb(68, 102, 102);
-  gap: 3px;
-}
-
-.position-display-cell {
-  aspect-ratio: 1;
-  border-radius: 2px;
-  background-color: #fff;
-}
-
-.position-display-cell-active {
-  background-color: #f55;
+  width: 100%;
+  overflow: hidden;
+  transition: opacity 0.15s;
+  z-index: 1;
 }

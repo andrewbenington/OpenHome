@@ -1,6 +1,6 @@
 import { useDraggable } from '@dnd-kit/core'
 import { Button, Card, Grid, Modal, ModalDialog, Stack } from '@mui/joy'
-import lodash from 'lodash'
+import lodash, { range } from 'lodash'
 import { GameOfOriginData } from 'pokemon-resources'
 import { PokemonData } from 'pokemon-species-data'
 import { useContext, useMemo, useState } from 'react'
@@ -294,12 +294,15 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
         onClose={() => setSelectedIndex(undefined)}
         navigateRight={navigateRight}
         navigateLeft={navigateLeft}
-        positionDisplay={
+        boxIndicatorProps={
           selectedIndex !== undefined
             ? {
-                index: selectedIndex,
+                currentIndex: selectedIndex,
                 columns: save.boxColumns,
-                total: save.boxColumns * save.boxRows,
+                rows: save.boxRows,
+                emptyIndexes: range(save.boxColumns * save.boxRows).filter(
+                  (index) => !currentBox?.pokemon?.[index]
+                ),
               }
             : undefined
         }
