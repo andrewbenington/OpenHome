@@ -1,8 +1,8 @@
-import { Autocomplete, Card, Chip, Modal, ModalDialog, ModalOverflow, Stack } from '@mui/joy'
+import { Autocomplete, Card, Chip, Modal, ModalDialog, Stack } from '@mui/joy'
 import dayjs from 'dayjs'
 import { useContext, useMemo, useState } from 'react'
 import { MdAdd } from 'react-icons/md'
-import PokemonDetailsPanel from 'src/pokemon/PokemonDetailsPanel'
+import PokemonDetailsModal from 'src/pokemon/PokemonDetailsModal'
 import BoxCell from 'src/saves/boxes/BoxCell'
 import SavesModal from 'src/saves/SavesModal'
 import { filterUndefined } from 'src/util/Sort'
@@ -54,8 +54,7 @@ export default function SortPokemon() {
   const [{ homeMons }] = useContext(LookupContext)
   const [{ homeData }, , openSaves] = useContext(OpenSavesContext)
   const [openSaveDialog, setOpenSaveDialog] = useState(false)
-  const [selectedMon, setSelectedMon] = useState<PKMInterface>()
-  const [tab, setTab] = useState('summary')
+  const [selectedIndex, setSelectedIndex] = useState<number>()
   const [sort, setSort] = useState('')
 
   const allMonsWithColors = useMemo(() => {
@@ -75,6 +74,16 @@ export default function SortPokemon() {
 
     return all
   }, [openSaves, homeData])
+
+  const sortedMonsWithColors = useMemo(
+    () => Object.values(allMonsWithColors).sort(getSortFunction(sort)),
+    [allMonsWithColors, sort]
+  )
+
+  const selectedMon = useMemo(
+    () => (selectedIndex !== undefined ? sortedMonsWithColors[selectedIndex]?.mon : undefined),
+    [sortedMonsWithColors, selectedIndex]
+  )
 
   if (!homeMons) return <div />
   return (
@@ -102,20 +111,18 @@ export default function SortPokemon() {
         </Card>
         <Card style={{ overflowY: 'auto' }}>
           <Stack direction="row" flexWrap="wrap" justifyContent="center">
-            {Object.values(allMonsWithColors)
-              .sort(getSortFunction(sort))
-              .map((monWithSave, i) => (
-                <div style={{ width: 36, height: 36, margin: 4 }} key={`mon_${i}`}>
-                  <BoxCell
-                    onClick={() => setSelectedMon(monWithSave.mon)}
-                    onDrop={() => {}}
-                    mon={monWithSave.mon}
-                    disabled={false}
-                    zIndex={2}
-                    borderColor={monWithSave.color}
-                  />
-                </div>
-              ))}
+            {sortedMonsWithColors.map((monWithSave, i) => (
+              <div style={{ width: 36, height: 36, margin: 4 }} key={`mon_${i}`}>
+                <BoxCell
+                  onClick={() => setSelectedIndex(i)}
+                  onDrop={() => {}}
+                  mon={monWithSave.mon}
+                  disabled={false}
+                  zIndex={2}
+                  borderColor={monWithSave.color}
+                />
+              </div>
+            ))}
           </Stack>
         </Card>
       </Stack>
@@ -124,21 +131,22 @@ export default function SortPokemon() {
           <SavesModal onClose={() => setOpenSaveDialog(false)} />
         </ModalDialog>
       </Modal>
-      <Modal open={!!selectedMon} onClose={() => setSelectedMon(undefined)}>
-        <ModalOverflow>
-          <ModalDialog
-            style={{
-              width: 800,
-              maxWidth: '80%',
-              padding: 0,
-              maxHeight: '95%',
-              overflow: 'hidden',
-            }}
-          >
-            {selectedMon && <PokemonDetailsPanel mon={selectedMon} tab={tab} setTab={setTab} />}
-          </ModalDialog>
-        </ModalOverflow>
-      </Modal>
+      <PokemonDetailsModal
+        mon={selectedMon}
+        onClose={() => setSelectedIndex(undefined)}
+        navigateLeft={() =>
+          sortedMonsWithColors.length && selectedIndex !== undefined
+            ? setSelectedIndex(
+                selectedIndex === 0 ? sortedMonsWithColors.length - 1 : selectedIndex - 1
+              )
+            : undefined
+        }
+        navigateRight={() =>
+          sortedMonsWithColors.length && selectedIndex !== undefined
+            ? setSelectedIndex((selectedIndex + 1) % sortedMonsWithColors.length)
+            : undefined
+        }
+      />
     </Stack>
   )
 }

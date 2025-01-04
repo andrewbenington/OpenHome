@@ -38,3 +38,38 @@
   margin: 0px 8px;
   width: 30px;
 }
+
+.modal-arrow {
+  position: absolute;
+  top: calc(50% - 28px);
+  height: 56px;
+  width: 56px;
+  border-radius: 28px;
+  display: grid;
+  align-items: center;
+  justify-content: center;
+  background-color: rgb(68, 102, 102);
+  transition: background-color 0.1s;
+  z-index: 1;
+}
+
+.modal-arrow:hover {
+  background-color: rgb(96, 144, 144);
+}
+
+.modal-arrow-left {
+  left: 5%;
+}
+
+.modal-arrow-right {
+  right: 5%;
+}
+
+.modal-box-indicator-wrapper {
+  position: absolute;
+  bottom: 8px;
+  width: 100%;
+  overflow: hidden;
+  transition: opacity 0.15s;
+  z-index: 1;
+}
