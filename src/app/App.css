@@ -6,6 +6,11 @@ body {
   -moz-osx-font-smoothing: grayscale;
   user-select: none;
   -webkit-user-select: none !important;
+  --color-light-panel: #dfd;
+  --color-light-background: rgb(83, 180, 165);
+  --color-dark-panel: #081721;
+  --color-dark-background: rgb(1, 83, 84);
+  --dark-teal-gradient: linear-gradient(310deg, rgba(54, 69, 78, 1) 0%, rgba(1, 83, 84, 1) 85%);
 }
 
 div {
@@ -200,4 +205,31 @@ button > svg {
 
 .datagrid-error-row {
   background-color: #f004;
+}
+
+.rt-TabsContent {
+  height: 100%;
+  overflow-y: auto;
+}
+
+.radix-themes {
+  --cursor-button: pointer;
+  --card-border-width: 0px;
+  .rt-BaseTabList {
+    background-color: var(--color-panel);
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  .radix-themes {
+    --color-panel: var(--color-light-panel);
+    --color-background: var(--color-light-background);
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .radix-themes {
+    --color-panel: var(--color-dark-panel);
+    --color-background: var(--color-dark-background);
+  }
 }

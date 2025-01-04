@@ -37,6 +37,8 @@
   flex-direction: row;
   justify-content: center;
   align-items: flex-start;
+  flex: 1;
+  min-width: 480px;
 }
 
 .right-column {

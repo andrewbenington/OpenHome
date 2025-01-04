@@ -1,5 +1,6 @@
 import { useDraggable } from '@dnd-kit/core'
-import { Button, Card, Grid, Modal, ModalDialog, Stack } from '@mui/joy'
+import { Button, Grid, Modal, ModalDialog, Stack } from '@mui/joy'
+import { Card } from '@radix-ui/themes'
 import lodash, { range } from 'lodash'
 import { GameOfOriginData } from 'pokemon-resources'
 import { PokemonData } from 'pokemon-species-data'

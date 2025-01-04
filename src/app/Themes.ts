@@ -2,14 +2,15 @@ import { Components, Theme } from '@mui/joy'
 import { ColorSystemOptions, CssVarsThemeOptions } from '@mui/joy/styles/extendTheme'
 
 // const teal = '#53B4A5'
-const lightTeal = '#7DCEAB'
-const lightTealSelected = '#aedac3'
-const red = '#BC4749'
-const red2 = '#e45454'
+export const lightTeal = '#7DCEAB'
+export const lightTealSelected = '#aedac3'
+export const red = '#BC4749'
+export const red2 = '#e45454'
 // const green = '#84DD63'
 // const yellow = '#FFC31F'
-const tealGradient = 'linear-gradient(355deg, rgba(83,180,165,1) 0%, rgba(125,206,171,1) 85%)'
-const darkTealGradient = 'linear-gradient(310deg, rgba(54,69,78,1) 0%, rgba(1,83,84,1) 85%)'
+export const tealGradient =
+  'linear-gradient(355deg, rgba(83,180,165,1) 0%, rgba(125,206,171,1) 85%)'
+export const darkTealGradient = 'linear-gradient(310deg, rgba(54,69,78,1) 0%, rgba(1,83,84,1) 85%)'
 // const oldBackground = '#A9CEF4'
 
 export const components: Components<Theme> = {

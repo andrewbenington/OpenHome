@@ -1,5 +1,3 @@
-import { Card } from '@mui/joy'
-
 const AttributeTag = (props: {
   color: string
   backgroundColor: string
@@ -9,15 +7,16 @@ const AttributeTag = (props: {
   const { color, backgroundColor, label, icon } = props
 
   return (
-    <Card
+    <div
       style={{
-        marginLeft: 5,
         marginTop: 5,
-        padding: 5,
+        padding: 3,
+        display: 'grid',
         width: 'fit-content',
         fontWeight: 'bold',
         color,
         backgroundColor,
+        borderRadius: 5,
       }}
     >
       {icon ? (
@@ -32,7 +31,7 @@ const AttributeTag = (props: {
       ) : (
         (label ?? '')
       )}
-    </Card>
+    </div>
   )
 }
 

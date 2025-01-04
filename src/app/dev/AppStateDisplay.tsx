@@ -1,4 +1,5 @@
-import { Card, Stack } from '@mui/joy'
+import { Stack } from '@mui/joy'
+import { Card } from '@radix-ui/themes'
 import * as E from 'fp-ts/lib/Either'
 import { useContext, useEffect, useState } from 'react'
 import { BackendContext } from 'src/backend/backendContext'
@@ -24,10 +25,10 @@ export default function AppStateDisplay() {
 
   return (
     <Stack>
-      <Card sx={{ margin: 1 }}>
+      <Card style={{ margin: 8 }}>
         <InfoGrid data={appState ?? {}} />
       </Card>
-      <Card style={{ display: 'flex', flexDirection: 'row' }}>
+      <Card style={{ margin: 8, display: 'flex', flexDirection: 'row' }}>
         <DevDataDisplay data={appInfoState} label="App Info State" />
         <DevDataDisplay data={openSavesState} label="Saves/Mons State" />
       </Card>

@@ -1,4 +1,5 @@
-import { Card, Modal, Tab, tabClasses, TabList, TabPanel, Tabs } from '@mui/joy'
+import { Modal, Tab, tabClasses, TabList, TabPanel, Tabs } from '@mui/joy'
+import { Card } from '@radix-ui/themes'
 import { useState } from 'react'
 import PokemonDetailsModal from '../../pokemon/PokemonDetailsModal'
 import { PKMInterface } from '../../types/interfaces'

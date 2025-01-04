@@ -1,4 +1,5 @@
-import { Button, Card, ToggleButtonGroup } from '@mui/joy'
+import { Button, ToggleButtonGroup } from '@mui/joy'
+import { Card } from '@radix-ui/themes'
 import { useContext, useEffect } from 'react'
 import { BackendContext } from '../backend/backendContext'
 import { AppInfoContext } from '../state/appInfo'
@@ -13,7 +14,7 @@ export default function Settings() {
 
   return (
     <div>
-      <Card variant="outlined" sx={{ m: 1, maxWidth: 400 }}>
+      <Card style={{ margin: 8, maxWidth: 400 }}>
         <b>Enabled ROM Hack Formats</b>
         <div>
           {appInfoState.extraSaveTypes.map((saveType) => (

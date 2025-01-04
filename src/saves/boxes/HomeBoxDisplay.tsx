@@ -1,5 +1,6 @@
 import { useDraggable } from '@dnd-kit/core'
-import { Card, Grid } from '@mui/joy'
+import { Grid } from '@mui/joy'
+import { Card } from '@radix-ui/themes'
 import lodash, { range } from 'lodash'
 import { useContext, useMemo, useState } from 'react'
 import { EditIcon } from 'src/components/Icons'
@@ -98,7 +99,10 @@ const HomeBoxDisplay = () => {
     homeData &&
     currentBox && (
       <>
-        <Card style={{ padding: 2, width: '100%', height: 'fit-content', gap: 0 }}>
+        <Card
+          variant="surface"
+          style={{ padding: 2, width: '100%', height: 'fit-content', gap: 0 }}
+        >
           <Grid container style={{ padding: 4, minHeight: 48 }}>
             <Grid xs={4} display="grid" alignItems="center" justifyContent="end">
               <ArrowButton

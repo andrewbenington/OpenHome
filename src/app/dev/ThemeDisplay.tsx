@@ -1,5 +1,6 @@
-import { Button, Card, Palette, Typography, useTheme } from '@mui/joy'
+import { Button, Palette, Typography, useTheme } from '@mui/joy'
 import { ColorPaletteProp, PalettePrimary, VariantProp } from '@mui/joy/styles/types'
+import { Card } from '@radix-ui/themes'
 
 const colorPalettes = ['primary', 'secondary', 'neutral']
 

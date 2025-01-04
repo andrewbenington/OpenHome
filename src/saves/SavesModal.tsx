@@ -15,10 +15,12 @@ import {
   ToggleButtonGroup,
   Typography,
 } from '@mui/joy'
+import { Theme } from '@radix-ui/themes'
 import * as E from 'fp-ts/lib/Either'
 import { debounce } from 'lodash'
 import { useCallback, useContext, useState } from 'react'
 import 'react-data-grid/lib/styles.css'
+import useIsDarkMode from 'src/hooks/dark-mode'
 import { ErrorContext } from 'src/state/error'
 import { PathData } from 'src/types/SAVTypes/path'
 import { SAVClass } from 'src/types/SAVTypes/util'
@@ -61,6 +63,7 @@ const SavesModal = (props: SavesModalProps) => {
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
   const [{ settings }, dispatchAppInfoState] = useContext(AppInfoContext)
   const [unknownSaveData, setUnknownSaveData] = useState<AmbiguousOpenState>()
+  const isDarkMode = useIsDarkMode()
 
   // these are kept as a local state to reduce lag
   const [cardSize, setCardSize] = useState(settings.saveCardSize)
@@ -165,106 +168,108 @@ const SavesModal = (props: SavesModalProps) => {
 
   return (
     <>
-      <Tabs
-        defaultValue="recents"
-        orientation="vertical"
-        sx={{ height: '100%', borderTopLeftRadius: 8, borderBottomLeftRadius: 8 }}
-      >
-        <TabList
-          variant="solid"
-          color="primary"
-          disableUnderline
-          sx={{
-            whiteSpace: 'nowrap',
-            p: 0.8,
-            gap: 0.5,
-            [`& .${tabClasses.root}`]: {
-              borderRadius: 'lg',
-            },
-            [`& .${tabClasses.root}[aria-selected="true"]`]: {
-              boxShadow: 'sm',
-            },
-            borderTopLeftRadius: 8,
-            borderBottomLeftRadius: 8,
-          }}
+      <Theme accentColor="red" hasBackground appearance={isDarkMode ? 'dark' : 'light'}>
+        <Tabs
+          defaultValue="recents"
+          orientation="vertical"
+          sx={{ height: '100%', borderTopLeftRadius: 8, borderBottomLeftRadius: 8 }}
         >
-          <Button
-            onClick={() => pickSaveFile()}
-            style={{ margin: 8, width: 'calc(100% - 16px)' }}
+          <TabList
+            variant="solid"
             color="primary"
-            variant="soft"
-          >
-            Open File
-          </Button>
-          <Tab disableIndicator value={'recents'} variant="solid" color="primary">
-            Recents
-          </Tab>
-          <Tab disableIndicator value={'suggested'} variant="solid" color="primary">
-            Suggested
-          </Tab>
-          <Tab disableIndicator value={'folders'} variant="solid" color="primary">
-            Save Folders
-          </Tab>
-          <div style={{ flex: 1 }} />
-          {viewMode === 'card' && (
-            <label style={{ margin: 4 }}>
-              Icon Size
-              <Slider
-                value={cardSize}
-                step={20}
-                onChange={(_, newSize) => {
-                  setCardSize(newSize as number)
-                  debouncedUpdateCardSize(newSize as number, dispatchAppInfoState)
-                }}
-                valueLabelDisplay="auto"
-                min={100}
-                max={350}
-                style={{ paddingTop: 0, paddingBottom: 30 }}
-                variant="soft"
-                color="neutral"
-              />
-            </label>
-          )}
-          <ToggleButtonGroup
-            value={viewMode}
-            onChange={(_, newValue) => {
-              if (newValue) {
-                setViewMode(newValue)
-                dispatchAppInfoState({ type: 'set_save_view', payload: newValue as SaveViewMode })
-              }
+            disableUnderline
+            sx={{
+              whiteSpace: 'nowrap',
+              p: 0.8,
+              gap: 0.5,
+              [`& .${tabClasses.root}`]: {
+                borderRadius: 'lg',
+              },
+              [`& .${tabClasses.root}[aria-selected="true"]`]: {
+                boxShadow: 'sm',
+              },
+              borderTopLeftRadius: 8,
+              borderBottomLeftRadius: 8,
             }}
-            color="secondary"
-            style={{ width: '95%', marginLeft: 'auto', marginRight: 'auto', marginBottom: 4 }}
           >
-            <Button value="card" color="secondary" variant="soft" fullWidth>
-              <CardsIcon />
+            <Button
+              onClick={() => pickSaveFile()}
+              style={{ margin: 8, width: 'calc(100% - 16px)' }}
+              color="primary"
+              variant="soft"
+            >
+              Open File
             </Button>
-            <Button value="grid" color="secondary" variant="soft" fullWidth>
-              <GridIcon />
-            </Button>
-          </ToggleButtonGroup>
-        </TabList>
-        <TabPanel value="recents">
-          <RecentSaves onOpen={pickSaveFile} view={viewMode} cardSize={cardSize} />
-        </TabPanel>
-        <TabPanel value="suggested">
-          <SuggestedSaves onOpen={pickSaveFile} view={viewMode} cardSize={cardSize} />
-        </TabPanel>
-        <TabPanel value="folders">
-          <SaveFolders />
-        </TabPanel>
-      </Tabs>
-      <SelectSaveType
-        open={!!unknownSaveData}
-        saveTypes={unknownSaveData?.possibleSaveTypes}
-        onSelect={(selected) => {
-          setUnknownSaveData(undefined)
-          if (!unknownSaveData || !selected) return
-          const data = unknownSaveData
+            <Tab disableIndicator value={'recents'} variant="solid" color="primary">
+              Recents
+            </Tab>
+            <Tab disableIndicator value={'suggested'} variant="solid" color="primary">
+              Suggested
+            </Tab>
+            <Tab disableIndicator value={'folders'} variant="solid" color="primary">
+              Save Folders
+            </Tab>
+            <div style={{ flex: 1 }} />
+            {viewMode === 'card' && (
+              <label style={{ margin: 4 }}>
+                Icon Size
+                <Slider
+                  value={cardSize}
+                  step={20}
+                  onChange={(_, newSize) => {
+                    setCardSize(newSize as number)
+                    debouncedUpdateCardSize(newSize as number, dispatchAppInfoState)
+                  }}
+                  valueLabelDisplay="auto"
+                  min={100}
+                  max={350}
+                  style={{ paddingTop: 0, paddingBottom: 30 }}
+                  variant="soft"
+                  color="neutral"
+                />
+              </label>
+            )}
+            <ToggleButtonGroup
+              value={viewMode}
+              onChange={(_, newValue) => {
+                if (newValue) {
+                  setViewMode(newValue)
+                  dispatchAppInfoState({ type: 'set_save_view', payload: newValue as SaveViewMode })
+                }
+              }}
+              color="secondary"
+              style={{ width: '95%', marginLeft: 'auto', marginRight: 'auto', marginBottom: 4 }}
+            >
+              <Button value="card" color="secondary" variant="soft" fullWidth>
+                <CardsIcon />
+              </Button>
+              <Button value="grid" color="secondary" variant="soft" fullWidth>
+                <GridIcon />
+              </Button>
+            </ToggleButtonGroup>
+          </TabList>
+          <TabPanel value="recents">
+            <RecentSaves onOpen={pickSaveFile} view={viewMode} cardSize={cardSize} />
+          </TabPanel>
+          <TabPanel value="suggested">
+            <SuggestedSaves onOpen={pickSaveFile} view={viewMode} cardSize={cardSize} />
+          </TabPanel>
+          <TabPanel value="folders">
+            <SaveFolders />
+          </TabPanel>
+        </Tabs>
+        <SelectSaveType
+          open={!!unknownSaveData}
+          saveTypes={unknownSaveData?.possibleSaveTypes}
+          onSelect={(selected) => {
+            setUnknownSaveData(undefined)
+            if (!unknownSaveData || !selected) return
+            const data = unknownSaveData
 
-          buildAndOpenSave(selected, data.filePath, data.fileBytes)
-        }}
-      />
+            buildAndOpenSave(selected, data.filePath, data.fileBytes)
+          }}
+        />
+      </Theme>
     </>
   )
 }

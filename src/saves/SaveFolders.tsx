@@ -1,13 +1,5 @@
-import {
-  Button,
-  Card,
-  DialogActions,
-  DialogTitle,
-  Modal,
-  ModalDialog,
-  Stack,
-  Typography,
-} from '@mui/joy'
+import { Button, DialogActions, DialogTitle, Modal, ModalDialog, Stack, Typography } from '@mui/joy'
+import { Card } from '@radix-ui/themes'
 import * as E from 'fp-ts/lib/Either'
 import { useCallback, useContext, useEffect, useState } from 'react'
 import { SaveFolder } from 'src/types/storage'
@@ -101,7 +93,7 @@ export default function SaveFolders() {
       </div>
       <Stack style={{ overflowY: 'auto', height: '100%' }}>
         {saveFolders?.map((folder) => (
-          <Card key={folder.path} color="primary" variant="soft">
+          <Card key={folder.path}>
             <Stack direction="row">
               <b>{folder.label ?? folder.path}</b>
               <div style={{ color: '#666' }}>{folder.path}</div>

@@ -2,8 +2,10 @@ import { closestCenter, DragOverlay, PointerSensor, useSensor } from '@dnd-kit/c
 import { restrictToWindowEdges } from '@dnd-kit/modifiers'
 import { Box, Typography } from '@mui/joy'
 import { extendTheme, ThemeProvider } from '@mui/joy/styles'
+import { Theme } from '@radix-ui/themes'
+import '@radix-ui/themes/styles.css'
 import * as E from 'fp-ts/lib/Either'
-import { debounce } from 'lodash'
+import debounce from 'lodash/debounce'
 import { useCallback, useContext, useEffect, useMemo, useReducer, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { BackendContext } from 'src/backend/backendContext'
@@ -50,13 +52,15 @@ export default function App() {
   const [errorState, errorDispatch] = useReducer(errorReducer, {})
 
   return (
-    <ThemeProvider theme={theme}>
-      <BackendProvider backend={TauriBackend}>
-        <ErrorContext.Provider value={[errorState, errorDispatch]}>
-          <AppWithBackend />
-        </ErrorContext.Provider>
-      </BackendProvider>
-    </ThemeProvider>
+    <Theme accentColor="red" hasBackground appearance={isDarkMode ? 'dark' : 'light'}>
+      <ThemeProvider theme={theme}>
+        <BackendProvider backend={TauriBackend}>
+          <ErrorContext.Provider value={[errorState, errorDispatch]}>
+            <AppWithBackend />
+          </ErrorContext.Provider>
+        </BackendProvider>
+      </ThemeProvider>
+    </Theme>
   )
 }
 

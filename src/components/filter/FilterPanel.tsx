@@ -1,4 +1,5 @@
-import { Button, Card, Stack, Typography } from '@mui/joy'
+import { Stack, Typography } from '@mui/joy'
+import { Button, Card } from '@radix-ui/themes'
 import { Ability, Balls, GameOfOriginData, Item, Type, Types } from 'pokemon-resources'
 import { PokemonData } from 'pokemon-species-data'
 import { useContext, useMemo } from 'react'
@@ -48,15 +49,15 @@ export default function FilterPanel() {
   )
 
   return (
-    <Card sx={{ marginLeft: 1 }}>
+    <Card>
       <div style={{ display: 'flex', paddingTop: 4 }}>
         <Typography fontSize={20} marginLeft={0.5} flex={1}>
           Filter
         </Typography>
         <Button
-          variant="outlined"
+          variant="outline"
           disabled={Object.values(filterState).length === 0}
-          color="danger"
+          color="tomato"
           onClick={() => dispatchFilterState({ type: 'clear_all' })}
           style={{ padding: 4 }}
         >

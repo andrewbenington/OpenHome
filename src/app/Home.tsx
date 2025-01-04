@@ -1,4 +1,5 @@
 import { Box, Modal, ModalDialog, Stack, useTheme } from '@mui/joy'
+import { Button } from '@radix-ui/themes'
 import * as E from 'fp-ts/lib/Either'
 import lodash, { flatten } from 'lodash'
 import { bytesToPKMInterface } from 'pokemon-files'
@@ -233,8 +234,8 @@ const Home = () => {
         {lodash.range(allOpenSaves.length).map((i) => (
           <OpenSaveDisplay key={`save_display_${i}`} saveIndex={i} />
         ))}
-        <button
-          className="card-button"
+        <Button
+          // className="card-button"
           onClick={() => setOpenSaveDialog(true)}
           style={{
             backgroundColor: palette.primary.mainChannel,
@@ -242,15 +243,9 @@ const Home = () => {
         >
           <MdFileOpen />
           Open Save
-        </button>
+        </Button>
       </Stack>
-      <div
-        className="home-box-column"
-        style={{
-          flex: 1,
-          minWidth: 480,
-        }}
-      >
+      <div className="home-box-column">
         <Box
           display="flex"
           flexDirection="row"
