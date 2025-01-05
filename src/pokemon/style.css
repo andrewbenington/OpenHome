@@ -68,6 +68,7 @@
 .modal-box-indicator-wrapper {
   position: absolute;
   bottom: 8px;
+  left: 0px;
   width: 100%;
   overflow: hidden;
   transition: opacity 0.15s;

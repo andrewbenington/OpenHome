@@ -66,7 +66,6 @@ export const components: Components<Theme> = {
       root: ({ theme }) => ({
         background: theme.palette.background.gradient,
         padding: 0,
-        height: '100%',
       }),
     },
   },
