@@ -235,7 +235,7 @@ const PokemonDetailsModal = (props: {
         {boxIndicatorProps && (
           <div
             className="modal-box-indicator-wrapper"
-            style={{ opacity: boxIndicatorVisible ? 1 : 0 }}
+            style={{ opacity: boxIndicatorVisible ? 1 : 0, pointerEvents: 'none' }}
           >
             <MiniBoxIndicator {...boxIndicatorProps} />
           </div>
