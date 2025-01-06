@@ -1,32 +1,16 @@
-import {
-  Button,
-  DialogContent,
-  DialogTitle,
-  Modal,
-  ModalClose,
-  ModalDialog,
-  Slider,
-  Stack,
-  Tab,
-  tabClasses,
-  TabList,
-  TabPanel,
-  Tabs,
-  ToggleButtonGroup,
-  Typography,
-} from '@mui/joy'
-import { Theme } from '@radix-ui/themes'
+import { Stack } from '@mui/joy'
+import { Button, Dialog, Flex, Separator, Slider, VisuallyHidden } from '@radix-ui/themes'
 import * as E from 'fp-ts/lib/Either'
 import { debounce } from 'lodash'
 import { useCallback, useContext, useState } from 'react'
 import 'react-data-grid/lib/styles.css'
-import useIsDarkMode from 'src/hooks/dark-mode'
-import { ErrorContext } from 'src/state/error'
 import { PathData } from 'src/types/SAVTypes/path'
 import { SAVClass } from 'src/types/SAVTypes/util'
 import { getMonFileIdentifier } from 'src/util/Lookup'
 import { BackendContext } from '../backend/backendContext'
 import { CardsIcon, GridIcon } from '../components/Icons'
+import SideTabs from '../components/side-tabs/SideTabs'
+import useDisplayError from '../hooks/displayError'
 import { AppInfoAction, AppInfoContext } from '../state/appInfo'
 import { LookupContext } from '../state/lookup'
 import { OpenSavesContext } from '../state/openSaves'
@@ -38,6 +22,7 @@ import SuggestedSaves from './SuggestedSaves'
 import { SaveViewMode } from './util'
 
 interface SavesModalProps {
+  open?: boolean
   onClose: () => void
 }
 
@@ -55,15 +40,14 @@ const debouncedUpdateCardSize = debounce(
 )
 
 const SavesModal = (props: SavesModalProps) => {
-  const { onClose } = props
+  const { open, onClose } = props
   const backend = useContext(BackendContext)
   const [, dispatchOpenSaves] = useContext(OpenSavesContext)
   const [lookupState] = useContext(LookupContext)
-  const [, dispatchError] = useContext(ErrorContext)
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
   const [{ settings }, dispatchAppInfoState] = useContext(AppInfoContext)
   const [unknownSaveData, setUnknownSaveData] = useState<AmbiguousOpenState>()
-  const isDarkMode = useIsDarkMode()
+  const displayError = useDisplayError()
 
   // these are kept as a local state to reduce lag
   const [cardSize, setCardSize] = useState(settings.saveCardSize)
@@ -90,32 +74,20 @@ const SavesModal = (props: SavesModalProps) => {
       )
 
       if (E.isLeft(result)) {
-        dispatchError({
-          type: 'set_message',
-          payload: {
-            title: 'Error Loading Save',
-            messages: [result.left],
-          },
-        })
+        displayError('Error Loading Save', result.left)
         return
       }
       const saveFile = result.right
 
       if (!saveFile) {
-        dispatchError({
-          type: 'set_message',
-          payload: {
-            title: 'Error Identifying Save',
-            messages: ['Make sure you opened a supported save file.'],
-          },
-        })
+        displayError('Error Identifying Save', 'Make sure you opened a supported save file.')
       } else {
         backend.addRecentSave(getSaveRef(saveFile))
         dispatchOpenSaves({ type: 'add_save', payload: saveFile })
         onClose()
       }
     },
-    [backend, dispatchError, dispatchOpenSaves, lookupState, onClose]
+    [backend, displayError, dispatchOpenSaves, lookupState, onClose]
   )
 
   const pickSaveFile = useCallback(
@@ -124,10 +96,7 @@ const SavesModal = (props: SavesModalProps) => {
         const pickedFile = await backend.pickFile()
 
         if (E.isLeft(pickedFile)) {
-          dispatchError({
-            type: 'set_message',
-            payload: { title: 'Error Selecting File', messages: [pickedFile.left] },
-          })
+          displayError('Error Selecting File', pickedFile.left)
           return
         }
         if (!pickedFile.right) return
@@ -135,7 +104,7 @@ const SavesModal = (props: SavesModalProps) => {
       }
       backend.loadSaveFile(filePath).then(
         E.match(
-          (err) => console.error(err),
+          (err) => displayError('Error loading save file', err),
           ({ path, fileBytes }) => {
             filePath = path
             if (filePath && fileBytes) {
@@ -147,13 +116,10 @@ const SavesModal = (props: SavesModalProps) => {
               }
 
               if (saveTypes.length === 0) {
-                dispatchError({
-                  type: 'set_message',
-                  payload: {
-                    title: 'Error Identifying Save',
-                    messages: ['Make sure you opened a supported save file.'],
-                  },
-                })
+                displayError(
+                  'Error Identifying Save',
+                  'Make sure you opened a supported save file.'
+                )
                 return
               }
 
@@ -163,101 +129,100 @@ const SavesModal = (props: SavesModalProps) => {
         )
       )
     },
-    [backend, buildAndOpenSave, dispatchError, getEnabledSaveTypes]
+    [backend, buildAndOpenSave, displayError, getEnabledSaveTypes]
   )
 
   return (
-    <>
-      <Theme accentColor="red" hasBackground appearance={isDarkMode ? 'dark' : 'light'}>
-        <Tabs
-          defaultValue="recents"
-          orientation="vertical"
-          sx={{ height: '100%', borderTopLeftRadius: 8, borderBottomLeftRadius: 8 }}
-        >
-          <TabList
-            variant="solid"
-            color="primary"
-            disableUnderline
-            sx={{
-              whiteSpace: 'nowrap',
-              p: 0.8,
-              gap: 0.5,
-              [`& .${tabClasses.root}`]: {
-                borderRadius: 'lg',
-              },
-              [`& .${tabClasses.root}[aria-selected="true"]`]: {
-                boxShadow: 'sm',
-              },
-              borderTopLeftRadius: 8,
-              borderBottomLeftRadius: 8,
-            }}
-          >
+    <Dialog.Root open={open} onOpenChange={(open) => !open && onClose?.()}>
+      <VisuallyHidden>
+        <Dialog.Title>Pokémon Details</Dialog.Title>
+        <Dialog.Description>Description</Dialog.Description>
+      </VisuallyHidden>
+      <Dialog.Content
+        maxWidth="95%"
+        style={{
+          minWidth: 800,
+          height: 'calc(90vh - 32px)',
+          overflow: 'hidden',
+        }}
+      >
+        <SideTabs.Root defaultValue="recents">
+          <SideTabs.TabList>
             <Button
               onClick={() => pickSaveFile()}
               style={{ margin: 8, width: 'calc(100% - 16px)' }}
-              color="primary"
-              variant="soft"
             >
               Open File
             </Button>
-            <Tab disableIndicator value={'recents'} variant="solid" color="primary">
-              Recents
-            </Tab>
-            <Tab disableIndicator value={'suggested'} variant="solid" color="primary">
-              Suggested
-            </Tab>
-            <Tab disableIndicator value={'folders'} variant="solid" color="primary">
-              Save Folders
-            </Tab>
+            <SideTabs.Tab value="recents">Recents</SideTabs.Tab>
+            <SideTabs.Tab value="suggested">Suggested</SideTabs.Tab>
+            <SideTabs.Tab value="folders">Save Folders</SideTabs.Tab>
             <div style={{ flex: 1 }} />
             {viewMode === 'card' && (
-              <label style={{ margin: 4 }}>
+              <label style={{ margin: 4, color: 'white' }}>
                 Icon Size
                 <Slider
-                  value={cardSize}
+                  value={[cardSize]}
                   step={20}
-                  onChange={(_, newSize) => {
-                    setCardSize(newSize as number)
-                    debouncedUpdateCardSize(newSize as number, dispatchAppInfoState)
+                  onValueChange={(newSize) => {
+                    setCardSize(newSize[0])
+                    debouncedUpdateCardSize(newSize[0], dispatchAppInfoState)
                   }}
-                  valueLabelDisplay="auto"
                   min={100}
                   max={350}
-                  style={{ paddingTop: 0, paddingBottom: 30 }}
-                  variant="soft"
-                  color="neutral"
+                  style={{ padding: '4px 0px 8px' }}
                 />
               </label>
             )}
-            <ToggleButtonGroup
-              value={viewMode}
-              onChange={(_, newValue) => {
-                if (newValue) {
-                  setViewMode(newValue)
-                  dispatchAppInfoState({ type: 'set_save_view', payload: newValue as SaveViewMode })
-                }
-              }}
-              color="secondary"
-              style={{ width: '95%', marginLeft: 'auto', marginRight: 'auto', marginBottom: 4 }}
-            >
-              <Button value="card" color="secondary" variant="soft" fullWidth>
+            <Flex direction="row" justify="center" width="100%">
+              <Button
+                value="card"
+                onClick={() => {
+                  if (viewMode === 'card') return
+                  setViewMode('card')
+                  dispatchAppInfoState({
+                    type: 'set_save_view',
+                    payload: 'card',
+                  })
+                }}
+                variant={viewMode === 'card' ? 'solid' : 'soft'}
+                style={{
+                  borderTopRightRadius: 0,
+                  borderBottomRightRadius: 0,
+                }}
+              >
                 <CardsIcon />
               </Button>
-              <Button value="grid" color="secondary" variant="soft" fullWidth>
+              <Button
+                value="grid"
+                onClick={() => {
+                  if (viewMode === 'grid') return
+                  setViewMode('grid')
+                  dispatchAppInfoState({
+                    type: 'set_save_view',
+                    payload: 'grid',
+                  })
+                }}
+                variant={viewMode === 'grid' ? 'solid' : 'soft'}
+                style={{
+                  borderTopLeftRadius: 0,
+                  borderBottomLeftRadius: 0,
+                }}
+              >
                 <GridIcon />
               </Button>
-            </ToggleButtonGroup>
-          </TabList>
-          <TabPanel value="recents">
+            </Flex>
+          </SideTabs.TabList>
+          <SideTabs.Panel value="recents">
             <RecentSaves onOpen={pickSaveFile} view={viewMode} cardSize={cardSize} />
-          </TabPanel>
-          <TabPanel value="suggested">
+          </SideTabs.Panel>
+          <SideTabs.Panel value="suggested">
             <SuggestedSaves onOpen={pickSaveFile} view={viewMode} cardSize={cardSize} />
-          </TabPanel>
-          <TabPanel value="folders">
+          </SideTabs.Panel>
+          <SideTabs.Panel value="folders">
             <SaveFolders />
-          </TabPanel>
-        </Tabs>
+          </SideTabs.Panel>
+        </SideTabs.Root>
         <SelectSaveType
           open={!!unknownSaveData}
           saveTypes={unknownSaveData?.possibleSaveTypes}
@@ -269,8 +234,8 @@ const SavesModal = (props: SavesModalProps) => {
             buildAndOpenSave(selected, data.filePath, data.fileBytes)
           }}
         />
-      </Theme>
-    </>
+      </Dialog.Content>
+    </Dialog.Root>
   )
 }
 
@@ -284,33 +249,31 @@ interface SelectSaveTypeProps {
 
 function SelectSaveType({ open, saveTypes, onSelect }: SelectSaveTypeProps) {
   return (
-    <Modal open={open} onClose={() => onSelect()}>
-      <ModalDialog
-        sx={{
-          minWidth: 400,
-          maxWidth: '80%',
-          borderRadius: 'lg',
-          padding: 2,
+    <Dialog.Root open={open} onOpenChange={(open) => !open && onSelect()}>
+      <Dialog.Content
+        style={{
+          padding: 8,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 8,
         }}
       >
-        <ModalClose />
-        <DialogTitle>Ambiguous Save Type</DialogTitle>
-        <DialogContent>
-          <Typography>Select a save type to proceed:</Typography>
-          <Stack spacing={2} mt={2}>
-            {saveTypes?.map((saveType) => (
-              <Button
-                key={saveType.saveTypeID}
-                onClick={() => onSelect(saveType)}
-                variant="soft"
-                color="primary"
-              >
-                {saveType.saveTypeName}
-              </Button>
-            ))}
-          </Stack>
-        </DialogContent>
-      </ModalDialog>
-    </Modal>
+        <Dialog.Title mt="2" mb="0">
+          Ambiguous Save Type
+        </Dialog.Title>
+        <Separator style={{ width: '100%' }} />
+        <Dialog.Description>Select a save type to proceed:</Dialog.Description>
+        <Stack spacing={2} mt={2}>
+          {saveTypes?.map((saveType) => (
+            <Button key={saveType.saveTypeID} onClick={() => onSelect(saveType)} variant="soft">
+              {saveType.saveTypeName}
+            </Button>
+          ))}
+        </Stack>
+        <Dialog.Close>
+          <button>Cancel</button>
+        </Dialog.Close>
+      </Dialog.Content>
+    </Dialog.Root>
   )
 }

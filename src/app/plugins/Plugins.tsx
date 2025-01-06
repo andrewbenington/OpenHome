@@ -1,7 +1,7 @@
-import { Tab, tabClasses, TabList, TabPanel, Tabs } from '@mui/joy'
 import { useContext, useEffect } from 'react'
 import { BackendContext } from 'src/backend/backendContext'
 import { AppInfoContext } from 'src/state/appInfo'
+import SideTabs from '../../components/side-tabs/SideTabs'
 import BrowsePlugins from './BrowsePlugins'
 import InstalledPlugins from './InstalledPlugins'
 import './style.css'
@@ -15,35 +15,17 @@ export default function PluginsPage() {
   }, [settings, backend])
 
   return (
-    <Tabs defaultValue="browse" orientation="vertical" style={{ height: '100%' }}>
-      <TabList
-        variant="solid"
-        color="primary"
-        sx={{
-          whiteSpace: 'nowrap',
-          p: 0.8,
-          gap: 0.5,
-          [`& .${tabClasses.root}`]: {
-            borderRadius: 'lg',
-          },
-          [`& .${tabClasses.root}[aria-selected="true"]`]: {
-            boxShadow: 'sm',
-          },
-        }}
-      >
-        <Tab disableIndicator value="browse" variant="solid" color="primary">
-          Browse Plugins
-        </Tab>
-        <Tab disableIndicator value="installed" variant="solid" color="primary">
-          Installed Plugins
-        </Tab>
-      </TabList>
-      <TabPanel value="browse">
+    <SideTabs.Root defaultValue="browse">
+      <SideTabs.TabList>
+        <SideTabs.Tab value="browse">Browse Plugins</SideTabs.Tab>
+        <SideTabs.Tab value="installed">Installed Plugins</SideTabs.Tab>
+      </SideTabs.TabList>
+      <SideTabs.Panel value="browse">
         <BrowsePlugins />
-      </TabPanel>
-      <TabPanel value="installed">
+      </SideTabs.Panel>
+      <SideTabs.Panel value="installed">
         <InstalledPlugins />
-      </TabPanel>
-    </Tabs>
+      </SideTabs.Panel>
+    </SideTabs.Root>
   )
 }

@@ -88,10 +88,6 @@ const PokemonDetailsModal = (props: {
 
   return (
     <Dialog.Root open={!!(mon && displayMon)} onOpenChange={(open) => !open && onClose?.()}>
-      <VisuallyHidden>
-        <Dialog.Title>Pokémon Details</Dialog.Title>
-        <Dialog.Description>Description</Dialog.Description>
-      </VisuallyHidden>
       <Dialog.Content
         onKeyDown={handleArrows}
         minWidth="800px"
@@ -103,6 +99,9 @@ const PokemonDetailsModal = (props: {
           height: 'fit-content',
         }}
       >
+        <VisuallyHidden>
+          <Dialog.Title>Pokémon Details</Dialog.Title>
+        </VisuallyHidden>
         {mon && displayMon && (
           <SideTabs.Root className="pokemon-modal-tabs" defaultValue="summary">
             <SideTabs.TabList>

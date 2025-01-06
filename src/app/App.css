@@ -236,6 +236,13 @@ button > svg {
   .rt-BaseTabList {
     background-color: var(--color-panel);
   }
+  .rt-BaseDialogContent {
+    background: var(--background-gradient);
+  }
+  .rt-RadioGroupItem {
+    display: flex;
+    flex-direction: row;
+  }
 }
 
 @media (prefers-color-scheme: light) {

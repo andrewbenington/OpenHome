@@ -1,6 +1,6 @@
 import { useDraggable } from '@dnd-kit/core'
-import { Button, Grid, Modal, ModalDialog, Stack } from '@mui/joy'
-import { Card } from '@radix-ui/themes'
+import { Grid, Stack } from '@mui/joy'
+import { Button, Card, Dialog } from '@radix-ui/themes'
 import lodash, { range } from 'lodash'
 import { GameOfOriginData } from 'pokemon-resources'
 import { PokemonData } from 'pokemon-species-data'
@@ -140,8 +140,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                 })
               }
               disabled={!!save.updatedBoxSlots.length}
-              color="danger"
-              size="sm"
+              color="tomato"
             >
               <MdClose />
             </Button>{' '}
@@ -158,9 +157,8 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
             <Button
               className="save-menu-button"
               onClick={() => setDetailsModal(true)}
-              variant="plain"
-              color="neutral"
-              size="sm"
+              variant="outline"
+              color="gray"
             >
               <MenuIcon />
             </Button>
@@ -251,9 +249,9 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
             ))}
           </div>
         </Card>
-        <Modal open={detailsModal} onClose={() => setDetailsModal(false)}>
-          <ModalDialog
-            sx={{
+        <Dialog.Root open={detailsModal} onOpenChange={setDetailsModal}>
+          <Dialog.Content
+            style={{
               minWidth: 800,
               width: '80%',
               maxHeight: 'fit-content',
@@ -286,8 +284,8 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
               </AttributeRow>
             )}
             {save.getExtraData && <InfoGrid data={save.getExtraData()} />}
-          </ModalDialog>
-        </Modal>
+          </Dialog.Content>
+        </Dialog.Root>
       </Stack>
 
       <PokemonDetailsModal

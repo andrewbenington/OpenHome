@@ -1,4 +1,4 @@
-import { Button, ButtonProps } from '@mui/joy'
+import { ButtonProps } from '@mui/joy'
 import { useMemo } from 'react'
 import { IconType } from 'react-icons'
 import { MdDataArray } from 'react-icons/md'
@@ -14,7 +14,7 @@ export default function MiniButton(props: MiniButtonProps) {
   const Icon = useMemo(() => icon ?? MdDataArray, [icon])
 
   return (
-    <Button
+    <button
       style={{
         padding: 0,
         minWidth: 0,
@@ -23,6 +23,9 @@ export default function MiniButton(props: MiniButtonProps) {
         marginTop: 'auto',
         marginBottom: 'auto',
         borderWidth: 1,
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
         ...style,
       }}
       variant="outlined"
@@ -30,6 +33,6 @@ export default function MiniButton(props: MiniButtonProps) {
     >
       <Icon fontSize="large" />
       {label && <div style={{ margin: '0px 4px' }}>{label}</div>}
-    </Button>
+    </button>
   )
 }

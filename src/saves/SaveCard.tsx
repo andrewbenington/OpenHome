@@ -1,4 +1,4 @@
-import { Button, Chip, Stack } from '@mui/joy'
+import { Chip, Stack } from '@mui/joy'
 import { GameOfOrigin, isGameBoy } from 'pokemon-resources'
 import { useContext, useMemo, useState } from 'react'
 import { SaveRef } from 'src/types/types'
@@ -91,8 +91,8 @@ export default function SaveCard({ save, onOpen, onRemove, size = 240 }: SaveCar
         </Stack>
         <div style={{ flex: 1 }} />
         {size >= expandedViewMinSize && save.valid ? (
-          <Button
-            sx={{
+          <button
+            style={{
               overflowWrap: 'anywhere',
               width: 'calc(100% - 12px)',
               fontSize: 12,
@@ -109,7 +109,6 @@ export default function SaveCard({ save, onOpen, onRemove, size = 240 }: SaveCar
               padding: '0px 3px 3px',
               zIndex: 1,
             }}
-            variant="solid"
             onClick={(e) => {
               e.stopPropagation()
               setExpanded(!expanded)
@@ -126,7 +125,7 @@ export default function SaveCard({ save, onOpen, onRemove, size = 240 }: SaveCar
             >
               {save.filePath.raw}
             </div>
-          </Button>
+          </button>
         ) : size < standardViewMinSize ? (
           <Chip color="secondary" variant="solid" sx={{ margin: '8px', zIndex: 1 }}>
             <b>{save.trainerName}</b>

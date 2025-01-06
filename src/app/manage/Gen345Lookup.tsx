@@ -14,7 +14,11 @@ type G345LookupRow = {
   homeMon?: OHPKM
 }
 
-export default function Gen345Lookup() {
+type Gen345LookupProps = {
+  onSelectMon: (mon: OHPKM) => void
+}
+
+export default function Gen345Lookup({ onSelectMon }: Gen345LookupProps) {
   const [{ homeMons, gen345 }] = useContext(LookupContext)
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
 
@@ -25,25 +29,22 @@ export default function Gen345Lookup() {
   }
 
   const columns: SortableColumn<G345LookupRow>[] = [
-    // {
-    //   key: 'display',
-    //   name: 'Display',
-    //   width: 80,
-
-    //   renderCell: (params) => <DevDataDisplay data={params.row} />,
-    //   cellClass: 'centered-cell',
-    // },
     {
       key: 'Pokémon',
-      name: 'Pokémon',
-      width: 100,
+      name: '',
+      width: 60,
       renderValue: (value) =>
         value.homeMon && (
-          <PokemonIcon
-            dexNumber={value.homeMon.dexNum}
-            formeNumber={value.homeMon.formeNum}
-            style={{ width: 30, height: 30 }}
-          />
+          <button
+            onClick={() => value.homeMon && onSelectMon(value.homeMon)}
+            className="mon-icon-button"
+          >
+            <PokemonIcon
+              dexNumber={value.homeMon.dexNum}
+              formeNumber={value.homeMon.formeNum}
+              style={{ width: 30, height: 30 }}
+            />
+          </button>
         ),
       cellClass: 'centered-cell',
     },

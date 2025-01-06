@@ -5,7 +5,7 @@ import {
   ListItemContent,
   ListItemDecorator,
 } from '@mui/joy'
-import { useContext, useMemo } from 'react'
+import { JSX, useContext, useMemo } from 'react'
 import { FilterContext } from 'src/state/filter'
 import { Filter } from 'src/types/Filter'
 import './style.css'
@@ -24,23 +24,11 @@ export interface FilterAutocompleteProps<OptionType>
 export default function FilterAutocomplete<
   OptionType extends Partial<Record<keyof OptionType, OptionType[keyof OptionType]>>,
 >(props: FilterAutocompleteProps<OptionType>) {
-  const {
-    options,
-    labelField,
-    indexField,
-    filterField,
-    // label,
-    // renderInput,
-    getIconComponent,
-    ...attributes
-  } = props
+  const { options, labelField, indexField, filterField, getIconComponent, ...attributes } = props
   const [filterState, dispatchFilterState] = useContext(FilterContext)
 
   const currentOption: OptionType | undefined = useMemo(() => {
     if (options.length === 0) return undefined
-    // if (typeof options[0] === 'string') {
-    //   return filterState[filterField]
-    // }
     if (filterField in filterState && filterState[filterField] !== undefined) {
       return options.find((option) => indexField && option[indexField] === filterState[filterField])
     }

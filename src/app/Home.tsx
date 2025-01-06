@@ -1,4 +1,4 @@
-import { Box, Modal, ModalDialog, Stack, useTheme } from '@mui/joy'
+import { Box, Stack, useTheme } from '@mui/joy'
 import { Button } from '@radix-ui/themes'
 import * as E from 'fp-ts/lib/Either'
 import lodash, { flatten } from 'lodash'
@@ -269,27 +269,13 @@ const Home = () => {
         <ReleaseArea />
       </Stack>
       <PokemonDetailsModal mon={selectedMon} onClose={() => setSelectedMon(undefined)} />
-      <Modal
+
+      <SavesModal
         open={openSaveDialog}
-        onClose={() => setOpenSaveDialog(false)}
-        sx={{ height: '100vh' }}
-      >
-        <ModalDialog
-          sx={{
-            minWidth: 800,
-            width: '80%',
-            maxHeight: 'fit-content',
-            height: '95vh',
-            overflow: 'hidden',
-          }}
-        >
-          <SavesModal
-            onClose={() => {
-              setOpenSaveDialog(false)
-            }}
-          />
-        </ModalDialog>
-      </Modal>
+        onClose={() => {
+          setOpenSaveDialog(false)
+        }}
+      />
     </div>
   )
 }

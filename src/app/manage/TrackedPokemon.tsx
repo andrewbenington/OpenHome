@@ -1,5 +1,3 @@
-import { Modal } from '@mui/joy'
-import { Card } from '@radix-ui/themes'
 import { useState } from 'react'
 import SideTabs from 'src/components/side-tabs/SideTabs'
 import PokemonDetailsModal from '../../pokemon/PokemonDetailsModal'
@@ -19,21 +17,15 @@ export default function TrackedPokemon() {
         <SideTabs.Tab value="gen345">Gen 3/4/5 IDs</SideTabs.Tab>
       </SideTabs.TabList>
       <SideTabs.Panel value="all">
-        <OpenHomeMonList />
+        <OpenHomeMonList onSelectMon={(mon) => setSelectedMon(mon)} />
       </SideTabs.Panel>
       <SideTabs.Panel value="gen12">
-        <Gen12Lookup />
+        <Gen12Lookup onSelectMon={(mon) => setSelectedMon(mon)} />
       </SideTabs.Panel>
       <SideTabs.Panel value="gen345">
-        <Gen345Lookup />
+        <Gen345Lookup onSelectMon={(mon) => setSelectedMon(mon)} />
       </SideTabs.Panel>
-      <Modal open={!!selectedMon} onClose={() => setSelectedMon(undefined)}>
-        <Card style={{ width: 800, height: 400, padding: 0, overflow: 'hidden' }}>
-          {selectedMon && (
-            <PokemonDetailsModal mon={selectedMon} onClose={() => setSelectedMon(undefined)} />
-          )}
-        </Card>
-      </Modal>
+      <PokemonDetailsModal mon={selectedMon} onClose={() => setSelectedMon(undefined)} />
     </SideTabs.Root>
   )
 }

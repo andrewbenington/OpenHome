@@ -1,12 +1,12 @@
-import { Autocomplete, Chip, Modal, ModalDialog, Stack } from '@mui/joy'
+import { Autocomplete, Chip, Stack } from '@mui/joy'
 import { Card } from '@radix-ui/themes'
 import dayjs from 'dayjs'
 import { useContext, useMemo, useState } from 'react'
 import { MdAdd } from 'react-icons/md'
 import PokemonDetailsModal from 'src/pokemon/PokemonDetailsModal'
-import BoxCell from 'src/saves/boxes/BoxCell'
 import SavesModal from 'src/saves/SavesModal'
 import { filterUndefined } from 'src/util/Sort'
+import PokemonIcon from '../../components/PokemonIcon'
 import { LookupContext } from '../../state/lookup'
 import { OpenSavesContext } from '../../state/openSaves'
 import { PKMInterface } from '../../types/interfaces'
@@ -76,30 +76,80 @@ export default function SortPokemon() {
     return all
   }, [openSaves, homeData])
 
-  const sortedMonsWithColors = useMemo(
-    () => Object.values(allMonsWithColors).sort(getSortFunction(sort)),
-    [allMonsWithColors, sort]
-  )
+  const sortedMonsWithColors = useMemo(() => {
+    return sort
+      ? Object.values(allMonsWithColors).sort(getSortFunction(sort))
+      : Object.values(allMonsWithColors)
+  }, [allMonsWithColors, sort])
 
   const selectedMon = useMemo(
     () => (selectedIndex !== undefined ? sortedMonsWithColors[selectedIndex]?.mon : undefined),
     [sortedMonsWithColors, selectedIndex]
   )
 
+  const boxCells = useMemo(() => {
+    return sortedMonsWithColors.map((monWithSave, i) => (
+      <div style={{ width: 36, height: 36, margin: 4 }} key={`mon_${i}`}>
+        <button
+          onClick={() => setSelectedIndex(i)}
+          className="mon-icon-button"
+          style={{
+            borderColor: monWithSave.color,
+            borderWidth: 2,
+            borderStyle: 'solid',
+          }}
+        >
+          <PokemonIcon
+            dexNumber={monWithSave.mon.dexNum}
+            formeNumber={monWithSave.mon.formeNum}
+            style={{
+              width: 30,
+              height: 30,
+            }}
+          />
+        </button>
+        {/* <BoxCell
+          onClick={() => setSelectedIndex(i)}
+          onDrop={() => {}}
+          mon={monWithSave.mon}
+          disabled={false}
+          zIndex={2}
+          borderColor={monWithSave.color}
+        /> */}
+      </div>
+    ))
+  }, [sortedMonsWithColors])
+
   if (!homeMons) return <div />
   return (
-    <Stack direction="row" flexWrap="wrap" padding={1} overflow="hidden" height="calc(100% - 16px)">
-      <Card style={{ height: 'calc(100% - 16px)' }}>
-        <Stack style={{ width: 120, flex: 0 }}>
-          <Chip variant="solid">OpenHome</Chip>
+    <Stack
+      direction="row"
+      flexWrap="wrap"
+      padding={1}
+      useFlexGap
+      overflow="hidden"
+      height="calc(100% - 16px)"
+    >
+      <Card style={{ height: '100%' }}>
+        <Stack style={{ width: 180, flex: 0 }}>
+          <Chip variant="solid" style={{ border: `2px solid ${homeData?.gameColor()}` }}>
+            OpenHome
+          </Chip>
           {openSaves.map((save) => (
-            <Chip key={save.tid} variant="solid">
+            <Chip
+              key={save.tid}
+              variant="solid"
+              style={{ border: `2px solid ${save.gameColor()}` }}
+            >
               {save.name} ({save.tid})
             </Chip>
           ))}
-          <Chip onClick={() => setOpenSaveDialog(true)}>
+          <button
+            onClick={() => setOpenSaveDialog(true)}
+            style={{ padding: 0, display: 'grid', justifyContent: 'center' }}
+          >
             <MdAdd />
-          </Chip>
+          </button>
         </Stack>
       </Card>
       <Stack style={{ flex: 1, height: '100%' }}>
@@ -110,28 +160,21 @@ export default function SortPokemon() {
             placeholder="Sort"
           />
         </Card>
-        <Card style={{ overflowY: 'auto' }}>
-          <Stack direction="row" flexWrap="wrap" justifyContent="center">
-            {sortedMonsWithColors.map((monWithSave, i) => (
-              <div style={{ width: 36, height: 36, margin: 4 }} key={`mon_${i}`}>
-                <BoxCell
-                  onClick={() => setSelectedIndex(i)}
-                  onDrop={() => {}}
-                  mon={monWithSave.mon}
-                  disabled={false}
-                  zIndex={2}
-                  borderColor={monWithSave.color}
-                />
-              </div>
-            ))}
+        <Card style={{ overflowY: 'hidden', height: '100%', padding: 0 }}>
+          <Stack
+            direction="row"
+            flexWrap="wrap"
+            justifyContent="center"
+            alignContent="start"
+            overflow="auto"
+            height="calc(100% - 16px)"
+            style={{ padding: 8 }}
+          >
+            {boxCells}
           </Stack>
         </Card>
       </Stack>
-      <Modal open={openSaveDialog} onClose={() => setOpenSaveDialog(false)}>
-        <ModalDialog sx={{ minHeight: 400, height: 600, width: 1000 }}>
-          <SavesModal onClose={() => setOpenSaveDialog(false)} />
-        </ModalDialog>
-      </Modal>
+      <SavesModal open={openSaveDialog} onClose={() => setOpenSaveDialog(false)} />
       <PokemonDetailsModal
         mon={selectedMon}
         onClose={() => setSelectedIndex(undefined)}

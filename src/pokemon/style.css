@@ -54,14 +54,15 @@
 
 .modal-arrow:hover {
   background-color: rgb(96, 144, 144);
+  transition: left 0.15s;
 }
 
 .modal-arrow-left {
-  left: 5%;
+  right: 90%;
 }
 
 .modal-arrow-right {
-  right: 5%;
+  left: 90%;
 }
 
 .modal-box-indicator-wrapper {
@@ -78,7 +79,6 @@
   min-height: 400px;
   max-height: 85vh;
   & .side-tab-panel {
-    background: var(--background-gradient);
     height: initial;
   }
 }
