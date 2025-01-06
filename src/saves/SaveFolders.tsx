@@ -1,4 +1,3 @@
-import { Stack } from '@mui/joy'
 import { Button, Card, Dialog, Flex } from '@radix-ui/themes'
 import * as E from 'fp-ts/lib/Either'
 import { useCallback, useContext, useEffect, useState } from 'react'
@@ -92,10 +91,10 @@ export default function SaveFolders() {
           Add Folder
         </Button>
       </div>
-      <Stack style={{ overflowY: 'auto', height: '100%' }}>
+      <Flex overflowY="auto" height="100%" direction="column" gap="1">
         {saveFolders?.map((folder) => (
           <Card key={folder.path}>
-            <Stack direction="row">
+            <Flex direction="row" gap="4" align="center">
               <b>{folder.label ?? folder.path}</b>
               <div style={{ color: '#666' }}>{folder.path}</div>
               <button
@@ -107,15 +106,16 @@ export default function SaveFolders() {
                   marginBottom: 'auto',
                   backgroundColor: '#aa0000',
                   height: 'fit-content',
+                  color: 'white',
                 }}
                 onClick={() => removeFolder(folder.path)}
               >
                 <RemoveIcon />
               </button>
-            </Stack>
+            </Flex>
           </Card>
         ))}
-      </Stack>
+      </Flex>
       <FolderLabelDialog
         open={!!pendingDirPath}
         onClose={() => setPendingDirPath(undefined)}

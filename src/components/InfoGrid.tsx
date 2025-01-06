@@ -1,5 +1,5 @@
-import { Divider, Grid, Stack } from '@mui/joy'
-import { Card } from '@radix-ui/themes'
+import { Divider, Grid } from '@mui/joy'
+import { Card, Flex } from '@radix-ui/themes'
 import { isDayjs } from 'dayjs'
 import { PKM } from 'pokemon-files'
 import { ReactNode, useMemo } from 'react'
@@ -145,12 +145,12 @@ function InfoGridElement(props: InfoGridElementProps) {
           </Grid>
         ) : isArray(value) ? (
           <Grid xs={12} key={`info-row-value`} marginBottom={1}>
-            <Stack spacing={1}>
+            <Flex direction="column" gap="1">
               {value.map((item, arrayIndex) =>
                 typeof item === 'object' ? (
                   isPKM(item) ? (
                     <Card>
-                      <Stack direction="row" alignItems="center">
+                      <Flex direction="row" align="center">
                         <PokemonIcon
                           dexNumber={item.dexNum}
                           formeNumber={item.formeNum}
@@ -160,7 +160,7 @@ function InfoGridElement(props: InfoGridElementProps) {
                           {item.nickname} • {item.format}
                           {item instanceof OHPKM ? ` • ${getMonFileIdentifier(item)}` : ''}
                         </div>
-                      </Stack>
+                      </Flex>
                     </Card>
                   ) : (
                     <Card key={`info-row-array[${arrayIndex}]`}>
@@ -174,7 +174,7 @@ function InfoGridElement(props: InfoGridElementProps) {
                   <div key={`info-row-array[${arrayIndex}]`}>{item}</div>
                 )
               )}
-            </Stack>
+            </Flex>
           </Grid>
         ) : (
           <Grid xs={12} key={`info-row-value`} marginBottom={1}>

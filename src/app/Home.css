@@ -25,6 +25,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  width: 280px !important;
+  min-width: 280px;
 }
 
 .save-file-stack {

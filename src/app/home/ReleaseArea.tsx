@@ -1,4 +1,4 @@
-import { Stack } from '@mui/joy'
+import { Flex } from '@radix-ui/themes'
 import { useContext } from 'react'
 import PokemonIcon from 'src/components/PokemonIcon'
 import DroppableSpace from 'src/saves/boxes/DroppableSpace'
@@ -8,7 +8,7 @@ export default function ReleaseArea() {
   const [openSavesState] = useContext(OpenSavesContext)
 
   return (
-    <Stack className="drop-area">
+    <Flex className="drop-area" align="center" direction="column">
       Release
       <DroppableSpace dropID={`to_release`}>
         <div className="release-icon-container" style={{ display: 'flex' }}>
@@ -24,6 +24,6 @@ export default function ReleaseArea() {
           })}
         </div>
       </DroppableSpace>
-    </Stack>
+    </Flex>
   )
 }

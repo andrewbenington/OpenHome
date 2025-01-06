@@ -35,12 +35,6 @@ export default function FilterAutocomplete<
     return undefined
   }, [filterField, filterState, indexField, options])
 
-  // const currentValue: string | null = useMemo(() => {
-  //   if (typeof currentOption === 'string') return currentOption
-  //   if (!currentOption) return null
-  //   return labelField ? currentOption[labelField] : JSON.stringify(currentOption)
-  // }, [currentOption])
-
   return (
     <Autocomplete
       selectOnFocus

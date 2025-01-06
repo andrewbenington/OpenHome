@@ -1,4 +1,3 @@
-import { Stack } from '@mui/joy'
 import { Button, Dialog, Flex, Separator, Slider, VisuallyHidden } from '@radix-ui/themes'
 import * as E from 'fp-ts/lib/Either'
 import { debounce } from 'lodash'
@@ -251,6 +250,7 @@ function SelectSaveType({ open, saveTypes, onSelect }: SelectSaveTypeProps) {
   return (
     <Dialog.Root open={open} onOpenChange={(open) => !open && onSelect()}>
       <Dialog.Content
+        width="300px"
         style={{
           padding: 8,
           display: 'flex',
@@ -263,15 +263,21 @@ function SelectSaveType({ open, saveTypes, onSelect }: SelectSaveTypeProps) {
         </Dialog.Title>
         <Separator style={{ width: '100%' }} />
         <Dialog.Description>Select a save type to proceed:</Dialog.Description>
-        <Stack spacing={2} mt={2}>
+        <Flex gap="1" mt="1">
           {saveTypes?.map((saveType) => (
-            <Button key={saveType.saveTypeID} onClick={() => onSelect(saveType)} variant="soft">
+            <Button
+              key={saveType.saveTypeID}
+              onClick={() => onSelect(saveType)}
+              style={{ width: '100%' }}
+            >
               {saveType.saveTypeName}
             </Button>
           ))}
-        </Stack>
+        </Flex>
         <Dialog.Close>
-          <button>Cancel</button>
+          <Button variant="outline" color="gray">
+            Cancel
+          </Button>
         </Dialog.Close>
       </Dialog.Content>
     </Dialog.Root>

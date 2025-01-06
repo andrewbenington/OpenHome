@@ -1,6 +1,6 @@
 import { useDraggable } from '@dnd-kit/core'
-import { Grid, Stack } from '@mui/joy'
-import { Button, Card, Dialog } from '@radix-ui/themes'
+import { Grid } from '@mui/joy'
+import { Button, Card, Dialog, Flex } from '@radix-ui/themes'
 import lodash, { range } from 'lodash'
 import { GameOfOriginData } from 'pokemon-resources'
 import { PokemonData } from 'pokemon-species-data'
@@ -128,7 +128,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
 
   return save && save.currentPCBox !== undefined ? (
     <>
-      <Stack style={{ width: '100%' }}>
+      <Flex direction="column" width="100%" gap="1">
         <Card style={{ padding: '8px 0px 0px' }}>
           <div className="save-header">
             <Button
@@ -286,7 +286,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
             {save.getExtraData && <InfoGrid data={save.getExtraData()} />}
           </Dialog.Content>
         </Dialog.Root>
-      </Stack>
+      </Flex>
 
       <PokemonDetailsModal
         mon={selectedMon}

@@ -1,4 +1,5 @@
-import { Chip, Stack } from '@mui/joy'
+import { Chip } from '@mui/joy'
+import { Flex } from '@radix-ui/themes'
 import { GameOfOrigin, isGameBoy } from 'pokemon-resources'
 import { useContext, useMemo, useState } from 'react'
 import { SaveRef } from 'src/types/types'
@@ -70,7 +71,7 @@ export default function SaveCard({ save, onOpen, onRemove, size = 240 }: SaveCar
         }}
         onClick={onOpen}
       >
-        <Stack direction="row" padding="6px" width="calc(100% - 12px)" justifyContent="start">
+        <Flex direction="row" width="100%" justify="start" style={{ padding: 8 }} gap="2">
           {size >= standardViewMinSize && (
             <Chip color="secondary" variant="solid" sx={{ zIndex: 1 }}>
               <b>{save.trainerName}</b>
@@ -88,7 +89,7 @@ export default function SaveCard({ save, onOpen, onRemove, size = 240 }: SaveCar
             onRemove={onRemove}
             backgroundAlwaysPresent={save.game ? isGameBoy(save.game) : false}
           />
-        </Stack>
+        </Flex>
         <div style={{ flex: 1 }} />
         {size >= expandedViewMinSize && save.valid ? (
           <button

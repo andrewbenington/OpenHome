@@ -1,5 +1,4 @@
-import { Stack, Typography } from '@mui/joy'
-import { Button, Card } from '@radix-ui/themes'
+import { Button, Card, Flex, Text } from '@radix-ui/themes'
 import { Ability, Balls, GameOfOriginData, Item, Type, Types } from 'pokemon-resources'
 import { PokemonData } from 'pokemon-species-data'
 import { useContext, useMemo } from 'react'
@@ -50,10 +49,10 @@ export default function FilterPanel() {
 
   return (
     <Card>
-      <div style={{ display: 'flex', paddingTop: 4 }}>
-        <Typography fontSize={20} marginLeft={0.5} flex={1}>
+      <Flex direction="row" justify="between">
+        <Text size="5" ml="1" weight="bold">
           Filter
-        </Typography>
+        </Text>
         <Button
           variant="outline"
           disabled={Object.values(filterState).length === 0}
@@ -63,8 +62,8 @@ export default function FilterPanel() {
         >
           Clear All
         </Button>
-      </div>
-      <Stack margin={1} spacing={1}>
+      </Flex>
+      <Flex direction="column" m="1" gap="1">
         <FilterAutocomplete
           options={Object.values(PokemonData)}
           groupBy={(option) => `Generation ${option.formes[0].gen}`}
@@ -204,7 +203,7 @@ export default function FilterPanel() {
             ) : undefined
           }
         />
-      </Stack>
+      </Flex>
     </Card>
   )
 }

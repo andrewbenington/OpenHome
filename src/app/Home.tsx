@@ -1,5 +1,5 @@
-import { Box, Stack, useTheme } from '@mui/joy'
-import { Button } from '@radix-ui/themes'
+import { Box, useTheme } from '@mui/joy'
+import { Button, Flex } from '@radix-ui/themes'
 import * as E from 'fp-ts/lib/Either'
 import lodash, { flatten } from 'lodash'
 import { bytesToPKMInterface } from 'pokemon-files'
@@ -223,14 +223,8 @@ const Home = () => {
   }, [lookupState.loaded, lookupState.error, loadAllLookups])
 
   return (
-    <div
-      style={{
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'row',
-      }}
-    >
-      <Stack className="save-file-column" spacing={1} width={280} minWidth={280}>
+    <Flex direction="row" style={{ height: '100%' }}>
+      <Flex className="save-file-column" gap="3">
         {lodash.range(allOpenSaves.length).map((i) => (
           <OpenSaveDisplay key={`save_display_${i}`} saveIndex={i} />
         ))}
@@ -244,7 +238,7 @@ const Home = () => {
           <MdFileOpen />
           Open Save
         </Button>
-      </Stack>
+      </Flex>
       <div className="home-box-column">
         <Box
           display="flex"
@@ -258,7 +252,7 @@ const Home = () => {
           <Box flex={1} />
         </Box>
       </div>
-      <Stack spacing={1} className="right-column" width={300}>
+      <Flex className="right-column">
         <FilterPanel />
         <div
           className="drop-area"
@@ -267,7 +261,7 @@ const Home = () => {
           Preview
         </div>
         <ReleaseArea />
-      </Stack>
+      </Flex>
       <PokemonDetailsModal mon={selectedMon} onClose={() => setSelectedMon(undefined)} />
 
       <SavesModal
@@ -276,7 +270,7 @@ const Home = () => {
           setOpenSaveDialog(false)
         }}
       />
-    </div>
+    </Flex>
   )
 }
 

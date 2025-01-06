@@ -1,4 +1,4 @@
-import { Stack } from '@mui/joy'
+import { Flex } from '@radix-ui/themes'
 import * as E from 'fp-ts/lib/Either'
 import { GameOfOrigin } from 'pokemon-resources'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
@@ -149,15 +149,7 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
       name: 'Path',
       minWidth: 300,
       renderValue: (save) => (
-        <Stack
-          flexWrap="wrap"
-          direction="row"
-          spacing={0.5}
-          useFlexGap
-          title={save.filePath.raw}
-          alignItems="start"
-          paddingTop={0.5}
-        >
+        <Flex wrap="wrap" direction="row" gap="1" title={save.filePath.raw} align="start" mt="1">
           {splitPath(save.filePath).map((segment, i) => (
             <div
               key={`${save.filePath.raw}_${i}`}
@@ -172,7 +164,7 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
               {segment !== save.filePath.name && ' >'}
             </div>
           ))}
-        </Stack>
+        </Flex>
       ),
     },
   ]
@@ -180,7 +172,7 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
   return view === 'grid' ? (
     <OHDataGrid rows={suggestedSaves ?? []} columns={columns} />
   ) : (
-    <Stack flexWrap="wrap" direction="row" useFlexGap justifyContent="center" margin={2}>
+    <Flex wrap="wrap" direction="row" justify="center" m="4" gap="2">
       {suggestedSaves?.map((save) => (
         <SaveCard
           key={save.filePath.raw}
@@ -191,6 +183,6 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
           size={cardSize}
         />
       ))}
-    </Stack>
+    </Flex>
   )
 }

@@ -1,5 +1,4 @@
-import { Stack } from '@mui/joy'
-import { Card } from '@radix-ui/themes'
+import { Card, Flex } from '@radix-ui/themes'
 import * as E from 'fp-ts/lib/Either'
 import { useContext, useEffect, useState } from 'react'
 import { BackendContext } from 'src/backend/backendContext'
@@ -26,7 +25,7 @@ export default function AppStateDisplay() {
   })
 
   return (
-    <Stack>
+    <Flex direction="column">
       <Card style={{ margin: 8 }}>
         <InfoGrid data={appState ?? {}} />
       </Card>
@@ -45,6 +44,6 @@ export default function AppStateDisplay() {
           Test Error
         </button>
       </Card>
-    </Stack>
+    </Flex>
   )
 }

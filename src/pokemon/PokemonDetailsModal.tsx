@@ -1,5 +1,4 @@
-import { Stack } from '@mui/joy'
-import { Dialog, VisuallyHidden } from '@radix-ui/themes'
+import { Dialog, Flex, VisuallyHidden } from '@radix-ui/themes'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary'
 import { MdDownload } from 'react-icons/md'
@@ -105,7 +104,7 @@ const PokemonDetailsModal = (props: {
         {mon && displayMon && (
           <SideTabs.Root className="pokemon-modal-tabs" defaultValue="summary">
             <SideTabs.TabList>
-              <Stack direction="row">
+              <Flex direction="row">
                 <FileTypeSelect
                   baseFormat={mon.format}
                   currentFormat={displayMon.format}
@@ -140,7 +139,7 @@ const PokemonDetailsModal = (props: {
                     <MdDownload style={{ color: 'white' }} />
                   </a>
                 </button>
-              </Stack>
+              </Flex>
               <SideTabs.Tab value="summary">Summary</SideTabs.Tab>
               <SideTabs.Tab value="moves_met_data">Moves/Met Data</SideTabs.Tab>
               <SideTabs.Tab value="stats">Stats</SideTabs.Tab>

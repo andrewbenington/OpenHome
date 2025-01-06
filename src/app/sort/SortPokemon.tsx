@@ -1,5 +1,5 @@
-import { Autocomplete, Chip, Stack } from '@mui/joy'
-import { Card } from '@radix-ui/themes'
+import { Autocomplete, Chip } from '@mui/joy'
+import { Card, Flex } from '@radix-ui/themes'
 import dayjs from 'dayjs'
 import { useContext, useMemo, useState } from 'react'
 import { MdAdd } from 'react-icons/md'
@@ -108,30 +108,15 @@ export default function SortPokemon() {
             }}
           />
         </button>
-        {/* <BoxCell
-          onClick={() => setSelectedIndex(i)}
-          onDrop={() => {}}
-          mon={monWithSave.mon}
-          disabled={false}
-          zIndex={2}
-          borderColor={monWithSave.color}
-        /> */}
       </div>
     ))
   }, [sortedMonsWithColors])
 
   if (!homeMons) return <div />
   return (
-    <Stack
-      direction="row"
-      flexWrap="wrap"
-      padding={1}
-      useFlexGap
-      overflow="hidden"
-      height="calc(100% - 16px)"
-    >
+    <Flex direction="row" wrap="wrap" overflow="hidden" height="calc(100% - 16px)" m="2" gap="2">
       <Card style={{ height: '100%' }}>
-        <Stack style={{ width: 180, flex: 0 }}>
+        <Flex direction="column" gap="1" style={{ width: 180, flex: 0 }}>
           <Chip variant="solid" style={{ border: `2px solid ${homeData?.gameColor()}` }}>
             OpenHome
           </Chip>
@@ -150,9 +135,9 @@ export default function SortPokemon() {
           >
             <MdAdd />
           </button>
-        </Stack>
+        </Flex>
       </Card>
-      <Stack style={{ flex: 1, height: '100%' }}>
+      <Flex direction="column" gap="2" style={{ flex: 1, height: '100%' }}>
         <Card>
           <Autocomplete
             options={['nickname', 'level', 'species', 'ribbons', 'met_date', 'origin']}
@@ -161,19 +146,18 @@ export default function SortPokemon() {
           />
         </Card>
         <Card style={{ overflowY: 'hidden', height: '100%', padding: 0 }}>
-          <Stack
+          <Flex
             direction="row"
-            flexWrap="wrap"
-            justifyContent="center"
-            alignContent="start"
+            wrap="wrap"
+            justify="center"
             overflow="auto"
             height="calc(100% - 16px)"
-            style={{ padding: 8 }}
+            style={{ padding: 8, alignContent: 'start' }}
           >
             {boxCells}
-          </Stack>
+          </Flex>
         </Card>
-      </Stack>
+      </Flex>
       <SavesModal open={openSaveDialog} onClose={() => setOpenSaveDialog(false)} />
       <PokemonDetailsModal
         mon={selectedMon}
@@ -191,6 +175,6 @@ export default function SortPokemon() {
             : undefined
         }
       />
-    </Stack>
+    </Flex>
   )
 }
