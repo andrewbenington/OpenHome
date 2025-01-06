@@ -1,20 +1,22 @@
 /* eslint-disable react-refresh/only-export-components */
-import { useContext, useState } from 'react'
+import { HTMLAttributes, useContext, useState } from 'react'
 import { SideTabsContext } from './SideTabsContext'
 import './style.css'
 
 export type SideTabsProps = {
   defaultValue: string
   children: React.ReactNode
-}
+} & HTMLAttributes<HTMLDivElement>
 
 function SideTabsRoot(props: SideTabsProps) {
-  const { defaultValue, children } = props
+  const { className, defaultValue, children, ...otherProps } = props
   const [value, setValue] = useState(defaultValue)
 
   return (
     <SideTabsContext.Provider value={[value, setValue]}>
-      <div className="side-tabs">{children}</div>
+      <div className={`side-tabs ${className ?? ''}`} {...otherProps}>
+        {children}
+      </div>
     </SideTabsContext.Provider>
   )
 }

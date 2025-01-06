@@ -72,3 +72,13 @@
   overflow: hidden;
   transition: opacity 0.15s;
 }
+
+.pokemon-modal-tabs {
+  width: 100%;
+  min-height: 400px;
+  max-height: 85vh;
+  & .side-tab-panel {
+    background: var(--background-gradient);
+    height: initial;
+  }
+}

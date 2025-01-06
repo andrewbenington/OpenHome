@@ -1,9 +1,10 @@
-import { Stack, Tab, tabClasses, TabList, TabPanel, Tabs } from '@mui/joy'
+import { Stack } from '@mui/joy'
 import { Dialog, VisuallyHidden } from '@radix-ui/themes'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary'
 import { MdDownload } from 'react-icons/md'
 import { ArrowLeftIcon, ArrowRightIcon } from 'src/components/Icons'
+import SideTabs from 'src/components/side-tabs/SideTabs'
 import MiniBoxIndicator, { MiniBoxIndicatorProps } from 'src/saves/boxes/MiniBoxIndicator'
 import { fileTypeFromString } from '../types/FileImport'
 import { PKMInterface } from '../types/interfaces'
@@ -37,7 +38,6 @@ const PokemonDetailsModal = (props: {
     boxIndicatorProps,
   } = props
   const [displayMon, setDisplayMon] = useState(mon)
-  const [tab, setTab] = useState('summary')
   const [boxIndicatorVisible, setBoxIndicatorVisible] = useState(false)
   const [boxIndicatorTimeout, setBoxIndicatorTimeout] = useState<NodeJS.Timeout>()
 
@@ -77,10 +77,10 @@ const PokemonDetailsModal = (props: {
 
   const handleArrows = useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
-      if (navigateLeft && e.key === 'ArrowLeft') {
-        navigateLeft()
-      } else if (navigateRight && e.key === 'ArrowRight') {
-        navigateRight()
+      if (e.key === 'ArrowLeft') {
+        navigateLeft?.()
+      } else if (e.key === 'ArrowRight') {
+        navigateRight?.()
       }
     },
     [navigateLeft, navigateRight]
@@ -100,40 +100,12 @@ const PokemonDetailsModal = (props: {
         style={{
           position: 'inherit',
           overflow: 'hidden',
-          maxHeight: '85vh',
           height: 'fit-content',
         }}
       >
         {mon && displayMon && (
-          <Tabs
-            orientation="vertical"
-            color="primary"
-            value={tab ?? 'summary'}
-            style={{
-              height: '100%',
-              width: '100%',
-              maxHeight: '85vh',
-              borderRadius: 7,
-              overflow: 'auto',
-            }}
-            onChange={(_, val) => setTab && setTab(val as string)}
-          >
-            <TabList
-              disableUnderline
-              sx={{
-                whiteSpace: 'nowrap',
-                p: 0.8,
-                gap: 0.5,
-                [`& .${tabClasses.root}`]: {
-                  borderRadius: 'lg',
-                },
-                [`& .${tabClasses.root}[aria-selected="true"]`]: {
-                  boxShadow: 'sm',
-                },
-              }}
-              variant="solid"
-              color="primary"
-            >
+          <SideTabs.Root className="pokemon-modal-tabs" defaultValue="summary">
+            <SideTabs.TabList>
               <Stack direction="row">
                 <FileTypeSelect
                   baseFormat={mon.format}
@@ -170,48 +142,34 @@ const PokemonDetailsModal = (props: {
                   </a>
                 </button>
               </Stack>
-              <Tab value="summary" disableIndicator color="primary" variant="solid">
-                Summary
-              </Tab>
-              <Tab value="moves_met_data" disableIndicator color="primary" variant="solid">
-                Moves/Met Data
-              </Tab>
-              <Tab value="stats" disableIndicator color="primary" variant="solid">
-                Stats
-              </Tab>
-              <Tab value="ribbons" disableIndicator color="primary" variant="solid">
-                Ribbons
-              </Tab>
-              <Tab value="other" disableIndicator color="primary" variant="solid">
-                Other
-              </Tab>
-              <Tab value="json" disableIndicator color="primary" variant="solid">
-                JSON
-              </Tab>
-              <Tab value="raw" disableIndicator color="primary" variant="solid">
-                Raw
-              </Tab>
-            </TabList>
+              <SideTabs.Tab value="summary">Summary</SideTabs.Tab>
+              <SideTabs.Tab value="moves_met_data">Moves/Met Data</SideTabs.Tab>
+              <SideTabs.Tab value="stats">Stats</SideTabs.Tab>
+              <SideTabs.Tab value="ribbons">Ribbons</SideTabs.Tab>
+              <SideTabs.Tab value="other">Other</SideTabs.Tab>
+              <SideTabs.Tab value="json">JSON</SideTabs.Tab>
+              <SideTabs.Tab value="raw">Raw</SideTabs.Tab>
+            </SideTabs.TabList>
             <ErrorBoundary FallbackComponent={FallbackComponent}>
-              <TabPanel value="summary">
+              <SideTabs.Panel value="summary">
                 <SummaryDisplay mon={displayMon} />
-              </TabPanel>
-              <TabPanel value="moves_met_data">
+              </SideTabs.Panel>
+              <SideTabs.Panel value="moves_met_data">
                 <MetDataMovesDisplay mon={displayMon} />
-              </TabPanel>
-              <TabPanel value="stats">
+              </SideTabs.Panel>
+              <SideTabs.Panel value="stats">
                 <StatsDisplay mon={displayMon} />
-              </TabPanel>
-              <TabPanel value="ribbons">
+              </SideTabs.Panel>
+              <SideTabs.Panel value="ribbons">
                 <RibbonsDisplay mon={displayMon} />
-              </TabPanel>
-              <TabPanel value="other">
+              </SideTabs.Panel>
+              <SideTabs.Panel value="other">
                 <OtherDisplay mon={displayMon} />
-              </TabPanel>
-              <TabPanel value="json">
+              </SideTabs.Panel>
+              <SideTabs.Panel value="json">
                 <JSONDisplay mon={displayMon} />
-              </TabPanel>
-              <TabPanel value="raw">
+              </SideTabs.Panel>
+              <SideTabs.Panel value="raw">
                 <RawDisplay
                   bytes={
                     displayMon.originalBytes
@@ -220,9 +178,9 @@ const PokemonDetailsModal = (props: {
                   }
                   format={displayMon.pluginIdentifier ? undefined : displayMon.format}
                 />
-              </TabPanel>
+              </SideTabs.Panel>
             </ErrorBoundary>
-          </Tabs>
+          </SideTabs.Root>
         )}
         {navigateLeft && (
           <button className="modal-arrow modal-arrow-left" onClick={navigateLeft}>

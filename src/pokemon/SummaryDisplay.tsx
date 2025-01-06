@@ -29,7 +29,6 @@ const styles = {
     imageRendering: 'pixelated',
     objectFit: 'contain',
   },
-  attributesList: { textAlign: 'left', marginTop: 10 },
   language: { padding: '5px 10px 5px 10px', marginLeft: 'auto' },
   nicknameRow: {
     display: 'flex',
@@ -53,7 +52,7 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
   }, [mon])
 
   return (
-    <Grid container spacing={1} width="100%" paddingLeft={1}>
+    <Grid container spacing={1} width="100%" padding="8px" margin={0}>
       <Grid xs={6}>
         <div style={styles.column}>
           {imageError ? (
@@ -129,7 +128,7 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
           )}
         </div>
       </Grid>
-      <Grid xs={6} style={styles.attributesList}>
+      <Grid xs={6}>
         <AttributeRow label="Nickname" value={mon.nickname} />
         <AttributeRow
           label="Species"
