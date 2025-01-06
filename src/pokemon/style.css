@@ -50,7 +50,6 @@
   justify-content: center;
   background-color: rgb(68, 102, 102);
   transition: background-color 0.1s;
-  z-index: 1;
 }
 
 .modal-arrow:hover {
@@ -72,5 +71,4 @@
   width: 100%;
   overflow: hidden;
   transition: opacity 0.15s;
-  z-index: 1;
 }

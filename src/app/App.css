@@ -11,6 +11,9 @@ body {
   --color-dark-panel: #081721;
   --color-dark-background: rgb(1, 83, 84);
   --dark-teal-gradient: linear-gradient(310deg, rgba(54, 69, 78, 1) 0%, rgba(1, 83, 84, 1) 85%);
+
+  --side-tab-hover: rgb(142, 174, 176);
+  --side-tab-selected: rgb(116, 155, 155);
 }
 
 div {

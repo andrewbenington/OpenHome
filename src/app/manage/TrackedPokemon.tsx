@@ -1,6 +1,7 @@
-import { Modal, Tab, tabClasses, TabList, TabPanel, Tabs } from '@mui/joy'
+import { Modal } from '@mui/joy'
 import { Card } from '@radix-ui/themes'
 import { useState } from 'react'
+import SideTabs from 'src/components/side-tabs/SideTabs'
 import PokemonDetailsModal from '../../pokemon/PokemonDetailsModal'
 import { PKMInterface } from '../../types/interfaces'
 import Gen12Lookup from './Gen12Lookup'
@@ -11,41 +12,21 @@ export default function TrackedPokemon() {
   const [selectedMon, setSelectedMon] = useState<PKMInterface>()
 
   return (
-    <Tabs defaultValue="all" orientation="vertical" style={{ height: '100%' }}>
-      <TabList
-        variant="solid"
-        color="primary"
-        sx={{
-          whiteSpace: 'nowrap',
-          p: 0.8,
-          gap: 0.5,
-          [`& .${tabClasses.root}`]: {
-            borderRadius: 'lg',
-          },
-          [`& .${tabClasses.root}[aria-selected="true"]`]: {
-            boxShadow: 'sm',
-          },
-        }}
-      >
-        <Tab disableIndicator value={'all'} variant="solid" color="primary">
-          All Pokémon
-        </Tab>
-        <Tab disableIndicator value={'gen12'} variant="solid" color="primary">
-          Gen 1/2 IDs
-        </Tab>
-        <Tab disableIndicator value={'gen345'} variant="solid" color="primary">
-          Gen 3/4/5 IDs
-        </Tab>
-      </TabList>
-      <TabPanel value="all">
+    <SideTabs.Root defaultValue="all">
+      <SideTabs.TabList>
+        <SideTabs.Tab value="all"> All Pokémon</SideTabs.Tab>
+        <SideTabs.Tab value="gen12">Gen 1/2 IDs</SideTabs.Tab>
+        <SideTabs.Tab value="gen345">Gen 3/4/5 IDs</SideTabs.Tab>
+      </SideTabs.TabList>
+      <SideTabs.Panel value="all">
         <OpenHomeMonList />
-      </TabPanel>
-      <TabPanel value="gen12">
+      </SideTabs.Panel>
+      <SideTabs.Panel value="gen12">
         <Gen12Lookup />
-      </TabPanel>
-      <TabPanel value="gen345">
+      </SideTabs.Panel>
+      <SideTabs.Panel value="gen345">
         <Gen345Lookup />
-      </TabPanel>
+      </SideTabs.Panel>
       <Modal open={!!selectedMon} onClose={() => setSelectedMon(undefined)}>
         <Card style={{ width: 800, height: 400, padding: 0, overflow: 'hidden' }}>
           {selectedMon && (
@@ -53,6 +34,6 @@ export default function TrackedPokemon() {
           )}
         </Card>
       </Modal>
-    </Tabs>
+    </SideTabs.Root>
   )
 }
