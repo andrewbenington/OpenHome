@@ -1,9 +1,8 @@
-import { ButtonProps } from '@mui/joy'
 import { useMemo } from 'react'
 import { IconType } from 'react-icons'
 import { MdDataArray } from 'react-icons/md'
 
-export type MiniButtonProps = ButtonProps & {
+export type MiniButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   icon?: IconType
   label?: string
 }
@@ -28,7 +27,6 @@ export default function MiniButton(props: MiniButtonProps) {
         alignItems: 'center',
         ...style,
       }}
-      variant="outlined"
       {...buttonProps}
     >
       <Icon fontSize="large" />

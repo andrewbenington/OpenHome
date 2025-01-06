@@ -1,5 +1,5 @@
-import { Autocomplete, Chip } from '@mui/joy'
-import { Card, Flex } from '@radix-ui/themes'
+import { Autocomplete } from '@mui/joy'
+import { Badge, Card, Flex } from '@radix-ui/themes'
 import dayjs from 'dayjs'
 import { useContext, useMemo, useState } from 'react'
 import { MdAdd } from 'react-icons/md'
@@ -117,17 +117,18 @@ export default function SortPokemon() {
     <Flex direction="row" wrap="wrap" overflow="hidden" height="calc(100% - 16px)" m="2" gap="2">
       <Card style={{ height: '100%' }}>
         <Flex direction="column" gap="1" style={{ width: 180, flex: 0 }}>
-          <Chip variant="solid" style={{ border: `2px solid ${homeData?.gameColor()}` }}>
+          <Badge color="gray" size="3" style={{ border: `2px solid ${homeData?.gameColor()}` }}>
             OpenHome
-          </Chip>
+          </Badge>
           {openSaves.map((save) => (
-            <Chip
+            <Badge
+              color="gray"
+              size="3"
               key={save.tid}
-              variant="solid"
               style={{ border: `2px solid ${save.gameColor()}` }}
             >
               {save.name} ({save.tid})
-            </Chip>
+            </Badge>
           ))}
           <button
             onClick={() => setOpenSaveDialog(true)}

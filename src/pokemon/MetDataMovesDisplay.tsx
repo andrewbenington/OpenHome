@@ -1,4 +1,4 @@
-import { Chip } from '@mui/joy'
+import { Badge, Flex } from '@radix-ui/themes'
 import {
   GameOfOriginData,
   getLocationString,
@@ -19,20 +19,6 @@ import { Styles } from '../types/types'
 import MoveCard from './MoveCard'
 
 const styles = {
-  container: {
-    display: 'flex',
-    flexDirection: 'column' as 'column',
-    height: 'calc(100% - 20px)',
-    padding: 10,
-  },
-  detailsContainer: {
-    display: 'flex',
-    flex: 1,
-    flexDirection: 'row',
-    height: 'fit-content',
-    padding: 4,
-  },
-  language: { padding: '5px 10px 5px 10px', marginLeft: 10 },
   gameContainer: {
     position: 'relative',
     width: 100,
@@ -137,16 +123,10 @@ const MetDataMovesDisplay = (props: { mon: PKMInterface }) => {
   }, [mon])
 
   return (
-    <div style={styles.container}>
-      <div style={styles.detailsContainer}>
+    <Flex direction="column" ml="4" mr="4" mt="2">
+      <Flex direction="row" style={{ flex: 1 }}>
         <div style={{ flex: 1 }}>
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              alignItems: 'center',
-            }}
-          >
+          <Flex direction="row" gap="1" align="center">
             {'ball' in mon && mon.ball ? (
               <img
                 draggable={false}
@@ -163,8 +143,10 @@ const MetDataMovesDisplay = (props: { mon: PKMInterface }) => {
                 ? ` ${RibbonTitles[mon.affixedRibbon]}`
                 : ''}
             </p>
-            <Chip style={styles.language}>{mon.language}</Chip>
-          </div>
+            <Badge variant="solid" color="gray" ml="2" size="2">
+              {mon.language}
+            </Badge>
+          </Flex>
           {eggMessage ? <p style={styles.description}>{eggMessage}</p> : <div />}
           <p style={styles.description}>{metMessage}</p>
           {/* check for undefined because 0 nature is Hardy */}
@@ -212,7 +194,7 @@ const MetDataMovesDisplay = (props: { mon: PKMInterface }) => {
           </div>
           {'markings' in mon && mon.markings ? <Markings markings={mon.markings} /> : <div />}
         </div>
-      </div>
+      </Flex>
       <div style={styles.centerFlex}>
         <MoveCard
           move={mon.moves[0]}
@@ -237,7 +219,7 @@ const MetDataMovesDisplay = (props: { mon: PKMInterface }) => {
           maxPP={getMoveMaxPP(mon.moves[3], mon.format, mon.movePPUps[3])}
         />
       </div>
-    </div>
+    </Flex>
   )
 }
 

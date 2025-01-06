@@ -20,8 +20,8 @@
 
 .status-chip {
   position: absolute !important;
-  bottom: 4px;
-  right: 4px;
+  bottom: 6px;
+  right: 6px;
   height: fit-content;
 }
 

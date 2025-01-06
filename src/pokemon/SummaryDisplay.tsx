@@ -1,4 +1,5 @@
-import { Chip, CircularProgress, Grid } from '@mui/joy'
+import { CircularProgress, Grid } from '@mui/joy'
+import { Badge } from '@radix-ui/themes'
 import { getDisplayID } from 'pokemon-files'
 import { AbilityToString } from 'pokemon-resources'
 import { PokemonData } from 'pokemon-species-data'
@@ -29,7 +30,6 @@ const styles = {
     imageRendering: 'pixelated',
     objectFit: 'contain',
   },
-  language: { padding: '5px 10px 5px 10px', marginLeft: 'auto' },
   nicknameRow: {
     display: 'flex',
     flexDirection: 'row',
@@ -85,7 +85,11 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
             <div />
           )}
           <div style={{ fontWeight: 'bold' }}>{mon.nickname}</div>
-          {mon.languageIndex !== undefined && <Chip style={styles.language}>{mon.language}</Chip>}
+          {mon.languageIndex !== undefined && (
+            <Badge variant="solid" color="gray" ml="2" size="3">
+              {mon.language}
+            </Badge>
+          )}
         </div>
         <AttributeRow label="Item" justifyEnd>
           {mon.heldItemName !== 'None' && (

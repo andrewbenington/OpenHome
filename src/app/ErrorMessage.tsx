@@ -1,5 +1,4 @@
-import { Alert } from '@mui/joy'
-import { Dialog, Separator } from '@radix-ui/themes'
+import { Callout, Dialog, Separator } from '@radix-ui/themes'
 import { useContext } from 'react'
 import { ErrorIcon } from 'src/components/Icons'
 import { ErrorContext } from '../state/error'
@@ -25,16 +24,12 @@ export default function ErrorMessageModal() {
         </Dialog.Title>
         <Separator style={{ width: '100%' }} />
         {errorState.messageData?.messages?.map((msg, i) => (
-          <Alert
-            startDecorator={<ErrorIcon style={{ width: 20, height: 20 }} />}
-            color="danger"
-            size="lg"
-            sx={{ padding: 1, fontWeight: 'bold' }}
-            variant="solid"
-            key={`alert_${i}`}
-          >
+          <Callout.Root color="tomato" key={`alert_${i}`} size="1">
+            <Callout.Icon>
+              <ErrorIcon style={{ width: 20, height: 20 }} />
+            </Callout.Icon>
             {msg}
-          </Alert>
+          </Callout.Root>
         ))}
       </Dialog.Content>
     </Dialog.Root>

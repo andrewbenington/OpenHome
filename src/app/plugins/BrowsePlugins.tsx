@@ -1,4 +1,5 @@
-import { Chip, CircularProgress, LinearProgress, Switch } from '@mui/joy'
+import { CircularProgress, LinearProgress, Switch } from '@mui/joy'
+import { Badge } from '@radix-ui/themes'
 import * as E from 'fp-ts/lib/Either'
 import { useCallback, useContext, useEffect, useState } from 'react'
 import { BackendContext } from 'src/backend/backendContext'
@@ -195,9 +196,9 @@ function AvailablePluginCard(props: AvailablePluginCardProps) {
         <CircularProgress />
       )}
       {installed && progressPercent === undefined && (
-        <Chip className="status-chip" color="success" variant="solid">
+        <Badge className="status-chip" color="green" variant="solid">
           Installed
-        </Chip>
+        </Badge>
       )}
       {progressPercent !== undefined && (
         <LinearProgress

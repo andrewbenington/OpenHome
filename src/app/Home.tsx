@@ -1,4 +1,3 @@
-import { Box, useTheme } from '@mui/joy'
 import { Button, Flex } from '@radix-ui/themes'
 import * as E from 'fp-ts/lib/Either'
 import lodash, { flatten } from 'lodash'
@@ -27,7 +26,6 @@ const Home = () => {
   const [openSavesState, openSavesDispatch, allOpenSaves] = useContext(OpenSavesContext)
   const [lookupState, lookupDispatch] = useContext(LookupContext)
   const backend = useContext(BackendContext)
-  const { palette } = useTheme()
   const [selectedMon, setSelectedMon] = useState<PKMInterface>()
   const [openSaveDialog, setOpenSaveDialog] = useState(false)
   const displayError = useDisplayError()
@@ -228,29 +226,15 @@ const Home = () => {
         {lodash.range(allOpenSaves.length).map((i) => (
           <OpenSaveDisplay key={`save_display_${i}`} saveIndex={i} />
         ))}
-        <Button
-          // className="card-button"
-          onClick={() => setOpenSaveDialog(true)}
-          style={{
-            backgroundColor: palette.primary.mainChannel,
-          }}
-        >
+        <Button onClick={() => setOpenSaveDialog(true)}>
           <MdFileOpen />
           Open Save
         </Button>
       </Flex>
       <div className="home-box-column">
-        <Box
-          display="flex"
-          flexDirection="row"
-          width="100%"
-          maxWidth={600}
-          minWidth={480}
-          alignItems="center"
-        >
+        <Flex direction="row" width="100%" maxWidth="600px" minWidth="480px" align="center">
           <HomeBoxDisplay />
-          <Box flex={1} />
-        </Box>
+        </Flex>
       </div>
       <Flex className="right-column">
         <FilterPanel />

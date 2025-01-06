@@ -34,7 +34,7 @@
 }
 
 .home-box-column {
-  padding: 8px 8px 8px 0px;
+  padding: 8px 12px 8px 4px;
   display: flex;
   flex-direction: row;
   justify-content: center;
