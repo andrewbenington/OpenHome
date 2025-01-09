@@ -1,4 +1,3 @@
-import { Chip } from '@mui/joy'
 import { Badge, Flex } from '@radix-ui/themes'
 import { GameOfOrigin, isGameBoy } from 'pokemon-resources'
 import { useContext, useMemo, useState } from 'react'
@@ -82,8 +81,8 @@ export default function SaveCard({ save, onOpen, onRemove, size = 240 }: SaveCar
               variant="solid"
               size="3"
               color="gray"
+              radius="full"
               style={{
-                borderRadius: 16,
                 maxWidth: '56%',
               }}
             >
@@ -136,9 +135,9 @@ export default function SaveCard({ save, onOpen, onRemove, size = 240 }: SaveCar
             </div>
           </button>
         ) : size < standardViewMinSize ? (
-          <Chip color="secondary" variant="solid" sx={{ margin: '8px', zIndex: 1 }}>
+          <Badge variant="solid" size="3" m="1" style={{ width: 'fit-content' }}>
             <b>{save.trainerName}</b>
-          </Chip>
+          </Badge>
         ) : (
           <div />
         )}

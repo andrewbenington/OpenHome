@@ -1,8 +1,7 @@
-import { Divider, Grid } from '@mui/joy'
-import { Card, Flex } from '@radix-ui/themes'
+import { Card, Flex, Grid } from '@radix-ui/themes'
 import { isDayjs } from 'dayjs'
 import { PKM } from 'pokemon-files'
-import { ReactNode, useMemo } from 'react'
+import React, { ReactNode, useCallback, useMemo } from 'react'
 import { OHPKM } from 'src/types/pkm/OHPKM'
 import { getMonFileIdentifier } from 'src/util/Lookup'
 import PokemonIcon from './PokemonIcon'
@@ -54,7 +53,7 @@ export function InfoGrid(props: InfoGridProps) {
   }, [labelBreakpoints])
 
   return (
-    <Grid container style={{ height: 'inherit' }}>
+    <Grid style={{ height: 'inherit' }}>
       {Object.entries(data)
         .filter(([, value]) => value !== undefined && value !== null)
         .map(([key, value], index) => (
@@ -101,106 +100,105 @@ export type InfoGridElementProps = {
 function InfoGridElement(props: InfoGridElementProps) {
   const { objKey: key, value, labelBreakpoints, dataBreakpoints, isLast } = props
 
+  const Component = useCallback(
+    (props: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>) =>
+      shouldBeExpandable(value)
+        ? React.createElement('details', props)
+        : React.createElement('div', props),
+    [value]
+  )
+
   if (!value) return <div />
 
   // if (!shouldBeExpandable(value)) return <SimpleInfoGridElement {...props} />
   return (
-    <Grid
-      container
-      rowGap={1}
-      component={shouldBeExpandable(value) ? 'details' : 'div'}
-      style={{ width: '100%', clear: 'both' }}
-    >
-      {/* <summary key={`info-row-${key}-summary`} style={{ fontSize: 18, fontWeight: 'bold' }}> */}
-      <Grid
-        component="summary"
-        {...labelBreakpoints}
+    <Grid columns="2" asChild style={{ width: '100%', clear: 'both' }}>
+      <Component
         style={{
-          float: shouldAlignRight(value) ? 'left' : undefined,
-          fontWeight: 'bold',
-          marginBottom: shouldBeExpandable(value) && !shouldAlignRight(value) ? 8 : 0,
+          borderWidth: 0.5,
+          borderBottomStyle: isLast ? undefined : 'solid',
+          borderColor: 'inherit',
+          padding: 3,
         }}
       >
-        {key}
-      </Grid>
-      {/* </summary> */}
-      {typeof value === 'object' ? (
-        Object.entries(value).length === 0 ? (
-          '{empty object}'
-        ) : isDayjs(value) ? (
-          <Grid {...dataBreakpoints} key={`info-row-value`}>
-            Dayjs(
-            {value.format('YYYY-MM-DD HH:mm')})
-          </Grid>
-        ) : isPKM(value) ? (
-          <Grid {...dataBreakpoints} key={`info-row-value`}>
-            PKM({value.nickname})
-          </Grid>
-        ) : 'name' in value &&
-          typeof value.name === 'string' &&
-          'tid' in value &&
-          typeof value.tid === 'number' ? (
-          <Grid {...dataBreakpoints} key={`info-row-value`}>
-            SAV({value.name}, {value.tid})
-          </Grid>
-        ) : isArray(value) ? (
-          <Grid xs={12} key={`info-row-value`} marginBottom={1}>
-            <Flex direction="column" gap="1">
-              {value.map((item, arrayIndex) =>
-                typeof item === 'object' ? (
-                  isPKM(item) ? (
-                    <Card>
-                      <Flex direction="row" align="center">
-                        <PokemonIcon
-                          dexNumber={item.dexNum}
-                          formeNumber={item.formeNum}
-                          style={{ width: 30, height: 30 }}
-                        />
-                        <div>
-                          {item.nickname} • {item.format}
-                          {item instanceof OHPKM ? ` • ${getMonFileIdentifier(item)}` : ''}
-                        </div>
-                      </Flex>
-                    </Card>
-                  ) : (
-                    <Card key={`info-row-array[${arrayIndex}]`}>
-                      <details open>
-                        <summary style={{ float: 'left', marginRight: 16 }}>{arrayIndex}</summary>
-                        <InfoGrid data={item} labelBreakpoints={labelBreakpoints} />
-                      </details>
-                    </Card>
-                  )
-                ) : (
-                  <div key={`info-row-array[${arrayIndex}]`}>{item}</div>
-                )
-              )}
-            </Flex>
-          </Grid>
-        ) : (
-          <Grid xs={12} key={`info-row-value`} marginBottom={1}>
-            {'props' in value ? (
-              (value as ReactNode)
-            ) : (
-              <Card>
-                <InfoGrid data={value} labelBreakpoints={labelBreakpoints} />
-              </Card>
-            )}
-          </Grid>
-        )
-      ) : value === '' ? (
-        '(empty string)'
-      ) : (
-        value.toString()
-      )}
-      {!isLast && (
-        <Divider
+        <summary
           style={{
-            width: '100%',
-            marginBottom: 4,
+            float: shouldAlignRight(value) ? 'left' : undefined,
+            fontWeight: 'bold',
+            marginBottom: shouldBeExpandable(value) && !shouldAlignRight(value) ? 8 : 0,
           }}
-          key={`info-row-divider`}
-        />
-      )}
+        >
+          {key}
+        </summary>
+        {typeof value === 'object' ? (
+          Object.entries(value).length === 0 ? (
+            '{empty object}'
+          ) : isDayjs(value) ? (
+            <Grid {...dataBreakpoints} key={`info-row-value`}>
+              Dayjs(
+              {value.format('YYYY-MM-DD HH:mm')})
+            </Grid>
+          ) : isPKM(value) ? (
+            <Grid {...dataBreakpoints} key={`info-row-value`}>
+              PKM({value.nickname})
+            </Grid>
+          ) : 'name' in value &&
+            typeof value.name === 'string' &&
+            'tid' in value &&
+            typeof value.tid === 'number' ? (
+            <Grid {...dataBreakpoints} key={`info-row-value`}>
+              SAV({value.name}, {value.tid})
+            </Grid>
+          ) : isArray(value) ? (
+            <Grid key={`info-row-value`} mb="2">
+              <Flex direction="column" gap="1">
+                {value.map((item, arrayIndex) =>
+                  typeof item === 'object' ? (
+                    isPKM(item) ? (
+                      <Card>
+                        <Flex direction="row" align="center">
+                          <PokemonIcon
+                            dexNumber={item.dexNum}
+                            formeNumber={item.formeNum}
+                            style={{ width: 30, height: 30 }}
+                          />
+                          <div>
+                            {item.nickname} • {item.format}
+                            {item instanceof OHPKM ? ` • ${getMonFileIdentifier(item)}` : ''}
+                          </div>
+                        </Flex>
+                      </Card>
+                    ) : (
+                      <Card key={`info-row-array[${arrayIndex}]`}>
+                        <details open>
+                          <summary style={{ float: 'left', marginRight: 16 }}>{arrayIndex}</summary>
+                          <InfoGrid data={item} labelBreakpoints={labelBreakpoints} />
+                        </details>
+                      </Card>
+                    )
+                  ) : (
+                    <div key={`info-row-array[${arrayIndex}]`}>{item}</div>
+                  )
+                )}
+              </Flex>
+            </Grid>
+          ) : (
+            <Grid key={`info-row-value`} mb="1">
+              {'props' in value ? (
+                (value as ReactNode)
+              ) : (
+                <Card>
+                  <InfoGrid data={value} labelBreakpoints={labelBreakpoints} />
+                </Card>
+              )}
+            </Grid>
+          )
+        ) : value === '' ? (
+          '(empty string)'
+        ) : (
+          value.toString()
+        )}
+      </Component>
     </Grid>
   )
 }

@@ -25,6 +25,22 @@
 }
 
 .type-icon-border {
-  /* border: 2px solid white; */
   border-radius: 16px;
+}
+
+.hex-display-grid {
+  margin: 4px 16px;
+  width: 680px;
+}
+
+.byte-row-display {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.single-byte-display {
+  font-size: 16px;
+}
+.single-byte-display:hover {
+  background-color: #fff3;
 }

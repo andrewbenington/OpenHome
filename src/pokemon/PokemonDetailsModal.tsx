@@ -1,10 +1,12 @@
 import { Dialog, Flex, VisuallyHidden } from '@radix-ui/themes'
+import { FileSchemas } from 'pokemon-files'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary'
 import { MdDownload } from 'react-icons/md'
 import { ArrowLeftIcon, ArrowRightIcon } from 'src/components/Icons'
 import SideTabs from 'src/components/side-tabs/SideTabs'
 import MiniBoxIndicator, { MiniBoxIndicatorProps } from 'src/saves/boxes/MiniBoxIndicator'
+import HexDisplay from '../components/HexDisplay'
 import { fileTypeFromString } from '../types/FileImport'
 import { PKMInterface } from '../types/interfaces'
 import { OHPKM } from '../types/pkm/OHPKM'
@@ -12,7 +14,6 @@ import FileTypeSelect from './FileTypeSelect'
 import JSONDisplay from './JSONDisplay'
 import MetDataMovesDisplay from './MetDataMovesDisplay'
 import OtherDisplay from './OtherDisplay'
-import RawDisplay from './RawDisplay'
 import RibbonsDisplay from './RibbonsDisplay'
 import StatsDisplay from './StatsDisplay'
 import SummaryDisplay from './SummaryDisplay'
@@ -168,13 +169,17 @@ const PokemonDetailsModal = (props: {
                 <JSONDisplay mon={displayMon} />
               </SideTabs.Panel>
               <SideTabs.Panel value="raw">
-                <RawDisplay
-                  bytes={
+                <HexDisplay
+                  data={
                     displayMon.originalBytes
                       ? displayMon.originalBytes
                       : new Uint8Array(displayMon.toBytes({ includeExtraFields: true }))
                   }
-                  format={displayMon.pluginIdentifier ? undefined : displayMon.format}
+                  format={
+                    displayMon.pluginIdentifier
+                      ? undefined
+                      : (displayMon.format as keyof typeof FileSchemas | 'OHPKM')
+                  }
                 />
               </SideTabs.Panel>
             </ErrorBoundary>

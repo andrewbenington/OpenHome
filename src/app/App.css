@@ -22,12 +22,14 @@ body {
       rgba(83, 180, 165, 1) 0%,
       rgba(125, 206, 171, 1) 85%
     );
+    --byte-hover: #fffa;
   }
 }
 
 @media (prefers-color-scheme: dark) {
   body {
     --background-gradient: linear-gradient(310deg, rgba(54, 69, 78, 1) 0%, rgba(1, 83, 84, 1) 85%);
+    --byte-hover: #ccc6;
   }
 }
 
