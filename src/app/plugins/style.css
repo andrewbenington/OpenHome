@@ -38,9 +38,9 @@
 
 .plugin-progress {
   position: absolute !important;
-  bottom: 4px;
-  width: 96% !important;
-  left: 2%;
+  bottom: 8px;
+  width: 92% !important;
+  left: 4%;
 }
 
 .error-icon-button {

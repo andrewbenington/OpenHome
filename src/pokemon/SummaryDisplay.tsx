@@ -1,5 +1,4 @@
-import { CircularProgress, Grid } from '@mui/joy'
-import { Badge } from '@radix-ui/themes'
+import { Badge, Grid, Spinner } from '@radix-ui/themes'
 import { getDisplayID } from 'pokemon-files'
 import { AbilityToString } from 'pokemon-resources'
 import { PokemonData } from 'pokemon-species-data'
@@ -8,7 +7,7 @@ import { getLevelGen12, getLevelGen3Onward } from 'src/util/StatCalc'
 import PokemonIcon from '../components/PokemonIcon'
 import TypeIcon from '../components/TypeIcon'
 import { getPublicImageURL } from '../images/images'
-import { BallsList, getItemIconPath } from '../images/items'
+import { BallsImageList, getItemIconPath } from '../images/items'
 import { PKMInterface } from '../types/interfaces'
 import { getTypes } from '../types/pkm/util'
 import { Styles } from '../types/types'
@@ -52,8 +51,8 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
   }, [mon])
 
   return (
-    <Grid container spacing={1} width="100%" padding="8px" margin={0}>
-      <Grid xs={6}>
+    <Grid columns="2" width="100%" p="3" gap="2">
+      <div>
         <div style={styles.column}>
           {imageError ? (
             <PokemonIcon
@@ -70,7 +69,7 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
               onError={() => setImageError(true)}
             />
           ) : (
-            <CircularProgress />
+            <Spinner style={{ margin: 'auto', height: 32 }} />
           )}
         </div>
         <div style={styles.nicknameRow}>
@@ -79,7 +78,7 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
               draggable={false}
               alt="poke ball type"
               style={{ width: 24, height: 24 }}
-              src={BallsList[mon.ball]}
+              src={BallsImageList[mon.ball]}
             />
           ) : (
             <div />
@@ -131,8 +130,8 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
             <AttributeTag label="N's Pokémon" backgroundColor="green" color="white" />
           )}
         </div>
-      </Grid>
-      <Grid xs={6}>
+      </div>
+      <div>
         <AttributeRow label="Nickname" value={mon.nickname} />
         <AttributeRow
           label="Species"
@@ -160,7 +159,7 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
             : getLevelGen3Onward(mon.dexNum, mon.exp)}
         </AttributeRow>
         <AttributeRow label="EXP">{mon.exp}</AttributeRow>
-      </Grid>
+      </div>
     </Grid>
   )
 }

@@ -1,4 +1,4 @@
-import { Tooltip } from '@mui/joy'
+import { Tooltip } from '@radix-ui/themes'
 import { Gen9Ribbons } from 'src/consts/Ribbons'
 import { getPublicImageURL } from '../images/images'
 import { getRibbonSpritePath } from '../images/ribbons'
@@ -78,7 +78,7 @@ const RibbonsDisplay = (props: { mon: PKMInterface }) => {
         const ribbonDisplay = formatRibbon(ribbon)
 
         return (
-          <Tooltip key={`ribbon_${ribbon}`} title={ribbonDisplay}>
+          <Tooltip key={`ribbon_${ribbon}`} content={ribbonDisplay} side="bottom">
             <img
               draggable={false}
               key={ribbonDisplay}

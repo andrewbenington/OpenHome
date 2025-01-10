@@ -1,5 +1,4 @@
-import { CircularProgress, LinearProgress, Switch } from '@mui/joy'
-import { Badge } from '@radix-ui/themes'
+import { Badge, Flex, Progress, Spinner, Switch } from '@radix-ui/themes'
 import * as E from 'fp-ts/lib/Either'
 import { useCallback, useContext, useEffect, useState } from 'react'
 import { BackendContext } from 'src/backend/backendContext'
@@ -68,16 +67,18 @@ export default function BrowsePlugins() {
   }, [installedPlugins, loadInstalled, pluginState.loaded])
 
   return loading ? (
-    <CircularProgress style={{ margin: 'auto', width: '100%', height: '100%' }} color="secondary" />
+    <Flex direction="column" justify="center" height="100%">
+      <Spinner style={{ margin: 'auto', height: 32 }} />
+    </Flex>
   ) : (
     <div style={{ padding: 16 }}>
       {isDev && (
         <label style={{ display: 'flex', flexDirection: 'row', gap: 8, marginBottom: 8 }}>
           <Switch
             checked={useDevRepo}
-            onChange={(e) => {
+            onCheckedChange={(val) => {
               setAvailablePlugins({})
-              setUseDevRepo(e.target.checked)
+              setUseDevRepo(val)
             }}
           />
           Use Local Repo
@@ -193,7 +194,7 @@ function AvailablePluginCard(props: AvailablePluginCardProps) {
       ) : metadata ? (
         <img className="plugin-icon" src={`${location}/icon.png`} />
       ) : (
-        <CircularProgress />
+        <Spinner style={{ margin: 'auto', height: 32 }} />
       )}
       {installed && progressPercent === undefined && (
         <Badge className="status-chip" color="green" variant="solid">
@@ -201,13 +202,7 @@ function AvailablePluginCard(props: AvailablePluginCardProps) {
         </Badge>
       )}
       {progressPercent !== undefined && (
-        <LinearProgress
-          className="plugin-progress"
-          value={progressPercent}
-          determinate
-          color="secondary"
-          variant="soft"
-        />
+        <Progress className="plugin-progress" value={progressPercent} />
       )}
       <div className="name-chip" style={{ width: '100%' }}>
         {name}

@@ -158,15 +158,8 @@ const HomeBoxDisplay = () => {
             <Grid xs={1} display="grid" alignItems="center" justifyContent="end">
               <MiniButton
                 icon={EditIcon}
-                style={{
-                  margin: 0,
-                  borderWidth: 1,
-                  borderStyle: 'solid',
-                  borderColor: editing ? 'transparent' : undefined,
-                  transition: 'none',
-                }}
-                color={editing ? 'secondary' : 'neutral'}
-                variant={editing ? 'solid' : 'outlined'}
+                style={{ transition: 'none', padding: 2 }}
+                variant={editing ? 'solid' : 'outline'}
                 onClick={() => setEditing(!editing)}
               />
             </Grid>

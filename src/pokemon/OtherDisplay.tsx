@@ -1,4 +1,4 @@
-import { Accordion, AccordionDetails, AccordionGroup, AccordionSummary } from '@mui/joy'
+import { Flex } from '@radix-ui/themes'
 import { AllPKMFields, getDisplayID, StatsPreSplit } from 'pokemon-files'
 import {
   BDSPTMMoveIndexes,
@@ -10,7 +10,6 @@ import {
 } from 'pokemon-resources'
 import { NationalDex } from 'pokemon-species-data'
 import { useMemo } from 'react'
-import { MdArrowForwardIos } from 'react-icons/md'
 import { Countries } from 'src/consts/Countries'
 import { EncounterTypes } from 'src/consts/EncounterTypes'
 import { SWEETS } from 'src/consts/Formes'
@@ -43,45 +42,18 @@ import {
 } from '../types/pkm/util'
 import { getFlagsInRange } from '../util/byteLogic'
 import AttributeRow from './AttributeRow'
-
-const styles = {
-  accordionSummary: {
-    border: 0,
-    padding: 0,
-    '& .MuiAccordionSummary-button': {
-      border: 0,
-      margin: '1px 0px 0px 0px',
-      padding: 0,
-      maxHeight: 32,
-      minBlockSize: 0,
-    },
-    '& .MuiAccordionSummary-indicator': {
-      position: 'absolute',
-      right: 10,
-    },
-    '& .Mui-expanded': {
-      '& .MuiAccordionSummary-indicator': {
-        transform: 'rotate(90deg)',
-      },
-    },
-  },
-  flexRowWrap: {
-    display: 'flex',
-    flexDirection: 'row' as 'row',
-    flexWrap: 'wrap' as 'wrap',
-  },
-}
+import AttributeRowExpand from './AttributeRowExpand'
 
 const OtherDisplay = (props: { mon: PKMInterface }) => {
   const { mon } = props
 
   return (
     <div style={{ overflow: 'hidden', height: '100%' }}>
-      <div
+      <Flex
+        direction="column"
+        gap="2px"
         style={{
-          display: 'flex',
-          flexDirection: 'column' as 'column',
-          height: 'calc(100% - 16px)',
+          height: '100%',
           padding: 8,
           overflowY: 'auto',
         }}
@@ -96,80 +68,45 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
             <code>{`0x${mon.encryptionConstant.toString(16).padStart(8, '0')}`}</code>
           </AttributeRow>
         )}
-        <AccordionGroup>
-          <Accordion>
-            <AccordionSummary
-              indicator={<MdArrowForwardIos style={{ fontSize: '0.9rem' }} />}
-              sx={styles.accordionSummary}
-            >
-              <AttributeRow
-                label="Original Trainer"
-                value={`${mon.trainerName} ${mon.trainerGender ? '♀' : '♂'}`}
-              />
-            </AccordionSummary>
-            <AccordionDetails>
-              <AttributeRow label="ID" value={getDisplayID(mon as any)} indent={10} />
-              {mon.secretID !== undefined && (
-                <AttributeRow label="Secret ID" indent={10}>
-                  <code>{`0x${mon.secretID.toString(16).padStart(4, '0')}`}</code>
-                </AttributeRow>
-              )}
-              {!!mon.trainerFriendship && (
-                <AttributeRow
-                  label="Friendship"
-                  value={mon.trainerFriendship.toString()}
-                  indent={10}
-                />
-              )}
-              {!!mon.trainerAffection && (
-                <AttributeRow
-                  label="Affection"
-                  value={mon.trainerAffection.toString()}
-                  indent={10}
-                />
-              )}
-              {'isCurrentHandler' in mon && (
-                <AttributeRow label="Trained last" value={`${!mon.isCurrentHandler}`} indent={10} />
-              )}
-            </AccordionDetails>
-          </Accordion>
-        </AccordionGroup>
+        <AttributeRowExpand
+          summary="Original Trainer"
+          value={`${mon.trainerName} ${mon.trainerGender ? '♀' : '♂'}`}
+        >
+          <AttributeRow label="ID" value={getDisplayID(mon as any)} indent={10} />
+          {mon.secretID !== undefined && (
+            <AttributeRow label="Secret ID" indent={10}>
+              <code>{`0x${mon.secretID.toString(16).padStart(4, '0')}`}</code>
+            </AttributeRow>
+          )}
+          {!!mon.trainerFriendship && (
+            <AttributeRow label="Friendship" value={mon.trainerFriendship.toString()} indent={10} />
+          )}
+          {!!mon.trainerAffection && (
+            <AttributeRow label="Affection" value={mon.trainerAffection.toString()} indent={10} />
+          )}
+          {'isCurrentHandler' in mon && (
+            <AttributeRow label="Trained last" value={`${!mon.isCurrentHandler}`} indent={10} />
+          )}
+        </AttributeRowExpand>
         {mon.handlerName && (
-          <AccordionGroup>
-            <Accordion>
-              <AccordionSummary
-                indicator={<MdArrowForwardIos style={{ fontSize: '0.9rem' }} />}
-                sx={styles.accordionSummary}
-              >
-                <AttributeRow
-                  label="Recent Trainer"
-                  value={`${mon.handlerName} ${mon.handlerGender ? '♀' : '♂'}`}
-                />
-              </AccordionSummary>
-              <AccordionDetails>
-                {'handlerID' in mon && (
-                  <AttributeRow label="ID" value={mon.handlerID?.toString()} indent={10} />
-                )}
-                {mon.handlerFriendship !== undefined && (
-                  <AttributeRow
-                    label="Friendship"
-                    value={mon.handlerFriendship.toString()}
-                    indent={10}
-                  />
-                )}
-                {mon.handlerAffection !== undefined && (
-                  <AttributeRow
-                    label="Affection"
-                    value={mon.handlerAffection.toString()}
-                    indent={10}
-                  />
-                )}
-              </AccordionDetails>
-            </Accordion>
-          </AccordionGroup>
+          <AttributeRowExpand
+            summary="Recent Trainer"
+            value={`${mon.handlerName} ${mon.handlerGender ? '♀' : '♂'}`}
+          >
+            {mon.handlerFriendship !== undefined && (
+              <AttributeRow
+                label="Friendship"
+                value={mon.handlerFriendship.toString()}
+                indent={10}
+              />
+            )}
+            {mon.handlerAffection !== undefined && (
+              <AttributeRow label="Affection" value={mon.handlerAffection.toString()} indent={10} />
+            )}
+          </AttributeRowExpand>
         )}
         <HiddenPowerDisplay mon={mon} />
-        {'personalityValue' in mon && mon.dexNum === NationalDex.Wurmple ? (
+        {mon.personalityValue !== undefined && mon.dexNum === NationalDex.Wurmple && (
           <AttributeRow
             label="Wurmple Evolution"
             value={
@@ -184,15 +121,11 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
                 : 'Beautifly'
             }
           />
-        ) : (
-          <div />
         )}
-        {mon.formArgument && mon.dexNum === NationalDex.Alcremie ? (
+        {mon.formArgument !== undefined && mon.dexNum === NationalDex.Alcremie && (
           <AttributeRow label="Sweet" value={SWEETS[mon.formArgument]} />
-        ) : (
-          <div />
         )}
-        {mon.personalityValue && mon.dexNum === NationalDex.Dunsparce ? (
+        {mon.personalityValue !== undefined && mon.dexNum === NationalDex.Dunsparce && (
           <AttributeRow
             label="Dudunsparce"
             value={
@@ -203,8 +136,6 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
                 : 'Three-Segment'
             }
           />
-        ) : (
-          <div />
         )}
         {mon.encryptionConstant !== undefined && mon.dexNum === NationalDex.Tandemaus && (
           <AttributeRow
@@ -212,7 +143,7 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
             value={mon.encryptionConstant % 100 ? 'Family of Four' : 'Family of Three'}
           />
         )}
-        {mon.gameOfOrigin && isGen4(mon.gameOfOrigin) && mon.encounterType !== undefined && (
+        {isGen4(mon.gameOfOrigin) && mon.encounterType !== undefined && (
           <AttributeRow label="Gen 4 Encounter Type" value={EncounterTypes[mon.encounterType]} />
         )}
         {mon.shinyLeaves !== undefined &&
@@ -222,212 +153,128 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
             </AttributeRow>
           )}
         {!isRestricted(USUM_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
-        mon.geolocations &&
-        mon.geolocations[0].country ? (
-          <AccordionGroup>
-            <Accordion>
-              <AccordionSummary
-                indicator={<MdArrowForwardIos style={{ fontSize: '0.9rem' }} />}
-                sx={styles.accordionSummary}
-              >
-                <AttributeRow
-                  label="Geolocations"
-                  value={mon.geolocations?.filter((geo) => geo.country).length.toString()}
-                />
-              </AccordionSummary>
-              <AccordionDetails>
-                {mon.geolocations?.map((geo, i) =>
-                  geo.country ? (
-                    <AttributeRow key={`geo_${i + 1}`} label={`Geolocation ${i + 1}`} indent={10}>
-                      {Countries[geo.country]}, Region {geo.region}
-                    </AttributeRow>
-                  ) : (
-                    <div key={`geo_${i + 1}`} />
-                  )
-                )}
-              </AccordionDetails>
-            </Accordion>
-          </AccordionGroup>
-        ) : (
-          <div />
-        )}
+          mon.geolocations &&
+          mon.geolocations[0].country > 0 && (
+            <AttributeRowExpand
+              summary="Geolocations"
+              value={mon.geolocations?.filter((geo) => geo.country).length.toString()}
+            >
+              {mon.geolocations?.map((geo, i) =>
+                geo.country ? (
+                  <AttributeRow key={`geo_${i + 1}`} label={`Geolocation ${i + 1}`} indent={10}>
+                    {Countries[geo.country]}, Region {geo.region}
+                  </AttributeRow>
+                ) : (
+                  <div key={`geo_${i + 1}`} />
+                )
+              )}
+            </AttributeRowExpand>
+          )}
         {!isRestricted(SWSH_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
-        mon.trFlagsSwSh &&
-        getFlagsInRange(mon.trFlagsSwSh, 0, 14).length > 0 ? (
-          <AccordionGroup>
-            <Accordion>
-              <AccordionSummary
-                indicator={<MdArrowForwardIos style={{ fontSize: '0.9rem' }} />}
-                sx={styles.accordionSummary}
-              >
-                <AttributeRow
-                  label="SwSh TRs"
-                  value={`${getFlagsInRange(mon.trFlagsSwSh, 0, 14).length} TRs`}
-                />
-              </AccordionSummary>
-              <AccordionDetails>
-                {getFlagsInRange(mon.trFlagsSwSh, 0, 14).map((i) => (
-                  <AttributeRow key={`swsh_tr_${i}`} label={`TR ${i}`} indent={10}>
-                    {Moves[SwShTRMoveIndexes[i]].name}
-                  </AttributeRow>
-                ))}
-              </AccordionDetails>
-            </Accordion>
-          </AccordionGroup>
-        ) : (
-          <div />
-        )}
+          mon.trFlagsSwSh &&
+          getFlagsInRange(mon.trFlagsSwSh, 0, 14).length > 0 && (
+            <AttributeRowExpand
+              summary="SwSh TRs"
+              value={`${getFlagsInRange(mon.trFlagsSwSh, 0, 14).length} TRs`}
+            >
+              {getFlagsInRange(mon.trFlagsSwSh, 0, 14).map((i) => (
+                <AttributeRow key={`swsh_tr_${i}`} label={`TR ${i}`} indent={10}>
+                  {Moves[SwShTRMoveIndexes[i]].name}
+                </AttributeRow>
+              ))}
+            </AttributeRowExpand>
+          )}
         {!isRestricted(HGSS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
-        mon.tmFlagsBDSP &&
-        getFlagsInRange(mon.tmFlagsBDSP, 0, 14).length > 0 ? (
-          <AccordionGroup>
-            <Accordion>
-              <AccordionSummary
-                indicator={<MdArrowForwardIos style={{ fontSize: '0.9rem' }} />}
-                sx={styles.accordionSummary}
-              >
-                <AttributeRow
-                  label="BDSP TMs"
-                  value={`${getFlagsInRange(mon.tmFlagsBDSP, 0, 14).length} TMs`}
-                />
-              </AccordionSummary>
-              <AccordionDetails>
-                {getFlagsInRange(mon.tmFlagsBDSP, 0, 14).map((i) => (
-                  <AttributeRow key={`bdsp_tm_${i + 1}`} label={`TM ${i + 1}`} indent={10}>
-                    {Moves[BDSPTMMoveIndexes[i]].name}
-                  </AttributeRow>
-                ))}
-              </AccordionDetails>
-            </Accordion>
-          </AccordionGroup>
-        ) : (
-          <div />
-        )}
+          mon.tmFlagsBDSP &&
+          getFlagsInRange(mon.tmFlagsBDSP, 0, 14).length > 0 && (
+            <AttributeRowExpand
+              summary="BDSP TMs"
+              value={`${getFlagsInRange(mon.tmFlagsBDSP, 0, 14).length} TMs`}
+            >
+              {getFlagsInRange(mon.tmFlagsBDSP, 0, 14).map((i) => (
+                <AttributeRow key={`bdsp_tm_${i + 1}`} label={`TM ${i + 1}`} indent={10}>
+                  {Moves[BDSPTMMoveIndexes[i]].name}
+                </AttributeRow>
+              ))}
+            </AttributeRowExpand>
+          )}
         {!isRestricted(LA_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
-        mon.tutorFlagsLA &&
-        getFlagsInRange(mon.tutorFlagsLA, 0, 8).length > 0 ? (
-          <AccordionGroup>
-            <Accordion>
-              <AccordionSummary
-                indicator={<MdArrowForwardIos style={{ fontSize: '0.9rem' }} />}
-                sx={styles.accordionSummary}
-              >
-                <AttributeRow
-                  label="LA Tutor Moves"
-                  value={`${getFlagsInRange(mon.tutorFlagsLA, 0, 8).length} Tutor Moves`}
-                />
-              </AccordionSummary>
-              <AccordionDetails>
-                {getFlagsInRange(mon.tutorFlagsLA, 0, 8).map((i) => (
-                  <AttributeRow key={`la_tutor_${i + 1}`} label={`Tutor ${i + 1}`} indent={10}>
-                    {Moves[LATutorMoveIndexes[i]].name}
-                  </AttributeRow>
-                ))}
-              </AccordionDetails>
-            </Accordion>
-          </AccordionGroup>
-        ) : (
-          <div />
-        )}
+          mon.tutorFlagsLA &&
+          getFlagsInRange(mon.tutorFlagsLA, 0, 8).length > 0 && (
+            <AttributeRowExpand
+              summary="LA Tutor Moves"
+              value={`${getFlagsInRange(mon.tutorFlagsLA, 0, 8).length} Tutor Moves`}
+            >
+              {getFlagsInRange(mon.tutorFlagsLA, 0, 8).map((i) => (
+                <AttributeRow key={`la_tutor_${i + 1}`} label={`Tutor ${i + 1}`} indent={10}>
+                  {Moves[LATutorMoveIndexes[i]].name}
+                </AttributeRow>
+              ))}
+            </AttributeRowExpand>
+          )}
 
         {!isRestricted(SV_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
-        mon.tmFlagsSV &&
-        getFlagsInRange(mon.tmFlagsSV, 0, 22).length > 0 ? (
-          <AccordionGroup>
-            <Accordion>
-              <AccordionSummary
-                indicator={<MdArrowForwardIos style={{ fontSize: '0.9rem' }} />}
-                sx={styles.accordionSummary}
-              >
-                <AttributeRow
-                  label="SV TMs"
-                  value={`${getFlagsInRange(mon.tmFlagsSV, 0, 22).length} TMs`}
-                />
-              </AccordionSummary>
-              <AccordionDetails>
-                {getFlagsInRange(mon.tmFlagsSV, 0, 22).map((i) => (
-                  <AttributeRow key={`sv_tm_${i}`} label={`TM ${i}`} indent={10}>
-                    {Moves[SVTMMoveIndexes[i]].name}
-                  </AttributeRow>
-                ))}
-              </AccordionDetails>
-            </Accordion>
-          </AccordionGroup>
-        ) : (
-          <div />
-        )}
+          mon.tmFlagsSV &&
+          getFlagsInRange(mon.tmFlagsSV, 0, 22).length > 0 && (
+            <AttributeRowExpand
+              summary="SV TMs"
+              value={`${getFlagsInRange(mon.tmFlagsSV, 0, 22).length} TMs`}
+            >
+              {getFlagsInRange(mon.tmFlagsSV, 0, 22).map((i) => (
+                <AttributeRow key={`sv_tm_${i}`} label={`TM ${i}`} indent={10}>
+                  {Moves[SVTMMoveIndexes[i]].name}
+                </AttributeRow>
+              ))}
+            </AttributeRowExpand>
+          )}
 
         {(!isRestricted(SWSH_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) ||
           !isRestricted(ORAS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum)) &&
           mon.trainerMemory && (
-            <AccordionGroup>
-              <Accordion>
-                <AccordionSummary
-                  indicator={<MdArrowForwardIos style={{ fontSize: '0.9rem' }} />}
-                  sx={styles.accordionSummary}
-                >
-                  <AttributeRow label="Trainer Memory" value={mon.trainerName} />
-                </AccordionSummary>
-                <AccordionDetails>
-                  <AttributeRow
-                    indent={10}
-                    label="Intensity"
-                    value={mon.trainerMemory.intensity.toString()}
-                  />
-                  <AttributeRow
-                    indent={10}
-                    label="Memory"
-                    value={mon.trainerMemory.memory.toString()}
-                  />
-                  <AttributeRow
-                    indent={10}
-                    label="Feeling"
-                    value={mon.trainerMemory.feeling.toString()}
-                  />
-                  <AttributeRow indent={10} label="Text Variables">
-                    <code>{`0x${mon.trainerMemory.textVariables
-                      .toString(16)
-                      .padStart(4, '0')}`}</code>
-                  </AttributeRow>
-                </AccordionDetails>
-              </Accordion>
-            </AccordionGroup>
+            <AttributeRowExpand summary="Trainer Memory" value={mon.trainerName}>
+              <AttributeRow
+                indent={10}
+                label="Intensity"
+                value={mon.trainerMemory.intensity.toString()}
+              />
+              <AttributeRow
+                indent={10}
+                label="Memory"
+                value={mon.trainerMemory.memory.toString()}
+              />
+              <AttributeRow
+                indent={10}
+                label="Feeling"
+                value={mon.trainerMemory.feeling.toString()}
+              />
+              <AttributeRow indent={10} label="Text Variables">
+                <code>{`0x${mon.trainerMemory.textVariables.toString(16).padStart(4, '0')}`}</code>
+              </AttributeRow>
+            </AttributeRowExpand>
           )}
         {(!isRestricted(SWSH_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) ||
           !isRestricted(ORAS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum)) &&
           mon.handlerMemory && (
-            <AccordionGroup>
-              <Accordion>
-                <AccordionSummary
-                  indicator={<MdArrowForwardIos style={{ fontSize: '0.9rem' }} />}
-                  sx={styles.accordionSummary}
-                >
-                  <AttributeRow label="Handler Memory" value={mon.handlerName} />
-                </AccordionSummary>
-                <AccordionDetails>
-                  <AttributeRow
-                    indent={10}
-                    label="Intensity"
-                    value={mon.handlerMemory.intensity.toString()}
-                  />
-                  <AttributeRow
-                    indent={10}
-                    label="Memory"
-                    value={mon.handlerMemory.memory.toString()}
-                  />
-                  <AttributeRow
-                    indent={10}
-                    label="Feeling"
-                    value={mon.handlerMemory.feeling.toString()}
-                  />
-                  <AttributeRow indent={10} label="Text Variables">
-                    <code>{`0x${mon.handlerMemory.textVariables
-                      .toString(16)
-                      .padStart(4, '0')}`}</code>
-                  </AttributeRow>
-                </AccordionDetails>
-              </Accordion>
-            </AccordionGroup>
+            <AttributeRowExpand summary="Handler Memory" value={mon.handlerName}>
+              <AttributeRow
+                indent={10}
+                label="Intensity"
+                value={mon.handlerMemory.intensity.toString()}
+              />
+              <AttributeRow
+                indent={10}
+                label="Memory"
+                value={mon.handlerMemory.memory.toString()}
+              />
+              <AttributeRow
+                indent={10}
+                label="Feeling"
+                value={mon.handlerMemory.feeling.toString()}
+              />
+              <AttributeRow indent={10} label="Text Variables">
+                <code>{`0x${mon.handlerMemory.textVariables.toString(16).padStart(4, '0')}`}</code>
+              </AttributeRow>
+            </AttributeRowExpand>
           )}
         {!isRestricted(SWSH_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
           mon.dynamaxLevel !== undefined && (
@@ -481,7 +328,7 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
         {mon instanceof OHPKM && (
           <AttributeRow label="OpenHome ID" value={getMonFileIdentifier(mon)} />
         )}
-      </div>
+      </Flex>
     </div>
   )
 }
@@ -544,15 +391,9 @@ function HiddenPowerDisplay(props: { mon: AllPKMFields }) {
 
   if (mon instanceof OHPKM) {
     return (
-      <Accordion>
-        <AccordionSummary
-          indicator={<MdArrowForwardIos style={{ fontSize: '0.9rem' }} />}
-          sx={styles.accordionSummary}
-        >
-          <AttributeRow label="Hidden Power">
-            <TypeIcon type={getHiddenPowerType(mon.ivs)} />
-          </AttributeRow>
-        </AccordionSummary>
+      <AttributeRowExpand summary="Hidden Power">
+        <TypeIcon type={getHiddenPowerType(mon.ivs)} />
+
         <AttributeRow label="Gen 2" indent={10}>
           <TypeIcon type={g2type} /> <p style={{ paddingLeft: 8 }}>{` ${g2power} Base Power`}</p>
         </AttributeRow>
@@ -561,7 +402,7 @@ function HiddenPowerDisplay(props: { mon: AllPKMFields }) {
           value={getHiddenPowerPower(mon.ivs).toString()}
           indent={10}
         />
-      </Accordion>
+      </AttributeRowExpand>
     )
   }
 

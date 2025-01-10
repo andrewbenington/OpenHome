@@ -1,4 +1,4 @@
-import { Option, Select } from '@mui/joy'
+import { Select } from '@radix-ui/themes'
 import {
   Chart as ChartJS,
   Filler,
@@ -71,9 +71,9 @@ const StatsDisplay = (props: { mon: PKMInterface }) => {
   const menuItems = useMemo(() => {
     const createMenuItem = (value: string) => {
       return (
-        <Option key={value} value={value}>
+        <Select.Item key={value} value={value}>
           {value}
-        </Option>
+        </Select.Item>
       )
     }
     const items = [createMenuItem('Stats')]
@@ -101,14 +101,18 @@ const StatsDisplay = (props: { mon: PKMInterface }) => {
   return (
     <div style={styles.container}>
       <div style={styles.selectors}>
-        <Select value={display} onChange={(_, val) => val && setDisplay(val)}>
-          {menuItems}
-        </Select>
+        <Select.Root value={display} onValueChange={(val) => val && setDisplay(val)}>
+          <Select.Trigger />
+          <Select.Content>{menuItems}</Select.Content>
+        </Select.Root>
         {display === 'EVs' && 'evs' in mon && 'evsG12' in mon ? (
-          <Select value={evType} onChange={(_, val) => val && setEVType(val)}>
-            <Option value="Modern">Modern</Option>
-            <Option value="Game Boy">Game Boy</Option>
-          </Select>
+          <Select.Root value={evType} onValueChange={(val) => val && setEVType(val)}>
+            <Select.Trigger />
+            <Select.Content>
+              <Select.Item value="Modern">Modern</Select.Item>
+              <Select.Item value="Game Boy">Game Boy</Select.Item>
+            </Select.Content>
+          </Select.Root>
         ) : (
           <div />
         )}

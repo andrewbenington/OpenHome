@@ -23,6 +23,9 @@ body {
       rgba(125, 206, 171, 1) 85%
     );
     --byte-hover: #fffa;
+    --attribute-row-label: rgb(179, 225, 206);
+    --attribute-row-content: rgb(160, 218, 194);
+    --dark-scrollbar: rgb(83, 180, 165);
   }
 }
 
@@ -30,6 +33,8 @@ body {
   body {
     --background-gradient: linear-gradient(310deg, rgba(54, 69, 78, 1) 0%, rgba(1, 83, 84, 1) 85%);
     --byte-hover: #ccc6;
+    --attribute-row-label: rgb(108, 141, 141);
+    --attribute-row-content: rgb(74, 108, 112);
   }
 }
 
@@ -144,11 +149,6 @@ fieldset:focus-visible {
 label {
   display: flex;
   flex-direction: column;
-}
-
-button > svg {
-  width: 24px;
-  height: 24px;
 }
 
 .App {

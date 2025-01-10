@@ -1,8 +1,7 @@
 import { closestCenter, DragOverlay, PointerSensor, useSensor } from '@dnd-kit/core'
 import { restrictToWindowEdges } from '@dnd-kit/modifiers'
-import { Box, Typography } from '@mui/joy'
 import { extendTheme, ThemeProvider } from '@mui/joy/styles'
-import { Theme } from '@radix-ui/themes'
+import { Flex, Text, Theme } from '@radix-ui/themes'
 import '@radix-ui/themes/styles.css'
 import * as E from 'fp-ts/lib/Either'
 import debounce from 'lodash/debounce'
@@ -213,11 +212,11 @@ function AppWithBackend() {
               >
                 <FilterContext.Provider value={[filterState, filterDispatch]}>
                   {loading ? (
-                    <Box width="100%" height="100%" display="grid">
-                      <Typography margin="auto" fontSize={40} fontWeight="bold">
+                    <Flex width="100%" height="100vh" align="center" justify="center">
+                      <Text size="9" weight="bold">
                         OpenHome
-                      </Typography>
-                    </Box>
+                      </Text>
+                    </Flex>
                   ) : (
                     <AppTabs />
                   )}
