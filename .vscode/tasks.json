@@ -22,6 +22,18 @@
         "kind": "build",
         "isDefault": true
       }
+    },
+    {
+      "label": "clean",
+      "type": "shell",
+      "command": "cmd",
+      "args": ["/c", "del /s /q dist && cargo clean --manifest-path=./src-tauri/Cargo.toml"],
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "detail": "Cleans the dist folder and performs a cargo clean."
     }
   ]
 }
