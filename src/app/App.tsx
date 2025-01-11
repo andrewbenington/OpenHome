@@ -1,11 +1,10 @@
 import { closestCenter, DragOverlay, PointerSensor, useSensor } from '@dnd-kit/core'
 import { restrictToWindowEdges } from '@dnd-kit/modifiers'
-import { extendTheme, ThemeProvider } from '@mui/joy/styles'
 import { Flex, Text, Theme } from '@radix-ui/themes'
 import '@radix-ui/themes/styles.css'
 import * as E from 'fp-ts/lib/Either'
 import debounce from 'lodash/debounce'
-import { useCallback, useContext, useEffect, useMemo, useReducer, useState } from 'react'
+import { useCallback, useContext, useEffect, useReducer, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { BackendContext } from 'src/backend/backendContext'
 import BackendInterface from 'src/backend/backendInterface'
@@ -29,7 +28,6 @@ import './App.css'
 import AppTabs from './AppTabs'
 import ErrorMessageModal from './ErrorMessage'
 import { PokemonDragContext } from './PokemonDrag'
-import { components, darkTheme, lightTheme } from './Themes'
 
 const debouncedUpdateSettings = debounce((backend: BackendInterface, settings: Settings) => {
   backend.updateSettings(settings).catch(console.error)
@@ -37,28 +35,15 @@ const debouncedUpdateSettings = debounce((backend: BackendInterface, settings: S
 
 export default function App() {
   const isDarkMode = useIsDarkMode()
-  const theme = useMemo(
-    () =>
-      extendTheme({
-        colorSchemes: {
-          dark: isDarkMode ? darkTheme : lightTheme,
-          light: isDarkMode ? darkTheme : lightTheme,
-        },
-        components,
-      }),
-    [isDarkMode]
-  )
   const [errorState, errorDispatch] = useReducer(errorReducer, {})
 
   return (
     <Theme accentColor="red" hasBackground appearance={isDarkMode ? 'dark' : 'light'}>
-      <ThemeProvider theme={theme}>
-        <BackendProvider backend={TauriBackend}>
-          <ErrorContext.Provider value={[errorState, errorDispatch]}>
-            <AppWithBackend />
-          </ErrorContext.Provider>
-        </BackendProvider>
-      </ThemeProvider>
+      <BackendProvider backend={TauriBackend}>
+        <ErrorContext.Provider value={[errorState, errorDispatch]}>
+          <AppWithBackend />
+        </ErrorContext.Provider>
+      </BackendProvider>
     </Theme>
   )
 }

@@ -1,11 +1,9 @@
 .arrow-button {
-  color: inherit;
-  background-color: transparent;
   border: none;
   transition: color 0.25s;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  padding: 0;
+  width: 36px;
+  height: 24px;
 }
 .arrow-button div svg {
   width: 20px;

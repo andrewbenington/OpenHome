@@ -1,4 +1,4 @@
-import { useTheme } from '@mui/joy'
+import { Button } from '@radix-ui/themes'
 import { useCallback, useState } from 'react'
 import { ArrowLeftIcon, ArrowRightIcon } from 'src/components/Icons'
 import '../style.css'
@@ -14,7 +14,6 @@ const DRAG_OVER_COOLDOWN_MS = 250
 const ArrowButton = (props: OpenHomeButtonProps) => {
   const { dragID, onClick, direction } = props
   const [hoverCooldown, setHoverCooldown] = useState(false)
-  const { palette } = useTheme()
 
   const onDragOver = useCallback(() => {
     if (hoverCooldown || !onClick) {
@@ -29,21 +28,11 @@ const ArrowButton = (props: OpenHomeButtonProps) => {
   }, [hoverCooldown, onClick])
 
   return (
-    <button
-      className="arrow-button"
-      onClick={onClick}
-      style={{
-        backgroundColor: palette.primary.solidBg,
-        color: palette.neutral.solidColor,
-        padding: 0,
-        width: 32,
-        height: 24,
-      }}
-    >
+    <Button className="arrow-button" onClick={onClick} variant="soft">
       <DroppableSpace dropID={`${dragID}-drop`} onOver={onDragOver}>
         {direction === 'left' ? <ArrowLeftIcon /> : <ArrowRightIcon />}
       </DroppableSpace>
-    </button>
+    </Button>
   )
 }
 
