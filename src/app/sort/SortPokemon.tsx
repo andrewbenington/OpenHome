@@ -1,4 +1,3 @@
-import { Autocomplete } from '@mui/joy'
 import { Badge, Card, Flex } from '@radix-ui/themes'
 import dayjs from 'dayjs'
 import { useContext, useMemo, useState } from 'react'
@@ -6,13 +5,17 @@ import { MdAdd } from 'react-icons/md'
 import PokemonDetailsModal from 'src/pokemon/PokemonDetailsModal'
 import SavesModal from 'src/saves/SavesModal'
 import { filterUndefined } from 'src/util/Sort'
+import Autocomplete from '../../components/Autocomplete'
 import PokemonIcon from '../../components/PokemonIcon'
 import { LookupContext } from '../../state/lookup'
 import { OpenSavesContext } from '../../state/openSaves'
 import { PKMInterface } from '../../types/interfaces'
 
+export type SortType = 'nickname' | 'level' | 'species' | 'origin' | 'met_date' | 'ribbons' | ''
+const SortTypes: SortType[] = ['', 'nickname', 'level', 'species', 'ribbons', 'met_date', 'origin']
+
 function getSortFunction(
-  sortStr: string | undefined
+  sortStr: SortType | undefined
 ): (a: { mon: PKMInterface }, b: { mon: PKMInterface }) => number {
   switch (sortStr?.toLowerCase()) {
     case 'nickname':
@@ -56,7 +59,7 @@ export default function SortPokemon() {
   const [{ homeData }, , openSaves] = useContext(OpenSavesContext)
   const [openSaveDialog, setOpenSaveDialog] = useState(false)
   const [selectedIndex, setSelectedIndex] = useState<number>()
-  const [sort, setSort] = useState('')
+  const [sort, setSort] = useState<SortType>('')
 
   const allMonsWithColors = useMemo(() => {
     if (!homeData) return []
@@ -139,11 +142,14 @@ export default function SortPokemon() {
         </Flex>
       </Card>
       <Flex direction="column" gap="2" style={{ flex: 1, height: '100%' }}>
-        <Card>
+        <Card style={{ contain: 'none' }}>
           <Autocomplete
-            options={['nickname', 'level', 'species', 'ribbons', 'met_date', 'origin']}
-            onChange={(_, value) => setSort(value ?? '')}
-            placeholder="Sort"
+            value={sort ?? null}
+            options={SortTypes}
+            onChange={(value) => setSort(value ?? '')}
+            label="Sort"
+            getOptionString={(opt) => opt}
+            getOptionUniqueID={(opt) => opt}
           />
         </Card>
         <Card style={{ overflowY: 'hidden', height: '100%', padding: 0 }}>

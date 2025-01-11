@@ -1,5 +1,17 @@
 import { Button, Card, Flex, Text } from '@radix-ui/themes'
-import { Ability, Balls, GameOfOriginData, Item, ItemToString, Types } from 'pokemon-resources'
+import {
+  Ability,
+  Balls,
+  GameOfOrigin,
+  GameOfOriginData,
+  isGBA,
+  isGen4,
+  isGen5,
+  Item,
+  ItemToString,
+  Origin,
+  Types,
+} from 'pokemon-resources'
 import { PokemonData } from 'pokemon-species-data'
 import { useContext, useMemo } from 'react'
 import { OpenHomeRibbons } from 'src/consts/Ribbons'
@@ -15,6 +27,28 @@ import TypeIcon from '../TypeIcon'
 type SelectOption = {
   label: string
   id: number
+}
+
+function getOriginIcon(origin: Origin) {
+  const path =
+    isGen4(origin.index) || isGen5(origin.index)
+      ? 'icons/ds.png'
+      : isGBA(origin.index)
+        ? 'icons/gba.png'
+        : origin.index === GameOfOrigin.ColosseumXD
+          ? 'icons/gcn.png'
+          : origin.mark
+            ? getOriginMark(origin.mark)
+            : undefined
+
+  return path ? (
+    <img
+      draggable={false}
+      alt="origin mark"
+      style={{ width: 24, height: 24 }}
+      src={getPublicImageURL(path)}
+    />
+  ) : undefined
 }
 
 export default function FilterPanel() {
@@ -198,16 +232,7 @@ export default function FilterPanel() {
               payload: { gameOfOrigin: option?.index },
             })
           }
-          getIconComponent={(origin) =>
-            origin?.mark ? (
-              <img
-                draggable={false}
-                alt="origin mark"
-                style={{ width: 24, height: 24 }}
-                src={getPublicImageURL(getOriginMark(origin?.mark))}
-              />
-            ) : undefined
-          }
+          getIconComponent={getOriginIcon}
         />
         <Autocomplete
           options={Balls.map((ball, id) => ({
