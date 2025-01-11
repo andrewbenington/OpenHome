@@ -51,6 +51,7 @@
   display: grid;
   align-items: center;
   text-align: center;
+  flex: 4;
 }
 
 .details-button {

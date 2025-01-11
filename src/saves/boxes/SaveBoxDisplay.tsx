@@ -144,11 +144,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
             >
               <MdClose />
             </Button>{' '}
-            <div
-              style={{
-                flex: 1,
-              }}
-            >
+            <div style={{ flex: 1 }}>
               <div style={{ textAlign: 'center', fontWeight: 'bold' }}>{save.getGameName()}</div>
               <div style={{ textAlign: 'center' }}>
                 {save?.name} ({save?.displayID})

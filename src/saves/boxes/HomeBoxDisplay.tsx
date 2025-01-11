@@ -1,6 +1,5 @@
 import { useDraggable } from '@dnd-kit/core'
-import { Grid } from '@mui/joy'
-import { Card } from '@radix-ui/themes'
+import { Card, Flex, Grid } from '@radix-ui/themes'
 import lodash, { range } from 'lodash'
 import { useContext, useMemo, useState } from 'react'
 import { EditIcon } from 'src/components/Icons'
@@ -15,6 +14,9 @@ import { getMonFileIdentifier } from 'src/util/Lookup'
 import { buildBackwardNavigator, buildForwardNavigator } from '../util'
 import ArrowButton from './ArrowButton'
 import BoxCell from './BoxCell'
+
+const COLUMN_COUNT = 12
+const ROW_COUNT = 10
 
 const HomeBoxDisplay = () => {
   const [{ homeData }, openSavesDispatch] = useContext(OpenSavesContext)
@@ -103,8 +105,8 @@ const HomeBoxDisplay = () => {
           variant="surface"
           style={{ padding: 2, width: '100%', height: 'fit-content', gap: 0 }}
         >
-          <Grid container style={{ padding: 4, minHeight: 48 }}>
-            <Grid xs={4} display="grid" alignItems="center" justifyContent="end">
+          <Flex direction="row" minHeight="48px" p="1">
+            <Flex align="center" justify="end" flexGrow="4">
               <ArrowButton
                 onClick={() =>
                   openSavesDispatch({
@@ -121,8 +123,8 @@ const HomeBoxDisplay = () => {
                 dragID="home-arrow-left"
                 direction="left"
               />
-            </Grid>
-            <Grid xs={4} className="box-name">
+            </Flex>
+            <div className="box-name">
               {editing ? (
                 <input
                   value={currentBox.name || ''}
@@ -139,8 +141,8 @@ const HomeBoxDisplay = () => {
               ) : (
                 <div>{currentBox.name?.trim() || `Box ${currentBox.index + 1}`}</div>
               )}
-            </Grid>
-            <Grid xs={3} display="grid" alignItems="center">
+            </div>
+            <Flex align="center" flexGrow="3">
               <ArrowButton
                 onClick={() =>
                   openSavesDispatch({
@@ -154,56 +156,48 @@ const HomeBoxDisplay = () => {
                 dragID="home-arrow-right"
                 direction="right"
               />
-            </Grid>
-            <Grid xs={1} display="grid" alignItems="center" justifyContent="end">
+            </Flex>
+            <Flex align="center" justify="end" flexGrow="1">
               <MiniButton
                 icon={EditIcon}
                 style={{ transition: 'none', padding: 2 }}
                 variant={editing ? 'solid' : 'outline'}
                 onClick={() => setEditing(!editing)}
               />
-            </Grid>
-          </Grid>
-          {lodash.range(10).map((row: number) => (
-            <Grid container key={`pc_row_${row}`}>
-              {lodash.range(12).map((rowIndex: number) => {
-                const mon = currentBox.pokemon[row * 12 + rowIndex]
-
-                return (
-                  <Grid
-                    key={`home_box_row_${rowIndex}`}
-                    xs={1}
-                    style={{ padding: '2px 2px 0px 2px' }}
-                  >
-                    <BoxCell
-                      onClick={() => setSelectedIndex(row * 12 + rowIndex)}
-                      dragID={`home_${homeData.currentPCBox}_${row * 12 + rowIndex}`}
-                      dragData={{
+            </Flex>
+          </Flex>
+          <Grid columns={COLUMN_COUNT.toString()} gap="1" p="1">
+            {lodash
+              .range(COLUMN_COUNT * ROW_COUNT)
+              .map((index: number) => currentBox.pokemon[index])
+              .map((mon, index) => (
+                <BoxCell
+                  key={`home_display_cell_${index}`}
+                  onClick={() => setSelectedIndex(index)}
+                  dragID={`home_${homeData.currentPCBox}_${index}`}
+                  dragData={{
+                    box: homeData.currentPCBox,
+                    boxPos: index,
+                    save: homeData,
+                  }}
+                  mon={mon}
+                  zIndex={0}
+                  onDrop={(importedMons) => {
+                    if (importedMons) {
+                      attemptImportMons(importedMons, {
                         box: homeData.currentPCBox,
-                        boxPos: row * 12 + rowIndex,
+                        boxPos: index,
                         save: homeData,
-                      }}
-                      mon={mon}
-                      zIndex={0}
-                      onDrop={(importedMons) => {
-                        if (importedMons) {
-                          attemptImportMons(importedMons, {
-                            box: homeData.currentPCBox,
-                            boxPos: row * 12 + rowIndex,
-                            save: homeData,
-                          })
-                        }
-                      }}
-                      disabled={
-                        // don't allow a swap with a pokémon not supported by the source save
-                        mon && dragData && !dragData?.save?.supportsMon(mon.dexNum, mon.formeNum)
-                      }
-                    />
-                  </Grid>
-                )
-              })}
-            </Grid>
-          ))}
+                      })
+                    }
+                  }}
+                  disabled={
+                    // don't allow a swap with a pokémon not supported by the source save
+                    mon && dragData && !dragData?.save?.supportsMon(mon.dexNum, mon.formeNum)
+                  }
+                />
+              ))}
+          </Grid>
         </Card>
         <PokemonDetailsModal
           mon={selectedMon}
