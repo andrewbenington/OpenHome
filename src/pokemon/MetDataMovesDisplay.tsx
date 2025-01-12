@@ -123,7 +123,7 @@ const MetDataMovesDisplay = (props: { mon: PKMInterface }) => {
   }, [mon])
 
   return (
-    <Flex direction="column" ml="4" mr="4" mt="2">
+    <Flex direction="column" ml="4" mr="4" mt="2" height="calc(100% - 24px)">
       <Flex direction="row" style={{ flex: 1 }}>
         <div style={{ flex: 1 }}>
           <Flex direction="row" gap="1" align="center">
@@ -195,6 +195,7 @@ const MetDataMovesDisplay = (props: { mon: PKMInterface }) => {
           {'markings' in mon && mon.markings ? <Markings markings={mon.markings} /> : <div />}
         </div>
       </Flex>
+      <div style={{ flex: 1 }} />
       <div style={styles.centerFlex}>
         <MoveCard
           move={mon.moves[0]}

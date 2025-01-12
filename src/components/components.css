@@ -79,7 +79,7 @@
 
 .autocomplete-dropdown::-webkit-scrollbar-thumb {
   border-radius: 10px;
-  background-color: var(--dark-scrollbar);
+  background-color: var(--autocomplete-scrollbar);
 }
 
 .autocomplete-option {

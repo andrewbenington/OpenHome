@@ -1,4 +1,4 @@
-import { Badge, Grid, Spinner } from '@radix-ui/themes'
+import { Badge, Flex, Grid, Spinner } from '@radix-ui/themes'
 import { getDisplayID } from 'pokemon-files'
 import { AbilityToString } from 'pokemon-resources'
 import { PokemonData } from 'pokemon-species-data'
@@ -131,7 +131,7 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
           )}
         </div>
       </div>
-      <div>
+      <Flex direction="column" gap="1">
         <AttributeRow label="Nickname" value={mon.nickname} />
         <AttributeRow
           label="Species"
@@ -159,7 +159,7 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
             : getLevelGen3Onward(mon.dexNum, mon.exp)}
         </AttributeRow>
         <AttributeRow label="EXP">{mon.exp}</AttributeRow>
-      </div>
+      </Flex>
     </Grid>
   )
 }
