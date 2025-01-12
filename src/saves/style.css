@@ -44,7 +44,11 @@
 }
 
 .box-navigation {
-  padding-bottom: 5px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  text-align: center;
+  padding: 4px;
 }
 
 .box-name {

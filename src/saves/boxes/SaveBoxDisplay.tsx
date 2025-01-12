@@ -1,6 +1,5 @@
 import { useDraggable } from '@dnd-kit/core'
-import { Grid } from '@mui/joy'
-import { Button, Card, Dialog, Flex } from '@radix-ui/themes'
+import { Button, Card, Dialog, Flex, Grid } from '@radix-ui/themes'
 import lodash, { range } from 'lodash'
 import { GameOfOriginData } from 'pokemon-resources'
 import { PokemonData } from 'pokemon-species-data'
@@ -167,8 +166,8 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
           }}
         >
           <div>
-            <Grid container className="box-navigation">
-              <Grid xs={4} display="grid" alignItems="center" justifyContent="end">
+            <div className="box-navigation">
+              <Flex align="center" justify="center" flexGrow="4">
                 <ArrowButton
                   onClick={() =>
                     openSavesDispatch({
@@ -183,11 +182,9 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                   dragID={`arrow_left_${save.tid}_${save.sid}_${save.currentPCBox}`}
                   direction="left"
                 />
-              </Grid>
-              <Grid xs={4} className="box-name">
-                {save.boxes[save.currentPCBox]?.name}
-              </Grid>
-              <Grid xs={4} display="grid" alignItems="center" justifyContent="start">
+              </Flex>
+              <div className="box-name">{save.boxes[save.currentPCBox]?.name}</div>
+              <Flex align="center" justify="center" flexGrow="4">
                 <ArrowButton
                   onClick={() =>
                     openSavesDispatch({
@@ -201,48 +198,37 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                   dragID={`arrow_right_${save.tid}_${save.sid}_${save.currentPCBox}`}
                   direction="right"
                 />
-              </Grid>
-            </Grid>
-            {lodash.range(save.boxRows).map((row: number) => (
-              <Grid container key={`pc_row_${row}`}>
-                {lodash.range(save.boxColumns).map((rowIndex: number) => {
-                  const mon =
-                    save.boxes[save.currentPCBox]?.pokemon[row * save.boxColumns + rowIndex]
-
-                  return (
-                    <Grid
-                      key={`pc_row_${row}_slot_${rowIndex}`}
-                      xs={12 / save.boxColumns}
-                      style={{ padding: '2px 2px 0px 2px' }}
-                    >
-                      <BoxCell
-                        onClick={() => setSelectedIndex(row * save.boxColumns + rowIndex)}
-                        dragID={`${save.tid}_${save.sid}_${save.currentPCBox}_${
-                          row * save.boxColumns + rowIndex
-                        }`}
-                        dragData={{
-                          box: save.currentPCBox,
-                          boxPos: row * save.boxColumns + rowIndex,
+              </Flex>
+            </div>
+            <Grid columns={save.boxColumns.toString()} gap="1" p="1">
+              {lodash
+                .range(save.boxColumns * save.boxRows)
+                .map((index: number) => currentBox?.pokemon?.[index])
+                .map((mon, index) => (
+                  <BoxCell
+                    onClick={() => setSelectedIndex(index)}
+                    key={index}
+                    dragID={`${save.tid}_${save.sid}_${save.currentPCBox}_${index}`}
+                    dragData={{
+                      box: save.currentPCBox,
+                      boxPos: index,
+                      save,
+                    }}
+                    disabled={isDisabled}
+                    mon={mon}
+                    zIndex={1}
+                    onDrop={(importedMons) => {
+                      if (importedMons) {
+                        attemptImportMons(importedMons, {
                           save,
-                        }}
-                        disabled={isDisabled}
-                        mon={mon}
-                        zIndex={5 - row}
-                        onDrop={(importedMons) => {
-                          if (importedMons) {
-                            attemptImportMons(importedMons, {
-                              save,
-                              box: save.currentPCBox,
-                              boxPos: row * save.boxColumns + rowIndex,
-                            })
-                          }
-                        }}
-                      />
-                    </Grid>
-                  )
-                })}
-              </Grid>
-            ))}
+                          box: save.currentPCBox,
+                          boxPos: index,
+                        })
+                      }
+                    }}
+                  />
+                ))}
+            </Grid>
           </div>
         </Card>
         <Dialog.Root open={detailsModal} onOpenChange={setDetailsModal}>
