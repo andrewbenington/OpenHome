@@ -1,4 +1,4 @@
-import { Stack } from '@mui/joy'
+import { Flex } from '@radix-ui/themes'
 import * as E from 'fp-ts/lib/Either'
 import { GameOfOrigin } from 'pokemon-resources'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
@@ -7,6 +7,7 @@ import { buildUnknownSaveFile } from 'src/types/SAVTypes/load'
 import { filterUndefined, numericSorter } from 'src/util/Sort'
 import { BackendContext } from '../backend/backendContext'
 import OHDataGrid, { SortableColumn } from '../components/OHDataGrid'
+import useDisplayError from '../hooks/displayError'
 import { AppInfoContext } from '../state/appInfo'
 import { LookupContext } from '../state/lookup'
 import { OpenSavesContext } from '../state/openSaves'
@@ -28,6 +29,16 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
   const [{ homeMons: homeMonMap, gen12: gen12LookupMap, gen345: gen345LookupMap }] =
     useContext(LookupContext)
   const [, , openSaves] = useContext(OpenSavesContext)
+  const [error, setError] = useState(false)
+  const displayError = useDisplayError()
+
+  const handleError = useCallback(
+    (title: string, messages: string | string[]) => {
+      setError(true)
+      displayError(title, messages)
+    },
+    [displayError]
+  )
 
   const openSavePaths = useMemo(
     () => Object.fromEntries(Object.values(openSaves).map((save) => [save.filePath.raw, true])),
@@ -58,9 +69,10 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
   )
 
   useEffect(() => {
+    if (error || suggestedSaves) return
     backend.findSuggestedSaves().then(
       E.match(
-        (err) => console.error(err),
+        (err) => handleError('Error getting suggested saves', err),
         async (possibleSaves) => {
           const allPaths = (possibleSaves?.citra ?? [])
             .concat(possibleSaves?.open_emu ?? [])
@@ -83,7 +95,7 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
         }
       )
     )
-  }, [backend, loadSaveData])
+  }, [backend, error, handleError, loadSaveData, suggestedSaves])
 
   const saveTypeFromOrigin = useCallback(
     (origin: number | undefined) =>
@@ -94,14 +106,6 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
   )
 
   const columns: SortableColumn<SAV>[] = [
-    // {
-    //   key: 'display',
-    //   name: 'Display',
-    //   width: 80,
-
-    //   renderCell: (params) => <DevDataDisplay data={params.row} />,
-    //   cellClass: 'centered-cell',
-    // },
     {
       key: 'open',
       name: 'Open',
@@ -145,15 +149,7 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
       name: 'Path',
       minWidth: 300,
       renderValue: (save) => (
-        <Stack
-          flexWrap="wrap"
-          direction="row"
-          spacing={0.5}
-          useFlexGap
-          title={save.filePath.raw}
-          alignItems="start"
-          paddingTop={0.5}
-        >
+        <Flex wrap="wrap" direction="row" gap="1" title={save.filePath.raw} align="start" mt="1">
           {splitPath(save.filePath).map((segment, i) => (
             <div
               key={`${save.filePath.raw}_${i}`}
@@ -168,7 +164,7 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
               {segment !== save.filePath.name && ' >'}
             </div>
           ))}
-        </Stack>
+        </Flex>
       ),
     },
   ]
@@ -176,7 +172,7 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
   return view === 'grid' ? (
     <OHDataGrid rows={suggestedSaves ?? []} columns={columns} />
   ) : (
-    <Stack flexWrap="wrap" direction="row" useFlexGap justifyContent="center" margin={2}>
+    <Flex wrap="wrap" direction="row" justify="center" m="4" gap="2">
       {suggestedSaves?.map((save) => (
         <SaveCard
           key={save.filePath.raw}
@@ -187,6 +183,6 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
           size={cardSize}
         />
       ))}
-    </Stack>
+    </Flex>
   )
 }

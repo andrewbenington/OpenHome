@@ -1,0 +1,45 @@
+.side-tabs {
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+  background: transparent;
+}
+
+.side-tab-list {
+  display: flex;
+  flex-direction: column;
+  width: fit-content;
+  background-color: rgb(68, 102, 102);
+  gap: 4px;
+  padding: 8px;
+}
+
+.side-tab-panel {
+  flex: 1;
+  height: 100%;
+  overflow-y: auto;
+  height: initial;
+}
+
+.side-tab {
+  border-radius: 12px;
+  background-color: transparent;
+  color: white;
+  font-weight: bold;
+  text-align: start;
+  padding: 4px 8px;
+}
+
+.side-tab:hover {
+  background-color: var(--side-tab-hover);
+}
+
+.side-tab-active,
+.side-tab:active {
+  background-color: var(--side-tab-selected);
+  box-shadow:
+    rgb(0, 0, 0) 0px 0px 0px 0px,
+    rgba(21, 21, 21, 0.08) 0px 1px 2px 0px,
+    rgba(21, 21, 21, 0.08) 0px 2px 4px 0px;
+}

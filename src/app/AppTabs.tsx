@@ -1,7 +1,6 @@
-import { Sheet, Tab, TabList, TabPanel, Tabs } from '@mui/joy'
+import { Box, Tabs, ThemePanel } from '@radix-ui/themes'
 import useIsDev from '../hooks/isDev'
 import AppStateDisplay from './dev/AppStateDisplay'
-import ThemeDisplay from './dev/ThemeDisplay'
 import Home from './Home'
 import TrackedPokemon from './manage/TrackedPokemon'
 import PluginsPage from './plugins/Plugins'
@@ -12,61 +11,55 @@ export default function AppTabs() {
   const isDev = useIsDev()
 
   return (
-    <Tabs defaultValue="home" style={{ height: '100vh', width: '100%' }} color="primary">
-      <TabPanel sx={{ '--Tabs-spacing': 0, height: 0 }} value="home" keepMounted>
-        <Home />
-      </TabPanel>
-      <TabPanel sx={{ '--Tabs-spacing': 0, height: 0 }} value="manage">
-        <TrackedPokemon />
-      </TabPanel>
-      <TabPanel sx={{ '--Tabs-spacing': 0, height: 0, overflowY: 'hidden' }} value="sort">
-        <SortPokemon />
-      </TabPanel>
-      <TabPanel sx={{ '--Tabs-spacing': 0, height: 0, overflowY: 'hidden' }} value="plugins">
-        <PluginsPage />
-      </TabPanel>
-      <TabPanel sx={{ '--Tabs-spacing': 0, height: 0, overflowY: 'hidden' }} value="settings">
-        <Settings />
-      </TabPanel>
-      {isDev && (
-        <>
-          <TabPanel sx={{ '--Tabs-spacing': 0, height: 0, overflowY: 'hidden' }} value="state">
-            <AppStateDisplay />
-          </TabPanel>
-          <TabPanel sx={{ '--Tabs-spacing': 0, height: 0, overflowY: 'hidden' }} value="theme">
-            <ThemeDisplay />
-          </TabPanel>
-        </>
-      )}
-      <Sheet>
-        <TabList className="tab-row" color="primary" variant="plain">
-          <Tab indicatorPlacement="top" value="home" color="primary" variant="plain">
-            Home
-          </Tab>
-          <Tab indicatorPlacement="top" value="manage" color="primary" variant="plain">
-            Tracked Pokémon
-          </Tab>
-          <Tab indicatorPlacement="top" value="sort" color="primary" variant="plain">
-            Sort Pokémon
-          </Tab>
-          <Tab indicatorPlacement="top" value="plugins" color="primary" variant="plain">
-            Plugins
-          </Tab>
-          <Tab indicatorPlacement="top" value="settings" color="primary" variant="plain">
-            Settings
-          </Tab>
-          {isDev && (
-            <>
-              <Tab indicatorPlacement="top" value="state" color="neutral" variant="plain">
-                App State
-              </Tab>
-              <Tab indicatorPlacement="top" value="theme" color="neutral" variant="plain">
-                Themes Display
-              </Tab>
-            </>
-          )}
-        </TabList>
-      </Sheet>
-    </Tabs>
+    <Tabs.Root
+      defaultValue="home"
+      style={{
+        height: '100vh',
+        width: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
+      <Box height="0" flexGrow="1">
+        <Tabs.Content value="home">
+          <Home />
+        </Tabs.Content>
+        <Tabs.Content value="manage">
+          <TrackedPokemon />
+        </Tabs.Content>
+        <Tabs.Content value="sort">
+          <SortPokemon />
+        </Tabs.Content>
+        <Tabs.Content value="plugins">
+          <PluginsPage />
+        </Tabs.Content>
+        <Tabs.Content value="settings">
+          <Settings />
+        </Tabs.Content>
+        {isDev && (
+          <>
+            <Tabs.Content value="state">
+              <AppStateDisplay />
+            </Tabs.Content>
+            <Tabs.Content value="theme">
+              <ThemePanel />
+            </Tabs.Content>
+          </>
+        )}
+      </Box>
+      <Tabs.List className="tab-row">
+        <Tabs.Trigger value="home">Home</Tabs.Trigger>
+        <Tabs.Trigger value="manage">Tracked Pokémon</Tabs.Trigger>
+        <Tabs.Trigger value="sort">Sort Pokémon</Tabs.Trigger>
+        <Tabs.Trigger value="plugins">Plugins</Tabs.Trigger>
+        <Tabs.Trigger value="settings">Settings</Tabs.Trigger>
+        {isDev && (
+          <>
+            <Tabs.Trigger value="state">App State</Tabs.Trigger>
+            <Tabs.Trigger value="theme">Themes Display</Tabs.Trigger>
+          </>
+        )}
+      </Tabs.List>
+    </Tabs.Root>
   )
 }

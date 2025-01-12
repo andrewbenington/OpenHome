@@ -1,83 +1,79 @@
-import {
-  Button,
-  Card,
-  DialogActions,
-  DialogTitle,
-  Modal,
-  ModalDialog,
-  Stack,
-  Typography,
-} from '@mui/joy'
+import { Button, Card, Dialog, Flex } from '@radix-ui/themes'
 import * as E from 'fp-ts/lib/Either'
 import { useCallback, useContext, useEffect, useState } from 'react'
 import { SaveFolder } from 'src/types/storage'
 import { BackendContext } from '../backend/backendContext'
 import { AddFolderIcon, RemoveIcon } from '../components/Icons'
+import useDisplayError from '../hooks/displayError'
 
 export default function SaveFolders() {
   const [saveFolders, setSaveFolders] = useState<SaveFolder[]>()
   const [pendingDirPath, setPendingDirPath] = useState<string>()
   const backend = useContext(BackendContext)
-  const [error, setError] = useState<string>()
+  const [error, setError] = useState(false)
+  const displayError = useDisplayError()
 
-  useEffect(() => {
-    backend.getSaveFolders().then(
-      E.match(
-        (err) => setError(err),
-        (folders) => setSaveFolders(folders)
-      )
-    )
-  }, [backend])
+  const handleError = useCallback(
+    (title: string, messages: string | string[]) => {
+      setError(true)
+      displayError(title, messages)
+    },
+    [displayError]
+  )
 
   const refreshFolders = useCallback(
     () =>
       backend.getSaveFolders().then(
         E.match(
-          (err) => setError(err),
-          (folders) => setSaveFolders(folders)
+          (err) => handleError('Error getting save folders', err),
+          (folders) => {
+            setError(false)
+            setSaveFolders(folders)
+          }
         )
       ),
-    [backend]
+    [backend, handleError]
   )
+
+  useEffect(() => {
+    if (error || saveFolders) return
+    refreshFolders()
+  }, [error, refreshFolders, saveFolders])
 
   const addFolder = useCallback(
     () =>
       backend.pickFolder().then(
         E.match(
-          (err) => setError(err),
+          (err) => handleError('Error picking folder', err),
           (dir) => setPendingDirPath(dir)
         )
       ),
-    [backend]
+    [backend, handleError]
   )
 
   const removeFolder = useCallback(
     (path: string) =>
       backend.removeSaveFolder(path).then(
         E.match(
-          async (err) => {
-            setError(err)
-          },
+          async (err) => handleError('Error removing folder', err),
           () => refreshFolders()
         )
       ),
-    [backend, refreshFolders]
+    [backend, refreshFolders, handleError]
   )
 
   const upsertFolder = useCallback(
     (path: string, label: string) =>
       backend.upsertSaveFolder(path, label).then(
         E.match(
-          async (err) => {
-            setError(err)
-          },
+          async (err) => handleError('Error saving folder', err),
           () => {
             setPendingDirPath(undefined)
             refreshFolders()
           }
         )
       ),
-    [backend, refreshFolders]
+    [backend, refreshFolders, handleError]
   )
 
   return (
@@ -90,19 +86,15 @@ export default function SaveFolders() {
           marginBottom: 8,
         }}
       >
-        <Button
-          onClick={addFolder}
-          color="secondary"
-          variant="solid"
-          sx={{ padding: 1, '& svg': { width: 20, height: 20 } }}
-        >
-          <AddFolderIcon style={{ marginRight: 8 }} /> Add Folder
+        <Button onClick={addFolder} variant="solid">
+          <AddFolderIcon />
+          Add Folder
         </Button>
       </div>
-      <Stack style={{ overflowY: 'auto', height: '100%' }}>
+      <Flex overflowY="auto" height="100%" direction="column" gap="1">
         {saveFolders?.map((folder) => (
-          <Card key={folder.path} color="primary" variant="soft">
-            <Stack direction="row">
+          <Card key={folder.path}>
+            <Flex direction="row" gap="4" align="center">
               <b>{folder.label ?? folder.path}</b>
               <div style={{ color: '#666' }}>{folder.path}</div>
               <button
@@ -114,15 +106,16 @@ export default function SaveFolders() {
                   marginBottom: 'auto',
                   backgroundColor: '#aa0000',
                   height: 'fit-content',
+                  color: 'white',
                 }}
                 onClick={() => removeFolder(folder.path)}
               >
                 <RemoveIcon />
               </button>
-            </Stack>
+            </Flex>
           </Card>
         ))}
-      </Stack>
+      </Flex>
       <FolderLabelDialog
         open={!!pendingDirPath}
         onClose={() => setPendingDirPath(undefined)}
@@ -135,14 +128,6 @@ export default function SaveFolders() {
           }
         }}
       />
-      <Modal open={!!error} onClose={() => setError(undefined)}>
-        <ModalDialog>
-          <Typography>{error}</Typography>
-          <DialogActions>
-            <button onClick={() => setError(undefined)}>OK</button>
-          </DialogActions>
-        </ModalDialog>
-      </Modal>
     </div>
   )
 }
@@ -158,13 +143,31 @@ function FolderLabelDialog(props: FolderLabelDialogProps) {
   const [label, setLabel] = useState('')
 
   return (
-    <Modal open={open} onClose={() => onClose()}>
-      <ModalDialog style={{ padding: 8 }}>
-        <DialogTitle>Set Folder Label</DialogTitle>
+    <Dialog.Root open={open} onOpenChange={(open) => !open && onClose()}>
+      <Dialog.Content
+        style={{
+          padding: 8,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 8,
+        }}
+        width="300px"
+      >
+        <Dialog.Title mt="2" mb="0">
+          Set Folder Label
+        </Dialog.Title>
         <input placeholder="Label" value={label} onChange={(e) => setLabel(e.target.value)} />
-        <DialogActions>
+        <Flex direction="row" gap="2" justify="end">
           <Button
-            color="secondary"
+            variant="outline"
+            onClick={() => {
+              setLabel('')
+              onClose()
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
             style={{ padding: '0px 16px' }}
             onClick={() => {
               submitLabel(label)
@@ -173,19 +176,8 @@ function FolderLabelDialog(props: FolderLabelDialogProps) {
           >
             Save
           </Button>
-          <Button
-            style={{ padding: '0px 16px' }}
-            variant="outlined"
-            color="neutral"
-            onClick={() => {
-              setLabel('')
-              onClose()
-            }}
-          >
-            Cancel
-          </Button>
-        </DialogActions>
-      </ModalDialog>
-    </Modal>
+        </Flex>
+      </Dialog.Content>
+    </Dialog.Root>
   )
 }

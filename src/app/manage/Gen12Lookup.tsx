@@ -15,7 +15,11 @@ type G12LookupRow = {
   homeMon?: OHPKM
 }
 
-export default function Gen12Lookup() {
+type Gen12LookupProps = {
+  onSelectMon: (mon: OHPKM) => void
+}
+
+export default function Gen12Lookup({ onSelectMon }: Gen12LookupProps) {
   const [{ homeMons, gen12 }] = useContext(LookupContext)
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
   const backend = useContext(BackendContext)
@@ -28,25 +32,22 @@ export default function Gen12Lookup() {
   }
 
   const columns: SortableColumn<G12LookupRow>[] = [
-    // {
-    //   key: 'display',
-    //   name: 'Display',
-    //   width: 80,
-
-    //   renderCell: (params) => <DevDataDisplay data={params.row} />,
-    //   cellClass: 'centered-cell',
-    // },
     {
       key: 'Pokémon',
-      name: 'Pokémon',
-      width: 100,
+      name: '',
+      width: 60,
       renderValue: (value) =>
         value.homeMon && (
-          <PokemonIcon
-            dexNumber={value.homeMon.dexNum}
-            formeNumber={value.homeMon.formeNum}
-            style={{ width: 30, height: 30 }}
-          />
+          <button
+            onClick={() => value.homeMon && onSelectMon(value.homeMon)}
+            className="mon-icon-button"
+          >
+            <PokemonIcon
+              dexNumber={value.homeMon.dexNum}
+              formeNumber={value.homeMon.formeNum}
+              style={{ width: 30, height: 30 }}
+            />
+          </button>
         ),
       cellClass: 'centered-cell',
     },

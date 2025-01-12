@@ -1,4 +1,4 @@
-import { Button, Card, Chip, Stack } from '@mui/joy'
+import { Badge, Flex } from '@radix-ui/themes'
 import { GameOfOrigin, isGameBoy } from 'pokemon-resources'
 import { useContext, useMemo, useState } from 'react'
 import { SaveRef } from 'src/types/types'
@@ -47,9 +47,9 @@ export default function SaveCard({ save, onOpen, onRemove, size = 240 }: SaveCar
 
   return (
     <div style={{ position: 'relative' }}>
-      <Card
+      <div
         className="save-card"
-        sx={{
+        style={{
           width: size,
           height: size,
           backgroundImage: saveType
@@ -66,34 +66,41 @@ export default function SaveCard({ save, onOpen, onRemove, size = 240 }: SaveCar
           cursor: 'pointer',
           position: 'relative',
           filter: save.valid ? undefined : 'grayscale(1)',
+          borderRadius: 5,
         }}
-        color="neutral"
-        variant="plain"
         onClick={onOpen}
       >
-        <Stack direction="row" padding="6px" width="calc(100% - 12px)" justifyContent="start">
+        <Flex direction="row" width="100%" justify="start" style={{ padding: 8 }} gap="2">
           {size >= standardViewMinSize && (
-            <Chip color="secondary" variant="solid" sx={{ zIndex: 1 }}>
+            <Badge variant="solid" size="3">
               <b>{save.trainerName}</b>
-            </Chip>
+            </Badge>
           )}
           {save.lastOpened && size >= expandedViewMinSize && (
-            <Chip variant="soft" color="neutral" sx={{ zIndex: 1 }}>
+            <Badge
+              variant="solid"
+              size="3"
+              color="gray"
+              radius="full"
+              style={{
+                maxWidth: '56%',
+              }}
+            >
               <b>{formatTimeSince(save.lastOpened)}</b>
-            </Chip>
+            </Badge>
           )}
-          <div style={{ flex: 1 }} />
+          <div style={{ flex: 1, marginLeft: -16 }} />
           <SaveDetailsMenu
             save={save}
             backgroundColor={backgroundColor}
             onRemove={onRemove}
             backgroundAlwaysPresent={save.game ? isGameBoy(save.game) : false}
           />
-        </Stack>
+        </Flex>
         <div style={{ flex: 1 }} />
         {size >= expandedViewMinSize && save.valid ? (
-          <Button
-            sx={{
+          <button
+            style={{
               overflowWrap: 'anywhere',
               width: 'calc(100% - 12px)',
               fontSize: 12,
@@ -110,7 +117,6 @@ export default function SaveCard({ save, onOpen, onRemove, size = 240 }: SaveCar
               padding: '0px 3px 3px',
               zIndex: 1,
             }}
-            variant="solid"
             onClick={(e) => {
               e.stopPropagation()
               setExpanded(!expanded)
@@ -127,15 +133,15 @@ export default function SaveCard({ save, onOpen, onRemove, size = 240 }: SaveCar
             >
               {save.filePath.raw}
             </div>
-          </Button>
+          </button>
         ) : size < standardViewMinSize ? (
-          <Chip color="secondary" variant="solid" sx={{ margin: '8px', zIndex: 1 }}>
+          <Badge variant="solid" size="3" m="1" style={{ width: 'fit-content' }}>
             <b>{save.trainerName}</b>
-          </Chip>
+          </Badge>
         ) : (
           <div />
         )}
-      </Card>
+      </div>
       {!save.valid && (
         <div
           style={{

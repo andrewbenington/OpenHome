@@ -1,11 +1,9 @@
 .arrow-button {
-  color: inherit;
-  background-color: transparent;
   border: none;
   transition: color 0.25s;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  padding: 0;
+  width: 36px;
+  height: 24px;
 }
 .arrow-button div svg {
   width: 20px;
@@ -46,24 +44,28 @@
 }
 
 .box-navigation {
-  padding-bottom: 5px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  text-align: center;
+  padding: 4px;
 }
 
 .box-name {
   display: grid;
   align-items: center;
   text-align: center;
+  flex: 4;
 }
 
 .details-button {
   --svg-size: 26px;
-  border-radius: 15px !important;
-  height: var(--svg-size);
-  width: var(--svg-size);
-  background-color: #fff0;
+  padding: 2px;
+  border-radius: 16px !important;
   position: absolute;
-  right: 0px;
-  min-height: 0px !important;
+  right: 12px;
+  top: 12px;
+  min-height: 0px;
   margin-bottom: 3px;
   & svg {
     height: var(--svg-size);
@@ -71,8 +73,12 @@
   }
 }
 
+.details-button-img-background {
+  background-color: #0007;
+}
+
 .details-button:hover {
-  background-color: #6663;
+  background-color: var(--hover-bg);
   /* border: 1px solid white; */
 }
 

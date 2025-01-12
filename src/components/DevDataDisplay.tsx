@@ -1,4 +1,4 @@
-import { Modal, ModalClose, ModalDialog, ModalOverflow } from '@mui/joy'
+import { Dialog } from '@radix-ui/themes'
 import { CSSProperties, useState } from 'react'
 import { IconType } from 'react-icons'
 import { MdDataObject } from 'react-icons/md'
@@ -23,14 +23,11 @@ export function DevDataDisplay(props: DevDataDisplayProps) {
         tabIndex={-1}
         {...props}
       />
-      <Modal open={debugModal} onClose={() => setDebugModal(false)}>
-        <ModalOverflow>
-          <ModalDialog minWidth="lg" sx={{ padding: 1 }}>
-            <ModalClose />
-            <InfoGrid labelBreakpoints={{ xs: 4 }} data={props.data ?? {}} />
-          </ModalDialog>
-        </ModalOverflow>
-      </Modal>
+      <Dialog.Root open={debugModal} onOpenChange={(open) => !open && setDebugModal(false)}>
+        <Dialog.Content style={{ padding: 8 }}>
+          <InfoGrid labelBreakpoints={{ xs: 4 }} data={props.data ?? {}} />
+        </Dialog.Content>
+      </Dialog.Root>
     </>
   )
 }

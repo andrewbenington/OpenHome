@@ -25,6 +25,70 @@
 }
 
 .type-icon-border {
-  /* border: 2px solid white; */
   border-radius: 16px;
+}
+
+.hex-display-grid {
+  margin: 4px 16px;
+  width: 680px;
+}
+
+.byte-row-display {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.single-byte-display {
+  font-size: 16px;
+}
+.single-byte-display:hover {
+  background-color: #fff3;
+}
+
+.autocomplete {
+  padding-left: 0px;
+  font-size: 16px;
+  padding: 0px 0px;
+  max-height: 2.2em;
+  & svg {
+    width: 20px;
+    height: 20px;
+  }
+  & button {
+    padding: 2px;
+  }
+}
+
+.autocomplete-dropdown {
+  display: inline-flex;
+  flex-direction: column;
+  margin-block-start: 4px;
+  position: fixed;
+  z-index: 2;
+  overflow-y: auto;
+  padding-inline-start: 0px;
+  max-height: 300px;
+  margin-right: 0px;
+  background-color: var(--autocomplete-background-color);
+  box-shadow:
+    rgb(0, 0, 0) 0px 0px 0px 0px,
+    rgba(21, 21, 21, 0.08) 0px 2px 8px -2px,
+    rgba(21, 21, 21, 0.08) 0px 6px 12px -2px;
+  border-radius: 5px;
+}
+
+.autocomplete-dropdown::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background-color: var(--autocomplete-scrollbar);
+}
+
+.autocomplete-option {
+  padding: 4px 8px;
+  cursor: pointer;
+  width: calc(100% - 16px);
+  list-style: none;
+  overflow: visible;
+}
+.selected {
+  background-color: var(--accent-6);
 }

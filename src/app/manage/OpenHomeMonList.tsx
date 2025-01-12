@@ -8,30 +8,29 @@ import { LookupContext } from 'src/state/lookup'
 import { OHPKM } from 'src/types/pkm/OHPKM'
 import { getMonFileIdentifier } from 'src/util/Lookup'
 import { numericSorter, stringSorter } from 'src/util/Sort'
+import './style.css'
 
-export default function OpenHomeMonList() {
+export type OpenHomeMonListProps = {
+  onSelectMon: (mon: OHPKM) => void
+}
+
+export default function OpenHomeMonList({ onSelectMon }: OpenHomeMonListProps) {
   const [{ homeMons }] = useContext(LookupContext)
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
 
   const columns: SortableColumn<OHPKM>[] = [
-    // {
-    //   key: 'display',
-    //   name: 'Display',
-    //   width: 80,
-
-    //   renderCell: (params) => <DevDataDisplay data={params.row} />,
-    //   cellClass: 'centered-cell',
-    // },
     {
       key: 'Pokémon',
       name: '',
       width: 60,
       renderValue: (value) => (
-        <PokemonIcon
-          dexNumber={value.dexNum}
-          formeNumber={value.formeNum}
-          style={{ width: 30, height: 30 }}
-        />
+        <button onClick={() => onSelectMon(value)} className="mon-icon-button">
+          <PokemonIcon
+            dexNumber={value.dexNum}
+            formeNumber={value.formeNum}
+            style={{ width: 30, height: 30 }}
+          />
+        </button>
       ),
       cellClass: 'centered-cell',
     },

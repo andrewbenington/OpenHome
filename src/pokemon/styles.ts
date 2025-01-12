@@ -23,7 +23,6 @@ const styles = {
     height: 'calc(100% - 20px)',
     padding: 10,
   },
-  flexRow: { display: 'flex', flexDirection: 'row' as 'row' },
   flexRowWrap: {
     display: 'flex',
     flexDirection: 'row' as 'row',

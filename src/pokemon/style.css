@@ -48,28 +48,91 @@
   display: grid;
   align-items: center;
   justify-content: center;
-  background-color: rgb(68, 102, 102);
+  background-color: var(--color-background);
   transition: background-color 0.1s;
-  z-index: 1;
+  & svg {
+    height: 24px;
+    width: 24px;
+  }
 }
 
 .modal-arrow:hover {
   background-color: rgb(96, 144, 144);
+  transition: left 0.15s;
 }
 
 .modal-arrow-left {
-  left: 5%;
+  right: 90%;
 }
 
 .modal-arrow-right {
-  right: 5%;
+  left: 90%;
 }
 
 .modal-box-indicator-wrapper {
   position: absolute;
   bottom: 8px;
+  left: 0px;
   width: 100%;
   overflow: hidden;
   transition: opacity 0.15s;
-  z-index: 1;
+}
+
+.pokemon-modal-tabs {
+  width: 100%;
+  min-height: 400px;
+  max-height: 85vh;
+  & .side-tab-panel {
+    height: initial;
+  }
+}
+
+.attribute-row {
+  height: fit-content;
+  min-height: 32px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+}
+
+.attribute-row-label {
+  background-color: var(--attribute-row-label);
+}
+
+.attribute-row-content {
+  background-color: var(--attribute-row-content);
+  max-width: calc(67% - 20px);
+  width: calc(67% - 20px);
+  height: 100%;
+  min-height: 32px;
+  padding: 0px 10px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  overflow-wrap: break-word;
+  overflow: hidden;
+}
+
+.expandable-attribute-row {
+  transition: max-height 0.2s ease;
+  cursor: pointer;
+}
+
+summary::-webkit-details-marker {
+  display: none;
+}
+
+.expandable-attribute-row > summary {
+  display: flex;
+  flex-direction: row;
+}
+
+.expandable-attribute-row-arrow {
+  position: absolute;
+  right: 8px;
+  top: 0;
+  height: 100%;
+  rotate: 0deg;
+  transition: rotate 0.2s;
 }

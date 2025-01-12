@@ -30,6 +30,10 @@ export const filterReducer: Reducer<FilterState, FilterAction> = (
         ...payload,
       }
 
+      if ('dexNumber' in payload && !payload.dexNumber) {
+        newState.formeNumber = undefined
+      }
+
       return newState
     }
     case 'clear_fields': {

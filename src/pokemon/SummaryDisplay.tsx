@@ -1,4 +1,4 @@
-import { Chip, CircularProgress, Grid } from '@mui/joy'
+import { Badge, Flex, Grid, Spinner } from '@radix-ui/themes'
 import { getDisplayID } from 'pokemon-files'
 import { AbilityToString } from 'pokemon-resources'
 import { PokemonData } from 'pokemon-species-data'
@@ -7,7 +7,7 @@ import { getLevelGen12, getLevelGen3Onward } from 'src/util/StatCalc'
 import PokemonIcon from '../components/PokemonIcon'
 import TypeIcon from '../components/TypeIcon'
 import { getPublicImageURL } from '../images/images'
-import { BallsList, getItemIconPath } from '../images/items'
+import { BallsImageList, getItemIconPath } from '../images/items'
 import { PKMInterface } from '../types/interfaces'
 import { getTypes } from '../types/pkm/util'
 import { Styles } from '../types/types'
@@ -24,14 +24,11 @@ const styles = {
     alignItems: 'center',
   },
   image: {
-    maxWidth: 140,
     maxHeight: 100,
     transform: 'scale(2)',
     imageRendering: 'pixelated',
     objectFit: 'contain',
   },
-  attributesList: { textAlign: 'left', marginTop: 10 },
-  language: { padding: '5px 10px 5px 10px', marginLeft: 'auto' },
   nicknameRow: {
     display: 'flex',
     flexDirection: 'row',
@@ -54,8 +51,8 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
   }, [mon])
 
   return (
-    <Grid container spacing={1} width="100%" paddingLeft={1}>
-      <Grid xs={6}>
+    <Grid columns="2" width="100%" p="3" gap="2">
+      <div>
         <div style={styles.column}>
           {imageError ? (
             <PokemonIcon
@@ -72,7 +69,7 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
               onError={() => setImageError(true)}
             />
           ) : (
-            <CircularProgress />
+            <Spinner style={{ margin: 'auto', height: 32 }} />
           )}
         </div>
         <div style={styles.nicknameRow}>
@@ -81,13 +78,17 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
               draggable={false}
               alt="poke ball type"
               style={{ width: 24, height: 24 }}
-              src={BallsList[mon.ball]}
+              src={BallsImageList[mon.ball]}
             />
           ) : (
             <div />
           )}
           <div style={{ fontWeight: 'bold' }}>{mon.nickname}</div>
-          {mon.languageIndex !== undefined && <Chip style={styles.language}>{mon.language}</Chip>}
+          {mon.languageIndex !== undefined && (
+            <Badge variant="solid" color="gray" ml="2" size="3">
+              {mon.language}
+            </Badge>
+          )}
         </div>
         <AttributeRow label="Item" justifyEnd>
           {mon.heldItemName !== 'None' && (
@@ -129,8 +130,8 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
             <AttributeTag label="N's Pokémon" backgroundColor="green" color="white" />
           )}
         </div>
-      </Grid>
-      <Grid xs={6} style={styles.attributesList}>
+      </div>
+      <Flex direction="column" gap="1">
         <AttributeRow label="Nickname" value={mon.nickname} />
         <AttributeRow
           label="Species"
@@ -158,7 +159,7 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
             : getLevelGen3Onward(mon.dexNum, mon.exp)}
         </AttributeRow>
         <AttributeRow label="EXP">{mon.exp}</AttributeRow>
-      </Grid>
+      </Flex>
     </Grid>
   )
 }

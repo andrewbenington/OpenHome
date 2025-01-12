@@ -1,17 +1,21 @@
-import { Autocomplete, Card, Chip, Modal, ModalDialog, Stack } from '@mui/joy'
+import { Badge, Card, Flex } from '@radix-ui/themes'
 import dayjs from 'dayjs'
 import { useContext, useMemo, useState } from 'react'
 import { MdAdd } from 'react-icons/md'
 import PokemonDetailsModal from 'src/pokemon/PokemonDetailsModal'
-import BoxCell from 'src/saves/boxes/BoxCell'
 import SavesModal from 'src/saves/SavesModal'
 import { filterUndefined } from 'src/util/Sort'
+import Autocomplete from '../../components/Autocomplete'
+import PokemonIcon from '../../components/PokemonIcon'
 import { LookupContext } from '../../state/lookup'
 import { OpenSavesContext } from '../../state/openSaves'
 import { PKMInterface } from '../../types/interfaces'
 
+export type SortType = 'nickname' | 'level' | 'species' | 'origin' | 'met_date' | 'ribbons' | ''
+const SortTypes: SortType[] = ['', 'nickname', 'level', 'species', 'ribbons', 'met_date', 'origin']
+
 function getSortFunction(
-  sortStr: string | undefined
+  sortStr: SortType | undefined
 ): (a: { mon: PKMInterface }, b: { mon: PKMInterface }) => number {
   switch (sortStr?.toLowerCase()) {
     case 'nickname':
@@ -55,7 +59,7 @@ export default function SortPokemon() {
   const [{ homeData }, , openSaves] = useContext(OpenSavesContext)
   const [openSaveDialog, setOpenSaveDialog] = useState(false)
   const [selectedIndex, setSelectedIndex] = useState<number>()
-  const [sort, setSort] = useState('')
+  const [sort, setSort] = useState<SortType>('')
 
   const allMonsWithColors = useMemo(() => {
     if (!homeData) return []
@@ -75,62 +79,93 @@ export default function SortPokemon() {
     return all
   }, [openSaves, homeData])
 
-  const sortedMonsWithColors = useMemo(
-    () => Object.values(allMonsWithColors).sort(getSortFunction(sort)),
-    [allMonsWithColors, sort]
-  )
+  const sortedMonsWithColors = useMemo(() => {
+    return sort
+      ? Object.values(allMonsWithColors).sort(getSortFunction(sort))
+      : Object.values(allMonsWithColors)
+  }, [allMonsWithColors, sort])
 
   const selectedMon = useMemo(
     () => (selectedIndex !== undefined ? sortedMonsWithColors[selectedIndex]?.mon : undefined),
     [sortedMonsWithColors, selectedIndex]
   )
 
+  const boxCells = useMemo(() => {
+    return sortedMonsWithColors.map((monWithSave, i) => (
+      <div style={{ width: 36, height: 36, margin: 4 }} key={`mon_${i}`}>
+        <button
+          onClick={() => setSelectedIndex(i)}
+          className="mon-icon-button"
+          style={{
+            borderColor: monWithSave.color,
+            borderWidth: 2,
+            borderStyle: 'solid',
+          }}
+        >
+          <PokemonIcon
+            dexNumber={monWithSave.mon.dexNum}
+            formeNumber={monWithSave.mon.formeNum}
+            style={{
+              width: 30,
+              height: 30,
+            }}
+          />
+        </button>
+      </div>
+    ))
+  }, [sortedMonsWithColors])
+
   if (!homeMons) return <div />
   return (
-    <Stack direction="row" flexWrap="wrap" padding={1} overflow="hidden" height="calc(100% - 16px)">
-      <Card style={{ height: 'calc(100% - 16px)' }}>
-        <Stack style={{ width: 120, flex: 0 }}>
-          <Chip variant="solid">OpenHome</Chip>
+    <Flex direction="row" wrap="wrap" overflow="hidden" height="calc(100% - 16px)" m="2" gap="2">
+      <Card style={{ height: '100%' }}>
+        <Flex direction="column" gap="1" style={{ width: 180, flex: 0 }}>
+          <Badge color="gray" size="3" style={{ border: `2px solid ${homeData?.gameColor()}` }}>
+            OpenHome
+          </Badge>
           {openSaves.map((save) => (
-            <Chip key={save.tid} variant="solid">
+            <Badge
+              color="gray"
+              size="3"
+              key={save.tid}
+              style={{ border: `2px solid ${save.gameColor()}` }}
+            >
               {save.name} ({save.tid})
-            </Chip>
+            </Badge>
           ))}
-          <Chip onClick={() => setOpenSaveDialog(true)}>
+          <button
+            onClick={() => setOpenSaveDialog(true)}
+            style={{ padding: 0, display: 'grid', justifyContent: 'center' }}
+          >
             <MdAdd />
-          </Chip>
-        </Stack>
+          </button>
+        </Flex>
       </Card>
-      <Stack style={{ flex: 1, height: '100%' }}>
-        <Card>
+      <Flex direction="column" gap="2" style={{ flex: 1, height: '100%' }}>
+        <Card style={{ contain: 'none' }}>
           <Autocomplete
-            options={['nickname', 'level', 'species', 'ribbons', 'met_date', 'origin']}
-            onChange={(_, value) => setSort(value ?? '')}
-            placeholder="Sort"
+            value={sort ?? null}
+            options={SortTypes}
+            onChange={(value) => setSort(value ?? '')}
+            label="Sort"
+            getOptionString={(opt) => opt}
+            getOptionUniqueID={(opt) => opt}
           />
         </Card>
-        <Card style={{ overflowY: 'auto' }}>
-          <Stack direction="row" flexWrap="wrap" justifyContent="center">
-            {sortedMonsWithColors.map((monWithSave, i) => (
-              <div style={{ width: 36, height: 36, margin: 4 }} key={`mon_${i}`}>
-                <BoxCell
-                  onClick={() => setSelectedIndex(i)}
-                  onDrop={() => {}}
-                  mon={monWithSave.mon}
-                  disabled={false}
-                  zIndex={2}
-                  borderColor={monWithSave.color}
-                />
-              </div>
-            ))}
-          </Stack>
+        <Card style={{ overflowY: 'hidden', height: '100%', padding: 0 }}>
+          <Flex
+            direction="row"
+            wrap="wrap"
+            justify="center"
+            overflow="auto"
+            height="calc(100% - 16px)"
+            style={{ padding: 8, alignContent: 'start' }}
+          >
+            {boxCells}
+          </Flex>
         </Card>
-      </Stack>
-      <Modal open={openSaveDialog} onClose={() => setOpenSaveDialog(false)}>
-        <ModalDialog sx={{ minHeight: 400, height: 600, width: 1000 }}>
-          <SavesModal onClose={() => setOpenSaveDialog(false)} />
-        </ModalDialog>
-      </Modal>
+      </Flex>
+      <SavesModal open={openSaveDialog} onClose={() => setOpenSaveDialog(false)} />
       <PokemonDetailsModal
         mon={selectedMon}
         onClose={() => setSelectedIndex(undefined)}
@@ -147,6 +182,6 @@ export default function SortPokemon() {
             : undefined
         }
       />
-    </Stack>
+    </Flex>
   )
 }

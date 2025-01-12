@@ -1,5 +1,4 @@
 import { useDroppable } from '@dnd-kit/core'
-import { useTheme } from '@mui/joy'
 import { ReactNode, useEffect } from 'react'
 import { MonLocation } from '../../state/openSaves'
 
@@ -29,7 +28,6 @@ const DroppableSpace = ({ dropID, dropData, disabled, onOver, children }: Droppa
     data: dropData,
     disabled: !dropID,
   })
-  const { palette } = useTheme()
 
   useEffect(() => {
     if (isOver) {
@@ -43,8 +41,8 @@ const DroppableSpace = ({ dropID, dropData, disabled, onOver, children }: Droppa
       style={{
         ...getBackgroundDetails(disabled),
         outlineStyle: 'solid',
-        outlineWidth: 1,
-        outlineColor: isOver ? palette.primary.mainChannel : 'transparent',
+        outlineWidth: 2,
+        outlineColor: isOver ? 'var(--accent-8)' : 'transparent',
         borderRadius: 3,
         display: 'grid',
         alignItems: 'center',

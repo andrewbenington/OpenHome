@@ -1,4 +1,4 @@
-import { Button, Card, ToggleButtonGroup } from '@mui/joy'
+import { Card, RadioGroup } from '@radix-ui/themes'
 import { useContext, useEffect } from 'react'
 import { BackendContext } from '../backend/backendContext'
 import { AppInfoContext } from '../state/appInfo'
@@ -13,9 +13,9 @@ export default function Settings() {
 
   return (
     <div>
-      <Card variant="outlined" sx={{ m: 1, maxWidth: 400 }}>
+      <Card style={{ margin: 8, maxWidth: 400 }}>
         <b>Enabled ROM Hack Formats</b>
-        <div>
+        <div style={{ margin: 8 }}>
           {appInfoState.extraSaveTypes.map((saveType) => (
             <label style={{ display: 'flex', flexDirection: 'row' }} key={saveType.saveTypeName}>
               <input
@@ -34,26 +34,19 @@ export default function Settings() {
         </div>
 
         <b>App Theme</b>
-        <ToggleButtonGroup
-          onChange={(_, newValue) => {
+        <RadioGroup.Root
+          onValueChange={(newValue: 'light' | 'dark' | 'system') => {
             if (!newValue) return
             backend.setTheme(newValue)
             dispatchAppInfoState({ type: 'set_app_theme', payload: newValue })
           }}
-          color="primary"
-          variant="soft"
           value={appInfoState.settings.appTheme}
+          style={{ margin: 8 }}
         >
-          <Button fullWidth value="system">
-            System
-          </Button>
-          <Button fullWidth value="light">
-            Light
-          </Button>
-          <Button fullWidth value="dark">
-            Dark
-          </Button>
-        </ToggleButtonGroup>
+          <RadioGroup.Item value="system">System</RadioGroup.Item>
+          <RadioGroup.Item value="light">Light</RadioGroup.Item>
+          <RadioGroup.Item value="dark">Dark</RadioGroup.Item>
+        </RadioGroup.Root>
       </Card>
     </div>
   )

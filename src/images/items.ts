@@ -48,7 +48,7 @@ const BallIcons: { [key: string]: string } = {
   Origin: 'items/index/1771.png',
 }
 
-export const BallsList = [
+export const BallsImageList = [
   '',
   BallIcons.Master,
   BallIcons.Ultra,
@@ -164,5 +164,5 @@ export const getItemIconPath = (item: Item | ItemGen3 | ItemGen2, format?: strin
 }
 
 export const getBallIconPath = (ball: number): string => {
-  return BallsList[ball]
+  return BallsImageList[ball]
 }

@@ -1,4 +1,4 @@
-import { Chip } from '@mui/joy'
+import { Badge } from '@radix-ui/themes'
 import * as E from 'fp-ts/lib/Either'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { MdDelete } from 'react-icons/md'
@@ -116,9 +116,9 @@ function InstalledPluginCard(props: {
           src={`data:image/${metadata.icon_image.extension};base64,${metadata.icon_image.base64}`}
         />
       )}
-      <Chip className="status-chip" color={enabled ? 'success' : 'warning'}>
+      <Badge className="status-chip" color={enabled ? 'green' : 'gold'} variant="solid">
         {enabled ? 'Enabled' : 'Disabled'}
-      </Chip>
+      </Badge>
       <div className="name-chip">{metadata.name}</div>
       <MdDelete
         className="delete-icon"

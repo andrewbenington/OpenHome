@@ -1,4 +1,4 @@
-import { Box, Modal, ModalDialog, Stack, useTheme } from '@mui/joy'
+import { Button, Flex } from '@radix-ui/themes'
 import * as E from 'fp-ts/lib/Either'
 import lodash, { flatten } from 'lodash'
 import { bytesToPKMInterface } from 'pokemon-files'
@@ -26,7 +26,6 @@ const Home = () => {
   const [openSavesState, openSavesDispatch, allOpenSaves] = useContext(OpenSavesContext)
   const [lookupState, lookupDispatch] = useContext(LookupContext)
   const backend = useContext(BackendContext)
-  const { palette } = useTheme()
   const [selectedMon, setSelectedMon] = useState<PKMInterface>()
   const [openSaveDialog, setOpenSaveDialog] = useState(false)
   const displayError = useDisplayError()
@@ -222,48 +221,22 @@ const Home = () => {
   }, [lookupState.loaded, lookupState.error, loadAllLookups])
 
   return (
-    <div
-      style={{
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'row',
-      }}
-    >
-      <Stack className="save-file-column" spacing={1} width={280} minWidth={280}>
+    <Flex direction="row" style={{ height: '100%' }}>
+      <Flex className="save-file-column" gap="3">
         {lodash.range(allOpenSaves.length).map((i) => (
           <OpenSaveDisplay key={`save_display_${i}`} saveIndex={i} />
         ))}
-        <button
-          className="card-button"
-          onClick={() => setOpenSaveDialog(true)}
-          style={{
-            backgroundColor: palette.primary.mainChannel,
-          }}
-        >
+        <Button onClick={() => setOpenSaveDialog(true)}>
           <MdFileOpen />
           Open Save
-        </button>
-      </Stack>
-      <div
-        className="home-box-column"
-        style={{
-          flex: 1,
-          minWidth: 480,
-        }}
-      >
-        <Box
-          display="flex"
-          flexDirection="row"
-          width="100%"
-          maxWidth={600}
-          minWidth={480}
-          alignItems="center"
-        >
+        </Button>
+      </Flex>
+      <div className="home-box-column">
+        <Flex direction="row" width="100%" maxWidth="600px" minWidth="480px" align="center">
           <HomeBoxDisplay />
-          <Box flex={1} />
-        </Box>
+        </Flex>
       </div>
-      <Stack spacing={1} className="right-column" width={300}>
+      <Flex gap="2" className="right-column">
         <FilterPanel />
         <div
           className="drop-area"
@@ -272,30 +245,16 @@ const Home = () => {
           Preview
         </div>
         <ReleaseArea />
-      </Stack>
+      </Flex>
       <PokemonDetailsModal mon={selectedMon} onClose={() => setSelectedMon(undefined)} />
-      <Modal
+
+      <SavesModal
         open={openSaveDialog}
-        onClose={() => setOpenSaveDialog(false)}
-        sx={{ height: '100vh' }}
-      >
-        <ModalDialog
-          sx={{
-            minWidth: 800,
-            width: '80%',
-            maxHeight: 'fit-content',
-            height: '95vh',
-            overflow: 'hidden',
-          }}
-        >
-          <SavesModal
-            onClose={() => {
-              setOpenSaveDialog(false)
-            }}
-          />
-        </ModalDialog>
-      </Modal>
-    </div>
+        onClose={() => {
+          setOpenSaveDialog(false)
+        }}
+      />
+    </Flex>
   )
 }
 

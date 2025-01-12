@@ -1,20 +1,55 @@
-import { Button, Card, Stack, Typography } from '@mui/joy'
-import { Ability, Balls, GameOfOriginData, Item, Type, Types } from 'pokemon-resources'
+import { Button, Card, Flex, Text } from '@radix-ui/themes'
+import {
+  Ability,
+  Balls,
+  GameOfOrigin,
+  GameOfOriginData,
+  isGBA,
+  isGen4,
+  isGen5,
+  Item,
+  ItemToString,
+  Origin,
+  Types,
+} from 'pokemon-resources'
 import { PokemonData } from 'pokemon-species-data'
 import { useContext, useMemo } from 'react'
 import { OpenHomeRibbons } from 'src/consts/Ribbons'
 import { getOriginMark } from 'src/images/game'
 import { getPublicImageURL } from 'src/images/images'
-import { BallsList, getItemIconPath } from 'src/images/items'
+import { BallsImageList, getItemIconPath } from 'src/images/items'
 import { getRibbonSpritePath } from 'src/images/ribbons'
 import { FilterContext } from 'src/state/filter'
+import Autocomplete from '../Autocomplete'
 import PokemonIcon from '../PokemonIcon'
 import TypeIcon from '../TypeIcon'
-import FilterAutocomplete from './FilterAutocomplete'
+import './style.css'
 
 type SelectOption = {
   label: string
   id: number
+}
+
+function getOriginIcon(origin: Origin) {
+  const path =
+    isGen4(origin.index) || isGen5(origin.index)
+      ? 'icons/ds.png'
+      : isGBA(origin.index)
+        ? 'icons/gba.png'
+        : origin.index === GameOfOrigin.ColosseumXD
+          ? 'icons/gcn.png'
+          : origin.mark
+            ? getOriginMark(origin.mark)
+            : undefined
+
+  return path ? (
+    <img
+      className="filter-icon invert-dark"
+      draggable={false}
+      alt="origin mark"
+      src={getPublicImageURL(path)}
+    />
+  ) : undefined
 }
 
 export default function FilterPanel() {
@@ -25,13 +60,14 @@ export default function FilterPanel() {
     [filterState.dexNumber]
   )
 
+  // TypeScript enums are difficult to work with...
   const items: SelectOption[] = useMemo(
     () =>
       Object.keys(Item)
-        .filter((item) => isNaN(Number(item)))
-        .map((item, id) => ({
-          label: item,
-          id,
+        .filter((indexStr) => !isNaN(Number(indexStr)))
+        .map((indexStr) => ({
+          label: ItemToString(parseInt(indexStr)),
+          id: parseInt(indexStr),
         })),
     []
   )
@@ -48,62 +84,81 @@ export default function FilterPanel() {
   )
 
   return (
-    <Card sx={{ marginLeft: 1 }}>
-      <div style={{ display: 'flex', paddingTop: 4 }}>
-        <Typography fontSize={20} marginLeft={0.5} flex={1}>
+    <Card style={{ contain: 'none' }}>
+      <Flex direction="row" justify="between">
+        <Text size="5" ml="1" weight="bold">
           Filter
-        </Typography>
+        </Text>
         <Button
-          variant="outlined"
+          variant="outline"
           disabled={Object.values(filterState).length === 0}
-          color="danger"
+          color="tomato"
           onClick={() => dispatchFilterState({ type: 'clear_all' })}
           style={{ padding: 4 }}
         >
           Clear All
         </Button>
-      </div>
-      <Stack margin={1} spacing={1}>
-        <FilterAutocomplete
+      </Flex>
+      <Flex direction="column" m="1" gap="0">
+        <Autocomplete
           options={Object.values(PokemonData)}
-          groupBy={(option) => `Generation ${option.formes[0].gen}`}
-          labelField="name"
-          indexField="nationalDex"
-          filterField="dexNumber"
-          placeholder="Species"
-          getOptionLabel={(option) => option.name}
+          getOptionString={(opt) => opt.name}
+          getOptionUniqueID={(opt) => opt.nationalDex.toString()}
+          value={filterState.dexNumber ? PokemonData[filterState.dexNumber] : undefined}
+          label="Species"
+          onChange={(option) =>
+            dispatchFilterState({
+              type: 'set_filter',
+              payload: { dexNumber: option?.nationalDex },
+            })
+          }
           getIconComponent={(currentMon) => (
-            <PokemonIcon
-              dexNumber={currentMon.nationalDex}
-              style={{ width: 32, height: 32, marginLeft: -4 }}
-            />
+            <PokemonIcon dexNumber={currentMon.nationalDex} style={{ width: 24, height: 24 }} />
           )}
         />
         {currentMon && currentMon.formes.length > 1 && (
-          <FilterAutocomplete
-            options={currentMon.formes}
-            labelField="formeName"
-            indexField="formeNumber"
-            filterField="formeNumber"
-            placeholder="Forme"
-            getOptionLabel={(option) => option.formeName}
+          <Autocomplete
+            options={[...currentMon.formes]}
+            getOptionString={(opt) => opt.formeName}
+            getOptionUniqueID={(opt) => opt.formeNumber.toString()}
+            value={
+              filterState.formeNumber !== undefined
+                ? currentMon.formes[filterState.formeNumber]
+                : undefined
+            }
+            label="Forme"
+            onChange={(option) =>
+              dispatchFilterState({
+                type: 'set_filter',
+                payload: { formeNumber: option?.formeNumber },
+              })
+            }
             getIconComponent={(currentForme) =>
-              filterState.dexNumber ? (
+              filterState.dexNumber &&
+              currentForme && (
                 <PokemonIcon
                   dexNumber={filterState.dexNumber}
                   formeNumber={currentForme.formeNumber}
-                  style={{ width: 32, height: 32, marginLeft: 0, marginRight: -4 }}
+                  style={{ width: 24, height: 24 }}
                 />
-              ) : undefined
+              )
             }
           />
         )}
-        <FilterAutocomplete
+        <Autocomplete
           options={items}
-          labelField="label"
-          indexField="id"
-          filterField="heldItemIndex"
-          placeholder="Held Item"
+          getOptionString={(opt) => opt.label}
+          getOptionUniqueID={(opt) => opt.id.toString()}
+          value={
+            filterState.heldItemIndex !== undefined ? items[filterState.heldItemIndex] : undefined
+          }
+          label="Held Item"
+          onChange={(option) =>
+            dispatchFilterState({
+              type: 'set_filter',
+              payload: { heldItemIndex: option?.id },
+            })
+          }
           getIconComponent={(currentItem) =>
             currentItem && (
               <img
@@ -117,69 +172,109 @@ export default function FilterPanel() {
             )
           }
         />
-        <FilterAutocomplete
+        <Autocomplete
           options={abilities}
-          labelField="label"
-          indexField="id"
-          filterField="abilityIndex"
-          placeholder="Ability"
+          getOptionString={(opt) => opt.label}
+          getOptionUniqueID={(opt) => opt.id.toString()}
+          value={
+            filterState.abilityIndex !== undefined ? abilities[filterState.abilityIndex] : undefined
+          }
+          label="Ability"
+          onChange={(option) =>
+            dispatchFilterState({
+              type: 'set_filter',
+              payload: { abilityIndex: option?.id },
+            })
+          }
         />
-        <FilterAutocomplete
+        <Autocomplete
           options={Types}
-          filterField="type1"
-          placeholder="Type 1"
+          getOptionString={(opt) => opt}
+          getOptionUniqueID={(opt) => opt}
+          value={filterState.type1}
+          label="Type 1"
+          onChange={(option) =>
+            dispatchFilterState({
+              type: 'set_filter',
+              payload: { type1: option },
+            })
+          }
           getIconComponent={(type) => <TypeIcon type={type} />}
         />
         {filterState.type1 && (
-          <FilterAutocomplete
-            options={Types.filter((type) => type !== filterState.type1)}
-            filterField="type2"
-            placeholder="Type 2"
-            getIconComponent={(type: Type) => <TypeIcon type={type} />}
+          <Autocomplete
+            options={Types}
+            getOptionString={(opt) => opt}
+            getOptionUniqueID={(opt) => opt}
+            value={filterState.type2}
+            label="Type 2"
+            onChange={(option) =>
+              dispatchFilterState({
+                type: 'set_filter',
+                payload: { type2: option },
+              })
+            }
+            getIconComponent={(type) => <TypeIcon type={type} />}
           />
         )}
-        <FilterAutocomplete
+        <Autocomplete
           options={GameOfOriginData.filter((origin) => !!origin)}
-          filterField="gameOfOrigin"
-          labelField="name"
-          indexField="index"
-          placeholder="Game Of Origin"
-          getOptionLabel={(option) => `Pokémon ${option?.name}`}
-          getIconComponent={(origin) =>
-            origin?.mark ? (
-              <img
-                draggable={false}
-                alt="origin mark"
-                style={{ width: 24, height: 24 }}
-                src={getPublicImageURL(getOriginMark(origin?.mark))}
-              />
-            ) : undefined
+          getOptionString={(option) => option?.name}
+          getOptionUniqueID={(opt) => opt.index.toString()}
+          value={
+            filterState.gameOfOrigin
+              ? GameOfOriginData.find((origin) => origin?.index === filterState.gameOfOrigin)
+              : undefined
           }
+          label="Game Of Origin"
+          onChange={(option) =>
+            dispatchFilterState({
+              type: 'set_filter',
+              payload: { gameOfOrigin: option?.index },
+            })
+          }
+          getIconComponent={getOriginIcon}
         />
-        <FilterAutocomplete
+        <Autocomplete
           options={Balls.map((ball, id) => ({
             label: ball,
             id,
           }))}
-          filterField="ball"
-          labelField="label"
-          indexField="id"
-          placeholder="Ball"
+          getOptionString={(option) => option.label}
+          getOptionUniqueID={(opt) => opt.id.toString()}
+          value={
+            filterState.ball ? { label: Balls[filterState.ball], id: filterState.ball } : undefined
+          }
+          label="Ball"
+          onChange={(option) =>
+            dispatchFilterState({
+              type: 'set_filter',
+              payload: { ball: option?.id },
+            })
+          }
           getIconComponent={(ball) => (
             <img
               draggable={false}
               alt="poke ball type"
               style={{ width: 24, height: 24 }}
-              src={BallsList[ball.id]}
+              src={BallsImageList[ball.id]}
             />
           )}
         />
-        <FilterAutocomplete
-          options={['Any', 'None', ...OpenHomeRibbons]}
-          filterField="ribbon"
-          placeholder="Ribbon"
+        <Autocomplete
+          options={['Any Ribbon', 'No Ribbon', ...OpenHomeRibbons]}
+          getOptionString={(opt) => opt}
+          getOptionUniqueID={(opt) => opt}
+          value={filterState.ribbon}
+          label="Ribbon"
+          onChange={(option) =>
+            dispatchFilterState({
+              type: 'set_filter',
+              payload: { ribbon: option },
+            })
+          }
           getIconComponent={(ribbon) =>
-            ribbon !== 'Any' && ribbon !== 'None' ? (
+            ribbon !== 'Any Ribbon' && ribbon !== 'No Ribbon' ? (
               <img
                 draggable={false}
                 style={{ width: 24, height: 24 }}
@@ -188,22 +283,30 @@ export default function FilterPanel() {
             ) : undefined
           }
         />
-        <FilterAutocomplete
+        <Autocomplete
           options={['Shiny', 'Not Shiny', 'Square Shiny', 'Star Shiny']}
-          filterField="shiny"
-          placeholder="Shiny"
+          getOptionString={(opt) => opt}
+          getOptionUniqueID={(opt) => opt}
+          value={filterState.shiny}
+          label="Shiny"
+          onChange={(option) =>
+            dispatchFilterState({
+              type: 'set_filter',
+              payload: { shiny: option },
+            })
+          }
           getIconComponent={(value) =>
             value !== 'Not Shiny' ? (
               <img
                 alt="shiny icon"
                 draggable={false}
                 src={getPublicImageURL('icons/Shiny.png')}
-                style={{ width: 24, height: 24 }}
+                className="filter-icon invert-light"
               />
             ) : undefined
           }
         />
-      </Stack>
+      </Flex>
     </Card>
   )
 }

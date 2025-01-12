@@ -39,9 +39,9 @@ export function filterApplies(filter: Filter, mon: PKMInterface) {
   }
   if (filter.ribbon !== undefined) {
     if (!mon.ribbons) return false
-    if (filter.ribbon === 'Any') {
+    if (filter.ribbon === 'Any Ribbon') {
       if (mon.ribbons.length === 0) return false
-    } else if (filter.ribbon === 'None') {
+    } else if (filter.ribbon === 'No Ribbon') {
       if (mon.ribbons.length !== 0) return false
     } else if (!mon.ribbons.includes(filter.ribbon)) return false
   }

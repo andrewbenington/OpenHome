@@ -1,5 +1,3 @@
-import useIsDarkMode from '../hooks/dark-mode'
-
 const AttributeRow = (props: {
   label: string
   value?: string
@@ -9,27 +7,15 @@ const AttributeRow = (props: {
   style?: any
 }) => {
   const { label, value, justifyEnd, indent, children, style } = props
-  const isDarkMode = useIsDarkMode()
 
   return (
-    <div
-      style={{
-        ...style,
-        height: 'fit-content',
-        minHeight: 32,
-        marginBottom: 2,
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-        width: '100%',
-      }}
-    >
+    <div className="attribute-row" style={style}>
       <div
+        className="attribute-row-label"
         style={{
           minWidth: indent ? `calc(33% - ${indent}px)` : '33%',
           height: '100%',
           minHeight: 32,
-          backgroundColor: '#fff6',
           marginLeft: indent,
           display: 'grid',
           alignItems: 'center',
@@ -47,20 +33,10 @@ const AttributeRow = (props: {
         </div>
       </div>
       <div
+        className="attribute-row-content"
         style={{
-          maxWidth: 'calc(67% - 10px)',
-          width: 'calc(67% - 10px)',
-          height: '100%',
-          minHeight: 32,
-          padding: '0px 10px',
-          backgroundColor: isDarkMode ? '#ddd3' : '#fff4',
-          display: 'flex',
-          flexDirection: 'row',
-          alignItems: 'center',
           justifyContent: justifyEnd ? 'end' : 'start',
           textAlign: justifyEnd ? 'end' : 'start',
-          overflowWrap: 'break-word',
-          overflow: 'hidden',
         }}
       >
         {value ?? children}

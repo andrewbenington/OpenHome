@@ -25,6 +25,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  width: 280px !important;
+  min-width: 280px;
 }
 
 .save-file-stack {
@@ -32,11 +34,13 @@
 }
 
 .home-box-column {
-  padding: 8px 8px 8px 0px;
+  padding: 8px 12px 8px 4px;
   display: flex;
   flex-direction: row;
   justify-content: center;
   align-items: flex-start;
+  flex: 1;
+  min-width: 480px;
 }
 
 .right-column {
@@ -53,11 +57,12 @@
 }
 
 .drop-area {
-  margin: 10px 5px 10px 5px;
   background-color: #fff4;
   position: relative;
   border: none;
   flex: 1;
   border-radius: 3px;
   text-align: center;
+  font-weight: bold;
+  cursor: default;
 }
