@@ -212,14 +212,6 @@ label {
   z-index: 1;
 }
 
-@media (prefers-color-scheme: light) {
-  .MuiTabPanel-root {
-    ::-webkit-scrollbar-thumb {
-      background-color: #7dceab;
-    }
-  }
-}
-
 .datagrid {
   border: none;
 }
