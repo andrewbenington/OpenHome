@@ -1,9 +1,7 @@
 import { Flex, Grid } from '@radix-ui/themes'
-import { Buffer } from 'buffer'
-import hexy from 'hexy'
 import { range } from 'lodash'
 import { FileSchemas } from 'pokemon-files'
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { OHPKM } from 'src/types/pkm/OHPKM'
 import './components.css'
 
@@ -13,7 +11,6 @@ interface HexDisplayProps {
 }
 
 function HexDisplay({ data, format }: HexDisplayProps) {
-  const [hexyText, setHexyText] = useState<string>()
   const [currentHover, setCurrentHover] = useState<number>()
   const schema = useMemo(() => {
     if (format === 'OHPKM') {
@@ -21,16 +18,6 @@ function HexDisplay({ data, format }: HexDisplayProps) {
     }
     return format ? FileSchemas[format] : undefined
   }, [format])
-
-  useEffect(() => {
-    if (data) {
-      const h = hexy.hexy(Buffer.from(data), {
-        caps: 'upper',
-      })
-
-      setHexyText(h)
-    }
-  }, [data])
 
   const hoveredField = useMemo(
     () =>
@@ -45,9 +32,6 @@ function HexDisplay({ data, format }: HexDisplayProps) {
     [schema, currentHover]
   )
 
-  if (!hexyText) {
-    return <div />
-  }
   return (
     <Grid columns="1fr 4fr 2fr" className="hex-display-grid">
       <Flex direction="column">
