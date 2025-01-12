@@ -101,6 +101,7 @@ const PokemonDetailsModal = (props: {
       >
         <VisuallyHidden>
           <Dialog.Title>Pokémon Details</Dialog.Title>
+          <Dialog.Description>Detailed information about the selected Pokémon</Dialog.Description>
         </VisuallyHidden>
         {mon && displayMon && (
           <SideTabs.Root className="pokemon-modal-tabs" defaultValue="summary">
