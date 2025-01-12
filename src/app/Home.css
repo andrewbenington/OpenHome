@@ -57,11 +57,12 @@
 }
 
 .drop-area {
-  margin: 10px 5px 10px 5px;
   background-color: #fff4;
   position: relative;
   border: none;
   flex: 1;
   border-radius: 3px;
   text-align: center;
+  font-weight: bold;
+  cursor: default;
 }

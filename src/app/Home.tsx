@@ -236,7 +236,7 @@ const Home = () => {
           <HomeBoxDisplay />
         </Flex>
       </div>
-      <Flex className="right-column">
+      <Flex gap="2" className="right-column">
         <FilterPanel />
         <div
           className="drop-area"

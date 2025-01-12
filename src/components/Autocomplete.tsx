@@ -16,7 +16,7 @@ import { DropdownArrowIcon, RemoveIcon } from './Icons'
 type SLJAutocompleteProps<Option> = {
   value?: Option | null
   onChange?: (val?: Option) => void
-  label?: string
+  label: string
   options: Option[]
   getOptionString: (opt: Option) => string
   getOptionUniqueID: (opt: Option) => string
@@ -55,6 +55,7 @@ function filterOptions<Option>(
 type AutocompleteState<Option> = {
   expanded: boolean
   options: Option[]
+  label: string // manual scrolling doesn't work if this is the same as another autocorrect instance
   getOptionString: (opt: Option) => string
   highlightedIndex: number | null
   inputFieldValue: string
@@ -93,23 +94,35 @@ function useAutocomplete<Option>(
           return { ...state, expanded: !state.expanded }
         }
         case 'highlight-down': {
+          const nextIndex =
+            state.highlightedIndex === null
+              ? 0
+              : (state.highlightedIndex + 1) % state.options.length
+
+          document
+            .getElementById(`autocomplete-option-${state.label}-${nextIndex}`)
+            ?.scrollIntoView({ block: 'center' })
+
           return {
             ...state,
-            highlightedIndex:
-              state.highlightedIndex === null
-                ? 0
-                : (state.highlightedIndex + 1) % state.options.length,
+            highlightedIndex: nextIndex,
           }
         }
         case 'highlight-up': {
+          const prevIndex =
+            state.highlightedIndex === null
+              ? 0
+              : state.highlightedIndex === 0
+                ? state.options.length - 1
+                : state.highlightedIndex - 1
+
+          document
+            .getElementById(`autocomplete-option-${state.label}-${prevIndex}`)
+            ?.scrollIntoView({ block: 'center' })
+
           return {
             ...state,
-            highlightedIndex:
-              state.highlightedIndex === null
-                ? 0
-                : state.highlightedIndex === 0
-                  ? state.options.length - 1
-                  : state.highlightedIndex - 1,
+            highlightedIndex: prevIndex,
           }
         }
       }
@@ -169,6 +182,7 @@ export default function SLJAutocomplete<Option>(props: SLJAutocompleteProps<Opti
   const [state, dispatchState] = useAutocomplete({
     expanded: false,
     options,
+    label: label ?? '',
     getOptionString,
     highlightedIndex: null,
     inputFieldValue: propValue ? getOptionString(propValue) : '',
@@ -230,7 +244,6 @@ export default function SLJAutocomplete<Option>(props: SLJAutocompleteProps<Opti
           size="3"
           value={state.inputFieldValue ?? null}
           placeholder={label}
-          // size={max([20, (value?.length ?? 0) + 5])}
           onChange={(e) => {
             const selectedID = e.target.id.slice(7)
             const selectedOption = options.find((opt) => getOptionUniqueID(opt) === selectedID)
@@ -307,9 +320,10 @@ export default function SLJAutocomplete<Option>(props: SLJAutocompleteProps<Opti
             <li
               key={`autocomplete-option-${index}`}
               className={`autocomplete-option ${index === state.highlightedIndex ? 'selected' : undefined}`}
-              id={`autocomplete-option-${getOptionUniqueID(option)}`}
+              id={`autocomplete-option-${label}-${index}`}
               tabIndex={-1}
               onMouseEnter={() => dispatchState(['set-highlighted', index])}
+              autoFocus={index === state.highlightedIndex}
             >
               {getOptionString(option)}
             </li>
