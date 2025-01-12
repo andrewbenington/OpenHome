@@ -50,6 +50,10 @@
   justify-content: center;
   background-color: rgb(68, 102, 102);
   transition: background-color 0.1s;
+  & svg {
+    height: 24px;
+    width: 24px;
+  }
 }
 
 .modal-arrow:hover {
