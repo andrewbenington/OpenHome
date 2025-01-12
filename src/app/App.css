@@ -236,6 +236,9 @@ label {
 .radix-themes {
   --cursor-button: pointer;
   --card-border-width: 0px;
+  --base-menu-content-padding: 0px;
+  --base-menu-item-height: 26px;
+  --cursor-menu-item: pointer;
   .rt-BaseTabList {
     background-color: var(--color-panel);
   }
@@ -245,6 +248,9 @@ label {
   .rt-RadioGroupItem {
     display: flex;
     flex-direction: row;
+  }
+  .rt-BaseMenuItem {
+    border-radius: 0;
   }
 }
 

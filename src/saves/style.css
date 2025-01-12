@@ -60,13 +60,12 @@
 
 .details-button {
   --svg-size: 26px;
-  border-radius: 15px !important;
-  height: var(--svg-size);
-  width: var(--svg-size);
-  background-color: #fff0;
+  padding: 2px;
+  border-radius: 16px !important;
   position: absolute;
-  right: 0px;
-  min-height: 0px !important;
+  right: 12px;
+  top: 12px;
+  min-height: 0px;
   margin-bottom: 3px;
   & svg {
     height: var(--svg-size);
@@ -74,8 +73,12 @@
   }
 }
 
+.details-button-img-background {
+  background-color: #0007;
+}
+
 .details-button:hover {
-  background-color: #6663;
+  background-color: var(--hover-bg);
   /* border: 1px solid white; */
 }
 

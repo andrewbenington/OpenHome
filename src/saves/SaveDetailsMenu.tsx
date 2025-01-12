@@ -1,4 +1,4 @@
-import { Dropdown, Menu, MenuButton, MenuItem } from '@mui/joy'
+import { DropdownMenu, IconButton } from '@radix-ui/themes'
 import { useContext, useEffect, useMemo, useState } from 'react'
 import { BackendContext } from 'src/backend/backendContext'
 import { MenuIcon } from 'src/components/Icons'
@@ -56,52 +56,48 @@ export default function SaveDetailsMenu(props: SaveDetailsMenuProps) {
     return !save.valid
       ? '#fff6'
       : backgroundAlwaysPresent
-        ? '#000b'
+        ? '#000'
         : darkBackground
           ? '#0003'
           : '#fff6'
   }, [backgroundAlwaysPresent, backgroundColor, darkBackground, isDarkMode, save.valid])
 
   return (
-    <Dropdown>
-      <MenuButton
-        className="details-button"
-        sx={{
-          color: darkBackground ? '#fff' : '#333',
-          backgroundColor: backgroundAlwaysPresent ? '#0007' : 'transparent',
-          ':hover': {
-            backgroundColor: hoverBg,
-          },
-          '& svg': {
-            color: darkBackground ? '#fff' : '#000',
-          },
-        }}
-        onClick={(e) => e.stopPropagation()}
-        color="secondary"
-        variant="solid"
-      >
-        <MenuIcon />
-      </MenuButton>
-      <Menu style={{ zIndex: 1301 }} placement="bottom-end">
+    <DropdownMenu.Root>
+      <DropdownMenu.Trigger onClick={(e) => e.stopPropagation()}>
+        <IconButton
+          className={`details-button ${backgroundAlwaysPresent ? 'details-button-img-background' : ''}`}
+          variant="ghost"
+          color="gray"
+          style={{
+            color: darkBackground ? '#fff' : '#333',
+            // @ts-ignore (css var workaround)
+            '--hover-bg': hoverBg,
+          }}
+        >
+          <MenuIcon />
+        </IconButton>
+      </DropdownMenu.Trigger>
+      <DropdownMenu.Content style={{ padding: 0 }} variant="soft">
         {onRemove && (
-          <MenuItem
+          <DropdownMenu.Item
             onClick={(e) => {
               e.stopPropagation()
               onRemove()
             }}
           >
             Remove
-          </MenuItem>
+          </DropdownMenu.Item>
         )}
-        <MenuItem
+        <DropdownMenu.Item
           onClick={(e) => {
             e.stopPropagation()
             backend.openDirectory(save.filePath.dir)
           }}
         >
           Reveal in {platform === 'macos' ? 'Finder' : 'File Explorer'}
-        </MenuItem>
-      </Menu>
-    </Dropdown>
+        </DropdownMenu.Item>
+      </DropdownMenu.Content>
+    </DropdownMenu.Root>
   )
 }
