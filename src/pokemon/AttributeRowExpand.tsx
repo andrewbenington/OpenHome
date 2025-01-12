@@ -28,7 +28,7 @@ export default function AttributeRowExpand(props: {
       className="expandable-attribute-row"
       style={{ maxHeight: expanded ? (length + 1) * 34 : 32 }}
       open={expanded}
-      onToggle={(e) => setExpanded(e.newState === 'open')}
+      onToggle={(e) => setExpanded((e.nativeEvent as ToggleEvent).newState === 'open')}
     >
       <summary>
         <div style={{ position: 'relative', width: '100%' }}>
