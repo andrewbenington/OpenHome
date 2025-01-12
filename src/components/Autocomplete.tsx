@@ -191,8 +191,11 @@ export default function SLJAutocomplete<Option>(props: SLJAutocompleteProps<Opti
   useEffect(() => {
     if (propValue) {
       dispatchState(['set-input', getOptionString(propValue)])
+    } else if (state.inputFieldValue && !state.expanded) {
+      // clear button
+      dispatchState(['set-input', ''])
     }
-  }, [dispatchState, getOptionString, propValue])
+  }, [dispatchState, getOptionString, propValue, state.expanded, state.inputFieldValue])
 
   useEffect(() => {
     if (outerElement?.current) {

@@ -26,6 +26,7 @@ body {
     --attribute-row-label: rgb(179, 225, 206);
     --attribute-row-content: rgb(160, 218, 194);
     --dark-scrollbar: rgb(83, 180, 165);
+    --autocomplete-background-color: #fff;
   }
 }
 
@@ -35,6 +36,7 @@ body {
     --byte-hover: #ccc6;
     --attribute-row-label: rgb(108, 141, 141);
     --attribute-row-content: rgb(74, 108, 112);
+    --autocomplete-background-color: #333;
   }
 }
 

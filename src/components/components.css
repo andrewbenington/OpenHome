@@ -69,7 +69,7 @@
   padding-inline-start: 0px;
   max-height: 300px;
   margin-right: 0px;
-  background-color: white;
+  background-color: var(--autocomplete-background-color);
   box-shadow:
     rgb(0, 0, 0) 0px 0px 0px 0px,
     rgba(21, 21, 21, 0.08) 0px 2px 8px -2px,
@@ -90,5 +90,5 @@
   overflow: visible;
 }
 .selected {
-  background-color: aliceblue;
+  background-color: var(--accent-6);
 }

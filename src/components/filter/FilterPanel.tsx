@@ -23,6 +23,7 @@ import { FilterContext } from 'src/state/filter'
 import Autocomplete from '../Autocomplete'
 import PokemonIcon from '../PokemonIcon'
 import TypeIcon from '../TypeIcon'
+import './style.css'
 
 type SelectOption = {
   label: string
@@ -43,9 +44,9 @@ function getOriginIcon(origin: Origin) {
 
   return path ? (
     <img
+      className="filter-icon invert-dark"
       draggable={false}
       alt="origin mark"
-      style={{ width: 24, height: 24 }}
       src={getPublicImageURL(path)}
     />
   ) : undefined
@@ -300,7 +301,7 @@ export default function FilterPanel() {
                 alt="shiny icon"
                 draggable={false}
                 src={getPublicImageURL('icons/Shiny.png')}
-                style={{ width: 24, height: 24 }}
+                className="filter-icon invert-light"
               />
             ) : undefined
           }
