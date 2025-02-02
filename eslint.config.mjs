@@ -22,6 +22,7 @@ export default [
     },
     files: ['src/**/*.{js,mjs,cjs,ts,mts,jsx,tsx}'],
     rules: {
+      'import/order': ['error', { 'newlines-between': 'always', alphabetize: { order: 'asc' } }],
       'react-refresh/only-export-components': ['error', { allowConstantExport: true }],
       '@typescript-eslint/no-unused-vars': [
         'warn',

@@ -382,3 +382,13 @@ export function sha1Digest(data: Uint8Array) {
 
   return wordArrayToUint8Array(shasum)
 }
+
+export function sha256Digest(data: Uint8Array[]) {
+  const words = cryptolib.WordArray.create(data[0])
+  for (const nextData of data.slice(1)) {
+    words.concat(cryptolib.WordArray.create(nextData))
+  }
+  const shasum = SHA256(words)
+
+  return wordArrayToUint8Array(shasum)
+}
