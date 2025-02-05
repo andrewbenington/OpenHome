@@ -1,5 +1,5 @@
 import { sha256Digest } from '../Encryption'
-import { SCBlock } from './SCBlock'
+import { buildSCBlock, SCBlock } from './SCBlock'
 
 const SIZE_HASH = 0x20
 const IntroHashBytes = new Uint8Array([
@@ -69,7 +69,7 @@ function readBlocks(data: Uint8Array): SCBlock[] {
 
   while (offset < data.length) {
     // console.log(`offset: ${offset}`)
-    const { block, newOffset } = SCBlock.readFromOffset(data, offset)
+    const { block, newOffset } = buildSCBlock(data, offset)
     result.push(block)
     offset = newOffset
   }

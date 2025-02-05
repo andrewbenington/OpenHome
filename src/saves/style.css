@@ -55,7 +55,8 @@
   display: grid;
   align-items: center;
   text-align: center;
-  flex: 4;
+  flex: 8;
+  min-width: fit-content;
 }
 
 .details-button {

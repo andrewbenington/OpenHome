@@ -6,6 +6,8 @@ import { DPSAV } from '../types/SAVTypes/DPSAV'
 import { G1SAV } from '../types/SAVTypes/G1SAV'
 import { G2SAV } from '../types/SAVTypes/G2SAV'
 import { G3SAV } from '../types/SAVTypes/G3SAV'
+import { LASAV } from '../types/SAVTypes/Gen8/LASAV'
+import { SwShSAV } from '../types/SAVTypes/Gen8/SwShSAV'
 import { HGSSSAV } from '../types/SAVTypes/HGSSSAV'
 import { ORASSAV } from '../types/SAVTypes/ORASSAV'
 import { PtSAV } from '../types/SAVTypes/PtSAV'
@@ -16,23 +18,27 @@ import { USUMSAV } from '../types/SAVTypes/USUMSAV'
 import { SAVClass } from '../types/SAVTypes/util'
 import { XYSAV } from '../types/SAVTypes/XYSAV'
 
+const OFFICIAL_SAVE_TYPES = [
+  G1SAV,
+  G2SAV,
+  G3SAV,
+  DPSAV,
+  PtSAV,
+  HGSSSAV,
+  BWSAV,
+  BW2SAV,
+  XYSAV,
+  ORASSAV,
+  SMSAV,
+  USUMSAV,
+  SwShSAV,
+  LASAV,
+]
+const EXTRA_SAVE_TYPES = [G3RRSAV, G3UBSAV]
+
 export const defaultSettings: Settings = {
   enabledSaveTypes: Object.fromEntries(
-    [
-      G1SAV,
-      G2SAV,
-      G3SAV,
-      DPSAV,
-      PtSAV,
-      HGSSSAV,
-      BWSAV,
-      BW2SAV,
-      XYSAV,
-      ORASSAV,
-      SMSAV,
-      USUMSAV,
-      G3RRSAV,
-    ].map((savetype) => [savetype.saveTypeID, true])
+    [...OFFICIAL_SAVE_TYPES, ...EXTRA_SAVE_TYPES].map((savetype) => [savetype.saveTypeID, true])
   ),
   enabledPlugins: {},
   saveCardSize: 180,
@@ -121,6 +127,12 @@ export const appInfoReducer: Reducer<AppInfoState, AppInfoAction> = (
             officialSaveTypeIDs.includes(saveTypeID) || extraSaveTypeIDs.includes(saveTypeID)
         )
       )
+      state.officialSaveTypes.forEach((st) => {
+        if (!(st.saveTypeID in enabled)) {
+          enabled[st.saveTypeID] = true
+        }
+      })
+      console.log(enabled)
 
       return { ...state, settings: { ...payload, enabledSaveTypes: enabled }, settingsLoaded: true }
     }
@@ -145,21 +157,8 @@ export const appInfoReducer: Reducer<AppInfoState, AppInfoAction> = (
 export const appInfoInitialState: AppInfoState = {
   settings: defaultSettings,
   settingsLoaded: false,
-  officialSaveTypes: [
-    G1SAV,
-    G2SAV,
-    G3SAV,
-    DPSAV,
-    PtSAV,
-    HGSSSAV,
-    BWSAV,
-    BW2SAV,
-    XYSAV,
-    ORASSAV,
-    SMSAV,
-    USUMSAV,
-  ],
-  extraSaveTypes: [G3RRSAV, G3UBSAV],
+  officialSaveTypes: OFFICIAL_SAVE_TYPES,
+  extraSaveTypes: EXTRA_SAVE_TYPES,
 }
 
 export const AppInfoContext = createContext<

@@ -1,101 +1,115 @@
 import { bytesToUint32LittleEndian } from '../byteLogic'
 import { SCXorShift32 } from './SCXorShift32'
 
-export class SCBlock {
+export type SCBoolBlock = {
   key: number
-  type?: number
-  raw?: Uint8Array
-  subtype?: number
+  type: number
+  raw?: undefined
+  subtype?: undefined
+  blockType: 'bool'
+}
 
-  constructor(key: number, type?: number, raw?: Uint8Array, subtype?: number) {
-    this.key = key
-    this.type = type
-    this.raw = raw
-    this.subtype = subtype
-  }
+export type SCObjectBlock = {
+  key: number
+  type: number
+  raw: ArrayBuffer
+  subtype?: undefined
+  blockType: 'object'
+}
 
-  public static readFromOffset(
-    data: Uint8Array,
-    offset: number
-  ): { block: SCBlock; newOffset: number } {
-    const key = bytesToUint32LittleEndian(data, offset)
-    offset += 4
-    return this.readFromOffsetWithKey(data, key, offset)
-  }
+export type SCArrayBlock = {
+  key: number
+  type?: undefined
+  raw: ArrayBuffer
+  subtype: number
+  blockType: 'array'
+}
 
-  public static readFromOffsetWithKey(
-    data: Uint8Array,
-    key: number,
-    offset: number
-  ): { block: SCBlock; newOffset: number } {
-    const xk = new SCXorShift32(key)
-    const next = xk.Next()
-    const type = (data[offset++] ^ next) & 0xff
-    // console.log(`offset: ${offset}; key: ${key}; next: ${next}`)
+export type SCValueBlock = {
+  key: number
+  type: number
+  raw: ArrayBuffer
+  subtype?: undefined
+  blockType: 'value'
+}
 
-    let block: SCBlock
-    if (key === 0x874da6fa) {
-      console.log('trainer block')
-    }
+export type SCBlock = SCBoolBlock | SCObjectBlock | SCArrayBlock | SCValueBlock
 
-    switch (type) {
-      case 1:
-      case 2:
-      case 3:
-        // Bool1, Bool2, Bool3
-        block = new SCBlock(key, type)
-        break
-      case 4: {
-        // Object
-        const numBytes = bytesToUint32LittleEndian(data, offset) ^ xk.Next32()
-        offset += 4
+export function buildSCBlock(
+  data: Uint8Array,
+  offset: number
+): { block: SCBlock; newOffset: number } {
+  const key = bytesToUint32LittleEndian(data, offset)
+  offset += 4
 
-        const arr = data.slice(offset, offset + numBytes)
-        offset += numBytes
+  const xk = new SCXorShift32(key)
+  const next = xk.Next()
+  const type = (data[offset++] ^ next) & 0xff
 
-        for (let i = 0; i < arr.length; i++) {
-          arr[i] ^= xk.Next()
-        }
+  switch (type) {
+    case 1:
+    case 2:
+    case 3:
+      // Bool1, Bool2, Bool3
 
-        block = new SCBlock(key, type, arr)
-        break
+      return {
+        block: { key, type, blockType: 'bool' },
+        newOffset: offset,
       }
-      case 5: {
-        // Array
-        const numEntries = bytesToUint32LittleEndian(data, offset) ^ xk.Next32()
-        offset += 4
+    case 4: {
+      // Object
+      const numBytes = bytesToUint32LittleEndian(data, offset) ^ xk.Next32()
+      offset += 4
 
-        const subtype = (data[offset++] ^ xk.Next()) & 0xff
-        const numBytes = numEntries * getTypeSize(subtype)
+      const arr = data.slice(offset, offset + numBytes)
+      offset += numBytes
 
-        const arr = data.slice(offset, offset + numBytes)
-        offset += numBytes
-
-        for (let i = 0; i < arr.length; i++) {
-          arr[i] ^= xk.Next()
-        }
-
-        block = new SCBlock(key, undefined, arr, subtype)
-        break
+      for (let i = 0; i < arr.length; i++) {
+        arr[i] ^= xk.Next()
       }
 
-      default: {
-        // Single Value Storage
-
-        const numBytes = getTypeSize(type)
-        const arr = data.slice(offset, offset + numBytes)
-        offset += numBytes
-
-        for (let i = 0; i < arr.length; i++) {
-          arr[i] ^= xk.Next()
-        }
-
-        block = new SCBlock(key, type, arr)
-        break
+      return {
+        block: { key, type, raw: arr.buffer, blockType: 'object' },
+        newOffset: offset,
       }
     }
+    case 5: {
+      // Array
+      const numEntries = bytesToUint32LittleEndian(data, offset) ^ xk.Next32()
+      offset += 4
 
-    return { block, newOffset: offset }
+      const subtype = (data[offset++] ^ xk.Next()) & 0xff
+      const numBytes = numEntries * getTypeSize(subtype)
+
+      const arr = data.slice(offset, offset + numBytes)
+      offset += numBytes
+
+      for (let i = 0; i < arr.length; i++) {
+        arr[i] ^= xk.Next()
+      }
+
+      return {
+        block: { key, raw: arr.buffer, subtype, blockType: 'array' },
+        newOffset: offset,
+      }
+    }
+
+    default: {
+      // Single Value Storage
+
+      const numBytes = getTypeSize(type)
+      const arr = data.slice(offset, offset + numBytes)
+      offset += numBytes
+
+      for (let i = 0; i < arr.length; i++) {
+        arr[i] ^= xk.Next()
+      }
+
+      return {
+        block: { key, type, raw: arr.buffer, blockType: 'value' },
+        newOffset: offset,
+      }
+    }
   }
 }
 
