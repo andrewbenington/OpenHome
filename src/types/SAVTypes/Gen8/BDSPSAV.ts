@@ -5,25 +5,43 @@ import { SCBlock, SCObjectBlock } from '../../../util/SwishCrypto/SCBlock'
 import { OHPKM } from '../../pkm/OHPKM'
 import { isRestricted } from '../../TransferRestrictions'
 import { PathData } from '../path'
-import { Box } from '../SAV'
-import { G8BlockName, G8SAV } from './G8SAV'
+import { Box, BoxCoordinates, SAV } from '../SAV'
 
 const SAVE_SIZE_BYTES = 1575705
 const BOX_COUNT = 40
 const BOX_NAME_LENGTH = 0x22
 
-export class BDSPSAV extends G8SAV<PB8> {
+export class BDSPSAV implements SAV<PB8> {
   static boxSizeBytes = PB8.getBoxSize() * 30
   static pkmType = PB8
   static saveTypeAbbreviation = 'BDSP'
   static saveTypeName = 'Pokémon Brilliant Diamond/Shining Pearl'
   static saveTypeID = 'BDSPSAV'
 
+  filePath: PathData
+  fileCreated?: Date
+
+  origin: GameOfOrigin = 0
+  isPlugin = false
+
+  boxRows = 5
+  boxColumns = 6
+
+
+  money: number = 0
+  name: string = ''
+  tid: number = 0
+  sid: number = 0
+  displayID: string = ''
+
+  currentPCBox: number = 0 // TODO: Gen 8 current box
+
   myStatusBlock: MyStatusBlock
   boxes: Box<PB8>[] = []
 
   constructor(path: PathData, bytes: Uint8Array) {
-    super(path, bytes)
+    this.bytes = bytes
+    this.filePath = path
 
     this.myStatusBlock = new MyStatusBlock(bytes)
 
@@ -35,7 +53,7 @@ export class BDSPSAV extends G8SAV<PB8> {
     this.displayID = this.tid.toString().padStart(6, '0')
     this.origin = this.myStatusBlock.getGame()
 
-    const boxNamesBlock = this.getBoxNamesBlock()
+    const boxNamesBlock = new BoxLayoutBDSP(this.bytes)
 
     const boxBlock = this.getBlockMust<SCObjectBlock>('Box', 'object')
     this.boxes = Array(this.getBoxCount())
@@ -74,40 +92,6 @@ export class BDSPSAV extends G8SAV<PB8> {
   buildPKM(bytes: ArrayBuffer, encrypted: boolean): PB8 {
     return new PB8(bytes, encrypted)
   }
-
-  getBlock(blockName: G8BlockName | 'MyStatus'): SCBlock | undefined {
-    switch (blockName) {
-      case 'BoxLayout': {
-        return {
-          blockType: 'object',
-          key: 0,
-          raw: this.bytes.slice(0x148aa, 0x148aa + 0x64a).buffer,
-          type: 0,
-        }
-      }
-      case 'MyStatus': {
-        return {
-          blockType: 'object',
-          key: 0,
-          raw: this.bytes.slice(0x148aa, 0x148aa + 0x64a).buffer,
-          type: 0,
-        }
-      }
-    }
-  }
-
-  getBlockMust<T extends SCBlock = SCBlock>(blockName: G8BlockName, type?: T['blockType']): T {
-    const block = this.getBlock(blockName)
-    if (!block) {
-      throw Error(`Missing block ${blockName}`)
-    }
-    if (type && block.blockType !== type) {
-      throw Error(`Block ${blockName} is type ${block.blockType} (expected ${type})`)
-    }
-    return block as T
-  }
-
-  getBoxNamesBlock = () => new BoxLayoutBDSP(this.bytes)
 
   getMonBoxSizeBytes(): number {
     return PB8.getBoxSize()
