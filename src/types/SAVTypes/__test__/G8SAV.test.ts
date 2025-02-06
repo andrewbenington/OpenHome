@@ -3,13 +3,11 @@ import { resolve } from 'path'
 import { utf16BytesToString } from 'pokemon-files'
 import { GameOfOriginData } from 'pokemon-resources'
 import { SwishCrypto } from '../../../util/SwishCrypto/SwishCrypto'
-import { BDSPSAV } from '../Gen8/BDSPSAV'
 import { LASAV } from '../Gen8/LASAV'
 import { SwShSAV } from '../Gen8/SwShSAV'
 import { PathData } from '../path'
 
 describe('gen 8 save files', () => {
-  // let ultraSunSave: USUMSAV
   let saveBytes: Uint8Array
 
   beforeAll(() => {
@@ -45,22 +43,6 @@ describe('gen 8 save files', () => {
     const arceusSave = new LASAV(parsedPath, saveBytes)
     console.log(arceusSave.name)
     console.log(arceusSave.currentPCBox)
-
-    savePath = resolve(__dirname, './SAVFILES/brilliantdiamond.bin')
-
-    saveBytes = new Uint8Array(readFileSync(savePath))
-
-    parsedPath = {
-      raw: './SAVFILES/brilliantdiamond.bin',
-      name: 'brilliantdiamond.bin',
-      dir: './SAVFILES',
-      ext: '',
-      separator: '/',
-    }
-
-    const bdSave = new BDSPSAV(parsedPath, saveBytes)
-    console.log(bdSave.name)
-    console.log(bdSave.currentPCBox)
   })
 
   test('SwishCrypto hash matches', () => {
@@ -87,19 +69,7 @@ describe('gen 8 save files', () => {
     if (trainerBlock?.raw) {
       console.log(utf16BytesToString(trainerBlock.raw, 0, 24))
     }
-
-    // const toLog: Record<string, Uint8Array> = {}
-
-    // blocks.forEach((block, i) => {
-    //   if (block.raw) {
-    //     toLog[`block${i + 1}`] = block.raw
-    //   }
-    // })
-    // logHashes(toLog)
   })
-  // test('first mon is as expected', () => {
-  //   expect(ultraSunSave.boxes[0].pokemon[0]?.nickname === 'Bulbasaur')
-  // })
 })
 
 function toHexString(byteArray: Uint8Array) {
