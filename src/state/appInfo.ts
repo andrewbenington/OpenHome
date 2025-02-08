@@ -127,6 +127,7 @@ export const appInfoReducer: Reducer<AppInfoState, AppInfoAction> = (
             officialSaveTypeIDs.includes(saveTypeID) || extraSaveTypeIDs.includes(saveTypeID)
         )
       )
+
       state.officialSaveTypes.forEach((st) => {
         if (!(st.saveTypeID in enabled)) {
           enabled[st.saveTypeID] = true

@@ -40,10 +40,12 @@ export function buildSCBlock(
 ): { block: SCBlock; newOffset: number } {
   const dataView = new DataView(data.buffer)
   const key = dataView.getUint32(offset, true)
+
   offset += 4
 
   const xk = new SCXorShift32(key)
   const type = (data[offset] ^ xk.Next()) & 0xff
+
   offset += 1
 
   switch (type) {
@@ -59,9 +61,11 @@ export function buildSCBlock(
     case 4: {
       // Object
       const numBytes = dataView.getUint32(offset, true) ^ xk.Next32()
+
       offset += 4
 
       const arr = data.slice(offset, offset + numBytes)
+
       offset += numBytes
 
       for (let i = 0; i < arr.length; i++) {
@@ -76,12 +80,14 @@ export function buildSCBlock(
     case 5: {
       // Array
       const numEntries = dataView.getUint32(offset, true) ^ xk.Next32()
+
       offset += 4
 
       const subtype = (data[offset++] ^ xk.Next()) & 0xff
       const numBytes = numEntries * getTypeSize(subtype)
 
       const arr = data.slice(offset, offset + numBytes)
+
       offset += numBytes
 
       for (let i = 0; i < arr.length; i++) {
@@ -99,6 +105,7 @@ export function buildSCBlock(
 
       const numBytes = getTypeSize(type)
       const arr = data.slice(offset, offset + numBytes)
+
       offset += numBytes
 
       for (let i = 0; i < arr.length; i++) {
@@ -125,22 +132,26 @@ export function writeSCBlock(block: SCBlock, bytes: Uint8Array, offset: number):
   const xk = new SCXorShift32(block.key)
   const next = xk.Next()
   const typeXored = (block.type ^ next) & 0xff
+
   dataView.setUint8(currentOffset, typeXored)
   currentOffset += 1
 
   if (block.blockType === 'object') {
     // write data size XORed
     const lengthXored = (block.raw.byteLength ^ xk.Next32()) & 0xffffffff
+
     dataView.setUint32(currentOffset, lengthXored, true)
     currentOffset += 4
   } else if (block.blockType === 'array') {
     // write array length XORed
     const entryCount = block.raw.byteLength / getTypeSize(block.subtype)
+
     dataView.setUint32(currentOffset, (entryCount ^ xk.Next32()) & 0xffffffff, true)
     currentOffset += 4
 
     // write subtype XORed
     const subtypeXored = (block.subtype ^ xk.Next()) & 0xff
+
     dataView.setUint8(currentOffset, subtypeXored)
     currentOffset += 1
   }

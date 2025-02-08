@@ -46,6 +46,7 @@ describe('gen 8 save files', () => {
 
     const monPath = resolve('src/types/pkm/__test__/PKMFiles/Gen4/magmortar.pkm')
     const monBytes = new Uint8Array(readFileSync(monPath))
+
     magmortar = new PK4(monBytes.buffer)
   })
 
@@ -53,11 +54,13 @@ describe('gen 8 save files', () => {
     const storedHash = saveBytes.slice(-SwishCrypto.SIZE_HASH)
     const dataBeforeHash = saveBytes.slice(0, -SwishCrypto.SIZE_HASH)
     const computedHash = SwishCrypto.computeHash(dataBeforeHash)
+
     expect(toHexString(storedHash)).toEqual(toHexString(computedHash))
   })
 
   test('SwishCrypto hash matches', () => {
     const valid = SwishCrypto.getIsHashValid(saveBytes)
+
     expect(valid)
   })
 
@@ -67,6 +70,7 @@ describe('gen 8 save files', () => {
     expect(swordSave.boxes[17].name).toBe('huevos sorpresa')
 
     const flapple = swordSave.boxes[1].pokemon[3]
+
     expect(flapple?.nickname).toBe('Flapple')
     expect(flapple?.canGigantamax).toBe(true)
     expect(flapple?.ball).toBe(Ball.Premier)
@@ -115,22 +119,27 @@ describe('gen 8 save files', () => {
 
   test('reencrypt', () => {
     const reencrypted = SwishCrypto.encrypt(swordSave.scBlocks, swordSave.bytes.length)
+
     expect(SwishCrypto.getIsHashValid(reencrypted)).toBe(true)
     const decrypted = new SwShSAV(swordPath, reencrypted)
+
     expect(decrypted.name).toBe(swordSave.name)
 
     const flapple = decrypted.boxes[1].pokemon[3]
+
     expect(flapple?.nickname).toBe('Flapple')
     expect(flapple?.canGigantamax).toBe(true)
     expect(flapple?.ball).toBe(Ball.Premier)
     expect(flapple?.getLevel()).toBe(100)
 
     const mon = swordSave.boxes[1].pokemon[3]
+
     if (!mon) {
       fail()
     }
 
     const ohpkm = new OHPKM(mon)
+
     ohpkm.nickname = 'NEW NAME'
     swordSave.boxes[1].pokemon[3] = ohpkm
     swordSave.updatedBoxSlots.push({ box: 1, index: 3 })
@@ -138,16 +147,19 @@ describe('gen 8 save files', () => {
     swordSave.prepareBoxesAndGetModified()
     const modified = new SwShSAV(swordPath, swordSave.bytes)
     const modifiedFlapple = modified.boxes[1].pokemon[3]
+
     expect(modifiedFlapple?.nickname).toBe('NEW NAME')
   })
 
   test('saveBoxes', () => {
     const mon = swordSave.boxes[1].pokemon[3]
+
     if (!mon) {
       fail()
     }
 
     const ohpkm = new OHPKM(mon)
+
     ohpkm.nickname = 'NEW NAME'
     swordSave.boxes[1].pokemon[3] = ohpkm
     swordSave.updatedBoxSlots.push({ box: 1, index: 3 })
@@ -155,6 +167,7 @@ describe('gen 8 save files', () => {
     swordSave.prepareBoxesAndGetModified()
     const modified = new SwShSAV(swordPath, swordSave.bytes)
     const modifiedFlapple = modified.boxes[1].pokemon[3]
+
     expect(modifiedFlapple?.nickname).toBe('NEW NAME')
     expect(SwishCrypto.getIsHashValid(swordSave.bytes)).toBe(true)
 
@@ -163,11 +176,13 @@ describe('gen 8 save files', () => {
 
   test('saveBoxes arceus', () => {
     const mon = arceusSave.boxes[1].pokemon[3]
+
     if (!mon) {
       fail()
     }
 
     const ohpkm = new OHPKM(mon)
+
     ohpkm.nickname = 'NEW NAME'
     arceusSave.boxes[1].pokemon[3] = ohpkm
     arceusSave.updatedBoxSlots.push({ box: 1, index: 3 })
@@ -178,10 +193,12 @@ describe('gen 8 save files', () => {
     arceusSave.prepareBoxesAndGetModified()
     const modified = new LASAV(swordPath, arceusSave.bytes)
     const modifiedFlapple = modified.boxes[1].pokemon[3]
+
     expect(modifiedFlapple?.nickname).toBe('NEW NAME')
     expect(SwishCrypto.getIsHashValid(arceusSave.bytes)).toBe(true)
 
     const modifiedMagmortar = modified.boxes[2].pokemon[8]
+
     expect(modifiedMagmortar?.nickname).toBe('MAGMORTAR')
 
     writeFileSync('main', arceusSave.bytes)

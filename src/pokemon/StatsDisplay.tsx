@@ -77,6 +77,7 @@ const StatsDisplay = (props: { mon: PKMInterface }) => {
       )
     }
     const items = [createMenuItem('Stats')]
+
     if (mon.stats) {
       items.push(createMenuItem('Stored Stats'))
     }

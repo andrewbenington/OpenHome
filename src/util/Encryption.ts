@@ -385,6 +385,7 @@ export function sha1Digest(data: Uint8Array) {
 
 export function sha256Digest(data: Uint8Array[]) {
   const words = cryptolib.WordArray.create(data[0])
+
   for (const nextData of data.slice(1)) {
     words.concat(cryptolib.WordArray.create(nextData))
   }

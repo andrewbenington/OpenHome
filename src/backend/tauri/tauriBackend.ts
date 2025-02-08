@@ -137,6 +137,7 @@ export const TauriBackend: BackendInterface = {
     const filePath = await save({
       defaultPath: await path.join(await path.downloadDir(), suggestedName),
     })
+
     if (!filePath) return E.right(null)
 
     return TauriInvoker.writeFileBytes(filePath, bytes)

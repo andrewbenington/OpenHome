@@ -34,6 +34,7 @@ function computeHash(data: Uint8Array): Uint8Array {
 function getIsHashValid(data: Uint8Array) {
   const storedHash = data.slice(-SIZE_HASH)
   const computed = computeHash(data.slice(0, -SIZE_HASH))
+
   return toHexString(storedHash) === toHexString(computed)
 }
 
@@ -46,8 +47,10 @@ function cryptStaticXorpadBytes(data: Uint8Array): Uint8Array {
   const afterXor = new Uint8Array(new ArrayBuffer(data.buffer.byteLength))
 
   let currentPos = 0
+
   do {
     const currentSlice = new BigUint64Array(data.buffer.slice(currentPos, currentPos + xp.length))
+
     for (let i = currentSlice.length - 1; i >= 0; i--) {
       currentSlice[i] ^= xp64[i]
     }
@@ -69,6 +72,7 @@ function readBlocks(data: Uint8Array): SCBlock[] {
   while (offset < data.length) {
     // console.log(`offset: ${offset}`)
     const { block, newOffset } = buildSCBlock(data, offset)
+
     result.push(block)
     offset = newOffset
   }
@@ -79,12 +83,14 @@ function readBlocks(data: Uint8Array): SCBlock[] {
 function decrypt(data: Uint8Array): SCBlock[] {
   const dataBeforeHash = data.slice(0, -SIZE_HASH)
   const dataAfterXor = cryptStaticXorpadBytes(dataBeforeHash)
+
   return readBlocks(dataAfterXor)
 }
 
 function getDecryptedRawData(blocks: SCBlock[], size: number): Uint8Array {
   const buffer = new Uint8Array(size)
   let offset = 0
+
   for (const block of blocks) {
     offset = writeSCBlock(block, buffer, offset)
   }

@@ -45,6 +45,7 @@ export class SwShSAV extends G8SAV<PK8> {
 
   getBlock(blockName: G8BlockName | keyof typeof BlockKeys): SCBlock | undefined {
     const key = this.getBlockKey(blockName)
+
     return this.scBlocks.find((b) => b.key === key)
   }
 
@@ -53,6 +54,7 @@ export class SwShSAV extends G8SAV<PK8> {
     type?: T['blockType']
   ): T {
     const block = this.getBlock(blockName)
+
     if (!block) {
       throw Error(`Missing block ${blockName}`)
     }
@@ -154,6 +156,7 @@ class TrainerBlock {
   }
   public getGame(): GameOfOrigin {
     const origin = this.dataView.getUint8(0x24)
+
     return origin === 0
       ? GameOfOrigin.Sword
       : origin === 1

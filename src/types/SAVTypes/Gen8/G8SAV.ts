@@ -48,11 +48,13 @@ export abstract class G8SAV<P extends PK8 | PB8 | PA8> implements SAV<P> {
     this.scBlocks = SwishCrypto.decrypt(bytes)
 
     const currentPCBlock = this.getBlockMust<SCValueBlock>('CurrentBox', 'value')
+
     this.currentPCBox = new DataView(currentPCBlock.raw).getUint8(0)
 
     const boxNamesBlock = new BoxNamesBlock(this.getBlockMust<SCArrayBlock>('BoxLayout', 'array'))
 
     const boxBlock = this.getBlockMust<SCObjectBlock>('Box', 'object')
+
     this.boxes = Array(this.getBoxCount())
     for (let box = 0; box < this.getBoxCount(); box++) {
       const boxName = boxNamesBlock.getBoxName(box)
@@ -123,6 +125,7 @@ export abstract class G8SAV<P extends PK8 | PB8 | PA8> implements SAV<P> {
             mon.refreshChecksum()
             const monBuffer = new Uint8Array(this.getMonBoxSizeBytes())
             const pcBytes = mon.toPCBytes()
+
             monBuffer.set(new Uint8Array(pcBytes), 0)
             blockBuffer.set(monBuffer, writeIndex)
           }

@@ -26,6 +26,7 @@ export class LASAV extends G8SAV<PA8> {
     this.name = this.myStatusBlock.getName()
 
     const fullTrainerID = this.myStatusBlock.getFullID()
+
     this.tid = fullTrainerID % 1000000
     this.sid = this.myStatusBlock.getSID()
     this.displayID = this.tid.toString().padStart(6, '0')
@@ -46,6 +47,7 @@ export class LASAV extends G8SAV<PA8> {
 
   getBlock(blockName: G8BlockName | keyof typeof BlockKeys): SCBlock | undefined {
     const key = this.getBlockKey(blockName)
+
     return this.scBlocks.find((b) => b.key === key)
   }
 
@@ -54,6 +56,7 @@ export class LASAV extends G8SAV<PA8> {
     type?: T['blockType']
   ): T {
     const block = this.getBlock(blockName)
+
     if (!block) {
       throw Error(`Missing block ${blockName}`)
     }

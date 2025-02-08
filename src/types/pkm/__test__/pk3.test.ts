@@ -12,6 +12,7 @@ test('gen 3 stat calculations', () => {
   const fileBytes = fs.readFileSync(file)
   const bytes = new Uint8Array(fileBytes)
   const mon = bytesToPKM(bytes, 'pkm')
+
   expect(mon.getStats()).toStrictEqual({
     hp: 282,
     atk: 359,
@@ -39,6 +40,7 @@ const slowpokeOH = bytesToPKM(
 
 test('gen 3 EVs are updated', () => {
   const emeraldPKM = new PK3(blazikenOH)
+
   // mimicking ev reduction berries and ev gain
   emeraldPKM.evs = {
     atk: 252,
@@ -61,6 +63,7 @@ test('gen 3 EVs are updated', () => {
 
 test('gen 3 ribbons are updated', () => {
   const emeraldPKM = new PK3(blazikenOH)
+
   // gaining Gen 3 ribbons
   emeraldPKM.ribbons = [
     ...emeraldPKM.ribbons,
@@ -79,6 +82,7 @@ test('gen 3 ribbons are updated', () => {
 
 test('gen 3 contest stats are updated', () => {
   const emeraldPKM = new PK3(blazikenOH)
+
   // gaining cool contest points
   emeraldPKM.contest = {
     cool: 30,
@@ -103,21 +107,25 @@ test('gen 3 conversion to OHPKM and back is lossless', () => {
   const ohPKM = new OHPKM(blazikenGen3)
   // gaining cool contest points
   const gen3PKM = new PK3(ohPKM)
+
   expect(blazikenGen3.toBytes()).toEqual(gen3PKM.toBytes())
 })
 
 test('pk3 and ohpkm have the same gen345Lookup key', () => {
   const ohPKM = new OHPKM(blazikenGen3)
+
   expect(getMonGen345Identifier(ohPKM)).toEqual(getMonGen345Identifier(blazikenGen3))
 })
 
 test('gen 6+ nickname accuracy', () => {
   const converted = new PK3(slowpokeOH)
+
   expect(converted.nickname).toBe(slowpokeOH.nickname)
 })
 
 test('gen 6+ shiny accuracy', () => {
   const converted = new PK3(slowpokeOH)
+
   if (!slowpokeOH.personalityValue) {
     throw Error('mon has no personality value')
   }
@@ -126,5 +134,6 @@ test('gen 6+ shiny accuracy', () => {
 
 test('gen 6+ nature accuracy', () => {
   const converted = new PK3(slowpokeOH)
+
   expect(converted.nature).toBe(slowpokeOH.nature)
 })

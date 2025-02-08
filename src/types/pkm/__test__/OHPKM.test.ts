@@ -24,12 +24,15 @@ describe('gen345 identifier', () => {
 
   test('lookup should be the same for 3/4/5', () => {
     const ohpkm = new OHPKM(luxray)
+
     expect(getMonGen345Identifier(luxray)).toBe(getMonGen345Identifier(ohpkm))
     const pk3 = new PK3(ohpkm)
+
     expect(getMonGen345Identifier(pk3)).toBe(getMonGen345Identifier(ohpkm))
     const pk5 = new PK5(ohpkm)
     const pv1 = generatePersonalityValuePreservingAttributes(ohpkm)
     const pv2 = generatePersonalityValuePreservingAttributes(pk5)
+
     expect(pv2).toBe(pv1)
     expect(getMonGen345Identifier(pk5)).toBe(getMonGen345Identifier(ohpkm))
   })
@@ -42,6 +45,7 @@ const slowpokeOH = bytesToPKM(
 
 test('converted ohpkm always has the same gen1 lookup key', () => {
   const lookup = getMonGen12Identifier(slowpokeOH)
+
   for (let i = 0; i < 100; i++) {
     expect(lookup).toEqual(getMonGen12Identifier(new PK1(slowpokeOH)))
   }
@@ -49,6 +53,7 @@ test('converted ohpkm always has the same gen1 lookup key', () => {
 
 test('converted ohpkm always has the same gen2 lookup key', () => {
   const lookup = getMonGen12Identifier(slowpokeOH)
+
   for (let i = 0; i < 100; i++) {
     expect(lookup).toEqual(getMonGen12Identifier(new PK2(slowpokeOH)))
   }
@@ -56,6 +61,7 @@ test('converted ohpkm always has the same gen2 lookup key', () => {
 
 test('converted ohpkm always has the same gen3 lookup key', () => {
   const lookup = getMonGen345Identifier(slowpokeOH)
+
   for (let i = 0; i < 100; i++) {
     expect(lookup).toEqual(getMonGen345Identifier(new PK3(slowpokeOH)))
   }
@@ -63,6 +69,7 @@ test('converted ohpkm always has the same gen3 lookup key', () => {
 
 test('converted ohpkm always has the same gen4 lookup key', () => {
   const lookup = getMonGen345Identifier(slowpokeOH)
+
   for (let i = 0; i < 100; i++) {
     expect(lookup).toEqual(getMonGen345Identifier(new PK4(slowpokeOH)))
   }

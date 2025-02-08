@@ -540,6 +540,7 @@ export function shinyLeafValues(shinyLeafNumber: number) {
 export function getHeightCalculated(mon: PKMInterface) {
   if (mon.height !== undefined && mon.heightDeviation) {
     const deviation = (mon.height / 255) * 0.40000004 + (1 - mon.heightDeviation)
+
     return PokemonData[mon.dexNum].formes[mon.formeNum].height * 100 * deviation
   }
   return undefined
@@ -548,6 +549,7 @@ export function getHeightCalculated(mon: PKMInterface) {
 export function getWeightCalculated(mon: PKMInterface) {
   if (mon.weight !== undefined && mon.weightDeviation) {
     const deviation = (mon.weight / 255) * 0.40000004 + (1 - mon.weightDeviation)
+
     return PokemonData[mon.dexNum].formes[mon.formeNum].weight * 10 * deviation
   }
   return undefined
