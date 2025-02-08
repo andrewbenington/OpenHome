@@ -27,7 +27,6 @@ import {
   getMonGen12Identifier,
   getMonGen345Identifier,
 } from 'src/util/Lookup'
-import { get16BitChecksumLittleEndian } from 'src/util/byteLogic'
 import DynamaxLevel from '../components/DynamaxLevel'
 import ShinyLeaves from '../components/ShinyLeaves'
 import TypeIcon from '../components/TypeIcon'
@@ -35,17 +34,25 @@ import { isRestricted } from '../types/TransferRestrictions'
 import { PKMInterface } from '../types/interfaces'
 import { OHPKM } from '../types/pkm/OHPKM'
 import {
+  getHeightCalculated,
   getHiddenPowerGen2,
   getHiddenPowerPower,
   getHiddenPowerType,
+  getWeightCalculated,
   shinyLeafValues,
 } from '../types/pkm/util'
 import { getFlagsInRange } from '../util/byteLogic'
 import AttributeRow from './AttributeRow'
 import AttributeRowExpand from './AttributeRowExpand'
 
+const HG_TO_LB = 0.2204623
+const CM_TO_IN = 0.3937008
+
 const OtherDisplay = (props: { mon: PKMInterface }) => {
   const { mon } = props
+
+  const heightCalculated = getHeightCalculated(mon) ?? 0
+  const weightCalculated = getWeightCalculated(mon) ?? 0
 
   return (
     <div style={{ overflow: 'hidden', height: '100%' }}>
@@ -298,6 +305,32 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
           mon.obedienceLevel !== undefined && (
             <AttributeRow label="Obedience" value={mon.obedienceLevel.toString()} />
           )}
+        {mon.height !== undefined && mon.weight !== undefined && (
+          <>
+            <AttributeRow label="Height (Relative)" value={mon.height.toString()} />
+            <AttributeRow label="Weight (Relative)" value={mon.weight.toString()} />
+          </>
+        )}
+        {mon.heightAbsolute !== undefined && mon.weightAbsolute !== undefined && (
+          <>
+            <AttributeRow
+              label="Height (Absolute)"
+              value={`${Math.floor((mon.heightAbsolute * CM_TO_IN) / 12)}'${Math.round((mon.heightAbsolute * CM_TO_IN) % 12)}" / ${mon.heightAbsolute.toPrecision(5)} cm`}
+            />
+            <AttributeRow
+              label="Height (Calculated)"
+              value={`${Math.floor((heightCalculated * CM_TO_IN) / 12)}'${Math.round((heightCalculated * CM_TO_IN) % 12)}" / ${heightCalculated.toPrecision(5)} cm`}
+            />
+            <AttributeRow
+              label="Weight (Absolute)"
+              value={`${(mon.weightAbsolute * HG_TO_LB).toPrecision(5)} lb / ${(mon.weightAbsolute / 10).toPrecision(5)} kg`}
+            />
+            <AttributeRow
+              label="Weight (Calculated)"
+              value={`${(weightCalculated * HG_TO_LB).toPrecision(5)} lb / ${(weightCalculated / 10).toPrecision(5)} kg`}
+            />
+          </>
+        )}
         {!isRestricted(GEN2_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
           mon.dvs !== undefined && (
             <AttributeRow
@@ -309,20 +342,19 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
           mon.personalityValue !== undefined && (
             <AttributeRow label="Gen 3/4/5 ID" value={getMonGen345Identifier(mon)} />
           )}
-        {mon.checksum !== undefined && (
+        {mon.formArgument !== undefined && (
+          <AttributeRow label="Form Argument" value={mon.formArgument.toString()} />
+        )}
+        {mon.checksum !== undefined && mon.calcChecksum && (
           <>
             <AttributeRow label="Checksum">
               <code>{`0x${mon.checksum.toString(16).padStart(4, '0')}`}</code>
             </AttributeRow>
-            <AttributeRow label="Calced Checksum">
-              <code>{`0x${get16BitChecksumLittleEndian(
-                mon.toBytes(),
-                0x08,
-                mon.toBytes().byteLength
-              )
-                .toString(16)
-                .padStart(4, '0')}`}</code>
-            </AttributeRow>
+            {'calcChecksum' in mon && (
+              <AttributeRow label="Calced Checksum">
+                <code>{`0x${mon.calcChecksum().toString(16).padStart(4, '0')}`}</code>
+              </AttributeRow>
+            )}
           </>
         )}
         {mon instanceof OHPKM && (

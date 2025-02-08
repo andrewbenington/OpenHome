@@ -1,17 +1,9 @@
 import { PA8 } from 'pokemon-files'
 import { GameOfOrigin } from 'pokemon-resources'
 import { LA_TRANSFER_RESTRICTIONS } from '../../../consts/TransferRestrictions'
-import {
-  SCArrayBlock,
-  SCBlock,
-  SCObjectBlock,
-  SCValueBlock,
-} from '../../../util/SwishCrypto/SCBlock'
-import { SwishCrypto } from '../../../util/SwishCrypto/SwishCrypto'
-import { OHPKM } from '../../pkm/OHPKM'
+import { SCArrayBlock, SCBlock } from '../../../util/SwishCrypto/SCBlock'
 import { isRestricted } from '../../TransferRestrictions'
 import { PathData } from '../path'
-import { Box } from '../SAV'
 import { BoxNamesBlock } from './BoxNamesBlock'
 import { G8BlockName, G8SAV } from './G8SAV'
 import { MyStatusBlock } from './MyStatusBlock'
@@ -26,19 +18,9 @@ export class LASAV extends G8SAV<PA8> {
   static saveTypeID = 'LASAV'
 
   myStatusBlock: MyStatusBlock
-  scBlocks: SCBlock[]
-
-  boxes: Box<PA8>[] = []
 
   constructor(path: PathData, bytes: Uint8Array) {
     super(path, bytes)
-
-    const dataBeforeHash = bytes.slice(0, -SwishCrypto.SIZE_HASH)
-    const dataAfterXor = SwishCrypto.cryptStaticXorpadBytes(dataBeforeHash)
-    this.scBlocks = SwishCrypto.readBlocks(dataAfterXor)
-
-    const currentPCBlock = this.getBlockMust<SCValueBlock>('CurrentBox', 'value')
-    this.currentPCBox = new DataView(currentPCBlock.raw).getUint8(0) + 1
 
     this.myStatusBlock = new MyStatusBlock(this.getBlockMust('MyStatus', 'object'))
     this.name = this.myStatusBlock.getName()
@@ -48,40 +30,13 @@ export class LASAV extends G8SAV<PA8> {
     this.sid = this.myStatusBlock.getSID()
     this.displayID = this.tid.toString().padStart(6, '0')
     this.origin = GameOfOrigin.LegendsArceus
-
-    const boxNamesBlock = this.getBoxNamesBlock()
-
-    const boxBlock = this.getBlockMust<SCObjectBlock>('Box', 'object')
-    this.boxes = Array(this.getBoxCount())
-    for (let box = 0; box < this.getBoxCount(); box++) {
-      const boxName = boxNamesBlock.getBoxName(box)
-
-      this.boxes[box] = new Box(boxName, 30)
-    }
-
-    for (let box = 0; box < this.getBoxCount(); box++) {
-      for (let monIndex = 0; monIndex < 30; monIndex++) {
-        try {
-          const startByte = this.getBoxSizeBytes() * box + this.getMonBoxSizeBytes() * monIndex
-          const endByte = startByte + this.getMonBoxSizeBytes()
-          const monData = boxBlock.raw.slice(startByte, endByte)
-          const mon = this.buildPKM(monData, true)
-
-          if (mon.gameOfOrigin !== 0 && mon.dexNum !== 0) {
-            this.boxes[box].pokemon[monIndex] = mon
-          }
-        } catch (e) {
-          console.error(e)
-        }
-      }
-    }
   }
 
   getBoxCount(): number {
     return 24
   }
 
-  buildPKM(bytes: ArrayBuffer, encrypted: boolean): PA8 {
+  monConstructor(bytes: ArrayBuffer, encrypted: boolean): PA8 {
     return new PA8(bytes, encrypted)
   }
 
@@ -118,44 +73,6 @@ export class LASAV extends G8SAV<PA8> {
     return LASAV.boxSizeBytes
   }
 
-  prepareBoxesAndGetModified() {
-    const changedMonPKMs: OHPKM[] = []
-
-    // this.updatedBoxSlots.forEach(({ box, index }) => {
-    //   const changedMon = this.boxes[box].pokemon[index]
-
-    //   // we don't want to save OHPKM files of mons that didn't leave the save
-    //   // (and would still be PK6s)
-    //   if (changedMon instanceof OHPKM) {
-    //     changedMonPKMs.push(changedMon)
-    //   }
-    //   const writeIndex = this.pcOffset + SwShSAV.boxSizeBytes * box + PK8.getBoxSize() * index
-
-    //   // changedMon will be undefined if pokemon was moved from this slot
-    //   // and the slot was left empty
-    //   if (changedMon) {
-    //     try {
-    //       const mon = changedMon instanceof OHPKM ? new PK7(changedMon) : changedMon
-
-    //       if (mon?.gameOfOrigin && mon?.dexNum) {
-    //         mon.refreshChecksum()
-    //         this.bytes.set(new Uint8Array(mon.toPCBytes()), writeIndex)
-    //       }
-    //     } catch (e) {
-    //       console.error(e)
-    //     }
-    //   } else {
-    //     const mon = new PK8(new Uint8Array(PK8.getBoxSize()).buffer)
-
-    //     mon.checksum = 0x0204
-    //     this.bytes.set(new Uint8Array(mon.toPCBytes()), writeIndex)
-    //   }
-    // })
-    // this.bytes.set(uint16ToBytesLittleEndian(this.calculateChecksum()), this.pcChecksumOffset)
-    // this.bytes = SignWithMemeCrypto(this.bytes)
-    return changedMonPKMs
-  }
-
   supportsMon(dexNumber: number, formeNumber: number): boolean {
     return !isRestricted(LA_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)
   }
@@ -180,7 +97,7 @@ export class LASAV extends G8SAV<PA8> {
   }
 
   static includesOrigin(origin: GameOfOrigin) {
-    return origin === GameOfOrigin.Sword || origin === GameOfOrigin.Shield
+    return origin === GameOfOrigin.LegendsArceus
   }
 }
 

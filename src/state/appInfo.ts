@@ -132,7 +132,6 @@ export const appInfoReducer: Reducer<AppInfoState, AppInfoAction> = (
           enabled[st.saveTypeID] = true
         }
       })
-      console.log(enabled)
 
       return { ...state, settings: { ...payload, enabledSaveTypes: enabled }, settingsLoaded: true }
     }

@@ -46,6 +46,7 @@ const DummyBackend: BackendInterface = {
   getSettings: async () => E.left('no backend in use'),
   updateSettings: async () => E.left('no backend in use'),
   setTheme: async () => E.left('no backend in use'),
+  saveLocalFile: async () => E.left('no backend in use'),
 
   /* plugins */
   getImageData: async () => E.left('no backend in use'),

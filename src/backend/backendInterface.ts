@@ -66,6 +66,7 @@ export default interface BackendInterface {
   getSettings: () => Promise<Errorable<Settings>>
   updateSettings: (settings: Settings) => Promise<Errorable<null>>
   setTheme(appTheme: 'light' | 'dark' | 'system'): Promise<Errorable<null>>
+  saveLocalFile: (bytes: Uint8Array, suggestedName: string) => Promise<Errorable<null>>
 
   /* plugins */
   getImageData: (absolutePath: string) => Promise<Errorable<ImageResponse>>

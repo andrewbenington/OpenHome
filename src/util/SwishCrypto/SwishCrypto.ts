@@ -1,5 +1,5 @@
 import { sha256Digest } from '../Encryption'
-import { buildSCBlock, SCBlock } from './SCBlock'
+import { buildSCBlock, SCBlock, writeSCBlock } from './SCBlock'
 
 const SIZE_HASH = 0x20
 const IntroHashBytes = new Uint8Array([
@@ -32,10 +32,9 @@ function computeHash(data: Uint8Array): Uint8Array {
 }
 
 function getIsHashValid(data: Uint8Array) {
-  const dataBeforeHash = data.slice(0, -SIZE_HASH)
   const storedHash = data.slice(-SIZE_HASH)
   const computed = computeHash(data.slice(0, -SIZE_HASH))
-  logHashes({ dataBeforeHash, storedHash, computed })
+  return toHexString(storedHash) === toHexString(computed)
 }
 
 function cryptStaticXorpadBytes(data: Uint8Array): Uint8Array {
@@ -77,6 +76,33 @@ function readBlocks(data: Uint8Array): SCBlock[] {
   return result
 }
 
+function decrypt(data: Uint8Array): SCBlock[] {
+  const dataBeforeHash = data.slice(0, -SIZE_HASH)
+  const dataAfterXor = cryptStaticXorpadBytes(dataBeforeHash)
+  return readBlocks(dataAfterXor)
+}
+
+function getDecryptedRawData(blocks: SCBlock[], size: number): Uint8Array {
+  const buffer = new Uint8Array(size)
+  let offset = 0
+  for (const block of blocks) {
+    offset = writeSCBlock(block, buffer, offset)
+  }
+
+  return buffer.slice(0, offset)
+}
+
+function encrypt(blocks: SCBlock[], size: number): Uint8Array {
+  const rawBytes = getDecryptedRawData(blocks, size)
+  const xoredData = cryptStaticXorpadBytes(rawBytes)
+  const hash = computeHash(xoredData)
+  const encrypted = new Uint8Array(xoredData.length + hash.length)
+
+  encrypted.set(xoredData, 0)
+  encrypted.set(hash, xoredData.length)
+  return encrypted
+}
+
 function toHexString(byteArray: Uint8Array) {
   return Array.from(byteArray, function (byte) {
     return ('0' + (byte & 0xff).toString(16)).slice(-2)
@@ -85,20 +111,20 @@ function toHexString(byteArray: Uint8Array) {
     .toUpperCase()
 }
 
-function logHashes(data: Record<string, Uint8Array>) {
-  for (const [name, bytes] of Object.entries(data)) {
-    let hex = toHexString(bytes)
-    if (hex.length > 64) {
-      hex = hex.slice(0, 32) + '...' + hex.slice(-32)
-    }
-    console.log(`${name}: ${hex} (${bytes.length})`)
-  }
-}
+// function logHashes(data: Record<string, Uint8Array>) {
+//   for (const [name, bytes] of Object.entries(data)) {
+//     let hex = toHexString(bytes)
+//     if (hex.length > 64) {
+//       hex = hex.slice(0, 32) + '...' + hex.slice(-32)
+//     }
+//     console.log(`${name}: ${hex} (${bytes.length})`)
+//   }
+// }
 
 export const SwishCrypto = {
   SIZE_HASH,
   computeHash,
   getIsHashValid,
-  cryptStaticXorpadBytes,
-  readBlocks,
+  decrypt,
+  encrypt,
 }

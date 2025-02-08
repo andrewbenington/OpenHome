@@ -1,4 +1,4 @@
-import { PA8, PB8, PK8 } from 'pokemon-files'
+import { AllPKMFields, PA8, PB8, PK8 } from 'pokemon-files'
 import { GameOfOrigin } from 'pokemon-resources'
 import {
   SCArrayBlock,
@@ -45,14 +45,12 @@ export abstract class G8SAV<P extends PK8 | PB8 | PA8> implements SAV<P> {
   constructor(path: PathData, bytes: Uint8Array) {
     this.bytes = bytes
     this.filePath = path
-    const dataBeforeHash = bytes.slice(0, -SwishCrypto.SIZE_HASH)
-    const dataAfterXor = SwishCrypto.cryptStaticXorpadBytes(dataBeforeHash)
-    this.scBlocks = SwishCrypto.readBlocks(dataAfterXor)
-
-    const boxNamesBlock = new BoxNamesBlock(this.getBlockMust<SCArrayBlock>('BoxLayout', 'array'))
+    this.scBlocks = SwishCrypto.decrypt(bytes)
 
     const currentPCBlock = this.getBlockMust<SCValueBlock>('CurrentBox', 'value')
-    this.currentPCBox = new DataView(currentPCBlock.raw).getUint8(0) + 1
+    this.currentPCBox = new DataView(currentPCBlock.raw).getUint8(0)
+
+    const boxNamesBlock = new BoxNamesBlock(this.getBlockMust<SCArrayBlock>('BoxLayout', 'array'))
 
     const boxBlock = this.getBlockMust<SCObjectBlock>('Box', 'object')
     this.boxes = Array(this.getBoxCount())
@@ -68,7 +66,7 @@ export abstract class G8SAV<P extends PK8 | PB8 | PA8> implements SAV<P> {
           const startByte = this.getBoxSizeBytes() * box + this.getMonBoxSizeBytes() * monIndex
           const endByte = startByte + this.getMonBoxSizeBytes()
           const monData = boxBlock.raw.slice(startByte, endByte)
-          const mon = this.buildPKM(monData, true)
+          const mon = this.monConstructor(monData, true)
 
           if (mon.gameOfOrigin !== 0 && mon.dexNum !== 0) {
             this.boxes[box].pokemon[monIndex] = mon
@@ -80,8 +78,6 @@ export abstract class G8SAV<P extends PK8 | PB8 | PA8> implements SAV<P> {
     }
   }
 
-  abstract buildPKM(bytes: ArrayBuffer, encrypted: boolean): P
-
   abstract getMonBoxSizeBytes(): number
   abstract getBoxSizeBytes(): number
 
@@ -90,24 +86,70 @@ export abstract class G8SAV<P extends PK8 | PB8 | PA8> implements SAV<P> {
     type?: T['blockType']
   ): T
 
-  abstract prepareBoxesAndGetModified(): OHPKM[]
-
   abstract supportsMon(dexNumber: number, formeNumber: number): boolean
 
   abstract getCurrentBox(): Box<P>
 
   abstract getGameName(): string
 
+  abstract monConstructor(arg: ArrayBuffer | AllPKMFields, encrypted?: boolean): P
+
+  prepareBoxesAndGetModified() {
+    const changedMonPKMs: OHPKM[] = []
+    const boxBlock = this.getBlockMust<SCObjectBlock>('Box', 'object')
+
+    this.updatedBoxSlots.forEach(({ box, index }) => {
+      const changedMon = this.boxes[box].pokemon[index]
+
+      // we don't want to save OHPKM files of mons that didn't leave the save
+      // (and would still be PK8/PA8s)
+      if (changedMon instanceof OHPKM) {
+        changedMonPKMs.push(changedMon)
+      }
+
+      const writeIndex = this.getBoxSizeBytes() * box + this.getMonBoxSizeBytes() * index
+      const blockBuffer = new Uint8Array(boxBlock.raw)
+
+      // changedMon will be undefined if pokemon was moved from this slot
+      // and the slot was left empty
+      if (changedMon) {
+        try {
+          const mon = changedMon instanceof OHPKM ? this.monConstructor(changedMon) : changedMon
+
+          if (mon?.gameOfOrigin && mon?.dexNum) {
+            if ('stats' in mon) {
+              mon.stats = mon.getStats()
+            }
+            mon.refreshChecksum()
+            const monBuffer = new Uint8Array(this.getMonBoxSizeBytes())
+            const pcBytes = mon.toPCBytes()
+            monBuffer.set(new Uint8Array(pcBytes), 0)
+            blockBuffer.set(monBuffer, writeIndex)
+          }
+        } catch (e) {
+          console.error(e)
+        }
+      } else {
+        const mon = this.monConstructor(new Uint8Array(this.getMonBoxSizeBytes()).buffer)
+
+        mon.refreshChecksum()
+        blockBuffer.set(new Uint8Array(mon.toPCBytes()), writeIndex)
+      }
+    })
+
+    this.bytes = SwishCrypto.encrypt(this.scBlocks, this.bytes.length)
+
+    return changedMonPKMs
+  }
+
   gameColor() {
     switch (this.origin) {
-      case GameOfOrigin.Sun:
-        return '#F1912B'
-      case GameOfOrigin.Moon:
-        return '#5599CA'
-      case GameOfOrigin.UltraSun:
-        return '#E95B2B'
-      case GameOfOrigin.UltraMoon:
-        return '#226DB5'
+      case GameOfOrigin.Sword:
+        return '#006998'
+      case GameOfOrigin.Shield:
+        return '#7C0033'
+      case GameOfOrigin.LegendsArceus:
+        return '#36597B'
       default:
         return '#666666'
     }

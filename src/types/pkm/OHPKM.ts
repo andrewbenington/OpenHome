@@ -53,6 +53,8 @@ import {
   generatePersonalityValuePreservingAttributes,
   generateTeraType,
   getAbilityFromNumber,
+  getHeightCalculated,
+  getWeightCalculated,
   gvsFromIVs,
   ivsFromDVs,
   writeIVsToBuffer,
@@ -84,12 +86,23 @@ export class OHPKM implements PKMInterface {
   }
 
   bytes: Uint8Array = new Uint8Array(FILE_SIZE)
+  heightDeviation = 0.2
+  weightDeviation = 0.2
 
   constructor(arg: PKMInterface | PluginPKMInterface | OHPKM | Uint8Array) {
     if (arg instanceof Uint8Array) {
       // If OHPKM format has expanded, we want to increase the size of older files to
       // make room for new fields
       this.bytes = extendUint8Array(arg, FILE_SIZE)
+
+      if (this.heightAbsolute === 0) {
+        this.height = 127
+        this.heightAbsolute = getHeightCalculated(this) ?? 0
+      }
+      if (this.weightAbsolute === 0) {
+        this.weight = 127
+        this.weightAbsolute = getWeightCalculated(this) ?? 0
+      }
     } else {
       const other = arg
       let prng: Prando
@@ -230,7 +243,7 @@ export class OHPKM implements PKMInterface {
       // Gen 6+
       this.contestMemoryCount = other.contestMemoryCount ?? 0
       this.battleMemoryCount = other.battleMemoryCount ?? 0
-      this.relearnMoves = other.relearnMoves ?? ([0, 0, 0, 0] as [number, number, number, number])
+      this.relearnMoves = other.relearnMoves ?? [0, 0, 0, 0]
       this.handlerName = other.handlerName ?? ''
       this.handlerGender = other.handlerGender ?? false
       this.isCurrentHandler = other.isCurrentHandler ?? false
@@ -348,13 +361,17 @@ export class OHPKM implements PKMInterface {
         this.unknownF3 = other.unknownF3
       }
 
-      if ('heightAbsoluteBytes' in other) {
+      this.height = other.height ?? 0
+      this.weight = other.weight ?? 0
+
+      if (other.heightAbsoluteBytes && other.weightAbsoluteBytes) {
         this.heightAbsoluteBytes = other.heightAbsoluteBytes
         this.weightAbsoluteBytes = other.weightAbsoluteBytes
       }
 
-      this.height = other.height ?? 0
-      this.weight = other.weight ?? 0
+      if (this.heightAbsolute === 0) {
+        this.heightAbsolute = getHeightCalculated(other) ?? 0
+      }
 
       this.scale = other.scale ?? 0
 
@@ -941,7 +958,11 @@ export class OHPKM implements PKMInterface {
   }
 
   public get heightAbsolute() {
-    return Buffer.from(this.heightAbsoluteBytes).readFloatLE()
+    return new DataView(this.bytes.buffer).getFloat32(0xac, true)
+  }
+
+  public set heightAbsolute(value: number) {
+    new DataView(this.bytes.buffer).setFloat32(0xac, value, true)
   }
 
   public get weightAbsoluteBytes() {
@@ -953,7 +974,11 @@ export class OHPKM implements PKMInterface {
   }
 
   public get weightAbsolute() {
-    return Buffer.from(this.weightAbsoluteBytes).readFloatLE()
+    return new DataView(this.bytes.buffer).getFloat32(0xb0, true)
+  }
+
+  public set weightAbsolute(value: number) {
+    new DataView(this.bytes.buffer).setFloat32(0xb0, value, true)
   }
 
   public get handlerName() {

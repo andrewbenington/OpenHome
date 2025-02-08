@@ -42,5 +42,3 @@ for (const [key, mapEntry] of Object.entries(RadicalRedToNationalDexMap)) {
     }
   }
 }
-
-console.log(RR_TRANSFER_RESTRICTIONS)

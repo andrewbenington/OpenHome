@@ -1,4 +1,3 @@
-import { bytesToUint32LittleEndian } from '../byteLogic'
 import { SCXorShift32 } from './SCXorShift32'
 
 export type SCBoolBlock = {
@@ -19,7 +18,7 @@ export type SCObjectBlock = {
 
 export type SCArrayBlock = {
   key: number
-  type?: undefined
+  type: number
   raw: ArrayBuffer
   subtype: number
   blockType: 'array'
@@ -39,12 +38,13 @@ export function buildSCBlock(
   data: Uint8Array,
   offset: number
 ): { block: SCBlock; newOffset: number } {
-  const key = bytesToUint32LittleEndian(data, offset)
+  const dataView = new DataView(data.buffer)
+  const key = dataView.getUint32(offset, true)
   offset += 4
 
   const xk = new SCXorShift32(key)
-  const next = xk.Next()
-  const type = (data[offset++] ^ next) & 0xff
+  const type = (data[offset] ^ xk.Next()) & 0xff
+  offset += 1
 
   switch (type) {
     case 1:
@@ -58,7 +58,7 @@ export function buildSCBlock(
       }
     case 4: {
       // Object
-      const numBytes = bytesToUint32LittleEndian(data, offset) ^ xk.Next32()
+      const numBytes = dataView.getUint32(offset, true) ^ xk.Next32()
       offset += 4
 
       const arr = data.slice(offset, offset + numBytes)
@@ -75,7 +75,7 @@ export function buildSCBlock(
     }
     case 5: {
       // Array
-      const numEntries = bytesToUint32LittleEndian(data, offset) ^ xk.Next32()
+      const numEntries = dataView.getUint32(offset, true) ^ xk.Next32()
       offset += 4
 
       const subtype = (data[offset++] ^ xk.Next()) & 0xff
@@ -89,7 +89,7 @@ export function buildSCBlock(
       }
 
       return {
-        block: { key, raw: arr.buffer, subtype, blockType: 'array' },
+        block: { key, type, raw: arr.buffer, subtype, blockType: 'array' },
         newOffset: offset,
       }
     }
@@ -111,6 +111,48 @@ export function buildSCBlock(
       }
     }
   }
+}
+
+export function writeSCBlock(block: SCBlock, bytes: Uint8Array, offset: number): number {
+  let currentOffset = offset
+  const dataView = new DataView(bytes.buffer)
+
+  // write key XORed
+  dataView.setUint32(currentOffset, block.key, true)
+  currentOffset += 4
+
+  // write type XORed
+  const xk = new SCXorShift32(block.key)
+  const next = xk.Next()
+  const typeXored = (block.type ^ next) & 0xff
+  dataView.setUint8(currentOffset, typeXored)
+  currentOffset += 1
+
+  if (block.blockType === 'object') {
+    // write data size XORed
+    const lengthXored = (block.raw.byteLength ^ xk.Next32()) & 0xffffffff
+    dataView.setUint32(currentOffset, lengthXored, true)
+    currentOffset += 4
+  } else if (block.blockType === 'array') {
+    // write array length XORed
+    const entryCount = block.raw.byteLength / getTypeSize(block.subtype)
+    dataView.setUint32(currentOffset, (entryCount ^ xk.Next32()) & 0xffffffff, true)
+    currentOffset += 4
+
+    // write subtype XORed
+    const subtypeXored = (block.subtype ^ xk.Next()) & 0xff
+    dataView.setUint8(currentOffset, subtypeXored)
+    currentOffset += 1
+  }
+
+  if (block.raw) {
+    new Uint8Array(block.raw).forEach((byte) => {
+      dataView.setUint8(currentOffset, (byte ^ xk.Next()) & 0xff)
+      currentOffset += 1
+    })
+  }
+
+  return currentOffset
 }
 
 function getTypeSize(type: number) {
