@@ -30,6 +30,7 @@ import {
 import DynamaxLevel from '../components/DynamaxLevel'
 import ShinyLeaves from '../components/ShinyLeaves'
 import TypeIcon from '../components/TypeIcon'
+import useIsDev from '../hooks/isDev'
 import { isRestricted } from '../types/TransferRestrictions'
 import { PKMInterface } from '../types/interfaces'
 import { OHPKM } from '../types/pkm/OHPKM'
@@ -50,6 +51,7 @@ const CM_TO_IN = 0.3937008
 
 const OtherDisplay = (props: { mon: PKMInterface }) => {
   const { mon } = props
+  const isDev = useIsDev()
 
   const heightCalculated = getHeightCalculated(mon) ?? 0
   const weightCalculated = getWeightCalculated(mon) ?? 0
@@ -307,28 +309,32 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
           )}
         {mon.height !== undefined && mon.weight !== undefined && (
           <>
-            <AttributeRow label="Height (Relative)" value={mon.height.toString()} />
-            <AttributeRow label="Weight (Relative)" value={mon.weight.toString()} />
+            <AttributeRow label="Height (Relative)" value={`${mon.height} / 255`} />
+            <AttributeRow label="Weight (Relative)" value={`${mon.weight} / 255`} />
           </>
         )}
         {mon.heightAbsolute !== undefined && mon.weightAbsolute !== undefined && (
           <>
             <AttributeRow
               label="Height (Absolute)"
-              value={`${Math.floor((mon.heightAbsolute * CM_TO_IN) / 12)}'${Math.round((mon.heightAbsolute * CM_TO_IN) % 12)}" / ${mon.heightAbsolute.toPrecision(5)} cm`}
+              value={`${Math.floor((mon.heightAbsolute * CM_TO_IN) / 12)}'${Math.round((mon.heightAbsolute * CM_TO_IN) % 12)}" • ${mon.heightAbsolute.toPrecision(5)} cm`}
             />
-            <AttributeRow
-              label="Height (Calculated)"
-              value={`${Math.floor((heightCalculated * CM_TO_IN) / 12)}'${Math.round((heightCalculated * CM_TO_IN) % 12)}" / ${heightCalculated.toPrecision(5)} cm`}
-            />
+            {isDev && (
+              <AttributeRow
+                label="Height (Calculated)"
+                value={`${Math.floor((heightCalculated * CM_TO_IN) / 12)}'${Math.round((heightCalculated * CM_TO_IN) % 12)}" • ${heightCalculated.toPrecision(5)} cm`}
+              />
+            )}
             <AttributeRow
               label="Weight (Absolute)"
-              value={`${(mon.weightAbsolute * HG_TO_LB).toPrecision(5)} lb / ${(mon.weightAbsolute / 10).toPrecision(5)} kg`}
+              value={`${(mon.weightAbsolute * HG_TO_LB).toPrecision(5)} lb • ${(mon.weightAbsolute / 10).toPrecision(5)} kg`}
             />
-            <AttributeRow
-              label="Weight (Calculated)"
-              value={`${(weightCalculated * HG_TO_LB).toPrecision(5)} lb / ${(weightCalculated / 10).toPrecision(5)} kg`}
-            />
+            {isDev && (
+              <AttributeRow
+                label="Weight (Calculated)"
+                value={`${(weightCalculated * HG_TO_LB).toPrecision(5)} lb • ${(weightCalculated / 10).toPrecision(5)} kg`}
+              />
+            )}
           </>
         )}
         {!isRestricted(GEN2_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
