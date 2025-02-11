@@ -12,7 +12,6 @@ import { fileTypeFromString } from '../types/FileImport'
 import { PKMInterface } from '../types/interfaces'
 import { OHPKM } from '../types/pkm/OHPKM'
 import FileTypeSelect from './FileTypeSelect'
-import JSONDisplay from './JSONDisplay'
 import MetDataMovesDisplay from './MetDataMovesDisplay'
 import OtherDisplay from './OtherDisplay'
 import RibbonsDisplay from './RibbonsDisplay'
@@ -157,7 +156,6 @@ const PokemonDetailsModal = (props: {
               <SideTabs.Tab value="stats">Stats</SideTabs.Tab>
               <SideTabs.Tab value="ribbons">Ribbons</SideTabs.Tab>
               <SideTabs.Tab value="other">Other</SideTabs.Tab>
-              <SideTabs.Tab value="json">JSON</SideTabs.Tab>
               <SideTabs.Tab value="raw">Raw</SideTabs.Tab>
             </SideTabs.TabList>
             <ErrorBoundary FallbackComponent={FallbackComponent}>
@@ -175,9 +173,6 @@ const PokemonDetailsModal = (props: {
               </SideTabs.Panel>
               <SideTabs.Panel value="other">
                 <OtherDisplay mon={displayMon} />
-              </SideTabs.Panel>
-              <SideTabs.Panel value="json">
-                <JSONDisplay mon={displayMon} />
               </SideTabs.Panel>
               <SideTabs.Panel value="raw">
                 <HexDisplay
