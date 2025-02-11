@@ -1,13 +1,21 @@
 import { PK8, utf16BytesToString } from 'pokemon-files'
-import { GameOfOrigin, GameOfOriginData } from 'pokemon-resources'
-import { SWSH_TRANSFER_RESTRICTIONS } from '../../../consts/TransferRestrictions'
-import { SCBlock, SCObjectBlock } from '../../../util/SwishCrypto/SCBlock'
+import { GameOfOrigin, GameOfOriginData, Languages } from 'pokemon-resources'
+import { NationalDex, PokemonData } from 'pokemon-species-data'
+import {
+  SWSH_TRANSFER_RESTRICTIONS_BASE,
+  SWSH_TRANSFER_RESTRICTIONS_CT,
+  SWSH_TRANSFER_RESTRICTIONS_IOA,
+} from '../../../consts/TransferRestrictions'
 import { isRestricted } from '../../TransferRestrictions'
 import { PathData } from '../path'
 import { G8BlockName, G8SAV } from './G8SAV'
+import { SCBlock, SCObjectBlock } from './SwishCrypto/SCBlock'
+import { SwishCrypto } from './SwishCrypto/SwishCrypto'
 
-const SAVE_SIZE_BYTES = 1_575_705
-const SAVE_SIZE_BYTES_1_3_0 = 1_603_500
+const SAVE_SIZE_BYTES_MIN = 0x171500
+const SAVE_SIZE_BYTES_MAX = 0x187800
+
+export type SWSH_SAVE_REVISION = 'Base Game' | 'Isle Of Armor' | 'Crown Tundra'
 
 export class SwShSAV extends G8SAV<PK8> {
   static boxSizeBytes = PK8.getBoxSize() * 30
@@ -73,12 +81,16 @@ export class SwShSAV extends G8SAV<PK8> {
   }
 
   supportsMon(dexNumber: number, formeNumber: number): boolean {
-    return !isRestricted(SWSH_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)
-  }
+    const revision = this.scBlocks ? this.getSaveRevision() : 'Crown Tundra'
+    const restrictions =
+      revision === 'Base Game'
+        ? SWSH_TRANSFER_RESTRICTIONS_BASE
+        : revision === 'Isle Of Armor'
+          ? SWSH_TRANSFER_RESTRICTIONS_IOA
+          : SWSH_TRANSFER_RESTRICTIONS_CT
 
-  // calculateChecksum(): number {
-  //   return CRC16_Invert(this.bytes, this.pcOffset, this.pcSize)
-  // }
+    return !isRestricted(restrictions, dexNumber, formeNumber)
+  }
 
   getCurrentBox() {
     return this.boxes[this.currentPCBox]
@@ -90,11 +102,38 @@ export class SwShSAV extends G8SAV<PK8> {
     return gameOfOrigin ? `Pokémon ${gameOfOrigin.name}` : '(Unknown Game)'
   }
 
+  getSaveRevision(): SWSH_SAVE_REVISION {
+    return this.getBlock('ZukanR2')
+      ? 'Crown Tundra'
+      : this.getBlock('ZukanR1')
+        ? 'Isle Of Armor'
+        : 'Base Game'
+  }
+
+  getDisplayData() {
+    const trainerBlock = this.trainerBlock
+
+    const pokedexOwned = trainerBlock.getPokeDexOwned()
+
+    if (pokedexOwned === 0xffff) {
+      return { Status: 'New Save File' }
+    }
+
+    return {
+      'Player Character': trainerBlock.getGender() ? 'Gloria' : 'Victor',
+      'Save Version': this.getSaveRevision(),
+      Language: Languages[trainerBlock.getLanguage()],
+      Pokédex: pokedexOwned,
+      'Shiny Pokémon Found': trainerBlock.getShinyPokemonFound(),
+      Starter: trainerBlock.getStarter(),
+    }
+  }
+
   static fileIsSave(bytes: Uint8Array): boolean {
-    if (bytes.length < SAVE_SIZE_BYTES || bytes.length > SAVE_SIZE_BYTES_1_3_0) {
+    if (bytes.length < SAVE_SIZE_BYTES_MIN || bytes.length > SAVE_SIZE_BYTES_MAX) {
       return false
     }
-    return true
+    return SwishCrypto.getIsHashValid(bytes)
   }
 
   static includesOrigin(origin: GameOfOrigin) {
@@ -165,5 +204,14 @@ class TrainerBlock {
   }
   public getGender(): boolean {
     return !!(this.dataView.getUint8(0x38) & 1)
+  }
+  public getStarter(): string {
+    const index = this.dataView.getUint8(0x25)
+
+    if (index === 0xff) {
+      return 'Not Selected'
+    }
+
+    return PokemonData[index * 3 + NationalDex.Grookey].name
   }
 }

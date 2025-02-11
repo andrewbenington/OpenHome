@@ -1,16 +1,11 @@
 import { AllPKMFields, PA8, PB8, PK8 } from 'pokemon-files'
 import { GameOfOrigin } from 'pokemon-resources'
-import {
-  SCArrayBlock,
-  SCBlock,
-  SCObjectBlock,
-  SCValueBlock,
-} from '../../../util/SwishCrypto/SCBlock'
-import { SwishCrypto } from '../../../util/SwishCrypto/SwishCrypto'
 import { OHPKM } from '../../pkm/OHPKM'
 import { PathData } from '../path'
 import { Box, BoxCoordinates, SAV } from '../SAV'
 import { BoxNamesBlock } from './BoxNamesBlock'
+import { SCArrayBlock, SCBlock, SCObjectBlock, SCValueBlock } from './SwishCrypto/SCBlock'
+import { SwishCrypto } from './SwishCrypto/SwishCrypto'
 
 export abstract class G8SAV<P extends PK8 | PB8 | PA8> implements SAV<P> {
   origin: GameOfOrigin = 0

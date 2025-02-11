@@ -25,6 +25,7 @@ export const ORIGINAL = 1
 
 export const BASE = 0
 export const ALOLAN = 1
+export const GALAR = 1
 
 export enum SWEETS {
   'Strawberry' = 0,

@@ -1,4 +1,4 @@
-import { sha256Digest } from '../Encryption'
+import { sha256Digest } from 'src/util/Encryption.ts'
 import { buildSCBlock, SCBlock, writeSCBlock } from './SCBlock'
 
 const SIZE_HASH = 0x20

@@ -1,14 +1,17 @@
-import { PA8 } from 'pokemon-files'
-import { GameOfOrigin } from 'pokemon-resources'
+import { PA8, utf16BytesToString } from 'pokemon-files'
+import { GameOfOrigin, Languages } from 'pokemon-resources'
 import { LA_TRANSFER_RESTRICTIONS } from '../../../consts/TransferRestrictions'
-import { SCArrayBlock, SCBlock } from '../../../util/SwishCrypto/SCBlock'
 import { isRestricted } from '../../TransferRestrictions'
 import { PathData } from '../path'
 import { BoxNamesBlock } from './BoxNamesBlock'
 import { G8BlockName, G8SAV } from './G8SAV'
-import { MyStatusBlock } from './MyStatusBlock'
+import { SCArrayBlock, SCBlock, SCObjectBlock } from './SwishCrypto/SCBlock'
+import { SwishCrypto } from './SwishCrypto/SwishCrypto'
 
-const SAVE_SIZE_BYTES = 1273310
+export type LA_SAVE_REVISION = 'Base' | 'Daybreak'
+
+const SAVE_SIZE_MIN = 0x136c00
+const SAVE_SIZE_MAX = 0x13ae00
 
 export class LASAV extends G8SAV<PA8> {
   static boxSizeBytes = PA8.getBoxSize() * 30
@@ -92,11 +95,24 @@ export class LASAV extends G8SAV<PA8> {
     return 'Pokémon Legends Arceus'
   }
 
+  getSaveRevision(): LA_SAVE_REVISION {
+    return this.getBlock('Daybreak') ? 'Daybreak' : 'Base'
+  }
+
+  getDisplayData() {
+    return {
+      'Save Version': this.getSaveRevision(),
+      'Player Character': this.myStatusBlock.getGender() ? 'Akari' : 'Rei',
+      Language: Languages[this.myStatusBlock.getLanguage()],
+    }
+  }
+
   static fileIsSave(bytes: Uint8Array): boolean {
-    if (bytes.length !== SAVE_SIZE_BYTES) {
+    if (bytes.length < SAVE_SIZE_MIN || bytes.length > SAVE_SIZE_MAX) {
       return false
     }
-    return true
+
+    return SwishCrypto.getIsHashValid(bytes)
   }
 
   static includesOrigin(origin: GameOfOrigin) {
@@ -109,4 +125,29 @@ const BlockKeys = {
   Box: 0x47e1ceab,
   MyStatus: 0xf25c070e,
   CurrentBox: 0x017c3cbb,
+  Daybreak: 0x8184efb4,
+}
+
+class MyStatusBlock {
+  dataView: DataView<ArrayBuffer>
+
+  constructor(scBlock: SCObjectBlock) {
+    this.dataView = new DataView(scBlock.raw)
+  }
+
+  public getName(): string {
+    return utf16BytesToString(this.dataView.buffer, 0x20, 24)
+  }
+  public getFullID(): number {
+    return this.dataView.getUint32(0x10, true)
+  }
+  public getSID(): number {
+    return this.dataView.getUint16(0x12, true)
+  }
+  public getGender(): boolean {
+    return !!(this.dataView.getUint8(0x15) & 1)
+  }
+  public getLanguage(): number {
+    return this.dataView.getUint8(0x17)
+  }
 }

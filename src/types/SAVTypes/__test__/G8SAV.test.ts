@@ -1,17 +1,25 @@
-import { readFileSync, writeFileSync } from 'fs'
+import { readFileSync } from 'fs'
 import { resolve } from 'path'
 import { PK4 } from 'pokemon-files'
 import { Ball, GameOfOrigin } from 'pokemon-resources'
-import { SCBoolBlock, SCObjectBlock, writeSCBlock } from '../../../util/SwishCrypto/SCBlock'
-import { SwishCrypto } from '../../../util/SwishCrypto/SwishCrypto'
 import { OHPKM } from '../../pkm/OHPKM'
 import { LASAV } from '../Gen8/LASAV'
+import { SCBoolBlock, SCObjectBlock, writeSCBlock } from '../Gen8/SwishCrypto/SCBlock'
+import { SwishCrypto } from '../Gen8/SwishCrypto/SwishCrypto'
 import { SwShSAV } from '../Gen8/SwShSAV'
 import { PathData } from '../path'
 
 const swordPath: PathData = {
   raw: './SAVFILES/sword',
   name: 'sword',
+  dir: './SAVFILES',
+  ext: '',
+  separator: '/',
+}
+
+const arceusPath = {
+  raw: './SAVFILES/legendsarceus',
+  name: 'legendsarceus',
   dir: './SAVFILES',
   ext: '',
   separator: '/',
@@ -34,15 +42,7 @@ describe('gen 8 save files', () => {
 
     saveBytes = new Uint8Array(readFileSync(savePath))
 
-    let parsedPath = {
-      raw: './SAVFILES/legendsarceus',
-      name: 'legendsarceus',
-      dir: './SAVFILES',
-      ext: '',
-      separator: '/',
-    }
-
-    arceusSave = new LASAV(parsedPath, saveBytes)
+    arceusSave = new LASAV(arceusPath, saveBytes)
 
     const monPath = resolve('src/types/pkm/__test__/PKMFiles/Gen4/magmortar.pkm')
     const monBytes = new Uint8Array(readFileSync(monPath))
@@ -50,7 +50,7 @@ describe('gen 8 save files', () => {
     magmortar = new PK4(monBytes.buffer)
   })
 
-  test('SwishCrypto hash matches', () => {
+  test('sword/shield hash matches', () => {
     const storedHash = saveBytes.slice(-SwishCrypto.SIZE_HASH)
     const dataBeforeHash = saveBytes.slice(0, -SwishCrypto.SIZE_HASH)
     const computedHash = SwishCrypto.computeHash(dataBeforeHash)
@@ -79,7 +79,7 @@ describe('gen 8 save files', () => {
 
   test('arceus data is correct', () => {
     expect(arceusSave.origin).toBe(GameOfOrigin.LegendsArceus)
-    expect(arceusSave.currentPCBox).toBe(23)
+    expect(arceusSave.currentPCBox).toBe(13)
   })
 
   test('write sc block', () => {
@@ -117,7 +117,7 @@ describe('gen 8 save files', () => {
     expect(offset).toBe(34)
   })
 
-  test('reencrypt', () => {
+  test('reencrypt sword/shield', () => {
     const reencrypted = SwishCrypto.encrypt(swordSave.scBlocks, swordSave.bytes.length)
 
     expect(SwishCrypto.getIsHashValid(reencrypted)).toBe(true)
@@ -135,7 +135,7 @@ describe('gen 8 save files', () => {
     const mon = swordSave.boxes[1].pokemon[3]
 
     if (!mon) {
-      fail()
+      throw new Error('Expected mon not found')
     }
 
     const ohpkm = new OHPKM(mon)
@@ -151,11 +151,11 @@ describe('gen 8 save files', () => {
     expect(modifiedFlapple?.nickname).toBe('NEW NAME')
   })
 
-  test('saveBoxes', () => {
+  test('sword save boxes', () => {
     const mon = swordSave.boxes[1].pokemon[3]
 
     if (!mon) {
-      fail()
+      throw new Error('Expected mon not found')
     }
 
     const ohpkm = new OHPKM(mon)
@@ -170,43 +170,35 @@ describe('gen 8 save files', () => {
 
     expect(modifiedFlapple?.nickname).toBe('NEW NAME')
     expect(SwishCrypto.getIsHashValid(swordSave.bytes)).toBe(true)
-
-    writeFileSync('main', swordSave.bytes)
   })
 
-  test('saveBoxes arceus', () => {
-    const mon = arceusSave.boxes[1].pokemon[3]
+  test('legends arceus save boxes', () => {
+    const mon = arceusSave.boxes[13].pokemon[1]
 
     if (!mon) {
-      fail()
+      throw new Error('Expected mon not found')
     }
+    expect(mon.nickname).toBe('Decidueye')
 
     const ohpkm = new OHPKM(mon)
 
     ohpkm.nickname = 'NEW NAME'
-    arceusSave.boxes[1].pokemon[3] = ohpkm
-    arceusSave.updatedBoxSlots.push({ box: 1, index: 3 })
+    arceusSave.boxes[13].pokemon[1] = ohpkm
+    arceusSave.updatedBoxSlots.push({ box: 13, index: 1 })
 
     arceusSave.boxes[2].pokemon[8] = new OHPKM(magmortar)
     arceusSave.updatedBoxSlots.push({ box: 2, index: 8 })
 
     arceusSave.prepareBoxesAndGetModified()
-    const modified = new LASAV(swordPath, arceusSave.bytes)
-    const modifiedFlapple = modified.boxes[1].pokemon[3]
+    const modified = new LASAV(arceusPath, arceusSave.bytes)
+    const modifiedDecidueye = modified.boxes[13].pokemon[1]
 
-    expect(modifiedFlapple?.nickname).toBe('NEW NAME')
+    expect(modifiedDecidueye?.nickname).toBe('NEW NAME')
     expect(SwishCrypto.getIsHashValid(arceusSave.bytes)).toBe(true)
 
     const modifiedMagmortar = modified.boxes[2].pokemon[8]
 
     expect(modifiedMagmortar?.nickname).toBe('MAGMORTAR')
-
-    writeFileSync('main', arceusSave.bytes)
-  })
-
-  test('reencrypt same', () => {
-    swordSave.prepareBoxesAndGetModified()
-    writeFileSync('main', swordSave.bytes)
   })
 })
 

@@ -1,5 +1,5 @@
 import { utf16BytesToString } from 'pokemon-files'
-import { SCArrayBlock } from '../../../util/SwishCrypto/SCBlock'
+import { SCArrayBlock } from './SwishCrypto/SCBlock'
 
 const BOX_COUNT = 32
 const BOX_NAME_LENGTH = 0x22

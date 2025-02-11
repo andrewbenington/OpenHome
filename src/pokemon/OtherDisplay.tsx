@@ -19,7 +19,7 @@ import {
   LA_TRANSFER_RESTRICTIONS,
   ORAS_TRANSFER_RESTRICTIONS,
   SV_TRANSFER_RESTRICTIONS,
-  SWSH_TRANSFER_RESTRICTIONS,
+  SWSH_TRANSFER_RESTRICTIONS_CT,
   USUM_TRANSFER_RESTRICTIONS,
 } from 'src/consts/TransferRestrictions'
 import {
@@ -179,7 +179,7 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
               )}
             </AttributeRowExpand>
           )}
-        {!isRestricted(SWSH_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
+        {!isRestricted(SWSH_TRANSFER_RESTRICTIONS_CT, mon.dexNum, mon.formeNum) &&
           mon.trFlagsSwSh &&
           getFlagsInRange(mon.trFlagsSwSh, 0, 14).length > 0 && (
             <AttributeRowExpand
@@ -237,7 +237,7 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
             </AttributeRowExpand>
           )}
 
-        {(!isRestricted(SWSH_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) ||
+        {(!isRestricted(SWSH_TRANSFER_RESTRICTIONS_CT, mon.dexNum, mon.formeNum) ||
           !isRestricted(ORAS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum)) &&
           mon.trainerMemory && (
             <AttributeRowExpand summary="Trainer Memory" value={mon.trainerName}>
@@ -261,7 +261,7 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
               </AttributeRow>
             </AttributeRowExpand>
           )}
-        {(!isRestricted(SWSH_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) ||
+        {(!isRestricted(SWSH_TRANSFER_RESTRICTIONS_CT, mon.dexNum, mon.formeNum) ||
           !isRestricted(ORAS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum)) &&
           mon.handlerMemory && (
             <AttributeRowExpand summary="Handler Memory" value={mon.handlerName}>
@@ -285,7 +285,7 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
               </AttributeRow>
             </AttributeRowExpand>
           )}
-        {!isRestricted(SWSH_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
+        {!isRestricted(SWSH_TRANSFER_RESTRICTIONS_CT, mon.dexNum, mon.formeNum) &&
           mon.dynamaxLevel !== undefined && (
             <>
               <AttributeRow label="Dynamax">
