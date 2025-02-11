@@ -350,6 +350,9 @@ export const generatePersonalityValuePreservingAttributes = (
   mon: PKMInterface,
   prng: Prando = new Prando()
 ) => {
+  if (!prng) {
+    prng = new Prando(mon.personalityValue ?? mon.ivs?.atk)
+  }
   let personalityValue = mon.personalityValue ?? prng.nextInt(0, 0xffffffff)
   let otherNature: Nature | undefined = mon.nature
   let otherAbilityNum = 4
@@ -532,4 +535,22 @@ export function shinyLeafValues(shinyLeafNumber: number) {
     fifth: !!(shinyLeafNumber & 16),
     crown: !!(shinyLeafNumber & 32),
   }
+}
+
+export function getHeightCalculated(mon: PKMInterface) {
+  if (mon.height !== undefined && mon.heightDeviation) {
+    const deviation = (mon.height / 255) * 0.40000004 + (1 - mon.heightDeviation)
+
+    return PokemonData[mon.dexNum].formes[mon.formeNum].height * 100 * deviation
+  }
+  return undefined
+}
+
+export function getWeightCalculated(mon: PKMInterface) {
+  if (mon.weight !== undefined && mon.weightDeviation) {
+    const deviation = (mon.weight / 255) * 0.40000004 + (1 - mon.weightDeviation)
+
+    return PokemonData[mon.dexNum].formes[mon.formeNum].weight * 10 * deviation
+  }
+  return undefined
 }

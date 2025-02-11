@@ -14,7 +14,6 @@ import { MonLocation, MonWithLocation, OpenSavesContext } from 'src/state/openSa
 import { PKMInterface } from 'src/types/interfaces'
 import { OHPKM } from 'src/types/pkm/OHPKM'
 import { getMonFileIdentifier } from 'src/util/Lookup'
-import { InfoGrid } from '../../components/InfoGrid'
 import { buildBackwardNavigator, buildForwardNavigator } from '../util'
 import ArrowButton from './ArrowButton'
 import BoxCell from './BoxCell'
@@ -124,6 +123,8 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
     () => buildBackwardNavigator(save, selectedIndex, setSelectedIndex),
     [save, selectedIndex]
   )
+
+  const displayData = useMemo(() => save.getDisplayData?.() ?? {}, [save])
 
   return save && save.currentPCBox !== undefined ? (
     <>
@@ -239,7 +240,9 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
               maxHeight: 'fit-content',
               height: '95%',
               overflow: 'hidden',
-              gap: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 2,
             }}
           >
             <AttributeRow label="Game">Pokémon {GameOfOriginData[save.origin]?.name}</AttributeRow>
@@ -265,7 +268,11 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                 <code>0x{save.calculateChecksum().toString(16)}</code>
               </AttributeRow>
             )}
-            {save.getExtraData && <InfoGrid data={save.getExtraData()} />}
+            {Object.entries(displayData).map(([label, value]) => (
+              <AttributeRow label={label} key={label}>
+                {value}
+              </AttributeRow>
+            ))}
           </Dialog.Content>
         </Dialog.Root>
       </Flex>

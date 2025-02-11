@@ -1,11 +1,12 @@
 import { Dialog, Flex, VisuallyHidden } from '@radix-ui/themes'
 import { FileSchemas } from 'pokemon-files'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary'
 import { MdDownload } from 'react-icons/md'
 import { ArrowLeftIcon, ArrowRightIcon } from 'src/components/Icons'
 import SideTabs from 'src/components/side-tabs/SideTabs'
 import MiniBoxIndicator, { MiniBoxIndicatorProps } from 'src/saves/boxes/MiniBoxIndicator'
+import { BackendContext } from '../backend/backendContext'
 import HexDisplay from '../components/HexDisplay'
 import { fileTypeFromString } from '../types/FileImport'
 import { PKMInterface } from '../types/interfaces'
@@ -40,6 +41,7 @@ const PokemonDetailsModal = (props: {
   const [displayMon, setDisplayMon] = useState(mon)
   const [boxIndicatorVisible, setBoxIndicatorVisible] = useState(false)
   const [boxIndicatorTimeout, setBoxIndicatorTimeout] = useState<NodeJS.Timeout>()
+  const backend = useContext(BackendContext)
 
   useEffect(() => setDisplayMon(mon), [mon])
 
@@ -133,7 +135,15 @@ const PokemonDetailsModal = (props: {
                     }
                   }}
                 />
-                <button style={{ margin: '8px 0px', padding: '4px 6px' }}>
+                <button
+                  style={{ margin: '8px 0px', padding: '4px 6px' }}
+                  onClick={() =>
+                    backend.saveLocalFile(
+                      new Uint8Array(displayMon.toBytes()),
+                      `${displayMon.nickname}.${displayMon.format.toLocaleLowerCase()}`
+                    )
+                  }
+                >
                   <a
                     href={buildURL(displayMon)}
                     download={`${displayMon.nickname}.${displayMon.format.toLocaleLowerCase()}`}

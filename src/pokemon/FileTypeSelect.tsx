@@ -2,10 +2,8 @@ import { uniq } from 'lodash'
 import { useContext, useMemo } from 'react'
 import {
   BDSP_TRANSFER_RESTRICTIONS,
-  LA_TRANSFER_RESTRICTIONS,
   LGPE_TRANSFER_RESTRICTIONS,
   SV_TRANSFER_RESTRICTIONS,
-  SWSH_TRANSFER_RESTRICTIONS,
 } from 'src/consts/TransferRestrictions'
 import { supportsMon } from 'src/types/SAVTypes/util'
 import { isRestricted } from 'src/types/TransferRestrictions'
@@ -67,14 +65,8 @@ const FileTypeSelect = (props: FileTypeSelectProps) => {
     if (!isRestricted(LGPE_TRANSFER_RESTRICTIONS, formData.dexNum, formData.formeNum)) {
       supportedFormats.push('PB7')
     }
-    if (!isRestricted(SWSH_TRANSFER_RESTRICTIONS, formData.dexNum, formData.formeNum)) {
-      supportedFormats.push('PK8')
-    }
     if (!isRestricted(BDSP_TRANSFER_RESTRICTIONS, formData.dexNum, formData.formeNum)) {
       supportedFormats.push('PB8')
-    }
-    if (!isRestricted(LA_TRANSFER_RESTRICTIONS, formData.dexNum, formData.formeNum)) {
-      supportedFormats.push('PA8')
     }
     if (!isRestricted(SV_TRANSFER_RESTRICTIONS, formData.dexNum, formData.formeNum)) {
       supportedFormats.push('PK9')

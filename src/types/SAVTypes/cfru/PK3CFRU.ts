@@ -20,14 +20,14 @@ import {
   markingsFourShapesToBytes,
   read30BitIVsFromBytes,
   readGen3StringFromBytes,
-  readStatsFromBytes,
+  readStatsFromBytesU8,
   setFlag,
   Stats,
   uIntFromBufferBits,
   uIntToBufferBits,
   write30BitIVsToBytes,
   writeGen3StringToBytes,
-  writeStatsToBytes,
+  writeStatsToBytesU8,
 } from 'pokemon-files'
 import { getHPGen3Onward, getStatGen3Onward } from '../../../util/StatCalc'
 import { PKMInterface, PluginPKMInterface } from '../../interfaces'
@@ -213,7 +213,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
       }
 
       // EVs 43:49
-      this.evs = readStatsFromBytes(dataView, 0x2c)
+      this.evs = readStatsFromBytesU8(dataView, 0x2c)
 
       // 49
       this.pokerusByte = dataView.getUint8(0x32)
@@ -405,7 +405,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
     uIntToBufferBits(dataView, this.moveToGameIndex(this.moves[3]), 0x2a, 6, 10, true)
 
     // EVs
-    writeStatsToBytes(dataView, 0x2c, this.evs)
+    writeStatsToBytesU8(dataView, 0x2c, this.evs)
 
     // 49 Pokerus
     dataView.setUint8(0x32, this.pokerusByte)

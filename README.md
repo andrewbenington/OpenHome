@@ -8,6 +8,14 @@ OpenHome is an open source, cross-platform tool for moving Pokémon between game
 
 Visit the [GitHub Pages site](https://andrewbenington.github.io/OpenHome/) for easy download links and more information.
 
+## Disclaimer
+
+OpenHome is only intended to be used for fun. Pokémon modified by OpenHome are not guaranteed to be legal Pokémon when transferred to a modern Pokémon game, and should never be used in official competitions or online play. Pokémon modified by OpenHome should not be moved into Pokémon Home, and Pokémon that have previously been stored in Pokémon Home should not be modified with OpenHome. Doing so may result in your Pokémon Home account being suspended.
+
+The OpenHome developers do not endorse piracy. There are online guides available with instructions on how to dump save files and ROMs of games from physically owned cartridges.
+
+While we do our best to avoid glitches, it's always a good idea to back up your save files in case of a save corruption error.
+
 ## Screenshots
 
 <img width="1000" alt="Screenshot 2024-01-14 at 1 47 47 PM" src="https://github.com/andrewbenington/OpenHome/assets/42848290/45b3bc85-d305-4429-8082-f540d9c87053">
@@ -116,6 +124,8 @@ the future.
 - Pokémon Omega Ruby/Alpha Sapphire
 - Pokémon Sun/Moon
 - Pokémon Ultra Sun/Ultra Moon
+- Pokémon Sword/Shield
+- Pokémon Legends Arceus
 
 ### Supported ROM Hack formats
 
