@@ -3,18 +3,18 @@ import * as E from 'fp-ts/lib/Either'
 import { debounce } from 'lodash'
 import { useCallback, useContext, useState } from 'react'
 import 'react-data-grid/lib/styles.css'
+import { BackendContext } from 'src/backend/backendContext'
+import { CardsIcon, GridIcon } from 'src/components/Icons'
+import SideTabs from 'src/components/side-tabs/SideTabs'
+import useDisplayError from 'src/hooks/displayError'
+import { AppInfoAction, AppInfoContext } from 'src/state/appInfo'
+import { LookupContext } from 'src/state/lookup'
+import { OpenSavesContext } from 'src/state/openSaves'
+import { buildSaveFile, getSaveTypes } from 'src/types/SAVTypes/load'
 import { PathData } from 'src/types/SAVTypes/path'
+import { getSaveRef } from 'src/types/SAVTypes/SAV'
 import { SAVClass } from 'src/types/SAVTypes/util'
 import { getMonFileIdentifier } from 'src/util/Lookup'
-import { BackendContext } from '../backend/backendContext'
-import { CardsIcon, GridIcon } from '../components/Icons'
-import SideTabs from '../components/side-tabs/SideTabs'
-import useDisplayError from '../hooks/displayError'
-import { AppInfoAction, AppInfoContext } from '../state/appInfo'
-import { LookupContext } from '../state/lookup'
-import { OpenSavesContext } from '../state/openSaves'
-import { getSaveRef } from '../types/SAVTypes/SAV'
-import { buildSaveFile, getSaveTypes } from '../types/SAVTypes/load'
 import RecentSaves from './RecentSaves'
 import SaveFolders from './SaveFolders'
 import SuggestedSaves from './SuggestedSaves'
@@ -38,19 +38,13 @@ const debouncedUpdateCardSize = debounce(
   500
 )
 
-const SavesModal = (props: SavesModalProps) => {
-  const { open, onClose } = props
-  const backend = useContext(BackendContext)
-  const [, dispatchOpenSaves] = useContext(OpenSavesContext)
-  const [lookupState] = useContext(LookupContext)
+function useOpenSaveHandler(onClose?: () => void) {
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
-  const [{ settings }, dispatchAppInfoState] = useContext(AppInfoContext)
-  const [unknownSaveData, setUnknownSaveData] = useState<AmbiguousOpenState>()
+  const [, dispatchOpenSaves] = useContext(OpenSavesContext)
+  const [tentativeSaveData, setTentativeSaveData] = useState<AmbiguousOpenState>()
+  const backend = useContext(BackendContext)
+  const [lookupState] = useContext(LookupContext)
   const displayError = useDisplayError()
-
-  // these are kept as a local state to reduce lag
-  const [cardSize, setCardSize] = useState(settings.saveCardSize)
-  const [viewMode, setViewMode] = useState<SaveViewMode>(settings.saveViewMode)
 
   const buildAndOpenSave = useCallback(
     (saveType: SAVClass, filePath: PathData, fileBytes: Uint8Array) => {
@@ -83,7 +77,7 @@ const SavesModal = (props: SavesModalProps) => {
       } else {
         backend.addRecentSave(getSaveRef(saveFile))
         dispatchOpenSaves({ type: 'add_save', payload: saveFile })
-        onClose()
+        onClose?.()
       }
     },
     [backend, displayError, dispatchOpenSaves, lookupState, onClose]
@@ -122,7 +116,7 @@ const SavesModal = (props: SavesModalProps) => {
                 return
               }
 
-              setUnknownSaveData({ possibleSaveTypes: saveTypes, filePath, fileBytes })
+              setTentativeSaveData({ possibleSaveTypes: saveTypes, filePath, fileBytes })
             }
           }
         )
@@ -130,6 +124,19 @@ const SavesModal = (props: SavesModalProps) => {
     },
     [backend, buildAndOpenSave, displayError, getEnabledSaveTypes]
   )
+
+  return { pickSaveFile, buildAndOpenSave, tentativeSaveData, setTentativeSaveData }
+}
+
+const SavesModal = (props: SavesModalProps) => {
+  const { open, onClose } = props
+  const [{ settings }, dispatchAppInfoState] = useContext(AppInfoContext)
+  const { buildAndOpenSave, pickSaveFile, tentativeSaveData, setTentativeSaveData } =
+    useOpenSaveHandler(onClose)
+
+  // these are kept as a local state to reduce lag
+  const [cardSize, setCardSize] = useState(settings.saveCardSize)
+  const [viewMode, setViewMode] = useState<SaveViewMode>(settings.saveViewMode)
 
   return (
     <Dialog.Root open={open} onOpenChange={(open) => !open && onClose?.()}>
@@ -223,12 +230,12 @@ const SavesModal = (props: SavesModalProps) => {
           </SideTabs.Panel>
         </SideTabs.Root>
         <SelectSaveType
-          open={!!unknownSaveData}
-          saveTypes={unknownSaveData?.possibleSaveTypes}
+          open={!!tentativeSaveData}
+          saveTypes={tentativeSaveData?.possibleSaveTypes}
           onSelect={(selected) => {
-            setUnknownSaveData(undefined)
-            if (!unknownSaveData || !selected) return
-            const data = unknownSaveData
+            setTentativeSaveData(undefined)
+            if (!tentativeSaveData || !selected) return
+            const data = tentativeSaveData
 
             buildAndOpenSave(selected, data.filePath, data.fileBytes)
           }}
