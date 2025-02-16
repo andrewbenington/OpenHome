@@ -1,7 +1,6 @@
 use std::process::Command;
 
 use tauri::{image::Image, include_image, menu::*, App, AppHandle, Emitter, Manager, Wry};
-
 const APP_ICON: Image<'_> = include_image!("icons/128x128.png");
 
 #[cfg(target_os = "macos")]
@@ -120,7 +119,9 @@ pub fn handle_menu_event(app_handle: &AppHandle, event: MenuEvent) {
     match event.id.as_ref() {
         // File menu actions
         // "new" => println!("New file action triggered!"),
-        // "open" => println!("Open file action triggered!"),
+        "open" => app_handle
+            .emit("open", ())
+            .unwrap_or_else(|err| println!("Error emitting 'open' event: {err}")),
         "save" => {
             let result = app_handle.emit("save", ());
             if let Err(error) = result {

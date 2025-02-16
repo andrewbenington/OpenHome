@@ -80,5 +80,6 @@ export default interface BackendInterface {
 export interface BackendListeners {
   onSave: () => void
   onReset: () => void
+  onOpen: () => void
   onPluginDownloadProgress: [string, (_progress_pct: number) => void]
 }
