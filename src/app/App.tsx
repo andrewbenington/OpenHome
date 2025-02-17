@@ -45,12 +45,29 @@ export default function App() {
 
 function buildKeyboardHandler(backend: BackendInterface) {
   return (e: KeyboardEvent) => {
+    if (!e.ctrlKey) return
     switch (e.key) {
-      case 'o': {
-        if (e.ctrlKey) {
-          backend.emitMenuEvent('open')
-        }
-      }
+      case 'o':
+        backend.emitMenuEvent('open')
+        return
+      case 's':
+        backend.emitMenuEvent('save')
+        return
+      case 'x':
+        backend.emitMenuEvent('reset')
+        return
+      case 'd':
+        backend.emitMenuEvent('open-appdata')
+        return
+      case 'q':
+        backend.emitMenuEvent('exit')
+        return
+      case 'u':
+        backend.emitMenuEvent('check-updates')
+        return
+      case 'g':
+        backend.emitMenuEvent('visit-github')
+        return
     }
   }
 }
