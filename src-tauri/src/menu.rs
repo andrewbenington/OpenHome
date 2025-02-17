@@ -115,8 +115,11 @@ fn command_open(target: &str) {
 }
 
 pub fn handle_menu_event(app_handle: &AppHandle, event: MenuEvent) {
-    println!("Triggered menu event ID: {}", event.id.as_ref());
-    match event.id.as_ref() {
+    handle_menu_event_id(app_handle, event.id.as_ref());
+}
+
+pub fn handle_menu_event_id(app_handle: &AppHandle, event_id: &str) {
+    match event_id {
         // File menu actions
         // "new" => println!("New file action triggered!"),
         "open" => app_handle

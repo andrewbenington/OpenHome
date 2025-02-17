@@ -251,7 +251,7 @@ export const TauriBackend: BackendInterface = {
     open(directory)
     return E.right(null)
   },
-  getPlatform: async () => platform(),
+  getPlatform: platform,
   getState: async () => TauriInvoker.getState(),
   getSettings: async () => {
     const promise = TauriInvoker.getStorageFileJSON('settings.json') as Promise<
@@ -270,6 +270,7 @@ export const TauriBackend: BackendInterface = {
   },
   setTheme: (appTheme: 'light' | 'dark' | 'system'): Promise<Errorable<null>> =>
     TauriInvoker.setTheme(appTheme),
+  emitMenuEvent: TauriInvoker.handleMenuAccelleratorWindows,
 
   getImageData: TauriInvoker.getImageData,
   listInstalledPlugins: TauriInvoker.listInstalledPlugins,

@@ -249,12 +249,7 @@ const Home = () => {
       </Flex>
       <PokemonDetailsModal mon={selectedMon} onClose={() => setSelectedMon(undefined)} />
 
-      <SavesModal
-        open={openSaveDialog}
-        onClose={() => {
-          setOpenSaveDialog(false)
-        }}
-      />
+      <SavesModal open={openSaveDialog} onClose={() => setOpenSaveDialog(false)} />
     </Flex>
   )
 }
