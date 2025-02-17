@@ -177,7 +177,6 @@ pub fn find_suggested_saves(
     app_handle: tauri::AppHandle,
     save_folders: Vec<PathBuf>,
 ) -> Result<saves::PossibleSaves, String> {
-    println!("Finding possible saves");
     let mut possible_saves = saves::PossibleSaves {
         citra: Vec::new(),
         desamume: Vec::new(),
