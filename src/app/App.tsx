@@ -53,7 +53,7 @@ function buildKeyboardHandler(backend: BackendInterface) {
       case 's':
         backend.emitMenuEvent('save')
         return
-      case 'x':
+      case 't':
         backend.emitMenuEvent('reset')
         return
       case 'd':

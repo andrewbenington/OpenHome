@@ -40,7 +40,7 @@ pub fn create_menu(app: &App) -> Result<Menu<Wry>, Box<dyn std::error::Error>> {
 
     let open_item = MenuItem::with_id(handle, "open", "Open", true, Some("CmdOrCtrl+O"))?;
     let save_item = MenuItem::with_id(handle, "save", "Save", true, Some("CmdOrCtrl+S"))?;
-    let reset_item = MenuItem::with_id(handle, "reset", "Reset", true, Some("CmdOrCtrl+X"))?;
+    let reset_item = MenuItem::with_id(handle, "reset", "Reset", true, Some("CmdOrCtrl+T"))?;
     let open_appdata_item = MenuItem::with_id(
         handle,
         "open-appdata",
