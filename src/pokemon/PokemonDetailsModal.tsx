@@ -19,10 +19,6 @@ import StatsDisplay from './StatsDisplay'
 import SummaryDisplay from './SummaryDisplay'
 import './style.css'
 
-function buildURL(mon: PKMInterface) {
-  return window.URL.createObjectURL(new Blob([mon.toBytes({ includeExtraFields: true })]))
-}
-
 const PokemonDetailsModal = (props: {
   mon?: PKMInterface
   onClose?: () => void
@@ -135,20 +131,16 @@ const PokemonDetailsModal = (props: {
                   }}
                 />
                 <button
-                  style={{ margin: '8px 0px', padding: '4px 6px' }}
-                  onClick={() =>
+                  style={{ margin: '8px 0px', padding: '4px 6px 2px 6px' }}
+                  onClick={() => {
+                    displayMon.refreshChecksum?.()
                     backend.saveLocalFile(
                       new Uint8Array(displayMon.toBytes()),
                       `${displayMon.nickname}.${displayMon.format.toLocaleLowerCase()}`
                     )
-                  }
+                  }}
                 >
-                  <a
-                    href={buildURL(displayMon)}
-                    download={`${displayMon.nickname}.${displayMon.format.toLocaleLowerCase()}`}
-                  >
-                    <MdDownload style={{ color: 'white' }} />
-                  </a>
+                  <MdDownload style={{ color: 'white' }} />
                 </button>
               </Flex>
               <SideTabs.Tab value="summary">Summary</SideTabs.Tab>
