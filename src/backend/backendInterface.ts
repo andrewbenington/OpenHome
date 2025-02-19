@@ -60,13 +60,14 @@ export default interface BackendInterface {
   pickFolder: () => Promise<Errorable<string | undefined>>
   getResourcesPath: () => Promise<string>
   openDirectory: (directory: string) => Promise<Errorable<null>>
-  getPlatform: () => Promise<string>
+  getPlatform: () => string
   registerListeners: (listeners: Partial<BackendListeners>) => () => void
   getState: () => Promise<Errorable<AppState>>
   getSettings: () => Promise<Errorable<Settings>>
   updateSettings: (settings: Settings) => Promise<Errorable<null>>
   setTheme(appTheme: 'light' | 'dark' | 'system'): Promise<Errorable<null>>
   saveLocalFile: (bytes: Uint8Array, suggestedName: string) => Promise<Errorable<null>>
+  emitMenuEvent: (menuEventId: string) => Promise<null>
 
   /* plugins */
   getImageData: (absolutePath: string) => Promise<Errorable<ImageResponse>>

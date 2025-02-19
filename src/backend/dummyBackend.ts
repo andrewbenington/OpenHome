@@ -40,13 +40,14 @@ const DummyBackend: BackendInterface = {
   pickFolder: async () => E.left('no backend in use'),
   getResourcesPath: async () => '',
   openDirectory: async () => E.left('no backend in use'),
-  getPlatform: async () => 'none',
+  getPlatform: () => 'none',
   registerListeners: (_: Partial<BackendListeners>) => () => {},
   getState: async () => E.left('no backend in use'),
   getSettings: async () => E.left('no backend in use'),
   updateSettings: async () => E.left('no backend in use'),
   setTheme: async () => E.left('no backend in use'),
   saveLocalFile: async () => E.left('no backend in use'),
+  emitMenuEvent: async () => null,
 
   /* plugins */
   getImageData: async () => E.left('no backend in use'),

@@ -1,5 +1,5 @@
 import { DropdownMenu, IconButton } from '@radix-ui/themes'
-import { useContext, useEffect, useMemo, useState } from 'react'
+import { useContext, useMemo } from 'react'
 import { BackendContext } from 'src/backend/backendContext'
 import { MenuIcon } from 'src/components/Icons'
 import useIsDarkMode from 'src/hooks/dark-mode'
@@ -36,11 +36,6 @@ export default function SaveDetailsMenu(props: SaveDetailsMenuProps) {
   const { save, backgroundColor, backgroundAlwaysPresent, onRemove } = props
   const backend = useContext(BackendContext)
   const isDarkMode = useIsDarkMode()
-  const [platform, setPlatform] = useState('')
-
-  useEffect(() => {
-    backend.getPlatform().then(setPlatform)
-  }, [backend])
 
   const darkBackground = useMemo(() => {
     if (!backgroundColor) {
@@ -95,7 +90,7 @@ export default function SaveDetailsMenu(props: SaveDetailsMenuProps) {
             backend.openDirectory(save.filePath.dir)
           }}
         >
-          Reveal in {platform === 'macos' ? 'Finder' : 'File Explorer'}
+          Reveal in {backend.getPlatform() === 'macos' ? 'Finder' : 'File Explorer'}
         </DropdownMenu.Item>
       </DropdownMenu.Content>
     </DropdownMenu.Root>

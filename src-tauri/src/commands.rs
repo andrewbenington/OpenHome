@@ -1,7 +1,7 @@
 use crate::plugin::{self, list_plugins, PluginMetadata, PluginMetadataWithIcon};
 use crate::state::{AppState, AppStateSnapshot};
 use crate::util::ImageResponse;
-use crate::{saves, util};
+use crate::{menu, saves, util};
 use serde_json::Value;
 use std::collections::HashMap;
 use std::fs;
@@ -177,7 +177,6 @@ pub fn find_suggested_saves(
     app_handle: tauri::AppHandle,
     save_folders: Vec<PathBuf>,
 ) -> Result<saves::PossibleSaves, String> {
-    println!("Finding possible saves");
     let mut possible_saves = saves::PossibleSaves {
         citra: Vec::new(),
         desamume: Vec::new(),
@@ -300,4 +299,9 @@ pub fn delete_plugin(app_handle: tauri::AppHandle, plugin_id: String) -> Result<
     let plugin_dir = plugins_dir.join(&plugin_id);
 
     util::delete_folder(&plugin_dir)
+}
+
+#[tauri::command]
+pub fn handle_windows_accellerator(app_handle: tauri::AppHandle, menu_event_id: String) {
+    menu::handle_menu_event_id(&app_handle, menu_event_id.as_ref());
 }

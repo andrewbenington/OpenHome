@@ -43,6 +43,35 @@ export default function App() {
   )
 }
 
+function buildKeyboardHandler(backend: BackendInterface) {
+  return (e: KeyboardEvent) => {
+    if (!e.ctrlKey) return
+    switch (e.key) {
+      case 'o':
+        backend.emitMenuEvent('open')
+        return
+      case 's':
+        backend.emitMenuEvent('save')
+        return
+      case 't':
+        backend.emitMenuEvent('reset')
+        return
+      case 'd':
+        backend.emitMenuEvent('open-appdata')
+        return
+      case 'q':
+        backend.emitMenuEvent('exit')
+        return
+      case 'u':
+        backend.emitMenuEvent('check-updates')
+        return
+      case 'g':
+        backend.emitMenuEvent('visit-github')
+        return
+    }
+  }
+}
+
 function AppWithBackend() {
   const [mouseState, mouseDispatch] = useReducer(mouseReducer, { shift: false })
   const [appInfoState, appInfoDispatch] = useReducer(appInfoReducer, appInfoInitialState)
@@ -71,6 +100,17 @@ function AppWithBackend() {
         )
       )
       .finally(() => setLoading(false))
+  }, [backend])
+
+  // only on app start
+  useEffect(() => {
+    if (backend.getPlatform() !== 'windows') return
+    const handler = buildKeyboardHandler(backend)
+
+    window.addEventListener('keydown', handler)
+    return () => {
+      window.removeEventListener('keydown', handler)
+    }
   }, [backend])
 
   useEffect(() => {
