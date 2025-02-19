@@ -318,7 +318,7 @@ export const TauriBackend: BackendInterface = {
       unlistenPromises.push(listen('save', listeners.onSave))
     }
     if (listeners.onReset) {
-      unlistenPromises.push(listen('save', listeners.onReset))
+      unlistenPromises.push(listen('reset', listeners.onReset))
     }
     if (listeners.onOpen) {
       unlistenPromises.push(listen('open', listeners.onOpen))
