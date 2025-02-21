@@ -18,13 +18,13 @@ pub struct PluginMetadata {
 
 impl PluginMetadata {
     pub fn with_icon_bytes(self, path: &Path) -> PluginMetadataWithIcon {
-        return PluginMetadataWithIcon {
+        PluginMetadataWithIcon {
             id: self.id,
             name: self.name,
             version: self.version,
             api_version: self.api_version,
             icon_image: util::get_image_data(path).ok(),
-        };
+        }
     }
 }
 
@@ -40,7 +40,7 @@ pub struct PluginMetadataWithIcon {
 pub fn list_plugins(
     app_handle: &tauri::AppHandle,
 ) -> Result<Vec<PluginMetadataWithIcon>, Box<dyn std::error::Error>> {
-    let plugins_path = util::prepend_appdata_to_path(&app_handle, &PathBuf::from("plugins"))
+    let plugins_path = util::prepend_appdata_to_path(app_handle, &PathBuf::from("plugins"))
         .map_err(|e| format!("Error building plugin path: {}", e))?;
 
     if !plugins_path.exists() {
@@ -50,7 +50,7 @@ pub fn list_plugins(
     let plugin_dirs = fs::read_dir(&plugins_path).map_err(|e| {
         format!(
             "Error reading directory {}: {}",
-            plugins_path.to_string_lossy().to_string(),
+            plugins_path.to_string_lossy(),
             e
         )
     })?;
@@ -74,7 +74,7 @@ pub fn list_plugins(
         if let Err(err) = file_r {
             eprintln!(
                 "Error opening plugin {}: {}",
-                plugin_dir_path.to_string_lossy().to_string(),
+                plugin_dir_path.to_string_lossy(),
                 err
             );
             continue;
@@ -91,7 +91,7 @@ pub fn list_plugins(
         }
     }
 
-    return Ok(plugins);
+    Ok(plugins)
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Clone, Debug)]
@@ -122,7 +122,7 @@ async fn download_to_file(source: &str, dest: &Path) -> Result<(), String> {
                 .map_err(|err| format!("write {:?}: {}", dest, err))
         })?;
 
-    return Ok(());
+    Ok(())
 }
 
 const ASSETS_PCT: f64 = 80.0;
@@ -136,7 +136,7 @@ pub async fn download_async(
         util::prepend_appdata_to_path(&app_handle, &Path::new("plugins").join(&plugin_metadata.id))
             .map_err(|err| format!("get plugins directory: {}", err))?;
 
-    fs::create_dir_all(&new_plugin_dir.join("dist"))
+    fs::create_dir_all(new_plugin_dir.join("dist"))
         .map_err(|err| format!("create plugin directory: {}", err))?;
 
     download_to_file(
@@ -149,7 +149,7 @@ pub async fn download_async(
         .await
         .map_err(|err| format!("download index.js file: {}", err))?;
 
-    File::create(&new_plugin_dir.join("dist").join("index.js"))
+    File::create(new_plugin_dir.join("dist").join("index.js"))
         .map_err(|err| format!("create index.js file: {}", err))
         .and_then(|mut f| {
             write!(f, "{}", index_js_body).map_err(|err| format!("write index.js file: {}", err))
@@ -179,5 +179,5 @@ pub async fn download_async(
 
     emit_download_progress(&app_handle, plugin_metadata.id.clone(), 100.0);
 
-    return Ok(index_js_body);
+    Ok(index_js_body)
 }

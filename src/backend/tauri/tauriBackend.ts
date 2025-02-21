@@ -323,9 +323,6 @@ export const TauriBackend: BackendInterface = {
     if (listeners.onOpen) {
       unlistenPromises.push(listen('open', listeners.onOpen))
     }
-    if (listeners.onOpen) {
-      unlistenPromises.push(listen('open', listeners.onOpen))
-    }
     if (listeners.onPluginDownloadProgress) {
       const [pluginID, listener] = listeners.onPluginDownloadProgress
 

@@ -29,6 +29,10 @@ check:
 	@npm run lint
 	@npm run format
 
+.PHONY: check-rs
+check-rs:
+	@cd src-tauri && cargo clippy -- -Aclippy::needless_return
+
 .PHONY: set-version
 set-version:
 ifeq ($(shell cargo install --list | grep cargo-edit), )
