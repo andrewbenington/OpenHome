@@ -192,7 +192,8 @@ where
 
 pub fn get_image_data(absolute_path: &Path) -> Result<ImageResponse, String> {
     if !absolute_path.exists() {
-        return Err(format!("File does not exist: {:?}", absolute_path));
+        let absolute_path = absolute_path.to_string_lossy();
+        return Err(format!("File does not exist: {absolute_path}"));
     }
 
     let mut file = File::open(absolute_path).map_err(|e| e.to_string())?;
@@ -224,17 +225,12 @@ pub fn get_image_data(absolute_path: &Path) -> Result<ImageResponse, String> {
 
 pub fn delete_folder(folder_path: &Path) -> Result<(), String> {
     if !folder_path.exists() {
-        return Err(format!(
-            "Folder does not exist: {}",
-            folder_path.to_string_lossy()
-        ));
+        let folder_path = folder_path.to_string_lossy();
+        return Err(format!("Folder does not exist: {folder_path}"));
     }
 
     fs::remove_dir_all(folder_path).map_err(|err| {
-        format!(
-            "Failed to delete the folder located at {}: {}",
-            folder_path.to_string_lossy(),
-            err
-        )
+        let folder_path = folder_path.to_string_lossy();
+        format!("Failed to delete the folder located at {folder_path}: {err}",)
     })
 }

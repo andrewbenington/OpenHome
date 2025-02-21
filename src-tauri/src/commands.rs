@@ -144,8 +144,7 @@ pub fn write_storage_file_json(
     relative_path: PathBuf,
     data: Value,
 ) -> Result<(), String> {
-    let serialized = data.to_string();
-    write_storage_file_text(app_handle, relative_path, serialized)
+    write_storage_file_text(app_handle, relative_path, data.to_string())
 }
 
 #[tauri::command]

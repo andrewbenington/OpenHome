@@ -52,8 +52,9 @@ impl AppState {
 
         let mut temp_files = self.temp_files.lock().unwrap();
         for temp_file in temp_files.iter() {
-            remove_file(temp_file)
-                .unwrap_or_else(|e| eprintln!("delete temp file {:?}: {}", temp_file, e));
+            remove_file(temp_file).unwrap_or_else(|e| {
+                eprintln!("delete temp file {}: {}", temp_file.to_string_lossy(), e)
+            });
         }
 
         *self.open_transaction.lock().unwrap() = false;
@@ -91,6 +92,6 @@ impl AppState {
             .map_err(|e| format!("Create/open file {}: {}", path.to_string_lossy(), e))?;
 
         file.write_all(&bytes)
-            .map_err(|e| format!("Write file {:?}: {}", path, e))
+            .map_err(|e| format!("Write file {}: {}", path.to_string_lossy(), e))
     }
 }

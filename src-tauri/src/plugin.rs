@@ -113,13 +113,13 @@ fn emit_download_progress(app_handle: &tauri::AppHandle, plugin_id: String, prog
 async fn download_to_file(source: &str, dest: &Path) -> Result<(), String> {
     let body = util::download_binary_file(source)
         .await
-        .map_err(|err| format!("download {:?}: {}", dest, err))?;
+        .map_err(|err| format!("download {}: {}", dest.to_string_lossy(), err))?;
 
     File::create(dest)
-        .map_err(|err| format!("create {:?}: {}", dest, err))
+        .map_err(|err| format!("create {}: {}", dest.to_string_lossy(), err))
         .and_then(|mut f| {
             f.write(&body)
-                .map_err(|err| format!("write {:?}: {}", dest, err))
+                .map_err(|err| format!("write {}: {}", dest.to_string_lossy(), err))
         })?;
 
     Ok(())
