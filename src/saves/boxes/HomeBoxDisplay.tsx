@@ -103,9 +103,16 @@ const HomeBoxDisplay = () => {
       <>
         <Card
           variant="surface"
-          style={{ padding: 2, width: '100%', height: 'fit-content', gap: 0 }}
+          style={{
+            padding: 6,
+            width: '100%',
+            height: 'fit-content',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 4,
+          }}
         >
-          <Flex direction="row" minHeight="48px" p="1">
+          <Flex direction="row" className="box-navigation">
             <Flex align="center" justify="end" flexGrow="4">
               <ArrowButton
                 onClick={() =>
@@ -160,13 +167,13 @@ const HomeBoxDisplay = () => {
             <Flex align="center" justify="end" flexGrow="1">
               <MiniButton
                 icon={EditIcon}
-                style={{ transition: 'none', padding: 2 }}
+                style={{ transition: 'none', padding: 0 }}
                 variant={editing ? 'solid' : 'outline'}
                 onClick={() => setEditing(!editing)}
               />
             </Flex>
           </Flex>
-          <Grid columns={COLUMN_COUNT.toString()} gap="1" p="1">
+          <Grid columns={COLUMN_COUNT.toString()} gap="1">
             {lodash
               .range(COLUMN_COUNT * ROW_COUNT)
               .map((index: number) => currentBox.pokemon[index])

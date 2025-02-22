@@ -109,7 +109,7 @@ button,
 select {
   border-radius: 3px;
   border: 2px solid transparent;
-  font-size: 1em;
+  font-size: small;
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
@@ -127,11 +127,9 @@ select:focus-visible {
 
 input,
 fieldset {
-  border-radius: 5px;
+  border-radius: 3px;
   border: 1px solid transparent;
-  margin: 0.2em;
-  padding: 0.2em;
-  font-size: 1em;
+  font-size: small;
   font-weight: 500;
   font-family: inherit;
   transition: border-color 0.25s;
@@ -192,10 +190,11 @@ label {
 
 .radix-themes {
   --cursor-button: pointer;
-  --card-border-width: 0px;
+  --card-border-width: 2px;
   --base-menu-content-padding: 0px;
   --base-menu-item-height: 26px;
   --cursor-menu-item: pointer;
+  --default-font-size: 0.9em;
   .rt-BaseTabList {
     background-color: var(--color-panel);
   }
@@ -208,6 +207,9 @@ label {
   }
   .rt-BaseMenuItem {
     border-radius: 0;
+  }
+  .rt-Card {
+    --base-card-border-radius: 5px;
   }
 }
 

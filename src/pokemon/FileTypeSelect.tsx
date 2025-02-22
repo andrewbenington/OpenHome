@@ -15,10 +15,11 @@ const styles = {
   fileTypeChip: {
     color: 'white',
     fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: 'small',
     boxShadow: 'none',
     flex: 1,
-    margin: 8,
+    padding: '4px 6px 2px 6px',
+    height: 'fit-content',
   },
 } as Styles
 
