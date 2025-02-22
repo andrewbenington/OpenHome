@@ -1,5 +1,4 @@
 use crate::util::{self, parse_path_data, PathData};
-use serde;
 use std::collections::HashMap;
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -211,27 +210,21 @@ pub fn get_recent_saves(app_handle: tauri::AppHandle) -> Result<HashMap<String, 
                 trainer_name: save.trainer_name.unwrap_or_default(),
                 trainer_id: save.trainer_id.unwrap_or_default(),
                 last_opened: save.last_opened,
-                last_modified: get_modified_time_ms(path).ok(),
+                last_modified: get_modified_time_ms(path),
                 valid: path.exists(),
                 plugin_identifier: save.plugin_identifier,
             },
         );
     }
 
-    return Ok(validated_recents);
+    Ok(validated_recents)
 }
 
-fn get_modified_time_ms(path: &Path) -> Result<f64, String> {
-    return path
-        .metadata()
-        .map_err(|e| format!("Error getting metadata: {}", e))
-        .and_then(|m| {
-            m.modified()
-                .map_err(|e| format!("Error getting modified time: {}", e))
-        })
-        .and_then(|st| {
-            st.duration_since(UNIX_EPOCH)
-                .map_err(|e| format!("Invalid modified time: {}", e))
-        })
-        .map(|dur| dur.as_millis() as f64);
+fn get_modified_time_ms(path: &Path) -> Option<f64> {
+    path.metadata()
+        .ok()
+        .as_ref()
+        .and_then(|metadata| metadata.modified().ok())
+        .and_then(|st| st.duration_since(UNIX_EPOCH).ok())
+        .map(|dur| dur.as_millis() as f64)
 }

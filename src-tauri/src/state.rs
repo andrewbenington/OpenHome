@@ -8,9 +8,9 @@ use serde::Serialize;
 
 fn add_tmp(path: &Path) -> PathBuf {
     if let Some(stem) = path.file_name() {
-        return path.with_file_name(format!("{}.tmp", stem.to_string_lossy().to_owned()));
+        return path.with_file_name(format!("{}.tmp", stem.to_string_lossy().into_owned()));
     }
-    return path.to_path_buf();
+    path.to_path_buf()
 }
 
 fn remove_tmp(mut path: PathBuf) -> PathBuf {
@@ -20,7 +20,7 @@ fn remove_tmp(mut path: PathBuf) -> PathBuf {
             path.set_file_name(new_name);
         }
     }
-    return path;
+    path
 }
 
 #[derive(Default, Serialize)]
@@ -42,7 +42,7 @@ impl AppState {
             return Err("Previous transaction is still open".to_owned());
         }
         *self.open_transaction.lock().unwrap() = true;
-        return Ok(());
+        Ok(())
     }
 
     pub fn rollback_transaction(&self) -> Result<(), String> {
@@ -52,13 +52,14 @@ impl AppState {
 
         let mut temp_files = self.temp_files.lock().unwrap();
         for temp_file in temp_files.iter() {
-            remove_file(temp_file)
-                .unwrap_or_else(|e| eprintln!("delete temp file {:?}: {}", temp_file, e));
+            remove_file(temp_file).unwrap_or_else(|e| {
+                eprintln!("delete temp file {}: {}", temp_file.to_string_lossy(), e)
+            });
         }
 
         *self.open_transaction.lock().unwrap() = false;
         temp_files.clear();
-        return Ok(());
+        Ok(())
     }
 
     pub fn commit_transaction(&self) -> Result<(), String> {
@@ -70,13 +71,13 @@ impl AppState {
         // overwrite original files with the .tmp versions, deleting the temps
         let mut temp_files = self.temp_files.lock().unwrap();
         for temp_file in temp_files.iter() {
-            println!("un-temping {}", temp_file.to_string_lossy().to_owned());
-            rename(&temp_file, &remove_tmp(temp_file.clone()))
-                .map_err(|e| format!("Un-Temp file {:?}: {}", temp_file, e))?;
+            println!("un-temping {}", temp_file.to_string_lossy().into_owned());
+            rename(temp_file, remove_tmp(temp_file.clone()))
+                .map_err(|e| format!("Un-Temp file {}: {}", temp_file.to_string_lossy(), e))?;
         }
         *self.open_transaction.lock().unwrap() = false;
         temp_files.clear();
-        return Ok(());
+        Ok(())
     }
 
     pub fn write_file_bytes(&self, absolute_path: &Path, bytes: Vec<u8>) -> Result<(), String> {
@@ -87,11 +88,10 @@ impl AppState {
             temp_files.push(path.clone());
         }
 
-        let mut file =
-            File::create(&path).map_err(|e| format!("Create/open file {:?}: {}", path, e))?;
+        let mut file = File::create(&path)
+            .map_err(|e| format!("Create/open file {}: {}", path.to_string_lossy(), e))?;
 
-        return file
-            .write_all(&bytes)
-            .map_err(|e| format!("Write file {:?}: {}", path, e));
+        file.write_all(&bytes)
+            .map_err(|e| format!("Write file {}: {}", path.to_string_lossy(), e))
     }
 }

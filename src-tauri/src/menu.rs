@@ -132,11 +132,9 @@ pub fn handle_menu_event_id(app_handle: &AppHandle, event_id: &str) {
             } else {
                 println!("Save successful");
             }
-            return ();
         }
         "reset" => {
             let _ = app_handle.emit("reset", ());
-            return ();
         }
         "open-appdata" => match app_handle.path().app_data_dir() {
             Err(err) => {

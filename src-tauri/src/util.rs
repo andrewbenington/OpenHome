@@ -1,9 +1,8 @@
 use base64::engine::general_purpose;
 use base64::Engine;
-use reqwest;
-use serde;
 use std::fs;
 use std::fs::{create_dir_all, File};
+use std::hash::{Hash, Hasher};
 use std::io::Cursor;
 use std::path::Path;
 use std::{collections::HashSet, io::Read, path::PathBuf};
@@ -16,7 +15,7 @@ pub struct ImageResponse {
     pub extension: String,
 }
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Hash)]
+#[derive(serde::Serialize, serde::Deserialize, Debug)]
 pub struct PathData {
     pub raw: String,
     pub name: String,
@@ -31,8 +30,13 @@ impl PartialEq for PathData {
     }
 }
 impl Eq for PathData {}
+impl Hash for PathData {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.raw.hash(state);
+    }
+}
 
-pub fn parse_path_data(path: &PathBuf) -> PathData {
+pub fn parse_path_data(path: &Path) -> PathData {
     let raw = path.to_string_lossy().to_string();
     let name = path
         .file_stem()
@@ -47,7 +51,7 @@ pub fn parse_path_data(path: &PathBuf) -> PathData {
     let dir = path
         .parent()
         .map(|p| p.to_string_lossy().to_string())
-        .unwrap_or_else(|| String::new());
+        .unwrap_or_default();
     let separator = std::path::MAIN_SEPARATOR.to_string();
     PathData {
         raw,
@@ -62,23 +66,18 @@ pub fn prepend_appdata_to_path(
     app_handle: &tauri::AppHandle,
     path: &PathBuf,
 ) -> Result<PathBuf, String> {
-    let appdata_dir = get_appdata_dir(app_handle)?;
-    let full_path = Path::new(&appdata_dir).join(path);
-
-    return Ok(full_path);
+    app_handle
+        .path()
+        .app_data_dir()
+        .map(|appdata| appdata.join(path))
+        .map_err(|e| format!("get appdata dir: {e}"))
 }
 
 pub fn prepend_appdata_storage_to_path(
     app_handle: &tauri::AppHandle,
-    path: &PathBuf,
+    path: &Path,
 ) -> Result<PathBuf, String> {
-    let appdata_dir = get_appdata_dir(app_handle)?;
-    let mut full_path = PathBuf::new();
-
-    full_path.push(&appdata_dir);
-    full_path.push("storage".to_owned());
-    full_path.push(path);
-    return Ok(full_path);
+    prepend_appdata_to_path(app_handle, &PathBuf::from("storage").join(path))
 }
 
 pub fn get_appdata_file_text(
@@ -94,69 +93,59 @@ pub fn get_appdata_file_text(
     file.read_to_string(&mut contents)
         .map_err(|e| e.to_string())?;
 
-    return Ok(contents);
+    Ok(contents)
 }
 
 pub fn get_storage_file_text(
     app_handle: &tauri::AppHandle,
-    relative_path: &PathBuf,
+    relative_path: &Path,
 ) -> Result<String, String> {
     let full_path = prepend_appdata_storage_to_path(app_handle, relative_path)?;
-
-    // Open the file, and return any error up the call stack
-    let mut file = File::open(full_path).map_err(|e| e.to_string())?;
-
-    let mut contents = String::new();
-    file.read_to_string(&mut contents)
-        .map_err(|e| e.to_string())?;
-
-    return Ok(contents);
+    fs::read_to_string(full_path).map_err(|e| e.to_string())
 }
 
 pub fn get_storage_file_json<T>(
     app_handle: &tauri::AppHandle,
-    relative_path: &PathBuf,
+    relative_path: &Path,
 ) -> Result<T, String>
 where
     T: serde::de::DeserializeOwned,
 {
-    let json_str = get_storage_file_text(app_handle, relative_path)?;
-    return serde_json::from_str(json_str.as_str())
-        .map_err(|e| format!("error opening {:?}: {e}", relative_path));
+    let json_str = get_storage_file_text(app_handle, relative_path)
+        .map_err(|e| format!("error reading {}: {e}", relative_path.to_string_lossy()))?;
+    serde_json::from_str(json_str.as_str())
+        .map_err(|e| format!("error parsing {}: {e}", relative_path.to_string_lossy()))
 }
 
 pub fn get_appdata_dir(app_handle: &tauri::AppHandle) -> Result<String, String> {
-    // Open the file, and return any error up the call stack
     let path_buf = app_handle
         .path()
         .app_data_dir()
         .map_err(|e| e.to_string())?;
 
-    return Ok(path_buf.to_string_lossy().into_owned());
+    Ok(path_buf.to_string_lossy().into_owned())
 }
 
 pub fn dedupe_paths(paths: Vec<PathData>) -> Vec<PathData> {
     let set: HashSet<PathData> = paths.into_iter().collect();
-    return set.into_iter().collect();
+    set.into_iter().collect()
 }
 
 pub fn create_openhome_directory(app_handle: &tauri::AppHandle) -> Result<(), String> {
     let appdata_dir = get_appdata_dir(app_handle)?;
     let full_path = PathBuf::from(appdata_dir).join("storage");
 
-    return create_dir_all(full_path).map_err(|e| e.to_string());
+    create_dir_all(full_path).map_err(|e| e.to_string())
 }
 
 pub async fn download_text_file(url: String) -> Result<String, Box<dyn std::error::Error>> {
     let response = reqwest::Client::new().get(url).send().await?;
-
-    return Ok(response.text().await?);
+    Ok(response.text().await?)
 }
 
 pub async fn download_binary_file(url: &str) -> Result<bytes::Bytes, Box<dyn std::error::Error>> {
     let response = reqwest::Client::new().get(url).send().await?;
-
-    return Ok(response.bytes().await?);
+    Ok(response.bytes().await?)
 }
 
 pub async fn download_extract_zip_file<F>(
@@ -165,7 +154,7 @@ pub async fn download_extract_zip_file<F>(
     progress_callback: F,
 ) -> Result<(), Box<dyn std::error::Error>>
 where
-    F: Fn(f64) -> (),
+    F: Fn(f64),
 {
     let bytes = download_binary_file(url).await?;
 
@@ -186,7 +175,7 @@ where
             std::io::copy(&mut file, &mut outfile)?;
         }
     }
-    return Ok(());
+    Ok(())
 }
 
 pub async fn download_json_file<T>(url: String) -> Result<T, Box<dyn std::error::Error>>
@@ -198,15 +187,16 @@ where
 
     let body: T = serde_json::from_str(&body_text)?;
 
-    return Ok(body);
+    Ok(body)
 }
 
 pub fn get_image_data(absolute_path: &Path) -> Result<ImageResponse, String> {
     if !absolute_path.exists() {
-        return Err(format!("File does not exist: {:?}", absolute_path));
+        let absolute_path = absolute_path.to_string_lossy();
+        return Err(format!("File does not exist: {absolute_path}"));
     }
 
-    let mut file = File::open(&absolute_path).map_err(|e| e.to_string())?;
+    let mut file = File::open(absolute_path).map_err(|e| e.to_string())?;
 
     let mut bytes = Vec::new();
     file.read_to_end(&mut bytes).map_err(|e| e.to_string())?;
@@ -230,22 +220,17 @@ pub fn get_image_data(absolute_path: &Path) -> Result<ImageResponse, String> {
         extension: extension_lower,
     };
 
-    return Ok(response);
+    Ok(response)
 }
 
 pub fn delete_folder(folder_path: &Path) -> Result<(), String> {
     if !folder_path.exists() {
-        return Err(format!(
-            "Folder does not exist: {}",
-            folder_path.to_string_lossy()
-        ));
+        let folder_path = folder_path.to_string_lossy();
+        return Err(format!("Folder does not exist: {folder_path}"));
     }
 
-    fs::remove_dir_all(&folder_path).map_err(|err| {
-        format!(
-            "Failed to delete the folder located at {}: {}",
-            folder_path.to_string_lossy(),
-            err
-        )
+    fs::remove_dir_all(folder_path).map_err(|err| {
+        let folder_path = folder_path.to_string_lossy();
+        format!("Failed to delete the folder located at {folder_path}: {err}",)
     })
 }
