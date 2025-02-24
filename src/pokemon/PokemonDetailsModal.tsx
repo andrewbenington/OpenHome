@@ -103,7 +103,7 @@ const PokemonDetailsModal = (props: {
         {mon && displayMon && (
           <SideTabs.Root className="pokemon-modal-tabs" defaultValue="summary">
             <SideTabs.TabList>
-              <Flex direction="row">
+              <Flex direction="row" gap="2" mb="1">
                 <FileTypeSelect
                   baseFormat={mon.format}
                   currentFormat={displayMon.format}
@@ -131,7 +131,7 @@ const PokemonDetailsModal = (props: {
                   }}
                 />
                 <button
-                  style={{ margin: '8px 0px', padding: '4px 6px 2px 6px' }}
+                  style={{ padding: '4px 6px 2px 6px' }}
                   onClick={() => {
                     displayMon.refreshChecksum?.()
                     backend.saveLocalFile(

@@ -3,11 +3,11 @@
   transition: color 0.25s;
   padding: 0;
   width: 36px;
-  height: 24px;
+  height: 21px;
 }
 .arrow-button div svg {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
 }
 
 .arrow-button:hover {
@@ -18,12 +18,24 @@
   display: flex;
   flex-direction: row;
   position: relative;
-  margin-bottom: 8px;
+  margin: 1px;
+  /* margin-bottom: 4px; */
+}
+.save-header svg {
+  height: 18px;
+  width: 18px;
+}
+
+.save-header-game {
+  font-weight: bold;
+  border-radius: 4px 0px 0px 4px;
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+  padding: 4px 14px 4px 4px;
 }
 
 .save-close-button {
-  position: absolute;
-  left: 8px;
   padding: 4px;
   display: grid;
   aspect-ratio: 1;
@@ -33,16 +45,19 @@
 
 .save-menu-button {
   position: absolute;
-  right: 8px;
-  padding: 4px;
+  right: 4px;
   display: grid;
   aspect-ratio: 1;
   align-items: center;
   height: fit-content;
+  margin-top: 4.5px;
+  padding: 1px;
 }
 
 .box-card {
-  padding: 5px;
+  padding: 6px 2px 2px;
+  display: flex;
+  flex-direction: column;
 }
 
 .box-navigation {
@@ -50,7 +65,7 @@
   flex-direction: row;
   align-items: center;
   text-align: center;
-  padding: 4px;
+  padding: 2px 0px;
 }
 
 .box-name {
@@ -59,6 +74,7 @@
   text-align: center;
   flex: 8;
   min-width: fit-content;
+  margin: 0px 6px;
 }
 
 .details-button {

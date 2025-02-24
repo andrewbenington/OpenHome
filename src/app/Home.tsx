@@ -243,7 +243,7 @@ const Home = () => {
           className="drop-area"
           onDrop={(e) => e.dataTransfer.files.length && previewFile(e.dataTransfer.files[0])}
         >
-          Preview
+          <div className="drop-area-text diagonal-clip">Preview</div>
         </div>
         <ReleaseArea />
       </Flex>

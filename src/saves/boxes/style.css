@@ -13,7 +13,6 @@
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: 3px;
 }
 
 .position-display-cell {
