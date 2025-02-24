@@ -84,9 +84,9 @@ export default function FilterPanel() {
   )
 
   return (
-    <Card style={{ contain: 'none' }}>
-      <Flex direction="row" justify="between">
-        <Text size="5" ml="1" weight="bold">
+    <Card style={{ contain: 'none', padding: 4 }}>
+      <Flex direction="row" justify="between" p="4px 4px 0px 4px">
+        <Text size="4" weight="bold">
           Filter
         </Text>
         <Button
@@ -94,7 +94,7 @@ export default function FilterPanel() {
           disabled={Object.values(filterState).length === 0}
           color="tomato"
           onClick={() => dispatchFilterState({ type: 'clear_all' })}
-          style={{ padding: 4 }}
+          size="1"
         >
           Clear All
         </Button>

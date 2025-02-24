@@ -27,7 +27,12 @@
 }
 
 .save-header-game {
-  clip-path: polygon(0% 0%, 0% 100%, calc(100% - 12px) 100%, calc(100% - 0px) 0%, 100% 0%);
+  font-weight: bold;
+  border-radius: 4px 0px 0px 4px;
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+  padding: 4px 14px 4px 4px;
 }
 
 .save-close-button {
@@ -41,11 +46,12 @@
 .save-menu-button {
   position: absolute;
   right: 4px;
-  padding: 4px;
   display: grid;
   aspect-ratio: 1;
   align-items: center;
   height: fit-content;
+  margin-top: 4.5px;
+  padding: 1px;
 }
 
 .box-card {

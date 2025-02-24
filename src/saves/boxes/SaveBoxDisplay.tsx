@@ -134,14 +134,9 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
           <div className="save-header">
             <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 4 }}>
               <div
-                className="save-header-game"
+                className="save-header-game diagonal-clip"
                 style={{
-                  fontWeight: 'bold',
                   backgroundColor: save.gameColor(),
-                  borderRadius: '4px 0px 0px 4px',
-                  display: 'flex',
-                  gap: 4,
-                  padding: '4px 14px 4px 4px',
                   color: colorIsDark(save.gameColor()) ? 'white' : 'black',
                 }}
               >
@@ -168,7 +163,6 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
               onClick={() => setDetailsModal(true)}
               variant="outline"
               color="gray"
-              style={{ padding: 1, marginTop: 4 }}
             >
               <MenuIcon />
             </Button>
