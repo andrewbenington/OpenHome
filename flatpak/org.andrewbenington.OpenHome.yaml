@@ -1,0 +1,33 @@
+id: org.andrewbenington.OpenHome
+
+runtime: org.gnome.Platform
+runtime-version: '46'
+sdk: org.gnome.Sdk
+
+command: OpenHome
+finish-args:
+  - --socket=wayland # Permission needed to show the window
+  - --socket=fallback-x11 # Permission needed to show the window
+  - --device=dri # OpenGL, not necessary for all projects
+  - --share=ipc
+
+modules:
+  - name: binary
+    buildsystem: simple
+    sources:
+      # temporary for testing
+      - type: dir
+        path: /home/fedora/Dev/OpenHome/src-tauri/target/release/bundle/deb/OpenHome_1.4.1_arm64/data
+      # - type: file
+      #   url: https://github.com/andrewbenington/OpenHome/releases/download/v1.4.1/OpenHome_1.4.1_arm64.deb
+      #   sha256: b5d29d0162157000c764fe3412c7f94b4d35a702af0d8f98d195ed7b3a18f4ad
+      # only-arches: [aarch64, x86_64]
+    build-commands:
+      # - ar -x *.deb
+      # - tar -xf data.tar.gz
+      - 'install -Dm755 usr/bin/OpenHome /app/bin/OpenHome'
+      - install -Dm644 usr/share/applications/OpenHome.desktop /app/share/applications/org.andrewbenington.OpenHome.desktop
+      - install -Dm644 usr/share/icons/hicolor/128x128/apps/OpenHome.png /app/share/icons/hicolor/128x128/apps/org.andrewbenington.OpenHome.png
+      - install -Dm644 usr/share/icons/hicolor/32x32/apps/OpenHome.png /app/share/icons/hicolor/32x32/apps/org.andrewbenington.OpenHome.png
+      - install -Dm644 usr/share/icons/hicolor/256x256@2/apps/OpenHome.png /app/share/icons/hicolor/256x256@2/apps/org.andrewbenington.OpenHome.png
+      - install -Dm644 org.andrewbenington.OpenHome.metainfo.xml /app/share/metainfo/org.andrewbenington.OpenHome.metainfo.xml

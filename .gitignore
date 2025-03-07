@@ -33,5 +33,9 @@ generate/out/
 
 planning.md
 
+# generated
 src/consts/JSON/version.json
 src-tauri/gen
+flatpak/.flatpak-builder
+flatpak/builddir
+flatpak/repo
