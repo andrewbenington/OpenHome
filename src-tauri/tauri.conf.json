@@ -23,6 +23,14 @@
     }
   },
   "bundle": {
+    "linux": {
+      "deb": {
+        "files": {
+          "org.andrewbenington.OpenHome.metainfo.xml": "./org.andrewbenington.OpenHome.metainfo.xml"
+        },
+        "desktopTemplate": "./template.desktop"
+      }
+    },
     "active": true,
     "targets": ["deb", "rpm", "appimage", "nsis", "dmg"],
     "icon": [

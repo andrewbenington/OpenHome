@@ -42,7 +42,10 @@ pub fn get_file_created(absolute_path: PathBuf) -> Result<u128, String> {
     // Open the file, and return any error up the call stack
     let file = File::open(absolute_path).map_err(|e| e.to_string())?;
     let metadata = file.metadata().map_err(|e| e.to_string())?;
-    let created_date = metadata.created().map_err(|e| e.to_string())?;
+    let created_date = metadata
+        .created()
+        .or(metadata.modified())
+        .map_err(|e| e.to_string())?;
     let unix_duration = created_date
         .duration_since(SystemTime::UNIX_EPOCH)
         .map_err(|e| e.to_string())?;

@@ -23,6 +23,10 @@ preview:
 lint:
 	@npm run lint
 
+.PHONY: clean
+clean:
+	@rm -rf src-tauri/target
+
 .PHONY: check
 check:
 	@npm run typecheck
