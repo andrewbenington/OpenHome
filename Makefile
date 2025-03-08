@@ -25,9 +25,7 @@ lint:
 
 .PHONY: clean
 clean:
-	@rm -rf flatpak/.flatpak-builder
-	@rm -rf flatpak/builddir
-	@rm -rf flatpak/repo
+	@rm -rf src-tauri/target
 
 .PHONY: check
 check:

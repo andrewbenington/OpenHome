@@ -25,7 +25,9 @@
   "bundle": {
     "linux": {
       "deb": {
-        "files": {"org.andrewbenington.OpenHome.metainfo.xml": "./org.andrewbenington.OpenHome.metainfo.xml"},
+        "files": {
+          "org.andrewbenington.OpenHome.metainfo.xml": "./org.andrewbenington.OpenHome.metainfo.xml"
+        },
         "desktopTemplate": "./template.desktop"
       }
     },
@@ -36,8 +38,7 @@
       "icons/128x128.png",
       "icons/128x128@2x.png",
       "icons/icon.icns",
-      "icons/icon.ico",
-      "icons/openhome.png"
+      "icons/icon.ico"
     ],
     "macOS": {
       "signingIdentity": "9MGK3X58YN",
