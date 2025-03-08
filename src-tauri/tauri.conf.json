@@ -32,7 +32,7 @@
       }
     },
     "active": true,
-    "targets": ["deb", "rpm", "appimage", "nsis", "dmg"],
+    "targets": ["deb", "appimage", "nsis", "dmg"],
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",

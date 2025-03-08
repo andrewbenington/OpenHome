@@ -23,12 +23,6 @@ jobs:
           - platform: 'ubuntu-24.04-arm'
             target: 'aarch64-unknown-linux-gnu'
             args: '--target aarch64-unknown-linux-gnu'
-          - platform: 'windows-latest'
-            target: 'x86_64-pc-windows-msvc'
-            args: ''
-          - platform: 'windows-latest'
-            target: 'aarch64-pc-windows-msvc'
-            args: '--target aarch64-pc-windows-msvc'
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -56,10 +50,6 @@ jobs:
       - name: build version.json (unix)
         if: matrix.platform != 'windows-latest'
         run: ./buildVersionJSON.sh
-
-      - name: build version.json (windows)
-        if: matrix.platform == 'windows-latest'
-        run: powershell -ExecutionPolicy Bypass -File ./buildVersionJSON.ps1
 
       - uses: tauri-apps/tauri-action@v0.5.16
         env:
