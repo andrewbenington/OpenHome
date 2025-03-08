@@ -25,7 +25,8 @@
   "bundle": {
     "linux": {
       "deb": {
-        "files": {"org.andrewbenington.OpenHome.metainfo.xml": "./org.andrewbenington.OpenHome.metainfo.xml"}
+        "files": {"org.andrewbenington.OpenHome.metainfo.xml": "./org.andrewbenington.OpenHome.metainfo.xml"},
+        "desktopTemplate": "./template.desktop"
       }
     },
     "active": true,

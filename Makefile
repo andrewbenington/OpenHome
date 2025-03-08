@@ -29,10 +29,6 @@ clean:
 	@rm -rf flatpak/builddir
 	@rm -rf flatpak/repo
 
-.PHONY: flatpak
-flatpak:
-	@cd flatpak && ls && ./flatpak.sh
-
 .PHONY: check
 check:
 	@npm run typecheck
