@@ -1,5 +1,5 @@
 import { ReactNode, RefAttributes, useEffect, useMemo, useState } from 'react'
-import DataGrid, { Column, DataGridHandle, DataGridProps, SortColumn } from 'react-data-grid'
+import { Column, DataGrid, DataGridHandle, DataGridProps, SortColumn } from 'react-data-grid'
 import 'react-data-grid/lib/styles.css'
 import './components.css'
 
