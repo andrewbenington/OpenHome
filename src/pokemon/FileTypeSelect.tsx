@@ -18,7 +18,7 @@ const styles = {
     fontSize: 'small',
     boxShadow: 'none',
     flex: 1,
-    padding: '4px 6px 2px 6px',
+    padding: '4px 22px 2px 6px',
     height: 'fit-content',
   },
 } as Styles
@@ -78,9 +78,7 @@ const FileTypeSelect = (props: FileTypeSelectProps) => {
   return (
     <select
       value={currentFormat}
-      onChange={(e) => {
-        onChange(e.target.value)
-      }}
+      onChange={(e) => onChange(e.target.value)}
       style={{
         ...styles.fileTypeChip,
         backgroundColor: color ?? fileTypeColors[currentFormat],
