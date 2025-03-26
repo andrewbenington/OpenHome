@@ -29,7 +29,7 @@
     "typecheck": "tsc",
     "dev:unix": "./buildVersionJSON.sh && tauri dev",
     "dev:win": "powershell -ExecutionPolicy Bypass -File ./buildVersionJSON.ps1 && tauri dev",
-    "build": "tsc && vite build",
+    "build": "tsc && vite build && export NO_STRIP=true tauri build",
     "dev": "vite",
     "tauri": "tauri",
     "test": "jest",
