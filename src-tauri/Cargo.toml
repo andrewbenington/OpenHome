@@ -1,9 +1,9 @@
 [package]
 name = "OpenHome"
-version = "1.4.3"
+version = "1.4.4-flatpak-test"
 description = "A tool for moving Pokémon between game saves"
 authors = ["Andrew Benington"]
-edition = "2021"
+edition = "2024"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
