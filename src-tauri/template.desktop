@@ -2,7 +2,7 @@
 Categories=Game;Utility
 Comment=A tool for moving Pokémon between game saves
 Exec=OpenHome
-Icon=org.andrewbenington.OpenHome
+Icon=dev.andrewbenington.OpenHome
 Name=OpenHome
 Terminal=false
 Type=Application

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
-  <id>org.andrewbenington.OpenHome</id>
+  <id>dev.andrewbenington.OpenHome</id>
   <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-only</project_license>
   <name>OpenHome</name>
   <categories>
-    <category>Game</category>
     <category>Utility</category>
   </categories>
   <summary>An open source tool for moving Pokémon between game save files</summary>
@@ -12,8 +12,9 @@
     <p>OpenHome is an open source tool for moving Pokémon between game save files, including
       forwards and backwards through generations, without data loss.</p>
   </description>
-  <launchable type="desktop-id">org.andrewbenington.OpenHome.desktop</launchable>
-  <developer_name>Andrew Benington</developer_name>
+  <content_rating type="oars-1.1" />
+  <launchable type="desktop-id">dev.andrewbenington.OpenHome.desktop</launchable>
+  <developer id="dev.andrewbenington"><name>Andrew Benington</name></developer>
   <url type="homepage">https://andrewbenington.github.io/OpenHome/</url>
   <screenshots>
     <screenshot type="default">

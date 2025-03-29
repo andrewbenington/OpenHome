@@ -26,13 +26,13 @@
     "linux": {
       "deb": {
         "files": {
-          "org.andrewbenington.OpenHome.metainfo.xml": "./org.andrewbenington.OpenHome.metainfo.xml"
+          "dev.andrewbenington.OpenHome.metainfo.xml": "./dev.andrewbenington.OpenHome.metainfo.xml"
         },
         "desktopTemplate": "./template.desktop"
       }
     },
     "active": true,
-    "targets": ["deb", "appimage", "nsis", "dmg"],
+    "targets": ["deb", "nsis", "dmg"],
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
