@@ -1,5 +1,5 @@
 [Desktop Entry]
-Categories=Game;Utility
+Categories=Utility
 Comment=A tool for moving Pokémon between game saves
 Exec=OpenHome
 Icon=dev.andrewbenington.OpenHome
