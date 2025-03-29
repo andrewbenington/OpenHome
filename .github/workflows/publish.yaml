@@ -61,7 +61,7 @@ jobs:
         if: matrix.platform == 'windows-latest'
         run: powershell -ExecutionPolicy Bypass -File ./buildVersionJSON.ps1
 
-      - uses: tauri-apps/tauri-action@v0.5.16
+      - uses: tauri-apps/tauri-action@v0.5.20
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NO_STRIP: true
