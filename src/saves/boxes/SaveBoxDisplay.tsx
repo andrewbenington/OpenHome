@@ -158,14 +158,16 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
               </div>
               {save?.name}
             </div>
-            <Button
-              className="save-menu-button"
-              onClick={() => setDetailsModal(true)}
-              variant="outline"
-              color="gray"
-            >
-              <MenuIcon />
-            </Button>
+            <div className="save-menu-buttons-right" style={{ marginRight: 4 }}>
+              <Button
+                className="save-button"
+                onClick={() => setDetailsModal(true)}
+                variant="outline"
+                color="gray"
+              >
+                <MenuIcon />
+              </Button>
+            </div>
           </div>
         </Card>
         <Card
