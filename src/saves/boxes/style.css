@@ -29,3 +29,76 @@
 .position-display-cell-active {
   background-color: #f55;
 }
+
+.save-close-button {
+  padding: 4px;
+  display: grid;
+  aspect-ratio: 1;
+  align-items: center;
+  height: fit-content;
+}
+
+.save-menu-buttons-right {
+  position: absolute;
+  right: 0px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.save-button {
+  padding: 1px;
+  aspect-ratio: 1;
+  height: 20px;
+  width: 20px;
+}
+
+.box-card {
+  padding: 6px 2px 2px;
+  display: flex;
+  flex-direction: column;
+}
+
+.box-navigation {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  text-align: center;
+  padding: 2px 0px;
+  position: relative;
+}
+.box-navigation svg {
+  height: 18px;
+  width: 18px;
+}
+
+.box-name {
+  display: grid;
+  align-items: center;
+  text-align: center;
+  flex: 8;
+  min-width: fit-content;
+  margin: 0px 6px;
+}
+
+.save-header {
+  display: flex;
+  flex-direction: row;
+  position: relative;
+  margin: 1px;
+  align-items: center;
+}
+.save-header svg {
+  height: 18px;
+  width: 18px;
+}
+
+.save-header-game {
+  font-weight: bold;
+  border-radius: 4px 0px 0px 4px;
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+  padding: 4px 14px 4px 4px;
+}

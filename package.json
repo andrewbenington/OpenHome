@@ -1,7 +1,7 @@
 {
   "productName": "OpenHome",
   "name": "openhome",
-  "version": "1.4.4-flatpak-test",
+  "version": "1.4.4",
   "description": "A tool for moving Pokémon between game saves",
   "keywords": [
     "pokemon",
@@ -29,7 +29,7 @@
     "typecheck": "tsc",
     "dev:unix": "./buildVersionJSON.sh && tauri dev",
     "dev:win": "powershell -ExecutionPolicy Bypass -File ./buildVersionJSON.ps1 && tauri dev",
-    "build": "tsc && vite build && export NO_STRIP=true tauri build",
+    "build": "tsc && vite build && tauri build",
     "dev": "vite",
     "tauri": "tauri",
     "test": "jest",

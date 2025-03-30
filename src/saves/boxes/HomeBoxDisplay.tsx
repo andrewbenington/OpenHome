@@ -1,19 +1,20 @@
 import { useDraggable } from '@dnd-kit/core'
-import { Card, Flex, Grid } from '@radix-ui/themes'
+import { Button, Card, DropdownMenu, Flex, Grid } from '@radix-ui/themes'
 import lodash, { range } from 'lodash'
 import { useContext, useMemo, useState } from 'react'
-import { EditIcon } from 'src/components/Icons'
-import MiniButton from 'src/components/MiniButton'
+import { EditIcon, MenuIcon } from 'src/components/Icons'
 import PokemonDetailsModal from 'src/pokemon/PokemonDetailsModal'
 import { ErrorContext } from 'src/state/error'
 import { LookupContext } from 'src/state/lookup'
 import { MonLocation, MonWithLocation, OpenSavesContext } from 'src/state/openSaves'
 import { PKMInterface } from 'src/types/interfaces'
 import { OHPKM } from 'src/types/pkm/OHPKM'
+import { SortTypes } from 'src/types/pkm/sort'
 import { getMonFileIdentifier } from 'src/util/Lookup'
 import { buildBackwardNavigator, buildForwardNavigator } from '../util'
 import ArrowButton from './ArrowButton'
 import BoxCell from './BoxCell'
+import './style.css'
 
 const COLUMN_COUNT = 12
 const ROW_COUNT = 10
@@ -164,14 +165,62 @@ const HomeBoxDisplay = () => {
                 direction="right"
               />
             </Flex>
-            <Flex align="center" justify="end" flexGrow="1">
-              <MiniButton
-                icon={EditIcon}
+            <div className="save-menu-buttons-right">
+              <Button
+                className="save-button"
                 style={{ transition: 'none', padding: 0 }}
                 variant={editing ? 'solid' : 'outline'}
+                color={editing ? undefined : 'gray'}
                 onClick={() => setEditing(!editing)}
-              />
-            </Flex>
+              >
+                <EditIcon />
+              </Button>
+              <DropdownMenu.Root>
+                <DropdownMenu.Trigger>
+                  <Button className="save-button" variant="outline" color="gray">
+                    <MenuIcon />
+                  </Button>
+                </DropdownMenu.Trigger>
+                <DropdownMenu.Content>
+                  <DropdownMenu.Sub>
+                    <DropdownMenu.SubTrigger>Sort this box...</DropdownMenu.SubTrigger>
+                    <DropdownMenu.SubContent>
+                      {SortTypes.filter((st) => st !== '').map((sortType) => (
+                        <DropdownMenu.Item
+                          key={sortType}
+                          onClick={() =>
+                            openSavesDispatch({
+                              type: 'sort_current_home_box',
+                              payload: { sortType },
+                            })
+                          }
+                        >
+                          By {sortType}
+                        </DropdownMenu.Item>
+                      ))}
+                    </DropdownMenu.SubContent>
+                  </DropdownMenu.Sub>
+                  <DropdownMenu.Sub>
+                    <DropdownMenu.SubTrigger>Sort all boxes...</DropdownMenu.SubTrigger>
+                    <DropdownMenu.SubContent>
+                      {SortTypes.filter((st) => st !== '').map((sortType) => (
+                        <DropdownMenu.Item
+                          key={sortType}
+                          onClick={() =>
+                            openSavesDispatch({
+                              type: 'sort_all_home_boxes',
+                              payload: { sortType },
+                            })
+                          }
+                        >
+                          By {sortType}
+                        </DropdownMenu.Item>
+                      ))}
+                    </DropdownMenu.SubContent>
+                  </DropdownMenu.Sub>
+                </DropdownMenu.Content>
+              </DropdownMenu.Root>
+            </div>
           </Flex>
           <Grid columns={COLUMN_COUNT.toString()} gap="1">
             {lodash

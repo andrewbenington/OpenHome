@@ -11,7 +11,7 @@
   <description>
     <p>OpenHome is an open source tool for moving Pokémon between game save files, including
       forwards and backwards through generations, without data loss.</p>
-    <p>The Flatpak version may run into issues tracking recently opened save files due to the nature
+    <p>The Flatpak version may run into extra issues due to the nature
       of Flatpak sandboxing. When submitting bugs, please specify you are using the Flatpak version.</p>
   </description>
   <launchable type="desktop-id">dev.andrewbenington.OpenHome.desktop</launchable>

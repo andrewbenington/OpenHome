@@ -5,6 +5,7 @@ import { SAV } from 'src/types/SAVTypes/SAV'
 import { StoredBoxData } from 'src/types/storage'
 import { getMonFileIdentifier } from 'src/util/Lookup'
 import { PKMInterface } from '../types/interfaces'
+import { getSortFunctionNullable, SortType } from '../types/pkm/sort'
 
 export type OpenSave = {
   index: number
@@ -75,6 +76,14 @@ export type OpenSavesAction =
       }
     }
   | {
+      type: 'sort_current_home_box'
+      payload: { sortType: SortType }
+    }
+  | {
+      type: 'sort_all_home_boxes'
+      payload: { sortType: SortType }
+    }
+  | {
       type: 'add_mon_to_release'
       payload: MonLocation
     }
@@ -111,7 +120,6 @@ const updateMonInSave = (
   if (save instanceof HomeData && state.homeData && (mon === undefined || mon instanceof OHPKM)) {
     replacedMon = state.homeData.boxes[box].pokemon[boxPos]
     state.homeData.boxes[box].pokemon[boxPos] = mon as OHPKM
-    state.homeData.updatedBoxSlots.push({ box, index: boxPos })
   } else if (saveID in state.openSaves) {
     const tempSaves = { ...state.openSaves }
 
@@ -224,6 +232,30 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
 
       updateMonInSave(state, destMon, source)
       updateMonInSave(state, sourceMon, dest)
+
+      return { ...state }
+    }
+    case 'sort_current_home_box': {
+      if (!state.homeData) return state
+
+      const boxMons = state.homeData
+        .getCurrentBox()
+        .pokemon.toSorted(getSortFunctionNullable(payload.sortType))
+
+      state.homeData.boxes[state.homeData.currentPCBox].pokemon = boxMons
+      return { ...state }
+    }
+    case 'sort_all_home_boxes': {
+      if (!state.homeData) return state
+
+      const allMons = state.homeData.boxes
+        .flatMap((box) => box.pokemon)
+        .toSorted(getSortFunctionNullable(payload.sortType))
+      const boxSize = state.homeData.boxColumns * state.homeData.boxRows
+
+      for (let i = 0; i < state.homeData.boxes.length; i++) {
+        state.homeData.boxes[i].pokemon = allMons.slice(i * boxSize, (i + 1) * boxSize)
+      }
 
       return { ...state }
     }
