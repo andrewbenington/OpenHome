@@ -62,7 +62,7 @@
   },
   "devDependencies": {
     "@stylistic/eslint-plugin": "^4.2.0",
-    "@tauri-apps/cli": "^2.4.0",
+    "@tauri-apps/cli": "^2.4.1",
     "@types/crypto-js": "^4.2.2",
     "@types/jest": "^29.5.14",
     "@types/lodash": "^4.17.16",
