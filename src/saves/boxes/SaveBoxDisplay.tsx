@@ -1,5 +1,5 @@
 import { useDraggable } from '@dnd-kit/core'
-import { Button, Card, Dialog, Flex, Grid } from '@radix-ui/themes'
+import { Button, Card, Dialog, DropdownMenu, Flex, Grid } from '@radix-ui/themes'
 import lodash, { range } from 'lodash'
 import { GameOfOriginData } from 'pokemon-resources'
 import { PokemonData } from 'pokemon-species-data'
@@ -159,14 +159,18 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
               {save?.name}
             </div>
             <div className="save-menu-buttons-right" style={{ marginRight: 4 }}>
-              <Button
-                className="save-button"
-                onClick={() => setDetailsModal(true)}
-                variant="outline"
-                color="gray"
-              >
-                <MenuIcon />
-              </Button>
+              <DropdownMenu.Root>
+                <DropdownMenu.Trigger>
+                  <Button className="save-button" variant="outline" color="gray">
+                    <MenuIcon />
+                  </Button>
+                </DropdownMenu.Trigger>
+                <DropdownMenu.Content>
+                  <DropdownMenu.Item onClick={() => setDetailsModal(true)}>
+                    Details...
+                  </DropdownMenu.Item>
+                </DropdownMenu.Content>
+              </DropdownMenu.Root>
             </div>
           </div>
         </Card>
@@ -283,7 +287,6 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
           </Dialog.Content>
         </Dialog.Root>
       </Flex>
-
       <PokemonDetailsModal
         mon={selectedMon}
         onClose={() => setSelectedIndex(undefined)}

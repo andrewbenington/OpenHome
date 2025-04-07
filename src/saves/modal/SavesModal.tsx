@@ -15,10 +15,10 @@ import { PathData } from 'src/types/SAVTypes/path'
 import { getSaveRef } from 'src/types/SAVTypes/SAV'
 import { SAVClass } from 'src/types/SAVTypes/util'
 import { getMonFileIdentifier } from 'src/util/Lookup'
+import { SaveViewMode } from '../util'
 import RecentSaves from './RecentSaves'
 import SaveFolders from './SaveFolders'
 import SuggestedSaves from './SuggestedSaves'
-import { SaveViewMode } from './util'
 
 interface SavesModalProps {
   open?: boolean

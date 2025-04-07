@@ -1,10 +1,10 @@
 import { Button, Card, Dialog, Flex } from '@radix-ui/themes'
 import * as E from 'fp-ts/lib/Either'
 import { useCallback, useContext, useEffect, useState } from 'react'
+import { BackendContext } from 'src/backend/backendContext'
+import { AddFolderIcon, RemoveIcon } from 'src/components/Icons'
+import useDisplayError from 'src/hooks/displayError'
 import { SaveFolder } from 'src/types/storage'
-import { BackendContext } from '../backend/backendContext'
-import { AddFolderIcon, RemoveIcon } from '../components/Icons'
-import useDisplayError from '../hooks/displayError'
 
 export default function SaveFolders() {
   const [saveFolders, setSaveFolders] = useState<SaveFolder[]>()
