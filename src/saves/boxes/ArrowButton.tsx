@@ -1,21 +1,32 @@
 import { Button } from '@radix-ui/themes'
-import { useCallback, useState } from 'react'
+import { CSSProperties, useCallback, useState } from 'react'
 import { ArrowLeftIcon, ArrowRightIcon } from 'src/components/Icons'
 import '../style.css'
 import DroppableSpace from './DroppableSpace'
 
 interface OpenHomeButtonProps {
   onClick?: (e?: any) => void
-  style?: any
+  style?: CSSProperties
   dragID?: string
   direction: 'left' | 'right'
 }
-const DRAG_OVER_COOLDOWN_MS = 250
+const DRAG_OVER_COOLDOWN_MS = 500
+
 const ArrowButton = (props: OpenHomeButtonProps) => {
-  const { dragID, onClick, direction } = props
+  const { dragID, onClick, direction, style } = props
+  const [firstHover, setFirstHover] = useState(true)
   const [hoverCooldown, setHoverCooldown] = useState(false)
 
   const onDragOver = useCallback(() => {
+    if (firstHover) {
+      setFirstHover(false)
+      setHoverCooldown(true)
+      setTimeout(() => {
+        setHoverCooldown(false)
+      }, DRAG_OVER_COOLDOWN_MS)
+      return
+    }
+
     if (hoverCooldown || !onClick) {
       return
     }
@@ -25,11 +36,15 @@ const ArrowButton = (props: OpenHomeButtonProps) => {
     setTimeout(() => {
       setHoverCooldown(false)
     }, DRAG_OVER_COOLDOWN_MS)
-  }, [hoverCooldown, onClick])
+  }, [hoverCooldown, onClick, firstHover])
+
+  const onNotDragOver = useCallback(() => {
+    setFirstHover(true)
+  }, [])
 
   return (
-    <Button className="arrow-button" onClick={onClick} variant="soft">
-      <DroppableSpace dropID={`${dragID}-drop`} onOver={onDragOver}>
+    <Button className="arrow-button" onClick={onClick} variant="soft" style={style}>
+      <DroppableSpace dropID={`${dragID}-drop`} onOver={onDragOver} onNotOver={onNotDragOver}>
         {direction === 'left' ? <ArrowLeftIcon /> : <ArrowRightIcon />}
       </DroppableSpace>
     </Button>

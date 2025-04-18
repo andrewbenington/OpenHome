@@ -39,15 +39,6 @@
   height: fit-content;
 }
 
-.save-menu-buttons-right {
-  position: absolute;
-  right: 0px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-}
-
 .save-button {
   padding: 1px;
   aspect-ratio: 1;

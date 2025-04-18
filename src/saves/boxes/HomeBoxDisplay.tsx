@@ -9,6 +9,7 @@ import { EditIcon, MenuIcon } from 'src/components/Icons'
 import PokemonDetailsModal from 'src/pokemon/PokemonDetailsModal'
 import { ErrorContext } from 'src/state/error'
 import { LookupContext } from 'src/state/lookup'
+import { MouseContext } from 'src/state/mouse'
 import { MonLocation, MonWithLocation, OpenSavesContext } from 'src/state/openSaves'
 import { PKMInterface } from 'src/types/interfaces'
 import { OHPKM } from 'src/types/pkm/OHPKM'
@@ -54,21 +55,21 @@ export default function HomeBoxDisplay() {
           }}
         >
           <Flex direction="row" className="box-navigation">
-            <ToggleGroup.Root
-              className="ToggleGroup"
-              value={viewMode}
-              type="single"
-              onValueChange={(newVal: BoxViewMode) => setViewMode(newVal)}
-              disabled={!!dragActive}
-            >
-              <ToggleGroup.Item value="one" className="ToggleGroupItem">
-                <FaSquare />
-              </ToggleGroup.Item>
-              <ToggleGroup.Item value="all" className="ToggleGroupItem">
-                <BsFillGrid3X3GapFill />
-              </ToggleGroup.Item>
-            </ToggleGroup.Root>
-            <Flex align="center" justify="end" flexGrow="4">
+            <Flex align="center" justify="between" flexGrow="3">
+              <ToggleGroup.Root
+                className="ToggleGroup"
+                value={viewMode}
+                type="single"
+                onValueChange={(newVal: BoxViewMode) => setViewMode(newVal)}
+                disabled={!!dragActive}
+              >
+                <ToggleGroup.Item value="one" className="ToggleGroupItem">
+                  <FaSquare />
+                </ToggleGroup.Item>
+                <ToggleGroup.Item value="all" className="ToggleGroupItem">
+                  <BsFillGrid3X3GapFill />
+                </ToggleGroup.Item>
+              </ToggleGroup.Root>
               <ArrowButton
                 onClick={() =>
                   openSavesDispatch({
@@ -82,6 +83,7 @@ export default function HomeBoxDisplay() {
                     },
                   })
                 }
+                style={{ visibility: viewMode === 'one' ? 'visible' : 'collapse' }}
                 dragID="home-arrow-left"
                 direction="left"
               />
@@ -90,7 +92,11 @@ export default function HomeBoxDisplay() {
               {editing ? (
                 <input
                   value={currentBox.name || ''}
-                  style={{ minWidth: 0, textAlign: 'center' }}
+                  style={{
+                    minWidth: 0,
+                    textAlign: 'center',
+                    visibility: viewMode === 'one' ? 'visible' : 'collapse',
+                  }}
                   placeholder={`Box ${currentBox.index + 1}`}
                   onChange={(e) =>
                     openSavesDispatch({
@@ -101,10 +107,12 @@ export default function HomeBoxDisplay() {
                   autoFocus
                 />
               ) : (
-                <div>{currentBox.name?.trim() || `Box ${currentBox.index + 1}`}</div>
+                <div style={{ visibility: viewMode === 'one' ? 'visible' : 'collapse' }}>
+                  {currentBox.name?.trim() || `Box ${currentBox.index + 1}`}
+                </div>
               )}
             </div>
-            <Flex align="center" flexGrow="3">
+            <Flex align="center" flexGrow="3" justify="between">
               <ArrowButton
                 onClick={() =>
                   openSavesDispatch({
@@ -115,67 +123,73 @@ export default function HomeBoxDisplay() {
                     },
                   })
                 }
+                style={{ visibility: viewMode === 'one' ? 'visible' : 'collapse' }}
                 dragID="home-arrow-right"
                 direction="right"
               />
-            </Flex>
-            <div className="save-menu-buttons-right">
-              <Button
-                className="save-button"
-                style={{ transition: 'none', padding: 0 }}
-                variant={editing ? 'solid' : 'outline'}
-                color={editing ? undefined : 'gray'}
-                onClick={() => setEditing(!editing)}
-              >
-                <EditIcon />
-              </Button>
-              <DropdownMenu.Root>
-                <DropdownMenu.Trigger>
-                  <Button className="save-button" variant="outline" color="gray">
-                    <MenuIcon />
+              <Flex gap="1">
+                {viewMode === 'one' && (
+                  <Button
+                    className="save-button"
+                    style={{ transition: 'none', padding: 0 }}
+                    variant={editing ? 'solid' : 'outline'}
+                    color={editing ? undefined : 'gray'}
+                    onClick={() => setEditing(!editing)}
+                  >
+                    <EditIcon />
                   </Button>
-                </DropdownMenu.Trigger>
-                <DropdownMenu.Content>
-                  <DropdownMenu.Sub>
-                    <DropdownMenu.SubTrigger>Sort this box...</DropdownMenu.SubTrigger>
-                    <DropdownMenu.SubContent>
-                      {SortTypes.filter((st) => st !== '').map((sortType) => (
-                        <DropdownMenu.Item
-                          key={sortType}
-                          onClick={() =>
-                            openSavesDispatch({
-                              type: 'sort_current_home_box',
-                              payload: { sortType },
-                            })
-                          }
-                        >
-                          By {sortType}
-                        </DropdownMenu.Item>
-                      ))}
-                    </DropdownMenu.SubContent>
-                  </DropdownMenu.Sub>
-                  <DropdownMenu.Sub>
-                    <DropdownMenu.SubTrigger>Sort all boxes...</DropdownMenu.SubTrigger>
-                    <DropdownMenu.SubContent>
-                      {SortTypes.filter((st) => st !== '').map((sortType) => (
-                        <DropdownMenu.Item
-                          key={sortType}
-                          onClick={() =>
-                            openSavesDispatch({
-                              type: 'sort_all_home_boxes',
-                              payload: { sortType },
-                            })
-                          }
-                        >
-                          By {sortType}
-                        </DropdownMenu.Item>
-                      ))}
-                    </DropdownMenu.SubContent>
-                  </DropdownMenu.Sub>
-                </DropdownMenu.Content>
-              </DropdownMenu.Root>
-            </div>
+                )}
+                <DropdownMenu.Root>
+                  <DropdownMenu.Trigger>
+                    <Button className="save-button" variant="outline" color="gray">
+                      <MenuIcon />
+                    </Button>
+                  </DropdownMenu.Trigger>
+                  <DropdownMenu.Content>
+                    {viewMode === 'one' && (
+                      <DropdownMenu.Sub>
+                        <DropdownMenu.SubTrigger>Sort this box...</DropdownMenu.SubTrigger>
+                        <DropdownMenu.SubContent>
+                          {SortTypes.filter((st) => st !== '').map((sortType) => (
+                            <DropdownMenu.Item
+                              key={sortType}
+                              onClick={() =>
+                                openSavesDispatch({
+                                  type: 'sort_current_home_box',
+                                  payload: { sortType },
+                                })
+                              }
+                            >
+                              By {sortType}
+                            </DropdownMenu.Item>
+                          ))}
+                        </DropdownMenu.SubContent>
+                      </DropdownMenu.Sub>
+                    )}
+                    <DropdownMenu.Sub>
+                      <DropdownMenu.SubTrigger>Sort all boxes...</DropdownMenu.SubTrigger>
+                      <DropdownMenu.SubContent>
+                        {SortTypes.filter((st) => st !== '').map((sortType) => (
+                          <DropdownMenu.Item
+                            key={sortType}
+                            onClick={() =>
+                              openSavesDispatch({
+                                type: 'sort_all_home_boxes',
+                                payload: { sortType },
+                              })
+                            }
+                          >
+                            By {sortType}
+                          </DropdownMenu.Item>
+                        ))}
+                      </DropdownMenu.SubContent>
+                    </DropdownMenu.Sub>
+                  </DropdownMenu.Content>
+                </DropdownMenu.Root>
+              </Flex>
+            </Flex>
           </Flex>
+
           {viewMode === 'one' ? (
             <BoxMons />
           ) : (
@@ -204,6 +218,7 @@ function BoxMons() {
   const [, dispatchError] = useContext(ErrorContext)
   const [selectedIndex, setSelectedIndex] = useState<number>()
   const { active } = useDraggable({ id: '' }) // necessary for rerendering...
+  const [mouseState] = useContext(MouseContext)
 
   const attemptImportMons = (mons: PKMInterface[], location: MonLocation) => {
     if (!homeData || !homeMons) {
@@ -275,6 +290,8 @@ function BoxMons() {
       homeData ? buildBackwardNavigator(homeData, selectedIndex, setSelectedIndex) : undefined,
     [homeData, selectedIndex]
   )
+
+  console.log({ dragData, mouseState })
 
   return (
     homeData &&

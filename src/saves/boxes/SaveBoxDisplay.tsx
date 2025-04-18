@@ -188,7 +188,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                     },
                   })
                 }
-                dragID={`arrow_left_${save.tid}_${save.sid}_${save.currentPCBox}`}
+                dragID={`arrow_left_${save.tid}_${save.sid}`}
                 direction="left"
               />
             </Flex>
@@ -204,7 +204,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                     },
                   })
                 }
-                dragID={`arrow_right_${save.tid}_${save.sid}_${save.currentPCBox}`}
+                dragID={`arrow_right_${save.tid}_${save.sid}`}
                 direction="right"
               />
             </Flex>

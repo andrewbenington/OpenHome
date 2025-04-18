@@ -19,10 +19,18 @@ export interface DroppableSpaceProps {
   dropData?: MonLocation
   disabled?: boolean
   onOver?: () => void
+  onNotOver?: () => void
   children?: ReactNode
 }
 
-const DroppableSpace = ({ dropID, dropData, disabled, onOver, children }: DroppableSpaceProps) => {
+const DroppableSpace = ({
+  dropID,
+  dropData,
+  disabled,
+  onOver,
+  onNotOver,
+  children,
+}: DroppableSpaceProps) => {
   const { setNodeRef, isOver } = useDroppable({
     id: dropID ?? '',
     data: dropData,
@@ -34,6 +42,10 @@ const DroppableSpace = ({ dropID, dropData, disabled, onOver, children }: Droppa
       onOver && onOver()
     }
   }, [isOver, onOver])
+
+  if (onNotOver && !isOver) {
+    onNotOver()
+  }
 
   return (
     <div
