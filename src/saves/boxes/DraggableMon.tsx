@@ -1,4 +1,4 @@
-import { useDraggable } from '@dnd-kit/core'
+import { useDraggable } from '@dnd-kit/react'
 import PokemonIcon from '../../components/PokemonIcon'
 import { MonWithLocation } from '../../state/openSaves'
 import { PKMInterface } from '../../types/interfaces'
@@ -25,7 +25,7 @@ export interface DraggableMonProps {
 }
 
 const DraggableMon = ({ mon, onClick, disabled, dragData, dragID }: DraggableMonProps) => {
-  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
+  const { ref, isDragging } = useDraggable({
     id: (dragID ?? '') + mon.personalityValue?.toString(),
     data: dragData,
     disabled: disabled || !dragID,
@@ -33,15 +33,13 @@ const DraggableMon = ({ mon, onClick, disabled, dragData, dragID }: DraggableMon
 
   return (
     <div
-      ref={setNodeRef}
+      ref={ref}
       style={{
         width: '100%',
         height: '100%',
         ...getBackgroundDetails(),
         cursor: 'pointer',
       }}
-      {...listeners}
-      {...attributes}
       onClick={onClick}
     >
       <PokemonIcon
