@@ -38,9 +38,9 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.4.4-flatpak-test" date="2025-03-29">
+    <release version="1.4.4" date="2025-03-30">
       <description>
-        <p>Pre-release for testing flatpak compatibility</p>
+        <p>Add ability to sort OpenHome boxes</p>
       </description>
     </release>
   </releases>
