@@ -32,8 +32,6 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   const [selectedIndex, setSelectedIndex] = useState<number>()
   const [dragMonState] = useContext(DragMonContext)
 
-  const dragData: MonWithLocation | undefined = useMemo(() => dragMonState.payload, [dragMonState])
-
   const save = useMemo(() => openSaves[saveIndex], [openSaves, saveIndex])
   const currentBox = useMemo(
     () => (save.currentPCBox < save.boxes.length ? save.boxes[save.currentPCBox] : undefined),
@@ -116,8 +114,6 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
 
     return !save.supportsMon(dragData.mon.dexNum, dragData.mon.formeNum)
   }, [save, dragMonState])
-
-  console.log(dragMonState)
 
   const navigateRight = useMemo(
     () => buildForwardNavigator(save, selectedIndex, setSelectedIndex),
@@ -220,7 +216,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
               .map((mon, index) => (
                 <BoxCell
                   onClick={() => setSelectedIndex(index)}
-                  key={index}
+                  key={`${save.currentPCBox}-${index}`}
                   dragID={`${save.tid}_${save.sid}_${save.currentPCBox}_${index}`}
                   location={{
                     box: save.currentPCBox,

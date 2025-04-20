@@ -1,7 +1,6 @@
 import { closestCenter } from '@dnd-kit/collision'
 import { useDroppable } from '@dnd-kit/react'
-import { ReactNode, useContext, useEffect } from 'react'
-import { DragMonContext } from '../../state/dragMon'
+import { ReactNode, useEffect } from 'react'
 import { MonLocation } from '../../state/openSaves'
 
 const getBackgroundDetails = (disabled?: boolean) => {
@@ -17,6 +16,7 @@ const getBackgroundDetails = (disabled?: boolean) => {
 }
 
 export interface DroppableSpaceProps {
+  className?: string
   dropID?: string
   dropData?: MonLocation
   disabled?: boolean
@@ -26,6 +26,7 @@ export interface DroppableSpaceProps {
 }
 
 const DroppableSpace = ({
+  className,
   dropID,
   dropData,
   disabled,
@@ -33,7 +34,6 @@ const DroppableSpace = ({
   onNotOver,
   children,
 }: DroppableSpaceProps) => {
-  const [dragMonState] = useContext(DragMonContext)
   const { isDropTarget, ref } = useDroppable({
     id: dropID ?? '',
     data: dropData,
@@ -51,11 +51,9 @@ const DroppableSpace = ({
     onNotOver()
   }
 
-  console.log({ isDropTarget, dropID, location, disabled, dragMonState })
-
   return (
     <div
-      className="pokemon-slot"
+      className={`pokemon-slot ${className || ''}`}
       style={{
         ...getBackgroundDetails(disabled),
         outlineStyle: 'solid',

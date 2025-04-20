@@ -19,8 +19,6 @@ export const dragMonReducer: Reducer<DragMonState, DragMonAction> = (
 ) => {
   const { type, payload } = action
 
-  console.log(action)
-
   switch (type) {
     case 'start_drag': {
       return { payload }

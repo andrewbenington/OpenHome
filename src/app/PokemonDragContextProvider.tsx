@@ -15,13 +15,13 @@ export default function PokemonDragContextProvider(props: { children?: ReactNode
       // modifiers={[RestrictToWindow]}
       onDragEnd={(e) => {
         const { operation } = e
-        const { source, target } = operation
+        const { target } = operation
 
         const dest = target?.data as MonLocation
         const payload = dragMonState.payload
 
         if (payload) {
-          if (source?.id === 'to_release') {
+          if (target?.id === 'to_release') {
             openSavesDispatch({
               type: 'add_mon_to_release',
               payload,

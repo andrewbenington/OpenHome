@@ -1,7 +1,7 @@
 import { Button, Card, DropdownMenu, Flex, Grid } from '@radix-ui/themes'
 import lodash, { range } from 'lodash'
 import { ToggleGroup } from 'radix-ui'
-import { useContext, useMemo, useState } from 'react'
+import { useCallback, useContext, useMemo, useState } from 'react'
 import { BsFillGrid3X3GapFill } from 'react-icons/bs'
 import { FaSquare } from 'react-icons/fa'
 import { EditIcon, MenuIcon } from 'src/components/Icons'
@@ -29,14 +29,10 @@ export default function HomeBoxDisplay() {
   const [openSavesState, openSavesDispatch] = useContext(OpenSavesContext)
   const [editing, setEditing] = useState(false)
   const [viewMode, setViewMode] = useState<BoxViewMode>('one')
-  const [dragMonState] = useContext(DragMonContext)
 
   const homeData = openSavesState.homeData
 
-  const currentBox = useMemo(
-    () => homeData?.boxes[homeData.currentPCBox],
-    [homeData?.boxes, homeData?.currentPCBox]
-  )
+  const currentBox = homeData?.boxes[homeData.currentPCBox]
 
   return (
     homeData &&
@@ -55,20 +51,7 @@ export default function HomeBoxDisplay() {
         >
           <Flex direction="row" className="box-navigation">
             <Flex align="center" justify="between" flexGrow="3">
-              <ToggleGroup.Root
-                className="ToggleGroup"
-                value={viewMode}
-                type="single"
-                onValueChange={(newVal: BoxViewMode) => setViewMode(newVal)}
-                disabled={!!dragMonState.payload}
-              >
-                <ToggleGroup.Item value="one" className="ToggleGroupItem">
-                  <FaSquare />
-                </ToggleGroup.Item>
-                <ToggleGroup.Item value="all" className="ToggleGroupItem">
-                  <BsFillGrid3X3GapFill />
-                </ToggleGroup.Item>
-              </ToggleGroup.Root>
+              <ViewToggle viewMode={viewMode} setViewMode={setViewMode} />
               <ArrowButton
                 onClick={() =>
                   openSavesDispatch({
@@ -286,8 +269,6 @@ function BoxMons() {
     [homeData, selectedIndex]
   )
 
-  console.log({ dragData })
-
   return (
     homeData &&
     currentBox && (
@@ -298,7 +279,7 @@ function BoxMons() {
             .map((index: number) => currentBox.pokemon[index])
             .map((mon, index) => (
               <BoxCell
-                key={`home_display_cell_${index}`}
+                key={`${homeData.currentPCBox}-${index}`}
                 onClick={() => setSelectedIndex(index)}
                 dragID={`home_${homeData.currentPCBox}_${index}`}
                 location={{
@@ -413,5 +394,66 @@ function BoxOverview({ boxIndex, onBoxSelect }: BoxOverviewProps) {
         </Flex>
       </Button>
     </DroppableSpace>
+  )
+}
+
+type ViewToggleProps = {
+  viewMode: BoxViewMode
+  setViewMode: (mode: BoxViewMode) => void
+}
+
+const DRAG_OVER_COOLDOWN_MS = 500
+
+function ViewToggle(props: ViewToggleProps) {
+  const { viewMode, setViewMode } = props
+  const [dragMonState] = useContext(DragMonContext)
+  const [firstHover, setFirstHover] = useState(true)
+  const [hoverCooldown, setHoverCooldown] = useState(false)
+
+  const onAllViewModeDragOver = useCallback(() => {
+    if (firstHover) {
+      setFirstHover(false)
+      setHoverCooldown(true)
+      setTimeout(() => {
+        setHoverCooldown(false)
+      }, DRAG_OVER_COOLDOWN_MS)
+      return
+    }
+
+    if (hoverCooldown) {
+      return
+    }
+    setHoverCooldown(true)
+    setViewMode('all')
+
+    setTimeout(() => {
+      setHoverCooldown(false)
+    }, DRAG_OVER_COOLDOWN_MS)
+  }, [firstHover, hoverCooldown, setViewMode])
+
+  const onNotDragOver = useCallback(() => {
+    setFirstHover(true)
+  }, [])
+
+  return (
+    <ToggleGroup.Root
+      className="ToggleGroup"
+      value={viewMode}
+      type="single"
+      onValueChange={(newVal: BoxViewMode) => setViewMode(newVal)}
+    >
+      <ToggleGroup.Item value="one" className="ToggleGroupItem" disabled={!!dragMonState.payload}>
+        <FaSquare />
+      </ToggleGroup.Item>
+      <ToggleGroup.Item value="all" className="ToggleGroupItem">
+        <DroppableSpace
+          dropID={`all-boxes-toggle`}
+          onOver={onAllViewModeDragOver}
+          onNotOver={onNotDragOver}
+        >
+          <BsFillGrid3X3GapFill />
+        </DroppableSpace>
+      </ToggleGroup.Item>
+    </ToggleGroup.Root>
   )
 }

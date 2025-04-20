@@ -6,7 +6,6 @@ import { bytesToPKM } from 'src/types/FileImport'
 import { filterApplies } from 'src/types/Filter'
 import { PKMInterface } from 'src/types/interfaces'
 import useDisplayError from '../../hooks/displayError'
-import { DragMonContext } from '../../state/dragMon'
 import '../style.css'
 import DraggableMon from './DraggableMon'
 import DroppableSpace from './DroppableSpace'
@@ -33,7 +32,6 @@ const BoxCell = ({
   location,
 }: BoxCellProps) => {
   const [filterState] = useContext(FilterContext)
-  const [dragMonState] = useContext(DragMonContext)
   const displayError = useDisplayError()
 
   const isFilteredOut = useMemo(() => {
@@ -72,7 +70,7 @@ const BoxCell = ({
     }
   }
 
-  const { ref, isDropTarget } = useDroppable({
+  const { ref } = useDroppable({
     id: dragID,
     data: location,
     disabled,
@@ -83,7 +81,6 @@ const BoxCell = ({
   return (
     <div
       ref={ref}
-      title={dragID}
       style={{
         padding: 0,
         width: '100%',
