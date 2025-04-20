@@ -1,15 +1,15 @@
 import {
   Active,
   DataRef,
-  DndContext,
   DndContextProps,
   DragCancelEvent,
+  DragDropProvider,
   DragEndEvent,
   DragMoveEvent,
   DragOverEvent,
   DragStartEvent,
   Over,
-} from '@dnd-kit/core'
+} from '@dnd-kit/react'
 import { MonLocation, MonWithLocation } from '../state/openSaves'
 
 export type PokemonDragOver = Omit<Over, 'data'> & { data: DataRef<MonLocation> }
@@ -37,4 +37,5 @@ export type PokemonDragContextProps = Omit<
 
 export type PokemonDragContextType = React.NamedExoticComponent<PokemonDragContextProps>
 
-export const PokemonDragContext = DndContext as React.NamedExoticComponent<PokemonDragContextProps>
+export const PokemonDragContext =
+  DragDropProvider as React.NamedExoticComponent<PokemonDragContextProps>

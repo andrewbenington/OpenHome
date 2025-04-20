@@ -1,4 +1,3 @@
-import { useDraggable } from '@dnd-kit/core'
 import { Button, Card, DropdownMenu, Flex, Grid } from '@radix-ui/themes'
 import lodash, { range } from 'lodash'
 import { ToggleGroup } from 'radix-ui'
@@ -9,12 +8,12 @@ import { EditIcon, MenuIcon } from 'src/components/Icons'
 import PokemonDetailsModal from 'src/pokemon/PokemonDetailsModal'
 import { ErrorContext } from 'src/state/error'
 import { LookupContext } from 'src/state/lookup'
-import { MouseContext } from 'src/state/mouse'
 import { MonLocation, MonWithLocation, OpenSavesContext } from 'src/state/openSaves'
 import { PKMInterface } from 'src/types/interfaces'
 import { OHPKM } from 'src/types/pkm/OHPKM'
 import { SortTypes } from 'src/types/pkm/sort'
 import { getMonFileIdentifier } from 'src/util/Lookup'
+import { DragMonContext } from '../../state/dragMon'
 import { buildBackwardNavigator, buildForwardNavigator } from '../util'
 import ArrowButton from './ArrowButton'
 import BoxCell from './BoxCell'
@@ -30,7 +29,7 @@ export default function HomeBoxDisplay() {
   const [openSavesState, openSavesDispatch] = useContext(OpenSavesContext)
   const [editing, setEditing] = useState(false)
   const [viewMode, setViewMode] = useState<BoxViewMode>('one')
-  const { active: dragActive } = useDraggable({ id: '' }) // necessary for rerendering all boxes view...
+  const [dragMonState] = useContext(DragMonContext)
 
   const homeData = openSavesState.homeData
 
@@ -61,7 +60,7 @@ export default function HomeBoxDisplay() {
                 value={viewMode}
                 type="single"
                 onValueChange={(newVal: BoxViewMode) => setViewMode(newVal)}
-                disabled={!!dragActive}
+                disabled={!!dragMonState.payload}
               >
                 <ToggleGroup.Item value="one" className="ToggleGroupItem">
                   <FaSquare />
@@ -217,8 +216,7 @@ function BoxMons() {
   const [{ homeData }, openSavesDispatch] = useContext(OpenSavesContext)
   const [, dispatchError] = useContext(ErrorContext)
   const [selectedIndex, setSelectedIndex] = useState<number>()
-  const { active } = useDraggable({ id: '' }) // necessary for rerendering...
-  const [mouseState] = useContext(MouseContext)
+  const [dragMonState] = useContext(DragMonContext)
 
   const attemptImportMons = (mons: PKMInterface[], location: MonLocation) => {
     if (!homeData || !homeMons) {
@@ -263,10 +261,7 @@ function BoxMons() {
     openSavesDispatch({ type: 'import_mons', payload: { mons, dest: location } })
   }
 
-  const dragData: MonWithLocation | undefined = useMemo(
-    () => active?.data.current as MonWithLocation | undefined,
-    [active]
-  )
+  const dragData: MonWithLocation | undefined = useMemo(() => dragMonState.payload, [dragMonState])
 
   const currentBox = useMemo(
     () => homeData?.boxes[homeData.currentPCBox],
@@ -291,7 +286,7 @@ function BoxMons() {
     [homeData, selectedIndex]
   )
 
-  console.log({ dragData, mouseState })
+  console.log({ dragData })
 
   return (
     homeData &&
@@ -306,7 +301,7 @@ function BoxMons() {
                 key={`home_display_cell_${index}`}
                 onClick={() => setSelectedIndex(index)}
                 dragID={`home_${homeData.currentPCBox}_${index}`}
-                dragData={{
+                location={{
                   box: homeData.currentPCBox,
                   boxPos: index,
                   save: homeData,
@@ -324,7 +319,7 @@ function BoxMons() {
                 }}
                 disabled={
                   // don't allow a swap with a pokémon not supported by the source save
-                  mon && dragData && !dragData?.save?.supportsMon(mon.dexNum, mon.formeNum)
+                  mon && dragData && !dragData.save.supportsMon(mon.dexNum, mon.formeNum)
                 }
               />
             ))}

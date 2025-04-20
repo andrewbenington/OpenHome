@@ -1,72 +1,84 @@
-import { closestCenter, DragOverlay, PointerSensor, useSensor } from '@dnd-kit/core'
-import { restrictToWindowEdges } from '@dnd-kit/modifiers'
-import { ReactNode, useContext, useState } from 'react'
-import { createPortal } from 'react-dom'
+import { DragDropProvider, DragOverlay, PointerSensor } from '@dnd-kit/react'
+import { ReactNode, useContext } from 'react'
 import PokemonIcon from '../components/PokemonIcon'
-import { MonWithLocation, OpenSavesContext } from '../state/openSaves'
-import { PKMInterface } from '../types/interfaces'
-import { PokemonDragContext } from './PokemonDrag'
+import { DragMonContext } from '../state/dragMon'
+import { MonLocation, MonWithLocation, OpenSavesContext } from '../state/openSaves'
 
 export default function PokemonDragContextProvider(props: { children?: ReactNode }) {
   const { children } = props
   const [, openSavesDispatch] = useContext(OpenSavesContext)
-  const [dragData, setDragData] = useState<MonWithLocation>()
-  const [dragMon, setDragMon] = useState<PKMInterface>()
+  const [dragMonState, dispatchDragMonState] = useContext(DragMonContext)
 
   return (
-    <PokemonDragContext
-      collisionDetection={closestCenter}
-      modifiers={[restrictToWindowEdges]}
+    <DragDropProvider
+      // collisionDetection={closestCenter}
+      // modifiers={[RestrictToWindow]}
       onDragEnd={(e) => {
-        const dest = e.over?.data.current
+        const { operation } = e
+        const { source, target } = operation
 
-        if (dragData) {
-          if (e.over?.id === 'to_release') {
+        const dest = target?.data as MonLocation
+        const payload = dragMonState.payload
+
+        if (payload) {
+          if (source?.id === 'to_release') {
             openSavesDispatch({
               type: 'add_mon_to_release',
-              payload: dragData,
+              payload,
             })
-          } else if (dragMon && dest?.save.supportsMon(dragMon.dexNum, dragMon.formeNum)) {
-            openSavesDispatch({ type: 'move_mon', payload: { source: dragData, dest } })
+          } else if (dest?.save?.supportsMon(payload.mon.dexNum, payload.mon.formeNum)) {
+            openSavesDispatch({ type: 'move_mon', payload: { source: payload, dest } })
           }
         }
 
-        setDragData(e.over?.data.current as MonWithLocation)
-        let d = e.over?.data.current
-
-        setDragMon(d?.save.boxes[d.box].pokemon[d.boxPos])
+        dispatchDragMonState({ type: 'end_drag' })
       }}
       onDragStart={(e) => {
-        setDragData(e.active.data.current)
-        setDragMon(e.active.data.current?.mon)
+        const { operation } = e
+        const { source } = operation
+
+        if (source?.data) {
+          dispatchDragMonState({ type: 'start_drag', payload: source.data as MonWithLocation })
+        }
       }}
       sensors={[
-        useSensor(PointerSensor, {
-          activationConstraint: {
-            distance: 0, // Set a small distance threshold
+        PointerSensor.configure({
+          activationConstraints: {
+            // Start dragging after moving 5px
+            distance: {
+              value: 5,
+            },
+            // Or after holding for 200ms
+            delay: {
+              value: 200,
+              tolerance: 10,
+            },
           },
         }),
       ]}
     >
-      {createPortal(
-        <DragOverlay dropAnimation={{ duration: 300 }} style={{ cursor: 'grabbing' }}>
-          {dragData && (
-            <PokemonIcon
-              dexNumber={dragMon?.dexNum ?? 0}
-              formeNumber={
-                dragData.save.boxes[dragData.box].pokemon[dragData.boxPos]?.formeNum ?? 0
-              }
-              isShiny={dragData.save.boxes[dragData.box].pokemon[dragData.boxPos]?.isShiny()}
-              heldItemIndex={
-                dragData.save.boxes[dragData.box].pokemon[dragData.boxPos]?.heldItemIndex
-              }
-              style={{ width: '100%', height: '100%' }}
-            />
-          )}
-        </DragOverlay>,
-        document.body
-      )}
+      <DragOverlay style={{ cursor: 'grabbing' }}>
+        {dragMonState.payload && (
+          <PokemonIcon
+            dexNumber={dragMonState.payload.mon.dexNum ?? 0}
+            formeNumber={
+              dragMonState.payload.save.boxes[dragMonState.payload.box].pokemon[
+                dragMonState.payload.boxPos
+              ]?.formeNum ?? 0
+            }
+            isShiny={dragMonState.payload.save.boxes[dragMonState.payload.box].pokemon[
+              dragMonState.payload.boxPos
+            ]?.isShiny()}
+            heldItemIndex={
+              dragMonState.payload.save.boxes[dragMonState.payload.box].pokemon[
+                dragMonState.payload.boxPos
+              ]?.heldItemIndex
+            }
+            style={{ width: '100%', height: '100%' }}
+          />
+        )}
+      </DragOverlay>
       {children}
-    </PokemonDragContext>
+    </DragDropProvider>
   )
 }

@@ -137,6 +137,8 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
 ) => {
   const { type, payload } = action
 
+  console.log(action)
+
   switch (type) {
     case 'set_home_boxes': {
       const { boxes, homeLookup } = payload

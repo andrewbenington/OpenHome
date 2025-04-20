@@ -1,4 +1,4 @@
-import { useDroppable } from '@dnd-kit/core'
+import { useDroppable } from '@dnd-kit/react'
 import { useContext, useMemo } from 'react'
 import { FilterContext } from 'src/state/filter'
 import { MonLocation } from 'src/state/openSaves'
@@ -6,6 +6,7 @@ import { bytesToPKM } from 'src/types/FileImport'
 import { filterApplies } from 'src/types/Filter'
 import { PKMInterface } from 'src/types/interfaces'
 import useDisplayError from '../../hooks/displayError'
+import { DragMonContext } from '../../state/dragMon'
 import '../style.css'
 import DraggableMon from './DraggableMon'
 import DroppableSpace from './DroppableSpace'
@@ -17,8 +18,8 @@ interface BoxCellProps {
   zIndex: number
   mon: PKMInterface | undefined
   borderColor?: string
-  dragID?: string
-  dragData?: MonLocation
+  dragID: string
+  location: MonLocation
 }
 
 const BoxCell = ({
@@ -29,9 +30,10 @@ const BoxCell = ({
   mon,
   borderColor,
   dragID,
-  dragData,
+  location,
 }: BoxCellProps) => {
   const [filterState] = useContext(FilterContext)
+  const [dragMonState] = useContext(DragMonContext)
   const displayError = useDisplayError()
 
   const isFilteredOut = useMemo(() => {
@@ -70,15 +72,18 @@ const BoxCell = ({
     }
   }
 
-  const { setNodeRef } = useDroppable({
-    id: dragID ?? '',
-    data: dragData,
+  const { ref, isDropTarget } = useDroppable({
+    id: dragID,
+    data: location,
     disabled,
   })
 
+  // console.log({ isDropTarget, dragID, location, disabled, dragMonState })
+
   return (
     <div
-      ref={setNodeRef}
+      ref={ref}
+      title={dragID}
       style={{
         padding: 0,
         width: '100%',
@@ -104,12 +109,12 @@ const BoxCell = ({
             height: '100%',
             ...getBackgroundDetails(),
           }}
-          dragData={dragData ? { ...dragData, mon } : undefined}
+          dragData={location ? { ...location, mon } : undefined}
           dragID={dragID}
           disabled={disabled || mon.isLocked || isFilteredOut}
         />
       ) : (
-        <DroppableSpace dropID={dragID} dropData={dragData} disabled={disabled} />
+        <DroppableSpace dropID={dragID} dropData={location} disabled={disabled} />
       )}
     </div>
   )

@@ -13,6 +13,7 @@ import { loadPlugin } from 'src/util/Plugin'
 import { BackendProvider } from '../backend/backendProvider'
 import useIsDarkMode from '../hooks/dark-mode'
 import { AppInfoContext, appInfoInitialState, appInfoReducer, Settings } from '../state/appInfo'
+import { DragMonContext, dragMonReducer } from '../state/dragMon'
 import { ErrorContext, errorReducer } from '../state/error'
 import { FilterContext, filterReducer } from '../state/filter'
 import { LookupContext, lookupReducer } from '../state/lookup'
@@ -74,6 +75,7 @@ function buildKeyboardHandler(backend: BackendInterface) {
 
 function AppWithBackend() {
   const [mouseState, mouseDispatch] = useReducer(mouseReducer, { shift: false })
+  const [dragMonState, dragMonDispatch] = useReducer(dragMonReducer, {})
   const [appInfoState, appInfoDispatch] = useReducer(appInfoReducer, appInfoInitialState)
   const [lookupState, lookupDispatch] = useReducer(lookupReducer, { loaded: false })
   const [filterState, filterDispatch] = useReducer(filterReducer, {})
@@ -176,20 +178,22 @@ function AppWithBackend() {
                   .map((data) => data.save),
               ]}
             >
-              <PokemonDragContextProvider>
-                <FilterContext.Provider value={[filterState, filterDispatch]}>
-                  {loading ? (
-                    <Flex width="100%" height="100vh" align="center" justify="center">
-                      <Text size="9" weight="bold">
-                        OpenHome
-                      </Text>
-                    </Flex>
-                  ) : (
-                    <AppTabs />
-                  )}
-                  <ErrorMessageModal />
-                </FilterContext.Provider>
-              </PokemonDragContextProvider>
+              <DragMonContext.Provider value={[dragMonState, dragMonDispatch]}>
+                <PokemonDragContextProvider>
+                  <FilterContext.Provider value={[filterState, filterDispatch]}>
+                    {loading ? (
+                      <Flex width="100%" height="100vh" align="center" justify="center">
+                        <Text size="9" weight="bold">
+                          OpenHome
+                        </Text>
+                      </Flex>
+                    ) : (
+                      <AppTabs />
+                    )}
+                    <ErrorMessageModal />
+                  </FilterContext.Provider>
+                </PokemonDragContextProvider>
+              </DragMonContext.Provider>
             </OpenSavesContext.Provider>
           </LookupContext.Provider>
         </MouseContext.Provider>

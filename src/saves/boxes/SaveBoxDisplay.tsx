@@ -1,4 +1,3 @@
-import { useDraggable } from '@dnd-kit/core'
 import { Button, Card, Dialog, Flex, Grid } from '@radix-ui/themes'
 import lodash, { range } from 'lodash'
 import { GameOfOriginData } from 'pokemon-resources'
@@ -14,6 +13,7 @@ import { MonLocation, MonWithLocation, OpenSavesContext } from 'src/state/openSa
 import { PKMInterface } from 'src/types/interfaces'
 import { OHPKM } from 'src/types/pkm/OHPKM'
 import { getMonFileIdentifier } from 'src/util/Lookup'
+import { DragMonContext } from '../../state/dragMon'
 import { colorIsDark } from '../../util/color'
 import { buildBackwardNavigator, buildForwardNavigator } from '../util'
 import ArrowButton from './ArrowButton'
@@ -30,7 +30,9 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   const [detailsModal, setDetailsModal] = useState(false)
   const { saveIndex } = props
   const [selectedIndex, setSelectedIndex] = useState<number>()
-  const { active } = useDraggable({ id: '' })
+  const [dragMonState] = useContext(DragMonContext)
+
+  const dragData: MonWithLocation | undefined = useMemo(() => dragMonState.payload, [dragMonState])
 
   const save = useMemo(() => openSaves[saveIndex], [openSaves, saveIndex])
   const currentBox = useMemo(
@@ -108,12 +110,14 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   }
 
   const isDisabled = useMemo(() => {
-    const dragData = active?.data.current as MonWithLocation | undefined
+    const dragData = dragMonState?.payload as MonWithLocation | undefined
 
     if (!dragData || Object.entries(dragData).length === 0) return false
 
     return !save.supportsMon(dragData.mon.dexNum, dragData.mon.formeNum)
-  }, [save, active])
+  }, [save, dragMonState])
+
+  console.log(dragMonState)
 
   const navigateRight = useMemo(
     () => buildForwardNavigator(save, selectedIndex, setSelectedIndex),
@@ -218,7 +222,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                   onClick={() => setSelectedIndex(index)}
                   key={index}
                   dragID={`${save.tid}_${save.sid}_${save.currentPCBox}_${index}`}
-                  dragData={{
+                  location={{
                     box: save.currentPCBox,
                     boxPos: index,
                     save,
