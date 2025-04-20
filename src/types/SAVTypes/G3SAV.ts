@@ -20,6 +20,8 @@ export const EMERALD_SECURITY_COPY_OFFSET = 0x01f4
 export const FRLG_SECURITY_OFFSET = 0x0af8
 export const FRLG_SECURITY_COPY_OFFSET = 0x0f20
 
+const MAX_ADDITIONAL_BYTES = 0x20
+
 export class G3Sector {
   data: Uint8Array
 
@@ -345,7 +347,7 @@ export class G3SAV implements SAV<PK3> {
   static saveTypeID = 'G3SAV'
 
   static fileIsSave(bytes: Uint8Array): boolean {
-    if (bytes.length !== SAVE_SIZE_BYTES) {
+    if (bytes.length - SAVE_SIZE_BYTES > MAX_ADDITIONAL_BYTES) {
       return false
     }
     try {
