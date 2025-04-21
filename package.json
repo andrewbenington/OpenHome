@@ -48,7 +48,7 @@
     "chart.js": "^4.4.8",
     "crypto-js": "^4.2.0",
     "dayjs": "^1.11.13",
-    "fp-ts": "^2.16.9",
+    "fp-ts": "^2.16.10",
     "lodash": "^4.17.21",
     "pokemon-files": "^0.3.12",
     "pokemon-resources": "^1.0.11",
