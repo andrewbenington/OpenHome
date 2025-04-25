@@ -77,9 +77,5 @@ sync-resources: generate/out
 download-item-sprites:
 	@python3 generate/downloadAllItems.py
 
-.PHONY: test
-test:
-	@ts-node --project tsconfig.node.json src/types/SAVTypes/__test__/G1SAV.test.ts
-
 %:
 	@npm run $@

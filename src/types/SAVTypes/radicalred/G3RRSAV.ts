@@ -36,7 +36,7 @@ export class G3RRSAV extends G3CFRUSAV<PK3RR> implements PluginSAV<PK3RR> {
     const firstSectionBytesIndex = findFirstSectionOffset(bytes)
     const firstSectionBytes = bytes.slice(firstSectionBytesIndex, firstSectionBytesIndex + 0x1000)
 
-    const gameCode = firstSectionBytes[0xac]
+    const gameCode = bytesToUint32LittleEndian(firstSectionBytes, 0xac)
 
     if (gameCode !== 1) return false
 

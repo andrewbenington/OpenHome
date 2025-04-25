@@ -270,12 +270,12 @@ function SelectSaveType({ open, saveTypes, onSelect }: SelectSaveTypeProps) {
         </Dialog.Title>
         <Separator style={{ width: '100%' }} />
         <Dialog.Description>Select a save type to proceed:</Dialog.Description>
-        <Flex gap="1" mt="1">
+        <Flex gap="1" mt="1" direction="column">
           {saveTypes?.map((saveType) => (
             <Button
               key={saveType.saveTypeID}
               onClick={() => onSelect(saveType)}
-              style={{ width: '100%' }}
+              style={{ width: '100%', minHeight: 36, height: 'fit-content' }}
             >
               {saveType.saveTypeName}
             </Button>
