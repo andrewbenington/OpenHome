@@ -1,4 +1,4 @@
-import { PK8, PK9, utf16BytesToString } from 'pokemon-files'
+import { PK9, utf16BytesToString } from 'pokemon-files'
 import { GameOfOrigin, GameOfOriginData, Languages } from 'pokemon-resources'
 import {
   SV_TRANSFER_RESTRICTIONS_BASE,
@@ -17,8 +17,8 @@ const SAVE_SIZE_BYTES_MAX = 0x434000
 export type SV_SAVE_REVISION = 'Base Game' | 'Teal Mask' | 'Indigo Disk'
 
 export class SVSAV extends G89SAV<PK9> {
-  static boxSizeBytes = PK8.getBoxSize() * 32
-  static pkmType = PK8
+  static boxSizeBytes = PK9.getBoxSize() * 30
+  static pkmType = PK9
   static saveTypeAbbreviation = 'SV'
   static saveTypeName = 'Pokémon Scarlet/Violet'
   static saveTypeID = 'SVSAV'
@@ -78,7 +78,7 @@ export class SVSAV extends G89SAV<PK9> {
   }
 
   getMonBoxSizeBytes(): number {
-    return PK8.getBoxSize()
+    return PK9.getBoxSize()
   }
 
   getBoxSizeBytes(): number {
