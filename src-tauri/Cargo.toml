@@ -25,7 +25,7 @@ strip = true # Remove debug symbols
 tauri-build = { version = "2", features = [] }
 
 [dependencies]
-tauri = { version = "2.5.0", features = [] }
+tauri = { version = "2.5.1", features = [] }
 tauri-plugin-shell = "2.2.1"
 serde = { version = "1.0.219", features = ["derive"] }
 serde_json = "1.0.140"

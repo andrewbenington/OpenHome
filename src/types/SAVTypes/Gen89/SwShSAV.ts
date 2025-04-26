@@ -8,7 +8,7 @@ import {
 } from '../../../consts/TransferRestrictions'
 import { isRestricted } from '../../TransferRestrictions'
 import { PathData } from '../path'
-import { G8BlockName, G8SAV } from './G8SAV'
+import { G89BlockName, G89SAV } from './G8SAV'
 import { SCBlock, SCObjectBlock } from './SwishCrypto/SCBlock'
 import { SwishCrypto } from './SwishCrypto/SwishCrypto'
 
@@ -17,7 +17,7 @@ const SAVE_SIZE_BYTES_MAX = 0x187800
 
 export type SWSH_SAVE_REVISION = 'Base Game' | 'Isle Of Armor' | 'Crown Tundra'
 
-export class SwShSAV extends G8SAV<PK8> {
+export class SwShSAV extends G89SAV<PK8> {
   static boxSizeBytes = PK8.getBoxSize() * 30
   static pkmType = PK8
   static saveTypeAbbreviation = 'SwSh'
@@ -47,18 +47,18 @@ export class SwShSAV extends G8SAV<PK8> {
     return new PK8(bytes, encrypted)
   }
 
-  getBlockKey(blockName: G8BlockName | keyof typeof BlockKeys): number {
+  getBlockKey(blockName: G89BlockName | keyof typeof BlockKeys): number {
     return BlockKeys[blockName]
   }
 
-  getBlock(blockName: G8BlockName | keyof typeof BlockKeys): SCBlock | undefined {
+  getBlock(blockName: G89BlockName | keyof typeof BlockKeys): SCBlock | undefined {
     const key = this.getBlockKey(blockName)
 
     return this.scBlocks.find((b) => b.key === key)
   }
 
   getBlockMust<T extends SCBlock = SCBlock>(
-    blockName: G8BlockName | keyof typeof BlockKeys,
+    blockName: G89BlockName | keyof typeof BlockKeys,
     type?: T['blockType']
   ): T {
     const block = this.getBlock(blockName)
