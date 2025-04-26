@@ -1,4 +1,4 @@
-import { AllPKMFields, PA8, PB8, PK8 } from 'pokemon-files'
+import { AllPKMFields, PA8, PB8, PK8, PK9 } from 'pokemon-files'
 import { GameOfOrigin } from 'pokemon-resources'
 import { OHPKM } from '../../pkm/OHPKM'
 import { PathData } from '../path'
@@ -7,7 +7,7 @@ import { BoxNamesBlock } from './BoxNamesBlock'
 import { SCArrayBlock, SCBlock, SCObjectBlock, SCValueBlock } from './SwishCrypto/SCBlock'
 import { SwishCrypto } from './SwishCrypto/SwishCrypto'
 
-export abstract class G8SAV<P extends PK8 | PB8 | PA8> implements SAV<P> {
+export abstract class G89SAV<P extends PK8 | PB8 | PA8 | PK9> implements SAV<P> {
   origin: GameOfOrigin = 0
   isPlugin = false
 
@@ -79,7 +79,7 @@ export abstract class G8SAV<P extends PK8 | PB8 | PA8> implements SAV<P> {
   abstract getBoxSizeBytes(): number
 
   abstract getBlockMust<T extends SCBlock = SCBlock>(
-    blockName: G8BlockName,
+    blockName: G89BlockName,
     type?: T['blockType']
   ): T
 
@@ -148,6 +148,10 @@ export abstract class G8SAV<P extends PK8 | PB8 | PA8> implements SAV<P> {
         return '#7C0033'
       case GameOfOrigin.LegendsArceus:
         return '#36597B'
+      case GameOfOrigin.Scarlet:
+        return '#F34134'
+      case GameOfOrigin.Violet:
+        return '#8334B7'
       default:
         return '#666666'
     }
@@ -158,4 +162,4 @@ export abstract class G8SAV<P extends PK8 | PB8 | PA8> implements SAV<P> {
   }
 }
 
-export type G8BlockName = 'BoxLayout' | 'Box' | 'CurrentBox'
+export type G89BlockName = 'BoxLayout' | 'Box' | 'CurrentBox'

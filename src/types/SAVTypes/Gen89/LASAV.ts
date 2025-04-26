@@ -4,7 +4,7 @@ import { LA_TRANSFER_RESTRICTIONS } from '../../../consts/TransferRestrictions'
 import { isRestricted } from '../../TransferRestrictions'
 import { PathData } from '../path'
 import { BoxNamesBlock } from './BoxNamesBlock'
-import { G8BlockName, G8SAV } from './G8SAV'
+import { G89BlockName, G89SAV } from './G8SAV'
 import { SCArrayBlock, SCBlock, SCObjectBlock } from './SwishCrypto/SCBlock'
 import { SwishCrypto } from './SwishCrypto/SwishCrypto'
 
@@ -13,7 +13,7 @@ export type LA_SAVE_REVISION = 'Base' | 'Daybreak'
 const SAVE_SIZE_MIN = 0x136c00
 const SAVE_SIZE_MAX = 0x13ae00
 
-export class LASAV extends G8SAV<PA8> {
+export class LASAV extends G89SAV<PA8> {
   static boxSizeBytes = PA8.getBoxSize() * 30
   static pkmType = PA8
   static saveTypeAbbreviation = 'LA'
@@ -44,18 +44,18 @@ export class LASAV extends G8SAV<PA8> {
     return new PA8(bytes, encrypted)
   }
 
-  getBlockKey(blockName: G8BlockName | keyof typeof BlockKeys): number {
+  getBlockKey(blockName: G89BlockName | keyof typeof BlockKeys): number {
     return BlockKeys[blockName]
   }
 
-  getBlock(blockName: G8BlockName | keyof typeof BlockKeys): SCBlock | undefined {
+  getBlock(blockName: G89BlockName | keyof typeof BlockKeys): SCBlock | undefined {
     const key = this.getBlockKey(blockName)
 
     return this.scBlocks.find((b) => b.key === key)
   }
 
   getBlockMust<T extends SCBlock = SCBlock>(
-    blockName: G8BlockName | keyof typeof BlockKeys,
+    blockName: G89BlockName | keyof typeof BlockKeys,
     type?: T['blockType']
   ): T {
     const block = this.getBlock(blockName)

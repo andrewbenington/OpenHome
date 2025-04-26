@@ -6,8 +6,9 @@ import { DPSAV } from '../types/SAVTypes/DPSAV'
 import { G1SAV } from '../types/SAVTypes/G1SAV'
 import { G2SAV } from '../types/SAVTypes/G2SAV'
 import { G3SAV } from '../types/SAVTypes/G3SAV'
-import { LASAV } from '../types/SAVTypes/Gen8/LASAV'
-import { SwShSAV } from '../types/SAVTypes/Gen8/SwShSAV'
+import { LASAV } from '../types/SAVTypes/Gen89/LASAV'
+import { SVSAV } from '../types/SAVTypes/Gen89/SVSAV'
+import { SwShSAV } from '../types/SAVTypes/Gen89/SwShSAV'
 import { HGSSSAV } from '../types/SAVTypes/HGSSSAV'
 import { ORASSAV } from '../types/SAVTypes/ORASSAV'
 import { PtSAV } from '../types/SAVTypes/PtSAV'
@@ -33,6 +34,7 @@ const OFFICIAL_SAVE_TYPES = [
   USUMSAV,
   SwShSAV,
   LASAV,
+  SVSAV,
 ]
 const EXTRA_SAVE_TYPES = [G3RRSAV, G3UBSAV]
 
