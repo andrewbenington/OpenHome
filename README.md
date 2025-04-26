@@ -1,3 +1,5 @@
+[![Enforce Types + Linting](https://github.com/andrewbenington/OpenHome/actions/workflows/typecheck_lint.yaml/badge.svg)](https://github.com/andrewbenington/OpenHome/actions/workflows/typecheck_lint.yaml)
+
 <p>
   OpenHome uses <a href="https://tauri.app//">Tauri</a>, <a href="https://facebook.github.io/react/">React</a>, and <a href="https://vite.dev/">Vite</a>.
 </p>
