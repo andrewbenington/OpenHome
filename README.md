@@ -128,6 +128,7 @@ the future.
 - Pokémon Ultra Sun/Ultra Moon
 - Pokémon Sword/Shield
 - Pokémon Legends Arceus
+- Pokémon Scarlet/Violet
 
 ### Supported ROM Hack formats
 
