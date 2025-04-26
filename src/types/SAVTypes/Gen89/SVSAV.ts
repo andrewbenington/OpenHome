@@ -17,7 +17,7 @@ const SAVE_SIZE_BYTES_MAX = 0x434000
 export type SV_SAVE_REVISION = 'Base Game' | 'Teal Mask' | 'Indigo Disk'
 
 export class SVSAV extends G89SAV<PK9> {
-  static boxSizeBytes = PK8.getBoxSize() * 30
+  static boxSizeBytes = PK8.getBoxSize() * 32
   static pkmType = PK8
   static saveTypeAbbreviation = 'SV'
   static saveTypeName = 'Pokémon Scarlet/Violet'
@@ -39,7 +39,7 @@ export class SVSAV extends G89SAV<PK9> {
   }
 
   getBoxCount(): number {
-    return 30
+    return 32
   }
 
   monConstructor(bytes: ArrayBuffer, encrypted: boolean): PK9 {
@@ -80,7 +80,7 @@ export class SVSAV extends G89SAV<PK9> {
   }
 
   supportsMon(dexNumber: number, formeNumber: number): boolean {
-    const revision = this.scBlocks ? this.getSaveRevision() : 'Crown Tundra'
+    const revision = this.scBlocks ? this.getSaveRevision() : 'Base Game'
     const restrictions =
       revision === 'Base Game'
         ? SV_TRANSFER_RESTRICTIONS_BASE
