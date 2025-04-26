@@ -32,6 +32,12 @@ export class SVSAV extends G89SAV<PK9> {
     this.name = this.trainerBlock.getName()
     const fullTrainerID = this.trainerBlock.getFullID()
 
+    this.boxes.forEach((box, i) => {
+      if (!box.name) {
+        box.name = `Box ${i + 1}`
+      }
+    })
+
     this.tid = fullTrainerID % 1000000
     this.sid = this.trainerBlock.getSID()
     this.displayID = this.tid.toString().padStart(6, '0')
