@@ -1,3 +1,4 @@
+import { PokemonData } from 'pokemon-species-data'
 import { createContext, Dispatch, Reducer } from 'react'
 import { OHPKM } from 'src/types/pkm/OHPKM'
 import { HomeData } from 'src/types/SAVTypes/HomeData'
@@ -28,6 +29,16 @@ export type MonLocation = {
   save: SAV
   box: number
   boxPos: number
+}
+
+export type MonWithLocationMultiple = {
+  save: SAV
+  boxPositions: BoxPositionsWithMons[]
+}
+
+export type BoxPositionsWithMons = {
+  box: number
+  monPositions: { mon: PKMInterface; position: number }[]
 }
 
 export type MonWithLocation = MonLocation & {
@@ -73,6 +84,13 @@ export type OpenSavesAction =
       payload: {
         source: MonWithLocation
         dest: MonLocation
+      }
+    }
+  | {
+      type: 'move_many_mons'
+      payload: {
+        sources: MonWithLocationMultiple
+        firstDest: MonLocation
       }
     }
   | {
@@ -266,27 +284,28 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
         (mon) => !((getMonFileIdentifier(new OHPKM(mon)) ?? '') in state.modifiedOHPKMs)
       )
 
-      let nextIndex = dest.boxPos
       const isHome = dest.save instanceof HomeData
       const tempSave = dest.save
+
+      let boxIndex = dest.box
+      let nextMonIndex = tempSave.boxes[boxIndex].firstOpenAtOrAfter(dest.boxPos)
 
       mons.forEach((mon) => {
         const homeMon = mon instanceof OHPKM ? mon : new OHPKM(mon)
 
-        while (
-          tempSave.boxes[dest.box].pokemon[nextIndex] &&
-          nextIndex < tempSave.boxRows * tempSave.boxColumns
-        ) {
-          nextIndex++
+        while (nextMonIndex === undefined) {
+          boxIndex++
+          nextMonIndex = tempSave.boxes[boxIndex].firstOpenIndex()
         }
-        if (nextIndex < tempSave.boxRows * tempSave.boxColumns) {
+        if (nextMonIndex < tempSave.boxRows * tempSave.boxColumns) {
           updateMonInSave(state, homeMon, {
             ...dest,
-            boxPos: nextIndex,
+            boxPos: nextMonIndex,
           })
           addedMons.push(homeMon)
-          nextIndex++
+          nextMonIndex++
         }
+        nextMonIndex = tempSave.boxes[boxIndex].firstOpenAtOrAfter(nextMonIndex)
       })
 
       if (isHome) {
@@ -295,6 +314,79 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
         state.openSaves[saveToStringIdentifier(tempSave)].save = tempSave
       }
       addedMons.forEach((mon) => (state.modifiedOHPKMs[getMonFileIdentifier(mon) ?? ''] = mon))
+      return { ...state }
+    }
+    case 'move_many_mons': {
+      const { sources, firstDest } = payload
+      const destIdentifier = saveToStringIdentifier(firstDest.save)
+      const sourceIdentifier = saveToStringIdentifier(sources.save)
+
+      let destBoxIndex = firstDest.box
+      let nextDestMonIndex = firstDest.save.boxes[destBoxIndex].firstOpenAtOrAfter(firstDest.boxPos)
+
+      const allSourceMonLocations = sources.boxPositions.flatMap((bp) =>
+        bp.monPositions.flatMap(({ mon, position }) => ({
+          boxIndex: bp.box,
+          mon,
+          monIndex: position,
+        }))
+      )
+
+      for (const {
+        boxIndex: sourceBoxIndex,
+        monIndex: sourceMonIndex,
+        mon: monToMove,
+      } of allSourceMonLocations) {
+        while (nextDestMonIndex === undefined) {
+          destBoxIndex++
+          nextDestMonIndex = firstDest.save.boxes[destBoxIndex].firstOpenIndex()
+        }
+
+        const sourceBox = sources.save.boxes[sourceBoxIndex]
+        const destBox = firstDest.save.boxes[destBoxIndex]
+
+        let sourceMon = sourceBox.pokemon[sourceMonIndex]
+        let destMon = destBox.pokemon[nextDestMonIndex]
+
+        if (sourceMon !== monToMove) return state // necessary in strict mode, otherwise the swap will happen twice and revert
+        if (sourceIdentifier !== destIdentifier) {
+          if (sourceMon) {
+            if (!(sourceMon instanceof OHPKM)) {
+              sourceMon = new OHPKM(sourceMon)
+            }
+            const identifier = getMonFileIdentifier(sourceMon)
+
+            if (identifier) {
+              state.modifiedOHPKMs[identifier] = sourceMon as OHPKM
+            }
+          }
+          if (destMon) {
+            if (!(destMon instanceof OHPKM)) {
+              destMon = new OHPKM(destMon)
+            }
+            const identifier = getMonFileIdentifier(destMon)
+
+            if (identifier) {
+              state.modifiedOHPKMs[identifier] = destMon as OHPKM
+            }
+          }
+        }
+
+        console.log(`destMon: ${destMon ? PokemonData[destMon.dexNum].name : '(none)'}`)
+        updateMonInSave(state, destMon, {
+          box: sourceBoxIndex,
+          boxPos: sourceMonIndex,
+          save: sources.save,
+        })
+        updateMonInSave(state, sourceMon, {
+          box: destBoxIndex,
+          boxPos: nextDestMonIndex,
+          save: firstDest.save,
+        })
+
+        nextDestMonIndex = firstDest.save.boxes[destBoxIndex].firstOpenAtOrAfter(nextDestMonIndex)
+      }
+
       return { ...state }
     }
     case 'add_mon_to_release': {

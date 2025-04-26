@@ -1,4 +1,4 @@
-import { Button, Card, Dialog, Flex, Grid } from '@radix-ui/themes'
+import { Button, Card, Dialog, DropdownMenu, Flex, Grid } from '@radix-ui/themes'
 import lodash, { range } from 'lodash'
 import { GameOfOriginData } from 'pokemon-resources'
 import { PokemonData } from 'pokemon-species-data'
@@ -9,7 +9,13 @@ import AttributeRow from 'src/pokemon/AttributeRow'
 import PokemonDetailsModal from 'src/pokemon/PokemonDetailsModal'
 import { ErrorContext } from 'src/state/error'
 import { LookupContext } from 'src/state/lookup'
-import { MonLocation, MonWithLocation, OpenSavesContext } from 'src/state/openSaves'
+import {
+  BoxPositionsWithMons,
+  MonLocation,
+  MonWithLocation,
+  MonWithLocationMultiple,
+  OpenSavesContext,
+} from 'src/state/openSaves'
 import { PKMInterface } from 'src/types/interfaces'
 import { OHPKM } from 'src/types/pkm/OHPKM'
 import { getMonFileIdentifier } from 'src/util/Lookup'
@@ -24,7 +30,7 @@ interface OpenSaveDisplayProps {
 }
 
 const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
-  const [, openSavesDispatch, openSaves] = useContext(OpenSavesContext)
+  const [openSavesState, openSavesDispatch, openSaves] = useContext(OpenSavesContext)
   const [{ homeMons }] = useContext(LookupContext)
   const [, dispatchError] = useContext(ErrorContext)
   const [detailsModal, setDetailsModal] = useState(false)
@@ -159,14 +165,60 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
               {save?.name}
             </div>
             <div className="save-menu-buttons-right" style={{ marginRight: 4 }}>
-              <Button
-                className="save-button"
-                onClick={() => setDetailsModal(true)}
-                variant="outline"
-                color="gray"
-              >
-                <MenuIcon />
-              </Button>
+              <DropdownMenu.Root>
+                <DropdownMenu.Trigger>
+                  <Button
+                    className="save-button"
+                    onClick={() => setDetailsModal(true)}
+                    variant="outline"
+                    color="gray"
+                  >
+                    <MenuIcon />
+                  </Button>
+                </DropdownMenu.Trigger>
+                <DropdownMenu.Content>
+                  <DropdownMenu.Item onClick={() => setDetailsModal(true)}>
+                    Details
+                  </DropdownMenu.Item>
+                  <DropdownMenu.Item
+                    onClick={() => {
+                      if (!openSavesState.homeData) return
+
+                      const toMove: MonWithLocationMultiple = {
+                        save,
+                        boxPositions: [],
+                      }
+
+                      for (let boxIndex = 0; boxIndex < save.boxes.length; boxIndex++) {
+                        const boxToMove: BoxPositionsWithMons = {
+                          box: boxIndex,
+                          monPositions: [],
+                        }
+
+                        save.boxes[boxIndex].pokemon.forEach((mon, monIndex) => {
+                          if (mon) {
+                            boxToMove.monPositions.push({ mon, position: monIndex })
+                          }
+                        })
+
+                        if (boxToMove.monPositions.length) {
+                          toMove.boxPositions.push(boxToMove)
+                        }
+                      }
+
+                      openSavesDispatch({
+                        type: 'move_many_mons',
+                        payload: {
+                          sources: toMove,
+                          firstDest: { save: openSavesState.homeData, box: 0, boxPos: 0 },
+                        },
+                      })
+                    }}
+                  >
+                    Move all boxes to OpenHome
+                  </DropdownMenu.Item>
+                </DropdownMenu.Content>
+              </DropdownMenu.Root>
             </div>
           </div>
         </Card>

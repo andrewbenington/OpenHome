@@ -13,6 +13,16 @@ export class Box<P extends PKMInterface> {
     this.name = name
     this.pokemon = new Array(boxSize)
   }
+
+  firstOpenIndex(): number | undefined {
+    return this.pokemon.findIndex((value) => value === undefined)
+  }
+
+  firstOpenAtOrAfter(index: number): number | undefined {
+    return this.pokemon.findIndex((value, i) => {
+      return i >= index && value === undefined
+    })
+  }
 }
 
 export interface BoxCoordinates {
