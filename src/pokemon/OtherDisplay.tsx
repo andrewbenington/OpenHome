@@ -18,7 +18,7 @@ import {
   HGSS_TRANSFER_RESTRICTIONS,
   LA_TRANSFER_RESTRICTIONS,
   ORAS_TRANSFER_RESTRICTIONS,
-  SV_TRANSFER_RESTRICTIONS,
+  SV_TRANSFER_RESTRICTIONS_ID,
   SWSH_TRANSFER_RESTRICTIONS_CT,
   USUM_TRANSFER_RESTRICTIONS,
 } from 'src/consts/TransferRestrictions'
@@ -222,7 +222,7 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
             </AttributeRowExpand>
           )}
 
-        {!isRestricted(SV_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
+        {!isRestricted(SV_TRANSFER_RESTRICTIONS_ID, mon.dexNum, mon.formeNum) &&
           mon.tmFlagsSV &&
           getFlagsInRange(mon.tmFlagsSV, 0, 22).length > 0 && (
             <AttributeRowExpand
@@ -300,10 +300,9 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
               )}
             </>
           )}
-        {!isRestricted(SV_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) && hasTeraTypes(mon) && (
-          <TeraTypeData mon={mon} />
-        )}
-        {!isRestricted(SV_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
+        {!isRestricted(SV_TRANSFER_RESTRICTIONS_ID, mon.dexNum, mon.formeNum) &&
+          hasTeraTypes(mon) && <TeraTypeData mon={mon} />}
+        {!isRestricted(SV_TRANSFER_RESTRICTIONS_ID, mon.dexNum, mon.formeNum) &&
           mon.obedienceLevel !== undefined && (
             <AttributeRow label="Obedience" value={mon.obedienceLevel.toString()} />
           )}

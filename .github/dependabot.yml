@@ -9,7 +9,17 @@ updates:
     directory: '/'
     schedule:
       interval: 'weekly'
-  - package-ecosystem: 'cargo' # See documentation for possible values
-    directory: '/src-tauri' # Location of package manifests
+    groups:
+      production-dependencies:
+        dependency-type: 'production'
+      development-dependencies:
+        dependency-type: 'development'
+  - package-ecosystem: 'cargo'
+    directory: '/src-tauri'
     schedule:
       interval: 'weekly'
+    groups:
+      production-dependencies:
+        dependency-type: 'production'
+      development-dependencies:
+        dependency-type: 'development'
