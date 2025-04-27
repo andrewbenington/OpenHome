@@ -371,7 +371,6 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
           }
         }
 
-        // console.log(`destMon: ${destMon ? PokemonData[destMon.dexNum].name : '(none)'}`)
         updateMonInSave(state, destMon, {
           box: sourceBoxIndex,
           boxPos: sourceMonIndex,
@@ -385,8 +384,6 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
 
         nextDestMonIndex = firstDest.save.boxes[destBoxIndex].firstOpenAtOrAfter(nextDestMonIndex)
       }
-
-      console.log(state.homeData?.boxes[0].pokemon[1])
 
       return { ...state }
     }

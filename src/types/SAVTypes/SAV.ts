@@ -15,13 +15,17 @@ export class Box<P extends PKMInterface> {
   }
 
   firstOpenIndex(): number | undefined {
-    return this.pokemon.findIndex((value) => value === undefined)
+    const nextIndex = this.pokemon.findIndex((value) => value === undefined)
+
+    return nextIndex === -1 ? undefined : nextIndex
   }
 
   firstOpenAtOrAfter(index: number): number | undefined {
-    return this.pokemon.findIndex((value, i) => {
+    const nextIndex = this.pokemon.findIndex((value, i) => {
       return i >= index && value === undefined
     })
+
+    return nextIndex === -1 ? undefined : nextIndex
   }
 }
 
