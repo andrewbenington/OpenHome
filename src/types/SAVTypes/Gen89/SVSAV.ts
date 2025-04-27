@@ -86,7 +86,7 @@ export class SVSAV extends G89SAV<PK9> {
   }
 
   supportsMon(dexNumber: number, formeNumber: number): boolean {
-    const revision = this.scBlocks ? this.getSaveRevision() : 'Base Game'
+    const revision = this.scBlocks ? this.getSaveRevision() : 'Indigo Disk'
     const restrictions =
       revision === 'Base Game'
         ? SV_TRANSFER_RESTRICTIONS_BASE

@@ -3,7 +3,6 @@ import { useContext, useMemo } from 'react'
 import {
   BDSP_TRANSFER_RESTRICTIONS,
   LGPE_TRANSFER_RESTRICTIONS,
-  SV_TRANSFER_RESTRICTIONS_ID,
 } from 'src/consts/TransferRestrictions'
 import { supportsMon } from 'src/types/SAVTypes/util'
 import { isRestricted } from 'src/types/TransferRestrictions'
@@ -68,9 +67,6 @@ const FileTypeSelect = (props: FileTypeSelectProps) => {
     }
     if (!isRestricted(BDSP_TRANSFER_RESTRICTIONS, formData.dexNum, formData.formeNum)) {
       supportedFormats.push('PB8')
-    }
-    if (!isRestricted(SV_TRANSFER_RESTRICTIONS_ID, formData.dexNum, formData.formeNum)) {
-      supportedFormats.push('PK9')
     }
     return supportedFormats
   }, [formData, getEnabledSaveTypes])
