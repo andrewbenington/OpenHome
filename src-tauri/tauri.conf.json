@@ -13,6 +13,7 @@
     "windows": [
       {
         "title": "OpenHome",
+        "label": "main",
         "width": 1200,
         "height": 720,
         "dragDropEnabled": true

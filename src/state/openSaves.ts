@@ -1,4 +1,3 @@
-import { PokemonData } from 'pokemon-species-data'
 import { createContext, Dispatch, Reducer } from 'react'
 import { OHPKM } from 'src/types/pkm/OHPKM'
 import { HomeData } from 'src/types/SAVTypes/HomeData'
@@ -348,7 +347,7 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
         let sourceMon = sourceBox.pokemon[sourceMonIndex]
         let destMon = destBox.pokemon[nextDestMonIndex]
 
-        if (sourceMon !== monToMove) return state // necessary in strict mode, otherwise the swap will happen twice and revert
+        if (sourceMon !== monToMove) continue // necessary in strict mode, otherwise the swap will happen twice and revert
         if (sourceIdentifier !== destIdentifier) {
           if (sourceMon) {
             if (!(sourceMon instanceof OHPKM)) {
@@ -372,7 +371,7 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
           }
         }
 
-        console.log(`destMon: ${destMon ? PokemonData[destMon.dexNum].name : '(none)'}`)
+        // console.log(`destMon: ${destMon ? PokemonData[destMon.dexNum].name : '(none)'}`)
         updateMonInSave(state, destMon, {
           box: sourceBoxIndex,
           boxPos: sourceMonIndex,
@@ -386,6 +385,8 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
 
         nextDestMonIndex = firstDest.save.boxes[destBoxIndex].firstOpenAtOrAfter(nextDestMonIndex)
       }
+
+      console.log(state.homeData?.boxes[0].pokemon[1])
 
       return { ...state }
     }
