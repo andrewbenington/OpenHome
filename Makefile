@@ -16,10 +16,6 @@ build-mac-intel:
 start:
 	@npm run tauri dev
 
-.PHONY: bundle
-bundle:
-	@npx tauri bundle
-
 .PHONY: build-appimage
 build-appimage:
 	@npx tauri build -b appimage
@@ -27,10 +23,6 @@ build-appimage:
 .PHONY: bundle-appimage
 bundle-appimage:
 	@npx tauri bundle -b appimage
-
-.PHONY: nobundle
-nobundle:
-	@npx tauri build --no-bundle
 
 .PHONY: preview
 preview:
