@@ -36,3 +36,4 @@ planning.md
 # generated
 src/consts/JSON/version.json
 src-tauri/gen
+src-tauri/targets
