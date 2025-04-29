@@ -72,6 +72,16 @@ For [Windows](./docs/BUILD_WINDOWS.md)
 
 For [macOS](./docs/BUILD_MAC.md)
 
+## Appimages
+
+Appimages are not currently built by default. To build an appimage you can do the following.
+
+```bash
+$ npm install
+$ NO_STRIP=TRUE npx tauri build -b appimage
+```
+Node and Rust are needed for compilation.
+
 ## Moving Between Saves
 
 This video is from an old version; The concept is the same but I'm too lazy to remake it.
