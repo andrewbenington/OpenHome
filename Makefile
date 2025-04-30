@@ -18,7 +18,7 @@ start:
 
 .PHONY: nobundle
 nobundle:
-	@npx tauri build --nobundle
+	@npx tauri build --no-bundle
 
 .PHONY: build-appimage
 build-appimage:
