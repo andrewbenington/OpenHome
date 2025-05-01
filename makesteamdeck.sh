@@ -5,4 +5,9 @@ docker run --rm -ti \
  -v ${PWD}:/project \
  -v ${PWD##*/}-node-modules:/project/node_modules \
  ghcr.io/steamdeckhomebrew/holo-toolchain-rust:latest \
- bash
+ sh -c "\
+ cd project; \
+ pacman -S npm pkgconf gdk-pixbuf2 extra-3.6/at-spi2-core extra-3.6/cairo extra-3.6/gtk3 extra-3.6/pango extra-3.6/webkit2gtk-4.1 --noconfirm; \
+ npm install; \
+ NO_STRIP=true make build-appimage \
+ "
