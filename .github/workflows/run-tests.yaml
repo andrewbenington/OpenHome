@@ -1,4 +1,4 @@
-name: Enforce Types + Linting
+name: Run Tests
 
 on:
   pull_request:
