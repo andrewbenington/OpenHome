@@ -57,7 +57,7 @@ describe('Save file detection', () => {
     test(`${fileName} should be Pokémon ${gameName}`, () => {
       const result = buildUnknownSaveFile(
         emptyPathData,
-        new Uint8Array(fs.readFileSync(path.join(__dirname, 'SAVFILES', fileName))),
+        new Uint8Array(fs.readFileSync(path.join(__dirname, 'SAVFiles', fileName))),
         {},
         allSaveTypes
       )
