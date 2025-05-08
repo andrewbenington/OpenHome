@@ -12,7 +12,7 @@ import { SCBlock, SCObjectBlock } from './SwishCrypto/SCBlock'
 import { SwishCrypto } from './SwishCrypto/SwishCrypto'
 
 const SAVE_SIZE_BYTES_MIN = 0x31626f
-const SAVE_SIZE_BYTES_MAX = 0x434000
+const SAVE_SIZE_BYTES_MAX = 0x43b000
 
 export type SV_SAVE_REVISION = 'Base Game' | 'Teal Mask' | 'Indigo Disk'
 
