@@ -28,6 +28,5 @@ jobs:
       - name: ESLint
         run: npm run lint:ci
 
-      # need to figure out how to get paths resolved correctly
-      # - name: Run Tests
-      #   run: npm run test
+      - name: Run Tests
+        run: npm run test

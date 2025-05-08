@@ -10,17 +10,17 @@ import { SwShSAV } from '../Gen89/SwShSAV'
 import { PathData } from '../path'
 
 const swordPath: PathData = {
-  raw: './SAVFILES/sword',
+  raw: 'SAVFILES/sword',
   name: 'sword',
-  dir: './SAVFILES',
+  dir: 'SAVFILES',
   ext: '',
   separator: '/',
 }
 
 const arceusPath = {
-  raw: './SAVFILES/legendsarceus',
+  raw: 'SAVFILES/legendsarceus',
   name: 'legendsarceus',
-  dir: './SAVFILES',
+  dir: 'SAVFILES',
   ext: '',
   separator: '/',
 }
@@ -32,13 +32,13 @@ describe('gen 8 save files', () => {
   let magmortar: PK4
 
   beforeAll(() => {
-    let savePath = resolve(__dirname, './SAVFILES/sword')
+    let savePath = resolve(__dirname, 'SAVFILES/sword')
 
     saveBytes = new Uint8Array(readFileSync(savePath))
 
     swordSave = new SwShSAV(swordPath, saveBytes)
 
-    savePath = resolve(__dirname, './SAVFILES/legendsarceus')
+    savePath = resolve(__dirname, 'SAVFILES/legendsarceus')
 
     saveBytes = new Uint8Array(readFileSync(savePath))
 

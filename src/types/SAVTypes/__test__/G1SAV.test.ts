@@ -12,7 +12,7 @@ import { emptyPathData } from '../path'
 
 const result = buildUnknownSaveFile(
   emptyPathData,
-  new Uint8Array(fs.readFileSync(path.join(__dirname, './SAVFiles', 'blue.sav'))),
+  new Uint8Array(fs.readFileSync(path.join(__dirname, 'SAVFILES', 'blue.sav'))),
   {},
   [G1SAV]
 )
