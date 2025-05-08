@@ -80,6 +80,7 @@ Appimages are not currently built by default. To build an appimage you can do th
 $ npm install
 $ NO_STRIP=TRUE npx tauri build -b appimage
 ```
+
 Node and Rust are needed for compilation.
 
 ## Moving Between Saves
