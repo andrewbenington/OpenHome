@@ -1,4 +1,4 @@
-use crate::plugin::{self, list_plugins, PluginMetadata, PluginMetadataWithIcon};
+use crate::plugin::{self, PluginMetadata, PluginMetadataWithIcon, list_plugins};
 use crate::state::{AppState, AppStateSnapshot};
 use crate::util::ImageResponse;
 use crate::{menu, saves, util};
@@ -201,7 +201,7 @@ pub fn find_suggested_saves(
             let citra_saves = saves::recursively_find_citra_saves(&folder, 0)?;
             possible_saves.citra.extend(citra_saves);
 
-            let mgba_saves = saves::recursively_find_mgba_saves(&folder, 0)?;
+            let mgba_saves = saves::recursively_find_mgba_saves(&folder, 0).unwrap_or_default();
             let gambatte_saves = saves::recursively_find_gambatte_saves(&folder, 0)?;
 
             possible_saves.open_emu.extend(mgba_saves);
