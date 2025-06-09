@@ -1,15 +1,15 @@
 import { PB8, utf16BytesToString } from 'pokemon-files'
 import { GameOfOrigin, GameOfOriginData } from 'pokemon-resources'
 import { BDSP_TRANSFER_RESTRICTIONS } from '../../../consts/TransferRestrictions'
-import { SCBlock, SCObjectBlock } from '../../../util/SwishCrypto/SCBlock'
 import { OHPKM } from '../../pkm/OHPKM'
 import { isRestricted } from '../../TransferRestrictions'
 import { PathData } from '../path'
 import { Box, BoxCoordinates, SAV } from '../SAV'
 
-const SAVE_SIZE_BYTES = 1575705
+const SAVE_SIZE_BYTES = 973856
 const BOX_COUNT = 40
 const BOX_NAME_LENGTH = 0x22
+const BOX_MONS_OFFSET = 0x14ef4
 
 export class BDSPSAV implements SAV<PB8> {
   static boxSizeBytes = PB8.getBoxSize() * 30
@@ -27,17 +27,23 @@ export class BDSPSAV implements SAV<PB8> {
   boxRows = 5
   boxColumns = 6
 
-
   money: number = 0
   name: string = ''
   tid: number = 0
   sid: number = 0
   displayID: string = ''
 
-  currentPCBox: number = 0 // TODO: Gen 8 current box
+  currentPCBox: number = 0 // TODO: current box
+
+  bytes: Uint8Array
+
+  invalid: boolean = false
+  tooEarlyToOpen: boolean = false
 
   myStatusBlock: MyStatusBlock
   boxes: Box<PB8>[] = []
+
+  updatedBoxSlots: BoxCoordinates[] = []
 
   constructor(path: PathData, bytes: Uint8Array) {
     this.bytes = bytes
@@ -55,7 +61,6 @@ export class BDSPSAV implements SAV<PB8> {
 
     const boxNamesBlock = new BoxLayoutBDSP(this.bytes)
 
-    const boxBlock = this.getBlockMust<SCObjectBlock>('Box', 'object')
     this.boxes = Array(this.getBoxCount())
     for (let box = 0; box < this.getBoxCount(); box++) {
       const boxName = boxNamesBlock.getBoxName(box)
@@ -66,9 +71,10 @@ export class BDSPSAV implements SAV<PB8> {
     for (let box = 0; box < this.getBoxCount(); box++) {
       for (let monIndex = 0; monIndex < 30; monIndex++) {
         try {
-          const startByte = this.getBoxSizeBytes() * box + this.getMonBoxSizeBytes() * monIndex
+          const startByte =
+            BOX_MONS_OFFSET + this.getBoxSizeBytes() * box + this.getMonBoxSizeBytes() * monIndex
           const endByte = startByte + this.getMonBoxSizeBytes()
-          const monData = boxBlock.raw.slice(startByte, endByte)
+          const monData = (bytes.buffer as ArrayBuffer).slice(startByte, endByte)
           const mon = this.buildPKM(monData, true)
 
           if (box === 0) {
@@ -87,6 +93,14 @@ export class BDSPSAV implements SAV<PB8> {
     }
   }
 
+  gameColor() {
+    return '#00CC00'
+  }
+
+  getPluginIdentifier() {
+    return undefined
+  }
+
   getBoxCount = () => BOX_COUNT
 
   buildPKM(bytes: ArrayBuffer, encrypted: boolean): PB8 {
@@ -101,6 +115,7 @@ export class BDSPSAV implements SAV<PB8> {
     return BDSPSAV.boxSizeBytes
   }
 
+  // TODO: implement
   prepareBoxesAndGetModified() {
     const changedMonPKMs: OHPKM[] = []
 
@@ -143,10 +158,6 @@ export class BDSPSAV implements SAV<PB8> {
     return !isRestricted(BDSP_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)
   }
 
-  // calculateChecksum(): number {
-  //   return CRC16_Invert(this.bytes, this.pcOffset, this.pcSize)
-  // }
-
   getCurrentBox() {
     return this.boxes[this.currentPCBox]
   }
@@ -157,6 +168,7 @@ export class BDSPSAV implements SAV<PB8> {
     return gameOfOrigin ? `Pokémon ${gameOfOrigin.name}` : '(Unknown Game)'
   }
 
+  // TODO: make file size flexible
   static fileIsSave(bytes: Uint8Array): boolean {
     if (bytes.length !== SAVE_SIZE_BYTES) {
       return false
@@ -165,7 +177,7 @@ export class BDSPSAV implements SAV<PB8> {
   }
 
   static includesOrigin(origin: GameOfOrigin) {
-    return origin === GameOfOrigin.Sword || origin === GameOfOrigin.Shield
+    return origin === GameOfOrigin.BrilliantDiamond || origin === GameOfOrigin.ShiningPearl
   }
 }
 
