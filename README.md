@@ -138,7 +138,6 @@ the future.
 - Pokémon Sun/Moon
 - Pokémon Ultra Sun/Ultra Moon
 - Pokémon Sword/Shield
-- Pokémon Brilliant Diamond/Shining Pearl
 - Pokémon Legends Arceus
 - Pokémon Scarlet/Violet
 
