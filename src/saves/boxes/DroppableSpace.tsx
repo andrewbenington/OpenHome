@@ -1,4 +1,5 @@
-import { useDroppable } from '@dnd-kit/core'
+import { closestCenter } from '@dnd-kit/collision'
+import { useDroppable } from '@dnd-kit/react'
 import { ReactNode, useEffect } from 'react'
 import { MonLocation } from '../../state/openSaves'
 
@@ -15,34 +16,49 @@ const getBackgroundDetails = (disabled?: boolean) => {
 }
 
 export interface DroppableSpaceProps {
+  className?: string
   dropID?: string
   dropData?: MonLocation
   disabled?: boolean
   onOver?: () => void
+  onNotOver?: () => void
   children?: ReactNode
 }
 
-const DroppableSpace = ({ dropID, dropData, disabled, onOver, children }: DroppableSpaceProps) => {
-  const { setNodeRef, isOver } = useDroppable({
+const DroppableSpace = ({
+  className,
+  dropID,
+  dropData,
+  disabled,
+  onOver,
+  onNotOver,
+  children,
+}: DroppableSpaceProps) => {
+  const { isDropTarget, ref } = useDroppable({
     id: dropID ?? '',
     data: dropData,
     disabled: !dropID,
+    collisionDetector: closestCenter,
   })
 
   useEffect(() => {
-    if (isOver) {
+    if (isDropTarget) {
       onOver && onOver()
     }
-  }, [isOver, onOver])
+  }, [isDropTarget, onOver])
+
+  if (onNotOver && !isDropTarget) {
+    onNotOver()
+  }
 
   return (
     <div
-      className="pokemon-slot"
+      className={`pokemon-slot ${className || ''}`}
       style={{
         ...getBackgroundDetails(disabled),
         outlineStyle: 'solid',
         outlineWidth: 2,
-        outlineColor: isOver ? 'var(--accent-8)' : 'transparent',
+        outlineColor: isDropTarget ? 'var(--accent-8)' : 'transparent',
         borderRadius: 3,
         display: 'grid',
         alignItems: 'center',
@@ -50,7 +66,7 @@ const DroppableSpace = ({ dropID, dropData, disabled, onOver, children }: Droppa
         width: '100%',
         height: '100%',
       }}
-      ref={setNodeRef}
+      ref={ref}
     >
       {children}
     </div>

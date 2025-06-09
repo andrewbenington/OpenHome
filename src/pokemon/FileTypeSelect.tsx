@@ -2,10 +2,7 @@ import { uniq } from 'lodash'
 import { useContext, useMemo } from 'react'
 import {
   BDSP_TRANSFER_RESTRICTIONS,
-  LA_TRANSFER_RESTRICTIONS,
   LGPE_TRANSFER_RESTRICTIONS,
-  SV_TRANSFER_RESTRICTIONS,
-  SWSH_TRANSFER_RESTRICTIONS,
 } from 'src/consts/TransferRestrictions'
 import { supportsMon } from 'src/types/SAVTypes/util'
 import { isRestricted } from 'src/types/TransferRestrictions'
@@ -17,10 +14,11 @@ const styles = {
   fileTypeChip: {
     color: 'white',
     fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: 'small',
     boxShadow: 'none',
     flex: 1,
-    margin: 8,
+    padding: '4px 22px 2px 6px',
+    height: 'fit-content',
   },
 } as Styles
 
@@ -67,17 +65,8 @@ const FileTypeSelect = (props: FileTypeSelectProps) => {
     if (!isRestricted(LGPE_TRANSFER_RESTRICTIONS, formData.dexNum, formData.formeNum)) {
       supportedFormats.push('PB7')
     }
-    if (!isRestricted(SWSH_TRANSFER_RESTRICTIONS, formData.dexNum, formData.formeNum)) {
-      supportedFormats.push('PK8')
-    }
     if (!isRestricted(BDSP_TRANSFER_RESTRICTIONS, formData.dexNum, formData.formeNum)) {
       supportedFormats.push('PB8')
-    }
-    if (!isRestricted(LA_TRANSFER_RESTRICTIONS, formData.dexNum, formData.formeNum)) {
-      supportedFormats.push('PA8')
-    }
-    if (!isRestricted(SV_TRANSFER_RESTRICTIONS, formData.dexNum, formData.formeNum)) {
-      supportedFormats.push('PK9')
     }
     return supportedFormats
   }, [formData, getEnabledSaveTypes])
@@ -85,9 +74,7 @@ const FileTypeSelect = (props: FileTypeSelectProps) => {
   return (
     <select
       value={currentFormat}
-      onChange={(e) => {
-        onChange(e.target.value)
-      }}
+      onChange={(e) => onChange(e.target.value)}
       style={{
         ...styles.fileTypeChip,
         backgroundColor: color ?? fileTypeColors[currentFormat],

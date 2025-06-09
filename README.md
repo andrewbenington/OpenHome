@@ -1,3 +1,5 @@
+[![Enforce Types + Linting](https://github.com/andrewbenington/OpenHome/actions/workflows/typecheck_lint.yaml/badge.svg)](https://github.com/andrewbenington/OpenHome/actions/workflows/typecheck_lint.yaml)
+
 <p>
   OpenHome uses <a href="https://tauri.app//">Tauri</a>, <a href="https://facebook.github.io/react/">React</a>, and <a href="https://vite.dev/">Vite</a>.
 </p>
@@ -7,6 +9,14 @@
 OpenHome is an open source, cross-platform tool for moving Pokémon between games losslessly, much like Pokémon Home on the Nintendo Switch. Unlike Pokémon Home, OpenHome also allows for moving Pokémon to past generations from future ones. When a Pokémon is moved into a save file, its data from other games is saved locally, so nothing is lost when transferring to past generations. For example, you can move your Kalos Champion Sceptile from Pokémon X to Pokémon Ruby, earn it the Artist Ribbon, and it will have both the Kalos Champion and Artist ribbons when moved back to Pokémon X.
 
 Visit the [GitHub Pages site](https://andrewbenington.github.io/OpenHome/) for easy download links and more information.
+
+## Disclaimer
+
+OpenHome is only intended to be used for fun. Pokémon modified by OpenHome are not guaranteed to be legal Pokémon when transferred to a modern Pokémon game, and should never be used in official competitions or online play. Pokémon modified by OpenHome should not be moved into Pokémon Home, and Pokémon that have previously been stored in Pokémon Home should not be modified with OpenHome. Doing so may result in your Pokémon Home account being suspended.
+
+The OpenHome developers do not endorse piracy. There are online guides available with instructions on how to dump save files and ROMs of games from physically owned cartridges.
+
+While we do our best to avoid glitches, it's always a good idea to back up your save files in case of a save corruption error.
 
 ## Screenshots
 
@@ -62,6 +72,17 @@ For [Windows](./docs/BUILD_WINDOWS.md)
 
 For [macOS](./docs/BUILD_MAC.md)
 
+## Appimages
+
+Appimages are not currently built by default. To build an appimage you can do the following.
+
+```bash
+$ npm install
+$ NO_STRIP=TRUE npx tauri build -b appimage
+```
+
+Node and Rust are needed for compilation.
+
 ## Moving Between Saves
 
 This video is from an old version; The concept is the same but I'm too lazy to remake it.
@@ -116,6 +137,9 @@ the future.
 - Pokémon Omega Ruby/Alpha Sapphire
 - Pokémon Sun/Moon
 - Pokémon Ultra Sun/Ultra Moon
+- Pokémon Sword/Shield
+- Pokémon Legends Arceus
+- Pokémon Scarlet/Violet
 
 ### Supported ROM Hack formats
 

@@ -1,4 +1,3 @@
-import { useDraggable } from '@dnd-kit/core'
 import { Button, Card, Dialog, Flex, Grid } from '@radix-ui/themes'
 import lodash, { range } from 'lodash'
 import { GameOfOriginData } from 'pokemon-resources'
@@ -14,7 +13,8 @@ import { MonLocation, MonWithLocation, OpenSavesContext } from 'src/state/openSa
 import { PKMInterface } from 'src/types/interfaces'
 import { OHPKM } from 'src/types/pkm/OHPKM'
 import { getMonFileIdentifier } from 'src/util/Lookup'
-import { InfoGrid } from '../../components/InfoGrid'
+import { DragMonContext } from '../../state/dragMon'
+import { colorIsDark } from '../../util/color'
 import { buildBackwardNavigator, buildForwardNavigator } from '../util'
 import ArrowButton from './ArrowButton'
 import BoxCell from './BoxCell'
@@ -30,7 +30,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   const [detailsModal, setDetailsModal] = useState(false)
   const { saveIndex } = props
   const [selectedIndex, setSelectedIndex] = useState<number>()
-  const { active } = useDraggable({ id: '' })
+  const [dragMonState] = useContext(DragMonContext)
 
   const save = useMemo(() => openSaves[saveIndex], [openSaves, saveIndex])
   const currentBox = useMemo(
@@ -108,12 +108,12 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   }
 
   const isDisabled = useMemo(() => {
-    const dragData = active?.data.current as MonWithLocation | undefined
+    const dragData = dragMonState?.payload as MonWithLocation | undefined
 
     if (!dragData || Object.entries(dragData).length === 0) return false
 
     return !save.supportsMon(dragData.mon.dexNum, dragData.mon.formeNum)
-  }, [save, active])
+  }, [save, dragMonState])
 
   const navigateRight = useMemo(
     () => buildForwardNavigator(save, selectedIndex, setSelectedIndex),
@@ -125,38 +125,49 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
     [save, selectedIndex]
   )
 
+  const displayData = useMemo(() => save.getDisplayData?.() ?? {}, [save])
+
   return save && save.currentPCBox !== undefined ? (
     <>
       <Flex direction="column" width="100%" gap="1">
-        <Card style={{ padding: '8px 0px 0px' }}>
+        <Card style={{ padding: 0 }}>
           <div className="save-header">
-            <Button
-              className="save-close-button"
-              onClick={() =>
-                openSavesDispatch({
-                  type: 'remove_save',
-                  payload: save,
-                })
-              }
-              disabled={!!save.updatedBoxSlots.length}
-              color="tomato"
-            >
-              <MdClose />
-            </Button>{' '}
-            <div style={{ flex: 1 }}>
-              <div style={{ textAlign: 'center', fontWeight: 'bold' }}>{save.getGameName()}</div>
-              <div style={{ textAlign: 'center' }}>
-                {save?.name} ({save?.displayID})
+            <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 4 }}>
+              <div
+                className="save-header-game diagonal-clip"
+                style={{
+                  backgroundColor: save.gameColor(),
+                  color: colorIsDark(save.gameColor()) ? 'white' : 'black',
+                }}
+              >
+                <Button
+                  className="save-close-button"
+                  onClick={() =>
+                    openSavesDispatch({
+                      type: 'remove_save',
+                      payload: save,
+                    })
+                  }
+                  disabled={!!save.updatedBoxSlots.length}
+                  color="tomato"
+                  style={{ padding: 1 }}
+                >
+                  <MdClose />
+                </Button>
+                {save.getGameName().slice(8)}
               </div>
+              {save?.name}
             </div>
-            <Button
-              className="save-menu-button"
-              onClick={() => setDetailsModal(true)}
-              variant="outline"
-              color="gray"
-            >
-              <MenuIcon />
-            </Button>
+            <div className="save-menu-buttons-right" style={{ marginRight: 4 }}>
+              <Button
+                className="save-button"
+                onClick={() => setDetailsModal(true)}
+                variant="outline"
+                color="gray"
+              >
+                <MenuIcon />
+              </Button>
+            </div>
           </div>
         </Card>
         <Card
@@ -165,71 +176,68 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
             backgroundColor: isDisabled ? '#666' : undefined,
           }}
         >
-          <div>
-            <div className="box-navigation">
-              <Flex align="center" justify="center" flexGrow="4">
-                <ArrowButton
-                  onClick={() =>
-                    openSavesDispatch({
-                      type: 'set_save_box',
-                      payload: {
-                        boxNum:
-                          save.currentPCBox > 0 ? save.currentPCBox - 1 : save.boxes.length - 1,
-                        save,
-                      },
-                    })
-                  }
-                  dragID={`arrow_left_${save.tid}_${save.sid}_${save.currentPCBox}`}
-                  direction="left"
-                />
-              </Flex>
-              <div className="box-name">{save.boxes[save.currentPCBox]?.name}</div>
-              <Flex align="center" justify="center" flexGrow="4">
-                <ArrowButton
-                  onClick={() =>
-                    openSavesDispatch({
-                      type: 'set_save_box',
-                      payload: {
-                        boxNum: (save.currentPCBox + 1) % save.boxes.length,
-                        save,
-                      },
-                    })
-                  }
-                  dragID={`arrow_right_${save.tid}_${save.sid}_${save.currentPCBox}`}
-                  direction="right"
-                />
-              </Flex>
-            </div>
-            <Grid columns={save.boxColumns.toString()} gap="1" p="1">
-              {lodash
-                .range(save.boxColumns * save.boxRows)
-                .map((index: number) => currentBox?.pokemon?.[index])
-                .map((mon, index) => (
-                  <BoxCell
-                    onClick={() => setSelectedIndex(index)}
-                    key={index}
-                    dragID={`${save.tid}_${save.sid}_${save.currentPCBox}_${index}`}
-                    dragData={{
-                      box: save.currentPCBox,
-                      boxPos: index,
+          <div className="box-navigation">
+            <Flex align="center" justify="center" flexGrow="4">
+              <ArrowButton
+                onClick={() =>
+                  openSavesDispatch({
+                    type: 'set_save_box',
+                    payload: {
+                      boxNum: save.currentPCBox > 0 ? save.currentPCBox - 1 : save.boxes.length - 1,
                       save,
-                    }}
-                    disabled={isDisabled}
-                    mon={mon}
-                    zIndex={1}
-                    onDrop={(importedMons) => {
-                      if (importedMons) {
-                        attemptImportMons(importedMons, {
-                          save,
-                          box: save.currentPCBox,
-                          boxPos: index,
-                        })
-                      }
-                    }}
-                  />
-                ))}
-            </Grid>
+                    },
+                  })
+                }
+                dragID={`arrow_left_${save.tid}_${save.sid}`}
+                direction="left"
+              />
+            </Flex>
+            <div className="box-name">{save.boxes[save.currentPCBox]?.name}</div>
+            <Flex align="center" justify="center" flexGrow="4">
+              <ArrowButton
+                onClick={() =>
+                  openSavesDispatch({
+                    type: 'set_save_box',
+                    payload: {
+                      boxNum: (save.currentPCBox + 1) % save.boxes.length,
+                      save,
+                    },
+                  })
+                }
+                dragID={`arrow_right_${save.tid}_${save.sid}`}
+                direction="right"
+              />
+            </Flex>
           </div>
+          <Grid columns={save.boxColumns.toString()} gap="1" p="1">
+            {lodash
+              .range(save.boxColumns * save.boxRows)
+              .map((index: number) => currentBox?.pokemon?.[index])
+              .map((mon, index) => (
+                <BoxCell
+                  onClick={() => setSelectedIndex(index)}
+                  key={`${save.currentPCBox}-${index}`}
+                  dragID={`${save.tid}_${save.sid}_${save.currentPCBox}_${index}`}
+                  location={{
+                    box: save.currentPCBox,
+                    boxPos: index,
+                    save,
+                  }}
+                  disabled={isDisabled}
+                  mon={mon}
+                  zIndex={1}
+                  onDrop={(importedMons) => {
+                    if (importedMons) {
+                      attemptImportMons(importedMons, {
+                        save,
+                        box: save.currentPCBox,
+                        boxPos: index,
+                      })
+                    }
+                  }}
+                />
+              ))}
+          </Grid>
         </Card>
         <Dialog.Root open={detailsModal} onOpenChange={setDetailsModal}>
           <Dialog.Content
@@ -239,7 +247,9 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
               maxHeight: 'fit-content',
               height: '95%',
               overflow: 'hidden',
-              gap: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 2,
             }}
           >
             <AttributeRow label="Game">Pokémon {GameOfOriginData[save.origin]?.name}</AttributeRow>
@@ -265,7 +275,11 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                 <code>0x{save.calculateChecksum().toString(16)}</code>
               </AttributeRow>
             )}
-            {save.getExtraData && <InfoGrid data={save.getExtraData()} />}
+            {Object.entries(displayData).map(([label, value]) => (
+              <AttributeRow label={label} key={label}>
+                {value}
+              </AttributeRow>
+            ))}
           </Dialog.Content>
         </Dialog.Root>
       </Flex>

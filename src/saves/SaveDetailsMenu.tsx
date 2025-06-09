@@ -1,9 +1,10 @@
 import { DropdownMenu, IconButton } from '@radix-ui/themes'
-import { useContext, useEffect, useMemo, useState } from 'react'
+import { useContext, useMemo } from 'react'
 import { BackendContext } from 'src/backend/backendContext'
 import { MenuIcon } from 'src/components/Icons'
 import useIsDarkMode from 'src/hooks/dark-mode'
 import { SaveRef } from 'src/types/types'
+import { colorIsDark } from '../util/color'
 
 export type SaveDetailsMenuProps = {
   save: SaveRef
@@ -12,35 +13,10 @@ export type SaveDetailsMenuProps = {
   onRemove?: () => void
 }
 
-function colorIsDark(bgColor?: string) {
-  if (!bgColor) return false
-  const color = bgColor.charAt(0) === '#' ? bgColor.substring(1, 7) : bgColor
-
-  const r = parseInt(color.substring(0, 2), 16)
-  const g = parseInt(color.substring(2, 4), 16)
-  const b = parseInt(color.substring(4, 6), 16)
-
-  const uicolors = [r / 255, g / 255, b / 255]
-  const c = uicolors.map((color) => {
-    if (color <= 0.03928) {
-      return color / 12.92
-    }
-    return Math.pow((color + 0.055) / 1.055, 2.4)
-  })
-  const L = 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]
-
-  return L <= 0.179
-}
-
 export default function SaveDetailsMenu(props: SaveDetailsMenuProps) {
   const { save, backgroundColor, backgroundAlwaysPresent, onRemove } = props
   const backend = useContext(BackendContext)
   const isDarkMode = useIsDarkMode()
-  const [platform, setPlatform] = useState('')
-
-  useEffect(() => {
-    backend.getPlatform().then(setPlatform)
-  }, [backend])
 
   const darkBackground = useMemo(() => {
     if (!backgroundColor) {
@@ -95,7 +71,7 @@ export default function SaveDetailsMenu(props: SaveDetailsMenuProps) {
             backend.openDirectory(save.filePath.dir)
           }}
         >
-          Reveal in {platform === 'macos' ? 'Finder' : 'File Explorer'}
+          Reveal in {backend.getPlatform() === 'macos' ? 'Finder' : 'File Explorer'}
         </DropdownMenu.Item>
       </DropdownMenu.Content>
     </DropdownMenu.Root>

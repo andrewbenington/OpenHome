@@ -280,7 +280,7 @@ export default function SLJAutocomplete<Option>(props: SLJAutocompleteProps<Opti
           }}
         >
           {propValue && getIconComponent && (
-            <TextField.Slot side="left" style={{ marginRight: 0 }}>
+            <TextField.Slot side="left" style={{ marginRight: 0, padding: '0px 4px 0px 8px' }}>
               {propValue && getIconComponent?.(propValue)}
             </TextField.Slot>
           )}

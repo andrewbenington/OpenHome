@@ -33,7 +33,6 @@ const styles = {
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
-    fontSize: 20,
     marginBottom: 8,
   },
 } as Styles
@@ -131,7 +130,7 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
           )}
         </div>
       </div>
-      <Flex direction="column" gap="1">
+      <Flex direction="column" gap="2px">
         <AttributeRow label="Nickname" value={mon.nickname} />
         <AttributeRow
           label="Species"

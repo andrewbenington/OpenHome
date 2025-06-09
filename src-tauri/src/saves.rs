@@ -1,5 +1,4 @@
-use crate::util::{self, parse_path_data, PathData};
-use serde;
+use crate::util::{self, PathData, parse_path_data};
 use std::collections::HashMap;
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -19,32 +18,21 @@ pub fn recursively_find_desamume_saves(
     depth: usize,
 ) -> Result<Vec<PathData>, String> {
     if depth >= MAX_SEARCH_DEPTH {
-        return Ok(vec![]);
+        return Ok(Vec::new());
     }
 
     let mut found_saves = Vec::new();
+    let inner_directory_paths = get_inner_directories(current_path);
 
-    let entries = fs::read_dir(current_path).map_err(|e| e.to_string())?;
-    for entry in entries {
-        let entry = entry.map_err(|e| e.to_string())?;
-        let entry_path = entry.path();
-
-        if entry_path.is_dir() {
-            if entry_path.ends_with("Battery Saves") || entry_path.ends_with("Battery") {
-                let inner_files = fs::read_dir(&entry_path).map_err(|e| e.to_string())?;
-                for inner_file in inner_files {
-                    let inner_file = inner_file.map_err(|e| e.to_string())?;
-                    let file_path = inner_file.path();
-
-                    if let Some(ext) = file_path.extension() {
-                        if ext == "dsv" {
-                            found_saves.push(parse_path_data(&file_path));
-                        }
-                    }
-                }
-            } else {
-                found_saves.extend(recursively_find_desamume_saves(&entry_path, depth + 1)?);
-            }
+    for path in inner_directory_paths {
+        if path.ends_with("Battery Saves") || path.ends_with("Battery") {
+            found_saves.extend(
+                get_inner_files_with_extension(&path, "dsv")
+                    .into_iter()
+                    .map(|path| parse_path_data(&path)),
+            );
+        } else {
+            found_saves.extend(recursively_find_desamume_saves(&path, depth + 1)?);
         }
     }
 
@@ -60,74 +48,44 @@ pub fn recursively_find_gambatte_saves(
     }
 
     let mut found_saves = Vec::new();
+    let inner_directory_paths = get_inner_directories(current_path);
 
-    let entries = fs::read_dir(current_path).map_err(|e| e.to_string())?;
-    for entry in entries {
-        let entry = entry.map_err(|e| e.to_string())?;
-        let entry_path = entry.path();
-
-        if entry_path.is_dir() {
-            if entry_path.ends_with("Battery Saves") {
-                let inner_files = fs::read_dir(&entry_path).map_err(|e| e.to_string())?;
-                for inner_file in inner_files {
-                    let inner_file = inner_file.map_err(|e| e.to_string())?;
-                    let file_path = inner_file.path();
-
-                    if let Some(ext) = file_path.extension() {
-                        if ext == "sav" || ext == "rtc" {
-                            found_saves.push(parse_path_data(&file_path));
-                        }
-                    }
-                }
-            } else {
-                found_saves.extend(recursively_find_gambatte_saves(&entry_path, depth + 1)?);
-            }
+    for path in inner_directory_paths {
+        if path.ends_with("Battery Saves") {
+            found_saves.extend(
+                get_inner_files_with_extensions(&path, &["sav", "rtc"])
+                    .into_iter()
+                    .map(|path| parse_path_data(&path)),
+            );
+        } else {
+            found_saves.extend(recursively_find_gambatte_saves(&path, depth + 1)?);
         }
     }
 
     Ok(found_saves)
 }
 
-pub fn recursively_find_mgba_saves(
-    current_path: &Path,
-    depth: usize,
-) -> Result<Vec<PathData>, String> {
+pub fn recursively_find_mgba_saves(current_path: &Path, depth: usize) -> Option<Vec<PathData>> {
     if depth >= MAX_SEARCH_DEPTH {
-        return Ok(vec![]);
+        return None;
     }
 
     let mut found_saves = Vec::new();
+    let inner_directory_paths = get_inner_directories(current_path);
 
-    let entries = fs::read_dir(current_path).map_err(|e| e.to_string())?;
-    for entry in entries {
-        let entry = entry.map_err(|e| e.to_string())?;
-        let entry_path = entry.path();
-
-        if entry_path.is_dir() {
-            if entry_path.ends_with("Battery Saves") {
-                let inner_files = fs::read_dir(&entry_path).map_err(|e| e.to_string())?; // CHANGED
-                for inner_file in inner_files {
-                    let inner_file = inner_file.map_err(|e| e.to_string())?; // CHANGED
-                    let file_path = inner_file.path();
-
-                    println!(
-                        "file_path mGBA: {}",
-                        file_path.to_str().unwrap_or("(no path)")
-                    );
-
-                    if let Some(ext) = file_path.extension() {
-                        if ext == "sav" {
-                            found_saves.push(parse_path_data(&file_path));
-                        }
-                    }
-                }
-            } else {
-                found_saves.extend(recursively_find_mgba_saves(&entry_path, depth + 1)?);
-            }
+    for path in inner_directory_paths {
+        if path.ends_with("Battery Saves") {
+            found_saves.extend(
+                get_inner_files_with_extension(&path, "sav")
+                    .into_iter()
+                    .map(|path| parse_path_data(&path)),
+            );
+        } else {
+            found_saves.extend(recursively_find_mgba_saves(&path, depth + 1)?);
         }
     }
 
-    Ok(found_saves)
+    Some(found_saves)
 }
 
 pub fn recursively_find_citra_saves(path: &PathBuf, depth: usize) -> Result<Vec<PathData>, String> {
@@ -211,27 +169,67 @@ pub fn get_recent_saves(app_handle: tauri::AppHandle) -> Result<HashMap<String, 
                 trainer_name: save.trainer_name.unwrap_or_default(),
                 trainer_id: save.trainer_id.unwrap_or_default(),
                 last_opened: save.last_opened,
-                last_modified: get_modified_time_ms(path).ok(),
+                last_modified: get_modified_time_ms(path),
                 valid: path.exists(),
                 plugin_identifier: save.plugin_identifier,
             },
         );
     }
 
-    return Ok(validated_recents);
+    Ok(validated_recents)
 }
 
-fn get_modified_time_ms(path: &Path) -> Result<f64, String> {
-    return path
-        .metadata()
-        .map_err(|e| format!("Error getting metadata: {}", e))
-        .and_then(|m| {
-            m.modified()
-                .map_err(|e| format!("Error getting modified time: {}", e))
+fn get_modified_time_ms(path: &Path) -> Option<f64> {
+    path.metadata()
+        .ok()
+        .as_ref()
+        .and_then(|metadata| metadata.modified().ok())
+        .and_then(|st| st.duration_since(UNIX_EPOCH).ok())
+        .map(|dur| dur.as_millis() as f64)
+}
+
+fn get_inner_directories(dir_path: &Path) -> Vec<PathBuf> {
+    let Ok(dir_entries) = fs::read_dir(dir_path) else {
+        return Vec::new();
+    };
+
+    dir_entries
+        .filter_map(|entry| entry.ok())
+        .map(|entry| entry.path())
+        .filter(|path| path.is_dir())
+        .collect()
+}
+
+fn get_inner_files_with_extension(dir_path: &Path, extension: &str) -> Vec<PathBuf> {
+    let Ok(dir_entries) = fs::read_dir(dir_path) else {
+        return Vec::new();
+    };
+
+    dir_entries
+        .filter_map(|entry| entry.ok())
+        .map(|entry| entry.path())
+        .filter(|path| {
+            !path.is_dir()
+                && path
+                    .extension()
+                    .is_some_and(|ext| ext.to_str().is_some_and(|ext| ext == extension))
         })
-        .and_then(|st| {
-            st.duration_since(UNIX_EPOCH)
-                .map_err(|e| format!("Invalid modified time: {}", e))
+        .collect()
+}
+
+fn get_inner_files_with_extensions(dir_path: &Path, extensions: &[&str]) -> Vec<PathBuf> {
+    let Ok(dir_entries) = fs::read_dir(dir_path) else {
+        return Vec::new();
+    };
+
+    dir_entries
+        .filter_map(|entry| entry.ok())
+        .map(|entry| entry.path())
+        .filter(|path| {
+            !path.is_dir()
+                && path
+                    .extension()
+                    .is_some_and(|ext| ext.to_str().is_some_and(|ext| extensions.contains(&ext)))
         })
-        .map(|dur| dur.as_millis() as f64);
+        .collect()
 }

@@ -8,8 +8,8 @@ export default function ReleaseArea() {
   const [openSavesState] = useContext(OpenSavesContext)
 
   return (
-    <Flex className="drop-area" align="center" direction="column">
-      Release
+    <Flex className="drop-area" direction="column">
+      <div className="drop-area-text diagonal-clip">Release</div>
       <DroppableSpace dropID={`to_release`}>
         <div className="release-icon-container" style={{ display: 'flex' }}>
           {openSavesState.monsToRelease.map((mon, i) => {

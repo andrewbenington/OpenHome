@@ -1,9 +1,9 @@
 import { Badge, Card, Flex } from '@radix-ui/themes'
-import dayjs from 'dayjs'
 import { useContext, useMemo, useState } from 'react'
 import { MdAdd } from 'react-icons/md'
 import PokemonDetailsModal from 'src/pokemon/PokemonDetailsModal'
 import SavesModal from 'src/saves/SavesModal'
+import { getSortFunction, SortType, SortTypes } from 'src/types/pkm/sort'
 import { filterUndefined } from 'src/util/Sort'
 import Autocomplete from '../../components/Autocomplete'
 import PokemonIcon from '../../components/PokemonIcon'
@@ -11,47 +11,12 @@ import { LookupContext } from '../../state/lookup'
 import { OpenSavesContext } from '../../state/openSaves'
 import { PKMInterface } from '../../types/interfaces'
 
-export type SortType = 'nickname' | 'level' | 'species' | 'origin' | 'met_date' | 'ribbons' | ''
-const SortTypes: SortType[] = ['', 'nickname', 'level', 'species', 'ribbons', 'met_date', 'origin']
-
-function getSortFunction(
+function getInnerSortFunction(
   sortStr: SortType | undefined
 ): (a: { mon: PKMInterface }, b: { mon: PKMInterface }) => number {
-  switch (sortStr?.toLowerCase()) {
-    case 'nickname':
-      return (a, b) => a.mon.nickname.localeCompare(b.mon.nickname)
-    case 'level':
-      return (a, b) => b.mon.getLevel() - a.mon.getLevel()
-    case 'species':
-      return (a, b) => a.mon.dexNum - b.mon.dexNum
-    case 'origin':
-      return (a, b) => a.mon.gameOfOrigin - b.mon.gameOfOrigin
-    case 'met_date':
-      return (a, b) => {
-        const aDate =
-          'metDate' in a.mon && a.mon.metDate
-            ? dayjs(new Date(a.mon.metDate.year, a.mon.metDate.month, a.mon.metDate.day)).unix()
-            : 0
-        const bDate =
-          'metDate' in b.mon && b.mon.metDate
-            ? dayjs(new Date(b.mon.metDate.year, b.mon.metDate.month, b.mon.metDate.day)).unix()
-            : 0
+  const sortFunction = getSortFunction(sortStr)
 
-        return bDate - aDate
-      }
-    case 'ribbons':
-      return (a, b) => {
-        const aCount = a.mon.ribbons ? a.mon.ribbons.length : 0
-        const bCount = b.mon.ribbons ? b.mon.ribbons.length : 0
-
-        return bCount - aCount
-      }
-    default:
-      return () => {
-        console.error('unrecognized sort term:', sortStr)
-        return 0
-      }
-  }
+  return (a, b) => sortFunction(a.mon, b.mon)
 }
 
 export default function SortPokemon() {
@@ -81,7 +46,7 @@ export default function SortPokemon() {
 
   const sortedMonsWithColors = useMemo(() => {
     return sort
-      ? Object.values(allMonsWithColors).sort(getSortFunction(sort))
+      ? Object.values(allMonsWithColors).sort(getInnerSortFunction(sort))
       : Object.values(allMonsWithColors)
   }, [allMonsWithColors, sort])
 

@@ -20,6 +20,8 @@ export const EMERALD_SECURITY_COPY_OFFSET = 0x01f4
 export const FRLG_SECURITY_OFFSET = 0x0af8
 export const FRLG_SECURITY_COPY_OFFSET = 0x0f20
 
+const MAX_ADDITIONAL_BYTES = 0x100
+
 export class G3Sector {
   data: Uint8Array
 
@@ -112,7 +114,7 @@ export class G3SaveBackup {
     }
     this.sectors.sort((sector1, sector2) => sector1.sectionID - sector2.sectionID)
 
-    this.gameCode = this.sectors[0].data[0xac]
+    this.gameCode = bytesToUint32LittleEndian(this.sectors[0].data, 0xac)
     switch (this.gameCode) {
       case 0:
         this.origin = GameOfOrigin.Ruby
@@ -345,7 +347,7 @@ export class G3SAV implements SAV<PK3> {
   static saveTypeID = 'G3SAV'
 
   static fileIsSave(bytes: Uint8Array): boolean {
-    if (bytes.length !== SAVE_SIZE_BYTES) {
+    if (bytes.length < SAVE_SIZE_BYTES || bytes.length - SAVE_SIZE_BYTES > MAX_ADDITIONAL_BYTES) {
       return false
     }
     try {
@@ -354,10 +356,7 @@ export class G3SAV implements SAV<PK3> {
       if (save.primarySave.gameCode === 0) {
         return true
       }
-      return (
-        save.primarySave.securityKey > 0 &&
-        save.primarySave.securityKey === save.primarySave.securityKeyCopy
-      )
+      return save.primarySave.securityKey > 0
     } catch {
       return false
     }

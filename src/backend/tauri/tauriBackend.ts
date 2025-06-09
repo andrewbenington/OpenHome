@@ -1,7 +1,7 @@
 import { path } from '@tauri-apps/api'
 import { Event, listen, UnlistenFn } from '@tauri-apps/api/event'
 import { getCurrentWindow } from '@tauri-apps/api/window'
-import { open as fileDialog } from '@tauri-apps/plugin-dialog'
+import { open as fileDialog, save } from '@tauri-apps/plugin-dialog'
 import { readFile, stat } from '@tauri-apps/plugin-fs'
 import { platform } from '@tauri-apps/plugin-os'
 import { open } from '@tauri-apps/plugin-shell'
@@ -133,6 +133,15 @@ export const TauriBackend: BackendInterface = {
   writeSaveFile: (path: string, bytes: Uint8Array) => {
     return TauriInvoker.writeFileBytes(path, bytes)
   },
+  saveLocalFile: async (bytes: Uint8Array, suggestedName: string) => {
+    const filePath = await save({
+      defaultPath: await path.join(await path.downloadDir(), suggestedName),
+    })
+
+    if (!filePath) return E.right(null)
+
+    return TauriInvoker.writeFileBytes(filePath, bytes)
+  },
 
   // /* game save management */
   getRecentSaves: async (): Promise<Errorable<Record<string, SaveRef>>> => {
@@ -242,7 +251,7 @@ export const TauriBackend: BackendInterface = {
     open(directory)
     return E.right(null)
   },
-  getPlatform: async () => platform(),
+  getPlatform: platform,
   getState: async () => TauriInvoker.getState(),
   getSettings: async () => {
     const promise = TauriInvoker.getStorageFileJSON('settings.json') as Promise<
@@ -261,6 +270,7 @@ export const TauriBackend: BackendInterface = {
   },
   setTheme: (appTheme: 'light' | 'dark' | 'system'): Promise<Errorable<null>> =>
     TauriInvoker.setTheme(appTheme),
+  emitMenuEvent: TauriInvoker.handleMenuAccelleratorWindows,
 
   getImageData: TauriInvoker.getImageData,
   listInstalledPlugins: TauriInvoker.listInstalledPlugins,
@@ -308,7 +318,10 @@ export const TauriBackend: BackendInterface = {
       unlistenPromises.push(listen('save', listeners.onSave))
     }
     if (listeners.onReset) {
-      unlistenPromises.push(listen('save', listeners.onReset))
+      unlistenPromises.push(listen('reset', listeners.onReset))
+    }
+    if (listeners.onOpen) {
+      unlistenPromises.push(listen('open', listeners.onOpen))
     }
     if (listeners.onPluginDownloadProgress) {
       const [pluginID, listener] = listeners.onPluginDownloadProgress

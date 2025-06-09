@@ -1,7 +1,6 @@
 use std::process::Command;
 
 use tauri::{image::Image, include_image, menu::*, App, AppHandle, Emitter, Manager, Wry};
-
 const APP_ICON: Image<'_> = include_image!("icons/128x128.png");
 
 #[cfg(target_os = "macos")]
@@ -41,7 +40,7 @@ pub fn create_menu(app: &App) -> Result<Menu<Wry>, Box<dyn std::error::Error>> {
 
     let open_item = MenuItem::with_id(handle, "open", "Open", true, Some("CmdOrCtrl+O"))?;
     let save_item = MenuItem::with_id(handle, "save", "Save", true, Some("CmdOrCtrl+S"))?;
-    let reset_item = MenuItem::with_id(handle, "reset", "Reset", true, Some("CmdOrCtrl+X"))?;
+    let reset_item = MenuItem::with_id(handle, "reset", "Reset", true, Some("CmdOrCtrl+T"))?;
     let open_appdata_item = MenuItem::with_id(
         handle,
         "open-appdata",
@@ -116,11 +115,16 @@ fn command_open(target: &str) {
 }
 
 pub fn handle_menu_event(app_handle: &AppHandle, event: MenuEvent) {
-    println!("Triggered menu event ID: {}", event.id.as_ref());
-    match event.id.as_ref() {
+    handle_menu_event_id(app_handle, event.id.as_ref());
+}
+
+pub fn handle_menu_event_id(app_handle: &AppHandle, event_id: &str) {
+    match event_id {
         // File menu actions
         // "new" => println!("New file action triggered!"),
-        // "open" => println!("Open file action triggered!"),
+        "open" => app_handle
+            .emit("open", ())
+            .unwrap_or_else(|err| println!("Error emitting 'open' event: {err}")),
         "save" => {
             let result = app_handle.emit("save", ());
             if let Err(error) = result {
@@ -128,11 +132,9 @@ pub fn handle_menu_event(app_handle: &AppHandle, event: MenuEvent) {
             } else {
                 println!("Save successful");
             }
-            return ();
         }
         "reset" => {
             let _ = app_handle.emit("reset", ());
-            return ();
         }
         "open-appdata" => match app_handle.path().app_data_dir() {
             Err(err) => {

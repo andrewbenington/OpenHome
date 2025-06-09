@@ -30,29 +30,6 @@ const Home = () => {
   const [openSaveDialog, setOpenSaveDialog] = useState(false)
   const displayError = useDisplayError()
 
-  const previewFile = useCallback(
-    async (file: File) => {
-      let mon: PKMInterface | undefined
-
-      if (file) {
-        const buffer = await file.arrayBuffer()
-        const [extension] = file.name.split('.').slice(-1)
-
-        try {
-          mon = bytesToPKMInterface(buffer, extension.toUpperCase())
-        } catch (e) {
-          displayError('Import Error', `Could not read Pokémon file: ${e}`)
-        }
-      }
-      if (!mon) {
-        displayError('Import Error', 'Not a valid Pokémon file format')
-        return
-      }
-      setSelectedMon(mon)
-    },
-    [displayError]
-  )
-
   const loadAllLookups = useCallback(async (): Promise<Errorable<Record<string, OHPKM>>> => {
     const onLoadError = (message: string) => {
       console.error(message)
@@ -190,6 +167,7 @@ const Home = () => {
   useEffect(() => {
     // returns a function to stop listening
     const stopListening = backend.registerListeners({
+      onOpen: () => setOpenSaveDialog(true),
       onSave: () => saveChanges(),
       onReset: () => {
         openSavesDispatch({ type: 'clear_mons_to_release' })
@@ -206,6 +184,29 @@ const Home = () => {
       stopListening()
     }
   }, [backend, saveChanges, lookupState, openSavesDispatch, loadAllHomeData])
+
+  const previewFile = useCallback(
+    async (file: File) => {
+      let mon: PKMInterface | undefined
+
+      if (file) {
+        const buffer = await file.arrayBuffer()
+        const [extension] = file.name.split('.').slice(-1)
+
+        try {
+          mon = bytesToPKMInterface(buffer, extension.toUpperCase())
+        } catch (e) {
+          displayError('Import Error', `Could not read Pokémon file: ${e}`)
+        }
+      }
+      if (!mon) {
+        displayError('Import Error', 'Not a valid Pokémon file format')
+        return
+      }
+      setSelectedMon(mon)
+    },
+    [displayError]
+  )
 
   useEffect(() => {
     if (lookupState.loaded && !openSavesState.homeData) {
@@ -242,18 +243,13 @@ const Home = () => {
           className="drop-area"
           onDrop={(e) => e.dataTransfer.files.length && previewFile(e.dataTransfer.files[0])}
         >
-          Preview
+          <div className="drop-area-text diagonal-clip">Preview</div>
         </div>
         <ReleaseArea />
       </Flex>
       <PokemonDetailsModal mon={selectedMon} onClose={() => setSelectedMon(undefined)} />
 
-      <SavesModal
-        open={openSaveDialog}
-        onClose={() => {
-          setOpenSaveDialog(false)
-        }}
-      />
+      <SavesModal open={openSaveDialog} onClose={() => setOpenSaveDialog(false)} />
     </Flex>
   )
 }

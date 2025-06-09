@@ -1,4 +1,5 @@
 import { NationalDex } from 'pokemon-species-data'
+import { bytesToUint32LittleEndian } from '../../../util/byteLogic'
 import { isRestricted, TransferRestrictions } from '../../TransferRestrictions'
 import { findFirstSectionOffset, G3CFRUSAV, SAVE_SIZES_BYTES } from '../cfru/G3CFRUSAV'
 import { PathData } from '../path'
@@ -44,9 +45,9 @@ export class G3UBSAV extends G3CFRUSAV<PK3UB> implements PluginSAV<PK3UB> {
     const firstSectionBytesIndex = findFirstSectionOffset(bytes)
     const firstSectionBytes = bytes.slice(firstSectionBytesIndex, firstSectionBytesIndex + 0x1000)
 
-    const gameCode = firstSectionBytes[0xac]
+    const gameCode = bytesToUint32LittleEndian(firstSectionBytes, 0xac)
 
-    return gameCode === 255
+    return gameCode === 0xffffffff
   }
 
   gameColor(): string {

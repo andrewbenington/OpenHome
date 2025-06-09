@@ -57,12 +57,21 @@
 }
 
 .drop-area {
-  background-color: #fff4;
+  background-color: #fff5;
   position: relative;
   border: none;
   flex: 1;
   border-radius: 3px;
+}
+
+.drop-area-text {
+  color: white;
+  background-color: #0443;
+  width: 60%;
   text-align: center;
+  display: grid;
+  align-items: center;
   font-weight: bold;
   cursor: default;
+  height: 26px;
 }

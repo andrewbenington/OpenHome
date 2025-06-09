@@ -67,7 +67,10 @@ export const buildUnknownSaveFile = (
   const saveTypes = getSaveTypes(fileBytes, supportedSaveTypes)
 
   if (saveTypes.length > 1) {
-    return E.left('Could not distinguish between multiple possible save types')
+    return E.left(
+      'Could not distinguish between multiple possible save types: ' +
+        saveTypes.map((st) => st.saveTypeName).join(', ')
+    )
   } else if (saveTypes.length === 0) {
     return E.left('Could not detect save type')
   }

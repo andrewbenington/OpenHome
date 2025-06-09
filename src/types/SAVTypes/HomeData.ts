@@ -42,6 +42,10 @@ export class HomeBox implements Box<OHPKM> {
       }
     })
   }
+
+  firstOpenIndex(): number | undefined {
+    return this.pokemon.findIndex((value) => value === undefined)
+  }
 }
 
 export class HomeData implements SAV<OHPKM> {

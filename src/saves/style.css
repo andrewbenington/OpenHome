@@ -3,60 +3,15 @@
   transition: color 0.25s;
   padding: 0;
   width: 36px;
-  height: 24px;
+  height: 21px;
 }
 .arrow-button div svg {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
 }
 
 .arrow-button:hover {
   opacity: 0.8;
-}
-
-.save-header {
-  display: flex;
-  flex-direction: row;
-  position: relative;
-  margin-bottom: 8px;
-}
-
-.save-close-button {
-  position: absolute;
-  left: 8px;
-  padding: 0px;
-  display: grid;
-  aspect-ratio: 1;
-  align-items: center;
-}
-
-.save-menu-button {
-  position: absolute;
-  right: 8px;
-  padding: 0px;
-  display: grid;
-  aspect-ratio: 1;
-  align-items: center;
-}
-
-.box-card {
-  padding: 5px;
-}
-
-.box-navigation {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  text-align: center;
-  padding: 4px;
-}
-
-.box-name {
-  display: grid;
-  align-items: center;
-  text-align: center;
-  flex: 8;
-  min-width: fit-content;
 }
 
 .details-button {

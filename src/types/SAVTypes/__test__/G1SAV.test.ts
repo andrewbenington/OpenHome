@@ -12,7 +12,7 @@ import { emptyPathData } from '../path'
 
 const result = buildUnknownSaveFile(
   emptyPathData,
-  new Uint8Array(fs.readFileSync(path.join(__dirname, './SAVFiles', 'blue.sav'))),
+  new Uint8Array(fs.readFileSync(path.join(__dirname, 'SAVFiles', 'blue.sav'))),
   {},
   [G1SAV]
 )
@@ -22,7 +22,9 @@ assert(E.isRight(result))
 const blueSaveFile = result.right as G1SAV
 
 const slowpokeOH = bytesToPKM(
-  new Uint8Array(fs.readFileSync(path.join(__dirname, './PKMFiles/OH', 'slowpoke-shiny.ohpkm'))),
+  new Uint8Array(
+    fs.readFileSync(path.join('src/types/pkm/__test__/PKMFiles/OH', 'slowpoke-shiny.ohpkm'))
+  ),
   'OHPKM'
 ) as OHPKM
 

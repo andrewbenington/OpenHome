@@ -86,7 +86,7 @@ export function fileTypeFromString(type: string): PKMClass | typeof OHPKM | unde
 export const bytesToPKM = (bytes: Uint8Array, extension: string): PKMInterface => {
   let T: PKMClass | typeof OHPKM | undefined
 
-  if (extension === '' || extension === 'PKM') {
+  if (extension === '' || extension.toUpperCase() === 'PKM') {
     T = fileTypeFromBytes(bytes)
   } else {
     T = fileTypeFromString(extension)

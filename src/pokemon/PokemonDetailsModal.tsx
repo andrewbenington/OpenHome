@@ -1,27 +1,23 @@
 import { Dialog, Flex, VisuallyHidden } from '@radix-ui/themes'
 import { FileSchemas } from 'pokemon-files'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary'
 import { MdDownload } from 'react-icons/md'
 import { ArrowLeftIcon, ArrowRightIcon } from 'src/components/Icons'
 import SideTabs from 'src/components/side-tabs/SideTabs'
 import MiniBoxIndicator, { MiniBoxIndicatorProps } from 'src/saves/boxes/MiniBoxIndicator'
+import { BackendContext } from '../backend/backendContext'
 import HexDisplay from '../components/HexDisplay'
 import { fileTypeFromString } from '../types/FileImport'
 import { PKMInterface } from '../types/interfaces'
 import { OHPKM } from '../types/pkm/OHPKM'
 import FileTypeSelect from './FileTypeSelect'
-import JSONDisplay from './JSONDisplay'
 import MetDataMovesDisplay from './MetDataMovesDisplay'
 import OtherDisplay from './OtherDisplay'
 import RibbonsDisplay from './RibbonsDisplay'
 import StatsDisplay from './StatsDisplay'
 import SummaryDisplay from './SummaryDisplay'
 import './style.css'
-
-function buildURL(mon: PKMInterface) {
-  return window.URL.createObjectURL(new Blob([mon.toBytes({ includeExtraFields: true })]))
-}
 
 const PokemonDetailsModal = (props: {
   mon?: PKMInterface
@@ -40,6 +36,7 @@ const PokemonDetailsModal = (props: {
   const [displayMon, setDisplayMon] = useState(mon)
   const [boxIndicatorVisible, setBoxIndicatorVisible] = useState(false)
   const [boxIndicatorTimeout, setBoxIndicatorTimeout] = useState<NodeJS.Timeout>()
+  const backend = useContext(BackendContext)
 
   useEffect(() => setDisplayMon(mon), [mon])
 
@@ -106,7 +103,7 @@ const PokemonDetailsModal = (props: {
         {mon && displayMon && (
           <SideTabs.Root className="pokemon-modal-tabs" defaultValue="summary">
             <SideTabs.TabList>
-              <Flex direction="row">
+              <Flex direction="row" gap="2" mb="1">
                 <FileTypeSelect
                   baseFormat={mon.format}
                   currentFormat={displayMon.format}
@@ -133,13 +130,17 @@ const PokemonDetailsModal = (props: {
                     }
                   }}
                 />
-                <button style={{ margin: '8px 0px', padding: '4px 6px' }}>
-                  <a
-                    href={buildURL(displayMon)}
-                    download={`${displayMon.nickname}.${displayMon.format.toLocaleLowerCase()}`}
-                  >
-                    <MdDownload style={{ color: 'white' }} />
-                  </a>
+                <button
+                  style={{ padding: '4px 6px 2px 6px' }}
+                  onClick={() => {
+                    displayMon.refreshChecksum?.()
+                    backend.saveLocalFile(
+                      new Uint8Array(displayMon.toBytes()),
+                      `${displayMon.nickname}.${displayMon.format.toLocaleLowerCase()}`
+                    )
+                  }}
+                >
+                  <MdDownload style={{ color: 'white' }} />
                 </button>
               </Flex>
               <SideTabs.Tab value="summary">Summary</SideTabs.Tab>
@@ -147,7 +148,6 @@ const PokemonDetailsModal = (props: {
               <SideTabs.Tab value="stats">Stats</SideTabs.Tab>
               <SideTabs.Tab value="ribbons">Ribbons</SideTabs.Tab>
               <SideTabs.Tab value="other">Other</SideTabs.Tab>
-              <SideTabs.Tab value="json">JSON</SideTabs.Tab>
               <SideTabs.Tab value="raw">Raw</SideTabs.Tab>
             </SideTabs.TabList>
             <ErrorBoundary FallbackComponent={FallbackComponent}>
@@ -165,9 +165,6 @@ const PokemonDetailsModal = (props: {
               </SideTabs.Panel>
               <SideTabs.Panel value="other">
                 <OtherDisplay mon={displayMon} />
-              </SideTabs.Panel>
-              <SideTabs.Panel value="json">
-                <JSONDisplay mon={displayMon} />
               </SideTabs.Panel>
               <SideTabs.Panel value="raw">
                 <HexDisplay

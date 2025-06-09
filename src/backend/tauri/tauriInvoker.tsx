@@ -166,4 +166,10 @@ export const TauriInvoker = {
 
     return promise.then(E.right).catch(E.left)
   },
+
+  handleMenuAccelleratorWindows(menuEventId: string): Promise<null> {
+    const promise: Promise<null> = invoke('handle_windows_accellerator', { menuEventId })
+
+    return promise
+  },
 }

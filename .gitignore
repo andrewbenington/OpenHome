@@ -8,6 +8,7 @@ tsconfig.tsbuildinfo
 
 # testing
 /coverage
+tester.sh
 
 # production
 /out
@@ -33,5 +34,7 @@ generate/out/
 
 planning.md
 
+# generated
 src/consts/JSON/version.json
 src-tauri/gen
+src-tauri/targets

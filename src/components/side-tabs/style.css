@@ -23,12 +23,11 @@
 }
 
 .side-tab {
-  border-radius: 12px;
+  border-radius: 6px;
   background-color: transparent;
   color: white;
-  font-weight: bold;
   text-align: start;
-  padding: 4px 8px;
+  padding: 2px 6px;
 }
 
 .side-tab:hover {

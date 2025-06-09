@@ -18,8 +18,8 @@ import {
   HGSS_TRANSFER_RESTRICTIONS,
   LA_TRANSFER_RESTRICTIONS,
   ORAS_TRANSFER_RESTRICTIONS,
-  SV_TRANSFER_RESTRICTIONS,
-  SWSH_TRANSFER_RESTRICTIONS,
+  SV_TRANSFER_RESTRICTIONS_ID,
+  SWSH_TRANSFER_RESTRICTIONS_CT,
   USUM_TRANSFER_RESTRICTIONS,
 } from 'src/consts/TransferRestrictions'
 import {
@@ -27,25 +27,34 @@ import {
   getMonGen12Identifier,
   getMonGen345Identifier,
 } from 'src/util/Lookup'
-import { get16BitChecksumLittleEndian } from 'src/util/byteLogic'
 import DynamaxLevel from '../components/DynamaxLevel'
 import ShinyLeaves from '../components/ShinyLeaves'
 import TypeIcon from '../components/TypeIcon'
+import useIsDev from '../hooks/isDev'
 import { isRestricted } from '../types/TransferRestrictions'
 import { PKMInterface } from '../types/interfaces'
 import { OHPKM } from '../types/pkm/OHPKM'
 import {
+  getHeightCalculated,
   getHiddenPowerGen2,
   getHiddenPowerPower,
   getHiddenPowerType,
+  getWeightCalculated,
   shinyLeafValues,
 } from '../types/pkm/util'
 import { getFlagsInRange } from '../util/byteLogic'
 import AttributeRow from './AttributeRow'
 import AttributeRowExpand from './AttributeRowExpand'
 
+const HG_TO_LB = 0.2204623
+const CM_TO_IN = 0.3937008
+
 const OtherDisplay = (props: { mon: PKMInterface }) => {
   const { mon } = props
+  const isDev = useIsDev()
+
+  const heightCalculated = getHeightCalculated(mon) ?? 0
+  const weightCalculated = getWeightCalculated(mon) ?? 0
 
   return (
     <div style={{ overflow: 'hidden', height: '100%' }}>
@@ -170,7 +179,7 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
               )}
             </AttributeRowExpand>
           )}
-        {!isRestricted(SWSH_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
+        {!isRestricted(SWSH_TRANSFER_RESTRICTIONS_CT, mon.dexNum, mon.formeNum) &&
           mon.trFlagsSwSh &&
           getFlagsInRange(mon.trFlagsSwSh, 0, 14).length > 0 && (
             <AttributeRowExpand
@@ -213,7 +222,7 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
             </AttributeRowExpand>
           )}
 
-        {!isRestricted(SV_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
+        {!isRestricted(SV_TRANSFER_RESTRICTIONS_ID, mon.dexNum, mon.formeNum) &&
           mon.tmFlagsSV &&
           getFlagsInRange(mon.tmFlagsSV, 0, 22).length > 0 && (
             <AttributeRowExpand
@@ -228,7 +237,7 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
             </AttributeRowExpand>
           )}
 
-        {(!isRestricted(SWSH_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) ||
+        {(!isRestricted(SWSH_TRANSFER_RESTRICTIONS_CT, mon.dexNum, mon.formeNum) ||
           !isRestricted(ORAS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum)) &&
           mon.trainerMemory && (
             <AttributeRowExpand summary="Trainer Memory" value={mon.trainerName}>
@@ -252,7 +261,7 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
               </AttributeRow>
             </AttributeRowExpand>
           )}
-        {(!isRestricted(SWSH_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) ||
+        {(!isRestricted(SWSH_TRANSFER_RESTRICTIONS_CT, mon.dexNum, mon.formeNum) ||
           !isRestricted(ORAS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum)) &&
           mon.handlerMemory && (
             <AttributeRowExpand summary="Handler Memory" value={mon.handlerName}>
@@ -276,7 +285,7 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
               </AttributeRow>
             </AttributeRowExpand>
           )}
-        {!isRestricted(SWSH_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
+        {!isRestricted(SWSH_TRANSFER_RESTRICTIONS_CT, mon.dexNum, mon.formeNum) &&
           mon.dynamaxLevel !== undefined && (
             <>
               <AttributeRow label="Dynamax">
@@ -291,13 +300,42 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
               )}
             </>
           )}
-        {!isRestricted(SV_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) && hasTeraTypes(mon) && (
-          <TeraTypeData mon={mon} />
-        )}
-        {!isRestricted(SV_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
+        {!isRestricted(SV_TRANSFER_RESTRICTIONS_ID, mon.dexNum, mon.formeNum) &&
+          hasTeraTypes(mon) && <TeraTypeData mon={mon} />}
+        {!isRestricted(SV_TRANSFER_RESTRICTIONS_ID, mon.dexNum, mon.formeNum) &&
           mon.obedienceLevel !== undefined && (
             <AttributeRow label="Obedience" value={mon.obedienceLevel.toString()} />
           )}
+        {mon.height !== undefined && mon.weight !== undefined && (
+          <>
+            <AttributeRow label="Height (Relative)" value={`${mon.height} / 255`} />
+            <AttributeRow label="Weight (Relative)" value={`${mon.weight} / 255`} />
+          </>
+        )}
+        {mon.heightAbsolute !== undefined && mon.weightAbsolute !== undefined && (
+          <>
+            <AttributeRow
+              label="Height (Absolute)"
+              value={`${Math.floor((mon.heightAbsolute * CM_TO_IN) / 12)}'${Math.round((mon.heightAbsolute * CM_TO_IN) % 12)}" • ${mon.heightAbsolute.toPrecision(5)} cm`}
+            />
+            {isDev && (
+              <AttributeRow
+                label="Height (Calculated)"
+                value={`${Math.floor((heightCalculated * CM_TO_IN) / 12)}'${Math.round((heightCalculated * CM_TO_IN) % 12)}" • ${heightCalculated.toPrecision(5)} cm`}
+              />
+            )}
+            <AttributeRow
+              label="Weight (Absolute)"
+              value={`${(mon.weightAbsolute * HG_TO_LB).toPrecision(5)} lb • ${(mon.weightAbsolute / 10).toPrecision(5)} kg`}
+            />
+            {isDev && (
+              <AttributeRow
+                label="Weight (Calculated)"
+                value={`${(weightCalculated * HG_TO_LB).toPrecision(5)} lb • ${(weightCalculated / 10).toPrecision(5)} kg`}
+              />
+            )}
+          </>
+        )}
         {!isRestricted(GEN2_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
           mon.dvs !== undefined && (
             <AttributeRow
@@ -309,20 +347,19 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
           mon.personalityValue !== undefined && (
             <AttributeRow label="Gen 3/4/5 ID" value={getMonGen345Identifier(mon)} />
           )}
-        {mon.checksum !== undefined && (
+        {mon.formArgument !== undefined && (
+          <AttributeRow label="Form Argument" value={mon.formArgument.toString()} />
+        )}
+        {mon.checksum !== undefined && mon.calcChecksum && (
           <>
             <AttributeRow label="Checksum">
               <code>{`0x${mon.checksum.toString(16).padStart(4, '0')}`}</code>
             </AttributeRow>
-            <AttributeRow label="Calced Checksum">
-              <code>{`0x${get16BitChecksumLittleEndian(
-                mon.toBytes(),
-                0x08,
-                mon.toBytes().byteLength
-              )
-                .toString(16)
-                .padStart(4, '0')}`}</code>
-            </AttributeRow>
+            {'calcChecksum' in mon && (
+              <AttributeRow label="Calced Checksum">
+                <code>{`0x${mon.calcChecksum().toString(16).padStart(4, '0')}`}</code>
+              </AttributeRow>
+            )}
           </>
         )}
         {mon instanceof OHPKM && (
