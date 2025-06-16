@@ -228,6 +228,7 @@ class MyStatusBlock {
   }
   public getGame(): GameOfOrigin {
     const origin = this.dataView.getUint8(0x2b)
+
     return origin === 0
       ? GameOfOrigin.BrilliantDiamond
       : origin === 1
