@@ -63,7 +63,7 @@ export class BDSPSAV implements SAV<PB8> {
 
     this.boxes = Array(this.getBoxCount())
     for (let box = 0; box < this.getBoxCount(); box++) {
-      const boxName = boxNamesBlock.getBoxName(box)
+      const boxName = boxNamesBlock.getBoxName(box) || `Box ${box + 1}`
 
       this.boxes[box] = new Box(boxName, 30)
     }
@@ -94,7 +94,14 @@ export class BDSPSAV implements SAV<PB8> {
   }
 
   gameColor() {
-    return '#00CC00'
+    switch (this.origin) {
+      case GameOfOrigin.BrilliantDiamond:
+        return '#44BAE5'
+      case GameOfOrigin.ShiningPearl:
+        return '#DA7D99'
+      default:
+        return '#666666'
+    }
   }
 
   getPluginIdentifier() {

@@ -367,7 +367,7 @@ export class G3SAV implements SAV<PK3> {
       case GameOfOrigin.Ruby:
         return '#CD2236'
       case GameOfOrigin.Sapphire:
-        return '#009652'
+        return '#3D51A7'
       case GameOfOrigin.Emerald:
         return '#009652'
       case GameOfOrigin.FireRed:
