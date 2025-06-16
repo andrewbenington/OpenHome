@@ -10,6 +10,7 @@ import { SwishCrypto } from './SwishCrypto/SwishCrypto'
 
 export type LA_SAVE_REVISION = 'Base' | 'Daybreak'
 
+const LA_PASTURE_COUNT = 32
 const SAVE_SIZE_MIN = 0x136c00
 const SAVE_SIZE_MAX = 0x13ae00
 
@@ -43,7 +44,7 @@ export class LASAV extends G89SAV<PA8> {
   }
 
   getBoxCount(): number {
-    return 24
+    return LA_PASTURE_COUNT
   }
 
   monConstructor(bytes: ArrayBuffer, encrypted: boolean): PA8 {
