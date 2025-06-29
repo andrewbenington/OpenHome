@@ -52,6 +52,13 @@ const Home = () => {
       return E.left(gen345Result.left)
     }
 
+    for (const [identifier, mon] of Object.entries(homeResult.right)) {
+      const hadErrors = mon.fixErrors()
+
+      if (hadErrors) {
+        backend.writeHomeMon(identifier, new Uint8Array(mon.toBytes()))
+      }
+    }
     lookupDispatch({ type: 'load_home_mons', payload: homeResult.right })
     lookupDispatch({ type: 'load_gen12', payload: gen12Result.right })
     lookupDispatch({ type: 'load_gen345', payload: gen345Result.right })

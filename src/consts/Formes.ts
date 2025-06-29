@@ -24,8 +24,10 @@ export const BLOOD_MOON = 1
 export const ORIGINAL = 1
 
 export const BASE = 0
-export const ALOLAN = 1
+export const ALOLA = 1
 export const GALAR = 1
+
+export const MAROWAK_ALOLA_TOTEM = 2
 
 export enum SWEETS {
   'Strawberry' = 0,

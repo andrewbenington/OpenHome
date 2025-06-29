@@ -10,6 +10,8 @@ import { PathData } from './path'
 import { SAV } from './SAV'
 import { SAVClass } from './util'
 
+const SKIP_OHPKM_LOAD = false
+
 // check if each pokemon in a save file has OpenHome data associated with it
 const recoverOHPKMData = (
   saveFile: SAV,
@@ -18,7 +20,7 @@ const recoverOHPKMData = (
   lookupMap?: { [key: string]: string },
   updateMonCallback?: (mon: OHPKM) => void
 ): SAV => {
-  if (!homeMonMap || !getIdentifier) {
+  if (!homeMonMap || !getIdentifier || SKIP_OHPKM_LOAD) {
     return saveFile
   }
   saveFile.boxes.forEach((box) => {

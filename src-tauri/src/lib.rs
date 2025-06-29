@@ -66,6 +66,7 @@ pub fn run() {
             commands::load_plugin_code,
             commands::delete_plugin,
             commands::handle_windows_accellerator,
+            commands::open_directory,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

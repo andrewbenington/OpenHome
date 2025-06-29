@@ -365,6 +365,25 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
         {mon instanceof OHPKM && (
           <AttributeRow label="OpenHome ID" value={getMonFileIdentifier(mon)} />
         )}
+        {mon.relearnMoves && (
+          <>
+            {mon.relearnMoves[0] > 0 && (
+              <AttributeRow label="Relearn Move 1" value={Moves[mon.relearnMoves[0]]?.name} />
+            )}
+            {mon.relearnMoves[1] > 0 && (
+              <AttributeRow label="Relearn Move 2" value={Moves[mon.relearnMoves[1]]?.name} />
+            )}
+            {mon.relearnMoves[2] > 0 && (
+              <AttributeRow label="Relearn Move 3" value={Moves[mon.relearnMoves[2]]?.name} />
+            )}
+            {mon.relearnMoves[3] > 0 && (
+              <AttributeRow label="Relearn Move 4" value={Moves[mon.relearnMoves[3]]?.name} />
+            )}
+          </>
+        )}
+        {mon.eggDate && <AttributeRow label="Hatch Date" value={mon.eggDate} />}
+        <AttributeRow label="Egg Location Index" value={mon.eggLocationIndex} />
+        <AttributeRow label="Gender" value={mon.gender} />
       </Flex>
     </div>
   )

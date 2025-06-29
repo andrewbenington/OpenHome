@@ -1,15 +1,19 @@
 import { PB8, utf16BytesToString } from 'pokemon-files'
 import { GameOfOrigin, GameOfOriginData } from 'pokemon-resources'
 import { BDSP_TRANSFER_RESTRICTIONS } from '../../../consts/TransferRestrictions'
+import { md5Digest } from '../../../util/Encryption'
 import { OHPKM } from '../../pkm/OHPKM'
 import { isRestricted } from '../../TransferRestrictions'
 import { PathData } from '../path'
 import { Box, BoxCoordinates, SAV } from '../SAV'
 
-const SAVE_SIZE_BYTES = 973856
+const SAVE_SIZE_BYTES_MIN = 900000
+const SAVE_SIZE_BYTES_MAX = 1000000
 const BOX_COUNT = 40
 const BOX_NAME_LENGTH = 0x22
 const BOX_MONS_OFFSET = 0x14ef4
+
+const HASH_OFFSET = 0xe9818
 
 export class BDSPSAV implements SAV<PB8> {
   static boxSizeBytes = PB8.getBoxSize() * 30
@@ -126,39 +130,49 @@ export class BDSPSAV implements SAV<PB8> {
   prepareBoxesAndGetModified() {
     const changedMonPKMs: OHPKM[] = []
 
-    // this.updatedBoxSlots.forEach(({ box, index }) => {
-    //   const changedMon = this.boxes[box].pokemon[index]
+    this.updatedBoxSlots.forEach(({ box, index: monIndex }) => {
+      const changedMon = this.boxes[box].pokemon[monIndex]
 
-    //   // we don't want to save OHPKM files of mons that didn't leave the save
-    //   // (and would still be PK6s)
-    //   if (changedMon instanceof OHPKM) {
-    //     changedMonPKMs.push(changedMon)
-    //   }
-    //   const writeIndex = this.pcOffset + BDSPSAV.boxSizeBytes * box + PK8.getBoxSize() * index
+      // we don't want to save OHPKM files of mons that didn't leave the save
+      // (and would still be PK6s)
+      if (changedMon instanceof OHPKM) {
+        changedMonPKMs.push(changedMon)
+      }
+      const writeIndex =
+        BOX_MONS_OFFSET + this.getBoxSizeBytes() * box + this.getMonBoxSizeBytes() * monIndex
 
-    //   // changedMon will be undefined if pokemon was moved from this slot
-    //   // and the slot was left empty
-    //   if (changedMon) {
-    //     try {
-    //       const mon = changedMon instanceof OHPKM ? new PK7(changedMon) : changedMon
+      // changedMon will be undefined if pokemon was moved from this slot
+      // and the slot was left empty
+      if (changedMon) {
+        try {
+          const mon = changedMon instanceof OHPKM ? new PB8(changedMon) : changedMon
 
-    //       if (mon?.gameOfOrigin && mon?.dexNum) {
-    //         mon.refreshChecksum()
-    //         this.bytes.set(new Uint8Array(mon.toPCBytes()), writeIndex)
-    //       }
-    //     } catch (e) {
-    //       console.error(e)
-    //     }
-    //   } else {
-    //     const mon = new PK8(new Uint8Array(PK8.getBoxSize()).buffer)
+          if (mon?.gameOfOrigin && mon?.dexNum) {
+            mon.refreshChecksum()
+            this.bytes.set(new Uint8Array(mon.toPCBytes()), writeIndex)
+          }
+        } catch (e) {
+          console.error(e)
+        }
+      } else {
+        const mon = new PB8(new Uint8Array(PB8.getBoxSize()).buffer)
 
-    //     mon.checksum = 0x0204
-    //     this.bytes.set(new Uint8Array(mon.toPCBytes()), writeIndex)
-    //   }
-    // })
-    // this.bytes.set(uint16ToBytesLittleEndian(this.calculateChecksum()), this.pcChecksumOffset)
-    // this.bytes = SignWithMemeCrypto(this.bytes)
+        mon.checksum = 0x0204
+        this.bytes.set(new Uint8Array(mon.toPCBytes()), writeIndex)
+      }
+    })
+    this.bytes.set(this.calculateChecksumBytes(), HASH_OFFSET)
     return changedMonPKMs
+  }
+
+  calculateChecksumBytes() {
+    const bytesCopy = copyByteArray(this.bytes)
+    bytesCopy.fill(0, HASH_OFFSET, HASH_OFFSET + 16)
+    return md5Digest(bytesCopy)
+  }
+
+  calculateChecksumStr() {
+    return uint8ArrayToBase64(this.calculateChecksumBytes())
   }
 
   supportsMon(dexNumber: number, formeNumber: number): boolean {
@@ -175,9 +189,18 @@ export class BDSPSAV implements SAV<PB8> {
     return gameOfOrigin ? `Pokémon ${gameOfOrigin.name}` : '(Unknown Game)'
   }
 
+  getDisplayData() {
+    return {
+      'Player Character': this.myStatusBlock.getGender() ? 'Dawn' : 'Lucas',
+      Hash: uint8ArrayToBase64(this.bytes.slice(HASH_OFFSET, HASH_OFFSET + 16)),
+      'Calculated Checksum': this.calculateChecksumStr(),
+      'TEST MD5': uint8ArrayToBase64(new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8])),
+    }
+  }
+
   // TODO: make file size flexible
   static fileIsSave(bytes: Uint8Array): boolean {
-    if (bytes.length !== SAVE_SIZE_BYTES) {
+    if (bytes.length < SAVE_SIZE_BYTES_MIN || bytes.length > SAVE_SIZE_BYTES_MAX) {
       return false
     }
     return true
@@ -235,4 +258,18 @@ class MyStatusBlock {
         ? GameOfOrigin.ShiningPearl
         : GameOfOrigin.INVALID_0
   }
+}
+
+function uint8ArrayToBase64(uint8Array: Uint8Array) {
+  // Convert to binary string
+  const binary = String.fromCharCode(...uint8Array)
+  // Encode to Base64
+  return btoa(binary)
+}
+
+function copyByteArray(bytes: Uint8Array): Uint8Array {
+  const bufferCopy = new ArrayBuffer(bytes.length)
+  const arrayCopy = new Uint8Array(bufferCopy)
+  arrayCopy.set(new Uint8Array(bytes))
+  return arrayCopy
 }
