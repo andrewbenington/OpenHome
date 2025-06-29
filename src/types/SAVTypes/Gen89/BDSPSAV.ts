@@ -81,12 +81,6 @@ export class BDSPSAV implements SAV<PB8> {
           const monData = (bytes.buffer as ArrayBuffer).slice(startByte, endByte)
           const mon = this.buildPKM(monData, true)
 
-          if (box === 0) {
-            console.log(
-              `monIndex: ${monIndex}, startByte: ${startByte}, endByte: ${endByte}, name: ${mon.nickname}, exp: ${mon.exp}`
-            )
-          }
-
           if (mon.gameOfOrigin !== 0 && mon.dexNum !== 0) {
             this.boxes[box].pokemon[monIndex] = mon
           }
@@ -134,7 +128,7 @@ export class BDSPSAV implements SAV<PB8> {
       const changedMon = this.boxes[box].pokemon[monIndex]
 
       // we don't want to save OHPKM files of mons that didn't leave the save
-      // (and would still be PK6s)
+      // (and would still be PB8s)
       if (changedMon instanceof OHPKM) {
         changedMonPKMs.push(changedMon)
       }
@@ -157,7 +151,6 @@ export class BDSPSAV implements SAV<PB8> {
       } else {
         const mon = new PB8(new Uint8Array(PB8.getBoxSize()).buffer)
 
-        mon.checksum = 0x0204
         this.bytes.set(new Uint8Array(mon.toPCBytes()), writeIndex)
       }
     })
@@ -167,6 +160,7 @@ export class BDSPSAV implements SAV<PB8> {
 
   calculateChecksumBytes() {
     const bytesCopy = copyByteArray(this.bytes)
+
     bytesCopy.fill(0, HASH_OFFSET, HASH_OFFSET + 16)
     return md5Digest(bytesCopy)
   }
@@ -263,6 +257,7 @@ class MyStatusBlock {
 function uint8ArrayToBase64(uint8Array: Uint8Array) {
   // Convert to binary string
   const binary = String.fromCharCode(...uint8Array)
+
   // Encode to Base64
   return btoa(binary)
 }
@@ -270,6 +265,7 @@ function uint8ArrayToBase64(uint8Array: Uint8Array) {
 function copyByteArray(bytes: Uint8Array): Uint8Array {
   const bufferCopy = new ArrayBuffer(bytes.length)
   const arrayCopy = new Uint8Array(bufferCopy)
+
   arrayCopy.set(new Uint8Array(bytes))
   return arrayCopy
 }
