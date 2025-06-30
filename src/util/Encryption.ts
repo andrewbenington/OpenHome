@@ -395,7 +395,6 @@ export function sha256Digest(data: Uint8Array[]) {
 }
 
 export function md5Digest(data: Uint8Array) {
-  console.log(`getting md5 for ${data.length} bytes`)
   const shasum = MD5(uint8ArrayToWordArray(data))
 
   return wordArrayToUint8Array(shasum)

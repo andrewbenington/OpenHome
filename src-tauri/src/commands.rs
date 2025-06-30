@@ -261,7 +261,6 @@ pub fn get_image_data(absolute_path: String) -> Result<ImageResponse, String> {
 
 #[tauri::command]
 pub fn open_directory(absolute_path: String) -> Result<(), String> {
-    println!("helloooo");
     util::open_directory(&absolute_path)
 }
 
