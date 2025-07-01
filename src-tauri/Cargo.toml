@@ -26,13 +26,13 @@ tauri-build = { version = "2", features = [] }
 
 [dependencies]
 tauri = { version = "2.5.1", features = [] }
-tauri-plugin-shell = "2.2.1"
+tauri-plugin-shell = "2.3.0"
 serde = { version = "1.0.219", features = ["derive"] }
 serde_json = "1.0.140"
-tauri-plugin-os = "2.2.1"
-tauri-plugin-dialog = "2.2.2"
+tauri-plugin-os = "2.3.0"
+tauri-plugin-dialog = "2.3.0"
 tauri-plugin-fs = "2.2.1"
-reqwest = { version = "0.12.18"}
+reqwest = { version = "0.12.20"}
 base64 = "0.22.1"
-zip = "4.0.0"
+zip = "4.2.0"
 bytes = "1.10.1"
