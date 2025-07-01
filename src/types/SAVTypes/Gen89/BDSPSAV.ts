@@ -15,6 +15,8 @@ const BOX_MONS_OFFSET = 0x14ef4
 
 const HASH_OFFSET = 0xe9818
 
+export type BDSP_SAVE_REVISION = '1.0' | '1.1' | '1.2' | '1.3'
+
 export class BDSPSAV implements SAV<PB8> {
   static boxSizeBytes = PB8.getBoxSize() * 30
   static pkmType = PB8
@@ -102,6 +104,24 @@ export class BDSPSAV implements SAV<PB8> {
     }
   }
 
+  getSaveRevision(): BDSP_SAVE_REVISION {
+    const dataView = new DataView(this.bytes.buffer)
+    const versionIdentifier = dataView.getUint8(0)
+
+    switch (versionIdentifier) {
+      case 0x25:
+        return '1.0'
+      case 0x2c:
+        return '1.1'
+      case 0x32:
+        return '1.2'
+      case 0x34:
+        return '1.3'
+      default:
+        throw new Error(`BDSP save has invalid version identifier: ${versionIdentifier}`)
+    }
+  }
+
   getPluginIdentifier() {
     return undefined
   }
@@ -186,9 +206,8 @@ export class BDSPSAV implements SAV<PB8> {
   getDisplayData() {
     return {
       'Player Character': this.myStatusBlock.getGender() ? 'Dawn' : 'Lucas',
-      Hash: uint8ArrayToBase64(this.bytes.slice(HASH_OFFSET, HASH_OFFSET + 16)),
+      'Save Version': this.getSaveRevision(),
       'Calculated Checksum': this.calculateChecksumStr(),
-      'TEST MD5': uint8ArrayToBase64(new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8])),
     }
   }
 
@@ -197,7 +216,15 @@ export class BDSPSAV implements SAV<PB8> {
     if (bytes.length < SAVE_SIZE_BYTES_MIN || bytes.length > SAVE_SIZE_BYTES_MAX) {
       return false
     }
-    return true
+    const dataView = new DataView(bytes.buffer)
+    const versionIdentifier = dataView.getUint8(0)
+
+    return (
+      versionIdentifier === 0x25 ||
+      versionIdentifier === 0x2c ||
+      versionIdentifier === 0x32 ||
+      versionIdentifier === 0x34
+    )
   }
 
   static includesOrigin(origin: GameOfOrigin) {
@@ -255,11 +282,7 @@ class MyStatusBlock {
 }
 
 function uint8ArrayToBase64(uint8Array: Uint8Array) {
-  // Convert to binary string
-  const binary = String.fromCharCode(...uint8Array)
-
-  // Encode to Base64
-  return btoa(binary)
+  return btoa(String.fromCharCode(...uint8Array))
 }
 
 function copyByteArray(bytes: Uint8Array): Uint8Array {
