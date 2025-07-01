@@ -218,6 +218,12 @@ td:nth-child(1) {
   font-size: 28px;
 }
 
+.experimental-label {
+  font-weight: bold;
+  font-size: 20px;
+  padding-top: 24px;
+}
+
 .download-buttons {
   width: 100%;
   display: flex;
@@ -242,6 +248,14 @@ td:nth-child(1) {
 
 .download-buttons > a:hover {
   background-color: #c85252;
+}
+
+.download-buttons-experimental > a {
+  background-color: #425452;
+}
+
+.download-buttons-experimental > a:hover {
+  background-color: #316e67;
 }
 
 .download-buttons > svg {
