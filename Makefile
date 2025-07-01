@@ -1,4 +1,4 @@
-VERSION=1.4.7
+VERSION=1.4.8-rc.1
 
 .PHONY: help
 help: # Display this help.
@@ -48,11 +48,6 @@ check-rs:
 
 .PHONY: set-version
 set-version:
-ifeq ($(shell cargo install --list | grep cargo-edit), )
-	# @echo "installing cargo-edit..."
-	# @cargo install cargo-edit --locked
-	# @echo "cargo-edit installed"
-endif
 	@jq --arg new_version "$(VERSION)" '.version = "$(VERSION)"' "src-tauri/tauri.conf.json" > version.tmp.json && mv version.tmp.json src-tauri/tauri.conf.json
 	@npx prettier --write src-tauri/tauri.conf.json
 	@cd src-tauri && cargo set-version $(VERSION)

@@ -1,5 +1,5 @@
 import { NationalDex } from 'pokemon-species-data'
-import { BASE, BLOOD_MOON, LGE_STARTER, LGP_STARTER } from '../consts/Formes'
+import { BASE, BLOOD_MOON, LGE_STARTER, LGP_STARTER, MAROWAK_ALOLA_TOTEM } from '../consts/Formes'
 
 interface FormRestrictions {
   [dexNum: number]: number[] | undefined
@@ -35,7 +35,7 @@ export const AlolanForms: FormRestrictions = {
   [NationalDex.Grimer]: [1],
   [NationalDex.Muk]: [1],
   [NationalDex.Exeggutor]: [1],
-  [NationalDex.Marowak]: [1],
+  [NationalDex.Marowak]: [1, MAROWAK_ALOLA_TOTEM],
 }
 
 export const GalarianForms: FormRestrictions = {

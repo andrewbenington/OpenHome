@@ -1,10 +1,11 @@
-use base64::engine::general_purpose;
 use base64::Engine;
+use base64::engine::general_purpose;
 use std::fs;
-use std::fs::{create_dir_all, File};
+use std::fs::{File, create_dir_all};
 use std::hash::{Hash, Hasher};
 use std::io::Cursor;
 use std::path::Path;
+use std::process::Command;
 use std::{collections::HashSet, io::Read, path::PathBuf};
 use tauri::Manager;
 use zip::ZipArchive;
@@ -223,14 +224,25 @@ pub fn get_image_data(absolute_path: &Path) -> Result<ImageResponse, String> {
     Ok(response)
 }
 
-pub fn delete_folder(folder_path: &Path) -> Result<(), String> {
-    if !folder_path.exists() {
-        let folder_path = folder_path.to_string_lossy();
-        return Err(format!("Folder does not exist: {folder_path}"));
+pub fn delete_directory(directory_path: &Path) -> Result<(), String> {
+    if !directory_path.exists() {
+        let folder_path = directory_path.to_string_lossy();
+        return Err(format!("Directory does not exist: {folder_path}"));
     }
 
-    fs::remove_dir_all(folder_path).map_err(|err| {
-        let folder_path = folder_path.to_string_lossy();
+    fs::remove_dir_all(directory_path).map_err(|err| {
+        let folder_path = directory_path.to_string_lossy();
         format!("Failed to delete the folder located at {folder_path}: {err}",)
     })
+}
+
+pub fn open_directory(directory_path: &str) -> Result<(), String> {
+    println!("open_directory");
+    if let Err(err) = Command::new("open").arg(directory_path).spawn() {
+        println!("uh oh");
+        Err(err.to_string())
+    } else {
+        println!("spawned successfully");
+        Ok(())
+    }
 }

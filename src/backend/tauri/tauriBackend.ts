@@ -2,9 +2,8 @@ import { path } from '@tauri-apps/api'
 import { Event, listen, UnlistenFn } from '@tauri-apps/api/event'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { open as fileDialog, save } from '@tauri-apps/plugin-dialog'
-import { readFile, stat } from '@tauri-apps/plugin-fs'
+import { FileInfo, readFile, stat } from '@tauri-apps/plugin-fs'
 import { platform } from '@tauri-apps/plugin-os'
-import { open } from '@tauri-apps/plugin-shell'
 import dayjs from 'dayjs'
 import * as E from 'fp-ts/lib/Either'
 import BackendInterface from 'src/backend/backendInterface'
@@ -247,10 +246,8 @@ export const TauriBackend: BackendInterface = {
 
     return `${dir}/plugins/${pluginId}`
   },
-  openDirectory: async (directory: string): Promise<Errorable<null>> => {
-    open(directory)
-    return E.right(null)
-  },
+  openDirectory: async (directory: string): Promise<Errorable<null>> =>
+    TauriInvoker.openDirectory(directory),
   getPlatform: platform,
   getState: async () => TauriInvoker.getState(),
   getSettings: async () => {
@@ -281,7 +278,11 @@ export const TauriBackend: BackendInterface = {
   registerListeners: (listeners) => {
     const unlistenPromises: Promise<UnlistenFn>[] = [
       listen('tauri://drag-drop', (e: OnDropEvent) => {
-        const allFilesPromise = e.payload.paths.map(async (filePath) => ({
+        const allFilesPromise: Promise<{
+          filePath: string
+          stat: FileInfo
+          bytes: Uint8Array
+        }>[] = e.payload.paths.map(async (filePath) => ({
           filePath,
           stat: await stat(filePath),
           bytes: await readFile(filePath),
@@ -290,7 +291,9 @@ export const TauriBackend: BackendInterface = {
         Promise.all(allFilesPromise).then(async (fileData) => {
           const filesWithData = fileData.map(
             ({ filePath, stat, bytes }) =>
-              new File([bytes], filePath, { lastModified: stat.mtime?.getUTCMilliseconds() })
+              new File([bytes as Uint8Array<ArrayBuffer>], filePath, {
+                lastModified: stat.mtime?.getUTCMilliseconds(),
+              })
           )
           // account for Windows pixel density variance
           const scaleFactor = platform() === 'windows' ? await getCurrentWindow().scaleFactor() : 1

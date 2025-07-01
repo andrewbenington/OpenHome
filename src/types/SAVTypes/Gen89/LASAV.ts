@@ -26,6 +26,12 @@ export class LASAV extends G89SAV<PA8> {
   constructor(path: PathData, bytes: Uint8Array) {
     super(path, bytes)
 
+    this.boxes.forEach((box, i) => {
+      if (!box.name) {
+        box.name = `Pasture ${i + 1}`
+      }
+    })
+
     this.myStatusBlock = new MyStatusBlock(this.getBlockMust('MyStatus', 'object'))
     this.name = this.myStatusBlock.getName()
 

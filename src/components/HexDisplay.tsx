@@ -68,7 +68,7 @@ function HexDisplay({ data, format }: HexDisplayProps) {
                     ? 'var(--byte-hover)'
                     : undefined,
               }}
-              title={`0x${i
+              title={`${i}\n0x${i
                 .toString(16)
                 .padStart(
                   4,

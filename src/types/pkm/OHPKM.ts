@@ -25,10 +25,11 @@ import {
   ItemFromString,
   ItemToString,
   Languages,
+  ModernRibbons,
   NatureToString,
   getMetLocation,
 } from 'pokemon-resources'
-import { NationalDex } from 'pokemon-species-data'
+import { NationalDex, PokemonData } from 'pokemon-species-data'
 import Prando from 'prando'
 import { OpenHomeRibbons } from 'src/consts/Ribbons'
 import { ShadowIDsColosseum, ShadowIDsXD } from 'src/consts/ShadowIDs'
@@ -1578,6 +1579,44 @@ export class OHPKM implements PKMInterface {
 
   public getStats(): Stats {
     return this.stats
+  }
+
+  public fixErrors(): boolean {
+    let errorsFound = false
+
+    // PLA mons cannot have been hatched
+    if (
+      this.gameOfOrigin === GameOfOrigin.LegendsArceus &&
+      (this.eggDate || this.eggLocationIndex)
+    ) {
+      this.eggDate = undefined
+      this.eggLocationIndex = undefined
+      errorsFound = true
+    }
+
+    // Affixed ribbon must be in the mon's possession
+    if (
+      this.affixedRibbon !== undefined &&
+      this.ribbons.includes(ModernRibbons[this.affixedRibbon])
+    ) {
+      this.affixedRibbon = undefined
+      errorsFound = true
+    }
+
+    const genderRatio = PokemonData[this.dexNum].formes[this.formeNum].genderRatio
+
+    if (this.gender === 2 && (genderRatio.male !== 0 || genderRatio.female !== 0)) {
+      this.gender = genderFromPID(this.personalityValue, this.dexNum)
+      errorsFound = true
+    } else if (this.gender === 0 && genderRatio.male === 0) {
+      this.gender = genderFromPID(this.personalityValue, this.dexNum)
+      errorsFound = true
+    } else if (this.gender === 1 && genderRatio.female === 0) {
+      this.gender = genderFromPID(this.personalityValue, this.dexNum)
+      errorsFound = true
+    }
+
+    return errorsFound
   }
 
   public updateData(other: PKMInterface, isFromOT: boolean = false) {

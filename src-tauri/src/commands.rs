@@ -260,6 +260,11 @@ pub fn get_image_data(absolute_path: String) -> Result<ImageResponse, String> {
 }
 
 #[tauri::command]
+pub fn open_directory(absolute_path: String) -> Result<(), String> {
+    util::open_directory(&absolute_path)
+}
+
+#[tauri::command]
 pub async fn download_plugin(
     app_handle: tauri::AppHandle,
     remote_url: String,
@@ -296,7 +301,7 @@ pub fn delete_plugin(app_handle: tauri::AppHandle, plugin_id: String) -> Result<
         .map_err(|err| format!("Error finding the plugins directory: {}", err))?;
     let plugin_dir = plugins_dir.join(&plugin_id);
 
-    util::delete_folder(&plugin_dir)
+    util::delete_directory(&plugin_dir)
 }
 
 #[tauri::command]

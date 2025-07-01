@@ -7,7 +7,7 @@ import {
 } from './byteLogic'
 import { MemeKey, pokedexAndSaveFileMemeKey, SIGNATURE_LENGTH } from './MemeKey'
 
-import { lib as cryptolib, SHA1, SHA256 } from 'crypto-js'
+import { lib as cryptolib, MD5, SHA1, SHA256 } from 'crypto-js'
 import { SIZE_SM, SIZE_USUM } from '../types/SAVTypes/util'
 const GEN3_BLOCKS_OFFSET = 0x20
 const GEN3_BLOCK_SIZE = 12
@@ -392,4 +392,19 @@ export function sha256Digest(data: Uint8Array[]) {
   const shasum = SHA256(words)
 
   return wordArrayToUint8Array(shasum)
+}
+
+export function md5Digest(data: Uint8Array) {
+  const shasum = MD5(uint8ArrayToWordArray(data))
+
+  return wordArrayToUint8Array(shasum)
+}
+
+function uint8ArrayToWordArray(u8arr: Uint8Array) {
+  const words = []
+
+  for (let i = 0; i < u8arr.length; i += 4) {
+    words.push((u8arr[i] << 24) | (u8arr[i + 1] << 16) | (u8arr[i + 2] << 8) | u8arr[i + 3])
+  }
+  return cryptolib.WordArray.create(words, u8arr.length)
 }

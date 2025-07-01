@@ -6,6 +6,7 @@ import { DPSAV } from '../types/SAVTypes/DPSAV'
 import { G1SAV } from '../types/SAVTypes/G1SAV'
 import { G2SAV } from '../types/SAVTypes/G2SAV'
 import { G3SAV } from '../types/SAVTypes/G3SAV'
+import { BDSPSAV } from '../types/SAVTypes/Gen89/BDSPSAV'
 import { LASAV } from '../types/SAVTypes/Gen89/LASAV'
 import { SVSAV } from '../types/SAVTypes/Gen89/SVSAV'
 import { SwShSAV } from '../types/SAVTypes/Gen89/SwShSAV'
@@ -33,6 +34,7 @@ const OFFICIAL_SAVE_TYPES = [
   SMSAV,
   USUMSAV,
   SwShSAV,
+  BDSPSAV,
   LASAV,
   SVSAV,
 ]
@@ -129,6 +131,12 @@ export const appInfoReducer: Reducer<AppInfoState, AppInfoAction> = (
             officialSaveTypeIDs.includes(saveTypeID) || extraSaveTypeIDs.includes(saveTypeID)
         )
       )
+
+      state.officialSaveTypes.forEach((st) => {
+        if (!(st.saveTypeID in enabled)) {
+          enabled[st.saveTypeID] = true
+        }
+      })
 
       state.officialSaveTypes.forEach((st) => {
         if (!(st.saveTypeID in enabled)) {

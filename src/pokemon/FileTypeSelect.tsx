@@ -1,9 +1,6 @@
 import { uniq } from 'lodash'
 import { useContext, useMemo } from 'react'
-import {
-  BDSP_TRANSFER_RESTRICTIONS,
-  LGPE_TRANSFER_RESTRICTIONS,
-} from 'src/consts/TransferRestrictions'
+import { LGPE_TRANSFER_RESTRICTIONS } from 'src/consts/TransferRestrictions'
 import { supportsMon } from 'src/types/SAVTypes/util'
 import { isRestricted } from 'src/types/TransferRestrictions'
 import { PKMFormData, Styles } from 'src/types/types'
@@ -64,9 +61,6 @@ const FileTypeSelect = (props: FileTypeSelectProps) => {
     // These should be removed when support is added for their corresponding saves
     if (!isRestricted(LGPE_TRANSFER_RESTRICTIONS, formData.dexNum, formData.formeNum)) {
       supportedFormats.push('PB7')
-    }
-    if (!isRestricted(BDSP_TRANSFER_RESTRICTIONS, formData.dexNum, formData.formeNum)) {
-      supportedFormats.push('PB8')
     }
     return supportedFormats
   }, [formData, getEnabledSaveTypes])

@@ -1,6 +1,11 @@
+import dayjs from 'dayjs'
+import { PKMDate } from 'pokemon-files'
+
+export type AttributeRowValue = string | number | PKMDate | undefined
+
 const AttributeRow = (props: {
   label: string
-  value?: string
+  value?: AttributeRowValue
   justifyEnd?: boolean
   indent?: number
   children?: any
@@ -39,10 +44,26 @@ const AttributeRow = (props: {
           textAlign: justifyEnd ? 'end' : 'start',
         }}
       >
-        {value ?? children}
+        {children ? children : formatValue(value)}
       </div>
     </div>
   )
+}
+
+function formatValue(value: AttributeRowValue): string {
+  if (value === undefined) {
+    return '<not present>'
+  }
+  if (typeof value === 'string') {
+    return value
+  }
+  if (typeof value === 'number') {
+    return value.toString()
+  }
+  if ('year' in value && 'month' in value) {
+    return dayjs(new Date(value.year, value.month, value.day)).format('MMM D, YYYY')
+  }
+  return `${value}`
 }
 
 export default AttributeRow
