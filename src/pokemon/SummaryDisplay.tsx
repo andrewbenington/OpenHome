@@ -140,7 +140,9 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
         />
         <AttributeRow label="Dex No." value={`${mon.dexNum}`} />
         <AttributeRow label="Type">
-          {getTypes(mon)?.map((type) => <TypeIcon type={type} key={`${type}_type_icon`} />)}
+          {getTypes(mon)?.map((type) => (
+            <TypeIcon type={type} key={`${type}_type_icon`} />
+          ))}
         </AttributeRow>
         <AttributeRow label="OT" value={`${mon.trainerName} ${mon.trainerGender ? '♀' : '♂'}`} />
         <AttributeRow label="Trainer ID" value={getDisplayID(mon as any)} />
