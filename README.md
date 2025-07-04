@@ -98,9 +98,9 @@ formats losslessly, there are sometimes mistakes. It's always a good idea to bac
 your save files. If you come across a bug, create an [issue](https://github.com/andrewbenington/OpenHome/issues) to bring it to my attention.
 
 All PKM formats from Generations I-IX are currently supported, including from Pokémon
-Colosseum and Pokémon XD. All game save files from Generations I-VII are supported,
+Colosseum and Pokémon XD. All game save files from Generations I-IX are supported,
 except for Pokémon Lets Go Pikachu/Eevee and the Japanese versions of Pokémon
-Red/Green/Blue/Yellow. Support for Switch game save files will come at some point in
+Red/Green/Blue/Yellow. Support for Let's Go will come at some point in
 the future.
 
 ### Supported PKM import formats
@@ -117,6 +117,7 @@ the future.
 - XDPKM
 - PB7
 - PK8
+- PA8
 - PB8
 - PK9
 
@@ -138,6 +139,7 @@ the future.
 - Pokémon Sun/Moon
 - Pokémon Ultra Sun/Ultra Moon
 - Pokémon Sword/Shield
+- Pokémon Brilliant Diamond/Shining Pearl
 - Pokémon Legends Arceus
 - Pokémon Scarlet/Violet
 
