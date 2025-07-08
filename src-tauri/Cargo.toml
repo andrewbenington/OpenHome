@@ -32,7 +32,7 @@ serde_json = "1.0.140"
 tauri-plugin-os = "2.3.0"
 tauri-plugin-dialog = "2.3.0"
 tauri-plugin-fs = "2.2.1"
-reqwest = { version = "0.12.20"}
+reqwest = { version = "0.12.22"}
 base64 = "0.22.1"
 zip = "4.2.0"
 bytes = "1.10.1"
