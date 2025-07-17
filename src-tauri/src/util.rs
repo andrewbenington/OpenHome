@@ -213,7 +213,7 @@ pub fn get_image_data(absolute_path: &Path) -> Result<ImageResponse, String> {
         && extension_lower != "jpg"
         && extension_lower != "jpeg"
     {
-        return Err(format!("Image format not supported: {}", extension_lower));
+        return Err(format!("Image format not supported: {extension_lower}"));
     }
 
     let response = ImageResponse {

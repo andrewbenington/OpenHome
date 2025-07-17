@@ -1,5 +1,6 @@
 use std::{
-    fs::{remove_file, rename, File},
+    error::Error,
+    fs::{File, remove_file, rename},
     io::Write,
     path::{Path, PathBuf},
 };
@@ -37,45 +38,52 @@ pub struct AppStateSnapshot {
 }
 
 impl AppState {
-    pub fn start_transaction(&self) -> Result<(), String> {
-        if *self.open_transaction.lock().unwrap() {
-            return Err("Previous transaction is still open".to_owned());
+    pub fn start_transaction(&self) -> Result<(), Box<dyn Error + '_>> {
+        let mut transaction_is_open = self.open_transaction.lock()?;
+        if *transaction_is_open {
+            Err("Previous transaction is still open".into())
+        } else {
+            *transaction_is_open = true;
+            Ok(())
         }
-        *self.open_transaction.lock().unwrap() = true;
-        Ok(())
     }
 
-    pub fn rollback_transaction(&self) -> Result<(), String> {
-        if !*self.open_transaction.lock().unwrap() {
+    pub fn rollback_transaction(&self) -> Result<(), Box<dyn Error + '_>> {
+        let mut transaction_is_open = self.open_transaction.lock()?;
+
+        if !*transaction_is_open {
             return Ok(());
         }
 
-        let mut temp_files = self.temp_files.lock().unwrap();
+        let mut temp_files = self.temp_files.lock()?;
         for temp_file in temp_files.iter() {
             remove_file(temp_file).unwrap_or_else(|e| {
                 eprintln!("delete temp file {}: {}", temp_file.to_string_lossy(), e)
             });
         }
 
-        *self.open_transaction.lock().unwrap() = false;
+        *transaction_is_open = false;
         temp_files.clear();
         Ok(())
     }
 
-    pub fn commit_transaction(&self) -> Result<(), String> {
-        if !*self.open_transaction.lock().unwrap() {
+    pub fn commit_transaction(&self) -> Result<(), Box<dyn Error + '_>> {
+        let mut transaction_is_open = self.open_transaction.lock()?;
+
+        if !*transaction_is_open {
             println!("no transaction open");
             return Ok(());
         }
 
         // overwrite original files with the .tmp versions, deleting the temps
-        let mut temp_files = self.temp_files.lock().unwrap();
+        let mut temp_files = self.temp_files.lock()?;
         for temp_file in temp_files.iter() {
-            println!("un-temping {}", temp_file.to_string_lossy().into_owned());
+            let temp_file_name = temp_file.to_string_lossy();
+            println!("un-temping {temp_file_name}");
             rename(temp_file, remove_tmp(temp_file.clone()))
-                .map_err(|e| format!("Un-Temp file {}: {}", temp_file.to_string_lossy(), e))?;
+                .map_err(|e| format!("Un-Temp file {temp_file_name}: {e}"))?;
         }
-        *self.open_transaction.lock().unwrap() = false;
+        *transaction_is_open = false;
         temp_files.clear();
         Ok(())
     }
