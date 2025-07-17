@@ -69,12 +69,19 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
       >
         {mon.personalityValue !== undefined && (
           <AttributeRow label="Personality Value">
-            <code>{`0x${mon.personalityValue.toString(16).padStart(8, '0')}`}</code>
+            <code>{`0x${mon.personalityValue.toString(16).padStart(8, '0')}`}</code> (
+            {mon.personalityValue})
           </AttributeRow>
         )}
         {mon.encryptionConstant !== undefined && (
           <AttributeRow label="Encryption Constant">
-            <code>{`0x${mon.encryptionConstant.toString(16).padStart(8, '0')}`}</code>
+            <code>{`0x${mon.encryptionConstant.toString(16).padStart(8, '0')}`}</code> (
+            {mon.encryptionConstant})
+          </AttributeRow>
+        )}
+        {mon.encryptionConstant !== undefined && (
+          <AttributeRow label="Shift Value">
+            <code>{(mon.encryptionConstant & 0x3e000) >> 0xd % 24}</code>
           </AttributeRow>
         )}
         <AttributeRowExpand

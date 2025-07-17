@@ -11,6 +11,7 @@ import { LASAV } from '../types/SAVTypes/Gen89/LASAV'
 import { SVSAV } from '../types/SAVTypes/Gen89/SVSAV'
 import { SwShSAV } from '../types/SAVTypes/Gen89/SwShSAV'
 import { HGSSSAV } from '../types/SAVTypes/HGSSSAV'
+import { LGPESAV } from '../types/SAVTypes/LGPESAV'
 import { ORASSAV } from '../types/SAVTypes/ORASSAV'
 import { PtSAV } from '../types/SAVTypes/PtSAV'
 import { G3RRSAV } from '../types/SAVTypes/radicalred/G3RRSAV'
@@ -33,6 +34,7 @@ const OFFICIAL_SAVE_TYPES = [
   ORASSAV,
   SMSAV,
   USUMSAV,
+  LGPESAV,
   SwShSAV,
   BDSPSAV,
   LASAV,

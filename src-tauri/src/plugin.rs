@@ -1,4 +1,5 @@
 use std::{
+    error::Error,
     fs::{self, File},
     io::Write,
     path::{Path, PathBuf},
@@ -39,7 +40,7 @@ pub struct PluginMetadataWithIcon {
 
 pub fn list_plugins(
     app_handle: &tauri::AppHandle,
-) -> Result<Vec<PluginMetadataWithIcon>, Box<dyn std::error::Error>> {
+) -> Result<Vec<PluginMetadataWithIcon>, Box<dyn Error>> {
     let plugins_path = util::prepend_appdata_to_path(app_handle, &PathBuf::from("plugins"))
         .map_err(|e| format!("Error building plugin path: {}", e))?;
 

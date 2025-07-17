@@ -97,19 +97,19 @@ pub fn delete_storage_files(
 
 #[tauri::command]
 pub fn start_transaction(state: tauri::State<'_, AppState>) -> Result<(), String> {
-    state.start_transaction()
+    state.start_transaction().map_err(|e| e.to_string())
 }
 
 #[tauri::command]
 pub fn rollback_transaction(state: tauri::State<'_, AppState>) -> Result<(), String> {
     println!("Rolling back transaction");
-    state.rollback_transaction()
+    state.rollback_transaction().map_err(|e| e.to_string())
 }
 
 #[tauri::command]
 pub fn commit_transaction(state: tauri::State<'_, AppState>) -> Result<(), String> {
     println!("Committing transaction");
-    state.commit_transaction()
+    state.commit_transaction().map_err(|e| e.to_string())
 }
 
 #[tauri::command]

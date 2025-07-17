@@ -271,7 +271,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
               </AttributeRow>
             )}
             {save.calculateChecksum && (
-              <AttributeRow label="Checksum">
+              <AttributeRow label="Calculated Checksum">
                 <code>0x{save.calculateChecksum().toString(16)}</code>
               </AttributeRow>
             )}
