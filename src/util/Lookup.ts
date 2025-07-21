@@ -1,8 +1,10 @@
 import { PK3, StatsPreSplit } from 'pokemon-files'
 import { isGameBoy } from 'pokemon-resources'
+import { PokemonData } from 'pokemon-species-data'
 import { PKMInterface } from '../types/interfaces'
 import { OHPKM } from '../types/pkm/OHPKM'
 import { getBaseMon } from '../types/pkm/util'
+import { Forme, PKMFormeRef } from '../types/types'
 import { bytesToString } from './byteLogic'
 import { gen12StringToUTF, utf16StringToGen12 } from './Strings/StringConverter'
 
@@ -63,4 +65,31 @@ export const getMonGen345Identifier = (mon: PKMInterface) => {
     console.error(error)
   }
   return undefined
+}
+
+export function getFormeData(dexNum: number, formeNum: number): Forme | undefined {
+  return PokemonData[dexNum]?.formes[formeNum]
+}
+
+export function isEvolution(prevo: PKMFormeRef, possibleEvo: PKMFormeRef): boolean {
+  const prevoForme = getFormeData(prevo.dexNum, prevo.formeNum)
+  const possibleEvoForme = getFormeData(possibleEvo.dexNum, possibleEvo.formeNum)
+
+  if (!prevoForme || !possibleEvoForme) return false
+
+  if (
+    prevoForme.evos.some(
+      (evo) => evo.dexNumber === possibleEvo.dexNum && evo.formeNumber === possibleEvo.formeNum
+    )
+  ) {
+    return true
+  }
+
+  for (const evo of prevoForme.evos) {
+    if (isEvolution(prevo, { dexNum: evo.dexNumber, formeNum: evo.formeNumber })) {
+      return true
+    }
+  }
+
+  return false
 }
