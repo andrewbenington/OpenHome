@@ -45,6 +45,7 @@ import {
 } from 'src/util/byteLogic'
 import { getHPGen3Onward, getLevelGen3Onward, getStatGen3Onward } from 'src/util/StatCalc'
 import { utf16BytesToString, utf16StringToBytes } from 'src/util/Strings/StringConverter'
+import { isEvolution } from '../../util/Lookup'
 import { PKMInterface, PluginPKMInterface } from '../interfaces'
 import schema from './OHPKM.json'
 import {
@@ -1626,6 +1627,14 @@ export class OHPKM implements PKMInterface {
     this.movePP = adjustMovePPBetweenFormats(this, other)
     this.movePPUps = other.movePPUps as [number, number, number, number]
 
+    if (this.dexNum !== other.dexNum && isEvolution(this, other)) {
+      this.dexNum = other.dexNum
+    }
+
+    if (this.dexNum === other.dexNum || isEvolution(this, other)) {
+      this.formeNum = other.formeNum
+    }
+
     if ('heldItemName' in other) {
       this.heldItemIndex = ItemFromString(other.heldItemName)
     }
@@ -1639,6 +1648,10 @@ export class OHPKM implements PKMInterface {
     if (other.evsG12) {
       this.evsG12 = other.evsG12
     }
+    if (other.hyperTraining) {
+      this.hyperTraining = other.hyperTraining
+    }
+
     this.ribbons = lodash.uniq([...this.ribbons, ...(other.ribbons ?? [])])
     if (other.contest) {
       this.contest = other.contest
@@ -1755,8 +1768,17 @@ export class OHPKM implements PKMInterface {
     if (other.teraTypeOverride !== undefined) {
       this.teraTypeOverride = other.teraTypeOverride
     }
+    if (other.trFlagsSwSh !== undefined) {
+      this.trFlagsSwSh = other.trFlagsSwSh
+    }
+    if (other.tmFlagsBDSP !== undefined) {
+      this.tmFlagsBDSP = other.tmFlagsBDSP
+    }
     if (other.tmFlagsSV !== undefined) {
       this.tmFlagsSV = other.tmFlagsSV
+    }
+    if (other.tmFlagsSVDLC !== undefined) {
+      this.tmFlagsSVDLC = other.tmFlagsSVDLC
     }
     if (other.obedienceLevel !== undefined) {
       this.obedienceLevel = other.obedienceLevel
