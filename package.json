@@ -61,19 +61,19 @@
     "react-icons": "^5.5.0"
   },
   "devDependencies": {
-    "@stylistic/eslint-plugin": "^5.1.0",
+    "@stylistic/eslint-plugin": "^5.2.0",
     "@tauri-apps/cli": "^2.6.2",
     "@types/crypto-js": "^4.2.2",
     "@types/jest": "^30.0.0",
     "@types/lodash": "^4.17.20",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
-    "@typescript-eslint/eslint-plugin": "^8.36.0",
+    "@typescript-eslint/eslint-plugin": "^8.37.0",
     "@typescript-eslint/parser": "^8.32.1",
-    "@vitejs/plugin-react": "^4.6.0",
+    "@vitejs/plugin-react": "^4.7.0",
     "eslint": "^9.31.0",
-    "eslint-config-prettier": "^10.1.5",
-    "eslint-plugin-prettier": "^5.5.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.3",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
@@ -82,6 +82,6 @@
     "react-dom": "^19.1.0",
     "ts-jest": "^29.4.0",
     "typescript": "^5.8.3",
-    "vite": "^7.0.4"
+    "vite": "^7.0.5"
   }
 }
