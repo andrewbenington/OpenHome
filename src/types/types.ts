@@ -1,4 +1,5 @@
 import { Either } from 'fp-ts/Either'
+import { PokemonData } from 'pokemon-species-data'
 import { CSSProperties } from 'react'
 import { PathData } from './SAVTypes/path'
 
@@ -54,46 +55,7 @@ export type SaveRefMap = { [key: string]: SaveRef }
 
 export type RegionalForme = 'Alola' | 'Galar' | 'Hisui' | 'Paldea'
 
-export type MonReference = { dexNumber: number; formeNumber: number }
-
-export type Forme = {
-  name: string
-  formeName: string
-  formeNumber: number
-  isBaseForme: boolean
-  isMega: boolean
-  isGMax: boolean
-  isBattleOnly: boolean
-  alias: string
-  types: Type[]
-  genderRatio: { M: number; F: number }
-  baseStats: {
-    hp: number
-    atk: number
-    def: number
-    spa: number
-    spd: number
-    spe: number
-  }
-  ability1: string
-  ability2?: string
-  abilityH?: string
-  height: number
-  weight: number
-  evos: MonReference[]
-  prevo?: MonReference
-  eggGroups: string[]
-  gen: number
-  regional?: RegionalForme
-  subLegendary: boolean
-  restrictedLegendary: boolean
-  ultraBeast: boolean
-  paradox: boolean
-  mythical: boolean
-  sprite: string
-  spriteIndex: [number, number]
-}
-
+export type Forme = (typeof PokemonData)[number]['formes'][number]
 export type Pokemon = {
   name: string
   nationalDex: number
@@ -152,7 +114,7 @@ export type LoadSaveResponse = {
   createdDate: Date
 }
 
-export interface PKMFormData {
+export interface PKMFormeRef {
   dexNum: number
   formeNum: number
 }

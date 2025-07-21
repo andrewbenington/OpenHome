@@ -3,7 +3,7 @@ import { useContext, useMemo } from 'react'
 import { LGPE_TRANSFER_RESTRICTIONS } from 'src/consts/TransferRestrictions'
 import { supportsMon } from 'src/types/SAVTypes/util'
 import { isRestricted } from 'src/types/TransferRestrictions'
-import { PKMFormData, Styles } from 'src/types/types'
+import { PKMFormeRef, Styles } from 'src/types/types'
 import { filterUndefined } from 'src/util/Sort'
 import { AppInfoContext } from '../state/appInfo'
 
@@ -41,7 +41,7 @@ interface FileTypeSelectProps {
   baseFormat: string
   currentFormat: string
   color?: string
-  formData: PKMFormData
+  formData: PKMFormeRef
   onChange: (selectedFormat: string) => void
 }
 
