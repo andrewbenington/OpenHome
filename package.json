@@ -36,12 +36,12 @@
     "precommit": "prettier --write . && eslint src --report-unused-disable-directives -c eslint.config.mjs --fix"
   },
   "dependencies": {
-    "@dnd-kit/helpers": "^0.1.19",
-    "@dnd-kit/react": "^0.1.19",
+    "@dnd-kit/helpers": "^0.1.20",
+    "@dnd-kit/react": "^0.1.20",
     "@radix-ui/themes": "^3.2.1",
-    "@tauri-apps/api": "^2.6.0",
-    "@tauri-apps/plugin-dialog": "^2.3.0",
-    "@tauri-apps/plugin-fs": "^2.4.0",
+    "@tauri-apps/api": "^2.7.0",
+    "@tauri-apps/plugin-dialog": "^2.3.1",
+    "@tauri-apps/plugin-fs": "^2.4.1",
     "@tauri-apps/plugin-os": "^2.3.0",
     "@tauri-apps/plugin-shell": "^2.3.0",
     "buffer": "^6.0.3",
