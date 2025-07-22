@@ -79,7 +79,11 @@ export const get16BitChecksumLittleEndian = (bytes: ArrayBuffer, start: number, 
   let checksum = 0
 
   for (let i = start; i < end; i += 2) {
-    checksum = (checksum + bytesToUint16LittleEndian(new Uint8Array(bytes), i)) & 0xffff
+    const nextVal = bytesToUint16LittleEndian(new Uint8Array(bytes), i)
+
+    console.log(nextVal)
+
+    checksum = (checksum + nextVal) & 0xffff
   }
   return checksum
 }

@@ -292,8 +292,8 @@ function not16Bit(val: number): number {
   return ((val & 0xffff) ^ 0xffff) & 0xffff
 }
 
-export const CRC16_Invert = (bytes: Uint8Array, start: number, size: number) => {
-  let chk = 0xffff
+export function CRC16(bytes: Uint8Array, start: number, size: number, initial: number) {
+  let chk = initial
 
   for (let i = start; i < start + size; i++) {
     const b = bytes[i]
@@ -301,7 +301,15 @@ export const CRC16_Invert = (bytes: Uint8Array, start: number, size: number) => 
     chk = (SeedTableInvert[b ^ (chk & 0xff)] ^ (chk >> 8)) & 0xffff
   }
 
-  return not16Bit(chk)
+  return chk
+}
+
+export function CRC16_Invert(bytes: Uint8Array, start: number, size: number) {
+  return not16Bit(CRC16(bytes, start, size, 0xffff))
+}
+
+export const CRC16_NoInvert = (bytes: Uint8Array, start: number, size: number) => {
+  return CRC16(bytes, start, size, 0)
 }
 
 export const SignMemeDataInPlace = (data: Uint8Array) => {
