@@ -69,14 +69,12 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
       >
         {mon.personalityValue !== undefined && (
           <AttributeRow label="Personality Value">
-            <code>{`0x${mon.personalityValue.toString(16).padStart(8, '0')}`}</code> (
-            {mon.personalityValue})
+            <code>{u32Display(mon.personalityValue)}</code>
           </AttributeRow>
         )}
         {mon.encryptionConstant !== undefined && (
           <AttributeRow label="Encryption Constant">
-            <code>{`0x${mon.encryptionConstant.toString(16).padStart(8, '0')}`}</code> (
-            {mon.encryptionConstant})
+            <code>{u32Display(mon.encryptionConstant)}</code>
           </AttributeRow>
         )}
         {mon.encryptionConstant !== undefined && (
@@ -91,7 +89,7 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
           <AttributeRow label="ID" value={getDisplayID(mon as any)} indent={10} />
           {mon.secretID !== undefined && (
             <AttributeRow label="Secret ID" indent={10}>
-              <code>{`0x${mon.secretID.toString(16).padStart(4, '0')}`}</code>
+              <code>{`${u16Display(mon.secretID)}`}</code>
             </AttributeRow>
           )}
           {!!mon.trainerFriendship && (
@@ -360,11 +358,11 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
         {mon.checksum !== undefined && mon.calcChecksum && (
           <>
             <AttributeRow label="Checksum">
-              <code>{`0x${mon.checksum.toString(16).padStart(4, '0')}`}</code>
+              <code>{u16Display(mon.checksum)}</code>
             </AttributeRow>
             {'calcChecksum' in mon && (
               <AttributeRow label="Calced Checksum">
-                <code>{`0x${mon.calcChecksum().toString(16).padStart(4, '0')}`}</code>
+                <code>{u16Display(mon.calcChecksum())}</code>
               </AttributeRow>
             )}
           </>
@@ -474,4 +472,27 @@ function HiddenPowerDisplay(props: { mon: AllPKMFields }) {
       <TypeIcon type={g2type} /> <p style={{ paddingLeft: 8 }}>{` ${g2power} Base Power`}</p>
     </AttributeRow>
   )
+}
+
+function u16Display(val: number) {
+  return `${hexStr(val, 4)} (${val})`
+}
+
+function u32Display(val: number) {
+  return `${hexStr(val, 8)} (${val})`
+}
+
+function hexStr(val: number, digits: number) {
+  return '0x' + changeEndianness(val.toString(16).toUpperCase().padStart(digits, '0'))
+}
+
+const changeEndianness = (hex: string) => {
+  const result = []
+  let len = hex.length - 2
+
+  while (len >= 0) {
+    result.push(hex.substr(len, 2))
+    len -= 2
+  }
+  return result.join('')
 }

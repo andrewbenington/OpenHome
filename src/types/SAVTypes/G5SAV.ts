@@ -108,7 +108,7 @@ export abstract class G5SAV implements SAV<PK5> {
   }
   pcChecksumOffset?: number | undefined
   pcOffset?: number | undefined
-  calculateChecksum?: (() => number) | undefined
+  calculatePcChecksum?: (() => number) | undefined
 
   updateBoxChecksum = (boxIndex: number) => {
     // const oldChecksum = bytesToUint16LittleEndian(

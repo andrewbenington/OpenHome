@@ -175,7 +175,7 @@ const Home = () => {
     // returns a function to stop listening
     const stopListening = backend.registerListeners({
       onOpen: () => setOpenSaveDialog(true),
-      onSave: () => saveChanges(),
+      onSave: saveChanges,
       onReset: () => {
         openSavesDispatch({ type: 'clear_mons_to_release' })
         if (lookupState.loaded) {

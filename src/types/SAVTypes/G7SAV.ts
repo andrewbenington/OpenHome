@@ -136,14 +136,14 @@ export abstract class G7SAV implements SAV<PK7> {
         this.bytes.set(new Uint8Array(mon.toPCBytes()), writeIndex)
       }
     })
-    this.bytes.set(uint16ToBytesLittleEndian(this.calculateChecksum()), this.pcChecksumOffset)
+    this.bytes.set(uint16ToBytesLittleEndian(this.calculatePcChecksum()), this.pcChecksumOffset)
     this.bytes = SignWithMemeCrypto(this.bytes)
     return changedMonPKMs
   }
 
   abstract supportsMon(dexNumber: number, formeNumber: number): boolean
 
-  calculateChecksum(): number {
+  calculatePcChecksum(): number {
     return CRC16_Invert(this.bytes, this.pcOffset, this.pcSize)
   }
 
@@ -177,7 +177,17 @@ export abstract class G7SAV implements SAV<PK7> {
   }
 
   calculateChecksumStr() {
-    return `0x${this.calculateChecksum().toString(16).padStart(4, '0')}`
+    return `0x${this.calculatePcChecksum().toString(16).padStart(4, '0')}`
+  }
+
+  getStoredChecksum(): number {
+    const dataView = new DataView(this.bytes.buffer)
+
+    return dataView.getUint16(this.pcChecksumOffset, true)
+  }
+
+  getStoredChecksumStr() {
+    return `0x${this.getStoredChecksum().toString(16).padStart(4, '0')}`
   }
 
   getDisplayData() {

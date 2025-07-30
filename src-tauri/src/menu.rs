@@ -1,6 +1,6 @@
 use std::process::Command;
 
-use tauri::{image::Image, include_image, menu::*, App, AppHandle, Emitter, Manager, Wry};
+use tauri::{App, AppHandle, Emitter, Manager, Wry, image::Image, include_image, menu::*};
 const APP_ICON: Image<'_> = include_image!("icons/128x128.png");
 
 #[cfg(target_os = "macos")]

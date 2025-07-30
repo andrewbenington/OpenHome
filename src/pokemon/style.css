@@ -126,6 +126,11 @@
   padding-left: calc(4px + var(--diagonal-length));
 }
 
+div.attribute-row-content {
+  user-select: all !important;
+  -webkit-user-select: text !important;
+}
+
 .expandable-attribute-row {
   transition: max-height 0.2s ease;
   cursor: pointer;

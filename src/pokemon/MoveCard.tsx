@@ -5,18 +5,18 @@ import { getTypeColor } from '../util/PokemonSprite'
 import './style.css'
 
 interface MoveCardProps {
-  move: number
+  move?: number
   movePP?: number
   maxPP?: number
   typeOverride?: Type
 }
 
 const MoveCard = ({ move, movePP, maxPP, typeOverride }: MoveCardProps) => {
-  const moveData = useMemo(() => Moves[move], [move])
+  const moveData = useMemo(() => (move ? Moves[move] : undefined), [move])
   const type = useMemo(() => typeOverride ?? (moveData?.type as Type), [typeOverride, moveData])
 
   const content = useMemo(() => {
-    if (move === 0) {
+    if (move === 0 || move === undefined) {
       // mon knows less than 4 moves
       return undefined
     }
@@ -27,7 +27,7 @@ const MoveCard = ({ move, movePP, maxPP, typeOverride }: MoveCardProps) => {
       return (
         <>
           <div className="type-icon-container" />
-          <div className="unknown-move-name">(Unknown Move)</div>
+          <div className="unknown-move-name">(Unknown Move: {move})</div>
         </>
       )
     }

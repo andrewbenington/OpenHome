@@ -223,7 +223,10 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                     boxPos: index,
                     save,
                   }}
-                  disabled={isDisabled}
+                  disabled={
+                    isDisabled || save.getSlotMetadata?.(save.currentPCBox, index)?.isDisabled
+                  }
+                  disabledReason={save.getSlotMetadata?.(save.currentPCBox, index)?.disabledReason}
                   mon={mon}
                   zIndex={1}
                   onDrop={(importedMons) => {
@@ -270,9 +273,9 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                 </div>
               </AttributeRow>
             )}
-            {save.calculateChecksum && (
-              <AttributeRow label="Calculated Checksum">
-                <code>0x{save.calculateChecksum().toString(16)}</code>
+            {save.calculatePcChecksum && (
+              <AttributeRow label="Calculated PC Checksum">
+                <code>0x{save.calculatePcChecksum().toString(16)}</code>
               </AttributeRow>
             )}
             {Object.entries(displayData).map(([label, value]) => (
