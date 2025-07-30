@@ -72,15 +72,6 @@ For [Windows](./docs/BUILD_WINDOWS.md)
 
 For [macOS](./docs/BUILD_MAC.md)
 
-## Appimages
-
-Appimages are not currently built by default. To build an appimage you can do the following.
-
-```bash
-$ npm install
-$ NO_STRIP=TRUE npx tauri build -b appimage
-```
-
 Node and Rust are needed for compilation.
 
 ## Moving Between Saves
@@ -99,9 +90,7 @@ your save files. If you come across a bug, create an [issue](https://github.com/
 
 All PKM formats from Generations I-IX are currently supported, including from Pokémon
 Colosseum and Pokémon XD. All game save files from Generations I-IX are supported,
-except for Pokémon Lets Go Pikachu/Eevee and the Japanese versions of Pokémon
-Red/Green/Blue/Yellow. Support for Let's Go will come at some point in
-the future.
+except for the Japanese versions of Pokémon Red/Green/Blue/Yellow and the Japanese versions of Pokémon Gold/Silver/Crystal.
 
 ### Supported PKM import formats
 
@@ -138,6 +127,7 @@ the future.
 - Pokémon Omega Ruby/Alpha Sapphire
 - Pokémon Sun/Moon
 - Pokémon Ultra Sun/Ultra Moon
+- Pokémon Let's Go Pikachu/Eevee
 - Pokémon Sword/Shield
 - Pokémon Brilliant Diamond/Shining Pearl
 - Pokémon Legends Arceus
