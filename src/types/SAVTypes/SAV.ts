@@ -20,6 +20,10 @@ export interface BoxCoordinates {
   index: number
 }
 
+export type SlotMetadata =
+  | { isDisabled: true; disabledReason: string }
+  | { isDisabled: false; disabledReason?: undefined }
+
 export interface SAV<P extends PKMInterface = PKMInterface> {
   origin: GameOfOrigin
 
@@ -54,10 +58,11 @@ export interface SAV<P extends PKMInterface = PKMInterface> {
 
   getCurrentBox: () => Box<P>
   supportsMon: (dexNumber: number, formeNumber: number) => boolean
+  getSlotMetadata?: (boxNum: number, boxSlot: number) => SlotMetadata
 
   prepareBoxesAndGetModified: () => OHPKM[]
 
-  calculateChecksum?: () => number
+  calculatePcChecksum?: () => number
 
   getGameName: () => string
 

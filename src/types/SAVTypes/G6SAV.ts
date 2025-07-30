@@ -119,13 +119,13 @@ export abstract class G6SAV implements SAV<PK6> {
         this.bytes.set(new Uint8Array(mon.toPCBytes()), writeIndex)
       }
     })
-    this.bytes.set(uint16ToBytesLittleEndian(this.calculateChecksum()), this.pcChecksumOffset)
+    this.bytes.set(uint16ToBytesLittleEndian(this.calculatePcChecksum()), this.pcChecksumOffset)
     return changedMonPKMs
   }
 
   abstract supportsMon(dexNumber: number, formeNumber: number): boolean
 
-  calculateChecksum(): number {
+  calculatePcChecksum(): number {
     return CRC16_CCITT(this.bytes, this.pcOffset, this.pcDataSize)
   }
 

@@ -69,7 +69,7 @@ export abstract class G4SAV implements SAV<PK4> {
   pluginIdentifier?: string | undefined
   pcChecksumOffset?: number | undefined
   pcOffset?: number | undefined
-  calculateChecksum?: (() => number) | undefined
+  calculatePcChecksum?: (() => number) | undefined
 
   buildBoxes() {
     if (bytesToUint32LittleEndian(this.bytes, this.currentSaveBoxStartOffset) === 0xffffffff) {

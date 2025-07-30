@@ -1,7 +1,7 @@
 {
   "productName": "OpenHome",
   "name": "openhome",
-  "version": "1.4.9",
+  "version": "1.4.10",
   "description": "A tool for moving Pokémon between game saves",
   "keywords": [
     "pokemon",
@@ -55,9 +55,9 @@
     "dayjs": "^1.11.13",
     "fp-ts": "^2.16.10",
     "lodash": "^4.17.21",
-    "pokemon-files": "^0.4.3",
+    "pokemon-files": "^0.4.6",
     "pokemon-resources": "^1.0.12",
-    "pokemon-species-data": "^0.4.5",
+    "pokemon-species-data": "^0.4.7",
     "prando": "^6.0.1",
     "react": "^19.1.0",
     "react-chartjs-2": "^5.3.0",

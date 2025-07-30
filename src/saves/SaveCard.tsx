@@ -45,6 +45,10 @@ export default function SaveCard({ save, onOpen, onRemove, size = 240 }: SaveCar
     return getGameColor(saveType, save.game as GameOfOrigin)
   }, [save.game, saveType])
 
+  const backgroundImage = saveType
+    ? `url(${getSaveLogo(saveType, save.game as GameOfOrigin)})`
+    : undefined
+
   return (
     <div style={{ position: 'relative' }}>
       <div
@@ -52,9 +56,7 @@ export default function SaveCard({ save, onOpen, onRemove, size = 240 }: SaveCar
         style={{
           width: size,
           height: size,
-          backgroundImage: saveType
-            ? `url(${getSaveLogo(saveType, save.game as GameOfOrigin)})`
-            : undefined,
+          backgroundImage,
           backgroundSize: gbBackground ? size : size * 0.9,
           backgroundRepeat: 'no-repeat',
           backgroundPosition: 'center',

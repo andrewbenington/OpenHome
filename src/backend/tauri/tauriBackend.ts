@@ -338,7 +338,11 @@ export const TauriBackend: BackendInterface = {
     return () =>
       unlistenPromise.then((unlistenFunctions) => {
         for (const unlistenFunction of unlistenFunctions) {
-          unlistenFunction()
+          try {
+            unlistenFunction()
+          } catch (e) {
+            console.error(e)
+          }
         }
       })
   },

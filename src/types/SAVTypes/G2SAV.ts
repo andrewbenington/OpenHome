@@ -116,7 +116,7 @@ export class G2SAV implements SAV<PK2> {
   sid?: number | undefined
   pcChecksumOffset?: number | undefined
   pcOffset?: number | undefined
-  calculateChecksum?: (() => number) | undefined
+  calculatePcChecksum?: (() => number) | undefined
 
   prepareBoxesAndGetModified() {
     const changedMonPKMs: OHPKM[] = []

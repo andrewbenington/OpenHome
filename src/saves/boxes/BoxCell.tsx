@@ -14,6 +14,7 @@ interface BoxCellProps {
   onClick: () => void
   onDrop: (_: PKMInterface[]) => void
   disabled?: boolean
+  disabledReason?: string
   zIndex: number
   mon: PKMInterface | undefined
   borderColor?: string
@@ -25,6 +26,7 @@ const BoxCell = ({
   onClick,
   onDrop,
   disabled,
+  disabledReason,
   zIndex,
   mon,
   borderColor,
@@ -96,6 +98,7 @@ const BoxCell = ({
         e.stopPropagation()
         onDropFromFiles(e.dataTransfer.files)
       }}
+      title={disabledReason}
     >
       {mon ? (
         <DraggableMon

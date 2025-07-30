@@ -92,7 +92,7 @@ export class HomeData implements SAV<OHPKM> {
   pluginIdentifier?: string | undefined
   pcChecksumOffset?: number | undefined
   pcOffset?: number | undefined
-  calculateChecksum?: (() => number) | undefined
+  calculatePcChecksum?: (() => number) | undefined
 
   getCurrentBox() {
     return this.boxes[this.currentPCBox]

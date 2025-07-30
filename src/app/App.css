@@ -16,6 +16,11 @@ body {
   --side-tab-selected: rgb(116, 155, 155);
 }
 
+img {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
 @media (prefers-color-scheme: light) {
   body {
     --background-gradient: linear-gradient(
