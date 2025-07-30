@@ -33,7 +33,7 @@ export function getMonSaveLogo(mon: PKMInterface, supportedSaves: SAVClass[]) {
   }
   return GameLogos[
     GameOfOriginData[mon.gameOfOrigin]?.logo ??
-      GameOfOriginData[mon.gameOfOrigin]?.name.replace(' ', '').replace("'", '') ??
+      GameOfOriginData[mon.gameOfOrigin]?.name.replaceAll(' ', '').replaceAll("'", '') ??
       ''
   ]
 }
@@ -48,7 +48,7 @@ export function getSaveLogo(saveType: SAVClass | undefined, origin: GameOfOrigin
 
   return GameLogos[
     GameOfOriginData[origin]?.logo ??
-      GameOfOriginData[origin]?.name.replace(' ', '').replace("'", '') ??
+      GameOfOriginData[origin]?.name.replaceAll(' ', '').replaceAll("'", '') ??
       ''
   ]
 }
