@@ -23,6 +23,8 @@ interface OpenSaveDisplayProps {
   saveIndex: number
 }
 
+const ALLOW_DUPE_IMPORT = true
+
 const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   const [, openSavesDispatch, openSaves] = useContext(OpenSavesContext)
   const [{ homeMons }] = useContext(LookupContext)
@@ -85,7 +87,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
           (mon) => mon && getMonFileIdentifier(mon) === identifier
         )
 
-        if (identifier in homeMons || inCurrentBox) {
+        if (!ALLOW_DUPE_IMPORT && (identifier in homeMons || inCurrentBox)) {
           const message =
             mons.length === 1
               ? 'This Pokémon has been moved into OpenHome before.'

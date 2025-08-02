@@ -1,4 +1,4 @@
-VERSION=1.4.10
+VERSION=1.4.11-pandorite-allow-dupes
 
 .PHONY: help
 help: # Display this help.

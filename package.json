@@ -1,7 +1,7 @@
 {
   "productName": "OpenHome",
   "name": "openhome",
-  "version": "1.4.10",
+  "version": "1.4.11-pandorite-allow-dupes",
   "description": "A tool for moving Pokémon between game saves",
   "keywords": [
     "pokemon",
