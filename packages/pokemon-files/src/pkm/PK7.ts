@@ -9,6 +9,7 @@ import {
   ModernRibbons,
   NatureToString,
 } from 'pokemon-resources'
+import * as PkmWasm from 'pokemon_wasm'
 import * as byteLogic from '../util/byteLogic'
 import * as encryption from '../util/encryption'
 import { AllPKMFields } from '../util/pkmInterface'
@@ -91,6 +92,7 @@ export class PK7 {
   handlerMemory: types.Memory
   trainerMemory: types.Memory
   trainerGender: boolean
+
   constructor(arg: ArrayBuffer | AllPKMFields, encrypted?: boolean) {
     if (arg instanceof ArrayBuffer) {
       let buffer = arg
@@ -99,14 +101,16 @@ export class PK7 {
         const unshuffledBytes = encryption.unshuffleBlocksGen67(unencryptedBytes)
         buffer = unshuffledBytes
       }
+
+      const inner = PkmWasm.Pk7.fromBytes(new Uint8Array(buffer))
       const dataView = new DataView(buffer)
-      this.encryptionConstant = dataView.getUint32(0x0, true)
-      this.sanity = dataView.getUint16(0x4, true)
-      this.checksum = dataView.getUint16(0x6, true)
-      this.dexNum = dataView.getUint16(0x8, true)
-      this.heldItemIndex = dataView.getUint16(0xa, true)
-      this.trainerID = dataView.getUint16(0xc, true)
-      this.secretID = dataView.getUint16(0xe, true)
+      this.encryptionConstant = inner.encryption_constant
+      this.sanity = inner.sanity
+      this.checksum = inner.checksum
+      this.dexNum = inner.dex_num
+      this.heldItemIndex = inner.held_item_index
+      this.trainerID = inner.trainer_id
+      this.secretID = inner.secret_id
       this.exp = dataView.getUint32(0x10, true)
       this.abilityIndex = dataView.getUint8(0x14)
       this.abilityNum = dataView.getUint8(0x15)
@@ -126,13 +130,8 @@ export class PK7 {
       this.battleMemoryCount = dataView.getUint8(0x39)
       this.superTrainingDistFlags = dataView.getUint8(0x3a)
       this.formArgument = dataView.getUint32(0x3c, true)
-      this.nickname = stringLogic.utf16BytesToString(buffer, 0x40, 12)
-      this.moves = [
-        dataView.getUint16(0x5a, true),
-        dataView.getUint16(0x5c, true),
-        dataView.getUint16(0x5e, true),
-        dataView.getUint16(0x60, true),
-      ]
+      this.nickname = inner.nickname
+      this.moves = Array.from(inner.moveIndices)
       this.movePP = [
         dataView.getUint8(0x62),
         dataView.getUint8(0x63),
@@ -153,7 +152,7 @@ export class PK7 {
       ]
       this.secretSuperTrainingUnlocked = byteLogic.getFlag(dataView, 0x72, 1)
       this.secretSuperTrainingComplete = byteLogic.getFlag(dataView, 0x72, 2)
-      this.ivs = types.read30BitIVsFromBytes(dataView, 0x74)
+      this.ivs = inner.ivs
       this.isEgg = byteLogic.getFlag(dataView, 0x74, 30)
       this.isNicknamed = byteLogic.getFlag(dataView, 0x74, 31)
       this.handlerName = stringLogic.utf16BytesToString(buffer, 0x78, 12)

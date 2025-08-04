@@ -10,6 +10,7 @@ export default defineConfig(async () => ({
   optimizeDeps: {
     include: ['@tauri-apps/plugin-dialog'],
   },
+  target: 'esnext',
   resolve: {
     alias: {
       src: fileURLToPath(new URL('./src', import.meta.url)),
