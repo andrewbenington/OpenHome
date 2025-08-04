@@ -1,4 +1,4 @@
-import { MarkingColorValue, Markings } from 'pokemon-files'
+import { MarkingColorValue, Markings } from '@pokemon-files/util'
 import { CSSProperties } from 'react'
 import { marking } from '../types/types'
 

@@ -1,4 +1,5 @@
-import { AllPKMFields, PA8, PB8, PK8, PK9 } from 'pokemon-files'
+import { PA8, PB8, PK8, PK9 } from '@pokemon-files/pkm'
+import { AllPKMFields } from '@pokemon-files/util'
 import { GameOfOrigin } from 'pokemon-resources'
 import { OHPKM } from '../../pkm/OHPKM'
 import { PathData } from '../path'

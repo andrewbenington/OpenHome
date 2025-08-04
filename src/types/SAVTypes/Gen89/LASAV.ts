@@ -1,4 +1,5 @@
-import { PA8, utf16BytesToString } from 'pokemon-files'
+import { PA8 } from '@pokemon-files/pkm'
+import { utf16BytesToString } from '@pokemon-files/util'
 import { GameOfOrigin, Languages } from 'pokemon-resources'
 import { LA_TRANSFER_RESTRICTIONS } from '../../../consts/TransferRestrictions'
 import { isRestricted } from '../../TransferRestrictions'

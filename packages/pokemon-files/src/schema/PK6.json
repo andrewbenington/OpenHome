@@ -1,0 +1,451 @@
+{
+  "totalBytes": 232,
+  "totalBytesExtraFields": 260,
+  "fileName": "PK6",
+  "fields": [
+    {
+      "name": "encryptionConstant",
+      "type": "number",
+      "numBytes": 4,
+      "endian": "Little",
+      "byteOffset": 0
+    },
+    {
+      "name": "sanity",
+      "type": "number",
+      "numBytes": 2,
+      "endian": "Little",
+      "byteOffset": 4
+    },
+    {
+      "name": "checksum",
+      "type": "number",
+      "numBytes": 2,
+      "endian": "Little",
+      "byteOffset": 6
+    },
+    {
+      "name": "dexNum",
+      "type": "number",
+      "numBytes": 2,
+      "endian": "Little",
+      "byteOffset": 8
+    },
+    {
+      "name": "heldItemIndex",
+      "type": "number",
+      "numBytes": 2,
+      "endian": "Little",
+      "byteOffset": 10
+    },
+    {
+      "name": "trainerID",
+      "type": "number",
+      "numBytes": 2,
+      "endian": "Little",
+      "byteOffset": 12
+    },
+    {
+      "name": "secretID",
+      "type": "number",
+      "numBytes": 2,
+      "endian": "Little",
+      "byteOffset": 14
+    },
+    {
+      "name": "exp",
+      "type": "number",
+      "numBytes": 4,
+      "endian": "Little",
+      "byteOffset": 16
+    },
+    {
+      "name": "abilityIndex",
+      "type": "number",
+      "byteOffset": 20,
+      "numBytes": 1
+    },
+    {
+      "name": "abilityNum",
+      "type": "number",
+      "byteOffset": 21,
+      "numBytes": 1
+    },
+    {
+      "name": "trainingBagHits",
+      "type": "number",
+      "byteOffset": 22,
+      "numBytes": 1
+    },
+    {
+      "name": "trainingBag",
+      "type": "number",
+      "byteOffset": 23,
+      "numBytes": 1
+    },
+    {
+      "name": "personalityValue",
+      "type": "number",
+      "numBytes": 4,
+      "endian": "Little",
+      "byteOffset": 24
+    },
+    {
+      "name": "nature",
+      "type": "number",
+      "byteOffset": 28,
+      "numBytes": 1
+    },
+    {
+      "name": "formeNum",
+      "type": "number",
+      "byteOffset": 29,
+      "numBytes": 1,
+      "bitOffset": 3,
+      "numBits": 5
+    },
+    {
+      "name": "gender",
+      "type": "number",
+      "byteOffset": 29,
+      "numBytes": 1,
+      "numBits": 2,
+      "bitOffset": 1
+    },
+    {
+      "name": "evs",
+      "type": "stats",
+      "byteOffset": 30,
+      "numBytes": 6
+    },
+    {
+      "name": "contest",
+      "type": "contestStats",
+      "byteOffset": 36,
+      "numBytes": 6
+    },
+    {
+      "name": "markings",
+      "type": "MarkingsSixShapesNoColor",
+      "byteOffset": 42,
+      "numBytes": 1
+    },
+    {
+      "name": "pokerusByte",
+      "type": "number",
+      "byteOffset": 43,
+      "numBytes": 1
+    },
+    {
+      "name": "superTrainingFlags",
+      "type": "number",
+      "numBytes": 4,
+      "endian": "Little",
+      "byteOffset": 44
+    },
+    {
+      "name": "ribbonBytes",
+      "type": "FlagSet",
+      "byteOffset": 48,
+      "numBytes": 6
+    },
+    {
+      "name": "contestMemoryCount",
+      "type": "number",
+      "byteOffset": 56,
+      "numBytes": 1
+    },
+    {
+      "name": "battleMemoryCount",
+      "type": "number",
+      "byteOffset": 57,
+      "numBytes": 1
+    },
+    {
+      "name": "superTrainingDistFlags",
+      "type": "number",
+      "byteOffset": 58,
+      "numBytes": 1
+    },
+    {
+      "name": "formArgument",
+      "type": "number",
+      "numBytes": 4,
+      "endian": "Little",
+      "byteOffset": 60
+    },
+    {
+      "name": "nickname",
+      "type": "string",
+      "numBytes": 24,
+      "byteOffset": 64,
+      "stringEncoding": "UTF-16"
+    },
+    {
+      "name": "moves",
+      "type": "tuple",
+      "tupleType": "number",
+      "tupleLength": 4,
+      "numBytes": 2,
+      "endian": "Little",
+      "byteOffset": 90
+    },
+    {
+      "name": "movePP",
+      "type": "tuple",
+      "tupleType": "number",
+      "tupleLength": 4,
+      "byteOffset": 98,
+      "numBytes": 1
+    },
+    {
+      "name": "movePPUps",
+      "type": "tuple",
+      "tupleType": "number",
+      "tupleLength": 4,
+      "byteOffset": 102,
+      "numBytes": 1
+    },
+    {
+      "name": "relearnMoves",
+      "type": "tuple",
+      "tupleType": "number",
+      "tupleLength": 4,
+      "numBytes": 2,
+      "endian": "Little",
+      "byteOffset": 106
+    },
+    {
+      "name": "secretSuperTrainingUnlocked",
+      "type": "boolean",
+      "byteOffset": 114,
+      "bitOffset": 1
+    },
+    {
+      "name": "secretSuperTrainingComplete",
+      "type": "boolean",
+      "byteOffset": 114,
+      "bitOffset": 2
+    },
+    {
+      "name": "ivs",
+      "type": "ivs30Bits",
+      "numBytes": 2,
+      "byteOffset": 116
+    },
+    {
+      "name": "isEgg",
+      "type": "boolean",
+      "byteOffset": 116,
+      "bitOffset": 30
+    },
+    {
+      "name": "isNicknamed",
+      "type": "boolean",
+      "byteOffset": 116,
+      "bitOffset": 31
+    },
+    {
+      "name": "handlerName",
+      "type": "string",
+      "numBytes": 24,
+      "byteOffset": 120,
+      "stringEncoding": "UTF-16"
+    },
+    {
+      "name": "handlerGender",
+      "type": "boolean",
+      "byteOffset": 146,
+      "bitOffset": 0
+    },
+    {
+      "name": "isCurrentHandler",
+      "type": "boolean",
+      "byteOffset": 147,
+      "bitOffset": 0
+    },
+    {
+      "name": "geolocations",
+      "type": "tuple",
+      "tupleType": "geolocation",
+      "tupleLength": 5,
+      "byteOffset": 148,
+      "numBytes": 1
+    },
+    {
+      "name": "handlerFriendship",
+      "type": "number",
+      "byteOffset": 162,
+      "numBytes": 1
+    },
+    {
+      "name": "handlerAffection",
+      "type": "number",
+      "byteOffset": 163,
+      "numBytes": 1
+    },
+    {
+      "name": "handlerMemory",
+      "type": "memory_3ds_handler",
+      "byteOffset": 164,
+      "numBytes": 6
+    },
+    {
+      "name": "trainerMemory",
+      "type": "memory_3ds_trainer",
+      "byteOffset": 204,
+      "numBytes": 5
+    },
+    {
+      "name": "fullness",
+      "type": "number",
+      "byteOffset": 174,
+      "numBytes": 1
+    },
+    {
+      "name": "enjoyment",
+      "type": "number",
+      "byteOffset": 175,
+      "numBytes": 1
+    },
+    {
+      "name": "trainerName",
+      "type": "string",
+      "numBytes": 24,
+      "byteOffset": 176,
+      "stringEncoding": "UTF-16"
+    },
+    {
+      "name": "trainerFriendship",
+      "type": "number",
+      "byteOffset": 202,
+      "numBytes": 1
+    },
+    {
+      "name": "trainerAffection",
+      "type": "number",
+      "byteOffset": 203,
+      "numBytes": 1
+    },
+    {
+      "name": "eggDate",
+      "type": "pokedate | undefined",
+      "byteOffset": 209,
+      "numBytes": 1
+    },
+    {
+      "name": "metDate",
+      "type": "pokedate",
+      "byteOffset": 212,
+      "numBytes": 1
+    },
+    {
+      "name": "eggLocationIndex",
+      "type": "number",
+      "numBytes": 2,
+      "endian": "Little",
+      "byteOffset": 216
+    },
+    {
+      "name": "metLocationIndex",
+      "type": "number",
+      "numBytes": 2,
+      "endian": "Little",
+      "byteOffset": 218
+    },
+    {
+      "name": "ball",
+      "type": "number",
+      "byteOffset": 220,
+      "numBytes": 1
+    },
+    {
+      "name": "metLevel",
+      "type": "number",
+      "byteOffset": 221,
+      "numBytes": 1
+    },
+    {
+      "name": "encounterType",
+      "type": "number",
+      "byteOffset": 222,
+      "numBytes": 1
+    },
+    {
+      "name": "gameOfOrigin",
+      "type": "number",
+      "byteOffset": 223,
+      "numBytes": 1
+    },
+    {
+      "name": "country",
+      "type": "number",
+      "byteOffset": 224,
+      "numBytes": 1
+    },
+    {
+      "name": "region",
+      "type": "number",
+      "byteOffset": 225,
+      "numBytes": 1
+    },
+    {
+      "name": "consoleRegion",
+      "type": "number",
+      "byteOffset": 226,
+      "numBytes": 1
+    },
+    {
+      "name": "languageIndex",
+      "type": "number",
+      "byteOffset": 227,
+      "numBytes": 1
+    },
+    {
+      "name": "statusCondition",
+      "type": "number",
+      "byteOffset": 232,
+      "lengthCheck": 260,
+      "numBytes": 1
+    },
+    {
+      "name": "currentHP",
+      "type": "number",
+      "byteOffset": 240,
+      "lengthCheck": 260,
+      "numBytes": 1
+    },
+    {
+      "name": "isFatefulEncounter",
+      "type": "boolean",
+      "byteOffset": 29,
+      "bitOffset": 0
+    },
+    {
+      "name": "ribbons",
+      "type": "ribbons",
+      "ribbonSpans": [
+        {
+          "ribbonSet": "modern",
+          "ribbonOffset": 0,
+          "byteOffset": 48,
+          "numBits": 46
+        }
+      ]
+    },
+    {
+      "name": "trainerGender",
+      "type": "boolean",
+      "byteOffset": 221,
+      "bitOffset": 7
+    }
+  ],
+  "stringEncoding": "UTF-16",
+  "endian": "Little",
+  "shinyThreshold": 16,
+  "maxValidMove": 621,
+  "maxRibbon": "Toughness Master",
+  "checksumStart": 8,
+  "checksumEnd": 232,
+  "maxBall": 25
+}

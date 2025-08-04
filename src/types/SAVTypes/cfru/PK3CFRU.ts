@@ -28,7 +28,7 @@ import {
   write30BitIVsToBytes,
   writeGen3StringToBytes,
   writeStatsToBytesU8,
-} from 'pokemon-files'
+} from '@pokemon-files/util'
 import { getHPGen3Onward, getStatGen3Onward } from '../../../util/StatCalc'
 import { PKMInterface, PluginPKMInterface } from '../../interfaces'
 
@@ -318,7 +318,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
       this.isEgg = other.isEgg ?? false
       this.hasHiddenAbility = other.abilityNum === 4
       this.isNicknamed = other.isNicknamed ?? false
-      this.currentHP = other.currentHP
+      this.currentHP = other.currentHP ?? 0 ?? 0
       this.nickname = other.nickname
       this.trainerName = other.trainerName
       this.trainerGender = other.trainerGender

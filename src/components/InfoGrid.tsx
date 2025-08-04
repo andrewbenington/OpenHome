@@ -1,6 +1,6 @@
+import { PKM } from '@pokemon-files/pkm'
 import { Card, Flex, Grid } from '@radix-ui/themes'
 import { isDayjs } from 'dayjs'
-import { PKM } from 'pokemon-files'
 import React, { ReactNode, useCallback, useMemo } from 'react'
 import { OHPKM } from 'src/types/pkm/OHPKM'
 import { getMonFileIdentifier } from 'src/util/Lookup'

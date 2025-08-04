@@ -1,5 +1,6 @@
+import { PKM } from '@pokemon-files/pkm'
+import { Stats, StatsPreSplit } from '@pokemon-files/util'
 import lodash from 'lodash'
-import { PKM, Stats, StatsPreSplit } from 'pokemon-files'
 import {
   AttackCharacteristics,
   DefenseCharacteristics,
@@ -537,20 +538,43 @@ export function shinyLeafValues(shinyLeafNumber: number) {
   }
 }
 
-export function getHeightCalculated(mon: PKMInterface) {
-  if (mon.height !== undefined && mon.heightDeviation) {
-    const deviation = (mon.height / 255) * 0.40000004 + (1 - mon.heightDeviation)
+export function getHeightCalculatedMaybe(mon: PKMInterface) {
+  if (mon.heightScalar !== undefined && mon.heightDeviation) {
+    const deviation = (mon.heightScalar / 255) * 0.40000004 + (1 - mon.heightDeviation)
 
     return PokemonData[mon.dexNum].formes[mon.formeNum].height * 100 * deviation
   }
   return undefined
 }
 
-export function getWeightCalculated(mon: PKMInterface) {
-  if (mon.weight !== undefined && mon.weightDeviation) {
-    const deviation = (mon.weight / 255) * 0.40000004 + (1 - mon.weightDeviation)
+export function getWeightCalculatedMaybe(mon: PKMInterface) {
+  if (mon.weightScalar !== undefined && mon.weightDeviation) {
+    const deviation = (mon.weightScalar / 255) * 0.40000004 + (1 - mon.weightDeviation)
 
     return PokemonData[mon.dexNum].formes[mon.formeNum].weight * 10 * deviation
   }
   return undefined
+}
+
+type PKMWithSize = {
+  heightScalar: number
+  weightScalar: number
+  heightDeviation: number
+  weightDeviation: number
+} & PKMInterface
+
+export function getHeightCalculated(mon: PKMWithSize) {
+  if (mon.dexNum === 0) return 0
+
+  const deviation = (mon.heightScalar / 255) * 0.40000004 + (1 - mon.heightDeviation)
+
+  return PokemonData[mon.dexNum].formes[mon.formeNum].height * 100 * deviation
+}
+
+export function getWeightCalculated(mon: PKMWithSize) {
+  if (mon.dexNum === 0) return 0
+
+  const deviation = (mon.weightScalar / 255) * 0.40000004 + (1 - mon.weightDeviation)
+
+  return PokemonData[mon.dexNum].formes[mon.formeNum].weight * 10 * deviation
 }

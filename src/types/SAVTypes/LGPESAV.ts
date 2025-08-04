@@ -1,5 +1,6 @@
+import { PB7 } from '@pokemon-files/pkm'
+import { utf16BytesToString } from '@pokemon-files/util'
 import { ceil, min } from 'lodash'
-import { PB7, utf16BytesToString } from 'pokemon-files'
 import { GameOfOrigin, GameOfOriginData } from 'pokemon-resources'
 import { NationalDex } from 'pokemon-species-data'
 import { LGE_STARTER, LGP_STARTER } from '../../consts/Formes'

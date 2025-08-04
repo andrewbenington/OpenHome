@@ -1,4 +1,4 @@
-import { AllPKMFields, Stats } from 'pokemon-files'
+import { AllPKMFields, Stats } from '@pokemon-files/util'
 
 export interface OfficialPKMInterface extends PKMInterface {
   pluginIdentifier?: undefined

@@ -1,4 +1,4 @@
-import { PK6 } from 'pokemon-files'
+import { PK6 } from '@pokemon-files/pkm'
 import { GameOfOrigin, GameOfOriginData } from 'pokemon-resources'
 import { bytesToUint16LittleEndian, uint16ToBytesLittleEndian } from 'src/util/byteLogic'
 import { CRC16_CCITT } from 'src/util/Encryption'

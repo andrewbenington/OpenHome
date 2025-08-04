@@ -1,6 +1,6 @@
+import { PK4 } from '@pokemon-files/pkm'
 import { readFileSync } from 'fs'
 import { resolve } from 'path'
-import { PK4 } from 'pokemon-files'
 import { Ball, GameOfOrigin } from 'pokemon-resources'
 import { OHPKM } from '../../pkm/OHPKM'
 import { LASAV } from '../Gen89/LASAV'

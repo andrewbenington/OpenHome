@@ -1,0 +1,231 @@
+{
+  "totalBytes": 196,
+  "fileName": "XDPKM",
+  "fields": [
+    {
+      "name": "dexNum",
+      "type": "number",
+      "numBytes": 2,
+      "endian": "Big",
+      "byteOffset": 0
+    },
+    {
+      "name": "heldItemIndex",
+      "type": "number",
+      "numBytes": 2,
+      "endian": "Big",
+      "byteOffset": 2
+    },
+    {
+      "name": "currentHP",
+      "type": "number",
+      "numBytes": 2,
+      "endian": "Big",
+      "byteOffset": 4
+    },
+    {
+      "name": "trainerFriendship",
+      "type": "number",
+      "numBytes": 2,
+      "endian": "Big",
+      "byteOffset": 6
+    },
+    {
+      "name": "metLocationIndex",
+      "type": "number",
+      "numBytes": 2,
+      "endian": "Big",
+      "byteOffset": 8
+    },
+    {
+      "name": "metLevel",
+      "type": "number",
+      "byteOffset": 14,
+      "numBytes": 1
+    },
+    {
+      "name": "ball",
+      "type": "number",
+      "byteOffset": 15,
+      "numBytes": 1
+    },
+    {
+      "name": "trainerGender",
+      "type": "boolean",
+      "byteOffset": 16,
+      "bitOffset": 1
+    },
+    {
+      "name": "statLevel",
+      "type": "number",
+      "byteOffset": 17,
+      "numBytes": 1
+    },
+    {
+      "name": "pokerusByte",
+      "type": "number",
+      "byteOffset": 19,
+      "numBytes": 1
+    },
+    {
+      "name": "markings",
+      "type": "MarkingsFourShapes",
+      "byteOffset": 20,
+      "numBytes": 1
+    },
+    {
+      "name": "isEgg",
+      "type": "boolean",
+      "byteOffset": 29,
+      "bitOffset": 7
+    },
+    {
+      "name": "exp",
+      "type": "number",
+      "numBytes": 4,
+      "endian": "Big",
+      "byteOffset": 32
+    },
+    {
+      "name": "secretID",
+      "type": "number",
+      "numBytes": 2,
+      "endian": "Big",
+      "byteOffset": 36
+    },
+    {
+      "name": "trainerID",
+      "type": "number",
+      "numBytes": 2,
+      "endian": "Big",
+      "byteOffset": 38
+    },
+    {
+      "name": "personalityValue",
+      "type": "number",
+      "numBytes": 4,
+      "endian": "Big",
+      "byteOffset": 40
+    },
+    {
+      "name": "isFatefulEncounter",
+      "type": "boolean",
+      "byteOffset": 51,
+      "bitOffset": 0
+    },
+    {
+      "name": "gameOfOrigin",
+      "type": "number",
+      "byteOffset": 52,
+      "numBytes": 1
+    },
+    {
+      "name": "languageIndex",
+      "type": "number",
+      "byteOffset": 55,
+      "numBytes": 1
+    },
+    {
+      "name": "trainerName",
+      "type": "string",
+      "numBytes": 22,
+      "byteOffset": 56,
+      "stringEncoding": "UTF-16"
+    },
+    {
+      "name": "nickname",
+      "type": "string",
+      "numBytes": 22,
+      "byteOffset": 78,
+      "stringEncoding": "UTF-16"
+    },
+    {
+      "name": "moves",
+      "type": "tuple",
+      "tupleType": "number",
+      "tupleLength": 4,
+      "numBytes": 2,
+      "endian": "Big",
+      "byteOffset": 128
+    },
+    {
+      "name": "movePP",
+      "type": "tuple",
+      "tupleType": "number",
+      "tupleLength": 4,
+      "byteOffset": 130,
+      "numBytes": 1
+    },
+    {
+      "name": "movePPUps",
+      "type": "tuple",
+      "tupleType": "number",
+      "tupleLength": 4,
+      "byteOffset": 131,
+      "numBytes": 1
+    },
+    {
+      "name": "evs",
+      "type": "stats",
+      "byteOffset": 157,
+      "numBytes": 6
+    },
+    {
+      "name": "ivs",
+      "type": "stats",
+      "byteOffset": 169,
+      "numBytes": 6
+    },
+    {
+      "name": "contest",
+      "type": "contestStats",
+      "byteOffset": 174,
+      "numBytes": 6
+    },
+    {
+      "name": "shadowID",
+      "type": "number",
+      "numBytes": 2,
+      "endian": "Big",
+      "byteOffset": 186
+    },
+    {
+      "name": "ribbons",
+      "type": "ribbons",
+      "ribbonSpans": [
+        {
+          "ribbonSet": "gen-3-contest",
+          "ribbonOffset": 0,
+          "byteOffset": 179,
+          "numBits": 40,
+          "contestCounts": true
+        },
+        {
+          "ribbonSet": "gen-3-standard",
+          "ribbonOffset": 0,
+          "byteOffset": 124,
+          "bitOffset": 15,
+          "numBits": 12
+        }
+      ]
+    },
+    {
+      "name": "partyStats",
+      "type": "stats"
+    },
+    {
+      "name": "isShadow",
+      "type": "boolean"
+    }
+  ],
+  "stringEncoding": "UTF-16",
+  "endian": "Big",
+  "natureFromPV": true,
+  "genderFromPV": true,
+  "unownFromPV": true,
+  "shinyThreshold": 8,
+  "maxValidMove": 354,
+  "pvAbilityBit": 0,
+  "isGen3": true,
+  "maxBall": 12
+}

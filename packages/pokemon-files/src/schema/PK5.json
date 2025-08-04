@@ -1,0 +1,303 @@
+{
+  "totalBytes": 136,
+  "totalBytesExtraFields": 236,
+  "fileName": "PK5",
+  "fields": [
+    {
+      "name": "personalityValue",
+      "type": "number",
+      "numBytes": 4,
+      "endian": "Little",
+      "byteOffset": 0
+    },
+    {
+      "name": "dexNum",
+      "type": "number",
+      "numBytes": 2,
+      "endian": "Little",
+      "byteOffset": 8
+    },
+    {
+      "name": "heldItemIndex",
+      "type": "number",
+      "numBytes": 2,
+      "endian": "Little",
+      "byteOffset": 10
+    },
+    {
+      "name": "trainerID",
+      "type": "number",
+      "numBytes": 2,
+      "endian": "Little",
+      "byteOffset": 12
+    },
+    {
+      "name": "secretID",
+      "type": "number",
+      "numBytes": 2,
+      "endian": "Little",
+      "byteOffset": 14
+    },
+    {
+      "name": "exp",
+      "type": "number",
+      "numBytes": 4,
+      "endian": "Little",
+      "byteOffset": 16
+    },
+    {
+      "name": "trainerFriendship",
+      "type": "number",
+      "byteOffset": 20,
+      "numBytes": 1
+    },
+    {
+      "name": "abilityIndex",
+      "type": "number",
+      "byteOffset": 21,
+      "numBytes": 1
+    },
+    {
+      "name": "markings",
+      "type": "MarkingsSixShapesNoColor",
+      "byteOffset": 22,
+      "numBytes": 1
+    },
+    {
+      "name": "languageIndex",
+      "type": "number",
+      "byteOffset": 23,
+      "numBytes": 1
+    },
+    {
+      "name": "evs",
+      "type": "stats",
+      "byteOffset": 24,
+      "numBytes": 6
+    },
+    {
+      "name": "contest",
+      "type": "contestStats",
+      "byteOffset": 30,
+      "numBytes": 6
+    },
+    {
+      "name": "moves",
+      "type": "tuple",
+      "tupleType": "number",
+      "tupleLength": 4,
+      "numBytes": 2,
+      "endian": "Little",
+      "byteOffset": 40
+    },
+    {
+      "name": "movePP",
+      "type": "tuple",
+      "tupleType": "number",
+      "tupleLength": 4,
+      "byteOffset": 48,
+      "numBytes": 1
+    },
+    {
+      "name": "movePPUps",
+      "type": "tuple",
+      "tupleType": "number",
+      "tupleLength": 4,
+      "byteOffset": 52,
+      "numBytes": 1
+    },
+    {
+      "name": "ivs",
+      "type": "ivs30Bits",
+      "numBytes": 2,
+      "byteOffset": 56
+    },
+    {
+      "name": "isEgg",
+      "type": "boolean",
+      "byteOffset": 56,
+      "bitOffset": 30
+    },
+    {
+      "name": "isNicknamed",
+      "type": "boolean",
+      "byteOffset": 56,
+      "bitOffset": 31
+    },
+    {
+      "name": "gender",
+      "type": "number",
+      "byteOffset": 64,
+      "numBytes": 1,
+      "numBits": 2,
+      "bitOffset": 1
+    },
+    {
+      "name": "formeNum",
+      "type": "number",
+      "byteOffset": 64,
+      "numBytes": 1,
+      "bitOffset": 3,
+      "numBits": 5
+    },
+    {
+      "name": "nature",
+      "type": "number",
+      "byteOffset": 65,
+      "numBytes": 1
+    },
+    {
+      "name": "isNsPokemon",
+      "type": "boolean",
+      "byteOffset": 66,
+      "bitOffset": 1
+    },
+    {
+      "name": "ribbonBytes",
+      "type": "FlagSet",
+      "byteOffset": 76,
+      "numBytes": 4
+    },
+    {
+      "name": "gameOfOrigin",
+      "type": "number",
+      "byteOffset": 95,
+      "numBytes": 1
+    },
+    {
+      "name": "eggDate",
+      "type": "pokedate | undefined",
+      "byteOffset": 120,
+      "numBytes": 1
+    },
+    {
+      "name": "metDate",
+      "type": "pokedate",
+      "byteOffset": 123,
+      "numBytes": 1
+    },
+    {
+      "name": "eggLocationIndex",
+      "type": "number",
+      "numBytes": 2,
+      "endian": "Little",
+      "byteOffset": 126
+    },
+    {
+      "name": "metLocationIndex",
+      "type": "number",
+      "numBytes": 2,
+      "endian": "Little",
+      "byteOffset": 128
+    },
+    {
+      "name": "pokerusByte",
+      "type": "number",
+      "byteOffset": 130,
+      "numBytes": 1
+    },
+    {
+      "name": "ball",
+      "type": "number",
+      "byteOffset": 131,
+      "numBytes": 1
+    },
+    {
+      "name": "metLevel",
+      "type": "number",
+      "byteOffset": 132,
+      "numBytes": 1
+    },
+    {
+      "name": "encounterType",
+      "type": "number",
+      "byteOffset": 133,
+      "numBytes": 1
+    },
+    {
+      "name": "pokeStarFame",
+      "type": "number",
+      "byteOffset": 135,
+      "numBytes": 1
+    },
+    {
+      "name": "statusCondition",
+      "type": "number",
+      "byteOffset": 136,
+      "lengthCheck": 236,
+      "numBytes": 1
+    },
+    {
+      "name": "currentHP",
+      "type": "number",
+      "byteOffset": 142,
+      "lengthCheck": 236,
+      "numBytes": 1
+    },
+    {
+      "name": "ribbons",
+      "type": "ribbons",
+      "ribbonSpans": [
+        {
+          "ribbonSet": "gen-4",
+          "ribbonOffset": 0,
+          "byteOffset": 36,
+          "numBits": 28
+        },
+        {
+          "ribbonSet": "gen-4",
+          "ribbonOffset": 28,
+          "byteOffset": 60,
+          "numBits": 32
+        },
+        {
+          "ribbonSet": "gen-4",
+          "ribbonOffset": 60,
+          "byteOffset": 96,
+          "numBits": 20
+        }
+      ]
+    },
+    {
+      "name": "isFatefulEncounter",
+      "type": "boolean",
+      "byteOffset": 64,
+      "bitOffset": 0
+    },
+    {
+      "name": "nickname",
+      "type": "string",
+      "numBytes": 24,
+      "byteOffset": 72,
+      "stringEncoding": "UTF-16"
+    },
+    {
+      "name": "trainerName",
+      "type": "string",
+      "numBytes": 16,
+      "byteOffset": 104,
+      "stringEncoding": "UTF-16"
+    },
+    {
+      "name": "trainerGender",
+      "type": "boolean",
+      "byteOffset": 132,
+      "bitOffset": 7
+    },
+    {
+      "name": "checksum",
+      "type": "number",
+      "byteOffset": 6,
+      "numBytes": 2,
+      "endian": "Little"
+    }
+  ],
+  "stringEncoding": "Gen5",
+  "endian": "Little",
+  "shinyThreshold": 8,
+  "maxValidMove": 559,
+  "pvAbilityBit": 16,
+  "checksumStart": 8,
+  "checksumEnd": 135,
+  "maxBall": 25
+}

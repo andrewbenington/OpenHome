@@ -1,4 +1,4 @@
-import { PK3 } from 'pokemon-files'
+import { PK3 } from '@pokemon-files/pkm'
 import { GameOfOrigin, GameOfOriginData } from 'pokemon-resources'
 import { NationalDex } from 'pokemon-species-data'
 import { GEN3_TRANSFER_RESTRICTIONS } from 'src/consts/TransferRestrictions'

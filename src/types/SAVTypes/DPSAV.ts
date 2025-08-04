@@ -1,4 +1,4 @@
-import { PK4 } from 'pokemon-files'
+import { PK4 } from '@pokemon-files/pkm'
 import { GameOfOrigin } from 'pokemon-resources'
 import { DP_TRANSFER_RESTRICTIONS } from 'src/consts/TransferRestrictions'
 import { bytesToUint16LittleEndian, bytesToUint32LittleEndian } from 'src/util/byteLogic'

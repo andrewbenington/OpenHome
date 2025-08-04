@@ -1,5 +1,5 @@
+import { PKMDate } from '@pokemon-files/util'
 import dayjs from 'dayjs'
-import { PKMDate } from 'pokemon-files'
 
 export type AttributeRowValue = string | number | PKMDate | undefined
 

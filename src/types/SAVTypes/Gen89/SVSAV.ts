@@ -1,4 +1,5 @@
-import { PK9, utf16BytesToString } from 'pokemon-files'
+import { PK9 } from '@pokemon-files/pkm'
+import { utf16BytesToString } from '@pokemon-files/util'
 import { GameOfOrigin, GameOfOriginData, Languages } from 'pokemon-resources'
 import {
   SV_TRANSFER_RESTRICTIONS_BASE,
