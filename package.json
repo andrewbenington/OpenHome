@@ -85,8 +85,8 @@
     "jest": "^30.0.4",
     "prettier": "^3.6.2",
     "react-dom": "^19.1.0",
-    "ts-jest": "^29.4.0",
-    "typescript": "^5.8.3",
+    "ts-jest": "^29.4.1",
+    "typescript": "^5.9.2",
     "vite": "^7.0.5"
   }
 }
