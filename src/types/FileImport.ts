@@ -13,7 +13,7 @@ import {
   PK8,
   PK9,
   XDPKM,
-} from 'pokemon-files'
+} from '@pokemon-files/pkm'
 import { PKMInterface } from './interfaces'
 import { OHPKM } from './pkm/OHPKM'
 import { PK3RR } from './SAVTypes/radicalred/PK3RR'

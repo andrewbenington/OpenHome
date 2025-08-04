@@ -1,6 +1,6 @@
+import { PA8, PK1, PK2, PK3, PK4, PK5 } from '@pokemon-files/pkm'
 import { readFileSync } from 'fs'
 import path, { resolve } from 'path'
-import { PA8, PK1, PK2, PK3, PK4, PK5 } from 'pokemon-files'
 import { getMonGen12Identifier, getMonGen345Identifier } from '../../../util/Lookup'
 import { bytesToPKM } from '../../FileImport'
 import { OHPKM } from '../OHPKM'

@@ -1,4 +1,4 @@
-import { utf16BytesToString } from 'pokemon-files'
+import { utf16BytesToString } from '@pokemon-files/util'
 import { SCArrayBlock } from './SwishCrypto/SCBlock'
 
 const BOX_COUNT = 32

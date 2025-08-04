@@ -1,4 +1,5 @@
-import { PK3, StatsPreSplit } from 'pokemon-files'
+import { PK3 } from '@pokemon-files/pkm'
+import { StatsPreSplit } from '@pokemon-files/util'
 import { isGameBoy } from 'pokemon-resources'
 import { PokemonData } from 'pokemon-species-data'
 import { PKMInterface } from '../types/interfaces'

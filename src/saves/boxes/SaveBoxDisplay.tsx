@@ -4,6 +4,7 @@ import { GameOfOriginData } from 'pokemon-resources'
 import { PokemonData } from 'pokemon-species-data'
 import { useContext, useMemo, useState } from 'react'
 import { MdClose } from 'react-icons/md'
+import { BackendContext } from 'src/backend/backendContext'
 import { MenuIcon } from 'src/components/Icons'
 import AttributeRow from 'src/pokemon/AttributeRow'
 import PokemonDetailsModal from 'src/pokemon/PokemonDetailsModal'
@@ -31,6 +32,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   const { saveIndex } = props
   const [selectedIndex, setSelectedIndex] = useState<number>()
   const [dragMonState] = useContext(DragMonContext)
+  const backend = useContext(BackendContext)
 
   const save = useMemo(() => openSaves[saveIndex], [openSaves, saveIndex])
   const currentBox = useMemo(
@@ -264,7 +266,15 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
               </AttributeRow>
             )}
             <AttributeRow label="File">
-              <div style={{ overflowWrap: 'break-word', width: '100%' }}>{save.filePath.raw}</div>
+              <div style={{ overflowWrap: 'break-word', width: '100%' }}>
+                {save.filePath.raw}
+                <button
+                  style={{ padding: 0, marginLeft: 8 }}
+                  onClick={() => backend.openDirectory(save.filePath.dir)}
+                >
+                  Open
+                </button>
+              </div>
             </AttributeRow>
             {save.fileCreated && (
               <AttributeRow label="File">

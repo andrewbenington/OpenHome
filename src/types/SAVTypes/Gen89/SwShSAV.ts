@@ -1,4 +1,5 @@
-import { PK8, utf16BytesToString } from 'pokemon-files'
+import { PK8 } from '@pokemon-files/pkm'
+import { utf16BytesToString } from '@pokemon-files/util'
 import { GameOfOrigin, GameOfOriginData, Languages } from 'pokemon-resources'
 import { NationalDex, PokemonData } from 'pokemon-species-data'
 import {

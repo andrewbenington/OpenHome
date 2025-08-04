@@ -1,4 +1,4 @@
-import { LevelUpExp } from 'pokemon-files'
+import { LevelUpExp } from '@pokemon-files/util'
 import { getNatureSummary } from 'pokemon-resources'
 import { NationalDex, NationalDexMax, PokemonData } from 'pokemon-species-data'
 import { PKMInterface } from '../types/interfaces'

@@ -1,4 +1,5 @@
-import { PB8, utf16BytesToString } from 'pokemon-files'
+import { PB8 } from '@pokemon-files/pkm'
+import { utf16BytesToString } from '@pokemon-files/util'
 import { GameOfOrigin, GameOfOriginData } from 'pokemon-resources'
 import { BDSP_TRANSFER_RESTRICTIONS } from '../../../consts/TransferRestrictions'
 import { md5Digest } from '../../../util/Encryption'

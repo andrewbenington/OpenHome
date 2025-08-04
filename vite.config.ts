@@ -1,6 +1,6 @@
-import { defineConfig } from 'vite'
-import { fileURLToPath, URL } from 'url'
 import react from '@vitejs/plugin-react'
+import { fileURLToPath, URL } from 'url'
+import { defineConfig } from 'vite'
 
 const host = process.env.TAURI_DEV_HOST
 
@@ -13,6 +13,7 @@ export default defineConfig(async () => ({
   resolve: {
     alias: {
       src: fileURLToPath(new URL('./src', import.meta.url)),
+      '@pokemon-files': fileURLToPath(new URL('./packages/pokemon-files/src', import.meta.url)),
     },
   },
   // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`

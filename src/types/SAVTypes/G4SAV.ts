@@ -1,4 +1,4 @@
-import { PK4 } from 'pokemon-files'
+import { PK4 } from '@pokemon-files/pkm'
 import { GameOfOrigin, GameOfOriginData } from 'pokemon-resources'
 import {
   bytesToUint16LittleEndian,

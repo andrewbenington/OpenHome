@@ -1,5 +1,5 @@
+import { PK1 } from '@pokemon-files/pkm'
 import lodash from 'lodash'
-import { PK1 } from 'pokemon-files'
 import { GameOfOrigin, GameOfOriginData, Languages } from 'pokemon-resources'
 import { NationalDex } from 'pokemon-species-data'
 import { GEN1_TRANSFER_RESTRICTIONS } from 'src/consts/TransferRestrictions'

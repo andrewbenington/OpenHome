@@ -1,0 +1,141 @@
+{
+  "totalBytes": 33,
+  "totalBytesExtraFields": 66,
+  "fileName": "PK1",
+  "fields": [
+    { "name": "gameOfOrigin", "type": "number", "noWrite": true },
+    { "name": "personalityValue", "type": "number", "noWrite": true },
+    {
+      "name": "languageIndex",
+      "type": "number",
+      "noWrite": true
+    },
+    {
+      "name": "dexNum",
+      "type": "number",
+      "byteOffset": 0,
+      "numBytes": 1,
+      "conversion": {
+        "type": "map",
+        "name": "Gen1PokemonIndex",
+        "outputType": "number"
+      }
+    },
+    {
+      "name": "currentHP",
+      "type": "number",
+      "byteOffset": 1,
+      "numBytes": 2
+    },
+    {
+      "name": "level",
+      "type": "number",
+      "byteOffset": 3,
+      "numBytes": 1
+    },
+    {
+      "name": "statusCondition",
+      "type": "number",
+      "byteOffset": 4,
+      "numBytes": 1
+    },
+    {
+      "name": "type1",
+      "type": "number",
+      "byteOffset": 5,
+      "numBytes": 1
+    },
+    {
+      "name": "type2",
+      "type": "number",
+      "byteOffset": 6,
+      "numBytes": 1
+    },
+    {
+      "name": "heldItemIndex",
+      "type": "number",
+      "byteOffset": 7,
+      "numBytes": 1
+    },
+    {
+      "name": "moves",
+      "type": "tuple",
+      "tupleType": "number",
+      "tupleLength": 4,
+      "byteOffset": 8,
+      "numBytes": 1
+    },
+    {
+      "name": "trainerID",
+      "type": "number",
+      "numBytes": 2,
+      "endian": "Big",
+      "byteOffset": 12
+    },
+    {
+      "name": "exp",
+      "type": "number",
+      "numBytes": 3,
+      "endian": "Big",
+      "byteOffset": 14
+    },
+    {
+      "name": "evsG12",
+      "type": "statsPreSplit",
+      "byteOffset": 17,
+      "numBytes": 2
+    },
+    {
+      "name": "dvs",
+      "type": "dvs",
+      "byteOffset": 27,
+      "numBytes": 1
+    },
+    {
+      "name": "movePP",
+      "type": "tuple",
+      "tupleType": "number",
+      "tupleLength": 4,
+      "byteOffset": 29,
+      "numBytes": 1,
+      "bitOffset": 0,
+      "numBits": 6,
+      "seperateBytes": true
+    },
+    {
+      "name": "movePPUps",
+      "type": "tuple",
+      "tupleType": "number",
+      "tupleLength": 4,
+      "byteOffset": 29,
+      "numBytes": 1,
+      "bitOffset": 6,
+      "numBits": 2,
+      "seperateBytes": true
+    },
+    {
+      "name": "trainerName",
+      "type": "string",
+      "byteOffset": 44,
+      "numBytes": 8,
+      "lengthCheck": 66,
+      "terminateString": true
+    },
+    {
+      "name": "nickname",
+      "type": "string",
+      "byteOffset": 55,
+      "numBytes": 11,
+      "lengthCheck": 66,
+      "terminateString": true
+    }
+  ],
+  "stringEncoding": "GameBoy",
+  "endian": "Big",
+  "noFormes": true,
+  "detectPrefix": true,
+  "genderFromDVs": true,
+  "shinyFromDVs": true,
+  "maxValidMove": 165,
+  "trainerIDTracker": true
+}

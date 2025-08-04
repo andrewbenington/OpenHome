@@ -1,4 +1,3 @@
-import * as lodash from 'lodash'
 import {
   ContestStats,
   Geolocation,
@@ -14,7 +13,8 @@ import {
   markingsSixShapesWithColorFromBytes,
   markingsSixShapesWithColorFromOther,
   markingsSixShapesWithColorToBytes,
-} from 'pokemon-files'
+} from '@pokemon-files/util'
+import * as lodash from 'lodash'
 import {
   AbilityFromString,
   AbilityToString,
@@ -96,15 +96,6 @@ export class OHPKM implements PKMInterface {
       // If OHPKM format has expanded, we want to increase the size of older files to
       // make room for new fields
       this.bytes = extendUint8Array(arg, FILE_SIZE)
-
-      if (this.heightAbsolute === 0) {
-        this.height = 127
-        this.heightAbsolute = getHeightCalculated(this) ?? 0
-      }
-      if (this.weightAbsolute === 0) {
-        this.weight = 127
-        this.weightAbsolute = getWeightCalculated(this) ?? 0
-      }
     } else {
       const other = arg
       let prng: Prando
@@ -322,6 +313,10 @@ export class OHPKM implements PKMInterface {
       this.homeTracker = other.homeTracker ?? new Uint8Array(8)
       this.statNature = this.nature
 
+      if (other.obedienceLevel !== undefined) {
+        this.obedienceLevel = other.obedienceLevel
+      }
+
       this.dynamaxLevel = other.dynamaxLevel ?? 0
       this.sociability = other.sociability ?? 0
 
@@ -363,19 +358,12 @@ export class OHPKM implements PKMInterface {
         this.unknownF3 = other.unknownF3
       }
 
-      this.height = other.height ?? 0
-      this.weight = other.weight ?? 0
-
-      if (other.heightAbsoluteBytes && other.weightAbsoluteBytes) {
-        this.heightAbsoluteBytes = other.heightAbsoluteBytes
-        this.weightAbsoluteBytes = other.weightAbsoluteBytes
+      if (other.heightScalar !== undefined && other.weightScalar !== undefined) {
+        this.heightScalar = other.heightScalar
+        this.weightScalar = other.weightScalar
       }
 
-      if (this.heightAbsolute === 0) {
-        this.heightAbsolute = getHeightCalculated(other) ?? 0
-      }
-
-      this.scale = other.scale ?? 0
+      this.scale = other.scale ?? other.heightScalar ?? 0
 
       this.teraTypeOriginal =
         other.teraTypeOriginal ?? generateTeraType(prng, this.dexNum, this.formeNum)
@@ -727,19 +715,19 @@ export class OHPKM implements PKMInterface {
     this.bytes.set(uint32ToBytesLittleEndian(value), 0x4c)
   }
 
-  public get height() {
+  public get heightScalar() {
     return this.bytes[0x50]
   }
 
-  public set height(value: number) {
+  public set heightScalar(value: number) {
     this.bytes[0x50] = value
   }
 
-  public get weight() {
+  public get weightScalar() {
     return this.bytes[0x51]
   }
 
-  public set weight(value: number) {
+  public set weightScalar(value: number) {
     this.bytes[0x51] = value
   }
 
@@ -951,36 +939,12 @@ export class OHPKM implements PKMInterface {
     this.bytes.set(uint16ToBytesBigEndian(dvBytes), 0xaa)
   }
 
-  public get heightAbsoluteBytes() {
-    return this.bytes.slice(0xac, 0xb0)
+  public get heightAbsolute(): number {
+    return getHeightCalculated(this)
   }
 
-  public set heightAbsoluteBytes(value: Uint8Array) {
-    this.bytes.set(value, 0xac)
-  }
-
-  public get heightAbsolute() {
-    return new DataView(this.bytes.buffer).getFloat32(0xac, true)
-  }
-
-  public set heightAbsolute(value: number) {
-    new DataView(this.bytes.buffer).setFloat32(0xac, value, true)
-  }
-
-  public get weightAbsoluteBytes() {
-    return this.bytes.slice(0xb0, 0xb4)
-  }
-
-  public set weightAbsoluteBytes(value: Uint8Array) {
-    this.bytes.set(value, 0xb0)
-  }
-
-  public get weightAbsolute() {
-    return new DataView(this.bytes.buffer).getFloat32(0xb0, true)
-  }
-
-  public set weightAbsolute(value: number) {
-    new DataView(this.bytes.buffer).setFloat32(0xb0, value, true)
+  public get weightAbsolute(): number {
+    return getWeightCalculated(this)
   }
 
   public get handlerName() {

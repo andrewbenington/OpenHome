@@ -1,8 +1,8 @@
+import { COLOPKM, PK3, XDPKM } from '@pokemon-files/pkm'
 import lodash from 'lodash'
-import { COLOPKM, PK3, XDPKM } from 'pokemon-files'
+import { getPublicImageURL } from '../images/images'
 import { PKMInterface } from '../types/interfaces'
 import { Styles } from '../types/types'
-import { getPublicImageURL } from '../images/images'
 
 const styles = {
   container: {

@@ -23,6 +23,9 @@
       ],
       "util/*": [
         "./util/*"
+      ],
+      "@pokemon-files/*": [
+        "./packages/pokemon-files/src/*"
       ]
     },
     /* Bundler mode */
@@ -40,6 +43,7 @@
   },
   "include": [
     "src",
+    "packages",
     "generate/_rename.js",
     "generate/generateMoveMap.ts"
   ]

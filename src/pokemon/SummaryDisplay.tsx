@@ -1,5 +1,5 @@
+import { getDisplayID } from '@pokemon-files/util'
 import { Badge, Flex, Grid, Spinner } from '@radix-ui/themes'
-import { getDisplayID } from 'pokemon-files'
 import { AbilityToString } from 'pokemon-resources'
 import { PokemonData } from 'pokemon-species-data'
 import { useMemo, useState } from 'react'

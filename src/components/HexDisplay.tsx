@@ -1,6 +1,6 @@
+import { FileSchemas } from '@pokemon-files/schema'
 import { Flex, Grid } from '@radix-ui/themes'
 import { range } from 'lodash'
-import { FileSchemas } from 'pokemon-files'
 import { useMemo, useState } from 'react'
 import { OHPKM } from 'src/types/pkm/OHPKM'
 import './components.css'

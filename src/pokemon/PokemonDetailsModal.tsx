@@ -1,5 +1,5 @@
+import { FileSchemas } from '@pokemon-files/schema'
 import { Dialog, Flex, VisuallyHidden } from '@radix-ui/themes'
-import { FileSchemas } from 'pokemon-files'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary'
 import { MdDownload } from 'react-icons/md'

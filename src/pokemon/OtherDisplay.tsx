@@ -1,5 +1,5 @@
+import { AllPKMFields, getDisplayID, StatsPreSplit } from '@pokemon-files/util'
 import { Flex } from '@radix-ui/themes'
-import { AllPKMFields, getDisplayID, StatsPreSplit } from 'pokemon-files'
 import {
   BDSPTMMoveIndexes,
   isGen4,
@@ -35,11 +35,11 @@ import { isRestricted } from '../types/TransferRestrictions'
 import { PKMInterface } from '../types/interfaces'
 import { OHPKM } from '../types/pkm/OHPKM'
 import {
-  getHeightCalculated,
+  getHeightCalculatedMaybe,
   getHiddenPowerGen2,
   getHiddenPowerPower,
   getHiddenPowerType,
-  getWeightCalculated,
+  getWeightCalculatedMaybe,
   shinyLeafValues,
 } from '../types/pkm/util'
 import { getFlagsInRange } from '../util/byteLogic'
@@ -53,8 +53,8 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
   const { mon } = props
   const isDev = useIsDev()
 
-  const heightCalculated = getHeightCalculated(mon) ?? 0
-  const weightCalculated = getWeightCalculated(mon) ?? 0
+  const heightCalculated = getHeightCalculatedMaybe(mon) ?? 0
+  const weightCalculated = getWeightCalculatedMaybe(mon) ?? 0
 
   return (
     <div style={{ overflow: 'hidden', height: '100%' }}>
@@ -311,12 +311,13 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
           mon.obedienceLevel !== undefined && (
             <AttributeRow label="Obedience" value={mon.obedienceLevel.toString()} />
           )}
-        {mon.height !== undefined && mon.weight !== undefined && (
+        {mon.heightScalar !== undefined && mon.weightScalar !== undefined && (
           <>
-            <AttributeRow label="Height (Relative)" value={`${mon.height} / 255`} />
-            <AttributeRow label="Weight (Relative)" value={`${mon.weight} / 255`} />
+            <AttributeRow label="Height (Relative)" value={`${mon.heightScalar} / 255`} />
+            <AttributeRow label="Weight (Relative)" value={`${mon.weightScalar} / 255`} />
           </>
         )}
+        {mon.scale !== undefined && <AttributeRow label="Scale" value={mon.scale} />}
         {mon.heightAbsolute !== undefined && mon.weightAbsolute !== undefined && (
           <>
             <AttributeRow

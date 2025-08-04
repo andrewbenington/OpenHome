@@ -21,6 +21,10 @@
     "name": "Andrew Benington",
     "email": "andrewbenington57@gmail.com"
   },
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
   "main": "./out/main/index.js",
   "scripts": {
     "format": "prettier --write .",
