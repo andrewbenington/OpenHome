@@ -140,7 +140,7 @@ export class COLOPKM {
       )
       this.movePPUps = other.movePPUps.filter((_, i) => other.moves[i] <= COLOPKM.maxValidMove())
       this.heldItemIndex = ItemGen3FromString(other.heldItemName)
-      this.currentHP = other.currentHP
+      this.currentHP = other.currentHP ?? 0
       this.evs = other.evs ?? {
         hp: 0,
         atk: 0,

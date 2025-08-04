@@ -199,7 +199,7 @@ export class PK3 {
       this.ribbonBytes = other.ribbonBytes ?? new Uint8Array(4)
       this.isFatefulEncounter = other.isFatefulEncounter ?? false
       this.statusCondition = other.statusCondition ?? 0
-      this.currentHP = other.currentHP
+      this.currentHP = other.currentHP ?? 0
       this.nickname = other.nickname
       this.trainerName = other.trainerName
       this.ribbons =

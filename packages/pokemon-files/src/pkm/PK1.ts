@@ -20,7 +20,6 @@ export class PK1 {
     return 33
   }
   gameOfOrigin: number
-  personalityValue: number
   languageIndex: number
   dexNum: number
   currentHP: number
@@ -43,7 +42,6 @@ export class PK1 {
       const buffer = new Uint8Array(arg)[2] === 0xff ? arg.slice(3) : arg
       const dataView = new DataView(buffer)
       this.gameOfOrigin = 0
-      this.personalityValue = 0
       this.languageIndex = 0
       this.dexNum = conversion.fromGen1PokemonIndex(dataView.getUint8(0x0))
       this.currentHP = dataView.getUint16(0x1, false)
@@ -51,7 +49,7 @@ export class PK1 {
       this.statusCondition = dataView.getUint8(0x4)
       this.type1 = dataView.getUint8(0x5)
       this.type2 = dataView.getUint8(0x6)
-      this.heldItemIndex = dataView.getUint8(0x7)
+      this.heldItemIndex = 0
       this.moves = [
         dataView.getUint8(0x8),
         dataView.getUint8(0x9),
@@ -94,10 +92,9 @@ export class PK1 {
     } else {
       const other = arg
       this.gameOfOrigin = other.gameOfOrigin
-      this.personalityValue = other.personalityValue ?? 0
       this.languageIndex = other.languageIndex
       this.dexNum = other.dexNum
-      this.currentHP = other.currentHP
+      this.currentHP = other.currentHP ?? 0
       this.level = other.level ?? 0
       this.statusCondition = other.statusCondition ?? 0
       this.type1 = other.type1 ?? 0

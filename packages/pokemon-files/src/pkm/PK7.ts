@@ -332,7 +332,7 @@ export class PK7 {
       this.consoleRegion = other.consoleRegion ?? 0
       this.languageIndex = other.languageIndex
       this.statusCondition = other.statusCondition ?? 0
-      this.currentHP = other.currentHP
+      this.currentHP = other.currentHP ?? 0
       this.ribbons = filterRibbons(other.ribbons ?? [], [ModernRibbons], 'Battle Tree Master') ?? []
       this.handlerMemory = other.handlerMemory ?? {
         intensity: 0,

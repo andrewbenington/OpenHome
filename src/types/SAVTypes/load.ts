@@ -10,7 +10,7 @@ import { PathData } from './path'
 import { SAV } from './SAV'
 import { SAVClass } from './util'
 
-const SKIP_OHPKM_LOAD = false
+const SKIP_OHPKM_LOAD = true
 
 // check if each pokemon in a save file has OpenHome data associated with it
 const recoverOHPKMData = (

@@ -115,7 +115,7 @@ export class XDPKM {
       const other = arg
       this.dexNum = other.dexNum
       this.heldItemIndex = ItemGen3FromString(other.heldItemName)
-      this.currentHP = other.currentHP
+      this.currentHP = other.currentHP ?? 0
       this.trainerFriendship = other.trainerFriendship ?? 0
       this.metLocationIndex = other.metLocationIndex ?? 0
       this.metLevel = other.metLevel ?? 0

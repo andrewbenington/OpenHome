@@ -564,12 +564,16 @@ type PKMWithSize = {
 } & PKMInterface
 
 export function getHeightCalculated(mon: PKMWithSize) {
+  if (mon.dexNum === 0) return 0
+
   const deviation = (mon.heightScalar / 255) * 0.40000004 + (1 - mon.heightDeviation)
 
   return PokemonData[mon.dexNum].formes[mon.formeNum].height * 100 * deviation
 }
 
 export function getWeightCalculated(mon: PKMWithSize) {
+  if (mon.dexNum === 0) return 0
+
   const deviation = (mon.weightScalar / 255) * 0.40000004 + (1 - mon.weightDeviation)
 
   return PokemonData[mon.dexNum].formes[mon.formeNum].weight * 10 * deviation

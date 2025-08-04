@@ -239,7 +239,7 @@ export class PK5 {
       this.encounterType = other.encounterType ?? 0
       this.pokeStarFame = other.pokeStarFame ?? 0
       this.statusCondition = other.statusCondition ?? 0
-      this.currentHP = other.currentHP
+      this.currentHP = other.currentHP ?? 0
       this.ribbons = filterRibbons(other.ribbons ?? [], [Gen4Ribbons], '') ?? []
       this.isFatefulEncounter = other.isFatefulEncounter ?? false
       this.nickname = other.nickname

@@ -51,8 +51,8 @@ export class PK9 {
   ribbonBytes: Uint8Array
   contestMemoryCount: number
   battleMemoryCount: number
-  height: number
-  weight: number
+  heightScalar: number
+  weightScalar: number
   scale: number
   tmFlagsSVDLC: Uint8Array
   nickname: string
@@ -127,8 +127,8 @@ export class PK9 {
       this.ribbonBytes = new Uint8Array(buffer).slice(0x34, 0x3c)
       this.contestMemoryCount = dataView.getUint8(0x3c)
       this.battleMemoryCount = dataView.getUint8(0x3d)
-      this.height = dataView.getUint8(0x48)
-      this.weight = dataView.getUint8(0x49)
+      this.heightScalar = dataView.getUint8(0x48)
+      this.weightScalar = dataView.getUint8(0x49)
       this.scale = dataView.getUint8(0x4a)
       this.tmFlagsSVDLC = new Uint8Array(buffer).slice(0x4b, 0x58)
       this.nickname = stringLogic.utf16BytesToString(buffer, 0x58, 12)
@@ -242,8 +242,8 @@ export class PK9 {
       this.ribbonBytes = other.ribbonBytes ?? new Uint8Array(8)
       this.contestMemoryCount = other.contestMemoryCount ?? 0
       this.battleMemoryCount = other.battleMemoryCount ?? 0
-      this.height = other.height ?? 0
-      this.weight = other.weight ?? 0
+      this.heightScalar = other.heightScalar ?? 0
+      this.weightScalar = other.weightScalar ?? 0
       this.scale = other.scale ?? 0
       this.tmFlagsSVDLC = other.tmFlagsSVDLC ?? new Uint8Array(13)
       this.nickname = other.nickname
@@ -255,7 +255,7 @@ export class PK9 {
       this.relearnMoves = other.relearnMoves?.filter(
         (_, i) => other.moves[i] <= PK9.maxValidMove()
       ) ?? [0, 0, 0, 0]
-      this.currentHP = other.currentHP
+      this.currentHP = other.currentHP ?? 0
       this.ivs = other.ivs ?? {
         hp: 0,
         atk: 0,
@@ -356,8 +356,8 @@ export class PK9 {
     new Uint8Array(buffer).set(new Uint8Array(this.ribbonBytes.slice(0, 8)), 0x34)
     dataView.setUint8(0x3c, this.contestMemoryCount)
     dataView.setUint8(0x3d, this.battleMemoryCount)
-    dataView.setUint8(0x48, this.height)
-    dataView.setUint8(0x49, this.weight)
+    dataView.setUint8(0x48, this.heightScalar)
+    dataView.setUint8(0x49, this.weightScalar)
     dataView.setUint8(0x4a, this.scale)
     new Uint8Array(buffer).set(new Uint8Array(this.tmFlagsSVDLC.slice(0, 13)), 0x4b)
     stringLogic.writeUTF16StringToBytes(dataView, this.nickname, 0x58, 12)

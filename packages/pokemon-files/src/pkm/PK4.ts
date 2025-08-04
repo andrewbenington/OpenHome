@@ -265,7 +265,7 @@ export class PK4 {
       this.encounterType = other.encounterType ?? 0
       this.performance = other.performance ?? 0
       this.statusCondition = other.statusCondition ?? 0
-      this.currentHP = other.currentHP
+      this.currentHP = other.currentHP ?? 0
 
       if (other.eggLocationIndex) {
         this.eggLocationIndexDP = validDPLocation(other.eggLocationIndex)

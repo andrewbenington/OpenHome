@@ -9,6 +9,7 @@ import {
   ModernRibbons,
   NatureToString,
 } from 'pokemon-resources'
+import { getHeightCalculated, getWeightCalculated } from '../../../../src/types/pkm/util'
 import * as byteLogic from '../util/byteLogic'
 import * as encryption from '../util/encryption'
 import { AllPKMFields } from '../util/pkmInterface'
@@ -52,8 +53,8 @@ export class PA8 {
   battleMemoryCount: number
   alphaMove: number
   sociability: number
-  height: number
-  weight: number
+  heightScalar: number
+  weightScalar: number
   scale: number
   moves: number[]
   movePP: number[]
@@ -102,8 +103,6 @@ export class PA8 {
   isAlpha: boolean
   isNoble: boolean
   ribbons: string[]
-  heightAbsoluteBytes: Uint8Array
-  weightAbsoluteBytes: Uint8Array
   trainerGender: boolean
   constructor(arg: ArrayBuffer | AllPKMFields, encrypted?: boolean) {
     if (arg instanceof ArrayBuffer) {
@@ -140,8 +139,8 @@ export class PA8 {
       this.battleMemoryCount = dataView.getUint8(0x3d)
       this.alphaMove = dataView.getUint16(0x3e, true)
       this.sociability = dataView.getUint32(0x48, true)
-      this.height = dataView.getUint8(0x50)
-      this.weight = dataView.getUint8(0x51)
+      this.heightScalar = dataView.getUint8(0x50)
+      this.weightScalar = dataView.getUint8(0x51)
       this.scale = dataView.getUint8(0x52)
       this.moves = [
         dataView.getUint16(0x54, true),
@@ -215,8 +214,9 @@ export class PA8 {
         .concat(
           byteLogic.getFlagIndexes(dataView, 0x40, 0, 47).map((index) => ModernRibbons[index + 64])
         )
-      this.heightAbsoluteBytes = new Uint8Array(buffer).slice(0xac, 0xb0)
-      this.weightAbsoluteBytes = new Uint8Array(buffer).slice(0xb0, 0xb4)
+      // these are recalculated from the mon's height/weight and species data
+      // this.heightAbsolute = dataView.getFloat32(0xac, true)
+      // this.weightAbsolute = dataView.getFloat32(0xb0, true)
       this.trainerGender = byteLogic.getFlag(dataView, 0x13d, 7)
     } else {
       const other = arg
@@ -267,19 +267,19 @@ export class PA8 {
       this.battleMemoryCount = other.battleMemoryCount ?? 0
       this.alphaMove = other.alphaMove ?? 0
       this.sociability = other.sociability ?? 0
-      this.height = other.height ?? 0
-      this.weight = other.weight ?? 0
-      this.scale = other.scale ?? 0
-      this.moves = other.moves.filter((_, i) => other.moves[i] <= PA8.maxValidMove())
-      this.movePP = adjustMovePPBetweenFormats(this, other).filter(
-        (_, i) => other.moves[i] <= PA8.maxValidMove()
+      this.heightScalar = other.heightScalar ?? 127
+      this.weightScalar = other.weightScalar ?? 127
+      this.scale = other.scale ?? this.heightScalar
+      this.moves = other.moves.filter((_, i) => LA_VALID_MOVES.includes(other.moves[i]))
+      this.movePP = adjustMovePPBetweenFormats(this, other).filter((_, i) =>
+        LA_VALID_MOVES.includes(other.moves[i])
       )
       this.nickname = other.nickname
-      this.movePPUps = other.movePPUps.filter((_, i) => other.moves[i] <= PA8.maxValidMove())
+      this.movePPUps = other.movePPUps.filter((_, i) => LA_VALID_MOVES.includes(other.moves[i]))
       this.relearnMoves = other.relearnMoves?.filter(
-        (_, i) => other.moves[i] <= PA8.maxValidMove()
+        (_, i) => other.relearnMoves && LA_VALID_MOVES.includes(other.relearnMoves[i])
       ) ?? [0, 0, 0, 0]
-      this.currentHP = other.currentHP
+      this.currentHP = other.currentHP ?? 0
       this.ivs = other.ivs ?? {
         hp: 0,
         atk: 0,
@@ -350,8 +350,6 @@ export class PA8 {
       this.isAlpha = other.isAlpha ?? false
       this.isNoble = other.isNoble ?? false
       this.ribbons = filterRibbons(other.ribbons ?? [], [ModernRibbons], 'Hisui') ?? []
-      this.heightAbsoluteBytes = other.heightAbsoluteBytes ?? new Uint8Array(4)
-      this.weightAbsoluteBytes = other.weightAbsoluteBytes ?? new Uint8Array(4)
       this.trainerGender = other.trainerGender
     }
   }
@@ -390,8 +388,8 @@ export class PA8 {
     dataView.setUint8(0x3d, this.battleMemoryCount)
     dataView.setUint16(0x3e, this.alphaMove, true)
     dataView.setUint32(0x48, this.sociability, true)
-    dataView.setUint8(0x50, this.height)
-    dataView.setUint8(0x51, this.weight)
+    dataView.setUint8(0x50, this.heightScalar)
+    dataView.setUint8(0x51, this.weightScalar)
     dataView.setUint8(0x52, this.scale)
     for (let i = 0; i < 4; i++) {
       dataView.setUint16(0x54 + i * 2, this.moves[i], true)
@@ -465,8 +463,8 @@ export class PA8 {
         .map((ribbon) => ModernRibbons.indexOf(ribbon) - 64)
         .filter((index) => index > -1 && index < 47)
     )
-    new Uint8Array(buffer).set(new Uint8Array(this.heightAbsoluteBytes.slice(0, 4)), 0xac)
-    new Uint8Array(buffer).set(new Uint8Array(this.weightAbsoluteBytes.slice(0, 4)), 0xb0)
+    dataView.setFloat32(0xac, getHeightCalculated(this), true)
+    dataView.setFloat32(0xb0, getHeightCalculated(this), true)
     byteLogic.setFlag(dataView, 0x13d, 7, this.trainerGender)
     return buffer
   }
@@ -486,20 +484,20 @@ export class PA8 {
     return ItemToString(this.heldItemIndex)
   }
 
-  public get heightAbsolute() {
-    return new DataView(this.heightAbsoluteBytes.buffer).getFloat32(0, true)
+  public get heightAbsolute(): number {
+    return getHeightCalculated(this)
   }
 
   public get heightDeviation() {
     return 0.2
   }
 
-  public get weightAbsolute() {
-    return new DataView(this.weightAbsoluteBytes.buffer).getFloat32(0, true)
-  }
-
   public get weightDeviation() {
     return 0.2
+  }
+
+  public get weightAbsolute(): number {
+    return getWeightCalculated(this)
   }
 
   public get natureName() {
@@ -554,5 +552,17 @@ export class PA8 {
     return [27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37]
   }
 }
+
+const LA_VALID_MOVES = [
+  7, 8, 9, 14, 16, 33, 38, 40, 42, 44, 52, 53, 56, 58, 59, 63, 71, 77, 78, 79, 80, 84, 85, 86, 87,
+  93, 94, 95, 98, 100, 102, 105, 116, 120, 126, 129, 135, 139, 141, 145, 147, 150, 151, 156, 157,
+  161, 163, 165, 172, 181, 183, 188, 189, 190, 191, 196, 200, 205, 206, 209, 224, 231, 237, 239,
+  242, 246, 247, 249, 301, 310, 314, 315, 318, 326, 332, 334, 337, 339, 344, 345, 347, 348, 352,
+  355, 370, 394, 396, 398, 399, 400, 401, 403, 404, 405, 406, 408, 409, 412, 413, 414, 416, 417,
+  418, 420, 421, 422, 423, 424, 425, 426, 427, 428, 430, 434, 437, 440, 442, 444, 446, 449, 451,
+  452, 453, 457, 458, 459, 460, 462, 463, 464, 465, 466, 467, 474, 491, 506, 522, 523, 528, 542,
+  555, 556, 577, 583, 584, 585, 595, 605, 608, 667, 670, 710, 796, 827, 828, 829, 830, 831, 832,
+  833, 834, 835, 836, 837, 838, 839, 840, 841, 842, 843, 844, 845, 846, 847, 848, 849, 850,
+]
 
 export default PA8

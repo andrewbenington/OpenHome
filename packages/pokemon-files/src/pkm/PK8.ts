@@ -52,8 +52,8 @@ export class PK8 {
   contestMemoryCount: number
   battleMemoryCount: number
   sociability: number
-  height: number
-  weight: number
+  heightScalar: number
+  weightScalar: number
   nickname: string
   moves: number[]
   movePP: number[]
@@ -133,8 +133,8 @@ export class PK8 {
       this.contestMemoryCount = dataView.getUint8(0x3c)
       this.battleMemoryCount = dataView.getUint8(0x3d)
       this.sociability = dataView.getUint32(0x48, true)
-      this.height = dataView.getUint8(0x50)
-      this.weight = dataView.getUint8(0x51)
+      this.heightScalar = dataView.getUint8(0x50)
+      this.weightScalar = dataView.getUint8(0x51)
       this.nickname = stringLogic.utf16BytesToString(buffer, 0x58, 12)
       this.moves = [
         dataView.getUint16(0x72, true),
@@ -253,8 +253,8 @@ export class PK8 {
       this.contestMemoryCount = other.contestMemoryCount ?? 0
       this.battleMemoryCount = other.battleMemoryCount ?? 0
       this.sociability = other.sociability ?? 0
-      this.height = other.height ?? 0
-      this.weight = other.weight ?? 0
+      this.heightScalar = other.heightScalar ?? 127
+      this.weightScalar = other.weightScalar ?? 127
       this.nickname = other.nickname
       this.moves = other.moves.filter((_, i) => other.moves[i] <= PK8.maxValidMove())
       this.movePP = adjustMovePPBetweenFormats(this, other).filter(
@@ -264,7 +264,7 @@ export class PK8 {
       this.relearnMoves = other.relearnMoves?.filter(
         (_, i) => other.moves[i] <= PK8.maxValidMove()
       ) ?? [0, 0, 0, 0]
-      this.currentHP = other.currentHP
+      this.currentHP = other.currentHP ?? 0
       this.ivs = other.ivs ?? {
         hp: 0,
         atk: 0,
@@ -379,8 +379,8 @@ export class PK8 {
     dataView.setUint8(0x3c, this.contestMemoryCount)
     dataView.setUint8(0x3d, this.battleMemoryCount)
     dataView.setUint32(0x48, this.sociability, true)
-    dataView.setUint8(0x50, this.height)
-    dataView.setUint8(0x51, this.weight)
+    dataView.setUint8(0x50, this.heightScalar)
+    dataView.setUint8(0x51, this.weightScalar)
     stringLogic.writeUTF16StringToBytes(dataView, this.nickname, 0x58, 12)
     for (let i = 0; i < 4; i++) {
       dataView.setUint16(0x72 + i * 2, this.moves[i], true)

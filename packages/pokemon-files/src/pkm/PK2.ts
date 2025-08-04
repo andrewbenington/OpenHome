@@ -144,7 +144,7 @@ export class PK2 {
       this.metLocationIndex = other.metLocationIndex ?? 0
       this.level = other.level ?? 0
       this.statusCondition = other.statusCondition ?? 0
-      this.currentHP = other.currentHP
+      this.currentHP = other.currentHP ?? 0
       this.trainerName = other.trainerName
       this.nickname = other.nickname
       this.trainerGender = other.trainerGender
