@@ -21,10 +21,6 @@
     "name": "Andrew Benington",
     "email": "andrewbenington57@gmail.com"
   },
-  "private": true,
-  "workspaces": [
-    "packages/*"
-  ],
   "main": "./out/main/index.js",
   "scripts": {
     "format": "prettier --write .",
@@ -59,7 +55,6 @@
     "dayjs": "^1.11.13",
     "fp-ts": "^2.16.10",
     "lodash": "^4.17.21",
-    "pokemon-files": "^0.4.6",
     "pokemon-resources": "^1.0.12",
     "pokemon-species-data": "^0.4.7",
     "prando": "^6.0.1",
