@@ -1,6 +1,7 @@
 import { GameOfOrigin } from 'pokemon-resources'
 
-import { COLOPKM, PA8, PB7, PB8, PK1, PK2, PK3, PK4, PK5, PK6, PK7, PK8, PK9, PKM, XDPKM } from '.'
+import { COLOPKM, PA8, PB7, PB8, PK1, PK2, PK3, PK4, PK5, PK6, PK8, PK9, PKM, XDPKM } from '.'
+import Pk7Rust from './wasm/PK7'
 
 function fileTypeFromBuffer(buffer: ArrayBuffer): string | undefined {
   switch (buffer.byteLength) {
@@ -48,7 +49,7 @@ export function classFromFormat(format: string) {
     case 'PK6':
       return PK6
     case 'PK7':
-      return PK7
+      return Pk7Rust
     case 'PB7':
       return PB7
     case 'PK8':

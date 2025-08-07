@@ -9,11 +9,11 @@ import {
   PK4,
   PK5,
   PK6,
-  PK7,
   PK8,
   PK9,
   XDPKM,
 } from '@pokemon-files/pkm'
+import Pk7Rust from '../../packages/pokemon-files/src/pkm/wasm/PK7'
 import { PKMInterface } from './interfaces'
 import { OHPKM } from './pkm/OHPKM'
 import { PK3RR } from './SAVTypes/radicalred/PK3RR'
@@ -65,7 +65,7 @@ export function fileTypeFromString(type: string): PKMClass | typeof OHPKM | unde
     case 'PK6':
       return PK6
     case 'PK7':
-      return PK7
+      return Pk7Rust
     case 'PB7':
       return PB7
     case 'PK8':

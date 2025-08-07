@@ -5,6 +5,7 @@ import { ErrorBoundary, FallbackProps } from 'react-error-boundary'
 import { MdDownload } from 'react-icons/md'
 import { ArrowLeftIcon, ArrowRightIcon } from 'src/components/Icons'
 import SideTabs from 'src/components/side-tabs/SideTabs'
+import useDisplayError from 'src/hooks/displayError'
 import MiniBoxIndicator, { MiniBoxIndicatorProps } from 'src/saves/boxes/MiniBoxIndicator'
 import { BackendContext } from '../backend/backendContext'
 import HexDisplay from '../components/HexDisplay'
@@ -37,6 +38,7 @@ const PokemonDetailsModal = (props: {
   const [boxIndicatorVisible, setBoxIndicatorVisible] = useState(false)
   const [boxIndicatorTimeout, setBoxIndicatorTimeout] = useState<NodeJS.Timeout>()
   const backend = useContext(BackendContext)
+  const displayError = useDisplayError()
 
   useEffect(() => setDisplayMon(mon), [mon])
 
@@ -123,10 +125,15 @@ const PokemonDetailsModal = (props: {
                     if (!P) {
                       throw `Invalid filetype: ${P}`
                     }
-                    if (mon instanceof OHPKM) {
-                      setDisplayMon(new P(mon as any))
-                    } else {
-                      setDisplayMon(new P(new OHPKM(mon) as any))
+                    try {
+                      if (mon instanceof OHPKM) {
+                        setDisplayMon(new P(mon as any))
+                      } else {
+                        setDisplayMon(new P(new OHPKM(mon) as any))
+                      }
+                    } catch (e) {
+                      console.error(e)
+                      displayError(`Error converting to ${P.getName()}`, `${e}`)
                     }
                   }}
                 />

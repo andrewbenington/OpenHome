@@ -1,4 +1,4 @@
-import init from 'pokemon_wasm'
+import init from '@pokemon-wasm/pkm_rs'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './app/App'

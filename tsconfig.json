@@ -26,6 +26,9 @@
       ],
       "@pokemon-files/*": [
         "./packages/pokemon-files/src/*"
+      ],
+      "@pokemon-wasm/*": [
+        "./packages/pokemon-wasm/pkg/*"
       ]
     },
     /* Bundler mode */
