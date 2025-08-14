@@ -18,7 +18,6 @@ function convertToPascalCase(input: string): string {
 
 function main() {
     generateModern()
-    generateOpenHome()
 }
 
 function generateModern() {
@@ -62,6 +61,25 @@ impl<const N: usize> ModernRibbonSet<N> {
             .into_iter()
             .for_each(|ribbon| self.add_ribbon(ribbon));
     }
+
+    pub fn from_ribbons(ribbons: Vec<ModernRibbon>) -> Self {
+        let mut ribbon_set = Self(FlagSet::from_bytes([0u8; N]));
+        ribbons
+            .into_iter()
+            .for_each(|ribbon| ribbon_set.add_ribbon(ribbon));
+
+        ribbon_set
+    }
+
+    pub fn truncate_to<const M: usize>(self) -> ModernRibbonSet<M> {
+        let mut truncated_bytes = [0u8; M];
+
+        let min_size = N.min(M);
+
+        truncated_bytes.copy_from_slice(&self.to_bytes()[0..min_size]);
+
+        ModernRibbonSet::<M>::from_bytes(truncated_bytes)
+    }
 }
 
 impl<const N: usize> Serialize for ModernRibbonSet<N> {
@@ -80,15 +98,29 @@ pub enum ModernRibbon {
 }
 
 impl ModernRibbon {
-    fn get_name(&self) -> &'static str {
+    pub const fn get_name(&self) -> &'static str {
         match self {
             ${enumValues.map((val, i) => `ModernRibbon::${val} => "${modernRibbons[i].endsWith("Mark") ? modernRibbons[i] : modernRibbons[i] + " Ribbon"}"`).join(",\n")},
         }
     }
 
-    fn get_index(&self) -> usize {
+    pub const fn get_index(&self) -> usize {
         match self {
             ${enumValues.map((val, i) => `ModernRibbon::${val} => ${i}`).join(",\n")},
+        }
+    }
+    
+    pub fn from_affixed_byte(affixed_byte: u8) -> Option<ModernRibbon> {
+        match affixed_byte {
+            0xff => None,
+            value => Some(ModernRibbon::from(value as usize))
+        }
+    }
+    
+    pub fn to_affixed_byte(affixed: Option<ModernRibbon>) -> u8 {
+        match affixed {
+            None => 0xff,
+            Some(ribbon) => ribbon.get_index() as u8,
         }
     }
 }
@@ -113,73 +145,4 @@ impl From<usize> for ModernRibbon {
     console.log("Rust code written to src/resources/ribbons/modern.rs");
 }
 
-function generateOpenHome() {
-    const modernRibbons: string[] = fs.readFileSync("text_source/ribbons_openhome.txt", "utf-8").split("\n");
-    const enumValues = modernRibbons.map(removeDiacritics).map(convertToPascalCase)
-    let output = `use std::fmt::Display;
-use crate::substructures::FlagSet;
-use serde::{Serialize, Serializer};
-
-#[derive(Default, Debug, Clone, Copy)]
-pub struct OpenHomeRibbonSet<const N: usize>(FlagSet<N>);
-
-impl<const N: usize> OpenHomeRibbonSet<N> {
-    pub const fn from_bytes(bytes: [u8; N]) -> Self {
-        Self(FlagSet::from_bytes(bytes))
-    }
-
-    pub fn get_ribbons(&self) -> Vec<OpenHomeRibbon> {
-        self.0
-            .get_indices()
-            .into_iter()
-            .map(OpenHomeRibbon::from)
-            .collect()
-    }
-
-    pub const fn to_bytes(self) -> [u8; N] {
-        self.0.to_bytes()
-    }
-}
-
-impl<const N: usize> Serialize for OpenHomeRibbonSet<N> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        self.get_ribbons().serialize(serializer)
-    }
-}
-
-#[derive(Debug, Serialize, PartialEq, Eq, Clone, Copy)]
-pub enum OpenHomeRibbon {
-  ${enumValues.join(",\n")}
-}
-
-impl OpenHomeRibbon {
-    fn get_name(&self) -> &'static str {
-        match self {
-            ${enumValues.map((val, i) => `OpenHomeRibbon::${val} => "${modernRibbons[i].endsWith("Mark") ? modernRibbons[i] : modernRibbons[i] + " Ribbon"}"`).join(",\n")},
-        }
-    }
-}
-
-impl Display for OpenHomeRibbon {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str(self.get_name())
-    }
-}
-    
-impl From<usize> for OpenHomeRibbon {
-    fn from(value: usize) -> Self {
-        match value {
-            ${enumValues.map((val, i) => `${i} => OpenHomeRibbon::${val}`).join(",\n")},
-            _ => panic!("Invalid value for OpenHomeRibbon: {}", value),
-        }
-    }
-}
-`
-    fs.mkdirSync("src/resources/ribbons", { recursive: true })
-    fs.writeFileSync("src/resources/ribbons/openhome.rs", output);
-    console.log("Rust code written to src/resources/ribbons/openhome.rs");
-}
 main();

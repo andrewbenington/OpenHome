@@ -33,7 +33,7 @@
     "typecheck": "tsc",
     "dev:unix": "./buildVersionJSON.sh && tauri dev",
     "dev:win": "powershell -ExecutionPolicy Bypass -File ./buildVersionJSON.ps1 && tauri dev",
-    "wasm": "wasm-pack build ./packages/pokemon-wasm --target web",
+    "wasm": "wasm-pack build ./packages/pokemon-wasm/pkm_rs --target web --out-dir ../pkg",
     "build": "tsc && vite build",
     "dev": "npm run wasm && vite",
     "tauri": "tauri",

@@ -1,11 +1,15 @@
 {
   "compilerOptions": {
-    "lib": ["ESNext"],
+    "lib": [
+      "ESNext"
+    ],
     "module": "ESNext",
     "moduleResolution": "bundler",
     "outDir": "out",
     "rootDir": ".",
     "listEmittedFiles": true
   },
-  "include": ["./*.ts"]
+  "include": [
+    "./*.ts"
+  ]
 }

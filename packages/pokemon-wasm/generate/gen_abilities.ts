@@ -1,92 +1,110 @@
 import * as fs from "fs";
 
 const overrides: Record<number, string> = {
-  266: "AS_ONE_ICE_RIDER",
-  267: "AS_ONE_SHADOW_RIDER",
-  301: "EMBODY_ASPECT_SPEED",
-  302: "EMBODY_ASPECT_SP_DEF",
-  303: "EMBODY_ASPECT_ATK",
-  304: "EMBODY_ASPECT_DEF",
+    266: "AS_ONE_ICE_RIDER",
+    267: "AS_ONE_SHADOW_RIDER",
+    301: "EMBODY_ASPECT_SPEED",
+    302: "EMBODY_ASPECT_SP_DEF",
+    303: "EMBODY_ASPECT_ATK",
+    304: "EMBODY_ASPECT_DEF",
 }
 
 function convertToEnumMember(input: string): string {
-  if (input === "—") {
-    return "None"
-  }
-  // Remove spaces and split the string into words
-  const words = input.trim().split(/[\s-]+/)
+    if (input === "—") {
+        return "None"
+    }
+    // Remove spaces and split the string into words
+    const words = input.trim().split(/[\s-]+/)
 
-  // Capitalize the first letter of each word and join them
-  const pascalCaseString = words
-    .map((word) => (word.length === 0 ? '' : word[0].toUpperCase() + word.slice(1)))
-    .join('')
-    .replace(/[^A-Za-z0-9]/g, "")
+    // Capitalize the first letter of each word and join them
+    const pascalCaseString = words
+        .map((word) => (word.length === 0 ? '' : word[0].toUpperCase() + word.slice(1)))
+        .join('')
+        .replace(/[^A-Za-z0-9]/g, "")
 
-  return pascalCaseString
+    return pascalCaseString
 }
 
 
-function rustConstName(index: number, ability: string): string {
-  if (index in overrides) {
-    return overrides[index]
-  }
+export function rustAbilityConstName(index: number, ability: string): string {
+    if (index in overrides) {
+        return overrides[index]
+    }
 
-  let constName = ability
-    .toUpperCase()
-    .replace(/[^A-Z0-9]/g, "_")
-    .replace(/_+/g, "_");
+    let constName = ability
+        .toUpperCase()
+        .replace(/[^A-Z0-9\s]/g, "")
+        .replace(/[^A-Z0-9]/g, "_")
+        .replace(/_+/g, "_");
 
-  return constName
+    return constName
 }
 
 function convertAbility(index: number, ability: string): string {
-  const constName = rustConstName(index, ability);
-
-  return `const ${constName}: AbilityMetadata = AbilityMetadata {
+    return `AbilityMetadata {
     id: ${index},
     name: "${ability}",
-};`;
+}`;
 }
 
 function main() {
-  const names: string[] = fs.readFileSync("text_source/abilities.txt", "utf-8").split("\n").slice(1);
+    const names: string[] = fs.readFileSync("text_source/abilities.txt", "utf-8").split("\n").slice(1);
 
-  let output = `use std::num::NonZeroU16;
+    let output = `use std::fmt::Debug;
+use std::{fmt::Display, num::NonZeroU16};
 use wasm_bindgen::prelude::*;
 
 use serde::{Serialize, Serializer};
 
 #[wasm_bindgen]
-#[derive(Debug, Default, PartialEq, Eq, Clone, Copy)]
-pub struct AbilityIndex(Option<NonZeroU16>);
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+pub struct AbilityIndex(NonZeroU16);
 
 impl AbilityIndex {
-    pub fn get_metadata(&self) -> Option<&'static AbilityMetadata> {
-        self.0.map(|idx| ALL_ABILITIES[(idx.get() - 1) as usize])
-    }
-
-    fn to_u16(self) -> u16 {
-        match self.0 {
-            None => 0,
-            Some(idx) => idx.get(),
+    pub fn new(index: u16) -> Option<AbilityIndex> {
+        if (index as usize) > ALL_ABILITIES.len() {
+            return None;
         }
+        NonZeroU16::new(index).map(AbilityIndex)
     }
 
-    pub fn to_le_bytes(self) -> [u8; 2] {
-        self.to_u16().to_le_bytes()
+    /// # Safety
+    ///
+    /// - \`index\` must be greater than zero and at most the maximum ability index supported by this version of the library.
+    pub const unsafe fn new_unchecked(index: u16) -> AbilityIndex {
+        unsafe { AbilityIndex(NonZeroU16::new_unchecked(index)) }
+    }
+
+    pub const fn get(&self) -> u16 {
+        self.0.get()
+    }
+
+    pub const fn get_metadata(&self) -> &AbilityMetadata {
+        ALL_ABILITIES[(self.get() - 1) as usize]
+    }
+
+    pub const fn to_le_bytes(self) -> [u8; 2] {
+        self.get().to_le_bytes()
     }
 }
 
 #[wasm_bindgen]
+#[allow(clippy::missing_const_for_fn)]
 impl AbilityIndex {
     #[wasm_bindgen(constructor)]
-    pub fn new(val: u16) -> AbilityIndex {
-        AbilityIndex(NonZeroU16::new(val))
+    pub fn new_js(val: u16) -> Option<AbilityIndex> {
+        AbilityIndex::new(val)
     }
 
     #[wasm_bindgen(getter)]
     pub fn index(self) -> u16 {
-        self.to_u16()
+        self.get()
+    }
+}
+
+impl Default for AbilityIndex {
+    fn default() -> Self {
+        Self(unsafe { NonZeroU16::new_unchecked(1) })
     }
 }
 
@@ -95,42 +113,69 @@ impl Serialize for AbilityIndex {
     where
         S: Serializer,
     {
-        serializer.serialize_str(match self.get_metadata() {
-            None => "<empty>",
-            Some(metadata) => metadata.name,
-        })
+        serializer.serialize_str(self.get_metadata().name)
     }
 }
 
-impl From<u8> for AbilityIndex {
-    fn from(value: u8) -> Self {
-        Self(match NonZeroU16::try_from(value as u16) {
-            Err(_) => None,
-            Ok(value) => Some(value),
-        })
+#[derive(Debug, Copy, Clone)]
+pub struct InvalidAbilityIndex<T: num::Integer + Display + Debug> {
+    received_index: T,
+}
+
+impl<T: num::Integer + Display + Debug> std::error::Error for InvalidAbilityIndex<T> {}
+
+impl<T: num::Integer + Display + Debug> InvalidAbilityIndex<T> {
+    pub const fn new(received_index: T) -> Self {
+        Self { received_index }
     }
 }
 
+impl<T: num::Integer + Display + Debug> Display for InvalidAbilityIndex<T> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(&format!(
+            "Ability index must be between 1 and {ABILITY_MAX}; received {}",
+            self.received_index
+        ))
+    }
+}
+
+impl TryFrom<u8> for AbilityIndex {
+    type Error = InvalidAbilityIndex<u8>;
+
+    fn try_from(value: u8) -> Result<Self, Self::Error> {
+        if (value as usize) > ABILITY_MAX {
+            return Err(Self::Error::new(value));
+        }
+
+        NonZeroU16::try_from(value as u16)
+            .map(AbilityIndex)
+            .map_err(|_| Self::Error::new(value))
+    }
+}
 
 impl From<AbilityIndex> for u8 {
     fn from(val: AbilityIndex) -> Self {
-        val.to_u16() as u8
+        val.get() as u8
     }
 }
 
-impl From<u16> for AbilityIndex {
-    fn from(value: u16) -> Self {
-        Self(match NonZeroU16::try_from(value) {
-            Err(_) => None,
-            Ok(value) => Some(value),
-        })
+impl TryFrom<u16> for AbilityIndex {
+    type Error = InvalidAbilityIndex<u16>;
+
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        if (value as usize) > ABILITY_MAX {
+            return Err(Self::Error::new(value));
+        }
+
+        NonZeroU16::try_from(value)
+            .map(AbilityIndex)
+            .map_err(|_| Self::Error::new(value))
     }
 }
-
 
 impl From<AbilityIndex> for u16 {
     fn from(val: AbilityIndex) -> Self {
-        val.to_u16()
+        val.get()
     }
 }
 
@@ -138,19 +183,19 @@ pub struct AbilityMetadata {
     id: u16,
     name: &'static str,
 }
+
+pub const ABILITY_MAX: usize = ${names.length};
     
 `
 
-  output += names
-    .map((name, index) => convertAbility(index + 1, name))
-    .join("\n\n");
+    output += `pub static ALL_ABILITIES: [&AbilityMetadata; ABILITY_MAX] = [\n` + names
+        .map((name, index) => "&" + convertAbility(index + 1, name))
+        .join(",\n") + "];";
 
-  output += `const ALL_ABILITIES: [&AbilityMetadata; ${names.length}] = [\n` + names
-    .map((name, index) => "&" + rustConstName(index + 1, name))
-    .join(",\n") + "];";
-
-  fs.writeFileSync("src/resources/abilities.rs", output);
-  console.log("Rust code written to src/resources/abilities.rs");
+    const filename = "pkm_rs/src/resources/abilities.rs"
+    fs.writeFileSync(filename, output);
+    console.log(`Rust code written to ${filename}`);
 }
 
 main();
+

@@ -164,6 +164,7 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
       }
     }
     case 'remove_save': {
+      state.openSaves[saveToStringIdentifier(payload)]?.save.cleanup?.()
       delete state.openSaves[saveToStringIdentifier(payload)]
 
       return { ...state, openSaves: { ...state.openSaves } }

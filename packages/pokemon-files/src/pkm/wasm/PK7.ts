@@ -36,6 +36,7 @@ export class Pk7Rust {
     return 232
   }
   inner: PkmWasm.Pk7
+  finalizationRegistry: FinalizationRegistry<string>
 
   constructor(arg: ArrayBuffer | AllPKMFields, encrypted?: boolean) {
     if (arg instanceof ArrayBuffer) {
@@ -47,9 +48,21 @@ export class Pk7Rust {
       }
 
       this.inner = PkmWasm.Pk7.fromBytes(new Uint8Array(buffer))
+      console.log('registering ' + this.inner.nickname)
+      this.finalizationRegistry = new FinalizationRegistry((message) => {
+        console.log('registry message: ' + message)
+        this.inner.free()
+      })
+      this.finalizationRegistry.register(this, this.nickname)
     } else {
       const other = arg
       this.inner = PkmWasm.Pk7.fromBytes(new Uint8Array(Pk7Rust.getBoxSize()))
+      console.log('registering ' + this.inner.nickname)
+      this.finalizationRegistry = new FinalizationRegistry((message) => {
+        console.log('registry message: ' + message)
+        this.inner.free()
+      })
+      this.finalizationRegistry.register(this, this.nickname)
 
       this.encryptionConstant = other.encryptionConstant ?? 0
       this.sanity = other.sanity ?? 0
@@ -281,10 +294,10 @@ export class Pk7Rust {
   }
 
   get nature() {
-    return this.inner.nature
+    return this.inner.nature.index
   }
   set nature(value: number) {
-    this.inner.nature = value
+    this.inner.nature = new PkmWasm.NatureIndex(value)
   }
 
   get isFatefulEncounter() {
@@ -580,10 +593,10 @@ export class Pk7Rust {
   }
 
   get gameOfOrigin() {
-    return this.inner.game_of_origin
+    return this.inner.game_of_origin.index
   }
   set gameOfOrigin(value: number) {
-    this.inner.game_of_origin = value
+    this.inner.game_of_origin = new PkmWasm.GameOfOriginIndex(value)
   }
 
   get country() {

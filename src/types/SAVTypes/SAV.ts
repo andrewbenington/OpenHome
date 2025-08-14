@@ -67,6 +67,8 @@ export interface SAV<P extends PKMInterface = PKMInterface> {
   getGameName: () => string
 
   getDisplayData?: () => Record<string, string | number | undefined>
+
+  cleanup?: () => void
 }
 
 export type PluginSAV<P extends PKMInterface = PKMInterface> = SAV<P> & {

@@ -17,5 +17,6 @@
   },
   "rust-analyzer.check.command": "clippy",
   "editor.formatOnSave": true,
-  "editor.inlayHints.enabled": "off"
+  // "editor.inlayHints.enabled": "off",
+  "rust-analyzer.procMacro.enable": true
 }
