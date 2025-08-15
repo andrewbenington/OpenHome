@@ -28,7 +28,7 @@
         "./packages/pokemon-files/src/*"
       ],
       "@pokemon-wasm/*": [
-        "./packages/pokemon-wasm/pkg/*"
+        "./pkm_rs/pkg/*"
       ]
     },
     /* Bundler mode */
@@ -49,5 +49,5 @@
     "packages",
     "generate/_rename.js",
     "generate/generateMoveMap.ts"
-  ]
+, "src-tauri/pokemon-wasm"  ]
 }

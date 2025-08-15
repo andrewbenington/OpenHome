@@ -1,6 +1,6 @@
-import init from '@pokemon-wasm/pkm_rs'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
+import init from '../pkm_rs/pkg'
 import App from './app/App'
 
 init()

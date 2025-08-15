@@ -9,9 +9,12 @@ use std::{
     env,
     fs::{self, create_dir_all},
     path::{Path, PathBuf},
+    sync::Mutex,
 };
 
 use tauri::{App, Manager};
+
+use crate::state::AppState;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -43,7 +46,7 @@ pub fn run() {
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_shell::init())
-        .manage(state::AppState::default())
+        .manage(AppState::default())
         .invoke_handler(tauri::generate_handler![
             commands::get_state,
             commands::get_file_bytes,

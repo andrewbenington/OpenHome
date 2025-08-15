@@ -1,5 +1,5 @@
 use crate::plugin::{self, PluginMetadata, PluginMetadataWithIcon, list_plugins};
-use crate::state::{AppState, AppStateSnapshot};
+use crate::state::{AppState, AppStateInner, AppStateSnapshot};
 use crate::util::ImageResponse;
 use crate::{menu, saves, util};
 use serde_json::Value;
@@ -12,9 +12,9 @@ use std::time::SystemTime;
 use tauri::Manager;
 
 #[tauri::command]
-pub fn get_state(state: tauri::State<'_, AppState>) -> AppStateSnapshot {
-    let temp_files = state.temp_files.lock().unwrap().clone();
-    let open_transaction = *state.open_transaction.lock().unwrap();
+pub fn get_state(state: tauri::State<'_, AppStateInner>) -> AppStateSnapshot {
+    let temp_files = state.temp_files.clone();
+    let open_transaction = state.open_transaction;
     AppStateSnapshot {
         temp_files,
         open_transaction,
@@ -97,18 +97,30 @@ pub fn delete_storage_files(
 
 #[tauri::command]
 pub fn start_transaction(state: tauri::State<'_, AppState>) -> Result<(), String> {
+    let Ok(mut state) = state.0.lock() else {
+        return Err("App state mutex is poisoned".to_string());
+    };
+
     state.start_transaction().map_err(|e| e.to_string())
 }
 
 #[tauri::command]
 pub fn rollback_transaction(state: tauri::State<'_, AppState>) -> Result<(), String> {
     println!("Rolling back transaction");
+    let Ok(mut state) = state.0.lock() else {
+        return Err("App state mutex is poisoned".to_string());
+    };
+
     state.rollback_transaction().map_err(|e| e.to_string())
 }
 
 #[tauri::command]
 pub fn commit_transaction(state: tauri::State<'_, AppState>) -> Result<(), String> {
     println!("Committing transaction");
+    let Ok(mut state) = state.0.lock() else {
+        return Err("App state mutex is poisoned".to_string());
+    };
+
     state.commit_transaction().map_err(|e| e.to_string())
 }
 
@@ -118,6 +130,10 @@ pub fn write_file_bytes(
     absolute_path: &Path,
     bytes: Vec<u8>,
 ) -> Result<(), String> {
+    let Ok(mut state) = state.0.lock() else {
+        return Err("App state mutex is poisoned".to_string());
+    };
+
     state.write_file_bytes(absolute_path, bytes)
 }
 
@@ -187,12 +203,12 @@ pub fn find_suggested_saves(
         .home_dir()
         .map(|home| home.join(".local/share/citra-emu/sdmc/Nintendo 3DS"));
 
-    if let Ok(citra_dir) = citra_dir_r {
-        if citra_dir.exists() {
-            possible_saves
-                .citra
-                .extend(saves::recursively_find_citra_saves(&citra_dir, 0)?);
-        }
+    if let Ok(citra_dir) = citra_dir_r
+        && citra_dir.exists()
+    {
+        possible_saves
+            .citra
+            .extend(saves::recursively_find_citra_saves(&citra_dir, 0)?);
     }
 
     // Iterate over user-provided save folders

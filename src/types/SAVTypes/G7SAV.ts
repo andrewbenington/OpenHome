@@ -6,7 +6,7 @@ import {
 } from 'src/util/byteLogic'
 import { CRC16_Invert, SignWithMemeCrypto } from 'src/util/Encryption'
 import { utf16BytesToString } from 'src/util/Strings/StringConverter'
-import Pk7Rust from '../../../packages/pokemon-files/src/pkm/wasm/PK7'
+import PK7 from '../../../packages/pokemon-files/src/pkm/wasm/PK7'
 import { OHPKM } from '../pkm/OHPKM'
 import { PathData } from './path'
 import { Box, BoxCoordinates, SAV } from './SAV'
@@ -15,8 +15,8 @@ import { SIZE_USUM } from './util'
 const BOX_SIZE: number = 232 * 30
 const BOX_COUNT = 32
 
-export abstract class G7SAV implements SAV<Pk7Rust> {
-  static pkmType = Pk7Rust
+export abstract class G7SAV implements SAV<PK7> {
+  static pkmType = PK7
   static saveTypeAbbreviation = 'SM/USUM'
   static saveTypeID = 'G7SAV'
 
@@ -37,7 +37,7 @@ export abstract class G7SAV implements SAV<Pk7Rust> {
 
   currentPCBox: number = 0 // TODO: Gen 7 current box
 
-  boxes: Array<Box<Pk7Rust>>
+  boxes: Array<Box<PK7>>
 
   bytes: Uint8Array
 
@@ -91,10 +91,15 @@ export abstract class G7SAV implements SAV<Pk7Rust> {
           const startByte = this.pcOffset + BOX_SIZE * box + 232 * monIndex
           const endByte = this.pcOffset + BOX_SIZE * box + 232 * (monIndex + 1)
           const monData = bytes.slice(startByte, endByte)
-          const mon = new Pk7Rust(monData.buffer, true)
 
-          if (mon.gameOfOrigin !== 0 && mon.dexNum !== 0) {
-            this.boxes[box].pokemon[monIndex] = mon
+          try {
+            const mon = new PK7(monData.buffer, true)
+
+            if (mon.gameOfOrigin !== 0 && mon.dexNum !== 0) {
+              this.boxes[box].pokemon[monIndex] = mon
+            }
+          } catch (e) {
+            console.error(`Error loading mon in box ${box + 1}, slot ${monIndex + 1}:`, e)
           }
         } catch (e) {
           console.error(e)
@@ -120,7 +125,7 @@ export abstract class G7SAV implements SAV<Pk7Rust> {
       // and the slot was left empty
       if (changedMon) {
         try {
-          const mon = changedMon instanceof OHPKM ? new Pk7Rust(changedMon) : changedMon
+          const mon = changedMon instanceof OHPKM ? new PK7(changedMon) : changedMon
 
           if (mon?.gameOfOrigin && mon?.dexNum) {
             mon.refreshChecksum()
@@ -130,7 +135,7 @@ export abstract class G7SAV implements SAV<Pk7Rust> {
           console.error(e)
         }
       } else {
-        const mon = new Pk7Rust(new Uint8Array(232).buffer)
+        const mon = new PK7(new Uint8Array(232).buffer)
 
         mon.checksum = 0x0204
         this.bytes.set(new Uint8Array(mon.toPCBytes()), writeIndex)

@@ -1,4 +1,4 @@
-import * as PkmWasm from '@pokemon-wasm/pkm_rs'
+import * as PkmWasm from '../../../../../pkm_rs/pkg'
 import {
   ContestStats,
   Geolocation,
@@ -10,7 +10,7 @@ import {
 
 export function convertPokeDate(date: PkmWasm.PokeDate): PKMDate {
   return {
-    year: date.year,
+    year: date.year(),
     month: date.month,
     day: date.day,
   }
@@ -20,7 +20,7 @@ export function convertPokeDateOptional(date?: PkmWasm.PokeDate | null): PKMDate
   if (!date) return undefined
 
   return {
-    year: date.year,
+    year: date.year(),
     month: date.month,
     day: date.day,
   }
