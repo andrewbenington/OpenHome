@@ -28,11 +28,11 @@ tauri-build = { version = "2", features = [] }
 tauri = { version = "2.7.0", features = [] }
 tauri-plugin-shell = "2.3.0"
 serde = { version = "1.0.219", features = ["derive"] }
-serde_json = "1.0.141"
+serde_json = "1.0.142"
 tauri-plugin-os = "2.3.0"
-tauri-plugin-dialog = "2.3.1"
+tauri-plugin-dialog = "2.3.2"
 tauri-plugin-fs = "2.2.1"
-reqwest = { version = "0.12.22"}
+reqwest = { version = "0.12.23"}
 base64 = "0.22.1"
 zip = "4.3.0"
 bytes = "1.10.1"
