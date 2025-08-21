@@ -4,7 +4,7 @@ use serde::Serialize;
 use wasm_bindgen::prelude::*;
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Debug, Default, Serialize, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Default, Serialize, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 #[repr(u8)]
 pub enum Ball {
     None,
@@ -91,5 +91,15 @@ impl From<u8> for Ball {
             37 => Ball::Origin,
             _ => panic!("Invalid value for Ball: {}", value),
         }
+    }
+}
+
+impl Ball {
+    pub fn poke_if_newer_than(self, other: Ball) -> Ball {
+        if self > other { Ball::Poke } else { self }
+    }
+
+    pub fn strange_if_newer_than(self, other: Ball) -> Ball {
+        if self > other { Ball::Strange } else { self }
     }
 }

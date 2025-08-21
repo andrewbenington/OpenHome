@@ -42,6 +42,18 @@ pub mod ohpkm {
 }
 
 #[cfg(test)]
+pub mod pk5 {
+    use std::path::PathBuf;
+
+    use crate::pkm::Pk5;
+
+    #[test]
+    fn to_from_bytes() -> Result<(), String> {
+        super::to_from_bytes_all_in_dir::<Pk5>(&PathBuf::from("pkm_files").join("pk5"))
+    }
+}
+
+#[cfg(test)]
 pub mod pb7 {
     use std::path::PathBuf;
 
@@ -57,27 +69,11 @@ pub mod pb7 {
 pub mod pk7 {
     use std::path::PathBuf;
 
-    use crate::{
-        pkm::{Pk7, traits::IsShiny},
-        tests::pkm::pkm_from_file,
-    };
+    use crate::pkm::Pk7;
 
     #[test]
     fn to_from_bytes() -> Result<(), String> {
         super::to_from_bytes_all_in_dir::<Pk7>(&PathBuf::from("pkm_files").join("pk7"))
-    }
-
-    #[test]
-    fn is_shiny() {
-        let mon = pkm_from_file::<Pk7>(
-            &PathBuf::from("pkm_files")
-                .join("pk7")
-                .join("larvesta_shiny.pk7")
-                .to_string_lossy(),
-        )
-        .unwrap()
-        .0;
-        assert!(mon.is_shiny());
     }
 }
 

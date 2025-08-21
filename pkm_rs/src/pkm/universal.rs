@@ -3,12 +3,12 @@ use rand::{SeedableRng, rngs::StdRng};
 use crate::{
     pkm::PkmResult,
     resources::{
-        AbilityIndex, Ball, FormeMetadata, FormeReference, GameOfOriginIndex, ModernRibbon,
-        MoveSlot, NatDexIndex, NatureIndex, OpenHomeRibbon, PkmType, TeraType,
+        AbilityIndex, Ball, FormeMetadata, GameOfOriginIndex, ModernRibbon, MoveSlot, NatDexIndex,
+        NatureIndex, OpenHomeRibbon, SpeciesAndForme, TeraType,
     },
     substructures::{
-        ContestStats, Gender, HyperTraining, Markings, MarkingsSixShapesColors, PokeDate, Stats8,
-        Stats16Le, StatsPreSplit, TrainerMemory,
+        ContestStats, Gender, HyperTraining, MarkingsSixShapesColors, PokeDate, Stats8, Stats16Le,
+        StatsPreSplit, TrainerMemory,
     },
 };
 
@@ -402,11 +402,8 @@ pub trait UniversalPkm {
         }
     }
 
-    fn get_forme_reference(&self) -> PkmResult<FormeReference> {
-        FormeReference::new_ndex_verified(
-            self.get_national_dex(),
-            self.get_forme_num().unwrap_or(0),
-        )
+    fn get_forme_reference(&self) -> PkmResult<SpeciesAndForme> {
+        SpeciesAndForme::new_valid_ndex(self.get_national_dex(), self.get_forme_num().unwrap_or(0))
     }
 
     fn get_forme_metadata(&self) -> PkmResult<&FormeMetadata> {
@@ -424,5 +421,3 @@ fn seeded_rng_from_u16(seed: u16) -> StdRng {
         (seed as u64) | ((seed as u64) << 16) | ((seed as u64) << 32) | ((seed as u64) << 48);
     StdRng::seed_from_u64(seed_u64)
 }
-
-pub type AnyPkm = Box<dyn UniversalPkm>;

@@ -107,8 +107,8 @@ pub fn get_flag(bytes: &[u8], byte_offset: u32, bit_index: u32) -> bool {
     bit_is_set(bytes[byte_index], bit_index)
 }
 
-pub fn set_flag(bytes: &mut [u8], byte_offset: u32, bit_index: u32, value: bool) {
-    let byte_index = (byte_offset + (bit_index / 8)) as usize;
+pub fn set_flag(bytes: &mut [u8], byte_offset: usize, bit_index: usize, value: bool) {
+    let byte_index = byte_offset + (bit_index / 8);
     if byte_index >= bytes.len() {
         panic!(
             "attempting to read flag out of range (byte {} of {})",

@@ -31,5 +31,5 @@
   "rust-analyzer.check.command": "clippy",
   // "editor.inlayHints.enabled": "off"
   "rust-analyzer.linkedProjects": [ "/Users/andrewbenington/Dev/OpenHome/Cargo.toml" ],
-  "rust-analyzer.cargo.features": [ "pkm_rs/wasm"]
+  "rust-analyzer.cargo.features": [ "pkm_rs/wasm"],
 }

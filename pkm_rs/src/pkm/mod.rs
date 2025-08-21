@@ -1,7 +1,8 @@
-mod generate;
 mod helpers;
 mod ohpkm;
 mod pb7;
+mod pk5;
+mod pk6;
 mod pk7;
 mod pk8;
 pub mod traits;
@@ -14,13 +15,15 @@ use serde::Serialize;
 pub use crate::resources::{ABILITY_MAX, NATIONAL_DEX_MAX};
 pub use ohpkm::Ohpkm;
 pub use pb7::Pb7;
+pub use pk5::Pk5;
+pub use pk6::Pk6;
 pub use pk7::Pk7;
 pub use pk8::Pk8;
 pub use universal::UniversalPkm;
 
 use crate::{
     pkm::traits::IsShiny,
-    resources::{FormeMetadata, NatDexIndex, SpeciesMetadata},
+    resources::{FormeMetadata, NATURE_MAX, NatDexIndex, SpeciesMetadata},
 };
 
 pub trait Pkm: Sized + Serialize + IsShiny {
@@ -31,12 +34,15 @@ pub trait Pkm: Sized + Serialize + IsShiny {
     fn party_size() -> usize;
 
     fn from_bytes(bytes: &[u8]) -> PkmResult<Self>;
-    fn write_bytes(&self, bytes: &mut [u8]);
+    fn write_box_bytes(&self, bytes: &mut [u8]);
+    fn write_party_bytes(&self, bytes: &mut [u8]);
     fn to_box_bytes(&self) -> Vec<u8>;
     fn to_party_bytes(&self) -> Vec<u8>;
 
     fn get_species_metadata(&self) -> &'static SpeciesMetadata;
-    fn get_forme_metadata(&self) -> Option<&'static FormeMetadata>;
+    fn get_forme_metadata(&self) -> &'static FormeMetadata;
+
+    fn calculate_level(&self) -> u8;
 }
 
 #[derive(Debug)]
@@ -55,6 +61,9 @@ pub enum PkmError {
     FormeIndex {
         national_dex: NatDexIndex,
         forme_index: u16,
+    },
+    NatureIndex {
+        nature_index: u8,
     },
     AbilityIndex {
         ability_index: u16,
@@ -91,6 +100,10 @@ impl Display for PkmError {
                     species_metadata.formes.len()
                 )
                 .to_owned()
+            }
+            PkmError::NatureIndex { nature_index } => {
+                format!("Invalid nature index {nature_index} (must be between 1 and {NATURE_MAX}")
+                    .to_owned()
             }
             PkmError::AbilityIndex { ability_index } => {
                 format!("Invalid ability index {ability_index} (must be between 1 and {ABILITY_MAX}")

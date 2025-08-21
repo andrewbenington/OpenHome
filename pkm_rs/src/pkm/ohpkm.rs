@@ -1,8 +1,8 @@
 use crate::pkm::traits::IsShiny4096;
 use crate::pkm::{Pkm, PkmError, PkmResult};
 use crate::resources::{
-    AbilityIndex, Ball, FormeMetadata, GameOfOriginIndex, ModernRibbon, MoveSlot, NatDexIndex,
-    NatureIndex, OpenHomeRibbonSet, SpeciesMetadata,
+    AbilityIndex, Ball, FormeMetadata, GameOfOriginIndex, ModernRibbon, MoveSlot, NatureIndex,
+    OpenHomeRibbonSet, SpeciesAndForme, SpeciesMetadata,
 };
 use crate::strings::SizedUtf16String;
 use crate::substructures::{
@@ -12,12 +12,14 @@ use crate::substructures::{
 use crate::util;
 use serde::Serialize;
 
+const MIN_SIZE: usize = 420;
+
 #[derive(Debug, Default, Serialize, Clone, Copy, IsShiny4096)]
 pub struct Ohpkm {
     pub encryption_constant: u32,
     pub sanity: u16,
     pub checksum: u16,
-    pub national_dex: NatDexIndex,
+    pub species_and_forme: SpeciesAndForme,
     pub held_item_index: u16,
     pub trainer_id: u16,
     pub secret_id: u16,
@@ -37,7 +39,6 @@ pub struct Ohpkm {
     pub is_fateful_encounter: bool,
     pub flag2_la: bool,
     pub gender: Gender,
-    pub forme_num: u16,
     pub evs: Stats8,
     pub contest: ContestStats,
     pub pokerus_byte: u8,
@@ -132,9 +133,9 @@ impl Pkm for Ohpkm {
 
     fn from_bytes(bytes: &[u8]) -> PkmResult<Self> {
         let size = bytes.len();
-        if size < Self::BOX_SIZE {
+        if size < MIN_SIZE {
             return Err(PkmError::ByteLength {
-                expected: Self::BOX_SIZE,
+                expected: MIN_SIZE,
                 received: size,
             });
         }
@@ -143,7 +144,10 @@ impl Pkm for Ohpkm {
             encryption_constant: u32::from_le_bytes(bytes[0..4].try_into().unwrap()),
             sanity: u16::from_le_bytes(bytes[4..6].try_into().unwrap()),
             checksum: u16::from_le_bytes(bytes[6..8].try_into().unwrap()),
-            national_dex: NatDexIndex::new(u16::from_le_bytes(bytes[8..10].try_into().unwrap()))?,
+            species_and_forme: SpeciesAndForme::new(
+                u16::from_le_bytes(bytes[8..10].try_into().unwrap()),
+                u16::from_le_bytes(bytes[36..38].try_into().unwrap()),
+            )?,
             held_item_index: u16::from_le_bytes(bytes[10..12].try_into().unwrap()),
             trainer_id: u16::from_le_bytes(bytes[12..14].try_into().unwrap()),
             secret_id: u16::from_le_bytes(bytes[14..16].try_into().unwrap()),
@@ -160,12 +164,11 @@ impl Pkm for Ohpkm {
             markings: MarkingsSixShapesColors::from_bytes(bytes[24..26].try_into().unwrap()),
             alpha_move: u16::from_le_bytes(bytes[26..28].try_into().unwrap()),
             personality_value: u32::from_le_bytes(bytes[28..32].try_into().unwrap()),
-            nature: NatureIndex::from(bytes[32]),
-            stat_nature: NatureIndex::from(bytes[33]),
+            nature: NatureIndex::try_from(bytes[32])?,
+            stat_nature: NatureIndex::try_from(bytes[33])?,
             is_fateful_encounter: util::get_flag(bytes, 34, 0),
             flag2_la: util::get_flag(bytes, 34, 1),
             gender: Gender::from_bits_2_3(bytes[34]),
-            forme_num: u16::from_le_bytes(bytes[36..38].try_into().unwrap()),
             evs: Stats8::from_bytes(bytes[38..44].try_into().unwrap()),
             contest: ContestStats::from_bytes(bytes[44..50].try_into().unwrap()),
             pokerus_byte: bytes[50],
@@ -271,16 +274,20 @@ impl Pkm for Ohpkm {
             tutor_flags_la: bytes[368..376].try_into().unwrap(),
             master_flags_la: bytes[376..384].try_into().unwrap(),
             tm_flags_sv: bytes[384..406].try_into().unwrap(),
-            tm_flags_sv_dlc: bytes[420..433].try_into().unwrap(),
+            tm_flags_sv_dlc: if bytes.len() >= 433 {
+                bytes[420..433].try_into().unwrap()
+            } else {
+                [0u8; 13]
+            },
         };
         Ok(mon)
     }
 
-    fn write_bytes(&self, bytes: &mut [u8]) {
+    fn write_box_bytes(&self, bytes: &mut [u8]) {
         bytes[0..4].copy_from_slice(&self.encryption_constant.to_le_bytes());
         bytes[4..6].copy_from_slice(&self.sanity.to_le_bytes());
         bytes[6..8].copy_from_slice(&self.checksum.to_le_bytes());
-        bytes[8..10].copy_from_slice(&self.national_dex.to_le_bytes());
+        bytes[8..10].copy_from_slice(&self.species_and_forme.get_ndex().to_le_bytes());
         bytes[10..12].copy_from_slice(&self.held_item_index.to_le_bytes());
         bytes[12..14].copy_from_slice(&self.trainer_id.to_le_bytes());
         bytes[14..16].copy_from_slice(&self.secret_id.to_le_bytes());
@@ -304,7 +311,7 @@ impl Pkm for Ohpkm {
         util::set_flag(bytes, 34, 1, self.flag2_la);
         self.gender.set_bits_2_3(&mut bytes[34]);
 
-        bytes[36..38].copy_from_slice(&self.forme_num.to_le_bytes());
+        bytes[36..38].copy_from_slice(&self.species_and_forme.get_forme_index().to_le_bytes());
         bytes[38..44].copy_from_slice(&self.evs.to_bytes());
         bytes[44..50].copy_from_slice(&self.contest.to_bytes());
         bytes[50] = self.pokerus_byte;
@@ -405,28 +412,32 @@ impl Pkm for Ohpkm {
         bytes[420..433].copy_from_slice(&self.tm_flags_sv_dlc);
     }
 
+    fn write_party_bytes(&self, bytes: &mut [u8]) {
+        self.write_box_bytes(bytes);
+    }
+
     fn to_box_bytes(&self) -> Vec<u8> {
-        let mut bytes = [0; 433];
-        self.write_bytes(&mut bytes);
+        let mut bytes = [0; Self::BOX_SIZE];
+        self.write_box_bytes(&mut bytes);
 
         Vec::from(bytes)
     }
 
     fn to_party_bytes(&self) -> Vec<u8> {
-        let mut bytes = [0; 433];
-        let box_slice: &mut [u8; 433] = bytes[0..433].as_mut().try_into().unwrap();
-        self.write_bytes(box_slice);
-
-        Vec::from(bytes)
+        self.to_box_bytes()
     }
 
     fn get_species_metadata(&self) -> &'static SpeciesMetadata {
-        self.national_dex.get_species_metadata()
+        self.species_and_forme.get_species_metadata()
     }
 
-    fn get_forme_metadata(&self) -> Option<&'static FormeMetadata> {
-        self.national_dex
-            .get_species_metadata()
-            .get_forme(self.forme_num as usize)
+    fn get_forme_metadata(&self) -> &'static FormeMetadata {
+        self.species_and_forme.get_forme_metadata()
+    }
+
+    fn calculate_level(&self) -> u8 {
+        self.get_species_metadata()
+            .level_up_type
+            .calculate_level(self.exp)
     }
 }

@@ -1,10 +1,20 @@
 use crate::util::bit_is_set;
+use pkm_rs_derive::Stats;
 use serde::Serialize;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
+pub trait Stats: Sized {
+    fn get_hp(&self) -> u16;
+    fn get_atk(&self) -> u16;
+    fn get_def(&self) -> u16;
+    fn get_spa(&self) -> u16;
+    fn get_spd(&self) -> u16;
+    fn get_spe(&self) -> u16;
+}
+
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Debug, Default, Serialize, Clone, Copy)]
+#[derive(Debug, Default, Serialize, Clone, Copy, Stats)]
 pub struct Stats8 {
     pub hp: u8,
     pub atk: u8,
@@ -62,6 +72,26 @@ impl Stats8 {
         bytes[byte_offset..byte_offset + 4].copy_from_slice(&numeric_val.to_le_bytes());
     }
 
+    const fn gv_from_iv(iv: u8) -> u8 {
+        match iv {
+            0..=19 => 0,
+            20..=25 => 1,
+            26..=30 => 2,
+            31.. => 3,
+        }
+    }
+
+    pub const fn gvs_from_ivs(&self) -> Stats8 {
+        Stats8 {
+            hp: Stats8::gv_from_iv(self.hp),
+            atk: Stats8::gv_from_iv(self.atk),
+            def: Stats8::gv_from_iv(self.def),
+            spa: Stats8::gv_from_iv(self.spa),
+            spd: Stats8::gv_from_iv(self.spd),
+            spe: Stats8::gv_from_iv(self.spe),
+        }
+    }
+
     pub const fn dvs_from_ivs(self, is_shiny: bool) -> StatsPreSplit {
         if is_shiny {
             let mut atk_dv = (self.atk - 1).div_ceil(2);
@@ -110,7 +140,7 @@ impl Stats8 {
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Debug, Default, Serialize, Clone, Copy)]
+#[derive(Debug, Default, Serialize, Clone, Copy, Stats)]
 pub struct Stats16Le {
     pub hp: u16,
     pub atk: u16,
@@ -152,38 +182,6 @@ impl Stats16Le {
             .try_into()
             .unwrap()
     }
-
-    // pub fn from_30_bits(bytes: [u8; 4]) -> Self {
-    //     let iv_bytes = u32::from_le_bytes(bytes);
-    //     Stats16Le {
-    //         hp: (iv_bytes & 0x1f).try_into().unwrap(),
-    //         atk: ((iv_bytes >> 5) & 0x1f).try_into().unwrap(),
-    //         def: ((iv_bytes >> 10) & 0x1f).try_into().unwrap(),
-    //         spe: ((iv_bytes >> 15) & 0x1f).try_into().unwrap(),
-    //         spa: ((iv_bytes >> 20) & 0x1f).try_into().unwrap(),
-    //         spd: ((iv_bytes >> 25) & 0x1f).try_into().unwrap(),
-    //     }
-    // }
-
-    // pub fn write_30_bits(&self, bytes: &mut [u8], byte_offset: usize) {
-    //     let current_val =
-    //         u32::from_le_bytes(bytes[byte_offset..byte_offset + 4].try_into().unwrap());
-    //     let mut numeric_val: u32 = self.spd as u32;
-    //     numeric_val <<= 5;
-    //     numeric_val |= self.spa as u32;
-    //     numeric_val <<= 5;
-    //     numeric_val |= self.spe as u32;
-    //     numeric_val <<= 5;
-    //     numeric_val |= self.def as u32;
-    //     numeric_val <<= 5;
-    //     numeric_val |= self.atk as u32;
-    //     numeric_val <<= 5;
-    //     numeric_val |= self.hp as u32;
-
-    //     numeric_val |= current_val & (0b11 << 30);
-
-    //     bytes[byte_offset..byte_offset + 4].copy_from_slice(&numeric_val.to_le_bytes());
-    // }
 }
 
 #[cfg(feature = "wasm")]
@@ -215,7 +213,7 @@ pub struct HyperTraining {
 }
 
 impl HyperTraining {
-    pub fn from_byte(byte: u8) -> Self {
+    pub const fn from_byte(byte: u8) -> Self {
         HyperTraining {
             hp: bit_is_set(byte, 0),
             atk: bit_is_set(byte, 1),

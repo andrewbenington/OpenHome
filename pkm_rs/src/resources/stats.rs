@@ -1,3 +1,4 @@
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum Stat {
     HP,
     Attack,

@@ -2,7 +2,9 @@ use crate::plugin::{self, PluginMetadata, PluginMetadataWithIcon, list_plugins};
 use crate::state::{AppState, AppStateInner, AppStateSnapshot};
 use crate::util::ImageResponse;
 use crate::{menu, saves, util};
+use pkm_rs::saves::SaveData;
 use serde_json::Value;
+use std::any::Any;
 use std::collections::HashMap;
 use std::fs;
 use std::fs::File;
@@ -26,11 +28,19 @@ pub fn get_state(state: tauri::State<'_, AppStateInner>) -> AppStateSnapshot {
 pub fn get_file_bytes(absolute_path: PathBuf) -> Result<Vec<u8>, String> {
     // let full_path = prepend_appdata_to_path(&app_handle, path)?;
 
+    // println!("file: {:?}", absolute_path.clone());
     // Open the file, and return any error up the call stack
     let mut file = File::open(absolute_path).map_err(|e| e.to_string())?;
 
     let mut contents = Vec::new();
+
     file.read_to_end(&mut contents).map_err(|e| e.to_string())?;
+
+    // let save_file = SaveData::build_from_bytes(contents.clone());
+    // match save_file {
+    //     Ok(file) => println!("successfully build: {:?}", file.to_string()),
+    //     Err(e) => println!("error loading save: {e}"),
+    // }
 
     Ok(contents)
 }

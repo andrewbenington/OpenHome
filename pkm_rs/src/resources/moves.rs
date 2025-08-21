@@ -17,10 +17,7 @@ impl MoveSlot {
     }
 
     pub fn from_le_bytes(bytes: [u8; 2]) -> Self {
-        Self(match NonZeroU16::try_from(u16::from_le_bytes(bytes)) {
-            Err(_) => None,
-            Ok(value) => Some(value),
-        })
+        Self(NonZeroU16::try_from(u16::from_le_bytes(bytes)).ok())
     }
 
     pub fn to_le_bytes(self) -> [u8; 2] {
@@ -42,10 +39,7 @@ impl Serialize for MoveSlot {
 
 impl From<u16> for MoveSlot {
     fn from(value: u16) -> Self {
-        Self(match NonZeroU16::try_from(value) {
-            Err(_) => None,
-            Ok(value) => Some(value),
-        })
+        Self(NonZeroU16::try_from(value).ok())
     }
 }
 

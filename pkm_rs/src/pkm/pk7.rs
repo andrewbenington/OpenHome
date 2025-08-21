@@ -1,11 +1,8 @@
-use core::panic;
-
 use crate::pkm::traits::{IsShiny4096, ModernEvs};
-use crate::pkm::universal::AnyPkm;
-use crate::pkm::{Ohpkm, Pkm, PkmError, PkmResult, UniversalPkm};
+use crate::pkm::{Ohpkm, Pkm, PkmError, PkmResult, helpers};
 use crate::resources::{
     AbilityIndex, Ball, FormeMetadata, GameOfOriginIndex, ModernRibbon, ModernRibbonSet, MoveSlot,
-    NatDexIndex, NatureIndex, OpenHomeRibbonSet, SpeciesMetadata,
+    NatureIndex, OpenHomeRibbonSet, SpeciesAndForme, SpeciesMetadata,
 };
 use crate::strings::SizedUtf16String;
 use crate::substructures::{
@@ -17,15 +14,13 @@ use serde::Serialize;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
-const MAX_RIBBON: ModernRibbon = ModernRibbon::BattleTreeMaster;
-
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Debug, Default, Serialize, Clone, Copy, IsShiny4096)]
 pub struct Pk7 {
     pub encryption_constant: u32,
     pub sanity: u16,
     pub checksum: u16,
-    pub national_dex: NatDexIndex,
+    pub species_and_forme: SpeciesAndForme,
     pub held_item_index: u16,
     pub trainer_id: u16,
     pub secret_id: u16,
@@ -37,7 +32,6 @@ pub struct Pk7 {
     pub nature: NatureIndex,
     pub is_fateful_encounter: bool,
     pub gender: Gender,
-    pub forme_num: u8,
     pub evs: Stats8,
     pub contest: ContestStats,
     pub resort_event_status: u8,
@@ -92,9 +86,13 @@ pub struct Pk7 {
     pub region: u8,
     pub console_region: u8,
     pub language_index: u8,
-    pub status_condition: u8,
-    pub current_hp: u8,
     pub trainer_gender: Gender,
+    pub status_condition: u32,
+    pub stat_level: u8,
+    pub form_argument_remain: u8,
+    pub form_argument_elapsed: u8,
+    pub current_hp: u16,
+    pub stats: Stats16Le,
 }
 
 impl Pkm for Pk7 {
@@ -122,7 +120,10 @@ impl Pkm for Pk7 {
             encryption_constant: u32::from_le_bytes(bytes[0..4].try_into().unwrap()),
             sanity: u16::from_le_bytes(bytes[4..6].try_into().unwrap()),
             checksum: u16::from_le_bytes(bytes[6..8].try_into().unwrap()),
-            national_dex: NatDexIndex::new(u16::from_le_bytes(bytes[8..10].try_into().unwrap()))?,
+            species_and_forme: SpeciesAndForme::new(
+                u16::from_le_bytes(bytes[8..10].try_into().unwrap()),
+                util::read_uint5_from_bits(bytes[29], 3).into(),
+            )?,
             held_item_index: u16::from_le_bytes(bytes[10..12].try_into().unwrap()),
             trainer_id: u16::from_le_bytes(bytes[12..14].try_into().unwrap()),
             secret_id: u16::from_le_bytes(bytes[14..16].try_into().unwrap()),
@@ -131,10 +132,9 @@ impl Pkm for Pk7 {
             ability_num: bytes[21],
             markings: MarkingsSixShapesColors::from_bytes(bytes[22..24].try_into().unwrap()),
             personality_value: u32::from_le_bytes(bytes[24..28].try_into().unwrap()),
-            nature: NatureIndex::from(bytes[28]),
+            nature: NatureIndex::try_from(bytes[28])?,
             is_fateful_encounter: util::get_flag(bytes, 29, 0),
             gender: Gender::from_bits_1_2(bytes[29]),
-            forme_num: util::read_uint5_from_bits(bytes[29], 3),
             evs: Stats8::from_bytes(bytes[30..36].try_into().unwrap()),
             contest: ContestStats::from_bytes(bytes[36..42].try_into().unwrap()),
             resort_event_status: bytes[42],
@@ -200,18 +200,46 @@ impl Pkm for Pk7 {
             region: bytes[225],
             console_region: bytes[226],
             language_index: bytes[227],
-            status_condition: if bytes.len() > 260 { bytes[232] } else { 0 },
-            current_hp: if bytes.len() > 260 { bytes[240] } else { 0 },
             trainer_gender: util::get_flag(bytes, 221, 7).into(),
+            status_condition: if bytes.len() > Self::BOX_SIZE {
+                u32::from_le_bytes(bytes[232..236].try_into().unwrap())
+            } else {
+                0
+            },
+            stat_level: if bytes.len() > Self::BOX_SIZE {
+                bytes[237]
+            } else {
+                0
+            },
+            form_argument_remain: if bytes.len() > Self::BOX_SIZE {
+                bytes[238]
+            } else {
+                0
+            },
+            form_argument_elapsed: if bytes.len() > Self::BOX_SIZE {
+                bytes[239]
+            } else {
+                0
+            },
+            current_hp: if bytes.len() > Self::BOX_SIZE {
+                u16::from_le_bytes(bytes[240..242].try_into().unwrap())
+            } else {
+                0
+            },
+            stats: if bytes.len() > Self::BOX_SIZE {
+                Stats16Le::from_bytes(bytes[242..254].try_into().unwrap())
+            } else {
+                Stats16Le::default()
+            },
         };
         Ok(mon)
     }
 
-    fn write_bytes(&self, bytes: &mut [u8]) {
+    fn write_box_bytes(&self, bytes: &mut [u8]) {
         bytes[0..4].copy_from_slice(&self.encryption_constant.to_le_bytes());
         bytes[4..6].copy_from_slice(&self.sanity.to_le_bytes());
         bytes[6..8].copy_from_slice(&self.checksum.to_le_bytes());
-        bytes[8..10].copy_from_slice(&self.national_dex.to_le_bytes());
+        bytes[8..10].copy_from_slice(&self.species_and_forme.get_ndex().to_le_bytes());
         bytes[10..12].copy_from_slice(&self.held_item_index.to_le_bytes());
         bytes[12..14].copy_from_slice(&self.trainer_id.to_le_bytes());
         bytes[14..16].copy_from_slice(&self.secret_id.to_le_bytes());
@@ -224,7 +252,11 @@ impl Pkm for Pk7 {
 
         self.gender.set_bits_1_2(&mut bytes[29]);
         util::set_flag(bytes, 29, 0, self.is_fateful_encounter);
-        util::write_uint5_to_bits(self.forme_num, &mut bytes[29], 3);
+        util::write_uint5_to_bits(
+            self.species_and_forme.get_forme_index() as u8,
+            &mut bytes[29],
+            3,
+        );
 
         bytes[30..36].copy_from_slice(&self.evs.to_bytes());
         bytes[36..42].copy_from_slice(&self.contest.to_bytes());
@@ -269,6 +301,7 @@ impl Pkm for Pk7 {
         util::set_flag(bytes, 116, 31, self.is_nicknamed);
 
         bytes[120..144].copy_from_slice(&self.handler_name);
+        util::set_flag(bytes, 146, 0, self.handler_gender);
         util::set_flag(bytes, 147, 0, self.is_current_handler);
         bytes[148..158].copy_from_slice(&self.geolocations.to_bytes());
 
@@ -297,6 +330,7 @@ impl Pkm for Pk7 {
         bytes[212..215].copy_from_slice(&self.met_date.to_bytes());
         bytes[216..218].copy_from_slice(&self.egg_location_index.to_le_bytes());
         bytes[218..220].copy_from_slice(&self.met_location_index.to_le_bytes());
+
         bytes[220] = self.ball as u8;
         bytes[221] = self.met_level;
         bytes[222] = self.hyper_training.to_byte();
@@ -307,38 +341,67 @@ impl Pkm for Pk7 {
         bytes[227] = self.language_index;
     }
 
+    fn write_party_bytes(&self, bytes: &mut [u8]) {
+        self.write_box_bytes(bytes);
+        bytes[232..236].copy_from_slice(&self.status_condition.to_le_bytes());
+        bytes[237] = self.stat_level;
+        bytes[238] = self.form_argument_remain;
+        bytes[239] = self.form_argument_elapsed;
+        bytes[240..242].copy_from_slice(&self.current_hp.to_le_bytes());
+        bytes[242..254].copy_from_slice(&self.stats.to_bytes());
+    }
+
     fn to_box_bytes(&self) -> Vec<u8> {
-        let mut bytes = [0; 232];
-        self.write_bytes(&mut bytes);
+        let mut bytes = [0; Self::BOX_SIZE];
+        self.write_box_bytes(&mut bytes);
 
         Vec::from(bytes)
     }
 
     fn to_party_bytes(&self) -> Vec<u8> {
-        let mut bytes = [0; 260];
-        let box_slice: &mut [u8; 232] = bytes[0..232].as_mut().try_into().unwrap();
-        self.write_bytes(box_slice);
-
-        bytes[232] = self.status_condition;
-        bytes[240] = self.current_hp;
+        let mut bytes = [0; Self::PARTY_SIZE];
+        self.write_party_bytes(&mut bytes);
 
         Vec::from(bytes)
     }
 
     fn get_species_metadata(&self) -> &'static SpeciesMetadata {
-        self.national_dex.get_species_metadata()
+        self.species_and_forme.get_species_metadata()
     }
 
-    fn get_forme_metadata(&self) -> Option<&'static FormeMetadata> {
-        self.national_dex
-            .get_species_metadata()
-            .get_forme(self.forme_num as usize)
+    fn get_forme_metadata(&self) -> &'static FormeMetadata {
+        self.species_and_forme.get_forme_metadata()
+    }
+
+    fn calculate_level(&self) -> u8 {
+        self.get_species_metadata()
+            .level_up_type
+            .calculate_level(self.exp)
+    }
+}
+
+impl Pk7 {
+    pub fn calculate_stats(&self) -> Stats16Le {
+        helpers::calculate_stats_modern(
+            self.species_and_forme,
+            &self.ivs,
+            &self.evs,
+            self.calculate_level(),
+            self.nature.get_metadata().expect("invalid nature index"),
+        )
     }
 }
 
 #[cfg(feature = "wasm")]
 #[wasm_bindgen]
+#[allow(clippy::missing_const_for_fn)]
 impl Pk7 {
+    #[wasm_bindgen(js_name = fromOhpkmBytes)]
+    pub fn from_ohpkm_bytes(bytes: Vec<u8>) -> Result<Pk7, JsValue> {
+        let ohpkm = Ohpkm::from_bytes(&bytes).map_err(|e| JsValue::from_str(&e.to_string()))?;
+        Ok(Pk7::from(ohpkm))
+    }
+
     #[wasm_bindgen(js_name = fromBytes)]
     pub fn from_byte_vector(bytes: Vec<u8>) -> Result<Pk7, JsValue> {
         Pk7::from_bytes(&bytes).map_err(|e| JsValue::from_str(&e.to_string()))
@@ -436,7 +499,6 @@ impl Pk7 {
 
     #[wasm_bindgen(getter)]
     pub fn ribbons(&self) -> Vec<String> {
-        println!("getting ribbons");
         self.ribbons
             .get_ribbons()
             .iter()
@@ -454,6 +516,21 @@ impl Pk7 {
         self.ribbons
             .set_ribbons(indices.into_iter().map(ModernRibbon::from).collect());
     }
+
+    #[wasm_bindgen]
+    pub fn set_species_and_forme(
+        &mut self,
+        national_dex: u16,
+        forme_index: u16,
+    ) -> Result<(), JsValue> {
+        match SpeciesAndForme::new(national_dex, forme_index) {
+            Ok(species_and_forme) => {
+                self.species_and_forme = species_and_forme;
+                Ok(())
+            }
+            Err(e) => Err(JsValue::from_str(&e.to_string())),
+        }
+    }
 }
 
 impl ModernEvs for Pk7 {
@@ -468,7 +545,7 @@ impl From<Pk7> for Ohpkm {
             encryption_constant: other.encryption_constant,
             sanity: other.sanity,
             checksum: other.checksum,
-            national_dex: other.national_dex,
+            species_and_forme: other.species_and_forme,
             held_item_index: other.held_item_index,
             trainer_id: other.trainer_id,
             secret_id: other.secret_id,
@@ -488,7 +565,6 @@ impl From<Pk7> for Ohpkm {
             is_fateful_encounter: other.is_fateful_encounter,
             flag2_la: false,
             gender: other.gender,
-            forme_num: other.forme_num as u16,
             evs: other.evs,
             contest: other.contest,
             pokerus_byte: other.pokerus_byte,
@@ -577,7 +653,7 @@ impl From<Ohpkm> for Pk7 {
             encryption_constant: other.encryption_constant,
             sanity: other.sanity,
             checksum: other.checksum,
-            national_dex: other.national_dex,
+            species_and_forme: other.species_and_forme,
             held_item_index: other.held_item_index,
             trainer_id: other.trainer_id,
             secret_id: other.secret_id,
@@ -589,7 +665,6 @@ impl From<Ohpkm> for Pk7 {
             nature: other.nature,
             is_fateful_encounter: other.is_fateful_encounter,
             gender: other.gender,
-            forme_num: other.forme_num as u8,
             evs: other.evs,
             contest: other.contest,
             resort_event_status: other.resort_event_status,
@@ -598,10 +673,7 @@ impl From<Ohpkm> for Pk7 {
             ribbons: ModernRibbonSet::from_ribbons(
                 other
                     .ribbons
-                    .get_modern()
-                    .into_iter()
-                    .take_while(|ribbon| ribbon.get_index() <= MAX_RIBBON.get_index())
-                    .collect(),
+                    .get_modern_not_past(ModernRibbon::BattleTreeMaster),
             ),
             contest_memory_count: other.contest_memory_count,
             battle_memory_count: other.battle_memory_count,
@@ -634,7 +706,7 @@ impl From<Ohpkm> for Pk7 {
             met_date: other.met_date,
             egg_location_index: other.egg_location_index,
             met_location_index: other.met_location_index,
-            ball: other.ball,
+            ball: other.ball.poke_if_newer_than(Ball::Beast),
             met_level: other.met_level,
             hyper_training: other.hyper_training,
             game_of_origin: other.game_of_origin,
@@ -642,9 +714,19 @@ impl From<Ohpkm> for Pk7 {
             region: other.region,
             console_region: other.console_region,
             language_index: other.language_index,
+            trainer_gender: other.trainer_gender,
             status_condition: 0,
             current_hp: 0,
-            trainer_gender: other.trainer_gender,
+            stat_level: 0,
+            form_argument_remain: 0,
+            form_argument_elapsed: 0,
+            stats: helpers::calculate_stats_modern(
+                other.species_and_forme,
+                &other.ivs,
+                &other.evs,
+                other.calculate_level(),
+                other.nature.get_metadata().expect("invalid nature value"),
+            ),
         }
     }
 }

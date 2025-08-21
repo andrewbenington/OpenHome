@@ -3,7 +3,7 @@ use wasm_bindgen::prelude::*;
 
 use serde::{Serialize, Serializer};
 
-use crate::resources::Stat;
+use crate::{pkm::PkmError, resources::Stat};
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Debug, Default, PartialEq, Eq, Clone, Copy)]
@@ -47,9 +47,16 @@ impl Serialize for NatureIndex {
     }
 }
 
-impl From<u8> for NatureIndex {
-    fn from(value: u8) -> Self {
-        Self(value)
+impl TryFrom<u8> for NatureIndex {
+    type Error = PkmError;
+
+    fn try_from(value: u8) -> Result<Self, Self::Error> {
+        if value > NATURE_MAX {
+            return Err(PkmError::NatureIndex {
+                nature_index: value,
+            });
+        }
+        Ok(Self(value))
     }
 }
 
@@ -68,6 +75,23 @@ pub struct NatureMetadata {
     id: u16,
     name: &'static str,
     stats: Option<NatureStatData>,
+}
+
+impl NatureMetadata {
+    pub fn multiplier_for(&self, stat: Stat) -> f32 {
+        match &self.stats {
+            None => 1.0,
+            Some(stat_changes) => {
+                if stat_changes.increase == stat {
+                    1.1
+                } else if stat_changes.decrease == stat {
+                    0.9
+                } else {
+                    1.0
+                }
+            }
+        }
+    }
 }
 
 const HARDY: NatureMetadata = NatureMetadata {
@@ -279,6 +303,8 @@ const QUIRKY: NatureMetadata = NatureMetadata {
     name: "Quirky",
     stats: None,
 };
+
+pub const NATURE_MAX: u8 = 24;
 
 const ALL_NATURES: [&NatureMetadata; 25] = [
     &HARDY, &LONELY, &BRAVE, &ADAMANT, &NAUGHTY, &BOLD, &DOCILE, &RELAXED, &IMPISH, &LAX, &TIMID,

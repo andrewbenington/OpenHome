@@ -12,7 +12,7 @@ fn u8_slice_to_u16_be(slice: &[u8]) -> Vec<u16> {
         .collect()
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct Gen5String<const N: usize> {
     raw_be: [u8; N],
 }

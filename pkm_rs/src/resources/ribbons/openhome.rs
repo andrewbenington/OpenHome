@@ -30,7 +30,7 @@ impl ObsoleteRibbonSet {
     }
 
     pub fn add_ribbon(&mut self, ribbon: ObsoleteRibbon) {
-        self.0.set_index(ribbon.get_index(), true);
+        self.0.set_index(ribbon.get_index() as u8, true);
     }
 
     pub fn set_ribbons(&mut self, ribbons: Vec<ObsoleteRibbon>) {
@@ -51,6 +51,7 @@ impl Serialize for ObsoleteRibbonSet {
 }
 
 #[derive(Debug, Serialize, PartialEq, Eq, Clone, Copy)]
+#[repr(u8)]
 pub enum ObsoleteRibbon {
     Winning,
     Victory,
@@ -156,57 +157,8 @@ impl ObsoleteRibbon {
         }
     }
 
-    fn get_index(&self) -> usize {
-        match self {
-            ObsoleteRibbon::Winning => 0,
-            ObsoleteRibbon::Victory => 1,
-            ObsoleteRibbon::Ability => 2,
-            ObsoleteRibbon::GreatAbility => 3,
-            ObsoleteRibbon::DoubleAbility => 4,
-            ObsoleteRibbon::MultiAbility => 5,
-            ObsoleteRibbon::PairAbility => 6,
-            ObsoleteRibbon::WorldAbility => 7,
-            ObsoleteRibbon::CoolHoenn => 8,
-            ObsoleteRibbon::CoolSuperHoenn => 9,
-            ObsoleteRibbon::CoolHyperHoenn => 10,
-            ObsoleteRibbon::CoolMasterHoenn => 11,
-            ObsoleteRibbon::BeautyHoenn => 12,
-            ObsoleteRibbon::BeautySuperHoenn => 13,
-            ObsoleteRibbon::BeautyHyperHoenn => 14,
-            ObsoleteRibbon::BeautyMasterHoenn => 15,
-            ObsoleteRibbon::CuteHoenn => 16,
-            ObsoleteRibbon::CuteSuperHoenn => 17,
-            ObsoleteRibbon::CuteHyperHoenn => 18,
-            ObsoleteRibbon::CuteMasterHoenn => 19,
-            ObsoleteRibbon::SmartHoenn => 20,
-            ObsoleteRibbon::SmartSuperHoenn => 21,
-            ObsoleteRibbon::SmartHyperHoenn => 22,
-            ObsoleteRibbon::SmartMasterHoenn => 23,
-            ObsoleteRibbon::ToughHoenn => 24,
-            ObsoleteRibbon::ToughSuperHoenn => 25,
-            ObsoleteRibbon::ToughHyperHoenn => 26,
-            ObsoleteRibbon::ToughMasterHoenn => 27,
-            ObsoleteRibbon::CoolSinnoh => 28,
-            ObsoleteRibbon::CoolGreatSinnoh => 29,
-            ObsoleteRibbon::CoolUltraSinnoh => 30,
-            ObsoleteRibbon::CoolMasterSinnoh => 31,
-            ObsoleteRibbon::BeautySinnoh => 32,
-            ObsoleteRibbon::BeautyGreatSinnoh => 33,
-            ObsoleteRibbon::BeautyUltraSinnoh => 34,
-            ObsoleteRibbon::BeautyMasterSinnoh => 35,
-            ObsoleteRibbon::CuteSinnoh => 36,
-            ObsoleteRibbon::CuteGreatSinnoh => 37,
-            ObsoleteRibbon::CuteUltraSinnoh => 38,
-            ObsoleteRibbon::CuteMasterSinnoh => 39,
-            ObsoleteRibbon::SmartSinnoh => 40,
-            ObsoleteRibbon::SmartGreatSinnoh => 41,
-            ObsoleteRibbon::SmartUltraSinnoh => 42,
-            ObsoleteRibbon::SmartMasterSinnoh => 43,
-            ObsoleteRibbon::ToughSinnoh => 44,
-            ObsoleteRibbon::ToughGreatSinnoh => 45,
-            ObsoleteRibbon::ToughUltraSinnoh => 46,
-            ObsoleteRibbon::ToughMasterSinnoh => 47,
-        }
+    fn get_index(self) -> usize {
+        self as usize
     }
 }
 
@@ -274,15 +226,15 @@ impl From<usize> for ObsoleteRibbon {
 
 #[derive(Debug, Clone, Copy, Serialize)]
 pub enum OpenHomeRibbon {
-    Modern(ModernRibbon),
-    Obsolete(ObsoleteRibbon),
+    Mod(ModernRibbon),
+    Obs(ObsoleteRibbon),
 }
 
 impl Display for OpenHomeRibbon {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str(&match self {
-            OpenHomeRibbon::Modern(ribbon) => ribbon.to_string(),
-            OpenHomeRibbon::Obsolete(ribbon) => ribbon.to_string(),
+            OpenHomeRibbon::Mod(ribbon) => ribbon.to_string(),
+            OpenHomeRibbon::Obs(ribbon) => ribbon.to_string(),
         })
     }
 }
@@ -318,6 +270,13 @@ impl<const MODERN_BYTE_COUNT: usize> OpenHomeRibbonSet<MODERN_BYTE_COUNT> {
         })
     }
 
+    pub fn from_obsolete(obsolete: ObsoleteRibbonSet) -> Self {
+        Self {
+            modern: ModernRibbonSet::<MODERN_BYTE_COUNT>::default(),
+            obsolete,
+        }
+    }
+
     pub fn from_modern<const M: usize>(modern: ModernRibbonSet<M>) -> Self {
         Self {
             modern: modern.truncate_to::<MODERN_BYTE_COUNT>(),
@@ -328,8 +287,8 @@ impl<const MODERN_BYTE_COUNT: usize> OpenHomeRibbonSet<MODERN_BYTE_COUNT> {
     pub fn get_ribbons(&self) -> Vec<OpenHomeRibbon> {
         self.get_obsolete()
             .into_iter()
-            .map(OpenHomeRibbon::Obsolete)
-            .chain(self.get_modern().into_iter().map(OpenHomeRibbon::Modern))
+            .map(OpenHomeRibbon::Obs)
+            .chain(self.get_modern().into_iter().map(OpenHomeRibbon::Mod))
             .collect()
     }
 
@@ -349,9 +308,20 @@ impl<const MODERN_BYTE_COUNT: usize> OpenHomeRibbonSet<MODERN_BYTE_COUNT> {
 
     pub fn add_ribbon(&mut self, ribbon: OpenHomeRibbon) {
         match ribbon {
-            OpenHomeRibbon::Modern(ribbon) => self.modern.add_ribbon(ribbon),
-            OpenHomeRibbon::Obsolete(ribbon) => self.obsolete.add_ribbon(ribbon),
+            OpenHomeRibbon::Mod(ribbon) => self.modern.add_ribbon(ribbon),
+            OpenHomeRibbon::Obs(ribbon) => self.obsolete.add_ribbon(ribbon),
         }
+    }
+
+    pub fn add_ribbons(&mut self, ribbons: Vec<OpenHomeRibbon>) {
+        ribbons
+            .into_iter()
+            .for_each(|ribbon| self.add_ribbon(ribbon));
+    }
+
+    pub fn with_ribbons(mut self, ribbons: Vec<OpenHomeRibbon>) -> Self {
+        self.add_ribbons(ribbons);
+        self
     }
 
     pub fn set_modern_ribbons(&mut self, ribbons: Vec<ModernRibbon>) {
@@ -360,6 +330,14 @@ impl<const MODERN_BYTE_COUNT: usize> OpenHomeRibbonSet<MODERN_BYTE_COUNT> {
 
     pub fn get_modern(&self) -> Vec<ModernRibbon> {
         self.modern.get_ribbons()
+    }
+
+    pub fn get_modern_not_past(&self, max_ribbon: ModernRibbon) -> Vec<ModernRibbon> {
+        self.modern
+            .get_ribbons()
+            .into_iter()
+            .take_while(|ribbon| ribbon.get_index() <= max_ribbon.get_index())
+            .collect()
     }
 
     pub fn get_obsolete(&self) -> Vec<ObsoleteRibbon> {
@@ -373,5 +351,11 @@ impl<const N: usize> Serialize for OpenHomeRibbonSet<N> {
         S: Serializer,
     {
         self.get_ribbons().serialize(serializer)
+    }
+}
+
+impl<const N: usize> FromIterator<OpenHomeRibbon> for OpenHomeRibbonSet<N> {
+    fn from_iter<T: IntoIterator<Item = OpenHomeRibbon>>(iter: T) -> Self {
+        Self::default().with_ribbons(iter.into_iter().collect())
     }
 }

@@ -1,6 +1,6 @@
 use crate::pkm::traits::{IsShiny4096, ModernEvs};
 use crate::pkm::{Pkm, PkmError, PkmResult};
-use crate::resources::{AbilityIndex, FormeMetadata, MoveSlot, NatDexIndex, SpeciesMetadata};
+use crate::resources::{AbilityIndex, FormeMetadata, MoveSlot, SpeciesAndForme, SpeciesMetadata};
 use crate::strings::SizedUtf16String;
 use crate::substructures::{
     Gender, HyperTraining, MarkingsSixShapesColors, PokeDate, Stats8, Stats16Le,
@@ -12,7 +12,7 @@ use serde::Serialize;
 pub struct Pb7 {
     pub encryption_constant: u32,
     pub checksum: u16,
-    pub national_dex: NatDexIndex,
+    pub species_and_forme: SpeciesAndForme,
     pub held_item_index: u16,
     pub trainer_id: u16,
     pub secret_id: u16,
@@ -25,7 +25,6 @@ pub struct Pb7 {
     pub nature: u8,
     pub is_fateful_encounter: bool,
     pub gender: Gender,
-    pub forme_num: u8,
     pub evs: Stats8,
     pub avs: Stats8,
     pub resort_event_status: u8,
@@ -104,7 +103,10 @@ impl Pkm for Pb7 {
         let mon = Pb7 {
             encryption_constant: u32::from_le_bytes(bytes[0..4].try_into().unwrap()),
             checksum: u16::from_le_bytes(bytes[6..8].try_into().unwrap()),
-            national_dex: NatDexIndex::new(u16::from_le_bytes(bytes[8..10].try_into().unwrap()))?,
+            species_and_forme: SpeciesAndForme::new(
+                u16::from_le_bytes(bytes[8..10].try_into().unwrap()),
+                util::read_uint5_from_bits(bytes[29], 3).into(),
+            )?,
             held_item_index: u16::from_le_bytes(bytes[10..12].try_into().unwrap()),
             trainer_id: u16::from_le_bytes(bytes[12..14].try_into().unwrap()),
             secret_id: u16::from_le_bytes(bytes[14..16].try_into().unwrap()),
@@ -117,12 +119,6 @@ impl Pkm for Pb7 {
             nature: bytes[28],
             is_fateful_encounter: util::get_flag(bytes, 29, 0),
             gender: Gender::from_bits_1_2(bytes[29]),
-            forme_num: util::int_from_buffer_bits_le::<u8>(bytes, 29, 3, 5).map_err(|e| {
-                PkmError::FieldError {
-                    field: "forme_num",
-                    source: e,
-                }
-            })?,
             evs: Stats8::from_bytes(bytes[30..36].try_into().unwrap()),
             avs: Stats8::from_bytes(bytes[36..42].try_into().unwrap()),
             resort_event_status: bytes[42],
@@ -171,6 +167,7 @@ impl Pkm for Pb7 {
             met_location_index: u16::from_le_bytes(bytes[218..220].try_into().unwrap()),
             ball: bytes[220],
             met_level: bytes[221],
+            trainer_gender: util::get_flag(bytes, 221, 7).into(),
             hyper_training: HyperTraining::from_byte(bytes[222]),
             game_of_origin: bytes[223],
             language_index: bytes[227],
@@ -184,15 +181,14 @@ impl Pkm for Pb7 {
             cp: u16::from_le_bytes(bytes[254..256].try_into().unwrap()),
             is_mega: bytes[256],
             mega_forme: bytes[257],
-            trainer_gender: util::get_flag(bytes, 221, 7).into(),
         };
         Ok(mon)
     }
 
-    fn write_bytes(&self, bytes: &mut [u8]) {
+    fn write_box_bytes(&self, bytes: &mut [u8]) {
         bytes[0..4].copy_from_slice(&self.encryption_constant.to_le_bytes());
         bytes[6..8].copy_from_slice(&self.checksum.to_le_bytes());
-        bytes[8..10].copy_from_slice(&self.national_dex.to_le_bytes());
+        bytes[8..10].copy_from_slice(&self.species_and_forme.get_ndex().to_le_bytes());
         bytes[10..12].copy_from_slice(&self.held_item_index.to_le_bytes());
         bytes[12..14].copy_from_slice(&self.trainer_id.to_le_bytes());
         bytes[14..16].copy_from_slice(&self.secret_id.to_le_bytes());
@@ -205,9 +201,12 @@ impl Pkm for Pb7 {
 
         self.gender.set_bits_1_2(&mut bytes[29]);
         util::set_flag(bytes, 29, 0, self.is_fateful_encounter);
-        util::write_uint5_to_bits(self.forme_num, &mut bytes[29], 3);
+        util::write_uint5_to_bits(
+            self.species_and_forme.get_forme_index() as u8,
+            &mut bytes[29],
+            3,
+        );
 
-        bytes[29] = self.forme_num;
         bytes[30..36].copy_from_slice(&self.evs.to_bytes());
         bytes[36..42].copy_from_slice(&self.avs.to_bytes());
         bytes[42] = self.resort_event_status;
@@ -283,9 +282,13 @@ impl Pkm for Pb7 {
         bytes[257] = self.mega_forme;
     }
 
+    fn write_party_bytes(&self, bytes: &mut [u8]) {
+        self.write_box_bytes(bytes);
+    }
+
     fn to_box_bytes(&self) -> Vec<u8> {
-        let mut bytes = [0; 260];
-        self.write_bytes(&mut bytes);
+        let mut bytes = [0; Self::BOX_SIZE];
+        self.write_box_bytes(&mut bytes);
 
         Vec::from(bytes)
     }
@@ -295,13 +298,17 @@ impl Pkm for Pb7 {
     }
 
     fn get_species_metadata(&self) -> &'static SpeciesMetadata {
-        self.national_dex.get_species_metadata()
+        self.species_and_forme.get_species_metadata()
     }
 
-    fn get_forme_metadata(&self) -> Option<&'static FormeMetadata> {
-        self.national_dex
-            .get_species_metadata()
-            .get_forme(self.forme_num as usize)
+    fn get_forme_metadata(&self) -> &'static FormeMetadata {
+        self.species_and_forme.get_forme_metadata()
+    }
+
+    fn calculate_level(&self) -> u8 {
+        self.get_species_metadata()
+            .level_up_type
+            .calculate_level(self.exp)
     }
 }
 

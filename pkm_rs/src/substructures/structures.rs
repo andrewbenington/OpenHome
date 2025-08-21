@@ -6,7 +6,7 @@ use wasm_bindgen::prelude::*;
 use crate::util;
 
 const MASK_BITS_1_2: u8 = 0b00000110;
-const MASK_BITS_1_2_INVERTED: u8 = 0b11110011;
+const MASK_BITS_1_2_INVERTED: u8 = 0b11111001;
 
 const MASK_BITS_2_3: u8 = 0b00001100;
 const MASK_BITS_2_3_INVERTED: u8 = 0b11110011;
@@ -124,12 +124,26 @@ impl<const N: usize> FlagSet<N> {
         self.raw
     }
 
-    pub fn set_index(&mut self, index: usize, value: bool) {
-        util::set_flag(&mut self.raw, 0, index as u32, value);
+    pub fn set_index(&mut self, index: u8, value: bool) {
+        util::set_flag(&mut self.raw, 0, index as usize, value);
     }
 
-    pub fn clear_all(&mut self) {
+    pub const fn clear_all(&mut self) {
         self.raw = [0; N]
+    }
+
+    pub fn add_index(&mut self, index: u8) {
+        self.set_index(index, true);
+    }
+
+    pub fn add_indices(&mut self, indices: Vec<u8>) {
+        indices.into_iter().for_each(|index| self.add_index(index));
+    }
+
+    pub fn from_indices(indices: Vec<u8>) -> Self {
+        let mut set = Self::default();
+        set.add_indices(indices);
+        set
     }
 }
 
@@ -145,6 +159,12 @@ impl<const N: usize> Serialize for FlagSet<N> {
 impl<const N: usize> Default for FlagSet<N> {
     fn default() -> Self {
         Self { raw: [0; N] }
+    }
+}
+
+impl<const N: usize> FromIterator<u8> for FlagSet<N> {
+    fn from_iter<T: IntoIterator<Item = u8>>(iter: T) -> Self {
+        Self::from_indices(iter.into_iter().collect())
     }
 }
 

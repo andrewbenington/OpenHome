@@ -1,18 +1,13 @@
-use pkm_rs::{
-    pkm::Ohpkm,
-    saves::{SaveData, SaveDataTrait},
-};
+use pkm_rs::{pkm::Ohpkm, saves::SaveData};
 
 use std::{
     error::Error,
     fs::{File, remove_file, rename},
     io::Write,
-    ops::Deref,
     path::{Path, PathBuf},
-    sync::{Arc, Mutex},
+    sync::Mutex,
 };
 
-use pkm_rs_derive::{DummyTrait, IsShiny4096};
 use serde::Serialize;
 
 fn add_tmp(path: &Path) -> PathBuf {
@@ -47,7 +42,6 @@ pub struct UnsavedChange {
     event: PokemonMove,
 }
 
-#[derive(DummyTrait)]
 pub struct OpenSave {
     pub save: SaveData,
     pub unsaved_changes: Vec<UnsavedChange>,

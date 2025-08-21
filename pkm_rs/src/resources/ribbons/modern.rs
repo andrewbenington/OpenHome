@@ -27,7 +27,7 @@ impl<const N: usize> ModernRibbonSet<N> {
     }
 
     pub fn add_ribbon(&mut self, ribbon: ModernRibbon) {
-        self.0.set_index(ribbon.get_index(), true);
+        self.0.set_index(ribbon.get_index() as u8, true);
     }
 
     pub fn set_ribbons(&mut self, ribbons: Vec<ModernRibbon>) {
@@ -69,7 +69,7 @@ impl<const N: usize> Serialize for ModernRibbonSet<N> {
 #[derive(Debug, Serialize, PartialEq, Eq, Clone, Copy)]
 pub enum ModernRibbon {
     KalosChampion,
-    Champion,
+    Gen3Champion,
     SinnohChampion,
     BestFriends,
     Training,
@@ -185,7 +185,7 @@ impl ModernRibbon {
     pub const fn get_name(&self) -> &'static str {
         match self {
             ModernRibbon::KalosChampion => "Kalos Champion Ribbon",
-            ModernRibbon::Champion => "Champion Ribbon",
+            ModernRibbon::Gen3Champion => "Champion Ribbon",
             ModernRibbon::SinnohChampion => "Sinnoh Champion Ribbon",
             ModernRibbon::BestFriends => "Best Friends Ribbon",
             ModernRibbon::Training => "Training Ribbon",
@@ -301,7 +301,7 @@ impl ModernRibbon {
     pub const fn get_index(&self) -> usize {
         match self {
             ModernRibbon::KalosChampion => 0,
-            ModernRibbon::Champion => 1,
+            ModernRibbon::Gen3Champion => 1,
             ModernRibbon::SinnohChampion => 2,
             ModernRibbon::BestFriends => 3,
             ModernRibbon::Training => 4,
@@ -439,7 +439,7 @@ impl From<usize> for ModernRibbon {
     fn from(value: usize) -> Self {
         match value {
             0 => ModernRibbon::KalosChampion,
-            1 => ModernRibbon::Champion,
+            1 => ModernRibbon::Gen3Champion,
             2 => ModernRibbon::SinnohChampion,
             3 => ModernRibbon::BestFriends,
             4 => ModernRibbon::Training,

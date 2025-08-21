@@ -1,6 +1,7 @@
 pub mod abilities;
 mod ball;
 mod games;
+mod language;
 mod moves;
 mod natures;
 mod pkm_types;
@@ -11,6 +12,7 @@ mod stats;
 pub use abilities::*;
 pub use ball::*;
 pub use games::*;
+pub use language::*;
 pub use moves::*;
 pub use natures::*;
 pub use pkm_types::*;
