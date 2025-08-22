@@ -306,3 +306,48 @@ impl From<Pk5> for Ohpkm {
         }
     }
 }
+
+impl From<Ohpkm> for Pk5 {
+    fn from(other: Ohpkm) -> Self {
+        Self {
+            personality_value: other.personality_value,
+            species_and_forme: other.species_and_forme,
+            trainer_id: other.trainer_id,
+            stored_checksum: 0,
+            held_item_index: other.held_item_index,
+            secret_id: other.secret_id,
+            exp: other.exp,
+            trainer_friendship: other.trainer_friendship,
+            ability_index: other.ability_index,
+            markings: other.markings.into(),
+            language_index: other.language_index,
+            evs: other.evs,
+            contest: other.contest,
+            moves: other.moves,
+            move_pp: other.move_pp,
+            move_pp_ups: other.move_pp_ups,
+            ivs: other.ivs,
+            is_egg: other.is_egg,
+            is_nicknamed: other.is_nicknamed,
+            gender: other.gender,
+            nature: other.nature,
+            is_ns_pokemon: other.is_ns_pokemon,
+            ribbons: DsRibbonSet::from_openhome(other.ribbons),
+            game_of_origin: other.game_of_origin,
+            egg_date: other.egg_date,
+            met_date: other.met_date,
+            egg_location_index: other.egg_location_index,
+            met_location_index: other.met_location_index,
+            pokerus_byte: other.pokerus_byte,
+            ball: other.ball,
+            met_level: other.met_level,
+            encounter_type: other.encounter_type,
+            poke_star_fame: other.poke_star_fame,
+            is_fateful_encounter: other.is_fateful_encounter,
+            nickname: other.nickname.to_string().into(),
+            trainer_name: other.trainer_name.to_string().into(),
+            trainer_gender: other.trainer_gender,
+            ..Default::default()
+        }
+    }
+}
