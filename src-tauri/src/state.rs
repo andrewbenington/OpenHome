@@ -1,11 +1,11 @@
 use std::{
-    error::Error,
-    fs::{File, remove_file, rename},
-    io::Write,
+    fs,
     path::{Path, PathBuf},
 };
 
 use serde::Serialize;
+
+use crate::error::{OpenHomeError, OpenHomeResult};
 
 fn add_tmp(path: &Path) -> PathBuf {
     if let Some(stem) = path.file_name() {
@@ -14,7 +14,7 @@ fn add_tmp(path: &Path) -> PathBuf {
     path.to_path_buf()
 }
 
-fn remove_tmp(mut path: PathBuf) -> PathBuf {
+fn remove_tmp_extension(mut path: PathBuf) -> PathBuf {
     if let Some(stem) = path.clone().file_name().and_then(|name| name.to_str()) {
         let new_name_o = stem.strip_suffix(".tmp");
         if let Some(new_name) = new_name_o {
@@ -38,26 +38,33 @@ pub struct AppStateSnapshot {
 }
 
 impl AppState {
-    pub fn start_transaction(&self) -> Result<(), Box<dyn Error + '_>> {
-        let mut transaction_is_open = self.open_transaction.lock()?;
+    pub fn start_transaction(&self) -> OpenHomeResult<()> {
+        let Ok(mut transaction_is_open) = self.open_transaction.lock() else {
+            return Err(OpenHomeError::MutexFailure);
+        };
+
         if *transaction_is_open {
-            Err("Previous transaction is still open".into())
+            Err(OpenHomeError::TransactionOpen)
         } else {
             *transaction_is_open = true;
             Ok(())
         }
     }
 
-    pub fn rollback_transaction(&self) -> Result<(), Box<dyn Error + '_>> {
-        let mut transaction_is_open = self.open_transaction.lock()?;
+    pub fn rollback_transaction(&self) -> OpenHomeResult<()> {
+        let Ok(mut transaction_is_open) = self.open_transaction.lock() else {
+            return Err(OpenHomeError::MutexFailure);
+        };
 
         if !*transaction_is_open {
             return Ok(());
         }
 
-        let mut temp_files = self.temp_files.lock()?;
+        let Ok(mut temp_files) = self.temp_files.lock() else {
+            return Err(OpenHomeError::MutexFailure);
+        };
         for temp_file in temp_files.iter() {
-            remove_file(temp_file).unwrap_or_else(|e| {
+            fs::remove_file(temp_file).unwrap_or_else(|e| {
                 eprintln!("delete temp file {}: {}", temp_file.to_string_lossy(), e)
             });
         }
@@ -67,28 +74,34 @@ impl AppState {
         Ok(())
     }
 
-    pub fn commit_transaction(&self) -> Result<(), Box<dyn Error + '_>> {
-        let mut transaction_is_open = self.open_transaction.lock()?;
+    pub fn commit_transaction(&self) -> OpenHomeResult<()> {
+        let Ok(mut transaction_is_open) = self.open_transaction.lock() else {
+            return Err(OpenHomeError::MutexFailure);
+        };
 
         if !*transaction_is_open {
-            println!("no transaction open");
             return Ok(());
         }
 
         // overwrite original files with the .tmp versions, deleting the temps
-        let mut temp_files = self.temp_files.lock()?;
+        let Ok(mut temp_files) = self.temp_files.lock() else {
+            return Err(OpenHomeError::MutexFailure);
+        };
         for temp_file in temp_files.iter() {
-            let temp_file_name = temp_file.to_string_lossy();
-            println!("un-temping {temp_file_name}");
-            rename(temp_file, remove_tmp(temp_file.clone()))
-                .map_err(|e| format!("Un-Temp file {temp_file_name}: {e}"))?;
+            fs::rename(temp_file, remove_tmp_extension(temp_file.clone()))
+                .map_err(|err| OpenHomeError::file_access(temp_file, err))?;
         }
+
         *transaction_is_open = false;
         temp_files.clear();
         Ok(())
     }
 
-    pub fn write_file_bytes(&self, absolute_path: &Path, bytes: Vec<u8>) -> Result<(), String> {
+    pub fn write_file_bytes_temped(
+        &self,
+        absolute_path: &Path,
+        bytes: Vec<u8>,
+    ) -> OpenHomeResult<()> {
         let mut path = absolute_path.to_path_buf();
         if *self.open_transaction.lock().unwrap() {
             let mut temp_files = self.temp_files.lock().unwrap();
@@ -96,10 +109,6 @@ impl AppState {
             temp_files.push(path.clone());
         }
 
-        let mut file = File::create(&path)
-            .map_err(|e| format!("Create/open file {}: {}", path.to_string_lossy(), e))?;
-
-        file.write_all(&bytes)
-            .map_err(|e| format!("Write file {}: {}", path.to_string_lossy(), e))
+        fs::write(&path, &bytes).map_err(|e| OpenHomeError::file_write(&path, e))
     }
 }

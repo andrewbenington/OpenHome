@@ -111,7 +111,7 @@ export type LookupMap = Record<string, string>
 export type LoadSaveResponse = {
   path: PathData
   fileBytes: Uint8Array
-  createdDate: Date
+  createdDate?: Date
 }
 
 export interface PKMFormeRef {
