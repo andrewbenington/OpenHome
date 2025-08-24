@@ -9,6 +9,7 @@ dependencies = [
  "base64 0.22.1",
  "bytes",
  "reqwest",
+ "semver",
  "serde",
  "serde_json",
  "tauri",

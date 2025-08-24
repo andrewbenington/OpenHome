@@ -3,30 +3,27 @@ mod error;
 mod menu;
 mod plugin;
 mod saves;
+mod startup;
 mod state;
 mod util;
 mod versioning;
 
-use std::{
-    env,
-    path::{Path, PathBuf},
-};
-
-use tauri::{App, Manager};
-
-use crate::error::{OpenHomeError, OpenHomeResult};
+use std::env;
+use tauri_plugin_dialog::{DialogExt, MessageDialogKind};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_fs::init())
+        .manage(state::AppState::default())
         .setup(|app| {
-            let handle = app.handle();
-            initialize_appdata(handle)?;
-
-            let result = set_theme_from_settings(app);
-            if let Err(error) = result {
-                eprintln!("{}", error)
+            if let Err(launch_error) = startup::run_app_startup(app) {
+                app.dialog()
+                    .message(launch_error.to_string())
+                    .title("OpenHome Failed to Launch")
+                    .kind(MessageDialogKind::Error)
+                    .blocking_show();
+                app.handle().exit(1);
             }
 
             match menu::create_menu(app) {
@@ -46,7 +43,6 @@ pub fn run() {
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_shell::init())
-        .manage(state::AppState::default())
         .invoke_handler(tauri::generate_handler![
             commands::get_state,
             commands::get_file_bytes,
@@ -73,64 +69,4 @@ pub fn run() {
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
-}
-
-fn initialize_appdata(app_handle: &tauri::AppHandle) -> OpenHomeResult<()> {
-    let storage_path = util::get_storage_path(app_handle)?;
-    util::create_directory(&storage_path)?;
-
-    let obj_files = [
-        "gen12_lookup.json",
-        "gen345_lookup.json",
-        "recent_saves.json",
-    ];
-
-    for obj_file in obj_files {
-        init_storage_json_file(app_handle, obj_file.into(), false)?;
-    }
-
-    let arr_files = ["box-data.json", "box-names.json", "save-folders.json"];
-
-    for arr_file in arr_files {
-        init_storage_json_file(app_handle, arr_file.into(), true)?;
-    }
-
-    let mons_path = util::get_appdata_dir(app_handle)?.join("mons");
-    util::create_directory(&mons_path)
-}
-
-fn init_storage_json_file(
-    app_handle: &tauri::AppHandle,
-    relative_path: PathBuf,
-    is_array: bool,
-) -> OpenHomeResult<()> {
-    let absolute_path = util::prepend_appdata_storage_to_path(app_handle, &relative_path)?;
-    if !Path::new(&absolute_path).exists() {
-        let contents = match is_array {
-            true => b"[]",
-            false => b"{}",
-        };
-
-        util::write_file_contents(absolute_path, contents)?;
-    }
-    Ok(())
-}
-
-fn set_theme_from_settings(app: &App) -> OpenHomeResult<()> {
-    let settings_json: serde_json::Value =
-        util::get_storage_file_json(app.app_handle(), "settings.json")?;
-
-    let app_theme = settings_json["appTheme"].as_str().unwrap_or("light");
-
-    let theme_option = match app_theme {
-        "dark" => Some(tauri::Theme::Dark),
-        "light" => Some(tauri::Theme::Light),
-        "system" => None::<tauri::Theme>,
-        _ => Some(tauri::Theme::Light),
-    };
-
-    app.get_webview_window("main")
-        .ok_or(OpenHomeError::WindowAccess { source: None })?
-        .set_theme(theme_option)
-        .map_err(|e| OpenHomeError::other_with_source("Could not set theme", e))
 }

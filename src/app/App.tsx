@@ -80,7 +80,7 @@ function AppWithBackend() {
   const [lookupState, lookupDispatch] = useReducer(lookupReducer, { loaded: false })
   const [filterState, filterDispatch] = useReducer(filterReducer, {})
   const [pluginState, pluginDispatch] = useReducer(pluginReducer, { plugins: [], loaded: false })
-  const [loading, setLoading] = useState(false)
+  const [settingsLoading, setSettingsLoading] = useState(false)
 
   const backend = useContext(BackendContext)
   const displayError = useDisplayError()
@@ -101,7 +101,7 @@ function AppWithBackend() {
           async (settings) => appInfoDispatch({ type: 'load_settings', payload: settings })
         )
       )
-      .finally(() => setLoading(false))
+      .finally(() => setSettingsLoading(false))
   }, [backend])
 
   // only on app start
@@ -181,7 +181,7 @@ function AppWithBackend() {
               <DragMonContext.Provider value={[dragMonState, dragMonDispatch]}>
                 <PokemonDragContextProvider>
                   <FilterContext.Provider value={[filterState, filterDispatch]}>
-                    {loading ? (
+                    {settingsLoading ? (
                       <Flex width="100%" height="100vh" align="center" justify="center">
                         <Text size="9" weight="bold">
                           OpenHome
