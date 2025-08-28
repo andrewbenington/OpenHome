@@ -2,7 +2,7 @@ import { createContext, Dispatch, Reducer } from 'react'
 import { OHPKM } from 'src/types/pkm/OHPKM'
 import { HomeData } from 'src/types/SAVTypes/HomeData'
 import { SAV } from 'src/types/SAVTypes/SAV'
-import { StoredBoxData } from 'src/types/storage'
+import { OpenHomeBank } from 'src/types/storage'
 import { getMonFileIdentifier } from 'src/util/Lookup'
 import { PKMInterface } from '../types/interfaces'
 import { getSortFunctionNullable, SortType } from '../types/pkm/sort'
@@ -36,10 +36,20 @@ export type MonWithLocation = MonLocation & {
 
 export type OpenSavesAction =
   | {
-      type: 'set_home_boxes'
+      type: 'set_home_banks'
       payload: {
-        boxes: StoredBoxData[]
+        banks: OpenHomeBank[]
         homeLookup: Record<string, OHPKM>
+      }
+    }
+  | {
+      type: 'add_home_bank'
+      payload: {
+        name?: string
+        box_count?: number
+        current_count: number
+        switch_to_bank: boolean
+        home_lookup: Record<string, OHPKM>
       }
     }
   | {
@@ -137,16 +147,40 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
 ) => {
   const { type, payload } = action
 
-  switch (type) {
-    case 'set_home_boxes': {
-      const { boxes, homeLookup } = payload
-      const newHomeData = state.homeData ?? new HomeData(boxes)
+  console.log({ type, payload })
 
-      Object.values(boxes).forEach((box) => {
-        newHomeData.boxes[box.index].loadMonsFromIdentifiers(box.monIdentifiersByIndex, homeLookup)
+  switch (type) {
+    case 'set_home_banks': {
+      const { banks, homeLookup } = payload
+      const newHomeData = state.homeData ?? new HomeData(banks)
+
+      Object.values(banks[newHomeData.currentBankIndex].boxes).forEach((box) => {
+        newHomeData.boxes[box.index].loadMonsFromIdentifiers(box.identifiers, homeLookup)
       })
 
       return { ...state, homeData: newHomeData }
+    }
+    case 'add_home_bank': {
+      const { name, box_count, current_count, switch_to_bank, home_lookup } = payload
+
+      // handle duplicate event dispatches in strict mode
+      if (!state.homeData || state.homeData?.banks.length !== current_count) {
+        return { ...state }
+      }
+
+      const updatedHomeData = state.homeData
+
+      updatedHomeData.addBank(name, box_count)
+      if (switch_to_bank) {
+        console.log('')
+        updatedHomeData.currentBankIndex = updatedHomeData.banks.length - 1
+        Object.values(updatedHomeData.banks[updatedHomeData.currentBankIndex].boxes).forEach(
+          (box) => {
+            updatedHomeData.boxes[box.index].loadMonsFromIdentifiers(box.identifiers, home_lookup)
+          }
+        )
+      }
+      return { ...state, homeData: updatedHomeData }
     }
     case 'add_save': {
       const saveIdentifier = saveToStringIdentifier(payload)

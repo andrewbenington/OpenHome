@@ -45,12 +45,12 @@ pub fn parse_path_data(path: &Path) -> PathData {
         .file_stem()
         .unwrap_or_default()
         .to_string_lossy()
-        .to_string();
+        .into();
     let ext = path
         .extension()
         .unwrap_or_default()
         .to_string_lossy()
-        .to_string();
+        .into();
     let dir = path
         .parent()
         .map(|p| p.to_string_lossy().to_string())
@@ -104,6 +104,16 @@ where
     C: AsRef<[u8]>,
 {
     fs::write(&path, contents).map_err(|err| OpenHomeError::file_access(path, err))
+}
+
+pub fn write_file_json<P, V>(path: P, value: V) -> OpenHomeResult<()>
+where
+    P: AsRef<Path>,
+    V: serde::ser::Serialize,
+{
+    let text =
+        serde_json::to_string(&value).map_err(|err| OpenHomeError::file_malformed(&path, err))?;
+    write_file_contents(path, text)
 }
 
 pub fn create_directory<P>(path: P) -> OpenHomeResult<()>

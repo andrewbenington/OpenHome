@@ -5,8 +5,18 @@ export type SaveFolder = {
 
 export type BoxMonIdentifiers = Record<number, string>
 
-export type StoredBoxData = {
+export type OpenHomeBox = {
   index: number
   name: string | undefined
-  monIdentifiersByIndex: BoxMonIdentifiers
+  identifiers: BoxMonIdentifiers
+}
+
+export type OpenHomeBank = {
+  index: number
+  name: string | undefined
+  boxes: OpenHomeBox[]
+}
+
+export function getBankName(bank: OpenHomeBank): string {
+  return bank.name ?? `Bank ${bank.index + 1}`
 }

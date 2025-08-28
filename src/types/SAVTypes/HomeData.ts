@@ -4,7 +4,7 @@ import { getMonFileIdentifier } from 'src/util/Lookup'
 import { numericSorter } from '../../util/Sort'
 import { TransferRestrictions } from '../TransferRestrictions'
 import { OHPKM } from '../pkm/OHPKM'
-import { BoxMonIdentifiers, StoredBoxData } from '../storage'
+import { BoxMonIdentifiers, OpenHomeBank } from '../storage'
 import { Box, BoxCoordinates, SAV } from './SAV'
 import { emptyPathData, PathData } from './path'
 
@@ -69,6 +69,8 @@ export class HomeData implements SAV<OHPKM> {
   currentPCBox: number = 0
   boxNames: string[]
   boxes: Array<HomeBox>
+  currentBankIndex: number = 0
+  banks: OpenHomeBank[]
 
   bytes: Uint8Array = new Uint8Array()
 
@@ -77,8 +79,9 @@ export class HomeData implements SAV<OHPKM> {
 
   updatedBoxSlots: BoxCoordinates[] = []
 
-  constructor(boxData?: Partial<StoredBoxData>[]) {
-    const sortedBoxData = boxData?.sort(
+  constructor(bankData: OpenHomeBank[]) {
+    this.banks = bankData
+    const sortedBoxData = bankData[0].boxes?.sort(
       numericSorter((box) => (box.index === undefined ? Number.NEGATIVE_INFINITY : box.index))
     )
 
@@ -96,6 +99,10 @@ export class HomeData implements SAV<OHPKM> {
 
   getCurrentBox() {
     return this.boxes[this.currentPCBox]
+  }
+
+  getCurrentBank() {
+    return this.banks[this.currentBankIndex]
   }
 
   getGameName() {
@@ -116,5 +123,13 @@ export class HomeData implements SAV<OHPKM> {
 
   getPluginIdentifier() {
     return undefined
+  }
+
+  addBank(name?: string, box_count: number = 30) {
+    this.banks.push({
+      name,
+      index: this.banks.length,
+      boxes: Array(box_count).map((_, index) => ({ name: undefined, index, identifiers: {} })),
+    })
   }
 }

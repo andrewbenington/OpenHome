@@ -1,5 +1,5 @@
+import { Spinner } from '@radix-ui/themes'
 import { useContext } from 'react'
-import { BackendContext } from 'src/backend/backendContext'
 import OHDataGrid, { SortableColumn } from 'src/components/OHDataGrid'
 import PokemonIcon from 'src/components/PokemonIcon'
 import { getPublicImageURL } from 'src/images/images'
@@ -7,7 +7,7 @@ import { getMonSaveLogo } from 'src/saves/util'
 import { AppInfoContext } from 'src/state/appInfo'
 import { OHPKM } from 'src/types/pkm/OHPKM'
 import { numericSorter, stringSorter } from 'src/util/Sort'
-import { LookupContext } from '../../state/lookup'
+import { LookupContext, useLookups } from '../../state/lookup'
 
 type G12LookupRow = {
   gen12ID: string
@@ -20,11 +20,13 @@ type Gen12LookupProps = {
 }
 
 export default function Gen12Lookup({ onSelectMon }: Gen12LookupProps) {
-  const [{ homeMons, gen12 }] = useContext(LookupContext)
+  const [{ homeMons }] = useContext(LookupContext)
+  const { lookups, loaded } = useLookups()
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
-  const backend = useContext(BackendContext)
 
-  backend.getResourcesPath().then(console.info)
+  if (!loaded) {
+    return <Spinner />
+  }
 
   function pokemonFromLookupID(id: string) {
     if (!homeMons) return undefined
@@ -82,9 +84,13 @@ export default function Gen12Lookup({ onSelectMon }: Gen12LookupProps) {
     },
   ]
 
+  console.log(lookups, lookups.gen12)
+
+  console.log(Object.entries(lookups.gen12))
+
   return (
     <OHDataGrid
-      rows={Object.entries(gen12 ?? {}).map(([gen12ID, homeID]) => ({
+      rows={Object.entries(lookups.gen12).map(([gen12ID, homeID]) => ({
         gen12ID,
         homeID,
         homeMon: pokemonFromLookupID(homeID),

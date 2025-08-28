@@ -171,4 +171,10 @@ impl Error for OpenHomeError {
     }
 }
 
+impl<T> From<std::sync::PoisonError<T>> for OpenHomeError {
+    fn from(_: std::sync::PoisonError<T>) -> Self {
+        OpenHomeError::MutexFailure
+    }
+}
+
 pub type OpenHomeResult<T> = Result<T, OpenHomeError>;

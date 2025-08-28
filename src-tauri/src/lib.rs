@@ -1,6 +1,8 @@
 mod commands;
+mod deprecated;
 mod error;
 mod menu;
+mod pkm_storage;
 mod plugin;
 mod saves;
 mod startup;
@@ -9,13 +11,13 @@ mod util;
 mod versioning;
 
 use std::env;
+use tauri::Manager;
 use tauri_plugin_dialog::{DialogExt, MessageDialogKind};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_fs::init())
-        .manage(state::AppState::default())
         .setup(|app| {
             if let Err(launch_error) = startup::run_app_startup(app) {
                 app.dialog()
@@ -25,6 +27,35 @@ pub fn run() {
                     .blocking_show();
                 app.handle().exit(1);
             }
+
+            // let banks = match pkm_storage::load_banks(app.handle()) {
+            //     Ok(banks) => banks,
+            //     Err(err) => {
+            //         app.dialog()
+            //             .message(err.to_string())
+            //             .title("OpenHome Failed to Launch")
+            //             .kind(MessageDialogKind::Error)
+            //             .blocking_show();
+            //         app.handle().exit(1);
+            //         unreachable!()
+            //     }
+            // };
+
+            let lookup_state = match state::LookupState::load_from_storage(app.handle()) {
+                Ok(lookup) => lookup,
+                Err(err) => {
+                    app.dialog()
+                        .message(err.to_string())
+                        .title("OpenHome Failed to Launch")
+                        .kind(MessageDialogKind::Error)
+                        .blocking_show();
+                    app.handle().exit(1);
+                    unreachable!()
+                }
+            };
+
+            app.manage(state::AppState::default());
+            app.manage(lookup_state);
 
             match menu::create_menu(app) {
                 Ok(menu) => {
@@ -66,6 +97,8 @@ pub fn run() {
             commands::delete_plugin,
             commands::handle_windows_accellerator,
             commands::open_directory,
+            state::get_lookups,
+            state::update_lookups,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

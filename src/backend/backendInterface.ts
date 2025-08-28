@@ -1,7 +1,7 @@
 import { Settings } from '../state/appInfo'
 import { OHPKM } from '../types/pkm/OHPKM'
 import { PathData, PossibleSaves } from '../types/SAVTypes/path'
-import { SaveFolder, StoredBoxData } from '../types/storage'
+import { OpenHomeBank, SaveFolder } from '../types/storage'
 import { Errorable, LoadSaveResponse, LookupMap, SaveRef } from '../types/types'
 import { PluginMetadataWithIcon } from '../util/Plugin'
 
@@ -21,12 +21,12 @@ export type PluginDownloadProgress = {
   progress: number
 }
 
+export type StoredLookups = { gen12: LookupMap; gen345: LookupMap }
+
 export default interface BackendInterface {
   /* past gen identifier lookups */
-  loadGen12Lookup: () => Promise<Errorable<LookupMap>>
-  loadGen345Lookup: () => Promise<Errorable<LookupMap>>
-  writeGen12Lookup: (lookup: LookupMap) => Promise<Errorable<null>>
-  writeGen345Lookup: (lookup: LookupMap) => Promise<Errorable<null>>
+  loadLookups: () => Promise<Errorable<StoredLookups>>
+  updateLookups: (gen_12: LookupMap, gen_345: LookupMap) => Promise<Errorable<null>>
 
   /* OHPKM management */
   loadHomeMonLookup: () => Promise<Errorable<Record<string, OHPKM>>>
@@ -34,8 +34,8 @@ export default interface BackendInterface {
   deleteHomeMons: (identifiers: string[]) => Promise<Errorable<null>>
 
   /* openhome boxes */
-  loadHomeBoxes: () => Promise<Errorable<StoredBoxData[]>>
-  writeHomeBoxes: (boxData: StoredBoxData[]) => Promise<Errorable<null>>
+  loadHomeBanks: () => Promise<Errorable<OpenHomeBank[]>>
+  writeHomeBanks: (boxData: OpenHomeBank[]) => Promise<Errorable<null>>
 
   /* game saves */
   loadSaveFile: (filePath: PathData) => Promise<Errorable<LoadSaveResponse>>
@@ -78,9 +78,13 @@ export default interface BackendInterface {
   deletePlugin(pluginId: string): Promise<Errorable<string>>
 }
 
+export type BankOrBoxChange = { bank: number; box: number }
+
 export interface BackendListeners {
   onSave: () => void
   onReset: () => void
   onOpen: () => void
+  onLookupsUpdate: (updated_lookups: StoredLookups) => void
   onPluginDownloadProgress: [string, (_progress_pct: number) => void]
+  onBankOrBoxChange: (change: BankOrBoxChange) => void
 }

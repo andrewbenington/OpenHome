@@ -1,9 +1,9 @@
 import { invoke } from '@tauri-apps/api/core'
 import * as E from 'fp-ts/lib/Either'
-import { Errorable, JSONArray, JSONObject, JSONValue, SaveRef } from 'src/types/types'
+import { Errorable, JSONArray, JSONObject, JSONValue, LookupMap, SaveRef } from 'src/types/types'
 import { PluginMetadataWithIcon } from 'src/util/Plugin'
 import { PossibleSaves } from '../../types/SAVTypes/path'
-import { AppState, ImageResponse } from '../backendInterface'
+import { AppState, ImageResponse, StoredLookups } from '../backendInterface'
 import { RustResult } from './types'
 
 function rustResultToEither<T, E>(result: RustResult<T, E>): E.Either<E, T> {
@@ -31,6 +31,18 @@ export const TauriInvoker = {
     })
 
     return promise.then((unixMillis) => E.right(new Date(unixMillis))).catch(E.left)
+  },
+
+  getLookups(): Promise<Errorable<StoredLookups>> {
+    const promise: Promise<StoredLookups> = invoke('get_lookups')
+
+    return promise.then(E.right).catch(E.left)
+  },
+
+  updateLookups(gen_12: LookupMap, gen_345: LookupMap): Promise<Errorable<null>> {
+    const promise: Promise<null> = invoke('get_lookups', { gen_12, gen_345 })
+
+    return promise.then(E.right).catch(E.left)
   },
 
   getStorageFileJSON(relativePath: string): Promise<Errorable<JSONObject | JSONArray>> {

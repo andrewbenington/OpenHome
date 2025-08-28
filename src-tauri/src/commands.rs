@@ -1,6 +1,6 @@
 use crate::error::{OpenHomeError, OpenHomeResult};
 use crate::plugin::{self, PluginMetadata, PluginMetadataWithIcon, list_plugins};
-use crate::state::{AppState, AppStateSnapshot};
+use crate::state::{AppState, AppStateInner, AppStateSnapshot};
 use crate::util::ImageResponse;
 use crate::{menu, saves, util};
 use serde_json::Value;
@@ -11,14 +11,8 @@ use std::time::SystemTime;
 use tauri::Manager;
 
 #[tauri::command]
-pub fn get_state(state: tauri::State<'_, AppState>) -> AppStateSnapshot {
-    let temp_files = state.temp_files.lock().unwrap().clone();
-    let open_transaction = *state.open_transaction.lock().unwrap();
-    AppStateSnapshot {
-        temp_files,
-        open_transaction,
-        is_dev: cfg!(debug_assertions),
-    }
+pub fn get_state(state: tauri::State<'_, AppState>) -> OpenHomeResult<AppStateSnapshot> {
+    Ok(state.lock()?.snapshot())
 }
 
 #[tauri::command]
@@ -93,17 +87,17 @@ pub fn delete_storage_files(
 
 #[tauri::command]
 pub fn start_transaction(state: tauri::State<'_, AppState>) -> OpenHomeResult<()> {
-    state.start_transaction()
+    state.lock()?.start_transaction()
 }
 
 #[tauri::command]
 pub fn rollback_transaction(state: tauri::State<'_, AppState>) -> OpenHomeResult<()> {
-    state.rollback_transaction()
+    state.lock()?.rollback_transaction()
 }
 
 #[tauri::command]
 pub fn commit_transaction(state: tauri::State<'_, AppState>) -> OpenHomeResult<()> {
-    state.commit_transaction()
+    state.lock()?.commit_transaction()
 }
 
 #[tauri::command]
@@ -112,7 +106,7 @@ pub fn write_file_bytes(
     absolute_path: &Path,
     bytes: Vec<u8>,
 ) -> OpenHomeResult<()> {
-    state.write_file_bytes_temped(absolute_path, bytes)
+    state.lock()?.write_file_bytes_temped(absolute_path, bytes)
 }
 
 #[tauri::command]

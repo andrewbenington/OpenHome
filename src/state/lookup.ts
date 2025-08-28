@@ -1,33 +1,32 @@
-import { createContext, Dispatch, Reducer } from 'react'
+import {
+  createContext,
+  Dispatch,
+  Reducer,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from 'react'
 import { OHPKM } from 'src/types/pkm/OHPKM'
-import { LookupMap } from '../types/types'
+import { BackendContext } from '../backend/backendContext'
+import { StoredLookups } from '../backend/backendInterface'
 
+import * as E from 'fp-ts/lib/Either'
+import { Errorable } from '../types/types'
 export type LookupState = {
   error?: string
 } & (
   | {
       homeMons: Record<string, OHPKM>
-      gen12: LookupMap
-      gen345: LookupMap
       loaded: true
     }
   | {
       homeMons?: Record<string, OHPKM>
-      gen12?: LookupMap
-      gen345?: LookupMap
       loaded: false
     }
 )
 
 export type LookupAction =
-  | {
-      type: 'load_gen12'
-      payload: LookupMap
-    }
-  | {
-      type: 'load_gen345'
-      payload: LookupMap
-    }
   | {
       type: 'load_home_mons'
       payload: Record<string, OHPKM>
@@ -54,29 +53,10 @@ export const lookupReducer: Reducer<LookupState, LookupAction> = (
         error: payload,
       }
     }
-    case 'load_gen12': {
-      const newState: LookupState = { ...state, gen12: payload }
-
-      if (newState.gen345 && newState.homeMons && newState.gen12) {
-        newState.loaded = true
-      }
-      return newState
-    }
-    case 'load_gen345': {
-      const newState: LookupState = { ...state, gen345: payload }
-
-      if (newState.gen345 && newState.homeMons && newState.gen12) {
-        newState.loaded = true
-      }
-      return newState
-    }
     case 'load_home_mons': {
       const homeMons: Record<string, OHPKM> = payload
-      const newState: LookupState = { ...state, homeMons }
+      const newState: LookupState = { ...state, homeMons, loaded: true }
 
-      if (newState.gen345 && newState.homeMons && newState.gen12) {
-        newState.loaded = true
-      }
       return newState
     }
     case 'clear': {
@@ -91,3 +71,48 @@ export const LookupContext = createContext<[LookupState, Dispatch<LookupAction>]
   initialState,
   () => {},
 ])
+
+export type LookupHookState = { getLookups: () => Promise<Errorable<StoredLookups>> } & (
+  | {
+      loaded: true
+      lookups: StoredLookups
+    }
+  | { loaded: false; lookups: undefined }
+)
+
+export function useLookups(): LookupHookState {
+  const [lookupsCache, setLookupsCache] = useState<StoredLookups>()
+  const [loading, setLoading] = useState(false)
+  const backend = useContext(BackendContext)
+
+  backend.registerListeners({
+    onLookupsUpdate: (updatedLookups) => setLookupsCache(updatedLookups),
+  })
+
+  const loadAndCacheLookups = useCallback(async () => {
+    if (lookupsCache) {
+      return E.right(lookupsCache)
+    }
+
+    const result = await backend.loadLookups()
+
+    if (E.isRight(result)) {
+      setLookupsCache(result.right)
+    }
+
+    return result
+  }, [backend, lookupsCache])
+
+  useEffect(() => {
+    if (!lookupsCache && !loading) {
+      setLoading(true)
+      loadAndCacheLookups().finally(() => setLoading(false))
+    }
+  }, [loadAndCacheLookups, loading, lookupsCache])
+
+  if (lookupsCache) {
+    return { getLookups: loadAndCacheLookups, lookups: lookupsCache, loaded: true }
+  } else {
+    return { getLookups: loadAndCacheLookups, lookups: undefined, loaded: false }
+  }
+}
