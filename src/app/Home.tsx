@@ -16,8 +16,8 @@ import useDisplayError from '../hooks/displayError'
 import HomeBoxDisplay from '../saves/boxes/HomeBoxDisplay'
 import OpenSaveDisplay from '../saves/boxes/SaveBoxDisplay'
 import SavesModal from '../saves/SavesModal'
-import { LookupContext } from '../state/lookup'
 import { OpenSavesContext } from '../state/openSaves'
+import { PersistedPkmDataContext } from '../state/persistedPkmData'
 import { PKMInterface } from '../types/interfaces'
 import { OHPKM } from '../types/pkm/OHPKM'
 import { getMonFileIdentifier, getMonGen12Identifier, getMonGen345Identifier } from '../util/Lookup'
@@ -26,7 +26,7 @@ import ReleaseArea from './home/ReleaseArea'
 
 const Home = () => {
   const [openSavesState, openSavesDispatch, allOpenSaves] = useContext(OpenSavesContext)
-  const [lookupState, lookupDispatch] = useContext(LookupContext)
+  const [lookupState, lookupDispatch] = useContext(PersistedPkmDataContext)
   const backend = useContext(BackendContext)
   const [selectedMon, setSelectedMon] = useState<PKMInterface>()
   const [openSaveDialog, setOpenSaveDialog] = useState(false)
@@ -52,7 +52,7 @@ const Home = () => {
       }
     }
 
-    lookupDispatch({ type: 'load_home_mons', payload: homeResult.right })
+    lookupDispatch({ type: 'load_persisted_pkm_data', payload: homeResult.right })
 
     return homeResult
   }, [backend, lookupDispatch])

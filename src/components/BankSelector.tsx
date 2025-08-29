@@ -1,7 +1,7 @@
 import { Button, DataList, DropdownMenu, TextField } from '@radix-ui/themes'
 import { useContext, useState } from 'react'
-import { LookupContext } from 'src/state/lookup'
 import { OpenSavesContext } from 'src/state/openSaves'
+import { PersistedPkmDataContext } from 'src/state/persistedPkmData'
 import { HomeData } from 'src/types/SAVTypes/HomeData'
 import { getBankName } from 'src/types/storage'
 
@@ -14,7 +14,7 @@ function removeNonDigits(input: string): string {
 export default function BankSelector(props: { homeData: HomeData }) {
   const { homeData } = props
   const [, openSavesDispatch] = useContext(OpenSavesContext)
-  const [lookupState] = useContext(LookupContext)
+  const [lookupState] = useContext(PersistedPkmDataContext)
   const [newBankName, setNewBankName] = useState<string>()
   const [newBankBoxCount, setNewBankBoxCount] = useState('30')
   const [isOpen, setIsOpen] = useState(false)

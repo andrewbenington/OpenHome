@@ -5,9 +5,10 @@ import PokemonIcon from 'src/components/PokemonIcon'
 import { getPublicImageURL } from 'src/images/images'
 import { getMonSaveLogo } from 'src/saves/util'
 import { AppInfoContext } from 'src/state/appInfo'
+import { useLookups } from 'src/state/lookups'
 import { OHPKM } from 'src/types/pkm/OHPKM'
 import { numericSorter, stringSorter } from 'src/util/Sort'
-import { LookupContext, useLookups } from '../../state/lookup'
+import { PersistedPkmDataContext } from '../../state/persistedPkmData'
 
 type G12LookupRow = {
   gen12ID: string
@@ -20,7 +21,7 @@ type Gen12LookupProps = {
 }
 
 export default function Gen12Lookup({ onSelectMon }: Gen12LookupProps) {
-  const [{ homeMons }] = useContext(LookupContext)
+  const [{ homeMons }] = useContext(PersistedPkmDataContext)
   const { lookups, loaded } = useLookups()
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
 
@@ -83,10 +84,6 @@ export default function Gen12Lookup({ onSelectMon }: Gen12LookupProps) {
       cellClass: 'mono-cell',
     },
   ]
-
-  console.log(lookups, lookups.gen12)
-
-  console.log(Object.entries(lookups.gen12))
 
   return (
     <OHDataGrid

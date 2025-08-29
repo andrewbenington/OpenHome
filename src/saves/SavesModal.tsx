@@ -8,13 +8,14 @@ import { CardsIcon, GridIcon } from 'src/components/Icons'
 import SideTabs from 'src/components/side-tabs/SideTabs'
 import useDisplayError from 'src/hooks/displayError'
 import { AppInfoAction, AppInfoContext } from 'src/state/appInfo'
-import { LookupContext, useLookups } from 'src/state/lookup'
 import { OpenSavesContext } from 'src/state/openSaves'
+import { PersistedPkmDataContext } from 'src/state/persistedPkmData'
 import { buildSaveFile, getSaveTypes } from 'src/types/SAVTypes/load'
 import { PathData } from 'src/types/SAVTypes/path'
 import { getSaveRef } from 'src/types/SAVTypes/SAV'
 import { SAVClass } from 'src/types/SAVTypes/util'
 import { getMonFileIdentifier } from 'src/util/Lookup'
+import { useLookups } from '../state/lookups'
 import RecentSaves from './RecentSaves'
 import SaveFolders from './SaveFolders'
 import SuggestedSaves from './SuggestedSaves'
@@ -43,7 +44,7 @@ function useOpenSaveHandler(onClose?: () => void) {
   const [, dispatchOpenSaves] = useContext(OpenSavesContext)
   const [tentativeSaveData, setTentativeSaveData] = useState<AmbiguousOpenState>()
   const backend = useContext(BackendContext)
-  const [lookupState] = useContext(LookupContext)
+  const [lookupState] = useContext(PersistedPkmDataContext)
   const { getLookups } = useLookups()
 
   const displayError = useDisplayError()

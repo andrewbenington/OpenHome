@@ -4,7 +4,6 @@ import { PropsWithChildren } from 'react'
 import { OHPKM } from 'src/types/pkm/OHPKM'
 import { HomeData } from 'src/types/SAVTypes/HomeData'
 import { SAV } from 'src/types/SAVTypes/SAV'
-import { OpenHomeBox } from 'src/types/storage'
 import { Errorable } from 'src/types/types'
 import { getMonFileIdentifier } from 'src/util/Lookup'
 import { BackendContext } from './backendContext'
@@ -45,12 +44,7 @@ async function writeAllHomeData(
   homeData: HomeData,
   mons: OHPKM[]
 ): Promise<Errorable<null>[]> {
-  const allStoredBoxData: OpenHomeBox[] = homeData.boxes.map((box, index) => ({
-    index,
-    name: box.name,
-    monIdentifiersByIndex: box.getIdentifierMapping(),
-  }))
-  const boxesResult = await backend.writeHomeBoxes(allStoredBoxData)
+  const boxesResult = await backend.writeHomeBanks(homeData.banks)
 
   if (E.isLeft(boxesResult)) {
     return [boxesResult]

@@ -7,8 +7,8 @@ import { FaSquare } from 'react-icons/fa'
 import { EditIcon, MenuIcon } from 'src/components/Icons'
 import PokemonDetailsModal from 'src/pokemon/PokemonDetailsModal'
 import { ErrorContext } from 'src/state/error'
-import { LookupContext } from 'src/state/lookup'
 import { MonLocation, MonWithLocation, OpenSavesContext } from 'src/state/openSaves'
+import { PersistedPkmDataContext } from 'src/state/persistedPkmData'
 import { PKMInterface } from 'src/types/interfaces'
 import { OHPKM } from 'src/types/pkm/OHPKM'
 import { SortTypes } from 'src/types/pkm/sort'
@@ -195,7 +195,7 @@ export default function HomeBoxDisplay() {
 }
 
 function BoxMons() {
-  const [{ homeMons }] = useContext(LookupContext)
+  const [{ homeMons }] = useContext(PersistedPkmDataContext)
   const [{ homeData }, openSavesDispatch] = useContext(OpenSavesContext)
   const [, dispatchError] = useContext(ErrorContext)
   const [selectedIndex, setSelectedIndex] = useState<number>()

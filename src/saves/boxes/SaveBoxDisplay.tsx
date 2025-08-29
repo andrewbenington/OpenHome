@@ -9,8 +9,8 @@ import { MenuIcon } from 'src/components/Icons'
 import AttributeRow from 'src/pokemon/AttributeRow'
 import PokemonDetailsModal from 'src/pokemon/PokemonDetailsModal'
 import { ErrorContext } from 'src/state/error'
-import { LookupContext } from 'src/state/lookup'
 import { MonLocation, MonWithLocation, OpenSavesContext } from 'src/state/openSaves'
+import { PersistedPkmDataContext } from 'src/state/persistedPkmData'
 import { PKMInterface } from 'src/types/interfaces'
 import { OHPKM } from 'src/types/pkm/OHPKM'
 import { getMonFileIdentifier } from 'src/util/Lookup'
@@ -26,7 +26,7 @@ interface OpenSaveDisplayProps {
 
 const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   const [, openSavesDispatch, openSaves] = useContext(OpenSavesContext)
-  const [{ homeMons }] = useContext(LookupContext)
+  const [{ homeMons }] = useContext(PersistedPkmDataContext)
   const [, dispatchError] = useContext(ErrorContext)
   const [detailsModal, setDetailsModal] = useState(false)
   const { saveIndex } = props
