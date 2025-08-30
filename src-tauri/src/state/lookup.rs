@@ -52,6 +52,9 @@ impl LookupStateInner {
         self.gen_12.extend(gen_12);
         self.gen_345.extend(gen_345);
 
+        util::write_storage_file_json(app_handle, "gen12_lookup.json", &self.gen_12)?;
+        util::write_storage_file_json(app_handle, "gen345_lookup.json", &self.gen_345)?;
+
         app_handle
             .emit("lookups_update", self.clone())
             .map_err(|err| {
@@ -74,6 +77,11 @@ pub fn update_lookups(
     gen_12: IdentifierLookup,
     gen_345: IdentifierLookup,
 ) -> OpenHomeResult<()> {
+    println!(
+        "updating lookups: {} gen12, {} gen234",
+        gen_12.len(),
+        gen_345.len()
+    );
     lookup_state
         .lock()?
         .update_lookups(&app_handle, gen_12, gen_345)

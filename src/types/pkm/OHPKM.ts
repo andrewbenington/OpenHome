@@ -45,7 +45,7 @@ import {
 } from 'src/util/byteLogic'
 import { getHPGen3Onward, getLevelGen3Onward, getStatGen3Onward } from 'src/util/StatCalc'
 import { utf16BytesToString, utf16StringToBytes } from 'src/util/Strings/StringConverter'
-import { isEvolution } from '../../util/Lookup'
+import { getHomeIdentifier, isEvolution } from '../../util/Lookup'
 import { PKMInterface, PluginPKMInterface } from '../interfaces'
 import schema from './OHPKM.json'
 import {
@@ -107,10 +107,16 @@ export class OHPKM implements PKMInterface {
             .concat((other.secretID ?? 0).toString())
             .concat(other.trainerID.toString())
         )
-      } else {
+      } else if (other.dvs) {
+        const { hp, atk, def, spc, spe } = other.dvs
+
         prng = new Prando(
-          other.trainerName.concat(JSON.stringify(other.dvs)).concat(other.trainerID.toString())
+          other.trainerName
+            .concat(`${hp}~${atk}~${def}~${spc}~${spe}`)
+            .concat(other.trainerID.toString())
         )
+      } else {
+        prng = new Prando(other.trainerName.concat(other.trainerID.toString()))
       }
 
       this.dexNum = other.dexNum
@@ -1582,6 +1588,10 @@ export class OHPKM implements PKMInterface {
     }
 
     return errorsFound
+  }
+
+  public getHomeIdentifier() {
+    return getHomeIdentifier(this)
   }
 
   public updateData(other: PKMInterface, isFromOT: boolean = false) {

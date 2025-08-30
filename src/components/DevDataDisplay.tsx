@@ -2,7 +2,7 @@ import { Dialog } from '@radix-ui/themes'
 import { CSSProperties, useState } from 'react'
 import { IconType } from 'react-icons'
 import { MdDataObject } from 'react-icons/md'
-import { InfoGrid } from './InfoGrid'
+import { InfoGrid } from './InfoGrid2'
 import MiniButton, { MiniButtonProps } from './MiniButton'
 
 type DevDataDisplayProps = {
@@ -25,7 +25,7 @@ export function DevDataDisplay(props: DevDataDisplayProps) {
       />
       <Dialog.Root open={debugModal} onOpenChange={(open) => !open && setDebugModal(false)}>
         <Dialog.Content style={{ padding: 8 }}>
-          <InfoGrid labelBreakpoints={{ xs: 4 }} data={props.data ?? {}} />
+          <InfoGrid data={props.data ?? {}} />
         </Dialog.Content>
       </Dialog.Root>
     </>

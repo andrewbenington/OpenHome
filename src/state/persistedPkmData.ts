@@ -1,15 +1,17 @@
 import { createContext, Dispatch, Reducer } from 'react'
 import { OHPKM } from 'src/types/pkm/OHPKM'
 
+export type PersistedPkmData = Record<string, OHPKM>
+
 export type PersistedPkmDataState = {
   error?: string
 } & (
   | {
-      homeMons: Record<string, OHPKM>
+      homeMons: PersistedPkmData
       loaded: true
     }
   | {
-      homeMons?: Record<string, OHPKM>
+      homeMons?: PersistedPkmData
       loaded: false
     }
 )
@@ -17,7 +19,7 @@ export type PersistedPkmDataState = {
 export type PersistedPkmDataAction =
   | {
       type: 'load_persisted_pkm_data'
-      payload: Record<string, OHPKM>
+      payload: PersistedPkmData
     }
   | {
       type: 'set_error'
@@ -26,6 +28,10 @@ export type PersistedPkmDataAction =
   | {
       type: 'clear'
       payload?: undefined
+    }
+  | {
+      type: 'persist_data'
+      payload: OHPKM
     }
 
 export const persistedPkmDataReducer: Reducer<PersistedPkmDataState, PersistedPkmDataAction> = (
@@ -46,6 +52,12 @@ export const persistedPkmDataReducer: Reducer<PersistedPkmDataState, PersistedPk
       const newState: PersistedPkmDataState = { ...state, homeMons, loaded: true }
 
       return newState
+    }
+    case 'persist_data': {
+      if (!state.loaded) return state
+      const mon = payload
+
+      return { ...state, homeMons: { ...state.homeMons, [mon.getHomeIdentifier()]: mon } }
     }
     case 'clear': {
       return { loaded: false }

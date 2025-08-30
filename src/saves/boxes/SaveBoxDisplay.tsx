@@ -222,7 +222,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                   dragID={`${save.tid}_${save.sid}_${save.currentPCBox}_${index}`}
                   location={{
                     box: save.currentPCBox,
-                    boxPos: index,
+                    box_slot: index,
                     save,
                   }}
                   disabled={
@@ -236,7 +236,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                       attemptImportMons(importedMons, {
                         save,
                         box: save.currentPCBox,
-                        boxPos: index,
+                        box_slot: index,
                       })
                     }
                   }}

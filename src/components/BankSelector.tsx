@@ -1,4 +1,4 @@
-import { Button, DataList, DropdownMenu, TextField } from '@radix-ui/themes'
+import { Button, DataList, DropdownMenu, Spinner, TextField } from '@radix-ui/themes'
 import { useContext, useState } from 'react'
 import { OpenSavesContext } from 'src/state/openSaves'
 import { PersistedPkmDataContext } from 'src/state/persistedPkmData'
@@ -13,23 +13,39 @@ function removeNonDigits(input: string): string {
 
 export default function BankSelector(props: { homeData: HomeData }) {
   const { homeData } = props
-  const [, openSavesDispatch] = useContext(OpenSavesContext)
-  const [lookupState] = useContext(PersistedPkmDataContext)
+  const [openSavesState, openSavesDispatch] = useContext(OpenSavesContext)
+  const [pkmDataState] = useContext(PersistedPkmDataContext)
   const [newBankName, setNewBankName] = useState<string>()
   const [newBankBoxCount, setNewBankBoxCount] = useState('30')
   const [isOpen, setIsOpen] = useState(false)
 
+  if (!pkmDataState.homeMons) {
+    return <Spinner />
+  }
+
+  const monLookup = pkmDataState.homeMons
+
   return (
     <DropdownMenu.Root open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenu.Trigger>
-        <Button variant="soft">
-          {getBankName(homeData.getCurrentBank())}
+        <Button variant="soft" size="1">
+          {openSavesState.homeData && getBankName(openSavesState.homeData.getCurrentBank())}
           <DropdownMenu.TriggerIcon />
         </Button>
       </DropdownMenu.Trigger>
       <DropdownMenu.Content>
         {homeData.banks.map((bank) => (
-          <DropdownMenu.Item key={bank.index}>{getBankName(bank)}</DropdownMenu.Item>
+          <DropdownMenu.Item
+            key={bank.index}
+            onClick={() =>
+              openSavesDispatch({
+                type: 'set_home_bank',
+                payload: { bank: bank.index, monLookup },
+              })
+            }
+          >
+            {getBankName(bank)}
+          </DropdownMenu.Item>
         ))}
 
         <DropdownMenu.Sub>
@@ -53,6 +69,7 @@ export default function BankSelector(props: { homeData: HomeData }) {
                     size="1"
                     value={newBankBoxCount}
                     onChange={(e) => setNewBankBoxCount(removeNonDigits(e.target.value))}
+                    autoFocus
                   />
                 </DataList.Value>
               </DataList.Item>
@@ -60,7 +77,7 @@ export default function BankSelector(props: { homeData: HomeData }) {
             <Button
               size="1"
               onClick={() => {
-                if (!lookupState.homeMons) return
+                if (!pkmDataState.homeMons) return
                 openSavesDispatch({
                   type: 'add_home_bank',
                   payload: {
@@ -68,7 +85,7 @@ export default function BankSelector(props: { homeData: HomeData }) {
                     box_count: parseInt(newBankBoxCount),
                     current_count: homeData.banks.length ?? 0,
                     switch_to_bank: true,
-                    home_lookup: lookupState.homeMons,
+                    home_lookup: pkmDataState.homeMons,
                   },
                 })
 

@@ -39,8 +39,8 @@ export const TauriInvoker = {
     return promise.then(E.right).catch(E.left)
   },
 
-  updateLookups(gen_12: LookupMap, gen_345: LookupMap): Promise<Errorable<null>> {
-    const promise: Promise<null> = invoke('get_lookups', { gen_12, gen_345 })
+  updateLookups(gen12: LookupMap, gen345: LookupMap): Promise<Errorable<null>> {
+    const promise: Promise<null> = invoke('update_lookups', { gen12, gen345 })
 
     return promise.then(E.right).catch(E.left)
   },

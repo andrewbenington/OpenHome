@@ -116,6 +116,19 @@ where
     write_file_contents(path, text)
 }
 
+pub fn write_storage_file_json<P, V>(
+    app_handle: &tauri::AppHandle,
+    relative_path: P,
+    value: V,
+) -> OpenHomeResult<()>
+where
+    P: AsRef<Path>,
+    V: serde::ser::Serialize,
+{
+    let full_path = prepend_appdata_storage_to_path(app_handle, relative_path)?;
+    write_file_json(&full_path, value)
+}
+
 pub fn create_directory<P>(path: P) -> OpenHomeResult<()>
 where
     P: AsRef<Path>,

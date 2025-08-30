@@ -55,13 +55,12 @@ export default function HomeBoxDisplay() {
               <ArrowButton
                 onClick={() =>
                   openSavesDispatch({
-                    type: 'set_save_box',
+                    type: 'set_home_box',
                     payload: {
-                      boxNum:
+                      box:
                         homeData.currentPCBox > 0
                           ? homeData.currentPCBox - 1
                           : homeData.boxes.length - 1,
-                      save: homeData,
                     },
                   })
                 }
@@ -98,10 +97,9 @@ export default function HomeBoxDisplay() {
               <ArrowButton
                 onClick={() =>
                   openSavesDispatch({
-                    type: 'set_save_box',
+                    type: 'set_home_box',
                     payload: {
-                      boxNum: (currentBox.index + 1) % homeData.boxes.length,
-                      save: homeData,
+                      box: (currentBox.index + 1) % homeData.boxes.length,
                     },
                   })
                 }
@@ -177,13 +175,14 @@ export default function HomeBoxDisplay() {
           ) : (
             <AllBoxes
               onBoxSelect={(boxIndex) => {
-                openSavesDispatch({
-                  type: 'set_save_box',
-                  payload: {
-                    boxNum: boxIndex,
-                    save: homeData,
-                  },
-                })
+                homeData.currentPCBox = boxIndex
+                // openSavesDispatch({
+                //   type: 'set_save_box',
+                //   payload: {
+                //     boxNum: boxIndex,
+                //     save: homeData,
+                //   },
+                // })
                 setViewMode('one')
               }}
             />
@@ -241,7 +240,18 @@ function BoxMons() {
         })
       }
     }
-    openSavesDispatch({ type: 'import_mons', payload: { mons, dest: location } })
+    openSavesDispatch({
+      type: 'import_mons',
+      payload: {
+        mons,
+        dest: {
+          bank: homeData.getCurrentBank().index,
+          box: location.box,
+          box_slot: location.box_slot,
+          is_home: true,
+        },
+      },
+    })
   }
 
   const dragData: MonWithLocation | undefined = useMemo(() => dragMonState.payload, [dragMonState])
@@ -283,24 +293,29 @@ function BoxMons() {
                 onClick={() => setSelectedIndex(index)}
                 dragID={`home_${homeData.currentPCBox}_${index}`}
                 location={{
+                  bank: homeData.currentBankIndex,
                   box: homeData.currentPCBox,
-                  boxPos: index,
-                  save: homeData,
+                  box_slot: index,
+                  is_home: true,
                 }}
                 mon={mon}
                 zIndex={0}
                 onDrop={(importedMons) => {
                   if (importedMons) {
                     attemptImportMons(importedMons, {
+                      bank: homeData.currentBankIndex,
                       box: homeData.currentPCBox,
-                      boxPos: index,
-                      save: homeData,
+                      box_slot: index,
+                      is_home: true,
                     })
                   }
                 }}
                 disabled={
                   // don't allow a swap with a pokémon not supported by the source save
-                  mon && dragData && !dragData.save.supportsMon(mon.dexNum, mon.formeNum)
+                  mon &&
+                  dragData &&
+                  !dragData.is_home &&
+                  !dragData.save.supportsMon(mon.dexNum, mon.formeNum)
                 }
               />
             ))}
@@ -367,7 +382,12 @@ function BoxOverview({ boxIndex, onBoxSelect }: BoxOverviewProps) {
       key={box.name ?? `Box ${boxIndex + 1}`}
       dropData={
         firstOpenIndex !== undefined
-          ? { save: homeData, box: boxIndex, boxPos: firstOpenIndex }
+          ? {
+              is_home: true,
+              bank: homeData.currentBankIndex,
+              box: boxIndex,
+              box_slot: firstOpenIndex,
+            }
           : undefined
       }
       disabled={firstOpenIndex === undefined}

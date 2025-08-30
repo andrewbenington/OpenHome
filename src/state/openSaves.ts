@@ -6,6 +6,7 @@ import { OpenHomeBank } from 'src/types/storage'
 import { getMonFileIdentifier } from 'src/util/Lookup'
 import { PKMInterface } from '../types/interfaces'
 import { getSortFunctionNullable, SortType } from '../types/pkm/sort'
+import { PersistedPkmData } from './persistedPkmData'
 
 export type OpenSave = {
   index: number
@@ -25,10 +26,12 @@ export type OpenSavesState = {
 }
 
 export type MonLocation = {
-  save: SAV
   box: number
-  boxPos: number
-}
+  box_slot: number
+} & (
+  | { is_home: false; bank: undefined; save: SAV }
+  | { is_home: true; bank: number; save?: undefined }
+)
 
 export type MonWithLocation = MonLocation & {
   mon: PKMInterface
@@ -37,16 +40,13 @@ export type MonWithLocation = MonLocation & {
 export type OpenSavesAction =
   | {
       type: 'set_home_banks'
-      payload: {
-        banks: OpenHomeBank[]
-        homeLookup: Record<string, OHPKM>
-      }
+      payload: { banks: OpenHomeBank[]; monLookup: PersistedPkmData }
     }
   | {
       type: 'add_home_bank'
       payload: {
         name?: string
-        box_count?: number
+        box_count: number
         current_count: number
         switch_to_bank: boolean
         home_lookup: Record<string, OHPKM>
@@ -65,25 +65,24 @@ export type OpenSavesAction =
       payload?: undefined
     }
   | {
+      type: 'set_home_box'
+      payload: { box: number }
+    }
+  | {
+      type: 'set_home_bank'
+      payload: { bank: number; monLookup: PersistedPkmData }
+    }
+  | {
       type: 'set_save_box'
-      payload: {
-        save: SAV
-        boxNum: number
-      }
+      payload: { save: SAV; boxNum: number }
     }
   | {
       type: 'import_mons'
-      payload: {
-        mons: PKMInterface[]
-        dest: MonLocation
-      }
+      payload: { mons: PKMInterface[]; dest: MonLocation }
     }
   | {
       type: 'move_mon'
-      payload: {
-        source: MonWithLocation
-        dest: MonLocation
-      }
+      payload: { source: MonWithLocation; dest: MonLocation }
     }
   | {
       type: 'sort_current_home_box'
@@ -124,18 +123,23 @@ const updateMonInSave = (
   dest: MonLocation
 ) => {
   let replacedMon
-  const { save, box, boxPos } = dest
-  const saveID = saveToStringIdentifier(save)
 
-  if (save instanceof HomeData && state.homeData && (mon === undefined || mon instanceof OHPKM)) {
-    replacedMon = state.homeData.boxes[box].pokemon[boxPos]
-    state.homeData.boxes[box].pokemon[boxPos] = mon as OHPKM
-  } else if (saveID in state.openSaves) {
+  if (dest.is_home) {
+    if (state.homeData && (mon === undefined || mon instanceof OHPKM)) {
+      replacedMon = state.homeData.boxes[dest.box].pokemon[dest.box_slot]
+      state.homeData.setPokemon(dest, mon)
+    }
+    return replacedMon
+  }
+
+  const saveID = saveToStringIdentifier(dest.save)
+
+  if (saveID in state.openSaves) {
     const tempSaves = { ...state.openSaves }
 
-    replacedMon = tempSaves[saveID].save.boxes[box].pokemon[boxPos]
-    tempSaves[saveID].save.boxes[box].pokemon[boxPos] = mon
-    tempSaves[saveID].save.updatedBoxSlots.push({ box, index: boxPos })
+    replacedMon = tempSaves[saveID].save.boxes[dest.box].pokemon[dest.box_slot]
+    tempSaves[saveID].save.boxes[dest.box].pokemon[dest.box_slot] = mon
+    tempSaves[saveID].save.updatedBoxSlots.push({ box: dest.box, index: dest.box_slot })
     state.openSaves = tempSaves
   }
   return replacedMon
@@ -147,16 +151,12 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
 ) => {
   const { type, payload } = action
 
-  console.log({ type, payload })
+  // console.log({ type, payload })
 
   switch (type) {
     case 'set_home_banks': {
-      const { banks, homeLookup } = payload
-      const newHomeData = state.homeData ?? new HomeData(banks)
-
-      Object.values(banks[newHomeData.currentBankIndex].boxes).forEach((box) => {
-        newHomeData.boxes[box.index].loadMonsFromIdentifiers(box.identifiers, homeLookup)
-      })
+      const { banks, monLookup } = payload
+      const newHomeData = state.homeData ?? new HomeData(banks, monLookup)
 
       return { ...state, homeData: newHomeData }
     }
@@ -170,15 +170,10 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
 
       const updatedHomeData = state.homeData
 
-      updatedHomeData.addBank(name, box_count)
+      const newBank = updatedHomeData.addBank(name, box_count)
+
       if (switch_to_bank) {
-        console.log('')
-        updatedHomeData.currentBankIndex = updatedHomeData.banks.length - 1
-        Object.values(updatedHomeData.banks[updatedHomeData.currentBankIndex].boxes).forEach(
-          (box) => {
-            updatedHomeData.boxes[box.index].loadMonsFromIdentifiers(box.identifiers, home_lookup)
-          }
-        )
+        updatedHomeData.setAndLoadBank(newBank.index, home_lookup)
       }
       return { ...state, homeData: updatedHomeData }
     }
@@ -211,6 +206,25 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
         error: payload,
       }
     }
+    case 'set_home_box': {
+      if (!state.homeData) return state
+      const { box } = payload
+
+      state.homeData.currentPCBox = box
+      const newState: OpenSavesState = {
+        ...state,
+        homeData: state.homeData,
+      }
+
+      return newState
+    }
+    case 'set_home_bank': {
+      if (!state.homeData) return state
+      const { bank, monLookup } = payload
+
+      state.homeData.setAndLoadBank(bank, monLookup)
+      return { ...state, homeData: state.homeData }
+    }
     case 'set_save_box': {
       const { save } = payload
       const identifier = saveToStringIdentifier(payload.save)
@@ -230,18 +244,22 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
       return newState
     }
     case 'move_mon': {
+      if (!state.homeData) return state
+
       const { source, dest } = payload
-      const sourceIdentifier = saveToStringIdentifier(source.save)
-      const destIdentifier = saveToStringIdentifier(dest.save)
+      const sourceSave = source.is_home ? state.homeData : source.save
+      const destSave = dest.is_home ? state.homeData : dest.save
 
-      const sourceBox = source.save.boxes[source.box]
-      const destBox = dest.save.boxes[dest.box]
+      const sourceBox = source.is_home
+        ? state.homeData.boxes[source.box]
+        : source.save.boxes[source.box]
+      const destBox = dest.is_home ? state.homeData.boxes[dest.box] : dest.save.boxes[dest.box]
 
-      let sourceMon = sourceBox.pokemon[source.boxPos]
-      let destMon = destBox.pokemon[dest.boxPos]
+      let sourceMon = sourceBox.pokemon[source.box_slot]
+      let destMon = destBox.pokemon[dest.box_slot]
 
       if (sourceMon !== source.mon) return state // necessary in strict mode, otherwise the swap will happen twice and revert
-      if (sourceIdentifier !== destIdentifier) {
+      if (sourceSave !== destSave) {
         if (sourceMon) {
           if (!(sourceMon instanceof OHPKM)) {
             sourceMon = new OHPKM(sourceMon)
@@ -285,7 +303,7 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
       const allMons = state.homeData.boxes
         .flatMap((box) => box.pokemon)
         .toSorted(getSortFunctionNullable(payload.sortType))
-      const boxSize = state.homeData.boxColumns * state.homeData.boxRows
+      const boxSize = HomeData.BOX_COLUMNS * HomeData.BOX_ROWS
 
       for (let i = 0; i < state.homeData.boxes.length; i++) {
         state.homeData.boxes[i].pokemon = allMons.slice(i * boxSize, (i + 1) * boxSize)
@@ -300,34 +318,63 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
         (mon) => !((getMonFileIdentifier(new OHPKM(mon)) ?? '') in state.modifiedOHPKMs)
       )
 
-      let nextIndex = dest.boxPos
-      const isHome = dest.save instanceof HomeData
-      const tempSave = dest.save
+      if (dest.is_home) {
+        let nextSlot = dest
 
-      mons.forEach((mon) => {
-        const homeMon = mon instanceof OHPKM ? mon : new OHPKM(mon)
+        mons.forEach((mon) => {
+          const homeMon = mon instanceof OHPKM ? mon : new OHPKM(mon)
 
-        while (
-          tempSave.boxes[dest.box].pokemon[nextIndex] &&
-          nextIndex < tempSave.boxRows * tempSave.boxColumns
-        ) {
-          nextIndex++
-        }
-        if (nextIndex < tempSave.boxRows * tempSave.boxColumns) {
-          updateMonInSave(state, homeMon, {
-            ...dest,
-            boxPos: nextIndex,
-          })
-          addedMons.push(homeMon)
-          nextIndex++
-        }
-      })
+          if (!state.homeData) {
+            throw Error('Home Data not loaded')
+          }
 
-      if (isHome) {
-        state.homeData = tempSave as HomeData
+          while (
+            !state.homeData.slotIsEmpty(nextSlot) &&
+            nextSlot.box < state.homeData.getCurrentBank().boxes.length
+          ) {
+            nextSlot.box_slot++
+            if (nextSlot.box_slot >= HomeData.BOX_COLUMNS * HomeData.BOX_ROWS) {
+              nextSlot.box_slot = 0
+              nextSlot.box++
+            }
+          }
+
+          if (nextSlot.box < state.homeData.getCurrentBank().boxes.length) {
+            state.homeData.setPokemon(nextSlot, homeMon)
+            addedMons.push(homeMon)
+            nextSlot.box_slot++
+            if (nextSlot.box_slot >= HomeData.BOX_COLUMNS * HomeData.BOX_ROWS) {
+              nextSlot.box_slot = 0
+              nextSlot.box++
+            }
+          }
+        })
       } else {
+        let nextIndex = dest.box_slot
+        const tempSave = dest.save
+
+        mons.forEach((mon) => {
+          const homeMon = mon instanceof OHPKM ? mon : new OHPKM(mon)
+
+          while (
+            tempSave.boxes[dest.box].pokemon[nextIndex] &&
+            nextIndex < tempSave.boxRows * tempSave.boxColumns
+          ) {
+            nextIndex++
+          }
+          if (nextIndex < tempSave.boxRows * tempSave.boxColumns) {
+            updateMonInSave(state, homeMon, {
+              ...dest,
+              box_slot: nextIndex,
+            })
+            addedMons.push(homeMon)
+            nextIndex++
+          }
+        })
+
         state.openSaves[saveToStringIdentifier(tempSave)].save = tempSave
       }
+
       addedMons.forEach((mon) => (state.modifiedOHPKMs[getMonFileIdentifier(mon) ?? ''] = mon))
       return { ...state }
     }

@@ -138,19 +138,6 @@ fieldset {
   font-weight: 500;
   font-family: inherit;
   transition: border-color 0.25s;
-  background-color: white;
-  color: #333;
-}
-input:hover,
-fieldset:hover {
-  border-color: white;
-}
-input:focus,
-input:focus-visible,
-fieldset:focus,
-fieldset:focus-visible {
-  border-color: white;
-  outline: none;
 }
 
 label {

@@ -16,15 +16,21 @@ export const getMonFileIdentifier = (mon: PKMInterface) => {
   const baseMon = getBaseMon(mon.dexNum, mon.formeNum)
 
   if (baseMon) {
-    return `${baseMon.dexNumber.toString().padStart(4, '0')}-${bytesToString(
-      mon.trainerID,
-      2
-    ).concat(bytesToString(mon.secretID ?? 0, 2))}-${bytesToString(
-      mon.personalityValue ?? 0,
-      4
-    )}-${bytesToString(mon.gameOfOrigin ?? -1, 1)}`
+    return getHomeIdentifier(new OHPKM(mon))
   }
   return undefined
+}
+
+export function getHomeIdentifier(mon: OHPKM) {
+  const baseMon = getBaseMon(mon.dexNum, mon.formeNum)
+
+  if (!baseMon) {
+    throw Error('Invalid dex number')
+  }
+
+  return `${baseMon.dexNumber.toString().padStart(4, '0')}-${bytesToString(mon.trainerID, 2).concat(
+    bytesToString(mon.secretID ?? 0, 2)
+  )}-${bytesToString(mon.personalityValue ?? 0, 4)}-${bytesToString(mon.gameOfOrigin ?? -1, 1)}`
 }
 
 export const getMonGen12Identifier = (mon: PKMInterface & { dvs: StatsPreSplit }) => {

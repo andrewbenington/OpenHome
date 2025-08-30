@@ -7,7 +7,6 @@ import { useCallback, useContext, useEffect, useState } from 'react'
 import { MdFileOpen } from 'react-icons/md'
 import BankSelector from 'src/components/BankSelector'
 import PokemonDetailsModal from 'src/pokemon/PokemonDetailsModal'
-import { getBankName } from 'src/types/storage'
 import { Errorable, LookupMap } from 'src/types/types'
 import { filterUndefined } from 'src/util/Sort'
 import { BackendContext } from '../backend/backendContext'
@@ -65,7 +64,7 @@ const Home = () => {
           (banks) =>
             openSavesDispatch({
               type: 'set_home_banks',
-              payload: { banks, homeLookup: homeMonLookup },
+              payload: { banks, monLookup: homeMonLookup },
             })
         )
       )
@@ -231,16 +230,8 @@ const Home = () => {
         </Button>
       </Flex>
       <div className="home-box-column">
-        <Card>
+        <Card style={{ padding: 6, width: 'calc(100% - 4px)' }}>
           {openSavesState.homeData && <BankSelector homeData={openSavesState.homeData} />}
-
-          <select value={openSavesState.homeData?.getCurrentBank().index}>
-            {openSavesState.homeData?.banks.map((bank) => (
-              <option value={bank.index} key={bank.index}>
-                {getBankName(bank)}
-              </option>
-            ))}
-          </select>
         </Card>
         <Flex direction="row" width="100%" maxWidth="600px" minWidth="480px" align="center">
           <HomeBoxDisplay />

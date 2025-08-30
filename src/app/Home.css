@@ -37,7 +37,7 @@
   padding: 8px 12px 8px 4px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: start;
   align-items: flex-start;
   flex: 1;
   min-width: 480px;
