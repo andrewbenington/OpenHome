@@ -162,7 +162,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
             </div>
             <div className="save-menu-buttons-right" style={{ marginRight: 4 }}>
               <Button
-                className="save-button"
+                className="mini-button"
                 onClick={() => setDetailsModal(true)}
                 variant="outline"
                 color="gray"
@@ -221,6 +221,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                   key={`${save.currentPCBox}-${index}`}
                   dragID={`${save.tid}_${save.sid}_${save.currentPCBox}_${index}`}
                   location={{
+                    is_home: false,
                     box: save.currentPCBox,
                     box_slot: index,
                     save,
@@ -234,6 +235,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                   onDrop={(importedMons) => {
                     if (importedMons) {
                       attemptImportMons(importedMons, {
+                        is_home: false,
                         save,
                         box: save.currentPCBox,
                         box_slot: index,

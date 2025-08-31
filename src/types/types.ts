@@ -1,4 +1,4 @@
-import { Either } from 'fp-ts/Either'
+import { Either, left, right } from 'fp-ts/Either'
 import { PokemonData } from 'pokemon-species-data'
 import { CSSProperties } from 'react'
 import { PathData } from './SAVTypes/path'
@@ -105,6 +105,12 @@ export interface SaveCoordinates {
 export type Styles = { [key: string]: CSSProperties }
 
 export type Errorable<T> = Either<string, T>
+export function Err<T>(inner: T) {
+  return left(inner)
+}
+export function Ok<T>(inner: T) {
+  return right(inner)
+}
 
 export type LookupMap = Record<string, string>
 

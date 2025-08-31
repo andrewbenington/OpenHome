@@ -93,16 +93,19 @@ function AppWithBackend() {
 
   // only on app start
   useEffect(() => {
+    if (appInfoState.error) {
+      return
+    }
     backend
       .getSettings()
       .then(
         E.match(
-          async (err) => console.error(err),
+          async (err) => displayError('Error loading settings', err),
           async (settings) => appInfoDispatch({ type: 'load_settings', payload: settings })
         )
       )
       .finally(() => setSettingsLoading(false))
-  }, [backend])
+  }, [appInfoState.error, backend, displayError])
 
   // only on app start
   useEffect(() => {

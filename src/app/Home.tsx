@@ -1,12 +1,12 @@
 import { bytesToPKMInterface } from '@pokemon-files/pkm'
-import { Button, Card, Flex } from '@radix-ui/themes'
+import { Button, Flex } from '@radix-ui/themes'
 import * as E from 'fp-ts/lib/Either'
 import lodash, { flatten } from 'lodash'
 import { GameOfOrigin, isGameBoy, isGen3, isGen4, isGen5 } from 'pokemon-resources'
 import { useCallback, useContext, useEffect, useState } from 'react'
 import { MdFileOpen } from 'react-icons/md'
-import BankSelector from 'src/components/BankSelector'
 import PokemonDetailsModal from 'src/pokemon/PokemonDetailsModal'
+import BankHeader from 'src/saves/BankHeader'
 import { Errorable, LookupMap } from 'src/types/types'
 import { filterUndefined } from 'src/util/Sort'
 import { BackendContext } from '../backend/backendContext'
@@ -58,18 +58,22 @@ const Home = () => {
 
   const loadAllHomeData = useCallback(
     async (homeMonLookup: Record<string, OHPKM>) => {
+      if (openSavesState.error) return
       await backend.loadHomeBanks().then(
         E.match(
-          (err) => openSavesDispatch({ type: 'set_error', payload: err }),
+          (err) => {
+            displayError('Error Loading OpenHome Data', err)
+            openSavesDispatch({ type: 'set_error', payload: err })
+          },
           (banks) =>
             openSavesDispatch({
-              type: 'set_home_banks',
+              type: 'load_home_banks',
               payload: { banks, monLookup: homeMonLookup },
             })
         )
       )
     },
-    [backend, openSavesDispatch]
+    [backend, displayError, openSavesDispatch, openSavesState.error]
   )
 
   const saveChanges = useCallback(async () => {
@@ -230,9 +234,7 @@ const Home = () => {
         </Button>
       </Flex>
       <div className="home-box-column">
-        <Card style={{ padding: 6, width: 'calc(100% - 4px)' }}>
-          {openSavesState.homeData && <BankSelector homeData={openSavesState.homeData} />}
-        </Card>
+        <BankHeader />
         <Flex direction="row" width="100%" maxWidth="600px" minWidth="480px" align="center">
           <HomeBoxDisplay />
         </Flex>

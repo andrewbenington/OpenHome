@@ -1,12 +1,12 @@
 use crate::pkm_storage;
 use std::collections::HashMap;
 
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize)]
 pub struct BoxPreV1_5_0 {
     pub index: u8,
-    #[serde(alias = "monIdentifiersByIndex")]
+    #[serde(rename = "monIdentifiersByIndex")]
     pub mon_identifiers_by_index: HashMap<String, String>,
     pub name: Option<String>,
 }
@@ -27,6 +27,19 @@ impl BoxPreV1_5_0 {
             name: self.name,
             index: self.index as usize,
             identifiers,
+        }
+    }
+
+    pub fn from_current(current: pkm_storage::Box) -> Self {
+        let mut identifiers: HashMap<String, String> = HashMap::new();
+        for (index, identifier) in current.identifiers {
+            identifiers.insert(index.to_string(), identifier);
+        }
+
+        Self {
+            name: current.name,
+            index: current.index as u8,
+            mon_identifiers_by_index: identifiers,
         }
     }
 }

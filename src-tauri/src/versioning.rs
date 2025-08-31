@@ -4,8 +4,8 @@ use strum::{self, EnumIter, IntoEnumIterator};
 use crate::{
     deprecated::BoxPreV1_5_0,
     error::{OpenHomeError, OpenHomeResult},
-    pkm_storage::Bank,
-    util::{self, prepend_appdata_to_path, read_file_text},
+    pkm_storage::{Bank, StoredBankData},
+    util::{self, prepend_appdata_to_path, read_file_text, write_file_contents},
 };
 
 const VERSION_FILE: &str = "version.txt";
@@ -20,16 +20,29 @@ pub fn get_version_last_used(app_handle: &tauri::AppHandle) -> OpenHomeResult<Op
     }
 }
 
-pub fn handle_version_migration(app_handle: &tauri::AppHandle) -> OpenHomeResult<()> {
+pub fn update_version_last_used(app_handle: &tauri::AppHandle) -> OpenHomeResult<()> {
+    let last_version_path = prepend_appdata_to_path(app_handle, VERSION_FILE)?;
+
+    write_file_contents(
+        &last_version_path,
+        app_handle.package_info().version.to_string(),
+    )
+    .map_err(|err| OpenHomeError::file_write(last_version_path, err))
+}
+
+pub fn handle_version_migration(
+    app_handle: &tauri::AppHandle,
+    ignore_version_error: bool,
+) -> OpenHomeResult<()> {
     let last_used_version = get_version_last_used(app_handle)?;
     match last_used_version {
         Some(ref from_file) => println!("User last used OpenHome version {from_file}"),
-        None => println!("User last used OpenHome version 1.4.12 or earlier"),
+        None => println!("User last used OpenHome version 1.4.13 or earlier"),
     }
 
     let last_used_version = match last_used_version {
         Some(ref version) => version,
-        None => "1.4.12",
+        None => "1.4.13",
     };
 
     let Ok(last_used_semver) = Version::parse(last_used_version) else {
@@ -38,13 +51,14 @@ pub fn handle_version_migration(app_handle: &tauri::AppHandle) -> OpenHomeResult
         )));
     };
 
-    // let current_version = app_handle.package_info().version.clone();
-    let current_version = Version::new(1, 5, 0);
+    let current_version = app_handle.package_info().version.clone();
+    // let current_version = Version::new(1, 5, 0);
 
-    if current_version < last_used_semver {
-        return Err(OpenHomeError::other(&format!(
-            "Last used version ({last_used_semver}) is newer than this version ({current_version}). Using this version may corrupt your data. Please use version {last_used_semver} or later."
-        )));
+    if current_version < last_used_semver && !ignore_version_error {
+        return Err(OpenHomeError::outdated_version(
+            last_used_semver,
+            current_version,
+        ));
     }
 
     if current_version == last_used_semver {
@@ -102,19 +116,10 @@ pub fn do_migration_1_5_0(app_handle: &tauri::AppHandle) -> OpenHomeResult<()> {
     let mut new_bank = Bank::default();
 
     for old_box in old_boxes {
-        println!(
-            "'{}' (index {}) has {} mons",
-            old_box
-                .name
-                .clone()
-                .unwrap_or(format!("Box {}", old_box.index + 1)),
-            old_box.index,
-            old_box.mon_identifiers_by_index.len()
-        );
         new_bank.add_box(old_box.upgrade());
     }
 
     let path = util::prepend_appdata_storage_to_path(app_handle, "banks.json")?;
 
-    util::write_file_json(path, vec![new_bank])
+    util::write_file_json(path, StoredBankData::from_banks(vec![new_bank]))
 }

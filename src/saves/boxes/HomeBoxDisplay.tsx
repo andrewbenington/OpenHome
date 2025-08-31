@@ -1,4 +1,4 @@
-import { Button, Card, DropdownMenu, Flex, Grid } from '@radix-ui/themes'
+import { Button, Card, DropdownMenu, Flex, Grid, Heading } from '@radix-ui/themes'
 import lodash, { range } from 'lodash'
 import { ToggleGroup } from 'radix-ui'
 import { useCallback, useContext, useMemo, useState } from 'react'
@@ -50,7 +50,7 @@ export default function HomeBoxDisplay() {
           }}
         >
           <Flex direction="row" className="box-navigation">
-            <Flex align="center" justify="between" flexGrow="3">
+            <Flex align="center" justify="between" flexGrow="3" width="0">
               <ViewToggle viewMode={viewMode} setViewMode={setViewMode} />
               <ArrowButton
                 onClick={() =>
@@ -81,19 +81,22 @@ export default function HomeBoxDisplay() {
                   placeholder={`Box ${currentBox.index + 1}`}
                   onChange={(e) =>
                     openSavesDispatch({
-                      type: 'set_box_name',
+                      type: 'set_home_box_name',
                       payload: { name: e.target.value ?? undefined, index: currentBox.index },
                     })
                   }
                   autoFocus
                 />
               ) : (
-                <div style={{ visibility: viewMode === 'one' ? 'visible' : 'collapse' }}>
+                <Heading
+                  size="3"
+                  style={{ visibility: viewMode === 'one' ? 'visible' : 'collapse' }}
+                >
                   {currentBox.name?.trim() || `Box ${currentBox.index + 1}`}
-                </div>
+                </Heading>
               )}
             </div>
-            <Flex align="center" flexGrow="3" justify="between">
+            <Flex align="center" flexGrow="3" width="0" justify="between">
               <ArrowButton
                 onClick={() =>
                   openSavesDispatch({
@@ -110,7 +113,7 @@ export default function HomeBoxDisplay() {
               <Flex gap="1">
                 {viewMode === 'one' && (
                   <Button
-                    className="save-button"
+                    className="mini-button"
                     style={{ transition: 'none', padding: 0 }}
                     variant={editing ? 'solid' : 'outline'}
                     color={editing ? undefined : 'gray'}
@@ -121,7 +124,7 @@ export default function HomeBoxDisplay() {
                 )}
                 <DropdownMenu.Root>
                   <DropdownMenu.Trigger>
-                    <Button className="save-button" variant="outline" color="gray">
+                    <Button className="mini-button" variant="outline" color="gray">
                       <MenuIcon />
                     </Button>
                   </DropdownMenu.Trigger>
@@ -175,14 +178,7 @@ export default function HomeBoxDisplay() {
           ) : (
             <AllBoxes
               onBoxSelect={(boxIndex) => {
-                homeData.currentPCBox = boxIndex
-                // openSavesDispatch({
-                //   type: 'set_save_box',
-                //   payload: {
-                //     boxNum: boxIndex,
-                //     save: homeData,
-                //   },
-                // })
+                homeData.currentBoxIndex = boxIndex
                 setViewMode('one')
               }}
             />

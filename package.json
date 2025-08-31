@@ -1,7 +1,7 @@
 {
   "productName": "OpenHome",
   "name": "openhome",
-  "version": "1.4.13",
+  "version": "1.5.0",
   "description": "A tool for moving Pokémon between game saves",
   "keywords": [
     "pokemon",

@@ -2,6 +2,7 @@ use std::error::Error;
 use std::path::Path;
 use std::{fmt::Display, path::PathBuf};
 
+use semver::Version;
 use serde::{Serialize, Serializer};
 
 #[derive(Debug)]
@@ -32,6 +33,10 @@ pub enum OpenHomeError {
     TransactionOpen,
     WindowAccess {
         source: Option<Box<dyn Error>>,
+    },
+    OutdatedVersion {
+        last_opened: Version,
+        this_version: Version,
     },
     Other {
         context: String,
@@ -89,6 +94,13 @@ impl OpenHomeError {
         }
     }
 
+    pub fn outdated_version(last_opened: Version, this_version: Version) -> OpenHomeError {
+        OpenHomeError::OutdatedVersion {
+            last_opened,
+            this_version,
+        }
+    }
+
     pub fn other(context: &str) -> OpenHomeError {
         OpenHomeError::Other {
             context: context.to_owned(),
@@ -136,6 +148,12 @@ impl Display for OpenHomeError {
                 Some(source) => format!("Could not access app window: {source}"),
                 None => "Could not access app window".to_owned(),
             },
+            Self::OutdatedVersion {
+                last_opened,
+                this_version,
+            } => format!(
+                "Last used version ({last_opened}) is newer than this version ({this_version}). Using this version may corrupt your data. Please use version {last_opened} or later."
+            ),
             Self::Other { context, source } => match source {
                 Some(source) => format!("{context}: {source}"),
                 None => context.clone(),

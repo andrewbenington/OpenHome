@@ -246,3 +246,15 @@ label {
 .diagonal-clip {
   clip-path: polygon(0% 0%, 0% 100%, calc(100% - 12px) 100%, calc(100% - 0px) 0%, 100% 0%);
 }
+
+.mini-button {
+  padding: 1px;
+  aspect-ratio: 1;
+  height: 20px;
+  width: 20px;
+
+  svg {
+    height: 18px;
+    width: 18px;
+  }
+}

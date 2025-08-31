@@ -2,7 +2,7 @@ import { createContext, Dispatch, Reducer } from 'react'
 import { OHPKM } from 'src/types/pkm/OHPKM'
 import { HomeData } from 'src/types/SAVTypes/HomeData'
 import { SAV } from 'src/types/SAVTypes/SAV'
-import { OpenHomeBank } from 'src/types/storage'
+import { StoredBankData } from 'src/types/storage'
 import { getMonFileIdentifier } from 'src/util/Lookup'
 import { PKMInterface } from '../types/interfaces'
 import { getSortFunctionNullable, SortType } from '../types/pkm/sort'
@@ -29,7 +29,7 @@ export type MonLocation = {
   box: number
   box_slot: number
 } & (
-  | { is_home: false; bank: undefined; save: SAV }
+  | { is_home: false; bank?: undefined; save: SAV }
   | { is_home: true; bank: number; save?: undefined }
 )
 
@@ -38,9 +38,12 @@ export type MonWithLocation = MonLocation & {
 }
 
 export type OpenSavesAction =
+  /*
+   *  BANKS
+   */
   | {
-      type: 'set_home_banks'
-      payload: { banks: OpenHomeBank[]; monLookup: PersistedPkmData }
+      type: 'load_home_banks'
+      payload: { banks: StoredBankData; monLookup: PersistedPkmData }
     }
   | {
       type: 'add_home_bank'
@@ -53,36 +56,19 @@ export type OpenSavesAction =
       }
     }
   | {
-      type: 'add_save'
-      payload: SAV
-    }
-  | {
-      type: 'remove_save'
-      payload: SAV
-    }
-  | {
-      type: 'clear_all'
-      payload?: undefined
-    }
-  | {
-      type: 'set_home_box'
-      payload: { box: number }
-    }
-  | {
-      type: 'set_home_bank'
+      type: 'set_current_home_bank'
       payload: { bank: number; monLookup: PersistedPkmData }
     }
   | {
-      type: 'set_save_box'
-      payload: { save: SAV; boxNum: number }
+      type: 'set_home_bank_name'
+      payload: { bank: number; name: string | undefined }
     }
+  /*
+   *  HOME BOXES
+   */
   | {
-      type: 'import_mons'
-      payload: { mons: PKMInterface[]; dest: MonLocation }
-    }
-  | {
-      type: 'move_mon'
-      payload: { source: MonWithLocation; dest: MonLocation }
+      type: 'set_home_box'
+      payload: { box: number }
     }
   | {
       type: 'sort_current_home_box'
@@ -93,6 +79,32 @@ export type OpenSavesAction =
       payload: { sortType: SortType }
     }
   | {
+      type: 'set_home_box_name'
+      payload: { name: string | undefined; index: number }
+    }
+  /*
+   *  SAVE FILES
+   */
+  | {
+      type: 'add_save'
+      payload: SAV
+    }
+  | {
+      type: 'remove_save'
+      payload: SAV
+    }
+  | {
+      type: 'set_save_box'
+      payload: { save: SAV; boxNum: number }
+    }
+  | {
+      type: 'close_all_saves'
+      payload?: undefined
+    }
+  /*
+   *  POKEMON
+   */
+  | {
       type: 'add_mon_to_release'
       payload: MonLocation
     }
@@ -101,9 +113,16 @@ export type OpenSavesAction =
       payload?: undefined
     }
   | {
-      type: 'close_all_saves'
-      payload?: undefined
+      type: 'import_mons'
+      payload: { mons: PKMInterface[]; dest: MonLocation }
     }
+  | {
+      type: 'move_mon'
+      payload: { source: MonWithLocation; dest: MonLocation }
+    }
+  /*
+   *  OTHER
+   */
   | {
       type: 'clear_updated_box_slots'
       payload?: undefined
@@ -111,10 +130,6 @@ export type OpenSavesAction =
   | {
       type: 'set_error'
       payload: string | undefined
-    }
-  | {
-      type: 'set_box_name'
-      payload: { name: string | undefined; index: number }
     }
 
 const updateMonInSave = (
@@ -154,7 +169,10 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
   // console.log({ type, payload })
 
   switch (type) {
-    case 'set_home_banks': {
+    /*
+     *  BANKS
+     */
+    case 'load_home_banks': {
       const { banks, monLookup } = payload
       const newHomeData = state.homeData ?? new HomeData(banks, monLookup)
 
@@ -177,6 +195,68 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
       }
       return { ...state, homeData: updatedHomeData }
     }
+    case 'set_current_home_bank': {
+      if (!state.homeData) return state
+      const { bank, monLookup } = payload
+
+      state.homeData.setAndLoadBank(bank, monLookup)
+      return { ...state, homeData: state.homeData }
+    }
+    case 'set_home_bank_name': {
+      if (!state.homeData) return state
+      const { bank, name } = payload
+
+      state.homeData.setBankName(bank, name)
+      return { ...state, homeData: state.homeData }
+    }
+    /*
+     *  HOME BOXES
+     */
+    case 'set_home_box': {
+      if (!state.homeData) return state
+      const { box } = payload
+
+      state.homeData.currentBoxIndex = box
+      const newState: OpenSavesState = {
+        ...state,
+        homeData: state.homeData,
+      }
+
+      return newState
+    }
+    case 'sort_current_home_box': {
+      if (!state.homeData) return state
+
+      const boxMons = state.homeData
+        .getCurrentBox()
+        .pokemon.toSorted(getSortFunctionNullable(payload.sortType))
+
+      state.homeData.boxes[state.homeData.currentPCBox].pokemon = boxMons
+      return { ...state }
+    }
+    case 'sort_all_home_boxes': {
+      if (!state.homeData) return state
+
+      const allMons = state.homeData.boxes
+        .flatMap((box) => box.pokemon)
+        .toSorted(getSortFunctionNullable(payload.sortType))
+      const boxSize = HomeData.BOX_COLUMNS * HomeData.BOX_ROWS
+
+      for (let i = 0; i < state.homeData.boxes.length; i++) {
+        state.homeData.boxes[i].pokemon = allMons.slice(i * boxSize, (i + 1) * boxSize)
+      }
+
+      return { ...state }
+    }
+    case 'set_home_box_name': {
+      const newState = { ...state }
+      const box = newState.homeData?.boxes[payload.index]
+
+      if (box) {
+        box.name = payload.name
+      }
+      return newState
+    }
     case 'add_save': {
       const saveIdentifier = saveToStringIdentifier(payload)
 
@@ -197,33 +277,11 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
 
       return { ...state, openSaves: { ...state.openSaves } }
     }
-    case 'clear_all': {
-      return { ...state, openSaves: {} }
-    }
     case 'set_error': {
       return {
         ...state,
         error: payload,
       }
-    }
-    case 'set_home_box': {
-      if (!state.homeData) return state
-      const { box } = payload
-
-      state.homeData.currentPCBox = box
-      const newState: OpenSavesState = {
-        ...state,
-        homeData: state.homeData,
-      }
-
-      return newState
-    }
-    case 'set_home_bank': {
-      if (!state.homeData) return state
-      const { bank, monLookup } = payload
-
-      state.homeData.setAndLoadBank(bank, monLookup)
-      return { ...state, homeData: state.homeData }
     }
     case 'set_save_box': {
       const { save } = payload
@@ -284,30 +342,6 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
 
       updateMonInSave(state, destMon, source)
       updateMonInSave(state, sourceMon, dest)
-
-      return { ...state }
-    }
-    case 'sort_current_home_box': {
-      if (!state.homeData) return state
-
-      const boxMons = state.homeData
-        .getCurrentBox()
-        .pokemon.toSorted(getSortFunctionNullable(payload.sortType))
-
-      state.homeData.boxes[state.homeData.currentPCBox].pokemon = boxMons
-      return { ...state }
-    }
-    case 'sort_all_home_boxes': {
-      if (!state.homeData) return state
-
-      const allMons = state.homeData.boxes
-        .flatMap((box) => box.pokemon)
-        .toSorted(getSortFunctionNullable(payload.sortType))
-      const boxSize = HomeData.BOX_COLUMNS * HomeData.BOX_ROWS
-
-      for (let i = 0; i < state.homeData.boxes.length; i++) {
-        state.homeData.boxes[i].pokemon = allMons.slice(i * boxSize, (i + 1) * boxSize)
-      }
 
       return { ...state }
     }
@@ -407,15 +441,6 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
     }
     case 'close_all_saves': {
       return { ...state, openSaves: {} }
-    }
-    case 'set_box_name': {
-      const newState = { ...state }
-      const box = newState.homeData?.boxes[payload.index]
-
-      if (box) {
-        box.name = payload.name
-      }
-      return newState
     }
   }
 }

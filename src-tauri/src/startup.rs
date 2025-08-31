@@ -1,6 +1,7 @@
 use std::path::{Path, PathBuf};
 
 use tauri::{App, Manager};
+use tauri_plugin_dialog::{DialogExt, MessageDialogButtons, MessageDialogKind};
 
 use crate::{
     error::{OpenHomeError, OpenHomeResult},
@@ -10,8 +11,30 @@ use crate::{
 pub fn run_app_startup(app: &App) -> OpenHomeResult<()> {
     let handle = app.handle();
 
-    versioning::handle_version_migration(handle)?;
+    if let Err(error) = versioning::handle_version_migration(handle, false) {
+        match error {
+            OpenHomeError::OutdatedVersion { .. } => {
+                let should_quit = app
+                    .dialog()
+                    .message(error.to_string())
+                    .title("OpenHome Version Error")
+                    .kind(MessageDialogKind::Error)
+                    .buttons(MessageDialogButtons::OkCancelCustom(
+                        "Quit".to_owned(),
+                        "Launch App Anyways".to_owned(),
+                    ))
+                    .blocking_show();
 
+                if should_quit {
+                    return Err(error);
+                }
+                versioning::handle_version_migration(handle, true)?;
+            }
+            other => return Err(other),
+        }
+    }
+
+    versioning::update_version_last_used(handle)?;
     initialize_storage(handle)?;
 
     let result = set_theme_from_settings(app);

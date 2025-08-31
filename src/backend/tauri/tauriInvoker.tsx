@@ -1,5 +1,6 @@
 import { invoke } from '@tauri-apps/api/core'
 import * as E from 'fp-ts/lib/Either'
+import { StoredBankData } from 'src/types/storage'
 import { Errorable, JSONArray, JSONObject, JSONValue, LookupMap, SaveRef } from 'src/types/types'
 import { PluginMetadataWithIcon } from 'src/util/Plugin'
 import { PossibleSaves } from '../../types/SAVTypes/path'
@@ -58,6 +59,18 @@ export const TauriInvoker = {
       relativePath,
       data,
     })
+
+    return promise.then(E.right).catch(E.left)
+  },
+
+  getBanks(): Promise<Errorable<StoredBankData>> {
+    const promise: Promise<StoredBankData> = invoke('load_banks')
+
+    return promise.then(E.right).catch(E.left)
+  },
+
+  writeBanks(bankData: StoredBankData): Promise<Errorable<null>> {
+    const promise: Promise<null> = invoke('write_banks', { bankData })
 
     return promise.then(E.right).catch(E.left)
   },

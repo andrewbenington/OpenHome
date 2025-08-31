@@ -3,7 +3,8 @@ import { getMonFileIdentifier } from 'src/util/Lookup'
 import { PersistedPkmData } from '../../state/persistedPkmData'
 import { TransferRestrictions } from '../TransferRestrictions'
 import { OHPKM } from '../pkm/OHPKM'
-import { BoxMonIdentifiers, getBankName, OpenHomeBank } from '../storage'
+import { BoxMonIdentifiers, getBankName, OpenHomeBank, StoredBankData } from '../storage'
+import { Err, Errorable, Ok } from '../types'
 import { Box } from './SAV'
 import { emptyPathData, PathData } from './path'
 
@@ -70,10 +71,10 @@ export class HomeData {
   sid?: number = 575757
   displayID: string = '575757'
 
-  currentPCBox: number = 0
+  _currentBoxIndex: number = 0
   boxes: Array<HomeBox> = []
-  currentBankIndex: number = 0
-  banks: OpenHomeBank[]
+  _currentBankIndex: number = 0
+  private _banks: OpenHomeBank[]
 
   bytes: Uint8Array = new Uint8Array()
 
@@ -82,9 +83,9 @@ export class HomeData {
 
   updatedBoxSlots: BankBoxCoordinates[] = []
 
-  constructor(all_bank_metadata: OpenHomeBank[], mon_lookup: PersistedPkmData) {
-    this.banks = all_bank_metadata
-    this.setAndLoadBank(0, mon_lookup)
+  constructor(stored_bank_data: StoredBankData, mon_lookup: PersistedPkmData) {
+    this._banks = stored_bank_data.banks
+    this.setAndLoadBank(stored_bank_data.current_bank, mon_lookup)
   }
   pluginIdentifier?: string | undefined
   pcChecksumOffset?: number | undefined
@@ -92,15 +93,15 @@ export class HomeData {
   calculatePcChecksum?: (() => number) | undefined
 
   getCurrentBox() {
-    return this.boxes[this.currentPCBox]
+    return this.boxes[this._currentBoxIndex]
   }
 
   getCurrentBank() {
-    return this.banks[this.currentBankIndex]
+    return this._banks[this._currentBankIndex]
   }
 
   getCurrentBankName() {
-    return getBankName(this.banks[this.currentBankIndex])
+    return getBankName(this._banks[this._currentBankIndex])
   }
 
   getGameName() {
@@ -124,25 +125,26 @@ export class HomeData {
   }
 
   addBank(name: string | undefined, box_count: number) {
-    const newBank = {
+    const newBank: OpenHomeBank = {
       name,
-      index: this.banks.length,
+      index: this._banks.length,
       boxes: range(box_count).map((_, index) => ({
         name: undefined,
         index,
         identifiers: {},
       })),
+      current_box: 0,
     }
 
-    this.banks.push(newBank)
+    this._banks.push(newBank)
     return newBank
   }
 
   setAndLoadBank(bank_index: number, mon_lookup: PersistedPkmData) {
-    this.currentBankIndex = bank_index
-    this.currentPCBox = 0
-    // console.log(this.banks, this.banks[bank_index], this.banks[bank_index].boxes)
-    const bankBoxes = this.banks[bank_index].boxes.sort((box_metadata) => box_metadata.index)
+    this._currentBankIndex = bank_index
+    this._currentBoxIndex = this._banks[bank_index].current_box
+    // console.log(this._banks, this._banks[bank_index], this._banks[bank_index].boxes)
+    const bankBoxes = this._banks[bank_index].boxes.sort((box_metadata) => box_metadata.index)
 
     this.boxes = bankBoxes.map(
       (box_metadata) =>
@@ -160,13 +162,13 @@ export class HomeData {
       )
     }
 
-    if (location.bank >= this.banks.length) {
+    if (location.bank >= this._banks.length) {
       throw new Error(
-        `Cannot access bank at index ${location.bank} (${this.banks.length} banks total)`
+        `Cannot access bank at index ${location.bank} (${this._banks.length} banks total)`
       )
     }
 
-    const bankToUpdate = this.banks[location.bank]
+    const bankToUpdate = this._banks[location.bank]
 
     if (location.box >= bankToUpdate.boxes.length) {
       throw new Error(
@@ -175,18 +177,28 @@ export class HomeData {
     }
 
     if (mon) {
-      this.banks[location.bank].boxes[location.box].identifiers[location.box_slot] =
+      this._banks[location.bank].boxes[location.box].identifiers[location.box_slot] =
         getMonFileIdentifier(mon) as string
-      if (location.bank === this.currentBankIndex) {
+      if (location.bank === this._currentBankIndex) {
         this.boxes[location.box].pokemon[location.box_slot] = mon
         bankToUpdate
       }
     } else {
-      delete this.banks[location.bank].boxes[location.box].identifiers[location.box_slot]
-      if (location.bank === this.currentBankIndex) {
+      delete this._banks[location.bank].boxes[location.box].identifiers[location.box_slot]
+      if (location.bank === this._currentBankIndex) {
         this.boxes[location.box].pokemon[location.box_slot] = undefined
       }
     }
+  }
+
+  setBankName(bank_index: number, name: string | undefined): Errorable<null> {
+    if (this._banks.length <= bank_index) {
+      return Err(`Cannot access bank at index ${bank_index} (${this._banks.length} banks total)`)
+    }
+
+    this._banks[bank_index].name = name
+
+    return Ok(null)
   }
 
   slotIsEmpty(location: BankBoxCoordinates): boolean {
@@ -196,13 +208,13 @@ export class HomeData {
       )
     }
 
-    if (location.bank >= this.banks.length) {
+    if (location.bank >= this._banks.length) {
       throw new Error(
-        `Cannot access bank at index ${location.bank} (${this.banks.length} banks total)`
+        `Cannot access bank at index ${location.bank} (${this._banks.length} banks total)`
       )
     }
 
-    const bank = this.banks[location.bank]
+    const bank = this._banks[location.bank]
 
     if (location.box >= bank.boxes.length) {
       throw new Error(
@@ -215,11 +227,44 @@ export class HomeData {
 
   displayState() {
     return {
-      currentBox: this.currentPCBox,
-      currentBankIndex: this.currentBankIndex,
+      currentBox: this._currentBoxIndex,
+      _currentBankIndex: this._currentBankIndex,
       currentBank: this.getCurrentBank(),
       boxCount: this.boxes.length,
     }
+  }
+
+  public get banks() {
+    return this._banks
+  }
+
+  public get currentBoxIndex() {
+    return this._currentBoxIndex
+  }
+
+  public set currentBoxIndex(index: number) {
+    if (index >= this.getCurrentBank().boxes.length) {
+      throw new Error(
+        `Cannot access box at index ${index} (${this.getCurrentBankName()} has ${this.getCurrentBank().boxes.length} boxes total)`
+      )
+    }
+    this._currentBoxIndex = index
+    this._banks[this._currentBankIndex].current_box = index
+  }
+
+  public get currentBankIndex() {
+    return this._currentBankIndex
+  }
+
+  public set currentBankIndex(index: number) {
+    if (index >= this._banks.length) {
+      throw new Error(`Cannot access bank at index ${index} (${this._banks.length} banks total)`)
+    }
+    this._currentBankIndex = index
+  }
+
+  public get currentPCBox() {
+    return this._currentBoxIndex
   }
 }
 

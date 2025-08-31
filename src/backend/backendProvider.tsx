@@ -44,10 +44,13 @@ async function writeAllHomeData(
   homeData: HomeData,
   mons: OHPKM[]
 ): Promise<Errorable<null>[]> {
-  const boxesResult = await backend.writeHomeBanks(homeData.banks)
+  const banksResult = await backend.writeHomeBanks({
+    banks: homeData.banks,
+    current_bank: homeData.currentBankIndex,
+  })
 
-  if (E.isLeft(boxesResult)) {
-    return [boxesResult]
+  if (E.isLeft(banksResult)) {
+    return [banksResult, await backend.rollbackTransaction()]
   }
 
   const results: Errorable<null>[] = []

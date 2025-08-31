@@ -14,32 +14,26 @@ use std::env;
 use tauri::Manager;
 use tauri_plugin_dialog::{DialogExt, MessageDialogKind};
 
+use crate::error::OpenHomeError;
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_fs::init())
         .setup(|app| {
             if let Err(launch_error) = startup::run_app_startup(app) {
-                app.dialog()
-                    .message(launch_error.to_string())
-                    .title("OpenHome Failed to Launch")
-                    .kind(MessageDialogKind::Error)
-                    .blocking_show();
-                app.handle().exit(1);
+                match launch_error {
+                    OpenHomeError::OutdatedVersion { .. } => app.handle().exit(1),
+                    _ => {
+                        app.dialog()
+                            .message(launch_error.to_string())
+                            .title("OpenHome Failed to Launch")
+                            .kind(MessageDialogKind::Error)
+                            .blocking_show();
+                        app.handle().exit(1);
+                    }
+                }
             }
-
-            // let banks = match pkm_storage::load_banks(app.handle()) {
-            //     Ok(banks) => banks,
-            //     Err(err) => {
-            //         app.dialog()
-            //             .message(err.to_string())
-            //             .title("OpenHome Failed to Launch")
-            //             .kind(MessageDialogKind::Error)
-            //             .blocking_show();
-            //         app.handle().exit(1);
-            //         unreachable!()
-            //     }
-            // };
 
             let lookup_state = match state::LookupState::load_from_storage(app.handle()) {
                 Ok(lookup) => lookup,
@@ -97,6 +91,8 @@ pub fn run() {
             commands::delete_plugin,
             commands::handle_windows_accellerator,
             commands::open_directory,
+            pkm_storage::load_banks,
+            pkm_storage::write_banks,
             state::get_lookups,
             state::update_lookups,
         ])

@@ -65,6 +65,7 @@ export type AppInfoState = {
   settingsLoaded: boolean
   officialSaveTypes: SAVClass[]
   extraSaveTypes: SAVClass[]
+  error?: string
 }
 
 export type AppInfoAction =
@@ -97,6 +98,10 @@ export type AppInfoAction =
   | {
       type: 'set_app_theme'
       payload: 'light' | 'dark' | 'system'
+    }
+  | {
+      type: 'set_error'
+      payload: string | undefined
     }
 
 export const appInfoReducer: Reducer<AppInfoState, AppInfoAction> = (
@@ -162,6 +167,9 @@ export const appInfoReducer: Reducer<AppInfoState, AppInfoAction> = (
     }
     case 'set_app_theme': {
       return { ...state, settings: { ...state.settings, appTheme: payload } }
+    }
+    case 'set_error': {
+      return { ...state, error: payload }
     }
   }
 }

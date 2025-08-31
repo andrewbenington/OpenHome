@@ -1,7 +1,7 @@
 import { Settings } from '../state/appInfo'
 import { OHPKM } from '../types/pkm/OHPKM'
 import { PathData, PossibleSaves } from '../types/SAVTypes/path'
-import { OpenHomeBank, SaveFolder } from '../types/storage'
+import { SaveFolder, StoredBankData } from '../types/storage'
 import { Errorable, LoadSaveResponse, LookupMap, SaveRef } from '../types/types'
 import { PluginMetadataWithIcon } from '../util/Plugin'
 
@@ -33,9 +33,9 @@ export default interface BackendInterface {
   writeHomeMon: (identifier: string, monBytes: Uint8Array) => Promise<Errorable<null>>
   deleteHomeMons: (identifiers: string[]) => Promise<Errorable<null>>
 
-  /* openhome boxes */
-  loadHomeBanks: () => Promise<Errorable<OpenHomeBank[]>>
-  writeHomeBanks: (boxData: OpenHomeBank[]) => Promise<Errorable<null>>
+  /* openhome banks/boxes */
+  loadHomeBanks: () => Promise<Errorable<StoredBankData>>
+  writeHomeBanks: (bankData: StoredBankData) => Promise<Errorable<null>>
 
   /* game saves */
   loadSaveFile: (filePath: PathData) => Promise<Errorable<LoadSaveResponse>>

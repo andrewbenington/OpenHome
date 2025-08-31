@@ -1,9 +1,84 @@
-import { Button, DataList, DropdownMenu, Spinner, TextField } from '@radix-ui/themes'
+import {
+  Button,
+  Card,
+  DataList,
+  DropdownMenu,
+  Flex,
+  Heading,
+  Spinner,
+  TextField,
+} from '@radix-ui/themes'
 import { useContext, useState } from 'react'
+import { EditIcon } from 'src/components/Icons'
 import { OpenSavesContext } from 'src/state/openSaves'
 import { PersistedPkmDataContext } from 'src/state/persistedPkmData'
 import { HomeData } from 'src/types/SAVTypes/HomeData'
 import { getBankName } from 'src/types/storage'
+
+export default function BankHeader() {
+  const [openSavesState, openSavesDispatch] = useContext(OpenSavesContext)
+  const [editing, setEditing] = useState(false)
+  const [bankNameEditValue, setBankNameEditValue] = useState(
+    openSavesState.homeData?.getCurrentBankName()
+  )
+
+  const homeData = openSavesState.homeData
+
+  if (!homeData) return <Spinner />
+
+  return (
+    <Card
+      className="bank-ribbon"
+      style={{
+        width: 'calc(100% - 4px)',
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+      }}
+    >
+      <div style={{ flexGrow: 1, width: 0 }}>{<BankSelector homeData={homeData} />}</div>
+      {editing ? (
+        <TextField.Root
+          size="1"
+          value={bankNameEditValue || ''}
+          style={{
+            minWidth: 0,
+            textAlign: 'center',
+            fontSize: 18,
+            fontFamily: 'var(--default-font-family)',
+            fontWeight: 'bold',
+          }}
+          placeholder={homeData.getCurrentBankName()}
+          onChange={(e) => setBankNameEditValue(e.target.value ?? undefined)}
+          autoFocus
+        />
+      ) : (
+        <Heading size="5">{homeData.getCurrentBankName()}</Heading>
+      )}
+
+      <Flex direction="row-reverse" flexGrow="1" width="0" gap="1">
+        <Button
+          className="mini-button"
+          style={{ transition: 'none', padding: 0 }}
+          variant={editing ? 'solid' : 'outline'}
+          color={editing ? undefined : 'gray'}
+          onClick={() => {
+            if (editing) {
+              openSavesDispatch({
+                type: 'set_home_bank_name',
+                payload: { bank: homeData.currentBankIndex, name: bankNameEditValue },
+              })
+            }
+            setEditing(!editing)
+          }}
+        >
+          <EditIcon />
+        </Button>
+      </Flex>
+    </Card>
+  )
+}
 
 const nonDigitsRE = /[^0-9]/g
 
@@ -11,9 +86,9 @@ function removeNonDigits(input: string): string {
   return input.replaceAll(nonDigitsRE, '')
 }
 
-export default function BankSelector(props: { homeData: HomeData }) {
+function BankSelector(props: { homeData: HomeData }) {
   const { homeData } = props
-  const [openSavesState, openSavesDispatch] = useContext(OpenSavesContext)
+  const [, openSavesDispatch] = useContext(OpenSavesContext)
   const [pkmDataState] = useContext(PersistedPkmDataContext)
   const [newBankName, setNewBankName] = useState<string>()
   const [newBankBoxCount, setNewBankBoxCount] = useState('30')
@@ -29,7 +104,7 @@ export default function BankSelector(props: { homeData: HomeData }) {
     <DropdownMenu.Root open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenu.Trigger>
         <Button variant="soft" size="1">
-          {openSavesState.homeData && getBankName(openSavesState.homeData.getCurrentBank())}
+          Switch Bank
           <DropdownMenu.TriggerIcon />
         </Button>
       </DropdownMenu.Trigger>
@@ -39,7 +114,7 @@ export default function BankSelector(props: { homeData: HomeData }) {
             key={bank.index}
             onClick={() =>
               openSavesDispatch({
-                type: 'set_home_bank',
+                type: 'set_current_home_bank',
                 payload: { bank: bank.index, monLookup },
               })
             }
@@ -57,7 +132,7 @@ export default function BankSelector(props: { homeData: HomeData }) {
                 <DataList.Value>
                   <TextField.Root
                     size="1"
-                    placeholder={`Bank ${homeData.banks.length + 2}`}
+                    placeholder={`Bank ${homeData.banks.length + 1}`}
                     onChange={(e) => setNewBankName(e.target.value || undefined)}
                   />
                 </DataList.Value>
