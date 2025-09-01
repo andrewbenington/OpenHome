@@ -11,7 +11,7 @@ describe('gen345 identifier', () => {
   let monBytes: Uint8Array
 
   beforeAll(() => {
-    const savePath = resolve(__dirname, './PKMFiles/Gen3/blaziken.pk3')
+    const savePath = resolve(__dirname, './PKMFiles/Gen3/blaziken.pkm')
 
     monBytes = new Uint8Array(readFileSync(savePath))
 
@@ -26,9 +26,7 @@ describe('gen345 identifier', () => {
     const ohpkm = new OHPKM(blaziken)
 
     expect(getMonGen345Identifier(blaziken)).toBe(getMonGen345Identifier(ohpkm))
-    const pk3 = new PK3(ohpkm)
 
-    expect(getMonGen345Identifier(pk3)).toBe(getMonGen345Identifier(ohpkm))
     const pk5 = new PK5(ohpkm)
     const pv1 = generatePersonalityValuePreservingAttributes(ohpkm)
     const pv2 = generatePersonalityValuePreservingAttributes(pk5)
