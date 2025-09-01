@@ -1,30 +1,60 @@
 import dayjs from 'dayjs'
 import { PKMInterface } from '../interfaces'
+import { getBaseMon } from './util'
 
-export type SortType = 'nickname' | 'level' | 'species' | 'origin' | 'met_date' | 'ribbons' | ''
-export const SortTypes: SortType[] = [
-  '',
-  'nickname',
-  'level',
-  'species',
-  'ribbons',
-  'met_date',
-  'origin',
+export const SortTypes = [
+  'Nickname',
+  'Level',
+  'Species',
+  'Species Family',
+  'Ribbon Count',
+  'Met Date',
+  'Origin',
 ]
+
+export type SortType = (typeof SortTypes)[number]
+
+export type PkmSorter = (a: PKMInterface, b: PKMInterface) => number
+
+function chain(sorters: PkmSorter[]): PkmSorter {
+  return (a: PKMInterface, b: PKMInterface) => {
+    for (const sorter of sorters) {
+      const diff = sorter(a, b)
+
+      if (diff !== 0) return diff
+    }
+
+    return 0
+  }
+}
+
+function sortByDexNum(a: PKMInterface, b: PKMInterface) {
+  return a.dexNum - b.dexNum
+}
+
+function sortByFormeNum(a: PKMInterface, b: PKMInterface) {
+  return (a.formeNum ?? 0) - (b.formeNum ?? 0)
+}
+
+function sortByBaseMon(a: PKMInterface, b: PKMInterface) {
+  return getBaseMon(a.dexNum, a.formeNum).dexNumber - getBaseMon(b.dexNum, b.formeNum).dexNumber
+}
 
 export function getSortFunction(
   sortStr: SortType | undefined
 ): (a: PKMInterface, b: PKMInterface) => number {
-  switch (sortStr?.toLowerCase()) {
-    case 'nickname':
+  switch (sortStr) {
+    case 'Nickname':
       return (a, b) => a.nickname.localeCompare(b.nickname)
-    case 'level':
+    case 'Level':
       return (a, b) => b.getLevel() - a.getLevel()
-    case 'species':
-      return (a, b) => a.dexNum - b.dexNum
-    case 'origin':
+    case 'Species':
+      return chain([sortByDexNum, sortByFormeNum])
+    case 'Species Family':
+      return chain([sortByBaseMon, sortByDexNum, sortByFormeNum])
+    case 'Origin':
       return (a, b) => a.gameOfOrigin - b.gameOfOrigin
-    case 'met_date':
+    case 'Met Date':
       return (a, b) => {
         const aDate =
           'metDate' in a && a.metDate
@@ -37,7 +67,7 @@ export function getSortFunction(
 
         return bDate - aDate
       }
-    case 'ribbons':
+    case 'Ribbon Count':
       return (a, b) => {
         const aCount = a.ribbons ? a.ribbons.length : 0
         const bCount = b.ribbons ? b.ribbons.length : 0
