@@ -1,7 +1,6 @@
 import { PK1, PK2, PK3, PK4, PK5 } from '@pokemon-files/pkm'
 import { readFileSync } from 'fs'
 import path, { resolve } from 'path'
-import { generatePersonalityValuePreservingAttributes } from '../../../../packages/pokemon-files/src'
 import { getMonGen12Identifier, getMonGen345Identifier } from '../../../util/Lookup'
 import { bytesToPKM } from '../../FileImport'
 import { OHPKM } from '../OHPKM'
@@ -27,11 +26,12 @@ describe('gen345 identifier', () => {
 
     expect(getMonGen345Identifier(blaziken)).toBe(getMonGen345Identifier(ohpkm))
 
-    const pk5 = new PK5(ohpkm)
-    const pv1 = generatePersonalityValuePreservingAttributes(ohpkm)
-    const pv2 = generatePersonalityValuePreservingAttributes(pk5)
+    const pk4 = new PK4(ohpkm)
 
-    expect(pv2).toBe(pv1)
+    expect(getMonGen345Identifier(pk4)).toBe(getMonGen345Identifier(ohpkm))
+
+    const pk5 = new PK5(ohpkm)
+
     expect(getMonGen345Identifier(pk5)).toBe(getMonGen345Identifier(ohpkm))
   })
 })
