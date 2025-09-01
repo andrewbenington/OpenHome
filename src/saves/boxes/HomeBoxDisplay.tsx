@@ -54,7 +54,7 @@ export default function HomeBoxDisplay() {
         >
           <Flex direction="row" className="box-navigation">
             <Flex align="center" justify="between" flexGrow="3" width="0">
-              <ViewToggle viewMode={viewMode} setViewMode={setViewMode} />
+              <ViewToggle viewMode={viewMode} setViewMode={setViewMode} disabled={editing} />
               <ArrowButton
                 onClick={() =>
                   openSavesDispatch({
@@ -426,12 +426,13 @@ function BoxOverview({ boxIndex, onBoxSelect }: BoxOverviewProps) {
 type ViewToggleProps = {
   viewMode: BoxViewMode
   setViewMode: (mode: BoxViewMode) => void
+  disabled?: boolean
 }
 
 const DRAG_OVER_COOLDOWN_MS = 500
 
 function ViewToggle(props: ViewToggleProps) {
-  const { viewMode, setViewMode } = props
+  const { viewMode, setViewMode, disabled } = props
   const [dragMonState] = useContext(DragMonContext)
   const [firstHover, setFirstHover] = useState(true)
   const [hoverCooldown, setHoverCooldown] = useState(false)
@@ -467,6 +468,7 @@ function ViewToggle(props: ViewToggleProps) {
       value={viewMode}
       type="single"
       onValueChange={(newVal: BoxViewMode) => setViewMode(newVal)}
+      disabled={disabled}
     >
       <ToggleGroup.Item value="one" className="ToggleGroupItem" disabled={!!dragMonState.payload}>
         <FaSquare />

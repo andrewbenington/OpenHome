@@ -25,16 +25,7 @@ export default function BankHeader() {
   if (!homeData) return <Spinner />
 
   return (
-    <Card
-      className="bank-ribbon"
-      style={{
-        width: 'calc(100% - 4px)',
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-      }}
-    >
+    <Card className="bank-ribbon">
       <div style={{ flexGrow: 1, width: 0 }}>
         {<BankSelector homeData={homeData} disabled={editing} />}
       </div>
@@ -104,8 +95,8 @@ function BankSelector(props: { homeData: HomeData; disabled?: boolean }) {
 
   return (
     <DropdownMenu.Root open={isOpen} onOpenChange={setIsOpen}>
-      <DropdownMenu.Trigger>
-        <Button variant="soft" size="1" disabled={disabled}>
+      <DropdownMenu.Trigger disabled={disabled}>
+        <Button variant="soft" size="1">
           Switch Bank
           <DropdownMenu.TriggerIcon />
         </Button>
