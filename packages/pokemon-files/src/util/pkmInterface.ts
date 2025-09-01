@@ -40,7 +40,6 @@ export interface AllPKMFields {
   fieldEventFatigue2?: number
   flag2LA?: boolean
   formArgument?: number
-  formNum?: number
   formeNum: number
   fullness?: number
   gameOfOrigin: number
