@@ -1,4 +1,4 @@
-VERSION=1.5.0
+VERSION=1.5.0-alpha-multiple-banks
 
 .PHONY: help
 help: # Display this help.
@@ -51,7 +51,7 @@ set-version:
 	@jq --arg new_version "$(VERSION)" '.version = "$(VERSION)"' "src-tauri/tauri.conf.json" > version.tmp.json && mv version.tmp.json src-tauri/tauri.conf.json
 	@npx prettier --write src-tauri/tauri.conf.json
 	@cd src-tauri && cargo set-version $(VERSION)
-	@npm version $(VERSION) --no-git-tag-version --allow-same-version
+	@npm version $(VERSION) --no-git-tag-version --allow-same-version 
 
 .PHONY: release-mac
 release-mac:
