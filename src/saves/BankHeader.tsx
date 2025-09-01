@@ -30,7 +30,7 @@ export default function BankHeader() {
     <Card
       className="bank-ribbon"
       style={{
-        width: 'calc(100% - 4px)',
+        width: '100%',
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'space-between',
