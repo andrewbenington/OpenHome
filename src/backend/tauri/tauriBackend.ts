@@ -94,7 +94,7 @@ export const TauriBackend: BackendInterface = {
       let bank: OpenHomeBank = { name: undefined, index: 0, boxes: [], current_box: 0 }
 
       for (let i = 0; i < 36; i++) {
-        bank.boxes.push({ index: i, identifiers: {}, name: undefined })
+        bank.boxes.push({ index: i, identifiers: {}, name: null })
       }
       stored_bank_data = { banks: [bank], current_bank: 0 }
       TauriInvoker.writeBanks(stored_bank_data)
