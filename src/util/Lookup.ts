@@ -1,7 +1,7 @@
-import { PK3 } from '@pokemon-files/pkm'
-import { StatsPreSplit } from '@pokemon-files/util'
+import { generatePersonalityValuePreservingAttributes, StatsPreSplit } from '@pokemon-files/util'
 import { isGameBoy } from 'pokemon-resources'
 import { PokemonData } from 'pokemon-species-data'
+import { PK3, PK4, PK5 } from '../../packages/pokemon-files/src'
 import { PKMInterface } from '../types/interfaces'
 import { OHPKM } from '../types/pkm/OHPKM'
 import { getBaseMon } from '../types/pkm/util'
@@ -53,20 +53,30 @@ export const getMonGen12Identifier = (mon: PKMInterface & { dvs: StatsPreSplit }
   return undefined
 }
 
-export const getMonGen345Identifier = (mon: PKMInterface) => {
+export const getMonGen345Identifier = (mon: PK3 | PK4 | PK5 | OHPKM) => {
   // if (!hasGen3OnData(mon)) {
   //   return undefined
   // }
   const baseMon = getBaseMon(mon.dexNum, mon.formeNum)
 
   try {
-    const pk3 = new PK3(new OHPKM(mon))
+    const ohpkm = new OHPKM(mon)
+    let pk3CompatiblePID
+
+    if (mon instanceof OHPKM) {
+      // Get the personality value that will be generated
+      pk3CompatiblePID = generatePersonalityValuePreservingAttributes(mon)
+    } else {
+      pk3CompatiblePID = mon.personalityValue
+    }
+
+    const trainerId = ohpkm.trainerID
+    const secretId = ohpkm.secretID
 
     if (baseMon) {
-      return `${baseMon.dexNumber.toString().padStart(4, '0')}-${bytesToString(
-        pk3.trainerID,
-        2
-      ).concat(bytesToString(pk3.secretID ?? 0, 2))}-${bytesToString(pk3.personalityValue!, 4)}`
+      return `${baseMon.dexNumber.toString().padStart(4, '0')}-${bytesToString(trainerId, 2).concat(
+        bytesToString(secretId, 2)
+      )}-${bytesToString(pk3CompatiblePID, 4)}`
     }
   } catch (error) {
     console.error(error)

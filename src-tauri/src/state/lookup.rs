@@ -77,11 +77,6 @@ pub fn update_lookups(
     gen_12: IdentifierLookup,
     gen_345: IdentifierLookup,
 ) -> OpenHomeResult<()> {
-    println!(
-        "updating lookups: {} gen12, {} gen234",
-        gen_12.len(),
-        gen_345.len()
-    );
     lookup_state
         .lock()?
         .update_lookups(&app_handle, gen_12, gen_345)

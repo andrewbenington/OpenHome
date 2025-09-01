@@ -1,6 +1,6 @@
 use crate::error::{OpenHomeError, OpenHomeResult};
 use crate::plugin::{self, PluginMetadata, PluginMetadataWithIcon, list_plugins};
-use crate::state::{AppState, AppStateInner, AppStateSnapshot};
+use crate::state::{AppState, AppStateSnapshot};
 use crate::util::ImageResponse;
 use crate::{menu, saves, util};
 use serde_json::Value;

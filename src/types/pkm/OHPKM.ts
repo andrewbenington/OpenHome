@@ -9,6 +9,7 @@ import {
   StatsPreSplit,
   genderFromDVs,
   genderFromPID,
+  generatePersonalityValuePreservingAttributes,
   markingsHaveColor,
   markingsSixShapesWithColorFromBytes,
   markingsSixShapesWithColorFromOther,
@@ -52,7 +53,6 @@ import {
   adjustMovePPBetweenFormats,
   dvsFromIVs,
   generateIVs,
-  generatePersonalityValuePreservingAttributes,
   generateTeraType,
   getAbilityFromNumber,
   getHeightCalculated,
@@ -143,7 +143,7 @@ export class OHPKM implements PKMInterface {
       this.personalityValue =
         other.personalityValue !== undefined
           ? other.personalityValue
-          : generatePersonalityValuePreservingAttributes(other, prng)
+          : generatePersonalityValuePreservingAttributes(other)
       this.isFatefulEncounter = other.isFatefulEncounter ?? false
 
       if (other.format === 'PK1' || other.format === 'PK2') {

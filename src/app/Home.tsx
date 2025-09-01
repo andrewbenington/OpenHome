@@ -195,7 +195,11 @@ const Home = () => {
         const [extension] = file.name.split('.').slice(-1)
 
         try {
-          mon = bytesToPKMInterface(buffer, extension.toUpperCase())
+          if (extension.toUpperCase() === 'OHPKM') {
+            mon = new OHPKM(new Uint8Array(buffer))
+          } else {
+            mon = bytesToPKMInterface(buffer, extension.toUpperCase())
+          }
         } catch (e) {
           displayError('Import Error', `Could not read Pokémon file: ${e}`)
         }

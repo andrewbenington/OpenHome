@@ -25,6 +25,8 @@ const ROW_COUNT = 10
 
 type BoxViewMode = 'one' | 'all'
 
+const ALLOW_DUPE_IMPORT = true
+
 export default function HomeBoxDisplay() {
   const [openSavesState, openSavesDispatch] = useContext(OpenSavesContext)
   const [editing, setEditing] = useState(false)
@@ -217,7 +219,7 @@ function BoxMons() {
           (mon) => mon && getMonFileIdentifier(mon) === identifier
         )
 
-        if (identifier in homeMons || inCurrentBox) {
+        if (!ALLOW_DUPE_IMPORT && (identifier in homeMons || inCurrentBox)) {
           const message =
             mons.length === 1
               ? 'This Pokémon has been moved into OpenHome before.'
