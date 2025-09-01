@@ -68,6 +68,10 @@
   margin: 0px 6px;
 }
 
+.box-name input {
+  text-indent: 0px;
+}
+
 .save-header {
   display: flex;
   flex-direction: row;

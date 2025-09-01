@@ -82,3 +82,7 @@
   padding: 2px 6px;
   height: 32px;
 }
+
+.bank-ribbon input {
+  text-indent: 0px;
+}

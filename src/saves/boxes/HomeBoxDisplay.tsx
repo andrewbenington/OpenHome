@@ -1,4 +1,4 @@
-import { Button, Card, DropdownMenu, Flex, Grid, Heading } from '@radix-ui/themes'
+import { Button, Card, DropdownMenu, Flex, Grid, Heading, TextField } from '@radix-ui/themes'
 import lodash, { range } from 'lodash'
 import { ToggleGroup } from 'radix-ui'
 import { useCallback, useContext, useMemo, useState } from 'react'
@@ -31,6 +31,7 @@ export default function HomeBoxDisplay() {
   const [openSavesState, openSavesDispatch] = useContext(OpenSavesContext)
   const [editing, setEditing] = useState(false)
   const [viewMode, setViewMode] = useState<BoxViewMode>('one')
+  const [editingBoxName, setEditingBoxName] = useState('')
 
   const homeData = openSavesState.homeData
 
@@ -69,24 +70,21 @@ export default function HomeBoxDisplay() {
                 style={{ visibility: viewMode === 'one' ? 'visible' : 'collapse' }}
                 dragID="home-arrow-left"
                 direction="left"
+                disabled={editing}
               />
             </Flex>
             <div className="box-name">
               {editing ? (
-                <input
-                  value={currentBox.name || ''}
+                <TextField.Root
+                  value={editingBoxName}
+                  size="1"
                   style={{
                     minWidth: 0,
                     textAlign: 'center',
                     visibility: viewMode === 'one' ? 'visible' : 'collapse',
                   }}
                   placeholder={`Box ${currentBox.index + 1}`}
-                  onChange={(e) =>
-                    openSavesDispatch({
-                      type: 'set_home_box_name',
-                      payload: { name: e.target.value ?? undefined, index: currentBox.index },
-                    })
-                  }
+                  onChange={(e) => setEditingBoxName(e.target.value)}
                   autoFocus
                 />
               ) : (
@@ -111,6 +109,7 @@ export default function HomeBoxDisplay() {
                 style={{ visibility: viewMode === 'one' ? 'visible' : 'collapse' }}
                 dragID="home-arrow-right"
                 direction="right"
+                disabled={editing}
               />
               <Flex gap="1">
                 {viewMode === 'one' && (
@@ -119,7 +118,17 @@ export default function HomeBoxDisplay() {
                     style={{ transition: 'none', padding: 0 }}
                     variant={editing ? 'solid' : 'outline'}
                     color={editing ? undefined : 'gray'}
-                    onClick={() => setEditing(!editing)}
+                    onClick={() => {
+                      if (editing) {
+                        openSavesDispatch({
+                          type: 'set_home_box_name',
+                          payload: { name: editingBoxName, index: currentBox.index },
+                        })
+                      } else {
+                        setEditingBoxName(homeData.getCurrentBox().name ?? '')
+                      }
+                      setEditing(!editing)
+                    }}
                   >
                     <EditIcon />
                   </Button>
@@ -174,7 +183,6 @@ export default function HomeBoxDisplay() {
               </Flex>
             </Flex>
           </Flex>
-
           {viewMode === 'one' ? (
             <BoxMons />
           ) : (

@@ -18,9 +18,7 @@ import { getBankName } from 'src/types/storage'
 export default function BankHeader() {
   const [openSavesState, openSavesDispatch] = useContext(OpenSavesContext)
   const [editing, setEditing] = useState(false)
-  const [bankNameEditValue, setBankNameEditValue] = useState(
-    openSavesState.homeData?.getCurrentBankName()
-  )
+  const [bankNameEditValue, setBankNameEditValue] = useState('')
 
   const homeData = openSavesState.homeData
 
@@ -30,14 +28,16 @@ export default function BankHeader() {
     <Card
       className="bank-ribbon"
       style={{
-        width: '100%',
+        width: 'calc(100% - 4px)',
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
       }}
     >
-      <div style={{ flexGrow: 1, width: 0 }}>{<BankSelector homeData={homeData} />}</div>
+      <div style={{ flexGrow: 1, width: 0 }}>
+        {<BankSelector homeData={homeData} disabled={editing} />}
+      </div>
       {editing ? (
         <TextField.Root
           size="1"
@@ -69,6 +69,8 @@ export default function BankHeader() {
                 type: 'set_home_bank_name',
                 payload: { bank: homeData.currentBankIndex, name: bankNameEditValue },
               })
+            } else {
+              setBankNameEditValue(homeData.getCurrentBankName())
             }
             setEditing(!editing)
           }}
@@ -86,8 +88,8 @@ function removeNonDigits(input: string): string {
   return input.replaceAll(nonDigitsRE, '')
 }
 
-function BankSelector(props: { homeData: HomeData }) {
-  const { homeData } = props
+function BankSelector(props: { homeData: HomeData; disabled?: boolean }) {
+  const { homeData, disabled } = props
   const [, openSavesDispatch] = useContext(OpenSavesContext)
   const [pkmDataState] = useContext(PersistedPkmDataContext)
   const [newBankName, setNewBankName] = useState<string>()
@@ -103,7 +105,7 @@ function BankSelector(props: { homeData: HomeData }) {
   return (
     <DropdownMenu.Root open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenu.Trigger>
-        <Button variant="soft" size="1">
+        <Button variant="soft" size="1" disabled={disabled}>
           Switch Bank
           <DropdownMenu.TriggerIcon />
         </Button>
