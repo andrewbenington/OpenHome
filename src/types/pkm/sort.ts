@@ -1,4 +1,7 @@
+import { PKM } from '@pokemon-files/pkm'
+import { getDisplayID } from '@pokemon-files/util/util'
 import dayjs from 'dayjs'
+import { Ball } from 'pokemon-resources'
 import { PKMInterface } from '../interfaces'
 import { getBaseMon } from './util'
 
@@ -10,6 +13,10 @@ export const SortTypes = [
   'Ribbon Count',
   'Met Date',
   'Origin',
+  'Shiny Status',
+  'Trainer',
+  'Poké Ball',
+  'Held Item',
 ]
 
 export type SortType = (typeof SortTypes)[number]
@@ -40,6 +47,53 @@ function sortByBaseMon(a: PKMInterface, b: PKMInterface) {
   return getBaseMon(a.dexNum, a.formeNum).dexNumber - getBaseMon(b.dexNum, b.formeNum).dexNumber
 }
 
+function sortByMetDate(a: PKMInterface, b: PKMInterface) {
+  const aDate =
+    'metDate' in a && a.metDate
+      ? dayjs(new Date(a.metDate.year, a.metDate.month, a.metDate.day)).unix()
+      : 0
+  const bDate =
+    'metDate' in b && b.metDate
+      ? dayjs(new Date(b.metDate.year, b.metDate.month, b.metDate.day)).unix()
+      : 0
+
+  return bDate - aDate
+}
+
+function sortByRibbonCount(a: PKMInterface, b: PKMInterface) {
+  const aCount = a.ribbons ? a.ribbons.length : 0
+  const bCount = b.ribbons ? b.ribbons.length : 0
+
+  return bCount - aCount
+}
+
+function sortByShinyStatus(a: PKMInterface, b: PKMInterface) {
+  return -1 * (Number(a.isShiny()) - Number(b.isShiny()))
+}
+
+function sortByTrainerName(a: PKMInterface, b: PKMInterface) {
+  return a.trainerName.localeCompare(b.trainerName)
+}
+
+function sortByTrainerId(a: PKMInterface, b: PKMInterface) {
+  return parseInt(getDisplayID(a as PKM)) - parseInt(getDisplayID(b as PKM))
+}
+
+function sortBySecretId(a: PKMInterface, b: PKMInterface) {
+  return a.trainerID - b.trainerID
+}
+
+function sortByHeldItem(a: PKMInterface, b: PKMInterface) {
+  if (a.heldItemIndex === b.heldItemIndex) return 0
+  if (a.heldItemIndex === 0 && b.heldItemIndex !== 0) {
+    return Number.POSITIVE_INFINITY
+  } else if (b.heldItemIndex === 0) {
+    return Number.NEGATIVE_INFINITY
+  }
+
+  return a.heldItemName.localeCompare(b.heldItemName)
+}
+
 export function getSortFunction(
   sortStr: SortType | undefined
 ): (a: PKMInterface, b: PKMInterface) => number {
@@ -55,25 +109,17 @@ export function getSortFunction(
     case 'Origin':
       return (a, b) => a.gameOfOrigin - b.gameOfOrigin
     case 'Met Date':
-      return (a, b) => {
-        const aDate =
-          'metDate' in a && a.metDate
-            ? dayjs(new Date(a.metDate.year, a.metDate.month, a.metDate.day)).unix()
-            : 0
-        const bDate =
-          'metDate' in b && b.metDate
-            ? dayjs(new Date(b.metDate.year, b.metDate.month, b.metDate.day)).unix()
-            : 0
-
-        return bDate - aDate
-      }
+      return sortByMetDate
     case 'Ribbon Count':
-      return (a, b) => {
-        const aCount = a.ribbons ? a.ribbons.length : 0
-        const bCount = b.ribbons ? b.ribbons.length : 0
-
-        return bCount - aCount
-      }
+      return sortByRibbonCount
+    case 'Shiny Status':
+      return sortByShinyStatus
+    case 'Trainer':
+      return chain([sortByTrainerName, sortByTrainerId, sortBySecretId])
+    case 'Poké Ball':
+      return (a, b) => (a.ball ?? Ball.Poke) - (b.ball ?? Ball.Poke)
+    case 'Held Item':
+      return sortByHeldItem
     default:
       return () => {
         console.error('unrecognized sort term:', sortStr)
