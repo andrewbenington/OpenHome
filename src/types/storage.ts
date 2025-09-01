@@ -17,7 +17,7 @@ export type OpenHomeBank = {
 
 export type OpenHomeBox = {
   index: number
-  name: string | undefined
+  name: string | null
   identifiers: BoxMonIdentifiers
 }
 

@@ -14,7 +14,7 @@ export class HomeBox implements Box<OHPKM> {
 
   pokemon: Array<OHPKM | undefined> = new Array(120)
 
-  constructor(name: string, index: number) {
+  constructor(name: string | undefined, index: number) {
     if (name !== `Box ${index + 1}`) {
       this.name = name
     }
@@ -129,7 +129,7 @@ export class HomeData {
       name,
       index: this._banks.length,
       boxes: range(box_count).map((_, index) => ({
-        name: undefined,
+        name: null,
         index,
         identifiers: {},
       })),
@@ -147,8 +147,7 @@ export class HomeData {
     const bankBoxes = this._banks[bank_index].boxes.sort((box_metadata) => box_metadata.index)
 
     this.boxes = bankBoxes.map(
-      (box_metadata) =>
-        new HomeBox(box_metadata.name ?? `Box ${box_metadata.index + 1}`, box_metadata.index)
+      (box_metadata) => new HomeBox(box_metadata.name ?? undefined, box_metadata.index)
     )
     bankBoxes.forEach((box_metadata) => {
       this.boxes[box_metadata.index].loadMonsFromIdentifiers(box_metadata.identifiers, mon_lookup)
