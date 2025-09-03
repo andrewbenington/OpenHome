@@ -1,6 +1,6 @@
 import { closestCenter } from '@dnd-kit/collision'
 import { useDroppable } from '@dnd-kit/react'
-import { ReactNode, useEffect } from 'react'
+import { ReactNode, useEffect, useRef } from 'react'
 import { MonLocation } from '../../state/openSaves'
 
 const getBackgroundDetails = (disabled?: boolean) => {
@@ -40,16 +40,24 @@ const DroppableSpace = ({
     disabled: !dropID,
     collisionDetector: closestCenter,
   })
+  const onOverRef = useRef(onOver)
+  const onNotOverRef = useRef(onNotOver)
+
+  useEffect(() => {
+    onOverRef.current = onOver
+  }, [onOver])
+
+  useEffect(() => {
+    onNotOverRef.current = onNotOver
+  }, [onNotOver])
 
   useEffect(() => {
     if (isDropTarget) {
-      onOver && onOver()
+      onOverRef.current?.()
+    } else {
+      onNotOverRef.current?.()
     }
-  }, [isDropTarget, onOver])
-
-  if (onNotOver && !isDropTarget) {
-    onNotOver()
-  }
+  }, [isDropTarget])
 
   return (
     <div

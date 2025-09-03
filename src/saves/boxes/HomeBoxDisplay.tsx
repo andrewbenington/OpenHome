@@ -1,7 +1,7 @@
 import { Button, Card, DropdownMenu, Flex, Grid } from '@radix-ui/themes'
 import lodash, { range } from 'lodash'
 import { ToggleGroup } from 'radix-ui'
-import { useCallback, useContext, useMemo, useState } from 'react'
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { BsFillGrid3X3GapFill } from 'react-icons/bs'
 import { FaSquare } from 'react-icons/fa'
 import { EditIcon, MenuIcon } from 'src/components/Icons'
@@ -34,6 +34,21 @@ export default function HomeBoxDisplay() {
 
   const currentBox = homeData?.boxes[homeData.currentPCBox]
 
+  const currentPcBox = homeData?.currentPCBox ?? 0
+
+  const onArrowLeft = useCallback(
+    () =>
+      homeData &&
+      openSavesDispatch({
+        type: 'set_save_box',
+        payload: {
+          boxNum: currentPcBox > 0 ? currentPcBox - 1 : homeData.boxes.length - 1,
+          save: homeData,
+        },
+      }),
+    [currentPcBox, homeData, openSavesDispatch]
+  )
+
   return (
     homeData &&
     currentBox && (
@@ -53,18 +68,7 @@ export default function HomeBoxDisplay() {
             <Flex align="center" justify="between" flexGrow="3">
               <ViewToggle viewMode={viewMode} setViewMode={setViewMode} />
               <ArrowButton
-                onClick={() =>
-                  openSavesDispatch({
-                    type: 'set_save_box',
-                    payload: {
-                      boxNum:
-                        homeData.currentPCBox > 0
-                          ? homeData.currentPCBox - 1
-                          : homeData.boxes.length - 1,
-                      save: homeData,
-                    },
-                  })
-                }
+                onClick={onArrowLeft}
                 style={{ visibility: viewMode === 'one' ? 'visible' : 'collapse' }}
                 dragID="home-arrow-left"
                 direction="left"
@@ -407,33 +411,30 @@ const DRAG_OVER_COOLDOWN_MS = 500
 function ViewToggle(props: ViewToggleProps) {
   const { viewMode, setViewMode } = props
   const [dragMonState] = useContext(DragMonContext)
-  const [firstHover, setFirstHover] = useState(true)
-  const [hoverCooldown, setHoverCooldown] = useState(false)
+  const [timer, setTimer] = useState<NodeJS.Timeout>()
+  const setViewModeRef = useRef(setViewMode)
+
+  useEffect(() => {
+    setViewModeRef.current = setViewMode
+  }, [setViewMode])
 
   const onAllViewModeDragOver = useCallback(() => {
-    if (firstHover) {
-      setFirstHover(false)
-      setHoverCooldown(true)
-      setTimeout(() => {
-        setHoverCooldown(false)
-      }, DRAG_OVER_COOLDOWN_MS)
-      return
+    if (timer) {
+      clearInterval(timer)
     }
 
-    if (hoverCooldown) {
-      return
-    }
-    setHoverCooldown(true)
-    setViewMode('all')
-
-    setTimeout(() => {
-      setHoverCooldown(false)
+    const newTimer = setInterval(() => {
+      setViewMode('all')
     }, DRAG_OVER_COOLDOWN_MS)
-  }, [firstHover, hoverCooldown, setViewMode])
+
+    setTimer(newTimer)
+  }, [setViewMode, timer])
 
   const onNotDragOver = useCallback(() => {
-    setFirstHover(true)
-  }, [])
+    if (timer) {
+      clearInterval(timer)
+    }
+  }, [timer])
 
   return (
     <ToggleGroup.Root
