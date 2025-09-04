@@ -6,6 +6,7 @@ import { getPublicImageURL } from '../images/images'
 import { getPokemonSpritePath } from '../images/pokemon'
 import { OpenHomePlugin, PluginContext } from '../state/plugin'
 import { PKMInterface } from '../types/interfaces'
+import { displayIndexAdder, isBattleFormeItem } from '../types/pkm/util'
 
 type RequiredFields<T, K extends keyof T> = T & Required<Pick<T, K>>
 
@@ -28,8 +29,21 @@ export default function useMonSprite(mon: PKMInterface) {
 
   useEffect(() => {
     if (loadError) return
+
+    let formeNum = mon.formeNum
+
+    if (isBattleFormeItem(mon.heldItemIndex)) {
+      formeNum = displayIndexAdder(mon.heldItemIndex)(mon.formeNum)
+    }
+
     for (const plugin of spritePlugins) {
-      const spritePath = plugin.getMonSpritePath({ ...mon, isShiny: mon.isShiny() })
+      const spritePath = plugin.getMonSpritePath({
+        dexNum: mon.dexNum,
+        formeNum,
+        format: mon.format,
+        isFemale: mon.gender === 1,
+        isShiny: mon.isShiny(),
+      })
 
       if (spritePath !== null) {
         backend.getPluginPath(plugin.id).then((pluginPath) => {
