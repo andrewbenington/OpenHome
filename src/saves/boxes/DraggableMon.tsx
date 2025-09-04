@@ -1,4 +1,7 @@
 import { useDraggable } from '@dnd-kit/react'
+import { useContext, useMemo } from 'react'
+import { DragMonContext } from 'src/state/dragMon'
+import { displayIndexAdder, isBattleFormeItem } from 'src/types/pkm/util'
 import PokemonIcon from '../../components/PokemonIcon'
 import { MonWithLocation } from '../../state/openSaves'
 import { PKMInterface } from '../../types/interfaces'
@@ -25,11 +28,22 @@ export interface DraggableMonProps {
 }
 
 const DraggableMon = ({ mon, onClick, disabled, dragData, dragID }: DraggableMonProps) => {
-  const { ref, isDragging } = useDraggable({
+  const { ref } = useDraggable({
     id: (dragID ?? '') + mon.personalityValue?.toString(),
     data: dragData,
     disabled: disabled || !dragID,
   })
+  const [dragState] = useContext(DragMonContext)
+
+  const isDragging = useMemo(
+    () =>
+      dragState.payload &&
+      dragData &&
+      dragState.payload.box === dragData.box &&
+      dragState.payload.boxPos === dragData.boxPos &&
+      dragState.payload.save === dragData.save,
+    [dragData, dragState.payload]
+  )
 
   return (
     <div
@@ -44,7 +58,11 @@ const DraggableMon = ({ mon, onClick, disabled, dragData, dragID }: DraggableMon
     >
       <PokemonIcon
         dexNumber={mon.dexNum}
-        formeNumber={mon.formeNum}
+        formeNumber={
+          isBattleFormeItem(mon.heldItemIndex)
+            ? displayIndexAdder(mon.heldItemIndex)(mon.formeNum)
+            : mon.formeNum
+        }
         isShiny={mon.isShiny()}
         heldItemIndex={mon.heldItemIndex}
         style={{
