@@ -9,6 +9,7 @@ export type StoredBankData = {
 }
 
 export type OpenHomeBank = {
+  id: string
   index: number
   name: string | undefined
   boxes: OpenHomeBox[]
@@ -16,6 +17,7 @@ export type OpenHomeBank = {
 }
 
 export type OpenHomeBox = {
+  id: string
   index: number
   name: string | null
   identifiers: BoxMonIdentifiers

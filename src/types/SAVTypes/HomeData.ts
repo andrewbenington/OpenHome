@@ -1,23 +1,36 @@
 import { GameOfOrigin } from 'pokemon-resources'
 import { getMonFileIdentifier } from 'src/util/Lookup'
+import { v4 as UuidV4 } from 'uuid'
 import { PersistedPkmData } from '../../state/persistedPkmData'
+import { range } from '../../util/Functional'
 import { TransferRestrictions } from '../TransferRestrictions'
 import { OHPKM } from '../pkm/OHPKM'
-import { BoxMonIdentifiers, getBankName, OpenHomeBank, StoredBankData } from '../storage'
+import {
+  BoxMonIdentifiers,
+  getBankName,
+  OpenHomeBank,
+  OpenHomeBox,
+  StoredBankData,
+} from '../storage'
 import { Err, Errorable, Ok } from '../types'
 import { Box } from './SAV'
 import { emptyPathData, PathData } from './path'
 
 export class HomeBox implements Box<OHPKM> {
+  id: string
   name: string | undefined
   index: number
 
   pokemon: Array<OHPKM | undefined> = new Array(120)
 
-  constructor(name: string | undefined, index: number) {
+  constructor(homeBox: OpenHomeBox) {
+    const { id, name, index } = homeBox
+
     if (name !== `Box ${index + 1}`) {
-      this.name = name
+      this.name = name ?? undefined
     }
+
+    this.id = id
     this.index = index
   }
 
@@ -84,7 +97,10 @@ export class HomeData {
   updatedBoxSlots: BankBoxCoordinates[] = []
 
   constructor(stored_bank_data: StoredBankData, mon_lookup: PersistedPkmData) {
-    this._banks = stored_bank_data.banks
+    this._banks = stored_bank_data.banks.map((bank) => ({
+      ...bank,
+      boxes: bank.boxes.map((box) => ({ ...box, last_saved_index: box.index })),
+    }))
     this.setAndLoadBank(stored_bank_data.current_bank, mon_lookup)
   }
   pluginIdentifier?: string | undefined
@@ -126,9 +142,11 @@ export class HomeData {
 
   addBank(name: string | undefined, box_count: number) {
     const newBank: OpenHomeBank = {
+      id: UuidV4(),
       name,
       index: this._banks.length,
       boxes: range(box_count).map((_, index) => ({
+        id: UuidV4(),
         name: null,
         index,
         identifiers: {},
@@ -146,9 +164,7 @@ export class HomeData {
     // console.log(this._banks, this._banks[bank_index], this._banks[bank_index].boxes)
     const bankBoxes = this._banks[bank_index].boxes.sort((box_metadata) => box_metadata.index)
 
-    this.boxes = bankBoxes.map(
-      (box_metadata) => new HomeBox(box_metadata.name ?? undefined, box_metadata.index)
-    )
+    this.boxes = bankBoxes.map((box) => new HomeBox(box))
     bankBoxes.forEach((box_metadata) => {
       this.boxes[box_metadata.index].loadMonsFromIdentifiers(box_metadata.identifiers, mon_lookup)
     })
@@ -188,6 +204,24 @@ export class HomeData {
         this.boxes[location.box].pokemon[location.box_slot] = undefined
       }
     }
+  }
+
+  setBoxName(bank_index: number, box_index: number, name: string | undefined): Errorable<null> {
+    if (this._banks.length <= bank_index) {
+      return Err(`Cannot access bank at index ${bank_index} (${this._banks.length} banks total)`)
+    }
+
+    const bank = this._banks[bank_index]
+
+    if (box_index >= bank.boxes.length) {
+      return Err(
+        `Cannot access box at index ${box_index} (${bank.name} has ${bank.boxes.length} boxes total)`
+      )
+    }
+
+    this._banks[bank_index].boxes[box_index].name = name ?? null
+
+    return Ok(null)
   }
 
   setBankName(bank_index: number, name: string | undefined): Errorable<null> {
@@ -279,8 +313,4 @@ export function bankBoxCoordinates(
   box_slot: number
 ): BankBoxCoordinates {
   return { bank, box, box_slot }
-}
-
-function range(size: number) {
-  return [...Array(size).keys()]
 }

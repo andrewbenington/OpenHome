@@ -38,3 +38,4 @@ zip = "4.6.0"
 bytes = "1.10.1"
 semver = "1.0.26"
 strum = { version = "0.27.2", features = [ "derive" ] }
+uuid = { version = "1.18.1", features = ["v4"] }

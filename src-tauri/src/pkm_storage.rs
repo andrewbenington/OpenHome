@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
 use crate::{
     deprecated,
@@ -24,8 +25,14 @@ impl StoredBankData {
     }
 }
 
+fn default_id() -> Uuid {
+    Uuid::new_v4()
+}
+
 #[derive(Default, Serialize, Deserialize, Clone)]
 pub struct Bank {
+    #[serde(default = "default_id")]
+    id: Uuid,
     name: Option<String>,
     index: usize,
     boxes: Vec<Box>,
@@ -42,6 +49,8 @@ impl Bank {
 
 #[derive(Default, Serialize, Deserialize, Clone)]
 pub struct Box {
+    #[serde(default = "default_id")]
+    pub id: Uuid,
     pub name: Option<String>,
     pub index: usize,
     pub identifiers: BoxIdentifiers,

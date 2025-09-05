@@ -24,6 +24,7 @@ impl BoxPreV1_5_0 {
         }
 
         pkm_storage::Box {
+            id: Default::default(),
             name: self.name,
             index: self.index as usize,
             identifiers,

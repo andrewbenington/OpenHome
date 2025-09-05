@@ -6,6 +6,7 @@ import { StoredBankData } from 'src/types/storage'
 import { getMonFileIdentifier } from 'src/util/Lookup'
 import { PKMInterface } from '../types/interfaces'
 import { getSortFunctionNullable, SortType } from '../types/pkm/sort'
+import { numericSorter } from '../util/Sort'
 import { PersistedPkmData } from './persistedPkmData'
 
 export type OpenSave = {
@@ -81,6 +82,10 @@ export type OpenSavesAction =
   | {
       type: 'set_home_box_name'
       payload: { name: string | undefined; index: number }
+    }
+  | {
+      type: 'reorder_home_boxes'
+      payload: { ids_in_new_order: string[] }
     }
   /*
    *  SAVE FILES
@@ -255,6 +260,19 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
       if (box) {
         box.name = payload.name
       }
+      return newState
+    }
+    case 'reorder_home_boxes': {
+      const newState = { ...state }
+
+      if (!newState.homeData) return { ...state }
+
+      newState.homeData.boxes = newState.homeData.boxes.toSorted(
+        numericSorter((box) => payload.ids_in_new_order.indexOf(box.id))
+      )
+
+      newState.homeData.boxes.forEach((box, newIndex) => (box.index = newIndex))
+
       return newState
     }
     case 'add_save': {

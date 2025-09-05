@@ -239,7 +239,15 @@ const Home = () => {
       </Flex>
       <div className="home-box-column">
         <BankHeader />
-        <Flex direction="row" width="100%" maxWidth="600px" minWidth="480px" align="center">
+        <Flex
+          direction="row"
+          width="100%"
+          maxWidth="600px"
+          minWidth="480px"
+          align="center"
+          height="0"
+          flexGrow="1"
+        >
           <HomeBoxDisplay />
         </Flex>
       </div>

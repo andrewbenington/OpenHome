@@ -1,4 +1,4 @@
-use semver::Version;
+use semver::{BuildMetadata, Prerelease, Version};
 use strum::{self, EnumIter, IntoEnumIterator};
 
 use crate::{
@@ -99,12 +99,22 @@ impl Migration {
     }
 }
 
+fn strip_prerelease(version: &Version) -> Version {
+    Version {
+        pre: Prerelease::EMPTY,
+        build: BuildMetadata::EMPTY,
+        ..*version
+    }
+}
+
 pub fn get_necessary_migrations(
     last_launch_version: Version,
     current_version: Version,
 ) -> Vec<Migration> {
     Migration::iter()
-        .filter(|m| m.version() > last_launch_version && m.version() <= current_version)
+        .filter(|m| {
+            m.version() > last_launch_version && m.version() <= strip_prerelease(&current_version)
+        })
         .collect()
 }
 

@@ -1,10 +1,11 @@
+import { CSS } from '@dnd-kit/utilities'
 import { Button, Card, DropdownMenu, Flex, Grid, Heading, TextField } from '@radix-ui/themes'
-import lodash, { range } from 'lodash'
+import lodash from 'lodash'
 import { ToggleGroup } from 'radix-ui'
-import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
+import { CSSProperties, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { BsFillGrid3X3GapFill } from 'react-icons/bs'
 import { FaSquare } from 'react-icons/fa'
-import { EditIcon, MenuIcon } from 'src/components/Icons'
+import { AddIcon, EditIcon, MenuIcon, MoveIcon } from 'src/components/Icons'
 import PokemonDetailsModal from 'src/pokemon/PokemonDetailsModal'
 import { ErrorContext } from 'src/state/error'
 import { MonLocation, MonWithLocation, OpenSavesContext } from 'src/state/openSaves'
@@ -18,6 +19,25 @@ import { buildBackwardNavigator, buildForwardNavigator } from '../util'
 import ArrowButton from './ArrowButton'
 import BoxCell from './BoxCell'
 import DroppableSpace from './DroppableSpace'
+
+import {
+  DndContext,
+  DragEndEvent,
+  KeyboardSensor,
+  PointerSensor,
+  UniqueIdentifier,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core'
+import {
+  rectSortingStrategy,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+} from '@dnd-kit/sortable'
+import { range } from 'src/util/Functional'
+import { HomeBox } from '../../types/SAVTypes/HomeData'
+import { filterUndefined } from '../../util/Sort'
 import './style.css'
 
 const COLUMN_COUNT = 12
@@ -30,6 +50,7 @@ const ALLOW_DUPE_IMPORT = true
 export default function HomeBoxDisplay() {
   const [openSavesState, openSavesDispatch] = useContext(OpenSavesContext)
   const [editing, setEditing] = useState(false)
+  const [moving, setMoving] = useState(false)
   const [viewMode, setViewMode] = useState<BoxViewMode>('one')
   const [editingBoxName, setEditingBoxName] = useState('')
 
@@ -59,6 +80,8 @@ export default function HomeBoxDisplay() {
             padding: 6,
             width: '100%',
             height: 'fit-content',
+            maxHeight: '100%',
+            overflow: 'auto',
             display: 'flex',
             flexDirection: 'column',
             gap: 4,
@@ -66,7 +89,11 @@ export default function HomeBoxDisplay() {
         >
           <Flex direction="row" className="box-navigation">
             <Flex align="center" justify="between" flexGrow="3" width="0">
-              <ViewToggle viewMode={viewMode} setViewMode={setViewMode} disabled={editing} />
+              <ViewToggle
+                viewMode={viewMode}
+                setViewMode={setViewMode}
+                disabled={editing || moving}
+              />
               <ArrowButton
                 onClick={onArrowLeft}
                 style={{ visibility: viewMode === 'one' ? 'visible' : 'collapse' }}
@@ -114,7 +141,7 @@ export default function HomeBoxDisplay() {
                 disabled={editing}
               />
               <Flex gap="1">
-                {viewMode === 'one' && (
+                {viewMode === 'one' ? (
                   <Button
                     className="mini-button"
                     style={{ transition: 'none', padding: 0 }}
@@ -133,6 +160,26 @@ export default function HomeBoxDisplay() {
                     }}
                   >
                     <EditIcon />
+                  </Button>
+                ) : (
+                  <Button
+                    className="mini-button"
+                    style={{ transition: 'none', padding: 0 }}
+                    variant={moving ? 'solid' : 'outline'}
+                    color={moving ? undefined : 'gray'}
+                    onClick={() => {
+                      // if (editing) {
+                      //   openSavesDispatch({
+                      //     type: 'set_home_box_name',
+                      //     payload: { name: editingBoxName, index: currentBox.index },
+                      //   })
+                      // } else {
+                      //   setEditingBoxName(homeData.getCurrentBox().name ?? '')
+                      // }
+                      setMoving(!moving)
+                    }}
+                  >
+                    <MoveIcon />
                   </Button>
                 )}
                 <DropdownMenu.Root>
@@ -193,6 +240,7 @@ export default function HomeBoxDisplay() {
                 homeData.currentBoxIndex = boxIndex
                 setViewMode('one')
               }}
+              moving={moving}
             />
           )}
         </Card>
@@ -351,61 +399,188 @@ function BoxMons() {
   )
 }
 
-function AllBoxes(props: { onBoxSelect: (index: number) => void }) {
-  const { onBoxSelect } = props
-  const [{ homeData }] = useContext(OpenSavesContext)
+function parseIntIfString(id: UniqueIdentifier) {
+  return typeof id === 'number' ? id : parseInt(id)
+}
+
+function newOrderFromDragEnd(movedFromIndex: number, movedIntoIndex: number, boxCount: number) {
+  if (movedFromIndex >= boxCount || movedIntoIndex >= boxCount) {
+    return range(boxCount)
+  }
+
+  const movedUp = movedIntoIndex < movedFromIndex
+
+  const before = range(movedIntoIndex).filter((index) => index !== movedFromIndex)
+  const after = range(movedIntoIndex + 1, boxCount).filter((index) => index !== movedFromIndex)
+
+  const newOrder = before
+
+  if (movedUp) {
+    newOrder.push(movedFromIndex)
+    newOrder.push(movedIntoIndex)
+  } else {
+    newOrder.push(movedIntoIndex)
+    newOrder.push(movedFromIndex)
+  }
+  newOrder.push(...after)
+
+  return newOrder
+}
+
+function AllBoxes(props: { onBoxSelect: (index: number) => void; moving?: boolean }) {
+  const { onBoxSelect, moving } = props
+  const [{ homeData }, openSavesDispatch] = useContext(OpenSavesContext)
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  )
+
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event
+
+    if (!active || !over || !homeData) return
+
+    const activeId = active.id.toString()
+    const overId = over.id.toString()
+
+    const activeIndex = homeData.boxes.findIndex((box) => box.id === activeId)
+    const overIndex = homeData.boxes.findIndex((box) => box.id === overId)
+
+    const newOrderIndices = newOrderFromDragEnd(activeIndex, overIndex, homeData.boxes.length)
+    const newOrderIds = newOrderIndices
+      .map((index) => homeData.boxes.find((box) => box.index === index)?.id)
+      .filter(filterUndefined)
+
+    openSavesDispatch({
+      type: 'reorder_home_boxes',
+      payload: {
+        ids_in_new_order: newOrderIds,
+      },
+    })
+  }
 
   return (
-    <Grid columns="8" gap="1">
-      {homeData?.boxes.map((box, boxIndex) => (
-        <BoxOverview
-          key={box.name ?? `Box ${boxIndex + 1}`}
-          boxIndex={boxIndex}
-          onBoxSelect={() => onBoxSelect(boxIndex)}
-        />
-      ))}
+    <Grid columns="6" gap="1" overflowY="auto" maxHeight="80%">
+      {moving ? (
+        <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+          <SortableContext
+            items={homeData?.boxes.map((box) => box.id) ?? []}
+            strategy={rectSortingStrategy}
+          >
+            {homeData?.boxes.map((box, boxIndex) => (
+              <SortableBoxOverview
+                key={box.id}
+                box={box}
+                onBoxSelect={() => onBoxSelect(boxIndex)}
+              />
+            ))}
+          </SortableContext>
+        </DndContext>
+      ) : (
+        homeData?.boxes.map((box, boxIndex) => (
+          <BoxOverview key={box.id} box={box} onBoxSelect={() => onBoxSelect(boxIndex)} />
+        ))
+      )}
+      <Button variant="soft" style={{ height: '100%' }}>
+        <AddIcon />
+      </Button>
     </Grid>
   )
 }
 
 type BoxOverviewProps = {
-  boxIndex: number
+  box: HomeBox
   onBoxSelect: () => void
 }
 
-function BoxOverview({ boxIndex, onBoxSelect }: BoxOverviewProps) {
+function BoxOverview({ box, onBoxSelect }: BoxOverviewProps) {
   const [{ homeData }] = useContext(OpenSavesContext)
-
-  const box = useMemo(() => {
-    return homeData?.boxes[boxIndex]
-  }, [homeData?.boxes, boxIndex])
 
   if (!homeData || !box) return <div />
 
   const firstOpenIndex = box.firstOpenIndex()
 
   return (
-    <DroppableSpace
-      dropID={`box-${boxIndex}`}
-      key={box.name ?? `Box ${boxIndex + 1}`}
-      dropData={
-        firstOpenIndex !== undefined
-          ? {
-              is_home: true,
-              bank: homeData.currentBankIndex,
-              box: boxIndex,
-              box_slot: firstOpenIndex,
-            }
-          : undefined
-      }
-      disabled={firstOpenIndex === undefined}
-    >
-      <Button
-        variant="soft"
-        style={{ height: 'fit-content', padding: '4px 8px' }}
-        onClick={onBoxSelect}
+    <Flex>
+      <DroppableSpace
+        dropID={`box-${box.id}`}
+        key={box.name ?? `Box ${box.index + 1}`}
+        dropData={
+          firstOpenIndex !== undefined
+            ? {
+                is_home: true,
+                bank: homeData.currentBankIndex,
+                box: box.index,
+                box_slot: firstOpenIndex,
+              }
+            : undefined
+        }
+        disabled={firstOpenIndex === undefined}
+        style={{ justifyContent: undefined }}
       >
-        <Flex direction="column">
+        <Button
+          variant="soft"
+          style={{
+            height: 'fit-content',
+            padding: '4px 8px',
+            width: '100%',
+            minWidth: '100%',
+          }}
+          onClick={onBoxSelect}
+        >
+          <Flex direction="column" width="100%">
+            <div className="box-icon-mon-container">
+              {range(homeData.boxColumns).map((i) => (
+                <div className="box-icon-mon-col" key={`pos-display-col-${i}`}>
+                  {range(homeData.boxRows).map((j) => (
+                    <div
+                      className={`box-icon-mon-indicator ${!box?.pokemon?.[j * homeData.boxColumns + i] ? 'box-icon-mon-empty' : ''}`}
+                      key={`pos-display-cell-${i}-${j}`}
+                    />
+                  ))}
+                </div>
+              ))}
+            </div>
+            {box.name ?? `Box ${box.index + 1}`}
+          </Flex>
+        </Button>
+      </DroppableSpace>
+    </Flex>
+  )
+}
+
+function SortableBoxOverview({ box }: BoxOverviewProps) {
+  const [{ homeData }] = useContext(OpenSavesContext)
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging, active } =
+    useSortable({ id: box.id })
+
+  const style: CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    zIndex: isDragging ? 1000 : undefined,
+  }
+
+  if (!homeData || !box) return <div />
+
+  return (
+    <Flex ref={setNodeRef} style={style} {...attributes} {...listeners}>
+      <Button
+        // color="cyan"
+        variant="solid"
+        style={{
+          height: 'fit-content',
+          padding: '4px 8px',
+          width: '100%',
+          minWidth: '100%',
+          cursor: active ? 'grabbing' : 'grab',
+        }}
+      >
+        <Flex direction="column" width="100%">
           <div className="box-icon-mon-container">
             {range(homeData.boxColumns).map((i) => (
               <div className="box-icon-mon-col" key={`pos-display-col-${i}`}>
@@ -418,10 +593,10 @@ function BoxOverview({ boxIndex, onBoxSelect }: BoxOverviewProps) {
               </div>
             ))}
           </div>
-          {box.name ?? `Box ${boxIndex + 1}`}
+          {box.name ?? `Box ${box.index + 1}`}
         </Flex>
       </Button>
-    </DroppableSpace>
+    </Flex>
   )
 }
 
@@ -484,3 +659,22 @@ function ViewToggle(props: ViewToggleProps) {
     </ToggleGroup.Root>
   )
 }
+
+// type SortableBoxProps = {
+//   name:
+// }
+
+// function SortableBox() {
+// const {
+//     attributes,
+//     listeners,
+//     setNodeRef,
+//     transform,
+//     transition,
+//   } = useSortable({id: props.id});
+
+//   const style = {
+//     transform:  CSS.Transform.toString(transform),
+//     transition,
+//   };
+// }
