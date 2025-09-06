@@ -53,6 +53,7 @@ fn initialize_storage(app_handle: &tauri::AppHandle) -> OpenHomeResult<()> {
         "gen12_lookup.json",
         "gen345_lookup.json",
         "recent_saves.json",
+        "settings.json",
     ];
 
     for obj_file in obj_files {
