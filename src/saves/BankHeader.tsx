@@ -14,6 +14,7 @@ import { OpenSavesContext } from 'src/state/openSaves'
 import { PersistedPkmDataContext } from 'src/state/persistedPkmData'
 import { HomeData } from 'src/types/SAVTypes/HomeData'
 import { getBankName } from 'src/types/storage'
+import ToggleButton from '../components/ToggleButton'
 
 export default function BankHeader() {
   const [openSavesState, openSavesDispatch] = useContext(OpenSavesContext)
@@ -49,25 +50,19 @@ export default function BankHeader() {
       )}
 
       <Flex direction="row-reverse" flexGrow="1" width="0" gap="1">
-        <Button
-          className="mini-button"
-          style={{ transition: 'none', padding: 0 }}
-          variant={editing ? 'solid' : 'outline'}
-          color={editing ? undefined : 'gray'}
-          onClick={() => {
-            if (editing) {
-              openSavesDispatch({
-                type: 'set_home_bank_name',
-                payload: { bank: homeData.currentBankIndex, name: bankNameEditValue },
-              })
-            } else {
-              setBankNameEditValue(homeData.getCurrentBankName())
-            }
-            setEditing(!editing)
-          }}
-        >
-          <EditIcon />
-        </Button>
+        <ToggleButton
+          state={editing}
+          setState={setEditing}
+          onSet={() => setBankNameEditValue(homeData.getCurrentBankName())}
+          onUnset={() =>
+            openSavesDispatch({
+              type: 'set_home_bank_name',
+              payload: { bank: homeData.currentBankIndex, name: bankNameEditValue },
+            })
+          }
+          icon={EditIcon}
+          hint="Change bank name"
+        />
       </Flex>
     </Card>
   )

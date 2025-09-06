@@ -1,11 +1,20 @@
 import { CSS } from '@dnd-kit/utilities'
-import { Button, Card, DropdownMenu, Flex, Grid, Heading, TextField } from '@radix-ui/themes'
+import {
+  Button,
+  Card,
+  DropdownMenu,
+  Flex,
+  Grid,
+  Heading,
+  TextField,
+  Tooltip,
+} from '@radix-ui/themes'
 import lodash from 'lodash'
 import { ToggleGroup } from 'radix-ui'
 import { CSSProperties, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { BsFillGrid3X3GapFill } from 'react-icons/bs'
 import { FaSquare } from 'react-icons/fa'
-import { AddIcon, DevIcon, EditIcon, MenuIcon, MoveIcon } from 'src/components/Icons'
+import { AddIcon, DevIcon, EditIcon, MenuIcon, MoveIcon, RemoveIcon } from 'src/components/Icons'
 import PokemonDetailsModal from 'src/pokemon/PokemonDetailsModal'
 import { ErrorContext } from 'src/state/error'
 import { MonLocation, MonWithLocation, OpenSavesContext } from 'src/state/openSaves'
@@ -35,8 +44,9 @@ import {
   useSortable,
 } from '@dnd-kit/sortable'
 import { range } from 'src/util/Functional'
+import ToggleButton from '../../components/ToggleButton'
 import useIsDev from '../../hooks/isDev'
-import { HomeBox } from '../../types/SAVTypes/HomeData'
+import { HomeBox, HomeData } from '../../types/SAVTypes/HomeData'
 import { filterUndefined } from '../../util/Sort'
 import './style.css'
 
@@ -51,6 +61,7 @@ export default function HomeBoxDisplay() {
   const [openSavesState, openSavesDispatch] = useContext(OpenSavesContext)
   const [editing, setEditing] = useState(false)
   const [moving, setMoving] = useState(false)
+  const [deleting, setDeleting] = useState(false)
   const [viewMode, setViewMode] = useState<BoxViewMode>('one')
   const [editingBoxName, setEditingBoxName] = useState('')
   const isDev = useIsDev()
@@ -144,59 +155,51 @@ export default function HomeBoxDisplay() {
               />
               <Flex gap="1">
                 {viewMode === 'one' ? (
-                  <Button
-                    className="mini-button"
-                    style={{ transition: 'none', padding: 0 }}
-                    variant={editing ? 'solid' : 'outline'}
-                    color={editing ? undefined : 'gray'}
-                    onClick={() => {
-                      if (editing) {
-                        openSavesDispatch({
-                          type: 'set_home_box_name',
-                          payload: { name: editingBoxName, index: currentBox.index },
-                        })
-                      } else {
-                        setEditingBoxName(homeData.getCurrentBox().name ?? '')
-                      }
-                      setEditing(!editing)
-                    }}
-                  >
-                    <EditIcon />
-                  </Button>
+                  <ToggleButton
+                    state={editing}
+                    setState={setEditing}
+                    onSet={() => setEditingBoxName(homeData.getCurrentBox().name ?? '')}
+                    onUnset={() =>
+                      openSavesDispatch({
+                        type: 'set_home_box_name',
+                        payload: { name: editingBoxName, index: currentBox.index },
+                      })
+                    }
+                    icon={EditIcon}
+                    hint="Change box name"
+                  />
                 ) : (
                   <>
                     {isDev && (
+                      <ToggleButton state={debugMode} setState={setDebugMode} icon={DevIcon} />
+                    )}
+                    <Tooltip content="Add box to end">
                       <Button
                         className="mini-button"
-                        style={{ transition: 'none', padding: 0 }}
-                        variant={debugMode ? 'solid' : 'outline'}
-                        color={debugMode ? undefined : 'gray'}
-                        onClick={() => {
-                          setDebugMode(!debugMode)
-                        }}
-                      >
-                        <DevIcon />
-                      </Button>
-                    )}
-                    <Button
-                      className="mini-button"
-                      style={{ transition: 'none', padding: 0 }}
-                      variant={moving ? 'solid' : 'outline'}
-                      color={moving ? undefined : 'gray'}
-                      onClick={() => {
-                        if (editing) {
+                        variant="outline"
+                        color="gray"
+                        onClick={() =>
                           openSavesDispatch({
-                            type: 'set_home_box_name',
-                            payload: { name: editingBoxName, index: currentBox.index },
+                            type: 'add_home_box',
+                            payload: { currentBoxCount: homeData.boxes.length },
                           })
-                        } else {
-                          setEditingBoxName(homeData.getCurrentBox().name ?? '')
                         }
-                        setMoving(!moving)
-                      }}
-                    >
-                      <MoveIcon />
-                    </Button>
+                      >
+                        <AddIcon />
+                      </Button>
+                    </Tooltip>
+                    <ToggleButton
+                      state={deleting}
+                      setState={setDeleting}
+                      icon={RemoveIcon}
+                      hint="Delete boxes..."
+                    />
+                    <ToggleButton
+                      state={moving}
+                      setState={setMoving}
+                      icon={MoveIcon}
+                      hint="Rearrange boxes"
+                    />
                   </>
                 )}
                 <DropdownMenu.Root>
@@ -258,6 +261,7 @@ export default function HomeBoxDisplay() {
                 setViewMode('one')
               }}
               moving={moving}
+              deleting={deleting}
               debugMode={debugMode}
             />
           )}
@@ -444,9 +448,10 @@ function newOrderFromDragEnd(movedFromIndex: number, movedIntoIndex: number, box
 function AllBoxes(props: {
   onBoxSelect: (index: number) => void
   moving?: boolean
+  deleting?: boolean
   debugMode?: boolean
 }) {
-  const { onBoxSelect, moving, debugMode } = props
+  const { onBoxSelect, moving, deleting, debugMode } = props
   const [{ homeData }, openSavesDispatch] = useContext(OpenSavesContext)
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -492,6 +497,7 @@ function AllBoxes(props: {
                 key={box.id}
                 box={box}
                 onBoxSelect={() => onBoxSelect(boxIndex)}
+                debugMode={debugMode}
               />
             ))}
           </SortableContext>
@@ -503,12 +509,10 @@ function AllBoxes(props: {
             box={box}
             onBoxSelect={() => onBoxSelect(boxIndex)}
             debugMode={debugMode}
+            deleting={deleting}
           />
         ))
       )}
-      <Button variant="soft" style={{ height: '100%' }}>
-        <AddIcon />
-      </Button>
     </Grid>
   )
 }
@@ -517,10 +521,11 @@ type BoxOverviewProps = {
   box: HomeBox
   onBoxSelect: () => void
   debugMode?: boolean
+  deleting?: boolean
 }
 
-function BoxOverview({ box, onBoxSelect, debugMode }: BoxOverviewProps) {
-  const [{ homeData }] = useContext(OpenSavesContext)
+function BoxOverview({ box, onBoxSelect, debugMode, deleting }: BoxOverviewProps) {
+  const [{ homeData }, openSavesDispatch] = useContext(OpenSavesContext)
 
   if (!homeData || !box) return <div />
 
@@ -544,45 +549,51 @@ function BoxOverview({ box, onBoxSelect, debugMode }: BoxOverviewProps) {
         disabled={firstOpenIndex === undefined}
         style={{ justifyContent: undefined }}
       >
-        <Button
-          variant="soft"
-          style={{
-            height: 'fit-content',
-            padding: '4px 8px',
-            width: '100%',
-            minWidth: '100%',
-          }}
-          onClick={onBoxSelect}
-        >
-          <Flex direction="column" width="100%">
-            <div className="box-icon-mon-container">
-              {range(homeData.boxColumns).map((i) => (
-                <div className="box-icon-mon-col" key={`pos-display-col-${i}`}>
-                  {range(homeData.boxRows).map((j) => (
-                    <div
-                      className={`box-icon-mon-indicator ${!box?.pokemon?.[j * homeData.boxColumns + i] ? 'box-icon-mon-empty' : ''}`}
-                      key={`pos-display-cell-${i}-${j}`}
-                    />
-                  ))}
-                </div>
-              ))}
-            </div>
-            {box.name ?? `Box ${box.index + 1}`}
-            {debugMode && (
-              <div style={{ fontWeight: 'lighter' }}>
-                <div>Index: {box.index}</div>
-                <div>{box.id.split('-')[0]}</div>
-              </div>
-            )}
-          </Flex>
-        </Button>
+        <div style={{ position: 'relative' }}>
+          <Button
+            variant="soft"
+            style={{
+              height: 'fit-content',
+              padding: '4px 8px',
+              width: '100%',
+              minWidth: '100%',
+            }}
+            onClick={onBoxSelect}
+            disabled={deleting}
+          >
+            <BoxWithMons box={box} debugMode={debugMode} />
+          </Button>
+          {deleting && (
+            <Button
+              className="mini-button"
+              style={{
+                position: 'absolute',
+                zIndex: 1,
+                top: 0,
+                right: 0,
+                backgroundColor: box.getMonCount() > 0 ? 'var(--gray-6)' : undefined,
+              }}
+              variant="solid"
+              color="red"
+              radius="full"
+              disabled={box.getMonCount() > 0}
+              onClick={() => {
+                openSavesDispatch({
+                  type: 'delete_home_box',
+                  payload: { index: box.index, id: box.id },
+                })
+              }}
+            >
+              <RemoveIcon />
+            </Button>
+          )}
+        </div>
       </DroppableSpace>
     </Flex>
   )
 }
 
-function SortableBoxOverview({ box }: BoxOverviewProps) {
-  const [{ homeData }] = useContext(OpenSavesContext)
+function SortableBoxOverview({ box, debugMode }: BoxOverviewProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging, active } =
     useSortable({ id: box.id })
 
@@ -595,7 +606,7 @@ function SortableBoxOverview({ box }: BoxOverviewProps) {
     zIndex: isDragging ? 1000 : undefined,
   }
 
-  if (!homeData || !box) return <div />
+  if (!box) return <div />
 
   return (
     <Flex ref={setNodeRef} style={style} {...attributes} {...listeners}>
@@ -609,22 +620,39 @@ function SortableBoxOverview({ box }: BoxOverviewProps) {
           cursor: active ? 'grabbing' : 'grab',
         }}
       >
-        <Flex direction="column" width="100%">
-          <div className="box-icon-mon-container">
-            {range(homeData.boxColumns).map((i) => (
-              <div className="box-icon-mon-col" key={`pos-display-col-${i}`}>
-                {range(homeData.boxRows).map((j) => (
-                  <div
-                    className={`box-icon-mon-indicator ${!box?.pokemon?.[j * homeData.boxColumns + i] ? 'box-icon-mon-empty' : ''}`}
-                    key={`pos-display-cell-${i}-${j}`}
-                  />
-                ))}
-              </div>
+        <BoxWithMons box={box} debugMode={debugMode} />
+      </Button>
+    </Flex>
+  )
+}
+
+type BoxMonIconsProps = {
+  box: HomeBox
+  debugMode?: boolean
+}
+
+function BoxWithMons({ box, debugMode }: BoxMonIconsProps) {
+  return (
+    <Flex direction="column" width="100%">
+      <div className="box-icon-mon-container">
+        {range(HomeData.BOX_COLUMNS).map((i) => (
+          <div className="box-icon-mon-col" key={`pos-display-col-${i}`}>
+            {range(HomeData.BOX_ROWS).map((j) => (
+              <div
+                className={`box-icon-mon-indicator ${!box?.pokemon?.[j * HomeData.BOX_COLUMNS + i] ? 'box-icon-mon-empty' : ''}`}
+                key={`pos-display-cell-${i}-${j}`}
+              />
             ))}
           </div>
-          {box.name ?? `Box ${box.index + 1}`}
-        </Flex>
-      </Button>
+        ))}
+      </div>
+      {box.name ?? `Box ${box.index + 1}`}
+      {debugMode && (
+        <div style={{ fontWeight: 'lighter' }}>
+          <div>Index: {box.index}</div>
+          <div>{box.id.split('-')[0]}</div>
+        </div>
+      )}
     </Flex>
   )
 }

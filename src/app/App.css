@@ -117,8 +117,11 @@ select {
   font-size: small;
   font-weight: 500;
   font-family: inherit;
-  cursor: pointer;
   transition: border-color 0.25s;
+}
+
+button:not(:disabled) {
+  cursor: pointer;
 }
 
 button {
@@ -248,10 +251,11 @@ label {
 }
 
 .mini-button {
-  padding: 1px;
+  padding: 0px;
   aspect-ratio: 1;
   height: 20px;
   width: 20px;
+  transition: none;
 
   svg {
     height: 18px;

@@ -83,6 +83,14 @@ export type OpenSavesAction =
       payload: { name: string | undefined; index: number }
     }
   | {
+      type: 'add_home_box'
+      payload: { currentBoxCount: number }
+    }
+  | {
+      type: 'delete_home_box'
+      payload: { index: number; id: string }
+    }
+  | {
       type: 'reorder_home_boxes'
       payload: { ids_in_new_order: string[] }
     }
@@ -256,7 +264,7 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
       const newState = { ...state }
 
       if (!newState.homeData) return { ...state }
-      newState.homeData.setCurrentBankBoxName(payload.index, payload.name)
+      newState.homeData.setBoxNameCurrentBank(payload.index, payload.name)
 
       return newState
     }
@@ -265,7 +273,28 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
 
       if (!newState.homeData) return { ...state }
 
-      newState.homeData.reorderCurrentBankBoxes(payload.ids_in_new_order)
+      newState.homeData.reorderBoxesCurrentBank(payload.ids_in_new_order)
+
+      return newState
+    }
+    case 'add_home_box': {
+      const newState = { ...state }
+
+      if (!newState.homeData || newState.homeData.boxes.length !== payload.currentBoxCount) {
+        // currentBoxCount check is to prevent adding multiple boxes during rerender/strict mode
+        return { ...state }
+      }
+
+      newState.homeData.addBoxCurrentBank()
+
+      return newState
+    }
+    case 'delete_home_box': {
+      const newState = { ...state }
+
+      if (!newState.homeData) return { ...state }
+
+      newState.homeData.deleteBoxCurrentBank(payload.index, payload.id)
 
       return newState
     }
