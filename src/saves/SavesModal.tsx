@@ -31,6 +31,13 @@ type AmbiguousOpenState = {
   fileBytes: Uint8Array
 }
 
+// If any detected type name matches these, force the disambiguation UI.
+const SPECIAL_DISAMBIG_NAMES = ['unbound', 'radical red'] as const
+const isSpecialType = (t: SAVClass) =>
+  !!t?.saveTypeName && SPECIAL_DISAMBIG_NAMES.some((n) => t.saveTypeName.toLowerCase().includes(n))
+const getSpecialDisambiguationOptions = (getEnabled: () => SAVClass[]) =>
+  getEnabled().filter(isSpecialType)
+
 const debouncedUpdateCardSize = debounce(
   (size: number, dispatch: React.Dispatch<AppInfoAction>) => {
     dispatch({ type: 'set_icon_size', payload: size })
@@ -102,6 +109,15 @@ function useOpenSaveHandler(onClose?: () => void) {
             filePath = path
             if (filePath && fileBytes) {
               let saveTypes = getSaveTypes(fileBytes, getEnabledSaveTypes())
+
+              if (saveTypes.some(isSpecialType)) {
+                const options = getSpecialDisambiguationOptions(getEnabledSaveTypes)
+
+                if (options.length > 0) {
+                  setTentativeSaveData({ possibleSaveTypes: options, filePath, fileBytes })
+                  return
+                }
+              }
 
               if (saveTypes.length === 1) {
                 buildAndOpenSave(saveTypes[0], filePath, fileBytes)
