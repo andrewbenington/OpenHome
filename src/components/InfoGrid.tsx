@@ -3,6 +3,7 @@ import { Card, Flex, Grid } from '@radix-ui/themes'
 import { isDayjs } from 'dayjs'
 import React, { ReactNode, useCallback, useMemo } from 'react'
 import { OHPKM } from 'src/types/pkm/OHPKM'
+import { HomeData } from 'src/types/SAVTypes/HomeData'
 import { getMonFileIdentifier } from 'src/util/Lookup'
 import PokemonIcon from './PokemonIcon'
 
@@ -98,17 +99,19 @@ export type InfoGridElementProps = {
 }
 
 function InfoGridElement(props: InfoGridElementProps) {
-  const { objKey: key, value, labelBreakpoints, dataBreakpoints, isLast } = props
+  const { objKey: key, value: valueProp, labelBreakpoints, dataBreakpoints, isLast } = props
 
   const Component = useCallback(
     (props: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>) =>
-      shouldBeExpandable(value)
+      shouldBeExpandable(valueProp)
         ? React.createElement('details', props)
         : React.createElement('div', props),
-    [value]
+    [valueProp]
   )
 
-  if (!value) return <div />
+  if (!valueProp) return <div />
+
+  const value = valueProp instanceof HomeData ? valueProp.displayState() : valueProp
 
   // if (!shouldBeExpandable(value)) return <SimpleInfoGridElement {...props} />
   return (
@@ -142,6 +145,8 @@ function InfoGridElement(props: InfoGridElementProps) {
             <Grid {...dataBreakpoints} key={`info-row-value`}>
               PKM({value.nickname})
             </Grid>
+          ) : value instanceof HomeData ? (
+            <InfoGrid data={value.displayState()} labelBreakpoints={labelBreakpoints} />
           ) : 'name' in value &&
             typeof value.name === 'string' &&
             'tid' in value &&

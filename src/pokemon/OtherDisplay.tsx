@@ -1,3 +1,4 @@
+import { PK3, PK4, PK5 } from '@pokemon-files/pkm'
 import { AllPKMFields, getDisplayID, StatsPreSplit } from '@pokemon-files/util'
 import { Flex } from '@radix-ui/themes'
 import {
@@ -350,6 +351,10 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
             />
           )}
         {!isRestricted(HGSS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
+          (mon instanceof PK3 ||
+            mon instanceof PK4 ||
+            mon instanceof PK5 ||
+            mon instanceof OHPKM) &&
           mon.personalityValue !== undefined && (
             <AttributeRow label="Gen 3/4/5 ID" value={getMonGen345Identifier(mon)} />
           )}

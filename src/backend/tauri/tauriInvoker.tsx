@@ -1,9 +1,10 @@
 import { invoke } from '@tauri-apps/api/core'
 import * as E from 'fp-ts/lib/Either'
-import { Errorable, JSONArray, JSONObject, JSONValue, SaveRef } from 'src/types/types'
+import { StoredBankData } from 'src/types/storage'
+import { Errorable, JSONArray, JSONObject, JSONValue, LookupMap, SaveRef } from 'src/types/types'
 import { PluginMetadataWithIcon } from 'src/util/Plugin'
 import { PossibleSaves } from '../../types/SAVTypes/path'
-import { AppState, ImageResponse } from '../backendInterface'
+import { AppState, ImageResponse, StoredLookups } from '../backendInterface'
 import { RustResult } from './types'
 
 function rustResultToEither<T, E>(result: RustResult<T, E>): E.Either<E, T> {
@@ -33,6 +34,18 @@ export const TauriInvoker = {
     return promise.then((unixMillis) => E.right(new Date(unixMillis))).catch(E.left)
   },
 
+  getLookups(): Promise<Errorable<StoredLookups>> {
+    const promise: Promise<StoredLookups> = invoke('get_lookups')
+
+    return promise.then(E.right).catch(E.left)
+  },
+
+  updateLookups(gen12: LookupMap, gen345: LookupMap): Promise<Errorable<null>> {
+    const promise: Promise<null> = invoke('update_lookups', { gen12, gen345 })
+
+    return promise.then(E.right).catch(E.left)
+  },
+
   getStorageFileJSON(relativePath: string): Promise<Errorable<JSONObject | JSONArray>> {
     const promise: Promise<JSONObject | JSONArray> = invoke('get_storage_file_json', {
       relativePath,
@@ -46,6 +59,18 @@ export const TauriInvoker = {
       relativePath,
       data,
     })
+
+    return promise.then(E.right).catch(E.left)
+  },
+
+  getBanks(): Promise<Errorable<StoredBankData>> {
+    const promise: Promise<StoredBankData> = invoke('load_banks')
+
+    return promise.then(E.right).catch(E.left)
+  },
+
+  writeBanks(bankData: StoredBankData): Promise<Errorable<null>> {
+    const promise: Promise<null> = invoke('write_banks', { bankData })
 
     return promise.then(E.right).catch(E.left)
   },

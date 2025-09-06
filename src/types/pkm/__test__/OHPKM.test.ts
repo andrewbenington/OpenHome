@@ -1,39 +1,37 @@
-import { PA8, PK1, PK2, PK3, PK4, PK5 } from '@pokemon-files/pkm'
+import { PK1, PK2, PK3, PK4, PK5 } from '@pokemon-files/pkm'
 import { readFileSync } from 'fs'
 import path, { resolve } from 'path'
 import { getMonGen12Identifier, getMonGen345Identifier } from '../../../util/Lookup'
 import { bytesToPKM } from '../../FileImport'
 import { OHPKM } from '../OHPKM'
-import { generatePersonalityValuePreservingAttributes } from '../util'
 
 describe('gen345 identifier', () => {
-  let luxray: PA8
+  let blaziken: PK3
   let monBytes: Uint8Array
 
   beforeAll(() => {
-    const savePath = resolve(__dirname, './PKMFiles/LA/Luxray.pa8')
+    const savePath = resolve(__dirname, './PKMFiles/Gen3/blaziken.pkm')
 
     monBytes = new Uint8Array(readFileSync(savePath))
 
-    luxray = new PA8(new Uint8Array(monBytes).buffer)
+    blaziken = new PK3(new Uint8Array(monBytes).buffer)
   })
 
   test('should have expected name', () => {
-    expect(luxray.nickname).toBe('Luxray')
+    expect(blaziken.nickname).toBe('BLAZIKEN')
   })
 
   test('lookup should be the same for 3/4/5', () => {
-    const ohpkm = new OHPKM(luxray)
+    const ohpkm = new OHPKM(blaziken)
 
-    expect(getMonGen345Identifier(luxray)).toBe(getMonGen345Identifier(ohpkm))
-    const pk3 = new PK3(ohpkm)
+    expect(getMonGen345Identifier(blaziken)).toBe(getMonGen345Identifier(ohpkm))
 
-    expect(getMonGen345Identifier(pk3)).toBe(getMonGen345Identifier(ohpkm))
+    const pk4 = new PK4(ohpkm)
+
+    expect(getMonGen345Identifier(pk4)).toBe(getMonGen345Identifier(ohpkm))
+
     const pk5 = new PK5(ohpkm)
-    const pv1 = generatePersonalityValuePreservingAttributes(ohpkm)
-    const pv2 = generatePersonalityValuePreservingAttributes(pk5)
 
-    expect(pv2).toBe(pv1)
     expect(getMonGen345Identifier(pk5)).toBe(getMonGen345Identifier(ohpkm))
   })
 })

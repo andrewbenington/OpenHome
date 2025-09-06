@@ -1,5 +1,7 @@
 import { DragDropProvider, DragOverlay, PointerSensor } from '@dnd-kit/react'
 import { ReactNode, useContext } from 'react'
+import { PersistedPkmDataContext } from 'src/state/persistedPkmData'
+import { OHPKM } from 'src/types/pkm/OHPKM'
 import PokemonIcon from '../components/PokemonIcon'
 import { DragMonContext } from '../state/dragMon'
 import { MonLocation, MonWithLocation, OpenSavesContext } from '../state/openSaves'
@@ -7,6 +9,7 @@ import { MonLocation, MonWithLocation, OpenSavesContext } from '../state/openSav
 export default function PokemonDragContextProvider(props: { children?: ReactNode }) {
   const { children } = props
   const [, openSavesDispatch] = useContext(OpenSavesContext)
+  const [, persistedPkmDataDispatch] = useContext(PersistedPkmDataContext)
   const [dragMonState, dispatchDragMonState] = useContext(DragMonContext)
 
   return (
@@ -26,8 +29,21 @@ export default function PokemonDragContextProvider(props: { children?: ReactNode
               type: 'add_mon_to_release',
               payload,
             })
-          } else if (dest?.save?.supportsMon(payload.mon.dexNum, payload.mon.formeNum)) {
-            openSavesDispatch({ type: 'move_mon', payload: { source: payload, dest } })
+          } else if (
+            dest.is_home ||
+            dest?.save?.supportsMon(payload.mon.dexNum, payload.mon.formeNum)
+          ) {
+            const { mon, ...source } = payload
+
+            if (source.save !== dest.save) {
+              persistedPkmDataDispatch({ type: 'persist_data', payload: new OHPKM(mon) })
+              openSavesDispatch({
+                type: 'move_mon',
+                payload: { source: payload, dest },
+              })
+            } else {
+              openSavesDispatch({ type: 'move_mon', payload: { source: payload, dest } })
+            }
           }
         }
 
@@ -61,19 +77,9 @@ export default function PokemonDragContextProvider(props: { children?: ReactNode
         {dragMonState.payload && (
           <PokemonIcon
             dexNumber={dragMonState.payload.mon.dexNum ?? 0}
-            formeNumber={
-              dragMonState.payload.save.boxes[dragMonState.payload.box].pokemon[
-                dragMonState.payload.boxPos
-              ]?.formeNum ?? 0
-            }
-            isShiny={dragMonState.payload.save.boxes[dragMonState.payload.box].pokemon[
-              dragMonState.payload.boxPos
-            ]?.isShiny()}
-            heldItemIndex={
-              dragMonState.payload.save.boxes[dragMonState.payload.box].pokemon[
-                dragMonState.payload.boxPos
-              ]?.heldItemIndex
-            }
+            formeNumber={dragMonState.payload.mon.formeNum ?? 0}
+            isShiny={dragMonState.payload.mon.isShiny()}
+            heldItemIndex={dragMonState.payload.mon.heldItemIndex}
             style={{ width: '100%', height: '100%' }}
           />
         )}

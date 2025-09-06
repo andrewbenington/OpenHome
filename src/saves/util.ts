@@ -3,6 +3,7 @@ import { colosseumOrXD, ColosseumOrXD, GameOfOrigin, GameOfOriginData } from 'po
 import { GameLogos, getOriginMark } from '../images/game'
 import { getPublicImageURL } from '../images/images'
 import { PKMInterface } from '../types/interfaces'
+import { HomeData } from '../types/SAVTypes/HomeData'
 import { Box, SAV } from '../types/SAVTypes/SAV'
 import { getPluginIdentifier, SAVClass } from '../types/SAVTypes/util'
 import { filterUndefined } from '../util/Sort'
@@ -127,7 +128,7 @@ export function getFollowingMon(
 
 export function buildNavigator(
   incrementFunction: (index: number) => number,
-  save: SAV,
+  save: SAV | HomeData,
   currentIndex?: number,
   callback?: (index?: number) => void
 ) {
@@ -151,7 +152,7 @@ export function buildNavigator(
  * Otherwise returns undefined
  */
 export function buildForwardNavigator(
-  save: SAV,
+  save: SAV | HomeData,
   currentIndex?: number,
   callback?: (index?: number) => void
 ) {
@@ -176,7 +177,7 @@ export function buildForwardNavigator(
  * Otherwise returns undefined
  */
 export function buildBackwardNavigator(
-  save: SAV,
+  save: SAV | HomeData,
   index?: number,
   callback?: (index?: number) => void
 ) {

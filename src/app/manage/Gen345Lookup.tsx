@@ -1,12 +1,14 @@
+import { Spinner } from '@radix-ui/themes'
 import { useContext } from 'react'
 import OHDataGrid, { SortableColumn } from 'src/components/OHDataGrid'
 import PokemonIcon from 'src/components/PokemonIcon'
 import { getPublicImageURL } from 'src/images/images'
 import { getMonSaveLogo } from 'src/saves/util'
 import { AppInfoContext } from 'src/state/appInfo'
+import { useLookups } from 'src/state/lookups'
 import { OHPKM } from 'src/types/pkm/OHPKM'
 import { numericSorter, stringSorter } from 'src/util/Sort'
-import { LookupContext } from '../../state/lookup'
+import { PersistedPkmDataContext } from '../../state/persistedPkmData'
 
 type G345LookupRow = {
   gen345ID: string
@@ -19,8 +21,13 @@ type Gen345LookupProps = {
 }
 
 export default function Gen345Lookup({ onSelectMon }: Gen345LookupProps) {
-  const [{ homeMons, gen345 }] = useContext(LookupContext)
+  const [{ homeMons }] = useContext(PersistedPkmDataContext)
+  const { lookups, loaded } = useLookups()
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
+
+  if (!loaded) {
+    return <Spinner />
+  }
 
   function pokemonFromLookupID(id: string) {
     if (!homeMons) return undefined
@@ -81,7 +88,7 @@ export default function Gen345Lookup({ onSelectMon }: Gen345LookupProps) {
 
   return (
     <OHDataGrid
-      rows={Object.entries(gen345 ?? {}).map(([gen345ID, homeID]) => ({
+      rows={Object.entries(lookups.gen345).map(([gen345ID, homeID]) => ({
         gen345ID,
         homeID,
         homeMon: pokemonFromLookupID(homeID),

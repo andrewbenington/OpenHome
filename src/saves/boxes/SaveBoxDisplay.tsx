@@ -9,8 +9,8 @@ import { MenuIcon } from 'src/components/Icons'
 import AttributeRow from 'src/pokemon/AttributeRow'
 import PokemonDetailsModal from 'src/pokemon/PokemonDetailsModal'
 import { ErrorContext } from 'src/state/error'
-import { LookupContext } from 'src/state/lookup'
 import { MonLocation, MonWithLocation, OpenSavesContext } from 'src/state/openSaves'
+import { PersistedPkmDataContext } from 'src/state/persistedPkmData'
 import { PKMInterface } from 'src/types/interfaces'
 import { OHPKM } from 'src/types/pkm/OHPKM'
 import { getMonFileIdentifier } from 'src/util/Lookup'
@@ -24,9 +24,11 @@ interface OpenSaveDisplayProps {
   saveIndex: number
 }
 
+const ALLOW_DUPE_IMPORT = true
+
 const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   const [, openSavesDispatch, openSaves] = useContext(OpenSavesContext)
-  const [{ homeMons }] = useContext(LookupContext)
+  const [{ homeMons }] = useContext(PersistedPkmDataContext)
   const [, dispatchError] = useContext(ErrorContext)
   const [detailsModal, setDetailsModal] = useState(false)
   const { saveIndex } = props
@@ -87,7 +89,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
           (mon) => mon && getMonFileIdentifier(mon) === identifier
         )
 
-        if (identifier in homeMons || inCurrentBox) {
+        if (!ALLOW_DUPE_IMPORT && (identifier in homeMons || inCurrentBox)) {
           const message =
             mons.length === 1
               ? 'This Pokémon has been moved into OpenHome before.'
@@ -162,7 +164,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
             </div>
             <div className="save-menu-buttons-right" style={{ marginRight: 4 }}>
               <Button
-                className="save-button"
+                className="mini-button"
                 onClick={() => setDetailsModal(true)}
                 variant="outline"
                 color="gray"
@@ -221,8 +223,9 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                   key={`${save.currentPCBox}-${index}`}
                   dragID={`${save.tid}_${save.sid}_${save.currentPCBox}_${index}`}
                   location={{
+                    is_home: false,
                     box: save.currentPCBox,
-                    boxPos: index,
+                    box_slot: index,
                     save,
                   }}
                   disabled={
@@ -234,9 +237,10 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                   onDrop={(importedMons) => {
                     if (importedMons) {
                       attemptImportMons(importedMons, {
+                        is_home: false,
                         save,
                         box: save.currentPCBox,
-                        boxPos: index,
+                        box_slot: index,
                       })
                     }
                   }}

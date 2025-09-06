@@ -9,8 +9,9 @@ import { BackendContext } from '../backend/backendContext'
 import OHDataGrid, { SortableColumn } from '../components/OHDataGrid'
 import useDisplayError from '../hooks/displayError'
 import { AppInfoContext } from '../state/appInfo'
-import { LookupContext } from '../state/lookup'
+import { useLookups } from '../state/lookups'
 import { OpenSavesContext } from '../state/openSaves'
+import { PersistedPkmDataContext } from '../state/persistedPkmData'
 import { PathData, splitPath } from '../types/SAVTypes/path'
 import SaveCard from './SaveCard'
 import { filterEmpty, getSaveLogo, SaveViewMode } from './util'
@@ -26,8 +27,8 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
   const backend = useContext(BackendContext)
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
   const [suggestedSaves, setSuggestedSaves] = useState<SAV[]>()
-  const [{ homeMons: homeMonMap, gen12: gen12LookupMap, gen345: gen345LookupMap }] =
-    useContext(LookupContext)
+  const [{ homeMons: homeMonMap }] = useContext(PersistedPkmDataContext)
+  const { getLookups } = useLookups()
   const [, , openSaves] = useContext(OpenSavesContext)
   const [error, setError] = useState(false)
   const displayError = useDisplayError()
@@ -48,6 +49,15 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
   const loadSaveData = useCallback(
     async (savePath: PathData) => {
       const response = await backend.loadSaveFile(savePath)
+      const lookupsResponse = await getLookups()
+
+      if (E.isLeft(lookupsResponse)) {
+        console.error(lookupsResponse.left)
+        handleError('Error loading lookups', lookupsResponse.left)
+        return
+      }
+
+      const lookups = lookupsResponse.right
 
       if (E.isRight(response)) {
         const { fileBytes } = response.right
@@ -57,15 +67,15 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
           fileBytes,
           {
             homeMonMap,
-            gen12LookupMap,
-            gen345LookupMap,
+            gen12LookupMap: lookups.gen12,
+            gen345LookupMap: lookups.gen345,
           },
           getEnabledSaveTypes()
         )
       }
       return undefined
     },
-    [backend, gen12LookupMap, gen345LookupMap, getEnabledSaveTypes, homeMonMap]
+    [backend, getEnabledSaveTypes, getLookups, handleError, homeMonMap]
   )
 
   useEffect(() => {

@@ -3,10 +3,26 @@ export type SaveFolder = {
   label?: string
 }
 
-export type BoxMonIdentifiers = Record<number, string>
+export type StoredBankData = {
+  banks: OpenHomeBank[]
+  current_bank: number
+}
 
-export type StoredBoxData = {
+export type OpenHomeBank = {
   index: number
   name: string | undefined
-  monIdentifiersByIndex: BoxMonIdentifiers
+  boxes: OpenHomeBox[]
+  current_box: number
+}
+
+export type OpenHomeBox = {
+  index: number
+  name: string | null
+  identifiers: BoxMonIdentifiers
+}
+
+export type BoxMonIdentifiers = Record<number, string>
+
+export function getBankName(bank: OpenHomeBank): string {
+  return bank.name ?? `Bank ${bank.index + 1}`
 }
