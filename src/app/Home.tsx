@@ -244,7 +244,6 @@ const Home = () => {
           width="100%"
           maxWidth="600px"
           minWidth="480px"
-          align="center"
           height="0"
           flexGrow="1"
         >

@@ -3,6 +3,7 @@ import { getMonFileIdentifier } from 'src/util/Lookup'
 import { v4 as UuidV4 } from 'uuid'
 import { PersistedPkmData } from '../../state/persistedPkmData'
 import { range } from '../../util/Functional'
+import { numericSorter } from '../../util/Sort'
 import { TransferRestrictions } from '../TransferRestrictions'
 import { OHPKM } from '../pkm/OHPKM'
 import {
@@ -206,12 +207,8 @@ export class HomeData {
     }
   }
 
-  setBoxName(bank_index: number, box_index: number, name: string | undefined): Errorable<null> {
-    if (this._banks.length <= bank_index) {
-      return Err(`Cannot access bank at index ${bank_index} (${this._banks.length} banks total)`)
-    }
-
-    const bank = this._banks[bank_index]
+  setCurrentBankBoxName(box_index: number, name: string | undefined): Errorable<null> {
+    const bank = this.getCurrentBank()
 
     if (box_index >= bank.boxes.length) {
       return Err(
@@ -219,9 +216,24 @@ export class HomeData {
       )
     }
 
-    this._banks[bank_index].boxes[box_index].name = name ?? null
+    this._banks[this.currentBankIndex].boxes[box_index].name = name ?? null
+
+    this.boxes[box_index].name = name
+    this.boxes = [...this.boxes]
 
     return Ok(null)
+  }
+
+  reorderCurrentBankBoxes(ids_in_new_order: string[]) {
+    this.boxes = this.boxes.toSorted(numericSorter((box) => ids_in_new_order.indexOf(box.id)))
+
+    this.boxes.forEach((box, newIndex) => (box.index = newIndex))
+
+    this._banks[this.currentBankIndex].boxes = this._banks[this.currentBankIndex].boxes.toSorted(
+      numericSorter((box) => ids_in_new_order.indexOf(box.id))
+    )
+
+    this._banks[this.currentBankIndex].boxes.forEach((box, newIndex) => (box.index = newIndex))
   }
 
   setBankName(bank_index: number, name: string | undefined): Errorable<null> {

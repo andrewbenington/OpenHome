@@ -23,6 +23,14 @@ impl StoredBankData {
             current_bank: 0,
         }
     }
+
+    fn reset_box_indices(&mut self) {
+        self.banks.iter_mut().for_each(Bank::reset_box_indices);
+    }
+
+    fn order_boxes_by_indices(&mut self) {
+        self.banks.iter_mut().for_each(Bank::order_boxes_by_indices);
+    }
 }
 
 fn default_id() -> Uuid {
@@ -45,6 +53,17 @@ impl Bank {
         new_box.index = self.boxes.len();
         self.boxes.push(new_box);
     }
+
+    fn reset_box_indices(&mut self) {
+        self.boxes
+            .iter_mut()
+            .enumerate()
+            .for_each(|(index, b)| b.index = index);
+    }
+
+    fn order_boxes_by_indices(&mut self) {
+        self.boxes.sort_by_key(|b| b.index);
+    }
 }
 
 #[derive(Default, Serialize, Deserialize, Clone)]
@@ -60,11 +79,20 @@ pub type BoxIdentifiers = HashMap<u8, String>;
 
 #[tauri::command]
 pub fn load_banks(app_handle: tauri::AppHandle) -> OpenHomeResult<StoredBankData> {
-    util::get_storage_file_json(&app_handle, "banks.json")
+    let mut storage: StoredBankData = util::get_storage_file_json(&app_handle, "banks.json")?;
+    storage.reset_box_indices();
+
+    Ok(storage)
 }
 
 #[tauri::command]
-pub fn write_banks(app_handle: tauri::AppHandle, bank_data: StoredBankData) -> OpenHomeResult<()> {
+pub fn write_banks(
+    app_handle: tauri::AppHandle,
+    mut bank_data: StoredBankData,
+) -> OpenHomeResult<()> {
+    bank_data.order_boxes_by_indices();
+    bank_data.reset_box_indices();
+
     util::write_storage_file_json(&app_handle, "banks.json", &bank_data)?;
 
     // For now, we will also update box-data.json with Bank 1 data to work with previous versions of OpenHome

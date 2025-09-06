@@ -5,7 +5,7 @@ import { ToggleGroup } from 'radix-ui'
 import { CSSProperties, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { BsFillGrid3X3GapFill } from 'react-icons/bs'
 import { FaSquare } from 'react-icons/fa'
-import { AddIcon, EditIcon, MenuIcon, MoveIcon } from 'src/components/Icons'
+import { AddIcon, DevIcon, EditIcon, MenuIcon, MoveIcon } from 'src/components/Icons'
 import PokemonDetailsModal from 'src/pokemon/PokemonDetailsModal'
 import { ErrorContext } from 'src/state/error'
 import { MonLocation, MonWithLocation, OpenSavesContext } from 'src/state/openSaves'
@@ -25,7 +25,6 @@ import {
   DragEndEvent,
   KeyboardSensor,
   PointerSensor,
-  UniqueIdentifier,
   useSensor,
   useSensors,
 } from '@dnd-kit/core'
@@ -36,6 +35,7 @@ import {
   useSortable,
 } from '@dnd-kit/sortable'
 import { range } from 'src/util/Functional'
+import useIsDev from '../../hooks/isDev'
 import { HomeBox } from '../../types/SAVTypes/HomeData'
 import { filterUndefined } from '../../util/Sort'
 import './style.css'
@@ -53,6 +53,8 @@ export default function HomeBoxDisplay() {
   const [moving, setMoving] = useState(false)
   const [viewMode, setViewMode] = useState<BoxViewMode>('one')
   const [editingBoxName, setEditingBoxName] = useState('')
+  const isDev = useIsDev()
+  const [debugMode, setDebugMode] = useState(false)
 
   const homeData = openSavesState.homeData
 
@@ -162,25 +164,40 @@ export default function HomeBoxDisplay() {
                     <EditIcon />
                   </Button>
                 ) : (
-                  <Button
-                    className="mini-button"
-                    style={{ transition: 'none', padding: 0 }}
-                    variant={moving ? 'solid' : 'outline'}
-                    color={moving ? undefined : 'gray'}
-                    onClick={() => {
-                      // if (editing) {
-                      //   openSavesDispatch({
-                      //     type: 'set_home_box_name',
-                      //     payload: { name: editingBoxName, index: currentBox.index },
-                      //   })
-                      // } else {
-                      //   setEditingBoxName(homeData.getCurrentBox().name ?? '')
-                      // }
-                      setMoving(!moving)
-                    }}
-                  >
-                    <MoveIcon />
-                  </Button>
+                  <>
+                    {isDev && (
+                      <Button
+                        className="mini-button"
+                        style={{ transition: 'none', padding: 0 }}
+                        variant={debugMode ? 'solid' : 'outline'}
+                        color={debugMode ? undefined : 'gray'}
+                        onClick={() => {
+                          setDebugMode(!debugMode)
+                        }}
+                      >
+                        <DevIcon />
+                      </Button>
+                    )}
+                    <Button
+                      className="mini-button"
+                      style={{ transition: 'none', padding: 0 }}
+                      variant={moving ? 'solid' : 'outline'}
+                      color={moving ? undefined : 'gray'}
+                      onClick={() => {
+                        if (editing) {
+                          openSavesDispatch({
+                            type: 'set_home_box_name',
+                            payload: { name: editingBoxName, index: currentBox.index },
+                          })
+                        } else {
+                          setEditingBoxName(homeData.getCurrentBox().name ?? '')
+                        }
+                        setMoving(!moving)
+                      }}
+                    >
+                      <MoveIcon />
+                    </Button>
+                  </>
                 )}
                 <DropdownMenu.Root>
                   <DropdownMenu.Trigger>
@@ -241,6 +258,7 @@ export default function HomeBoxDisplay() {
                 setViewMode('one')
               }}
               moving={moving}
+              debugMode={debugMode}
             />
           )}
         </Card>
@@ -399,10 +417,6 @@ function BoxMons() {
   )
 }
 
-function parseIntIfString(id: UniqueIdentifier) {
-  return typeof id === 'number' ? id : parseInt(id)
-}
-
 function newOrderFromDragEnd(movedFromIndex: number, movedIntoIndex: number, boxCount: number) {
   if (movedFromIndex >= boxCount || movedIntoIndex >= boxCount) {
     return range(boxCount)
@@ -427,8 +441,12 @@ function newOrderFromDragEnd(movedFromIndex: number, movedIntoIndex: number, box
   return newOrder
 }
 
-function AllBoxes(props: { onBoxSelect: (index: number) => void; moving?: boolean }) {
-  const { onBoxSelect, moving } = props
+function AllBoxes(props: {
+  onBoxSelect: (index: number) => void
+  moving?: boolean
+  debugMode?: boolean
+}) {
+  const { onBoxSelect, moving, debugMode } = props
   const [{ homeData }, openSavesDispatch] = useContext(OpenSavesContext)
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -480,7 +498,12 @@ function AllBoxes(props: { onBoxSelect: (index: number) => void; moving?: boolea
         </DndContext>
       ) : (
         homeData?.boxes.map((box, boxIndex) => (
-          <BoxOverview key={box.id} box={box} onBoxSelect={() => onBoxSelect(boxIndex)} />
+          <BoxOverview
+            key={box.id}
+            box={box}
+            onBoxSelect={() => onBoxSelect(boxIndex)}
+            debugMode={debugMode}
+          />
         ))
       )}
       <Button variant="soft" style={{ height: '100%' }}>
@@ -493,9 +516,10 @@ function AllBoxes(props: { onBoxSelect: (index: number) => void; moving?: boolea
 type BoxOverviewProps = {
   box: HomeBox
   onBoxSelect: () => void
+  debugMode?: boolean
 }
 
-function BoxOverview({ box, onBoxSelect }: BoxOverviewProps) {
+function BoxOverview({ box, onBoxSelect, debugMode }: BoxOverviewProps) {
   const [{ homeData }] = useContext(OpenSavesContext)
 
   if (!homeData || !box) return <div />
@@ -544,6 +568,12 @@ function BoxOverview({ box, onBoxSelect }: BoxOverviewProps) {
               ))}
             </div>
             {box.name ?? `Box ${box.index + 1}`}
+            {debugMode && (
+              <div style={{ fontWeight: 'lighter' }}>
+                <div>Index: {box.index}</div>
+                <div>{box.id.split('-')[0]}</div>
+              </div>
+            )}
           </Flex>
         </Button>
       </DroppableSpace>
@@ -570,7 +600,6 @@ function SortableBoxOverview({ box }: BoxOverviewProps) {
   return (
     <Flex ref={setNodeRef} style={style} {...attributes} {...listeners}>
       <Button
-        // color="cyan"
         variant="solid"
         style={{
           height: 'fit-content',
@@ -659,22 +688,3 @@ function ViewToggle(props: ViewToggleProps) {
     </ToggleGroup.Root>
   )
 }
-
-// type SortableBoxProps = {
-//   name:
-// }
-
-// function SortableBox() {
-// const {
-//     attributes,
-//     listeners,
-//     setNodeRef,
-//     transform,
-//     transition,
-//   } = useSortable({id: props.id});
-
-//   const style = {
-//     transform:  CSS.Transform.toString(transform),
-//     transition,
-//   };
-// }

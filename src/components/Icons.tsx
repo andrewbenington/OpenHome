@@ -9,6 +9,7 @@ import {
   MdArrowForwardIos,
   MdClose,
   MdCreateNewFolder,
+  MdDataObject,
   MdError,
   MdGrid4X4,
   MdMoreVert,
@@ -31,3 +32,5 @@ export const DropdownArrowIcon = MdArrowDropDown
 export const ExpandArrowIcon = MdArrowForwardIos
 
 export const ErrorIcon = MdError
+
+export const DevIcon = MdDataObject

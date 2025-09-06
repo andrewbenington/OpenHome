@@ -6,7 +6,6 @@ import { StoredBankData } from 'src/types/storage'
 import { getMonFileIdentifier } from 'src/util/Lookup'
 import { PKMInterface } from '../types/interfaces'
 import { getSortFunctionNullable, SortType } from '../types/pkm/sort'
-import { numericSorter } from '../util/Sort'
 import { PersistedPkmData } from './persistedPkmData'
 
 export type OpenSave = {
@@ -240,7 +239,7 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
       return { ...state }
     }
     case 'sort_all_home_boxes': {
-      if (!state.homeData) return state
+      if (!state.homeData) return { ...state }
 
       const allMons = state.homeData.boxes
         .flatMap((box) => box.pokemon)
@@ -255,11 +254,10 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
     }
     case 'set_home_box_name': {
       const newState = { ...state }
-      const box = newState.homeData?.boxes[payload.index]
 
-      if (box) {
-        box.name = payload.name
-      }
+      if (!newState.homeData) return { ...state }
+      newState.homeData.setCurrentBankBoxName(payload.index, payload.name)
+
       return newState
     }
     case 'reorder_home_boxes': {
@@ -267,11 +265,7 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
 
       if (!newState.homeData) return { ...state }
 
-      newState.homeData.boxes = newState.homeData.boxes.toSorted(
-        numericSorter((box) => payload.ids_in_new_order.indexOf(box.id))
-      )
-
-      newState.homeData.boxes.forEach((box, newIndex) => (box.index = newIndex))
+      newState.homeData.reorderCurrentBankBoxes(payload.ids_in_new_order)
 
       return newState
     }
