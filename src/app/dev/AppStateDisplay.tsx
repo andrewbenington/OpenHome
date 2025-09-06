@@ -90,7 +90,7 @@ function monDisplay(mon: PKMInterface) {
 
   return {
     species: species.name,
-    forme: species.formes[mon.formNum ?? 0].formeName,
+    forme: species.formes[mon.formeNum ?? 0].formeName,
     nickname: mon.nickname,
     origin: mon.gameOfOrigin ? 'Pokémon ' + GameOfOriginData[mon.gameOfOrigin]?.name : undefined,
   }

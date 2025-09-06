@@ -9,7 +9,7 @@ import * as E from 'fp-ts/lib/Either'
 import BackendInterface, { BankOrBoxChange, StoredLookups } from 'src/backend/backendInterface'
 import { OHPKM } from 'src/types/pkm/OHPKM'
 import { PathData, PossibleSaves } from 'src/types/SAVTypes/path'
-import { OpenHomeBank, SaveFolder, StoredBankData } from 'src/types/storage'
+import { SaveFolder, StoredBankData } from 'src/types/storage'
 import { Errorable, JSONObject, LoadSaveResponse, LookupMap, SaveRef } from 'src/types/types'
 import { defaultSettings, Settings } from '../../state/appInfo'
 import { TauriInvoker } from './tauriInvoker'
@@ -84,23 +84,7 @@ export const TauriBackend: BackendInterface = {
 
   /* openhome boxes */
   loadHomeBanks: async function (): Promise<Errorable<StoredBankData>> {
-    const result = await TauriInvoker.getBanks()
-
-    if (E.isLeft(result)) return result
-
-    let stored_bank_data = result.right
-
-    if (stored_bank_data.banks.length === 0) {
-      let bank: OpenHomeBank = { name: undefined, index: 0, boxes: [], current_box: 0 }
-
-      for (let i = 0; i < 36; i++) {
-        bank.boxes.push({ index: i, identifiers: {}, name: null })
-      }
-      stored_bank_data = { banks: [bank], current_bank: 0 }
-      TauriInvoker.writeBanks(stored_bank_data)
-    }
-
-    return E.right(stored_bank_data)
+    return TauriInvoker.getBanks()
   },
   writeHomeBanks: (bankData: StoredBankData): Promise<Errorable<null>> => {
     return TauriInvoker.writeBanks(bankData)
