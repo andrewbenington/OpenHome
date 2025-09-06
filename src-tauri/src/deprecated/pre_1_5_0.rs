@@ -2,6 +2,7 @@ use crate::pkm_storage;
 use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
 #[derive(Deserialize, Serialize)]
 pub struct BoxPreV1_5_0 {
@@ -24,7 +25,7 @@ impl BoxPreV1_5_0 {
         }
 
         pkm_storage::Box {
-            id: Default::default(),
+            id: Uuid::new_v4(),
             name: self.name,
             index: self.index as usize,
             identifiers,

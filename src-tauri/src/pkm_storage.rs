@@ -18,10 +18,13 @@ pub struct StoredBankData {
 
 impl StoredBankData {
     pub fn from_banks(banks: Vec<Bank>) -> Self {
-        Self {
+        let mut bank_data = StoredBankData {
             banks,
             current_bank: 0,
-        }
+        };
+        bank_data.reset_box_indices();
+
+        bank_data
     }
 
     fn reset_box_indices(&mut self) {

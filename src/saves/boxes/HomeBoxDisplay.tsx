@@ -127,6 +127,17 @@ export default function HomeBoxDisplay() {
                   }}
                   placeholder={`Box ${currentBox.index + 1}`}
                   onChange={(e) => setEditingBoxName(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      openSavesDispatch({
+                        type: 'set_home_box_name',
+                        payload: { name: editingBoxName, index: currentBox.index },
+                      })
+                      setEditing(false)
+                    } else if (e.key === 'Escape') {
+                      setEditing(false)
+                    }
+                  }}
                   autoFocus
                 />
               ) : (
@@ -191,14 +202,16 @@ export default function HomeBoxDisplay() {
                     <ToggleButton
                       state={deleting}
                       setState={setDeleting}
+                      disabled={moving}
                       icon={RemoveIcon}
                       hint="Delete boxes..."
                     />
                     <ToggleButton
                       state={moving}
                       setState={setMoving}
+                      disabled={deleting}
                       icon={MoveIcon}
-                      hint="Rearrange boxes"
+                      hint="Rearrange boxes..."
                     />
                   </>
                 )}

@@ -6,18 +6,28 @@ export type ToggleButtonProps = {
   setState: (value: boolean) => void
   icon: IconType
   hint?: string
+  disabled?: boolean
   onSet?: () => void
   onUnset?: () => void
 }
 
 export default function ToggleButton(props: ToggleButtonProps) {
-  const { state: isToggled, setState: setIsToggled, icon: Icon, hint, onSet, onUnset } = props
+  const {
+    state: isToggled,
+    setState: setIsToggled,
+    icon: Icon,
+    hint,
+    disabled,
+    onSet,
+    onUnset,
+  } = props
 
   const button = (
     <Button
       className="mini-button"
       variant={isToggled ? 'solid' : 'outline'}
       color={isToggled ? undefined : 'gray'}
+      disabled={disabled}
       onClick={() => {
         if (isToggled) {
           onUnset?.()

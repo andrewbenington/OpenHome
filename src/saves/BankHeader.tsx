@@ -43,6 +43,17 @@ export default function BankHeader() {
           }}
           placeholder={homeData.getCurrentBankName()}
           onChange={(e) => setBankNameEditValue(e.target.value ?? undefined)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              openSavesDispatch({
+                type: 'set_home_bank_name',
+                payload: { bank: homeData.currentBankIndex, name: bankNameEditValue },
+              })
+              setEditing(false)
+            } else if (e.key === 'Escape') {
+              setEditing(false)
+            }
+          }}
           autoFocus
         />
       ) : (
