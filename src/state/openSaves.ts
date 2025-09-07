@@ -79,6 +79,10 @@ export type OpenSavesAction =
       payload: { sortType: SortType }
     }
   | {
+      type: 'current_home_box_remove_dupes'
+      payload?: undefined
+    }
+  | {
       type: 'set_home_box_name'
       payload: { name: string | undefined; index: number }
     }
@@ -178,7 +182,7 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
 ) => {
   const { type, payload } = action
 
-  // console.log({ type, payload })
+  console.log({ type, payload })
 
   switch (type) {
     /*
@@ -186,7 +190,7 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
      */
     case 'load_home_banks': {
       const { banks, monLookup } = payload
-      const newHomeData = state.homeData ?? new HomeData(banks, monLookup)
+      const newHomeData = new HomeData(banks, monLookup)
 
       return { ...state, homeData: newHomeData }
     }
@@ -258,6 +262,12 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
         state.homeData.boxes[i].pokemon = allMons.slice(i * boxSize, (i + 1) * boxSize)
       }
 
+      return { ...state }
+    }
+    case 'current_home_box_remove_dupes': {
+      if (!state.homeData) return state
+
+      state.homeData.currentBoxRemoveDupes()
       return { ...state }
     }
     case 'set_home_box_name': {

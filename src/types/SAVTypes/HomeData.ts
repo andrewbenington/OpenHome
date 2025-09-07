@@ -287,6 +287,29 @@ export class HomeData {
     this._banks[this.currentBankIndex].boxes.forEach((box, newIndex) => (box.index = newIndex))
   }
 
+  currentBoxRemoveDupes() {
+    const alreadyPresent: Set<string> = new Set()
+
+    for (let slot = 0; slot < HomeData.BOX_COLUMNS * HomeData.BOX_ROWS; slot++) {
+      const mon = this.boxes[this.currentPCBox].pokemon[slot]
+
+      if (!mon) continue
+
+      const identifier = getMonFileIdentifier(mon)
+
+      if (!identifier) continue
+      if (alreadyPresent.has(identifier)) {
+        this.boxes[this.currentPCBox].pokemon[slot] = undefined
+        delete this._banks[this.currentBankIndex].boxes[this.currentPCBox].identifiers[slot]
+      } else {
+        alreadyPresent.add(identifier)
+      }
+    }
+
+    this.boxes = [...this.boxes]
+    this._banks[this.currentBankIndex].boxes = [...this._banks[this.currentBankIndex].boxes]
+  }
+
   setBankName(bank_index: number, name: string | undefined): Errorable<null> {
     if (this._banks.length <= bank_index) {
       return Err(`Cannot access bank at index ${bank_index} (${this._banks.length} banks total)`)

@@ -260,6 +260,15 @@ export default function HomeBoxDisplay() {
                         ))}
                       </DropdownMenu.SubContent>
                     </DropdownMenu.Sub>
+                    <DropdownMenu.Item
+                      onClick={() =>
+                        openSavesDispatch({
+                          type: 'current_home_box_remove_dupes',
+                        })
+                      }
+                    >
+                      Remove duplicates from this box
+                    </DropdownMenu.Item>
                   </DropdownMenu.Content>
                 </DropdownMenu.Root>
               </Flex>

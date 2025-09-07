@@ -25,7 +25,7 @@ import ReleaseArea from './home/ReleaseArea'
 
 const Home = () => {
   const [openSavesState, openSavesDispatch, allOpenSaves] = useContext(OpenSavesContext)
-  const [lookupState, lookupDispatch] = useContext(PersistedPkmDataContext)
+  const [persistedPkmState, persistedPkmDispatch] = useContext(PersistedPkmDataContext)
   const backend = useContext(BackendContext)
   const [selectedMon, setSelectedMon] = useState<PKMInterface>()
   const [openSaveDialog, setOpenSaveDialog] = useState(false)
@@ -34,7 +34,7 @@ const Home = () => {
   const loadAllLookups = useCallback(async (): Promise<Errorable<Record<string, OHPKM>>> => {
     const onLoadError = (message: string) => {
       console.error(message)
-      lookupDispatch({ type: 'set_error', payload: message })
+      persistedPkmDispatch({ type: 'set_error', payload: message })
     }
     const homeResult = await backend.loadHomeMonLookup()
 
@@ -51,10 +51,10 @@ const Home = () => {
       }
     }
 
-    lookupDispatch({ type: 'load_persisted_pkm_data', payload: homeResult.right })
+    persistedPkmDispatch({ type: 'load_persisted_pkm_data', payload: homeResult.right })
 
     return homeResult
-  }, [backend, lookupDispatch])
+  }, [backend, persistedPkmDispatch])
 
   const loadAllHomeData = useCallback(
     async (homeMonLookup: Record<string, OHPKM>) => {
@@ -77,7 +77,7 @@ const Home = () => {
   )
 
   const saveChanges = useCallback(async () => {
-    if (!openSavesState.homeData || !lookupState.loaded) return
+    if (!openSavesState.homeData || !persistedPkmState.loaded) return
 
     const result = await backend.startTransaction()
 
@@ -143,7 +143,7 @@ const Home = () => {
     openSavesDispatch({ type: 'clear_updated_box_slots' })
     openSavesDispatch({ type: 'clear_mons_to_release' })
 
-    lookupDispatch({ type: 'clear' })
+    persistedPkmDispatch({ type: 'clear' })
     await loadAllLookups().then(
       E.match(
         (err) => {
@@ -158,8 +158,8 @@ const Home = () => {
     backend,
     loadAllHomeData,
     loadAllLookups,
-    lookupDispatch,
-    lookupState,
+    persistedPkmDispatch,
+    persistedPkmState,
     openSavesDispatch,
     openSavesState,
     displayError,
@@ -172,8 +172,8 @@ const Home = () => {
       onSave: saveChanges,
       onReset: () => {
         openSavesDispatch({ type: 'clear_mons_to_release' })
-        if (lookupState.loaded) {
-          loadAllHomeData(lookupState.homeMons)
+        if (persistedPkmState.loaded) {
+          loadAllHomeData(persistedPkmState.homeMons)
         }
         openSavesDispatch({ type: 'close_all_saves' })
       },
@@ -184,7 +184,7 @@ const Home = () => {
     return () => {
       stopListening()
     }
-  }, [backend, saveChanges, lookupState, openSavesDispatch, loadAllHomeData])
+  }, [backend, saveChanges, persistedPkmState, openSavesDispatch, loadAllHomeData])
 
   const previewFile = useCallback(
     async (file: File) => {
@@ -214,17 +214,22 @@ const Home = () => {
   )
 
   useEffect(() => {
-    if (lookupState.loaded && !openSavesState.homeData) {
-      loadAllHomeData(lookupState.homeMons)
+    if (persistedPkmState.loaded && !openSavesState.homeData) {
+      loadAllHomeData(persistedPkmState.homeMons)
     }
-  }, [loadAllHomeData, lookupState.homeMons, lookupState.loaded, openSavesState.homeData])
+  }, [
+    loadAllHomeData,
+    persistedPkmState.homeMons,
+    persistedPkmState.loaded,
+    openSavesState.homeData,
+  ])
 
   // load lookups
   useEffect(() => {
-    if (!lookupState.loaded && !lookupState.error) {
+    if (!persistedPkmState.loaded && !persistedPkmState.error) {
       loadAllLookups()
     }
-  }, [lookupState.loaded, lookupState.error, loadAllLookups])
+  }, [persistedPkmState.loaded, persistedPkmState.error, loadAllLookups])
 
   return (
     <Flex direction="row" style={{ height: '100%' }}>
