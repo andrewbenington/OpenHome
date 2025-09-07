@@ -1,4 +1,4 @@
-VERSION=1.5.0-alpha-multiple-banks.1
+VERSION=1.5.0-alpha-multiple-banks.2.sv-dlc-fix
 
 .PHONY: help
 help: # Display this help.
