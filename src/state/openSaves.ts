@@ -248,6 +248,8 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
         .pokemon.toSorted(getSortFunctionNullable(payload.sortType))
 
       state.homeData.boxes[state.homeData.currentPCBox].pokemon = boxMons
+      state.homeData.syncBankToBoxes()
+      state.homeData = state.homeData.clone()
       return { ...state }
     }
     case 'sort_all_home_boxes': {
@@ -261,6 +263,9 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
       for (let i = 0; i < state.homeData.boxes.length; i++) {
         state.homeData.boxes[i].pokemon = allMons.slice(i * boxSize, (i + 1) * boxSize)
       }
+
+      state.homeData.syncBankToBoxes()
+      state.homeData = state.homeData.clone()
 
       return { ...state }
     }

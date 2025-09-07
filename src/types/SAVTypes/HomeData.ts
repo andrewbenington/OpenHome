@@ -1,5 +1,5 @@
 import { GameOfOrigin } from 'pokemon-resources'
-import { getMonFileIdentifier } from 'src/util/Lookup'
+import { getHomeIdentifier, getMonFileIdentifier } from 'src/util/Lookup'
 import { v4 as UuidV4 } from 'uuid'
 import { PersistedPkmData } from '../../state/persistedPkmData'
 import { range } from '../../util/Functional'
@@ -38,7 +38,7 @@ export class HomeBox implements Box<OHPKM> {
   getIdentifierMapping(): BoxMonIdentifiers {
     const entries = this.pokemon
       .map(
-        (mon, i) => [i, mon ? getMonFileIdentifier(mon) : undefined] as [number, string | undefined]
+        (mon, i) => [i, mon ? getHomeIdentifier(mon) : undefined] as [number, string | undefined]
       )
       .filter(([, identifier]) => !!identifier) as [number, string][]
 
@@ -220,10 +220,9 @@ export class HomeData {
       )
     }
 
-    this._banks[this.currentBankIndex].boxes[box_index].name = name || null
-
     this.boxes[box_index].name = name || undefined
     this.boxes = [...this.boxes]
+    this.syncBankToBoxes()
 
     return Ok(null)
   }
@@ -247,10 +246,8 @@ export class HomeData {
       return Err(`Box id and index mismatch`)
     }
     this.boxes = [...this.boxes.filter((box) => box.id !== box_id)]
-    this._banks[this.currentBankIndex].boxes = this._banks[this.currentBankIndex].boxes.filter(
-      (box) => box.id !== box_id
-    )
     this.resetBoxIndices()
+    this.syncBankToBoxes()
 
     return Ok(null)
   }
@@ -264,8 +261,8 @@ export class HomeData {
     }
 
     this.boxes = [...this.boxes, new HomeBox(newBox)]
-    this._banks[this.currentBankIndex].boxes = [...this._banks[this.currentBankIndex].boxes, newBox]
     this.resetBoxIndices()
+    this.syncBankToBoxes()
 
     return Ok(null)
   }
@@ -275,16 +272,12 @@ export class HomeData {
 
     this.boxes.forEach((box, newIndex) => (box.index = newIndex))
 
-    this._banks[this.currentBankIndex].boxes = this._banks[this.currentBankIndex].boxes.toSorted(
-      numericSorter((box) => ids_in_new_order.indexOf(box.id))
-    )
-
-    this._banks[this.currentBankIndex].boxes.forEach((box, newIndex) => (box.index = newIndex))
+    this.syncBankToBoxes()
   }
 
   resetBoxIndices() {
     this.boxes.forEach((box, newIndex) => (box.index = newIndex))
-    this._banks[this.currentBankIndex].boxes.forEach((box, newIndex) => (box.index = newIndex))
+    this.syncBankToBoxes()
   }
 
   currentBoxRemoveDupes() {
@@ -300,14 +293,22 @@ export class HomeData {
       if (!identifier) continue
       if (alreadyPresent.has(identifier)) {
         this.boxes[this.currentPCBox].pokemon[slot] = undefined
-        delete this._banks[this.currentBankIndex].boxes[this.currentPCBox].identifiers[slot]
       } else {
         alreadyPresent.add(identifier)
       }
     }
 
     this.boxes = [...this.boxes]
-    this._banks[this.currentBankIndex].boxes = [...this._banks[this.currentBankIndex].boxes]
+    this.syncBankToBoxes()
+  }
+
+  syncBankToBoxes() {
+    this._banks[this._currentBankIndex].boxes = this.boxes.map((box) => ({
+      id: box.id,
+      index: box.index,
+      name: box.name || null,
+      identifiers: box.getIdentifierMapping(),
+    }))
   }
 
   setBankName(bank_index: number, name: string | undefined): Errorable<null> {
@@ -384,6 +385,17 @@ export class HomeData {
 
   public get currentPCBox() {
     return this._currentBoxIndex
+  }
+
+  clone() {
+    const newHomeData = new HomeData({ banks: this._banks, current_bank: 0 }, {})
+
+    newHomeData._currentBankIndex = this._currentBankIndex
+    newHomeData._currentBoxIndex = this._currentBoxIndex
+    newHomeData.boxes = [...this.boxes]
+    newHomeData.updatedBoxSlots = this.updatedBoxSlots
+
+    return newHomeData
   }
 }
 

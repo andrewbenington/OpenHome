@@ -82,19 +82,19 @@ pub fn handle_version_migration(
 
 #[derive(EnumIter, Clone, Copy, strum::Display, Debug)]
 pub enum Migration {
-    V1_5_0,
+    V1_5_0ALPHA,
 }
 
 impl Migration {
     pub fn version(&self) -> Version {
         match self {
-            Migration::V1_5_0 => Version::new(1, 5, 0),
+            Migration::V1_5_0ALPHA => Version::parse("v1.5.0-alpha-multiple-banks").unwrap(),
         }
     }
 
     pub fn do_migration(&self, app_handle: &tauri::AppHandle) -> OpenHomeResult<()> {
         match self {
-            Migration::V1_5_0 => do_migration_1_5_0(app_handle),
+            Migration::V1_5_0ALPHA => do_migration_1_5_0(app_handle),
         }
     }
 }

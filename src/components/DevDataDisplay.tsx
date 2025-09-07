@@ -24,7 +24,7 @@ export function DevDataDisplay(props: DevDataDisplayProps) {
         {...props}
       />
       <Dialog.Root open={debugModal} onOpenChange={(open) => !open && setDebugModal(false)}>
-        <Dialog.Content style={{ padding: 8 }}>
+        <Dialog.Content style={{ padding: 8, maxWidth: '100%' }} size="4">
           <InfoGrid data={props.data ?? {}} />
         </Dialog.Content>
       </Dialog.Root>
