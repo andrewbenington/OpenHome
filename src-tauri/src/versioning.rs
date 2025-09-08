@@ -99,14 +99,6 @@ impl Migration {
     }
 }
 
-fn strip_prerelease(version: &Version) -> Version {
-    Version {
-        pre: Prerelease::EMPTY,
-        build: BuildMetadata::EMPTY,
-        ..*version
-    }
-}
-
 pub fn get_necessary_migrations(
     last_launch_version: Version,
     current_version: Version,
