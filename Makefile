@@ -1,4 +1,4 @@
-VERSION=1.5.0-alpha-multiple-banks.3.maybe-fix-dupes
+VERSION=1.5.0-alpha-multiple-banks.4.bank-sync-fix
 
 .PHONY: help
 help: # Display this help.

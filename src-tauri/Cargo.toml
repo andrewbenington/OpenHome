@@ -1,6 +1,6 @@
 [package]
 name = "OpenHome"
-version = "1.5.0-alpha-multiple-banks.3.maybe-fix-dupes"
+version = "1.5.0-alpha-multiple-banks.4.bank-sync-fix"
 description = "A tool for moving Pokémon between game saves"
 authors = ["Andrew Benington"]
 edition = "2024"

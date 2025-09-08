@@ -88,7 +88,7 @@ pub enum Migration {
 impl Migration {
     pub fn version(&self) -> Version {
         match self {
-            Migration::V1_5_0ALPHA => Version::parse("v1.5.0-alpha-multiple-banks").unwrap(),
+            Migration::V1_5_0ALPHA => Version::parse("1.5.0-alpha-multiple-banks").unwrap(),
         }
     }
 
@@ -112,9 +112,7 @@ pub fn get_necessary_migrations(
     current_version: Version,
 ) -> Vec<Migration> {
     Migration::iter()
-        .filter(|m| {
-            m.version() > last_launch_version && m.version() <= strip_prerelease(&current_version)
-        })
+        .filter(|m| m.version() > last_launch_version && m.version() <= current_version)
         .collect()
 }
 
