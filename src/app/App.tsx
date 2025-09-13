@@ -16,9 +16,9 @@ import { AppInfoContext, appInfoInitialState, appInfoReducer, Settings } from '.
 import { DragMonContext, dragMonReducer } from '../state/dragMon'
 import { ErrorContext, errorReducer } from '../state/error'
 import { FilterContext, filterReducer } from '../state/filter'
-import { LookupContext, lookupReducer } from '../state/lookup'
 import { MouseContext, mouseReducer } from '../state/mouse'
 import { OpenSavesContext, openSavesReducer } from '../state/openSaves'
+import { PersistedPkmDataContext, persistedPkmDataReducer } from '../state/persistedPkmData'
 import { HomeData } from '../types/SAVTypes/HomeData'
 import './App.css'
 import AppTabs from './AppTabs'
@@ -77,10 +77,10 @@ function AppWithBackend() {
   const [mouseState, mouseDispatch] = useReducer(mouseReducer, { shift: false })
   const [dragMonState, dragMonDispatch] = useReducer(dragMonReducer, {})
   const [appInfoState, appInfoDispatch] = useReducer(appInfoReducer, appInfoInitialState)
-  const [lookupState, lookupDispatch] = useReducer(lookupReducer, { loaded: false })
+  const [lookupState, lookupDispatch] = useReducer(persistedPkmDataReducer, { loaded: false })
   const [filterState, filterDispatch] = useReducer(filterReducer, {})
   const [pluginState, pluginDispatch] = useReducer(pluginReducer, { plugins: [], loaded: false })
-  const [loading, setLoading] = useState(false)
+  const [settingsLoading, setSettingsLoading] = useState(false)
 
   const backend = useContext(BackendContext)
   const displayError = useDisplayError()
@@ -93,16 +93,19 @@ function AppWithBackend() {
 
   // only on app start
   useEffect(() => {
+    if (appInfoState.error) {
+      return
+    }
     backend
       .getSettings()
       .then(
         E.match(
-          async (err) => console.error(err),
+          async (err) => displayError('Error loading settings', err),
           async (settings) => appInfoDispatch({ type: 'load_settings', payload: settings })
         )
       )
-      .finally(() => setLoading(false))
-  }, [backend])
+      .finally(() => setSettingsLoading(false))
+  }, [appInfoState.error, backend, displayError])
 
   // only on app start
   useEffect(() => {
@@ -166,7 +169,7 @@ function AppWithBackend() {
     <PluginContext.Provider value={[pluginState, pluginDispatch]}>
       <AppInfoContext.Provider value={[appInfoState, appInfoDispatch, getEnabledSaveTypes]}>
         <MouseContext.Provider value={[mouseState, mouseDispatch]}>
-          <LookupContext.Provider value={[lookupState, lookupDispatch]}>
+          <PersistedPkmDataContext.Provider value={[lookupState, lookupDispatch]}>
             <OpenSavesContext.Provider
               value={[
                 openSavesState,
@@ -181,7 +184,7 @@ function AppWithBackend() {
               <DragMonContext.Provider value={[dragMonState, dragMonDispatch]}>
                 <PokemonDragContextProvider>
                   <FilterContext.Provider value={[filterState, filterDispatch]}>
-                    {loading ? (
+                    {settingsLoading ? (
                       <Flex width="100%" height="100vh" align="center" justify="center">
                         <Text size="9" weight="bold">
                           OpenHome
@@ -195,7 +198,7 @@ function AppWithBackend() {
                 </PokemonDragContextProvider>
               </DragMonContext.Provider>
             </OpenSavesContext.Provider>
-          </LookupContext.Provider>
+          </PersistedPkmDataContext.Provider>
         </MouseContext.Provider>
       </AppInfoContext.Provider>
     </PluginContext.Provider>

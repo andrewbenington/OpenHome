@@ -1,6 +1,6 @@
 import { closestCenter } from '@dnd-kit/collision'
 import { useDroppable } from '@dnd-kit/react'
-import { ReactNode, useEffect } from 'react'
+import { CSSProperties, ReactNode, useEffect, useRef } from 'react'
 import { MonLocation } from '../../state/openSaves'
 
 const getBackgroundDetails = (disabled?: boolean) => {
@@ -23,6 +23,7 @@ export interface DroppableSpaceProps {
   onOver?: () => void
   onNotOver?: () => void
   children?: ReactNode
+  style?: CSSProperties
 }
 
 const DroppableSpace = ({
@@ -33,6 +34,7 @@ const DroppableSpace = ({
   onOver,
   onNotOver,
   children,
+  style,
 }: DroppableSpaceProps) => {
   const { isDropTarget, ref } = useDroppable({
     id: dropID ?? '',
@@ -40,20 +42,28 @@ const DroppableSpace = ({
     disabled: !dropID,
     collisionDetector: closestCenter,
   })
+  const onOverRef = useRef(onOver)
+  const onNotOverRef = useRef(onNotOver)
+
+  useEffect(() => {
+    onOverRef.current = onOver
+  }, [onOver])
+
+  useEffect(() => {
+    onNotOverRef.current = onNotOver
+  }, [onNotOver])
 
   useEffect(() => {
     if (isDropTarget) {
-      onOver && onOver()
+      onOverRef.current?.()
+    } else {
+      onNotOverRef.current?.()
     }
-  }, [isDropTarget, onOver])
-
-  if (onNotOver && !isDropTarget) {
-    onNotOver()
-  }
+  }, [isDropTarget])
 
   return (
     <div
-      className={`pokemon-slot ${className || ''}`}
+      className={className}
       style={{
         ...getBackgroundDetails(disabled),
         outlineStyle: 'solid',
@@ -65,6 +75,7 @@ const DroppableSpace = ({
         justifyContent: 'center',
         width: '100%',
         height: '100%',
+        ...style,
       }}
       ref={ref}
     >

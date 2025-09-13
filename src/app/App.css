@@ -117,8 +117,11 @@ select {
   font-size: small;
   font-weight: 500;
   font-family: inherit;
-  cursor: pointer;
   transition: border-color 0.25s;
+}
+
+button:not(:disabled) {
+  cursor: pointer;
 }
 
 button {
@@ -138,19 +141,6 @@ fieldset {
   font-weight: 500;
   font-family: inherit;
   transition: border-color 0.25s;
-  background-color: white;
-  color: #333;
-}
-input:hover,
-fieldset:hover {
-  border-color: white;
-}
-input:focus,
-input:focus-visible,
-fieldset:focus,
-fieldset:focus-visible {
-  border-color: white;
-  outline: none;
 }
 
 label {
@@ -258,4 +248,17 @@ label {
 
 .diagonal-clip {
   clip-path: polygon(0% 0%, 0% 100%, calc(100% - 12px) 100%, calc(100% - 0px) 0%, 100% 0%);
+}
+
+.mini-button {
+  padding: 0px;
+  aspect-ratio: 1;
+  height: 20px;
+  width: 20px;
+  transition: none;
+
+  svg {
+    height: 18px;
+    width: 18px;
+  }
 }

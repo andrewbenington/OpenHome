@@ -1,6 +1,5 @@
 import { readFileSync } from 'fs'
 import { resolve } from 'path'
-import { get16BitChecksumLittleEndian } from '../../../util/byteLogic'
 import { PathData } from '../path'
 import { SMSAV } from '../SMSAV'
 import { USUMSAV } from '../USUMSAV'
@@ -60,15 +59,5 @@ describe('moon save file', () => {
 
   test('first mon is as expected', () => {
     expect(moonSav.boxes[0].pokemon[0]?.nickname === 'Bulbasaur')
-  })
-
-  test('checksum test', () => {
-    console.log(
-      get16BitChecksumLittleEndian(
-        new Uint8Array([0xff, 0xdd, 0xcc, 0xaa, 0x34, 0x43]).buffer,
-        0,
-        6
-      )
-    )
   })
 })

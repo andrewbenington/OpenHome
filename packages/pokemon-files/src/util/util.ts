@@ -69,10 +69,8 @@ export const getUnownLetterGen3 = (personalityValue: number) => {
   return letterValue % 28
 }
 
-export const generatePersonalityValuePreservingAttributes = (mon: AllPKMFields, prng?: Prando) => {
-  if (!prng) {
-    prng = new Prando(mon.personalityValue ?? mon.ivs?.atk)
-  }
+export const generatePersonalityValuePreservingAttributes = (mon: AllPKMFields) => {
+  const prng = new Prando(mon.personalityValue ?? mon.ivs?.atk)
 
   let personalityValue = 0
   let otherNature: Nature | undefined
@@ -101,12 +99,12 @@ export const generatePersonalityValuePreservingAttributes = (mon: AllPKMFields, 
     const newGender = getGen3To5Gender(Number(newPersonalityValue), mon.dexNum)
     const newNature = Number(newPersonalityValue % BigInt(25))
 
+    const newAbilityNum = Number(newPersonalityValue & BigInt(1)) + 1
+
     if (
       (!shouldCheckUnown || getUnownLetterGen3(Number(newPersonalityValue)) === mon.formeNum) &&
       newGender === otherGender &&
-      (otherAbilityNum === 4 ||
-        shouldCheckUnown ||
-        Number(newPersonalityValue & BigInt(1)) + 1 === otherAbilityNum) &&
+      (otherAbilityNum === 4 || shouldCheckUnown || newAbilityNum === otherAbilityNum) &&
       (otherNature === undefined || newNature === otherNature) &&
       getIsShinyPreGen6(mon.trainerID, mon.secretID ?? 0, Number(newPersonalityValue)) ===
         mon.isShiny()

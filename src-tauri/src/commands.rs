@@ -1,3 +1,4 @@
+use crate::error::{OpenHomeError, OpenHomeResult};
 use crate::plugin::{self, PluginMetadata, PluginMetadataWithIcon, list_plugins};
 use crate::state::{AppState, AppStateInner, AppStateSnapshot};
 use crate::util::ImageResponse;
@@ -7,65 +8,45 @@ use serde_json::Value;
 use std::any::Any;
 use std::collections::HashMap;
 use std::fs;
-use std::fs::File;
-use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
 use std::time::SystemTime;
 use tauri::Manager;
 
 #[tauri::command]
-pub fn get_state(state: tauri::State<'_, AppStateInner>) -> AppStateSnapshot {
-    let temp_files = state.temp_files.clone();
-    let open_transaction = state.open_transaction;
-    AppStateSnapshot {
-        temp_files,
-        open_transaction,
-        is_dev: cfg!(debug_assertions),
-    }
+pub fn get_state(state: tauri::State<'_, AppState>) -> OpenHomeResult<AppStateSnapshot> {
+    Ok(state.lock()?.snapshot())
 }
 
 #[tauri::command]
-pub fn get_file_bytes(absolute_path: PathBuf) -> Result<Vec<u8>, String> {
-    // let full_path = prepend_appdata_to_path(&app_handle, path)?;
-
-    // println!("file: {:?}", absolute_path.clone());
-    // Open the file, and return any error up the call stack
-    let mut file = File::open(absolute_path).map_err(|e| e.to_string())?;
-
-    let mut contents = Vec::new();
-
-    file.read_to_end(&mut contents).map_err(|e| e.to_string())?;
-
-    // let save_file = SaveData::build_from_bytes(contents.clone());
-    // match save_file {
-    //     Ok(file) => println!("successfully build: {:?}", file.to_string()),
-    //     Err(e) => println!("error loading save: {e}"),
-    // }
-
-    Ok(contents)
+pub fn get_file_bytes(absolute_path: PathBuf) -> OpenHomeResult<Vec<u8>> {
+    util::read_file_bytes(absolute_path)
 }
 
 #[tauri::command]
-pub fn get_file_created(absolute_path: PathBuf) -> Result<u128, String> {
+pub fn get_file_created(absolute_path: PathBuf) -> OpenHomeResult<Option<u128>> {
     // let full_path = prepend_appdata_to_path(&app_handle, path)?;
 
     // Open the file, and return any error up the call stack
-    let file = File::open(absolute_path).map_err(|e| e.to_string())?;
-    let metadata = file.metadata().map_err(|e| e.to_string())?;
-    let created_date = metadata
-        .created()
-        .or(metadata.modified())
-        .map_err(|e| e.to_string())?;
-    let unix_duration = created_date
+    let metadata =
+        fs::metadata(&absolute_path).map_err(|e| OpenHomeError::file_access(&absolute_path, e))?;
+
+    let Ok(created_or_modified_date) = metadata.created().or(metadata.modified()) else {
+        return Ok(None);
+    };
+
+    Ok(created_or_modified_date
         .duration_since(SystemTime::UNIX_EPOCH)
-        .map_err(|e| e.to_string())?;
-    Ok(unix_duration.as_millis())
+        .map(|dur| dur.as_millis())
+        .ok())
 }
 
+type FilenameToBytesMap = HashMap<String, Vec<u8>>;
+
 #[tauri::command]
-pub fn get_ohpkm_files(app_handle: tauri::AppHandle) -> Result<HashMap<String, Vec<u8>>, String> {
-    let mons_path = util::prepend_appdata_storage_to_path(&app_handle, &PathBuf::from("mons"))?;
-    let mon_files = fs::read_dir(mons_path).map_err(|e| e.to_string())?;
+pub fn get_ohpkm_files(app_handle: tauri::AppHandle) -> OpenHomeResult<FilenameToBytesMap> {
+    let mons_path = util::prepend_appdata_storage_to_path(&app_handle, "mons")?;
+    let mon_files =
+        fs::read_dir(&mons_path).map_err(|e| OpenHomeError::file_access(&mons_path, e))?;
 
     let mut map = HashMap::new();
     for mon_file_os_str in mon_files.flatten() {
@@ -77,9 +58,8 @@ pub fn get_ohpkm_files(app_handle: tauri::AppHandle) -> Result<HashMap<String, V
             continue;
         }
 
-        let mon_bytes_r = get_file_bytes(path);
-        let mon_filename = mon_file_os_str.file_name().to_string_lossy().into_owned();
-        if let Ok(mon_bytes) = mon_bytes_r {
+        if let Ok(mon_bytes) = get_file_bytes(path) {
+            let mon_filename = mon_file_os_str.file_name().to_string_lossy().into_owned();
             map.insert(mon_filename, mon_bytes);
         }
     }
@@ -91,14 +71,16 @@ pub fn get_ohpkm_files(app_handle: tauri::AppHandle) -> Result<HashMap<String, V
 pub fn delete_storage_files(
     app_handle: tauri::AppHandle,
     relative_paths: Vec<PathBuf>,
-) -> HashMap<PathBuf, Result<(), String>> {
+) -> HashMap<PathBuf, OpenHomeResult<()>> {
     let mut result = HashMap::new();
     for relative_path in relative_paths {
         let full_path_r = util::prepend_appdata_storage_to_path(&app_handle, &relative_path);
 
         result.insert(
-            relative_path,
-            full_path_r.and_then(|fp| fs::remove_file(fp).map_err(|e| e.to_string())),
+            relative_path.clone(),
+            full_path_r.and_then(|fp| {
+                fs::remove_file(fp).map_err(|e| OpenHomeError::file_access(&relative_path, e))
+            }),
         );
     }
 
@@ -106,32 +88,18 @@ pub fn delete_storage_files(
 }
 
 #[tauri::command]
-pub fn start_transaction(state: tauri::State<'_, AppState>) -> Result<(), String> {
-    let Ok(mut state) = state.0.lock() else {
-        return Err("App state mutex is poisoned".to_string());
-    };
-
-    state.start_transaction().map_err(|e| e.to_string())
+pub fn start_transaction(state: tauri::State<'_, AppState>) -> OpenHomeResult<()> {
+    state.lock()?.start_transaction()
 }
 
 #[tauri::command]
-pub fn rollback_transaction(state: tauri::State<'_, AppState>) -> Result<(), String> {
-    println!("Rolling back transaction");
-    let Ok(mut state) = state.0.lock() else {
-        return Err("App state mutex is poisoned".to_string());
-    };
-
-    state.rollback_transaction().map_err(|e| e.to_string())
+pub fn rollback_transaction(state: tauri::State<'_, AppState>) -> OpenHomeResult<()> {
+    state.lock()?.rollback_transaction()
 }
 
 #[tauri::command]
-pub fn commit_transaction(state: tauri::State<'_, AppState>) -> Result<(), String> {
-    println!("Committing transaction");
-    let Ok(mut state) = state.0.lock() else {
-        return Err("App state mutex is poisoned".to_string());
-    };
-
-    state.commit_transaction().map_err(|e| e.to_string())
+pub fn commit_transaction(state: tauri::State<'_, AppState>) -> OpenHomeResult<()> {
+    state.lock()?.commit_transaction()
 }
 
 #[tauri::command]
@@ -139,12 +107,8 @@ pub fn write_file_bytes(
     state: tauri::State<'_, AppState>,
     absolute_path: &Path,
     bytes: Vec<u8>,
-) -> Result<(), String> {
-    let Ok(mut state) = state.0.lock() else {
-        return Err("App state mutex is poisoned".to_string());
-    };
-
-    state.write_file_bytes(absolute_path, bytes)
+) -> OpenHomeResult<()> {
+    state.lock()?.write_file_bytes_temped(absolute_path, bytes)
 }
 
 #[tauri::command]
@@ -152,19 +116,9 @@ pub fn write_storage_file_bytes(
     app_handle: tauri::AppHandle,
     relative_path: PathBuf,
     bytes: Vec<u8>,
-) -> Result<(), String> {
+) -> OpenHomeResult<()> {
     let full_path = util::prepend_appdata_storage_to_path(&app_handle, &relative_path)?;
-
-    let mut file = File::create(full_path).map_err(|e| {
-        format!(
-            "create/open file {}: {}",
-            relative_path.to_string_lossy(),
-            e
-        )
-    })?;
-
-    file.write_all(&bytes)
-        .map_err(|e| format!("write file {}: {}", relative_path.to_string_lossy(), e))
+    util::write_file_contents(full_path, bytes)
 }
 
 #[tauri::command]
@@ -172,7 +126,7 @@ pub fn write_storage_file_json(
     app_handle: tauri::AppHandle,
     relative_path: PathBuf,
     data: Value,
-) -> Result<(), String> {
+) -> OpenHomeResult<()> {
     write_storage_file_text(app_handle, relative_path, data.to_string())
 }
 
@@ -181,19 +135,16 @@ pub fn write_storage_file_text(
     app_handle: tauri::AppHandle,
     relative_path: PathBuf,
     text: String,
-) -> Result<(), String> {
+) -> OpenHomeResult<()> {
     let full_path = util::prepend_appdata_storage_to_path(&app_handle, &relative_path)?;
-
-    fs::write(full_path, text.as_bytes())
-        .map(|_| ())
-        .map_err(|e| e.to_string())
+    util::write_file_contents(full_path, text)
 }
 
 #[tauri::command]
 pub fn get_storage_file_json(
     app_handle: tauri::AppHandle,
     relative_path: PathBuf,
-) -> Result<Value, String> {
+) -> OpenHomeResult<Value> {
     util::get_storage_file_json(&app_handle, &relative_path)
 }
 
@@ -281,12 +232,12 @@ pub fn validate_recent_saves(
 }
 
 #[tauri::command]
-pub fn get_image_data(absolute_path: String) -> Result<ImageResponse, String> {
+pub fn get_image_data(absolute_path: String) -> OpenHomeResult<ImageResponse> {
     util::get_image_data(&PathBuf::from(absolute_path))
 }
 
 #[tauri::command]
-pub fn open_directory(absolute_path: String) -> Result<(), String> {
+pub fn open_directory(absolute_path: String) -> OpenHomeResult<()> {
     util::open_directory(&absolute_path)
 }
 
@@ -294,12 +245,10 @@ pub fn open_directory(absolute_path: String) -> Result<(), String> {
 pub async fn download_plugin(
     app_handle: tauri::AppHandle,
     remote_url: String,
-) -> Result<String, String> {
+) -> OpenHomeResult<String> {
     let metadata_url = format!("{}/plugin.json", remote_url);
 
-    let plugin_metadata: PluginMetadata = util::download_json_file(metadata_url)
-        .await
-        .map_err(|e| e.to_string())?;
+    let plugin_metadata: PluginMetadata = util::download_json_file(&metadata_url).await?;
 
     plugin::download_async(app_handle, remote_url, plugin_metadata).await
 }
@@ -307,12 +256,12 @@ pub async fn download_plugin(
 #[tauri::command]
 pub fn list_installed_plugins(
     app_handle: tauri::AppHandle,
-) -> Result<Vec<PluginMetadataWithIcon>, String> {
-    list_plugins(&app_handle).map_err(|e| format!("Error listing plugins: {}", e))
+) -> OpenHomeResult<Vec<PluginMetadataWithIcon>> {
+    list_plugins(&app_handle)
 }
 
 #[tauri::command]
-pub fn load_plugin_code(app_handle: tauri::AppHandle, plugin_id: String) -> Result<String, String> {
+pub fn load_plugin_code(app_handle: tauri::AppHandle, plugin_id: String) -> OpenHomeResult<String> {
     let relative_path = &PathBuf::from("plugins")
         .join(plugin_id)
         .join("dist")
@@ -322,9 +271,8 @@ pub fn load_plugin_code(app_handle: tauri::AppHandle, plugin_id: String) -> Resu
 }
 
 #[tauri::command]
-pub fn delete_plugin(app_handle: tauri::AppHandle, plugin_id: String) -> Result<(), String> {
-    let plugins_dir = util::prepend_appdata_to_path(&app_handle, &PathBuf::from("plugins"))
-        .map_err(|err| format!("Error finding the plugins directory: {}", err))?;
+pub fn delete_plugin(app_handle: tauri::AppHandle, plugin_id: String) -> OpenHomeResult<()> {
+    let plugins_dir = util::prepend_appdata_to_path(&app_handle, "plugins")?;
     let plugin_dir = plugins_dir.join(&plugin_id);
 
     util::delete_directory(&plugin_dir)
