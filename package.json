@@ -24,8 +24,8 @@
   "main": "./out/main/index.js",
   "scripts": {
     "format": "prettier --write .",
-    "lint": "eslint src --report-unused-disable-directives -c eslint.config.mjs --fix",
-    "lint:ci": "eslint src --report-unused-disable-directives -c eslint.config.mjs",
+    "lint": "eslint src --max-warnings 0 --report-unused-disable-directives -c eslint.config.mjs --fix",
+    "lint:ci": "eslint src --max-warnings 0 --report-unused-disable-directives -c eslint.config.mjs",
     "typecheck": "tsc",
     "dev:unix": "./buildVersionJSON.sh && tauri dev",
     "dev:win": "powershell -ExecutionPolicy Bypass -File ./buildVersionJSON.ps1 && tauri dev",
