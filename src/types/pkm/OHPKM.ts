@@ -1574,6 +1574,12 @@ export class OHPKM implements PKMInterface {
       errorsFound = true
     }
 
+    // Fix ability bug from pre-1.5.0 (affected Mind's Eye and Dragon's Maw)
+    if (this.abilityIndex === 0) {
+      this.ability = getAbilityFromNumber(this.dexNum, this.formeNum, this.abilityNum)
+      this.abilityIndex = AbilityFromString(this.ability)
+    }
+
     const genderRatio = PokemonData[this.dexNum].formes[this.formeNum].genderRatio
 
     if (this.gender === 2 && (genderRatio.male !== 0 || genderRatio.female !== 0)) {
