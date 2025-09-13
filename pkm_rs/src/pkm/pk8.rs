@@ -1,5 +1,5 @@
 use crate::pkm::traits::ModernEvs;
-use crate::pkm::{Pkm, PkmError, PkmResult};
+use crate::pkm::{Pkm, Error, Result};
 use crate::resources::{FormeMetadata, MoveSlot, SpeciesAndForme, SpeciesMetadata};
 use crate::strings::SizedUtf16String;
 use crate::substructures::{
@@ -93,10 +93,10 @@ impl Pkm for Pk8 {
         Self::PARTY_SIZE
     }
 
-    fn from_bytes(bytes: &[u8]) -> PkmResult<Self> {
+    fn from_bytes(bytes: &[u8]) -> Result<Self> {
         let size = bytes.len();
         if size < Self::BOX_SIZE {
-            return Err(PkmError::ByteLength {
+            return Err(Error::ByteLength {
                 expected: Self::BOX_SIZE,
                 received: size,
             });
@@ -177,7 +177,7 @@ impl Pkm for Pk8 {
             met_location_index: u16::from_le_bytes(bytes[290..292].try_into().unwrap()),
             ball: bytes[292],
             met_level: util::int_from_buffer_bits_le::<u8>(bytes, 293, 0, 7).map_err(|e| {
-                PkmError::FieldError {
+                Error::FieldError {
                     field: "met_level",
                     source: e,
                 }

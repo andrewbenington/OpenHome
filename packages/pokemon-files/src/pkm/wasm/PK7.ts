@@ -36,7 +36,7 @@ export class Pk7Rust {
   inner: PkmWasm.Pk7
   finalizationRegistry: FinalizationRegistry<string>
 
-  constructor(arg: ArrayBuffer | AllPKMFields, encrypted?: boolean) {
+  constructor(arg: ArrayBuffer | AllPKMFields | PkmWasm.Pk7, encrypted?: boolean) {
     if (arg instanceof ArrayBuffer) {
       let buffer = arg
       if (encrypted) {
@@ -46,6 +46,14 @@ export class Pk7Rust {
       }
 
       this.inner = PkmWasm.Pk7.fromBytes(new Uint8Array(buffer))
+      console.log('registering ' + this.inner.nickname)
+      this.finalizationRegistry = new FinalizationRegistry((message) => {
+        console.log('registry message: ' + message)
+        this.inner.free()
+      })
+      this.finalizationRegistry.register(this, this.nickname)
+    } else if (arg instanceof PkmWasm.Pk7) {
+      this.inner = arg
       console.log('registering ' + this.inner.nickname)
       this.finalizationRegistry = new FinalizationRegistry((message) => {
         console.log('registry message: ' + message)

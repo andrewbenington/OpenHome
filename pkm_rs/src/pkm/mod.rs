@@ -5,10 +5,11 @@ mod pk5;
 mod pk6;
 mod pk7;
 mod pk8;
-pub mod traits;
+mod result;
 mod universal;
 
-use std::{error::Error, fmt::Display};
+pub mod buffers;
+pub mod traits;
 
 use serde::Serialize;
 
@@ -19,11 +20,12 @@ pub use pk5::Pk5;
 pub use pk6::Pk6;
 pub use pk7::Pk7;
 pub use pk8::Pk8;
+pub use result::*;
 pub use universal::UniversalPkm;
 
 use crate::{
     pkm::traits::IsShiny,
-    resources::{FormeMetadata, NATURE_MAX, NatDexIndex, SpeciesMetadata},
+    resources::{FormeMetadata, SpeciesMetadata},
 };
 
 pub trait Pkm: Sized + Serialize + IsShiny {
@@ -33,7 +35,7 @@ pub trait Pkm: Sized + Serialize + IsShiny {
     fn box_size() -> usize;
     fn party_size() -> usize;
 
-    fn from_bytes(bytes: &[u8]) -> PkmResult<Self>;
+    fn from_bytes(bytes: &[u8]) -> Result<Self>;
     fn write_box_bytes(&self, bytes: &mut [u8]);
     fn write_party_bytes(&self, bytes: &mut [u8]);
     fn to_box_bytes(&self) -> Vec<u8>;
@@ -44,88 +46,3 @@ pub trait Pkm: Sized + Serialize + IsShiny {
 
     fn calculate_level(&self) -> u8;
 }
-
-#[derive(Debug)]
-pub enum PkmError {
-    ByteLength {
-        expected: usize,
-        received: usize,
-    },
-    CryptRange {
-        range: (usize, usize),
-        buffer_size: usize,
-    },
-    NationalDex {
-        national_dex: u16,
-    },
-    FormeIndex {
-        national_dex: NatDexIndex,
-        forme_index: u16,
-    },
-    NatureIndex {
-        nature_index: u8,
-    },
-    AbilityIndex {
-        ability_index: u16,
-    },
-    FieldError {
-        field: &'static str,
-        source: Box<dyn Error>,
-    },
-}
-
-impl Display for PkmError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let message = match self {
-            PkmError::ByteLength { expected, received } => {
-                format!("Invalid byte length (expected {expected}, received {received}")
-                    .to_owned()
-            }
-            PkmError::CryptRange { range, buffer_size } => {
-                format!("Attempting to decrypt/encrypt range ({}, {}) over buffer of size {buffer_size}", range.0, range.1)
-                    .to_owned()
-            }
-            PkmError::NationalDex { national_dex } => {
-                format!("Invalid National Dex number {national_dex} (must be between 1 and {NATIONAL_DEX_MAX}")
-                    .to_owned()
-            }
-            PkmError::FormeIndex {
-                national_dex,
-                forme_index,
-            } => {
-                let species_metadata = national_dex.get_species_metadata();
-                format!(
-                    "Invalid forme index {forme_index} for Pokémon {} (must be <= {})",
-                    species_metadata.name,
-                    species_metadata.formes.len()
-                )
-                .to_owned()
-            }
-            PkmError::NatureIndex { nature_index } => {
-                format!("Invalid nature index {nature_index} (must be between 1 and {NATURE_MAX}")
-                    .to_owned()
-            }
-            PkmError::AbilityIndex { ability_index } => {
-                format!("Invalid ability index {ability_index} (must be between 1 and {ABILITY_MAX}")
-                    .to_owned()
-            }
-            PkmError::FieldError { field, source } => {
-                format!("Error reading field {field}: {source}")
-                    .to_owned()
-            }
-        };
-
-        f.write_str(&message)
-    }
-}
-
-impl Error for PkmError {
-    fn source(&self) -> Option<&(dyn Error + 'static)> {
-        match self {
-            Self::FieldError { field: _, source } => Some(source.as_ref()),
-            _ => None,
-        }
-    }
-}
-
-pub type PkmResult<T> = Result<T, PkmError>;

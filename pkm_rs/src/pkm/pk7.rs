@@ -1,5 +1,5 @@
 use crate::pkm::traits::{IsShiny4096, ModernEvs};
-use crate::pkm::{Ohpkm, Pkm, PkmError, PkmResult, helpers};
+use crate::pkm::{Error, Ohpkm, Pkm, Result, helpers};
 use crate::resources::{
     AbilityIndex, Ball, FormeMetadata, GameOfOriginIndex, ModernRibbon, ModernRibbonSet, MoveSlot,
     NatureIndex, OpenHomeRibbonSet, SpeciesAndForme, SpeciesMetadata,
@@ -107,10 +107,10 @@ impl Pkm for Pk7 {
         Self::PARTY_SIZE
     }
 
-    fn from_bytes(bytes: &[u8]) -> PkmResult<Self> {
+    fn from_bytes(bytes: &[u8]) -> Result<Self> {
         let size = bytes.len();
         if size < Self::BOX_SIZE {
-            return Err(PkmError::ByteLength {
+            return Err(Error::ByteLength {
                 expected: Self::BOX_SIZE,
                 received: size,
             });
@@ -397,13 +397,13 @@ impl Pk7 {
 #[allow(clippy::missing_const_for_fn)]
 impl Pk7 {
     #[wasm_bindgen(js_name = fromOhpkmBytes)]
-    pub fn from_ohpkm_bytes(bytes: Vec<u8>) -> Result<Pk7, JsValue> {
+    pub fn from_ohpkm_bytes(bytes: Vec<u8>) -> core::result::Result<Pk7, JsValue> {
         let ohpkm = Ohpkm::from_bytes(&bytes).map_err(|e| JsValue::from_str(&e.to_string()))?;
         Ok(Pk7::from(ohpkm))
     }
 
     #[wasm_bindgen(js_name = fromBytes)]
-    pub fn from_byte_vector(bytes: Vec<u8>) -> Result<Pk7, JsValue> {
+    pub fn from_byte_vector(bytes: Vec<u8>) -> core::result::Result<Pk7, JsValue> {
         Pk7::from_bytes(&bytes).map_err(|e| JsValue::from_str(&e.to_string()))
     }
 
@@ -522,7 +522,7 @@ impl Pk7 {
         &mut self,
         national_dex: u16,
         forme_index: u16,
-    ) -> Result<(), JsValue> {
+    ) -> core::result::Result<(), JsValue> {
         match SpeciesAndForme::new(national_dex, forme_index) {
             Ok(species_and_forme) => {
                 self.species_and_forme = species_and_forme;

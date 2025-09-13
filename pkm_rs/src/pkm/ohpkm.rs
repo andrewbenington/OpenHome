@@ -1,5 +1,5 @@
 use crate::pkm::traits::IsShiny4096;
-use crate::pkm::{Pkm, PkmError, PkmResult};
+use crate::pkm::{Pkm, Error, Result};
 use crate::resources::{
     AbilityIndex, Ball, FormeMetadata, GameOfOriginIndex, ModernRibbon, MoveSlot, NatureIndex,
     OpenHomeRibbonSet, SpeciesAndForme, SpeciesMetadata,
@@ -131,10 +131,10 @@ impl Pkm for Ohpkm {
         Self::PARTY_SIZE
     }
 
-    fn from_bytes(bytes: &[u8]) -> PkmResult<Self> {
+    fn from_bytes(bytes: &[u8]) -> Result<Self> {
         let size = bytes.len();
         if size < MIN_SIZE {
-            return Err(PkmError::ByteLength {
+            return Err(Error::ByteLength {
                 expected: MIN_SIZE,
                 received: size,
             });
@@ -175,7 +175,7 @@ impl Pkm for Ohpkm {
             contest_memory_count: bytes[52],
             battle_memory_count: bytes[53],
             ribbons: OpenHomeRibbonSet::from_bytes(bytes[54..76].try_into().unwrap()).map_err(
-                |e| PkmError::FieldError {
+                |e| Error::FieldError {
                     field: "ribbons",
                     source: e,
                 },

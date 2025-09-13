@@ -2,7 +2,7 @@ use std::{num::Wrapping, ops::Range};
 
 use sha2::{Digest, Sha256};
 
-use crate::pkm::{PkmError, PkmResult};
+use crate::pkm::{Error, Result};
 
 const ENCRYPTION_OFFSET: usize = 8;
 const STARTING_SEED: u32 = 0x41c64e6d;
@@ -92,7 +92,7 @@ pub fn unshuffle_blocks(
     offset: usize,
     shift_value: usize,
     block_size: usize,
-) -> PkmResult<Vec<u8>> {
+) -> Result<Vec<u8>> {
     rearrange_blocks(
         bytes,
         offset,
@@ -107,7 +107,7 @@ pub fn shuffle_blocks(
     offset: usize,
     shift_value: usize,
     block_size: usize,
-) -> PkmResult<Vec<u8>> {
+) -> Result<Vec<u8>> {
     rearrange_blocks(bytes, offset, shift_value, block_size, SHUFFLE_BLOCK_ORDERS)
 }
 
@@ -117,11 +117,11 @@ fn rearrange_blocks(
     shift_value: usize,
     block_size: usize,
     orders: [[usize; 4]; 24],
-) -> PkmResult<Vec<u8>> {
+) -> Result<Vec<u8>> {
     let min_size = offset + block_size * 4;
     let length = bytes.len();
     if length < min_size {
-        return Err(PkmError::ByteLength {
+        return Err(Error::ByteLength {
             expected: min_size,
             received: length,
         });
@@ -159,10 +159,10 @@ fn rearrange_blocks(
     Ok(unshuffled_bytes)
 }
 
-pub fn shuffle_blocks_gen_6_7(bytes: &[u8]) -> PkmResult<Vec<u8>> {
+pub fn shuffle_blocks_gen_6_7(bytes: &[u8]) -> Result<Vec<u8>> {
     let length = bytes.len();
     if length < GEN_67_MIN_SIZE {
-        return Err(PkmError::ByteLength {
+        return Err(Error::ByteLength {
             expected: GEN_67_MIN_SIZE,
             received: length,
         });
@@ -174,10 +174,10 @@ pub fn shuffle_blocks_gen_6_7(bytes: &[u8]) -> PkmResult<Vec<u8>> {
     shuffle_blocks(bytes, ENCRYPTION_OFFSET, shift_value, GEN_67_BLOCK_SIZE)
 }
 
-pub fn unshuffle_blocks_gen_6_7(bytes: &[u8]) -> PkmResult<Vec<u8>> {
+pub fn unshuffle_blocks_gen_6_7(bytes: &[u8]) -> Result<Vec<u8>> {
     let length = bytes.len();
     if length < GEN_67_MIN_SIZE {
-        return Err(PkmError::ByteLength {
+        return Err(Error::ByteLength {
             expected: GEN_67_MIN_SIZE,
             received: length,
         });
@@ -189,7 +189,7 @@ pub fn unshuffle_blocks_gen_6_7(bytes: &[u8]) -> PkmResult<Vec<u8>> {
     unshuffle_blocks(bytes, ENCRYPTION_OFFSET, shift_value, GEN_67_BLOCK_SIZE)
 }
 
-pub fn decrypt_pkm_blocks(bytes: &[u8], seed: u32, block_size: usize) -> PkmResult<Vec<u8>> {
+pub fn decrypt_pkm_blocks(bytes: &[u8], seed: u32, block_size: usize) -> Result<Vec<u8>> {
     decrypt_pkm_bytes(
         bytes,
         seed,
@@ -198,10 +198,10 @@ pub fn decrypt_pkm_blocks(bytes: &[u8], seed: u32, block_size: usize) -> PkmResu
     )
 }
 
-pub fn decrypt_pkm_bytes(bytes: &[u8], seed: u32, start: usize, end: usize) -> PkmResult<Vec<u8>> {
+pub fn decrypt_pkm_bytes(bytes: &[u8], seed: u32, start: usize, end: usize) -> Result<Vec<u8>> {
     let length = bytes.len();
     if end > length {
-        return Err(PkmError::CryptRange {
+        return Err(Error::CryptRange {
             range: (start, end),
             buffer_size: length,
         });
@@ -221,10 +221,10 @@ pub fn decrypt_pkm_bytes(bytes: &[u8], seed: u32, start: usize, end: usize) -> P
     Ok(decrypted_bytes)
 }
 
-pub fn decrypt_pkm_bytes_gen_6_7(bytes: &[u8]) -> PkmResult<Vec<u8>> {
+pub fn decrypt_pkm_bytes_gen_6_7(bytes: &[u8]) -> Result<Vec<u8>> {
     let length = bytes.len();
     if length < GEN_67_MIN_SIZE {
-        return Err(PkmError::ByteLength {
+        return Err(Error::ByteLength {
             expected: GEN_67_MIN_SIZE,
             received: length,
         });

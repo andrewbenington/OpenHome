@@ -1,7 +1,7 @@
 use rand::{SeedableRng, rngs::StdRng};
 
 use crate::{
-    pkm::PkmResult,
+    pkm::Result,
     resources::{
         AbilityIndex, Ball, FormeMetadata, GameOfOriginIndex, ModernRibbon, MoveSlot, NatDexIndex,
         NatureIndex, OpenHomeRibbon, SpeciesAndForme, TeraType,
@@ -402,11 +402,11 @@ pub trait UniversalPkm {
         }
     }
 
-    fn get_forme_reference(&self) -> PkmResult<SpeciesAndForme> {
+    fn get_forme_reference(&self) -> Result<SpeciesAndForme> {
         SpeciesAndForme::new_valid_ndex(self.get_national_dex(), self.get_forme_num().unwrap_or(0))
     }
 
-    fn get_forme_metadata(&self) -> PkmResult<&FormeMetadata> {
+    fn get_forme_metadata(&self) -> Result<&FormeMetadata> {
         self.get_forme_reference().map(|r| r.get_forme_metadata())
     }
 }

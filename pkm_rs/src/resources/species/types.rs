@@ -5,7 +5,7 @@ use serde::{Serialize, Serializer};
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
-use crate::pkm::{PkmError, PkmResult};
+use crate::pkm::{Error, Result};
 use crate::resources::{ALL_SPECIES, AbilityIndex, MAX_NATIONAL_DEX};
 use crate::resources::{games::Generation, pkm_types::PkmType};
 use crate::substructures::Stats16Le;
@@ -17,15 +17,15 @@ extern crate static_assertions;
 pub struct NatDexIndex(NonZeroU16);
 
 impl NatDexIndex {
-    pub fn new(index: u16) -> PkmResult<NatDexIndex> {
+    pub fn new(index: u16) -> Result<NatDexIndex> {
         if (index as usize) > MAX_NATIONAL_DEX {
-            return Err(PkmError::NationalDex {
+            return Err(Error::NationalDex {
                 national_dex: index,
             });
         }
         NonZeroU16::new(index)
             .map(NatDexIndex)
-            .ok_or(PkmError::NationalDex {
+            .ok_or(Error::NationalDex {
                 national_dex: index,
             })
     }
@@ -46,7 +46,7 @@ impl NatDexIndex {
         &ALL_SPECIES[(self.get() - 1) as usize]
     }
 
-    pub fn from_le_bytes(bytes: [u8; 2]) -> PkmResult<NatDexIndex> {
+    pub fn from_le_bytes(bytes: [u8; 2]) -> Result<NatDexIndex> {
         NatDexIndex::new(u16::from_le_bytes(bytes))
     }
 
@@ -66,13 +66,13 @@ impl NatDexIndex {
 
     #[cfg(feature = "wasm")]
     #[wasm_bindgen(constructor)]
-    pub fn new_js(val: u16) -> Result<NatDexIndex, JsValue> {
+    pub fn new_js(val: u16) -> core::result::Result<NatDexIndex, JsValue> {
         NatDexIndex::new(val).map_err(|e| JsValue::from_str(&e.to_string()))
     }
 }
 
 impl Serialize for NatDexIndex {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    fn serialize<S>(&self, serializer: S) -> core::result::Result<S::Ok, S::Error>
     where
         S: Serializer,
     {
@@ -95,11 +95,11 @@ pub struct SpeciesAndForme {
 }
 
 impl SpeciesAndForme {
-    pub fn new(national_dex: u16, forme_index: u16) -> PkmResult<SpeciesAndForme> {
+    pub fn new(national_dex: u16, forme_index: u16) -> Result<SpeciesAndForme> {
         let valid_ndex = NatDexIndex::new(national_dex)?;
 
         if valid_ndex.get_species_metadata().formes.len() <= forme_index as usize {
-            return Err(PkmError::FormeIndex {
+            return Err(Error::FormeIndex {
                 national_dex: valid_ndex,
                 forme_index,
             });
@@ -114,9 +114,9 @@ impl SpeciesAndForme {
     pub const fn new_valid_ndex(
         national_dex: NatDexIndex,
         forme_index: u16,
-    ) -> PkmResult<SpeciesAndForme> {
+    ) -> Result<SpeciesAndForme> {
         if national_dex.get_species_metadata().formes.len() <= forme_index as usize {
-            return Err(PkmError::FormeIndex {
+            return Err(Error::FormeIndex {
                 national_dex,
                 forme_index,
             });

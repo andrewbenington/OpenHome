@@ -94,8 +94,8 @@ where
 //     }
 // }
 
-pub fn get_flag(bytes: &[u8], byte_offset: u32, bit_index: u32) -> bool {
-    let byte_index = (byte_offset + (bit_index / 8)) as usize;
+pub fn get_flag(bytes: &[u8], byte_offset: usize, bit_index: usize) -> bool {
+    let byte_index = byte_offset + (bit_index / 8);
     if byte_index >= bytes.len() {
         panic!(
             "attempting to read flag out of range (byte {} of {})",

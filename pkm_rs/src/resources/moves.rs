@@ -16,6 +16,10 @@ impl MoveSlot {
         self.0.map(|idx| ALL_MOVES[(idx.get() - 1) as usize])
     }
 
+    pub fn from_u16(value: u16) -> Self {
+        Self(NonZeroU16::try_from(value).ok())
+    }
+
     pub fn from_le_bytes(bytes: [u8; 2]) -> Self {
         Self(NonZeroU16::try_from(u16::from_le_bytes(bytes)).ok())
     }
@@ -26,7 +30,7 @@ impl MoveSlot {
 }
 
 impl Serialize for MoveSlot {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    fn serialize<S>(&self, serializer: S) -> core::result::Result<S::Ok, S::Error>
     where
         S: Serializer,
     {

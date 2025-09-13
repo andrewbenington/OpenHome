@@ -1,5 +1,5 @@
 use crate::pkm::traits::{IsShiny, IsShiny8192};
-use crate::pkm::{Ohpkm, Pkm, PkmError, PkmResult};
+use crate::pkm::{Error, Ohpkm, Pkm, Result};
 use crate::resources::{
     AbilityIndex, Ball, DsRibbonSet, FormeMetadata, GameOfOriginIndex, Gen3RibbonSet,
     Gen4StandardRibbonSet, MoveSlot, NatureIndex, ObsoleteRibbonSet, OpenHomeRibbonSet,
@@ -68,10 +68,10 @@ impl Pkm for Pk5 {
         Self::PARTY_SIZE
     }
 
-    fn from_bytes(bytes: &[u8]) -> PkmResult<Self> {
+    fn from_bytes(bytes: &[u8]) -> Result<Self> {
         let size = bytes.len();
         if size < Pk5::BOX_SIZE {
-            return Err(PkmError::ByteLength {
+            return Err(Error::ByteLength {
                 expected: Pk5::BOX_SIZE,
                 received: size,
             });

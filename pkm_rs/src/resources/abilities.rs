@@ -6,7 +6,7 @@ use wasm_bindgen::prelude::*;
 
 use serde::{Serialize, Serializer};
 
-use crate::pkm::{PkmError, PkmResult};
+use crate::pkm::{Error, Result};
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
@@ -63,7 +63,7 @@ impl Default for AbilityIndex {
 }
 
 impl Serialize for AbilityIndex {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    fn serialize<S>(&self, serializer: S) -> core::result::Result<S::Ok, S::Error>
     where
         S: Serializer,
     {
@@ -72,18 +72,18 @@ impl Serialize for AbilityIndex {
 }
 
 impl TryFrom<u8> for AbilityIndex {
-    type Error = PkmError;
+    type Error = Error;
 
-    fn try_from(value: u8) -> Result<Self, Self::Error> {
+    fn try_from(value: u8) -> core::result::Result<Self, Self::Error> {
         if (value as usize) > ABILITY_MAX {
-            return Err(PkmError::AbilityIndex {
+            return Err(Error::AbilityIndex {
                 ability_index: value as u16,
             });
         }
 
         NonZeroU16::new(value as u16)
             .map(AbilityIndex)
-            .ok_or(PkmError::AbilityIndex {
+            .ok_or(Error::AbilityIndex {
                 ability_index: value as u16,
             })
     }
@@ -96,18 +96,18 @@ impl From<AbilityIndex> for u8 {
 }
 
 impl TryFrom<u16> for AbilityIndex {
-    type Error = PkmError;
+    type Error = Error;
 
-    fn try_from(value: u16) -> PkmResult<Self> {
+    fn try_from(value: u16) -> Result<Self> {
         if (value as usize) > ABILITY_MAX {
-            return Err(PkmError::AbilityIndex {
+            return Err(Error::AbilityIndex {
                 ability_index: value,
             });
         }
 
         NonZeroU16::new(value)
             .map(AbilityIndex)
-            .ok_or(PkmError::AbilityIndex {
+            .ok_or(Error::AbilityIndex {
                 ability_index: value,
             })
     }

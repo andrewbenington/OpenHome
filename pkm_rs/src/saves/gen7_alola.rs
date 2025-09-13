@@ -4,13 +4,15 @@ use crate::encryption::crc16_ccitt_invert;
 use crate::encryption::decrypt_pkm_bytes_gen_6_7;
 use crate::encryption::unshuffle_blocks_gen_6_7;
 use crate::pkm::Pk7;
-use crate::pkm::PkmResult;
 use crate::substructures::Gender;
 use crate::util::get_flag;
 
 use super::SaveDataTrait;
 use crate::pkm::Pkm;
 use crate::strings::SizedUtf16String;
+
+#[cfg(feature = "wasm")]
+use wasm_bindgen::prelude::*;
 
 const SM_TRAINER_DATA_OFFSET: usize = 0x1200;
 const USUM_TRAINER_DATA_OFFSET: usize = 0x1400;
@@ -24,6 +26,7 @@ const BOX_SLOTS: usize = BOX_ROWS * BOX_COLS;
 
 const SM_SIZE_BYTES: usize = 0x6be00;
 
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Serialize, Debug)]
 pub struct SunMoonSave {
     #[serde(skip_serializing)]
@@ -49,13 +52,14 @@ impl SaveDataTrait for SunMoonSave {
         })
     }
 
-    fn get_mon_bytes_at(&self, box_num: usize, offset: usize) -> PkmResult<Vec<u8>> {
-        let decrypted_bytes = decrypt_pkm_bytes_gen_6_7(&self.get_mon_bytes(box_num, offset))?;
-        unshuffle_blocks_gen_6_7(&decrypted_bytes)
+    fn get_mon_bytes_at(&self, box_num: usize, offset: usize) -> Result<Vec<u8>, String> {
+        let decrypted_bytes = decrypt_pkm_bytes_gen_6_7(&self.get_mon_bytes(box_num, offset))
+            .map_err(|err| err.to_string())?;
+        unshuffle_blocks_gen_6_7(&decrypted_bytes).map_err(|err| err.to_string())
     }
 
-    fn get_mon_at(&self, box_num: usize, offset: usize) -> PkmResult<Pk7> {
-        Pk7::from_bytes(&self.get_mon_bytes_at(box_num, offset)?)
+    fn get_mon_at(&self, box_num: usize, offset: usize) -> Result<Pk7, String> {
+        Pk7::from_bytes(&self.get_mon_bytes_at(box_num, offset)?).map_err(|err| err.to_string())
     }
 
     fn box_rows() -> usize {
@@ -87,13 +91,50 @@ impl SunMoonSave {
     }
 }
 
-#[derive(Default, Debug, Serialize)]
+#[cfg(feature = "wasm")]
+#[wasm_bindgen]
+#[allow(clippy::missing_const_for_fn)]
+impl SunMoonSave {
+    #[wasm_bindgen]
+    pub fn get_mon_at(&self, box_num: usize, offset: usize) -> Result<Pk7, String> {
+        Pk7::from_bytes(&self.get_mon_bytes_at(box_num, offset)?).map_err(|err| err.to_string())
+    }
+
+    #[wasm_bindgen(js_name = fromBytes)]
+    pub fn from_byte_vector(bytes: Vec<u8>) -> core::result::Result<Self, JsValue> {
+        Self::from_bytes(bytes).map_err(|e| JsValue::from_str(&e.to_string()))
+    }
+
+    #[wasm_bindgen]
+    pub fn calc_checksum(&self) -> u16 {
+        crc16_ccitt_invert(&self.bytes, SM_BOX_DATA_OFFSET, BOX_DATA_SIZE)
+    }
+
+    #[wasm_bindgen]
+    pub fn is_valid_save(bytes: &[u8]) -> bool {
+        bytes.len() == SM_SIZE_BYTES
+    }
+}
+
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[derive(Default, Debug, Serialize, Clone, Copy)]
 pub struct TrainerData {
     pub trainer_id: u16,
     pub secret_id: u16,
     pub game_code: u8,
     pub trainer_gender: Gender,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub trainer_name: SizedUtf16String<24>,
+}
+
+#[cfg(feature = "wasm")]
+#[wasm_bindgen]
+#[allow(clippy::missing_const_for_fn)]
+impl TrainerData {
+    #[wasm_bindgen]
+    pub fn get_name_js(&self) -> String {
+        self.trainer_name.to_string()
+    }
 }
 
 const USUM_SIZE_BYTES: usize = 0x6cc00;
@@ -123,13 +164,14 @@ impl SaveDataTrait for UltraSunMoonSave {
         })
     }
 
-    fn get_mon_bytes_at(&self, box_num: usize, offset: usize) -> PkmResult<Vec<u8>> {
-        let decrypted_bytes = decrypt_pkm_bytes_gen_6_7(&self.get_mon_bytes(box_num, offset))?;
-        unshuffle_blocks_gen_6_7(&decrypted_bytes)
+    fn get_mon_bytes_at(&self, box_num: usize, offset: usize) -> Result<Vec<u8>, String> {
+        let decrypted_bytes = decrypt_pkm_bytes_gen_6_7(&self.get_mon_bytes(box_num, offset))
+            .map_err(|err| err.to_string())?;
+        unshuffle_blocks_gen_6_7(&decrypted_bytes).map_err(|err| err.to_string())
     }
 
-    fn get_mon_at(&self, box_num: usize, offset: usize) -> PkmResult<Pk7> {
-        Pk7::from_bytes(&self.get_mon_bytes_at(box_num, offset)?)
+    fn get_mon_at(&self, box_num: usize, offset: usize) -> Result<Pk7, String> {
+        Pk7::from_bytes(&self.get_mon_bytes_at(box_num, offset)?).map_err(|err| err.to_string())
     }
 
     fn box_rows() -> usize {

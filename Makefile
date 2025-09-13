@@ -14,7 +14,7 @@ build-mac-intel:
 
 .PHONY: build-wasm
 build-wasm: # Generate WASM from Rust code
-	@cd packages/pokemon-wasm && wasm-pack build --target web
+	@cd packages/pokemon-files && wasm-pack build --target web
 
 .PHONY: start
 start:

@@ -3,7 +3,7 @@ use wasm_bindgen::prelude::*;
 
 use serde::{Serialize, Serializer};
 
-use crate::{pkm::PkmError, resources::Stat};
+use crate::{pkm::Error, resources::Stat};
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Debug, Default, PartialEq, Eq, Clone, Copy)]
@@ -48,11 +48,11 @@ impl Serialize for NatureIndex {
 }
 
 impl TryFrom<u8> for NatureIndex {
-    type Error = PkmError;
+    type Error = Error;
 
     fn try_from(value: u8) -> Result<Self, Self::Error> {
         if value > NATURE_MAX {
-            return Err(PkmError::NatureIndex {
+            return Err(Error::NatureIndex {
                 nature_index: value,
             });
         }

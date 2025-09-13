@@ -1,14 +1,16 @@
-pub mod stats;
+mod checksum;
+mod identifiers;
+mod pkm_base;
+mod stats;
 
+pub use checksum::Checksum;
+pub use identifiers::*;
+pub use pkm_base::*;
 pub use stats::*;
 
 pub trait TrainerWithSecret {
     fn get_trainer_id(&self) -> u16;
     fn get_secret_id(&self) -> u16;
-}
-
-pub trait EncryptionConstant: TrainerWithSecret {
-    fn get_encryption_constant(&self) -> u32;
 }
 
 pub trait IsShiny {

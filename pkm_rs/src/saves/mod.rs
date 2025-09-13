@@ -1,7 +1,7 @@
-use std::{fmt::Display, path::Path};
+use std::path::Path;
 
 use crate::{
-    pkm::{Pkm, PkmResult},
+    pkm::Pkm,
     saves::{gen7_alola::SunMoonSave, lets_go::LetsGoSave},
 };
 
@@ -13,8 +13,8 @@ pub trait SaveDataTrait: Sized + Send + Sync {
     type PkmType: Pkm;
 
     fn from_bytes(bytes: Vec<u8>) -> Result<Self, String>;
-    fn get_mon_at(&self, box_num: usize, offset: usize) -> PkmResult<Self::PkmType>;
-    fn get_mon_bytes_at(&self, box_num: usize, offset: usize) -> PkmResult<Vec<u8>>;
+    fn get_mon_at(&self, box_num: usize, offset: usize) -> Result<Self::PkmType, String>;
+    fn get_mon_bytes_at(&self, box_num: usize, offset: usize) -> Result<Vec<u8>, String>;
 
     fn box_rows() -> usize;
     fn box_cols() -> usize;

@@ -2,7 +2,6 @@ use serde::Serialize;
 
 use crate::encryption::decrypt_pkm_bytes_gen_6_7;
 use crate::encryption::unshuffle_blocks_gen_6_7;
-use crate::pkm::PkmResult;
 use crate::substructures::Gender;
 use crate::util::get_flag;
 
@@ -54,13 +53,19 @@ impl SaveDataTrait for LetsGoSave {
         BOX_SLOTS
     }
 
-    fn get_mon_bytes_at(&self, _: usize, offset: usize) -> PkmResult<Vec<u8>> {
-        let decrypted_bytes = decrypt_pkm_bytes_gen_6_7(&self.get_mon_bytes(offset))?;
-        unshuffle_blocks_gen_6_7(&decrypted_bytes)
+    fn get_mon_bytes_at(&self, _: usize, offset: usize) -> Result<Vec<u8>, String> {
+        let decrypted_bytes = decrypt_pkm_bytes_gen_6_7(&self.get_mon_bytes(offset))
+            .map_err(|err| err.to_string())?;
+        unshuffle_blocks_gen_6_7(&decrypted_bytes).map_err(|err| err.to_string())
     }
 
-    fn get_mon_at(&self, box_num: usize, offset: usize) -> PkmResult<Pb7> {
-        Pb7::from_bytes(&self.get_mon_bytes_at(box_num, offset)?)
+    fn get_mon_at(&self, box_num: usize, offset: usize) -> Result<Pb7, String> {
+        Pb7::from_bytes(
+            &self
+                .get_mon_bytes_at(box_num, offset)
+                .map_err(|err| err.to_string())?,
+        )
+        .map_err(|err| err.to_string())
     }
 
     fn calc_checksum(&self) -> u16 {

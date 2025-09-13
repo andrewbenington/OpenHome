@@ -1,5 +1,5 @@
 use crate::pkm::traits::{IsShiny4096, ModernEvs};
-use crate::pkm::{Pkm, PkmError, PkmResult};
+use crate::pkm::{Error, Pkm, Result};
 use crate::resources::{AbilityIndex, FormeMetadata, MoveSlot, SpeciesAndForme, SpeciesMetadata};
 use crate::strings::SizedUtf16String;
 use crate::substructures::{
@@ -91,10 +91,10 @@ impl Pkm for Pb7 {
         Self::PARTY_SIZE
     }
 
-    fn from_bytes(bytes: &[u8]) -> PkmResult<Self> {
+    fn from_bytes(bytes: &[u8]) -> Result<Self> {
         let size = bytes.len();
         if size < Pb7::BOX_SIZE {
-            return Err(PkmError::ByteLength {
+            return Err(Error::ByteLength {
                 expected: Pb7::BOX_SIZE,
                 received: size,
             });
