@@ -6,7 +6,8 @@ import { GameOfOrigin, isGameBoy, isGen3, isGen4, isGen5 } from 'pokemon-resourc
 import { useCallback, useContext, useEffect, useState } from 'react'
 import { MdFileOpen } from 'react-icons/md'
 import PokemonDetailsModal from 'src/pokemon/PokemonDetailsModal'
-import { Errorable } from 'src/types/types'
+import BankHeader from 'src/saves/BankHeader'
+import { Errorable, LookupMap } from 'src/types/types'
 import { filterUndefined } from 'src/util/Sort'
 import { BackendContext } from '../backend/backendContext'
 import FilterPanel from '../components/filter/FilterPanel'
@@ -14,8 +15,8 @@ import useDisplayError from '../hooks/displayError'
 import HomeBoxDisplay from '../saves/boxes/HomeBoxDisplay'
 import OpenSaveDisplay from '../saves/boxes/SaveBoxDisplay'
 import SavesModal from '../saves/SavesModal'
-import { LookupContext } from '../state/lookup'
 import { OpenSavesContext } from '../state/openSaves'
+import { PersistedPkmDataContext } from '../state/persistedPkmData'
 import { PKMInterface } from '../types/interfaces'
 import { OHPKM } from '../types/pkm/OHPKM'
 import { getMonFileIdentifier, getMonGen12Identifier, getMonGen345Identifier } from '../util/Lookup'
@@ -24,7 +25,7 @@ import ReleaseArea from './home/ReleaseArea'
 
 const Home = () => {
   const [openSavesState, openSavesDispatch, allOpenSaves] = useContext(OpenSavesContext)
-  const [lookupState, lookupDispatch] = useContext(LookupContext)
+  const [persistedPkmState, persistedPkmDispatch] = useContext(PersistedPkmDataContext)
   const backend = useContext(BackendContext)
   const [selectedMon, setSelectedMon] = useState<PKMInterface>()
   const [openSaveDialog, setOpenSaveDialog] = useState(false)
@@ -33,23 +34,13 @@ const Home = () => {
   const loadAllLookups = useCallback(async (): Promise<Errorable<Record<string, OHPKM>>> => {
     const onLoadError = (message: string) => {
       console.error(message)
-      lookupDispatch({ type: 'set_error', payload: message })
+      persistedPkmDispatch({ type: 'set_error', payload: message })
     }
-    const [homeResult, gen12Result, gen345Result] = await Promise.all([
-      backend.loadHomeMonLookup(),
-      backend.loadGen12Lookup(),
-      backend.loadGen345Lookup(),
-    ])
+    const homeResult = await backend.loadHomeMonLookup()
 
     if (E.isLeft(homeResult)) {
       onLoadError(homeResult.left)
       return E.left(homeResult.left)
-    } else if (E.isLeft(gen12Result)) {
-      onLoadError(gen12Result.left)
-      return E.left(gen12Result.left)
-    } else if (E.isLeft(gen345Result)) {
-      onLoadError(gen345Result.left)
-      return E.left(gen345Result.left)
     }
 
     for (const [identifier, mon] of Object.entries(homeResult.right)) {
@@ -59,31 +50,34 @@ const Home = () => {
         backend.writeHomeMon(identifier, new Uint8Array(mon.toBytes()))
       }
     }
-    lookupDispatch({ type: 'load_home_mons', payload: homeResult.right })
-    lookupDispatch({ type: 'load_gen12', payload: gen12Result.right })
-    lookupDispatch({ type: 'load_gen345', payload: gen345Result.right })
+
+    persistedPkmDispatch({ type: 'load_persisted_pkm_data', payload: homeResult.right })
 
     return homeResult
-  }, [backend, lookupDispatch])
+  }, [backend, persistedPkmDispatch])
 
   const loadAllHomeData = useCallback(
     async (homeMonLookup: Record<string, OHPKM>) => {
-      await backend.loadHomeBoxes().then(
+      if (openSavesState.error) return
+      await backend.loadHomeBanks().then(
         E.match(
-          (err) => openSavesDispatch({ type: 'set_error', payload: err }),
-          (boxes) =>
+          (err) => {
+            displayError('Error Loading OpenHome Data', err)
+            openSavesDispatch({ type: 'set_error', payload: err })
+          },
+          (banks) =>
             openSavesDispatch({
-              type: 'set_home_boxes',
-              payload: { boxes, homeLookup: homeMonLookup },
+              type: 'load_home_banks',
+              payload: { banks, monLookup: homeMonLookup },
             })
         )
       )
     },
-    [backend, openSavesDispatch]
+    [backend, displayError, openSavesDispatch, openSavesState.error]
   )
 
   const saveChanges = useCallback(async () => {
-    if (!openSavesState.homeData || !lookupState.loaded) return
+    if (!openSavesState.homeData || !persistedPkmState.loaded) return
 
     const result = await backend.startTransaction()
 
@@ -92,7 +86,8 @@ const Home = () => {
       return
     }
 
-    const { gen12, gen345 } = lookupState
+    const newGen12Lookup: LookupMap = {}
+    const newGen345Lookup: LookupMap = {}
     const saveTypesAndChangedMons = allOpenSaves.map(
       (save) => [save.origin, save.prepareBoxesAndGetModified()] as [GameOfOrigin, OHPKM[]]
     )
@@ -104,7 +99,7 @@ const Home = () => {
           const gen12Identifier = getMonGen12Identifier(mon)
 
           if (openHomeIdentifier !== undefined && gen12Identifier) {
-            gen12[gen12Identifier] = openHomeIdentifier
+            newGen12Lookup[gen12Identifier] = openHomeIdentifier
           }
         })
       } else if (isGen3(saveOrigin) || isGen4(saveOrigin) || isGen5(saveOrigin)) {
@@ -113,15 +108,14 @@ const Home = () => {
           const gen345Identifier = getMonGen345Identifier(mon)
 
           if (openHomeIdentifier !== undefined && gen345Identifier) {
-            gen345[gen345Identifier] = openHomeIdentifier
+            newGen345Lookup[gen345Identifier] = openHomeIdentifier
           }
         })
       }
     }
 
     const promises = [
-      backend.writeGen12Lookup(gen12),
-      backend.writeGen345Lookup(gen345),
+      backend.updateLookups(newGen12Lookup, newGen345Lookup),
       backend.writeAllSaveFiles(allOpenSaves),
       backend.writeAllHomeData(
         openSavesState.homeData,
@@ -149,7 +143,7 @@ const Home = () => {
     openSavesDispatch({ type: 'clear_updated_box_slots' })
     openSavesDispatch({ type: 'clear_mons_to_release' })
 
-    lookupDispatch({ type: 'clear' })
+    persistedPkmDispatch({ type: 'clear' })
     await loadAllLookups().then(
       E.match(
         (err) => {
@@ -164,8 +158,8 @@ const Home = () => {
     backend,
     loadAllHomeData,
     loadAllLookups,
-    lookupDispatch,
-    lookupState,
+    persistedPkmDispatch,
+    persistedPkmState,
     openSavesDispatch,
     openSavesState,
     displayError,
@@ -178,8 +172,8 @@ const Home = () => {
       onSave: saveChanges,
       onReset: () => {
         openSavesDispatch({ type: 'clear_mons_to_release' })
-        if (lookupState.loaded) {
-          loadAllHomeData(lookupState.homeMons)
+        if (persistedPkmState.loaded) {
+          loadAllHomeData(persistedPkmState.homeMons)
         }
         openSavesDispatch({ type: 'close_all_saves' })
       },
@@ -190,7 +184,7 @@ const Home = () => {
     return () => {
       stopListening()
     }
-  }, [backend, saveChanges, lookupState, openSavesDispatch, loadAllHomeData])
+  }, [backend, saveChanges, persistedPkmState, openSavesDispatch, loadAllHomeData])
 
   const previewFile = useCallback(
     async (file: File) => {
@@ -201,7 +195,11 @@ const Home = () => {
         const [extension] = file.name.split('.').slice(-1)
 
         try {
-          mon = bytesToPKMInterface(buffer, extension.toUpperCase())
+          if (extension.toUpperCase() === 'OHPKM') {
+            mon = new OHPKM(new Uint8Array(buffer))
+          } else {
+            mon = bytesToPKMInterface(buffer, extension.toUpperCase())
+          }
         } catch (e) {
           displayError('Import Error', `Could not read Pokémon file: ${e}`)
         }
@@ -216,17 +214,22 @@ const Home = () => {
   )
 
   useEffect(() => {
-    if (lookupState.loaded && !openSavesState.homeData) {
-      loadAllHomeData(lookupState.homeMons)
+    if (persistedPkmState.loaded && !openSavesState.homeData) {
+      loadAllHomeData(persistedPkmState.homeMons)
     }
-  }, [loadAllHomeData, lookupState.homeMons, lookupState.loaded, openSavesState.homeData])
+  }, [
+    loadAllHomeData,
+    persistedPkmState.homeMons,
+    persistedPkmState.loaded,
+    openSavesState.homeData,
+  ])
 
   // load lookups
   useEffect(() => {
-    if (!lookupState.loaded && !lookupState.error) {
+    if (!persistedPkmState.loaded && !persistedPkmState.error) {
       loadAllLookups()
     }
-  }, [lookupState.loaded, lookupState.error, loadAllLookups])
+  }, [persistedPkmState.loaded, persistedPkmState.error, loadAllLookups])
 
   return (
     <Flex direction="row" style={{ height: '100%' }}>
@@ -240,7 +243,15 @@ const Home = () => {
         </Button>
       </Flex>
       <div className="home-box-column">
-        <Flex direction="row" width="100%" maxWidth="600px" minWidth="480px" align="center">
+        <BankHeader />
+        <Flex
+          direction="row"
+          width="100%"
+          maxWidth="600px"
+          minWidth="480px"
+          height="0"
+          flexGrow="1"
+        >
           <HomeBoxDisplay />
         </Flex>
       </div>

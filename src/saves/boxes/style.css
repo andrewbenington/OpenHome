@@ -39,13 +39,6 @@
   height: fit-content;
 }
 
-.save-button {
-  padding: 1px;
-  aspect-ratio: 1;
-  height: 20px;
-  width: 20px;
-}
-
 .box-card {
   padding: 6px 2px 2px;
   display: flex;
@@ -69,9 +62,14 @@
   display: grid;
   align-items: center;
   text-align: center;
-  flex: 8;
+  flex: 3;
+  width: 0px;
   min-width: fit-content;
   margin: 0px 6px;
+}
+
+.box-name input {
+  text-indent: 0px;
 }
 
 .save-header {
@@ -125,7 +123,7 @@
   border-top-right-radius: 4px;
   border-bottom-right-radius: 4px;
 }
-.ToggleGroupItem:hover {
+.ToggleGroupItem:hover:not(:disabled) {
   background-color: var(--accent-a5);
 }
 .ToggleGroupItem[data-state='on'] {

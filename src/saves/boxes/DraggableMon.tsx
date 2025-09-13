@@ -1,4 +1,6 @@
 import { useDraggable } from '@dnd-kit/react'
+import { useContext, useMemo } from 'react'
+import { DragMonContext } from 'src/state/dragMon'
 import PokemonIcon from '../../components/PokemonIcon'
 import { MonWithLocation } from '../../state/openSaves'
 import { PKMInterface } from '../../types/interfaces'
@@ -25,11 +27,22 @@ export interface DraggableMonProps {
 }
 
 const DraggableMon = ({ mon, onClick, disabled, dragData, dragID }: DraggableMonProps) => {
-  const { ref, isDragging } = useDraggable({
+  const { ref } = useDraggable({
     id: (dragID ?? '') + mon.personalityValue?.toString(),
     data: dragData,
     disabled: disabled || !dragID,
   })
+  const [dragState] = useContext(DragMonContext)
+
+  const isDragging = useMemo(
+    () =>
+      dragState.payload &&
+      dragData &&
+      dragState.payload.box === dragData.box &&
+      dragState.payload.box_slot === dragData.box_slot &&
+      dragState.payload.save === dragData.save,
+    [dragData, dragState.payload]
+  )
 
   return (
     <div

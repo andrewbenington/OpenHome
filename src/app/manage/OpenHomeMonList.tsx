@@ -4,7 +4,7 @@ import PokemonIcon from 'src/components/PokemonIcon'
 import { getPublicImageURL } from 'src/images/images'
 import { getMonSaveLogo } from 'src/saves/util'
 import { AppInfoContext } from 'src/state/appInfo'
-import { LookupContext } from 'src/state/lookup'
+import { PersistedPkmDataContext } from 'src/state/persistedPkmData'
 import { OHPKM } from 'src/types/pkm/OHPKM'
 import { getMonFileIdentifier } from 'src/util/Lookup'
 import { numericSorter, stringSorter } from 'src/util/Sort'
@@ -15,7 +15,7 @@ export type OpenHomeMonListProps = {
 }
 
 export default function OpenHomeMonList({ onSelectMon }: OpenHomeMonListProps) {
-  const [{ homeMons }] = useContext(LookupContext)
+  const [{ homeMons }] = useContext(PersistedPkmDataContext)
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
 
   const columns: SortableColumn<OHPKM>[] = [

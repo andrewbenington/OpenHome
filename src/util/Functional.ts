@@ -19,3 +19,7 @@ function partitionResultsRecursive<E, A>(acc: PartitionedEither<E, A>, either: E
   }
   return acc
 }
+
+export function range(startOrSize: number, end?: number) {
+  return end ? [...Array(end).keys()].slice(startOrSize) : [...Array(startOrSize).keys()]
+}
