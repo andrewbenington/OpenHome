@@ -23,6 +23,9 @@ A clear and concise description of what you expected to happen.
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
 
+**Save file**
+If applicable, please upload your Pokémon save file.
+
 **Platform (please complete the following information):**
 
 - OS: [e.g. Windows]
