@@ -1,12 +1,11 @@
 [package]
 name = "OpenHome"
-version = "1.5.0-alpha-multiple-banks.4.bank-sync-fix"
+version = "1.5.0"
 description = "A tool for moving Pokémon between game saves"
 authors = ["Andrew Benington"]
 edition = "2024"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [lib]
 # The `_lib` suffix may seem redundant but it is necessary
 # to make the lib name unique and wouldn't conflict with the bin name.
@@ -32,10 +31,10 @@ serde_json = "1.0.143"
 tauri-plugin-os = "2.3.1"
 tauri-plugin-dialog = "2.4.0"
 tauri-plugin-fs = "2.4.2"
-reqwest = { version = "0.12.23"}
+reqwest = { version = "0.12.23" }
 base64 = "0.22.1"
 zip = "5.0.0"
 bytes = "1.10.1"
 semver = "1.0.26"
-strum = { version = "0.27.2", features = [ "derive" ] }
+strum = { version = "0.27.2", features = ["derive"] }
 uuid = { version = "1.18.1", features = ["v4"] }

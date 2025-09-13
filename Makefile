@@ -1,4 +1,4 @@
-VERSION=1.5.0-alpha-multiple-banks.4.bank-sync-fix
+VERSION=1.5.0
 
 .PHONY: help
 help: # Display this help.
@@ -50,6 +50,7 @@ check-rs:
 set-version:
 	@jq --arg new_version "$(VERSION)" '.version = "$(VERSION)"' "src-tauri/tauri.conf.json" > version.tmp.json && mv version.tmp.json src-tauri/tauri.conf.json
 	@npx prettier --write src-tauri/tauri.conf.json
+	@cargo install cargo-edit
 	@cd src-tauri && cargo set-version $(VERSION)
 	@npm version $(VERSION) --no-git-tag-version --allow-same-version 
 
