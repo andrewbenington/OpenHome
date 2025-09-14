@@ -150,7 +150,7 @@ pub fn get_storage_file_json(
 pub fn find_suggested_saves(
     app_handle: tauri::AppHandle,
     save_folders: Vec<PathBuf>,
-) -> Result<saves::PossibleSaves, String> {
+) -> core::result::Result<saves::PossibleSaves, String> {
     let mut possible_saves = saves::PossibleSaves {
         citra: Vec::new(),
         desamume: Vec::new(),
@@ -201,7 +201,10 @@ pub fn find_suggested_saves(
 }
 
 #[tauri::command]
-pub fn set_app_theme(app_handle: tauri::AppHandle, app_theme: String) -> Result<(), String> {
+pub fn set_app_theme(
+    app_handle: tauri::AppHandle,
+    app_theme: String,
+) -> core::result::Result<(), String> {
     let main_window = app_handle
         .get_webview_window("main")
         .ok_or("Main window not found")?;
@@ -225,7 +228,7 @@ pub fn set_app_theme(app_handle: tauri::AppHandle, app_theme: String) -> Result<
 #[tauri::command]
 pub fn validate_recent_saves(
     app_handle: tauri::AppHandle,
-) -> Result<HashMap<String, saves::SaveRef>, String> {
+) -> core::result::Result<HashMap<String, saves::SaveRef>, String> {
     saves::get_recent_saves(app_handle)
 }
 

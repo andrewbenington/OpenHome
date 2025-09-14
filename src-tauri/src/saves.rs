@@ -16,7 +16,7 @@ const MAX_SEARCH_DEPTH: usize = 2;
 pub fn recursively_find_desamume_saves(
     current_path: &Path,
     depth: usize,
-) -> Result<Vec<PathData>, String> {
+) -> core::result::Result<Vec<PathData>, String> {
     if depth >= MAX_SEARCH_DEPTH {
         return Ok(Vec::new());
     }
@@ -42,7 +42,7 @@ pub fn recursively_find_desamume_saves(
 pub fn recursively_find_gambatte_saves(
     current_path: &Path,
     depth: usize,
-) -> Result<Vec<PathData>, String> {
+) -> core::result::Result<Vec<PathData>, String> {
     if depth >= MAX_SEARCH_DEPTH {
         return Ok(vec![]);
     }
@@ -88,7 +88,10 @@ pub fn recursively_find_mgba_saves(current_path: &Path, depth: usize) -> Option<
     Some(found_saves)
 }
 
-pub fn recursively_find_citra_saves(path: &PathBuf, depth: usize) -> Result<Vec<PathData>, String> {
+pub fn recursively_find_citra_saves(
+    path: &PathBuf,
+    depth: usize,
+) -> core::result::Result<Vec<PathData>, String> {
     if depth >= MAX_SEARCH_DEPTH {
         return Ok(vec![]);
     }
@@ -144,7 +147,9 @@ pub struct StoredSaveRef {
     pub plugin_identifier: Option<String>,
 }
 
-pub fn get_recent_saves(app_handle: tauri::AppHandle) -> Result<HashMap<String, SaveRef>, String> {
+pub fn get_recent_saves(
+    app_handle: tauri::AppHandle,
+) -> core::result::Result<HashMap<String, SaveRef>, String> {
     let file_path: PathBuf = "recent_saves.json".to_string().into();
     let recent_saves: HashMap<String, StoredSaveRef> =
         util::get_storage_file_json(&app_handle, &file_path)

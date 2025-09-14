@@ -165,7 +165,7 @@ impl Display for OpenHomeError {
 }
 
 impl Serialize for OpenHomeError {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    fn serialize<S>(&self, serializer: S) -> core::result::Result<S::Ok, S::Error>
     where
         S: Serializer,
     {
@@ -195,4 +195,4 @@ impl<T> From<std::sync::PoisonError<T>> for OpenHomeError {
     }
 }
 
-pub type OpenHomeResult<T> = Result<T, OpenHomeError>;
+pub type OpenHomeResult<T> = core::result::Result<T, OpenHomeError>;
