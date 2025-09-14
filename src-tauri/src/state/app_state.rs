@@ -7,7 +7,7 @@ use std::{
 
 use serde::Serialize;
 
-use crate::error::{OpenHomeError, OpenHomeResult};
+use crate::error::{Error, Result};
 
 fn add_tmp(path: &Path) -> PathBuf {
     if let Some(stem) = path.file_name() {
@@ -52,16 +52,16 @@ pub struct AppStateSnapshot {
 }
 
 impl AppStateInner {
-    pub fn start_transaction(&mut self) -> OpenHomeResult<()> {
+    pub fn start_transaction(&mut self) -> Result<()> {
         if self.open_transaction {
-            Err(OpenHomeError::TransactionOpen)
+            Err(Error::TransactionOpen)
         } else {
             self.open_transaction = true;
             Ok(())
         }
     }
 
-    pub fn rollback_transaction(&mut self) -> OpenHomeResult<()> {
+    pub fn rollback_transaction(&mut self) -> Result<()> {
         if !self.open_transaction {
             return Ok(());
         }
@@ -77,7 +77,7 @@ impl AppStateInner {
         Ok(())
     }
 
-    pub fn commit_transaction(&mut self) -> OpenHomeResult<()> {
+    pub fn commit_transaction(&mut self) -> Result<()> {
         if !self.open_transaction {
             return Ok(());
         }
@@ -85,7 +85,7 @@ impl AppStateInner {
         // overwrite original files with the .tmp versions, deleting the temps
         for temp_file in self.temp_files.iter() {
             fs::rename(temp_file, remove_tmp_extension(temp_file.clone()))
-                .map_err(|err| OpenHomeError::file_access(temp_file, err))?;
+                .map_err(|err| Error::file_access(temp_file, err))?;
         }
 
         self.open_transaction = false;
@@ -97,14 +97,14 @@ impl AppStateInner {
         &mut self,
         absolute_path: &Path,
         bytes: Vec<u8>,
-    ) -> OpenHomeResult<()> {
+    ) -> Result<()> {
         let mut path = absolute_path.to_path_buf();
         if self.open_transaction {
             path = add_tmp(&path);
             self.temp_files.push(path.clone());
         }
 
-        fs::write(&path, &bytes).map_err(|e| OpenHomeError::file_write(&path, e))
+        fs::write(&path, &bytes).map_err(|e| Error::file_write(&path, e))
     }
 
     pub fn snapshot(&self) -> AppStateSnapshot {

@@ -4,16 +4,16 @@ use tauri::{App, Manager};
 use tauri_plugin_dialog::{DialogExt, MessageDialogButtons, MessageDialogKind};
 
 use crate::{
-    error::{OpenHomeError, OpenHomeResult},
+    error::{Error, Result},
     util, versioning,
 };
 
-pub fn run_app_startup(app: &App) -> OpenHomeResult<()> {
+pub fn run_app_startup(app: &App) -> Result<()> {
     let handle = app.handle();
 
     if let Err(error) = versioning::handle_version_migration(handle, false) {
         match error {
-            OpenHomeError::OutdatedVersion { .. } => {
+            Error::OutdatedVersion { .. } => {
                 let should_quit = app
                     .dialog()
                     .message(error.to_string())
@@ -45,7 +45,7 @@ pub fn run_app_startup(app: &App) -> OpenHomeResult<()> {
     Ok(())
 }
 
-fn initialize_storage(app_handle: &tauri::AppHandle) -> OpenHomeResult<()> {
+fn initialize_storage(app_handle: &tauri::AppHandle) -> Result<()> {
     let storage_path = util::get_storage_path(app_handle)?;
     util::create_directory(&storage_path)?;
 
@@ -74,7 +74,7 @@ fn init_storage_json_file(
     app_handle: &tauri::AppHandle,
     relative_path: PathBuf,
     is_array: bool,
-) -> OpenHomeResult<()> {
+) -> Result<()> {
     let absolute_path = util::prepend_appdata_storage_to_path(app_handle, &relative_path)?;
     if !Path::new(&absolute_path).exists() {
         let contents = match is_array {
@@ -87,7 +87,7 @@ fn init_storage_json_file(
     Ok(())
 }
 
-fn set_theme_from_settings(app: &App) -> OpenHomeResult<()> {
+fn set_theme_from_settings(app: &App) -> Result<()> {
     let settings_json: serde_json::Value =
         util::get_storage_file_json(app.app_handle(), "settings.json")?;
 
@@ -101,7 +101,7 @@ fn set_theme_from_settings(app: &App) -> OpenHomeResult<()> {
     };
 
     app.get_webview_window("main")
-        .ok_or(OpenHomeError::WindowAccess { source: None })?
+        .ok_or(Error::WindowAccess { source: None })?
         .set_theme(theme_option)
-        .map_err(|e| OpenHomeError::other_with_source("Could not set theme", e))
+        .map_err(|e| Error::other_with_source("Could not set theme", e))
 }

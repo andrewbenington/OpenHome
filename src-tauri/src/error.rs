@@ -1,4 +1,3 @@
-use std::error::Error;
 use std::path::Path;
 use std::{fmt::Display, path::PathBuf};
 
@@ -6,25 +5,25 @@ use semver::Version;
 use serde::{Serialize, Serializer};
 
 #[derive(Debug)]
-pub enum OpenHomeError {
+pub enum Error {
     AppDataAccess {
-        source: Box<dyn Error>,
+        source: Box<dyn std::error::Error>,
     },
     FileAccess {
         path: PathBuf,
-        source: Box<dyn Error>,
+        source: Box<dyn std::error::Error>,
     },
     FileDownload {
         url: String,
-        source: Box<dyn Error>,
+        source: Box<dyn std::error::Error>,
     },
     FileMalformed {
         path: PathBuf,
-        source: Box<dyn Error>,
+        source: Box<dyn std::error::Error>,
     },
     FileWrite {
         path: PathBuf,
-        source: Box<dyn Error>,
+        source: Box<dyn std::error::Error>,
     },
     FileMissing {
         path: PathBuf,
@@ -32,7 +31,7 @@ pub enum OpenHomeError {
     MutexFailure,
     TransactionOpen,
     WindowAccess {
-        source: Option<Box<dyn Error>>,
+        source: Option<Box<dyn std::error::Error>>,
     },
     OutdatedVersion {
         last_opened: Version,
@@ -40,83 +39,83 @@ pub enum OpenHomeError {
     },
     Other {
         context: String,
-        source: Option<Box<dyn Error>>,
+        source: Option<Box<dyn std::error::Error>>,
     },
 }
 
-impl OpenHomeError {
-    pub fn appdata<E: Error + 'static>(source: E) -> OpenHomeError {
-        OpenHomeError::AppDataAccess {
+impl Error {
+    pub fn appdata<E: std::error::Error + 'static>(source: E) -> Error {
+        Error::AppDataAccess {
             source: Box::new(source),
         }
     }
 
-    pub fn file_access<P, E: Error + 'static>(path: P, source: E) -> OpenHomeError
+    pub fn file_access<P, E: std::error::Error + 'static>(path: P, source: E) -> Error
     where
         P: AsRef<Path>,
     {
-        OpenHomeError::FileAccess {
+        Error::FileAccess {
             path: path.as_ref().to_path_buf(),
             source: Box::new(source),
         }
     }
 
-    pub fn file_download<E: Error + 'static>(url: &str, source: E) -> OpenHomeError {
-        OpenHomeError::FileDownload {
+    pub fn file_download<E: std::error::Error + 'static>(url: &str, source: E) -> Error {
+        Error::FileDownload {
             url: url.to_owned(),
             source: Box::new(source),
         }
     }
 
-    pub fn file_malformed<P, E: Error + 'static>(path: P, source: E) -> OpenHomeError
+    pub fn file_malformed<P, E: std::error::Error + 'static>(path: P, source: E) -> Error
     where
         P: AsRef<Path>,
     {
-        OpenHomeError::FileMalformed {
+        Error::FileMalformed {
             path: path.as_ref().to_path_buf(),
             source: Box::new(source),
         }
     }
 
-    pub fn file_missing(path: &Path) -> OpenHomeError {
-        OpenHomeError::FileMissing {
+    pub fn file_missing(path: &Path) -> Error {
+        Error::FileMissing {
             path: path.to_path_buf(),
         }
     }
 
-    pub fn file_write<P, E: Error + 'static>(path: P, source: E) -> OpenHomeError
+    pub fn file_write<P, E: std::error::Error + 'static>(path: P, source: E) -> Error
     where
         P: AsRef<Path>,
     {
-        OpenHomeError::FileWrite {
+        Error::FileWrite {
             path: path.as_ref().to_path_buf(),
             source: Box::new(source),
         }
     }
 
-    pub fn outdated_version(last_opened: Version, this_version: Version) -> OpenHomeError {
-        OpenHomeError::OutdatedVersion {
+    pub fn outdated_version(last_opened: Version, this_version: Version) -> Error {
+        Error::OutdatedVersion {
             last_opened,
             this_version,
         }
     }
 
-    pub fn other(context: &str) -> OpenHomeError {
-        OpenHomeError::Other {
+    pub fn other(context: &str) -> Error {
+        Error::Other {
             context: context.to_owned(),
             source: None,
         }
     }
 
-    pub fn other_with_source<E: Error + 'static>(context: &str, source: E) -> OpenHomeError {
-        OpenHomeError::Other {
+    pub fn other_with_source<E: std::error::Error + 'static>(context: &str, source: E) -> Error {
+        Error::Other {
             context: context.to_owned(),
             source: Some(Box::new(source)),
         }
     }
 }
 
-impl Display for OpenHomeError {
+impl Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let message = match self {
             Self::AppDataAccess { source } => {
@@ -164,7 +163,7 @@ impl Display for OpenHomeError {
     }
 }
 
-impl Serialize for OpenHomeError {
+impl Serialize for Error {
     fn serialize<S>(&self, serializer: S) -> core::result::Result<S::Ok, S::Error>
     where
         S: Serializer,
@@ -173,8 +172,8 @@ impl Serialize for OpenHomeError {
     }
 }
 
-impl Error for OpenHomeError {
-    fn source(&self) -> Option<&(dyn Error + 'static)> {
+impl std::error::Error for Error {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match self {
             Self::AppDataAccess { source }
             | Self::FileAccess { source, .. }
@@ -189,10 +188,10 @@ impl Error for OpenHomeError {
     }
 }
 
-impl<T> From<std::sync::PoisonError<T>> for OpenHomeError {
+impl<T> From<std::sync::PoisonError<T>> for Error {
     fn from(_: std::sync::PoisonError<T>) -> Self {
-        OpenHomeError::MutexFailure
+        Error::MutexFailure
     }
 }
 
-pub type OpenHomeResult<T> = core::result::Result<T, OpenHomeError>;
+pub type Result<T> = core::result::Result<T, Error>;

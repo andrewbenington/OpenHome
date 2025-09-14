@@ -1,4 +1,4 @@
-use crate::error::{OpenHomeError, OpenHomeResult};
+use crate::error::{Error, Result};
 use crate::plugin::{self, PluginMetadata, PluginMetadataWithIcon, list_plugins};
 use crate::state::{AppState, AppStateSnapshot};
 use crate::util::ImageResponse;
@@ -11,22 +11,22 @@ use std::time::SystemTime;
 use tauri::Manager;
 
 #[tauri::command]
-pub fn get_state(state: tauri::State<'_, AppState>) -> OpenHomeResult<AppStateSnapshot> {
+pub fn get_state(state: tauri::State<'_, AppState>) -> Result<AppStateSnapshot> {
     Ok(state.lock()?.snapshot())
 }
 
 #[tauri::command]
-pub fn get_file_bytes(absolute_path: PathBuf) -> OpenHomeResult<Vec<u8>> {
+pub fn get_file_bytes(absolute_path: PathBuf) -> Result<Vec<u8>> {
     util::read_file_bytes(absolute_path)
 }
 
 #[tauri::command]
-pub fn get_file_created(absolute_path: PathBuf) -> OpenHomeResult<Option<u128>> {
+pub fn get_file_created(absolute_path: PathBuf) -> Result<Option<u128>> {
     // let full_path = prepend_appdata_to_path(&app_handle, path)?;
 
     // Open the file, and return any error up the call stack
     let metadata =
-        fs::metadata(&absolute_path).map_err(|e| OpenHomeError::file_access(&absolute_path, e))?;
+        fs::metadata(&absolute_path).map_err(|e| Error::file_access(&absolute_path, e))?;
 
     let Ok(created_or_modified_date) = metadata.created().or(metadata.modified()) else {
         return Ok(None);
@@ -41,10 +41,9 @@ pub fn get_file_created(absolute_path: PathBuf) -> OpenHomeResult<Option<u128>> 
 type FilenameToBytesMap = HashMap<String, Vec<u8>>;
 
 #[tauri::command]
-pub fn get_ohpkm_files(app_handle: tauri::AppHandle) -> OpenHomeResult<FilenameToBytesMap> {
+pub fn get_ohpkm_files(app_handle: tauri::AppHandle) -> Result<FilenameToBytesMap> {
     let mons_path = util::prepend_appdata_storage_to_path(&app_handle, "mons")?;
-    let mon_files =
-        fs::read_dir(&mons_path).map_err(|e| OpenHomeError::file_access(&mons_path, e))?;
+    let mon_files = fs::read_dir(&mons_path).map_err(|e| Error::file_access(&mons_path, e))?;
 
     let mut map = HashMap::new();
     for mon_file_os_str in mon_files.flatten() {
@@ -69,7 +68,7 @@ pub fn get_ohpkm_files(app_handle: tauri::AppHandle) -> OpenHomeResult<FilenameT
 pub fn delete_storage_files(
     app_handle: tauri::AppHandle,
     relative_paths: Vec<PathBuf>,
-) -> HashMap<PathBuf, OpenHomeResult<()>> {
+) -> HashMap<PathBuf, Result<()>> {
     let mut result = HashMap::new();
     for relative_path in relative_paths {
         let full_path_r = util::prepend_appdata_storage_to_path(&app_handle, &relative_path);
@@ -77,7 +76,7 @@ pub fn delete_storage_files(
         result.insert(
             relative_path.clone(),
             full_path_r.and_then(|fp| {
-                fs::remove_file(fp).map_err(|e| OpenHomeError::file_access(&relative_path, e))
+                fs::remove_file(fp).map_err(|e| Error::file_access(&relative_path, e))
             }),
         );
     }
@@ -86,17 +85,17 @@ pub fn delete_storage_files(
 }
 
 #[tauri::command]
-pub fn start_transaction(state: tauri::State<'_, AppState>) -> OpenHomeResult<()> {
+pub fn start_transaction(state: tauri::State<'_, AppState>) -> Result<()> {
     state.lock()?.start_transaction()
 }
 
 #[tauri::command]
-pub fn rollback_transaction(state: tauri::State<'_, AppState>) -> OpenHomeResult<()> {
+pub fn rollback_transaction(state: tauri::State<'_, AppState>) -> Result<()> {
     state.lock()?.rollback_transaction()
 }
 
 #[tauri::command]
-pub fn commit_transaction(state: tauri::State<'_, AppState>) -> OpenHomeResult<()> {
+pub fn commit_transaction(state: tauri::State<'_, AppState>) -> Result<()> {
     state.lock()?.commit_transaction()
 }
 
@@ -105,7 +104,7 @@ pub fn write_file_bytes(
     state: tauri::State<'_, AppState>,
     absolute_path: &Path,
     bytes: Vec<u8>,
-) -> OpenHomeResult<()> {
+) -> Result<()> {
     state.lock()?.write_file_bytes_temped(absolute_path, bytes)
 }
 
@@ -114,7 +113,7 @@ pub fn write_storage_file_bytes(
     app_handle: tauri::AppHandle,
     relative_path: PathBuf,
     bytes: Vec<u8>,
-) -> OpenHomeResult<()> {
+) -> Result<()> {
     let full_path = util::prepend_appdata_storage_to_path(&app_handle, &relative_path)?;
     util::write_file_contents(full_path, bytes)
 }
@@ -124,7 +123,7 @@ pub fn write_storage_file_json(
     app_handle: tauri::AppHandle,
     relative_path: PathBuf,
     data: Value,
-) -> OpenHomeResult<()> {
+) -> Result<()> {
     write_storage_file_text(app_handle, relative_path, data.to_string())
 }
 
@@ -133,7 +132,7 @@ pub fn write_storage_file_text(
     app_handle: tauri::AppHandle,
     relative_path: PathBuf,
     text: String,
-) -> OpenHomeResult<()> {
+) -> Result<()> {
     let full_path = util::prepend_appdata_storage_to_path(&app_handle, &relative_path)?;
     util::write_file_contents(full_path, text)
 }
@@ -142,7 +141,7 @@ pub fn write_storage_file_text(
 pub fn get_storage_file_json(
     app_handle: tauri::AppHandle,
     relative_path: PathBuf,
-) -> OpenHomeResult<Value> {
+) -> Result<Value> {
     util::get_storage_file_json(&app_handle, &relative_path)
 }
 
@@ -233,20 +232,17 @@ pub fn validate_recent_saves(
 }
 
 #[tauri::command]
-pub fn get_image_data(absolute_path: String) -> OpenHomeResult<ImageResponse> {
+pub fn get_image_data(absolute_path: String) -> Result<ImageResponse> {
     util::get_image_data(&PathBuf::from(absolute_path))
 }
 
 #[tauri::command]
-pub fn open_directory(absolute_path: String) -> OpenHomeResult<()> {
+pub fn open_directory(absolute_path: String) -> Result<()> {
     util::open_directory(&absolute_path)
 }
 
 #[tauri::command]
-pub async fn download_plugin(
-    app_handle: tauri::AppHandle,
-    remote_url: String,
-) -> OpenHomeResult<String> {
+pub async fn download_plugin(app_handle: tauri::AppHandle, remote_url: String) -> Result<String> {
     let metadata_url = format!("{}/plugin.json", remote_url);
 
     let plugin_metadata: PluginMetadata = util::download_json_file(&metadata_url).await?;
@@ -255,14 +251,12 @@ pub async fn download_plugin(
 }
 
 #[tauri::command]
-pub fn list_installed_plugins(
-    app_handle: tauri::AppHandle,
-) -> OpenHomeResult<Vec<PluginMetadataWithIcon>> {
+pub fn list_installed_plugins(app_handle: tauri::AppHandle) -> Result<Vec<PluginMetadataWithIcon>> {
     list_plugins(&app_handle)
 }
 
 #[tauri::command]
-pub fn load_plugin_code(app_handle: tauri::AppHandle, plugin_id: String) -> OpenHomeResult<String> {
+pub fn load_plugin_code(app_handle: tauri::AppHandle, plugin_id: String) -> Result<String> {
     let relative_path = &PathBuf::from("plugins")
         .join(plugin_id)
         .join("dist")
@@ -272,7 +266,7 @@ pub fn load_plugin_code(app_handle: tauri::AppHandle, plugin_id: String) -> Open
 }
 
 #[tauri::command]
-pub fn delete_plugin(app_handle: tauri::AppHandle, plugin_id: String) -> OpenHomeResult<()> {
+pub fn delete_plugin(app_handle: tauri::AppHandle, plugin_id: String) -> Result<()> {
     let plugins_dir = util::prepend_appdata_to_path(&app_handle, "plugins")?;
     let plugin_dir = plugins_dir.join(&plugin_id);
 

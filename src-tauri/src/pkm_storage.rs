@@ -5,7 +5,7 @@ use uuid::Uuid;
 
 use crate::{
     deprecated,
-    error::{OpenHomeError, OpenHomeResult},
+    error::{Error, Result},
     util,
 };
 
@@ -81,7 +81,7 @@ pub struct Box {
 pub type BoxIdentifiers = HashMap<u8, String>;
 
 #[tauri::command]
-pub fn load_banks(app_handle: tauri::AppHandle) -> OpenHomeResult<StoredBankData> {
+pub fn load_banks(app_handle: tauri::AppHandle) -> Result<StoredBankData> {
     let mut storage: StoredBankData = util::get_storage_file_json(&app_handle, "banks.json")?;
     storage.reset_box_indices();
 
@@ -89,10 +89,7 @@ pub fn load_banks(app_handle: tauri::AppHandle) -> OpenHomeResult<StoredBankData
 }
 
 #[tauri::command]
-pub fn write_banks(
-    app_handle: tauri::AppHandle,
-    mut bank_data: StoredBankData,
-) -> OpenHomeResult<()> {
+pub fn write_banks(app_handle: tauri::AppHandle, mut bank_data: StoredBankData) -> Result<()> {
     bank_data.order_boxes_by_indices();
     bank_data.reset_box_indices();
 
@@ -101,7 +98,7 @@ pub fn write_banks(
     // For now, we will also update box-data.json with Bank 1 data to work with previous versions of OpenHome
     let first_bank = bank_data.banks.into_iter().find(|bank| bank.index == 0);
     let Some(first_bank) = first_bank else {
-        return Err(OpenHomeError::other(
+        return Err(Error::other(
             "No bank with index 0; Previous versions of OpenHome will not see updated data.",
         ));
     };
