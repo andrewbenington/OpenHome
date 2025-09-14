@@ -14,7 +14,7 @@ use std::env;
 use tauri::Manager;
 use tauri_plugin_dialog::{DialogExt, MessageDialogKind};
 
-use crate::error::OpenHomeError;
+use crate::error::Error;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -23,7 +23,7 @@ pub fn run() {
         .setup(|app| {
             if let Err(launch_error) = startup::run_app_startup(app) {
                 match launch_error {
-                    OpenHomeError::OutdatedVersion { .. } => app.handle().exit(1),
+                    Error::OutdatedVersion { .. } => app.handle().exit(1),
                     _ => {
                         app.dialog()
                             .message(launch_error.to_string())

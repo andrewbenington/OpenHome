@@ -3,7 +3,7 @@ use std::{fs, path::Path};
 use tauri::Emitter;
 
 use crate::{
-    error::{OpenHomeError, OpenHomeResult},
+    error::{Error, Result},
     util::{self, ImageResponse},
 };
 
@@ -36,15 +36,15 @@ pub struct PluginMetadataWithIcon {
     pub icon_image: Option<ImageResponse>,
 }
 
-pub fn list_plugins(app_handle: &tauri::AppHandle) -> OpenHomeResult<Vec<PluginMetadataWithIcon>> {
+pub fn list_plugins(app_handle: &tauri::AppHandle) -> Result<Vec<PluginMetadataWithIcon>> {
     let plugins_path = util::get_appdata_dir(app_handle)?.join("plugins");
 
     if !plugins_path.exists() {
         return Ok(Vec::new());
     }
 
-    let plugin_dirs = fs::read_dir(&plugins_path)
-        .map_err(|err| OpenHomeError::file_access(&plugins_path, err))?;
+    let plugin_dirs =
+        fs::read_dir(&plugins_path).map_err(|err| Error::file_access(&plugins_path, err))?;
 
     let mut plugins: Vec<PluginMetadataWithIcon> = vec![];
 
@@ -89,10 +89,10 @@ fn emit_download_progress(app_handle: &tauri::AppHandle, plugin_id: String, prog
     }
 }
 
-async fn download_to_file(url: &str, dest: &Path) -> OpenHomeResult<()> {
+async fn download_to_file(url: &str, dest: &Path) -> Result<()> {
     let body = util::download_binary_file(url)
         .await
-        .map_err(|e| OpenHomeError::file_download(url, e))?;
+        .map_err(|e| Error::file_download(url, e))?;
 
     util::write_file_contents(dest, body)
 }
@@ -103,7 +103,7 @@ pub async fn download_async(
     app_handle: tauri::AppHandle,
     remote_url: String,
     plugin_metadata: PluginMetadata,
-) -> OpenHomeResult<String> {
+) -> Result<String> {
     let new_plugin_dir = util::get_appdata_dir(&app_handle)?
         .join("plugins")
         .join(&plugin_metadata.id);
@@ -128,7 +128,7 @@ pub async fn download_async(
         emit_download_progress(&app_handle, plugin_metadata.id.clone(), overall_pct)
     })
     .await
-    .map_err(|err| OpenHomeError::other_with_source("Could not extract assets.zip", err))?;
+    .map_err(|err| Error::other_with_source("Could not extract assets.zip", err))?;
 
     emit_download_progress(&app_handle, plugin_metadata.id.clone(), 10.0 + ASSETS_PCT);
 

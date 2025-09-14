@@ -3,7 +3,7 @@ use std::{collections::HashMap, ops::Deref, sync::Mutex};
 use serde::Serialize;
 use tauri::Emitter;
 
-use crate::error::{OpenHomeError, OpenHomeResult};
+use crate::error::{Error, Result};
 use crate::util;
 
 // type OhpkmBytesLookup = HashMap<String, Vec<u8>>;
@@ -21,7 +21,7 @@ impl Deref for LookupState {
 }
 
 impl LookupState {
-    pub fn load_from_storage(app_handle: &tauri::AppHandle) -> OpenHomeResult<Self> {
+    pub fn load_from_storage(app_handle: &tauri::AppHandle) -> Result<Self> {
         let inner = LookupStateInner::load_from_storage(app_handle)?;
         Ok(Self(Mutex::new(inner)))
     }
@@ -36,7 +36,7 @@ pub struct LookupStateInner {
 }
 
 impl LookupStateInner {
-    fn load_from_storage(app_handle: &tauri::AppHandle) -> OpenHomeResult<Self> {
+    fn load_from_storage(app_handle: &tauri::AppHandle) -> Result<Self> {
         Ok(Self {
             gen_12: util::get_storage_file_json(app_handle, "gen12_lookup.json")?,
             gen_345: util::get_storage_file_json(app_handle, "gen345_lookup.json")?,
@@ -48,7 +48,7 @@ impl LookupStateInner {
         app_handle: &tauri::AppHandle,
         gen_12: IdentifierLookup,
         gen_345: IdentifierLookup,
-    ) -> OpenHomeResult<()> {
+    ) -> Result<()> {
         self.gen_12.extend(gen_12);
         self.gen_345.extend(gen_345);
 
@@ -58,15 +58,13 @@ impl LookupStateInner {
         app_handle
             .emit("lookups_update", self.clone())
             .map_err(|err| {
-                OpenHomeError::other_with_source("Could not emit 'lookups_update' to frontend", err)
+                Error::other_with_source("Could not emit 'lookups_update' to frontend", err)
             })
     }
 }
 
 #[tauri::command]
-pub fn get_lookups(
-    lookup_state: tauri::State<'_, LookupState>,
-) -> OpenHomeResult<LookupStateInner> {
+pub fn get_lookups(lookup_state: tauri::State<'_, LookupState>) -> Result<LookupStateInner> {
     Ok(lookup_state.lock()?.clone())
 }
 
@@ -76,7 +74,7 @@ pub fn update_lookups(
     lookup_state: tauri::State<'_, LookupState>,
     gen_12: IdentifierLookup,
     gen_345: IdentifierLookup,
-) -> OpenHomeResult<()> {
+) -> Result<()> {
     lookup_state
         .lock()?
         .update_lookups(&app_handle, gen_12, gen_345)
