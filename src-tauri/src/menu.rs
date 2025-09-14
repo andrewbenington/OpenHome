@@ -10,7 +10,7 @@ const OPEN_CMD: &str = "xdg-open";
 #[cfg(target_os = "windows")]
 const OPEN_CMD: &str = "explorer";
 
-pub fn create_menu(app: &App) -> Result<Menu<Wry>, Box<dyn std::error::Error>> {
+pub fn create_menu(app: &App) -> core::result::Result<Menu<Wry>, Box<dyn std::error::Error>> {
     let handle = app.handle();
     let menu = Menu::new(handle)?;
 
