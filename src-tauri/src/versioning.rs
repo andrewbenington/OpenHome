@@ -1,4 +1,4 @@
-use semver::{BuildMetadata, Prerelease, Version};
+use semver::Version;
 use strum::{self, EnumIter, IntoEnumIterator};
 
 use crate::{
