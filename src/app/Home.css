@@ -36,11 +36,13 @@
 .home-box-column {
   padding: 8px 12px 8px 4px;
   display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: flex-start;
+  flex-direction: column;
+  justify-content: start;
+  align-items: center;
   flex: 1;
   min-width: 480px;
+  max-width: 600px;
+  margin-left: auto;
 }
 
 .right-column {

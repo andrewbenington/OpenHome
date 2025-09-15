@@ -9,6 +9,7 @@ import {
   StatsPreSplit,
   genderFromDVs,
   genderFromPID,
+  generatePersonalityValuePreservingAttributes,
   markingsHaveColor,
   markingsSixShapesWithColorFromBytes,
   markingsSixShapesWithColorFromOther,
@@ -45,14 +46,13 @@ import {
 } from 'src/util/byteLogic'
 import { getHPGen3Onward, getLevelGen3Onward, getStatGen3Onward } from 'src/util/StatCalc'
 import { utf16BytesToString, utf16StringToBytes } from 'src/util/Strings/StringConverter'
-import { isEvolution } from '../../util/Lookup'
+import { getHomeIdentifier, isEvolution } from '../../util/Lookup'
 import { PKMInterface, PluginPKMInterface } from '../interfaces'
 import schema from './OHPKM.json'
 import {
   adjustMovePPBetweenFormats,
   dvsFromIVs,
   generateIVs,
-  generatePersonalityValuePreservingAttributes,
   generateTeraType,
   getAbilityFromNumber,
   getHeightCalculated,
@@ -107,10 +107,16 @@ export class OHPKM implements PKMInterface {
             .concat((other.secretID ?? 0).toString())
             .concat(other.trainerID.toString())
         )
-      } else {
+      } else if (other.dvs) {
+        const { hp, atk, def, spc, spe } = other.dvs
+
         prng = new Prando(
-          other.trainerName.concat(JSON.stringify(other.dvs)).concat(other.trainerID.toString())
+          other.trainerName
+            .concat(`${hp}~${atk}~${def}~${spc}~${spe}`)
+            .concat(other.trainerID.toString())
         )
+      } else {
+        prng = new Prando(other.trainerName.concat(other.trainerID.toString()))
       }
 
       this.dexNum = other.dexNum
@@ -137,7 +143,7 @@ export class OHPKM implements PKMInterface {
       this.personalityValue =
         other.personalityValue !== undefined
           ? other.personalityValue
-          : generatePersonalityValuePreservingAttributes(other, prng)
+          : generatePersonalityValuePreservingAttributes(other)
       this.isFatefulEncounter = other.isFatefulEncounter ?? false
 
       if (other.format === 'PK1' || other.format === 'PK2') {
@@ -1568,6 +1574,12 @@ export class OHPKM implements PKMInterface {
       errorsFound = true
     }
 
+    // Fix ability bug from pre-1.5.0 (affected Mind's Eye and Dragon's Maw)
+    if (this.abilityIndex === 0) {
+      this.ability = getAbilityFromNumber(this.dexNum, this.formeNum, this.abilityNum)
+      this.abilityIndex = AbilityFromString(this.ability)
+    }
+
     const genderRatio = PokemonData[this.dexNum].formes[this.formeNum].genderRatio
 
     if (this.gender === 2 && (genderRatio.male !== 0 || genderRatio.female !== 0)) {
@@ -1582,6 +1594,10 @@ export class OHPKM implements PKMInterface {
     }
 
     return errorsFound
+  }
+
+  public getHomeIdentifier() {
+    return getHomeIdentifier(this)
   }
 
   public updateData(other: PKMInterface, isFromOT: boolean = false) {

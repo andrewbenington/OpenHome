@@ -6,10 +6,10 @@ import { FileInfo, readFile, stat } from '@tauri-apps/plugin-fs'
 import { platform } from '@tauri-apps/plugin-os'
 import dayjs from 'dayjs'
 import * as E from 'fp-ts/lib/Either'
-import BackendInterface from 'src/backend/backendInterface'
+import BackendInterface, { BankOrBoxChange, StoredLookups } from 'src/backend/backendInterface'
 import { OHPKM } from 'src/types/pkm/OHPKM'
 import { PathData, PossibleSaves } from 'src/types/SAVTypes/path'
-import { SaveFolder, StoredBoxData } from 'src/types/storage'
+import { SaveFolder, StoredBankData } from 'src/types/storage'
 import { Errorable, JSONObject, LoadSaveResponse, LookupMap, SaveRef } from 'src/types/types'
 import { defaultSettings, Settings } from '../../state/appInfo'
 import { TauriInvoker } from './tauriInvoker'
@@ -34,17 +34,11 @@ type OnDropEvent = Event<{ position: { x: number; y: number }; paths: string[] }
 
 export const TauriBackend: BackendInterface = {
   /* past gen identifier lookups */
-  loadGen12Lookup: function (): Promise<Errorable<LookupMap>> {
-    return TauriInvoker.getStorageFileJSON('gen12_lookup.json') as Promise<Errorable<LookupMap>>
+  loadLookups: function (): Promise<Errorable<StoredLookups>> {
+    return TauriInvoker.getLookups()
   },
-  loadGen345Lookup: function (): Promise<Errorable<LookupMap>> {
-    return TauriInvoker.getStorageFileJSON('gen345_lookup.json') as Promise<Errorable<LookupMap>>
-  },
-  writeGen12Lookup: function (lookup: LookupMap): Promise<Errorable<null>> {
-    return TauriInvoker.writeStorageFileJSON('gen12_lookup.json', lookup)
-  },
-  writeGen345Lookup: function (lookup: LookupMap): Promise<Errorable<null>> {
-    return TauriInvoker.writeStorageFileJSON('gen345_lookup.json', lookup)
+  updateLookups: function (gen_12: LookupMap, gen_345: LookupMap): Promise<Errorable<null>> {
+    return TauriInvoker.updateLookups(gen_12, gen_345)
   },
 
   // /* OHPKM management */
@@ -89,26 +83,11 @@ export const TauriBackend: BackendInterface = {
   },
 
   /* openhome boxes */
-  loadHomeBoxes: async function (): Promise<Errorable<StoredBoxData[]>> {
-    const result = await (TauriInvoker.getStorageFileJSON('box-data.json') as Promise<
-      Errorable<StoredBoxData[]>
-    >)
-
-    if (E.isLeft(result)) return result
-
-    let boxData = result.right
-
-    if (boxData.length === 0) {
-      for (let i = 0; i < 36; i++) {
-        boxData.push({ index: i, monIdentifiersByIndex: {}, name: undefined })
-      }
-      TauriInvoker.writeStorageFileJSON('box-data.json', boxData)
-    }
-
-    return E.right(boxData)
+  loadHomeBanks: async function (): Promise<Errorable<StoredBankData>> {
+    return TauriInvoker.getBanks()
   },
-  writeHomeBoxes: (boxData: StoredBoxData[]): Promise<Errorable<null>> => {
-    return TauriInvoker.writeStorageFileJSON('box-data.json', boxData)
+  writeHomeBanks: (bankData: StoredBankData): Promise<Errorable<null>> => {
+    return TauriInvoker.writeBanks(bankData)
   },
 
   /* game saves */
@@ -325,6 +304,20 @@ export const TauriBackend: BackendInterface = {
     }
     if (listeners.onOpen) {
       unlistenPromises.push(listen('open', listeners.onOpen))
+    }
+    if (listeners.onLookupsUpdate) {
+      const listener = listeners.onLookupsUpdate
+
+      unlistenPromises.push(
+        listen<StoredLookups>('lookups_update', (event) => listener(event.payload))
+      )
+    }
+    if (listeners.onBankOrBoxChange) {
+      const listener = listeners.onBankOrBoxChange
+
+      unlistenPromises.push(
+        listen<BankOrBoxChange>('bank_or_box_change', (event) => listener(event.payload))
+      )
     }
     if (listeners.onPluginDownloadProgress) {
       const [pluginID, listener] = listeners.onPluginDownloadProgress

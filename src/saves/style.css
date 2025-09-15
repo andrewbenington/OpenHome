@@ -77,3 +77,17 @@
   height: 26px;
   width: 56px;
 }
+
+.bank-ribbon {
+  padding: 2px 6px;
+  height: 32px;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.bank-ribbon input {
+  text-indent: 0px;
+}

@@ -8,13 +8,14 @@ import { CardsIcon, GridIcon } from 'src/components/Icons'
 import SideTabs from 'src/components/side-tabs/SideTabs'
 import useDisplayError from 'src/hooks/displayError'
 import { AppInfoAction, AppInfoContext } from 'src/state/appInfo'
-import { LookupContext } from 'src/state/lookup'
 import { OpenSavesContext } from 'src/state/openSaves'
+import { PersistedPkmDataContext } from 'src/state/persistedPkmData'
 import { buildSaveFile, getSaveTypes } from 'src/types/SAVTypes/load'
 import { PathData } from 'src/types/SAVTypes/path'
 import { getSaveRef } from 'src/types/SAVTypes/SAV'
 import { SAVClass } from 'src/types/SAVTypes/util'
 import { getMonFileIdentifier } from 'src/util/Lookup'
+import { useLookups } from '../state/lookups'
 import RecentSaves from './RecentSaves'
 import SaveFolders from './SaveFolders'
 import SuggestedSaves from './SuggestedSaves'
@@ -50,18 +51,29 @@ function useOpenSaveHandler(onClose?: () => void) {
   const [, dispatchOpenSaves] = useContext(OpenSavesContext)
   const [tentativeSaveData, setTentativeSaveData] = useState<AmbiguousOpenState>()
   const backend = useContext(BackendContext)
-  const [lookupState] = useContext(LookupContext)
+  const [lookupState] = useContext(PersistedPkmDataContext)
+  const { getLookups } = useLookups()
+
   const displayError = useDisplayError()
 
   const buildAndOpenSave = useCallback(
-    (saveType: SAVClass, filePath: PathData, fileBytes: Uint8Array) => {
+    async (saveType: SAVClass, filePath: PathData, fileBytes: Uint8Array) => {
+      const lookupsResult = await getLookups()
+
+      if (E.isLeft(lookupsResult)) {
+        displayError('Error Loading Lookups', lookupsResult.left)
+        return
+      }
+
+      const lookups = lookupsResult.right
+
       const result = buildSaveFile(
         filePath,
         fileBytes,
         {
           homeMonMap: lookupState.homeMons,
-          gen12LookupMap: lookupState.gen12,
-          gen345LookupMap: lookupState.gen345,
+          gen12LookupMap: lookups.gen12,
+          gen345LookupMap: lookups.gen345,
         },
         saveType,
         (updatedMon) => {
@@ -87,7 +99,7 @@ function useOpenSaveHandler(onClose?: () => void) {
         onClose?.()
       }
     },
-    [backend, displayError, dispatchOpenSaves, lookupState, onClose]
+    [getLookups, lookupState.homeMons, displayError, backend, dispatchOpenSaves, onClose]
   )
 
   const pickSaveFile = useCallback(
@@ -105,7 +117,7 @@ function useOpenSaveHandler(onClose?: () => void) {
       backend.loadSaveFile(filePath).then(
         E.match(
           (err) => displayError('Error loading save file', err),
-          ({ path, fileBytes }) => {
+          async ({ path, fileBytes }) => {
             filePath = path
             if (filePath && fileBytes) {
               let saveTypes = getSaveTypes(fileBytes, getEnabledSaveTypes())
@@ -120,7 +132,7 @@ function useOpenSaveHandler(onClose?: () => void) {
               }
 
               if (saveTypes.length === 1) {
-                buildAndOpenSave(saveTypes[0], filePath, fileBytes)
+                await buildAndOpenSave(saveTypes[0], filePath, fileBytes)
                 return
               }
 
@@ -248,12 +260,12 @@ const SavesModal = (props: SavesModalProps) => {
         <SelectSaveType
           open={!!tentativeSaveData}
           saveTypes={tentativeSaveData?.possibleSaveTypes}
-          onSelect={(selected) => {
+          onSelect={async (selected) => {
             setTentativeSaveData(undefined)
             if (!tentativeSaveData || !selected) return
             const data = tentativeSaveData
 
-            buildAndOpenSave(selected, data.filePath, data.fileBytes)
+            await buildAndOpenSave(selected, data.filePath, data.fileBytes)
           }}
         />
       </Dialog.Content>

@@ -7,7 +7,6 @@ import {
   HPCharacteristics,
   HPCharacteristicsPre6,
   Moves,
-  Nature,
   SpecialAtkCharacteristics,
   SpecialDefCharacteristics,
   SpeedCharacteristics,
@@ -17,14 +16,11 @@ import {
 import { NationalDex, PokemonData } from 'pokemon-species-data'
 import Prando from 'prando'
 import {
-  bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
   getFlag,
   uint16ToBytesLittleEndian,
-  uint32ToBytesLittleEndian,
   writeUint32ToBuffer,
 } from 'src/util/byteLogic'
-import { getGen3To5Gender } from 'src/util/GenderCalc'
 import { PKMInterface } from '../interfaces'
 import { OHPKM } from './OHPKM'
 
@@ -342,76 +338,6 @@ export const getSixDigitTID = (tid: number, sid: number) => {
   bytes.set(uint16ToBytesLittleEndian(tid), 0)
   bytes.set(uint16ToBytesLittleEndian(sid), 2)
   return bytesToUint32LittleEndian(bytes, 0x0c) % 1000000
-}
-
-const getIsShinyPreGen6 = (trainerID: number, secretID: number, personalityValue: number) =>
-  (trainerID ^ secretID ^ ((personalityValue >> 16) & 0xffff) ^ (personalityValue & 0xffff)) < 8
-
-export const generatePersonalityValuePreservingAttributes = (
-  mon: PKMInterface,
-  prng: Prando = new Prando()
-) => {
-  if (!prng) {
-    prng = new Prando(mon.personalityValue ?? mon.ivs?.atk)
-  }
-  let personalityValue = mon.personalityValue ?? prng.nextInt(0, 0xffffffff)
-  let otherNature: Nature | undefined = mon.nature
-  let otherAbilityNum = 4
-
-  if (mon.abilityNum !== undefined) {
-    otherAbilityNum = mon.abilityNum
-  }
-
-  if ('statNature' in mon) {
-    otherNature = mon.statNature
-  }
-  // xoring the other three values with this to calculate upper half of personality value
-  // will ensure shininess or non-shininess depending on original mon
-  const otherGender = mon.gender
-  let i = 0
-  let newPersonalityValue = BigInt(personalityValue)
-  const shouldCheckUnown = mon.dexNum === NationalDex.Unown
-
-  while (i < 0x10000) {
-    const newGender = getGen3To5Gender(Number(newPersonalityValue), mon.dexNum)
-    const newNature = Number(newPersonalityValue % 25n)
-
-    if (
-      (!shouldCheckUnown || getUnownLetterGen3(Number(newPersonalityValue)) === mon.formeNum) &&
-      newGender === otherGender &&
-      (otherAbilityNum === 4 ||
-        shouldCheckUnown ||
-        Number((newPersonalityValue & 1n) + 1n) === otherAbilityNum) &&
-      (otherNature === undefined || newNature === otherNature) &&
-      getIsShinyPreGen6(mon.trainerID, mon.secretID ?? 0, Number(newPersonalityValue)) ===
-        mon.isShiny()
-    ) {
-      return Number(newPersonalityValue)
-    }
-    i++
-    const pvBytes = uint32ToBytesLittleEndian(personalityValue)
-    let pvLower16, pvUpper16
-
-    if (mon.dexNum === NationalDex.Unown) {
-      pvLower16 = prng.nextInt(0, 0xffff)
-      pvUpper16 = prng.nextInt(0, 0xffff)
-      if (mon.isShiny()) {
-        pvUpper16 =
-          ((mon.trainerID ^ (mon.secretID ?? 0) ^ pvLower16) & 0xfcfc) | (pvUpper16 & 0x0303)
-      }
-    } else {
-      pvLower16 = bytesToUint16LittleEndian(pvBytes, 0)
-      pvUpper16 = bytesToUint16LittleEndian(pvBytes, 2)
-      pvLower16 ^= i
-      if (mon.isShiny()) {
-        pvUpper16 = mon.trainerID ^ (mon.secretID ?? 0) ^ pvLower16
-      }
-    }
-    pvBytes.set(uint16ToBytesLittleEndian(pvUpper16), 2)
-    pvBytes.set(uint16ToBytesLittleEndian(pvLower16), 0)
-    newPersonalityValue = BigInt(bytesToUint32LittleEndian(pvBytes, 0))
-  }
-  return personalityValue
 }
 
 export function getCharacteristic(mon: PKMInterface) {

@@ -29,5 +29,6 @@
     "MACOSX_DEPLOYMENT_TARGET": "14.6"
   },
   "rust-analyzer.check.command": "clippy",
-  "editor.inlayHints.enabled": "off"
+  "editor.inlayHints.enabled": "off",
+  "editor.tabSize": 2
 }
