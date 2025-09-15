@@ -1210,9 +1210,9 @@ export const UnboundToNationalDexMap: Record<string, GameToNationalDexEntry | nu
   '1206': { NationalDexIndex: 889, FormIndex: 1 }, // Zamazenta-Crowned
   '1207': { NationalDexIndex: 890, FormIndex: 1 }, // Eternatus-Eternamax
   '1208': { NationalDexIndex: 892, FormIndex: 1 }, // Urshifu-Rapid-Strike
-  '1209': null, // SPECIES_ZARUDE_DADA (not found)
-  '1210': null, // SPECIES_CALYREX_ICE_RIDER (not found)
-  '1211': null, // SPECIES_CALYREX_SHADOW_RIDER (not found)
+  '1209': { NationalDexIndex: 893, FormIndex: 1 }, // Zarude-Dada
+  '1210': { NationalDexIndex: 898, FormIndex: 1 }, // Calyrex-Ice-Rider
+  '1211': { NationalDexIndex: 898, FormIndex: 2 }, // Calyrex-Shadow-Rider
   '1212': { NationalDexIndex: 52, FormIndex: 2 }, // Meowth-Galar
   '1213': { NationalDexIndex: 77, FormIndex: 1 }, // Ponyta-Galar
   '1214': { NationalDexIndex: 78, FormIndex: 1 }, // Rapidash-Galar
@@ -1255,8 +1255,8 @@ export const UnboundToNationalDexMap: Record<string, GameToNationalDexEntry | nu
   '1251': { NationalDexIndex: 899, FormIndex: 0 }, // Wyrdeer
   '1252': { NationalDexIndex: 900, FormIndex: 0 }, // Kleavor
   '1253': { NationalDexIndex: 901, FormIndex: 0 }, // Ursaluna
-  '1254': null, // SPECIES_BASCULEGION_M (not found)
-  '1255': null, // Basculegion-F (not found)
+  '1254': { NationalDexIndex: 902, FormIndex: 0 }, // Basculegion-M
+  '1255': { NationalDexIndex: 902, FormIndex: 1 }, // Basculegion-F
   '1256': { NationalDexIndex: 903, FormIndex: 0 }, // Sneasler
   '1257': { NationalDexIndex: 904, FormIndex: 0 }, // Overqwil
   '1258': { NationalDexIndex: 905, FormIndex: 0 }, // Enamorus
