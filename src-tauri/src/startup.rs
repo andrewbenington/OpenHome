@@ -52,6 +52,7 @@ fn initialize_storage(app_handle: &tauri::AppHandle) -> Result<()> {
     let obj_files = [
         "gen12_lookup.json",
         "gen345_lookup.json",
+        "pokedex.json",
         "recent_saves.json",
         "settings.json",
     ];

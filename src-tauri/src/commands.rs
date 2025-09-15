@@ -1,6 +1,6 @@
 use crate::error::{Error, Result};
 use crate::plugin::{self, PluginMetadata, PluginMetadataWithIcon, list_plugins};
-use crate::state::{AppState, AppStateSnapshot};
+use crate::state::{AppState, AppStateSnapshot, PokedexState};
 use crate::util::ImageResponse;
 use crate::{menu, saves, util};
 use serde_json::Value;
@@ -95,8 +95,13 @@ pub fn rollback_transaction(state: tauri::State<'_, AppState>) -> Result<()> {
 }
 
 #[tauri::command]
-pub fn commit_transaction(state: tauri::State<'_, AppState>) -> Result<()> {
-    state.lock()?.commit_transaction()
+pub fn commit_transaction(
+    app_handle: tauri::AppHandle,
+    app_state: tauri::State<'_, AppState>,
+    pokedex_state: tauri::State<'_, PokedexState>,
+) -> Result<()> {
+    app_state.lock()?.commit_transaction()?;
+    util::write_storage_file_json(&app_handle, "pokedex.json", pokedex_state.lock()?.clone())
 }
 
 #[tauri::command]

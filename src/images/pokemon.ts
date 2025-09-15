@@ -1,9 +1,9 @@
 import { NationalDex, PokemonData } from 'pokemon-species-data'
 
 import { BLOOD_MOON, SWEETS } from 'src/consts/Formes'
-import { PKMInterface } from 'src/types/interfaces'
 import { toGen3RRPokemonIndex } from 'src/types/SAVTypes/radicalred/conversion/Gen3RRPokemonIndex'
 import { RRSprites } from 'src/types/SAVTypes/radicalred/conversion/RadicalRedSprites'
+import { MonSpriteData } from '../state/plugin'
 import { toGen3CRFUPokemonIndex } from '../types/SAVTypes/cfru/conversion/util'
 import { NationalDexToUnboundMap } from '../types/SAVTypes/unbound/conversion/UnboundSpeciesMap'
 import { UBSprites } from '../types/SAVTypes/unbound/conversion/UnboundSprites'
@@ -28,7 +28,7 @@ export const fileToSpriteFolder: Record<string, string> = {
   OHPKM: 'home',
 }
 
-export const getPokemonSpritePath = (mon: PKMInterface, format?: string) => {
+export const getPokemonSpritePath = (mon: MonSpriteData, format?: string) => {
   const monFormat = format ?? mon.format
   let spriteName = PokemonData[mon.dexNum]?.formes[mon.formeNum]?.sprite ?? ''
 
@@ -74,6 +74,6 @@ export const getPokemonSpritePath = (mon: PKMInterface, format?: string) => {
     return `sprites/${spriteFolder}/${gen3UBname}`
   }
   return `sprites/${spriteFolder}${
-    mon.isShiny() && spriteFolder !== 'gen1' && spriteFolder !== 'gen9' ? '/shiny/' : '/'
+    mon.isShiny && spriteFolder !== 'gen1' && spriteFolder !== 'gen9' ? '/shiny/' : '/'
   }${spriteName}.${spriteFolder === 'gen3gc' ? 'gif' : 'png'}`
 }

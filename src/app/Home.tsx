@@ -19,6 +19,7 @@ import { OpenSavesContext } from '../state/openSaves'
 import { PersistedPkmDataContext } from '../state/persistedPkmData'
 import { PKMInterface } from '../types/interfaces'
 import { OHPKM } from '../types/pkm/OHPKM'
+import { PokedexUpdate } from '../types/pokedex'
 import { getMonFileIdentifier, getMonGen12Identifier, getMonGen345Identifier } from '../util/Lookup'
 import './Home.css'
 import ReleaseArea from './home/ReleaseArea'
@@ -43,13 +44,23 @@ const Home = () => {
       return E.left(homeResult.left)
     }
 
+    const pokedexUpdates: PokedexUpdate[] = []
+
     for (const [identifier, mon] of Object.entries(homeResult.right)) {
       const hadErrors = mon.fixErrors()
 
       if (hadErrors) {
         backend.writeHomeMon(identifier, new Uint8Array(mon.toBytes()))
       }
+
+      pokedexUpdates.push({
+        dexNumber: mon.dexNum,
+        formeNumber: mon.formeNum,
+        status: mon.isShiny() ? 'ShinyCaught' : 'Caught',
+      })
     }
+
+    backend.registerInPokedex(pokedexUpdates)
 
     persistedPkmDispatch({ type: 'load_persisted_pkm_data', payload: homeResult.right })
 

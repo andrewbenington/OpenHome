@@ -1,9 +1,10 @@
 import { Dispatch, Reducer, createContext } from 'react'
 
-interface MonData {
+export interface MonSpriteData {
   dexNum: number
   formeNum: number
   format: string
+  formArgument?: number
   isFemale?: boolean
   isShiny?: boolean
 }
@@ -11,7 +12,7 @@ interface MonData {
 export interface OpenHomePlugin {
   id: string
   name: string
-  getMonSpritePath?: (params: MonData) => string | null
+  getMonSpritePath?: (params: MonSpriteData) => string | null
 }
 
 export type PluginState = { plugins: OpenHomePlugin[]; loaded: boolean }
