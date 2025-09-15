@@ -833,7 +833,7 @@ export const UnboundToNationalDexMap: Record<string, GameToNationalDexEntry | nu
   '829': { NationalDexIndex: 720, FormIndex: 1 }, // Hoopa-Unbound
   '830': { NationalDexIndex: 721, FormIndex: 0 }, // Volcanion
   '831': { NationalDexIndex: 668, FormIndex: 0 }, // Pyroar
-  '832': null, // Meowstic-F (not found)
+  '832': { NationalDexIndex: 678, FormIndex: 1 }, // Meowstic-F
   '833': { NationalDexIndex: 681, FormIndex: 1 }, // Aegislash-Blade
   '834': { NationalDexIndex: 493, FormIndex: 17 }, // Arceus-Fairy
   '835': null, // SPECIES_ZYGARDE_CELL (not found)
