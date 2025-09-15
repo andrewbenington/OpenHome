@@ -41,7 +41,7 @@ export class PK3RR extends PK3CFRU implements PluginPKMInterface {
   }
 
   monFromGameIndex(gameIndex: number): CFRUToNationalDexEntry {
-    return fromGen3CRFUPokemonIndex(gameIndex, RadicalRedToNationalDexMap)
+    return fromGen3CRFUPokemonIndex(gameIndex, RadicalRedToNationalDexMap, 'Pokemon Radical Red')
   }
 
   monToGameIndex(nationalDexNumber: number, formIndex: number): number {
