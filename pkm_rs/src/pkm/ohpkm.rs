@@ -1,5 +1,5 @@
 use crate::pkm::traits::IsShiny4096;
-use crate::pkm::{Pkm, Error, Result};
+use crate::pkm::{Error, Pkm, Result};
 use crate::resources::{
     AbilityIndex, Ball, FormeMetadata, GameOfOriginIndex, ModernRibbon, MoveSlot, NatureIndex,
     OpenHomeRibbonSet, SpeciesAndForme, SpeciesMetadata,
@@ -119,19 +119,8 @@ pub struct Ohpkm {
     pub tm_flags_sv_dlc: [u8; 13],
 }
 
-impl Pkm for Ohpkm {
-    const BOX_SIZE: usize = 433;
-    const PARTY_SIZE: usize = 433;
-
-    fn box_size() -> usize {
-        Self::BOX_SIZE
-    }
-
-    fn party_size() -> usize {
-        Self::PARTY_SIZE
-    }
-
-    fn from_bytes(bytes: &[u8]) -> Result<Self> {
+impl Ohpkm {
+    pub fn from_bytes(bytes: &[u8]) -> Result<Self> {
         let size = bytes.len();
         if size < MIN_SIZE {
             return Err(Error::ByteLength {
@@ -281,6 +270,23 @@ impl Pkm for Ohpkm {
             },
         };
         Ok(mon)
+    }
+}
+
+impl Pkm for Ohpkm {
+    const BOX_SIZE: usize = 433;
+    const PARTY_SIZE: usize = 433;
+
+    fn from_bytes(bytes: &[u8]) -> Result<Box<Self>> {
+        Self::from_bytes(bytes).map(Box::new)
+    }
+
+    fn box_size() -> usize {
+        Self::BOX_SIZE
+    }
+
+    fn party_size() -> usize {
+        Self::PARTY_SIZE
     }
 
     fn write_box_bytes(&self, bytes: &mut [u8]) {

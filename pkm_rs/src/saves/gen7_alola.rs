@@ -35,10 +35,8 @@ pub struct SunMoonSave {
     pub trainer: TrainerData,
 }
 
-impl SaveDataTrait for SunMoonSave {
-    type PkmType = Pk7;
-
-    fn from_bytes(bytes: Vec<u8>) -> Result<Self, String> {
+impl SunMoonSave {
+    pub fn from_bytes(bytes: Vec<u8>) -> Result<Self, String> {
         let size = bytes.len();
         let my_status = TrainerData::from_bytes(
             &bytes[SM_TRAINER_DATA_OFFSET..SM_TRAINER_DATA_OFFSET + TRAINER_DATA_SIZE]
@@ -51,6 +49,10 @@ impl SaveDataTrait for SunMoonSave {
             trainer: my_status,
         })
     }
+}
+
+impl SaveDataTrait for SunMoonSave {
+    type PkmType = Pk7;
 
     fn get_mon_bytes_at(&self, box_num: usize, offset: usize) -> Result<Vec<u8>, String> {
         let decrypted_bytes = decrypt_pkm_bytes_gen_6_7(&self.get_mon_bytes(box_num, offset))
@@ -101,8 +103,8 @@ impl SunMoonSave {
     }
 
     #[wasm_bindgen(js_name = fromBytes)]
-    pub fn from_byte_vector(bytes: Vec<u8>) -> core::result::Result<Self, JsValue> {
-        Self::from_bytes(bytes).map_err(|e| JsValue::from_str(&e.to_string()))
+    pub fn from_byte_vector(bytes: Vec<u8>) -> core::result::Result<Self, String> {
+        Self::from_bytes(bytes).map_err(|e| e.to_string())
     }
 
     #[wasm_bindgen]
@@ -147,10 +149,8 @@ pub struct UltraSunMoonSave {
     pub trainer: TrainerData,
 }
 
-impl SaveDataTrait for UltraSunMoonSave {
-    type PkmType = Pk7;
-
-    fn from_bytes(bytes: Vec<u8>) -> Result<Self, String> {
+impl UltraSunMoonSave {
+    pub fn from_bytes(bytes: Vec<u8>) -> Result<Self, String> {
         let size = bytes.len();
         let my_status = TrainerData::from_bytes(
             &bytes[USUM_TRAINER_DATA_OFFSET..USUM_TRAINER_DATA_OFFSET + TRAINER_DATA_SIZE]
@@ -163,6 +163,10 @@ impl SaveDataTrait for UltraSunMoonSave {
             trainer: my_status,
         })
     }
+}
+
+impl SaveDataTrait for UltraSunMoonSave {
+    type PkmType = Pk7;
 
     fn get_mon_bytes_at(&self, box_num: usize, offset: usize) -> Result<Vec<u8>, String> {
         let decrypted_bytes = decrypt_pkm_bytes_gen_6_7(&self.get_mon_bytes(box_num, offset))

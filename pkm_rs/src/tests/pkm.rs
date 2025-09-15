@@ -26,7 +26,7 @@ fn pkm_from_file<PKM: Pkm>(filename: &str) -> Result<(PKM, Vec<u8>), Box<dyn Err
         Ok(text) => println!("{text}"),
         Err(e) => println!("{e}"),
     }
-    Ok((pkm, contents))
+    Ok((*pkm, contents))
 }
 
 #[cfg(test)]

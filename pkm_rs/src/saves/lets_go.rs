@@ -26,10 +26,8 @@ pub struct LetsGoSave {
     poke_list_header: PokeListHeader,
 }
 
-impl SaveDataTrait for LetsGoSave {
-    type PkmType = Pb7;
-
-    fn from_bytes(bytes: Vec<u8>) -> Result<Self, String> {
+impl LetsGoSave {
+    pub fn from_bytes(bytes: Vec<u8>) -> Result<Self, String> {
         let size = bytes.len();
         let my_status = TrainerData::from_bytes(&bytes);
         let poke_list_header = PokeListHeader::from_bytes(&bytes);
@@ -40,6 +38,10 @@ impl SaveDataTrait for LetsGoSave {
             poke_list_header,
         })
     }
+}
+
+impl SaveDataTrait for LetsGoSave {
+    type PkmType = Pb7;
 
     fn box_rows() -> usize {
         BOX_ROWS

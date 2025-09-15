@@ -15,6 +15,7 @@ import { PathData } from 'src/types/SAVTypes/path'
 import { getSaveRef } from 'src/types/SAVTypes/SAV'
 import { SAVClass } from 'src/types/SAVTypes/util'
 import { getMonFileIdentifier } from 'src/util/Lookup'
+import { TauriInvoker } from '../backend/tauri/tauriInvoker'
 import { useLookups } from '../state/lookups'
 import RecentSaves from './RecentSaves'
 import SaveFolders from './SaveFolders'
@@ -114,6 +115,7 @@ function useOpenSaveHandler(onClose?: () => void) {
         if (!pickedFile.right) return
         filePath = pickedFile.right
       }
+      TauriInvoker.detectSaveType(filePath.raw).then(console.log)
       backend.loadSaveFile(filePath).then(
         E.match(
           (err) => displayError('Error loading save file', err),

@@ -5,7 +5,7 @@ use std::{
     sync::Mutex,
 };
 
-use crate::error::OpenHomeResult;
+use crate::error::Result;
 use pkm_rs::saves::{SaveData, SaveType, gen7_alola::SunMoonSave, lets_go::LetsGoSave};
 use serde::Serialize;
 
@@ -17,6 +17,12 @@ pub struct OpenSavesStateInner {
     saves: HashMap<PathBuf, SaveData>,
 }
 
+impl OpenSavesStateInner {
+    pub fn add_save(&mut self, path: PathBuf, save: SaveData) {
+        self.saves.entry(path).or_insert(save);
+    }
+}
+
 #[derive(Serialize)]
 pub enum OpenSaveResponse {
     NotRecognized,
@@ -25,16 +31,15 @@ pub enum OpenSaveResponse {
 }
 
 impl OpenSavesStateInner {
-    pub fn open_save(path: &Path) -> OpenHomeResult<OpenSaveResponse> {
+    pub fn open_save(path: &Path) -> Result<OpenSaveResponse> {
         let bytes = util::read_file_bytes(path)?;
         let possible_save_types = SaveType::detect_from_bytes(&bytes);
 
-        match possible_save_types.len() {
-            0 => Ok(OpenSaveResponse::NotRecognized),
-            1 => possible_save_types[0]
-                .build(&bytes)
-                .map(OpenSaveResponse::OneMatch),
-        }
+        Ok(match possible_save_types.len() {
+            0 => OpenSaveResponse::NotRecognized,
+            1 => OpenSaveResponse::OneMatch(possible_save_types[0]),
+            2.. => OpenSaveResponse::MultipleMatches(possible_save_types),
+        })
     }
 }
 
@@ -47,10 +52,4 @@ impl Deref for OpenSavesState {
     fn deref(&self) -> &Self::Target {
         &self.0
     }
-}
-
-pub struct DisambiguationPrompt {
-    id: u8,
-    save_data_results: Vec<OpenHomeResult<SaveData>>,
-    bytes: Box<[u8]>,
 }

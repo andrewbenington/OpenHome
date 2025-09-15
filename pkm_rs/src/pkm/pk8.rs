@@ -1,5 +1,5 @@
 use crate::pkm::traits::ModernEvs;
-use crate::pkm::{Pkm, Error, Result};
+use crate::pkm::{Error, Pkm, Result};
 use crate::resources::{FormeMetadata, MoveSlot, SpeciesAndForme, SpeciesMetadata};
 use crate::strings::SizedUtf16String;
 use crate::substructures::{
@@ -81,19 +81,8 @@ pub struct Pk8 {
     pub stats: Stats16Le,
 }
 
-impl Pkm for Pk8 {
-    const BOX_SIZE: usize = 344;
-    const PARTY_SIZE: usize = 344;
-
-    fn box_size() -> usize {
-        Self::BOX_SIZE
-    }
-
-    fn party_size() -> usize {
-        Self::PARTY_SIZE
-    }
-
-    fn from_bytes(bytes: &[u8]) -> Result<Self> {
+impl Pk8 {
+    pub fn from_bytes(bytes: &[u8]) -> Result<Self> {
         let size = bytes.len();
         if size < Self::BOX_SIZE {
             return Err(Error::ByteLength {
@@ -190,6 +179,23 @@ impl Pkm for Pk8 {
             stats: Stats16Le::from_bytes(bytes[330..342].try_into().unwrap()),
         };
         Ok(mon)
+    }
+}
+
+impl Pkm for Pk8 {
+    const BOX_SIZE: usize = 344;
+    const PARTY_SIZE: usize = 344;
+
+    fn box_size() -> usize {
+        Self::BOX_SIZE
+    }
+
+    fn party_size() -> usize {
+        Self::PARTY_SIZE
+    }
+
+    fn from_bytes(bytes: &[u8]) -> Result<Box<Self>> {
+        Self::from_bytes(bytes).map(Box::new)
     }
 
     fn write_box_bytes(&self, bytes: &mut [u8]) {

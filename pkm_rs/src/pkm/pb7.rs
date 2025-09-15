@@ -79,19 +79,8 @@ pub struct Pb7 {
     pub trainer_gender: Gender,
 }
 
-impl Pkm for Pb7 {
-    const BOX_SIZE: usize = 260;
-    const PARTY_SIZE: usize = 260;
-
-    fn box_size() -> usize {
-        Self::BOX_SIZE
-    }
-
-    fn party_size() -> usize {
-        Self::PARTY_SIZE
-    }
-
-    fn from_bytes(bytes: &[u8]) -> Result<Self> {
+impl Pb7 {
+    pub fn from_bytes(bytes: &[u8]) -> Result<Self> {
         let size = bytes.len();
         if size < Pb7::BOX_SIZE {
             return Err(Error::ByteLength {
@@ -183,6 +172,23 @@ impl Pkm for Pb7 {
             mega_forme: bytes[257],
         };
         Ok(mon)
+    }
+}
+
+impl Pkm for Pb7 {
+    const BOX_SIZE: usize = 260;
+    const PARTY_SIZE: usize = 260;
+
+    fn box_size() -> usize {
+        Self::BOX_SIZE
+    }
+
+    fn party_size() -> usize {
+        Self::PARTY_SIZE
+    }
+
+    fn from_bytes(bytes: &[u8]) -> Result<Box<Self>> {
+        Self::from_bytes(bytes).map(Box::new)
     }
 
     fn write_box_bytes(&self, bytes: &mut [u8]) {

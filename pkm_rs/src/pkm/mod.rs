@@ -28,14 +28,14 @@ use crate::{
     resources::{FormeMetadata, SpeciesMetadata},
 };
 
-pub trait Pkm: Sized + Serialize + IsShiny {
+pub trait Pkm: Serialize + IsShiny {
     const BOX_SIZE: usize;
     const PARTY_SIZE: usize;
 
     fn box_size() -> usize;
     fn party_size() -> usize;
 
-    fn from_bytes(bytes: &[u8]) -> Result<Self>;
+    fn from_bytes(bytes: &[u8]) -> Result<Box<Self>>;
     fn write_box_bytes(&self, bytes: &mut [u8]);
     fn write_party_bytes(&self, bytes: &mut [u8]);
     fn to_box_bytes(&self) -> Vec<u8>;

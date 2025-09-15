@@ -50,6 +50,7 @@ pub fn run() {
 
             app.manage(state::AppState::default());
             app.manage(lookup_state);
+            app.manage(state::OpenSavesState::default());
 
             match menu::create_menu(app) {
                 Ok(menu) => {
@@ -93,6 +94,7 @@ pub fn run() {
             commands::open_directory,
             pkm_storage::load_banks,
             pkm_storage::write_banks,
+            saves::detect_save_type,
             state::get_lookups,
             state::update_lookups,
         ])

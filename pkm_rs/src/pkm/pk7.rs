@@ -95,19 +95,8 @@ pub struct Pk7 {
     pub stats: Stats16Le,
 }
 
-impl Pkm for Pk7 {
-    const BOX_SIZE: usize = 232;
-    const PARTY_SIZE: usize = 260;
-
-    fn box_size() -> usize {
-        Self::BOX_SIZE
-    }
-
-    fn party_size() -> usize {
-        Self::PARTY_SIZE
-    }
-
-    fn from_bytes(bytes: &[u8]) -> Result<Self> {
+impl Pk7 {
+    pub fn from_bytes(bytes: &[u8]) -> Result<Self> {
         let size = bytes.len();
         if size < Self::BOX_SIZE {
             return Err(Error::ByteLength {
@@ -233,6 +222,23 @@ impl Pkm for Pk7 {
             },
         };
         Ok(mon)
+    }
+}
+
+impl Pkm for Pk7 {
+    const BOX_SIZE: usize = 232;
+    const PARTY_SIZE: usize = 260;
+
+    fn box_size() -> usize {
+        Self::BOX_SIZE
+    }
+
+    fn party_size() -> usize {
+        Self::PARTY_SIZE
+    }
+
+    fn from_bytes(bytes: &[u8]) -> Result<Box<Self>> {
+        Self::from_bytes(bytes).map(Box::new)
     }
 
     fn write_box_bytes(&self, bytes: &mut [u8]) {

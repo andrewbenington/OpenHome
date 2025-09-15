@@ -34,6 +34,14 @@ export const TauriInvoker = {
     return promise.then((unixMillis) => E.right(new Date(unixMillis))).catch(E.left)
   },
 
+  detectSaveType(absolutePath: string): Promise<Errorable<any>> {
+    const promise: Promise<any> = invoke('detect_save_type', {
+      absolutePath,
+    })
+
+    return promise.then(E.right).catch(E.left)
+  },
+
   getLookups(): Promise<Errorable<StoredLookups>> {
     const promise: Promise<StoredLookups> = invoke('get_lookups')
 

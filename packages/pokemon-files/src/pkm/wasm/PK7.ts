@@ -46,17 +46,17 @@ export class Pk7Rust {
       }
 
       this.inner = PkmWasm.Pk7.fromBytes(new Uint8Array(buffer))
-      console.log('registering ' + this.inner.nickname)
+      // console.log('registering ' + this.inner.nickname)
       this.finalizationRegistry = new FinalizationRegistry((message) => {
-        console.log('registry message: ' + message)
+        // console.log('registry message: ' + message)
         this.inner.free()
       })
       this.finalizationRegistry.register(this, this.nickname)
     } else if (arg instanceof PkmWasm.Pk7) {
       this.inner = arg
-      console.log('registering ' + this.inner.nickname)
+      // console.log('registering ' + this.inner.nickname)
       this.finalizationRegistry = new FinalizationRegistry((message) => {
-        console.log('registry message: ' + message)
+        // console.log('registry message: ' + message)
         this.inner.free()
       })
       this.finalizationRegistry.register(this, this.nickname)
@@ -67,7 +67,7 @@ export class Pk7Rust {
       }
 
       this.inner = PkmWasm.Pk7.fromOhpkmBytes(new Uint8Array(other.toBytes()))
-      console.log('registering ' + this.inner.nickname)
+      // console.log('registering ' + this.inner.nickname)
       this.finalizationRegistry = new FinalizationRegistry((message) => {
         console.log('registry message: ' + message)
         this.inner.free()
@@ -652,7 +652,6 @@ export class Pk7Rust {
   }
 
   get ribbons() {
-    console.log('getting ribbons from rust')
     return this.inner.ribbons.map((ribbonName) =>
       ribbonName.endsWith('Ribbon') ? ribbonName.substring(0, ribbonName.length - 7) : ribbonName
     )
