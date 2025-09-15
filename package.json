@@ -59,7 +59,7 @@
     "react-data-grid": "^7.0.0-beta.57",
     "react-error-boundary": "^6.0.0",
     "react-icons": "^5.5.0",
-    "uuid": "^12.0.0"
+    "uuid": "^13.0.0"
   },
   "devDependencies": {
     "@stylistic/eslint-plugin": "^5.3.1",
