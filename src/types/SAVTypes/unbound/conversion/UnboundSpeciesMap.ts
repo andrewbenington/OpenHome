@@ -841,19 +841,19 @@ export const UnboundToNationalDexMap: Record<string, GameToNationalDexEntry | nu
   '837': { NationalDexIndex: 718, FormIndex: 1 }, // Zygarde-10%
   '838': { NationalDexIndex: 718, FormIndex: 4 }, // Zygarde-Complete
   '839': { NationalDexIndex: 658, FormIndex: 2 }, // Greninja-Ash
-  '840': { NationalDexIndex: 669, FormIndex: 1 }, // Flabébé-Blue
+  '840': { NationalDexIndex: 669, FormIndex: 3 }, // Flabébé-Blue  // FLABEBE LINE
   '841': { NationalDexIndex: 669, FormIndex: 2 }, // Flabébé-Orange
-  '842': { NationalDexIndex: 669, FormIndex: 4 }, // Flabébé-Yellow
-  '843': { NationalDexIndex: 669, FormIndex: 3 }, // Flabébé-White
-  '844': { NationalDexIndex: 669, FormIndex: 1 }, // Flabébé-Blue
-  '845': { NationalDexIndex: 669, FormIndex: 2 }, // Flabébé-Orange
-  '846': { NationalDexIndex: 669, FormIndex: 4 }, // Flabébé-Yellow
-  '847': { NationalDexIndex: 669, FormIndex: 3 }, // Flabébé-White
+  '842': { NationalDexIndex: 669, FormIndex: 1 }, // Flabébé-Yellow
+  '843': { NationalDexIndex: 669, FormIndex: 4 }, // Flabébé-White
+  '844': { NationalDexIndex: 670, FormIndex: 3 }, // Floette-Blue   // FLOETTE LINE
+  '845': { NationalDexIndex: 670, FormIndex: 2 }, // Floette-Orange
+  '846': { NationalDexIndex: 670, FormIndex: 1 }, // Floette-Yellow
+  '847': { NationalDexIndex: 670, FormIndex: 4 }, // Floette-White
   '848': { NationalDexIndex: 670, FormIndex: 5 }, // Floette-Eternal
-  '849': { NationalDexIndex: 670, FormIndex: 1 }, // Floette-Blue
-  '850': { NationalDexIndex: 670, FormIndex: 2 }, // Floette-Orange
-  '851': { NationalDexIndex: 670, FormIndex: 4 }, // Floette-Yellow
-  '852': { NationalDexIndex: 670, FormIndex: 3 }, // Floette-White
+  '849': { NationalDexIndex: 671, FormIndex: 3 }, // Florges-Blue   // FLORGES LINE
+  '850': { NationalDexIndex: 671, FormIndex: 2 }, // Florges-Orange
+  '851': { NationalDexIndex: 671, FormIndex: 1 }, // Florges-Yellow
+  '852': { NationalDexIndex: 671, FormIndex: 4 }, // Florges-White
   '853': { NationalDexIndex: 710, FormIndex: 0 }, // Pumpkaboo
   '854': { NationalDexIndex: 710, FormIndex: 0 }, // Pumpkaboo
   '855': { NationalDexIndex: 710, FormIndex: 0 }, // Pumpkaboo
