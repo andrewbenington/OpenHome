@@ -5,6 +5,7 @@ import useDisplayError from '../hooks/displayError'
 import { getPublicImageURL } from '../images/images'
 import { getPokemonSpritePath } from '../images/pokemon'
 import { MonSpriteData, OpenHomePlugin, PluginContext } from '../state/plugin'
+import { displayIndexAdder, isBattleFormeItem } from '../types/pkm/util'
 
 type RequiredFields<T, K extends keyof T> = T & Required<Pick<T, K>>
 
@@ -31,6 +32,11 @@ export default function useMonSprite(mon: MonSpriteData) {
 
   useEffect(() => {
     if (loadError) return
+
+    if (isBattleFormeItem(mon.heldItemIndex)) {
+      mon.formeNum = displayIndexAdder(mon.heldItemIndex)(mon.formeNum)
+    }
+
     for (const plugin of spritePlugins) {
       const spritePath = plugin.getMonSpritePath(mon)
 
