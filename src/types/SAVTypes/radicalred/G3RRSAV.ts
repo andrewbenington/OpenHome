@@ -36,12 +36,6 @@ export class G3RRSAV extends G3CFRUSAV<PK3RR> implements PluginSAV<PK3RR> {
     const firstSectionBytesIndex = findFirstSectionOffset(bytes)
     const firstSectionBytes = bytes.slice(firstSectionBytesIndex, firstSectionBytesIndex + 0x1000)
 
-    const signature = bytesToUint32LittleEndian(firstSectionBytes, 0x0ff8)
-
-    console.info('Checking Radical Red save', { signature })
-
-    if (signature === 0x08012025) return true
-
     const gameCode = bytesToUint32LittleEndian(firstSectionBytes, 0xac)
 
     if (gameCode !== 1) return false

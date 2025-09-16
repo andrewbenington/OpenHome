@@ -47,17 +47,9 @@ export class G3UBSAV extends G3CFRUSAV<PK3UB> implements PluginSAV<PK3UB> {
 
     const signature = bytesToUint32LittleEndian(firstSectionBytes, 0x0ff8)
 
-    console.info('Checking Unbound save', { signature })
-
     // from unbound cloud
     // https://github.com/Skeli789/Unbound-Cloud/blob/a5d966b74b865f51fef608e19ca63e0e51593f5e/server/src/Defines.py#L25C1-L26C1
-    if (signature === 0x01122000 || signature === 0x01121999 || signature === 0x01121998) {
-      return true
-    }
-
-    const gameCode = bytesToUint32LittleEndian(firstSectionBytes, 0xac)
-
-    return gameCode === 0xffffffff
+    return signature === 0x01122000 || signature === 0x01121999 || signature === 0x01121998
   }
 
   gameColor(): string {
