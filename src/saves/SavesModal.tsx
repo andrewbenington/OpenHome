@@ -122,7 +122,9 @@ function useOpenSaveHandler(onClose?: () => void) {
             if (filePath && fileBytes) {
               let saveTypes = getSaveTypes(fileBytes, getEnabledSaveTypes())
 
-              if (saveTypes.some(isSpecialType)) {
+              if (saveTypes.length > 1) {
+                setTentativeSaveData({ possibleSaveTypes: saveTypes, filePath, fileBytes })
+              } else if (saveTypes.some(isSpecialType)) {
                 const options = getSpecialDisambiguationOptions(getEnabledSaveTypes)
 
                 if (options.length > 0) {
