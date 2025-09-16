@@ -506,10 +506,11 @@ export function getWeightCalculated(mon: PKMWithSize) {
   return PokemonData[mon.dexNum].formes[mon.formeNum].weight * 10 * deviation
 }
 
-export function isMegaStone(item: Item) {
+export function isMegaStone(item?: Item) {
   return (
-    (item >= Item.Gengarite && item <= Item.Latiosite) ||
-    (item >= Item.Swampertite && item <= Item.Beedrillite)
+    item &&
+    ((item >= Item.Gengarite && item <= Item.Latiosite) ||
+      (item >= Item.Swampertite && item <= Item.Beedrillite))
   )
 }
 
@@ -521,25 +522,27 @@ export function isZCrystal(item: Item) {
   )
 }
 
-export function isBattleFormeItem(item: Item) {
+export function isBattleFormeItem(item?: Item) {
   return (
     isMegaStone(item) ||
     item === Item.UltranecroziumZ ||
     item === Item.UltranecroziumZ_1 ||
     item === Item.RedOrb ||
-    item === Item.BlueOrb
+    item === Item.BlueOrb ||
+    item === Item.RustedSword ||
+    item === Item.RustedShield
   )
 }
 
-export function displayIndexAdder(item: Item) {
+export function displayIndexAdder(item?: Item) {
   if (item === Item.UltranecroziumZ || item === Item.UltranecroziumZ_1) {
     return (x: number) => x + 3
   }
   return (x: number) => x + 1
 }
 
-export function hasMega(mon: PKMInterface) {
-  const formes = PokemonData[mon.dexNum].formes
+export function hasMega(nationalDex: number) {
+  const formes = PokemonData[nationalDex].formes
 
   return formes.some((forme) => forme.isMega)
 }

@@ -1,7 +1,7 @@
 import { Button, Card, Flex, Heading, Separator, Spinner } from '@radix-ui/themes'
 import { Pokemon, PokemonData } from 'pokemon-species-data'
 import { useEffect, useMemo, useState } from 'react'
-import { ArrowLeftIcon, ArrowRightIcon } from '../components/Icons'
+import { ArrowLeftIcon, ArrowLeftRightIcon, ArrowRightIcon } from '../components/Icons'
 import PokemonIcon from '../components/PokemonIcon'
 import useMonSprite from '../pokemon/useMonSprite'
 import { usePokedex } from '../state/pokedex'
@@ -123,7 +123,11 @@ function PokedexDetails({
 }: PokedexDetailsProps) {
   const [imageError, setImageError] = useState(false)
 
-  const selectedFormeStatus = getFormeStatus(pokedex, species, selectedForme.formeNumber ?? 0)
+  const selectedFormeStatus = getFormeStatus(
+    pokedex,
+    species.nationalDex,
+    selectedForme.formeNumber ?? 0
+  )
   const spritePath = useMonSprite({
     dexNum: species.nationalDex,
     formeNum: selectedForme.formeNumber,
@@ -176,7 +180,11 @@ function PokedexDetails({
                 dexNumber={species.nationalDex}
                 formeNumber={forme.formeNumber}
                 style={{ width: 48, height: 48 }}
-                greyedOut={!getFormeStatus(pokedex, species, forme.formeNumber)?.includes('Caught')}
+                greyedOut={
+                  !getFormeStatus(pokedex, species.nationalDex, forme.formeNumber)?.includes(
+                    'Caught'
+                  )
+                }
               />
             </Button>
           ))}
@@ -185,6 +193,7 @@ function PokedexDetails({
         <EvolutionFamily
           nationalDex={species.nationalDex}
           formeNumber={selectedForme.formeNumber}
+          pokedex={pokedex}
         />
       </Flex>
     </Flex>
@@ -194,9 +203,10 @@ function PokedexDetails({
 type EvolutionLineProps = {
   nationalDex: number
   formeNumber: number
+  pokedex: Pokedex
 }
 
-function EvolutionFamily({ nationalDex, formeNumber }: EvolutionLineProps) {
+function EvolutionFamily({ nationalDex, formeNumber, pokedex }: EvolutionLineProps) {
   const baseMon = getBaseMon(nationalDex, formeNumber)
   const baseMonFormes = PokemonData[baseMon.dexNumber].formes
 
@@ -209,13 +219,14 @@ function EvolutionFamily({ nationalDex, formeNumber }: EvolutionLineProps) {
             nationalDex={baseMon.dexNumber}
             formeNumber={formeNumber}
             key={formeNumber}
+            pokedex={pokedex}
           />
         ))}
     </Flex>
   )
 }
 
-function EvolutionLine({ nationalDex, formeNumber }: EvolutionLineProps) {
+function EvolutionLine({ nationalDex, formeNumber, pokedex }: EvolutionLineProps) {
   const evolutions = PokemonData[nationalDex].formes[formeNumber].evos
 
   if (evolutions.length === 8) {
@@ -224,7 +235,11 @@ function EvolutionLine({ nationalDex, formeNumber }: EvolutionLineProps) {
         <Flex direction="column" gap="2" align="center">
           {evolutions.slice(0, 4).map((evo, i) => (
             <Flex key={`${evo.dexNumber}-${evo.formeNumber}`} align="center" gap="2">
-              <EvolutionLine nationalDex={evo.dexNumber} formeNumber={evo.formeNumber} />
+              <EvolutionLine
+                nationalDex={evo.dexNumber}
+                formeNumber={evo.formeNumber}
+                pokedex={pokedex}
+              />
               <ArrowLeftIcon
                 style={{
                   rotate: `${(1.5 - i) * 28}deg`,
@@ -239,6 +254,7 @@ function EvolutionLine({ nationalDex, formeNumber }: EvolutionLineProps) {
           dexNumber={nationalDex}
           formeNumber={formeNumber}
           style={{ width: 48, height: 48 }}
+          greyedOut={!getFormeStatus(pokedex, nationalDex, formeNumber)?.includes('Caught')}
         />
         <Flex direction="column" gap="2">
           {evolutions.slice(4).map((evo, i) => (
@@ -250,7 +266,11 @@ function EvolutionLine({ nationalDex, formeNumber }: EvolutionLineProps) {
                   marginBottom: (1.5 - i) * -15,
                 }}
               />
-              <EvolutionLine nationalDex={evo.dexNumber} formeNumber={evo.formeNumber} />
+              <EvolutionLine
+                nationalDex={evo.dexNumber}
+                formeNumber={evo.formeNumber}
+                pokedex={pokedex}
+              />
             </Flex>
           ))}
         </Flex>
@@ -258,13 +278,39 @@ function EvolutionLine({ nationalDex, formeNumber }: EvolutionLineProps) {
     )
   }
 
+  const megaFormes = PokemonData[nationalDex].formes.filter((f) => f.isMega)
+
   return (
     <Flex align="center" gap="2">
       <PokemonIcon
         dexNumber={nationalDex}
         formeNumber={formeNumber}
         style={{ width: 48, height: 48 }}
+        greyedOut={!getFormeStatus(pokedex, nationalDex, formeNumber)?.includes('Caught')}
       />
+      {!PokemonData[nationalDex].formes[formeNumber].regional && megaFormes.length > 0 && (
+        <Flex direction="column" gap="2">
+          {megaFormes.map((mega, i) => (
+            <Flex key={`${nationalDex}-${mega.formeNumber}`} align="center" gap="2">
+              <ArrowLeftRightIcon
+                style={{
+                  rotate: `${((megaFormes.length - 1) / 2 - i) * -36}deg`,
+                  marginTop: ((megaFormes.length - 1) / 2 - i) * 15,
+                  marginBottom: ((megaFormes.length - 1) / 2 - i) * -15,
+                }}
+              />
+              <PokemonIcon
+                dexNumber={nationalDex}
+                formeNumber={mega.formeNumber}
+                style={{ width: 48, height: 48 }}
+                greyedOut={
+                  !getFormeStatus(pokedex, nationalDex, mega.formeNumber)?.includes('Caught')
+                }
+              />
+            </Flex>
+          ))}
+        </Flex>
+      )}
       <Flex direction="column" gap="2">
         {evolutions.map((evo, i) => (
           <Flex key={`${evo.dexNumber}-${evo.formeNumber}`} align="center" gap="2">
@@ -275,7 +321,11 @@ function EvolutionLine({ nationalDex, formeNumber }: EvolutionLineProps) {
                 marginBottom: ((evolutions.length - 1) / 2 - i) * -15,
               }}
             />
-            <EvolutionLine nationalDex={evo.dexNumber} formeNumber={evo.formeNumber} />
+            <EvolutionLine
+              nationalDex={evo.dexNumber}
+              formeNumber={evo.formeNumber}
+              pokedex={pokedex}
+            />
           </Flex>
         ))}
       </Flex>
@@ -306,11 +356,11 @@ function getHighestFormeStatus(
 
 function getFormeStatus(
   pokedex: Pokedex,
-  species: Pokemon,
+  nationalDex: number,
   formeIndex: number
 ): PokedexStatus | undefined {
-  if (!(species.nationalDex in pokedex.byDexNumber)) return undefined
-  return pokedex.byDexNumber[species.nationalDex].formes[formeIndex]
+  if (!(nationalDex in pokedex.byDexNumber)) return undefined
+  return pokedex.byDexNumber[nationalDex].formes[formeIndex]
 }
 
 const StatusIndices: Record<PokedexStatus, number> = {

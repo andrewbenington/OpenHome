@@ -5,6 +5,7 @@ export interface MonSpriteData {
   formeNum: number
   format: string
   formArgument?: number
+  heldItemIndex?: number
   isFemale?: boolean
   isShiny?: boolean
 }

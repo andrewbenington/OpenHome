@@ -7,6 +7,7 @@ import { useCallback, useContext, useEffect, useState } from 'react'
 import { MdFileOpen } from 'react-icons/md'
 import PokemonDetailsModal from 'src/pokemon/PokemonDetailsModal'
 import BankHeader from 'src/saves/BankHeader'
+import { displayIndexAdder, isBattleFormeItem } from 'src/types/pkm/util'
 import { Errorable, LookupMap } from 'src/types/types'
 import { filterUndefined } from 'src/util/Sort'
 import { BackendContext } from '../backend/backendContext'
@@ -58,6 +59,14 @@ const Home = () => {
         formeNumber: mon.formeNum,
         status: mon.isShiny() ? 'ShinyCaught' : 'Caught',
       })
+
+      if (isBattleFormeItem(mon.heldItemIndex)) {
+        pokedexUpdates.push({
+          dexNumber: mon.dexNum,
+          formeNumber: displayIndexAdder(mon.heldItemIndex)(mon.formeNum),
+          status: mon.isShiny() ? 'ShinyCaught' : 'Caught',
+        })
+      }
     }
 
     backend.registerInPokedex(pokedexUpdates)
