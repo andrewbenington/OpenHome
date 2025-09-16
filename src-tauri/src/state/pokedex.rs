@@ -62,6 +62,10 @@ impl Pokedex {
         })
     }
 
+    pub fn write_to_storage(&self, app_handle: &tauri::AppHandle) -> Result<()> {
+        util::write_storage_file_json(app_handle, "pokedex.json", &self.by_dex_number)
+    }
+
     pub fn register(
         &mut self,
         dex_number: DexNumber,

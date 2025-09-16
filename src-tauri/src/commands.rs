@@ -101,7 +101,7 @@ pub fn commit_transaction(
     pokedex_state: tauri::State<'_, PokedexState>,
 ) -> Result<()> {
     app_state.lock()?.commit_transaction()?;
-    util::write_storage_file_json(&app_handle, "pokedex.json", pokedex_state.lock()?.clone())
+    pokedex_state.lock()?.write_to_storage(&app_handle)
 }
 
 #[tauri::command]

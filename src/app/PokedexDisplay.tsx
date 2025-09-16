@@ -1,15 +1,18 @@
-import { Button, Flex, Spinner } from '@radix-ui/themes'
+import { Button, Card, Flex, Heading, Separator, Spinner } from '@radix-ui/themes'
 import { Pokemon, PokemonData } from 'pokemon-species-data'
 import { useEffect, useMemo, useState } from 'react'
+import { ArrowLeftIcon, ArrowRightIcon } from '../components/Icons'
 import PokemonIcon from '../components/PokemonIcon'
 import useMonSprite from '../pokemon/useMonSprite'
 import { usePokedex } from '../state/pokedex'
+import { getBaseMon } from '../types/pkm/util'
 import { Pokedex, PokedexStatus } from '../types/pokedex'
 import { Forme } from '../types/types'
 
 export default function PokedexDisplay() {
   const pokedexState = usePokedex()
   const [selectedSpecies, setSelectedSpecies] = useState<Pokemon>()
+  const [selectedForme, setSelectedForme] = useState<Forme>()
 
   if (!pokedexState.loaded) {
     return <Spinner />
@@ -19,28 +22,45 @@ export default function PokedexDisplay() {
 
   return (
     <Flex style={{ height: '100%' }}>
+      <Flex direction="column" width="calc(100% - 300px)">
+        <div style={{ backgroundColor: 'var(--gray-6)', padding: '4px 8px' }}>
+          <Heading>{selectedForme?.formeName}</Heading>
+        </div>
+        <div style={{ width: '100%', height: '100%' }}>
+          {selectedSpecies && selectedForme && (
+            <PokedexDetails
+              pokedex={pokedex}
+              species={selectedSpecies}
+              selectedForme={selectedForme}
+              setSelectedForme={setSelectedForme}
+            />
+          )}
+        </div>
+      </Flex>
       <Flex
-        direction="column"
-        width="200px"
+        className="side-tab-list"
         overflowX="hidden"
         gap="2"
         overflowY="auto"
         height="100%"
+        style={{ width: 300 }}
       >
         {Object.entries(PokemonData).map(([_, species]) => (
           <PokedexTab
             key={species.nationalDex}
             pokedex={pokedex}
             species={species}
-            onClick={() => setSelectedSpecies(species)}
+            onClick={() => {
+              setSelectedSpecies(species)
+              const [caughtFormeIndex] = getHighestFormeStatus(pokedex, species)
+
+              setSelectedForme(species.formes[caughtFormeIndex])
+            }}
             selected={selectedSpecies?.nationalDex === species.nationalDex}
           />
         ))}
         <div />
       </Flex>
-      <div style={{ width: 'calc(100% - 200px)', height: '100%' }}>
-        {selectedSpecies && <PokedexDetails pokedex={pokedex} species={selectedSpecies} />}
-      </div>
     </Flex>
   )
 }
@@ -61,18 +81,19 @@ function PokedexTab({ pokedex, species, onClick, selected }: PokedexTabProps) {
   const isCaught = maxStatus && StatusIndices[maxStatus] >= StatusIndices.Caught
 
   return (
-    <button
+    <Button
       key={species.nationalDex}
       onClick={onClick}
       style={{
         textAlign: 'start',
         backgroundColor: selected ? '#00cccc' : 'gray',
         display: 'flex',
-        height: 48,
+        minHeight: 48,
         alignItems: 'center',
         fontWeight: isCaught ? 'bold' : 'normal',
       }}
       disabled={!maxStatus}
+      radius="full"
     >
       {species.nationalDex}. {species.name}
       {maxStatus && (
@@ -83,64 +104,66 @@ function PokedexTab({ pokedex, species, onClick, selected }: PokedexTabProps) {
           style={{ width: 32, height: 32, marginLeft: 'auto' }}
         />
       )}
-    </button>
+    </Button>
   )
 }
 
 type PokedexDetailsProps = {
   pokedex: Pokedex
   species: Pokemon
+  selectedForme: Forme
+  setSelectedForme: (forme: Forme) => void
 }
 
-function PokedexDetails({ pokedex, species }: PokedexDetailsProps) {
+function PokedexDetails({
+  pokedex,
+  species,
+  selectedForme,
+  setSelectedForme,
+}: PokedexDetailsProps) {
   const [imageError, setImageError] = useState(false)
-  const [formeIndex] = getHighestFormeStatus(pokedex, species)
-  const [selectedForme, setSelectedForme] = useState<Forme>(species.formes[formeIndex])
 
+  const selectedFormeStatus = getFormeStatus(pokedex, species, selectedForme.formeNumber ?? 0)
   const spritePath = useMonSprite({
     dexNum: species.nationalDex,
     formeNum: selectedForme.formeNumber,
     format: 'OHPKM',
+    isShiny: selectedFormeStatus === 'ShinyCaught',
   })
 
   useEffect(() => {
-    setSelectedForme(species.formes[formeIndex])
     setImageError(false)
-  }, [species, formeIndex])
+  }, [selectedForme])
 
-  const selectedFormeStatus = getFormeStatus(pokedex, species, selectedForme.formeNumber)
   const selectedFormeCaught = selectedFormeStatus?.includes('Caught')
 
   return (
-    <Flex justify="center">
-      <div
-        style={{
-          height: '50%',
-          display: 'grid',
-          alignItems: 'center',
-          justifyContent: 'center',
-          width: '100%',
-        }}
-      >
-        {imageError ? (
-          <PokemonIcon
-            dexNumber={species.nationalDex}
-            formeNumber={selectedForme.formeNumber}
-            style={{ width: '90%', height: 0, paddingBottom: '90%' }}
-            greyedOut={!selectedFormeCaught}
-          />
-        ) : spritePath ? (
-          <img
-            draggable={false}
-            src={spritePath}
-            onError={() => setImageError(true)}
-            style={{ filter: !selectedFormeCaught ? 'saturate(0%)' : undefined }}
-          />
-        ) : (
-          <Spinner style={{ margin: 'auto', height: 32 }} />
-        )}
-        <div>{selectedForme.formeName}</div>
-        <Flex justify="center" gap="2">
+    <Flex justify="center" height="100%">
+      <Flex direction="column" height="100%" align="center" width="100%" gap="2">
+        <Card style={{ height: '40%', aspectRatio: 1 }}>
+          {imageError ? (
+            <PokemonIcon
+              dexNumber={species.nationalDex}
+              formeNumber={selectedForme.formeNumber}
+              style={{ width: '90%', height: 0, paddingBottom: '90%' }}
+              greyedOut={!selectedFormeCaught}
+            />
+          ) : spritePath ? (
+            <img
+              draggable={false}
+              src={spritePath}
+              onError={() => setImageError(true)}
+              style={{
+                filter: !selectedFormeCaught ? 'saturate(0%)' : undefined,
+                height: 'calc(100% - 16px)',
+                padding: 8,
+              }}
+            />
+          ) : (
+            <Spinner style={{ margin: 'auto', height: 32 }} />
+          )}
+        </Card>
+        <Flex justify="center" gap="2" width="100%" wrap="wrap">
           {species.formes.map((forme) => (
             <Button
               key={forme.formeNumber}
@@ -158,7 +181,104 @@ function PokedexDetails({ pokedex, species }: PokedexDetailsProps) {
             </Button>
           ))}
         </Flex>
-      </div>
+        <Separator style={{ width: '100%' }} />
+        <EvolutionFamily
+          nationalDex={species.nationalDex}
+          formeNumber={selectedForme.formeNumber}
+        />
+      </Flex>
+    </Flex>
+  )
+}
+
+type EvolutionLineProps = {
+  nationalDex: number
+  formeNumber: number
+}
+
+function EvolutionFamily({ nationalDex, formeNumber }: EvolutionLineProps) {
+  const baseMon = getBaseMon(nationalDex, formeNumber)
+  const baseMonFormes = PokemonData[baseMon.dexNumber].formes
+
+  return (
+    <Flex direction="column" gap="2" align="center">
+      {baseMonFormes
+        .filter((forme) => forme.evos.length > 0)
+        .map(({ formeNumber }) => (
+          <EvolutionLine
+            nationalDex={baseMon.dexNumber}
+            formeNumber={formeNumber}
+            key={formeNumber}
+          />
+        ))}
+    </Flex>
+  )
+}
+
+function EvolutionLine({ nationalDex, formeNumber }: EvolutionLineProps) {
+  const evolutions = PokemonData[nationalDex].formes[formeNumber].evos
+
+  if (evolutions.length === 8) {
+    return (
+      <Flex align="center" gap="2">
+        <Flex direction="column" gap="2" align="center">
+          {evolutions.slice(0, 4).map((evo, i) => (
+            <Flex key={`${evo.dexNumber}-${evo.formeNumber}`} align="center" gap="2">
+              <EvolutionLine nationalDex={evo.dexNumber} formeNumber={evo.formeNumber} />
+              <ArrowLeftIcon
+                style={{
+                  rotate: `${(1.5 - i) * 28}deg`,
+                  marginTop: (1.5 - i) * 15,
+                  marginBottom: (1.5 - i) * -15,
+                }}
+              />
+            </Flex>
+          ))}
+        </Flex>
+        <PokemonIcon
+          dexNumber={nationalDex}
+          formeNumber={formeNumber}
+          style={{ width: 48, height: 48 }}
+        />
+        <Flex direction="column" gap="2">
+          {evolutions.slice(4).map((evo, i) => (
+            <Flex key={`${evo.dexNumber}-${evo.formeNumber}`} align="center" gap="2">
+              <ArrowRightIcon
+                style={{
+                  rotate: `${(1.5 - i) * -36}deg`,
+                  marginTop: (1.5 - i) * 15,
+                  marginBottom: (1.5 - i) * -15,
+                }}
+              />
+              <EvolutionLine nationalDex={evo.dexNumber} formeNumber={evo.formeNumber} />
+            </Flex>
+          ))}
+        </Flex>
+      </Flex>
+    )
+  }
+
+  return (
+    <Flex align="center" gap="2">
+      <PokemonIcon
+        dexNumber={nationalDex}
+        formeNumber={formeNumber}
+        style={{ width: 48, height: 48 }}
+      />
+      <Flex direction="column" gap="2">
+        {evolutions.map((evo, i) => (
+          <Flex key={`${evo.dexNumber}-${evo.formeNumber}`} align="center" gap="2">
+            <ArrowRightIcon
+              style={{
+                rotate: `${((evolutions.length - 1) / 2 - i) * -36}deg`,
+                marginTop: ((evolutions.length - 1) / 2 - i) * 15,
+                marginBottom: ((evolutions.length - 1) / 2 - i) * -15,
+              }}
+            />
+            <EvolutionLine nationalDex={evo.dexNumber} formeNumber={evo.formeNumber} />
+          </Flex>
+        ))}
+      </Flex>
     </Flex>
   )
 }

@@ -46,8 +46,6 @@ export function usePokedex(): PokedexManager {
     }
   }, [loadAndCachePokedex, loading, pokedexCache])
 
-  console.log(pokedexCache)
-
   if (pokedexCache) {
     return { getPokedex: loadAndCachePokedex, pokedex: pokedexCache, loaded: true }
   } else {
