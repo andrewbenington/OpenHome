@@ -1,4 +1,4 @@
-import { Button, Flex } from '@radix-ui/themes'
+import { Flex } from '@radix-ui/themes'
 import { Pokemon, PokemonData } from 'pokemon-species-data'
 import { useMemo } from 'react'
 import PokemonIcon from 'src/components/PokemonIcon'
@@ -61,7 +61,7 @@ function PokedexTab({ pokedex, species, onClick, selected }: PokedexTabProps) {
   const isCaught = maxStatus && StatusIndices[maxStatus] >= StatusIndices.Caught
 
   return (
-    <Button
+    <button
       className="pokedex-tab"
       key={species.nationalDex}
       onClick={(e) => {
@@ -70,11 +70,12 @@ function PokedexTab({ pokedex, species, onClick, selected }: PokedexTabProps) {
       }}
       style={{
         backgroundColor: selected ? 'var(--accent-10)' : isCaught ? 'var(--accent-7)' : 'gray',
-        minHeight: selected ? 40 : 32,
-        margin: selected ? '2px 0px' : '2px 0px 2px 8px',
+        minHeight: 32,
+        margin: '2px 0px 2px 8px',
         fontWeight: isCaught ? 'bold' : 'normal',
+        borderRadius: 16,
+        border: 'none',
       }}
-      radius="full"
     >
       <PokemonIcon
         className="pokedex-icon-container"
@@ -82,11 +83,11 @@ function PokedexTab({ pokedex, species, onClick, selected }: PokedexTabProps) {
         formeNumber={formeIndex}
         silhouette={!maxStatus}
         style={{
-          minWidth: selected ? 60 : 32,
-          minHeight: selected ? 44 : 32,
+          minWidth: 32,
+          minHeight: 32,
         }}
       />
       {species.nationalDex}. {species.name}
-    </Button>
+    </button>
   )
 }

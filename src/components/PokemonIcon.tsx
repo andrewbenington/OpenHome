@@ -1,5 +1,6 @@
 import { PokemonData } from 'pokemon-species-data'
 import { HTMLAttributes } from 'react'
+import useIsDarkMode from 'src/hooks/dark-mode'
 import BoxIcons from '../images/BoxIcons.png'
 import { getPublicImageURL } from '../images/images'
 import { getItemIconPath } from '../images/items'
@@ -36,6 +37,8 @@ export default function PokemonIcon(props: PokemonIconProps) {
     return `${(x / 35) * 100}% ${(y / 36) * 100}%`
   }
 
+  const isDarkMode = useIsDarkMode()
+
   return (
     <div
       className="pokemon-icon-container"
@@ -54,7 +57,11 @@ export default function PokemonIcon(props: PokemonIconProps) {
             dexNum: dexNumber,
             formeNum: formeNumber ?? 0,
           }),
-          filter: silhouette ? 'contrast(0%) brightness(25%)' : undefined,
+          filter: silhouette
+            ? isDarkMode
+              ? 'contrast(0%) brightness(85%)'
+              : 'contrast(0%) brightness(25%)'
+            : undefined,
         }}
       />
       {isShiny && (

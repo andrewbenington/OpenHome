@@ -39,16 +39,14 @@ export default function PokedexDisplay() {
       </div>
       <Flex style={{ height: 'calc(100% - 38px)' }}>
         <Flex className="pokedex-body" direction="column" width="calc(100% - 300px)">
-          <div style={{ width: '100%', height: '100%' }}>
-            {selectedSpecies && selectedForme && (
-              <PokedexDetails
-                pokedex={pokedex}
-                species={selectedSpecies}
-                selectedForme={selectedForme}
-                setSelectedForme={setSelectedForme}
-              />
-            )}
-          </div>
+          {selectedSpecies && selectedForme && (
+            <PokedexDetails
+              pokedex={pokedex}
+              species={selectedSpecies}
+              selectedForme={selectedForme}
+              setSelectedForme={setSelectedForme}
+            />
+          )}
         </Flex>
         <PokedexSidebar
           selectedSpecies={selectedSpecies}
@@ -95,7 +93,7 @@ function PokedexDetails({
   const selectedFormeCaught = selectedFormeStatus?.includes('Caught')
 
   return (
-    <Flex direction="row" height="100%" justify="between" width="100%">
+    <Flex direction="row" height="100%" align="center" width="100%">
       <Flex direction="column" align="center" justify="center" height="100%" width="40%" gap="2">
         <Flex direction="column" height="100%" width="100%" align="center" justify="center" gap="2">
           <div
@@ -156,7 +154,7 @@ function PokedexDetails({
         </Flex>
       </Flex>
       <Separator orientation="vertical" style={{ height: '100%' }} />
-      <Flex direction="column" align="end" height="100%" width="60%" gap="2" p="1">
+      <Flex direction="column" height="100%" maxHeight="600px" width="60%" gap="2" p="1">
         <Flex width="100%" height="50%">
           <div style={{ width: '50%', marginTop: 'auto', marginBottom: 'auto' }}>
             <BaseStatsChart forme={selectedForme} />
