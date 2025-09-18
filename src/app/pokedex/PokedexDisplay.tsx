@@ -1,6 +1,7 @@
 import { Button, Card, Flex, Heading, Separator, Spinner, Text } from '@radix-ui/themes'
 import { Pokemon } from 'pokemon-species-data'
 import { useEffect, useState } from 'react'
+import TypeIcon from 'src/components/TypeIcon'
 import AttributeRow from 'src/pokemon/AttributeRow'
 import PokemonIcon from '../../components/PokemonIcon'
 import useMonSprite from '../../pokemon/useMonSprite'
@@ -96,23 +97,10 @@ function PokedexDetails({
   return (
     <Flex direction="row" height="100%" justify="between" width="100%">
       <Flex direction="column" align="center" justify="center" height="100%" width="40%" gap="2">
-        <Flex
-          id="image-and-forme-select"
-          direction="column"
-          height="100%"
-          width="100%"
-          align="center"
-          justify="center"
-          gap="2"
-        >
+        <Flex direction="column" height="100%" width="100%" align="center" justify="center" gap="2">
           <div
             className="pokedex-image-frame"
-            style={{
-              minWidth: 140,
-              width: 240,
-              aspectRatio: 1,
-              position: 'relative',
-            }}
+            style={{ minWidth: 140, width: 240, aspectRatio: 1, position: 'relative' }}
           >
             {imageError ? (
               <PokemonIcon
@@ -183,6 +171,11 @@ function PokedexDetails({
             <AttributeRow label="Level-Up">{species.levelUpType}</AttributeRow>
             <AttributeRow label="Height">{selectedForme.height}</AttributeRow>
             <AttributeRow label="Weight">{selectedForme.weight}</AttributeRow>
+            <AttributeRow label="Type">
+              {selectedForme.types?.map((type) => (
+                <TypeIcon type={type} key={`${type}_type_icon`} />
+              ))}
+            </AttributeRow>
           </Flex>
         </Flex>
         <Flex width="100%" height="50%">

@@ -32,9 +32,7 @@ export default function BaseStatsChart({ forme }: BaseStatsChartProps) {
             },
           },
           layout: { padding: 8 },
-          scales: {
-            r: { min: 0, max: 200 },
-          },
+          scales: { r: { min: 0, max: 200 } },
           backgroundColor: 'rgb(132, 99, 255)',
           color: 'rgb(132, 99, 255)',
         }}
