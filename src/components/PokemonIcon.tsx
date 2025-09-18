@@ -12,6 +12,7 @@ interface PokemonIconProps extends HTMLAttributes<HTMLDivElement> {
   heldItemIndex?: number
   heldItemFormat?: string
   greyedOut?: boolean
+  silhouette?: boolean
 }
 
 export default function PokemonIcon(props: PokemonIconProps) {
@@ -22,6 +23,7 @@ export default function PokemonIcon(props: PokemonIconProps) {
     heldItemIndex,
     heldItemFormat,
     greyedOut,
+    silhouette,
     ...attributes
   } = props
 
@@ -52,6 +54,7 @@ export default function PokemonIcon(props: PokemonIconProps) {
             dexNum: dexNumber,
             formeNum: formeNumber ?? 0,
           }),
+          filter: silhouette ? 'contrast(0%) brightness(25%)' : undefined,
         }}
       />
       {isShiny && (

@@ -3,15 +3,36 @@
   transform: translate(0, 0);
 }
 
+.pokedex-icon-container {
+  position: relative;
+  transform: translate(0, 0);
+  background-color: #333e;
+  width: 44px !important;
+  height: 36px !important;
+  border-radius: 28px;
+  overflow: visible;
+  margin-left: -14px;
+  padding: 0px 6px;
+  box-shadow:
+    0px 2px 1px -1px rgb(0 0 0 / 20%),
+    0px 1px 1px 0px rgb(0 0 0 / 14%),
+    0px 1px 3px 0px rgb(0 0 0 / 12%);
+  .pokemon-icon-image {
+    height: 90%;
+  width: 80%;
+  }
+}
+
 .pokemon-icon-image {
   background-size: 3600%;
   background-repeat: no-repeat;
+  margin: auto;
   height: 100%;
   width: 100%;
   z-index: 1;
   top: 0;
-  left: 0;
-  position: absolute;
+  /* position: absolute; */
+  object-fit: contain;
 }
 
 .centered-cell {

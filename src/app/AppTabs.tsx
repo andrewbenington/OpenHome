@@ -4,7 +4,7 @@ import AppStateDisplay from './dev/AppStateDisplay'
 import Home from './Home'
 import TrackedPokemon from './manage/TrackedPokemon'
 import PluginsPage from './plugins/Plugins'
-import PokedexDisplay from './PokedexDisplay'
+import PokedexDisplay from './pokedex/PokedexDisplay'
 import Settings from './Settings'
 import SortPokemon from './sort/SortPokemon'
 
