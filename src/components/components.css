@@ -6,7 +6,7 @@
 .pokedex-icon-container {
   position: relative;
   transform: translate(0, 0);
-  background-color: #333e;
+  background-color: var(--gray-6);
   width: 44px !important;
   height: 36px !important;
   border-radius: 28px;

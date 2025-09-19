@@ -24,7 +24,6 @@ export default function PokedexSidebar(props: PokedexSidebarProps) {
       gap="2"
       overflowY="auto"
       height="100%"
-      style={{ width: 300 }}
     >
       {Object.entries(PokemonData).map(([_, species]) => (
         <PokedexTab
@@ -53,10 +52,9 @@ type PokedexTabProps = {
 }
 
 function PokedexTab({ pokedex, species, onClick, selected }: PokedexTabProps) {
-  const [formeIndex, maxStatus] = useMemo(
-    () => getHighestFormeStatus(pokedex, species),
-    [pokedex, species]
-  )
+  const [formeIndex, maxStatus] = useMemo(() => {
+    return getHighestFormeStatus(pokedex, species)
+  }, [pokedex, species])
 
   const isCaught = maxStatus && StatusIndices[maxStatus] >= StatusIndices.Caught
 
@@ -69,12 +67,12 @@ function PokedexTab({ pokedex, species, onClick, selected }: PokedexTabProps) {
         onClick()
       }}
       style={{
-        backgroundColor: selected ? 'var(--accent-10)' : isCaught ? 'var(--accent-7)' : 'gray',
-        minHeight: 32,
-        margin: '2px 0px 2px 8px',
+        backgroundColor: selected
+          ? 'var(--accent-10)'
+          : isCaught
+            ? 'var(--accent-6)'
+            : 'var(--gray-7',
         fontWeight: isCaught ? 'bold' : 'normal',
-        borderRadius: 16,
-        border: 'none',
       }}
     >
       <PokemonIcon

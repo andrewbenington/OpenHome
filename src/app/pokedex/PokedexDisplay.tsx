@@ -163,8 +163,7 @@ function PokedexDetails({
           <Flex
             direction="column"
             align="end"
-            gap="1"
-            style={{ height: '100%', overflowY: 'auto', width: '50%', padding: 4 }}
+            style={{ height: '100%', overflowY: 'auto', width: '50%', padding: 4, gap: 2 }}
           >
             <AttributeRow label="Level-Up">{species.levelUpType}</AttributeRow>
             <AttributeRow label="Height">{selectedForme.height}</AttributeRow>
