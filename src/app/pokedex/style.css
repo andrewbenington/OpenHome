@@ -13,7 +13,36 @@
     rgba(0, 0, 0, 0.15) 0px -36px 30px 0px inset,
     rgba(0, 0, 0, 0.1) 0px -79px 40px 0px inset,
     rgba(0, 0, 0, 0.06) 0px 2px 1px,
-    rgba(0, 0, 0, 0.09) 0px 4px 2px;
+    rgba(0, 0, 0, 0.09) 0px 4px 2px,
+    rgba(0, 0, 0, 0.09) 0px 8px 4px,
+    rgba(0, 0, 0, 0.09) 0px 16px 8px,
+    rgba(0, 0, 0, 0.09) 0px 32px 16px;
+}
+
+.pokedex-caption {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  background-color: var(--accent-9);
+  min-height: 32px;
+  margin-top: -36px;
+  border-radius: 12px;
+  padding: 0px 16px;
+  border: none;
+  z-index: 100;
+  align-items: center;
+  justify-content: start;
+  box-shadow:
+    rgba(0, 0, 0, 0.17) 0px -23px 25px 0px inset,
+    rgba(0, 0, 0, 0.15) 0px -36px 30px 0px inset,
+    rgba(0, 0, 0, 0.1) 0px -79px 40px 0px inset,
+    rgba(0, 0, 0, 0.06) 0px 2px 1px,
+    rgba(0, 0, 0, 0.09) 0px 4px 2px,
+    rgba(0, 0, 0, 0.09) 0px 8px 4px,
+    rgba(0, 0, 0, 0.09) 0px 16px 8px,
+    rgba(0, 0, 0, 0.09) 0px 32px 16px;
+  font-size: 18px;
+  font-weight: bold;
 }
 
 .pokedex-image {
@@ -33,7 +62,7 @@
   box-shadow:
     rgba(50, 50, 93, 0.25) 0px 30px 60px -12px inset,
     rgba(0, 0, 0, 0.3) 0px 18px 36px -18px inset;
-    width: 300px;
+  width: 300px;
 }
 
 .pokedex-header {
@@ -44,7 +73,7 @@
     rgba(0, 0, 0, 0.07) 0px 4px 4px,
     rgba(0, 0, 0, 0.07) 0px 8px 8px,
     rgba(0, 0, 0, 0.07) 0px 16px 16px;
-    z-index: 100;
+  z-index: 100;
 }
 
 .pokedex-body {
@@ -79,7 +108,6 @@
   box-shadow:
     rgba(50, 50, 93, 0.25) 0px 30px 60px -12px inset,
     rgba(0, 0, 0, 0.3) 0px 18px 36px -18px inset;
-  z-index: -1;
   border-radius: 5%;
   background-color: rgba(255, 255, 255, 0.833);
   contain: content;

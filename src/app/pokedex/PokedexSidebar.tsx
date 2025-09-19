@@ -2,6 +2,7 @@ import { Flex } from '@radix-ui/themes'
 import { Pokemon, PokemonData } from 'pokemon-species-data'
 import { useMemo } from 'react'
 import PokemonIcon from 'src/components/PokemonIcon'
+import { getPublicImageURL } from 'src/images/images'
 import { Pokedex } from 'src/types/pokedex'
 import { Forme } from 'src/types/types'
 import './style.css'
@@ -80,12 +81,18 @@ function PokedexTab({ pokedex, species, onClick, selected }: PokedexTabProps) {
         dexNumber={species.nationalDex}
         formeNumber={formeIndex}
         silhouette={!maxStatus}
-        style={{
-          minWidth: 32,
-          minHeight: 32,
-        }}
+        style={{ minWidth: 32, minHeight: 32 }}
       />
       {species.nationalDex}. {species.name}
+      <div style={{ flex: 1 }} />
+      {maxStatus === 'ShinyCaught' && (
+        <img
+          alt="shiny icon"
+          style={{ width: 26, height: 26, marginRight: 5 }}
+          draggable={false}
+          src={getPublicImageURL('icons/Shiny.png')}
+        />
+      )}
     </button>
   )
 }

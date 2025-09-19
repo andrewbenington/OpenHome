@@ -2,6 +2,7 @@ import { Button, Card, Flex, Heading, Separator, Spinner, Text } from '@radix-ui
 import { Pokemon } from 'pokemon-species-data'
 import { useEffect, useState } from 'react'
 import TypeIcon from 'src/components/TypeIcon'
+import { getPublicImageURL } from 'src/images/images'
 import AttributeRow from 'src/pokemon/AttributeRow'
 import PokemonIcon from '../../components/PokemonIcon'
 import useMonSprite from '../../pokemon/useMonSprite'
@@ -73,6 +74,7 @@ function PokedexDetails({
   setSelectedForme,
 }: PokedexDetailsProps) {
   const [imageError, setImageError] = useState(false)
+  const [showShiny, setShowShiny] = useState(false)
 
   const selectedFormeStatus = getFormeStatus(
     pokedex,
@@ -83,7 +85,7 @@ function PokedexDetails({
     dexNum: species.nationalDex,
     formeNum: selectedForme.formeNumber,
     format: 'OHPKM',
-    isShiny: selectedFormeStatus === 'ShinyCaught',
+    isShiny: selectedFormeStatus === 'ShinyCaught' && showShiny,
   })
 
   useEffect(() => {
@@ -100,6 +102,34 @@ function PokedexDetails({
             className="pokedex-image-frame"
             style={{ minWidth: 140, width: 240, aspectRatio: 1, position: 'relative' }}
           >
+            {selectedFormeStatus === 'ShinyCaught' && (
+              <button
+                style={{
+                  position: 'absolute',
+                  width: 30,
+                  height: 30,
+                  right: 5,
+                  top: 5,
+                  zIndex: 20,
+                  backgroundColor: showShiny ? 'var(--accent-9)' : 'var(--gray-9)',
+                  borderRadius: 15,
+                  boxShadow: 'none',
+                }}
+                onClick={() => setShowShiny(!showShiny)}
+              >
+                <img
+                  alt="shiny icon"
+                  style={{
+                    width: 26,
+                    height: 26,
+                    marginLeft: -4,
+                    marginTop: -4,
+                  }}
+                  draggable={false}
+                  src={getPublicImageURL('icons/Shiny.png')}
+                />
+              </button>
+            )}
             {imageError ? (
               <PokemonIcon
                 dexNumber={species.nationalDex}
@@ -129,6 +159,8 @@ function PokedexDetails({
               <Spinner style={{ margin: 'auto', height: 32 }} />
             )}
           </div>
+          <div className="pokedex-caption">{selectedForme.formeName}</div>
+
           <Flex justify="center" gap="2" width="100%" wrap="wrap">
             {species.formes.map((forme) => (
               <Button
@@ -153,6 +185,7 @@ function PokedexDetails({
           </Flex>
         </Flex>
       </Flex>
+
       <Separator orientation="vertical" style={{ height: '100%' }} />
       <Flex direction="column" height="100%" maxHeight="600px" width="60%" gap="2" p="1">
         <Flex width="100%" height="50%">
@@ -166,13 +199,21 @@ function PokedexDetails({
             style={{ height: '100%', overflowY: 'auto', width: '50%', padding: 4, gap: 2 }}
           >
             <AttributeRow label="Level-Up">{species.levelUpType}</AttributeRow>
-            <AttributeRow label="Height">{selectedForme.height}</AttributeRow>
-            <AttributeRow label="Weight">{selectedForme.weight}</AttributeRow>
             <AttributeRow label="Type">
               {selectedForme.types?.map((type) => (
                 <TypeIcon type={type} key={`${type}_type_icon`} />
               ))}
             </AttributeRow>
+            <AttributeRow label="Ability 1">{selectedForme.ability1}</AttributeRow>
+            {selectedForme.ability2 && (
+              <AttributeRow label="Ability 2">{selectedForme.ability2}</AttributeRow>
+            )}
+
+            {selectedForme.abilityH && (
+              <AttributeRow label="Ability H">
+                <div>{selectedForme.abilityH}</div>
+              </AttributeRow>
+            )}
           </Flex>
         </Flex>
         <Flex width="100%" height="50%">
