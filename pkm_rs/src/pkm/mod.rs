@@ -1,6 +1,7 @@
 mod helpers;
 mod ohpkm;
 mod pb7;
+mod pk3cfru;
 mod pk5;
 mod pk6;
 mod pk7;
@@ -16,6 +17,7 @@ use serde::Serialize;
 pub use crate::resources::{ABILITY_MAX, NATIONAL_DEX_MAX};
 pub use ohpkm::Ohpkm;
 pub use pb7::Pb7;
+pub use pk3cfru::Pk3cfru;
 pub use pk5::Pk5;
 pub use pk6::Pk6;
 pub use pk7::Pk7;

@@ -17,6 +17,7 @@ static_assertions = "1.1.0"
 sha2 = "0.10.9"
 rand = "0.9.2"
 getrandom = { version = "0.3.3", features = ["wasm_js"] }
+phf = { version = "0.13.1", features = ["macros"] }
 
 [lib]
 name = "pkm_rs"
