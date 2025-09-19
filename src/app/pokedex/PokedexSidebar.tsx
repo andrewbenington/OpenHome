@@ -57,6 +57,7 @@ function PokedexTab({ pokedex, species, onClick, selected }: PokedexTabProps) {
     return getHighestFormeStatus(pokedex, species)
   }, [pokedex, species])
 
+  const isSeen = maxStatus && StatusIndices[maxStatus] >= StatusIndices.Seen
   const isCaught = maxStatus && StatusIndices[maxStatus] >= StatusIndices.Caught
 
   return (
@@ -80,7 +81,8 @@ function PokedexTab({ pokedex, species, onClick, selected }: PokedexTabProps) {
         className="pokedex-icon-container"
         dexNumber={species.nationalDex}
         formeNumber={formeIndex}
-        silhouette={!maxStatus}
+        silhouette={!isSeen}
+        greyedOut={!isCaught}
         style={{ minWidth: 32, minHeight: 32 }}
       />
       {species.nationalDex}. {species.name}

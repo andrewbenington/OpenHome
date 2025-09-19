@@ -10,11 +10,14 @@ import useDisplayError from 'src/hooks/displayError'
 import { AppInfoAction, AppInfoContext } from 'src/state/appInfo'
 import { OpenSavesContext } from 'src/state/openSaves'
 import { PersistedPkmDataContext } from 'src/state/persistedPkmData'
+import { displayIndexAdder, isBattleFormeItem } from 'src/types/pkm/util'
+import { PokedexUpdate } from 'src/types/pokedex'
 import { buildSaveFile, getSaveTypes } from 'src/types/SAVTypes/load'
 import { PathData } from 'src/types/SAVTypes/path'
-import { getSaveRef } from 'src/types/SAVTypes/SAV'
+import { getSaveRef, SAV } from 'src/types/SAVTypes/SAV'
 import { SAVClass } from 'src/types/SAVTypes/util'
 import { getMonFileIdentifier } from 'src/util/Lookup'
+import { filterUndefined } from 'src/util/Sort'
 import { useLookups } from '../state/lookups'
 import RecentSaves from './RecentSaves'
 import SaveFolders from './SaveFolders'
@@ -96,6 +99,7 @@ function useOpenSaveHandler(onClose?: () => void) {
       } else {
         backend.addRecentSave(getSaveRef(saveFile))
         dispatchOpenSaves({ type: 'add_save', payload: saveFile })
+        backend.registerInPokedex(pokedexSeenFromSave(saveFile))
         onClose?.()
       }
     },
@@ -317,4 +321,26 @@ function SelectSaveType({ open, saveTypes, onSelect }: SelectSaveTypeProps) {
       </Dialog.Content>
     </Dialog.Root>
   )
+}
+
+function pokedexSeenFromSave(saveFile: SAV) {
+  const pokedexUpdates: PokedexUpdate[] = []
+
+  for (const mon of saveFile.boxes.flatMap((box) => box.pokemon).filter(filterUndefined)) {
+    pokedexUpdates.push({
+      dexNumber: mon.dexNum,
+      formeNumber: mon.formeNum,
+      status: mon.isShiny() ? 'ShinySeen' : 'Seen',
+    })
+
+    if (isBattleFormeItem(mon.heldItemIndex)) {
+      pokedexUpdates.push({
+        dexNumber: mon.dexNum,
+        formeNumber: displayIndexAdder(mon.heldItemIndex)(mon.formeNum),
+        status: mon.isShiny() ? 'ShinySeen' : 'Seen',
+      })
+    }
+  }
+
+  return pokedexUpdates
 }
