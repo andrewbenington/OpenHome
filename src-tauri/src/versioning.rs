@@ -23,6 +23,11 @@ pub fn get_version_last_used(app_handle: &tauri::AppHandle) -> Result<Option<Str
 pub fn update_version_last_used(app_handle: &tauri::AppHandle) -> Result<()> {
     let last_version_path = prepend_appdata_to_path(app_handle, VERSION_FILE)?;
 
+    // Create OpenHome directory if it doesn't exist
+    if let Some(parent) = last_version_path.parent() {
+        util::create_directory(parent)?;
+    }
+
     write_file_contents(
         &last_version_path,
         app_handle.package_info().version.to_string(),
@@ -106,8 +111,16 @@ pub fn get_necessary_migrations(
 }
 
 pub fn do_migration_1_5_0(app_handle: &tauri::AppHandle) -> Result<()> {
+    const BOXDATA_FILE: &str = "box-data.json";
+
+    // Skip migration logic if no box data file exists
+    let full_path = util::prepend_appdata_storage_to_path(app_handle, BOXDATA_FILE)?;
+    if !full_path.exists() {
+        return Ok(());
+    }
+
     let mut old_boxes =
-        util::get_storage_file_json::<_, Vec<BoxPreV1_5_0>>(app_handle, "box-data.json")?;
+        util::get_storage_file_json::<_, Vec<BoxPreV1_5_0>>(app_handle, BOXDATA_FILE)?;
     old_boxes.sort_by_key(|b| b.index);
 
     let mut new_bank = Bank::default();
