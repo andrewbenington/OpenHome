@@ -1,9 +1,10 @@
 import { NationalDex, PokemonData } from 'pokemon-species-data'
 
 import { BLOOD_MOON, SWEETS } from 'src/consts/Formes'
-import { PKMInterface } from 'src/types/interfaces'
 import { toGen3RRPokemonIndex } from 'src/types/SAVTypes/radicalred/conversion/Gen3RRPokemonIndex'
 import { RRSprites } from 'src/types/SAVTypes/radicalred/conversion/RadicalRedSprites'
+import { MonSpriteData } from '../state/plugin'
+import { displayIndexAdder, isBattleFormeItem } from '../types/pkm/util'
 import { toGen3CRFUPokemonIndex } from '../types/SAVTypes/cfru/conversion/util'
 import { NationalDexToUnboundMap } from '../types/SAVTypes/unbound/conversion/UnboundSpeciesMap'
 import { UBSprites } from '../types/SAVTypes/unbound/conversion/UnboundSprites'
@@ -28,26 +29,31 @@ export const fileToSpriteFolder: Record<string, string> = {
   OHPKM: 'home',
 }
 
-export const getPokemonSpritePath = (mon: PKMInterface, format?: string) => {
+export const getPokemonSpritePath = (mon: MonSpriteData, format?: string) => {
   const monFormat = format ?? mon.format
-  let spriteName = PokemonData[mon.dexNum]?.formes[mon.formeNum]?.sprite ?? ''
+  let formeNum = mon.formeNum
+
+  if (isBattleFormeItem(mon.heldItemIndex)) {
+    formeNum = displayIndexAdder(mon.heldItemIndex)(mon.formeNum)
+  }
+  let spriteName = PokemonData[mon.dexNum]?.formes[formeNum]?.sprite ?? ''
 
   if (mon.dexNum === NationalDex.Alcremie) {
     spriteName = `${
-      PokemonData[mon.dexNum]?.formes[mon.formeNum]?.formeName?.toLowerCase() ??
+      PokemonData[mon.dexNum]?.formes[formeNum]?.formeName?.toLowerCase() ??
       'alcremie-vanilla-cream'
     }-${SWEETS[mon.formArgument ?? 0].toLocaleLowerCase()}`
   }
   let spriteFolder = fileToSpriteFolder[monFormat]
 
   if (monFormat === 'PK3RR') {
-    if (mon.dexNum === NationalDex.Ursaluna && mon.formeNum === BLOOD_MOON) {
+    if (mon.dexNum === NationalDex.Ursaluna && formeNum === BLOOD_MOON) {
       return 'sprites/home/ursaluna-bloodmoon.png'
     }
     if (mon.dexNum === NationalDex.Terapagos) {
       return 'sprites/home/terapagos-terastal.png'
     }
-    let gen3RRname = RRSprites[toGen3RRPokemonIndex(mon.dexNum, mon.formeNum)]
+    let gen3RRname = RRSprites[toGen3RRPokemonIndex(mon.dexNum, formeNum)]
 
     if (!gen3RRname) {
       console.error(`missing Radical Red sprite for ${spriteName}`)
@@ -58,11 +64,11 @@ export const getPokemonSpritePath = (mon: PKMInterface, format?: string) => {
     gen3RRname = gen3RRname[0].toUpperCase() + gen3RRname.slice(1).toLowerCase()
     return `sprites/${spriteFolder}/${gen3RRname}`
   } else if (monFormat === 'PK3UB') {
-    if (mon.dexNum === NationalDex.Ursaluna && mon.formeNum === BLOOD_MOON) {
+    if (mon.dexNum === NationalDex.Ursaluna && formeNum === BLOOD_MOON) {
       return 'sprites/home/ursaluna-bloodmoon.png'
     }
     let gen3UBname =
-      UBSprites[toGen3CRFUPokemonIndex(mon.dexNum, mon.formeNum, NationalDexToUnboundMap)]
+      UBSprites[toGen3CRFUPokemonIndex(mon.dexNum, formeNum, NationalDexToUnboundMap)]
 
     if (!gen3UBname) {
       console.error(`missing Unbound sprite for ${spriteName}`)
@@ -74,6 +80,6 @@ export const getPokemonSpritePath = (mon: PKMInterface, format?: string) => {
     return `sprites/${spriteFolder}/${gen3UBname}`
   }
   return `sprites/${spriteFolder}${
-    mon.isShiny() && spriteFolder !== 'gen1' && spriteFolder !== 'gen9' ? '/shiny/' : '/'
+    mon.isShiny && spriteFolder !== 'gen1' && spriteFolder !== 'gen9' ? '/shiny/' : '/'
   }${spriteName}.${spriteFolder === 'gen3gc' ? 'gif' : 'png'}`
 }

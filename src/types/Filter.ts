@@ -1,11 +1,12 @@
-import { Type } from 'pokemon-resources'
+import { Item, Type } from 'pokemon-resources'
 import { PokemonData } from 'pokemon-species-data'
 import { PKMInterface } from './interfaces'
+import { isMegaStone, isZCrystal } from './pkm/util'
 
 export interface Filter {
   dexNumber?: number
   formeNumber?: number
-  heldItemIndex?: number
+  heldItem?: number | HeldItemCategory
   abilityIndex?: number
   type1?: Type
   type2?: Type
@@ -15,6 +16,8 @@ export interface Filter {
   ball?: number
 }
 
+export type HeldItemFilter = number | HeldItemCategory
+
 export function filterApplies(filter: Filter, mon: PKMInterface) {
   if (filter.dexNumber && mon.dexNum !== filter.dexNumber) {
     return false
@@ -22,7 +25,7 @@ export function filterApplies(filter: Filter, mon: PKMInterface) {
   if (filter.formeNumber !== undefined && mon.formeNum !== filter.formeNumber) {
     return false
   }
-  if (filter.heldItemIndex !== undefined && mon.heldItemIndex !== filter.heldItemIndex) {
+  if (filter.heldItem !== undefined && !heldItemPassesFilter(mon.heldItemIndex, filter.heldItem)) {
     return false
   }
   if (filter.ball !== undefined && 'ball' in mon && mon.ball !== filter.ball) {
@@ -74,4 +77,21 @@ export function filterApplies(filter: Filter, mon: PKMInterface) {
     return false
   }
   return true
+}
+
+export type HeldItemCategory = 'any' | 'mega_stone' | 'z_crystal'
+
+function heldItemPassesFilter(heldItemIndex: number, filter: HeldItemFilter): boolean {
+  if (typeof filter === 'number') {
+    return heldItemIndex === filter
+  }
+
+  switch (filter) {
+    case 'any':
+      return heldItemIndex > 0
+    case 'mega_stone':
+      return isMegaStone(heldItemIndex as Item)
+    case 'z_crystal':
+      return isZCrystal(heldItemIndex as Item)
+  }
 }

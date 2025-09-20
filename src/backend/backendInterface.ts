@@ -1,5 +1,6 @@
 import { Settings } from '../state/appInfo'
 import { OHPKM } from '../types/pkm/OHPKM'
+import { Pokedex, PokedexUpdate } from '../types/pokedex'
 import { PathData, PossibleSaves } from '../types/SAVTypes/path'
 import { SaveFolder, StoredBankData } from '../types/storage'
 import { Errorable, LoadSaveResponse, LookupMap, SaveRef } from '../types/types'
@@ -27,6 +28,10 @@ export default interface BackendInterface {
   /* past gen identifier lookups */
   loadLookups: () => Promise<Errorable<StoredLookups>>
   updateLookups: (gen_12: LookupMap, gen_345: LookupMap) => Promise<Errorable<null>>
+
+  /* past gen identifier lookups */
+  loadPokedex: () => Promise<Errorable<Pokedex>>
+  registerInPokedex: (updates: PokedexUpdate[]) => Promise<Errorable<null>>
 
   /* OHPKM management */
   loadHomeMonLookup: () => Promise<Errorable<Record<string, OHPKM>>>
@@ -85,6 +90,7 @@ export interface BackendListeners {
   onReset: () => void
   onOpen: () => void
   onLookupsUpdate: (updated_lookups: StoredLookups) => void
+  onPokedexUpdate: (updated_pokedex: Pokedex) => void
   onPluginDownloadProgress: [string, (_progress_pct: number) => void]
   onBankOrBoxChange: (change: BankOrBoxChange) => void
 }

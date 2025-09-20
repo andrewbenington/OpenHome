@@ -12,6 +12,7 @@ import { PathData, PossibleSaves } from 'src/types/SAVTypes/path'
 import { SaveFolder, StoredBankData } from 'src/types/storage'
 import { Errorable, JSONObject, LoadSaveResponse, LookupMap, SaveRef } from 'src/types/types'
 import { defaultSettings, Settings } from '../../state/appInfo'
+import { Pokedex, PokedexUpdate } from '../../types/pokedex'
 import { TauriInvoker } from './tauriInvoker'
 
 async function pathDataFromRaw(raw: string): Promise<PathData> {
@@ -39,6 +40,14 @@ export const TauriBackend: BackendInterface = {
   },
   updateLookups: function (gen_12: LookupMap, gen_345: LookupMap): Promise<Errorable<null>> {
     return TauriInvoker.updateLookups(gen_12, gen_345)
+  },
+
+  /* pokedex */
+  loadPokedex: function (): Promise<Errorable<Pokedex>> {
+    return TauriInvoker.getPokedex()
+  },
+  registerInPokedex: function (updates: PokedexUpdate[]): Promise<Errorable<null>> {
+    return TauriInvoker.registerInPokedex(updates)
   },
 
   // /* OHPKM management */
@@ -311,6 +320,11 @@ export const TauriBackend: BackendInterface = {
       unlistenPromises.push(
         listen<StoredLookups>('lookups_update', (event) => listener(event.payload))
       )
+    }
+    if (listeners.onPokedexUpdate) {
+      const listener = listeners.onPokedexUpdate
+
+      unlistenPromises.push(listen<Pokedex>('pokedex_update', (event) => listener(event.payload)))
     }
     if (listeners.onBankOrBoxChange) {
       const listener = listeners.onBankOrBoxChange

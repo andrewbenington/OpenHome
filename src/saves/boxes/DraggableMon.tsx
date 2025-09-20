@@ -1,6 +1,7 @@
 import { useDraggable } from '@dnd-kit/react'
 import { useContext, useMemo } from 'react'
 import { DragMonContext } from 'src/state/dragMon'
+import { displayIndexAdder, isBattleFormeItem } from 'src/types/pkm/util'
 import PokemonIcon from '../../components/PokemonIcon'
 import { MonWithLocation } from '../../state/openSaves'
 import { PKMInterface } from '../../types/interfaces'
@@ -57,7 +58,11 @@ const DraggableMon = ({ mon, onClick, disabled, dragData, dragID }: DraggableMon
     >
       <PokemonIcon
         dexNumber={mon.dexNum}
-        formeNumber={mon.formeNum}
+        formeNumber={
+          isBattleFormeItem(mon.heldItemIndex)
+            ? displayIndexAdder(mon.heldItemIndex)(mon.formeNum)
+            : mon.formeNum
+        }
         isShiny={mon.isShiny()}
         heldItemIndex={mon.heldItemIndex}
         style={{
