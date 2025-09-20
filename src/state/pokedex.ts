@@ -20,7 +20,6 @@ export function usePokedex(): PokedexManager {
 
   backend.registerListeners({
     onPokedexUpdate: (updatedPokedex) => {
-      console.log(updatedPokedex)
       setPokedexCache(updatedPokedex)
     },
   })

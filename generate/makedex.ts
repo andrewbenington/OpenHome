@@ -47,7 +47,6 @@ const mapUbSpeciesToDexAndForm = () => {
   const speciesMap = buildSpeciesDictionary()
   const result: Record<number, { NationalDexNumber: number; FormNumber: number } | null> = {}
 
-  console.log(speciesMap)
   Gen3UBSpecies.forEach((speciesName, index) => {
     const normalizedSpeciesName = normalizeName(speciesName)
     const mappings = speciesMap.get(normalizedSpeciesName)
