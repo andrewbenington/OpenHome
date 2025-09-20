@@ -1,6 +1,6 @@
-import { Flex } from '@radix-ui/themes'
+import { useVirtualizer } from '@tanstack/react-virtual'
 import { Pokemon, PokemonData } from 'pokemon-species-data'
-import { useMemo } from 'react'
+import { CSSProperties, useMemo, useRef } from 'react'
 import PokemonIcon from 'src/components/PokemonIcon'
 import { getPublicImageURL } from 'src/images/images'
 import { Pokedex } from 'src/types/pokedex'
@@ -15,33 +15,58 @@ export type PokedexSidebarProps = {
   pokedex: Pokedex
 }
 
+function easeInOutQuint(t: number) {
+  return t < 0.5 ? 16 * t * t * t * t * t : 1 + 16 * --t * t * t * t * t
+}
+
 export default function PokedexSidebar(props: PokedexSidebarProps) {
   const { selectedSpecies, setSelectedSpecies, setSelectedForme, pokedex } = props
 
-  return (
-    <Flex
-      className="side-tab-list pokedex-sidebar"
-      overflowX="hidden"
-      gap="2"
-      overflowY="auto"
-      height="100%"
-    >
-      {Object.entries(PokemonData).map(([_, species]) => (
-        <PokedexTab
-          key={species.nationalDex}
-          pokedex={pokedex}
-          species={species}
-          onClick={() => {
-            setSelectedSpecies(species)
-            const [caughtFormeIndex] = getHighestFormeStatus(pokedex, species)
+  const parentRef = useRef(null)
+  // The virtualizer
+  const virtualizer = useVirtualizer({
+    count: 1025,
+    // count: Object.keys(PokemonData).length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 32,
+    overscan: 25,
+    gap: 5,
+  })
 
-            setSelectedForme(species.formes[caughtFormeIndex])
-          }}
-          selected={selectedSpecies?.nationalDex === species.nationalDex}
-        />
-      ))}
+  return (
+    <div ref={parentRef} className="side-tab-list pokedex-sidebar">
+      <div style={{ height: virtualizer.getTotalSize(), width: '100%', position: 'relative' }}>
+        {virtualizer.getVirtualItems().map((virtualRow) => (
+          <PokedexTab
+            key={virtualRow.index}
+            pokedex={pokedex}
+            species={PokemonData[virtualRow.index + 1]}
+            onClick={() => {
+              setSelectedSpecies(PokemonData[virtualRow.index + 1])
+              const [caughtFormeIndex] = getHighestFormeStatus(
+                pokedex,
+                PokemonData[virtualRow.index + 1]
+              )
+
+              setSelectedForme(PokemonData[virtualRow.index + 1].formes[caughtFormeIndex])
+              virtualizer.scrollToIndex(virtualRow.index, { behavior: 'smooth', align: 'center' })
+            }}
+            selected={
+              selectedSpecies?.nationalDex === PokemonData[virtualRow.index + 1].nationalDex
+            }
+            style={{
+              // height: `${virtualRow.size}px`,
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              height: `${virtualRow.size}px`,
+              transform: `translateY(${virtualRow.start}px)`,
+            }}
+          />
+        ))}
+      </div>
       <div />
-    </Flex>
+    </div>
   )
 }
 
@@ -50,9 +75,10 @@ type PokedexTabProps = {
   species: Pokemon
   onClick: () => void
   selected: boolean
+  style?: CSSProperties
 }
 
-function PokedexTab({ pokedex, species, onClick, selected }: PokedexTabProps) {
+function PokedexTab({ pokedex, species, onClick, selected, style }: PokedexTabProps) {
   const [formeIndex, maxStatus] = useMemo(() => {
     return getHighestFormeStatus(pokedex, species)
   }, [pokedex, species])
@@ -64,10 +90,7 @@ function PokedexTab({ pokedex, species, onClick, selected }: PokedexTabProps) {
     <button
       className="pokedex-tab"
       key={species.nationalDex}
-      onClick={(e) => {
-        e.currentTarget.scrollIntoView({ block: 'center', behavior: 'smooth' })
-        onClick()
-      }}
+      onClick={onClick}
       style={{
         backgroundColor: selected
           ? 'var(--accent-10)'
@@ -75,6 +98,7 @@ function PokedexTab({ pokedex, species, onClick, selected }: PokedexTabProps) {
             ? 'var(--accent-6)'
             : 'var(--gray-7',
         fontWeight: isCaught ? 'bold' : 'normal',
+        ...style,
       }}
     >
       <PokemonIcon
