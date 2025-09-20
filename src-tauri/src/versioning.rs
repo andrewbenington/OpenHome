@@ -2,7 +2,7 @@ use semver::Version;
 use strum::{self, EnumIter, IntoEnumIterator};
 
 use crate::{
-    deprecated::BoxPreV1_5_0,
+    deprecated::{self, BoxPreV1_5_0},
     error::{Error, Result},
     pkm_storage::{Bank, StoredBankData},
     util::{self, prepend_appdata_to_path, read_file_text, write_file_contents},
@@ -22,6 +22,11 @@ pub fn get_version_last_used(app_handle: &tauri::AppHandle) -> Result<Option<Str
 
 pub fn update_version_last_used(app_handle: &tauri::AppHandle) -> Result<()> {
     let last_version_path = prepend_appdata_to_path(app_handle, VERSION_FILE)?;
+
+    // Create OpenHome directory if it doesn't exist
+    if let Some(parent) = last_version_path.parent() {
+        util::create_directory(parent)?;
+    }
 
     write_file_contents(
         &last_version_path,
@@ -106,8 +111,14 @@ pub fn get_necessary_migrations(
 }
 
 pub fn do_migration_1_5_0(app_handle: &tauri::AppHandle) -> Result<()> {
+    // Skip migration logic if no box data file exists
+    let full_path = util::prepend_appdata_storage_to_path(app_handle, deprecated::BOXDATA_FILE)?;
+    if !full_path.exists() {
+        return Ok(());
+    }
+
     let mut old_boxes =
-        util::get_storage_file_json::<_, Vec<BoxPreV1_5_0>>(app_handle, "box-data.json")?;
+        util::get_storage_file_json::<_, Vec<BoxPreV1_5_0>>(app_handle, deprecated::BOXDATA_FILE)?;
     old_boxes.sort_by_key(|b| b.index);
 
     let mut new_bank = Bank::default();
@@ -116,7 +127,7 @@ pub fn do_migration_1_5_0(app_handle: &tauri::AppHandle) -> Result<()> {
         new_bank.add_box(old_box.upgrade());
     }
 
-    let path = util::prepend_appdata_storage_to_path(app_handle, "banks.json")?;
+    let banks_path = util::prepend_appdata_storage_to_path(app_handle, "banks.json")?;
 
-    util::write_file_json(path, StoredBankData::from_banks(vec![new_bank]))
+    util::write_file_json(banks_path, StoredBankData::from_banks(vec![new_bank]))
 }

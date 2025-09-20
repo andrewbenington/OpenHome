@@ -45,9 +45,11 @@ export class G3UBSAV extends G3CFRUSAV<PK3UB> implements PluginSAV<PK3UB> {
     const firstSectionBytesIndex = findFirstSectionOffset(bytes)
     const firstSectionBytes = bytes.slice(firstSectionBytesIndex, firstSectionBytesIndex + 0x1000)
 
-    const gameCode = bytesToUint32LittleEndian(firstSectionBytes, 0xac)
+    const signature = bytesToUint32LittleEndian(firstSectionBytes, 0x0ff8)
 
-    return gameCode === 0xffffffff
+    // from unbound cloud
+    // https://github.com/Skeli789/Unbound-Cloud/blob/a5d966b74b865f51fef608e19ca63e0e51593f5e/server/src/Defines.py#L25C1-L26C1
+    return signature === 0x01122000 || signature === 0x01121999 || signature === 0x01121998
   }
 
   gameColor(): string {
