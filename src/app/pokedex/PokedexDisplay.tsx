@@ -36,7 +36,7 @@ export default function PokedexDisplay() {
           color: 'var(--accent-contrast)',
         }}
       >
-        <Heading>{selectedForme?.formeName}</Heading>
+        <Heading>National Pokédex</Heading>
       </div>
       <Flex style={{ height: 'calc(100% - 38px)' }}>
         <Flex className="pokedex-body" direction="column" width="calc(100% - 300px)">

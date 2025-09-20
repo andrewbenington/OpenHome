@@ -30,7 +30,6 @@ pub type FormeNumber = u16;
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 pub enum PokedexStatus {
     Seen,
-    ShinySeen,
     Caught,
     ShinyCaught,
 }

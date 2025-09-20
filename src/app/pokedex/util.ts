@@ -34,9 +34,8 @@ export function getFormeStatus(
 
 export const StatusIndices: Record<PokedexStatus, number> = {
   Seen: 0,
-  ShinySeen: 1,
-  Caught: 2,
-  ShinyCaught: 3,
+  Caught: 1,
+  ShinyCaught: 2,
 }
 
 export function getPokedexSummary(species: Pokemon, forme: Forme) {
@@ -49,7 +48,9 @@ export function getPokedexSummary(species: Pokemon, forme: Forme) {
     forme.formeNumber === 0 ? getBaseFormeType(species) : forme.isMega ? 'mega-evolution' : 'forme'
   let text = `${name} is a ${types} ${formeType} introduced in Generation ${forme.gen}.`
 
-  if (forme.regional) {
+  if (forme.formeName === 'Basculin-White-Striped') {
+    text += ` It is sometimes considered a regional forme from the ${forme.regional} region.`
+  } else if (forme.regional) {
     text += ` It is a regional forme from the ${forme.regional} region.`
   }
 
