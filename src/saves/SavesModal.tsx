@@ -330,14 +330,14 @@ function pokedexSeenFromSave(saveFile: SAV) {
     pokedexUpdates.push({
       dexNumber: mon.dexNum,
       formeNumber: mon.formeNum,
-      status: mon.isShiny() ? 'ShinySeen' : 'Seen',
+      status: 'Seen',
     })
 
     if (isBattleFormeItem(mon.heldItemIndex)) {
       pokedexUpdates.push({
         dexNumber: mon.dexNum,
         formeNumber: displayIndexAdder(mon.heldItemIndex)(mon.formeNum),
-        status: mon.isShiny() ? 'ShinySeen' : 'Seen',
+        status: 'Seen',
       })
     }
   }
