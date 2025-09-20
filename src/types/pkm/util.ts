@@ -506,9 +506,9 @@ export function getWeightCalculated(mon: PKMWithSize) {
   return PokemonData[mon.dexNum].formes[mon.formeNum].weight * 10 * deviation
 }
 
-export function isMegaStone(item?: Item) {
+export function isMegaStone(item?: Item): boolean {
   return (
-    item &&
+    item !== undefined &&
     ((item >= Item.Gengarite && item <= Item.Latiosite) ||
       (item >= Item.Swampertite && item <= Item.Beedrillite))
   )

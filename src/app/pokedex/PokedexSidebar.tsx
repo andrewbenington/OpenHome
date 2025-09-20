@@ -1,6 +1,6 @@
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { Pokemon, PokemonData } from 'pokemon-species-data'
-import { CSSProperties, useMemo, useRef } from 'react'
+import { CSSProperties, useEffect, useMemo, useRef } from 'react'
 import PokemonIcon from 'src/components/PokemonIcon'
 import { getPublicImageURL } from 'src/images/images'
 import { Pokedex } from 'src/types/pokedex'
@@ -15,26 +15,32 @@ export type PokedexSidebarProps = {
   pokedex: Pokedex
 }
 
-function easeInOutQuint(t: number) {
-  return t < 0.5 ? 16 * t * t * t * t * t : 1 + 16 * --t * t * t * t * t
-}
-
 export default function PokedexSidebar(props: PokedexSidebarProps) {
   const { selectedSpecies, setSelectedSpecies, setSelectedForme, pokedex } = props
 
   const parentRef = useRef(null)
   // The virtualizer
   const virtualizer = useVirtualizer({
-    count: 1025,
-    // count: Object.keys(PokemonData).length,
+    count: Object.keys(PokemonData).length,
     getScrollElement: () => parentRef.current,
     estimateSize: () => 32,
-    overscan: 25,
-    gap: 5,
+    overscan: 5,
+    gap: 8,
+    paddingStart: 8,
+    paddingEnd: 8,
   })
 
+  useEffect(() => {
+    if (selectedSpecies) {
+      virtualizer.scrollToIndex(selectedSpecies?.nationalDex - 1, {
+        behavior: 'smooth',
+        align: 'center',
+      })
+    }
+  }, [selectedSpecies, virtualizer])
+
   return (
-    <div ref={parentRef} className="side-tab-list pokedex-sidebar">
+    <div ref={parentRef} className="pokedex-sidebar">
       <div style={{ height: virtualizer.getTotalSize(), width: '100%', position: 'relative' }}>
         {virtualizer.getVirtualItems().map((virtualRow) => (
           <PokedexTab

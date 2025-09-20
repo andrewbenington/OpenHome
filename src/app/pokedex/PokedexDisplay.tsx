@@ -1,5 +1,5 @@
 import { Button, Card, Flex, Heading, Separator, Spinner, Text } from '@radix-ui/themes'
-import { Pokemon } from 'pokemon-species-data'
+import { Pokemon, PokemonData } from 'pokemon-species-data'
 import { useEffect, useState } from 'react'
 import TypeIcon from 'src/components/TypeIcon'
 import { getPublicImageURL } from 'src/images/images'
@@ -46,6 +46,7 @@ export default function PokedexDisplay() {
               species={selectedSpecies}
               selectedForme={selectedForme}
               setSelectedForme={setSelectedForme}
+              setSelectedSpecies={setSelectedSpecies}
             />
           )}
         </Flex>
@@ -65,6 +66,7 @@ type PokedexDetailsProps = {
   species: Pokemon
   selectedForme: Forme
   setSelectedForme: (forme: Forme) => void
+  setSelectedSpecies: (species: Pokemon) => void
 }
 
 function PokedexDetails({
@@ -72,6 +74,7 @@ function PokedexDetails({
   species,
   selectedForme,
   setSelectedForme,
+  setSelectedSpecies,
 }: PokedexDetailsProps) {
   const [imageError, setImageError] = useState(false)
   const [showShiny, setShowShiny] = useState(false)
@@ -189,7 +192,7 @@ function PokedexDetails({
       <Separator orientation="vertical" style={{ height: '100%' }} />
       <Flex direction="column" height="100%" maxHeight="600px" width="60%" gap="2" p="1">
         <Flex width="100%" height="50%">
-          <div style={{ width: '50%', marginTop: 'auto', marginBottom: 'auto' }}>
+          <div style={{ width: '50%' }}>
             <BaseStatsChart forme={selectedForme} />
           </div>
 
@@ -229,6 +232,9 @@ function PokedexDetails({
                 nationalDex={species.nationalDex}
                 formeNumber={selectedForme.formeNumber}
                 pokedex={pokedex}
+                onClick={(nationalDex) => {
+                  setSelectedSpecies(PokemonData[nationalDex])
+                }}
               />
             </div>{' '}
           </Card>

@@ -14,6 +14,7 @@ export type EvolutionFamilyProps = {
   formeNumber: number
   pokedex: Pokedex
   height?: Responsive<string>
+  onClick?: (nationalDex: number) => void
 }
 
 export default function EvolutionFamily({
@@ -21,6 +22,7 @@ export default function EvolutionFamily({
   formeNumber,
   pokedex,
   height,
+  onClick,
 }: EvolutionFamilyProps) {
   const baseMon = getBaseMon(nationalDex, formeNumber)
   const baseMonFormes = PokemonData[baseMon.dexNumber].formes
@@ -42,13 +44,14 @@ export default function EvolutionFamily({
             formeNumber={formeNumber}
             key={formeNumber}
             pokedex={pokedex}
+            onClick={onClick}
           />
         ))}
     </Flex>
   )
 }
 
-function EvolutionLine({ nationalDex, formeNumber, pokedex }: EvolutionFamilyProps) {
+function EvolutionLine({ nationalDex, formeNumber, pokedex, onClick }: EvolutionFamilyProps) {
   const evolutions = PokemonData[nationalDex].formes[formeNumber].evos
   const megaFormes = PokemonData[nationalDex].formes.filter((f) => f.isMega)
 
@@ -93,6 +96,7 @@ function EvolutionLine({ nationalDex, formeNumber, pokedex }: EvolutionFamilyPro
                 nationalDex={evo.dexNumber}
                 formeNumber={evo.formeNumber}
                 pokedex={pokedex}
+                onClick={onClick}
               />
             </Flex>
           ))}
@@ -106,8 +110,9 @@ function EvolutionLine({ nationalDex, formeNumber, pokedex }: EvolutionFamilyPro
       <PokemonIcon
         dexNumber={nationalDex}
         formeNumber={formeNumber}
-        style={{ width: ICON_SIZE, height: ICON_SIZE }}
+        style={{ width: ICON_SIZE, height: ICON_SIZE, cursor: onClick ? 'pointer' : undefined }}
         silhouette={!getFormeStatus(pokedex, nationalDex, formeNumber)?.includes('Caught')}
+        onClick={() => onClick?.(nationalDex)}
       />
       {!PokemonData[nationalDex].formes[formeNumber].regional && megaFormes.length > 0 && (
         <Flex direction="column" gap="2">
@@ -146,6 +151,7 @@ function EvolutionLine({ nationalDex, formeNumber, pokedex }: EvolutionFamilyPro
               nationalDex={evo.dexNumber}
               formeNumber={evo.formeNumber}
               pokedex={pokedex}
+              onClick={onClick}
             />
           </Flex>
         ))}
