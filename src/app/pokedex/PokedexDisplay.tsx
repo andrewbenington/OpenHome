@@ -217,6 +217,10 @@ function PokedexDetails({
                 <div>{selectedForme.abilityH}</div>
               </AttributeRow>
             )}
+
+            <AttributeRow label="Egg Groups">
+              <div>{selectedForme.eggGroups.join(' • ')}</div>
+            </AttributeRow>
           </Flex>
         </Flex>
         <Flex width="100%" height="50%">
@@ -232,8 +236,9 @@ function PokedexDetails({
                 nationalDex={species.nationalDex}
                 formeNumber={selectedForme.formeNumber}
                 pokedex={pokedex}
-                onClick={(nationalDex) => {
+                onClick={(nationalDex, formeIndex) => {
                   setSelectedSpecies(PokemonData[nationalDex])
+                  setSelectedForme(PokemonData[nationalDex].formes[formeIndex])
                 }}
               />
             </div>{' '}

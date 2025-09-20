@@ -14,7 +14,7 @@ export type EvolutionFamilyProps = {
   formeNumber: number
   pokedex: Pokedex
   height?: Responsive<string>
-  onClick?: (nationalDex: number) => void
+  onClick?: (nationalDex: number, formeNumber: number) => void
 }
 
 export default function EvolutionFamily({
@@ -112,7 +112,7 @@ function EvolutionLine({ nationalDex, formeNumber, pokedex, onClick }: Evolution
         formeNumber={formeNumber}
         style={{ width: ICON_SIZE, height: ICON_SIZE, cursor: onClick ? 'pointer' : undefined }}
         silhouette={!getFormeStatus(pokedex, nationalDex, formeNumber)?.includes('Caught')}
-        onClick={() => onClick?.(nationalDex)}
+        onClick={() => onClick?.(nationalDex, formeNumber)}
       />
       {!PokemonData[nationalDex].formes[formeNumber].regional && megaFormes.length > 0 && (
         <Flex direction="column" gap="2">
