@@ -15,6 +15,8 @@ pub mod traits;
 
 use serde::Serialize;
 
+pub use crate::pkm::plugins::cfru::pk3cfru::Pk3cfru;
+
 pub use crate::resources::{ABILITY_MAX, NATIONAL_DEX_MAX};
 pub use ohpkm::Ohpkm;
 pub use pb7::Pb7;
