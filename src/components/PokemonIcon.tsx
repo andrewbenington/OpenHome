@@ -6,7 +6,7 @@ import { getPublicImageURL } from '../images/images'
 import { getItemIconPath } from '../images/items'
 import './components.css'
 
-interface PokemonIconProps extends HTMLAttributes<HTMLDivElement> {
+export interface PokemonIconProps extends HTMLAttributes<HTMLDivElement> {
   dexNumber: number
   formeNumber?: number
   isShiny?: boolean

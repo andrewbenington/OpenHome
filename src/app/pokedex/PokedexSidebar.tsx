@@ -9,19 +9,28 @@ import './style.css'
 import { getHighestFormeStatus, StatusIndices } from './util'
 
 export type PokedexSidebarProps = {
+  filter?: string
+  pokedex: Pokedex
   selectedSpecies?: Pokemon
   setSelectedSpecies: (species: Pokemon) => void
   setSelectedForme: (forme: Forme) => void
-  pokedex: Pokedex
 }
 
 export default function PokedexSidebar(props: PokedexSidebarProps) {
-  const { selectedSpecies, setSelectedSpecies, setSelectedForme, pokedex } = props
+  const { filter, selectedSpecies, setSelectedSpecies, setSelectedForme, pokedex } = props
 
   const parentRef = useRef(null)
-  // The virtualizer
+
+  const filteredSpecies = useMemo(
+    () =>
+      Object.values(PokemonData).filter(
+        (mon) => !filter || mon.name.toUpperCase().startsWith(filter?.trim().toUpperCase())
+      ),
+    [filter]
+  )
+
   const virtualizer = useVirtualizer({
-    count: Object.keys(PokemonData).length,
+    count: filteredSpecies.length,
     getScrollElement: () => parentRef.current,
     estimateSize: () => 32,
     overscan: 5,
@@ -46,19 +55,19 @@ export default function PokedexSidebar(props: PokedexSidebarProps) {
           <PokedexTab
             key={virtualRow.index}
             pokedex={pokedex}
-            species={PokemonData[virtualRow.index + 1]}
+            species={filteredSpecies[virtualRow.index]}
             onClick={() => {
-              setSelectedSpecies(PokemonData[virtualRow.index + 1])
+              setSelectedSpecies(filteredSpecies[virtualRow.index])
               const [caughtFormeIndex] = getHighestFormeStatus(
                 pokedex,
-                PokemonData[virtualRow.index + 1]
+                filteredSpecies[virtualRow.index]
               )
 
-              setSelectedForme(PokemonData[virtualRow.index + 1].formes[caughtFormeIndex])
+              setSelectedForme(filteredSpecies[virtualRow.index].formes[caughtFormeIndex])
               virtualizer.scrollToIndex(virtualRow.index, { behavior: 'smooth', align: 'center' })
             }}
             selected={
-              selectedSpecies?.nationalDex === PokemonData[virtualRow.index + 1].nationalDex
+              selectedSpecies?.nationalDex === filteredSpecies[virtualRow.index].nationalDex
             }
             style={{
               // height: `${virtualRow.size}px`,

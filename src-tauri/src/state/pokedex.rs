@@ -97,12 +97,10 @@ pub fn update_pokedex(
     pokedex_state: tauri::State<'_, PokedexState>,
     updates: Vec<PokedexUpdate>,
 ) -> Result<()> {
-    println!("received {} updates: {:?}", updates.len(), updates);
     let mut pokedex = pokedex_state.lock()?;
     for update in updates {
         pokedex.register(update.dex_number, update.forme_number, update.status);
     }
-    println!("updated: {:?}", pokedex);
 
     app_handle
         .emit("pokedex_update", pokedex.clone())

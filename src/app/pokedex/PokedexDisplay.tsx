@@ -1,4 +1,4 @@
-import { Button, Card, Flex, Heading, Separator, Spinner, Text } from '@radix-ui/themes'
+import { Button, Card, Flex, Heading, Separator, Spinner, Text, TextField } from '@radix-ui/themes'
 import { Pokemon, PokemonData } from 'pokemon-species-data'
 import { useEffect, useState } from 'react'
 import TypeIcon from 'src/components/TypeIcon'
@@ -17,6 +17,7 @@ import { getFormeStatus, getPokedexSummary } from './util'
 
 export default function PokedexDisplay() {
   const pokedexState = usePokedex()
+  const [filter, setFilter] = useState('')
   const [selectedSpecies, setSelectedSpecies] = useState<Pokemon>()
   const [selectedForme, setSelectedForme] = useState<Forme>()
 
@@ -25,18 +26,29 @@ export default function PokedexDisplay() {
   }
 
   const pokedex = pokedexState.pokedex
+  const caughtCount = Object.values(pokedex.byDexNumber).filter((entry) =>
+    Object.values(entry.formes).some((status) => status.endsWith('Caught'))
+  ).length
+
+  const seenCount = Object.values(pokedex.byDexNumber).length
 
   return (
     <Flex direction="column" height="100%" minWidth="940px">
-      <div
-        className="pokedex-header"
-        style={{
-          backgroundColor: 'var(--accent-9)',
-          padding: '4px 8px',
-          color: 'var(--accent-contrast)',
-        }}
-      >
+      <div className="pokedex-header">
         <Heading>National Pokédex</Heading>
+        <div style={{ flex: 1 }} />
+        <Text>
+          <b>Caught:</b> {caughtCount}
+        </Text>
+        <Text>
+          <b>Seen:</b> {seenCount}
+        </Text>
+        <TextField.Root
+          size="1"
+          placeholder="Filter..."
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+        />
       </div>
       <Flex style={{ height: 'calc(100% - 38px)' }}>
         <Flex className="pokedex-body" direction="column" width="calc(100% - 300px)">
@@ -51,6 +63,7 @@ export default function PokedexDisplay() {
           )}
         </Flex>
         <PokedexSidebar
+          filter={filter}
           selectedSpecies={selectedSpecies}
           setSelectedSpecies={setSelectedSpecies}
           setSelectedForme={setSelectedForme}
@@ -122,12 +135,7 @@ function PokedexDetails({
               >
                 <img
                   alt="shiny icon"
-                  style={{
-                    width: 26,
-                    height: 26,
-                    marginLeft: -4,
-                    marginTop: -4,
-                  }}
+                  style={{ width: 26, height: 26, marginLeft: -4, marginTop: -4 }}
                   draggable={false}
                   src={getPublicImageURL('icons/Shiny.png')}
                 />
@@ -190,7 +198,7 @@ function PokedexDetails({
       </Flex>
 
       <Separator orientation="vertical" style={{ height: '100%' }} />
-      <Flex direction="column" height="100%" maxHeight="600px" width="60%" gap="2" p="1">
+      <Flex direction="column" height="700px" maxHeight="100%" width="60%" gap="2" p="1">
         <Flex width="100%" height="50%">
           <div style={{ width: '50%' }}>
             <BaseStatsChart forme={selectedForme} />
