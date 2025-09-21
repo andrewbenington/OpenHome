@@ -1,8 +1,9 @@
 import { Flex } from '@radix-ui/themes'
 import { Responsive } from '@radix-ui/themes/props'
-import { PokemonData } from 'pokemon-species-data'
+import { NationalDex, PokemonData } from 'pokemon-species-data'
 import { ArrowLeftIcon, ArrowLeftRightIcon, ArrowRightIcon } from 'src/components/Icons'
 import PokemonIcon, { PokemonIconProps } from 'src/components/PokemonIcon'
+import { BLOOD_MOON } from 'src/consts/Formes'
 import { getBaseMon } from 'src/types/pkm/util'
 import { Pokedex } from 'src/types/pokedex'
 import { getFormeStatus } from './util'
@@ -24,7 +25,12 @@ export default function EvolutionFamily({
   height,
   onClick,
 }: EvolutionFamilyProps) {
-  const baseMon = getBaseMon(nationalDex, formeNumber)
+  let baseMon = getBaseMon(nationalDex, formeNumber)
+
+  if (nationalDex === NationalDex.Ursaluna) {
+    // Include Teddiursa line for Ursaluna Bloodmoon
+    baseMon = { dexNumber: NationalDex.Teddiursa, formeNumber: 0 }
+  }
   const baseMonFormes = PokemonData[baseMon.dexNumber].formes
 
   return (
@@ -47,6 +53,17 @@ export default function EvolutionFamily({
             onClick={onClick}
           />
         ))}
+      {baseMon.dexNumber === NationalDex.Teddiursa && (
+        // Workaround for evo lines where one forme have a prevo and another doesn't, currently
+        // only Ursaluna
+        <EvolutionLine
+          nationalDex={NationalDex.Ursaluna}
+          formeNumber={BLOOD_MOON}
+          key="ursaluna-bloodmoon"
+          pokedex={pokedex}
+          onClick={onClick}
+        />
+      )}
     </Flex>
   )
 }
