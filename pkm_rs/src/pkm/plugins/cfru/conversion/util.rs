@@ -4,7 +4,7 @@ use crate::resources::{NatDexIndex, SpeciesAndForme};
 #[derive(Debug, Clone, Copy)]
 pub struct GameToNationalDexEntry {
     pub national_dex_index: i16,
-    pub form_index: i8,
+    pub form_index: i16,
 }
 
 /// Convert game index to National Dex entry
@@ -27,12 +27,12 @@ pub fn from_gen3_cfru_pokemon_index(
 /// Convert National Dex + Form index to game index
 pub fn to_gen3_cfru_pokemon_index(
     saf: &SpeciesAndForme,
-    ndex_to_game_map: &phf::Map<&'static str, u16>,
+    ndex_to_game_map: &phf::Map<&'static str, i16>,
 ) -> Result<u16> {
     let key = format!("{}_{}", saf.get_ndex().get(), saf.get_forme_index());
     match ndex_to_game_map.get(&*key) {
-        Some(&radical_red_index) => Ok(radical_red_index),
-        None => Err(Error::FormeIndex {
+        Some(&radical_red_index) if radical_red_index >= 0 => Ok(radical_red_index as u16),
+        _ => Err(Error::FormeIndex {
             national_dex: saf.get_ndex(),
             forme_index: saf.get_forme_index(),
         }),

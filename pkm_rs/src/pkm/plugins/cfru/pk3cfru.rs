@@ -1,7 +1,5 @@
-// TODO: Update the path below to the correct module where RADICAL_RED_TO_NATIONAL_DEX_MAP is defined.
-
-use crate::pkm::plugins::cfru::conversion;
-use crate::pkm::plugins::cfru::conversion::util::to_gen3_cfru_pokemon_index;
+use super::conversion::util::{from_gen3_cfru_pokemon_index, to_gen3_cfru_pokemon_index};
+use super::conversion::{NATIONAL_DEX_TO_RADICAL_RED_MAP, RADICAL_RED_TO_NATIONAL_DEX_MAP};
 use crate::pkm::traits::IsShiny;
 use crate::pkm::{Error, Pkm, Result};
 use crate::resources::{
@@ -154,7 +152,7 @@ impl Pk3cfru {
             | ((bytes[base + 4] as u64) << 32);
 
         [
-            MoveSlot::from(((v >> 0) & 0x3FF) as u16),
+            MoveSlot::from((v & 0x3FF) as u16),
             MoveSlot::from(((v >> 10) & 0x3FF) as u16),
             MoveSlot::from(((v >> 20) & 0x3FF) as u16),
             MoveSlot::from(((v >> 30) & 0x3FF) as u16),
@@ -190,13 +188,8 @@ impl Pk3cfru {
 
         // 0x1C..0x1E: CFRU game species index
         let cfru_species_index = u16::from_le_bytes(bytes[0x1C..0x1E].try_into().unwrap());
-        let entry = super::conversion::util::from_gen3_cfru_pokemon_index(
-            cfru_species_index,
-            &RADICAL_RED_TO_NATIONAL_DEX_MAP,
-        )
-        .map_err(|msg| Error::Other(msg.into()))?;
-
-        let saf = SpeciesAndForme::new(entry.national_dex_index as u16, entry.form_index as u8)?;
+        let saf =
+            from_gen3_cfru_pokemon_index(cfru_species_index, &RADICAL_RED_TO_NATIONAL_DEX_MAP)?;
 
         // 0x34..0x36: met info & flags
         let meta = u16::from_le_bytes(bytes[0x34..0x36].try_into().unwrap());
