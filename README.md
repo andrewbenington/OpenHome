@@ -20,13 +20,7 @@ While we do our best to avoid glitches, it's always a good idea to back up your 
 
 ## Screenshots
 
-<img width="1000" alt="Screenshot 2024-01-14 at 1 47 47 PM" src="https://github.com/andrewbenington/OpenHome/assets/42848290/45b3bc85-d305-4429-8082-f540d9c87053">
-<img width="200" alt="Screenshot 2024-01-14 at 1 23 54 PM" src="https://github.com/andrewbenington/OpenHome/assets/42848290/e4480130-0dac-46fb-809a-e9a4b1c77777">
-<img width="200" alt="Screenshot 2024-01-14 at 1 53 02 PM" src="https://github.com/andrewbenington/OpenHome/assets/42848290/cd834651-d59e-4ae0-9e8b-85e7ac833edd">
-<img width="200" alt="Screenshot 2024-01-14 at 1 53 55 PM" src="https://github.com/andrewbenington/OpenHome/assets/42848290/4fb3ce94-909c-42c6-a5c6-138ce6e345a5">
-<img width="200" alt="Screenshot 2024-01-14 at 1 24 18 PM" src="https://github.com/andrewbenington/OpenHome/assets/42848290/5c568c3c-3c09-410e-a1e3-f9407a60c50b">
-<img width="200" alt="Screenshot 2024-01-14 at 1 24 39 PM" src="https://github.com/andrewbenington/OpenHome/assets/42848290/d9de03a5-41ae-41e5-baba-876e7bac461e">
-<img width="200" alt="Screenshot 2024-01-14 at 1 25 22 PM" src="https://github.com/andrewbenington/OpenHome/assets/42848290/992ddb5f-2c6d-45e9-9b99-83c3f644e7a8">
+<img width="1000" src="docs/newScreenshots/MainPage.png"><img width="200" src="docs/newScreenshots/MainPageFiltered.png"><img width="200" src="docs/newScreenshots/MainPageBoxView.png"><img width="200" src="docs/newScreenshots/PkmnSummary.png"><img width="200" src="docs/newScreenshots/PkmnOldSprite.png"><img width="200" src="docs/newScreenshots/PkmnMoves.png"><img width="200" src="docs/newScreenshots/PkmnStats.png"><img width="200" src="docs/newScreenshots/PkmnRibbon.png"><img width="200" src="docs/newScreenshots/PkmnOther.png">
 
 ## Downloading and Installing
 

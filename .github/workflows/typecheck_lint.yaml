@@ -4,7 +4,7 @@ permissions:
   contents: read
 
 on:
-  pull_request:
+  pull_request_target:
   push:
     branches:
       - main
@@ -15,10 +15,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
-          ref: ${{ github.head_ref }}
-
+          ref: ${{ github.event.pull_request.head.ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
       - name: Install NodeJS
         uses: actions/setup-node@v4
 
