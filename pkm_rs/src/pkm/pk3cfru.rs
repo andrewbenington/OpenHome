@@ -1,6 +1,7 @@
+// TODO: Update the path below to the correct module where RADICAL_RED_TO_NATIONAL_DEX_MAP is defined.
+use crate::pkm::cfru::gen3_rrspecies_map;
 use crate::pkm::traits::IsShiny;
 use crate::pkm::{Error, Pkm, Result};
-use crate::resources::RadicalRedToNationalDexMap;
 use crate::resources::{
     Ball, FormeMetadata, GameOfOriginIndex, MoveSlot, SpeciesAndForme, SpeciesMetadata,
 };
@@ -188,7 +189,7 @@ impl Pk3cfru {
         // 0x1C..0x1E: CFRU game species index
         let cfru_species_index = u16::from_le_bytes(bytes[0x1C..0x1E].try_into().unwrap());
         // let saf =
-        let species_name = RadicalRedToNationalDexMap[cfru_species_index as usize];
+        let species_name = RADICAL_RED_TO_NATIONAL_DEX_MAP[cfru_species_index as usize];
 
         // 0x34..0x36: met info & flags
         let meta = u16::from_le_bytes(bytes[0x34..0x36].try_into().unwrap());

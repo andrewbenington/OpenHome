@@ -1,4 +1,4 @@
-pub const Gen3RRSpecies: [&str; 2] = [
+pub const GEN3_RR_SPECIES: [&str; 1376] = [
     "Egg",
     "Bulbasaur",
     "Ivysaur",

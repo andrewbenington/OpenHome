@@ -9,6 +9,8 @@ mod pk8;
 mod result;
 mod universal;
 
+mod cfru;
+
 pub mod buffers;
 pub mod traits;
 
