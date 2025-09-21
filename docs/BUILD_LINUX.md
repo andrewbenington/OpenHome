@@ -1,5 +1,28 @@
 # Building the application (Linux)
 
+## Install Tauri‐specific system dependencies
+
+Depending on your distro, install the required packages so Tauri can build properly. See Tauri’s prerequisites.
+
+Here are examples for the most common distros:
+
+```bash
+# Debian / Ubuntu / other Debian-based
+sudo apt update
+sudo apt install libwebkit2gtk-4.1-dev build-essential curl wget file libxdo-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev
+
+# Arch
+sudo pacman -Syu
+sudo pacman -S --needed webkit2gtk-4.1 base-devel curl wget file openssl appmenu-gtk-module libappindicator-gtk3 librsvg
+
+# Fedora / RHEL
+sudo dnf check-update
+sudo dnf install webkit2gtk4.1-devel openssl-devel curl wget file libappindicator-gtk3-devel librsvg2-devel
+sudo dnf group install "C Development Tools and Libraries"
+```
+
+If you use another distro, check the Tauri docs for the appropriate equivalent.
+
 ## Install Node.js and npm
 
 Node.js and npm are required to build the OpenHome application. Install them using your package manager. For example, on Ubuntu or Debian-based systems, run:
