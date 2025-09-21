@@ -50,7 +50,7 @@ export default function PokedexDisplay() {
           onChange={(e) => setFilter(e.target.value)}
         />
       </div>
-      <Flex style={{ height: 'calc(100% - 38px)' }}>
+      <Flex style={{ height: 'calc(100% - 34px)' }}>
         <Flex className="pokedex-body" direction="column" width="calc(100% - 300px)">
           {selectedSpecies && selectedForme && (
             <PokedexDetails
