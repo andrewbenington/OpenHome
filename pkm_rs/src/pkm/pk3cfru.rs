@@ -1,5 +1,6 @@
 use crate::pkm::traits::IsShiny;
 use crate::pkm::{Error, Pkm, Result};
+use crate::resources::RadicalRedToNationalDexMap;
 use crate::resources::{
     Ball, FormeMetadata, GameOfOriginIndex, MoveSlot, SpeciesAndForme, SpeciesMetadata,
 };
@@ -187,6 +188,7 @@ impl Pk3cfru {
         // 0x1C..0x1E: CFRU game species index
         let cfru_species_index = u16::from_le_bytes(bytes[0x1C..0x1E].try_into().unwrap());
         // let saf =
+        let species_name = RadicalRedToNationalDexMap[cfru_species_index as usize];
 
         // 0x34..0x36: met info & flags
         let meta = u16::from_le_bytes(bytes[0x34..0x36].try_into().unwrap());

@@ -9,7 +9,7 @@ pub struct GameToNationalDexEntry {
     pub form_index: i8,
 }
 
-pub static RADICAL_RED_TO_NATIONAL_DEX: phf::Map<&'static str, GameToNationalDexEntry> = phf_map! {
+pub static RadicalRedToNationalDexMap: phf::Map<&'static str, GameToNationalDexEntry> = phf_map! {
   "0" => GameToNationalDexEntry { national_dex_index: 0, form_index: 0},
   "1" => GameToNationalDexEntry { national_dex_index: 1, form_index: 0},
   "2" => GameToNationalDexEntry { national_dex_index: 2, form_index: 0},
