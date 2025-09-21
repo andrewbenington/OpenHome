@@ -53,7 +53,7 @@ fn cfru_ball_index(ball: Ball) -> u8 {
     } else if (Ball::PokeLegendsArceus as u8) <= (ball as u8)
         && (ball as u8) <= (Ball::Origin as u8)
     {
-        // Collapse all Hisui/LA balls to PokeLegendsArceus for CFRU writes (TS fallback).
+        // Hisui/LA balls to PokeLegendsArceus for CFRU writes
         CFRU_BALLS
             .iter()
             .position(|&b| b == Ball::PokeLegendsArceus)
@@ -159,7 +159,7 @@ impl Pk3cfru {
         ]
     }
 
-    /// Pack 4×10-bit move IDs into 5 bytes at 0x27..0x2B (little-endian bits).
+    /// Pack 4×10-bit move IDs into 5 bytes at 0x27..0x2B
     #[inline]
     fn write_moves_10bit(moves: &[MoveSlot; 4], bytes: &mut [u8]) {
         let base = 0x27;
@@ -228,7 +228,7 @@ impl Pk3cfru {
             trainer_friendship: bytes[37],
             ball: cfru_ball_from_index(bytes[38]),
             moves: Self::read_moves_10bit(bytes),
-            move_pp: [0, 0, 0, 0], // Not stored in CFRU; compute in UI layer if needed
+            move_pp: [0, 0, 0, 0], // to be computed later
             evs: Stats8::from_bytes(bytes[44..50].try_into().unwrap()),
             pokerus_byte: bytes[50],
             met_location_index: bytes[51],
@@ -239,7 +239,7 @@ impl Pk3cfru {
             ivs,
             is_egg,
             has_hidden_ability,
-            is_nicknamed: true, // TS default
+            is_nicknamed: true,
             current_hp: 0,
         };
 
@@ -344,7 +344,7 @@ impl Pkm for Pk3cfru {
 
         // 52:53 Met Info (packed: level, game of origin, Gigantamax, trainer gender)
         let mut meta: u16 = 0;
-        meta |= (self.met_level as u16 & 0x7F) << 0;
+        meta |= (self.met_level as u16 & 0x7F);
         meta |= (u8::from(self.game_of_origin) as u16 & 0x0F) << 7;
         meta |= ((self.can_gigantamax as u16) & 0x01) << 11;
         meta |= ((bool::from(self.trainer_gender) as u16) & 0x01) << 15;
