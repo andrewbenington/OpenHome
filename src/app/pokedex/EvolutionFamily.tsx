@@ -2,13 +2,11 @@ import { Flex } from '@radix-ui/themes'
 import { Responsive } from '@radix-ui/themes/props'
 import { NationalDex, PokemonData } from 'pokemon-species-data'
 import { ArrowLeftIcon, ArrowLeftRightIcon, ArrowRightIcon } from 'src/components/Icons'
-import PokemonIcon, { PokemonIconProps } from 'src/components/PokemonIcon'
 import { BLOOD_MOON } from 'src/consts/Formes'
 import { getBaseMon } from 'src/types/pkm/util'
 import { Pokedex } from 'src/types/pokedex'
+import TooltipPokemonIcon from './TooltipPokemonIcon'
 import { getFormeStatus } from './util'
-
-const ICON_SIZE = 32
 
 export type EvolutionFamilyProps = {
   nationalDex: number
@@ -94,7 +92,7 @@ function EvolutionLine({ nationalDex, formeNumber, pokedex, onClick }: Evolution
             </Flex>
           ))}
         </Flex>
-        <EvoLinePokemonIcon
+        <TooltipPokemonIcon
           dexNumber={nationalDex}
           formeNumber={formeNumber}
           silhouette={!getFormeStatus(pokedex, nationalDex, formeNumber)?.includes('Caught')}
@@ -125,7 +123,7 @@ function EvolutionLine({ nationalDex, formeNumber, pokedex, onClick }: Evolution
 
   return (
     <Flex align="center" gap="2">
-      <EvoLinePokemonIcon
+      <TooltipPokemonIcon
         dexNumber={nationalDex}
         formeNumber={formeNumber}
         silhouette={!getFormeStatus(pokedex, nationalDex, formeNumber)?.includes('Caught')}
@@ -142,10 +140,9 @@ function EvolutionLine({ nationalDex, formeNumber, pokedex, onClick }: Evolution
                   marginBottom: ((megaFormes.length - 1) / 2 - i) * -15,
                 }}
               />
-              <EvoLinePokemonIcon
+              <TooltipPokemonIcon
                 dexNumber={nationalDex}
                 formeNumber={mega.formeNumber}
-                style={{ width: ICON_SIZE, height: ICON_SIZE }}
                 silhouette={
                   !getFormeStatus(pokedex, nationalDex, mega.formeNumber)?.includes('Caught')
                 }
@@ -174,26 +171,5 @@ function EvolutionLine({ nationalDex, formeNumber, pokedex, onClick }: Evolution
         ))}
       </Flex>
     </Flex>
-  )
-}
-
-type EvoLinePokemonIconProps = PokemonIconProps & {
-  onClick?: (nationalDex: number, formeNumber: number) => void
-}
-
-function EvoLinePokemonIcon(props: EvoLinePokemonIconProps) {
-  const { onClick, ...pkmIconProps } = props
-
-  return (
-    <PokemonIcon
-      {...pkmIconProps}
-      onClick={() => onClick?.(props.dexNumber, props.formeNumber ?? 0)}
-      style={{
-        ...props.style,
-        width: ICON_SIZE,
-        height: ICON_SIZE,
-        cursor: onClick ? 'pointer' : undefined,
-      }}
-    />
   )
 }

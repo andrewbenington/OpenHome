@@ -13,6 +13,7 @@ import BaseStatsChart from './BaseStatsChart'
 import EvolutionFamily from './EvolutionFamily'
 import PokedexSidebar from './PokedexSidebar'
 import './style.css'
+import TooltipPokemonIcon from './TooltipPokemonIcon'
 import { getFormeStatus, getPokedexSummary } from './util'
 
 export default function PokedexDisplay() {
@@ -181,7 +182,7 @@ function PokedexDetails({
                 size="4"
                 style={{ minWidth: 0, padding: 0, aspectRatio: 1 }}
               >
-                <PokemonIcon
+                <TooltipPokemonIcon
                   dexNumber={species.nationalDex}
                   formeNumber={forme.formeNumber}
                   style={{ width: 48, height: 48 }}
