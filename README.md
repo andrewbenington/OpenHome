@@ -20,16 +20,7 @@ While we do our best to avoid glitches, it's always a good idea to back up your 
 
 ## Screenshots
 
-<img width="1000" src="docs/newScreenshots/MainPage.png">
-<img width="200" src="docs/newScreenshots/MainPageFiltered.png">
-<img width="200" src="docs/newScreenshots/MainPageBoxView.png">
-<img width="200" src="docs/newScreenshots/PkmnSummary.png">
-<img width="200" src="docs/newScreenshots/PkmnOldSprite.png">
-<img width="200" src="docs/newScreenshots/PkmnMoves.png">
-<img width="200" src="docs/newScreenshots/PkmnStats.png">
-<img width="200" src="docs/newScreenshots/PkmnSummary.png">
-<img width="200" src="docs/newScreenshots/PkmnRibbon.png">
-<img width="200" src="docs/newScreenshots/PkmnOther.png">
+<img width="1000" src="docs/newScreenshots/MainPage.png"><img width="200" src="docs/newScreenshots/MainPageFiltered.png"><img width="200" src="docs/newScreenshots/MainPageBoxView.png"><img width="200" src="docs/newScreenshots/PkmnSummary.png"><img width="200" src="docs/newScreenshots/PkmnOldSprite.png"><img width="200" src="docs/newScreenshots/PkmnMoves.png"><img width="200" src="docs/newScreenshots/PkmnStats.png"><img width="200" src="docs/newScreenshots/PkmnSummary.png"><img width="200" src="docs/newScreenshots/PkmnRibbon.png"><img width="200" src="docs/newScreenshots/PkmnOther.png">
 
 ## Downloading and Installing
 
