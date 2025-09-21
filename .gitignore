@@ -39,3 +39,9 @@ src/consts/JSON/version.json
 src-tauri/gen
 src-tauri/target
 target/
+
+# IDE files
+*.code-workspace
+*.sublime-workspace
+*.sublime-project
+*.wakatime-project
