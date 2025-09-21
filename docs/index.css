@@ -314,3 +314,76 @@ img {
 .module-header > a:first-child {
   margin-left: 16px;
 }
+
+.issue-button {
+  height: 50px;
+  width: 150px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.5s ease-in-out;
+}
+
+.issue-button:hover {
+  box-shadow: .5px .5px 150px #252525;
+}
+
+.issue-button::after {
+  content: "Thanks";
+  height: 50px;
+  width: 150px;
+  background-color: #008080;
+  color: #fff;
+  position: absolute;
+  top: 0%;
+  left: 0%;
+  transform: translateY(50px);
+  font-size: 1.2rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.5s ease-in-out;
+}
+
+.issue-button::before {
+  height: 50px;
+  width: 150px;
+  background-color: #fff;
+  color: #008080;
+  position: absolute;
+  top: 0%;
+  left: 0%;
+  transform: translateY(0px) scale(1.2);
+  font-size: 1.2rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.5s ease-in-out;
+}
+
+.ibbug.issue-button::before {
+  content: "Bug";
+}
+
+.ibfeature.issue-button::before {
+  content: "Feature";
+}
+
+.issue-button:hover::after {
+  transform: translateY(0) scale(1.2);
+}
+
+.issue-button:hover::before {
+  transform: translateY(-50px) scale(0) rotate(120deg);
+}
+
+.issue-button-container {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 10px 0;
+}
