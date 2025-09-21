@@ -72,6 +72,8 @@ For [Windows](./docs/BUILD_WINDOWS.md)
 
 For [macOS](./docs/BUILD_MAC.md)
 
+For [Linux](./docs/BUILD_LINUX.md)
+
 Node and Rust are needed for compilation.
 
 ## Moving Between Saves
