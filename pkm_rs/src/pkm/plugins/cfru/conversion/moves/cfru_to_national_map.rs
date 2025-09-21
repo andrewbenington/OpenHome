@@ -1,5 +1,8 @@
+// Regex used:
 // \s*(?:"([^"]+)"|'([^']+)'|([^':]+)):\s*(\d+),
 //   "$1$2$3" => $4,
+
+use phf::phf_map;
 
 pub static CFRU_TO_NATIONAL_MAP: phf::Map<&'static str, u16> = phf_map! {
   "Pound" => 1,

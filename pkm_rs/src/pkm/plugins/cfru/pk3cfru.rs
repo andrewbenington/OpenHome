@@ -1,5 +1,7 @@
 // TODO: Update the path below to the correct module where RADICAL_RED_TO_NATIONAL_DEX_MAP is defined.
-use crate::pkm::cfru::gen3_rrspecies_map;
+
+use crate::pkm::plugins::cfru::conversion;
+use crate::pkm::plugins::cfru::conversion::util::to_gen3_cfru_pokemon_index;
 use crate::pkm::traits::IsShiny;
 use crate::pkm::{Error, Pkm, Result};
 use crate::resources::{
@@ -188,8 +190,13 @@ impl Pk3cfru {
 
         // 0x1C..0x1E: CFRU game species index
         let cfru_species_index = u16::from_le_bytes(bytes[0x1C..0x1E].try_into().unwrap());
-        // let saf =
-        let species_name = RADICAL_RED_TO_NATIONAL_DEX_MAP[cfru_species_index as usize];
+        let entry = super::conversion::util::from_gen3_cfru_pokemon_index(
+            cfru_species_index,
+            &RADICAL_RED_TO_NATIONAL_DEX_MAP,
+        )
+        .map_err(|msg| Error::Other(msg.into()))?;
+
+        let saf = SpeciesAndForme::new(entry.national_dex_index as u16, entry.form_index as u8)?;
 
         // 0x34..0x36: met info & flags
         let meta = u16::from_le_bytes(bytes[0x34..0x36].try_into().unwrap());
@@ -303,8 +310,14 @@ impl Pkm for Pk3cfru {
         bytes[27] = self.markings.to_byte();
 
         // 28:30 Species (DexNum / CFRU game index)
-        // let cfru_species =
-        // bytes[28..30].copy_from_slice();
+        if let Ok(cfru_species) =
+            to_gen3_cfru_pokemon_index(&self.species_and_forme, &NATIONAL_DEX_TO_RADICAL_RED_MAP)
+        {
+            bytes[28..30].copy_from_slice(&cfru_species.to_le_bytes());
+        } else {
+            // fallback or propagate error
+            bytes[28..30].copy_from_slice(&0u16.to_le_bytes());
+        }
 
         // 30:32 Held Item
         bytes[30..32].copy_from_slice(&self.held_item_index.to_le_bytes());
