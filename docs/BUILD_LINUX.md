@@ -21,7 +21,7 @@ sudo dnf install webkit2gtk4.1-devel openssl-devel curl wget file libappindicato
 sudo dnf group install "C Development Tools and Libraries"
 ```
 
-If you use another distro, check the Tauri docs for the appropriate equivalent.
+If you use another distro, check the [Tauri docs](https://v2.tauri.app/start/prerequisites/#linux) for the appropriate equivalent.
 
 ## Install Node.js and npm
 
