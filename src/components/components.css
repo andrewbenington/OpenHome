@@ -6,12 +6,13 @@
 .pokemon-icon-image {
   background-size: 3600%;
   background-repeat: no-repeat;
+  margin: auto;
   height: 100%;
   width: 100%;
   z-index: 1;
   top: 0;
-  left: 0;
-  position: absolute;
+  /* position: absolute; */
+  object-fit: contain;
 }
 
 .centered-cell {

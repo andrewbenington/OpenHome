@@ -327,11 +327,11 @@ img {
 }
 
 .issue-button:hover {
-  box-shadow: .5px .5px 150px #252525;
+  box-shadow: 0.5px 0.5px 150px #252525;
 }
 
 .issue-button::after {
-  content: "Thanks";
+  content: 'Thanks';
   height: 50px;
   width: 150px;
   background-color: #008080;
@@ -366,11 +366,11 @@ img {
 }
 
 .ibbug.issue-button::before {
-  content: "Bug";
+  content: 'Bug';
 }
 
 .ibfeature.issue-button::before {
-  content: "Feature";
+  content: 'Feature';
 }
 
 .issue-button:hover::after {

@@ -6,6 +6,7 @@ import {
   DefenseCharacteristics,
   HPCharacteristics,
   HPCharacteristicsPre6,
+  Item,
   Moves,
   SpecialAtkCharacteristics,
   SpecialDefCharacteristics,
@@ -503,4 +504,45 @@ export function getWeightCalculated(mon: PKMWithSize) {
   const deviation = (mon.weightScalar / 255) * 0.40000004 + (1 - mon.weightDeviation)
 
   return PokemonData[mon.dexNum].formes[mon.formeNum].weight * 10 * deviation
+}
+
+export function isMegaStone(item?: Item): boolean {
+  return (
+    item !== undefined &&
+    ((item >= Item.Gengarite && item <= Item.Latiosite) ||
+      (item >= Item.Swampertite && item <= Item.Beedrillite))
+  )
+}
+
+export function isZCrystal(item: Item) {
+  return (
+    (item >= Item.NormaliumZ && item <= Item.PikaniumZ) ||
+    (item >= Item.DecidiumZ && item <= Item.PikashuniumZ_1) ||
+    (item >= Item.SolganiumZ && item <= Item.KommoniumZ_1)
+  )
+}
+
+export function isBattleFormeItem(item?: Item) {
+  return (
+    isMegaStone(item) ||
+    item === Item.UltranecroziumZ ||
+    item === Item.UltranecroziumZ_1 ||
+    item === Item.RedOrb ||
+    item === Item.BlueOrb ||
+    item === Item.RustedSword ||
+    item === Item.RustedShield
+  )
+}
+
+export function displayIndexAdder(item?: Item) {
+  if (item === Item.UltranecroziumZ || item === Item.UltranecroziumZ_1) {
+    return (x: number) => x + 3
+  }
+  return (x: number) => x + 1
+}
+
+export function hasMega(nationalDex: number) {
+  const formes = PokemonData[nationalDex].formes
+
+  return formes.some((forme) => forme.isMega)
 }
