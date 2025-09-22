@@ -90,16 +90,14 @@ pub mod pk8 {
 }
 
 #[cfg(test)]
-pub mod pk3cfru {
+pub mod pk3rr {
     use std::path::PathBuf;
 
-    use crate::pkm::Pk3cfru;
+    use crate::pkm::Pk3rr;
 
     #[test]
     fn to_from_bytes() -> Result<(), String> {
-        super::to_from_bytes_all_in_dir::<Pk3cfru>(
-            &PathBuf::from("pkm_files").join("plugins/pk3rr"),
-        )
+        super::to_from_bytes_all_in_dir::<Pk3rr>(&PathBuf::from("pkm_files").join("plugins/pk3rr"))
     }
 }
 

@@ -1,6 +1,3 @@
-use crate::pkm::plugins::cfru::conversion::util::{
-    from_gen3_cfru_pokemon_index, to_gen3_cfru_pokemon_index,
-};
 use crate::pkm::traits::IsShiny;
 use crate::pkm::{Error, Pkm, Result};
 use crate::resources::{
