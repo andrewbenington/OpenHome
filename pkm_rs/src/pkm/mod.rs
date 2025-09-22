@@ -40,10 +40,10 @@ pub trait Pkm: Serialize + IsShiny {
     fn party_size() -> usize;
 
     fn from_bytes(bytes: &[u8]) -> Result<Box<Self>>;
-    fn write_box_bytes(&self, bytes: &mut [u8]);
-    fn write_party_bytes(&self, bytes: &mut [u8]);
-    fn to_box_bytes(&self) -> Vec<u8>;
-    fn to_party_bytes(&self) -> Vec<u8>;
+    fn write_box_bytes(&self, bytes: &mut [u8]) -> Result<()>;
+    fn write_party_bytes(&self, bytes: &mut [u8]) -> Result<()>;
+    fn to_box_bytes(&self) -> Result<Vec<u8>>;
+    fn to_party_bytes(&self) -> Result<Vec<u8>>;
 
     fn get_species_metadata(&self) -> &'static SpeciesMetadata;
     fn get_forme_metadata(&self) -> &'static FormeMetadata;

@@ -1,7 +1,7 @@
-use super::conversion::util::{from_gen3_cfru_pokemon_index, to_gen3_cfru_pokemon_index};
-use super::conversion::{NATIONAL_DEX_TO_RADICAL_RED_MAP, RADICAL_RED_TO_NATIONAL_DEX_MAP};
+use super::conversion::CFRU_TO_NATIONAL_DEX_MAP;
+use crate::pkm::plugins::cfru::conversion::util::to_gen3_cfru_pokemon_index;
 use crate::pkm::traits::IsShiny;
-use crate::pkm::{Error, Pkm, Result};
+use crate::pkm::{Error, NdexConvertSource, Pkm, Result};
 use crate::resources::{
     Ball, FormeMetadata, GameOfOriginIndex, MoveSlot, SpeciesAndForme, SpeciesMetadata,
 };
@@ -188,8 +188,12 @@ impl Pk3cfru {
 
         // 0x1C..0x1E: CFRU game species index
         let cfru_species_index = u16::from_le_bytes(bytes[0x1C..0x1E].try_into().unwrap());
-        let saf =
-            from_gen3_cfru_pokemon_index(cfru_species_index, &RADICAL_RED_TO_NATIONAL_DEX_MAP)?;
+        let saf = CFRU_TO_NATIONAL_DEX_MAP
+            .get(&cfru_species_index)
+            .ok_or(Error::NationalDex {
+                value: cfru_species_index,
+                source: NdexConvertSource::Crfu,
+            })?;
 
         // 0x34..0x36: met info & flags
         let meta = u16::from_le_bytes(bytes[0x34..0x36].try_into().unwrap());
@@ -220,7 +224,7 @@ impl Pk3cfru {
             language_index: bytes[18],
             trainer_name: Gen3String::from_bytes(bytes[19..26].try_into().unwrap()),
             markings: MarkingsFourShapes::from_byte(bytes[26]),
-            species_and_forme: saf,
+            species_and_forme: *saf,
             cfru_species_index,
             held_item_index: u16::from_le_bytes(bytes[30..32].try_into().unwrap()),
             exp: u32::from_le_bytes(bytes[32..36].try_into().unwrap()),
@@ -274,7 +278,7 @@ impl Pkm for Pk3cfru {
         Self::from_bytes(bytes).map(Box::new)
     }
 
-    fn write_box_bytes(&self, bytes: &mut [u8]) {
+    fn write_box_bytes(&self, bytes: &mut [u8]) -> Result<()> {
         // Zero buffer then fill
         for b in bytes.iter_mut().take(Self::BOX_SIZE) {
             *b = 0;
@@ -303,14 +307,8 @@ impl Pkm for Pk3cfru {
         bytes[27] = self.markings.to_byte();
 
         // 28:30 Species (DexNum / CFRU game index)
-        if let Ok(cfru_species) =
-            to_gen3_cfru_pokemon_index(&self.species_and_forme, &NATIONAL_DEX_TO_RADICAL_RED_MAP)
-        {
-            bytes[28..30].copy_from_slice(&cfru_species.to_le_bytes());
-        } else {
-            // fallback or propagate error
-            bytes[28..30].copy_from_slice(&0u16.to_le_bytes());
-        }
+        bytes[28..30]
+            .copy_from_slice(&to_gen3_cfru_pokemon_index(&self.species_and_forme)?.to_le_bytes());
 
         // 30:32 Held Item
         bytes[30..32].copy_from_slice(&self.held_item_index.to_le_bytes());
@@ -344,7 +342,7 @@ impl Pkm for Pk3cfru {
 
         // 52:53 Met Info (packed: level, game of origin, Gigantamax, trainer gender)
         let mut meta: u16 = 0;
-        meta |= (self.met_level as u16 & 0x7F);
+        meta |= self.met_level as u16 & 0x7F;
         meta |= (u8::from(self.game_of_origin) as u16 & 0x0F) << 7;
         meta |= ((self.can_gigantamax as u16) & 0x01) << 11;
         meta |= ((bool::from(self.trainer_gender) as u16) & 0x01) << 15;
@@ -354,23 +352,25 @@ impl Pkm for Pk3cfru {
         self.ivs.write_30_bits(bytes, 54);
         util::set_flag(bytes, 54, 30, self.is_egg);
         util::set_flag(bytes, 54, 31, self.has_hidden_ability);
+
+        Ok(())
     }
 
-    fn write_party_bytes(&self, bytes: &mut [u8]) {
+    fn write_party_bytes(&self, bytes: &mut [u8]) -> Result<()> {
         // CFRU uses the same 58 bytes; no extra party-only block provided.
-        self.write_box_bytes(bytes);
+        self.write_box_bytes(bytes)
     }
 
-    fn to_box_bytes(&self) -> Vec<u8> {
+    fn to_box_bytes(&self) -> Result<Vec<u8>> {
         let mut bytes = vec![0; Self::BOX_SIZE];
-        self.write_box_bytes(&mut bytes);
-        bytes
+        self.write_box_bytes(&mut bytes)?;
+        Ok(bytes)
     }
 
-    fn to_party_bytes(&self) -> Vec<u8> {
+    fn to_party_bytes(&self) -> Result<Vec<u8>> {
         let mut bytes = vec![0; Self::PARTY_SIZE];
-        self.write_party_bytes(&mut bytes);
-        bytes
+        self.write_party_bytes(&mut bytes)?;
+        Ok(bytes)
     }
 
     fn get_species_metadata(&self) -> &'static SpeciesMetadata {

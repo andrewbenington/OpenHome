@@ -243,7 +243,7 @@ impl Pkm for Pk6 {
         Self::from_bytes(bytes).map(Box::new)
     }
 
-    fn write_box_bytes(&self, bytes: &mut [u8]) {
+    fn write_box_bytes(&self, bytes: &mut [u8]) -> Result<()> {
         bytes[0..4].copy_from_slice(&self.encryption_constant.to_le_bytes());
         bytes[4..6].copy_from_slice(&self.sanity.to_le_bytes());
         bytes[6..8].copy_from_slice(&self.checksum.to_le_bytes());
@@ -349,30 +349,34 @@ impl Pkm for Pk6 {
         bytes[225] = self.region;
         bytes[226] = self.console_region;
         bytes[227] = self.language_index;
+
+        Ok(())
     }
 
-    fn write_party_bytes(&self, bytes: &mut [u8]) {
-        self.write_box_bytes(bytes);
+    fn write_party_bytes(&self, bytes: &mut [u8]) -> Result<()> {
+        self.write_box_bytes(bytes)?;
         bytes[232..236].copy_from_slice(&self.status_condition.to_le_bytes());
         bytes[237] = self.stat_level;
         bytes[238] = self.form_argument_remain;
         bytes[239] = self.form_argument_elapsed;
         bytes[240..242].copy_from_slice(&self.current_hp.to_le_bytes());
         bytes[242..254].copy_from_slice(&self.stats.to_bytes());
+
+        Ok(())
     }
 
-    fn to_box_bytes(&self) -> Vec<u8> {
+    fn to_box_bytes(&self) -> Result<Vec<u8>> {
         let mut bytes = [0; Self::BOX_SIZE];
-        self.write_box_bytes(&mut bytes);
+        self.write_box_bytes(&mut bytes)?;
 
-        Vec::from(bytes)
+        Ok(Vec::from(bytes))
     }
 
-    fn to_party_bytes(&self) -> Vec<u8> {
+    fn to_party_bytes(&self) -> Result<Vec<u8>> {
         let mut bytes = [0; Self::PARTY_SIZE];
-        self.write_party_bytes(&mut bytes);
+        self.write_party_bytes(&mut bytes)?;
 
-        Vec::from(bytes)
+        Ok(Vec::from(bytes))
     }
 
     fn get_species_metadata(&self) -> &'static SpeciesMetadata {

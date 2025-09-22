@@ -161,7 +161,7 @@ impl Pkm for Pk5 {
         Self::from_bytes(bytes).map(Box::new)
     }
 
-    fn write_box_bytes(&self, bytes: &mut [u8]) {
+    fn write_box_bytes(&self, bytes: &mut [u8]) -> Result<()> {
         bytes[0..4].copy_from_slice(&self.personality_value.to_le_bytes());
         bytes[8..10].copy_from_slice(&self.species_and_forme.get_ndex().to_le_bytes());
         bytes[10..12].copy_from_slice(&self.held_item_index.to_le_bytes());
@@ -217,29 +217,33 @@ impl Pkm for Pk5 {
         bytes[72..96].copy_from_slice(self.nickname.bytes().as_ref());
         bytes[104..120].copy_from_slice(self.trainer_name.bytes().as_ref());
         util::set_flag(bytes, 132, 7, self.trainer_gender.into());
+
+        Ok(())
     }
 
-    fn write_party_bytes(&self, bytes: &mut [u8]) {
-        self.write_box_bytes(bytes);
+    fn write_party_bytes(&self, bytes: &mut [u8]) -> Result<()> {
+        self.write_box_bytes(bytes)?;
         bytes[136..140].copy_from_slice(&self.status_condition.to_le_bytes());
         bytes[140] = self.stat_level;
         bytes[141] = self.junk_byte;
         bytes[142] = self.current_hp;
         bytes[142..154].copy_from_slice(&self.stats.to_bytes());
+
+        Ok(())
     }
 
-    fn to_box_bytes(&self) -> Vec<u8> {
+    fn to_box_bytes(&self) -> Result<Vec<u8>> {
         let mut bytes = [0; Self::BOX_SIZE];
-        self.write_box_bytes(&mut bytes);
+        self.write_box_bytes(&mut bytes)?;
 
-        Vec::from(bytes)
+        Ok(Vec::from(bytes))
     }
 
-    fn to_party_bytes(&self) -> Vec<u8> {
+    fn to_party_bytes(&self) -> Result<Vec<u8>> {
         let mut bytes = [0; Self::PARTY_SIZE];
-        self.write_party_bytes(&mut bytes);
+        self.write_party_bytes(&mut bytes)?;
 
-        Vec::from(bytes)
+        Ok(Vec::from(bytes))
     }
 
     fn get_species_metadata(&self) -> &'static SpeciesMetadata {
