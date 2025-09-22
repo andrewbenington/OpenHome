@@ -4,6 +4,8 @@ use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
+pub const BOXDATA_FILE: &str = "box-data.json";
+
 #[derive(Deserialize, Serialize)]
 pub struct BoxPreV1_5_0 {
     pub index: u8,

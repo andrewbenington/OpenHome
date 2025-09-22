@@ -6,7 +6,7 @@ use std::{
 };
 
 use crate::error::Result;
-use pkm_rs::saves::{SaveData, SaveType, gen7_alola::SunMoonSave, lets_go::LetsGoSave};
+use pkm_rs::saves::{SaveData, SaveType};
 use serde::Serialize;
 
 use crate::util;
