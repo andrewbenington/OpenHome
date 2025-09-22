@@ -1,5 +1,5 @@
 use super::conversion::util::{from_gen3_rr_pokemon_index, to_gen3_rr_pokemon_index};
-use crate::pkm::plugins::cfru::pk3cfru::Pk3cfru;
+use crate::pkm::plugins::cfru::pk3cfru::Pk3Cfru;
 use crate::pkm::{Result, plugins::cfru::pk3cfru::CfruMapping};
 use crate::resources::SpeciesAndForme;
 
@@ -25,4 +25,4 @@ impl CfruMapping for RadicalRedMapping {
     }
 }
 
-pub type Pk3rr = Pk3cfru<RadicalRedMapping>;
+pub type Pk3Rr = Pk3Cfru<RadicalRedMapping>;

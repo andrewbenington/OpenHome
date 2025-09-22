@@ -1,5 +1,5 @@
 use super::conversion::util::{from_gen3_ub_pokemon_index, to_gen3_ub_pokemon_index};
-use crate::pkm::plugins::cfru::pk3cfru::Pk3cfru;
+use crate::pkm::plugins::cfru::pk3cfru::Pk3Cfru;
 use crate::pkm::{Result, plugins::cfru::pk3cfru::CfruMapping};
 use crate::resources::SpeciesAndForme;
 
@@ -22,4 +22,4 @@ impl CfruMapping for UnboundMapping {
     }
 }
 
-pub type Pk3ub = Pk3cfru<UnboundMapping>;
+pub type Pk3Ub = Pk3Cfru<UnboundMapping>;

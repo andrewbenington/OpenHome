@@ -90,7 +90,7 @@ impl CfruMapping for BaseCfruMapping {
 
 /// PK3CFRU (58 bytes)
 #[derive(Debug, Default, Serialize, Clone)]
-pub struct Pk3cfru<M: CfruMapping = BaseCfruMapping> {
+pub struct Pk3Cfru<M: CfruMapping = BaseCfruMapping> {
     _marker: std::marker::PhantomData<M>,
 
     // Personality 0:4
@@ -163,7 +163,7 @@ pub struct Pk3cfru<M: CfruMapping = BaseCfruMapping> {
     pub current_hp: u16,
 }
 
-impl<M: CfruMapping> Pk3cfru<M> {
+impl<M: CfruMapping> Pk3Cfru<M> {
     pub const BOX_SIZE: usize = 58;
     pub const PARTY_SIZE: usize = 100;
 
@@ -237,7 +237,7 @@ impl<M: CfruMapping> Pk3cfru<M> {
             (ppb >> 6) & 0x3,
         ];
 
-        let mon = Pk3cfru {
+        let mon = Pk3Cfru {
             _marker: std::marker::PhantomData,
 
             personality_value: u32::from_le_bytes(bytes[0..4].try_into().unwrap()),
@@ -274,7 +274,7 @@ impl<M: CfruMapping> Pk3cfru<M> {
     }
 }
 
-impl<M: CfruMapping> IsShiny for Pk3cfru<M> {
+impl<M: CfruMapping> IsShiny for Pk3Cfru<M> {
     fn is_shiny(&self) -> bool {
         let tid = self.trainer_id as u32;
         let sid = self.secret_id as u32;
@@ -285,9 +285,9 @@ impl<M: CfruMapping> IsShiny for Pk3cfru<M> {
     }
 }
 
-impl<M: CfruMapping> Pkm for Pk3cfru<M> {
-    const BOX_SIZE: usize = Pk3cfru::<M>::BOX_SIZE;
-    const PARTY_SIZE: usize = Pk3cfru::<M>::PARTY_SIZE;
+impl<M: CfruMapping> Pkm for Pk3Cfru<M> {
+    const BOX_SIZE: usize = Pk3Cfru::<M>::BOX_SIZE;
+    const PARTY_SIZE: usize = Pk3Cfru::<M>::PARTY_SIZE;
 
     fn box_size() -> usize {
         Self::BOX_SIZE
