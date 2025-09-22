@@ -1366,7 +1366,7 @@ pub static CFRU_TO_NATIONAL_DEX_MAP: phf::Map<u16, SpeciesAndForme> = phf_map! {
 
 type NdexAndForme = (u16, u16);
 
-pub static NATIONAL_DEX_TO_RADICAL_RED_MAP: phf::Map<NdexAndForme, u16> = phf_map! {
+pub static NATIONAL_DEX_TO_CFRU_MAP: phf::Map<NdexAndForme, u16> = phf_map! {
     (0,0) => 0,
     (1000,0) => 852,
     (1001,0) => 749,

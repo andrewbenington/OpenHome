@@ -1,7 +1,8 @@
-use super::conversion::CFRU_TO_NATIONAL_DEX_MAP;
-use crate::pkm::plugins::cfru::conversion::util::to_gen3_cfru_pokemon_index;
+use crate::pkm::plugins::cfru::conversion::util::{
+    from_gen3_cfru_pokemon_index, to_gen3_cfru_pokemon_index,
+};
 use crate::pkm::traits::IsShiny;
-use crate::pkm::{Error, NdexConvertSource, Pkm, Result};
+use crate::pkm::{Error, Pkm, Result};
 use crate::resources::{
     Ball, FormeMetadata, GameOfOriginIndex, MoveSlot, SpeciesAndForme, SpeciesMetadata,
 };
@@ -188,12 +189,7 @@ impl Pk3cfru {
 
         // 0x1C..0x1E: CFRU game species index
         let cfru_species_index = u16::from_le_bytes(bytes[0x1C..0x1E].try_into().unwrap());
-        let saf = CFRU_TO_NATIONAL_DEX_MAP
-            .get(&cfru_species_index)
-            .ok_or(Error::NationalDex {
-                value: cfru_species_index,
-                source: NdexConvertSource::Crfu,
-            })?;
+        let saf = from_gen3_cfru_pokemon_index(cfru_species_index)?;
 
         // 0x34..0x36: met info & flags
         let meta = u16::from_le_bytes(bytes[0x34..0x36].try_into().unwrap());
@@ -224,7 +220,7 @@ impl Pk3cfru {
             language_index: bytes[18],
             trainer_name: Gen3String::from_bytes(bytes[19..26].try_into().unwrap()),
             markings: MarkingsFourShapes::from_byte(bytes[26]),
-            species_and_forme: *saf,
+            species_and_forme: saf,
             cfru_species_index,
             held_item_index: u16::from_le_bytes(bytes[30..32].try_into().unwrap()),
             exp: u32::from_le_bytes(bytes[32..36].try_into().unwrap()),
