@@ -5,6 +5,7 @@ use tauri_plugin_dialog::{DialogExt, MessageDialogButtons, MessageDialogKind};
 
 use crate::{
     error::{Error, Result},
+    pkm_storage::StoredBankData,
     util, versioning,
 };
 
@@ -35,6 +36,8 @@ pub fn run_app_startup(app: &App) -> Result<()> {
     }
 
     versioning::update_version_last_used(handle)?;
+
+    // IMPORTANT: should occur after any migrations (above)
     initialize_storage(handle)?;
 
     let result = set_theme_from_settings(app);
@@ -61,13 +64,17 @@ fn initialize_storage(app_handle: &tauri::AppHandle) -> Result<()> {
         init_storage_json_file(app_handle, obj_file.into(), false)?;
     }
 
-    let arr_files = ["box-data.json", "box-names.json", "save-folders.json"];
+    let arr_files = ["save-folders.json"];
 
     for arr_file in arr_files {
         init_storage_json_file(app_handle, arr_file.into(), true)?;
     }
 
-    let mons_path = util::get_appdata_dir(app_handle)?.join("mons");
+    if !storage_path.join("banks.json").exists() {
+        util::write_storage_file_json(app_handle, "banks.json", StoredBankData::default())?;
+    }
+
+    let mons_path = util::get_storage_path(app_handle)?.join("mons");
     util::create_directory(&mons_path)
 }
 
