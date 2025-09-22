@@ -4,8 +4,8 @@ import { BackendContext } from '../backend/backendContext'
 import useDisplayError from '../hooks/displayError'
 import { getPublicImageURL } from '../images/images'
 import { getPokemonSpritePath } from '../images/pokemon'
-import { OpenHomePlugin, PluginContext } from '../state/plugin'
-import { PKMInterface } from '../types/interfaces'
+import { MonSpriteData, OpenHomePlugin, PluginContext } from '../state/plugin'
+import { displayIndexAdder, isBattleFormeItem } from '../types/pkm/util'
 
 type RequiredFields<T, K extends keyof T> = T & Required<Pick<T, K>>
 
@@ -14,7 +14,7 @@ function isSpritePlugin(plugin: OpenHomePlugin): plugin is SpritePlugin {
   return !!plugin.getMonSpritePath
 }
 
-export default function useMonSprite(mon: PKMInterface) {
+export default function useMonSprite(mon: MonSpriteData) {
   const [pluginState] = useContext(PluginContext)
   const backend = useContext(BackendContext)
   const [spritePath, setSpritePath] = useState<string | null>(null)
@@ -27,9 +27,18 @@ export default function useMonSprite(mon: PKMInterface) {
   )
 
   useEffect(() => {
+    setLoadError(false)
+  }, [mon])
+
+  useEffect(() => {
     if (loadError) return
+
+    if (isBattleFormeItem(mon.heldItemIndex)) {
+      mon.formeNum = displayIndexAdder(mon.heldItemIndex)(mon.formeNum)
+    }
+
     for (const plugin of spritePlugins) {
-      const spritePath = plugin.getMonSpritePath({ ...mon, isShiny: mon.isShiny() })
+      const spritePath = plugin.getMonSpritePath(mon)
 
       if (spritePath !== null) {
         backend.getPluginPath(plugin.id).then((pluginPath) => {

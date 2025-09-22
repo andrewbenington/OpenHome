@@ -1,4 +1,4 @@
-VERSION=1.5.0
+VERSION=1.6.0
 
 .PHONY: help
 help: # Display this help.
@@ -72,6 +72,13 @@ generate: generate/out/generate.js
 	@node ./generate/out/generate.js Items text/items/PostGen4.txt items/PostGen4.ts
 	@npx prettier --log-level silent --write src/resources/gen*
 
+.PHONY: gen-wasm
+gen-wasm:
+# 	@node generate/gen_ribbons.ts
+# 	@node generate/gen_moves.ts
+# 	@node generate/gen_abilities.ts
+	@cd pkm_rs && node generate/gen_species_data.ts
+	
 generate/out/syncPKHexResources.js: generate/syncPKHexResources.ts
 	@echo "compiling generate/syncPKHexResources.ts..."
 	@cd generate && tsc

@@ -12,6 +12,7 @@ import PK6 from './PK6'
 import PK7 from './PK7'
 import PK8 from './PK8'
 import PK9 from './PK9'
+import Pk7Rust from './wasm/PK7'
 import XDPKM from './XDPKM'
 
 export * from './COLOPKM'
@@ -40,6 +41,7 @@ export type PKM =
   | PK5
   | PK6
   | PK7
+  | Pk7Rust
   | PB7
   | PK8
   | PA8

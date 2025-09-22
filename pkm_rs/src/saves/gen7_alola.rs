@@ -4,6 +4,7 @@ use crate::encryption::crc16_ccitt_invert;
 use crate::encryption::decrypt_pkm_bytes_gen_6_7;
 use crate::encryption::unshuffle_blocks_gen_6_7;
 use crate::pkm::Pk7;
+use crate::resources::GameOfOrigin;
 use crate::substructures::Gender;
 use crate::util::get_flag;
 
@@ -20,6 +21,8 @@ const TRAINER_DATA_SIZE: usize = 0xc0;
 const SM_BOX_DATA_OFFSET: usize = 0x04e00;
 const BOX_DATA_SIZE: usize = 0x36600;
 // const BOX_CHECKSUM_OFFSET: usize = 0x75fda;
+
+const BOX_COUNT: usize = 32;
 const BOX_ROWS: usize = 6;
 const BOX_COLS: usize = 5;
 const BOX_SLOTS: usize = BOX_ROWS * BOX_COLS;
@@ -76,12 +79,32 @@ impl SaveDataTrait for SunMoonSave {
         BOX_SLOTS
     }
 
+    fn box_count() -> usize {
+        BOX_COUNT
+    }
+
+    fn current_pc_box_idx(&self) -> usize {
+        if self.bytes[0] >= 32 {
+            0
+        } else {
+            self.bytes[0].into()
+        }
+    }
+
     fn calc_checksum(&self) -> u16 {
         crc16_ccitt_invert(&self.bytes, SM_BOX_DATA_OFFSET, BOX_DATA_SIZE)
     }
 
     fn is_valid_save(bytes: &[u8]) -> bool {
         bytes.len() == SM_SIZE_BYTES
+    }
+
+    fn display_tid(&self) -> String {
+        super::six_digit_display(self.trainer.trainer_id, self.trainer.secret_id)
+    }
+
+    fn game_of_origin(&self) -> Option<crate::resources::GameOfOrigin> {
+        crate::resources::GAME_OF_ORIGIN_DATA[self.trainer.game_code as usize].copied()
     }
 }
 
@@ -115,6 +138,36 @@ impl SunMoonSave {
     #[wasm_bindgen]
     pub fn is_valid_save(bytes: &[u8]) -> bool {
         bytes.len() == SM_SIZE_BYTES
+    }
+
+    #[wasm_bindgen]
+    pub fn display_tid(&self) -> String {
+        super::six_digit_display(self.trainer.trainer_id, self.trainer.secret_id)
+    }
+
+    #[wasm_bindgen]
+    pub fn box_count() -> usize {
+        BOX_COUNT
+    }
+
+    #[wasm_bindgen]
+    pub fn box_cols() -> usize {
+        BOX_COLS
+    }
+
+    #[wasm_bindgen]
+    pub fn box_size() -> usize {
+        BOX_COLS * BOX_ROWS
+    }
+
+    #[wasm_bindgen]
+    pub fn current_pc_box_idx(&self) -> usize {
+        SaveDataTrait::current_pc_box_idx(self)
+    }
+
+    #[wasm_bindgen]
+    pub fn game_of_origin(&self) -> Option<GameOfOrigin> {
+        SaveDataTrait::game_of_origin(self)
     }
 }
 
@@ -190,12 +243,32 @@ impl SaveDataTrait for UltraSunMoonSave {
         BOX_SLOTS
     }
 
+    fn box_count() -> usize {
+        BOX_COUNT
+    }
+
+    fn current_pc_box_idx(&self) -> usize {
+        if self.bytes[0] >= 32 {
+            0
+        } else {
+            self.bytes[0].into()
+        }
+    }
+
     fn calc_checksum(&self) -> u16 {
         crc16_ccitt_invert(&self.bytes, SM_BOX_DATA_OFFSET, BOX_DATA_SIZE)
     }
 
     fn is_valid_save(bytes: &[u8]) -> bool {
         bytes.len() == USUM_SIZE_BYTES
+    }
+
+    fn display_tid(&self) -> String {
+        super::six_digit_display(self.trainer.trainer_id, self.trainer.secret_id)
+    }
+
+    fn game_of_origin(&self) -> Option<crate::resources::GameOfOrigin> {
+        crate::resources::GAME_OF_ORIGIN_DATA[self.trainer.game_code as usize].copied()
     }
 }
 

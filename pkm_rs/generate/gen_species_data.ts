@@ -1,14 +1,13 @@
-import * as fs from "fs";
+import * as fs from 'fs'
 
 const abilityOverrides: Record<number, string> = {
-  266: "AS_ONE_ICE_RIDER",
-  267: "AS_ONE_SHADOW_RIDER",
-  301: "EMBODY_ASPECT_SPEED",
-  302: "EMBODY_ASPECT_SP_DEF",
-  303: "EMBODY_ASPECT_ATK",
-  304: "EMBODY_ASPECT_DEF",
+  266: 'AS_ONE_ICE',
+  267: 'AS_ONE_SHADOW',
+  301: 'EMBODY_ASPECT_SPEED',
+  302: 'EMBODY_ASPECT_SP_DEF',
+  303: 'EMBODY_ASPECT_ATK',
+  304: 'EMBODY_ASPECT_DEF',
 }
-
 
 export function rustAbilityConstName(index: number, ability: string): string {
   if (index in abilityOverrides) {
@@ -17,20 +16,14 @@ export function rustAbilityConstName(index: number, ability: string): string {
 
   let constName = ability
     .toUpperCase()
-    .replace(/[^A-Z0-9\s]/g, "")
-    .replace(/[^A-Z0-9]/g, "_")
-    .replace(/_+/g, "_");
+    .replace(/[^A-Z0-9\s]/g, '')
+    .replace(/[^A-Z0-9]/g, '_')
+    .replace(/_+/g, '_')
 
   return constName
 }
 
-type LevelUpType =
-  | 'Slow'
-  | 'Medium Slow'
-  | 'Medium Fast'
-  | 'Fast'
-  | 'Erratic'
-  | 'Fluctuating'
+type LevelUpType = 'Slow' | 'Medium Slow' | 'Medium Fast' | 'Fast' | 'Erratic' | 'Fluctuating'
 
 type Species = {
   readonly name: string
@@ -63,8 +56,8 @@ type Forme = {
   readonly abilityH?: string
   readonly height: number
   readonly weight: number
-  readonly evos?: readonly FormeReference[]
-  readonly prevo?: FormeReference
+  readonly evos?: readonly SpeciesAndForme[]
+  readonly prevo?: SpeciesAndForme
   readonly eggGroups: readonly string[]
   readonly gen: number
   readonly regional?: RegionalForme
@@ -78,16 +71,21 @@ type Forme = {
   readonly spriteIndex: readonly [number, number]
 }
 
-const ability_names: string[] = fs.readFileSync("text_source/abilities.txt", "utf-8").split("\n").map(val => val.replaceAll("’", ""));
+const ability_names: string[] = fs
+  .readFileSync('text_source/abilities.txt', 'utf-8')
+  .split('\n')
+  .map((val) => val.replaceAll('’', ''))
 
 function getAbilityIndex(name: string) {
   const constName = rustAbilityConstName(0, name)
   if (Object.values(abilityOverrides).includes(constName)) {
-    const [index] = Object.entries(abilityOverrides).find(([idx, abilityName]) => abilityName === constName)
+    const [index] = Object.entries(abilityOverrides).find(
+      ([idx, abilityName]) => abilityName === constName
+    )
     return parseInt(index)
   }
 
-  const index = ability_names.indexOf(name.replaceAll("’", "").replaceAll("'", ""))
+  const index = ability_names.indexOf(name.replaceAll('’', '').replaceAll("'", ''))
   if (index < 1) {
     throw new Error(`Ability not found: ${name}`)
   }
@@ -96,19 +94,21 @@ function getAbilityIndex(name: string) {
 
 export type RegionalForme = 'Alola' | 'Galar' | 'Hisui' | 'Paldea'
 
-type FormeReference = {
+type SpeciesAndForme = {
   readonly dexNumber: number
   readonly formeNumber: number
 }
 
-
 function rustFormeConstName(forme: Forme): string {
-  const formeName = forme.formeName === forme.name && forme.isBaseForme ? forme.formeName + "-base" : forme.formeName
+  const formeName =
+    forme.formeName === forme.name && forme.isBaseForme
+      ? forme.formeName + '-base'
+      : forme.formeName
   let constName = formeName
     .toUpperCase()
-    .replace(/[^A-Z0-9\s-]/g, "")
-    .replace(/[^A-Z0-9]/g, "_")
-    .replace(/_+/g, "_");
+    .replace(/[^A-Z0-9\s-]/g, '')
+    .replace(/[^A-Z0-9]/g, '_')
+    .replace(/_+/g, '_')
 
   return constName
 }
@@ -116,9 +116,9 @@ function rustFormeConstName(forme: Forme): string {
 function rustSpeciesConstName(species: Species): string {
   let constName = species.name
     .toUpperCase()
-    .replace(/[^A-Z0-9\s]/g, "")
-    .replace(/[^A-Z0-9]/g, "_")
-    .replace(/_+/g, "_");
+    .replace(/[^A-Z0-9\s]/g, '')
+    .replace(/[^A-Z0-9]/g, '_')
+    .replace(/_+/g, '_')
 
   return constName
 }
@@ -126,19 +126,19 @@ function rustSpeciesConstName(species: Species): string {
 function genderRatioToRust(gr: { readonly M: number; readonly F: number }): string {
   switch (gr.M) {
     case 0.0:
-      return gr.F === 0 ? "GenderRatio::Genderless" : "GenderRatio::AllFemale"
+      return gr.F === 0 ? 'GenderRatio::Genderless' : 'GenderRatio::AllFemale'
     case 0.125:
-      return "GenderRatio::M1ToF7"
+      return 'GenderRatio::M1ToF7'
     case 0.25:
-      return "GenderRatio::M1ToF3"
+      return 'GenderRatio::M1ToF3'
     case 0.5:
-      return "GenderRatio::Equal"
+      return 'GenderRatio::Equal'
     case 0.75:
-      return "GenderRatio::M3ToF1"
+      return 'GenderRatio::M3ToF1'
     case 0.875:
-      return "GenderRatio::M7ToF1"
+      return 'GenderRatio::M7ToF1'
     case 1:
-      return "GenderRatio::AllMale"
+      return 'GenderRatio::AllMale'
     default:
       throw new Error(`UNKNOWN GENDER RATIO: ${JSON.stringify(gr)}`)
   }
@@ -155,13 +155,12 @@ function statsToRust(stats: {
   return `Stats16Le::new(${stats.hp}, ${stats.atk}, ${stats.def}, ${stats.spa}, ${stats.spd}, ${stats.spe})`
 }
 
-
-function formeReferenceToRust(ref: FormeReference): string {
-  return `unsafe { FormeReference::new_unchecked(${ref.dexNumber}, ${ref.formeNumber}) }`
+function speciesAndFormeToRust(ref: SpeciesAndForme): string {
+  return `unsafe { SpeciesAndForme::new_unchecked(${ref.dexNumber}, ${ref.formeNumber}) }`
 }
 
-function evolutionsToRust(evos?: readonly FormeReference[]): string {
-  return `&[${(evos ?? []).map(formeReferenceToRust).join(",")}]`
+function evolutionsToRust(evos?: readonly SpeciesAndForme[]): string {
+  return `&[${(evos ?? []).map(speciesAndFormeToRust).join(',')}]`
 }
 
 function map<T, S>(input: T | null | undefined, f: (T) => S): S | null | undefined {
@@ -175,30 +174,30 @@ function optionalToRust<T, S>(value: T | null | undefined, tranformer?: (T) => S
   if (value !== undefined && value !== null) {
     return `Some(${tranformer ? tranformer(value) : value})`
   } else {
-    return "None"
+    return 'None'
   }
 }
-
 
 function pkmTypeToRust(pt: string): string {
   return `PkmType::${pt}`
 }
 
 function eggGroupToRust(eg: string): string {
-  const enumName = eg === "Undiscovered" ? "NoEggsDiscovered" : eg.split(" ").join("").split("-").join("")
+  const enumName =
+    eg === 'Undiscovered' ? 'NoEggsDiscovered' : eg.split(' ').join('').split('-').join('')
   return `EggGroup::${enumName}`
 }
 
 function levelUpTypeToRust(lut: string): string {
-  return `LevelUpType::${lut.split(" ").join("")}`
+  return `LevelUpType::${lut.split(' ').join('')}`
 }
 
 function abilityConstName(forme: Forme, ability: string) {
-  if (ability === "As One") {
-    return rustAbilityConstName(forme.formeName.includes("Ice-Rider") ? 266 : 267, "As One")
+  if (ability === 'As One') {
+    return rustAbilityConstName(forme.formeName.includes('Ice-Rider') ? 266 : 267, 'As One')
   }
-  if (ability === "Embody Aspect") {
-    return rustAbilityConstName(301 + forme.formeNumber, "Embody Aspect")
+  if (ability === 'Embody Aspect') {
+    return rustAbilityConstName(301 + forme.formeNumber, 'Embody Aspect')
   }
   return rustAbilityConstName(0, ability)
 }
@@ -208,9 +207,9 @@ function falseIfUndef(input?: boolean): boolean {
 }
 
 function convertForme(natDexIndex: number, forme: Forme): string {
-  const constName = rustFormeConstName(forme);
+  const constName = rustFormeConstName(forme)
 
-  console.log("forme:", constName)
+  console.log('forme:', constName)
   return `FormeMetadata {
     species_name: "${forme.name}",
     national_dex: unsafe { NatDexIndex::new_unchecked(${natDexIndex}) },
@@ -232,7 +231,7 @@ function convertForme(natDexIndex: number, forme: Forme): string {
     base_height: ${forme.height}f32,
     base_weight: ${forme.weight}f32,
     evolutions: ${evolutionsToRust(forme.evos)},
-    pre_evolution: ${optionalToRust(forme.prevo, formeReferenceToRust)},
+    pre_evolution: ${optionalToRust(forme.prevo, speciesAndFormeToRust)},
     egg_groups: (${eggGroupToRust(forme.eggGroups[0])}, ${optionalToRust(forme.eggGroups[1], eggGroupToRust)}),
     introduced: Generation::G${forme.gen},
     is_restricted_legend: ${falseIfUndef(forme.restrictedLegendary)},
@@ -242,7 +241,7 @@ function convertForme(natDexIndex: number, forme: Forme): string {
     is_paradox: ${falseIfUndef(forme.paradox)},
     sprite: "${forme.sprite}",
     sprite_index: (${forme.spriteIndex}),
-}`;
+}`
 }
 
 function prependStaticRef(input: string) {
@@ -254,16 +253,18 @@ function convertSpecies(species: Species): string {
     name: "${species.name}",
     national_dex: unsafe { NatDexIndex::new_unchecked(${species.nationalDex}) },
     level_up_type: ${levelUpTypeToRust(species.levelUpType)},
-    formes: &[${species.formes.map(forme => convertForme(species.nationalDex, forme)).join(",")}]
-}`;
+    formes: &[${species.formes.map((forme) => convertForme(species.nationalDex, forme)).join(',')}]
+}`
 }
 
 function main() {
-
-  const speciesJson: Record<string, Species> = JSON.parse(fs.readFileSync("text_source/species.json", "utf-8"));
+  console.log(process.cwd())
+  const speciesJson: Record<string, Species> = JSON.parse(
+    fs.readFileSync('text_source/species.json', 'utf-8')
+  )
 
   let output = `
-use crate::resources::{AbilityIndex, EggGroup, FormeMetadata, FormeReference, GenderRatio, LevelUpType, NatDexIndex, SpeciesMetadata };
+use crate::resources::{AbilityIndex, EggGroup, FormeMetadata, GenderRatio, LevelUpType, NatDexIndex, SpeciesAndForme, SpeciesMetadata };
 use crate::resources::{games::Generation, pkm_types::PkmType};
 use crate::substructures::Stats16Le;
 
@@ -281,16 +282,14 @@ pub const NATIONAL_DEX_MAX: usize = ${Object.keys(speciesJson).length};
   //   .map(convertSpecies)
   //   .join("\n\n");
 
+  output +=
+    `pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [\n` +
+    Object.values(speciesJson).map(convertSpecies).join(',\n') +
+    '];'
 
-  output += `pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [\n` + Object.values(speciesJson)
-    .map(convertSpecies)
-    .join(",\n") + "];";
-
-  const filename = "pkm_rs/src/resources/species/metadata.rs"
-  fs.writeFileSync(filename, output);
-  console.log(`Rust code written to ${filename}`);
+  const filename = 'src/resources/species/metadata.rs'
+  fs.writeFileSync(filename, output)
+  console.log(`Rust code written to ${filename}`)
 }
 
-
-main();
-
+main()

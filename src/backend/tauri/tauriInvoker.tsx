@@ -3,6 +3,7 @@ import * as E from 'fp-ts/lib/Either'
 import { StoredBankData } from 'src/types/storage'
 import { Errorable, JSONArray, JSONObject, JSONValue, LookupMap, SaveRef } from 'src/types/types'
 import { PluginMetadataWithIcon } from 'src/util/Plugin'
+import { Pokedex, PokedexUpdate } from '../../types/pokedex'
 import { PossibleSaves } from '../../types/SAVTypes/path'
 import { AppState, ImageResponse, StoredLookups } from '../backendInterface'
 import { RustResult } from './types'
@@ -50,6 +51,18 @@ export const TauriInvoker = {
 
   updateLookups(gen12: LookupMap, gen345: LookupMap): Promise<Errorable<null>> {
     const promise: Promise<null> = invoke('update_lookups', { gen12, gen345 })
+
+    return promise.then(E.right).catch(E.left)
+  },
+
+  getPokedex(): Promise<Errorable<Pokedex>> {
+    const promise: Promise<Pokedex> = invoke('get_pokedex')
+
+    return promise.then(E.right).catch(E.left)
+  },
+
+  registerInPokedex(updates: PokedexUpdate[]): Promise<Errorable<null>> {
+    const promise: Promise<null> = invoke('update_pokedex', { updates })
 
     return promise.then(E.right).catch(E.left)
   },

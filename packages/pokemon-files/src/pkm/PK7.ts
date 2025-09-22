@@ -107,7 +107,7 @@ export class PK7 {
       this.encryptionConstant = inner.encryption_constant
       this.sanity = inner.sanity
       this.checksum = inner.checksum
-      this.dexNum = inner.national_dex.index
+      this.dexNum = inner.species_and_forme.national_dex
       this.heldItemIndex = inner.held_item_index
       this.trainerID = inner.trainer_id
       this.secretID = inner.secret_id

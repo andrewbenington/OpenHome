@@ -53,7 +53,7 @@ export function getGameColor(saveType: SAVClass | undefined, origin: GameOfOrigi
 }
 
 export function getPluginIdentifier(saveType: SAVClass | undefined): string | undefined {
-  return saveType?.prototype.getPluginIdentifier()
+  return saveType?.prototype.getPluginIdentifier?.()
 }
 
 export function getGameName(saveType: SAVClass | undefined): string | undefined {

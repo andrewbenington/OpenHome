@@ -20,6 +20,7 @@ import { getPublicImageURL } from 'src/images/images'
 import { BallsImageList, getItemIconPath } from 'src/images/items'
 import { getRibbonSpritePath } from 'src/images/ribbons'
 import { FilterContext } from 'src/state/filter'
+import { HeldItemCategory } from 'src/types/Filter'
 import Autocomplete from '../Autocomplete'
 import PokemonIcon from '../PokemonIcon'
 import TypeIcon from '../TypeIcon'
@@ -29,6 +30,15 @@ type SelectOption = {
   label: string
   id: number
 }
+
+type ItemOption =
+  | ({
+      type: 'specific_item'
+    } & SelectOption)
+  | {
+      type: HeldItemCategory
+      label: string
+    }
 
 function getOriginIcon(origin: Origin) {
   const path =
@@ -52,24 +62,41 @@ function getOriginIcon(origin: Origin) {
   ) : undefined
 }
 
+// TypeScript enums are difficult to work with...
+const heldItems: SelectOption[] = Object.keys(Item)
+  .filter((indexStr) => !isNaN(Number(indexStr)))
+  .map((indexStr) => ({
+    label: ItemToString(parseInt(indexStr)),
+    id: parseInt(indexStr),
+  }))
+
+const itemOptions: ItemOption[] = [
+  {
+    type: 'specific_item',
+    id: 0,
+    label: 'No Item',
+  },
+  {
+    type: 'any',
+    label: 'Any Item',
+  },
+  {
+    type: 'mega_stone',
+    label: 'Mega Stone',
+  },
+  {
+    type: 'z_crystal',
+    label: 'Z Crystal',
+  },
+  ...heldItems.slice(1).map((item) => ({ type: 'specific_item', ...item }) as ItemOption),
+]
+
 export default function FilterPanel() {
   const [filterState, dispatchFilterState] = useContext(FilterContext)
 
   const currentMon = useMemo(
     () => (filterState.dexNumber ? PokemonData[filterState.dexNumber] : undefined),
     [filterState.dexNumber]
-  )
-
-  // TypeScript enums are difficult to work with...
-  const items: SelectOption[] = useMemo(
-    () =>
-      Object.keys(Item)
-        .filter((indexStr) => !isNaN(Number(indexStr)))
-        .map((indexStr) => ({
-          label: ItemToString(parseInt(indexStr)),
-          id: parseInt(indexStr),
-        })),
-    []
   )
 
   const abilities: SelectOption[] = useMemo(
@@ -146,21 +173,30 @@ export default function FilterPanel() {
           />
         )}
         <Autocomplete
-          options={items}
+          options={itemOptions}
           getOptionString={(opt) => opt.label}
-          getOptionUniqueID={(opt) => opt.id.toString()}
+          getOptionUniqueID={(opt) => (opt.type === 'specific_item' ? opt.id.toString() : opt.type)}
           value={
-            filterState.heldItemIndex !== undefined ? items[filterState.heldItemIndex] : undefined
+            typeof filterState.heldItem === 'number'
+              ? { type: 'specific_item', ...heldItems[filterState.heldItem] }
+              : filterState.heldItem !== undefined
+                ? itemOptions.find(
+                    (opt) => opt.type !== 'specific_item' && opt.type === filterState.heldItem
+                  )
+                : undefined
           }
           label="Held Item"
           onChange={(option) =>
             dispatchFilterState({
               type: 'set_filter',
-              payload: { heldItemIndex: option?.id },
+              payload: {
+                heldItem:
+                  option?.type === 'specific_item' ? option.id : (option?.type as HeldItemCategory),
+              },
             })
           }
           getIconComponent={(currentItem) =>
-            currentItem && (
+            currentItem.type === 'specific_item' && (
               <img
                 alt="item icon"
                 src={getPublicImageURL(getItemIconPath(currentItem.id, 'PK9'))}

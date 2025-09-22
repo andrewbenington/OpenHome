@@ -14,6 +14,8 @@ const BOX_DATA_OFFSET: usize = 0x5c00;
 const BOX_ROWS: usize = 6;
 const BOX_COLS: usize = 5;
 const BOX_SLOTS: usize = BOX_ROWS * BOX_COLS;
+const BOX_SLOTS_TOTAL: usize = 1000;
+const BOX_COUNT: usize = (BOX_SLOTS_TOTAL / 30) + 1;
 
 const SAVE_FILE_SIZE: usize = 0x100000;
 
@@ -55,6 +57,14 @@ impl SaveDataTrait for LetsGoSave {
         BOX_SLOTS
     }
 
+    fn box_count() -> usize {
+        BOX_COUNT
+    }
+
+    fn current_pc_box_idx(&self) -> usize {
+        0
+    }
+
     fn get_mon_bytes_at(&self, _: usize, offset: usize) -> Result<Vec<u8>, String> {
         let decrypted_bytes = decrypt_pkm_bytes_gen_6_7(&self.get_mon_bytes(offset))
             .map_err(|err| err.to_string())?;
@@ -76,6 +86,14 @@ impl SaveDataTrait for LetsGoSave {
 
     fn is_valid_save(bytes: &[u8]) -> bool {
         bytes.len() == SAVE_FILE_SIZE
+    }
+
+    fn display_tid(&self) -> String {
+        super::six_digit_display(self.trainer.trainer_id, self.trainer.secret_id)
+    }
+
+    fn game_of_origin(&self) -> Option<crate::resources::GameOfOrigin> {
+        crate::resources::GAME_OF_ORIGIN_DATA[self.trainer.game_code as usize].copied()
     }
 }
 

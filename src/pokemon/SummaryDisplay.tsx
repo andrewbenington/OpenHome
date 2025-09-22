@@ -40,7 +40,14 @@ const styles = {
 const SummaryDisplay = (props: { mon: PKMInterface }) => {
   const { mon } = props
   const [imageError, setImageError] = useState(false)
-  const spritePath = useMonSprite(mon)
+  const spritePath = useMonSprite({
+    dexNum: mon.dexNum,
+    formeNum: mon.formeNum,
+    formArgument: mon.formArgument,
+    isShiny: mon.isShiny(),
+    isFemale: mon.gender === 1,
+    format: mon.format,
+  })
 
   const itemAltText = useMemo(() => {
     const monData = PokemonData[mon.dexNum]?.formes[mon.formeNum]

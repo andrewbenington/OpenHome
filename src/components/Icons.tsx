@@ -6,6 +6,7 @@ import {
   MdArrowDropDown,
   MdArrowForward,
   MdArrowForwardIos,
+  MdCompareArrows,
   MdCreateNewFolder,
   MdDataObject,
   MdError,
@@ -26,6 +27,7 @@ export const CardsIcon = IoGrid
 
 export const ArrowLeftIcon = MdArrowBack
 export const ArrowRightIcon = MdArrowForward
+export const ArrowLeftRightIcon = MdCompareArrows
 export const DropdownArrowIcon = MdArrowDropDown
 
 export const ExpandArrowIcon = MdArrowForwardIos
