@@ -27,9 +27,9 @@ import {
 
 export class Pk7Rust {
   static getName() {
-    return 'PK7'
+    return 'PK7Wasm'
   }
-  format: 'PK7' = 'PK7'
+  format: 'PK7Wasm' = 'PK7Wasm'
   static getBoxSize() {
     return 232
   }

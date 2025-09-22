@@ -6,7 +6,7 @@ import {
 } from 'src/util/byteLogic'
 import { CRC16_Invert, SignWithMemeCrypto } from 'src/util/Encryption'
 import { utf16BytesToString } from 'src/util/Strings/StringConverter'
-import PK7 from '../../../packages/pokemon-files/src/pkm/wasm/PK7'
+import PK7 from '../../../packages/pokemon-files/src/pkm/PK7'
 import { OHPKM } from '../pkm/OHPKM'
 import { PathData } from './path'
 import { Box, BoxCoordinates, SAV } from './SAV'

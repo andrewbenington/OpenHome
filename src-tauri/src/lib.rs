@@ -64,7 +64,6 @@ pub fn run() {
             app.manage(pokedex_state);
 
             app.manage(state::AppState::default());
-            app.manage(lookup_state);
             app.manage(state::OpenSavesState::default());
 
             match menu::create_menu(app) {

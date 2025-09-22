@@ -76,13 +76,17 @@ impl From<GameOfOriginIndex> for u8 {
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Debug, Clone, Copy)]
 pub struct GameOfOrigin {
-    name: &'static str,
-    mark: Option<&'static str>,
-    region: Option<&'static str>,
-    generation: Generation,
-    logo: Option<&'static str>,
-    index: usize,
-    gamecube_index: Option<usize>,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+    pub name: &'static str,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+    pub mark: Option<&'static str>,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+    pub region: Option<&'static str>,
+    pub generation: Generation,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+    pub logo: Option<&'static str>,
+    pub index: usize,
+    pub gamecube_index: Option<usize>,
 }
 
 pub static GAME_OF_ORIGIN_DATA: [Option<&'static GameOfOrigin>; 52] = [
@@ -459,3 +463,28 @@ pub static GAME_OF_ORIGIN_DATA: [Option<&'static GameOfOrigin>; 52] = [
         logo: None,
     }),
 ];
+
+#[cfg(feature = "wasm")]
+#[wasm_bindgen]
+#[allow(clippy::missing_const_for_fn)]
+impl GameOfOrigin {
+    #[wasm_bindgen(getter)]
+    pub fn name(&self) -> String {
+        self.name.to_string()
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn mark(&self) -> Option<String> {
+        self.mark.map(String::from)
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn region(&self) -> Option<String> {
+        self.region.map(String::from)
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn logo(&self) -> Option<String> {
+        self.logo.map(String::from)
+    }
+}

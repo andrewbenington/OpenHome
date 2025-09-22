@@ -2,6 +2,7 @@ use serde::Serialize;
 
 use crate::{
     pkm::Pkm,
+    resources::GameOfOrigin,
     saves::{
         gen7_alola::{SunMoonSave, UltraSunMoonSave},
         lets_go::LetsGoSave,
@@ -22,9 +23,15 @@ pub trait SaveDataTrait: Send + Sync {
     fn box_rows() -> usize;
     fn box_cols() -> usize;
     fn box_slots() -> usize;
+    fn box_count() -> usize;
+    fn current_pc_box_idx(&self) -> usize;
     fn calc_checksum(&self) -> u16;
 
     fn is_valid_save(bytes: &[u8]) -> bool;
+
+    fn display_tid(&self) -> String;
+
+    fn game_of_origin(&self) -> Option<GameOfOrigin>;
 }
 
 #[derive(Serialize, Clone, Copy)]
@@ -102,4 +109,10 @@ impl SaveData {
     //         Err("Unrecognized or invalid save file format".to_string())
     //     }
     // }
+}
+
+fn six_digit_display(trainer_id: u16, secret_id: u16) -> String {
+    let full_id: u32 = (secret_id as u32) << 16 | (trainer_id as u32);
+
+    format!("{:0>6}", full_id)
 }

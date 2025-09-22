@@ -16,6 +16,7 @@ import { ORASSAV } from '../types/SAVTypes/ORASSAV'
 import { PtSAV } from '../types/SAVTypes/PtSAV'
 import { G3RRSAV } from '../types/SAVTypes/radicalred/G3RRSAV'
 import { SMSAV } from '../types/SAVTypes/SMSAV'
+import { SMSAV_WASM } from '../types/SAVTypes/SMSAV_WASM'
 import { G3UBSAV } from '../types/SAVTypes/unbound/G3UBSAV'
 import { USUMSAV } from '../types/SAVTypes/USUMSAV'
 import { SAVClass } from '../types/SAVTypes/util'
@@ -33,6 +34,7 @@ const OFFICIAL_SAVE_TYPES = [
   XYSAV,
   ORASSAV,
   SMSAV,
+  SMSAV_WASM,
   USUMSAV,
   LGPESAV,
   SwShSAV,
