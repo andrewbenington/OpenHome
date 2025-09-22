@@ -118,6 +118,7 @@
   min-height: 28px;
   padding: 0px 12px 0px 4px;
   display: flex;
+  gap: 4px;
   flex-direction: row;
   align-items: center;
   overflow-wrap: break-word;

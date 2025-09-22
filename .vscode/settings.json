@@ -28,6 +28,19 @@
   "rust-analyzer.cargo.extraEnv": {
     "MACOSX_DEPLOYMENT_TARGET": "14.6"
   },
+  "postcssSorting.config": {
+    "properties-order": [
+      "width",
+      "height",
+      "padding",
+      "margin",
+      "display",
+      "flex-direction",
+      "justify-content",
+      "align-items"
+    ],
+    "unspecified-properties-position": "bottomAlphabetical"
+  },
   "rust-analyzer.check.command": "clippy",
   "editor.inlayHints.enabled": "off",
   "editor.tabSize": 2
