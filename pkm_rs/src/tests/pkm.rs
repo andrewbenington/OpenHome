@@ -184,7 +184,9 @@ fn find_inconsistencies<PKM: Pkm>(filename: &str) -> Result<(), String> {
     let result = pkm_from_file::<PKM>(filename);
     let (mon, bytes) = result.unwrap_or_else(|e| panic!("could not load {filename}: {e}"));
 
-    let actual = mon.to_party_bytes();
+    let actual = mon
+        .to_party_bytes()
+        .map_err(|err| format!("couldn't convert to bytes: {err}"))?;
     let expected = bytes;
     let differences = find_differing_ranges(&actual, &expected);
 

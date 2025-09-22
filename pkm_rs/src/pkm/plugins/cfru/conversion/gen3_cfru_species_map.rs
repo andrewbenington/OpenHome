@@ -128,7 +128,7 @@ pub static CFRU_TO_NATIONAL_DEX_MAP: phf::Map<u16, SpeciesAndForme> = phf_map! {
   119 => unsafe { SpeciesAndForme::new_unchecked(119, 0) },
   120 => unsafe { SpeciesAndForme::new_unchecked(120, 0) },
   121 => unsafe { SpeciesAndForme::new_unchecked(121, 0) },
-  122 => unsafe { SpeciesAndForme::new_unchecked(122, 122) },
+  122 => unsafe { SpeciesAndForme::new_unchecked(122, 0) },
   123 => unsafe { SpeciesAndForme::new_unchecked(123, 0) },
   124 => unsafe { SpeciesAndForme::new_unchecked(124, 0) },
   125 => unsafe { SpeciesAndForme::new_unchecked(125, 0) },
@@ -256,7 +256,7 @@ pub static CFRU_TO_NATIONAL_DEX_MAP: phf::Map<u16, SpeciesAndForme> = phf_map! {
   247 => unsafe { SpeciesAndForme::new_unchecked(247, 0) },
   248 => unsafe { SpeciesAndForme::new_unchecked(248, 0) },
   249 => unsafe { SpeciesAndForme::new_unchecked(249, 0) },
-  250 => unsafe { SpeciesAndForme::new_unchecked(250, 250) },
+  250 => unsafe { SpeciesAndForme::new_unchecked(250, 0) },
   251 => unsafe { SpeciesAndForme::new_unchecked(251, 0) },
   // 252-276: not present
   277 => unsafe { SpeciesAndForme::new_unchecked(252, 0) },
@@ -1367,7 +1367,6 @@ pub static CFRU_TO_NATIONAL_DEX_MAP: phf::Map<u16, SpeciesAndForme> = phf_map! {
 type NdexAndForme = (u16, u16);
 
 pub static NATIONAL_DEX_TO_CFRU_MAP: phf::Map<NdexAndForme, u16> = phf_map! {
-    (0,0) => 0,
     (1000,0) => 852,
     (1001,0) => 749,
     (1002,0) => 748,
@@ -1424,7 +1423,7 @@ pub static NATIONAL_DEX_TO_CFRU_MAP: phf::Map<NdexAndForme, u16> = phf_map! {
     (11,0) => 11,
     (120,0) => 120,
     (121,0) => 121,
-    (122,122) => 122,
+    (122,0) => 122,
     (123,0) => 123,
     (124,0) => 124,
     (125,0) => 125,
@@ -1616,7 +1615,7 @@ pub static NATIONAL_DEX_TO_CFRU_MAP: phf::Map<NdexAndForme, u16> = phf_map! {
     (248,1) => 889,
     (249,0) => 249,
     (24,0) => 24,
-    (250,250) => 250,
+    (250,0) => 250,
     (251,0) => 251,
     (252,0) => 277,
     (253,0) => 278,
@@ -2613,3 +2612,33 @@ pub static NATIONAL_DEX_TO_CFRU_MAP: phf::Map<NdexAndForme, u16> = phf_map! {
     (9,0) => 9,
     (9,1) => 872,
 };
+
+#[cfg(test)]
+pub mod test {
+    pub use crate::pkm::Result;
+
+    #[test]
+    fn from_shares_keys_with_to_map() -> Result<()> {
+        use super::NATIONAL_DEX_TO_CFRU_MAP;
+        use crate::resources::SpeciesAndForme;
+
+        for (national_dex, forme_number) in NATIONAL_DEX_TO_CFRU_MAP.keys() {
+            SpeciesAndForme::new(*national_dex, *forme_number)?;
+        }
+        Ok(())
+    }
+
+    #[test]
+    fn to_shares_keys_with_from_map() -> Result<()> {
+        use super::CFRU_TO_NATIONAL_DEX_MAP;
+        use crate::resources::SpeciesAndForme;
+
+        for unchecked_saf in CFRU_TO_NATIONAL_DEX_MAP.values() {
+            SpeciesAndForme::new(
+                unchecked_saf.get_ndex().to_u16(),
+                unchecked_saf.get_forme_index(),
+            )?;
+        }
+        Ok(())
+    }
+}
