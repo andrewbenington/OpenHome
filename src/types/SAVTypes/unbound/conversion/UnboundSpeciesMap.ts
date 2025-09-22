@@ -833,7 +833,7 @@ export const UnboundToNationalDexMap: Record<string, GameToNationalDexEntry | nu
   '829': { NationalDexIndex: 720, FormIndex: 1 }, // Hoopa-Unbound
   '830': { NationalDexIndex: 721, FormIndex: 0 }, // Volcanion
   '831': { NationalDexIndex: 668, FormIndex: 0 }, // Pyroar
-  '832': null, // Meowstic-F (not found)
+  '832': { NationalDexIndex: 678, FormIndex: 1 }, // Meowstic-F
   '833': { NationalDexIndex: 681, FormIndex: 1 }, // Aegislash-Blade
   '834': { NationalDexIndex: 493, FormIndex: 17 }, // Arceus-Fairy
   '835': null, // SPECIES_ZYGARDE_CELL (not found)
@@ -841,19 +841,19 @@ export const UnboundToNationalDexMap: Record<string, GameToNationalDexEntry | nu
   '837': { NationalDexIndex: 718, FormIndex: 1 }, // Zygarde-10%
   '838': { NationalDexIndex: 718, FormIndex: 4 }, // Zygarde-Complete
   '839': { NationalDexIndex: 658, FormIndex: 2 }, // Greninja-Ash
-  '840': { NationalDexIndex: 669, FormIndex: 1 }, // Flabébé-Blue
+  '840': { NationalDexIndex: 669, FormIndex: 3 }, // Flabébé-Blue  // FLABEBE LINE
   '841': { NationalDexIndex: 669, FormIndex: 2 }, // Flabébé-Orange
-  '842': { NationalDexIndex: 669, FormIndex: 4 }, // Flabébé-Yellow
-  '843': { NationalDexIndex: 669, FormIndex: 3 }, // Flabébé-White
-  '844': { NationalDexIndex: 669, FormIndex: 1 }, // Flabébé-Blue
-  '845': { NationalDexIndex: 669, FormIndex: 2 }, // Flabébé-Orange
-  '846': { NationalDexIndex: 669, FormIndex: 4 }, // Flabébé-Yellow
-  '847': { NationalDexIndex: 669, FormIndex: 3 }, // Flabébé-White
+  '842': { NationalDexIndex: 669, FormIndex: 1 }, // Flabébé-Yellow
+  '843': { NationalDexIndex: 669, FormIndex: 4 }, // Flabébé-White
+  '844': { NationalDexIndex: 670, FormIndex: 3 }, // Floette-Blue   // FLOETTE LINE
+  '845': { NationalDexIndex: 670, FormIndex: 2 }, // Floette-Orange
+  '846': { NationalDexIndex: 670, FormIndex: 1 }, // Floette-Yellow
+  '847': { NationalDexIndex: 670, FormIndex: 4 }, // Floette-White
   '848': { NationalDexIndex: 670, FormIndex: 5 }, // Floette-Eternal
-  '849': { NationalDexIndex: 670, FormIndex: 1 }, // Floette-Blue
-  '850': { NationalDexIndex: 670, FormIndex: 2 }, // Floette-Orange
-  '851': { NationalDexIndex: 670, FormIndex: 4 }, // Floette-Yellow
-  '852': { NationalDexIndex: 670, FormIndex: 3 }, // Floette-White
+  '849': { NationalDexIndex: 671, FormIndex: 3 }, // Florges-Blue   // FLORGES LINE
+  '850': { NationalDexIndex: 671, FormIndex: 2 }, // Florges-Orange
+  '851': { NationalDexIndex: 671, FormIndex: 1 }, // Florges-Yellow
+  '852': { NationalDexIndex: 671, FormIndex: 4 }, // Florges-White
   '853': { NationalDexIndex: 710, FormIndex: 0 }, // Pumpkaboo
   '854': { NationalDexIndex: 710, FormIndex: 0 }, // Pumpkaboo
   '855': { NationalDexIndex: 710, FormIndex: 0 }, // Pumpkaboo
@@ -1210,9 +1210,9 @@ export const UnboundToNationalDexMap: Record<string, GameToNationalDexEntry | nu
   '1206': { NationalDexIndex: 889, FormIndex: 1 }, // Zamazenta-Crowned
   '1207': { NationalDexIndex: 890, FormIndex: 1 }, // Eternatus-Eternamax
   '1208': { NationalDexIndex: 892, FormIndex: 1 }, // Urshifu-Rapid-Strike
-  '1209': null, // SPECIES_ZARUDE_DADA (not found)
-  '1210': null, // SPECIES_CALYREX_ICE_RIDER (not found)
-  '1211': null, // SPECIES_CALYREX_SHADOW_RIDER (not found)
+  '1209': { NationalDexIndex: 893, FormIndex: 1 }, // Zarude-Dada
+  '1210': { NationalDexIndex: 898, FormIndex: 1 }, // Calyrex-Ice-Rider
+  '1211': { NationalDexIndex: 898, FormIndex: 2 }, // Calyrex-Shadow-Rider
   '1212': { NationalDexIndex: 52, FormIndex: 2 }, // Meowth-Galar
   '1213': { NationalDexIndex: 77, FormIndex: 1 }, // Ponyta-Galar
   '1214': { NationalDexIndex: 78, FormIndex: 1 }, // Rapidash-Galar
@@ -1255,8 +1255,8 @@ export const UnboundToNationalDexMap: Record<string, GameToNationalDexEntry | nu
   '1251': { NationalDexIndex: 899, FormIndex: 0 }, // Wyrdeer
   '1252': { NationalDexIndex: 900, FormIndex: 0 }, // Kleavor
   '1253': { NationalDexIndex: 901, FormIndex: 0 }, // Ursaluna
-  '1254': null, // SPECIES_BASCULEGION_M (not found)
-  '1255': null, // Basculegion-F (not found)
+  '1254': { NationalDexIndex: 902, FormIndex: 0 }, // Basculegion-M
+  '1255': { NationalDexIndex: 902, FormIndex: 1 }, // Basculegion-F
   '1256': { NationalDexIndex: 903, FormIndex: 0 }, // Sneasler
   '1257': { NationalDexIndex: 904, FormIndex: 0 }, // Overqwil
   '1258': { NationalDexIndex: 905, FormIndex: 0 }, // Enamorus

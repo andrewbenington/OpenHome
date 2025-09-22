@@ -39,7 +39,7 @@ export class PK3UB extends PK3CFRU implements PluginPKMInterface {
   }
 
   monFromGameIndex(gameIndex: number): CFRUToNationalDexEntry {
-    return fromGen3CRFUPokemonIndex(gameIndex, UnboundToNationalDexMap)
+    return fromGen3CRFUPokemonIndex(gameIndex, UnboundToNationalDexMap, 'Pokémon Unbound')
   }
 
   monToGameIndex(nationalDexNumber: number, formIndex: number): number {

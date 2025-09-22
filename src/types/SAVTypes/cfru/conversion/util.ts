@@ -25,10 +25,11 @@ export function makeNationalDexToGameMap(
 }
 
 export function fromGen3CRFUPokemonIndex(
-  radicalRedIndex: number,
-  GameToNationalDexMap: Record<string, GameToNationalDexEntry | null>
+  index: number,
+  GameToNationalDexMap: Record<string, GameToNationalDexEntry | null>,
+  gameName: string
 ): GameToNationalDexEntry {
-  const entry = GameToNationalDexMap[String(radicalRedIndex)]
+  const entry = GameToNationalDexMap[String(index)]
 
   if (entry) {
     return {
@@ -36,7 +37,7 @@ export function fromGen3CRFUPokemonIndex(
       FormIndex: entry.FormIndex,
     }
   } else {
-    throw new Error(`Radical Red index ${radicalRedIndex} not found.`)
+    throw new Error(`${gameName} index ${index} not found.`)
   }
 }
 
