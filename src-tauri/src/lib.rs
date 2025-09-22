@@ -40,13 +40,28 @@ pub fn run() {
                 Err(err) => {
                     app.dialog()
                         .message(err.to_string())
-                        .title("OpenHome Failed to Launch")
+                        .title("OpenHome Failed to Launch - Lookup File Error")
                         .kind(MessageDialogKind::Error)
                         .blocking_show();
                     app.handle().exit(1);
                     unreachable!()
                 }
             };
+            app.manage(lookup_state);
+
+            let pokedex_state = match state::PokedexState::load_from_storage(app.handle()) {
+                Ok(pokedex) => pokedex,
+                Err(err) => {
+                    app.dialog()
+                        .message(err.to_string())
+                        .title("OpenHome Failed to Launch - Pokedex File Error")
+                        .kind(MessageDialogKind::Error)
+                        .blocking_show();
+                    app.handle().exit(1);
+                    unreachable!()
+                }
+            };
+            app.manage(pokedex_state);
 
             app.manage(state::AppState::default());
             app.manage(lookup_state);
@@ -97,6 +112,8 @@ pub fn run() {
             saves::detect_save_type,
             state::get_lookups,
             state::update_lookups,
+            state::get_pokedex,
+            state::update_pokedex,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
