@@ -1,4 +1,4 @@
-pub const GEN3_CFRU_SPECIES: [&str; 1376] = [
+pub static GEN3_CFRU_SPECIES: [&str; 1376] = [
     "Egg",
     "Bulbasaur",
     "Ivysaur",
