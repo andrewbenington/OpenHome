@@ -1250,7 +1250,7 @@ pub static RADICAL_RED_TO_NATIONAL_DEX_MAP: phf::Map<&'static str, GameToNationa
   "1240" => GameToNationalDexEntry { national_dex_index: 128, form_index: 0},
   "1241" => GameToNationalDexEntry { national_dex_index: 143, form_index: 0},
   "1242" => GameToNationalDexEntry { national_dex_index: 569, form_index: 0},
-      // Bruce Bonnet
+      // Brute Bonnet
   "1243" => GameToNationalDexEntry { national_dex_index: 986, form_index: 0},
       // Sandy Shocks
   "1244" => GameToNationalDexEntry { national_dex_index: 989, form_index: 0},
