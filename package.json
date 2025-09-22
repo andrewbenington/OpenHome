@@ -46,7 +46,6 @@
     "@tauri-apps/plugin-fs": "^2.4.2",
     "@tauri-apps/plugin-os": "^2.3.1",
     "@tauri-apps/plugin-shell": "^2.3.1",
-    "buffer": "^6.0.3",
     "chart.js": "^4.5.0",
     "crypto-js": "^4.2.0",
     "dayjs": "^1.11.18",
