@@ -65,9 +65,37 @@ fn cfru_ball_index(ball: Ball) -> u8 {
     }
 }
 
+pub trait CfruMapping {
+    fn mon_from_game_index(idx: u16) -> Result<SpeciesAndForme>;
+    fn mon_to_game_index(species: &SpeciesAndForme) -> Result<u16>;
+
+    fn is_fakemon(species_idx: u16) -> bool {
+        let _ = species_idx;
+        false
+    }
+    fn plugin_identifier() -> &'static str;
+}
+
+pub struct BaseCfruMapping;
+
+impl CfruMapping for BaseCfruMapping {
+    fn mon_from_game_index(_idx: u16) -> Result<SpeciesAndForme> {
+        Err(Error::Other("CFRU is an abstract class.".into()))
+    }
+    fn mon_to_game_index(_species: &SpeciesAndForme) -> Result<u16> {
+        Err(Error::Other("CFRU is an abstract class.".into()))
+    }
+
+    fn plugin_identifier() -> &'static str {
+        "cfru"
+    }
+}
+
 /// PK3CFRU (58 bytes)
 #[derive(Debug, Default, Serialize, Clone)]
-pub struct Pk3cfru {
+pub struct Pk3cfru<M: CfruMapping = BaseCfruMapping> {
+    _marker: std::marker::PhantomData<M>,
+
     // Personality 0:4
     pub personality_value: u32,
 
@@ -138,7 +166,7 @@ pub struct Pk3cfru {
     pub current_hp: u16,
 }
 
-impl Pk3cfru {
+impl<M: CfruMapping> Pk3cfru<M> {
     pub const BOX_SIZE: usize = 58;
     pub const PARTY_SIZE: usize = 100;
 
@@ -189,7 +217,7 @@ impl Pk3cfru {
 
         // 0x1C..0x1E: CFRU game species index
         let cfru_species_index = u16::from_le_bytes(bytes[0x1C..0x1E].try_into().unwrap());
-        let saf = from_gen3_cfru_pokemon_index(cfru_species_index)?;
+        let saf = M::mon_from_game_index(cfru_species_index)?;
 
         // 0x34..0x36: met info & flags
         let meta = u16::from_le_bytes(bytes[0x34..0x36].try_into().unwrap());
@@ -213,6 +241,8 @@ impl Pk3cfru {
         ];
 
         let mon = Pk3cfru {
+            _marker: std::marker::PhantomData,
+
             personality_value: u32::from_le_bytes(bytes[0..4].try_into().unwrap()),
             trainer_id: u16::from_le_bytes(bytes[4..6].try_into().unwrap()),
             secret_id: u16::from_le_bytes(bytes[6..8].try_into().unwrap()),
@@ -247,7 +277,7 @@ impl Pk3cfru {
     }
 }
 
-impl IsShiny for Pk3cfru {
+impl<M: CfruMapping> IsShiny for Pk3cfru<M> {
     fn is_shiny(&self) -> bool {
         let tid = self.trainer_id as u32;
         let sid = self.secret_id as u32;
@@ -258,9 +288,9 @@ impl IsShiny for Pk3cfru {
     }
 }
 
-impl Pkm for Pk3cfru {
-    const BOX_SIZE: usize = Pk3cfru::BOX_SIZE;
-    const PARTY_SIZE: usize = Pk3cfru::PARTY_SIZE;
+impl<M: CfruMapping> Pkm for Pk3cfru<M> {
+    const BOX_SIZE: usize = Pk3cfru::<M>::BOX_SIZE;
+    const PARTY_SIZE: usize = Pk3cfru::<M>::PARTY_SIZE;
 
     fn box_size() -> usize {
         Self::BOX_SIZE
@@ -304,7 +334,7 @@ impl Pkm for Pk3cfru {
 
         // 28:30 Species (DexNum / CFRU game index)
         bytes[28..30]
-            .copy_from_slice(&to_gen3_cfru_pokemon_index(&self.species_and_forme)?.to_le_bytes());
+            .copy_from_slice(&M::mon_to_game_index(&self.species_and_forme)?.to_le_bytes());
 
         // 30:32 Held Item
         bytes[30..32].copy_from_slice(&self.held_item_index.to_le_bytes());

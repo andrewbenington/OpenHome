@@ -38,6 +38,9 @@ pub enum Error {
         field: &'static str,
         source: Box<dyn std::error::Error>,
     },
+
+    // Generic error for when nothing else fits
+    Other(String),
 }
 
 impl Display for Error {
@@ -89,7 +92,9 @@ impl Display for Error {
             Error::FieldError { field, source } => {
                 format!("Error reading field {field}: {source}")
                     .to_owned()
-            }
+            },
+
+            Error::Other(msg) => msg.clone(),
         };
 
         f.write_str(&message)
@@ -122,7 +127,8 @@ pub enum NdexConvertSource {
     Gen2,
     Gen3,
     ScarletViolet,
-    Crfu,
+    RR,
+    UB,
 }
 
 impl Display for NdexConvertSource {
@@ -133,7 +139,8 @@ impl Display for NdexConvertSource {
             NdexConvertSource::Gen2 => "gen 2 index",
             NdexConvertSource::Gen3 => "gen 3 index",
             NdexConvertSource::ScarletViolet => "scarlet/violet index",
-            NdexConvertSource::Crfu => "crfu index (radical red/unbound)",
+            NdexConvertSource::RR => "radical red index",
+            NdexConvertSource::UB => "unbound index",
         })
     }
 }
