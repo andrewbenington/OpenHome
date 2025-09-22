@@ -31,8 +31,8 @@
   "rust-analyzer.check.command": "clippy",
   // "editor.inlayHints.enabled": "off"
   "rust-analyzer.linkedProjects": [
-    "${workspaceFolder}\\Cargo.toml",
-    "${workspaceFolder}\\pkm_rs\\Cargo.toml",
+    "${workspaceFolder}/Cargo.toml",
+    "${workspaceFolder}/pkm_rs/Cargo.toml",
   ],
   "rust-analyzer.cargo.features": [ "pkm_rs/wasm"],
   "editor.tabSize": 2
