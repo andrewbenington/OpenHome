@@ -22,10 +22,6 @@ fn pkm_from_file<PKM: Pkm>(filename: &str) -> Result<(PKM, Vec<u8>), Box<dyn Err
 
     let pkm = PKM::from_bytes(&contents)?;
 
-    match toml::to_string(&pkm) {
-        Ok(text) => println!("{text}"),
-        Err(e) => println!("{e}"),
-    }
     Ok((*pkm, contents))
 }
 
