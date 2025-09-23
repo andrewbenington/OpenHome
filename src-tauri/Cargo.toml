@@ -26,14 +26,14 @@ tauri-build = { version = "2.4.1", features = [] }
 [dependencies]
 tauri = { version = "2.8.5", features = [] }
 tauri-plugin-shell = "2.3.1"
-serde = { version = "1.0.219", features = ["derive"] }
-serde_json = "1.0.143"
+serde = { version = "1.0.226", features = ["derive"] }
+serde_json = "1.0.145"
 tauri-plugin-os = "2.3.1"
 tauri-plugin-dialog = "2.4.0"
 tauri-plugin-fs = "2.4.2"
 reqwest = { version = "0.12.23" }
 base64 = "0.22.1"
-zip = "5.0.0"
+zip = "5.1.1"
 bytes = "1.10.1"
 sha2 = "0.10.9"
 getrandom = "0.3.3"
@@ -43,7 +43,7 @@ static_assertions = "1.1.0"
 toml = "*"
 pkm_rs_derive = {path = "../pkm_rs_derive"}
 pkm_rs = {path = "../pkm_rs"}
-semver = "1.0.26"
+semver = "1.0.27"
 strum = { version = "0.27.2", features = ["derive"] }
 uuid = { version = "1.18.1", features = ["v4"] }
 
