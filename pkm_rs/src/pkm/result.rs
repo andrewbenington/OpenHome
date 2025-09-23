@@ -5,6 +5,13 @@ use serde::{Serialize, Serializer};
 use crate::resources::{ABILITY_MAX, NATIONAL_DEX_MAX, NATURE_MAX, NatDexIndex, SpeciesAndForme};
 
 #[derive(Debug)]
+pub enum MoveErrorKind {
+    CfruIndexNotFound(u16),
+    NationalIdNotFound(u16),
+    NameNotFound(String),
+}
+
+#[derive(Debug)]
 pub enum Error {
     BufferSize {
         field: String,
@@ -37,6 +44,11 @@ pub enum Error {
     FieldError {
         field: &'static str,
         source: Box<dyn std::error::Error>,
+    },
+
+    MoveError {
+        value: u16,
+        source: MoveErrorSource,
     },
 
     // Generic error for when nothing else fits
@@ -94,6 +106,10 @@ impl Display for Error {
                     .to_owned()
             },
 
+            Error::MoveError { value, source } => {
+                format!("Invalid move reference {value} (source: {source})").to_owned()
+            }
+
             Error::Other(msg) => msg.clone(),
         };
 
@@ -141,6 +157,26 @@ impl Display for NdexConvertSource {
             NdexConvertSource::ScarletViolet => "scarlet/violet index",
             NdexConvertSource::RR => "radical red index",
             NdexConvertSource::UB => "unbound index",
+        })
+    }
+}
+
+#[derive(Debug, Default)]
+pub enum MoveErrorSource {
+    #[default]
+    Other,
+    CFRUIndex,
+    NationalIndex,
+    Name,
+}
+
+impl Display for MoveErrorSource {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(match self {
+            MoveErrorSource::Other => "other",
+            MoveErrorSource::CFRUIndex => "CFRU index",
+            MoveErrorSource::NationalIndex => "national move index",
+            MoveErrorSource::Name => "move name",
         })
     }
 }

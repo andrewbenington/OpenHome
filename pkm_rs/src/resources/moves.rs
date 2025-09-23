@@ -73,6 +73,12 @@ pub enum MoveClass {
     Status,
 }
 
+impl MoveMetadata {
+    pub fn name(&self) -> &'static str {
+        self.name
+    }
+}
+
 const POUND: MoveMetadata = MoveMetadata {
     id: 1,
     name: "Pound",
@@ -10181,7 +10187,8 @@ const MALIGNANT_CHAIN: MoveMetadata = MoveMetadata {
     pp: 5,
     pkm_type: PkmType::Poison,
 };
-const ALL_MOVES: [&MoveMetadata; 919] = [
+
+pub const ALL_MOVES: [&MoveMetadata; 919] = [
     &POUND,
     &KARATE_CHOP,
     &DOUBLE_SLAP,
