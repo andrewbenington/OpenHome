@@ -66,6 +66,10 @@ pub trait CfruMapping {
     fn mon_from_game_index(idx: u16) -> Result<SpeciesAndForme>;
     fn mon_to_game_index(species: &SpeciesAndForme) -> Result<u16>;
 
+    // fn move_from_game_index(gameIndex: u16) -> Result<u16>;
+
+    // fn move_to_game_index(nationalMoveId: u16) -> Result<u16>;
+
     fn is_fakemon(species_idx: u16) -> bool {
         let _ = species_idx;
         false
