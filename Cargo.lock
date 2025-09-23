@@ -3033,7 +3033,6 @@ dependencies = [
  "serde_json",
  "sha2",
  "static_assertions",
- "toml 0.9.5",
  "wasm-bindgen",
 ]
 
