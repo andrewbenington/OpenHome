@@ -11,5 +11,5 @@ $versionData = @{
     build_date = $BUILD_DATE
 }
 
-New-Item "./src/consts/JSON" -Type Directory
+New-Item "./src/consts/JSON" -Type Directory -Force > $null
 $versionData | ConvertTo-Json | Out-File -Encoding utf8 "./src/consts/JSON/version.json"
