@@ -1,5 +1,5 @@
 use crate::pkm::plugins::rr::conversion::{NATIONAL_DEX_TO_RR_MAP, RR_TO_NATIONAL_DEX_MAP};
-use crate::pkm::{Error, NdexConvertSource, Result};
+use crate::pkm::{Error, Result};
 use crate::resources::SpeciesAndForme;
 
 /// Convert game index to National Dex entry
