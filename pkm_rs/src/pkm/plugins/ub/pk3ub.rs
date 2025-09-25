@@ -22,4 +22,4 @@ impl CfruMapping for UnboundMapping {
     }
 }
 
-pub type Pk3Ub = Pk3Cfru<UnboundMapping>;
+pub type Pk3ub = Pk3Cfru<UnboundMapping>;
