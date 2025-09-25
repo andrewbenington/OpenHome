@@ -188,22 +188,13 @@ impl<M: CfruMapping> Pk3Cfru<M> {
 
         for i in 0..4 {
             let cfru_index = ((v >> (i * 10)) & 0x3FF) as usize;
+
+            if cfru_index == 0 {
+                moves[i] = MoveSlot::empty();
+                continue;
+            }
+
             let nat_id = from_gen3_cfru_move_index(cfru_index).unwrap_or(0); // fallback to 0 if unknown
-
-            let nat_name = ALL_MOVES
-                .get(nat_id as usize)
-                .map(|m| m.name())
-                .unwrap_or("<UNKNOWN>");
-
-            let cfru_name = GEN3_CFRU_MOVES
-                .get(cfru_index)
-                .copied()
-                .unwrap_or("<UNKNOWN>");
-
-            println!(
-                "read_moves_10bit: slot {i}, CFRU idx = {cfru_index} ({cfru_name}), \
-         NatID = {nat_id} ({nat_name})"
-            );
 
             moves[i] = MoveSlot::from(nat_id as u16);
         }
@@ -218,24 +209,15 @@ impl<M: CfruMapping> Pk3Cfru<M> {
 
         let mut v: u64 = 0;
         for i in 0..4 {
-            let nat_id = u16::from(moves[i]) as usize;
-            let cfru_index = to_gen3_cfru_move_index(nat_id).unwrap_or(0); // fallback to 0 if unknown
+            let cfru_index = if moves[i].is_empty() {
+                // if the slot is empty, force CFRU index 0
+                0
+            } else {
+                let nat_id = u16::from(moves[i]) as usize;
+                to_gen3_cfru_move_index(nat_id).unwrap_or(0) as usize
+            };
+
             v |= (cfru_index as u64 & 0x3FF) << (i * 10);
-
-            let nat_name = ALL_MOVES
-                .get(nat_id as usize)
-                .map(|m| m.name())
-                .unwrap_or("<UNKNOWN>");
-
-            let cfru_name = GEN3_CFRU_MOVES
-                .get(cfru_index as usize)
-                .copied()
-                .unwrap_or("<UNKNOWN>");
-
-            println!(
-                "write_moves_10bit: slot {i}, CFRU idx = {cfru_index} ({cfru_name}), \
-         NatID = {nat_id} ({nat_name})"
-            );
         }
 
         bytes[base] = (v & 0xFF) as u8;

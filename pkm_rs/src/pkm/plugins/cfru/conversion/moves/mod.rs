@@ -1017,7 +1017,7 @@ pub fn from_gen3_cfru_move_index(cfru_index: usize) -> Result<u16> {
         return Ok(0); // None
     }
 
-    if let Some(&name) = GEN3_CFRU_MOVES.get(cfru_index - 1) {
+    if let Some(&name) = GEN3_CFRU_MOVES.get(cfru_index) {
         CFRU_TO_NATIONAL_MAP
             .get(name)
             .copied()
@@ -1038,10 +1038,10 @@ pub fn to_gen3_cfru_move_index(national_move_id: usize) -> Result<u16> {
         return Ok(0); // None
     }
 
-    if let Some(&meta) = ALL_MOVES.get(national_move_id) {
+    if let Some(&meta) = ALL_MOVES.get(national_move_id - 1) {
         NATIONAL_TO_CFRU_MAP
             .get(meta.name())
-            .and_then(|list| list.first().map(|&idx| idx + 1))
+            .and_then(|list| list.first().copied())
             .ok_or(Error::MoveError {
                 value: national_move_id as u16,
                 source: MoveErrorSource::NationalIndex,
