@@ -1012,22 +1012,22 @@ use crate::resources::ALL_MOVES;
 use cfru_to_national_map::CFRU_TO_NATIONAL_MAP;
 use national_to_cfru::NATIONAL_TO_CFRU_MAP;
 
-pub fn from_gen3_cfru_move_index(rr_index: usize) -> Result<u16> {
-    if rr_index == 0 {
-        return Ok(0);
+pub fn from_gen3_cfru_move_index(cfru_index: usize) -> Result<u16> {
+    if cfru_index == 0 {
+        return Ok(0); // None
     }
 
-    if let Some(&name) = GEN3_CFRU_MOVES.get(rr_index) {
+    if let Some(&name) = GEN3_CFRU_MOVES.get(cfru_index - 1) {
         CFRU_TO_NATIONAL_MAP
             .get(name)
             .copied()
             .ok_or(Error::MoveError {
-                value: rr_index as u16,
+                value: cfru_index as u16,
                 source: MoveErrorSource::CFRUIndex,
             })
     } else {
         Err(Error::MoveError {
-            value: rr_index as u16,
+            value: cfru_index as u16,
             source: MoveErrorSource::CFRUIndex,
         })
     }
@@ -1035,13 +1035,13 @@ pub fn from_gen3_cfru_move_index(rr_index: usize) -> Result<u16> {
 
 pub fn to_gen3_cfru_move_index(national_move_id: usize) -> Result<u16> {
     if national_move_id == 0 {
-        return Ok(0);
+        return Ok(0); // None
     }
 
     if let Some(&meta) = ALL_MOVES.get(national_move_id) {
         NATIONAL_TO_CFRU_MAP
             .get(meta.name())
-            .and_then(|list| list.first().copied())
+            .and_then(|list| list.first().map(|&idx| idx + 1))
             .ok_or(Error::MoveError {
                 value: national_move_id as u16,
                 source: MoveErrorSource::NationalIndex,

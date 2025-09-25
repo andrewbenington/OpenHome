@@ -25,4 +25,4 @@ impl CfruMapping for RadicalRedMapping {
     }
 }
 
-pub type Pk3Rr = Pk3Cfru<RadicalRedMapping>;
+pub type Pk3rr = Pk3Cfru<RadicalRedMapping>;

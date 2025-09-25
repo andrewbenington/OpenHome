@@ -6,10 +6,10 @@ use crate::resources::SpeciesAndForme;
 pub fn from_gen3_rr_pokemon_index(rr_species_index: u16) -> Result<SpeciesAndForme> {
     RR_TO_NATIONAL_DEX_MAP
         .get(&rr_species_index)
-        .ok_or(Error::NationalDex {
-            value: rr_species_index,
-            source: NdexConvertSource::RR,
-        })
+        .ok_or(Error::Other(format!(
+            "Unsupported RR species index: {}",
+            rr_species_index
+        )))
         .copied()
 }
 

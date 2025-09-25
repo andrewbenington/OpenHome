@@ -1,7 +1,10 @@
+use crate::pkm::plugins::cfru::conversion::moves::{
+    GEN3_CFRU_MOVES, from_gen3_cfru_move_index, to_gen3_cfru_move_index,
+};
 use crate::pkm::traits::IsShiny;
 use crate::pkm::{Error, Pkm, Result};
 use crate::resources::{
-    Ball, FormeMetadata, GameOfOriginIndex, MoveSlot, SpeciesAndForme, SpeciesMetadata,
+    ALL_MOVES, Ball, FormeMetadata, GameOfOriginIndex, MoveSlot, SpeciesAndForme, SpeciesMetadata,
 };
 use crate::strings::Gen3String;
 use crate::substructures::{Gender, MarkingsFourShapes, Stats8};
@@ -171,7 +174,7 @@ impl<M: CfruMapping> Pk3Cfru<M> {
     pub const BOX_SIZE: usize = 58;
     pub const PARTY_SIZE: usize = 100;
 
-    /// Unpack 4×10-bit move IDs from 5 bytes at 0x27..0x2B (little-endian bits).
+    /// Unpack 4×10-bit move IDs from 5 bytes at 0x27..0x2B
     #[inline]
     fn read_moves_10bit(bytes: &[u8]) -> [MoveSlot; 4] {
         let base = 0x27;
@@ -181,24 +184,59 @@ impl<M: CfruMapping> Pk3Cfru<M> {
             | ((bytes[base + 3] as u64) << 24)
             | ((bytes[base + 4] as u64) << 32);
 
-        [
-            MoveSlot::from((v & 0x3FF) as u16),
-            MoveSlot::from(((v >> 10) & 0x3FF) as u16),
-            MoveSlot::from(((v >> 20) & 0x3FF) as u16),
-            MoveSlot::from(((v >> 30) & 0x3FF) as u16),
-        ]
+        let mut moves = [MoveSlot::from(0u16); 4];
+
+        for i in 0..4 {
+            let cfru_index = ((v >> (i * 10)) & 0x3FF) as usize;
+            let nat_id = from_gen3_cfru_move_index(cfru_index).unwrap_or(0); // fallback to 0 if unknown
+
+            let nat_name = ALL_MOVES
+                .get(nat_id as usize)
+                .map(|m| m.name())
+                .unwrap_or("<UNKNOWN>");
+
+            let cfru_name = GEN3_CFRU_MOVES
+                .get(cfru_index)
+                .copied()
+                .unwrap_or("<UNKNOWN>");
+
+            println!(
+                "read_moves_10bit: slot {i}, CFRU idx = {cfru_index} ({cfru_name}), \
+         NatID = {nat_id} ({nat_name})"
+            );
+
+            moves[i] = MoveSlot::from(nat_id as u16);
+        }
+
+        moves
     }
 
     /// Pack 4×10-bit move IDs into 5 bytes at 0x27..0x2B
     #[inline]
     fn write_moves_10bit(moves: &[MoveSlot; 4], bytes: &mut [u8]) {
         let base = 0x27;
-        let m0 = u16::from(moves[0]) as u64 & 0x3FF;
-        let m1 = u16::from(moves[1]) as u64 & 0x3FF;
-        let m2 = u16::from(moves[2]) as u64 & 0x3FF;
-        let m3 = u16::from(moves[3]) as u64 & 0x3FF;
 
-        let v = (m0) | (m1 << 10) | (m2 << 20) | (m3 << 30);
+        let mut v: u64 = 0;
+        for i in 0..4 {
+            let nat_id = u16::from(moves[i]) as usize;
+            let cfru_index = to_gen3_cfru_move_index(nat_id).unwrap_or(0); // fallback to 0 if unknown
+            v |= (cfru_index as u64 & 0x3FF) << (i * 10);
+
+            let nat_name = ALL_MOVES
+                .get(nat_id as usize)
+                .map(|m| m.name())
+                .unwrap_or("<UNKNOWN>");
+
+            let cfru_name = GEN3_CFRU_MOVES
+                .get(cfru_index as usize)
+                .copied()
+                .unwrap_or("<UNKNOWN>");
+
+            println!(
+                "write_moves_10bit: slot {i}, CFRU idx = {cfru_index} ({cfru_name}), \
+         NatID = {nat_id} ({nat_name})"
+            );
+        }
 
         bytes[base] = (v & 0xFF) as u8;
         bytes[base + 1] = ((v >> 8) & 0xFF) as u8;
@@ -248,11 +286,24 @@ impl<M: CfruMapping> Pk3Cfru<M> {
             trainer_id: u16::from_le_bytes(bytes[4..6].try_into().unwrap()),
             secret_id: u16::from_le_bytes(bytes[6..8].try_into().unwrap()),
             nickname: Gen3String::from_bytes(bytes[8..18].try_into().unwrap()),
+
+            // Sanity 19
+            // sanity = bytes[19];
+
+            // Language 18
             language_index: bytes[18],
-            trainer_name: Gen3String::from_bytes(bytes[19..26].try_into().unwrap()),
-            markings: MarkingsFourShapes::from_byte(bytes[26]),
+
+            // OT Name 20:27
+            trainer_name: Gen3String::from_bytes(bytes[20..27].try_into().unwrap()),
+
+            // Markings 27
+            markings: MarkingsFourShapes::from_byte(bytes[27]),
+
             species_and_forme: saf,
-            cfru_species_index,
+
+            // Species 28:30
+            cfru_species_index: u16::from_le_bytes(bytes[28..30].try_into().unwrap()),
+
             held_item_index: u16::from_le_bytes(bytes[30..32].try_into().unwrap()),
             exp: u32::from_le_bytes(bytes[32..36].try_into().unwrap()),
             move_pp_ups,
