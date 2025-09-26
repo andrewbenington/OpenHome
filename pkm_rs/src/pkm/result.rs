@@ -101,7 +101,7 @@ impl Display for Error {
 
             Error::GameDex { value, game } => {
                 format!("Invalid game dex index {value} in {game} (no corresponding National Dex entry)")
-            }
+            }        
 
             Error::FormeIndex {
                 national_dex,
