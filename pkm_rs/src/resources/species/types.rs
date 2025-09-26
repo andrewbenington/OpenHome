@@ -400,3 +400,9 @@ impl SpeciesMetadata {
         Some(&self.formes[forme_index])
     }
 }
+
+impl Display for SpeciesMetadata {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.name)
+    }
+}
