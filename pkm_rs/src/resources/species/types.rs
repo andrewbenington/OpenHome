@@ -1,3 +1,4 @@
+use std::fmt::Display;
 use std::num::NonZeroU16;
 
 use serde::{Serialize, Serializer};
@@ -5,7 +6,7 @@ use serde::{Serialize, Serializer};
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
-use crate::pkm::{Error, Result};
+use crate::pkm::{Error, NdexConvertSource, Result};
 use crate::resources::{ALL_SPECIES, AbilityIndex, MAX_NATIONAL_DEX};
 use crate::resources::{games::Generation, pkm_types::PkmType};
 use crate::substructures::Stats16Le;
@@ -20,13 +21,15 @@ impl NatDexIndex {
     pub fn new(index: u16) -> Result<NatDexIndex> {
         if (index as usize) > MAX_NATIONAL_DEX {
             return Err(Error::NationalDex {
-                national_dex: index,
+                value: index,
+                source: NdexConvertSource::Other,
             });
         }
         NonZeroU16::new(index)
             .map(NatDexIndex)
             .ok_or(Error::NationalDex {
-                national_dex: index,
+                value: index,
+                source: NdexConvertSource::Other,
             })
     }
 
@@ -52,6 +55,10 @@ impl NatDexIndex {
 
     pub const fn to_le_bytes(self) -> [u8; 2] {
         self.get().to_le_bytes()
+    }
+
+    pub const fn to_u16(self) -> u16 {
+        self.0.get()
     }
 }
 
@@ -152,6 +159,10 @@ impl SpeciesAndForme {
 
     pub const fn get_forme_index(&self) -> u16 {
         self.forme_index
+    }
+
+    pub const fn to_tuple(&self) -> (u16, u16) {
+        (self.national_dex.to_u16(), self.forme_index)
     }
 }
 
@@ -367,6 +378,12 @@ impl FormeMetadata {
     }
 }
 
+impl Display for FormeMetadata {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.forme_name)
+    }
+}
+
 pub struct SpeciesMetadata {
     pub name: &'static str,
     pub national_dex: NatDexIndex,
@@ -381,5 +398,11 @@ impl SpeciesMetadata {
         }
 
         Some(&self.formes[forme_index])
+    }
+}
+
+impl Display for SpeciesMetadata {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.name)
     }
 }

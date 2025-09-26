@@ -27,6 +27,14 @@ impl MoveSlot {
     pub fn to_le_bytes(self) -> [u8; 2] {
         self.0.map(NonZeroU16::get).unwrap_or(0u16).to_le_bytes()
     }
+
+    pub const fn empty() -> Self {
+        Self(None)
+    }
+
+    pub const fn is_empty(&self) -> bool {
+        self.0.is_none()
+    }
 }
 
 impl Serialize for MoveSlot {
@@ -71,6 +79,12 @@ pub enum MoveClass {
     Physical,
     Special,
     Status,
+}
+
+impl MoveMetadata {
+    pub fn name(&self) -> &'static str {
+        self.name
+    }
 }
 
 const POUND: MoveMetadata = MoveMetadata {
@@ -10181,7 +10195,8 @@ const MALIGNANT_CHAIN: MoveMetadata = MoveMetadata {
     pp: 5,
     pkm_type: PkmType::Poison,
 };
-const ALL_MOVES: [&MoveMetadata; 919] = [
+
+pub const ALL_MOVES: [&MoveMetadata; 919] = [
     &POUND,
     &KARATE_CHOP,
     &DOUBLE_SLAP,

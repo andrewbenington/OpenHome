@@ -198,7 +198,7 @@ impl Pkm for Pk8 {
         Self::from_bytes(bytes).map(Box::new)
     }
 
-    fn write_box_bytes(&self, bytes: &mut [u8]) {
+    fn write_box_bytes(&self, bytes: &mut [u8]) -> Result<()> {
         bytes[0..4].copy_from_slice(&self.encryption_constant.to_le_bytes());
         bytes[4..6].copy_from_slice(&self.sanity.to_le_bytes());
         bytes[6..8].copy_from_slice(&self.checksum.to_le_bytes());
@@ -267,20 +267,22 @@ impl Pkm for Pk8 {
 
         bytes[328] = self.level;
         bytes[330..342].copy_from_slice(&self.stats.to_bytes());
+
+        Ok(())
     }
 
-    fn write_party_bytes(&self, bytes: &mut [u8]) {
-        self.write_box_bytes(bytes);
+    fn write_party_bytes(&self, bytes: &mut [u8]) -> Result<()> {
+        self.write_box_bytes(bytes)
     }
 
-    fn to_box_bytes(&self) -> Vec<u8> {
+    fn to_box_bytes(&self) -> Result<Vec<u8>> {
         let mut bytes = [0; Self::BOX_SIZE];
-        self.write_box_bytes(&mut bytes);
+        self.write_box_bytes(&mut bytes)?;
 
-        Vec::from(bytes)
+        Ok(Vec::from(bytes))
     }
 
-    fn to_party_bytes(&self) -> Vec<u8> {
+    fn to_party_bytes(&self) -> Result<Vec<u8>> {
         self.to_box_bytes()
     }
 

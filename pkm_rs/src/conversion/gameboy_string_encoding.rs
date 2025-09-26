@@ -1,4 +1,4 @@
-pub fn decode(key: u8) -> Option<char> {
+pub const fn decode(key: u8) -> Option<char> {
     match key {
         127 => Some(' '),
         128 => Some('A'),
@@ -114,7 +114,7 @@ pub fn decode(key: u8) -> Option<char> {
     }
 }
 
-pub fn encode(value: char) -> Option<u8> {
+pub const fn encode(value: char) -> Option<u8> {
     match value {
         ' ' => Some(127),
         'A' => Some(128),
