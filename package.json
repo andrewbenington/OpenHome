@@ -33,6 +33,7 @@
     "dev": "vite",
     "tauri": "tauri",
     "test": "jest",
+    "wasm": "RUSTFLAGS='--cfg getrandom_backend=\"wasm_js\"' wasm-pack build ./pkm_rs_types --target web -- --features wasm",
     "precommit": "prettier --write . && eslint src --report-unused-disable-directives -c eslint.config.mjs --fix"
   },
   "dependencies": {

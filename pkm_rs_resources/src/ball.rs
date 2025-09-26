@@ -1,0 +1,105 @@
+use serde::Serialize;
+
+#[cfg(feature = "wasm")]
+use wasm_bindgen::prelude::*;
+
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[derive(Debug, Default, Serialize, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[repr(u8)]
+pub enum Ball {
+    None,
+    Master,
+    Ultra,
+    Great,
+    #[default]
+    Poke,
+    Safari,
+    Net,
+    Dive,
+    Nest,
+    Repeat,
+    Timer,
+    Luxury,
+    Premier,
+    Dusk,
+    Heal,
+    Quick,
+    Cherish,
+    Fast,
+    Level,
+    Lure,
+    Heavy,
+    Love,
+    Friend,
+    Moon,
+    Sport,
+    Dream,
+    Beast,
+    Strange,
+    PokeLegendsArceus,
+    GreatLegendsArceus,
+    UltraLegendsArceus,
+    Feather,
+    Wing,
+    Jet,
+    HeavyLegendsArceus,
+    Leaden,
+    Gigaton,
+    Origin,
+}
+
+impl From<u8> for Ball {
+    fn from(value: u8) -> Self {
+        match value {
+            0 => Ball::None,
+            1 => Ball::Master,
+            2 => Ball::Ultra,
+            3 => Ball::Great,
+            4 => Ball::Poke,
+            5 => Ball::Safari,
+            6 => Ball::Net,
+            7 => Ball::Dive,
+            8 => Ball::Nest,
+            9 => Ball::Repeat,
+            10 => Ball::Timer,
+            11 => Ball::Luxury,
+            12 => Ball::Premier,
+            13 => Ball::Dusk,
+            14 => Ball::Heal,
+            15 => Ball::Quick,
+            16 => Ball::Cherish,
+            17 => Ball::Fast,
+            18 => Ball::Level,
+            19 => Ball::Lure,
+            20 => Ball::Heavy,
+            21 => Ball::Love,
+            22 => Ball::Friend,
+            23 => Ball::Moon,
+            24 => Ball::Sport,
+            25 => Ball::Dream,
+            26 => Ball::Beast,
+            27 => Ball::Strange,
+            28 => Ball::PokeLegendsArceus,
+            29 => Ball::GreatLegendsArceus,
+            30 => Ball::UltraLegendsArceus,
+            31 => Ball::Feather,
+            32 => Ball::Wing,
+            33 => Ball::Jet,
+            34 => Ball::HeavyLegendsArceus,
+            35 => Ball::Leaden,
+            36 => Ball::Gigaton,
+            37 => Ball::Origin,
+            _ => panic!("Invalid value for Ball: {}", value),
+        }
+    }
+}
+
+impl Ball {
+    pub fn poke_if_newer_than(self, other: Ball) -> Ball {
+        if self > other { Ball::Poke } else { self }
+    }
+
+    pub fn strange_if_newer_than(self, other: Ball) -> Ball {
+        if self > other { Ball::Strange } else { self }
+    }
+}

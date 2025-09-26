@@ -43,5 +43,6 @@
   },
   "rust-analyzer.check.command": "clippy",
   "editor.inlayHints.enabled": "off",
-  "editor.tabSize": 2
+  "editor.tabSize": 2,
+  "rust-analyzer.cargo.features": [ "pkm_rs_resources/wasm", "pkm_rs_types/wasm"],
 }
