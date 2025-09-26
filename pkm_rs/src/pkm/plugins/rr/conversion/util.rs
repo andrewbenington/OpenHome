@@ -1,15 +1,15 @@
 use crate::pkm::plugins::rr::conversion::{NATIONAL_DEX_TO_RR_MAP, RR_TO_NATIONAL_DEX_MAP};
-use crate::pkm::{Error, Result};
+use crate::pkm::{Error, NdexConvertSource, Result};
 use crate::resources::SpeciesAndForme;
 
 /// Convert game index to National Dex entry
-pub fn from_gen3_rr_pokemon_index(rr_species_index: u16) -> Result<SpeciesAndForme> {
+pub fn from_gen3_rr_pokemon_index(species_index: u16) -> Result<SpeciesAndForme> {
     RR_TO_NATIONAL_DEX_MAP
-        .get(&rr_species_index)
-        .ok_or(Error::Other(format!(
-            "Unsupported RR species index: {}",
-            rr_species_index
-        )))
+        .get(&species_index)
+        .ok_or(Error::GameDex {
+            value: species_index,
+            game: NdexConvertSource::Gen3RR,
+        })
         .copied()
 }
 
@@ -17,6 +17,9 @@ pub fn from_gen3_rr_pokemon_index(rr_species_index: u16) -> Result<SpeciesAndFor
 pub fn to_gen3_rr_pokemon_index(saf: &SpeciesAndForme) -> Result<u16> {
     NATIONAL_DEX_TO_RR_MAP
         .get(&saf.to_tuple())
-        .ok_or(Error::UnsupportedPkm(*saf))
+        .ok_or(Error::GenDex {
+            saf: *saf,
+            generation: NdexConvertSource::Gen3RR,
+        })
         .copied()
 }

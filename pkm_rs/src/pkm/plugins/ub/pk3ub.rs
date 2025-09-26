@@ -3,8 +3,6 @@ use crate::pkm::plugins::cfru::pk3cfru::Pk3Cfru;
 use crate::pkm::{Result, plugins::cfru::pk3cfru::CfruMapping};
 use crate::resources::SpeciesAndForme;
 
-const FAKEMON_INDEXES: [u16; 0] = [];
-
 pub struct UnboundMapping;
 
 impl CfruMapping for UnboundMapping {
@@ -14,11 +12,11 @@ impl CfruMapping for UnboundMapping {
     fn mon_to_game_index(species: &SpeciesAndForme) -> Result<u16> {
         to_gen3_ub_pokemon_index(species)
     }
-    fn is_fakemon(species_idx: u16) -> bool {
-        FAKEMON_INDEXES.contains(&species_idx)
+    fn is_fakemon(_species_idx: u16) -> bool {
+        false
     }
     fn plugin_identifier() -> &'static str {
-        "radical_red"
+        "unbound"
     }
 }
 

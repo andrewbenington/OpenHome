@@ -30,7 +30,22 @@ pub enum Error {
         value: u16,
         source: NdexConvertSource,
     },
-    UnsupportedPkm(SpeciesAndForme),
+
+    /// Indicates that the given SpeciesAndForme does not exist
+    /// in the specified generation of games
+    GenDex {
+        saf: SpeciesAndForme,
+        generation: NdexConvertSource,
+    },
+
+    /// Indicates that the given game index does not
+    /// have a corresponding National index (usually its
+    /// a fake mon)
+    GameDex {
+        value: u16,
+        game: NdexConvertSource,
+    },
+
     FormeIndex {
         national_dex: NatDexIndex,
         forme_index: u16,
@@ -77,10 +92,17 @@ impl Display for Error {
                 format!("Invalid National Dex number {national_dex} (source: {source}; must be between 1 and {NATIONAL_DEX_MAX}")
                     .to_owned()
             }
-            Error::UnsupportedPkm( s) => {
-                let forme_metadata = s.get_forme_metadata();
-                format!("Forme '{forme_metadata}' not supported")
+
+            Error::GenDex { saf, generation } => {
+                let species = saf.get_species_metadata();
+                let form = saf.get_forme_metadata();
+                format!("Pokémon '{species}' (form: {form}) does not exist in {generation}")
             }
+
+            Error::GameDex { value, game } => {
+                format!("Invalid game dex index {value} in {game} (no corresponding National Dex entry)")
+            }
+
             Error::FormeIndex {
                 national_dex,
                 forme_index,
@@ -143,20 +165,54 @@ pub enum NdexConvertSource {
     Gen2,
     Gen3,
     ScarletViolet,
-    RR,
-    UB,
+    Gen3RR,
+    Gen3UB,
 }
 
 impl Display for NdexConvertSource {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str(match self {
             NdexConvertSource::Other => "other",
-            NdexConvertSource::Gen1 => "gen 1 index",
-            NdexConvertSource::Gen2 => "gen 2 index",
-            NdexConvertSource::Gen3 => "gen 3 index",
-            NdexConvertSource::ScarletViolet => "scarlet/violet index",
-            NdexConvertSource::RR => "radical red index",
-            NdexConvertSource::UB => "unbound index",
+            NdexConvertSource::Gen1 => "Gen 1",
+            NdexConvertSource::Gen2 => "Gen 2",
+            NdexConvertSource::Gen3 => "Gen 3",
+            NdexConvertSource::ScarletViolet => "Scarlet/Violet",
+            NdexConvertSource::Gen3RR => "Radical Red",
+            NdexConvertSource::Gen3UB => "Unbound",
+        })
+    }
+}
+
+#[derive(Debug, Default)]
+pub enum GenSource {
+    #[default]
+    Gen1, // Red/Blue/Yellow
+    Gen2,   // Gold/Silver/Crystal
+    Gen3,   // Ruby/Sapphire/Emerald, FireRed/LeafGreen
+    Gen4,   // Diamond/Pearl/Platinum, HeartGold/SoulSilver
+    Gen5,   // Black/White, Black2/White2
+    Gen6,   // X/Y, OmegaRuby/AlphaSapphire
+    Gen7,   // Sun/Moon, UltraSun/UltraMoon, LGPE
+    Gen8,   // Sword/Shield, BDSP, Legends: Arceus
+    Gen9,   // Scarlet/Violet
+    Gen3RR, // Radical Red
+    Gen3UB, // Unbound
+}
+
+impl Display for GenSource {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(match self {
+            GenSource::Gen1 => "Gen 1",
+            GenSource::Gen2 => "Gen 2",
+            GenSource::Gen3 => "Gen 3",
+            GenSource::Gen4 => "Gen 4",
+            GenSource::Gen5 => "Gen 5",
+            GenSource::Gen6 => "Gen 6",
+            GenSource::Gen7 => "Gen 7",
+            GenSource::Gen8 => "Gen 8",
+            GenSource::Gen9 => "Gen 9",
+            GenSource::Gen3RR => "Radical Red",
+            GenSource::Gen3UB => "Unbound",
         })
     }
 }
