@@ -4,7 +4,7 @@ use serde::Serialize;
 
 use crate::conversion::gen3_string_encoding;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Gen3String<const N: usize> {
     raw: [u8; N],
 }

@@ -4975,7 +4975,7 @@ export const RadicalRedToNationalDexMap: Record<string, GameToNationalDexEntry |
     FormIndex: 0,
   },
   '1243': {
-    // Bruce Bonnet
+    // Brute Bonnet
     NationalDexIndex: 986,
     FormIndex: 0,
   },

@@ -191,7 +191,7 @@ impl Pkm for Pb7 {
         Self::from_bytes(bytes).map(Box::new)
     }
 
-    fn write_box_bytes(&self, bytes: &mut [u8]) {
+    fn write_box_bytes(&self, bytes: &mut [u8]) -> Result<()> {
         bytes[0..4].copy_from_slice(&self.encryption_constant.to_le_bytes());
         bytes[6..8].copy_from_slice(&self.checksum.to_le_bytes());
         bytes[8..10].copy_from_slice(&self.species_and_forme.get_ndex().to_le_bytes());
@@ -286,20 +286,22 @@ impl Pkm for Pb7 {
         bytes[254..256].copy_from_slice(&self.cp.to_le_bytes());
         bytes[256] = self.is_mega;
         bytes[257] = self.mega_forme;
+
+        Ok(())
     }
 
-    fn write_party_bytes(&self, bytes: &mut [u8]) {
-        self.write_box_bytes(bytes);
+    fn write_party_bytes(&self, bytes: &mut [u8]) -> Result<()> {
+        self.write_box_bytes(bytes)
     }
 
-    fn to_box_bytes(&self) -> Vec<u8> {
+    fn to_box_bytes(&self) -> Result<Vec<u8>> {
         let mut bytes = [0; Self::BOX_SIZE];
-        self.write_box_bytes(&mut bytes);
+        self.write_box_bytes(&mut bytes)?;
 
-        Vec::from(bytes)
+        Ok(Vec::from(bytes))
     }
 
-    fn to_party_bytes(&self) -> Vec<u8> {
+    fn to_party_bytes(&self) -> Result<Vec<u8>> {
         self.to_box_bytes()
     }
 

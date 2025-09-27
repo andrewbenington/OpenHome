@@ -12,10 +12,6 @@ build-mac-arm:
 build-mac-intel:
 	@npx tauri build --target x86_64-apple-darwin
 
-.PHONY: build-wasm
-build-wasm: # Generate WASM from Rust code
-	@cd packages/pokemon-files && wasm-pack build --target web
-
 .PHONY: start
 start:
 	@npm run tauri dev

@@ -86,6 +86,30 @@ pub mod pk8 {
 }
 
 #[cfg(test)]
+pub mod pk3rr {
+    use std::path::PathBuf;
+
+    use crate::pkm::Pk3rr;
+
+    #[test]
+    fn to_from_bytes() -> Result<(), String> {
+        super::to_from_bytes_all_in_dir::<Pk3rr>(&PathBuf::from("pkm_files").join("plugins/pk3rr"))
+    }
+}
+
+#[cfg(test)]
+pub mod pk3ub {
+    use std::path::PathBuf;
+
+    use crate::pkm::Pk3ub;
+
+    #[test]
+    fn to_from_bytes() -> Result<(), String> {
+        super::to_from_bytes_all_in_dir::<Pk3ub>(&PathBuf::from("pkm_files").join("plugins/pk3ub"))
+    }
+}
+
+#[cfg(test)]
 fn to_from_bytes_all_in_dir<PKM: Pkm>(dir: &Path) -> Result<(), String> {
     use std::fs;
 
@@ -166,7 +190,9 @@ fn find_inconsistencies<PKM: Pkm>(filename: &str) -> Result<(), String> {
     let result = pkm_from_file::<PKM>(filename);
     let (mon, bytes) = result.unwrap_or_else(|e| panic!("could not load {filename}: {e}"));
 
-    let actual = mon.to_party_bytes();
+    let actual = mon
+        .to_party_bytes()
+        .map_err(|err| format!("couldn't convert to bytes: {err}"))?;
     let expected = bytes;
     let differences = find_differing_ranges(&actual, &expected);
 
