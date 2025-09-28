@@ -1,4 +1,5 @@
 import { MimeJr, MrMime, MrRime, Sylveon, Vaporeon } from 'pokemon-species-data'
+import { expect, test } from 'vitest'
 import { getFormeData, isEvolution } from '../Lookup'
 
 test('mr rime is evo of mime jr', () => {

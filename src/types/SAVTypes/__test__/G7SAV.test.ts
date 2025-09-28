@@ -1,5 +1,6 @@
 import { readFileSync } from 'fs'
 import { resolve } from 'path'
+import { beforeAll, describe, expect, test } from 'vitest'
 import { PathData } from '../path'
 import { SMSAV } from '../SMSAV'
 import { USUMSAV } from '../USUMSAV'
