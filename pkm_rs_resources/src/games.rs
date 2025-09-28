@@ -1,8 +1,5 @@
 use pkm_rs_types::{GameOfOrigin, GameOfOriginIndex, Generation};
 
-#[cfg(feature = "wasm")]
-use wasm_bindgen::prelude::*;
-
 pub trait OriginMetadata {
     fn get_metadata(&self) -> Option<&'static GameOfOrigin>;
 }

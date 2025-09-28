@@ -1,6 +1,6 @@
-import { LevelUpExp } from '@pokemon-files/util'
 import { getNatureSummary } from 'pokemon-resources'
 import { NationalDex, NationalDexMax, PokemonData } from 'pokemon-species-data'
+import { MetadataLookup, SpeciesLookup } from '../../pkm_rs_resources/pkg/pkm_rs_resources'
 import { PKMInterface } from '../types/interfaces'
 import { Stat } from '../types/types'
 
@@ -36,7 +36,7 @@ export const getHPGen3Onward = (mon: PKMInterface) => {
   if (mon.dexNum === NationalDex.Shedinja) {
     return 1
   }
-  const baseHP = PokemonData[mon.dexNum]?.formes[mon.formeNum]?.baseStats?.hp
+  const baseHP = MetadataLookup(mon.dexNum, mon.formeNum)?.baseStats.hp
 
   if (baseHP) {
     const iv = (mon.ivs as any).hp
@@ -52,13 +52,7 @@ export const getHPGen3Onward = (mon: PKMInterface) => {
 }
 
 export const getLevelGen3Onward = (dexNum: number, exp: number) => {
-  if (dexNum < 1 || dexNum > NationalDexMax) {
-    return 1
-  }
-  const levelUpType = PokemonData[dexNum].levelUpType
-  const cutoffList = LevelUpExp[levelUpType]
-
-  return cutoffList.findIndex((minExp) => exp <= minExp) + 1
+  return SpeciesLookup(dexNum)?.calculateLevel(exp) ?? 1
 }
 
 export const getLevelGen12 = (dexNum: number, exp: number) => {

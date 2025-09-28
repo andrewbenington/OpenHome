@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-pkm_rs_types = {path = "../pkm_rs_types"}
+pkm_rs_types = {path = "../pkm_rs_types", features=["wasm"]}
 serde = { version = "1.0.219", features = ["derive"] }
 serde_json = "1.0.140"
 num = "0.4.3"
@@ -23,4 +23,4 @@ crate-type = ["cdylib", "rlib"]
 missing_const_for_fn = "warn"
 
 [features]
-wasm = ["wasm-bindgen", "js-sys", "serde-wasm-bindgen", "getrandom/wasm_js"]
+wasm = ["wasm-bindgen", "js-sys", "serde-wasm-bindgen", "getrandom/wasm_js", "pkm_rs_types/wasm"]

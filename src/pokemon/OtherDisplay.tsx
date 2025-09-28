@@ -36,11 +36,10 @@ import { isRestricted } from '../types/TransferRestrictions'
 import { PKMInterface } from '../types/interfaces'
 import { OHPKM } from '../types/pkm/OHPKM'
 import {
-  getHeightCalculatedMaybe,
   getHiddenPowerGen2,
   getHiddenPowerPower,
   getHiddenPowerType,
-  getWeightCalculatedMaybe,
+  getWeightCalculated,
   shinyLeafValues,
 } from '../types/pkm/util'
 import { getFlagsInRange } from '../util/byteLogic'
@@ -54,8 +53,8 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
   const { mon } = props
   const isDev = useIsDev()
 
-  const heightCalculated = getHeightCalculatedMaybe(mon) ?? 0
-  const weightCalculated = getWeightCalculatedMaybe(mon) ?? 0
+  const heightCalculated = getWeightCalculated(mon)
+  const weightCalculated = getWeightCalculated(mon)
 
   return (
     <div style={{ overflow: 'hidden', height: '100%' }}>

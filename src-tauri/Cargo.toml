@@ -24,7 +24,6 @@ strip = true # Remove debug symbols
 tauri-build = { version = "2.4.1", features = [] }
 
 [dependencies]
-pkm_rs_resources = {path = "../pkm_rs_resources"}
 tauri = { version = "2.8.5", features = [] }
 tauri-plugin-shell = "2.3.1"
 serde = { version = "1.0.226", features = ["derive"] }

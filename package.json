@@ -29,11 +29,11 @@
     "typecheck": "tsc",
     "dev:unix": "./buildVersionJSON.sh && tauri dev",
     "dev:win": "powershell -ExecutionPolicy Bypass -File ./buildVersionJSON.ps1 && tauri dev",
-    "build": "tsc && vite build",
-    "dev": "vite",
+    "build": "npm run wasm && tsc && vite build",
+    "dev": "npm run wasm && vite",
     "tauri": "tauri",
     "test": "jest",
-    "wasm": "RUSTFLAGS='--cfg getrandom_backend=\"wasm_js\"' wasm-pack build ./pkm_rs_types --target web -- --features wasm",
+    "wasm": "RUSTFLAGS='--cfg getrandom_backend=\"wasm_js\"' wasm-pack build ./pkm_rs_resources --target web -- --features wasm",
     "precommit": "prettier --write . && eslint src --report-unused-disable-directives -c eslint.config.mjs --fix"
   },
   "dependencies": {

@@ -22,6 +22,7 @@ import {
   uint16ToBytesLittleEndian,
   writeUint32ToBuffer,
 } from 'src/util/byteLogic'
+import { MetadataLookup } from '../../../pkm_rs_resources/pkg/pkm_rs_resources'
 import { PKMInterface } from '../interfaces'
 import { OHPKM } from './OHPKM'
 
@@ -46,20 +47,7 @@ export const writeIVsToBuffer = (
 }
 
 export const getAbilityFromNumber = (dexNum: number, formeNum: number, abilityNum: number) => {
-  if (!PokemonData[dexNum]?.formes[formeNum]) {
-    return 'None'
-  }
-  if (abilityNum === 4) {
-    return (
-      PokemonData[dexNum].formes[formeNum].abilityH ?? PokemonData[dexNum].formes[formeNum].ability1
-    )
-  }
-  if (abilityNum === 2) {
-    return (
-      PokemonData[dexNum].formes[formeNum].ability2 ?? PokemonData[dexNum].formes[formeNum].ability1
-    )
-  }
-  return PokemonData[dexNum].formes[formeNum].ability1
+  return MetadataLookup(dexNum, formeNum)?.abilityByNum(abilityNum).name ?? 'None'
 }
 
 export const getUnownLetterGen3 = (personalityValue: number) => {
@@ -456,54 +444,29 @@ export type PKMFile = PKM | OHPKM
 
 export function shinyLeafValues(shinyLeafNumber: number) {
   return {
-    first: !!(shinyLeafNumber & 1),
-    second: !!(shinyLeafNumber & 2),
-    third: !!(shinyLeafNumber & 4),
-    fourth: !!(shinyLeafNumber & 8),
-    fifth: !!(shinyLeafNumber & 16),
-    crown: !!(shinyLeafNumber & 32),
+    first: Boolean(shinyLeafNumber & 1),
+    second: Boolean(shinyLeafNumber & 2),
+    third: Boolean(shinyLeafNumber & 4),
+    fourth: Boolean(shinyLeafNumber & 8),
+    fifth: Boolean(shinyLeafNumber & 16),
+    crown: Boolean(shinyLeafNumber & 32),
   }
 }
 
-export function getHeightCalculatedMaybe(mon: PKMInterface) {
-  if (mon.heightScalar !== undefined && mon.heightDeviation) {
-    const deviation = (mon.heightScalar / 255) * 0.40000004 + (1 - mon.heightDeviation)
-
-    return PokemonData[mon.dexNum].formes[mon.formeNum].height * 100 * deviation
-  }
-  return undefined
-}
-
-export function getWeightCalculatedMaybe(mon: PKMInterface) {
-  if (mon.weightScalar !== undefined && mon.weightDeviation) {
-    const deviation = (mon.weightScalar / 255) * 0.40000004 + (1 - mon.weightDeviation)
-
-    return PokemonData[mon.dexNum].formes[mon.formeNum].weight * 10 * deviation
-  }
-  return undefined
-}
-
-type PKMWithSize = {
-  heightScalar: number
-  weightScalar: number
-  heightDeviation: number
-  weightDeviation: number
-} & PKMInterface
-
-export function getHeightCalculated(mon: PKMWithSize) {
-  if (mon.dexNum === 0) return 0
+export function getHeightCalculated(mon: PKMInterface) {
+  const formeMetadata = MetadataLookup(mon.dexNum, mon.formeNum)
+  if (!formeMetadata || mon.heightScalar === undefined || !mon.heightDeviation) return 0
 
   const deviation = (mon.heightScalar / 255) * 0.40000004 + (1 - mon.heightDeviation)
-
-  return PokemonData[mon.dexNum].formes[mon.formeNum].height * 100 * deviation
+  return formeMetadata.baseHeight * 100 * deviation
 }
 
-export function getWeightCalculated(mon: PKMWithSize) {
-  if (mon.dexNum === 0) return 0
+export function getWeightCalculated(mon: PKMInterface) {
+  const formeMetadata = MetadataLookup(mon.dexNum, mon.formeNum)
+  if (!formeMetadata || mon.weightScalar === undefined || !mon.weightDeviation) return 0
 
   const deviation = (mon.weightScalar / 255) * 0.40000004 + (1 - mon.weightDeviation)
-
-  return PokemonData[mon.dexNum].formes[mon.formeNum].weight * 10 * deviation
+  return formeMetadata.baseWeight * 10 * deviation
 }
 
 export function isMegaStone(item?: Item): boolean {

@@ -176,9 +176,12 @@ name = "pkm_rs_types"
 version = "0.1.0"
 dependencies = [
  "getrandom",
+ "js-sys",
  "pkm_rs_derive",
  "serde",
+ "serde-wasm-bindgen",
  "static_assertions",
+ "wasm-bindgen",
 ]
 
 [[package]]

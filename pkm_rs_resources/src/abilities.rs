@@ -54,6 +54,12 @@ impl AbilityIndex {
     pub fn index(self) -> u16 {
         self.get()
     }
+
+    #[cfg(feature = "wasm")]
+    #[wasm_bindgen(getter)]
+    pub fn name(self) -> String {
+        self.get_metadata().name.to_owned()
+    }
 }
 
 impl Default for AbilityIndex {
@@ -126,6 +132,7 @@ pub struct AbilityMetadata {
 pub const ABILITY_MAX: usize = 310;
 
 pub static ALL_ABILITIES: [&AbilityMetadata; ABILITY_MAX] = [
+    // &AbilityMetadata { name: "None" },
     &AbilityMetadata { name: "Stench" },
     &AbilityMetadata { name: "Drizzle" },
     &AbilityMetadata {

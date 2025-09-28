@@ -1,13 +1,9 @@
 use std::num::NonZeroU16;
 
-use pkm_rs_types::{Generation, PkmType, Stats16Le};
+use pkm_rs_types::{Generation, PkmType, Region, Stats16Le};
 use serde::{Serialize, Serializer};
 
-use crate::{
-    Error, Result,
-    abilities::AbilityIndex,
-    species::{ALL_SPECIES, SpeciesAndForme},
-};
+use crate::{Error, Result, abilities::AbilityIndex, species::ALL_SPECIES};
 
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
@@ -223,34 +219,91 @@ pub enum EggGroup {
     #[default]
     NoEggsDiscovered,
 }
-
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[derive(Debug, Clone)]
 pub struct FormeMetadata {
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub species_name: &'static str,
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = nationalDex))]
     pub national_dex: NatDexIndex,
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub forme_name: &'static str,
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = formeIndex))]
     pub forme_index: u16,
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = isBaseForme))]
     pub is_base_forme: bool,
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = isMega))]
     pub is_mega: bool,
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = isGmax))]
     pub is_gmax: bool,
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = isBattleOnly))]
     pub is_battle_only: bool,
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = isCosmetic))]
     pub is_cosmetic: bool,
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub types: (PkmType, Option<PkmType>),
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = genderRatio))]
     pub gender_ratio: GenderRatio,
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = baseStats))]
     pub base_stats: Stats16Le,
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub abilities: (AbilityIndex, AbilityIndex),
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = hiddenAbility))]
     pub hidden_ability: Option<AbilityIndex>,
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = baseHeight))]
     pub base_height: f32,
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = baseWeight))]
     pub base_weight: f32,
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub evolutions: &'static [SpeciesAndForme],
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = preEvolution))]
     pub pre_evolution: Option<SpeciesAndForme>,
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub egg_groups: (EggGroup, Option<EggGroup>),
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = introduced))]
     pub introduced: Generation,
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = isRestrictedLegend))]
     pub is_restricted_legend: bool,
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = isSubLegend))]
     pub is_sub_legend: bool,
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = isMythical))]
     pub is_mythical: bool,
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = isUltraBeast))]
     pub is_ultra_beast: bool,
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = isParadox))]
     pub is_paradox: bool,
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(readonly))]
+    pub regional: Option<Region>,
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub sprite: &'static str,
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub sprite_index: (u8, u8),
 }
 
@@ -273,11 +326,61 @@ impl FormeMetadata {
         }
     }
 }
+#[cfg(feature = "wasm")]
+#[wasm_bindgen]
+#[allow(clippy::missing_const_for_fn)]
+impl FormeMetadata {
+    #[wasm_bindgen(getter)]
+    pub fn types(&self) -> Vec<PkmType> {
+        match self.types.1 {
+            Some(type_1) => vec![self.types.0, type_1],
+            None => vec![self.types.0],
+        }
+    }
 
+    #[wasm_bindgen(getter)]
+    pub fn abilities(&self) -> Vec<AbilityIndex> {
+        vec![self.abilities.0, self.abilities.1]
+    }
+
+    #[wasm_bindgen(js_name = abilityByNum)]
+    pub fn ability_by_num(&self, num: u8) -> AbilityIndex {
+        match num {
+            4 => self.hidden_ability.unwrap_or(self.abilities.0),
+            2 => self.abilities.1,
+            _ => self.abilities.0,
+        }
+    }
+
+    #[wasm_bindgen(getter = eggGroups)]
+    pub fn egg_groups(&self) -> Vec<EggGroup> {
+        match self.egg_groups.1 {
+            Some(egg_group_1) => vec![self.egg_groups.0, egg_group_1],
+            None => vec![self.egg_groups.0],
+        }
+    }
+
+    #[wasm_bindgen(getter = speciesName)]
+    pub fn species_name(&self) -> String {
+        self.species_name.to_owned()
+    }
+
+    #[wasm_bindgen(getter = formeName)]
+    pub fn forme_name(&self) -> String {
+        self.forme_name.to_owned()
+    }
+}
+
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[derive(Debug, Clone)]
 pub struct SpeciesMetadata {
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub name: &'static str,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub national_dex: NatDexIndex,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = levelUpType))]
     pub level_up_type: LevelUpType,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub formes: &'static [FormeMetadata],
 }
 
@@ -288,5 +391,126 @@ impl SpeciesMetadata {
         }
 
         Some(&self.formes[forme_index])
+    }
+}
+
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[allow(clippy::missing_const_for_fn)]
+impl SpeciesMetadata {
+    #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
+    pub fn name(&self) -> String {
+        self.name.to_owned()
+    }
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
+    pub fn formes(&self) -> Vec<FormeMetadata> {
+        Vec::from(self.formes)
+    }
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(getter = nationalDex))]
+    pub fn national_dex(&self) -> u16 {
+        self.national_dex.index()
+    }
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = calculateLevel))]
+    pub fn calculate_level(&self, exp: u32) -> u8 {
+        self.level_up_type.calculate_level(exp)
+    }
+}
+
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[derive(Debug, Default, PartialEq, Eq, Clone, Copy, Serialize)]
+pub struct SpeciesAndForme {
+    national_dex: NatDexIndex,
+    forme_index: u16,
+}
+
+impl SpeciesAndForme {
+    pub fn new(national_dex: u16, forme_index: u16) -> Result<SpeciesAndForme> {
+        let valid_ndex = NatDexIndex::new(national_dex)?;
+
+        if valid_ndex.get_species_metadata().formes.len() <= forme_index as usize {
+            return Err(Error::FormeIndex {
+                national_dex: valid_ndex,
+                forme_index,
+            });
+        }
+
+        Ok(SpeciesAndForme {
+            national_dex: valid_ndex,
+            forme_index,
+        })
+    }
+
+    pub const fn new_valid_ndex(
+        national_dex: NatDexIndex,
+        forme_index: u16,
+    ) -> Result<SpeciesAndForme> {
+        if national_dex.get_species_metadata().formes.len() <= forme_index as usize {
+            return Err(Error::FormeIndex {
+                national_dex,
+                forme_index,
+            });
+        }
+
+        Ok(SpeciesAndForme {
+            national_dex,
+            forme_index,
+        })
+    }
+
+    /// # Safety
+    ///
+    /// - `national_dex` must be greater than zero and at most the maximum National Dex number supported by this version of the library.
+    /// - `forme_index` must be less than the total number of formes for the Pokémon with the given `national_dex` number
+    pub const unsafe fn new_unchecked(national_dex: u16, forme_index: u16) -> SpeciesAndForme {
+        SpeciesAndForme {
+            national_dex: unsafe { NatDexIndex::new_unchecked(national_dex) },
+            forme_index,
+        }
+    }
+
+    pub fn get_base_evolution(&self) -> SpeciesAndForme {
+        match self.get_forme_metadata().pre_evolution {
+            None => *self,
+            Some(forme_ref) => forme_ref.get_base_evolution(),
+        }
+    }
+
+    pub const fn get_ndex(&self) -> NatDexIndex {
+        self.national_dex
+    }
+
+    pub const fn get_forme_index(&self) -> u16 {
+        self.forme_index
+    }
+}
+
+impl SpeciesAndForme {
+    pub const fn get_species_metadata(&self) -> &'static SpeciesMetadata {
+        self.national_dex.get_species_metadata()
+    }
+
+    pub const fn get_forme_metadata(&self) -> &'static FormeMetadata {
+        &self.get_species_metadata().formes[self.forme_index as usize]
+    }
+}
+
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[allow(clippy::missing_const_for_fn)]
+impl SpeciesAndForme {
+    #[cfg_attr(feature = "wasm", wasm_bindgen(getter = nationalDex))]
+    pub fn get_ndex_js(&self) -> u16 {
+        self.national_dex.get()
+    }
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(getter = formeIndex))]
+    pub fn get_forme_index_js(&self) -> u16 {
+        self.forme_index
+    }
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = getMetadata))]
+    pub fn get_forme_metadata_js(&self) -> FormeMetadata {
+        self.get_forme_metadata().clone()
     }
 }

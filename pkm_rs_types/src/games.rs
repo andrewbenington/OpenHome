@@ -1,9 +1,11 @@
+use serde::Serialize;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Default, Serialize, Clone, Copy, PartialEq, Eq)]
 pub enum Generation {
+    #[default]
     None,
     G1,
     G2,
@@ -14,6 +16,21 @@ pub enum Generation {
     G7,
     G8,
     G9,
+}
+
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[derive(Debug, Serialize, Clone, Copy, PartialEq, Eq)]
+pub enum Region {
+    Kanto,
+    Johto,
+    Hoenn,
+    Sinnoh,
+    Unova,
+    Kalos,
+    Alola,
+    Galar,
+    Hisui,
+    Paldea,
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
