@@ -1,9 +1,10 @@
 import fs from 'fs'
 // import { TextDecoder } from 'node:util' // (ESM style imports)
 import { PK1 } from '@pokemon-files/pkm'
-import assert from 'assert'
+import assert, { fail } from 'assert'
 import * as E from 'fp-ts/lib/Either'
 import path from 'path'
+import { expect, test } from 'vitest'
 import { bytesToPKM } from '../../FileImport'
 import { OHPKM } from '../../pkm/OHPKM'
 import { G1SAV } from '../G1SAV'

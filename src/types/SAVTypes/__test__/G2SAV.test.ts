@@ -3,6 +3,7 @@ import assert from 'assert'
 import * as E from 'fp-ts/lib/Either'
 import fs from 'fs'
 import path from 'path'
+import { expect, test } from 'vitest'
 import { bytesToPKM } from '../../FileImport'
 import { OHPKM } from '../../pkm/OHPKM'
 import { G2SAV } from '../G2SAV'
@@ -40,7 +41,7 @@ test('removing mon shifts others in box', () => {
   ])
 
   if (E.isLeft(result1)) {
-    fail(result1.left)
+    throw Error(result1.left)
   }
 
   const modifiedSaveFile1 = result1.right as G2SAV
@@ -54,7 +55,7 @@ test('removing mon shifts others in box', () => {
   ])
 
   if (E.isLeft(result2)) {
-    fail(result2.left)
+    throw Error(result2.left)
   }
 
   const modifiedSaveFile2 = result2.right as G2SAV
@@ -70,7 +71,7 @@ test('inserting mon works', () => {
   ])
 
   if (E.isLeft(result1)) {
-    fail(result1.left)
+    throw Error(result1.left)
   }
 
   const modifiedSaveFile1 = result1.right as G2SAV
@@ -84,7 +85,7 @@ test('inserting mon works', () => {
   ])
 
   if (E.isLeft(result2)) {
-    fail(result2.left)
+    throw Error(result2.left)
   }
 
   const modifiedSaveFile2 = result2.right as G2SAV
