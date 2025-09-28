@@ -1,11 +1,17 @@
 import { Dispatch, Reducer, createContext } from 'react'
 import { MonWithLocation } from './openSaves'
 
-export type DragMonState = { payload?: MonWithLocation }
+type Item = string
+
+export type DragPayload =
+  | { kind: 'mon'; monData: MonWithLocation }
+  | { kind: 'item'; itemName: Item }
+
+export type DragMonState = { payload?: DragPayload }
 export type DragMonAction =
   | {
       type: 'start_drag'
-      payload: MonWithLocation
+      payload: DragPayload
     }
   | {
       type: 'end_drag'

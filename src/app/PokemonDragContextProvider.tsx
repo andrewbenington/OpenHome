@@ -1,10 +1,12 @@
 import { DragDropProvider, DragOverlay, PointerSensor } from '@dnd-kit/react'
+import { ItemFromString } from 'pokemon-resources'
 import { ReactNode, useContext } from 'react'
+import { Bag } from 'src/saves/Bag'
 import { PersistedPkmDataContext } from 'src/state/persistedPkmData'
 import { OHPKM } from 'src/types/pkm/OHPKM'
 import PokemonIcon from '../components/PokemonIcon'
-import { DragMonContext } from '../state/dragMon'
-import { MonLocation, MonWithLocation, OpenSavesContext } from '../state/openSaves'
+import { DragMonContext, DragPayload } from '../state/dragMon'
+import { MonLocation, OpenSavesContext } from '../state/openSaves'
 
 export default function PokemonDragContextProvider(props: { children?: ReactNode }) {
   const { children } = props
@@ -20,29 +22,38 @@ export default function PokemonDragContextProvider(props: { children?: ReactNode
         const { operation } = e
         const { target } = operation
 
+        console.log('[DragEnd] target =', target, 'payload =', dragMonState.payload)
+
         const dest = target?.data as MonLocation
         const payload = dragMonState.payload
 
-        if (payload) {
+        if (!payload) return
+
+        if (payload.kind === 'item') {
+        } else if (payload.kind === 'mon') {
+          const { mon } = payload.monData
+
           if (target?.id === 'to_release') {
             openSavesDispatch({
               type: 'add_mon_to_release',
-              payload,
+              payload: payload.monData,
             })
-          } else if (
-            dest.is_home ||
-            dest?.save?.supportsMon(payload.mon.dexNum, payload.mon.formeNum)
-          ) {
-            const { mon, ...source } = payload
+          } else if (target?.id === 'bag-box') {
+            if (mon.heldItemIndex) {
+              Bag.addItem(mon.heldItemName)
+              mon.heldItemIndex = 0
+            }
+          } else if (dest && (dest.is_home || dest.save?.supportsMon(mon.dexNum, mon.formeNum))) {
+            const source = payload.monData
 
             if (source.save !== dest.save) {
               persistedPkmDataDispatch({ type: 'persist_data', payload: new OHPKM(mon) })
               openSavesDispatch({
                 type: 'move_mon',
-                payload: { source: payload, dest },
+                payload: { source, dest },
               })
             } else {
-              openSavesDispatch({ type: 'move_mon', payload: { source: payload, dest } })
+              openSavesDispatch({ type: 'move_mon', payload: { source, dest } })
             }
           }
         }
@@ -50,11 +61,20 @@ export default function PokemonDragContextProvider(props: { children?: ReactNode
         dispatchDragMonState({ type: 'end_drag' })
       }}
       onDragStart={(e) => {
-        const { operation } = e
-        const { source } = operation
+        const { source } = e.operation
 
-        if (source?.data) {
-          dispatchDragMonState({ type: 'start_drag', payload: source.data as MonWithLocation })
+        console.log('[DragStart] source.data =', source?.data)
+
+        if (!source?.data) return
+        const data = source.data as DragPayload
+
+        if (data.kind === 'item') {
+          console.log('[DragStart] dragging item:', data.itemName)
+          Bag.popItem(data.itemName)
+          dispatchDragMonState({ type: 'start_drag', payload: data })
+        } else if (data.kind === 'mon') {
+          console.log('[DragStart] dragging mon:', data.monData)
+          dispatchDragMonState({ type: 'start_drag', payload: data })
         }
       }}
       sensors={[
@@ -74,15 +94,23 @@ export default function PokemonDragContextProvider(props: { children?: ReactNode
       ]}
     >
       <DragOverlay style={{ cursor: 'grabbing' }}>
-        {dragMonState.payload && (
-          <PokemonIcon
-            dexNumber={dragMonState.payload.mon.dexNum ?? 0}
-            formeNumber={dragMonState.payload.mon.formeNum ?? 0}
-            isShiny={dragMonState.payload.mon.isShiny()}
-            heldItemIndex={dragMonState.payload.mon.heldItemIndex}
-            style={{ width: '100%', height: '100%' }}
-          />
-        )}
+        {dragMonState.payload &&
+          (dragMonState.payload.kind === 'item' ? (
+            <img
+              src={`/items/index/${ItemFromString(dragMonState.payload.itemName)?.toString().padStart(4, '0')}.png`}
+              alt={dragMonState.payload.itemName}
+              style={{ width: 32, height: 32 }}
+              draggable={false}
+            />
+          ) : (
+            <PokemonIcon
+              dexNumber={dragMonState.payload.monData.mon.dexNum ?? 0}
+              formeNumber={dragMonState.payload.monData.mon.formeNum ?? 0}
+              isShiny={dragMonState.payload.monData.mon.isShiny()}
+              heldItemIndex={dragMonState.payload.monData.mon.heldItemIndex}
+              style={{ width: '100%', height: '100%' }}
+            />
+          ))}
       </DragOverlay>
       {children}
     </DragDropProvider>

@@ -6,6 +6,7 @@ import { GameOfOrigin, isGameBoy, isGen3, isGen4, isGen5 } from 'pokemon-resourc
 import { useCallback, useContext, useEffect, useState } from 'react'
 import { MdFileOpen } from 'react-icons/md'
 import PokemonDetailsModal from 'src/pokemon/PokemonDetailsModal'
+import BagBox from 'src/saves/BagBox'
 import BankHeader from 'src/saves/BankHeader'
 import { displayIndexAdder, isBattleFormeItem } from 'src/types/pkm/util'
 import { Errorable, LookupMap } from 'src/types/types'
@@ -276,6 +277,7 @@ const Home = () => {
         </Flex>
       </div>
       <Flex gap="2" className="right-column">
+        <BagBox />
         <FilterPanel />
         <div
           className="drop-area"
