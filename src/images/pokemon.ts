@@ -1,5 +1,5 @@
-import { NationalDex, PokemonData } from 'pokemon-species-data'
-
+import { MetadataLookup } from '@pokemon-resources/pkg'
+import { NationalDex } from 'pokemon-species-data'
 import { BLOOD_MOON, SWEETS } from 'src/consts/Formes'
 import { toGen3RRPokemonIndex } from 'src/types/SAVTypes/radicalred/conversion/Gen3RRPokemonIndex'
 import { RRSprites } from 'src/types/SAVTypes/radicalred/conversion/RadicalRedSprites'
@@ -36,12 +36,12 @@ export const getPokemonSpritePath = (mon: MonSpriteData, format?: string) => {
   if (isBattleFormeItem(mon.heldItemIndex)) {
     formeNum = displayIndexAdder(mon.heldItemIndex)(mon.formeNum)
   }
-  let spriteName = PokemonData[mon.dexNum]?.formes[formeNum]?.sprite ?? ''
+  const formeMetadata = MetadataLookup(mon.dexNum, mon.formeNum)
+  let spriteName = formeMetadata?.sprite ?? ''
 
   if (mon.dexNum === NationalDex.Alcremie) {
     spriteName = `${
-      PokemonData[mon.dexNum]?.formes[formeNum]?.formeName?.toLowerCase() ??
-      'alcremie-vanilla-cream'
+      formeMetadata?.formeName?.toLowerCase() ?? 'alcremie-vanilla-cream'
     }-${SWEETS[mon.formArgument ?? 0].toLocaleLowerCase()}`
   }
   let spriteFolder = fileToSpriteFolder[monFormat]

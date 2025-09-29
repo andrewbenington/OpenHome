@@ -3,8 +3,11 @@ import { CSSProperties, useEffect, useMemo, useRef } from 'react'
 import PokemonIcon from 'src/components/PokemonIcon'
 import { getPublicImageURL } from 'src/images/images'
 import { Pokedex } from 'src/types/pokedex'
-import { ALL_SPECIES_DATA } from 'src/util/resources'
-import { FormeMetadata, SpeciesMetadata } from '../../../pkm_rs_resources/pkg/pkm_rs_resources'
+import {
+  all_species_data,
+  FormeMetadata,
+  SpeciesMetadata,
+} from '../../../pkm_rs_resources/pkg/pkm_rs_resources'
 import './style.css'
 import { getHighestFormeStatus, StatusIndices } from './util'
 
@@ -19,6 +22,8 @@ export type PokedexSidebarProps = {
 export default function PokedexSidebar(props: PokedexSidebarProps) {
   const { filter, selectedSpecies, setSelectedSpecies, setSelectedForme, pokedex } = props
 
+  const ALL_SPECIES_DATA = useMemo(() => all_species_data(), [])
+
   const parentRef = useRef(null)
 
   const filteredSpecies = useMemo(
@@ -26,7 +31,7 @@ export default function PokedexSidebar(props: PokedexSidebarProps) {
       Object.values(ALL_SPECIES_DATA).filter(
         (mon) => !filter || mon.name.toUpperCase().startsWith(filter?.trim().toUpperCase())
       ),
-    [filter]
+    [ALL_SPECIES_DATA, filter]
   )
 
   const virtualizer = useVirtualizer({

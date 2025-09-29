@@ -1,4 +1,5 @@
 import { AllPKMFields, Stats } from '@pokemon-files/util'
+import { FormeMetadata, SpeciesMetadata } from '@pokemon-resources/pkg'
 
 export interface OfficialPKMInterface extends PKMInterface {
   pluginIdentifier?: undefined
@@ -19,4 +20,6 @@ export type PKMInterface = AllPKMFields & {
   isLocked?: boolean
   originalBytes?: Uint8Array
   selectColor?: string
+  metadata?: FormeMetadata
+  speciesMetadata?: SpeciesMetadata
 }

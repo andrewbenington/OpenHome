@@ -1,4 +1,5 @@
 use std::num::NonZeroU16;
+use strum_macros::{Display, EnumString};
 
 use pkm_rs_types::{Generation, PkmType, Region, Stats16Le};
 use serde::{Serialize, Serializer};
@@ -100,7 +101,7 @@ pub enum GenderRatio {
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Debug, Default, PartialEq, Eq, Clone, Copy)]
+#[derive(Debug, Default, EnumString, Display, PartialEq, Eq, Clone, Copy)]
 pub enum LevelUpType {
     #[default]
     MediumFast,
@@ -116,7 +117,8 @@ impl LevelUpType {
         self.get_thresholds()
             .iter()
             .position(|threshold| *threshold >= exp)
-            .unwrap_or(100) as u8
+            .unwrap_or(99) as u8
+            + 1
     }
 
     pub fn get_min_exp_for_level(&self, level: u8) -> u32 {
@@ -200,7 +202,7 @@ impl LevelUpType {
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Debug, Default, PartialEq, Eq, Clone, Copy)]
+#[derive(Debug, Default, EnumString, Display, PartialEq, Eq, Clone, Copy)]
 pub enum EggGroup {
     Monster,
     Fairy,
@@ -330,12 +332,24 @@ impl FormeMetadata {
 #[wasm_bindgen]
 #[allow(clippy::missing_const_for_fn)]
 impl FormeMetadata {
-    #[wasm_bindgen(getter)]
-    pub fn types(&self) -> Vec<PkmType> {
-        match self.types.1 {
-            Some(type_1) => vec![self.types.0, type_1],
-            None => vec![self.types.0],
-        }
+    #[wasm_bindgen(getter = type1)]
+    pub fn type_1(&self) -> String {
+        self.types.0.to_string()
+    }
+
+    #[wasm_bindgen(getter = type1Index)]
+    pub fn type_1_index(&self) -> u8 {
+        self.types.0 as u8
+    }
+
+    #[wasm_bindgen(getter = type2)]
+    pub fn type_2(&self) -> Option<String> {
+        self.types.1.map(|t| t.to_string())
+    }
+
+    #[wasm_bindgen(getter = type2Index)]
+    pub fn type_2_index(&self) -> Option<u8> {
+        self.types.1.map(|t| t as u8)
     }
 
     #[wasm_bindgen(getter)]
@@ -352,12 +366,26 @@ impl FormeMetadata {
         }
     }
 
-    #[wasm_bindgen(getter = eggGroups)]
-    pub fn egg_groups(&self) -> Vec<EggGroup> {
-        match self.egg_groups.1 {
-            Some(egg_group_1) => vec![self.egg_groups.0, egg_group_1],
-            None => vec![self.egg_groups.0],
+    #[wasm_bindgen(js_name = abilityByNumGen3)]
+    pub fn ability_by_num_gen_3(&self, num: u8) -> AbilityIndex {
+        if num == 2 && self.abilities.1.get() <= 77 {
+            self.abilities.1
+        } else {
+            self.abilities.0
         }
+    }
+
+    #[wasm_bindgen(getter = eggGroups)]
+    pub fn egg_groups(&self) -> Vec<String> {
+        match self.egg_groups.1 {
+            Some(egg_group_1) => vec![self.egg_groups.0.to_string(), egg_group_1.to_string()],
+            None => vec![self.egg_groups.0.to_string()],
+        }
+    }
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
+    pub fn evolutions(&self) -> Vec<SpeciesAndForme> {
+        self.evolutions.to_vec()
     }
 
     #[wasm_bindgen(getter = speciesName)]
@@ -369,6 +397,16 @@ impl FormeMetadata {
     pub fn forme_name(&self) -> String {
         self.forme_name.to_owned()
     }
+
+    #[wasm_bindgen(getter)]
+    pub fn sprite(&self) -> String {
+        self.sprite.to_owned()
+    }
+
+    #[wasm_bindgen(getter = spriteCoords)]
+    pub fn sprite_coords(&self) -> Vec<u8> {
+        vec![self.sprite_index.0, self.sprite_index.1]
+    }
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
@@ -378,7 +416,7 @@ pub struct SpeciesMetadata {
     pub name: &'static str,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub national_dex: NatDexIndex,
-    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = levelUpType))]
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub level_up_type: LevelUpType,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub formes: &'static [FormeMetadata],
@@ -415,6 +453,11 @@ impl SpeciesMetadata {
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = calculateLevel))]
     pub fn calculate_level(&self, exp: u32) -> u8 {
         self.level_up_type.calculate_level(exp)
+    }
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(getter = levelUpType))]
+    pub fn level_up_type(&self) -> String {
+        self.level_up_type.to_string()
     }
 }
 
@@ -512,5 +555,10 @@ impl SpeciesAndForme {
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = getMetadata))]
     pub fn get_forme_metadata_js(&self) -> FormeMetadata {
         self.get_forme_metadata().clone()
+    }
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = tryNew))]
+    pub fn try_new(national_dex: u16, forme_index: u16) -> Option<Self> {
+        Self::new(national_dex, forme_index).ok()
     }
 }

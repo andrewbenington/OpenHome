@@ -9,6 +9,9 @@ import { SCBoolBlock, SCObjectBlock, writeSCBlock } from '../Gen89/SwishCrypto/S
 import { SwishCrypto } from '../Gen89/SwishCrypto/SwishCrypto'
 import { SwShSAV } from '../Gen89/SwShSAV'
 import { PathData } from '../path'
+import { initializeWasm } from './init'
+
+beforeAll(initializeWasm)
 
 const swordPath: PathData = {
   raw: 'SAVFiles/sword',

@@ -1,8 +1,9 @@
 import { getNatureSummary } from 'pokemon-resources'
-import { NationalDex, NationalDexMax, PokemonData } from 'pokemon-species-data'
+import { NationalDex, NationalDexMax } from 'pokemon-species-data'
 
 import { PKM } from '../pkm'
 
+import { MetadataLookup, SpeciesLookup } from '@pokemon-resources/pkg'
 import {
   AllPKMs,
   PKMWithDVs,
@@ -12,7 +13,6 @@ import {
   PKMWithNature,
   SpeciesData,
 } from './interfaces'
-import { LevelUpExp } from './levelUpExp'
 import { Stat } from './types'
 
 export interface PKMWithStandardStats
@@ -62,7 +62,7 @@ export const getStandardPKMStats = (mon: PKMWithStandardStats) => {
     }
   }
 
-  const level = getLevelGen3Onward(mon.dexNum, mon.exp)
+  const level = SpeciesLookup(mon.dexNum)?.calculateLevel(mon.exp) ?? 0
 
   return {
     hp: getHPGen3Onward(mon, level),
@@ -108,7 +108,7 @@ export const getStatGen3Onward = (mon: PKMWithStandardStatCalc, stat: Stat, leve
     : natureSummary?.toLowerCase().includes(`-${stat}`)
       ? 0.9
       : 1
-  const baseStats = PokemonData[mon.dexNum]?.formes[mon.formeNum]?.baseStats
+  const baseStats = MetadataLookup(mon.dexNum, mon.formeNum)?.baseStats
 
   if (baseStats) {
     const baseStat = baseStats[stat]
@@ -132,7 +132,7 @@ export const getHPGen3Onward = (mon: PKMWithStandardStatCalc, level: number) => 
     return 1
   }
 
-  const baseHP = PokemonData[mon.dexNum]?.formes[mon.formeNum]?.baseStats?.hp
+  const baseHP = MetadataLookup(mon.dexNum, mon.formeNum)?.baseStats?.hp
 
   if (baseHP) {
     const iv = mon.ivs.hp
@@ -144,23 +144,12 @@ export const getHPGen3Onward = (mon: PKMWithStandardStatCalc, level: number) => 
   return 0
 }
 
-export const getLevelGen3Onward = (dexNum: number, exp: number) => {
-  if (dexNum < 1 || dexNum > NationalDexMax) {
-    return 1
-  }
-
-  const levelUpType = PokemonData[dexNum].levelUpType
-  const cutoffList = LevelUpExp[levelUpType]
-
-  return cutoffList.findIndex((minExp) => exp <= minExp) + 1
-}
-
 export const getLevelGen12 = (dexNum: number, exp: number) => {
   if (dexNum > 251) {
     return 1
   }
 
-  const levelUpType = PokemonData[dexNum].levelUpType
+  const levelUpType = SpeciesLookup(dexNum)?.levelUpType
 
   for (let level = 100; level > 0; level--) {
     switch (levelUpType) {

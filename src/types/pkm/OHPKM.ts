@@ -15,6 +15,7 @@ import {
   markingsSixShapesWithColorFromOther,
   markingsSixShapesWithColorToBytes,
 } from '@pokemon-files/util'
+import { GenderRatio, MetadataLookup, SpeciesLookup } from '@pokemon-resources/pkg'
 import * as lodash from 'lodash'
 import {
   AbilityFromString,
@@ -30,7 +31,7 @@ import {
   NatureToString,
   getMetLocation,
 } from 'pokemon-resources'
-import { NationalDex, PokemonData } from 'pokemon-species-data'
+import { NationalDex } from 'pokemon-species-data'
 import Prando from 'prando'
 import { OpenHomeRibbons } from 'src/consts/Ribbons'
 import { ShadowIDsColosseum, ShadowIDsXD } from 'src/consts/ShadowIDs'
@@ -44,7 +45,7 @@ import {
   uint16ToBytesLittleEndian,
   uint32ToBytesLittleEndian,
 } from 'src/util/byteLogic'
-import { getHPGen3Onward, getLevelGen3Onward, getStatGen3Onward } from 'src/util/StatCalc'
+import { getHPGen3Onward, getStatGen3Onward } from 'src/util/StatCalc'
 import { utf16BytesToString, utf16StringToBytes } from 'src/util/Strings/StringConverter'
 import { getHomeIdentifier, isEvolution } from '../../util/Lookup'
 import { PKMInterface, PluginPKMInterface } from '../interfaces'
@@ -465,7 +466,7 @@ export class OHPKM implements PKMInterface {
   }
 
   public get level() {
-    return getLevelGen3Onward(this.dexNum, this.exp)
+    return this.speciesMetadata?.calculateLevel(this.exp) ?? 1
   }
 
   public get abilityIndex() {
@@ -1544,6 +1545,14 @@ export class OHPKM implements PKMInterface {
     )
   }
 
+  public get metadata() {
+    return MetadataLookup(this.dexNum, this.formeNum)
+  }
+
+  public get speciesMetadata() {
+    return SpeciesLookup(this.dexNum)
+  }
+
   public toBytes(): ArrayBuffer {
     return this.bytes.buffer as ArrayBuffer
   }
@@ -1580,17 +1589,18 @@ export class OHPKM implements PKMInterface {
       this.abilityIndex = AbilityFromString(this.ability)
     }
 
-    const genderRatio = PokemonData[this.dexNum].formes[this.formeNum].genderRatio
-
-    if (this.gender === 2 && (genderRatio.male !== 0 || genderRatio.female !== 0)) {
-      this.gender = genderFromPID(this.personalityValue, this.dexNum)
-      errorsFound = true
-    } else if (this.gender === 0 && genderRatio.male === 0) {
-      this.gender = genderFromPID(this.personalityValue, this.dexNum)
-      errorsFound = true
-    } else if (this.gender === 1 && genderRatio.female === 0) {
-      this.gender = genderFromPID(this.personalityValue, this.dexNum)
-      errorsFound = true
+    const genderRatio = this.metadata?.genderRatio
+    if (genderRatio !== undefined) {
+      if (this.gender === 2 && genderRatio !== GenderRatio.Genderless) {
+        this.gender = genderFromPID(this.personalityValue, this.dexNum)
+        errorsFound = true
+      } else if (this.gender === 0 && genderRatio === GenderRatio.AllFemale) {
+        this.gender = genderFromPID(this.personalityValue, this.dexNum)
+        errorsFound = true
+      } else if (this.gender === 1 && genderRatio === GenderRatio.AllMale) {
+        this.gender = genderFromPID(this.personalityValue, this.dexNum)
+        errorsFound = true
+      }
     }
 
     return errorsFound

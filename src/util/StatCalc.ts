@@ -1,5 +1,5 @@
 import { getNatureSummary } from 'pokemon-resources'
-import { NationalDex, NationalDexMax, PokemonData } from 'pokemon-species-data'
+import { NationalDex, NationalDexMax } from 'pokemon-species-data'
 import { MetadataLookup, SpeciesLookup } from '../../pkm_rs_resources/pkg/pkm_rs_resources'
 import { PKMInterface } from '../types/interfaces'
 import { Stat } from '../types/types'
@@ -14,7 +14,7 @@ export const getStatGen3Onward = (stat: Stat, mon: PKMInterface) => {
     : natureSummary?.includes(`-${stat}`)
       ? 0.9
       : 1
-  const baseStats = PokemonData[mon.dexNum]?.formes[mon.formeNum]?.baseStats
+  const baseStats = MetadataLookup(mon.dexNum, mon.formeNum)?.baseStats
 
   if (baseStats) {
     const baseStat = (baseStats as any)[stat.toLowerCase()]
@@ -51,15 +51,11 @@ export const getHPGen3Onward = (mon: PKMInterface) => {
   return 0
 }
 
-export const getLevelGen3Onward = (dexNum: number, exp: number) => {
-  return SpeciesLookup(dexNum)?.calculateLevel(exp) ?? 1
-}
-
 export const getLevelGen12 = (dexNum: number, exp: number) => {
   if (dexNum > 251) {
     return 1
   }
-  const levelUpType = PokemonData[dexNum].levelUpType
+  const levelUpType = SpeciesLookup(dexNum)?.levelUpType
 
   for (let level = 100; level > 0; level--) {
     switch (levelUpType) {
@@ -68,12 +64,12 @@ export const getLevelGen12 = (dexNum: number, exp: number) => {
           return level
         }
         break
-      case 'Medium Fast':
+      case 'MediumFast':
         if (level ** 3 <= exp) {
           return level
         }
         break
-      case 'Medium Slow':
+      case 'MediumSlow':
         if (1.2 * level ** 3 - 15 * level ** 2 + 100 * level - 140 <= exp) {
           return level
         }

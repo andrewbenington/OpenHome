@@ -26,6 +26,9 @@
       ],
       "@pokemon-files/*": [
         "./packages/pokemon-files/src/*"
+      ],
+      "@pokemon-resources/*": [
+        "./pkm_rs_resources/*"
       ]
     },
     /* Bundler mode */

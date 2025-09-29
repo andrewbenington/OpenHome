@@ -1,18 +1,9 @@
-import {
-  AbilityFromString,
-  Ball,
-  GameOfOrigin,
-  ItemFromString,
-  Languages,
-  NatureToString,
-} from 'pokemon-resources'
-import { PokemonData } from 'pokemon-species-data'
+import { Ball, GameOfOrigin, ItemFromString, Languages, NatureToString } from 'pokemon-resources'
 
 import {
   genderFromPID,
   generatePersonalityValuePreservingAttributes,
   getFlag,
-  getLevelGen3Onward,
   getMoveMaxPP,
   MarkingsFourShapes,
   markingsFourShapesFromBytes,
@@ -29,6 +20,7 @@ import {
   writeGen3StringToBytes,
   writeStatsToBytesU8,
 } from '@pokemon-files/util'
+import { MetadataLookup, SpeciesLookup } from '@pokemon-resources/pkg'
 import { getHPGen3Onward, getStatGen3Onward } from '../../../util/StatCalc'
 import { PKMInterface, PluginPKMInterface } from '../../interfaces'
 
@@ -459,26 +451,11 @@ export abstract class PK3CFRU implements PluginPKMInterface {
   }
 
   public get abilityIndex() {
-    return AbilityFromString(this.ability)
+    return this.metadata?.abilityByNum(this.abilityNum)?.index ?? 0
   }
 
   public get ability() {
-    const pokemonData = PokemonData[this.dexNum]
-
-    if (!pokemonData) return '—'
-
-    const forme = pokemonData.formes[this.formeNum]
-
-    if (!forme) return '—'
-
-    const { ability1, ability2, abilityH } = forme
-
-    if (this.hasHiddenAbility && abilityH) return abilityH
-    if (this.abilityNum === 2 && ability2) {
-      return ability2
-    }
-
-    return ability1
+    return this.metadata?.abilityByNum(this.abilityNum)?.name ?? '—'
   }
 
   public get natureName() {
@@ -490,7 +467,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
   }
 
   public getLevel() {
-    return getLevelGen3Onward(this.dexNum, this.exp)
+    return this.speciesMetadata?.calculateLevel(this.exp) ?? 1
   }
 
   isShiny() {
@@ -510,6 +487,14 @@ export abstract class PK3CFRU implements PluginPKMInterface {
       (this.personalityValue & 0xffff) ^
       ((this.personalityValue >> 16) & 0xffff)
     )
+  }
+
+  public get metadata() {
+    return MetadataLookup(this.dexNum, this.formeNum)
+  }
+
+  public get speciesMetadata() {
+    return SpeciesLookup(this.dexNum)
   }
 
   static maxValidMove() {

@@ -38,10 +38,7 @@ export const StatusIndices: Record<PokedexStatus, number> = {
 }
 
 export function getPokedexSummary(species: SpeciesMetadata, forme: FormeMetadata) {
-  const types =
-    forme.types.length === 1
-      ? `${forme.types[0]}-type`
-      : `${forme.types[0]}- and ${forme.types[1]}-type`
+  const types = forme.type2 ? `${forme.type1}- and ${forme.type2}-type` : `${forme.type1}-type`
   const name = forme.formeIndex === 0 ? species.name : forme.formeName
   const formeType =
     forme.formeIndex === 0

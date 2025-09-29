@@ -1,7 +1,7 @@
+import { SpeciesLookup } from '@pokemon-resources/pkg'
 import { Card, Flex, Heading, Separator } from '@radix-ui/themes'
 import * as E from 'fp-ts/lib/Either'
 import { GameOfOriginData } from 'pokemon-resources'
-import { PokemonData } from 'pokemon-species-data'
 import { useContext, useEffect, useState } from 'react'
 import { BackendContext } from 'src/backend/backendContext'
 import { AppState } from 'src/backend/backendInterface'
@@ -86,11 +86,11 @@ function openSavesDisplay(state: OpenSavesState) {
 }
 
 function monDisplay(mon: PKMInterface) {
-  const species = PokemonData[mon.dexNum]
+  const species = SpeciesLookup(mon.dexNum)
 
   return {
-    species: species.name,
-    forme: species.formes[mon.formeNum ?? 0].formeName,
+    species: species?.name,
+    forme: species?.formes[mon.formeNum ?? 0].formeName,
     nickname: mon.nickname,
     origin: mon.gameOfOrigin ? 'Pokémon ' + GameOfOriginData[mon.gameOfOrigin]?.name : undefined,
   }

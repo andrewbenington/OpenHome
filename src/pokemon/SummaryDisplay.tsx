@@ -1,9 +1,8 @@
 import { getDisplayID } from '@pokemon-files/util'
+import { MetadataLookup } from '@pokemon-resources/pkg'
 import { Badge, Flex, Grid, Spinner } from '@radix-ui/themes'
 import { AbilityToString } from 'pokemon-resources'
-import { PokemonData } from 'pokemon-species-data'
 import { useMemo, useState } from 'react'
-import { getLevelGen12, getLevelGen3Onward } from 'src/util/StatCalc'
 import PokemonIcon from '../components/PokemonIcon'
 import TypeIcon from '../components/TypeIcon'
 import { getPublicImageURL } from '../images/images'
@@ -50,7 +49,7 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
   })
 
   const itemAltText = useMemo(() => {
-    const monData = PokemonData[mon.dexNum]?.formes[mon.formeNum]
+    const monData = MetadataLookup(mon.dexNum, mon.formeNum)
 
     if (!monData) return 'pokemon sprite'
     return `${monData.formeName}${mon.isShiny() ? '-shiny' : ''} sprite`
@@ -141,7 +140,7 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
         <AttributeRow label="Nickname" value={mon.nickname} />
         <AttributeRow
           label="Species"
-          value={`${PokemonData[mon.dexNum]?.formes[mon.formeNum]?.formeName} ${
+          value={`${MetadataLookup(mon.dexNum, mon.formeNum)?.formeName} ${
             mon.gender !== undefined ? ['♂', '♀', ''][mon.gender] : ''
           }`}
         />
@@ -161,11 +160,7 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
             })`}
           />
         )}
-        <AttributeRow label="Level">
-          {['PK1', 'PK2'].includes(mon.format)
-            ? getLevelGen12(mon.dexNum, mon.exp)
-            : getLevelGen3Onward(mon.dexNum, mon.exp)}
-        </AttributeRow>
+        <AttributeRow label="Level">{mon.getLevel()}</AttributeRow>
         <AttributeRow label="EXP">{mon.exp}</AttributeRow>
       </Flex>
     </Grid>

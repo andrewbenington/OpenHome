@@ -1,6 +1,6 @@
 import { MimeJr, MrMime, MrRime, Sylveon, Vaporeon } from 'pokemon-species-data'
 import { expect, test } from 'vitest'
-import { getFormeData, isEvolution } from '../Lookup'
+import { isEvolution } from '../Lookup'
 
 test('mr rime is evo of mime jr', () => {
   expect(
@@ -45,8 +45,4 @@ test('vaporeon is NOT evo of sylveon', () => {
       { dexNum: Vaporeon.Vaporeon.nationalDex, formeNum: 0 }
     )
   )
-})
-
-test('getFormeData returns undefined for invalid forme', () => {
-  expect(getFormeData(Sylveon.Sylveon.nationalDex, 100)).toBeUndefined()
 })

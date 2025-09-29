@@ -36,6 +36,7 @@ describe('G3SAV - Gen 3 Save File Read Test', () => {
       expect(firstPokemon.moves[0]).toBe(33) // Tackle
       expect(firstPokemon.moves[1]).toBe(45) // Growl
       expect(firstPokemon.dexNum).toBe(1)
+      expect(firstPokemon.exp).toBe(135)
       expect(SpeciesLookup(firstPokemon.dexNum)?.name).toBe('Bulbasaur')
     } else {
       fail('No Pokémon found in the first box, first slot.')

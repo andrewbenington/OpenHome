@@ -14,6 +14,7 @@ export default defineConfig(async () => ({
     alias: {
       src: fileURLToPath(new URL('./src', import.meta.url)),
       '@pokemon-files': fileURLToPath(new URL('./packages/pokemon-files/src', import.meta.url)),
+      '@pokemon-resources': fileURLToPath(new URL('./pkm_rs_resources', import.meta.url)),
     },
   },
   // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`

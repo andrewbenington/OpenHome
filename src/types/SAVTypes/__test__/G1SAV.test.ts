@@ -4,23 +4,29 @@ import { PK1 } from '@pokemon-files/pkm'
 import assert, { fail } from 'assert'
 import * as E from 'fp-ts/lib/Either'
 import path from 'path'
-import { expect, test } from 'vitest'
+import { beforeAll, expect, test } from 'vitest'
 import { bytesToPKM } from '../../FileImport'
 import { OHPKM } from '../../pkm/OHPKM'
 import { G1SAV } from '../G1SAV'
 import { buildUnknownSaveFile } from '../load'
 import { emptyPathData } from '../path'
+import { initializeWasm } from './init'
 
-const result = buildUnknownSaveFile(
-  emptyPathData,
-  new Uint8Array(fs.readFileSync(path.join(__dirname, 'SAVFiles', 'blue.sav'))),
-  {},
-  [G1SAV]
-)
+let blueSaveFile: G1SAV
 
-assert(E.isRight(result))
+beforeAll(initializeWasm)
+beforeAll(() => {
+  const result = buildUnknownSaveFile(
+    emptyPathData,
+    new Uint8Array(fs.readFileSync(path.join(__dirname, 'SAVFiles', 'blue.sav'))),
+    {},
+    [G1SAV]
+  )
 
-const blueSaveFile = result.right as G1SAV
+  assert(E.isRight(result))
+
+  blueSaveFile = result.right as G1SAV
+})
 
 const slowpokeOH = bytesToPKM(
   new Uint8Array(
@@ -30,6 +36,7 @@ const slowpokeOH = bytesToPKM(
 ) as OHPKM
 
 test('pc box decoded correctly', () => {
+  initializeWasm()
   expect(blueSaveFile.boxes[7].pokemon[0]?.nickname).toEqual('KABUTOPS')
   expect(blueSaveFile.boxes[7].pokemon[1]?.nickname).toEqual('AERODACTYL')
   expect(blueSaveFile.boxes[7].pokemon[9]?.nickname).toEqual('MEWTWO')

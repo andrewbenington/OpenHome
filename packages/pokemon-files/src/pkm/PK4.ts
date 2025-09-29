@@ -8,12 +8,13 @@ import {
   NatureToString,
 } from 'pokemon-resources'
 
+import { MetadataLookup, SpeciesLookup } from '@pokemon-resources/pkg'
 import * as byteLogic from '../util/byteLogic'
 import * as encryption from '../util/encryption'
 import { genderFromPID } from '../util/genderCalc'
 import { AllPKMFields } from '../util/pkmInterface'
 import { filterRibbons } from '../util/ribbonLogic'
-import { getLevelGen3Onward, getStats } from '../util/statCalc'
+import { getStats } from '../util/statCalc'
 import * as stringLogic from '../util/stringConversion'
 import * as types from '../util/types'
 import {
@@ -430,8 +431,9 @@ export class PK4 {
 
     return encryption.decryptByteArrayGen45(shuffledBytes)
   }
+
   public getLevel() {
-    return getLevelGen3Onward(this.dexNum, this.exp)
+    return this.speciesMetadata?.calculateLevel(this.exp) ?? 1
   }
 
   isShiny() {
@@ -451,6 +453,14 @@ export class PK4 {
       (this.personalityValue & 0xffff) ^
       ((this.personalityValue >> 16) & 0xffff)
     )
+  }
+
+  public get metadata() {
+    return MetadataLookup(this.dexNum, this.formeNum)
+  }
+
+  public get speciesMetadata() {
+    return SpeciesLookup(this.dexNum)
   }
 
   static maxValidMove() {

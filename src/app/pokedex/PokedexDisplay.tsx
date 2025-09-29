@@ -1,9 +1,15 @@
+import {
+  FormeMetadata,
+  MetadataLookup,
+  SpeciesLookup,
+  SpeciesMetadata,
+} from '@pokemon-resources/pkg'
 import { Button, Card, Flex, Heading, Separator, Spinner, Text, TextField } from '@radix-ui/themes'
 import { useEffect, useState } from 'react'
 import TypeIcon from 'src/components/TypeIcon'
 import { getPublicImageURL } from 'src/images/images'
 import AttributeRow from 'src/pokemon/AttributeRow'
-import { FormeMetadata, SpeciesMetadata } from '../../../pkm_rs_resources/pkg/pkm_rs_resources'
+import { Type } from 'src/types/types'
 import PokemonIcon from '../../components/PokemonIcon'
 import useMonSprite from '../../pokemon/useMonSprite'
 import { usePokedex } from '../../state/pokedex'
@@ -78,8 +84,8 @@ type PokedexDetailsProps = {
   pokedex: Pokedex
   species: SpeciesMetadata
   selectedForme: FormeMetadata
-  setSelectedForme: (forme: FormeMetadata) => void
-  setSelectedSpecies: (species: SpeciesMetadata) => void
+  setSelectedForme: (forme?: FormeMetadata) => void
+  setSelectedSpecies: (species?: SpeciesMetadata) => void
 }
 
 function PokedexDetails({
@@ -166,7 +172,7 @@ function PokedexDetails({
               <Spinner style={{ margin: 'auto', height: 32 }} />
             )}
           </div>
-          <div className="pokedex-caption">{selectedForme.formeIndex}</div>
+          <div className="pokedex-caption">{selectedForme.formeName}</div>
 
           <Flex justify="center" gap="2" width="100%" wrap="wrap">
             {species.formes.map((forme) => (
@@ -207,9 +213,8 @@ function PokedexDetails({
           >
             <AttributeRow label="Level-Up">{species.levelUpType}</AttributeRow>
             <AttributeRow label="Type">
-              {selectedForme.types?.map((type) => (
-                <TypeIcon type={type} key={`${type}_type_icon`} />
-              ))}
+              <TypeIcon type={selectedForme.type1 as Type} />
+              {selectedForme.type2 && <TypeIcon type={selectedForme.type2 as Type} />}
             </AttributeRow>
             <AttributeRow label="Ability 1">{selectedForme.abilities[0].name}</AttributeRow>
             {selectedForme.abilities[1] !== selectedForme.abilities[0] && (
@@ -238,11 +243,11 @@ function PokedexDetails({
               <EvolutionFamily
                 height="calc(100% - 16px)"
                 nationalDex={species.nationalDex}
-                formeNumber={selectedForme.formeNumber}
+                formeNumber={selectedForme.formeIndex}
                 pokedex={pokedex}
                 onClick={(nationalDex, formeIndex) => {
-                  setSelectedSpecies(PokemonData[nationalDex])
-                  setSelectedForme(PokemonData[nationalDex].formes[formeIndex])
+                  setSelectedSpecies(SpeciesLookup(nationalDex))
+                  setSelectedForme(MetadataLookup(nationalDex, formeIndex))
                 }}
               />
             </div>{' '}

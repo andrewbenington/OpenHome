@@ -1,5 +1,5 @@
+import { MetadataLookup } from '@pokemon-resources/pkg'
 import { Item, Type } from 'pokemon-resources'
-import { PokemonData } from 'pokemon-species-data'
 import { PKMInterface } from './interfaces'
 import { isMegaStone, isZCrystal } from './pkm/util'
 
@@ -61,19 +61,24 @@ export function filterApplies(filter: Filter, mon: PKMInterface) {
     }
   }
 
+  const formeMetadata = MetadataLookup(mon.dexNum, mon.formeNum)
+  if (!formeMetadata) {
+    return false
+  }
+
   if (
-    !(`${mon.dexNum}` in PokemonData) ||
-    PokemonData[`${mon.dexNum}`].formes.length < mon.formeNum
+    filter.type1 !== undefined &&
+    formeMetadata.type1 !== filter.type1 &&
+    formeMetadata.type2 !== filter.type1
   ) {
     return false
   }
 
-  const forme = PokemonData[`${mon.dexNum}`].formes[mon.formeNum]
-
-  if (filter.type1 !== undefined && !forme.types.includes(filter.type1)) {
-    return false
-  }
-  if (filter.type2 !== undefined && !forme.types.includes(filter.type2)) {
+  if (
+    filter.type2 !== undefined &&
+    formeMetadata.type1 !== filter.type2 &&
+    formeMetadata.type2 !== filter.type2
+  ) {
     return false
   }
   return true

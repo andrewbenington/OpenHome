@@ -3,10 +3,8 @@ use serde::Serialize;
 use wasm_bindgen::prelude::*;
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Debug, Default, Serialize, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Serialize, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Generation {
-    #[default]
-    None,
     G1,
     G2,
     G3,
@@ -16,6 +14,7 @@ pub enum Generation {
     G7,
     G8,
     G9,
+    None,
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]

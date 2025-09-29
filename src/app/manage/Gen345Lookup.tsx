@@ -32,7 +32,6 @@ export default function Gen345Lookup({ onSelectMon }: Gen345LookupProps) {
   function pokemonFromLookupID(id: string) {
     if (!homeMons) return undefined
     return homeMons[id]
-    // return PokemonData[parseInt(id.split('-')[0])]
   }
 
   const columns: SortableColumn<G345LookupRow>[] = [

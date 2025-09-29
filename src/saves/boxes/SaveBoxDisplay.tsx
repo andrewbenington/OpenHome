@@ -1,7 +1,6 @@
 import { Button, Card, Dialog, Flex, Grid } from '@radix-ui/themes'
 import lodash, { range } from 'lodash'
 import { GameOfOriginData } from 'pokemon-resources'
-import { PokemonData } from 'pokemon-species-data'
 import { useContext, useMemo, useState } from 'react'
 import { MdClose } from 'react-icons/md'
 import { BackendContext } from 'src/backend/backendContext'
@@ -72,7 +71,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
           title: 'Import Failed',
           messages: unsupportedMons.map(
             (mon) =>
-              `${PokemonData[mon.dexNum]?.formes[mon.formeNum]?.formeName} cannot be moved into ${saveName}`
+              `${MetadataLookup(mon.dexNum, mon.formeNum)?.formeName} cannot be moved into ${saveName}`
           ),
         },
       })

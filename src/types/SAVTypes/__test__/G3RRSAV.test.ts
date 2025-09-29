@@ -1,27 +1,11 @@
+import { SpeciesLookup } from '@pokemon-resources/pkg'
 import { fail } from 'assert'
 import { existsSync, readFileSync, writeFileSync } from 'fs'
 import { resolve } from 'path'
-import { PokemonData } from 'pokemon-species-data'
 import { beforeAll, describe, expect, test } from 'vitest'
 import { OHPKM } from '../../pkm/OHPKM'
 import { PathData } from '../path'
 import { G3RRSAV } from '../radicalred/G3RRSAV'
-
-// function display_mon(mon: PK3RR | OHPKM) {
-//   console.log('Boxmon:', {
-//     nickname: mon.nickname,
-//     // level: firstPokemon.level,
-//     trainerName: mon.trainerName,
-//     // trainerID: firstPokemon.trainerID,
-//     heldItemIndex: mon.heldItemIndex,
-//     languageIndex: mon.languageIndex,
-//     dexNum: mon.dexNum,
-//     formeNum: mon.formeNum,
-//     moves: mon.moves,
-//     gameOfOrigin: mon.gameOfOrigin,
-//     species: PokemonData[mon.dexNum].name,
-//   })
-// }
 
 describe('G3RRSAV - Radical Red Save File Read Test', () => {
   let radicalRedSave: G3RRSAV
@@ -59,7 +43,7 @@ describe('G3RRSAV - Radical Red Save File Read Test', () => {
       expect(firstPokemon.moves[0]).toBe(33) // Tackle
       expect(firstPokemon.moves[1]).toBe(336) // Howl
       expect(firstPokemon.dexNum).toBe(261)
-      expect(PokemonData[firstPokemon.dexNum].name).toBe('Poochyena')
+      expect(SpeciesLookup(firstPokemon.dexNum)?.name).toBe('Poochyena')
     } else {
       fail('No Pokémon found in the first box, first slot.')
     }

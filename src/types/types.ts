@@ -1,5 +1,4 @@
 import { Either, left, right } from 'fp-ts/Either'
-import { PokemonData } from 'pokemon-species-data'
 import { CSSProperties } from 'react'
 import { PathData } from './SAVTypes/path'
 
@@ -54,14 +53,6 @@ export interface SaveRef extends Partial<JSONObject> {
 export type SaveRefMap = { [key: string]: SaveRef }
 
 export type RegionalForme = 'Alola' | 'Galar' | 'Hisui' | 'Paldea'
-
-export type Forme = (typeof PokemonData)[number]['formes'][number]
-export type Pokemon = {
-  name: string
-  nationalDex: number
-  formes: Forme[]
-  levelUpType: levelUpType
-}
 
 export type Origin = {
   name: string

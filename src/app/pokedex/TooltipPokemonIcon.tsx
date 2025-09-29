@@ -1,5 +1,5 @@
+import { MetadataLookup } from '@pokemon-resources/pkg'
 import { Tooltip } from '@radix-ui/themes'
-import { PokemonData } from 'pokemon-species-data'
 import PokemonIcon, { PokemonIconProps } from 'src/components/PokemonIcon'
 
 const ICON_SIZE = 32
@@ -12,7 +12,7 @@ export default function TooltipPokemonIcon(props: TooltipPokemonIconProps) {
   const { onClick, ...pkmIconProps } = props
 
   return (
-    <Tooltip content={PokemonData[props.dexNumber].formes[props.formeNumber ?? 0].formeName}>
+    <Tooltip content={MetadataLookup(props.dexNumber, props.formeNumber ?? 0)?.formeName}>
       <PokemonIcon
         {...pkmIconProps}
         onClick={() => onClick?.(props.dexNumber, props.formeNumber ?? 0)}

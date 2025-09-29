@@ -1,7 +1,8 @@
 import { PK8 } from '@pokemon-files/pkm'
 import { utf16BytesToString } from '@pokemon-files/util'
+import { SpeciesLookup } from '@pokemon-resources/pkg'
 import { GameOfOrigin, GameOfOriginData, Languages } from 'pokemon-resources'
-import { NationalDex, PokemonData } from 'pokemon-species-data'
+import { NationalDex } from 'pokemon-species-data'
 import {
   SWSH_TRANSFER_RESTRICTIONS_BASE,
   SWSH_TRANSFER_RESTRICTIONS_CT,
@@ -209,10 +210,10 @@ class TrainerBlock {
   public getStarter(): string {
     const index = this.dataView.getUint8(0x25)
 
-    if (index === 0xff) {
-      return 'Not Selected'
+    if (index <= 2) {
+      return SpeciesLookup(index * 3 + NationalDex.Grookey)?.name!
     }
 
-    return PokemonData[index * 3 + NationalDex.Grookey].name
+    return 'Not Selected'
   }
 }

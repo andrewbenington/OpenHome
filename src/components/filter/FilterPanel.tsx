@@ -1,3 +1,4 @@
+import { SpeciesLookup } from '@pokemon-resources/pkg'
 import { Button, Card, Flex, Text } from '@radix-ui/themes'
 import {
   Ability,
@@ -12,13 +13,13 @@ import {
   Origin,
   Types,
 } from 'pokemon-resources'
-import { PokemonData } from 'pokemon-species-data'
 import { useContext, useMemo } from 'react'
 import { OpenHomeRibbons } from 'src/consts/Ribbons'
 import { getOriginMark } from 'src/images/game'
 import { getPublicImageURL } from 'src/images/images'
 import { BallsImageList, getItemIconPath } from 'src/images/items'
 import { getRibbonSpritePath } from 'src/images/ribbons'
+import { ALL_SPECIES_DATA } from 'src/metadata'
 import { FilterContext } from 'src/state/filter'
 import { HeldItemCategory } from 'src/types/Filter'
 import Autocomplete from '../Autocomplete'
@@ -95,7 +96,7 @@ export default function FilterPanel() {
   const [filterState, dispatchFilterState] = useContext(FilterContext)
 
   const currentMon = useMemo(
-    () => (filterState.dexNumber ? PokemonData[filterState.dexNumber] : undefined),
+    () => (filterState.dexNumber ? SpeciesLookup(filterState.dexNumber) : undefined),
     [filterState.dexNumber]
   )
 
@@ -128,10 +129,10 @@ export default function FilterPanel() {
       </Flex>
       <Flex direction="column" m="1" gap="0">
         <Autocomplete
-          options={Object.values(PokemonData)}
+          options={Object.values(ALL_SPECIES_DATA)}
           getOptionString={(opt) => opt.name}
           getOptionUniqueID={(opt) => opt.nationalDex.toString()}
-          value={filterState.dexNumber ? PokemonData[filterState.dexNumber] : undefined}
+          value={filterState.dexNumber ? SpeciesLookup(filterState.dexNumber) : undefined}
           label="Species"
           onChange={(option) =>
             dispatchFilterState({
@@ -147,7 +148,7 @@ export default function FilterPanel() {
           <Autocomplete
             options={[...currentMon.formes]}
             getOptionString={(opt) => opt.formeName}
-            getOptionUniqueID={(opt) => opt.formeNumber.toString()}
+            getOptionUniqueID={(opt) => opt.formeIndex.toString()}
             value={
               filterState.formeNumber !== undefined
                 ? currentMon.formes[filterState.formeNumber]
@@ -157,7 +158,7 @@ export default function FilterPanel() {
             onChange={(option) =>
               dispatchFilterState({
                 type: 'set_filter',
-                payload: { formeNumber: option?.formeNumber },
+                payload: { formeNumber: option?.formeIndex },
               })
             }
             getIconComponent={(currentForme) =>
@@ -165,7 +166,7 @@ export default function FilterPanel() {
               currentForme && (
                 <PokemonIcon
                   dexNumber={filterState.dexNumber}
-                  formeNumber={currentForme.formeNumber}
+                  formeNumber={currentForme.formeIndex}
                   style={{ width: 24, height: 24 }}
                 />
               )
