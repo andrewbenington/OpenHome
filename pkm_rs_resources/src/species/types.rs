@@ -281,7 +281,7 @@ pub struct FormeMetadata {
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub egg_groups: (EggGroup, Option<EggGroup>),
 
-    #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = introduced))]
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub introduced: Generation,
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = isRestrictedLegend))]
@@ -396,6 +396,11 @@ impl FormeMetadata {
     #[wasm_bindgen(getter = formeName)]
     pub fn forme_name(&self) -> String {
         self.forme_name.to_owned()
+    }
+
+    #[wasm_bindgen(getter = introducedGen)]
+    pub fn introduced_gen(&self) -> usize {
+        self.introduced as usize + 1
     }
 
     #[wasm_bindgen(getter)]

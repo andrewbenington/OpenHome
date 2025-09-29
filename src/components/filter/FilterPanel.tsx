@@ -1,4 +1,4 @@
-import { SpeciesLookup } from '@pokemon-resources/pkg'
+import { all_species_data, SpeciesLookup } from '@pokemon-resources/pkg'
 import { Button, Card, Flex, Text } from '@radix-ui/themes'
 import {
   Ability,
@@ -19,13 +19,16 @@ import { getOriginMark } from 'src/images/game'
 import { getPublicImageURL } from 'src/images/images'
 import { BallsImageList, getItemIconPath } from 'src/images/items'
 import { getRibbonSpritePath } from 'src/images/ribbons'
-import { ALL_SPECIES_DATA } from 'src/metadata'
 import { FilterContext } from 'src/state/filter'
 import { HeldItemCategory } from 'src/types/Filter'
 import Autocomplete from '../Autocomplete'
 import PokemonIcon from '../PokemonIcon'
 import TypeIcon from '../TypeIcon'
 import './style.css'
+
+import init from '../../../pkm_rs_resources/pkg'
+
+init()
 
 type SelectOption = {
   label: string
@@ -95,6 +98,8 @@ const itemOptions: ItemOption[] = [
 export default function FilterPanel() {
   const [filterState, dispatchFilterState] = useContext(FilterContext)
 
+  const ALL_SPECIES_DATA = useMemo(all_species_data, [])
+
   const currentMon = useMemo(
     () => (filterState.dexNumber ? SpeciesLookup(filterState.dexNumber) : undefined),
     [filterState.dexNumber]
@@ -104,10 +109,7 @@ export default function FilterPanel() {
     () =>
       Object.keys(Ability)
         .filter((ability) => isNaN(Number(ability)))
-        .map((ability, id) => ({
-          label: ability,
-          id,
-        })),
+        .map((ability, id) => ({ label: ability, id })),
     []
   )
 

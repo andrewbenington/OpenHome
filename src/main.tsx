@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom/client'
 import init from '../pkm_rs_resources/pkg'
 import App from './app/App'
 
-init()
+await init()
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
