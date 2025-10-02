@@ -4,6 +4,7 @@ import { HomeData } from 'src/types/SAVTypes/HomeData'
 import { SAV } from 'src/types/SAVTypes/SAV'
 import { StoredBankData } from 'src/types/storage'
 import { getMonFileIdentifier } from 'src/util/Lookup'
+import { Bag } from '../saves/Bag'
 import { PKMInterface } from '../types/interfaces'
 import { getSortFunctionNullable, SortType } from '../types/pkm/sort'
 import { PersistedPkmData } from './persistedPkmData'
@@ -135,6 +136,10 @@ export type OpenSavesAction =
   | {
       type: 'move_mon'
       payload: { source: MonWithLocation; dest: MonLocation }
+    }
+  | {
+      type: 'give_item_to_mon'
+      payload: { itemName: string; dest: MonLocation }
     }
   /*
    *  OTHER
@@ -401,6 +406,56 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
 
       return { ...state }
     }
+
+    case 'give_item_to_mon': {
+      const { itemName, dest } = payload
+
+      let targetMon: PKMInterface | undefined
+
+      if (dest.is_home) {
+        targetMon = state.homeData?.boxes[dest.box].pokemon[dest.box_slot]
+      } else {
+        // targetMon = dest.save.boxes[dest.box].pokemon[dest.box_slot]
+        targetMon = undefined
+      }
+
+      if (!targetMon) {
+        return state
+      }
+
+      if (targetMon.heldItemName === itemName) {
+        return state
+      }
+
+      let updatedMon: OHPKM
+
+      if (targetMon instanceof OHPKM) {
+        updatedMon = targetMon
+      } else {
+        updatedMon = new OHPKM(targetMon)
+      }
+
+      updatedMon.heldItemName = itemName
+
+      if (dest.is_home) {
+        state.homeData?.setPokemon(dest, updatedMon)
+      } else {
+        dest.save.boxes[dest.box].pokemon[dest.box_slot] = updatedMon
+        dest.save.updatedBoxSlots.push({ box: dest.box, index: dest.box_slot })
+        state.openSaves = { ...state.openSaves }
+      }
+
+      const identifier = getMonFileIdentifier(updatedMon)
+
+      if (identifier) {
+        state.modifiedOHPKMs[identifier] = updatedMon
+      }
+
+      Bag.popItem(itemName)
+
+      return { ...state }
+    }
+
     case 'import_mons': {
       const addedMons: OHPKM[] = []
       const { dest } = action.payload

@@ -1,5 +1,5 @@
 import { bytesToPKMInterface } from '@pokemon-files/pkm'
-import { Button, Flex } from '@radix-ui/themes'
+import { Button, Flex, Tabs } from '@radix-ui/themes'
 import * as E from 'fp-ts/lib/Either'
 import lodash, { flatten } from 'lodash'
 import { GameOfOrigin, isGameBoy, isGen3, isGen4, isGen5 } from 'pokemon-resources'
@@ -276,15 +276,29 @@ const Home = () => {
           <HomeBoxDisplay />
         </Flex>
       </div>
-      <Flex gap="2" className="right-column">
-        <BagBox />
-        <FilterPanel />
+      <Flex gap="2" className="right-column" style={{ flexDirection: 'column' }}>
+        <Tabs.Root defaultValue="filter">
+          <Tabs.List>
+            <Tabs.Trigger value="filter">Filter</Tabs.Trigger>
+            <Tabs.Trigger value="bag">Bag</Tabs.Trigger>
+          </Tabs.List>
+
+          <Tabs.Content value="filter" style={{ flexGrow: 1 }}>
+            <FilterPanel />
+          </Tabs.Content>
+
+          <Tabs.Content value="bag" style={{ flexGrow: 1 }}>
+            <BagBox />
+          </Tabs.Content>
+        </Tabs.Root>
+
         <div
           className="drop-area"
           onDrop={(e) => e.dataTransfer.files.length && previewFile(e.dataTransfer.files[0])}
         >
           <div className="drop-area-text diagonal-clip">Preview</div>
         </div>
+
         <ReleaseArea />
       </Flex>
       <PokemonDetailsModal mon={selectedMon} onClose={() => setSelectedMon(undefined)} />

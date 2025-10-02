@@ -22,14 +22,18 @@ export default function PokemonDragContextProvider(props: { children?: ReactNode
         const { operation } = e
         const { target } = operation
 
-        console.log('[DragEnd] target =', target, 'payload =', dragMonState.payload)
-
         const dest = target?.data as MonLocation
         const payload = dragMonState.payload
 
         if (!payload) return
 
         if (payload.kind === 'item') {
+          if (dest && target) {
+            openSavesDispatch({
+              type: 'give_item_to_mon',
+              payload: { itemName: payload.itemName, dest: target.data as MonLocation },
+            })
+          }
         } else if (payload.kind === 'mon') {
           const { mon } = payload.monData
 
@@ -48,13 +52,8 @@ export default function PokemonDragContextProvider(props: { children?: ReactNode
 
             if (source.save !== dest.save) {
               persistedPkmDataDispatch({ type: 'persist_data', payload: new OHPKM(mon) })
-              openSavesDispatch({
-                type: 'move_mon',
-                payload: { source, dest },
-              })
-            } else {
-              openSavesDispatch({ type: 'move_mon', payload: { source, dest } })
             }
+            openSavesDispatch({ type: 'move_mon', payload: { source, dest } })
           }
         }
 
@@ -70,7 +69,6 @@ export default function PokemonDragContextProvider(props: { children?: ReactNode
 
         if (data.kind === 'item') {
           console.log('[DragStart] dragging item:', data.itemName)
-          Bag.popItem(data.itemName)
           dispatchDragMonState({ type: 'start_drag', payload: data })
         } else if (data.kind === 'mon') {
           console.log('[DragStart] dragging mon:', data.monData)

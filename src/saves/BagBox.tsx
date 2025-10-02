@@ -8,14 +8,14 @@ import { Bag } from './Bag'
 import DroppableSpace from './boxes/DroppableSpace'
 
 function DraggableItem({ item }: { item: { name: string; count: number } }) {
-  const { draggable } = useDraggable({
+  const { ref, isDragging } = useDraggable({
     id: `item-${item.name}`,
     data: { kind: 'item', itemName: item.name },
   })
 
   return (
     <div
-      {...draggable} // this attaches ref & drag events in v6+
+      ref={ref}
       style={{
         position: 'relative',
         width: 24,
@@ -26,7 +26,11 @@ function DraggableItem({ item }: { item: { name: string; count: number } }) {
       <img
         src={`/items/index/${ItemFromString(item.name)?.toString().padStart(4, '0')}.png`}
         alt={item.name}
-        style={{ width: '100%', height: '100%' }}
+        style={{
+          width: '100%',
+          height: '100%',
+          visibility: isDragging ? 'hidden' : undefined,
+        }}
         draggable={false}
       />
       <Text
