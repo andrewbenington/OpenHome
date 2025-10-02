@@ -1,9 +1,11 @@
-import { NationalDex, PokemonData } from 'pokemon-species-data'
+import { MetadataLookup, SpeciesLookup } from '@pokemon-resources/pkg'
+import { NationalDex } from 'pokemon-species-data'
 import { ImageResponse } from '../backend/backendInterface'
 import { OpenHomePlugin } from '../state/plugin'
 
 type PluginBuilder = (
-  pdata: typeof PokemonData,
+  metadataLookup: typeof MetadataLookup,
+  speciesLookup: typeof SpeciesLookup,
   ndex: typeof NationalDex
 ) => { plugin: OpenHomePlugin }
 
@@ -20,13 +22,14 @@ export function loadPlugin(pluginCode: string): OpenHomePlugin {
   })
 
   const buildPlugin = new Function(
-    'PokemonData',
+    'MetadataLookup',
+    'SpeciesLookup',
     'NationalDex',
     ...shadowedGlobals,
     pluginCode + '; return buildPlugin;'
   ) as PluginBuilder
 
-  const { plugin } = buildPlugin(PokemonData, NationalDex)
+  const { plugin } = buildPlugin(MetadataLookup, SpeciesLookup, NationalDex)
 
   return plugin
 }
@@ -35,11 +38,14 @@ export interface PluginMetadata {
   id: string
   name: string
   version: string
+  api_version: number
 }
 
 export interface PluginMetadataWithIcon {
   id: string
   name: string
+  version: string
+  api_version: number
   icon: string
   assets: Record<string, string>
   icon_image: ImageResponse | null

@@ -8,6 +8,7 @@ import { AppInfoContext } from 'src/state/appInfo'
 import { PluginContext } from 'src/state/plugin'
 import { loadPlugin, PluginMetadata, PluginMetadataWithIcon } from 'src/util/Plugin'
 import { ErrorIcon } from '../../components/Icons'
+import { CURRENT_PLUGIN_API_VERSION } from './Plugins'
 import './style.css'
 
 const GITHUB_REPO =
@@ -31,11 +32,12 @@ export default function BrowsePlugins() {
 
   useEffect(() => {
     setLoading(true)
-    fetch(`${useDevRepo ? LOCAL_REPO : GITHUB_REPO}/plugins.json`)
+    fetch(`${useDevRepo ? LOCAL_REPO : GITHUB_REPO}/plugins-v2.json`)
       .then(async (resp) => {
         setLoading(false)
         try {
-          const available: Record<string, string> = await resp.json()
+          const response: { v2: Record<string, string> } = await resp.json()
+          const available = response.v2
 
           setAvailablePlugins(available)
         } catch (e) {
@@ -93,7 +95,7 @@ export default function BrowsePlugins() {
               location={location}
               useDevRepo={useDevRepo}
               reloadInstalled={loadInstalled}
-              installed={installedPlugins?.some((plugin) => plugin.name === name) ?? false}
+              installedInstance={installedPlugins?.find((plugin) => plugin.name === name)}
             />
           ))}
       </div>
@@ -106,11 +108,11 @@ type AvailablePluginCardProps = {
   location: string
   useDevRepo?: boolean
   reloadInstalled: () => void
-  installed: boolean
+  installedInstance?: PluginMetadataWithIcon
 }
 
 function AvailablePluginCard(props: AvailablePluginCardProps) {
-  const { name, location, useDevRepo, reloadInstalled, installed } = props
+  const { name, location, useDevRepo, reloadInstalled, installedInstance } = props
   const [metadata, setMetadata] = useState<PluginMetadata>()
   const [error, setError] = useState<string>()
   const displayError = useDisplayError()
@@ -196,10 +198,19 @@ function AvailablePluginCard(props: AvailablePluginCardProps) {
       ) : (
         <Spinner style={{ margin: 'auto', height: 32 }} />
       )}
-      {installed && progressPercent === undefined && (
-        <Badge className="status-chip" color="green" variant="solid">
-          Installed
+      {progressPercent === undefined &&
+      installedInstance &&
+      installedInstance.api_version < CURRENT_PLUGIN_API_VERSION ? (
+        <Badge className="status-chip" color="tomato" variant="solid">
+          Update...
         </Badge>
+      ) : (
+        installedInstance &&
+        progressPercent === undefined && (
+          <Badge className="status-chip" color="green" variant="solid">
+            Installed
+          </Badge>
+        )
       )}
       {progressPercent !== undefined && (
         <Progress className="plugin-progress" value={progressPercent} />
@@ -207,6 +218,17 @@ function AvailablePluginCard(props: AvailablePluginCardProps) {
       <div className="name-chip" style={{ width: '100%' }}>
         {name}
       </div>
+      {installedInstance && (
+        <Badge
+          title={location}
+          className="version-badge"
+          variant="solid"
+          color="gray"
+          radius="large"
+        >
+          v{installedInstance?.api_version}
+        </Badge>
+      )}
     </button>
   )
 }
