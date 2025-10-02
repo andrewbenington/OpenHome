@@ -1,56 +1,55 @@
-import * as fs from "fs";
+import * as fs from 'fs'
 
 const overrides: Record<number, string> = {
-    266: "AS_ONE_ICE_RIDER",
-    267: "AS_ONE_SHADOW_RIDER",
-    301: "EMBODY_ASPECT_SPEED",
-    302: "EMBODY_ASPECT_SP_DEF",
-    303: "EMBODY_ASPECT_ATK",
-    304: "EMBODY_ASPECT_DEF",
+  266: 'AS_ONE_ICE_RIDER',
+  267: 'AS_ONE_SHADOW_RIDER',
+  301: 'EMBODY_ASPECT_SPEED',
+  302: 'EMBODY_ASPECT_SP_DEF',
+  303: 'EMBODY_ASPECT_ATK',
+  304: 'EMBODY_ASPECT_DEF',
 }
 
 function convertToEnumMember(input: string): string {
-    if (input === "—") {
-        return "None"
-    }
-    // Remove spaces and split the string into words
-    const words = input.trim().split(/[\s-]+/)
+  if (input === '—') {
+    return 'None'
+  }
+  // Remove spaces and split the string into words
+  const words = input.trim().split(/[\s-]+/)
 
-    // Capitalize the first letter of each word and join them
-    const pascalCaseString = words
-        .map((word) => (word.length === 0 ? '' : word[0].toUpperCase() + word.slice(1)))
-        .join('')
-        .replace(/[^A-Za-z0-9]/g, "")
+  // Capitalize the first letter of each word and join them
+  const pascalCaseString = words
+    .map((word) => (word.length === 0 ? '' : word[0].toUpperCase() + word.slice(1)))
+    .join('')
+    .replace(/[^A-Za-z0-9]/g, '')
 
-    return pascalCaseString
+  return pascalCaseString
 }
 
-
 export function rustAbilityConstName(index: number, ability: string): string {
-    if (index in overrides) {
-        return overrides[index]
-    }
+  if (index in overrides) {
+    return overrides[index]
+  }
 
-    let constName = ability
-        .toUpperCase()
-        .replace(/[^A-Z0-9\s]/g, "")
-        .replace(/[^A-Z0-9]/g, "_")
-        .replace(/_+/g, "_");
+  let constName = ability
+    .toUpperCase()
+    .replace(/[^A-Z0-9\s]/g, '')
+    .replace(/[^A-Z0-9]/g, '_')
+    .replace(/_+/g, '_')
 
-    return constName
+  return constName
 }
 
 function convertAbility(index: number, ability: string): string {
-    return `AbilityMetadata {
+  return `AbilityMetadata {
     id: ${index},
     name: "${ability}",
-}`;
+}`
 }
 
 function main() {
-    const names: string[] = fs.readFileSync("text_source/abilities.txt", "utf-8").split("\n").slice(1);
+  const names: string[] = fs.readFileSync('text_source/abilities.txt', 'utf-8').split('\n').slice(1)
 
-    let output = `use std::fmt::Debug;
+  let output = `use std::fmt::Debug;
 use std::{fmt::Display, num::NonZeroU16};
 use wasm_bindgen::prelude::*;
 
@@ -188,14 +187,14 @@ pub const ABILITY_MAX: usize = ${names.length};
     
 `
 
-    output += `pub static ALL_ABILITIES: [&AbilityMetadata; ABILITY_MAX] = [\n` + names
-        .map((name, index) => "&" + convertAbility(index + 1, name))
-        .join(",\n") + "];";
+  output +=
+    `pub static ALL_ABILITIES: [&AbilityMetadata; ABILITY_MAX] = [\n` +
+    names.map((name, index) => '&' + convertAbility(index + 1, name)).join(',\n') +
+    '];'
 
-    const filename = "pkm_rs/src/resources/abilities.rs"
-    fs.writeFileSync(filename, output);
-    console.log(`Rust code written to ${filename}`);
+  const filename = 'pkm_rs/src/resources/abilities.rs'
+  fs.writeFileSync(filename, output)
+  console.log(`Rust code written to ${filename}`)
 }
 
-main();
-
+main()

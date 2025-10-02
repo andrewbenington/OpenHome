@@ -1,29 +1,31 @@
-import * as fs from "fs";
+import * as fs from 'fs'
 
 function removeDiacritics(str: string) {
-    return str.normalize('NFD').replace(/[\u0300-\u036f,\(,\))]/g, '')
+  return str.normalize('NFD').replace(/[\u0300-\u036f,\(,\))]/g, '')
 }
 
 function convertToPascalCase(input: string): string {
-    // Remove spaces and split the string into words
-    const words = input.trim().split(/[\s-]+/)
+  // Remove spaces and split the string into words
+  const words = input.trim().split(/[\s-]+/)
 
-    // Capitalize the first letter of each word and join them
-    const pascalCaseString = words
-        .map((word) => (word.length === 0 ? '' : word[0].toUpperCase() + word.slice(1)))
-        .join('')
+  // Capitalize the first letter of each word and join them
+  const pascalCaseString = words
+    .map((word) => (word.length === 0 ? '' : word[0].toUpperCase() + word.slice(1)))
+    .join('')
 
-    return pascalCaseString
+  return pascalCaseString
 }
 
 function main() {
-    generateModern()
+  generateModern()
 }
 
 function generateModern() {
-    const modernRibbons: string[] = fs.readFileSync("text_source/ribbons_modern.txt", "utf-8").split("\n");
-    const enumValues = modernRibbons.map(removeDiacritics).map(convertToPascalCase)
-    let output = `use std::fmt::Display;
+  const modernRibbons: string[] = fs
+    .readFileSync('text_source/ribbons_modern.txt', 'utf-8')
+    .split('\n')
+  const enumValues = modernRibbons.map(removeDiacritics).map(convertToPascalCase)
+  let output = `use std::fmt::Display;
 use crate::substructures::FlagSet;
 use serde::{Serialize, Serializer};
 
@@ -94,19 +96,19 @@ impl<const N: usize> Serialize for ModernRibbonSet<N> {
 
 #[derive(Debug, Serialize, PartialEq, Eq, Clone, Copy)]
 pub enum ModernRibbon {
-  ${enumValues.join(",\n")}
+  ${enumValues.join(',\n')}
 }
 
 impl ModernRibbon {
     pub const fn get_name(&self) -> &'static str {
         match self {
-            ${enumValues.map((val, i) => `ModernRibbon::${val} => "${modernRibbons[i].endsWith("Mark") ? modernRibbons[i] : modernRibbons[i] + " Ribbon"}"`).join(",\n")},
+            ${enumValues.map((val, i) => `ModernRibbon::${val} => "${modernRibbons[i].endsWith('Mark') ? modernRibbons[i] : modernRibbons[i] + ' Ribbon'}"`).join(',\n')},
         }
     }
 
     pub const fn get_index(&self) -> usize {
         match self {
-            ${enumValues.map((val, i) => `ModernRibbon::${val} => ${i}`).join(",\n")},
+            ${enumValues.map((val, i) => `ModernRibbon::${val} => ${i}`).join(',\n')},
         }
     }
     
@@ -134,15 +136,15 @@ impl Display for ModernRibbon {
 impl From<usize> for ModernRibbon {
     fn from(value: usize) -> Self {
         match value {
-            ${enumValues.map((val, i) => `${i} => ModernRibbon::${val}`).join(",\n")},
+            ${enumValues.map((val, i) => `${i} => ModernRibbon::${val}`).join(',\n')},
             _ => panic!("Invalid value for ModernRibbon: {}", value),
         }
     }
 }
 `
-    fs.mkdirSync("src/resources/ribbons", { recursive: true })
-    fs.writeFileSync("src/resources/ribbons/modern.rs", output);
-    console.log("Rust code written to src/resources/ribbons/modern.rs");
+  fs.mkdirSync('src/resources/ribbons', { recursive: true })
+  fs.writeFileSync('src/resources/ribbons/modern.rs', output)
+  console.log('Rust code written to src/resources/ribbons/modern.rs')
 }
 
-main();
+main()

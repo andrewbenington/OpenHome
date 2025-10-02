@@ -2,7 +2,7 @@ import { PK8 } from '@pokemon-files/pkm'
 import { utf16BytesToString } from '@pokemon-files/util'
 import { SpeciesLookup } from '@pokemon-resources/pkg'
 import { GameOfOrigin, GameOfOriginData, Languages } from 'pokemon-resources'
-import { NationalDex } from 'pokemon-species-data'
+import { NationalDex } from 'src/consts/NationalDex'
 import {
   SWSH_TRANSFER_RESTRICTIONS_BASE,
   SWSH_TRANSFER_RESTRICTIONS_CT,

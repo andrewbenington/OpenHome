@@ -1,5 +1,6 @@
 use serde::{Serialize, Serializer};
 
+use strum_macros::{Display, EnumString};
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -12,7 +13,7 @@ const MASK_BITS_2_3: u8 = 0b00001100;
 const MASK_BITS_2_3_INVERTED: u8 = 0b11110011;
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Debug, Default, Serialize, Clone, Copy, Eq, PartialEq)]
+#[derive(Debug, EnumString, Display, Default, Serialize, Clone, Copy, Eq, PartialEq)]
 pub enum Gender {
     #[default]
     Male,
@@ -64,16 +65,24 @@ impl Gender {
     }
 }
 
-#[cfg(feature = "wasm")]
-#[wasm_bindgen]
+#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = genderToBool))]
 pub fn gender_to_bool(value: Gender) -> bool {
     value == Gender::Female
 }
 
-#[cfg(feature = "wasm")]
-#[wasm_bindgen]
+#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = genderFromBool))]
 pub fn gender_from_bool(value: bool) -> Gender {
     Gender::from(value)
+}
+
+#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = genderToInt))]
+pub fn gender_to_int(value: Gender) -> u8 {
+    value.to_numeric()
+}
+
+#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = genderFromInt))]
+pub fn gender_from_int(value: u8) -> Gender {
+    Gender::from_bits_1_2(value)
 }
 
 impl From<bool> for Gender {

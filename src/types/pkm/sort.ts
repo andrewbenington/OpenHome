@@ -44,7 +44,9 @@ function sortByFormeNum(a: PKMInterface, b: PKMInterface) {
 }
 
 function sortByBaseMon(a: PKMInterface, b: PKMInterface) {
-  return getBaseMon(a.dexNum, a.formeNum).dexNumber - getBaseMon(b.dexNum, b.formeNum).dexNumber
+  const nationalDexA = getBaseMon(a.dexNum, a.formeNum)?.nationalDex ?? 0
+  const nationalDexB = getBaseMon(b.dexNum, b.formeNum)?.nationalDex ?? 0
+  return nationalDexA - nationalDexB
 }
 
 function sortByMetDate(a: PKMInterface, b: PKMInterface) {

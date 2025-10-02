@@ -1,7 +1,7 @@
 import { PK1 } from '@pokemon-files/pkm'
 import lodash from 'lodash'
 import { GameOfOrigin, GameOfOriginData, Languages } from 'pokemon-resources'
-import { NationalDex } from 'pokemon-species-data'
+import { NationalDex } from 'src/consts/NationalDex'
 import { GEN1_TRANSFER_RESTRICTIONS } from 'src/consts/TransferRestrictions'
 import { bytesToUint16BigEndian, get8BitChecksum } from 'src/util/byteLogic'
 import { natDexToGen1ID } from 'src/util/ConvertPokemonID'

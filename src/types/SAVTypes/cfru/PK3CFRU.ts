@@ -1,7 +1,6 @@
 import { Ball, GameOfOrigin, ItemFromString, Languages, NatureToString } from 'pokemon-resources'
 
 import {
-  genderFromPID,
   generatePersonalityValuePreservingAttributes,
   getFlag,
   getMoveMaxPP,
@@ -431,7 +430,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
   }
 
   public get gender() {
-    return genderFromPID(this.personalityValue, this.dexNum)
+    return this.metadata?.genderFromPid(this.personalityValue)
   }
 
   public get language() {

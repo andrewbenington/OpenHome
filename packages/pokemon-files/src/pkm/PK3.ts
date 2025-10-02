@@ -8,13 +8,12 @@ import {
   Languages,
   NatureToString,
 } from 'pokemon-resources'
-import { NationalDex } from 'pokemon-species-data'
+import { NationalDex } from 'src/consts/NationalDex'
 
 import { MetadataLookup, SpeciesLookup } from '@pokemon-resources/pkg'
 import * as conversion from '../conversion'
 import * as byteLogic from '../util/byteLogic'
 import * as encryption from '../util/encryption'
-import { genderFromPID } from '../util/genderCalc'
 import { AllPKMFields } from '../util/pkmInterface'
 import {
   filterRibbons,
@@ -280,7 +279,7 @@ export class PK3 {
   }
 
   public get gender() {
-    return genderFromPID(this.personalityValue, this.dexNum)
+    return this.metadata?.genderFromPid(this.personalityValue)
   }
 
   public get language() {

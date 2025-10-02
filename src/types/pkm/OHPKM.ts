@@ -7,15 +7,13 @@ import {
   PKMDate,
   Stats,
   StatsPreSplit,
-  genderFromDVs,
-  genderFromPID,
   generatePersonalityValuePreservingAttributes,
   markingsHaveColor,
   markingsSixShapesWithColorFromBytes,
   markingsSixShapesWithColorFromOther,
   markingsSixShapesWithColorToBytes,
 } from '@pokemon-files/util'
-import { GenderRatio, MetadataLookup, SpeciesLookup } from '@pokemon-resources/pkg'
+import { Gender, GenderRatio, MetadataLookup, SpeciesLookup } from '@pokemon-resources/pkg'
 import * as lodash from 'lodash'
 import {
   AbilityFromString,
@@ -31,8 +29,8 @@ import {
   NatureToString,
   getMetLocation,
 } from 'pokemon-resources'
-import { NationalDex } from 'pokemon-species-data'
 import Prando from 'prando'
+import { NationalDex } from 'src/consts/NationalDex'
 import { OpenHomeRibbons } from 'src/consts/Ribbons'
 import { ShadowIDsColosseum, ShadowIDsXD } from 'src/consts/ShadowIDs'
 import {
@@ -155,11 +153,13 @@ export class OHPKM implements PKMInterface {
         this.gender =
           other.gender ??
           (other.dvs
-            ? genderFromDVs(other.dvs, this.dexNum)
-            : genderFromPID(this.personalityValue, this.dexNum))
+            ? this.metadata?.genderFromAtkDv(this.dvs.atk)
+            : this.metadata?.genderFromPid(this.personalityValue)) ??
+          Gender.Genderless
       } else {
         this.abilityNum = other.abilityNum ?? 0
-        this.gender = other.gender ?? genderFromPID(this.personalityValue, this.dexNum)
+        this.gender =
+          other.gender ?? this.metadata?.genderFromPid(this.personalityValue) ?? Gender.Genderless
       }
 
       this.nature = other.nature !== undefined ? other.nature : this.personalityValue % 25
@@ -1589,16 +1589,16 @@ export class OHPKM implements PKMInterface {
       this.abilityIndex = AbilityFromString(this.ability)
     }
 
+    const metadata = this.metadata
     const genderRatio = this.metadata?.genderRatio
-    if (genderRatio !== undefined) {
-      if (this.gender === 2 && genderRatio !== GenderRatio.Genderless) {
-        this.gender = genderFromPID(this.personalityValue, this.dexNum)
-        errorsFound = true
-      } else if (this.gender === 0 && genderRatio === GenderRatio.AllFemale) {
-        this.gender = genderFromPID(this.personalityValue, this.dexNum)
-        errorsFound = true
-      } else if (this.gender === 1 && genderRatio === GenderRatio.AllMale) {
-        this.gender = genderFromPID(this.personalityValue, this.dexNum)
+    if (metadata && genderRatio !== undefined) {
+      if (
+        (this.gender === Gender.Genderless && genderRatio !== GenderRatio.Genderless) ||
+        (this.gender !== Gender.Genderless && genderRatio === GenderRatio.Genderless) ||
+        (this.gender === Gender.Male && genderRatio === GenderRatio.AllFemale) ||
+        (this.gender === Gender.Female && genderRatio === GenderRatio.AllMale)
+      ) {
+        this.gender = metadata.genderFromPid(this.personalityValue)
         errorsFound = true
       }
     }

@@ -1,5 +1,5 @@
 import { getNatureSummary } from 'pokemon-resources'
-import { NationalDex, NationalDexMax } from 'pokemon-species-data'
+import { NationalDex, NationalDexMax } from 'src/consts/NationalDex'
 
 import { PKM } from '../pkm'
 

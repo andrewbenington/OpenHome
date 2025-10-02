@@ -2,9 +2,8 @@
 
 import { MetadataLookup, SpeciesLookup } from '@pokemon-resources/pkg'
 import { isGameBoy, ItemFromString, ItemToString, Languages } from 'pokemon-resources'
-import { NationalDex } from 'pokemon-species-data'
+import { NationalDex } from 'src/consts/NationalDex'
 import * as byteLogic from '../util/byteLogic'
-import { genderFromDVs } from '../util/genderCalc'
 import { AllPKMFields } from '../util/pkmInterface'
 import { getLevelGen12, getStats } from '../util/statCalc'
 import * as stringLogic from '../util/stringConversion'
@@ -211,7 +210,7 @@ export class PK2 {
   }
 
   public get gender() {
-    return genderFromDVs(this.dvs, this.dexNum)
+    return this.metadata?.genderFromAtkDv(this.dvs.atk)
   }
 
   public get language() {

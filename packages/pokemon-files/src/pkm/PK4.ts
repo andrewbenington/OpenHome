@@ -11,7 +11,6 @@ import {
 import { MetadataLookup, SpeciesLookup } from '@pokemon-resources/pkg'
 import * as byteLogic from '../util/byteLogic'
 import * as encryption from '../util/encryption'
-import { genderFromPID } from '../util/genderCalc'
 import { AllPKMFields } from '../util/pkmInterface'
 import { filterRibbons } from '../util/ribbonLogic'
 import { getStats } from '../util/statCalc'
@@ -397,7 +396,7 @@ export class PK4 {
   }
 
   public get gender() {
-    return genderFromPID(this.personalityValue, this.dexNum)
+    return this.metadata?.genderFromPid(this.personalityValue)
   }
 
   public get language() {

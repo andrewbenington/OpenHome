@@ -1,3 +1,4 @@
+import { MetadataLookup } from '@pokemon-resources/pkg'
 import { Button, Card, Dialog, Flex, Grid } from '@radix-ui/themes'
 import lodash, { range } from 'lodash'
 import { GameOfOriginData } from 'pokemon-resources'

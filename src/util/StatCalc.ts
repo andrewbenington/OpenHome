@@ -1,5 +1,5 @@
 import { getNatureSummary } from 'pokemon-resources'
-import { NationalDex, NationalDexMax } from 'pokemon-species-data'
+import { NationalDex, NationalDexMax } from 'src/consts/NationalDex'
 import { MetadataLookup, SpeciesLookup } from '../../pkm_rs_resources/pkg/pkm_rs_resources'
 import { PKMInterface } from '../types/interfaces'
 import { Stat } from '../types/types'

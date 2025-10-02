@@ -10,9 +10,8 @@ import {
   Languages,
   NatureToString,
 } from 'pokemon-resources'
-import { NationalDex } from 'pokemon-species-data'
+import { NationalDex } from 'src/consts/NationalDex'
 import * as byteLogic from '../util/byteLogic'
-import { genderFromPID } from '../util/genderCalc'
 import { AllPKMFields } from '../util/pkmInterface'
 import {
   filterRibbons,
@@ -242,7 +241,7 @@ export class COLOPKM {
   }
 
   public get gender() {
-    return genderFromPID(this.personalityValue, this.dexNum)
+    return this.metadata?.genderFromPid(this.personalityValue)
   }
 
   public get language() {

@@ -1,6 +1,6 @@
 import { PK3 } from '@pokemon-files/pkm'
 import { GameOfOrigin, GameOfOriginData } from 'pokemon-resources'
-import { NationalDex } from 'pokemon-species-data'
+import { NationalDex } from 'src/consts/NationalDex'
 import { GEN3_TRANSFER_RESTRICTIONS } from 'src/consts/TransferRestrictions'
 import {
   bytesToUint16LittleEndian,

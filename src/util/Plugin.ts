@@ -1,5 +1,5 @@
 import { MetadataLookup, SpeciesLookup } from '@pokemon-resources/pkg'
-import { NationalDex } from 'pokemon-species-data'
+import { NationalDex } from 'src/consts/NationalDex'
 import { ImageResponse } from '../backend/backendInterface'
 import { OpenHomePlugin } from '../state/plugin'
 

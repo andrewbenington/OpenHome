@@ -13,8 +13,8 @@ import {
   SpeedCharacteristics,
   Type,
 } from 'pokemon-resources'
-import { NationalDex } from 'pokemon-species-data'
 import Prando from 'prando'
+import { NationalDex } from 'src/consts/NationalDex'
 import {
   bytesToUint32LittleEndian,
   getFlag,

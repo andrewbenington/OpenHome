@@ -1,3 +1,5 @@
+#[cfg(feature = "wasm")]
+use pkm_rs_types::Gender;
 use std::num::NonZeroU16;
 use strum_macros::{Display, EnumString};
 
@@ -98,6 +100,62 @@ pub enum GenderRatio {
     M1ToF3,
     M3ToF1,
     M7ToF1,
+}
+
+impl GenderRatio {
+    const fn male_pid_last_byte_threshold(&self) -> u8 {
+        match self {
+            GenderRatio::M1ToF7 => 225,
+            GenderRatio::M1ToF3 => 191,
+            GenderRatio::Equal => 127,
+            GenderRatio::M3ToF1 => 63,
+            GenderRatio::M7ToF1 => 31,
+            _ => 255, // special cases
+        }
+    }
+
+    const fn male_atk_dv_threshold(&self) -> u8 {
+        match self {
+            GenderRatio::AllMale => 0,
+            GenderRatio::M7ToF1 => 2,
+            GenderRatio::M3ToF1 => 4,
+            GenderRatio::Equal => 8,
+            GenderRatio::M1ToF3 => 12,
+            GenderRatio::M1ToF7 => 14, // no species in gen 2 has this ratio
+            _ => 255,                  // special cases
+        }
+    }
+
+    const fn gender_for_pid(&self, pid: u32) -> Gender {
+        match self {
+            Self::Genderless => Gender::Genderless,
+            Self::AllMale => Gender::Male,
+            Self::AllFemale => Gender::Female,
+            ratio => {
+                let last_byte = (pid & 0xff) as u8;
+                if last_byte >= ratio.male_pid_last_byte_threshold() {
+                    Gender::Male
+                } else {
+                    Gender::Female
+                }
+            }
+        }
+    }
+
+    const fn gender_for_atk_dv(&self, atk_dv: u8) -> Gender {
+        match self {
+            Self::Genderless => Gender::Genderless,
+            Self::AllMale => Gender::Male,
+            Self::AllFemale => Gender::Female,
+            ratio => {
+                if atk_dv >= ratio.male_atk_dv_threshold() {
+                    Gender::Male
+                } else {
+                    Gender::Female
+                }
+            }
+        }
+    }
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
@@ -299,7 +357,7 @@ pub struct FormeMetadata {
     #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = isParadox))]
     pub is_paradox: bool,
 
-    #[cfg_attr(feature = "wasm", wasm_bindgen(readonly))]
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub regional: Option<Region>,
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
@@ -327,7 +385,14 @@ impl FormeMetadata {
             Some(forme_ref) => forme_ref.get_base_evolution(),
         }
     }
+
+    pub fn is_evolution_of(&self, other: &FormeMetadata) -> bool {
+        other.evolutions.iter().any(|other_evo| {
+            *other_evo == self.forme_ref() || self.is_evolution_of(other_evo.get_forme_metadata())
+        })
+    }
 }
+
 #[cfg(feature = "wasm")]
 #[wasm_bindgen]
 #[allow(clippy::missing_const_for_fn)]
@@ -404,6 +469,11 @@ impl FormeMetadata {
     }
 
     #[wasm_bindgen(getter)]
+    pub fn regional(&self) -> Option<String> {
+        self.regional.as_ref().map(Region::to_string)
+    }
+
+    #[wasm_bindgen(getter)]
     pub fn sprite(&self) -> String {
         self.sprite.to_owned()
     }
@@ -411,6 +481,20 @@ impl FormeMetadata {
     #[wasm_bindgen(getter = spriteCoords)]
     pub fn sprite_coords(&self) -> Vec<u8> {
         vec![self.sprite_index.0, self.sprite_index.1]
+    }
+
+    #[wasm_bindgen(js_name = genderFromAtkDv)]
+    pub fn gender_from_atk_dv(&self, atk_dv: u8) -> Gender {
+        self.gender_ratio.gender_for_atk_dv(atk_dv)
+    }
+
+    #[wasm_bindgen(js_name = genderFromPid)]
+    pub fn gender_from_pid(&self, pid: u32) -> Gender {
+        self.gender_ratio.gender_for_pid(pid)
+    }
+    #[wasm_bindgen(js_name = isEvolutionOf)]
+    pub fn is_evolution_of_js(&self, other: &FormeMetadata) -> bool {
+        self.is_evolution_of(other)
     }
 }
 
@@ -555,6 +639,11 @@ impl SpeciesAndForme {
     #[cfg_attr(feature = "wasm", wasm_bindgen(getter = formeIndex))]
     pub fn get_forme_index_js(&self) -> u16 {
         self.forme_index
+    }
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = getSpeciesMetadata))]
+    pub fn get_species_metadata_js(&self) -> SpeciesMetadata {
+        self.get_species_metadata().clone()
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = getMetadata))]

@@ -9,11 +9,11 @@ import {
   SVTMMoveIndexes,
   SwShTRMoveIndexes,
 } from 'pokemon-resources'
-import { NationalDex } from 'pokemon-species-data'
 import { useMemo } from 'react'
 import { Countries } from 'src/consts/Countries'
 import { EncounterTypes } from 'src/consts/EncounterTypes'
 import { SWEETS } from 'src/consts/Formes'
+import { NationalDex } from 'src/consts/NationalDex'
 import {
   GEN2_TRANSFER_RESTRICTIONS,
   HGSS_TRANSFER_RESTRICTIONS,

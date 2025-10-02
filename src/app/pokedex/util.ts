@@ -46,7 +46,7 @@ export function getPokedexSummary(species: SpeciesMetadata, forme: FormeMetadata
       : forme.isMega
         ? 'mega-evolution'
         : 'forme'
-  let text = `${name} is a ${types} ${formeType} introduced in Generation ${forme.introduced}.`
+  let text = `${name} is a ${types} ${formeType} introduced in Generation ${forme.introducedGen}.`
 
   if (forme.formeName === 'Basculin-White-Striped') {
     text += ` It is sometimes considered a regional forme from the ${forme.regional} region.`

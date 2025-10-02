@@ -1,6 +1,6 @@
 import { MetadataLookup } from '@pokemon-resources/pkg'
-import { NationalDex } from 'pokemon-species-data'
 import { BLOOD_MOON, SWEETS } from 'src/consts/Formes'
+import { NationalDex } from 'src/consts/NationalDex'
 import { toGen3RRPokemonIndex } from 'src/types/SAVTypes/radicalred/conversion/Gen3RRPokemonIndex'
 import { RRSprites } from 'src/types/SAVTypes/radicalred/conversion/RadicalRedSprites'
 import { MonSpriteData } from '../state/plugin'

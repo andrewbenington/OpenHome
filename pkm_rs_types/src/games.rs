@@ -1,4 +1,5 @@
 use serde::Serialize;
+use strum_macros::{Display, EnumString};
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -18,7 +19,7 @@ pub enum Generation {
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Debug, Serialize, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, EnumString, Display, Serialize, Clone, Copy, PartialEq, Eq)]
 pub enum Region {
     Kanto,
     Johto,

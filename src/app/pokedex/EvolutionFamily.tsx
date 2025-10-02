@@ -1,9 +1,9 @@
-import { MetadataLookup, SpeciesLookup } from '@pokemon-resources/pkg'
+import { MetadataLookup, SpeciesAndForme, SpeciesLookup } from '@pokemon-resources/pkg'
 import { Flex } from '@radix-ui/themes'
 import { Responsive } from '@radix-ui/themes/props'
-import { NationalDex } from 'pokemon-species-data'
 import { ArrowLeftIcon, ArrowLeftRightIcon, ArrowRightIcon } from 'src/components/Icons'
 import { BLOOD_MOON } from 'src/consts/Formes'
+import { NationalDex } from 'src/consts/NationalDex'
 import { getBaseMon } from 'src/types/pkm/util'
 import { Pokedex } from 'src/types/pokedex'
 import TooltipPokemonIcon from './TooltipPokemonIcon'
@@ -28,9 +28,12 @@ export default function EvolutionFamily({
 
   if (nationalDex === NationalDex.Ursaluna) {
     // Include Teddiursa line for Ursaluna Bloodmoon
-    baseMon = { dexNumber: NationalDex.Teddiursa, formeNumber: 0 }
+    baseMon = SpeciesAndForme.tryNew(NationalDex.Teddiursa, 0)
   }
-  const baseMonFormes = SpeciesLookup(baseMon.dexNumber)?.formes ?? []
+
+  if (!baseMon) return <div />
+
+  const baseMonFormes = baseMon.getSpeciesMetadata().formes
 
   return (
     <Flex
@@ -45,14 +48,14 @@ export default function EvolutionFamily({
         .filter((forme) => !forme.isMega)
         .map(({ formeIndex }) => (
           <EvolutionLine
-            nationalDex={baseMon.dexNumber}
+            nationalDex={baseMon.nationalDex}
             formeNumber={formeIndex}
             key={formeIndex}
             pokedex={pokedex}
             onClick={onClick}
           />
         ))}
-      {baseMon.dexNumber === NationalDex.Teddiursa && (
+      {baseMon.nationalDex === NationalDex.Teddiursa && (
         // Workaround for evo lines where one forme have a prevo and another doesn't, currently
         // only Ursaluna
         <EvolutionLine
