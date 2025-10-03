@@ -1,9 +1,6 @@
 import { useDraggable } from '@dnd-kit/react'
 import { Card, Flex, Grid, Text } from '@radix-ui/themes'
 import { ItemFromString } from 'pokemon-resources'
-import { useContext } from 'react'
-import { DragMonContext } from 'src/state/dragMon'
-import { OpenSavesContext } from 'src/state/openSaves'
 import { Bag } from './Bag'
 import DroppableSpace from './boxes/DroppableSpace'
 
@@ -49,9 +46,6 @@ function DraggableItem({ item }: { item: { name: string; count: number } }) {
 }
 
 export default function BagBox() {
-  const [dragMonState] = useContext(DragMonContext)
-  const [, openSavesDispatch] = useContext(OpenSavesContext)
-
   const items = Bag.getItems()
   const rowsNeeded = Math.ceil(items.length / 6) + (items.length % 6 === 0 ? 1 : 0)
   const totalSlots = rowsNeeded * 6

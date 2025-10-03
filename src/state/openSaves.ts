@@ -435,7 +435,13 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
         updatedMon = new OHPKM(targetMon)
       }
 
+      const oldItem = updatedMon.heldItemName
+
       updatedMon.heldItemName = itemName
+
+      if (oldItem !== '') {
+        Bag.addItem(oldItem)
+      }
 
       if (dest.is_home) {
         state.homeData?.setPokemon(dest, updatedMon)
