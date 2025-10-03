@@ -10,6 +10,12 @@ function DraggableItem({ item }: { item: { name: string; count: number } }) {
     data: { kind: 'item', itemName: item.name },
   })
 
+  const getItemIconPath = (itemName: string) => {
+    const itemId = ItemFromString(itemName)?.toString().padStart(4, '0')
+
+    return itemId ? `/items/index/${itemId}.png` : ''
+  }
+
   return (
     <div
       ref={ref}
@@ -21,7 +27,7 @@ function DraggableItem({ item }: { item: { name: string; count: number } }) {
       }}
     >
       <img
-        src={`/items/index/${ItemFromString(item.name)?.toString().padStart(4, '0')}.png`}
+        src={getItemIconPath(item.name)}
         alt={item.name}
         style={{
           width: '100%',
@@ -49,12 +55,6 @@ export default function BagBox() {
   const items = Bag.getItems()
   const rowsNeeded = Math.ceil(items.length / 6) + (items.length % 6 === 0 ? 1 : 0)
   const totalSlots = rowsNeeded * 6
-
-  const getItemIconPath = (itemName: string) => {
-    const itemId = ItemFromString(itemName)?.toString().padStart(4, '0')
-
-    return itemId ? `/items/index/${itemId}.png` : ''
-  }
 
   return (
     <DroppableSpace

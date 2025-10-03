@@ -439,7 +439,7 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
 
       updatedMon.heldItemName = itemName
 
-      if (oldItem !== '') {
+      if (oldItem !== 'None') {
         Bag.addItem(oldItem)
       }
 
