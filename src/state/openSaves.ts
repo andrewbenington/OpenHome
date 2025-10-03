@@ -377,7 +377,7 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
       let sourceMon = sourceBox.pokemon[source.box_slot]
       let destMon = destBox.pokemon[dest.box_slot]
 
-      if (sourceMon !== source.mon) return state // necessary in strict mode, otherwise the swap will happen twice and revert
+      if (sourceMon !== source.mon) return state
       if (sourceSave !== destSave) {
         if (sourceMon) {
           if (!(sourceMon instanceof OHPKM)) {
