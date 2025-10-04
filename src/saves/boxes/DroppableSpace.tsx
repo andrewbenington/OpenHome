@@ -74,7 +74,7 @@ const DroppableSpace = ({
         alignItems: 'center',
         justifyContent: 'center',
         width: '100%',
-        height: '100%',
+        // height: '100%',
         ...style,
       }}
       ref={ref}

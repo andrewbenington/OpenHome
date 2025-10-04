@@ -30,18 +30,18 @@ export interface DraggableMonProps {
 const DraggableMon = ({ mon, onClick, disabled, dragData, dragID }: DraggableMonProps) => {
   const { ref } = useDraggable({
     id: (dragID ?? '') + mon.personalityValue?.toString(),
-    data: dragData,
+    data: dragData ? { kind: 'mon', monData: dragData } : undefined,
     disabled: disabled || !dragID,
   })
   const [dragState] = useContext(DragMonContext)
 
   const isDragging = useMemo(
     () =>
-      dragState.payload &&
+      dragState.payload?.kind === 'mon' &&
       dragData &&
-      dragState.payload.box === dragData.box &&
-      dragState.payload.box_slot === dragData.box_slot &&
-      dragState.payload.save === dragData.save,
+      dragState.payload.monData.box === dragData.box &&
+      dragState.payload.monData.box_slot === dragData.box_slot &&
+      dragState.payload.monData.save === dragData.save,
     [dragData, dragState.payload]
   )
 
