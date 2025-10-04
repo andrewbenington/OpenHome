@@ -9,7 +9,7 @@ import { MenuIcon } from 'src/components/Icons'
 import AttributeRow from 'src/pokemon/AttributeRow'
 import PokemonDetailsModal from 'src/pokemon/PokemonDetailsModal'
 import { ErrorContext } from 'src/state/error'
-import { MonLocation, MonWithLocation, OpenSavesContext } from 'src/state/openSaves'
+import { MonLocation, OpenSavesContext } from 'src/state/openSaves'
 import { PersistedPkmDataContext } from 'src/state/persistedPkmData'
 import { PKMInterface } from 'src/types/interfaces'
 import { OHPKM } from 'src/types/pkm/OHPKM'
@@ -112,7 +112,13 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   }
 
   const isDisabled = useMemo(() => {
-    const dragData = dragMonState?.payload as MonWithLocation | undefined
+    // if (dragMonState?.payload.kind !== 'mon') return false
+
+    const dragPayload = dragMonState?.payload // as MonWithLocation | undefined
+
+    if (!dragPayload || dragPayload.kind !== 'mon') return false
+
+    const dragData = dragPayload.monData
 
     if (!dragData || Object.entries(dragData).length === 0) return false
 
