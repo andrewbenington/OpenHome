@@ -31,6 +31,8 @@ pub enum Region {
     Galar,
     Hisui,
     Paldea,
+
+    Orre,
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
@@ -77,7 +79,7 @@ impl From<GameOfOriginIndex> for u8 {
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Debug, Clone, Copy)]
-pub struct GameOfOrigin {
+pub struct GameOfOriginMetadata {
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub name: &'static str,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
@@ -94,7 +96,7 @@ pub struct GameOfOrigin {
 #[cfg(feature = "wasm")]
 #[wasm_bindgen]
 #[allow(clippy::missing_const_for_fn)]
-impl GameOfOrigin {
+impl GameOfOriginMetadata {
     #[wasm_bindgen(getter)]
     pub fn name(&self) -> String {
         self.name.to_string()

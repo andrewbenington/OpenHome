@@ -1,5 +1,5 @@
+import { OriginGameMetadata, OriginGameType } from '@pokemon-resources/pkg'
 import dayjs from 'dayjs'
-import { colosseumOrXD, ColosseumOrXD, GameOfOrigin, GameOfOriginData } from 'pokemon-resources'
 import { GameLogos, getOriginMark } from '../images/game'
 import { getPublicImageURL } from '../images/images'
 import { PKMInterface } from '../types/interfaces'
@@ -19,27 +19,26 @@ export function getMonSaveLogo(mon: PKMInterface, supportedSaves: SAVClass[]) {
   if (!mon.gameOfOrigin) {
     return getOriginMark('GB')
   }
-  if (mon.gameOfOrigin === GameOfOrigin.ColosseumXD) {
-    switch (colosseumOrXD(mon.dexNum, mon.ribbons?.includes('National Ribbon') || mon.isShadow)) {
-      case ColosseumOrXD.Colosseum:
-        return GameLogos.Colosseum
-      case ColosseumOrXD.XD:
-        return GameLogos.XD
-      case ColosseumOrXD.NotDeterminable:
-        return GameLogos.ColosseumXD
+
+  if (mon.gameOfOrigin === OriginGameType.ColosseumXd) {
+    if (mon.isFatefulEncounter) {
+      return GameLogos.XD
+    } else {
+      return GameLogos.Colosseum
     }
   }
+
   if (mon.gameOfOrigin === -1) {
     return GameLogos.GB
   }
-  return GameLogos[
-    GameOfOriginData[mon.gameOfOrigin]?.logo ??
-      GameOfOriginData[mon.gameOfOrigin]?.name.replaceAll(' ', '').replaceAll("'", '') ??
-      ''
-  ]
+
+  return `logos/${OriginGameMetadata.fromIndex(mon.gameOfOrigin)?.logo}.png`
 }
 
-export function getSaveLogo(saveType: SAVClass | undefined, origin: GameOfOrigin): string {
+export function getSaveLogo(
+  saveType: SAVClass | undefined,
+  origin: OriginGameType
+): string | undefined {
   if (saveType?.prototype.getPluginIdentifier.call({})) {
     return getPublicImageURL(`logos/${saveType.prototype.getPluginIdentifier.call({})}.png`)
   }
@@ -47,11 +46,7 @@ export function getSaveLogo(saveType: SAVClass | undefined, origin: GameOfOrigin
     return getPublicImageURL(getOriginMark('GB'))
   }
 
-  return GameLogos[
-    GameOfOriginData[origin]?.logo ??
-      GameOfOriginData[origin]?.name.replaceAll(' ', '').replaceAll("'", '') ??
-      ''
-  ]
+  return `logos/${OriginGameMetadata.fromIndex(origin)?.logo}.png`
 }
 
 export function formatTimeSince(timestamp?: number) {

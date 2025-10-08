@@ -1,6 +1,6 @@
+import { OriginGameMetadata } from '@pokemon-resources/pkg'
 import { Flex } from '@radix-ui/themes'
 import * as E from 'fp-ts/lib/Either'
-import { GameOfOrigin } from 'pokemon-resources'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { getSaveRef, SAV } from 'src/types/SAVTypes/SAV'
 import { buildUnknownSaveFile } from 'src/types/SAVTypes/load'
@@ -14,7 +14,7 @@ import { OpenSavesContext } from '../state/openSaves'
 import { PersistedPkmDataContext } from '../state/persistedPkmData'
 import { PathData, splitPath } from '../types/SAVTypes/path'
 import SaveCard from './SaveCard'
-import { filterEmpty, getSaveLogo, SaveViewMode } from './util'
+import { filterEmpty, SaveViewMode } from './util'
 
 interface SaveFileSelectorProps {
   onOpen: (path: PathData) => void
@@ -107,14 +107,6 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
     )
   }, [backend, error, handleError, loadSaveData, suggestedSaves])
 
-  const saveTypeFromOrigin = useCallback(
-    (origin: number | undefined) =>
-      origin
-        ? getEnabledSaveTypes().find((s) => s.includesOrigin(origin as GameOfOrigin))
-        : undefined,
-    [getEnabledSaveTypes]
-  )
-
   const columns: SortableColumn<SAV>[] = [
     {
       key: 'open',
@@ -138,13 +130,14 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
       key: 'game',
       name: 'Game',
       width: 130,
-      renderValue: (value) => (
-        <img
-          alt="save logo"
-          height={40}
-          src={getSaveLogo(saveTypeFromOrigin(value.origin), value.origin as GameOfOrigin)}
-        />
-      ),
+      renderValue: (value) => {
+        const metadata = OriginGameMetadata.fromIndex(value.origin)
+        return metadata?.logo ? (
+          <img alt="save logo" height={40} src={`logos/${metadata.logo}`} />
+        ) : (
+          <div>{metadata?.gameName ?? 'Unknown'}</div>
+        )
+      },
       sortFunction: numericSorter((val) => val.origin),
       cellClass: 'centered-cell',
     },
@@ -187,9 +180,7 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
         <SaveCard
           key={save.filePath.raw}
           save={getSaveRef(save)}
-          onOpen={() => {
-            onOpen(save.filePath)
-          }}
+          onOpen={() => onOpen(save.filePath)}
           size={cardSize}
         />
       ))}
