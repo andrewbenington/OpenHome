@@ -4,11 +4,10 @@ import {
   Gen4Ribbons,
   ItemFromString,
   ItemToString,
-  Languages,
   NatureToString,
 } from 'pokemon-resources'
 
-import { MetadataLookup, SpeciesLookup } from '@pokemon-resources/pkg'
+import { Languages, MetadataLookup, SpeciesLookup } from '@pokemon-resources/pkg'
 import * as byteLogic from '../util/byteLogic'
 import * as encryption from '../util/encryption'
 import { AllPKMFields } from '../util/pkmInterface'
@@ -400,7 +399,7 @@ export class PK4 {
   }
 
   public get language() {
-    return Languages[this.languageIndex]
+    return Languages.stringFromByte(this.languageIndex)
   }
 
   public get abilityName() {

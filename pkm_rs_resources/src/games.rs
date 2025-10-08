@@ -9,7 +9,7 @@ pub enum ColosseumOrXd {
     Indeterminate,
 }
 
-#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "OriginGameType"))]
+#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "OriginGame"))]
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum OriginGame {
     Red,

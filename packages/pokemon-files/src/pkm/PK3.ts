@@ -5,12 +5,11 @@ import {
   Gen3StandardRibbons,
   ItemGen3FromString,
   ItemGen3ToString,
-  Languages,
   NatureToString,
 } from 'pokemon-resources'
 import { NationalDex } from 'src/consts/NationalDex'
 
-import { MetadataLookup, SpeciesLookup } from '@pokemon-resources/pkg'
+import { Languages, MetadataLookup, SpeciesLookup } from '@pokemon-resources/pkg'
 import * as conversion from '../conversion'
 import * as byteLogic from '../util/byteLogic'
 import * as encryption from '../util/encryption'
@@ -283,7 +282,7 @@ export class PK3 {
   }
 
   public get language() {
-    return Languages[this.languageIndex]
+    return Languages.stringFromByte(this.languageIndex)
   }
   public get heldItemName() {
     return ItemGen3ToString(this.heldItemIndex)

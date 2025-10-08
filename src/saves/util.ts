@@ -1,4 +1,4 @@
-import { OriginGameMetadata, OriginGameType } from '@pokemon-resources/pkg'
+import { OriginGame, OriginGameMetadata } from '@pokemon-resources/pkg'
 import dayjs from 'dayjs'
 import { GameLogos, getOriginMark } from '../images/game'
 import { getPublicImageURL } from '../images/images'
@@ -20,7 +20,7 @@ export function getMonSaveLogo(mon: PKMInterface, supportedSaves: SAVClass[]) {
     return getOriginMark('GB')
   }
 
-  if (mon.gameOfOrigin === OriginGameType.ColosseumXd) {
+  if (mon.gameOfOrigin === OriginGame.ColosseumXd) {
     if (mon.isFatefulEncounter) {
       return GameLogos.XD
     } else {
@@ -37,7 +37,7 @@ export function getMonSaveLogo(mon: PKMInterface, supportedSaves: SAVClass[]) {
 
 export function getSaveLogo(
   saveType: SAVClass | undefined,
-  origin: OriginGameType
+  origin: OriginGame
 ): string | undefined {
   if (saveType?.prototype.getPluginIdentifier.call({})) {
     return getPublicImageURL(`logos/${saveType.prototype.getPluginIdentifier.call({})}.png`)

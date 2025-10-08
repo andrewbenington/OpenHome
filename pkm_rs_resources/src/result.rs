@@ -3,6 +3,7 @@ use std::fmt::Display;
 use serde::{Serialize, Serializer};
 
 use crate::abilities::ABILITY_MAX;
+use crate::language::LANGUAGE_MAX;
 use crate::natures::NATURE_MAX;
 use crate::species::{NATIONAL_DEX_MAX, NatDexIndex};
 
@@ -27,6 +28,9 @@ pub enum Error {
     FormeIndex {
         national_dex: NatDexIndex,
         forme_index: u16,
+    },
+    LanguageIndex {
+        language_index: u8,
     },
     NatureIndex {
         nature_index: u8,
@@ -73,6 +77,10 @@ impl Display for Error {
                     species_metadata.formes.len()
                 )
                 .to_owned()
+            }
+            Error::LanguageIndex { language_index } => {
+                format!("Invalid language index {language_index} (must be between 0 and {LANGUAGE_MAX}")
+                    .to_owned()
             }
             Error::NatureIndex { nature_index } => {
                 format!("Invalid nature index {nature_index} (must be between 1 and {NATURE_MAX}")

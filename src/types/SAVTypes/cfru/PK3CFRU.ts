@@ -434,7 +434,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
   }
 
   public get language() {
-    return Languages[this.languageIndex]
+    return Languages.stringFromByte(this.languageIndex)
   }
 
   public get heldItemName() {

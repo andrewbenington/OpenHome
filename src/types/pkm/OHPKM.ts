@@ -1204,7 +1204,7 @@ export class OHPKM implements PKMInterface {
   }
 
   public get language() {
-    return Languages[this.languageIndex]
+    return Languages.stringFromByte(this.languageIndex)
   }
 
   public set language(value: string) {
