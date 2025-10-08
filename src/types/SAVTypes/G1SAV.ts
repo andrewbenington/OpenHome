@@ -1,6 +1,7 @@
 import { PK1 } from '@pokemon-files/pkm'
+import { Language } from '@pokemon-resources/pkg'
 import lodash from 'lodash'
-import { GameOfOrigin, GameOfOriginData, Languages } from 'pokemon-resources'
+import { GameOfOrigin, GameOfOriginData } from 'pokemon-resources'
 import { NationalDex } from 'src/consts/NationalDex'
 import { GEN1_TRANSFER_RESTRICTIONS } from 'src/consts/TransferRestrictions'
 import { bytesToUint16BigEndian, get8BitChecksum } from 'src/util/byteLogic'
@@ -126,7 +127,7 @@ export class G1SAV implements SAV<PK1> {
               11
             )
             mon.gameOfOrigin = this.origin
-            mon.languageIndex = Languages.indexOf('ENG')
+            mon.language = Language.English
             this.boxes[boxNumber].pokemon[monIndex] = mon
           } catch (e) {
             console.error(e)

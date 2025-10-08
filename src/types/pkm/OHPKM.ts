@@ -13,7 +13,14 @@ import {
   markingsSixShapesWithColorFromOther,
   markingsSixShapesWithColorToBytes,
 } from '@pokemon-files/util'
-import { Gender, GenderRatio, MetadataLookup, SpeciesLookup } from '@pokemon-resources/pkg'
+import {
+  Gender,
+  GenderRatio,
+  Language,
+  Languages,
+  MetadataLookup,
+  SpeciesLookup,
+} from '@pokemon-resources/pkg'
 import * as lodash from 'lodash'
 import {
   AbilityFromString,
@@ -24,7 +31,6 @@ import {
   Gen34TowerRibbons,
   ItemFromString,
   ItemToString,
-  Languages,
   ModernRibbons,
   NatureToString,
   getMetLocation,
@@ -1199,20 +1205,16 @@ export class OHPKM implements PKMInterface {
       : bytesToUint32LittleEndian(this.bytes, 0x0c) % 1000000
   }
 
-  public get languageIndex() {
+  public get language() {
     return this.bytes[0xf2]
   }
 
-  public get language() {
-    return Languages.stringFromByte(this.languageIndex)
+  public set language(value: Language) {
+    this.bytes[0xf2] = Languages.fromByteOrNone(value)
   }
 
-  public set language(value: string) {
-    const index = Languages.indexOf(value)
-
-    if (index > -1) {
-      this.bytes[0xf2] = index
-    }
+  public get languageString() {
+    return Languages.stringFromByte(this.language)
   }
 
   public get unknownF3() {

@@ -9,7 +9,7 @@ import {
   NatureToString,
 } from 'pokemon-resources'
 
-import { Languages, MetadataLookup, SpeciesLookup } from '@pokemon-resources/pkg'
+import { Language, Languages, MetadataLookup, SpeciesLookup } from '@pokemon-resources/pkg'
 import * as byteLogic from '../util/byteLogic'
 import * as encryption from '../util/encryption'
 import { AllPKMFields } from '../util/pkmInterface'
@@ -39,7 +39,7 @@ export class PK5 {
   trainerFriendship: number
   abilityIndex: number
   markings: types.MarkingsSixShapesNoColor
-  languageIndex: number
+  language: Language
   evs: types.Stats
   contest: types.ContestStats
   moves: number[]
@@ -93,7 +93,7 @@ export class PK5 {
       this.trainerFriendship = dataView.getUint8(0x14)
       this.abilityIndex = dataView.getUint8(0x15)
       this.markings = types.markingsSixShapesNoColorFromBytes(dataView, 0x16)
-      this.languageIndex = dataView.getUint8(0x17)
+      this.language = Languages.fromByteOrNone(dataView.getUint8(0x17))
       this.evs = types.readStatsFromBytesU8(dataView, 0x18)
       this.contest = types.readContestStatsFromBytes(dataView, 0x1e)
       this.moves = [
@@ -178,7 +178,7 @@ export class PK5 {
         star: false,
         diamond: false,
       }
-      this.languageIndex = other.languageIndex
+      this.language = other.language
       this.evs = other.evs ?? {
         hp: 0,
         atk: 0,
@@ -266,7 +266,7 @@ export class PK5 {
     dataView.setUint8(0x14, this.trainerFriendship)
     dataView.setUint8(0x15, this.abilityIndex)
     types.markingsSixShapesNoColorToBytes(dataView, 0x16, this.markings)
-    dataView.setUint8(0x17, this.languageIndex)
+    dataView.setUint8(0x17, this.language)
     types.writeStatsToBytesU8(dataView, 0x18, this.evs)
     types.writeContestStatsToBytes(dataView, 0x1e, this.contest)
     for (let i = 0; i < 4; i++) {
@@ -343,8 +343,8 @@ export class PK5 {
     return getStats(this)
   }
 
-  public get language() {
-    return Languages.stringFromByte(this.languageIndex)
+  public get languageString() {
+    return Languages.stringFromByte(this.language)
   }
 
   public get abilityName() {

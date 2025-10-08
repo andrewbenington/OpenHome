@@ -1,6 +1,7 @@
 import { PK9 } from '@pokemon-files/pkm'
 import { utf16BytesToString } from '@pokemon-files/util'
-import { GameOfOrigin, GameOfOriginData, Languages } from 'pokemon-resources'
+import { Languages } from '@pokemon-resources/pkg'
+import { GameOfOrigin, GameOfOriginData } from 'pokemon-resources'
 import {
   SV_TRANSFER_RESTRICTIONS_BASE,
   SV_TRANSFER_RESTRICTIONS_ID,
@@ -122,7 +123,7 @@ export class SVSAV extends G89SAV<PK9> {
     return {
       'Player Character': trainerBlock.getGender() ? 'Juliana' : 'Florian',
       'Save Version': this.getSaveRevision(),
-      Language: Languages[trainerBlock.getLanguage()],
+      Language: Languages.stringFromByte(trainerBlock.getLanguage()),
     }
   }
 

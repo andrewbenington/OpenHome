@@ -1,7 +1,7 @@
 import { PK8 } from '@pokemon-files/pkm'
 import { utf16BytesToString } from '@pokemon-files/util'
-import { SpeciesLookup } from '@pokemon-resources/pkg'
-import { GameOfOrigin, GameOfOriginData, Languages } from 'pokemon-resources'
+import { Languages, SpeciesLookup } from '@pokemon-resources/pkg'
+import { GameOfOrigin, GameOfOriginData } from 'pokemon-resources'
 import { NationalDex } from 'src/consts/NationalDex'
 import {
   SWSH_TRANSFER_RESTRICTIONS_BASE,
@@ -124,7 +124,7 @@ export class SwShSAV extends G89SAV<PK8> {
     return {
       'Player Character': trainerBlock.getGender() ? 'Gloria' : 'Victor',
       'Save Version': this.getSaveRevision(),
-      Language: Languages[trainerBlock.getLanguage()],
+      Language: Languages.stringFromByte(trainerBlock.getLanguage()),
       Pokédex: pokedexOwned,
       'Shiny Pokémon Found': trainerBlock.getShinyPokemonFound(),
       Starter: trainerBlock.getStarter(),

@@ -89,11 +89,9 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
             <div />
           )}
           <div style={{ fontWeight: 'bold' }}>{mon.nickname}</div>
-          {mon.languageIndex !== undefined && (
-            <Badge variant="solid" color="gray" ml="2" size="3">
-              {mon.language}
-            </Badge>
-          )}
+          <Badge variant="solid" color="gray" ml="2" size="3">
+            {mon.languageString}
+          </Badge>
         </div>
         <AttributeRow label="Item" justifyEnd>
           {mon.heldItemName !== 'None' && (

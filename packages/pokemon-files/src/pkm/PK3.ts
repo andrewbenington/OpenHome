@@ -9,7 +9,7 @@ import {
 } from 'pokemon-resources'
 import { NationalDex } from 'src/consts/NationalDex'
 
-import { Languages, MetadataLookup, SpeciesLookup } from '@pokemon-resources/pkg'
+import { Language, Languages, MetadataLookup, SpeciesLookup } from '@pokemon-resources/pkg'
 import * as conversion from '../conversion'
 import * as byteLogic from '../util/byteLogic'
 import * as encryption from '../util/encryption'
@@ -36,7 +36,7 @@ export class PK3 {
   personalityValue: number
   trainerID: number
   secretID: number
-  languageIndex: number
+  language: Language
   markings: types.MarkingsFourShapes
   dexNum: number
   heldItemIndex: number
@@ -81,7 +81,7 @@ export class PK3 {
       this.personalityValue = dataView.getUint32(0x0, true)
       this.trainerID = dataView.getUint16(0x4, true)
       this.secretID = dataView.getUint16(0x6, true)
-      this.languageIndex = dataView.getUint8(0x12)
+      this.language = Languages.fromByteOrNone(dataView.getUint8(0x12))
       this.markings = types.markingsFourShapesFromBytes(dataView, 0x1b)
       this.dexNum = conversion.fromGen3PokemonIndex(dataView.getUint16(0x20, true))
       this.heldItemIndex = dataView.getUint16(0x22, true)
@@ -142,7 +142,7 @@ export class PK3 {
       this.personalityValue = generatePersonalityValuePreservingAttributes(other) ?? 0
       this.trainerID = other.trainerID
       this.secretID = other.secretID
-      this.languageIndex = other.languageIndex
+      this.language = other.language
       this.markings = types.markingsFourShapesFromOther(other.markings) ?? {
         circle: false,
         triangle: false,
@@ -218,7 +218,7 @@ export class PK3 {
     dataView.setUint32(0x0, this.personalityValue, true)
     dataView.setUint16(0x4, this.trainerID, true)
     dataView.setUint16(0x6, this.secretID, true)
-    dataView.setUint8(0x12, this.languageIndex)
+    dataView.setUint8(0x12, this.language)
     types.markingsFourShapesToBytes(dataView, 0x1b, this.markings)
     dataView.setUint16(0x20, conversion.toGen3PokemonIndex(this.dexNum), true)
     dataView.setUint16(0x22, this.heldItemIndex, true)
@@ -281,8 +281,8 @@ export class PK3 {
     return this.metadata?.genderFromPid(this.personalityValue)
   }
 
-  public get language() {
-    return Languages.stringFromByte(this.languageIndex)
+  public get languageString() {
+    return Languages.stringFromByte(this.language)
   }
   public get heldItemName() {
     return ItemGen3ToString(this.heldItemIndex)

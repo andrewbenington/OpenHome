@@ -26,19 +26,34 @@ pub enum Language {
 }
 
 impl Language {
-    pub fn as_str(&self) -> &'static str {
+    pub const fn as_str(&self) -> &'static str {
         match self {
-            Language::None => "None",
-            Language::Japanese => "Japanese",
-            Language::English => "English",
-            Language::French => "French",
-            Language::Italian => "Italian",
-            Language::German => "German",
-            Language::UNUSED => "UNUSED",
-            Language::SpanishSpain => "Spanish (Spain)",
-            Language::Korean => "Korean",
-            Language::ChineseSimplified => "Chinese (Simplified)",
-            Language::ChineseTraditional => "Chinese (Traditional)",
+            Language::None => "NONE",
+            Language::Japanese => "JPN",
+            Language::English => "ENG",
+            Language::French => "FRE",
+            Language::Italian => "ITL",
+            Language::German => "GER",
+            Language::UNUSED => "--",
+            Language::SpanishSpain => "SPN",
+            Language::Korean => "KOR",
+            Language::ChineseSimplified => "CHS",
+            Language::ChineseTraditional => "CHT",
+        }
+    }
+
+    pub const fn try_from_gcn(value: u8) -> Result<Self> {
+        match value {
+            0 => Ok(Language::None),
+            1 => Ok(Language::Japanese),
+            2 => Ok(Language::English),
+            3 => Ok(Language::German),
+            4 => Ok(Language::French),
+            5 => Ok(Language::Italian),
+            6 => Ok(Language::SpanishSpain),
+            _ => Err(Error::LanguageIndex {
+                language_index: value,
+            }),
         }
     }
 }
@@ -79,8 +94,35 @@ impl Languages {
     }
 
     #[cfg(feature = "wasm")]
+    #[wasm_bindgen(js_name = "fromByteOrNoneGcn")]
+    pub fn from_u8_or_none_gcn(value: u8) -> Language {
+        Language::try_from_gcn(value).unwrap_or(Language::None)
+    }
+
+    #[cfg(feature = "wasm")]
     #[wasm_bindgen(js_name = "stringFromByte")]
     pub fn string_from_byte(value: u8) -> String {
         Languages::from_u8_or_none(value).as_str().to_owned()
+    }
+
+    #[cfg(feature = "wasm")]
+    #[wasm_bindgen(js_name = "stringFromByteGcn")]
+    pub fn string_from_byte_gcn(value: u8) -> String {
+        Languages::from_u8_or_none_gcn(value).as_str().to_owned()
+    }
+
+    #[cfg(feature = "wasm")]
+    #[wasm_bindgen(js_name = "toGcnByte")]
+    pub fn to_gcn_byte(value: u8) -> u8 {
+        match Language::try_from(value).unwrap_or(Language::None) {
+            Language::None => 0,
+            Language::Japanese => 1,
+            Language::English => 2,
+            Language::German => 3,
+            Language::French => 4,
+            Language::Italian => 5,
+            Language::SpanishSpain => 6,
+            _ => 0,
+        }
     }
 }

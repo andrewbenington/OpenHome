@@ -1,4 +1,4 @@
-import { Ball, GameOfOrigin, ItemFromString, Languages, NatureToString } from 'pokemon-resources'
+import { Ball, GameOfOrigin, ItemFromString, NatureToString } from 'pokemon-resources'
 
 import {
   generatePersonalityValuePreservingAttributes,
@@ -19,7 +19,7 @@ import {
   writeGen3StringToBytes,
   writeStatsToBytesU8,
 } from '@pokemon-files/util'
-import { MetadataLookup, SpeciesLookup } from '@pokemon-resources/pkg'
+import { Language, Languages, MetadataLookup, SpeciesLookup } from '@pokemon-resources/pkg'
 import { getHPGen3Onward, getStatGen3Onward } from '../../../util/StatCalc'
 import { PKMInterface, PluginPKMInterface } from '../../interfaces'
 
@@ -73,7 +73,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
   personalityValue: number
   trainerID: number
   secretID: number
-  languageIndex: number
+  language: Language
   markings: MarkingsFourShapes
   dexNum: number
   formeNum: number
@@ -127,7 +127,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
       this.nickname = readGen3StringFromBytes(dataView, 0x8, 10)
 
       // Language 18
-      this.languageIndex = dataView.getUint8(0x12)
+      this.language = Languages.fromByteOrNone(dataView.getUint8(0x12))
 
       // Sanity 19
       // this.sanity = dataView.getUint8(0x13)
@@ -237,7 +237,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
       this.personalityValue = generatePersonalityValuePreservingAttributes(other) ?? 0
       this.trainerID = other.trainerID
       this.secretID = other.secretID
-      this.languageIndex = other.languageIndex
+      this.language = other.language
       this.markings = markingsFourShapesFromOther(other.markings) ?? {
         circle: false,
         triangle: false,
@@ -349,7 +349,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
     writeGen3StringToBytes(dataView, this.nickname, 0x8, 10, false)
 
     // 18 Language
-    dataView.setUint8(0x12, this.languageIndex)
+    dataView.setUint8(0x12, this.language)
 
     // 19 Sanity
     // dataView.setUint8(0x13, SANITY VALUE IDK);
@@ -433,8 +433,8 @@ export abstract class PK3CFRU implements PluginPKMInterface {
     return this.metadata?.genderFromPid(this.personalityValue)
   }
 
-  public get language() {
-    return Languages.stringFromByte(this.languageIndex)
+  public get languageString() {
+    return Languages.stringFromByte(this.language)
   }
 
   public get heldItemName() {

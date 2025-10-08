@@ -1,6 +1,7 @@
 import { PA8 } from '@pokemon-files/pkm'
 import { utf16BytesToString } from '@pokemon-files/util'
-import { GameOfOrigin, Languages } from 'pokemon-resources'
+import { Languages } from '@pokemon-resources/pkg'
+import { GameOfOrigin } from 'pokemon-resources'
 import { LA_TRANSFER_RESTRICTIONS } from '../../../consts/TransferRestrictions'
 import { isRestricted } from '../../TransferRestrictions'
 import { PathData } from '../path'
@@ -111,7 +112,7 @@ export class LASAV extends G89SAV<PA8> {
     return {
       'Save Version': this.getSaveRevision(),
       'Player Character': this.myStatusBlock.getGender() ? 'Akari' : 'Rei',
-      Language: Languages[this.myStatusBlock.getLanguage()],
+      Language: Languages.stringFromByte(this.myStatusBlock.getLanguage()),
     }
   }
 

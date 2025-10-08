@@ -1,6 +1,7 @@
 import { PK2 } from '@pokemon-files/pkm'
+import { Language } from '@pokemon-resources/pkg'
 import { uniq } from 'lodash'
-import { GameOfOrigin, GameOfOriginData, Languages } from 'pokemon-resources'
+import { GameOfOrigin, GameOfOriginData } from 'pokemon-resources'
 import { EXCLAMATION } from 'src/consts/Formes'
 import { NationalDex } from 'src/consts/NationalDex'
 import { GEN2_TRANSFER_RESTRICTIONS } from 'src/consts/TransferRestrictions'
@@ -107,7 +108,7 @@ export class G2SAV implements SAV<PK2> {
           11
         )
         mon.gameOfOrigin = mon.metLevel ? GameOfOrigin.Crystal : this.origin
-        mon.languageIndex = Languages.indexOf('ENG')
+        mon.language = Language.English
         this.boxes[boxNumber].pokemon[monIndex] = mon
       }
     })
