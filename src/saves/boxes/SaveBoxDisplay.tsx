@@ -64,15 +64,13 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
     const unsupportedMons = mons.filter((mon) => !save.supportsMon(mon.dexNum, mon.formeNum))
 
     if (unsupportedMons.length) {
-      const saveName = save.getGameName()
-
       dispatchError({
         type: 'set_message',
         payload: {
           title: 'Import Failed',
           messages: unsupportedMons.map(
             (mon) =>
-              `${MetadataLookup(mon.dexNum, mon.formeNum)?.formeName} cannot be moved into ${saveName}`
+              `${MetadataLookup(mon.dexNum, mon.formeNum)?.formeName} cannot be moved into ${save.gameName}`
           ),
         },
       })
@@ -140,8 +138,8 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
               <div
                 className="save-header-game diagonal-clip"
                 style={{
-                  backgroundColor: save.gameColor(),
-                  color: colorIsDark(save.gameColor()) ? 'white' : 'black',
+                  backgroundColor: save.gameColor,
+                  color: colorIsDark(save.gameColor) ? 'white' : 'black',
                 }}
               >
                 <Button
@@ -158,7 +156,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                 >
                   <MdClose />
                 </Button>
-                {save.getGameName().slice(8)}
+                {save.gameName}
               </div>
               {save?.name}
             </div>
@@ -285,11 +283,6 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                 <div style={{ overflowWrap: 'break-word', width: '100%' }}>
                   {save.fileCreated.toDateString()}
                 </div>
-              </AttributeRow>
-            )}
-            {save.calculatePcChecksum && (
-              <AttributeRow label="Calculated PC Checksum">
-                <code>0x{save.calculatePcChecksum().toString(16)}</code>
               </AttributeRow>
             )}
             {Object.entries(displayData).map(([label, value]) => (

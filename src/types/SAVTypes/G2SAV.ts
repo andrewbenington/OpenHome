@@ -1,7 +1,6 @@
 import { PK2 } from '@pokemon-files/pkm'
-import { Language } from '@pokemon-resources/pkg'
+import { Language, OriginGame } from '@pokemon-resources/pkg'
 import { uniq } from 'lodash'
-import { GameOfOrigin, GameOfOriginData } from 'pokemon-resources'
 import { EXCLAMATION } from 'src/consts/Formes'
 import { NationalDex } from 'src/consts/NationalDex'
 import { GEN2_TRANSFER_RESTRICTIONS } from 'src/consts/TransferRestrictions'
@@ -9,21 +8,21 @@ import { bytesToUint16BigEndian, get8BitChecksum } from 'src/util/byteLogic'
 import { gen12StringToUTF, utf16StringToGen12 } from 'src/util/Strings/StringConverter'
 import { OHPKM } from '../pkm/OHPKM'
 import { emptyPathData, PathData } from './path'
-import { Box, BoxCoordinates, SAV } from './SAV'
+import { Box, BoxCoordinates, OfficialSAV } from './SAV'
 import { LOOKUP_TYPE } from './util'
 
 const CURRENT_BOX_OFFSET_GS_INTL = 0x2724
 const CURRENT_BOX_OFFSET_C_INTL = 0x2700
 const SAVE_SIZE_BYTES = 0x8000
 
-export class G2SAV implements SAV<PK2> {
+export class G2SAV extends OfficialSAV<PK2> {
   static pkmType = PK2
   boxOffsets: number[]
 
   static transferRestrictions = GEN2_TRANSFER_RESTRICTIONS
   static lookupType: LOOKUP_TYPE = 'gen12'
 
-  origin: GameOfOrigin = 0
+  origin: OriginGame = OriginGame.Gold
   isPlugin: false = false
 
   boxRows = 4
@@ -48,6 +47,7 @@ export class G2SAV implements SAV<PK2> {
   updatedBoxSlots: BoxCoordinates[] = []
 
   constructor(path: PathData, bytes: Uint8Array, fileCreated?: Date) {
+    super()
     this.bytes = bytes
     this.filePath = path
     this.fileCreated = fileCreated
@@ -62,16 +62,16 @@ export class G2SAV implements SAV<PK2> {
     if (this.areGoldSilverChecksumsValid()) {
       // hacky but unavoidable
       if (this.filePath.name.toUpperCase().includes('SILVER')) {
-        this.origin = GameOfOrigin.Silver
+        this.origin = OriginGame.Silver
       } else {
-        this.origin = GameOfOrigin.Gold
+        this.origin = OriginGame.Gold
       }
     } else if (this.areCrystalInternationalChecksumsValid()) {
-      this.origin = GameOfOrigin.Crystal
+      this.origin = OriginGame.Crystal
     }
 
     this.currentPCBox =
-      this.origin === GameOfOrigin.Crystal
+      this.origin === OriginGame.Crystal
         ? this.bytes[CURRENT_BOX_OFFSET_C_INTL]
         : this.bytes[CURRENT_BOX_OFFSET_GS_INTL]
 
@@ -107,7 +107,7 @@ export class G2SAV implements SAV<PK2> {
             monIndex * 11,
           11
         )
-        mon.gameOfOrigin = mon.metLevel ? GameOfOrigin.Crystal : this.origin
+        mon.gameOfOrigin = mon.metLevel ? OriginGame.Crystal : this.origin
         mon.language = Language.English
         this.boxes[boxNumber].pokemon[monIndex] = mon
       }
@@ -199,12 +199,12 @@ export class G2SAV implements SAV<PK2> {
       this.bytes[boxByteOffset + 1 + numMons] = 0xff
     })
     switch (this.origin) {
-      case GameOfOrigin.Gold:
-      case GameOfOrigin.Silver:
+      case OriginGame.Gold:
+      case OriginGame.Silver:
         this.bytes[0x2d69] = this.getGoldSilverInternationalChecksum1()
         this.bytes[0x7e6d] = this.getGoldSilverInternationalChecksum2()
         break
-      case GameOfOrigin.Crystal:
+      case OriginGame.Crystal:
         this.bytes.set(this.bytes.slice(0x2009, 0x2b82), 0x1209)
         this.bytes[0x2d0d] = this.getCrystalInternationalChecksum1()
         this.bytes[0x1f0d] = this.getCrystalInternationalChecksum2()
@@ -269,12 +269,6 @@ export class G2SAV implements SAV<PK2> {
     return this.boxes[this.currentPCBox]
   }
 
-  getGameName() {
-    const gameOfOrigin = GameOfOriginData[this.origin]
-
-    return gameOfOrigin ? `Pokémon ${gameOfOrigin.name}` : '(Unknown Game)'
-  }
-
   static saveTypeAbbreviation = 'GSC (Int)'
   static saveTypeName = 'Pokémon Gold/Silver/Crystal (INT)'
   static saveTypeID = 'G2SAV'
@@ -292,24 +286,7 @@ export class G2SAV implements SAV<PK2> {
     }
   }
 
-  gameColor() {
-    switch (this.origin) {
-      case GameOfOrigin.Gold:
-        return '#DAA520'
-      case GameOfOrigin.Silver:
-        return '#C0C0C0'
-      case GameOfOrigin.Crystal:
-        return '#3D51A7'
-      default:
-        return '#666666'
-    }
-  }
-
-  static includesOrigin(origin: GameOfOrigin) {
-    return origin >= GameOfOrigin.Gold && origin <= GameOfOrigin.Crystal
-  }
-
-  getPluginIdentifier() {
-    return undefined
+  static includesOrigin(origin: OriginGame) {
+    return origin >= OriginGame.Gold && origin <= OriginGame.Crystal
   }
 }

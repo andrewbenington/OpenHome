@@ -1,4 +1,4 @@
-import { GameOfOrigin } from 'pokemon-resources'
+import { OriginGame } from '@pokemon-resources/pkg'
 import { BW_TRANSFER_RESTRICTIONS } from 'src/consts/TransferRestrictions'
 import { isRestricted } from '../TransferRestrictions'
 import { G5SAV } from './G5SAV'
@@ -22,15 +22,15 @@ export class BWSAV extends G5SAV {
     }
 
     return (
-      bytes[G5SAV.originOffset] === GameOfOrigin.White ||
-      bytes[G5SAV.originOffset] === GameOfOrigin.Black
+      bytes[G5SAV.originOffset] === OriginGame.White ||
+      bytes[G5SAV.originOffset] === OriginGame.Black
     )
   }
 
   static saveTypeName = 'Pokémon Black/White'
   static saveTypeID = 'BWSAV'
 
-  static includesOrigin(origin: GameOfOrigin) {
-    return origin === GameOfOrigin.White || origin === GameOfOrigin.Black
+  static includesOrigin(origin: OriginGame) {
+    return origin === OriginGame.White || origin === OriginGame.Black
   }
 }

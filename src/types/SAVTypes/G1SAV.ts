@@ -1,7 +1,6 @@
 import { PK1 } from '@pokemon-files/pkm'
-import { Language } from '@pokemon-resources/pkg'
+import { Language, OriginGame } from '@pokemon-resources/pkg'
 import lodash from 'lodash'
-import { GameOfOrigin, GameOfOriginData } from 'pokemon-resources'
 import { NationalDex } from 'src/consts/NationalDex'
 import { GEN1_TRANSFER_RESTRICTIONS } from 'src/consts/TransferRestrictions'
 import { bytesToUint16BigEndian, get8BitChecksum } from 'src/util/byteLogic'
@@ -9,12 +8,12 @@ import { natDexToGen1ID } from 'src/util/ConvertPokemonID'
 import { gen12StringToUTF, utf16StringToGen12 } from 'src/util/Strings/StringConverter'
 import { OHPKM } from '../pkm/OHPKM'
 import { PathData } from './path'
-import { Box, BoxCoordinates, SAV } from './SAV'
+import { Box, BoxCoordinates, OfficialSAV } from './SAV'
 import { LOOKUP_TYPE } from './util'
 
 const SAVE_SIZE_BYTES = 0x8000
 
-export class G1SAV implements SAV<PK1> {
+export class G1SAV extends OfficialSAV<PK1> {
   static pkmType = PK1
 
   static transferRestrictions = GEN1_TRANSFER_RESTRICTIONS
@@ -36,7 +35,7 @@ export class G1SAV implements SAV<PK1> {
 
   BOX_NICKNAME_OFFSET = 0x386
 
-  origin: GameOfOrigin = GameOfOrigin.Red // TODO: game detection
+  origin: OriginGame = OriginGame.Red
   isPlugin: false = false
 
   boxRows = 4
@@ -61,6 +60,7 @@ export class G1SAV implements SAV<PK1> {
   updatedBoxSlots: BoxCoordinates[] = []
 
   constructor(path: PathData, bytes: Uint8Array, fileCreated?: Date) {
+    super()
     this.bytes = bytes
     this.filePath = path
     this.fileCreated = fileCreated
@@ -87,13 +87,14 @@ export class G1SAV implements SAV<PK1> {
       currenBoxByteOffset
     )
 
+    this.origin = OriginGame.Red
     if (this.bytes[0x271c] > 0 || path.name.toLowerCase().includes('yellow')) {
       // pikachu friendship
-      this.origin = GameOfOrigin.Yellow
+      this.origin = OriginGame.Yellow
     } else if (path.name.toLowerCase().includes('blue')) {
-      this.origin = GameOfOrigin.BlueGreen
+      this.origin = OriginGame.BlueGreen
     } else {
-      this.origin = GameOfOrigin.Red
+      this.origin = OriginGame.Red
     }
     const pokemonPerBox = this.boxRows * this.boxColumns
 
@@ -243,12 +244,6 @@ export class G1SAV implements SAV<PK1> {
     return this.boxes[this.currentPCBox]
   }
 
-  getGameName() {
-    const gameOfOrigin = GameOfOriginData[this.origin]
-
-    return gameOfOrigin ? `Pokémon ${gameOfOrigin.name}` : '(Unknown Game)'
-  }
-
   static saveTypeAbbreviation = 'RBY (Int)'
   static saveTypeName = 'Pokémon Red/Blue/Yellow (INT)'
   static saveTypeID = 'G1SAV'
@@ -267,26 +262,8 @@ export class G1SAV implements SAV<PK1> {
     return bytes.length === SAVE_SIZE_BYTES
   }
 
-  gameColor() {
-    switch (this.origin) {
-      case GameOfOrigin.Red:
-        return '#DA3914'
-      case GameOfOrigin.BlueGreen:
-      case GameOfOrigin.BlueJapan:
-        return '#2E50D8'
-      case GameOfOrigin.Yellow:
-        return '#FFD733'
-      default:
-        return '#666666'
-    }
-  }
-
-  static includesOrigin(origin: GameOfOrigin) {
-    return origin >= GameOfOrigin.Red && origin <= GameOfOrigin.Yellow
-  }
-
-  getPluginIdentifier() {
-    return undefined
+  static includesOrigin(origin: OriginGame) {
+    return origin >= OriginGame.Red && origin <= OriginGame.Yellow
   }
 }
 

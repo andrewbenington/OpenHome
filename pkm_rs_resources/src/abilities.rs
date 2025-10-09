@@ -49,14 +49,12 @@ impl AbilityIndex {
         AbilityIndex::new(val)
     }
 
-    #[cfg(feature = "wasm")]
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
     pub fn index(self) -> u16 {
         self.get()
     }
 
-    #[cfg(feature = "wasm")]
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
     pub fn name(self) -> String {
         self.get_metadata().name.to_owned()
     }

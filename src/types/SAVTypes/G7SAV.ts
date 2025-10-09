@@ -1,5 +1,5 @@
 import { PK7 } from '@pokemon-files/pkm'
-import { GameOfOrigin, GameOfOriginData } from 'pokemon-resources'
+import { OriginGame } from '@pokemon-resources/pkg'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -9,19 +9,18 @@ import { CRC16_Invert, SignWithMemeCrypto } from 'src/util/Encryption'
 import { utf16BytesToString } from 'src/util/Strings/StringConverter'
 import { OHPKM } from '../pkm/OHPKM'
 import { PathData } from './path'
-import { Box, BoxCoordinates, SAV } from './SAV'
+import { Box, BoxCoordinates, OfficialSAV } from './SAV'
 import { SIZE_USUM } from './util'
 
 const BOX_SIZE: number = 232 * 30
 const BOX_COUNT = 32
 
-export abstract class G7SAV implements SAV<PK7> {
+export abstract class G7SAV extends OfficialSAV<PK7> {
   static pkmType = PK7
   static saveTypeAbbreviation = 'SM/USUM'
   static saveTypeID = 'G7SAV'
 
-  origin: GameOfOrigin = 0
-  isPlugin = false
+  origin: OriginGame
 
   boxRows = 5
   boxColumns = 6
@@ -61,6 +60,7 @@ export abstract class G7SAV implements SAV<PK7> {
     pcChecksumOffset: number,
     boxNamesOffset: number
   ) {
+    super()
     this.bytes = bytes
     this.filePath = path
     if (bytes.length === SIZE_USUM) {
@@ -149,31 +149,6 @@ export abstract class G7SAV implements SAV<PK7> {
 
   getCurrentBox() {
     return this.boxes[this.currentPCBox]
-  }
-
-  getGameName() {
-    const gameOfOrigin = GameOfOriginData[this.origin]
-
-    return gameOfOrigin ? `Pokémon ${gameOfOrigin.name}` : '(Unknown Game)'
-  }
-
-  gameColor() {
-    switch (this.origin) {
-      case GameOfOrigin.Sun:
-        return '#F1912B'
-      case GameOfOrigin.Moon:
-        return '#5599CA'
-      case GameOfOrigin.UltraSun:
-        return '#E95B2B'
-      case GameOfOrigin.UltraMoon:
-        return '#226DB5'
-      default:
-        return '#666666'
-    }
-  }
-
-  getPluginIdentifier() {
-    return undefined
   }
 
   calculateChecksumStr() {

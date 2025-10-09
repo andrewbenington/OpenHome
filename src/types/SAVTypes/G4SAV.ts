@@ -1,5 +1,5 @@
 import { PK4 } from '@pokemon-files/pkm'
-import { GameOfOrigin, GameOfOriginData } from 'pokemon-resources'
+import { OriginGame } from '@pokemon-resources/pkg'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -9,16 +9,16 @@ import { CRC16_CCITT } from 'src/util/Encryption'
 import { gen4StringToUTF } from 'src/util/Strings/StringConverter'
 import { OHPKM } from '../pkm/OHPKM'
 import { PathData } from './path'
-import { Box, BoxCoordinates, SAV } from './SAV'
+import { Box, BoxCoordinates, OfficialSAV } from './SAV'
 import { LOOKUP_TYPE } from './util'
 
-export abstract class G4SAV implements SAV<PK4> {
+export abstract class G4SAV extends OfficialSAV<PK4> {
   static BOX_COUNT = 18
   static pkmType = PK4
   static SAVE_SIZE_BYTES = 0x80000
   static lookupType: LOOKUP_TYPE = 'gen345'
 
-  origin: GameOfOrigin = 0
+  origin: OriginGame
   isPlugin: false = false
 
   boxRows = 5
@@ -57,19 +57,17 @@ export abstract class G4SAV implements SAV<PK4> {
   footerSize: number = 0x14
 
   constructor(path: PathData, bytes: Uint8Array) {
+    super()
     this.bytes = bytes
     this.filePath = path
     this.boxes = Array(G4SAV.BOX_COUNT)
     if (bytesToUint32LittleEndian(bytes, 0) === 0xffffffff) {
       this.tooEarlyToOpen = true
+      this.origin = OriginGame.Diamond
       return
     }
     this.origin = bytes[0x80]
   }
-  pluginIdentifier?: string | undefined
-  pcChecksumOffset?: number | undefined
-  pcOffset?: number | undefined
-  calculatePcChecksum?: (() => number) | undefined
 
   buildBoxes() {
     if (bytesToUint32LittleEndian(this.bytes, this.currentSaveBoxStartOffset) === 0xffffffff) {
@@ -170,12 +168,6 @@ export abstract class G4SAV implements SAV<PK4> {
     return this.boxes[this.currentPCBox]
   }
 
-  getGameName() {
-    const gameOfOrigin = GameOfOriginData[this.origin]
-
-    return gameOfOrigin ? `Pokémon ${gameOfOrigin.name}` : '(Unknown Game)'
-  }
-
   static saveTypeAbbreviation = 'DPPt/HGSS'
   static saveTypeName = 'Pokémon Diamond/Pearl/Platinum/HeartGold/SoulSilver'
   static saveTypeID = 'G4SAV'
@@ -193,31 +185,10 @@ export abstract class G4SAV implements SAV<PK4> {
     return date === DATE_INT || date === DATE_KO
   }
 
-  gameColor() {
-    switch (this.origin) {
-      case GameOfOrigin.Diamond:
-        return '#90BEED'
-      case GameOfOrigin.Pearl:
-        return '#DD7CB1'
-      case GameOfOrigin.Platinum:
-        return '#A0A08D'
-      case GameOfOrigin.HeartGold:
-        return '#E8B502'
-      case GameOfOrigin.SoulSilver:
-        return '#AAB9CF'
-      default:
-        return '#666666'
-    }
-  }
-
-  static includesOrigin(origin: GameOfOrigin) {
+  static includesOrigin(origin: OriginGame) {
     return (
-      (origin >= GameOfOrigin.Diamond && origin <= GameOfOrigin.Platinum) ||
-      (origin >= GameOfOrigin.HeartGold && origin <= GameOfOrigin.SoulSilver)
+      (origin >= OriginGame.Diamond && origin <= OriginGame.Platinum) ||
+      (origin >= OriginGame.HeartGold && origin <= OriginGame.SoulSilver)
     )
-  }
-
-  getPluginIdentifier() {
-    return undefined
   }
 }

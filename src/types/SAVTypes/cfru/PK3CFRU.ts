@@ -1,4 +1,4 @@
-import { Ball, GameOfOrigin, ItemFromString, NatureToString } from 'pokemon-resources'
+import { Ball, ItemFromString, NatureToString } from 'pokemon-resources'
 
 import {
   generatePersonalityValuePreservingAttributes,
@@ -19,7 +19,13 @@ import {
   writeGen3StringToBytes,
   writeStatsToBytesU8,
 } from '@pokemon-files/util'
-import { Language, Languages, MetadataLookup, SpeciesLookup } from '@pokemon-resources/pkg'
+import {
+  Language,
+  Languages,
+  MetadataLookup,
+  OriginGame,
+  SpeciesLookup,
+} from '@pokemon-resources/pkg'
 import { getHPGen3Onward, getStatGen3Onward } from '../../../util/StatCalc'
 import { PKMInterface, PluginPKMInterface } from '../../interfaces'
 
@@ -28,8 +34,8 @@ export interface CFRUToNationalDexEntry {
   FormIndex: number
 }
 
-const INTERNAL_ORIGIN_NON_RR = GameOfOrigin.INVALID_6
-const INTERNAL_ORIGIN_FROM_CFRU = GameOfOrigin.FireRed
+const INTERNAL_ORIGIN_NON_RR = 6
+const INTERNAL_ORIGIN_FROM_CFRU = OriginGame.FireRed
 const FIRERED_IN_GAME_TRADE = 255
 
 const CFRU_BALLS: Ball[] = [

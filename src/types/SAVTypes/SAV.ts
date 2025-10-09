@@ -1,4 +1,4 @@
-import { GameOfOrigin } from 'pokemon-resources'
+import { getPluginColor, OriginGame, OriginGames, OriginMark } from '@pokemon-resources/pkg'
 import { SaveRef } from '../../types/types'
 import { PKMInterface } from '../interfaces'
 import { OHPKM } from '../pkm/OHPKM'
@@ -24,8 +24,10 @@ export type SlotMetadata =
   | { isDisabled: true; disabledReason: string }
   | { isDisabled: false; disabledReason?: undefined }
 
-export interface SAV<P extends PKMInterface = PKMInterface> {
-  origin: GameOfOrigin
+export type SAV<P extends PKMInterface = PKMInterface> = OfficialSAV<P> | PluginSAV<P>
+
+export interface BaseSAV<P extends PKMInterface = PKMInterface> {
+  origin: OriginGame
 
   boxRows: number
   boxColumns: number
@@ -47,14 +49,9 @@ export interface SAV<P extends PKMInterface = PKMInterface> {
   invalid: boolean
   tooEarlyToOpen: boolean
 
-  pcChecksumOffset?: number
-  pcOffset?: number
-
   updatedBoxSlots: BoxCoordinates[]
 
-  gameColor: () => string
   isPlugin: boolean
-  getPluginIdentifier: () => string | undefined
 
   getCurrentBox: () => Box<P>
   supportsMon: (dexNumber: number, formeNumber: number) => boolean
@@ -62,27 +59,103 @@ export interface SAV<P extends PKMInterface = PKMInterface> {
 
   prepareBoxesAndGetModified: () => OHPKM[]
 
-  calculatePcChecksum?: () => number
-
-  getGameName: () => string
-
-  getDisplayData?: () => Record<string, string | number | undefined>
+  getDisplayData(): Record<string, string | number | undefined> | undefined
 }
 
-export type PluginSAV<P extends PKMInterface = PKMInterface> = SAV<P> & {
-  getPluginIdentifier: () => string
-  isPlugin: true
+export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> implements BaseSAV<P> {
+  abstract origin: OriginGame
+  abstract boxRows: number
+  abstract boxColumns: number
+  abstract filePath: PathData
+  abstract fileCreated?: Date | undefined
+  abstract money: number
+  abstract name: string
+  abstract tid: number
+  abstract sid?: number | undefined
+  abstract displayID: string
+  abstract currentPCBox: number
+  abstract boxes: Box<P>[]
+  abstract bytes: Uint8Array<ArrayBufferLike>
+  abstract invalid: boolean
+  abstract tooEarlyToOpen: boolean
+  abstract updatedBoxSlots: BoxCoordinates[]
+  abstract getCurrentBox(): Box<P>
+  abstract supportsMon(dexNumber: number, formeNumber: number): boolean
+  abstract prepareBoxesAndGetModified(): OHPKM[]
+
+  getDisplayData(): Record<string, string | number | undefined> | undefined {
+    return {
+      'Trainer Name': this.name,
+      'Trainer ID': this.displayID,
+    }
+  }
+
+  getSlotMetadata?: (boxNum: number, boxSlot: number) => SlotMetadata = undefined
+  isPlugin: false = false
+
+  get gameName(): string {
+    return OriginGames.gameName(this.origin)
+  }
+
+  get gameColor(): string {
+    return OriginGames.color(this.origin)
+  }
+
+  get gameLogoPath(): string | undefined {
+    return OriginGames.logoPath(this.origin)
+  }
+
+  get originMark(): OriginMark | undefined {
+    return OriginGames.mark(this.origin)
+  }
+}
+
+export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implements BaseSAV<P> {
+  abstract origin: OriginGame
+  abstract boxRows: number
+  abstract boxColumns: number
+  abstract filePath: PathData
+  abstract fileCreated?: Date | undefined
+  abstract money: number
+  abstract name: string
+  abstract tid: number
+  abstract sid?: number | undefined
+  abstract displayID: string
+  abstract currentPCBox: number
+  abstract boxes: Box<P>[]
+  abstract bytes: Uint8Array<ArrayBufferLike>
+  abstract invalid: boolean
+  abstract tooEarlyToOpen: boolean
+  abstract updatedBoxSlots: BoxCoordinates[]
+  abstract getCurrentBox: () => Box<P>
+  abstract supportsMon: (dexNumber: number, formeNumber: number) => boolean
+  abstract getSlotMetadata?: ((boxNum: number, boxSlot: number) => SlotMetadata) | undefined
+  abstract prepareBoxesAndGetModified: () => OHPKM[]
+  abstract getDisplayData(): Record<string, string | number | undefined> | undefined
+
+  abstract getPluginIdentifier: () => string
+  isPlugin = true
+
+  abstract get gameName(): string
+
+  get gameColor(): string {
+    return getPluginColor(this.getPluginIdentifier())
+  }
+
+  get gameLogoPath(): string {
+    return `logos/${this.getPluginIdentifier()}.png`
+  }
 }
 
 export function getSaveRef(save: SAV): SaveRef {
   return {
     filePath: save.filePath,
-    game: save.origin,
+    game: save.isPlugin ? null : save.origin,
     trainerName: save.name ? save.name : null,
     trainerID: save.displayID,
     lastOpened: null,
     lastModified: null,
-    pluginIdentifier: save.getPluginIdentifier() ?? null,
+    pluginIdentifier: save.isPlugin ? save.getPluginIdentifier() : null,
     valid: true,
   }
 }

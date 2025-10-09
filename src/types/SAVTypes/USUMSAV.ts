@@ -1,4 +1,4 @@
-import { GameOfOrigin } from 'pokemon-resources'
+import { OriginGame } from '@pokemon-resources/pkg'
 import { USUM_TRANSFER_RESTRICTIONS } from 'src/consts/TransferRestrictions'
 import { isRestricted } from '../TransferRestrictions'
 import { G7SAV } from './G7SAV'
@@ -28,7 +28,7 @@ export class USUMSAV extends G7SAV {
 
   static saveTypeName = 'Pokémon Ultra Sun/Ultra Moon'
 
-  static includesOrigin(origin: GameOfOrigin) {
-    return origin === GameOfOrigin.UltraSun || origin === GameOfOrigin.UltraMoon
+  static includesOrigin(origin: OriginGame) {
+    return origin === OriginGame.UltraSun || origin === OriginGame.UltraMoon
   }
 }

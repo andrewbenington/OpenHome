@@ -1,9 +1,8 @@
-import { all_species_data, SpeciesLookup } from '@pokemon-resources/pkg'
+import { all_species_data, OriginGame, SpeciesLookup } from '@pokemon-resources/pkg'
 import { Button, Card, Flex, Text } from '@radix-ui/themes'
 import {
   Ability,
   Balls,
-  GameOfOrigin,
   GameOfOriginData,
   isGBA,
   isGen4,
@@ -50,7 +49,7 @@ function getOriginIcon(origin: Origin) {
       ? 'icons/ds.png'
       : isGBA(origin.index)
         ? 'icons/gba.png'
-        : origin.index === GameOfOrigin.ColosseumXD
+        : origin.index === OriginGame.ColosseumXd
           ? 'icons/gcn.png'
           : origin.mark
             ? getOriginMark(origin.mark)

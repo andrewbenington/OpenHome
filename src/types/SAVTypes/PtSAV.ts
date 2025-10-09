@@ -1,5 +1,5 @@
 import { PK4 } from '@pokemon-files/pkm'
-import { GameOfOrigin } from 'pokemon-resources'
+import { OriginGame } from '@pokemon-resources/pkg'
 import { PT_TRANSFER_RESTRICTIONS } from 'src/consts/TransferRestrictions'
 import { bytesToUint16LittleEndian, bytesToUint32LittleEndian } from 'src/util/byteLogic'
 import { gen4StringToUTF } from 'src/util/Strings/StringConverter'
@@ -20,7 +20,7 @@ export class PtSAV extends G4SAV {
   invalid: boolean = false
   tooEarlyToOpen: boolean = false
 
-  origin = GameOfOrigin.Platinum
+  origin = OriginGame.Platinum
 
   static transferRestrictions = PT_TRANSFER_RESTRICTIONS
 
@@ -86,7 +86,7 @@ export class PtSAV extends G4SAV {
     return G4SAV.validDateAndSize(bytes, 0x4cf2c)
   }
 
-  static includesOrigin(origin: GameOfOrigin) {
-    return origin === GameOfOrigin.Platinum
+  static includesOrigin(origin: OriginGame) {
+    return origin === OriginGame.Platinum
   }
 }

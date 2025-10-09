@@ -3,7 +3,6 @@ import { isRestricted, TransferRestrictions } from '../../TransferRestrictions'
 import { findFirstSectionOffset, G3CFRUSAV, SAVE_SIZES_BYTES } from '../cfru/G3CFRUSAV'
 import { FRLG_SECURITY_COPY_OFFSET, FRLG_SECURITY_OFFSET } from '../G3SAV'
 import { PathData } from '../path'
-import { PluginSAV } from '../SAV'
 import { RRExcludedForms, RRTransferMon } from './conversion/RRTransferMons'
 import PK3RR from './PK3RR'
 
@@ -13,10 +12,14 @@ const RR_TRANSFER_RESTRICTIONS: TransferRestrictions = {
   excludedForms: RRExcludedForms,
 }
 
-export class G3RRSAV extends G3CFRUSAV<PK3RR> implements PluginSAV<PK3RR> {
+export class G3RRSAV extends G3CFRUSAV<PK3RR> {
   static transferRestrictions: TransferRestrictions = RR_TRANSFER_RESTRICTIONS
 
   pluginIdentifier = 'radical_red'
+
+  get gameName() {
+    return 'Radical Red'
+  }
 
   supportsMon(dexNumber: number, formeNumber: number) {
     return !isRestricted(RR_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)
@@ -46,9 +49,5 @@ export class G3RRSAV extends G3CFRUSAV<PK3RR> implements PluginSAV<PK3RR> {
     // Radical Red seems to have the security key set to 0, which has a 1 in 4.2 billion
     // chance to happen in vanilla FireRed (if it can even be 0 at all)
     return securityKey === 0 || securityKey !== securityKeyCopy
-  }
-
-  gameColor(): string {
-    return '#660000'
   }
 }

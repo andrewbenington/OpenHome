@@ -1,4 +1,3 @@
-import { OriginGameMetadata } from '@pokemon-resources/pkg'
 import { Flex } from '@radix-ui/themes'
 import * as E from 'fp-ts/lib/Either'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
@@ -131,11 +130,10 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
       name: 'Game',
       width: 130,
       renderValue: (value) => {
-        const metadata = OriginGameMetadata.fromIndex(value.origin)
-        return metadata?.logo ? (
-          <img alt="save logo" height={40} src={`logos/${metadata.logo}`} />
+        return value.gameLogoPath ? (
+          <img alt="save logo" height={40} src={value.gameLogoPath} />
         ) : (
-          <div>{metadata?.gameName ?? 'Unknown'}</div>
+          <div>{value.gameName}</div>
         )
       },
       sortFunction: numericSorter((val) => val.origin),

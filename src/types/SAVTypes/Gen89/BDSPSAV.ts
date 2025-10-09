@@ -1,12 +1,12 @@
 import { PB8 } from '@pokemon-files/pkm'
 import { utf16BytesToString } from '@pokemon-files/util'
-import { GameOfOrigin, GameOfOriginData } from 'pokemon-resources'
+import { OriginGame } from '@pokemon-resources/pkg'
 import { BDSP_TRANSFER_RESTRICTIONS } from '../../../consts/TransferRestrictions'
 import { md5Digest } from '../../../util/Encryption'
 import { OHPKM } from '../../pkm/OHPKM'
 import { isRestricted } from '../../TransferRestrictions'
 import { PathData } from '../path'
-import { Box, BoxCoordinates, SAV } from '../SAV'
+import { Box, BoxCoordinates, OfficialSAV } from '../SAV'
 
 const SAVE_SIZE_BYTES_MIN = 900000
 const SAVE_SIZE_BYTES_MAX = 1000000
@@ -18,7 +18,7 @@ const HASH_OFFSET = 0xe9818
 
 export type BDSP_SAVE_REVISION = '1.0' | '1.1' | '1.2' | '1.3'
 
-export class BDSPSAV implements SAV<PB8> {
+export class BDSPSAV extends OfficialSAV<PB8> {
   static boxSizeBytes = PB8.getBoxSize() * 30
   static pkmType = PB8
   static saveTypeAbbreviation = 'BDSP'
@@ -28,8 +28,8 @@ export class BDSPSAV implements SAV<PB8> {
   filePath: PathData
   fileCreated?: Date
 
-  origin: GameOfOrigin = 0
-  isPlugin = false
+  origin: OriginGame
+  isPlugin = false as const
 
   boxRows = 5
   boxColumns = 6
@@ -53,6 +53,7 @@ export class BDSPSAV implements SAV<PB8> {
   updatedBoxSlots: BoxCoordinates[] = []
 
   constructor(path: PathData, bytes: Uint8Array) {
+    super()
     this.bytes = bytes
     this.filePath = path
 
@@ -91,17 +92,6 @@ export class BDSPSAV implements SAV<PB8> {
           console.error(e)
         }
       }
-    }
-  }
-
-  gameColor() {
-    switch (this.origin) {
-      case GameOfOrigin.BrilliantDiamond:
-        return '#44BAE5'
-      case GameOfOrigin.ShiningPearl:
-        return '#DA7D99'
-      default:
-        return '#666666'
     }
   }
 
@@ -198,12 +188,6 @@ export class BDSPSAV implements SAV<PB8> {
     return this.boxes[this.currentPCBox]
   }
 
-  getGameName() {
-    const gameOfOrigin = GameOfOriginData[this.origin]
-
-    return gameOfOrigin ? `Pokémon ${gameOfOrigin.name}` : '(Unknown Game)'
-  }
-
   getDisplayData() {
     return {
       'Player Character': this.myStatusBlock.getGender() ? 'Dawn' : 'Lucas',
@@ -228,8 +212,8 @@ export class BDSPSAV implements SAV<PB8> {
     )
   }
 
-  static includesOrigin(origin: GameOfOrigin) {
-    return origin === GameOfOrigin.BrilliantDiamond || origin === GameOfOrigin.ShiningPearl
+  static includesOrigin(origin: OriginGame) {
+    return origin === OriginGame.BrilliantDiamond || origin === OriginGame.ShiningPearl
   }
 }
 
@@ -271,14 +255,10 @@ class MyStatusBlock {
   public getGender(): boolean {
     return !(this.dataView.getUint8(0x24) & 1)
   }
-  public getGame(): GameOfOrigin {
+  public getGame(): OriginGame {
     const origin = this.dataView.getUint8(0x2b)
 
-    return origin === 0
-      ? GameOfOrigin.BrilliantDiamond
-      : origin === 1
-        ? GameOfOrigin.ShiningPearl
-        : GameOfOrigin.INVALID_0
+    return origin === 0 ? OriginGame.BrilliantDiamond : OriginGame.ShiningPearl
   }
 }
 

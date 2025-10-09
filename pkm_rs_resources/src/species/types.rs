@@ -59,8 +59,7 @@ impl NatDexIndex {
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[allow(clippy::missing_const_for_fn)]
 impl NatDexIndex {
-    #[cfg(feature = "wasm")]
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
     pub fn index(&self) -> u16 {
         self.get()
     }

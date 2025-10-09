@@ -1,7 +1,6 @@
 import { PK9 } from '@pokemon-files/pkm'
 import { utf16BytesToString } from '@pokemon-files/util'
-import { Languages } from '@pokemon-resources/pkg'
-import { GameOfOrigin, GameOfOriginData } from 'pokemon-resources'
+import { Languages, OriginGame } from '@pokemon-resources/pkg'
 import {
   SV_TRANSFER_RESTRICTIONS_BASE,
   SV_TRANSFER_RESTRICTIONS_ID,
@@ -26,6 +25,8 @@ export class SVSAV extends G89SAV<PK9> {
   static saveTypeID = 'SVSAV'
 
   trainerBlock: MyStatus
+
+  origin: OriginGame
 
   constructor(path: PathData, bytes: Uint8Array) {
     super(path, bytes)
@@ -103,12 +104,6 @@ export class SVSAV extends G89SAV<PK9> {
     return this.boxes[this.currentPCBox]
   }
 
-  getGameName() {
-    const gameOfOrigin = GameOfOriginData[this.origin]
-
-    return gameOfOrigin ? `Pokémon ${gameOfOrigin.name}` : '(Unknown Game)'
-  }
-
   getSaveRevision(): SV_SAVE_REVISION {
     return this.getBlock('BlueberryPoints')
       ? 'Indigo Disk'
@@ -134,8 +129,8 @@ export class SVSAV extends G89SAV<PK9> {
     return SwishCrypto.getIsHashValid(bytes)
   }
 
-  static includesOrigin(origin: GameOfOrigin) {
-    return origin === GameOfOrigin.Scarlet || origin === GameOfOrigin.Violet
+  static includesOrigin(origin: OriginGame) {
+    return origin === OriginGame.Scarlet || origin === OriginGame.Violet
   }
 }
 
@@ -177,7 +172,7 @@ class MyStatus {
   public getSID(): number {
     return this.dataView.getUint16(0x02, true)
   }
-  public getGame(): GameOfOrigin {
+  public getGame(): OriginGame {
     return this.dataView.getUint8(0x04)
   }
   public getGender(): boolean {

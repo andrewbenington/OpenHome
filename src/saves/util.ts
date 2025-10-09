@@ -1,11 +1,11 @@
-import { OriginGame, OriginGameMetadata } from '@pokemon-resources/pkg'
+import { OriginGame, OriginGames } from '@pokemon-resources/pkg'
 import dayjs from 'dayjs'
 import { GameLogos, getOriginMark } from '../images/game'
-import { getPublicImageURL } from '../images/images'
 import { PKMInterface } from '../types/interfaces'
 import { HomeData } from '../types/SAVTypes/HomeData'
 import { Box, SAV } from '../types/SAVTypes/SAV'
 import { getPluginIdentifier, SAVClass } from '../types/SAVTypes/util'
+import { SaveRef } from '../types/types'
 import { filterUndefined } from '../util/Sort'
 
 export type SaveViewMode = 'card' | 'grid'
@@ -32,21 +32,15 @@ export function getMonSaveLogo(mon: PKMInterface, supportedSaves: SAVClass[]) {
     return GameLogos.GB
   }
 
-  return `logos/${OriginGameMetadata.fromIndex(mon.gameOfOrigin)?.logo}.png`
+  return OriginGames.logoPath(mon.gameOfOrigin)
 }
 
-export function getSaveLogo(
-  saveType: SAVClass | undefined,
-  origin: OriginGame
-): string | undefined {
-  if (saveType?.prototype.getPluginIdentifier.call({})) {
-    return getPublicImageURL(`logos/${saveType.prototype.getPluginIdentifier.call({})}.png`)
-  }
-  if (!origin) {
-    return getPublicImageURL(getOriginMark('GB'))
-  }
-
-  return `logos/${OriginGameMetadata.fromIndex(origin)?.logo}.png`
+export function logoFromSaveRef(ref: SaveRef): string | undefined {
+  return ref.pluginIdentifier
+    ? `logos/${ref.pluginIdentifier}.png`
+    : ref.game
+      ? OriginGames.logoPath(ref.game)
+      : undefined
 }
 
 export function formatTimeSince(timestamp?: number) {

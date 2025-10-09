@@ -1,7 +1,6 @@
 import { PK8 } from '@pokemon-files/pkm'
 import { utf16BytesToString } from '@pokemon-files/util'
-import { Languages, SpeciesLookup } from '@pokemon-resources/pkg'
-import { GameOfOrigin, GameOfOriginData } from 'pokemon-resources'
+import { Languages, OriginGame, SpeciesLookup } from '@pokemon-resources/pkg'
 import { NationalDex } from 'src/consts/NationalDex'
 import {
   SWSH_TRANSFER_RESTRICTIONS_BASE,
@@ -27,6 +26,7 @@ export class SwShSAV extends G89SAV<PK8> {
   static saveTypeID = 'SwShSAV'
 
   trainerBlock: TrainerBlock
+  origin: OriginGame
 
   constructor(path: PathData, bytes: Uint8Array) {
     super(path, bytes)
@@ -98,12 +98,6 @@ export class SwShSAV extends G89SAV<PK8> {
     return this.boxes[this.currentPCBox]
   }
 
-  getGameName() {
-    const gameOfOrigin = GameOfOriginData[this.origin]
-
-    return gameOfOrigin ? `Pokémon ${gameOfOrigin.name}` : '(Unknown Game)'
-  }
-
   getSaveRevision(): SWSH_SAVE_REVISION {
     return this.getBlock('ZukanR2')
       ? 'Crown Tundra'
@@ -138,8 +132,8 @@ export class SwShSAV extends G89SAV<PK8> {
     return SwishCrypto.getIsHashValid(bytes)
   }
 
-  static includesOrigin(origin: GameOfOrigin) {
-    return origin === GameOfOrigin.Sword || origin === GameOfOrigin.Shield
+  static includesOrigin(origin: OriginGame) {
+    return origin === OriginGame.Sword || origin === OriginGame.Shield
   }
 }
 
@@ -195,14 +189,10 @@ class TrainerBlock {
   public getShinyPokemonFound(): number {
     return this.dataView.getUint16(0x22, true)
   }
-  public getGame(): GameOfOrigin {
+  public getGame(): OriginGame {
     const origin = this.dataView.getUint8(0x24)
 
-    return origin === 0
-      ? GameOfOrigin.Sword
-      : origin === 1
-        ? GameOfOrigin.Shield
-        : GameOfOrigin.INVALID_0
+    return origin === 0 ? OriginGame.Sword : OriginGame.Shield
   }
   public getGender(): boolean {
     return !!(this.dataView.getUint8(0x38) & 1)

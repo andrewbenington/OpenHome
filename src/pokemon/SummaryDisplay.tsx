@@ -89,7 +89,7 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
             <div />
           )}
           <div style={{ fontWeight: 'bold' }}>{mon.nickname}</div>
-          <Badge variant="solid" color="gray" ml="2" size="3">
+          <Badge variant="solid" color="gray" ml="2" size="1">
             {mon.languageString}
           </Badge>
         </div>

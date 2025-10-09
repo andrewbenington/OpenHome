@@ -87,32 +87,27 @@ pub struct Languages;
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[allow(clippy::missing_const_for_fn)]
 impl Languages {
-    #[cfg(feature = "wasm")]
-    #[wasm_bindgen(js_name = "fromByteOrNone")]
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "fromByteOrNone"))]
     pub fn from_u8_or_none(value: u8) -> Language {
         Language::try_from(value).unwrap_or(Language::None)
     }
 
-    #[cfg(feature = "wasm")]
-    #[wasm_bindgen(js_name = "fromByteOrNoneGcn")]
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "fromByteOrNoneGcn"))]
     pub fn from_u8_or_none_gcn(value: u8) -> Language {
         Language::try_from_gcn(value).unwrap_or(Language::None)
     }
 
-    #[cfg(feature = "wasm")]
-    #[wasm_bindgen(js_name = "stringFromByte")]
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "stringFromByte"))]
     pub fn string_from_byte(value: u8) -> String {
         Languages::from_u8_or_none(value).as_str().to_owned()
     }
 
-    #[cfg(feature = "wasm")]
-    #[wasm_bindgen(js_name = "stringFromByteGcn")]
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "stringFromByteGcn"))]
     pub fn string_from_byte_gcn(value: u8) -> String {
         Languages::from_u8_or_none_gcn(value).as_str().to_owned()
     }
 
-    #[cfg(feature = "wasm")]
-    #[wasm_bindgen(js_name = "toGcnByte")]
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "toGcnByte"))]
     pub fn to_gcn_byte(value: u8) -> u8 {
         match Language::try_from(value).unwrap_or(Language::None) {
             Language::None => 0,

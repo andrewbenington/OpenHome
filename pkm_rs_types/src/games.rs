@@ -37,9 +37,9 @@ pub enum Region {
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Debug, PartialEq, Eq, Default, Clone, Copy)]
-pub struct GameOfOriginIndex(u8);
+pub struct OriginGameIndex(u8);
 
-impl GameOfOriginIndex {
+impl OriginGameIndex {
     pub const fn to_byte(self) -> u8 {
         self.0
     }
@@ -51,35 +51,34 @@ impl GameOfOriginIndex {
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[allow(clippy::missing_const_for_fn)]
-impl GameOfOriginIndex {
+impl OriginGameIndex {
     #[cfg(feature = "wasm")]
     #[wasm_bindgen(constructor)]
-    pub fn new(val: u8) -> GameOfOriginIndex {
-        GameOfOriginIndex(val)
+    pub fn new(val: u8) -> OriginGameIndex {
+        OriginGameIndex(val)
     }
 
-    #[cfg(feature = "wasm")]
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
     pub fn index(self) -> u8 {
         self.0
     }
 }
 
-impl From<u8> for GameOfOriginIndex {
+impl From<u8> for OriginGameIndex {
     fn from(value: u8) -> Self {
         Self(value)
     }
 }
 
-impl From<GameOfOriginIndex> for u8 {
-    fn from(val: GameOfOriginIndex) -> Self {
+impl From<OriginGameIndex> for u8 {
+    fn from(val: OriginGameIndex) -> Self {
         val.0
     }
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Debug, Clone, Copy)]
-pub struct GameOfOriginMetadata {
+pub struct OriginGameMetadata {
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub name: &'static str,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
@@ -96,7 +95,7 @@ pub struct GameOfOriginMetadata {
 #[cfg(feature = "wasm")]
 #[wasm_bindgen]
 #[allow(clippy::missing_const_for_fn)]
-impl GameOfOriginMetadata {
+impl OriginGameMetadata {
     #[wasm_bindgen(getter)]
     pub fn name(&self) -> String {
         self.name.to_string()

@@ -28,8 +28,7 @@ impl NatureIndex {
         NatureIndex(val)
     }
 
-    #[cfg(feature = "wasm")]
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
     pub fn index(self) -> u8 {
         self.0
     }

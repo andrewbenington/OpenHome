@@ -1,3 +1,4 @@
+import { OriginGames } from '@pokemon-resources/pkg'
 import { Badge, Flex } from '@radix-ui/themes'
 import {
   GameOfOriginData,
@@ -10,11 +11,10 @@ import Markings from '../components/Markings'
 import { getOriginMark } from '../images/game'
 import { getPublicImageURL } from '../images/images'
 import { getBallIconPath } from '../images/items'
-import { getMonSaveLogo } from '../saves/util'
 import { AppInfoContext } from '../state/appInfo'
 import { PKMInterface } from '../types/interfaces'
 import { getCharacteristic, getMoveMaxPP } from '../types/pkm/util'
-import { getGameName, getPluginIdentifier } from '../types/SAVTypes/util'
+import { getPluginIdentifier } from '../types/SAVTypes/util'
 import { Styles } from '../types/types'
 import MoveCard from './MoveCard'
 
@@ -76,11 +76,15 @@ const MetDataMovesDisplay = (props: { mon: PKMInterface }) => {
     let message = 'Met'
 
     if (mon.pluginOrigin) {
-      const saveType = getEnabledSaveTypes().find(
+      const pluginSaveType = getEnabledSaveTypes().find(
         (saveType) => mon.pluginOrigin === getPluginIdentifier(saveType)
       )
 
-      message += ` in ${saveType ? getGameName(saveType) : '(unknown game)'}`
+      if (pluginSaveType) {
+        message += ` in ${pluginSaveType.saveTypeName}`
+      } else {
+        message += ` in ${OriginGames.gameName(mon.gameOfOrigin) ?? '(unknown game)'}`
+      }
     }
 
     if (mon.metTimeOfDay) {
@@ -143,8 +147,8 @@ const MetDataMovesDisplay = (props: { mon: PKMInterface }) => {
                 ? ` ${RibbonTitles[mon.affixedRibbon]}`
                 : ''}
             </p>
-            <Badge variant="solid" color="gray" ml="2" size="2">
-              {mon.language}
+            <Badge variant="solid" color="gray" ml="2" size="1">
+              {mon.languageString}
             </Badge>
           </Flex>
           {eggMessage ? <p style={styles.description}>{eggMessage}</p> : <div />}
@@ -159,21 +163,17 @@ const MetDataMovesDisplay = (props: { mon: PKMInterface }) => {
             <div />
           )}
         </div>
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-evenly',
-          }}
-        >
+        <Flex direction="column">
           <div style={styles.gameContainer}>
             {mon.gameOfOrigin && (
               <img
                 draggable={false}
-                alt={`${
-                  mon.pluginOrigin ? mon.pluginOrigin : GameOfOriginData[mon.gameOfOrigin]?.name
-                } logo`}
-                src={getPublicImageURL(getMonSaveLogo(mon, getEnabledSaveTypes()) ?? '')}
+                alt={`${mon.pluginOrigin ?? OriginGames.gameName(mon.gameOfOrigin)} logo`}
+                src={
+                  mon.pluginOrigin
+                    ? `logos/${mon.pluginOrigin}.png`
+                    : OriginGames.logoPath(mon.gameOfOrigin)
+                }
                 style={styles.gameImage}
               />
             )}
@@ -193,7 +193,7 @@ const MetDataMovesDisplay = (props: { mon: PKMInterface }) => {
             )}
           </div>
           {'markings' in mon && mon.markings ? <Markings markings={mon.markings} /> : <div />}
-        </div>
+        </Flex>
       </Flex>
       <div style={{ flex: 1 }} />
       <div style={styles.centerFlex}>

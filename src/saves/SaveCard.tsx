@@ -1,14 +1,12 @@
+import { Generation, getPluginColor, OriginGames } from '@pokemon-resources/pkg'
 import { Badge, Flex } from '@radix-ui/themes'
-import { GameOfOrigin, isGameBoy } from 'pokemon-resources'
-import { useContext, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { SaveRef } from 'src/types/types'
 import { ErrorIcon } from '../components/Icons'
 import useDisplayError from '../hooks/displayError'
-import { AppInfoContext } from '../state/appInfo'
-import { getGameColor, getPluginIdentifier } from '../types/SAVTypes/util'
 import SaveDetailsMenu from './SaveDetailsMenu'
 import './style.css'
-import { formatTimeSince, getSaveLogo } from './util'
+import { formatTimeSince, logoFromSaveRef } from './util'
 
 export type SaveCardProps = {
   save: SaveRef
@@ -24,30 +22,22 @@ const standardViewMinSize = 180
 export default function SaveCard({ save, onOpen, onRemove, size = 240 }: SaveCardProps) {
   const [expanded, setExpanded] = useState(false)
   const displayError = useDisplayError()
-  const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
 
-  const gbBackground = useMemo(() => (save.game ? isGameBoy(save.game) : false), [save.game])
-
-  const saveType = useMemo(
-    () =>
-      save.game
-        ? getEnabledSaveTypes().find((s) => {
-            if (save.pluginIdentifier || getPluginIdentifier(s)) {
-              return save.pluginIdentifier === getPluginIdentifier(s)
-            }
-            return s.includesOrigin(save.game as GameOfOrigin)
-          })
-        : undefined,
-    [getEnabledSaveTypes, save.game, save.pluginIdentifier]
-  )
+  const isGameBoy = useMemo(() => {
+    return save.game
+      ? OriginGames.generation(save.game) === Generation.G1 ||
+          OriginGames.generation(save.game) === Generation.G2
+      : false
+  }, [save.game])
 
   const backgroundColor = useMemo(() => {
-    return getGameColor(saveType, save.game as GameOfOrigin)
-  }, [save.game, saveType])
+    return save.pluginIdentifier
+      ? getPluginColor(save.pluginIdentifier)
+      : OriginGames.color(save.game ?? 0)
+  }, [save.game, save.pluginIdentifier])
 
-  const backgroundImage = saveType
-    ? `url(${getSaveLogo(saveType, save.game as GameOfOrigin)})`
-    : undefined
+  const saveLogoPath = logoFromSaveRef(save)
+  const backgroundImage = saveLogoPath ? `url(${saveLogoPath})` : undefined
 
   return (
     <div style={{ position: 'relative' }}>
@@ -57,7 +47,7 @@ export default function SaveCard({ save, onOpen, onRemove, size = 240 }: SaveCar
           width: size,
           height: size,
           backgroundImage,
-          backgroundSize: gbBackground ? size : size * 0.9,
+          backgroundSize: isGameBoy ? size : size * 0.9,
           backgroundRepeat: 'no-repeat',
           backgroundPosition: 'center',
           backgroundColor,
@@ -79,15 +69,7 @@ export default function SaveCard({ save, onOpen, onRemove, size = 240 }: SaveCar
             </Badge>
           )}
           {save.lastOpened && size >= expandedViewMinSize && (
-            <Badge
-              variant="solid"
-              size="3"
-              color="gray"
-              radius="full"
-              style={{
-                maxWidth: '56%',
-              }}
-            >
+            <Badge variant="solid" size="3" color="gray" radius="full" style={{ maxWidth: '56%' }}>
               <b>{formatTimeSince(save.lastOpened)}</b>
             </Badge>
           )}
@@ -96,7 +78,7 @@ export default function SaveCard({ save, onOpen, onRemove, size = 240 }: SaveCar
             save={save}
             backgroundColor={backgroundColor}
             onRemove={onRemove}
-            backgroundAlwaysPresent={save.game ? isGameBoy(save.game) : false}
+            backgroundAlwaysPresent={isGameBoy}
           />
         </Flex>
         <div style={{ flex: 1 }} />

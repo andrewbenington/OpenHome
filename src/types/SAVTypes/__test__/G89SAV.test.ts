@@ -1,7 +1,8 @@
 import { PK4 } from '@pokemon-files/pkm'
+import { OriginGame } from '@pokemon-resources/pkg'
 import { readFileSync } from 'fs'
 import { resolve } from 'path'
-import { Ball, GameOfOrigin } from 'pokemon-resources'
+import { Ball } from 'pokemon-resources'
 import { beforeAll, describe, expect, test } from 'vitest'
 import { OHPKM } from '../../pkm/OHPKM'
 import { LASAV } from '../Gen89/LASAV'
@@ -69,7 +70,7 @@ describe('gen 8 save files', () => {
   })
 
   test('sword data is correct', () => {
-    expect(swordSave.origin).toBe(GameOfOrigin.Sword)
+    expect(swordSave.origin).toBe(OriginGame.Sword)
     expect(swordSave.currentPCBox).toBe(15)
     expect(swordSave.boxes[17].name).toBe('huevos sorpresa')
 
@@ -82,7 +83,7 @@ describe('gen 8 save files', () => {
   })
 
   test('arceus data is correct', () => {
-    expect(arceusSave.origin).toBe(GameOfOrigin.LegendsArceus)
+    expect(arceusSave.origin).toBe(OriginGame.LegendsArceus)
     expect(arceusSave.currentPCBox).toBe(13)
   })
 

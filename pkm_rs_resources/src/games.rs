@@ -9,9 +9,45 @@ pub enum ColosseumOrXd {
     Indeterminate,
 }
 
-#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "OriginGame"))]
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
+#[repr(u8)]
 pub enum OriginGame {
+    Invalid0,
+    Sapphire,
+    Ruby,
+    Emerald,
+    FireRed,
+    LeafGreen,
+    Invalid6,
+    HeartGold,
+    SoulSilver,
+    Invalid9,
+    Diamond,
+    Pearl,
+    Platinum,
+    Invalid13,
+    Invalid14,
+    ColosseumXd,
+    BattleRevolution,
+    Invalid17,
+    Invalid18,
+    Invalid19,
+    White,
+    Black,
+    White2,
+    Black2,
+    X,
+    Y,
+    AlphaSapphire,
+    OmegaRuby,
+    Invalid28,
+    Invalid29,
+    Sun,
+    Moon,
+    UltraSun,
+    UltraMoon,
+    Go,
     Red,
     BlueGreen,
     BlueJpn,
@@ -19,31 +55,6 @@ pub enum OriginGame {
     Gold,
     Silver,
     Crystal,
-    Ruby,
-    Sapphire,
-    Emerald,
-    FireRed,
-    LeafGreen,
-    ColosseumXd,
-    Diamond,
-    Pearl,
-    Platinum,
-    HeartGold,
-    SoulSilver,
-    BattleRevolution,
-    Black,
-    White,
-    Black2,
-    White2,
-    X,
-    Y,
-    OmegaRuby,
-    AlphaSapphire,
-    Go,
-    Sun,
-    Moon,
-    UltraSun,
-    UltraMoon,
     LetsGoPikachu,
     LetsGoEevee,
     Sword,
@@ -57,53 +68,6 @@ pub enum OriginGame {
 }
 
 impl OriginGame {
-    pub const fn to_u32(&self) -> u32 {
-        match self {
-            OriginGame::Red => 35,
-            OriginGame::BlueGreen => 36,
-            OriginGame::BlueJpn => 37,
-            OriginGame::Yellow => 38,
-            OriginGame::Gold => 39,
-            OriginGame::Silver => 40,
-            OriginGame::Crystal => 41,
-            OriginGame::Ruby => 2,
-            OriginGame::Sapphire => 1,
-            OriginGame::Emerald => 3,
-            OriginGame::FireRed => 4,
-            OriginGame::LeafGreen => 5,
-            OriginGame::ColosseumXd => 15,
-            OriginGame::Diamond => 10,
-            OriginGame::Pearl => 11,
-            OriginGame::Platinum => 12,
-            OriginGame::HeartGold => 7,
-            OriginGame::SoulSilver => 8,
-            OriginGame::BattleRevolution => 16,
-            OriginGame::Black => 21,
-            OriginGame::White => 20,
-            OriginGame::Black2 => 23,
-            OriginGame::White2 => 22,
-            OriginGame::X => 24,
-            OriginGame::Y => 25,
-            OriginGame::OmegaRuby => 27,
-            OriginGame::AlphaSapphire => 26,
-            OriginGame::Go => 34,
-            OriginGame::Sun => 30,
-            OriginGame::Moon => 31,
-            OriginGame::UltraSun => 32,
-            OriginGame::UltraMoon => 33,
-            OriginGame::LetsGoPikachu => 42,
-            OriginGame::LetsGoEevee => 43,
-            OriginGame::Sword => 44,
-            OriginGame::Shield => 45,
-            OriginGame::Home => 46,
-            OriginGame::LegendsArceus => 47,
-            OriginGame::BrilliantDiamond => 48,
-            OriginGame::ShiningPearl => 49,
-            OriginGame::Scarlet => 50,
-            OriginGame::Violet => 51,
-        }
-    }
-
     pub const fn game_name(&self) -> &'static str {
         match *self {
             Self::Red => "Red",
@@ -148,54 +112,16 @@ impl OriginGame {
             Self::ShiningPearl => "Shining Pearl",
             Self::Scarlet => "Scarlet",
             Self::Violet => "Violet",
-        }
-    }
-
-    pub const fn from_u32(index: u32) -> Option<Self> {
-        match index {
-            35 => Some(OriginGame::Red),
-            36 => Some(OriginGame::BlueGreen),
-            37 => Some(OriginGame::BlueJpn),
-            38 => Some(OriginGame::Yellow),
-            39 => Some(OriginGame::Gold),
-            40 => Some(OriginGame::Silver),
-            41 => Some(OriginGame::Crystal),
-            2 => Some(OriginGame::Ruby),
-            1 => Some(OriginGame::Sapphire),
-            3 => Some(OriginGame::Emerald),
-            4 => Some(OriginGame::FireRed),
-            5 => Some(OriginGame::LeafGreen),
-            15 => Some(OriginGame::ColosseumXd),
-            10 => Some(OriginGame::Diamond),
-            11 => Some(OriginGame::Pearl),
-            12 => Some(OriginGame::Platinum),
-            7 => Some(OriginGame::HeartGold),
-            8 => Some(OriginGame::SoulSilver),
-            16 => Some(OriginGame::BattleRevolution),
-            21 => Some(OriginGame::Black),
-            20 => Some(OriginGame::White),
-            23 => Some(OriginGame::Black2),
-            22 => Some(OriginGame::White2),
-            24 => Some(OriginGame::X),
-            25 => Some(OriginGame::Y),
-            27 => Some(OriginGame::OmegaRuby),
-            26 => Some(OriginGame::AlphaSapphire),
-            34 => Some(OriginGame::Go),
-            30 => Some(OriginGame::Sun),
-            31 => Some(OriginGame::Moon),
-            32 => Some(OriginGame::UltraSun),
-            33 => Some(OriginGame::UltraMoon),
-            42 => Some(OriginGame::LetsGoPikachu),
-            43 => Some(OriginGame::LetsGoEevee),
-            44 => Some(OriginGame::Sword),
-            45 => Some(OriginGame::Shield),
-            46 => Some(OriginGame::Home),
-            47 => Some(OriginGame::LegendsArceus),
-            48 => Some(OriginGame::BrilliantDiamond),
-            49 => Some(OriginGame::ShiningPearl),
-            50 => Some(OriginGame::Scarlet),
-            51 => Some(OriginGame::Violet),
-            _ => None,
+            Self::Invalid0 => "Invalid (0)",
+            Self::Invalid6 => "Invalid (6)",
+            Self::Invalid9 => "Invalid (9)",
+            Self::Invalid13 => "Invalid (13)",
+            Self::Invalid14 => "Invalid (14)",
+            Self::Invalid17 => "Invalid (17)",
+            Self::Invalid18 => "Invalid (18)",
+            Self::Invalid19 => "Invalid (19)",
+            Self::Invalid28 => "Invalid (28)",
+            Self::Invalid29 => "Invalid (29)",
         }
     }
 
@@ -230,6 +156,7 @@ impl OriginGame {
             | Self::ShiningPearl => Generation::G8,
             Self::Scarlet | Self::Violet => Generation::G9,
             Self::Go | Self::Home => Generation::None,
+            _ => Generation::None,
         }
     }
 
@@ -262,6 +189,7 @@ impl OriginGame {
             Self::LegendsArceus => Some(Region::Hisui),
             Self::Scarlet | Self::Violet => Some(Region::Paldea),
             Self::BattleRevolution | Self::Go | Self::Home => None,
+            _ => None,
         }
     }
 
@@ -295,109 +223,222 @@ impl OriginGame {
         }
     }
 
-    pub const fn logo(&self) -> &'static str {
+    pub fn logo(&self) -> Option<String> {
         match *self {
-            Self::Red => "Red",
-            Self::BlueGreen => "BlueGreen",
-            Self::BlueJpn => "BlueJpn",
-            Self::Yellow => "Yellow",
-            Self::Gold => "Gold",
-            Self::Silver => "Silver",
-            Self::Crystal => "Crystal",
-            Self::Ruby => "Ruby",
-            Self::Sapphire => "Sapphire",
-            Self::Emerald => "Emerald",
-            Self::FireRed => "FireRed",
-            Self::LeafGreen => "LeafGreen",
-            Self::ColosseumXd => "ColosseumXd",
-            Self::Diamond => "Diamond",
-            Self::Pearl => "Pearl",
-            Self::Platinum => "Platinum",
-            Self::HeartGold => "HeartGold",
-            Self::SoulSilver => "SoulSilver",
-            Self::BattleRevolution => "BattleRevolution",
-            Self::Black => "Black",
-            Self::White => "White",
-            Self::Black2 => "Black2",
-            Self::White2 => "White2",
-            Self::X => "X",
-            Self::Y => "Y",
-            Self::OmegaRuby => "OmegaRuby",
-            Self::AlphaSapphire => "AlphaSapphire",
-            Self::Go => "Go",
-            Self::Sun => "Sun",
-            Self::Moon => "Moon",
-            Self::UltraSun => "UltraSun",
-            Self::UltraMoon => "UltraMoon",
-            Self::LetsGoPikachu => "LetsGoPikachu",
-            Self::LetsGoEevee => "LetsGoEevee",
-            Self::Sword => "Sword",
-            Self::Shield => "Shield",
-            Self::Home => "Home",
-            Self::LegendsArceus => "LegendsArceus",
-            Self::BrilliantDiamond => "BrilliantDiamond",
-            Self::ShiningPearl => "ShiningPearl",
-            Self::Scarlet => "Scarlet",
-            Self::Violet => "Violet",
+            Self::Red => Some("Red".to_owned()),
+            Self::BlueGreen => Some("BlueGreen".to_owned()),
+            Self::BlueJpn => Some("BlueJpn".to_owned()),
+            Self::Yellow => Some("Yellow".to_owned()),
+            Self::Gold => Some("Gold".to_owned()),
+            Self::Silver => Some("Silver".to_owned()),
+            Self::Crystal => Some("Crystal".to_owned()),
+            Self::Ruby => Some("Ruby".to_owned()),
+            Self::Sapphire => Some("Sapphire".to_owned()),
+            Self::Emerald => Some("Emerald".to_owned()),
+            Self::FireRed => Some("FireRed".to_owned()),
+            Self::LeafGreen => Some("LeafGreen".to_owned()),
+            Self::ColosseumXd => Some("ColosseumXd".to_owned()),
+            Self::Diamond => Some("Diamond".to_owned()),
+            Self::Pearl => Some("Pearl".to_owned()),
+            Self::Platinum => Some("Platinum".to_owned()),
+            Self::HeartGold => Some("HeartGold".to_owned()),
+            Self::SoulSilver => Some("SoulSilver".to_owned()),
+            Self::BattleRevolution => Some("BattleRevolution".to_owned()),
+            Self::Black => Some("Black".to_owned()),
+            Self::White => Some("White".to_owned()),
+            Self::Black2 => Some("Black2".to_owned()),
+            Self::White2 => Some("White2".to_owned()),
+            Self::X => Some("X".to_owned()),
+            Self::Y => Some("Y".to_owned()),
+            Self::OmegaRuby => Some("OmegaRuby".to_owned()),
+            Self::AlphaSapphire => Some("AlphaSapphire".to_owned()),
+            Self::Go => Some("Go".to_owned()),
+            Self::Sun => Some("Sun".to_owned()),
+            Self::Moon => Some("Moon".to_owned()),
+            Self::UltraSun => Some("UltraSun".to_owned()),
+            Self::UltraMoon => Some("UltraMoon".to_owned()),
+            Self::LetsGoPikachu => Some("LetsGoPikachu".to_owned()),
+            Self::LetsGoEevee => Some("LetsGoEevee".to_owned()),
+            Self::Sword => Some("Sword".to_owned()),
+            Self::Shield => Some("Shield".to_owned()),
+            Self::Home => Some("Home".to_owned()),
+            Self::LegendsArceus => Some("LegendsArceus".to_owned()),
+            Self::BrilliantDiamond => Some("BrilliantDiamond".to_owned()),
+            Self::ShiningPearl => Some("ShiningPearl".to_owned()),
+            Self::Scarlet => Some("Scarlet".to_owned()),
+            Self::Violet => Some("Violet".to_owned()),
+            _ => None,
+        }
+    }
+
+    // source: https://bulbapedia.bulbagarden.net/wiki/Help:Color_templates
+    pub const fn color(&self) -> &'static str {
+        match *self {
+            Self::Red => "#DA3914",
+            Self::BlueGreen | Self::BlueJpn => "#2E50D8",
+            Self::Yellow => "#FFD733",
+            Self::Gold => "#DAA520",
+            Self::Silver => "#C0C0C0",
+            Self::Crystal => "#3D51A7",
+            Self::Ruby => "#CD2236",
+            Self::Sapphire => "#3D51A7",
+            Self::Emerald => "#50C878",
+            Self::FireRed => "#F15C01",
+            Self::LeafGreen => "#9FDC00",
+            Self::ColosseumXd => "#604E82",
+            Self::Diamond => "#90BEED",
+            Self::Pearl => "#DD7CB1",
+            Self::Platinum => "#A0A08D",
+            Self::HeartGold => "#E8B502",
+            Self::SoulSilver => "#AAB9CF",
+            Self::BattleRevolution => "#DCA202",
+            Self::Black => "#444444",
+            Self::White => "#E1E1E1",
+            Self::Black2 => "#303E51",
+            Self::White2 => "#EBC5C3",
+            Self::X => "#025DA6",
+            Self::Y => "#EA1A3E",
+            Self::OmegaRuby => "#AB2813",
+            Self::AlphaSapphire => "#26649C",
+            Self::Go => "#0161AF",
+            Self::Sun => "#F1912B",
+            Self::Moon => "#5599CA",
+            Self::UltraSun => "#E95B2B",
+            Self::UltraMoon => "#226DB5",
+            Self::LetsGoPikachu => "#F5DA26",
+            Self::LetsGoEevee => "#D4924B",
+            Self::Sword => "#006998",
+            Self::Shield => "#7C0033",
+            Self::Home => "#009F7A",
+            Self::LegendsArceus => "#36597B",
+            Self::BrilliantDiamond => "#44BAE5",
+            Self::ShiningPearl => "#DA7D99",
+            Self::Scarlet => "#F34134",
+            Self::Violet => "#8334B7",
+            _ => "#666666",
         }
     }
 }
 
+impl From<u8> for OriginGame {
+    fn from(value: u8) -> Self {
+        match value {
+            0 => OriginGame::Invalid0,
+            1 => OriginGame::Sapphire,
+            2 => OriginGame::Ruby,
+            3 => OriginGame::Emerald,
+            4 => OriginGame::FireRed,
+            5 => OriginGame::LeafGreen,
+            6 => OriginGame::Invalid6,
+            7 => OriginGame::HeartGold,
+            8 => OriginGame::SoulSilver,
+            9 => OriginGame::Invalid9,
+            10 => OriginGame::Diamond,
+            11 => OriginGame::Pearl,
+            12 => OriginGame::Platinum,
+            13 => OriginGame::Invalid13,
+            14 => OriginGame::Invalid14,
+            15 => OriginGame::ColosseumXd,
+            16 => OriginGame::BattleRevolution,
+            17 => OriginGame::Invalid17,
+            18 => OriginGame::Invalid18,
+            19 => OriginGame::Invalid19,
+            20 => OriginGame::White,
+            21 => OriginGame::Black,
+            22 => OriginGame::White2,
+            23 => OriginGame::Black2,
+            24 => OriginGame::X,
+            25 => OriginGame::Y,
+            26 => OriginGame::AlphaSapphire,
+            27 => OriginGame::OmegaRuby,
+            28 => OriginGame::Invalid28,
+            29 => OriginGame::Invalid29,
+            30 => OriginGame::Sun,
+            31 => OriginGame::Moon,
+            32 => OriginGame::UltraSun,
+            33 => OriginGame::UltraMoon,
+            34 => OriginGame::Go,
+            35 => OriginGame::Red,
+            36 => OriginGame::BlueGreen,
+            37 => OriginGame::BlueJpn,
+            38 => OriginGame::Yellow,
+            39 => OriginGame::Gold,
+            40 => OriginGame::Silver,
+            41 => OriginGame::Crystal,
+            42 => OriginGame::LetsGoPikachu,
+            43 => OriginGame::LetsGoEevee,
+            44 => OriginGame::Sword,
+            45 => OriginGame::Shield,
+            46 => OriginGame::Home,
+            47 => OriginGame::LegendsArceus,
+            48 => OriginGame::BrilliantDiamond,
+            49 => OriginGame::ShiningPearl,
+            50 => OriginGame::Scarlet,
+            51 => OriginGame::Violet,
+            _ => OriginGame::Invalid0,
+        }
+    }
+}
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
-struct OriginGameMetadata(OriginGame);
+struct OriginGames;
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[allow(clippy::missing_const_for_fn)]
-impl OriginGameMetadata {
-    #[cfg(feature = "wasm")]
-    #[wasm_bindgen(js_name = "fromIndex")]
-    pub fn from_index(val: u32) -> Option<OriginGameMetadata> {
-        OriginGame::from_u32(val).map(OriginGameMetadata)
+impl OriginGames {
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "gameName"))]
+    pub fn game_name(value: u8) -> String {
+        OriginGame::from(value).game_name().to_owned()
     }
 
-    #[cfg(feature = "wasm")]
-    #[wasm_bindgen(getter = "gameName")]
-    pub fn game_name(&self) -> String {
-        self.0.game_name().to_owned()
+    #[cfg_attr(feature = "wasm", wasm_bindgen)]
+    pub fn generation(value: u8) -> Generation {
+        OriginGame::from(value).generation()
     }
 
-    #[cfg(feature = "wasm")]
-    #[wasm_bindgen(getter)]
-    pub fn index(&self) -> u32 {
-        self.0.to_u32()
+    #[cfg_attr(feature = "wasm", wasm_bindgen)]
+    pub fn region(value: u8) -> Option<Region> {
+        OriginGame::from(value).region()
     }
 
-    #[cfg(feature = "wasm")]
-    #[wasm_bindgen(getter)]
-    pub fn generation(&self) -> u8 {
-        self.0.generation() as u8
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "gamecubeIndex"))]
+    pub fn gamecube_index(value: u8) -> Option<u8> {
+        OriginGame::from(value).gamecube_index()
     }
 
-    #[cfg(feature = "wasm")]
-    #[wasm_bindgen(getter)]
-    pub fn region(&self) -> Option<String> {
-        self.0.region().map(|r| r.to_string())
+    #[cfg_attr(feature = "wasm", wasm_bindgen)]
+    pub fn mark(value: u8) -> Option<OriginMark> {
+        OriginGame::from(value).mark()
     }
 
-    #[cfg(feature = "wasm")]
-    #[wasm_bindgen(getter = "gamecubeIndex")]
-    pub fn gamecube_index(&self) -> Option<u8> {
-        self.0.gamecube_index()
+    #[cfg_attr(feature = "wasm", wasm_bindgen)]
+    pub fn color(value: u8) -> String {
+        OriginGame::from(value).color().to_owned()
     }
 
-    #[cfg(feature = "wasm")]
-    #[wasm_bindgen(getter)]
-    pub fn mark(&self) -> Option<String> {
-        self.0.mark().map(|m| m.to_string())
-    }
-
-    #[cfg(feature = "wasm")]
-    #[wasm_bindgen(getter)]
-    pub fn logo(&self) -> String {
-        self.0.logo().to_owned()
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "logoPath"))]
+    pub fn logo_path(value: u8) -> Option<String> {
+        OriginGame::from(value)
+            .logo()
+            .map(|filename| format!("/logos/{filename}.png"))
     }
 }
 
+pub fn plugin_color(plugin_identifier: &str) -> &'static str {
+    match plugin_identifier {
+        "unbound" => "#C127FE",
+        "radical_red" => "#660000",
+        _ => "#666666",
+    }
+}
+
+#[cfg(feature = "wasm")]
+#[wasm_bindgen(js_name = "getPluginColor")]
+pub fn plugin_color_js(plugin_identifier: &str) -> String {
+    plugin_color(plugin_identifier).to_owned()
+}
+
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum OriginMark {
     GameBoy,
     Pentagon,

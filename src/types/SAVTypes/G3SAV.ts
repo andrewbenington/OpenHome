@@ -1,5 +1,5 @@
 import { PK3 } from '@pokemon-files/pkm'
-import { GameOfOrigin, GameOfOriginData } from 'pokemon-resources'
+import { OriginGame } from '@pokemon-resources/pkg'
 import { NationalDex } from 'src/consts/NationalDex'
 import { GEN3_TRANSFER_RESTRICTIONS } from 'src/consts/TransferRestrictions'
 import {
@@ -11,7 +11,7 @@ import {
 import { gen3StringToUTF } from 'src/util/Strings/StringConverter'
 import { OHPKM } from '../pkm/OHPKM'
 import { emptyPathData, PathData } from './path'
-import { Box, BoxCoordinates, SAV } from './SAV'
+import { Box, BoxCoordinates, OfficialSAV } from './SAV'
 import { LOOKUP_TYPE } from './util'
 
 export const SAVE_SIZE_BYTES = 0x20000
@@ -74,7 +74,7 @@ export class G3Sector {
   }
 }
 export class G3SaveBackup {
-  origin: GameOfOrigin = GameOfOrigin.INVALID_0
+  origin: OriginGame
 
   bytes: Uint8Array
 
@@ -117,11 +117,11 @@ export class G3SaveBackup {
     this.gameCode = bytesToUint32LittleEndian(this.sectors[0].data, 0xac)
     switch (this.gameCode) {
       case 0:
-        this.origin = GameOfOrigin.Ruby
+        this.origin = OriginGame.Ruby
         this.money = bytesToUint32LittleEndian(this.sectors[1].data, 0x490)
         break
       case 1:
-        this.origin = GameOfOrigin.FireRed
+        this.origin = OriginGame.FireRed
         this.securityKey = bytesToUint32LittleEndian(this.sectors[0].data, FRLG_SECURITY_OFFSET)
         this.securityKeyCopy = bytesToUint32LittleEndian(
           this.sectors[0].data,
@@ -130,7 +130,7 @@ export class G3SaveBackup {
         this.money = bytesToUint32LittleEndian(this.sectors[1].data, 0x290) ^ this.securityKey
         break
       default:
-        this.origin = GameOfOrigin.Emerald
+        this.origin = OriginGame.Emerald
         this.securityKey = bytesToUint32LittleEndian(this.sectors[0].data, EMERALD_SECURITY_OFFSET)
         this.securityKeyCopy = bytesToUint32LittleEndian(
           this.sectors[0].data,
@@ -177,7 +177,7 @@ export class G3SaveBackup {
   }
 }
 
-export class G3SAV implements SAV<PK3> {
+export class G3SAV extends OfficialSAV<PK3> {
   static pkmType = PK3
 
   static transferRestrictions = GEN3_TRANSFER_RESTRICTIONS
@@ -195,7 +195,7 @@ export class G3SAV implements SAV<PK3> {
 
   primarySaveOffset: number
 
-  origin: GameOfOrigin
+  origin: OriginGame
   isPlugin: false = false
 
   boxRows = 5
@@ -221,6 +221,7 @@ export class G3SAV implements SAV<PK3> {
   updatedBoxSlots: BoxCoordinates[] = []
 
   constructor(path: PathData, bytes: Uint8Array) {
+    super()
     this.bytes = bytes
     this.filePath = path
     const saveOne = new G3SaveBackup(bytes.slice(0, 0xe000))
@@ -263,19 +264,19 @@ export class G3SAV implements SAV<PK3> {
 
       fileName = fileName.replace(/\s+/g, '')
       if (fileName.includes('Ruby')) {
-        this.origin = GameOfOrigin.Ruby
+        this.origin = OriginGame.Ruby
         return
       }
       if (fileName.includes('Sapphire')) {
-        this.origin = GameOfOrigin.Sapphire
+        this.origin = OriginGame.Sapphire
         return
       }
       if (fileName.includes('FireRed')) {
-        this.origin = GameOfOrigin.FireRed
+        this.origin = OriginGame.FireRed
         return
       }
       if (fileName.includes('LeafGreen')) {
-        this.origin = GameOfOrigin.LeafGreen
+        this.origin = OriginGame.LeafGreen
       } else {
         this.origin = this.primarySave.origin
       }
@@ -336,12 +337,6 @@ export class G3SAV implements SAV<PK3> {
     return this.boxes[this.currentPCBox]
   }
 
-  getGameName() {
-    const gameOfOrigin = GameOfOriginData[this.origin]
-
-    return gameOfOrigin ? `Pokémon ${gameOfOrigin.name}` : '(Unknown Game)'
-  }
-
   static saveTypeAbbreviation = 'RSE/FRLG'
   static saveTypeName = 'Pokémon Ruby/Sapphire/Emerald/FireRed/LeafGreen'
   static saveTypeID = 'G3SAV'
@@ -362,33 +357,13 @@ export class G3SAV implements SAV<PK3> {
     }
   }
 
-  gameColor() {
-    switch (this.origin) {
-      case GameOfOrigin.Ruby:
-        return '#CD2236'
-      case GameOfOrigin.Sapphire:
-        return '#3D51A7'
-      case GameOfOrigin.Emerald:
-        return '#009652'
-      case GameOfOrigin.FireRed:
-        return '#F15C01'
-      case GameOfOrigin.LeafGreen:
-        return '#9FDC00'
-      default:
-        return '#666666'
-    }
+  static includesOrigin(origin: OriginGame) {
+    return origin >= OriginGame.Sapphire && origin <= OriginGame.LeafGreen
   }
 
-  static includesOrigin(origin: GameOfOrigin) {
-    return origin >= GameOfOrigin.Sapphire && origin <= GameOfOrigin.LeafGreen
-  }
-
-  getPluginIdentifier() {
-    return undefined
-  }
-
-  getExtraData(): object {
+  getDisplayData(): Record<string, string | number | undefined> {
     return {
+      ...super.getDisplayData(),
       securityKey: this.primarySave.securityKey,
       securityKeyCopyEmerald: new DataView(
         this.primarySave.sectors[0].data.buffer as ArrayBuffer

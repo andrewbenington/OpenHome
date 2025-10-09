@@ -3,14 +3,13 @@ import { bytesToUint32LittleEndian } from '../../../util/byteLogic'
 import { isRestricted, TransferRestrictions } from '../../TransferRestrictions'
 import { findFirstSectionOffset, G3CFRUSAV, SAVE_SIZES_BYTES } from '../cfru/G3CFRUSAV'
 import { PathData } from '../path'
-import { PluginSAV } from '../SAV'
 import PK3UB from './PK3UB'
 
 const UB_TRANSFER_RESTRICTIONS: TransferRestrictions = {
   maxDexNum: NationalDex.Enamorus,
 }
 
-export class G3UBSAV extends G3CFRUSAV<PK3UB> implements PluginSAV<PK3UB> {
+export class G3UBSAV extends G3CFRUSAV<PK3UB> {
   static transferRestrictions: TransferRestrictions = UB_TRANSFER_RESTRICTIONS
 
   pluginIdentifier = 'unbound'
@@ -27,8 +26,8 @@ export class G3UBSAV extends G3CFRUSAV<PK3UB> implements PluginSAV<PK3UB> {
     return 'unbound'
   }
 
-  getGameName() {
-    return 'Pokémon Unbound'
+  get gameName() {
+    return 'Unbound'
   }
 
   constructor(path: PathData, bytes: Uint8Array) {
@@ -50,9 +49,5 @@ export class G3UBSAV extends G3CFRUSAV<PK3UB> implements PluginSAV<PK3UB> {
     // from unbound cloud
     // https://github.com/Skeli789/Unbound-Cloud/blob/a5d966b74b865f51fef608e19ca63e0e51593f5e/server/src/Defines.py#L25C1-L26C1
     return signature === 0x01122000 || signature === 0x01121999 || signature === 0x01121998
-  }
-
-  gameColor(): string {
-    return '#c127fe'
   }
 }

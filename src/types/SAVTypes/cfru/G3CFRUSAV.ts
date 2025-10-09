@@ -1,4 +1,4 @@
-import { GameOfOrigin } from 'pokemon-resources'
+import { OriginGame } from '@pokemon-resources/pkg'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -8,7 +8,7 @@ import {
 import { gen3StringToUTF } from '../../../util/Strings/StringConverter'
 import { PluginPKMInterface } from '../../interfaces'
 import { OHPKM } from '../../pkm/OHPKM'
-import { Box, BoxCoordinates, PluginSAV } from '../SAV'
+import { Box, BoxCoordinates } from '../SAV'
 import { PathData } from '../path'
 import { LOOKUP_TYPE } from '../util'
 // import { RRTransferMon } from './conversion/RRTransferMons'
@@ -59,7 +59,7 @@ class G3CFRUSector {
 }
 
 class G3CFRUSaveBackup<T extends PluginPKMInterface> {
-  origin: GameOfOrigin = GameOfOrigin.INVALID_0
+  origin = OriginGame.FireRed
   bytes: Uint8Array
   saveIndex: number = 0
   isFirstSave: boolean = false
@@ -121,7 +121,7 @@ class G3CFRUSaveBackup<T extends PluginPKMInterface> {
 
           box.pokemon[i % 30] = mon
           if (mon.trainerID === this.tid) {
-            mon.gameOfOrigin = GameOfOrigin.FireRed
+            mon.gameOfOrigin = OriginGame.FireRed
           }
         }
       } catch (e) {
@@ -134,7 +134,7 @@ class G3CFRUSaveBackup<T extends PluginPKMInterface> {
   }
 }
 
-export abstract class G3CFRUSAV<T extends PluginPKMInterface> implements PluginSAV<T> {
+export abstract class G3CFRUSAV<T extends PluginPKMInterface> {
   static pkmType: any
   pkmTypeClass: any
 
@@ -150,9 +150,10 @@ export abstract class G3CFRUSAV<T extends PluginPKMInterface> implements PluginS
   backupSave: G3CFRUSaveBackup<T>
   primarySaveOffset: number
 
-  origin: GameOfOrigin = 0
+  origin = OriginGame.FireRed
   isPlugin: true = true
   abstract pluginIdentifier: string
+  abstract get gameName(): string
 
   boxRows = 5
   boxColumns = 6
@@ -213,14 +214,10 @@ export abstract class G3CFRUSAV<T extends PluginPKMInterface> implements PluginS
           mon.secretID === this.sid &&
           mon.trainerName === this.name
         ) {
-          this.origin = mon.gameOfOrigin
         }
       })
     })
-
-    this.origin = GameOfOrigin.FireRed
   }
-  getExtraData?: (() => object) | undefined
 
   pcChecksumOffset?: number | undefined
   pcOffset?: number | undefined
@@ -286,14 +283,8 @@ export abstract class G3CFRUSAV<T extends PluginPKMInterface> implements PluginS
     return this.boxes[this.currentPCBox]
   }
 
-  getGameName() {
-    return 'Pokémon Radical Red'
-  }
-
-  abstract gameColor(): string
-
-  static includesOrigin(origin: GameOfOrigin) {
-    return origin === GameOfOrigin.FireRed
+  static includesOrigin(origin: OriginGame) {
+    return origin === OriginGame.FireRed
   }
 
   static saveTypeAbbreviation = 'Radical Red'

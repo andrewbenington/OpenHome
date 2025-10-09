@@ -1,4 +1,4 @@
-import { GameOfOrigin } from 'pokemon-resources'
+import { OriginGame } from '@pokemon-resources/pkg'
 import { XY_TRANSFER_RESTRICTIONS } from 'src/consts/TransferRestrictions'
 import { isRestricted } from '../TransferRestrictions'
 import { G6SAV } from './G6SAV'
@@ -26,7 +26,7 @@ export class XYSAV extends G6SAV {
   static saveTypeName = 'Pokémon X/Y'
   static saveTypeID = 'XYSAV'
 
-  static includesOrigin(origin: GameOfOrigin) {
-    return origin === GameOfOrigin.X || origin === GameOfOrigin.Y
+  static includesOrigin(origin: OriginGame) {
+    return origin === OriginGame.X || origin === OriginGame.Y
   }
 }

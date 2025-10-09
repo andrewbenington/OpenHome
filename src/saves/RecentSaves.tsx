@@ -1,6 +1,6 @@
+import { OriginGames } from '@pokemon-resources/pkg'
 import { Flex } from '@radix-ui/themes'
 import * as E from 'fp-ts/lib/Either'
-import { GameOfOrigin } from 'pokemon-resources'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { PathData, splitPath } from 'src/types/SAVTypes/path'
 import { getPluginIdentifier } from 'src/types/SAVTypes/util'
@@ -14,7 +14,7 @@ import { AppInfoContext } from '../state/appInfo'
 import { OpenSavesContext } from '../state/openSaves'
 import SaveCard from './SaveCard'
 import SaveDetailsMenu from './SaveDetailsMenu'
-import { formatTime, formatTimeSince, getSaveLogo, SaveViewMode } from './util'
+import { formatTime, formatTimeSince, SaveViewMode } from './util'
 
 interface SaveFileSelectorProps {
   onOpen: (path: PathData) => void
@@ -70,14 +70,6 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
         )
       ),
     [backend, getRecentSaves, displayError]
-  )
-
-  const saveTypeFromOrigin = useCallback(
-    (origin: number | undefined) =>
-      origin
-        ? getEnabledSaveTypes().find((s) => s.includesOrigin(origin as GameOfOrigin))
-        : undefined,
-    [getEnabledSaveTypes]
   )
 
   useEffect(() => {
@@ -137,7 +129,11 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
           <img
             alt="save logo"
             height={40}
-            src={getSaveLogo(saveTypeFromOrigin(value.game), value.game as GameOfOrigin)}
+            src={
+              value.pluginIdentifier
+                ? `logos/${value.pluginIdentifier}.png`
+                : OriginGames.logoPath(value.game)
+            }
           />
         ) : (
           ''

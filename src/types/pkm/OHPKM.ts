@@ -19,6 +19,7 @@ import {
   Language,
   Languages,
   MetadataLookup,
+  OriginGame,
   SpeciesLookup,
 } from '@pokemon-resources/pkg'
 import * as lodash from 'lodash'
@@ -26,7 +27,6 @@ import {
   AbilityFromString,
   AbilityToString,
   Ball,
-  GameOfOrigin,
   Gen34ContestRibbons,
   Gen34TowerRibbons,
   ItemFromString,
@@ -1200,7 +1200,7 @@ export class OHPKM implements PKMInterface {
   }
 
   public get displayID() {
-    return this.gameOfOrigin < GameOfOrigin.Sun
+    return this.gameOfOrigin < OriginGame.Sun
       ? this.trainerID
       : bytesToUint32LittleEndian(this.bytes, 0x0c) % 1000000
   }
@@ -1567,10 +1567,7 @@ export class OHPKM implements PKMInterface {
     let errorsFound = false
 
     // PLA mons cannot have been hatched
-    if (
-      this.gameOfOrigin === GameOfOrigin.LegendsArceus &&
-      (this.eggDate || this.eggLocationIndex)
-    ) {
+    if (this.gameOfOrigin === OriginGame.LegendsArceus && (this.eggDate || this.eggLocationIndex)) {
       this.eggDate = undefined
       this.eggLocationIndex = undefined
       errorsFound = true
