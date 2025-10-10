@@ -99,7 +99,7 @@ function PokedexDetails({
   const [showShiny, setShowShiny] = useState(false)
 
   const selectedFormeStatus = getFormeStatus(pokedex, species.nationalDex, selectedForme.formeIndex)
-  const spritePath = useMonSprite({
+  const spriteResult = useMonSprite({
     dexNum: species.nationalDex,
     formeNum: selectedForme.formeIndex,
     format: 'OHPKM',
@@ -150,18 +150,18 @@ function PokedexDetails({
                 style={{ width: '90%', height: 0, paddingBottom: '90%' }}
                 silhouette={!selectedFormeCaught}
               />
-            ) : spritePath ? (
+            ) : spriteResult.path ? (
               <>
                 <img
                   className="pokedex-image pokedex-image-shadow"
                   draggable={false}
-                  src={spritePath}
+                  src={spriteResult.path}
                   onError={() => setImageError(true)}
                 />
                 <img
                   className="pokedex-image"
                   draggable={false}
-                  src={spritePath}
+                  src={spriteResult.path}
                   onError={() => setImageError(true)}
                   style={{
                     filter: !selectedFormeCaught ? 'saturate(0%)' : undefined,
