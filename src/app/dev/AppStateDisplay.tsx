@@ -1,7 +1,6 @@
-import { SpeciesLookup } from '@pokemon-resources/pkg'
+import { OriginGames, SpeciesLookup } from '@pokemon-resources/pkg'
 import { Card, Flex, Heading, Separator } from '@radix-ui/themes'
 import * as E from 'fp-ts/lib/Either'
-import { GameOfOriginData } from 'pokemon-resources'
 import { useContext, useEffect, useState } from 'react'
 import { BackendContext } from 'src/backend/backendContext'
 import { AppState } from 'src/backend/backendInterface'
@@ -92,6 +91,6 @@ function monDisplay(mon: PKMInterface) {
     species: species?.name,
     forme: species?.formes[mon.formeNum ?? 0].formeName,
     nickname: mon.nickname,
-    origin: mon.gameOfOrigin ? 'Pokémon ' + GameOfOriginData[mon.gameOfOrigin]?.name : undefined,
+    origin: mon.gameOfOrigin ? `Pokémon ${OriginGames.gameName(mon.gameOfOrigin)}` : undefined,
   }
 }

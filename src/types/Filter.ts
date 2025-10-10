@@ -1,4 +1,4 @@
-import { MetadataLookup } from '@pokemon-resources/pkg'
+import { MetadataLookup, OriginGame } from '@pokemon-resources/pkg'
 import { Item, Type } from 'pokemon-resources'
 import { PKMInterface } from './interfaces'
 import { isMegaStone, isZCrystal } from './pkm/util'
@@ -10,7 +10,7 @@ export interface Filter {
   abilityIndex?: number
   type1?: Type
   type2?: Type
-  gameOfOrigin?: number
+  gameOfOrigin?: OriginGame
   ribbon?: string
   shiny?: string
   ball?: number
