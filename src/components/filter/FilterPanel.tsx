@@ -37,22 +37,17 @@ type ItemOption =
 function getOriginIcon(origin: OriginGameWithData) {
   const path =
     origin.generation === Generation.G4 || origin.generation === Generation.G5
-      ? 'icons/ds.png'
+      ? 'i/cons/ds.png'
       : origin.game === OriginGame.ColosseumXd
-        ? 'icons/gcn.png'
+        ? '/icons/gcn.png'
         : origin.generation === Generation.G3
-          ? 'icons/gba.png'
+          ? '/icons/gba.png'
           : origin.mark
-            ? `origin_marks/${origin.mark}.png`
+            ? `/origin_marks/${origin.mark}.png`
             : undefined
 
   return path ? (
-    <img
-      className="filter-icon invert-dark"
-      draggable={false}
-      alt="origin mark"
-      src={getPublicImageURL(path)}
-    />
+    <img className="filter-icon invert-dark" draggable={false} alt="origin mark" src={path} />
   ) : undefined
 }
 

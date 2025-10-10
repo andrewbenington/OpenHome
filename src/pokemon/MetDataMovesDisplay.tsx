@@ -1,14 +1,8 @@
 import { OriginGames } from '@pokemon-resources/pkg'
 import { Badge, Flex } from '@radix-ui/themes'
-import {
-  GameOfOriginData,
-  getLocationString,
-  NatureToString,
-  RibbonTitles,
-} from 'pokemon-resources'
+import { getLocationString, NatureToString, RibbonTitles } from 'pokemon-resources'
 import { useContext, useMemo } from 'react'
 import Markings from '../components/Markings'
-import { getOriginMark } from '../images/game'
 import { getPublicImageURL } from '../images/images'
 import { getBallIconPath } from '../images/items'
 import { AppInfoContext } from '../state/appInfo'
@@ -35,13 +29,6 @@ const styles = {
     left: 0,
     right: 0,
     opacity: 0.6,
-  },
-  originMark: {
-    width: 50,
-    height: 50,
-    objectFit: 'contain',
-    zIndex: 2,
-    opacity: 0.8,
   },
   centerFlex: {
     display: 'flex',
@@ -126,6 +113,8 @@ const MetDataMovesDisplay = (props: { mon: PKMInterface }) => {
     return message
   }, [mon])
 
+  const markImage = mon.gameOfOrigin ? OriginGames.markPath(mon.gameOfOrigin) : undefined
+
   return (
     <Flex direction="column" ml="4" mr="4" mt="2" height="calc(100% - 24px)">
       <Flex direction="row" style={{ flex: 1 }}>
@@ -177,19 +166,8 @@ const MetDataMovesDisplay = (props: { mon: PKMInterface }) => {
                 style={styles.gameImage}
               />
             )}
-            {mon.gameOfOrigin && GameOfOriginData[mon.gameOfOrigin]?.mark && (
-              <img
-                draggable={false}
-                alt="origin mark"
-                src={getPublicImageURL(
-                  getOriginMark(
-                    mon.gameOfOrigin === -1
-                      ? 'GB'
-                      : (GameOfOriginData[mon.gameOfOrigin]?.mark ?? '')
-                  )
-                )}
-                style={styles.originMark}
-              />
+            {markImage && (
+              <img className="origin-mark" draggable={false} alt="origin mark" src={markImage} />
             )}
           </div>
           {'markings' in mon && mon.markings ? <Markings markings={mon.markings} /> : <div />}

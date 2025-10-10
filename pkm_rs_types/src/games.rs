@@ -450,9 +450,13 @@ impl OriginGames {
         OriginGame::from(value).gamecube_index()
     }
 
-    #[cfg_attr(feature = "wasm", wasm_bindgen)]
-    pub fn mark(value: u8) -> Option<OriginMark> {
-        OriginGame::from(value).mark()
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "markPath"))]
+    pub fn mark_path(value: u8) -> Option<String> {
+        OriginGame::from(value)
+            .mark()
+            .as_ref()
+            .map(OriginMark::to_string)
+            .map(|filename| format!("/origin_marks/{filename}.png"))
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen)]

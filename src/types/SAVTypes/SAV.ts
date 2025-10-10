@@ -1,4 +1,4 @@
-import { getPluginColor, OriginGame, OriginGames, OriginMark } from '@pokemon-resources/pkg'
+import { getPluginColor, OriginGame, OriginGames } from '@pokemon-resources/pkg'
 import { SaveRef } from '../../types/types'
 import { PKMInterface } from '../interfaces'
 import { OHPKM } from '../pkm/OHPKM'
@@ -103,10 +103,6 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
 
   get gameLogoPath(): string | undefined {
     return OriginGames.logoPath(this.origin)
-  }
-
-  get originMark(): OriginMark | undefined {
-    return OriginGames.mark(this.origin)
   }
 }
 
