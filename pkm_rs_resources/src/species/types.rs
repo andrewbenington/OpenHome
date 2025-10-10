@@ -463,8 +463,8 @@ impl FormeMetadata {
     }
 
     #[wasm_bindgen(getter = introducedGen)]
-    pub fn introduced_gen(&self) -> usize {
-        self.introduced as usize + 1
+    pub fn introduced_gen(&self) -> Generation {
+        self.introduced
     }
 
     #[wasm_bindgen(getter)]

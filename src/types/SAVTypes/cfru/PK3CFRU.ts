@@ -107,7 +107,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
   nickname: string
   trainerName: string
   trainerGender: boolean
-  isLocked: boolean = false
+  isFakemon: boolean = false
   originalBytes?: Uint8Array
 
   abstract selectColor: string
@@ -151,26 +151,12 @@ export abstract class PK3CFRU implements PluginPKMInterface {
       if (speciesData.NationalDexIndex < 0) {
         this.dexNum = 0
         this.formeNum = 0
-        // console.warn(
-        //   'The species is invalid. Species: ',
-        //   Gen3RRSpecies[speciesIndex],
-        //   ', PokeDex Number: ',
-        //   speciesIndex
-        // )
       } else {
         this.dexNum = speciesData.NationalDexIndex
         this.formeNum = speciesData.FormIndex
       }
 
-      this.isLocked = this.isFakemon(speciesIndex)
-      if (this.isLocked) {
-        // console.warn(
-        //   'The species is locked. Species: ',
-        //   Gen3RRSpecies[speciesIndex],
-        //   ', RR Dex Number: ',
-        //   speciesIndex
-        // )
-      }
+      this.isFakemon = this.indexIsFakemon(speciesIndex)
 
       // Held Item 30:32
       this.privateHeldItemIndex = dataView.getUint16(0x1e, true)
@@ -338,7 +324,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
   abstract monFromGameIndex(gameIndex: number): CFRUToNationalDexEntry
   abstract monToGameIndex(nationalDexNumber: number, formIndex: number): number
 
-  abstract isFakemon(speciesIndex: number): boolean
+  abstract indexIsFakemon(speciesIndex: number): boolean
 
   toBytes(): ArrayBuffer {
     const buffer = new ArrayBuffer(58) // 58 bytes as specified

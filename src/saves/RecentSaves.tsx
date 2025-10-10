@@ -5,7 +5,7 @@ import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { PathData, splitPath } from 'src/types/SAVTypes/path'
 import { getPluginIdentifier } from 'src/types/SAVTypes/util'
 import { SaveRef } from 'src/types/types'
-import { filterUndefined, numericSorter } from 'src/util/Sort'
+import { filterUndefined, numericSorter, stringSorter } from 'src/util/Sort'
 import { BackendContext } from '../backend/backendContext'
 import { ErrorIcon } from '../components/Icons'
 import OHDataGrid, { SortableColumn } from '../components/OHDataGrid'
@@ -139,6 +139,21 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
           ''
         ),
       sortFunction: numericSorter((val) => val.game ?? -1),
+      cellClass: 'centered-cell',
+    },
+    {
+      key: 'game_origin',
+      name: 'Origin',
+      width: 130,
+      renderValue: (value) => value.game,
+      sortFunction: numericSorter((val) => val.game ?? -1),
+      cellClass: 'centered-cell',
+    },
+    {
+      key: 'pluginIdentifier',
+      name: 'Plugin',
+      width: 130,
+      sortFunction: stringSorter((val) => val.pluginIdentifier ?? ''),
       cellClass: 'centered-cell',
     },
     {

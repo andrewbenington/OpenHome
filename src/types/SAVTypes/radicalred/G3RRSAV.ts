@@ -3,6 +3,7 @@ import { isRestricted, TransferRestrictions } from '../../TransferRestrictions'
 import { findFirstSectionOffset, G3CFRUSAV, SAVE_SIZES_BYTES } from '../cfru/G3CFRUSAV'
 import { FRLG_SECURITY_COPY_OFFSET, FRLG_SECURITY_OFFSET } from '../G3SAV'
 import { PathData } from '../path'
+import { SlotMetadata } from '../SAV'
 import { RRExcludedForms, RRTransferMon } from './conversion/RRTransferMons'
 import PK3RR from './PK3RR'
 
@@ -49,5 +50,22 @@ export class G3RRSAV extends G3CFRUSAV<PK3RR> {
     // Radical Red seems to have the security key set to 0, which has a 1 in 4.2 billion
     // chance to happen in vanilla FireRed (if it can even be 0 at all)
     return securityKey === 0 || securityKey !== securityKeyCopy
+  }
+
+  static getPluginIdentifier() {
+    return 'radical_red'
+  }
+
+  getSlotMetadata = (boxNum: number, boxSlot: number): SlotMetadata => {
+    const mon = this.boxes[boxNum].pokemon[boxSlot]
+
+    if (mon instanceof PK3RR && mon.isFakemon) {
+      return {
+        isDisabled: true,
+        disabledReason: 'Fanmade Pokémon species cannot be moved out of the box',
+      }
+    }
+
+    return { isDisabled: false }
   }
 }

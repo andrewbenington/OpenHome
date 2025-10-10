@@ -25,10 +25,6 @@ import PokemonIcon from '../PokemonIcon'
 import TypeIcon from '../TypeIcon'
 import './style.css'
 
-import init from '../../../pkm_rs_resources/pkg'
-
-init()
-
 type SelectOption = {
   label: string
   id: number

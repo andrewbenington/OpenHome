@@ -7,7 +7,7 @@ edition = "2024"
 pkm_rs_derive = {path = "../pkm_rs_derive"}
 serde = { version = "1.0.219", features = ["derive"] }
 static_assertions = "1.1.0"
-wasm-bindgen = { version = "0.2", optional = true }
+wasm-bindgen = { version = "0.2.104", optional = true }
 js-sys = { version = "0.3.77", optional = true }
 serde-wasm-bindgen = { version = "0.6.5", optional = true }
 getrandom = { version = "0.3.3", features = ["wasm_js"] }

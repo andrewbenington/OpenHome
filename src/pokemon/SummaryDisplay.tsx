@@ -1,8 +1,9 @@
 import { getDisplayID } from '@pokemon-files/util'
 import { MetadataLookup } from '@pokemon-resources/pkg'
-import { Badge, Flex, Grid, Spinner } from '@radix-ui/themes'
+import { Badge, Flex, Grid, Spinner, Tooltip } from '@radix-ui/themes'
 import { AbilityToString } from 'pokemon-resources'
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
+import { ErrorIcon } from 'src/components/Icons'
 import PokemonIcon from '../components/PokemonIcon'
 import TypeIcon from '../components/TypeIcon'
 import { getPublicImageURL } from '../images/images'
@@ -38,8 +39,7 @@ const styles = {
 
 const SummaryDisplay = (props: { mon: PKMInterface }) => {
   const { mon } = props
-  const [imageError, setImageError] = useState(false)
-  const spritePath = useMonSprite({
+  const spriteResult = useMonSprite({
     dexNum: mon.dexNum,
     formeNum: mon.formeNum,
     formArgument: mon.formArgument,
@@ -59,23 +59,53 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
     <Grid columns="2" width="100%" p="3" gap="2">
       <div>
         <div style={styles.column}>
-          {imageError ? (
-            <PokemonIcon
-              dexNumber={mon.dexNum}
-              formeNumber={mon.formeNum}
-              style={{ width: '90%', height: 0, paddingBottom: '90%' }}
-            />
-          ) : spritePath ? (
-            <img
-              draggable={false}
-              alt={itemAltText}
-              style={styles.image}
-              src={spritePath}
-              onError={() => setImageError(true)}
-            />
-          ) : (
-            <Spinner style={{ margin: 'auto', height: 32 }} />
-          )}
+          <div
+            style={{
+              width: '100%',
+              height: '100%',
+              position: 'relative',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            {spriteResult.loading ? (
+              <Spinner style={{ margin: 'auto', height: 32 }} />
+            ) : spriteResult.path ? (
+              <img
+                draggable={false}
+                alt={itemAltText}
+                style={styles.image}
+                src={spriteResult.path}
+              />
+            ) : (
+              <PokemonIcon
+                dexNumber={mon.dexNum}
+                formeNumber={mon.formeNum}
+                style={{
+                  width: '60%',
+                  height: '90%',
+                  margin: 'auto',
+                  imageRendering: 'pixelated',
+                }}
+              />
+            )}
+            {spriteResult.errorMessage && (
+              <Tooltip content={spriteResult.errorMessage}>
+                <Badge
+                  variant="solid"
+                  color="tomato"
+                  style={{
+                    position: 'absolute',
+                    bottom: '10%',
+                    right: '10%',
+                  }}
+                >
+                  <ErrorIcon fontSize={20} />
+                </Badge>
+              </Tooltip>
+            )}
+          </div>
         </div>
         <div style={styles.nicknameRow}>
           {mon.ball ? (

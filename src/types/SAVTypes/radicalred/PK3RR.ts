@@ -48,7 +48,7 @@ export class PK3RR extends PK3CFRU implements PluginPKMInterface {
     return toGen3CRFUPokemonIndex(nationalDexNumber, formIndex, NationalDexToRadicalRedMap)
   }
 
-  isFakemon(speciesIndex: number): boolean {
+  indexIsFakemon(speciesIndex: number): boolean {
     return FAKEMON_INDEXES.includes(speciesIndex)
   }
 

@@ -211,9 +211,6 @@ function falseIfUndef(input?: boolean): boolean {
 }
 
 function convertForme(natDexIndex: number, forme: Forme): string {
-  const constName = rustFormeConstName(forme)
-
-  console.log('forme:', constName)
   return `FormeMetadata {
     species_name: "${forme.name}",
     national_dex: unsafe { NatDexIndex::new_unchecked(${natDexIndex}) },
@@ -263,7 +260,6 @@ function convertSpecies(species: Species): string {
 }
 
 function main() {
-  console.log(process.cwd())
   const speciesJson: Record<string, Species> = JSON.parse(
     fs.readFileSync('text_source/species.json', 'utf-8')
   )

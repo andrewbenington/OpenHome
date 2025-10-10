@@ -127,35 +127,42 @@ export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implement
   abstract invalid: boolean
   abstract tooEarlyToOpen: boolean
   abstract updatedBoxSlots: BoxCoordinates[]
-  abstract getCurrentBox: () => Box<P>
-  abstract supportsMon: (dexNumber: number, formeNumber: number) => boolean
+  abstract getCurrentBox(): Box<P>
+  abstract supportsMon(dexNumber: number, formeNumber: number): boolean
   abstract getSlotMetadata?: ((boxNum: number, boxSlot: number) => SlotMetadata) | undefined
-  abstract prepareBoxesAndGetModified: () => OHPKM[]
-  abstract getDisplayData(): Record<string, string | number | undefined> | undefined
+  abstract prepareBoxesAndGetModified(): OHPKM[]
 
-  abstract getPluginIdentifier: () => string
+  getDisplayData(): Record<string, string | number | undefined> | undefined {
+    return {
+      'Trainer Name': this.name,
+      'Trainer ID': this.displayID,
+      Plugin: this.pluginIdentifier,
+    }
+  }
+
+  abstract pluginIdentifier: string
   isPlugin = true
 
   abstract get gameName(): string
 
   get gameColor(): string {
-    return getPluginColor(this.getPluginIdentifier())
+    return getPluginColor(this.pluginIdentifier)
   }
 
   get gameLogoPath(): string {
-    return `logos/${this.getPluginIdentifier()}.png`
+    return `logos/${this.pluginIdentifier}.png`
   }
 }
 
 export function getSaveRef(save: SAV): SaveRef {
   return {
     filePath: save.filePath,
-    game: save.isPlugin ? null : save.origin,
+    game: save.origin,
     trainerName: save.name ? save.name : null,
     trainerID: save.displayID,
     lastOpened: null,
     lastModified: null,
-    pluginIdentifier: save.isPlugin ? save.getPluginIdentifier() : null,
+    pluginIdentifier: save.isPlugin ? save.pluginIdentifier : null,
     valid: true,
   }
 }

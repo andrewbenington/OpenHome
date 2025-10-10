@@ -30,7 +30,6 @@ export function loadPlugin(pluginCode: string): OpenHomePlugin {
   ) as PluginBuilder
 
   const { plugin } = buildPlugin(MetadataLookup, SpeciesLookup, NationalDex)
-
   return plugin
 }
 

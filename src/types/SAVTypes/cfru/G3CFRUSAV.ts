@@ -8,7 +8,7 @@ import {
 import { gen3StringToUTF } from '../../../util/Strings/StringConverter'
 import { PluginPKMInterface } from '../../interfaces'
 import { OHPKM } from '../../pkm/OHPKM'
-import { Box, BoxCoordinates } from '../SAV'
+import { Box, BoxCoordinates, PluginSAV } from '../SAV'
 import { PathData } from '../path'
 import { LOOKUP_TYPE } from '../util'
 // import { RRTransferMon } from './conversion/RRTransferMons'
@@ -134,7 +134,7 @@ class G3CFRUSaveBackup<T extends PluginPKMInterface> {
   }
 }
 
-export abstract class G3CFRUSAV<T extends PluginPKMInterface> {
+export abstract class G3CFRUSAV<T extends PluginPKMInterface> extends PluginSAV<T> {
   static pkmType: any
   pkmTypeClass: any
 
@@ -178,6 +178,7 @@ export abstract class G3CFRUSAV<T extends PluginPKMInterface> {
   updatedBoxSlots: BoxCoordinates[] = []
 
   constructor(path: PathData, bytes: Uint8Array, pkmType: any) {
+    super()
     this.pkmTypeClass = pkmType
     this.bytes = bytes
     this.filePath = path
@@ -290,10 +291,6 @@ export abstract class G3CFRUSAV<T extends PluginPKMInterface> {
   static saveTypeAbbreviation = 'Radical Red'
   static saveTypeName = 'Pokémon Radical Red'
   static saveTypeID = 'G3RRSAV'
-
-  getPluginIdentifier() {
-    return 'radical_red'
-  }
 }
 
 export const findFirstSectionOffset = (bytes: Uint8Array): number => {
