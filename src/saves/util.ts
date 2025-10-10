@@ -1,39 +1,12 @@
-import { OriginGame, OriginGames } from '@pokemon-resources/pkg'
+import { OriginGames } from '@pokemon-resources/pkg'
 import dayjs from 'dayjs'
-import { GameLogos, getOriginMark } from '../images/game'
 import { PKMInterface } from '../types/interfaces'
 import { HomeData } from '../types/SAVTypes/HomeData'
 import { Box, SAV } from '../types/SAVTypes/SAV'
-import { getPluginIdentifier, SAVClass } from '../types/SAVTypes/util'
 import { SaveRef } from '../types/types'
 import { filterUndefined } from '../util/Sort'
 
 export type SaveViewMode = 'card' | 'grid'
-
-export function getMonSaveLogo(mon: PKMInterface, supportedSaves: SAVClass[]) {
-  if (mon.pluginOrigin) {
-    const pluginSave = supportedSaves.find((s) => getPluginIdentifier(s) === mon.pluginOrigin)
-
-    return `logos/${getPluginIdentifier(pluginSave)}.png`
-  }
-  if (!mon.gameOfOrigin) {
-    return getOriginMark('GB')
-  }
-
-  if (mon.gameOfOrigin === OriginGame.ColosseumXd) {
-    if (mon.isFatefulEncounter) {
-      return GameLogos.XD
-    } else {
-      return GameLogos.Colosseum
-    }
-  }
-
-  if (mon.gameOfOrigin === -1) {
-    return GameLogos.GB
-  }
-
-  return OriginGames.logoPath(mon.gameOfOrigin)
-}
 
 export function logoFromSaveRef(ref: SaveRef): string | undefined {
   return ref.pluginIdentifier

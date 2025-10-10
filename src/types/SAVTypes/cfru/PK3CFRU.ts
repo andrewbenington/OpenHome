@@ -34,7 +34,7 @@ export interface CFRUToNationalDexEntry {
   FormIndex: number
 }
 
-const INTERNAL_ORIGIN_NON_RR = 6
+const INTERNAL_ORIGIN_NON_RR = OriginGame.Invalid6
 const INTERNAL_ORIGIN_FROM_CFRU = OriginGame.FireRed
 const FIRERED_IN_GAME_TRADE = 255
 

@@ -1,7 +1,6 @@
 import { MetadataLookup } from '@pokemon-resources/pkg'
 import { Button, Card, Dialog, Flex, Grid } from '@radix-ui/themes'
 import lodash, { range } from 'lodash'
-import { GameOfOriginData } from 'pokemon-resources'
 import { useContext, useMemo, useState } from 'react'
 import { MdClose } from 'react-icons/md'
 import { BackendContext } from 'src/backend/backendContext'
@@ -259,7 +258,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
               gap: 2,
             }}
           >
-            <AttributeRow label="Game">Pokémon {GameOfOriginData[save.origin]?.name}</AttributeRow>
+            <AttributeRow label="Game">Pokémon {save.gameName}</AttributeRow>
             <AttributeRow label="Trainer Name">{save.name}</AttributeRow>
             <AttributeRow label="Trainer ID">{save.displayID}</AttributeRow>
             {save.sid && (
