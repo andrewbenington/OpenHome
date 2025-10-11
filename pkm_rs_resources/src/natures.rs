@@ -24,6 +24,10 @@ impl NatureIndex {
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[allow(clippy::missing_const_for_fn)]
 impl NatureIndex {
+    //! IMPORTANT: DO NOT ADD NON-BORROWING SELF METHODS
+    //! (JavaScript will be copying this value and consuming
+    //! methods could result in use-after-free)
+
     #[cfg_attr(feature = "wasm", wasm_bindgen(constructor))]
     pub fn new_js(val: u8) -> Result<NatureIndex, JsValue> {
         if val > NATURE_MAX {
