@@ -8,6 +8,7 @@ import {
   Stats,
   StatsPreSplit,
   generatePersonalityValuePreservingAttributes,
+  getStandardPKMStats,
   markingsHaveColor,
   markingsSixShapesWithColorFromBytes,
   markingsSixShapesWithColorFromOther,
@@ -19,6 +20,7 @@ import {
   Language,
   Languages,
   MetadataLookup,
+  NatureIndex,
   OriginGame,
   SpeciesLookup,
 } from '@pokemon-resources/pkg'
@@ -32,7 +34,6 @@ import {
   ItemFromString,
   ItemToString,
   ModernRibbons,
-  NatureToString,
   getMetLocation,
 } from 'pokemon-resources'
 import Prando from 'prando'
@@ -49,7 +50,6 @@ import {
   uint16ToBytesLittleEndian,
   uint32ToBytesLittleEndian,
 } from 'src/util/byteLogic'
-import { getHPGen3Onward, getStatGen3Onward } from 'src/util/StatCalc'
 import { utf16BytesToString, utf16StringToBytes } from 'src/util/Strings/StringConverter'
 import { getHomeIdentifier, isEvolution } from '../../util/Lookup'
 import { PKMInterface, PluginPKMInterface } from '../interfaces'
@@ -168,7 +168,8 @@ export class OHPKM implements PKMInterface {
           other.gender ?? this.metadata?.genderFromPid(this.personalityValue) ?? Gender.Genderless
       }
 
-      this.nature = other.nature !== undefined ? other.nature : this.personalityValue % 25
+      this.nature =
+        other.nature !== undefined ? other.nature : NatureIndex.newFromPid(this.personalityValue)
       this.ivs = other.ivs ?? (other.dvs !== undefined ? ivsFromDVs(other.dvs) : generateIVs(prng))
       this.evs = other.evs ?? {
         hp: 0,
@@ -583,23 +584,19 @@ export class OHPKM implements PKMInterface {
   }
 
   public get nature() {
-    return this.bytes[0x20]
+    return new NatureIndex(this.bytes[0x20])
   }
 
-  public set nature(value: number) {
-    this.bytes[0x20] = value
-  }
-
-  public get natureName() {
-    return NatureToString(this.nature)
+  public set nature(value: NatureIndex) {
+    this.bytes[0x20] = value.index
   }
 
   public get statNature() {
-    return this.bytes[0x21]
+    return new NatureIndex(this.bytes[0x21])
   }
 
-  public set statNature(value: number) {
-    this.bytes[0x21] = value
+  public set statNature(value: NatureIndex) {
+    this.bytes[0x21] = value.index
   }
 
   public get isFatefulEncounter() {
@@ -1509,14 +1506,7 @@ export class OHPKM implements PKMInterface {
   }
 
   public get stats(): Stats {
-    return {
-      hp: getHPGen3Onward(this),
-      atk: getStatGen3Onward('Atk', this),
-      def: getStatGen3Onward('Def', this),
-      spe: getStatGen3Onward('Spe', this),
-      spa: getStatGen3Onward('SpA', this),
-      spd: getStatGen3Onward('SpD', this),
-    }
+    return getStandardPKMStats(this)
   }
 
   public get currentHP(): number {

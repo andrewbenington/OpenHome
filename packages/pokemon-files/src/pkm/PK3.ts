@@ -5,11 +5,16 @@ import {
   Gen3StandardRibbons,
   ItemGen3FromString,
   ItemGen3ToString,
-  NatureToString,
 } from 'pokemon-resources'
 import { NationalDex } from 'src/consts/NationalDex'
 
-import { Language, Languages, MetadataLookup, SpeciesLookup } from '@pokemon-resources/pkg'
+import {
+  Language,
+  Languages,
+  MetadataLookup,
+  NatureIndex,
+  SpeciesLookup,
+} from '@pokemon-resources/pkg'
 import * as conversion from '../conversion'
 import * as byteLogic from '../util/byteLogic'
 import * as encryption from '../util/encryption'
@@ -289,7 +294,7 @@ export class PK3 {
   }
 
   public get nature() {
-    return this.personalityValue % 25
+    return NatureIndex.newFromPid(this.personalityValue)
   }
 
   public get abilityNum() {
@@ -302,10 +307,6 @@ export class PK3 {
 
   public get ability() {
     return this.metadata?.abilityByNumGen3(this.abilityNum)?.name ?? '—'
-  }
-
-  public get natureName() {
-    return NatureToString(this.nature)
   }
 
   public get formeNum() {

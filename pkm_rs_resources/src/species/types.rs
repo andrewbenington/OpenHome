@@ -6,6 +6,8 @@ use strum_macros::{Display, EnumString};
 use pkm_rs_types::{Generation, PkmType, Region, Stats16Le};
 use serde::{Serialize, Serializer};
 
+#[cfg(feature = "wasm")]
+use crate::stats::Stat;
 use crate::{Error, Result, abilities::AbilityIndex, species::ALL_SPECIES};
 
 #[cfg(feature = "wasm")]
@@ -491,9 +493,22 @@ impl FormeMetadata {
     pub fn gender_from_pid(&self, pid: u32) -> Gender {
         self.gender_ratio.gender_for_pid(pid)
     }
+
     #[wasm_bindgen(js_name = isEvolutionOf)]
     pub fn is_evolution_of_js(&self, other: &FormeMetadata) -> bool {
         self.is_evolution_of(other)
+    }
+
+    #[wasm_bindgen(js_name = getBaseStat)]
+    pub fn get_base_stat(&self, stat: Stat) -> u16 {
+        match stat {
+            Stat::HP => self.base_stats.hp,
+            Stat::Attack => self.base_stats.atk,
+            Stat::Defense => self.base_stats.def,
+            Stat::SpecialAttack => self.base_stats.spa,
+            Stat::SpecialDefense => self.base_stats.spd,
+            Stat::Speed => self.base_stats.spe,
+        }
     }
 }
 

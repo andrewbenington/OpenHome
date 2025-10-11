@@ -1,13 +1,12 @@
-import {
-  AbilityToString,
-  Ball,
-  Gen4Ribbons,
-  ItemFromString,
-  ItemToString,
-  NatureToString,
-} from 'pokemon-resources'
+import { AbilityToString, Ball, Gen4Ribbons, ItemFromString, ItemToString } from 'pokemon-resources'
 
-import { Language, Languages, MetadataLookup, SpeciesLookup } from '@pokemon-resources/pkg'
+import {
+  Language,
+  Languages,
+  MetadataLookup,
+  NatureIndex,
+  SpeciesLookup,
+} from '@pokemon-resources/pkg'
 import * as byteLogic from '../util/byteLogic'
 import * as encryption from '../util/encryption'
 import { AllPKMFields } from '../util/pkmInterface'
@@ -410,16 +409,13 @@ export class PK4 {
   }
 
   public get nature() {
-    return this.personalityValue % 25
+    return NatureIndex.newFromPid(this.personalityValue)
   }
 
   public get abilityNum() {
     return ((this.personalityValue >> 0) & 1) + 1
   }
 
-  public get natureName() {
-    return NatureToString(this.nature)
-  }
   public refreshChecksum() {
     this.checksum = encryption.get16BitChecksumLittleEndian(this.toBytes(), 0x08, 0x87)
   }

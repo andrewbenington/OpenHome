@@ -1,9 +1,10 @@
-import { Ball, ItemFromString, NatureToString } from 'pokemon-resources'
+import { Ball, ItemFromString } from 'pokemon-resources'
 
 import {
   generatePersonalityValuePreservingAttributes,
   getFlag,
   getMoveMaxPP,
+  getStandardPKMStats,
   MarkingsFourShapes,
   markingsFourShapesFromBytes,
   markingsFourShapesFromOther,
@@ -23,10 +24,10 @@ import {
   Language,
   Languages,
   MetadataLookup,
+  NatureIndex,
   OriginGame,
   SpeciesLookup,
 } from '@pokemon-resources/pkg'
-import { getHPGen3Onward, getStatGen3Onward } from '../../../util/StatCalc'
 import { PKMInterface, PluginPKMInterface } from '../../interfaces'
 
 export interface CFRUToNationalDexEntry {
@@ -411,14 +412,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
   }
 
   public getStats() {
-    return {
-      hp: getHPGen3Onward(this),
-      atk: getStatGen3Onward('Atk', this),
-      def: getStatGen3Onward('Def', this),
-      spe: getStatGen3Onward('Spe', this),
-      spa: getStatGen3Onward('SpA', this),
-      spd: getStatGen3Onward('SpD', this),
-    }
+    return getStandardPKMStats(this)
   }
 
   public get gender() {
@@ -434,7 +428,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
   }
 
   public get nature() {
-    return this.personalityValue % 25
+    return NatureIndex.newFromPid(this.personalityValue)
   }
 
   public get abilityNum() {
@@ -447,10 +441,6 @@ export abstract class PK3CFRU implements PluginPKMInterface {
 
   public get ability() {
     return this.metadata?.abilityByNum(this.abilityNum)?.name ?? '—'
-  }
-
-  public get natureName() {
-    return NatureToString(this.nature)
   }
 
   toPCBytes() {

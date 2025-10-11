@@ -1,6 +1,6 @@
 import { OriginGames } from '@pokemon-resources/pkg'
 import { Badge, Flex } from '@radix-ui/themes'
-import { getLocationString, NatureToString, RibbonTitles } from 'pokemon-resources'
+import { getLocationString, RibbonTitles } from 'pokemon-resources'
 import { useContext, useMemo } from 'react'
 import Markings from '../components/Markings'
 import { getPublicImageURL } from '../images/images'
@@ -97,18 +97,18 @@ const MetDataMovesDisplay = (props: { mon: PKMInterface }) => {
   }, [getEnabledSaveTypes, mon])
 
   const natureMessage = useMemo(() => {
-    const currentNature = mon.statNature ?? mon.nature ?? 0
+    const currentNature = mon.statNature ?? mon.nature
+    if (!currentNature) return undefined
+
     let message = 'Has a'
-    const vowelStart = ['A', 'E', 'I', 'O', 'U'].includes(
-      (NatureToString(currentNature) ?? 'Undefined')[0]
-    )
+    const vowelStart = ['A', 'E', 'I', 'O', 'U'].includes(currentNature.name[0])
 
     if (vowelStart) {
       message += 'n'
     }
-    message += ` ${NatureToString(currentNature)} nature.`
+    message += ` ${currentNature.name} nature.`
     if (mon.statNature && mon.nature !== mon.statNature) {
-      message += ` (originally ${NatureToString(mon.statNature)})`
+      message += ` (originally ${mon.statNature.name})`
     }
     return message
   }, [mon])

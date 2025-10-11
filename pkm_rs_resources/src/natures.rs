@@ -10,8 +10,10 @@ use crate::{Error, stats::Stat};
 pub struct NatureIndex(u8);
 
 impl NatureIndex {
-    pub fn get_metadata(&self) -> Option<&'static NatureMetadata> {
-        ALL_NATURES.get(self.0 as usize).copied()
+    pub fn get_metadata(&self) -> &'static NatureMetadata {
+        ALL_NATURES
+            .get(self.0 as usize)
+            .expect("NatureIndex should never have an invalid index")
     }
 
     pub const fn to_byte(self) -> u8 {
@@ -22,15 +24,47 @@ impl NatureIndex {
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[allow(clippy::missing_const_for_fn)]
 impl NatureIndex {
-    #[cfg(feature = "wasm")]
-    #[wasm_bindgen(constructor)]
-    pub fn new(val: u8) -> NatureIndex {
-        NatureIndex(val)
+    #[cfg_attr(feature = "wasm", wasm_bindgen(constructor))]
+    pub fn new_js(val: u8) -> Result<NatureIndex, JsValue> {
+        if val > NATURE_MAX {
+            Err(format!("Invalid nature index: {val}").into())
+        } else {
+            Ok(NatureIndex(val))
+        }
+    }
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "newFromPid"))]
+    pub fn new_from_pid(val: u32) -> NatureIndex {
+        Self((val % (NATURE_MAX as u32)) as u8)
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
     pub fn index(self) -> u8 {
         self.0
+    }
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
+    pub fn name(self) -> String {
+        if let Some(stats) = &self.get_metadata().stats {
+            format!("+{}, -{}", stats.increase.abbr(), stats.decrease.abbr())
+        } else {
+            String::new()
+        }
+    }
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
+    pub fn stats(self) -> Option<NatureStatData> {
+        self.get_metadata().stats
+    }
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "multiplierFor"))]
+    pub fn multiplier_for(self, stat: Stat) -> f32 {
+        self.get_metadata().multiplier_for(stat)
+    }
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
+    pub fn summary(self) -> String {
+        self.get_metadata().name.to_owned()
     }
 }
 
@@ -39,10 +73,7 @@ impl Serialize for NatureIndex {
     where
         S: Serializer,
     {
-        serializer.serialize_str(match self.get_metadata() {
-            None => "<invalid>",
-            Some(metadata) => metadata.name,
-        })
+        serializer.serialize_str(self.get_metadata().name)
     }
 }
 
@@ -65,6 +96,8 @@ impl From<NatureIndex> for u8 {
     }
 }
 
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[derive(Debug, Clone, Copy)]
 pub struct NatureStatData {
     pub increase: Stat,
     pub decrease: Stat,

@@ -1,10 +1,16 @@
-import { isGameBoy, Moves, Nature } from 'pokemon-resources'
+import { isGameBoy, Moves } from 'pokemon-resources'
 import Prando from 'prando'
 import { NationalDex } from 'src/consts/NationalDex'
 
 import { PKM } from '../pkm'
 
-import { Gender, genderFromInt, MetadataLookup, OriginGame } from '@pokemon-resources/pkg'
+import {
+  Gender,
+  genderFromInt,
+  MetadataLookup,
+  NatureIndex,
+  OriginGame,
+} from '@pokemon-resources/pkg'
 import { AllPKMFields } from './pkmInterface'
 
 export function getGen3MiscFlags(pokemon: PKM): number {
@@ -45,7 +51,7 @@ export function generatePersonalityValuePreservingAttributes(mon: AllPKMFields):
   const prng = new Prando(mon.personalityValue ?? mon.ivs?.atk)
 
   let personalityValue = 0
-  let otherNature: Nature | undefined
+  let otherNature: NatureIndex | undefined
   let otherAbilityNum = 4
 
   if (mon.personalityValue !== undefined && mon.abilityNum !== undefined) {
@@ -78,7 +84,7 @@ export function generatePersonalityValuePreservingAttributes(mon: AllPKMFields):
   let i = 0
   while (i < 0x10000) {
     const newGender = metadata.genderFromPid(Number(newPersonalityValue))
-    const newNature = Number(newPersonalityValue % BigInt(25))
+    const newNature = NatureIndex.newFromPid(Number(newPersonalityValue))
 
     const newAbilityNum = Number(newPersonalityValue & BigInt(1)) + 1
 
