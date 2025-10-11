@@ -1,6 +1,7 @@
-import { AbilityToString, Ball, Gen4Ribbons, ItemFromString, ItemToString } from 'pokemon-resources'
+import { AbilityToString, Gen4Ribbons, ItemFromString, ItemToString } from 'pokemon-resources'
 
 import {
+  Ball,
   Language,
   Languages,
   MetadataLookup,

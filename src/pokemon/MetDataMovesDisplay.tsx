@@ -98,7 +98,7 @@ const MetDataMovesDisplay = (props: { mon: PKMInterface }) => {
 
   const natureMessage = useMemo(() => {
     const currentNature = mon.statNature ?? mon.nature
-    if (!currentNature) return undefined
+    if (!currentNature || !mon.nature) return undefined
 
     let message = 'Has a'
     const vowelStart = ['A', 'E', 'I', 'O', 'U'].includes(currentNature.name[0])
@@ -107,8 +107,8 @@ const MetDataMovesDisplay = (props: { mon: PKMInterface }) => {
       message += 'n'
     }
     message += ` ${currentNature.name} nature.`
-    if (mon.statNature && mon.nature !== mon.statNature) {
-      message += ` (originally ${mon.statNature.name})`
+    if (mon.statNature && !mon.nature?.equals(mon.statNature)) {
+      message += ` (originally ${mon.nature.name})`
     }
     return message
   }, [mon])
