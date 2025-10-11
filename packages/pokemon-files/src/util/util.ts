@@ -92,7 +92,7 @@ export function generatePersonalityValuePreservingAttributes(mon: AllPKMFields):
       (!shouldCheckUnown || getUnownLetterGen3(Number(newPersonalityValue)) === mon.formeNum) &&
       newGender === otherGender &&
       (otherAbilityNum === 4 || shouldCheckUnown || newAbilityNum === otherAbilityNum) &&
-      (otherNature === undefined || newNature === otherNature) &&
+      (otherNature === undefined || newNature.equals(otherNature)) &&
       getIsShinyPreGen6(mon.trainerID, mon.secretID ?? 0, Number(newPersonalityValue)) ===
         mon.isShiny()
     ) {

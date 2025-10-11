@@ -145,5 +145,5 @@ test('gen 6+ shiny accuracy', () => {
 test('gen 6+ nature accuracy', () => {
   const converted = new PK3(slowpokeOhpkm)
 
-  expect(converted.nature).toBe(slowpokeOhpkm.nature)
+  expect(converted.nature.index).toEqual(slowpokeOhpkm.nature.index)
 })

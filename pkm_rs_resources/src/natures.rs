@@ -35,16 +35,16 @@ impl NatureIndex {
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "newFromPid"))]
     pub fn new_from_pid(val: u32) -> NatureIndex {
-        Self((val % (NATURE_MAX as u32)) as u8)
+        Self((val % (NATURE_COUNT as u32)) as u8)
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
-    pub fn index(self) -> u8 {
+    pub fn index(&self) -> u8 {
         self.0
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
-    pub fn name(self) -> String {
+    pub fn summary(&self) -> String {
         if let Some(stats) = &self.get_metadata().stats {
             format!("+{}, -{}", stats.increase.abbr(), stats.decrease.abbr())
         } else {
@@ -53,18 +53,28 @@ impl NatureIndex {
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
-    pub fn stats(self) -> Option<NatureStatData> {
+    pub fn stats(&self) -> Option<NatureStatData> {
         self.get_metadata().stats
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "multiplierFor"))]
-    pub fn multiplier_for(self, stat: Stat) -> f32 {
+    pub fn multiplier_for(&self, stat: Stat) -> f32 {
         self.get_metadata().multiplier_for(stat)
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
-    pub fn summary(self) -> String {
+    pub fn name(&self) -> String {
         self.get_metadata().name.to_owned()
+    }
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen)]
+    pub fn copy(&self) -> NatureIndex {
+        NatureIndex(self.0)
+    }
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen)]
+    pub fn equals(&self, other: &NatureIndex) -> bool {
+        self.0 == other.index()
     }
 }
 
@@ -311,6 +321,7 @@ const QUIRKY: NatureMetadata = NatureMetadata {
 };
 
 pub const NATURE_MAX: u8 = 24;
+pub const NATURE_COUNT: u8 = NATURE_MAX + 1;
 
 const ALL_NATURES: [&NatureMetadata; 25] = [
     &HARDY, &LONELY, &BRAVE, &ADAMANT, &NAUGHTY, &BOLD, &DOCILE, &RELAXED, &IMPISH, &LAX, &TIMID,
