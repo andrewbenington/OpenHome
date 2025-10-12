@@ -22,6 +22,7 @@ import {
   writeUint32ToBuffer,
 } from 'src/util/byteLogic'
 import {
+  AbilityIndex,
   MetadataLookup,
   SpeciesAndForme,
   SpeciesLookup,
@@ -49,8 +50,12 @@ export const writeIVsToBuffer = (
   writeUint32ToBuffer(ivsValue, buffer, offset)
 }
 
-export const getAbilityFromNumber = (dexNum: number, formeNum: number, abilityNum: number) => {
-  return MetadataLookup(dexNum, formeNum)?.abilityByNum(abilityNum).name ?? 'None'
+export const getAbilityFromNumber = (
+  dexNum: number,
+  formeNum: number,
+  abilityNum: number
+): AbilityIndex | undefined => {
+  return MetadataLookup(dexNum, formeNum)?.abilityByNum(abilityNum)
 }
 
 export const getUnownLetterGen3 = (personalityValue: number) => {

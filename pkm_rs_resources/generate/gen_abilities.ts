@@ -50,12 +50,16 @@ function main() {
   const names: string[] = fs.readFileSync('text_source/abilities.txt', 'utf-8').split('\n').slice(1)
 
   let output = `use std::fmt::Debug;
-use std::{fmt::Display, num::NonZeroU16};
+use std::num::NonZeroU16;
+
+#[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
 use serde::{Serialize, Serializer};
 
-#[wasm_bindgen]
+use crate::{Error, Result};
+
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub struct AbilityIndex(NonZeroU16);
 
@@ -87,17 +91,27 @@ impl AbilityIndex {
     }
 }
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[allow(clippy::missing_const_for_fn)]
 impl AbilityIndex {
-    #[wasm_bindgen(constructor)]
-    pub fn new_js(val: u16) -> Option<AbilityIndex> {
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = fromIndex))]
+    pub fn from_index(val: u16) -> Option<AbilityIndex> {
         AbilityIndex::new(val)
     }
 
-    #[wasm_bindgen(getter)]
-    pub fn index(self) -> u16 {
+    #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
+    pub fn index(&self) -> u16 {
         self.get()
+    }
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
+    pub fn name(&self) -> String {
+        self.get_metadata().name.to_owned()
+    }
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen)]
+    pub fn equals(&self, other: &AbilityIndex) -> bool {
+        self.0 == other.0
     }
 }
 
@@ -108,7 +122,7 @@ impl Default for AbilityIndex {
 }
 
 impl Serialize for AbilityIndex {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    fn serialize<S>(&self, serializer: S) -> core::result::Result<S::Ok, S::Error>
     where
         S: Serializer,
     {
@@ -116,39 +130,21 @@ impl Serialize for AbilityIndex {
     }
 }
 
-#[derive(Debug, Copy, Clone)]
-pub struct InvalidAbilityIndex<T: num::Integer + Display + Debug> {
-    received_index: T,
-}
-
-impl<T: num::Integer + Display + Debug> std::error::Error for InvalidAbilityIndex<T> {}
-
-impl<T: num::Integer + Display + Debug> InvalidAbilityIndex<T> {
-    pub const fn new(received_index: T) -> Self {
-        Self { received_index }
-    }
-}
-
-impl<T: num::Integer + Display + Debug> Display for InvalidAbilityIndex<T> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str(&format!(
-            "Ability index must be between 1 and {ABILITY_MAX}; received {}",
-            self.received_index
-        ))
-    }
-}
-
 impl TryFrom<u8> for AbilityIndex {
-    type Error = InvalidAbilityIndex<u8>;
+    type Error = Error;
 
-    fn try_from(value: u8) -> Result<Self, Self::Error> {
+    fn try_from(value: u8) -> core::result::Result<Self, Self::Error> {
         if (value as usize) > ABILITY_MAX {
-            return Err(Self::Error::new(value));
+            return Err(Error::AbilityIndex {
+                ability_index: value as u16,
+            });
         }
 
-        NonZeroU16::try_from(value as u16)
+        NonZeroU16::new(value as u16)
             .map(AbilityIndex)
-            .map_err(|_| Self::Error::new(value))
+            .ok_or(Error::AbilityIndex {
+                ability_index: value as u16,
+            })
     }
 }
 
@@ -159,16 +155,20 @@ impl From<AbilityIndex> for u8 {
 }
 
 impl TryFrom<u16> for AbilityIndex {
-    type Error = InvalidAbilityIndex<u16>;
+    type Error = Error;
 
-    fn try_from(value: u16) -> Result<Self, Self::Error> {
+    fn try_from(value: u16) -> Result<Self> {
         if (value as usize) > ABILITY_MAX {
-            return Err(Self::Error::new(value));
+            return Err(Error::AbilityIndex {
+                ability_index: value,
+            });
         }
 
-        NonZeroU16::try_from(value)
+        NonZeroU16::new(value)
             .map(AbilityIndex)
-            .map_err(|_| Self::Error::new(value))
+            .ok_or(Error::AbilityIndex {
+                ability_index: value,
+            })
     }
 }
 
@@ -178,13 +178,20 @@ impl From<AbilityIndex> for u16 {
     }
 }
 
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[derive(Clone, Copy)]
 pub struct AbilityMetadata {
-    id: u16,
+    id: usize,
     name: &'static str,
 }
 
-pub const ABILITY_MAX: usize = ${names.length};
-    
+pub const ABILITY_MAX: usize = 310;
+
+#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "getAbilityMax"))]
+#[allow(clippy::missing_const_for_fn)]
+pub fn get_all_abilities() -> Vec<AbilityMetadata> {
+    ALL_ABILITIES.into_iter().copied().collect()
+}
 `
 
   output +=
@@ -192,7 +199,7 @@ pub const ABILITY_MAX: usize = ${names.length};
     names.map((name, index) => '&' + convertAbility(index + 1, name)).join(',\n') +
     '];'
 
-  const filename = 'pkm_rs/src/resources/abilities.rs'
+  const filename = 'src/abilities.rs'
   fs.writeFileSync(filename, output)
   console.log(`Rust code written to ${filename}`)
 }

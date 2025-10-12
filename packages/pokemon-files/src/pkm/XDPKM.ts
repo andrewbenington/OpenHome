@@ -260,12 +260,8 @@ export class XDPKM {
     return ((this.personalityValue >> 0) & 1) + 1
   }
 
-  public get abilityIndex() {
-    return this.metadata?.abilityByNumGen3(this.abilityNum)?.index ?? 0
-  }
-
   public get ability() {
-    return this.metadata?.abilityByNumGen3(this.abilityNum)?.name ?? '—'
+    return this.metadata?.abilityByNumGen3(this.abilityNum)
   }
 
   public get formeNum() {

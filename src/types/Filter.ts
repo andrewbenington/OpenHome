@@ -7,7 +7,7 @@ export interface Filter {
   dexNumber?: number
   formeNumber?: number
   heldItem?: number | HeldItemCategory
-  abilityIndex?: number
+  ability?: number
   type1?: Type
   type2?: Type
   gameOfOrigin?: OriginGame
@@ -32,8 +32,8 @@ export function filterApplies(filter: Filter, mon: PKMInterface) {
     return false
   }
   if (
-    filter.abilityIndex !== undefined &&
-    (!('abilityIndex' in mon) || mon.abilityIndex !== filter.abilityIndex)
+    filter.ability !== undefined &&
+    (!('ability' in mon) || mon.ability?.index !== filter.ability)
   ) {
     return false
   }

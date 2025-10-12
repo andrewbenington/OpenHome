@@ -1,13 +1,14 @@
 import {
   all_species_data,
   Generation,
+  getAllAbilities,
   OriginGame,
   OriginGames,
   OriginGameWithData,
   SpeciesLookup,
 } from '@pokemon-resources/pkg'
 import { Button, Card, Flex, Text } from '@radix-ui/themes'
-import { Ability, Balls, Item, ItemToString, Types } from 'pokemon-resources'
+import { Balls, Item, ItemToString, Types } from 'pokemon-resources'
 import { useContext, useMemo } from 'react'
 import { OpenHomeRibbons } from 'src/consts/Ribbons'
 import { getPublicImageURL } from 'src/images/images'
@@ -80,14 +81,15 @@ const itemOptions: ItemOption[] = [
   ...heldItems.slice(1).map((item) => ({ type: 'specific_item', ...item }) as ItemOption),
 ]
 
-const abilities: SelectOption[] = Object.keys(Ability)
-  .filter((ability) => isNaN(Number(ability)))
-  .map((ability, id) => ({ label: ability, id }))
-
 export default function FilterPanel() {
   const [filterState, dispatchFilterState] = useContext(FilterContext)
 
   const ALL_SPECIES_DATA = useMemo(all_species_data, [])
+
+  const ALL_ABILITIES: SelectOption[] = getAllAbilities().map(({ name, id }) => ({
+    label: name,
+    id,
+  }))
 
   const currentMon = useMemo(
     () => (filterState.dexNumber ? SpeciesLookup(filterState.dexNumber) : undefined),
@@ -193,17 +195,17 @@ export default function FilterPanel() {
           }
         />
         <Autocomplete
-          options={abilities}
+          options={ALL_ABILITIES}
           getOptionString={(opt) => opt.label}
           getOptionUniqueID={(opt) => opt.id.toString()}
           value={
-            filterState.abilityIndex !== undefined ? abilities[filterState.abilityIndex] : undefined
+            filterState.ability !== undefined ? ALL_ABILITIES[filterState.ability - 1] : undefined
           }
           label="Ability"
           onChange={(option) =>
             dispatchFilterState({
               type: 'set_filter',
-              payload: { abilityIndex: option?.id },
+              payload: { ability: option?.id },
             })
           }
         />

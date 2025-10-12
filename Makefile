@@ -72,8 +72,8 @@ generate: generate/out/generate.js
 gen-wasm:
 # 	@node generate/gen_ribbons.ts
 # 	@node generate/gen_moves.ts
-# 	@node generate/gen_abilities.ts
-	@cd pkm_rs_resources && node generate/gen_species_data.ts
+	@cd pkm_rs_resources && node node generate/gen_abilities.ts
+# 	@cd pkm_rs_resources && node generate/gen_species_data.ts
 	
 generate/out/syncPKHexResources.js: generate/syncPKHexResources.ts
 	@echo "compiling generate/syncPKHexResources.ts..."

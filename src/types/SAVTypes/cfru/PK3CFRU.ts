@@ -435,12 +435,8 @@ export abstract class PK3CFRU implements PluginPKMInterface {
     return this.hasHiddenAbility ? 4 : ((this.personalityValue >> 0) & 1) + 1
   }
 
-  public get abilityIndex() {
-    return this.metadata?.abilityByNum(this.abilityNum)?.index ?? 0
-  }
-
   public get ability() {
-    return this.metadata?.abilityByNum(this.abilityNum)?.name ?? '—'
+    return this.metadata?.abilityByNum(this.abilityNum)
   }
 
   toPCBytes() {

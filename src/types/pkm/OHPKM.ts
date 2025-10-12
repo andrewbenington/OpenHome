@@ -15,6 +15,7 @@ import {
   markingsSixShapesWithColorToBytes,
 } from '@pokemon-files/util'
 import {
+  AbilityIndex,
   Gender,
   GenderRatio,
   Language,
@@ -26,8 +27,6 @@ import {
 } from '@pokemon-resources/pkg'
 import * as lodash from 'lodash'
 import {
-  AbilityFromString,
-  AbilityToString,
   Ball,
   Gen34ContestRibbons,
   Gen34TowerRibbons,
@@ -214,7 +213,6 @@ export class OHPKM implements PKMInterface {
       this.metTimeOfDay = other.metTimeOfDay ?? 0
       this.metLocationIndex = other.metLocationIndex ?? 0
       this.ability = getAbilityFromNumber(this.dexNum, this.formeNum, this.abilityNum)
-      this.abilityIndex = AbilityFromString(this.ability)
 
       this.isShadow = other.isShadow ?? false
 
@@ -476,24 +474,12 @@ export class OHPKM implements PKMInterface {
     return this.speciesMetadata?.calculateLevel(this.exp) ?? 1
   }
 
-  public get abilityIndex() {
-    return bytesToUint16LittleEndian(this.bytes, 0x14)
-  }
-
-  public set abilityIndex(value: number) {
-    this.bytes.set(uint16ToBytesLittleEndian(value), 0x14)
-  }
-
   public get ability() {
-    return AbilityToString(this.abilityIndex)
+    return AbilityIndex.fromIndex(bytesToUint16LittleEndian(this.bytes, 0x14))
   }
 
-  public set ability(value: string) {
-    const abilityIndex = AbilityFromString(value)
-
-    if (abilityIndex > -1) {
-      this.abilityIndex = abilityIndex
-    }
+  public set ability(value: AbilityIndex | undefined) {
+    this.bytes.set(uint16ToBytesLittleEndian(value?.index ?? 0), 0x14)
   }
 
   public get abilityNum() {
@@ -1573,9 +1559,8 @@ export class OHPKM implements PKMInterface {
     }
 
     // Fix ability bug from pre-1.5.0 (affected Mind's Eye and Dragon's Maw)
-    if (this.abilityIndex === 0) {
+    if (!this.ability) {
       this.ability = getAbilityFromNumber(this.dexNum, this.formeNum, this.abilityNum)
-      this.abilityIndex = AbilityFromString(this.ability)
     }
 
     const metadata = this.metadata

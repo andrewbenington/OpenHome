@@ -1,6 +1,7 @@
-import { AbilityToString, Gen4Ribbons, ItemFromString, ItemToString } from 'pokemon-resources'
+import { Gen4Ribbons, ItemFromString, ItemToString } from 'pokemon-resources'
 
 import {
+  AbilityIndex,
   Ball,
   Language,
   Languages,
@@ -38,7 +39,7 @@ export class PK4 {
   secretID: number
   exp: number
   trainerFriendship: number
-  abilityIndex: number
+  ability?: AbilityIndex
   markings: types.MarkingsSixShapesNoColor
   language: Language
   evs: types.Stats
@@ -97,7 +98,7 @@ export class PK4 {
       this.secretID = dataView.getUint16(0xe, true)
       this.exp = dataView.getUint32(0x10, true)
       this.trainerFriendship = dataView.getUint8(0x14)
-      this.abilityIndex = dataView.getUint8(0x15)
+      this.ability = AbilityIndex.fromIndex(dataView.getUint8(0x15))
       this.markings = types.markingsSixShapesNoColorFromBytes(dataView, 0x16)
       this.language = Languages.fromByteOrNone(dataView.getUint8(0x17))
       this.evs = types.readStatsFromBytesU8(dataView, 0x18)
@@ -188,7 +189,7 @@ export class PK4 {
       this.secretID = other.secretID
       this.exp = other.exp
       this.trainerFriendship = other.trainerFriendship ?? 0
-      this.abilityIndex = other.abilityIndex ?? 0
+      this.ability = other.ability
       this.markings = types.markingsSixShapesNoColorFromOther(other.markings) ?? {
         circle: false,
         triangle: false,
@@ -314,7 +315,7 @@ export class PK4 {
     dataView.setUint16(0xe, this.secretID, true)
     dataView.setUint32(0x10, this.exp, true)
     dataView.setUint8(0x14, this.trainerFriendship)
-    dataView.setUint8(0x15, this.abilityIndex)
+    dataView.setUint8(0x15, this.ability?.index ?? 0)
     types.markingsSixShapesNoColorToBytes(dataView, 0x16, this.markings)
     dataView.setUint8(0x17, this.language)
     types.writeStatsToBytesU8(dataView, 0x18, this.evs)
@@ -402,9 +403,6 @@ export class PK4 {
     return Languages.stringFromByte(this.language)
   }
 
-  public get abilityName() {
-    return AbilityToString(this.abilityIndex)
-  }
   public get heldItemName() {
     return ItemToString(this.heldItemIndex)
   }

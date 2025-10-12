@@ -1,7 +1,6 @@
 import { getDisplayID } from '@pokemon-files/util'
 import { MetadataLookup } from '@pokemon-resources/pkg'
 import { Badge, Flex, Grid, Spinner, Tooltip } from '@radix-ui/themes'
-import { AbilityToString } from 'pokemon-resources'
 import { useMemo } from 'react'
 import { ErrorIcon } from 'src/components/Icons'
 import PokemonIcon from '../components/PokemonIcon'
@@ -180,12 +179,10 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
         </AttributeRow>
         <AttributeRow label="OT" value={`${mon.trainerName} ${mon.trainerGender ? '♀' : '♂'}`} />
         <AttributeRow label="Trainer ID" value={getDisplayID(mon as any)} />
-        {mon.abilityIndex !== undefined && (
+        {mon.ability !== undefined && (
           <AttributeRow
             label="Ability"
-            value={`${AbilityToString(mon.abilityIndex)} (${
-              mon.abilityNum === 4 ? 'HA' : mon.abilityNum
-            })`}
+            value={`${mon.ability.name} (${mon.abilityNum === 4 ? 'HA' : mon.abilityNum})`}
           />
         )}
         <AttributeRow label="Level">{mon.getLevel()}</AttributeRow>
