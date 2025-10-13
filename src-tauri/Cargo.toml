@@ -33,7 +33,7 @@ tauri-plugin-dialog = "2.4.0"
 tauri-plugin-fs = "2.4.2"
 reqwest = { version = "0.12.23" }
 base64 = "0.22.1"
-zip = "5.1.1"
+zip = "6.0.0"
 bytes = "1.10.1"
 semver = "1.0.27"
 strum = { version = "0.27.2", features = ["derive"] }
