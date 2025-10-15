@@ -1,4 +1,4 @@
-import { MetadataLookup } from '@pokemon-resources/pkg'
+import { MetadataLookup } from '@pkm-rs-resources/pkg'
 import { Tooltip } from '@radix-ui/themes'
 import PokemonIcon, { PokemonIconProps } from 'src/components/PokemonIcon'
 

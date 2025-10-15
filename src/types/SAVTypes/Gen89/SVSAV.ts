@@ -1,6 +1,6 @@
+import { Languages, OriginGame } from '@pkm-rs-resources/pkg'
 import { PK9 } from '@pokemon-files/pkm'
 import { utf16BytesToString } from '@pokemon-files/util'
-import { Languages, OriginGame } from '@pokemon-resources/pkg'
 import {
   SV_TRANSFER_RESTRICTIONS_BASE,
   SV_TRANSFER_RESTRICTIONS_ID,

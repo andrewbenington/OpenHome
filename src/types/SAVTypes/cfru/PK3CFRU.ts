@@ -1,6 +1,14 @@
 import { Ball, ItemFromString } from 'pokemon-resources'
 
 import {
+  Language,
+  Languages,
+  MetadataLookup,
+  NatureIndex,
+  OriginGame,
+  SpeciesLookup,
+} from '@pkm-rs-resources/pkg'
+import {
   generatePersonalityValuePreservingAttributes,
   getFlag,
   getMoveMaxPP,
@@ -20,14 +28,6 @@ import {
   writeGen3StringToBytes,
   writeStatsToBytesU8,
 } from '@pokemon-files/util'
-import {
-  Language,
-  Languages,
-  MetadataLookup,
-  NatureIndex,
-  OriginGame,
-  SpeciesLookup,
-} from '@pokemon-resources/pkg'
 import { PKMInterface, PluginPKMInterface } from '../../interfaces'
 
 export interface CFRUToNationalDexEntry {

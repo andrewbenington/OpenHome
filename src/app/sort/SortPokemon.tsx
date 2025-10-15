@@ -1,4 +1,4 @@
-import { OriginGames } from '@pokemon-resources/pkg'
+import { OriginGames } from '@pkm-rs-resources/pkg'
 import { Badge, Card, Flex } from '@radix-ui/themes'
 import { useContext, useMemo, useState } from 'react'
 import { MdAdd } from 'react-icons/md'

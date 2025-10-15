@@ -7,7 +7,7 @@ import {
   MetadataLookup,
   NatureIndex,
   SpeciesLookup,
-} from '@pokemon-resources/pkg'
+} from '@pkm-rs-resources/pkg'
 import { Ball, ItemToString } from 'pokemon-resources'
 import { PKMInterface } from '../../../../src/types/interfaces'
 import { getHeightCalculated, getWeightCalculated } from '../../../../src/types/pkm/util'

@@ -6,7 +6,7 @@ import {
   OriginGames,
   OriginGameWithData,
   SpeciesLookup,
-} from '@pokemon-resources/pkg'
+} from '@pkm-rs-resources/pkg'
 import { Button, Card, Flex, Text } from '@radix-ui/themes'
 import { Balls, Item, ItemToString, Types } from 'pokemon-resources'
 import { useContext, useMemo } from 'react'

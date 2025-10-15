@@ -1,4 +1,15 @@
 import {
+  AbilityIndex,
+  Gender,
+  GenderRatio,
+  Language,
+  Languages,
+  MetadataLookup,
+  NatureIndex,
+  OriginGame,
+  SpeciesLookup,
+} from '@pkm-rs-resources/pkg'
+import {
   ContestStats,
   Geolocation,
   HyperTrainStats,
@@ -14,17 +25,6 @@ import {
   markingsSixShapesWithColorFromOther,
   markingsSixShapesWithColorToBytes,
 } from '@pokemon-files/util'
-import {
-  AbilityIndex,
-  Gender,
-  GenderRatio,
-  Language,
-  Languages,
-  MetadataLookup,
-  NatureIndex,
-  OriginGame,
-  SpeciesLookup,
-} from '@pokemon-resources/pkg'
 import * as lodash from 'lodash'
 import {
   Ball,

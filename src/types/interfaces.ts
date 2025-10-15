@@ -1,5 +1,5 @@
+import { FormeMetadata, SpeciesMetadata } from '@pkm-rs-resources/pkg'
 import { AllPKMFields, Stats } from '@pokemon-files/util'
-import { FormeMetadata, SpeciesMetadata } from '@pokemon-resources/pkg'
 
 export interface OfficialPKMInterface extends PKMInterface {
   pluginIdentifier?: undefined

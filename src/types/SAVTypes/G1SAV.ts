@@ -1,5 +1,5 @@
+import { Language, OriginGame } from '@pkm-rs-resources/pkg'
 import { PK1 } from '@pokemon-files/pkm'
-import { Language, OriginGame } from '@pokemon-resources/pkg'
 import lodash from 'lodash'
 import { NationalDex } from 'src/consts/NationalDex'
 import { GEN1_TRANSFER_RESTRICTIONS } from 'src/consts/TransferRestrictions'

@@ -1,5 +1,5 @@
+import { Generation, OriginGame, OriginGames } from '@pkm-rs-resources/pkg'
 import { bytesToPKMInterface } from '@pokemon-files/pkm'
-import { Generation, OriginGame, OriginGames } from '@pokemon-resources/pkg'
 import { Button, Flex } from '@radix-ui/themes'
 import * as E from 'fp-ts/lib/Either'
 import lodash, { flatten } from 'lodash'

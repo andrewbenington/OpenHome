@@ -1,5 +1,5 @@
+import { MetadataLookup } from '@pkm-rs-resources/pkg'
 import { getDisplayID } from '@pokemon-files/util'
-import { MetadataLookup } from '@pokemon-resources/pkg'
 import { Badge, Flex, Grid, Spinner, Tooltip } from '@radix-ui/themes'
 import { useMemo } from 'react'
 import { ErrorIcon } from 'src/components/Icons'

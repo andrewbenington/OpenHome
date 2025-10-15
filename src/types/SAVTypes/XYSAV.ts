@@ -1,4 +1,4 @@
-import { OriginGame } from '@pokemon-resources/pkg'
+import { OriginGame } from '@pkm-rs-resources/pkg'
 import { XY_TRANSFER_RESTRICTIONS } from 'src/consts/TransferRestrictions'
 import { isRestricted } from '../TransferRestrictions'
 import { G6SAV } from './G6SAV'

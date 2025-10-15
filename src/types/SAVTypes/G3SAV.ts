@@ -1,5 +1,5 @@
+import { OriginGame } from '@pkm-rs-resources/pkg'
 import { PK3 } from '@pokemon-files/pkm'
-import { OriginGame } from '@pokemon-resources/pkg'
 import { NationalDex } from 'src/consts/NationalDex'
 import { GEN3_TRANSFER_RESTRICTIONS } from 'src/consts/TransferRestrictions'
 import {

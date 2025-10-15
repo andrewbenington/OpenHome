@@ -1,4 +1,4 @@
-import { getPluginColor, OriginGame, OriginGames } from '@pokemon-resources/pkg'
+import { getPluginColor, OriginGame, OriginGames } from '@pkm-rs-resources/pkg'
 import { SaveRef } from '../../types/types'
 import { PKMInterface } from '../interfaces'
 import { OHPKM } from '../pkm/OHPKM'

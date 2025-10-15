@@ -1,6 +1,6 @@
+import { Languages, OriginGame, SpeciesLookup } from '@pkm-rs-resources/pkg'
 import { PK8 } from '@pokemon-files/pkm'
 import { utf16BytesToString } from '@pokemon-files/util'
-import { Languages, OriginGame, SpeciesLookup } from '@pokemon-resources/pkg'
 import { NationalDex } from 'src/consts/NationalDex'
 import {
   SWSH_TRANSFER_RESTRICTIONS_BASE,

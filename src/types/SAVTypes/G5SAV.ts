@@ -1,5 +1,5 @@
+import { OriginGame } from '@pkm-rs-resources/pkg'
 import { PK5 } from '@pokemon-files/pkm'
-import { OriginGame } from '@pokemon-resources/pkg'
 import { uniq } from 'lodash'
 import {
   bytesToUint16LittleEndian,

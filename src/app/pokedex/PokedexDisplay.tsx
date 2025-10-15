@@ -1,9 +1,9 @@
 import {
-  FormeMetadata,
-  MetadataLookup,
-  SpeciesLookup,
-  SpeciesMetadata,
-} from '@pokemon-resources/pkg'
+    FormeMetadata,
+    MetadataLookup,
+    SpeciesLookup,
+    SpeciesMetadata,
+} from '@pkm-rs-resources/pkg'
 import { Button, Card, Flex, Heading, Separator, Spinner, Text, TextField } from '@radix-ui/themes'
 import { useEffect, useState } from 'react'
 import TypeIcon from 'src/components/TypeIcon'

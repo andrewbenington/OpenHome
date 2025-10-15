@@ -1,6 +1,6 @@
+import { OriginGame } from '@pkm-rs-resources/pkg'
 import { PB8 } from '@pokemon-files/pkm'
 import { utf16BytesToString } from '@pokemon-files/util'
-import { OriginGame } from '@pokemon-resources/pkg'
 import { BDSP_TRANSFER_RESTRICTIONS } from '../../../consts/TransferRestrictions'
 import { md5Digest } from '../../../util/Encryption'
 import { OHPKM } from '../../pkm/OHPKM'

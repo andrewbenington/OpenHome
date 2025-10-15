@@ -1,4 +1,4 @@
-import { OriginGames } from '@pokemon-resources/pkg'
+import { OriginGames } from '@pkm-rs-resources/pkg'
 import dayjs from 'dayjs'
 import { PKMInterface } from '../types/interfaces'
 import { HomeData } from '../types/SAVTypes/HomeData'

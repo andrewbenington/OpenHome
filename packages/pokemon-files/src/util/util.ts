@@ -10,7 +10,7 @@ import {
   MetadataLookup,
   NatureIndex,
   OriginGame,
-} from '@pokemon-resources/pkg'
+} from '@pkm-rs-resources/pkg'
 import { AllPKMFields } from './pkmInterface'
 
 export function getGen3MiscFlags(pokemon: PKM): number {

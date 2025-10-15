@@ -1,4 +1,4 @@
-import { Generation, getPluginColor, OriginGames } from '@pokemon-resources/pkg'
+import { Generation, getPluginColor, OriginGames } from '@pkm-rs-resources/pkg'
 import { Badge, Flex } from '@radix-ui/themes'
 import { useMemo, useState } from 'react'
 import { SaveRef } from 'src/types/types'

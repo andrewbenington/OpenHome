@@ -1,4 +1,4 @@
-import { MetadataLookup, OriginGame } from '@pokemon-resources/pkg'
+import { MetadataLookup, OriginGame } from '@pkm-rs-resources/pkg'
 import { Item, Type } from 'pokemon-resources'
 import { PKMInterface } from './interfaces'
 import { isMegaStone, isZCrystal } from './pkm/util'

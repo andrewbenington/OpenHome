@@ -27,7 +27,7 @@
       "@pokemon-files/*": [
         "./packages/pokemon-files/src/*"
       ],
-      "@pokemon-resources/*": [
+      "@pkm-rs-resources/*": [
         "./pkm_rs_resources/*"
       ]
     },

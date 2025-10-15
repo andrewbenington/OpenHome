@@ -1,4 +1,4 @@
-import { OriginGames, SpeciesLookup } from '@pokemon-resources/pkg'
+import { OriginGames, SpeciesLookup } from '@pkm-rs-resources/pkg'
 import { Card, Flex, Heading, Separator } from '@radix-ui/themes'
 import * as E from 'fp-ts/lib/Either'
 import { useContext, useEffect, useState } from 'react'

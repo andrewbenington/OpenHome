@@ -1,4 +1,4 @@
-import { MetadataLookup } from '@pokemon-resources/pkg'
+import { MetadataLookup } from '@pkm-rs-resources/pkg'
 import { HTMLAttributes } from 'react'
 import useIsDarkMode from 'src/hooks/dark-mode'
 import BoxIcons from '../images/BoxIcons.png'

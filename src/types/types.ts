@@ -1,4 +1,4 @@
-import { OriginGame } from '@pokemon-resources/pkg'
+import { OriginGame } from '@pkm-rs-resources/pkg'
 import { Either, left, right } from 'fp-ts/Either'
 import { CSSProperties } from 'react'
 import { PathData } from './SAVTypes/path'

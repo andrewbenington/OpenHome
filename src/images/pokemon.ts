@@ -1,4 +1,4 @@
-import { MetadataLookup } from '@pokemon-resources/pkg'
+import { MetadataLookup } from '@pkm-rs-resources/pkg'
 import { BLOOD_MOON, SWEETS } from 'src/consts/Formes'
 import { NationalDex } from 'src/consts/NationalDex'
 import { toGen3RRPokemonIndex } from 'src/types/SAVTypes/radicalred/conversion/Gen3RRPokemonIndex'

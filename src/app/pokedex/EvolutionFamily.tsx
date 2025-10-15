@@ -1,4 +1,4 @@
-import { MetadataLookup, SpeciesAndForme, SpeciesLookup } from '@pokemon-resources/pkg'
+import { MetadataLookup, SpeciesAndForme, SpeciesLookup } from '@pkm-rs-resources/pkg'
 import { Flex } from '@radix-ui/themes'
 import { Responsive } from '@radix-ui/themes/props'
 import { ArrowLeftIcon, ArrowLeftRightIcon, ArrowRightIcon } from 'src/components/Icons'

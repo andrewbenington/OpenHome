@@ -1,4 +1,4 @@
-import { OriginGames } from '@pokemon-resources/pkg'
+import { OriginGames } from '@pkm-rs-resources/pkg'
 import { Badge, Flex } from '@radix-ui/themes'
 import { getLocationString, RibbonTitles } from 'pokemon-resources'
 import { useContext, useMemo } from 'react'

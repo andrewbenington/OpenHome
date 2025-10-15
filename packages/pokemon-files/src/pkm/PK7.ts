@@ -8,7 +8,7 @@ import {
   MetadataLookup,
   NatureIndex,
   SpeciesLookup,
-} from '@pokemon-resources/pkg'
+} from '@pkm-rs-resources/pkg'
 import { ItemFromString, ItemToString, ModernRibbons } from 'pokemon-resources'
 import * as byteLogic from '../util/byteLogic'
 import * as encryption from '../util/encryption'

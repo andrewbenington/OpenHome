@@ -1,6 +1,6 @@
+import { Languages, OriginGame } from '@pkm-rs-resources/pkg'
 import { PA8 } from '@pokemon-files/pkm'
 import { utf16BytesToString } from '@pokemon-files/util'
-import { Languages, OriginGame } from '@pokemon-resources/pkg'
 import { LA_TRANSFER_RESTRICTIONS } from '../../../consts/TransferRestrictions'
 import { isRestricted } from '../../TransferRestrictions'
 import { PathData } from '../path'

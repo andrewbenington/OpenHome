@@ -1,4 +1,4 @@
-import { SpeciesLookup } from '@pokemon-resources/pkg'
+import { SpeciesLookup } from '@pkm-rs-resources/pkg'
 import { fail } from 'assert'
 import { existsSync, readFileSync, writeFileSync } from 'fs'
 import { resolve } from 'path'

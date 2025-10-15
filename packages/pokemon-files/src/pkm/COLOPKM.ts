@@ -7,7 +7,7 @@ import {
   MetadataLookup,
   NatureIndex,
   SpeciesLookup,
-} from '@pokemon-resources/pkg'
+} from '@pkm-rs-resources/pkg'
 import {
   Gen3ContestRibbons,
   Gen3StandardRibbons,

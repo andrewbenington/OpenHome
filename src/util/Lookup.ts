@@ -1,5 +1,5 @@
+import { MetadataLookup } from '@pkm-rs-resources/pkg'
 import { generatePersonalityValuePreservingAttributes, StatsPreSplit } from '@pokemon-files/util'
-import { MetadataLookup } from '@pokemon-resources/pkg'
 import { isGameBoy } from 'pokemon-resources'
 import { PK3, PK4, PK5 } from '../../packages/pokemon-files/src'
 import { PKMInterface } from '../types/interfaces'

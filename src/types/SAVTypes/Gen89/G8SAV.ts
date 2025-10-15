@@ -1,6 +1,6 @@
+import { OriginGame } from '@pkm-rs-resources/pkg'
 import { PA8, PB8, PK8, PK9 } from '@pokemon-files/pkm'
 import { AllPKMFields } from '@pokemon-files/util'
-import { OriginGame } from '@pokemon-resources/pkg'
 import { OHPKM } from '../../pkm/OHPKM'
 import { PathData } from '../path'
 import { Box, BoxCoordinates, OfficialSAV } from '../SAV'

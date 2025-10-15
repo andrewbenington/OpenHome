@@ -1,6 +1,6 @@
+import { OriginGame } from '@pkm-rs-resources/pkg'
 import { PB7 } from '@pokemon-files/pkm'
 import { utf16BytesToString } from '@pokemon-files/util'
-import { OriginGame } from '@pokemon-resources/pkg'
 import { ceil, min } from 'lodash'
 import { NationalDex } from 'src/consts/NationalDex'
 import { LGE_STARTER, LGP_STARTER } from '../../consts/Formes'

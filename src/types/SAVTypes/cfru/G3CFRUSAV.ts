@@ -1,4 +1,4 @@
-import { OriginGame } from '@pokemon-resources/pkg'
+import { OriginGame } from '@pkm-rs-resources/pkg'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,

@@ -1,5 +1,5 @@
+import { Language, OriginGame } from '@pkm-rs-resources/pkg'
 import { PK2 } from '@pokemon-files/pkm'
-import { Language, OriginGame } from '@pokemon-resources/pkg'
 import { uniq } from 'lodash'
 import { EXCLAMATION } from 'src/consts/Formes'
 import { NationalDex } from 'src/consts/NationalDex'
