@@ -9,7 +9,8 @@ import {
   NatureIndex,
   SpeciesLookup,
 } from '@pkm-rs-resources/pkg'
-import { ItemFromString, ItemToString, ModernRibbons } from 'pokemon-resources'
+import { ItemFromString, ItemToString } from '@pokemon-resources/items'
+import { ModernRibbons } from '@pokemon-resources/other'
 import * as byteLogic from '../util/byteLogic'
 import * as encryption from '../util/encryption'
 import { AllPKMFields } from '../util/pkmInterface'

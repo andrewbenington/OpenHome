@@ -2,13 +2,15 @@
 
 import {
   AbilityIndex,
+  Ball,
   Language,
   Languages,
   MetadataLookup,
   NatureIndex,
   SpeciesLookup,
 } from '@pkm-rs-resources/pkg'
-import { Ball, ItemFromString, ItemToString, ModernRibbons } from 'pokemon-resources'
+import { ModernRibbons } from '@pokemon-resources/index'
+import { ItemFromString, ItemToString } from '@pokemon-resources/items'
 import { getHeightCalculated, getWeightCalculated } from '../../../../src/types/pkm/util'
 import * as byteLogic from '../util/byteLogic'
 import * as encryption from '../util/encryption'

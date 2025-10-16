@@ -1,4 +1,4 @@
-import { Gen4Ribbons, ItemFromString, ItemToString } from 'pokemon-resources'
+import { Gen4Ribbons, ItemFromString, ItemToString } from '@pokemon-resources/index'
 
 import {
   AbilityIndex,

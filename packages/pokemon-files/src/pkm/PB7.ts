@@ -2,13 +2,14 @@
 
 import {
   AbilityIndex,
+  Ball,
   Language,
   Languages,
   MetadataLookup,
   NatureIndex,
   SpeciesLookup,
 } from '@pkm-rs-resources/pkg'
-import { Ball, ItemToString } from 'pokemon-resources'
+import { ItemToString } from '@pokemon-resources/items'
 import { PKMInterface } from '../../../../src/types/interfaces'
 import { getHeightCalculated, getWeightCalculated } from '../../../../src/types/pkm/util'
 import * as byteLogic from '../util/byteLogic'

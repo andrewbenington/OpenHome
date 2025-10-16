@@ -10,6 +10,9 @@ export default defineConfig({
     alias: {
       src: fileURLToPath(new URL('./src', import.meta.url)),
       '@pokemon-files': fileURLToPath(new URL('./packages/pokemon-files/src', import.meta.url)),
+      '@pokemon-resources': fileURLToPath(
+        new URL('./packages/pokemon-resources/src', import.meta.url)
+      ),
       '@pkm-rs-resources': fileURLToPath(new URL('./pkm_rs_resources', import.meta.url)),
     },
   },
