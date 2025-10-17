@@ -1,7 +1,7 @@
 import { DragDropProvider, DragOverlay, PointerSensor } from '@dnd-kit/react'
 import { ItemFromString } from 'pokemon-resources'
 import { ReactNode, useContext } from 'react'
-import { Bag } from 'src/saves/Bag'
+import { BagContext } from 'src/state/bag'
 import { PersistedPkmDataContext } from 'src/state/persistedPkmData'
 import { OHPKM } from 'src/types/pkm/OHPKM'
 import PokemonIcon from '../components/PokemonIcon'
@@ -13,6 +13,7 @@ export default function PokemonDragContextProvider(props: { children?: ReactNode
   const [, openSavesDispatch] = useContext(OpenSavesContext)
   const [, persistedPkmDataDispatch] = useContext(PersistedPkmDataContext)
   const [dragMonState, dispatchDragMonState] = useContext(DragMonContext)
+  const [, bagDispatch] = useContext(BagContext)
 
   return (
     <DragDropProvider
@@ -31,7 +32,11 @@ export default function PokemonDragContextProvider(props: { children?: ReactNode
           if (dest && target) {
             openSavesDispatch({
               type: 'give_item_to_mon',
-              payload: { itemName: payload.itemName, dest: target.data as MonLocation },
+              payload: {
+                itemName: payload.itemName,
+                dest: target.data as MonLocation,
+                bagDispatch,
+              },
             })
           }
         } else if (payload.kind === 'mon') {
@@ -44,7 +49,7 @@ export default function PokemonDragContextProvider(props: { children?: ReactNode
             })
           } else if (target?.id === 'bag-box') {
             if (mon.heldItemIndex) {
-              Bag.addItem(mon.heldItemName)
+              bagDispatch({ type: 'add_item', payload: { name: mon.heldItemName, qty: 1 } })
               mon.heldItemIndex = 0
             }
           } else if (dest && (dest.is_home || dest.save?.supportsMon(mon.dexNum, mon.formeNum))) {

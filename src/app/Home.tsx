@@ -8,6 +8,7 @@ import { MdFileOpen } from 'react-icons/md'
 import PokemonDetailsModal from 'src/pokemon/PokemonDetailsModal'
 import BagBox from 'src/saves/BagBox'
 import BankHeader from 'src/saves/BankHeader'
+import { BagContext } from 'src/state/bag'
 import { displayIndexAdder, isBattleFormeItem } from 'src/types/pkm/util'
 import { Errorable, LookupMap } from 'src/types/types'
 import { filterUndefined } from 'src/util/Sort'
@@ -29,6 +30,7 @@ import ReleaseArea from './home/ReleaseArea'
 const Home = () => {
   const [openSavesState, openSavesDispatch, allOpenSaves] = useContext(OpenSavesContext)
   const [persistedPkmState, persistedPkmDispatch] = useContext(PersistedPkmDataContext)
+  const [bagState, bagDispatch] = useContext(BagContext)
   const backend = useContext(BackendContext)
   const [selectedMon, setSelectedMon] = useState<PKMInterface>()
   const [openSaveDialog, setOpenSaveDialog] = useState(false)
@@ -150,6 +152,16 @@ const Home = () => {
       ),
     ]
 
+    if (bagState.modified) {
+      const saveBagResult = await backend.saveBag(bagState.items)
+      if (E.isLeft(saveBagResult)) {
+        displayError('Error Saving Bag', saveBagResult.left)
+        await backend.rollbackTransaction()
+        return
+      }
+      bagDispatch({ type: 'clear_modified' })
+    }
+
     const results = flatten(await Promise.all(promises))
     const errors = results.filter(E.isLeft).map((err) => err.left)
 
@@ -200,12 +212,20 @@ const Home = () => {
       },
     })
 
+    // // reloads bag from file
+    // backend.loadBag().then(
+    //   E.match(
+    //     (err) => bagDispatch({ type: 'set_error', payload: err }),
+    //     (bagObj) => bagDispatch({ type: 'load_bag', payload: bagObj })
+    //   )
+    // )
+
     // the "stop listening" function should be called when the effect returns,
     // otherwise duplicate listeners will exist
     return () => {
       stopListening()
     }
-  }, [backend, saveChanges, persistedPkmState, openSavesDispatch, loadAllHomeData])
+  }, [backend, saveChanges, persistedPkmState, openSavesDispatch, loadAllHomeData, bagDispatch])
 
   const previewFile = useCallback(
     async (file: File) => {
@@ -251,6 +271,26 @@ const Home = () => {
       loadAllLookups()
     }
   }, [persistedPkmState.loaded, persistedPkmState.error, loadAllLookups])
+
+  // load bag
+  useEffect(() => {
+    if (!bagState.loaded && !bagState.error) {
+      console.log('[Bag] Loading bag from backend...')
+      backend.loadBag().then(
+        E.match(
+          (err) => {
+            console.error('[Bag] Failed to load bag:', err)
+            bagDispatch({ type: 'set_error', payload: err })
+          },
+          (bagObj) => {
+            console.log('[Bag] Loaded successfully:', bagObj)
+            console.log(`[Bag] Item count: ${Object.keys(bagObj).length}`)
+            bagDispatch({ type: 'load_bag', payload: bagObj })
+          }
+        )
+      )
+    }
+  }, [backend, bagState.loaded, bagState.error, bagDispatch])
 
   return (
     <Flex direction="row" style={{ height: '100%' }}>

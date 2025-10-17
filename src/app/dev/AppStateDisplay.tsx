@@ -9,6 +9,7 @@ import { DevDataDisplay } from 'src/components/DevDataDisplay'
 import { InfoGrid } from 'src/components/InfoGrid2'
 import useDisplayError from 'src/hooks/displayError'
 import { AppInfoContext, AppInfoState } from 'src/state/appInfo'
+import { BagContext } from 'src/state/bag'
 import { OpenSavesContext, OpenSavesState } from 'src/state/openSaves'
 import { PKMInterface } from 'src/types/interfaces'
 import { ErrorContext } from '../../state/error'
@@ -18,6 +19,7 @@ export default function AppStateDisplay() {
   const [appInfoState] = useContext(AppInfoContext)
   const [openSavesState] = useContext(OpenSavesContext)
   const [errorState, dispatchErrorState] = useContext(ErrorContext)
+  const [bagState] = useContext(BagContext)
   const backend = useContext(BackendContext)
   const [error, setError] = useState<string>()
   const displayError = useDisplayError()
@@ -47,6 +49,7 @@ export default function AppStateDisplay() {
       <Card style={{ margin: 8, display: 'flex', flexDirection: 'row', gap: 8 }}>
         <DevDataDisplay data={appInfoDisplay(appInfoState)} label="App Info State" />
         <DevDataDisplay data={openSavesDisplay(openSavesState)} label="Saves/Mons State" />
+        <DevDataDisplay data={bagDisplay(bagState)} label="Bag State" />
         <DevDataDisplay data={errorState} label="Error State" />
         <button
           onClick={() =>
@@ -93,5 +96,22 @@ function monDisplay(mon: PKMInterface) {
     forme: species.formes[mon.formeNum ?? 0].formeName,
     nickname: mon.nickname,
     origin: mon.gameOfOrigin ? 'Pokémon ' + GameOfOriginData[mon.gameOfOrigin]?.name : undefined,
+  }
+}
+
+function bagDisplay(state: {
+  items: Record<string, number>
+  modified: boolean
+  loaded: boolean
+  error?: string
+}) {
+  return {
+    Loaded: state.loaded,
+    Modified: state.modified,
+    Error: state.error ?? 'None',
+    Items: Object.entries(state.items).map(([name, qty]) => ({
+      name,
+      qty,
+    })),
   }
 }

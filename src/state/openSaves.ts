@@ -4,9 +4,9 @@ import { HomeData } from 'src/types/SAVTypes/HomeData'
 import { SAV } from 'src/types/SAVTypes/SAV'
 import { StoredBankData } from 'src/types/storage'
 import { getMonFileIdentifier } from 'src/util/Lookup'
-import { Bag } from '../saves/Bag'
 import { PKMInterface } from '../types/interfaces'
 import { getSortFunctionNullable, SortType } from '../types/pkm/sort'
+import { BagAction } from './bag'
 import { PersistedPkmData } from './persistedPkmData'
 
 export type OpenSave = {
@@ -139,7 +139,7 @@ export type OpenSavesAction =
     }
   | {
       type: 'give_item_to_mon'
-      payload: { itemName: string; dest: MonLocation }
+      payload: { itemName: string; dest: MonLocation; bagDispatch: Dispatch<BagAction> }
     }
   /*
    *  OTHER
@@ -408,7 +408,7 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
     }
 
     case 'give_item_to_mon': {
-      const { itemName, dest } = payload
+      const { itemName, dest, bagDispatch } = payload
 
       let targetMon: PKMInterface | undefined
 
@@ -439,8 +439,8 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
 
       updatedMon.heldItemName = itemName
 
-      if (oldItem !== 'None') {
-        Bag.addItem(oldItem)
+      if (oldItem && oldItem !== 'None') {
+        bagDispatch({ type: 'add_item', payload: { name: oldItem, qty: 1 } })
       }
 
       if (dest.is_home) {
@@ -457,7 +457,7 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
         state.modifiedOHPKMs[identifier] = updatedMon
       }
 
-      Bag.popItem(itemName)
+      bagDispatch({ type: 'remove_item', payload: { name: itemName, qty: 1 } })
 
       return { ...state }
     }
