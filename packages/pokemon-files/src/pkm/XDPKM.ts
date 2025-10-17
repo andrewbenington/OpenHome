@@ -13,7 +13,7 @@ import {
   Gen3StandardRibbons,
   ItemGen3FromString,
   ItemGen3ToString,
-} from 'pokemon-resources'
+} from '@pokemon-resources/index'
 import { NationalDex } from 'src/consts/NationalDex'
 import * as byteLogic from '../util/byteLogic'
 import { AllPKMFields } from '../util/pkmInterface'

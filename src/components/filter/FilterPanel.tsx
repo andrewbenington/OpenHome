@@ -2,13 +2,14 @@ import {
   all_species_data,
   Generation,
   getAllAbilities,
+  getAllBalls,
   OriginGame,
   OriginGames,
   OriginGameWithData,
   SpeciesLookup,
 } from '@pkm-rs-resources/pkg'
+import { Item, ItemToString, Types } from '@pokemon-resources/index'
 import { Button, Card, Flex, Text } from '@radix-ui/themes'
-import { Balls, Item, ItemToString, Types } from 'pokemon-resources'
 import { useContext, useMemo } from 'react'
 import { OpenHomeRibbons } from 'src/consts/Ribbons'
 import { getPublicImageURL } from 'src/images/images'
@@ -89,6 +90,11 @@ export default function FilterPanel() {
   const ALL_ABILITIES: SelectOption[] = getAllAbilities().map(({ name, id }) => ({
     label: name,
     id,
+  }))
+
+  const ALL_BALLS: SelectOption[] = getAllBalls().map(({ name, index }) => ({
+    label: name,
+    id: index,
   }))
 
   const currentMon = useMemo(
@@ -253,12 +259,10 @@ export default function FilterPanel() {
           getIconComponent={getOriginIcon}
         />
         <Autocomplete
-          options={Balls.map((ball, id) => ({ label: ball, id }))}
+          options={ALL_BALLS}
           getOptionString={(option) => option.label}
           getOptionUniqueID={(opt) => opt.id.toString()}
-          value={
-            filterState.ball ? { label: Balls[filterState.ball], id: filterState.ball } : undefined
-          }
+          value={filterState.ball ? ALL_BALLS[filterState.ball] : undefined}
           label="Ball"
           onChange={(option) =>
             dispatchFilterState({ type: 'set_filter', payload: { ball: option?.id } })

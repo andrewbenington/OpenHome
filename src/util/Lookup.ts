@@ -1,6 +1,5 @@
-import { MetadataLookup } from '@pkm-rs-resources/pkg'
+import { MetadataLookup, OriginGames } from '@pkm-rs-resources/pkg'
 import { generatePersonalityValuePreservingAttributes, StatsPreSplit } from '@pokemon-files/util'
-import { isGameBoy } from 'pokemon-resources'
 import { PK3, PK4, PK5 } from '../../packages/pokemon-files/src'
 import { PKMInterface } from '../types/interfaces'
 import { OHPKM } from '../types/pkm/OHPKM'
@@ -42,7 +41,7 @@ export const getMonGen12Identifier = (mon: PKMInterface & { dvs: StatsPreSplit }
   const baseMon = getBaseMon(mon.dexNum, mon.formeNum)
   let tid = mon.trainerID
 
-  if (mon instanceof OHPKM && !isGameBoy(mon.gameOfOrigin)) {
+  if (mon instanceof OHPKM && !OriginGames.isGameboy(mon.gameOfOrigin)) {
     tid = mon.personalityValue % 0x10000
   }
   if (baseMon && dvs) {

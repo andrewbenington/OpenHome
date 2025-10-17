@@ -1,4 +1,4 @@
-import { isGameBoy, Moves } from 'pokemon-resources'
+import { Moves } from '@pokemon-resources/index'
 import Prando from 'prando'
 import { NationalDex } from 'src/consts/NationalDex'
 
@@ -7,9 +7,11 @@ import { PKM } from '../pkm'
 import {
   Gender,
   genderFromInt,
+  Generation,
   MetadataLookup,
   NatureIndex,
   OriginGame,
+  OriginGames,
 } from '@pkm-rs-resources/pkg'
 import { AllPKMFields } from './pkmInterface'
 
@@ -24,7 +26,8 @@ export function getGen3MiscFlags(pokemon: PKM): number {
 export function getDisplayID(pokemon: PKM): string {
   if (
     !('gameOfOrigin' in pokemon) ||
-    isGameBoy(pokemon.gameOfOrigin) ||
+    OriginGames.generation(pokemon.gameOfOrigin) === Generation.G1 ||
+    OriginGames.generation(pokemon.gameOfOrigin) === Generation.G2 ||
     pokemon.gameOfOrigin < OriginGame.Sun
   ) {
     return pokemon.trainerID.toString().padStart(5, '0')

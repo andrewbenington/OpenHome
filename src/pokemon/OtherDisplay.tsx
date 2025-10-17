@@ -1,14 +1,14 @@
+import { Generation, OriginGames } from '@pkm-rs-resources/pkg'
 import { PK3, PK4, PK5 } from '@pokemon-files/pkm'
 import { AllPKMFields, getDisplayID, StatsPreSplit } from '@pokemon-files/util'
-import { Flex } from '@radix-ui/themes'
 import {
   BDSPTMMoveIndexes,
-  isGen4,
   LATutorMoveIndexes,
   Moves,
   SVTMMoveIndexes,
   SwShTRMoveIndexes,
-} from 'pokemon-resources'
+} from '@pokemon-resources/index'
+import { Flex } from '@radix-ui/themes'
 import { useMemo } from 'react'
 import { Countries } from 'src/consts/Countries'
 import { EncounterTypes } from 'src/consts/EncounterTypes'
@@ -157,9 +157,10 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
             value={mon.encryptionConstant % 100 ? 'Family of Four' : 'Family of Three'}
           />
         )}
-        {isGen4(mon.gameOfOrigin) && mon.encounterType !== undefined && (
-          <AttributeRow label="Gen 4 Encounter Type" value={EncounterTypes[mon.encounterType]} />
-        )}
+        {OriginGames.generation(mon.gameOfOrigin) === Generation.G4 &&
+          mon.encounterType !== undefined && (
+            <AttributeRow label="Gen 4 Encounter Type" value={EncounterTypes[mon.encounterType]} />
+          )}
         {mon.shinyLeaves !== undefined &&
           !isRestricted(HGSS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) && (
             <AttributeRow label="Shiny Leaves">

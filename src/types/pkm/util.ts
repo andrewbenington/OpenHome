@@ -1,6 +1,5 @@
 import { PKM } from '@pokemon-files/pkm'
 import { Stats, StatsPreSplit } from '@pokemon-files/util'
-import lodash from 'lodash'
 import {
   AttackCharacteristics,
   DefenseCharacteristics,
@@ -12,7 +11,8 @@ import {
   SpecialDefCharacteristics,
   SpeedCharacteristics,
   Type,
-} from 'pokemon-resources'
+} from '@pokemon-resources/index'
+import lodash from 'lodash'
 import Prando from 'prando'
 import { NationalDex } from 'src/consts/NationalDex'
 import {

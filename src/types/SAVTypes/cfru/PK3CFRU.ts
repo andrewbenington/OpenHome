@@ -1,6 +1,7 @@
-import { Ball, ItemFromString } from 'pokemon-resources'
+import { ItemFromString } from '@pokemon-resources/index'
 
 import {
+  Ball,
   Language,
   Languages,
   MetadataLookup,
@@ -56,7 +57,7 @@ const CFRU_BALLS: Ball[] = [
   Ball.Heal,
   Ball.Quick,
   Ball.Cherish,
-  Ball.INVALID,
+  Ball.None,
   Ball.Fast,
   Ball.Level,
   Ball.Lure,
@@ -64,7 +65,7 @@ const CFRU_BALLS: Ball[] = [
   Ball.Love,
   Ball.Friend,
   Ball.Moon,
-  Ball.PokeHisui,
+  Ball.PokeLegendsArceus,
   Ball.Beast,
   Ball.Dream,
 ]
@@ -281,8 +282,8 @@ export abstract class PK3CFRU implements PluginPKMInterface {
 
       if (other.ball) {
         this.ball =
-          other.ball >= Ball.PokeHisui && other.ball <= Ball.Origin
-            ? Ball.PokeHisui
+          other.ball >= Ball.PokeLegendsArceus && other.ball <= Ball.Origin
+            ? Ball.PokeLegendsArceus
             : other.ball === Ball.Sport
               ? Ball.Poke
               : other.ball
@@ -376,8 +377,8 @@ export abstract class PK3CFRU implements PluginPKMInterface {
     const ballIndex =
       this.ball in CFRU_BALLS
         ? CFRU_BALLS.indexOf(this.ball)
-        : this.ball >= Ball.PokeHisui && this.ball <= Ball.Origin
-          ? Ball.PokeHisui
+        : this.ball >= Ball.PokeLegendsArceus && this.ball <= Ball.Origin
+          ? Ball.PokeLegendsArceus
           : Ball.Poke
 
     dataView.setUint8(0x26, ballIndex)

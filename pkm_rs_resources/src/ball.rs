@@ -48,6 +48,8 @@ pub enum Ball {
     Origin,
 }
 
+pub const BALL_COUNT: usize = 38;
+
 impl From<u8> for Ball {
     fn from(value: u8) -> Self {
         match value {
@@ -89,7 +91,7 @@ impl From<u8> for Ball {
             35 => Ball::Leaden,
             36 => Ball::Gigaton,
             37 => Ball::Origin,
-            _ => panic!("Invalid value for Ball: {}", value),
+            _ => Ball::Strange,
         }
     }
 }
@@ -102,4 +104,108 @@ impl Ball {
     pub fn strange_if_newer_than(self, other: Ball) -> Ball {
         if self > other { Ball::Strange } else { self }
     }
+
+    pub const fn name(&self) -> &'static str {
+        match self {
+            Ball::None => "None",
+            Ball::Master => "Master Ball",
+            Ball::Ultra => "Ultra Ball",
+            Ball::Great => "Great Ball",
+            Ball::Poke => "Poké Ball",
+            Ball::Safari => "Safari Ball",
+            Ball::Net => "Net Ball",
+            Ball::Dive => "Dive Ball",
+            Ball::Nest => "Nest Ball",
+            Ball::Repeat => "Repeat Ball",
+            Ball::Timer => "Timer Ball",
+            Ball::Luxury => "Luxury Ball",
+            Ball::Premier => "Premier Ball",
+            Ball::Dusk => "Dusk Ball",
+            Ball::Heal => "Heal Ball",
+            Ball::Quick => "Quick Ball",
+            Ball::Cherish => "Cherish Ball",
+            Ball::Fast => "Fast Ball",
+            Ball::Level => "Level Ball",
+            Ball::Lure => "Lure Ball",
+            Ball::Heavy => "Heavy Ball",
+            Ball::Love => "Love Ball",
+            Ball::Friend => "Friend Ball",
+            Ball::Moon => "Moon Ball",
+            Ball::Sport => "Sport Ball",
+            Ball::Dream => "Dream Ball",
+            Ball::Beast => "Beast Ball",
+            Ball::Strange => "Strange Ball",
+            Ball::PokeLegendsArceus => "Poké Ball (Hisui)",
+            Ball::GreatLegendsArceus => "Great Ball (Hisui)",
+            Ball::UltraLegendsArceus => "Ultra Ball (Hisui)",
+            Ball::Feather => "Feather Ball",
+            Ball::Wing => "Wing Ball",
+            Ball::Jet => "Jet Ball",
+            Ball::HeavyLegendsArceus => "Heavy Ball (Hisui)",
+            Ball::Leaden => "Leaden Ball",
+            Ball::Gigaton => "Gigaton Ball",
+            Ball::Origin => "Origin Ball",
+        }
+    }
+
+    pub fn get_metadata(&self) -> BallMetadata {
+        BallMetadata {
+            index: *self as u8,
+            name: self.name().to_owned(),
+        }
+    }
+}
+
+pub static ALL_BALLS: [Ball; BALL_COUNT] = [
+    Ball::None,
+    Ball::Master,
+    Ball::Ultra,
+    Ball::Great,
+    Ball::Poke,
+    Ball::Safari,
+    Ball::Net,
+    Ball::Dive,
+    Ball::Nest,
+    Ball::Repeat,
+    Ball::Timer,
+    Ball::Luxury,
+    Ball::Premier,
+    Ball::Dusk,
+    Ball::Heal,
+    Ball::Quick,
+    Ball::Cherish,
+    Ball::Fast,
+    Ball::Level,
+    Ball::Lure,
+    Ball::Heavy,
+    Ball::Love,
+    Ball::Friend,
+    Ball::Moon,
+    Ball::Sport,
+    Ball::Dream,
+    Ball::Beast,
+    Ball::Strange,
+    Ball::PokeLegendsArceus,
+    Ball::GreatLegendsArceus,
+    Ball::UltraLegendsArceus,
+    Ball::Feather,
+    Ball::Wing,
+    Ball::Jet,
+    Ball::HeavyLegendsArceus,
+    Ball::Leaden,
+    Ball::Gigaton,
+    Ball::Origin,
+];
+
+#[cfg_attr(feature = "wasm", wasm_bindgen(getter_with_clone))]
+#[allow(clippy::missing_const_for_fn)]
+pub struct BallMetadata {
+    pub index: u8,
+    pub name: String,
+}
+
+#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "getAllBalls"))]
+#[allow(clippy::missing_const_for_fn)]
+pub fn get_all_balls() -> Vec<BallMetadata> {
+    ALL_BALLS.iter().map(Ball::get_metadata).collect()
 }

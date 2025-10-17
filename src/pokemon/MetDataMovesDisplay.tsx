@@ -1,6 +1,6 @@
 import { OriginGames } from '@pkm-rs-resources/pkg'
+import { getLocationString, RibbonTitles } from '@pokemon-resources/index'
 import { Badge, Flex } from '@radix-ui/themes'
-import { getLocationString, RibbonTitles } from 'pokemon-resources'
 import { useContext, useMemo } from 'react'
 import Markings from '../components/Markings'
 import { getPublicImageURL } from '../images/images'

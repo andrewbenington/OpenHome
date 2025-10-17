@@ -10,7 +10,7 @@ pub enum ColosseumOrXd {
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
 #[repr(u8)]
 pub enum OriginGame {
     Invalid0,
@@ -363,6 +363,26 @@ impl OriginGame {
             Self::Violet,
         ]
     }
+
+    pub fn is_gameboy(self) -> bool {
+        self >= Self::Red && self <= Self::Crystal
+    }
+
+    pub fn is_gba(self) -> bool {
+        self <= Self::LeafGreen
+    }
+
+    pub fn is_lets_go(self) -> bool {
+        self == Self::LetsGoEevee && self == Self::LetsGoPikachu
+    }
+
+    pub fn is_bdsp(self) -> bool {
+        self == Self::BrilliantDiamond && self == Self::ShiningPearl
+    }
+
+    pub fn is_scarlet_violet(self) -> bool {
+        self == Self::Scarlet && self == Self::Violet
+    }
 }
 
 impl From<u8> for OriginGame {
@@ -445,6 +465,11 @@ impl OriginGames {
         OriginGame::from(value).region()
     }
 
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "regionName"))]
+    pub fn region_name(value: u8) -> Option<String> {
+        OriginGame::from(value).region().map(|r| r.to_string())
+    }
+
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "gamecubeIndex"))]
     pub fn gamecube_index(value: u8) -> Option<u8> {
         OriginGame::from(value).gamecube_index()
@@ -481,6 +506,31 @@ impl OriginGames {
         OriginGame::all_valid()
             .map(OriginGameWithData::new)
             .to_vec()
+    }
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "isGameboy"))]
+    pub fn is_gameboy(value: u8) -> bool {
+        OriginGame::from(value).is_gameboy()
+    }
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "isGba"))]
+    pub fn is_gba(value: u8) -> bool {
+        OriginGame::from(value).is_gba()
+    }
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "isLetsGo"))]
+    pub fn is_lets_go(value: u8) -> bool {
+        OriginGame::from(value).is_lets_go()
+    }
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "isBdsp"))]
+    pub fn is_bdsp(value: u8) -> bool {
+        OriginGame::from(value).is_bdsp()
+    }
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "isScarletViolet"))]
+    pub fn is_scarlet_violet(value: u8) -> bool {
+        OriginGame::from(value).is_scarlet_violet()
     }
 }
 

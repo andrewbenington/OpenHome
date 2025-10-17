@@ -1,5 +1,6 @@
 import {
   AbilityIndex,
+  Ball,
   Gender,
   GenderRatio,
   Language,
@@ -25,16 +26,15 @@ import {
   markingsSixShapesWithColorFromOther,
   markingsSixShapesWithColorToBytes,
 } from '@pokemon-files/util'
-import * as lodash from 'lodash'
 import {
-  Ball,
   Gen34ContestRibbons,
   Gen34TowerRibbons,
   ItemFromString,
   ItemToString,
   ModernRibbons,
   getMetLocation,
-} from 'pokemon-resources'
+} from '@pokemon-resources/index'
+import * as lodash from 'lodash'
 import Prando from 'prando'
 import { NationalDex } from 'src/consts/NationalDex'
 import { OpenHomeRibbons } from 'src/consts/Ribbons'
