@@ -3,23 +3,27 @@ import assert from 'assert'
 import * as E from 'fp-ts/lib/Either'
 import fs from 'fs'
 import path from 'path'
-import { expect, test } from 'vitest'
+import { beforeAll, expect, test } from 'vitest'
 import { bytesToPKM } from '../../FileImport'
 import { OHPKM } from '../../pkm/OHPKM'
 import { G2SAV } from '../G2SAV'
 import { buildUnknownSaveFile } from '../load'
 import { emptyPathData } from '../path'
 
-const result = buildUnknownSaveFile(
-  emptyPathData,
-  new Uint8Array(fs.readFileSync(path.join(__dirname, 'SAVFiles', 'crystal.sav'))),
-  {},
-  [G2SAV]
-)
+let crystalSaveFile: G2SAV
 
-assert(E.isRight(result))
+beforeAll(() => {
+  const result = buildUnknownSaveFile(
+    emptyPathData,
+    new Uint8Array(fs.readFileSync(path.join(__dirname, 'SAVFiles', 'crystal.sav'))),
+    {},
+    [G2SAV]
+  )
 
-const crystalSaveFile = result.right as G2SAV
+  assert(E.isRight(result))
+
+  crystalSaveFile = result.right as G2SAV
+})
 
 const slowpokeOH = bytesToPKM(
   new Uint8Array(

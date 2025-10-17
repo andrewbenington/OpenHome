@@ -1,0 +1,26 @@
+[package]
+name = "pkm_rs_types"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+pkm_rs_derive = {path = "../pkm_rs_derive"}
+serde = { version = "1.0.219", features = ["derive"] }
+static_assertions = "1.1.0"
+wasm-bindgen = { version = "0.2.104", optional = true }
+js-sys = { version = "0.3.77", optional = true }
+serde-wasm-bindgen = { version = "0.6.5", optional = true }
+getrandom = { version = "0.3.3", features = ["wasm_js"] }
+strum = "0.27.2"
+strum_macros = "0.27.2"
+
+[lib]
+name = "pkm_rs_types"
+path = "src/lib.rs"
+crate-type = ["cdylib", "rlib"]
+
+[lints.clippy]
+missing_const_for_fn = "warn"
+
+[features]
+wasm = ["wasm-bindgen", "js-sys", "serde-wasm-bindgen", "getrandom/wasm_js"]

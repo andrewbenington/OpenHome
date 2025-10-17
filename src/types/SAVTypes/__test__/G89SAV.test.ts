@@ -1,7 +1,7 @@
+import { Ball, OriginGame } from '@pkm-rs-resources/pkg'
 import { PK4 } from '@pokemon-files/pkm'
 import { readFileSync } from 'fs'
 import { resolve } from 'path'
-import { Ball, GameOfOrigin } from 'pokemon-resources'
 import { beforeAll, describe, expect, test } from 'vitest'
 import { OHPKM } from '../../pkm/OHPKM'
 import { LASAV } from '../Gen89/LASAV'
@@ -9,6 +9,9 @@ import { SCBoolBlock, SCObjectBlock, writeSCBlock } from '../Gen89/SwishCrypto/S
 import { SwishCrypto } from '../Gen89/SwishCrypto/SwishCrypto'
 import { SwShSAV } from '../Gen89/SwShSAV'
 import { PathData } from '../path'
+import { initializeWasm } from './init'
+
+beforeAll(initializeWasm)
 
 const swordPath: PathData = {
   raw: 'SAVFiles/sword',
@@ -66,7 +69,7 @@ describe('gen 8 save files', () => {
   })
 
   test('sword data is correct', () => {
-    expect(swordSave.origin).toBe(GameOfOrigin.Sword)
+    expect(swordSave.origin).toBe(OriginGame.Sword)
     expect(swordSave.currentPCBox).toBe(15)
     expect(swordSave.boxes[17].name).toBe('huevos sorpresa')
 
@@ -79,7 +82,7 @@ describe('gen 8 save files', () => {
   })
 
   test('arceus data is correct', () => {
-    expect(arceusSave.origin).toBe(GameOfOrigin.LegendsArceus)
+    expect(arceusSave.origin).toBe(OriginGame.LegendsArceus)
     expect(arceusSave.currentPCBox).toBe(13)
   })
 

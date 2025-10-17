@@ -1,19 +1,19 @@
-import {
-  AbilityToString,
-  Ball,
-  Gen4Ribbons,
-  ItemFromString,
-  ItemToString,
-  Languages,
-  NatureToString,
-} from 'pokemon-resources'
+import { Gen4Ribbons, ItemFromString, ItemToString } from '@pokemon-resources/index'
 
+import {
+  AbilityIndex,
+  Ball,
+  Language,
+  Languages,
+  MetadataLookup,
+  NatureIndex,
+  SpeciesLookup,
+} from '@pkm-rs-resources/pkg'
 import * as byteLogic from '../util/byteLogic'
 import * as encryption from '../util/encryption'
-import { genderFromPID } from '../util/genderCalc'
 import { AllPKMFields } from '../util/pkmInterface'
 import { filterRibbons } from '../util/ribbonLogic'
-import { getLevelGen3Onward, getStats } from '../util/statCalc'
+import { getStats } from '../util/statCalc'
 import * as stringLogic from '../util/stringConversion'
 import * as types from '../util/types'
 import {
@@ -39,9 +39,9 @@ export class PK4 {
   secretID: number
   exp: number
   trainerFriendship: number
-  abilityIndex: number
+  ability?: AbilityIndex
   markings: types.MarkingsSixShapesNoColor
-  languageIndex: number
+  language: Language
   evs: types.Stats
   contest: types.ContestStats
   moves: number[]
@@ -98,9 +98,9 @@ export class PK4 {
       this.secretID = dataView.getUint16(0xe, true)
       this.exp = dataView.getUint32(0x10, true)
       this.trainerFriendship = dataView.getUint8(0x14)
-      this.abilityIndex = dataView.getUint8(0x15)
+      this.ability = AbilityIndex.fromIndex(dataView.getUint8(0x15))
       this.markings = types.markingsSixShapesNoColorFromBytes(dataView, 0x16)
-      this.languageIndex = dataView.getUint8(0x17)
+      this.language = Languages.fromByteOrNone(dataView.getUint8(0x17))
       this.evs = types.readStatsFromBytesU8(dataView, 0x18)
       this.contest = types.readContestStatsFromBytes(dataView, 0x1e)
       this.moves = [
@@ -189,7 +189,7 @@ export class PK4 {
       this.secretID = other.secretID
       this.exp = other.exp
       this.trainerFriendship = other.trainerFriendship ?? 0
-      this.abilityIndex = other.abilityIndex ?? 0
+      this.ability = other.ability
       this.markings = types.markingsSixShapesNoColorFromOther(other.markings) ?? {
         circle: false,
         triangle: false,
@@ -198,7 +198,7 @@ export class PK4 {
         star: false,
         diamond: false,
       }
-      this.languageIndex = other.languageIndex
+      this.language = other.language
       this.evs = other.evs ?? {
         hp: 0,
         atk: 0,
@@ -315,9 +315,9 @@ export class PK4 {
     dataView.setUint16(0xe, this.secretID, true)
     dataView.setUint32(0x10, this.exp, true)
     dataView.setUint8(0x14, this.trainerFriendship)
-    dataView.setUint8(0x15, this.abilityIndex)
+    dataView.setUint8(0x15, this.ability?.index ?? 0)
     types.markingsSixShapesNoColorToBytes(dataView, 0x16, this.markings)
-    dataView.setUint8(0x17, this.languageIndex)
+    dataView.setUint8(0x17, this.language)
     types.writeStatsToBytesU8(dataView, 0x18, this.evs)
     types.writeContestStatsToBytes(dataView, 0x1e, this.contest)
     for (let i = 0; i < 4; i++) {
@@ -396,31 +396,25 @@ export class PK4 {
   }
 
   public get gender() {
-    return genderFromPID(this.personalityValue, this.dexNum)
+    return this.metadata?.genderFromPid(this.personalityValue)
   }
 
-  public get language() {
-    return Languages[this.languageIndex]
+  public get languageString() {
+    return Languages.stringFromByte(this.language)
   }
 
-  public get abilityName() {
-    return AbilityToString(this.abilityIndex)
-  }
   public get heldItemName() {
     return ItemToString(this.heldItemIndex)
   }
 
   public get nature() {
-    return this.personalityValue % 25
+    return NatureIndex.newFromPid(this.personalityValue)
   }
 
   public get abilityNum() {
     return ((this.personalityValue >> 0) & 1) + 1
   }
 
-  public get natureName() {
-    return NatureToString(this.nature)
-  }
   public refreshChecksum() {
     this.checksum = encryption.get16BitChecksumLittleEndian(this.toBytes(), 0x08, 0x87)
   }
@@ -430,8 +424,9 @@ export class PK4 {
 
     return encryption.decryptByteArrayGen45(shuffledBytes)
   }
+
   public getLevel() {
-    return getLevelGen3Onward(this.dexNum, this.exp)
+    return this.speciesMetadata?.calculateLevel(this.exp) ?? 1
   }
 
   isShiny() {
@@ -451,6 +446,14 @@ export class PK4 {
       (this.personalityValue & 0xffff) ^
       ((this.personalityValue >> 16) & 0xffff)
     )
+  }
+
+  public get metadata() {
+    return MetadataLookup(this.dexNum, this.formeNum)
+  }
+
+  public get speciesMetadata() {
+    return SpeciesLookup(this.dexNum)
   }
 
   static maxValidMove() {

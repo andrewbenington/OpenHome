@@ -1,5 +1,3 @@
-import { ColosseumOrXD, GameOfOrigin, GameOfOriginData, colosseumOrXD } from 'pokemon-resources'
-
 export const GameLogos: { [key: string]: string } = {
   AlphaSapphire: `logos/Alpha_Sapphire.png`,
   Black2: `logos/Black_2.png`,
@@ -44,30 +42,6 @@ export const GameLogos: { [key: string]: string } = {
   XD: `logos/XD.png`,
   Y: `logos/Y.png`,
   Yellow: `logos/Yellow.png`,
-}
-
-export const getGameLogo = (
-  gameOfOrigin: number,
-  extraData?: { pluginIdentifier?: string; dexNum?: number; hasNationalRibbon?: boolean }
-) => {
-  if (gameOfOrigin === GameOfOrigin.ColosseumXD) {
-    switch (colosseumOrXD(extraData?.dexNum, extraData?.hasNationalRibbon)) {
-      case ColosseumOrXD.Colosseum:
-        return GameLogos.Colosseum
-      case ColosseumOrXD.XD:
-        return GameLogos.XD
-      case ColosseumOrXD.NotDeterminable:
-        return GameLogos.ColosseumXD
-    }
-  }
-  if (gameOfOrigin === -1) {
-    return GameLogos.GB
-  }
-  return GameLogos[
-    GameOfOriginData[gameOfOrigin]?.logo ??
-      GameOfOriginData[gameOfOrigin]?.name.replace(' ', '') ??
-      ''
-  ]
 }
 
 export const getOriginMark = (originMark: string) => {

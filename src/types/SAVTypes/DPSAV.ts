@@ -1,5 +1,5 @@
+import { OriginGame } from '@pkm-rs-resources/pkg'
 import { PK4 } from '@pokemon-files/pkm'
-import { GameOfOrigin } from 'pokemon-resources'
 import { DP_TRANSFER_RESTRICTIONS } from 'src/consts/TransferRestrictions'
 import { bytesToUint16LittleEndian, bytesToUint32LittleEndian } from 'src/util/byteLogic'
 import { gen4StringToUTF } from 'src/util/Strings/StringConverter'
@@ -86,7 +86,7 @@ export class DPSAV extends G4SAV {
     return G4SAV.validDateAndSize(bytes, 0x4c100)
   }
 
-  static includesOrigin(origin: GameOfOrigin) {
-    return origin === GameOfOrigin.Diamond || origin === GameOfOrigin.Pearl
+  static includesOrigin(origin: OriginGame) {
+    return origin === OriginGame.Diamond || origin === OriginGame.Pearl
   }
 }

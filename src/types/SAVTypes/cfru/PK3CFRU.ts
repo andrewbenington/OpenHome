@@ -1,19 +1,19 @@
-import {
-  AbilityFromString,
-  Ball,
-  GameOfOrigin,
-  ItemFromString,
-  Languages,
-  NatureToString,
-} from 'pokemon-resources'
-import { PokemonData } from 'pokemon-species-data'
+import { ItemFromString } from '@pokemon-resources/index'
 
 import {
-  genderFromPID,
+  Ball,
+  Language,
+  Languages,
+  MetadataLookup,
+  NatureIndex,
+  OriginGame,
+  SpeciesLookup,
+} from '@pkm-rs-resources/pkg'
+import {
   generatePersonalityValuePreservingAttributes,
   getFlag,
-  getLevelGen3Onward,
   getMoveMaxPP,
+  getStandardPKMStats,
   MarkingsFourShapes,
   markingsFourShapesFromBytes,
   markingsFourShapesFromOther,
@@ -29,7 +29,6 @@ import {
   writeGen3StringToBytes,
   writeStatsToBytesU8,
 } from '@pokemon-files/util'
-import { getHPGen3Onward, getStatGen3Onward } from '../../../util/StatCalc'
 import { PKMInterface, PluginPKMInterface } from '../../interfaces'
 
 export interface CFRUToNationalDexEntry {
@@ -37,8 +36,8 @@ export interface CFRUToNationalDexEntry {
   FormIndex: number
 }
 
-const INTERNAL_ORIGIN_NON_RR = GameOfOrigin.INVALID_6
-const INTERNAL_ORIGIN_FROM_CFRU = GameOfOrigin.FireRed
+const INTERNAL_ORIGIN_NON_RR = OriginGame.Invalid6
+const INTERNAL_ORIGIN_FROM_CFRU = OriginGame.FireRed
 const FIRERED_IN_GAME_TRADE = 255
 
 const CFRU_BALLS: Ball[] = [
@@ -58,7 +57,7 @@ const CFRU_BALLS: Ball[] = [
   Ball.Heal,
   Ball.Quick,
   Ball.Cherish,
-  Ball.INVALID,
+  Ball.None,
   Ball.Fast,
   Ball.Level,
   Ball.Lure,
@@ -66,7 +65,7 @@ const CFRU_BALLS: Ball[] = [
   Ball.Love,
   Ball.Friend,
   Ball.Moon,
-  Ball.PokeHisui,
+  Ball.PokeLegendsArceus,
   Ball.Beast,
   Ball.Dream,
 ]
@@ -82,7 +81,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
   personalityValue: number
   trainerID: number
   secretID: number
-  languageIndex: number
+  language: Language
   markings: MarkingsFourShapes
   dexNum: number
   formeNum: number
@@ -110,7 +109,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
   nickname: string
   trainerName: string
   trainerGender: boolean
-  isLocked: boolean = false
+  isFakemon: boolean = false
   originalBytes?: Uint8Array
 
   abstract selectColor: string
@@ -136,7 +135,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
       this.nickname = readGen3StringFromBytes(dataView, 0x8, 10)
 
       // Language 18
-      this.languageIndex = dataView.getUint8(0x12)
+      this.language = Languages.fromByteOrNone(dataView.getUint8(0x12))
 
       // Sanity 19
       // this.sanity = dataView.getUint8(0x13)
@@ -154,26 +153,12 @@ export abstract class PK3CFRU implements PluginPKMInterface {
       if (speciesData.NationalDexIndex < 0) {
         this.dexNum = 0
         this.formeNum = 0
-        // console.warn(
-        //   'The species is invalid. Species: ',
-        //   Gen3RRSpecies[speciesIndex],
-        //   ', PokeDex Number: ',
-        //   speciesIndex
-        // )
       } else {
         this.dexNum = speciesData.NationalDexIndex
         this.formeNum = speciesData.FormIndex
       }
 
-      this.isLocked = this.isFakemon(speciesIndex)
-      if (this.isLocked) {
-        // console.warn(
-        //   'The species is locked. Species: ',
-        //   Gen3RRSpecies[speciesIndex],
-        //   ', RR Dex Number: ',
-        //   speciesIndex
-        // )
-      }
+      this.isFakemon = this.indexIsFakemon(speciesIndex)
 
       // Held Item 30:32
       this.privateHeldItemIndex = dataView.getUint16(0x1e, true)
@@ -246,7 +231,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
       this.personalityValue = generatePersonalityValuePreservingAttributes(other) ?? 0
       this.trainerID = other.trainerID
       this.secretID = other.secretID
-      this.languageIndex = other.languageIndex
+      this.language = other.language
       this.markings = markingsFourShapesFromOther(other.markings) ?? {
         circle: false,
         triangle: false,
@@ -297,8 +282,8 @@ export abstract class PK3CFRU implements PluginPKMInterface {
 
       if (other.ball) {
         this.ball =
-          other.ball >= Ball.PokeHisui && other.ball <= Ball.Origin
-            ? Ball.PokeHisui
+          other.ball >= Ball.PokeLegendsArceus && other.ball <= Ball.Origin
+            ? Ball.PokeLegendsArceus
             : other.ball === Ball.Sport
               ? Ball.Poke
               : other.ball
@@ -341,7 +326,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
   abstract monFromGameIndex(gameIndex: number): CFRUToNationalDexEntry
   abstract monToGameIndex(nationalDexNumber: number, formIndex: number): number
 
-  abstract isFakemon(speciesIndex: number): boolean
+  abstract indexIsFakemon(speciesIndex: number): boolean
 
   toBytes(): ArrayBuffer {
     const buffer = new ArrayBuffer(58) // 58 bytes as specified
@@ -358,7 +343,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
     writeGen3StringToBytes(dataView, this.nickname, 0x8, 10, false)
 
     // 18 Language
-    dataView.setUint8(0x12, this.languageIndex)
+    dataView.setUint8(0x12, this.language)
 
     // 19 Sanity
     // dataView.setUint8(0x13, SANITY VALUE IDK);
@@ -392,8 +377,8 @@ export abstract class PK3CFRU implements PluginPKMInterface {
     const ballIndex =
       this.ball in CFRU_BALLS
         ? CFRU_BALLS.indexOf(this.ball)
-        : this.ball >= Ball.PokeHisui && this.ball <= Ball.Origin
-          ? Ball.PokeHisui
+        : this.ball >= Ball.PokeLegendsArceus && this.ball <= Ball.Origin
+          ? Ball.PokeLegendsArceus
           : Ball.Poke
 
     dataView.setUint8(0x26, ballIndex)
@@ -428,22 +413,15 @@ export abstract class PK3CFRU implements PluginPKMInterface {
   }
 
   public getStats() {
-    return {
-      hp: getHPGen3Onward(this),
-      atk: getStatGen3Onward('Atk', this),
-      def: getStatGen3Onward('Def', this),
-      spe: getStatGen3Onward('Spe', this),
-      spa: getStatGen3Onward('SpA', this),
-      spd: getStatGen3Onward('SpD', this),
-    }
+    return getStandardPKMStats(this)
   }
 
   public get gender() {
-    return genderFromPID(this.personalityValue, this.dexNum)
+    return this.metadata?.genderFromPid(this.personalityValue)
   }
 
-  public get language() {
-    return Languages[this.languageIndex]
+  public get languageString() {
+    return Languages.stringFromByte(this.language)
   }
 
   public get heldItemName() {
@@ -451,38 +429,15 @@ export abstract class PK3CFRU implements PluginPKMInterface {
   }
 
   public get nature() {
-    return this.personalityValue % 25
+    return NatureIndex.newFromPid(this.personalityValue)
   }
 
   public get abilityNum() {
     return this.hasHiddenAbility ? 4 : ((this.personalityValue >> 0) & 1) + 1
   }
 
-  public get abilityIndex() {
-    return AbilityFromString(this.ability)
-  }
-
   public get ability() {
-    const pokemonData = PokemonData[this.dexNum]
-
-    if (!pokemonData) return '—'
-
-    const forme = pokemonData.formes[this.formeNum]
-
-    if (!forme) return '—'
-
-    const { ability1, ability2, abilityH } = forme
-
-    if (this.hasHiddenAbility && abilityH) return abilityH
-    if (this.abilityNum === 2 && ability2) {
-      return ability2
-    }
-
-    return ability1
-  }
-
-  public get natureName() {
-    return NatureToString(this.nature)
+    return this.metadata?.abilityByNum(this.abilityNum)
   }
 
   toPCBytes() {
@@ -490,7 +445,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
   }
 
   public getLevel() {
-    return getLevelGen3Onward(this.dexNum, this.exp)
+    return this.speciesMetadata?.calculateLevel(this.exp) ?? 1
   }
 
   isShiny() {
@@ -510,6 +465,14 @@ export abstract class PK3CFRU implements PluginPKMInterface {
       (this.personalityValue & 0xffff) ^
       ((this.personalityValue >> 16) & 0xffff)
     )
+  }
+
+  public get metadata() {
+    return MetadataLookup(this.dexNum, this.formeNum)
+  }
+
+  public get speciesMetadata() {
+    return SpeciesLookup(this.dexNum)
   }
 
   static maxValidMove() {

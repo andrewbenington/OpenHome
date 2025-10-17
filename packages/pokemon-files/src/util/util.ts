@@ -1,9 +1,18 @@
-import { GameOfOrigin, isGameBoy, Moves, Nature } from 'pokemon-resources'
-import { getGenderRatio, NationalDex } from 'pokemon-species-data'
+import { Moves } from '@pokemon-resources/index'
 import Prando from 'prando'
+import { NationalDex } from 'src/consts/NationalDex'
 
 import { PKM } from '../pkm'
 
+import {
+  Gender,
+  genderFromInt,
+  Generation,
+  MetadataLookup,
+  NatureIndex,
+  OriginGame,
+  OriginGames,
+} from '@pkm-rs-resources/pkg'
 import { AllPKMFields } from './pkmInterface'
 
 export function getGen3MiscFlags(pokemon: PKM): number {
@@ -17,8 +26,9 @@ export function getGen3MiscFlags(pokemon: PKM): number {
 export function getDisplayID(pokemon: PKM): string {
   if (
     !('gameOfOrigin' in pokemon) ||
-    isGameBoy(pokemon.gameOfOrigin) ||
-    pokemon.gameOfOrigin < GameOfOrigin.Sun
+    OriginGames.generation(pokemon.gameOfOrigin) === Generation.G1 ||
+    OriginGames.generation(pokemon.gameOfOrigin) === Generation.G2 ||
+    pokemon.gameOfOrigin < OriginGame.Sun
   ) {
     return pokemon.trainerID.toString().padStart(5, '0')
   }
@@ -26,35 +36,6 @@ export function getDisplayID(pokemon: PKM): string {
   const fullTrainerID = (BigInt(pokemon.secretID) << BigInt(16)) | BigInt(pokemon.trainerID)
 
   return (fullTrainerID % BigInt(1000000)).toString().padStart(6, '0')
-}
-
-const gen3To5MaleThreshold: { [key: number]: number } = {
-  0: 254,
-  0.125: 225,
-  0.25: 191,
-  0.5: 127,
-  0.75: 63,
-  0.875: 31,
-  1: 0,
-}
-
-export const getGen3To5Gender = (PID: number, dexNum: number) => {
-  if (dexNum === 0) {
-    return 2
-  }
-
-  const genderRatio = getGenderRatio(dexNum, 0)
-  const maleRatio = genderRatio.male > 0 || genderRatio.female > 0 ? genderRatio.male : -1
-
-  if (maleRatio === -1) {
-    return 2
-  }
-
-  if (maleRatio === 0) {
-    return 1
-  }
-
-  return (PID & 0xff) >= gen3To5MaleThreshold[maleRatio] ? 0 : 1
 }
 
 const getIsShinyPreGen6 = (trainerID: number, secretID: number, personalityValue: number) =>
@@ -69,11 +50,11 @@ export const getUnownLetterGen3 = (personalityValue: number) => {
   return letterValue % 28
 }
 
-export const generatePersonalityValuePreservingAttributes = (mon: AllPKMFields) => {
+export function generatePersonalityValuePreservingAttributes(mon: AllPKMFields): number {
   const prng = new Prando(mon.personalityValue ?? mon.ivs?.atk)
 
   let personalityValue = 0
-  let otherNature: Nature | undefined
+  let otherNature: NatureIndex | undefined
   let otherAbilityNum = 4
 
   if (mon.personalityValue !== undefined && mon.abilityNum !== undefined) {
@@ -90,14 +71,23 @@ export const generatePersonalityValuePreservingAttributes = (mon: AllPKMFields) 
 
   // xoring the other three values with this to calculate upper half of personality value
   // will ensure shininess or non-shininess depending on original mon
-  const otherGender = mon.gender
-  let i = 0
   let newPersonalityValue = BigInt(personalityValue)
+  const metadata = MetadataLookup(mon.dexNum, 0)
+  if (!metadata) {
+    return Number(newPersonalityValue)
+  }
+
+  const otherGender: Gender =
+    mon.gender !== undefined
+      ? genderFromInt(mon.gender)
+      : metadata.genderFromPid(Number(newPersonalityValue))
+
   const shouldCheckUnown = mon.dexNum === NationalDex.Unown
 
+  let i = 0
   while (i < 0x10000) {
-    const newGender = getGen3To5Gender(Number(newPersonalityValue), mon.dexNum)
-    const newNature = Number(newPersonalityValue % BigInt(25))
+    const newGender = metadata.genderFromPid(Number(newPersonalityValue))
+    const newNature = NatureIndex.newFromPid(Number(newPersonalityValue))
 
     const newAbilityNum = Number(newPersonalityValue & BigInt(1)) + 1
 
@@ -105,7 +95,7 @@ export const generatePersonalityValuePreservingAttributes = (mon: AllPKMFields) 
       (!shouldCheckUnown || getUnownLetterGen3(Number(newPersonalityValue)) === mon.formeNum) &&
       newGender === otherGender &&
       (otherAbilityNum === 4 || shouldCheckUnown || newAbilityNum === otherAbilityNum) &&
-      (otherNature === undefined || newNature === otherNature) &&
+      (otherNature === undefined || newNature.equals(otherNature)) &&
       getIsShinyPreGen6(mon.trainerID, mon.secretID ?? 0, Number(newPersonalityValue)) ===
         mon.isShiny()
     ) {

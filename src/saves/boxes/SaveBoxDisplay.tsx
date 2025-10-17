@@ -1,7 +1,6 @@
+import { MetadataLookup } from '@pkm-rs-resources/pkg'
 import { Button, Card, Dialog, Flex, Grid } from '@radix-ui/themes'
 import lodash, { range } from 'lodash'
-import { GameOfOriginData } from 'pokemon-resources'
-import { PokemonData } from 'pokemon-species-data'
 import { useContext, useMemo, useState } from 'react'
 import { MdClose } from 'react-icons/md'
 import { BackendContext } from 'src/backend/backendContext'
@@ -64,15 +63,13 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
     const unsupportedMons = mons.filter((mon) => !save.supportsMon(mon.dexNum, mon.formeNum))
 
     if (unsupportedMons.length) {
-      const saveName = save.getGameName()
-
       dispatchError({
         type: 'set_message',
         payload: {
           title: 'Import Failed',
           messages: unsupportedMons.map(
             (mon) =>
-              `${PokemonData[mon.dexNum]?.formes[mon.formeNum]?.formeName} cannot be moved into ${saveName}`
+              `${MetadataLookup(mon.dexNum, mon.formeNum)?.formeName} cannot be moved into ${save.gameName}`
           ),
         },
       })
@@ -140,8 +137,8 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
               <div
                 className="save-header-game diagonal-clip"
                 style={{
-                  backgroundColor: save.gameColor(),
-                  color: colorIsDark(save.gameColor()) ? 'white' : 'black',
+                  backgroundColor: save.gameColor,
+                  color: colorIsDark(save.gameColor) ? 'white' : 'black',
                 }}
               >
                 <Button
@@ -158,7 +155,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                 >
                   <MdClose />
                 </Button>
-                {save.getGameName().slice(8)}
+                {save.gameName}
               </div>
               {save?.name}
             </div>
@@ -261,7 +258,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
               gap: 2,
             }}
           >
-            <AttributeRow label="Game">Pokémon {GameOfOriginData[save.origin]?.name}</AttributeRow>
+            <AttributeRow label="Game">Pokémon {save.gameName}</AttributeRow>
             <AttributeRow label="Trainer Name">{save.name}</AttributeRow>
             <AttributeRow label="Trainer ID">{save.displayID}</AttributeRow>
             {save.sid && (
@@ -285,11 +282,6 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                 <div style={{ overflowWrap: 'break-word', width: '100%' }}>
                   {save.fileCreated.toDateString()}
                 </div>
-              </AttributeRow>
-            )}
-            {save.calculatePcChecksum && (
-              <AttributeRow label="Calculated PC Checksum">
-                <code>0x{save.calculatePcChecksum().toString(16)}</code>
               </AttributeRow>
             )}
             {Object.entries(displayData).map(([label, value]) => (

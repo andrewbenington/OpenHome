@@ -36,7 +36,9 @@ pub struct PluginMetadataWithIcon {
     pub icon_image: Option<ImageResponse>,
 }
 
-pub fn list_plugins(app_handle: &tauri::AppHandle) -> Result<Vec<PluginMetadataWithIcon>> {
+pub fn list_downloaded_plugins(
+    app_handle: &tauri::AppHandle,
+) -> Result<Vec<PluginMetadataWithIcon>> {
     let plugins_path = util::get_appdata_dir(app_handle)?.join("plugins");
 
     if !plugins_path.exists() {
@@ -112,9 +114,9 @@ pub async fn download_async(
     util::create_directory(&dist_dir)?;
 
     let plugin_json_path = new_plugin_dir.join("plugin.json");
-    download_to_file(&format!("{}/plugin.json", remote_url), &plugin_json_path).await?;
+    download_to_file(&format!("{remote_url}/plugin.json"), &plugin_json_path).await?;
 
-    let index_js_body = util::download_text_file(&format!("{}/dist/index.js", remote_url)).await?;
+    let index_js_body = util::download_text_file(&format!("{remote_url}/dist/index.js")).await?;
     let index_js_path = new_plugin_dir.join("dist").join("index.js");
     util::write_file_contents(index_js_path, &index_js_body)?;
 

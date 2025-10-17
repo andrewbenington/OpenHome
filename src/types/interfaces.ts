@@ -1,3 +1,4 @@
+import { FormeMetadata, SpeciesMetadata } from '@pkm-rs-resources/pkg'
 import { AllPKMFields, Stats } from '@pokemon-files/util'
 
 export interface OfficialPKMInterface extends PKMInterface {
@@ -16,7 +17,9 @@ export type PKMInterface = AllPKMFields & {
   pluginIdentifier?: string
   // If met in a plugin save, this will be the save's plugin_identifier. otherwise this is empty
   pluginOrigin?: string
-  isLocked?: boolean
+  isFakemon?: boolean
   originalBytes?: Uint8Array
   selectColor?: string
+  metadata?: FormeMetadata
+  speciesMetadata?: SpeciesMetadata
 }

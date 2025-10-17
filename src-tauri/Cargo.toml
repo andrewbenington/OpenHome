@@ -11,7 +11,7 @@ edition = "2024"
 # to make the lib name unique and wouldn't conflict with the bin name.
 # This seems to be only an issue on Windows, see https://github.com/rust-lang/cargo/issues/8519
 name = "openhome_lib"
-crate-type = ["staticlib", "cdylib", "rlib"]
+crate-type = ["cdylib", "rlib"]
 
 [profile.release]
 panic = "abort" # Strip expensive panic clean-up logic
@@ -34,7 +34,11 @@ tauri-plugin-fs = "2.4.2"
 reqwest = { version = "0.12.23" }
 base64 = "0.22.1"
 zip = "5.1.1"
+static_assertions = "1.1.0"
 bytes = "1.10.1"
 semver = "1.0.27"
 strum = { version = "0.27.2", features = ["derive"] }
 uuid = { version = "1.18.1", features = ["v4"] }
+
+[features]
+wasm = []

@@ -1,4 +1,4 @@
-import { NationalDex } from 'pokemon-species-data'
+import { NationalDex } from 'src/consts/NationalDex'
 export const ShadowIDsColosseum: Record<number, number> = {
   [NationalDex.Makuhita]: 1,
   [NationalDex.Bayleef]: 2,

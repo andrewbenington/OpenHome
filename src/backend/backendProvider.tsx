@@ -1,5 +1,4 @@
 import * as E from 'fp-ts/lib/Either'
-import { PokemonData } from 'pokemon-species-data'
 import { PropsWithChildren } from 'react'
 import { OHPKM } from 'src/types/pkm/OHPKM'
 import { HomeData } from 'src/types/SAVTypes/HomeData'
@@ -62,9 +61,7 @@ async function writeAllHomeData(
 
       if (identifier === undefined) {
         results.push(
-          E.left(
-            `Could not get identifier for mon: ${mon.nickname} (${PokemonData[mon.dexNum].name})`
-          )
+          E.left(`Could not get identifier for mon: ${mon.nickname} (${mon.metadata?.formeName})`)
         )
         continue
       }
@@ -72,7 +69,7 @@ async function writeAllHomeData(
 
       results.push(result)
     } catch (e) {
-      const species = mon.dexNum in PokemonData ? PokemonData[mon.dexNum].name : 'Unknown Species'
+      const species = mon.speciesMetadata?.name ?? 'Unknown Species'
 
       results.push(E.left(`Error encoding ${mon.nickname} (${species}): ${e}`))
     }

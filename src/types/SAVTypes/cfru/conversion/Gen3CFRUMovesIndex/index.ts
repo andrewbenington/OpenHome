@@ -1003,7 +1003,7 @@ export const Gen3CFRUMoves = [
   'One Blow',
 ]
 
-import { Moves } from 'pokemon-resources'
+import { Moves } from '@pokemon-resources/index'
 import { CFRUToNationalMap } from './CFRUToNationalMap'
 import { NationalToCFRUMap } from './NationalToCFRUMap'
 

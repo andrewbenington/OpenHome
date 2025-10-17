@@ -1,4 +1,3 @@
-import { GameOfOrigin } from 'pokemon-resources'
 import { getHomeIdentifier, getMonFileIdentifier } from 'src/util/Lookup'
 import { v4 as UuidV4 } from 'uuid'
 import { PersistedPkmData } from '../../state/persistedPkmData'
@@ -15,7 +14,6 @@ import {
 } from '../storage'
 import { Err, Errorable, Ok } from '../types'
 import { Box } from './SAV'
-import { emptyPathData, PathData } from './path'
 
 export class HomeBox implements Box<OHPKM> {
   id: string
@@ -69,9 +67,6 @@ export class HomeBox implements Box<OHPKM> {
 }
 
 export class HomeData {
-  origin: GameOfOrigin = 0
-  isPlugin = false
-
   static BOX_ROWS = 10
   static BOX_COLUMNS = 12
 
@@ -79,15 +74,6 @@ export class HomeData {
   boxColumns = HomeData.BOX_COLUMNS
 
   transferRestrictions: TransferRestrictions = {}
-
-  filePath: PathData = emptyPathData
-  fileCreated?: Date
-
-  money: number = 0
-  name: string = 'OpenHome'
-  tid: number = 575757
-  sid?: number = 575757
-  displayID: string = '575757'
 
   _currentBoxIndex: number = 0
   boxes: Array<HomeBox> = []
@@ -125,24 +111,8 @@ export class HomeData {
     return getBankName(this._banks[this._currentBankIndex])
   }
 
-  getGameName() {
-    return 'OpenHome'
-  }
-
-  prepareBoxesAndGetModified() {
-    return []
-  }
-
-  supportsMon() {
-    return true
-  }
-
   gameColor() {
     return '#7DCEAB'
-  }
-
-  getPluginIdentifier() {
-    return undefined
   }
 
   addBank(name: string | undefined, box_count: number) {

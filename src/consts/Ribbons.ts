@@ -1,4 +1,4 @@
-import { Gen34ContestRibbons, Gen34TowerRibbons } from 'pokemon-resources'
+import { Gen34ContestRibbons, Gen34TowerRibbons } from '@pokemon-resources/index'
 
 export const Gen9Ribbons = [
   'Kalos Champion',

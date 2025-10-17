@@ -49,7 +49,10 @@ const recoverOHPKMData = (
   return saveFile
 }
 
-export const getSaveTypes = (bytes: Uint8Array, supportedSaveTypes: SAVClass[]): SAVClass[] => {
+export const getPossibleSaveTypes = (
+  bytes: Uint8Array,
+  supportedSaveTypes: SAVClass[]
+): SAVClass[] => {
   return supportedSaveTypes.filter((saveType) => saveType.fileIsSave(bytes))
 }
 
@@ -66,7 +69,7 @@ export const buildUnknownSaveFile = (
   supportedSaveTypes: SAVClass[],
   updateMonCallback?: (mon: OHPKM) => void
 ): E.Either<string, SAV | undefined> => {
-  const saveTypes = getSaveTypes(fileBytes, supportedSaveTypes)
+  const saveTypes = getPossibleSaveTypes(fileBytes, supportedSaveTypes)
 
   if (saveTypes.length > 1) {
     return E.left(

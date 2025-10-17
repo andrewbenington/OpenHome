@@ -6,6 +6,8 @@ import BrowsePlugins from './BrowsePlugins'
 import InstalledPlugins from './InstalledPlugins'
 import './style.css'
 
+export const CURRENT_PLUGIN_API_VERSION = 2
+
 export default function PluginsPage() {
   const [{ settings }] = useContext(AppInfoContext)
   const backend = useContext(BackendContext)

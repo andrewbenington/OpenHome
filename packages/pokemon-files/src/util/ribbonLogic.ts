@@ -1,4 +1,4 @@
-import { Gen3ContestRibbons } from 'pokemon-resources'
+import { Gen3ContestRibbons } from '@pokemon-resources/index'
 
 import { uIntFromBufferBits, uIntToBufferBits } from './byteLogic'
 

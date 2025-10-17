@@ -69,7 +69,7 @@ describe('Save file detection', () => {
 
       const saveFile = result.right
 
-      expect(saveFile?.getGameName()).toBe(`Pokémon ${gameName}`)
+      expect(saveFile?.gameName).toBe(gameName)
     })
   }
 })

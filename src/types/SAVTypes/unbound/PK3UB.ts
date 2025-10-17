@@ -46,7 +46,7 @@ export class PK3UB extends PK3CFRU implements PluginPKMInterface {
     return toGen3CRFUPokemonIndex(nationalDexNumber, formIndex, NationalDexToUnboundMap)
   }
 
-  isFakemon(speciesIndex: number): boolean {
+  indexIsFakemon(speciesIndex: number): boolean {
     return FAKEMON_INDEXES.includes(speciesIndex)
   }
 

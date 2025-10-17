@@ -6,7 +6,7 @@ import {
   ItemGen3,
   ItemGen3ToString,
   ItemToString,
-} from 'pokemon-resources'
+} from '@pokemon-resources/index'
 
 const BallIcons: { [key: string]: string } = {
   Master: 'items/index/0001.png',
