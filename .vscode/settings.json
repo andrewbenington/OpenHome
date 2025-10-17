@@ -11,6 +11,10 @@
   "[javascript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
   "[json]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
@@ -44,5 +48,8 @@
   "rust-analyzer.check.command": "clippy",
   "editor.inlayHints.enabled": "off",
   "editor.tabSize": 2,
-  "rust-analyzer.cargo.features": ["pkm_rs_resources/wasm", "pkm_rs_types/wasm"]
+  "rust-analyzer.cargo.features": [
+    "pkm_rs_resources/wasm",
+    "pkm_rs_types/wasm"
+  ]
 }

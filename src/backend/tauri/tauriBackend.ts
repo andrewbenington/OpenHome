@@ -203,6 +203,23 @@ export const TauriBackend: BackendInterface = {
     return TauriInvoker.writeStorageFileJSON('save-folders.json', saveFolders)
   },
 
+  /* bag */
+  loadBag: async () => {
+    const result = await (TauriInvoker.getStorageFileJSON('bag.json') as Promise<
+      Errorable<Record<string, number>>
+    >)
+
+    if (E.isLeft(result)) {
+      // initialize empty bag if not present
+      return E.right({})
+    }
+    return result
+  },
+
+  saveBag: async (items: Record<string, number>): Promise<Errorable<null>> => {
+    return TauriInvoker.writeStorageFileJSON('bag.json', items as JSONObject)
+  },
+
   /* transactions */
   startTransaction: async (): Promise<Errorable<null>> => {
     return TauriInvoker.startTransaction()
