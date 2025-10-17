@@ -1,27 +1,10 @@
 import { createContext, Dispatch, Reducer } from 'react'
 
-// src/types/BagItem.ts
-
-export interface BagItem {
-  /** Item ID or index in the master item list */
-  id: number
-
-  /** Quantity (number of this item held) */
-  quantity: number
-
-  /** Optional: name or display label */
-  name?: string
-
-  /** Optional: image/icon path for rendering */
-  iconPath?: string
-}
-
 /*
  *  STATE
  */
-// bagContext.ts
 export type BagState = {
-  items: Record<string, number> // e.g. { "Potion": 5, "Ultra Ball": 12 }
+  items: Record<string, number>
   modified: boolean
   loaded: boolean
   error?: string
