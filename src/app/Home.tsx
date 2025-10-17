@@ -280,16 +280,12 @@ const Home = () => {
   // load bag
   useEffect(() => {
     if (!bagState.loaded && !bagState.error) {
-      console.log('[Bag] Loading bag from backend...')
       backend.loadBag().then(
         E.match(
           (err) => {
-            console.error('[Bag] Failed to load bag:', err)
             bagDispatch({ type: 'set_error', payload: err })
           },
           (bagObj) => {
-            console.log('[Bag] Loaded successfully:', bagObj)
-            console.log(`[Bag] Item count: ${Object.keys(bagObj).length}`)
             bagDispatch({ type: 'load_bag', payload: bagObj })
           }
         )

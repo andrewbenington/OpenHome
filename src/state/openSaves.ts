@@ -415,7 +415,6 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
       if (dest.is_home) {
         targetMon = state.homeData?.boxes[dest.box].pokemon[dest.box_slot]
       } else {
-        // targetMon = dest.save.boxes[dest.box].pokemon[dest.box_slot]
         targetMon = undefined
       }
 

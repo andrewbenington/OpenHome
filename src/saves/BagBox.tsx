@@ -11,8 +11,6 @@ export default function BagBox() {
   const rowsNeeded = Math.max(Math.ceil(items.length / 6) + (items.length % 6 === 0 ? 1 : 0), 6)
   const totalSlots = rowsNeeded * 6
 
-  console.log('[BagBox] bagState:', bagState)
-
   return (
     <Card style={{ contain: 'none', padding: 4, width: '100%', boxSizing: 'border-box' }}>
       <Flex direction="column" gap="2" style={{ width: '100%' }}>

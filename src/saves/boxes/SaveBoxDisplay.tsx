@@ -109,9 +109,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   }
 
   const isDisabled = useMemo(() => {
-    // if (dragMonState?.payload.kind !== 'mon') return false
-
-    const dragPayload = dragMonState?.payload // as MonWithLocation | undefined
+    const dragPayload = dragMonState?.payload
 
     if (!dragPayload || dragPayload.kind !== 'mon') return false
 

@@ -100,8 +100,6 @@ const BoxCell = ({
     disabled,
   })
 
-  // console.log({ isDropTarget, dragID, location, disabled, dragMonState })
-
   return (
     <div
       ref={ref}

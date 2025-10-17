@@ -67,16 +67,12 @@ export default function PokemonDragContextProvider(props: { children?: ReactNode
       onDragStart={(e) => {
         const { source } = e.operation
 
-        console.log('[DragStart] source.data =', source?.data)
-
         if (!source?.data) return
         const data = source.data as DragPayload
 
         if (data.kind === 'item') {
-          console.log('[DragStart] dragging item:', data.itemName)
           dispatchDragMonState({ type: 'start_drag', payload: data })
         } else if (data.kind === 'mon') {
-          console.log('[DragStart] dragging mon:', data.monData)
           dispatchDragMonState({ type: 'start_drag', payload: data })
         }
       }}
