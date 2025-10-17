@@ -1,57 +1,19 @@
+import { OriginGames } from '@pkm-rs-resources/pkg'
 import dayjs from 'dayjs'
-import { colosseumOrXD, ColosseumOrXD, GameOfOrigin, GameOfOriginData } from 'pokemon-resources'
-import { GameLogos, getOriginMark } from '../images/game'
-import { getPublicImageURL } from '../images/images'
 import { PKMInterface } from '../types/interfaces'
 import { HomeData } from '../types/SAVTypes/HomeData'
 import { Box, SAV } from '../types/SAVTypes/SAV'
-import { getPluginIdentifier, SAVClass } from '../types/SAVTypes/util'
+import { SaveRef } from '../types/types'
 import { filterUndefined } from '../util/Sort'
 
 export type SaveViewMode = 'card' | 'grid'
 
-export function getMonSaveLogo(mon: PKMInterface, supportedSaves: SAVClass[]) {
-  if (mon.pluginOrigin) {
-    const pluginSave = supportedSaves.find((s) => getPluginIdentifier(s) === mon.pluginOrigin)
-
-    return `logos/${getPluginIdentifier(pluginSave)}.png`
-  }
-  if (!mon.gameOfOrigin) {
-    return getOriginMark('GB')
-  }
-  if (mon.gameOfOrigin === GameOfOrigin.ColosseumXD) {
-    switch (colosseumOrXD(mon.dexNum, mon.ribbons?.includes('National Ribbon') || mon.isShadow)) {
-      case ColosseumOrXD.Colosseum:
-        return GameLogos.Colosseum
-      case ColosseumOrXD.XD:
-        return GameLogos.XD
-      case ColosseumOrXD.NotDeterminable:
-        return GameLogos.ColosseumXD
-    }
-  }
-  if (mon.gameOfOrigin === -1) {
-    return GameLogos.GB
-  }
-  return GameLogos[
-    GameOfOriginData[mon.gameOfOrigin]?.logo ??
-      GameOfOriginData[mon.gameOfOrigin]?.name.replaceAll(' ', '').replaceAll("'", '') ??
-      ''
-  ]
-}
-
-export function getSaveLogo(saveType: SAVClass | undefined, origin: GameOfOrigin): string {
-  if (saveType?.prototype.getPluginIdentifier.call({})) {
-    return getPublicImageURL(`logos/${saveType.prototype.getPluginIdentifier.call({})}.png`)
-  }
-  if (!origin) {
-    return getPublicImageURL(getOriginMark('GB'))
-  }
-
-  return GameLogos[
-    GameOfOriginData[origin]?.logo ??
-      GameOfOriginData[origin]?.name.replaceAll(' ', '').replaceAll("'", '') ??
-      ''
-  ]
+export function logoFromSaveRef(ref: SaveRef): string | undefined {
+  return ref.pluginIdentifier
+    ? `logos/${ref.pluginIdentifier}.png`
+    : ref.game
+      ? OriginGames.logoPath(ref.game)
+      : undefined
 }
 
 export function formatTimeSince(timestamp?: number) {

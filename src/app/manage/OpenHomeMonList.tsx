@@ -1,9 +1,7 @@
+import { OriginGames } from '@pkm-rs-resources/pkg'
 import { useContext } from 'react'
 import OHDataGrid, { SortableColumn } from 'src/components/OHDataGrid'
 import PokemonIcon from 'src/components/PokemonIcon'
-import { getPublicImageURL } from 'src/images/images'
-import { getMonSaveLogo } from 'src/saves/util'
-import { AppInfoContext } from 'src/state/appInfo'
 import { PersistedPkmDataContext } from 'src/state/persistedPkmData'
 import { OHPKM } from 'src/types/pkm/OHPKM'
 import { getMonFileIdentifier } from 'src/util/Lookup'
@@ -16,7 +14,6 @@ export type OpenHomeMonListProps = {
 
 export default function OpenHomeMonList({ onSelectMon }: OpenHomeMonListProps) {
   const [{ homeMons }] = useContext(PersistedPkmDataContext)
-  const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
 
   const columns: SortableColumn<OHPKM>[] = [
     {
@@ -52,7 +49,11 @@ export default function OpenHomeMonList({ onSelectMon }: OpenHomeMonListProps) {
         <img
           alt="save logo"
           height={40}
-          src={getPublicImageURL(getMonSaveLogo(value, getEnabledSaveTypes()))}
+          src={
+            value.pluginOrigin
+              ? `logos/${value.pluginOrigin}.png`
+              : OriginGames.logoPath(value.gameOfOrigin)
+          }
         />
       ),
       sortFunction: numericSorter((val) => val?.gameOfOrigin),

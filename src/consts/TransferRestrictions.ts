@@ -1,5 +1,5 @@
 import { range } from 'lodash'
-import { NationalDex } from 'pokemon-species-data'
+import { NationalDex } from 'src/consts/NationalDex'
 import {
   CapPikachus,
   Gen89RegionalForms,

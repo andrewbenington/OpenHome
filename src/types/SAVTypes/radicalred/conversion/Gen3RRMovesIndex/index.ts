@@ -1003,7 +1003,7 @@ export const Gen3RRMoves = [
   'One Blow',
 ]
 
-import { Moves } from 'pokemon-resources'
+import { Moves } from '@pokemon-resources/index'
 import { NationalToRRMap } from './NationalToRRMap'
 import { RRToNationalMap } from './RRToNationalMap'
 

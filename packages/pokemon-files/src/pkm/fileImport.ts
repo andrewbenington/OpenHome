@@ -1,5 +1,4 @@
-import { GameOfOrigin } from 'pokemon-resources'
-
+import { OriginGame } from '@pkm-rs-resources/pkg'
 import { COLOPKM, PA8, PB7, PB8, PK1, PK2, PK3, PK4, PK5, PK6, PK7, PK8, PK9, PKM, XDPKM } from '.'
 
 function fileTypeFromBuffer(buffer: ArrayBuffer): string | undefined {
@@ -13,7 +12,7 @@ function fileTypeFromBuffer(buffer: ArrayBuffer): string | undefined {
       return 'PK3'
     case 136:
       if (
-        new DataView(buffer).getUint8(0x5f) >= GameOfOrigin.White ||
+        new DataView(buffer).getUint8(0x5f) >= OriginGame.White ||
         new DataView(buffer).getUint16(0x80) === 30001
       ) {
         return 'PK5'

@@ -1,4 +1,16 @@
 import {
+  AbilityIndex,
+  Ball,
+  Gender,
+  GenderRatio,
+  Language,
+  Languages,
+  MetadataLookup,
+  NatureIndex,
+  OriginGame,
+  SpeciesLookup,
+} from '@pkm-rs-resources/pkg'
+import {
   ContestStats,
   Geolocation,
   HyperTrainStats,
@@ -7,31 +19,24 @@ import {
   PKMDate,
   Stats,
   StatsPreSplit,
-  genderFromDVs,
-  genderFromPID,
   generatePersonalityValuePreservingAttributes,
+  getStandardPKMStats,
   markingsHaveColor,
   markingsSixShapesWithColorFromBytes,
   markingsSixShapesWithColorFromOther,
   markingsSixShapesWithColorToBytes,
 } from '@pokemon-files/util'
-import * as lodash from 'lodash'
 import {
-  AbilityFromString,
-  AbilityToString,
-  Ball,
-  GameOfOrigin,
   Gen34ContestRibbons,
   Gen34TowerRibbons,
   ItemFromString,
   ItemToString,
-  Languages,
   ModernRibbons,
-  NatureToString,
   getMetLocation,
-} from 'pokemon-resources'
-import { NationalDex, PokemonData } from 'pokemon-species-data'
+} from '@pokemon-resources/index'
+import * as lodash from 'lodash'
 import Prando from 'prando'
+import { NationalDex } from 'src/consts/NationalDex'
 import { OpenHomeRibbons } from 'src/consts/Ribbons'
 import { ShadowIDsColosseum, ShadowIDsXD } from 'src/consts/ShadowIDs'
 import {
@@ -44,7 +49,6 @@ import {
   uint16ToBytesLittleEndian,
   uint32ToBytesLittleEndian,
 } from 'src/util/byteLogic'
-import { getHPGen3Onward, getLevelGen3Onward, getStatGen3Onward } from 'src/util/StatCalc'
 import { utf16BytesToString, utf16StringToBytes } from 'src/util/Strings/StringConverter'
 import { getHomeIdentifier, isEvolution } from '../../util/Lookup'
 import { PKMInterface, PluginPKMInterface } from '../interfaces'
@@ -154,14 +158,17 @@ export class OHPKM implements PKMInterface {
         this.gender =
           other.gender ??
           (other.dvs
-            ? genderFromDVs(other.dvs, this.dexNum)
-            : genderFromPID(this.personalityValue, this.dexNum))
+            ? this.metadata?.genderFromAtkDv(this.dvs.atk)
+            : this.metadata?.genderFromPid(this.personalityValue)) ??
+          Gender.Genderless
       } else {
         this.abilityNum = other.abilityNum ?? 0
-        this.gender = other.gender ?? genderFromPID(this.personalityValue, this.dexNum)
+        this.gender =
+          other.gender ?? this.metadata?.genderFromPid(this.personalityValue) ?? Gender.Genderless
       }
 
-      this.nature = other.nature !== undefined ? other.nature : this.personalityValue % 25
+      this.nature =
+        other.nature !== undefined ? other.nature : NatureIndex.newFromPid(this.personalityValue)
       this.ivs = other.ivs ?? (other.dvs !== undefined ? ivsFromDVs(other.dvs) : generateIVs(prng))
       this.evs = other.evs ?? {
         hp: 0,
@@ -206,7 +213,6 @@ export class OHPKM implements PKMInterface {
       this.metTimeOfDay = other.metTimeOfDay ?? 0
       this.metLocationIndex = other.metLocationIndex ?? 0
       this.ability = getAbilityFromNumber(this.dexNum, this.formeNum, this.abilityNum)
-      this.abilityIndex = AbilityFromString(this.ability)
 
       this.isShadow = other.isShadow ?? false
 
@@ -465,27 +471,15 @@ export class OHPKM implements PKMInterface {
   }
 
   public get level() {
-    return getLevelGen3Onward(this.dexNum, this.exp)
-  }
-
-  public get abilityIndex() {
-    return bytesToUint16LittleEndian(this.bytes, 0x14)
-  }
-
-  public set abilityIndex(value: number) {
-    this.bytes.set(uint16ToBytesLittleEndian(value), 0x14)
+    return this.speciesMetadata?.calculateLevel(this.exp) ?? 1
   }
 
   public get ability() {
-    return AbilityToString(this.abilityIndex)
+    return AbilityIndex.fromIndex(bytesToUint16LittleEndian(this.bytes, 0x14))
   }
 
-  public set ability(value: string) {
-    const abilityIndex = AbilityFromString(value)
-
-    if (abilityIndex > -1) {
-      this.abilityIndex = abilityIndex
-    }
+  public set ability(value: AbilityIndex | undefined) {
+    this.bytes.set(uint16ToBytesLittleEndian(value?.index ?? 0), 0x14)
   }
 
   public get abilityNum() {
@@ -576,23 +570,19 @@ export class OHPKM implements PKMInterface {
   }
 
   public get nature() {
-    return this.bytes[0x20]
+    return new NatureIndex(this.bytes[0x20])
   }
 
-  public set nature(value: number) {
-    this.bytes[0x20] = value
-  }
-
-  public get natureName() {
-    return NatureToString(this.nature)
+  public set nature(value: NatureIndex) {
+    this.bytes[0x20] = value.index
   }
 
   public get statNature() {
-    return this.bytes[0x21]
+    return new NatureIndex(this.bytes[0x21])
   }
 
-  public set statNature(value: number) {
-    this.bytes[0x21] = value
+  public set statNature(value: NatureIndex) {
+    this.bytes[0x21] = value.index
   }
 
   public get isFatefulEncounter() {
@@ -1193,25 +1183,21 @@ export class OHPKM implements PKMInterface {
   }
 
   public get displayID() {
-    return this.gameOfOrigin < GameOfOrigin.Sun
+    return this.gameOfOrigin < OriginGame.Sun
       ? this.trainerID
       : bytesToUint32LittleEndian(this.bytes, 0x0c) % 1000000
   }
 
-  public get languageIndex() {
+  public get language() {
     return this.bytes[0xf2]
   }
 
-  public get language() {
-    return Languages[this.languageIndex]
+  public set language(value: Language) {
+    this.bytes[0xf2] = Languages.fromByteOrNone(value)
   }
 
-  public set language(value: string) {
-    const index = Languages.indexOf(value)
-
-    if (index > -1) {
-      this.bytes[0xf2] = index
-    }
+  public get languageString() {
+    return Languages.stringFromByte(this.language)
   }
 
   public get unknownF3() {
@@ -1506,14 +1492,7 @@ export class OHPKM implements PKMInterface {
   }
 
   public get stats(): Stats {
-    return {
-      hp: getHPGen3Onward(this),
-      atk: getStatGen3Onward('Atk', this),
-      def: getStatGen3Onward('Def', this),
-      spe: getStatGen3Onward('Spe', this),
-      spa: getStatGen3Onward('SpA', this),
-      spd: getStatGen3Onward('SpD', this),
-    }
+    return getStandardPKMStats(this)
   }
 
   public get currentHP(): number {
@@ -1544,6 +1523,14 @@ export class OHPKM implements PKMInterface {
     )
   }
 
+  public get metadata() {
+    return MetadataLookup(this.dexNum, this.formeNum)
+  }
+
+  public get speciesMetadata() {
+    return SpeciesLookup(this.dexNum)
+  }
+
   public toBytes(): ArrayBuffer {
     return this.bytes.buffer as ArrayBuffer
   }
@@ -1556,10 +1543,7 @@ export class OHPKM implements PKMInterface {
     let errorsFound = false
 
     // PLA mons cannot have been hatched
-    if (
-      this.gameOfOrigin === GameOfOrigin.LegendsArceus &&
-      (this.eggDate || this.eggLocationIndex)
-    ) {
+    if (this.gameOfOrigin === OriginGame.LegendsArceus && (this.eggDate || this.eggLocationIndex)) {
       this.eggDate = undefined
       this.eggLocationIndex = undefined
       errorsFound = true
@@ -1575,22 +1559,22 @@ export class OHPKM implements PKMInterface {
     }
 
     // Fix ability bug from pre-1.5.0 (affected Mind's Eye and Dragon's Maw)
-    if (this.abilityIndex === 0) {
+    if (!this.ability) {
       this.ability = getAbilityFromNumber(this.dexNum, this.formeNum, this.abilityNum)
-      this.abilityIndex = AbilityFromString(this.ability)
     }
 
-    const genderRatio = PokemonData[this.dexNum].formes[this.formeNum].genderRatio
-
-    if (this.gender === 2 && (genderRatio.male !== 0 || genderRatio.female !== 0)) {
-      this.gender = genderFromPID(this.personalityValue, this.dexNum)
-      errorsFound = true
-    } else if (this.gender === 0 && genderRatio.male === 0) {
-      this.gender = genderFromPID(this.personalityValue, this.dexNum)
-      errorsFound = true
-    } else if (this.gender === 1 && genderRatio.female === 0) {
-      this.gender = genderFromPID(this.personalityValue, this.dexNum)
-      errorsFound = true
+    const metadata = this.metadata
+    const genderRatio = this.metadata?.genderRatio
+    if (metadata && genderRatio !== undefined) {
+      if (
+        (this.gender === Gender.Genderless && genderRatio !== GenderRatio.Genderless) ||
+        (this.gender !== Gender.Genderless && genderRatio === GenderRatio.Genderless) ||
+        (this.gender === Gender.Male && genderRatio === GenderRatio.AllFemale) ||
+        (this.gender === Gender.Female && genderRatio === GenderRatio.AllMale)
+      ) {
+        this.gender = metadata.genderFromPid(this.personalityValue)
+        errorsFound = true
+      }
     }
 
     return errorsFound

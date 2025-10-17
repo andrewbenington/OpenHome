@@ -1,3 +1,4 @@
+import { Stats } from '@pkm-rs-resources/pkg'
 import { Select } from '@radix-ui/themes'
 import {
   Chart as ChartJS,
@@ -9,7 +10,6 @@ import {
   Title,
   Tooltip,
 } from 'chart.js'
-import { getNatureSummary } from 'pokemon-resources'
 import { useEffect, useMemo, useState } from 'react'
 import { Radar } from 'react-chartjs-2'
 import {
@@ -175,23 +175,19 @@ const StatsDisplay = (props: { mon: PKMInterface }) => {
                   },
                   borderRadius: display === 'Contest' ? 12 : 0,
                   backdropPadding: display === 'Contest' ? 4 : 0,
-                  callback: (value) => {
-                    if (!('nature' in mon)) {
-                      return value
-                    }
-                    let natureSummary: string
+                  callback: (statAbbr) => {
+                    const stat = Stats.fromAbbr(statAbbr)
 
-                    if (mon.statNature !== mon.nature) {
-                      natureSummary = getNatureSummary(mon.statNature)
-                    } else {
-                      natureSummary = getNatureSummary(mon.nature)
+                    if (!stat || !mon.nature) {
+                      return statAbbr
                     }
-                    if (natureSummary?.includes(`-${value}`)) {
-                      return `${value}▼`
-                    } else if (natureSummary?.includes(`+${value}`)) {
-                      return `${value}▲`
+
+                    if (mon.nature.stats?.decrease === stat) {
+                      return `${statAbbr}▼`
+                    } else if (mon.nature.stats?.increase === stat) {
+                      return `${statAbbr}▲`
                     } else {
-                      return `${value}`
+                      return `${statAbbr}`
                     }
                   },
                 },

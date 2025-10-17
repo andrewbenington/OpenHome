@@ -1,5 +1,5 @@
 use crate::error::{Error, Result};
-use crate::plugin::{self, PluginMetadata, PluginMetadataWithIcon, list_plugins};
+use crate::plugin::{self, PluginMetadata, PluginMetadataWithIcon, list_downloaded_plugins};
 use crate::state::{AppState, AppStateSnapshot, PokedexState};
 use crate::util::ImageResponse;
 use crate::{menu, saves, util};
@@ -248,7 +248,7 @@ pub fn open_directory(absolute_path: String) -> Result<()> {
 
 #[tauri::command]
 pub async fn download_plugin(app_handle: tauri::AppHandle, remote_url: String) -> Result<String> {
-    let metadata_url = format!("{}/plugin.json", remote_url);
+    let metadata_url = format!("{remote_url}/plugin.json");
 
     let plugin_metadata: PluginMetadata = util::download_json_file(&metadata_url).await?;
 
@@ -257,7 +257,7 @@ pub async fn download_plugin(app_handle: tauri::AppHandle, remote_url: String) -
 
 #[tauri::command]
 pub fn list_installed_plugins(app_handle: tauri::AppHandle) -> Result<Vec<PluginMetadataWithIcon>> {
-    list_plugins(&app_handle)
+    list_downloaded_plugins(&app_handle)
 }
 
 #[tauri::command]

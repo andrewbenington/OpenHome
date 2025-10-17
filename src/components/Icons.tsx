@@ -6,6 +6,7 @@ import {
   MdArrowDropDown,
   MdArrowForward,
   MdArrowForwardIos,
+  MdClear,
   MdCompareArrows,
   MdCreateNewFolder,
   MdDataObject,
@@ -21,6 +22,7 @@ export const RemoveIcon = TiMinus
 export const EditIcon = AiFillEdit
 export const MoveIcon = BiMove
 export const AddIcon = TiPlus
+export const ClearIcon = MdClear
 
 export const GridIcon = MdGrid4X4
 export const CardsIcon = IoGrid

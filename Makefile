@@ -68,6 +68,13 @@ generate: generate/out/generate.js
 	@node ./generate/out/generate.js Items text/items/PostGen4.txt items/PostGen4.ts
 	@npx prettier --log-level silent --write src/resources/gen*
 
+.PHONY: gen-wasm
+gen-wasm:
+# 	@node generate/gen_ribbons.ts
+# 	@node generate/gen_moves.ts
+	@cd pkm_rs_resources && node node generate/gen_abilities.ts
+# 	@cd pkm_rs_resources && node generate/gen_species_data.ts
+	
 generate/out/syncPKHexResources.js: generate/syncPKHexResources.ts
 	@echo "compiling generate/syncPKHexResources.ts..."
 	@cd generate && tsc

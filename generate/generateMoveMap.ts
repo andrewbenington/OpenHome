@@ -1,5 +1,5 @@
+import { Moves } from '@pokemon-resources/index'
 import { writeFileSync } from 'fs'
-import { Moves } from 'pokemon-resources'
 import { Gen3RRMoves } from '../src/types/SAVTypes/radicalred/conversion/Gen3RRMovesIndex'
 
 const NationalMoves = Moves

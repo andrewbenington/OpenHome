@@ -1,8 +1,8 @@
+import { Generation, OriginGame, OriginGames } from '@pkm-rs-resources/pkg'
 import { bytesToPKMInterface } from '@pokemon-files/pkm'
 import { Button, Flex, Tabs } from '@radix-ui/themes'
 import * as E from 'fp-ts/lib/Either'
 import lodash, { flatten } from 'lodash'
-import { GameOfOrigin, isGameBoy, isGen3, isGen4, isGen5 } from 'pokemon-resources'
 import { useCallback, useContext, useEffect, useState } from 'react'
 import { MdFileOpen } from 'react-icons/md'
 import PokemonDetailsModal from 'src/pokemon/PokemonDetailsModal'
@@ -112,11 +112,12 @@ const Home = () => {
     const newGen12Lookup: LookupMap = {}
     const newGen345Lookup: LookupMap = {}
     const saveTypesAndChangedMons = allOpenSaves.map(
-      (save) => [save.origin, save.prepareBoxesAndGetModified()] as [GameOfOrigin, OHPKM[]]
+      (save) => [save.origin, save.prepareBoxesAndGetModified()] as [OriginGame, OHPKM[]]
     )
 
     for (const [saveOrigin, changedMons] of saveTypesAndChangedMons) {
-      if (isGameBoy(saveOrigin)) {
+      const generation = OriginGames.generation(saveOrigin)
+      if (generation === Generation.G1 || generation === Generation.G2) {
         changedMons.forEach((mon) => {
           const openHomeIdentifier = getMonFileIdentifier(mon)
           const gen12Identifier = getMonGen12Identifier(mon)
@@ -125,7 +126,11 @@ const Home = () => {
             newGen12Lookup[gen12Identifier] = openHomeIdentifier
           }
         })
-      } else if (isGen3(saveOrigin) || isGen4(saveOrigin) || isGen5(saveOrigin)) {
+      } else if (
+        generation === Generation.G3 ||
+        generation === Generation.G4 ||
+        generation === Generation.G5
+      ) {
         changedMons.forEach((mon) => {
           const openHomeIdentifier = getMonFileIdentifier(mon)
           const gen345Identifier = getMonGen345Identifier(mon)

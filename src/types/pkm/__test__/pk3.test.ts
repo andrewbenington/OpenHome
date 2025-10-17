@@ -2,11 +2,35 @@ import { PK3 } from '@pokemon-files/pkm'
 import fs from 'fs'
 import { TextDecoder } from 'node:util' // (ESM style imports)
 import path from 'path'
-import { expect, test } from 'vitest'
+import { beforeAll, expect, test } from 'vitest'
 import { getMonGen345Identifier } from '../../../util/Lookup'
 import { bytesToPKM } from '../../FileImport'
 import { OHPKM } from '../OHPKM'
+import { initializeWasm } from './init'
 ;(global as any).TextDecoder = TextDecoder
+
+beforeAll(initializeWasm)
+
+var blazikenOhpkm: OHPKM
+var blazikenPk3: PK3
+var slowpokeOhpkm: OHPKM
+
+beforeAll(() => {
+  blazikenOhpkm = bytesToPKM(
+    new Uint8Array(fs.readFileSync(path.join(__dirname, './PKMFiles/OH', 'blaziken.ohpkm'))),
+    'OHPKM'
+  ) as OHPKM
+
+  blazikenPk3 = bytesToPKM(
+    new Uint8Array(fs.readFileSync(path.join(__dirname, './PKMFiles/Gen3', 'blaziken.pkm'))),
+    'PK3'
+  ) as PK3
+
+  slowpokeOhpkm = bytesToPKM(
+    new Uint8Array(fs.readFileSync(path.join(__dirname, './PKMFiles/OH', 'slowpoke-shiny.ohpkm'))),
+    'OHPKM'
+  ) as OHPKM
+})
 
 test('gen 3 stat calculations', () => {
   const file = path.join(__dirname, './PKMFiles/Gen3', 'blaziken.pkm')
@@ -24,23 +48,8 @@ test('gen 3 stat calculations', () => {
   })
 })
 
-const blazikenOH = bytesToPKM(
-  new Uint8Array(fs.readFileSync(path.join(__dirname, './PKMFiles/OH', 'blaziken.ohpkm'))),
-  'OHPKM'
-) as OHPKM
-
-const blazikenGen3 = bytesToPKM(
-  new Uint8Array(fs.readFileSync(path.join(__dirname, './PKMFiles/Gen3', 'blaziken.pkm'))),
-  'PK3'
-) as PK3
-
-const slowpokeOH = bytesToPKM(
-  new Uint8Array(fs.readFileSync(path.join(__dirname, './PKMFiles/OH', 'slowpoke-shiny.ohpkm'))),
-  'OHPKM'
-) as OHPKM
-
 test('gen 3 EVs are updated', () => {
-  const emeraldPKM = new PK3(blazikenOH)
+  const emeraldPKM = new PK3(blazikenOhpkm)
 
   // mimicking ev reduction berries and ev gain
   emeraldPKM.evs = {
@@ -51,8 +60,8 @@ test('gen 3 EVs are updated', () => {
     def: 0,
     spd: 0,
   }
-  blazikenOH.updateData(emeraldPKM)
-  expect(blazikenOH.evs).toStrictEqual({
+  blazikenOhpkm.updateData(emeraldPKM)
+  expect(blazikenOhpkm.evs).toStrictEqual({
     atk: 252,
     hp: 6,
     spa: 0,
@@ -63,7 +72,7 @@ test('gen 3 EVs are updated', () => {
 })
 
 test('gen 3 ribbons are updated', () => {
-  const emeraldPKM = new PK3(blazikenOH)
+  const emeraldPKM = new PK3(blazikenOhpkm)
 
   // gaining Gen 3 ribbons
   emeraldPKM.ribbons = [
@@ -74,15 +83,15 @@ test('gen 3 ribbons are updated', () => {
     'Cool Master (Hoenn)',
     'Winning',
   ]
-  blazikenOH.updateData(emeraldPKM)
-  expect(blazikenOH.ribbons).toContain('Cool Master (Hoenn)')
-  expect(blazikenOH.ribbons).toContain('Winning')
-  expect(blazikenOH.ribbons).toContain('Effort')
-  expect(blazikenOH.ribbons).toContain('Footprint')
+  blazikenOhpkm.updateData(emeraldPKM)
+  expect(blazikenOhpkm.ribbons).toContain('Cool Master (Hoenn)')
+  expect(blazikenOhpkm.ribbons).toContain('Winning')
+  expect(blazikenOhpkm.ribbons).toContain('Effort')
+  expect(blazikenOhpkm.ribbons).toContain('Footprint')
 })
 
 test('gen 3 contest stats are updated', () => {
-  const emeraldPKM = new PK3(blazikenOH)
+  const emeraldPKM = new PK3(blazikenOhpkm)
 
   // gaining cool contest points
   emeraldPKM.contest = {
@@ -93,8 +102,8 @@ test('gen 3 contest stats are updated', () => {
     cute: 255,
     sheen: 1,
   }
-  blazikenOH.updateData(emeraldPKM)
-  expect(blazikenOH.contest).toStrictEqual({
+  blazikenOhpkm.updateData(emeraldPKM)
+  expect(blazikenOhpkm.contest).toStrictEqual({
     cool: 30,
     beauty: 255,
     smart: 255,
@@ -105,36 +114,36 @@ test('gen 3 contest stats are updated', () => {
 })
 
 test('gen 3 conversion to OHPKM and back is lossless', () => {
-  const ohPKM = new OHPKM(blazikenGen3)
+  const ohPKM = new OHPKM(blazikenPk3)
   // gaining cool contest points
   const gen3PKM = new PK3(ohPKM)
 
-  expect(blazikenGen3.toBytes()).toEqual(gen3PKM.toBytes())
+  expect(blazikenPk3.toBytes()).toEqual(gen3PKM.toBytes())
 })
 
 test('pk3 and ohpkm have the same gen345Lookup key', () => {
-  const ohPKM = new OHPKM(blazikenGen3)
+  const ohPKM = new OHPKM(blazikenPk3)
 
-  expect(getMonGen345Identifier(ohPKM)).toEqual(getMonGen345Identifier(blazikenGen3))
+  expect(getMonGen345Identifier(ohPKM)).toEqual(getMonGen345Identifier(blazikenPk3))
 })
 
 test('gen 6+ nickname accuracy', () => {
-  const converted = new PK3(slowpokeOH)
+  const converted = new PK3(slowpokeOhpkm)
 
-  expect(converted.nickname).toBe(slowpokeOH.nickname)
+  expect(converted.nickname).toBe(slowpokeOhpkm.nickname)
 })
 
 test('gen 6+ shiny accuracy', () => {
-  const converted = new PK3(slowpokeOH)
+  const converted = new PK3(slowpokeOhpkm)
 
-  if (!slowpokeOH.personalityValue) {
+  if (!slowpokeOhpkm.personalityValue) {
     throw Error('mon has no personality value')
   }
-  expect(converted.isShiny()).toBe(slowpokeOH.isShiny())
+  expect(converted.isShiny()).toBe(slowpokeOhpkm.isShiny())
 })
 
 test('gen 6+ nature accuracy', () => {
-  const converted = new PK3(slowpokeOH)
+  const converted = new PK3(slowpokeOhpkm)
 
-  expect(converted.nature).toBe(slowpokeOH.nature)
+  expect(converted.nature.index).toEqual(slowpokeOhpkm.nature.index)
 })

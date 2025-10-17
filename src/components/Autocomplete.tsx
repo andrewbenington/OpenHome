@@ -11,7 +11,7 @@ import {
   useState,
 } from 'react'
 import './components.css'
-import { DropdownArrowIcon, RemoveIcon } from './Icons'
+import { ClearIcon, DropdownArrowIcon } from './Icons'
 
 type SLJAutocompleteProps<Option> = {
   value?: Option | null
@@ -294,7 +294,7 @@ export default function SLJAutocomplete<Option>(props: SLJAutocompleteProps<Opti
                   onChange?.(undefined)
                 }}
               >
-                <RemoveIcon />
+                <ClearIcon />
               </IconButton>
             </TextField.Slot>
           )}

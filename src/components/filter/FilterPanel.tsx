@@ -1,21 +1,17 @@
-import { Button, Card, Flex, Text } from '@radix-ui/themes'
 import {
-  Ability,
-  Balls,
-  GameOfOrigin,
-  GameOfOriginData,
-  isGBA,
-  isGen4,
-  isGen5,
-  Item,
-  ItemToString,
-  Origin,
-  Types,
-} from 'pokemon-resources'
-import { PokemonData } from 'pokemon-species-data'
+  all_species_data,
+  Generation,
+  getAllAbilities,
+  getAllBalls,
+  OriginGame,
+  OriginGames,
+  OriginGameWithData,
+  SpeciesLookup,
+} from '@pkm-rs-resources/pkg'
+import { Item, ItemToString, Types } from '@pokemon-resources/index'
+import { Button, Card, Flex, Text } from '@radix-ui/themes'
 import { useContext, useMemo } from 'react'
 import { OpenHomeRibbons } from 'src/consts/Ribbons'
-import { getOriginMark } from 'src/images/game'
 import { getPublicImageURL } from 'src/images/images'
 import { BallsImageList, getItemIconPath } from 'src/images/items'
 import { getRibbonSpritePath } from 'src/images/ribbons'
@@ -40,25 +36,20 @@ type ItemOption =
       label: string
     }
 
-function getOriginIcon(origin: Origin) {
+function getOriginIcon(origin: OriginGameWithData) {
   const path =
-    isGen4(origin.index) || isGen5(origin.index)
-      ? 'icons/ds.png'
-      : isGBA(origin.index)
-        ? 'icons/gba.png'
-        : origin.index === GameOfOrigin.ColosseumXD
-          ? 'icons/gcn.png'
+    origin.generation === Generation.G4 || origin.generation === Generation.G5
+      ? 'i/cons/ds.png'
+      : origin.game === OriginGame.ColosseumXd
+        ? '/icons/gcn.png'
+        : origin.generation === Generation.G3
+          ? '/icons/gba.png'
           : origin.mark
-            ? getOriginMark(origin.mark)
+            ? `/origin_marks/${origin.mark}.png`
             : undefined
 
   return path ? (
-    <img
-      className="filter-icon invert-dark"
-      draggable={false}
-      alt="origin mark"
-      src={getPublicImageURL(path)}
-    />
+    <img className="filter-icon invert-dark" draggable={false} alt="origin mark" src={path} />
   ) : undefined
 }
 
@@ -94,20 +85,21 @@ const itemOptions: ItemOption[] = [
 export default function FilterPanel() {
   const [filterState, dispatchFilterState] = useContext(FilterContext)
 
-  const currentMon = useMemo(
-    () => (filterState.dexNumber ? PokemonData[filterState.dexNumber] : undefined),
-    [filterState.dexNumber]
-  )
+  const ALL_SPECIES_DATA = useMemo(all_species_data, [])
 
-  const abilities: SelectOption[] = useMemo(
-    () =>
-      Object.keys(Ability)
-        .filter((ability) => isNaN(Number(ability)))
-        .map((ability, id) => ({
-          label: ability,
-          id,
-        })),
-    []
+  const ALL_ABILITIES: SelectOption[] = getAllAbilities().map(({ name, id }) => ({
+    label: name,
+    id,
+  }))
+
+  const ALL_BALLS: SelectOption[] = getAllBalls().map(({ name, index }) => ({
+    label: name,
+    id: index,
+  }))
+
+  const currentMon = useMemo(
+    () => (filterState.dexNumber ? SpeciesLookup(filterState.dexNumber) : undefined),
+    [filterState.dexNumber]
   )
 
   return (
@@ -128,10 +120,10 @@ export default function FilterPanel() {
       </Flex>
       <Flex direction="column" m="1" gap="0">
         <Autocomplete
-          options={Object.values(PokemonData)}
+          options={Object.values(ALL_SPECIES_DATA)}
           getOptionString={(opt) => opt.name}
           getOptionUniqueID={(opt) => opt.nationalDex.toString()}
-          value={filterState.dexNumber ? PokemonData[filterState.dexNumber] : undefined}
+          value={filterState.dexNumber ? SpeciesLookup(filterState.dexNumber) : undefined}
           label="Species"
           onChange={(option) =>
             dispatchFilterState({
@@ -147,7 +139,7 @@ export default function FilterPanel() {
           <Autocomplete
             options={[...currentMon.formes]}
             getOptionString={(opt) => opt.formeName}
-            getOptionUniqueID={(opt) => opt.formeNumber.toString()}
+            getOptionUniqueID={(opt) => opt.formeIndex.toString()}
             value={
               filterState.formeNumber !== undefined
                 ? currentMon.formes[filterState.formeNumber]
@@ -157,7 +149,7 @@ export default function FilterPanel() {
             onChange={(option) =>
               dispatchFilterState({
                 type: 'set_filter',
-                payload: { formeNumber: option?.formeNumber },
+                payload: { formeNumber: option?.formeIndex },
               })
             }
             getIconComponent={(currentForme) =>
@@ -165,7 +157,7 @@ export default function FilterPanel() {
               currentForme && (
                 <PokemonIcon
                   dexNumber={filterState.dexNumber}
-                  formeNumber={currentForme.formeNumber}
+                  formeNumber={currentForme.formeIndex}
                   style={{ width: 24, height: 24 }}
                 />
               )
@@ -209,17 +201,17 @@ export default function FilterPanel() {
           }
         />
         <Autocomplete
-          options={abilities}
+          options={ALL_ABILITIES}
           getOptionString={(opt) => opt.label}
           getOptionUniqueID={(opt) => opt.id.toString()}
           value={
-            filterState.abilityIndex !== undefined ? abilities[filterState.abilityIndex] : undefined
+            filterState.ability !== undefined ? ALL_ABILITIES[filterState.ability - 1] : undefined
           }
           label="Ability"
           onChange={(option) =>
             dispatchFilterState({
               type: 'set_filter',
-              payload: { abilityIndex: option?.id },
+              payload: { ability: option?.id },
             })
           }
         />
@@ -254,39 +246,26 @@ export default function FilterPanel() {
           />
         )}
         <Autocomplete
-          options={GameOfOriginData.filter((origin) => !!origin)}
+          options={OriginGames.allMetadata()}
           getOptionString={(option) => option?.name}
-          getOptionUniqueID={(opt) => opt.index.toString()}
+          getOptionUniqueID={(opt) => opt.game.toString()}
           value={
-            filterState.gameOfOrigin
-              ? GameOfOriginData.find((origin) => origin?.index === filterState.gameOfOrigin)
-              : undefined
+            filterState.gameOfOrigin ? OriginGames.getMetadata(filterState.gameOfOrigin) : undefined
           }
           label="Game Of Origin"
           onChange={(option) =>
-            dispatchFilterState({
-              type: 'set_filter',
-              payload: { gameOfOrigin: option?.index },
-            })
+            dispatchFilterState({ type: 'set_filter', payload: { gameOfOrigin: option?.game } })
           }
           getIconComponent={getOriginIcon}
         />
         <Autocomplete
-          options={Balls.map((ball, id) => ({
-            label: ball,
-            id,
-          }))}
+          options={ALL_BALLS}
           getOptionString={(option) => option.label}
           getOptionUniqueID={(opt) => opt.id.toString()}
-          value={
-            filterState.ball ? { label: Balls[filterState.ball], id: filterState.ball } : undefined
-          }
+          value={filterState.ball ? ALL_BALLS[filterState.ball] : undefined}
           label="Ball"
           onChange={(option) =>
-            dispatchFilterState({
-              type: 'set_filter',
-              payload: { ball: option?.id },
-            })
+            dispatchFilterState({ type: 'set_filter', payload: { ball: option?.id } })
           }
           getIconComponent={(ball) => (
             <img
@@ -304,10 +283,7 @@ export default function FilterPanel() {
           value={filterState.ribbon}
           label="Ribbon"
           onChange={(option) =>
-            dispatchFilterState({
-              type: 'set_filter',
-              payload: { ribbon: option },
-            })
+            dispatchFilterState({ type: 'set_filter', payload: { ribbon: option } })
           }
           getIconComponent={(ribbon) =>
             ribbon !== 'Any Ribbon' && ribbon !== 'No Ribbon' ? (
@@ -326,10 +302,7 @@ export default function FilterPanel() {
           value={filterState.shiny}
           label="Shiny"
           onChange={(option) =>
-            dispatchFilterState({
-              type: 'set_filter',
-              payload: { shiny: option },
-            })
+            dispatchFilterState({ type: 'set_filter', payload: { shiny: option } })
           }
           getIconComponent={(value) =>
             value !== 'Not Shiny' ? (

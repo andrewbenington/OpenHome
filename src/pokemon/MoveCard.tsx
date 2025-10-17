@@ -1,4 +1,4 @@
-import { Moves, Type } from 'pokemon-resources'
+import { Moves, Type } from '@pokemon-resources/index'
 import { useMemo } from 'react'
 import TypeIcon from '../components/TypeIcon'
 import { getTypeColor } from '../util/PokemonSprite'

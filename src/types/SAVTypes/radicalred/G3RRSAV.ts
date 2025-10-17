@@ -3,7 +3,7 @@ import { isRestricted, TransferRestrictions } from '../../TransferRestrictions'
 import { findFirstSectionOffset, G3CFRUSAV, SAVE_SIZES_BYTES } from '../cfru/G3CFRUSAV'
 import { FRLG_SECURITY_COPY_OFFSET, FRLG_SECURITY_OFFSET } from '../G3SAV'
 import { PathData } from '../path'
-import { PluginSAV } from '../SAV'
+import { SlotMetadata } from '../SAV'
 import { RRExcludedForms, RRTransferMon } from './conversion/RRTransferMons'
 import PK3RR from './PK3RR'
 
@@ -13,10 +13,14 @@ const RR_TRANSFER_RESTRICTIONS: TransferRestrictions = {
   excludedForms: RRExcludedForms,
 }
 
-export class G3RRSAV extends G3CFRUSAV<PK3RR> implements PluginSAV<PK3RR> {
+export class G3RRSAV extends G3CFRUSAV<PK3RR> {
   static transferRestrictions: TransferRestrictions = RR_TRANSFER_RESTRICTIONS
 
   pluginIdentifier = 'radical_red'
+
+  get gameName() {
+    return 'Radical Red'
+  }
 
   supportsMon(dexNumber: number, formeNumber: number) {
     return !isRestricted(RR_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)
@@ -48,7 +52,20 @@ export class G3RRSAV extends G3CFRUSAV<PK3RR> implements PluginSAV<PK3RR> {
     return securityKey === 0 || securityKey !== securityKeyCopy
   }
 
-  gameColor(): string {
-    return '#660000'
+  static getPluginIdentifier() {
+    return 'radical_red'
+  }
+
+  getSlotMetadata = (boxNum: number, boxSlot: number): SlotMetadata => {
+    const mon = this.boxes[boxNum].pokemon[boxSlot]
+
+    if (mon instanceof PK3RR && mon.isFakemon) {
+      return {
+        isDisabled: true,
+        disabledReason: 'Fanmade Pokémon species cannot be moved out of the box',
+      }
+    }
+
+    return { isDisabled: false }
   }
 }

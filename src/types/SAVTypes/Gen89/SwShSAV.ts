@@ -1,7 +1,7 @@
+import { Languages, OriginGame, SpeciesLookup } from '@pkm-rs-resources/pkg'
 import { PK8 } from '@pokemon-files/pkm'
 import { utf16BytesToString } from '@pokemon-files/util'
-import { GameOfOrigin, GameOfOriginData, Languages } from 'pokemon-resources'
-import { NationalDex, PokemonData } from 'pokemon-species-data'
+import { NationalDex } from 'src/consts/NationalDex'
 import {
   SWSH_TRANSFER_RESTRICTIONS_BASE,
   SWSH_TRANSFER_RESTRICTIONS_CT,
@@ -26,6 +26,7 @@ export class SwShSAV extends G89SAV<PK8> {
   static saveTypeID = 'SwShSAV'
 
   trainerBlock: TrainerBlock
+  origin: OriginGame
 
   constructor(path: PathData, bytes: Uint8Array) {
     super(path, bytes)
@@ -97,12 +98,6 @@ export class SwShSAV extends G89SAV<PK8> {
     return this.boxes[this.currentPCBox]
   }
 
-  getGameName() {
-    const gameOfOrigin = GameOfOriginData[this.origin]
-
-    return gameOfOrigin ? `Pokémon ${gameOfOrigin.name}` : '(Unknown Game)'
-  }
-
   getSaveRevision(): SWSH_SAVE_REVISION {
     return this.getBlock('ZukanR2')
       ? 'Crown Tundra'
@@ -123,7 +118,7 @@ export class SwShSAV extends G89SAV<PK8> {
     return {
       'Player Character': trainerBlock.getGender() ? 'Gloria' : 'Victor',
       'Save Version': this.getSaveRevision(),
-      Language: Languages[trainerBlock.getLanguage()],
+      Language: Languages.stringFromByte(trainerBlock.getLanguage()),
       Pokédex: pokedexOwned,
       'Shiny Pokémon Found': trainerBlock.getShinyPokemonFound(),
       Starter: trainerBlock.getStarter(),
@@ -137,8 +132,8 @@ export class SwShSAV extends G89SAV<PK8> {
     return SwishCrypto.getIsHashValid(bytes)
   }
 
-  static includesOrigin(origin: GameOfOrigin) {
-    return origin === GameOfOrigin.Sword || origin === GameOfOrigin.Shield
+  static includesOrigin(origin: OriginGame) {
+    return origin === OriginGame.Sword || origin === OriginGame.Shield
   }
 }
 
@@ -194,14 +189,10 @@ class TrainerBlock {
   public getShinyPokemonFound(): number {
     return this.dataView.getUint16(0x22, true)
   }
-  public getGame(): GameOfOrigin {
+  public getGame(): OriginGame {
     const origin = this.dataView.getUint8(0x24)
 
-    return origin === 0
-      ? GameOfOrigin.Sword
-      : origin === 1
-        ? GameOfOrigin.Shield
-        : GameOfOrigin.INVALID_0
+    return origin === 0 ? OriginGame.Sword : OriginGame.Shield
   }
   public getGender(): boolean {
     return !!(this.dataView.getUint8(0x38) & 1)
@@ -209,10 +200,10 @@ class TrainerBlock {
   public getStarter(): string {
     const index = this.dataView.getUint8(0x25)
 
-    if (index === 0xff) {
-      return 'Not Selected'
+    if (index <= 2) {
+      return SpeciesLookup(index * 3 + NationalDex.Grookey)?.name!
     }
 
-    return PokemonData[index * 3 + NationalDex.Grookey].name
+    return 'Not Selected'
   }
 }

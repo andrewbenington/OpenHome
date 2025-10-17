@@ -1,19 +1,19 @@
+import { Generation, OriginGames } from '@pkm-rs-resources/pkg'
 import { PK3, PK4, PK5 } from '@pokemon-files/pkm'
 import { AllPKMFields, getDisplayID, StatsPreSplit } from '@pokemon-files/util'
-import { Flex } from '@radix-ui/themes'
 import {
   BDSPTMMoveIndexes,
-  isGen4,
   LATutorMoveIndexes,
   Moves,
   SVTMMoveIndexes,
   SwShTRMoveIndexes,
-} from 'pokemon-resources'
-import { NationalDex } from 'pokemon-species-data'
+} from '@pokemon-resources/index'
+import { Flex } from '@radix-ui/themes'
 import { useMemo } from 'react'
 import { Countries } from 'src/consts/Countries'
 import { EncounterTypes } from 'src/consts/EncounterTypes'
 import { SWEETS } from 'src/consts/Formes'
+import { NationalDex } from 'src/consts/NationalDex'
 import {
   GEN2_TRANSFER_RESTRICTIONS,
   HGSS_TRANSFER_RESTRICTIONS,
@@ -36,11 +36,10 @@ import { isRestricted } from '../types/TransferRestrictions'
 import { PKMInterface } from '../types/interfaces'
 import { OHPKM } from '../types/pkm/OHPKM'
 import {
-  getHeightCalculatedMaybe,
   getHiddenPowerGen2,
   getHiddenPowerPower,
   getHiddenPowerType,
-  getWeightCalculatedMaybe,
+  getWeightCalculated,
   shinyLeafValues,
 } from '../types/pkm/util'
 import { getFlagsInRange } from '../util/byteLogic'
@@ -54,8 +53,8 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
   const { mon } = props
   const isDev = useIsDev()
 
-  const heightCalculated = getHeightCalculatedMaybe(mon) ?? 0
-  const weightCalculated = getWeightCalculatedMaybe(mon) ?? 0
+  const heightCalculated = getWeightCalculated(mon)
+  const weightCalculated = getWeightCalculated(mon)
 
   return (
     <div style={{ overflow: 'hidden', height: '100%' }}>
@@ -158,9 +157,10 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
             value={mon.encryptionConstant % 100 ? 'Family of Four' : 'Family of Three'}
           />
         )}
-        {isGen4(mon.gameOfOrigin) && mon.encounterType !== undefined && (
-          <AttributeRow label="Gen 4 Encounter Type" value={EncounterTypes[mon.encounterType]} />
-        )}
+        {OriginGames.generation(mon.gameOfOrigin) === Generation.G4 &&
+          mon.encounterType !== undefined && (
+            <AttributeRow label="Gen 4 Encounter Type" value={EncounterTypes[mon.encounterType]} />
+          )}
         {mon.shinyLeaves !== undefined &&
           !isRestricted(HGSS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) && (
             <AttributeRow label="Shiny Leaves">

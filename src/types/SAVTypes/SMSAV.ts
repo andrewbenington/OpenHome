@@ -1,4 +1,4 @@
-import { GameOfOrigin } from 'pokemon-resources'
+import { OriginGame } from '@pkm-rs-resources/pkg'
 import { SM_TRANSFER_RESTRICTIONS } from 'src/consts/TransferRestrictions'
 import { isRestricted } from '../TransferRestrictions'
 import { G7SAV } from './G7SAV'
@@ -26,7 +26,7 @@ export class SMSAV extends G7SAV {
   static saveTypeName: string = 'Pokémon Sun/Moon'
   static saveTypeID = 'SMSAV'
 
-  static includesOrigin(origin: GameOfOrigin) {
-    return origin === GameOfOrigin.Sun || origin === GameOfOrigin.Moon
+  static includesOrigin(origin: OriginGame) {
+    return origin === OriginGame.Sun || origin === OriginGame.Moon
   }
 }

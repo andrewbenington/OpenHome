@@ -1,8 +1,8 @@
+import { OriginGame } from '@pkm-rs-resources/pkg'
 import { PB7 } from '@pokemon-files/pkm'
 import { utf16BytesToString } from '@pokemon-files/util'
 import { ceil, min } from 'lodash'
-import { GameOfOrigin, GameOfOriginData } from 'pokemon-resources'
-import { NationalDex } from 'pokemon-species-data'
+import { NationalDex } from 'src/consts/NationalDex'
 import { LGE_STARTER, LGP_STARTER } from '../../consts/Formes'
 import { LGPE_TRANSFER_RESTRICTIONS } from '../../consts/TransferRestrictions'
 import { bytesToUint16LittleEndian, bytesToUint32LittleEndian } from '../../util/byteLogic'
@@ -10,7 +10,7 @@ import { CRC16_NoInvert } from '../../util/Encryption'
 import { OHPKM } from '../pkm/OHPKM'
 import { isRestricted } from '../TransferRestrictions'
 import { PathData } from './path'
-import { Box, BoxCoordinates, SAV, SlotMetadata } from './SAV'
+import { Box, BoxCoordinates, OfficialSAV, SlotMetadata } from './SAV'
 
 const PC_OFFSET = 0x5c00
 const PC_CHECKSUM_OFFSET = 0xb8662
@@ -27,7 +27,7 @@ const POKE_LIST_HEADER_CHECKSUM_OFFSET = 0xb865a
 
 const EMPTY_SLOT_CHECKSUM = 0x0000
 
-export class LGPESAV implements SAV<PB7> {
+export class LGPESAV extends OfficialSAV<PB7> {
   static pkmType = PB7
   static saveTypeAbbreviation = 'LGPE'
   static saveTypeName: string = "Pokémon Let's Go Pikachu/Eevee"
@@ -37,12 +37,11 @@ export class LGPESAV implements SAV<PB7> {
     return bytes.length === SAVE_SIZE_BYTES
   }
 
-  static includesOrigin(origin: GameOfOrigin) {
-    return origin === GameOfOrigin.LetsGoPikachu || origin === GameOfOrigin.LetsGoEevee
+  static includesOrigin(origin: OriginGame) {
+    return origin === OriginGame.LetsGoPikachu || origin === OriginGame.LetsGoEevee
   }
 
-  origin: GameOfOrigin = 0
-  isPlugin = false
+  origin: OriginGame
 
   boxRows = 5
   boxColumns = 6
@@ -72,6 +71,7 @@ export class LGPESAV implements SAV<PB7> {
   pokeListHeader: PokeListHeader
 
   constructor(path: PathData, bytes: Uint8Array) {
+    super()
     this.bytes = bytes
     this.filePath = path
     this.name = utf16BytesToString(
@@ -239,7 +239,7 @@ export class LGPESAV implements SAV<PB7> {
     return !isRestricted(LGPE_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)
   }
 
-  getSlotMetadata(boxNum: number, boxSlot: number): SlotMetadata {
+  getSlotMetadata = (boxNum: number, boxSlot: number): SlotMetadata => {
     const monIndex = boxNum * 30 + boxSlot
 
     if (monIndex >= BOX_SLOTS_TOTAL) {
@@ -293,27 +293,6 @@ export class LGPESAV implements SAV<PB7> {
 
   getCurrentBox() {
     return this.boxes[this.currentPCBox]
-  }
-
-  getGameName() {
-    const gameOfOrigin = GameOfOriginData[this.origin]
-
-    return gameOfOrigin ? `Pokémon ${gameOfOrigin.name}` : '(Unknown Game)'
-  }
-
-  gameColor() {
-    switch (this.origin) {
-      case GameOfOrigin.LetsGoPikachu:
-        return '#F5DA26'
-      case GameOfOrigin.LetsGoEevee:
-        return '#D4924B'
-      default:
-        return '#666666'
-    }
-  }
-
-  getPluginIdentifier() {
-    return undefined
   }
 
   getDisplayData() {

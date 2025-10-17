@@ -13,6 +13,8 @@ export interface MonSpriteData {
 export interface OpenHomePlugin {
   id: string
   name: string
+  version: string
+  api_version: number
   getMonSpritePath?: (params: MonSpriteData) => string | null
 }
 
