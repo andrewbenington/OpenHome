@@ -1,6 +1,8 @@
+import { fail } from 'assert'
 import { existsSync, readFileSync, writeFileSync } from 'fs'
 import { resolve } from 'path'
 import { PokemonData } from 'pokemon-species-data'
+import { beforeAll, describe, expect, test } from 'vitest'
 import { OHPKM } from '../../pkm/OHPKM'
 import { PathData } from '../path'
 import { G3RRSAV } from '../radicalred/G3RRSAV'
