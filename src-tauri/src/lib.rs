@@ -19,6 +19,7 @@ use crate::error::Error;
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_sql::Builder::new().build())
         .plugin(tauri_plugin_fs::init())
         .setup(|app| {
             if let Err(launch_error) = startup::run_app_startup(app) {
