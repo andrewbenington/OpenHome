@@ -8,7 +8,7 @@ export default function BagBox() {
   const [bagState] = useContext(BagContext)
   const items = useMemo(() => Object.entries(bagState.items), [bagState.items])
 
-  const rowsNeeded = Math.max(Math.ceil(items.length / 6) + (items.length % 6 === 0 ? 1 : 0), 6)
+  const rowsNeeded = Math.max(Math.ceil(items.length / 6) + (items.length % 6 === 0 ? 1 : 0), 1)
   const totalSlots = rowsNeeded * 6
 
   return (
@@ -42,7 +42,17 @@ export default function BagBox() {
                     borderRadius: 4,
                   }}
                 >
-                  {entry ? <DraggableItem item={{ name, count }} /> : null}
+                  {entry ? (
+                    <DraggableItem item={{ name, count }} />
+                  ) : (
+                    <img
+                      src="/items/index/0000.png"
+                      alt=""
+                      aria-hidden
+                      draggable={false}
+                      style={{ opacity: 0 }}
+                    />
+                  )}
                 </Flex>
               )
             })}
