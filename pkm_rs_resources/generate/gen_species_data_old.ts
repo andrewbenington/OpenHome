@@ -1,16 +1,4 @@
-import Database from 'better-sqlite3'
-import camelcaseKeys from 'camelcase-keys'
 import * as fs from 'fs'
-import {
-  evolutionsGetByEvo,
-  type EvolutionsGetByEvoRow,
-  evolutionsGetByPrevo,
-  type EvolutionsGetByPrevoRow,
-  formGetByNationalDex,
-  type FormGetByNationalDexRow,
-  speciesGetAll,
-  type SpeciesGetAllRow,
-} from './queries.ts'
 
 const abilityOverrides: Record<number, string> = {
   266: 'AS_ONE_ICE',
@@ -37,16 +25,6 @@ export function rustAbilityConstName(index: number, ability: string): string {
 
 type LevelUpType = 'Slow' | 'Medium Slow' | 'Medium Fast' | 'Fast' | 'Erratic' | 'Fluctuating'
 
-type GenderRatio =
-  | 'Genderless'
-  | 'AllMale'
-  | 'AllFemale'
-  | 'Equal'
-  | 'M1ToF7'
-  | 'M1ToF3'
-  | 'M7ToF1'
-  | 'M3ToF1'
-
 type Species = {
   readonly name: string
   readonly nationalDex: number
@@ -64,7 +42,7 @@ type Forme = {
   readonly isBattleOnly: boolean
   readonly alias: string
   readonly types: readonly string[]
-  readonly genderRatio: GenderRatio
+  readonly genderRatio: { readonly M: number; readonly F: number }
   readonly baseStats: {
     readonly hp: number
     readonly atk: number
@@ -73,9 +51,9 @@ type Forme = {
     readonly spd: number
     readonly spe: number
   }
-  readonly ability1: number
-  readonly ability2?: number
-  readonly abilityH?: number
+  readonly ability1: string
+  readonly ability2?: string
+  readonly abilityH?: string
   readonly height: number
   readonly weight: number
   readonly evos?: readonly SpeciesAndForme[]
@@ -93,26 +71,26 @@ type Forme = {
   readonly spriteIndex: readonly [number, number]
 }
 
-// const ability_names: string[] = fs
-//   .readFileSync('text_source/abilities.txt', 'utf-8')
-//   .split('\n')
-//   .map((val) => val.replaceAll('’', ''))
+const ability_names: string[] = fs
+  .readFileSync('text_source/abilities.txt', 'utf-8')
+  .split('\n')
+  .map((val) => val.replaceAll('’', ''))
 
-// function getAbilityIndex(name: string) {
-//   const constName = rustAbilityConstName(0, name)
-//   if (Object.values(abilityOverrides).includes(constName)) {
-//     const [index] = Object.entries(abilityOverrides).find(
-//       ([idx, abilityName]) => abilityName === constName
-//     )
-//     return parseInt(index)
-//   }
+function getAbilityIndex(name: string) {
+  const constName = rustAbilityConstName(0, name)
+  if (Object.values(abilityOverrides).includes(constName)) {
+    const [index] = Object.entries(abilityOverrides).find(
+      ([idx, abilityName]) => abilityName === constName
+    )
+    return parseInt(index)
+  }
 
-//   const index = ability_names.indexOf(name.replaceAll('’', '').replaceAll("'", ''))
-//   if (index < 1) {
-//     throw new Error(`Ability not found: ${name}`)
-//   }
-//   return index
-// }
+  const index = ability_names.indexOf(name.replaceAll('’', '').replaceAll("'", ''))
+  if (index < 1) {
+    throw new Error(`Ability not found: ${name}`)
+  }
+  return index
+}
 
 export type RegionalForme = 'Alola' | 'Galar' | 'Hisui' | 'Paldea'
 
@@ -244,13 +222,13 @@ function convertForme(natDexIndex: number, forme: Forme): string {
     is_battle_only: ${falseIfUndef(forme.isBattleOnly)},
     is_cosmetic: ${falseIfUndef(forme.cosmeticForme)},
     types: (PkmType::${forme.types[0]}, ${optionalToRust(forme.types[1], pkmTypeToRust)}),
-    gender_ratio: GenderRatio::${forme.genderRatio},
+    gender_ratio: ${genderRatioToRust(forme.genderRatio)},
     base_stats: ${statsToRust(forme.baseStats)},
     abilities: (
-      unsafe { AbilityIndex::new_unchecked(${forme.ability1}) },
-      unsafe { AbilityIndex::new_unchecked(${forme.ability2 ?? forme.ability1}) },
+      unsafe { AbilityIndex::new_unchecked(${getAbilityIndex(forme.ability1)}) },
+      unsafe { AbilityIndex::new_unchecked(${getAbilityIndex(forme.ability2 ?? forme.ability1)}) },
     ),
-    hidden_ability: ${optionalToRust(forme.abilityH, (val: number) => `unsafe { AbilityIndex::new_unchecked(${val}) }`)},
+    hidden_ability: ${optionalToRust(forme.abilityH, (val: string) => `unsafe { AbilityIndex::new_unchecked(${getAbilityIndex(val)}) }`)},
     base_height: ${forme.height}f32,
     base_weight: ${forme.weight}f32,
     evolutions: ${evolutionsToRust(forme.evos)},
@@ -279,100 +257,6 @@ function convertSpecies(species: Species): string {
     level_up_type: ${levelUpTypeToRust(species.levelUpType)},
     formes: &[${species.formes.map((forme) => convertForme(species.nationalDex, forme)).join(',')}]
 }`
-}
-
-function rowToSpecies(row: SpeciesGetAllRow, forms: Forme[]): Species {
-  return {
-    name: row.name,
-    nationalDex: row.nationalDex,
-    levelUpType: row.levelUpType,
-    formes: forms,
-  }
-}
-
-function rowToForm(
-  row: FormGetByNationalDexRow,
-  evos: EvolutionsGetByPrevoRow[],
-  prevo: EvolutionsGetByEvoRow | null
-): Forme {
-  return {
-    name: row.name,
-    formeName: row.displayName,
-    formeNumber: row.formIndex,
-    isBaseForme: row.isBaseForm === 1,
-    isMega: row.isMega === 1,
-    isGMax: row.isGmax === 1,
-    isBattleOnly: row.isBattleOnly === 1,
-    alias: '', // Placeholder
-    types: [row.type1, row.type2].filter(Boolean) as string[],
-    genderRatio: row.genderRatio,
-    baseStats: {
-      hp: row.baseHp,
-      atk: row.baseAttack,
-      def: row.baseDefense,
-      spa: row.baseSpecialAttack,
-      spd: row.baseSpecialDefense,
-      spe: row.baseSpeed,
-    },
-    ability1: row.ability1,
-    ability2: row.ability2 || undefined,
-    abilityH: row.abilityHidden || undefined,
-    height: row.heightDecimeters,
-    weight: row.weightHectograms,
-    evos: evos.map((evo) => ({
-      dexNumber: evo.evoNationalDex,
-      formeNumber: evo.evoFormIndex,
-    })),
-    prevo: prevo
-      ? {
-          dexNumber: prevo.prevoNationalDex,
-          formeNumber: prevo.prevoFormIndex,
-        }
-      : undefined,
-    eggGroups: [row.eggGroup1, row.eggGroup2].filter(Boolean) as string[],
-    gen: row.introducedGen,
-    regional: row.regional || undefined,
-    subLegendary: row.isSublegendary === 1,
-    restrictedLegendary: row.isRestrictedLegendary === 1,
-    ultraBeast: row.isUltraBeast === 1,
-    paradox: row.isParadox === 1,
-    mythical: row.isMythical === 1,
-    cosmeticForme: false, // Placeholder
-    sprite: row.spriteName,
-    spriteIndex: [row.spriteRow, row.spriteCol],
-  }
-}
-
-async function getAllSpeciesAndFormes() {
-  const db = new Database('generate/pkm.db')
-
-  const speciesRows = camelcaseKeys(await speciesGetAll(db))
-  const allSpecies: Species[] = []
-
-  for (const species of speciesRows) {
-    console.log(species)
-    const formeRows = camelcaseKeys(await formGetByNationalDex(db, species.nationalDex))
-    const speciesForms: Forme[] = []
-    for (const formeRow of formeRows) {
-      const evolutions = camelcaseKeys(
-        await evolutionsGetByPrevo(db, {
-          prevoNationalDex: formeRow.nationalDex,
-          prevoFormIndex: formeRow.formIndex,
-        })
-      )
-      const preEvolution = camelcaseKeys(
-        await evolutionsGetByEvo(db, {
-          evoNationalDex: formeRow.nationalDex,
-          evoFormIndex: formeRow.formIndex,
-        })
-      )
-      speciesForms.push(rowToForm(formeRow, evolutions, preEvolution))
-    }
-    const fullSpecies = rowToSpecies(species, speciesForms)
-    allSpecies.push(fullSpecies)
-  }
-
-  return allSpecies
 }
 
 function main() {
@@ -420,8 +304,4 @@ pub fn all_species_data() -> Vec<SpeciesMetadata> {
   console.log(`Rust code written to ${filename}`)
 }
 
-// main()
-
-const allSpecies = await getAllSpeciesAndFormes()
-
-console.log(JSON.stringify(allSpecies[121], null, 2))
+main()

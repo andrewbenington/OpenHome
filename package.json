@@ -48,6 +48,7 @@
     "@tauri-apps/plugin-os": "^2.3.1",
     "@tauri-apps/plugin-shell": "^2.3.1",
     "@tauri-apps/plugin-sql": "^2.3.0",
+    "camelcase-keys": "^10.0.0",
     "chart.js": "^4.5.0",
     "crypto-js": "^4.2.0",
     "dayjs": "^1.11.18",

@@ -2,5 +2,8 @@
   "type": "module",
   "devDependencies": {
     "@types/node": "^24.0.14"
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.4.1"
   }
 }
