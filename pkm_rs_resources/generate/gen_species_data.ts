@@ -93,77 +93,11 @@ type Forme = {
   readonly spriteIndex: readonly [number, number]
 }
 
-// const ability_names: string[] = fs
-//   .readFileSync('text_source/abilities.txt', 'utf-8')
-//   .split('\n')
-//   .map((val) => val.replaceAll('’', ''))
-
-// function getAbilityIndex(name: string) {
-//   const constName = rustAbilityConstName(0, name)
-//   if (Object.values(abilityOverrides).includes(constName)) {
-//     const [index] = Object.entries(abilityOverrides).find(
-//       ([idx, abilityName]) => abilityName === constName
-//     )
-//     return parseInt(index)
-//   }
-
-//   const index = ability_names.indexOf(name.replaceAll('’', '').replaceAll("'", ''))
-//   if (index < 1) {
-//     throw new Error(`Ability not found: ${name}`)
-//   }
-//   return index
-// }
-
 export type RegionalForme = 'Alola' | 'Galar' | 'Hisui' | 'Paldea'
 
 type SpeciesAndForme = {
   readonly dexNumber: number
   readonly formeNumber: number
-}
-
-function rustFormeConstName(forme: Forme): string {
-  const formeName =
-    forme.formeName === forme.name && forme.isBaseForme
-      ? forme.formeName + '-base'
-      : forme.formeName
-  let constName = formeName
-    .toUpperCase()
-    .replace(/[^A-Z0-9\s-]/g, '')
-    .replace(/[^A-Z0-9]/g, '_')
-    .replace(/_+/g, '_')
-
-  return constName
-}
-
-function rustSpeciesConstName(species: Species): string {
-  let constName = species.name
-    .toUpperCase()
-    .replace(/[^A-Z0-9\s]/g, '')
-    .replace(/[^A-Z0-9]/g, '_')
-    .replace(/_+/g, '_')
-
-  return constName
-}
-
-function genderRatioToRust(gr: { readonly M: number; readonly F: number }): string {
-  switch (gr.M) {
-    case 0.0:
-      return gr.F === 0 ? 'GenderRatio::Genderless' : 'GenderRatio::AllFemale'
-    case 0.125:
-      return 'GenderRatio::M1ToF7'
-    case 0.25:
-      return 'GenderRatio::M1ToF3'
-    case 0.5:
-      return 'GenderRatio::Equal'
-    case 0.75:
-      return 'GenderRatio::M3ToF1'
-    case 0.875:
-      return 'GenderRatio::M7ToF1'
-    case 1:
-      return 'GenderRatio::AllMale'
-    default:
-      throw new Error(`UNKNOWN GENDER RATIO: ${JSON.stringify(gr)}`)
-  }
 }
 
 function statsToRust(stats: {
@@ -183,13 +117,6 @@ function speciesAndFormeToRust(ref: SpeciesAndForme): string {
 
 function evolutionsToRust(evos?: readonly SpeciesAndForme[]): string {
   return `&[${(evos ?? []).map(speciesAndFormeToRust).join(',')}]`
-}
-
-function map<T, S>(input: T | null | undefined, f: (T) => S): S | null | undefined {
-  if (input === undefined) return undefined
-  if (input === null) return null
-
-  return f(input)
 }
 
 function optionalToRust<T, S>(value: T | null | undefined, tranformer?: (T) => S): string {
@@ -218,16 +145,6 @@ function regionToRust(reg: string): string {
   return `Region::${reg[0].toUpperCase()}${reg.slice(1)}`
 }
 
-function abilityConstName(forme: Forme, ability: string) {
-  if (ability === 'As One') {
-    return rustAbilityConstName(forme.formeName.includes('Ice-Rider') ? 266 : 267, 'As One')
-  }
-  if (ability === 'Embody Aspect') {
-    return rustAbilityConstName(301 + forme.formeNumber, 'Embody Aspect')
-  }
-  return rustAbilityConstName(0, ability)
-}
-
 function falseIfUndef(input?: boolean): boolean {
   return input === true
 }
@@ -251,8 +168,8 @@ function convertForme(natDexIndex: number, forme: Forme): string {
       unsafe { AbilityIndex::new_unchecked(${forme.ability2 ?? forme.ability1}) },
     ),
     hidden_ability: ${optionalToRust(forme.abilityH, (val: number) => `unsafe { AbilityIndex::new_unchecked(${val}) }`)},
-    base_height: ${forme.height}f32,
-    base_weight: ${forme.weight}f32,
+    base_height: ${forme.height},
+    base_weight: ${forme.weight},
     evolutions: ${evolutionsToRust(forme.evos)},
     pre_evolution: ${optionalToRust(forme.prevo, speciesAndFormeToRust)},
     egg_groups: (${eggGroupToRust(forme.eggGroups[0])}, ${optionalToRust(forme.eggGroups[1], eggGroupToRust)}),
@@ -375,10 +292,8 @@ async function getAllSpeciesAndFormes() {
   return allSpecies
 }
 
-function main() {
-  const speciesJson: Record<string, Species> = JSON.parse(
-    fs.readFileSync('text_source/species.json', 'utf-8')
-  )
+async function main() {
+  const allSpecies: Species[] = await getAllSpeciesAndFormes()
 
   let output = `
 use crate::abilities::AbilityIndex;
@@ -391,7 +306,7 @@ use pkm_rs_types::{Generation, PkmType, Region, Stats16Le};
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
-pub const NATIONAL_DEX_MAX: usize = ${Object.keys(speciesJson).length};
+pub const NATIONAL_DEX_MAX: usize = ${allSpecies.length};
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 pub fn all_species_data() -> Vec<SpeciesMetadata> {
@@ -400,19 +315,9 @@ pub fn all_species_data() -> Vec<SpeciesMetadata> {
 
   `
 
-  // const allFormes = Object.values(speciesJson).map(species => species.formes.map(forme => [species.nationalDex, forme])).flat() as [number, Forme][]
-
-  // output += allFormes
-  //   .map(([nationalDex, forme]) => convertForme(nationalDex, forme))
-  //   .join("\n\n");
-
-  // output += Object.values(speciesJson)
-  //   .map(convertSpecies)
-  //   .join("\n\n");
-
   output +=
     `pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [\n` +
-    Object.values(speciesJson).map(convertSpecies).join(',\n') +
+    allSpecies.map(convertSpecies).join(',\n') +
     '];'
 
   const filename = 'src/species/metadata.rs'
@@ -420,8 +325,4 @@ pub fn all_species_data() -> Vec<SpeciesMetadata> {
   console.log(`Rust code written to ${filename}`)
 }
 
-// main()
-
-const allSpecies = await getAllSpeciesAndFormes()
-
-console.log(JSON.stringify(allSpecies[121], null, 2))
+await main()

@@ -326,10 +326,10 @@ pub struct FormeMetadata {
     pub hidden_ability: Option<AbilityIndex>,
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = baseHeight))]
-    pub base_height: f32,
+    pub base_height: u32,
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = baseWeight))]
-    pub base_weight: f32,
+    pub base_weight: u32,
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub evolutions: &'static [SpeciesAndForme],
