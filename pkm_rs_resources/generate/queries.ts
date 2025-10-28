@@ -127,3 +127,23 @@ export async function evolutionsGetByEvo(
   }
   return result as EvolutionsGetByEvoRow
 }
+
+export const moveGetAllQuery = `-- name: MoveGetAll :many
+SELECT id, name, accuracy, move_class, generation, power, base_pp, type FROM move`
+
+export interface MoveGetAllRow {
+  id: number
+  name: any
+  accuracy: number | null
+  moveClass: any
+  generation: any
+  power: number | null
+  basePp: number
+  type: any
+}
+
+export async function moveGetAll(database: Database): Promise<MoveGetAllRow[]> {
+  const stmt = database.prepare(moveGetAllQuery)
+  const result = await stmt.all()
+  return result as MoveGetAllRow[]
+}

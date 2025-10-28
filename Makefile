@@ -74,6 +74,7 @@ gen-wasm:
 # 	@node generate/gen_moves.ts
 # 	@cd pkm_rs_resources && node generate/gen_abilities.ts
 # 	@cd pkm_rs_resources && node generate/gen_species_data.ts
+	@cd pkm_rs_resources && ts-node generate/gen_moves.ts
 	@cd pkm_rs_resources && ts-node generate/gen_species_data.ts
 	
 generate/out/syncPKHexResources.js: generate/syncPKHexResources.ts
