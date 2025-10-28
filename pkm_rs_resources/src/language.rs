@@ -23,6 +23,7 @@ pub enum Language {
     Korean,
     ChineseSimplified,
     ChineseTraditional,
+    SpanishLatinAmerica,
 }
 
 impl Language {
@@ -31,14 +32,15 @@ impl Language {
             Language::None => "NONE",
             Language::Japanese => "JPN",
             Language::English => "ENG",
-            Language::French => "FRE",
-            Language::Italian => "ITL",
-            Language::German => "GER",
+            Language::French => "FRA",
+            Language::Italian => "ITA",
+            Language::German => "DEU",
             Language::UNUSED => "--",
-            Language::SpanishSpain => "SPN",
+            Language::SpanishSpain => "ES-ES",
             Language::Korean => "KOR",
             Language::ChineseSimplified => "CHS",
             Language::ChineseTraditional => "CHT",
+            Language::SpanishLatinAmerica => "ES-LA",
         }
     }
 

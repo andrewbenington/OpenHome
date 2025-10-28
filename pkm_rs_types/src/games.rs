@@ -65,6 +65,7 @@ pub enum OriginGame {
     ShiningPearl,
     Scarlet,
     Violet,
+    LegendsZa,
 }
 
 impl OriginGame {
@@ -107,11 +108,12 @@ impl OriginGame {
             Self::Sword => "Sword",
             Self::Shield => "Shield",
             Self::Home => "Home",
-            Self::LegendsArceus => "Legends Arceus",
+            Self::LegendsArceus => "Legends: Arceus",
             Self::BrilliantDiamond => "Brilliant Diamond",
             Self::ShiningPearl => "Shining Pearl",
             Self::Scarlet => "Scarlet",
             Self::Violet => "Violet",
+            Self::LegendsZa => "Legends: Z-A",
             Self::Invalid0 => "Invalid (0)",
             Self::Invalid6 => "Invalid (6)",
             Self::Invalid9 => "Invalid (9)",
@@ -154,7 +156,7 @@ impl OriginGame {
             | Self::LegendsArceus
             | Self::BrilliantDiamond
             | Self::ShiningPearl => Generation::G8,
-            Self::Scarlet | Self::Violet => Generation::G9,
+            Self::Scarlet | Self::Violet | Self::LegendsZa => Generation::G9,
             Self::Go | Self::Home => Generation::None,
             _ => Generation::None,
         }
@@ -183,7 +185,7 @@ impl OriginGame {
             | Self::BrilliantDiamond
             | Self::ShiningPearl => Some(Region::Sinnoh),
             Self::Black | Self::White | Self::Black2 | Self::White2 => Some(Region::Unova),
-            Self::X | Self::Y => Some(Region::Kalos),
+            Self::X | Self::Y | Self::LegendsZa => Some(Region::Kalos),
             Self::Sun | Self::Moon | Self::UltraSun | Self::UltraMoon => Some(Region::Alola),
             Self::Sword | Self::Shield => Some(Region::Galar),
             Self::LegendsArceus => Some(Region::Hisui),
@@ -218,6 +220,7 @@ impl OriginGame {
             Self::LegendsArceus => Some(OriginMark::Hisui),
             Self::BrilliantDiamond | Self::ShiningPearl => Some(OriginMark::Bdsp),
             Self::Scarlet | Self::Violet => Some(OriginMark::Tera),
+            Self::LegendsZa => Some(OriginMark::Mega),
             Self::Go => Some(OriginMark::Go),
             _ => None,
         }
@@ -267,6 +270,7 @@ impl OriginGame {
             Self::ShiningPearl => Some("ShiningPearl".to_owned()),
             Self::Scarlet => Some("Scarlet".to_owned()),
             Self::Violet => Some("Violet".to_owned()),
+            Self::LegendsZa => Some("LegendsZa".to_owned()),
             _ => None,
         }
     }
@@ -315,11 +319,12 @@ impl OriginGame {
             Self::ShiningPearl => "#DA7D99",
             Self::Scarlet => "#F34134",
             Self::Violet => "#8334B7",
+            Self::LegendsZa => "#31CA56",
             _ => "#666666",
         }
     }
 
-    pub const fn all_valid() -> [OriginGame; 40] {
+    pub const fn all_valid() -> [OriginGame; 41] {
         [
             Self::Sapphire,
             Self::Ruby,
@@ -361,6 +366,7 @@ impl OriginGame {
             Self::ShiningPearl,
             Self::Scarlet,
             Self::Violet,
+            Self::LegendsZa,
         ]
     }
 
@@ -440,6 +446,7 @@ impl From<u8> for OriginGame {
             49 => OriginGame::ShiningPearl,
             50 => OriginGame::Scarlet,
             51 => OriginGame::Violet,
+            52 => OriginGame::LegendsZa,
             _ => OriginGame::Invalid0,
         }
     }
@@ -636,21 +643,23 @@ pub enum OriginMark {
     Hisui,
     Bdsp,
     Tera,
+    Mega,
     Go,
 }
 
 impl std::fmt::Display for OriginMark {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let s = match self {
-            OriginMark::GameBoy => "GameBoy",
-            OriginMark::Pentagon => "Pentagon",
-            OriginMark::Alola => "Alola",
-            OriginMark::LetsGo => "LetsGo",
-            OriginMark::Galar => "Galar",
-            OriginMark::Hisui => "Hisui",
-            OriginMark::Bdsp => "Bdsp",
-            OriginMark::Tera => "Tera",
-            OriginMark::Go => "Go",
+            Self::GameBoy => "GameBoy",
+            Self::Pentagon => "Pentagon",
+            Self::Alola => "Alola",
+            Self::LetsGo => "LetsGo",
+            Self::Galar => "Galar",
+            Self::Hisui => "Hisui",
+            Self::Bdsp => "Bdsp",
+            Self::Tera => "Tera",
+            Self::Mega => "Mega",
+            Self::Go => "Go",
         };
         write!(f, "{s}")
     }
