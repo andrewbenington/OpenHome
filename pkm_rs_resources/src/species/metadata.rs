@@ -37602,7 +37602,7 @@ SpeciesMetadata {
     is_paradox: false,
     regional: None,
     sprite: "zygarde-50",
-    sprite_index: (33,26),
+    sprite_index: (34,26),
 },FormeMetadata {
     species_name: "Zygarde-Complete",
     national_dex: unsafe { NatDexIndex::new_unchecked(718) },
