@@ -145,7 +145,7 @@ function levelUpTypeToRust(lut: string): string {
 }
 
 function regionToRust(reg: string): string {
-  return `Region::${reg[0].toUpperCase()}${reg.slice(1)}`
+  return `GameSetting::${reg[0].toUpperCase()}${reg.slice(1)}`
 }
 
 function falseIfUndef(input?: boolean): boolean {
@@ -192,16 +192,6 @@ function convertForme(natDexIndex: number, forme: Forme): string {
     sprite: "${forme.sprite}",
     sprite_index: (${forme.spriteIndex}),
 }`
-}
-
-function convertMegaEvolution(metadata: MegaEvolutionGetByBaseFormRow): string {
-  return `MegaEvolutionMegadata {
-    mega_form: 
-}`
-}
-
-function prependStaticRef(input: string) {
-  return `&${input}`
 }
 
 function convertSpecies(species: Species): string {
@@ -324,7 +314,7 @@ use crate::species::{
     EggGroup, FormeMetadata, GenderRatio, LevelUpType, MegaEvolutionMetadata, NatDexIndex, SpeciesAndForme,
     SpeciesMetadata,
 };
-use pkm_rs_types::{Generation, PkmType, Region, Stats16Le};
+use pkm_rs_types::{Generation, PkmType, GameSetting, Stats16Le};
 
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;

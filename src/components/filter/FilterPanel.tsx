@@ -3,12 +3,15 @@ import {
   Generation,
   getAllAbilities,
   getAllBalls,
+  getAllItems,
+  ItemIndex,
+  ItemMetadata,
   OriginGame,
   OriginGames,
   OriginGameWithData,
   SpeciesLookup,
 } from '@pkm-rs-resources/pkg'
-import { Item, ItemToString, Types } from '@pokemon-resources/index'
+import { Types } from '@pokemon-resources/index'
 import { Button, Card, Flex, Text } from '@radix-ui/themes'
 import { useContext, useMemo } from 'react'
 import { OpenHomeRibbons } from 'src/consts/Ribbons'
@@ -53,34 +56,19 @@ function getOriginIcon(origin: OriginGameWithData) {
   ) : undefined
 }
 
-// TypeScript enums are difficult to work with...
-const heldItems: SelectOption[] = Object.keys(Item)
-  .filter((indexStr) => !isNaN(Number(indexStr)))
-  .map((indexStr) => ({
-    label: ItemToString(parseInt(indexStr)),
-    id: parseInt(indexStr),
-  }))
+function itemMetadataToSelectOption(metadata: ItemMetadata): SelectOption {
+  return {
+    label: metadata.name,
+    id: metadata.id,
+  }
+}
 
-const itemOptions: ItemOption[] = [
-  {
-    type: 'specific_item',
-    id: 0,
-    label: 'No Item',
-  },
-  {
-    type: 'any',
-    label: 'Any Item',
-  },
-  {
-    type: 'mega_stone',
-    label: 'Mega Stone',
-  },
-  {
-    type: 'z_crystal',
-    label: 'Z Crystal',
-  },
-  ...heldItems.slice(1).map((item) => ({ type: 'specific_item', ...item }) as ItemOption),
-]
+function itemIndexToSelectOption(index: number): SelectOption {
+  const parsed = ItemIndex.fromIndex(index)
+  if (!parsed) return { id: index, label: '' }
+
+  return itemMetadataToSelectOption(parsed.getMetadata())
+}
 
 export default function FilterPanel() {
   const [filterState, dispatchFilterState] = useContext(FilterContext)
@@ -96,6 +84,29 @@ export default function FilterPanel() {
     label: name,
     id: index,
   }))
+
+  const ALL_ITEMS: SelectOption[] = getAllItems().map(itemMetadataToSelectOption)
+
+  const itemOptions: ItemOption[] = [
+    {
+      type: 'specific_item',
+      id: 0,
+      label: 'No Item',
+    },
+    {
+      type: 'any',
+      label: 'Any Item',
+    },
+    {
+      type: 'mega_stone',
+      label: 'Mega Stone',
+    },
+    {
+      type: 'z_crystal',
+      label: 'Z Crystal',
+    },
+    ...ALL_ITEMS.map((item) => ({ type: 'specific_item', ...item }) as ItemOption),
+  ]
 
   const currentMon = useMemo(
     () => (filterState.dexNumber ? SpeciesLookup(filterState.dexNumber) : undefined),
@@ -167,10 +178,15 @@ export default function FilterPanel() {
         <Autocomplete
           options={itemOptions}
           getOptionString={(opt) => opt.label}
-          getOptionUniqueID={(opt) => (opt.type === 'specific_item' ? opt.id.toString() : opt.type)}
+          getOptionUniqueID={(opt) =>
+            opt.type === 'specific_item' && opt.id ? opt.id.toString() : opt.type
+          }
           value={
             typeof filterState.heldItem === 'number'
-              ? { type: 'specific_item', ...heldItems[filterState.heldItem] }
+              ? {
+                  type: 'specific_item',
+                  ...itemIndexToSelectOption(filterState.heldItem),
+                }
               : filterState.heldItem !== undefined
                 ? itemOptions.find(
                     (opt) => opt.type !== 'specific_item' && opt.type === filterState.heldItem

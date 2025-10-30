@@ -177,3 +177,20 @@ export async function megaEvolutionGetByBaseForm(
   const result = await stmt.all({ p1: args.nationalDex, p2: args.baseFormIndex })
   return result as MegaEvolutionGetByBaseFormRow[]
 }
+
+export const itemGetAllQuery = `-- name: ItemGetAll :many
+SELECT
+  id, name
+FROM
+  item`
+
+export interface ItemGetAllRow {
+  id: number
+  name: any
+}
+
+export async function itemGetAll(database: Database): Promise<ItemGetAllRow[]> {
+  const stmt = database.prepare(itemGetAllQuery)
+  const result = await stmt.all()
+  return result as ItemGetAllRow[]
+}
