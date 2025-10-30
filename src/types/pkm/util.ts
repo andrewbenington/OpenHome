@@ -195,7 +195,11 @@ export const generatePersonalityValue = () => {
 // recursively returns prevo
 export const getBaseMon = (dexNum: number, forme?: number) => {
   let mon = SpeciesAndForme.tryNew(dexNum, forme ?? 0)
-  let prevo = mon?.getMetadata()?.preEvolution
+  let metadata = mon?.getMetadata()
+  if (metadata?.isMega) {
+    metadata = SpeciesAndForme.tryNew(dexNum, 0)?.getMetadata()
+  }
+  let prevo = metadata?.preEvolution
 
   while (prevo) {
     mon = prevo

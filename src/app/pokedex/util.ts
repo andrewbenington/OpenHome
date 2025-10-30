@@ -44,7 +44,7 @@ export function getPokedexSummary(species: SpeciesMetadata, forme: FormeMetadata
     forme.formeIndex === 0
       ? getBaseFormeDescriptor(species)
       : forme.isMega
-        ? 'mega-evolution'
+        ? 'Mega Evolution'
         : 'forme'
   let text = `${name} is a ${types} ${formeType} introduced in Generation ${forme.introducedGen}.`
 

@@ -147,3 +147,33 @@ export async function moveGetAll(database: Database): Promise<MoveGetAllRow[]> {
   const result = await stmt.all()
   return result as MoveGetAllRow[]
 }
+
+export const megaEvolutionGetByBaseFormQuery = `-- name: MegaEvolutionGetByBaseForm :many
+SELECT
+  national_dex, form_index, base_form_index, mega_stone_id
+FROM
+  mega_evolution
+WHERE
+  national_dex = :p1
+  AND base_form_index = :p2`
+
+export interface MegaEvolutionGetByBaseFormArgs {
+  nationalDex: number
+  baseFormIndex: number
+}
+
+export interface MegaEvolutionGetByBaseFormRow {
+  nationalDex: number
+  formIndex: number
+  baseFormIndex: number
+  megaStoneId: number | null
+}
+
+export async function megaEvolutionGetByBaseForm(
+  database: Database,
+  args: MegaEvolutionGetByBaseFormArgs
+): Promise<MegaEvolutionGetByBaseFormRow[]> {
+  const stmt = database.prepare(megaEvolutionGetByBaseFormQuery)
+  const result = await stmt.all({ p1: args.nationalDex, p2: args.baseFormIndex })
+  return result as MegaEvolutionGetByBaseFormRow[]
+}

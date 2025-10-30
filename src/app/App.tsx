@@ -13,7 +13,6 @@ import { loadPlugin } from 'src/util/Plugin'
 import { BackendProvider } from '../backend/backendProvider'
 import useIsDarkMode from '../hooks/dark-mode'
 import { AppInfoContext, appInfoInitialState, appInfoReducer, Settings } from '../state/appInfo'
-import { useDatabase } from '../state/database'
 import { DragMonContext, dragMonReducer } from '../state/dragMon'
 import { ErrorContext, errorReducer } from '../state/error'
 import { FilterContext, filterReducer } from '../state/filter'
@@ -33,7 +32,6 @@ const debouncedUpdateSettings = debounce((backend: BackendInterface, settings: S
 export default function App() {
   const isDarkMode = useIsDarkMode()
   const [errorState, errorDispatch] = useReducer(errorReducer, {})
-  useDatabase()
 
   return (
     <Theme accentColor="red" hasBackground appearance={isDarkMode ? 'dark' : 'light'}>

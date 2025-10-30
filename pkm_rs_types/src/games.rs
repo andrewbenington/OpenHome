@@ -162,7 +162,7 @@ impl OriginGame {
         }
     }
 
-    pub const fn region(&self) -> Option<Region> {
+    pub const fn region(&self) -> Option<GameSetting> {
         match *self {
             Self::Red
             | Self::BlueGreen
@@ -171,26 +171,28 @@ impl OriginGame {
             | Self::FireRed
             | Self::LeafGreen
             | Self::LetsGoPikachu
-            | Self::LetsGoEevee => Some(Region::Kanto),
+            | Self::LetsGoEevee => Some(GameSetting::Kanto),
             Self::Gold | Self::Silver | Self::Crystal | Self::HeartGold | Self::SoulSilver => {
-                Some(Region::Johto)
+                Some(GameSetting::Johto)
             }
             Self::Ruby | Self::Sapphire | Self::Emerald | Self::OmegaRuby | Self::AlphaSapphire => {
-                Some(Region::Hoenn)
+                Some(GameSetting::Hoenn)
             }
-            Self::ColosseumXd => Some(Region::Orre),
+            Self::ColosseumXd => Some(GameSetting::Orre),
             Self::Diamond
             | Self::Pearl
             | Self::Platinum
             | Self::BrilliantDiamond
-            | Self::ShiningPearl => Some(Region::Sinnoh),
-            Self::Black | Self::White | Self::Black2 | Self::White2 => Some(Region::Unova),
-            Self::X | Self::Y | Self::LegendsZa => Some(Region::Kalos),
-            Self::Sun | Self::Moon | Self::UltraSun | Self::UltraMoon => Some(Region::Alola),
-            Self::Sword | Self::Shield => Some(Region::Galar),
-            Self::LegendsArceus => Some(Region::Hisui),
-            Self::Scarlet | Self::Violet => Some(Region::Paldea),
-            Self::BattleRevolution | Self::Go | Self::Home => None,
+            | Self::ShiningPearl => Some(GameSetting::Sinnoh),
+            Self::Black | Self::White | Self::Black2 | Self::White2 => Some(GameSetting::Unova),
+            Self::X | Self::Y => Some(GameSetting::Kalos),
+            Self::Sun | Self::Moon | Self::UltraSun | Self::UltraMoon => Some(GameSetting::Alola),
+            Self::Sword | Self::Shield => Some(GameSetting::Galar),
+            Self::LegendsArceus => Some(GameSetting::Hisui),
+            Self::Scarlet | Self::Violet => Some(GameSetting::Paldea),
+            Self::LegendsZa => Some(GameSetting::Lumiose),
+            Self::Go => Some(GameSetting::PokemonGo),
+            Self::BattleRevolution | Self::Home => None,
             _ => None,
         }
     }
@@ -468,7 +470,7 @@ impl OriginGames {
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen)]
-    pub fn region(value: u8) -> Option<Region> {
+    pub fn region(value: u8) -> Option<GameSetting> {
         OriginGame::from(value).region()
     }
 
@@ -572,7 +574,7 @@ pub enum Generation {
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Debug, EnumString, Display, Serialize, Clone, Copy, PartialEq, Eq)]
-pub enum Region {
+pub enum GameSetting {
     Kanto,
     Johto,
     Hoenn,
@@ -583,8 +585,10 @@ pub enum Region {
     Galar,
     Hisui,
     Paldea,
+    Lumiose,
 
     Orre,
+    PokemonGo,
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]

@@ -1,8 +1,8 @@
-import { MetadataLookup, SpeciesAndForme, SpeciesLookup } from '@pkm-rs-resources/pkg'
+import { MetadataLookup, SpeciesAndForme } from '@pkm-rs-resources/pkg'
 import { Flex } from '@radix-ui/themes'
 import { Responsive } from '@radix-ui/themes/props'
 import { ArrowLeftIcon, ArrowLeftRightIcon, ArrowRightIcon } from 'src/components/Icons'
-import { BLOOD_MOON } from 'src/consts/Formes'
+import { BLOOD_MOON, ETERNAL_FLOWER } from 'src/consts/Formes'
 import { NationalDex } from 'src/consts/NationalDex'
 import { getBaseMon } from 'src/types/pkm/util'
 import { Pokedex } from 'src/types/pokedex'
@@ -29,8 +29,10 @@ export default function EvolutionFamily({
   if (nationalDex === NationalDex.Ursaluna) {
     // Include Teddiursa line for Ursaluna Bloodmoon
     baseMon = SpeciesAndForme.tryNew(NationalDex.Teddiursa, 0)
+  } else if (nationalDex === NationalDex.Floette) {
+    // Include Flabébé line for Floette Eternal Flower
+    baseMon = SpeciesAndForme.tryNew(NationalDex.Flabebe, 0)
   }
-
   if (!baseMon) return <div />
 
   const baseMonFormes = baseMon.getSpeciesMetadata().formes
@@ -38,7 +40,7 @@ export default function EvolutionFamily({
   return (
     <Flex
       direction="column"
-      gap="4"
+      gap="3"
       height={height}
       justify="center"
       align="center"
@@ -55,13 +57,22 @@ export default function EvolutionFamily({
             onClick={onClick}
           />
         ))}
+      {/* Workaround for evo lines where one forme have a prevo and another doesn't, currently only
+      Ursaluna and Floette */}
       {baseMon.nationalDex === NationalDex.Teddiursa && (
-        // Workaround for evo lines where one forme have a prevo and another doesn't, currently
-        // only Ursaluna
         <EvolutionLine
           nationalDex={NationalDex.Ursaluna}
           formeNumber={BLOOD_MOON}
           key="ursaluna-bloodmoon"
+          pokedex={pokedex}
+          onClick={onClick}
+        />
+      )}
+      {baseMon.nationalDex === NationalDex.Flabebe && (
+        <EvolutionLine
+          nationalDex={NationalDex.Floette}
+          formeNumber={ETERNAL_FLOWER}
+          key="floette-eternal-flower"
           pokedex={pokedex}
           onClick={onClick}
         />
@@ -73,7 +84,7 @@ export default function EvolutionFamily({
 function EvolutionLine({ nationalDex, formeNumber, pokedex, onClick }: EvolutionFamilyProps) {
   const formeMetadata = MetadataLookup(nationalDex, formeNumber)
   const evolutions = formeMetadata?.evolutions ?? []
-  const megaFormes = SpeciesLookup(nationalDex)?.formes.filter((f) => f.isMega) ?? []
+  const megaFormes = formeMetadata?.megaEvolutions ?? []
 
   if (evolutions.length === 8) {
     return (
@@ -137,7 +148,7 @@ function EvolutionLine({ nationalDex, formeNumber, pokedex, onClick }: Evolution
       {!MetadataLookup(nationalDex, formeNumber)?.regional && megaFormes.length > 0 && (
         <Flex direction="column" gap="2">
           {megaFormes.map((mega, i) => (
-            <Flex key={`${nationalDex}-${mega.formeIndex}`} align="center" gap="2">
+            <Flex key={`${nationalDex}-${mega.mega_forme.formeIndex}`} align="center" gap="2">
               <ArrowLeftRightIcon
                 style={{
                   rotate: `${((megaFormes.length - 1) / 2 - i) * -36}deg`,
@@ -147,9 +158,11 @@ function EvolutionLine({ nationalDex, formeNumber, pokedex, onClick }: Evolution
               />
               <TooltipPokemonIcon
                 dexNumber={nationalDex}
-                formeNumber={mega.formeIndex}
+                formeNumber={mega.mega_forme.formeIndex}
                 silhouette={
-                  !getFormeStatus(pokedex, nationalDex, mega.formeIndex)?.includes('Caught')
+                  !getFormeStatus(pokedex, nationalDex, mega.mega_forme.formeIndex)?.includes(
+                    'Caught'
+                  )
                 }
               />
             </Flex>

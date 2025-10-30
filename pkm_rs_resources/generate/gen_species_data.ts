@@ -8,6 +8,8 @@ import {
   type EvolutionsGetByPrevoRow,
   formGetByNationalDex,
   type FormGetByNationalDexRow,
+  megaEvolutionGetByBaseForm,
+  type MegaEvolutionGetByBaseFormRow,
   speciesGetAll,
   type SpeciesGetAllRow,
 } from './queries.ts'
@@ -60,6 +62,7 @@ type Forme = {
   readonly formeNumber: number
   readonly isBaseForme: boolean
   readonly isMega: boolean
+  readonly megaEvolutionData: MegaEvolutionGetByBaseFormRow[]
   readonly isGMax: boolean
   readonly isBattleOnly: boolean
   readonly alias: string
@@ -96,8 +99,8 @@ type Forme = {
 export type RegionalForme = 'Alola' | 'Galar' | 'Hisui' | 'Paldea'
 
 type SpeciesAndForme = {
-  readonly dexNumber: number
-  readonly formeNumber: number
+  readonly nationalDex: number
+  readonly formIndex: number
 }
 
 function statsToRust(stats: {
@@ -112,7 +115,7 @@ function statsToRust(stats: {
 }
 
 function speciesAndFormeToRust(ref: SpeciesAndForme): string {
-  return `unsafe { SpeciesAndForme::new_unchecked(${ref.dexNumber}, ${ref.formeNumber}) }`
+  return `unsafe { SpeciesAndForme::new_unchecked(${ref.nationalDex}, ${ref.formIndex}) }`
 }
 
 function evolutionsToRust(evos?: readonly SpeciesAndForme[]): string {
@@ -157,6 +160,12 @@ function convertForme(natDexIndex: number, forme: Forme): string {
     forme_index: ${forme.formeNumber},
     is_base_forme: ${forme.isBaseForme},
     is_mega: ${falseIfUndef(forme.isMega)},
+    mega_evolution_data: &[${forme.megaEvolutionData
+      .map(
+        (megaForm) =>
+          `MegaEvolutionMetadata { mega_forme: ${speciesAndFormeToRust(megaForm)}, required_item_id: ${optionalToRust(megaForm.megaStoneId)} }`
+      )
+      .join(',')}],
     is_gmax: ${falseIfUndef(forme.isGMax)},
     is_battle_only: ${falseIfUndef(forme.isBattleOnly)},
     is_cosmetic: ${falseIfUndef(forme.cosmeticForme)},
@@ -185,6 +194,12 @@ function convertForme(natDexIndex: number, forme: Forme): string {
 }`
 }
 
+function convertMegaEvolution(metadata: MegaEvolutionGetByBaseFormRow): string {
+  return `MegaEvolutionMegadata {
+    mega_form: 
+}`
+}
+
 function prependStaticRef(input: string) {
   return `&${input}`
 }
@@ -210,7 +225,8 @@ function rowToSpecies(row: SpeciesGetAllRow, forms: Forme[]): Species {
 function rowToForm(
   row: FormGetByNationalDexRow,
   evos: EvolutionsGetByPrevoRow[],
-  prevo: EvolutionsGetByEvoRow | null
+  prevo: EvolutionsGetByEvoRow | null,
+  megas: MegaEvolutionGetByBaseFormRow[]
 ): Forme {
   return {
     name: row.name,
@@ -218,6 +234,7 @@ function rowToForm(
     formeNumber: row.formIndex,
     isBaseForme: row.isBaseForm === 1,
     isMega: row.isMega === 1,
+    megaEvolutionData: megas,
     isGMax: row.isGmax === 1,
     isBattleOnly: row.isBattleOnly === 1,
     alias: '', // Placeholder
@@ -237,13 +254,13 @@ function rowToForm(
     height: row.heightDecimeters,
     weight: row.weightHectograms,
     evos: evos.map((evo) => ({
-      dexNumber: evo.evoNationalDex,
-      formeNumber: evo.evoFormIndex,
+      nationalDex: evo.evoNationalDex,
+      formIndex: evo.evoFormIndex,
     })),
     prevo: prevo
       ? {
-          dexNumber: prevo.prevoNationalDex,
-          formeNumber: prevo.prevoFormIndex,
+          nationalDex: prevo.prevoNationalDex,
+          formIndex: prevo.prevoFormIndex,
         }
       : undefined,
     eggGroups: [row.eggGroup1, row.eggGroup2].filter(Boolean) as string[],
@@ -283,7 +300,13 @@ async function getAllSpeciesAndFormes() {
           evoFormIndex: formeRow.formIndex,
         })
       )
-      speciesForms.push(rowToForm(formeRow, evolutions, preEvolution))
+      const megas = camelcaseKeys(
+        await megaEvolutionGetByBaseForm(db, {
+          nationalDex: formeRow.nationalDex,
+          baseFormIndex: formeRow.formIndex,
+        })
+      )
+      speciesForms.push(rowToForm(formeRow, evolutions, preEvolution, megas))
     }
     const fullSpecies = rowToSpecies(species, speciesForms)
     allSpecies.push(fullSpecies)
@@ -298,7 +321,7 @@ async function main() {
   let output = `
 use crate::abilities::AbilityIndex;
 use crate::species::{
-    EggGroup, FormeMetadata, GenderRatio, LevelUpType, NatDexIndex, SpeciesAndForme,
+    EggGroup, FormeMetadata, GenderRatio, LevelUpType, MegaEvolutionMetadata, NatDexIndex, SpeciesAndForme,
     SpeciesMetadata,
 };
 use pkm_rs_types::{Generation, PkmType, Region, Stats16Le};
@@ -312,6 +335,7 @@ pub const NATIONAL_DEX_MAX: usize = ${allSpecies.length};
 pub fn all_species_data() -> Vec<SpeciesMetadata> {
     ALL_SPECIES.clone().into_iter().collect()
 }
+
 
   `
 
