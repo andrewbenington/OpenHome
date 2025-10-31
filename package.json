@@ -61,25 +61,25 @@
     "uuid": "^13.0.0"
   },
   "devDependencies": {
-    "@stylistic/eslint-plugin": "^5.4.0",
-    "@tauri-apps/cli": "^2.8.4",
+    "@stylistic/eslint-plugin": "^5.5.0",
+    "@tauri-apps/cli": "^2.9.2",
     "@types/crypto-js": "^4.2.2",
     "@types/lodash": "^4.17.20",
-    "@types/react": "^19.1.15",
-    "@types/react-dom": "^19.2.0",
-    "@typescript-eslint/eslint-plugin": "^8.45.0",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
+    "@typescript-eslint/eslint-plugin": "^8.46.2",
     "@typescript-eslint/parser": "^8.44.1",
-    "@vitejs/plugin-react": "^5.0.4",
-    "eslint": "^9.37.0",
+    "@vitejs/plugin-react": "^5.1.0",
+    "eslint": "^9.38.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
     "eslint-plugin-react": "^7.37.5",
-    "eslint-plugin-react-hooks": "^6.1.1",
-    "eslint-plugin-react-refresh": "^0.4.23",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-refresh": "^0.4.24",
     "prettier": "^3.6.2",
     "react-dom": "^19.2.0",
     "typescript": "^5.9.3",
-    "vite": "^7.1.9",
-    "vitest": "^3.2.4"
+    "vite": "^7.1.12",
+    "vitest": "^4.0.6"
   }
 }
