@@ -141,7 +141,7 @@ function EvolutionLine({ nationalDex, formeNumber, pokedex, onClick }: Evolution
       {!MetadataLookup(nationalDex, formeNumber)?.regional && megaFormes.length > 0 && (
         <Flex direction="column" gap="2">
           {megaFormes.map((mega, i) => (
-            <Flex key={`${nationalDex}-${mega.mega_forme.formeIndex}`} align="center" gap="2">
+            <Flex key={`${nationalDex}-${mega.megaForme.formeIndex}`} align="center" gap="2">
               <ArrowLeftRightIcon
                 style={{
                   rotate: `${((megaFormes.length - 1) / 2 - i) * -36}deg`,
@@ -151,13 +151,13 @@ function EvolutionLine({ nationalDex, formeNumber, pokedex, onClick }: Evolution
               />
               <TooltipPokemonIcon
                 dexNumber={nationalDex}
-                formeNumber={mega.mega_forme.formeIndex}
+                formeNumber={mega.megaForme.formeIndex}
                 silhouette={
-                  !getFormeStatus(pokedex, nationalDex, mega.mega_forme.formeIndex)?.includes(
+                  !getFormeStatus(pokedex, nationalDex, mega.megaForme.formeIndex)?.includes(
                     'Caught'
                   )
                 }
-                onClick={() => onClick?.(nationalDex, mega.mega_forme.formeIndex)}
+                onClick={() => onClick?.(nationalDex, mega.megaForme.formeIndex)}
               />
             </Flex>
           ))}
