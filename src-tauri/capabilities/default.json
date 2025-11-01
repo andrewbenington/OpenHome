@@ -9,7 +9,6 @@
     "os:default",
     "dialog:default",
     "fs:default",
-    "fs:allow-app-meta",
-    "sql:default"
+    "fs:allow-app-meta"
   ]
 }

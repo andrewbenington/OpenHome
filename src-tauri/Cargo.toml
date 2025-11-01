@@ -39,9 +39,6 @@ bytes = "1.10.1"
 semver = "1.0.27"
 strum = { version = "0.27.2", features = ["derive"] }
 uuid = { version = "1.18.1", features = ["v4"] }
-tauri-plugin-sql = { version = "2", features = ["sqlite"] }
-tauri-plugin-sqlite = "0.1.1"
-
 
 [features]
 wasm = []
