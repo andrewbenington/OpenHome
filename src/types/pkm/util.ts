@@ -192,15 +192,21 @@ export const generatePersonalityValue = () => {
   return Math.floor(Math.random() * 2 ** 32)
 }
 
-// recursively returns prevo
+// recursively returns pre-evolution. if provided a mega forme, returns the first pre-evolution
+// of the base forme.
 export const getBaseMon = (dexNum: number, forme?: number) => {
   let mon = SpeciesAndForme.tryNew(dexNum, forme ?? 0)
-  let prevo = mon?.getMetadata()?.preEvolution
+  let metadata = mon?.getMetadata()
 
-  while (prevo) {
-    mon = prevo
-    prevo = mon?.getMetadata()?.preEvolution
+  if (metadata?.isMega) {
+    metadata = metadata?.getMegaBaseForme() ?? metadata
   }
+
+  while (metadata?.preEvolution) {
+    mon = metadata.preEvolution
+    metadata = mon?.getMetadata()
+  }
+
   return mon
 }
 

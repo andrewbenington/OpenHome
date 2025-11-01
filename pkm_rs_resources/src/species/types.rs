@@ -3,7 +3,7 @@ use pkm_rs_types::Gender;
 use std::num::NonZeroU16;
 use strum_macros::{Display, EnumString};
 
-use pkm_rs_types::{Generation, PkmType, Region, Stats16Le};
+use pkm_rs_types::{GameSetting, Generation, PkmType, Stats16Le};
 use serde::{Serialize, Serializer};
 
 #[cfg(feature = "wasm")]
@@ -301,6 +301,9 @@ pub struct FormeMetadata {
     #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = isMega))]
     pub is_mega: bool,
 
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+    pub mega_evolution_data: &'static [MegaEvolutionMetadata],
+
     #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = isGmax))]
     pub is_gmax: bool,
 
@@ -326,10 +329,10 @@ pub struct FormeMetadata {
     pub hidden_ability: Option<AbilityIndex>,
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = baseHeight))]
-    pub base_height: f32,
+    pub base_height: u32,
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = baseWeight))]
-    pub base_weight: f32,
+    pub base_weight: u32,
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub evolutions: &'static [SpeciesAndForme],
@@ -359,7 +362,7 @@ pub struct FormeMetadata {
     pub is_paradox: bool,
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub regional: Option<Region>,
+    pub regional: Option<GameSetting>,
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub sprite: &'static str,
@@ -371,6 +374,10 @@ pub struct FormeMetadata {
 impl FormeMetadata {
     pub const fn forme_ref(&self) -> SpeciesAndForme {
         unsafe { SpeciesAndForme::new_unchecked(self.national_dex.get(), self.forme_index) }
+    }
+
+    pub const fn species_metadata(&self) -> &SpeciesMetadata {
+        self.forme_ref().get_species_metadata()
     }
 
     pub const fn get_ability(&self, ability_num: u8) -> AbilityIndex {
@@ -392,12 +399,24 @@ impl FormeMetadata {
             *other_evo == self.forme_ref() || self.is_evolution_of(other_evo.get_forme_metadata())
         })
     }
+
+    fn is_mega_forme_of(&self, other: &FormeMetadata) -> bool {
+        other
+            .mega_evolution_data
+            .iter()
+            .any(|mega| mega.mega_forme.forme_index == self.forme_index)
+    }
 }
 
 #[cfg(feature = "wasm")]
 #[wasm_bindgen]
 #[allow(clippy::missing_const_for_fn)]
 impl FormeMetadata {
+    #[wasm_bindgen(getter = megaEvolutions)]
+    pub fn mega_evolutions(&self) -> Vec<MegaEvolutionMetadata> {
+        self.mega_evolution_data.to_vec()
+    }
+
     #[wasm_bindgen(getter = type1)]
     pub fn type_1(&self) -> String {
         self.types.0.to_string()
@@ -471,7 +490,7 @@ impl FormeMetadata {
 
     #[wasm_bindgen(getter)]
     pub fn regional(&self) -> Option<String> {
-        self.regional.as_ref().map(Region::to_string)
+        self.regional.as_ref().map(GameSetting::to_string)
     }
 
     #[wasm_bindgen(getter)]
@@ -510,6 +529,28 @@ impl FormeMetadata {
             Stat::Speed => self.base_stats.spe,
         }
     }
+
+    #[wasm_bindgen(js_name = getMegaBaseForme)]
+    pub fn get_mega_base_forme(&self) -> Option<FormeMetadata> {
+        if !self.is_mega {
+            return None;
+        }
+
+        self.species_metadata()
+            .formes
+            .iter()
+            .find(|other| self.is_mega_forme_of(other))
+            .cloned()
+    }
+}
+
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[derive(Debug, Clone, Copy)]
+pub struct MegaEvolutionMetadata {
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = megaForme))]
+    pub mega_forme: SpeciesAndForme,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = requiredItemId))]
+    pub required_item_id: Option<u16>,
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
@@ -527,11 +568,11 @@ pub struct SpeciesMetadata {
 
 impl SpeciesMetadata {
     pub const fn get_forme(&self, forme_index: usize) -> Option<&'static FormeMetadata> {
-        if forme_index >= self.formes.len() {
-            return None;
+        if forme_index < self.formes.len() {
+            Some(&self.formes[forme_index])
+        } else {
+            None
         }
-
-        Some(&self.formes[forme_index])
     }
 }
 

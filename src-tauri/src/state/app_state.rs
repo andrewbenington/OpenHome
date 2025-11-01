@@ -93,11 +93,7 @@ impl AppStateInner {
         Ok(())
     }
 
-    pub fn write_file_bytes_temped(
-        &mut self,
-        absolute_path: &Path,
-        bytes: Vec<u8>,
-    ) -> Result<()> {
+    pub fn write_file_bytes_temped(&mut self, absolute_path: &Path, bytes: Vec<u8>) -> Result<()> {
         let mut path = absolute_path.to_path_buf();
         if self.open_transaction {
             path = add_tmp(&path);

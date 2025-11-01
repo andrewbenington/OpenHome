@@ -1,6 +1,7 @@
-import { MetadataLookup } from '@pkm-rs-resources/pkg'
+import { FormeMetadata, Generation, MetadataLookup } from '@pkm-rs-resources/pkg'
 import { HTMLAttributes } from 'react'
 import useIsDarkMode from 'src/hooks/dark-mode'
+import useMonSprite from 'src/pokemon/useMonSprite'
 import BoxIcons from '../images/BoxIcons.png'
 import { getPublicImageURL } from '../images/images'
 import { getItemIconPath } from '../images/items'
@@ -16,6 +17,15 @@ export interface PokemonIconProps extends HTMLAttributes<HTMLDivElement> {
   silhouette?: boolean
 }
 
+function getBackgroundPosition(formeMetadata?: FormeMetadata) {
+  const [x, y] =
+    !formeMetadata || (formeMetadata.isMega && formeMetadata.introducedGen === Generation.G9)
+      ? [0, 0]
+      : formeMetadata.spriteCoords
+
+  return `${(x / 35) * 100}% ${(y / 36) * 100}%`
+}
+
 export default function PokemonIcon(props: PokemonIconProps) {
   const {
     dexNumber,
@@ -28,17 +38,26 @@ export default function PokemonIcon(props: PokemonIconProps) {
     ...attributes
   } = props
 
-  const getBackgroundPosition = (mon: { dexNum: number; formeNum: number }) => {
-    const formeMetadata = MetadataLookup(mon.dexNum, mon.formeNum)
-    if (!formeMetadata) {
-      return '0% 0%'
-    }
-    const [x, y] = formeMetadata.spriteCoords
+  const formeMetadata = MetadataLookup(dexNumber, formeNumber ?? 0)
 
-    return `${(x / 35) * 100}% ${(y / 36) * 100}%`
-  }
+  const isGen9Mega = formeMetadata?.isMega && formeMetadata.introducedGen === Generation.G9
 
   const isDarkMode = useIsDarkMode()
+
+  if (isGen9Mega) {
+    return (
+      <PokemonIconUsingSprite
+        dexNumber={dexNumber}
+        formeNumber={formeNumber}
+        isShiny={isShiny}
+        heldItemIndex={heldItemIndex}
+        heldItemFormat={heldItemFormat}
+        greyedOut={greyedOut}
+        silhouette={silhouette}
+        {...attributes}
+      />
+    )
+  }
 
   return (
     <div
@@ -54,10 +73,92 @@ export default function PokemonIcon(props: PokemonIconProps) {
         className="pokemon-icon-image"
         style={{
           backgroundImage: `url(${BoxIcons})`,
-          backgroundPosition: getBackgroundPosition({
-            dexNum: dexNumber,
-            formeNum: formeNumber ?? 0,
-          }),
+          backgroundPosition: getBackgroundPosition(formeMetadata),
+          filter: silhouette
+            ? isDarkMode
+              ? 'contrast(0%) brightness(85%)'
+              : 'contrast(0%) brightness(25%)'
+            : undefined,
+        }}
+      />
+      {isShiny && (
+        <img
+          alt="shiny icon"
+          draggable={false}
+          src={getPublicImageURL('icons/Shiny.png')}
+          style={{
+            position: 'absolute',
+            width: '40%',
+            height: '40%',
+            left: 0,
+            top: 0,
+            zIndex: 2,
+            pointerEvents: 'none',
+            filter: greyedOut ? 'grayscale(100%)' : undefined,
+          }}
+        />
+      )}
+      {heldItemIndex ? (
+        <img
+          alt="item icon"
+          draggable={false}
+          src={getPublicImageURL(getItemIconPath(heldItemIndex, heldItemFormat ?? 'PK9'))}
+          style={{
+            position: 'absolute',
+            width: '50%',
+            height: '50%',
+            right: 0,
+            bottom: 0,
+            zIndex: 2,
+            pointerEvents: 'none',
+            filter: greyedOut ? 'grayscale(100%)' : undefined,
+          }}
+        />
+      ) : (
+        <></>
+      )}
+    </div>
+  )
+}
+
+function PokemonIconUsingSprite(props: PokemonIconProps) {
+  const {
+    dexNumber,
+    formeNumber,
+    isShiny,
+    heldItemIndex,
+    heldItemFormat,
+    greyedOut,
+    silhouette,
+    ...attributes
+  } = props
+
+  const spriteResult = useMonSprite({
+    dexNum: dexNumber,
+    formeNum: formeNumber ?? 0,
+    format: 'OHPKM',
+    isShiny,
+  })
+
+  const isDarkMode = useIsDarkMode()
+
+  return (
+    <div
+      className="pokemon-icon-container"
+      {...attributes}
+      style={{
+        ...attributes.style,
+        filter: greyedOut ? 'grayscale(100%)' : undefined,
+      }}
+    >
+      <img
+        alt="pokemon sprite"
+        draggable={false}
+        src={spriteResult.path}
+        style={{
+          width: '100%',
+          height: '100%',
+          imageRendering: 'pixelated',
           filter: silhouette
             ? isDarkMode
               ? 'contrast(0%) brightness(85%)'

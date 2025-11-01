@@ -1,4 +1,4 @@
-import { Generation, OriginGame, OriginGames, Region } from '@pkm-rs-resources/pkg'
+import { GameSetting, Generation, OriginGame, OriginGames } from '@pkm-rs-resources/pkg'
 
 import { Gen2Locations } from './gen2'
 import { Gen3GBALocations } from './gen3-gba'
@@ -62,11 +62,11 @@ export const getLocationString = (game: number, index: number, format: string, e
     locations = Gen5Locations
   } else if (generation === Generation.G6) {
     locations = Gen6Locations
-  } else if (region === Region.Alola) {
+  } else if (region === GameSetting.Alola) {
     locations = Gen7AlolaLocations
   } else if (OriginGames.isLetsGo(game)) {
     locations = Gen7KantoLocations
-  } else if (region === Region.Galar) {
+  } else if (region === GameSetting.Galar) {
     locations = Gen8GalarLocations
   } else if (game === OriginGame.LegendsArceus) {
     locations = Gen8HisuiLocations
@@ -101,7 +101,7 @@ export function getMetLocation(
   if (!origin) return ''
 
   const generation = OriginGames.generation(origin)
-  const region = OriginGames.region(origin)
+  const gameSetting = OriginGames.region(origin)
 
   if (generation === Generation.G2 || fileFormat === 'PK2') {
     return Gen2Locations[0][index]
@@ -127,7 +127,7 @@ export function getMetLocation(
     return Gen6Locations[Math.floor(index / 10000) * 10000][index % 10000]
   }
 
-  if (region === Region.Alola || fileFormat === 'PK7') {
+  if (gameSetting === GameSetting.Alola || fileFormat === 'PK7') {
     return Gen7AlolaLocations[Math.floor(index / 10000) * 10000][index % 10000]
   }
 
@@ -135,7 +135,7 @@ export function getMetLocation(
     return Gen7KantoLocations[Math.floor(index / 10000) * 10000][index % 10000]
   }
 
-  if (region === Region.Galar || fileFormat === 'PK8') {
+  if (gameSetting === GameSetting.Galar || fileFormat === 'PK8') {
     return Gen8GalarLocations[Math.floor(index / 10000) * 10000][index % 10000]
   }
 
