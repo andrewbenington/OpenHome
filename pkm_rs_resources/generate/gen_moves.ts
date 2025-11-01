@@ -154,7 +154,7 @@ pub enum MoveClass {
   output += allMoves.map(convertMove).join('\n\n')
 
   output +=
-    `const ALL_MOVES: [&MoveMetadata; ${allMoves.length}] = [\n` +
+    `\n\nconst ALL_MOVES: [&MoveMetadata; ${allMoves.length}] = [\n` +
     allMoves.map((move) => '&' + rustConstName(move)).join(',\n') +
     '];'
 
