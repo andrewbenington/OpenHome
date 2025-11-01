@@ -274,7 +274,6 @@ async function getAllSpeciesAndFormes() {
   const allSpecies: Species[] = []
 
   for (const species of speciesRows) {
-    console.log(species)
     const formeRows = camelcaseKeys(await formGetByNationalDex(db, species.nationalDex))
     const speciesForms: Forme[] = []
     for (const formeRow of formeRows) {
