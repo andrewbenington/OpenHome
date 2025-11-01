@@ -2,12 +2,17 @@ import { MetadataLookup, SpeciesAndForme } from '@pkm-rs-resources/pkg'
 import { Flex } from '@radix-ui/themes'
 import { Responsive } from '@radix-ui/themes/props'
 import { ArrowLeftIcon, ArrowLeftRightIcon, ArrowRightIcon } from 'src/components/Icons'
-import { BLOOD_MOON, ETERNAL_FLOWER } from 'src/consts/Formes'
 import { NationalDex } from 'src/consts/NationalDex'
 import { getBaseMon } from 'src/types/pkm/util'
 import { Pokedex } from 'src/types/pokedex'
 import TooltipPokemonIcon from './TooltipPokemonIcon'
 import { getFormeStatus } from './util'
+
+const MONS_WITH_NON_EVOLVABLE_FORMES = [
+  NationalDex.Floette,
+  NationalDex.Ursaluna,
+  NationalDex.Greninja,
+]
 
 export type EvolutionFamilyProps = {
   nationalDex: number
@@ -26,21 +31,29 @@ export default function EvolutionFamily({
 }: EvolutionFamilyProps) {
   let baseMon = getBaseMon(nationalDex, formeNumber)
 
-  if (nationalDex === NationalDex.Ursaluna) {
-    // Include Teddiursa line for Ursaluna Bloodmoon
-    baseMon = SpeciesAndForme.tryNew(NationalDex.Teddiursa, 0)
-  } else if (nationalDex === NationalDex.Floette) {
-    // Include Flabébé line for Floette Eternal Flower
-    baseMon = SpeciesAndForme.tryNew(NationalDex.Flabebe, 0)
+  if (MONS_WITH_NON_EVOLVABLE_FORMES.includes(nationalDex)) {
+    // Ensures full family is shown even when formes like Ash Greninja are selected
+    baseMon = getBaseMon(nationalDex, 0)
   }
+
   if (!baseMon) return <div />
 
   const baseMonFormes = baseMon.getSpeciesMetadata().formes
 
+  if (MONS_WITH_NON_EVOLVABLE_FORMES.includes(nationalDex)) {
+    const otherFormes = SpeciesAndForme.tryNew(nationalDex, formeNumber)
+      ?.getSpeciesMetadata()
+      .formes.filter((forme) => !forme.preEvolution && !forme.isMega)
+
+    if (otherFormes) {
+      baseMonFormes.push(...otherFormes)
+    }
+  }
+
   return (
     <Flex
       direction="column"
-      gap="3"
+      gap="2"
       height={height}
       justify="center"
       align="center"
@@ -48,35 +61,15 @@ export default function EvolutionFamily({
     >
       {baseMonFormes
         .filter((forme) => !forme.isMega)
-        .map(({ formeIndex }) => (
+        .map(({ nationalDex, formeIndex }) => (
           <EvolutionLine
-            nationalDex={baseMon.nationalDex}
+            nationalDex={nationalDex.index}
             formeNumber={formeIndex}
             key={formeIndex}
             pokedex={pokedex}
             onClick={onClick}
           />
         ))}
-      {/* Workaround for evo lines where one forme have a prevo and another doesn't, currently only
-      Ursaluna and Floette */}
-      {baseMon.nationalDex === NationalDex.Teddiursa && (
-        <EvolutionLine
-          nationalDex={NationalDex.Ursaluna}
-          formeNumber={BLOOD_MOON}
-          key="ursaluna-bloodmoon"
-          pokedex={pokedex}
-          onClick={onClick}
-        />
-      )}
-      {baseMon.nationalDex === NationalDex.Flabebe && (
-        <EvolutionLine
-          nationalDex={NationalDex.Floette}
-          formeNumber={ETERNAL_FLOWER}
-          key="floette-eternal-flower"
-          pokedex={pokedex}
-          onClick={onClick}
-        />
-      )}
     </Flex>
   )
 }
@@ -164,6 +157,7 @@ function EvolutionLine({ nationalDex, formeNumber, pokedex, onClick }: Evolution
                     'Caught'
                   )
                 }
+                onClick={() => onClick?.(nationalDex, mega.mega_forme.formeIndex)}
               />
             </Flex>
           ))}
