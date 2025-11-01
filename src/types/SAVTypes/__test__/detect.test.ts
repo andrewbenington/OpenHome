@@ -31,7 +31,7 @@ const files = {
   'white.sav': 'White',
   ultrasun: 'Ultra Sun',
   sword: 'Sword',
-  legendsarceus: 'Legends Arceus',
+  legendsarceus: 'Legends: Arceus',
 }
 
 const allSaveTypes = [

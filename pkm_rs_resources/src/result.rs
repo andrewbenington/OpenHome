@@ -3,6 +3,7 @@ use std::fmt::Display;
 use serde::{Serialize, Serializer};
 
 use crate::abilities::ABILITY_MAX;
+use crate::items::ITEM_MAX;
 use crate::language::LANGUAGE_MAX;
 use crate::natures::NATURE_MAX;
 use crate::species::{NATIONAL_DEX_MAX, NatDexIndex};
@@ -37,6 +38,9 @@ pub enum Error {
     },
     AbilityIndex {
         ability_index: u16,
+    },
+    ItemIndex {
+        item_index: u16,
     },
     FieldError {
         field: &'static str,
@@ -88,6 +92,10 @@ impl Display for Error {
             }
             Error::AbilityIndex { ability_index } => {
                 format!("Invalid ability index {ability_index} (must be between 1 and {ABILITY_MAX}")
+                    .to_owned()
+            }
+            Error::ItemIndex { item_index } => {
+                format!("Invalid item index {item_index} (must be between 1 and {ITEM_MAX}")
                     .to_owned()
             }
             Error::FieldError { field, source } => {

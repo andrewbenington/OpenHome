@@ -10180,7 +10180,19 @@ const MALIGNANT_CHAIN: MoveMetadata = MoveMetadata {
     pp: 5,
     pkm_type: PkmType::Poison,
 };
-const ALL_MOVES: [&MoveMetadata; 919] = [
+
+const NIHIL_LIGHT: MoveMetadata = MoveMetadata {
+    id: 920,
+    name: "Nihil Light",
+    accuracy: Some(100),
+    class: MoveClass::Special,
+    introduced: Generation::G9,
+    power: Some(200),
+    pp: 10,
+    pkm_type: PkmType::Dragon,
+};
+
+const ALL_MOVES: [&MoveMetadata; 920] = [
     &POUND,
     &KARATE_CHOP,
     &DOUBLE_SLAP,
@@ -11100,4 +11112,5 @@ const ALL_MOVES: [&MoveMetadata; 919] = [
     &PSYCHIC_NOISE,
     &UPPER_HAND,
     &MALIGNANT_CHAIN,
+    &NIHIL_LIGHT,
 ];
