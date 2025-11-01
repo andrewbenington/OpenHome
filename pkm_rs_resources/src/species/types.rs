@@ -376,6 +376,10 @@ impl FormeMetadata {
         unsafe { SpeciesAndForme::new_unchecked(self.national_dex.get(), self.forme_index) }
     }
 
+    pub const fn species_metadata(&self) -> &SpeciesMetadata {
+        self.forme_ref().get_species_metadata()
+    }
+
     pub const fn get_ability(&self, ability_num: u8) -> AbilityIndex {
         match ability_num {
             1 => self.abilities.0,
@@ -394,6 +398,13 @@ impl FormeMetadata {
         other.evolutions.iter().any(|other_evo| {
             *other_evo == self.forme_ref() || self.is_evolution_of(other_evo.get_forme_metadata())
         })
+    }
+
+    fn is_mega_forme_of(&self, other: &FormeMetadata) -> bool {
+        other
+            .mega_evolution_data
+            .iter()
+            .any(|mega| mega.mega_forme.forme_index == self.forme_index)
     }
 }
 
@@ -518,6 +529,19 @@ impl FormeMetadata {
             Stat::Speed => self.base_stats.spe,
         }
     }
+
+    #[wasm_bindgen(js_name = getMegaBaseForme)]
+    pub fn get_mega_base_forme(&self) -> Option<FormeMetadata> {
+        if !self.is_mega {
+            return None;
+        }
+
+        self.species_metadata()
+            .formes
+            .iter()
+            .find(|other| self.is_mega_forme_of(other))
+            .cloned()
+    }
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
@@ -542,11 +566,11 @@ pub struct SpeciesMetadata {
 
 impl SpeciesMetadata {
     pub const fn get_forme(&self, forme_index: usize) -> Option<&'static FormeMetadata> {
-        if forme_index >= self.formes.len() {
-            return None;
+        if forme_index < self.formes.len() {
+            Some(&self.formes[forme_index])
+        } else {
+            None
         }
-
-        Some(&self.formes[forme_index])
     }
 }
 
