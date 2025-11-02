@@ -23,7 +23,6 @@ import {
 } from 'src/util/byteLogic'
 import {
   AbilityIndex,
-  all_species_data,
   MetadataLookup,
   SpeciesAndForme,
   SpeciesLookup,
@@ -472,14 +471,20 @@ export function getWeightCalculated(mon: PKMInterface) {
   return formeMetadata.baseWeight * 10 * deviation
 }
 
+const CLEFABLITE = 2559
+const FROSLASSITE = 2566
+const EMBOARITE = 2569
+const DRAMPANITE = 2585
+const FALINKSITE = 2587
+
 export function isMegaStone(item?: Item): boolean {
   return (
     item !== undefined &&
-    all_species_data()
-      .flatMap((species) => species.formes)
-      .flatMap((forme) => forme.megaEvolutions)
-      .flatMap((megaData) => megaData.requiredItemId)
-      .includes(item)
+    ((item >= Item.Gengarite && item <= Item.Latiosite) ||
+      (item >= Item.Swampertite && item <= Item.Beedrillite) ||
+      (item >= CLEFABLITE && item <= FROSLASSITE) ||
+      (item >= EMBOARITE && item <= DRAMPANITE) ||
+      (item as number) === FALINKSITE)
   )
 }
 
@@ -491,15 +496,14 @@ export function isZCrystal(item: Item) {
   )
 }
 
-export function isBattleFormeItem(item?: Item) {
+export function isBattleFormeItem(nationalDex: number, item?: Item) {
   return (
-    isMegaStone(item) ||
-    item === Item.UltranecroziumZ ||
-    item === Item.UltranecroziumZ_1 ||
-    item === Item.RedOrb ||
-    item === Item.BlueOrb ||
-    item === Item.RustedSword ||
-    item === Item.RustedShield
+    (nationalDex === NationalDex.Necrozma &&
+      (item === Item.UltranecroziumZ || item === Item.UltranecroziumZ_1)) ||
+    (nationalDex === NationalDex.Groudon && item === Item.RedOrb) ||
+    (nationalDex === NationalDex.Kyogre && item === Item.BlueOrb) ||
+    (nationalDex === NationalDex.Zacian && item === Item.RustedSword) ||
+    (nationalDex === NationalDex.Zamazenta && item === Item.RustedShield)
   )
 }
 

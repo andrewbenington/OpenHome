@@ -1,7 +1,8 @@
 import { useDraggable } from '@dnd-kit/react'
+import { MetadataLookup } from '@pkm-rs-resources/pkg'
 import { useContext, useMemo } from 'react'
 import { DragMonContext } from 'src/state/dragMon'
-import { displayIndexAdder, isBattleFormeItem } from 'src/types/pkm/util'
+import { displayIndexAdder, isBattleFormeItem, isMegaStone } from 'src/types/pkm/util'
 import PokemonIcon from '../../components/PokemonIcon'
 import { MonWithLocation } from '../../state/openSaves'
 import { PKMInterface } from '../../types/interfaces'
@@ -45,6 +46,18 @@ const DraggableMon = ({ mon, onClick, disabled, dragData, dragID }: DraggableMon
     [dragData, dragState.payload]
   )
 
+  let formeNumber = mon.formeNum
+
+  if (isMegaStone(mon.heldItemIndex)) {
+    const megaForStone = MetadataLookup(mon.dexNum, mon.formeNum)?.megaEvolutions.find(
+      (mega) => mega.requiredItemId === mon.heldItemIndex
+    )
+
+    if (megaForStone) formeNumber = megaForStone.megaForme.formeIndex
+  } else if (isBattleFormeItem(mon.dexNum, mon.heldItemIndex)) {
+    formeNumber = displayIndexAdder(mon.heldItemIndex)(mon.formeNum)
+  }
+
   return (
     <div
       ref={ref}
@@ -58,11 +71,7 @@ const DraggableMon = ({ mon, onClick, disabled, dragData, dragID }: DraggableMon
     >
       <PokemonIcon
         dexNumber={mon.dexNum}
-        formeNumber={
-          isBattleFormeItem(mon.heldItemIndex)
-            ? displayIndexAdder(mon.heldItemIndex)(mon.formeNum)
-            : mon.formeNum
-        }
+        formeNumber={formeNumber}
         isShiny={mon.isShiny()}
         heldItemIndex={isDragging && dragState.mode === 'item' ? undefined : mon.heldItemIndex}
         style={{

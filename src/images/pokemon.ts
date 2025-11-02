@@ -4,7 +4,7 @@ import { NationalDex } from 'src/consts/NationalDex'
 import { toGen3RRPokemonIndex } from 'src/types/SAVTypes/radicalred/conversion/Gen3RRPokemonIndex'
 import { RRSprites } from 'src/types/SAVTypes/radicalred/conversion/RadicalRedSprites'
 import { MonSpriteData } from '../state/plugin'
-import { displayIndexAdder, isBattleFormeItem } from '../types/pkm/util'
+import { displayIndexAdder, isBattleFormeItem, isMegaStone } from '../types/pkm/util'
 import { toGen3CRFUPokemonIndex } from '../types/SAVTypes/cfru/conversion/util'
 import { NationalDexToUnboundMap } from '../types/SAVTypes/unbound/conversion/UnboundSpeciesMap'
 import { UBSprites } from '../types/SAVTypes/unbound/conversion/UnboundSprites'
@@ -33,9 +33,16 @@ export const getPokemonSpritePath = (mon: MonSpriteData, format?: string) => {
   const monFormat = format ?? mon.format
   let formeNum = mon.formeNum
 
-  if (isBattleFormeItem(mon.heldItemIndex)) {
+  if (isMegaStone(mon.heldItemIndex)) {
+    const megaForStone = MetadataLookup(mon.dexNum, mon.formeNum)?.megaEvolutions.find(
+      (mega) => mega.requiredItemId === mon.heldItemIndex
+    )
+
+    if (megaForStone) formeNum = megaForStone.megaForme.formeIndex
+  } else if (isBattleFormeItem(mon.dexNum, mon.heldItemIndex)) {
     formeNum = displayIndexAdder(mon.heldItemIndex)(mon.formeNum)
   }
+
   const formeMetadata = MetadataLookup(mon.dexNum, mon.formeNum)
   let spriteName = formeMetadata?.sprite ?? ''
 

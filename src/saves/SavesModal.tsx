@@ -317,7 +317,7 @@ function pokedexSeenFromSave(saveFile: SAV) {
       status: 'Seen',
     })
 
-    if (isBattleFormeItem(mon.heldItemIndex)) {
+    if (isBattleFormeItem(mon.dexNum, mon.heldItemIndex)) {
       pokedexUpdates.push({
         dexNumber: mon.dexNum,
         formeNumber: displayIndexAdder(mon.heldItemIndex)(mon.formeNum),

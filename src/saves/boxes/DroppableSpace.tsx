@@ -61,6 +61,8 @@ const DroppableSpace = ({
     }
   }, [isDropTarget])
 
+  console.log('rendering DroppableSpace')
+
   return (
     <div
       className={className}

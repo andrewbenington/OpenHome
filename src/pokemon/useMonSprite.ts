@@ -1,3 +1,4 @@
+import { MetadataLookup } from '@pkm-rs-resources/pkg'
 import * as E from 'fp-ts/lib/Either'
 import { useContext, useEffect, useMemo, useState } from 'react'
 import { CURRENT_PLUGIN_API_VERSION } from '../app/plugins/Plugins'
@@ -6,7 +7,7 @@ import useDisplayError from '../hooks/displayError'
 import { getPublicImageURL } from '../images/images'
 import { getPokemonSpritePath } from '../images/pokemon'
 import { MonSpriteData, OpenHomePlugin, PluginContext } from '../state/plugin'
-import { displayIndexAdder, isBattleFormeItem } from '../types/pkm/util'
+import { displayIndexAdder, isBattleFormeItem, isMegaStone } from '../types/pkm/util'
 
 type RequiredFields<T, K extends keyof T> = T & Required<Pick<T, K>>
 
@@ -43,7 +44,13 @@ export default function useMonSprite(mon: MonSpriteData): MonSpriteResult {
   useEffect(() => {
     if (spriteResult.errorMessage || spriteResult.path) return
 
-    if (isBattleFormeItem(mon.heldItemIndex)) {
+    if (isMegaStone(mon.heldItemIndex)) {
+      const megaForStone = MetadataLookup(mon.dexNum, mon.formeNum)?.megaEvolutions.find(
+        (mega) => mega.requiredItemId === mon.heldItemIndex
+      )
+
+      if (megaForStone) mon.formeNum = megaForStone.megaForme.formeIndex
+    } else if (isBattleFormeItem(mon.dexNum, mon.heldItemIndex)) {
       mon.formeNum = displayIndexAdder(mon.heldItemIndex)(mon.formeNum)
     }
 
