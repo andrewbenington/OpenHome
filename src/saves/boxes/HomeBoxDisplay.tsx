@@ -82,7 +82,6 @@ export default function HomeBoxDisplay() {
       }),
     [homeData, openSavesDispatch]
   )
-  console.log('rendering HomeBoxDisplay')
 
   return (
     homeData &&
