@@ -138,7 +138,7 @@ export type OpenSavesAction =
       payload: { source: MonWithLocation; dest: MonLocation }
     }
   | {
-      type: 'give_item_to_mon'
+      type: 'set_mon_item'
       payload: { item: ItemIndex | undefined; dest: MonLocation }
     }
   /*
@@ -407,7 +407,7 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
       return { ...state }
     }
 
-    case 'give_item_to_mon': {
+    case 'set_mon_item': {
       const { item, dest } = payload
 
       const targetMon = getMonAtLocation(state, dest)
