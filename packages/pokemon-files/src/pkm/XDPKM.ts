@@ -9,7 +9,7 @@ import {
   NatureIndex,
   SpeciesLookup,
 } from '@pkm-rs-resources/pkg'
-import { Gen3ContestRibbons, Gen3StandardRibbons, ItemGen3ToString } from '@pokemon-resources/index'
+import { Gen3ContestRibbons, Gen3StandardRibbons } from '@pokemon-resources/index'
 import { NationalDex } from 'src/consts/NationalDex'
 import * as byteLogic from '../util/byteLogic'
 import { AllPKMFields } from '../util/pkmInterface'
@@ -244,8 +244,13 @@ export class XDPKM {
   public get languageString() {
     return Languages.stringFromByte(this.language)
   }
+
+  public get heldItemIndex() {
+    return this.heldItemIndexGen3?.toModern()?.index ?? 0
+  }
+
   public get heldItemName() {
-    return ItemGen3ToString(this.heldItemIndex)
+    return this.heldItemIndexGen3?.name ?? 'None'
   }
 
   public get nature() {
@@ -292,10 +297,6 @@ export class XDPKM {
       (this.personalityValue & 0xffff) ^
       ((this.personalityValue >> 16) & 0xffff)
     )
-  }
-
-  public get heldItemIndex() {
-    return this.heldItemIndexGen3?.toModern()?.index ?? 0
   }
 
   public get metadata() {

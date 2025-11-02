@@ -1,4 +1,3 @@
-import { ItemGen3ToString } from '@pokemon-resources/items'
 import { Gen3ContestRibbons, Gen3StandardRibbons } from '@pokemon-resources/other'
 import { NationalDex } from 'src/consts/NationalDex'
 
@@ -289,8 +288,14 @@ export class PK3 {
   public get languageString() {
     return Languages.stringFromByte(this.language)
   }
+
+  public get heldItemIndex() {
+    return this.heldItemIndexGen3?.toModern()?.index ?? 0
+  }
+
   public get heldItemName() {
-    return ItemGen3ToString(this.heldItemIndex)
+    console.log(this.heldItemIndexGen3?.index, this.heldItemIndexGen3?.name, this.heldItemIndex)
+    return this.heldItemIndexGen3?.name ?? 'None'
   }
 
   public get nature() {
@@ -361,10 +366,6 @@ export class PK3 {
       (this.personalityValue & 0xffff) ^
       ((this.personalityValue >> 16) & 0xffff)
     )
-  }
-
-  public get heldItemIndex() {
-    return this.heldItemIndexGen3?.toModern()?.index ?? 0
   }
 
   public get metadata() {

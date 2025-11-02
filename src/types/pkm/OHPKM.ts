@@ -125,7 +125,7 @@ export class OHPKM implements PKMInterface {
 
       this.dexNum = other.dexNum
       this.formeNum = other.formeNum ?? 0
-      this.heldItemIndex = ItemFromString(other.heldItemName)
+      this.heldItemIndex = other.heldItemIndex
       this.trainerName = other.trainerName
       this.trainerGender = other.trainerGender
       this.trainerID = other.trainerID
@@ -436,14 +436,6 @@ export class OHPKM implements PKMInterface {
 
   public get heldItemName() {
     return ItemToString(this.heldItemIndex)
-  }
-
-  public set heldItemName(value: string) {
-    const itemIndex = ItemFromString(value)
-
-    if (itemIndex > -1) {
-      this.heldItemIndex = itemIndex
-    }
   }
 
   public get trainerID() {

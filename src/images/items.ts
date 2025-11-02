@@ -3,8 +3,6 @@ import {
   ItemFromString,
   ItemGen2,
   ItemGen2ToString,
-  ItemGen3,
-  ItemGen3ToString,
   ItemToString,
 } from '@pokemon-resources/index'
 
@@ -103,16 +101,10 @@ const itemEquivalents: Record<string, string> = {
   "Oak's Parcel": 'Parcel',
 }
 
-export const getItemIconPath = (item: Item | ItemGen3 | ItemGen2, format?: string): string => {
+export const getItemIconPath = (item: Item | ItemGen2, format?: string): string => {
   let itemName: string
 
-  if (format === 'PK3' || format === 'COLOPKM' || format === 'XDPKM') {
-    itemName = ItemGen3ToString(item as ItemGen3)
-    if (itemName in itemEquivalents) {
-      itemName = itemEquivalents[itemName]
-    }
-    item = ItemFromString(itemName)
-  } else if (format === 'PK2') {
+  if (format === 'PK2') {
     itemName = ItemGen2ToString(item as ItemGen2)
     if (itemName in itemEquivalents) {
       itemName = itemEquivalents[itemName]
