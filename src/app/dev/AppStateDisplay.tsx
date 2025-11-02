@@ -1,4 +1,4 @@
-import { OriginGames, SpeciesLookup } from '@pkm-rs-resources/pkg'
+import { ItemIndex, OriginGames, SpeciesLookup } from '@pkm-rs-resources/pkg'
 import { Card, Flex, Heading, Separator } from '@radix-ui/themes'
 import * as E from 'fp-ts/lib/Either'
 import { useContext, useEffect, useState } from 'react'
@@ -8,7 +8,7 @@ import { DevDataDisplay } from 'src/components/DevDataDisplay'
 import { InfoGrid } from 'src/components/InfoGrid2'
 import useDisplayError from 'src/hooks/displayError'
 import { AppInfoContext, AppInfoState } from 'src/state/appInfo'
-import { BagContext } from 'src/state/bag'
+import { BagContext, BagState } from 'src/state/bag'
 import { OpenSavesContext, OpenSavesState } from 'src/state/openSaves'
 import { PKMInterface } from 'src/types/interfaces'
 import { ErrorContext } from '../../state/error'
@@ -98,18 +98,13 @@ function monDisplay(mon: PKMInterface) {
   }
 }
 
-function bagDisplay(state: {
-  items: Record<string, number>
-  modified: boolean
-  loaded: boolean
-  error?: string
-}) {
+function bagDisplay(state: BagState) {
   return {
     Loaded: state.loaded,
     Modified: state.modified,
     Error: state.error ?? 'None',
-    Items: Object.entries(state.items).map(([name, qty]) => ({
-      name,
+    Items: Object.entries(state.itemCounts).map(([indexStr, qty]) => ({
+      name: ItemIndex.fromIndex(parseInt(indexStr)),
       qty,
     })),
   }

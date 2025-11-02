@@ -1,15 +1,12 @@
+import { ItemIndex } from '@pkm-rs-resources/pkg'
 import { Card, Flex, Grid } from '@radix-ui/themes'
-import { useContext, useMemo } from 'react'
+import { useContext } from 'react'
 import { BagContext } from 'src/state/bag'
 import DroppableSpace from './boxes/DroppableSpace'
 import DraggableItem from './DraggableItem'
 
 export default function BagBox() {
   const [bagState] = useContext(BagContext)
-  const items = useMemo(() => Object.entries(bagState.items), [bagState.items])
-
-  const rowsNeeded = Math.max(Math.ceil(items.length / 6) + (items.length % 6 === 0 ? 1 : 0), 1)
-  const totalSlots = rowsNeeded * 6
 
   return (
     <Card style={{ contain: 'none', padding: 4, width: '100%', boxSizing: 'border-box' }}>
@@ -25,10 +22,9 @@ export default function BagBox() {
           }}
         >
           <Grid columns="6" gap="2">
-            {Array.from({ length: totalSlots }, (_, index) => {
-              const entry = items[index]
-              const name = entry?.[0]
-              const count = entry?.[1]
+            {Object.entries(bagState.itemCounts).map(([indexStr, count]) => {
+              const index = parseInt(indexStr)
+              const validatedIndex = ItemIndex.fromIndex(index)
 
               return (
                 <Flex
@@ -42,8 +38,8 @@ export default function BagBox() {
                     borderRadius: 4,
                   }}
                 >
-                  {entry ? (
-                    <DraggableItem item={{ name, count }} />
+                  {validatedIndex ? (
+                    <DraggableItem item={validatedIndex} count={count} />
                   ) : (
                     <img
                       src="/items/index/0000.png"

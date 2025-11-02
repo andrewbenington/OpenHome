@@ -83,7 +83,7 @@ function AppWithBackend() {
   const [pluginState, pluginDispatch] = useReducer(pluginReducer, { plugins: [], loaded: false })
   const [settingsLoading, setSettingsLoading] = useState(false)
   const [bagState, bagDispatch] = useReducer(bagReducer, {
-    items: {},
+    itemCounts: {},
     modified: false,
     loaded: false,
   })

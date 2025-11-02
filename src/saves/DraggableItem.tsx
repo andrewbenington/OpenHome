@@ -1,18 +1,19 @@
 import { useDraggable } from '@dnd-kit/react'
+import { ItemIndex } from '@pkm-rs-resources/pkg'
 import { Text } from '@radix-ui/themes'
-import { ItemFromString } from 'pokemon-resources'
+import { getPublicImageURL } from '../images/images'
+import { getItemIconPath } from '../images/items'
 
-function DraggableItem({ item }: { item: { name: string; count: number } }) {
+type DraggableItemProps = {
+  item: ItemIndex
+  count: number
+}
+
+function DraggableItem({ item, count }: DraggableItemProps) {
   const { ref, isDragging } = useDraggable({
     id: `item-${item.name}`,
-    data: { kind: 'item', itemName: item.name },
+    data: { kind: 'item', item: item },
   })
-
-  const getItemIconPath = (itemName: string) => {
-    const itemId = ItemFromString(itemName)?.toString().padStart(4, '0')
-
-    return itemId ? `/items/index/${itemId}.png` : ''
-  }
 
   return (
     <div
@@ -25,7 +26,7 @@ function DraggableItem({ item }: { item: { name: string; count: number } }) {
       }}
     >
       <img
-        src={getItemIconPath(item.name)}
+        src={getPublicImageURL(getItemIconPath(item.index, 'PK9'))}
         alt={item.name}
         style={{
           width: '100%',
@@ -43,7 +44,7 @@ function DraggableItem({ item }: { item: { name: string; count: number } }) {
           right: -6,
         }}
       >
-        {item.count}
+        {count}
       </Text>
     </div>
   )

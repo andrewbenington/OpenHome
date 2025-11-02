@@ -4,34 +4,44 @@ import { createContext, Dispatch, Reducer } from 'react'
  *  STATE
  */
 export type BagState = {
-  items: Record<string, number>
+  itemCounts: Record<number, number>
   modified: boolean
   loaded: boolean
   error?: string
 }
 
 export type BagAction =
-  | { type: 'load_bag'; payload: Record<string, number> }
-  | { type: 'add_item'; payload: { name: string; qty: number } }
-  | { type: 'remove_item'; payload: { name: string; qty: number } }
+  | { type: 'load_bag'; payload: Record<number, number> }
+  | { type: 'add_item'; payload: { index: number; qty: number } }
+  | { type: 'remove_item'; payload: { index: number; qty: number } }
   | { type: 'clear_modified' }
   | { type: 'set_error'; payload?: string }
 
 export const bagReducer: Reducer<BagState, BagAction> = (state, action) => {
   switch (action.type) {
     case 'load_bag':
-      return { ...state, items: action.payload, loaded: true, modified: false, error: undefined }
+      return {
+        ...state,
+        itemCounts: action.payload,
+        loaded: true,
+        modified: false,
+        error: undefined,
+      }
     case 'add_item': {
-      const qty = (state.items[action.payload.name] ?? 0) + action.payload.qty
-      return { ...state, items: { ...state.items, [action.payload.name]: qty }, modified: true }
+      const qty = (state.itemCounts[action.payload.index] ?? 0) + action.payload.qty
+      return {
+        ...state,
+        itemCounts: { ...state.itemCounts, [action.payload.index]: qty },
+        modified: true,
+      }
     }
     case 'remove_item': {
-      const { name, qty } = action.payload
-      const next = { ...state.items }
-      const newQty = (next[name] ?? 0) - qty
-      if (newQty <= 0) delete next[name]
-      else next[name] = newQty
-      return { ...state, items: next, modified: true }
+      const { index, qty } = action.payload
+      const next = { ...state.itemCounts }
+      const newQty = (next[index] ?? 0) - qty
+      if (newQty <= 0) delete next[index]
+      else next[index] = newQty
+      return { ...state, itemCounts: next, modified: true }
     }
     case 'clear_modified':
       return { ...state, modified: false }
@@ -42,7 +52,7 @@ export const bagReducer: Reducer<BagState, BagAction> = (state, action) => {
   }
 }
 
-const initialBagState: BagState = { items: {}, modified: false, loaded: false }
+const initialBagState: BagState = { itemCounts: {}, modified: false, loaded: false }
 
 /*
  *  CONTEXT

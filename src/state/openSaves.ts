@@ -1,3 +1,4 @@
+import { ItemIndex } from '@pkm-rs-resources/pkg'
 import { createContext, Dispatch, Reducer } from 'react'
 import { OHPKM } from 'src/types/pkm/OHPKM'
 import { HomeData } from 'src/types/SAVTypes/HomeData'
@@ -139,7 +140,7 @@ export type OpenSavesAction =
     }
   | {
       type: 'give_item_to_mon'
-      payload: { itemName: string; dest: MonLocation; bagDispatch: Dispatch<BagAction> }
+      payload: { item: ItemIndex; dest: MonLocation; bagDispatch: Dispatch<BagAction> }
     }
   /*
    *  OTHER
@@ -408,7 +409,7 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
     }
 
     case 'give_item_to_mon': {
-      const { itemName, dest, bagDispatch } = payload
+      const { item, dest, bagDispatch } = payload
 
       let targetMon: PKMInterface | undefined
 
@@ -422,7 +423,7 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
         return state
       }
 
-      if (targetMon.heldItemName === itemName) {
+      if (targetMon.heldItemIndex === item.index) {
         return state
       }
 
@@ -436,10 +437,10 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
 
       const oldItem = updatedMon.heldItemName
 
-      updatedMon.heldItemName = itemName
+      updatedMon.heldItemIndex = item.index
 
       if (oldItem && oldItem !== 'None') {
-        bagDispatch({ type: 'add_item', payload: { name: oldItem, qty: 1 } })
+        bagDispatch({ type: 'add_item', payload: { index: item.index, qty: 1 } })
       }
 
       if (dest.is_home) {
@@ -456,7 +457,7 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
         state.modifiedOHPKMs[identifier] = updatedMon
       }
 
-      bagDispatch({ type: 'remove_item', payload: { name: itemName, qty: 1 } })
+      bagDispatch({ type: 'remove_item', payload: { index: item.index, qty: 1 } })
 
       return { ...state }
     }

@@ -158,7 +158,7 @@ const Home = () => {
     ]
 
     if (bagState.modified) {
-      const saveBagResult = await backend.saveBag(bagState.items)
+      const saveBagResult = await backend.saveBag(bagState.itemCounts)
       if (E.isLeft(saveBagResult)) {
         displayError('Error Saving Bag', saveBagResult.left)
         await backend.rollbackTransaction()
@@ -192,15 +192,20 @@ const Home = () => {
       )
     )
   }, [
-    allOpenSaves,
+    openSavesState.homeData,
+    openSavesState.modifiedOHPKMs,
+    openSavesState.monsToRelease,
+    persistedPkmState.loaded,
     backend,
-    loadAllHomeData,
-    loadAllLookups,
-    persistedPkmDispatch,
-    persistedPkmState,
+    allOpenSaves,
+    bagState.modified,
+    bagState.itemCounts,
     openSavesDispatch,
-    openSavesState,
+    persistedPkmDispatch,
+    loadAllLookups,
     displayError,
+    bagDispatch,
+    loadAllHomeData,
   ])
 
   useEffect(() => {
