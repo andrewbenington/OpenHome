@@ -3,8 +3,6 @@ import {
   ItemFromString,
   ItemGen2,
   ItemGen2ToString,
-  ItemGen3,
-  ItemGen3ToString,
   ItemToString,
 } from '@pokemon-resources/index'
 
@@ -94,25 +92,15 @@ const SharedItemSpritePrefixes = ['Data Card', 'Lost Satchel', 'Old Verse', 'Los
 const itemEquivalents: Record<string, string> = {
   'Parlyz Heal': 'Paralyze Heal',
   Bicycle: 'Bike',
-  'Devon Goods': 'Devon Parts',
-  Itemfinder: 'Dowsing Machine',
-  'Pokéblock Case': 'Pokéblock Kit',
   NeverMeltIce: 'Never-Melt Ice',
   'Up-Grade': 'Upgrade',
   Stick: 'Leek',
-  "Oak's Parcel": 'Parcel',
 }
 
-export const getItemIconPath = (item: Item | ItemGen3 | ItemGen2, format?: string): string => {
+export const getItemIconPath = (item: Item | ItemGen2, format?: string): string => {
   let itemName: string
 
-  if (format === 'PK3' || format === 'COLOPKM' || format === 'XDPKM') {
-    itemName = ItemGen3ToString(item as ItemGen3)
-    if (itemName in itemEquivalents) {
-      itemName = itemEquivalents[itemName]
-    }
-    item = ItemFromString(itemName)
-  } else if (format === 'PK2') {
+  if (format === 'PK2') {
     itemName = ItemGen2ToString(item as ItemGen2)
     if (itemName in itemEquivalents) {
       itemName = itemEquivalents[itemName]

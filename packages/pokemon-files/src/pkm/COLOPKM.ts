@@ -2,18 +2,14 @@
 
 import {
   Ball,
+  ItemGen3,
   Language,
   Languages,
   MetadataLookup,
   NatureIndex,
   SpeciesLookup,
 } from '@pkm-rs-resources/pkg'
-import {
-  Gen3ContestRibbons,
-  Gen3StandardRibbons,
-  ItemGen3FromString,
-  ItemGen3ToString,
-} from '@pokemon-resources/index'
+import { Gen3ContestRibbons, Gen3StandardRibbons } from '@pokemon-resources/index'
 import { NationalDex } from 'src/consts/NationalDex'
 import * as byteLogic from '../util/byteLogic'
 import { AllPKMFields } from '../util/pkmInterface'
@@ -53,7 +49,7 @@ export class COLOPKM {
   moves: number[]
   movePP: number[]
   movePPUps: number[]
-  heldItemIndex: number
+  heldItemIndexGen3?: ItemGen3
   currentHP: number
   evs: types.Stats
   ivs: types.Stats
@@ -102,7 +98,7 @@ export class COLOPKM {
         dataView.getUint8(0x7d),
         dataView.getUint8(0x7e),
       ]
-      this.heldItemIndex = dataView.getUint16(0x88, false)
+      this.heldItemIndexGen3 = ItemGen3.fromIndex(dataView.getUint16(0x88, false))
       this.currentHP = dataView.getUint16(0x8a, false)
       this.evs = types.readStatsFromBytesU8(dataView, 0x99)
       this.ivs = types.readStatsFromBytesU8(dataView, 0xa5)
@@ -142,7 +138,7 @@ export class COLOPKM {
         (_, i) => other.moves[i] <= COLOPKM.maxValidMove()
       )
       this.movePPUps = other.movePPUps.filter((_, i) => other.moves[i] <= COLOPKM.maxValidMove())
-      this.heldItemIndex = ItemGen3FromString(other.heldItemName)
+      this.heldItemIndexGen3 = ItemGen3.fromModern(other.heldItemIndex)
       this.currentHP = other.currentHP ?? 0
       this.evs = other.evs ?? {
         hp: 0,
@@ -252,8 +248,12 @@ export class COLOPKM {
     return Languages.stringFromByteGcn(this.language)
   }
 
+  public get heldItemIndex() {
+    return this.heldItemIndexGen3?.toModern()?.index ?? 0
+  }
+
   public get heldItemName() {
-    return ItemGen3ToString(this.heldItemIndex)
+    return this.heldItemIndexGen3?.name ?? 'None'
   }
 
   public get nature() {
