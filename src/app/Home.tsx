@@ -329,7 +329,7 @@ const Home = () => {
         </Flex>
       </div>
       <Flex gap="2" className="right-column" direction="column">
-        <Card style={{ minHeight: '50%', padding: 0 }}>
+        <Card style={{ minHeight: '50%', maxHeight: '60%', padding: 0 }}>
           <Tabs.Root style={{ flex: 1, height: '100%' }} defaultValue="filter">
             <Tabs.List size="2" style={tabStyle}>
               <Tabs.Trigger value="filter">Filter</Tabs.Trigger>
