@@ -205,7 +205,7 @@ export const TauriBackend: BackendInterface = {
 
   /* bag */
   loadItemBag: async () => {
-    const result = await (TauriInvoker.getStorageFileJSON('bag.json') as Promise<
+    const result = await (TauriInvoker.getStorageFileJSON('item-bag.json') as Promise<
       Errorable<Record<string, number>>
     >)
 
@@ -217,7 +217,7 @@ export const TauriBackend: BackendInterface = {
   },
 
   saveItemBag: async (items: Record<string, number>): Promise<Errorable<null>> => {
-    return TauriInvoker.writeStorageFileJSON('bag.json', items as JSONObject)
+    return TauriInvoker.writeStorageFileJSON('item-bag.json', items as JSONObject)
   },
 
   /* transactions */
