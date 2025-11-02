@@ -6,7 +6,9 @@ export type DragPayload =
   | { kind: 'mon'; monData: MonWithLocation }
   | { kind: 'item'; item: ItemIndex }
 
-export type DragMonState = { payload?: DragPayload }
+type DragMode = 'mon' | 'item'
+
+export type DragMonState = { payload?: DragPayload; mode: DragMode }
 export type DragMonAction =
   | {
       type: 'start_drag'
@@ -16,25 +18,32 @@ export type DragMonAction =
       type: 'end_drag'
       payload?: undefined
     }
+  | {
+      type: 'set_mode'
+      payload: DragMode
+    }
 
 // a reducer isnt necessary for this simple state, but will be necessary for multi-drag
 export const dragMonReducer: Reducer<DragMonState, DragMonAction> = (
-  _: DragMonState,
+  state: DragMonState,
   action: DragMonAction
 ) => {
   const { type, payload } = action
 
   switch (type) {
     case 'start_drag': {
-      return { payload }
+      return { ...state, payload }
     }
     case 'end_drag': {
-      return { payload: undefined }
+      return { ...state, payload: undefined }
+    }
+    case 'set_mode': {
+      return { ...state, mode: payload }
     }
   }
 }
 
-const initialState = {}
+const initialState: DragMonState = { mode: 'mon' }
 
 export const DragMonContext = createContext<[DragMonState, Dispatch<DragMonAction>]>([
   initialState,

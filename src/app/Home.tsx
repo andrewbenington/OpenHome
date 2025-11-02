@@ -1,6 +1,6 @@
 import { Generation, OriginGame, OriginGames } from '@pkm-rs-resources/pkg'
 import { bytesToPKMInterface } from '@pokemon-files/pkm'
-import { Button, Flex, Tabs } from '@radix-ui/themes'
+import { Button, Card, Flex, Tabs } from '@radix-ui/themes'
 import * as E from 'fp-ts/lib/Either'
 import lodash, { flatten } from 'lodash'
 import { useCallback, useContext, useEffect, useState } from 'react'
@@ -322,22 +322,23 @@ const Home = () => {
           <HomeBoxDisplay />
         </Flex>
       </div>
-      <Flex gap="2" className="right-column" style={{ flexDirection: 'column' }}>
-        <Tabs.Root defaultValue="filter">
-          <Tabs.List>
-            <Tabs.Trigger value="filter">Filter</Tabs.Trigger>
-            <Tabs.Trigger value="bag">Bag</Tabs.Trigger>
-          </Tabs.List>
+      <Flex gap="2" className="right-column" direction="column">
+        <Card style={{ minHeight: '50%', padding: 0 }}>
+          <Tabs.Root style={{ flex: 1, height: '100%' }} defaultValue="filter">
+            <Tabs.List size="1">
+              <Tabs.Trigger value="filter">Filter</Tabs.Trigger>
+              <Tabs.Trigger value="bag">Bag</Tabs.Trigger>
+            </Tabs.List>
 
-          <Tabs.Content value="filter" style={{ flexGrow: 1 }}>
-            <FilterPanel />
-          </Tabs.Content>
+            <Tabs.Content value="filter" style={{ flexGrow: 1 }}>
+              <FilterPanel />
+            </Tabs.Content>
 
-          <Tabs.Content value="bag" style={{ flexGrow: 1 }}>
-            <BagBox />
-          </Tabs.Content>
-        </Tabs.Root>
-
+            <Tabs.Content value="bag">
+              <BagBox />
+            </Tabs.Content>
+          </Tabs.Root>
+        </Card>
         <div
           className="drop-area"
           onDrop={(e) => e.dataTransfer.files.length && previewFile(e.dataTransfer.files[0])}

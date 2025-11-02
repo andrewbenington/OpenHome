@@ -94,21 +94,33 @@ export default function PokemonDragContextProvider(props: { children?: ReactNode
       ]}
     >
       <DragOverlay style={{ cursor: 'grabbing' }}>
-        {dragMonState.payload?.kind === 'item' ? (
-          <img
-            src={getPublicImageURL(getItemIconPath(dragMonState.payload.item.index, 'PK9'))}
-            alt={dragMonState.payload.item.name}
-            style={{ width: 32, height: 32 }}
-            draggable={false}
-          />
+        {dragMonState.mode === 'item' ? (
+          dragMonState.payload?.kind === 'item' ? (
+            <img
+              src={getPublicImageURL(getItemIconPath(dragMonState.payload.item.index, 'PK9'))}
+              alt={dragMonState.payload.item.name}
+              style={{ width: 32, height: 32 }}
+              draggable={false}
+            />
+          ) : (
+            <img
+              src={getPublicImageURL(
+                getItemIconPath(dragMonState.payload?.monData.mon.heldItemIndex ?? 0, 'PK9')
+              )}
+              style={{ width: 32, height: 32 }}
+              draggable={false}
+            />
+          )
         ) : (
-          <PokemonIcon
-            dexNumber={dragMonState.payload?.monData.mon.dexNum ?? 0}
-            formeNumber={dragMonState.payload?.monData.mon.formeNum ?? 0}
-            isShiny={dragMonState.payload?.monData.mon.isShiny()}
-            heldItemIndex={dragMonState.payload?.monData.mon.heldItemIndex}
-            style={{ width: '100%', height: '100%' }}
-          />
+          dragMonState.payload?.kind === 'mon' && (
+            <PokemonIcon
+              dexNumber={dragMonState.payload?.monData.mon.dexNum ?? 0}
+              formeNumber={dragMonState.payload?.monData.mon.formeNum ?? 0}
+              isShiny={dragMonState.payload?.monData.mon.isShiny()}
+              heldItemIndex={dragMonState.payload?.monData.mon.heldItemIndex}
+              style={{ width: '100%', height: '100%' }}
+            />
+          )
         )}
       </DragOverlay>
       {children}

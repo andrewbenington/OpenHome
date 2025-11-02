@@ -64,11 +64,11 @@ const DraggableMon = ({ mon, onClick, disabled, dragData, dragID }: DraggableMon
             : mon.formeNum
         }
         isShiny={mon.isShiny()}
-        heldItemIndex={mon.heldItemIndex}
+        heldItemIndex={isDragging && dragState.mode === 'item' ? undefined : mon.heldItemIndex}
         style={{
           width: '100%',
           height: '100%',
-          visibility: isDragging ? 'hidden' : undefined,
+          visibility: isDragging && dragState.mode === 'mon' ? 'hidden' : undefined,
         }}
         greyedOut={disabled}
       />

@@ -12,7 +12,7 @@ import {
   SpeciesLookup,
 } from '@pkm-rs-resources/pkg'
 import { Types } from '@pokemon-resources/index'
-import { Button, Card, Flex, Text } from '@radix-ui/themes'
+import { Button, Flex, Text } from '@radix-ui/themes'
 import { useContext, useMemo } from 'react'
 import { OpenHomeRibbons } from 'src/consts/Ribbons'
 import { getPublicImageURL } from 'src/images/images'
@@ -114,9 +114,9 @@ export default function FilterPanel() {
   )
 
   return (
-    <Card style={{ contain: 'none', padding: 4 }}>
+    <div style={{ contain: 'none', padding: 4 }}>
       <Flex direction="row" justify="between" p="4px 4px 0px 4px">
-        <Text size="4" weight="bold">
+        <Text size="3" weight="bold">
           Filter
         </Text>
         <Button
@@ -332,6 +332,6 @@ export default function FilterPanel() {
           }
         />
       </Flex>
-    </Card>
+    </div>
   )
 }

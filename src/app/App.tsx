@@ -76,7 +76,7 @@ function buildKeyboardHandler(backend: BackendInterface) {
 
 function AppWithBackend() {
   const [mouseState, mouseDispatch] = useReducer(mouseReducer, { shift: false })
-  const [dragMonState, dragMonDispatch] = useReducer(dragMonReducer, {})
+  const [dragMonState, dragMonDispatch] = useReducer(dragMonReducer, { mode: 'mon' })
   const [appInfoState, appInfoDispatch] = useReducer(appInfoReducer, appInfoInitialState)
   const [lookupState, lookupDispatch] = useReducer(persistedPkmDataReducer, { loaded: false })
   const [filterState, filterDispatch] = useReducer(filterReducer, {})
