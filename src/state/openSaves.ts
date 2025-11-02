@@ -140,7 +140,7 @@ export type OpenSavesAction =
     }
   | {
       type: 'give_item_to_mon'
-      payload: { item: ItemIndex; dest: MonLocation; bagDispatch: Dispatch<BagAction> }
+      payload: { item: ItemIndex | undefined; dest: MonLocation; bagDispatch: Dispatch<BagAction> }
     }
   /*
    *  OTHER
@@ -188,7 +188,7 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
 ) => {
   const { type, payload } = action
 
-  // console.log({ type, payload })
+  console.log({ type, payload })
 
   switch (type) {
     /*
@@ -420,11 +420,11 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
       }
 
       if (!targetMon) {
-        return state
+        return { ...state }
       }
 
-      if (targetMon.heldItemIndex === item.index) {
-        return state
+      if (targetMon.heldItemIndex === item?.index) {
+        return { ...state }
       }
 
       let updatedMon: OHPKM
@@ -437,10 +437,10 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
 
       const oldItem = updatedMon.heldItemName
 
-      updatedMon.heldItemIndex = item.index
+      updatedMon.heldItemIndex = item?.index ?? 0
 
       if (oldItem && oldItem !== 'None') {
-        bagDispatch({ type: 'add_item', payload: { index: item.index, qty: 1 } })
+        bagDispatch({ type: 'add_item', payload: { index: item?.index ?? 0, qty: 1 } })
       }
 
       if (dest.is_home) {
@@ -457,7 +457,9 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
         state.modifiedOHPKMs[identifier] = updatedMon
       }
 
-      bagDispatch({ type: 'remove_item', payload: { index: item.index, qty: 1 } })
+      if (item) {
+        bagDispatch({ type: 'remove_item', payload: { index: item?.index, qty: 1 } })
+      }
 
       return { ...state }
     }

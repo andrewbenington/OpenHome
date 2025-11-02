@@ -51,6 +51,10 @@ export default function PokemonDragContextProvider(props: { children?: ReactNode
           } else if (target?.id === 'bag-box') {
             if (mon.heldItemIndex) {
               bagDispatch({ type: 'add_item', payload: { index: mon.heldItemIndex, qty: 1 } })
+              openSavesDispatch({
+                type: 'give_item_to_mon',
+                payload: { item: undefined, dest: payload.monData, bagDispatch },
+              })
               mon.heldItemIndex = 0
             }
           } else if (dest && (dest.is_home || dest.save?.supportsMon(mon.dexNum, mon.formeNum))) {
