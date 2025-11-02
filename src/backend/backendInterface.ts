@@ -55,9 +55,9 @@ export default interface BackendInterface {
   removeSaveFolder: (path: string) => Promise<Errorable<null>>
   upsertSaveFolder: (folderPath: string, label: string) => Promise<Errorable<null>>
 
-  /* bag */
-  loadBag: () => Promise<Errorable<Record<string, number>>>
-  saveBag: (items: Record<string, number>) => Promise<Errorable<null>>
+  /* item bag */
+  loadItemBag: () => Promise<Errorable<Record<string, number>>>
+  saveItemBag: (items: Record<string, number>) => Promise<Errorable<null>>
 
   /* transactions */
   startTransaction: () => Promise<Errorable<null>>

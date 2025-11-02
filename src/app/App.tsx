@@ -7,7 +7,7 @@ import { BackendContext } from 'src/backend/backendContext'
 import BackendInterface from 'src/backend/backendInterface'
 import { TauriBackend } from 'src/backend/tauri/tauriBackend'
 import useDisplayError from 'src/hooks/displayError'
-import { BagContext, bagReducer } from 'src/state/bag'
+import { ItemBagContext, itemBagReducer } from 'src/state/itemBag'
 import { PluginContext, pluginReducer } from 'src/state/plugin'
 import { partitionResults } from 'src/util/Functional'
 import { loadPlugin } from 'src/util/Plugin'
@@ -82,7 +82,7 @@ function AppWithBackend() {
   const [filterState, filterDispatch] = useReducer(filterReducer, {})
   const [pluginState, pluginDispatch] = useReducer(pluginReducer, { plugins: [], loaded: false })
   const [settingsLoading, setSettingsLoading] = useState(false)
-  const [bagState, bagDispatch] = useReducer(bagReducer, {
+  const [bagState, bagDispatch] = useReducer(itemBagReducer, {
     itemCounts: {},
     modified: false,
     loaded: false,
@@ -187,7 +187,7 @@ function AppWithBackend() {
                   .map((data) => data.save),
               ]}
             >
-              <BagContext.Provider value={[bagState, bagDispatch]}>
+              <ItemBagContext.Provider value={[bagState, bagDispatch]}>
                 <DragMonContext.Provider value={[dragMonState, dragMonDispatch]}>
                   <PokemonDragContextProvider>
                     <FilterContext.Provider value={[filterState, filterDispatch]}>
@@ -204,7 +204,7 @@ function AppWithBackend() {
                     </FilterContext.Provider>
                   </PokemonDragContextProvider>
                 </DragMonContext.Provider>
-              </BagContext.Provider>
+              </ItemBagContext.Provider>
             </OpenSavesContext.Provider>
           </PersistedPkmDataContext.Provider>
         </MouseContext.Provider>

@@ -8,7 +8,7 @@ import { DevDataDisplay } from 'src/components/DevDataDisplay'
 import { InfoGrid } from 'src/components/InfoGrid2'
 import useDisplayError from 'src/hooks/displayError'
 import { AppInfoContext, AppInfoState } from 'src/state/appInfo'
-import { BagContext, BagState } from 'src/state/bag'
+import { ItemBagContext, ItemBagState } from 'src/state/itemBag'
 import { OpenSavesContext, OpenSavesState } from 'src/state/openSaves'
 import { PKMInterface } from 'src/types/interfaces'
 import { ErrorContext } from '../../state/error'
@@ -18,7 +18,7 @@ export default function AppStateDisplay() {
   const [appInfoState] = useContext(AppInfoContext)
   const [openSavesState] = useContext(OpenSavesContext)
   const [errorState, dispatchErrorState] = useContext(ErrorContext)
-  const [bagState] = useContext(BagContext)
+  const [bagState] = useContext(ItemBagContext)
   const backend = useContext(BackendContext)
   const [error, setError] = useState<string>()
   const displayError = useDisplayError()
@@ -98,7 +98,7 @@ function monDisplay(mon: PKMInterface) {
   }
 }
 
-function bagDisplay(state: BagState) {
+function bagDisplay(state: ItemBagState) {
   return {
     Loaded: state.loaded,
     Modified: state.modified,

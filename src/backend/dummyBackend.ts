@@ -33,8 +33,8 @@ const DummyBackend: BackendInterface = {
   upsertSaveFolder: async () => E.left('no backend in use'),
 
   /* bag */
-  loadBag: async () => E.left('no backend in use'),
-  saveBag: async () => E.left('no backend in use'),
+  loadItemBag: async () => E.left('no backend in use'),
+  saveItemBag: async () => E.left('no backend in use'),
 
   /* transactions */
   startTransaction: async () => E.left('no backend in use'),

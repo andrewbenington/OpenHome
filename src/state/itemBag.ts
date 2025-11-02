@@ -3,23 +3,23 @@ import { createContext, Dispatch, Reducer } from 'react'
 /*
  *  STATE
  */
-export type BagState = {
+export type ItemBagState = {
   itemCounts: Record<number, number>
   modified: boolean
   loaded: boolean
   error?: string
 }
 
-export type BagAction =
-  | { type: 'load_bag'; payload: Record<number, number> }
+export type ItemBagAction =
+  | { type: 'load_item_bag'; payload: Record<number, number> }
   | { type: 'add_item'; payload: { index: number; qty: number } }
   | { type: 'remove_item'; payload: { index: number; qty: number } }
   | { type: 'clear_modified' }
   | { type: 'set_error'; payload?: string }
 
-export const bagReducer: Reducer<BagState, BagAction> = (state, action) => {
+export const itemBagReducer: Reducer<ItemBagState, ItemBagAction> = (state, action) => {
   switch (action.type) {
-    case 'load_bag':
+    case 'load_item_bag':
       return {
         ...state,
         itemCounts: action.payload,
@@ -52,12 +52,12 @@ export const bagReducer: Reducer<BagState, BagAction> = (state, action) => {
   }
 }
 
-const initialBagState: BagState = { itemCounts: {}, modified: false, loaded: false }
+const initialBagState: ItemBagState = { itemCounts: {}, modified: false, loaded: false }
 
 /*
  *  CONTEXT
  */
-export const BagContext = createContext<[BagState, Dispatch<BagAction>]>([
+export const ItemBagContext = createContext<[ItemBagState, Dispatch<ItemBagAction>]>([
   initialBagState,
   () => {},
 ])

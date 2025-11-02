@@ -1,14 +1,14 @@
 import { Generation, OriginGame, OriginGames } from '@pkm-rs-resources/pkg'
 import { bytesToPKMInterface } from '@pokemon-files/pkm'
-import { Button, Card, Flex, Tabs } from '@radix-ui/themes'
+import { Badge, Button, Card, Flex, Tabs } from '@radix-ui/themes'
 import * as E from 'fp-ts/lib/Either'
 import lodash, { flatten } from 'lodash'
 import { useCallback, useContext, useEffect, useState } from 'react'
 import { MdFileOpen } from 'react-icons/md'
 import PokemonDetailsModal from 'src/pokemon/PokemonDetailsModal'
-import BagBox from 'src/saves/BagBox'
 import BankHeader from 'src/saves/BankHeader'
-import { BagContext } from 'src/state/bag'
+import ItemBag from 'src/saves/ItemBag'
+import { ItemBagContext } from 'src/state/itemBag'
 import { displayIndexAdder, isBattleFormeItem } from 'src/types/pkm/util'
 import { CSSWithVariables, Errorable, LookupMap } from 'src/types/types'
 import { filterUndefined } from 'src/util/Sort'
@@ -30,7 +30,7 @@ import ReleaseArea from './home/ReleaseArea'
 const Home = () => {
   const [openSavesState, openSavesDispatch, allOpenSaves] = useContext(OpenSavesContext)
   const [persistedPkmState, persistedPkmDispatch] = useContext(PersistedPkmDataContext)
-  const [bagState, bagDispatch] = useContext(BagContext)
+  const [itemBagState, bagDispatch] = useContext(ItemBagContext)
   const backend = useContext(BackendContext)
   const [selectedMon, setSelectedMon] = useState<PKMInterface>()
   const [openSaveDialog, setOpenSaveDialog] = useState(false)
@@ -157,8 +157,8 @@ const Home = () => {
       ),
     ]
 
-    if (bagState.modified) {
-      const saveBagResult = await backend.saveBag(bagState.itemCounts)
+    if (itemBagState.modified) {
+      const saveBagResult = await backend.saveItemBag(itemBagState.itemCounts)
       if (E.isLeft(saveBagResult)) {
         displayError('Error Saving Bag', saveBagResult.left)
         await backend.rollbackTransaction()
@@ -198,8 +198,8 @@ const Home = () => {
     persistedPkmState.loaded,
     backend,
     allOpenSaves,
-    bagState.modified,
-    bagState.itemCounts,
+    itemBagState.modified,
+    itemBagState.itemCounts,
     openSavesDispatch,
     persistedPkmDispatch,
     loadAllLookups,
@@ -223,10 +223,10 @@ const Home = () => {
     })
 
     // // reloads bag from file
-    // backend.loadBag().then(
+    // backend.loadItemBag().then(
     //   E.match(
     //     (err) => bagDispatch({ type: 'set_error', payload: err }),
-    //     (bagObj) => bagDispatch({ type: 'load_bag', payload: bagObj })
+    //     (bagObj) => bagDispatch({ type: 'load_item_bag', payload: bagObj })
     //   )
     // )
 
@@ -284,19 +284,19 @@ const Home = () => {
 
   // load bag
   useEffect(() => {
-    if (!bagState.loaded && !bagState.error) {
-      backend.loadBag().then(
+    if (!itemBagState.loaded && !itemBagState.error) {
+      backend.loadItemBag().then(
         E.match(
           (err) => {
             bagDispatch({ type: 'set_error', payload: err })
           },
           (bagObj) => {
-            bagDispatch({ type: 'load_bag', payload: bagObj })
+            bagDispatch({ type: 'load_item_bag', payload: bagObj })
           }
         )
       )
     }
-  }, [backend, bagState.loaded, bagState.error, bagDispatch])
+  }, [backend, itemBagState.loaded, itemBagState.error, bagDispatch])
 
   const tabStyle: CSSWithVariables = {
     '--tab-padding-x': '6px',
@@ -333,7 +333,9 @@ const Home = () => {
           <Tabs.Root style={{ flex: 1, height: '100%' }} defaultValue="filter">
             <Tabs.List size="2" style={tabStyle}>
               <Tabs.Trigger value="filter">Filter</Tabs.Trigger>
-              <Tabs.Trigger value="bag">Bag</Tabs.Trigger>
+              <Tabs.Trigger value="bag">
+                Item Bag <Badge style={{ marginLeft: 4, marginRight: -4 }}>BETA</Badge>
+              </Tabs.Trigger>
             </Tabs.List>
 
             <Tabs.Content value="filter" style={{ flexGrow: 1 }}>
@@ -341,7 +343,7 @@ const Home = () => {
             </Tabs.Content>
 
             <Tabs.Content value="bag">
-              <BagBox />
+              <ItemBag />
             </Tabs.Content>
           </Tabs.Root>
         </Card>

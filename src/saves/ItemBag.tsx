@@ -1,13 +1,13 @@
 import { ItemIndex } from '@pkm-rs-resources/pkg'
 import { Flex, Grid } from '@radix-ui/themes'
 import { useContext } from 'react'
-import { BagContext } from 'src/state/bag'
+import { ItemBagContext } from 'src/state/itemBag'
 import { DragMonContext } from '../state/dragMon'
 import DroppableSpace from './boxes/DroppableSpace'
 import DraggableItem from './DraggableItem'
 
-export default function BagBox() {
-  const [bagState] = useContext(BagContext)
+export default function ItemBag() {
+  const [bagState] = useContext(ItemBagContext)
   const [, dragMonDispatch] = useContext(DragMonContext)
 
   return (
@@ -17,7 +17,7 @@ export default function BagBox() {
       style={{ width: 'calc(100% - 10px)', height: 'calc(100% - 10px)', margin: 5 }}
     >
       <DroppableSpace
-        dropID="bag-box"
+        dropID="item-bag"
         style={{
           width: 'calc(100% - 10px)',
           height: 'calc(100% - 44px)',
