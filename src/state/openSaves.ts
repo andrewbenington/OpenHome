@@ -410,13 +410,7 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
     case 'give_item_to_mon': {
       const { item, dest } = payload
 
-      let targetMon: PKMInterface | undefined
-
-      if (dest.is_home) {
-        targetMon = state.homeData?.boxes[dest.box].pokemon[dest.box_slot]
-      } else {
-        targetMon = undefined
-      }
+      const targetMon = getMonAtLocation(state, dest)
 
       if (!targetMon) {
         return { ...state }
@@ -436,13 +430,7 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
 
       updatedMon.heldItemIndex = item?.index ?? 0
 
-      if (dest.is_home) {
-        state.homeData?.setPokemon(dest, updatedMon)
-      } else {
-        dest.save.boxes[dest.box].pokemon[dest.box_slot] = updatedMon
-        dest.save.updatedBoxSlots.push({ box: dest.box, index: dest.box_slot })
-        state.openSaves = { ...state.openSaves }
-      }
+      updateMonInSave(state, updatedMon, dest)
 
       const identifier = getMonFileIdentifier(updatedMon)
 
