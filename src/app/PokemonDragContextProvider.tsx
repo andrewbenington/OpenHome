@@ -98,23 +98,21 @@ export default function PokemonDragContextProvider(props: { children?: ReactNode
       ]}
     >
       <DragOverlay style={{ cursor: 'grabbing' }}>
-        {dragMonState.mode === 'item' ? (
-          dragMonState.payload?.kind === 'item' ? (
-            <img
-              src={getPublicImageURL(getItemIconPath(dragMonState.payload.item.index, 'PK9'))}
-              alt={dragMonState.payload.item.name}
-              style={{ width: 32, height: 32 }}
-              draggable={false}
-            />
-          ) : (
-            <img
-              src={getPublicImageURL(
-                getItemIconPath(dragMonState.payload?.monData.mon.heldItemIndex ?? 0, 'PK9')
-              )}
-              style={{ width: 32, height: 32 }}
-              draggable={false}
-            />
-          )
+        {dragMonState.payload?.kind === 'item' ? (
+          <img
+            src={getPublicImageURL(getItemIconPath(dragMonState.payload.item.index, 'PK9'))}
+            alt={dragMonState.payload.item.name}
+            style={{ width: 32, height: 32 }}
+            draggable={false}
+          />
+        ) : dragMonState.mode === 'item' ? (
+          <img
+            src={getPublicImageURL(
+              getItemIconPath(dragMonState.payload?.monData.mon.heldItemIndex ?? 0, 'PK9')
+            )}
+            style={{ width: 32, height: 32 }}
+            draggable={false}
+          />
         ) : (
           dragMonState.payload?.kind === 'mon' && (
             <PokemonIcon
