@@ -36,9 +36,9 @@ export default function PokemonDragContextProvider(props: { children?: ReactNode
               payload: {
                 item: payload.item,
                 dest: target.data as MonLocation,
-                bagDispatch,
               },
             })
+            bagDispatch({ type: 'remove_item', payload: { index: payload.item.index, qty: 1 } })
           }
         } else if (payload.kind === 'mon') {
           const { mon } = payload.monData
@@ -53,7 +53,7 @@ export default function PokemonDragContextProvider(props: { children?: ReactNode
               bagDispatch({ type: 'add_item', payload: { index: mon.heldItemIndex, qty: 1 } })
               openSavesDispatch({
                 type: 'give_item_to_mon',
-                payload: { item: undefined, dest: payload.monData, bagDispatch },
+                payload: { item: undefined, dest: payload.monData },
               })
               mon.heldItemIndex = 0
             }

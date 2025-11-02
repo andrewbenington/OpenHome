@@ -7,7 +7,6 @@ import { StoredBankData } from 'src/types/storage'
 import { getMonFileIdentifier } from 'src/util/Lookup'
 import { PKMInterface } from '../types/interfaces'
 import { getSortFunctionNullable, SortType } from '../types/pkm/sort'
-import { BagAction } from './bag'
 import { PersistedPkmData } from './persistedPkmData'
 
 export type OpenSave = {
@@ -140,7 +139,7 @@ export type OpenSavesAction =
     }
   | {
       type: 'give_item_to_mon'
-      payload: { item: ItemIndex | undefined; dest: MonLocation; bagDispatch: Dispatch<BagAction> }
+      payload: { item: ItemIndex | undefined; dest: MonLocation }
     }
   /*
    *  OTHER
@@ -409,7 +408,7 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
     }
 
     case 'give_item_to_mon': {
-      const { item, dest, bagDispatch } = payload
+      const { item, dest } = payload
 
       let targetMon: PKMInterface | undefined
 
@@ -435,13 +434,7 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
         updatedMon = new OHPKM(targetMon)
       }
 
-      const oldItem = updatedMon.heldItemName
-
       updatedMon.heldItemIndex = item?.index ?? 0
-
-      if (oldItem && oldItem !== 'None') {
-        bagDispatch({ type: 'add_item', payload: { index: item?.index ?? 0, qty: 1 } })
-      }
 
       if (dest.is_home) {
         state.homeData?.setPokemon(dest, updatedMon)
@@ -455,10 +448,6 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
 
       if (identifier) {
         state.modifiedOHPKMs[identifier] = updatedMon
-      }
-
-      if (item) {
-        bagDispatch({ type: 'remove_item', payload: { index: item?.index, qty: 1 } })
       }
 
       return { ...state }
@@ -575,3 +564,16 @@ export const OpenSavesContext = createContext<[OpenSavesState, Dispatch<OpenSave
   () => {},
   [],
 ])
+
+export function getMonAtLocation(state: OpenSavesState, location: MonLocation) {
+  if (location.is_home) {
+    return state.homeData?.boxes[location.box].pokemon[location.box_slot]
+  }
+
+  const saveID = saveToStringIdentifier(location.save)
+
+  if (saveID in state.openSaves) {
+    return state.openSaves[saveID].save.boxes[location.box].pokemon[location.box_slot]
+  }
+  return undefined
+}
