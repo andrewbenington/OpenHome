@@ -7,11 +7,11 @@ import PokemonIcon from '../components/PokemonIcon'
 import { getPublicImageURL } from '../images/images'
 import { getItemIconPath } from '../images/items'
 import { DragMonContext, DragPayload } from '../state/dragMon'
-import { MonLocation, OpenSavesContext } from '../state/openSaves'
+import { getMonAtLocation, MonLocation, OpenSavesContext } from '../state/openSaves'
 
 export default function PokemonDragContextProvider(props: { children?: ReactNode }) {
   const { children } = props
-  const [, openSavesDispatch] = useContext(OpenSavesContext)
+  const [openSaves, openSavesDispatch] = useContext(OpenSavesContext)
   const [, persistedPkmDataDispatch] = useContext(PersistedPkmDataContext)
   const [dragMonState, dispatchDragMonState] = useContext(DragMonContext)
   const [, bagDispatch] = useContext(ItemBagContext)
@@ -31,6 +31,12 @@ export default function PokemonDragContextProvider(props: { children?: ReactNode
 
         if (payload.kind === 'item') {
           if (dest && target) {
+            // Avoid losing the second item if mon already holding same item
+            const destMon = getMonAtLocation(openSaves, dest)
+            if (destMon?.heldItemIndex === payload.item.index) {
+              return
+            }
+
             openSavesDispatch({
               type: 'set_mon_item',
               payload: {
