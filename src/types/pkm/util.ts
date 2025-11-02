@@ -23,6 +23,7 @@ import {
 } from 'src/util/byteLogic'
 import {
   AbilityIndex,
+  all_species_data,
   MetadataLookup,
   SpeciesAndForme,
   SpeciesLookup,
@@ -474,8 +475,11 @@ export function getWeightCalculated(mon: PKMInterface) {
 export function isMegaStone(item?: Item): boolean {
   return (
     item !== undefined &&
-    ((item >= Item.Gengarite && item <= Item.Latiosite) ||
-      (item >= Item.Swampertite && item <= Item.Beedrillite))
+    all_species_data()
+      .flatMap((species) => species.formes)
+      .flatMap((forme) => forme.megaEvolutions)
+      .flatMap((megaData) => megaData.requiredItemId)
+      .includes(item)
   )
 }
 

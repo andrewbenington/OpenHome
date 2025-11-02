@@ -1,6 +1,6 @@
 import { useDraggable } from '@dnd-kit/react'
 import { ItemIndex } from '@pkm-rs-resources/pkg'
-import { Text } from '@radix-ui/themes'
+import { Text, Tooltip } from '@radix-ui/themes'
 import { getPublicImageURL } from '../images/images'
 import { getItemIconPath } from '../images/items'
 
@@ -25,16 +25,19 @@ function DraggableItem({ item, count }: DraggableItemProps) {
         cursor: 'grab',
       }}
     >
-      <img
-        src={getPublicImageURL(getItemIconPath(item.index, 'PK9'))}
-        alt={item.name}
-        style={{
-          width: '100%',
-          height: '100%',
-          visibility: isDragging ? 'hidden' : undefined,
-        }}
-        draggable={false}
-      />
+      <Tooltip content={item.name}>
+        <img
+          src={getPublicImageURL(getItemIconPath(item.index, 'PK9'))}
+          alt={item.name}
+          style={{
+            width: '100%',
+            height: '100%',
+            visibility: isDragging ? 'hidden' : undefined,
+          }}
+          draggable={false}
+        />
+      </Tooltip>
+
       <Text
         size="1"
         weight="bold"
