@@ -10,7 +10,7 @@ import BagBox from 'src/saves/BagBox'
 import BankHeader from 'src/saves/BankHeader'
 import { BagContext } from 'src/state/bag'
 import { displayIndexAdder, isBattleFormeItem } from 'src/types/pkm/util'
-import { Errorable, LookupMap } from 'src/types/types'
+import { CSSWithVariables, Errorable, LookupMap } from 'src/types/types'
 import { filterUndefined } from 'src/util/Sort'
 import { BackendContext } from '../backend/backendContext'
 import FilterPanel from '../components/filter/FilterPanel'
@@ -298,6 +298,12 @@ const Home = () => {
     }
   }, [backend, bagState.loaded, bagState.error, bagDispatch])
 
+  const tabStyle: CSSWithVariables = {
+    '--tab-padding-x': '6px',
+    '--tab-inner-padding-y': '2px',
+    '--tab-height': '32px',
+  }
+
   return (
     <Flex direction="row" style={{ height: '100%' }}>
       <Flex className="save-file-column" gap="3">
@@ -325,7 +331,7 @@ const Home = () => {
       <Flex gap="2" className="right-column" direction="column">
         <Card style={{ minHeight: '50%', padding: 0 }}>
           <Tabs.Root style={{ flex: 1, height: '100%' }} defaultValue="filter">
-            <Tabs.List size="1">
+            <Tabs.List size="2" style={tabStyle}>
               <Tabs.Trigger value="filter">Filter</Tabs.Trigger>
               <Tabs.Trigger value="bag">Bag</Tabs.Trigger>
             </Tabs.List>
