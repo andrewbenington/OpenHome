@@ -21,6 +21,11 @@ export type OpenHomeBox = {
   index: number
   name: string | null
   identifiers: BoxMonIdentifiers
+  customization?: BoxCustomization
+}
+
+export type BoxCustomization = {
+  color?: string
 }
 
 export type BoxMonIdentifiers = Record<number, string>

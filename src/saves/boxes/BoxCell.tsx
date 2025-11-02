@@ -9,6 +9,7 @@ import { PKMInterface } from 'src/types/interfaces'
 import { displayIndexAdder, isBattleFormeItem } from 'src/types/pkm/util'
 import { PokedexUpdate } from 'src/types/pokedex'
 import useDisplayError from '../../hooks/displayError'
+import { contrastingBgColor } from '../../util/color'
 import '../style.css'
 import DraggableMon from './DraggableMon'
 import DroppableSpace from './DroppableSpace'
@@ -21,6 +22,7 @@ interface BoxCellProps {
   zIndex: number
   mon: PKMInterface | undefined
   borderColor?: string
+  backgroundColor?: string
   dragID: string
   location: MonLocation
 }
@@ -33,6 +35,7 @@ const BoxCell = ({
   zIndex,
   mon,
   borderColor,
+  backgroundColor,
   dragID,
   location,
 }: BoxCellProps) => {
@@ -90,7 +93,7 @@ const BoxCell = ({
       }
     }
     return {
-      backgroundColor: '#0000',
+      backgroundColor: contrastingBgColor(backgroundColor),
     }
   }
 
@@ -111,7 +114,7 @@ const BoxCell = ({
         aspectRatio: 1,
         borderRadius: 3,
         borderWidth: 1,
-        backgroundColor: disabled || isFilteredOut ? '#555' : '#6662',
+        backgroundColor: disabled || isFilteredOut ? '#555' : contrastingBgColor(backgroundColor),
         borderColor: borderColor,
         zIndex,
       }}

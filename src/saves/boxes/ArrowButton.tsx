@@ -1,20 +1,20 @@
-import { Button } from '@radix-ui/themes'
+import { Button, ButtonProps } from '@radix-ui/themes'
 import { CSSProperties, useCallback, useEffect, useRef, useState } from 'react'
 import { ArrowLeftIcon, ArrowRightIcon } from 'src/components/Icons'
 import '../style.css'
 import DroppableSpace from './DroppableSpace'
 
-interface OpenHomeButtonProps {
+type OpenHomeButtonProps = {
   onClick?: (e?: any) => void
   disabled?: boolean
   style?: CSSProperties
   dragID?: string
   direction: 'left' | 'right'
-}
+} & ButtonProps
 const DRAG_OVER_COOLDOWN_MS = 500
 
 const ArrowButton = (props: OpenHomeButtonProps) => {
-  const { onClick, disabled, style, dragID, direction } = props
+  const { onClick, disabled, style, dragID, direction, ...buttonProps } = props
   const [timer, setTimer] = useState<NodeJS.Timeout>()
   const onClickRef = useRef(onClick)
 
@@ -44,9 +44,10 @@ const ArrowButton = (props: OpenHomeButtonProps) => {
     <Button
       className="arrow-button"
       onClick={onClick}
-      variant="soft"
+      variant={props.variant ?? 'soft'}
       style={style}
       disabled={disabled}
+      {...buttonProps}
     >
       <DroppableSpace dropID={`${dragID}-drop`} onOver={onDragOver} onNotOver={onNotDragOver}>
         {direction === 'left' ? <ArrowLeftIcon /> : <ArrowRightIcon />}

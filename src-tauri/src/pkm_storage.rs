@@ -95,6 +95,7 @@ pub struct Box {
     pub name: Option<String>,
     pub index: usize,
     pub identifiers: BoxIdentifiers,
+    pub customization: Option<BoxCustomization>,
 }
 
 impl Box {
@@ -142,4 +143,9 @@ pub fn write_banks(app_handle: tauri::AppHandle, mut bank_data: StoredBankData) 
         .map(deprecated::BoxPreV1_5_0::from_current)
         .collect();
     util::write_storage_file_json(&app_handle, "box-data.json", old_box_data)
+}
+
+#[derive(Default, Serialize, Deserialize, Clone)]
+pub struct BoxCustomization {
+    pub color: Option<String>,
 }

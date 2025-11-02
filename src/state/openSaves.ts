@@ -87,6 +87,10 @@ export type OpenSavesAction =
       payload: { name: string | undefined; index: number }
     }
   | {
+      type: 'set_home_box_color'
+      payload: { color: string | undefined; index: number }
+    }
+  | {
       type: 'add_home_box'
       payload: { currentBoxCount: number }
     }
@@ -280,6 +284,14 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
 
       if (!newState.homeData) return { ...state }
       newState.homeData.setBoxNameCurrentBank(payload.index, payload.name)
+
+      return newState
+    }
+    case 'set_home_box_color': {
+      const newState = { ...state }
+
+      if (!newState.homeData) return { ...state }
+      newState.homeData.setBoxColorCurrentBank(payload.index, payload.color)
 
       return newState
     }

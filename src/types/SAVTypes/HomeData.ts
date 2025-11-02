@@ -6,6 +6,7 @@ import { filterUndefined, numericSorter } from '../../util/Sort'
 import { TransferRestrictions } from '../TransferRestrictions'
 import { OHPKM } from '../pkm/OHPKM'
 import {
+  BoxCustomization,
   BoxMonIdentifiers,
   getBankName,
   OpenHomeBank,
@@ -19,18 +20,29 @@ export class HomeBox implements Box<OHPKM> {
   id: string
   name: string | undefined
   index: number
+  customization: BoxCustomization | null
 
   pokemon: Array<OHPKM | undefined> = new Array(120)
 
-  constructor(homeBox: OpenHomeBox) {
-    const { id, name, index } = homeBox
-
+  constructor(
+    id: string,
+    name: string | null | undefined,
+    index: number,
+    customization: BoxCustomization | null | undefined
+  ) {
     if (name !== `Box ${index + 1}`) {
       this.name = name ?? undefined
     }
 
     this.id = id
     this.index = index
+    this.customization = customization ?? null
+  }
+
+  static fromStored(homeBox: OpenHomeBox) {
+    const { id, name: storedName, index, customization } = homeBox
+    const name = storedName !== `Box ${index + 1}` ? storedName : undefined
+    return new HomeBox(id, name, index, customization)
   }
 
   getIdentifierMapping(): BoxMonIdentifiers {
@@ -139,7 +151,7 @@ export class HomeData {
     // console.log(this._banks, this._banks[bank_index], this._banks[bank_index].boxes)
     const bankBoxes = this._banks[bank_index].boxes.sort((box_metadata) => box_metadata.index)
 
-    this.boxes = bankBoxes.map((box) => new HomeBox(box))
+    this.boxes = bankBoxes.map(HomeBox.fromStored)
     bankBoxes.forEach((box_metadata) => {
       this.boxes[box_metadata.index].loadMonsFromIdentifiers(box_metadata.identifiers, mon_lookup)
     })
@@ -197,6 +209,23 @@ export class HomeData {
     return Ok(null)
   }
 
+  setBoxColorCurrentBank(box_index: number, color: string | undefined): Errorable<null> {
+    const bank = this.getCurrentBank()
+
+    if (box_index >= bank.boxes.length) {
+      return Err(
+        `Cannot access box at index ${box_index} (${bank.name} has ${bank.boxes.length} boxes total)`
+      )
+    }
+
+    const currentCustomization = this.boxes[box_index].customization ?? {}
+    this.boxes[box_index].customization = { ...currentCustomization, color }
+    this.boxes = [...this.boxes]
+    this.syncBankToBoxes()
+
+    return Ok(null)
+  }
+
   deleteBoxCurrentBank(box_index: number, box_id: string): Errorable<null> {
     const bank = this.getCurrentBank()
 
@@ -216,36 +245,26 @@ export class HomeData {
       return Err(`Box id and index mismatch`)
     }
     this.boxes = [...this.boxes.filter((box) => box.id !== box_id)]
-    this.resetBoxIndices()
+    this.indexAndSyncBoxes()
     this.syncBankToBoxes()
 
     return Ok(null)
   }
 
   addBoxCurrentBank(): Errorable<null> {
-    const newBox: OpenHomeBox = {
-      id: UuidV4(),
-      name: null,
-      index: this.boxes.length,
-      identifiers: {},
-    }
-
-    this.boxes = [...this.boxes, new HomeBox(newBox)]
-    this.resetBoxIndices()
-    this.syncBankToBoxes()
+    const newBox = new HomeBox(UuidV4(), null, this.boxes.length, null)
+    this.boxes = [...this.boxes, newBox]
+    this.indexAndSyncBoxes()
 
     return Ok(null)
   }
 
   reorderBoxesCurrentBank(ids_in_new_order: string[]) {
     this.boxes = this.boxes.toSorted(numericSorter((box) => ids_in_new_order.indexOf(box.id)))
-
-    this.boxes.forEach((box, newIndex) => (box.index = newIndex))
-
-    this.syncBankToBoxes()
+    this.indexAndSyncBoxes()
   }
 
-  resetBoxIndices() {
+  indexAndSyncBoxes() {
     this.boxes.forEach((box, newIndex) => (box.index = newIndex))
     this.syncBankToBoxes()
   }
@@ -278,6 +297,7 @@ export class HomeData {
       index: box.index,
       name: box.name || null,
       identifiers: box.getIdentifierMapping(),
+      customization: box.customization ?? undefined,
     }))
   }
 

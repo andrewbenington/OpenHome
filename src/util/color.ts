@@ -17,3 +17,23 @@ export function colorIsDark(bgColor?: string) {
 
   return L <= 0.179
 }
+
+export function contrastingBgColor(color?: string) {
+  if (!color) return '#ffffff20'
+  return colorIsDark(color) ? '#ffffff19' : '#00000019'
+}
+
+export function contrastingTextColor(color?: string) {
+  if (!color) return undefined
+  return colorIsDark(color) ? '#fff' : '#000'
+}
+
+export function contrastingBoxShadow(color?: string) {
+  const textColor = contrastingTextColor(color)
+
+  return textColor?.length === 4
+    ? `inset 0 0 0 1px ${textColor}6`
+    : textColor?.length === 7
+      ? `inset 0 0 0 1px ${textColor}60`
+      : undefined
+}

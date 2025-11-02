@@ -131,3 +131,7 @@ export type JSONValue = string | number | boolean | null | undefined | JSONArray
 export interface JSONObject extends Record<string, JSONValue> {}
 
 export interface JSONArray extends Array<JSONValue> {}
+
+type CSSVariable = `--${string}`
+
+export type CSSWithVariables = CSSProperties & Record<CSSVariable, string | undefined>

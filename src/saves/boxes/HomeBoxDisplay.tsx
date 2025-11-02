@@ -47,7 +47,10 @@ import { range } from 'src/util/Functional'
 import ToggleButton from '../../components/ToggleButton'
 import useIsDev from '../../hooks/isDev'
 import { HomeBox, HomeData } from '../../types/SAVTypes/HomeData'
+import { CSSWithVariables } from '../../types/types'
+import { contrastingBoxShadow, contrastingTextColor } from '../../util/color'
 import { filterUndefined } from '../../util/Sort'
+import BoxCustomization from './BoxSettings'
 import './style.css'
 
 const COLUMN_COUNT = 12
@@ -64,6 +67,7 @@ export default function HomeBoxDisplay() {
   const [deleting, setDeleting] = useState(false)
   const [viewMode, setViewMode] = useState<BoxViewMode>('one')
   const [editingBoxName, setEditingBoxName] = useState('')
+  const [boxSettingsOpen, setBoxSettingsOpen] = useState(false)
   const isDev = useIsDev()
   const [debugMode, setDebugMode] = useState(false)
 
@@ -83,23 +87,24 @@ export default function HomeBoxDisplay() {
     [homeData, openSavesDispatch]
   )
 
+  const containerStyle: CSSWithVariables =
+    viewMode === 'one'
+      ? {
+          '--card-background-color': currentBox?.customization?.color,
+        }
+      : {}
+
+  const isCustomColor = currentBox?.customization?.color
+  const textColor = contrastingTextColor(currentBox?.customization?.color)
+  const boxShadow = isCustomColor
+    ? contrastingBoxShadow(currentBox?.customization?.color)
+    : undefined
+
   return (
     homeData &&
     currentBox && (
       <>
-        <Card
-          variant="surface"
-          style={{
-            padding: 6,
-            width: '100%',
-            height: 'fit-content',
-            maxHeight: '100%',
-            overflow: 'auto',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 4,
-          }}
-        >
+        <Card className="home-box-display" variant="surface" style={containerStyle}>
           <Flex direction="row" className="box-navigation">
             <Flex align="center" justify="between" flexGrow="3" width="0">
               <ViewToggle
@@ -109,9 +114,14 @@ export default function HomeBoxDisplay() {
               />
               <ArrowButton
                 onClick={onArrowLeft}
-                style={{ visibility: viewMode === 'one' ? 'visible' : 'collapse' }}
+                style={{
+                  visibility: viewMode === 'one' ? 'visible' : 'collapse',
+                  color: textColor,
+                  boxShadow,
+                }}
                 dragID="home-arrow-left"
                 direction="left"
+                color={isCustomColor ? 'gray' : undefined}
                 disabled={editing}
               />
             </Flex>
@@ -124,6 +134,7 @@ export default function HomeBoxDisplay() {
                     minWidth: 0,
                     textAlign: 'center',
                     visibility: viewMode === 'one' ? 'visible' : 'collapse',
+                    color: textColor,
                   }}
                   placeholder={`Box ${currentBox.index + 1}`}
                   onChange={(e) => setEditingBoxName(e.target.value)}
@@ -143,7 +154,10 @@ export default function HomeBoxDisplay() {
               ) : (
                 <Heading
                   size="3"
-                  style={{ visibility: viewMode === 'one' ? 'visible' : 'collapse' }}
+                  style={{
+                    visibility: viewMode === 'one' ? 'visible' : 'collapse',
+                    color: textColor,
+                  }}
                 >
                   {currentBox.name?.trim() || `Box ${currentBox.index + 1}`}
                 </Heading>
@@ -159,8 +173,13 @@ export default function HomeBoxDisplay() {
                     },
                   })
                 }
-                style={{ visibility: viewMode === 'one' ? 'visible' : 'collapse' }}
+                style={{
+                  visibility: viewMode === 'one' ? 'visible' : 'collapse',
+                  color: contrastingTextColor(currentBox.customization?.color),
+                  boxShadow,
+                }}
                 dragID="home-arrow-right"
+                color={isCustomColor ? 'gray' : undefined}
                 direction="right"
                 disabled={editing}
               />
@@ -178,6 +197,8 @@ export default function HomeBoxDisplay() {
                     }
                     icon={EditIcon}
                     hint="Change box name"
+                    colorOverride={textColor}
+                    boxShadow={boxShadow}
                   />
                 ) : (
                   <>
@@ -187,7 +208,7 @@ export default function HomeBoxDisplay() {
                     <Tooltip content="Add box to end">
                       <Button
                         className="mini-button"
-                        variant="outline"
+                        variant="soft"
                         color="gray"
                         onClick={() =>
                           openSavesDispatch({
@@ -217,7 +238,12 @@ export default function HomeBoxDisplay() {
                 )}
                 <DropdownMenu.Root>
                   <DropdownMenu.Trigger>
-                    <Button className="mini-button" variant="outline" color="gray">
+                    <Button
+                      className="mini-button"
+                      variant="outline"
+                      color="gray"
+                      style={{ color: textColor, boxShadow }}
+                    >
                       <MenuIcon />
                     </Button>
                   </DropdownMenu.Trigger>
@@ -269,11 +295,19 @@ export default function HomeBoxDisplay() {
                     >
                       Remove duplicates from this box
                     </DropdownMenu.Item>
+                    <DropdownMenu.Item onClick={() => setBoxSettingsOpen(true)}>
+                      Box Settings...
+                    </DropdownMenu.Item>
                   </DropdownMenu.Content>
                 </DropdownMenu.Root>
               </Flex>
             </Flex>
           </Flex>
+          <BoxCustomization
+            homeBoxIndex={currentBox.index}
+            open={boxSettingsOpen}
+            onClose={() => setBoxSettingsOpen(false)}
+          />
           {viewMode === 'one' ? (
             <BoxMons />
           ) : (
@@ -417,6 +451,7 @@ function BoxMons() {
                   !dragData.is_home &&
                   !dragData.save.supportsMon(mon.dexNum, mon.formeNum)
                 }
+                backgroundColor={currentBox.customization?.color}
               />
             ))}
         </Grid>
@@ -618,6 +653,9 @@ function BoxOverview({ box, onBoxSelect, debugMode, deleting }: BoxOverviewProps
 function SortableBoxOverview({ box, debugMode }: BoxOverviewProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging, active } =
     useSortable({ id: box.id })
+  const containerStyle: CSSWithVariables = {
+    '--card-background-color': box?.customization?.color,
+  }
 
   const style: CSSProperties = {
     transform: CSS.Transform.toString(transform),
@@ -626,6 +664,7 @@ function SortableBoxOverview({ box, debugMode }: BoxOverviewProps) {
     alignItems: 'center',
     justifyContent: 'space-between',
     zIndex: isDragging ? 1000 : undefined,
+    ...containerStyle,
   }
 
   if (!box) return <div />
@@ -640,6 +679,7 @@ function SortableBoxOverview({ box, debugMode }: BoxOverviewProps) {
           width: '100%',
           minWidth: '100%',
           cursor: active ? 'grabbing' : 'grab',
+          ...containerStyle,
         }}
       >
         <BoxWithMons box={box} debugMode={debugMode} />
@@ -654,9 +694,13 @@ type BoxMonIconsProps = {
 }
 
 function BoxWithMons({ box, debugMode }: BoxMonIconsProps) {
+  const containerStyle: CSSWithVariables = {
+    backgroundColor: box?.customization?.color,
+  }
+
   return (
     <Flex direction="column" width="100%">
-      <div className="box-icon-mon-container">
+      <div className="box-icon-mon-container" style={containerStyle}>
         {range(HomeData.BOX_COLUMNS).map((i) => (
           <div className="box-icon-mon-col" key={`pos-display-col-${i}`}>
             {range(HomeData.BOX_ROWS).map((j) => (

@@ -9,6 +9,8 @@ export type ToggleButtonProps = {
   disabled?: boolean
   onSet?: () => void
   onUnset?: () => void
+  colorOverride?: string
+  boxShadow?: string
 }
 
 export default function ToggleButton(props: ToggleButtonProps) {
@@ -20,6 +22,8 @@ export default function ToggleButton(props: ToggleButtonProps) {
     disabled,
     onSet,
     onUnset,
+    colorOverride,
+    boxShadow,
   } = props
 
   const button = (
@@ -36,6 +40,7 @@ export default function ToggleButton(props: ToggleButtonProps) {
         }
         setIsToggled(!isToggled)
       }}
+      style={{ color: colorOverride, boxShadow }}
     >
       <Icon />
     </Button>

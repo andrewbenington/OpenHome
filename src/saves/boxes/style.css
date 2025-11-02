@@ -160,3 +160,14 @@
 .box-icon-mon-empty {
   background-color: #fff3;
 }
+
+.home-box-display {
+  padding: 6px;
+  width: 100%;
+  height: fit-content;
+  max-height: 100%;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}

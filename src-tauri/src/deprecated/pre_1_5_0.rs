@@ -31,6 +31,7 @@ impl BoxPreV1_5_0 {
             name: self.name,
             index: self.index as usize,
             identifiers,
+            ..Default::default()
         }
     }
 
