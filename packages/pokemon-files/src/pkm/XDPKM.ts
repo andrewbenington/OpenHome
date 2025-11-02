@@ -2,18 +2,14 @@
 
 import {
   Ball,
+  ItemGen3,
   Language,
   Languages,
   MetadataLookup,
   NatureIndex,
   SpeciesLookup,
 } from '@pkm-rs-resources/pkg'
-import {
-  Gen3ContestRibbons,
-  Gen3StandardRibbons,
-  ItemGen3FromString,
-  ItemGen3ToString,
-} from '@pokemon-resources/index'
+import { Gen3ContestRibbons, Gen3StandardRibbons, ItemGen3ToString } from '@pokemon-resources/index'
 import { NationalDex } from 'src/consts/NationalDex'
 import * as byteLogic from '../util/byteLogic'
 import { AllPKMFields } from '../util/pkmInterface'
@@ -36,7 +32,7 @@ export class XDPKM {
     return 196
   }
   dexNum: number
-  heldItemIndex: number
+  heldItemIndexGen3?: ItemGen3
   currentHP: number
   trainerFriendship: number
   metLocationIndex: number
@@ -69,7 +65,7 @@ export class XDPKM {
       const buffer = arg
       const dataView = new DataView(buffer)
       this.dexNum = dataView.getUint16(0x0, false)
-      this.heldItemIndex = dataView.getUint16(0x2, false)
+      this.heldItemIndexGen3 = ItemGen3.fromIndex(dataView.getUint16(0x2, false))
       this.currentHP = dataView.getUint16(0x4, false)
       this.trainerFriendship = dataView.getUint16(0x6, false)
       this.metLocationIndex = dataView.getUint16(0x8, false)
@@ -117,7 +113,7 @@ export class XDPKM {
     } else {
       const other = arg
       this.dexNum = other.dexNum
-      this.heldItemIndex = ItemGen3FromString(other.heldItemName)
+      this.heldItemIndexGen3 = ItemGen3.fromModern(other.heldItemIndex)
       this.currentHP = other.currentHP ?? 0
       this.trainerFriendship = other.trainerFriendship ?? 0
       this.metLocationIndex = other.metLocationIndex ?? 0
@@ -296,6 +292,10 @@ export class XDPKM {
       (this.personalityValue & 0xffff) ^
       ((this.personalityValue >> 16) & 0xffff)
     )
+  }
+
+  public get heldItemIndex() {
+    return this.heldItemIndexGen3?.toModern()?.index ?? 0
   }
 
   public get metadata() {
