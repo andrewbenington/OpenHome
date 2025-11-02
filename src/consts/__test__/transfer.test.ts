@@ -82,3 +82,19 @@ describe('strict supersets', () => {
     })
   }
 })
+
+describe('no duplicates', () => {
+  for (let [name, restrictions] of Object.entries(allTransferRestrictions)) {
+    test(`no duplicates in ${name}`, () => {
+      if (restrictions.transferableDexNums) {
+        for (const nationalDex of restrictions.transferableDexNums) {
+          const count = restrictions.transferableDexNums.filter(
+            (index) => index === nationalDex
+          ).length
+
+          if (count > 1) throw new Error(`Occurs ${count} times in ${name}: ${nationalDex}`)
+        }
+      }
+    })
+  }
+})
