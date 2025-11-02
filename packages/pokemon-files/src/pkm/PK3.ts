@@ -1,9 +1,10 @@
-import { ItemGen3FromString, ItemGen3ToString } from '@pokemon-resources/items'
+import { ItemGen3ToString } from '@pokemon-resources/items'
 import { Gen3ContestRibbons, Gen3StandardRibbons } from '@pokemon-resources/other'
 import { NationalDex } from 'src/consts/NationalDex'
 
 import {
   Ball,
+  ItemGen3,
   Language,
   Languages,
   MetadataLookup,
@@ -39,7 +40,7 @@ export class PK3 {
   language: Language
   markings: types.MarkingsFourShapes
   dexNum: number
-  heldItemIndex: number
+  heldItemIndexGen3?: ItemGen3
   exp: number
   movePPUps: number[]
   trainerFriendship: number
@@ -84,7 +85,9 @@ export class PK3 {
       this.language = Languages.fromByteOrNone(dataView.getUint8(0x12))
       this.markings = types.markingsFourShapesFromBytes(dataView, 0x1b)
       this.dexNum = conversion.fromGen3PokemonIndex(dataView.getUint16(0x20, true))
-      this.heldItemIndex = dataView.getUint16(0x22, true)
+
+      this.heldItemIndexGen3 = ItemGen3.fromIndex(dataView.getUint16(0x22, true))
+
       this.exp = dataView.getUint32(0x24, true)
       this.movePPUps = [
         byteLogic.uIntFromBufferBits(dataView, 0x28, 0, 2, true),
@@ -150,7 +153,7 @@ export class PK3 {
         heart: false,
       }
       this.dexNum = other.dexNum
-      this.heldItemIndex = ItemGen3FromString(other.heldItemName)
+      this.heldItemIndexGen3 = ItemGen3.fromModern(other.heldItemIndex)
       this.exp = other.exp
       this.movePPUps = other.movePPUps.filter((_, i) => other.moves[i] <= PK3.maxValidMove())
       this.trainerFriendship = other.trainerFriendship ?? 0
@@ -221,7 +224,9 @@ export class PK3 {
     dataView.setUint8(0x12, this.language)
     types.markingsFourShapesToBytes(dataView, 0x1b, this.markings)
     dataView.setUint16(0x20, conversion.toGen3PokemonIndex(this.dexNum), true)
-    dataView.setUint16(0x22, this.heldItemIndex, true)
+
+    dataView.setUint16(0x22, this.heldItemIndexGen3?.index ?? 0, true)
+
     dataView.setUint32(0x24, this.exp, true)
     for (let i = 0; i < 4; i++) {
       byteLogic.uIntToBufferBits(dataView, this.movePPUps[i], 0x28, 0 + i * 2, 2, true)
@@ -356,6 +361,10 @@ export class PK3 {
       (this.personalityValue & 0xffff) ^
       ((this.personalityValue >> 16) & 0xffff)
     )
+  }
+
+  public get heldItemIndex() {
+    return this.heldItemIndexGen3?.toModern()?.index ?? 0
   }
 
   public get metadata() {
