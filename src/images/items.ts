@@ -92,13 +92,9 @@ const SharedItemSpritePrefixes = ['Data Card', 'Lost Satchel', 'Old Verse', 'Los
 const itemEquivalents: Record<string, string> = {
   'Parlyz Heal': 'Paralyze Heal',
   Bicycle: 'Bike',
-  'Devon Goods': 'Devon Parts',
-  Itemfinder: 'Dowsing Machine',
-  'Pokéblock Case': 'Pokéblock Kit',
   NeverMeltIce: 'Never-Melt Ice',
   'Up-Grade': 'Upgrade',
   Stick: 'Leek',
-  "Oak's Parcel": 'Parcel',
 }
 
 export const getItemIconPath = (item: Item | ItemGen2, format?: string): string => {
