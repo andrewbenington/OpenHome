@@ -91,6 +91,7 @@ export default function HomeBoxDisplay() {
     viewMode === 'one'
       ? {
           '--card-background-color': currentBox?.customization?.color,
+          backgroundImage: `url(${currentBox?.customization?.image})`,
         }
       : {}
 

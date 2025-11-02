@@ -26,6 +26,7 @@ export type OpenHomeBox = {
 
 export type BoxCustomization = {
   color?: string
+  image?: string
 }
 
 export type BoxMonIdentifiers = Record<number, string>

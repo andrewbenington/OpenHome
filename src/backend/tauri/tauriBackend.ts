@@ -96,9 +96,6 @@ export const TauriBackend: BackendInterface = {
     return TauriInvoker.getBanks()
   },
   writeHomeBanks: (bankData: StoredBankData): Promise<Errorable<null>> => {
-    console.log(
-      bankData.banks.flatMap((bank) => bank.boxes).flatMap((box) => [box.name, box.customization])
-    )
     return TauriInvoker.writeBanks(bankData)
   },
 
