@@ -173,7 +173,7 @@ export class PK2 {
     const dataView = new DataView(buffer)
 
     dataView.setUint8(0x0, this.dexNum)
-    dataView.setUint8(0x1, this.heldItemIndex)
+    dataView.setUint8(0x1, this.heldItemIndexGen2?.index ?? 0)
     for (let i = 0; i < 4; i++) {
       dataView.setUint8(0x2 + i, this.moves[i])
     }

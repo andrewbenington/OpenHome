@@ -162,7 +162,7 @@ export class PK1 {
     dataView.setUint8(0x4, this.statusCondition)
     dataView.setUint8(0x5, this.type1)
     dataView.setUint8(0x6, this.type2)
-    dataView.setUint8(0x7, this.heldItemIndex)
+    dataView.setUint8(0x7, this.heldItemIndexGen1?.index ?? 0)
     for (let i = 0; i < 4; i++) {
       dataView.setUint8(0x8 + i, this.moves[i])
     }
