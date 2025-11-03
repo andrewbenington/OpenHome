@@ -2,6 +2,7 @@
 
 import {
   Generation,
+  ItemGen1,
   Language,
   Languages,
   MetadataLookup,
@@ -9,7 +10,6 @@ import {
   SpeciesLookup,
 } from '@pkm-rs-resources/pkg'
 
-import { ItemFromString, ItemToString } from '@pokemon-resources/items'
 import * as conversion from '../conversion'
 import * as byteLogic from '../util/byteLogic'
 import { AllPKMFields } from '../util/pkmInterface'
@@ -34,7 +34,7 @@ export class PK1 {
   statusCondition: number
   type1: number
   type2: number
-  heldItemIndex: number
+  heldItemIndexGen1?: ItemGen1
   moves: number[]
   trainerID: number
   exp: number
@@ -56,7 +56,7 @@ export class PK1 {
       this.statusCondition = dataView.getUint8(0x4)
       this.type1 = dataView.getUint8(0x5)
       this.type2 = dataView.getUint8(0x6)
-      this.heldItemIndex = 0
+      this.heldItemIndexGen1 = undefined
       this.moves = [
         dataView.getUint8(0x8),
         dataView.getUint8(0x9),
@@ -106,7 +106,7 @@ export class PK1 {
       this.statusCondition = other.statusCondition ?? 0
       this.type1 = other.type1 ?? 0
       this.type2 = other.type2 ?? 0
-      this.heldItemIndex = ItemFromString(other.heldItemName)
+      this.heldItemIndexGen1 = ItemGen1.fromModern(other.heldItemIndex)
       this.moves = other.moves.filter((_, i) => other.moves[i] <= PK1.maxValidMove())
       if (
         !(
@@ -199,8 +199,13 @@ export class PK1 {
   public get languageString() {
     return Languages.stringFromByte(this.language)
   }
+
+  public get heldItemIndex() {
+    return this.heldItemIndexGen1?.toModern()?.index ?? 0
+  }
+
   public get heldItemName() {
-    return ItemToString(this.heldItemIndex)
+    return this.heldItemIndexGen1?.name ?? 'None'
   }
 
   public get trainerGender() {
