@@ -1,5 +1,4 @@
-import { ItemIndex } from '@pkm-rs-resources/pkg'
-import { Item } from '@pokemon-resources/index'
+import { Item } from '@pkm-rs-resources/pkg'
 
 const BallIcons: { [key: string]: string } = {
   Master: 'items/index/0001.png',
@@ -84,7 +83,7 @@ export const BallsImageList = [
 
 const SharedItemSpritePrefixes = ['Data Card', 'Lost Satchel', 'Old Verse', 'Lost Satchel']
 
-export const getItemIconPath = (item: Item): string => {
+export const getItemIconPath = (item: number): string => {
   if (
     (item > 1057 && item < 1074) ||
     (item > 1639 && item < 1651) ||
@@ -100,7 +99,12 @@ export const getItemIconPath = (item: Item): string => {
     return `items/index/0000.png`
   }
 
-  const itemName = ItemIndex.fromIndex(item)?.name ?? ''
+  const PICNIC_SET = 2311
+  const BLUE_POKE_BALL_PICK = 2342
+  const PINK_BOTTLE = 2348
+  const YELLOW_DISH = 2400
+
+  const itemName = Item.fromIndex(item)?.name ?? 'None'
   if (item > 0) {
     if (itemName.startsWith('HM') || (itemName.startsWith('TM') && itemName.charAt(2) !== 'V')) {
       return 'items/tm/normal.png'
@@ -112,8 +116,8 @@ export const getItemIconPath = (item: Item): string => {
       return 'items/shared/dynamax-crystal.png'
     }
     if (
-      (item >= Item.PicnicSet && item <= Item.BluePokeBallPick) ||
-      (item >= Item.PinkBottle && item <= Item.YellowDish)
+      (item >= PICNIC_SET && item <= BLUE_POKE_BALL_PICK) ||
+      (item >= PINK_BOTTLE && item <= YELLOW_DISH)
     ) {
       return 'items/shared/picnic-set.png'
     }

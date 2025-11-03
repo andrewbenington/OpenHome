@@ -4,7 +4,7 @@ import {
   getAllAbilities,
   getAllBalls,
   getAllItems,
-  ItemIndex,
+  Item,
   ItemMetadata,
   OriginGame,
   OriginGames,
@@ -64,10 +64,10 @@ function itemMetadataToSelectOption(metadata: ItemMetadata): SelectOption {
 }
 
 function itemIndexToSelectOption(index: number): SelectOption {
-  const parsed = ItemIndex.fromIndex(index)
-  if (!parsed) return { id: index, label: '' }
+  const item = Item.fromIndex(index)
+  if (!item) return { id: index, label: '' }
 
-  return itemMetadataToSelectOption(parsed.getMetadata())
+  return itemMetadataToSelectOption(item.getMetadata())
 }
 
 export default function FilterPanel() {
