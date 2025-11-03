@@ -1,6 +1,7 @@
 import Database from 'better-sqlite3'
 import * as fs from 'fs'
 import {
+  itemGen1GetAll,
   type ItemGen1GetAllRow,
   itemGen2GetAll,
   type ItemGen2GetAllRow,
@@ -63,7 +64,7 @@ function convertItemPastGen(
 }
 
 async function generateGen1() {
-  const allItems = await itemGen2GetAll(new Database('generate/pkm.db'))
+  const allItems = await itemGen1GetAll(new Database('generate/pkm.db'))
 
   let output = `use crate::items::{ItemGen1, ItemMetadataPastGen};
 

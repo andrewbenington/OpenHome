@@ -126,7 +126,7 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
           {mon.heldItemName !== 'None' && (
             <img
               alt="item icon"
-              src={getPublicImageURL(getItemIconPath(mon.heldItemIndex, mon.format))}
+              src={getPublicImageURL(getItemIconPath(mon.heldItemIndex))}
               style={{ width: 24, height: 24, marginRight: 5 }}
             />
           )}

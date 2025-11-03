@@ -207,7 +207,7 @@ export default function FilterPanel() {
             currentItem.type === 'specific_item' && (
               <img
                 alt="item icon"
-                src={getPublicImageURL(getItemIconPath(currentItem.id, 'PK9'))}
+                src={getPublicImageURL(getItemIconPath(currentItem.id))}
                 style={{ width: 24, height: 24 }}
                 onError={(e) => {
                   ;(e.target as HTMLImageElement).src = getPublicImageURL(`items/index/0000.png`)

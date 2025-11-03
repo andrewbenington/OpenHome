@@ -56,7 +56,7 @@ export class PK1 {
       this.statusCondition = dataView.getUint8(0x4)
       this.type1 = dataView.getUint8(0x5)
       this.type2 = dataView.getUint8(0x6)
-      this.heldItemIndexGen1 = undefined
+      this.heldItemIndexGen1 = ItemGen1.fromIndex(dataView.getUint8(0x7))
       this.moves = [
         dataView.getUint8(0x8),
         dataView.getUint8(0x9),
@@ -96,6 +96,11 @@ export class PK1 {
       } else {
         this.nickname = this.metadata?.formeName ?? ''
       }
+      console.log(
+        this.nickname,
+        dataView.getUint8(0x7),
+        ItemGen1.fromIndex(dataView.getUint8(0x7))?.name
+      )
     } else {
       const other = arg
       this.gameOfOrigin = other.gameOfOrigin

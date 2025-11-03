@@ -82,10 +82,10 @@ impl ItemGen1 {
             152 => Self::new(80),
             153 => Self::new(79),
             154 => Self::new(150),
-            155 => Self::new(173),
-            156 => Self::new(83),
+            155 => Self::new(90),
+            156 => Self::new(45),
             157 => Self::new(109),
-            158 => Self::new(174),
+            158 => Self::new(50),
             213 => Self::new(3),
             216 => Self::new(57),
             217 => Self::new(73),
@@ -99,7 +99,7 @@ impl ItemGen1 {
             231 => Self::new(126),
             232 => Self::new(140),
             233 => Self::new(143),
-            234 => Self::new(146),
+            234 => Self::new(25),
             235 => Self::new(151),
             236 => Self::new(163),
             237 => Self::new(76),
@@ -189,7 +189,6 @@ impl ItemGen1 {
             472 => Self::new(116),
             473 => Self::new(103),
             474 => Self::new(70),
-            475 => Self::new(127),
             476 => Self::new(133),
             477 => Self::new(175),
             478 => Self::new(66),
@@ -217,1279 +216,1281 @@ impl ItemGen1 {
             504 => Self::new(114),
             737 => Self::new(249),
             890 => Self::new(75),
-            891 => Self::new(60), _ => None,
-         }
+            891 => Self::new(60),
+            _ => None,
+        }
     }
 }
 
 pub static ALL_ITEMS_GEN1: [&ItemMetadataPastGen; ITEM_MAX_GEN1] = [
-&ItemMetadataPastGen {
-    id: 1,
-    modern_id: Some(1),
-    name: "Master Ball",
-},
-&ItemMetadataPastGen {
-    id: 2,
-    modern_id: Some(2),
-    name: "Ultra Ball",
-},
-&ItemMetadataPastGen {
-    id: 3,
-    modern_id: Some(213),
-    name: "BrightPowder",
-},
-&ItemMetadataPastGen {
-    id: 4,
-    modern_id: Some(3),
-    name: "Great Ball",
-},
-&ItemMetadataPastGen {
-    id: 5,
-    modern_id: Some(4),
-    name: "Poké Ball",
-},
-&ItemMetadataPastGen {
-    id: 6,
-    modern_id: None,
-    name: "Teru-sama (0)",
-},
-&ItemMetadataPastGen {
-    id: 7,
-    modern_id: Some(450),
-    name: "Bicycle",
-},
-&ItemMetadataPastGen {
-    id: 8,
-    modern_id: Some(81),
-    name: "Moon Stone",
-},
-&ItemMetadataPastGen {
-    id: 9,
-    modern_id: Some(18),
-    name: "Antidote",
-},
-&ItemMetadataPastGen {
-    id: 10,
-    modern_id: Some(19),
-    name: "Burn Heal",
-},
-&ItemMetadataPastGen {
-    id: 11,
-    modern_id: Some(20),
-    name: "Ice Heal",
-},
-&ItemMetadataPastGen {
-    id: 12,
-    modern_id: Some(21),
-    name: "Awakening",
-},
-&ItemMetadataPastGen {
-    id: 13,
-    modern_id: Some(22),
-    name: "Parlyz Heal",
-},
-&ItemMetadataPastGen {
-    id: 14,
-    modern_id: Some(23),
-    name: "Full Restore",
-},
-&ItemMetadataPastGen {
-    id: 15,
-    modern_id: Some(24),
-    name: "Max Potion",
-},
-&ItemMetadataPastGen {
-    id: 16,
-    modern_id: Some(25),
-    name: "Hyper Potion",
-},
-&ItemMetadataPastGen {
-    id: 17,
-    modern_id: Some(26),
-    name: "Super Potion",
-},
-&ItemMetadataPastGen {
-    id: 18,
-    modern_id: Some(17),
-    name: "Potion",
-},
-&ItemMetadataPastGen {
-    id: 19,
-    modern_id: Some(78),
-    name: "Escape Rope",
-},
-&ItemMetadataPastGen {
-    id: 20,
-    modern_id: Some(79),
-    name: "Repel",
-},
-&ItemMetadataPastGen {
-    id: 21,
-    modern_id: Some(41),
-    name: "Max Elixer",
-},
-&ItemMetadataPastGen {
-    id: 22,
-    modern_id: Some(82),
-    name: "Fire Stone",
-},
-&ItemMetadataPastGen {
-    id: 23,
-    modern_id: Some(83),
-    name: "Thunder Stone",
-},
-&ItemMetadataPastGen {
-    id: 24,
-    modern_id: Some(84),
-    name: "Water Stone",
-},
-&ItemMetadataPastGen {
-    id: 25,
-    modern_id: None,
-    name: "Teru-sama (1)",
-},
-&ItemMetadataPastGen {
-    id: 26,
-    modern_id: Some(45),
-    name: "HP Up",
-},
-&ItemMetadataPastGen {
-    id: 27,
-    modern_id: Some(46),
-    name: "Protein",
-},
-&ItemMetadataPastGen {
-    id: 28,
-    modern_id: Some(47),
-    name: "Iron",
-},
-&ItemMetadataPastGen {
-    id: 29,
-    modern_id: Some(48),
-    name: "Carbos",
-},
-&ItemMetadataPastGen {
-    id: 30,
-    modern_id: Some(256),
-    name: "Lucky Punch",
-},
-&ItemMetadataPastGen {
-    id: 31,
-    modern_id: Some(49),
-    name: "Calcium",
-},
-&ItemMetadataPastGen {
-    id: 32,
-    modern_id: Some(50),
-    name: "Rare Candy",
-},
-&ItemMetadataPastGen {
-    id: 33,
-    modern_id: Some(60),
-    name: "X Accuracy",
-},
-&ItemMetadataPastGen {
-    id: 34,
-    modern_id: Some(85),
-    name: "Leaf Stone",
-},
-&ItemMetadataPastGen {
-    id: 35,
-    modern_id: Some(257),
-    name: "Metal Powder",
-},
-&ItemMetadataPastGen {
-    id: 36,
-    modern_id: Some(92),
-    name: "Nugget",
-},
-&ItemMetadataPastGen {
-    id: 37,
-    modern_id: Some(63),
-    name: "Poké Doll",
-},
-&ItemMetadataPastGen {
-    id: 38,
-    modern_id: Some(27),
-    name: "Full Heal",
-},
-&ItemMetadataPastGen {
-    id: 39,
-    modern_id: Some(28),
-    name: "Revive",
-},
-&ItemMetadataPastGen {
-    id: 40,
-    modern_id: Some(29),
-    name: "Max Revive",
-},
-&ItemMetadataPastGen {
-    id: 41,
-    modern_id: Some(55),
-    name: "Guard Spec.",
-},
-&ItemMetadataPastGen {
-    id: 42,
-    modern_id: Some(76),
-    name: "Super Repel",
-},
-&ItemMetadataPastGen {
-    id: 43,
-    modern_id: Some(77),
-    name: "Max Repel",
-},
-&ItemMetadataPastGen {
-    id: 44,
-    modern_id: Some(56),
-    name: "Dire Hit",
-},
-&ItemMetadataPastGen {
-    id: 45,
-    modern_id: None,
-    name: "Teru-sama (2)",
-},
-&ItemMetadataPastGen {
-    id: 46,
-    modern_id: Some(30),
-    name: "Fresh Water",
-},
-&ItemMetadataPastGen {
-    id: 47,
-    modern_id: Some(31),
-    name: "Soda Pop",
-},
-&ItemMetadataPastGen {
-    id: 48,
-    modern_id: Some(32),
-    name: "Lemonade",
-},
-&ItemMetadataPastGen {
-    id: 49,
-    modern_id: Some(57),
-    name: "X Attack",
-},
-&ItemMetadataPastGen {
-    id: 50,
-    modern_id: None,
-    name: "Teru-sama (3)",
-},
-&ItemMetadataPastGen {
-    id: 51,
-    modern_id: Some(58),
-    name: "X Defend",
-},
-&ItemMetadataPastGen {
-    id: 52,
-    modern_id: Some(59),
-    name: "X Speed",
-},
-&ItemMetadataPastGen {
-    id: 53,
-    modern_id: None,
-    name: "X Special",
-},
-&ItemMetadataPastGen {
-    id: 54,
-    modern_id: Some(444),
-    name: "Coin Case",
-},
-&ItemMetadataPastGen {
-    id: 55,
-    modern_id: Some(471),
-    name: "Itemfinder",
-},
-&ItemMetadataPastGen {
-    id: 56,
-    modern_id: None,
-    name: "Teru-sama (4)",
-},
-&ItemMetadataPastGen {
-    id: 57,
-    modern_id: Some(216),
-    name: "Exp Share",
-},
-&ItemMetadataPastGen {
-    id: 58,
-    modern_id: Some(445),
-    name: "Old Rod",
-},
-&ItemMetadataPastGen {
-    id: 59,
-    modern_id: Some(446),
-    name: "Good Rod",
-},
-&ItemMetadataPastGen {
-    id: 60,
-    modern_id: Some(891),
-    name: "Silver Leaf",
-},
-&ItemMetadataPastGen {
-    id: 61,
-    modern_id: Some(447),
-    name: "Super Rod",
-},
-&ItemMetadataPastGen {
-    id: 62,
-    modern_id: Some(51),
-    name: "PP Up",
-},
-&ItemMetadataPastGen {
-    id: 63,
-    modern_id: Some(38),
-    name: "Ether",
-},
-&ItemMetadataPastGen {
-    id: 64,
-    modern_id: Some(39),
-    name: "Max Ether",
-},
-&ItemMetadataPastGen {
-    id: 65,
-    modern_id: Some(40),
-    name: "Elixer",
-},
-&ItemMetadataPastGen {
-    id: 66,
-    modern_id: Some(478),
-    name: "Red Scale",
-},
-&ItemMetadataPastGen {
-    id: 67,
-    modern_id: Some(464),
-    name: "SecretPotion",
-},
-&ItemMetadataPastGen {
-    id: 68,
-    modern_id: Some(456),
-    name: "S.S. Ticket",
-},
-&ItemMetadataPastGen {
-    id: 69,
-    modern_id: Some(484),
-    name: "Mystery Egg",
-},
-&ItemMetadataPastGen {
-    id: 70,
-    modern_id: Some(474),
-    name: "Clear Bell",
-},
-&ItemMetadataPastGen {
-    id: 71,
-    modern_id: Some(482),
-    name: "Silver Wing",
-},
-&ItemMetadataPastGen {
-    id: 72,
-    modern_id: Some(33),
-    name: "Moomoo Milk",
-},
-&ItemMetadataPastGen {
-    id: 73,
-    modern_id: Some(217),
-    name: "Quick Claw",
-},
-&ItemMetadataPastGen {
-    id: 74,
-    modern_id: Some(151),
-    name: "PSNCureBerry",
-},
-&ItemMetadataPastGen {
-    id: 75,
-    modern_id: Some(890),
-    name: "Gold Leaf",
-},
-&ItemMetadataPastGen {
-    id: 76,
-    modern_id: Some(237),
-    name: "Soft Sand",
-},
-&ItemMetadataPastGen {
-    id: 77,
-    modern_id: Some(244),
-    name: "Sharp Beak",
-},
-&ItemMetadataPastGen {
-    id: 78,
-    modern_id: Some(149),
-    name: "PRZCureBerry",
-},
-&ItemMetadataPastGen {
-    id: 79,
-    modern_id: Some(153),
-    name: "Burnt Berry",
-},
-&ItemMetadataPastGen {
-    id: 80,
-    modern_id: Some(152),
-    name: "Ice Berry",
-},
-&ItemMetadataPastGen {
-    id: 81,
-    modern_id: Some(245),
-    name: "Poison Barb",
-},
-&ItemMetadataPastGen {
-    id: 82,
-    modern_id: Some(221),
-    name: "King's Rock",
-},
-&ItemMetadataPastGen {
-    id: 83,
-    modern_id: Some(156),
-    name: "Bitter Berry",
-},
-&ItemMetadataPastGen {
-    id: 84,
-    modern_id: Some(150),
-    name: "Mint Berry",
-},
-&ItemMetadataPastGen {
-    id: 85,
-    modern_id: Some(485),
-    name: "Red Apricorn",
-},
-&ItemMetadataPastGen {
-    id: 86,
-    modern_id: Some(86),
-    name: "TinyMushroom",
-},
-&ItemMetadataPastGen {
-    id: 87,
-    modern_id: Some(87),
-    name: "Big Mushroom",
-},
-&ItemMetadataPastGen {
-    id: 88,
-    modern_id: Some(222),
-    name: "SilverPowder",
-},
-&ItemMetadataPastGen {
-    id: 89,
-    modern_id: Some(486),
-    name: "Blu Apricorn",
-},
-&ItemMetadataPastGen {
-    id: 90,
-    modern_id: None,
-    name: "Teru-sama (5)",
-},
-&ItemMetadataPastGen {
-    id: 91,
-    modern_id: Some(223),
-    name: "Amulet Coin",
-},
-&ItemMetadataPastGen {
-    id: 92,
-    modern_id: Some(487),
-    name: "Ylw Apricorn",
-},
-&ItemMetadataPastGen {
-    id: 93,
-    modern_id: Some(488),
-    name: "Grn Apricorn",
-},
-&ItemMetadataPastGen {
-    id: 94,
-    modern_id: Some(224),
-    name: "Cleanse Tag",
-},
-&ItemMetadataPastGen {
-    id: 95,
-    modern_id: Some(243),
-    name: "Mystic Water",
-},
-&ItemMetadataPastGen {
-    id: 96,
-    modern_id: Some(248),
-    name: "TwistedSpoon",
-},
-&ItemMetadataPastGen {
-    id: 97,
-    modern_id: Some(490),
-    name: "Wht Apricorn",
-},
-&ItemMetadataPastGen {
-    id: 98,
-    modern_id: Some(241),
-    name: "Black Belt",
-},
-&ItemMetadataPastGen {
-    id: 99,
-    modern_id: Some(491),
-    name: "Blk Apricorn",
-},
-&ItemMetadataPastGen {
-    id: 100,
-    modern_id: None,
-    name: "Teru-sama (6)",
-},
-&ItemMetadataPastGen {
-    id: 101,
-    modern_id: Some(489),
-    name: "Pnk Apricorn",
-},
-&ItemMetadataPastGen {
-    id: 102,
-    modern_id: Some(240),
-    name: "BlackGlasses",
-},
-&ItemMetadataPastGen {
-    id: 103,
-    modern_id: Some(473),
-    name: "SlowpokeTail",
-},
-&ItemMetadataPastGen {
-    id: 104,
-    modern_id: Some(251),
-    name: "Pink Bow",
-},
-&ItemMetadataPastGen {
-    id: 105,
-    modern_id: Some(259),
-    name: "Stick",
-},
-&ItemMetadataPastGen {
-    id: 106,
-    modern_id: Some(228),
-    name: "Smoke Ball",
-},
-&ItemMetadataPastGen {
-    id: 107,
-    modern_id: Some(246),
-    name: "NeverMeltIce",
-},
-&ItemMetadataPastGen {
-    id: 108,
-    modern_id: Some(242),
-    name: "Magnet",
-},
-&ItemMetadataPastGen {
-    id: 109,
-    modern_id: Some(157),
-    name: "MiracleBerry",
-},
-&ItemMetadataPastGen {
-    id: 110,
-    modern_id: Some(88),
-    name: "Pearl",
-},
-&ItemMetadataPastGen {
-    id: 111,
-    modern_id: Some(89),
-    name: "Big Pearl",
-},
-&ItemMetadataPastGen {
-    id: 112,
-    modern_id: Some(229),
-    name: "Everstone",
-},
-&ItemMetadataPastGen {
-    id: 113,
-    modern_id: Some(247),
-    name: "Spell Tag",
-},
-&ItemMetadataPastGen {
-    id: 114,
-    modern_id: Some(504),
-    name: "RageCandyBar",
-},
-&ItemMetadataPastGen {
-    id: 115,
-    modern_id: None,
-    name: "GS Ball",
-},
-&ItemMetadataPastGen {
-    id: 116,
-    modern_id: Some(472),
-    name: "Blue Card",
-},
-&ItemMetadataPastGen {
-    id: 117,
-    modern_id: Some(239),
-    name: "Miracle Seed",
-},
-&ItemMetadataPastGen {
-    id: 118,
-    modern_id: Some(258),
-    name: "Thick Club",
-},
-&ItemMetadataPastGen {
-    id: 119,
-    modern_id: Some(230),
-    name: "Focus Band",
-},
-&ItemMetadataPastGen {
-    id: 120,
-    modern_id: None,
-    name: "Teru-sama (7)",
-},
-&ItemMetadataPastGen {
-    id: 121,
-    modern_id: Some(34),
-    name: "EnergyPowder",
-},
-&ItemMetadataPastGen {
-    id: 122,
-    modern_id: Some(35),
-    name: "Energy Root",
-},
-&ItemMetadataPastGen {
-    id: 123,
-    modern_id: Some(36),
-    name: "Heal Powder",
-},
-&ItemMetadataPastGen {
-    id: 124,
-    modern_id: Some(37),
-    name: "Revival Herb",
-},
-&ItemMetadataPastGen {
-    id: 125,
-    modern_id: Some(238),
-    name: "Hard Stone",
-},
-&ItemMetadataPastGen {
-    id: 126,
-    modern_id: Some(231),
-    name: "Lucky Egg",
-},
-&ItemMetadataPastGen {
-    id: 127,
-    modern_id: Some(475),
-    name: "Card Key",
-},
-&ItemMetadataPastGen {
-    id: 128,
-    modern_id: Some(481),
-    name: "Machine Part",
-},
-&ItemMetadataPastGen {
-    id: 129,
-    modern_id: None,
-    name: "Egg Ticket",
-},
-&ItemMetadataPastGen {
-    id: 130,
-    modern_id: Some(479),
-    name: "Lost Item",
-},
-&ItemMetadataPastGen {
-    id: 131,
-    modern_id: Some(90),
-    name: "Stardust",
-},
-&ItemMetadataPastGen {
-    id: 132,
-    modern_id: Some(91),
-    name: "Star Piece",
-},
-&ItemMetadataPastGen {
-    id: 133,
-    modern_id: Some(476),
-    name: "Basement Key",
-},
-&ItemMetadataPastGen {
-    id: 134,
-    modern_id: Some(480),
-    name: "Pass",
-},
-&ItemMetadataPastGen {
-    id: 135,
-    modern_id: None,
-    name: "Teru-sama (8)",
-},
-&ItemMetadataPastGen {
-    id: 136,
-    modern_id: None,
-    name: "Teru-sama (9)",
-},
-&ItemMetadataPastGen {
-    id: 137,
-    modern_id: None,
-    name: "Teru-sama (10)",
-},
-&ItemMetadataPastGen {
-    id: 138,
-    modern_id: Some(249),
-    name: "Charcoal",
-},
-&ItemMetadataPastGen {
-    id: 139,
-    modern_id: Some(43),
-    name: "Berry Juice",
-},
-&ItemMetadataPastGen {
-    id: 140,
-    modern_id: Some(232),
-    name: "Scope Lens",
-},
-&ItemMetadataPastGen {
-    id: 141,
-    modern_id: None,
-    name: "Teru-sama (11)",
-},
-&ItemMetadataPastGen {
-    id: 142,
-    modern_id: None,
-    name: "Teru-sama (12)",
-},
-&ItemMetadataPastGen {
-    id: 143,
-    modern_id: Some(233),
-    name: "Metal Coat",
-},
-&ItemMetadataPastGen {
-    id: 144,
-    modern_id: Some(250),
-    name: "Dragon Fang",
-},
-&ItemMetadataPastGen {
-    id: 145,
-    modern_id: None,
-    name: "Teru-sama (13)",
-},
-&ItemMetadataPastGen {
-    id: 146,
-    modern_id: Some(234),
-    name: "Leftovers",
-},
-&ItemMetadataPastGen {
-    id: 147,
-    modern_id: None,
-    name: "Teru-sama (14)",
-},
-&ItemMetadataPastGen {
-    id: 148,
-    modern_id: None,
-    name: "Teru-sama (15)",
-},
-&ItemMetadataPastGen {
-    id: 149,
-    modern_id: None,
-    name: "Teru-sama (16)",
-},
-&ItemMetadataPastGen {
-    id: 150,
-    modern_id: Some(154),
-    name: "MysteryBerry",
-},
-&ItemMetadataPastGen {
-    id: 151,
-    modern_id: Some(235),
-    name: "Dragon Scale",
-},
-&ItemMetadataPastGen {
-    id: 152,
-    modern_id: None,
-    name: "Berserk Gene",
-},
-&ItemMetadataPastGen {
-    id: 153,
-    modern_id: None,
-    name: "Teru-sama (17)",
-},
-&ItemMetadataPastGen {
-    id: 154,
-    modern_id: None,
-    name: "Teru-sama (18)",
-},
-&ItemMetadataPastGen {
-    id: 155,
-    modern_id: None,
-    name: "Teru-sama (19)",
-},
-&ItemMetadataPastGen {
-    id: 156,
-    modern_id: Some(44),
-    name: "Sacred Ash",
-},
-&ItemMetadataPastGen {
-    id: 157,
-    modern_id: Some(495),
-    name: "Heavy Ball",
-},
-&ItemMetadataPastGen {
-    id: 158,
-    modern_id: None,
-    name: "Flower Mail",
-},
-&ItemMetadataPastGen {
-    id: 159,
-    modern_id: Some(493),
-    name: "Level Ball",
-},
-&ItemMetadataPastGen {
-    id: 160,
-    modern_id: Some(494),
-    name: "Lure Ball",
-},
-&ItemMetadataPastGen {
-    id: 161,
-    modern_id: Some(492),
-    name: "Fast Ball",
-},
-&ItemMetadataPastGen {
-    id: 162,
-    modern_id: None,
-    name: "Teru-sama (20)",
-},
-&ItemMetadataPastGen {
-    id: 163,
-    modern_id: Some(236),
-    name: "Light Ball",
-},
-&ItemMetadataPastGen {
-    id: 164,
-    modern_id: Some(497),
-    name: "Friend Ball",
-},
-&ItemMetadataPastGen {
-    id: 165,
-    modern_id: Some(498),
-    name: "Moon Ball",
-},
-&ItemMetadataPastGen {
-    id: 166,
-    modern_id: Some(496),
-    name: "Love Ball",
-},
-&ItemMetadataPastGen {
-    id: 167,
-    modern_id: None,
-    name: "Normal Box",
-},
-&ItemMetadataPastGen {
-    id: 168,
-    modern_id: None,
-    name: "Gorgeous Box",
-},
-&ItemMetadataPastGen {
-    id: 169,
-    modern_id: Some(80),
-    name: "Sun Stone",
-},
-&ItemMetadataPastGen {
-    id: 170,
-    modern_id: None,
-    name: "Polkadot Bow",
-},
-&ItemMetadataPastGen {
-    id: 171,
-    modern_id: None,
-    name: "Teru-sama (21)",
-},
-&ItemMetadataPastGen {
-    id: 172,
-    modern_id: Some(252),
-    name: "Up-Grade",
-},
-&ItemMetadataPastGen {
-    id: 173,
-    modern_id: Some(155),
-    name: "Berry",
-},
-&ItemMetadataPastGen {
-    id: 174,
-    modern_id: Some(158),
-    name: "Gold Berry",
-},
-&ItemMetadataPastGen {
-    id: 175,
-    modern_id: Some(477),
-    name: "SquirtBottle",
-},
-&ItemMetadataPastGen {
-    id: 176,
-    modern_id: None,
-    name: "Teru-sama (22)",
-},
-&ItemMetadataPastGen {
-    id: 177,
-    modern_id: Some(500),
-    name: "Park Ball",
-},
-&ItemMetadataPastGen {
-    id: 178,
-    modern_id: Some(483),
-    name: "Rainbow Wing",
-},
-&ItemMetadataPastGen {
-    id: 179,
-    modern_id: None,
-    name: "Teru-sama (23)",
-},
-&ItemMetadataPastGen {
-    id: 180,
-    modern_id: None,
-    name: "Brick Piece",
-},
-&ItemMetadataPastGen {
-    id: 181,
-    modern_id: None,
-    name: "Surf Mail",
-},
-&ItemMetadataPastGen {
-    id: 182,
-    modern_id: None,
-    name: "Litebluemail",
-},
-&ItemMetadataPastGen {
-    id: 183,
-    modern_id: None,
-    name: "Portraitmail",
-},
-&ItemMetadataPastGen {
-    id: 184,
-    modern_id: None,
-    name: "Lovely Mail",
-},
-&ItemMetadataPastGen {
-    id: 185,
-    modern_id: None,
-    name: "Eon Mail",
-},
-&ItemMetadataPastGen {
-    id: 186,
-    modern_id: None,
-    name: "Morph Mail",
-},
-&ItemMetadataPastGen {
-    id: 187,
-    modern_id: None,
-    name: "Bluesky Mail",
-},
-&ItemMetadataPastGen {
-    id: 188,
-    modern_id: None,
-    name: "Music Mail",
-},
-&ItemMetadataPastGen {
-    id: 189,
-    modern_id: None,
-    name: "Mirage Mail",
-},
-&ItemMetadataPastGen {
-    id: 190,
-    modern_id: None,
-    name: "Teru-sama (24)",
-},
-&ItemMetadataPastGen {
-    id: 191,
-    modern_id: Some(328),
-    name: "TM01",
-},
-&ItemMetadataPastGen {
-    id: 192,
-    modern_id: Some(329),
-    name: "TM02",
-},
-&ItemMetadataPastGen {
-    id: 193,
-    modern_id: Some(330),
-    name: "TM03",
-},
-&ItemMetadataPastGen {
-    id: 194,
-    modern_id: Some(331),
-    name: "TM04",
-},
-&ItemMetadataPastGen {
-    id: 195,
-    modern_id: None,
-    name: "TM04 (Unused)",
-},
-&ItemMetadataPastGen {
-    id: 196,
-    modern_id: Some(332),
-    name: "TM05",
-},
-&ItemMetadataPastGen {
-    id: 197,
-    modern_id: Some(333),
-    name: "TM06",
-},
-&ItemMetadataPastGen {
-    id: 198,
-    modern_id: Some(334),
-    name: "TM07",
-},
-&ItemMetadataPastGen {
-    id: 199,
-    modern_id: Some(335),
-    name: "TM08",
-},
-&ItemMetadataPastGen {
-    id: 200,
-    modern_id: Some(336),
-    name: "TM09",
-},
-&ItemMetadataPastGen {
-    id: 201,
-    modern_id: Some(337),
-    name: "TM10",
-},
-&ItemMetadataPastGen {
-    id: 202,
-    modern_id: Some(338),
-    name: "TM11",
-},
-&ItemMetadataPastGen {
-    id: 203,
-    modern_id: Some(339),
-    name: "TM12",
-},
-&ItemMetadataPastGen {
-    id: 204,
-    modern_id: Some(340),
-    name: "TM13",
-},
-&ItemMetadataPastGen {
-    id: 205,
-    modern_id: Some(341),
-    name: "TM14",
-},
-&ItemMetadataPastGen {
-    id: 206,
-    modern_id: Some(342),
-    name: "TM15",
-},
-&ItemMetadataPastGen {
-    id: 207,
-    modern_id: Some(343),
-    name: "TM16",
-},
-&ItemMetadataPastGen {
-    id: 208,
-    modern_id: Some(344),
-    name: "TM17",
-},
-&ItemMetadataPastGen {
-    id: 209,
-    modern_id: Some(345),
-    name: "TM18",
-},
-&ItemMetadataPastGen {
-    id: 210,
-    modern_id: Some(346),
-    name: "TM19",
-},
-&ItemMetadataPastGen {
-    id: 211,
-    modern_id: Some(347),
-    name: "TM20",
-},
-&ItemMetadataPastGen {
-    id: 212,
-    modern_id: Some(348),
-    name: "TM21",
-},
-&ItemMetadataPastGen {
-    id: 213,
-    modern_id: Some(349),
-    name: "TM22",
-},
-&ItemMetadataPastGen {
-    id: 214,
-    modern_id: Some(350),
-    name: "TM23",
-},
-&ItemMetadataPastGen {
-    id: 215,
-    modern_id: Some(351),
-    name: "TM24",
-},
-&ItemMetadataPastGen {
-    id: 216,
-    modern_id: Some(352),
-    name: "TM25",
-},
-&ItemMetadataPastGen {
-    id: 217,
-    modern_id: Some(353),
-    name: "TM26",
-},
-&ItemMetadataPastGen {
-    id: 218,
-    modern_id: Some(354),
-    name: "TM27",
-},
-&ItemMetadataPastGen {
-    id: 219,
-    modern_id: Some(355),
-    name: "TM28",
-},
-&ItemMetadataPastGen {
-    id: 220,
-    modern_id: None,
-    name: "TM28 (Unused)",
-},
-&ItemMetadataPastGen {
-    id: 221,
-    modern_id: Some(356),
-    name: "TM29",
-},
-&ItemMetadataPastGen {
-    id: 222,
-    modern_id: Some(357),
-    name: "TM30",
-},
-&ItemMetadataPastGen {
-    id: 223,
-    modern_id: Some(358),
-    name: "TM31",
-},
-&ItemMetadataPastGen {
-    id: 224,
-    modern_id: Some(359),
-    name: "TM32",
-},
-&ItemMetadataPastGen {
-    id: 225,
-    modern_id: Some(360),
-    name: "TM33",
-},
-&ItemMetadataPastGen {
-    id: 226,
-    modern_id: Some(361),
-    name: "TM34",
-},
-&ItemMetadataPastGen {
-    id: 227,
-    modern_id: Some(362),
-    name: "TM35",
-},
-&ItemMetadataPastGen {
-    id: 228,
-    modern_id: Some(363),
-    name: "TM36",
-},
-&ItemMetadataPastGen {
-    id: 229,
-    modern_id: Some(364),
-    name: "TM37",
-},
-&ItemMetadataPastGen {
-    id: 230,
-    modern_id: Some(365),
-    name: "TM38",
-},
-&ItemMetadataPastGen {
-    id: 231,
-    modern_id: Some(366),
-    name: "TM39",
-},
-&ItemMetadataPastGen {
-    id: 232,
-    modern_id: Some(367),
-    name: "TM40",
-},
-&ItemMetadataPastGen {
-    id: 233,
-    modern_id: Some(368),
-    name: "TM41",
-},
-&ItemMetadataPastGen {
-    id: 234,
-    modern_id: Some(369),
-    name: "TM42",
-},
-&ItemMetadataPastGen {
-    id: 235,
-    modern_id: Some(370),
-    name: "TM43",
-},
-&ItemMetadataPastGen {
-    id: 236,
-    modern_id: Some(371),
-    name: "TM44",
-},
-&ItemMetadataPastGen {
-    id: 237,
-    modern_id: Some(372),
-    name: "TM45",
-},
-&ItemMetadataPastGen {
-    id: 238,
-    modern_id: Some(373),
-    name: "TM46",
-},
-&ItemMetadataPastGen {
-    id: 239,
-    modern_id: Some(374),
-    name: "TM47",
-},
-&ItemMetadataPastGen {
-    id: 240,
-    modern_id: Some(375),
-    name: "TM48",
-},
-&ItemMetadataPastGen {
-    id: 241,
-    modern_id: Some(376),
-    name: "TM49",
-},
-&ItemMetadataPastGen {
-    id: 242,
-    modern_id: Some(377),
-    name: "TM50",
-},
-&ItemMetadataPastGen {
-    id: 243,
-    modern_id: Some(420),
-    name: "HM01",
-},
-&ItemMetadataPastGen {
-    id: 244,
-    modern_id: Some(421),
-    name: "HM02",
-},
-&ItemMetadataPastGen {
-    id: 245,
-    modern_id: Some(422),
-    name: "HM03",
-},
-&ItemMetadataPastGen {
-    id: 246,
-    modern_id: Some(423),
-    name: "HM04",
-},
-&ItemMetadataPastGen {
-    id: 247,
-    modern_id: Some(424),
-    name: "HM05",
-},
-&ItemMetadataPastGen {
-    id: 248,
-    modern_id: Some(425),
-    name: "HM06",
-},
-&ItemMetadataPastGen {
-    id: 249,
-    modern_id: Some(737),
-    name: "HM07",
-},
-&ItemMetadataPastGen {
-    id: 250,
-    modern_id: None,
-    name: "HM08 (Unused)",
-},
-&ItemMetadataPastGen {
-    id: 251,
-    modern_id: None,
-    name: "HM09 (Unused)",
-},
-&ItemMetadataPastGen {
-    id: 252,
-    modern_id: None,
-    name: "HM10 (Unused)",
-},
-&ItemMetadataPastGen {
-    id: 253,
-    modern_id: None,
-    name: "HM11 (Unused)",
-},
-&ItemMetadataPastGen {
-    id: 254,
-    modern_id: None,
-    name: "HM12 (Unused)",
-}];
+    &ItemMetadataPastGen {
+        id: 1,
+        modern_id: Some(1),
+        name: "Master Ball",
+    },
+    &ItemMetadataPastGen {
+        id: 2,
+        modern_id: Some(2),
+        name: "Ultra Ball",
+    },
+    &ItemMetadataPastGen {
+        id: 3,
+        modern_id: Some(213),
+        name: "BrightPowder",
+    },
+    &ItemMetadataPastGen {
+        id: 4,
+        modern_id: Some(3),
+        name: "Great Ball",
+    },
+    &ItemMetadataPastGen {
+        id: 5,
+        modern_id: Some(4),
+        name: "Poké Ball",
+    },
+    &ItemMetadataPastGen {
+        id: 6,
+        modern_id: None,
+        name: "Teru-sama (0)",
+    },
+    &ItemMetadataPastGen {
+        id: 7,
+        modern_id: Some(450),
+        name: "Bicycle",
+    },
+    &ItemMetadataPastGen {
+        id: 8,
+        modern_id: Some(81),
+        name: "Moon Stone",
+    },
+    &ItemMetadataPastGen {
+        id: 9,
+        modern_id: Some(18),
+        name: "Antidote",
+    },
+    &ItemMetadataPastGen {
+        id: 10,
+        modern_id: Some(19),
+        name: "Burn Heal",
+    },
+    &ItemMetadataPastGen {
+        id: 11,
+        modern_id: Some(20),
+        name: "Ice Heal",
+    },
+    &ItemMetadataPastGen {
+        id: 12,
+        modern_id: Some(21),
+        name: "Awakening",
+    },
+    &ItemMetadataPastGen {
+        id: 13,
+        modern_id: Some(22),
+        name: "Parlyz Heal",
+    },
+    &ItemMetadataPastGen {
+        id: 14,
+        modern_id: Some(23),
+        name: "Full Restore",
+    },
+    &ItemMetadataPastGen {
+        id: 15,
+        modern_id: Some(24),
+        name: "Max Potion",
+    },
+    &ItemMetadataPastGen {
+        id: 16,
+        modern_id: Some(25),
+        name: "Hyper Potion",
+    },
+    &ItemMetadataPastGen {
+        id: 17,
+        modern_id: Some(26),
+        name: "Super Potion",
+    },
+    &ItemMetadataPastGen {
+        id: 18,
+        modern_id: Some(17),
+        name: "Potion",
+    },
+    &ItemMetadataPastGen {
+        id: 19,
+        modern_id: Some(78),
+        name: "Escape Rope",
+    },
+    &ItemMetadataPastGen {
+        id: 20,
+        modern_id: Some(79),
+        name: "Repel",
+    },
+    &ItemMetadataPastGen {
+        id: 21,
+        modern_id: Some(41),
+        name: "Max Elixer",
+    },
+    &ItemMetadataPastGen {
+        id: 22,
+        modern_id: Some(82),
+        name: "Fire Stone",
+    },
+    &ItemMetadataPastGen {
+        id: 23,
+        modern_id: Some(83),
+        name: "Thunder Stone",
+    },
+    &ItemMetadataPastGen {
+        id: 24,
+        modern_id: Some(84),
+        name: "Water Stone",
+    },
+    &ItemMetadataPastGen {
+        id: 25,
+        modern_id: Some(234),
+        name: "Leftovers",
+    },
+    &ItemMetadataPastGen {
+        id: 26,
+        modern_id: Some(45),
+        name: "HP Up",
+    },
+    &ItemMetadataPastGen {
+        id: 27,
+        modern_id: Some(46),
+        name: "Protein",
+    },
+    &ItemMetadataPastGen {
+        id: 28,
+        modern_id: Some(47),
+        name: "Iron",
+    },
+    &ItemMetadataPastGen {
+        id: 29,
+        modern_id: Some(48),
+        name: "Carbos",
+    },
+    &ItemMetadataPastGen {
+        id: 30,
+        modern_id: Some(256),
+        name: "Lucky Punch",
+    },
+    &ItemMetadataPastGen {
+        id: 31,
+        modern_id: Some(49),
+        name: "Calcium",
+    },
+    &ItemMetadataPastGen {
+        id: 32,
+        modern_id: Some(50),
+        name: "Rare Candy",
+    },
+    &ItemMetadataPastGen {
+        id: 33,
+        modern_id: Some(60),
+        name: "X Accuracy",
+    },
+    &ItemMetadataPastGen {
+        id: 34,
+        modern_id: Some(85),
+        name: "Leaf Stone",
+    },
+    &ItemMetadataPastGen {
+        id: 35,
+        modern_id: Some(257),
+        name: "Metal Powder",
+    },
+    &ItemMetadataPastGen {
+        id: 36,
+        modern_id: Some(92),
+        name: "Nugget",
+    },
+    &ItemMetadataPastGen {
+        id: 37,
+        modern_id: Some(63),
+        name: "Poké Doll",
+    },
+    &ItemMetadataPastGen {
+        id: 38,
+        modern_id: Some(27),
+        name: "Full Heal",
+    },
+    &ItemMetadataPastGen {
+        id: 39,
+        modern_id: Some(28),
+        name: "Revive",
+    },
+    &ItemMetadataPastGen {
+        id: 40,
+        modern_id: Some(29),
+        name: "Max Revive",
+    },
+    &ItemMetadataPastGen {
+        id: 41,
+        modern_id: Some(55),
+        name: "Guard Spec.",
+    },
+    &ItemMetadataPastGen {
+        id: 42,
+        modern_id: Some(76),
+        name: "Super Repel",
+    },
+    &ItemMetadataPastGen {
+        id: 43,
+        modern_id: Some(77),
+        name: "Max Repel",
+    },
+    &ItemMetadataPastGen {
+        id: 44,
+        modern_id: Some(56),
+        name: "Dire Hit",
+    },
+    &ItemMetadataPastGen {
+        id: 45,
+        modern_id: Some(156),
+        name: "Bitter Berry",
+    },
+    &ItemMetadataPastGen {
+        id: 46,
+        modern_id: Some(30),
+        name: "Fresh Water",
+    },
+    &ItemMetadataPastGen {
+        id: 47,
+        modern_id: Some(31),
+        name: "Soda Pop",
+    },
+    &ItemMetadataPastGen {
+        id: 48,
+        modern_id: Some(32),
+        name: "Lemonade",
+    },
+    &ItemMetadataPastGen {
+        id: 49,
+        modern_id: Some(57),
+        name: "X Attack",
+    },
+    &ItemMetadataPastGen {
+        id: 50,
+        modern_id: Some(158),
+        name: "Gold Berry",
+    },
+    &ItemMetadataPastGen {
+        id: 51,
+        modern_id: Some(58),
+        name: "X Defend",
+    },
+    &ItemMetadataPastGen {
+        id: 52,
+        modern_id: Some(59),
+        name: "X Speed",
+    },
+    &ItemMetadataPastGen {
+        id: 53,
+        modern_id: None,
+        name: "X Special",
+    },
+    &ItemMetadataPastGen {
+        id: 54,
+        modern_id: Some(444),
+        name: "Coin Case",
+    },
+    &ItemMetadataPastGen {
+        id: 55,
+        modern_id: Some(471),
+        name: "Itemfinder",
+    },
+    &ItemMetadataPastGen {
+        id: 56,
+        modern_id: None,
+        name: "Teru-sama (4)",
+    },
+    &ItemMetadataPastGen {
+        id: 57,
+        modern_id: Some(216),
+        name: "Exp Share",
+    },
+    &ItemMetadataPastGen {
+        id: 58,
+        modern_id: Some(445),
+        name: "Old Rod",
+    },
+    &ItemMetadataPastGen {
+        id: 59,
+        modern_id: Some(446),
+        name: "Good Rod",
+    },
+    &ItemMetadataPastGen {
+        id: 60,
+        modern_id: Some(891),
+        name: "Silver Leaf",
+    },
+    &ItemMetadataPastGen {
+        id: 61,
+        modern_id: Some(447),
+        name: "Super Rod",
+    },
+    &ItemMetadataPastGen {
+        id: 62,
+        modern_id: Some(51),
+        name: "PP Up",
+    },
+    &ItemMetadataPastGen {
+        id: 63,
+        modern_id: Some(38),
+        name: "Ether",
+    },
+    &ItemMetadataPastGen {
+        id: 64,
+        modern_id: Some(39),
+        name: "Max Ether",
+    },
+    &ItemMetadataPastGen {
+        id: 65,
+        modern_id: Some(40),
+        name: "Elixer",
+    },
+    &ItemMetadataPastGen {
+        id: 66,
+        modern_id: Some(478),
+        name: "Red Scale",
+    },
+    &ItemMetadataPastGen {
+        id: 67,
+        modern_id: Some(464),
+        name: "SecretPotion",
+    },
+    &ItemMetadataPastGen {
+        id: 68,
+        modern_id: Some(456),
+        name: "S.S. Ticket",
+    },
+    &ItemMetadataPastGen {
+        id: 69,
+        modern_id: Some(484),
+        name: "Mystery Egg",
+    },
+    &ItemMetadataPastGen {
+        id: 70,
+        modern_id: Some(474),
+        name: "Clear Bell",
+    },
+    &ItemMetadataPastGen {
+        id: 71,
+        modern_id: Some(482),
+        name: "Silver Wing",
+    },
+    &ItemMetadataPastGen {
+        id: 72,
+        modern_id: Some(33),
+        name: "Moomoo Milk",
+    },
+    &ItemMetadataPastGen {
+        id: 73,
+        modern_id: Some(217),
+        name: "Quick Claw",
+    },
+    &ItemMetadataPastGen {
+        id: 74,
+        modern_id: Some(151),
+        name: "PSNCureBerry",
+    },
+    &ItemMetadataPastGen {
+        id: 75,
+        modern_id: Some(890),
+        name: "Gold Leaf",
+    },
+    &ItemMetadataPastGen {
+        id: 76,
+        modern_id: Some(237),
+        name: "Soft Sand",
+    },
+    &ItemMetadataPastGen {
+        id: 77,
+        modern_id: Some(244),
+        name: "Sharp Beak",
+    },
+    &ItemMetadataPastGen {
+        id: 78,
+        modern_id: Some(149),
+        name: "PRZCureBerry",
+    },
+    &ItemMetadataPastGen {
+        id: 79,
+        modern_id: Some(153),
+        name: "Burnt Berry",
+    },
+    &ItemMetadataPastGen {
+        id: 80,
+        modern_id: Some(152),
+        name: "Ice Berry",
+    },
+    &ItemMetadataPastGen {
+        id: 81,
+        modern_id: Some(245),
+        name: "Poison Barb",
+    },
+    &ItemMetadataPastGen {
+        id: 82,
+        modern_id: Some(221),
+        name: "King's Rock",
+    },
+    &ItemMetadataPastGen {
+        id: 83,
+        modern_id: Some(156),
+        name: "Bitter Berry",
+    },
+    &ItemMetadataPastGen {
+        id: 84,
+        modern_id: Some(150),
+        name: "Mint Berry",
+    },
+    &ItemMetadataPastGen {
+        id: 85,
+        modern_id: Some(485),
+        name: "Red Apricorn",
+    },
+    &ItemMetadataPastGen {
+        id: 86,
+        modern_id: Some(86),
+        name: "TinyMushroom",
+    },
+    &ItemMetadataPastGen {
+        id: 87,
+        modern_id: Some(87),
+        name: "Big Mushroom",
+    },
+    &ItemMetadataPastGen {
+        id: 88,
+        modern_id: Some(222),
+        name: "SilverPowder",
+    },
+    &ItemMetadataPastGen {
+        id: 89,
+        modern_id: Some(486),
+        name: "Blu Apricorn",
+    },
+    &ItemMetadataPastGen {
+        id: 90,
+        modern_id: Some(155),
+        name: "Berry",
+    },
+    &ItemMetadataPastGen {
+        id: 91,
+        modern_id: Some(223),
+        name: "Amulet Coin",
+    },
+    &ItemMetadataPastGen {
+        id: 92,
+        modern_id: Some(487),
+        name: "Ylw Apricorn",
+    },
+    &ItemMetadataPastGen {
+        id: 93,
+        modern_id: Some(488),
+        name: "Grn Apricorn",
+    },
+    &ItemMetadataPastGen {
+        id: 94,
+        modern_id: Some(224),
+        name: "Cleanse Tag",
+    },
+    &ItemMetadataPastGen {
+        id: 95,
+        modern_id: Some(243),
+        name: "Mystic Water",
+    },
+    &ItemMetadataPastGen {
+        id: 96,
+        modern_id: Some(248),
+        name: "TwistedSpoon",
+    },
+    &ItemMetadataPastGen {
+        id: 97,
+        modern_id: Some(490),
+        name: "Wht Apricorn",
+    },
+    &ItemMetadataPastGen {
+        id: 98,
+        modern_id: Some(241),
+        name: "Black Belt",
+    },
+    &ItemMetadataPastGen {
+        id: 99,
+        modern_id: Some(491),
+        name: "Blk Apricorn",
+    },
+    &ItemMetadataPastGen {
+        id: 100,
+        modern_id: Some(155),
+        name: "Berry",
+    },
+    &ItemMetadataPastGen {
+        id: 101,
+        modern_id: Some(489),
+        name: "Pnk Apricorn",
+    },
+    &ItemMetadataPastGen {
+        id: 102,
+        modern_id: Some(240),
+        name: "BlackGlasses",
+    },
+    &ItemMetadataPastGen {
+        id: 103,
+        modern_id: Some(473),
+        name: "SlowpokeTail",
+    },
+    &ItemMetadataPastGen {
+        id: 104,
+        modern_id: Some(251),
+        name: "Pink Bow",
+    },
+    &ItemMetadataPastGen {
+        id: 105,
+        modern_id: Some(259),
+        name: "Stick",
+    },
+    &ItemMetadataPastGen {
+        id: 106,
+        modern_id: Some(228),
+        name: "Smoke Ball",
+    },
+    &ItemMetadataPastGen {
+        id: 107,
+        modern_id: Some(246),
+        name: "NeverMeltIce",
+    },
+    &ItemMetadataPastGen {
+        id: 108,
+        modern_id: Some(242),
+        name: "Magnet",
+    },
+    &ItemMetadataPastGen {
+        id: 109,
+        modern_id: Some(157),
+        name: "MiracleBerry",
+    },
+    &ItemMetadataPastGen {
+        id: 110,
+        modern_id: Some(88),
+        name: "Pearl",
+    },
+    &ItemMetadataPastGen {
+        id: 111,
+        modern_id: Some(89),
+        name: "Big Pearl",
+    },
+    &ItemMetadataPastGen {
+        id: 112,
+        modern_id: Some(229),
+        name: "Everstone",
+    },
+    &ItemMetadataPastGen {
+        id: 113,
+        modern_id: Some(247),
+        name: "Spell Tag",
+    },
+    &ItemMetadataPastGen {
+        id: 114,
+        modern_id: Some(504),
+        name: "RageCandyBar",
+    },
+    &ItemMetadataPastGen {
+        id: 115,
+        modern_id: None,
+        name: "GS Ball",
+    },
+    &ItemMetadataPastGen {
+        id: 116,
+        modern_id: Some(472),
+        name: "Blue Card",
+    },
+    &ItemMetadataPastGen {
+        id: 117,
+        modern_id: Some(239),
+        name: "Miracle Seed",
+    },
+    &ItemMetadataPastGen {
+        id: 118,
+        modern_id: Some(258),
+        name: "Thick Club",
+    },
+    &ItemMetadataPastGen {
+        id: 119,
+        modern_id: Some(230),
+        name: "Focus Band",
+    },
+    &ItemMetadataPastGen {
+        id: 120,
+        modern_id: Some(155),
+        name: "Berry",
+    },
+    &ItemMetadataPastGen {
+        id: 121,
+        modern_id: Some(34),
+        name: "EnergyPowder",
+    },
+    &ItemMetadataPastGen {
+        id: 122,
+        modern_id: Some(35),
+        name: "Energy Root",
+    },
+    &ItemMetadataPastGen {
+        id: 123,
+        modern_id: Some(36),
+        name: "Heal Powder",
+    },
+    &ItemMetadataPastGen {
+        id: 124,
+        modern_id: Some(37),
+        name: "Revival Herb",
+    },
+    &ItemMetadataPastGen {
+        id: 125,
+        modern_id: Some(238),
+        name: "Hard Stone",
+    },
+    &ItemMetadataPastGen {
+        id: 126,
+        modern_id: Some(231),
+        name: "Lucky Egg",
+    },
+    &ItemMetadataPastGen {
+        id: 127,
+        modern_id: Some(155),
+        name: "Berry",
+    },
+    &ItemMetadataPastGen {
+        id: 128,
+        modern_id: Some(481),
+        name: "Machine Part",
+    },
+    &ItemMetadataPastGen {
+        id: 129,
+        modern_id: None,
+        name: "Egg Ticket",
+    },
+    &ItemMetadataPastGen {
+        id: 130,
+        modern_id: Some(479),
+        name: "Lost Item",
+    },
+    &ItemMetadataPastGen {
+        id: 131,
+        modern_id: Some(90),
+        name: "Stardust",
+    },
+    &ItemMetadataPastGen {
+        id: 132,
+        modern_id: Some(91),
+        name: "Star Piece",
+    },
+    &ItemMetadataPastGen {
+        id: 133,
+        modern_id: Some(476),
+        name: "Basement Key",
+    },
+    &ItemMetadataPastGen {
+        id: 134,
+        modern_id: Some(480),
+        name: "Pass",
+    },
+    &ItemMetadataPastGen {
+        id: 135,
+        modern_id: None,
+        name: "Teru-sama (8)",
+    },
+    &ItemMetadataPastGen {
+        id: 136,
+        modern_id: None,
+        name: "Teru-sama (9)",
+    },
+    &ItemMetadataPastGen {
+        id: 137,
+        modern_id: None,
+        name: "Teru-sama (10)",
+    },
+    &ItemMetadataPastGen {
+        id: 138,
+        modern_id: Some(249),
+        name: "Charcoal",
+    },
+    &ItemMetadataPastGen {
+        id: 139,
+        modern_id: Some(43),
+        name: "Berry Juice",
+    },
+    &ItemMetadataPastGen {
+        id: 140,
+        modern_id: Some(232),
+        name: "Scope Lens",
+    },
+    &ItemMetadataPastGen {
+        id: 141,
+        modern_id: None,
+        name: "Teru-sama (11)",
+    },
+    &ItemMetadataPastGen {
+        id: 142,
+        modern_id: None,
+        name: "Teru-sama (12)",
+    },
+    &ItemMetadataPastGen {
+        id: 143,
+        modern_id: Some(233),
+        name: "Metal Coat",
+    },
+    &ItemMetadataPastGen {
+        id: 144,
+        modern_id: Some(250),
+        name: "Dragon Fang",
+    },
+    &ItemMetadataPastGen {
+        id: 145,
+        modern_id: None,
+        name: "Teru-sama (13)",
+    },
+    &ItemMetadataPastGen {
+        id: 146,
+        modern_id: Some(234),
+        name: "Leftovers",
+    },
+    &ItemMetadataPastGen {
+        id: 147,
+        modern_id: None,
+        name: "Teru-sama (14)",
+    },
+    &ItemMetadataPastGen {
+        id: 148,
+        modern_id: None,
+        name: "Teru-sama (15)",
+    },
+    &ItemMetadataPastGen {
+        id: 149,
+        modern_id: None,
+        name: "Teru-sama (16)",
+    },
+    &ItemMetadataPastGen {
+        id: 150,
+        modern_id: Some(154),
+        name: "MysteryBerry",
+    },
+    &ItemMetadataPastGen {
+        id: 151,
+        modern_id: Some(235),
+        name: "Dragon Scale",
+    },
+    &ItemMetadataPastGen {
+        id: 152,
+        modern_id: None,
+        name: "Berserk Gene",
+    },
+    &ItemMetadataPastGen {
+        id: 153,
+        modern_id: None,
+        name: "Teru-sama (17)",
+    },
+    &ItemMetadataPastGen {
+        id: 154,
+        modern_id: None,
+        name: "Teru-sama (18)",
+    },
+    &ItemMetadataPastGen {
+        id: 155,
+        modern_id: None,
+        name: "Teru-sama (19)",
+    },
+    &ItemMetadataPastGen {
+        id: 156,
+        modern_id: Some(44),
+        name: "Sacred Ash",
+    },
+    &ItemMetadataPastGen {
+        id: 157,
+        modern_id: Some(495),
+        name: "Heavy Ball",
+    },
+    &ItemMetadataPastGen {
+        id: 158,
+        modern_id: None,
+        name: "Flower Mail",
+    },
+    &ItemMetadataPastGen {
+        id: 159,
+        modern_id: Some(493),
+        name: "Level Ball",
+    },
+    &ItemMetadataPastGen {
+        id: 160,
+        modern_id: Some(494),
+        name: "Lure Ball",
+    },
+    &ItemMetadataPastGen {
+        id: 161,
+        modern_id: Some(492),
+        name: "Fast Ball",
+    },
+    &ItemMetadataPastGen {
+        id: 162,
+        modern_id: None,
+        name: "Teru-sama (20)",
+    },
+    &ItemMetadataPastGen {
+        id: 163,
+        modern_id: Some(236),
+        name: "Light Ball",
+    },
+    &ItemMetadataPastGen {
+        id: 164,
+        modern_id: Some(497),
+        name: "Friend Ball",
+    },
+    &ItemMetadataPastGen {
+        id: 165,
+        modern_id: Some(498),
+        name: "Moon Ball",
+    },
+    &ItemMetadataPastGen {
+        id: 166,
+        modern_id: Some(496),
+        name: "Love Ball",
+    },
+    &ItemMetadataPastGen {
+        id: 167,
+        modern_id: None,
+        name: "Normal Box",
+    },
+    &ItemMetadataPastGen {
+        id: 168,
+        modern_id: None,
+        name: "Gorgeous Box",
+    },
+    &ItemMetadataPastGen {
+        id: 169,
+        modern_id: Some(80),
+        name: "Sun Stone",
+    },
+    &ItemMetadataPastGen {
+        id: 170,
+        modern_id: None,
+        name: "Polkadot Bow",
+    },
+    &ItemMetadataPastGen {
+        id: 171,
+        modern_id: None,
+        name: "Teru-sama (21)",
+    },
+    &ItemMetadataPastGen {
+        id: 172,
+        modern_id: Some(252),
+        name: "Up-Grade",
+    },
+    &ItemMetadataPastGen {
+        id: 173,
+        modern_id: Some(155),
+        name: "Berry",
+    },
+    &ItemMetadataPastGen {
+        id: 174,
+        modern_id: Some(158),
+        name: "Gold Berry",
+    },
+    &ItemMetadataPastGen {
+        id: 175,
+        modern_id: Some(477),
+        name: "SquirtBottle",
+    },
+    &ItemMetadataPastGen {
+        id: 176,
+        modern_id: None,
+        name: "Teru-sama (22)",
+    },
+    &ItemMetadataPastGen {
+        id: 177,
+        modern_id: Some(500),
+        name: "Park Ball",
+    },
+    &ItemMetadataPastGen {
+        id: 178,
+        modern_id: Some(483),
+        name: "Rainbow Wing",
+    },
+    &ItemMetadataPastGen {
+        id: 179,
+        modern_id: None,
+        name: "Teru-sama (23)",
+    },
+    &ItemMetadataPastGen {
+        id: 180,
+        modern_id: None,
+        name: "Brick Piece",
+    },
+    &ItemMetadataPastGen {
+        id: 181,
+        modern_id: None,
+        name: "Surf Mail",
+    },
+    &ItemMetadataPastGen {
+        id: 182,
+        modern_id: None,
+        name: "Litebluemail",
+    },
+    &ItemMetadataPastGen {
+        id: 183,
+        modern_id: None,
+        name: "Portraitmail",
+    },
+    &ItemMetadataPastGen {
+        id: 184,
+        modern_id: None,
+        name: "Lovely Mail",
+    },
+    &ItemMetadataPastGen {
+        id: 185,
+        modern_id: None,
+        name: "Eon Mail",
+    },
+    &ItemMetadataPastGen {
+        id: 186,
+        modern_id: None,
+        name: "Morph Mail",
+    },
+    &ItemMetadataPastGen {
+        id: 187,
+        modern_id: None,
+        name: "Bluesky Mail",
+    },
+    &ItemMetadataPastGen {
+        id: 188,
+        modern_id: None,
+        name: "Music Mail",
+    },
+    &ItemMetadataPastGen {
+        id: 189,
+        modern_id: None,
+        name: "Mirage Mail",
+    },
+    &ItemMetadataPastGen {
+        id: 190,
+        modern_id: Some(155),
+        name: "Berry",
+    },
+    &ItemMetadataPastGen {
+        id: 191,
+        modern_id: Some(328),
+        name: "TM01",
+    },
+    &ItemMetadataPastGen {
+        id: 192,
+        modern_id: Some(329),
+        name: "TM02",
+    },
+    &ItemMetadataPastGen {
+        id: 193,
+        modern_id: Some(330),
+        name: "TM03",
+    },
+    &ItemMetadataPastGen {
+        id: 194,
+        modern_id: Some(331),
+        name: "TM04",
+    },
+    &ItemMetadataPastGen {
+        id: 195,
+        modern_id: None,
+        name: "TM04 (Unused)",
+    },
+    &ItemMetadataPastGen {
+        id: 196,
+        modern_id: Some(332),
+        name: "TM05",
+    },
+    &ItemMetadataPastGen {
+        id: 197,
+        modern_id: Some(333),
+        name: "TM06",
+    },
+    &ItemMetadataPastGen {
+        id: 198,
+        modern_id: Some(334),
+        name: "TM07",
+    },
+    &ItemMetadataPastGen {
+        id: 199,
+        modern_id: Some(335),
+        name: "TM08",
+    },
+    &ItemMetadataPastGen {
+        id: 200,
+        modern_id: Some(336),
+        name: "TM09",
+    },
+    &ItemMetadataPastGen {
+        id: 201,
+        modern_id: Some(337),
+        name: "TM10",
+    },
+    &ItemMetadataPastGen {
+        id: 202,
+        modern_id: Some(338),
+        name: "TM11",
+    },
+    &ItemMetadataPastGen {
+        id: 203,
+        modern_id: Some(339),
+        name: "TM12",
+    },
+    &ItemMetadataPastGen {
+        id: 204,
+        modern_id: Some(340),
+        name: "TM13",
+    },
+    &ItemMetadataPastGen {
+        id: 205,
+        modern_id: Some(341),
+        name: "TM14",
+    },
+    &ItemMetadataPastGen {
+        id: 206,
+        modern_id: Some(342),
+        name: "TM15",
+    },
+    &ItemMetadataPastGen {
+        id: 207,
+        modern_id: Some(343),
+        name: "TM16",
+    },
+    &ItemMetadataPastGen {
+        id: 208,
+        modern_id: Some(344),
+        name: "TM17",
+    },
+    &ItemMetadataPastGen {
+        id: 209,
+        modern_id: Some(345),
+        name: "TM18",
+    },
+    &ItemMetadataPastGen {
+        id: 210,
+        modern_id: Some(346),
+        name: "TM19",
+    },
+    &ItemMetadataPastGen {
+        id: 211,
+        modern_id: Some(347),
+        name: "TM20",
+    },
+    &ItemMetadataPastGen {
+        id: 212,
+        modern_id: Some(348),
+        name: "TM21",
+    },
+    &ItemMetadataPastGen {
+        id: 213,
+        modern_id: Some(349),
+        name: "TM22",
+    },
+    &ItemMetadataPastGen {
+        id: 214,
+        modern_id: Some(350),
+        name: "TM23",
+    },
+    &ItemMetadataPastGen {
+        id: 215,
+        modern_id: Some(351),
+        name: "TM24",
+    },
+    &ItemMetadataPastGen {
+        id: 216,
+        modern_id: Some(352),
+        name: "TM25",
+    },
+    &ItemMetadataPastGen {
+        id: 217,
+        modern_id: Some(353),
+        name: "TM26",
+    },
+    &ItemMetadataPastGen {
+        id: 218,
+        modern_id: Some(354),
+        name: "TM27",
+    },
+    &ItemMetadataPastGen {
+        id: 219,
+        modern_id: Some(355),
+        name: "TM28",
+    },
+    &ItemMetadataPastGen {
+        id: 220,
+        modern_id: None,
+        name: "TM28 (Unused)",
+    },
+    &ItemMetadataPastGen {
+        id: 221,
+        modern_id: Some(356),
+        name: "TM29",
+    },
+    &ItemMetadataPastGen {
+        id: 222,
+        modern_id: Some(357),
+        name: "TM30",
+    },
+    &ItemMetadataPastGen {
+        id: 223,
+        modern_id: Some(358),
+        name: "TM31",
+    },
+    &ItemMetadataPastGen {
+        id: 224,
+        modern_id: Some(359),
+        name: "TM32",
+    },
+    &ItemMetadataPastGen {
+        id: 225,
+        modern_id: Some(360),
+        name: "TM33",
+    },
+    &ItemMetadataPastGen {
+        id: 226,
+        modern_id: Some(361),
+        name: "TM34",
+    },
+    &ItemMetadataPastGen {
+        id: 227,
+        modern_id: Some(362),
+        name: "TM35",
+    },
+    &ItemMetadataPastGen {
+        id: 228,
+        modern_id: Some(363),
+        name: "TM36",
+    },
+    &ItemMetadataPastGen {
+        id: 229,
+        modern_id: Some(364),
+        name: "TM37",
+    },
+    &ItemMetadataPastGen {
+        id: 230,
+        modern_id: Some(365),
+        name: "TM38",
+    },
+    &ItemMetadataPastGen {
+        id: 231,
+        modern_id: Some(366),
+        name: "TM39",
+    },
+    &ItemMetadataPastGen {
+        id: 232,
+        modern_id: Some(367),
+        name: "TM40",
+    },
+    &ItemMetadataPastGen {
+        id: 233,
+        modern_id: Some(368),
+        name: "TM41",
+    },
+    &ItemMetadataPastGen {
+        id: 234,
+        modern_id: Some(369),
+        name: "TM42",
+    },
+    &ItemMetadataPastGen {
+        id: 235,
+        modern_id: Some(370),
+        name: "TM43",
+    },
+    &ItemMetadataPastGen {
+        id: 236,
+        modern_id: Some(371),
+        name: "TM44",
+    },
+    &ItemMetadataPastGen {
+        id: 237,
+        modern_id: Some(372),
+        name: "TM45",
+    },
+    &ItemMetadataPastGen {
+        id: 238,
+        modern_id: Some(373),
+        name: "TM46",
+    },
+    &ItemMetadataPastGen {
+        id: 239,
+        modern_id: Some(374),
+        name: "TM47",
+    },
+    &ItemMetadataPastGen {
+        id: 240,
+        modern_id: Some(375),
+        name: "TM48",
+    },
+    &ItemMetadataPastGen {
+        id: 241,
+        modern_id: Some(376),
+        name: "TM49",
+    },
+    &ItemMetadataPastGen {
+        id: 242,
+        modern_id: Some(377),
+        name: "TM50",
+    },
+    &ItemMetadataPastGen {
+        id: 243,
+        modern_id: Some(420),
+        name: "HM01",
+    },
+    &ItemMetadataPastGen {
+        id: 244,
+        modern_id: Some(421),
+        name: "HM02",
+    },
+    &ItemMetadataPastGen {
+        id: 245,
+        modern_id: Some(422),
+        name: "HM03",
+    },
+    &ItemMetadataPastGen {
+        id: 246,
+        modern_id: Some(423),
+        name: "HM04",
+    },
+    &ItemMetadataPastGen {
+        id: 247,
+        modern_id: Some(424),
+        name: "HM05",
+    },
+    &ItemMetadataPastGen {
+        id: 248,
+        modern_id: Some(425),
+        name: "HM06",
+    },
+    &ItemMetadataPastGen {
+        id: 249,
+        modern_id: Some(737),
+        name: "HM07",
+    },
+    &ItemMetadataPastGen {
+        id: 250,
+        modern_id: None,
+        name: "HM08 (Unused)",
+    },
+    &ItemMetadataPastGen {
+        id: 251,
+        modern_id: None,
+        name: "HM09 (Unused)",
+    },
+    &ItemMetadataPastGen {
+        id: 252,
+        modern_id: None,
+        name: "HM10 (Unused)",
+    },
+    &ItemMetadataPastGen {
+        id: 253,
+        modern_id: None,
+        name: "HM11 (Unused)",
+    },
+    &ItemMetadataPastGen {
+        id: 254,
+        modern_id: None,
+        name: "HM12 (Unused)",
+    },
+];

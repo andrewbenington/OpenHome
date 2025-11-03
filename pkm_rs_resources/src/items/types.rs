@@ -6,7 +6,7 @@ use wasm_bindgen::prelude::*;
 
 use serde::{Serialize, Serializer};
 
-use crate::items::{gen2, gen3, modern};
+use crate::items::{gen1, gen2, gen3, modern};
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
@@ -154,7 +154,7 @@ impl ItemGen1 {
     }
 
     pub const fn get_metadata(&self) -> &ItemMetadataPastGen {
-        gen3::ALL_ITEMS_GEN3[(self.get() - 1) as usize]
+        gen1::ALL_ITEMS_GEN1[(self.get() - 1) as usize]
     }
 
     pub const fn to_le_bytes(self) -> [u8; 2] {
