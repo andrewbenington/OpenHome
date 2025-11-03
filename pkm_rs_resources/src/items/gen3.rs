@@ -1,4 +1,4 @@
-use crate::items::{ItemGen3, ItemMetadataGen3};
+use crate::items::{ItemGen3, ItemMetadataPastGen};
 
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
@@ -7,7 +7,7 @@ pub const ITEM_MAX_GEN3: usize = 376;
 
 #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "getAllItemsGen3"))]
 #[allow(clippy::missing_const_for_fn)]
-pub fn get_all_items_gen3() -> Vec<ItemMetadataGen3> {
+pub fn get_all_items_gen3() -> Vec<ItemMetadataPastGen> {
     ALL_ITEMS_GEN3.into_iter().copied().collect()
 }
 
@@ -301,1883 +301,1883 @@ impl ItemGen3 {
     }
 }
 
-pub static ALL_ITEMS_GEN3: [&ItemMetadataGen3; ITEM_MAX_GEN3] = [
-    &ItemMetadataGen3 {
+pub static ALL_ITEMS_GEN3: [&ItemMetadataPastGen; ITEM_MAX_GEN3] = [
+    &ItemMetadataPastGen {
         id: 1,
         modern_id: Some(1),
         name: "Master Ball",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 2,
         modern_id: Some(2),
         name: "Ultra Ball",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 3,
         modern_id: Some(3),
         name: "Great Ball",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 4,
         modern_id: Some(4),
         name: "Poké Ball",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 5,
         modern_id: Some(5),
         name: "Safari Ball",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 6,
         modern_id: Some(6),
         name: "Net Ball",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 7,
         modern_id: Some(7),
         name: "Dive Ball",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 8,
         modern_id: Some(8),
         name: "Nest Ball",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 9,
         modern_id: Some(9),
         name: "Repeat Ball",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 10,
         modern_id: Some(10),
         name: "Timer Ball",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 11,
         modern_id: Some(11),
         name: "Luxury Ball",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 12,
         modern_id: Some(12),
         name: "Premier Ball",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 13,
         modern_id: Some(17),
         name: "Potion",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 14,
         modern_id: Some(18),
         name: "Antidote",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 15,
         modern_id: Some(19),
         name: "Burn Heal",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 16,
         modern_id: Some(20),
         name: "Ice Heal",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 17,
         modern_id: Some(21),
         name: "Awakening",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 18,
         modern_id: Some(22),
         name: "Parlyz Heal",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 19,
         modern_id: Some(23),
         name: "Full Restore",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 20,
         modern_id: Some(24),
         name: "Max Potion",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 21,
         modern_id: Some(25),
         name: "Hyper Potion",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 22,
         modern_id: Some(26),
         name: "Super Potion",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 23,
         modern_id: Some(27),
         name: "Full Heal",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 24,
         modern_id: Some(28),
         name: "Revive",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 25,
         modern_id: Some(29),
         name: "Max Revive",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 26,
         modern_id: Some(30),
         name: "Fresh Water",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 27,
         modern_id: Some(31),
         name: "Soda Pop",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 28,
         modern_id: Some(32),
         name: "Lemonade",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 29,
         modern_id: Some(33),
         name: "Moomoo Milk",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 30,
         modern_id: Some(34),
         name: "EnergyPowder",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 31,
         modern_id: Some(35),
         name: "Energy Root",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 32,
         modern_id: Some(36),
         name: "Heal Powder",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 33,
         modern_id: Some(37),
         name: "Revival Herb",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 34,
         modern_id: Some(38),
         name: "Ether",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 35,
         modern_id: Some(39),
         name: "Max Ether",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 36,
         modern_id: Some(40),
         name: "Elixir",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 37,
         modern_id: Some(41),
         name: "Max Elixir",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 38,
         modern_id: Some(42),
         name: "Lava Cookie",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 39,
         modern_id: Some(65),
         name: "Blue Flute",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 40,
         modern_id: Some(66),
         name: "Yellow Flute",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 41,
         modern_id: Some(67),
         name: "Red Flute",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 42,
         modern_id: Some(68),
         name: "Black Flute",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 43,
         modern_id: Some(69),
         name: "White Flute",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 44,
         modern_id: Some(43),
         name: "Berry Juice",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 45,
         modern_id: Some(44),
         name: "Sacred Ash",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 46,
         modern_id: Some(70),
         name: "Shoal Salt",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 47,
         modern_id: Some(71),
         name: "Shoal Shell",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 48,
         modern_id: Some(72),
         name: "Red Shard",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 49,
         modern_id: Some(73),
         name: "Blue Shard",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 50,
         modern_id: Some(74),
         name: "Yellow Shard",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 51,
         modern_id: Some(75),
         name: "Green Shard",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 52,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 53,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 54,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 55,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 56,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 57,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 58,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 59,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 60,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 61,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 62,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 63,
         modern_id: Some(45),
         name: "HP Up",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 64,
         modern_id: Some(46),
         name: "Protein",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 65,
         modern_id: Some(47),
         name: "Iron",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 66,
         modern_id: Some(48),
         name: "Carbos",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 67,
         modern_id: Some(49),
         name: "Calcium",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 68,
         modern_id: Some(50),
         name: "Rare Candy",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 69,
         modern_id: Some(51),
         name: "PP Up",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 70,
         modern_id: Some(52),
         name: "Zinc",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 71,
         modern_id: Some(53),
         name: "PP Max",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 72,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 73,
         modern_id: Some(55),
         name: "Guard Spec.",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 74,
         modern_id: Some(56),
         name: "Dire Hit",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 75,
         modern_id: Some(57),
         name: "X Attack",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 76,
         modern_id: Some(58),
         name: "X Defend",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 77,
         modern_id: Some(59),
         name: "X Speed",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 78,
         modern_id: Some(60),
         name: "X Accuracy",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 79,
         modern_id: None,
         name: "X Special",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 80,
         modern_id: Some(63),
         name: "Poké Doll",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 81,
         modern_id: Some(64),
         name: "Fluffy Tail",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 82,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 83,
         modern_id: Some(76),
         name: "Super Repel",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 84,
         modern_id: Some(77),
         name: "Max Repel",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 85,
         modern_id: Some(78),
         name: "Escape Rope",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 86,
         modern_id: Some(79),
         name: "Repel",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 87,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 88,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 89,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 90,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 91,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 92,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 93,
         modern_id: Some(80),
         name: "Sun Stone",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 94,
         modern_id: Some(81),
         name: "Moon Stone",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 95,
         modern_id: Some(82),
         name: "Fire Stone",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 96,
         modern_id: Some(83),
         name: "Thunder Stone",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 97,
         modern_id: Some(84),
         name: "Water Stone",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 98,
         modern_id: Some(85),
         name: "Leaf Stone",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 99,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 100,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 101,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 102,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 103,
         modern_id: Some(86),
         name: "TinyMushroom",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 104,
         modern_id: Some(87),
         name: "Big Mushroom",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 105,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 106,
         modern_id: Some(88),
         name: "Pearl",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 107,
         modern_id: Some(89),
         name: "Big Pearl",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 108,
         modern_id: Some(90),
         name: "Stardust",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 109,
         modern_id: Some(91),
         name: "Star Piece",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 110,
         modern_id: Some(92),
         name: "Nugget",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 111,
         modern_id: Some(93),
         name: "Heart Scale",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 112,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 113,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 114,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 115,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 116,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 117,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 118,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 119,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 120,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 121,
         modern_id: None,
         name: "Orange Mail",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 122,
         modern_id: None,
         name: "Harbor Mail",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 123,
         modern_id: None,
         name: "Glitter Mail",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 124,
         modern_id: None,
         name: "Mech Mail",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 125,
         modern_id: None,
         name: "Wood Mail",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 126,
         modern_id: None,
         name: "Wave Mail",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 127,
         modern_id: None,
         name: "Bead Mail",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 128,
         modern_id: None,
         name: "Shadow Mail",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 129,
         modern_id: None,
         name: "Tropic Mail",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 130,
         modern_id: None,
         name: "Dream Mail",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 131,
         modern_id: None,
         name: "Fab Mail",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 132,
         modern_id: None,
         name: "Retro Mail",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 133,
         modern_id: Some(149),
         name: "Cheri Berry",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 134,
         modern_id: Some(150),
         name: "Chesto Berry",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 135,
         modern_id: Some(151),
         name: "Pecha Berry",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 136,
         modern_id: Some(152),
         name: "Rawst Berry",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 137,
         modern_id: Some(153),
         name: "Aspear Berry",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 138,
         modern_id: Some(154),
         name: "Leppa Berry",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 139,
         modern_id: Some(155),
         name: "Oran Berry",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 140,
         modern_id: Some(156),
         name: "Persim Berry",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 141,
         modern_id: Some(157),
         name: "Lum Berry",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 142,
         modern_id: Some(158),
         name: "Sitrus Berry",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 143,
         modern_id: Some(159),
         name: "Figy Berry",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 144,
         modern_id: Some(160),
         name: "Wiki Berry",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 145,
         modern_id: Some(161),
         name: "Mago Berry",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 146,
         modern_id: Some(162),
         name: "Aguav Berry",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 147,
         modern_id: Some(163),
         name: "Iapapa Berry",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 148,
         modern_id: Some(164),
         name: "Razz Berry",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 149,
         modern_id: Some(165),
         name: "Bluk Berry",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 150,
         modern_id: Some(166),
         name: "Nanab Berry",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 151,
         modern_id: Some(167),
         name: "Wepear Berry",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 152,
         modern_id: Some(168),
         name: "Pinap Berry",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 153,
         modern_id: Some(169),
         name: "Pomeg Berry",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 154,
         modern_id: Some(170),
         name: "Kelpsy Berry",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 155,
         modern_id: Some(171),
         name: "Qualot Berry",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 156,
         modern_id: Some(172),
         name: "Hondew Berry",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 157,
         modern_id: Some(173),
         name: "Grepa Berry",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 158,
         modern_id: Some(174),
         name: "Tamato Berry",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 159,
         modern_id: Some(175),
         name: "Cornn Berry",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 160,
         modern_id: Some(176),
         name: "Magost Berry",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 161,
         modern_id: Some(177),
         name: "Rabuta Berry",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 162,
         modern_id: Some(178),
         name: "Nomel Berry",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 163,
         modern_id: Some(179),
         name: "Spelon Berry",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 164,
         modern_id: Some(180),
         name: "Pamtre Berry",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 165,
         modern_id: Some(181),
         name: "Watmel Berry",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 166,
         modern_id: Some(182),
         name: "Durin Berry",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 167,
         modern_id: Some(183),
         name: "Belue Berry",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 168,
         modern_id: Some(201),
         name: "Liechi Berry",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 169,
         modern_id: Some(202),
         name: "Ganlon Berry",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 170,
         modern_id: Some(203),
         name: "Salac Berry",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 171,
         modern_id: Some(204),
         name: "Petaya Berry",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 172,
         modern_id: Some(205),
         name: "Apicot Berry",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 173,
         modern_id: Some(206),
         name: "Lansat Berry",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 174,
         modern_id: Some(207),
         name: "Starf Berry",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 175,
         modern_id: Some(208),
         name: "Enigma Berry",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 176,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 177,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 178,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 179,
         modern_id: Some(213),
         name: "BrightPowder",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 180,
         modern_id: Some(214),
         name: "White Herb",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 181,
         modern_id: Some(215),
         name: "Macho Brace",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 182,
         modern_id: Some(216),
         name: "Exp. Share",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 183,
         modern_id: Some(217),
         name: "Quick Claw",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 184,
         modern_id: Some(218),
         name: "Soothe Bell",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 185,
         modern_id: Some(219),
         name: "Mental Herb",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 186,
         modern_id: Some(220),
         name: "Choice Band",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 187,
         modern_id: Some(221),
         name: "King's Rock",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 188,
         modern_id: Some(222),
         name: "SilverPowder",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 189,
         modern_id: Some(223),
         name: "Amulet Coin",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 190,
         modern_id: Some(224),
         name: "Cleanse Tag",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 191,
         modern_id: Some(225),
         name: "Soul Dew",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 192,
         modern_id: Some(226),
         name: "DeepSeaTooth",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 193,
         modern_id: Some(227),
         name: "DeepSeaScale",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 194,
         modern_id: Some(228),
         name: "Smoke Ball",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 195,
         modern_id: Some(229),
         name: "Everstone",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 196,
         modern_id: Some(230),
         name: "Focus Band",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 197,
         modern_id: Some(231),
         name: "Lucky Egg",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 198,
         modern_id: Some(232),
         name: "Scope Lens",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 199,
         modern_id: Some(233),
         name: "Metal Coat",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 200,
         modern_id: Some(234),
         name: "Leftovers",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 201,
         modern_id: Some(235),
         name: "Dragon Scale",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 202,
         modern_id: Some(236),
         name: "Light Ball",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 203,
         modern_id: Some(237),
         name: "Soft Sand",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 204,
         modern_id: Some(238),
         name: "Hard Stone",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 205,
         modern_id: Some(239),
         name: "Miracle Seed",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 206,
         modern_id: Some(240),
         name: "BlackGlasses",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 207,
         modern_id: Some(241),
         name: "Black Belt",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 208,
         modern_id: Some(242),
         name: "Magnet",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 209,
         modern_id: Some(243),
         name: "Mystic Water",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 210,
         modern_id: Some(244),
         name: "Sharp Beak",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 211,
         modern_id: Some(245),
         name: "Poison Barb",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 212,
         modern_id: Some(246),
         name: "NeverMeltIce",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 213,
         modern_id: Some(247),
         name: "Spell Tag",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 214,
         modern_id: Some(248),
         name: "TwistedSpoon",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 215,
         modern_id: Some(249),
         name: "Charcoal",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 216,
         modern_id: Some(250),
         name: "Dragon Fang",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 217,
         modern_id: Some(251),
         name: "Silk Scarf",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 218,
         modern_id: Some(252),
         name: "Up-Grade",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 219,
         modern_id: Some(253),
         name: "Shell Bell",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 220,
         modern_id: Some(254),
         name: "Sea Incense",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 221,
         modern_id: Some(255),
         name: "Lax Incense",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 222,
         modern_id: Some(256),
         name: "Lucky Punch",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 223,
         modern_id: Some(257),
         name: "Metal Powder",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 224,
         modern_id: Some(258),
         name: "Thick Club",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 225,
         modern_id: Some(259),
         name: "Stick",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 226,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 227,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 228,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 229,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 230,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 231,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 232,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 233,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 234,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 235,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 236,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 237,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 238,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 239,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 240,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 241,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 242,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 243,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 244,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 245,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 246,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 247,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 248,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 249,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 250,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 251,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 252,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 253,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 254,
         modern_id: Some(260),
         name: "Red Scarf",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 255,
         modern_id: Some(261),
         name: "Blue Scarf",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 256,
         modern_id: Some(262),
         name: "Pink Scarf",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 257,
         modern_id: Some(263),
         name: "Green Scarf",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 258,
         modern_id: Some(264),
         name: "Yellow Scarf",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 259,
         modern_id: Some(718),
         name: "Mach Bike",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 260,
         modern_id: Some(444),
         name: "Coin Case",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 261,
         modern_id: Some(471),
         name: "Itemfinder",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 262,
         modern_id: Some(445),
         name: "Old Rod",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 263,
         modern_id: Some(446),
         name: "Good Rod",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 264,
         modern_id: Some(447),
         name: "Super Rod",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 265,
         modern_id: Some(456),
         name: "S.S. Ticket",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 266,
         modern_id: Some(457),
         name: "Contest Pass",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 267,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 268,
         modern_id: Some(720),
         name: "Wailmer Pail",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 269,
         modern_id: Some(721),
         name: "Devon Goods",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 270,
         modern_id: Some(722),
         name: "Soot Sack",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 271,
         modern_id: Some(476),
         name: "Basement Key",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 272,
         modern_id: Some(719),
         name: "Acro Bike",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 273,
         modern_id: None,
         name: "Pokéblock Case",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 274,
         modern_id: Some(725),
         name: "Letter",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 275,
         modern_id: Some(726),
         name: "Eon Ticket",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 276,
         modern_id: Some(534),
         name: "Red Orb",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 277,
         modern_id: Some(535),
         name: "Blue Orb",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 278,
         modern_id: Some(727),
         name: "Scanner",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 279,
         modern_id: Some(728),
         name: "Go-Goggles",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 280,
         modern_id: Some(729),
         name: "Meteorite",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 281,
         modern_id: Some(730),
         name: "Rm. 1 Key",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 282,
         modern_id: Some(731),
         name: "Rm. 2 Key",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 283,
         modern_id: Some(732),
         name: "Rm. 4 Key",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 284,
         modern_id: Some(733),
         name: "Rm. 6 Key",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 285,
         modern_id: Some(463),
         name: "Storage Key",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 286,
         modern_id: Some(99),
         name: "Root Fossil",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 287,
         modern_id: Some(100),
         name: "Claw Fossil",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 288,
         modern_id: Some(735),
         name: "Devon Scope",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 289,
         modern_id: Some(328),
         name: "TM01",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 290,
         modern_id: Some(329),
         name: "TM02",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 291,
         modern_id: Some(330),
         name: "TM03",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 292,
         modern_id: Some(331),
         name: "TM04",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 293,
         modern_id: Some(332),
         name: "TM05",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 294,
         modern_id: Some(333),
         name: "TM06",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 295,
         modern_id: Some(334),
         name: "TM07",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 296,
         modern_id: Some(335),
         name: "TM08",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 297,
         modern_id: Some(336),
         name: "TM09",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 298,
         modern_id: Some(337),
         name: "TM10",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 299,
         modern_id: Some(338),
         name: "TM11",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 300,
         modern_id: Some(339),
         name: "TM12",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 301,
         modern_id: Some(340),
         name: "TM13",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 302,
         modern_id: Some(341),
         name: "TM14",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 303,
         modern_id: Some(342),
         name: "TM15",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 304,
         modern_id: Some(343),
         name: "TM16",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 305,
         modern_id: Some(344),
         name: "TM17",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 306,
         modern_id: Some(345),
         name: "TM18",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 307,
         modern_id: Some(346),
         name: "TM19",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 308,
         modern_id: Some(347),
         name: "TM20",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 309,
         modern_id: Some(348),
         name: "TM21",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 310,
         modern_id: Some(349),
         name: "TM22",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 311,
         modern_id: Some(350),
         name: "TM23",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 312,
         modern_id: Some(351),
         name: "TM24",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 313,
         modern_id: Some(352),
         name: "TM25",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 314,
         modern_id: Some(353),
         name: "TM26",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 315,
         modern_id: Some(354),
         name: "TM27",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 316,
         modern_id: Some(355),
         name: "TM28",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 317,
         modern_id: Some(356),
         name: "TM29",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 318,
         modern_id: Some(357),
         name: "TM30",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 319,
         modern_id: Some(358),
         name: "TM31",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 320,
         modern_id: Some(359),
         name: "TM32",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 321,
         modern_id: Some(360),
         name: "TM33",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 322,
         modern_id: Some(361),
         name: "TM34",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 323,
         modern_id: Some(362),
         name: "TM35",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 324,
         modern_id: Some(363),
         name: "TM36",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 325,
         modern_id: Some(364),
         name: "TM37",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 326,
         modern_id: Some(365),
         name: "TM38",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 327,
         modern_id: Some(366),
         name: "TM39",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 328,
         modern_id: Some(367),
         name: "TM40",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 329,
         modern_id: Some(368),
         name: "TM41",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 330,
         modern_id: Some(369),
         name: "TM42",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 331,
         modern_id: Some(370),
         name: "TM43",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 332,
         modern_id: Some(371),
         name: "TM44",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 333,
         modern_id: Some(372),
         name: "TM45",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 334,
         modern_id: Some(373),
         name: "TM46",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 335,
         modern_id: Some(374),
         name: "TM47",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 336,
         modern_id: Some(375),
         name: "TM48",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 337,
         modern_id: Some(376),
         name: "TM49",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 338,
         modern_id: Some(377),
         name: "TM50",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 339,
         modern_id: Some(420),
         name: "HM01",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 340,
         modern_id: Some(421),
         name: "HM02",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 341,
         modern_id: Some(422),
         name: "HM03",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 342,
         modern_id: Some(423),
         name: "HM04",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 343,
         modern_id: Some(424),
         name: "HM05",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 344,
         modern_id: Some(425),
         name: "HM06",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 345,
         modern_id: Some(737),
         name: "HM07",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 346,
         modern_id: None,
         name: "HM08",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 347,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 348,
         modern_id: Some(114),
         name: "???",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 349,
         modern_id: Some(459),
         name: "Oak's Parcel",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 350,
         modern_id: Some(651),
         name: "Poké Flute",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 351,
         modern_id: Some(467),
         name: "Secret Key",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 352,
         modern_id: None,
         name: "Bike Voucher",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 353,
         modern_id: Some(877),
         name: "Gold Teeth",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 354,
         modern_id: Some(103),
         name: "Old Amber",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 355,
         modern_id: Some(475),
         name: "Card Key",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 356,
         modern_id: Some(878),
         name: "Lift Key",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 357,
         modern_id: Some(101),
         name: "Helix Fossil",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 358,
         modern_id: Some(102),
         name: "Dome Fossil",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 359,
         modern_id: Some(874),
         name: "Silph Scope",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 360,
         modern_id: Some(450),
         name: "Bicycle",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 361,
         modern_id: Some(442),
         name: "Town Map",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 362,
         modern_id: Some(443),
         name: "Vs. Seeker",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 363,
         modern_id: None,
         name: "Fame Checker",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 364,
         modern_id: Some(123),
         name: "TM Case",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 365,
         modern_id: None,
         name: "Berry Pouch",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 366,
         modern_id: None,
         name: "Teachy TV",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 367,
         modern_id: None,
         name: "Tri-Pass",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 368,
         modern_id: None,
         name: "Rainbow Pass",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 369,
         modern_id: Some(113),
         name: "Tea",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 370,
         modern_id: None,
         name: "MysticTicket",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 371,
         modern_id: None,
         name: "AuroraTicket",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 372,
         modern_id: None,
         name: "Powder Jar",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 373,
         modern_id: None,
         name: "Ruby",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 374,
         modern_id: None,
         name: "Sapphire",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 375,
         modern_id: None,
         name: "Magma Emblem",
     },
-    &ItemMetadataGen3 {
+    &ItemMetadataPastGen {
         id: 376,
         modern_id: None,
         name: "Old Sea Map",

@@ -6,7 +6,7 @@ use wasm_bindgen::prelude::*;
 
 use serde::{Serialize, Serializer};
 
-use crate::items::{gen3, modern};
+use crate::items::{gen1, gen2, gen3, modern};
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
@@ -102,29 +102,190 @@ impl ItemMetadata {
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Debug, PartialEq, Eq, Clone, Copy)]
-pub struct ItemGen3(NonZeroU16);
+#[derive(Clone, Copy)]
+pub struct ItemMetadataPastGen {
+    pub id: usize,
+    pub modern_id: Option<usize>,
+    #[wasm_bindgen(skip)]
+    pub(crate) name: &'static str,
+}
 
-impl ItemGen3 {
-    pub fn new(index: u16) -> Option<ItemGen3> {
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[allow(clippy::missing_const_for_fn)]
+impl ItemMetadataPastGen {
+    #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
+    pub fn name(&self) -> String {
+        self.name.to_owned()
+    }
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = toModern))]
+    pub fn to_modern(&self) -> Option<ItemIndex> {
+        if let Some(modern_id) = self.modern_id {
+            ItemIndex::new(modern_id as u16)
+        } else {
+            None
+        }
+    }
+}
+
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+// There are no held items in gen 1, but this represents what they become
+// when traded to gen 2
+pub struct ItemGen1(NonZeroU16);
+
+impl ItemGen1 {
+    pub fn new(index: u16) -> Option<ItemGen1> {
         if (index as usize) > modern::ALL_ITEMS.len() {
             return None;
         }
-        NonZeroU16::new(index).map(ItemGen3)
+        NonZeroU16::new(index).map(ItemGen1)
     }
 
     /// # Safety
     ///
     /// - `index` must be greater than zero and at most the maximum item index supported by this version of the library.
-    pub const unsafe fn new_unchecked(index: u16) -> ItemGen3 {
-        unsafe { ItemGen3(NonZeroU16::new_unchecked(index)) }
+    pub const unsafe fn new_unchecked(index: u16) -> ItemGen1 {
+        unsafe { ItemGen1(NonZeroU16::new_unchecked(index)) }
     }
 
     pub const fn get(&self) -> u16 {
         self.0.get()
     }
 
-    pub const fn get_metadata(&self) -> &ItemMetadataGen3 {
+    pub const fn get_metadata(&self) -> &ItemMetadataPastGen {
+        gen1::ALL_ITEMS_GEN1[(self.get() - 1) as usize]
+    }
+
+    pub const fn to_le_bytes(self) -> [u8; 2] {
+        self.get().to_le_bytes()
+    }
+}
+
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[allow(clippy::missing_const_for_fn)]
+impl ItemGen1 {
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = fromIndex))]
+    pub fn from_index(val: u16) -> Option<Self> {
+        Self::new(val)
+    }
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
+    pub fn index(&self) -> u16 {
+        self.get()
+    }
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
+    pub fn name(&self) -> String {
+        self.get_metadata().name.to_owned()
+    }
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen)]
+    pub fn equals(&self, other: &Self) -> bool {
+        self.0 == other.0
+    }
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = toModern))]
+    pub fn to_modern(&self) -> Option<ItemIndex> {
+        self.get_metadata().to_modern()
+    }
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = fromModern))]
+    pub fn from_modern_js(modern_index: u16) -> Option<Self> {
+        Self::from_modern_index(modern_index)
+    }
+}
+
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+pub struct ItemGen2(NonZeroU16);
+
+impl ItemGen2 {
+    pub fn new(index: u16) -> Option<Self> {
+        if (index as usize) > modern::ALL_ITEMS.len() {
+            return None;
+        }
+        NonZeroU16::new(index).map(Self)
+    }
+
+    /// # Safety
+    ///
+    /// - `index` must be greater than zero and at most the maximum item index supported by this version of the library.
+    pub const unsafe fn new_unchecked(index: u16) -> Self {
+        unsafe { Self(NonZeroU16::new_unchecked(index)) }
+    }
+
+    pub const fn get(&self) -> u16 {
+        self.0.get()
+    }
+
+    pub const fn get_metadata(&self) -> &ItemMetadataPastGen {
+        gen2::ALL_ITEMS_GEN2[(self.get() - 1) as usize]
+    }
+
+    pub const fn to_le_bytes(self) -> [u8; 2] {
+        self.get().to_le_bytes()
+    }
+}
+
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[allow(clippy::missing_const_for_fn)]
+impl ItemGen2 {
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = fromIndex))]
+    pub fn from_index(val: u16) -> Option<Self> {
+        Self::new(val)
+    }
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
+    pub fn index(&self) -> u16 {
+        self.get()
+    }
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
+    pub fn name(&self) -> String {
+        self.get_metadata().name.to_owned()
+    }
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen)]
+    pub fn equals(&self, other: &Self) -> bool {
+        self.0 == other.0
+    }
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = toModern))]
+    pub fn to_modern(&self) -> Option<ItemIndex> {
+        self.get_metadata().to_modern()
+    }
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = fromModern))]
+    pub fn from_modern_js(modern_index: u16) -> Option<Self> {
+        Self::from_modern_index(modern_index)
+    }
+}
+
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+pub struct ItemGen3(NonZeroU16);
+
+impl ItemGen3 {
+    pub fn new(index: u16) -> Option<Self> {
+        if (index as usize) > modern::ALL_ITEMS.len() {
+            return None;
+        }
+        NonZeroU16::new(index).map(Self)
+    }
+
+    /// # Safety
+    ///
+    /// - `index` must be greater than zero and at most the maximum item index supported by this version of the library.
+    pub const unsafe fn new_unchecked(index: u16) -> Self {
+        unsafe { Self(NonZeroU16::new_unchecked(index)) }
+    }
+
+    pub const fn get(&self) -> u16 {
+        self.0.get()
+    }
+
+    pub const fn get_metadata(&self) -> &ItemMetadataPastGen {
         gen3::ALL_ITEMS_GEN3[(self.get() - 1) as usize]
     }
 
@@ -137,8 +298,8 @@ impl ItemGen3 {
 #[allow(clippy::missing_const_for_fn)]
 impl ItemGen3 {
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = fromIndex))]
-    pub fn from_index(val: u16) -> Option<ItemGen3> {
-        ItemGen3::new(val)
+    pub fn from_index(val: u16) -> Option<Self> {
+        Self::new(val)
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
@@ -163,33 +324,6 @@ impl ItemGen3 {
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = fromModern))]
     pub fn from_modern_js(modern_index: u16) -> Option<Self> {
-        ItemGen3::from_modern_index(modern_index)
-    }
-}
-
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Clone, Copy)]
-pub struct ItemMetadataGen3 {
-    pub id: usize,
-    pub modern_id: Option<usize>,
-    #[wasm_bindgen(skip)]
-    pub(crate) name: &'static str,
-}
-
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[allow(clippy::missing_const_for_fn)]
-impl ItemMetadataGen3 {
-    #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
-    pub fn name(&self) -> String {
-        self.name.to_owned()
-    }
-
-    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = toModern))]
-    pub fn to_modern(&self) -> Option<ItemIndex> {
-        if let Some(modern_id) = self.modern_id {
-            ItemIndex::new(modern_id as u16)
-        } else {
-            None
-        }
+        Self::from_modern_index(modern_index)
     }
 }
