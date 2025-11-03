@@ -1,10 +1,5 @@
-import {
-  Item,
-  ItemFromString,
-  ItemGen2,
-  ItemGen2ToString,
-  ItemToString,
-} from '@pokemon-resources/index'
+import { ItemIndex } from '@pkm-rs-resources/pkg'
+import { Item } from '@pokemon-resources/index'
 
 const BallIcons: { [key: string]: string } = {
   Master: 'items/index/0001.png',
@@ -89,26 +84,7 @@ export const BallsImageList = [
 
 const SharedItemSpritePrefixes = ['Data Card', 'Lost Satchel', 'Old Verse', 'Lost Satchel']
 
-const itemEquivalents: Record<string, string> = {
-  'Parlyz Heal': 'Paralyze Heal',
-  Bicycle: 'Bike',
-  NeverMeltIce: 'Never-Melt Ice',
-  'Up-Grade': 'Upgrade',
-  Stick: 'Leek',
-}
-
-export const getItemIconPath = (item: Item | ItemGen2, format?: string): string => {
-  let itemName: string
-
-  if (format === 'PK2') {
-    itemName = ItemGen2ToString(item as ItemGen2)
-    if (itemName in itemEquivalents) {
-      itemName = itemEquivalents[itemName]
-    }
-    item = ItemFromString(itemName)
-  } else {
-    itemName = ItemToString(item as Item)
-  }
+export const getItemIconPath = (item: Item): string => {
   if (
     (item > 1057 && item < 1074) ||
     (item > 1639 && item < 1651) ||
@@ -123,6 +99,8 @@ export const getItemIconPath = (item: Item | ItemGen2, format?: string): string 
   ) {
     return `items/index/0000.png`
   }
+
+  const itemName = ItemIndex.fromIndex(item)?.name ?? ''
   if (item > 0) {
     if (itemName.startsWith('HM') || (itemName.startsWith('TM') && itemName.charAt(2) !== 'V')) {
       return 'items/tm/normal.png'

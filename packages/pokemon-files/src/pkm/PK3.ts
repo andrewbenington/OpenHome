@@ -294,7 +294,6 @@ export class PK3 {
   }
 
   public get heldItemName() {
-    console.log(this.heldItemIndexGen3?.index, this.heldItemIndexGen3?.name, this.heldItemIndex)
     return this.heldItemIndexGen3?.name ?? 'None'
   }
 
