@@ -8,6 +8,8 @@ import {
   itemGen3GetAll,
   type ItemGen3GetAllRow,
   itemGetAll,
+  itemRadicalRedGetAll,
+  itemUnboundGetAll,
 } from './queries.ts'
 
 function optionalToRust<T, S>(value: T | null | undefined, tranformer?: (T) => S): string {
@@ -33,7 +35,7 @@ async function generateModern() {
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
-pub const ITEM_MAX: usize = 2600;
+pub const ITEM_MAX: usize = ${allItems.length};
 
 #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "getAllItems"))]
 #[allow(clippy::missing_const_for_fn)]
@@ -198,7 +200,83 @@ impl ItemGen3 {
   console.log(`Rust code written to ${filename}`)
 }
 
+async function generateRadicalRed() {
+  const allItems = await itemRadicalRedGetAll(new Database('generate/pkm.db'))
+
+  let output = `use crate::items::ItemMetadataPastGen;
+use crate::items::types_extra::ItemRadicalRed;
+
+pub const ITEM_MAX_RADICAL_RED: usize = ${allItems.length};
+
+impl ItemRadicalRed {
+    pub fn from_modern_index(modern_index: u16) -> Option<Self> {
+        match modern_index {`
+
+  const alreadyProcessed: Set<number> = new Set()
+  for (const item of allItems.toSorted((a, b) => a.modernId - b.modernId)) {
+    if (item.modernId && !alreadyProcessed.has(item.modernId)) {
+      output += `
+            ${item.modernId} => Self::new(${item.id}),`
+      alreadyProcessed.add(item.modernId)
+    }
+  }
+  output += ` _ => None,
+         }
+    }
+}
+
+`
+
+  output +=
+    `pub static ALL_ITEMS_RADICAL_RED: [&ItemMetadataPastGen; ITEM_MAX_RADICAL_RED] = [\n` +
+    allItems.map(convertItemPastGen).join(',\n') +
+    '];'
+
+  const filename = 'src/items/radical_red.rs'
+  fs.writeFileSync(filename, output)
+  console.log(`Rust code written to ${filename}`)
+}
+
+async function generateUnbound() {
+  const allItems = await itemUnboundGetAll(new Database('generate/pkm.db'))
+
+  let output = `use crate::items::ItemMetadataPastGen;
+use crate::items::types_extra::ItemUnbound;
+
+pub const ITEM_MAX_UNBOUND: usize = ${allItems.length};
+
+impl ItemUnbound {
+    pub fn from_modern_index(modern_index: u16) -> Option<Self> {
+        match modern_index {`
+
+  const alreadyProcessed: Set<number> = new Set()
+  for (const item of allItems.toSorted((a, b) => a.modernId - b.modernId)) {
+    if (item.modernId && !alreadyProcessed.has(item.modernId)) {
+      output += `
+            ${item.modernId} => Self::new(${item.id}),`
+      alreadyProcessed.add(item.modernId)
+    }
+  }
+  output += ` _ => None,
+         }
+    }
+}
+
+`
+
+  output +=
+    `pub static ALL_ITEMS_UNBOUND: [&ItemMetadataPastGen; ITEM_MAX_UNBOUND] = [\n` +
+    allItems.map(convertItemPastGen).join(',\n') +
+    '];'
+
+  const filename = 'src/items/unbound.rs'
+  fs.writeFileSync(filename, output)
+  console.log(`Rust code written to ${filename}`)
+}
+
 generateModern()
 generateGen1()
 generateGen2()
 generateGen3()
+generateRadicalRed()
+generateUnbound()

@@ -5,7 +5,6 @@ import {
   DefenseCharacteristics,
   HPCharacteristics,
   HPCharacteristicsPre6,
-  Item,
   Moves,
   SpecialAtkCharacteristics,
   SpecialDefCharacteristics,
@@ -471,44 +470,61 @@ export function getWeightCalculated(mon: PKMInterface) {
   return formeMetadata.baseWeight * 10 * deviation
 }
 
+const GENGARITE = 656
+const LATIOSITE = 685
+const SWAMPERTITE = 752
+const BEEDRILLITE = 770
 const CLEFABLITE = 2559
 const FROSLASSITE = 2566
 const EMBOARITE = 2569
 const DRAMPANITE = 2585
 const FALINKSITE = 2587
 
-export function isMegaStone(item?: Item): boolean {
+export function isMegaStone(itemIndex?: number): boolean {
   return (
-    item !== undefined &&
-    ((item >= Item.Gengarite && item <= Item.Latiosite) ||
-      (item >= Item.Swampertite && item <= Item.Beedrillite) ||
-      (item >= CLEFABLITE && item <= FROSLASSITE) ||
-      (item >= EMBOARITE && item <= DRAMPANITE) ||
-      (item as number) === FALINKSITE)
+    itemIndex !== undefined &&
+    ((itemIndex >= GENGARITE && itemIndex <= LATIOSITE) ||
+      (itemIndex >= SWAMPERTITE && itemIndex <= BEEDRILLITE) ||
+      (itemIndex >= CLEFABLITE && itemIndex <= FROSLASSITE) ||
+      (itemIndex >= EMBOARITE && itemIndex <= DRAMPANITE) ||
+      (itemIndex as number) === FALINKSITE)
   )
 }
 
-export function isZCrystal(item: Item) {
+const NORMALIUM_Z = 776
+const PIKANIUM_Z = 794
+const DECIDIUM_Z = 798
+const PIKASHUNIUM_Z_2 = 836
+const SOLGANIUM_Z = 921
+const KOMMONIUM_Z_2 = 932
+
+export function isZCrystal(itemIndex: number) {
   return (
-    (item >= Item.NormaliumZ && item <= Item.PikaniumZ) ||
-    (item >= Item.DecidiumZ && item <= Item.PikashuniumZ_1) ||
-    (item >= Item.SolganiumZ && item <= Item.KommoniumZ_1)
+    (itemIndex >= NORMALIUM_Z && itemIndex <= PIKANIUM_Z) ||
+    (itemIndex >= DECIDIUM_Z && itemIndex <= PIKASHUNIUM_Z_2) ||
+    (itemIndex >= SOLGANIUM_Z && itemIndex <= KOMMONIUM_Z_2)
   )
 }
 
-export function isBattleFormeItem(nationalDex: number, item?: Item) {
+const ULTRANECROZIUM_Z_1 = 923
+const ULTRANECROZIUM_Z_2 = 929
+const RED_ORB = 534
+const BLUE_ORB = 535
+const RUSTED_SWORD = 1103
+const RUSTED_SHIELD = 1104
+export function isBattleFormeItem(nationalDex: number, itemIndex?: number) {
   return (
     (nationalDex === NationalDex.Necrozma &&
-      (item === Item.UltranecroziumZ || item === Item.UltranecroziumZ_1)) ||
-    (nationalDex === NationalDex.Groudon && item === Item.RedOrb) ||
-    (nationalDex === NationalDex.Kyogre && item === Item.BlueOrb) ||
-    (nationalDex === NationalDex.Zacian && item === Item.RustedSword) ||
-    (nationalDex === NationalDex.Zamazenta && item === Item.RustedShield)
+      (itemIndex === ULTRANECROZIUM_Z_1 || itemIndex === ULTRANECROZIUM_Z_2)) ||
+    (nationalDex === NationalDex.Groudon && itemIndex === RED_ORB) ||
+    (nationalDex === NationalDex.Kyogre && itemIndex === BLUE_ORB) ||
+    (nationalDex === NationalDex.Zacian && itemIndex === RUSTED_SWORD) ||
+    (nationalDex === NationalDex.Zamazenta && itemIndex === RUSTED_SHIELD)
   )
 }
 
-export function displayIndexAdder(item?: Item) {
-  if (item === Item.UltranecroziumZ || item === Item.UltranecroziumZ_1) {
+export function displayIndexAdder(itemIndex?: number) {
+  if (itemIndex === ULTRANECROZIUM_Z_1 || itemIndex === ULTRANECROZIUM_Z_2) {
     return (x: number) => x + 3
   }
   return (x: number) => x + 1

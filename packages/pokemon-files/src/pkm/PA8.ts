@@ -3,6 +3,7 @@
 import {
   AbilityIndex,
   Ball,
+  Item,
   Language,
   Languages,
   MetadataLookup,
@@ -10,7 +11,6 @@ import {
   SpeciesLookup,
 } from '@pkm-rs-resources/pkg'
 import { ModernRibbons } from '@pokemon-resources/index'
-import { ItemFromString, ItemToString } from '@pokemon-resources/items'
 import { getHeightCalculated, getWeightCalculated } from '../../../../src/types/pkm/util'
 import * as byteLogic from '../util/byteLogic'
 import * as encryption from '../util/encryption'
@@ -226,7 +226,7 @@ export class PA8 {
       this.sanity = other.sanity ?? 0
       this.checksum = other.checksum ?? 0
       this.dexNum = other.dexNum
-      this.heldItemIndex = ItemFromString(other.heldItemName)
+      this.heldItemIndex = other.heldItemIndex
       this.trainerID = other.trainerID
       this.secretID = other.secretID
       this.exp = other.exp
@@ -480,7 +480,7 @@ export class PA8 {
   }
 
   public get heldItemName() {
-    return ItemToString(this.heldItemIndex)
+    return Item.fromIndex(this.heldItemIndex)?.name ?? 'None'
   }
 
   public get heightAbsolute(): number {
