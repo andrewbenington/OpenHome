@@ -1,4 +1,4 @@
-import { ItemIndex, OriginGames, SpeciesLookup } from '@pkm-rs-resources/pkg'
+import { Item, OriginGames, SpeciesLookup } from '@pkm-rs-resources/pkg'
 import { Card, Flex, Heading, Separator } from '@radix-ui/themes'
 import * as E from 'fp-ts/lib/Either'
 import { useContext, useEffect, useState } from 'react'
@@ -104,7 +104,7 @@ function bagDisplay(state: ItemBagState) {
     Modified: state.modified,
     Error: state.error ?? 'None',
     Items: Object.entries(state.itemCounts).map(([indexStr, qty]) => ({
-      name: ItemIndex.fromIndex(parseInt(indexStr)),
+      name: Item.fromIndex(parseInt(indexStr)),
       qty,
     })),
   }

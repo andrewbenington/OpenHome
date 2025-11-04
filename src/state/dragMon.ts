@@ -1,10 +1,8 @@
-import { ItemIndex } from '@pkm-rs-resources/pkg'
+import { Item } from '@pkm-rs-resources/pkg'
 import { Dispatch, Reducer, createContext } from 'react'
 import { MonWithLocation } from './openSaves'
 
-export type DragPayload =
-  | { kind: 'mon'; monData: MonWithLocation }
-  | { kind: 'item'; item: ItemIndex }
+export type DragPayload = { kind: 'mon'; monData: MonWithLocation } | { kind: 'item'; item: Item }
 
 type DragMode = 'mon' | 'item'
 

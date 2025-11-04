@@ -1,4 +1,4 @@
-import { ItemIndex } from '@pkm-rs-resources/pkg'
+import { Item } from '@pkm-rs-resources/pkg'
 import { Flex, Grid } from '@radix-ui/themes'
 import { useContext } from 'react'
 import { ItemBagContext } from 'src/state/itemBag'
@@ -33,7 +33,7 @@ export default function ItemBag() {
         <Grid columns="6" gap="2" justify="end" align={'end'}>
           {Object.entries(bagState.itemCounts).map(([indexStr, count]) => {
             const index = parseInt(indexStr)
-            const validatedIndex = ItemIndex.fromIndex(index)
+            const validatedIndex = Item.fromIndex(index)
 
             return (
               <Flex
