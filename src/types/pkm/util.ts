@@ -512,6 +512,7 @@ const RED_ORB = 534
 const BLUE_ORB = 535
 const RUSTED_SWORD = 1103
 const RUSTED_SHIELD = 1104
+
 export function isBattleFormeItem(nationalDex: number, itemIndex?: number) {
   return (
     (nationalDex === NationalDex.Necrozma &&
