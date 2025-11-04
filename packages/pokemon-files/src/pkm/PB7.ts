@@ -3,13 +3,13 @@
 import {
   AbilityIndex,
   Ball,
+  Item,
   Language,
   Languages,
   MetadataLookup,
   NatureIndex,
   SpeciesLookup,
 } from '@pkm-rs-resources/pkg'
-import { ItemToString } from '@pokemon-resources/items'
 import { PKMInterface } from '../../../../src/types/interfaces'
 import { getHeightCalculated, getWeightCalculated } from '../../../../src/types/pkm/util'
 import * as byteLogic from '../util/byteLogic'
@@ -412,7 +412,7 @@ export class PB7 {
   }
 
   public get heldItemName() {
-    return ItemToString(this.heldItemIndex)
+    return Item.fromIndex(this.heldItemIndex)?.name ?? 'None'
   }
 
   public get heightAbsolute(): number {

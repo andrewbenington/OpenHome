@@ -1,4 +1,3 @@
-export * from './items'
 export * from './learned-moves'
 export * from './locations'
 export * from './moves'

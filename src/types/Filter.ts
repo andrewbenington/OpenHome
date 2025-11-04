@@ -1,5 +1,5 @@
 import { MetadataLookup, OriginGame } from '@pkm-rs-resources/pkg'
-import { Item, Type } from '@pokemon-resources/index'
+import { Type } from '@pokemon-resources/index'
 import { PKMInterface } from './interfaces'
 import { isMegaStone, isZCrystal } from './pkm/util'
 
@@ -95,8 +95,8 @@ function heldItemPassesFilter(heldItemIndex: number, filter: HeldItemFilter): bo
     case 'any':
       return heldItemIndex > 0
     case 'mega_stone':
-      return isMegaStone(heldItemIndex as Item)
+      return isMegaStone(heldItemIndex)
     case 'z_crystal':
-      return isZCrystal(heldItemIndex as Item)
+      return isZCrystal(heldItemIndex)
   }
 }
