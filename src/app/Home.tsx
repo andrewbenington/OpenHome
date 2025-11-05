@@ -342,7 +342,7 @@ const Home = () => {
               <FilterPanel />
             </Tabs.Content>
 
-            <Tabs.Content value="bag">
+            <Tabs.Content value="bag" style={{ maxHeight: 'calc(100% - 32px)', overflow: 'auto' }}>
               <ItemBag />
             </Tabs.Content>
           </Tabs.Root>

@@ -11,21 +11,16 @@ export default function ItemBag() {
   const [, dragMonDispatch] = useContext(DragMonContext)
 
   return (
-    <Flex
-      direction="column"
-      gap="2"
-      style={{ width: 'calc(100% - 10px)', height: 'calc(100% - 10px)', margin: 5 }}
-    >
+    <Flex direction="column" p="1" gap="2" style={{ marginLeft: 5 }}>
       <DroppableSpace
         dropID="item-bag"
         style={{
-          width: 'calc(100% - 10px)',
-          height: 'calc(100% - 44px)',
-          padding: 5,
           borderRadius: 6,
           boxSizing: 'content-box',
           justifyContent: 'start',
           alignItems: 'start',
+          height: '100%',
+          padding: '5px 0px',
         }}
         onOver={() => dragMonDispatch({ type: 'set_mode', payload: 'item' })}
         onNotOver={() => dragMonDispatch({ type: 'set_mode', payload: 'mon' })}
