@@ -22,13 +22,13 @@ export default function PokemonDragContextProvider(props: { children?: ReactNode
         const { operation } = e
         const { target } = operation
 
-        const dest = target?.data as MonLocation
+        const dest = target?.data
         const payload = dragMonState.payload
 
         if (!payload) return
 
         if (payload.kind === 'item') {
-          if (dest && target) {
+          if (isMonLocation(dest) && target) {
             // Avoid losing the second item if mon already holding same item
             const destMon = getMonAtLocation(openSaves, dest)
             if (destMon?.heldItemIndex === payload.item.index) {
@@ -61,7 +61,10 @@ export default function PokemonDragContextProvider(props: { children?: ReactNode
               })
               mon.heldItemIndex = 0
             }
-          } else if (dest && (dest.is_home || dest.save?.supportsMon(mon.dexNum, mon.formeNum))) {
+          } else if (
+            isMonLocation(dest) &&
+            (dest.is_home || dest.save.supportsMon(mon.dexNum, mon.formeNum))
+          ) {
             const source = payload.monData
 
             // If moving mon outside of its save, start persisting this mon's data in OpenHome
@@ -98,14 +101,9 @@ export default function PokemonDragContextProvider(props: { children?: ReactNode
         PointerSensor.configure({
           activationConstraints: {
             // Start dragging after moving 5px
-            distance: {
-              value: 5,
-            },
+            distance: { value: 5 },
             // Or after holding for 200ms
-            delay: {
-              value: 200,
-              tolerance: 10,
-            },
+            delay: { value: 200, tolerance: 10 },
           },
         }),
       ]}
@@ -141,4 +139,8 @@ export default function PokemonDragContextProvider(props: { children?: ReactNode
       {children}
     </DragDropProvider>
   )
+}
+
+function isMonLocation(obj: object | undefined): obj is MonLocation {
+  return obj !== undefined && 'box' in obj && 'boxSlot' in obj
 }
