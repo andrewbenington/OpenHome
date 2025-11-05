@@ -1,4 +1,4 @@
-import { Language, OriginGame } from '@pkm-rs-resources/pkg'
+import { ItemGen1, Language, OriginGame } from '@pkm-rs-resources/pkg'
 import { PK1 } from '@pokemon-files/pkm'
 import lodash from 'lodash'
 import { NationalDex } from 'src/consts/NationalDex'
@@ -238,6 +238,10 @@ export class G1SAV extends OfficialSAV<PK1> {
 
   supportsMon(dexNumber: number, formeNumber: number) {
     return dexNumber <= NationalDex.Mew && formeNumber === 0
+  }
+
+  supportsItem(itemIndex: number) {
+    return ItemGen1.fromModern(itemIndex) !== undefined
   }
 
   getCurrentBox() {

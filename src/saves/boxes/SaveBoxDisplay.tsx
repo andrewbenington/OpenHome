@@ -111,7 +111,11 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   const isDisabled = useMemo(() => {
     const dragPayload = dragMonState?.payload
 
-    if (!dragPayload || dragPayload.kind !== 'mon') return false
+    if (!dragPayload) return false
+
+    if (dragPayload.kind === 'item') {
+      return !save.supportsItem(dragPayload.item.index)
+    }
 
     const dragData = dragPayload.monData
 

@@ -18,8 +18,6 @@ export default function PokemonDragContextProvider(props: { children?: ReactNode
 
   return (
     <DragDropProvider
-      // collisionDetection={closestCenter}
-      // modifiers={[RestrictToWindow]}
       onDragEnd={(e) => {
         const { operation } = e
         const { target } = operation
@@ -66,9 +64,18 @@ export default function PokemonDragContextProvider(props: { children?: ReactNode
           } else if (dest && (dest.is_home || dest.save?.supportsMon(mon.dexNum, mon.formeNum))) {
             const source = payload.monData
 
+            // If moving mon outside of its save, start persisting this mon's data in OpenHome
+            // (if it isnt already)
             if (source.save !== dest.save) {
               persistedPkmDataDispatch({ type: 'persist_data', payload: new OHPKM(mon) })
             }
+
+            // Move item to OpenHome bag if not supported by the save file
+            if (mon.heldItemIndex && !dest.is_home && !dest.save?.supportsItem(mon.heldItemIndex)) {
+              bagDispatch({ type: 'add_item', payload: { index: mon.heldItemIndex, qty: 1 } })
+              mon.heldItemIndex = 0
+            }
+
             openSavesDispatch({ type: 'move_mon', payload: { source, dest } })
           }
         }

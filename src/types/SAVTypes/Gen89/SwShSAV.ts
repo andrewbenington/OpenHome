@@ -2,6 +2,7 @@ import { Languages, OriginGame, SpeciesLookup } from '@pkm-rs-resources/pkg'
 import { PK8 } from '@pokemon-files/pkm'
 import { utf16BytesToString } from '@pokemon-files/util'
 import { NationalDex } from 'src/consts/NationalDex'
+import { Item } from '../../../consts/Items'
 import {
   SWSH_TRANSFER_RESTRICTIONS_BASE,
   SWSH_TRANSFER_RESTRICTIONS_CT,
@@ -84,14 +85,26 @@ export class SwShSAV extends G89SAV<PK8> {
 
   supportsMon(dexNumber: number, formeNumber: number): boolean {
     const revision = this.scBlocks ? this.getSaveRevision() : 'Crown Tundra'
-    const restrictions =
-      revision === 'Base Game'
-        ? SWSH_TRANSFER_RESTRICTIONS_BASE
-        : revision === 'Isle Of Armor'
-          ? SWSH_TRANSFER_RESTRICTIONS_IOA
-          : SWSH_TRANSFER_RESTRICTIONS_CT
+    switch (revision) {
+      case 'Base Game':
+        return !isRestricted(SWSH_TRANSFER_RESTRICTIONS_BASE, dexNumber, formeNumber)
+      case 'Isle Of Armor':
+        return !isRestricted(SWSH_TRANSFER_RESTRICTIONS_IOA, dexNumber, formeNumber)
+      case 'Crown Tundra':
+        return !isRestricted(SWSH_TRANSFER_RESTRICTIONS_CT, dexNumber, formeNumber)
+    }
+  }
 
-    return !isRestricted(restrictions, dexNumber, formeNumber)
+  supportsItem(itemIndex: number) {
+    const revision = this.scBlocks ? this.getSaveRevision() : 'Crown Tundra'
+    switch (revision) {
+      case 'Base Game':
+        return itemIndex <= Item.DynamaxCrystalAql7235
+      case 'Isle Of Armor':
+        return itemIndex <= Item.MarkCharm
+      case 'Crown Tundra':
+        return itemIndex <= Item.ReinsOfUnity_3
+    }
   }
 
   getCurrentBox() {
