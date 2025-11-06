@@ -5,7 +5,6 @@ import {
   DefenseCharacteristics,
   HPCharacteristics,
   HPCharacteristicsPre6,
-  Item,
   Moves,
   SpecialAtkCharacteristics,
   SpecialDefCharacteristics,
@@ -471,36 +470,55 @@ export function getWeightCalculated(mon: PKMInterface) {
   return formeMetadata.baseWeight * 10 * deviation
 }
 
-export function isMegaStone(item?: Item): boolean {
+const GENGARITE = 656
+const LATIOSITE = 685
+const SWAMPERTITE = 752
+const BEEDRILLITE = 770
+
+export function isMegaStone(itemIndex?: number): boolean {
   return (
-    item !== undefined &&
-    ((item >= Item.Gengarite && item <= Item.Latiosite) ||
-      (item >= Item.Swampertite && item <= Item.Beedrillite))
+    itemIndex !== undefined &&
+    ((itemIndex >= GENGARITE && itemIndex <= LATIOSITE) ||
+      (itemIndex >= SWAMPERTITE && itemIndex <= BEEDRILLITE))
   )
 }
 
-export function isZCrystal(item: Item) {
+const NORMALIUM_Z = 776
+const PIKANIUM_Z = 794
+const DECIDIUM_Z = 798
+const PIKASHUNIUM_Z_2 = 836
+const SOLGANIUM_Z = 921
+const KOMMONIUM_Z_2 = 932
+
+export function isZCrystal(itemIndex: number) {
   return (
-    (item >= Item.NormaliumZ && item <= Item.PikaniumZ) ||
-    (item >= Item.DecidiumZ && item <= Item.PikashuniumZ_1) ||
-    (item >= Item.SolganiumZ && item <= Item.KommoniumZ_1)
+    (itemIndex >= NORMALIUM_Z && itemIndex <= PIKANIUM_Z) ||
+    (itemIndex >= DECIDIUM_Z && itemIndex <= PIKASHUNIUM_Z_2) ||
+    (itemIndex >= SOLGANIUM_Z && itemIndex <= KOMMONIUM_Z_2)
   )
 }
 
-export function isBattleFormeItem(item?: Item) {
+const ULTRANECROZIUM_Z_1 = 923
+const ULTRANECROZIUM_Z_2 = 929
+const RED_ORB = 534
+const BLUE_ORB = 535
+const RUSTED_SWORD = 1103
+const RUSTED_SHIELD = 1104
+
+export function isBattleFormeItem(itemIndex?: number) {
   return (
-    isMegaStone(item) ||
-    item === Item.UltranecroziumZ ||
-    item === Item.UltranecroziumZ_1 ||
-    item === Item.RedOrb ||
-    item === Item.BlueOrb ||
-    item === Item.RustedSword ||
-    item === Item.RustedShield
+    isMegaStone(itemIndex) ||
+    itemIndex === ULTRANECROZIUM_Z_1 ||
+    itemIndex === ULTRANECROZIUM_Z_2 ||
+    itemIndex === RED_ORB ||
+    itemIndex === BLUE_ORB ||
+    itemIndex === RUSTED_SWORD ||
+    itemIndex === RUSTED_SHIELD
   )
 }
 
-export function displayIndexAdder(item?: Item) {
-  if (item === Item.UltranecroziumZ || item === Item.UltranecroziumZ_1) {
+export function displayIndexAdder(itemIndex?: number) {
+  if (itemIndex === ULTRANECROZIUM_Z_1 || itemIndex === ULTRANECROZIUM_Z_2) {
     return (x: number) => x + 3
   }
   return (x: number) => x + 1
