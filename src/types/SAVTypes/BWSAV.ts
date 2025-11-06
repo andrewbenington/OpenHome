@@ -1,5 +1,6 @@
 import { OriginGame } from '@pkm-rs-resources/pkg'
 import { BW_TRANSFER_RESTRICTIONS } from 'src/consts/TransferRestrictions'
+import { Item } from '../../consts/Items'
 import { isRestricted } from '../TransferRestrictions'
 import { G5SAV } from './G5SAV'
 import { hasDesamumeFooter } from './util'
@@ -9,6 +10,10 @@ export class BWSAV extends G5SAV {
 
   supportsMon(dexNumber: number, formeNumber: number) {
     return !isRestricted(BW_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)
+  }
+
+  supportsItem(itemIndex: number) {
+    return itemIndex <= Item.Xtransceiver
   }
 
   static fileIsSave(bytes: Uint8Array): boolean {

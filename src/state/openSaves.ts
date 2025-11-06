@@ -1,3 +1,4 @@
+import { Item } from '@pkm-rs-resources/pkg'
 import { createContext, Dispatch, Reducer } from 'react'
 import { OHPKM } from 'src/types/pkm/OHPKM'
 import { HomeData } from 'src/types/SAVTypes/HomeData'
@@ -135,6 +136,10 @@ export type OpenSavesAction =
   | {
       type: 'move_mon'
       payload: { source: MonWithLocation; dest: MonLocation }
+    }
+  | {
+      type: 'set_mon_item'
+      payload: { item: Item | undefined; dest: MonLocation }
     }
   /*
    *  OTHER
@@ -401,6 +406,41 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
 
       return { ...state }
     }
+
+    case 'set_mon_item': {
+      const { item, dest } = payload
+
+      const targetMon = getMonAtLocation(state, dest)
+
+      if (!targetMon) {
+        return { ...state }
+      }
+
+      if (targetMon.heldItemIndex === item?.index) {
+        return { ...state }
+      }
+
+      let updatedMon: OHPKM
+
+      if (targetMon instanceof OHPKM) {
+        updatedMon = targetMon
+      } else {
+        updatedMon = new OHPKM(targetMon)
+      }
+
+      updatedMon.heldItemIndex = item?.index ?? 0
+
+      updateMonInSave(state, updatedMon, dest)
+
+      const identifier = getMonFileIdentifier(updatedMon)
+
+      if (identifier) {
+        state.modifiedOHPKMs[identifier] = updatedMon
+      }
+
+      return { ...state }
+    }
+
     case 'import_mons': {
       const addedMons: OHPKM[] = []
       const { dest } = action.payload
@@ -512,3 +552,16 @@ export const OpenSavesContext = createContext<[OpenSavesState, Dispatch<OpenSave
   () => {},
   [],
 ])
+
+export function getMonAtLocation(state: OpenSavesState, location: MonLocation) {
+  if (location.is_home) {
+    return state.homeData?.boxes[location.box].pokemon[location.box_slot]
+  }
+
+  const saveID = saveToStringIdentifier(location.save)
+
+  if (saveID in state.openSaves) {
+    return state.openSaves[saveID].save.boxes[location.box].pokemon[location.box_slot]
+  }
+  return undefined
+}

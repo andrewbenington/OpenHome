@@ -66,7 +66,7 @@ const BoxCell = ({
           status: mon.isShiny() ? 'ShinyCaught' : 'Caught',
         })
 
-        if (isBattleFormeItem(mon.heldItemIndex)) {
+        if (isBattleFormeItem(mon.dexNum, mon.heldItemIndex)) {
           pokedexUpdates.push({
             dexNumber: mon.dexNum,
             formeNumber: displayIndexAdder(mon.heldItemIndex)(mon.formeNum),
@@ -99,8 +99,6 @@ const BoxCell = ({
     data: location,
     disabled,
   })
-
-  // console.log({ isDropTarget, dragID, location, disabled, dragMonState })
 
   return (
     <div

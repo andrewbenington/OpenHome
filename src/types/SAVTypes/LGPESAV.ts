@@ -4,6 +4,7 @@ import { utf16BytesToString } from '@pokemon-files/util'
 import { ceil, min } from 'lodash'
 import { NationalDex } from 'src/consts/NationalDex'
 import { LGE_STARTER, LGP_STARTER } from '../../consts/Formes'
+import { Item } from '../../consts/Items'
 import { LGPE_TRANSFER_RESTRICTIONS } from '../../consts/TransferRestrictions'
 import { bytesToUint16LittleEndian, bytesToUint32LittleEndian } from '../../util/byteLogic'
 import { CRC16_NoInvert } from '../../util/Encryption'
@@ -237,6 +238,10 @@ export class LGPESAV extends OfficialSAV<PB7> {
 
   supportsMon(dexNumber: number, formeNumber: number): boolean {
     return !isRestricted(LGPE_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)
+  }
+
+  supportsItem(itemIndex: number) {
+    return itemIndex <= Item.MagmarCandy
   }
 
   getSlotMetadata = (boxNum: number, boxSlot: number): SlotMetadata => {

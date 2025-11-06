@@ -54,8 +54,10 @@ export interface BaseSAV<P extends PKMInterface = PKMInterface> {
   isPlugin: boolean
 
   getCurrentBox: () => Box<P>
-  supportsMon: (dexNumber: number, formeNumber: number) => boolean
   getSlotMetadata?: (boxNum: number, boxSlot: number) => SlotMetadata
+
+  supportsMon: (dexNumber: number, formeNumber: number) => boolean
+  supportsItem: (itemIndex: number) => boolean
 
   prepareBoxesAndGetModified: () => OHPKM[]
 
@@ -81,6 +83,7 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
   abstract updatedBoxSlots: BoxCoordinates[]
   abstract getCurrentBox(): Box<P>
   abstract supportsMon(dexNumber: number, formeNumber: number): boolean
+  abstract supportsItem(itemIndex: number): boolean
   abstract prepareBoxesAndGetModified(): OHPKM[]
 
   getDisplayData(): Record<string, string | number | undefined> | undefined {
@@ -90,8 +93,9 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
     }
   }
 
-  getSlotMetadata?: (boxNum: number, boxSlot: number) => SlotMetadata = undefined
   isPlugin: false = false
+
+  getSlotMetadata?: (boxNum: number, boxSlot: number) => SlotMetadata = undefined
 
   get gameName(): string {
     return OriginGames.gameName(this.origin)
@@ -125,6 +129,7 @@ export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implement
   abstract updatedBoxSlots: BoxCoordinates[]
   abstract getCurrentBox(): Box<P>
   abstract supportsMon(dexNumber: number, formeNumber: number): boolean
+  abstract supportsItem(itemIndex: number): boolean
   abstract getSlotMetadata?: ((boxNum: number, boxSlot: number) => SlotMetadata) | undefined
   abstract prepareBoxesAndGetModified(): OHPKM[]
 
@@ -136,8 +141,9 @@ export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implement
     }
   }
 
-  abstract pluginIdentifier: string
   isPlugin = true
+
+  abstract pluginIdentifier: string
 
   abstract get gameName(): string
 

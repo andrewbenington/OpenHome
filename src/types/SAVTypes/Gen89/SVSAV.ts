@@ -1,6 +1,7 @@
 import { Languages, OriginGame } from '@pkm-rs-resources/pkg'
 import { PK9 } from '@pokemon-files/pkm'
 import { utf16BytesToString } from '@pokemon-files/util'
+import { Item } from '../../../consts/Items'
 import {
   SV_TRANSFER_RESTRICTIONS_BASE,
   SV_TRANSFER_RESTRICTIONS_ID,
@@ -90,14 +91,26 @@ export class SVSAV extends G89SAV<PK9> {
 
   supportsMon(dexNumber: number, formeNumber: number): boolean {
     const revision = this.scBlocks ? this.getSaveRevision() : 'Indigo Disk'
-    const restrictions =
-      revision === 'Base Game'
-        ? SV_TRANSFER_RESTRICTIONS_BASE
-        : revision === 'Teal Mask'
-          ? SV_TRANSFER_RESTRICTIONS_TM
-          : SV_TRANSFER_RESTRICTIONS_ID
+    switch (revision) {
+      case 'Base Game':
+        return !isRestricted(SV_TRANSFER_RESTRICTIONS_BASE, dexNumber, formeNumber)
+      case 'Teal Mask':
+        return !isRestricted(SV_TRANSFER_RESTRICTIONS_TM, dexNumber, formeNumber)
+      case 'Indigo Disk':
+        return !isRestricted(SV_TRANSFER_RESTRICTIONS_ID, dexNumber, formeNumber)
+    }
+  }
 
-    return !isRestricted(restrictions, dexNumber, formeNumber)
+  supportsItem(itemIndex: number) {
+    const revision = this.scBlocks ? this.getSaveRevision() : 'Indigo Disk'
+    switch (revision) {
+      case 'Base Game':
+        return itemIndex <= Item.YellowDish
+      case 'Teal Mask':
+        return itemIndex <= Item.GlimmeringCharm
+      case 'Indigo Disk':
+        return itemIndex <= Item.BriarsBook
+    }
   }
 
   getCurrentBox() {

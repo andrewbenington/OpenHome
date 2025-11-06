@@ -1,6 +1,7 @@
 import { OriginGame } from '@pkm-rs-resources/pkg'
 import { PB8 } from '@pokemon-files/pkm'
 import { utf16BytesToString } from '@pokemon-files/util'
+import { Item } from '../../../consts/Items'
 import { BDSP_TRANSFER_RESTRICTIONS } from '../../../consts/TransferRestrictions'
 import { md5Digest } from '../../../util/Encryption'
 import { OHPKM } from '../../pkm/OHPKM'
@@ -182,6 +183,10 @@ export class BDSPSAV extends OfficialSAV<PB8> {
 
   supportsMon(dexNumber: number, formeNumber: number): boolean {
     return !isRestricted(BDSP_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)
+  }
+
+  supportsItem(itemIndex: number) {
+    return itemIndex <= Item.DsSounds
   }
 
   getCurrentBox() {

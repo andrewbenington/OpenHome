@@ -1,7 +1,8 @@
 import { useDraggable } from '@dnd-kit/react'
+import { MetadataLookup } from '@pkm-rs-resources/pkg'
 import { useContext, useMemo } from 'react'
 import { DragMonContext } from 'src/state/dragMon'
-import { displayIndexAdder, isBattleFormeItem } from 'src/types/pkm/util'
+import { displayIndexAdder, isBattleFormeItem, isMegaStone } from 'src/types/pkm/util'
 import PokemonIcon from '../../components/PokemonIcon'
 import { MonWithLocation } from '../../state/openSaves'
 import { PKMInterface } from '../../types/interfaces'
@@ -30,20 +31,32 @@ export interface DraggableMonProps {
 const DraggableMon = ({ mon, onClick, disabled, dragData, dragID }: DraggableMonProps) => {
   const { ref } = useDraggable({
     id: (dragID ?? '') + mon.personalityValue?.toString(),
-    data: dragData,
+    data: dragData ? { kind: 'mon', monData: dragData } : undefined,
     disabled: disabled || !dragID,
   })
   const [dragState] = useContext(DragMonContext)
 
   const isDragging = useMemo(
     () =>
-      dragState.payload &&
+      dragState.payload?.kind === 'mon' &&
       dragData &&
-      dragState.payload.box === dragData.box &&
-      dragState.payload.box_slot === dragData.box_slot &&
-      dragState.payload.save === dragData.save,
+      dragState.payload.monData.box === dragData.box &&
+      dragState.payload.monData.box_slot === dragData.box_slot &&
+      dragState.payload.monData.save === dragData.save,
     [dragData, dragState.payload]
   )
+
+  let formeNumber = mon.formeNum
+
+  if (isMegaStone(mon.heldItemIndex)) {
+    const megaForStone = MetadataLookup(mon.dexNum, mon.formeNum)?.megaEvolutions.find(
+      (mega) => mega.requiredItemId === mon.heldItemIndex
+    )
+
+    if (megaForStone) formeNumber = megaForStone.megaForme.formeIndex
+  } else if (isBattleFormeItem(mon.dexNum, mon.heldItemIndex)) {
+    formeNumber = displayIndexAdder(mon.heldItemIndex)(mon.formeNum)
+  }
 
   return (
     <div
@@ -58,17 +71,13 @@ const DraggableMon = ({ mon, onClick, disabled, dragData, dragID }: DraggableMon
     >
       <PokemonIcon
         dexNumber={mon.dexNum}
-        formeNumber={
-          isBattleFormeItem(mon.heldItemIndex)
-            ? displayIndexAdder(mon.heldItemIndex)(mon.formeNum)
-            : mon.formeNum
-        }
+        formeNumber={formeNumber}
         isShiny={mon.isShiny()}
-        heldItemIndex={mon.heldItemIndex}
+        heldItemIndex={isDragging && dragState.mode === 'item' ? undefined : mon.heldItemIndex}
         style={{
           width: '100%',
           height: '100%',
-          visibility: isDragging ? 'hidden' : undefined,
+          visibility: isDragging && dragState.mode === 'mon' ? 'hidden' : undefined,
         }}
         greyedOut={disabled}
       />

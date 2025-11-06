@@ -1,3 +1,4 @@
+import { ItemRadicalRed } from '@pkm-rs-resources/pkg'
 import { bytesToUint32LittleEndian } from '../../../util/byteLogic'
 import { isRestricted, TransferRestrictions } from '../../TransferRestrictions'
 import { findFirstSectionOffset, G3CFRUSAV, SAVE_SIZES_BYTES } from '../cfru/G3CFRUSAV'
@@ -24,6 +25,10 @@ export class G3RRSAV extends G3CFRUSAV<PK3RR> {
 
   supportsMon(dexNumber: number, formeNumber: number) {
     return !isRestricted(RR_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)
+  }
+
+  supportsItem(itemIndex: number) {
+    return ItemRadicalRed.fromModern(itemIndex) !== undefined
   }
 
   constructor(path: PathData, bytes: Uint8Array) {
