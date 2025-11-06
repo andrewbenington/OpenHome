@@ -1,4 +1,4 @@
-import { GameOfOrigin } from 'pokemon-resources'
+import { OriginGame } from '@pkm-rs-resources/pkg'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -59,7 +59,7 @@ class G3CFRUSector {
 }
 
 class G3CFRUSaveBackup<T extends PluginPKMInterface> {
-  origin: GameOfOrigin = GameOfOrigin.INVALID_0
+  origin = OriginGame.FireRed
   bytes: Uint8Array
   saveIndex: number = 0
   isFirstSave: boolean = false
@@ -121,7 +121,7 @@ class G3CFRUSaveBackup<T extends PluginPKMInterface> {
 
           box.pokemon[i % 30] = mon
           if (mon.trainerID === this.tid) {
-            mon.gameOfOrigin = GameOfOrigin.FireRed
+            mon.gameOfOrigin = OriginGame.FireRed
           }
         }
       } catch (e) {
@@ -134,7 +134,7 @@ class G3CFRUSaveBackup<T extends PluginPKMInterface> {
   }
 }
 
-export abstract class G3CFRUSAV<T extends PluginPKMInterface> implements PluginSAV<T> {
+export abstract class G3CFRUSAV<T extends PluginPKMInterface> extends PluginSAV<T> {
   static pkmType: any
   pkmTypeClass: any
 
@@ -150,9 +150,10 @@ export abstract class G3CFRUSAV<T extends PluginPKMInterface> implements PluginS
   backupSave: G3CFRUSaveBackup<T>
   primarySaveOffset: number
 
-  origin: GameOfOrigin = 0
+  origin = OriginGame.FireRed
   isPlugin: true = true
   abstract pluginIdentifier: string
+  abstract get gameName(): string
 
   boxRows = 5
   boxColumns = 6
@@ -177,6 +178,7 @@ export abstract class G3CFRUSAV<T extends PluginPKMInterface> implements PluginS
   updatedBoxSlots: BoxCoordinates[] = []
 
   constructor(path: PathData, bytes: Uint8Array, pkmType: any) {
+    super()
     this.pkmTypeClass = pkmType
     this.bytes = bytes
     this.filePath = path
@@ -213,14 +215,10 @@ export abstract class G3CFRUSAV<T extends PluginPKMInterface> implements PluginS
           mon.secretID === this.sid &&
           mon.trainerName === this.name
         ) {
-          this.origin = mon.gameOfOrigin
         }
       })
     })
-
-    this.origin = GameOfOrigin.FireRed
   }
-  getExtraData?: (() => object) | undefined
 
   pcChecksumOffset?: number | undefined
   pcOffset?: number | undefined
@@ -286,23 +284,13 @@ export abstract class G3CFRUSAV<T extends PluginPKMInterface> implements PluginS
     return this.boxes[this.currentPCBox]
   }
 
-  getGameName() {
-    return 'Pokémon Radical Red'
-  }
-
-  abstract gameColor(): string
-
-  static includesOrigin(origin: GameOfOrigin) {
-    return origin === GameOfOrigin.FireRed
+  static includesOrigin(origin: OriginGame) {
+    return origin === OriginGame.FireRed
   }
 
   static saveTypeAbbreviation = 'Radical Red'
   static saveTypeName = 'Pokémon Radical Red'
   static saveTypeID = 'G3RRSAV'
-
-  getPluginIdentifier() {
-    return 'radical_red'
-  }
 }
 
 export const findFirstSectionOffset = (bytes: Uint8Array): number => {

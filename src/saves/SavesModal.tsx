@@ -12,7 +12,7 @@ import { OpenSavesContext } from 'src/state/openSaves'
 import { PersistedPkmDataContext } from 'src/state/persistedPkmData'
 import { displayIndexAdder, isBattleFormeItem } from 'src/types/pkm/util'
 import { PokedexUpdate } from 'src/types/pokedex'
-import { buildSaveFile, getSaveTypes } from 'src/types/SAVTypes/load'
+import { buildSaveFile, getPossibleSaveTypes } from 'src/types/SAVTypes/load'
 import { PathData } from 'src/types/SAVTypes/path'
 import { getSaveRef, SAV } from 'src/types/SAVTypes/SAV'
 import { SAVClass } from 'src/types/SAVTypes/util'
@@ -119,7 +119,7 @@ function useOpenSaveHandler(onClose?: () => void) {
           async ({ path, fileBytes }) => {
             filePath = path
             if (filePath && fileBytes) {
-              let saveTypes = getSaveTypes(fileBytes, getEnabledSaveTypes())
+              let saveTypes = getPossibleSaveTypes(fileBytes, getEnabledSaveTypes())
 
               if (saveTypes.length === 1) {
                 await buildAndOpenSave(saveTypes[0], filePath, fileBytes)

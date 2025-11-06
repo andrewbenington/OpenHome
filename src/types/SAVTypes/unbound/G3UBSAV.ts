@@ -1,16 +1,16 @@
-import { NationalDex } from 'pokemon-species-data'
+import { NationalDex } from 'src/consts/NationalDex'
 import { bytesToUint32LittleEndian } from '../../../util/byteLogic'
 import { isRestricted, TransferRestrictions } from '../../TransferRestrictions'
 import { findFirstSectionOffset, G3CFRUSAV, SAVE_SIZES_BYTES } from '../cfru/G3CFRUSAV'
 import { PathData } from '../path'
-import { PluginSAV } from '../SAV'
+import { SlotMetadata } from '../SAV'
 import PK3UB from './PK3UB'
 
 const UB_TRANSFER_RESTRICTIONS: TransferRestrictions = {
   maxDexNum: NationalDex.Enamorus,
 }
 
-export class G3UBSAV extends G3CFRUSAV<PK3UB> implements PluginSAV<PK3UB> {
+export class G3UBSAV extends G3CFRUSAV<PK3UB> {
   static transferRestrictions: TransferRestrictions = UB_TRANSFER_RESTRICTIONS
 
   pluginIdentifier = 'unbound'
@@ -27,8 +27,8 @@ export class G3UBSAV extends G3CFRUSAV<PK3UB> implements PluginSAV<PK3UB> {
     return 'unbound'
   }
 
-  getGameName() {
-    return 'Pokémon Unbound'
+  get gameName() {
+    return 'Unbound'
   }
 
   constructor(path: PathData, bytes: Uint8Array) {
@@ -52,7 +52,20 @@ export class G3UBSAV extends G3CFRUSAV<PK3UB> implements PluginSAV<PK3UB> {
     return signature === 0x01122000 || signature === 0x01121999 || signature === 0x01121998
   }
 
-  gameColor(): string {
-    return '#c127fe'
+  static getPluginIdentifier() {
+    return 'unbound'
+  }
+
+  getSlotMetadata = (boxNum: number, boxSlot: number): SlotMetadata => {
+    const mon = this.boxes[boxNum].pokemon[boxSlot]
+
+    if (mon instanceof PK3UB && mon.isFakemon) {
+      return {
+        isDisabled: true,
+        disabledReason: 'Fanmade Pokémon species cannot be moved out of the box',
+      }
+    }
+
+    return { isDisabled: false }
   }
 }

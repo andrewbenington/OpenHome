@@ -240,7 +240,7 @@ pub fn derive_stats(input: TokenStream) -> TokenStream {
     }
 
     let expanded = quote! {
-        impl crate::substructures::stats::Stats for #struct_name {
+        impl crate::stats::Stats for #struct_name {
             fn get_hp(&self) -> u16 {
                 self.hp as u16
             }

@@ -1,9 +1,8 @@
+import { MetadataLookup } from '@pkm-rs-resources/pkg'
 import { getDisplayID } from '@pokemon-files/util'
-import { Badge, Flex, Grid, Spinner } from '@radix-ui/themes'
-import { AbilityToString } from 'pokemon-resources'
-import { PokemonData } from 'pokemon-species-data'
-import { useMemo, useState } from 'react'
-import { getLevelGen12, getLevelGen3Onward } from 'src/util/StatCalc'
+import { Badge, Flex, Grid, Spinner, Tooltip } from '@radix-ui/themes'
+import { useMemo } from 'react'
+import { ErrorIcon } from 'src/components/Icons'
 import PokemonIcon from '../components/PokemonIcon'
 import TypeIcon from '../components/TypeIcon'
 import { getPublicImageURL } from '../images/images'
@@ -39,8 +38,7 @@ const styles = {
 
 const SummaryDisplay = (props: { mon: PKMInterface }) => {
   const { mon } = props
-  const [imageError, setImageError] = useState(false)
-  const spritePath = useMonSprite({
+  const spriteResult = useMonSprite({
     dexNum: mon.dexNum,
     formeNum: mon.formeNum,
     formArgument: mon.formArgument,
@@ -50,7 +48,7 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
   })
 
   const itemAltText = useMemo(() => {
-    const monData = PokemonData[mon.dexNum]?.formes[mon.formeNum]
+    const monData = MetadataLookup(mon.dexNum, mon.formeNum)
 
     if (!monData) return 'pokemon sprite'
     return `${monData.formeName}${mon.isShiny() ? '-shiny' : ''} sprite`
@@ -60,23 +58,53 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
     <Grid columns="2" width="100%" p="3" gap="2">
       <div>
         <div style={styles.column}>
-          {imageError ? (
-            <PokemonIcon
-              dexNumber={mon.dexNum}
-              formeNumber={mon.formeNum}
-              style={{ width: '90%', height: 0, paddingBottom: '90%' }}
-            />
-          ) : spritePath ? (
-            <img
-              draggable={false}
-              alt={itemAltText}
-              style={styles.image}
-              src={spritePath}
-              onError={() => setImageError(true)}
-            />
-          ) : (
-            <Spinner style={{ margin: 'auto', height: 32 }} />
-          )}
+          <div
+            style={{
+              width: '100%',
+              height: '100%',
+              position: 'relative',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            {spriteResult.loading ? (
+              <Spinner style={{ margin: 'auto', height: 32 }} />
+            ) : spriteResult.path ? (
+              <img
+                draggable={false}
+                alt={itemAltText}
+                style={styles.image}
+                src={spriteResult.path}
+              />
+            ) : (
+              <PokemonIcon
+                dexNumber={mon.dexNum}
+                formeNumber={mon.formeNum}
+                style={{
+                  width: '60%',
+                  height: '90%',
+                  margin: 'auto',
+                  imageRendering: 'pixelated',
+                }}
+              />
+            )}
+            {spriteResult.errorMessage && (
+              <Tooltip content={spriteResult.errorMessage}>
+                <Badge
+                  variant="solid"
+                  color="tomato"
+                  style={{
+                    position: 'absolute',
+                    bottom: '10%',
+                    right: '10%',
+                  }}
+                >
+                  <ErrorIcon fontSize={20} />
+                </Badge>
+              </Tooltip>
+            )}
+          </div>
         </div>
         <div style={styles.nicknameRow}>
           {mon.ball ? (
@@ -90,17 +118,15 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
             <div />
           )}
           <div style={{ fontWeight: 'bold' }}>{mon.nickname}</div>
-          {mon.languageIndex !== undefined && (
-            <Badge variant="solid" color="gray" ml="2" size="3">
-              {mon.language}
-            </Badge>
-          )}
+          <Badge variant="solid" color="gray" ml="2" size="1">
+            {mon.languageString}
+          </Badge>
         </div>
         <AttributeRow label="Item" justifyEnd>
           {mon.heldItemName !== 'None' && (
             <img
               alt="item icon"
-              src={getPublicImageURL(getItemIconPath(mon.heldItemIndex, mon.format))}
+              src={getPublicImageURL(getItemIconPath(mon.heldItemIndex))}
               style={{ width: 24, height: 24, marginRight: 5 }}
             />
           )}
@@ -141,7 +167,7 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
         <AttributeRow label="Nickname" value={mon.nickname} />
         <AttributeRow
           label="Species"
-          value={`${PokemonData[mon.dexNum]?.formes[mon.formeNum]?.formeName} ${
+          value={`${MetadataLookup(mon.dexNum, mon.formeNum)?.formeName} ${
             mon.gender !== undefined ? ['♂', '♀', ''][mon.gender] : ''
           }`}
         />
@@ -153,19 +179,13 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
         </AttributeRow>
         <AttributeRow label="OT" value={`${mon.trainerName} ${mon.trainerGender ? '♀' : '♂'}`} />
         <AttributeRow label="Trainer ID" value={getDisplayID(mon as any)} />
-        {mon.abilityIndex !== undefined && (
+        {mon.ability !== undefined && (
           <AttributeRow
             label="Ability"
-            value={`${AbilityToString(mon.abilityIndex)} (${
-              mon.abilityNum === 4 ? 'HA' : mon.abilityNum
-            })`}
+            value={`${mon.ability.name} (${mon.abilityNum === 4 ? 'HA' : mon.abilityNum})`}
           />
         )}
-        <AttributeRow label="Level">
-          {['PK1', 'PK2'].includes(mon.format)
-            ? getLevelGen12(mon.dexNum, mon.exp)
-            : getLevelGen3Onward(mon.dexNum, mon.exp)}
-        </AttributeRow>
+        <AttributeRow label="Level">{mon.getLevel()}</AttributeRow>
         <AttributeRow label="EXP">{mon.exp}</AttributeRow>
       </Flex>
     </Grid>

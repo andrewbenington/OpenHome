@@ -10,10 +10,10 @@ import {
 } from 'chart.js'
 import { Radar } from 'react-chartjs-2'
 import useIsDarkMode from 'src/hooks/dark-mode'
-import { Forme } from 'src/types/types'
+import { FormeMetadata } from '../../../pkm_rs_resources/pkg/pkm_rs_resources'
 
 export type BaseStatsChartProps = {
-  forme: Forme
+  forme: FormeMetadata
 }
 
 export default function BaseStatsChart({ forme }: BaseStatsChartProps) {

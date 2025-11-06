@@ -1,6 +1,7 @@
 import * as E from 'fp-ts/lib/Either'
 import fs from 'fs'
 import path from 'path'
+import { describe, expect, test } from 'vitest'
 import { BW2SAV } from '../BW2SAV'
 import { BWSAV } from '../BWSAV'
 import { DPSAV } from '../DPSAV'
@@ -30,7 +31,7 @@ const files = {
   'white.sav': 'White',
   ultrasun: 'Ultra Sun',
   sword: 'Sword',
-  legendsarceus: 'Legends Arceus',
+  legendsarceus: 'Legends: Arceus',
 }
 
 const allSaveTypes = [
@@ -68,7 +69,7 @@ describe('Save file detection', () => {
 
       const saveFile = result.right
 
-      expect(saveFile?.getGameName()).toBe(`Pokémon ${gameName}`)
+      expect(saveFile?.gameName).toBe(gameName)
     })
   }
 })

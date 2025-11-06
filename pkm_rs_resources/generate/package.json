@@ -1,0 +1,10 @@
+{
+  "type": "module",
+  "devDependencies": {
+    "@types/node": "^24.0.14"
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.4.1",
+    "camelcase-keys": "^10.0.0"
+  }
+}

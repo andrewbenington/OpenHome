@@ -1,5 +1,5 @@
-import { Item, Type } from 'pokemon-resources'
-import { PokemonData } from 'pokemon-species-data'
+import { MetadataLookup, OriginGame } from '@pkm-rs-resources/pkg'
+import { Type } from '@pokemon-resources/index'
 import { PKMInterface } from './interfaces'
 import { isMegaStone, isZCrystal } from './pkm/util'
 
@@ -7,10 +7,10 @@ export interface Filter {
   dexNumber?: number
   formeNumber?: number
   heldItem?: number | HeldItemCategory
-  abilityIndex?: number
+  ability?: number
   type1?: Type
   type2?: Type
-  gameOfOrigin?: number
+  gameOfOrigin?: OriginGame
   ribbon?: string
   shiny?: string
   ball?: number
@@ -32,8 +32,8 @@ export function filterApplies(filter: Filter, mon: PKMInterface) {
     return false
   }
   if (
-    filter.abilityIndex !== undefined &&
-    (!('abilityIndex' in mon) || mon.abilityIndex !== filter.abilityIndex)
+    filter.ability !== undefined &&
+    (!('ability' in mon) || mon.ability?.index !== filter.ability)
   ) {
     return false
   }
@@ -61,19 +61,24 @@ export function filterApplies(filter: Filter, mon: PKMInterface) {
     }
   }
 
+  const formeMetadata = MetadataLookup(mon.dexNum, mon.formeNum)
+  if (!formeMetadata) {
+    return false
+  }
+
   if (
-    !(`${mon.dexNum}` in PokemonData) ||
-    PokemonData[`${mon.dexNum}`].formes.length < mon.formeNum
+    filter.type1 !== undefined &&
+    formeMetadata.type1 !== filter.type1 &&
+    formeMetadata.type2 !== filter.type1
   ) {
     return false
   }
 
-  const forme = PokemonData[`${mon.dexNum}`].formes[mon.formeNum]
-
-  if (filter.type1 !== undefined && !forme.types.includes(filter.type1)) {
-    return false
-  }
-  if (filter.type2 !== undefined && !forme.types.includes(filter.type2)) {
+  if (
+    filter.type2 !== undefined &&
+    formeMetadata.type1 !== filter.type2 &&
+    formeMetadata.type2 !== filter.type2
+  ) {
     return false
   }
   return true
@@ -90,8 +95,8 @@ function heldItemPassesFilter(heldItemIndex: number, filter: HeldItemFilter): bo
     case 'any':
       return heldItemIndex > 0
     case 'mega_stone':
-      return isMegaStone(heldItemIndex as Item)
+      return isMegaStone(heldItemIndex)
     case 'z_crystal':
-      return isZCrystal(heldItemIndex as Item)
+      return isZCrystal(heldItemIndex)
   }
 }

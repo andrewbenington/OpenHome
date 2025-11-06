@@ -11,6 +11,7 @@ export const ORIGIN = 1
 export const SKY = 1
 export const THERIAN = 1
 export const RESOLUTE = 1
+export const ETERNAL_FLOWER = 5
 export const UNBOUND = 1
 export const TEN_PCT = 1
 export const TEN_PCT_PC = 2

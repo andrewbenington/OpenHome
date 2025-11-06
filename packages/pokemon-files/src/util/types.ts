@@ -41,6 +41,8 @@ export interface Stats {
   spe: number
 }
 
+export type StatAbbr = keyof Stats
+
 export interface StatsPreSplit {
   hp: number
   atk: number

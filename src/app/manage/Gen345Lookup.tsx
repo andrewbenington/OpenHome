@@ -1,10 +1,8 @@
+import { OriginGames } from '@pkm-rs-resources/pkg'
 import { Spinner } from '@radix-ui/themes'
 import { useContext } from 'react'
 import OHDataGrid, { SortableColumn } from 'src/components/OHDataGrid'
 import PokemonIcon from 'src/components/PokemonIcon'
-import { getPublicImageURL } from 'src/images/images'
-import { getMonSaveLogo } from 'src/saves/util'
-import { AppInfoContext } from 'src/state/appInfo'
 import { useLookups } from 'src/state/lookups'
 import { OHPKM } from 'src/types/pkm/OHPKM'
 import { numericSorter, stringSorter } from 'src/util/Sort'
@@ -23,7 +21,6 @@ type Gen345LookupProps = {
 export default function Gen345Lookup({ onSelectMon }: Gen345LookupProps) {
   const [{ homeMons }] = useContext(PersistedPkmDataContext)
   const { lookups, loaded } = useLookups()
-  const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
 
   if (!loaded) {
     return <Spinner />
@@ -32,7 +29,6 @@ export default function Gen345Lookup({ onSelectMon }: Gen345LookupProps) {
   function pokemonFromLookupID(id: string) {
     if (!homeMons) return undefined
     return homeMons[id]
-    // return PokemonData[parseInt(id.split('-')[0])]
   }
 
   const columns: SortableColumn<G345LookupRow>[] = [
@@ -64,7 +60,11 @@ export default function Gen345Lookup({ onSelectMon }: Gen345LookupProps) {
           <img
             alt="save logo"
             height={40}
-            src={getPublicImageURL(getMonSaveLogo(value.homeMon, getEnabledSaveTypes()))}
+            src={
+              value.homeMon.pluginOrigin
+                ? `logos/${value.homeMon.pluginOrigin}.png`
+                : OriginGames.logoPath(value.homeMon.gameOfOrigin)
+            }
           />
         ),
       sortFunction: numericSorter((val) => val.homeMon?.gameOfOrigin),

@@ -1,5 +1,6 @@
 // import { TextDecoder } from 'node:util' // (ESM style imports)
 import { difference } from 'lodash'
+import { describe, test } from 'vitest'
 import { TransferRestrictions } from '../../types/TransferRestrictions'
 import {
   BDSP_TRANSFER_RESTRICTIONS,
@@ -77,6 +78,22 @@ describe('strict supersets', () => {
 
       if (missingFromSuper.length > 0) {
         throw new Error(`Superset missing values: ${missingFromSuper.join(', ')}`)
+      }
+    })
+  }
+})
+
+describe('no duplicates', () => {
+  for (let [name, restrictions] of Object.entries(allTransferRestrictions)) {
+    test(`no duplicates in ${name}`, () => {
+      if (restrictions.transferableDexNums) {
+        for (const nationalDex of restrictions.transferableDexNums) {
+          const count = restrictions.transferableDexNums.filter(
+            (index) => index === nationalDex
+          ).length
+
+          if (count > 1) throw new Error(`Occurs ${count} times in ${name}: ${nationalDex}`)
+        }
       }
     })
   }

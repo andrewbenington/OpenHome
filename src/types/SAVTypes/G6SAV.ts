@@ -1,22 +1,22 @@
+import { OriginGame } from '@pkm-rs-resources/pkg'
 import { PK6 } from '@pokemon-files/pkm'
-import { GameOfOrigin, GameOfOriginData } from 'pokemon-resources'
 import { bytesToUint16LittleEndian, uint16ToBytesLittleEndian } from 'src/util/byteLogic'
 import { CRC16_CCITT } from 'src/util/Encryption'
 import { utf16BytesToString } from 'src/util/Strings/StringConverter'
 import { OHPKM } from '../pkm/OHPKM'
 import { PathData } from './path'
-import { Box, BoxCoordinates, SAV } from './SAV'
+import { Box, BoxCoordinates, OfficialSAV } from './SAV'
 
 const BOX_NAMES_OFFSET: number = 0x04400
 const BOX_SIZE: number = 232 * 30
 const BOX_DATA_SIZE: number = 0x34ad0
 
-export abstract class G6SAV implements SAV<PK6> {
+export abstract class G6SAV extends OfficialSAV<PK6> {
   static pkmType = PK6
   static saveTypeAbbreviation = 'XY/ORAS'
   static saveTypeID = 'G6SAV'
 
-  origin: GameOfOrigin = 0
+  origin: OriginGame
   isPlugin: false = false
 
   boxRows = 5
@@ -51,6 +51,7 @@ export abstract class G6SAV implements SAV<PK6> {
   pcChecksumOffset: number
 
   constructor(path: PathData, bytes: Uint8Array, pcOffset: number, pcChecksumOffset: number) {
+    super()
     this.bytes = bytes
     this.filePath = path
     this.name = utf16BytesToString(this.bytes, this.trainerDataOffset + 72, 0x10)
@@ -131,30 +132,5 @@ export abstract class G6SAV implements SAV<PK6> {
 
   getCurrentBox() {
     return this.boxes[this.currentPCBox]
-  }
-
-  getGameName() {
-    const gameOfOrigin = GameOfOriginData[this.origin]
-
-    return gameOfOrigin ? `Pokémon ${gameOfOrigin.name}` : '(Unknown Game)'
-  }
-
-  gameColor() {
-    switch (this.origin) {
-      case GameOfOrigin.X:
-        return '#025DA6'
-      case GameOfOrigin.Y:
-        return '#EA1A3E'
-      case GameOfOrigin.OmegaRuby:
-        return '#AB2813'
-      case GameOfOrigin.AlphaSapphire:
-        return '#26649C'
-      default:
-        return '#666666'
-    }
-  }
-
-  getPluginIdentifier() {
-    return undefined
   }
 }

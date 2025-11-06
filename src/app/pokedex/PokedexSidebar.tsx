@@ -1,32 +1,37 @@
 import { useVirtualizer } from '@tanstack/react-virtual'
-import { Pokemon, PokemonData } from 'pokemon-species-data'
 import { CSSProperties, useEffect, useMemo, useRef } from 'react'
 import PokemonIcon from 'src/components/PokemonIcon'
 import { getPublicImageURL } from 'src/images/images'
 import { Pokedex } from 'src/types/pokedex'
-import { Forme } from 'src/types/types'
+import {
+  all_species_data,
+  FormeMetadata,
+  SpeciesMetadata,
+} from '../../../pkm_rs_resources/pkg/pkm_rs_resources'
 import './style.css'
 import { getHighestFormeStatus, StatusIndices } from './util'
 
 export type PokedexSidebarProps = {
   filter?: string
   pokedex: Pokedex
-  selectedSpecies?: Pokemon
-  setSelectedSpecies: (species: Pokemon) => void
-  setSelectedForme: (forme: Forme) => void
+  selectedSpecies?: SpeciesMetadata
+  setSelectedSpecies: (species: SpeciesMetadata) => void
+  setSelectedForme: (forme: FormeMetadata) => void
 }
 
 export default function PokedexSidebar(props: PokedexSidebarProps) {
   const { filter, selectedSpecies, setSelectedSpecies, setSelectedForme, pokedex } = props
 
+  const ALL_SPECIES_DATA = useMemo(() => all_species_data(), [])
+
   const parentRef = useRef(null)
 
   const filteredSpecies = useMemo(
     () =>
-      Object.values(PokemonData).filter(
+      Object.values(ALL_SPECIES_DATA).filter(
         (mon) => !filter || mon.name.toUpperCase().startsWith(filter?.trim().toUpperCase())
       ),
-    [filter]
+    [ALL_SPECIES_DATA, filter]
   )
 
   const virtualizer = useVirtualizer({
@@ -41,7 +46,7 @@ export default function PokedexSidebar(props: PokedexSidebarProps) {
 
   useEffect(() => {
     if (selectedSpecies) {
-      virtualizer.scrollToIndex(selectedSpecies?.nationalDex - 1, {
+      virtualizer.scrollToIndex(selectedSpecies.nationalDex - 1, {
         behavior: 'smooth',
         align: 'center',
       })
@@ -87,7 +92,7 @@ export default function PokedexSidebar(props: PokedexSidebarProps) {
 
 type PokedexTabProps = {
   pokedex: Pokedex
-  species: Pokemon
+  species: SpeciesMetadata
   onClick: () => void
   selected: boolean
   style?: CSSProperties

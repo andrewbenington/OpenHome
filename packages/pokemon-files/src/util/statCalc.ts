@@ -1,8 +1,8 @@
-import { getNatureSummary } from 'pokemon-resources'
-import { NationalDex, NationalDexMax, PokemonData } from 'pokemon-species-data'
+import { NationalDex, NationalDexMax } from 'src/consts/NationalDex'
 
 import { PKM } from '../pkm'
 
+import { MetadataLookup, SpeciesLookup, Stat, Stats } from '@pkm-rs-resources/pkg'
 import {
   AllPKMs,
   PKMWithDVs,
@@ -12,8 +12,7 @@ import {
   PKMWithNature,
   SpeciesData,
 } from './interfaces'
-import { LevelUpExp } from './levelUpExp'
-import { Stat } from './types'
+import { StatAbbr } from './types'
 
 export interface PKMWithStandardStats
   extends AllPKMs,
@@ -62,15 +61,15 @@ export const getStandardPKMStats = (mon: PKMWithStandardStats) => {
     }
   }
 
-  const level = getLevelGen3Onward(mon.dexNum, mon.exp)
+  const level = SpeciesLookup(mon.dexNum)?.calculateLevel(mon.exp) ?? 0
 
   return {
     hp: getHPGen3Onward(mon, level),
-    atk: getStatGen3Onward(mon, 'atk', level),
-    def: getStatGen3Onward(mon, 'def', level),
-    spe: getStatGen3Onward(mon, 'spe', level),
-    spa: getStatGen3Onward(mon, 'spa', level),
-    spd: getStatGen3Onward(mon, 'spd', level),
+    atk: getStatGen3Onward(mon, Stat.Attack, level),
+    def: getStatGen3Onward(mon, Stat.Defense, level),
+    spe: getStatGen3Onward(mon, Stat.Speed, level),
+    spa: getStatGen3Onward(mon, Stat.SpecialAttack, level),
+    spd: getStatGen3Onward(mon, Stat.SpecialDefense, level),
   }
 }
 
@@ -102,18 +101,15 @@ export const getStatGen3Onward = (mon: PKMWithStandardStatCalc, stat: Stat, leve
     return 0
   }
 
-  const natureSummary = getNatureSummary(mon.nature)
-  const natureMultiplier = natureSummary?.toLowerCase().includes(`+${stat}`)
-    ? 1.1
-    : natureSummary?.toLowerCase().includes(`-${stat}`)
-      ? 0.9
-      : 1
-  const baseStats = PokemonData[mon.dexNum]?.formes[mon.formeNum]?.baseStats
+  const natureMultiplier = mon.nature.multiplierFor(stat)
 
-  if (baseStats) {
-    const baseStat = baseStats[stat]
-    const iv = mon.ivs[stat]
-    const ev = mon.evs[stat]
+  const metadata = MetadataLookup(mon.dexNum, mon.formeNum)
+  const statAbbr = Stats.abbrLower(stat) as StatAbbr
+
+  if (metadata) {
+    const baseStat = metadata.getBaseStat(stat)
+    const iv = mon.ivs[statAbbr]
+    const ev = mon.evs[statAbbr]
 
     return Math.floor(
       natureMultiplier * (Math.floor((level * (2 * baseStat + iv + Math.floor(ev / 4))) / 100) + 5)
@@ -132,7 +128,7 @@ export const getHPGen3Onward = (mon: PKMWithStandardStatCalc, level: number) => 
     return 1
   }
 
-  const baseHP = PokemonData[mon.dexNum]?.formes[mon.formeNum]?.baseStats?.hp
+  const baseHP = MetadataLookup(mon.dexNum, mon.formeNum)?.baseStats?.hp
 
   if (baseHP) {
     const iv = mon.ivs.hp
@@ -144,23 +140,12 @@ export const getHPGen3Onward = (mon: PKMWithStandardStatCalc, level: number) => 
   return 0
 }
 
-export const getLevelGen3Onward = (dexNum: number, exp: number) => {
-  if (dexNum < 1 || dexNum > NationalDexMax) {
-    return 1
-  }
-
-  const levelUpType = PokemonData[dexNum].levelUpType
-  const cutoffList = LevelUpExp[levelUpType]
-
-  return cutoffList.findIndex((minExp) => exp <= minExp) + 1
-}
-
 export const getLevelGen12 = (dexNum: number, exp: number) => {
   if (dexNum > 251) {
     return 1
   }
 
-  const levelUpType = PokemonData[dexNum].levelUpType
+  const levelUpType = SpeciesLookup(dexNum)?.levelUpType
 
   for (let level = 100; level > 0; level--) {
     switch (levelUpType) {

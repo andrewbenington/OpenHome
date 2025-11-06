@@ -1,27 +1,31 @@
 import { PKM } from '@pokemon-files/pkm'
 import { Stats, StatsPreSplit } from '@pokemon-files/util'
-import lodash from 'lodash'
 import {
   AttackCharacteristics,
   DefenseCharacteristics,
   HPCharacteristics,
   HPCharacteristicsPre6,
-  Item,
   Moves,
   SpecialAtkCharacteristics,
   SpecialDefCharacteristics,
   SpeedCharacteristics,
   Type,
-  Types,
-} from 'pokemon-resources'
-import { NationalDex, PokemonData } from 'pokemon-species-data'
+} from '@pokemon-resources/index'
+import lodash from 'lodash'
 import Prando from 'prando'
+import { NationalDex } from 'src/consts/NationalDex'
 import {
   bytesToUint32LittleEndian,
   getFlag,
   uint16ToBytesLittleEndian,
   writeUint32ToBuffer,
 } from 'src/util/byteLogic'
+import {
+  AbilityIndex,
+  MetadataLookup,
+  SpeciesAndForme,
+  SpeciesLookup,
+} from '../../../pkm_rs_resources/pkg/pkm_rs_resources'
 import { PKMInterface } from '../interfaces'
 import { OHPKM } from './OHPKM'
 
@@ -45,21 +49,12 @@ export const writeIVsToBuffer = (
   writeUint32ToBuffer(ivsValue, buffer, offset)
 }
 
-export const getAbilityFromNumber = (dexNum: number, formeNum: number, abilityNum: number) => {
-  if (!PokemonData[dexNum]?.formes[formeNum]) {
-    return 'None'
-  }
-  if (abilityNum === 4) {
-    return (
-      PokemonData[dexNum].formes[formeNum].abilityH ?? PokemonData[dexNum].formes[formeNum].ability1
-    )
-  }
-  if (abilityNum === 2) {
-    return (
-      PokemonData[dexNum].formes[formeNum].ability2 ?? PokemonData[dexNum].formes[formeNum].ability1
-    )
-  }
-  return PokemonData[dexNum].formes[formeNum].ability1
+export const getAbilityFromNumber = (
+  dexNum: number,
+  formeNum: number,
+  abilityNum: number
+): AbilityIndex | undefined => {
+  return MetadataLookup(dexNum, formeNum)?.abilityByNum(abilityNum)
 }
 
 export const getUnownLetterGen3 = (personalityValue: number) => {
@@ -72,36 +67,22 @@ export const getUnownLetterGen3 = (personalityValue: number) => {
 }
 
 export const generateTeraType = (prng: Prando, dexNum: number, formeNum: number) => {
-  if (!PokemonData[dexNum]?.formes[formeNum]) {
+  const formeMetadata = SpeciesAndForme.tryNew(dexNum, formeNum)
+  if (!formeMetadata) {
     return 0
   }
-  const { types: monTypes } = PokemonData[dexNum].formes[formeNum]
   const baseMon = getBaseMon(dexNum, formeNum)
 
-  if (!PokemonData[baseMon.dexNumber]?.formes[baseMon.formeNumber]) {
-    return 0
-  }
-  const { types: baseMonTypes } = PokemonData[baseMon.dexNumber].formes[baseMon.formeNumber]
-
-  if (!monTypes || !baseMonTypes) {
+  const baseMonMetadata = baseMon?.getMetadata()
+  if (!baseMonMetadata) {
     return 0
   }
 
-  const areTypesIdentical =
-    monTypes.length === baseMonTypes.length &&
-    monTypes.every((type, index) => type === baseMonTypes[index])
-
-  let types = areTypesIdentical ? monTypes : lodash.intersection(monTypes, baseMonTypes)
-
-  if (types.length === 0) {
-    types = baseMonTypes
+  if (prng.nextInt(0, 1) === 1 && baseMonMetadata.type2Index) {
+    return baseMonMetadata.type2Index
   }
-  if (!types) {
-    return 0
-  }
-  const typeIndex = prng.nextInt(0, types.length - 1)
 
-  return Types.indexOf(types[typeIndex])
+  return baseMonMetadata.type1Index
 }
 
 export const ivsFromDVs = (dvs: StatsPreSplit) => {
@@ -210,15 +191,21 @@ export const generatePersonalityValue = () => {
   return Math.floor(Math.random() * 2 ** 32)
 }
 
-// recursively returns prevo
+// recursively returns pre-evolution. if provided a mega forme, returns the first pre-evolution
+// of the base forme.
 export const getBaseMon = (dexNum: number, forme?: number) => {
-  let mon = { dexNumber: dexNum, formeNumber: forme ?? 0 }
-  let prevo = PokemonData[dexNum]?.formes[forme ?? 0]?.prevo
+  let mon = SpeciesAndForme.tryNew(dexNum, forme ?? 0)
+  let metadata = mon?.getMetadata()
 
-  while (prevo) {
-    mon = prevo
-    prevo = PokemonData[mon.dexNumber]?.formes[mon.formeNumber]?.prevo
+  if (metadata?.isMega) {
+    metadata = metadata?.getMegaBaseForme() ?? metadata
   }
+
+  while (metadata?.preEvolution) {
+    mon = metadata.preEvolution
+    metadata = mon?.getMetadata()
+  }
+
   return mon
 }
 
@@ -229,26 +216,28 @@ export const formatHasColorMarkings = (format: string) => {
   )
 }
 
-export const getTypes = (mon: PKMInterface) => {
-  let types = PokemonData[mon.dexNum]?.formes[mon.formeNum ?? 0]?.types
+export const getTypes = (mon: PKMInterface): Type[] => {
+  const metadata = mon.metadata
+  if (!metadata) {
+    return ['Normal']
+  }
+
+  const type1 = metadata.type1 as Type
+  const type2 = metadata.type2 as Type | undefined
 
   if (
     mon.format === 'PK1' &&
     (mon.dexNum === NationalDex.Magnemite || mon.dexNum === NationalDex.Magneton)
   ) {
-    types = ['Electric']
+    return ['Electric']
   } else if (['PK1', 'PK2', 'PK3', 'COLOPKM', 'XDPKM', 'PK4', 'PK5'].includes(mon.format)) {
-    if (types?.includes('Fairy')) {
-      if (types.length === 1 || types.includes('Flying')) {
-        types = types.map((type) => (type === 'Fairy' ? 'Normal' : type))
-      } else if (types[0] === 'Fairy') {
-        return [types[1]]
-      } else {
-        return [types[0]]
-      }
+    if (type2 === 'Fairy') {
+      return [type1]
+    } else if (type1 === 'Fairy') {
+      return type2 ? ['Normal', type2] : ['Normal']
     }
   }
-  return types ?? []
+  return type2 ? [type1, type2] : [type1]
 }
 
 export const getMoveMaxPP = (moveIndex: number, format: string, ppUps = 0) => {
@@ -456,93 +445,87 @@ export type PKMFile = PKM | OHPKM
 
 export function shinyLeafValues(shinyLeafNumber: number) {
   return {
-    first: !!(shinyLeafNumber & 1),
-    second: !!(shinyLeafNumber & 2),
-    third: !!(shinyLeafNumber & 4),
-    fourth: !!(shinyLeafNumber & 8),
-    fifth: !!(shinyLeafNumber & 16),
-    crown: !!(shinyLeafNumber & 32),
+    first: Boolean(shinyLeafNumber & 1),
+    second: Boolean(shinyLeafNumber & 2),
+    third: Boolean(shinyLeafNumber & 4),
+    fourth: Boolean(shinyLeafNumber & 8),
+    fifth: Boolean(shinyLeafNumber & 16),
+    crown: Boolean(shinyLeafNumber & 32),
   }
 }
 
-export function getHeightCalculatedMaybe(mon: PKMInterface) {
-  if (mon.heightScalar !== undefined && mon.heightDeviation) {
-    const deviation = (mon.heightScalar / 255) * 0.40000004 + (1 - mon.heightDeviation)
-
-    return PokemonData[mon.dexNum].formes[mon.formeNum].height * 100 * deviation
-  }
-  return undefined
-}
-
-export function getWeightCalculatedMaybe(mon: PKMInterface) {
-  if (mon.weightScalar !== undefined && mon.weightDeviation) {
-    const deviation = (mon.weightScalar / 255) * 0.40000004 + (1 - mon.weightDeviation)
-
-    return PokemonData[mon.dexNum].formes[mon.formeNum].weight * 10 * deviation
-  }
-  return undefined
-}
-
-type PKMWithSize = {
-  heightScalar: number
-  weightScalar: number
-  heightDeviation: number
-  weightDeviation: number
-} & PKMInterface
-
-export function getHeightCalculated(mon: PKMWithSize) {
-  if (mon.dexNum === 0) return 0
+export function getHeightCalculated(mon: PKMInterface) {
+  const formeMetadata = MetadataLookup(mon.dexNum, mon.formeNum)
+  if (!formeMetadata || mon.heightScalar === undefined || !mon.heightDeviation) return 0
 
   const deviation = (mon.heightScalar / 255) * 0.40000004 + (1 - mon.heightDeviation)
-
-  return PokemonData[mon.dexNum].formes[mon.formeNum].height * 100 * deviation
+  return formeMetadata.baseHeight * 100 * deviation
 }
 
-export function getWeightCalculated(mon: PKMWithSize) {
-  if (mon.dexNum === 0) return 0
+export function getWeightCalculated(mon: PKMInterface) {
+  const formeMetadata = MetadataLookup(mon.dexNum, mon.formeNum)
+  if (!formeMetadata || mon.weightScalar === undefined || !mon.weightDeviation) return 0
 
   const deviation = (mon.weightScalar / 255) * 0.40000004 + (1 - mon.weightDeviation)
-
-  return PokemonData[mon.dexNum].formes[mon.formeNum].weight * 10 * deviation
+  return formeMetadata.baseWeight * 10 * deviation
 }
 
-export function isMegaStone(item?: Item): boolean {
+const GENGARITE = 656
+const LATIOSITE = 685
+const SWAMPERTITE = 752
+const BEEDRILLITE = 770
+
+export function isMegaStone(itemIndex?: number): boolean {
   return (
-    item !== undefined &&
-    ((item >= Item.Gengarite && item <= Item.Latiosite) ||
-      (item >= Item.Swampertite && item <= Item.Beedrillite))
+    itemIndex !== undefined &&
+    ((itemIndex >= GENGARITE && itemIndex <= LATIOSITE) ||
+      (itemIndex >= SWAMPERTITE && itemIndex <= BEEDRILLITE))
   )
 }
 
-export function isZCrystal(item: Item) {
+const NORMALIUM_Z = 776
+const PIKANIUM_Z = 794
+const DECIDIUM_Z = 798
+const PIKASHUNIUM_Z_2 = 836
+const SOLGANIUM_Z = 921
+const KOMMONIUM_Z_2 = 932
+
+export function isZCrystal(itemIndex: number) {
   return (
-    (item >= Item.NormaliumZ && item <= Item.PikaniumZ) ||
-    (item >= Item.DecidiumZ && item <= Item.PikashuniumZ_1) ||
-    (item >= Item.SolganiumZ && item <= Item.KommoniumZ_1)
+    (itemIndex >= NORMALIUM_Z && itemIndex <= PIKANIUM_Z) ||
+    (itemIndex >= DECIDIUM_Z && itemIndex <= PIKASHUNIUM_Z_2) ||
+    (itemIndex >= SOLGANIUM_Z && itemIndex <= KOMMONIUM_Z_2)
   )
 }
 
-export function isBattleFormeItem(item?: Item) {
+const ULTRANECROZIUM_Z_1 = 923
+const ULTRANECROZIUM_Z_2 = 929
+const RED_ORB = 534
+const BLUE_ORB = 535
+const RUSTED_SWORD = 1103
+const RUSTED_SHIELD = 1104
+
+export function isBattleFormeItem(itemIndex?: number) {
   return (
-    isMegaStone(item) ||
-    item === Item.UltranecroziumZ ||
-    item === Item.UltranecroziumZ_1 ||
-    item === Item.RedOrb ||
-    item === Item.BlueOrb ||
-    item === Item.RustedSword ||
-    item === Item.RustedShield
+    isMegaStone(itemIndex) ||
+    itemIndex === ULTRANECROZIUM_Z_1 ||
+    itemIndex === ULTRANECROZIUM_Z_2 ||
+    itemIndex === RED_ORB ||
+    itemIndex === BLUE_ORB ||
+    itemIndex === RUSTED_SWORD ||
+    itemIndex === RUSTED_SHIELD
   )
 }
 
-export function displayIndexAdder(item?: Item) {
-  if (item === Item.UltranecroziumZ || item === Item.UltranecroziumZ_1) {
+export function displayIndexAdder(itemIndex?: number) {
+  if (itemIndex === ULTRANECROZIUM_Z_1 || itemIndex === ULTRANECROZIUM_Z_2) {
     return (x: number) => x + 3
   }
   return (x: number) => x + 1
 }
 
 export function hasMega(nationalDex: number) {
-  const formes = PokemonData[nationalDex].formes
+  const formes = SpeciesLookup(nationalDex)?.formes ?? []
 
   return formes.some((forme) => forme.isMega)
 }

@@ -1,9 +1,9 @@
+import { ItemUnbound } from '@pkm-rs-resources/pkg'
 import { PluginPKMInterface } from '../../interfaces'
 import PK3CFRU, { CFRUToNationalDexEntry } from '../cfru/PK3CFRU'
 
 import { fromGen3CFRUMoveIndex, toGen3CFRUMoveIndex } from '../cfru/conversion/Gen3CFRUMovesIndex'
 import { fromGen3CRFUPokemonIndex, toGen3CRFUPokemonIndex } from '../cfru/conversion/util'
-import { ItemGen3UnboundFromString, ItemGen3UnboundToString } from './conversion/Gen3UnboundItems'
 import { NationalDexToUnboundMap, UnboundToNationalDexMap } from './conversion/UnboundSpeciesMap'
 
 // const FAKEMON_INDEXES = [
@@ -22,12 +22,16 @@ export class PK3UB extends PK3CFRU implements PluginPKMInterface {
     return 'PK3UB'
   }
 
-  itemFromString(itemName: string): number {
-    return ItemGen3UnboundFromString(itemName)
+  get heldItemIndex(): number {
+    return ItemUnbound.fromIndex(this.internalHeldItemIndex)?.toModern()?.index ?? 0
+  }
+
+  internalItemIndexFromModern(modernIndex: number): number {
+    return ItemUnbound.fromModern(modernIndex)?.index ?? 0
   }
 
   itemToString(index: number): string {
-    return ItemGen3UnboundToString(index)
+    return ItemUnbound.fromIndex(index)?.name ?? 'None'
   }
 
   moveFromGameIndex(gameIndex: number): number {
@@ -46,7 +50,7 @@ export class PK3UB extends PK3CFRU implements PluginPKMInterface {
     return toGen3CRFUPokemonIndex(nationalDexNumber, formIndex, NationalDexToUnboundMap)
   }
 
-  isFakemon(speciesIndex: number): boolean {
+  indexIsFakemon(speciesIndex: number): boolean {
     return FAKEMON_INDEXES.includes(speciesIndex)
   }
 

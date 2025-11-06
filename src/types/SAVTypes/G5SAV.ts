@@ -1,6 +1,6 @@
+import { OriginGame } from '@pkm-rs-resources/pkg'
 import { PK5 } from '@pokemon-files/pkm'
 import { uniq } from 'lodash'
-import { GameOfOrigin, GameOfOriginData } from 'pokemon-resources'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -10,7 +10,7 @@ import { CRC16_CCITT } from 'src/util/Encryption'
 import { gen5StringToUTF } from 'src/util/Strings/StringConverter'
 import { OHPKM } from '../pkm/OHPKM'
 import { PathData } from './path'
-import { Box, BoxCoordinates, SAV } from './SAV'
+import { Box, BoxCoordinates, OfficialSAV } from './SAV'
 import { hasDesamumeFooter, LOOKUP_TYPE } from './util'
 
 const PC_OFFSET = 0x400
@@ -18,7 +18,7 @@ const BOX_NAMES_OFFSET: number = 0x04
 const BOX_CHECKSUM_OFFSET: number = 0xff2
 const BOX_SIZE: number = 0x1000
 
-export abstract class G5SAV implements SAV<PK5> {
+export abstract class G5SAV extends OfficialSAV<PK5> {
   static BOX_COUNT = 24
   static pkmType = PK5
   static SAVE_SIZE_BYTES = 0x80000
@@ -27,7 +27,7 @@ export abstract class G5SAV implements SAV<PK5> {
   static saveTypeAbbreviation = 'BW/BW2'
   static saveTypeID = 'G5SAV'
 
-  origin: GameOfOrigin = 0
+  origin: OriginGame = OriginGame.Black
   isPlugin: false = false
 
   boxRows = 5
@@ -62,6 +62,7 @@ export abstract class G5SAV implements SAV<PK5> {
   checksumMirrorsChecksumOffset: number = 0x23f9a
 
   constructor(path: PathData, bytes: Uint8Array) {
+    super()
     this.bytes = bytes
     this.filePath = path
     this.boxes = new Array(G5SAV.BOX_COUNT)
@@ -78,7 +79,7 @@ export abstract class G5SAV implements SAV<PK5> {
     this.displayID = this.tid.toString().padStart(5, '0')
 
     this.origin = this.bytes[this.trainerDataOffset + 0x1f]
-    if (this.origin >= GameOfOrigin.White2) {
+    if (this.origin >= OriginGame.White2) {
       this.checksumMirrorsOffset = 0x25f00
       this.checksumMirrorsSize = 0x94
       this.checksumMirrorsChecksumOffset = 0x25fa2
@@ -106,9 +107,6 @@ export abstract class G5SAV implements SAV<PK5> {
       }
     }
   }
-  pcChecksumOffset?: number | undefined
-  pcOffset?: number | undefined
-  calculatePcChecksum?: (() => number) | undefined
 
   updateBoxChecksum = (boxIndex: number) => {
     // const oldChecksum = bytesToUint16LittleEndian(
@@ -184,12 +182,6 @@ export abstract class G5SAV implements SAV<PK5> {
     return this.boxes[this.currentPCBox]
   }
 
-  getGameName() {
-    const gameOfOrigin = GameOfOriginData[this.origin]
-
-    return gameOfOrigin ? `Pokémon ${gameOfOrigin.name}` : '(Unknown Game)'
-  }
-
   static gen4ValidDateAndSize(bytes: Uint8Array, offset: number) {
     const size = bytesToUint32LittleEndian(bytes, offset - 0xc)
 
@@ -214,25 +206,6 @@ export abstract class G5SAV implements SAV<PK5> {
 
     const g5Origin = bytes[G5SAV.originOffset]
 
-    return g5Origin >= GameOfOrigin.White && g5Origin <= GameOfOrigin.Black2
-  }
-
-  gameColor() {
-    switch (this.origin) {
-      case GameOfOrigin.Black:
-        return '#444444'
-      case GameOfOrigin.White:
-        return '#E1E1E1'
-      case GameOfOrigin.Black2:
-        return '#303E51'
-      case GameOfOrigin.White2:
-        return '#EBC5C3'
-      default:
-        return '#666666'
-    }
-  }
-
-  getPluginIdentifier() {
-    return undefined
+    return g5Origin >= OriginGame.White && g5Origin <= OriginGame.Black2
   }
 }

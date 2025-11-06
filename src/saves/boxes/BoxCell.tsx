@@ -133,7 +133,7 @@ const BoxCell = ({
           }}
           dragData={location ? { ...location, mon } : undefined}
           dragID={dragID}
-          disabled={disabled || mon.isLocked || isFilteredOut}
+          disabled={disabled || isFilteredOut}
         />
       ) : (
         <DroppableSpace dropID={dragID} dropData={location} disabled={disabled} />

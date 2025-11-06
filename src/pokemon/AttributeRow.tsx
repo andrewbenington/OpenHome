@@ -44,7 +44,7 @@ const AttributeRow = (props: {
           textAlign: justifyEnd ? 'end' : 'start',
         }}
       >
-        {children ? children : formatValue(value)}
+        {children !== undefined ? children : formatValue(value)}
       </div>
     </div>
   )

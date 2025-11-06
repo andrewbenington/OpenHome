@@ -1,10 +1,9 @@
-import { Pokemon } from 'pokemon-species-data'
+import { FormeMetadata, SpeciesMetadata } from '../../../pkm_rs_resources/pkg/pkm_rs_resources'
 import { Pokedex, PokedexStatus } from '../../types/pokedex'
-import { Forme } from '../../types/types'
 
 export function getHighestFormeStatus(
   pokedex: Pokedex,
-  species: Pokemon
+  species: SpeciesMetadata
 ): [number, PokedexStatus | undefined] {
   if (!(species.nationalDex in pokedex.byDexNumber)) return [0, undefined]
 
@@ -38,15 +37,16 @@ export const StatusIndices: Record<PokedexStatus, number> = {
   ShinyCaught: 2,
 }
 
-export function getPokedexSummary(species: Pokemon, forme: Forme) {
-  const types =
-    forme.types.length === 1
-      ? `${forme.types[0]}-type`
-      : `${forme.types[0]}- and ${forme.types[1]}-type`
-  const name = forme.formeNumber === 0 ? species.name : forme.formeName
+export function getPokedexSummary(species: SpeciesMetadata, forme: FormeMetadata) {
+  const types = forme.type2 ? `${forme.type1}- and ${forme.type2}-type` : `${forme.type1}-type`
+  const name = forme.formeIndex === 0 ? species.name : forme.formeName
   const formeType =
-    forme.formeNumber === 0 ? getBaseFormeType(species) : forme.isMega ? 'mega-evolution' : 'forme'
-  let text = `${name} is a ${types} ${formeType} introduced in Generation ${forme.gen}.`
+    forme.formeIndex === 0
+      ? getBaseFormeDescriptor(species)
+      : forme.isMega
+        ? 'Mega Evolution'
+        : 'forme'
+  let text = `${name} is a ${types} ${formeType} introduced in Generation ${forme.introducedGen}.`
 
   if (forme.formeName === 'Basculin-White-Striped') {
     text += ` It is sometimes considered a regional forme from the ${forme.regional} region.`
@@ -61,22 +61,22 @@ export function getPokedexSummary(species: Pokemon, forme: Forme) {
   return text
 }
 
-function getBaseFormeType(species: Pokemon) {
+function getBaseFormeDescriptor(species: SpeciesMetadata) {
   const baseForme = species.formes[0]
 
-  if (baseForme.mythical) {
+  if (baseForme.isMythical) {
     return 'Mythical Pokémon'
   }
-  if (baseForme.restrictedLegendary) {
+  if (baseForme.isRestrictedLegend) {
     return 'restricted Legendary Pokémon'
   }
-  if (baseForme.ultraBeast) {
+  if (baseForme.isUltraBeast) {
     return 'Ultra Beast'
   }
-  if (baseForme.subLegendary) {
+  if (baseForme.isSubLegend) {
     return 'Legendary Pokémon'
   }
-  if (baseForme.paradox) {
+  if (baseForme.isParadox) {
     return 'Paradox Pokémon'
   }
 

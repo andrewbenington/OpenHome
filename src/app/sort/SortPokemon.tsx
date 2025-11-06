@@ -1,3 +1,4 @@
+import { OriginGames } from '@pkm-rs-resources/pkg'
 import { Badge, Card, Flex } from '@radix-ui/themes'
 import { useContext, useMemo, useState } from 'react'
 import { MdAdd } from 'react-icons/md'
@@ -31,7 +32,9 @@ export default function SortPokemon() {
     const all: { mon: PKMInterface; color: string }[] = openSaves
       .flatMap((save) =>
         save.boxes.flatMap((box) =>
-          box.pokemon.flatMap((mon) => (mon ? { mon, color: save.gameColor() } : undefined))
+          box.pokemon.flatMap((mon) =>
+            mon ? { mon, color: OriginGames.color(save.origin) } : undefined
+          )
         )
       )
       .concat(
@@ -93,7 +96,7 @@ export default function SortPokemon() {
               color="gray"
               size="3"
               key={save.tid}
-              style={{ border: `2px solid ${save.gameColor()}` }}
+              style={{ border: `2px solid ${OriginGames.color(save.origin)}` }}
             >
               {save.name} ({save.tid})
             </Badge>

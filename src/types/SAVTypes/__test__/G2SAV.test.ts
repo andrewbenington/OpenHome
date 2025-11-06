@@ -3,22 +3,27 @@ import assert from 'assert'
 import * as E from 'fp-ts/lib/Either'
 import fs from 'fs'
 import path from 'path'
+import { beforeAll, expect, test } from 'vitest'
 import { bytesToPKM } from '../../FileImport'
 import { OHPKM } from '../../pkm/OHPKM'
 import { G2SAV } from '../G2SAV'
 import { buildUnknownSaveFile } from '../load'
 import { emptyPathData } from '../path'
 
-const result = buildUnknownSaveFile(
-  emptyPathData,
-  new Uint8Array(fs.readFileSync(path.join(__dirname, 'SAVFiles', 'crystal.sav'))),
-  {},
-  [G2SAV]
-)
+let crystalSaveFile: G2SAV
 
-assert(E.isRight(result))
+beforeAll(() => {
+  const result = buildUnknownSaveFile(
+    emptyPathData,
+    new Uint8Array(fs.readFileSync(path.join(__dirname, 'SAVFiles', 'crystal.sav'))),
+    {},
+    [G2SAV]
+  )
 
-const crystalSaveFile = result.right as G2SAV
+  assert(E.isRight(result))
+
+  crystalSaveFile = result.right as G2SAV
+})
 
 const slowpokeOH = bytesToPKM(
   new Uint8Array(
@@ -40,7 +45,7 @@ test('removing mon shifts others in box', () => {
   ])
 
   if (E.isLeft(result1)) {
-    fail(result1.left)
+    throw Error(result1.left)
   }
 
   const modifiedSaveFile1 = result1.right as G2SAV
@@ -54,7 +59,7 @@ test('removing mon shifts others in box', () => {
   ])
 
   if (E.isLeft(result2)) {
-    fail(result2.left)
+    throw Error(result2.left)
   }
 
   const modifiedSaveFile2 = result2.right as G2SAV
@@ -70,7 +75,7 @@ test('inserting mon works', () => {
   ])
 
   if (E.isLeft(result1)) {
-    fail(result1.left)
+    throw Error(result1.left)
   }
 
   const modifiedSaveFile1 = result1.right as G2SAV
@@ -84,7 +89,7 @@ test('inserting mon works', () => {
   ])
 
   if (E.isLeft(result2)) {
-    fail(result2.left)
+    throw Error(result2.left)
   }
 
   const modifiedSaveFile2 = result2.right as G2SAV

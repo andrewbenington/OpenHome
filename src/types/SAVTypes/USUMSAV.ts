@@ -1,4 +1,4 @@
-import { GameOfOrigin } from 'pokemon-resources'
+import { OriginGame } from '@pkm-rs-resources/pkg'
 import { USUM_TRANSFER_RESTRICTIONS } from 'src/consts/TransferRestrictions'
 import Pk7Rust from '../../../packages/pokemon-files/src/pkm/wasm/PK7'
 import { isRestricted } from '../TransferRestrictions'
@@ -36,8 +36,8 @@ export class USUMSAV extends G7SAV {
 
   static saveTypeName = 'Pokémon Ultra Sun/Ultra Moon'
 
-  static includesOrigin(origin: GameOfOrigin) {
-    return origin === GameOfOrigin.UltraSun || origin === GameOfOrigin.UltraMoon
+  static includesOrigin(origin: OriginGame) {
+    return origin === OriginGame.UltraSun || origin === OriginGame.UltraMoon
   }
 
   cleanup() {

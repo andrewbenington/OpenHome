@@ -1,24 +1,29 @@
-import assert from 'assert'
+import { fail } from 'assert'
 import * as E from 'fp-ts/lib/Either'
 import fs from 'fs'
 import path from 'path'
-import { PokemonData } from 'pokemon-species-data'
+import { describe, expect, test } from 'vitest'
+import { SpeciesLookup } from '../../../../pkm_rs_resources/pkg/pkm_rs_resources'
 import { G3SAV } from '../G3SAV'
 import { buildUnknownSaveFile } from '../load'
 import { emptyPathData } from '../path'
+import { initializeWasm } from './init'
 
-const result = buildUnknownSaveFile(
-  emptyPathData,
-  new Uint8Array(fs.readFileSync(path.join(__dirname, 'SAVFiles', 'emerald.sav'))),
-  {},
-  [G3SAV]
-)
+describe('G3SAV - Gen 3 Save File Read Test', async () => {
+  await initializeWasm()
 
-assert(E.isRight(result))
+  const result = buildUnknownSaveFile(
+    emptyPathData,
+    new Uint8Array(fs.readFileSync(path.join(__dirname, 'SAVFiles', 'emerald.sav'))),
+    {},
+    [G3SAV]
+  )
 
-const emeraldSaveFile = result.right as G3SAV
+  if (E.isLeft(result)) {
+    fail(`Failed to build save file: ${result.left}`)
+  }
 
-describe('G3SAV - Gen 3 Save File Read Test', () => {
+  const emeraldSaveFile = result.right as G3SAV
   test('should load initial save data correctly', () => {
     expect(emeraldSaveFile.name).toBe('RoC')
   })
@@ -35,7 +40,8 @@ describe('G3SAV - Gen 3 Save File Read Test', () => {
       expect(firstPokemon.moves[0]).toBe(33) // Tackle
       expect(firstPokemon.moves[1]).toBe(45) // Growl
       expect(firstPokemon.dexNum).toBe(1)
-      expect(PokemonData[firstPokemon.dexNum].name).toBe('Bulbasaur')
+      expect(firstPokemon.exp).toBe(135)
+      expect(SpeciesLookup(firstPokemon.dexNum)?.name).toBe('Bulbasaur')
     } else {
       fail('No Pokémon found in the first box, first slot.')
     }

@@ -1,22 +1,25 @@
 import { PK1, PK2, PK3, PK4, PK5 } from '@pokemon-files/pkm'
 import { readFileSync } from 'fs'
 import path, { resolve } from 'path'
+import { beforeAll, describe, expect, test } from 'vitest'
 import { getMonGen12Identifier, getMonGen345Identifier } from '../../../util/Lookup'
 import { bytesToPKM } from '../../FileImport'
 import { OHPKM } from '../OHPKM'
+import { initializeWasm } from './init'
+
+var blaziken: PK3
+
+beforeAll(initializeWasm)
+beforeAll(() => {
+  const savePath = resolve(__dirname, './PKMFiles/Gen3/blaziken.pkm')
+
+  let monBytes: Uint8Array
+  monBytes = new Uint8Array(readFileSync(savePath))
+
+  blaziken = new PK3(new Uint8Array(monBytes).buffer)
+})
 
 describe('gen345 identifier', () => {
-  let blaziken: PK3
-  let monBytes: Uint8Array
-
-  beforeAll(() => {
-    const savePath = resolve(__dirname, './PKMFiles/Gen3/blaziken.pkm')
-
-    monBytes = new Uint8Array(readFileSync(savePath))
-
-    blaziken = new PK3(new Uint8Array(monBytes).buffer)
-  })
-
   test('should have expected name', () => {
     expect(blaziken.nickname).toBe('BLAZIKEN')
   })

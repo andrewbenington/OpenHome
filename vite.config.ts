@@ -16,6 +16,10 @@ export default defineConfig(async () => ({
       src: fileURLToPath(new URL('./src', import.meta.url)),
       '@pokemon-files': fileURLToPath(new URL('./packages/pokemon-files/src', import.meta.url)),
       '@pokemon-wasm': fileURLToPath(new URL('./packages/pokemon-wasm/pkg', import.meta.url)),
+      '@pokemon-resources': fileURLToPath(
+        new URL('./packages/pokemon-resources/src', import.meta.url)
+      ),
+      '@pkm-rs-resources': fileURLToPath(new URL('./pkm_rs_resources', import.meta.url)),
     },
   },
   // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`

@@ -1,14 +1,19 @@
+import {
+  FormeMetadata,
+  MetadataLookup,
+  SpeciesLookup,
+  SpeciesMetadata,
+} from '@pkm-rs-resources/pkg'
 import { Button, Card, Flex, Heading, Separator, Spinner, Text, TextField } from '@radix-ui/themes'
-import { Pokemon, PokemonData } from 'pokemon-species-data'
 import { useEffect, useState } from 'react'
 import TypeIcon from 'src/components/TypeIcon'
 import { getPublicImageURL } from 'src/images/images'
 import AttributeRow from 'src/pokemon/AttributeRow'
+import { Type } from 'src/types/types'
 import PokemonIcon from '../../components/PokemonIcon'
 import useMonSprite from '../../pokemon/useMonSprite'
 import { usePokedex } from '../../state/pokedex'
 import { Pokedex } from '../../types/pokedex'
-import { Forme } from '../../types/types'
 import BaseStatsChart from './BaseStatsChart'
 import EvolutionFamily from './EvolutionFamily'
 import PokedexSidebar from './PokedexSidebar'
@@ -19,8 +24,8 @@ import { getFormeStatus, getPokedexSummary } from './util'
 export default function PokedexDisplay() {
   const pokedexState = usePokedex()
   const [filter, setFilter] = useState('')
-  const [selectedSpecies, setSelectedSpecies] = useState<Pokemon>()
-  const [selectedForme, setSelectedForme] = useState<Forme>()
+  const [selectedSpecies, setSelectedSpecies] = useState<SpeciesMetadata>()
+  const [selectedForme, setSelectedForme] = useState<FormeMetadata>()
 
   if (!pokedexState.loaded) {
     return <Spinner />
@@ -77,10 +82,10 @@ export default function PokedexDisplay() {
 
 type PokedexDetailsProps = {
   pokedex: Pokedex
-  species: Pokemon
-  selectedForme: Forme
-  setSelectedForme: (forme: Forme) => void
-  setSelectedSpecies: (species: Pokemon) => void
+  species: SpeciesMetadata
+  selectedForme: FormeMetadata
+  setSelectedForme: (forme?: FormeMetadata) => void
+  setSelectedSpecies: (species?: SpeciesMetadata) => void
 }
 
 function PokedexDetails({
@@ -93,14 +98,10 @@ function PokedexDetails({
   const [imageError, setImageError] = useState(false)
   const [showShiny, setShowShiny] = useState(false)
 
-  const selectedFormeStatus = getFormeStatus(
-    pokedex,
-    species.nationalDex,
-    selectedForme.formeNumber ?? 0
-  )
-  const spritePath = useMonSprite({
+  const selectedFormeStatus = getFormeStatus(pokedex, species.nationalDex, selectedForme.formeIndex)
+  const spriteResult = useMonSprite({
     dexNum: species.nationalDex,
-    formeNum: selectedForme.formeNumber,
+    formeNum: selectedForme.formeIndex,
     format: 'OHPKM',
     isShiny: selectedFormeStatus === 'ShinyCaught' && showShiny,
   })
@@ -145,22 +146,22 @@ function PokedexDetails({
             {imageError ? (
               <PokemonIcon
                 dexNumber={species.nationalDex}
-                formeNumber={selectedForme.formeNumber}
+                formeNumber={selectedForme.formeIndex}
                 style={{ width: '90%', height: 0, paddingBottom: '90%' }}
                 silhouette={!selectedFormeCaught}
               />
-            ) : spritePath ? (
+            ) : spriteResult.path ? (
               <>
                 <img
                   className="pokedex-image pokedex-image-shadow"
                   draggable={false}
-                  src={spritePath}
+                  src={spriteResult.path}
                   onError={() => setImageError(true)}
                 />
                 <img
                   className="pokedex-image"
                   draggable={false}
-                  src={spritePath}
+                  src={spriteResult.path}
                   onError={() => setImageError(true)}
                   style={{
                     filter: !selectedFormeCaught ? 'saturate(0%)' : undefined,
@@ -176,18 +177,18 @@ function PokedexDetails({
           <Flex justify="center" gap="2" width="100%" wrap="wrap">
             {species.formes.map((forme) => (
               <Button
-                key={forme.formeNumber}
-                variant={forme.formeNumber === selectedForme.formeNumber ? 'solid' : 'soft'}
+                key={forme.formeIndex}
+                variant={forme.formeIndex === selectedForme.formeIndex ? 'solid' : 'soft'}
                 onClick={() => setSelectedForme(forme)}
                 size="4"
                 style={{ minWidth: 0, padding: 0, aspectRatio: 1 }}
               >
                 <TooltipPokemonIcon
                   dexNumber={species.nationalDex}
-                  formeNumber={forme.formeNumber}
+                  formeNumber={forme.formeIndex}
                   style={{ width: 48, height: 48 }}
                   silhouette={
-                    !getFormeStatus(pokedex, species.nationalDex, forme.formeNumber)?.includes(
+                    !getFormeStatus(pokedex, species.nationalDex, forme.formeIndex)?.includes(
                       'Caught'
                     )
                   }
@@ -212,18 +213,17 @@ function PokedexDetails({
           >
             <AttributeRow label="Level-Up">{species.levelUpType}</AttributeRow>
             <AttributeRow label="Type">
-              {selectedForme.types?.map((type) => (
-                <TypeIcon type={type} key={`${type}_type_icon`} />
-              ))}
+              <TypeIcon type={selectedForme.type1 as Type} />
+              {selectedForme.type2 && <TypeIcon type={selectedForme.type2 as Type} />}
             </AttributeRow>
-            <AttributeRow label="Ability 1">{selectedForme.ability1}</AttributeRow>
-            {selectedForme.ability2 && (
-              <AttributeRow label="Ability 2">{selectedForme.ability2}</AttributeRow>
+            <AttributeRow label="Ability 1">{selectedForme.abilities[0].name}</AttributeRow>
+            {selectedForme.abilities[1] !== selectedForme.abilities[0] && (
+              <AttributeRow label="Ability 2">{selectedForme.abilities[1].name}</AttributeRow>
             )}
 
-            {selectedForme.abilityH && (
+            {selectedForme.hiddenAbility && (
               <AttributeRow label="Ability H">
-                <div>{selectedForme.abilityH}</div>
+                <div>{selectedForme.hiddenAbility.name}</div>
               </AttributeRow>
             )}
 
@@ -243,11 +243,11 @@ function PokedexDetails({
               <EvolutionFamily
                 height="calc(100% - 16px)"
                 nationalDex={species.nationalDex}
-                formeNumber={selectedForme.formeNumber}
+                formeNumber={selectedForme.formeIndex}
                 pokedex={pokedex}
                 onClick={(nationalDex, formeIndex) => {
-                  setSelectedSpecies(PokemonData[nationalDex])
-                  setSelectedForme(PokemonData[nationalDex].formes[formeIndex])
+                  setSelectedSpecies(SpeciesLookup(nationalDex))
+                  setSelectedForme(MetadataLookup(nationalDex, formeIndex))
                 }}
               />
             </div>{' '}

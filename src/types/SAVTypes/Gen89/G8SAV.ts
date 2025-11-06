@@ -1,16 +1,16 @@
+import { OriginGame } from '@pkm-rs-resources/pkg'
 import { PA8, PB8, PK8, PK9 } from '@pokemon-files/pkm'
 import { AllPKMFields } from '@pokemon-files/util'
-import { GameOfOrigin } from 'pokemon-resources'
 import { OHPKM } from '../../pkm/OHPKM'
 import { PathData } from '../path'
-import { Box, BoxCoordinates, SAV } from '../SAV'
+import { Box, BoxCoordinates, OfficialSAV } from '../SAV'
 import { BoxNamesBlock } from './BoxNamesBlock'
 import { SCArrayBlock, SCBlock, SCObjectBlock, SCValueBlock } from './SwishCrypto/SCBlock'
 import { SwishCrypto } from './SwishCrypto/SwishCrypto'
 
-export abstract class G89SAV<P extends PK8 | PB8 | PA8 | PK9> implements SAV<P> {
-  origin: GameOfOrigin = 0
-  isPlugin = false
+export abstract class G89SAV<P extends PK8 | PB8 | PA8 | PK9> extends OfficialSAV<P> {
+  isPlugin: false = false
+  abstract origin: OriginGame
 
   boxRows = 5
   boxColumns = 6
@@ -39,6 +39,7 @@ export abstract class G89SAV<P extends PK8 | PB8 | PA8 | PK9> implements SAV<P> 
   updatedBoxSlots: BoxCoordinates[] = []
 
   constructor(path: PathData, bytes: Uint8Array) {
+    super()
     this.bytes = bytes
     this.filePath = path
     this.scBlocks = SwishCrypto.decrypt(bytes)
@@ -87,8 +88,6 @@ export abstract class G89SAV<P extends PK8 | PB8 | PA8 | PK9> implements SAV<P> 
   abstract supportsMon(dexNumber: number, formeNumber: number): boolean
 
   abstract getCurrentBox(): Box<P>
-
-  abstract getGameName(): string
 
   abstract monConstructor(arg: ArrayBuffer | AllPKMFields, encrypted?: boolean): P
 
@@ -139,23 +138,6 @@ export abstract class G89SAV<P extends PK8 | PB8 | PA8 | PK9> implements SAV<P> 
     this.bytes = SwishCrypto.encrypt(this.scBlocks, this.bytes.length)
 
     return changedMonPKMs
-  }
-
-  gameColor() {
-    switch (this.origin) {
-      case GameOfOrigin.Sword:
-        return '#006998'
-      case GameOfOrigin.Shield:
-        return '#7C0033'
-      case GameOfOrigin.LegendsArceus:
-        return '#36597B'
-      case GameOfOrigin.Scarlet:
-        return '#F34134'
-      case GameOfOrigin.Violet:
-        return '#8334B7'
-      default:
-        return '#666666'
-    }
   }
 
   getPluginIdentifier() {

@@ -7,6 +7,7 @@ import useDisplayError from 'src/hooks/displayError'
 import { AppInfoContext } from 'src/state/appInfo'
 import { PluginContext } from 'src/state/plugin'
 import { loadPlugin, PluginMetadataWithIcon } from 'src/util/Plugin'
+import { CURRENT_PLUGIN_API_VERSION } from './Plugins'
 import './style.css'
 
 export default function InstalledPlugins() {
@@ -73,9 +74,11 @@ function InstalledPluginCard(props: {
   const backend = useContext(BackendContext)
   const displayError = useDisplayError()
 
+  const outdated = metadata.api_version < CURRENT_PLUGIN_API_VERSION
+
   const enabled = useMemo(() => {
     return settings.enabledPlugins[metadata.id]
-  }, [metadata.id, settings.enabledPlugins])
+  }, [metadata, settings.enabledPlugins])
 
   const enablePlugin = useCallback(() => {
     backend.loadPluginCode(metadata.id).then(
@@ -116,8 +119,12 @@ function InstalledPluginCard(props: {
           src={`data:image/${metadata.icon_image.extension};base64,${metadata.icon_image.base64}`}
         />
       )}
-      <Badge className="status-chip" color={enabled ? 'green' : 'gold'} variant="solid">
-        {enabled ? 'Enabled' : 'Disabled'}
+      <Badge
+        className="status-chip"
+        color={outdated ? 'tomato' : enabled ? 'green' : 'gold'}
+        variant="solid"
+      >
+        {outdated ? 'Outdated' : enabled ? 'Enabled' : 'Disabled'}
       </Badge>
       <div className="name-chip">{metadata.name}</div>
       <MdDelete

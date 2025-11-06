@@ -1,6 +1,6 @@
+import { Languages, OriginGame } from '@pkm-rs-resources/pkg'
 import { PA8 } from '@pokemon-files/pkm'
 import { utf16BytesToString } from '@pokemon-files/util'
-import { GameOfOrigin, Languages } from 'pokemon-resources'
 import { LA_TRANSFER_RESTRICTIONS } from '../../../consts/TransferRestrictions'
 import { isRestricted } from '../../TransferRestrictions'
 import { PathData } from '../path'
@@ -23,6 +23,7 @@ export class LASAV extends G89SAV<PA8> {
   static saveTypeID = 'LASAV'
 
   myStatusBlock: MyStatusBlock
+  origin = OriginGame.LegendsArceus
 
   constructor(path: PathData, bytes: Uint8Array) {
     super(path, bytes)
@@ -41,7 +42,6 @@ export class LASAV extends G89SAV<PA8> {
     this.tid = fullTrainerID % 1000000
     this.sid = this.myStatusBlock.getSID()
     this.displayID = this.tid.toString().padStart(6, '0')
-    this.origin = GameOfOrigin.LegendsArceus
   }
 
   getBoxCount(): number {
@@ -91,16 +91,12 @@ export class LASAV extends G89SAV<PA8> {
     return !isRestricted(LA_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)
   }
 
-  // calculateChecksum(): number {
-  //   return CRC16_Invert(this.bytes, this.pcOffset, this.pcSize)
-  // }
-
   getCurrentBox() {
     return this.boxes[this.currentPCBox]
   }
 
-  getGameName() {
-    return 'Pokémon Legends Arceus'
+  getOrigin() {
+    return OriginGame.LegendsArceus
   }
 
   getSaveRevision(): LA_SAVE_REVISION {
@@ -111,7 +107,7 @@ export class LASAV extends G89SAV<PA8> {
     return {
       'Save Version': this.getSaveRevision(),
       'Player Character': this.myStatusBlock.getGender() ? 'Akari' : 'Rei',
-      Language: Languages[this.myStatusBlock.getLanguage()],
+      Language: Languages.stringFromByte(this.myStatusBlock.getLanguage()),
     }
   }
 
@@ -123,8 +119,8 @@ export class LASAV extends G89SAV<PA8> {
     return SwishCrypto.getIsHashValid(bytes)
   }
 
-  static includesOrigin(origin: GameOfOrigin) {
-    return origin === GameOfOrigin.LegendsArceus
+  static includesOrigin(origin: OriginGame) {
+    return origin === OriginGame.LegendsArceus
   }
 }
 
