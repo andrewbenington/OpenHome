@@ -1,5 +1,3 @@
-import { ItemFromString } from '@pokemon-resources/index'
-
 import {
   Ball,
   Language,
@@ -85,8 +83,8 @@ export abstract class PK3CFRU implements PluginPKMInterface {
   markings: MarkingsFourShapes
   dexNum: number
   formeNum: number
-  privateHeldItemIndex: number
-  heldItemIndex: number
+  internalHeldItemIndex: number
+  abstract heldItemIndex: number
   exp: number
   movePPUps: number[]
   movePP: number[] = [0, 0, 0, 0]
@@ -161,8 +159,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
       this.isFakemon = this.indexIsFakemon(speciesIndex)
 
       // Held Item 30:32
-      this.privateHeldItemIndex = dataView.getUint16(0x1e, true)
-      this.heldItemIndex = ItemFromString(this.heldItemName)
+      this.internalHeldItemIndex = dataView.getUint16(0x1e, true)
 
       // Exp 32:36
       this.exp = dataView.getUint32(0x20, true)
@@ -240,8 +237,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
       }
       this.dexNum = other.dexNum
       this.formeNum = other.formeNum
-      this.privateHeldItemIndex = this.itemFromString(other.heldItemName)
-      this.heldItemIndex = ItemFromString(other.heldItemName)
+      this.internalHeldItemIndex = this.internalItemIndexFromModern(other.heldItemIndex)
       this.exp = other.exp
       this.movePPUps = other.movePPUps
       this.trainerFriendship = other.trainerFriendship ?? 0
@@ -317,7 +313,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
     return new this(buffer)
   }
 
-  abstract itemFromString(itemName: string): number
+  abstract internalItemIndexFromModern(modernIndex: number): number
   abstract itemToString(index: number): string
 
   abstract moveFromGameIndex(gameIndex: number): number
@@ -359,7 +355,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
     dataView.setUint16(0x1c, this.monToGameIndex(this.dexNum, this.formeNum), true)
 
     // 30:32 Held Item
-    dataView.setUint16(0x1e, this.privateHeldItemIndex, true)
+    dataView.setUint16(0x1e, this.internalHeldItemIndex, true)
 
     // 32:36 Experience
     dataView.setUint32(0x20, this.exp, true)
@@ -425,7 +421,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
   }
 
   public get heldItemName() {
-    return this.itemToString(this.privateHeldItemIndex)
+    return this.itemToString(this.internalHeldItemIndex)
   }
 
   public get nature() {

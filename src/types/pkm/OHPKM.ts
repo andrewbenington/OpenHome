@@ -3,6 +3,7 @@ import {
   Ball,
   Gender,
   GenderRatio,
+  Item,
   Language,
   Languages,
   MetadataLookup,
@@ -29,8 +30,6 @@ import {
 import {
   Gen34ContestRibbons,
   Gen34TowerRibbons,
-  ItemFromString,
-  ItemToString,
   ModernRibbons,
   getMetLocation,
 } from '@pokemon-resources/index'
@@ -435,7 +434,7 @@ export class OHPKM implements PKMInterface {
   }
 
   public get heldItemName() {
-    return ItemToString(this.heldItemIndex)
+    return Item.fromIndex(this.heldItemIndex)?.name ?? 'None'
   }
 
   public get trainerID() {
@@ -1591,9 +1590,7 @@ export class OHPKM implements PKMInterface {
       this.formeNum = other.formeNum
     }
 
-    if ('heldItemName' in other) {
-      this.heldItemIndex = ItemFromString(other.heldItemName)
-    }
+    this.heldItemIndex = other.heldItemIndex
 
     if (other.avs) {
       this.avs = other.avs

@@ -3,7 +3,7 @@ use crate::items::ItemMetadata;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
-pub const ITEM_MAX: usize = 2600;
+pub const ITEM_MAX: usize = 2632;
 
 #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "getAllItems"))]
 #[allow(clippy::missing_const_for_fn)]
@@ -10144,5 +10144,88 @@ pub static ALL_ITEMS: [&ItemMetadata; ITEM_MAX] = [
     &ItemMetadata {
         id: 2600,
         name: "Lida’s Things",
+    },
+    &ItemMetadata { id: 2601, name: "" },
+    &ItemMetadata { id: 2603, name: "" },
+    &ItemMetadata { id: 2605, name: "" },
+    &ItemMetadata { id: 2606, name: "" },
+    &ItemMetadata { id: 2607, name: "" },
+    &ItemMetadata { id: 2608, name: "" },
+    &ItemMetadata { id: 2609, name: "" },
+    &ItemMetadata { id: 2610, name: "" },
+    &ItemMetadata { id: 2611, name: "" },
+    &ItemMetadata { id: 2612, name: "" },
+    &ItemMetadata { id: 2613, name: "" },
+    &ItemMetadata { id: 2614, name: "" },
+    &ItemMetadata { id: 2615, name: "" },
+    &ItemMetadata { id: 2616, name: "" },
+    &ItemMetadata { id: 2617, name: "" },
+    &ItemMetadata {
+        id: 2618,
+        name: "Mega Shard",
+    },
+    &ItemMetadata {
+        id: 2619,
+        name: "Colorful Screw",
+    },
+    &ItemMetadata {
+        id: 2620,
+        name: "Red Canari Plush",
+    },
+    &ItemMetadata {
+        id: 2621,
+        name: "Red Canari Plush",
+    },
+    &ItemMetadata {
+        id: 2622,
+        name: "Red Canari Plush",
+    },
+    &ItemMetadata {
+        id: 2623,
+        name: "Gold Canari Plush",
+    },
+    &ItemMetadata {
+        id: 2624,
+        name: "Gold Canari Plush",
+    },
+    &ItemMetadata {
+        id: 2625,
+        name: "Gold Canari Plush",
+    },
+    &ItemMetadata {
+        id: 2626,
+        name: "Pink Canari Plush",
+    },
+    &ItemMetadata {
+        id: 2627,
+        name: "Pink Canari Plush",
+    },
+    &ItemMetadata {
+        id: 2628,
+        name: "Pink Canari Plush",
+    },
+    &ItemMetadata {
+        id: 2629,
+        name: "Green Canari Plush",
+    },
+    &ItemMetadata {
+        id: 2630,
+        name: "Green Canari Plush",
+    },
+    &ItemMetadata {
+        id: 2631,
+        name: "Green Canari Plush",
+    },
+    &ItemMetadata {
+        id: 2632,
+        name: "Blue Canari Plush",
+    },
+    &ItemMetadata {
+        id: 2633,
+        name: "Blue Canari Plush",
+    },
+    &ItemMetadata {
+        id: 2634,
+        name: "Blue Canari Plush",
     },
 ];

@@ -3,13 +3,14 @@
 import {
   AbilityIndex,
   Ball,
+  Item,
   Language,
   Languages,
   MetadataLookup,
   NatureIndex,
   SpeciesLookup,
 } from '@pkm-rs-resources/pkg'
-import { ItemFromString, ItemToString, ModernRibbons } from '@pokemon-resources/index'
+import { ModernRibbons } from '@pokemon-resources/index'
 import * as byteLogic from '../util/byteLogic'
 import * as encryption from '../util/encryption'
 import { AllPKMFields } from '../util/pkmInterface'
@@ -211,7 +212,7 @@ export class PK8 {
       this.sanity = other.sanity ?? 0
       this.checksum = other.checksum ?? 0
       this.dexNum = other.dexNum
-      this.heldItemIndex = ItemFromString(other.heldItemName)
+      this.heldItemIndex = other.heldItemIndex
       this.trainerID = other.trainerID
       this.secretID = other.secretID
       this.exp = other.exp
@@ -464,7 +465,7 @@ export class PK8 {
   }
 
   public get heldItemName() {
-    return ItemToString(this.heldItemIndex)
+    return Item.fromIndex(this.heldItemIndex)?.name ?? 'None'
   }
 
   public calcChecksum() {

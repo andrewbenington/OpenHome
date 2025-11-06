@@ -1,8 +1,9 @@
-import { Gen4Ribbons, ItemFromString, ItemToString } from '@pokemon-resources/index'
+import { Gen4Ribbons } from '@pokemon-resources/index'
 
 import {
   AbilityIndex,
   Ball,
+  Item,
   Language,
   Languages,
   MetadataLookup,
@@ -184,7 +185,7 @@ export class PK4 {
 
       this.personalityValue = generatePersonalityValuePreservingAttributes(other) ?? 0
       this.dexNum = other.dexNum
-      this.heldItemIndex = ItemFromString(other.heldItemName)
+      this.heldItemIndex = other.heldItemIndex
       this.trainerID = other.trainerID
       this.secretID = other.secretID
       this.exp = other.exp
@@ -404,7 +405,7 @@ export class PK4 {
   }
 
   public get heldItemName() {
-    return ItemToString(this.heldItemIndex)
+    return Item.fromIndex(this.heldItemIndex)?.name ?? 'None'
   }
 
   public get nature() {
