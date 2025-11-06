@@ -222,14 +222,6 @@ const Home = () => {
       },
     })
 
-    // // reloads bag from file
-    // backend.loadItemBag().then(
-    //   E.match(
-    //     (err) => bagDispatch({ type: 'set_error', payload: err }),
-    //     (bagObj) => bagDispatch({ type: 'load_item_bag', payload: bagObj })
-    //   )
-    // )
-
     // the "stop listening" function should be called when the effect returns,
     // otherwise duplicate listeners will exist
     return () => {
