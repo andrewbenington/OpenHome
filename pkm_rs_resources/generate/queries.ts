@@ -249,3 +249,39 @@ export async function itemGen3GetAll(database: Database): Promise<ItemGen3GetAll
   const result = await stmt.all()
   return camelcaseKeys(result) as ItemGen3GetAllRow[]
 }
+
+export const itemRadicalRedGetAllQuery = `-- name: ItemRadicalRedGetAll :many
+SELECT
+  id, modern_id, name
+FROM
+  item_radical_red`
+
+export interface ItemRadicalRedGetAllRow {
+  id: number
+  modernId: number | null
+  name: any
+}
+
+export async function itemRadicalRedGetAll(database: Database): Promise<ItemRadicalRedGetAllRow[]> {
+  const stmt = database.prepare(itemRadicalRedGetAllQuery)
+  const result = await stmt.all()
+  return camelcaseKeys(result) as ItemRadicalRedGetAllRow[]
+}
+
+export const itemUnboundGetAllQuery = `-- name: ItemUnboundGetAll :many
+SELECT
+  id, modern_id, name
+FROM
+  item_unbound`
+
+export interface ItemUnboundGetAllRow {
+  id: number
+  modernId: number | null
+  name: any
+}
+
+export async function itemUnboundGetAll(database: Database): Promise<ItemUnboundGetAllRow[]> {
+  const stmt = database.prepare(itemUnboundGetAllQuery)
+  const result = await stmt.all()
+  return camelcaseKeys(result) as ItemUnboundGetAllRow[]
+}

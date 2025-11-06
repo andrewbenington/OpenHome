@@ -10,21 +10,21 @@ use crate::items::{gen1, gen2, gen3, modern};
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
-pub struct ItemIndex(NonZeroU16);
+pub struct Item(NonZeroU16);
 
-impl ItemIndex {
-    pub fn new(index: u16) -> Option<ItemIndex> {
+impl Item {
+    pub fn new(index: u16) -> Option<Item> {
         if (index as usize) > modern::ALL_ITEMS.len() {
             return None;
         }
-        NonZeroU16::new(index).map(ItemIndex)
+        NonZeroU16::new(index).map(Item)
     }
 
     /// # Safety
     ///
     /// - `index` must be greater than zero and at most the maximum item index supported by this version of the library.
-    pub const unsafe fn new_unchecked(index: u16) -> ItemIndex {
-        unsafe { ItemIndex(NonZeroU16::new_unchecked(index)) }
+    pub const unsafe fn new_unchecked(index: u16) -> Item {
+        unsafe { Item(NonZeroU16::new_unchecked(index)) }
     }
 
     pub const fn get(&self) -> u16 {
@@ -42,10 +42,10 @@ impl ItemIndex {
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[allow(clippy::missing_const_for_fn)]
-impl ItemIndex {
+impl Item {
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = fromIndex))]
-    pub fn from_index(val: u16) -> Option<ItemIndex> {
-        ItemIndex::new(val)
+    pub fn from_index(val: u16) -> Option<Item> {
+        Item::new(val)
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
@@ -59,7 +59,7 @@ impl ItemIndex {
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen)]
-    pub fn equals(&self, other: &ItemIndex) -> bool {
+    pub fn equals(&self, other: &Item) -> bool {
         self.0 == other.0
     }
 
@@ -69,13 +69,13 @@ impl ItemIndex {
     }
 }
 
-impl Default for ItemIndex {
+impl Default for Item {
     fn default() -> Self {
         Self(unsafe { NonZeroU16::new_unchecked(1) })
     }
 }
 
-impl Serialize for ItemIndex {
+impl Serialize for Item {
     fn serialize<S>(&self, serializer: S) -> core::result::Result<S::Ok, S::Error>
     where
         S: Serializer,
@@ -119,9 +119,9 @@ impl ItemMetadataPastGen {
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = toModern))]
-    pub fn to_modern(&self) -> Option<ItemIndex> {
+    pub fn to_modern(&self) -> Option<Item> {
         if let Some(modern_id) = self.modern_id {
-            ItemIndex::new(modern_id as u16)
+            Item::new(modern_id as u16)
         } else {
             None
         }
@@ -136,7 +136,7 @@ pub struct ItemGen1(NonZeroU16);
 
 impl ItemGen1 {
     pub fn new(index: u16) -> Option<ItemGen1> {
-        if (index as usize) > modern::ALL_ITEMS.len() {
+        if (index as usize) > gen1::ALL_ITEMS_GEN1.len() {
             return None;
         }
         NonZeroU16::new(index).map(ItemGen1)
@@ -186,7 +186,7 @@ impl ItemGen1 {
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = toModern))]
-    pub fn to_modern(&self) -> Option<ItemIndex> {
+    pub fn to_modern(&self) -> Option<Item> {
         self.get_metadata().to_modern()
     }
 
@@ -202,7 +202,7 @@ pub struct ItemGen2(NonZeroU16);
 
 impl ItemGen2 {
     pub fn new(index: u16) -> Option<Self> {
-        if (index as usize) > modern::ALL_ITEMS.len() {
+        if (index as usize) > gen2::ALL_ITEMS_GEN2.len() {
             return None;
         }
         NonZeroU16::new(index).map(Self)
@@ -252,7 +252,7 @@ impl ItemGen2 {
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = toModern))]
-    pub fn to_modern(&self) -> Option<ItemIndex> {
+    pub fn to_modern(&self) -> Option<Item> {
         self.get_metadata().to_modern()
     }
 
@@ -268,7 +268,7 @@ pub struct ItemGen3(NonZeroU16);
 
 impl ItemGen3 {
     pub fn new(index: u16) -> Option<Self> {
-        if (index as usize) > modern::ALL_ITEMS.len() {
+        if (index as usize) > gen3::ALL_ITEMS_GEN3.len() {
             return None;
         }
         NonZeroU16::new(index).map(Self)
@@ -318,7 +318,7 @@ impl ItemGen3 {
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = toModern))]
-    pub fn to_modern(&self) -> Option<ItemIndex> {
+    pub fn to_modern(&self) -> Option<Item> {
         self.get_metadata().to_modern()
     }
 
