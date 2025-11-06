@@ -1,15 +1,19 @@
 use rand::{SeedableRng, rngs::StdRng};
 
 use crate::{
-    pkm::Result,
-    resources::{
-        AbilityIndex, Ball, FormeMetadata, GameOfOriginIndex, ModernRibbon, MoveSlot, NatDexIndex,
-        NatureIndex, OpenHomeRibbon, SpeciesAndForme, TeraType,
-    },
-    substructures::{
-        ContestStats, Gender, HyperTraining, MarkingsSixShapesColors, PokeDate, Stats8, Stats16Le,
-        StatsPreSplit, TrainerMemory,
-    },
+    pkm::{Error, Result},
+    substructures::{Gender, PokeDate, TrainerMemory},
+};
+
+use pkm_rs_resources::moves::MoveSlot;
+use pkm_rs_resources::natures::NatureIndex;
+use pkm_rs_resources::ribbons::ModernRibbon;
+use pkm_rs_resources::species::{FormeMetadata, SpeciesAndForme};
+use pkm_rs_resources::{abilities::AbilityIndex, species::NatDexIndex};
+use pkm_rs_resources::{ball::Ball, ribbons::OpenHomeRibbon};
+use pkm_rs_types::{
+    ContestStats, HyperTraining, MarkingsSixShapesColors, OriginGame, Stats8, Stats16Le,
+    StatsPreSplit, TeraType,
 };
 
 pub trait UniversalPkm {
@@ -268,11 +272,11 @@ pub trait UniversalPkm {
         None
     }
 
-    fn get_game_of_origin(&self) -> Option<GameOfOriginIndex> {
+    fn get_game_of_origin(&self) -> Option<OriginGame> {
         None
     }
 
-    fn get_game_of_origin_battle(&self) -> Option<GameOfOriginIndex> {
+    fn get_game_of_origin_battle(&self) -> Option<OriginGame> {
         None
     }
 
@@ -404,6 +408,7 @@ pub trait UniversalPkm {
 
     fn get_forme_reference(&self) -> Result<SpeciesAndForme> {
         SpeciesAndForme::new_valid_ndex(self.get_national_dex(), self.get_forme_num().unwrap_or(0))
+            .map_err(|e| Error::from(e))
     }
 
     fn get_forme_metadata(&self) -> Result<&FormeMetadata> {

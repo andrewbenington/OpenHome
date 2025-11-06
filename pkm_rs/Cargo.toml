@@ -5,6 +5,8 @@ authors = ["Andrew Benington"]
 edition = "2024"
 
 [dependencies]
+pkm_rs_types = {path = "../pkm_rs_types", features=["wasm"]}
+pkm_rs_resources = {path = "../pkm_rs_resources", features=["wasm"]}
 serde = { version = "1.0.219", features = ["derive"] }
 serde_json = "1.0.140"
 num = "0.4.3"

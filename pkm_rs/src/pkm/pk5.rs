@@ -1,15 +1,19 @@
 use crate::pkm::traits::{IsShiny, IsShiny8192};
 use crate::pkm::{Error, Ohpkm, Pkm, Result};
-use crate::resources::{
-    AbilityIndex, Ball, DsRibbonSet, FormeMetadata, GameOfOriginIndex, MoveSlot, NatureIndex,
-    SpeciesAndForme, SpeciesMetadata,
-};
 use crate::strings::Gen5String;
-use crate::substructures::{ContestStats, Gender, MarkingsSixShapes, PokeDate, Stats8, Stats16Le};
+use crate::substructures::{Gender, PokeDate};
 use crate::util;
+
+use pkm_rs_resources::abilities::AbilityIndex;
+use pkm_rs_resources::ball::Ball;
+use pkm_rs_resources::moves::MoveSlot;
+use pkm_rs_resources::natures::NatureIndex;
+use pkm_rs_resources::ribbons::DsRibbonSet;
+use pkm_rs_resources::species::{FormeMetadata, SpeciesAndForme, SpeciesMetadata};
+use pkm_rs_types::{ContestStats, MarkingsSixShapes, OriginGame, Stats8, Stats16Le};
 use serde::Serialize;
 
-#[derive(Debug, Default, Serialize, Clone, Copy, IsShiny8192)]
+#[derive(Debug, Serialize, Clone, Copy, IsShiny8192)]
 pub struct Pk5 {
     pub personality_value: u32,
     pub species_and_forme: SpeciesAndForme,
@@ -34,7 +38,7 @@ pub struct Pk5 {
     pub nature: NatureIndex,
     pub is_ns_pokemon: bool,
     pub ribbons: DsRibbonSet,
-    pub game_of_origin: GameOfOriginIndex,
+    pub game_of_origin: OriginGame,
     pub egg_date: Option<PokeDate>,
     pub met_date: PokeDate,
     pub egg_location_index: u16,
@@ -101,7 +105,7 @@ impl Pk5 {
                 bytes[36..40].try_into().unwrap(),
                 bytes[96..100].try_into().unwrap(),
             ),
-            game_of_origin: GameOfOriginIndex::from(bytes[95]),
+            game_of_origin: OriginGame::from(bytes[95]),
             egg_date: PokeDate::from_bytes_optional(bytes[120..123].try_into().unwrap()),
             met_date: PokeDate::from_bytes(bytes[123..126].try_into().unwrap()),
             egg_location_index: u16::from_le_bytes(bytes[126..128].try_into().unwrap()),
@@ -202,7 +206,7 @@ impl Pkm for Pk5 {
         bytes[65] = self.nature.to_byte();
         util::set_flag(bytes, 66, 1, self.is_ns_pokemon);
 
-        bytes[95] = self.game_of_origin.to_byte();
+        bytes[95] = self.game_of_origin as u8;
         bytes[120..123].copy_from_slice(&PokeDate::to_bytes_optional(self.egg_date));
         bytes[123..126].copy_from_slice(&self.met_date.to_bytes());
         bytes[126..128].copy_from_slice(&self.egg_location_index.to_le_bytes());
@@ -356,7 +360,11 @@ impl From<Ohpkm> for Pk5 {
             nickname: other.nickname.to_string().into(),
             trainer_name: other.trainer_name.to_string().into(),
             trainer_gender: other.trainer_gender,
-            ..Default::default()
+            current_hp: 0,
+            junk_byte: 0,
+            stat_level: other.calculate_level(),
+            stats: Stats16Le::default(),
+            status_condition: 0,
         }
     }
 }

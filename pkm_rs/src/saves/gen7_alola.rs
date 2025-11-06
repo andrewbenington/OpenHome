@@ -1,10 +1,10 @@
+use pkm_rs_types::OriginGame;
 use serde::Serialize;
 
 use crate::encryption::crc16_ccitt_invert;
 use crate::encryption::decrypt_pkm_bytes_gen_6_7;
 use crate::encryption::unshuffle_blocks_gen_6_7;
 use crate::pkm::Pk7;
-use crate::resources::GameOfOrigin;
 use crate::substructures::Gender;
 use crate::util::get_flag;
 
@@ -103,8 +103,8 @@ impl SaveDataTrait for SunMoonSave {
         super::six_digit_display(self.trainer.trainer_id, self.trainer.secret_id)
     }
 
-    fn game_of_origin(&self) -> Option<crate::resources::GameOfOrigin> {
-        crate::resources::GAME_OF_ORIGIN_DATA[self.trainer.game_code as usize].copied()
+    fn game_of_origin(&self) -> Option<OriginGame> {
+        Some(OriginGame::from(self.trainer.game_code))
     }
 }
 
@@ -166,8 +166,8 @@ impl SunMoonSave {
     }
 
     #[wasm_bindgen]
-    pub fn game_of_origin(&self) -> Option<GameOfOrigin> {
-        SaveDataTrait::game_of_origin(self)
+    pub fn game_of_origin(&self) -> OriginGame {
+        OriginGame::from(self.trainer.game_code)
     }
 }
 
@@ -267,8 +267,8 @@ impl SaveDataTrait for UltraSunMoonSave {
         super::six_digit_display(self.trainer.trainer_id, self.trainer.secret_id)
     }
 
-    fn game_of_origin(&self) -> Option<crate::resources::GameOfOrigin> {
-        crate::resources::GAME_OF_ORIGIN_DATA[self.trainer.game_code as usize].copied()
+    fn game_of_origin(&self) -> Option<OriginGame> {
+        Some(OriginGame::from(self.trainer.game_code))
     }
 }
 

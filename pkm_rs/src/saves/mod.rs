@@ -1,8 +1,8 @@
+use pkm_rs_types::OriginGame;
 use serde::Serialize;
 
 use crate::{
     pkm::Pkm,
-    resources::GameOfOrigin,
     saves::{
         gen7_alola::{SunMoonSave, UltraSunMoonSave},
         lets_go::LetsGoSave,
@@ -31,7 +31,7 @@ pub trait SaveDataTrait: Send + Sync {
 
     fn display_tid(&self) -> String;
 
-    fn game_of_origin(&self) -> Option<GameOfOrigin>;
+    fn game_of_origin(&self) -> Option<OriginGame>;
 }
 
 #[derive(Serialize, Clone, Copy)]

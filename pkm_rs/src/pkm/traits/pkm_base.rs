@@ -1,5 +1,6 @@
+use pkm_rs_resources::{moves::MoveSlot, species::SpeciesAndForme};
+
 use crate::pkm::result::Result;
-use crate::resources::{MoveSlot, SpeciesAndForme};
 
 pub trait PkmBase {
     fn species_and_forme(&self) -> Result<SpeciesAndForme>;

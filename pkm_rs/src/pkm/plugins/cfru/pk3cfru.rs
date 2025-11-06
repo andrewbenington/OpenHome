@@ -3,13 +3,14 @@ use crate::pkm::plugins::cfru::conversion::moves::{
 };
 use crate::pkm::traits::IsShiny;
 use crate::pkm::{Error, Pkm, Result};
-use crate::resources::{
-    ALL_MOVES, Ball, FormeMetadata, GameOfOriginIndex, MoveSlot, SpeciesAndForme, SpeciesMetadata,
-};
 use crate::strings::Gen3String;
-use crate::substructures::{Gender, MarkingsFourShapes, Stats8};
+use crate::substructures::Gender;
 use crate::util;
 
+use pkm_rs_resources::ball::Ball;
+use pkm_rs_resources::moves::MoveSlot;
+use pkm_rs_resources::species::{FormeMetadata, SpeciesAndForme, SpeciesMetadata};
+use pkm_rs_types::{MarkingsFourShapes, OriginGame, Stats8};
 use serde::Serialize;
 
 pub const CFRU_BALLS: [Ball; 27] = [
@@ -155,10 +156,10 @@ pub struct Pk3Cfru<M: CfruMapping = BaseCfruMapping> {
     pub met_location_index: u8,
 
     // 51:53
-    pub met_level: u8,                     // 0x34 bits 0..6
-    pub game_of_origin: GameOfOriginIndex, // 0x34 bits 7..10
-    pub can_gigantamax: bool,              // 0x34 bit 11
-    pub trainer_gender: Gender,            // 0x34 bit 15
+    pub met_level: u8,              // 0x34 bits 0..6
+    pub game_of_origin: OriginGame, // 0x34 bits 7..10
+    pub can_gigantamax: bool,       // 0x34 bit 11
+    pub trainer_gender: Gender,     // 0x34 bit 15
 
     // 53:57
     pub ivs: Stats8,              // 0x36..0x39 (30 bits)
@@ -243,7 +244,7 @@ impl<M: CfruMapping> Pk3Cfru<M> {
         // 0x34..0x36: met info & flags
         let meta = u16::from_le_bytes(bytes[0x34..0x36].try_into().unwrap());
         let met_level = (meta & 0x7F) as u8;
-        let game_of_origin = GameOfOriginIndex::from(((meta >> 7) & 0xF) as u8);
+        let game_of_origin = OriginGame::from(((meta >> 7) & 0xF) as u8);
         let can_gigantamax = ((meta >> 11) & 1) != 0;
         let trainer_gender: Gender = (((meta >> 15) & 1) != 0).into();
 
@@ -403,7 +404,7 @@ impl<M: CfruMapping> Pkm for Pk3Cfru<M> {
         // 52:53 Met Info (packed: level, game of origin, Gigantamax, trainer gender)
         let mut meta: u16 = 0;
         meta |= self.met_level as u16 & 0x7F;
-        meta |= (u8::from(self.game_of_origin) as u16 & 0x0F) << 7;
+        meta |= (self.game_of_origin as u16 & 0x0F) << 7;
         meta |= ((self.can_gigantamax as u16) & 0x01) << 11;
         meta |= ((bool::from(self.trainer_gender) as u16) & 0x01) << 15;
         bytes[52..54].copy_from_slice(&meta.to_le_bytes());

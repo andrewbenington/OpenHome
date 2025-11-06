@@ -1007,10 +1007,10 @@ mod cfru_to_national_map;
 mod national_to_cfru;
 
 use crate::pkm::{Error, MoveErrorSource, Result};
-use crate::resources::ALL_MOVES;
 
 use cfru_to_national_map::CFRU_TO_NATIONAL_MAP;
 use national_to_cfru::NATIONAL_TO_CFRU_MAP;
+use pkm_rs_resources::moves::{MoveMetadata, MoveSlot};
 
 pub fn from_gen3_cfru_move_index(cfru_index: usize) -> Result<u16> {
     if cfru_index == 0 {
@@ -1038,9 +1038,12 @@ pub fn to_gen3_cfru_move_index(national_move_id: usize) -> Result<u16> {
         return Ok(0); // None
     }
 
-    if let Some(&meta) = ALL_MOVES.get(national_move_id - 1) {
+    if let Some(move_name) = MoveSlot::from_u16((national_move_id - 1) as u16)
+        .get_metadata()
+        .map(MoveMetadata::get_name)
+    {
         NATIONAL_TO_CFRU_MAP
-            .get(meta.name())
+            .get(move_name)
             .and_then(|list| list.first().copied())
             .ok_or(Error::MoveError {
                 value: national_move_id as u16,

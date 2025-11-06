@@ -1,6 +1,7 @@
+use pkm_rs_resources::species::SpeciesAndForme;
+
 use crate::pkm::plugins::ub::conversion::{NATIONAL_DEX_TO_UB_MAP, UB_TO_NATIONAL_DEX_MAP};
 use crate::pkm::{Error, NdexConvertSource, Result};
-use crate::resources::SpeciesAndForme;
 
 /// Convert game index to National Dex entry
 pub fn from_gen3_ub_pokemon_index(species_index: u16) -> Result<SpeciesAndForme> {

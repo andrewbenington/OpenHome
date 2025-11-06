@@ -26,6 +26,14 @@ impl MoveSlot {
     pub fn to_le_bytes(self) -> [u8; 2] {
         self.0.map(NonZeroU16::get).unwrap_or(0u16).to_le_bytes()
     }
+
+    pub const fn empty() -> Self {
+        Self(None)
+    }
+
+    pub const fn is_empty(&self) -> bool {
+        self.0.is_none()
+    }
 }
 
 impl Serialize for MoveSlot {
@@ -64,6 +72,12 @@ pub struct MoveMetadata {
     power: Option<u8>,
     pp: u8,
     pkm_type: PkmType,
+}
+
+impl MoveMetadata {
+    pub const fn get_name(&self) -> &'static str {
+        self.name
+    }
 }
 
 pub enum MoveClass {

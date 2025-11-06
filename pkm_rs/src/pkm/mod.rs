@@ -1,4 +1,3 @@
-mod helpers;
 mod ohpkm;
 mod pb7;
 mod pk5;
@@ -13,25 +12,23 @@ mod plugins;
 pub mod buffers;
 pub mod traits;
 
+use pkm_rs_resources::species::{FormeMetadata, SpeciesMetadata};
 use serde::Serialize;
 
 pub use plugins::rr::pk3rr::Pk3rr;
 pub use plugins::ub::pk3ub::Pk3ub;
 
-pub use crate::resources::{ABILITY_MAX, NATIONAL_DEX_MAX};
 pub use ohpkm::Ohpkm;
 pub use pb7::Pb7;
 pub use pk5::Pk5;
 pub use pk6::Pk6;
 pub use pk7::Pk7;
 pub use pk8::Pk8;
+pub use pkm_rs_resources::{abilities::ABILITY_MAX, species::NATIONAL_DEX_MAX};
 pub use result::*;
 pub use universal::UniversalPkm;
 
-use crate::{
-    pkm::traits::IsShiny,
-    resources::{FormeMetadata, SpeciesMetadata},
-};
+use crate::pkm::traits::IsShiny;
 
 pub trait Pkm: Serialize + IsShiny {
     const BOX_SIZE: usize;

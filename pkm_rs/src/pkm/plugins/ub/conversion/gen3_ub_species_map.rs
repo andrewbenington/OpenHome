@@ -1,6 +1,6 @@
 use phf::phf_map;
 
-use crate::resources::SpeciesAndForme;
+use pkm_rs_resources::species::SpeciesAndForme;
 
 pub static UB_TO_NATIONAL_DEX_MAP: phf::Map<u16, SpeciesAndForme> = phf_map! {
   // '0': null, // Egg (not found)

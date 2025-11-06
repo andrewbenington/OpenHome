@@ -1,6 +1,5 @@
 use phf::phf_map;
-
-use crate::resources::SpeciesAndForme;
+use pkm_rs_resources::species::SpeciesAndForme;
 
 // '(\d+)'\s*:\s*\{\n\s*NationalDexIndex:\s*(-?\d+),\n\s*FormIndex:\s*(-?\d+)
 // "$1" => SpeciesAndForme { national_dex_index: $2, form_index: $3

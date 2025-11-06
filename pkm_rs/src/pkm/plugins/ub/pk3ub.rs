@@ -1,7 +1,8 @@
+use pkm_rs_resources::species::SpeciesAndForme;
+
 use super::conversion::util::{from_gen3_ub_pokemon_index, to_gen3_ub_pokemon_index};
 use crate::pkm::plugins::cfru::pk3cfru::Pk3Cfru;
 use crate::pkm::{Result, plugins::cfru::pk3cfru::CfruMapping};
-use crate::resources::SpeciesAndForme;
 
 pub struct UnboundMapping;
 

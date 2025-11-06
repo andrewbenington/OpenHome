@@ -1,11 +1,13 @@
 use crate::pkm::traits::{IsShiny4096, ModernEvs};
 use crate::pkm::{Error, Pkm, Result};
-use crate::resources::{AbilityIndex, FormeMetadata, MoveSlot, SpeciesAndForme, SpeciesMetadata};
 use crate::strings::SizedUtf16String;
-use crate::substructures::{
-    Gender, HyperTraining, MarkingsSixShapesColors, PokeDate, Stats8, Stats16Le,
-};
+use crate::substructures::{Gender, PokeDate};
 use crate::util;
+
+use pkm_rs_resources::abilities::AbilityIndex;
+use pkm_rs_resources::moves::MoveSlot;
+use pkm_rs_resources::species::{FormeMetadata, SpeciesAndForme, SpeciesMetadata};
+use pkm_rs_types::{HyperTraining, MarkingsSixShapesColors, Stats8, Stats16Le};
 use serde::Serialize;
 
 #[derive(Debug, Default, Serialize, Clone, Copy, IsShiny4096)]
@@ -321,7 +323,7 @@ impl Pkm for Pb7 {
 }
 
 impl ModernEvs for Pb7 {
-    fn get_evs(&self) -> crate::substructures::Stats8 {
+    fn get_evs(&self) -> Stats8 {
         self.evs
     }
 }

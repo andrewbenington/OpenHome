@@ -1,13 +1,13 @@
 use crate::pkm::traits::ModernEvs;
 use crate::pkm::{Error, Pkm, Result};
-use crate::resources::{FormeMetadata, MoveSlot, SpeciesAndForme, SpeciesMetadata};
 use crate::strings::SizedUtf16String;
-use crate::substructures::{
-    ContestStats, HyperTraining, MarkingsSixShapesColors, Stats8, Stats16Le,
-};
 use crate::substructures::{FlagSet, Gender};
 use crate::util;
+
 use pkm_rs_derive::IsShiny4096;
+use pkm_rs_resources::moves::MoveSlot;
+use pkm_rs_resources::species::{FormeMetadata, SpeciesAndForme, SpeciesMetadata};
+use pkm_rs_types::{ContestStats, HyperTraining, MarkingsSixShapesColors, Stats8, Stats16Le};
 use serde::Serialize;
 
 #[derive(Debug, Default, Serialize, Clone, Copy, IsShiny4096)]
@@ -302,7 +302,7 @@ impl Pkm for Pk8 {
 }
 
 impl ModernEvs for Pk8 {
-    fn get_evs(&self) -> crate::substructures::Stats8 {
+    fn get_evs(&self) -> Stats8 {
         self.evs
     }
 }

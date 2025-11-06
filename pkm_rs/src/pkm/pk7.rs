@@ -1,21 +1,27 @@
 use crate::pkm::traits::{IsShiny4096, ModernEvs};
-use crate::pkm::{Error, Ohpkm, Pkm, Result, helpers};
-use crate::resources::{
-    AbilityIndex, Ball, FormeMetadata, GameOfOriginIndex, ModernRibbon, ModernRibbonSet, MoveSlot,
-    NatureIndex, OpenHomeRibbonSet, SpeciesAndForme, SpeciesMetadata,
-};
+use crate::pkm::{Error, Ohpkm, Pkm, Result};
 use crate::strings::SizedUtf16String;
-use crate::substructures::{
-    ContestStats, Gender, Geolocations, HyperTraining, MarkingsSixShapesColors, PokeDate, Stats8,
-    Stats16Le, StatsPreSplit, TrainerMemory,
-};
+use crate::substructures::{Gender, Geolocations, PokeDate, TrainerMemory};
 use crate::util;
+
+use pkm_rs_resources::abilities::AbilityIndex;
+use pkm_rs_resources::ball::Ball;
+use pkm_rs_resources::helpers;
+use pkm_rs_resources::moves::MoveSlot;
+use pkm_rs_resources::natures::NatureIndex;
+use pkm_rs_resources::ribbons::{ModernRibbon, ModernRibbonSet, OpenHomeRibbonSet};
+use pkm_rs_resources::species::{FormeMetadata, SpeciesAndForme, SpeciesMetadata};
+use pkm_rs_types::{
+    ContestStats, HyperTraining, MarkingsSixShapesColors, OriginGame, Stats8, Stats16Le,
+    StatsPreSplit,
+};
 use serde::Serialize;
+
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Debug, Default, Serialize, Clone, Copy, IsShiny4096)]
+#[derive(Debug, Serialize, Clone, Copy, IsShiny4096)]
 pub struct Pk7 {
     pub encryption_constant: u32,
     pub sanity: u16,
@@ -81,7 +87,7 @@ pub struct Pk7 {
     pub ball: Ball,
     pub met_level: u8,
     pub hyper_training: HyperTraining,
-    pub game_of_origin: GameOfOriginIndex,
+    pub game_of_origin: OriginGame,
     pub country: u8,
     pub region: u8,
     pub console_region: u8,
@@ -184,7 +190,7 @@ impl Pk7 {
             ball: Ball::from(bytes[220]),
             met_level: bytes[221],
             hyper_training: HyperTraining::from_byte(bytes[222]),
-            game_of_origin: GameOfOriginIndex::from(bytes[223]),
+            game_of_origin: OriginGame::from(bytes[223]),
             country: bytes[224],
             region: bytes[225],
             console_region: bytes[226],
@@ -340,7 +346,7 @@ impl Pkm for Pk7 {
         bytes[220] = self.ball as u8;
         bytes[221] = self.met_level;
         bytes[222] = self.hyper_training.to_byte();
-        bytes[223] = self.game_of_origin.to_byte();
+        bytes[223] = self.game_of_origin as u8;
         bytes[224] = self.country;
         bytes[225] = self.region;
         bytes[226] = self.console_region;
@@ -397,7 +403,7 @@ impl Pk7 {
             &self.ivs,
             &self.evs,
             self.calculate_level(),
-            self.nature.get_metadata().expect("invalid nature index"),
+            self.nature.get_metadata(),
         )
     }
 }
@@ -545,7 +551,7 @@ impl Pk7 {
 }
 
 impl ModernEvs for Pk7 {
-    fn get_evs(&self) -> crate::substructures::Stats8 {
+    fn get_evs(&self) -> Stats8 {
         self.evs
     }
 }
@@ -736,7 +742,7 @@ impl From<Ohpkm> for Pk7 {
                 &other.ivs,
                 &other.evs,
                 other.calculate_level(),
-                other.nature.get_metadata().expect("invalid nature value"),
+                other.nature.get_metadata(),
             ),
         }
     }

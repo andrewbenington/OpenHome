@@ -1,7 +1,8 @@
+use pkm_rs_resources::species::SpeciesAndForme;
+
 use super::conversion::util::{from_gen3_rr_pokemon_index, to_gen3_rr_pokemon_index};
 use crate::pkm::plugins::cfru::pk3cfru::Pk3Cfru;
 use crate::pkm::{Result, plugins::cfru::pk3cfru::CfruMapping};
-use crate::resources::SpeciesAndForme;
 
 const FAKEMON_INDEXES: [u16; 22] = [
     1186, 1200, 1274, 1275, 1276, 1277, 1278, 1279, 1282, 1283, 1284, 1285, 1286, 1287, 1288, 1289,

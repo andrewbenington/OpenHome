@@ -1,15 +1,19 @@
 use crate::pkm::traits::IsShiny4096;
 use crate::pkm::{Error, Pkm, Result};
-use crate::resources::{
-    AbilityIndex, Ball, FormeMetadata, GameOfOriginIndex, ModernRibbon, MoveSlot, NatureIndex,
-    OpenHomeRibbonSet, SpeciesAndForme, SpeciesMetadata,
-};
 use crate::strings::SizedUtf16String;
-use crate::substructures::{
-    ContestStats, Gender, HyperTraining, MarkingsSixShapesColors, PokeDate, Stats8, Stats16Le,
-    StatsPreSplit, TrainerMemory,
-};
+use crate::substructures::{Gender, PokeDate, TrainerMemory};
 use crate::util;
+
+use pkm_rs_resources::abilities::AbilityIndex;
+use pkm_rs_resources::ball::Ball;
+use pkm_rs_resources::moves::MoveSlot;
+use pkm_rs_resources::natures::NatureIndex;
+use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbonSet};
+use pkm_rs_resources::species::{FormeMetadata, SpeciesAndForme, SpeciesMetadata};
+use pkm_rs_types::{
+    ContestStats, HyperTraining, MarkingsSixShapesColors, OriginGame, Stats8, Stats16Le,
+    StatsPreSplit,
+};
 use serde::Serialize;
 
 const MIN_SIZE: usize = 420;
@@ -85,8 +89,8 @@ pub struct Ohpkm {
     pub shiny_leaves: u8,
     pub fullness: u8,
     pub enjoyment: u8,
-    pub game_of_origin: GameOfOriginIndex,
-    pub game_of_origin_battle: Option<GameOfOriginIndex>,
+    pub game_of_origin: OriginGame,
+    pub game_of_origin_battle: Option<OriginGame>,
     pub country: u8,
     pub region: u8,
     pub console_region: u8,
@@ -224,10 +228,10 @@ impl Ohpkm {
             shiny_leaves: bytes[234],
             fullness: bytes[235],
             enjoyment: bytes[236],
-            game_of_origin: GameOfOriginIndex::from(bytes[237]),
+            game_of_origin: OriginGame::from(bytes[237]),
             game_of_origin_battle: match bytes[238] {
                 0 => None,
-                val => Some(GameOfOriginIndex::from(val)),
+                val => Some(OriginGame::from(val)),
             },
             country: bytes[239],
             region: bytes[240],
@@ -383,10 +387,8 @@ impl Pkm for Ohpkm {
         bytes[234] = self.shiny_leaves;
         bytes[235] = self.fullness;
         bytes[236] = self.enjoyment;
-        bytes[237] = self.game_of_origin.to_byte();
-        bytes[238] = self
-            .game_of_origin_battle
-            .map_or(0, GameOfOriginIndex::to_byte);
+        bytes[237] = self.game_of_origin as u8;
+        bytes[238] = self.game_of_origin_battle.map_or(0, |g| g as u8);
         bytes[239] = self.country;
         bytes[240] = self.region;
         bytes[240] = self.console_region;

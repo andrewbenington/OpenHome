@@ -1,5 +1,3 @@
-use crate::substructures::Stats8;
-
 pub trait ModernEvs {
-    fn get_evs(&self) -> Stats8;
+    fn get_evs(&self) -> pkm_rs_types::Stats8;
 }

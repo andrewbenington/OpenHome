@@ -1,7 +1,6 @@
-use crate::{
-    resources::{NatureMetadata, SpeciesAndForme, Stat},
-    substructures::{Stats, Stats16Le},
-};
+use pkm_rs_types::{Stats, Stats16Le};
+
+use crate::{natures::NatureMetadata, species::SpeciesAndForme, stats::Stat};
 
 pub fn calculate_stats_modern<I: Stats, E: Stats>(
     species_and_forme: SpeciesAndForme,

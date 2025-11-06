@@ -5,7 +5,6 @@ mod tests;
 mod util;
 
 pub mod pkm;
-pub mod resources;
 pub mod saves;
 pub mod substructures;
 

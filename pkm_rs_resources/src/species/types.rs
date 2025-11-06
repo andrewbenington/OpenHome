@@ -671,6 +671,10 @@ impl SpeciesAndForme {
     pub const fn get_forme_index(&self) -> u16 {
         self.forme_index
     }
+
+    pub const fn to_tuple(self) -> (u16, u16) {
+        (self.national_dex.get(), self.forme_index)
+    }
 }
 
 impl SpeciesAndForme {

@@ -1,3 +1,3 @@
 [workspace]
 resolver = "3"
-members = ["src-tauri", "pkm_rs", "pkm_rs_derive"]
+members = ["src-tauri", "pkm_rs", "pkm_rs_derive", "pkm_rs_resources", "pkm_rs_types"]

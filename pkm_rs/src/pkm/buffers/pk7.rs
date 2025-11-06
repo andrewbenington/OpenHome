@@ -1,13 +1,14 @@
+use pkm_rs_resources::{
+    abilities::AbilityIndex, moves::MoveSlot, natures::NatureIndex, ribbons::ModernRibbonSet,
+    species::SpeciesAndForme,
+};
+use pkm_rs_types::{ContestStats, MarkingsSixShapesColors, Stats8};
+
 use crate::{
     encryption,
-    pkm::{
-        Result,
-        buffers::helpers::PkmBuffer,
-        traits::{Checksum, EncryptionConstant, Pid, PkmBase, SecretId, TrainerId},
-    },
-    resources::{AbilityIndex, ModernRibbonSet, MoveSlot, NatureIndex, SpeciesAndForme},
+    pkm::{Error, Result, buffers::helpers::PkmBuffer},
     strings::SizedUtf16String,
-    substructures::{ContestStats, Gender, MarkingsSixShapesColors, Stats8},
+    substructures::Gender,
     util,
 };
 
@@ -42,6 +43,7 @@ impl<'a> Pk7BoxBuffer<'a> {
             self.buffer.read_u16_le(8),
             util::read_uint5_from_bits(self.buffer[29], 3).into(),
         )
+        .map_err(Error::from)
     }
 
     fn get_held_item_index(&self) -> u16 {
@@ -69,7 +71,7 @@ impl<'a> Pk7BoxBuffer<'a> {
     }
 
     fn get_ability_index(&self) -> Result<AbilityIndex> {
-        AbilityIndex::try_from(self.buffer[20])
+        AbilityIndex::try_from(self.buffer[20]).map_err(Error::from)
     }
 
     fn get_ability_num(&self) -> u8 {
@@ -89,7 +91,7 @@ impl<'a> Pk7BoxBuffer<'a> {
     }
 
     fn get_nature_index(&self) -> Result<NatureIndex> {
-        NatureIndex::try_from(self.buffer[28])
+        NatureIndex::try_from(self.buffer[28]).map_err(Error::from)
     }
 
     fn get_is_fateful_encounter(&self) -> bool {

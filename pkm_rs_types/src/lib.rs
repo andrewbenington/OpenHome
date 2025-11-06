@@ -13,3 +13,5 @@ pub use result::*;
 pub use stats::*;
 pub use structures::*;
 pub use util::*;
+
+extern crate self as pkm_rs_types;

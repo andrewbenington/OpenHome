@@ -1,3 +1,4 @@
+use pkm_rs_types::OriginGame;
 use serde::Serialize;
 
 use crate::encryption::decrypt_pkm_bytes_gen_6_7;
@@ -92,8 +93,8 @@ impl SaveDataTrait for LetsGoSave {
         super::six_digit_display(self.trainer.trainer_id, self.trainer.secret_id)
     }
 
-    fn game_of_origin(&self) -> Option<crate::resources::GameOfOrigin> {
-        crate::resources::GAME_OF_ORIGIN_DATA[self.trainer.game_code as usize].copied()
+    fn game_of_origin(&self) -> Option<OriginGame> {
+        Some(OriginGame::from(self.trainer.game_code))
     }
 }
 

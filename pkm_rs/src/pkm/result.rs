@@ -1,8 +1,9 @@
 use std::fmt::Display;
 
+use pkm_rs_resources::species::{NatDexIndex, SpeciesAndForme};
 use serde::{Serialize, Serializer};
+use pkm_rs_resources::{species::MAX_NATIONAL_DEX, natures::NATURE_MAX, abilities::ABILITY_MAX, language::LANGUAGE_MAX, items::ITEM_MAX};
 
-use crate::resources::{ABILITY_MAX, NATIONAL_DEX_MAX, NATURE_MAX, NatDexIndex, SpeciesAndForme};
 
 #[derive(Debug)]
 pub enum MoveErrorKind {
@@ -50,11 +51,17 @@ pub enum Error {
         national_dex: NatDexIndex,
         forme_index: u16,
     },
+    LanguageIndex {
+        language_index: u8,
+    },
     NatureIndex {
         nature_index: u8,
     },
     AbilityIndex {
         ability_index: u16,
+    },
+    ItemIndex {
+        item_index: u16,
     },
     FieldError {
         field: &'static str,
@@ -89,14 +96,14 @@ impl Display for Error {
                     .to_owned()
             }
             Error::NationalDex { value: national_dex , source} => {
-                format!("Invalid National Dex number {national_dex} (source: {source}; must be between 1 and {NATIONAL_DEX_MAX}")
+                format!("Invalid National Dex number {national_dex} (source: {source}; must be between 1 and {MAX_NATIONAL_DEX}")
                     .to_owned()
             }
 
             Error::GenDex { saf, generation } => {
                 let species = saf.get_species_metadata();
                 let form = saf.get_forme_metadata();
-                format!("Pokémon '{species}' (form: {form}) does not exist in {generation}")
+                format!("Pokémon '{}' (form: {}) does not exist in {generation}", species.name, form.forme_name)
             }
 
             Error::GameDex { value, game } => {
@@ -115,12 +122,20 @@ impl Display for Error {
                 )
                 .to_owned()
             }
+            Error::LanguageIndex { language_index } => {
+                format!("Invalid language index {language_index} (must be between 1 and {LANGUAGE_MAX}")
+                    .to_owned()
+            }
             Error::NatureIndex { nature_index } => {
                 format!("Invalid nature index {nature_index} (must be between 1 and {NATURE_MAX}")
                     .to_owned()
             }
             Error::AbilityIndex { ability_index } => {
                 format!("Invalid ability index {ability_index} (must be between 1 and {ABILITY_MAX}")
+                    .to_owned()
+            }
+            Error::ItemIndex { item_index } => {
+                format!("Invalid item index {item_index} (must be between 1 and {ITEM_MAX}")
                     .to_owned()
             }
             Error::FieldError { field, source } => {
@@ -144,6 +159,20 @@ impl std::error::Error for Error {
         match self {
             Self::FieldError { field: _, source } => Some(source.as_ref()),
             _ => None,
+        }
+    }
+}
+
+impl From<pkm_rs_resources::Error> for Error {
+    fn from(value: pkm_rs_resources::Error) -> Self {
+        match value {
+            pkm_rs_resources::Error::NationalDex { national_dex } => Self::NationalDex { value: national_dex, source: NdexConvertSource::Other },
+            pkm_rs_resources::Error::FormeIndex { national_dex, forme_index } => Self::FormeIndex { national_dex, forme_index },
+            pkm_rs_resources::Error::LanguageIndex { language_index } => Self::LanguageIndex { language_index },
+            pkm_rs_resources::Error::NatureIndex { nature_index } => Self::NatureIndex { nature_index },
+            pkm_rs_resources::Error::AbilityIndex { ability_index } => Self::AbilityIndex { ability_index },
+            pkm_rs_resources::Error::ItemIndex { item_index } => Self::ItemIndex { item_index },
+            pkm_rs_resources::Error::FieldError { field, source } => Self::FieldError { field, source },
         }
     }
 }

@@ -143,6 +143,12 @@ pub struct MoveMetadata {
     pkm_type: PkmType,
 }
 
+impl MoveMetadata {
+    pub const fn get_name(&self) -> &'static str {
+        self.name
+    }
+}
+
 pub enum MoveClass {
     Physical,
     Special,
