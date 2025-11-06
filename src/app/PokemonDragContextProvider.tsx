@@ -142,5 +142,5 @@ export default function PokemonDragContextProvider(props: { children?: ReactNode
 }
 
 function isMonLocation(obj: object | undefined): obj is MonLocation {
-  return obj !== undefined && 'box' in obj && 'boxSlot' in obj
+  return obj !== undefined && 'box' in obj && 'box_slot' in obj
 }
