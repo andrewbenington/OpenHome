@@ -125,7 +125,10 @@ class G3CFRUSaveBackup<T extends PluginPKMInterface> {
           }
         }
       } catch (e) {
-        console.error(e)
+        // :)
+        if (!`${e}`.endsWith('index 0 not found.')) {
+          console.error(e)
+        }
       }
     }
 

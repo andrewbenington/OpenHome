@@ -1,4 +1,4 @@
-import { Language, OriginGame } from '@pkm-rs-resources/pkg'
+import { ItemGen2, Language, OriginGame } from '@pkm-rs-resources/pkg'
 import { PK2 } from '@pokemon-files/pkm'
 import { uniq } from 'lodash'
 import { EXCLAMATION } from 'src/consts/Formes'
@@ -263,6 +263,10 @@ export class G2SAV extends OfficialSAV<PK2> {
       (dexNumber <= NationalDex.Celebi && formeNumber === 0) ||
       (dexNumber === NationalDex.Unown && formeNumber < EXCLAMATION)
     )
+  }
+
+  supportsItem(itemIndex: number) {
+    return ItemGen2.fromModern(itemIndex) !== undefined
   }
 
   getCurrentBox() {

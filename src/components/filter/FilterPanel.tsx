@@ -4,7 +4,7 @@ import {
   getAllAbilities,
   getAllBalls,
   getAllItems,
-  ItemIndex,
+  Item,
   ItemMetadata,
   OriginGame,
   OriginGames,
@@ -12,7 +12,7 @@ import {
   SpeciesLookup,
 } from '@pkm-rs-resources/pkg'
 import { Types } from '@pokemon-resources/index'
-import { Button, Card, Flex, Text } from '@radix-ui/themes'
+import { Button, Flex, Text } from '@radix-ui/themes'
 import { useContext, useMemo } from 'react'
 import { OpenHomeRibbons } from 'src/consts/Ribbons'
 import { getPublicImageURL } from 'src/images/images'
@@ -64,10 +64,10 @@ function itemMetadataToSelectOption(metadata: ItemMetadata): SelectOption {
 }
 
 function itemIndexToSelectOption(index: number): SelectOption {
-  const parsed = ItemIndex.fromIndex(index)
-  if (!parsed) return { id: index, label: '' }
+  const item = Item.fromIndex(index)
+  if (!item) return { id: index, label: '' }
 
-  return itemMetadataToSelectOption(parsed.getMetadata())
+  return itemMetadataToSelectOption(item.getMetadata())
 }
 
 export default function FilterPanel() {
@@ -114,9 +114,9 @@ export default function FilterPanel() {
   )
 
   return (
-    <Card style={{ contain: 'none', padding: 4 }}>
+    <div style={{ contain: 'none', padding: 4 }}>
       <Flex direction="row" justify="between" p="4px 4px 0px 4px">
-        <Text size="4" weight="bold">
+        <Text size="3" weight="bold">
           Filter
         </Text>
         <Button
@@ -207,7 +207,7 @@ export default function FilterPanel() {
             currentItem.type === 'specific_item' && (
               <img
                 alt="item icon"
-                src={getPublicImageURL(getItemIconPath(currentItem.id, 'PK9'))}
+                src={getPublicImageURL(getItemIconPath(currentItem.id))}
                 style={{ width: 24, height: 24 }}
                 onError={(e) => {
                   ;(e.target as HTMLImageElement).src = getPublicImageURL(`items/index/0000.png`)
@@ -332,6 +332,6 @@ export default function FilterPanel() {
           }
         />
       </Flex>
-    </Card>
+    </div>
   )
 }

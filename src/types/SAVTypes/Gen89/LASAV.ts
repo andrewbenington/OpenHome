@@ -91,6 +91,15 @@ export class LASAV extends G89SAV<PA8> {
     return !isRestricted(LA_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)
   }
 
+  supportsItem(_: number) {
+    // max supported item is Legend Plate if future functionality allows for direcly
+    // adding to the game's satchel, but for now this will always return false because
+    // there are no held Items
+
+    // return itemIndex <= Item.LegendPlate
+    return false
+  }
+
   getCurrentBox() {
     return this.boxes[this.currentPCBox]
   }

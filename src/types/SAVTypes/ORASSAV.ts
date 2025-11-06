@@ -1,5 +1,6 @@
 import { OriginGame } from '@pkm-rs-resources/pkg'
 import { ORAS_TRANSFER_RESTRICTIONS } from 'src/consts/TransferRestrictions'
+import { Item } from '../../consts/Items'
 import { isRestricted } from '../TransferRestrictions'
 import { G6SAV } from './G6SAV'
 import { PathData } from './path'
@@ -17,6 +18,10 @@ export class ORASSAV extends G6SAV {
 
   supportsMon(dexNumber: number, formeNumber: number): boolean {
     return !isRestricted(ORAS_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)
+  }
+
+  supportsItem(itemIndex: number) {
+    return itemIndex <= Item.EonFlute
   }
 
   static fileIsSave(bytes: Uint8Array): boolean {

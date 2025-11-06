@@ -5,7 +5,6 @@ import {
   DefenseCharacteristics,
   HPCharacteristics,
   HPCharacteristicsPre6,
-  Item,
   Moves,
   SpecialAtkCharacteristics,
   SpecialDefCharacteristics,
@@ -27,6 +26,7 @@ import {
   SpeciesAndForme,
   SpeciesLookup,
 } from '../../../pkm_rs_resources/pkg/pkm_rs_resources'
+import { Item } from '../../consts/Items'
 import { PKMInterface } from '../interfaces'
 import { OHPKM } from './OHPKM'
 
@@ -471,36 +471,38 @@ export function getWeightCalculated(mon: PKMInterface) {
   return formeMetadata.baseWeight * 10 * deviation
 }
 
-export function isMegaStone(item?: Item): boolean {
+export function isMegaStone(itemIndex?: number): boolean {
   return (
-    item !== undefined &&
-    ((item >= Item.Gengarite && item <= Item.Latiosite) ||
-      (item >= Item.Swampertite && item <= Item.Beedrillite))
+    itemIndex !== undefined &&
+    ((itemIndex >= Item.Gengarite && itemIndex <= Item.Latiosite) ||
+      (itemIndex >= Item.Swampertite && itemIndex <= Item.Beedrillite) ||
+      (itemIndex >= Item.Clefablite && itemIndex <= Item.Froslassite) ||
+      (itemIndex >= Item.Emboarite && itemIndex <= Item.Drampanite) ||
+      (itemIndex as number) === Item.Falinksite)
   )
 }
 
-export function isZCrystal(item: Item) {
+export function isZCrystal(itemIndex: number) {
   return (
-    (item >= Item.NormaliumZ && item <= Item.PikaniumZ) ||
-    (item >= Item.DecidiumZ && item <= Item.PikashuniumZ_1) ||
-    (item >= Item.SolganiumZ && item <= Item.KommoniumZ_1)
+    (itemIndex >= Item.NormaliumZ && itemIndex <= Item.PikaniumZ) ||
+    (itemIndex >= Item.DecidiumZ && itemIndex <= Item.PikashuniumZ_2) ||
+    (itemIndex >= Item.SolganiumZ && itemIndex <= Item.KommoniumZ_2)
   )
 }
 
-export function isBattleFormeItem(item?: Item) {
+export function isBattleFormeItem(nationalDex: number, itemIndex?: number) {
   return (
-    isMegaStone(item) ||
-    item === Item.UltranecroziumZ ||
-    item === Item.UltranecroziumZ_1 ||
-    item === Item.RedOrb ||
-    item === Item.BlueOrb ||
-    item === Item.RustedSword ||
-    item === Item.RustedShield
+    (nationalDex === NationalDex.Necrozma &&
+      (itemIndex === Item.UltranecroziumZ_1 || itemIndex === Item.UltranecroziumZ_2)) ||
+    (nationalDex === NationalDex.Groudon && itemIndex === Item.RedOrb) ||
+    (nationalDex === NationalDex.Kyogre && itemIndex === Item.BlueOrb) ||
+    (nationalDex === NationalDex.Zacian && itemIndex === Item.RustedSword) ||
+    (nationalDex === NationalDex.Zamazenta && itemIndex === Item.RustedShield)
   )
 }
 
-export function displayIndexAdder(item?: Item) {
-  if (item === Item.UltranecroziumZ || item === Item.UltranecroziumZ_1) {
+export function displayIndexAdder(itemIndex?: number) {
+  if (itemIndex === Item.UltranecroziumZ_1 || itemIndex === Item.UltranecroziumZ_2) {
     return (x: number) => x + 3
   }
   return (x: number) => x + 1

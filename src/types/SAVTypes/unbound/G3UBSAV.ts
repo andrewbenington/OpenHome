@@ -1,3 +1,4 @@
+import { ItemUnbound } from '@pkm-rs-resources/pkg'
 import { NationalDex } from 'src/consts/NationalDex'
 import { bytesToUint32LittleEndian } from '../../../util/byteLogic'
 import { isRestricted, TransferRestrictions } from '../../TransferRestrictions'
@@ -21,6 +22,10 @@ export class G3UBSAV extends G3CFRUSAV<PK3UB> {
 
   supportsMon(dexNumber: number, formeNumber: number) {
     return !isRestricted(UB_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)
+  }
+
+  supportsItem(itemIndex: number) {
+    return ItemUnbound.fromModern(itemIndex) !== undefined
   }
 
   getPluginIdentifier() {

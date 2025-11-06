@@ -389,7 +389,14 @@ function BoxMons() {
     })
   }
 
-  const dragData: MonWithLocation | undefined = useMemo(() => dragMonState.payload, [dragMonState])
+  const dragData: MonWithLocation | undefined = useMemo(() => {
+    const payload = dragMonState.payload
+
+    if (payload?.kind === 'mon') {
+      return payload.monData
+    }
+    return undefined
+  }, [dragMonState])
 
   const currentBox = useMemo(
     () => homeData?.boxes[homeData.currentPCBox],

@@ -12,7 +12,6 @@ export interface PokemonIconProps extends HTMLAttributes<HTMLDivElement> {
   formeNumber?: number
   isShiny?: boolean
   heldItemIndex?: number
-  heldItemFormat?: string
   greyedOut?: boolean
   silhouette?: boolean
 }
@@ -27,16 +26,8 @@ function getBackgroundPosition(formeMetadata?: FormeMetadata) {
 }
 
 export default function PokemonIcon(props: PokemonIconProps) {
-  const {
-    dexNumber,
-    formeNumber,
-    isShiny,
-    heldItemIndex,
-    heldItemFormat,
-    greyedOut,
-    silhouette,
-    ...attributes
-  } = props
+  const { dexNumber, formeNumber, isShiny, heldItemIndex, greyedOut, silhouette, ...attributes } =
+    props
 
   const formeMetadata = MetadataLookup(dexNumber, formeNumber ?? 0)
 
@@ -51,7 +42,6 @@ export default function PokemonIcon(props: PokemonIconProps) {
         formeNumber={formeNumber}
         isShiny={isShiny}
         heldItemIndex={heldItemIndex}
-        heldItemFormat={heldItemFormat}
         greyedOut={greyedOut}
         silhouette={silhouette}
         {...attributes}
@@ -102,7 +92,7 @@ export default function PokemonIcon(props: PokemonIconProps) {
         <img
           alt="item icon"
           draggable={false}
-          src={getPublicImageURL(getItemIconPath(heldItemIndex, heldItemFormat ?? 'PK9'))}
+          src={getPublicImageURL(getItemIconPath(heldItemIndex))}
           style={{
             position: 'absolute',
             width: '50%',
@@ -122,16 +112,8 @@ export default function PokemonIcon(props: PokemonIconProps) {
 }
 
 function PokemonIconUsingSprite(props: PokemonIconProps) {
-  const {
-    dexNumber,
-    formeNumber,
-    isShiny,
-    heldItemIndex,
-    heldItemFormat,
-    greyedOut,
-    silhouette,
-    ...attributes
-  } = props
+  const { dexNumber, formeNumber, isShiny, heldItemIndex, greyedOut, silhouette, ...attributes } =
+    props
 
   const spriteResult = useMonSprite({
     dexNum: dexNumber,
@@ -187,7 +169,7 @@ function PokemonIconUsingSprite(props: PokemonIconProps) {
         <img
           alt="item icon"
           draggable={false}
-          src={getPublicImageURL(getItemIconPath(heldItemIndex, heldItemFormat ?? 'PK9'))}
+          src={getPublicImageURL(getItemIconPath(heldItemIndex))}
           style={{
             position: 'absolute',
             width: '50%',

@@ -1,5 +1,6 @@
 import { OriginGame } from '@pkm-rs-resources/pkg'
 import { USUM_TRANSFER_RESTRICTIONS } from 'src/consts/TransferRestrictions'
+import { Item } from '../../consts/Items'
 import { isRestricted } from '../TransferRestrictions'
 import { G7SAV } from './G7SAV'
 import { PathData } from './path'
@@ -20,6 +21,10 @@ export class USUMSAV extends G7SAV {
 
   supportsMon(dexNumber: number, formeNumber: number): boolean {
     return !isRestricted(USUM_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)
+  }
+
+  supportsItem(itemIndex: number) {
+    return itemIndex <= Item.RotoCatch
   }
 
   static fileIsSave(bytes: Uint8Array): boolean {

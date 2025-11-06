@@ -3,6 +3,7 @@ import { PK4 } from '@pokemon-files/pkm'
 import { DP_TRANSFER_RESTRICTIONS } from 'src/consts/TransferRestrictions'
 import { bytesToUint16LittleEndian, bytesToUint32LittleEndian } from 'src/util/byteLogic'
 import { gen4StringToUTF } from 'src/util/Strings/StringConverter'
+import { Item } from '../../consts/Items'
 import { isRestricted } from '../TransferRestrictions'
 import { G4SAV } from './G4SAV'
 import { PathData } from './path'
@@ -68,6 +69,10 @@ export class DPSAV extends G4SAV {
 
   supportsMon(dexNumber: number, formeNumber: number) {
     return !isRestricted(DP_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)
+  }
+
+  supportsItem(itemIndex: number) {
+    return itemIndex <= Item.SecretPotion
   }
 
   static saveTypeName = 'Pokémon Diamond/Pearl'
