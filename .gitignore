@@ -25,6 +25,7 @@ tester.sh
 # python
 *.pyc
 __pycache__/
+.venv/
 
 *.log*
 .env

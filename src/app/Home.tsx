@@ -1,14 +1,16 @@
 import { Generation, OriginGame, OriginGames } from '@pkm-rs-resources/pkg'
 import { bytesToPKMInterface } from '@pokemon-files/pkm'
-import { Button, Flex } from '@radix-ui/themes'
+import { Badge, Button, Card, Flex, Tabs } from '@radix-ui/themes'
 import * as E from 'fp-ts/lib/Either'
 import lodash, { flatten } from 'lodash'
 import { useCallback, useContext, useEffect, useState } from 'react'
 import { MdFileOpen } from 'react-icons/md'
 import PokemonDetailsModal from 'src/pokemon/PokemonDetailsModal'
 import BankHeader from 'src/saves/BankHeader'
+import ItemBag from 'src/saves/ItemBag'
+import { ItemBagContext } from 'src/state/itemBag'
 import { displayIndexAdder, isBattleFormeItem } from 'src/types/pkm/util'
-import { Errorable, LookupMap } from 'src/types/types'
+import { CSSWithVariables, Errorable, LookupMap } from 'src/types/types'
 import { filterUndefined } from 'src/util/Sort'
 import { BackendContext } from '../backend/backendContext'
 import FilterPanel from '../components/filter/FilterPanel'
@@ -28,6 +30,7 @@ import ReleaseArea from './home/ReleaseArea'
 const Home = () => {
   const [openSavesState, openSavesDispatch, allOpenSaves] = useContext(OpenSavesContext)
   const [persistedPkmState, persistedPkmDispatch] = useContext(PersistedPkmDataContext)
+  const [itemBagState, bagDispatch] = useContext(ItemBagContext)
   const backend = useContext(BackendContext)
   const [selectedMon, setSelectedMon] = useState<PKMInterface>()
   const [openSaveDialog, setOpenSaveDialog] = useState(false)
@@ -60,7 +63,7 @@ const Home = () => {
         status: mon.isShiny() ? 'ShinyCaught' : 'Caught',
       })
 
-      if (isBattleFormeItem(mon.heldItemIndex)) {
+      if (isBattleFormeItem(mon.dexNum, mon.heldItemIndex)) {
         pokedexUpdates.push({
           dexNumber: mon.dexNum,
           formeNumber: displayIndexAdder(mon.heldItemIndex)(mon.formeNum),
@@ -154,6 +157,16 @@ const Home = () => {
       ),
     ]
 
+    if (itemBagState.modified) {
+      const saveBagResult = await backend.saveItemBag(itemBagState.itemCounts)
+      if (E.isLeft(saveBagResult)) {
+        displayError('Error Saving Bag', saveBagResult.left)
+        await backend.rollbackTransaction()
+        return
+      }
+      bagDispatch({ type: 'clear_modified' })
+    }
+
     const results = flatten(await Promise.all(promises))
     const errors = results.filter(E.isLeft).map((err) => err.left)
 
@@ -179,15 +192,20 @@ const Home = () => {
       )
     )
   }, [
-    allOpenSaves,
+    openSavesState.homeData,
+    openSavesState.modifiedOHPKMs,
+    openSavesState.monsToRelease,
+    persistedPkmState.loaded,
     backend,
-    loadAllHomeData,
-    loadAllLookups,
-    persistedPkmDispatch,
-    persistedPkmState,
+    allOpenSaves,
+    itemBagState.modified,
+    itemBagState.itemCounts,
     openSavesDispatch,
-    openSavesState,
+    persistedPkmDispatch,
+    loadAllLookups,
     displayError,
+    bagDispatch,
+    loadAllHomeData,
   ])
 
   useEffect(() => {
@@ -209,7 +227,7 @@ const Home = () => {
     return () => {
       stopListening()
     }
-  }, [backend, saveChanges, persistedPkmState, openSavesDispatch, loadAllHomeData])
+  }, [backend, saveChanges, persistedPkmState, openSavesDispatch, loadAllHomeData, bagDispatch])
 
   const previewFile = useCallback(
     async (file: File) => {
@@ -256,6 +274,28 @@ const Home = () => {
     }
   }, [persistedPkmState.loaded, persistedPkmState.error, loadAllLookups])
 
+  // load bag
+  useEffect(() => {
+    if (!itemBagState.loaded && !itemBagState.error) {
+      backend.loadItemBag().then(
+        E.match(
+          (err) => {
+            bagDispatch({ type: 'set_error', payload: err })
+          },
+          (bagObj) => {
+            bagDispatch({ type: 'load_item_bag', payload: bagObj })
+          }
+        )
+      )
+    }
+  }, [backend, itemBagState.loaded, itemBagState.error, bagDispatch])
+
+  const tabStyle: CSSWithVariables = {
+    '--tab-padding-x': '6px',
+    '--tab-inner-padding-y': '2px',
+    '--tab-height': '32px',
+  }
+
   return (
     <Flex direction="row" style={{ height: '100%' }}>
       <Flex className="save-file-column" gap="3">
@@ -280,14 +320,32 @@ const Home = () => {
           <HomeBoxDisplay />
         </Flex>
       </div>
-      <Flex gap="2" className="right-column">
-        <FilterPanel />
+      <Flex gap="2" className="right-column" direction="column">
+        <Card style={{ minHeight: '50%', maxHeight: '60%', padding: 0 }}>
+          <Tabs.Root style={{ flex: 1, height: '100%' }} defaultValue="filter">
+            <Tabs.List size="2" style={tabStyle}>
+              <Tabs.Trigger value="filter">Filter</Tabs.Trigger>
+              <Tabs.Trigger value="bag">
+                Item Bag <Badge style={{ marginLeft: 4, marginRight: -4 }}>BETA</Badge>
+              </Tabs.Trigger>
+            </Tabs.List>
+
+            <Tabs.Content value="filter" style={{ flexGrow: 1 }}>
+              <FilterPanel />
+            </Tabs.Content>
+
+            <Tabs.Content value="bag" style={{ maxHeight: 'calc(100% - 32px)', overflow: 'auto' }}>
+              <ItemBag />
+            </Tabs.Content>
+          </Tabs.Root>
+        </Card>
         <div
           className="drop-area"
           onDrop={(e) => e.dataTransfer.files.length && previewFile(e.dataTransfer.files[0])}
         >
           <div className="drop-area-text diagonal-clip">Preview</div>
         </div>
+
         <ReleaseArea />
       </Flex>
       <PokemonDetailsModal mon={selectedMon} onClose={() => setSelectedMon(undefined)} />

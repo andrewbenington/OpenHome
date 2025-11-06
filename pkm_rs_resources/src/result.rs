@@ -26,7 +26,7 @@ pub enum Error {
     AbilityIndex {
         ability_index: u16,
     },
-    ItemIndex {
+    Item {
         item_index: u16,
     },
     FieldError {
@@ -66,7 +66,7 @@ impl Display for Error {
                 format!("Invalid ability index {ability_index} (must be between 1 and {ABILITY_MAX}")
                     .to_owned()
             }
-            Error::ItemIndex { item_index } => {
+            Error::Item { item_index } => {
                 format!("Invalid item index {item_index} (must be between 1 and {ITEM_MAX}")
                     .to_owned()
             }

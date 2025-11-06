@@ -1,4 +1,4 @@
-import { OriginGame } from '@pkm-rs-resources/pkg'
+import { ItemGen3, OriginGame } from '@pkm-rs-resources/pkg'
 import { PK3 } from '@pokemon-files/pkm'
 import { NationalDex } from 'src/consts/NationalDex'
 import { GEN3_TRANSFER_RESTRICTIONS } from 'src/consts/TransferRestrictions'
@@ -331,6 +331,10 @@ export class G3SAV extends OfficialSAV<PK3> {
 
   supportsMon(dexNumber: number, formeNumber: number) {
     return dexNumber <= NationalDex.Deoxys && (formeNumber === 0 || dexNumber === NationalDex.Unown)
+  }
+
+  supportsItem(itemIndex: number) {
+    return ItemGen3.fromModern(itemIndex) !== undefined
   }
 
   getCurrentBox() {

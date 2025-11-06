@@ -3,6 +3,7 @@ import { PK4 } from '@pokemon-files/pkm'
 import { HGSS_TRANSFER_RESTRICTIONS } from 'src/consts/TransferRestrictions'
 import { bytesToUint16LittleEndian, bytesToUint32LittleEndian } from 'src/util/byteLogic'
 import { gen4StringToUTF } from 'src/util/Strings/StringConverter'
+import { Item } from '../../consts/Items'
 import { isRestricted } from '../TransferRestrictions'
 import { G4SAV } from './G4SAV'
 import { PathData } from './path'
@@ -72,6 +73,10 @@ export class HGSSSAV extends G4SAV {
 
   supportsMon(dexNumber: number, formeNumber: number) {
     return !isRestricted(HGSS_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)
+  }
+
+  supportsItem(itemIndex: number) {
+    return itemIndex <= Item.EnigmaStone
   }
 
   static saveTypeName = 'Pokémon HeartGold/SoulSilver'

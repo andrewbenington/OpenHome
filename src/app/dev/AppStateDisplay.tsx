@@ -1,4 +1,4 @@
-import { OriginGames, SpeciesLookup } from '@pkm-rs-resources/pkg'
+import { Item, OriginGames, SpeciesLookup } from '@pkm-rs-resources/pkg'
 import { Card, Flex, Heading, Separator } from '@radix-ui/themes'
 import * as E from 'fp-ts/lib/Either'
 import { useContext, useEffect, useState } from 'react'
@@ -8,6 +8,7 @@ import { DevDataDisplay } from 'src/components/DevDataDisplay'
 import { InfoGrid } from 'src/components/InfoGrid2'
 import useDisplayError from 'src/hooks/displayError'
 import { AppInfoContext, AppInfoState } from 'src/state/appInfo'
+import { ItemBagContext, ItemBagState } from 'src/state/itemBag'
 import { OpenSavesContext, OpenSavesState } from 'src/state/openSaves'
 import { PKMInterface } from 'src/types/interfaces'
 import { ErrorContext } from '../../state/error'
@@ -17,6 +18,7 @@ export default function AppStateDisplay() {
   const [appInfoState] = useContext(AppInfoContext)
   const [openSavesState] = useContext(OpenSavesContext)
   const [errorState, dispatchErrorState] = useContext(ErrorContext)
+  const [bagState] = useContext(ItemBagContext)
   const backend = useContext(BackendContext)
   const [error, setError] = useState<string>()
   const displayError = useDisplayError()
@@ -46,6 +48,7 @@ export default function AppStateDisplay() {
       <Card style={{ margin: 8, display: 'flex', flexDirection: 'row', gap: 8 }}>
         <DevDataDisplay data={appInfoDisplay(appInfoState)} label="App Info State" />
         <DevDataDisplay data={openSavesDisplay(openSavesState)} label="Saves/Mons State" />
+        <DevDataDisplay data={bagDisplay(bagState)} label="Bag State" />
         <DevDataDisplay data={errorState} label="Error State" />
         <button
           onClick={() =>
@@ -92,5 +95,17 @@ function monDisplay(mon: PKMInterface) {
     forme: species?.formes[mon.formeNum ?? 0].formeName,
     nickname: mon.nickname,
     origin: mon.gameOfOrigin ? `Pokémon ${OriginGames.gameName(mon.gameOfOrigin)}` : undefined,
+  }
+}
+
+function bagDisplay(state: ItemBagState) {
+  return {
+    Loaded: state.loaded,
+    Modified: state.modified,
+    Error: state.error ?? 'None',
+    Items: Object.entries(state.itemCounts).map(([indexStr, qty]) => ({
+      name: Item.fromIndex(parseInt(indexStr)),
+      qty,
+    })),
   }
 }

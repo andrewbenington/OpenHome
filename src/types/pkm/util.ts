@@ -26,6 +26,7 @@ import {
   SpeciesAndForme,
   SpeciesLookup,
 } from '../../../pkm_rs_resources/pkg/pkm_rs_resources'
+import { Item } from '../../consts/Items'
 import { PKMInterface } from '../interfaces'
 import { OHPKM } from './OHPKM'
 
@@ -470,55 +471,38 @@ export function getWeightCalculated(mon: PKMInterface) {
   return formeMetadata.baseWeight * 10 * deviation
 }
 
-const GENGARITE = 656
-const LATIOSITE = 685
-const SWAMPERTITE = 752
-const BEEDRILLITE = 770
-
 export function isMegaStone(itemIndex?: number): boolean {
   return (
     itemIndex !== undefined &&
-    ((itemIndex >= GENGARITE && itemIndex <= LATIOSITE) ||
-      (itemIndex >= SWAMPERTITE && itemIndex <= BEEDRILLITE))
+    ((itemIndex >= Item.Gengarite && itemIndex <= Item.Latiosite) ||
+      (itemIndex >= Item.Swampertite && itemIndex <= Item.Beedrillite) ||
+      (itemIndex >= Item.Clefablite && itemIndex <= Item.Froslassite) ||
+      (itemIndex >= Item.Emboarite && itemIndex <= Item.Drampanite) ||
+      (itemIndex as number) === Item.Falinksite)
   )
 }
-
-const NORMALIUM_Z = 776
-const PIKANIUM_Z = 794
-const DECIDIUM_Z = 798
-const PIKASHUNIUM_Z_2 = 836
-const SOLGANIUM_Z = 921
-const KOMMONIUM_Z_2 = 932
 
 export function isZCrystal(itemIndex: number) {
   return (
-    (itemIndex >= NORMALIUM_Z && itemIndex <= PIKANIUM_Z) ||
-    (itemIndex >= DECIDIUM_Z && itemIndex <= PIKASHUNIUM_Z_2) ||
-    (itemIndex >= SOLGANIUM_Z && itemIndex <= KOMMONIUM_Z_2)
+    (itemIndex >= Item.NormaliumZ && itemIndex <= Item.PikaniumZ) ||
+    (itemIndex >= Item.DecidiumZ && itemIndex <= Item.PikashuniumZ_2) ||
+    (itemIndex >= Item.SolganiumZ && itemIndex <= Item.KommoniumZ_2)
   )
 }
 
-const ULTRANECROZIUM_Z_1 = 923
-const ULTRANECROZIUM_Z_2 = 929
-const RED_ORB = 534
-const BLUE_ORB = 535
-const RUSTED_SWORD = 1103
-const RUSTED_SHIELD = 1104
-
-export function isBattleFormeItem(itemIndex?: number) {
+export function isBattleFormeItem(nationalDex: number, itemIndex?: number) {
   return (
-    isMegaStone(itemIndex) ||
-    itemIndex === ULTRANECROZIUM_Z_1 ||
-    itemIndex === ULTRANECROZIUM_Z_2 ||
-    itemIndex === RED_ORB ||
-    itemIndex === BLUE_ORB ||
-    itemIndex === RUSTED_SWORD ||
-    itemIndex === RUSTED_SHIELD
+    (nationalDex === NationalDex.Necrozma &&
+      (itemIndex === Item.UltranecroziumZ_1 || itemIndex === Item.UltranecroziumZ_2)) ||
+    (nationalDex === NationalDex.Groudon && itemIndex === Item.RedOrb) ||
+    (nationalDex === NationalDex.Kyogre && itemIndex === Item.BlueOrb) ||
+    (nationalDex === NationalDex.Zacian && itemIndex === Item.RustedSword) ||
+    (nationalDex === NationalDex.Zamazenta && itemIndex === Item.RustedShield)
   )
 }
 
 export function displayIndexAdder(itemIndex?: number) {
-  if (itemIndex === ULTRANECROZIUM_Z_1 || itemIndex === ULTRANECROZIUM_Z_2) {
+  if (itemIndex === Item.UltranecroziumZ_1 || itemIndex === Item.UltranecroziumZ_2) {
     return (x: number) => x + 3
   }
   return (x: number) => x + 1
