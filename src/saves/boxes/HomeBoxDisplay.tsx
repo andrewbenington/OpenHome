@@ -18,7 +18,7 @@ import { AddIcon, DevIcon, EditIcon, MenuIcon, MoveIcon, RemoveIcon } from 'src/
 import PokemonDetailsModal from 'src/pokemon/PokemonDetailsModal'
 import { ErrorContext } from 'src/state/error'
 import { PersistedPkmDataContext } from 'src/state/persistedPkmData'
-import { MonLocation, MonWithLocation, OpenSavesContext } from 'src/state/saves/openSaves'
+import { MonLocation, MonWithLocation, SavesContext } from 'src/state/saves/openSaves'
 import { PKMInterface } from 'src/types/interfaces'
 import { OHPKM } from 'src/types/pkm/OHPKM'
 import { SortTypes } from 'src/types/pkm/sort'
@@ -58,7 +58,7 @@ type BoxViewMode = 'one' | 'all'
 const ALLOW_DUPE_IMPORT = true
 
 export default function HomeBoxDisplay() {
-  const [openSavesState, openSavesDispatch] = useContext(OpenSavesContext)
+  const [openSavesState, openSavesDispatch] = useContext(SavesContext)
   const [editing, setEditing] = useState(false)
   const [moving, setMoving] = useState(false)
   const [deleting, setDeleting] = useState(false)
@@ -295,7 +295,7 @@ export default function HomeBoxDisplay() {
 
 function BoxMons() {
   const [{ homeMons }] = useContext(PersistedPkmDataContext)
-  const [{ homeData }, openSavesDispatch] = useContext(OpenSavesContext)
+  const [{ homeData }, openSavesDispatch] = useContext(SavesContext)
   const [, dispatchError] = useContext(ErrorContext)
   const [selectedIndex, setSelectedIndex] = useState<number>()
   const [dragMonState] = useContext(DragMonContext)
@@ -481,7 +481,7 @@ function AllBoxes(props: {
   debugMode?: boolean
 }) {
   const { onBoxSelect, moving, deleting, debugMode } = props
-  const [{ homeData }, openSavesDispatch] = useContext(OpenSavesContext)
+  const [{ homeData }, openSavesDispatch] = useContext(SavesContext)
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
     useSensor(KeyboardSensor, {
@@ -554,7 +554,7 @@ type BoxOverviewProps = {
 }
 
 function BoxOverview({ box, onBoxSelect, debugMode, deleting }: BoxOverviewProps) {
-  const [{ homeData }, openSavesDispatch] = useContext(OpenSavesContext)
+  const [{ homeData }, openSavesDispatch] = useContext(SavesContext)
 
   if (!homeData || !box) return <div />
 

@@ -9,7 +9,7 @@ import SideTabs from 'src/components/side-tabs/SideTabs'
 import useDisplayError from 'src/hooks/displayError'
 import { AppInfoAction, AppInfoContext } from 'src/state/appInfo'
 import { PersistedPkmDataContext } from 'src/state/persistedPkmData'
-import { OpenSavesContext } from 'src/state/saves/openSaves'
+import { SavesContext } from 'src/state/saves/openSaves'
 import { displayIndexAdder, isBattleFormeItem } from 'src/types/pkm/util'
 import { PokedexUpdate } from 'src/types/pokedex'
 import { buildSaveFile, getPossibleSaveTypes } from 'src/types/SAVTypes/load'
@@ -44,7 +44,7 @@ const debouncedUpdateCardSize = debounce(
 
 function useOpenSaveHandler(onClose?: () => void) {
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
-  const [, dispatchOpenSaves] = useContext(OpenSavesContext)
+  const [, dispatchOpenSaves] = useContext(SavesContext)
   const [tentativeSaveData, setTentativeSaveData] = useState<AmbiguousOpenState>()
   const backend = useContext(BackendContext)
   const [lookupState] = useContext(PersistedPkmDataContext)

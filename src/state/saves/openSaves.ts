@@ -547,7 +547,7 @@ const initialState: OpenSavesState = {
   openSaves: {},
 }
 
-export const OpenSavesContext = createContext<[OpenSavesState, Dispatch<OpenSavesAction>, SAV[]]>([
+export const SavesContext = createContext<[OpenSavesState, Dispatch<OpenSavesAction>, SAV[]]>([
   initialState,
   () => {},
   [],

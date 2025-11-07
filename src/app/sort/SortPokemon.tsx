@@ -9,7 +9,7 @@ import { filterUndefined } from 'src/util/Sort'
 import Autocomplete from '../../components/Autocomplete'
 import PokemonIcon from '../../components/PokemonIcon'
 import { PersistedPkmDataContext } from '../../state/persistedPkmData'
-import { OpenSavesContext } from '../../state/saves/openSaves'
+import { SavesContext } from '../../state/saves/openSaves'
 import { PKMInterface } from '../../types/interfaces'
 
 function getInnerSortFunction(
@@ -22,7 +22,7 @@ function getInnerSortFunction(
 
 export default function SortPokemon() {
   const [{ homeMons }] = useContext(PersistedPkmDataContext)
-  const [{ homeData }, , openSaves] = useContext(OpenSavesContext)
+  const [{ homeData }, , openSaves] = useContext(SavesContext)
   const [openSaveDialog, setOpenSaveDialog] = useState(false)
   const [selectedIndex, setSelectedIndex] = useState<number>()
   const [sort, setSort] = useState<SortType>('')

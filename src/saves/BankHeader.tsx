@@ -11,13 +11,13 @@ import {
 import { useContext, useState } from 'react'
 import { EditIcon } from 'src/components/Icons'
 import { PersistedPkmDataContext } from 'src/state/persistedPkmData'
-import { OpenSavesContext } from 'src/state/saves/openSaves'
+import { SavesContext } from 'src/state/saves/openSaves'
 import { HomeData } from 'src/types/SAVTypes/HomeData'
 import { getBankName } from 'src/types/storage'
 import ToggleButton from '../components/ToggleButton'
 
 export default function BankHeader() {
-  const [openSavesState, openSavesDispatch] = useContext(OpenSavesContext)
+  const [openSavesState, openSavesDispatch] = useContext(SavesContext)
   const [editing, setEditing] = useState(false)
   const [bankNameEditValue, setBankNameEditValue] = useState('')
 
@@ -87,7 +87,7 @@ function removeNonDigits(input: string): string {
 
 function BankSelector(props: { homeData: HomeData; disabled?: boolean }) {
   const { homeData, disabled } = props
-  const [, openSavesDispatch] = useContext(OpenSavesContext)
+  const [, openSavesDispatch] = useContext(SavesContext)
   const [pkmDataState] = useContext(PersistedPkmDataContext)
   const [newBankName, setNewBankName] = useState<string>()
   const [newBankBoxCount, setNewBankBoxCount] = useState('30')

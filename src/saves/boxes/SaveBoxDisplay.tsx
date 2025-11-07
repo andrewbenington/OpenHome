@@ -9,7 +9,7 @@ import AttributeRow from 'src/pokemon/AttributeRow'
 import PokemonDetailsModal from 'src/pokemon/PokemonDetailsModal'
 import { ErrorContext } from 'src/state/error'
 import { PersistedPkmDataContext } from 'src/state/persistedPkmData'
-import { MonLocation, OpenSavesContext } from 'src/state/saves/openSaves'
+import { MonLocation, SavesContext } from 'src/state/saves/openSaves'
 import { PKMInterface } from 'src/types/interfaces'
 import { OHPKM } from 'src/types/pkm/OHPKM'
 import { getMonFileIdentifier } from 'src/util/Lookup'
@@ -26,7 +26,7 @@ interface OpenSaveDisplayProps {
 const ALLOW_DUPE_IMPORT = true
 
 const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
-  const [, openSavesDispatch, openSaves] = useContext(OpenSavesContext)
+  const [, openSavesDispatch, openSaves] = useContext(SavesContext)
   const [{ homeMons }] = useContext(PersistedPkmDataContext)
   const [, dispatchError] = useContext(ErrorContext)
   const [detailsModal, setDetailsModal] = useState(false)

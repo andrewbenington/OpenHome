@@ -10,7 +10,7 @@ import useDisplayError from '../hooks/displayError'
 import { AppInfoContext } from '../state/appInfo'
 import { useLookups } from '../state/lookups'
 import { PersistedPkmDataContext } from '../state/persistedPkmData'
-import { OpenSavesContext } from '../state/saves/openSaves'
+import { SavesContext } from '../state/saves/openSaves'
 import { PathData, splitPath } from '../types/SAVTypes/path'
 import SaveCard from './SaveCard'
 import { filterEmpty, SaveViewMode } from './util'
@@ -28,7 +28,7 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
   const [suggestedSaves, setSuggestedSaves] = useState<SAV[]>()
   const [{ homeMons: homeMonMap }] = useContext(PersistedPkmDataContext)
   const { getLookups } = useLookups()
-  const [, , openSaves] = useContext(OpenSavesContext)
+  const [, , openSaves] = useContext(SavesContext)
   const [error, setError] = useState(false)
   const displayError = useDisplayError()
 

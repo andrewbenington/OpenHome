@@ -19,8 +19,7 @@ import { ErrorContext, errorReducer } from '../state/error'
 import { FilterContext, filterReducer } from '../state/filter'
 import { MouseContext, mouseReducer } from '../state/mouse'
 import { PersistedPkmDataContext, persistedPkmDataReducer } from '../state/persistedPkmData'
-import { OpenSavesContext, openSavesReducer } from '../state/saves/openSaves'
-import { HomeData } from '../types/SAVTypes/HomeData'
+import SavesProvider from '../state/saves/SavesProvider'
 import './App.css'
 import AppTabs from './AppTabs'
 import ErrorMessageModal from './ErrorMessage'
@@ -90,12 +89,6 @@ function AppWithBackend() {
 
   const backend = useContext(BackendContext)
   const displayError = useDisplayError()
-
-  const [openSavesState, openSavesDispatch] = useReducer(openSavesReducer, {
-    modifiedOHPKMs: {},
-    monsToRelease: [],
-    openSaves: {},
-  })
 
   // only on app start
   useEffect(() => {
@@ -176,18 +169,8 @@ function AppWithBackend() {
       <AppInfoContext.Provider value={[appInfoState, appInfoDispatch, getEnabledSaveTypes]}>
         <MouseContext.Provider value={[mouseState, mouseDispatch]}>
           <PersistedPkmDataContext.Provider value={[lookupState, lookupDispatch]}>
-            <OpenSavesContext.Provider
-              value={[
-                openSavesState,
-                openSavesDispatch,
-                Object.values(openSavesState.openSaves)
-                  .filter((data) => !!data)
-                  .filter((data) => !(data.save instanceof HomeData))
-                  .sort((a, b) => a.index - b.index)
-                  .map((data) => data.save),
-              ]}
-            >
-              <ItemBagContext.Provider value={[bagState, bagDispatch]}>
+            <ItemBagContext.Provider value={[bagState, bagDispatch]}>
+              <SavesProvider>
                 <DragMonContext.Provider value={[dragMonState, dragMonDispatch]}>
                   <PokemonDragContextProvider>
                     <FilterContext.Provider value={[filterState, filterDispatch]}>
@@ -204,8 +187,8 @@ function AppWithBackend() {
                     </FilterContext.Provider>
                   </PokemonDragContextProvider>
                 </DragMonContext.Provider>
-              </ItemBagContext.Provider>
-            </OpenSavesContext.Provider>
+              </SavesProvider>
+            </ItemBagContext.Provider>
           </PersistedPkmDataContext.Provider>
         </MouseContext.Provider>
       </AppInfoContext.Provider>
