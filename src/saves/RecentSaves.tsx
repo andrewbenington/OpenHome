@@ -11,7 +11,7 @@ import { ErrorIcon } from '../components/Icons'
 import OHDataGrid, { SortableColumn } from '../components/OHDataGrid'
 import useDisplayError from '../hooks/displayError'
 import { AppInfoContext } from '../state/appInfo'
-import { SavesContext } from '../state/saves/openSaves'
+import { useSaves } from '../state/saves/useSaves'
 import SaveCard from './SaveCard'
 import SaveDetailsMenu from './SaveDetailsMenu'
 import { formatTime, formatTimeSince, SaveViewMode } from './util'
@@ -26,7 +26,7 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
   const { onOpen, view, cardSize } = props
   const backend = useContext(BackendContext)
   const [recentSaves, setRecentSaves] = useState<Record<string, SaveRef>>()
-  const [, , openSaves] = useContext(SavesContext)
+  const [, , openSaves] = useSaves()
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
   const displayError = useDisplayError()
 

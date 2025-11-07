@@ -19,7 +19,7 @@ import {
 import { filterUndefined } from '../../util/Sort'
 import { ItemBagContext } from '../itemBag'
 import { PersistedPkmDataContext } from '../persistedPkmData'
-import { openSavesReducer, SavesContext } from './openSaves'
+import { openSavesReducer, SavesContext } from './reducer'
 
 export type SavesProviderProps = {
   children: ReactNode

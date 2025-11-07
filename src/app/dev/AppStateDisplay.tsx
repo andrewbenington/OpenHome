@@ -9,14 +9,15 @@ import { InfoGrid } from 'src/components/InfoGrid2'
 import useDisplayError from 'src/hooks/displayError'
 import { AppInfoContext, AppInfoState } from 'src/state/appInfo'
 import { ItemBagContext, ItemBagState } from 'src/state/itemBag'
-import { OpenSavesState, SavesContext } from 'src/state/saves/openSaves'
+import { OpenSavesState } from 'src/state/saves/reducer'
 import { PKMInterface } from 'src/types/interfaces'
 import { ErrorContext } from '../../state/error'
+import { useSaves } from '../../state/saves/useSaves'
 
 export default function AppStateDisplay() {
   const [appState, setAppState] = useState<AppState>()
   const [appInfoState] = useContext(AppInfoContext)
-  const [openSavesState] = useContext(SavesContext)
+  const [openSavesState] = useSaves()
   const [errorState, dispatchErrorState] = useContext(ErrorContext)
   const [bagState] = useContext(ItemBagContext)
   const backend = useContext(BackendContext)

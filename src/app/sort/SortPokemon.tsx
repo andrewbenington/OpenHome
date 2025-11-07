@@ -1,6 +1,6 @@
 import { OriginGames } from '@pkm-rs-resources/pkg'
 import { Badge, Card, Flex } from '@radix-ui/themes'
-import { useContext, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { MdAdd } from 'react-icons/md'
 import PokemonDetailsModal from 'src/pokemon/PokemonDetailsModal'
 import SavesModal from 'src/saves/SavesModal'
@@ -8,8 +8,7 @@ import { getSortFunction, SortType, SortTypes } from 'src/types/pkm/sort'
 import { filterUndefined } from 'src/util/Sort'
 import Autocomplete from '../../components/Autocomplete'
 import PokemonIcon from '../../components/PokemonIcon'
-import { PersistedPkmDataContext } from '../../state/persistedPkmData'
-import { SavesContext } from '../../state/saves/openSaves'
+import { useSaves } from '../../state/saves/useSaves'
 import { PKMInterface } from '../../types/interfaces'
 
 function getInnerSortFunction(
@@ -21,14 +20,12 @@ function getInnerSortFunction(
 }
 
 export default function SortPokemon() {
-  const [{ homeMons }] = useContext(PersistedPkmDataContext)
-  const [{ homeData }, , openSaves] = useContext(SavesContext)
+  const [{ homeData }, , openSaves] = useSaves()
   const [openSaveDialog, setOpenSaveDialog] = useState(false)
   const [selectedIndex, setSelectedIndex] = useState<number>()
   const [sort, setSort] = useState<SortType>('')
 
   const allMonsWithColors = useMemo(() => {
-    if (!homeData) return []
     const all: { mon: PKMInterface; color: string }[] = openSaves
       .flatMap((save) =>
         save.boxes.flatMap((box) =>
@@ -83,7 +80,6 @@ export default function SortPokemon() {
     ))
   }, [sortedMonsWithColors])
 
-  if (!homeMons) return <div />
   return (
     <Flex direction="row" wrap="wrap" overflow="hidden" height="calc(100% - 16px)" m="2" gap="2">
       <Card style={{ height: '100%' }}>

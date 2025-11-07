@@ -1,6 +1,6 @@
 import { Dispatch, useContext } from 'react'
 import { SAV } from '../../types/SAVTypes/SAV'
-import { OpenSavesAction, OpenSavesState, SavesContext } from './openSaves'
+import { OpenSavesAction, OpenSavesState, SavesContext } from './reducer'
 
 export type SavesState = Required<Omit<OpenSavesState, 'error'>>
 

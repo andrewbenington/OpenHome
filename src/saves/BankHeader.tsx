@@ -11,25 +11,20 @@ import {
 import { useContext, useState } from 'react'
 import { EditIcon } from 'src/components/Icons'
 import { PersistedPkmDataContext } from 'src/state/persistedPkmData'
-import { SavesContext } from 'src/state/saves/openSaves'
-import { HomeData } from 'src/types/SAVTypes/HomeData'
 import { getBankName } from 'src/types/storage'
 import ToggleButton from '../components/ToggleButton'
+import { useSaves } from '../state/saves/useSaves'
 
 export default function BankHeader() {
-  const [openSavesState, openSavesDispatch] = useContext(SavesContext)
+  const [openSavesState, openSavesDispatch] = useSaves()
   const [editing, setEditing] = useState(false)
   const [bankNameEditValue, setBankNameEditValue] = useState('')
 
   const homeData = openSavesState.homeData
 
-  if (!homeData) return <Spinner />
-
   return (
     <Card className="bank-ribbon">
-      <div style={{ flexGrow: 1, width: 0 }}>
-        {<BankSelector homeData={homeData} disabled={editing} />}
-      </div>
+      <div style={{ flexGrow: 1, width: 0 }}>{<BankSelector disabled={editing} />}</div>
       {editing ? (
         <TextField.Root
           size="1"
@@ -85,9 +80,9 @@ function removeNonDigits(input: string): string {
   return input.replaceAll(nonDigitsRE, '')
 }
 
-function BankSelector(props: { homeData: HomeData; disabled?: boolean }) {
-  const { homeData, disabled } = props
-  const [, openSavesDispatch] = useContext(SavesContext)
+function BankSelector(props: { disabled?: boolean }) {
+  const { disabled } = props
+  const [{ homeData }, openSavesDispatch] = useSaves()
   const [pkmDataState] = useContext(PersistedPkmDataContext)
   const [newBankName, setNewBankName] = useState<string>()
   const [newBankBoxCount, setNewBankBoxCount] = useState('30')

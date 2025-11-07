@@ -9,11 +9,12 @@ import AttributeRow from 'src/pokemon/AttributeRow'
 import PokemonDetailsModal from 'src/pokemon/PokemonDetailsModal'
 import { ErrorContext } from 'src/state/error'
 import { PersistedPkmDataContext } from 'src/state/persistedPkmData'
-import { MonLocation, SavesContext } from 'src/state/saves/openSaves'
+import { MonLocation } from 'src/state/saves/reducer'
 import { PKMInterface } from 'src/types/interfaces'
 import { OHPKM } from 'src/types/pkm/OHPKM'
 import { getMonFileIdentifier } from 'src/util/Lookup'
 import { DragMonContext } from '../../state/dragMon'
+import { useSaves } from '../../state/saves/useSaves'
 import { colorIsDark } from '../../util/color'
 import { buildBackwardNavigator, buildForwardNavigator } from '../util'
 import ArrowButton from './ArrowButton'
@@ -26,7 +27,7 @@ interface OpenSaveDisplayProps {
 const ALLOW_DUPE_IMPORT = true
 
 const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
-  const [, openSavesDispatch, openSaves] = useContext(SavesContext)
+  const [, openSavesDispatch, openSaves] = useSaves()
   const [{ homeMons }] = useContext(PersistedPkmDataContext)
   const [, dispatchError] = useContext(ErrorContext)
   const [detailsModal, setDetailsModal] = useState(false)

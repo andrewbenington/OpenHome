@@ -9,7 +9,6 @@ import SideTabs from 'src/components/side-tabs/SideTabs'
 import useDisplayError from 'src/hooks/displayError'
 import { AppInfoAction, AppInfoContext } from 'src/state/appInfo'
 import { PersistedPkmDataContext } from 'src/state/persistedPkmData'
-import { SavesContext } from 'src/state/saves/openSaves'
 import { displayIndexAdder, isBattleFormeItem } from 'src/types/pkm/util'
 import { PokedexUpdate } from 'src/types/pokedex'
 import { buildSaveFile, getPossibleSaveTypes } from 'src/types/SAVTypes/load'
@@ -19,6 +18,7 @@ import { SAVClass } from 'src/types/SAVTypes/util'
 import { getMonFileIdentifier } from 'src/util/Lookup'
 import { filterUndefined } from 'src/util/Sort'
 import { useLookups } from '../state/lookups'
+import { useSaves } from '../state/saves/useSaves'
 import RecentSaves from './RecentSaves'
 import SaveFolders from './SaveFolders'
 import SuggestedSaves from './SuggestedSaves'
@@ -44,7 +44,7 @@ const debouncedUpdateCardSize = debounce(
 
 function useOpenSaveHandler(onClose?: () => void) {
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
-  const [, dispatchOpenSaves] = useContext(SavesContext)
+  const [, dispatchOpenSaves] = useSaves()
   const [tentativeSaveData, setTentativeSaveData] = useState<AmbiguousOpenState>()
   const backend = useContext(BackendContext)
   const [lookupState] = useContext(PersistedPkmDataContext)
@@ -161,7 +161,7 @@ const SavesModal = (props: SavesModalProps) => {
         <Dialog.Description>Description</Dialog.Description>
       </VisuallyHidden>
       <Dialog.Content
-        maxWidth="95%"
+        maxWidth="95vw"
         style={{
           minWidth: 800,
           height: 'calc(90vh - 32px)',

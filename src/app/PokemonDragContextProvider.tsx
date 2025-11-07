@@ -7,11 +7,12 @@ import PokemonIcon from '../components/PokemonIcon'
 import { getPublicImageURL } from '../images/images'
 import { getItemIconPath } from '../images/items'
 import { DragMonContext, DragPayload } from '../state/dragMon'
-import { getMonAtLocation, MonLocation, SavesContext } from '../state/saves/openSaves'
+import { getMonAtLocation, MonLocation } from '../state/saves/reducer'
+import { useSaves } from '../state/saves/useSaves'
 
 export default function PokemonDragContextProvider(props: { children?: ReactNode }) {
   const { children } = props
-  const [openSaves, openSavesDispatch] = useContext(SavesContext)
+  const [openSaves, openSavesDispatch] = useSaves()
   const [, persistedPkmDataDispatch] = useContext(PersistedPkmDataContext)
   const [dragMonState, dispatchDragMonState] = useContext(DragMonContext)
   const [, bagDispatch] = useContext(ItemBagContext)

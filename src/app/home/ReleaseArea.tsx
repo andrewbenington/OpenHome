@@ -1,11 +1,10 @@
 import { Flex } from '@radix-ui/themes'
-import { useContext } from 'react'
 import PokemonIcon from 'src/components/PokemonIcon'
 import DroppableSpace from 'src/saves/boxes/DroppableSpace'
-import { SavesContext } from 'src/state/saves/openSaves'
+import { useSaves } from '../../state/saves/useSaves'
 
 export default function ReleaseArea() {
-  const [openSavesState] = useContext(SavesContext)
+  const [openSavesState] = useSaves()
 
   return (
     <Flex className="drop-area" direction="column">
