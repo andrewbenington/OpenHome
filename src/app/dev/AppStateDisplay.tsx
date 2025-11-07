@@ -9,7 +9,7 @@ import { InfoGrid } from 'src/components/InfoGrid2'
 import useDisplayError from 'src/hooks/displayError'
 import { AppInfoContext, AppInfoState } from 'src/state/appInfo'
 import { ItemBagContext, ItemBagState } from 'src/state/itemBag'
-import { OpenSavesContext, OpenSavesState } from 'src/state/openSaves'
+import { OpenSavesContext, OpenSavesState } from 'src/state/saves/openSaves'
 import { PKMInterface } from 'src/types/interfaces'
 import { ErrorContext } from '../../state/error'
 

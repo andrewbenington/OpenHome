@@ -4,7 +4,7 @@ import { useContext, useMemo } from 'react'
 import { DragMonContext } from 'src/state/dragMon'
 import { displayIndexAdder, isBattleFormeItem, isMegaStone } from 'src/types/pkm/util'
 import PokemonIcon from '../../components/PokemonIcon'
-import { MonWithLocation } from '../../state/openSaves'
+import { MonWithLocation } from '../../state/saves/openSaves'
 import { PKMInterface } from '../../types/interfaces'
 
 const getBackgroundDetails = (disabled?: boolean) => {

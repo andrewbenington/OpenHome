@@ -5,9 +5,9 @@ import { HomeData } from 'src/types/SAVTypes/HomeData'
 import { SAV } from 'src/types/SAVTypes/SAV'
 import { StoredBankData } from 'src/types/storage'
 import { getMonFileIdentifier } from 'src/util/Lookup'
-import { PKMInterface } from '../types/interfaces'
-import { getSortFunctionNullable, SortType } from '../types/pkm/sort'
-import { PersistedPkmData } from './persistedPkmData'
+import { PKMInterface } from '../../types/interfaces'
+import { getSortFunctionNullable, SortType } from '../../types/pkm/sort'
+import { PersistedPkmData } from '../persistedPkmData'
 
 export type OpenSave = {
   index: number

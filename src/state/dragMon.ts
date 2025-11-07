@@ -1,6 +1,6 @@
 import { Item } from '@pkm-rs-resources/pkg'
 import { Dispatch, Reducer, createContext } from 'react'
-import { MonWithLocation } from './openSaves'
+import { MonWithLocation } from './saves/openSaves'
 
 export type DragPayload = { kind: 'mon'; monData: MonWithLocation } | { kind: 'item'; item: Item }
 
