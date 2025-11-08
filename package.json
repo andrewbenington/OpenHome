@@ -29,7 +29,7 @@
     "typecheck": "tsc",
     "dev:unix": "./buildVersionJSON.sh && tauri dev",
     "dev:win": "powershell -ExecutionPolicy Bypass -File ./buildVersionJSON.ps1 && tauri dev",
-    "build": "npm run wasm && tsc && vite build",
+    "build": "npm run wasm && vite build",
     "dev": "npm run wasm && vite",
     "tauri": "tauri",
     "test": "vitest run",
