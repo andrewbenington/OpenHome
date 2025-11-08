@@ -1,18 +1,19 @@
 import { DragDropProvider, DragOverlay, PointerSensor } from '@dnd-kit/react'
 import { ReactNode, useContext } from 'react'
 import { ItemBagContext } from 'src/state/itemBag'
-import { PersistedPkmDataContext } from 'src/state/persistedPkmData'
 import { OHPKM } from 'src/types/pkm/OHPKM'
 import PokemonIcon from '../components/PokemonIcon'
 import { getPublicImageURL } from '../images/images'
 import { getItemIconPath } from '../images/items'
 import { DragMonContext, DragPayload } from '../state/dragMon'
-import { getMonAtLocation, MonLocation, OpenSavesContext } from '../state/openSaves'
+import { useOhpkmStore } from '../state/ohpkm/useOhpkmStore'
+import { MonLocation } from '../state/saves/reducer'
+import { useSaves } from '../state/saves/useSaves'
 
 export default function PokemonDragContextProvider(props: { children?: ReactNode }) {
   const { children } = props
-  const [openSaves, openSavesDispatch] = useContext(OpenSavesContext)
-  const [, persistedPkmDataDispatch] = useContext(PersistedPkmDataContext)
+  const savesAndBanks = useSaves()
+  const ohpkmStore = useOhpkmStore()
   const [dragMonState, dispatchDragMonState] = useContext(DragMonContext)
   const [, bagDispatch] = useContext(ItemBagContext)
 
@@ -30,36 +31,22 @@ export default function PokemonDragContextProvider(props: { children?: ReactNode
         if (payload.kind === 'item') {
           if (isMonLocation(dest) && target) {
             // Avoid losing the second item if mon already holding same item
-            const destMon = getMonAtLocation(openSaves, dest)
+            const destMon = savesAndBanks.getMonAtLocation(dest)
             if (destMon?.heldItemIndex === payload.item.index) {
               return
             }
-
-            openSavesDispatch({
-              type: 'set_mon_item',
-              payload: {
-                item: payload.item,
-                dest: target.data as MonLocation,
-              },
-            })
+            savesAndBanks.setMonHeldItem(payload.item, dest)
             bagDispatch({ type: 'remove_item', payload: { index: payload.item.index, qty: 1 } })
           }
         } else if (payload.kind === 'mon') {
           const { mon } = payload.monData
 
           if (target?.id === 'to_release') {
-            openSavesDispatch({
-              type: 'add_mon_to_release',
-              payload: payload.monData,
-            })
+            savesAndBanks.releaseMonAtLocation(payload.monData)
           } else if (target?.id === 'item-bag') {
             if (mon.heldItemIndex) {
               bagDispatch({ type: 'add_item', payload: { index: mon.heldItemIndex, qty: 1 } })
-              openSavesDispatch({
-                type: 'set_mon_item',
-                payload: { item: undefined, dest: payload.monData },
-              })
-              mon.heldItemIndex = 0
+              savesAndBanks.setMonHeldItem(undefined, payload.monData)
             }
           } else if (
             isMonLocation(dest) &&
@@ -70,7 +57,7 @@ export default function PokemonDragContextProvider(props: { children?: ReactNode
             // If moving mon outside of its save, start persisting this mon's data in OpenHome
             // (if it isnt already)
             if (source.save !== dest.save) {
-              persistedPkmDataDispatch({ type: 'persist_data', payload: new OHPKM(mon) })
+              ohpkmStore.overwrite(new OHPKM(mon))
             }
 
             // Move item to OpenHome bag if not supported by the save file
@@ -79,7 +66,7 @@ export default function PokemonDragContextProvider(props: { children?: ReactNode
               mon.heldItemIndex = 0
             }
 
-            openSavesDispatch({ type: 'move_mon', payload: { source, dest } })
+            savesAndBanks.moveMon(source, dest)
           }
         }
 

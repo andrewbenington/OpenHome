@@ -1,6 +1,6 @@
 import { getHomeIdentifier, getMonFileIdentifier } from 'src/util/Lookup'
 import { v4 as UuidV4 } from 'uuid'
-import { PersistedPkmData } from '../../state/persistedPkmData'
+import { OhpkmLookup } from '../../state/ohpkm/useOhpkmStore'
 import { range } from '../../util/Functional'
 import { filterUndefined, numericSorter } from '../../util/Sort'
 import { TransferRestrictions } from '../TransferRestrictions'
@@ -43,10 +43,10 @@ export class HomeBox implements Box<OHPKM> {
     return Object.fromEntries(entries)
   }
 
-  loadMonsFromIdentifiers(boxIdentifers: BoxMonIdentifiers, monMap: { [key: string]: OHPKM }) {
+  loadMonsFromIdentifiers(boxIdentifers: BoxMonIdentifiers, monLookup: OhpkmLookup) {
     this.pokemon = new Array(120)
     Object.entries(boxIdentifers).forEach(([indexStr, identifier]) => {
-      const mon = monMap[identifier]
+      const mon = monLookup(identifier)
       const index = parseInt(indexStr)
 
       if (!Number.isNaN(index) && mon) {
@@ -87,12 +87,12 @@ export class HomeData {
 
   updatedBoxSlots: BankBoxCoordinates[] = []
 
-  constructor(stored_bank_data: StoredBankData, mon_lookup: PersistedPkmData) {
-    this._banks = stored_bank_data.banks.map((bank) => ({
+  constructor(storedBankData: StoredBankData, monLookup: OhpkmLookup) {
+    this._banks = storedBankData.banks.map((bank) => ({
       ...bank,
       boxes: bank.boxes.map((box) => ({ ...box, last_saved_index: box.index })),
     }))
-    this.setAndLoadBank(stored_bank_data.current_bank, mon_lookup)
+    this.setAndLoadBank(storedBankData.current_bank, monLookup)
   }
   pluginIdentifier?: string | undefined
   pcChecksumOffset?: number | undefined
@@ -133,15 +133,15 @@ export class HomeData {
     return newBank
   }
 
-  setAndLoadBank(bank_index: number, mon_lookup: PersistedPkmData) {
-    this._currentBankIndex = bank_index
-    this._currentBoxIndex = this._banks[bank_index].current_box
+  setAndLoadBank(bankIndex: number, getMonById: OhpkmLookup) {
+    this._currentBankIndex = bankIndex
+    this._currentBoxIndex = this._banks[bankIndex].current_box
     // console.log(this._banks, this._banks[bank_index], this._banks[bank_index].boxes)
-    const bankBoxes = this._banks[bank_index].boxes.sort((box_metadata) => box_metadata.index)
+    const bankBoxes = this._banks[bankIndex].boxes.sort((box_metadata) => box_metadata.index)
 
     this.boxes = bankBoxes.map((box) => new HomeBox(box))
-    bankBoxes.forEach((box_metadata) => {
-      this.boxes[box_metadata.index].loadMonsFromIdentifiers(box_metadata.identifiers, mon_lookup)
+    bankBoxes.forEach((boxMetadata) => {
+      this.boxes[boxMetadata.index].loadMonsFromIdentifiers(boxMetadata.identifiers, getMonById)
     })
   }
 
@@ -357,8 +357,8 @@ export class HomeData {
     return this._currentBoxIndex
   }
 
-  clone() {
-    const newHomeData = new HomeData({ banks: this._banks, current_bank: 0 }, {})
+  clone(monLookup: OhpkmLookup) {
+    const newHomeData = new HomeData({ banks: this._banks, current_bank: 0 }, monLookup)
 
     newHomeData._currentBankIndex = this._currentBankIndex
     newHomeData._currentBoxIndex = this._currentBoxIndex

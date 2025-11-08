@@ -1,6 +1,6 @@
 import { OriginGames } from '@pkm-rs-resources/pkg'
 import { Badge, Card, Flex } from '@radix-ui/themes'
-import { useContext, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { MdAdd } from 'react-icons/md'
 import PokemonDetailsModal from 'src/pokemon/PokemonDetailsModal'
 import SavesModal from 'src/saves/SavesModal'
@@ -8,8 +8,7 @@ import { getSortFunction, SortType, SortTypes } from 'src/types/pkm/sort'
 import { filterUndefined } from 'src/util/Sort'
 import Autocomplete from '../../components/Autocomplete'
 import PokemonIcon from '../../components/PokemonIcon'
-import { OpenSavesContext } from '../../state/openSaves'
-import { PersistedPkmDataContext } from '../../state/persistedPkmData'
+import { useSaves } from '../../state/saves/useSaves'
 import { PKMInterface } from '../../types/interfaces'
 
 function getInnerSortFunction(
@@ -21,15 +20,13 @@ function getInnerSortFunction(
 }
 
 export default function SortPokemon() {
-  const [{ homeMons }] = useContext(PersistedPkmDataContext)
-  const [{ homeData }, , openSaves] = useContext(OpenSavesContext)
+  const savesAndBanks = useSaves()
   const [openSaveDialog, setOpenSaveDialog] = useState(false)
   const [selectedIndex, setSelectedIndex] = useState<number>()
   const [sort, setSort] = useState<SortType>('')
 
   const allMonsWithColors = useMemo(() => {
-    if (!homeData) return []
-    const all: { mon: PKMInterface; color: string }[] = openSaves
+    const all: { mon: PKMInterface; color: string }[] = savesAndBanks.allOpenSaves
       .flatMap((save) =>
         save.boxes.flatMap((box) =>
           box.pokemon.flatMap((mon) =>
@@ -38,14 +35,14 @@ export default function SortPokemon() {
         )
       )
       .concat(
-        Object.values(homeData.boxes.flatMap((box) => box.pokemon) ?? {}).map((mon) =>
-          mon ? { mon, color: homeData.gameColor() } : undefined
+        Object.values(savesAndBanks.homeData.boxes.flatMap((box) => box.pokemon) ?? {}).map(
+          (mon) => (mon ? { mon, color: savesAndBanks.homeData.gameColor() } : undefined)
         )
       )
       .filter(filterUndefined)
 
     return all
-  }, [openSaves, homeData])
+  }, [savesAndBanks.allOpenSaves, savesAndBanks.homeData])
 
   const sortedMonsWithColors = useMemo(() => {
     return sort
@@ -83,15 +80,18 @@ export default function SortPokemon() {
     ))
   }, [sortedMonsWithColors])
 
-  if (!homeMons) return <div />
   return (
     <Flex direction="row" wrap="wrap" overflow="hidden" height="calc(100% - 16px)" m="2" gap="2">
       <Card style={{ height: '100%' }}>
         <Flex direction="column" gap="1" style={{ width: 180, flex: 0 }}>
-          <Badge color="gray" size="3" style={{ border: `2px solid ${homeData?.gameColor()}` }}>
+          <Badge
+            color="gray"
+            size="3"
+            style={{ border: `2px solid ${savesAndBanks.homeData.gameColor()}` }}
+          >
             OpenHome
           </Badge>
-          {openSaves.map((save) => (
+          {savesAndBanks.allOpenSaves.map((save) => (
             <Badge
               color="gray"
               size="3"

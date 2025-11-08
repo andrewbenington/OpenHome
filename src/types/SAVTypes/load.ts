@@ -4,6 +4,7 @@ import {
   getMonGen12Identifier,
   getMonGen345Identifier,
 } from 'src/util/Lookup'
+import { OhpkmLookup } from '../../state/ohpkm/useOhpkmStore'
 import { PKMInterface } from '../interfaces'
 import { OHPKM } from '../pkm/OHPKM'
 import { PathData } from './path'
@@ -16,11 +17,11 @@ const SKIP_OHPKM_LOAD = false
 const recoverOHPKMData = (
   saveFile: SAV,
   getIdentifier: (_: PKMInterface) => string | undefined,
-  homeMonMap?: { [key: string]: OHPKM },
+  getOhpkmById?: OhpkmLookup,
   lookupMap?: { [key: string]: string },
   updateMonCallback?: (mon: OHPKM) => void
 ): SAV => {
-  if (!homeMonMap || !getIdentifier || SKIP_OHPKM_LOAD) {
+  if (!getIdentifier || SKIP_OHPKM_LOAD) {
     return saveFile
   }
   saveFile.boxes.forEach((box) => {
@@ -32,16 +33,14 @@ const recoverOHPKMData = (
         const homeIdentifier = lookupMap ? lookupMap[lookupIdentifier] : lookupIdentifier
 
         if (!homeIdentifier) return
-        const result = Object.entries(homeMonMap).find((entry) => entry[0] === homeIdentifier)
+        const storedOhpkm = getOhpkmById?.(homeIdentifier)
 
-        if (result) {
-          const updatedOHPKM = result[1]
-
-          updatedOHPKM.updateData(mon)
+        if (storedOhpkm) {
+          storedOhpkm.updateData(mon)
           if (updateMonCallback) {
-            updateMonCallback(updatedOHPKM)
+            updateMonCallback(storedOhpkm)
           }
-          box.pokemon[monIndex] = updatedOHPKM
+          box.pokemon[monIndex] = storedOhpkm
         }
       }
     })
@@ -56,8 +55,8 @@ export const getPossibleSaveTypes = (
   return supportedSaveTypes.filter((saveType) => saveType.fileIsSave(bytes))
 }
 
-export type LookupMaps = {
-  homeMonMap?: Record<string, OHPKM>
+export type MonLookup = {
+  getOhpkmById?: OhpkmLookup
   gen12LookupMap?: Record<string, string>
   gen345LookupMap?: Record<string, string>
 }
@@ -65,7 +64,7 @@ export type LookupMaps = {
 export const buildUnknownSaveFile = (
   filePath: PathData,
   fileBytes: Uint8Array,
-  lookupMaps: LookupMaps,
+  lookupMaps: MonLookup,
   supportedSaveTypes: SAVClass[],
   updateMonCallback?: (mon: OHPKM) => void
 ): E.Either<string, SAV | undefined> => {
@@ -89,11 +88,11 @@ export const buildUnknownSaveFile = (
 export const buildSaveFile = (
   filePath: PathData,
   fileBytes: Uint8Array,
-  lookupMaps: LookupMaps,
+  lookupMaps: MonLookup,
   saveType: SAVClass,
   updateMonCallback?: (mon: OHPKM) => void
 ): E.Either<string, SAV | undefined> => {
-  const { homeMonMap, gen12LookupMap, gen345LookupMap } = lookupMaps
+  const { getOhpkmById, gen12LookupMap, gen345LookupMap } = lookupMaps
 
   const lookupMap =
     saveType.lookupType === 'gen12'
@@ -113,7 +112,7 @@ export const buildSaveFile = (
     const saveFile = recoverOHPKMData(
       new saveType(filePath, fileBytes),
       getIdentifier as (_: PKMInterface) => string | undefined,
-      homeMonMap,
+      getOhpkmById,
       lookupMap,
       updateMonCallback
     )

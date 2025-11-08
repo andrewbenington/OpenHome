@@ -13,7 +13,8 @@ build-mac-intel:
 	@npx tauri build --target x86_64-apple-darwin
 
 .PHONY: start
-start:
+start: wasm-deps
+	@npm i
 	@npm run tauri dev
 
 .PHONY: build-appimage
@@ -45,6 +46,15 @@ check:
 .PHONY: check-rs
 check-rs:
 	@cd src-tauri && cargo clippy -- -Aclippy::needless_return
+
+.PHONY: wasm-deps
+wasm-deps:
+ifeq ($(shell which wasm-pack 2>/dev/null), )
+	@echo "wasm-pack not installed! installing..."
+	@cargo install wasm-pack
+else
+	@echo "wasm-pack already installed!"
+endif
 
 .PHONY: set-version
 set-version:

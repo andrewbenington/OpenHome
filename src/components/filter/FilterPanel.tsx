@@ -42,7 +42,7 @@ type ItemOption =
 function getOriginIcon(origin: OriginGameWithData) {
   const path =
     origin.generation === Generation.G4 || origin.generation === Generation.G5
-      ? 'i/cons/ds.png'
+      ? 'icons/ds.png'
       : origin.game === OriginGame.ColosseumXd
         ? '/icons/gcn.png'
         : origin.generation === Generation.G3
