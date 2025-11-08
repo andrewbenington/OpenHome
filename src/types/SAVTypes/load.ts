@@ -17,7 +17,7 @@ const SKIP_OHPKM_LOAD = false
 const recoverOHPKMData = (
   saveFile: SAV,
   getIdentifier: (_: PKMInterface) => string | undefined,
-  getOhpkmById: OhpkmLookup,
+  getOhpkmById?: OhpkmLookup,
   lookupMap?: { [key: string]: string },
   updateMonCallback?: (mon: OHPKM) => void
 ): SAV => {
@@ -33,7 +33,7 @@ const recoverOHPKMData = (
         const homeIdentifier = lookupMap ? lookupMap[lookupIdentifier] : lookupIdentifier
 
         if (!homeIdentifier) return
-        const storedOhpkm = getOhpkmById(homeIdentifier)
+        const storedOhpkm = getOhpkmById?.(homeIdentifier)
 
         if (storedOhpkm) {
           storedOhpkm.updateData(mon)
@@ -56,7 +56,7 @@ export const getPossibleSaveTypes = (
 }
 
 export type MonLookup = {
-  getOhpkmById: OhpkmLookup
+  getOhpkmById?: OhpkmLookup
   gen12LookupMap?: Record<string, string>
   gen345LookupMap?: Record<string, string>
 }

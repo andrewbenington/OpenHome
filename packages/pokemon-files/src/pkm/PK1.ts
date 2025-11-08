@@ -96,11 +96,6 @@ export class PK1 {
       } else {
         this.nickname = this.metadata?.formeName ?? ''
       }
-      console.log(
-        this.nickname,
-        dataView.getUint8(0x7),
-        ItemGen1.fromIndex(dataView.getUint8(0x7))?.name
-      )
     } else {
       const other = arg
       this.gameOfOrigin = other.gameOfOrigin
