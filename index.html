@@ -1,32 +1,48 @@
 <!doctype html>
-<html lang="en" style="height: 100vh; overflow: hidden;">
+<html lang="en" style="height: 100vh; overflow: hidden">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>OpenHome</title>
+    <style>
+      @media (prefers-color-scheme: light) {
+        body {
+          --background-gradient: linear-gradient(
+            355deg,
+            rgba(83, 180, 165, 1) 0%,
+            rgba(125, 206, 171, 1) 85%
+          );
+          background: var(--background-gradient);
+        }
+      }
+
+      @media (prefers-color-scheme: dark) {
+        body {
+          --background-gradient: linear-gradient(
+            310deg,
+            rgba(54, 69, 78, 1) 0%,
+            rgba(1, 83, 84, 1) 85%
+          );
+          background: var(--background-gradient);
+        }
+      }
+
+      .loading-logo-container {
+        height: 100vh;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        position: relative;
+      }
+    </style>
   </head>
 
-  <body
-    style="
-      background: linear-gradient(355deg, rgba(83, 180, 165, 1) 0%, rgba(125, 206, 171, 1) 85%);
-      height: 100vh;
-      overflow: hidden;
-      margin: 0;
-    "
-  >
+  <body style="height: 100vh; overflow: hidden; margin: 0">
     <div id="root">
-      <div
-        style="
-          height: 100vh;
-          width: 100%;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          z-index: 1000;
-          position: relative;
-        "
-      >
+      <div class="loading-logo-container">
         <img src="logos/logo-full.png" style="width: 128px; height: 128px; position: absolute" />
       </div>
     </div>
