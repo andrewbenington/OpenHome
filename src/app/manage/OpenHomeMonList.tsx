@@ -1,11 +1,10 @@
 import { OriginGames } from '@pkm-rs-resources/pkg'
-import { useContext } from 'react'
 import OHDataGrid, { SortableColumn } from 'src/components/OHDataGrid'
 import PokemonIcon from 'src/components/PokemonIcon'
-import { OhpkmStoreContext } from 'src/state/ohpkm/reducer'
 import { OHPKM } from 'src/types/pkm/OHPKM'
 import { getMonFileIdentifier } from 'src/util/Lookup'
 import { numericSorter, stringSorter } from 'src/util/Sort'
+import { useOhpkmStore } from '../../state/ohpkm/useOhpkmStore'
 import './style.css'
 
 export type OpenHomeMonListProps = {
@@ -13,7 +12,7 @@ export type OpenHomeMonListProps = {
 }
 
 export default function OpenHomeMonList({ onSelectMon }: OpenHomeMonListProps) {
-  const [{ homeMons }] = useContext(OhpkmStoreContext)
+  const ohpkmStore = useOhpkmStore()
 
   const columns: SortableColumn<OHPKM>[] = [
     {
@@ -76,7 +75,7 @@ export default function OpenHomeMonList({ onSelectMon }: OpenHomeMonListProps) {
 
   return (
     <OHDataGrid
-      rows={Object.values(homeMons ?? {})}
+      rows={ohpkmStore.getAllStored()}
       columns={columns}
       style={{ borderLeft: 'none', borderBottom: 'none' }}
     />

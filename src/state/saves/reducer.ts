@@ -7,7 +7,7 @@ import { StoredBankData } from 'src/types/storage'
 import { getMonFileIdentifier } from 'src/util/Lookup'
 import { PKMInterface } from '../../types/interfaces'
 import { getSortFunctionNullable, SortType } from '../../types/pkm/sort'
-import { OhpkmStoreData } from '../ohpkm/reducer'
+import { OhpkmLookup } from '../ohpkm/useOhpkmStore'
 
 export type OpenSave = {
   index: number
@@ -44,21 +44,21 @@ export type OpenSavesAction =
    */
   | {
       type: 'load_home_banks'
-      payload: { banks: StoredBankData; monLookup: OhpkmStoreData }
+      payload: { banks: StoredBankData; getMonById: OhpkmLookup }
     }
   | {
       type: 'add_home_bank'
       payload: {
         name?: string
-        box_count: number
-        current_count: number
-        switch_to_bank: boolean
-        home_lookup: Record<string, OHPKM>
+        boxCount: number
+        currentCount: number
+        switchToBank: boolean
+        getMonById: OhpkmLookup
       }
     }
   | {
       type: 'set_current_home_bank'
-      payload: { bank: number; monLookup: OhpkmStoreData }
+      payload: { bank: number; getMonById: (id: string) => OHPKM | undefined }
     }
   | {
       type: 'set_home_bank_name'
@@ -73,11 +73,11 @@ export type OpenSavesAction =
     }
   | {
       type: 'sort_current_home_box'
-      payload: { sortType: SortType }
+      payload: { sortType: SortType; getMonById: OhpkmLookup }
     }
   | {
       type: 'sort_all_home_boxes'
-      payload: { sortType: SortType }
+      payload: { sortType: SortType; getMonById: OhpkmLookup }
     }
   | {
       type: 'current_home_box_remove_dupes'
@@ -97,7 +97,7 @@ export type OpenSavesAction =
     }
   | {
       type: 'reorder_home_boxes'
-      payload: { ids_in_new_order: string[] }
+      payload: { idsInNewOrder: string[] }
     }
   /*
    *  SAVE FILES
@@ -194,33 +194,33 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
      *  BANKS
      */
     case 'load_home_banks': {
-      const { banks, monLookup } = payload
-      const newHomeData = new HomeData(banks, monLookup)
+      const { banks, getMonById } = payload
+      const newHomeData = new HomeData(banks, getMonById)
 
       return { ...state, homeData: newHomeData }
     }
     case 'add_home_bank': {
-      const { name, box_count, current_count, switch_to_bank, home_lookup } = payload
+      const { name, boxCount, currentCount, switchToBank, getMonById } = payload
 
       // handle duplicate event dispatches in strict mode
-      if (!state.homeData || state.homeData?.banks.length !== current_count) {
+      if (!state.homeData || state.homeData?.banks.length !== currentCount) {
         return { ...state }
       }
 
       const updatedHomeData = state.homeData
 
-      const newBank = updatedHomeData.addBank(name, box_count)
+      const newBank = updatedHomeData.addBank(name, boxCount)
 
-      if (switch_to_bank) {
-        updatedHomeData.setAndLoadBank(newBank.index, home_lookup)
+      if (switchToBank) {
+        updatedHomeData.setAndLoadBank(newBank.index, getMonById)
       }
       return { ...state, homeData: updatedHomeData }
     }
     case 'set_current_home_bank': {
       if (!state.homeData) return state
-      const { bank, monLookup } = payload
+      const { bank, getMonById } = payload
 
-      state.homeData.setAndLoadBank(bank, monLookup)
+      state.homeData.setAndLoadBank(bank, getMonById)
       return { ...state, homeData: state.homeData }
     }
     case 'set_home_bank_name': {
@@ -254,7 +254,7 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
 
       state.homeData.boxes[state.homeData.currentPCBox].pokemon = boxMons
       state.homeData.syncBankToBoxes()
-      state.homeData = state.homeData.clone()
+      state.homeData = state.homeData.clone(payload.getMonById)
       return { ...state }
     }
     case 'sort_all_home_boxes': {
@@ -270,7 +270,7 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
       }
 
       state.homeData.syncBankToBoxes()
-      state.homeData = state.homeData.clone()
+      state.homeData = state.homeData.clone(payload.getMonById)
 
       return { ...state }
     }
@@ -293,7 +293,7 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
 
       if (!newState.homeData) return { ...state }
 
-      newState.homeData.reorderBoxesCurrentBank(payload.ids_in_new_order)
+      newState.homeData.reorderBoxesCurrentBank(payload.idsInNewOrder)
 
       return newState
     }

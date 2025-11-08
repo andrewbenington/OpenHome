@@ -9,7 +9,7 @@ import OHDataGrid, { SortableColumn } from '../components/OHDataGrid'
 import useDisplayError from '../hooks/displayError'
 import { AppInfoContext } from '../state/appInfo'
 import { useLookups } from '../state/lookups'
-import { OhpkmStoreContext } from '../state/ohpkm/reducer'
+import { useOhpkmStore } from '../state/ohpkm/useOhpkmStore'
 import { useSaves } from '../state/saves/useSaves'
 import { PathData, splitPath } from '../types/SAVTypes/path'
 import SaveCard from './SaveCard'
@@ -26,7 +26,7 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
   const backend = useContext(BackendContext)
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
   const [suggestedSaves, setSuggestedSaves] = useState<SAV[]>()
-  const [{ homeMons: homeMonMap }] = useContext(OhpkmStoreContext)
+  const ohpkmStore = useOhpkmStore()
   const { getLookups } = useLookups()
   const [, , openSaves] = useSaves()
   const [error, setError] = useState(false)
@@ -65,7 +65,7 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
           savePath,
           fileBytes,
           {
-            homeMonMap,
+            getOhpkmById: ohpkmStore.getById,
             gen12LookupMap: lookups.gen12,
             gen345LookupMap: lookups.gen345,
           },
@@ -74,7 +74,7 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
       }
       return undefined
     },
-    [backend, getEnabledSaveTypes, getLookups, handleError, homeMonMap]
+    [backend, getEnabledSaveTypes, getLookups, handleError, ohpkmStore.getById]
   )
 
   useEffect(() => {

@@ -1,19 +1,19 @@
 import { DragDropProvider, DragOverlay, PointerSensor } from '@dnd-kit/react'
 import { ReactNode, useContext } from 'react'
 import { ItemBagContext } from 'src/state/itemBag'
-import { OhpkmStoreContext } from 'src/state/ohpkm/reducer'
 import { OHPKM } from 'src/types/pkm/OHPKM'
 import PokemonIcon from '../components/PokemonIcon'
 import { getPublicImageURL } from '../images/images'
 import { getItemIconPath } from '../images/items'
 import { DragMonContext, DragPayload } from '../state/dragMon'
+import { useOhpkmStore } from '../state/ohpkm/useOhpkmStore'
 import { getMonAtLocation, MonLocation } from '../state/saves/reducer'
 import { useSaves } from '../state/saves/useSaves'
 
 export default function PokemonDragContextProvider(props: { children?: ReactNode }) {
   const { children } = props
   const [openSaves, openSavesDispatch] = useSaves()
-  const [, persistedPkmDataDispatch] = useContext(OhpkmStoreContext)
+  const ohpkmStore = useOhpkmStore()
   const [dragMonState, dispatchDragMonState] = useContext(DragMonContext)
   const [, bagDispatch] = useContext(ItemBagContext)
 
@@ -71,7 +71,7 @@ export default function PokemonDragContextProvider(props: { children?: ReactNode
             // If moving mon outside of its save, start persisting this mon's data in OpenHome
             // (if it isnt already)
             if (source.save !== dest.save) {
-              persistedPkmDataDispatch({ type: 'persist_data', payload: new OHPKM(mon) })
+              ohpkmStore.overwrite(new OHPKM(mon))
             }
 
             // Move item to OpenHome bag if not supported by the save file

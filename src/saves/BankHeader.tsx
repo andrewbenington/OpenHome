@@ -1,18 +1,9 @@
-import {
-  Button,
-  Card,
-  DataList,
-  DropdownMenu,
-  Flex,
-  Heading,
-  Spinner,
-  TextField,
-} from '@radix-ui/themes'
-import { useContext, useState } from 'react'
+import { Button, Card, DataList, DropdownMenu, Flex, Heading, TextField } from '@radix-ui/themes'
+import { useState } from 'react'
 import { EditIcon } from 'src/components/Icons'
-import { OhpkmStoreContext } from 'src/state/ohpkm/reducer'
 import { getBankName } from 'src/types/storage'
 import ToggleButton from '../components/ToggleButton'
+import { useOhpkmStore } from '../state/ohpkm/useOhpkmStore'
 import { useSaves } from '../state/saves/useSaves'
 
 export default function BankHeader() {
@@ -83,16 +74,10 @@ function removeNonDigits(input: string): string {
 function BankSelector(props: { disabled?: boolean }) {
   const { disabled } = props
   const [{ homeData }, openSavesDispatch] = useSaves()
-  const [pkmDataState] = useContext(OhpkmStoreContext)
+  const ohpkmStore = useOhpkmStore()
   const [newBankName, setNewBankName] = useState<string>()
   const [newBankBoxCount, setNewBankBoxCount] = useState('30')
   const [isOpen, setIsOpen] = useState(false)
-
-  if (!pkmDataState.homeMons) {
-    return <Spinner />
-  }
-
-  const monLookup = pkmDataState.homeMons
 
   return (
     <DropdownMenu.Root open={isOpen} onOpenChange={setIsOpen}>
@@ -109,7 +94,7 @@ function BankSelector(props: { disabled?: boolean }) {
             onClick={() =>
               openSavesDispatch({
                 type: 'set_current_home_bank',
-                payload: { bank: bank.index, monLookup },
+                payload: { bank: bank.index, getMonById: ohpkmStore.getById },
               })
             }
           >
@@ -146,15 +131,14 @@ function BankSelector(props: { disabled?: boolean }) {
             <Button
               size="1"
               onClick={() => {
-                if (!pkmDataState.homeMons) return
                 openSavesDispatch({
                   type: 'add_home_bank',
                   payload: {
                     name: newBankName,
-                    box_count: parseInt(newBankBoxCount),
-                    current_count: homeData.banks.length ?? 0,
-                    switch_to_bank: true,
-                    home_lookup: pkmDataState.homeMons,
+                    boxCount: parseInt(newBankBoxCount),
+                    currentCount: homeData.banks.length ?? 0,
+                    switchToBank: true,
+                    getMonById: ohpkmStore.getById,
                   },
                 })
 

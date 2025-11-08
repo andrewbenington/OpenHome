@@ -8,7 +8,6 @@ import { CardsIcon, GridIcon } from 'src/components/Icons'
 import SideTabs from 'src/components/side-tabs/SideTabs'
 import useDisplayError from 'src/hooks/displayError'
 import { AppInfoAction, AppInfoContext } from 'src/state/appInfo'
-import { OhpkmStoreContext } from 'src/state/ohpkm/reducer'
 import { displayIndexAdder, isBattleFormeItem } from 'src/types/pkm/util'
 import { PokedexUpdate } from 'src/types/pokedex'
 import { buildSaveFile, getPossibleSaveTypes } from 'src/types/SAVTypes/load'
@@ -18,6 +17,7 @@ import { SAVClass } from 'src/types/SAVTypes/util'
 import { getMonFileIdentifier } from 'src/util/Lookup'
 import { filterUndefined } from 'src/util/Sort'
 import { useLookups } from '../state/lookups'
+import { useOhpkmStore } from '../state/ohpkm/useOhpkmStore'
 import { useSaves } from '../state/saves/useSaves'
 import RecentSaves from './RecentSaves'
 import SaveFolders from './SaveFolders'
@@ -47,7 +47,7 @@ function useOpenSaveHandler(onClose?: () => void) {
   const [, dispatchOpenSaves] = useSaves()
   const [tentativeSaveData, setTentativeSaveData] = useState<AmbiguousOpenState>()
   const backend = useContext(BackendContext)
-  const [lookupState] = useContext(OhpkmStoreContext)
+  const ohpkmStore = useOhpkmStore()
   const { getLookups } = useLookups()
 
   const displayError = useDisplayError()
@@ -67,7 +67,7 @@ function useOpenSaveHandler(onClose?: () => void) {
         filePath,
         fileBytes,
         {
-          homeMonMap: lookupState.homeMons,
+          getOhpkmById: ohpkmStore.getById,
           gen12LookupMap: lookups.gen12,
           gen345LookupMap: lookups.gen345,
         },
@@ -96,7 +96,7 @@ function useOpenSaveHandler(onClose?: () => void) {
         onClose?.()
       }
     },
-    [getLookups, lookupState.homeMons, displayError, backend, dispatchOpenSaves, onClose]
+    [getLookups, ohpkmStore.getById, displayError, backend, dispatchOpenSaves, onClose]
   )
 
   const pickSaveFile = useCallback(

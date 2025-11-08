@@ -8,12 +8,12 @@ import { MenuIcon } from 'src/components/Icons'
 import AttributeRow from 'src/pokemon/AttributeRow'
 import PokemonDetailsModal from 'src/pokemon/PokemonDetailsModal'
 import { ErrorContext } from 'src/state/error'
-import { OhpkmStoreContext } from 'src/state/ohpkm/reducer'
 import { MonLocation } from 'src/state/saves/reducer'
 import { PKMInterface } from 'src/types/interfaces'
 import { OHPKM } from 'src/types/pkm/OHPKM'
 import { getMonFileIdentifier } from 'src/util/Lookup'
 import { DragMonContext } from '../../state/dragMon'
+import { useOhpkmStore } from '../../state/ohpkm/useOhpkmStore'
 import { useSaves } from '../../state/saves/useSaves'
 import { colorIsDark } from '../../util/color'
 import { buildBackwardNavigator, buildForwardNavigator } from '../util'
@@ -28,7 +28,7 @@ const ALLOW_DUPE_IMPORT = true
 
 const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   const [, openSavesDispatch, openSaves] = useSaves()
-  const [{ homeMons }] = useContext(OhpkmStoreContext)
+  const ohpkmStore = useOhpkmStore()
   const [, dispatchError] = useContext(ErrorContext)
   const [detailsModal, setDetailsModal] = useState(false)
   const { saveIndex } = props
@@ -50,17 +50,6 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   }, [currentBox, selectedIndex])
 
   const attemptImportMons = (mons: PKMInterface[], location: MonLocation) => {
-    if (!homeMons) {
-      dispatchError({
-        type: 'set_message',
-        payload: {
-          title: 'Import Failed',
-          messages: ['Home data is not loaded. Something went wrong.'],
-        },
-      })
-      return
-    }
-
     const unsupportedMons = mons.filter((mon) => !save.supportsMon(mon.dexNum, mon.formeNum))
 
     if (unsupportedMons.length) {
@@ -87,7 +76,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
           (mon) => mon && getMonFileIdentifier(mon) === identifier
         )
 
-        if (!ALLOW_DUPE_IMPORT && (identifier in homeMons || inCurrentBox)) {
+        if (!ALLOW_DUPE_IMPORT && (ohpkmStore.monIsStored(identifier) || inCurrentBox)) {
           const message =
             mons.length === 1
               ? 'This Pokémon has been moved into OpenHome before.'

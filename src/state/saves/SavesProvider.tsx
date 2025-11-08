@@ -17,7 +17,7 @@ import {
 } from '../../util/Lookup'
 import { filterUndefined } from '../../util/Sort'
 import { ItemBagContext } from '../itemBag'
-import { useOhpkmStore } from '../ohpkm/useOhpkmStore'
+import { OhpkmLookup, useOhpkmStore } from '../ohpkm/useOhpkmStore'
 import { openSavesReducer, SavesContext } from './reducer'
 
 export type SavesProviderProps = {
@@ -26,7 +26,7 @@ export type SavesProviderProps = {
 
 export default function SavesProvider({ children }: SavesProviderProps) {
   const backend = useContext(BackendContext)
-  const [ohpkmStore, persistedPkmDispatch] = useOhpkmStore()
+  const ohpkmStore = useOhpkmStore()
   const [itemBagState, bagDispatch] = useContext(ItemBagContext)
   const displayError = useDisplayError()
   const [openSavesState, openSavesDispatch] = useReducer(openSavesReducer, {
@@ -42,7 +42,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
     .map((data) => data.save)
 
   const loadAllHomeData = useCallback(
-    async (homeMonLookup: Record<string, OHPKM>) => {
+    async (getMonById: OhpkmLookup) => {
       if (openSavesState.error) return
       await backend.loadHomeBanks().then(
         E.match(
@@ -53,7 +53,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
           (banks) =>
             openSavesDispatch({
               type: 'load_home_banks',
-              payload: { banks, monLookup: homeMonLookup },
+              payload: { banks, getMonById },
             })
         )
       )
@@ -143,14 +143,14 @@ export default function SavesProvider({ children }: SavesProviderProps) {
     openSavesDispatch({ type: 'clear_updated_box_slots' })
     openSavesDispatch({ type: 'clear_mons_to_release' })
 
-    persistedPkmDispatch({ type: 'set_saving' })
+    ohpkmStore.setSaving()
     await ohpkmStore.reloadStore().then(
       E.match(
         (err) => {
           openSavesDispatch({ type: 'set_error', payload: err })
           displayError('Error Loading Lookup Data', err)
         },
-        (homeLookup) => loadAllHomeData(homeLookup)
+        (getMonById) => loadAllHomeData(getMonById)
       )
     )
   }, [
@@ -161,7 +161,6 @@ export default function SavesProvider({ children }: SavesProviderProps) {
     allOpenSaves,
     itemBagState.modified,
     itemBagState.itemCounts,
-    persistedPkmDispatch,
     ohpkmStore,
     displayError,
     bagDispatch,
@@ -190,7 +189,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
       onSave: saveChanges,
       onReset: () => {
         openSavesDispatch({ type: 'clear_mons_to_release' })
-        loadAllHomeData(ohpkmStore.store)
+        loadAllHomeData(ohpkmStore.getById)
         openSavesDispatch({ type: 'close_all_saves' })
       },
     })
@@ -204,9 +203,9 @@ export default function SavesProvider({ children }: SavesProviderProps) {
 
   useEffect(() => {
     if (!openSavesState.homeData) {
-      loadAllHomeData(ohpkmStore.store)
+      loadAllHomeData(ohpkmStore.getById)
     }
-  }, [loadAllHomeData, ohpkmStore.store, openSavesState.homeData])
+  }, [loadAllHomeData, ohpkmStore.getById, openSavesState.homeData])
 
   if (openSavesState.error) {
     return (

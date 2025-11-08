@@ -1,12 +1,11 @@
 import { OriginGames } from '@pkm-rs-resources/pkg'
 import { Spinner } from '@radix-ui/themes'
-import { useContext } from 'react'
 import OHDataGrid, { SortableColumn } from 'src/components/OHDataGrid'
 import PokemonIcon from 'src/components/PokemonIcon'
 import { useLookups } from 'src/state/lookups'
 import { OHPKM } from 'src/types/pkm/OHPKM'
 import { numericSorter, stringSorter } from 'src/util/Sort'
-import { OhpkmStoreContext } from '../../state/ohpkm/reducer'
+import { useOhpkmStore } from '../../state/ohpkm/useOhpkmStore'
 
 type G345LookupRow = {
   gen345ID: string
@@ -19,16 +18,11 @@ type Gen345LookupProps = {
 }
 
 export default function Gen345Lookup({ onSelectMon }: Gen345LookupProps) {
-  const [{ homeMons }] = useContext(OhpkmStoreContext)
+  const ohpkmStore = useOhpkmStore()
   const { lookups, loaded } = useLookups()
 
   if (!loaded) {
     return <Spinner />
-  }
-
-  function pokemonFromLookupID(id: string) {
-    if (!homeMons) return undefined
-    return homeMons[id]
   }
 
   const columns: SortableColumn<G345LookupRow>[] = [
@@ -91,7 +85,7 @@ export default function Gen345Lookup({ onSelectMon }: Gen345LookupProps) {
       rows={Object.entries(lookups.gen345).map(([gen345ID, homeID]) => ({
         gen345ID,
         homeID,
-        homeMon: pokemonFromLookupID(homeID),
+        homeMon: ohpkmStore.getById(homeID),
       }))}
       columns={columns}
     />

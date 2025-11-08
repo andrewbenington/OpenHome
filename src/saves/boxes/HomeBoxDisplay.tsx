@@ -17,7 +17,6 @@ import { FaSquare } from 'react-icons/fa'
 import { AddIcon, DevIcon, EditIcon, MenuIcon, MoveIcon, RemoveIcon } from 'src/components/Icons'
 import PokemonDetailsModal from 'src/pokemon/PokemonDetailsModal'
 import { ErrorContext } from 'src/state/error'
-import { OhpkmStoreContext } from 'src/state/ohpkm/reducer'
 import { MonLocation, MonWithLocation } from 'src/state/saves/reducer'
 import { PKMInterface } from 'src/types/interfaces'
 import { OHPKM } from 'src/types/pkm/OHPKM'
@@ -46,6 +45,7 @@ import {
 import { range } from 'src/util/Functional'
 import ToggleButton from '../../components/ToggleButton'
 import useIsDev from '../../hooks/isDev'
+import { useOhpkmStore } from '../../state/ohpkm/useOhpkmStore'
 import { useSaves } from '../../state/saves/useSaves'
 import { HomeBox, HomeData } from '../../types/SAVTypes/HomeData'
 import { filterUndefined } from '../../util/Sort'
@@ -60,6 +60,7 @@ const ALLOW_DUPE_IMPORT = true
 
 export default function HomeBoxDisplay() {
   const [openSavesState, openSavesDispatch] = useSaves()
+  const ohpkmStore = useOhpkmStore()
   const [editing, setEditing] = useState(false)
   const [moving, setMoving] = useState(false)
   const [deleting, setDeleting] = useState(false)
@@ -220,7 +221,7 @@ export default function HomeBoxDisplay() {
                           onClick={() =>
                             openSavesDispatch({
                               type: 'sort_current_home_box',
-                              payload: { sortType },
+                              payload: { sortType, getMonById: ohpkmStore.getById },
                             })
                           }
                         >
@@ -239,7 +240,7 @@ export default function HomeBoxDisplay() {
                         onClick={() =>
                           openSavesDispatch({
                             type: 'sort_all_home_boxes',
-                            payload: { sortType },
+                            payload: { sortType, getMonById: ohpkmStore.getById },
                           })
                         }
                       >
@@ -280,23 +281,13 @@ export default function HomeBoxDisplay() {
 }
 
 function BoxMons() {
-  const [{ homeMons }] = useContext(OhpkmStoreContext)
+  const ohpkmStore = useOhpkmStore()
   const [{ homeData }, openSavesDispatch] = useSaves()
   const [, dispatchError] = useContext(ErrorContext)
   const [selectedIndex, setSelectedIndex] = useState<number>()
   const [dragMonState] = useContext(DragMonContext)
 
   const attemptImportMons = (mons: PKMInterface[], location: MonLocation) => {
-    if (!homeMons) {
-      dispatchError({
-        type: 'set_message',
-        payload: {
-          title: 'Import Failed',
-          messages: ['Home data is not loaded. Something went wrong.'],
-        },
-      })
-      return
-    }
     for (const mon of mons) {
       try {
         const identifier = getMonFileIdentifier(new OHPKM(mon))
@@ -307,7 +298,7 @@ function BoxMons() {
           (mon) => mon && getMonFileIdentifier(mon) === identifier
         )
 
-        if (!ALLOW_DUPE_IMPORT && (identifier in homeMons || inCurrentBox)) {
+        if (!ALLOW_DUPE_IMPORT && (ohpkmStore.monIsStored(identifier) || inCurrentBox)) {
           const message =
             mons.length === 1
               ? 'This Pokémon has been moved into OpenHome before.'
@@ -487,7 +478,7 @@ function AllBoxes(props: {
     openSavesDispatch({
       type: 'reorder_home_boxes',
       payload: {
-        ids_in_new_order: newOrderIds,
+        idsInNewOrder: newOrderIds,
       },
     })
   }
