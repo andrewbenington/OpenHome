@@ -33,12 +33,13 @@
     "typecheck": "tsc",
     "dev:unix": "./buildVersionJSON.sh && tauri dev",
     "dev:win": "powershell -ExecutionPolicy Bypass -File ./buildVersionJSON.ps1 && tauri dev",
-    "wasm": "wasm-pack build ./pkm_rs --target web -- --features wasm",
-    "build": "npm run wasm && tsc && vite build",
+    "build": "npm run wasm && vite build",
     "dev": "npm run wasm && vite",
     "tauri": "tauri",
     "test": "vitest run",
-    "wasm": "wasm-pack build ./pkm_rs_resources --target web -- --features wasm",
+    "wasm-resources": "wasm-pack build ./pkm_rs_resources --target web -- --features wasm",
+    "wasm-pkm-rs": "wasm-pack build ./pkm_rs --target web -- --features wasm",
+    "wasm": "npm run wasm-resources && npm run wasm-pkm-rs",
     "precommit": "prettier --write . && eslint src --report-unused-disable-directives -c eslint.config.mjs --fix"
   },
   "dependencies": {
