@@ -17,7 +17,7 @@ import { useSaves } from '../../state/saves/useSaves'
 export default function AppStateDisplay() {
   const [appState, setAppState] = useState<AppState>()
   const [appInfoState] = useContext(AppInfoContext)
-  const [openSavesState] = useSaves()
+  const savesAndBanks = useSaves()
   const [errorState, dispatchErrorState] = useContext(ErrorContext)
   const [bagState] = useContext(ItemBagContext)
   const backend = useContext(BackendContext)
@@ -48,7 +48,7 @@ export default function AppStateDisplay() {
       </Card>
       <Card style={{ margin: 8, display: 'flex', flexDirection: 'row', gap: 8 }}>
         <DevDataDisplay data={appInfoDisplay(appInfoState)} label="App Info State" />
-        <DevDataDisplay data={openSavesDisplay(openSavesState)} label="Saves/Mons State" />
+        <DevDataDisplay data={openSavesDisplay(savesAndBanks)} label="Saves/Mons State" />
         <DevDataDisplay data={bagDisplay(bagState)} label="Bag State" />
         <DevDataDisplay data={errorState} label="Error State" />
         <button

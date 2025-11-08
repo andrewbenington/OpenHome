@@ -7,12 +7,12 @@ import { getPublicImageURL } from '../images/images'
 import { getItemIconPath } from '../images/items'
 import { DragMonContext, DragPayload } from '../state/dragMon'
 import { useOhpkmStore } from '../state/ohpkm/useOhpkmStore'
-import { getMonAtLocation, MonLocation } from '../state/saves/reducer'
+import { MonLocation } from '../state/saves/reducer'
 import { useSaves } from '../state/saves/useSaves'
 
 export default function PokemonDragContextProvider(props: { children?: ReactNode }) {
   const { children } = props
-  const [openSaves, openSavesDispatch] = useSaves()
+  const savesAndBanks = useSaves()
   const ohpkmStore = useOhpkmStore()
   const [dragMonState, dispatchDragMonState] = useContext(DragMonContext)
   const [, bagDispatch] = useContext(ItemBagContext)
@@ -31,36 +31,23 @@ export default function PokemonDragContextProvider(props: { children?: ReactNode
         if (payload.kind === 'item') {
           if (isMonLocation(dest) && target) {
             // Avoid losing the second item if mon already holding same item
-            const destMon = getMonAtLocation(openSaves, dest)
+            const destMon = savesAndBanks.getMonAtLocation(dest)
             if (destMon?.heldItemIndex === payload.item.index) {
               return
             }
-
-            openSavesDispatch({
-              type: 'set_mon_item',
-              payload: {
-                item: payload.item,
-                dest: target.data as MonLocation,
-              },
-            })
+            savesAndBanks.setMonHeldItem(payload.item, dest)
             bagDispatch({ type: 'remove_item', payload: { index: payload.item.index, qty: 1 } })
           }
         } else if (payload.kind === 'mon') {
           const { mon } = payload.monData
 
           if (target?.id === 'to_release') {
-            openSavesDispatch({
-              type: 'add_mon_to_release',
-              payload: payload.monData,
-            })
+            savesAndBanks.releaseMonAtLocation(payload.monData)
           } else if (target?.id === 'item-bag') {
             if (mon.heldItemIndex) {
               bagDispatch({ type: 'add_item', payload: { index: mon.heldItemIndex, qty: 1 } })
-              openSavesDispatch({
-                type: 'set_mon_item',
-                payload: { item: undefined, dest: payload.monData },
-              })
-              mon.heldItemIndex = 0
+              savesAndBanks.setMonHeldItem(undefined, payload.monData)
+              // mon.heldItemIndex = 0
             }
           } else if (
             isMonLocation(dest) &&
@@ -80,7 +67,7 @@ export default function PokemonDragContextProvider(props: { children?: ReactNode
               mon.heldItemIndex = 0
             }
 
-            openSavesDispatch({ type: 'move_mon', payload: { source, dest } })
+            savesAndBanks.moveMon(source, dest)
           }
         }
 

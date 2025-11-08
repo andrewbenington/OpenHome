@@ -23,7 +23,7 @@ const Home = () => {
   const backend = useContext(BackendContext)
   const [selectedMon, setSelectedMon] = useState<PKMInterface>()
   const [openSaveDialog, setOpenSaveDialog] = useState(false)
-  const [, , allOpenSaves] = useSaves()
+  const savesAndBanks = useSaves()
   const displayError = useDisplayError()
 
   useEffect(() => {
@@ -75,7 +75,7 @@ const Home = () => {
   return (
     <Flex direction="row" style={{ height: '100%' }}>
       <Flex className="save-file-column" gap="3">
-        {lodash.range(allOpenSaves.length).map((i) => (
+        {lodash.range(savesAndBanks.allOpenSaves.length).map((i) => (
           <OpenSaveDisplay key={`save_display_${i}`} saveIndex={i} />
         ))}
         <Button onClick={() => setOpenSaveDialog(true)}>

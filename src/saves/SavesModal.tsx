@@ -44,7 +44,7 @@ const debouncedUpdateCardSize = debounce(
 
 function useOpenSaveHandler(onClose?: () => void) {
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
-  const [, dispatchOpenSaves] = useSaves()
+  const savesAndBanks = useSaves()
   const [tentativeSaveData, setTentativeSaveData] = useState<AmbiguousOpenState>()
   const backend = useContext(BackendContext)
   const ohpkmStore = useOhpkmStore()
@@ -91,12 +91,12 @@ function useOpenSaveHandler(onClose?: () => void) {
         displayError('Error Identifying Save', 'Make sure you opened a supported save file.')
       } else {
         backend.addRecentSave(getSaveRef(saveFile))
-        dispatchOpenSaves({ type: 'add_save', payload: saveFile })
+        savesAndBanks.addSave(saveFile)
         backend.registerInPokedex(pokedexSeenFromSave(saveFile))
         onClose?.()
       }
     },
-    [getLookups, ohpkmStore.getById, displayError, backend, dispatchOpenSaves, onClose]
+    [getLookups, ohpkmStore.getById, displayError, backend, savesAndBanks, onClose]
   )
 
   const pickSaveFile = useCallback(

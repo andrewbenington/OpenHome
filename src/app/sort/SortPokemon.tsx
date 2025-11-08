@@ -20,13 +20,13 @@ function getInnerSortFunction(
 }
 
 export default function SortPokemon() {
-  const [{ homeData }, , openSaves] = useSaves()
+  const savesAndBanks = useSaves()
   const [openSaveDialog, setOpenSaveDialog] = useState(false)
   const [selectedIndex, setSelectedIndex] = useState<number>()
   const [sort, setSort] = useState<SortType>('')
 
   const allMonsWithColors = useMemo(() => {
-    const all: { mon: PKMInterface; color: string }[] = openSaves
+    const all: { mon: PKMInterface; color: string }[] = savesAndBanks.allOpenSaves
       .flatMap((save) =>
         save.boxes.flatMap((box) =>
           box.pokemon.flatMap((mon) =>
@@ -35,14 +35,14 @@ export default function SortPokemon() {
         )
       )
       .concat(
-        Object.values(homeData.boxes.flatMap((box) => box.pokemon) ?? {}).map((mon) =>
-          mon ? { mon, color: homeData.gameColor() } : undefined
+        Object.values(savesAndBanks.homeData.boxes.flatMap((box) => box.pokemon) ?? {}).map(
+          (mon) => (mon ? { mon, color: savesAndBanks.homeData.gameColor() } : undefined)
         )
       )
       .filter(filterUndefined)
 
     return all
-  }, [openSaves, homeData])
+  }, [savesAndBanks.allOpenSaves, savesAndBanks.homeData])
 
   const sortedMonsWithColors = useMemo(() => {
     return sort
@@ -84,10 +84,14 @@ export default function SortPokemon() {
     <Flex direction="row" wrap="wrap" overflow="hidden" height="calc(100% - 16px)" m="2" gap="2">
       <Card style={{ height: '100%' }}>
         <Flex direction="column" gap="1" style={{ width: 180, flex: 0 }}>
-          <Badge color="gray" size="3" style={{ border: `2px solid ${homeData?.gameColor()}` }}>
+          <Badge
+            color="gray"
+            size="3"
+            style={{ border: `2px solid ${savesAndBanks.homeData.gameColor()}` }}
+          >
             OpenHome
           </Badge>
-          {openSaves.map((save) => (
+          {savesAndBanks.allOpenSaves.map((save) => (
             <Badge
               color="gray"
               size="3"

@@ -26,13 +26,13 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
   const { onOpen, view, cardSize } = props
   const backend = useContext(BackendContext)
   const [recentSaves, setRecentSaves] = useState<Record<string, SaveRef>>()
-  const [, , openSaves] = useSaves()
+  const savesAndBanks = useSaves()
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
   const displayError = useDisplayError()
 
   const openSavePaths = useMemo(
-    () => Object.fromEntries(openSaves.map((save) => [save.filePath.raw, true])),
-    [openSaves]
+    () => Object.fromEntries(savesAndBanks.allOpenSaves.map((save) => [save.filePath.raw, true])),
+    [savesAndBanks.allOpenSaves]
   )
 
   const getRecentSaves = useCallback(() => {

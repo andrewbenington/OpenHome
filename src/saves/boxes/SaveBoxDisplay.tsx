@@ -27,7 +27,7 @@ interface OpenSaveDisplayProps {
 const ALLOW_DUPE_IMPORT = true
 
 const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
-  const [, openSavesDispatch, openSaves] = useSaves()
+  const savesAndBanks = useSaves()
   const ohpkmStore = useOhpkmStore()
   const [, dispatchError] = useContext(ErrorContext)
   const [detailsModal, setDetailsModal] = useState(false)
@@ -36,7 +36,11 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   const [dragMonState] = useContext(DragMonContext)
   const backend = useContext(BackendContext)
 
-  const save = useMemo(() => openSaves[saveIndex], [openSaves, saveIndex])
+  const save = useMemo(
+    () => savesAndBanks.allOpenSaves[saveIndex],
+    [savesAndBanks.allOpenSaves, saveIndex]
+  )
+
   const currentBox = useMemo(
     () => (save.currentPCBox < save.boxes.length ? save.boxes[save.currentPCBox] : undefined),
     [save.boxes, save.currentPCBox]
@@ -95,7 +99,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
         })
       }
     }
-    openSavesDispatch({ type: 'import_mons', payload: { mons, dest: location } })
+    savesAndBanks.importMonsToLocation(mons, location)
   }
 
   const isDisabled = useMemo(() => {
@@ -141,12 +145,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
               >
                 <Button
                   className="save-close-button"
-                  onClick={() =>
-                    openSavesDispatch({
-                      type: 'remove_save',
-                      payload: save,
-                    })
-                  }
+                  onClick={() => savesAndBanks.removeSave(save)}
                   disabled={!!save.updatedBoxSlots.length}
                   color="tomato"
                   style={{ padding: 1 }}
@@ -178,15 +177,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
           <div className="box-navigation">
             <Flex align="center" justify="center" flexGrow="4">
               <ArrowButton
-                onClick={() =>
-                  openSavesDispatch({
-                    type: 'set_save_box',
-                    payload: {
-                      boxNum: save.currentPCBox > 0 ? save.currentPCBox - 1 : save.boxes.length - 1,
-                      save,
-                    },
-                  })
-                }
+                onClick={() => savesAndBanks.saveBoxNavigateLeft(save)}
                 dragID={`arrow_left_${save.tid}_${save.sid}`}
                 direction="left"
               />
@@ -194,15 +185,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
             <div className="box-name">{save.boxes[save.currentPCBox]?.name}</div>
             <Flex align="center" justify="center" flexGrow="4">
               <ArrowButton
-                onClick={() =>
-                  openSavesDispatch({
-                    type: 'set_save_box',
-                    payload: {
-                      boxNum: (save.currentPCBox + 1) % save.boxes.length,
-                      save,
-                    },
-                  })
-                }
+                onClick={() => savesAndBanks.saveBoxNavigateRight(save)}
                 dragID={`arrow_right_${save.tid}_${save.sid}`}
                 direction="right"
               />

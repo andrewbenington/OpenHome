@@ -28,7 +28,7 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
   const [suggestedSaves, setSuggestedSaves] = useState<SAV[]>()
   const ohpkmStore = useOhpkmStore()
   const { getLookups } = useLookups()
-  const [, , openSaves] = useSaves()
+  const savesAndBanks = useSaves()
   const [error, setError] = useState(false)
   const displayError = useDisplayError()
 
@@ -41,8 +41,8 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
   )
 
   const openSavePaths = useMemo(
-    () => Object.fromEntries(Object.values(openSaves).map((save) => [save.filePath.raw, true])),
-    [openSaves]
+    () => Object.fromEntries(savesAndBanks.allOpenSaves.map((save) => [save.filePath.raw, true])),
+    [savesAndBanks.allOpenSaves]
   )
 
   const loadSaveData = useCallback(

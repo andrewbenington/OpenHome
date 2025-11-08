@@ -59,8 +59,7 @@ type BoxViewMode = 'one' | 'all'
 const ALLOW_DUPE_IMPORT = true
 
 export default function HomeBoxDisplay() {
-  const [openSavesState, openSavesDispatch] = useSaves()
-  const ohpkmStore = useOhpkmStore()
+  const savesAndBanks = useSaves()
   const [editing, setEditing] = useState(false)
   const [moving, setMoving] = useState(false)
   const [deleting, setDeleting] = useState(false)
@@ -69,20 +68,9 @@ export default function HomeBoxDisplay() {
   const isDev = useIsDev()
   const [debugMode, setDebugMode] = useState(false)
 
-  const homeData = openSavesState.homeData
+  const homeData = savesAndBanks.homeData
 
   const currentBox = homeData.boxes[homeData.currentPCBox]
-
-  const onArrowLeft = useCallback(
-    () =>
-      openSavesDispatch({
-        type: 'set_home_box',
-        payload: {
-          box: homeData.currentPCBox > 0 ? homeData.currentPCBox - 1 : homeData.boxes.length - 1,
-        },
-      }),
-    [homeData, openSavesDispatch]
-  )
 
   return (
     <Card
@@ -102,7 +90,7 @@ export default function HomeBoxDisplay() {
         <Flex align="center" justify="between" flexGrow="3" width="0">
           <ViewToggle viewMode={viewMode} setViewMode={setViewMode} disabled={editing || moving} />
           <ArrowButton
-            onClick={onArrowLeft}
+            onClick={savesAndBanks.homeBoxNavigateLeft}
             style={{ visibility: viewMode === 'one' ? 'visible' : 'collapse' }}
             dragID="home-arrow-left"
             direction="left"
@@ -123,10 +111,7 @@ export default function HomeBoxDisplay() {
               onChange={(e) => setEditingBoxName(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
-                  openSavesDispatch({
-                    type: 'set_home_box_name',
-                    payload: { name: editingBoxName, index: currentBox.index },
-                  })
+                  savesAndBanks.setBoxNameCurrentBank(currentBox.index, editingBoxName)
                   setEditing(false)
                 } else if (e.key === 'Escape') {
                   setEditing(false)
@@ -142,14 +127,7 @@ export default function HomeBoxDisplay() {
         </div>
         <Flex align="center" flexGrow="3" width="0" justify="between">
           <ArrowButton
-            onClick={() =>
-              openSavesDispatch({
-                type: 'set_home_box',
-                payload: {
-                  box: (currentBox.index + 1) % homeData.boxes.length,
-                },
-              })
-            }
+            onClick={savesAndBanks.homeBoxNavigateRight}
             style={{ visibility: viewMode === 'one' ? 'visible' : 'collapse' }}
             dragID="home-arrow-right"
             direction="right"
@@ -162,10 +140,7 @@ export default function HomeBoxDisplay() {
                 setState={setEditing}
                 onSet={() => setEditingBoxName(homeData.getCurrentBox().name ?? '')}
                 onUnset={() =>
-                  openSavesDispatch({
-                    type: 'set_home_box_name',
-                    payload: { name: editingBoxName, index: currentBox.index },
-                  })
+                  savesAndBanks.setBoxNameCurrentBank(currentBox.index, editingBoxName)
                 }
                 icon={EditIcon}
                 hint="Change box name"
@@ -178,12 +153,7 @@ export default function HomeBoxDisplay() {
                     className="mini-button"
                     variant="outline"
                     color="gray"
-                    onClick={() =>
-                      openSavesDispatch({
-                        type: 'add_home_box',
-                        payload: { currentBoxCount: homeData.boxes.length },
-                      })
-                    }
+                    onClick={savesAndBanks.addBoxCurrentBank}
                   >
                     <AddIcon />
                   </Button>
@@ -218,12 +188,7 @@ export default function HomeBoxDisplay() {
                       {SortTypes.filter((st) => st !== '').map((sortType) => (
                         <DropdownMenu.Item
                           key={sortType}
-                          onClick={() =>
-                            openSavesDispatch({
-                              type: 'sort_current_home_box',
-                              payload: { sortType, getMonById: ohpkmStore.getById },
-                            })
-                          }
+                          onClick={() => savesAndBanks.sortCurrentHomeBox(sortType)}
                         >
                           By {sortType}
                         </DropdownMenu.Item>
@@ -237,25 +202,14 @@ export default function HomeBoxDisplay() {
                     {SortTypes.filter((st) => st !== '').map((sortType) => (
                       <DropdownMenu.Item
                         key={sortType}
-                        onClick={() =>
-                          openSavesDispatch({
-                            type: 'sort_all_home_boxes',
-                            payload: { sortType, getMonById: ohpkmStore.getById },
-                          })
-                        }
+                        onClick={() => savesAndBanks.sortAllHomeBoxes(sortType)}
                       >
                         By {sortType}
                       </DropdownMenu.Item>
                     ))}
                   </DropdownMenu.SubContent>
                 </DropdownMenu.Sub>
-                <DropdownMenu.Item
-                  onClick={() =>
-                    openSavesDispatch({
-                      type: 'current_home_box_remove_dupes',
-                    })
-                  }
-                >
+                <DropdownMenu.Item onClick={savesAndBanks.removeDupesCurrentHomeBox}>
                   Remove duplicates from this box
                 </DropdownMenu.Item>
               </DropdownMenu.Content>
@@ -282,10 +236,12 @@ export default function HomeBoxDisplay() {
 
 function BoxMons() {
   const ohpkmStore = useOhpkmStore()
-  const [{ homeData }, openSavesDispatch] = useSaves()
+  const savesAndBanks = useSaves()
   const [, dispatchError] = useContext(ErrorContext)
   const [selectedIndex, setSelectedIndex] = useState<number>()
   const [dragMonState] = useContext(DragMonContext)
+
+  const homeData = savesAndBanks.homeData
 
   const attemptImportMons = (mons: PKMInterface[], location: MonLocation) => {
     for (const mon of mons) {
@@ -317,18 +273,7 @@ function BoxMons() {
         })
       }
     }
-    openSavesDispatch({
-      type: 'import_mons',
-      payload: {
-        mons,
-        dest: {
-          bank: homeData.getCurrentBank().index,
-          box: location.box,
-          box_slot: location.box_slot,
-          is_home: true,
-        },
-      },
-    })
+    savesAndBanks.importMonsToLocation(mons, location)
   }
 
   const dragData: MonWithLocation | undefined = useMemo(() => {
@@ -451,13 +396,15 @@ function AllBoxes(props: {
   debugMode?: boolean
 }) {
   const { onBoxSelect, moving, deleting, debugMode } = props
-  const [{ homeData }, openSavesDispatch] = useSaves()
+  const savesAndBanks = useSaves()
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
   )
+
+  const { homeData } = savesAndBanks
 
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event
@@ -475,12 +422,7 @@ function AllBoxes(props: {
       .map((index) => homeData.boxes.find((box) => box.index === index)?.id)
       .filter(filterUndefined)
 
-    openSavesDispatch({
-      type: 'reorder_home_boxes',
-      payload: {
-        idsInNewOrder: newOrderIds,
-      },
-    })
+    savesAndBanks.reorderBoxesCurrentBank(newOrderIds)
   }
 
   return (
@@ -524,7 +466,7 @@ type BoxOverviewProps = {
 }
 
 function BoxOverview({ box, onBoxSelect, debugMode, deleting }: BoxOverviewProps) {
-  const [{ homeData }, openSavesDispatch] = useSaves()
+  const savesAndBanks = useSaves()
 
   const firstOpenIndex = box.firstOpenIndex()
 
@@ -537,7 +479,7 @@ function BoxOverview({ box, onBoxSelect, debugMode, deleting }: BoxOverviewProps
           firstOpenIndex !== undefined
             ? {
                 is_home: true,
-                bank: homeData.currentBankIndex,
+                bank: savesAndBanks.homeData.currentBankIndex,
                 box: box.index,
                 box_slot: firstOpenIndex,
               }
@@ -575,10 +517,7 @@ function BoxOverview({ box, onBoxSelect, debugMode, deleting }: BoxOverviewProps
               radius="full"
               disabled={box.getMonCount() > 0}
               onClick={() => {
-                openSavesDispatch({
-                  type: 'delete_home_box',
-                  payload: { index: box.index, id: box.id },
-                })
+                savesAndBanks.deleteBoxCurrentBank(box.id, box.index)
               }}
             >
               <RemoveIcon />

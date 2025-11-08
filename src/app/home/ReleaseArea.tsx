@@ -4,14 +4,14 @@ import DroppableSpace from 'src/saves/boxes/DroppableSpace'
 import { useSaves } from '../../state/saves/useSaves'
 
 export default function ReleaseArea() {
-  const [openSavesState] = useSaves()
+  const savesAndBanks = useSaves()
 
   return (
     <Flex className="drop-area" direction="column">
       <div className="drop-area-text diagonal-clip">Release</div>
       <DroppableSpace dropID={`to_release`}>
         <div className="release-icon-container" style={{ display: 'flex' }}>
-          {openSavesState.monsToRelease.map((mon, i) => (
+          {savesAndBanks.monsToRelease.map((mon, i) => (
             <PokemonIcon
               key={`delete_mon_${i}`}
               dexNumber={mon.dexNum}

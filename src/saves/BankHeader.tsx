@@ -3,15 +3,14 @@ import { useState } from 'react'
 import { EditIcon } from 'src/components/Icons'
 import { getBankName } from 'src/types/storage'
 import ToggleButton from '../components/ToggleButton'
-import { useOhpkmStore } from '../state/ohpkm/useOhpkmStore'
 import { useSaves } from '../state/saves/useSaves'
 
 export default function BankHeader() {
-  const [openSavesState, openSavesDispatch] = useSaves()
+  const savesAndBanks = useSaves()
   const [editing, setEditing] = useState(false)
   const [bankNameEditValue, setBankNameEditValue] = useState('')
 
-  const homeData = openSavesState.homeData
+  const homeData = savesAndBanks.homeData
 
   return (
     <Card className="bank-ribbon">
@@ -31,10 +30,7 @@ export default function BankHeader() {
           onChange={(e) => setBankNameEditValue(e.target.value ?? undefined)}
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
-              openSavesDispatch({
-                type: 'set_home_bank_name',
-                payload: { bank: homeData.currentBankIndex, name: bankNameEditValue },
-              })
+              savesAndBanks.setCurrentBankName(bankNameEditValue)
               setEditing(false)
             } else if (e.key === 'Escape') {
               setEditing(false)
@@ -51,12 +47,7 @@ export default function BankHeader() {
           state={editing}
           setState={setEditing}
           onSet={() => setBankNameEditValue(homeData.getCurrentBankName())}
-          onUnset={() =>
-            openSavesDispatch({
-              type: 'set_home_bank_name',
-              payload: { bank: homeData.currentBankIndex, name: bankNameEditValue },
-            })
-          }
+          onUnset={() => savesAndBanks.setCurrentBankName(bankNameEditValue)}
           icon={EditIcon}
           hint="Change bank name"
         />
@@ -73,8 +64,7 @@ function removeNonDigits(input: string): string {
 
 function BankSelector(props: { disabled?: boolean }) {
   const { disabled } = props
-  const [{ homeData }, openSavesDispatch] = useSaves()
-  const ohpkmStore = useOhpkmStore()
+  const savesAndBanks = useSaves()
   const [newBankName, setNewBankName] = useState<string>()
   const [newBankBoxCount, setNewBankBoxCount] = useState('30')
   const [isOpen, setIsOpen] = useState(false)
@@ -88,15 +78,10 @@ function BankSelector(props: { disabled?: boolean }) {
         </Button>
       </DropdownMenu.Trigger>
       <DropdownMenu.Content>
-        {homeData.banks.map((bank) => (
+        {savesAndBanks.homeData.banks.map((bank) => (
           <DropdownMenu.Item
             key={bank.index}
-            onClick={() =>
-              openSavesDispatch({
-                type: 'set_current_home_bank',
-                payload: { bank: bank.index, getMonById: ohpkmStore.getById },
-              })
-            }
+            onClick={() => savesAndBanks.switchToBank(bank.index)}
           >
             {getBankName(bank)}
           </DropdownMenu.Item>
@@ -111,7 +96,7 @@ function BankSelector(props: { disabled?: boolean }) {
                 <DataList.Value>
                   <TextField.Root
                     size="1"
-                    placeholder={`Bank ${homeData.banks.length + 1}`}
+                    placeholder={`Bank ${savesAndBanks.homeData.banks.length + 1}`}
                     onChange={(e) => setNewBankName(e.target.value || undefined)}
                   />
                 </DataList.Value>
@@ -131,17 +116,7 @@ function BankSelector(props: { disabled?: boolean }) {
             <Button
               size="1"
               onClick={() => {
-                openSavesDispatch({
-                  type: 'add_home_bank',
-                  payload: {
-                    name: newBankName,
-                    boxCount: parseInt(newBankBoxCount),
-                    currentCount: homeData.banks.length ?? 0,
-                    switchToBank: true,
-                    getMonById: ohpkmStore.getById,
-                  },
-                })
-
+                savesAndBanks.addBank(newBankName, parseInt(newBankBoxCount))
                 setIsOpen(false)
               }}
             >
