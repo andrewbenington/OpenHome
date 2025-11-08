@@ -1,35 +1,20 @@
-import {
-  Button,
-  Card,
-  DataList,
-  DropdownMenu,
-  Flex,
-  Heading,
-  Spinner,
-  TextField,
-} from '@radix-ui/themes'
-import { useContext, useState } from 'react'
+import { Button, Card, DataList, DropdownMenu, Flex, Heading, TextField } from '@radix-ui/themes'
+import { useState } from 'react'
 import { EditIcon } from 'src/components/Icons'
-import { OpenSavesContext } from 'src/state/openSaves'
-import { PersistedPkmDataContext } from 'src/state/persistedPkmData'
-import { HomeData } from 'src/types/SAVTypes/HomeData'
 import { getBankName } from 'src/types/storage'
 import ToggleButton from '../components/ToggleButton'
+import { useSaves } from '../state/saves/useSaves'
 
 export default function BankHeader() {
-  const [openSavesState, openSavesDispatch] = useContext(OpenSavesContext)
+  const savesAndBanks = useSaves()
   const [editing, setEditing] = useState(false)
   const [bankNameEditValue, setBankNameEditValue] = useState('')
 
-  const homeData = openSavesState.homeData
-
-  if (!homeData) return <Spinner />
+  const homeData = savesAndBanks.homeData
 
   return (
     <Card className="bank-ribbon">
-      <div style={{ flexGrow: 1, width: 0 }}>
-        {<BankSelector homeData={homeData} disabled={editing} />}
-      </div>
+      <div style={{ flexGrow: 1, width: 0 }}>{<BankSelector disabled={editing} />}</div>
       {editing ? (
         <TextField.Root
           size="1"
@@ -45,10 +30,7 @@ export default function BankHeader() {
           onChange={(e) => setBankNameEditValue(e.target.value ?? undefined)}
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
-              openSavesDispatch({
-                type: 'set_home_bank_name',
-                payload: { bank: homeData.currentBankIndex, name: bankNameEditValue },
-              })
+              savesAndBanks.setCurrentBankName(bankNameEditValue)
               setEditing(false)
             } else if (e.key === 'Escape') {
               setEditing(false)
@@ -65,12 +47,7 @@ export default function BankHeader() {
           state={editing}
           setState={setEditing}
           onSet={() => setBankNameEditValue(homeData.getCurrentBankName())}
-          onUnset={() =>
-            openSavesDispatch({
-              type: 'set_home_bank_name',
-              payload: { bank: homeData.currentBankIndex, name: bankNameEditValue },
-            })
-          }
+          onUnset={() => savesAndBanks.setCurrentBankName(bankNameEditValue)}
           icon={EditIcon}
           hint="Change bank name"
         />
@@ -85,19 +62,12 @@ function removeNonDigits(input: string): string {
   return input.replaceAll(nonDigitsRE, '')
 }
 
-function BankSelector(props: { homeData: HomeData; disabled?: boolean }) {
-  const { homeData, disabled } = props
-  const [, openSavesDispatch] = useContext(OpenSavesContext)
-  const [pkmDataState] = useContext(PersistedPkmDataContext)
+function BankSelector(props: { disabled?: boolean }) {
+  const { disabled } = props
+  const savesAndBanks = useSaves()
   const [newBankName, setNewBankName] = useState<string>()
   const [newBankBoxCount, setNewBankBoxCount] = useState('30')
   const [isOpen, setIsOpen] = useState(false)
-
-  if (!pkmDataState.homeMons) {
-    return <Spinner />
-  }
-
-  const monLookup = pkmDataState.homeMons
 
   return (
     <DropdownMenu.Root open={isOpen} onOpenChange={setIsOpen}>
@@ -108,15 +78,10 @@ function BankSelector(props: { homeData: HomeData; disabled?: boolean }) {
         </Button>
       </DropdownMenu.Trigger>
       <DropdownMenu.Content>
-        {homeData.banks.map((bank) => (
+        {savesAndBanks.homeData.banks.map((bank) => (
           <DropdownMenu.Item
             key={bank.index}
-            onClick={() =>
-              openSavesDispatch({
-                type: 'set_current_home_bank',
-                payload: { bank: bank.index, monLookup },
-              })
-            }
+            onClick={() => savesAndBanks.switchToBank(bank.index)}
           >
             {getBankName(bank)}
           </DropdownMenu.Item>
@@ -131,7 +96,7 @@ function BankSelector(props: { homeData: HomeData; disabled?: boolean }) {
                 <DataList.Value>
                   <TextField.Root
                     size="1"
-                    placeholder={`Bank ${homeData.banks.length + 1}`}
+                    placeholder={`Bank ${savesAndBanks.homeData.banks.length + 1}`}
                     onChange={(e) => setNewBankName(e.target.value || undefined)}
                   />
                 </DataList.Value>
@@ -151,18 +116,7 @@ function BankSelector(props: { homeData: HomeData; disabled?: boolean }) {
             <Button
               size="1"
               onClick={() => {
-                if (!pkmDataState.homeMons) return
-                openSavesDispatch({
-                  type: 'add_home_bank',
-                  payload: {
-                    name: newBankName,
-                    box_count: parseInt(newBankBoxCount),
-                    current_count: homeData.banks.length ?? 0,
-                    switch_to_bank: true,
-                    home_lookup: pkmDataState.homeMons,
-                  },
-                })
-
+                savesAndBanks.addBank(newBankName, parseInt(newBankBoxCount))
                 setIsOpen(false)
               }}
             >

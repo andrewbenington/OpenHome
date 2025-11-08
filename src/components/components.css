@@ -90,6 +90,50 @@
   list-style: none;
   overflow: visible;
 }
+
 .selected {
   background-color: var(--accent-6);
+}
+
+.loading-overlay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+
+  --logo-side: 128px;
+}
+
+.loading-centered-container {
+  height: var(--logo-side);
+  width: 100%;
+  position: relative;
+}
+
+.loading-openhome-logo-back {
+  width: var(--logo-side);
+  height: var(--logo-side);
+  position: absolute;
+  left: calc(50% - var(--logo-side) / 2);
+}
+
+.loading-openhome-logo-letter {
+  width: var(--logo-side);
+  height: var(--logo-side);
+  position: absolute;
+  left: calc(50% - var(--logo-side) / 2);
+  animation: spin 0.7s ease-in-out infinite;
+}
+
+.loading-message {
+  position: absolute;
+  top: var(--logo-side);
+  width: 100%;
+  text-align: center;
+}
+
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  }
 }

@@ -8,8 +8,6 @@ import { CardsIcon, GridIcon } from 'src/components/Icons'
 import SideTabs from 'src/components/side-tabs/SideTabs'
 import useDisplayError from 'src/hooks/displayError'
 import { AppInfoAction, AppInfoContext } from 'src/state/appInfo'
-import { OpenSavesContext } from 'src/state/openSaves'
-import { PersistedPkmDataContext } from 'src/state/persistedPkmData'
 import { displayIndexAdder, isBattleFormeItem } from 'src/types/pkm/util'
 import { PokedexUpdate } from 'src/types/pokedex'
 import { buildSaveFile, getPossibleSaveTypes } from 'src/types/SAVTypes/load'
@@ -19,6 +17,8 @@ import { SAVClass } from 'src/types/SAVTypes/util'
 import { getMonFileIdentifier } from 'src/util/Lookup'
 import { filterUndefined } from 'src/util/Sort'
 import { useLookups } from '../state/lookups'
+import { useOhpkmStore } from '../state/ohpkm/useOhpkmStore'
+import { useSaves } from '../state/saves/useSaves'
 import RecentSaves from './RecentSaves'
 import SaveFolders from './SaveFolders'
 import SuggestedSaves from './SuggestedSaves'
@@ -44,10 +44,10 @@ const debouncedUpdateCardSize = debounce(
 
 function useOpenSaveHandler(onClose?: () => void) {
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
-  const [, dispatchOpenSaves] = useContext(OpenSavesContext)
+  const savesAndBanks = useSaves()
   const [tentativeSaveData, setTentativeSaveData] = useState<AmbiguousOpenState>()
   const backend = useContext(BackendContext)
-  const [lookupState] = useContext(PersistedPkmDataContext)
+  const ohpkmStore = useOhpkmStore()
   const { getLookups } = useLookups()
 
   const displayError = useDisplayError()
@@ -67,7 +67,7 @@ function useOpenSaveHandler(onClose?: () => void) {
         filePath,
         fileBytes,
         {
-          homeMonMap: lookupState.homeMons,
+          getOhpkmById: ohpkmStore.getById,
           gen12LookupMap: lookups.gen12,
           gen345LookupMap: lookups.gen345,
         },
@@ -91,12 +91,12 @@ function useOpenSaveHandler(onClose?: () => void) {
         displayError('Error Identifying Save', 'Make sure you opened a supported save file.')
       } else {
         backend.addRecentSave(getSaveRef(saveFile))
-        dispatchOpenSaves({ type: 'add_save', payload: saveFile })
+        savesAndBanks.addSave(saveFile)
         backend.registerInPokedex(pokedexSeenFromSave(saveFile))
         onClose?.()
       }
     },
-    [getLookups, lookupState.homeMons, displayError, backend, dispatchOpenSaves, onClose]
+    [getLookups, ohpkmStore.getById, displayError, backend, savesAndBanks, onClose]
   )
 
   const pickSaveFile = useCallback(
@@ -161,7 +161,7 @@ const SavesModal = (props: SavesModalProps) => {
         <Dialog.Description>Description</Dialog.Description>
       </VisuallyHidden>
       <Dialog.Content
-        maxWidth="95%"
+        maxWidth="95vw"
         style={{
           minWidth: 800,
           height: 'calc(90vh - 32px)',

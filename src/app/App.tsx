@@ -18,9 +18,8 @@ import { DragMonContext, dragMonReducer } from '../state/dragMon'
 import { ErrorContext, errorReducer } from '../state/error'
 import { FilterContext, filterReducer } from '../state/filter'
 import { MouseContext, mouseReducer } from '../state/mouse'
-import { OpenSavesContext, openSavesReducer } from '../state/openSaves'
-import { PersistedPkmDataContext, persistedPkmDataReducer } from '../state/persistedPkmData'
-import { HomeData } from '../types/SAVTypes/HomeData'
+import OhpkmStoreProvider from '../state/ohpkm/OhpkmStoreProvider'
+import SavesProvider from '../state/saves/SavesProvider'
 import './App.css'
 import AppTabs from './AppTabs'
 import ErrorMessageModal from './ErrorMessage'
@@ -35,7 +34,11 @@ export default function App() {
   const [errorState, errorDispatch] = useReducer(errorReducer, {})
 
   return (
-    <Theme accentColor="red" hasBackground appearance={isDarkMode ? 'dark' : 'light'}>
+    <Theme
+      accentColor="red"
+      appearance={isDarkMode ? 'dark' : 'light'}
+      style={{ background: 'var(--background-gradient)' }}
+    >
       <BackendProvider backend={TauriBackend}>
         <ErrorContext.Provider value={[errorState, errorDispatch]}>
           <AppWithBackend />
@@ -78,7 +81,6 @@ function AppWithBackend() {
   const [mouseState, mouseDispatch] = useReducer(mouseReducer, { shift: false })
   const [dragMonState, dragMonDispatch] = useReducer(dragMonReducer, { mode: 'mon' })
   const [appInfoState, appInfoDispatch] = useReducer(appInfoReducer, appInfoInitialState)
-  const [lookupState, lookupDispatch] = useReducer(persistedPkmDataReducer, { loaded: false })
   const [filterState, filterDispatch] = useReducer(filterReducer, {})
   const [pluginState, pluginDispatch] = useReducer(pluginReducer, { plugins: [], loaded: false })
   const [settingsLoading, setSettingsLoading] = useState(false)
@@ -90,12 +92,6 @@ function AppWithBackend() {
 
   const backend = useContext(BackendContext)
   const displayError = useDisplayError()
-
-  const [openSavesState, openSavesDispatch] = useReducer(openSavesReducer, {
-    modifiedOHPKMs: {},
-    monsToRelease: [],
-    openSaves: {},
-  })
 
   // only on app start
   useEffect(() => {
@@ -175,19 +171,9 @@ function AppWithBackend() {
     <PluginContext.Provider value={[pluginState, pluginDispatch]}>
       <AppInfoContext.Provider value={[appInfoState, appInfoDispatch, getEnabledSaveTypes]}>
         <MouseContext.Provider value={[mouseState, mouseDispatch]}>
-          <PersistedPkmDataContext.Provider value={[lookupState, lookupDispatch]}>
-            <OpenSavesContext.Provider
-              value={[
-                openSavesState,
-                openSavesDispatch,
-                Object.values(openSavesState.openSaves)
-                  .filter((data) => !!data)
-                  .filter((data) => !(data.save instanceof HomeData))
-                  .sort((a, b) => a.index - b.index)
-                  .map((data) => data.save),
-              ]}
-            >
-              <ItemBagContext.Provider value={[bagState, bagDispatch]}>
+          <OhpkmStoreProvider>
+            <ItemBagContext.Provider value={[bagState, bagDispatch]}>
+              <SavesProvider>
                 <DragMonContext.Provider value={[dragMonState, dragMonDispatch]}>
                   <PokemonDragContextProvider>
                     <FilterContext.Provider value={[filterState, filterDispatch]}>
@@ -204,9 +190,9 @@ function AppWithBackend() {
                     </FilterContext.Provider>
                   </PokemonDragContextProvider>
                 </DragMonContext.Provider>
-              </ItemBagContext.Provider>
-            </OpenSavesContext.Provider>
-          </PersistedPkmDataContext.Provider>
+              </SavesProvider>
+            </ItemBagContext.Provider>
+          </OhpkmStoreProvider>
         </MouseContext.Provider>
       </AppInfoContext.Provider>
     </PluginContext.Provider>

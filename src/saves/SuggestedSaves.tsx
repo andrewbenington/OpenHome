@@ -9,8 +9,8 @@ import OHDataGrid, { SortableColumn } from '../components/OHDataGrid'
 import useDisplayError from '../hooks/displayError'
 import { AppInfoContext } from '../state/appInfo'
 import { useLookups } from '../state/lookups'
-import { OpenSavesContext } from '../state/openSaves'
-import { PersistedPkmDataContext } from '../state/persistedPkmData'
+import { useOhpkmStore } from '../state/ohpkm/useOhpkmStore'
+import { useSaves } from '../state/saves/useSaves'
 import { PathData, splitPath } from '../types/SAVTypes/path'
 import SaveCard from './SaveCard'
 import { filterEmpty, SaveViewMode } from './util'
@@ -26,9 +26,9 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
   const backend = useContext(BackendContext)
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
   const [suggestedSaves, setSuggestedSaves] = useState<SAV[]>()
-  const [{ homeMons: homeMonMap }] = useContext(PersistedPkmDataContext)
+  const ohpkmStore = useOhpkmStore()
   const { getLookups } = useLookups()
-  const [, , openSaves] = useContext(OpenSavesContext)
+  const savesAndBanks = useSaves()
   const [error, setError] = useState(false)
   const displayError = useDisplayError()
 
@@ -41,8 +41,8 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
   )
 
   const openSavePaths = useMemo(
-    () => Object.fromEntries(Object.values(openSaves).map((save) => [save.filePath.raw, true])),
-    [openSaves]
+    () => Object.fromEntries(savesAndBanks.allOpenSaves.map((save) => [save.filePath.raw, true])),
+    [savesAndBanks.allOpenSaves]
   )
 
   const loadSaveData = useCallback(
@@ -65,7 +65,7 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
           savePath,
           fileBytes,
           {
-            homeMonMap,
+            getOhpkmById: ohpkmStore.getById,
             gen12LookupMap: lookups.gen12,
             gen345LookupMap: lookups.gen345,
           },
@@ -74,7 +74,7 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
       }
       return undefined
     },
-    [backend, getEnabledSaveTypes, getLookups, handleError, homeMonMap]
+    [backend, getEnabledSaveTypes, getLookups, handleError, ohpkmStore.getById]
   )
 
   useEffect(() => {

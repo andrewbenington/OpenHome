@@ -1575,7 +1575,7 @@ export class OHPKM implements PKMInterface {
     return getHomeIdentifier(this)
   }
 
-  public updateData(other: PKMInterface, isFromOT: boolean = false) {
+  public updateData(other: PKMInterface) {
     this.exp = other.exp
 
     this.moves = other.moves as [number, number, number, number]
@@ -1737,9 +1737,7 @@ export class OHPKM implements PKMInterface {
       this.obedienceLevel = other.obedienceLevel
     }
 
-    if (isFromOT) {
-      this.nickname = other.nickname
-    }
+    this.nickname = other.nickname
   }
 }
 
