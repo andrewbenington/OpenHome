@@ -18,7 +18,7 @@ import { DragMonContext, dragMonReducer } from '../state/dragMon'
 import { ErrorContext, errorReducer } from '../state/error'
 import { FilterContext, filterReducer } from '../state/filter'
 import { MouseContext, mouseReducer } from '../state/mouse'
-import { PersistedPkmDataContext, persistedPkmDataReducer } from '../state/persistedPkmData'
+import OhpkmStoreProvider from '../state/ohpkm/OhpkmStoreProvider'
 import SavesProvider from '../state/saves/SavesProvider'
 import './App.css'
 import AppTabs from './AppTabs'
@@ -34,7 +34,12 @@ export default function App() {
   const [errorState, errorDispatch] = useReducer(errorReducer, {})
 
   return (
-    <Theme accentColor="red" hasBackground appearance={isDarkMode ? 'dark' : 'light'}>
+    <Theme
+      accentColor="red"
+      hasBackground
+      appearance={isDarkMode ? 'dark' : 'light'}
+      style={{ backgroundColor: 'var(--background-gradient)' }}
+    >
       <BackendProvider backend={TauriBackend}>
         <ErrorContext.Provider value={[errorState, errorDispatch]}>
           <AppWithBackend />
@@ -77,7 +82,6 @@ function AppWithBackend() {
   const [mouseState, mouseDispatch] = useReducer(mouseReducer, { shift: false })
   const [dragMonState, dragMonDispatch] = useReducer(dragMonReducer, { mode: 'mon' })
   const [appInfoState, appInfoDispatch] = useReducer(appInfoReducer, appInfoInitialState)
-  const [lookupState, lookupDispatch] = useReducer(persistedPkmDataReducer, { loaded: false })
   const [filterState, filterDispatch] = useReducer(filterReducer, {})
   const [pluginState, pluginDispatch] = useReducer(pluginReducer, { plugins: [], loaded: false })
   const [settingsLoading, setSettingsLoading] = useState(false)
@@ -168,7 +172,7 @@ function AppWithBackend() {
     <PluginContext.Provider value={[pluginState, pluginDispatch]}>
       <AppInfoContext.Provider value={[appInfoState, appInfoDispatch, getEnabledSaveTypes]}>
         <MouseContext.Provider value={[mouseState, mouseDispatch]}>
-          <PersistedPkmDataContext.Provider value={[lookupState, lookupDispatch]}>
+          <OhpkmStoreProvider>
             <ItemBagContext.Provider value={[bagState, bagDispatch]}>
               <SavesProvider>
                 <DragMonContext.Provider value={[dragMonState, dragMonDispatch]}>
@@ -189,7 +193,7 @@ function AppWithBackend() {
                 </DragMonContext.Provider>
               </SavesProvider>
             </ItemBagContext.Provider>
-          </PersistedPkmDataContext.Provider>
+          </OhpkmStoreProvider>
         </MouseContext.Provider>
       </AppInfoContext.Provider>
     </PluginContext.Provider>

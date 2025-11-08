@@ -9,7 +9,7 @@ import OHDataGrid, { SortableColumn } from '../components/OHDataGrid'
 import useDisplayError from '../hooks/displayError'
 import { AppInfoContext } from '../state/appInfo'
 import { useLookups } from '../state/lookups'
-import { PersistedPkmDataContext } from '../state/persistedPkmData'
+import { OhpkmStoreContext } from '../state/ohpkm/reducer'
 import { useSaves } from '../state/saves/useSaves'
 import { PathData, splitPath } from '../types/SAVTypes/path'
 import SaveCard from './SaveCard'
@@ -26,7 +26,7 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
   const backend = useContext(BackendContext)
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
   const [suggestedSaves, setSuggestedSaves] = useState<SAV[]>()
-  const [{ homeMons: homeMonMap }] = useContext(PersistedPkmDataContext)
+  const [{ homeMons: homeMonMap }] = useContext(OhpkmStoreContext)
   const { getLookups } = useLookups()
   const [, , openSaves] = useSaves()
   const [error, setError] = useState(false)

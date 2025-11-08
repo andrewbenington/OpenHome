@@ -8,7 +8,7 @@ import { CardsIcon, GridIcon } from 'src/components/Icons'
 import SideTabs from 'src/components/side-tabs/SideTabs'
 import useDisplayError from 'src/hooks/displayError'
 import { AppInfoAction, AppInfoContext } from 'src/state/appInfo'
-import { PersistedPkmDataContext } from 'src/state/persistedPkmData'
+import { OhpkmStoreContext } from 'src/state/ohpkm/reducer'
 import { displayIndexAdder, isBattleFormeItem } from 'src/types/pkm/util'
 import { PokedexUpdate } from 'src/types/pokedex'
 import { buildSaveFile, getPossibleSaveTypes } from 'src/types/SAVTypes/load'
@@ -47,7 +47,7 @@ function useOpenSaveHandler(onClose?: () => void) {
   const [, dispatchOpenSaves] = useSaves()
   const [tentativeSaveData, setTentativeSaveData] = useState<AmbiguousOpenState>()
   const backend = useContext(BackendContext)
-  const [lookupState] = useContext(PersistedPkmDataContext)
+  const [lookupState] = useContext(OhpkmStoreContext)
   const { getLookups } = useLookups()
 
   const displayError = useDisplayError()

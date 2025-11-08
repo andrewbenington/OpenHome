@@ -7,7 +7,7 @@ import { StoredBankData } from 'src/types/storage'
 import { getMonFileIdentifier } from 'src/util/Lookup'
 import { PKMInterface } from '../../types/interfaces'
 import { getSortFunctionNullable, SortType } from '../../types/pkm/sort'
-import { PersistedPkmData } from '../persistedPkmData'
+import { OhpkmStoreData } from '../ohpkm/reducer'
 
 export type OpenSave = {
   index: number
@@ -44,7 +44,7 @@ export type OpenSavesAction =
    */
   | {
       type: 'load_home_banks'
-      payload: { banks: StoredBankData; monLookup: PersistedPkmData }
+      payload: { banks: StoredBankData; monLookup: OhpkmStoreData }
     }
   | {
       type: 'add_home_bank'
@@ -58,7 +58,7 @@ export type OpenSavesAction =
     }
   | {
       type: 'set_current_home_bank'
-      payload: { bank: number; monLookup: PersistedPkmData }
+      payload: { bank: number; monLookup: OhpkmStoreData }
     }
   | {
       type: 'set_home_bank_name'

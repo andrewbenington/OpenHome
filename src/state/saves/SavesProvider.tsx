@@ -1,16 +1,15 @@
 import { Generation, OriginGame, OriginGames } from '@pkm-rs-resources/pkg'
-import { Callout, Spinner } from '@radix-ui/themes'
+import { Callout } from '@radix-ui/themes'
 import * as E from 'fp-ts/lib/Either'
 import { flatten } from 'lodash'
 import { ReactNode, useCallback, useContext, useEffect, useReducer } from 'react'
 import { BackendContext } from '../../backend/backendContext'
 import { ErrorIcon } from '../../components/Icons'
+import LoadingIndicator from '../../components/LoadingIndicator'
 import useDisplayError from '../../hooks/displayError'
 import { OHPKM } from '../../types/pkm/OHPKM'
-import { displayIndexAdder, isBattleFormeItem } from '../../types/pkm/util'
-import { PokedexUpdate } from '../../types/pokedex'
 import { HomeData } from '../../types/SAVTypes/HomeData'
-import { Errorable, LookupMap } from '../../types/types'
+import { LookupMap } from '../../types/types'
 import {
   getMonFileIdentifier,
   getMonGen12Identifier,
@@ -18,7 +17,7 @@ import {
 } from '../../util/Lookup'
 import { filterUndefined } from '../../util/Sort'
 import { ItemBagContext } from '../itemBag'
-import { PersistedPkmDataContext } from '../persistedPkmData'
+import { useOhpkmStore } from '../ohpkm/useOhpkmStore'
 import { openSavesReducer, SavesContext } from './reducer'
 
 export type SavesProviderProps = {
@@ -27,7 +26,7 @@ export type SavesProviderProps = {
 
 export default function SavesProvider({ children }: SavesProviderProps) {
   const backend = useContext(BackendContext)
-  const [persistedPkmState, persistedPkmDispatch] = useContext(PersistedPkmDataContext)
+  const [ohpkmStore, persistedPkmDispatch] = useOhpkmStore()
   const [itemBagState, bagDispatch] = useContext(ItemBagContext)
   const displayError = useDisplayError()
   const [openSavesState, openSavesDispatch] = useReducer(openSavesReducer, {
@@ -41,49 +40,6 @@ export default function SavesProvider({ children }: SavesProviderProps) {
     .filter((data) => !(data.save instanceof HomeData))
     .sort((a, b) => a.index - b.index)
     .map((data) => data.save)
-
-  const loadAllLookups = useCallback(async (): Promise<Errorable<Record<string, OHPKM>>> => {
-    const onLoadError = (message: string) => {
-      console.error(message)
-      persistedPkmDispatch({ type: 'set_error', payload: message })
-    }
-    const homeResult = await backend.loadHomeMonLookup()
-
-    if (E.isLeft(homeResult)) {
-      onLoadError(homeResult.left)
-      return E.left(homeResult.left)
-    }
-
-    const pokedexUpdates: PokedexUpdate[] = []
-
-    for (const [identifier, mon] of Object.entries(homeResult.right)) {
-      const hadErrors = mon.fixErrors()
-
-      if (hadErrors) {
-        backend.writeHomeMon(identifier, new Uint8Array(mon.toBytes()))
-      }
-
-      pokedexUpdates.push({
-        dexNumber: mon.dexNum,
-        formeNumber: mon.formeNum,
-        status: mon.isShiny() ? 'ShinyCaught' : 'Caught',
-      })
-
-      if (isBattleFormeItem(mon.dexNum, mon.heldItemIndex)) {
-        pokedexUpdates.push({
-          dexNumber: mon.dexNum,
-          formeNumber: displayIndexAdder(mon.heldItemIndex)(mon.formeNum),
-          status: mon.isShiny() ? 'ShinyCaught' : 'Caught',
-        })
-      }
-    }
-
-    backend.registerInPokedex(pokedexUpdates)
-
-    persistedPkmDispatch({ type: 'load_persisted_pkm_data', payload: homeResult.right })
-
-    return homeResult
-  }, [backend, persistedPkmDispatch])
 
   const loadAllHomeData = useCallback(
     async (homeMonLookup: Record<string, OHPKM>) => {
@@ -106,7 +62,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
   )
 
   const saveChanges = useCallback(async () => {
-    if (!openSavesState.homeData || !persistedPkmState.loaded) return
+    if (!openSavesState.homeData) return
 
     const result = await backend.startTransaction()
 
@@ -187,8 +143,8 @@ export default function SavesProvider({ children }: SavesProviderProps) {
     openSavesDispatch({ type: 'clear_updated_box_slots' })
     openSavesDispatch({ type: 'clear_mons_to_release' })
 
-    persistedPkmDispatch({ type: 'clear' })
-    await loadAllLookups().then(
+    persistedPkmDispatch({ type: 'set_saving' })
+    await ohpkmStore.reloadStore().then(
       E.match(
         (err) => {
           openSavesDispatch({ type: 'set_error', payload: err })
@@ -201,36 +157,16 @@ export default function SavesProvider({ children }: SavesProviderProps) {
     openSavesState.homeData,
     openSavesState.modifiedOHPKMs,
     openSavesState.monsToRelease,
-    persistedPkmState.loaded,
     backend,
     allOpenSaves,
     itemBagState.modified,
     itemBagState.itemCounts,
-    openSavesDispatch,
     persistedPkmDispatch,
-    loadAllLookups,
+    ohpkmStore,
     displayError,
     bagDispatch,
     loadAllHomeData,
   ])
-
-  useEffect(() => {
-    if (persistedPkmState.loaded && !openSavesState.homeData) {
-      loadAllHomeData(persistedPkmState.homeMons)
-    }
-  }, [
-    loadAllHomeData,
-    persistedPkmState.homeMons,
-    persistedPkmState.loaded,
-    openSavesState.homeData,
-  ])
-
-  // load lookups
-  useEffect(() => {
-    if (!persistedPkmState.loaded && !persistedPkmState.error) {
-      loadAllLookups()
-    }
-  }, [persistedPkmState.loaded, persistedPkmState.error, loadAllLookups])
 
   // load bag
   useEffect(() => {
@@ -254,9 +190,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
       onSave: saveChanges,
       onReset: () => {
         openSavesDispatch({ type: 'clear_mons_to_release' })
-        if (persistedPkmState.loaded) {
-          loadAllHomeData(persistedPkmState.homeMons)
-        }
+        loadAllHomeData(ohpkmStore.store)
         openSavesDispatch({ type: 'close_all_saves' })
       },
     })
@@ -266,7 +200,13 @@ export default function SavesProvider({ children }: SavesProviderProps) {
     return () => {
       stopListening()
     }
-  }, [backend, saveChanges, persistedPkmState, openSavesDispatch, loadAllHomeData, bagDispatch])
+  }, [backend, saveChanges, ohpkmStore, openSavesDispatch, loadAllHomeData, bagDispatch])
+
+  useEffect(() => {
+    if (!openSavesState.homeData) {
+      loadAllHomeData(ohpkmStore.store)
+    }
+  }, [loadAllHomeData, ohpkmStore.store, openSavesState.homeData])
 
   if (openSavesState.error) {
     return (
@@ -280,7 +220,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
   }
 
   if (!openSavesState.homeData) {
-    return <Spinner />
+    return <LoadingIndicator message="Loading OpenHome boxes..." />
   }
 
   return (

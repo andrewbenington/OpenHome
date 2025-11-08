@@ -6,7 +6,7 @@ import PokemonIcon from 'src/components/PokemonIcon'
 import { useLookups } from 'src/state/lookups'
 import { OHPKM } from 'src/types/pkm/OHPKM'
 import { numericSorter, stringSorter } from 'src/util/Sort'
-import { PersistedPkmDataContext } from '../../state/persistedPkmData'
+import { OhpkmStoreContext } from '../../state/ohpkm/reducer'
 
 type G345LookupRow = {
   gen345ID: string
@@ -19,7 +19,7 @@ type Gen345LookupProps = {
 }
 
 export default function Gen345Lookup({ onSelectMon }: Gen345LookupProps) {
-  const [{ homeMons }] = useContext(PersistedPkmDataContext)
+  const [{ homeMons }] = useContext(OhpkmStoreContext)
   const { lookups, loaded } = useLookups()
 
   if (!loaded) {

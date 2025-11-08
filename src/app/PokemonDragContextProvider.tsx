@@ -1,7 +1,7 @@
 import { DragDropProvider, DragOverlay, PointerSensor } from '@dnd-kit/react'
 import { ReactNode, useContext } from 'react'
 import { ItemBagContext } from 'src/state/itemBag'
-import { PersistedPkmDataContext } from 'src/state/persistedPkmData'
+import { OhpkmStoreContext } from 'src/state/ohpkm/reducer'
 import { OHPKM } from 'src/types/pkm/OHPKM'
 import PokemonIcon from '../components/PokemonIcon'
 import { getPublicImageURL } from '../images/images'
@@ -13,7 +13,7 @@ import { useSaves } from '../state/saves/useSaves'
 export default function PokemonDragContextProvider(props: { children?: ReactNode }) {
   const { children } = props
   const [openSaves, openSavesDispatch] = useSaves()
-  const [, persistedPkmDataDispatch] = useContext(PersistedPkmDataContext)
+  const [, persistedPkmDataDispatch] = useContext(OhpkmStoreContext)
   const [dragMonState, dispatchDragMonState] = useContext(DragMonContext)
   const [, bagDispatch] = useContext(ItemBagContext)
 

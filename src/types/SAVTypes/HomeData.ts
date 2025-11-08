@@ -1,6 +1,6 @@
 import { getHomeIdentifier, getMonFileIdentifier } from 'src/util/Lookup'
 import { v4 as UuidV4 } from 'uuid'
-import { PersistedPkmData } from '../../state/persistedPkmData'
+import { OhpkmStoreData } from '../../state/ohpkm/reducer'
 import { range } from '../../util/Functional'
 import { filterUndefined, numericSorter } from '../../util/Sort'
 import { TransferRestrictions } from '../TransferRestrictions'
@@ -87,7 +87,7 @@ export class HomeData {
 
   updatedBoxSlots: BankBoxCoordinates[] = []
 
-  constructor(stored_bank_data: StoredBankData, mon_lookup: PersistedPkmData) {
+  constructor(stored_bank_data: StoredBankData, mon_lookup: OhpkmStoreData) {
     this._banks = stored_bank_data.banks.map((bank) => ({
       ...bank,
       boxes: bank.boxes.map((box) => ({ ...box, last_saved_index: box.index })),
@@ -133,7 +133,7 @@ export class HomeData {
     return newBank
   }
 
-  setAndLoadBank(bank_index: number, mon_lookup: PersistedPkmData) {
+  setAndLoadBank(bank_index: number, mon_lookup: OhpkmStoreData) {
     this._currentBankIndex = bank_index
     this._currentBoxIndex = this._banks[bank_index].current_box
     // console.log(this._banks, this._banks[bank_index], this._banks[bank_index].boxes)

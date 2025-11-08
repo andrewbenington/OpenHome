@@ -8,7 +8,7 @@ import { MenuIcon } from 'src/components/Icons'
 import AttributeRow from 'src/pokemon/AttributeRow'
 import PokemonDetailsModal from 'src/pokemon/PokemonDetailsModal'
 import { ErrorContext } from 'src/state/error'
-import { PersistedPkmDataContext } from 'src/state/persistedPkmData'
+import { OhpkmStoreContext } from 'src/state/ohpkm/reducer'
 import { MonLocation } from 'src/state/saves/reducer'
 import { PKMInterface } from 'src/types/interfaces'
 import { OHPKM } from 'src/types/pkm/OHPKM'
@@ -28,7 +28,7 @@ const ALLOW_DUPE_IMPORT = true
 
 const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   const [, openSavesDispatch, openSaves] = useSaves()
-  const [{ homeMons }] = useContext(PersistedPkmDataContext)
+  const [{ homeMons }] = useContext(OhpkmStoreContext)
   const [, dispatchError] = useContext(ErrorContext)
   const [detailsModal, setDetailsModal] = useState(false)
   const { saveIndex } = props

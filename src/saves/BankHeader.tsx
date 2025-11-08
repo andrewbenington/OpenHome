@@ -10,7 +10,7 @@ import {
 } from '@radix-ui/themes'
 import { useContext, useState } from 'react'
 import { EditIcon } from 'src/components/Icons'
-import { PersistedPkmDataContext } from 'src/state/persistedPkmData'
+import { OhpkmStoreContext } from 'src/state/ohpkm/reducer'
 import { getBankName } from 'src/types/storage'
 import ToggleButton from '../components/ToggleButton'
 import { useSaves } from '../state/saves/useSaves'
@@ -83,7 +83,7 @@ function removeNonDigits(input: string): string {
 function BankSelector(props: { disabled?: boolean }) {
   const { disabled } = props
   const [{ homeData }, openSavesDispatch] = useSaves()
-  const [pkmDataState] = useContext(PersistedPkmDataContext)
+  const [pkmDataState] = useContext(OhpkmStoreContext)
   const [newBankName, setNewBankName] = useState<string>()
   const [newBankBoxCount, setNewBankBoxCount] = useState('30')
   const [isOpen, setIsOpen] = useState(false)

@@ -1,13 +1,36 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" style="height: 100vh; overflow: hidden;">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>OpenHome</title>
   </head>
 
-  <body>
-    <div id="root"></div>
+  <body
+    style="
+      background: linear-gradient(355deg, rgba(83, 180, 165, 1) 0%, rgba(125, 206, 171, 1) 85%);
+      height: 100vh;
+      overflow: hidden;
+      margin: 0;
+    "
+  >
+    <div id="root">
+      <div
+        style="
+          height: 100vh;
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          z-index: 1000;
+          position: relative;
+        "
+      >
+        <img src="logos/logo-full.png" style="width: 128px; height: 128px; position: absolute" />
+      </div>
+    </div>
+
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
