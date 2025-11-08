@@ -19,7 +19,6 @@ export default function AppTabs() {
         width: '100%',
         display: 'flex',
         flexDirection: 'column',
-        backgroundColor: 'var(--background-gradient)',
       }}
     >
       <Box height="0" flexGrow="1">

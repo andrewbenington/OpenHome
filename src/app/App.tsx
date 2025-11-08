@@ -36,9 +36,8 @@ export default function App() {
   return (
     <Theme
       accentColor="red"
-      hasBackground
       appearance={isDarkMode ? 'dark' : 'light'}
-      style={{ backgroundColor: 'var(--background-gradient)' }}
+      style={{ background: 'var(--background-gradient)' }}
     >
       <BackendProvider backend={TauriBackend}>
         <ErrorContext.Provider value={[errorState, errorDispatch]}>

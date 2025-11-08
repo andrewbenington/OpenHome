@@ -47,7 +47,6 @@ export default function PokemonDragContextProvider(props: { children?: ReactNode
             if (mon.heldItemIndex) {
               bagDispatch({ type: 'add_item', payload: { index: mon.heldItemIndex, qty: 1 } })
               savesAndBanks.setMonHeldItem(undefined, payload.monData)
-              // mon.heldItemIndex = 0
             }
           } else if (
             isMonLocation(dest) &&
