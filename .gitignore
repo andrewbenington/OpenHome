@@ -1,6 +1,7 @@
 # dependencies
 /node_modules
 /pkm_rs_resources/generate/node_modules
+/pkm_rs/generate/node_modules
 
 /.pnp
 .pnp.js

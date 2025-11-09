@@ -1,0 +1,32 @@
+[package]
+name = "pkm_rs"
+version = "0.1.0"
+authors = ["Andrew Benington"]
+edition = "2024"
+
+[dependencies]
+pkm_rs_types = {path = "../pkm_rs_types", features=["wasm"]}
+pkm_rs_resources = {path = "../pkm_rs_resources", features=["wasm"]}
+serde = { version = "1.0.219", features = ["derive"] }
+serde_json = "1.0.140"
+num = "0.4.3"
+wasm-bindgen = { version = "0.2", optional = true }
+js-sys = { version = "0.3.77", optional = true }
+serde-wasm-bindgen = { version = "0.6.5", optional = true }
+pkm_rs_derive = { path = "../pkm_rs_derive" }
+static_assertions = "1.1.0"
+sha2 = "0.10.9"
+rand = "0.9.2"
+getrandom = { version = "0.3.3", features = ["wasm_js"] }
+phf = { version = "0.13.1", features = ["macros"] }
+
+[lib]
+name = "pkm_rs"
+path = "src/lib.rs"
+crate-type = ["cdylib", "rlib"]
+
+[lints.clippy]
+missing_const_for_fn = "warn"
+
+[features]
+wasm = ["wasm-bindgen", "js-sys", "serde-wasm-bindgen", "getrandom/wasm_js"]

@@ -10,9 +10,10 @@ pub enum ColosseumOrXd {
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
+#[derive(Debug, Default, PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Serialize)]
 #[repr(u8)]
 pub enum OriginGame {
+    #[default]
     Invalid0,
     Sapphire,
     Ruby,
