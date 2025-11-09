@@ -1,15 +1,14 @@
-use pkm_rs_types::OriginGame;
-use serde::Serialize;
-
+use super::SaveDataTrait;
 use crate::encryption::decrypt_pkm_bytes_gen_6_7;
 use crate::encryption::unshuffle_blocks_gen_6_7;
-use crate::substructures::Gender;
-use crate::util::get_flag;
-
-use super::SaveDataTrait;
 use crate::pkm::Pb7;
 use crate::pkm::Pkm;
 use crate::strings::SizedUtf16String;
+use crate::util::get_flag;
+
+use pkm_rs_types::Gender;
+use pkm_rs_types::OriginGame;
+use serde::Serialize;
 
 const BOX_DATA_OFFSET: usize = 0x5c00;
 const BOX_ROWS: usize = 6;

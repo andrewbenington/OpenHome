@@ -1,13 +1,13 @@
 use crate::pkm::traits::ModernEvs;
 use crate::pkm::{Error, Pkm, Result};
 use crate::strings::SizedUtf16String;
-use crate::substructures::{FlagSet, Gender};
 use crate::util;
 
 use pkm_rs_derive::IsShiny4096;
 use pkm_rs_resources::moves::MoveSlot;
 use pkm_rs_resources::species::{FormeMetadata, SpeciesAndForme, SpeciesMetadata};
 use pkm_rs_types::{ContestStats, HyperTraining, MarkingsSixShapesColors, Stats8, Stats16Le};
+use pkm_rs_types::{FlagSet, Gender};
 use serde::Serialize;
 
 #[derive(Debug, Default, Serialize, Clone, Copy, IsShiny4096)]

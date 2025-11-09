@@ -1,7 +1,6 @@
 use crate::pkm::traits::IsShiny4096;
 use crate::pkm::{Error, Pkm, Result};
 use crate::strings::SizedUtf16String;
-use crate::substructures::{Gender, PokeDate, TrainerMemory};
 use crate::util;
 
 use pkm_rs_resources::abilities::AbilityIndex;
@@ -14,6 +13,7 @@ use pkm_rs_types::{
     ContestStats, HyperTraining, MarkingsSixShapesColors, OriginGame, Stats8, Stats16Le,
     StatsPreSplit,
 };
+use pkm_rs_types::{Gender, PokeDate, TrainerMemory};
 use serde::Serialize;
 
 const MIN_SIZE: usize = 420;

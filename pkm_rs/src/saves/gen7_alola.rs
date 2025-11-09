@@ -5,7 +5,7 @@ use crate::encryption::crc16_ccitt_invert;
 use crate::encryption::decrypt_pkm_bytes_gen_6_7;
 use crate::encryption::unshuffle_blocks_gen_6_7;
 use crate::pkm::Pk7;
-use crate::substructures::Gender;
+use pkm_rs_types::Gender;
 use crate::util::get_flag;
 
 use super::SaveDataTrait;

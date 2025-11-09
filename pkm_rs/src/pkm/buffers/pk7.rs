@@ -1,16 +1,15 @@
-use pkm_rs_resources::{
-    abilities::AbilityIndex, moves::MoveSlot, natures::NatureIndex, ribbons::ModernRibbonSet,
-    species::SpeciesAndForme,
-};
-use pkm_rs_types::{ContestStats, MarkingsSixShapesColors, Stats8};
-
 use crate::{
     encryption,
     pkm::{Error, Result, buffers::helpers::PkmBuffer},
     strings::SizedUtf16String,
-    substructures::Gender,
     util,
 };
+
+use pkm_rs_resources::{
+    abilities::AbilityIndex, moves::MoveSlot, natures::NatureIndex, ribbons::ModernRibbonSet,
+    species::SpeciesAndForme,
+};
+use pkm_rs_types::{ContestStats, Gender, MarkingsSixShapesColors, Stats8};
 
 pub struct Pk7BoxBuffer<'a> {
     buffer: PkmBuffer<'a, 232>,

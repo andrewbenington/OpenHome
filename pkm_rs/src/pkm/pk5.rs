@@ -1,7 +1,6 @@
 use crate::pkm::traits::{IsShiny, IsShiny8192};
 use crate::pkm::{Error, Ohpkm, Pkm, Result};
 use crate::strings::Gen5String;
-use crate::substructures::{Gender, PokeDate};
 use crate::util;
 
 use pkm_rs_resources::abilities::AbilityIndex;
@@ -11,6 +10,7 @@ use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::DsRibbonSet;
 use pkm_rs_resources::species::{FormeMetadata, SpeciesAndForme, SpeciesMetadata};
 use pkm_rs_types::{ContestStats, MarkingsSixShapes, OriginGame, Stats8, Stats16Le};
+use pkm_rs_types::{Gender, PokeDate};
 use serde::Serialize;
 
 #[derive(Debug, Serialize, Clone, Copy, IsShiny8192)]

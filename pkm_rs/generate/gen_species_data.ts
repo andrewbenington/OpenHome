@@ -266,7 +266,7 @@ function main() {
   let output = `
 use crate::resources::{AbilityIndex, EggGroup, FormeMetadata, GenderRatio, LevelUpType, NatDexIndex, SpeciesAndForme, SpeciesMetadata };
 use crate::resources::{games::Generation, pkm_types::PkmType};
-use crate::substructures::Stats16Le;
+use pkm_rs_types::Stats16Le;
 
 pub const NATIONAL_DEX_MAX: usize = ${Object.keys(speciesJson).length};
 

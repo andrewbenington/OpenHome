@@ -6,7 +6,6 @@ mod util;
 
 pub mod pkm;
 pub mod saves;
-pub mod substructures;
 
 #[macro_use]
 extern crate static_assertions;

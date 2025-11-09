@@ -26,7 +26,7 @@ function generateModern() {
     .split('\n')
   const enumValues = modernRibbons.map(removeDiacritics).map(convertToPascalCase)
   let output = `use std::fmt::Display;
-use crate::substructures::FlagSet;
+use pkm_rs_types::FlagSet;
 use serde::{Serialize, Serializer};
 
 #[derive(Default, Debug, Clone, Copy)]

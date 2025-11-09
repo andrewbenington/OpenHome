@@ -1,7 +1,5 @@
 use std::{num::Wrapping, ops::Range};
 
-use sha2::{Digest, Sha256};
-
 use crate::pkm::{Error, Result};
 
 const ENCRYPTION_OFFSET: usize = 8;

@@ -1,8 +1,8 @@
 use std::fmt::Display;
 
 use pkm_rs_resources::species::{NatDexIndex, SpeciesAndForme};
-use serde::{Serialize, Serializer};
 use pkm_rs_resources::{species::MAX_NATIONAL_DEX, natures::NATURE_MAX, abilities::ABILITY_MAX, language::LANGUAGE_MAX, items::ITEM_MAX};
+use serde::{Serialize, Serializer};
 
 
 #[derive(Debug)]

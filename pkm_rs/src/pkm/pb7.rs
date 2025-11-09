@@ -1,12 +1,12 @@
 use crate::pkm::traits::{IsShiny4096, ModernEvs};
 use crate::pkm::{Error, Pkm, Result};
 use crate::strings::SizedUtf16String;
-use crate::substructures::{Gender, PokeDate};
 use crate::util;
 
 use pkm_rs_resources::abilities::AbilityIndex;
 use pkm_rs_resources::moves::MoveSlot;
 use pkm_rs_resources::species::{FormeMetadata, SpeciesAndForme, SpeciesMetadata};
+use pkm_rs_types::{Gender, PokeDate};
 use pkm_rs_types::{HyperTraining, MarkingsSixShapesColors, Stats8, Stats16Le};
 use serde::Serialize;
 

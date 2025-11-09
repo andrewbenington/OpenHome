@@ -1,7 +1,6 @@
 use crate::pkm::traits::{IsShiny4096, ModernEvs};
 use crate::pkm::{Error, Ohpkm, Pkm, Result};
 use crate::strings::SizedUtf16String;
-use crate::substructures::{Gender, Geolocations, PokeDate, TrainerMemory};
 use crate::util;
 
 use pkm_rs_resources::abilities::AbilityIndex;
@@ -15,6 +14,7 @@ use pkm_rs_types::{
     ContestStats, HyperTraining, MarkingsSixShapesColors, OriginGame, Stats8, Stats16Le,
     StatsPreSplit,
 };
+use pkm_rs_types::{Gender, Geolocations, PokeDate, TrainerMemory};
 use serde::Serialize;
 
 #[cfg(feature = "wasm")]

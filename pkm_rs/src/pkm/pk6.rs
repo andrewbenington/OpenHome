@@ -2,7 +2,6 @@
 use crate::pkm::traits::IsShiny4096;
 use crate::pkm::{Error, Pkm, Result};
 use crate::strings::SizedUtf16String;
-use crate::substructures::{Gender, Geolocations, PokeDate, TrainerMemory};
 use crate::util;
 
 use pkm_rs_resources::abilities::AbilityIndex;
@@ -12,6 +11,7 @@ use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::ModernRibbonSet;
 use pkm_rs_resources::species::{FormeMetadata, SpeciesAndForme, SpeciesMetadata};
 use pkm_rs_types::{ContestStats, MarkingsSixShapes, OriginGame, Stats8, Stats16Le};
+use pkm_rs_types::{Gender, Geolocations, PokeDate, TrainerMemory};
 use serde::Serialize;
 
 #[cfg(feature = "wasm")]

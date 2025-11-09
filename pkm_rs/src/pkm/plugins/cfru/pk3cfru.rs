@@ -1,15 +1,15 @@
 use crate::pkm::plugins::cfru::conversion::moves::{
-    GEN3_CFRU_MOVES, from_gen3_cfru_move_index, to_gen3_cfru_move_index,
+    from_gen3_cfru_move_index, to_gen3_cfru_move_index,
 };
 use crate::pkm::traits::IsShiny;
 use crate::pkm::{Error, Pkm, Result};
 use crate::strings::Gen3String;
-use crate::substructures::Gender;
 use crate::util;
 
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::moves::MoveSlot;
 use pkm_rs_resources::species::{FormeMetadata, SpeciesAndForme, SpeciesMetadata};
+use pkm_rs_types::Gender;
 use pkm_rs_types::{MarkingsFourShapes, OriginGame, Stats8};
 use serde::Serialize;
 

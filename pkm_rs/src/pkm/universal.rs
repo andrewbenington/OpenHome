@@ -1,9 +1,6 @@
 use rand::{SeedableRng, rngs::StdRng};
 
-use crate::{
-    pkm::{Error, Result},
-    substructures::{Gender, PokeDate, TrainerMemory},
-};
+use crate::pkm::{Error, Result};
 
 use pkm_rs_resources::moves::MoveSlot;
 use pkm_rs_resources::natures::NatureIndex;
@@ -15,6 +12,7 @@ use pkm_rs_types::{
     ContestStats, HyperTraining, MarkingsSixShapesColors, OriginGame, Stats8, Stats16Le,
     StatsPreSplit, TeraType,
 };
+use pkm_rs_types::{Gender, PokeDate, TrainerMemory};
 
 pub trait UniversalPkm {
     fn get_encryption_constant(&self) -> Option<u32> {
