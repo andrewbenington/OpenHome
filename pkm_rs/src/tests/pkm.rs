@@ -1,6 +1,8 @@
 #[cfg(test)]
 use crate::pkm::Pkm;
 #[cfg(test)]
+use std::collections::HashSet;
+#[cfg(test)]
 use std::error::Error;
 #[cfg(test)]
 use std::fs::File;
@@ -26,19 +28,11 @@ fn pkm_from_file<PKM: Pkm>(filename: &str) -> Result<(PKM, Vec<u8>), Box<dyn Err
 }
 
 #[cfg(test)]
-pub mod ohpkm {
-    use std::path::PathBuf;
-
-    use crate::pkm::Ohpkm;
-
-    #[test]
-    fn to_from_bytes() -> Result<(), String> {
-        super::to_from_bytes_all_in_dir::<Ohpkm>(&PathBuf::from("pkm_files").join("ohpkm"))
-    }
-}
-
-#[cfg(test)]
-fn to_from_bytes_all_in_dir<PKM: Pkm>(dir: &Path) -> Result<(), String> {
+fn to_from_bytes_all_in_dir<PKM: Pkm>(
+    dir: &Path,
+    ignore_ranges: HashSet<ByteRange>,
+    ignore_34_top_four: bool,
+) -> Result<(), String> {
     use std::fs;
 
     let pkm_files = fs::read_dir(dir).map_err(|e| format!("directory read error: {e}"))?;
@@ -48,7 +42,9 @@ fn to_from_bytes_all_in_dir<PKM: Pkm>(dir: &Path) -> Result<(), String> {
             Ok(dir_entry) => {
                 let path = dir.join(dir_entry.file_name());
                 let filename = path.to_string_lossy();
-                if let Err(e) = find_inconsistencies::<PKM>(&filename) {
+                if let Err(e) =
+                    find_inconsistencies::<PKM>(&filename, &ignore_ranges, ignore_34_top_four)
+                {
                     return Err(format!("read {filename}: {e}"));
                 }
             }
@@ -59,13 +55,17 @@ fn to_from_bytes_all_in_dir<PKM: Pkm>(dir: &Path) -> Result<(), String> {
 }
 
 #[cfg(test)]
-fn find_differing_ranges(actual: &[u8], expected: &[u8]) -> Option<Vec<ByteRange>> {
+fn find_differing_ranges(
+    actual: &[u8],
+    expected: &[u8],
+    ignore_34_top_four: bool,
+) -> Option<Vec<ByteRange>> {
     let mut differences: Vec<ByteRange> = Vec::new();
 
     let mut current_range: Option<ByteRange> = None;
 
     for (i, (a, b)) in actual.iter().zip(expected.iter()).enumerate() {
-        if a != b {
+        if a != b && (!ignore_34_top_four || (i == 34 && (*a & 0b1111 != *b & 0b1111))) {
             match &mut current_range {
                 Some(existing) => existing.extend_one(),
                 None => current_range = Some(ByteRange::new_at(i)),
@@ -83,6 +83,7 @@ fn find_differing_ranges(actual: &[u8], expected: &[u8]) -> Option<Vec<ByteRange
 }
 
 #[cfg(test)]
+#[derive(PartialEq, Eq, Hash)]
 struct ByteRange {
     start_idx: usize,
     end_idx: usize,
@@ -90,6 +91,13 @@ struct ByteRange {
 
 #[cfg(test)]
 impl ByteRange {
+    pub const fn new(start: usize, end_inclusive: usize) -> Self {
+        Self {
+            start_idx: start,
+            end_idx: end_inclusive,
+        }
+    }
+
     pub const fn new_at(at: usize) -> Self {
         Self {
             start_idx: at,
@@ -113,7 +121,11 @@ fn u8_slice_to_hex_string(slice: &[u8]) -> String {
 }
 
 #[cfg(test)]
-fn find_inconsistencies<PKM: Pkm>(filename: &str) -> Result<(), String> {
+fn find_inconsistencies<PKM: Pkm>(
+    filename: &str,
+    ignore_ranges: &HashSet<ByteRange>,
+    ignore_34_top_four: bool,
+) -> Result<(), String> {
     println!("filename: {filename}");
     let result = pkm_from_file::<PKM>(filename);
     let (mon, bytes) = result.unwrap_or_else(|e| panic!("could not load {filename}: {e}"));
@@ -122,23 +134,53 @@ fn find_inconsistencies<PKM: Pkm>(filename: &str) -> Result<(), String> {
         .to_party_bytes()
         .map_err(|err| format!("couldn't convert to bytes: {err}"))?;
     let expected = bytes;
-    let differences = find_differing_ranges(&actual, &expected);
+    let differences = find_differing_ranges(&actual, &expected, ignore_34_top_four);
+
+    let mut diffs_not_ignored = 0;
 
     if let Some(differences) = &differences {
         for diff in differences {
+            if ignore_ranges.contains(diff) {
+                continue;
+            }
+
+            diffs_not_ignored += 1;
+
             let actual_bytes = &actual[diff.range()];
             let expected_bytes = &expected[diff.range()];
-            println!(
-                "0x{:03x}..0x{:03x} ({}..{}):",
-                diff.start_idx, diff.end_idx, diff.start_idx, diff.end_idx
-            );
-            println!("\t{}", u8_slice_to_hex_string(actual_bytes));
-            println!("\t{}", u8_slice_to_hex_string(expected_bytes));
+            if diff.start_idx == diff.end_idx {
+                println!("0x{:03x} ({}):", diff.start_idx, diff.start_idx);
+            } else {
+                println!(
+                    "0x{:03x}..0x{:03x} ({}..{}):",
+                    diff.start_idx, diff.end_idx, diff.start_idx, diff.end_idx
+                );
+            }
+            println!("\texpected: {}", u8_slice_to_hex_string(expected_bytes));
+            println!("\tactual:   {}", u8_slice_to_hex_string(actual_bytes));
         }
     }
 
-    match differences {
-        Some(diffs) => Err(format!("{} differences", diffs.len())),
-        None => Ok(()),
+    match diffs_not_ignored {
+        0 => Ok(()),
+        _ => Err(format!("{diffs_not_ignored} differences")),
+    }
+}
+
+#[cfg(test)]
+pub mod ohpkm {
+    use std::{collections::HashSet, path::PathBuf};
+
+    use crate::{pkm::Ohpkm, tests::pkm::ByteRange};
+
+    #[test]
+    fn to_from_bytes() -> Result<(), String> {
+        let ohpkm_ignore_ranges: HashSet<ByteRange> =
+            vec![ByteRange::new(172, 179)].into_iter().collect();
+        super::to_from_bytes_all_in_dir::<Ohpkm>(
+            &PathBuf::from("pkm_files").join("ohpkm"),
+            ohpkm_ignore_ranges,
+            true,
+        )
     }
 }

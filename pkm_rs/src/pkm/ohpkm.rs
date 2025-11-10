@@ -10,8 +10,8 @@ use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbonSet};
 use pkm_rs_resources::species::{FormeMetadata, SpeciesAndForme, SpeciesMetadata};
 use pkm_rs_types::{
-    ContestStats, HyperTraining, MarkingsSixShapesColors, OriginGame, Stats8, Stats16Le,
-    StatsPreSplit,
+    ContestStats, Geolocations, HyperTraining, MarkingsSixShapesColors, OriginGame, Stats8,
+    Stats16Le, StatsPreSplit,
 };
 use pkm_rs_types::{Gender, PokeDate, TrainerMemory};
 use serde::Serialize;
@@ -21,8 +21,6 @@ const MIN_SIZE: usize = 420;
 #[derive(Debug, Default, Serialize, Clone, Copy, IsShiny4096)]
 pub struct Ohpkm {
     pub encryption_constant: u32,
-    pub sanity: u16,
-    pub checksum: u16,
     pub species_and_forme: SpeciesAndForme,
     pub held_item_index: u16,
     pub trainer_id: u16,
@@ -70,6 +68,7 @@ pub struct Ohpkm {
     pub dvs: StatsPreSplit,
     pub handler_name: SizedUtf16String<24>,
     pub handler_language: u8,
+    pub is_current_handler: bool,
     pub resort_event_status: u8,
     pub handler_id: u16,
     pub handler_friendship: u8,
@@ -91,6 +90,7 @@ pub struct Ohpkm {
     pub enjoyment: u8,
     pub game_of_origin: OriginGame,
     pub game_of_origin_battle: Option<OriginGame>,
+    pub plugin_origin: SizedUtf16String<32>,
     pub country: u8,
     pub region: u8,
     pub console_region: u8,
@@ -98,6 +98,7 @@ pub struct Ohpkm {
     pub unknown_f3: u8,
     pub form_argument: u32,
     pub affixed_ribbon: Option<ModernRibbon>,
+    pub geolocations: Geolocations,
     pub encounter_type: u8,
     pub performance: u8,
     pub trainer_name: SizedUtf16String<24>,
@@ -120,6 +121,7 @@ pub struct Ohpkm {
     pub tutor_flags_la: [u8; 8],
     pub master_flags_la: [u8; 8],
     pub tm_flags_sv: [u8; 22],
+    pub evs_g12: StatsPreSplit,
     pub tm_flags_sv_dlc: [u8; 13],
 }
 
@@ -135,8 +137,6 @@ impl Ohpkm {
         // try_into() will always succeed thanks to the length check
         let mon = Ohpkm {
             encryption_constant: u32::from_le_bytes(bytes[0..4].try_into().unwrap()),
-            sanity: u16::from_le_bytes(bytes[4..6].try_into().unwrap()),
-            checksum: u16::from_le_bytes(bytes[6..8].try_into().unwrap()),
             species_and_forme: SpeciesAndForme::new(
                 u16::from_le_bytes(bytes[8..10].try_into().unwrap()),
                 u16::from_le_bytes(bytes[36..38].try_into().unwrap()),
@@ -204,6 +204,7 @@ impl Ohpkm {
             dvs: StatsPreSplit::from_dv_bytes(bytes[170..172].try_into().unwrap()),
             handler_name: SizedUtf16String::<24>::from_bytes(bytes[184..208].try_into().unwrap()),
             handler_language: bytes[211],
+            is_current_handler: util::get_flag(bytes, 212, 0),
             resort_event_status: bytes[213],
             handler_id: u16::from_le_bytes(bytes[214..216].try_into().unwrap()),
             handler_friendship: bytes[216],
@@ -223,9 +224,9 @@ impl Ohpkm {
             palma: u32::from_le_bytes(bytes[231..235].try_into().unwrap()),
             poke_star_fame: bytes[232],
             met_time_of_day: bytes[233],
+            shiny_leaves: bytes[234] & 0x3f,
             handler_gender: util::get_flag(bytes, 234, 7),
             is_ns_pokemon: util::get_flag(bytes, 234, 6),
-            shiny_leaves: bytes[234],
             fullness: bytes[235],
             enjoyment: bytes[236],
             game_of_origin: OriginGame::from(bytes[237]),
@@ -240,6 +241,7 @@ impl Ohpkm {
             unknown_f3: bytes[243],
             form_argument: u32::from_le_bytes(bytes[244..248].try_into().unwrap()),
             affixed_ribbon: ModernRibbon::from_affixed_byte(bytes[248]),
+            geolocations: Geolocations::from_bytes(bytes[249..259].try_into().unwrap()),
             encounter_type: bytes[270],
             performance: bytes[271],
             trainer_name: SizedUtf16String::<24>::from_bytes(bytes[272..296].try_into().unwrap()),
@@ -256,7 +258,7 @@ impl Ohpkm {
             ball: Ball::from(bytes[311]),
             egg_location_index: u16::from_le_bytes(bytes[312..314].try_into().unwrap()),
             met_location_index: u16::from_le_bytes(bytes[314..316].try_into().unwrap()),
-            met_level: bytes[316],
+            met_level: bytes[316] & !0x80,
             hyper_training: HyperTraining::from_byte(bytes[317] & 0b111111),
             trainer_gender: Gender::from(util::get_flag(bytes, 317, 7)),
             obedience_level: bytes[318],
@@ -267,10 +269,16 @@ impl Ohpkm {
             tutor_flags_la: bytes[368..376].try_into().unwrap(),
             master_flags_la: bytes[376..384].try_into().unwrap(),
             tm_flags_sv: bytes[384..406].try_into().unwrap(),
+            evs_g12: StatsPreSplit::from_bytes(bytes[410..420].try_into().unwrap()),
             tm_flags_sv_dlc: if bytes.len() >= 433 {
                 bytes[420..433].try_into().unwrap()
             } else {
                 [0u8; 13]
+            },
+            plugin_origin: if bytes.len() >= 465 {
+                SizedUtf16String::<32>::from_bytes(bytes[433..465].try_into().unwrap())
+            } else {
+                SizedUtf16String::<32>::default()
             },
         };
         Ok(mon)
@@ -295,8 +303,7 @@ impl Pkm for Ohpkm {
 
     fn write_box_bytes(&self, bytes: &mut [u8]) -> Result<()> {
         bytes[0..4].copy_from_slice(&self.encryption_constant.to_le_bytes());
-        bytes[4..6].copy_from_slice(&self.sanity.to_le_bytes());
-        bytes[6..8].copy_from_slice(&self.checksum.to_le_bytes());
+        bytes[4..6].copy_from_slice(&0u16.to_le_bytes());
         bytes[8..10].copy_from_slice(&self.species_and_forme.get_ndex().to_le_bytes());
         bytes[10..12].copy_from_slice(&self.held_item_index.to_le_bytes());
         bytes[12..14].copy_from_slice(&self.trainer_id.to_le_bytes());
@@ -371,9 +378,16 @@ impl Pkm for Ohpkm {
 
         bytes[184..208].copy_from_slice(&self.handler_name);
         bytes[211] = self.handler_language;
+        util::set_flag(bytes, 212, 0, self.is_current_handler);
         bytes[213] = self.resort_event_status;
         bytes[214..216].copy_from_slice(&self.handler_id.to_le_bytes());
         bytes[216] = self.handler_friendship;
+
+        bytes[217] = self.handler_memory.intensity;
+        bytes[218] = self.handler_memory.memory;
+        bytes[219] = self.handler_memory.feeling;
+        bytes[220..222].copy_from_slice(&self.handler_memory.text_variable.to_le_bytes());
+
         bytes[222] = self.handler_affection;
         bytes[223..227].copy_from_slice(&self.super_training_flags.to_le_bytes());
         bytes[227] = self.super_training_dist_flags;
@@ -384,7 +398,9 @@ impl Pkm for Ohpkm {
         bytes[232] = self.poke_star_fame;
         bytes[233] = self.met_time_of_day;
 
-        bytes[234] = self.shiny_leaves;
+        bytes[234] = ((self.handler_gender as u8) << 7)
+            | ((self.is_ns_pokemon as u8) << 6)
+            | (self.shiny_leaves & 0x3f);
         bytes[235] = self.fullness;
         bytes[236] = self.enjoyment;
         bytes[237] = self.game_of_origin as u8;
@@ -396,10 +412,17 @@ impl Pkm for Ohpkm {
         bytes[243] = self.unknown_f3;
         bytes[244..248].copy_from_slice(&self.form_argument.to_le_bytes());
         bytes[248] = ModernRibbon::to_affixed_byte(self.affixed_ribbon);
+        bytes[249..259].copy_from_slice(&self.geolocations.to_bytes());
         bytes[270] = self.encounter_type;
         bytes[271] = self.performance;
         bytes[272..296].copy_from_slice(&self.trainer_name);
         bytes[298] = self.trainer_friendship;
+
+        bytes[299] = self.trainer_memory.intensity;
+        bytes[300] = self.trainer_memory.memory;
+        bytes[301..303].copy_from_slice(&self.trainer_memory.text_variable.to_le_bytes());
+        bytes[303] = self.trainer_memory.feeling;
+
         bytes[304] = self.trainer_affection;
         bytes[305..308].copy_from_slice(&PokeDate::to_bytes_optional(self.egg_date));
         bytes[308..311].copy_from_slice(&self.met_date.to_bytes());
@@ -408,7 +431,7 @@ impl Pkm for Ohpkm {
         bytes[314..316].copy_from_slice(&self.met_location_index.to_le_bytes());
         bytes[316] = self.met_level;
         bytes[317] = self.hyper_training.to_byte();
-        util::set_flag(bytes, 317, 0, bool::from(self.trainer_gender));
+        util::set_flag(bytes, 317, 7, bool::from(self.trainer_gender));
         bytes[318] = self.obedience_level;
         bytes[319..327].copy_from_slice(&self.home_tracker);
         bytes[326..340].copy_from_slice(&self.tr_flags_swsh);
@@ -417,7 +440,11 @@ impl Pkm for Ohpkm {
         bytes[368..376].copy_from_slice(&self.tutor_flags_la);
         bytes[376..384].copy_from_slice(&self.master_flags_la);
         bytes[384..406].copy_from_slice(&self.tm_flags_sv);
+        bytes[410..420].copy_from_slice(&self.evs_g12.to_bytes());
         bytes[420..433].copy_from_slice(&self.tm_flags_sv_dlc);
+        if bytes.len() >= 465 {
+            bytes[433..465].copy_from_slice(&self.plugin_origin.to_ascii_lowercase());
+        }
 
         Ok(())
     }

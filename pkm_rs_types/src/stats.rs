@@ -262,15 +262,21 @@ pub struct StatsPreSplit {
 }
 
 impl StatsPreSplit {
-    // pub fn from_bytes_be(bytes: [u8; 10]) -> Self {
-    //     StatsPreSplit {
-    //         hp: u16::from_be_bytes(bytes[0..2].try_into().unwrap()),
-    //         atk: u16::from_be_bytes(bytes[2..4].try_into().unwrap()),
-    //         def: u16::from_be_bytes(bytes[4..6].try_into().unwrap()),
-    //         spe: u16::from_be_bytes(bytes[6..8].try_into().unwrap()),
-    //         spc: u16::from_be_bytes(bytes[8..10].try_into().unwrap()),
-    //     }
-    // }
+    pub fn from_bytes(bytes: [u8; 10]) -> Self {
+        Self {
+            hp: u16::from_le_bytes(bytes[0..2].try_into().unwrap()),
+            atk: u16::from_le_bytes(bytes[2..4].try_into().unwrap()),
+            def: u16::from_le_bytes(bytes[4..6].try_into().unwrap()),
+            spe: u16::from_le_bytes(bytes[6..8].try_into().unwrap()),
+            spc: u16::from_le_bytes(bytes[8..10].try_into().unwrap()),
+        }
+    }
+
+    pub fn to_bytes(self) -> [u8; 10] {
+        u16_le_slice_to_u8([self.hp, self.atk, self.def, self.spe, self.spc])
+            .try_into()
+            .unwrap()
+    }
 
     pub const fn from_dv_bytes(bytes: &[u8; 2]) -> Self {
         let dv_bytes = u16::from_be_bytes([bytes[0], bytes[1]]);
