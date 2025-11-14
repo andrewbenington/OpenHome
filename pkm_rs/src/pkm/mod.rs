@@ -1,12 +1,11 @@
-mod ohpkm;
 mod result;
 
+pub mod ohpkm;
 pub mod traits;
 
 use pkm_rs_resources::species::{FormeMetadata, SpeciesMetadata};
 use serde::Serialize;
 
-pub use ohpkm::Ohpkm;
 pub use pkm_rs_resources::{abilities::ABILITY_MAX, species::NATIONAL_DEX_MAX};
 pub use result::*;
 

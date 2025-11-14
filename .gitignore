@@ -47,3 +47,5 @@ target/
 *.sublime-workspace
 *.sublime-project
 *.wakatime-project
+
+pkm_rs/pkm_files/ohpkm

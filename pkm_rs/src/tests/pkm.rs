@@ -55,6 +55,40 @@ fn to_from_bytes_all_in_dir<PKM: Pkm>(
 }
 
 #[cfg(test)]
+fn v2_from_all_v1() -> Result<(), Box<dyn Error>> {
+    use std::{fs, path::PathBuf};
+    let v1_path = PathBuf::from("pkm_files").join("ohpkm").join("v1");
+    let v2_path = PathBuf::from("pkm_files").join("ohpkm").join("v2");
+
+    if fs::exists(&v2_path)? {
+        fs::remove_dir_all(&v2_path)?;
+    }
+
+    fs::create_dir(&v2_path)?;
+
+    let pkm_files = fs::read_dir(&v1_path).map_err(|e| format!("directory read error: {e}"))?;
+    for dir_entry in pkm_files {
+        match dir_entry {
+            Err(e) => println!("directory entry error: {e}"),
+            Ok(dir_entry) => {
+                use crate::pkm::ohpkm::{OhpkmV1, OhpkmV2};
+
+                let v1_path = v1_path.join(dir_entry.file_name());
+                let v1_filename = v1_path.to_string_lossy();
+                let v1 = pkm_from_file::<OhpkmV1>(&v1_filename)?.0;
+
+                let v2 = OhpkmV2::from_v1(v1);
+
+                let v2_filename = v2_path.join(dir_entry.file_name());
+
+                fs::write(v2_filename, v2.to_bytes()?)?;
+            }
+        }
+    }
+
+    Ok(())
+}
+#[cfg(test)]
 fn find_differing_ranges(
     actual: &[u8],
     expected: &[u8],
@@ -169,18 +203,23 @@ fn find_inconsistencies<PKM: Pkm>(
 
 #[cfg(test)]
 pub mod ohpkm {
-    use std::{collections::HashSet, path::PathBuf};
+    use std::{collections::HashSet, error::Error, path::PathBuf};
 
-    use crate::{pkm::Ohpkm, tests::pkm::ByteRange};
+    use crate::{pkm::ohpkm::OhpkmV1, tests::pkm::ByteRange};
 
     #[test]
     fn to_from_bytes() -> Result<(), String> {
         let ohpkm_ignore_ranges: HashSet<ByteRange> =
             vec![ByteRange::new(172, 179)].into_iter().collect();
-        super::to_from_bytes_all_in_dir::<Ohpkm>(
+        super::to_from_bytes_all_in_dir::<OhpkmV1>(
             &PathBuf::from("pkm_files").join("ohpkm"),
             ohpkm_ignore_ranges,
             true,
         )
+    }
+
+    #[test]
+    fn do_v2() -> Result<(), Box<dyn Error>> {
+        super::v2_from_all_v1()
     }
 }

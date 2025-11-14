@@ -51,12 +51,16 @@ impl<const N: usize> Serialize for SizedUtf16String<N> {
 }
 
 impl<const N: usize> SizedUtf16String<N> {
-    pub fn from_bytes(bytes: [u8; N]) -> Self {
+    pub const fn from_bytes(bytes: [u8; N]) -> Self {
         SizedUtf16String { raw_le: bytes }
     }
 
-    pub fn bytes(&self) -> [u8; N] {
+    pub const fn bytes(&self) -> [u8; N] {
         self.raw_le
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self[0] == 0 && self[1] == 0
     }
 }
 

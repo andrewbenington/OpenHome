@@ -25,7 +25,7 @@ pub enum Gender {
 impl Gender {
     pub const fn set_bits_1_2(&self, dest: &mut u8) {
         *dest &= MASK_BITS_1_2_INVERTED;
-        *dest |= self.to_numeric() << 1
+        *dest |= self.to_byte() << 1
     }
 
     pub const fn from_bits_1_2(source: u8) -> Self {
@@ -41,7 +41,7 @@ impl Gender {
 
     pub const fn set_bits_2_3(&self, dest: &mut u8) {
         *dest &= MASK_BITS_2_3_INVERTED;
-        *dest |= self.to_numeric() << 2
+        *dest |= self.to_byte() << 2
     }
 
     pub const fn from_bits_2_3(source: u8) -> Self {
@@ -55,12 +55,21 @@ impl Gender {
         }
     }
 
-    const fn to_numeric(self) -> u8 {
+    pub const fn to_byte(self) -> u8 {
         match self {
             Gender::Male => 0,
             Gender::Female => 1,
             Gender::Genderless => 2,
             Gender::Invalid => 3,
+        }
+    }
+
+    pub const fn from_u8(byte: u8) -> Self {
+        match byte {
+            0 => Self::Male,
+            1 => Self::Female,
+            2 => Self::Genderless,
+            _ => Self::Invalid,
         }
     }
 }
@@ -77,7 +86,7 @@ pub fn gender_from_bool(value: bool) -> Gender {
 
 #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = genderToInt))]
 pub fn gender_to_int(value: Gender) -> u8 {
-    value.to_numeric()
+    value.to_byte()
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = genderFromInt))]

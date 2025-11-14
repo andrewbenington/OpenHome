@@ -1,5 +1,6 @@
-use std::fmt::Display;
+use crate::pkm::ohpkm::sectioned_data;
 
+use std::fmt::Display;
 use pkm_rs_resources::species::{NatDexIndex, SpeciesAndForme};
 use pkm_rs_resources::{species::MAX_NATIONAL_DEX, natures::NATURE_MAX, abilities::ABILITY_MAX, language::LANGUAGE_MAX, items::ITEM_MAX};
 use serde::{Serialize, Serializer};
@@ -16,10 +17,6 @@ pub enum MoveErrorKind {
 pub enum Error {
     BufferSize {
         field: String,
-        offset: usize,
-        buffer_size: usize,
-    },
-    ByteLength {
         expected: usize,
         received: usize,
     },
@@ -77,19 +74,20 @@ pub enum Error {
     Other(String),
 }
 
+impl Error {
+    pub fn other(message: &str) -> Self {
+        Self::Other(String::from(message))
+    }
+}
+
 impl Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let message = match self {
             Error::BufferSize {
                 field,
-                offset,
-                buffer_size,
+               expected, received,
             } => {
-                format!("Buffer too short ({buffer_size}B) to access {field} (at {offset})").to_owned()
-            }
-            Error::ByteLength { expected, received } => {
-                format!("Invalid byte length (expected {expected}, received {received}")
-                    .to_owned()
+                format!("{field} requires buffer of length {expected}, but actual length is {received}").to_owned()
             }
             Error::CryptRange { range, buffer_size } => {
                 format!("Attempting to decrypt/encrypt range ({}, {}) over buffer of size {buffer_size}", range.0, range.1)
@@ -166,8 +164,7 @@ impl std::error::Error for Error {
 impl From<pkm_rs_resources::Error> for Error {
     fn from(value: pkm_rs_resources::Error) -> Self {
         match value {
-            pkm_rs_resources::Error::BufferSize { field, offset, buffer_size } => Self::BufferSize { field, offset, buffer_size },
-            pkm_rs_resources::Error::ByteLength { expected, received } => Self::ByteLength { expected, received },
+            pkm_rs_resources::Error::BufferSize { field, expected, received } => Self::BufferSize { field, expected, received },
             pkm_rs_resources::Error::CryptRange { range, buffer_size } => Self::CryptRange { range, buffer_size },
             pkm_rs_resources::Error::NationalDex { national_dex } => Self::NationalDex { value: national_dex, source: NdexConvertSource::Other },
             pkm_rs_resources::Error::FormeIndex { national_dex, forme_index } => Self::FormeIndex { national_dex, forme_index },
@@ -176,6 +173,19 @@ impl From<pkm_rs_resources::Error> for Error {
             pkm_rs_resources::Error::AbilityIndex { ability_index } => Self::AbilityIndex { ability_index },
             pkm_rs_resources::Error::ItemIndex { item_index } => Self::ItemIndex { item_index },
             pkm_rs_resources::Error::FieldError { field, source } => Self::FieldError { field, source },
+        }
+    }
+}
+
+impl From<sectioned_data::Error> for Error {
+    fn from(value: sectioned_data::Error) -> Self {
+        match value {
+            sectioned_data::Error::BufferTooShort { field, expected, received } => Self::BufferSize { field, expected, received },
+            sectioned_data::Error::SectionOutOfBounds { section_name, offset, length, buffer_size } => Self::BufferSize { 
+                field: section_name,
+                expected: (offset+length) as usize, 
+                received: buffer_size 
+            },
         }
     }
 }

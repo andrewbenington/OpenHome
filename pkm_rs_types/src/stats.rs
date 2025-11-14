@@ -300,6 +300,10 @@ impl StatsPreSplit {
 
         dv_val_u16.to_be_bytes()
     }
+
+    pub const fn is_empty(&self) -> bool {
+        self.hp == 0 && self.atk == 0 && self.def == 0 && self.spc == 0 && self.spe == 0
+    }
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
