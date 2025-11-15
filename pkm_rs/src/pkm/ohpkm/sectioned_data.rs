@@ -9,6 +9,7 @@ pub trait DataSection: Sized {
 
     fn from_bytes(bytes: &[u8]) -> CoreResult<Self, Self::ErrorType>;
     fn to_bytes(&self) -> CoreResult<Vec<u8>, Self::ErrorType>;
+    fn is_empty(&self) -> bool;
 
     fn extract_from(
         data: &SectionedData<Self::TagType>,
@@ -130,7 +131,7 @@ impl<Tag: SectionTag> SectionedData<Tag> {
         }
     }
 
-    pub fn add_section<T: DataSection<TagType = Tag>>(
+    pub fn add<T: DataSection<TagType = Tag>>(
         &mut self,
         section: T,
     ) -> CoreResult<&mut Self, T::ErrorType> {
@@ -139,7 +140,18 @@ impl<Tag: SectionTag> SectionedData<Tag> {
         Ok(self)
     }
 
-    pub fn add_section_if<T: DataSection<TagType = Tag>>(
+    pub fn add_if_not_empty<T: DataSection<TagType = Tag>>(
+        &mut self,
+        section: T,
+    ) -> CoreResult<&mut Self, T::ErrorType> {
+        if !section.is_empty() {
+            self.tagged_buffers.push(section.to_tagged_buffer()?);
+        }
+
+        Ok(self)
+    }
+
+    pub fn add_if_some<T: DataSection<TagType = Tag>>(
         &mut self,
         section: Option<T>,
     ) -> CoreResult<&mut Self, T::ErrorType> {

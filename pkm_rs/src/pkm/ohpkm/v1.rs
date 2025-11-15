@@ -5,6 +5,7 @@ use crate::util;
 
 use pkm_rs_resources::abilities::AbilityIndex;
 use pkm_rs_resources::ball::Ball;
+use pkm_rs_resources::language::Language;
 use pkm_rs_resources::moves::MoveSlot;
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbonSet};
@@ -94,7 +95,7 @@ pub struct OhpkmV1 {
     pub country: u8,
     pub region: u8,
     pub console_region: u8,
-    pub language_index: u8,
+    pub language: Language,
     pub unknown_f3: u8,
     pub form_argument: u32,
     pub affixed_ribbon: Option<ModernRibbon>,
@@ -238,7 +239,7 @@ impl OhpkmV1 {
             country: bytes[239],
             region: bytes[240],
             console_region: bytes[240],
-            language_index: bytes[242],
+            language: Language::try_from(bytes[242])?,
             unknown_f3: bytes[243],
             form_argument: u32::from_le_bytes(bytes[244..248].try_into().unwrap()),
             affixed_ribbon: ModernRibbon::from_affixed_byte(bytes[248]),
@@ -409,7 +410,7 @@ impl Pkm for OhpkmV1 {
         bytes[239] = self.country;
         bytes[240] = self.region;
         bytes[240] = self.console_region;
-        bytes[242] = self.language_index;
+        bytes[242] = self.language as u8;
         bytes[243] = self.unknown_f3;
         bytes[244..248].copy_from_slice(&self.form_argument.to_le_bytes());
         bytes[248] = ModernRibbon::to_affixed_byte(self.affixed_ribbon);
