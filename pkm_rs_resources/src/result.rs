@@ -12,10 +12,6 @@ use crate::species::{NATIONAL_DEX_MAX, NatDexIndex};
 pub enum Error {
     BufferSize {
         field: String,
-        offset: usize,
-        buffer_size: usize,
-    },
-    ByteLength {
         expected: usize,
         received: usize,
     },
@@ -39,7 +35,7 @@ pub enum Error {
     AbilityIndex {
         ability_index: u16,
     },
-    Item {
+    ItemIndex {
         item_index: u16,
     },
     FieldError {
@@ -51,16 +47,8 @@ pub enum Error {
 impl Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let message = match self {
-            Error::BufferSize {
-                field,
-                offset,
-                buffer_size,
-            } => {
-                format!("Buffer too short ({buffer_size}B) to access {field} (at {offset})").to_owned()
-            }
-            Error::ByteLength { expected, received } => {
-                format!("Invalid byte length (expected {expected}, received {received}")
-                    .to_owned()
+            Error::BufferSize { field, expected, received } => {
+                format!("{field} requires buffer of length {expected}, but actual length is {received}").to_owned()
             }
             Error::CryptRange { range, buffer_size } => {
                 format!("Attempting to decrypt/encrypt range ({}, {}) over buffer of size {buffer_size}", range.0, range.1)
@@ -94,7 +82,7 @@ impl Display for Error {
                 format!("Invalid ability index {ability_index} (must be between 1 and {ABILITY_MAX}")
                     .to_owned()
             }
-            Error::Item { item_index } => {
+            Error::ItemIndex { item_index } => {
                 format!("Invalid item index {item_index} (must be between 1 and {ITEM_MAX}")
                     .to_owned()
             }

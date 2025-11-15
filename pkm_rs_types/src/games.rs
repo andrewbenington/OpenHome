@@ -10,9 +10,10 @@ pub enum ColosseumOrXd {
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
+#[derive(Debug, Default, PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Serialize)]
 #[repr(u8)]
 pub enum OriginGame {
+    #[default]
     Invalid0,
     Sapphire,
     Ruby,
@@ -380,16 +381,29 @@ impl OriginGame {
         self <= Self::LeafGreen
     }
 
+    pub fn is_ds(self) -> bool {
+        (self >= Self::HeartGold && self <= Self::Platinum)
+            || (self >= Self::White && self <= Self::Black2)
+    }
+
+    pub fn is_3ds(self) -> bool {
+        self >= Self::X && self <= Self::UltraMoon
+    }
+
     pub fn is_lets_go(self) -> bool {
-        self == Self::LetsGoEevee && self == Self::LetsGoPikachu
+        self == Self::LetsGoEevee || self == Self::LetsGoPikachu
+    }
+
+    pub fn is_swsh(self) -> bool {
+        self == Self::Sword || self == Self::Shield
     }
 
     pub fn is_bdsp(self) -> bool {
-        self == Self::BrilliantDiamond && self == Self::ShiningPearl
+        self == Self::BrilliantDiamond || self == Self::ShiningPearl
     }
 
     pub fn is_scarlet_violet(self) -> bool {
-        self == Self::Scarlet && self == Self::Violet
+        self == Self::Scarlet || self == Self::Violet
     }
 }
 
