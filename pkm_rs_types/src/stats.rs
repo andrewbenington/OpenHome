@@ -306,6 +306,22 @@ impl StatsPreSplit {
     }
 }
 
+#[cfg(feature = "wasm")]
+#[wasm_bindgen]
+impl StatsPreSplit {
+    #[wasm_bindgen(constructor)]
+    #[allow(clippy::missing_const_for_fn)]
+    pub fn new(hp: u16, atk: u16, def: u16, spc: u16, spe: u16) -> Self {
+        Self {
+            hp,
+            atk,
+            def,
+            spc,
+            spe,
+        }
+    }
+}
+
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Debug, Default, Serialize, Clone, Copy)]
 pub struct ContestStats {

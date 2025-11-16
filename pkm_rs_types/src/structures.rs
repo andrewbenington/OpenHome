@@ -163,6 +163,10 @@ impl<const N: usize> FlagSet<N> {
         set.add_indices(indices);
         set
     }
+
+    pub fn is_empty(&self) -> bool {
+        self.raw.iter().all(|byte| *byte == 0)
+    }
 }
 
 impl<const N: usize> Serialize for FlagSet<N> {

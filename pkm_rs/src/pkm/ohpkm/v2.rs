@@ -12,15 +12,16 @@ use pkm_rs_resources::moves::MoveSlot;
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbonSet};
 use pkm_rs_resources::species::SpeciesAndForme;
+#[cfg(feature = "wasm")]
+use pkm_rs_types::TeraTypeWasm;
 use pkm_rs_types::{
-    ContestStats, Geolocations, HyperTraining, MarkingsSixShapesColors, OriginGame, Stats8,
-    Stats16Le, StatsPreSplit, TeraType,
+    ContestStats, FlagSet, Geolocations, HyperTraining, MarkingsSixShapesColors, OriginGame,
+    Stats8, Stats16Le, StatsPreSplit, TeraType,
 };
 use pkm_rs_types::{Gender, PokeDate, TrainerMemory};
 use serde::Serialize;
 use strum_macros::Display;
 
-const MIN_SIZE: usize = 420;
 const MAGIC_NUMBER: u32 = 0x57575757;
 const CURRENT_VERSION: u16 = 2;
 
@@ -57,7 +58,7 @@ impl SectionTagV2 {
         }
     }
 
-    pub const fn size(&self) -> usize {
+    pub const fn min_size(&self) -> usize {
         match *self {
             Self::MainData => 305,
             Self::GameboyData => 13,
@@ -67,7 +68,7 @@ impl SectionTagV2 {
             Self::BdspTmFlags => 14,
             Self::LegendsArceus => 44,
             Self::ScarletViolet => 37,
-            Self::PluginData => 32,
+            Self::PluginData => 0,
         }
     }
 }
@@ -78,7 +79,7 @@ impl SectionTag for SectionTagV2 {
     }
 
     fn size(&self) -> usize {
-        self.size()
+        self.min_size()
     }
 
     fn index(&self) -> u16 {
@@ -818,11 +819,11 @@ impl DataSection for SwordShieldData {
 pub struct LegendsArceusData {
     pub gvs: Stats8,
     #[wasm_bindgen(skip)]
-    pub move_flags: [u8; 14],
+    pub move_flags: FlagSet<14>,
     #[wasm_bindgen(skip)]
-    pub tutor_flags: [u8; 8],
+    pub tutor_flags: FlagSet<8>,
     #[wasm_bindgen(skip)]
-    pub master_flags: [u8; 8],
+    pub master_flags: FlagSet<8>,
     pub is_alpha: bool,
     pub is_noble: bool,
     pub alpha_move: u16,
@@ -845,9 +846,9 @@ impl LegendsArceusData {
             Some(Self {
                 gvs: old.gvs,
                 alpha_move: old.alpha_move,
-                move_flags: old.move_flags_la,
-                tutor_flags: old.tutor_flags_la,
-                master_flags: old.master_flags_la,
+                move_flags: FlagSet::from_bytes(old.move_flags_la),
+                tutor_flags: FlagSet::from_bytes(old.tutor_flags_la),
+                master_flags: FlagSet::from_bytes(old.master_flags_la),
                 is_alpha: old.is_alpha,
                 is_noble: old.is_noble,
                 flag2: old.flag2_la,
@@ -871,9 +872,9 @@ impl DataSection for LegendsArceusData {
         Ok(Self {
             gvs: Stats8::from_bytes(bytes[0..6].try_into().unwrap()),
             alpha_move: u16::from_le_bytes(bytes[6..8].try_into().unwrap()),
-            move_flags: bytes[8..22].try_into().unwrap(),
-            tutor_flags: bytes[22..30].try_into().unwrap(),
-            master_flags: bytes[30..38].try_into().unwrap(),
+            move_flags: FlagSet::from_bytes(bytes[8..22].try_into().unwrap()),
+            tutor_flags: FlagSet::from_bytes(bytes[22..30].try_into().unwrap()),
+            master_flags: FlagSet::from_bytes(bytes[30..38].try_into().unwrap()),
             is_alpha: util::get_flag(bytes, 38, 0),
             is_noble: util::get_flag(bytes, 38, 1),
             flag2: util::get_flag(bytes, 38, 2),
@@ -887,9 +888,9 @@ impl DataSection for LegendsArceusData {
 
         bytes[0..6].copy_from_slice(&self.gvs.to_bytes());
         bytes[6..8].copy_from_slice(&self.alpha_move.to_le_bytes());
-        bytes[8..22].copy_from_slice(&self.move_flags);
-        bytes[22..30].copy_from_slice(&self.tutor_flags);
-        bytes[30..38].copy_from_slice(&self.master_flags);
+        bytes[8..22].copy_from_slice(&self.move_flags.to_bytes());
+        bytes[22..30].copy_from_slice(&self.tutor_flags.to_bytes());
+        bytes[30..38].copy_from_slice(&self.master_flags.to_bytes());
         util::set_flag(&mut bytes, 38, 0, self.is_alpha);
         util::set_flag(&mut bytes, 38, 1, self.is_noble);
         util::set_flag(&mut bytes, 38, 2, self.flag2);
@@ -902,18 +903,18 @@ impl DataSection for LegendsArceusData {
     fn is_empty(&self) -> bool {
         !self.is_alpha
             && !self.is_noble
-            && bytes_are_empty(&self.move_flags)
-            && bytes_are_empty(&self.tutor_flags)
-            && bytes_are_empty(&self.master_flags)
+            && self.move_flags.is_empty()
+            && self.master_flags.is_empty()
+            && self.tutor_flags.is_empty()
     }
 }
 
-#[derive(Debug, Serialize, Clone, Copy)]
+#[derive(Debug, Default, Serialize, Clone, Copy)]
 pub struct ScarletVioletData {
     pub tera_type_original: TeraType,
     pub tera_type_override: Option<TeraType>,
-    pub tm_flags_sv: [u8; 22],
-    pub tm_flags_sv_dlc: [u8; 13],
+    pub tm_flags_sv: FlagSet<22>,
+    pub tm_flags_sv_dlc: FlagSet<13>,
 }
 
 impl ScarletVioletData {
@@ -931,9 +932,18 @@ impl ScarletVioletData {
             Some(Self {
                 tera_type_original,
                 tera_type_override,
-                tm_flags_sv: old.tm_flags_sv,
-                tm_flags_sv_dlc: old.tm_flags_sv_dlc,
+                tm_flags_sv: FlagSet::from_bytes(old.tm_flags_sv),
+                tm_flags_sv_dlc: FlagSet::from_bytes(old.tm_flags_sv_dlc),
             })
+        }
+    }
+
+    pub fn default_generated_tera_type(species_and_forme: SpeciesAndForme) -> Self {
+        Self {
+            tera_type_original: species_and_forme
+                .get_forme_metadata()
+                .transferred_tera_type(),
+            ..Default::default()
         }
     }
 }
@@ -956,8 +966,8 @@ impl DataSection for ScarletVioletData {
         Ok(Self {
             tera_type_original,
             tera_type_override: TeraType::from_byte(bytes[1]),
-            tm_flags_sv: bytes[2..24].try_into().unwrap(),
-            tm_flags_sv_dlc: bytes[24..37].try_into().unwrap(),
+            tm_flags_sv: FlagSet::from_bytes(bytes[2..24].try_into().unwrap()),
+            tm_flags_sv_dlc: FlagSet::from_bytes(bytes[24..37].try_into().unwrap()),
         })
     }
 
@@ -966,47 +976,41 @@ impl DataSection for ScarletVioletData {
 
         bytes[0] = self.tera_type_original.to_byte();
         bytes[1] = self.tera_type_override.map_or(0, TeraType::to_byte);
-        bytes[2..24].copy_from_slice(&self.tm_flags_sv);
-        bytes[24..37].copy_from_slice(&self.tm_flags_sv_dlc);
+        bytes[2..24].copy_from_slice(&self.tm_flags_sv.to_bytes());
+        bytes[24..37].copy_from_slice(&self.tm_flags_sv_dlc.to_bytes());
 
         Ok(bytes.to_vec())
     }
 
     fn is_empty(&self) -> bool {
-        false
+        self.tera_type_override.is_none()
+            && self.tm_flags_sv.is_empty()
+            && self.tm_flags_sv_dlc.is_empty()
     }
 }
 
-#[derive(Debug, Default, Clone, Copy)]
+#[derive(Debug, Default, Clone)]
 pub struct PluginData {
-    pub plugin_origin: SizedUtf16String<32>,
+    pub plugin_origin: String,
 }
 
 impl PluginData {
-    pub fn from_bytes(bytes: &[u8]) -> Result<Self> {
-        let size = bytes.len();
-        if size < SectionTagV2::PluginData.size() {
-            return Err(Error::BufferSize {
-                field: SectionTagV2::PluginData.to_string(),
-                expected: MIN_SIZE,
-                received: size,
-            });
-        }
-
-        // try_into() will always succeed thanks to the length check
-        Ok(Self {
-            plugin_origin: SizedUtf16String::<32>::from_bytes(bytes[0..32].try_into().unwrap()),
-        })
-    }
-
     pub fn from_v1(old: OhpkmV1) -> Option<Self> {
         if old.plugin_origin.is_empty() {
             None
         } else {
-            Some(Self {
-                plugin_origin: old.plugin_origin,
-            })
+            Some(Self::from_origin(old.plugin_origin.to_string()))
         }
+    }
+
+    fn try_from_origin_utf8(origin_bytes: &[u8]) -> Result<Self> {
+        String::from_utf8(origin_bytes.to_vec())
+            .map(Self::from_origin)
+            .map_err(Error::plugin_origin)
+    }
+
+    const fn from_origin(plugin_origin: String) -> Self {
+        Self { plugin_origin }
     }
 }
 
@@ -1019,10 +1023,7 @@ impl DataSection for PluginData {
     fn from_bytes(bytes: &[u8]) -> Result<Self> {
         Self::ensure_buffer_size(bytes)?;
 
-        // try_into() will always succeed thanks to the buffer size check
-        Ok(Self {
-            plugin_origin: SizedUtf16String::<32>::from_bytes(bytes.try_into().unwrap()),
-        })
+        Self::try_from_origin_utf8(bytes)
     }
 
     fn is_empty(&self) -> bool {
@@ -1030,7 +1031,7 @@ impl DataSection for PluginData {
     }
 
     fn to_bytes(&self) -> Result<Vec<u8>> {
-        Ok(self.plugin_origin.to_vec())
+        Ok(self.plugin_origin.clone().into_bytes())
     }
 }
 
@@ -1101,7 +1102,7 @@ impl OhpkmV2 {
             .add_if_not_empty(self.swsh_data)?
             .add_if_some(self.la_data)?
             .add_if_some(self.sv_data)?
-            .add_if_some(self.plugin_data)?;
+            .add_if_some(self.plugin_data.clone())?;
 
         Ok(sectioned_data.to_bytes()?)
     }
@@ -1111,17 +1112,19 @@ fn bytes_are_empty(bytes: &[u8]) -> bool {
     bytes.iter().all(|b| *b == 0)
 }
 
+type JsResult<T> = core::result::Result<T, JsValue>;
+
 #[cfg(feature = "wasm")]
 #[wasm_bindgen]
 #[allow(clippy::missing_const_for_fn)]
 impl OhpkmV2 {
     #[wasm_bindgen(constructor)]
-    pub fn new_js(national_dex: u16, forme_index: u16) -> core::result::Result<Self, JsValue> {
+    pub fn new_js(national_dex: u16, forme_index: u16) -> JsResult<Self> {
         Self::new(national_dex, forme_index).map_err(|e| JsValue::from_str(&e.to_string()))
     }
 
     #[wasm_bindgen(js_name = fromBytes)]
-    pub fn from_byte_vector(bytes: Vec<u8>) -> core::result::Result<Self, JsValue> {
+    pub fn from_byte_vector(bytes: Vec<u8>) -> JsResult<Self> {
         Self::from_bytes(&bytes).map_err(|e| JsValue::from_str(&e.to_string()))
     }
 
@@ -1235,19 +1238,8 @@ impl OhpkmV2 {
         self.main_data.ribbons.to_bytes().into_iter().collect()
     }
 
-    // #[wasm_bindgen(setter)]
-    // pub fn set_ribbon_indices(&mut self, indices: Vec<usize>) {
-    //     self.main_data
-    //         .ribbons
-    //         .set_ribbons(indices.into_iter().map(ModernRibbon::from).collect());
-    // }
-
     #[wasm_bindgen]
-    pub fn set_species_and_forme(
-        &mut self,
-        national_dex: u16,
-        forme_index: u16,
-    ) -> core::result::Result<(), JsValue> {
+    pub fn set_species_and_forme(&mut self, national_dex: u16, forme_index: u16) -> JsResult<()> {
         match SpeciesAndForme::new(national_dex, forme_index) {
             Ok(species_and_forme) => {
                 self.main_data.species_and_forme = species_and_forme;
@@ -1257,8 +1249,56 @@ impl OhpkmV2 {
         }
     }
 
+    #[wasm_bindgen(getter)]
+    pub fn plugin_origin(&self) -> Option<String> {
+        Some(self.plugin_data.clone()?.plugin_origin)
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_plugin_origin(&mut self, value: Option<String>) {
+        match value {
+            Some(plugin_origin) => {
+                self.plugin_data.get_or_insert_default().plugin_origin = plugin_origin
+            }
+            None => self.plugin_data = None,
+        }
+    }
+
+    // Scarlet/Violet
+
+    #[wasm_bindgen(getter)]
+    pub fn tera_type_original(&self) -> Option<TeraTypeWasm> {
+        self.sv_data
+            .map(|d| TeraTypeWasm::from(d.tera_type_original))
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn tera_type_override(&self) -> Option<TeraTypeWasm> {
+        self.sv_data
+            .map(|d| TeraTypeWasm::from(d.tera_type_original))
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_tera_type_override(&mut self, value: Option<TeraTypeWasm>) {
+        self.sv_data
+            .get_or_insert(ScarletVioletData::default_generated_tera_type(
+                self.main_data.species_and_forme,
+            ))
+            .tera_type_override = value.map(TeraType::from);
+
+        if self.sv_data.as_ref().is_some_and(DataSection::is_empty) {
+            self.sv_data = None
+        }
+    }
+
+    // #[wasm_bindgen(setter)]
+    // pub fn set_ribbon_indices(&mut self, indices: Vec<usize>) {
+    //     self.main_data
+    //         .ribbons
+    //         .set_ribbons(indices.into_iter().map(ModernRibbon::from).collect());
+    // }
     #[wasm_bindgen(js_name = toBytes)]
-    pub fn to_bytes_js(&self) -> core::result::Result<Vec<u8>, JsValue> {
+    pub fn to_bytes_js(&self) -> JsResult<Vec<u8>> {
         self.to_bytes()
             .map_err(|e| JsValue::from_str(&e.to_string()))
     }

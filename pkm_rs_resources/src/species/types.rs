@@ -3,7 +3,7 @@ use pkm_rs_types::Gender;
 use std::num::NonZeroU16;
 use strum_macros::{Display, EnumString};
 
-use pkm_rs_types::{GameSetting, Generation, PkmType, Stats16Le};
+use pkm_rs_types::{GameSetting, Generation, PkmType, Stats16Le, TeraType};
 use serde::{Serialize, Serializer};
 
 #[cfg(feature = "wasm")]
@@ -405,6 +405,15 @@ impl FormeMetadata {
             .mega_evolution_data
             .iter()
             .any(|mega| mega.mega_forme.forme_index == self.forme_index)
+    }
+
+    /// Tera Type assigned by Pokémon HOME for the species when not originally
+    /// from Scarlet/Violet
+    pub fn transferred_tera_type(&self) -> TeraType {
+        TeraType::Standard(match self.types {
+            (PkmType::Normal, Some(type2)) => type2,
+            (type1, _) => type1,
+        })
     }
 }
 

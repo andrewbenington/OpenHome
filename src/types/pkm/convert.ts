@@ -5,6 +5,7 @@ import {
   Memory,
   PKMDate,
   Stats,
+  StatsPreSplit,
 } from '../../../packages/pokemon-files/src'
 import * as PkmWasm from '../../../pkm_rs/pkg'
 
@@ -58,7 +59,7 @@ export function geolocationsToWasm(value: Geolocation[]): PkmWasm.Geolocations {
 }
 
 export function contestStatsFromWasm(value: PkmWasm.ContestStats): ContestStats {
-  const { free, ...stats } = value
+  const { free: _, ...stats } = value
   return stats
 }
 
@@ -74,7 +75,7 @@ export function contestStatsToWasm(value: ContestStats): PkmWasm.ContestStats {
 }
 
 export function statsFromWasmStats8(value: PkmWasm.Stats8): Stats {
-  const { free, ...stats } = value
+  const { free: _, ...stats } = value
   return stats
 }
 
@@ -83,12 +84,21 @@ export function statsToWasmStats8(value: Stats): PkmWasm.Stats8 {
 }
 
 export function statsFromWasmStats16Le(value: PkmWasm.Stats16Le): Stats {
-  const { free, ...stats } = value
+  const { free: _, ...stats } = value
   return stats
 }
 
 export function statsToWasmStats16Le(value: Stats): PkmWasm.Stats16Le {
   return new PkmWasm.Stats16Le(value.hp, value.atk, value.def, value.spa, value.spd, value.spe)
+}
+
+export function statsPreSplitFromWasm(value: PkmWasm.StatsPreSplit): StatsPreSplit {
+  const { free: _, ...stats } = value
+  return stats
+}
+
+export function statsPreSplitToWasm(value: StatsPreSplit): PkmWasm.StatsPreSplit {
+  return new PkmWasm.StatsPreSplit(value.hp, value.atk, value.def, value.spc, value.spe)
 }
 
 export function trainerMemoryToWasm(value: Memory): PkmWasm.TrainerMemory {

@@ -1,6 +1,7 @@
 use crate::pkm::ohpkm::sectioned_data;
 
-use std::fmt::Display;
+use std::fmt::{Display};
+use std::string::FromUtf8Error;
 use pkm_rs_resources::species::{NatDexIndex, SpeciesAndForme};
 use pkm_rs_resources::{species::MAX_NATIONAL_DEX, natures::NATURE_MAX, abilities::ABILITY_MAX, language::LANGUAGE_MAX, items::ITEM_MAX};
 use serde::{Serialize, Serializer};
@@ -70,6 +71,10 @@ pub enum Error {
         source: MoveErrorSource,
     },
 
+    StringDecode {
+        source: StringErrorSource,
+    },
+
     // Generic error for when nothing else fits
     Other(String),
 }
@@ -77,6 +82,10 @@ pub enum Error {
 impl Error {
     pub fn other(message: &str) -> Self {
         Self::Other(String::from(message))
+    }
+
+    pub const fn plugin_origin(error: FromUtf8Error) -> Self {
+        Self::StringDecode { source: StringErrorSource::PluginOrigin(error) }
     }
 }
 
@@ -139,10 +148,14 @@ impl Display for Error {
             Error::FieldError { field, source } => {
                 format!("Error reading field {field}: {source}")
                     .to_owned()
-            },
+            }
 
             Error::MoveError { value, source } => {
                 format!("Invalid move reference {value} (source: {source})").to_owned()
+            }
+
+            Error::StringDecode { source } => {
+                format!("String decode error: {source}").to_owned()
             }
 
             Error::Other(msg) => msg.clone(),
@@ -242,14 +255,34 @@ pub enum MoveErrorSource {
     Name,
 }
 
+
 impl Display for MoveErrorSource {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str(match self {
-            MoveErrorSource::Other => "other",
-            MoveErrorSource::CFRUIndex => "CFRU index",
-            MoveErrorSource::NationalIndex => "national move index",
-            MoveErrorSource::Name => "move name",
+            Self::Other => "other",
+            Self::CFRUIndex => "CFRU index",
+            Self::NationalIndex => "national move index",
+            Self::Name => "move name",
         })
+    }
+}
+
+#[derive(Debug, Default)]
+pub enum StringErrorSource {
+    #[default]
+    Other,
+    PluginOrigin(FromUtf8Error),
+}
+
+
+impl Display for StringErrorSource {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Other => f.write_str("other"),
+            Self::PluginOrigin(utf_error) =>  
+                f.write_fmt(format_args!("OHPKM plugin origin: {utf_error}")),
+            }
+            
     }
 }
 

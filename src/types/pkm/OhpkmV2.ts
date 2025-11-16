@@ -9,6 +9,7 @@ import {
   NatureIndex,
   SpeciesLookup,
   Stats16Le,
+  TeraTypeWasm,
 } from '@pkm-rs-resources/pkg'
 import * as lodash from 'lodash'
 import Prando from 'prando'
@@ -29,6 +30,7 @@ import {
   geolocationsToWasm,
   markingsSixShapesColorsFromWasm,
   markingsSixShapesColorsToWasm,
+  statsPreSplitToWasm,
   statsToWasmStats16Le,
   statsToWasmStats8,
   trainerMemoryToWasm,
@@ -91,8 +93,7 @@ export class OhpkmV2 {
       this.nickname = other.nickname
       this.language = other.language
       this.gameOfOrigin = other.gameOfOrigin
-      // TODO: PLUGIN ORIGIN
-      // this.inner pluginOrigin = other.pluginOrigin
+      this.pluginOrigin = other.pluginOrigin
 
       this.isEgg = other.isEgg ?? false
       this.pokerusByte = other.pokerusByte ?? 0
@@ -128,20 +129,19 @@ export class OhpkmV2 {
       if (other.evs) {
         this.evs = other.evs
       }
-      // this.evsG12 = other.evsG12 ?? {
-      //   hp: 0,
-      //   atk: 0,
-      //   def: 0,
-      //   spe: 0,
-      //   spc: 0,
-      // }
+      if (other.evsG12) {
+        this.evs
+      }
+
       if (other.contest) {
         this.contest = other.contest
       }
 
       this.ball = other.ball !== undefined ? other.ball : Ball.Poke
       this.markings = markingsSixShapesWithColorFromOther(other.markings)
-      // this.dvs = other.dvs ?? dvsFromIVs(this.ivs, other.isShiny())
+      if (other.dvs) {
+        this.dvs = other.dvs
+      }
 
       if (other.format === 'PK2' && other.dexNum === NationalDex.Unown && other.dvs) {
         const letterBits = (other.formeNum ?? 0) * 10
@@ -151,7 +151,7 @@ export class OhpkmV2 {
         newDvs.def = (newDvs.def & 0b1001) | (((letterBits >> 4) & 0b11) << 1)
         newDvs.spe = (newDvs.spe & 0b1001) | (((letterBits >> 2) & 0b11) << 1)
         newDvs.spc = (newDvs.spc & 0b1001) | ((letterBits & 0b11) << 1)
-        // this.dvs = newDvs
+        this.dvs = newDvs
       }
 
       this.metLocationIndex = other.metLocationIndex ?? 0
@@ -358,12 +358,19 @@ export class OhpkmV2 {
     this.inner.main_data.evs = statsToWasmStats8(value)
   }
 
-  // get evsG12() {
-  //   return this.inner.gameboy_data.evs_g12
-  // }
-  // set evs(value: types.StatsPreSplit) {
-  //   this.inner.gameboy_data.evs_g12 = statsToWasmStats16Le(value)
-  // }
+  get evsG12() {
+    return this.inner.gameboy_data.evs_g12
+  }
+  set evsG12(value: types.StatsPreSplit) {
+    this.inner.gameboy_data.evs_g12 = statsPreSplitToWasm(value)
+  }
+
+  get dvs() {
+    return this.inner.gameboy_data.dvs
+  }
+  set dvs(value: types.StatsPreSplit) {
+    this.inner.gameboy_data.dvs = statsPreSplitToWasm(value)
+  }
 
   get contest() {
     return this.inner.main_data.contest
@@ -769,13 +776,28 @@ export class OhpkmV2 {
     this.inner.gen45_data.is_ns_pokemon = value
   }
 
+  get teraTypeOriginal() {
+    return this.inner.tera_type_original
+  }
+
+  get teraTypeOverride() {
+    return this.inner.tera_type_override
+  }
+
+  set teraTypeOverride(value: TeraTypeWasm | undefined) {
+    this.inner.tera_type_override = value
+  }
+
+  get pluginOrigin() {
+    return this.inner.plugin_origin
+  }
+  set pluginOrigin(value: string | undefined) {
+    this.inner.plugin_origin = value
+  }
+
   static fromBytes(buffer: ArrayBuffer): OhpkmV2 {
     return new OhpkmV2(buffer)
   }
-
-  // public getStats() {
-  //   return getStats(this)
-  // }
 
   public get abilityName() {
     return this.ability.name
