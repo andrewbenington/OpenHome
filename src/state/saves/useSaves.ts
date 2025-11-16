@@ -1,4 +1,4 @@
-import { Item } from '@pkm-rs-resources/pkg'
+import { Item } from '@pkm-rs/pkg'
 import { useContext } from 'react'
 import { PKMInterface } from '../../types/interfaces'
 import { OHPKM } from '../../types/pkm/OHPKM'

@@ -1,4 +1,4 @@
-import { NatureIndex } from '@pkm-rs-resources/pkg'
+import { NatureIndex } from '@pkm-rs/pkg'
 import { Stats, StatsPreSplit } from './types'
 
 export interface AllPKMs extends SpeciesData {

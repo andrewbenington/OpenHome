@@ -1,4 +1,4 @@
-import { OriginGame } from '@pkm-rs-resources/pkg'
+import { OriginGame } from '@pkm-rs/pkg'
 import { PB8 } from '@pokemon-files/pkm'
 import { utf16BytesToString } from '@pokemon-files/util'
 import { Item } from '../../../consts/Items'

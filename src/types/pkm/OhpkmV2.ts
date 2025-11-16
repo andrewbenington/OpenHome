@@ -5,23 +5,32 @@ import {
   Ball,
   Gender,
   Language,
+  Languages,
   MetadataLookup,
   NatureIndex,
   SpeciesLookup,
   Stats16Le,
   TeraTypeWasm,
-} from '@pkm-rs-resources/pkg'
+} from '@pkm-rs/pkg'
 import * as lodash from 'lodash'
 import Prando from 'prando'
 import {
   AllPKMFields,
   generatePersonalityValuePreservingAttributes,
+  getStandardPKMStats,
   markingsSixShapesWithColorFromOther,
+  Stats,
 } from '../../../packages/pokemon-files/src'
 import * as types from '../../../packages/pokemon-files/src/util/types'
-import { Gen34ContestRibbons, Gen34TowerRibbons } from '../../../packages/pokemon-resources/src'
+import {
+  Gen34ContestRibbons,
+  Gen34TowerRibbons,
+  Gen3Ribbons,
+  ModernRibbons,
+} from '../../../packages/pokemon-resources/src'
 import * as PkmRs from '../../../pkm_rs/pkg'
 import { NationalDex } from '../../consts/NationalDex'
+import { PKMInterface } from '../interfaces'
 import {
   contestStatsToWasm,
   convertPokeDate,
@@ -37,7 +46,7 @@ import {
 } from './convert'
 import { adjustMovePPBetweenFormats, generateIVs, getAbilityFromNumber, ivsFromDVs } from './util'
 
-export class OhpkmV2 {
+export class OhpkmV2 implements PKMInterface {
   static getName() {
     return 'PK7Wasm'
   }
@@ -707,16 +716,34 @@ export class OhpkmV2 {
     this.inner.main_data.language = value
   }
 
-  // get ribbons() {
-  //   return this.inner.ribbons.map((ribbonName) =>
-  //     ribbonName.endsWith('Ribbon') ? ribbonName.substring(0, ribbonName.length - 7) : ribbonName
-  //   )
-  // }
-  // set ribbons(ribbonNames: string[]) {
-  //   this.inner.main_data.ribbon_indices = new Uint32Array(
-  //     ribbonNames.map((name) => ModernRibbons.indexOf(name)).filter((idx) => idx !== -1)
-  //   )
-  // }
+  get ribbons() {
+    return this.inner
+      .allRibbonNames()
+      .map((ribbonName) =>
+        ribbonName.endsWith('Ribbon') ? ribbonName.substring(0, ribbonName.length - 7) : ribbonName
+      )
+  }
+
+  set ribbons(names: string[]) {
+    this.addGen3Ribbons(names)
+    this.addModernRibbons(names)
+  }
+
+  addGen3Ribbons(ribbonNames: string[]) {
+    this.inner.addGen3Ribbons(
+      new Uint32Array(
+        ribbonNames.map((name) => Gen3Ribbons.indexOf(name)).filter((idx) => idx !== -1)
+      )
+    )
+  }
+
+  addModernRibbons(ribbonNames: string[]) {
+    this.inner.addModernRibbons(
+      new Uint32Array(
+        ribbonNames.map((name) => ModernRibbons.indexOf(name)).filter((idx) => idx !== -1)
+      )
+    )
+  }
 
   get handlerMemory() {
     return this.inner.main_data.handler_memory
@@ -804,11 +831,19 @@ export class OhpkmV2 {
   }
 
   public get heldItemName() {
-    return PkmRs.Item.fromIndex(this.heldItemIndex)?.name
+    return PkmRs.Item.fromIndex(this.heldItemIndex)?.name ?? 'None'
   }
 
-  public get ribbonBytes() {
-    return this.inner.ribbon_bytes
+  public get languageString() {
+    return Languages.stringFromByte(this.language)
+  }
+
+  public getLevel(): number {
+    return this.speciesMetadata?.calculateLevel(this.exp) ?? 1
+  }
+
+  public getStats(): Stats {
+    return getStandardPKMStats(this)
   }
 
   public toBytes() {

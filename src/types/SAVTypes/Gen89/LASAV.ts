@@ -1,4 +1,4 @@
-import { Languages, OriginGame } from '@pkm-rs-resources/pkg'
+import { Languages, OriginGame } from '@pkm-rs/pkg'
 import { PA8 } from '@pokemon-files/pkm'
 import { utf16BytesToString } from '@pokemon-files/util'
 import { LA_TRANSFER_RESTRICTIONS } from '../../../consts/TransferRestrictions'

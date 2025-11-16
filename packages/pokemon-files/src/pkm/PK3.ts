@@ -9,7 +9,7 @@ import {
   MetadataLookup,
   NatureIndex,
   SpeciesLookup,
-} from '@pkm-rs-resources/pkg'
+} from '@pkm-rs/pkg'
 import * as conversion from '../conversion'
 import * as byteLogic from '../util/byteLogic'
 import * as encryption from '../util/encryption'

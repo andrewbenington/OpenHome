@@ -1,4 +1,4 @@
-import { MetadataLookup } from '@pkm-rs-resources/pkg'
+import { MetadataLookup } from '@pkm-rs/pkg'
 import { Button, Card, Dialog, Flex, Grid } from '@radix-ui/themes'
 import lodash, { range } from 'lodash'
 import { useContext, useMemo, useState } from 'react'

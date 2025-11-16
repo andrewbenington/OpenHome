@@ -56,7 +56,7 @@ const FileTypeSelect = (props: FileTypeSelectProps) => {
       )
     ).filter(filterUndefined)
 
-    return supportedFormats
+    return [...supportedFormats, 'OhpkmV2']
   }, [formData, getEnabledSaveTypes])
 
   return (

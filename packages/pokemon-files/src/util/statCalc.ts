@@ -2,7 +2,7 @@ import { NationalDex, NationalDexMax } from 'src/consts/NationalDex'
 
 import { PKM } from '../pkm'
 
-import { MetadataLookup, SpeciesLookup, Stat, Stats } from '@pkm-rs-resources/pkg'
+import { MetadataLookup, SpeciesLookup, Stat, Stats } from '@pkm-rs/pkg'
 import {
   AllPKMs,
   PKMWithDVs,

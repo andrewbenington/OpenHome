@@ -4,6 +4,9 @@ use std::{error::Error, fmt::Display};
 
 use crate::ribbons::{ModernRibbon, ModernRibbonSet};
 
+#[cfg(feature = "wasm")]
+use wasm_bindgen::prelude::*;
+
 #[derive(Default, Debug, Clone, Copy)]
 pub struct ObsoleteRibbonSet(FlagSet<6>);
 
@@ -49,6 +52,7 @@ impl Serialize for ObsoleteRibbonSet {
     }
 }
 
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Debug, Serialize, PartialEq, Eq, Clone, Copy)]
 #[repr(u8)]
 pub enum ObsoleteRibbon {
@@ -283,7 +287,7 @@ impl<const MODERN_BYTE_COUNT: usize> OpenHomeRibbonSet<MODERN_BYTE_COUNT> {
         }
     }
 
-    pub fn get_ribbons(&self) -> Vec<OpenHomeRibbon> {
+    pub fn to_vec(&self) -> Vec<OpenHomeRibbon> {
         self.get_obsolete()
             .into_iter()
             .map(OpenHomeRibbon::Obs)
@@ -349,12 +353,21 @@ impl<const N: usize> Serialize for OpenHomeRibbonSet<N> {
     where
         S: Serializer,
     {
-        self.get_ribbons().serialize(serializer)
+        self.to_vec().serialize(serializer)
     }
 }
 
 impl<const N: usize> FromIterator<OpenHomeRibbon> for OpenHomeRibbonSet<N> {
     fn from_iter<T: IntoIterator<Item = OpenHomeRibbon>>(iter: T) -> Self {
         Self::default().with_ribbons(iter.into_iter().collect())
+    }
+}
+
+impl<const N: usize> IntoIterator for OpenHomeRibbonSet<N> {
+    type Item = OpenHomeRibbon;
+    type IntoIter = std::vec::IntoIter<Self::Item>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.to_vec().into_iter()
     }
 }

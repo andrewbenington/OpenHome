@@ -6,6 +6,7 @@ import { MdDownload } from 'react-icons/md'
 import { ArrowLeftIcon, ArrowRightIcon } from 'src/components/Icons'
 import SideTabs from 'src/components/side-tabs/SideTabs'
 import MiniBoxIndicator, { MiniBoxIndicatorProps } from 'src/saves/boxes/MiniBoxIndicator'
+import OhpkmV2 from 'src/types/pkm/OhpkmV2'
 import { BackendContext } from '../backend/backendContext'
 import HexDisplay from '../components/HexDisplay'
 import { fileTypeFromString } from '../types/FileImport'
@@ -116,6 +117,10 @@ const PokemonDetailsModal = (props: {
                     }
                     if (newFormat === 'OHPKM') {
                       setDisplayMon(mon instanceof OHPKM ? mon : new OHPKM(mon))
+                      return
+                    }
+                    if (newFormat === 'OhpkmV2') {
+                      setDisplayMon(new OhpkmV2(mon))
                       return
                     }
                     const P = fileTypeFromString(newFormat)

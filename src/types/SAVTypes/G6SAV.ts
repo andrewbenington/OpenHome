@@ -1,4 +1,4 @@
-import { OriginGame } from '@pkm-rs-resources/pkg'
+import { OriginGame } from '@pkm-rs/pkg'
 import { PK6 } from '@pokemon-files/pkm'
 import { bytesToUint16LittleEndian, uint16ToBytesLittleEndian } from 'src/util/byteLogic'
 import { CRC16_CCITT } from 'src/util/Encryption'

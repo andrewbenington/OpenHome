@@ -1,4 +1,4 @@
-import { OriginGame } from '@pkm-rs-resources/pkg'
+import { OriginGame } from '@pkm-rs/pkg'
 import { PK4 } from '@pokemon-files/pkm'
 import { PT_TRANSFER_RESTRICTIONS } from 'src/consts/TransferRestrictions'
 import { bytesToUint16LittleEndian, bytesToUint32LittleEndian } from 'src/util/byteLogic'

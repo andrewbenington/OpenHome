@@ -10,7 +10,7 @@ import {
   NatureIndex,
   OriginGame,
   SpeciesLookup,
-} from '@pkm-rs-resources/pkg'
+} from '@pkm-rs/pkg'
 import {
   ContestStats,
   Geolocation,

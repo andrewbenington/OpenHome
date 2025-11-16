@@ -1,4 +1,4 @@
-import { MetadataLookup, SpeciesLookup } from '@pkm-rs-resources/pkg'
+import { MetadataLookup, SpeciesLookup } from '@pkm-rs/pkg'
 import { NationalDex } from 'src/consts/NationalDex'
 import { ImageResponse } from '../backend/backendInterface'
 import { OpenHomePlugin } from '../state/plugin'

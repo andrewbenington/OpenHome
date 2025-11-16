@@ -189,7 +189,7 @@ impl Gen3Ribbon {
         }
     }
 
-    const fn to_openhome(self) -> OpenHomeRibbon {
+    pub const fn to_openhome(self) -> OpenHomeRibbon {
         match self {
             Gen3Ribbon::Champion => OpenHomeRibbon::Mod(ModernRibbon::Gen3Champion),
             Gen3Ribbon::Effort => OpenHomeRibbon::Mod(ModernRibbon::Effort),
@@ -691,7 +691,6 @@ impl DsRibbonSet {
     pub fn from_openhome<const M: usize>(openhome_set: OpenHomeRibbonSet<M>) -> Self {
         Self {
             gen3: openhome_set
-                .get_ribbons()
                 .into_iter()
                 .filter_map(|ribbon| match ribbon {
                     OpenHomeRibbon::Mod(ribbon) => Gen3Ribbon::from_modern_if_present(ribbon),
@@ -699,7 +698,6 @@ impl DsRibbonSet {
                 })
                 .collect(),
             gen4_standard: openhome_set
-                .get_ribbons()
                 .into_iter()
                 .filter_map(|ribbon| match ribbon {
                     OpenHomeRibbon::Mod(ribbon) => {
@@ -711,7 +709,6 @@ impl DsRibbonSet {
                 })
                 .collect(),
             gen4_contest: openhome_set
-                .get_ribbons()
                 .into_iter()
                 .filter_map(|ribbon| match ribbon {
                     OpenHomeRibbon::Mod(_) => None,

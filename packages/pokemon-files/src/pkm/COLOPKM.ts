@@ -8,7 +8,7 @@ import {
   MetadataLookup,
   NatureIndex,
   SpeciesLookup,
-} from '@pkm-rs-resources/pkg'
+} from '@pkm-rs/pkg'
 import { Gen3ContestRibbons, Gen3StandardRibbons } from '@pokemon-resources/index'
 import { NationalDex } from 'src/consts/NationalDex'
 import * as byteLogic from '../util/byteLogic'

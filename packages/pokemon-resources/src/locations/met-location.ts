@@ -1,4 +1,4 @@
-import { GameSetting, Generation, OriginGame, OriginGames } from '@pkm-rs-resources/pkg'
+import { GameSetting, Generation, OriginGame, OriginGames } from '@pkm-rs/pkg'
 
 import { Gen2Locations } from './gen2'
 import { Gen3GBALocations } from './gen3-gba'

@@ -13,7 +13,7 @@ export default defineConfig({
       '@pokemon-resources': fileURLToPath(
         new URL('./packages/pokemon-resources/src', import.meta.url)
       ),
-      '@pkm-rs-resources': fileURLToPath(new URL('./pkm_rs_resources', import.meta.url)),
+      '@pkm-rs': fileURLToPath(new URL('./pkm_rs', import.meta.url)),
     },
   },
 })

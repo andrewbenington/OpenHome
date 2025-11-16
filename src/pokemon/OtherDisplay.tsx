@@ -1,4 +1,4 @@
-import { Generation, OriginGames } from '@pkm-rs-resources/pkg'
+import { Generation, OriginGames } from '@pkm-rs/pkg'
 import { PK3, PK4, PK5 } from '@pokemon-files/pkm'
 import { AllPKMFields, getDisplayID, StatsPreSplit } from '@pokemon-files/util'
 import {

@@ -1,5 +1,5 @@
 import { useDraggable } from '@dnd-kit/react'
-import { Item } from '@pkm-rs-resources/pkg'
+import { Item } from '@pkm-rs/pkg'
 import { Text, Tooltip } from '@radix-ui/themes'
 import { getPublicImageURL } from '../images/images'
 import { getItemIconPath } from '../images/items'

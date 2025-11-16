@@ -1,4 +1,4 @@
-import { MetadataLookup } from '@pkm-rs-resources/pkg'
+import { MetadataLookup } from '@pkm-rs/pkg'
 import * as E from 'fp-ts/lib/Either'
 import { useContext, useEffect, useMemo, useState } from 'react'
 import { CURRENT_PLUGIN_API_VERSION } from '../app/plugins/Plugins'

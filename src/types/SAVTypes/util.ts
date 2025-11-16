@@ -1,4 +1,4 @@
-import { OriginGame } from '@pkm-rs-resources/pkg'
+import { OriginGame } from '@pkm-rs/pkg'
 import { PKMInterface } from '../interfaces'
 import { PathData } from './path'
 import { SAV } from './SAV'

@@ -1,4 +1,4 @@
-import { FormeMetadata, Generation, MetadataLookup } from '@pkm-rs-resources/pkg'
+import { FormeMetadata, Generation, MetadataLookup } from '@pkm-rs/pkg'
 import { HTMLAttributes } from 'react'
 import useIsDarkMode from 'src/hooks/dark-mode'
 import useMonSprite from 'src/pokemon/useMonSprite'

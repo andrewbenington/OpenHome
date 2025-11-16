@@ -1,4 +1,4 @@
-import { ItemGen2, Language, OriginGame } from '@pkm-rs-resources/pkg'
+import { ItemGen2, Language, OriginGame } from '@pkm-rs/pkg'
 import { PK2 } from '@pokemon-files/pkm'
 import { uniq } from 'lodash'
 import { EXCLAMATION } from 'src/consts/Formes'

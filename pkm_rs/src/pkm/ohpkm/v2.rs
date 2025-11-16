@@ -10,7 +10,9 @@ use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::language::Language;
 use pkm_rs_resources::moves::MoveSlot;
 use pkm_rs_resources::natures::NatureIndex;
-use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbonSet};
+#[cfg(feature = "wasm")]
+use pkm_rs_resources::ribbons::ObsoleteRibbon;
+use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbon, OpenHomeRibbonSet};
 use pkm_rs_resources::species::SpeciesAndForme;
 #[cfg(feature = "wasm")]
 use pkm_rs_types::TeraTypeWasm;
@@ -1038,6 +1040,7 @@ impl DataSection for PluginData {
 #[derive(Default, Debug)]
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 pub struct OhpkmV2 {
+    #[wasm_bindgen(skip)]
     pub main_data: MainDataV2,
     pub gameboy_data: GameboyData,
     pub gen45_data: Gen45Data,
@@ -1223,19 +1226,33 @@ impl OhpkmV2 {
         self.main_data.egg_date = value
     }
 
-    #[wasm_bindgen(getter)]
-    pub fn ribbons(&self) -> Vec<String> {
+    #[wasm_bindgen(js_name = allRibbonNames)]
+    pub fn all_ribbon_names(&self) -> Vec<String> {
         self.main_data
             .ribbons
-            .get_ribbons()
-            .iter()
+            .into_iter()
             .map(|ribbon| ribbon.to_string())
             .collect()
     }
 
-    #[wasm_bindgen(getter)]
-    pub fn ribbon_bytes(&self) -> Vec<u8> {
-        self.main_data.ribbons.to_bytes().into_iter().collect()
+    #[wasm_bindgen(js_name = addModernRibbons)]
+    pub fn add_modern_ribbons(&mut self, ribbon_indices: Vec<usize>) {
+        ribbon_indices
+            .into_iter()
+            .map(ModernRibbon::from)
+            .map(OpenHomeRibbon::Mod)
+            .for_each(|r| self.main_data.ribbons.add_ribbon(r));
+    }
+
+    #[wasm_bindgen(js_name = addGen3Ribbons)]
+    pub fn add_gen3_ribbons(&mut self, ribbon_indices: Vec<usize>) {
+        use pkm_rs_resources::ribbons::Gen3Ribbon;
+
+        ribbon_indices
+            .into_iter()
+            .map(Gen3Ribbon::from_index)
+            .map(Gen3Ribbon::to_openhome)
+            .for_each(|r| self.main_data.ribbons.add_ribbon(r));
     }
 
     #[wasm_bindgen]
