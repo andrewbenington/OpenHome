@@ -1131,11 +1131,505 @@ impl OhpkmV2 {
         Self::from_bytes(&bytes).map_err(|e| JsValue::from_str(&e.to_string()))
     }
 
+    #[wasm_bindgen(getter, js_name = personalityValue)]
+    pub fn personality_value(&self) -> u32 {
+        self.main_data.personality_value
+    }
+    #[wasm_bindgen(setter, js_name = personalityValue)]
+    pub fn set_personality_value(&mut self, v: u32) {
+        self.main_data.personality_value = v;
+    }
+
+    #[wasm_bindgen(getter, js_name = encryptionConstant)]
+    pub fn encryption_constant(&self) -> u32 {
+        self.main_data.encryption_constant
+    }
+    #[wasm_bindgen(setter, js_name = encryptionConstant)]
+    pub fn set_encryption_constant(&mut self, v: u32) {
+        self.main_data.encryption_constant = v;
+    }
+
+    #[wasm_bindgen(getter, js_name = speciesAndForme)]
+    pub fn species_and_forme(&self) -> SpeciesAndForme {
+        self.main_data.species_and_forme
+    }
+    #[wasm_bindgen(setter, js_name = speciesAndForme)]
+    pub fn set_species_and_forme(&mut self, v: SpeciesAndForme) {
+        self.main_data.species_and_forme = v;
+    }
+
+    #[wasm_bindgen(getter, js_name = heldItemIndex)]
+    pub fn held_item_index(&self) -> u16 {
+        self.main_data.held_item_index
+    }
+    #[wasm_bindgen(setter, js_name = heldItemIndex)]
+    pub fn set_held_item_index(&mut self, v: u16) {
+        self.main_data.held_item_index = v;
+    }
+
+    #[wasm_bindgen(getter, js_name = trainerId)]
+    pub fn trainer_id(&self) -> u16 {
+        self.main_data.trainer_id
+    }
+    #[wasm_bindgen(setter, js_name = trainerId)]
+    pub fn set_trainer_id(&mut self, v: u16) {
+        self.main_data.trainer_id = v;
+    }
+
+    #[wasm_bindgen(getter, js_name = secretId)]
+    pub fn secret_id(&self) -> u16 {
+        self.main_data.secret_id
+    }
+    #[wasm_bindgen(setter, js_name = secretId)]
+    pub fn set_secret_id(&mut self, v: u16) {
+        self.main_data.secret_id = v;
+    }
+
+    #[wasm_bindgen(getter, js_name = exp)]
+    pub fn exp(&self) -> u32 {
+        self.main_data.exp
+    }
+    #[wasm_bindgen(setter, js_name = exp)]
+    pub fn set_exp(&mut self, v: u32) {
+        self.main_data.exp = v;
+    }
+
+    #[wasm_bindgen(getter, js_name = abilityIndex)]
+    pub fn ability_index(&self) -> AbilityIndex {
+        self.main_data.ability_index
+    }
+    #[wasm_bindgen(setter, js_name = abilityIndex)]
+    pub fn set_ability_index(&mut self, v: AbilityIndex) {
+        self.main_data.ability_index = v;
+    }
+
+    #[wasm_bindgen(getter, js_name = abilityNum)]
+    pub fn ability_num(&self) -> u8 {
+        self.main_data.ability_num
+    }
+    #[wasm_bindgen(setter, js_name = abilityNum)]
+    pub fn set_ability_num(&mut self, v: u8) {
+        self.main_data.ability_num = v;
+    }
+
+    #[wasm_bindgen(getter, js_name = favorite)]
+    pub fn favorite(&self) -> bool {
+        self.main_data.favorite
+    }
+    #[wasm_bindgen(setter, js_name = favorite)]
+    pub fn set_favorite(&mut self, v: bool) {
+        self.main_data.favorite = v;
+    }
+
+    #[wasm_bindgen(getter, js_name = isShadow)]
+    pub fn is_shadow(&self) -> bool {
+        self.main_data.is_shadow
+    }
+    #[wasm_bindgen(setter, js_name = isShadow)]
+    pub fn set_is_shadow(&mut self, v: bool) {
+        self.main_data.is_shadow = v;
+    }
+
+    #[wasm_bindgen(getter, js_name = markings)]
+    pub fn markings(&self) -> MarkingsSixShapesColors {
+        self.main_data.markings
+    }
+    #[wasm_bindgen(setter, js_name = markings)]
+    pub fn set_markings(&mut self, v: MarkingsSixShapesColors) {
+        self.main_data.markings = v;
+    }
+
+    #[wasm_bindgen(getter, js_name = nature)]
+    pub fn nature(&self) -> NatureIndex {
+        self.main_data.nature
+    }
+    #[wasm_bindgen(setter, js_name = nature)]
+    pub fn set_nature(&mut self, v: NatureIndex) {
+        self.main_data.nature = v;
+    }
+
+    #[wasm_bindgen(getter, js_name = statNature)]
+    pub fn stat_nature(&self) -> NatureIndex {
+        self.main_data.stat_nature
+    }
+    #[wasm_bindgen(setter, js_name = statNature)]
+    pub fn set_stat_nature(&mut self, v: NatureIndex) {
+        self.main_data.stat_nature = v;
+    }
+
+    #[wasm_bindgen(getter, js_name = isFatefulEncounter)]
+    pub fn is_fateful_encounter(&self) -> bool {
+        self.main_data.is_fateful_encounter
+    }
+    #[wasm_bindgen(setter, js_name = isFatefulEncounter)]
+    pub fn set_is_fateful_encounter(&mut self, v: bool) {
+        self.main_data.is_fateful_encounter = v;
+    }
+
+    #[wasm_bindgen(getter, js_name = gender)]
+    pub fn gender(&self) -> Gender {
+        self.main_data.gender
+    }
+    #[wasm_bindgen(setter, js_name = gender)]
+    pub fn set_gender(&mut self, v: Gender) {
+        self.main_data.gender = v;
+    }
+
+    #[wasm_bindgen(getter, js_name = evs)]
+    pub fn evs(&self) -> Stats8 {
+        self.main_data.evs
+    }
+    #[wasm_bindgen(setter, js_name = evs)]
+    pub fn set_evs(&mut self, v: Stats8) {
+        self.main_data.evs = v;
+    }
+
+    #[wasm_bindgen(getter, js_name = contest)]
+    pub fn contest(&self) -> ContestStats {
+        self.main_data.contest
+    }
+    #[wasm_bindgen(setter, js_name = contest)]
+    pub fn set_contest(&mut self, v: ContestStats) {
+        self.main_data.contest = v;
+    }
+
+    #[wasm_bindgen(getter, js_name = pokerusByte)]
+    pub fn pokerus_byte(&self) -> u8 {
+        self.main_data.pokerus_byte
+    }
+    #[wasm_bindgen(setter, js_name = pokerusByte)]
+    pub fn set_pokerus_byte(&mut self, v: u8) {
+        self.main_data.pokerus_byte = v;
+    }
+
+    #[wasm_bindgen(getter, js_name = contestMemoryCount)]
+    pub fn contest_memory_count(&self) -> u8 {
+        self.main_data.contest_memory_count
+    }
+    #[wasm_bindgen(setter, js_name = contestMemoryCount)]
+    pub fn set_contest_memory_count(&mut self, v: u8) {
+        self.main_data.contest_memory_count = v;
+    }
+
+    #[wasm_bindgen(getter, js_name = battleMemoryCount)]
+    pub fn battle_memory_count(&self) -> u8 {
+        self.main_data.battle_memory_count
+    }
+    #[wasm_bindgen(setter, js_name = battleMemoryCount)]
+    pub fn set_battle_memory_count(&mut self, v: u8) {
+        self.main_data.battle_memory_count = v;
+    }
     // #[wasm_bindgen(js_name = toBytes)]
     // pub fn get_bytes_wasm(&self) -> core::result::Result<Vec<u8>, JsValue> {
     //     self.to_box_bytes()
     //         .map_err(|e| JsValue::from_str(&e.to_string()))
     // }
+
+    #[wasm_bindgen(getter, js_name = sociability)]
+    pub fn sociability(&self) -> u32 {
+        self.main_data.sociability
+    }
+    #[wasm_bindgen(setter, js_name = sociability)]
+    pub fn set_sociability(&mut self, v: u32) {
+        self.main_data.sociability = v;
+    }
+
+    #[wasm_bindgen(getter, js_name = heightScalar)]
+    pub fn height_scalar(&self) -> u8 {
+        self.main_data.height_scalar
+    }
+    #[wasm_bindgen(setter, js_name = heightScalar)]
+    pub fn set_height_scalar(&mut self, v: u8) {
+        self.main_data.height_scalar = v;
+    }
+
+    #[wasm_bindgen(getter, js_name = weightScalar)]
+    pub fn weight_scalar(&self) -> u8 {
+        self.main_data.weight_scalar
+    }
+    #[wasm_bindgen(setter, js_name = weightScalar)]
+    pub fn set_weight_scalar(&mut self, v: u8) {
+        self.main_data.weight_scalar = v;
+    }
+
+    #[wasm_bindgen(getter, js_name = scale)]
+    pub fn scale(&self) -> u8 {
+        self.main_data.scale
+    }
+    #[wasm_bindgen(setter, js_name = scale)]
+    pub fn set_scale(&mut self, v: u8) {
+        self.main_data.scale = v;
+    }
+
+    #[wasm_bindgen(getter, js_name = ivs)]
+    pub fn ivs(&self) -> Stats8 {
+        self.main_data.ivs
+    }
+    #[wasm_bindgen(setter, js_name = ivs)]
+    pub fn set_ivs(&mut self, v: Stats8) {
+        self.main_data.ivs = v;
+    }
+
+    #[wasm_bindgen(getter, js_name = isEgg)]
+    pub fn is_egg(&self) -> bool {
+        self.main_data.is_egg
+    }
+    #[wasm_bindgen(setter, js_name = isEgg)]
+    pub fn set_is_egg(&mut self, v: bool) {
+        self.main_data.is_egg = v;
+    }
+
+    #[wasm_bindgen(getter, js_name = isNicknamed)]
+    pub fn is_nicknamed(&self) -> bool {
+        self.main_data.is_nicknamed
+    }
+    #[wasm_bindgen(setter, js_name = isNicknamed)]
+    pub fn set_is_nicknamed(&mut self, v: bool) {
+        self.main_data.is_nicknamed = v;
+    }
+
+    #[wasm_bindgen(getter, js_name = handlerLanguage)]
+    pub fn handler_language(&self) -> u8 {
+        self.main_data.handler_language
+    }
+    #[wasm_bindgen(setter, js_name = handlerLanguage)]
+    pub fn set_handler_language(&mut self, v: u8) {
+        self.main_data.handler_language = v;
+    }
+
+    #[wasm_bindgen(getter, js_name = isCurrentHandler)]
+    pub fn is_current_handler(&self) -> bool {
+        self.main_data.is_current_handler
+    }
+    #[wasm_bindgen(setter, js_name = isCurrentHandler)]
+    pub fn set_is_current_handler(&mut self, v: bool) {
+        self.main_data.is_current_handler = v;
+    }
+
+    #[wasm_bindgen(getter, js_name = handlerId)]
+    pub fn handler_id(&self) -> u16 {
+        self.main_data.handler_id
+    }
+    #[wasm_bindgen(setter, js_name = handlerId)]
+    pub fn set_handler_id(&mut self, v: u16) {
+        self.main_data.handler_id = v;
+    }
+
+    #[wasm_bindgen(getter, js_name = handlerFriendship)]
+    pub fn handler_friendship(&self) -> u8 {
+        self.main_data.handler_friendship
+    }
+    #[wasm_bindgen(setter, js_name = handlerFriendship)]
+    pub fn set_handler_friendship(&mut self, v: u8) {
+        self.main_data.handler_friendship = v;
+    }
+
+    #[wasm_bindgen(getter, js_name = handlerMemory)]
+    pub fn handler_memory(&self) -> TrainerMemory {
+        self.main_data.handler_memory
+    }
+    #[wasm_bindgen(setter, js_name = handlerMemory)]
+    pub fn set_handler_memory(&mut self, v: TrainerMemory) {
+        self.main_data.handler_memory = v;
+    }
+
+    #[wasm_bindgen(getter, js_name = handlerAffection)]
+    pub fn handler_affection(&self) -> u8 {
+        self.main_data.handler_affection
+    }
+    #[wasm_bindgen(setter, js_name = handlerAffection)]
+    pub fn set_handler_affection(&mut self, v: u8) {
+        self.main_data.handler_affection = v;
+    }
+
+    #[wasm_bindgen(getter, js_name = handlerGender)]
+    pub fn handler_gender(&self) -> bool {
+        self.main_data.handler_gender
+    }
+    #[wasm_bindgen(setter, js_name = handlerGender)]
+    pub fn set_handler_gender(&mut self, v: bool) {
+        self.main_data.handler_gender = v;
+    }
+
+    #[wasm_bindgen(getter, js_name = fullness)]
+    pub fn fullness(&self) -> u8 {
+        self.main_data.fullness
+    }
+    #[wasm_bindgen(setter, js_name = fullness)]
+    pub fn set_fullness(&mut self, v: u8) {
+        self.main_data.fullness = v;
+    }
+
+    #[wasm_bindgen(getter, js_name = enjoyment)]
+    pub fn enjoyment(&self) -> u8 {
+        self.main_data.enjoyment
+    }
+    #[wasm_bindgen(setter, js_name = enjoyment)]
+    pub fn set_enjoyment(&mut self, v: u8) {
+        self.main_data.enjoyment = v;
+    }
+
+    #[wasm_bindgen(getter, js_name = gameOfOrigin)]
+    pub fn game_of_origin(&self) -> OriginGame {
+        self.main_data.game_of_origin
+    }
+    #[wasm_bindgen(setter, js_name = gameOfOrigin)]
+    pub fn set_game_of_origin(&mut self, v: OriginGame) {
+        self.main_data.game_of_origin = v;
+    }
+
+    #[wasm_bindgen(getter, js_name = gameOfOriginBattle)]
+    pub fn game_of_origin_battle(&self) -> Option<OriginGame> {
+        self.main_data.game_of_origin_battle
+    }
+    #[wasm_bindgen(setter, js_name = gameOfOriginBattle)]
+    pub fn set_game_of_origin_battle(&mut self, v: Option<OriginGame>) {
+        self.main_data.game_of_origin_battle = v;
+    }
+
+    #[wasm_bindgen(getter, js_name = consoleRegion)]
+    pub fn console_region(&self) -> u8 {
+        self.main_data.console_region
+    }
+    #[wasm_bindgen(setter, js_name = consoleRegion)]
+    pub fn set_console_region(&mut self, v: u8) {
+        self.main_data.console_region = v;
+    }
+
+    #[wasm_bindgen(getter, js_name = language)]
+    pub fn language(&self) -> Language {
+        self.main_data.language
+    }
+    #[wasm_bindgen(setter, js_name = language)]
+    pub fn set_language(&mut self, v: Language) {
+        self.main_data.language = v;
+    }
+
+    #[wasm_bindgen(getter, js_name = formArgument)]
+    pub fn form_argument(&self) -> u32 {
+        self.main_data.form_argument
+    }
+    #[wasm_bindgen(setter, js_name = formArgument)]
+    pub fn set_form_argument(&mut self, v: u32) {
+        self.main_data.form_argument = v;
+    }
+
+    #[wasm_bindgen(getter, js_name = affixedRibbon)]
+    pub fn affixed_ribbon(&self) -> Option<ModernRibbon> {
+        self.main_data.affixed_ribbon
+    }
+    #[wasm_bindgen(setter, js_name = affixedRibbon)]
+    pub fn set_affixed_ribbon(&mut self, v: Option<ModernRibbon>) {
+        self.main_data.affixed_ribbon = v;
+    }
+
+    #[wasm_bindgen(getter, js_name = trainerFriendship)]
+    pub fn trainer_friendship(&self) -> u8 {
+        self.main_data.trainer_friendship
+    }
+    #[wasm_bindgen(setter, js_name = trainerFriendship)]
+    pub fn set_trainer_friendship(&mut self, v: u8) {
+        self.main_data.trainer_friendship = v;
+    }
+
+    #[wasm_bindgen(getter, js_name = trainerMemory)]
+    pub fn trainer_memory(&self) -> TrainerMemory {
+        self.main_data.trainer_memory
+    }
+    #[wasm_bindgen(setter, js_name = trainerMemory)]
+    pub fn set_trainer_memory(&mut self, v: TrainerMemory) {
+        self.main_data.trainer_memory = v;
+    }
+
+    #[wasm_bindgen(getter, js_name = trainerAffection)]
+    pub fn trainer_affection(&self) -> u8 {
+        self.main_data.trainer_affection
+    }
+    #[wasm_bindgen(setter, js_name = trainerAffection)]
+    pub fn set_trainer_affection(&mut self, v: u8) {
+        self.main_data.trainer_affection = v;
+    }
+
+    #[wasm_bindgen(getter, js_name = eggDate)]
+    pub fn egg_date(&self) -> Option<PokeDate> {
+        self.main_data.egg_date
+    }
+    #[wasm_bindgen(setter, js_name = eggDate)]
+    pub fn set_egg_date(&mut self, v: Option<PokeDate>) {
+        self.main_data.egg_date = v;
+    }
+
+    #[wasm_bindgen(getter, js_name = metDate)]
+    pub fn met_date(&self) -> PokeDate {
+        self.main_data.met_date
+    }
+    #[wasm_bindgen(setter, js_name = metDate)]
+    pub fn set_met_date(&mut self, v: PokeDate) {
+        self.main_data.met_date = v;
+    }
+
+    #[wasm_bindgen(getter, js_name = ball)]
+    pub fn ball(&self) -> Ball {
+        self.main_data.ball
+    }
+    #[wasm_bindgen(setter, js_name = ball)]
+    pub fn set_ball(&mut self, v: Ball) {
+        self.main_data.ball = v;
+    }
+
+    #[wasm_bindgen(getter, js_name = eggLocationIndex)]
+    pub fn egg_location_index(&self) -> u16 {
+        self.main_data.egg_location_index
+    }
+    #[wasm_bindgen(setter, js_name = eggLocationIndex)]
+    pub fn set_egg_location_index(&mut self, v: u16) {
+        self.main_data.egg_location_index = v;
+    }
+
+    #[wasm_bindgen(getter, js_name = metLocationIndex)]
+    pub fn met_location_index(&self) -> u16 {
+        self.main_data.met_location_index
+    }
+    #[wasm_bindgen(setter, js_name = metLocationIndex)]
+    pub fn set_met_location_index(&mut self, v: u16) {
+        self.main_data.met_location_index = v;
+    }
+
+    #[wasm_bindgen(getter, js_name = metLevel)]
+    pub fn met_level(&self) -> u8 {
+        self.main_data.met_level
+    }
+    #[wasm_bindgen(setter, js_name = metLevel)]
+    pub fn set_met_level(&mut self, v: u8) {
+        self.main_data.met_level = v;
+    }
+
+    #[wasm_bindgen(getter, js_name = hyperTraining)]
+    pub fn hyper_training(&self) -> HyperTraining {
+        self.main_data.hyper_training
+    }
+    #[wasm_bindgen(setter, js_name = hyperTraining)]
+    pub fn set_hyper_training(&mut self, v: HyperTraining) {
+        self.main_data.hyper_training = v;
+    }
+
+    #[wasm_bindgen(getter, js_name = trainerGender)]
+    pub fn trainer_gender(&self) -> Gender {
+        self.main_data.trainer_gender
+    }
+    #[wasm_bindgen(setter, js_name = trainerGender)]
+    pub fn set_trainer_gender(&mut self, v: Gender) {
+        self.main_data.trainer_gender = v;
+    }
+
+    #[wasm_bindgen(getter, js_name = obedienceLevel)]
+    pub fn obedience_level(&self) -> u8 {
+        self.main_data.obedience_level
+    }
+    #[wasm_bindgen(setter, js_name = obedienceLevel)]
+    pub fn set_obedience_level(&mut self, v: u8) {
+        self.main_data.obedience_level = v;
+    }
 
     #[wasm_bindgen(getter)]
     pub fn nickname(&self) -> String {
@@ -1221,11 +1715,6 @@ impl OhpkmV2 {
         ]
     }
 
-    #[wasm_bindgen(setter)]
-    pub fn set_egg_date(&mut self, value: Option<PokeDate>) {
-        self.main_data.egg_date = value
-    }
-
     #[wasm_bindgen(js_name = allRibbonNames)]
     pub fn all_ribbon_names(&self) -> Vec<String> {
         self.main_data
@@ -1255,16 +1744,16 @@ impl OhpkmV2 {
             .for_each(|r| self.main_data.ribbons.add_ribbon(r));
     }
 
-    #[wasm_bindgen]
-    pub fn set_species_and_forme(&mut self, national_dex: u16, forme_index: u16) -> JsResult<()> {
-        match SpeciesAndForme::new(national_dex, forme_index) {
-            Ok(species_and_forme) => {
-                self.main_data.species_and_forme = species_and_forme;
-                Ok(())
-            }
-            Err(e) => Err(JsValue::from_str(&e.to_string())),
-        }
-    }
+    // #[wasm_bindgen]
+    // pub fn set_species_and_forme(&mut self, national_dex: u16, forme_index: u16) -> JsResult<()> {
+    //     match SpeciesAndForme::new(national_dex, forme_index) {
+    //         Ok(species_and_forme) => {
+    //             self.main_data.species_and_forme = species_and_forme;
+    //             Ok(())
+    //         }
+    //         Err(e) => Err(JsValue::from_str(&e.to_string())),
+    //     }
+    // }
 
     #[wasm_bindgen(getter)]
     pub fn plugin_origin(&self) -> Option<String> {

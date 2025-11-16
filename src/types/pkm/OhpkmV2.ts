@@ -4,10 +4,12 @@ import {
   AbilityIndex,
   Ball,
   Gender,
+  HyperTraining,
   Language,
   Languages,
   MetadataLookup,
   NatureIndex,
+  PokeDate,
   SpeciesLookup,
   Stats16Le,
   TeraTypeWasm,
@@ -265,106 +267,108 @@ export class OhpkmV2 implements PKMInterface {
       if (other.avs) {
         this.avs = statsToWasmStats16Le(other.avs)
       }
+
+      this.teraTypeOverride = other.teraTypeOverride
     }
   }
 
   get encryptionConstant() {
-    return this.inner.main_data.encryption_constant
+    return this.inner.encryptionConstant
   }
   set encryptionConstant(value: number) {
-    this.inner.main_data.encryption_constant = value
+    this.inner.encryptionConstant = value
   }
 
   get dexNum() {
-    return this.inner.main_data.species_and_forme.nationalDex
+    return this.inner.speciesAndForme.nationalDex
   }
 
   get heldItemIndex() {
-    return this.inner.main_data.held_item_index
+    return this.inner.heldItemIndex
   }
   set heldItemIndex(value: number) {
-    this.inner.main_data.held_item_index = value
+    this.inner.heldItemIndex = value
   }
 
   get trainerID() {
-    return this.inner.main_data.trainer_id
+    return this.inner.trainerId
   }
   set trainerID(value: number) {
-    this.inner.main_data.trainer_id = value
+    this.inner.trainerId = value
   }
 
   get secretID() {
-    return this.inner.main_data.secret_id
+    return this.inner.secretId
   }
   set secretID(value: number) {
-    this.inner.main_data.secret_id = value
+    this.inner.secretId = value
   }
 
   get exp() {
-    return this.inner.main_data.exp
+    return this.inner.exp
   }
   set exp(value: number) {
-    this.inner.main_data.exp = value
+    this.inner.exp = value
   }
 
   get ability() {
-    return this.inner.main_data.ability_index
+    return this.inner.abilityIndex
   }
   set ability(value: AbilityIndex) {
-    this.inner.main_data.ability_index = value
+    this.inner.abilityIndex = value
   }
 
   get abilityNum() {
-    return this.inner.main_data.ability_num
+    return this.inner.abilityNum
   }
   set abilityNum(value: number) {
-    this.inner.main_data.ability_num = value
+    this.inner.abilityNum = value
   }
 
   get markings() {
-    return markingsSixShapesColorsFromWasm(this.inner.main_data.markings)
+    return markingsSixShapesColorsFromWasm(this.inner.markings)
   }
   set markings(value: types.MarkingsSixShapesWithColor) {
-    this.inner.main_data.markings = markingsSixShapesColorsToWasm(value)
+    this.inner.markings = markingsSixShapesColorsToWasm(value)
   }
 
   get personalityValue() {
-    return this.inner.main_data.personality_value
+    return this.inner.personalityValue
   }
   set personalityValue(value: number) {
-    this.inner.main_data.personality_value = value
+    this.inner.personalityValue = value
   }
 
   get nature() {
-    return this.inner.main_data.nature
+    return this.inner.nature
   }
   set nature(value: NatureIndex) {
-    this.inner.main_data.nature = value
+    this.inner.nature = value
   }
 
   get isFatefulEncounter() {
-    return this.inner.main_data.is_fateful_encounter
+    return this.inner.isFatefulEncounter
   }
   set isFatefulEncounter(value: boolean) {
-    this.inner.main_data.is_fateful_encounter = value
+    this.inner.isFatefulEncounter = value
   }
 
   get gender() {
-    return this.inner.main_data.gender
+    return this.inner.gender
   }
   set gender(value: number) {
-    this.inner.main_data.gender = value
+    this.inner.gender = value
   }
 
   get formeNum() {
-    return this.inner.main_data.species_and_forme.formeIndex
+    return this.inner.speciesAndForme.formeIndex
   }
 
   get evs() {
-    return this.inner.main_data.evs
+    return this.inner.evs
   }
   set evs(value: types.Stats) {
-    this.inner.main_data.evs = statsToWasmStats8(value)
+    this.inner.evs = statsToWasmStats8(value)
   }
 
   get evsG12() {
@@ -382,10 +386,10 @@ export class OhpkmV2 implements PKMInterface {
   }
 
   get contest() {
-    return this.inner.main_data.contest
+    return this.inner.contest
   }
   set contest(value: types.ContestStats) {
-    this.inner.main_data.contest = contestStatsToWasm(value)
+    this.inner.contest = contestStatsToWasm(value)
   }
 
   get resortEventStatus() {
@@ -403,10 +407,10 @@ export class OhpkmV2 implements PKMInterface {
   }
 
   get pokerusByte() {
-    return this.inner.main_data.pokerus_byte
+    return this.inner.pokerusByte
   }
   set pokerusByte(value: number) {
-    this.inner.main_data.pokerus_byte = value
+    this.inner.pokerusByte = value
   }
 
   get superTrainingFlags() {
@@ -417,17 +421,17 @@ export class OhpkmV2 implements PKMInterface {
   }
 
   get contestMemoryCount() {
-    return this.inner.main_data.contest_memory_count
+    return this.inner.contestMemoryCount
   }
   set contestMemoryCount(value: number) {
-    this.inner.main_data.contest_memory_count = value
+    this.inner.contestMemoryCount = value
   }
 
   get battleMemoryCount() {
-    return this.inner.main_data.battle_memory_count
+    return this.inner.battleMemoryCount
   }
   set battleMemoryCount(value: number) {
-    this.inner.main_data.battle_memory_count = value
+    this.inner.battleMemoryCount = value
   }
 
   get superTrainingDistFlags() {
@@ -438,10 +442,10 @@ export class OhpkmV2 implements PKMInterface {
   }
 
   get formArgument() {
-    return this.inner.main_data.form_argument
+    return this.inner.formArgument
   }
   set formArgument(value: number) {
-    this.inner.main_data.form_argument = value
+    this.inner.formArgument = value
   }
 
   get nickname() {
@@ -509,31 +513,31 @@ export class OhpkmV2 implements PKMInterface {
   }
 
   get ivs() {
-    return this.inner.main_data.ivs
+    return this.inner.ivs
   }
   set ivs(value: types.Stats) {
-    this.inner.main_data.ivs = statsToWasmStats8(value)
+    this.inner.ivs = statsToWasmStats8(value)
   }
 
   get isEgg() {
-    return this.inner.main_data.is_egg
+    return this.inner.isEgg
   }
   set isEgg(value: boolean) {
-    this.inner.main_data.is_egg = value
+    this.inner.isEgg = value
   }
 
   get isNicknamed() {
-    return this.inner.main_data.is_nicknamed
+    return this.inner.isNicknamed
   }
   set isNicknamed(value: boolean) {
-    this.inner.main_data.is_nicknamed = value
+    this.inner.isNicknamed = value
   }
 
   get isShadow() {
-    return this.inner.main_data.is_shadow
+    return this.inner.isShadow
   }
   set isShadow(value: boolean) {
-    this.inner.main_data.is_shadow = value
+    this.inner.isShadow = value
   }
 
   get handlerName() {
@@ -544,17 +548,17 @@ export class OhpkmV2 implements PKMInterface {
   }
 
   get handlerGender() {
-    return this.inner.main_data.handler_gender
+    return this.inner.handlerGender
   }
   set handlerGender(value: boolean) {
-    this.inner.main_data.handler_gender = value
+    this.inner.handlerGender = value
   }
 
   get isCurrentHandler() {
-    return this.inner.main_data.is_current_handler
+    return this.inner.isCurrentHandler
   }
   set isCurrentHandler(value: boolean) {
-    this.inner.main_data.is_current_handler = value
+    this.inner.isCurrentHandler = value
   }
 
   get geolocations() {
@@ -565,31 +569,31 @@ export class OhpkmV2 implements PKMInterface {
   }
 
   get handlerFriendship() {
-    return this.inner.main_data.handler_friendship
+    return this.inner.handlerFriendship
   }
   set handlerFriendship(value: number) {
-    this.inner.main_data.handler_friendship = value
+    this.inner.handlerFriendship = value
   }
 
   get handlerAffection() {
-    return this.inner.main_data.handler_affection
+    return this.inner.handlerAffection
   }
   set handlerAffection(value: number) {
-    this.inner.main_data.handler_affection = value
+    this.inner.handlerAffection = value
   }
 
   get fullness() {
-    return this.inner.main_data.fullness
+    return this.inner.fullness
   }
   set fullness(value: number) {
-    this.inner.main_data.fullness = value
+    this.inner.fullness = value
   }
 
   get enjoyment() {
-    return this.inner.main_data.enjoyment
+    return this.inner.enjoyment
   }
   set enjoyment(value: number) {
-    this.inner.main_data.enjoyment = value
+    this.inner.enjoyment = value
   }
 
   get trainerName() {
@@ -600,36 +604,36 @@ export class OhpkmV2 implements PKMInterface {
   }
 
   get trainerFriendship() {
-    return this.inner.main_data.trainer_friendship
+    return this.inner.trainerFriendship
   }
   set trainerFriendship(value: number) {
-    this.inner.main_data.trainer_friendship = value
+    this.inner.trainerFriendship = value
   }
 
   get trainerAffection() {
-    return this.inner.main_data.trainer_affection
+    return this.inner.trainerAffection
   }
   set trainerAffection(value: number) {
-    this.inner.main_data.trainer_affection = value
+    this.inner.trainerAffection = value
   }
 
   get eggDate() {
-    return convertPokeDateOptional(this.inner.egg_date)
+    return convertPokeDateOptional(this.inner.eggDate)
   }
 
   set eggDate(value: types.PKMDate | undefined) {
     if (value) {
-      this.inner.egg_date = new PkmRs.PokeDate(value.year, value.month, value.day)
+      this.inner.eggDate = new PokeDate(value.year, value.month, value.day)
     } else {
-      this.inner.egg_date = undefined
+      this.inner.eggDate = undefined
     }
   }
 
   get metDate() {
-    return convertPokeDate(this.inner.main_data.met_date)
+    return convertPokeDate(this.inner.metDate)
   }
   set metDate(value: types.PKMDate) {
-    this.inner.main_data.met_date = new PkmRs.PokeDate(value.year, value.month, value.day)
+    this.inner.metDate = new PokeDate(value.year, value.month, value.day)
   }
 
   get metTimeOfDay() {
@@ -640,38 +644,38 @@ export class OhpkmV2 implements PKMInterface {
   }
 
   get eggLocationIndex() {
-    return this.inner.main_data.egg_location_index ?? undefined
+    return this.inner.eggLocationIndex ?? undefined
   }
   set eggLocationIndex(value: number | undefined) {
-    this.inner.main_data.egg_location_index = value ?? 0
+    this.inner.eggLocationIndex = value ?? 0
   }
 
   get metLocationIndex() {
-    return this.inner.main_data.met_location_index
+    return this.inner.metLocationIndex
   }
   set metLocationIndex(value: number) {
-    this.inner.main_data.met_location_index = value
+    this.inner.metLocationIndex = value
   }
 
   get ball() {
-    return this.inner.main_data.ball
+    return this.inner.ball
   }
   set ball(value: number) {
-    this.inner.main_data.ball = value
+    this.inner.ball = value
   }
 
   get metLevel() {
-    return this.inner.main_data.met_level
+    return this.inner.metLevel
   }
   set metLevel(value: number) {
-    this.inner.main_data.met_level = value
+    this.inner.metLevel = value
   }
 
   get hyperTraining() {
-    return this.inner.main_data.hyper_training
+    return this.inner.hyperTraining
   }
   set hyperTraining(value: types.HyperTrainStats) {
-    this.inner.main_data.hyper_training = new PkmRs.HyperTraining(
+    this.inner.hyperTraining = new HyperTraining(
       value.hp,
       value.atk,
       value.def,
@@ -682,10 +686,10 @@ export class OhpkmV2 implements PKMInterface {
   }
 
   get gameOfOrigin() {
-    return this.inner.main_data.game_of_origin
+    return this.inner.gameOfOrigin
   }
   set gameOfOrigin(value: number) {
-    this.inner.main_data.game_of_origin = value
+    this.inner.gameOfOrigin = value
   }
 
   get country() {
@@ -703,17 +707,17 @@ export class OhpkmV2 implements PKMInterface {
   }
 
   get consoleRegion() {
-    return this.inner.main_data.console_region
+    return this.inner.consoleRegion
   }
   set consoleRegion(value: number) {
-    this.inner.main_data.console_region = value
+    this.inner.consoleRegion = value
   }
 
   get language() {
-    return this.inner.main_data.language
+    return this.inner.language
   }
   set language(value: Language) {
-    this.inner.main_data.language = value
+    this.inner.language = value
   }
 
   get ribbons() {
@@ -746,24 +750,24 @@ export class OhpkmV2 implements PKMInterface {
   }
 
   get handlerMemory() {
-    return this.inner.main_data.handler_memory
+    return this.inner.handlerMemory
   }
   set handlerMemory(value: types.Memory) {
-    this.inner.main_data.handler_memory = trainerMemoryToWasm(value)
+    this.inner.handlerMemory = trainerMemoryToWasm(value)
   }
 
   get trainerMemory() {
-    return this.inner.main_data.trainer_memory
+    return this.inner.trainerMemory
   }
   set trainerMemory(value: types.Memory) {
-    this.inner.main_data.trainer_memory = trainerMemoryToWasm(value)
+    this.inner.trainerMemory = trainerMemoryToWasm(value)
   }
 
   get trainerGender() {
-    return PkmRs.genderToBool(this.inner.main_data.trainer_gender)
+    return PkmRs.genderToBool(this.inner.trainerGender)
   }
   set trainerGender(value: boolean) {
-    this.inner.main_data.trainer_gender = PkmRs.genderFromBool(value)
+    this.inner.trainerGender = PkmRs.genderFromBool(value)
   }
 
   // Gen 4+
