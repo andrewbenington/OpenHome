@@ -33,6 +33,7 @@ const fileTypeColors: Record<string, string> = {
   PB8: '#6bf',
   PA8: '#8cc',
   PK9: '#f52',
+  OhpkmV2: 'fuschia',
 }
 
 interface FileTypeSelectProps {
@@ -56,7 +57,7 @@ const FileTypeSelect = (props: FileTypeSelectProps) => {
       )
     ).filter(filterUndefined)
 
-    return [...supportedFormats, 'OhpkmV2']
+    return supportedFormats
   }, [formData, getEnabledSaveTypes])
 
   return (
@@ -78,6 +79,7 @@ const FileTypeSelect = (props: FileTypeSelectProps) => {
       ) : (
         <option value={baseFormat}>{baseFormat}</option>
       )}
+      <option value="OhpkmV2">OpenHome V2</option>
     </select>
   )
 }

@@ -695,6 +695,11 @@ impl SpeciesAndForme {
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[allow(clippy::missing_const_for_fn)]
 impl SpeciesAndForme {
+    #[wasm_bindgen(constructor)]
+    pub fn new_js(national_dex: u16, forme_index: u16) -> core::result::Result<Self, JsValue> {
+        Self::new(national_dex, forme_index).map_err(|e| JsValue::from_str(&e.to_string()))
+    }
+
     #[cfg_attr(feature = "wasm", wasm_bindgen(getter = nationalDex))]
     pub fn get_ndex_js(&self) -> u16 {
         self.national_dex.get()

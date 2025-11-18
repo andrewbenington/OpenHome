@@ -9,6 +9,24 @@ use crate::{Error, stats::Stat};
 #[derive(Debug, Default, PartialEq, Eq, Clone, Copy)]
 pub struct NatureIndex(u8);
 
+#[wasm_bindgen]
+extern "C" {
+    // Use `js_namespace` here to bind `console.log(..)` instead of just
+    // `log(..)`
+    #[wasm_bindgen(js_namespace = console)]
+    fn log(s: &str);
+
+    // The `console.log` is quite polymorphic, so we can bind it with multiple
+    // signatures. Note that we need to use `js_name` to ensure we always call
+    // `log` in JS.
+    #[wasm_bindgen(js_namespace = console, js_name = log)]
+    fn log_u32(a: u32);
+
+    // Multiple arguments too!
+    #[wasm_bindgen(js_namespace = console, js_name = log)]
+    fn log_many(a: &str, b: &str);
+}
+
 impl NatureIndex {
     pub fn get_metadata(&self) -> &'static NatureMetadata {
         ALL_NATURES
@@ -16,7 +34,8 @@ impl NatureIndex {
             .expect("NatureIndex should never have an invalid index")
     }
 
-    pub const fn to_byte(self) -> u8 {
+    pub fn to_byte(&self) -> u8 {
+        log("nature to bytes");
         self.0
     }
 }
@@ -30,7 +49,9 @@ impl NatureIndex {
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(constructor))]
     pub fn new_js(val: u8) -> Result<NatureIndex, JsValue> {
+        log("creating new");
         if val > NATURE_MAX {
+            log("BAD NATURE");
             Err(format!("Invalid nature index: {val}").into())
         } else {
             Ok(NatureIndex(val))
@@ -44,6 +65,7 @@ impl NatureIndex {
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
     pub fn index(&self) -> u8 {
+        log("getting index rust");
         self.0
     }
 

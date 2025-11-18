@@ -1,5 +1,8 @@
 use std::{fmt::Display, hash::Hash};
 
+#[cfg(feature = "wasm")]
+use wasm_bindgen::prelude::*;
+
 type CoreResult<T, E> = core::result::Result<T, E>;
 
 pub trait DataSection: Sized {
@@ -122,6 +125,24 @@ impl<Tag: SectionTag> SectionedData<Tag> {
     }
 }
 
+#[wasm_bindgen]
+extern "C" {
+    // Use `js_namespace` here to bind `console.log(..)` instead of just
+    // `log(..)`
+    #[wasm_bindgen(js_namespace = console)]
+    fn log(s: &str);
+
+    // The `console.log` is quite polymorphic, so we can bind it with multiple
+    // signatures. Note that we need to use `js_name` to ensure we always call
+    // `log` in JS.
+    #[wasm_bindgen(js_namespace = console, js_name = log)]
+    fn log_u32(a: u32);
+
+    // Multiple arguments too!
+    #[wasm_bindgen(js_namespace = console, js_name = log)]
+    fn log_many(a: &str, b: &str);
+}
+
 impl<Tag: SectionTag> SectionedData<Tag> {
     pub const fn new(magic_number: u32, version: u16) -> Self {
         Self {
@@ -135,6 +156,7 @@ impl<Tag: SectionTag> SectionedData<Tag> {
         &mut self,
         section: T,
     ) -> CoreResult<&mut Self, T::ErrorType> {
+        log("adding just regular");
         self.tagged_buffers.push(section.to_tagged_buffer()?);
 
         Ok(self)
@@ -155,6 +177,7 @@ impl<Tag: SectionTag> SectionedData<Tag> {
         &mut self,
         section: Option<T>,
     ) -> CoreResult<&mut Self, T::ErrorType> {
+        log("adding if some");
         if let Some(section) = section {
             self.tagged_buffers.push(section.to_tagged_buffer()?);
         }

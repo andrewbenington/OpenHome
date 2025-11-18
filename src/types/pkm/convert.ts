@@ -38,7 +38,10 @@ export function geolocationToWasm(value: Geolocation): PkmWasm.Geolocation {
   return new PkmWasm.Geolocation(value.region, value.country)
 }
 
-export function geolocationsFromWasm(value: PkmWasm.Geolocations): Geolocation[] {
+export function geolocationsFromWasm(
+  value: PkmWasm.Geolocations | undefined
+): Geolocation[] | undefined {
+  if (!value) return undefined
   return [
     geolocationFromWasm(value[0]),
     geolocationFromWasm(value[1]),
@@ -48,7 +51,10 @@ export function geolocationsFromWasm(value: PkmWasm.Geolocations): Geolocation[]
   ]
 }
 
-export function geolocationsToWasm(value: Geolocation[]): PkmWasm.Geolocations {
+export function geolocationsToWasm(
+  value: Geolocation[] | undefined
+): PkmWasm.Geolocations | undefined {
+  if (!value) return undefined
   return new PkmWasm.Geolocations(
     geolocationToWasm(value[0]),
     geolocationToWasm(value[1]),
@@ -59,8 +65,14 @@ export function geolocationsToWasm(value: Geolocation[]): PkmWasm.Geolocations {
 }
 
 export function contestStatsFromWasm(value: PkmWasm.ContestStats): ContestStats {
-  const { free: _, ...stats } = value
-  return stats
+  return {
+    cool: value.cool,
+    beauty: value.beauty,
+    cute: value.cute,
+    smart: value.smart,
+    tough: value.tough,
+    sheen: value.sheen,
+  }
 }
 
 export function contestStatsToWasm(value: ContestStats): PkmWasm.ContestStats {
@@ -75,30 +87,81 @@ export function contestStatsToWasm(value: ContestStats): PkmWasm.ContestStats {
 }
 
 export function statsFromWasmStats8(value: PkmWasm.Stats8): Stats {
-  const { free: _, ...stats } = value
-  return stats
+  return {
+    hp: value.hp,
+    atk: value.atk,
+    def: value.def,
+    spa: value.spa,
+    spd: value.spe,
+    spe: value.spe,
+  }
 }
 
 export function statsToWasmStats8(value: Stats): PkmWasm.Stats8 {
   return new PkmWasm.Stats8(value.hp, value.atk, value.def, value.spa, value.spd, value.spe)
 }
 
-export function statsFromWasmStats16Le(value: PkmWasm.Stats16Le): Stats {
-  const { free: _, ...stats } = value
-  return stats
+export function statsFromWasm(value: PkmWasm.Stats16Le | PkmWasm.Stats8): Stats {
+  return {
+    hp: value.hp,
+    atk: value.atk,
+    def: value.def,
+    spa: value.spa,
+    spd: value.spe,
+    spe: value.spe,
+  }
 }
 
-export function statsToWasmStats16Le(value: Stats): PkmWasm.Stats16Le {
+export function stats16LeToWasmNullable(value: Stats | undefined): PkmWasm.Stats16Le | undefined {
+  if (!value) return undefined
   return new PkmWasm.Stats16Le(value.hp, value.atk, value.def, value.spa, value.spd, value.spe)
 }
 
-export function statsPreSplitFromWasm(value: PkmWasm.StatsPreSplit): StatsPreSplit {
-  const { free: _, ...stats } = value
-  return stats
+export function statsFromWasmNullable(
+  value: PkmWasm.Stats8 | PkmWasm.Stats16Le | undefined
+): Stats | undefined {
+  if (!value) return undefined
+  return {
+    hp: value.hp,
+    atk: value.atk,
+    def: value.def,
+    spa: value.spa,
+    spd: value.spe,
+    spe: value.spe,
+  }
 }
 
-export function statsPreSplitToWasm(value: StatsPreSplit): PkmWasm.StatsPreSplit {
+export function stats16LeToWasm(value: Stats): PkmWasm.Stats16Le {
+  return new PkmWasm.Stats16Le(value.hp, value.atk, value.def, value.spa, value.spd, value.spe)
+}
+
+export function statsPreSplitFromWasm(
+  value: PkmWasm.StatsPreSplit | undefined
+): StatsPreSplit | undefined {
+  if (!value) return undefined
+  return {
+    hp: value.hp,
+    atk: value.atk,
+    def: value.def,
+    spc: value.spc,
+    spe: value.spe,
+  }
+}
+
+export function statsPreSplitToWasm(
+  value: StatsPreSplit | undefined
+): PkmWasm.StatsPreSplit | undefined {
+  if (!value) return undefined
   return new PkmWasm.StatsPreSplit(value.hp, value.atk, value.def, value.spc, value.spe)
+}
+
+export function trainerMemoryFromWasm(value: PkmWasm.TrainerMemory): Memory {
+  return {
+    intensity: value.intensity,
+    memory: value.memory,
+    feeling: value.feeling,
+    textVariables: value.textVariables,
+  }
 }
 
 export function trainerMemoryToWasm(value: Memory): PkmWasm.TrainerMemory {
@@ -145,4 +208,12 @@ export function markingsSixShapesColorsToWasm(
     value.star,
     value.diamond
   )
+}
+
+export function genderToWasm(value: number) {
+  return value === 1 ? PkmWasm.Gender.Female : PkmWasm.Gender.Male
+}
+
+export function genderFromWasm(value: PkmWasm.Gender) {
+  return value === PkmWasm.Gender.Female ? 1 : 0
 }

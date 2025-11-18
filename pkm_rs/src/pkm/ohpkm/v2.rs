@@ -1,27 +1,30 @@
 use crate::pkm::ohpkm::OhpkmV1;
 use crate::pkm::ohpkm::sectioned_data::{DataSection, SectionTag, SectionedData};
-use crate::pkm::traits::IsShiny4096;
+use crate::pkm::ohpkm::v2_sections::{
+    GameboyData, Gen45Data, Gen67Data, LegendsArceusData, MainDataV2, PluginData,
+    ScarletVioletData, SwordShieldData,
+};
 use crate::pkm::{Error, Result};
 use crate::strings::SizedUtf16String;
-use crate::util;
 
+#[cfg(feature = "wasm")]
+use pkm_rs_derive::safe_wasm_impl;
 use pkm_rs_resources::abilities::AbilityIndex;
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::language::Language;
 use pkm_rs_resources::moves::MoveSlot;
 use pkm_rs_resources::natures::NatureIndex;
-#[cfg(feature = "wasm")]
-use pkm_rs_resources::ribbons::ObsoleteRibbon;
+
 use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbon, OpenHomeRibbonSet};
 use pkm_rs_resources::species::SpeciesAndForme;
+
 #[cfg(feature = "wasm")]
 use pkm_rs_types::TeraTypeWasm;
 use pkm_rs_types::{
-    ContestStats, FlagSet, Geolocations, HyperTraining, MarkingsSixShapesColors, OriginGame,
-    Stats8, Stats16Le, StatsPreSplit, TeraType,
+    ContestStats, Geolocations, HyperTraining, MarkingsSixShapesColors, OriginGame, Stats8,
+    Stats16Le, StatsPreSplit, TeraType,
 };
 use pkm_rs_types::{Gender, PokeDate, TrainerMemory};
-use serde::Serialize;
 use strum_macros::Display;
 
 const MAGIC_NUMBER: u32 = 0x57575757;
@@ -89,963 +92,15 @@ impl SectionTag for SectionTagV2 {
     }
 }
 
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Debug, Default, Serialize, Clone, Copy, IsShiny4096)]
-pub struct MainDataV2 {
-    pub personality_value: u32,
-    pub encryption_constant: u32,
-    pub species_and_forme: SpeciesAndForme,
-    pub held_item_index: u16,
-    pub trainer_id: u16,
-    pub secret_id: u16,
-    pub exp: u32,
-    pub ability_index: AbilityIndex,
-    pub ability_num: u8,
-    pub favorite: bool,
-    pub is_shadow: bool,
-    pub markings: MarkingsSixShapesColors,
-    pub nature: NatureIndex,
-    pub stat_nature: NatureIndex,
-    pub is_fateful_encounter: bool,
-    pub gender: Gender,
-    pub evs: Stats8,
-    pub contest: ContestStats,
-    pub pokerus_byte: u8,
-    pub contest_memory_count: u8,
-    pub battle_memory_count: u8,
-    #[wasm_bindgen(skip)]
-    pub ribbons: OpenHomeRibbonSet<16>,
-    pub sociability: u32,
-    pub height_scalar: u8,
-    pub weight_scalar: u8,
-    pub scale: u8,
-    #[wasm_bindgen(skip)]
-    pub moves: [MoveSlot; 4],
-    #[wasm_bindgen(skip)]
-    pub move_pp: [u8; 4],
-    #[wasm_bindgen(skip)]
-    pub nickname: SizedUtf16String<26>,
-    #[wasm_bindgen(skip)]
-    pub move_pp_ups: [u8; 4],
-    #[wasm_bindgen(skip)]
-    pub relearn_moves: [MoveSlot; 4],
-    pub ivs: Stats8,
-    pub is_egg: bool,
-    pub is_nicknamed: bool,
-    #[wasm_bindgen(skip)]
-    pub handler_name: SizedUtf16String<24>,
-    pub handler_language: u8,
-    pub is_current_handler: bool,
-    pub handler_id: u16,
-    pub handler_friendship: u8,
-    pub handler_memory: TrainerMemory,
-    pub handler_affection: u8,
-    pub handler_gender: bool,
-    pub fullness: u8,
-    pub enjoyment: u8,
-    pub game_of_origin: OriginGame,
-    pub game_of_origin_battle: Option<OriginGame>,
-    pub console_region: u8,
-    pub language: Language,
-    pub form_argument: u32,
-    pub affixed_ribbon: Option<ModernRibbon>,
-    #[wasm_bindgen(skip)]
-    pub trainer_name: SizedUtf16String<24>,
-    pub trainer_friendship: u8,
-    pub trainer_memory: TrainerMemory,
-    pub trainer_affection: u8,
-    pub egg_date: Option<PokeDate>,
-    pub met_date: PokeDate,
-    pub ball: Ball,
-    pub egg_location_index: u16,
-    pub met_location_index: u16,
-    pub met_level: u8,
-    pub hyper_training: HyperTraining,
-    pub trainer_gender: Gender,
-    pub obedience_level: u8,
-    #[wasm_bindgen(skip)]
-    pub home_tracker: [u8; 8],
-}
-
-impl MainDataV2 {
-    pub fn new(national_dex: u16, forme_index: u16) -> Result<Self> {
-        Ok(Self {
-            species_and_forme: SpeciesAndForme::new(national_dex, forme_index)?,
-            ..Default::default()
-        })
-    }
-    pub const fn from_v1(old: OhpkmV1) -> Self {
-        MainDataV2 {
-            encryption_constant: old.encryption_constant,
-            species_and_forme: old.species_and_forme,
-            held_item_index: old.held_item_index,
-            trainer_id: old.trainer_id,
-            secret_id: old.secret_id,
-            exp: old.exp,
-            ability_index: old.ability_index,
-            ability_num: old.ability_num,
-            favorite: old.favorite,
-            is_shadow: old.is_shadow,
-            markings: old.markings,
-            personality_value: old.personality_value,
-            ball: old.ball,
-            nature: old.nature,
-            stat_nature: old.stat_nature,
-            is_fateful_encounter: old.is_fateful_encounter,
-            gender: old.gender,
-            evs: old.evs,
-            contest: old.contest,
-            pokerus_byte: old.pokerus_byte,
-            contest_memory_count: old.contest_memory_count,
-            battle_memory_count: old.battle_memory_count,
-            ribbons: old.ribbons,
-            sociability: old.sociability,
-            height_scalar: old.height_scalar,
-            weight_scalar: old.weight_scalar,
-            scale: old.scale,
-            moves: old.moves,
-            move_pp: old.move_pp,
-            nickname: old.nickname,
-            egg_date: old.egg_date,
-            met_date: old.met_date,
-            egg_location_index: old.egg_location_index,
-            met_location_index: old.met_location_index,
-            met_level: old.met_level,
-            move_pp_ups: old.move_pp_ups,
-            relearn_moves: old.relearn_moves,
-            ivs: old.ivs,
-            is_egg: old.is_egg,
-            is_nicknamed: old.is_nicknamed,
-            hyper_training: old.hyper_training,
-            trainer_gender: old.trainer_gender,
-            handler_name: old.handler_name,
-            handler_language: old.handler_language,
-            is_current_handler: old.is_current_handler,
-            handler_id: old.handler_id,
-            handler_friendship: old.handler_friendship,
-            handler_memory: old.handler_memory,
-            handler_affection: old.handler_affection,
-            handler_gender: old.handler_gender,
-            fullness: old.fullness,
-            enjoyment: old.enjoyment,
-            game_of_origin: old.game_of_origin,
-            game_of_origin_battle: old.game_of_origin_battle,
-            console_region: old.console_region,
-            language: old.language,
-            form_argument: old.form_argument,
-            affixed_ribbon: old.affixed_ribbon,
-            trainer_name: old.trainer_name,
-            trainer_friendship: old.trainer_friendship,
-            trainer_memory: old.trainer_memory,
-            trainer_affection: old.trainer_affection,
-            obedience_level: old.obedience_level,
-            home_tracker: old.home_tracker,
-        }
-    }
-}
-
-impl DataSection for MainDataV2 {
-    type TagType = SectionTagV2;
-    const TAG: Self::TagType = SectionTagV2::MainData;
-
-    type ErrorType = Error;
-
-    fn from_bytes(bytes: &[u8]) -> Result<Self> {
-        Self::ensure_buffer_size(bytes)?;
-
-        // try_into() will always succeed thanks to the buffer size check
-        let data = Self {
-            personality_value: u32::from_le_bytes(bytes[0..4].try_into().unwrap()),
-            encryption_constant: u32::from_le_bytes(bytes[4..8].try_into().unwrap()),
-            species_and_forme: SpeciesAndForme::new(
-                u16::from_le_bytes(bytes[8..10].try_into().unwrap()),
-                u16::from_le_bytes(bytes[10..12].try_into().unwrap()),
-            )?,
-            trainer_id: u16::from_le_bytes(bytes[12..14].try_into().unwrap()),
-            secret_id: u16::from_le_bytes(bytes[14..16].try_into().unwrap()),
-            exp: u32::from_le_bytes(bytes[16..20].try_into().unwrap()),
-            ability_index: AbilityIndex::try_from(u16::from_le_bytes(
-                bytes[20..22].try_into().unwrap(),
-            ))?,
-
-            ability_num: util::read_uint3_from_bits(bytes[22], 0),
-            favorite: util::get_flag(bytes, 22, 3),
-            is_shadow: util::get_flag(bytes, 22, 4),
-            is_fateful_encounter: util::get_flag(bytes, 22, 5),
-            trainer_gender: Gender::from(util::get_flag(bytes, 22, 6)),
-
-            game_of_origin: OriginGame::from(bytes[24]),
-            game_of_origin_battle: match bytes[25] {
-                0 => None,
-                val => Some(OriginGame::from(val)),
-            },
-
-            markings: MarkingsSixShapesColors::from_bytes(bytes[26..28].try_into().unwrap()),
-            ball: Ball::from(bytes[29]),
-            nature: NatureIndex::try_from(bytes[32])?,
-            stat_nature: NatureIndex::try_from(bytes[33])?,
-            gender: Gender::from_u8(bytes[34]),
-
-            held_item_index: u16::from_le_bytes(bytes[36..38].try_into().unwrap()),
-            evs: Stats8::from_bytes(bytes[38..44].try_into().unwrap()),
-            contest: ContestStats::from_bytes(bytes[44..50].try_into().unwrap()),
-            pokerus_byte: bytes[50],
-            contest_memory_count: bytes[52],
-            battle_memory_count: bytes[53],
-            ribbons: OpenHomeRibbonSet::from_bytes(bytes[54..76].try_into().unwrap()).map_err(
-                |e| Error::FieldError {
-                    field: "ribbons",
-                    source: e,
-                },
-            )?,
-            sociability: u32::from_le_bytes(bytes[76..80].try_into().unwrap()),
-            height_scalar: bytes[80],
-            weight_scalar: bytes[81],
-            scale: bytes[82],
-            moves: [
-                MoveSlot::from(u16::from_le_bytes(bytes[84..86].try_into().unwrap())),
-                MoveSlot::from(u16::from_le_bytes(bytes[86..88].try_into().unwrap())),
-                MoveSlot::from(u16::from_le_bytes(bytes[88..90].try_into().unwrap())),
-                MoveSlot::from(u16::from_le_bytes(bytes[90..92].try_into().unwrap())),
-            ],
-            move_pp: [bytes[92], bytes[93], bytes[94], bytes[95]],
-            nickname: SizedUtf16String::<26>::from_bytes(bytes[96..122].try_into().unwrap()),
-            egg_date: PokeDate::from_bytes_optional(bytes[122..125].try_into().unwrap()),
-            met_date: PokeDate::from_bytes(bytes[125..128].try_into().unwrap()),
-            met_level: bytes[128] & !0x80,
-            egg_location_index: u16::from_le_bytes(bytes[129..131].try_into().unwrap()),
-            met_location_index: u16::from_le_bytes(bytes[131..133].try_into().unwrap()),
-            move_pp_ups: [bytes[134], bytes[135], bytes[136], bytes[137]],
-            relearn_moves: [
-                MoveSlot::from(u16::from_le_bytes(bytes[138..140].try_into().unwrap())),
-                MoveSlot::from(u16::from_le_bytes(bytes[140..142].try_into().unwrap())),
-                MoveSlot::from(u16::from_le_bytes(bytes[142..144].try_into().unwrap())),
-                MoveSlot::from(u16::from_le_bytes(bytes[144..146].try_into().unwrap())),
-            ],
-            ivs: Stats8::from_30_bits(bytes[148..152].try_into().unwrap()),
-            is_egg: util::get_flag(bytes, 148, 30),
-            is_nicknamed: util::get_flag(bytes, 148, 31),
-            // bytes[152],
-            hyper_training: HyperTraining::from_byte(bytes[153]),
-            home_tracker: bytes[172..180].try_into().unwrap(),
-            handler_name: SizedUtf16String::<24>::from_bytes(bytes[184..208].try_into().unwrap()),
-            handler_language: bytes[211],
-            is_current_handler: util::get_flag(bytes, 212, 0),
-            // resort_event_status: bytes[213],
-            handler_id: u16::from_le_bytes(bytes[214..216].try_into().unwrap()),
-            handler_friendship: bytes[216],
-            handler_memory: TrainerMemory {
-                intensity: bytes[217],
-                memory: bytes[218],
-                feeling: bytes[219],
-                text_variable: u16::from_le_bytes(bytes[220..222].try_into().unwrap()),
-            },
-            handler_affection: bytes[222],
-            // super_training_flags: u32::from_le_bytes(bytes[223..227].try_into().unwrap()),
-            // super_training_dist_flags: bytes[227],
-            // secret_super_training_unlocked: util::get_flag(bytes, 228, 0),
-            // secret_super_training_complete: util::get_flag(bytes, 228, 1),
-            // training_bag_hits: bytes[229],
-            // training_bag: bytes[230],
-            // 231..235
-            // poke_star_fame: bytes[232],
-            obedience_level: bytes[233],
-            // shiny_leaves: bytes[234] & 0x3f,
-            handler_gender: util::get_flag(bytes, 234, 7),
-            // is_ns_pokemon: util::get_flag(bytes, 234, 6),
-            fullness: bytes[235],
-            enjoyment: bytes[236],
-            // country: bytes[239],
-            // region: bytes[240],
-            console_region: bytes[240],
-            language: Language::try_from(bytes[242])?,
-            form_argument: u32::from_le_bytes(bytes[244..248].try_into().unwrap()),
-            affixed_ribbon: ModernRibbon::from_affixed_byte(bytes[248]),
-            // geolocations: Geolocations::from_bytes(bytes[249..259].try_into().unwrap()),
-            // encounter_type: bytes[270],
-            // performance: bytes[271],
-            trainer_name: SizedUtf16String::<24>::from_bytes(bytes[272..296].try_into().unwrap()),
-            trainer_friendship: bytes[298],
-            trainer_memory: TrainerMemory {
-                intensity: bytes[299],
-                memory: bytes[300],
-                text_variable: u16::from_le_bytes(bytes[301..303].try_into().unwrap()),
-                feeling: bytes[303],
-            },
-            trainer_affection: bytes[304],
-        };
-        Ok(data)
-    }
-
-    fn to_bytes(&self) -> Result<Vec<u8>> {
-        let mut bytes = [0u8; 305];
-
-        bytes[0..4].copy_from_slice(&self.personality_value.to_le_bytes());
-        bytes[4..8].copy_from_slice(&self.encryption_constant.to_le_bytes());
-        bytes[8..10].copy_from_slice(&self.species_and_forme.get_ndex().to_le_bytes());
-        bytes[10..12].copy_from_slice(&self.species_and_forme.get_forme_index().to_le_bytes());
-        bytes[12..14].copy_from_slice(&self.trainer_id.to_le_bytes());
-        bytes[14..16].copy_from_slice(&self.secret_id.to_le_bytes());
-        bytes[16..20].copy_from_slice(&self.exp.to_le_bytes());
-        bytes[20..22].copy_from_slice(&self.ability_index.to_le_bytes());
-
-        util::write_uint3_to_bits(self.ability_num, &mut bytes[22], 0);
-        util::set_flag(&mut bytes, 22, 3, self.favorite);
-        util::set_flag(&mut bytes, 22, 4, self.is_shadow);
-        util::set_flag(&mut bytes, 22, 5, self.is_fateful_encounter);
-        util::set_flag(&mut bytes, 22, 6, bool::from(self.trainer_gender));
-
-        bytes[24] = self.game_of_origin as u8;
-        bytes[25] = self.game_of_origin_battle.map_or(0, |g| g as u8);
-
-        bytes[26..28].copy_from_slice(&self.markings.to_bytes());
-        bytes[29] = self.ball as u8;
-        bytes[32] = self.nature.to_byte();
-        bytes[33] = self.stat_nature.to_byte();
-        bytes[34] = self.gender.to_byte();
-
-        bytes[36..38].copy_from_slice(&self.held_item_index.to_le_bytes());
-        bytes[38..44].copy_from_slice(&self.evs.to_bytes());
-        bytes[44..50].copy_from_slice(&self.contest.to_bytes());
-        bytes[50] = self.pokerus_byte;
-        bytes[52] = self.contest_memory_count;
-        bytes[53] = self.battle_memory_count;
-        bytes[54..76].copy_from_slice(&self.ribbons.to_bytes());
-        bytes[76..80].copy_from_slice(&self.sociability.to_le_bytes());
-        bytes[80] = self.height_scalar;
-        bytes[81] = self.weight_scalar;
-        bytes[82] = self.scale;
-
-        bytes[84..86].copy_from_slice(&self.moves[0].to_le_bytes());
-        bytes[86..88].copy_from_slice(&self.moves[1].to_le_bytes());
-        bytes[88..90].copy_from_slice(&self.moves[2].to_le_bytes());
-        bytes[90..92].copy_from_slice(&self.moves[3].to_le_bytes());
-
-        bytes[92] = self.move_pp[0];
-        bytes[93] = self.move_pp[1];
-        bytes[94] = self.move_pp[2];
-        bytes[95] = self.move_pp[3];
-
-        bytes[96..122].copy_from_slice(&self.nickname);
-
-        bytes[122..125].copy_from_slice(&PokeDate::to_bytes_optional(self.egg_date));
-        bytes[125..128].copy_from_slice(&self.met_date.to_bytes());
-        bytes[128] = self.met_level;
-        bytes[129..131].copy_from_slice(&self.egg_location_index.to_le_bytes());
-        bytes[131..133].copy_from_slice(&self.met_location_index.to_le_bytes());
-
-        bytes[134] = self.move_pp_ups[0];
-        bytes[135] = self.move_pp_ups[1];
-        bytes[136] = self.move_pp_ups[2];
-        bytes[137] = self.move_pp_ups[3];
-
-        bytes[138..140].copy_from_slice(&self.relearn_moves[0].to_le_bytes());
-        bytes[140..142].copy_from_slice(&self.relearn_moves[1].to_le_bytes());
-        bytes[142..144].copy_from_slice(&self.relearn_moves[2].to_le_bytes());
-        bytes[144..146].copy_from_slice(&self.relearn_moves[3].to_le_bytes());
-
-        self.ivs.write_30_bits(&mut bytes, 148);
-        util::set_flag(&mut bytes, 148, 30, self.is_egg);
-        util::set_flag(&mut bytes, 148, 31, self.is_nicknamed);
-
-        bytes[153] = self.hyper_training.to_byte();
-
-        // gap: 160..172
-
-        bytes[172..180].copy_from_slice(&self.home_tracker);
-
-        bytes[184..208].copy_from_slice(&self.handler_name);
-        bytes[211] = self.handler_language;
-        util::set_flag(&mut bytes, 212, 0, self.is_current_handler);
-        // bytes[213] = self.resort_event_status;
-        bytes[214..216].copy_from_slice(&self.handler_id.to_le_bytes());
-        bytes[216] = self.handler_friendship;
-
-        bytes[217] = self.handler_memory.intensity;
-        bytes[218] = self.handler_memory.memory;
-        bytes[219] = self.handler_memory.feeling;
-        bytes[220..222].copy_from_slice(&self.handler_memory.text_variable.to_le_bytes());
-
-        bytes[222] = self.handler_affection;
-        // bytes[223..227].copy_from_slice(&self.super_training_flags.to_le_bytes());
-        // bytes[227] = self.super_training_dist_flags;
-
-        // bytes[229] = self.training_bag_hits;
-        // bytes[230] = self.training_bag;
-        // bytes[232] = self.poke_star_fame;
-        bytes[233] = self.obedience_level;
-
-        bytes[234] = (self.handler_gender as u8) << 7;
-        // | ((self.is_ns_pokemon as u8) << 6)
-        // | (self.shiny_leaves & 0x3f);
-        bytes[235] = self.fullness;
-        bytes[236] = self.enjoyment;
-
-        // bytes[239] = self.country;
-        // bytes[240] = self.region;
-        bytes[240] = self.console_region;
-        bytes[242] = self.language as u8;
-
-        bytes[244..248].copy_from_slice(&self.form_argument.to_le_bytes());
-        bytes[248] = ModernRibbon::to_affixed_byte(self.affixed_ribbon);
-        // bytes[249..259].copy_from_slice(&self.geolocations.to_bytes());
-        // bytes[270] = self.encounter_type;
-        // bytes[271] = self.performance;
-        bytes[272..296].copy_from_slice(&self.trainer_name);
-        bytes[298] = self.trainer_friendship;
-
-        bytes[299] = self.trainer_memory.intensity;
-        bytes[300] = self.trainer_memory.memory;
-        bytes[301..303].copy_from_slice(&self.trainer_memory.text_variable.to_le_bytes());
-        bytes[303] = self.trainer_memory.feeling;
-
-        bytes[304] = self.trainer_affection;
-
-        Ok(bytes.to_vec())
-    }
-
-    fn is_empty(&self) -> bool {
-        false
-    }
-}
-
-#[derive(Debug, Default, Serialize, Clone, Copy)]
-pub struct PastHandlerData {
-    pub id: u16,
-    pub friendship: u8,
-    pub memory: TrainerMemory,
-    pub affection: u8,
-    pub gender: Gender,
-}
-
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Debug, Default, Serialize, Clone, Copy)]
-pub struct GameboyData {
-    pub dvs: StatsPreSplit,
-    pub met_time_of_day: u8,
-    pub evs_g12: StatsPreSplit,
-}
-
-impl GameboyData {
-    pub fn from_v1(old: OhpkmV1) -> Option<Self> {
-        if !old.game_of_origin.is_gameboy() && old.met_time_of_day == 0 && old.evs_g12.is_empty() {
-            None
-        } else {
-            Some(Self {
-                dvs: old.dvs,
-                met_time_of_day: old.met_time_of_day,
-                evs_g12: old.evs_g12,
-            })
-        }
-    }
-}
-
-impl DataSection for GameboyData {
-    type TagType = SectionTagV2;
-    const TAG: Self::TagType = SectionTagV2::GameboyData;
-
-    type ErrorType = Error;
-
-    fn from_bytes(bytes: &[u8]) -> Result<Self> {
-        Self::ensure_buffer_size(bytes)?;
-
-        // try_into() will always succeed thanks to the buffer size check
-        Ok(Self {
-            dvs: StatsPreSplit::from_dv_bytes(bytes[0..2].try_into().unwrap()),
-            met_time_of_day: bytes[2],
-            evs_g12: StatsPreSplit::from_bytes(bytes[3..13].try_into().unwrap()),
-        })
-    }
-
-    fn to_bytes(&self) -> Result<Vec<u8>> {
-        let mut bytes = [0u8; 13];
-
-        bytes[0..2].copy_from_slice(&self.dvs.to_dv_bytes());
-        bytes[2] = self.met_time_of_day;
-        bytes[3..13].copy_from_slice(&self.evs_g12.to_bytes());
-
-        Ok(bytes.to_vec())
-    }
-
-    fn is_empty(&self) -> bool {
-        self.dvs.is_empty() && self.met_time_of_day == 0 && self.evs_g12.is_empty()
-    }
-}
-
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Debug, Default, Serialize, Clone, Copy)]
-pub struct Gen45Data {
-    pub encounter_type: u8,
-    pub performance: u8,
-    pub shiny_leaves: u8,
-    pub poke_star_fame: u8,
-    pub is_ns_pokemon: bool,
-}
-
-impl Gen45Data {
-    pub fn from_v1(old: OhpkmV1) -> Option<Self> {
-        if !old.game_of_origin.is_ds()
-            && old.encounter_type == 0
-            && old.performance == 0
-            && old.shiny_leaves == 0
-            && old.poke_star_fame == 0
-            && !old.is_ns_pokemon
-        {
-            None
-        } else {
-            Some(Self {
-                encounter_type: old.encounter_type,
-                performance: old.performance,
-                shiny_leaves: old.shiny_leaves,
-                poke_star_fame: old.poke_star_fame,
-                is_ns_pokemon: old.is_ns_pokemon,
-            })
-        }
-    }
-}
-
-impl DataSection for Gen45Data {
-    type TagType = SectionTagV2;
-    const TAG: Self::TagType = SectionTagV2::Gen45Data;
-
-    type ErrorType = Error;
-    fn from_bytes(bytes: &[u8]) -> Result<Self> {
-        Self::ensure_buffer_size(bytes)?;
-
-        Ok(Self {
-            encounter_type: bytes[0],
-            performance: bytes[1],
-            shiny_leaves: bytes[2],
-            poke_star_fame: bytes[3],
-            is_ns_pokemon: util::get_flag(bytes, 4, 0),
-        })
-    }
-
-    fn to_bytes(&self) -> Result<Vec<u8>> {
-        let mut bytes = [0u8; 33];
-
-        bytes[0] = self.encounter_type;
-        bytes[1] = self.performance;
-        bytes[2] = self.shiny_leaves;
-        bytes[3] = self.poke_star_fame;
-        util::set_flag(&mut bytes, 4, 0, self.is_ns_pokemon);
-
-        Ok(bytes.to_vec())
-    }
-
-    fn is_empty(&self) -> bool {
-        self.encounter_type == 0
-            && self.performance == 0
-            && self.shiny_leaves == 0
-            && self.poke_star_fame == 0
-            && !self.is_ns_pokemon
-    }
-}
-
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Debug, Default, Serialize, Clone, Copy)]
-pub struct Gen67Data {
-    pub training_bag_hits: u8,
-    pub training_bag: u8,
-    pub super_training_flags: u32,
-    pub super_training_dist_flags: u8,
-    pub secret_super_training_unlocked: bool,
-    pub secret_super_training_complete: bool,
-    pub country: u8,
-    pub region: u8,
-    pub geolocations: Geolocations,
-    pub resort_event_status: u8,
-    pub avs: Stats16Le,
-}
-
-impl Gen67Data {
-    pub fn from_v1(old: OhpkmV1) -> Option<Self> {
-        if !old.game_of_origin.is_3ds()
-            && !old.game_of_origin.is_lets_go()
-            && old.training_bag == 0
-            && old.training_bag_hits == 0
-            && old.super_training_flags == 0
-            && old.super_training_dist_flags == 0
-            && !old.secret_super_training_unlocked
-            && !old.secret_super_training_complete
-            && old.country == 0
-            && old.region == 0
-            && bytes_are_empty(&old.geolocations.to_bytes())
-            && old.resort_event_status == 0
-            && bytes_are_empty(&old.avs.to_bytes())
-        {
-            None
-        } else {
-            Some(Self {
-                training_bag_hits: old.training_bag_hits,
-                training_bag: old.training_bag,
-                super_training_flags: old.super_training_flags,
-                super_training_dist_flags: old.super_training_dist_flags,
-                secret_super_training_unlocked: old.secret_super_training_unlocked,
-                secret_super_training_complete: old.secret_super_training_complete,
-                country: old.country,
-                region: old.region,
-                geolocations: old.geolocations,
-                resort_event_status: old.resort_event_status,
-                avs: old.avs,
-            })
-        }
-    }
-}
-
-impl DataSection for Gen67Data {
-    type TagType = SectionTagV2;
-    const TAG: Self::TagType = SectionTagV2::Gen67Data;
-
-    type ErrorType = Error;
-    fn from_bytes(bytes: &[u8]) -> Result<Self> {
-        Self::ensure_buffer_size(bytes)?;
-
-        Ok(Self {
-            training_bag_hits: bytes[0],
-            training_bag: bytes[1],
-            super_training_flags: u32::from_le_bytes(bytes[2..6].try_into().unwrap()),
-            super_training_dist_flags: bytes[6],
-            secret_super_training_unlocked: util::get_flag(bytes, 7, 0),
-            secret_super_training_complete: util::get_flag(bytes, 7, 1),
-            country: bytes[8],
-            region: bytes[9],
-            geolocations: Geolocations::from_bytes(bytes[10..20].try_into().unwrap()),
-            resort_event_status: bytes[20],
-            avs: Stats16Le::from_bytes(bytes[21..33].try_into().unwrap()),
-        })
-    }
-
-    fn to_bytes(&self) -> Result<Vec<u8>> {
-        let mut bytes = [0u8; 33];
-
-        bytes[0] = self.training_bag_hits;
-        bytes[1] = self.training_bag;
-        bytes[2..6].copy_from_slice(&self.super_training_flags.to_le_bytes());
-        bytes[6] = self.super_training_dist_flags;
-        util::set_flag(&mut bytes, 7, 0, self.secret_super_training_unlocked);
-        util::set_flag(&mut bytes, 7, 1, self.secret_super_training_complete);
-        bytes[8] = self.country;
-        bytes[9] = self.region;
-        bytes[10..20].copy_from_slice(&self.geolocations.to_bytes());
-        bytes[20] = self.resort_event_status;
-        bytes[21..33].copy_from_slice(&self.avs.to_bytes());
-
-        Ok(bytes.to_vec())
-    }
-
-    fn is_empty(&self) -> bool {
-        self.training_bag == 0
-            && self.training_bag_hits == 0
-            && self.super_training_flags == 0
-            && self.super_training_dist_flags == 0
-            && !self.secret_super_training_unlocked
-            && !self.secret_super_training_complete
-            && self.country == 0
-            && self.region == 0
-            && bytes_are_empty(&self.geolocations.to_bytes())
-            && self.resort_event_status == 0
-            && bytes_are_empty(&self.avs.to_bytes())
-    }
-}
-
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Debug, Default, Serialize, Clone, Copy)]
-pub struct SwordShieldData {
-    pub can_gigantamax: bool,
-    pub dynamax_level: u8,
-    pub palma: u32,
-    #[wasm_bindgen(skip)]
-    pub tr_flags: [u8; 14],
-}
-
-impl SwordShieldData {
-    pub fn from_v1(old: OhpkmV1) -> Option<Self> {
-        if !old.game_of_origin.is_swsh()
-            && !old.can_gigantamax
-            && old.palma == 0
-            && old.dynamax_level == 0
-            && bytes_are_empty(&old.tr_flags_swsh)
-        {
-            None
-        } else {
-            Some(Self {
-                can_gigantamax: old.can_gigantamax,
-                palma: old.palma,
-                dynamax_level: old.dynamax_level,
-                tr_flags: old.tr_flags_swsh,
-            })
-        }
-    }
-}
-
-impl DataSection for SwordShieldData {
-    type TagType = SectionTagV2;
-    const TAG: Self::TagType = SectionTagV2::SwordShield;
-
-    type ErrorType = Error;
-
-    fn from_bytes(bytes: &[u8]) -> Result<Self> {
-        Self::ensure_buffer_size(bytes)?;
-
-        // try_into() will always succeed thanks to the buffer size check
-        Ok(Self {
-            can_gigantamax: util::get_flag(bytes, 0, 0),
-            dynamax_level: bytes[1],
-            palma: u32::from_le_bytes(bytes[2..6].try_into().unwrap()),
-            tr_flags: bytes[6..20].try_into().unwrap(),
-        })
-    }
-
-    fn to_bytes(&self) -> Result<Vec<u8>> {
-        let mut bytes = [0u8; 20];
-
-        util::set_flag(&mut bytes, 0, 0, self.can_gigantamax);
-        bytes[1] = self.dynamax_level;
-        bytes[2..6].copy_from_slice(&self.palma.to_le_bytes());
-        bytes[6..20].copy_from_slice(&self.tr_flags);
-
-        Ok(bytes.to_vec())
-    }
-
-    fn is_empty(&self) -> bool {
-        !self.can_gigantamax
-            && self.palma == 0
-            && self.dynamax_level == 0
-            && bytes_are_empty(&self.tr_flags)
-    }
-}
-
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Debug, Default, Serialize, Clone, Copy)]
-pub struct LegendsArceusData {
-    pub gvs: Stats8,
-    #[wasm_bindgen(skip)]
-    pub move_flags: FlagSet<14>,
-    #[wasm_bindgen(skip)]
-    pub tutor_flags: FlagSet<8>,
-    #[wasm_bindgen(skip)]
-    pub master_flags: FlagSet<8>,
-    pub is_alpha: bool,
-    pub is_noble: bool,
-    pub alpha_move: u16,
-    pub flag2: bool,
-    pub unknown_a0: u32,
-    pub unknown_f3: u8,
-}
-
-impl LegendsArceusData {
-    pub fn from_v1(old: OhpkmV1) -> Option<Self> {
-        if old.game_of_origin != OriginGame::LegendsArceus
-            && !old.is_alpha
-            && !old.is_noble
-            && bytes_are_empty(&old.move_flags_la)
-            && bytes_are_empty(&old.tutor_flags_la)
-            && bytes_are_empty(&old.master_flags_la)
-        {
-            None
-        } else {
-            Some(Self {
-                gvs: old.gvs,
-                alpha_move: old.alpha_move,
-                move_flags: FlagSet::from_bytes(old.move_flags_la),
-                tutor_flags: FlagSet::from_bytes(old.tutor_flags_la),
-                master_flags: FlagSet::from_bytes(old.master_flags_la),
-                is_alpha: old.is_alpha,
-                is_noble: old.is_noble,
-                flag2: old.flag2_la,
-                unknown_f3: old.unknown_f3,
-                unknown_a0: old.unknown_a0,
-            })
-        }
-    }
-}
-
-impl DataSection for LegendsArceusData {
-    type TagType = SectionTagV2;
-    const TAG: Self::TagType = SectionTagV2::LegendsArceus;
-
-    type ErrorType = Error;
-
-    fn from_bytes(bytes: &[u8]) -> Result<Self> {
-        Self::ensure_buffer_size(bytes)?;
-
-        // try_into() will always succeed thanks to the buffer size check
-        Ok(Self {
-            gvs: Stats8::from_bytes(bytes[0..6].try_into().unwrap()),
-            alpha_move: u16::from_le_bytes(bytes[6..8].try_into().unwrap()),
-            move_flags: FlagSet::from_bytes(bytes[8..22].try_into().unwrap()),
-            tutor_flags: FlagSet::from_bytes(bytes[22..30].try_into().unwrap()),
-            master_flags: FlagSet::from_bytes(bytes[30..38].try_into().unwrap()),
-            is_alpha: util::get_flag(bytes, 38, 0),
-            is_noble: util::get_flag(bytes, 38, 1),
-            flag2: util::get_flag(bytes, 38, 2),
-            unknown_f3: bytes[39],
-            unknown_a0: u32::from_le_bytes(bytes[40..44].try_into().unwrap()),
-        })
-    }
-
-    fn to_bytes(&self) -> Result<Vec<u8>> {
-        let mut bytes = [0u8; 44];
-
-        bytes[0..6].copy_from_slice(&self.gvs.to_bytes());
-        bytes[6..8].copy_from_slice(&self.alpha_move.to_le_bytes());
-        bytes[8..22].copy_from_slice(&self.move_flags.to_bytes());
-        bytes[22..30].copy_from_slice(&self.tutor_flags.to_bytes());
-        bytes[30..38].copy_from_slice(&self.master_flags.to_bytes());
-        util::set_flag(&mut bytes, 38, 0, self.is_alpha);
-        util::set_flag(&mut bytes, 38, 1, self.is_noble);
-        util::set_flag(&mut bytes, 38, 2, self.flag2);
-        bytes[39] = self.unknown_f3;
-        bytes[40..44].copy_from_slice(&self.unknown_a0.to_le_bytes());
-
-        Ok(bytes.to_vec())
-    }
-
-    fn is_empty(&self) -> bool {
-        !self.is_alpha
-            && !self.is_noble
-            && self.move_flags.is_empty()
-            && self.master_flags.is_empty()
-            && self.tutor_flags.is_empty()
-    }
-}
-
-#[derive(Debug, Default, Serialize, Clone, Copy)]
-pub struct ScarletVioletData {
-    pub tera_type_original: TeraType,
-    pub tera_type_override: Option<TeraType>,
-    pub tm_flags_sv: FlagSet<22>,
-    pub tm_flags_sv_dlc: FlagSet<13>,
-}
-
-impl ScarletVioletData {
-    pub fn from_v1(old: OhpkmV1) -> Option<Self> {
-        let tera_type_original = TeraType::from_byte(old.tera_type_original)?;
-        let tera_type_override = TeraType::from_byte(old.tera_type_override);
-
-        if !old.game_of_origin.is_scarlet_violet()
-            && tera_type_override.is_none()
-            && bytes_are_empty(&old.tm_flags_sv)
-            && bytes_are_empty(&old.tm_flags_sv_dlc)
-        {
-            None
-        } else {
-            Some(Self {
-                tera_type_original,
-                tera_type_override,
-                tm_flags_sv: FlagSet::from_bytes(old.tm_flags_sv),
-                tm_flags_sv_dlc: FlagSet::from_bytes(old.tm_flags_sv_dlc),
-            })
-        }
-    }
-
-    pub fn default_generated_tera_type(species_and_forme: SpeciesAndForme) -> Self {
-        Self {
-            tera_type_original: species_and_forme
-                .get_forme_metadata()
-                .transferred_tera_type(),
-            ..Default::default()
-        }
-    }
-}
-
-impl DataSection for ScarletVioletData {
-    type TagType = SectionTagV2;
-    const TAG: Self::TagType = SectionTagV2::ScarletViolet;
-
-    type ErrorType = Error;
-
-    fn from_bytes(bytes: &[u8]) -> Result<Self> {
-        Self::ensure_buffer_size(bytes)?;
-
-        // try_into() will always succeed thanks to the buffer size check
-        let tera_type_original = TeraType::from_byte(bytes[0]).ok_or(Error::Other(format!(
-            "Invalid original tera type index: {}",
-            bytes[0]
-        )))?;
-
-        Ok(Self {
-            tera_type_original,
-            tera_type_override: TeraType::from_byte(bytes[1]),
-            tm_flags_sv: FlagSet::from_bytes(bytes[2..24].try_into().unwrap()),
-            tm_flags_sv_dlc: FlagSet::from_bytes(bytes[24..37].try_into().unwrap()),
-        })
-    }
-
-    fn to_bytes(&self) -> Result<Vec<u8>> {
-        let mut bytes = [0u8; 37];
-
-        bytes[0] = self.tera_type_original.to_byte();
-        bytes[1] = self.tera_type_override.map_or(0, TeraType::to_byte);
-        bytes[2..24].copy_from_slice(&self.tm_flags_sv.to_bytes());
-        bytes[24..37].copy_from_slice(&self.tm_flags_sv_dlc.to_bytes());
-
-        Ok(bytes.to_vec())
-    }
-
-    fn is_empty(&self) -> bool {
-        self.tera_type_override.is_none()
-            && self.tm_flags_sv.is_empty()
-            && self.tm_flags_sv_dlc.is_empty()
-    }
-}
-
-#[derive(Debug, Default, Clone)]
-pub struct PluginData {
-    pub plugin_origin: String,
-}
-
-impl PluginData {
-    pub fn from_v1(old: OhpkmV1) -> Option<Self> {
-        if old.plugin_origin.is_empty() {
-            None
-        } else {
-            Some(Self::from_origin(old.plugin_origin.to_string()))
-        }
-    }
-
-    fn try_from_origin_utf8(origin_bytes: &[u8]) -> Result<Self> {
-        String::from_utf8(origin_bytes.to_vec())
-            .map(Self::from_origin)
-            .map_err(Error::plugin_origin)
-    }
-
-    const fn from_origin(plugin_origin: String) -> Self {
-        Self { plugin_origin }
-    }
-}
-
-impl DataSection for PluginData {
-    type TagType = SectionTagV2;
-    const TAG: Self::TagType = SectionTagV2::PluginData;
-
-    type ErrorType = Error;
-
-    fn from_bytes(bytes: &[u8]) -> Result<Self> {
-        Self::ensure_buffer_size(bytes)?;
-
-        Self::try_from_origin_utf8(bytes)
-    }
-
-    fn is_empty(&self) -> bool {
-        false
-    }
-
-    fn to_bytes(&self) -> Result<Vec<u8>> {
-        Ok(self.plugin_origin.clone().into_bytes())
-    }
-}
-
 #[derive(Default, Debug)]
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 pub struct OhpkmV2 {
     #[wasm_bindgen(skip)]
     pub main_data: MainDataV2,
-    pub gameboy_data: GameboyData,
-    pub gen45_data: Gen45Data,
-    pub gen67_data: Gen67Data,
-    pub swsh_data: SwordShieldData,
+    pub gameboy_data: Option<GameboyData>,
+    pub gen45_data: Option<Gen45Data>,
+    pub gen67_data: Option<Gen67Data>,
+    pub swsh_data: Option<SwordShieldData>,
     pub la_data: Option<LegendsArceusData>,
     #[wasm_bindgen(skip)]
     pub sv_data: Option<ScarletVioletData>,
@@ -1053,11 +108,35 @@ pub struct OhpkmV2 {
     pub plugin_data: Option<PluginData>,
 }
 
+#[wasm_bindgen]
+extern "C" {
+    // Use `js_namespace` here to bind `console.log(..)` instead of just
+    // `log(..)`
+    #[wasm_bindgen(js_namespace = console)]
+    fn log(s: &str);
+
+    // The `console.log` is quite polymorphic, so we can bind it with multiple
+    // signatures. Note that we need to use `js_name` to ensure we always call
+    // `log` in JS.
+    #[wasm_bindgen(js_namespace = console, js_name = log)]
+    fn log_u32(a: u32);
+
+    // Multiple arguments too!
+    #[wasm_bindgen(js_namespace = console, js_name = log)]
+    fn log_many(a: &str, b: &str);
+}
+
 impl OhpkmV2 {
     pub fn new(national_dex: u16, forme_index: u16) -> Result<Self> {
         Ok(Self {
             main_data: MainDataV2::new(national_dex, forme_index)?,
-            ..Default::default()
+            gameboy_data: None,
+            gen45_data: None,
+            gen67_data: None,
+            swsh_data: None,
+            la_data: None,
+            sv_data: None,
+            plugin_data: None,
         })
     }
     pub fn from_bytes(bytes: &[u8]) -> Result<Self> {
@@ -1072,10 +151,10 @@ impl OhpkmV2 {
         Ok(Self {
             main_data: MainDataV2::extract_from(&sectioned_data)?
                 .ok_or(Error::other("Main data not present in OHPKM V2 file"))?,
-            gameboy_data: GameboyData::extract_from(&sectioned_data)?.unwrap_or_default(),
-            gen45_data: Gen45Data::extract_from(&sectioned_data)?.unwrap_or_default(),
-            gen67_data: Gen67Data::extract_from(&sectioned_data)?.unwrap_or_default(),
-            swsh_data: SwordShieldData::extract_from(&sectioned_data)?.unwrap_or_default(),
+            gameboy_data: GameboyData::extract_from(&sectioned_data)?,
+            gen45_data: Gen45Data::extract_from(&sectioned_data)?,
+            gen67_data: Gen67Data::extract_from(&sectioned_data)?,
+            swsh_data: SwordShieldData::extract_from(&sectioned_data)?,
             la_data: LegendsArceusData::extract_from(&sectioned_data)?,
             sv_data: ScarletVioletData::extract_from(&sectioned_data)?,
             plugin_data: PluginData::extract_from(&sectioned_data)?,
@@ -1085,10 +164,10 @@ impl OhpkmV2 {
     pub fn from_v1(old: OhpkmV1) -> Self {
         Self {
             main_data: MainDataV2::from_v1(old),
-            gameboy_data: GameboyData::from_v1(old).unwrap_or_default(),
-            gen45_data: Gen45Data::from_v1(old).unwrap_or_default(),
-            gen67_data: Gen67Data::from_v1(old).unwrap_or_default(),
-            swsh_data: SwordShieldData::from_v1(old).unwrap_or_default(),
+            gameboy_data: GameboyData::from_v1(old),
+            gen45_data: Gen45Data::from_v1(old),
+            gen67_data: Gen67Data::from_v1(old),
+            swsh_data: SwordShieldData::from_v1(old),
             la_data: LegendsArceusData::from_v1(old),
             sv_data: ScarletVioletData::from_v1(old),
             plugin_data: PluginData::from_v1(old),
@@ -1099,534 +178,550 @@ impl OhpkmV2 {
         let mut sectioned_data = SectionedData::new(MAGIC_NUMBER, CURRENT_VERSION);
         sectioned_data
             .add(self.main_data)?
-            .add_if_not_empty(self.gameboy_data)?
-            .add_if_not_empty(self.gen45_data)?
-            .add_if_not_empty(self.gen67_data)?
-            .add_if_not_empty(self.swsh_data)?
+            .add_if_some(self.gameboy_data)?
+            .add_if_some(self.gen45_data)?
+            .add_if_some(self.gen67_data)?
+            .add_if_some(self.swsh_data)?
             .add_if_some(self.la_data)?
             .add_if_some(self.sv_data)?
             .add_if_some(self.plugin_data.clone())?;
 
-        Ok(sectioned_data.to_bytes()?)
-    }
-}
+        let r = Ok(sectioned_data.to_bytes()?);
+        log("ok and we did it");
 
-fn bytes_are_empty(bytes: &[u8]) -> bool {
-    bytes.iter().all(|b| *b == 0)
+        r
+    }
 }
 
 type JsResult<T> = core::result::Result<T, JsValue>;
 
 #[cfg(feature = "wasm")]
+#[safe_wasm_impl]
 #[wasm_bindgen]
 #[allow(clippy::missing_const_for_fn)]
 impl OhpkmV2 {
     #[wasm_bindgen(constructor)]
-    pub fn new_js(national_dex: u16, forme_index: u16) -> JsResult<Self> {
-        Self::new(national_dex, forme_index).map_err(|e| JsValue::from_str(&e.to_string()))
+    pub fn from_byte_vector(bytes: &[u8]) -> JsResult<Self> {
+        if !bytes.is_empty() {
+            Self::from_bytes(bytes).map_err(|e| JsValue::from_str(&e.to_string()))
+        } else {
+            Ok(Self::default())
+        }
     }
 
-    #[wasm_bindgen(js_name = fromBytes)]
-    pub fn from_byte_vector(bytes: Vec<u8>) -> JsResult<Self> {
-        Self::from_bytes(&bytes).map_err(|e| JsValue::from_str(&e.to_string()))
-    }
-
-    #[wasm_bindgen(getter, js_name = personalityValue)]
+    #[wasm_bindgen(getter = personalityValue)]
     pub fn personality_value(&self) -> u32 {
         self.main_data.personality_value
     }
-    #[wasm_bindgen(setter, js_name = personalityValue)]
+    #[wasm_bindgen(setter = personalityValue)]
     pub fn set_personality_value(&mut self, v: u32) {
         self.main_data.personality_value = v;
     }
 
-    #[wasm_bindgen(getter, js_name = encryptionConstant)]
+    #[wasm_bindgen(getter = encryptionConstant)]
     pub fn encryption_constant(&self) -> u32 {
         self.main_data.encryption_constant
     }
-    #[wasm_bindgen(setter, js_name = encryptionConstant)]
+    #[wasm_bindgen(setter = encryptionConstant)]
     pub fn set_encryption_constant(&mut self, v: u32) {
         self.main_data.encryption_constant = v;
     }
 
-    #[wasm_bindgen(getter, js_name = speciesAndForme)]
+    #[wasm_bindgen(getter = speciesAndForme)]
     pub fn species_and_forme(&self) -> SpeciesAndForme {
         self.main_data.species_and_forme
     }
-    #[wasm_bindgen(setter, js_name = speciesAndForme)]
-    pub fn set_species_and_forme(&mut self, v: SpeciesAndForme) {
-        self.main_data.species_and_forme = v;
+    #[wasm_bindgen(setter = speciesAndForme)]
+    pub fn set_species_and_forme(&mut self, v: &SpeciesAndForme) {
+        self.main_data.species_and_forme = *v;
     }
 
-    #[wasm_bindgen(getter, js_name = heldItemIndex)]
+    #[wasm_bindgen(getter = heldItemIndex)]
     pub fn held_item_index(&self) -> u16 {
         self.main_data.held_item_index
     }
-    #[wasm_bindgen(setter, js_name = heldItemIndex)]
+    #[wasm_bindgen(setter = heldItemIndex)]
     pub fn set_held_item_index(&mut self, v: u16) {
         self.main_data.held_item_index = v;
     }
 
-    #[wasm_bindgen(getter, js_name = trainerId)]
+    #[wasm_bindgen(getter = trainerID)]
     pub fn trainer_id(&self) -> u16 {
         self.main_data.trainer_id
     }
-    #[wasm_bindgen(setter, js_name = trainerId)]
+    #[wasm_bindgen(setter = trainerID)]
     pub fn set_trainer_id(&mut self, v: u16) {
         self.main_data.trainer_id = v;
     }
 
-    #[wasm_bindgen(getter, js_name = secretId)]
+    #[wasm_bindgen(getter = secretID)]
     pub fn secret_id(&self) -> u16 {
         self.main_data.secret_id
     }
-    #[wasm_bindgen(setter, js_name = secretId)]
+    #[wasm_bindgen(setter = secretID)]
     pub fn set_secret_id(&mut self, v: u16) {
         self.main_data.secret_id = v;
     }
 
-    #[wasm_bindgen(getter, js_name = exp)]
+    #[wasm_bindgen(getter = exp)]
     pub fn exp(&self) -> u32 {
         self.main_data.exp
     }
-    #[wasm_bindgen(setter, js_name = exp)]
+    #[wasm_bindgen(setter = exp)]
     pub fn set_exp(&mut self, v: u32) {
         self.main_data.exp = v;
     }
 
-    #[wasm_bindgen(getter, js_name = abilityIndex)]
+    #[wasm_bindgen(getter = abilityIndex)]
     pub fn ability_index(&self) -> AbilityIndex {
         self.main_data.ability_index
     }
-    #[wasm_bindgen(setter, js_name = abilityIndex)]
-    pub fn set_ability_index(&mut self, v: AbilityIndex) {
-        self.main_data.ability_index = v;
+    #[wasm_bindgen(setter = abilityIndex)]
+    pub fn set_ability_index(&mut self, v: &AbilityIndex) {
+        self.main_data.ability_index = *v;
     }
 
-    #[wasm_bindgen(getter, js_name = abilityNum)]
+    #[wasm_bindgen(getter = abilityNum)]
     pub fn ability_num(&self) -> u8 {
         self.main_data.ability_num
     }
-    #[wasm_bindgen(setter, js_name = abilityNum)]
+    #[wasm_bindgen(setter = abilityNum)]
     pub fn set_ability_num(&mut self, v: u8) {
         self.main_data.ability_num = v;
     }
 
-    #[wasm_bindgen(getter, js_name = favorite)]
+    #[wasm_bindgen(getter = favorite)]
     pub fn favorite(&self) -> bool {
         self.main_data.favorite
     }
-    #[wasm_bindgen(setter, js_name = favorite)]
+    #[wasm_bindgen(setter = favorite)]
     pub fn set_favorite(&mut self, v: bool) {
         self.main_data.favorite = v;
     }
 
-    #[wasm_bindgen(getter, js_name = isShadow)]
+    #[wasm_bindgen(getter = isShadow)]
     pub fn is_shadow(&self) -> bool {
         self.main_data.is_shadow
     }
-    #[wasm_bindgen(setter, js_name = isShadow)]
+    #[wasm_bindgen(setter = isShadow)]
     pub fn set_is_shadow(&mut self, v: bool) {
         self.main_data.is_shadow = v;
     }
 
-    #[wasm_bindgen(getter, js_name = markings)]
+    #[wasm_bindgen(getter = markingsWasm)]
     pub fn markings(&self) -> MarkingsSixShapesColors {
         self.main_data.markings
     }
-    #[wasm_bindgen(setter, js_name = markings)]
-    pub fn set_markings(&mut self, v: MarkingsSixShapesColors) {
-        self.main_data.markings = v;
+
+    #[wasm_bindgen(setter = markingsWasm)]
+    pub fn set_markings(&mut self, v: &MarkingsSixShapesColors) {
+        self.main_data.markings = *v;
     }
 
-    #[wasm_bindgen(getter, js_name = nature)]
+    #[wasm_bindgen(getter = nature)]
     pub fn nature(&self) -> NatureIndex {
         self.main_data.nature
     }
-    #[wasm_bindgen(setter, js_name = nature)]
-    pub fn set_nature(&mut self, v: NatureIndex) {
-        self.main_data.nature = v;
+
+    #[wasm_bindgen(setter = nature)]
+    pub fn set_nature(&mut self, v: &NatureIndex) {
+        self.main_data.nature = *v;
     }
 
-    #[wasm_bindgen(getter, js_name = statNature)]
+    #[wasm_bindgen(getter = statNature)]
     pub fn stat_nature(&self) -> NatureIndex {
-        self.main_data.stat_nature
+        self.main_data.mint_nature.unwrap_or(self.main_data.nature)
     }
-    #[wasm_bindgen(setter, js_name = statNature)]
-    pub fn set_stat_nature(&mut self, v: NatureIndex) {
-        self.main_data.stat_nature = v;
+    #[wasm_bindgen(setter = statNature)]
+    pub fn set_stat_nature(&mut self, v: &NatureIndex) {
+        self.main_data.mint_nature = if *v != self.nature() { Some(*v) } else { None };
     }
 
-    #[wasm_bindgen(getter, js_name = isFatefulEncounter)]
+    #[wasm_bindgen(getter = isFatefulEncounter)]
     pub fn is_fateful_encounter(&self) -> bool {
         self.main_data.is_fateful_encounter
     }
-    #[wasm_bindgen(setter, js_name = isFatefulEncounter)]
+    #[wasm_bindgen(setter = isFatefulEncounter)]
     pub fn set_is_fateful_encounter(&mut self, v: bool) {
         self.main_data.is_fateful_encounter = v;
     }
 
-    #[wasm_bindgen(getter, js_name = gender)]
-    pub fn gender(&self) -> Gender {
-        self.main_data.gender
+    #[wasm_bindgen(getter)]
+    pub fn gender(&self) -> u8 {
+        self.main_data.gender as u8
     }
-    #[wasm_bindgen(setter, js_name = gender)]
-    pub fn set_gender(&mut self, v: Gender) {
-        self.main_data.gender = v;
+    #[wasm_bindgen(setter)]
+    pub fn set_gender(&mut self, v: u8) {
+        self.main_data.gender = Gender::from_u8(v);
     }
 
-    #[wasm_bindgen(getter, js_name = evs)]
+    #[wasm_bindgen(getter = evs)]
     pub fn evs(&self) -> Stats8 {
         self.main_data.evs
     }
-    #[wasm_bindgen(setter, js_name = evs)]
-    pub fn set_evs(&mut self, v: Stats8) {
-        self.main_data.evs = v;
+    #[wasm_bindgen(setter = evs)]
+    pub fn set_evs(&mut self, v: &Stats8) {
+        self.main_data.evs = *v;
     }
 
-    #[wasm_bindgen(getter, js_name = contest)]
+    #[wasm_bindgen(getter = contest)]
     pub fn contest(&self) -> ContestStats {
         self.main_data.contest
     }
-    #[wasm_bindgen(setter, js_name = contest)]
-    pub fn set_contest(&mut self, v: ContestStats) {
-        self.main_data.contest = v;
+    #[wasm_bindgen(setter = contest)]
+    pub fn set_contest(&mut self, v: &ContestStats) {
+        self.main_data.contest = *v;
     }
 
-    #[wasm_bindgen(getter, js_name = pokerusByte)]
+    #[wasm_bindgen(getter = pokerusByte)]
     pub fn pokerus_byte(&self) -> u8 {
         self.main_data.pokerus_byte
     }
-    #[wasm_bindgen(setter, js_name = pokerusByte)]
+    #[wasm_bindgen(setter = pokerusByte)]
     pub fn set_pokerus_byte(&mut self, v: u8) {
         self.main_data.pokerus_byte = v;
     }
 
-    #[wasm_bindgen(getter, js_name = contestMemoryCount)]
+    #[wasm_bindgen(getter = contestMemoryCount)]
     pub fn contest_memory_count(&self) -> u8 {
         self.main_data.contest_memory_count
     }
-    #[wasm_bindgen(setter, js_name = contestMemoryCount)]
+    #[wasm_bindgen(setter = contestMemoryCount)]
     pub fn set_contest_memory_count(&mut self, v: u8) {
         self.main_data.contest_memory_count = v;
     }
 
-    #[wasm_bindgen(getter, js_name = battleMemoryCount)]
+    #[wasm_bindgen(getter = battleMemoryCount)]
     pub fn battle_memory_count(&self) -> u8 {
         self.main_data.battle_memory_count
     }
-    #[wasm_bindgen(setter, js_name = battleMemoryCount)]
+    #[wasm_bindgen(setter = battleMemoryCount)]
     pub fn set_battle_memory_count(&mut self, v: u8) {
         self.main_data.battle_memory_count = v;
     }
-    // #[wasm_bindgen(js_name = toBytes)]
-    // pub fn get_bytes_wasm(&self) -> core::result::Result<Vec<u8>, JsValue> {
-    //     self.to_box_bytes()
-    //         .map_err(|e| JsValue::from_str(&e.to_string()))
-    // }
 
-    #[wasm_bindgen(getter, js_name = sociability)]
+    #[wasm_bindgen(getter = ribbons)]
+    pub fn ribbons(&self) -> Vec<String> {
+        self.main_data
+            .ribbons
+            .into_iter()
+            .map(|r| {
+                let ribbon_name = r.to_string();
+                if ribbon_name.ends_with(" Ribbon") {
+                    ribbon_name.strip_suffix(" Ribbon").unwrap().to_owned()
+                } else {
+                    ribbon_name
+                }
+            })
+            .collect()
+    }
+    #[wasm_bindgen(setter = ribbons)]
+    pub fn set_ribbons(&mut self, v: Vec<String>) {
+        self.main_data.ribbons = OpenHomeRibbonSet::from_names(v);
+    }
+
+    #[wasm_bindgen(getter = sociability)]
     pub fn sociability(&self) -> u32 {
         self.main_data.sociability
     }
-    #[wasm_bindgen(setter, js_name = sociability)]
+    #[wasm_bindgen(setter = sociability)]
     pub fn set_sociability(&mut self, v: u32) {
         self.main_data.sociability = v;
     }
 
-    #[wasm_bindgen(getter, js_name = heightScalar)]
+    #[wasm_bindgen(getter = heightScalar)]
     pub fn height_scalar(&self) -> u8 {
         self.main_data.height_scalar
     }
-    #[wasm_bindgen(setter, js_name = heightScalar)]
+    #[wasm_bindgen(setter = heightScalar)]
     pub fn set_height_scalar(&mut self, v: u8) {
         self.main_data.height_scalar = v;
     }
 
-    #[wasm_bindgen(getter, js_name = weightScalar)]
+    #[wasm_bindgen(getter = weightScalar)]
     pub fn weight_scalar(&self) -> u8 {
         self.main_data.weight_scalar
     }
-    #[wasm_bindgen(setter, js_name = weightScalar)]
+    #[wasm_bindgen(setter = weightScalar)]
     pub fn set_weight_scalar(&mut self, v: u8) {
         self.main_data.weight_scalar = v;
     }
 
-    #[wasm_bindgen(getter, js_name = scale)]
+    #[wasm_bindgen(getter = scale)]
     pub fn scale(&self) -> u8 {
         self.main_data.scale
     }
-    #[wasm_bindgen(setter, js_name = scale)]
+    #[wasm_bindgen(setter = scale)]
     pub fn set_scale(&mut self, v: u8) {
         self.main_data.scale = v;
     }
 
-    #[wasm_bindgen(getter, js_name = ivs)]
+    #[wasm_bindgen(getter = ivs)]
     pub fn ivs(&self) -> Stats8 {
         self.main_data.ivs
     }
-    #[wasm_bindgen(setter, js_name = ivs)]
-    pub fn set_ivs(&mut self, v: Stats8) {
-        self.main_data.ivs = v;
+    #[wasm_bindgen(setter = ivs)]
+    pub fn set_ivs(&mut self, v: &Stats8) {
+        self.main_data.ivs = *v;
     }
 
-    #[wasm_bindgen(getter, js_name = isEgg)]
+    #[wasm_bindgen(getter = isEgg)]
     pub fn is_egg(&self) -> bool {
         self.main_data.is_egg
     }
-    #[wasm_bindgen(setter, js_name = isEgg)]
+    #[wasm_bindgen(setter = isEgg)]
     pub fn set_is_egg(&mut self, v: bool) {
         self.main_data.is_egg = v;
     }
 
-    #[wasm_bindgen(getter, js_name = isNicknamed)]
+    #[wasm_bindgen(getter = isNicknamed)]
     pub fn is_nicknamed(&self) -> bool {
         self.main_data.is_nicknamed
     }
-    #[wasm_bindgen(setter, js_name = isNicknamed)]
+    #[wasm_bindgen(setter = isNicknamed)]
     pub fn set_is_nicknamed(&mut self, v: bool) {
         self.main_data.is_nicknamed = v;
     }
 
-    #[wasm_bindgen(getter, js_name = handlerLanguage)]
+    #[wasm_bindgen(getter = handlerLanguage)]
     pub fn handler_language(&self) -> u8 {
         self.main_data.handler_language
     }
-    #[wasm_bindgen(setter, js_name = handlerLanguage)]
+    #[wasm_bindgen(setter = handlerLanguage)]
     pub fn set_handler_language(&mut self, v: u8) {
         self.main_data.handler_language = v;
     }
 
-    #[wasm_bindgen(getter, js_name = isCurrentHandler)]
+    #[wasm_bindgen(getter = isCurrentHandler)]
     pub fn is_current_handler(&self) -> bool {
         self.main_data.is_current_handler
     }
-    #[wasm_bindgen(setter, js_name = isCurrentHandler)]
+    #[wasm_bindgen(setter = isCurrentHandler)]
     pub fn set_is_current_handler(&mut self, v: bool) {
         self.main_data.is_current_handler = v;
     }
 
-    #[wasm_bindgen(getter, js_name = handlerId)]
+    #[wasm_bindgen(getter = handlerId)]
     pub fn handler_id(&self) -> u16 {
         self.main_data.handler_id
     }
-    #[wasm_bindgen(setter, js_name = handlerId)]
+    #[wasm_bindgen(setter = handlerId)]
     pub fn set_handler_id(&mut self, v: u16) {
         self.main_data.handler_id = v;
     }
 
-    #[wasm_bindgen(getter, js_name = handlerFriendship)]
+    #[wasm_bindgen(getter = handlerFriendship)]
     pub fn handler_friendship(&self) -> u8 {
         self.main_data.handler_friendship
     }
-    #[wasm_bindgen(setter, js_name = handlerFriendship)]
+    #[wasm_bindgen(setter = handlerFriendship)]
     pub fn set_handler_friendship(&mut self, v: u8) {
         self.main_data.handler_friendship = v;
     }
 
-    #[wasm_bindgen(getter, js_name = handlerMemory)]
+    #[wasm_bindgen(getter = handlerMemoryWasm)]
     pub fn handler_memory(&self) -> TrainerMemory {
         self.main_data.handler_memory
     }
-    #[wasm_bindgen(setter, js_name = handlerMemory)]
-    pub fn set_handler_memory(&mut self, v: TrainerMemory) {
-        self.main_data.handler_memory = v;
+    #[wasm_bindgen(setter = handlerMemoryWasm)]
+    pub fn set_handler_memory(&mut self, v: &TrainerMemory) {
+        self.main_data.handler_memory = *v;
     }
 
-    #[wasm_bindgen(getter, js_name = handlerAffection)]
+    #[wasm_bindgen(getter = handlerAffection)]
     pub fn handler_affection(&self) -> u8 {
         self.main_data.handler_affection
     }
-    #[wasm_bindgen(setter, js_name = handlerAffection)]
+    #[wasm_bindgen(setter = handlerAffection)]
     pub fn set_handler_affection(&mut self, v: u8) {
         self.main_data.handler_affection = v;
     }
 
-    #[wasm_bindgen(getter, js_name = handlerGender)]
+    #[wasm_bindgen(getter = handlerGender)]
     pub fn handler_gender(&self) -> bool {
         self.main_data.handler_gender
     }
-    #[wasm_bindgen(setter, js_name = handlerGender)]
+    #[wasm_bindgen(setter = handlerGender)]
     pub fn set_handler_gender(&mut self, v: bool) {
         self.main_data.handler_gender = v;
     }
 
-    #[wasm_bindgen(getter, js_name = fullness)]
+    #[wasm_bindgen(getter = fullness)]
     pub fn fullness(&self) -> u8 {
         self.main_data.fullness
     }
-    #[wasm_bindgen(setter, js_name = fullness)]
+    #[wasm_bindgen(setter = fullness)]
     pub fn set_fullness(&mut self, v: u8) {
         self.main_data.fullness = v;
     }
 
-    #[wasm_bindgen(getter, js_name = enjoyment)]
+    #[wasm_bindgen(getter = enjoyment)]
     pub fn enjoyment(&self) -> u8 {
         self.main_data.enjoyment
     }
-    #[wasm_bindgen(setter, js_name = enjoyment)]
+    #[wasm_bindgen(setter = enjoyment)]
     pub fn set_enjoyment(&mut self, v: u8) {
         self.main_data.enjoyment = v;
     }
 
-    #[wasm_bindgen(getter, js_name = gameOfOrigin)]
+    #[wasm_bindgen(getter = gameOfOrigin)]
     pub fn game_of_origin(&self) -> OriginGame {
         self.main_data.game_of_origin
     }
-    #[wasm_bindgen(setter, js_name = gameOfOrigin)]
+    #[wasm_bindgen(setter = gameOfOrigin)]
     pub fn set_game_of_origin(&mut self, v: OriginGame) {
         self.main_data.game_of_origin = v;
     }
 
-    #[wasm_bindgen(getter, js_name = gameOfOriginBattle)]
+    #[wasm_bindgen(getter = gameOfOriginBattle)]
     pub fn game_of_origin_battle(&self) -> Option<OriginGame> {
         self.main_data.game_of_origin_battle
     }
-    #[wasm_bindgen(setter, js_name = gameOfOriginBattle)]
+    #[wasm_bindgen(setter = gameOfOriginBattle)]
     pub fn set_game_of_origin_battle(&mut self, v: Option<OriginGame>) {
         self.main_data.game_of_origin_battle = v;
     }
 
-    #[wasm_bindgen(getter, js_name = consoleRegion)]
+    #[wasm_bindgen(getter = consoleRegion)]
     pub fn console_region(&self) -> u8 {
         self.main_data.console_region
     }
-    #[wasm_bindgen(setter, js_name = consoleRegion)]
+    #[wasm_bindgen(setter = consoleRegion)]
     pub fn set_console_region(&mut self, v: u8) {
         self.main_data.console_region = v;
     }
 
-    #[wasm_bindgen(getter, js_name = language)]
+    #[wasm_bindgen(getter = language)]
     pub fn language(&self) -> Language {
         self.main_data.language
     }
-    #[wasm_bindgen(setter, js_name = language)]
+    #[wasm_bindgen(setter = language)]
     pub fn set_language(&mut self, v: Language) {
         self.main_data.language = v;
     }
 
-    #[wasm_bindgen(getter, js_name = formArgument)]
+    #[wasm_bindgen(getter = formArgument)]
     pub fn form_argument(&self) -> u32 {
         self.main_data.form_argument
     }
-    #[wasm_bindgen(setter, js_name = formArgument)]
+    #[wasm_bindgen(setter = formArgument)]
     pub fn set_form_argument(&mut self, v: u32) {
         self.main_data.form_argument = v;
     }
 
-    #[wasm_bindgen(getter, js_name = affixedRibbon)]
+    #[wasm_bindgen(getter = affixedRibbon)]
     pub fn affixed_ribbon(&self) -> Option<ModernRibbon> {
         self.main_data.affixed_ribbon
     }
-    #[wasm_bindgen(setter, js_name = affixedRibbon)]
+    #[wasm_bindgen(setter = affixedRibbon)]
     pub fn set_affixed_ribbon(&mut self, v: Option<ModernRibbon>) {
         self.main_data.affixed_ribbon = v;
     }
 
-    #[wasm_bindgen(getter, js_name = trainerFriendship)]
+    #[wasm_bindgen(getter = trainerFriendship)]
     pub fn trainer_friendship(&self) -> u8 {
         self.main_data.trainer_friendship
     }
-    #[wasm_bindgen(setter, js_name = trainerFriendship)]
+    #[wasm_bindgen(setter = trainerFriendship)]
     pub fn set_trainer_friendship(&mut self, v: u8) {
         self.main_data.trainer_friendship = v;
     }
 
-    #[wasm_bindgen(getter, js_name = trainerMemory)]
+    #[wasm_bindgen(getter = trainerMemoryWasm)]
     pub fn trainer_memory(&self) -> TrainerMemory {
         self.main_data.trainer_memory
     }
-    #[wasm_bindgen(setter, js_name = trainerMemory)]
-    pub fn set_trainer_memory(&mut self, v: TrainerMemory) {
-        self.main_data.trainer_memory = v;
+    #[wasm_bindgen(setter = trainerMemoryWasm)]
+    pub fn set_trainer_memory(&mut self, v: &TrainerMemory) {
+        self.main_data.trainer_memory = *v;
     }
 
-    #[wasm_bindgen(getter, js_name = trainerAffection)]
+    #[wasm_bindgen(getter = trainerAffection)]
     pub fn trainer_affection(&self) -> u8 {
         self.main_data.trainer_affection
     }
-    #[wasm_bindgen(setter, js_name = trainerAffection)]
+    #[wasm_bindgen(setter = trainerAffection)]
     pub fn set_trainer_affection(&mut self, v: u8) {
         self.main_data.trainer_affection = v;
     }
 
-    #[wasm_bindgen(getter, js_name = eggDate)]
+    #[wasm_bindgen(getter = eggDateWasm)]
     pub fn egg_date(&self) -> Option<PokeDate> {
         self.main_data.egg_date
     }
-    #[wasm_bindgen(setter, js_name = eggDate)]
+    #[wasm_bindgen(setter = eggDateWasm)]
     pub fn set_egg_date(&mut self, v: Option<PokeDate>) {
         self.main_data.egg_date = v;
     }
 
-    #[wasm_bindgen(getter, js_name = metDate)]
+    #[wasm_bindgen(getter = metDateWasm)]
     pub fn met_date(&self) -> PokeDate {
         self.main_data.met_date
     }
-    #[wasm_bindgen(setter, js_name = metDate)]
-    pub fn set_met_date(&mut self, v: PokeDate) {
-        self.main_data.met_date = v;
+    #[wasm_bindgen(setter = metDateWasm)]
+    pub fn set_met_date(&mut self, v: &PokeDate) {
+        self.main_data.met_date = *v;
     }
 
-    #[wasm_bindgen(getter, js_name = ball)]
+    #[wasm_bindgen(getter = ball)]
     pub fn ball(&self) -> Ball {
         self.main_data.ball
     }
-    #[wasm_bindgen(setter, js_name = ball)]
+    #[wasm_bindgen(setter = ball)]
     pub fn set_ball(&mut self, v: Ball) {
         self.main_data.ball = v;
     }
 
-    #[wasm_bindgen(getter, js_name = eggLocationIndex)]
-    pub fn egg_location_index(&self) -> u16 {
+    #[wasm_bindgen(getter = eggLocationIndex)]
+    pub fn egg_location_index(&self) -> Option<u16> {
         self.main_data.egg_location_index
     }
-    #[wasm_bindgen(setter, js_name = eggLocationIndex)]
-    pub fn set_egg_location_index(&mut self, v: u16) {
+    #[wasm_bindgen(setter = eggLocationIndex)]
+    pub fn set_egg_location_index(&mut self, v: Option<u16>) {
         self.main_data.egg_location_index = v;
     }
 
-    #[wasm_bindgen(getter, js_name = metLocationIndex)]
+    #[wasm_bindgen(getter = metLocationIndex)]
     pub fn met_location_index(&self) -> u16 {
         self.main_data.met_location_index
     }
-    #[wasm_bindgen(setter, js_name = metLocationIndex)]
+    #[wasm_bindgen(setter = metLocationIndex)]
     pub fn set_met_location_index(&mut self, v: u16) {
         self.main_data.met_location_index = v;
     }
 
-    #[wasm_bindgen(getter, js_name = metLevel)]
+    #[wasm_bindgen(getter = metLevel)]
     pub fn met_level(&self) -> u8 {
         self.main_data.met_level
     }
-    #[wasm_bindgen(setter, js_name = metLevel)]
+    #[wasm_bindgen(setter = metLevel)]
     pub fn set_met_level(&mut self, v: u8) {
         self.main_data.met_level = v;
     }
 
-    #[wasm_bindgen(getter, js_name = hyperTraining)]
+    #[wasm_bindgen(getter = hyperTrainingWasm)]
     pub fn hyper_training(&self) -> HyperTraining {
         self.main_data.hyper_training
     }
-    #[wasm_bindgen(setter, js_name = hyperTraining)]
-    pub fn set_hyper_training(&mut self, v: HyperTraining) {
-        self.main_data.hyper_training = v;
+    #[wasm_bindgen(setter = hyperTrainingWasm)]
+    pub fn set_hyper_training(&mut self, v: &HyperTraining) {
+        self.main_data.hyper_training = *v;
     }
 
-    #[wasm_bindgen(getter, js_name = trainerGender)]
-    pub fn trainer_gender(&self) -> Gender {
-        self.main_data.trainer_gender
+    #[wasm_bindgen(getter = trainerGender)]
+    pub fn trainer_gender(&self) -> bool {
+        self.main_data.trainer_gender.into()
     }
-    #[wasm_bindgen(setter, js_name = trainerGender)]
-    pub fn set_trainer_gender(&mut self, v: Gender) {
-        self.main_data.trainer_gender = v;
+    #[wasm_bindgen(setter = trainerGender)]
+    pub fn set_trainer_gender(&mut self, v: bool) {
+        self.main_data.trainer_gender = Gender::from(v);
     }
 
-    #[wasm_bindgen(getter, js_name = obedienceLevel)]
+    #[wasm_bindgen(getter = obedienceLevel)]
     pub fn obedience_level(&self) -> u8 {
         self.main_data.obedience_level
     }
-    #[wasm_bindgen(setter, js_name = obedienceLevel)]
+    #[wasm_bindgen(setter = obedienceLevel)]
     pub fn set_obedience_level(&mut self, v: u8) {
         self.main_data.obedience_level = v;
     }
@@ -1641,22 +736,22 @@ impl OhpkmV2 {
         self.main_data.nickname = SizedUtf16String::<26>::from(value);
     }
 
-    #[wasm_bindgen(getter)]
+    #[wasm_bindgen(getter = trainerName)]
     pub fn trainer_name(&self) -> String {
         self.main_data.trainer_name.to_string()
     }
 
-    #[wasm_bindgen(setter)]
+    #[wasm_bindgen(setter = trainerName)]
     pub fn set_trainer_name(&mut self, value: String) {
         self.main_data.trainer_name = SizedUtf16String::<24>::from(value);
     }
 
-    #[wasm_bindgen(getter)]
+    #[wasm_bindgen(getter = handlerName)]
     pub fn handler_name(&self) -> String {
         self.main_data.handler_name.to_string()
     }
 
-    #[wasm_bindgen(setter)]
+    #[wasm_bindgen(setter = handlerName)]
     pub fn set_handler_name(&mut self, value: String) {
         self.main_data.handler_name = SizedUtf16String::<24>::from(value);
     }
@@ -1667,7 +762,7 @@ impl OhpkmV2 {
     }
 
     #[wasm_bindgen(setter)]
-    pub fn set_move_indices(&mut self, value: Vec<u16>) {
+    pub fn set_move_indices(&mut self, value: &[u16]) {
         self.main_data.moves = [
             MoveSlot::from(value[0]),
             MoveSlot::from(value[1]),
@@ -1682,7 +777,7 @@ impl OhpkmV2 {
     }
 
     #[wasm_bindgen(setter)]
-    pub fn set_move_pp(&mut self, value: Vec<u8>) {
+    pub fn set_move_pp(&mut self, value: &[u8]) {
         self.main_data.move_pp = [value[0], value[1], value[2], value[3]]
     }
 
@@ -1692,7 +787,7 @@ impl OhpkmV2 {
     }
 
     #[wasm_bindgen(setter)]
-    pub fn set_move_pp_ups(&mut self, value: Vec<u8>) {
+    pub fn set_move_pp_ups(&mut self, value: &[u8]) {
         self.main_data.move_pp_ups = [value[0], value[1], value[2], value[3]]
     }
 
@@ -1706,22 +801,13 @@ impl OhpkmV2 {
     }
 
     #[wasm_bindgen(setter)]
-    pub fn set_relearn_move_indices(&mut self, value: Vec<u16>) {
+    pub fn set_relearn_move_indices(&mut self, value: &[u16]) {
         self.main_data.relearn_moves = [
             MoveSlot::from(value[0]),
             MoveSlot::from(value[1]),
             MoveSlot::from(value[2]),
             MoveSlot::from(value[3]),
         ]
-    }
-
-    #[wasm_bindgen(js_name = allRibbonNames)]
-    pub fn all_ribbon_names(&self) -> Vec<String> {
-        self.main_data
-            .ribbons
-            .into_iter()
-            .map(|ribbon| ribbon.to_string())
-            .collect()
     }
 
     #[wasm_bindgen(js_name = addModernRibbons)]
@@ -1755,12 +841,14 @@ impl OhpkmV2 {
     //     }
     // }
 
-    #[wasm_bindgen(getter)]
+    // Plugins
+
+    #[wasm_bindgen(getter = pluginOrigin)]
     pub fn plugin_origin(&self) -> Option<String> {
         Some(self.plugin_data.clone()?.plugin_origin)
     }
 
-    #[wasm_bindgen(setter)]
+    #[wasm_bindgen(setter = pluginOrigin)]
     pub fn set_plugin_origin(&mut self, value: Option<String>) {
         match value {
             Some(plugin_origin) => {
@@ -1770,42 +858,503 @@ impl OhpkmV2 {
         }
     }
 
-    // Scarlet/Violet
+    // Game Boy
 
-    #[wasm_bindgen(getter)]
-    pub fn tera_type_original(&self) -> Option<TeraTypeWasm> {
-        self.sv_data
-            .map(|d| TeraTypeWasm::from(d.tera_type_original))
+    #[wasm_bindgen(getter = dvsWasm)]
+    pub fn dvs(&self) -> Option<StatsPreSplit> {
+        Some(self.gameboy_data?.dvs)
+    }
+
+    #[wasm_bindgen(setter = dvsWasm)]
+    pub fn set_dvs(&mut self, value: Option<StatsPreSplit>) {
+        log(&format!("setting dvs to {value:?}"));
+        match value {
+            Some(dvs) => self.gameboy_data.get_or_insert_default().dvs = dvs,
+            None => self.gameboy_data = None,
+        }
+    }
+
+    #[wasm_bindgen(getter = metTimeOfDay)]
+    pub fn met_time_of_day(&self) -> Option<u8> {
+        Some(self.gameboy_data?.met_time_of_day)
+    }
+
+    #[wasm_bindgen(setter = metTimeOfDay)]
+    pub fn set_met_time_of_day(&mut self, value: Option<u8>) {
+        match value {
+            Some(met_tod) => self.gameboy_data.get_or_insert_default().met_time_of_day = met_tod,
+            None => self.gameboy_data = None,
+        }
+    }
+
+    #[wasm_bindgen(getter = evsG12Wasm)]
+    pub fn evs_g12(&self) -> Option<StatsPreSplit> {
+        Some(self.gameboy_data?.evs_g12)
+    }
+
+    #[wasm_bindgen(setter = evsG12Wasm)]
+    pub fn set_evs_g12(&mut self, value: Option<StatsPreSplit>) {
+        match value {
+            Some(evs_g12) => self.gameboy_data.get_or_insert_default().evs_g12 = evs_g12,
+            None => self.gameboy_data = None,
+        }
+    }
+
+    // Gen 4/5
+
+    #[wasm_bindgen(getter = encounterType)]
+    pub fn encounter_type(&self) -> Option<u8> {
+        Some(self.gen45_data?.encounter_type)
+    }
+
+    #[wasm_bindgen(setter = encounterType)]
+    pub fn set_encounter_type(&mut self, value: Option<u8>) {
+        match value {
+            Some(encounter_type) => {
+                self.gen45_data.get_or_insert_default().encounter_type = encounter_type
+            }
+            None => {
+                if let Some(gen45_data) = &mut self.gen45_data {
+                    gen45_data.encounter_type = 0
+                }
+            }
+        }
     }
 
     #[wasm_bindgen(getter)]
-    pub fn tera_type_override(&self) -> Option<TeraTypeWasm> {
-        self.sv_data
-            .map(|d| TeraTypeWasm::from(d.tera_type_original))
+    pub fn performance(&self) -> Option<u8> {
+        Some(self.gen45_data?.performance)
     }
 
     #[wasm_bindgen(setter)]
-    pub fn set_tera_type_override(&mut self, value: Option<TeraTypeWasm>) {
+    pub fn set_performance(&mut self, value: Option<u8>) {
+        match value {
+            Some(performance) => self.gen45_data.get_or_insert_default().performance = performance,
+            None => {
+                if let Some(gen45_data) = &mut self.gen45_data {
+                    gen45_data.performance = 0
+                }
+            }
+        }
+    }
+
+    #[wasm_bindgen(getter = shinyLeaves)]
+    pub fn shiny_leaves(&self) -> Option<u8> {
+        Some(self.gen45_data?.shiny_leaves)
+    }
+
+    #[wasm_bindgen(setter = shinyLeaves)]
+    pub fn set_shiny_leaves(&mut self, value: Option<u8>) {
+        match value {
+            Some(shiny_leaves) => {
+                self.gen45_data.get_or_insert_default().shiny_leaves = shiny_leaves
+            }
+            None => {
+                if let Some(gen45_data) = &mut self.gen45_data {
+                    gen45_data.shiny_leaves = 0
+                }
+            }
+        }
+    }
+
+    #[wasm_bindgen(getter = pokeStarFame)]
+    pub fn poke_star_fame(&self) -> Option<u8> {
+        Some(self.gen45_data?.poke_star_fame)
+    }
+
+    #[wasm_bindgen(setter = pokeStarFame)]
+    pub fn set_poke_star_fame(&mut self, value: Option<u8>) {
+        match value {
+            Some(poke_star_fame) => {
+                self.gen45_data.get_or_insert_default().poke_star_fame = poke_star_fame
+            }
+            None => {
+                if let Some(gen45_data) = &mut self.gen45_data {
+                    gen45_data.poke_star_fame = 0
+                }
+            }
+        }
+    }
+
+    #[wasm_bindgen(getter = isNsPokemon)]
+    pub fn is_ns_pokemon(&self) -> Option<bool> {
+        Some(self.gen45_data?.is_ns_pokemon)
+    }
+
+    #[wasm_bindgen(setter = isNsPokemon)]
+    pub fn set_is_ns_pokemon(&mut self, value: Option<bool>) {
+        match value {
+            Some(is_ns_pokemon) => {
+                self.gen45_data.get_or_insert_default().is_ns_pokemon = is_ns_pokemon
+            }
+            None => {
+                if let Some(gen45_data) = &mut self.gen45_data {
+                    gen45_data.is_ns_pokemon = false
+                }
+            }
+        }
+    }
+
+    // Gen 6/7
+
+    #[wasm_bindgen(getter = trainingBagHits)]
+    pub fn training_bag_hits(&self) -> Option<u8> {
+        Some(self.gen67_data?.training_bag_hits)
+    }
+
+    #[wasm_bindgen(setter = trainingBagHits)]
+    pub fn set_training_bag_hits(&mut self, value: Option<u8>) {
+        match value {
+            Some(training_bag_hits) => {
+                self.gen67_data.get_or_insert_default().training_bag_hits = training_bag_hits
+            }
+            None => {
+                if let Some(gen67_data) = &mut self.gen67_data {
+                    gen67_data.training_bag_hits = 0
+                }
+            }
+        }
+    }
+
+    #[wasm_bindgen(getter = trainingBag)]
+    pub fn training_bag(&self) -> Option<u8> {
+        Some(self.gen67_data?.training_bag)
+    }
+
+    #[wasm_bindgen(setter = trainingBag)]
+    pub fn set_training_bag(&mut self, value: Option<u8>) {
+        match value {
+            Some(training_bag) => {
+                self.gen67_data.get_or_insert_default().training_bag = training_bag
+            }
+            None => {
+                if let Some(gen67_data) = &mut self.gen67_data {
+                    gen67_data.training_bag = 0
+                }
+            }
+        }
+    }
+
+    #[wasm_bindgen(getter = superTrainingFlags)]
+    pub fn super_training_flags(&self) -> Option<u32> {
+        Some(self.gen67_data?.super_training_flags)
+    }
+
+    #[wasm_bindgen(setter = superTrainingFlags)]
+    pub fn set_super_training_flags(&mut self, value: Option<u32>) {
+        match value {
+            Some(super_training_flags) => {
+                self.gen67_data.get_or_insert_default().super_training_flags = super_training_flags
+            }
+            None => {
+                if let Some(gen67_data) = &mut self.gen67_data {
+                    gen67_data.super_training_flags = 0
+                }
+            }
+        }
+    }
+
+    #[wasm_bindgen(getter = superTrainingDistFlags)]
+    pub fn super_training_dist_flags(&self) -> Option<u8> {
+        Some(self.gen67_data?.super_training_dist_flags)
+    }
+
+    #[wasm_bindgen(setter = superTrainingDistFlags)]
+    pub fn set_super_training_dist_flags(&mut self, value: Option<u8>) {
+        match value {
+            Some(super_training_dist_flags) => {
+                self.gen67_data
+                    .get_or_insert_default()
+                    .super_training_dist_flags = super_training_dist_flags
+            }
+            None => {
+                if let Some(gen67_data) = &mut self.gen67_data {
+                    gen67_data.super_training_dist_flags = 0
+                }
+            }
+        }
+    }
+
+    #[wasm_bindgen(getter = secretSuperTrainingUnlocked)]
+    pub fn secret_super_training_unlocked(&self) -> Option<bool> {
+        Some(self.gen67_data?.secret_super_training_unlocked)
+    }
+
+    #[wasm_bindgen(setter = secretSuperTrainingUnlocked)]
+    pub fn set_secret_super_training_unlocked(&mut self, value: Option<bool>) {
+        match value {
+            Some(secret_super_training_unlocked) => {
+                self.gen67_data
+                    .get_or_insert_default()
+                    .secret_super_training_unlocked = secret_super_training_unlocked
+            }
+            None => {
+                if let Some(gen67_data) = &mut self.gen67_data {
+                    gen67_data.secret_super_training_unlocked = false
+                }
+            }
+        }
+    }
+
+    #[wasm_bindgen(getter = secretSuperTrainingComplete)]
+    pub fn secret_super_training_complete(&self) -> Option<bool> {
+        Some(self.gen67_data?.secret_super_training_complete)
+    }
+
+    #[wasm_bindgen(setter = secretSuperTrainingComplete)]
+    pub fn set_secret_super_training_complete(&mut self, value: Option<bool>) {
+        match value {
+            Some(secret_super_training_complete) => {
+                self.gen67_data
+                    .get_or_insert_default()
+                    .secret_super_training_complete = secret_super_training_complete
+            }
+            None => {
+                if let Some(gen67_data) = &mut self.gen67_data {
+                    gen67_data.secret_super_training_complete = false
+                }
+            }
+        }
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn country(&self) -> Option<u8> {
+        Some(self.gen67_data?.country)
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_country(&mut self, value: Option<u8>) {
+        match value {
+            Some(country) => self.gen67_data.get_or_insert_default().country = country,
+            None => {
+                if let Some(gen67_data) = &mut self.gen67_data {
+                    gen67_data.country = 0
+                }
+            }
+        }
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn region(&self) -> Option<u8> {
+        Some(self.gen67_data?.region)
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_region(&mut self, value: Option<u8>) {
+        match value {
+            Some(region) => self.gen67_data.get_or_insert_default().region = region,
+            None => {
+                if let Some(gen67_data) = &mut self.gen67_data {
+                    gen67_data.region = 0
+                }
+            }
+        }
+    }
+
+    #[wasm_bindgen(getter = geolocationsWasm)]
+    pub fn geolocations(&self) -> Option<Geolocations> {
+        Some(self.gen67_data?.geolocations)
+    }
+
+    #[wasm_bindgen(setter = geolocationsWasm)]
+    pub fn set_geolocations(&mut self, value: Option<Geolocations>) {
+        match value {
+            Some(geolocations) => {
+                self.gen67_data.get_or_insert_default().geolocations = geolocations
+            }
+            None => {
+                if let Some(gen67_data) = &mut self.gen67_data {
+                    gen67_data.geolocations = Geolocations::default()
+                }
+            }
+        }
+    }
+
+    #[wasm_bindgen(getter = resortEventStatus)]
+    pub fn resort_event_status(&self) -> Option<u8> {
+        Some(self.gen67_data?.resort_event_status)
+    }
+
+    #[wasm_bindgen(setter = resortEventStatus)]
+    pub fn set_resort_event_status(&mut self, value: Option<u8>) {
+        match value {
+            Some(resort_event_status) => {
+                self.gen67_data.get_or_insert_default().resort_event_status = resort_event_status
+            }
+            None => {
+                if let Some(gen67_data) = &mut self.gen67_data {
+                    gen67_data.resort_event_status = 0
+                }
+            }
+        }
+    }
+
+    #[wasm_bindgen(getter = avsWasm)]
+    pub fn avs(&self) -> Option<Stats16Le> {
+        Some(self.gen67_data?.avs)
+    }
+
+    #[wasm_bindgen(setter = avsWasm)]
+    pub fn set_avs(&mut self, value: Option<Stats16Le>) {
+        match value {
+            Some(avs) => self.gen67_data.get_or_insert_default().avs = avs,
+            None => {
+                if let Some(gen67_data) = &mut self.gen67_data {
+                    gen67_data.avs = Stats16Le::default()
+                }
+            }
+        }
+    }
+
+    // Sword/Shield
+
+    #[wasm_bindgen(getter = canGigantamax)]
+    pub fn can_gigantamax(&self) -> Option<bool> {
+        Some(self.swsh_data?.can_gigantamax)
+    }
+
+    #[wasm_bindgen(setter = canGigantamax)]
+    pub fn set_can_gigantamax(&mut self, value: Option<bool>) {
+        match value {
+            Some(can_gigantamax) => {
+                self.swsh_data.get_or_insert_default().can_gigantamax = can_gigantamax
+            }
+            None => {
+                if let Some(swsh_data) = &mut self.swsh_data {
+                    swsh_data.can_gigantamax = false
+                }
+            }
+        }
+    }
+
+    #[wasm_bindgen(getter = dynamaxLevel)]
+    pub fn dynamax_level(&self) -> Option<u8> {
+        Some(self.swsh_data?.dynamax_level)
+    }
+
+    #[wasm_bindgen(setter = dynamaxLevel)]
+    pub fn set_dynamax_level(&mut self, value: Option<u8>) {
+        match value {
+            Some(dynamax_level) => {
+                self.swsh_data.get_or_insert_default().dynamax_level = dynamax_level
+            }
+            None => {
+                if let Some(swsh_data) = &mut self.swsh_data {
+                    swsh_data.dynamax_level = 0
+                }
+            }
+        }
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn palma(&self) -> Option<u32> {
+        Some(self.swsh_data?.palma)
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_palma(&mut self, value: Option<u32>) {
+        match value {
+            Some(palma) => self.swsh_data.get_or_insert_default().palma = palma,
+            None => {
+                if let Some(swsh_data) = &mut self.swsh_data {
+                    swsh_data.palma = 0
+                }
+            }
+        }
+    }
+
+    #[wasm_bindgen(getter = trFlagsSwSh)]
+    pub fn tr_flags_swsh(&self) -> Option<Vec<u8>> {
+        Some(self.swsh_data?.tr_flags.to_vec())
+    }
+
+    #[wasm_bindgen(setter = trFlagsSwSh)]
+    pub fn set_tr_flags_swsh(&mut self, value: Option<Vec<u8>>) {
+        match value {
+            Some(tr_flags) => self.swsh_data.get_or_insert_default().tr_flags[0..tr_flags.len()]
+                .copy_from_slice(&tr_flags),
+            None => {
+                if let Some(swsh_data) = &mut self.swsh_data {
+                    swsh_data.tr_flags = [0u8; 14]
+                }
+            }
+        }
+    }
+
+    // Scarlet/Violet
+
+    #[wasm_bindgen(getter = teraTypeOriginal)]
+    pub fn tera_type_original(&self) -> TeraTypeWasm {
+        log(&format!(
+            "sv data: {:?} -> {:?}",
+            self.sv_data,
+            self.sv_data
+                .map(|d| TeraTypeWasm::from(d.tera_type_original))
+                .unwrap_or(
+                    self.species_and_forme()
+                        .get_forme_metadata()
+                        .transferred_tera_type()
+                        .into(),
+                )
+        ));
+        self.sv_data
+            .map(|d| TeraTypeWasm::from(d.tera_type_original))
+            .unwrap_or(
+                self.species_and_forme()
+                    .get_forme_metadata()
+                    .transferred_tera_type()
+                    .into(),
+            )
+    }
+
+    #[wasm_bindgen(js_name = setTeraTypeOriginalIf)]
+    pub fn set_tera_type_original_if(&mut self, value: Option<u8>) {
+        log(&format!("setting original tera type to {value:?}"));
+        let Some(value) = value else { return };
+
+        if let Some(tera_type) = TeraTypeWasm::from_byte(value) {
+            self.sv_data
+                .get_or_insert(ScarletVioletData::default_generated_tera_type(
+                    self.main_data.species_and_forme,
+                ))
+                .tera_type_original = tera_type.into()
+        }
+    }
+
+    #[wasm_bindgen(getter = teraTypeOverride)]
+    pub fn tera_type_override(&self) -> u8 {
+        self.sv_data
+            .and_then(|d| d.tera_type_override)
+            .map_or(19, TeraType::to_byte)
+    }
+
+    #[wasm_bindgen(setter = teraTypeOverride)]
+    pub fn set_tera_type_override(&mut self, value: u8) {
         self.sv_data
             .get_or_insert(ScarletVioletData::default_generated_tera_type(
                 self.main_data.species_and_forme,
             ))
-            .tera_type_override = value.map(TeraType::from);
+            .tera_type_override = TeraType::from_byte(value);
 
         if self.sv_data.as_ref().is_some_and(DataSection::is_empty) {
             self.sv_data = None
         }
     }
 
-    // #[wasm_bindgen(setter)]
-    // pub fn set_ribbon_indices(&mut self, indices: Vec<usize>) {
-    //     self.main_data
-    //         .ribbons
-    //         .set_ribbons(indices.into_iter().map(ModernRibbon::from).collect());
-    // }
-    #[wasm_bindgen(js_name = toBytes)]
+    #[wasm_bindgen(js_name = toByteArray)]
     pub fn to_bytes_js(&self) -> JsResult<Vec<u8>> {
-        self.to_bytes()
-            .map_err(|e| JsValue::from_str(&e.to_string()))
+        log("to bytes in rust");
+        let r = self
+            .to_bytes()
+            .map_err(|e| JsValue::from_str(&e.to_string()));
+        log("to bytes in rust DONE");
+
+        r
+    }
+}
+
+impl Drop for OhpkmV2 {
+    fn drop(&mut self) {
+        log("dropping in rust")
     }
 }

@@ -4,6 +4,7 @@ import lodash, { range } from 'lodash'
 import { useContext, useMemo, useState } from 'react'
 import { MdClose } from 'react-icons/md'
 import { BackendContext } from 'src/backend/backendContext'
+import Fallback from 'src/components/Fallback'
 import { MenuIcon } from 'src/components/Icons'
 import AttributeRow from 'src/pokemon/AttributeRow'
 import PokemonDetailsModal from 'src/pokemon/PokemonDetailsModal'
@@ -274,24 +275,26 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
         </Dialog.Root>
       </Flex>
 
-      <PokemonDetailsModal
-        mon={selectedMon}
-        onClose={() => setSelectedIndex(undefined)}
-        navigateRight={navigateRight}
-        navigateLeft={navigateLeft}
-        boxIndicatorProps={
-          selectedIndex !== undefined
-            ? {
-                currentIndex: selectedIndex,
-                columns: save.boxColumns,
-                rows: save.boxRows,
-                emptyIndexes: range(save.boxColumns * save.boxRows).filter(
-                  (index) => !currentBox?.pokemon?.[index]
-                ),
-              }
-            : undefined
-        }
-      />
+      <Fallback>
+        <PokemonDetailsModal
+          mon={selectedMon}
+          onClose={() => setSelectedIndex(undefined)}
+          navigateRight={navigateRight}
+          navigateLeft={navigateLeft}
+          boxIndicatorProps={
+            selectedIndex !== undefined
+              ? {
+                  currentIndex: selectedIndex,
+                  columns: save.boxColumns,
+                  rows: save.boxRows,
+                  emptyIndexes: range(save.boxColumns * save.boxRows).filter(
+                    (index) => !currentBox?.pokemon?.[index]
+                  ),
+                }
+              : undefined
+          }
+        />
+      </Fallback>
     </>
   ) : (
     <div />
