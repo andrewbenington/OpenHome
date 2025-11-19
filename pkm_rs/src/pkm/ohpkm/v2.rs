@@ -1,7 +1,7 @@
 use crate::pkm::ohpkm::OhpkmV1;
 use crate::pkm::ohpkm::sectioned_data::{DataSection, SectionTag, SectionedData};
 use crate::pkm::ohpkm::v2_sections::{
-    GameboyData, Gen45Data, Gen67Data, LegendsArceusData, MainDataV2, PluginData,
+    BdspData, GameboyData, Gen45Data, Gen67Data, LegendsArceusData, MainDataV2, PluginData,
     ScarletVioletData, SwordShieldData,
 };
 use crate::pkm::{Error, Result};
@@ -101,6 +101,7 @@ pub struct OhpkmV2 {
     pub gen45_data: Option<Gen45Data>,
     pub gen67_data: Option<Gen67Data>,
     pub swsh_data: Option<SwordShieldData>,
+    pub bdsp_data: Option<BdspData>,
     pub la_data: Option<LegendsArceusData>,
     #[wasm_bindgen(skip)]
     pub sv_data: Option<ScarletVioletData>,
@@ -134,6 +135,7 @@ impl OhpkmV2 {
             gen45_data: None,
             gen67_data: None,
             swsh_data: None,
+            bdsp_data: None,
             la_data: None,
             sv_data: None,
             plugin_data: None,
@@ -155,6 +157,7 @@ impl OhpkmV2 {
             gen45_data: Gen45Data::extract_from(&sectioned_data)?,
             gen67_data: Gen67Data::extract_from(&sectioned_data)?,
             swsh_data: SwordShieldData::extract_from(&sectioned_data)?,
+            bdsp_data: BdspData::extract_from(&sectioned_data)?,
             la_data: LegendsArceusData::extract_from(&sectioned_data)?,
             sv_data: ScarletVioletData::extract_from(&sectioned_data)?,
             plugin_data: PluginData::extract_from(&sectioned_data)?,
@@ -168,6 +171,7 @@ impl OhpkmV2 {
             gen45_data: Gen45Data::from_v1(old),
             gen67_data: Gen67Data::from_v1(old),
             swsh_data: SwordShieldData::from_v1(old),
+            bdsp_data: BdspData::from_v1(old),
             la_data: LegendsArceusData::from_v1(old),
             sv_data: ScarletVioletData::from_v1(old),
             plugin_data: PluginData::from_v1(old),
@@ -182,6 +186,7 @@ impl OhpkmV2 {
             .add_if_some(self.gen45_data)?
             .add_if_some(self.gen67_data)?
             .add_if_some(self.swsh_data)?
+            .add_if_some(self.bdsp_data)?
             .add_if_some(self.la_data)?
             .add_if_some(self.sv_data)?
             .add_if_some(self.plugin_data.clone())?;
@@ -1281,6 +1286,217 @@ impl OhpkmV2 {
         }
     }
 
+    // Brilliant Diamond/Shining Pearl
+
+    #[wasm_bindgen(getter = tmFlagsBDSP)]
+    pub fn tutor_flags_bdsp(&self) -> Option<Vec<u8>> {
+        Some(self.bdsp_data?.tm_flags.to_bytes().to_vec())
+    }
+
+    #[wasm_bindgen(setter = tmFlagsBDSP)]
+    pub fn set_tm_flags_bdsp(&mut self, value: Option<Vec<u8>>) {
+        match value {
+            Some(tm_flags) => {
+                let mut new_bytes = [0u8; 14];
+                new_bytes.copy_from_slice(&tm_flags);
+                self.bdsp_data.get_or_insert_default().tm_flags =
+                    FlagSet::<14>::from_bytes(new_bytes);
+            }
+            None => {
+                if let Some(bdsp_data) = &mut self.bdsp_data {
+                    bdsp_data.tm_flags = FlagSet::default();
+                }
+            }
+        }
+    }
+
+    // Legends Arceus
+
+    #[wasm_bindgen(getter = gvsWasm)]
+    pub fn gvs(&self) -> Option<Stats8> {
+        Some(self.la_data?.gvs)
+    }
+
+    #[wasm_bindgen(setter = gvsWasm)]
+    pub fn set_gvs(&mut self, value: Option<Stats8>) {
+        match value {
+            Some(gvs) => self.la_data.get_or_insert_default().gvs = gvs,
+            None => {
+                if let Some(la_data) = &mut self.la_data {
+                    la_data.gvs = Stats8::default()
+                }
+            }
+        }
+    }
+
+    #[wasm_bindgen(getter = alphaMove)]
+    pub fn alpha_move(&self) -> Option<u16> {
+        Some(self.la_data?.alpha_move)
+    }
+
+    #[wasm_bindgen(setter = alphaMove)]
+    pub fn set_alpha_move(&mut self, value: Option<u16>) {
+        match value {
+            Some(alpha_move) => self.la_data.get_or_insert_default().alpha_move = alpha_move,
+            None => {
+                if let Some(la_data) = &mut self.la_data {
+                    la_data.alpha_move = 0
+                }
+            }
+        }
+    }
+
+    #[wasm_bindgen(getter = moveFlagsLA)]
+    pub fn move_flags_la(&self) -> Option<Vec<u8>> {
+        Some(self.la_data?.move_flags.to_bytes().to_vec())
+    }
+
+    #[wasm_bindgen(setter = moveFlagsLA)]
+    pub fn set_move_flags_la(&mut self, value: Option<Vec<u8>>) {
+        match value {
+            Some(move_flags) => {
+                let mut new_bytes = [0u8; 14];
+                new_bytes.copy_from_slice(&move_flags);
+                self.la_data.get_or_insert_default().move_flags =
+                    FlagSet::<14>::from_bytes(new_bytes);
+            }
+            None => {
+                if let Some(la_data) = &mut self.la_data {
+                    la_data.move_flags = FlagSet::default();
+                }
+            }
+        }
+    }
+
+    #[wasm_bindgen(getter = tutorFlagsLA)]
+    pub fn tutor_flags_la(&self) -> Option<Vec<u8>> {
+        Some(self.la_data?.tutor_flags.to_bytes().to_vec())
+    }
+
+    #[wasm_bindgen(setter = tutorFlagsLA)]
+    pub fn set_tutor_flags_la(&mut self, value: Option<Vec<u8>>) {
+        match value {
+            Some(tutor_flags) => {
+                let mut new_bytes = [0u8; 8];
+                new_bytes.copy_from_slice(&tutor_flags);
+                self.la_data.get_or_insert_default().tutor_flags =
+                    FlagSet::<8>::from_bytes(new_bytes);
+            }
+            None => {
+                if let Some(la_data) = &mut self.la_data {
+                    la_data.tutor_flags = FlagSet::default();
+                }
+            }
+        }
+    }
+
+    #[wasm_bindgen(getter = masterFlagsLA)]
+    pub fn master_flags_la(&self) -> Option<Vec<u8>> {
+        Some(self.la_data?.master_flags.to_bytes().to_vec())
+    }
+
+    #[wasm_bindgen(setter = masterFlagsLA)]
+    pub fn set_master_flags_la(&mut self, value: Option<Vec<u8>>) {
+        match value {
+            Some(master_flags) => {
+                let mut new_bytes = [0u8; 8];
+                new_bytes.copy_from_slice(&master_flags);
+                self.la_data.get_or_insert_default().master_flags =
+                    FlagSet::<8>::from_bytes(new_bytes);
+            }
+            None => {
+                if let Some(la_data) = &mut self.la_data {
+                    la_data.master_flags = FlagSet::default();
+                }
+            }
+        }
+    }
+
+    #[wasm_bindgen(getter = isNoble)]
+    pub fn is_noble(&self) -> Option<bool> {
+        Some(self.la_data?.is_noble)
+    }
+
+    #[wasm_bindgen(setter = isNoble)]
+    pub fn set_is_noble(&mut self, value: Option<bool>) {
+        match value {
+            Some(is_noble) => self.la_data.get_or_insert_default().is_noble = is_noble,
+            None => {
+                if let Some(la_data) = &mut self.la_data {
+                    la_data.is_noble = false
+                }
+            }
+        }
+    }
+
+    #[wasm_bindgen(getter = isAlpha)]
+    pub fn is_alpha(&self) -> Option<bool> {
+        Some(self.la_data?.is_alpha)
+    }
+
+    #[wasm_bindgen(setter = isAlpha)]
+    pub fn set_is_alpha(&mut self, value: Option<bool>) {
+        match value {
+            Some(is_alpha) => self.la_data.get_or_insert_default().is_alpha = is_alpha,
+            None => {
+                if let Some(la_data) = &mut self.la_data {
+                    la_data.is_alpha = false
+                }
+            }
+        }
+    }
+
+    #[wasm_bindgen(getter = flag2LA)]
+    pub fn flag2_la(&self) -> Option<bool> {
+        Some(self.la_data?.flag2)
+    }
+
+    #[wasm_bindgen(setter = flag2LA)]
+    pub fn set_flag2_la(&mut self, value: Option<bool>) {
+        match value {
+            Some(flag2_la) => self.la_data.get_or_insert_default().flag2 = flag2_la,
+            None => {
+                if let Some(la_data) = &mut self.la_data {
+                    la_data.flag2 = false
+                }
+            }
+        }
+    }
+
+    #[wasm_bindgen(getter = unknownF3)]
+    pub fn unknown_f3(&self) -> Option<u8> {
+        Some(self.la_data?.unknown_f3)
+    }
+
+    #[wasm_bindgen(setter = unknownF3)]
+    pub fn set_unknown_f3(&mut self, value: Option<u8>) {
+        match value {
+            Some(unknown_f3) => self.la_data.get_or_insert_default().unknown_f3 = unknown_f3,
+            None => {
+                if let Some(la_data) = &mut self.la_data {
+                    la_data.unknown_f3 = 0
+                }
+            }
+        }
+    }
+
+    #[wasm_bindgen(getter = unknownA0)]
+    pub fn unknown_a0(&self) -> Option<u32> {
+        Some(self.la_data?.unknown_a0)
+    }
+
+    #[wasm_bindgen(setter = unknownA0)]
+    pub fn set_unknown_a0(&mut self, value: Option<u32>) {
+        match value {
+            Some(unknown_a0) => self.la_data.get_or_insert_default().unknown_a0 = unknown_a0,
+            None => {
+                if let Some(la_data) = &mut self.la_data {
+                    la_data.unknown_a0 = 0
+                }
+            }
+        }
+    }
+
     // Scarlet/Violet
 
     #[wasm_bindgen(getter = teraTypeOriginal)]
@@ -1329,23 +1545,45 @@ impl OhpkmV2 {
         }
     }
 
-    #[wasm_bindgen(getter = tmFlagsSv)]
+    #[wasm_bindgen(getter = tmFlagsSV)]
     pub fn tm_flags_sv(&self) -> Option<Vec<u8>> {
         Some(self.sv_data?.tm_flags.to_bytes().to_vec())
     }
 
-    #[wasm_bindgen(setter = tmFlagsSv)]
+    #[wasm_bindgen(setter = tmFlagsSV)]
     pub fn set_tm_flags_sv(&mut self, value: Option<Vec<u8>>) {
         match value {
-            Some(tr_flags) => {
+            Some(tm_flags) => {
                 let mut new_bytes = [0u8; 22];
-                new_bytes.copy_from_slice(&tr_flags);
+                new_bytes.copy_from_slice(&tm_flags);
                 self.sv_data.get_or_insert_default().tm_flags =
                     FlagSet::<22>::from_bytes(new_bytes);
             }
             None => {
                 if let Some(sv_data) = &mut self.sv_data {
                     sv_data.tm_flags = FlagSet::<22>::default();
+                }
+            }
+        }
+    }
+
+    #[wasm_bindgen(getter = tmFlagsSVDLC)]
+    pub fn tm_flags_sv_dlc(&self) -> Option<Vec<u8>> {
+        Some(self.sv_data?.tm_flags_dlc.to_bytes().to_vec())
+    }
+
+    #[wasm_bindgen(setter = tmFlagsSVDLC)]
+    pub fn set_tm_flags_sv_dlc(&mut self, value: Option<Vec<u8>>) {
+        match value {
+            Some(tm_flags_dlc) => {
+                let mut new_bytes = [0u8; 13];
+                new_bytes.copy_from_slice(&tm_flags_dlc);
+                self.sv_data.get_or_insert_default().tm_flags_dlc =
+                    FlagSet::<13>::from_bytes(new_bytes);
+            }
+            None => {
+                if let Some(sv_data) = &mut self.sv_data {
+                    sv_data.tm_flags_dlc = FlagSet::<13>::default();
                 }
             }
         }

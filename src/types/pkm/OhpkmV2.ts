@@ -33,10 +33,11 @@ import {
   markingsSixShapesColorsFromWasm,
   markingsSixShapesColorsToWasm,
   stats16LeToWasmNullable,
+  stats8ToWasm,
+  stats8ToWasmNullable,
   statsFromWasmNullable,
   statsPreSplitFromWasm,
   statsPreSplitToWasm,
-  statsToWasmStats8,
   trainerMemoryToWasm,
 } from './convert'
 import {
@@ -132,16 +133,14 @@ export class OhpkmV2 extends PkmRs.OhpkmV2 implements PKMInterface {
           other.gender ?? this.metadata?.genderFromPid(this.personalityValue) ?? Gender.Genderless
       }
 
-      console.log('doing nature stuff')
       this.nature = other.nature ?? NatureIndex.newFromPid(this.personalityValue)
-      console.log('and tada thats it')
 
-      this.ivs = statsToWasmStats8(
+      this.ivs = stats8ToWasm(
         other.ivs ?? (other.dvs !== undefined ? ivsFromDVs(other.dvs) : generateIVs(prng))
       )
 
       if (other.evs) {
-        this.evs = statsToWasmStats8(other.evs)
+        this.evs = stats8ToWasm(other.evs)
       }
       this.evsG12 = other.evsG12
 
@@ -287,36 +286,22 @@ export class OhpkmV2 extends PkmRs.OhpkmV2 implements PKMInterface {
       this.palma = other.palma
       this.trFlagsSwSh = other.trFlagsSwSh
 
-      // if (other.tmFlagsBDSP) {
-      //   this.tmFlagsBDSP = other.tmFlagsBDSP
-      // }
+      this.tmFlagsBDSP = other.tmFlagsBDSP
 
-      // this.isAlpha = other.isAlpha || this.ribbons.includes('Alpha Mark')
-      // if (other.isAlpha && !this.ribbons.includes('Alpha Mark')) {
-      //   this.ribbons = [...this.ribbons, 'Alpha Mark']
-      // }
-      // this.isNoble = other.isNoble ?? false
-      // this.alphaMove = other.alphaMove ?? 0
-      // this.gvs = other.gvs ?? gvsFromIVs(this.ivs)
+      this.isAlpha = other.isAlpha || this.ribbons.includes('Alpha Mark')
+      if (other.isAlpha && !this.ribbons.includes('Alpha Mark')) {
+        this.ribbons = [...this.ribbons, 'Alpha Mark']
+      }
+      this.isNoble = other.isNoble ?? false
+      this.alphaMove = other.alphaMove ?? 0
+      this.gvs = other.gvs
 
-      // if (other.moveFlagsLA) {
-      //   this.moveFlagsLA = other.moveFlagsLA
-      // }
-      // if (other.tutorFlagsLA) {
-      //   this.tutorFlagsLA = other.tutorFlagsLA
-      // }
-      // if (other.masterFlagsLA) {
-      //   this.masterFlagsLA = other.masterFlagsLA
-      // }
-      // if (other.flag2LA) {
-      //   this.flag2LA = other.flag2LA
-      // }
-      // if (other.unknownA0) {
-      //   this.unknownA0 = other.unknownA0
-      // }
-      // if (other.unknownF3) {
-      //   this.unknownF3 = other.unknownF3
-      // }
+      this.moveFlagsLA = other.moveFlagsLA
+      this.tutorFlagsLA = other.tutorFlagsLA
+      this.masterFlagsLA = other.masterFlagsLA
+      this.flag2LA = other.flag2LA
+      this.unknownA0 = other.unknownA0
+      this.unknownF3 = other.unknownF3
 
       if (other.heightScalar !== undefined && other.weightScalar !== undefined) {
         this.heightScalar = other.heightScalar
@@ -328,9 +313,8 @@ export class OhpkmV2 extends PkmRs.OhpkmV2 implements PKMInterface {
       this.teraTypeOverride = other.teraTypeOverride ?? 19
       this.setTeraTypeOriginalIf(other.teraTypeOriginal)
 
-      // if (other.tmFlagsSV) {
-      //   this.tmFlagsSV = other.tmFlagsSV
-      // }
+      this.tmFlagsSV = other.tmFlagsSV
+      this.tmFlagsSVDLC = other.tmFlagsSVDLC
     }
   }
 
@@ -457,6 +441,14 @@ export class OhpkmV2 extends PkmRs.OhpkmV2 implements PKMInterface {
       value.spd,
       value.spe
     )
+  }
+
+  get gvs() {
+    return statsFromWasmNullable(this.gvsWasm)
+  }
+
+  set gvs(value: Stats | undefined) {
+    this.gvsWasm = stats8ToWasmNullable(value)
   }
 
   public get heightAbsolute(): number {

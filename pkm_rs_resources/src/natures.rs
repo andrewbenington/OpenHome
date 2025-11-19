@@ -49,7 +49,7 @@ impl NatureIndex {
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(constructor))]
     pub fn new_js(val: u8) -> Result<NatureIndex, JsValue> {
-        log("creating new");
+        // log("creating new");
         if val > NATURE_MAX {
             log("BAD NATURE");
             Err(format!("Invalid nature index: {val}").into())
@@ -65,7 +65,7 @@ impl NatureIndex {
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
     pub fn index(&self) -> u8 {
-        log("getting index rust");
+        // log("getting index rust");
         self.0
     }
 

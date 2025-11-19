@@ -472,6 +472,7 @@ pub struct PastHandlerData {
     pub memory: TrainerMemory,
     pub affection: u8,
     pub gender: Gender,
+    pub origin_game: OriginGame,
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
@@ -769,6 +770,53 @@ impl DataSection for SwordShieldData {
             && self.palma == 0
             && self.dynamax_level == 0
             && bytes_are_empty(&self.tr_flags)
+    }
+}
+
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[derive(Debug, Default, Serialize, Clone, Copy)]
+pub struct BdspData {
+    #[wasm_bindgen(skip)]
+    pub tm_flags: FlagSet<14>,
+}
+
+impl BdspData {
+    pub fn from_v1(old: OhpkmV1) -> Option<Self> {
+        if !old.game_of_origin.is_bdsp() && bytes_are_empty(&old.tm_flags_bdsp) {
+            None
+        } else {
+            Some(Self {
+                tm_flags: FlagSet::from_bytes(old.tm_flags_bdsp),
+            })
+        }
+    }
+}
+
+impl DataSection for BdspData {
+    type TagType = SectionTagV2;
+    const TAG: Self::TagType = SectionTagV2::BdspTmFlags;
+
+    type ErrorType = Error;
+
+    fn from_bytes(bytes: &[u8]) -> Result<Self> {
+        Self::ensure_buffer_size(bytes)?;
+
+        // try_into() will always succeed thanks to the buffer size check
+        Ok(Self {
+            tm_flags: FlagSet::from_bytes(bytes[0..14].try_into().unwrap()),
+        })
+    }
+
+    fn to_bytes(&self) -> Result<Vec<u8>> {
+        let mut bytes = [0u8; 14];
+
+        bytes.copy_from_slice(&self.tm_flags.to_bytes());
+
+        Ok(bytes.to_vec())
+    }
+
+    fn is_empty(&self) -> bool {
+        self.tm_flags.is_empty()
     }
 }
 

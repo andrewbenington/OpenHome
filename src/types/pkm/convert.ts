@@ -86,7 +86,7 @@ export function contestStatsToWasm(value: ContestStats): PkmWasm.ContestStats {
   )
 }
 
-export function statsFromWasmStats8(value: PkmWasm.Stats8): Stats {
+export function stats8FromWasm(value: PkmWasm.Stats8): Stats {
   return {
     hp: value.hp,
     atk: value.atk,
@@ -97,7 +97,12 @@ export function statsFromWasmStats8(value: PkmWasm.Stats8): Stats {
   }
 }
 
-export function statsToWasmStats8(value: Stats): PkmWasm.Stats8 {
+export function stats8ToWasm(value: Stats): PkmWasm.Stats8 {
+  return new PkmWasm.Stats8(value.hp, value.atk, value.def, value.spa, value.spd, value.spe)
+}
+
+export function stats8ToWasmNullable(value: Stats | undefined): PkmWasm.Stats8 | undefined {
+  if (!value) return undefined
   return new PkmWasm.Stats8(value.hp, value.atk, value.def, value.spa, value.spd, value.spe)
 }
 
