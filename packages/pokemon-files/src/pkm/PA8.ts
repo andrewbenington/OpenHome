@@ -206,10 +206,10 @@ export class PA8 {
       this.homeTracker = new Uint8Array(buffer).slice(0x14d, 0x155)
       this.tutorFlagsLA = new Uint8Array(buffer).slice(0x155, 0x15d)
       this.masterFlagsLA = new Uint8Array(buffer).slice(0x15d, 0x165)
-      this.favorite = byteLogic.getFlag(dataView, 0x16, 4)
-      this.canGigantamax = byteLogic.getFlag(dataView, 0x16, 5)
-      this.isAlpha = byteLogic.getFlag(dataView, 0x16, 6)
-      this.isNoble = byteLogic.getFlag(dataView, 0x16, 7)
+      this.favorite = byteLogic.getFlag(dataView, 0x16, 3)
+      this.canGigantamax = byteLogic.getFlag(dataView, 0x16, 4)
+      this.isAlpha = byteLogic.getFlag(dataView, 0x16, 5)
+      this.isNoble = byteLogic.getFlag(dataView, 0x16, 6)
       this.ribbons = byteLogic
         .getFlagIndexes(dataView, 0x34, 0, 64)
         .map((index) => ModernRibbons[index])
@@ -445,10 +445,10 @@ export class PA8 {
     new Uint8Array(buffer).set(new Uint8Array(this.homeTracker.slice(0, 8)), 0x14d)
     new Uint8Array(buffer).set(new Uint8Array(this.tutorFlagsLA.slice(0, 8)), 0x155)
     new Uint8Array(buffer).set(new Uint8Array(this.masterFlagsLA.slice(0, 8)), 0x15d)
-    byteLogic.setFlag(dataView, 0x16, 4, this.favorite)
-    byteLogic.setFlag(dataView, 0x16, 5, this.canGigantamax)
-    byteLogic.setFlag(dataView, 0x16, 6, this.isAlpha)
-    byteLogic.setFlag(dataView, 0x16, 7, this.isNoble)
+    byteLogic.setFlag(dataView, 0x16, 3, this.favorite)
+    byteLogic.setFlag(dataView, 0x16, 4, this.canGigantamax)
+    byteLogic.setFlag(dataView, 0x16, 5, this.isAlpha)
+    byteLogic.setFlag(dataView, 0x16, 6, this.isNoble)
     byteLogic.setFlagIndexes(
       dataView,
       0x34,
