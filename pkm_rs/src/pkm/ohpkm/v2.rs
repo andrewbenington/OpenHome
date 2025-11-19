@@ -21,8 +21,8 @@ use pkm_rs_resources::species::SpeciesAndForme;
 #[cfg(feature = "wasm")]
 use pkm_rs_types::TeraTypeWasm;
 use pkm_rs_types::{
-    ContestStats, Geolocations, HyperTraining, MarkingsSixShapesColors, OriginGame, Stats8,
-    Stats16Le, StatsPreSplit, TeraType,
+    ContestStats, FlagSet, Geolocations, HyperTraining, MarkingsSixShapesColors, OriginGame,
+    Stats8, Stats16Le, StatsPreSplit, TeraType,
 };
 use pkm_rs_types::{Gender, PokeDate, TrainerMemory};
 use strum_macros::Display;
@@ -1285,18 +1285,6 @@ impl OhpkmV2 {
 
     #[wasm_bindgen(getter = teraTypeOriginal)]
     pub fn tera_type_original(&self) -> TeraTypeWasm {
-        log(&format!(
-            "sv data: {:?} -> {:?}",
-            self.sv_data,
-            self.sv_data
-                .map(|d| TeraTypeWasm::from(d.tera_type_original))
-                .unwrap_or(
-                    self.species_and_forme()
-                        .get_forme_metadata()
-                        .transferred_tera_type()
-                        .into(),
-                )
-        ));
         self.sv_data
             .map(|d| TeraTypeWasm::from(d.tera_type_original))
             .unwrap_or(
@@ -1338,6 +1326,28 @@ impl OhpkmV2 {
 
         if self.sv_data.as_ref().is_some_and(DataSection::is_empty) {
             self.sv_data = None
+        }
+    }
+
+    #[wasm_bindgen(getter = tmFlagsSv)]
+    pub fn tm_flags_sv(&self) -> Option<Vec<u8>> {
+        Some(self.sv_data?.tm_flags.to_bytes().to_vec())
+    }
+
+    #[wasm_bindgen(setter = tmFlagsSv)]
+    pub fn set_tm_flags_sv(&mut self, value: Option<Vec<u8>>) {
+        match value {
+            Some(tr_flags) => {
+                let mut new_bytes = [0u8; 22];
+                new_bytes.copy_from_slice(&tr_flags);
+                self.sv_data.get_or_insert_default().tm_flags =
+                    FlagSet::<22>::from_bytes(new_bytes);
+            }
+            None => {
+                if let Some(sv_data) = &mut self.sv_data {
+                    sv_data.tm_flags = FlagSet::<22>::default();
+                }
+            }
         }
     }
 

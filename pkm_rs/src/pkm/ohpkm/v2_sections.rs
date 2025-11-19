@@ -871,8 +871,8 @@ impl DataSection for LegendsArceusData {
 pub struct ScarletVioletData {
     pub tera_type_original: TeraType,
     pub tera_type_override: Option<TeraType>,
-    pub tm_flags_sv: FlagSet<22>,
-    pub tm_flags_sv_dlc: FlagSet<13>,
+    pub tm_flags: FlagSet<22>,
+    pub tm_flags_dlc: FlagSet<13>,
 }
 
 impl ScarletVioletData {
@@ -890,8 +890,8 @@ impl ScarletVioletData {
             Some(Self {
                 tera_type_original,
                 tera_type_override,
-                tm_flags_sv: FlagSet::from_bytes(old.tm_flags_sv),
-                tm_flags_sv_dlc: FlagSet::from_bytes(old.tm_flags_sv_dlc),
+                tm_flags: FlagSet::from_bytes(old.tm_flags_sv),
+                tm_flags_dlc: FlagSet::from_bytes(old.tm_flags_sv_dlc),
             })
         }
     }
@@ -924,8 +924,8 @@ impl DataSection for ScarletVioletData {
         Ok(Self {
             tera_type_original,
             tera_type_override: TeraType::from_byte(bytes[1]),
-            tm_flags_sv: FlagSet::from_bytes(bytes[2..24].try_into().unwrap()),
-            tm_flags_sv_dlc: FlagSet::from_bytes(bytes[24..37].try_into().unwrap()),
+            tm_flags: FlagSet::from_bytes(bytes[2..24].try_into().unwrap()),
+            tm_flags_dlc: FlagSet::from_bytes(bytes[24..37].try_into().unwrap()),
         })
     }
 
@@ -934,16 +934,16 @@ impl DataSection for ScarletVioletData {
 
         bytes[0] = self.tera_type_original.to_byte();
         bytes[1] = self.tera_type_override.map_or(0, TeraType::to_byte);
-        bytes[2..24].copy_from_slice(&self.tm_flags_sv.to_bytes());
-        bytes[24..37].copy_from_slice(&self.tm_flags_sv_dlc.to_bytes());
+        bytes[2..24].copy_from_slice(&self.tm_flags.to_bytes());
+        bytes[24..37].copy_from_slice(&self.tm_flags_dlc.to_bytes());
 
         Ok(bytes.to_vec())
     }
 
     fn is_empty(&self) -> bool {
         self.tera_type_override.is_none()
-            && self.tm_flags_sv.is_empty()
-            && self.tm_flags_sv_dlc.is_empty()
+            && self.tm_flags.is_empty()
+            && self.tm_flags_dlc.is_empty()
     }
 }
 
