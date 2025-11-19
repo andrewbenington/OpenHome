@@ -203,7 +203,7 @@ td:nth-child(1) {
   height: 400px;
   background-color: #aedac3;
   padding: 16px 64px;
-  display: grid;
+  display: flex;
   align-items: center;
 }
 
@@ -216,6 +216,7 @@ td:nth-child(1) {
 .download-label {
   font-weight: bold;
   font-size: 28px;
+  margin-top: 28px;
 }
 
 .experimental-label {
@@ -233,17 +234,26 @@ td:nth-child(1) {
 .download-buttons > a {
   border: none;
   border-radius: 8px;
-  padding: 12px 20px;
+  padding: 12px 48px 12px 20px;
   background-color: #e45454;
   font-weight: bold;
   font-size: 18px;
-  width: 160px;
+  min-width: 128px;
   text-align: start;
   position: relative;
   color: white;
   text-decoration: none;
   box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
   transition: background-color 0.15s;
+}
+
+.all-platforms-toggle {
+  border: none;
+  border-radius: 8px;
+  padding: 4px 8px;
+  margin-left: 4px;
+  font-size: 14px;
+  box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
 }
 
 .download-buttons > a:hover {
