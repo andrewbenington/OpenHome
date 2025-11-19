@@ -30,7 +30,7 @@
     "dev:unix": "./buildVersionJSON.sh && tauri dev",
     "dev:win": "powershell -ExecutionPolicy Bypass -File ./buildVersionJSON.ps1 && tauri dev",
     "build": "npm run wasm && vite build",
-    "dev": "vite",
+    "dev": "npm run wasm && vite",
     "tauri": "tauri",
     "test": "vitest run",
     "wasm-resources": "wasm-pack build ./pkm_rs_resources --target web -- --features wasm",
