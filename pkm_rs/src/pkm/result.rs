@@ -272,6 +272,7 @@ pub enum StringErrorSource {
     #[default]
     Other,
     PluginOrigin(FromUtf8Error),
+    Notes(FromUtf8Error),
 }
 
 
@@ -279,10 +280,11 @@ impl Display for StringErrorSource {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Other => f.write_str("other"),
-            Self::PluginOrigin(utf_error) =>  
-                f.write_fmt(format_args!("OHPKM plugin origin: {utf_error}")),
-            }
-            
+            Self::PluginOrigin(utf_error) =>  {
+                f.write_fmt(format_args!("OHPKM plugin origin: {utf_error}"))
+            },
+            Self::Notes(utf_error) => f.write_fmt(format_args!("OHPKM notes: {utf_error}")),
+        }
     }
 }
 

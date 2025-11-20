@@ -45,6 +45,7 @@ pub enum SectionTagV2 {
     LegendsArceus,
     ScarletViolet,
     PluginData,
+    Notes,
 }
 
 impl SectionTagV2 {
@@ -59,6 +60,7 @@ impl SectionTagV2 {
             6 => Some(Self::LegendsArceus),
             7 => Some(Self::ScarletViolet),
             8 => Some(Self::PluginData),
+            9 => Some(Self::Notes),
             _ => None,
         }
     }
@@ -74,6 +76,7 @@ impl SectionTagV2 {
             Self::LegendsArceus => 44,
             Self::ScarletViolet => 37,
             Self::PluginData => 0,
+            Self::Notes => 0,
         }
     }
 }

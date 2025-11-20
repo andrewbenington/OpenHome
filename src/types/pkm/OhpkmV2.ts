@@ -104,6 +104,7 @@ export class OhpkmV2 extends PkmRs.OhpkmV2 implements PKMInterface {
       this.nickname = other.nickname
       this.language = other.language
       this.gameOfOrigin = other.gameOfOrigin
+      this.gameOfOriginBattle = other.gameOfOriginBattle
       this.pluginOrigin = other.pluginOrigin
 
       this.isEgg = other.isEgg ?? false
@@ -170,7 +171,9 @@ export class OhpkmV2 extends PkmRs.OhpkmV2 implements PKMInterface {
       this.metTimeOfDay = other.metTimeOfDay ?? 0
       this.metLocationIndex = other.metLocationIndex ?? 0
       this.ability =
-        getAbilityFromNumber(this.dexNum, this.formeNum, this.abilityNum) ?? this.ability
+        other.ability ??
+        getAbilityFromNumber(this.dexNum, this.formeNum, this.abilityNum) ??
+        this.ability
 
       this.isShadow = other.isShadow ?? false
 

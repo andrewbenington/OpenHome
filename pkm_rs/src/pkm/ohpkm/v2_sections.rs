@@ -17,7 +17,7 @@ use serde::Serialize;
 
 use crate::{
     pkm::{
-        Error, Result,
+        Error, Result, StringErrorSource,
         ohpkm::{OhpkmV1, SectionTagV2, sectioned_data::DataSection},
     },
     strings::SizedUtf16String,
@@ -1038,5 +1038,32 @@ impl DataSection for PluginData {
 
     fn to_bytes(&self) -> Result<Vec<u8>> {
         Ok(self.plugin_origin.clone().into_bytes())
+    }
+}
+
+pub struct Notes(String);
+
+impl DataSection for Notes {
+    type TagType = SectionTagV2;
+    const TAG: Self::TagType = SectionTagV2::Notes;
+
+    type ErrorType = Error;
+
+    fn from_bytes(bytes: &[u8]) -> Result<Self> {
+        Self::ensure_buffer_size(bytes)?;
+
+        String::from_utf8(bytes.to_vec())
+            .map(Notes)
+            .map_err(|e| Error::StringDecode {
+                source: StringErrorSource::Notes(e),
+            })
+    }
+
+    fn to_bytes(&self) -> Result<Vec<u8>> {
+        Ok(self.0.clone().into_bytes())
+    }
+
+    fn is_empty(&self) -> bool {
+        self.0.is_empty()
     }
 }
