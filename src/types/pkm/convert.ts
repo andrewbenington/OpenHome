@@ -131,7 +131,7 @@ export function statsFromWasmNullable(
     atk: value.atk,
     def: value.def,
     spa: value.spa,
-    spd: value.spe,
+    spd: value.spd,
     spe: value.spe,
   }
 }

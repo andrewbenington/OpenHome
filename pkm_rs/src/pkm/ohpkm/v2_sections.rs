@@ -96,7 +96,7 @@ pub struct MainDataV2 {
     pub form_argument: u32,
     pub affixed_ribbon: Option<ModernRibbon>,
     #[wasm_bindgen(skip)]
-    pub trainer_name: SizedUtf16String<24>,
+    pub trainer_name: SizedUtf16String<26>,
     pub trainer_friendship: u8,
     pub trainer_memory: TrainerMemory,
     pub trainer_affection: u8,
@@ -320,7 +320,7 @@ impl DataSection for MainDataV2 {
             // geolocations: Geolocations::from_bytes(bytes[249..259].try_into().unwrap()),
             // encounter_type: bytes[270],
             // performance: bytes[271],
-            trainer_name: SizedUtf16String::<24>::from_bytes(bytes[272..296].try_into().unwrap()),
+            trainer_name: SizedUtf16String::<26>::from_bytes(bytes[272..298].try_into().unwrap()),
             trainer_friendship: bytes[298],
             trainer_memory: TrainerMemory {
                 intensity: bytes[299],
@@ -447,7 +447,7 @@ impl DataSection for MainDataV2 {
         // bytes[249..259].copy_from_slice(&self.geolocations.to_bytes());
         // bytes[270] = self.encounter_type;
         // bytes[271] = self.performance;
-        bytes[272..296].copy_from_slice(&self.trainer_name);
+        bytes[272..298].copy_from_slice(&self.trainer_name);
         bytes[298] = self.trainer_friendship;
 
         bytes[299] = self.trainer_memory.intensity;

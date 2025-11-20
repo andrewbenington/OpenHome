@@ -1402,7 +1402,7 @@ export class OHPKM implements PKMInterface {
   }
 
   public get homeTracker() {
-    return this.bytes.slice(0x13f, 0x14d + 8)
+    return this.bytes.slice(0x13f, 0x13f + 8)
   }
 
   public set homeTracker(value: Uint8Array) {
@@ -1553,12 +1553,16 @@ export class OHPKM implements PKMInterface {
 
     // Fix ability bug from pre-1.5.0 (affected Mind's Eye and Dragon's Maw)
     // Fix ability bug from pre-1.7.1 (abilities not updated after evolution/capsule/patch)
-    const speciesAbilities = metadata?.abilities ?? []
-    if (metadata?.hiddenAbility) {
-      speciesAbilities.push(metadata.hiddenAbility)
-    }
-    if (!this.ability || !speciesAbilities?.some((other) => other.index === this.ability?.index)) {
-      this.ability = getAbilityFromNumber(this.dexNum, this.formeNum, this.abilityNum)
+    // Fix ability num bug from some point in the past (set to 0 instead of 1)
+    if (!this.abilityNumMatchesIndex()) {
+      const fixedAbilityNum = this.abilityNumByIndex()
+      if (fixedAbilityNum) {
+        // This ability is a valid one for the species! Set the appropriate ability number
+        this.abilityNum = fixedAbilityNum
+      } else {
+        // Hm, this ability is invalid for the species. Let's reset it using the ability number
+        this.ability = getAbilityFromNumber(this.dexNum, this.formeNum, this.abilityNum)
+      }
       errorsFound = true
     }
 
@@ -1574,6 +1578,18 @@ export class OHPKM implements PKMInterface {
         errorsFound = true
       }
     }
+
+    // Only the lowest 4 bits are currently used
+    if ((this.bytes[0x22] & 0xf0) > 0) {
+      this.bytes[0x22] = this.bytes[0x22] & 0x0f
+    }
+
+    // Home tracker write error overwrote these bytes
+    if (this.bytes[0x14e] > 0 || this.bytes[0x14f] > 0) {
+      this.bytes.set([0, 0], 0x14e)
+    }
+
+    errorsFound = false
 
     return errorsFound
   }
@@ -1760,6 +1776,57 @@ export class OHPKM implements PKMInterface {
 
     this.nickname = other.nickname
   }
+
+  private abilityNumMatchesIndex(): boolean {
+    if (this.abilityNum === FIRST_ABILITY) return this.abilityIsFirstSlot()
+    if (this.abilityNum === SECOND_ABILITY) return this.abilityIsSecondSlot()
+    if (this.abilityNum === HIDDEN_ABILITY) return this.abilityIsHiddenSlot()
+
+    return false
+  }
+
+  private abilityNumByIndex(): AbilityNum | undefined {
+    const metadata = this.metadata
+    if (!metadata) return undefined
+
+    const [ability1, ability2] = metadata.abilities
+
+    if (this.ability?.index === ability1.index) return FIRST_ABILITY
+    if (this.ability?.index === ability2.index) return SECOND_ABILITY
+    if (metadata.hiddenAbility && this.ability?.index === metadata.hiddenAbility.index) {
+      return HIDDEN_ABILITY
+    }
+
+    return undefined
+  }
+
+  private abilityIsFirstSlot(): boolean {
+    const metadata = this.metadata
+    return (
+      metadata !== undefined &&
+      this.ability !== undefined &&
+      this.ability.index === metadata.abilities[0].index
+    )
+  }
+
+  private abilityIsSecondSlot(): boolean {
+    const metadata = this.metadata
+    return (
+      metadata !== undefined &&
+      this.ability !== undefined &&
+      this.ability.index === metadata.abilities[1].index
+    )
+  }
+
+  private abilityIsHiddenSlot(): boolean {
+    const metadata = this.metadata
+    const hiddenOrFirst = metadata?.hiddenAbility ?? metadata?.abilities[0]
+    return (
+      hiddenOrFirst !== undefined &&
+      this.ability !== undefined &&
+      this.ability.index === hiddenOrFirst.index
+    )
+  }
 }
 
 function extendUint8Array(array: Uint8Array, minLength: number) {
@@ -1773,6 +1840,11 @@ function extendUint8Array(array: Uint8Array, minLength: number) {
 
   return extendedArray
 }
+
+type AbilityNum = 1 | 2 | 4
+const FIRST_ABILITY: AbilityNum = 1
+const SECOND_ABILITY: AbilityNum = 2
+const HIDDEN_ABILITY: AbilityNum = 4
 
 type MarkingShape = keyof MarkingsSixShapesWithColor
 

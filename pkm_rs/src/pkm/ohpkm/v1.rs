@@ -102,7 +102,7 @@ pub struct OhpkmV1 {
     pub geolocations: Geolocations,
     pub encounter_type: u8,
     pub performance: u8,
-    pub trainer_name: SizedUtf16String<24>,
+    pub trainer_name: SizedUtf16String<26>,
     pub trainer_friendship: u8,
     pub trainer_memory: TrainerMemory,
     pub trainer_affection: u8,
@@ -246,7 +246,7 @@ impl OhpkmV1 {
             geolocations: Geolocations::from_bytes(bytes[249..259].try_into().unwrap()),
             encounter_type: bytes[270],
             performance: bytes[271],
-            trainer_name: SizedUtf16String::<24>::from_bytes(bytes[272..296].try_into().unwrap()),
+            trainer_name: SizedUtf16String::<26>::from_bytes(bytes[272..298].try_into().unwrap()),
             trainer_friendship: bytes[298],
             trainer_memory: TrainerMemory {
                 intensity: bytes[299],

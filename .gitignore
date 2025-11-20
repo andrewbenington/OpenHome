@@ -10,6 +10,7 @@ tsconfig.tsbuildinfo
 # testing
 /coverage
 tester.sh
+src/types/pkm/__test__/PKMFiles/OH
 
 # production
 /out

@@ -751,7 +751,7 @@ impl OhpkmV2 {
 
     #[wasm_bindgen(setter = trainerName)]
     pub fn set_trainer_name(&mut self, value: String) {
-        self.main_data.trainer_name = SizedUtf16String::<24>::from(value);
+        self.main_data.trainer_name = SizedUtf16String::<26>::from(value);
     }
 
     #[wasm_bindgen(getter = handlerName)]
@@ -1516,7 +1516,6 @@ impl OhpkmV2 {
 
     #[wasm_bindgen(js_name = setTeraTypeOriginalIf)]
     pub fn set_tera_type_original_if(&mut self, value: Option<u8>) {
-        log(&format!("setting original tera type to {value:?}"));
         let Some(value) = value else { return };
 
         if let Some(tera_type) = TeraTypeWasm::from_byte(value) {
@@ -1594,18 +1593,7 @@ impl OhpkmV2 {
 
     #[wasm_bindgen(js_name = toByteArray)]
     pub fn to_bytes_js(&self) -> JsResult<Vec<u8>> {
-        log("to bytes in rust");
-        let r = self
-            .to_bytes()
-            .map_err(|e| JsValue::from_str(&e.to_string()));
-        log("to bytes in rust DONE");
-
-        r
-    }
-}
-
-impl Drop for OhpkmV2 {
-    fn drop(&mut self) {
-        log("dropping in rust")
+        self.to_bytes()
+            .map_err(|e| JsValue::from_str(&e.to_string()))
     }
 }

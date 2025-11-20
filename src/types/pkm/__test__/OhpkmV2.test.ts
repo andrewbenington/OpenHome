@@ -9,18 +9,10 @@ import { initializeWasm } from './init'
 
 beforeAll(initializeWasm)
 
-var blazikenOhpkm: OHPKM
 var blazikenPk3: PK3
 var blazikenPk3Bytes: Uint8Array
 
-const OH_DIR = './PKMFiles/OH'
-
 beforeAll(() => {
-  blazikenOhpkm = bytesToPKM(
-    new Uint8Array(fs.readFileSync(path.join(__dirname, './PKMFiles/OH', 'blaziken.ohpkm'))),
-    'OHPKM'
-  ) as OHPKM
-
   blazikenPk3Bytes = new Uint8Array(
     fs.readFileSync(path.join(__dirname, './PKMFiles/Gen3', 'blaziken.pkm'))
   )
@@ -48,10 +40,12 @@ describe('OHPKM V1 → V2 → V1 is lossless', () => {
     .readdirSync(path.join(__dirname, 'PKMFiles', 'OH'))
     .filter((f) => f.endsWith('.ohpkm'))
 
-  for (const file of files.slice(0, 2)) {
+  for (const file of files) {
     test(file, () => {
       const bytes = new Uint8Array(fs.readFileSync(path.join(__dirname, 'PKMFiles', 'OH', file)))
       const original = bytesToPKM(bytes, 'OHPKM') as OHPKM
+      original.fixErrors()
+      original.homeTracker = new Uint8Array(8)
 
       const v2 = new OhpkmV2(original)
       const roundTrip = new OHPKM(v2)
