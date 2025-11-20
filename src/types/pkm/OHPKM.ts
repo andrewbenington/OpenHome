@@ -1598,11 +1598,19 @@ export class OHPKM implements PKMInterface {
     }
 
     this.heldItemIndex = other.heldItemIndex
-    if (other.ability) {
-      this.ability = other.ability
-    }
-    if (other.abilityNum) {
-      this.abilityNum = other.abilityNum
+    if (other.ability && !FORMATS_WITHOUT_ABILITIES.includes(other.format)) {
+      // don't update if OHPKM has hidden ability and the other mon is from
+      // a game without hidden abilities
+      if (
+        !this.ability ||
+        this.ability?.index !== this.metadata?.hiddenAbility?.index ||
+        !FORMATS_WITHOUT_HIDDEN_ABILITIES.includes(other.format)
+      ) {
+        this.ability = other.ability
+        if (other.abilityNum) {
+          this.abilityNum = other.abilityNum
+        }
+      }
     }
 
     if (other.avs) {
@@ -1767,3 +1775,7 @@ function extendUint8Array(array: Uint8Array, minLength: number) {
 }
 
 type MarkingShape = keyof MarkingsSixShapesWithColor
+
+const FORMATS_WITHOUT_ABILITIES = ['PA8', 'PA9']
+
+const FORMATS_WITHOUT_HIDDEN_ABILITIES = ['PK1', 'PK2', 'PK3', 'COLOPKM', 'XDPKM', 'PK4', 'PB7']
