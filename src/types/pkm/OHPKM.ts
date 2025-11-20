@@ -137,6 +137,7 @@ export class OHPKM implements PKMInterface {
       this.nickname = other.nickname
       this.language = other.language
       this.gameOfOrigin = other.gameOfOrigin
+      this.gameOfOriginBattle = other.gameOfOriginBattle ?? 0
       this.pluginOrigin = other.pluginOrigin
 
       this.isEgg = other.isEgg ?? false
@@ -894,9 +895,9 @@ export class OHPKM implements PKMInterface {
     this.bytes[0xa4] = value.hp
     this.bytes[0xa5] = value.atk
     this.bytes[0xa6] = value.def
-    this.bytes[0xa7] = value.spa
-    this.bytes[0xa8] = value.spd
-    this.bytes[0xa9] = value.spe
+    this.bytes[0xa7] = value.spe
+    this.bytes[0xa8] = value.spa
+    this.bytes[0xa9] = value.spd
   }
 
   public get dvs() {
@@ -1532,6 +1533,7 @@ export class OHPKM implements PKMInterface {
 
   public fixErrors(): boolean {
     let errorsFound = false
+    const metadata = this.metadata
 
     // PLA mons cannot have been hatched
     if (this.gameOfOrigin === OriginGame.LegendsArceus && (this.eggDate || this.eggLocationIndex)) {
@@ -1550,11 +1552,16 @@ export class OHPKM implements PKMInterface {
     }
 
     // Fix ability bug from pre-1.5.0 (affected Mind's Eye and Dragon's Maw)
-    if (!this.ability) {
+    // Fix ability bug from pre-1.7.1 (abilities not updated after evolution/capsule/patch)
+    const speciesAbilities = metadata?.abilities ?? []
+    if (metadata?.hiddenAbility) {
+      speciesAbilities.push(metadata.hiddenAbility)
+    }
+    if (!this.ability || !speciesAbilities?.some((other) => other.index === this.ability?.index)) {
       this.ability = getAbilityFromNumber(this.dexNum, this.formeNum, this.abilityNum)
+      errorsFound = true
     }
 
-    const metadata = this.metadata
     const genderRatio = this.metadata?.genderRatio
     if (metadata && genderRatio !== undefined) {
       if (
@@ -1591,6 +1598,20 @@ export class OHPKM implements PKMInterface {
     }
 
     this.heldItemIndex = other.heldItemIndex
+    if (other.ability && !FORMATS_WITHOUT_ABILITIES.includes(other.format)) {
+      // don't update if OHPKM has hidden ability and the other mon is from
+      // a game without hidden abilities
+      if (
+        !this.ability ||
+        this.ability?.index !== this.metadata?.hiddenAbility?.index ||
+        !FORMATS_WITHOUT_HIDDEN_ABILITIES.includes(other.format)
+      ) {
+        this.ability = other.ability
+        if (other.abilityNum) {
+          this.abilityNum = other.abilityNum
+        }
+      }
+    }
 
     if (other.avs) {
       this.avs = other.avs
@@ -1754,3 +1775,7 @@ function extendUint8Array(array: Uint8Array, minLength: number) {
 }
 
 type MarkingShape = keyof MarkingsSixShapesWithColor
+
+const FORMATS_WITHOUT_ABILITIES = ['PK1', 'PK2', 'PB7', 'PA8', 'PA9']
+
+const FORMATS_WITHOUT_HIDDEN_ABILITIES = ['PK3', 'COLOPKM', 'XDPKM', 'PK4']
