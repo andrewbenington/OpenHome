@@ -13,7 +13,7 @@ import { LOOKUP_TYPE } from './util'
 
 const CURRENT_BOX_OFFSET_GS_INTL = 0x2724
 const CURRENT_BOX_OFFSET_C_INTL = 0x2700
-const SAVE_SIZE_BYTES = 0x8000
+const MIN_SAVE_SIZE_BYTES = 0x8000
 
 export class G2SAV extends OfficialSAV<PK2> {
   static pkmType = PK2
@@ -221,6 +221,8 @@ export class G2SAV extends OfficialSAV<PK2> {
     }
     const checksum2 = this.getGoldSilverInternationalChecksum2()
 
+    if (checksum1 === 0 && checksum2 === 0) return false
+
     return checksum2 === this.bytes[0x7e6d]
   }
 
@@ -255,6 +257,8 @@ export class G2SAV extends OfficialSAV<PK2> {
     }
     const checksum2 = this.getCrystalInternationalChecksum2()
 
+    if (checksum1 === 0 && checksum2 === 0) return false
+
     return checksum2 === this.bytes[0x1f0d]
   }
 
@@ -278,7 +282,7 @@ export class G2SAV extends OfficialSAV<PK2> {
   static saveTypeID = 'G2SAV'
 
   static fileIsSave(bytes: Uint8Array): boolean {
-    if (bytes.length < SAVE_SIZE_BYTES) {
+    if (bytes.length < MIN_SAVE_SIZE_BYTES) {
       return false
     }
     try {
