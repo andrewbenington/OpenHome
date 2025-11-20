@@ -1776,6 +1776,6 @@ function extendUint8Array(array: Uint8Array, minLength: number) {
 
 type MarkingShape = keyof MarkingsSixShapesWithColor
 
-const FORMATS_WITHOUT_ABILITIES = ['PA8', 'PA9']
+const FORMATS_WITHOUT_ABILITIES = ['PK1', 'PK2', 'PB7', 'PA8', 'PA9']
 
-const FORMATS_WITHOUT_HIDDEN_ABILITIES = ['PK1', 'PK2', 'PK3', 'COLOPKM', 'XDPKM', 'PK4', 'PB7']
+const FORMATS_WITHOUT_HIDDEN_ABILITIES = ['PK3', 'COLOPKM', 'XDPKM', 'PK4']
