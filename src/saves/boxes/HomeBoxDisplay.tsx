@@ -604,7 +604,7 @@ const DRAG_OVER_COOLDOWN_MS = 500
 function ViewToggle(props: ViewToggleProps) {
   const { viewMode, setViewMode, disabled } = props
   const [dragMonState] = useContext(DragMonContext)
-  const [timer, setTimer] = useState<number>()
+  const [timer, setTimer] = useState<NodeJS.Timeout>()
   const setViewModeRef = useRef(setViewMode)
 
   useEffect(() => {
