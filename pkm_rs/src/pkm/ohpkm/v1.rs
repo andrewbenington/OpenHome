@@ -188,6 +188,8 @@ impl OhpkmV1 {
             is_fateful_encounter: util::get_flag(bytes, 34, 0),
             flag2_la: util::get_flag(bytes, 34, 1),
             gender: Gender::from_bits_2_3(bytes[34]),
+            // THIS IS DIFFERENT FROM Stats8::from_bytes() ON PURPOSE
+            // DO NOT CHANGE
             evs: Stats8 {
                 hp: bytes[38],
                 atk: bytes[39],
@@ -362,12 +364,16 @@ impl Pkm for OhpkmV1 {
         self.gender.set_bits_2_3(&mut bytes[34]);
 
         bytes[36..38].copy_from_slice(&self.species_and_forme.get_forme_index().to_le_bytes());
+
+        // THIS IS DIFFERENT FROM Stats8::to_bytes() ON PURPOSE
+        // DO NOT CHANGE
         bytes[38] = self.evs.hp;
         bytes[39] = self.evs.atk;
         bytes[40] = self.evs.def;
         bytes[41] = self.evs.spa;
         bytes[42] = self.evs.spd;
         bytes[43] = self.evs.spe;
+
         bytes[38..44].copy_from_slice(&self.evs.to_bytes());
         bytes[44..50].copy_from_slice(&self.contest.to_bytes());
         bytes[50] = self.pokerus_byte;
