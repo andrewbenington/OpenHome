@@ -1,4 +1,4 @@
-import { Ball } from '@pkm-rs-resources/pkg'
+import { Ball } from '@pkm-rs/pkg'
 import { PKM } from '@pokemon-files/pkm'
 import { getDisplayID } from '@pokemon-files/util/util'
 import dayjs from 'dayjs'

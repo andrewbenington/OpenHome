@@ -8,7 +8,7 @@ import {
   MetadataLookup,
   OriginGames,
   SpeciesLookup,
-} from '@pkm-rs-resources/pkg'
+} from '@pkm-rs/pkg'
 
 import * as conversion from '../conversion'
 import * as byteLogic from '../util/byteLogic'

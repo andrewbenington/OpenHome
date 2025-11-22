@@ -1,4 +1,4 @@
-import { MetadataLookup, OriginGames } from '@pkm-rs-resources/pkg'
+import { MetadataLookup, OriginGames } from '@pkm-rs/pkg'
 import { generatePersonalityValuePreservingAttributes, StatsPreSplit } from '@pokemon-files/util'
 import { PK3, PK4, PK5 } from '../../packages/pokemon-files/src'
 import { PKMInterface } from '../types/interfaces'

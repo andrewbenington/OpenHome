@@ -3,6 +3,7 @@ import { Badge, Button, Card, Flex, Tabs } from '@radix-ui/themes'
 import lodash from 'lodash'
 import { useCallback, useContext, useEffect, useState } from 'react'
 import { MdFileOpen } from 'react-icons/md'
+import PokemonIcon from 'src/components/PokemonIcon'
 import PokemonDetailsModal from 'src/pokemon/PokemonDetailsModal'
 import BankHeader from 'src/saves/BankHeader'
 import ItemBag from 'src/saves/ItemBag'
@@ -125,7 +126,8 @@ const Home = () => {
         <ReleaseArea />
       </Flex>
       <PokemonDetailsModal mon={selectedMon} onClose={() => setSelectedMon(undefined)} />
-
+      {/* force icons sprite sheet to stay loaded */}
+      <PokemonIcon dexNumber={0} />
       <SavesModal open={openSaveDialog} onClose={() => setOpenSaveDialog(false)} />
     </Flex>
   )

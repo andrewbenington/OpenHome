@@ -1,4 +1,4 @@
-import { MetadataLookup, SpeciesAndForme } from '@pkm-rs-resources/pkg'
+import { MetadataLookup, SpeciesAndForme } from '@pkm-rs/pkg'
 import { Flex } from '@radix-ui/themes'
 import { Responsive } from '@radix-ui/themes/props'
 import { ArrowLeftIcon, ArrowLeftRightIcon, ArrowRightIcon } from 'src/components/Icons'

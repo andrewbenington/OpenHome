@@ -1,4 +1,4 @@
-import { Stats } from '@pkm-rs-resources/pkg'
+import { Stats } from '@pkm-rs/pkg'
 import { Select } from '@radix-ui/themes'
 import {
   Chart as ChartJS,

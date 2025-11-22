@@ -1,4 +1,4 @@
-import { Languages, OriginGame } from '@pkm-rs-resources/pkg'
+import { Languages, OriginGame } from '@pkm-rs/pkg'
 import { PK9 } from '@pokemon-files/pkm'
 import { utf16BytesToString } from '@pokemon-files/util'
 import { Item } from '../../../consts/Items'

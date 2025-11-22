@@ -1,7 +1,7 @@
-import '@pkm-rs-resources/pkg'
+import '@pkm-rs/pkg'
 import { Type } from './types/types'
 
-declare module '@pkm-rs-resources/pkg' {
+declare module '@pkm-rs/pkg' {
   type FormeMetadata = {
     readonly type1: Type
     readonly type2?: Type

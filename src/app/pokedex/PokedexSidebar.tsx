@@ -1,13 +1,9 @@
+import { all_species_data, FormeMetadata, SpeciesMetadata } from '@pkm-rs/pkg'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { CSSProperties, useEffect, useMemo, useRef } from 'react'
 import PokemonIcon from 'src/components/PokemonIcon'
 import { getPublicImageURL } from 'src/images/images'
 import { Pokedex } from 'src/types/pokedex'
-import {
-  all_species_data,
-  FormeMetadata,
-  SpeciesMetadata,
-} from '../../../pkm_rs_resources/pkg/pkm_rs_resources'
 import './style.css'
 import { getHighestFormeStatus, StatusIndices } from './util'
 

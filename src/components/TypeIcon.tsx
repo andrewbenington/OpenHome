@@ -1,5 +1,5 @@
+import { PkmType } from '@pkm-rs/pkg'
 import { teraTypeFromIndex, Type } from '@pokemon-resources/index'
-import { PkmType } from '../../pkm_rs_resources/pkg/pkm_rs_resources'
 import { getPublicImageURL, getTypeIconPath } from '../images/images'
 import './components.css'
 

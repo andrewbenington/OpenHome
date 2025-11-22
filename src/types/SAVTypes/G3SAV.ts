@@ -1,4 +1,4 @@
-import { ItemGen3, OriginGame } from '@pkm-rs-resources/pkg'
+import { ItemGen3, OriginGame } from '@pkm-rs/pkg'
 import { PK3 } from '@pokemon-files/pkm'
 import { NationalDex } from 'src/consts/NationalDex'
 import { GEN3_TRANSFER_RESTRICTIONS } from 'src/consts/TransferRestrictions'

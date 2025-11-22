@@ -1,4 +1,4 @@
-import { Ball, OriginGame } from '@pkm-rs-resources/pkg'
+import { Ball, OriginGame } from '@pkm-rs/pkg'
 import { PK4 } from '@pokemon-files/pkm'
 import { readFileSync } from 'fs'
 import { resolve } from 'path'

@@ -30,8 +30,8 @@
       "@pokemon-resources/*": [
         "./packages/pokemon-resources/src/*"
       ],
-      "@pkm-rs-resources/*": [
-        "./pkm_rs_resources/*"
+      "@pkm-rs/*": [
+        "./pkm_rs/*"
       ]
     },
     /* Bundler mode */

@@ -1,5 +1,5 @@
 import { useDraggable } from '@dnd-kit/react'
-import { MetadataLookup } from '@pkm-rs-resources/pkg'
+import { MetadataLookup } from '@pkm-rs/pkg'
 import { useContext, useMemo } from 'react'
 import { DragMonContext } from 'src/state/dragMon'
 import { displayIndexAdder, isBattleFormeItem, isMegaStone } from 'src/types/pkm/util'

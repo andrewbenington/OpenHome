@@ -1,4 +1,4 @@
-import { Generation, OriginGames } from '@pkm-rs-resources/pkg'
+import { Generation, OriginGames } from '@pkm-rs/pkg'
 import { PK3, PK4, PK5 } from '@pokemon-files/pkm'
 import { AllPKMFields, getDisplayID, StatsPreSplit } from '@pokemon-files/util'
 import {
@@ -395,6 +395,8 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
         {mon.eggDate && <AttributeRow label="Hatch Date" value={mon.eggDate} />}
         <AttributeRow label="Egg Location Index" value={mon.eggLocationIndex} />
         <AttributeRow label="Gender" value={mon.gender} />
+        <AttributeRow label="Is Favorite" value={String(Boolean(mon.favorite))} />
+        <AttributeRow label="Is Shadow" value={String(Boolean(mon.isShadow))} />
       </Flex>
     </div>
   )

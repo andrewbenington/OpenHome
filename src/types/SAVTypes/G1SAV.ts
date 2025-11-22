@@ -1,4 +1,4 @@
-import { ItemGen1, Language, OriginGame } from '@pkm-rs-resources/pkg'
+import { ItemGen1, Language, OriginGame } from '@pkm-rs/pkg'
 import { PK1 } from '@pokemon-files/pkm'
 import lodash from 'lodash'
 import { NationalDex } from 'src/consts/NationalDex'

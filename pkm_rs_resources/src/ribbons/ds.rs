@@ -131,7 +131,7 @@ impl Gen3Ribbon {
             Gen3Ribbon::ToughHyperHoenn => "Tough Hyper Ribbon",
             Gen3Ribbon::ToughMasterHoenn => "Tough Master Ribbon",
             Gen3Ribbon::Champion => "Champion Ribbon",
-            Gen3Ribbon::Winning => "Wining Ribbon",
+            Gen3Ribbon::Winning => "Winning Ribbon",
             Gen3Ribbon::Victory => "Victory Ribbon",
             Gen3Ribbon::Artist => "Artist Ribbon",
             Gen3Ribbon::Effort => "Effort Ribbon",
@@ -142,6 +142,44 @@ impl Gen3Ribbon {
             Gen3Ribbon::National => "National Ribbon",
             Gen3Ribbon::Earth => "Earth Ribbon",
             Gen3Ribbon::World => "World Ribbon",
+        }
+    }
+
+    pub fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Cool Ribbon" => Some(Gen3Ribbon::CoolHoenn),
+            "Cool Super Ribbon" => Some(Gen3Ribbon::CoolSuperHoenn),
+            "Cool Hyper Ribbon" => Some(Gen3Ribbon::CoolHyperHoenn),
+            "Cool Master Ribbon" => Some(Gen3Ribbon::CoolMasterHoenn),
+            "Beauty Ribbon" => Some(Gen3Ribbon::BeautyHoenn),
+            "Beauty Super Ribbon" => Some(Gen3Ribbon::BeautySuperHoenn),
+            "Beauty Hyper Ribbon" => Some(Gen3Ribbon::BeautyHyperHoenn),
+            "Beauty Master Ribbon" => Some(Gen3Ribbon::BeautyMasterHoenn),
+            "Cute Ribbon" => Some(Gen3Ribbon::CuteHoenn),
+            "Cute Super Ribbon" => Some(Gen3Ribbon::CuteSuperHoenn),
+            "Cute Hyper Ribbon" => Some(Gen3Ribbon::CuteHyperHoenn),
+            "Cute Master Ribbon" => Some(Gen3Ribbon::CuteMasterHoenn),
+            "Smart Ribbon" => Some(Gen3Ribbon::SmartHoenn),
+            "Smart Super Ribbon" => Some(Gen3Ribbon::SmartSuperHoenn),
+            "Smart Hyper Ribbon" => Some(Gen3Ribbon::SmartHyperHoenn),
+            "Smart Master Ribbon" => Some(Gen3Ribbon::SmartMasterHoenn),
+            "Tough Ribbon" => Some(Gen3Ribbon::ToughHoenn),
+            "Tough Super Ribbon" => Some(Gen3Ribbon::ToughSuperHoenn),
+            "Tough Hyper Ribbon" => Some(Gen3Ribbon::ToughHyperHoenn),
+            "Tough Master Ribbon" => Some(Gen3Ribbon::ToughMasterHoenn),
+            "Champion Ribbon" => Some(Gen3Ribbon::Champion),
+            "Winning Ribbon" => Some(Gen3Ribbon::Winning),
+            "Victory Ribbon" => Some(Gen3Ribbon::Victory),
+            "Artist Ribbon" => Some(Gen3Ribbon::Artist),
+            "Effort Ribbon" => Some(Gen3Ribbon::Effort),
+            "Battle Champion Ribbon" => Some(Gen3Ribbon::BattleChampion),
+            "Regional Champion Ribbon" => Some(Gen3Ribbon::RegionalChampion),
+            "National Champion Ribbon" => Some(Gen3Ribbon::NationalChampion),
+            "Country Ribbon" => Some(Gen3Ribbon::Country),
+            "National Ribbon" => Some(Gen3Ribbon::National),
+            "Earth Ribbon" => Some(Gen3Ribbon::Earth),
+            "World Ribbon" => Some(Gen3Ribbon::World),
+            _ => None,
         }
     }
 
@@ -189,7 +227,7 @@ impl Gen3Ribbon {
         }
     }
 
-    const fn to_openhome(self) -> OpenHomeRibbon {
+    pub const fn to_openhome(self) -> OpenHomeRibbon {
         match self {
             Gen3Ribbon::Champion => OpenHomeRibbon::Mod(ModernRibbon::Gen3Champion),
             Gen3Ribbon::Effort => OpenHomeRibbon::Mod(ModernRibbon::Effort),
@@ -375,6 +413,40 @@ impl Gen4StandardRibbon {
             Self::Wishing => "Wishing Ribbon",
             Self::Classic => "Classic Ribbon",
             Self::Premier => "Premier Ribbon",
+        }
+    }
+
+    pub fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Sinnoh Champion Ribbon" => Some(Self::SinnohChampion),
+            "Ability Ribbon" => Some(Self::Ability),
+            "Great Ability Ribbon" => Some(Self::GreatAbility),
+            "Double Ability Ribbon" => Some(Self::DoubleAbility),
+            "Multi Ability Ribbon" => Some(Self::MultiAbility),
+            "Pair Ability Ribbon" => Some(Self::PairAbility),
+            "World Ability Ribbon" => Some(Self::WorldAbility),
+            "Alert Ribbon" => Some(Self::Alert),
+            "Shock Ribbon" => Some(Self::Shock),
+            "Downcast Ribbon" => Some(Self::Downcast),
+            "Careless Ribbon" => Some(Self::Careless),
+            "Relax Ribbon" => Some(Self::Relax),
+            "Snooze Ribbon" => Some(Self::Snooze),
+            "Smile Ribbon" => Some(Self::Smile),
+            "Gorgeous Ribbon" => Some(Self::Gorgeous),
+            "Royal Ribbon" => Some(Self::Royal),
+            "Gorgeous Royal Ribbon" => Some(Self::GorgeousRoyal),
+            "Footprint Ribbon" => Some(Self::Footprint),
+            "Record Ribbon" => Some(Self::Record),
+            "Event Ribbon" => Some(Self::Event),
+            "Legend Ribbon" => Some(Self::Legend),
+            "World Champion Ribbon" => Some(Self::WorldChampion),
+            "Birthday Ribbon" => Some(Self::Birthday),
+            "Special Ribbon" => Some(Self::Special),
+            "Souvenir Ribbon" => Some(Self::Souvenir),
+            "Wishing Ribbon" => Some(Self::Wishing),
+            "Classic Ribbon" => Some(Self::Classic),
+            "Premier Ribbon" => Some(Self::Premier),
+            _ => None,
         }
     }
 
@@ -691,7 +763,6 @@ impl DsRibbonSet {
     pub fn from_openhome<const M: usize>(openhome_set: OpenHomeRibbonSet<M>) -> Self {
         Self {
             gen3: openhome_set
-                .get_ribbons()
                 .into_iter()
                 .filter_map(|ribbon| match ribbon {
                     OpenHomeRibbon::Mod(ribbon) => Gen3Ribbon::from_modern_if_present(ribbon),
@@ -699,7 +770,6 @@ impl DsRibbonSet {
                 })
                 .collect(),
             gen4_standard: openhome_set
-                .get_ribbons()
                 .into_iter()
                 .filter_map(|ribbon| match ribbon {
                     OpenHomeRibbon::Mod(ribbon) => {
@@ -711,7 +781,6 @@ impl DsRibbonSet {
                 })
                 .collect(),
             gen4_contest: openhome_set
-                .get_ribbons()
                 .into_iter()
                 .filter_map(|ribbon| match ribbon {
                     OpenHomeRibbon::Mod(_) => None,

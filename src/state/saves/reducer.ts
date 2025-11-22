@@ -1,4 +1,4 @@
-import { Item } from '@pkm-rs-resources/pkg'
+import { Item } from '@pkm-rs/pkg'
 import { createContext, Dispatch, Reducer } from 'react'
 import { OHPKM } from 'src/types/pkm/OHPKM'
 import { HomeData } from 'src/types/SAVTypes/HomeData'

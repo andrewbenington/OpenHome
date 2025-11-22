@@ -1,4 +1,4 @@
-import { Item } from '@pkm-rs-resources/pkg'
+import { Item } from '@pkm-rs/pkg'
 import { Flex, Grid } from '@radix-ui/themes'
 import { useContext } from 'react'
 import { ItemBagContext } from 'src/state/itemBag'

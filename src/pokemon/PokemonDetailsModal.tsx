@@ -1,11 +1,13 @@
 import { FileSchemas } from '@pokemon-files/schema'
 import { Dialog, Flex, VisuallyHidden } from '@radix-ui/themes'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
-import { ErrorBoundary, FallbackProps } from 'react-error-boundary'
+import { FallbackProps } from 'react-error-boundary'
 import { MdDownload } from 'react-icons/md'
+import Fallback from 'src/components/Fallback'
 import { ArrowLeftIcon, ArrowRightIcon } from 'src/components/Icons'
 import SideTabs from 'src/components/side-tabs/SideTabs'
 import MiniBoxIndicator, { MiniBoxIndicatorProps } from 'src/saves/boxes/MiniBoxIndicator'
+import OhpkmV2 from 'src/types/pkm/OhpkmV2'
 import { BackendContext } from '../backend/backendContext'
 import HexDisplay from '../components/HexDisplay'
 import { fileTypeFromString } from '../types/FileImport'
@@ -118,6 +120,10 @@ const PokemonDetailsModal = (props: {
                       setDisplayMon(mon instanceof OHPKM ? mon : new OHPKM(mon))
                       return
                     }
+                    if (newFormat === 'OhpkmV2') {
+                      setDisplayMon(new OhpkmV2(mon))
+                      return
+                    }
                     const P = fileTypeFromString(newFormat)
 
                     if (!P) {
@@ -150,7 +156,7 @@ const PokemonDetailsModal = (props: {
               <SideTabs.Tab value="other">Other</SideTabs.Tab>
               <SideTabs.Tab value="raw">Raw</SideTabs.Tab>
             </SideTabs.TabList>
-            <ErrorBoundary FallbackComponent={FallbackComponent}>
+            <Fallback>
               <SideTabs.Panel value="summary">
                 <SummaryDisplay mon={displayMon} />
               </SideTabs.Panel>
@@ -167,20 +173,23 @@ const PokemonDetailsModal = (props: {
                 <OtherDisplay mon={displayMon} />
               </SideTabs.Panel>
               <SideTabs.Panel value="raw">
-                <HexDisplay
-                  data={
-                    displayMon.originalBytes
-                      ? displayMon.originalBytes
-                      : new Uint8Array(displayMon.toBytes({ includeExtraFields: true }))
-                  }
-                  format={
-                    displayMon.pluginIdentifier
-                      ? undefined
-                      : (displayMon.format as keyof typeof FileSchemas | 'OHPKM')
-                  }
-                />
+                <Fallback>
+                  <HexDisplay
+                    data={
+                      new Uint8Array(displayMon.toBytes({ includeExtraFields: true }))
+                      // displayMon.originalBytes
+                      //   ? displayMon.originalBytes
+                      //   : new Uint8Array(displayMon.toBytes({ includeExtraFields: true }))
+                    }
+                    format={
+                      displayMon.pluginIdentifier
+                        ? undefined
+                        : (displayMon.format as keyof typeof FileSchemas | 'OHPKM')
+                    }
+                  />
+                </Fallback>
               </SideTabs.Panel>
-            </ErrorBoundary>
+            </Fallback>
           </SideTabs.Root>
         )}
         {navigateLeft && (

@@ -1,4 +1,4 @@
-import { Languages, OriginGame, SpeciesLookup } from '@pkm-rs-resources/pkg'
+import { Languages, OriginGame, SpeciesLookup } from '@pkm-rs/pkg'
 import { PK8 } from '@pokemon-files/pkm'
 import { utf16BytesToString } from '@pokemon-files/util'
 import { NationalDex } from 'src/consts/NationalDex'

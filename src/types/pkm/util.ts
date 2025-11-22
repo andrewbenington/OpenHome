@@ -1,3 +1,4 @@
+import { AbilityIndex, MetadataLookup, SpeciesAndForme, SpeciesLookup } from '@pkm-rs/pkg'
 import { PKM } from '@pokemon-files/pkm'
 import { Stats, StatsPreSplit } from '@pokemon-files/util'
 import {
@@ -20,12 +21,6 @@ import {
   uint16ToBytesLittleEndian,
   writeUint32ToBuffer,
 } from 'src/util/byteLogic'
-import {
-  AbilityIndex,
-  MetadataLookup,
-  SpeciesAndForme,
-  SpeciesLookup,
-} from '../../../pkm_rs_resources/pkg/pkm_rs_resources'
 import { Item } from '../../consts/Items'
 import { PKMInterface } from '../interfaces'
 import { OHPKM } from './OHPKM'

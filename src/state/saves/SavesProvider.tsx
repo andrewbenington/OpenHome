@@ -1,4 +1,4 @@
-import { Generation, OriginGame, OriginGames } from '@pkm-rs-resources/pkg'
+import { Generation, OriginGame, OriginGames } from '@pkm-rs/pkg'
 import { Callout } from '@radix-ui/themes'
 import * as E from 'fp-ts/lib/Either'
 import { flatten } from 'lodash'

@@ -1,4 +1,4 @@
-import { ItemUnbound } from '@pkm-rs-resources/pkg'
+import { ItemUnbound } from '@pkm-rs/pkg'
 import { PluginPKMInterface } from '../../interfaces'
 import PK3CFRU, { CFRUToNationalDexEntry } from '../cfru/PK3CFRU'
 

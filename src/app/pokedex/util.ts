@@ -1,4 +1,4 @@
-import { FormeMetadata, SpeciesMetadata } from '../../../pkm_rs_resources/pkg/pkm_rs_resources'
+import { FormeMetadata, SpeciesMetadata } from '@pkm-rs/pkg'
 import { Pokedex, PokedexStatus } from '../../types/pokedex'
 
 export function getHighestFormeStatus(

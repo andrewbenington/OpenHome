@@ -1,4 +1,4 @@
-import { OriginGame } from '@pkm-rs-resources/pkg'
+import { OriginGame } from '@pkm-rs/pkg'
 import { USUM_TRANSFER_RESTRICTIONS } from 'src/consts/TransferRestrictions'
 import { Item } from '../../consts/Items'
 import { isRestricted } from '../TransferRestrictions'

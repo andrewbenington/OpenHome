@@ -1,4 +1,4 @@
-import { Item } from '@pkm-rs-resources/pkg'
+import { Item } from '@pkm-rs/pkg'
 import { Dispatch, Reducer, createContext } from 'react'
 import { MonWithLocation } from './saves/reducer'
 
