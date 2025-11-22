@@ -11,6 +11,9 @@ node -v
 npm -v
 ```
 
+## Download and install pnpm
+Pnpm is an alternative to npm that saves disk storage and runtime by keeping a singular global store of installed packages and reducing redundancy.
+
 ## Download and Install Rust
 
 You need to download Rust perferably using `rustup`. You may need the Windows C++ build tools. Get it from here https://www.rust-lang.org/tools/install.
