@@ -14,6 +14,7 @@ export interface Filter {
   ribbon?: string
   shiny?: string
   ball?: number
+  isEgg?: boolean
 }
 
 export type HeldItemFilter = number | HeldItemCategory
@@ -29,6 +30,9 @@ export function filterApplies(filter: Filter, mon: PKMInterface) {
     return false
   }
   if (filter.ball !== undefined && 'ball' in mon && mon.ball !== filter.ball) {
+    return false
+  }
+  if (filter.isEgg !== undefined && mon.isEgg !== filter.isEgg) {
     return false
   }
   if (

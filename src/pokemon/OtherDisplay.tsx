@@ -395,6 +395,8 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
         {mon.eggDate && <AttributeRow label="Hatch Date" value={mon.eggDate} />}
         <AttributeRow label="Egg Location Index" value={mon.eggLocationIndex} />
         <AttributeRow label="Gender" value={mon.gender} />
+        <AttributeRow label="Is Egg" value={String(Boolean(mon.isEgg))} />
+        <AttributeRow label="Is Nicknamed" value={String(Boolean(mon.isNicknamed))} />
         <AttributeRow label="Is Favorite" value={String(Boolean(mon.favorite))} />
         <AttributeRow label="Is Shadow" value={String(Boolean(mon.isShadow))} />
       </Flex>

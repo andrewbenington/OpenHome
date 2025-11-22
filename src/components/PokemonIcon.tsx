@@ -11,14 +11,17 @@ export interface PokemonIconProps extends HTMLAttributes<HTMLDivElement> {
   dexNumber: number
   formeNumber?: number
   isShiny?: boolean
+  isEgg?: boolean
   heldItemIndex?: number
   greyedOut?: boolean
   silhouette?: boolean
 }
 
-function getBackgroundPosition(formeMetadata?: FormeMetadata) {
+function getBackgroundPosition(formeMetadata?: FormeMetadata, isEgg?: boolean) {
   const [x, y] =
-    !formeMetadata || (formeMetadata.isMega && formeMetadata.introducedGen === Generation.G9)
+    isEgg ||
+    !formeMetadata ||
+    (formeMetadata.isMega && formeMetadata.introducedGen === Generation.G9)
       ? [0, 0]
       : formeMetadata.spriteCoords
 
@@ -26,8 +29,16 @@ function getBackgroundPosition(formeMetadata?: FormeMetadata) {
 }
 
 export default function PokemonIcon(props: PokemonIconProps) {
-  const { dexNumber, formeNumber, isShiny, heldItemIndex, greyedOut, silhouette, ...attributes } =
-    props
+  const {
+    dexNumber,
+    formeNumber,
+    isShiny,
+    heldItemIndex,
+    greyedOut,
+    silhouette,
+    isEgg,
+    ...attributes
+  } = props
 
   const formeMetadata = MetadataLookup(dexNumber, formeNumber ?? 0)
 
@@ -44,6 +55,7 @@ export default function PokemonIcon(props: PokemonIconProps) {
         heldItemIndex={heldItemIndex}
         greyedOut={greyedOut}
         silhouette={silhouette}
+        isEgg={isEgg}
         {...attributes}
       />
     )
@@ -63,7 +75,7 @@ export default function PokemonIcon(props: PokemonIconProps) {
         className="pokemon-icon-image"
         style={{
           backgroundImage: `url(${BoxIcons})`,
-          backgroundPosition: getBackgroundPosition(formeMetadata),
+          backgroundPosition: getBackgroundPosition(formeMetadata, isEgg),
           filter: silhouette
             ? isDarkMode
               ? 'contrast(0%) brightness(85%)'

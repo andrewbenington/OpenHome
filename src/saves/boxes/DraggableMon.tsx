@@ -73,6 +73,7 @@ const DraggableMon = ({ mon, onClick, disabled, dragData, dragID }: DraggableMon
         dexNumber={mon.dexNum}
         formeNumber={formeNumber}
         isShiny={mon.isShiny()}
+        isEgg={mon.isEgg}
         heldItemIndex={isDragging && dragState.mode === 'item' ? undefined : mon.heldItemIndex}
         style={{
           width: '100%',

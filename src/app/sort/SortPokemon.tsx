@@ -70,6 +70,8 @@ export default function SortPokemon() {
           <PokemonIcon
             dexNumber={monWithSave.mon.dexNum}
             formeNumber={monWithSave.mon.formeNum}
+            isEgg={monWithSave.mon.isEgg}
+            isShiny={monWithSave.mon.isShiny()}
             style={{
               width: 30,
               height: 30,

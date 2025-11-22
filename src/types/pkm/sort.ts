@@ -17,6 +17,7 @@ export const SortTypes = [
   'Trainer',
   'Poké Ball',
   'Held Item',
+  'Is Egg',
 ]
 
 export type SortType = (typeof SortTypes)[number]
@@ -120,6 +121,8 @@ export function getSortFunction(
       return chain([sortByTrainerName, sortByTrainerId, sortBySecretId])
     case 'Poké Ball':
       return (a, b) => (a.ball ?? Ball.Poke) - (b.ball ?? Ball.Poke)
+    case 'Is Egg':
+      return (a, b) => Number(a.isEgg) - Number(b.isEgg)
     case 'Held Item':
       return sortByHeldItem
     default:
