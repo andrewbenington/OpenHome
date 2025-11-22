@@ -40,6 +40,7 @@ import {
   statsPreSplitToWasm,
   trainerMemoryToWasm,
 } from './convert'
+import { OHPKM } from './OHPKM'
 import {
   adjustMovePPBetweenFormats,
   generateIVs,
@@ -93,7 +94,9 @@ export class OhpkmV2 extends PkmRs.OhpkmV2 implements PKMInterface {
       this.encryptionConstant = other.encryptionConstant ?? 0
       this.heldItemIndex = other.heldItemIndex
       this.trainerName = other.trainerName
+      console.log(`setting v2 gender to ${other.trainerGender}`)
       this.trainerGender = other.trainerGender
+      console.log(`v2 gender is now ${this.trainerGender}`)
       this.trainerID = other.trainerID
       this.secretID = other.secretID
       this.exp = other.exp
@@ -319,6 +322,14 @@ export class OhpkmV2 extends PkmRs.OhpkmV2 implements PKMInterface {
       this.tmFlagsSV = other.tmFlagsSV
       this.tmFlagsSVDLC = other.tmFlagsSVDLC
     }
+  }
+
+  static fromV1Wasm(v1: OHPKM) {
+    console.log('In OhpkmV2.fromV1Wasm v1 trainer gender is', v1.trainerGender)
+    const v2 = PkmRs.OhpkmV2.fromV1Bytes(new Uint8Array(v1.toBytes()))
+    console.log('byte 317 is', new Uint8Array(v1.toBytes())[317])
+    console.log('In OhpkmV2.fromV1Wasm v2 trainer gender is', v2.trainerGender)
+    return new OhpkmV2(v2.toByteArray().buffer as ArrayBuffer)
   }
 
   get dexNum() {

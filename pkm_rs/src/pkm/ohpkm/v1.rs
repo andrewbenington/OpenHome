@@ -1,3 +1,5 @@
+#[cfg(feature = "wasm")]
+use crate::pkm::ohpkm::JsResult;
 use crate::pkm::traits::IsShiny4096;
 use crate::pkm::{Error, Pkm, Result};
 use crate::strings::SizedUtf16String;
@@ -17,8 +19,13 @@ use pkm_rs_types::{
 use pkm_rs_types::{Gender, PokeDate, TrainerMemory};
 use serde::Serialize;
 
+#[cfg(feature = "wasm")]
+use wasm_bindgen::prelude::*;
+
 const MIN_SIZE: usize = 420;
 
+#[cfg(feature = "wasm")]
+#[wasm_bindgen]
 #[derive(Debug, Default, Serialize, Clone, Copy, IsShiny4096)]
 pub struct OhpkmV1 {
     pub encryption_constant: u32,
@@ -47,16 +54,22 @@ pub struct OhpkmV1 {
     pub pokerus_byte: u8,
     pub contest_memory_count: u8,
     pub battle_memory_count: u8,
+    #[wasm_bindgen(skip)]
     pub ribbons: OpenHomeRibbonSet<16>,
     pub sociability: u32,
     pub height_scalar: u8,
     pub weight_scalar: u8,
     pub scale: u8,
+    #[wasm_bindgen(skip)]
     pub moves: [MoveSlot; 4],
+    #[wasm_bindgen(skip)]
     pub move_pp: [u8; 4],
+    #[wasm_bindgen(skip)]
     pub nickname: SizedUtf16String<26>,
     pub avs: Stats16Le,
+    #[wasm_bindgen(skip)]
     pub move_pp_ups: [u8; 4],
+    #[wasm_bindgen(skip)]
     pub relearn_moves: [MoveSlot; 4],
     pub ivs: Stats8,
     pub is_egg: bool,
@@ -67,6 +80,7 @@ pub struct OhpkmV1 {
     pub unknown_a0: u32,
     pub gvs: Stats8,
     pub dvs: StatsPreSplit,
+    #[wasm_bindgen(skip)]
     pub handler_name: SizedUtf16String<24>,
     pub handler_language: u8,
     pub is_current_handler: bool,
@@ -91,6 +105,7 @@ pub struct OhpkmV1 {
     pub enjoyment: u8,
     pub game_of_origin: OriginGame,
     pub game_of_origin_battle: Option<OriginGame>,
+    #[wasm_bindgen(skip)]
     pub plugin_origin: SizedUtf16String<32>,
     pub country: u8,
     pub region: u8,
@@ -102,6 +117,7 @@ pub struct OhpkmV1 {
     pub geolocations: Geolocations,
     pub encounter_type: u8,
     pub performance: u8,
+    #[wasm_bindgen(skip)]
     pub trainer_name: SizedUtf16String<26>,
     pub trainer_friendship: u8,
     pub trainer_memory: TrainerMemory,
@@ -115,14 +131,22 @@ pub struct OhpkmV1 {
     pub hyper_training: HyperTraining,
     pub trainer_gender: Gender,
     pub obedience_level: u8,
+    #[wasm_bindgen(skip)]
     pub home_tracker: [u8; 8],
+    #[wasm_bindgen(skip)]
     pub tr_flags_swsh: [u8; 14],
+    #[wasm_bindgen(skip)]
     pub tm_flags_bdsp: [u8; 14],
+    #[wasm_bindgen(skip)]
     pub move_flags_la: [u8; 14],
+    #[wasm_bindgen(skip)]
     pub tutor_flags_la: [u8; 8],
+    #[wasm_bindgen(skip)]
     pub master_flags_la: [u8; 8],
+    #[wasm_bindgen(skip)]
     pub tm_flags_sv: [u8; 22],
     pub evs_g12: StatsPreSplit,
+    #[wasm_bindgen(skip)]
     pub tm_flags_sv_dlc: [u8; 13],
 }
 
@@ -164,7 +188,14 @@ impl OhpkmV1 {
             is_fateful_encounter: util::get_flag(bytes, 34, 0),
             flag2_la: util::get_flag(bytes, 34, 1),
             gender: Gender::from_bits_2_3(bytes[34]),
-            evs: Stats8::from_bytes(bytes[38..44].try_into().unwrap()),
+            evs: Stats8 {
+                hp: bytes[38],
+                atk: bytes[39],
+                def: bytes[40],
+                spa: bytes[41],
+                spd: bytes[42],
+                spe: bytes[43],
+            },
             contest: ContestStats::from_bytes(bytes[44..50].try_into().unwrap()),
             pokerus_byte: bytes[50],
             contest_memory_count: bytes[52],
@@ -261,8 +292,8 @@ impl OhpkmV1 {
             egg_location_index: u16::from_le_bytes(bytes[312..314].try_into().unwrap()),
             met_location_index: u16::from_le_bytes(bytes[314..316].try_into().unwrap()),
             met_level: bytes[316] & !0x80,
+            trainer_gender: Gender::from(util::get_flag(bytes, 316, 7)),
             hyper_training: HyperTraining::from_byte(bytes[317] & 0b111111),
-            trainer_gender: Gender::from(util::get_flag(bytes, 317, 7)),
             obedience_level: bytes[318],
             home_tracker: bytes[319..327].try_into().unwrap(),
             tr_flags_swsh: bytes[326..340].try_into().unwrap(),
@@ -331,6 +362,12 @@ impl Pkm for OhpkmV1 {
         self.gender.set_bits_2_3(&mut bytes[34]);
 
         bytes[36..38].copy_from_slice(&self.species_and_forme.get_forme_index().to_le_bytes());
+        bytes[38] = self.evs.hp;
+        bytes[39] = self.evs.atk;
+        bytes[40] = self.evs.def;
+        bytes[41] = self.evs.spa;
+        bytes[42] = self.evs.spd;
+        bytes[43] = self.evs.spe;
         bytes[38..44].copy_from_slice(&self.evs.to_bytes());
         bytes[44..50].copy_from_slice(&self.contest.to_bytes());
         bytes[50] = self.pokerus_byte;
@@ -432,8 +469,8 @@ impl Pkm for OhpkmV1 {
         bytes[312..314].copy_from_slice(&self.egg_location_index.to_le_bytes());
         bytes[314..316].copy_from_slice(&self.met_location_index.to_le_bytes());
         bytes[316] = self.met_level;
+        util::set_flag(bytes, 316, 7, bool::from(self.trainer_gender));
         bytes[317] = self.hyper_training.to_byte();
-        util::set_flag(bytes, 317, 7, bool::from(self.trainer_gender));
         bytes[318] = self.obedience_level;
         bytes[319..327].copy_from_slice(&self.home_tracker);
         bytes[326..340].copy_from_slice(&self.tr_flags_swsh);
@@ -478,5 +515,19 @@ impl Pkm for OhpkmV1 {
         self.get_species_metadata()
             .level_up_type
             .calculate_level(self.exp)
+    }
+}
+
+#[cfg(feature = "wasm")]
+#[wasm_bindgen]
+#[allow(clippy::missing_const_for_fn)]
+impl OhpkmV1 {
+    #[wasm_bindgen(js_name = "toBytes")]
+    pub fn to_bytes_wasm(&self) -> JsResult<Vec<u8>> {
+        use wasm_bindgen::JsValue;
+
+        self.to_box_bytes()
+            .map_err(|e| Error::to_string(&e))
+            .map_err(JsValue::from)
     }
 }

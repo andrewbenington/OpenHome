@@ -1,7 +1,6 @@
 use std::{fmt::Display, hash::Hash};
 
-#[cfg(feature = "wasm")]
-use wasm_bindgen::prelude::*;
+use crate::pkm::ohpkm::console_log;
 
 type CoreResult<T, E> = core::result::Result<T, E>;
 
@@ -23,10 +22,10 @@ pub trait DataSection: Sized {
     }
 
     fn ensure_buffer_size(bytes: &[u8]) -> Result<()> {
-        if bytes.len() >= Self::TAG.size() {
+        if bytes.len() < Self::TAG.min_size() {
             Err(Error::BufferTooShort {
                 field: Self::TAG.to_string(),
-                expected: Self::TAG.size(),
+                expected: Self::TAG.min_size(),
                 received: bytes.len(),
             })
         } else {
@@ -45,7 +44,7 @@ pub trait DataSection: Sized {
 pub trait SectionTag: Sized + Copy + Eq + Hash + Display {
     fn from_index(index: u16) -> Option<Self>;
     fn index(&self) -> u16;
-    fn size(&self) -> usize;
+    fn min_size(&self) -> usize;
 }
 
 pub type SectionOffset = u16;
@@ -125,24 +124,6 @@ impl<Tag: SectionTag> SectionedData<Tag> {
     }
 }
 
-#[wasm_bindgen]
-extern "C" {
-    // Use `js_namespace` here to bind `console.log(..)` instead of just
-    // `log(..)`
-    #[wasm_bindgen(js_namespace = console)]
-    fn log(s: &str);
-
-    // The `console.log` is quite polymorphic, so we can bind it with multiple
-    // signatures. Note that we need to use `js_name` to ensure we always call
-    // `log` in JS.
-    #[wasm_bindgen(js_namespace = console, js_name = log)]
-    fn log_u32(a: u32);
-
-    // Multiple arguments too!
-    #[wasm_bindgen(js_namespace = console, js_name = log)]
-    fn log_many(a: &str, b: &str);
-}
-
 impl<Tag: SectionTag> SectionedData<Tag> {
     pub const fn new(magic_number: u32, version: u16) -> Self {
         Self {
@@ -156,7 +137,6 @@ impl<Tag: SectionTag> SectionedData<Tag> {
         &mut self,
         section: T,
     ) -> CoreResult<&mut Self, T::ErrorType> {
-        log("adding just regular");
         self.tagged_buffers.push(section.to_tagged_buffer()?);
 
         Ok(self)
@@ -177,7 +157,6 @@ impl<Tag: SectionTag> SectionedData<Tag> {
         &mut self,
         section: Option<T>,
     ) -> CoreResult<&mut Self, T::ErrorType> {
-        log("adding if some");
         if let Some(section) = section {
             self.tagged_buffers.push(section.to_tagged_buffer()?);
         }
@@ -210,18 +189,21 @@ impl<Tag: SectionTag> SectionedData<Tag> {
         let mut sections: Vec<TaggedBuffer<Tag>> = Vec::with_capacity(section_count as usize);
 
         for i in 0..section_count {
-            let metadata_start = (i * SECTION_METADATA_SIZE) as usize;
+            let metadata_start = HEADER_SIZE + (i * SECTION_METADATA_SIZE) as usize;
             let metadata_end = metadata_start + (SECTION_METADATA_SIZE as usize);
 
             let metadata_o =
                 SectionMetadata::<Tag>::from_bytes(&bytes[metadata_start..metadata_end]);
             let Some(metadata) = metadata_o else {
+                console_log(format!(
+                    "MALFORMED METADATA at {metadata_start} - {metadata_end}"
+                ));
                 continue;
             };
 
             let section_start = metadata.offset() as usize;
             let section_end = section_start + (metadata.length() as usize);
-            if bytes.len() <= section_end {
+            if bytes.len() < section_end {
                 return Err(Error::SectionOutOfBounds {
                     section_name: metadata.tag().to_string(),
                     offset: min_buffer_size as u16,

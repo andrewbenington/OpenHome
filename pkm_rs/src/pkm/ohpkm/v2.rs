@@ -1,14 +1,12 @@
-use crate::pkm::ohpkm::OhpkmV1;
 use crate::pkm::ohpkm::sectioned_data::{DataSection, SectionTag, SectionedData};
 use crate::pkm::ohpkm::v2_sections::{
     BdspData, GameboyData, Gen45Data, Gen67Data, LegendsArceusData, MainDataV2, PluginData,
     ScarletVioletData, SwordShieldData,
 };
+use crate::pkm::ohpkm::{OhpkmV1, console_log};
 use crate::pkm::{Error, Result};
 use crate::strings::SizedUtf16String;
 
-#[cfg(feature = "wasm")]
-use pkm_rs_derive::safe_wasm_impl;
 use pkm_rs_resources::abilities::AbilityIndex;
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::language::Language;
@@ -18,6 +16,7 @@ use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbon, OpenHomeRibbonSet};
 use pkm_rs_resources::species::SpeciesAndForme;
 
+use crate::pkm::ohpkm::JsResult;
 #[cfg(feature = "wasm")]
 use pkm_rs_types::TeraTypeWasm;
 use pkm_rs_types::{
@@ -86,7 +85,7 @@ impl SectionTag for SectionTagV2 {
         Self::new(index)
     }
 
-    fn size(&self) -> usize {
+    fn min_size(&self) -> usize {
         self.min_size()
     }
 
@@ -110,24 +109,6 @@ pub struct OhpkmV2 {
     pub sv_data: Option<ScarletVioletData>,
     #[wasm_bindgen(skip)]
     pub plugin_data: Option<PluginData>,
-}
-
-#[wasm_bindgen]
-extern "C" {
-    // Use `js_namespace` here to bind `console.log(..)` instead of just
-    // `log(..)`
-    #[wasm_bindgen(js_namespace = console)]
-    fn log(s: &str);
-
-    // The `console.log` is quite polymorphic, so we can bind it with multiple
-    // signatures. Note that we need to use `js_name` to ensure we always call
-    // `log` in JS.
-    #[wasm_bindgen(js_namespace = console, js_name = log)]
-    fn log_u32(a: u32);
-
-    // Multiple arguments too!
-    #[wasm_bindgen(js_namespace = console, js_name = log)]
-    fn log_many(a: &str, b: &str);
 }
 
 impl OhpkmV2 {
@@ -195,16 +176,14 @@ impl OhpkmV2 {
             .add_if_some(self.plugin_data.clone())?;
 
         let r = Ok(sectioned_data.to_bytes()?);
-        log("ok and we did it");
+        console_log("ok and we did it");
 
         r
     }
 }
 
-type JsResult<T> = core::result::Result<T, JsValue>;
-
 #[cfg(feature = "wasm")]
-#[safe_wasm_impl]
+// #[safe_wasm_impl]
 #[wasm_bindgen]
 #[allow(clippy::missing_const_for_fn)]
 impl OhpkmV2 {
@@ -875,7 +854,6 @@ impl OhpkmV2 {
 
     #[wasm_bindgen(setter = dvsWasm)]
     pub fn set_dvs(&mut self, value: Option<StatsPreSplit>) {
-        log(&format!("setting dvs to {value:?}"));
         match value {
             Some(dvs) => self.gameboy_data.get_or_insert_default().dvs = dvs,
             None => self.gameboy_data = None,
@@ -1593,7 +1571,48 @@ impl OhpkmV2 {
 
     #[wasm_bindgen(js_name = toByteArray)]
     pub fn to_bytes_js(&self) -> JsResult<Vec<u8>> {
-        self.to_bytes()
-            .map_err(|e| JsValue::from_str(&e.to_string()))
+        Ok(self.to_bytes()?)
     }
+
+    #[wasm_bindgen(js_name = fromV1Bytes)]
+    pub fn from_v1_bytes(bytes: Vec<u8>) -> JsResult<Self> {
+        Ok(OhpkmV1::from_bytes(&bytes).map(OhpkmV2::from_v1)?)
+    }
+
+    #[wasm_bindgen(js_name = getSectionBytes)]
+    pub fn get_section_bytes(&self) -> JsResult<js_sys::Object> {
+        let obj = js_sys::Object::new();
+
+        js_sys::Reflect::set(
+            &obj,
+            &JsValue::from("MainData"),
+            &JsValue::from(self.main_data.to_bytes()?),
+        )?;
+        add_section_bytes_to_js_object(&obj, &self.gameboy_data)?;
+        add_section_bytes_to_js_object(&obj, &self.gen45_data)?;
+        add_section_bytes_to_js_object(&obj, &self.gen67_data)?;
+        add_section_bytes_to_js_object(&obj, &self.swsh_data)?;
+        add_section_bytes_to_js_object(&obj, &self.bdsp_data)?;
+        add_section_bytes_to_js_object(&obj, &self.la_data)?;
+        add_section_bytes_to_js_object(&obj, &self.sv_data)?;
+        add_section_bytes_to_js_object(&obj, &self.plugin_data)?;
+
+        Ok(obj)
+    }
+}
+
+fn add_section_bytes_to_js_object<T: DataSection<ErrorType = Error>>(
+    obj: &js_sys::Object,
+    section: &Option<T>,
+) -> JsResult<()> {
+    if let Some(section) = section
+        && !section.is_empty()
+    {
+        js_sys::Reflect::set(
+            obj,
+            &JsValue::from(T::TAG.to_string()),
+            &JsValue::from(section.to_bytes()?),
+        )?;
+    }
+    Ok(())
 }

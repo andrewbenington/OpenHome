@@ -18,7 +18,7 @@ use serde::Serialize;
 use crate::{
     pkm::{
         Error, Result, StringErrorSource,
-        ohpkm::{OhpkmV1, SectionTagV2, sectioned_data::DataSection},
+        ohpkm::{OhpkmV1, SectionTagV2, console_log, sectioned_data::DataSection},
     },
     strings::SizedUtf16String,
     util,
@@ -525,7 +525,7 @@ impl DataSection for GameboyData {
     }
 
     fn is_empty(&self) -> bool {
-        self.dvs.is_empty() && self.met_time_of_day == 0 && self.evs_g12.is_empty()
+        self.met_time_of_day == 0 && self.evs_g12.is_empty()
     }
 }
 

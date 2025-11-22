@@ -126,6 +126,7 @@ export class OHPKM implements PKMInterface {
       this.formeNum = other.formeNum ?? 0
       this.heldItemIndex = other.heldItemIndex
       this.trainerName = other.trainerName
+      console.log('other trainer gender:', other.trainerGender)
       this.trainerGender = other.trainerGender
       this.trainerID = other.trainerID
       this.secretID = other.secretID ?? 0

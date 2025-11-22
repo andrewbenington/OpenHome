@@ -28,13 +28,6 @@ test('gen 3 conversion to OHPKM V2 and back is lossless', () => {
   expect(new Uint8Array(blazikenPk3.toBytes())).toEqual(new Uint8Array(gen3PKM.toBytes()))
 })
 
-// test('OHPKM V1 conversion to OHPKM V2 and back is lossless', () => {
-//   const v2 = new OhpkmV2(slowpokeOhpkm)
-//   const ohpkm = new OHPKM(v2)
-
-//   expect(new Uint8Array(slowpokeOhpkm.toBytes())).toEqual(new Uint8Array(ohpkm.toBytes()))
-// })
-
 describe('OHPKM V1 → V2 → V1 is lossless', () => {
   const files = fs
     .readdirSync(path.join(__dirname, 'PKMFiles', 'OH'))
@@ -62,7 +55,65 @@ describe('OHPKM V1 → V2 → V1 is lossless', () => {
   }
 })
 
-function diffSpans(a: Uint8Array, b: Uint8Array): string {
+describe('OHPKM V1 WASM → V2 → V1 is lossless', () => {
+  const files = fs
+    .readdirSync(path.join(__dirname, 'PKMFiles', 'OH'))
+    .filter((f) => f.endsWith('.ohpkm'))
+
+  for (const file of files) {
+    test(file, () => {
+      const bytes = new Uint8Array(fs.readFileSync(path.join(__dirname, 'PKMFiles', 'OH', file)))
+      const original = bytesToPKM(bytes, 'OHPKM') as OHPKM
+      original.fixErrors()
+      original.homeTracker = new Uint8Array(8)
+
+      // console.log('building from wasm')
+      const v2FromV1Wasm = OhpkmV2.fromV1Wasm(original)
+      // console.log('building from js')
+      const v2FromJs = new OhpkmV2(original)
+
+      const bytesPerSectionWasm = v2FromV1Wasm.getSectionBytes() as Record<string, Uint8Array>
+      const bytesPerSectionJs = v2FromJs.getSectionBytes() as Record<string, Uint8Array>
+
+      for (const tag of Object.keys(bytesPerSectionJs) as Array<keyof typeof bytesPerSectionJs>) {
+        const wasmBytes = bytesPerSectionWasm[tag]
+        const jsBytes = bytesPerSectionJs[tag]
+
+        if (!wasmBytes) {
+          throw new Error(`Section ${tag} missing from WASM version`)
+        }
+
+        if (wasmBytes.length !== jsBytes.length) {
+          throw new Error(
+            `Section ${tag} length mismatch: WASM=${wasmBytes.length} JS=${jsBytes.length}`
+          )
+        }
+
+        if (!jsBytes.every((v, i) => v === wasmBytes[i])) {
+          throw new Error(
+            tag +
+              ' ' +
+              diffSpans(
+                wasmBytes,
+                jsBytes,
+                10,
+                'OHPKM.ts -> fromV1Wasm() -> from_v1_bytes  ',
+                'OHPKM.ts -> new OhpkmV2()                  '
+              )
+          )
+        }
+      }
+    })
+  }
+})
+
+function diffSpans(
+  a: Uint8Array,
+  b: Uint8Array,
+  radix = 16,
+  expected = 'expected',
+  actual = 'actual'
+): string {
   const len = Math.max(a.length, b.length)
   let i = 0
 
@@ -90,9 +141,10 @@ function diffSpans(a: Uint8Array, b: Uint8Array): string {
       bHex.push(b[j] !== undefined ? hex(b[j]) : '--')
     }
 
-    out += `Mismatch 0x${start.toString(16)}-0x${end.toString(16)} (len=${end - start + 1})\n`
-    out += `  expected: ${aHex.join(' ')}\n`
-    out += `  actual:   ${bHex.join(' ')}\n\n`
+    const prefix = radix === 16 ? '0x' : ''
+    out += `Mismatch ${prefix}${start.toString(radix)}-${prefix}${end.toString(radix)} (len=${end - start + 1})\n`
+    out += `  ${expected}: ${aHex.join(' ')}\n`
+    out += `  ${actual}: ${bHex.join(' ')}\n\n`
   }
 
   if (out === '') {

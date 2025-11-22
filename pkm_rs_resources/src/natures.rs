@@ -35,7 +35,6 @@ impl NatureIndex {
     }
 
     pub fn to_byte(&self) -> u8 {
-        log("nature to bytes");
         self.0
     }
 }
