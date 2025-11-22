@@ -46,3 +46,4 @@ target/
 *.sublime-workspace
 *.sublime-project
 *.wakatime-project
+.idea
