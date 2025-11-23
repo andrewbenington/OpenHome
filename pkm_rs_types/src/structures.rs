@@ -388,6 +388,115 @@ impl BitSet for u8 {
     }
 }
 
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[derive(Default, Debug, Clone, Copy)]
+pub struct ShinyLeaves(u8);
+
+impl ShinyLeaves {
+    pub const fn from_byte(byte: u8) -> Self {
+        match byte >> 5 {
+            1 => Self(0b100000),
+            _ => Self(byte & 0b11111),
+        }
+    }
+
+    pub const fn to_byte(&self) -> u8 {
+        self.0
+    }
+
+    pub const fn is_empty(&self) -> bool {
+        self.0 == 0
+    }
+}
+
+impl Serialize for ShinyLeaves {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        if self.has_crown() {
+            serializer.serialize_str("Crown")
+        } else if self.0 == 0 {
+            serializer.serialize_str("No Leaves")
+        } else {
+            let mut leaves = vec![];
+            if self.has_first() {
+                leaves.push("First");
+            }
+            if self.has_second() {
+                leaves.push("Second");
+            }
+            if self.has_third() {
+                leaves.push("Third");
+            }
+            if self.has_fourth() {
+                leaves.push("Fourth");
+            }
+            if self.has_fifth() {
+                leaves.push("Fifth");
+            }
+            serializer.serialize_str(&leaves.join(", "))
+        }
+    }
+}
+
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[allow(clippy::missing_const_for_fn)]
+impl ShinyLeaves {
+    #[wasm_bindgen(constructor)]
+    pub fn new_empty() -> Self {
+        Self::default()
+    }
+
+    #[wasm_bindgen(js_name = fromByte)]
+    pub fn from_byte_js(byte: u8) -> Self {
+        Self::from_byte(byte)
+    }
+
+    #[wasm_bindgen(js_name = toByte)]
+    pub fn to_byte_js(&self) -> u8 {
+        self.to_byte()
+    }
+
+    #[wasm_bindgen(js_name = hasFirst)]
+    pub fn has_first(&self) -> bool {
+        (self.0 & 0b00001) != 0
+    }
+
+    #[wasm_bindgen(js_name = hasSecond)]
+    pub fn has_second(&self) -> bool {
+        (self.0 & 0b00010) != 0
+    }
+
+    #[wasm_bindgen(js_name = hasThird)]
+    pub fn has_third(&self) -> bool {
+        (self.0 & 0b00100) != 0
+    }
+
+    #[wasm_bindgen(js_name = hasFourth)]
+    pub fn has_fourth(&self) -> bool {
+        (self.0 & 0b01000) != 0
+    }
+
+    #[wasm_bindgen(js_name = hasFifth)]
+    pub fn has_fifth(&self) -> bool {
+        (self.0 & 0b10000) != 0
+    }
+
+    #[wasm_bindgen(js_name = hasCrown)]
+    pub fn has_crown(&self) -> bool {
+        (self.0 & 0b100000) != 0
+    }
+
+    pub fn count(&self) -> u8 {
+        if self.has_crown() {
+            return 0;
+        }
+
+        self.0.count_ones() as u8
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -432,5 +541,28 @@ mod tests {
         let mut byte_with_invalid_gender = 0b00000110;
         Gender::Female.set_bits_1_2(&mut byte_with_invalid_gender);
         assert_eq!(byte_with_invalid_gender, 0b00000010);
+    }
+
+    #[test]
+    fn shiny_leaves_to_from_byte() {
+        let byte = 0b01010;
+        let leaves = ShinyLeaves::from_byte(byte);
+
+        assert!(!leaves.has_first());
+        assert!(leaves.has_second());
+        assert!(!leaves.has_third());
+        assert!(leaves.has_fourth());
+        assert!(!leaves.has_fifth());
+        assert!(!leaves.has_crown());
+
+        let back_to_byte = leaves.to_byte();
+        assert_eq!(byte, back_to_byte);
+
+        let crown_byte = 0b100000;
+        let crown = ShinyLeaves::from_byte(crown_byte);
+
+        let ShinyLeaves::Crown = crown else {
+            panic!("expected crown, got leaves");
+        };
     }
 }

@@ -5,6 +5,7 @@ import { defineConfig } from 'vite'
 export default defineConfig({
   test: {
     setupFiles: ['src/test-setup.ts'],
+    hideSkippedTests: true,
   },
   resolve: {
     alias: {

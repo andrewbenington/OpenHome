@@ -1,7 +1,6 @@
 import { FileSchemas } from '@pokemon-files/schema'
 import { Dialog, Flex, VisuallyHidden } from '@radix-ui/themes'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
-import { FallbackProps } from 'react-error-boundary'
 import { MdDownload } from 'react-icons/md'
 import Fallback from 'src/components/Fallback'
 import { ArrowLeftIcon, ArrowRightIcon } from 'src/components/Icons'
@@ -216,16 +215,3 @@ const PokemonDetailsModal = (props: {
 }
 
 export default PokemonDetailsModal
-
-function FallbackComponent(props: FallbackProps) {
-  const { error, resetErrorBoundary } = props
-
-  return (
-    <div role="alert">
-      <p>Something went wrong:</p>
-      <pre>{error.message}</pre>
-      <p>{JSON.stringify(Object.getPrototypeOf(error))}</p>
-      <button onClick={resetErrorBoundary}>Try again</button>
-    </div>
-  )
-}

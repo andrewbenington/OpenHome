@@ -11,7 +11,7 @@ use pkm_rs_resources::{
 
 use pkm_rs_types::{
     ContestStats, FlagSet, Gender, Geolocations, HyperTraining, MarkingsSixShapesColors,
-    OriginGame, PokeDate, Stats8, Stats16Le, StatsPreSplit, TeraType, TrainerMemory,
+    OriginGame, PokeDate, ShinyLeaves, Stats8, Stats16Le, StatsPreSplit, TeraType, TrainerMemory,
 };
 use serde::Serialize;
 
@@ -534,7 +534,7 @@ impl DataSection for GameboyData {
 pub struct Gen45Data {
     pub encounter_type: u8,
     pub performance: u8,
-    pub shiny_leaves: u8,
+    pub shiny_leaves: ShinyLeaves,
     pub poke_star_fame: u8,
     pub is_ns_pokemon: bool,
 }
@@ -544,7 +544,7 @@ impl Gen45Data {
         if !old.game_of_origin.is_ds()
             && old.encounter_type == 0
             && old.performance == 0
-            && old.shiny_leaves == 0
+            && old.shiny_leaves.is_empty()
             && old.poke_star_fame == 0
             && !old.is_ns_pokemon
         {
@@ -572,7 +572,7 @@ impl DataSection for Gen45Data {
         Ok(Self {
             encounter_type: bytes[0],
             performance: bytes[1],
-            shiny_leaves: bytes[2],
+            shiny_leaves: ShinyLeaves::from_byte(bytes[2]),
             poke_star_fame: bytes[3],
             is_ns_pokemon: util::get_flag(bytes, 4, 0),
         })
@@ -583,7 +583,7 @@ impl DataSection for Gen45Data {
 
         bytes[0] = self.encounter_type;
         bytes[1] = self.performance;
-        bytes[2] = self.shiny_leaves;
+        bytes[2] = self.shiny_leaves.to_byte();
         bytes[3] = self.poke_star_fame;
         util::set_flag(&mut bytes, 4, 0, self.is_ns_pokemon);
 
@@ -593,7 +593,7 @@ impl DataSection for Gen45Data {
     fn is_empty(&self) -> bool {
         self.encounter_type == 0
             && self.performance == 0
-            && self.shiny_leaves == 0
+            && self.shiny_leaves.is_empty()
             && self.poke_star_fame == 0
             && !self.is_ns_pokemon
     }

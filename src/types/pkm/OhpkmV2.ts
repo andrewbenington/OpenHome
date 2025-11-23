@@ -9,6 +9,7 @@ import {
   NatureIndex,
   PokeDate,
   SpeciesLookup,
+  updatePidIfWouldBecomeShinyGen345,
 } from '@pkm-rs/pkg'
 import * as lodash from 'lodash'
 import Prando from 'prando'
@@ -35,6 +36,7 @@ import {
   stats16LeToWasmNullable,
   stats8ToWasm,
   stats8ToWasmNullable,
+  statsFromWasm,
   statsFromWasmNullable,
   statsPreSplitFromWasm,
   statsPreSplitToWasm,
@@ -71,13 +73,23 @@ export class OhpkmV2 extends PkmRs.OhpkmV2 implements PKMInterface {
 
       let prng: Prando
 
-      if ('personalityValue' in other) {
+      if (other.personalityValue !== undefined && other.secretID !== undefined) {
         prng = new Prando(
           other.trainerName
-            .concat((other.personalityValue ?? 0).toString())
-            .concat((other.secretID ?? 0).toString())
+            .concat(other.personalityValue.toString())
+            .concat(other.secretID.toString())
             .concat(other.trainerID.toString())
         )
+
+        if (other.format === 'PK3' || other.format === 'PK4' || other.format === 'PK5') {
+          this.personalityValue = updatePidIfWouldBecomeShinyGen345(
+            other.personalityValue,
+            other.trainerID,
+            other.secretID
+          )
+        } else {
+          this.personalityValue = other.personalityValue
+        }
       } else if (other.dvs) {
         const { hp, atk, def, spc, spe } = other.dvs
 
@@ -86,17 +98,23 @@ export class OhpkmV2 extends PkmRs.OhpkmV2 implements PKMInterface {
             .concat(`${hp}~${atk}~${def}~${spc}~${spe}`)
             .concat(other.trainerID.toString())
         )
+
+        this.personalityValue = generatePersonalityValuePreservingAttributes(other)
       } else {
         prng = new Prando(other.trainerName.concat(other.trainerID.toString()))
       }
 
       this.speciesAndForme = new PkmRs.SpeciesAndForme(other.dexNum, other.formeNum)
-      this.encryptionConstant = other.encryptionConstant ?? 0
+
+      if (other.personalityValue === undefined) {
+        this.encryptionConstant = 0
+      } else {
+        this.encryptionConstant = other.encryptionConstant ?? this.personalityValue
+      }
+
       this.heldItemIndex = other.heldItemIndex
       this.trainerName = other.trainerName
-      console.log(`setting v2 gender to ${other.trainerGender}`)
       this.trainerGender = other.trainerGender
-      console.log(`v2 gender is now ${this.trainerGender}`)
       this.trainerID = other.trainerID
       this.secretID = other.secretID
       this.exp = other.exp
@@ -114,10 +132,6 @@ export class OhpkmV2 extends PkmRs.OhpkmV2 implements PKMInterface {
       this.pokerusByte = other.pokerusByte ?? 0
       this.trainerFriendship = other.trainerFriendship ?? 40
 
-      this.personalityValue =
-        other.personalityValue !== undefined
-          ? other.personalityValue
-          : generatePersonalityValuePreservingAttributes(other)
       this.isFatefulEncounter = other.isFatefulEncounter ?? false
 
       if (other.format === 'PK1' || other.format === 'PK2') {
@@ -179,9 +193,6 @@ export class OhpkmV2 extends PkmRs.OhpkmV2 implements PKMInterface {
         this.ability
 
       this.isShadow = other.isShadow ?? false
-
-      this.encryptionConstant =
-        other.encryptionConstant ?? other.personalityValue ?? prng.nextInt(0, 0xffffffff)
 
       if (other.metDate) {
         this.metDate = other.metDate
@@ -325,10 +336,7 @@ export class OhpkmV2 extends PkmRs.OhpkmV2 implements PKMInterface {
   }
 
   static fromV1Wasm(v1: OHPKM) {
-    console.log('In OhpkmV2.fromV1Wasm v1 trainer gender is', v1.trainerGender)
     const v2 = PkmRs.OhpkmV2.fromV1Bytes(new Uint8Array(v1.toBytes()))
-    console.log('byte 317 is', new Uint8Array(v1.toBytes())[317])
-    console.log('In OhpkmV2.fromV1Wasm v2 trainer gender is', v2.trainerGender)
     return new OhpkmV2(v2.toByteArray().buffer as ArrayBuffer)
   }
 
@@ -352,6 +360,13 @@ export class OhpkmV2 extends PkmRs.OhpkmV2 implements PKMInterface {
   }
   set evsG12(value: types.StatsPreSplit | undefined) {
     this.evsG12Wasm = statsPreSplitToWasm(value)
+  }
+
+  get ivs() {
+    return statsFromWasm(this.ivsWasm)
+  }
+  set ivs(value: types.Stats) {
+    this.ivsWasm = stats8ToWasm(value)
   }
 
   get dvs() {

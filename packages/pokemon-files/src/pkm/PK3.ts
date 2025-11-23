@@ -54,7 +54,7 @@ export class PK3 {
   ball: number
   ivs: types.Stats
   isEgg: boolean
-  isNicknamed: boolean
+  abilityNum: number
   ribbonBytes: Uint8Array
   isFatefulEncounter: boolean
   statusCondition: number
@@ -116,7 +116,7 @@ export class PK3 {
       this.ball = byteLogic.uIntFromBufferBits(dataView, 0x46, 11, 4, true)
       this.ivs = types.read30BitIVsFromBytes(dataView, 0x48)
       this.isEgg = byteLogic.getFlag(dataView, 0x48, 30)
-      this.isNicknamed = byteLogic.getFlag(dataView, 0x48, 31)
+      this.abilityNum = byteLogic.getFlag(dataView, 0x48, 31) ? 2 : 1
       this.ribbonBytes = new Uint8Array(buffer).slice(0x4c, 0x50)
       this.isFatefulEncounter = byteLogic.getFlag(dataView, 0x4c, 31)
       if (dataView.byteLength >= 100) {
@@ -195,7 +195,15 @@ export class PK3 {
         spd: 0,
       }
       this.isEgg = other.isEgg ?? false
-      this.isNicknamed = other.isNicknamed ?? false
+      this.abilityNum = other.abilityNum ?? 1
+      if (
+        this.abilityNum === 2 &&
+        this.metadata
+          ?.abilityByNumGen3(this.abilityNum)
+          ?.equals(this.metadata.abilityByNumGen3(this.abilityNum))
+      ) {
+        this.abilityNum = 1
+      }
       this.ribbonBytes = other.ribbonBytes ?? new Uint8Array(4)
       this.isFatefulEncounter = other.isFatefulEncounter ?? false
       this.statusCondition = other.statusCondition ?? 0
@@ -249,7 +257,7 @@ export class PK3 {
     byteLogic.uIntToBufferBits(dataView, this.ball, 70, 11, 4, true)
     types.write30BitIVsToBytes(dataView, 0x48, this.ivs)
     byteLogic.setFlag(dataView, 0x48, 30, this.isEgg)
-    byteLogic.setFlag(dataView, 0x48, 31, this.isNicknamed)
+    byteLogic.setFlag(dataView, 0x48, 31, this.abilityNum === 2)
     new Uint8Array(buffer).set(new Uint8Array(this.ribbonBytes.slice(0, 4)), 0x4c)
     byteLogic.setFlag(dataView, 0x4c, 31, this.isFatefulEncounter)
     if (options?.includeExtraFields) {
@@ -299,10 +307,6 @@ export class PK3 {
 
   public get nature() {
     return NatureIndex.newFromPid(this.personalityValue)
-  }
-
-  public get abilityNum() {
-    return ((this.personalityValue >> 0) & 1) + 1
   }
 
   public get ability() {

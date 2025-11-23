@@ -17,13 +17,13 @@ use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbon, OpenHomeRibbonSet}
 use pkm_rs_resources::species::SpeciesAndForme;
 
 use crate::pkm::ohpkm::JsResult;
-#[cfg(feature = "wasm")]
-use pkm_rs_types::TeraTypeWasm;
 use pkm_rs_types::{
     ContestStats, FlagSet, Geolocations, HyperTraining, MarkingsSixShapesColors, OriginGame,
     Stats8, Stats16Le, StatsPreSplit, TeraType,
 };
 use pkm_rs_types::{Gender, PokeDate, TrainerMemory};
+#[cfg(feature = "wasm")]
+use pkm_rs_types::{ShinyLeaves, TeraTypeWasm};
 use strum_macros::Display;
 
 const MAGIC_NUMBER: u32 = 0x57575757;
@@ -98,17 +98,17 @@ impl SectionTag for SectionTagV2 {
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 pub struct OhpkmV2 {
     #[wasm_bindgen(skip)]
-    pub main_data: MainDataV2,
-    pub gameboy_data: Option<GameboyData>,
-    pub gen45_data: Option<Gen45Data>,
-    pub gen67_data: Option<Gen67Data>,
-    pub swsh_data: Option<SwordShieldData>,
-    pub bdsp_data: Option<BdspData>,
-    pub la_data: Option<LegendsArceusData>,
+    main_data: MainDataV2,
+    gameboy_data: Option<GameboyData>,
+    gen45_data: Option<Gen45Data>,
+    gen67_data: Option<Gen67Data>,
+    swsh_data: Option<SwordShieldData>,
+    bdsp_data: Option<BdspData>,
+    la_data: Option<LegendsArceusData>,
     #[wasm_bindgen(skip)]
-    pub sv_data: Option<ScarletVioletData>,
+    sv_data: Option<ScarletVioletData>,
     #[wasm_bindgen(skip)]
-    pub plugin_data: Option<PluginData>,
+    plugin_data: Option<PluginData>,
 }
 
 impl OhpkmV2 {
@@ -443,11 +443,11 @@ impl OhpkmV2 {
         self.main_data.scale = v;
     }
 
-    #[wasm_bindgen(getter = ivs)]
+    #[wasm_bindgen(getter = ivsWasm)]
     pub fn ivs(&self) -> Stats8 {
         self.main_data.ivs
     }
-    #[wasm_bindgen(setter = ivs)]
+    #[wasm_bindgen(setter = ivsWasm)]
     pub fn set_ivs(&mut self, v: &Stats8) {
         self.main_data.ivs = *v;
     }
@@ -925,19 +925,19 @@ impl OhpkmV2 {
     }
 
     #[wasm_bindgen(getter = shinyLeaves)]
-    pub fn shiny_leaves(&self) -> Option<u8> {
+    pub fn shiny_leaves(&self) -> Option<ShinyLeaves> {
         Some(self.gen45_data?.shiny_leaves)
     }
 
     #[wasm_bindgen(setter = shinyLeaves)]
-    pub fn set_shiny_leaves(&mut self, value: Option<u8>) {
+    pub fn set_shiny_leaves(&mut self, value: Option<ShinyLeaves>) {
         match value {
             Some(shiny_leaves) => {
                 self.gen45_data.get_or_insert_default().shiny_leaves = shiny_leaves
             }
             None => {
                 if let Some(gen45_data) = &mut self.gen45_data {
-                    gen45_data.shiny_leaves = 0
+                    gen45_data.shiny_leaves = ShinyLeaves::default()
                 }
             }
         }

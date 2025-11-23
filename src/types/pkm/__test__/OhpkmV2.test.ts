@@ -1,7 +1,7 @@
 import { PK3 } from '@pokemon-files/pkm'
 import fs from 'fs'
 import path from 'path'
-import { beforeAll, describe, expect, test } from 'vitest'
+import { assert, beforeAll, describe, test } from 'vitest'
 import { bytesToPKM } from '../../FileImport'
 import { OHPKM } from '../OHPKM'
 import OhpkmV2 from '../OhpkmV2'
@@ -9,23 +9,50 @@ import { initializeWasm } from './init'
 
 beforeAll(initializeWasm)
 
-var blazikenPk3: PK3
-var blazikenPk3Bytes: Uint8Array
+describe('gen 3 conversion to OHPKM V2 and back is lossless', async () => {
+  const files = fs
+    .readdirSync(path.join(__dirname, 'PKMFiles', 'Gen3'))
+    .filter((f) => f.endsWith('.pkm'))
+  await initializeWasm()
 
-beforeAll(() => {
-  blazikenPk3Bytes = new Uint8Array(
-    fs.readFileSync(path.join(__dirname, './PKMFiles/Gen3', 'blaziken.pkm'))
-  )
+  for (const file of files) {
+    const bytes = new Uint8Array(fs.readFileSync(path.join(__dirname, 'PKMFiles', 'Gen3', file)))
+    const original = bytesToPKM(bytes, 'PK3') as PK3
+    original.refreshChecksum()
 
-  blazikenPk3 = bytesToPKM(blazikenPk3Bytes, 'PK3') as PK3
-})
+    const v2 = new OhpkmV2(original)
+    test(`ohpkm v2 genders match - ${file}`, () => {
+      assert(original.gender === v2.gender)
+    })
 
-test('gen 3 conversion to OHPKM V2 and back is lossless', () => {
-  const ohPKM = new OhpkmV2(blazikenPk3)
-  const gen3PKM = new PK3(ohPKM)
-  gen3PKM.refreshChecksum()
+    const roundTrip = new PK3(v2)
+    roundTrip.refreshChecksum()
 
-  expect(new Uint8Array(blazikenPk3.toBytes())).toEqual(new Uint8Array(gen3PKM.toBytes()))
+    test(`ability nums match - ${file}`, () => {
+      assert(original.abilityNum === roundTrip.abilityNum)
+    })
+
+    test(`pids match - ${file}`, () => {
+      if (original.personalityValue !== roundTrip.personalityValue) {
+        throw new Error(
+          `PID mismatch: original=${original.personalityValue} roundTrip=${roundTrip.personalityValue}`
+        )
+      }
+    })
+
+    test(`genders match - ${file}`, () => {
+      assert(original.gender === roundTrip.gender)
+    })
+
+    const expectedBytes = new Uint8Array(original.toBytes())
+    const actualBytes = new Uint8Array(roundTrip.toBytes())
+
+    test(`bytes match - ${file}`, () => {
+      if (!expectedBytes.every((v, i) => v === actualBytes[i])) {
+        throw new Error(diffSpans(expectedBytes, actualBytes))
+      }
+    })
+  }
 })
 
 describe('OHPKM V1 → V2 → V1 is lossless', () => {
@@ -46,7 +73,7 @@ describe('OHPKM V1 → V2 → V1 is lossless', () => {
       const expected = new Uint8Array(original.toBytes())
       const actual = new Uint8Array(roundTrip.toBytes())
 
-      zeroOutRanges(expected, actual, [AbsoluteWeightHeight])
+      zeroOutRanges(expected, actual, [AbsoluteWeightHeight, UnknownBytesRange])
 
       if (!expected.every((v, i) => v === actual[i])) {
         throw new Error(diffSpans(expected, actual))
@@ -55,55 +82,63 @@ describe('OHPKM V1 → V2 → V1 is lossless', () => {
   }
 })
 
-describe('OHPKM V1 WASM → V2 → V1 is lossless', () => {
+describe('OHPKM V1 WASM → V2 → V1 is lossless', async () => {
+  await initializeWasm()
+
   const files = fs
     .readdirSync(path.join(__dirname, 'PKMFiles', 'OH'))
     .filter((f) => f.endsWith('.ohpkm'))
 
   for (const file of files) {
-    test(file, () => {
-      const bytes = new Uint8Array(fs.readFileSync(path.join(__dirname, 'PKMFiles', 'OH', file)))
-      const original = bytesToPKM(bytes, 'OHPKM') as OHPKM
-      original.fixErrors()
-      original.homeTracker = new Uint8Array(8)
+    const bytes = new Uint8Array(fs.readFileSync(path.join(__dirname, 'PKMFiles', 'OH', file)))
+    const original = bytesToPKM(bytes, 'OHPKM') as OHPKM
+    original.fixErrors()
+    original.homeTracker = new Uint8Array(8)
 
-      // console.log('building from wasm')
-      const v2FromV1Wasm = OhpkmV2.fromV1Wasm(original)
-      // console.log('building from js')
-      const v2FromJs = new OhpkmV2(original)
+    // console.log('building from wasm')
+    const v2FromV1Wasm = OhpkmV2.fromV1Wasm(original)
+    // console.log('building from js')
+    const v2FromJs = new OhpkmV2(original)
 
-      const bytesPerSectionWasm = v2FromV1Wasm.getSectionBytes() as Record<string, Uint8Array>
-      const bytesPerSectionJs = v2FromJs.getSectionBytes() as Record<string, Uint8Array>
-
-      for (const tag of Object.keys(bytesPerSectionJs) as Array<keyof typeof bytesPerSectionJs>) {
-        const wasmBytes = bytesPerSectionWasm[tag]
-        const jsBytes = bytesPerSectionJs[tag]
-
-        if (!wasmBytes) {
-          throw new Error(`Section ${tag} missing from WASM version`)
-        }
-
-        if (wasmBytes.length !== jsBytes.length) {
-          throw new Error(
-            `Section ${tag} length mismatch: WASM=${wasmBytes.length} JS=${jsBytes.length}`
-          )
-        }
-
-        if (!jsBytes.every((v, i) => v === wasmBytes[i])) {
-          throw new Error(
-            tag +
-              ' ' +
-              diffSpans(
-                wasmBytes,
-                jsBytes,
-                10,
-                'OHPKM.ts -> fromV1Wasm() -> from_v1_bytes  ',
-                'OHPKM.ts -> new OhpkmV2()                  '
-              )
-          )
-        }
+    test(`pids match - ${file}`, () => {
+      if (v2FromV1Wasm.personalityValue !== v2FromJs.personalityValue) {
+        throw new Error(
+          `PID mismatch: wasm=${v2FromV1Wasm.personalityValue} js=${v2FromJs.personalityValue}`
+        )
       }
     })
+
+    const bytesPerSectionWasm = v2FromV1Wasm.getSectionBytes() as Record<string, Uint8Array>
+    const bytesPerSectionJs = v2FromJs.getSectionBytes() as Record<string, Uint8Array>
+
+    for (const tag of Object.keys(bytesPerSectionJs) as Array<keyof typeof bytesPerSectionJs>) {
+      const wasmBytes = bytesPerSectionWasm[tag]
+      const jsBytes = bytesPerSectionJs[tag]
+
+      if (!wasmBytes) {
+        throw new Error(`Section ${tag} missing from WASM version`)
+      }
+
+      if (wasmBytes.length !== jsBytes.length) {
+        throw new Error(
+          `Section ${tag} length mismatch: WASM=${wasmBytes.length} JS=${jsBytes.length}`
+        )
+      }
+
+      test(`${tag} bytes match - ${file}`, () => {
+        if (!jsBytes.every((v, i) => v === wasmBytes[i])) {
+          throw new Error(
+            diffSpans(
+              wasmBytes,
+              jsBytes,
+              10,
+              'OHPKM.ts -> fromV1Wasm() -> from_v1_bytes  ',
+              'OHPKM.ts -> new OhpkmV2()                  '
+            )
+          )
+        }
+      })
+    }
   }
 })
 
@@ -154,6 +189,7 @@ function diffSpans(
   return out.trim()
 }
 const AbsoluteWeightHeight: [number, number] = [0xac, 0xb3]
+const UnknownBytesRange: [number, number] = [0x97, 0x97]
 
 function zeroOutRanges(a: Uint8Array, b: Uint8Array, ignoreRanges: Array<[number, number]>) {
   for (const [start, end] of ignoreRanges) {

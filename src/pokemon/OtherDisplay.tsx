@@ -29,7 +29,7 @@ import {
   getMonGen345Identifier,
 } from 'src/util/Lookup'
 import DynamaxLevel from '../components/DynamaxLevel'
-import ShinyLeaves from '../components/ShinyLeaves'
+import ShinyLeavesDisplay from '../components/ShinyLeaves'
 import TypeIcon from '../components/TypeIcon'
 import useIsDev from '../hooks/isDev'
 import { isRestricted } from '../types/TransferRestrictions'
@@ -40,7 +40,6 @@ import {
   getHiddenPowerPower,
   getHiddenPowerType,
   getWeightCalculated,
-  shinyLeafValues,
 } from '../types/pkm/util'
 import { getFlagsInRange } from '../util/byteLogic'
 import AttributeRow from './AttributeRow'
@@ -164,7 +163,7 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
         {mon.shinyLeaves !== undefined &&
           !isRestricted(HGSS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) && (
             <AttributeRow label="Shiny Leaves">
-              <ShinyLeaves {...shinyLeafValues(mon.shinyLeaves)} />
+              <ShinyLeavesDisplay leaves={mon.shinyLeaves} />
             </AttributeRow>
           )}
         {!isRestricted(USUM_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&

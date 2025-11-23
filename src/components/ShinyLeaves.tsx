@@ -1,3 +1,4 @@
+import { ShinyLeaves } from '@pkm-rs/pkg'
 import { getPublicImageURL } from '../images/images'
 
 const styles = {
@@ -45,18 +46,11 @@ const ShinyLeafIcon = (props: ShinyLeafIconProps) => {
 }
 
 interface ShinyLeavesProps {
-  first: boolean
-  second: boolean
-  third: boolean
-  fourth: boolean
-  fifth: boolean
-  crown: boolean
+  leaves: ShinyLeaves
 }
 
-const ShinyLeaves = (props: ShinyLeavesProps) => {
-  const { first, second, third, fourth, fifth, crown } = props
-
-  return crown ? (
+const ShinyLeavesDisplay = ({ leaves }: ShinyLeavesProps) => {
+  return leaves.hasCrown() ? (
     <img
       alt="shiny_leaf_crown"
       draggable={false}
@@ -65,13 +59,13 @@ const ShinyLeaves = (props: ShinyLeavesProps) => {
     />
   ) : (
     <div style={{ display: 'flex', flexDirection: 'row' }}>
-      <ShinyLeafIcon full={first} index={0} />
-      <ShinyLeafIcon full={second} index={1} />
-      <ShinyLeafIcon full={third} index={2} />
-      <ShinyLeafIcon full={fourth} index={3} />
-      <ShinyLeafIcon full={fifth} index={4} />
+      <ShinyLeafIcon full={leaves.hasFirst()} index={0} />
+      <ShinyLeafIcon full={leaves.hasSecond()} index={1} />
+      <ShinyLeafIcon full={leaves.hasThird()} index={2} />
+      <ShinyLeafIcon full={leaves.hasFourth()} index={3} />
+      <ShinyLeafIcon full={leaves.hasFifth()} index={4} />
     </div>
   )
 }
 
-export default ShinyLeaves
+export default ShinyLeavesDisplay

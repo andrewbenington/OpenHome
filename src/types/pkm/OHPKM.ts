@@ -9,7 +9,9 @@ import {
   MetadataLookup,
   NatureIndex,
   OriginGame,
+  ShinyLeaves,
   SpeciesLookup,
+  updatePidIfWouldBecomeShinyGen345,
 } from '@pkm-rs/pkg'
 import {
   ContestStats,
@@ -102,14 +104,27 @@ export class OHPKM implements PKMInterface {
     } else {
       const other = arg
       let prng: Prando
-
-      if ('personalityValue' in other) {
+      if (
+        'personalityValue' in other &&
+        other.personalityValue !== undefined &&
+        other.secretID !== undefined
+      ) {
         prng = new Prando(
           other.trainerName
-            .concat((other.personalityValue ?? 0).toString())
-            .concat((other.secretID ?? 0).toString())
+            .concat(other.personalityValue.toString())
+            .concat(other.secretID.toString())
             .concat(other.trainerID.toString())
         )
+
+        if (other.format === 'PK3' || other.format === 'PK4' || other.format === 'PK5') {
+          this.personalityValue = updatePidIfWouldBecomeShinyGen345(
+            other.personalityValue,
+            other.trainerID,
+            other.secretID
+          )
+        } else {
+          this.personalityValue = other.personalityValue
+        }
       } else if (other.dvs) {
         const { hp, atk, def, spc, spe } = other.dvs
 
@@ -118,15 +133,21 @@ export class OHPKM implements PKMInterface {
             .concat(`${hp}~${atk}~${def}~${spc}~${spe}`)
             .concat(other.trainerID.toString())
         )
+        this.personalityValue = generatePersonalityValuePreservingAttributes(other)
       } else {
         prng = new Prando(other.trainerName.concat(other.trainerID.toString()))
+      }
+
+      if (other.personalityValue === undefined) {
+        this.encryptionConstant = 0
+      } else {
+        this.encryptionConstant = other.encryptionConstant ?? this.personalityValue
       }
 
       this.dexNum = other.dexNum
       this.formeNum = other.formeNum ?? 0
       this.heldItemIndex = other.heldItemIndex
       this.trainerName = other.trainerName
-      console.log('other trainer gender:', other.trainerGender)
       this.trainerGender = other.trainerGender
       this.trainerID = other.trainerID
       this.secretID = other.secretID ?? 0
@@ -145,10 +166,6 @@ export class OHPKM implements PKMInterface {
       this.pokerusByte = other.pokerusByte ?? 0
       this.trainerFriendship = other.trainerFriendship ?? 40
 
-      this.personalityValue =
-        other.personalityValue !== undefined
-          ? other.personalityValue
-          : generatePersonalityValuePreservingAttributes(other)
       this.isFatefulEncounter = other.isFatefulEncounter ?? false
 
       if (other.format === 'PK1' || other.format === 'PK2') {
@@ -217,9 +234,6 @@ export class OHPKM implements PKMInterface {
 
       this.isShadow = other.isShadow ?? false
 
-      this.encryptionConstant =
-        other.encryptionConstant ?? other.personalityValue ?? prng.nextInt(0, 0xffffffff)
-
       if (other.metDate) {
         this.metDate = other.metDate
       } else {
@@ -239,7 +253,7 @@ export class OHPKM implements PKMInterface {
 
       this.encounterType = other.encounterType ?? 0
 
-      this.shinyLeaves = other.shinyLeaves ?? 0
+      this.shinyLeaves = other.shinyLeaves ?? new ShinyLeaves()
       this.performance = other.performance ?? 0
 
       // Gen 5+
@@ -1099,11 +1113,11 @@ export class OHPKM implements PKMInterface {
   }
 
   public get shinyLeaves() {
-    return this.bytes[0xea] & 0x3f
+    return ShinyLeaves.fromByte(this.bytes[0xea])
   }
 
-  public set shinyLeaves(value: number) {
-    this.bytes[0xea] = (this.bytes[0xea] & 0xc0) | (value & 0x3f)
+  public set shinyLeaves(value: ShinyLeaves) {
+    this.bytes[0xea] = (this.bytes[0xea] & 0xc0) | value.toByte()
   }
 
   public get fullness() {

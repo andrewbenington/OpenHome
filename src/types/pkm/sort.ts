@@ -18,6 +18,7 @@ export const SortTypes = [
   'Poké Ball',
   'Held Item',
   'Is Egg',
+  'Shiny Leaves',
 ]
 
 export type SortType = (typeof SortTypes)[number]
@@ -123,6 +124,10 @@ export function getSortFunction(
       return (a, b) => (a.ball ?? Ball.Poke) - (b.ball ?? Ball.Poke)
     case 'Is Egg':
       return (a, b) => Number(a.isEgg) - Number(b.isEgg)
+    case 'Shiny Leaves':
+      return (a, b) =>
+        (b.shinyLeaves?.hasCrown() ? 6 : (b.shinyLeaves?.count() ?? 0)) -
+        (a.shinyLeaves?.hasCrown() ? 6 : (a.shinyLeaves?.count() ?? 0))
     case 'Held Item':
       return sortByHeldItem
     default:

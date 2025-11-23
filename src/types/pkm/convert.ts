@@ -92,7 +92,7 @@ export function stats8FromWasm(value: PkmWasm.Stats8): Stats {
     atk: value.atk,
     def: value.def,
     spa: value.spa,
-    spd: value.spe,
+    spd: value.spd,
     spe: value.spe,
   }
 }
@@ -112,7 +112,7 @@ export function statsFromWasm(value: PkmWasm.Stats16Le | PkmWasm.Stats8): Stats 
     atk: value.atk,
     def: value.def,
     spa: value.spa,
-    spd: value.spe,
+    spd: value.spd,
     spe: value.spe,
   }
 }

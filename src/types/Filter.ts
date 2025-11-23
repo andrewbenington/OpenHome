@@ -15,6 +15,7 @@ export interface Filter {
   shiny?: string
   ball?: number
   isEgg?: boolean
+  shinyLeaves?: number
 }
 
 export type HeldItemFilter = number | HeldItemCategory
@@ -34,6 +35,9 @@ export function filterApplies(filter: Filter, mon: PKMInterface) {
   }
   if (filter.isEgg !== undefined && mon.isEgg !== filter.isEgg) {
     return false
+  }
+  if (filter.shinyLeaves !== undefined && 'shinyLeaves' in mon) {
+    return mon.shinyLeaves && mon.shinyLeaves.count() >= filter.shinyLeaves
   }
   if (
     filter.ability !== undefined &&

@@ -6,7 +6,6 @@ import { PKM } from '../pkm'
 
 import {
   Gender,
-  genderFromInt,
   Generation,
   MetadataLookup,
   NatureIndex,
@@ -55,12 +54,10 @@ export function generatePersonalityValuePreservingAttributes(mon: AllPKMFields):
 
   let personalityValue = 0
   let otherNature: NatureIndex | undefined
-  let otherAbilityNum = 4
 
   if (mon.personalityValue !== undefined && mon.abilityNum !== undefined) {
     personalityValue = mon.personalityValue
     otherNature = mon.nature
-    otherAbilityNum = mon.abilityNum
   } else {
     personalityValue = prng.nextInt(0, 0xffffffff)
   }
@@ -77,10 +74,7 @@ export function generatePersonalityValuePreservingAttributes(mon: AllPKMFields):
     return Number(newPersonalityValue)
   }
 
-  const otherGender: Gender =
-    mon.gender !== undefined
-      ? genderFromInt(mon.gender)
-      : metadata.genderFromPid(Number(newPersonalityValue))
+  const otherGender: Gender = mon.gender ?? metadata.genderFromPid(Number(newPersonalityValue))
 
   const shouldCheckUnown = mon.dexNum === NationalDex.Unown
 
@@ -89,16 +83,24 @@ export function generatePersonalityValuePreservingAttributes(mon: AllPKMFields):
     const newGender = metadata.genderFromPid(Number(newPersonalityValue))
     const newNature = NatureIndex.newFromPid(Number(newPersonalityValue))
 
-    const newAbilityNum = Number(newPersonalityValue & BigInt(1)) + 1
-
-    if (
-      (!shouldCheckUnown || getUnownLetterGen3(Number(newPersonalityValue)) === mon.formeNum) &&
-      newGender === otherGender &&
-      (otherAbilityNum === 4 || shouldCheckUnown || newAbilityNum === otherAbilityNum) &&
-      (otherNature === undefined || newNature.equals(otherNature)) &&
-      getIsShinyPreGen6(mon.trainerID, mon.secretID ?? 0, Number(newPersonalityValue)) ===
+    function getInconsistancy(): string | null {
+      if (shouldCheckUnown && getUnownLetterGen3(Number(newPersonalityValue)) !== mon.formeNum) {
+        return 'wrong unown letter'
+      } else if (newGender !== otherGender) {
+        return `gender mismatch`
+      } else if (otherNature !== undefined && !newNature.equals(otherNature)) {
+        return 'nature mismatch'
+      } else if (
+        getIsShinyPreGen6(mon.trainerID, mon.secretID ?? 0, Number(newPersonalityValue)) !==
         mon.isShiny()
-    ) {
+      ) {
+        return 'shininess mismatch'
+      }
+
+      return null
+    }
+
+    if (getInconsistancy() === null) {
       return Number(newPersonalityValue)
     }
 

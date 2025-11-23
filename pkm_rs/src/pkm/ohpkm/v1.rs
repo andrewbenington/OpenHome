@@ -12,6 +12,8 @@ use pkm_rs_resources::moves::MoveSlot;
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbonSet};
 use pkm_rs_resources::species::{FormeMetadata, SpeciesAndForme, SpeciesMetadata};
+#[cfg(feature = "wasm")]
+use pkm_rs_types::ShinyLeaves;
 use pkm_rs_types::{
     ContestStats, Geolocations, HyperTraining, MarkingsSixShapesColors, OriginGame, Stats8,
     Stats16Le, StatsPreSplit,
@@ -100,7 +102,7 @@ pub struct OhpkmV1 {
     pub met_time_of_day: u8,
     pub handler_gender: bool,
     pub is_ns_pokemon: bool,
-    pub shiny_leaves: u8,
+    pub shiny_leaves: ShinyLeaves,
     pub fullness: u8,
     pub enjoyment: u8,
     pub game_of_origin: OriginGame,
@@ -259,7 +261,7 @@ impl OhpkmV1 {
             palma: u32::from_le_bytes(bytes[231..235].try_into().unwrap()),
             poke_star_fame: bytes[232],
             met_time_of_day: bytes[233],
-            shiny_leaves: bytes[234] & 0x3f,
+            shiny_leaves: ShinyLeaves::from_byte(bytes[234]),
             handler_gender: util::get_flag(bytes, 234, 7),
             is_ns_pokemon: util::get_flag(bytes, 234, 6),
             fullness: bytes[235],
@@ -445,7 +447,7 @@ impl Pkm for OhpkmV1 {
 
         bytes[234] = ((self.handler_gender as u8) << 7)
             | ((self.is_ns_pokemon as u8) << 6)
-            | (self.shiny_leaves & 0x3f);
+            | (self.shiny_leaves.to_byte());
         bytes[235] = self.fullness;
         bytes[236] = self.enjoyment;
         bytes[237] = self.game_of_origin as u8;
