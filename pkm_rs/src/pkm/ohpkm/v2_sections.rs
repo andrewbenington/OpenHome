@@ -203,7 +203,8 @@ impl DataSection for MainDataV2 {
     fn from_bytes(bytes: &[u8]) -> Result<Self> {
         Self::ensure_buffer_size(bytes)?;
 
-        // try_into() will always succeed thanks to the buffer size check
+        // try_into() will always succeed if the buffer range size is correct.
+        // if incorrect, it is a fatal coding flaw and will always panic.
         let data = Self {
             personality_value: u32::from_le_bytes(bytes[0..4].try_into().unwrap()),
             encryption_constant: u32::from_le_bytes(bytes[4..8].try_into().unwrap()),
