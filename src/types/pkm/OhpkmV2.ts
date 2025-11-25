@@ -34,7 +34,6 @@ import {
   geolocationsToWasm,
   markingsSixShapesColorsFromWasm,
   markingsSixShapesColorsToWasm,
-  stats16LeToWasm,
   stats16LeToWasmNullable,
   stats8ToWasm,
   stats8ToWasmNullable,
@@ -376,7 +375,7 @@ export class OhpkmV2 extends PkmRs.OhpkmV2 implements PKMInterface {
   }
 
   set evs(value: Stats) {
-    this.evsWasm = stats16LeToWasm(value)
+    this.evsWasm = stats8ToWasm(value)
   }
 
   get dvs() {

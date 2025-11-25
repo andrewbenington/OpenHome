@@ -137,6 +137,12 @@ impl Stats8 {
             spe,
         }
     }
+
+    // ensure TypeScript doesn't allow Stats8 and Stats16Le to be confused
+    #[wasm_bindgen(getter = stats8)]
+    pub fn rust_type_name(&self) -> bool {
+        true
+    }
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
@@ -198,6 +204,12 @@ impl Stats16Le {
             spd,
             spe,
         }
+    }
+
+    // ensure TypeScript doesn't allow Stats8 and Stats16Le to be confused
+    #[wasm_bindgen(getter = stats16Le)]
+    pub fn rust_type_name(&self) -> bool {
+        true
     }
 }
 
