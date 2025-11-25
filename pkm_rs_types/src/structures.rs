@@ -85,11 +85,13 @@ pub fn gender_from_bool(value: bool) -> Gender {
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = genderToInt))]
+#[allow(clippy::missing_const_for_fn)]
 pub fn gender_to_int(value: Gender) -> u8 {
     value.to_byte()
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = genderFromInt))]
+#[allow(clippy::missing_const_for_fn)]
 pub fn gender_from_int(value: u8) -> Gender {
     Gender::from_bits_1_2(value)
 }
@@ -409,6 +411,7 @@ impl ShinyLeaves {
     }
 }
 
+#[cfg(feature = "wasm")]
 impl Serialize for ShinyLeaves {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
@@ -440,7 +443,8 @@ impl Serialize for ShinyLeaves {
     }
 }
 
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg(feature = "wasm")]
+#[wasm_bindgen]
 #[allow(clippy::missing_const_for_fn)]
 impl ShinyLeaves {
     #[wasm_bindgen(constructor)]
@@ -543,6 +547,7 @@ mod tests {
         assert_eq!(byte_with_invalid_gender, 0b00000010);
     }
 
+    #[cfg(feature = "wasm")]
     #[test]
     fn shiny_leaves_to_from_byte() {
         let byte = 0b01010;
