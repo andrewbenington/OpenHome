@@ -459,7 +459,7 @@ impl Pkm for OhpkmV1 {
         bytes[249..259].copy_from_slice(&self.geolocations.to_bytes());
         bytes[270] = self.encounter_type;
         bytes[271] = self.performance;
-        bytes[272..296].copy_from_slice(&self.trainer_name);
+        bytes[272..298].copy_from_slice(&self.trainer_name);
         bytes[298] = self.trainer_friendship;
 
         bytes[299] = self.trainer_memory.intensity;

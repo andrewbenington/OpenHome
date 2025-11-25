@@ -31,4 +31,4 @@ crate-type = ["cdylib", "rlib"]
 missing_const_for_fn = "warn"
 
 [features]
-wasm = ["wasm-bindgen", "js-sys", "serde-wasm-bindgen", "getrandom/wasm_js"]
+wasm = ["wasm-bindgen", "js-sys", "serde-wasm-bindgen", "getrandom/wasm_js", "pkm_rs_types/wasm", "pkm_rs_resources/wasm"]

@@ -1623,7 +1623,6 @@ impl OhpkmV2 {
 }
 
 #[cfg(feature = "wasm")]
-#[wasm_bindgen]
 fn add_section_bytes_to_js_object<T: DataSection<ErrorType = Error>>(
     obj: &js_sys::Object,
     section: &Option<T>,

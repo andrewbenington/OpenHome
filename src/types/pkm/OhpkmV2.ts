@@ -58,7 +58,7 @@ export class OhpkmV2 extends PkmRs.OhpkmV2 implements PKMInterface {
   static getName() {
     return 'OhpkmV2'
   }
-  format: 'OhpkmV2' = 'OhpkmV2'
+  format: string = 'OhpkmV2'
   static getBoxSize() {
     return 232
   }

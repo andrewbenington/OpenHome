@@ -1,9 +1,10 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, fs};
 
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use crate::{
+    commands::get_file_bytes,
     deprecated,
     error::{Error, Result},
     util,
@@ -142,4 +143,29 @@ pub fn write_banks(app_handle: tauri::AppHandle, mut bank_data: StoredBankData) 
         .map(deprecated::BoxPreV1_5_0::from_current)
         .collect();
     util::write_storage_file_json(&app_handle, "box-data.json", old_box_data)
+}
+
+pub type FilenameToBytesMap = HashMap<String, Vec<u8>>;
+
+pub fn get_all_ohpkm_bytes(app_handle: &tauri::AppHandle) -> Result<FilenameToBytesMap> {
+    let mons_path = util::prepend_appdata_storage_to_path(app_handle, "mons")?;
+    let mon_files = fs::read_dir(&mons_path).map_err(|e| Error::file_access(&mons_path, e))?;
+
+    let mut map = HashMap::new();
+    for mon_file_os_str in mon_files.flatten() {
+        let path = mon_file_os_str.path();
+        if !path
+            .extension()
+            .is_some_and(|ext| ext.eq_ignore_ascii_case("ohpkm"))
+        {
+            continue;
+        }
+
+        if let Ok(mon_bytes) = util::read_file_bytes(path) {
+            let mon_filename = mon_file_os_str.file_name().to_string_lossy().into_owned();
+            map.insert(mon_filename, mon_bytes);
+        }
+    }
+
+    Ok(map)
 }

@@ -1,4 +1,5 @@
 use crate::error::{Error, Result};
+use crate::pkm_storage::{FilenameToBytesMap, get_all_ohpkm_bytes};
 use crate::plugin::{self, PluginMetadata, PluginMetadataWithIcon, list_downloaded_plugins};
 use crate::state::{AppState, AppStateSnapshot, PokedexState};
 use crate::util::ImageResponse;
@@ -38,11 +39,9 @@ pub fn get_file_created(absolute_path: PathBuf) -> Result<Option<u128>> {
         .ok())
 }
 
-type FilenameToBytesMap = HashMap<String, Vec<u8>>;
-
 #[tauri::command]
 pub fn get_ohpkm_files(app_handle: tauri::AppHandle) -> Result<FilenameToBytesMap> {
-    let mons_path = util::prepend_appdata_storage_to_path(&app_handle, "mons")?;
+    let mons_path = util::prepend_appdata_storage_to_path(&app_handle, "mons_v2")?;
     let mon_files = fs::read_dir(&mons_path).map_err(|e| Error::file_access(&mons_path, e))?;
 
     let mut map = HashMap::new();
@@ -55,7 +54,7 @@ pub fn get_ohpkm_files(app_handle: tauri::AppHandle) -> Result<FilenameToBytesMa
             continue;
         }
 
-        if let Ok(mon_bytes) = get_file_bytes(path) {
+        if let Ok(mon_bytes) = util::read_file_bytes(path) {
             let mon_filename = mon_file_os_str.file_name().to_string_lossy().into_owned();
             map.insert(mon_filename, mon_bytes);
         }

@@ -20,6 +20,11 @@ import OhpkmV2 from './OhpkmV2'
 import { adjustMovePPBetweenFormats, getAbilityFromNumber } from './util'
 
 export class OHPKM extends OhpkmV2 {
+  static getName() {
+    return 'OHPKM'
+  }
+  format: 'OHPKM' = 'OHPKM'
+
   public get stats(): Stats {
     return getStandardPKMStats(this)
   }

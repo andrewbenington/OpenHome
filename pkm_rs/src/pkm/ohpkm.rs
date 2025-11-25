@@ -23,7 +23,6 @@ extern "C" {
 }
 
 #[cfg(feature = "wasm")]
-#[wasm_bindgen]
 pub fn console_log<T: ToString>(s: T) {
     log(&s.to_string());
 }
