@@ -26,6 +26,7 @@ import * as PkmRs from '../../../pkm_rs/pkg'
 import { NationalDex } from '../../consts/NationalDex'
 import { PKMInterface } from '../interfaces'
 import {
+  contestStatsFromWasm,
   contestStatsToWasm,
   convertPokeDate,
   convertPokeDateOptional,
@@ -33,6 +34,7 @@ import {
   geolocationsToWasm,
   markingsSixShapesColorsFromWasm,
   markingsSixShapesColorsToWasm,
+  stats16LeToWasm,
   stats16LeToWasmNullable,
   stats8ToWasm,
   stats8ToWasmNullable,
@@ -64,9 +66,9 @@ export class OhpkmV2 extends PkmRs.OhpkmV2 implements PKMInterface {
   heightDeviation = 0.2
   weightDeviation = 0.2
 
-  constructor(arg: ArrayBuffer | AllPKMFields) {
-    if (arg instanceof ArrayBuffer) {
-      super(new Uint8Array(arg))
+  constructor(arg: Uint8Array | AllPKMFields) {
+    if (arg instanceof Uint8Array) {
+      super(arg)
     } else {
       const other = arg
       super(new Uint8Array())
@@ -337,7 +339,7 @@ export class OhpkmV2 extends PkmRs.OhpkmV2 implements PKMInterface {
 
   static fromV1Wasm(v1: OHPKM) {
     const v2 = PkmRs.OhpkmV2.fromV1Bytes(new Uint8Array(v1.toBytes()))
-    return new OhpkmV2(v2.toByteArray().buffer as ArrayBuffer)
+    return new OhpkmV2(v2.toByteArray())
   }
 
   get dexNum() {
@@ -369,6 +371,14 @@ export class OhpkmV2 extends PkmRs.OhpkmV2 implements PKMInterface {
     this.ivsWasm = stats8ToWasm(value)
   }
 
+  get evs() {
+    return statsFromWasm(this.evsWasm)
+  }
+
+  set evs(value: Stats) {
+    this.evsWasm = stats16LeToWasm(value)
+  }
+
   get dvs() {
     return statsPreSplitFromWasm(this.dvsWasm)
   }
@@ -381,6 +391,14 @@ export class OhpkmV2 extends PkmRs.OhpkmV2 implements PKMInterface {
   }
   set avs(value: Stats | undefined) {
     this.avsWasm = stats16LeToWasmNullable(value)
+  }
+
+  get contest() {
+    return contestStatsFromWasm(this.contestWasm)
+  }
+
+  set contest(value: types.ContestStats) {
+    this.contestWasm = contestStatsToWasm(value)
   }
 
   get moves() {
@@ -488,7 +506,7 @@ export class OhpkmV2 extends PkmRs.OhpkmV2 implements PKMInterface {
     return getWeightCalculated(this)
   }
 
-  static fromBytes(buffer: ArrayBuffer): OhpkmV2 {
+  static fromBytes(buffer: Uint8Array): OhpkmV2 {
     return new OhpkmV2(buffer)
   }
 
@@ -512,7 +530,7 @@ export class OhpkmV2 extends PkmRs.OhpkmV2 implements PKMInterface {
     return getStandardPKMStats(this)
   }
 
-  public fromBytes(bytes: ArrayBuffer) {
+  public fromBytes(bytes: Uint8Array) {
     return new OhpkmV2(bytes)
   }
 
@@ -520,23 +538,12 @@ export class OhpkmV2 extends PkmRs.OhpkmV2 implements PKMInterface {
     return this.toByteArray().buffer as ArrayBuffer
   }
 
-  isShiny() {
-    return (
-      (this.trainerID ^
-        this.secretID ^
-        (this.personalityValue & 0xffff) ^
-        ((this.personalityValue >> 16) & 0xffff)) <
-      16
-    )
+  public isShiny() {
+    return this.isShinyWasm()
   }
 
-  isSquareShiny() {
-    return !(
-      this.trainerID ^
-      this.secretID ^
-      (this.personalityValue & 0xffff) ^
-      ((this.personalityValue >> 16) & 0xffff)
-    )
+  public isSquareShiny() {
+    return this.isSquareShinyWasm()
   }
 
   public get metadata() {

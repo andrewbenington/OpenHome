@@ -2,6 +2,7 @@ use semver::Version;
 use strum::{self, EnumIter, IntoEnumIterator};
 
 use crate::{
+    commands::get_ohpkm_files,
     deprecated::{self, BoxPreV1_5_0},
     error::{Error, Result},
     pkm_storage::{Bank, StoredBankData},
@@ -131,3 +132,19 @@ pub fn do_migration_1_5_0(app_handle: &tauri::AppHandle) -> Result<()> {
 
     util::write_file_json(banks_path, StoredBankData::from_banks(vec![new_bank]))
 }
+
+// pub fn do_migration_1_8_0(app_handle: &tauri::AppHandle) -> Result<()> {
+//     let mon_bytes = get_ohpkm_files(app_handle)?;
+//     for (path, bytes) in mon_bytes {
+//         let ohpkm_v1 = OhpkmV1::from_bytes(&bytes).map_err(|e| {
+//             Error::other(&format!(
+//                 "Failed to parse OHPKM file during migration: {}: {}",
+//                 path.display(),
+//                 e
+//             ))
+//         })?;
+//         let upgraded_ohpkm = ohpkm_v1.upgrade_to_latest();
+//         let upgraded_bytes = upgraded_ohpkm.to_bytes();
+//         util::write_file_contents(path, upgraded_bytes)?;
+//     }
+// }

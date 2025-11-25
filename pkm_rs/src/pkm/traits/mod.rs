@@ -15,6 +15,7 @@ pub trait TrainerWithSecret {
 
 pub trait IsShiny {
     fn is_shiny(&self) -> bool;
+    fn is_square_shiny(&self) -> bool;
 }
 
 pub use pkm_rs_derive::IsShiny4096;

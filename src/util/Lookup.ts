@@ -3,6 +3,7 @@ import { generatePersonalityValuePreservingAttributes, StatsPreSplit } from '@po
 import { PK3, PK4, PK5 } from '../../packages/pokemon-files/src'
 import { PKMInterface } from '../types/interfaces'
 import { OHPKM } from '../types/pkm/OHPKM'
+import { OhpkmV1 } from '../types/pkm/OhpkmV1'
 import { getBaseMon } from '../types/pkm/util'
 import { PKMFormeRef } from '../types/types'
 import { bytesToString } from './byteLogic'
@@ -20,7 +21,7 @@ export const getMonFileIdentifier = (mon: PKMInterface) => {
   return undefined
 }
 
-export function getHomeIdentifier(mon: OHPKM) {
+export function getHomeIdentifier(mon: OHPKM | OhpkmV1): string {
   const baseMon = getBaseMon(mon.dexNum, mon.formeNum)
 
   if (!baseMon) {

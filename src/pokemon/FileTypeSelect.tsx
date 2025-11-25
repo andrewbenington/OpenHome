@@ -33,6 +33,7 @@ const fileTypeColors: Record<string, string> = {
   PB8: '#6bf',
   PA8: '#8cc',
   PK9: '#f52',
+  OhpkmV1: 'fuschia',
   OhpkmV2: 'fuschia',
 }
 
@@ -79,6 +80,7 @@ const FileTypeSelect = (props: FileTypeSelectProps) => {
       ) : (
         <option value={baseFormat}>{baseFormat}</option>
       )}
+      <option value="OhpkmV1">OpenHome V1</option>
       <option value="OhpkmV2">OpenHome V2</option>
     </select>
   )

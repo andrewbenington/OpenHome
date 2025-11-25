@@ -4,6 +4,7 @@ use crate::pkm::ohpkm::v2_sections::{
     ScarletVioletData, SwordShieldData,
 };
 use crate::pkm::ohpkm::{OhpkmV1, console_log};
+use crate::pkm::traits::IsShiny;
 use crate::pkm::{Error, Result};
 use crate::strings::SizedUtf16String;
 
@@ -342,20 +343,20 @@ impl OhpkmV2 {
         self.main_data.gender = Gender::from_u8(v);
     }
 
-    #[wasm_bindgen(getter = evs)]
+    #[wasm_bindgen(getter = evsWasm)]
     pub fn evs(&self) -> Stats8 {
         self.main_data.evs
     }
-    #[wasm_bindgen(setter = evs)]
+    #[wasm_bindgen(setter = evsWasm)]
     pub fn set_evs(&mut self, v: &Stats8) {
         self.main_data.evs = *v;
     }
 
-    #[wasm_bindgen(getter = contest)]
+    #[wasm_bindgen(getter = contestWasm)]
     pub fn contest(&self) -> ContestStats {
         self.main_data.contest
     }
-    #[wasm_bindgen(setter = contest)]
+    #[wasm_bindgen(setter = contestWasm)]
     pub fn set_contest(&mut self, v: &ContestStats) {
         self.main_data.contest = *v;
     }
@@ -1598,6 +1599,17 @@ impl OhpkmV2 {
         add_section_bytes_to_js_object(&obj, &self.plugin_data)?;
 
         Ok(obj)
+    }
+
+    // Calculated
+    #[wasm_bindgen(js_name = isShinyWasm)]
+    pub fn is_shiny(&self) -> bool {
+        self.main_data.is_shiny()
+    }
+
+    #[wasm_bindgen(js_name = isSquareShinyWasm)]
+    pub fn is_square_shiny(&self) -> bool {
+        self.main_data.is_square_shiny()
     }
 }
 

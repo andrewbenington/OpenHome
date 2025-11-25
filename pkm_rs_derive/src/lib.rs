@@ -61,6 +61,13 @@ pub fn derive_is_shiny_4096(input: TokenStream) -> TokenStream {
                 self.trainer_id ^
                 self.secret_id) < 16
             }
+
+            fn is_square_shiny(&self) -> bool {
+                (((self.personality_value & 0xffff) as u16) ^
+                (((self.personality_value >> 16) & 0xffff) as u16) ^
+                self.trainer_id ^
+                self.secret_id) == 0
+            }
         }
     };
 
@@ -122,6 +129,13 @@ pub fn derive_is_shiny_8192(input: TokenStream) -> TokenStream {
                 (((self.personality_value >> 16) & 0xffff) as u16) ^
                 self.trainer_id ^
                 self.secret_id) < 8
+            }
+
+            fn is_square_shiny(&self) -> bool {
+                (((self.personality_value & 0xffff) as u16) ^
+                (((self.personality_value >> 16) & 0xffff) as u16) ^
+                self.trainer_id ^
+                self.secret_id) == 0
             }
         }
     };
