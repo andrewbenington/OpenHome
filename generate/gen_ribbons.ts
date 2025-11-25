@@ -142,9 +142,9 @@ impl From<usize> for ModernRibbon {
     }
 }
 `
-  fs.mkdirSync('src/resources/ribbons', { recursive: true })
-  fs.writeFileSync('src/resources/ribbons/modern.rs', output)
-  console.log('Rust code written to src/resources/ribbons/modern.rs')
+  fs.mkdirSync('pkm_rs_resources/src/resources/ribbons', { recursive: true })
+  fs.writeFileSync('pkm_rs_resources/src/resources/ribbons/modern.rs', output)
+  console.log('Rust code written to pkm_rs_resources/src/resources/ribbons/modern.rs')
 }
 
 main()

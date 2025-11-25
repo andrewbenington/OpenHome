@@ -333,7 +333,7 @@ pub fn all_species_data() -> Vec<SpeciesMetadata> {
     allSpecies.map(convertSpecies).join(',\n') +
     '];'
 
-  const filename = 'src/species/metadata.rs'
+  const filename = 'pkm_rs_resources/src/species/metadata.rs'
   fs.writeFileSync(filename, output)
   console.log(`Rust code written to ${filename}`)
 }
