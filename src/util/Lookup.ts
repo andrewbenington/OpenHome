@@ -1,5 +1,5 @@
 import { MetadataLookup, OriginGames } from '@pkm-rs/pkg'
-import { generatePersonalityValuePreservingAttributes, StatsPreSplit } from '@pokemon-files/util'
+import { generatePersonalityValuePreservingAttributes } from '@pokemon-files/util'
 import { PK3, PK4, PK5 } from '../../packages/pokemon-files/src'
 import { PKMInterface } from '../types/interfaces'
 import { OHPKM } from '../types/pkm/OHPKM'
@@ -36,8 +36,10 @@ export function getHomeIdentifier(mon: OHPKM | OhpkmV1): string {
   )}-${bytesToString(mon.personalityValue ?? 0, 4)}-${bytesToString(mon.gameOfOrigin ?? -1, 1)}`
 }
 
-export const getMonGen12Identifier = (mon: PKMInterface & { dvs: StatsPreSplit }) => {
+export const getMonGen12Identifier = (mon: PKMInterface) => {
   const { dvs } = mon
+  if (!dvs) return undefined
+
   const convertedTrainerName = gen12StringToUTF(utf16StringToGen12(mon.trainerName, 8, true), 0, 8)
   const baseMon = getBaseMon(mon.dexNum, mon.formeNum)
   let tid = mon.trainerID

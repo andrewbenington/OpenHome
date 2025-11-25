@@ -11,8 +11,8 @@ import { PKMInterface } from '../types/interfaces'
 import { getTypes } from '../types/pkm/util'
 import { Styles } from '../types/types'
 import { getTypeColor } from '../util/PokemonSprite'
-import AttributeRow from './AttributeRow'
-import AttributeTag from './AttributeTag'
+import AttributeRow from './components/AttributeRow'
+import AttributeTag from './components/AttributeTag'
 import useMonSprite from './useMonSprite'
 
 const styles = {

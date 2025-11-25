@@ -1,4 +1,5 @@
 import { Generation, OriginGame, OriginGames } from '@pkm-rs/pkg'
+import { PK1, PK2 } from '@pokemon-files/pkm'
 import { Callout } from '@radix-ui/themes'
 import * as E from 'fp-ts/lib/Either'
 import { flatten } from 'lodash'
@@ -80,7 +81,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
     for (const [saveOrigin, changedMons] of saveTypesAndChangedMons) {
       const generation = OriginGames.generation(saveOrigin)
       if (generation === Generation.G1 || generation === Generation.G2) {
-        changedMons.forEach((mon) => {
+        changedMons.forEach((mon: PK1 | PK2 | OHPKM) => {
           const openHomeIdentifier = getMonFileIdentifier(mon)
           const gen12Identifier = getMonGen12Identifier(mon)
 

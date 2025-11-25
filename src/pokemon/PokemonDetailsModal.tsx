@@ -13,13 +13,14 @@ import { fileTypeFromString } from '../types/FileImport'
 import { PKMInterface } from '../types/interfaces'
 import { OHPKM } from '../types/pkm/OHPKM'
 import { OhpkmV1 } from '../types/pkm/OhpkmV1'
-import FileTypeSelect from './FileTypeSelect'
+import FileTypeSelect from './components/FileTypeSelect'
 import MetDataMovesDisplay from './MetDataMovesDisplay'
+import NotesDisplay from './NotesDisplay'
 import OtherDisplay from './OtherDisplay'
 import RibbonsDisplay from './RibbonsDisplay'
 import StatsDisplay from './StatsDisplay'
-import SummaryDisplay from './SummaryDisplay'
 import './style.css'
+import SummaryDisplay from './SummaryDisplay'
 
 const PokemonDetailsModal = (props: {
   mon?: PKMInterface
@@ -158,6 +159,7 @@ const PokemonDetailsModal = (props: {
               <SideTabs.Tab value="stats">Stats</SideTabs.Tab>
               <SideTabs.Tab value="ribbons">Ribbons</SideTabs.Tab>
               <SideTabs.Tab value="other">Other</SideTabs.Tab>
+              {mon instanceof OHPKM && <SideTabs.Tab value="notes">Notes</SideTabs.Tab>}
               <SideTabs.Tab value="raw">Raw</SideTabs.Tab>
             </SideTabs.TabList>
             <Fallback>
@@ -176,6 +178,11 @@ const PokemonDetailsModal = (props: {
               <SideTabs.Panel value="other">
                 <OtherDisplay mon={displayMon} />
               </SideTabs.Panel>
+              {mon instanceof OHPKM && (
+                <SideTabs.Panel value="notes">
+                  <NotesDisplay mon={mon} />
+                </SideTabs.Panel>
+              )}
               <SideTabs.Panel value="raw">
                 <Fallback>
                   <HexDisplay

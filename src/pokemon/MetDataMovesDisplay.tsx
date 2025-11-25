@@ -10,7 +10,7 @@ import { PKMInterface } from '../types/interfaces'
 import { getCharacteristic, getMoveMaxPP } from '../types/pkm/util'
 import { getPluginIdentifier } from '../types/SAVTypes/util'
 import { Styles } from '../types/types'
-import MoveCard from './MoveCard'
+import MoveCard from './components/MoveCard'
 
 const styles = {
   gameContainer: {

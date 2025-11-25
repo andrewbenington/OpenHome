@@ -3,7 +3,7 @@ import { useContext, useMemo } from 'react'
 import { supportsMon } from 'src/types/SAVTypes/util'
 import { PKMFormeRef, Styles } from 'src/types/types'
 import { filterUndefined } from 'src/util/Sort'
-import { AppInfoContext } from '../state/appInfo'
+import { AppInfoContext } from '../../state/appInfo'
 
 const styles = {
   fileTypeChip: {

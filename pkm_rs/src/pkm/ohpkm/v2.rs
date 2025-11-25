@@ -1,7 +1,7 @@
 use crate::pkm::ohpkm::OhpkmV1;
 use crate::pkm::ohpkm::sectioned_data::{DataSection, SectionTag, SectionedData};
 use crate::pkm::ohpkm::v2_sections::{
-    BdspData, GameboyData, Gen45Data, Gen67Data, LegendsArceusData, MainDataV2, PluginData,
+    BdspData, GameboyData, Gen45Data, Gen67Data, LegendsArceusData, MainDataV2, Notes, PluginData,
     ScarletVioletData, SwordShieldData,
 };
 #[cfg(feature = "wasm")]
@@ -122,6 +122,7 @@ pub struct OhpkmV2 {
     sv_data: Option<ScarletVioletData>,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     plugin_data: Option<PluginData>,
+    notes: Option<Notes>,
 }
 
 impl OhpkmV2 {
@@ -136,6 +137,7 @@ impl OhpkmV2 {
             la_data: None,
             sv_data: None,
             plugin_data: None,
+            notes: None,
         })
     }
     pub fn from_bytes(bytes: &[u8]) -> Result<Self> {
@@ -158,6 +160,7 @@ impl OhpkmV2 {
             la_data: LegendsArceusData::extract_from(&sectioned_data)?,
             sv_data: ScarletVioletData::extract_from(&sectioned_data)?,
             plugin_data: PluginData::extract_from(&sectioned_data)?,
+            notes: Notes::extract_from(&sectioned_data)?,
         })
     }
 
@@ -172,6 +175,7 @@ impl OhpkmV2 {
             la_data: LegendsArceusData::from_v1(old),
             sv_data: ScarletVioletData::from_v1(old),
             plugin_data: PluginData::from_v1(old),
+            notes: None,
         }
     }
 
@@ -186,7 +190,8 @@ impl OhpkmV2 {
             .add_if_some(self.bdsp_data)?
             .add_if_some(self.la_data)?
             .add_if_some(self.sv_data)?
-            .add_if_some(self.plugin_data.clone())?;
+            .add_if_some(self.plugin_data.clone())?
+            .add_if_some(self.notes.clone())?;
 
         Ok(sectioned_data.to_bytes()?)
     }
@@ -1608,6 +1613,21 @@ impl OhpkmV2 {
         add_section_bytes_to_js_object(&obj, &self.plugin_data)?;
 
         Ok(obj)
+    }
+
+    // Notes
+
+    #[wasm_bindgen(getter)]
+    pub fn notes(&self) -> Option<String> {
+        Some(self.notes.clone()?.0)
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_notes(&mut self, value: Option<String>) {
+        match value {
+            Some(notes) => self.notes = Some(Notes(notes)),
+            None => self.notes = None,
+        }
     }
 
     // Calculated

@@ -2,7 +2,9 @@ import { Item } from '@pkm-rs/pkg'
 import { useContext } from 'react'
 import { PKMInterface } from '../../types/interfaces'
 import { OHPKM } from '../../types/pkm/OHPKM'
-import { SAV } from '../../types/SAVTypes/SAV'
+import { HomeData } from '../../types/SAVTypes/HomeData'
+import { Box, SAV } from '../../types/SAVTypes/SAV'
+import { OpenHomeBox } from '../../types/storage'
 import { useOhpkmStore } from '../ohpkm/useOhpkmStore'
 import { MonLocation, MonWithLocation, OpenSavesState, SavesContext } from './reducer'
 
@@ -34,6 +36,7 @@ export type SavesAndBanksManager = Required<Omit<OpenSavesState, 'error'>> & {
 
   getMonAtLocation(location: MonLocation): PKMInterface | OHPKM | undefined
   setMonHeldItem(item: Item | undefined, location: MonLocation): void
+  updateMonNotes(monId: string, notes: string | undefined): void
   moveMon(source: MonWithLocation, dest: MonLocation): void
   releaseMonAtLocation(location: MonLocation): void
 }
@@ -207,6 +210,29 @@ export function useSaves(): SavesAndBanksManager {
     })
   }
 
+  function updateMonNotes(monId: string, notes: string | undefined) {
+    if (!homeData) return
+
+    const mon: MonLocation | undefined =
+      findMonInHome(monId, homeData) ??
+      allOpenSaves.reduce<MonLocation | undefined>(
+        (foundSaveMon, save) => foundSaveMon ?? findMonInSave(monId, save),
+        undefined
+      )
+    if (!mon) return
+
+    openSavesDispatch({
+      type: 'update_home_mon',
+      payload: {
+        location: mon,
+        updater: (mon) => {
+          mon.notes = notes
+          return mon
+        },
+      },
+    })
+  }
+
   function moveMon(source: MonWithLocation, dest: MonLocation) {
     openSavesDispatch({ type: 'move_mon', payload: { source, dest } })
   }
@@ -247,7 +273,47 @@ export function useSaves(): SavesAndBanksManager {
 
     getMonAtLocation,
     setMonHeldItem,
+    updateMonNotes,
     moveMon,
     releaseMonAtLocation,
+  }
+}
+
+function findMonInBox(
+  box: Box<PKMInterface>,
+  boxIndex: number,
+  monId: string,
+  save: SAV
+): MonLocation | undefined {
+  for (const [boxSlot, mon] of box.pokemon.entries()) {
+    if (mon instanceof OHPKM && mon.getHomeIdentifier() === monId) {
+      return { box: boxIndex, box_slot: boxSlot, is_home: false, save }
+    }
+  }
+}
+
+function findMonInSave(monId: string, save: SAV): MonLocation | undefined {
+  for (const [boxIndex, box] of save.boxes.entries()) {
+    return findMonInBox(box, boxIndex, monId, save)
+  }
+}
+
+function findMonInHomeBox(
+  box: OpenHomeBox,
+  monId: string,
+  bankIndex: number
+): MonLocation | undefined {
+  for (const [boxSlotStr, identifier] of Object.entries(box.identifiers)) {
+    if (identifier === monId)
+      return { box: box.index, box_slot: parseInt(boxSlotStr), bank: bankIndex, is_home: true }
+  }
+}
+
+function findMonInHome(monId: string, homeData: HomeData): MonLocation | undefined {
+  for (const [bankIndex, bank] of homeData.banks.entries()) {
+    for (const box of bank.boxes) {
+      const found = findMonInHomeBox(box, monId, bankIndex)
+      if (found) return found
+    }
   }
 }

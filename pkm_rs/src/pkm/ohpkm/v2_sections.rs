@@ -1042,7 +1042,8 @@ impl DataSection for PluginData {
     }
 }
 
-pub struct Notes(String);
+#[derive(Debug, Default, Clone)]
+pub struct Notes(pub String);
 
 impl DataSection for Notes {
     type TagType = SectionTagV2;

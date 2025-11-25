@@ -159,6 +159,8 @@ impl<Tag: SectionTag> SectionedData<Tag> {
         section: Option<T>,
     ) -> CoreResult<&mut Self, T::ErrorType> {
         if let Some(section) = section {
+            #[cfg(feature = "wasm")]
+            console_log(format!("adding section: {}", T::TAG));
             self.tagged_buffers.push(section.to_tagged_buffer()?);
         }
 

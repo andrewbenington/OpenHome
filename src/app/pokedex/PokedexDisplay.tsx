@@ -3,7 +3,7 @@ import { Button, Card, Flex, Heading, Separator, Spinner, Text, TextField } from
 import { useEffect, useState } from 'react'
 import TypeIcon from 'src/components/TypeIcon'
 import { getPublicImageURL } from 'src/images/images'
-import AttributeRow from 'src/pokemon/AttributeRow'
+import AttributeRow from 'src/pokemon/components/AttributeRow'
 import { Type } from 'src/types/types'
 import PokemonIcon from '../../components/PokemonIcon'
 import useMonSprite from '../../pokemon/useMonSprite'

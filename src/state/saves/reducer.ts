@@ -141,6 +141,10 @@ export type OpenSavesAction =
       type: 'set_mon_item'
       payload: { item: Item | undefined; dest: MonLocation }
     }
+  | {
+      type: 'update_home_mon'
+      payload: { location: MonLocation; updater: (mon: OHPKM) => OHPKM }
+    }
   /*
    *  OTHER
    */
@@ -406,7 +410,6 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
 
       return { ...state }
     }
-
     case 'set_mon_item': {
       const { item, dest } = payload
 
@@ -440,7 +443,35 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
 
       return { ...state }
     }
+    case 'update_home_mon': {
+      const { location, updater } = payload
 
+      const targetMon = getMonAtLocation(state, location)
+
+      if (!targetMon) {
+        return { ...state }
+      }
+
+      let updatedMon: OHPKM
+
+      if (targetMon instanceof OHPKM) {
+        updatedMon = targetMon
+      } else {
+        updatedMon = new OHPKM(targetMon)
+      }
+
+      updatedMon = updater(updatedMon)
+
+      updateMonInSave(state, updatedMon, location)
+
+      const identifier = getMonFileIdentifier(updatedMon)
+
+      if (identifier) {
+        state.modifiedOHPKMs[identifier] = updatedMon
+      }
+
+      return { ...state }
+    }
     case 'import_mons': {
       const addedMons: OHPKM[] = []
       const { dest } = action.payload
