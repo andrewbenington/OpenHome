@@ -3,7 +3,7 @@
 
 import * as fs from 'fs'
 import { PokemonData } from 'pokemon-species-data'
-import { Gen3UBSpecies } from '../src/types/SAVTypes/unbound/conversion/UBPokemonIndex'
+import { Gen3UBSpecies } from '../../src/types/SAVTypes/unbound/conversion/UBPokemonIndex'
 
 const formRegEx: RegExp = /(\w*)-(\w*)/
 

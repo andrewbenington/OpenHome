@@ -1,6 +1,6 @@
 import { PokemonData } from 'pokemon-species-data'
-import { RadicalRedToNationalDexMap } from '../src/types/SAVTypes/radicalred/conversion/RadicalRedSpeciesMap'
-import { TransferRestrictions } from '../src/types/TransferRestrictions'
+import { RadicalRedToNationalDexMap } from '../../src/types/SAVTypes/radicalred/conversion/RadicalRedSpeciesMap'
+import { TransferRestrictions } from '../../src/types/TransferRestrictions'
 
 const RR_TRANSFER_RESTRICTIONS: TransferRestrictions = {
   excludedForms: {},

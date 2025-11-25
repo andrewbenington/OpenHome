@@ -88,7 +88,7 @@ impl Serialize for Item {
 #[derive(Clone, Copy)]
 pub struct ItemMetadata {
     pub id: usize,
-    #[wasm_bindgen(skip)]
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub(crate) name: &'static str,
 }
 
@@ -106,7 +106,7 @@ impl ItemMetadata {
 pub struct ItemMetadataPastGen {
     pub id: usize,
     pub modern_id: Option<usize>,
-    #[wasm_bindgen(skip)]
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub(crate) name: &'static str,
 }
 

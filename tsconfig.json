@@ -51,6 +51,6 @@
     "src",
     "packages",
     "generate/_rename.js",
-    "generate/generateMoveMap.ts"
+    "generate/generate-cfru/generateMoveMap.ts"
   ]
 }

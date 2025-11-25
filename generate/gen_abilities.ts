@@ -181,17 +181,28 @@ impl From<AbilityIndex> for u16 {
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Clone, Copy)]
 pub struct AbilityMetadata {
-    id: usize,
-    name: &'static str,
+    pub id: usize,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+    pub name: &'static str,
+}
+
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[allow(clippy::missing_const_for_fn)]
+impl AbilityMetadata {
+    #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
+    pub fn name(&self) -> String {
+        self.name.to_owned()
+    }
 }
 
 pub const ABILITY_MAX: usize = 310;
 
-#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "getAbilityMax"))]
+#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "getAllAbilities"))]
 #[allow(clippy::missing_const_for_fn)]
 pub fn get_all_abilities() -> Vec<AbilityMetadata> {
     ALL_ABILITIES.into_iter().copied().collect()
 }
+
 `
 
   output +=

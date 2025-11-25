@@ -50,7 +50,7 @@ pub fn get_all_items() -> Vec<ItemMetadata> {
     allItems.map(({ id, name }) => '&' + convertItem(id, name)).join(',\n') +
     '];'
 
-  const filename = 'src/items/modern.rs'
+  const filename = 'pkm_resources/src/items/modern.rs'
   fs.writeFileSync(filename, output)
   console.log(`Rust code written to ${filename}`)
 }
@@ -105,7 +105,7 @@ impl ItemGen1 {
     allItems.map(convertItemPastGen).join(',\n') +
     '];'
 
-  const filename = 'src/items/gen1.rs'
+  const filename = 'pkm_resources/src/items/gen1.rs'
   fs.writeFileSync(filename, output)
   console.log(`Rust code written to ${filename}`)
 }
@@ -150,7 +150,7 @@ impl ItemGen2 {
     allItems.map(convertItemPastGen).join(',\n') +
     '];'
 
-  const filename = 'src/items/gen2.rs'
+  const filename = 'pkm_resources/src/items/gen2.rs'
   fs.writeFileSync(filename, output)
   console.log(`Rust code written to ${filename}`)
 }
@@ -195,7 +195,7 @@ impl ItemGen3 {
     allItems.map(convertItemPastGen).join(',\n') +
     '];'
 
-  const filename = 'src/items/gen3.rs'
+  const filename = 'pkm_resources/src/items/gen3.rs'
   fs.writeFileSync(filename, output)
   console.log(`Rust code written to ${filename}`)
 }
@@ -232,7 +232,7 @@ impl ItemRadicalRed {
     allItems.map(convertItemPastGen).join(',\n') +
     '];'
 
-  const filename = 'src/items/radical_red.rs'
+  const filename = 'pkm_resources/src/items/radical_red.rs'
   fs.writeFileSync(filename, output)
   console.log(`Rust code written to ${filename}`)
 }
@@ -269,7 +269,7 @@ impl ItemUnbound {
     allItems.map(convertItemPastGen).join(',\n') +
     '];'
 
-  const filename = 'src/items/unbound.rs'
+  const filename = 'pkm_resources/src/items/unbound.rs'
   fs.writeFileSync(filename, output)
   console.log(`Rust code written to ${filename}`)
 }

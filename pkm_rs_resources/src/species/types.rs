@@ -1,4 +1,3 @@
-#[cfg(feature = "wasm")]
 use pkm_rs_types::Gender;
 use std::num::NonZeroU16;
 use strum_macros::{Display, EnumString};
@@ -692,7 +691,8 @@ impl SpeciesAndForme {
     }
 }
 
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg(feature = "wasm")]
+#[wasm_bindgen]
 #[allow(clippy::missing_const_for_fn)]
 impl SpeciesAndForme {
     #[wasm_bindgen(constructor)]
