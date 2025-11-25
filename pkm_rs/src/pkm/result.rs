@@ -5,6 +5,7 @@ use std::string::FromUtf8Error;
 use pkm_rs_resources::species::{NatDexIndex, SpeciesAndForme};
 use pkm_rs_resources::{species::MAX_NATIONAL_DEX, natures::NATURE_MAX, abilities::ABILITY_MAX, language::LANGUAGE_MAX, items::ITEM_MAX};
 use serde::{Serialize, Serializer};
+#[cfg(feature = "wasm")]
 use wasm_bindgen::JsValue;
 
 
@@ -291,6 +292,7 @@ impl Display for StringErrorSource {
 
 pub type Result<T> = core::result::Result<T, Error>;
 
+#[cfg(feature = "wasm")]
 impl From<Error> for JsValue {
     fn from(value: Error) -> Self {
         value.to_string().into()

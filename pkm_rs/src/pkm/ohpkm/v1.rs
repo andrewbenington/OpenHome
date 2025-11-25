@@ -1,5 +1,3 @@
-#[cfg(feature = "wasm")]
-use crate::pkm::ohpkm::JsResult;
 use crate::pkm::traits::IsShiny4096;
 use crate::pkm::{Error, Pkm, Result};
 use crate::strings::SizedUtf16String;
@@ -12,22 +10,21 @@ use pkm_rs_resources::moves::MoveSlot;
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbonSet};
 use pkm_rs_resources::species::{FormeMetadata, SpeciesAndForme, SpeciesMetadata};
-#[cfg(feature = "wasm")]
-use pkm_rs_types::ShinyLeaves;
 use pkm_rs_types::{
-    ContestStats, Geolocations, HyperTraining, MarkingsSixShapesColors, OriginGame, Stats8,
-    Stats16Le, StatsPreSplit,
+    ContestStats, Geolocations, HyperTraining, MarkingsSixShapesColors, OriginGame, ShinyLeaves,
+    Stats8, Stats16Le, StatsPreSplit,
 };
 use pkm_rs_types::{Gender, PokeDate, TrainerMemory};
 use serde::Serialize;
 
 #[cfg(feature = "wasm")]
+use crate::pkm::ohpkm::JsResult;
+#[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
 const MIN_SIZE: usize = 420;
 
-#[cfg(feature = "wasm")]
-#[wasm_bindgen]
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Debug, Default, Serialize, Clone, Copy, IsShiny4096)]
 pub struct OhpkmV1 {
     pub encryption_constant: u32,
@@ -56,22 +53,22 @@ pub struct OhpkmV1 {
     pub pokerus_byte: u8,
     pub contest_memory_count: u8,
     pub battle_memory_count: u8,
-    #[wasm_bindgen(skip)]
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub ribbons: OpenHomeRibbonSet<16>,
     pub sociability: u32,
     pub height_scalar: u8,
     pub weight_scalar: u8,
     pub scale: u8,
-    #[wasm_bindgen(skip)]
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub moves: [MoveSlot; 4],
-    #[wasm_bindgen(skip)]
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub move_pp: [u8; 4],
-    #[wasm_bindgen(skip)]
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub nickname: SizedUtf16String<26>,
     pub avs: Stats16Le,
-    #[wasm_bindgen(skip)]
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub move_pp_ups: [u8; 4],
-    #[wasm_bindgen(skip)]
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub relearn_moves: [MoveSlot; 4],
     pub ivs: Stats8,
     pub is_egg: bool,
@@ -82,7 +79,7 @@ pub struct OhpkmV1 {
     pub unknown_a0: u32,
     pub gvs: Stats8,
     pub dvs: StatsPreSplit,
-    #[wasm_bindgen(skip)]
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub handler_name: SizedUtf16String<24>,
     pub handler_language: u8,
     pub is_current_handler: bool,
@@ -107,7 +104,7 @@ pub struct OhpkmV1 {
     pub enjoyment: u8,
     pub game_of_origin: OriginGame,
     pub game_of_origin_battle: Option<OriginGame>,
-    #[wasm_bindgen(skip)]
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub plugin_origin: SizedUtf16String<32>,
     pub country: u8,
     pub region: u8,
@@ -119,7 +116,7 @@ pub struct OhpkmV1 {
     pub geolocations: Geolocations,
     pub encounter_type: u8,
     pub performance: u8,
-    #[wasm_bindgen(skip)]
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub trainer_name: SizedUtf16String<26>,
     pub trainer_friendship: u8,
     pub trainer_memory: TrainerMemory,
@@ -133,22 +130,22 @@ pub struct OhpkmV1 {
     pub hyper_training: HyperTraining,
     pub trainer_gender: Gender,
     pub obedience_level: u8,
-    #[wasm_bindgen(skip)]
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub home_tracker: [u8; 8],
-    #[wasm_bindgen(skip)]
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub tr_flags_swsh: [u8; 14],
-    #[wasm_bindgen(skip)]
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub tm_flags_bdsp: [u8; 14],
-    #[wasm_bindgen(skip)]
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub move_flags_la: [u8; 14],
-    #[wasm_bindgen(skip)]
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub tutor_flags_la: [u8; 8],
-    #[wasm_bindgen(skip)]
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub master_flags_la: [u8; 8],
-    #[wasm_bindgen(skip)]
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub tm_flags_sv: [u8; 22],
     pub evs_g12: StatsPreSplit,
-    #[wasm_bindgen(skip)]
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub tm_flags_sv_dlc: [u8; 13],
 }
 

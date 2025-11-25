@@ -1,5 +1,6 @@
 use std::{fmt::Display, hash::Hash};
 
+#[cfg(feature = "wasm")]
 use crate::pkm::ohpkm::console_log;
 
 type CoreResult<T, E> = core::result::Result<T, E>;
@@ -195,6 +196,7 @@ impl<Tag: SectionTag> SectionedData<Tag> {
             let metadata_o =
                 SectionMetadata::<Tag>::from_bytes(&bytes[metadata_start..metadata_end]);
             let Some(metadata) = metadata_o else {
+                #[cfg(feature = "wasm")]
                 console_log(format!(
                     "MALFORMED METADATA at {metadata_start} - {metadata_end}"
                 ));

@@ -1,27 +1,39 @@
+use crate::pkm::ohpkm::OhpkmV1;
 use crate::pkm::ohpkm::sectioned_data::{DataSection, SectionTag, SectionedData};
 use crate::pkm::ohpkm::v2_sections::{
     BdspData, GameboyData, Gen45Data, Gen67Data, LegendsArceusData, MainDataV2, PluginData,
     ScarletVioletData, SwordShieldData,
 };
-use crate::pkm::ohpkm::{OhpkmV1, console_log};
+#[cfg(feature = "wasm")]
 use crate::pkm::traits::IsShiny;
 use crate::pkm::{Error, Result};
+#[cfg(feature = "wasm")]
 use crate::strings::SizedUtf16String;
 
+#[cfg(feature = "wasm")]
 use pkm_rs_resources::abilities::AbilityIndex;
+#[cfg(feature = "wasm")]
 use pkm_rs_resources::ball::Ball;
+#[cfg(feature = "wasm")]
 use pkm_rs_resources::language::Language;
+#[cfg(feature = "wasm")]
 use pkm_rs_resources::moves::MoveSlot;
+#[cfg(feature = "wasm")]
 use pkm_rs_resources::natures::NatureIndex;
 
+#[cfg(feature = "wasm")]
 use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbon, OpenHomeRibbonSet};
+#[cfg(feature = "wasm")]
 use pkm_rs_resources::species::SpeciesAndForme;
 
+#[cfg(feature = "wasm")]
 use crate::pkm::ohpkm::JsResult;
+#[cfg(feature = "wasm")]
 use pkm_rs_types::{
     ContestStats, FlagSet, Geolocations, HyperTraining, MarkingsSixShapesColors, OriginGame,
     Stats8, Stats16Le, StatsPreSplit, TeraType,
 };
+#[cfg(feature = "wasm")]
 use pkm_rs_types::{Gender, PokeDate, TrainerMemory};
 #[cfg(feature = "wasm")]
 use pkm_rs_types::{ShinyLeaves, TeraTypeWasm};
@@ -98,7 +110,7 @@ impl SectionTag for SectionTagV2 {
 #[derive(Default, Debug)]
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 pub struct OhpkmV2 {
-    #[wasm_bindgen(skip)]
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     main_data: MainDataV2,
     gameboy_data: Option<GameboyData>,
     gen45_data: Option<Gen45Data>,
@@ -106,9 +118,9 @@ pub struct OhpkmV2 {
     swsh_data: Option<SwordShieldData>,
     bdsp_data: Option<BdspData>,
     la_data: Option<LegendsArceusData>,
-    #[wasm_bindgen(skip)]
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     sv_data: Option<ScarletVioletData>,
-    #[wasm_bindgen(skip)]
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     plugin_data: Option<PluginData>,
 }
 
@@ -176,10 +188,7 @@ impl OhpkmV2 {
             .add_if_some(self.sv_data)?
             .add_if_some(self.plugin_data.clone())?;
 
-        let r = Ok(sectioned_data.to_bytes()?);
-        console_log("ok and we did it");
-
-        r
+        Ok(sectioned_data.to_bytes()?)
     }
 }
 
@@ -1613,6 +1622,8 @@ impl OhpkmV2 {
     }
 }
 
+#[cfg(feature = "wasm")]
+#[wasm_bindgen]
 fn add_section_bytes_to_js_object<T: DataSection<ErrorType = Error>>(
     obj: &js_sys::Object,
     section: &Option<T>,

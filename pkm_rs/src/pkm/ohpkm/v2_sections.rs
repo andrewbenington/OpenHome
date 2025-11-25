@@ -18,7 +18,7 @@ use serde::Serialize;
 use crate::{
     pkm::{
         Error, Result, StringErrorSource,
-        ohpkm::{OhpkmV1, SectionTagV2, console_log, sectioned_data::DataSection},
+        ohpkm::{OhpkmV1, SectionTagV2, sectioned_data::DataSection},
     },
     strings::SizedUtf16String,
     util,
@@ -59,26 +59,26 @@ pub struct MainDataV2 {
     pub pokerus_byte: u8,
     pub contest_memory_count: u8,
     pub battle_memory_count: u8,
-    #[wasm_bindgen(skip)]
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub ribbons: OpenHomeRibbonSet<16>,
     pub sociability: u32,
     pub height_scalar: u8,
     pub weight_scalar: u8,
     pub scale: u8,
-    #[wasm_bindgen(skip)]
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub moves: [MoveSlot; 4],
-    #[wasm_bindgen(skip)]
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub move_pp: [u8; 4],
-    #[wasm_bindgen(skip)]
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub nickname: SizedUtf16String<26>,
-    #[wasm_bindgen(skip)]
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub move_pp_ups: [u8; 4],
-    #[wasm_bindgen(skip)]
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub relearn_moves: [MoveSlot; 4],
     pub ivs: Stats8,
     pub is_egg: bool,
     pub is_nicknamed: bool,
-    #[wasm_bindgen(skip)]
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub handler_name: SizedUtf16String<24>,
     pub handler_language: u8,
     pub is_current_handler: bool,
@@ -95,7 +95,7 @@ pub struct MainDataV2 {
     pub language: Language,
     pub form_argument: u32,
     pub affixed_ribbon: Option<ModernRibbon>,
-    #[wasm_bindgen(skip)]
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub trainer_name: SizedUtf16String<26>,
     pub trainer_friendship: u8,
     pub trainer_memory: TrainerMemory,
@@ -109,7 +109,7 @@ pub struct MainDataV2 {
     pub hyper_training: HyperTraining,
     pub trainer_gender: Gender,
     pub obedience_level: u8,
-    #[wasm_bindgen(skip)]
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub home_tracker: [u8; 8],
 }
 
@@ -713,7 +713,7 @@ pub struct SwordShieldData {
     pub can_gigantamax: bool,
     pub dynamax_level: u8,
     pub palma: u32,
-    #[wasm_bindgen(skip)]
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub tr_flags: [u8; 14],
 }
 
@@ -777,7 +777,7 @@ impl DataSection for SwordShieldData {
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Debug, Default, Serialize, Clone, Copy)]
 pub struct BdspData {
-    #[wasm_bindgen(skip)]
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub tm_flags: FlagSet<14>,
 }
 
@@ -825,11 +825,11 @@ impl DataSection for BdspData {
 #[derive(Debug, Default, Serialize, Clone, Copy)]
 pub struct LegendsArceusData {
     pub gvs: Stats8,
-    #[wasm_bindgen(skip)]
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub move_flags: FlagSet<14>,
-    #[wasm_bindgen(skip)]
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub tutor_flags: FlagSet<8>,
-    #[wasm_bindgen(skip)]
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub master_flags: FlagSet<8>,
     pub is_alpha: bool,
     pub is_noble: bool,
