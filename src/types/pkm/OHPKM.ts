@@ -330,11 +330,6 @@ export class OHPKM extends PkmRs.OhpkmV2 implements PKMInterface {
     }
   }
 
-  static fromV1Wasm(v1: OHPKM) {
-    const v2 = PkmRs.OhpkmV2.fromV1Bytes(new Uint8Array(v1.toBytes()))
-    return new OhpkmV2(v2.toByteArray())
-  }
-
   get dexNum() {
     return this.speciesAndForme.nationalDex
   }
@@ -499,8 +494,8 @@ export class OHPKM extends PkmRs.OhpkmV2 implements PKMInterface {
     return getWeightCalculated(this)
   }
 
-  static fromBytes(buffer: Uint8Array): OhpkmV2 {
-    return new OhpkmV2(buffer)
+  static fromBytes(buffer: ArrayBuffer): OhpkmV2 {
+    return new OhpkmV2(new Uint8Array(buffer))
   }
 
   public get abilityName() {
@@ -541,14 +536,6 @@ export class OHPKM extends PkmRs.OhpkmV2 implements PKMInterface {
 
   static maxValidMove() {
     return 728
-  }
-
-  static maxValidBall() {
-    return 26
-  }
-
-  static allowedBalls() {
-    return []
   }
 
   public get stats(): Stats {

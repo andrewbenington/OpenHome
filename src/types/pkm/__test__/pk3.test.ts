@@ -27,7 +27,7 @@ beforeAll(() => {
   ) as PK3
 
   slowpokeOhpkm = bytesToPKM(
-    new Uint8Array(fs.readFileSync(path.join(__dirname, './PKMFiles/OH', 'slowpoke-shiny.ohpkm'))),
+    new Uint8Array(fs.readFileSync(path.join(__dirname, './PKMFiles/OH', 'slowbro.ohpkm'))),
     'OHPKM'
   ) as OHPKM
 })

@@ -1,7 +1,7 @@
 import { FormeMetadata, Generation, MetadataLookup } from '@pkm-rs/pkg'
 import { HTMLAttributes } from 'react'
 import useIsDarkMode from 'src/hooks/dark-mode'
-import useMonSprite from 'src/pokemon/useMonSprite'
+import useMonSprite from 'src/pokemon-details/useMonSprite'
 import BoxIcons from '../images/BoxIcons.png'
 import { getPublicImageURL } from '../images/images'
 import { getItemIconPath } from '../images/items'

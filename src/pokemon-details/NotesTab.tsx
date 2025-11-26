@@ -16,7 +16,6 @@ export default function NotesDisplay(props: { mon: OHPKM }) {
           setNotesText(e.target.value)
           updateMonNotes(mon.getHomeIdentifier(), e.target.value ?? '')
         }}
-        onBlur={() => updateMonNotes(mon.getHomeIdentifier(), notesText)}
         style={{ height: '100%' }}
       />
     </div>

@@ -1,5 +1,7 @@
 import { OriginGame } from '@pkm-rs/pkg'
 import { PKMInterface } from '../interfaces'
+import { OHPKM } from '../pkm/OHPKM'
+import { OhpkmV1 } from '../pkm/OhpkmV1'
 import { PathData } from './path'
 import { SAV } from './SAV'
 
@@ -10,15 +12,17 @@ export type LOOKUP_TYPE = 'gen12' | 'gen345'
 export const DESAMUME_FOOTER_START =
   '|<--Snip above here to create a raw sav by excluding this DeSmuME savedata footer:'
 
-export interface PKMClass {
+export interface SavePkmClass {
   new (arg: ArrayBuffer | PKMInterface, encrypted?: boolean): PKMInterface
   fromBytes(bytes: ArrayBuffer): PKMInterface
   getName(): string
 }
 
+export type AnyPkmClass = SavePkmClass | typeof OHPKM | typeof OhpkmV1
+
 export interface SAVClass {
   new (path: PathData, bytes: Uint8Array): SAV
-  pkmType: PKMClass
+  pkmType: SavePkmClass
   fileIsSave: (bytes: Uint8Array) => boolean
   includesOrigin: (origin: OriginGame) => boolean
   lookupType?: 'gen12' | 'gen345'

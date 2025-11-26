@@ -6,6 +6,9 @@ import { beforeAll, describe, expect, test } from 'vitest'
 import { OHPKM } from '../../pkm/OHPKM'
 import { PathData } from '../path'
 import { G3RRSAV } from '../radicalred/G3RRSAV'
+import { initializeWasm } from './init'
+
+beforeAll(initializeWasm)
 
 describe('G3RRSAV - Radical Red Save File Read Test', () => {
   let radicalRedSave: G3RRSAV

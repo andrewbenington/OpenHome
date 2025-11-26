@@ -14,13 +14,13 @@ import { PKMInterface } from '../types/interfaces'
 import { OHPKM } from '../types/pkm/OHPKM'
 import { OhpkmV1 } from '../types/pkm/OhpkmV1'
 import FileTypeSelect from './components/FileTypeSelect'
-import MetDataMovesDisplay from './MetDataMovesDisplay'
-import NotesDisplay from './NotesDisplay'
-import OtherDisplay from './OtherDisplay'
-import RibbonsDisplay from './RibbonsDisplay'
-import StatsDisplay from './StatsDisplay'
+import NotesDisplay from './NotesTab'
+import OtherDisplay from './OtherTab'
+import RibbonsDisplay from './RibbonsTab'
+import StatsDisplay from './StatsTab'
 import './style.css'
-import SummaryDisplay from './SummaryDisplay'
+import SummaryDisplay from './SummaryTab'
+import MetDataMovesTab from './tabs/MetDataMovesTab'
 
 const PokemonDetailsModal = (props: {
   mon?: PKMInterface
@@ -167,7 +167,7 @@ const PokemonDetailsModal = (props: {
                 <SummaryDisplay mon={displayMon} />
               </SideTabs.Panel>
               <SideTabs.Panel value="moves_met_data">
-                <MetDataMovesDisplay mon={displayMon} />
+                <MetDataMovesTab mon={displayMon} />
               </SideTabs.Panel>
               <SideTabs.Panel value="stats">
                 <StatsDisplay mon={displayMon} />

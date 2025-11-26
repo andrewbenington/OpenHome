@@ -4,6 +4,7 @@ import path from 'path'
 import { assert, beforeAll, describe, test } from 'vitest'
 import { bytesToPKM } from '../../FileImport'
 import { OHPKM } from '../OHPKM'
+import { OhpkmV1 } from '../OhpkmV1'
 import OhpkmV2 from '../OhpkmV2'
 import { initializeWasm } from './init'
 
@@ -62,10 +63,11 @@ describe('OHPKM V1 → V2 → V1 is lossless', () => {
 
   for (const file of files) {
     test(file, () => {
-      const bytes = new Uint8Array(fs.readFileSync(path.join(__dirname, 'PKMFiles', 'OH', file)))
-      const original = bytesToPKM(bytes, 'OHPKM') as OHPKM
+      const bytes = new Uint8Array(
+        fs.readFileSync(path.join(__dirname, 'PKMFiles', 'OH', file)).buffer
+      )
+      const original = bytesToPKM(bytes, 'OhpkmV1') as OhpkmV1
       original.fixErrors()
-      original.homeTracker = new Uint8Array(8)
 
       const v2 = new OhpkmV2(original)
       const roundTrip = new OHPKM(v2)
@@ -91,13 +93,10 @@ describe('OHPKM V1 WASM → V2 → V1 is lossless', async () => {
 
   for (const file of files) {
     const bytes = new Uint8Array(fs.readFileSync(path.join(__dirname, 'PKMFiles', 'OH', file)))
-    const original = bytesToPKM(bytes, 'OHPKM') as OHPKM
+    const original = bytesToPKM(bytes, 'OhpkmV1') as OhpkmV1
     original.fixErrors()
-    original.homeTracker = new Uint8Array(8)
 
-    // console.log('building from wasm')
     const v2FromV1Wasm = OhpkmV2.fromV1Wasm(original)
-    // console.log('building from js')
     const v2FromJs = new OhpkmV2(original)
 
     test(`pids match - ${file}`, () => {

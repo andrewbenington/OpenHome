@@ -812,6 +812,26 @@ impl OhpkmV2 {
         ]
     }
 
+    #[wasm_bindgen(getter = homeTracker)]
+    pub fn home_tracker(&self) -> Option<Vec<u8>> {
+        if self.main_data.home_tracker.iter().all(|b| *b == 0) {
+            None
+        } else {
+            Some(self.main_data.home_tracker.to_vec())
+        }
+    }
+
+    #[wasm_bindgen(setter = homeTracker)]
+    pub fn set_home_tracker(&mut self, tracker: Option<Vec<u8>>) {
+        if let Some(tracker) = tracker
+            && tracker.len() == 8
+        {
+            self.main_data.home_tracker.copy_from_slice(&tracker);
+        } else {
+            self.main_data.home_tracker.copy_from_slice(&[0u8; 8]);
+        }
+    }
+
     #[wasm_bindgen(js_name = addModernRibbons)]
     pub fn add_modern_ribbons(&mut self, ribbon_indices: Vec<usize>) {
         ribbon_indices

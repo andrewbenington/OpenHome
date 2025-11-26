@@ -2,15 +2,15 @@ import { OriginGames } from '@pkm-rs/pkg'
 import { getLocationString, RibbonTitles } from '@pokemon-resources/index'
 import { Badge, Flex } from '@radix-ui/themes'
 import { useContext, useMemo } from 'react'
-import Markings from '../components/Markings'
-import { getPublicImageURL } from '../images/images'
-import { getBallIconPath } from '../images/items'
-import { AppInfoContext } from '../state/appInfo'
-import { PKMInterface } from '../types/interfaces'
-import { getCharacteristic, getMoveMaxPP } from '../types/pkm/util'
-import { getPluginIdentifier } from '../types/SAVTypes/util'
-import { Styles } from '../types/types'
-import MoveCard from './components/MoveCard'
+import Markings from '../../components/Markings'
+import { getPublicImageURL } from '../../images/images'
+import { getBallIconPath } from '../../images/items'
+import { AppInfoContext } from '../../state/appInfo'
+import { PKMInterface } from '../../types/interfaces'
+import { getCharacteristic, getMoveMaxPP } from '../../types/pkm/util'
+import { getPluginIdentifier } from '../../types/SAVTypes/util'
+import { Styles } from '../../types/types'
+import MoveCard from '../components/MoveCard'
 
 const styles = {
   gameContainer: {
@@ -42,7 +42,7 @@ const styles = {
 
 const metTimesOfDay = ['in the morning', 'during the daytime', 'in the evening']
 
-const MetDataMovesDisplay = (props: { mon: PKMInterface }) => {
+const MetDataMovesTab = (props: { mon: PKMInterface }) => {
   const { mon } = props
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
 
@@ -202,4 +202,4 @@ const MetDataMovesDisplay = (props: { mon: PKMInterface }) => {
   )
 }
 
-export default MetDataMovesDisplay
+export default MetDataMovesTab

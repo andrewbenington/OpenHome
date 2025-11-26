@@ -40,7 +40,7 @@ describe('gen345 identifier', () => {
 })
 
 const slowpokeOH = bytesToPKM(
-  new Uint8Array(readFileSync(path.join(__dirname, './PKMFiles/OH', 'slowpoke-shiny.ohpkm'))),
+  new Uint8Array(readFileSync(path.join(__dirname, './PKMFiles/OH', 'slowbro.ohpkm'))),
   'OHPKM'
 ) as OHPKM
 

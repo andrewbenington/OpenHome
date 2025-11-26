@@ -43,7 +43,7 @@ import {
   statsPreSplitToWasm,
   trainerMemoryToWasm,
 } from './convert'
-import { OHPKM } from './OHPKM'
+import { OhpkmV1 } from './OhpkmV1'
 import {
   adjustMovePPBetweenFormats,
   generateIVs,
@@ -333,10 +333,12 @@ export class OhpkmV2 extends PkmRs.OhpkmV2 implements PKMInterface {
 
       this.tmFlagsSV = other.tmFlagsSV
       this.tmFlagsSVDLC = other.tmFlagsSVDLC
+
+      this.homeTracker = other.homeTracker
     }
   }
 
-  static fromV1Wasm(v1: OHPKM) {
+  static fromV1Wasm(v1: OhpkmV1) {
     const v2 = PkmRs.OhpkmV2.fromV1Bytes(new Uint8Array(v1.toBytes()))
     return new OhpkmV2(v2.toByteArray())
   }
