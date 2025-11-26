@@ -3,7 +3,6 @@ import fs from 'fs'
 import path from 'path'
 import { assert, beforeAll, describe, test } from 'vitest'
 import { bytesToPKM } from '../../FileImport'
-import { OHPKM } from '../OHPKM'
 import { OhpkmV1 } from '../OhpkmV1'
 import OhpkmV2 from '../OhpkmV2'
 import { initializeWasm } from './init'
@@ -70,7 +69,7 @@ describe('OHPKM V1 → V2 → V1 is lossless', () => {
       original.fixErrors()
 
       const v2 = new OhpkmV2(original)
-      const roundTrip = new OHPKM(v2)
+      const roundTrip = new OhpkmV1(v2)
 
       const expected = new Uint8Array(original.toBytes())
       const actual = new Uint8Array(roundTrip.toBytes())

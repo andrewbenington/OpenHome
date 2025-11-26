@@ -1539,7 +1539,7 @@ export class OhpkmV1 implements PKMInterface {
   }
 
   public toBytes(): ArrayBuffer {
-    return this.bytes.buffer as ArrayBuffer
+    return this.bytes.buffer.slice(0, 497) as ArrayBuffer // needed. i hate dealing with buffers in js
   }
 
   public getStats(): Stats {
