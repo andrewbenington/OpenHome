@@ -1,7 +1,6 @@
 use std::{fmt::Display, hash::Hash};
 
-#[cfg(feature = "wasm")]
-use crate::pkm::ohpkm::console_log;
+use crate::pkm::ohpkm::log;
 
 type CoreResult<T, E> = core::result::Result<T, E>;
 
@@ -17,9 +16,18 @@ pub trait DataSection: Sized {
     fn extract_from(
         data: &SectionedData<Self::TagType>,
     ) -> CoreResult<Option<Self>, Self::ErrorType> {
-        data.get_section_data(Self::TAG)
+        data.find_section_data(Self::TAG)
             .map(|d| Self::from_bytes(&d.bytes))
             .transpose()
+    }
+
+    fn extract_all_from(
+        data: &SectionedData<Self::TagType>,
+    ) -> CoreResult<Vec<Self>, Self::ErrorType> {
+        data.all_section_data(Self::TAG)
+            .into_iter()
+            .map(|d| Self::from_bytes(&d.bytes))
+            .collect()
     }
 
     fn ensure_buffer_size(bytes: &[u8]) -> Result<()> {
@@ -34,9 +42,13 @@ pub trait DataSection: Sized {
         }
     }
 
-    fn to_tagged_buffer(self) -> CoreResult<TaggedBuffer<Self::TagType>, Self::ErrorType> {
+    fn to_tagged_buffer(&self) -> CoreResult<TaggedBuffer<Self::TagType>, Self::ErrorType> {
+        log(format!("to_tagged_buffer<{}> {{\n", Self::TAG));
+        let bytes = self.to_bytes()?;
+        log("}");
+
         Ok(TaggedBuffer {
-            bytes: self.to_bytes()?,
+            bytes,
             tag: Self::TAG,
         })
     }
@@ -67,7 +79,7 @@ impl<Tag: SectionTag> SectionMetadata<Tag> {
         ))
     }
 
-    pub fn to_bytes(self) -> Vec<u8> {
+    pub fn to_bytes(&self) -> Vec<u8> {
         let mut buffer: Vec<u8> = Vec::with_capacity(6);
         buffer.extend_from_slice(&self.0.index().to_le_bytes());
         buffer.extend_from_slice(&self.1.to_le_bytes());
@@ -120,8 +132,15 @@ pub struct SectionedData<Tag: SectionTag> {
 }
 
 impl<Tag: SectionTag> SectionedData<Tag> {
-    pub fn get_section_data(&self, tag: Tag) -> Option<&TaggedBuffer<Tag>> {
+    pub fn find_section_data(&self, tag: Tag) -> Option<&TaggedBuffer<Tag>> {
         self.tagged_buffers.iter().find(|tb| tb.tag == tag)
+    }
+
+    pub fn all_section_data(&self, tag: Tag) -> Vec<&TaggedBuffer<Tag>> {
+        self.tagged_buffers
+            .iter()
+            .filter(|tb| tb.tag == tag)
+            .collect()
     }
 }
 
@@ -159,9 +178,22 @@ impl<Tag: SectionTag> SectionedData<Tag> {
         section: Option<T>,
     ) -> CoreResult<&mut Self, T::ErrorType> {
         if let Some(section) = section {
-            #[cfg(feature = "wasm")]
-            console_log(format!("adding section: {}", T::TAG));
+            log(format!("adding section: {}", T::TAG));
             self.tagged_buffers.push(section.to_tagged_buffer()?);
+            log(format!("added: {}", T::TAG));
+        }
+
+        Ok(self)
+    }
+
+    pub fn add_all<T: DataSection<TagType = Tag>>(
+        &mut self,
+        sections: Vec<T>,
+    ) -> CoreResult<&mut Self, T::ErrorType> {
+        log("add all");
+        for section in sections.into_iter() {
+            self.tagged_buffers
+                .push(DataSection::to_tagged_buffer(&section)?);
         }
 
         Ok(self)
@@ -199,7 +231,7 @@ impl<Tag: SectionTag> SectionedData<Tag> {
                 SectionMetadata::<Tag>::from_bytes(&bytes[metadata_start..metadata_end]);
             let Some(metadata) = metadata_o else {
                 #[cfg(feature = "wasm")]
-                console_log(format!(
+                log(format!(
                     "MALFORMED METADATA at {metadata_start} - {metadata_end}"
                 ));
                 continue;

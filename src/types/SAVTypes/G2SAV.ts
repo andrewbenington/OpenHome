@@ -289,8 +289,7 @@ export class G2SAV extends OfficialSAV<PK2> {
       const g2Save = new G2SAV(emptyPathData, bytes)
 
       return g2Save.areCrystalInternationalChecksumsValid() || g2Save.areGoldSilverChecksumsValid()
-    } catch (e) {
-      console.error(e)
+    } catch {
       return false
     }
   }

@@ -1,8 +1,8 @@
 use crate::pkm::ohpkm::OhpkmV1;
 use crate::pkm::ohpkm::sectioned_data::{DataSection, SectionTag, SectionedData};
 use crate::pkm::ohpkm::v2_sections::{
-    BdspData, GameboyData, Gen45Data, Gen67Data, LegendsArceusData, MainDataV2, Notes, PluginData,
-    ScarletVioletData, SwordShieldData,
+    BdspData, GameboyData, Gen45Data, Gen67Data, LegendsArceusData, MainDataV2, Notes,
+    PastHandlerData, PluginData, ScarletVioletData, SwordShieldData,
 };
 #[cfg(feature = "wasm")]
 use crate::pkm::traits::IsShiny;
@@ -56,6 +56,7 @@ pub enum SectionTagV2 {
     BdspTmFlags,
     LegendsArceus,
     ScarletViolet,
+    PastHandler,
     PluginData,
     Notes,
 }
@@ -71,8 +72,9 @@ impl SectionTagV2 {
             5 => Some(Self::BdspTmFlags),
             6 => Some(Self::LegendsArceus),
             7 => Some(Self::ScarletViolet),
-            8 => Some(Self::PluginData),
-            9 => Some(Self::Notes),
+            8 => Some(Self::PastHandler),
+            9 => Some(Self::PluginData),
+            10 => Some(Self::Notes),
             _ => None,
         }
     }
@@ -87,6 +89,7 @@ impl SectionTagV2 {
             Self::BdspTmFlags => 14,
             Self::LegendsArceus => 44,
             Self::ScarletViolet => 37,
+            Self::PastHandler => 12,
             Self::PluginData => 0,
             Self::Notes => 0,
         }
@@ -107,7 +110,7 @@ impl SectionTag for SectionTagV2 {
     }
 }
 
-#[derive(Default, Debug)]
+#[derive(Default, Debug, Clone)]
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 pub struct OhpkmV2 {
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
@@ -120,6 +123,7 @@ pub struct OhpkmV2 {
     la_data: Option<LegendsArceusData>,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     sv_data: Option<ScarletVioletData>,
+    handler_data: Vec<PastHandlerData>,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     plugin_data: Option<PluginData>,
     notes: Option<Notes>,
@@ -136,6 +140,7 @@ impl OhpkmV2 {
             bdsp_data: None,
             la_data: None,
             sv_data: None,
+            handler_data: Vec::new(),
             plugin_data: None,
             notes: None,
         })
@@ -159,6 +164,7 @@ impl OhpkmV2 {
             bdsp_data: BdspData::extract_from(&sectioned_data)?,
             la_data: LegendsArceusData::extract_from(&sectioned_data)?,
             sv_data: ScarletVioletData::extract_from(&sectioned_data)?,
+            handler_data: PastHandlerData::extract_all_from(&sectioned_data)?,
             plugin_data: PluginData::extract_from(&sectioned_data)?,
             notes: Notes::extract_from(&sectioned_data)?,
         })
@@ -174,6 +180,7 @@ impl OhpkmV2 {
             bdsp_data: BdspData::from_v1(old),
             la_data: LegendsArceusData::from_v1(old),
             sv_data: ScarletVioletData::from_v1(old),
+            handler_data: PastHandlerData::from_v1(old).map_or(Vec::new(), |hd| vec![hd]),
             plugin_data: PluginData::from_v1(old),
             notes: None,
         }
@@ -189,7 +196,8 @@ impl OhpkmV2 {
             .add_if_some(self.swsh_data)?
             .add_if_some(self.bdsp_data)?
             .add_if_some(self.la_data)?
-            .add_if_some(self.sv_data)?
+            .add_if_some(self.clone().sv_data)?
+            .add_all(self.handler_data.clone())?
             .add_if_some(self.plugin_data.clone())?
             .add_if_some(self.notes.clone())?;
 
@@ -1555,9 +1563,9 @@ impl OhpkmV2 {
             ))
             .tera_type_override = TeraType::from_byte(value);
 
-        if self.sv_data.as_ref().is_some_and(DataSection::is_empty) {
-            self.sv_data = None
-        }
+        // if self.sv_data.as_ref().is_some_and(DataSection::is_empty) {
+        //     self.sv_data = None
+        // }
     }
 
     #[wasm_bindgen(getter = tmFlagsSV)]

@@ -88,7 +88,6 @@ export function fileTypeFromString(type: string): AnyPkmClass | undefined {
 
 export const bytesToPKM = (bytes: Uint8Array, extension: string): PKMInterface => {
   let T: AnyPkmClass | undefined
-  console.warn(bytes.length, extension)
 
   if (extension === '' || extension.toUpperCase() === 'PKM') {
     T = fileTypeFromBytes(new Uint8Array(bytes))

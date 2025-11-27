@@ -1,14 +1,14 @@
-use std::{
-    fs,
-    path::{Path, PathBuf},
-};
+use std::{fs, path::PathBuf};
 
 use pkm_rs::pkm::{
     Pkm,
-    ohpkm::{self, OhpkmV1, OhpkmV2},
+    ohpkm::{OhpkmV1, OhpkmV2},
 };
 use semver::Version;
-use strum::{self, EnumIter, IntoEnumIterator};
+use strum::{self, EnumIter};
+
+#[cfg(not(debug_assertions))]
+use strum::IntoEnumIterator;
 
 use crate::{
     deprecated::{self, BoxPreV1_5_0},
@@ -72,7 +72,7 @@ pub fn handle_version_migration(
         return Err(Error::outdated_version(last_used_semver, current_version));
     }
 
-    if current_version == last_used_semver {
+    if current_version == last_used_semver && !cfg!(debug_assertions) {
         println!("Version has not changed since last launch")
     } else {
         println!(
@@ -113,6 +113,7 @@ impl Migration {
     }
 }
 
+#[cfg(not(debug_assertions))]
 pub fn get_necessary_migrations(
     last_launch_version: Version,
     current_version: Version,
@@ -120,6 +121,14 @@ pub fn get_necessary_migrations(
     Migration::iter()
         .filter(|m| m.version() > last_launch_version && m.version() <= current_version)
         .collect()
+}
+
+#[cfg(debug_assertions)]
+pub fn get_necessary_migrations(
+    last_launch_version: Version,
+    current_version: Version,
+) -> Vec<Migration> {
+    vec![Migration::V1_8_0ALPHA]
 }
 
 pub fn do_migration_1_5_0(app_handle: &tauri::AppHandle) -> Result<()> {

@@ -284,6 +284,28 @@ pub struct TrainerMemory {
     pub text_variable: u16,
 }
 
+impl TrainerMemory {
+    pub fn from_bytes_in_order(bytes: &[u8; 5]) -> Self {
+        Self {
+            intensity: bytes[0],
+            memory: bytes[1],
+            feeling: bytes[2],
+            text_variable: u16::from_le_bytes(bytes[3..5].try_into().unwrap()),
+        }
+    }
+
+    pub fn to_bytes_in_order(&self) -> [u8; 5] {
+        let mut bytes = [0u8; 5];
+
+        bytes[0] = self.intensity;
+        bytes[1] = self.memory;
+        bytes[2] = self.feeling;
+        bytes[3..5].copy_from_slice(&self.text_variable.to_le_bytes());
+
+        bytes
+    }
+}
+
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[allow(clippy::missing_const_for_fn)]
 impl TrainerMemory {

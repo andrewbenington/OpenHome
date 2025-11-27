@@ -74,7 +74,7 @@ fn initialize_storage(app_handle: &tauri::AppHandle) -> Result<()> {
         util::write_storage_file_json(app_handle, "banks.json", StoredBankData::default())?;
     }
 
-    let mons_path = util::get_storage_path(app_handle)?.join("mons");
+    let mons_path = util::get_storage_path(app_handle)?.join("mons_v2");
     util::create_directory(&mons_path)
 }
 

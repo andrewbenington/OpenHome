@@ -466,16 +466,6 @@ impl DataSection for MainDataV2 {
     }
 }
 
-#[derive(Debug, Default, Serialize, Clone, Copy)]
-pub struct PastHandlerData {
-    pub id: u16,
-    pub friendship: u8,
-    pub memory: TrainerMemory,
-    pub affection: u8,
-    pub gender: Gender,
-    pub origin_game: OriginGame,
-}
-
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Debug, Default, Serialize, Clone, Copy)]
 pub struct GameboyData {
@@ -993,6 +983,72 @@ impl DataSection for ScarletVioletData {
         self.tera_type_override.is_none()
             && self.tm_flags.is_empty()
             && self.tm_flags_dlc.is_empty()
+    }
+}
+
+#[derive(Debug, Default, Serialize, Clone, Copy)]
+pub struct PastHandlerData {
+    pub id: u16,
+    pub friendship: u8,
+    pub memory: TrainerMemory,
+    pub affection: u8,
+    pub gender: Gender,
+    pub origin_game: Option<OriginGame>,
+}
+
+impl PastHandlerData {
+    pub fn from_v1(old: OhpkmV1) -> Option<Self> {
+        if old.handler_id != 0 {
+            Some(PastHandlerData {
+                id: old.handler_id,
+                friendship: old.handler_friendship,
+                memory: old.handler_memory,
+                affection: old.handler_affection,
+                gender: Gender::from(old.handler_gender),
+                origin_game: None,
+            })
+        } else {
+            None
+        }
+    }
+}
+
+impl DataSection for PastHandlerData {
+    type TagType = SectionTagV2;
+    const TAG: Self::TagType = SectionTagV2::PastHandler;
+
+    type ErrorType = Error;
+
+    fn from_bytes(bytes: &[u8]) -> Result<Self> {
+        Ok(Self {
+            id: u16::from_le_bytes(bytes[0..=1].try_into().unwrap()),
+            friendship: bytes[2],
+            memory: TrainerMemory::from_bytes_in_order(bytes[3..=7].try_into().unwrap()),
+            affection: bytes[8],
+            gender: Gender::from_u8(bytes[9]),
+            origin_game: if bytes[10] != 0 {
+                Some(OriginGame::from(bytes[10]))
+            } else {
+                None
+            },
+        })
+    }
+
+    fn to_bytes(&self) -> Result<Vec<u8>> {
+        let mut bytes = [0u8; 11];
+
+        bytes[0..=1].copy_from_slice(&self.id.to_le_bytes());
+        bytes[2] = self.friendship;
+        bytes[3..=7].copy_from_slice(&self.memory.to_bytes_in_order());
+        bytes[8] = self.affection;
+        bytes[9] = self.gender.to_byte();
+        bytes[10] = self.origin_game.map(|g| g as u8).unwrap_or(0);
+
+        Ok(bytes.to_vec())
+    }
+
+    fn is_empty(&self) -> bool {
+        self.id == 0
     }
 }
 
