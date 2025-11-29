@@ -1,8 +1,10 @@
+mod bytes;
 mod checksum;
 mod identifiers;
 mod pkm_base;
 mod stats;
 
+pub use bytes::*;
 pub use checksum::Checksum;
 pub use identifiers::*;
 pub use pkm_base::*;

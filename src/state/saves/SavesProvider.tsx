@@ -72,6 +72,17 @@ export default function SavesProvider({ children }: SavesProviderProps) {
       return
     }
 
+    for (const save of allOpenSaves) {
+      save.boxes.forEach((box) =>
+        box.pokemon.forEach((mon) => {
+          if (mon instanceof OHPKM) {
+            console.log(`trading ${mon.nickname} to ${save.gameName}`)
+            mon.tradeToSave(save)
+          }
+        })
+      )
+    }
+
     const newGen12Lookup: LookupMap = {}
     const newGen345Lookup: LookupMap = {}
     const saveTypesAndChangedMons = allOpenSaves.map(

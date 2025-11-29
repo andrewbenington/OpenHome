@@ -4,46 +4,38 @@ use crate::pkm::ohpkm::v2_sections::{
     BdspData, GameboyData, Gen45Data, Gen67Data, LegendsArceusData, MainDataV2, Notes,
     PastHandlerData, PluginData, ScarletVioletData, SwordShieldData,
 };
-#[cfg(feature = "wasm")]
-use crate::pkm::traits::IsShiny;
 use crate::pkm::{Error, Result};
-#[cfg(feature = "wasm")]
-use crate::strings::SizedUtf16String;
 
 #[cfg(feature = "wasm")]
-use pkm_rs_resources::abilities::AbilityIndex;
-#[cfg(feature = "wasm")]
-use pkm_rs_resources::ball::Ball;
-#[cfg(feature = "wasm")]
-use pkm_rs_resources::language::Language;
-#[cfg(feature = "wasm")]
-use pkm_rs_resources::moves::MoveSlot;
-#[cfg(feature = "wasm")]
-use pkm_rs_resources::natures::NatureIndex;
-
-#[cfg(feature = "wasm")]
-use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbon, OpenHomeRibbonSet};
-#[cfg(feature = "wasm")]
-use pkm_rs_resources::species::SpeciesAndForme;
-
-#[cfg(feature = "wasm")]
-use crate::pkm::ohpkm::JsResult;
-#[cfg(feature = "wasm")]
-use pkm_rs_types::{
-    ContestStats, FlagSet, Geolocations, HyperTraining, MarkingsSixShapesColors, OriginGame,
-    Stats8, Stats16Le, StatsPreSplit, TeraType,
-};
-#[cfg(feature = "wasm")]
-use pkm_rs_types::{Gender, PokeDate, TrainerMemory};
-#[cfg(feature = "wasm")]
-use pkm_rs_types::{ShinyLeaves, TeraTypeWasm};
+use pkm_rs_types::TrainerData;
 use strum_macros::Display;
-
-const MAGIC_NUMBER: u32 = 0x57575757;
-const CURRENT_VERSION: u16 = 2;
 
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
+
+#[cfg(feature = "wasm")]
+use crate::pkm::{ohpkm::JsResult, traits::IsShiny};
+
+#[cfg(feature = "wasm")]
+use pkm_rs_resources::{
+    abilities::AbilityIndex,
+    ball::Ball,
+    language::Language,
+    moves::MoveSlot,
+    natures::NatureIndex,
+    ribbons::{ModernRibbon, OpenHomeRibbon, OpenHomeRibbonSet},
+    species::SpeciesAndForme,
+};
+
+#[cfg(feature = "wasm")]
+use pkm_rs_types::{
+    ContestStats, FlagSet, Gender, Geolocations, HyperTraining, MarkingsSixShapesColors,
+    OriginGame, PokeDate, ShinyLeaves, Stats8, Stats16Le, StatsPreSplit, TeraType, TeraTypeWasm,
+    TrainerMemory, strings::SizedUtf16String,
+};
+
+const MAGIC_NUMBER: u32 = 0x57575757;
+const CURRENT_VERSION: u16 = 2;
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash, Display)]
 #[repr(u16)]
@@ -206,7 +198,6 @@ impl OhpkmV2 {
 }
 
 #[cfg(feature = "wasm")]
-// #[safe_wasm_impl]
 #[wasm_bindgen]
 #[allow(clippy::missing_const_for_fn)]
 impl OhpkmV2 {
@@ -763,7 +754,7 @@ impl OhpkmV2 {
 
     #[wasm_bindgen(setter = handlerName)]
     pub fn set_handler_name(&mut self, value: String) {
-        self.main_data.handler_name = SizedUtf16String::<24>::from(value);
+        self.main_data.handler_name = SizedUtf16String::<26>::from(value);
     }
 
     #[wasm_bindgen(getter)]
@@ -967,12 +958,12 @@ impl OhpkmV2 {
         }
     }
 
-    #[wasm_bindgen(getter = shinyLeaves)]
+    #[wasm_bindgen(getter = shinyLeavesWasm)]
     pub fn shiny_leaves(&self) -> Option<ShinyLeaves> {
         Some(self.gen45_data?.shiny_leaves)
     }
 
-    #[wasm_bindgen(setter = shinyLeaves)]
+    #[wasm_bindgen(setter = shinyLeavesWasm)]
     pub fn set_shiny_leaves(&mut self, value: Option<ShinyLeaves>) {
         match value {
             Some(shiny_leaves) => {
@@ -1562,10 +1553,6 @@ impl OhpkmV2 {
                 self.main_data.species_and_forme,
             ))
             .tera_type_override = TeraType::from_byte(value);
-
-        // if self.sv_data.as_ref().is_some_and(DataSection::is_empty) {
-        //     self.sv_data = None
-        // }
     }
 
     #[wasm_bindgen(getter = tmFlagsSV)]
@@ -1643,8 +1630,43 @@ impl OhpkmV2 {
         Ok(obj)
     }
 
-    // Notes
+    // Past Handlers
+    #[wasm_bindgen(getter)]
+    pub fn handlers(&self) -> Vec<PastHandlerData> {
+        self.handler_data.clone()
+    }
 
+    #[wasm_bindgen(js_name = findDataForTrainer)]
+    pub fn find_data_for_trainer(
+        &mut self,
+        tid: u16,
+        sid: u16,
+        game: OriginGame,
+    ) -> Option<PastHandlerData> {
+        self.handler_data
+            .iter()
+            .find(|h| {
+                h.id.is_some_and(|id| id.get() == tid)
+                    && h.secret_id.is_some_and(|id| id.get() == sid)
+                    && h.origin_game.is_some_and(|g| g == game)
+            })
+            .cloned()
+    }
+
+    #[wasm_bindgen(js_name = registerHandler)]
+    pub fn register_handler(&mut self, handler: TrainerData) {
+        if let Some(existing_record) = self
+            .handler_data
+            .iter_mut()
+            .find(|h| h.trainer_data_matches(&handler.name, handler.gender))
+        {
+            existing_record.update_from(&handler);
+        } else {
+            self.handler_data.push(handler.into());
+        }
+    }
+
+    // Notes
     #[wasm_bindgen(getter)]
     pub fn notes(&self) -> Option<String> {
         Some(self.notes.clone()?.0)

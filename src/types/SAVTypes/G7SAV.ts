@@ -70,10 +70,10 @@ export abstract class G7SAV extends OfficialSAV<PK7> {
 
     const fullTrainerID = bytesToUint32LittleEndian(this.bytes, this.trainerDataOffset)
 
-    this.tid = fullTrainerID % 1000000
+    this.tid = bytesToUint16LittleEndian(this.bytes, this.trainerDataOffset)
     this.sid = bytesToUint16LittleEndian(this.bytes, this.trainerDataOffset + 2)
     this.currentPCBox = this.bytes[0] < 32 ? this.bytes[0] : 0
-    this.displayID = this.tid.toString().padStart(6, '0')
+    this.displayID = (fullTrainerID % 1000000).toString().padStart(6, '0')
     this.origin = this.bytes[this.trainerDataOffset + 4]
     this.pcOffset = pcOffset
     this.pcChecksumOffset = pcChecksumOffset

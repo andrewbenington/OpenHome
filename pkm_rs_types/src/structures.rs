@@ -4,7 +4,7 @@ use strum_macros::{Display, EnumString};
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
-use crate::util;
+use crate::{OriginGame, strings::SizedUtf16String, util};
 
 const MASK_BITS_1_2: u8 = 0b00000110;
 const MASK_BITS_1_2_INVERTED: u8 = 0b11111001;
@@ -274,6 +274,54 @@ impl Serialize for PokeDate {
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[derive(Debug, Serialize, Clone)]
+pub struct TrainerData {
+    pub id: u16,
+    pub secret_id: u16,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+    pub name: SizedUtf16String<26>,
+    pub friendship: u8,
+    pub memory: TrainerMemory,
+    pub affection: u8,
+    pub gender: Gender,
+    pub origin_game: Option<OriginGame>,
+}
+
+#[cfg(feature = "wasm")]
+#[wasm_bindgen]
+#[allow(clippy::missing_const_for_fn)]
+#[allow(clippy::too_many_arguments)]
+impl TrainerData {
+    #[wasm_bindgen(getter)]
+    pub fn name(&self) -> String {
+        self.name.to_string()
+    }
+
+    #[wasm_bindgen(constructor)]
+    pub fn new(
+        id: u16,
+        secret_id: u16,
+        name: String,
+        friendship: u8,
+        memory: Option<TrainerMemory>,
+        affection: u8,
+        gender: Gender,
+        origin_game: Option<OriginGame>,
+    ) -> Self {
+        Self {
+            id,
+            secret_id,
+            name: name.into(),
+            friendship,
+            memory: memory.unwrap_or_default(),
+            affection,
+            gender,
+            origin_game,
+        }
+    }
+}
+
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Debug, Clone, Copy, Default, Serialize)]
 pub struct TrainerMemory {
     pub intensity: u8,
@@ -520,6 +568,11 @@ impl ShinyLeaves {
         }
 
         self.0.count_ones() as u8
+    }
+
+    #[wasm_bindgen(js_name = clone)]
+    pub fn clone_js(&self) -> Self {
+        Self::from_byte(self.0)
     }
 }
 

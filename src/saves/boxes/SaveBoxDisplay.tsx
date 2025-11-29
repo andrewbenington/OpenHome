@@ -242,8 +242,11 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
           >
             <AttributeRow label="Game">Pokémon {save.gameName}</AttributeRow>
             <AttributeRow label="Trainer Name">{save.name}</AttributeRow>
-            <AttributeRow label="Trainer ID">{save.displayID}</AttributeRow>
-            {save.sid && (
+            <AttributeRow label="Trainer Display ID">{save.displayID}</AttributeRow>
+            <AttributeRow label="Trainer Real ID">
+              <code>0x{save.tid.toString(16)}</code>
+            </AttributeRow>
+            {save.sid !== undefined && (
               <AttributeRow label="Secret ID">
                 <code>0x{save.sid.toString(16)}</code>
               </AttributeRow>

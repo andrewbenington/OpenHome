@@ -53,7 +53,7 @@ export class PK4 {
   isEgg: boolean
   isNicknamed: boolean
   formeNum: number
-  shinyLeaves: ShinyLeaves
+  shinyLeavesInner: ShinyLeaves = new ShinyLeaves()
   ribbonBytes: Uint8Array
   gameOfOrigin: number
   eggDate: types.PKMDate | undefined
@@ -233,7 +233,7 @@ export class PK4 {
       this.isEgg = other.isEgg ?? false
       this.isNicknamed = other.isNicknamed ?? false
       this.formeNum = other.formeNum
-      this.shinyLeaves = other.shinyLeaves ?? new ShinyLeaves()
+      this.shinyLeaves = other.shinyLeaves?.clone() ?? new ShinyLeaves()
       this.ribbonBytes = other.ribbonBytes ?? new Uint8Array(4)
       this.gameOfOrigin = other.gameOfOrigin
       this.eggDate = other.eggDate ?? {
@@ -429,6 +429,14 @@ export class PK4 {
 
   public getLevel() {
     return this.speciesMetadata?.calculateLevel(this.exp) ?? 1
+  }
+
+  public get shinyLeaves() {
+    return this.shinyLeavesInner.clone()
+  }
+
+  public set shinyLeaves(other: ShinyLeaves) {
+    this.shinyLeavesInner = other.clone()
   }
 
   isShiny() {

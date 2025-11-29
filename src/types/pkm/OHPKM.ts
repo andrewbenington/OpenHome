@@ -25,6 +25,7 @@ import * as PkmRs from '../../../pkm_rs/pkg'
 import { NationalDex } from '../../consts/NationalDex'
 import { getHomeIdentifier, isEvolution } from '../../util/Lookup'
 import { PKMInterface } from '../interfaces'
+import { SAV } from '../SAVTypes/SAV'
 import {
   contestStatsFromWasm,
   contestStatsToWasm,
@@ -219,10 +220,16 @@ export class OHPKM extends PkmRs.OhpkmV2 implements PKMInterface {
       this.contestMemoryCount = other.contestMemoryCount ?? 0
       this.battleMemoryCount = other.battleMemoryCount ?? 0
       this.relearnMoves = other.relearnMoves ?? [0, 0, 0, 0]
-      this.handlerName = other.handlerName ?? ''
-      this.handlerGender = other.handlerGender ?? false
-      this.isCurrentHandler = other.isCurrentHandler ?? false
-      this.handlerFriendship = other.handlerFriendship ?? 0
+
+      if (other.handlerName) {
+        this.handlerName = other.handlerName ?? ''
+        this.handlerGender = other.handlerGender ?? false
+        this.isCurrentHandler = other.isCurrentHandler ?? false
+        this.handlerFriendship = other.handlerFriendship ?? 0
+        if (other.handlerMemory) {
+          this.handlerMemory = other.handlerMemory
+        }
+      }
 
       if ('ribbons' in other) {
         const contestRibbons = lodash.intersection(other.ribbons, Gen34ContestRibbons)
@@ -234,9 +241,6 @@ export class OHPKM extends PkmRs.OhpkmV2 implements PKMInterface {
         this.ribbons = other.ribbons?.map((r) => r + ' Ribbon') ?? []
       }
 
-      if (other.handlerMemory) {
-        this.handlerMemory = other.handlerMemory
-      }
       if (other.trainerMemory) {
         this.trainerMemory = other.trainerMemory
       }
@@ -320,7 +324,7 @@ export class OHPKM extends PkmRs.OhpkmV2 implements PKMInterface {
         this.weightScalar = other.weightScalar
       }
 
-      this.scale = other.scale ?? other.heightScalar ?? 0
+      this.scale = other.scale ?? other.heightScalar ?? 127
 
       this.teraTypeOverride = other.teraTypeOverride ?? 19
       this.setTeraTypeOriginalIf(other.teraTypeOriginal)
@@ -486,6 +490,14 @@ export class OHPKM extends PkmRs.OhpkmV2 implements PKMInterface {
     this.gvsWasm = stats8ToWasmNullable(value)
   }
 
+  get shinyLeaves() {
+    return this.shinyLeavesWasm?.clone()
+  }
+
+  set shinyLeaves(value: PkmRs.ShinyLeaves | undefined) {
+    if (value) this.shinyLeavesWasm = value
+  }
+
   public get heightAbsolute(): number {
     return getHeightCalculated(this)
   }
@@ -532,6 +544,52 @@ export class OHPKM extends PkmRs.OhpkmV2 implements PKMInterface {
 
   public isSquareShiny() {
     return this.isSquareShinyWasm()
+  }
+
+  public updateTrainerData(
+    save: SAV,
+    friendship: number,
+    affection: number,
+    memory?: PkmRs.TrainerMemory
+  ) {
+    this.registerHandler(
+      new PkmRs.TrainerData(
+        save.tid,
+        save.sid ?? 0,
+        save.name,
+        friendship,
+        memory,
+        affection,
+        save.trainer_gender ?? Gender.Male,
+        save.origin
+      )
+    )
+  }
+
+  public isFrom(save: SAV) {
+    return (
+      this.trainerID === save.tid &&
+      save.origin === this.gameOfOrigin &&
+      (save.sid === undefined || save.sid === this.secretID)
+    )
+  }
+
+  public tradeToSave(save: SAV) {
+    this.isCurrentHandler = !this.isFrom(save)
+    if (!this.isCurrentHandler) return
+
+    this.handlerName = save.name
+
+    const existingTrainerData = this.findDataForTrainer(save.tid, save.sid ?? 0, save.origin)
+
+    if (existingTrainerData) {
+      this.handlerAffection = existingTrainerData.affection
+      this.handlerFriendship = existingTrainerData.friendship
+      this.handlerMemoryWasm = existingTrainerData.memory
+    } else {
+      this.handlerFriendship = 70 // TODO: PER-FORM BASE FRIENDSHIP
+      this.updateTrainerData(save, 70, 0)
+    }
   }
 
   static maxValidMove() {
@@ -615,7 +673,7 @@ export class OHPKM extends PkmRs.OhpkmV2 implements PKMInterface {
     return getHomeIdentifier(this)
   }
 
-  public updateData(other: PKMInterface) {
+  public syncWithGameData(other: PKMInterface, save?: SAV) {
     this.exp = other.exp
 
     this.moves = other.moves as [number, number, number, number]
@@ -689,12 +747,41 @@ export class OHPKM extends PkmRs.OhpkmV2 implements PKMInterface {
     if (other.pokerusByte) {
       this.pokerusByte = other.pokerusByte
     }
-    if (other.trainerFriendship) {
-      this.trainerFriendship = Math.max(other.trainerFriendship, this.trainerFriendship)
+
+    const shouldUpdateOriginalTrainer = save
+      ? save.tid === this.trainerID && (!save.sid || save.sid === this.secretID)
+      : true
+
+    if (shouldUpdateOriginalTrainer) {
+      // The updated data is from this mon's game/trainer, so the OT fields will be updated
+      if (other.trainerFriendship) {
+        this.trainerFriendship = other.trainerFriendship
+      }
+      if (other.trainerMemory) {
+        this.trainerMemory = other.trainerMemory
+      }
+      if (other.trainerAffection) {
+        this.trainerAffection = other.trainerAffection
+      }
+    } else if (save) {
+      // The updated data is not the original game/trainer, so the appropriate data is stored in "handler" fields
+      this.updateTrainerData(
+        save,
+        other.handlerFriendship ?? 70, // TODO: USE BASE FRIENDSHIP
+        other.handlerAffection ?? 0,
+        other.handlerMemory
+          ? new PkmRs.TrainerMemory(
+              other.handlerMemory.intensity,
+              other.handlerMemory.memory,
+              other.handlerMemory.feeling,
+              other.handlerMemory.textVariables
+            )
+          : undefined
+      )
     }
 
     if (other.shinyLeaves) {
-      this.shinyLeaves = other.shinyLeaves
+      this.shinyLeaves = other.shinyLeaves.clone()
     }
     if (other.performance) {
       this.performance = other.performance
@@ -704,29 +791,6 @@ export class OHPKM extends PkmRs.OhpkmV2 implements PKMInterface {
       this.pokeStarFame = other.pokeStarFame
     }
 
-    if (other.handlerName) {
-      this.handlerName = other.handlerName
-    }
-    if (other.handlerGender !== undefined) {
-      this.handlerGender = other.handlerGender
-    }
-    if (other.isCurrentHandler !== undefined) {
-      this.isCurrentHandler = other.isCurrentHandler
-    }
-    if (other.handlerFriendship !== undefined) {
-      this.handlerFriendship = other.handlerFriendship
-    }
-
-    if (other.handlerMemory) {
-      this.handlerMemory = other.handlerMemory
-    }
-    if (other.trainerMemory) {
-      this.trainerMemory = other.trainerMemory
-    }
-
-    if (other.handlerAffection) {
-      this.handlerAffection = other.handlerAffection
-    }
     if (other.superTrainingFlags) {
       this.superTrainingFlags = other.superTrainingFlags
     }
@@ -760,9 +824,6 @@ export class OHPKM extends PkmRs.OhpkmV2 implements PKMInterface {
     }
     if (other.geolocations) {
       this.geolocations = other.geolocations
-    }
-    if (other.trainerAffection) {
-      this.trainerAffection = other.trainerAffection
     }
 
     if (other.statNature !== undefined) {

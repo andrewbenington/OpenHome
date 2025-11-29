@@ -21,6 +21,7 @@ import StatsDisplay from './StatsTab'
 import './style.css'
 import SummaryDisplay from './SummaryTab'
 import MetDataMovesTab from './tabs/MetDataMovesTab'
+import TrainersDisplay from './TrainersTab'
 
 const PokemonDetailsModal = (props: {
   mon?: PKMInterface
@@ -159,7 +160,12 @@ const PokemonDetailsModal = (props: {
               <SideTabs.Tab value="stats">Stats</SideTabs.Tab>
               <SideTabs.Tab value="ribbons">Ribbons</SideTabs.Tab>
               <SideTabs.Tab value="other">Other</SideTabs.Tab>
-              {mon instanceof OHPKM && <SideTabs.Tab value="notes">Notes</SideTabs.Tab>}
+              {mon instanceof OHPKM && (
+                <>
+                  <SideTabs.Tab value="trainers">Trainers</SideTabs.Tab>
+                  <SideTabs.Tab value="notes">Notes</SideTabs.Tab>
+                </>
+              )}
               <SideTabs.Tab value="raw">Raw</SideTabs.Tab>
             </SideTabs.TabList>
             <Fallback>
@@ -179,9 +185,14 @@ const PokemonDetailsModal = (props: {
                 <OtherDisplay mon={displayMon} />
               </SideTabs.Panel>
               {mon instanceof OHPKM && (
-                <SideTabs.Panel value="notes">
-                  <NotesDisplay mon={mon} />
-                </SideTabs.Panel>
+                <>
+                  <SideTabs.Panel value="trainers">
+                    <TrainersDisplay mon={mon} />
+                  </SideTabs.Panel>
+                  <SideTabs.Panel value="notes">
+                    <NotesDisplay mon={mon} />
+                  </SideTabs.Panel>
+                </>
               )}
               <SideTabs.Panel value="raw">
                 <Fallback>

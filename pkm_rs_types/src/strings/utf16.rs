@@ -4,7 +4,7 @@ use serde::Serialize;
 
 const TERMINATOR: u16 = 0x0000;
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct SizedUtf16String<const N: usize> {
     raw_le: [u8; N],
 }

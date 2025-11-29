@@ -43,9 +43,7 @@ pub trait DataSection: Sized {
     }
 
     fn to_tagged_buffer(&self) -> CoreResult<TaggedBuffer<Self::TagType>, Self::ErrorType> {
-        log(format!("to_tagged_buffer<{}> {{\n", Self::TAG));
         let bytes = self.to_bytes()?;
-        log("}");
 
         Ok(TaggedBuffer {
             bytes,

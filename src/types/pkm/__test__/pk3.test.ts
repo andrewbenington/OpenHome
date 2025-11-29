@@ -60,7 +60,7 @@ test('gen 3 EVs are updated', () => {
     def: 0,
     spd: 0,
   }
-  blazikenOhpkm.updateData(emeraldPKM)
+  blazikenOhpkm.syncWithGameData(emeraldPKM)
   expect(blazikenOhpkm.evs).toStrictEqual({
     atk: 252,
     hp: 6,
@@ -83,7 +83,7 @@ test('gen 3 ribbons are updated', () => {
     'Cool Master (Hoenn)',
     'Winning',
   ]
-  blazikenOhpkm.updateData(emeraldPKM)
+  blazikenOhpkm.syncWithGameData(emeraldPKM)
   expect(blazikenOhpkm.ribbons).toContain('Cool Master (Hoenn)')
   expect(blazikenOhpkm.ribbons).toContain('Winning')
   expect(blazikenOhpkm.ribbons).toContain('Effort')
@@ -102,7 +102,7 @@ test('gen 3 contest stats are updated', () => {
     cute: 255,
     sheen: 1,
   }
-  blazikenOhpkm.updateData(emeraldPKM)
+  blazikenOhpkm.syncWithGameData(emeraldPKM)
   expect(blazikenOhpkm.contest).toStrictEqual({
     cool: 30,
     beauty: 255,

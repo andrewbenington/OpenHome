@@ -106,6 +106,9 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
             summary="Recent Trainer"
             value={`${mon.handlerName} ${mon.handlerGender ? '♀' : '♂'}`}
           >
+            {mon.handlerID !== undefined && mon.handlerID !== 0 && (
+              <AttributeRow label="ID" value={mon.handlerID.toString()} indent={10} /> // unused in official games??
+            )}
             {mon.handlerFriendship !== undefined && (
               <AttributeRow
                 label="Friendship"

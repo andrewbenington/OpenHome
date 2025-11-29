@@ -1,28 +1,24 @@
-use pkm_rs_derive::IsShiny4096;
-use pkm_rs_resources::{
-    abilities::AbilityIndex,
-    ball::Ball,
-    language::Language,
-    moves::MoveSlot,
-    natures::NatureIndex,
-    ribbons::{ModernRibbon, OpenHomeRibbonSet},
-    species::SpeciesAndForme,
-};
+use crate::pkm::ohpkm::sectioned_data::DataSection;
+use crate::pkm::ohpkm::{OhpkmV1, SectionTagV2, log};
+use crate::pkm::traits::{IsShiny4096, OhpkmByte, OhpkmBytes};
+use crate::pkm::{Error, Result, StringErrorSource};
+use crate::util;
 
-use pkm_rs_types::{
-    ContestStats, FlagSet, Gender, Geolocations, HyperTraining, MarkingsSixShapesColors,
-    OriginGame, PokeDate, ShinyLeaves, Stats8, Stats16Le, StatsPreSplit, TeraType, TrainerMemory,
-};
+use pkm_rs_resources::abilities::AbilityIndex;
+use pkm_rs_resources::ball::Ball;
+use pkm_rs_resources::language::Language;
+use pkm_rs_resources::moves::MoveSlot;
+use pkm_rs_resources::natures::NatureIndex;
+use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbonSet};
+use pkm_rs_resources::species::SpeciesAndForme;
+
+use pkm_rs_types::strings::SizedUtf16String;
+use pkm_rs_types::{ContestStats, Stats8, Stats16Le, StatsPreSplit, TrainerData};
+use pkm_rs_types::{FlagSet, Geolocations, HyperTraining, MarkingsSixShapesColors, TeraType};
+use pkm_rs_types::{Gender, OriginGame, PokeDate, ShinyLeaves, TrainerMemory};
+
 use serde::Serialize;
-
-use crate::{
-    pkm::{
-        Error, Result, StringErrorSource,
-        ohpkm::{OhpkmV1, SectionTagV2, sectioned_data::DataSection},
-    },
-    strings::SizedUtf16String,
-    util,
-};
+use std::num::NonZeroU16;
 
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
@@ -79,7 +75,7 @@ pub struct MainDataV2 {
     pub is_egg: bool,
     pub is_nicknamed: bool,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub handler_name: SizedUtf16String<24>,
+    pub handler_name: SizedUtf16String<26>,
     pub handler_language: u8,
     pub is_current_handler: bool,
     pub handler_id: u16,
@@ -285,7 +281,7 @@ impl DataSection for MainDataV2 {
             // bytes[152],
             hyper_training: HyperTraining::from_byte(bytes[153]),
             home_tracker: bytes[172..180].try_into().unwrap(),
-            handler_name: SizedUtf16String::<24>::from_bytes(bytes[184..208].try_into().unwrap()),
+            handler_name: SizedUtf16String::<26>::from_bytes(bytes[184..210].try_into().unwrap()),
             handler_language: bytes[211],
             is_current_handler: util::get_flag(bytes, 212, 0),
             // resort_event_status: bytes[213],
@@ -411,7 +407,7 @@ impl DataSection for MainDataV2 {
 
         bytes[172..180].copy_from_slice(&self.home_tracker);
 
-        bytes[184..208].copy_from_slice(&self.handler_name);
+        bytes[184..210].copy_from_slice(&self.handler_name);
         bytes[211] = self.handler_language;
         util::set_flag(&mut bytes, 212, 0, self.is_current_handler);
         // bytes[213] = self.resort_event_status;
@@ -986,9 +982,15 @@ impl DataSection for ScarletVioletData {
     }
 }
 
-#[derive(Debug, Default, Serialize, Clone, Copy)]
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[derive(Debug, Default, Serialize, Clone)]
 pub struct PastHandlerData {
-    pub id: u16,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+    pub id: Option<NonZeroU16>,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+    pub secret_id: Option<NonZeroU16>,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+    pub name: SizedUtf16String<26>,
     pub friendship: u8,
     pub memory: TrainerMemory,
     pub affection: u8,
@@ -998,9 +1000,12 @@ pub struct PastHandlerData {
 
 impl PastHandlerData {
     pub fn from_v1(old: OhpkmV1) -> Option<Self> {
-        if old.handler_id != 0 {
+        log(format!("handlers from v1: {}", old.handler_id));
+        if !old.handler_name.is_empty() {
             Some(PastHandlerData {
-                id: old.handler_id,
+                id: NonZeroU16::new(old.handler_id),
+                secret_id: None,
+                name: old.handler_name,
                 friendship: old.handler_friendship,
                 memory: old.handler_memory,
                 affection: old.handler_affection,
@@ -1009,6 +1014,73 @@ impl PastHandlerData {
             })
         } else {
             None
+        }
+    }
+
+    pub fn trainer_data_matches(&self, name: &SizedUtf16String<26>, gender: Gender) -> bool {
+        self.gender == gender && self.name == *name
+    }
+
+    pub const fn update_from(&mut self, other: &TrainerData) {
+        self.id = NonZeroU16::new(other.id);
+        self.secret_id = NonZeroU16::new(other.secret_id);
+        self.friendship = other.friendship;
+        self.memory = other.memory;
+        self.affection = other.affection;
+        self.origin_game = other.origin_game;
+    }
+}
+
+#[cfg(feature = "wasm")]
+#[wasm_bindgen]
+#[allow(clippy::missing_const_for_fn)]
+#[allow(clippy::too_many_arguments)]
+impl PastHandlerData {
+    #[wasm_bindgen(getter)]
+    pub fn id(&self) -> Option<u16> {
+        self.id.map(NonZeroU16::get)
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn name(&self) -> String {
+        self.name.to_string()
+    }
+
+    #[wasm_bindgen(constructor)]
+    pub fn new(
+        id: Option<u16>,
+        secret_id: Option<u16>,
+        name: String,
+        friendship: u8,
+        memory: Option<TrainerMemory>,
+        affection: u8,
+        gender: Gender,
+        origin_game: Option<OriginGame>,
+    ) -> Self {
+        Self {
+            id: id.and_then(NonZeroU16::new),
+            secret_id: secret_id.and_then(NonZeroU16::new),
+            name: name.into(),
+            friendship,
+            memory: memory.unwrap_or_default(),
+            affection,
+            gender,
+            origin_game,
+        }
+    }
+}
+
+impl From<TrainerData> for PastHandlerData {
+    fn from(other: TrainerData) -> Self {
+        Self {
+            id: NonZeroU16::new(other.id),
+            secret_id: NonZeroU16::new(other.secret_id),
+            name: other.name,
+            gender: other.gender,
+            friendship: other.friendship,
+            memory: other.memory,
+            affection: other.affection,
+            origin_game: other.origin_game,
         }
     }
 }
@@ -1021,34 +1093,34 @@ impl DataSection for PastHandlerData {
 
     fn from_bytes(bytes: &[u8]) -> Result<Self> {
         Ok(Self {
-            id: u16::from_le_bytes(bytes[0..=1].try_into().unwrap()),
-            friendship: bytes[2],
-            memory: TrainerMemory::from_bytes_in_order(bytes[3..=7].try_into().unwrap()),
-            affection: bytes[8],
-            gender: Gender::from_u8(bytes[9]),
-            origin_game: if bytes[10] != 0 {
-                Some(OriginGame::from(bytes[10]))
-            } else {
-                None
-            },
+            id: Option::<NonZeroU16>::from_ohpkm_bytes(bytes[0..=1].try_into().unwrap()),
+            secret_id: Option::<NonZeroU16>::from_ohpkm_bytes(bytes[2..=3].try_into().unwrap()),
+            name: SizedUtf16String::<26>::from_bytes(bytes[4..=29].try_into().unwrap()),
+            friendship: bytes[30],
+            memory: TrainerMemory::from_bytes_in_order(bytes[31..=35].try_into().unwrap()),
+            affection: bytes[36],
+            gender: Gender::from_u8(bytes[37]),
+            origin_game: Option::<OriginGame>::from_ohpkm_byte(bytes[38]),
         })
     }
 
     fn to_bytes(&self) -> Result<Vec<u8>> {
-        let mut bytes = [0u8; 11];
+        let mut bytes = [0u8; 39];
 
-        bytes[0..=1].copy_from_slice(&self.id.to_le_bytes());
-        bytes[2] = self.friendship;
-        bytes[3..=7].copy_from_slice(&self.memory.to_bytes_in_order());
-        bytes[8] = self.affection;
-        bytes[9] = self.gender.to_byte();
-        bytes[10] = self.origin_game.map(|g| g as u8).unwrap_or(0);
+        bytes[0..=1].copy_from_slice(&self.id.to_ohpkm_bytes());
+        bytes[2..=3].copy_from_slice(&self.secret_id.to_ohpkm_bytes());
+        bytes[4..=29].copy_from_slice(&self.name.bytes());
+        bytes[30] = self.friendship;
+        bytes[31..=35].copy_from_slice(&self.memory.to_bytes_in_order());
+        bytes[36] = self.affection;
+        bytes[37] = self.gender.to_byte();
+        bytes[38] = self.origin_game.to_ohpkm_byte();
 
         Ok(bytes.to_vec())
     }
 
     fn is_empty(&self) -> bool {
-        self.id == 0
+        self.name.is_empty()
     }
 }
 

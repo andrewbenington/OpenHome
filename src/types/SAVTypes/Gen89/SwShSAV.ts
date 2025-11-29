@@ -1,4 +1,4 @@
-import { Languages, OriginGame, SpeciesLookup } from '@pkm-rs/pkg'
+import { Gender, Languages, OriginGame, SpeciesLookup } from '@pkm-rs/pkg'
 import { PK8 } from '@pokemon-files/pkm'
 import { utf16BytesToString } from '@pokemon-files/util'
 import { NationalDex } from 'src/consts/NationalDex'
@@ -34,11 +34,10 @@ export class SwShSAV extends G89SAV<PK8> {
 
     this.trainerBlock = new TrainerBlock(this.getBlockMust('TrainerCard', 'object'))
     this.name = this.trainerBlock.getName()
-    const fullTrainerID = this.trainerBlock.getFullID()
 
-    this.tid = fullTrainerID % 1000000
+    this.tid = this.trainerBlock.getTID()
     this.sid = this.trainerBlock.getSID()
-    this.displayID = this.tid.toString().padStart(6, '0')
+    this.displayID = (this.trainerBlock.getFullID() % 1000000).toString().padStart(6, '0')
     this.origin = this.trainerBlock.getGame()
   }
 
@@ -148,6 +147,10 @@ export class SwShSAV extends G89SAV<PK8> {
   static includesOrigin(origin: OriginGame) {
     return origin === OriginGame.Sword || origin === OriginGame.Shield
   }
+
+  get trainer_gender(): Gender {
+    return this.trainerBlock.getGender() ? Gender.Female : Gender.Male
+  }
 }
 
 const BlockKeys = {
@@ -192,6 +195,9 @@ class TrainerBlock {
   }
   public getFullID(): number {
     return this.dataView.getUint32(0x1c, true)
+  }
+  public getTID(): number {
+    return this.dataView.getUint16(0x1c, true)
   }
   public getSID(): number {
     return this.dataView.getUint16(0x1e, true)

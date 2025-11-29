@@ -1,6 +1,6 @@
+use crate::pkm::ohpkm::log;
 use crate::pkm::traits::IsShiny4096;
 use crate::pkm::{Error, Pkm, Result};
-use crate::strings::SizedUtf16String;
 use crate::util;
 
 use pkm_rs_resources::abilities::AbilityIndex;
@@ -10,11 +10,12 @@ use pkm_rs_resources::moves::MoveSlot;
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbonSet};
 use pkm_rs_resources::species::{FormeMetadata, SpeciesAndForme, SpeciesMetadata};
-use pkm_rs_types::{
-    ContestStats, Geolocations, HyperTraining, MarkingsSixShapesColors, OriginGame, ShinyLeaves,
-    Stats8, Stats16Le, StatsPreSplit,
-};
-use pkm_rs_types::{Gender, PokeDate, TrainerMemory};
+
+use pkm_rs_types::strings::SizedUtf16String;
+use pkm_rs_types::{ContestStats, Stats8, Stats16Le, StatsPreSplit};
+use pkm_rs_types::{Gender, OriginGame, PokeDate, ShinyLeaves, TrainerMemory};
+use pkm_rs_types::{Geolocations, HyperTraining, MarkingsSixShapesColors};
+
 use serde::Serialize;
 
 #[cfg(feature = "wasm")]
@@ -80,7 +81,7 @@ pub struct OhpkmV1 {
     pub gvs: Stats8,
     pub dvs: StatsPreSplit,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub handler_name: SizedUtf16String<24>,
+    pub handler_name: SizedUtf16String<26>,
     pub handler_language: u8,
     pub is_current_handler: bool,
     pub resort_event_status: u8,
@@ -236,7 +237,7 @@ impl OhpkmV1 {
             unknown_a0: u32::from_le_bytes(bytes[160..164].try_into().unwrap()),
             gvs: Stats8::from_bytes(bytes[164..170].try_into().unwrap()),
             dvs: StatsPreSplit::from_dv_bytes(bytes[170..172].try_into().unwrap()),
-            handler_name: SizedUtf16String::<24>::from_bytes(bytes[184..208].try_into().unwrap()),
+            handler_name: SizedUtf16String::<26>::from_bytes(bytes[184..210].try_into().unwrap()),
             handler_language: bytes[211],
             is_current_handler: util::get_flag(bytes, 212, 0),
             resort_event_status: bytes[213],
@@ -315,6 +316,7 @@ impl OhpkmV1 {
                 SizedUtf16String::<32>::default()
             },
         };
+        log(format!("v1 handler id: {}", mon.handler_id));
         Ok(mon)
     }
 }
@@ -420,7 +422,7 @@ impl Pkm for OhpkmV1 {
 
         // height_absolute and weight_absolute are now calculated on the fly, so thes bytes are skipped
 
-        bytes[184..208].copy_from_slice(&self.handler_name);
+        bytes[184..210].copy_from_slice(&self.handler_name);
         bytes[211] = self.handler_language;
         util::set_flag(bytes, 212, 0, self.is_current_handler);
         bytes[213] = self.resort_event_status;
