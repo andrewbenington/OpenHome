@@ -28,14 +28,14 @@ impl Gender {
         *dest |= self.to_byte() << 1
     }
 
-    pub const fn from_bits_1_2(source: u8) -> Self {
+    pub fn from_bits_1_2(source: u8) -> Self {
         let numeric_val = (source & MASK_BITS_1_2) >> 1;
         match numeric_val {
             0 => Self::Male,
             1 => Self::Female,
             2 => Self::Genderless,
             3 => Self::Invalid,
-            _ => unreachable!(),
+            _ => panic!("invalid gender: {numeric_val}"),
         }
     }
 
@@ -44,14 +44,14 @@ impl Gender {
         *dest |= self.to_byte() << 2
     }
 
-    pub const fn from_bits_2_3(source: u8) -> Self {
+    pub fn from_bits_2_3(source: u8) -> Self {
         let numeric_val = (source & MASK_BITS_2_3) >> 2;
         match numeric_val {
             0 => Self::Male,
             1 => Self::Female,
             2 => Self::Genderless,
             3 => Self::Invalid,
-            _ => unreachable!(),
+            _ => panic!("invalid gender: {numeric_val}"),
         }
     }
 

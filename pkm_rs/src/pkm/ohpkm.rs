@@ -22,25 +22,29 @@ extern "C" {
     fn console_log(s: &str);
 }
 
+#[cfg(feature = "wasm")]
 pub fn log<T: ToString>(s: T) {
-    #[cfg(not(feature = "wasm"))]
-    println!("{}", s.to_string());
-
-    #[cfg(feature = "wasm")]
     console_log(&s.to_string());
+}
+
+#[cfg(not(feature = "wasm"))]
+pub fn log<T: ToString>(s: T) {
+    println!("{}", s.to_string());
+}
+
+#[macro_export]
+macro_rules! log {
+    ($($arg:tt)*) => {{
+        $crate::pkm::ohpkm::log(format!($($arg)*));
+    }};
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = updatePidIfWouldBecomeShinyGen345))]
 #[allow(clippy::missing_const_for_fn)]
 pub fn update_pid_if_would_become_shiny_gen_345(pid: u32, tid: u16, sid: u16) -> u32 {
     if !is_shiny_gen_3_to_5(pid, tid, sid) && is_shiny_gen_6_plus(pid, tid, sid) {
-        log(format!(
-            "ALTERING PID: {pid} (shiny xor value: {})",
-            shiny_xor_value(pid, tid, sid)
-        ));
         pid ^ 0x10000000
     } else {
-        log(format!("KEEPING PID: {pid}"));
         pid
     }
 }

@@ -17,8 +17,8 @@ var slowpokeOhpkm: OHPKM
 
 beforeAll(() => {
   blazikenOhpkm = bytesToPKM(
-    new Uint8Array(fs.readFileSync(path.join(__dirname, './PKMFiles/OH', 'blaziken.ohpkm'))),
-    'OHPKM'
+    new Uint8Array(fs.readFileSync(path.join(__dirname, './PKMFiles/OhpkmV2', 'blaziken.ohpkm'))),
+    'OhpkmV2'
   ) as OHPKM
 
   blazikenPk3 = bytesToPKM(
@@ -27,8 +27,8 @@ beforeAll(() => {
   ) as PK3
 
   slowpokeOhpkm = bytesToPKM(
-    new Uint8Array(fs.readFileSync(path.join(__dirname, './PKMFiles/OH', 'slowbro.ohpkm'))),
-    'OHPKM'
+    new Uint8Array(fs.readFileSync(path.join(__dirname, './PKMFiles/OhpkmV2', 'slowbro.ohpkm'))),
+    'OhpkmV2'
   ) as OHPKM
 })
 
@@ -72,7 +72,9 @@ test('gen 3 EVs are updated', () => {
 })
 
 test('gen 3 ribbons are updated', () => {
+  console.log('blazikenOhpkm ribbons', blazikenOhpkm.ribbons)
   const emeraldPKM = new PK3(blazikenOhpkm)
+  console.log('emeraldPKM ribbons', emeraldPKM.ribbons)
 
   // gaining Gen 3 ribbons
   emeraldPKM.ribbons = [

@@ -1,6 +1,6 @@
 use std::{fmt::Display, hash::Hash};
 
-use crate::pkm::ohpkm::log;
+use crate::log;
 
 type CoreResult<T, E> = core::result::Result<T, E>;
 
@@ -176,9 +176,7 @@ impl<Tag: SectionTag> SectionedData<Tag> {
         section: Option<T>,
     ) -> CoreResult<&mut Self, T::ErrorType> {
         if let Some(section) = section {
-            log(format!("adding section: {}", T::TAG));
             self.tagged_buffers.push(section.to_tagged_buffer()?);
-            log(format!("added: {}", T::TAG));
         }
 
         Ok(self)
@@ -188,7 +186,6 @@ impl<Tag: SectionTag> SectionedData<Tag> {
         &mut self,
         sections: Vec<T>,
     ) -> CoreResult<&mut Self, T::ErrorType> {
-        log("add all");
         for section in sections.into_iter() {
             self.tagged_buffers
                 .push(DataSection::to_tagged_buffer(&section)?);
@@ -229,9 +226,7 @@ impl<Tag: SectionTag> SectionedData<Tag> {
                 SectionMetadata::<Tag>::from_bytes(&bytes[metadata_start..metadata_end]);
             let Some(metadata) = metadata_o else {
                 #[cfg(feature = "wasm")]
-                log(format!(
-                    "MALFORMED METADATA at {metadata_start} - {metadata_end}"
-                ));
+                log!("MALFORMED METADATA at {metadata_start} - {metadata_end}");
                 continue;
             };
 

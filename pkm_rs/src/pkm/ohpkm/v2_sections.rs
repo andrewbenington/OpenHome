@@ -1,5 +1,5 @@
 use crate::pkm::ohpkm::sectioned_data::DataSection;
-use crate::pkm::ohpkm::{OhpkmV1, SectionTagV2, log};
+use crate::pkm::ohpkm::{OhpkmV1, SectionTagV2};
 use crate::pkm::traits::{IsShiny4096, OhpkmByte, OhpkmBytes};
 use crate::pkm::{Error, Result, StringErrorSource};
 use crate::util;
@@ -1000,7 +1000,6 @@ pub struct PastHandlerData {
 
 impl PastHandlerData {
     pub fn from_v1(old: OhpkmV1) -> Option<Self> {
-        log(format!("handlers from v1: {}", old.handler_id));
         if !old.handler_name.is_empty() {
             Some(PastHandlerData {
                 id: NonZeroU16::new(old.handler_id),

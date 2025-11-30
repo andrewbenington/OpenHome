@@ -1,4 +1,3 @@
-use crate::pkm::ohpkm::log;
 use crate::pkm::traits::IsShiny4096;
 use crate::pkm::{Error, Pkm, Result};
 use crate::util;
@@ -316,7 +315,6 @@ impl OhpkmV1 {
                 SizedUtf16String::<32>::default()
             },
         };
-        log(format!("v1 handler id: {}", mon.handler_id));
         Ok(mon)
     }
 }

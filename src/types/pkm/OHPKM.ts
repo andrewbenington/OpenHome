@@ -6,6 +6,7 @@ import {
   MetadataLookup,
   NatureIndex,
   PokeDate,
+  ShinyLeaves,
   SpeciesLookup,
   updatePidIfWouldBecomeShinyGen345,
 } from '@pkm-rs/pkg'
@@ -18,11 +19,11 @@ import {
   markingsHaveColor,
 } from '@pokemon-files/util'
 import { Gen34ContestRibbons, Gen34TowerRibbons, ModernRibbons } from '@pokemon-resources/index'
-import * as lodash from 'lodash'
 import Prando from 'prando'
 import * as types from '../../../packages/pokemon-files/src/util/types'
 import * as PkmRs from '../../../pkm_rs/pkg'
 import { NationalDex } from '../../consts/NationalDex'
+import { intersection, unique } from '../../util/Functional'
 import { getHomeIdentifier, isEvolution } from '../../util/Lookup'
 import { PKMInterface } from '../interfaces'
 import { SAV } from '../SAVTypes/SAV'
@@ -44,7 +45,7 @@ import {
   statsPreSplitToWasm,
   trainerMemoryToWasm,
 } from './convert'
-import OhpkmV2 from './OhpkmV2'
+import { OhpkmV1 } from './OhpkmV1'
 import {
   adjustMovePPBetweenFormats,
   generateIVs,
@@ -232,10 +233,10 @@ export class OHPKM extends PkmRs.OhpkmV2 implements PKMInterface {
       }
 
       if ('ribbons' in other) {
-        const contestRibbons = lodash.intersection(other.ribbons, Gen34ContestRibbons)
+        const contestRibbons = intersection(other.ribbons, Gen34ContestRibbons)
 
         this.contestMemoryCount = Math.max(contestRibbons.length, this.contestMemoryCount)
-        const battleRibbons = lodash.intersection(other.ribbons, Gen34TowerRibbons)
+        const battleRibbons = intersection(other.ribbons, Gen34TowerRibbons)
 
         this.battleMemoryCount = Math.max(battleRibbons.length, this.battleMemoryCount)
         this.ribbons = other.ribbons?.map((r) => r + ' Ribbon') ?? []
@@ -285,10 +286,9 @@ export class OHPKM extends PkmRs.OhpkmV2 implements PKMInterface {
       this.avs = other.avs
 
       this.handlerLanguage = other.handlerLanguage ?? 0
-      // this.handlerID = other.handlerID ?? 0
       this.statNature = other.statNature !== undefined ? other.statNature : this.nature
       this.affixedRibbon = other.affixedRibbon
-      // this.homeTracker = other.homeTracker ?? new Uint8Array(8)
+      this.homeTracker = other.homeTracker ?? new Uint8Array(8)
 
       if (other.obedienceLevel !== undefined) {
         this.obedienceLevel = other.obedienceLevel
@@ -333,6 +333,19 @@ export class OHPKM extends PkmRs.OhpkmV2 implements PKMInterface {
       this.tmFlagsSVDLC = other.tmFlagsSVDLC
     }
   }
+
+  // static constructors
+
+  static fromBytes(buffer: ArrayBuffer): OHPKM {
+    return new OHPKM(new Uint8Array(buffer))
+  }
+
+  static fromV1Wasm(v1: OhpkmV1) {
+    const v2 = PkmRs.OhpkmV2.fromV1Bytes(new Uint8Array(v1.toBytes()))
+    return new OHPKM(v2.toByteArray())
+  }
+
+  // getters / setters
 
   get dexNum() {
     return this.speciesAndForme.nationalDex
@@ -445,7 +458,6 @@ export class OHPKM extends PkmRs.OhpkmV2 implements PKMInterface {
   get eggDate() {
     return convertPokeDateOptional(this.eggDateWasm)
   }
-
   set eggDate(value: types.PKMDate | undefined) {
     if (value) {
       this.eggDateWasm = new PokeDate(value.year, value.month, value.day)
@@ -485,18 +497,18 @@ export class OHPKM extends PkmRs.OhpkmV2 implements PKMInterface {
   get gvs() {
     return statsFromWasmNullable(this.gvsWasm)
   }
-
   set gvs(value: Stats | undefined) {
     this.gvsWasm = stats8ToWasmNullable(value)
   }
 
   get shinyLeaves() {
-    return this.shinyLeavesWasm?.clone()
+    return this.shinyLeavesWasm
+  }
+  set shinyLeaves(value: ShinyLeaves | undefined) {
+    this.shinyLeavesWasm = value
   }
 
-  set shinyLeaves(value: PkmRs.ShinyLeaves | undefined) {
-    if (value) this.shinyLeavesWasm = value
-  }
+  // derived fields
 
   public get heightAbsolute(): number {
     return getHeightCalculated(this)
@@ -504,10 +516,6 @@ export class OHPKM extends PkmRs.OhpkmV2 implements PKMInterface {
 
   public get weightAbsolute(): number {
     return getWeightCalculated(this)
-  }
-
-  static fromBytes(buffer: ArrayBuffer): OhpkmV2 {
-    return new OhpkmV2(new Uint8Array(buffer))
   }
 
   public get abilityName() {
@@ -528,10 +536,6 @@ export class OHPKM extends PkmRs.OhpkmV2 implements PKMInterface {
 
   public getStats(): Stats {
     return getStandardPKMStats(this)
-  }
-
-  public fromBytes(bytes: Uint8Array) {
-    return new OhpkmV2(bytes)
   }
 
   public toBytes() {
@@ -717,7 +721,7 @@ export class OHPKM extends PkmRs.OhpkmV2 implements PKMInterface {
       this.hyperTraining = other.hyperTraining
     }
 
-    this.ribbons = lodash.uniq([...this.ribbons, ...(other.ribbons ?? [])])
+    this.ribbons = unique([...this.ribbons, ...(other.ribbons ?? [])])
     if (other.contest) {
       this.contest = other.contest
     }
@@ -737,10 +741,10 @@ export class OHPKM extends PkmRs.OhpkmV2 implements PKMInterface {
     }
 
     // memory ribbons need to be updated if new ribbons were earned to add to the count
-    const contestRibbons = lodash.intersection(this.ribbons, Gen34ContestRibbons)
+    const contestRibbons = intersection(this.ribbons, Gen34ContestRibbons)
 
     this.contestMemoryCount = Math.max(contestRibbons.length, this.contestMemoryCount)
-    const battleRibbons = lodash.intersection(this.ribbons, Gen34TowerRibbons)
+    const battleRibbons = intersection(this.ribbons, Gen34TowerRibbons)
 
     this.battleMemoryCount = Math.max(battleRibbons.length, this.battleMemoryCount)
 
