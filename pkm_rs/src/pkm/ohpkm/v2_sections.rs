@@ -1041,9 +1041,24 @@ impl PastHandlerData {
         self.id.map(NonZeroU16::get)
     }
 
+    #[wasm_bindgen(setter)]
+    pub fn set_id(&mut self, value: u16) {
+        self.id = NonZeroU16::new(value)
+    }
+
     #[wasm_bindgen(getter)]
     pub fn name(&self) -> String {
         self.name.to_string()
+    }
+
+    #[wasm_bindgen(getter = secretId)]
+    pub fn secret_id(&self) -> u16 {
+        self.secret_id.map(NonZeroU16::get).unwrap_or(0)
+    }
+
+    #[wasm_bindgen(setter = secretId)]
+    pub fn set_secret_id(&mut self, value: u16) {
+        self.secret_id = NonZeroU16::new(value)
     }
 
     #[wasm_bindgen(constructor)]

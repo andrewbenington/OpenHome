@@ -560,7 +560,7 @@ export class OHPKM extends PkmRs.OhpkmV2 implements PKMInterface {
         friendship,
         memory,
         affection,
-        save.trainer_gender ?? Gender.Male,
+        save.trainerGender ?? Gender.Male,
         save.origin
       )
     )

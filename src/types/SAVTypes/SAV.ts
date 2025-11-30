@@ -74,7 +74,7 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
   abstract name: string
   abstract tid: number
   abstract sid?: number | undefined
-  abstract trainer_gender?: Gender
+  abstract trainerGender?: Gender
   abstract displayID: string
   abstract currentPCBox: number
   abstract boxes: Box<P>[]
@@ -90,9 +90,8 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
   getDisplayData(): Record<string, string | number | undefined> | undefined {
     return {
       'Trainer Name': this.name,
-      'Trainer ID 2': this.displayID,
+      'Trainer ID': this.displayID,
       'Secret ID': this.sid,
-      HHHH: 'h',
     }
   }
 
@@ -123,7 +122,7 @@ export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implement
   abstract name: string
   abstract tid: number
   abstract sid?: number | undefined
-  abstract trainer_gender?: Gender
+  abstract trainerGender?: Gender
   abstract displayID: string
   abstract currentPCBox: number
   abstract boxes: Box<P>[]

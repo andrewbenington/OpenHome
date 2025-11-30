@@ -58,6 +58,16 @@ export function useSaves(): SavesAndBanksManager {
 
   const loadedHomeData = homeData
 
+  function findMon(monId: string) {
+    return (
+      findMonInHome(monId, loadedHomeData) ??
+      allOpenSaves.reduce<MonLocation | undefined>(
+        (foundSaveMon, save) => foundSaveMon ?? findMonInSave(monId, save),
+        undefined
+      )
+    )
+  }
+
   function switchToBank(bankIndex: number) {
     openSavesDispatch({
       type: 'set_current_home_bank',
@@ -188,6 +198,32 @@ export function useSaves(): SavesAndBanksManager {
   }
 
   function addSave(save: SAV) {
+    const allOhpkms = ohpkmStore.getAllStored()
+    for (const mon of allOhpkms) {
+      if (!save.supportsMon(mon.dexNum, mon.formeNum)) continue
+
+      const matchingHandler = mon.findDataForTrainer(save.tid, save.sid ?? 0, save.origin)
+      if (!matchingHandler) continue
+
+      mon.updateTrainerData(
+        save,
+        matchingHandler.friendship,
+        matchingHandler.affection,
+        matchingHandler.memory
+      )
+
+      ohpkmStore.overwrite(mon)
+      const location = findMon(mon.getHomeIdentifier())
+      if (location) {
+        openSavesDispatch({
+          type: 'update_home_mon',
+          payload: {
+            location,
+            updater: (_) => mon,
+          },
+        })
+      }
+    }
     openSavesDispatch({ type: 'add_save', payload: save })
   }
 
@@ -213,18 +249,13 @@ export function useSaves(): SavesAndBanksManager {
   function updateMonNotes(monId: string, notes: string | undefined) {
     if (!homeData) return
 
-    const mon: MonLocation | undefined =
-      findMonInHome(monId, homeData) ??
-      allOpenSaves.reduce<MonLocation | undefined>(
-        (foundSaveMon, save) => foundSaveMon ?? findMonInSave(monId, save),
-        undefined
-      )
-    if (!mon) return
+    const location: MonLocation | undefined = findMon(monId)
+    if (!location) return
 
     openSavesDispatch({
       type: 'update_home_mon',
       payload: {
-        location: mon,
+        location: location,
         updater: (mon) => {
           mon.notes = notes
           return mon

@@ -148,7 +148,7 @@ export class SwShSAV extends G89SAV<PK8> {
     return origin === OriginGame.Sword || origin === OriginGame.Shield
   }
 
-  get trainer_gender(): Gender {
+  get trainerGender(): Gender {
     return this.trainerBlock.getGender() ? Gender.Female : Gender.Male
   }
 }
