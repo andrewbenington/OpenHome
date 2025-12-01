@@ -17,17 +17,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install NodeJS
-        uses: actions/setup-node@v6
+      - name: Install PNPM
+        uses: actions/setup-pnpm@v4
 
       - name: Install Dependencies
-        run: npm ci
+        run: pnpm ci
 
       - name: Install wasm-pack
         run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
 
       - name: Build WASM
-        run: npm run wasm
+        run: pnpm run wasm
 
       - name: Run Tests
-        run: npm run test
+        run: pnpm run test
