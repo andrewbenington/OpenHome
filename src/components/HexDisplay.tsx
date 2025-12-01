@@ -6,7 +6,7 @@ import './components.css'
 
 interface HexDisplayProps {
   data: Uint8Array
-  format?: keyof typeof FileSchemas | 'OHPKM'
+  format?: keyof typeof FileSchemas
 }
 
 function HexDisplay({ data, format }: HexDisplayProps) {
