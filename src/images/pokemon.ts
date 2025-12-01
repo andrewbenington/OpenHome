@@ -28,7 +28,6 @@ export const fileToSpriteFolder: Record<string, string> = {
   PK9: 'gen9',
   OHPKM: 'home',
   OhpkmV1: 'home',
-  OhpkmV2: 'home',
 }
 
 export const getPokemonSpritePath = (mon: MonSpriteData, format?: string) => {

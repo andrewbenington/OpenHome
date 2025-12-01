@@ -1,9 +1,9 @@
 import { Tooltip } from '@radix-ui/themes'
 import { Gen9Ribbons } from 'src/consts/Ribbons'
-import { getPublicImageURL } from '../images/images'
-import { getRibbonSpritePath } from '../images/ribbons'
-import { PKMInterface } from '../types/interfaces'
-import { Styles } from '../types/types'
+import { getPublicImageURL } from '../../images/images'
+import { getRibbonSpritePath } from '../../images/ribbons'
+import { PKMInterface } from '../../types/interfaces'
+import { Styles } from '../../types/types'
 
 const styles = {
   container: {

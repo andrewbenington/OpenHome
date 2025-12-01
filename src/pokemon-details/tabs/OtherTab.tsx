@@ -28,22 +28,22 @@ import {
   getMonGen12Identifier,
   getMonGen345Identifier,
 } from 'src/util/Lookup'
-import DynamaxLevel from '../components/DynamaxLevel'
-import ShinyLeavesDisplay from '../components/ShinyLeaves'
-import TypeIcon from '../components/TypeIcon'
-import useIsDev from '../hooks/isDev'
-import { isRestricted } from '../types/TransferRestrictions'
-import { PKMInterface } from '../types/interfaces'
-import { OHPKM } from '../types/pkm/OHPKM'
+import DynamaxLevel from '../../components/DynamaxLevel'
+import ShinyLeavesDisplay from '../../components/ShinyLeaves'
+import TypeIcon from '../../components/TypeIcon'
+import useIsDev from '../../hooks/isDev'
+import { isRestricted } from '../../types/TransferRestrictions'
+import { PKMInterface } from '../../types/interfaces'
+import { OHPKM } from '../../types/pkm/OHPKM'
 import {
   getHiddenPowerGen2,
   getHiddenPowerPower,
   getHiddenPowerType,
   getWeightCalculated,
-} from '../types/pkm/util'
-import { getFlagsInRange } from '../util/byteLogic'
-import AttributeRow from './components/AttributeRow'
-import AttributeRowExpand from './components/AttributeRowExpand'
+} from '../../types/pkm/util'
+import { getFlagsInRange } from '../../util/byteLogic'
+import AttributeRow from '../components/AttributeRow'
+import AttributeRowExpand from '../components/AttributeRowExpand'
 
 const HG_TO_LB = 0.2204623
 const CM_TO_IN = 0.3937008

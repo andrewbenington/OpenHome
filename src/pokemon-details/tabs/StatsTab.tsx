@@ -17,10 +17,10 @@ import {
   LA_TRANSFER_RESTRICTIONS,
   LGPE_TRANSFER_RESTRICTIONS,
 } from 'src/consts/TransferRestrictions'
-import SheenStars from '../components/SheenStars'
-import { isRestricted } from '../types/TransferRestrictions'
-import { PKMInterface } from '../types/interfaces'
-import { Styles } from '../types/types'
+import SheenStars from '../../components/SheenStars'
+import { isRestricted } from '../../types/TransferRestrictions'
+import { PKMInterface } from '../../types/interfaces'
+import { Styles } from '../../types/types'
 const styles = {
   container: {
     display: 'flex',
