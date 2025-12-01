@@ -1,4 +1,4 @@
-import { OriginGame } from '@pkm-rs/pkg'
+import { Gender, OriginGame } from '@pkm-rs/pkg'
 import { PK4 } from '@pokemon-files/pkm'
 import { PT_TRANSFER_RESTRICTIONS } from 'src/consts/TransferRestrictions'
 import { bytesToUint16LittleEndian, bytesToUint32LittleEndian } from 'src/util/byteLogic'
@@ -17,6 +17,7 @@ export class PtSAV extends G4SAV {
   tid: number
   sid: number
   displayID: string
+  trainerGender: Gender
 
   invalid: boolean = false
   tooEarlyToOpen: boolean = false
@@ -63,6 +64,7 @@ export class PtSAV extends G4SAV {
     this.tid = bytesToUint16LittleEndian(bytes, PtSAV.TRAINER_ID_OFFSET)
     this.sid = bytesToUint16LittleEndian(bytes, PtSAV.TRAINER_ID_OFFSET + 2)
     this.displayID = this.tid.toString().padStart(5, '0')
+    this.trainerGender = bytes[PtSAV.TRAINER_ID_OFFSET + 8]
     this.buildBoxes()
   }
 

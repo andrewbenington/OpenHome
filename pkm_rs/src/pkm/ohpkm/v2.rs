@@ -1636,8 +1636,21 @@ impl OhpkmV2 {
         self.handler_data.clone()
     }
 
-    #[wasm_bindgen(js_name = findDataForTrainer)]
-    pub fn find_data_for_trainer(
+    #[wasm_bindgen(js_name = matchingUnknownHandler)]
+    pub fn matching_unknown_handler(
+        &mut self,
+        name: String,
+        gender: Gender,
+    ) -> Option<PastHandlerData> {
+        let sized_string = SizedUtf16String::<26>::from(name);
+        self.handler_data
+            .iter()
+            .find(|h| h.unknown_trainer_data_matches(&sized_string, gender))
+            .cloned()
+    }
+
+    #[wasm_bindgen(js_name = findKnownHandler)]
+    pub fn find_known_handler(
         &mut self,
         tid: u16,
         sid: u16,
@@ -1645,22 +1658,25 @@ impl OhpkmV2 {
     ) -> Option<PastHandlerData> {
         self.handler_data
             .iter()
-            .find(|h| {
-                h.id.is_some_and(|id| id.get() == tid)
-                    && h.secret_id.is_some_and(|id| id.get() == sid)
-                    && h.origin_game.is_some_and(|g| g == game)
-            })
+            .find(|h| h.known_trainer_data_matches(tid, sid, game))
             .cloned()
     }
 
     #[wasm_bindgen(js_name = registerHandler)]
     pub fn register_handler(&mut self, handler: TrainerData) {
-        if let Some(existing_record) = self
+        if let Some(origin_game) = handler.origin_game
+            && let Some(matching_known_record) = self
+                .handler_data
+                .iter_mut()
+                .find(|h| h.known_trainer_data_matches(handler.id, handler.secret_id, origin_game))
+        {
+            matching_known_record.update_from(&handler);
+        } else if let Some(matching_unknown_record) = self
             .handler_data
             .iter_mut()
-            .find(|h| h.trainer_data_matches(&handler.name, handler.gender))
+            .find(|h| h.unknown_trainer_data_matches(&handler.name, handler.gender))
         {
-            existing_record.update_from(&handler);
+            matching_unknown_record.update_from(&handler)
         } else {
             self.handler_data.push(handler.into());
         }

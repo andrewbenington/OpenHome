@@ -251,6 +251,11 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                 <code>0x{save.sid.toString(16)}</code>
               </AttributeRow>
             )}
+            {save.trainerGender !== undefined && (
+              <AttributeRow label="Trainer Gender">
+                {save.trainerGender ? 'Female' : 'Male'}
+              </AttributeRow>
+            )}
             <AttributeRow label="File">
               <div style={{ overflowWrap: 'break-word', width: '100%' }}>
                 {save.filePath.raw}

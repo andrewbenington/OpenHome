@@ -1,4 +1,4 @@
-import { OriginGame } from '@pkm-rs/pkg'
+import { Gender, OriginGame } from '@pkm-rs/pkg'
 import { PK6 } from '@pokemon-files/pkm'
 import { bytesToUint16LittleEndian, uint16ToBytesLittleEndian } from 'src/util/byteLogic'
 import { CRC16_CCITT } from 'src/util/Encryption'
@@ -30,6 +30,7 @@ export abstract class G6SAV extends OfficialSAV<PK6> {
   tid: number = 0
   sid: number = 0
   displayID: string = ''
+  trainerGender: Gender = Gender.Male
 
   currentPCBox: number = 0 // TODO: Gen 5 current box
 
@@ -60,6 +61,7 @@ export abstract class G6SAV extends OfficialSAV<PK6> {
     this.currentPCBox = this.bytes[0]
     this.displayID = this.tid.toString().padStart(5, '0')
     this.origin = this.bytes[this.trainerDataOffset + 4]
+    this.trainerGender = this.bytes[this.trainerDataOffset + 5]
     this.pcOffset = pcOffset
     this.pcChecksumOffset = pcChecksumOffset
 

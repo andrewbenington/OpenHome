@@ -1016,8 +1016,18 @@ impl PastHandlerData {
         }
     }
 
-    pub fn trainer_data_matches(&self, name: &SizedUtf16String<26>, gender: Gender) -> bool {
-        self.gender == gender && self.name == *name
+    pub fn known_trainer_data_matches(&self, tid: u16, sid: u16, origin: OriginGame) -> bool {
+        self.id.is_some_and(|t| t.get() == tid)
+            && self.secret_id.is_some_and(|s| s.get() == sid)
+            && self.origin_game.is_some_and(|game| game == origin)
+    }
+
+    pub fn unknown_trainer_data_matches(
+        &self,
+        name: &SizedUtf16String<26>,
+        gender: Gender,
+    ) -> bool {
+        self.gender == gender && self.name == *name && self.origin_game.is_none()
     }
 
     pub const fn update_from(&mut self, other: &TrainerData) {

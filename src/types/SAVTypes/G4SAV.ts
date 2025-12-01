@@ -90,6 +90,7 @@ export abstract class G4SAV extends OfficialSAV<PK4> {
           const mon = new PK4(monData.buffer, true)
 
           if (mon.dexNum !== 0 && mon.gameOfOrigin !== 0) {
+            // set game origin if origin missing and matching mon is found; necessary for diamond/pearl
             if (
               this.origin === 0 &&
               mon.trainerID === this.tid &&

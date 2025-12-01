@@ -11,7 +11,6 @@ import HexDisplay from '../components/HexDisplay'
 import { fileTypeFromString } from '../types/FileImport'
 import { PKMInterface } from '../types/interfaces'
 import { OHPKM } from '../types/pkm/OHPKM'
-import { OhpkmV1 } from '../types/pkm/OhpkmV1'
 import FileTypeSelect from './components/FileTypeSelect'
 import NotesDisplay from './NotesTab'
 import OtherDisplay from './OtherTab'
@@ -119,10 +118,6 @@ const PokemonDetailsModal = (props: {
                     }
                     if (newFormat === 'OHPKM') {
                       setDisplayMon(mon instanceof OHPKM ? mon : new OHPKM(mon))
-                      return
-                    }
-                    if (newFormat === 'OhpkmV1') {
-                      setDisplayMon(new OhpkmV1(mon))
                       return
                     }
                     const P = fileTypeFromString(newFormat)

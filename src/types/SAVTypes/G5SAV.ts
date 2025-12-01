@@ -1,4 +1,4 @@
-import { OriginGame } from '@pkm-rs/pkg'
+import { Gender, OriginGame } from '@pkm-rs/pkg'
 import { PK5 } from '@pokemon-files/pkm'
 import { uniq } from 'lodash'
 import {
@@ -41,6 +41,7 @@ export abstract class G5SAV extends OfficialSAV<PK5> {
   tid: number = 0
   sid: number = 0
   displayID: string = ''
+  trainerGender: Gender = Gender.Male
 
   currentPCBox: number = 0 // TODO: Gen 5 current box
   boxes: Array<Box<PK5>>
@@ -77,6 +78,7 @@ export abstract class G5SAV extends OfficialSAV<PK5> {
     this.sid = bytesToUint16LittleEndian(this.bytes, this.trainerDataOffset + 0x16)
     this.currentPCBox = this.bytes[0]
     this.displayID = this.tid.toString().padStart(5, '0')
+    this.trainerGender = this.bytes[0x21]
 
     this.origin = this.bytes[this.trainerDataOffset + 0x1f]
     if (this.origin >= OriginGame.White2) {

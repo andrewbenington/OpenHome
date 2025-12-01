@@ -198,30 +198,32 @@ export function useSaves(): SavesAndBanksManager {
   }
 
   function addSave(save: SAV) {
-    const allOhpkms = ohpkmStore.getAllStored()
-    for (const mon of allOhpkms) {
-      if (!save.supportsMon(mon.dexNum, mon.formeNum)) continue
+    if (save.trainerGender !== undefined) {
+      const allOhpkms = ohpkmStore.getAllStored()
+      for (const mon of allOhpkms) {
+        if (!save.supportsMon(mon.dexNum, mon.formeNum)) continue
 
-      const matchingHandler = mon.findDataForTrainer(save.tid, save.sid ?? 0, save.origin)
-      if (!matchingHandler) continue
+        const matchingHandler = mon.matchingUnknownHandler(save.name, save.trainerGender)
+        if (!matchingHandler) continue
 
-      mon.updateTrainerData(
-        save,
-        matchingHandler.friendship,
-        matchingHandler.affection,
-        matchingHandler.memory
-      )
+        mon.updateTrainerData(
+          save,
+          matchingHandler.friendship,
+          matchingHandler.affection,
+          matchingHandler.memory
+        )
 
-      ohpkmStore.overwrite(mon)
-      const location = findMon(mon.getHomeIdentifier())
-      if (location) {
-        openSavesDispatch({
-          type: 'update_home_mon',
-          payload: {
-            location,
-            updater: (_) => mon,
-          },
-        })
+        ohpkmStore.overwrite(mon)
+        const location = findMon(mon.getHomeIdentifier())
+        if (location) {
+          openSavesDispatch({
+            type: 'update_home_mon',
+            payload: {
+              location,
+              updater: (_) => mon,
+            },
+          })
+        }
       }
     }
     openSavesDispatch({ type: 'add_save', payload: save })

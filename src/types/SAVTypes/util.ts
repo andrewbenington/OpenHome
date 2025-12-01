@@ -1,7 +1,6 @@
 import { OriginGame } from '@pkm-rs/pkg'
 import { PKMInterface } from '../interfaces'
 import { OHPKM } from '../pkm/OHPKM'
-import { OhpkmV1 } from '../pkm/OhpkmV1'
 import { PathData } from './path'
 import { SAV } from './SAV'
 
@@ -18,7 +17,7 @@ export interface SavePkmClass {
   getName(): string
 }
 
-export type AnyPkmClass = SavePkmClass | typeof OHPKM | typeof OhpkmV1
+export type AnyPkmClass = SavePkmClass | typeof OHPKM
 
 export interface SAVClass {
   new (path: PathData, bytes: Uint8Array): SAV

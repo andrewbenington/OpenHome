@@ -584,7 +584,7 @@ export class OHPKM extends PkmRs.OhpkmV2 implements PKMInterface {
 
     this.handlerName = save.name
 
-    const existingTrainerData = this.findDataForTrainer(save.tid, save.sid ?? 0, save.origin)
+    const existingTrainerData = this.findKnownHandler(save.tid, save.sid ?? 0, save.origin)
 
     if (existingTrainerData) {
       this.handlerAffection = existingTrainerData.affection

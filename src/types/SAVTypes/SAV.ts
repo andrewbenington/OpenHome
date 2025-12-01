@@ -74,7 +74,7 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
   abstract name: string
   abstract tid: number
   abstract sid?: number | undefined
-  abstract trainerGender?: Gender
+  abstract trainerGender: Gender
   abstract displayID: string
   abstract currentPCBox: number
   abstract boxes: Box<P>[]

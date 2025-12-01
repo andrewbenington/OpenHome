@@ -1,4 +1,4 @@
-import { OriginGame } from '@pkm-rs/pkg'
+import { Gender, OriginGame } from '@pkm-rs/pkg'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -68,6 +68,7 @@ class G3CFRUSaveBackup<T extends PluginPKMInterface> {
   name: string = ''
   tid: number = 0
   sid: number = 0
+  trainerGender: Gender
   sectors: G3CFRUSector[]
   pcDataContiguous: Uint8Array
   currentPCBox: number
@@ -90,6 +91,7 @@ class G3CFRUSaveBackup<T extends PluginPKMInterface> {
     this.name = gen3StringToUTF(this.sectors[0].data, 0x00, 7)
     this.tid = bytesToUint16LittleEndian(this.sectors[0].data, 0x0a)
     this.sid = bytesToUint16LittleEndian(this.sectors[0].data, 0x0c)
+    this.trainerGender = this.sectors[0].data[0x08] ? Gender.Female : Gender.Male
 
     const boxes: number = 18
     const nBytes: number = boxes * 58 * 30
@@ -169,6 +171,7 @@ export abstract class G3CFRUSAV<T extends PluginPKMInterface> extends PluginSAV<
   tid: number
   sid: number
   displayID: string
+  trainerGender: Gender
 
   currentPCBox: number
   boxes: Array<Box<T>>
@@ -205,22 +208,10 @@ export abstract class G3CFRUSAV<T extends PluginPKMInterface> extends PluginSAV<
     this.tid = this.primarySave.tid
     this.displayID = this.primarySave.tid.toString().padStart(5, '0')
     this.sid = this.primarySave.sid
+    this.trainerGender = this.primarySave.trainerGender
     this.currentPCBox = this.primarySave.currentPCBox
     this.boxes = this.primarySave.boxes
     this.boxNames = this.primarySave.boxNames
-
-    // Hacky way to detect save version
-    this.boxes.forEach((box) => {
-      box.pokemon.forEach((mon) => {
-        if (
-          mon &&
-          mon.trainerID === this.tid &&
-          mon.secretID === this.sid &&
-          mon.trainerName === this.name
-        ) {
-        }
-      })
-    })
   }
 
   pcChecksumOffset?: number | undefined
