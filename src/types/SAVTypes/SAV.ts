@@ -122,7 +122,7 @@ export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implement
   abstract name: string
   abstract tid: number
   abstract sid?: number | undefined
-  abstract trainerGender?: Gender
+  abstract trainerGender: Gender
   abstract displayID: string
   abstract currentPCBox: number
   abstract boxes: Box<P>[]

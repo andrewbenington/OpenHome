@@ -564,7 +564,7 @@ export class OHPKM extends PkmRs.OhpkmV2 implements PKMInterface {
         friendship,
         memory,
         affection,
-        save.trainerGender ?? Gender.Male,
+        save.trainerGender,
         save.origin
       ),
       save.isPlugin ? save.pluginIdentifier : undefined
