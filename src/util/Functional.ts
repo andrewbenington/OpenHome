@@ -24,8 +24,10 @@ export function range(startOrSize: number, end?: number) {
   return end ? [...Array(end).keys()].slice(startOrSize) : [...Array(startOrSize).keys()]
 }
 
-export function intersection<T>(first: T[] | undefined, second: T[] | undefined): T[] {
-  return Array.from(new Set(first).intersection(new Set(second)))
+export function intersection<T>(first: T[] | undefined, second: T[]): T[] {
+  const set1 = new Set(first)
+  const set2 = new Set(second)
+  return Array.from(set1.intersection(set2))
 }
 
 export function unique<T>(items: T[] | undefined): T[] {
