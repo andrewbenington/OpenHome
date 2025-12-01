@@ -16,6 +16,7 @@
     "type": "git",
     "url": "git+https://github.com/andrewbenington/OpenHome.git"
   },
+  "packageManager": "^pnpm@10.24.0",
   "license": "GPL-3.0-only",
   "author": {
     "name": "Andrew Benington",
