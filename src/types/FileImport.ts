@@ -16,6 +16,7 @@ import {
 } from '@pokemon-files/pkm'
 import { PKMInterface } from './interfaces'
 import { OHPKM } from './pkm/OHPKM'
+import { OhpkmV1 } from './pkm/OhpkmV1'
 import { PK3RR } from './SAVTypes/radicalred/PK3RR'
 import { PK3UB } from './SAVTypes/unbound/PK3UB'
 import { AnyPkmClass, SavePkmClass } from './SAVTypes/util'
@@ -76,6 +77,8 @@ export function fileTypeFromString(type: string): AnyPkmClass | undefined {
       return PB8
     case 'PK9':
       return PK9
+    case 'OhpkmV1':
+      return OhpkmV1
     case 'OhpkmV2':
       return OHPKM
     default:

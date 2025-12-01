@@ -2,12 +2,19 @@ import {
   AbilityIndex,
   Ball,
   Gender,
+  GenderRatio,
+  HyperTraining,
+  Item,
   Languages,
   MetadataLookup,
   NatureIndex,
+  OriginGame,
   PokeDate,
   ShinyLeaves,
+  SpeciesAndForme,
   SpeciesLookup,
+  TrainerData,
+  TrainerMemory,
   updatePidIfWouldBecomeShinyGen345,
 } from '@pkm-rs/pkg'
 import {
@@ -21,7 +28,7 @@ import {
 import { Gen34ContestRibbons, Gen34TowerRibbons, ModernRibbons } from '@pokemon-resources/index'
 import Prando from 'prando'
 import * as types from '../../../packages/pokemon-files/src/util/types'
-import * as PkmRs from '../../../pkm_rs/pkg'
+import { OhpkmV2 as OhpkmV2Wasm } from '../../../pkm_rs/pkg'
 import { NationalDex } from '../../consts/NationalDex'
 import { intersection, unique } from '../../util/Functional'
 import { getHomeIdentifier, isEvolution } from '../../util/Lookup'
@@ -55,7 +62,7 @@ import {
   ivsFromDVs,
 } from './util'
 
-export class OHPKM extends PkmRs.OhpkmV2 implements PKMInterface {
+export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   static getName() {
     return 'OHPKM'
   }
@@ -101,7 +108,7 @@ export class OHPKM extends PkmRs.OhpkmV2 implements PKMInterface {
         prng = new Prando(other.trainerName.concat(other.trainerID.toString()))
       }
 
-      this.speciesAndForme = new PkmRs.SpeciesAndForme(other.dexNum, other.formeNum)
+      this.speciesAndForme = new SpeciesAndForme(other.dexNum, other.formeNum)
 
       if (other.personalityValue === undefined) {
         this.encryptionConstant = 0
@@ -341,7 +348,7 @@ export class OHPKM extends PkmRs.OhpkmV2 implements PKMInterface {
   }
 
   static fromV1Wasm(v1: OhpkmV1) {
-    const v2 = PkmRs.OhpkmV2.fromV1Bytes(new Uint8Array(v1.toBytes()))
+    const v2 = OhpkmV2Wasm.fromV1Bytes(new Uint8Array(v1.toBytes()))
     return new OHPKM(v2.toByteArray())
   }
 
@@ -484,7 +491,7 @@ export class OHPKM extends PkmRs.OhpkmV2 implements PKMInterface {
     return this.hyperTrainingWasm
   }
   set hyperTraining(value: types.HyperTrainStats) {
-    this.hyperTrainingWasm = new PkmRs.HyperTraining(
+    this.hyperTrainingWasm = new HyperTraining(
       value.hp,
       value.atk,
       value.def,
@@ -523,7 +530,7 @@ export class OHPKM extends PkmRs.OhpkmV2 implements PKMInterface {
   }
 
   public get heldItemName() {
-    return PkmRs.Item.fromIndex(this.heldItemIndex)?.name ?? 'None'
+    return Item.fromIndex(this.heldItemIndex)?.name ?? 'None'
   }
 
   public get languageString() {
@@ -554,10 +561,10 @@ export class OHPKM extends PkmRs.OhpkmV2 implements PKMInterface {
     save: SAV,
     friendship: number,
     affection: number,
-    memory?: PkmRs.TrainerMemory
+    memory?: TrainerMemory
   ) {
     this.registerHandler(
-      new PkmRs.TrainerData(
+      new TrainerData(
         save.tid,
         save.sid ?? 0,
         save.name,
@@ -622,10 +629,7 @@ export class OHPKM extends PkmRs.OhpkmV2 implements PKMInterface {
     const metadata = this.metadata
 
     // PLA mons cannot have been hatched
-    if (
-      this.gameOfOrigin === PkmRs.OriginGame.LegendsArceus &&
-      (this.eggDate || this.eggLocationIndex)
-    ) {
+    if (this.gameOfOrigin === OriginGame.LegendsArceus && (this.eggDate || this.eggLocationIndex)) {
       this.eggDate = undefined
       this.eggLocationIndex = undefined
       errorsFound = true
@@ -659,10 +663,10 @@ export class OHPKM extends PkmRs.OhpkmV2 implements PKMInterface {
     const genderRatio = this.metadata?.genderRatio
     if (metadata && genderRatio !== undefined) {
       if (
-        (this.gender === Gender.Genderless && genderRatio !== PkmRs.GenderRatio.Genderless) ||
-        (this.gender !== Gender.Genderless && genderRatio === PkmRs.GenderRatio.Genderless) ||
-        (this.gender === Gender.Male && genderRatio === PkmRs.GenderRatio.AllFemale) ||
-        (this.gender === Gender.Female && genderRatio === PkmRs.GenderRatio.AllMale)
+        (this.gender === Gender.Genderless && genderRatio !== GenderRatio.Genderless) ||
+        (this.gender !== Gender.Genderless && genderRatio === GenderRatio.Genderless) ||
+        (this.gender === Gender.Male && genderRatio === GenderRatio.AllFemale) ||
+        (this.gender === Gender.Female && genderRatio === GenderRatio.AllMale)
       ) {
         this.gender = metadata.genderFromPid(this.personalityValue)
         errorsFound = true
@@ -686,11 +690,11 @@ export class OHPKM extends PkmRs.OhpkmV2 implements PKMInterface {
     this.movePPUps = other.movePPUps as [number, number, number, number]
 
     if (this.dexNum !== other.dexNum && isEvolution(this, other)) {
-      this.speciesAndForme = new PkmRs.SpeciesAndForme(other.dexNum, this.formeNum)
+      this.speciesAndForme = new SpeciesAndForme(other.dexNum, this.formeNum)
     }
 
     if (this.dexNum === other.dexNum || isEvolution(this, other)) {
-      this.speciesAndForme = new PkmRs.SpeciesAndForme(this.dexNum, this.formeNum)
+      this.speciesAndForme = new SpeciesAndForme(this.dexNum, this.formeNum)
     }
 
     this.heldItemIndex = other.heldItemIndex
@@ -775,7 +779,7 @@ export class OHPKM extends PkmRs.OhpkmV2 implements PKMInterface {
         other.handlerFriendship ?? 70, // TODO: USE BASE FRIENDSHIP
         other.handlerAffection ?? 0,
         other.handlerMemory
-          ? new PkmRs.TrainerMemory(
+          ? new TrainerMemory(
               other.handlerMemory.intensity,
               other.handlerMemory.memory,
               other.handlerMemory.feeling,
@@ -857,7 +861,9 @@ export class OHPKM extends PkmRs.OhpkmV2 implements PKMInterface {
       this.obedienceLevel = other.obedienceLevel
     }
 
-    this.nickname = other.nickname
+    if (save && save.origin >= OriginGame.Sword) {
+      this.nickname = other.nickname
+    }
   }
 
   private abilityNumMatchesIndex(): boolean {
