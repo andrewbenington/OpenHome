@@ -1,4 +1,4 @@
-import { OriginGame } from '@pkm-rs-resources/pkg'
+import { Gender, OriginGame } from '@pkm-rs/pkg'
 import { PB8 } from '@pokemon-files/pkm'
 import { utf16BytesToString } from '@pokemon-files/util'
 import { Item } from '../../../consts/Items'
@@ -219,6 +219,10 @@ export class BDSPSAV extends OfficialSAV<PB8> {
 
   static includesOrigin(origin: OriginGame) {
     return origin === OriginGame.BrilliantDiamond || origin === OriginGame.ShiningPearl
+  }
+
+  get trainerGender() {
+    return this.myStatusBlock.getGender() ? Gender.Female : Gender.Male
   }
 }
 

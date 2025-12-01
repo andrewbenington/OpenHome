@@ -1,4 +1,4 @@
-import { MetadataLookup } from '@pkm-rs-resources/pkg'
+import { MetadataLookup } from '@pkm-rs/pkg'
 import { BLOOD_MOON, SWEETS } from 'src/consts/Formes'
 import { NationalDex } from 'src/consts/NationalDex'
 import { toGen3RRPokemonIndex } from 'src/types/SAVTypes/radicalred/conversion/Gen3RRPokemonIndex'
@@ -27,6 +27,7 @@ export const fileToSpriteFolder: Record<string, string> = {
   PB8: 'home',
   PK9: 'gen9',
   OHPKM: 'home',
+  OhpkmV1: 'home',
 }
 
 export const getPokemonSpritePath = (mon: MonSpriteData, format?: string) => {

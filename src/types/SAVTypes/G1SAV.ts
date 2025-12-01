@@ -1,4 +1,4 @@
-import { ItemGen1, Language, OriginGame } from '@pkm-rs-resources/pkg'
+import { Gender, ItemGen1, Language, OriginGame } from '@pkm-rs/pkg'
 import { PK1 } from '@pokemon-files/pkm'
 import lodash from 'lodash'
 import { NationalDex } from 'src/consts/NationalDex'
@@ -268,6 +268,10 @@ export class G1SAV extends OfficialSAV<PK1> {
 
   static includesOrigin(origin: OriginGame) {
     return origin >= OriginGame.Red && origin <= OriginGame.Yellow
+  }
+
+  get trainerGender() {
+    return Gender.Male
   }
 }
 

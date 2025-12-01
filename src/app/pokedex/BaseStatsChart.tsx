@@ -1,3 +1,4 @@
+import { FormeMetadata } from '@pkm-rs/pkg'
 import { Text } from '@radix-ui/themes'
 import {
   Chart as ChartJS,
@@ -10,7 +11,6 @@ import {
 } from 'chart.js'
 import { Radar } from 'react-chartjs-2'
 import useIsDarkMode from 'src/hooks/dark-mode'
-import { FormeMetadata } from '../../../pkm_rs_resources/pkg/pkm_rs_resources'
 
 export type BaseStatsChartProps = {
   forme: FormeMetadata

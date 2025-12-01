@@ -23,3 +23,11 @@ function partitionResultsRecursive<E, A>(acc: PartitionedEither<E, A>, either: E
 export function range(startOrSize: number, end?: number) {
   return end ? [...Array(end).keys()].slice(startOrSize) : [...Array(startOrSize).keys()]
 }
+
+export function intersection<T>(first: T[] | undefined, second: T[] | undefined): T[] {
+  return Array.from(new Set(first).intersection(new Set(second)))
+}
+
+export function unique<T>(items: T[] | undefined): T[] {
+  return Array.from(new Set(items))
+}

@@ -131,7 +131,7 @@ impl From<AbilityIndex> for u16 {
 #[derive(Clone, Copy)]
 pub struct AbilityMetadata {
     pub id: usize,
-    #[wasm_bindgen(skip)]
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub name: &'static str,
 }
 

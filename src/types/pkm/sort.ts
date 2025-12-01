@@ -1,4 +1,4 @@
-import { Ball } from '@pkm-rs-resources/pkg'
+import { Ball } from '@pkm-rs/pkg'
 import { PKM } from '@pokemon-files/pkm'
 import { getDisplayID } from '@pokemon-files/util/util'
 import dayjs from 'dayjs'
@@ -17,6 +17,8 @@ export const SortTypes = [
   'Trainer',
   'Poké Ball',
   'Held Item',
+  'Is Egg',
+  'Shiny Leaves',
 ]
 
 export type SortType = (typeof SortTypes)[number]
@@ -120,6 +122,12 @@ export function getSortFunction(
       return chain([sortByTrainerName, sortByTrainerId, sortBySecretId])
     case 'Poké Ball':
       return (a, b) => (a.ball ?? Ball.Poke) - (b.ball ?? Ball.Poke)
+    case 'Is Egg':
+      return (a, b) => Number(a.isEgg) - Number(b.isEgg)
+    case 'Shiny Leaves':
+      return (a, b) =>
+        (b.shinyLeaves?.hasCrown() ? 6 : (b.shinyLeaves?.count() ?? 0)) -
+        (a.shinyLeaves?.hasCrown() ? 6 : (a.shinyLeaves?.count() ?? 0))
     case 'Held Item':
       return sortByHeldItem
     default:

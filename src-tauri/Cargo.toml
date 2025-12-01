@@ -1,6 +1,6 @@
 [package]
 name = "OpenHome"
-version = "1.7.1"
+version = "1.8.0-alpha-ohpkm-v2"
 description = "A tool for moving Pokémon between game saves"
 authors = ["Andrew Benington"]
 edition = "2024"
@@ -24,6 +24,7 @@ strip = true # Remove debug symbols
 tauri-build = { version = "2.5.1", features = [] }
 
 [dependencies]
+pkm_rs = {path = "../pkm_rs"}
 tauri = { version = "2.9.2", features = [] }
 tauri-plugin-shell = "2.3.3"
 serde = { version = "1.0.228", features = ["derive"] }

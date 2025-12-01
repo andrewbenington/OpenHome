@@ -1,4 +1,4 @@
-import { ItemGen3, OriginGame } from '@pkm-rs-resources/pkg'
+import { Gender, ItemGen3, OriginGame } from '@pkm-rs/pkg'
 import { PK3 } from '@pokemon-files/pkm'
 import { NationalDex } from 'src/consts/NationalDex'
 import { GEN3_TRANSFER_RESTRICTIONS } from 'src/consts/TransferRestrictions'
@@ -94,6 +94,8 @@ export class G3SaveBackup {
 
   sid: number = 0
 
+  trainerGender: Gender
+
   sectors: G3Sector[]
 
   pcDataContiguous: Uint8Array
@@ -174,6 +176,7 @@ export class G3SaveBackup {
     this.name = gen3StringToUTF(this.sectors[0].data, 0x00, 7)
     this.tid = bytesToUint16LittleEndian(this.sectors[0].data, 0x0a)
     this.sid = bytesToUint16LittleEndian(this.sectors[0].data, 0x0c)
+    this.trainerGender = this.sectors[0].data[0x08] ? Gender.Female : Gender.Male
   }
 }
 
@@ -378,5 +381,9 @@ export class G3SAV extends OfficialSAV<PK3> {
       rivalName: gen3StringToUTF(this.primarySave.sectors[3].data, 0x0bcc, 8),
       gameCode: this.primarySave.gameCode,
     }
+  }
+
+  get trainerGender() {
+    return this.primarySave.trainerGender
   }
 }

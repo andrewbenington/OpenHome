@@ -86,7 +86,7 @@ export const TauriBackend: BackendInterface = {
   },
 
   writeHomeMon: async (identifier: string, bytes: Uint8Array): Promise<Errorable<null>> => {
-    const relativePath = await path.join('mons', `${identifier}.ohpkm`)
+    const relativePath = await path.join('mons_v2', `${identifier}.ohpkm`)
 
     return TauriInvoker.writeStorageFileBytes(relativePath, bytes)
   },

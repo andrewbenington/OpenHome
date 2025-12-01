@@ -16,11 +16,12 @@ import {
 } from '@pokemon-files/pkm'
 import { PKMInterface } from './interfaces'
 import { OHPKM } from './pkm/OHPKM'
+import { OhpkmV1 } from './pkm/OhpkmV1'
 import { PK3RR } from './SAVTypes/radicalred/PK3RR'
 import { PK3UB } from './SAVTypes/unbound/PK3UB'
-import { PKMClass } from './SAVTypes/util'
+import { AnyPkmClass, SavePkmClass } from './SAVTypes/util'
 
-function fileTypeFromBytes(bytes: Uint8Array): PKMClass | undefined {
+function fileTypeFromBytes(bytes: Uint8Array): SavePkmClass | undefined {
   switch (bytes.length) {
     case 69:
       return PK1
@@ -42,7 +43,7 @@ function fileTypeFromBytes(bytes: Uint8Array): PKMClass | undefined {
   }
 }
 
-export function fileTypeFromString(type: string): PKMClass | typeof OHPKM | undefined {
+export function fileTypeFromString(type: string): AnyPkmClass | undefined {
   switch (type) {
     case 'PK1':
       return PK1
@@ -76,7 +77,9 @@ export function fileTypeFromString(type: string): PKMClass | typeof OHPKM | unde
       return PB8
     case 'PK9':
       return PK9
-    case 'OHPKM':
+    case 'OhpkmV1':
+      return OhpkmV1
+    case 'OhpkmV2':
       return OHPKM
     default:
       return undefined
@@ -84,17 +87,16 @@ export function fileTypeFromString(type: string): PKMClass | typeof OHPKM | unde
 }
 
 export const bytesToPKM = (bytes: Uint8Array, extension: string): PKMInterface => {
-  let T: PKMClass | typeof OHPKM | undefined
+  let T: AnyPkmClass | undefined
 
   if (extension === '' || extension.toUpperCase() === 'PKM') {
-    T = fileTypeFromBytes(bytes)
+    T = fileTypeFromBytes(new Uint8Array(bytes))
   } else {
     T = fileTypeFromString(extension)
   }
   if (!T) {
     throw `Unrecognized file`
   }
-  const buffer = bytes.buffer.slice(bytes.byteOffset, bytes.byteLength + bytes.byteOffset)
 
-  return T.fromBytes(buffer as ArrayBuffer)
+  return T.fromBytes(bytes.buffer as ArrayBuffer)
 }

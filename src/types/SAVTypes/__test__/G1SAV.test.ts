@@ -12,6 +12,7 @@ import { emptyPathData } from '../path'
 import { initializeWasm } from './init'
 
 let blueSaveFile: G1SAV
+var slowbroOH: OHPKM
 
 beforeAll(initializeWasm)
 beforeAll(() => {
@@ -25,17 +26,16 @@ beforeAll(() => {
   assert(E.isRight(result))
 
   blueSaveFile = result.right as G1SAV
+
+  slowbroOH = bytesToPKM(
+    new Uint8Array(
+      fs.readFileSync(path.join('src/types/pkm/__test__/PKMFiles/OhpkmV2', 'slowbro.ohpkm'))
+    ),
+    'OhpkmV2'
+  ) as OHPKM
 })
 
-const slowpokeOH = bytesToPKM(
-  new Uint8Array(
-    fs.readFileSync(path.join('src/types/pkm/__test__/PKMFiles/OH', 'slowpoke-shiny.ohpkm'))
-  ),
-  'OHPKM'
-) as OHPKM
-
 test('pc box decoded correctly', () => {
-  initializeWasm()
   expect(blueSaveFile.boxes[7].pokemon[0]?.nickname).toEqual('KABUTOPS')
   expect(blueSaveFile.boxes[7].pokemon[1]?.nickname).toEqual('AERODACTYL')
   expect(blueSaveFile.boxes[7].pokemon[9]?.nickname).toEqual('MEWTWO')
@@ -82,7 +82,7 @@ test('inserting mon works', () => {
   }
   const modifiedSaveFile1 = result1.right as G1SAV
 
-  modifiedSaveFile1.boxes[7].pokemon[11] = new PK1(slowpokeOH)
+  modifiedSaveFile1.boxes[7].pokemon[11] = new PK1(slowbroOH)
   modifiedSaveFile1.updatedBoxSlots.push({ box: 7, index: 0 })
   modifiedSaveFile1.prepareBoxesAndGetModified()
 
@@ -98,5 +98,5 @@ test('inserting mon works', () => {
 
   expect(modifiedSaveFile2.boxes[7].pokemon[0]?.nickname).toEqual('KABUTOPS')
   expect(modifiedSaveFile2.boxes[7].pokemon[10]?.nickname).toEqual('MEW')
-  expect(modifiedSaveFile2.boxes[7].pokemon[11]?.nickname).toEqual('Slowpoke')
+  expect(modifiedSaveFile2.boxes[7].pokemon[11]?.nickname).toEqual('Slowbro')
 })

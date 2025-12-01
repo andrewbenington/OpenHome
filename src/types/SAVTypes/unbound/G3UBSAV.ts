@@ -1,4 +1,4 @@
-import { ItemUnbound } from '@pkm-rs-resources/pkg'
+import { ItemUnbound } from '@pkm-rs/pkg'
 import { NationalDex } from 'src/consts/NationalDex'
 import { bytesToUint32LittleEndian } from '../../../util/byteLogic'
 import { isRestricted, TransferRestrictions } from '../../TransferRestrictions'

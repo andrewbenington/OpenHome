@@ -1,5 +1,4 @@
 import { PK2 } from '@pokemon-files/pkm'
-import assert from 'assert'
 import * as E from 'fp-ts/lib/Either'
 import fs from 'fs'
 import path from 'path'
@@ -9,10 +8,14 @@ import { OHPKM } from '../../pkm/OHPKM'
 import { G2SAV } from '../G2SAV'
 import { buildUnknownSaveFile } from '../load'
 import { emptyPathData } from '../path'
+import { initializeWasm } from './init'
 
+beforeAll(initializeWasm)
 let crystalSaveFile: G2SAV
+var slowbroOH: OHPKM
 
-beforeAll(() => {
+beforeAll(async () => {
+  await initializeWasm()
   const result = buildUnknownSaveFile(
     emptyPathData,
     new Uint8Array(fs.readFileSync(path.join(__dirname, 'SAVFiles', 'crystal.sav'))),
@@ -20,17 +23,17 @@ beforeAll(() => {
     [G2SAV]
   )
 
-  assert(E.isRight(result))
+  if (E.isLeft(result)) {
+    throw result.left
+  }
 
   crystalSaveFile = result.right as G2SAV
-})
 
-const slowpokeOH = bytesToPKM(
-  new Uint8Array(
-    fs.readFileSync(path.join('src/types/pkm/__test__/PKMFiles/OH', 'slowpoke-shiny.ohpkm'))
-  ),
-  'OHPKM'
-) as OHPKM
+  const slowpokeBytes = fs.readFileSync(
+    path.join('src/types/pkm/__test__/PKMFiles/OhpkmV2', 'slowbro.ohpkm')
+  )
+  slowbroOH = bytesToPKM(new Uint8Array(slowpokeBytes), 'OhpkmV2') as OHPKM
+})
 
 test('pc box decoded correctly', () => {
   expect(crystalSaveFile.boxes[9].pokemon[0]?.nickname).toEqual('AMPHAROS')
@@ -80,7 +83,7 @@ test('inserting mon works', () => {
 
   const modifiedSaveFile1 = result1.right as G2SAV
 
-  modifiedSaveFile1.boxes[13].pokemon[17] = new PK2(slowpokeOH)
+  modifiedSaveFile1.boxes[13].pokemon[17] = new PK2(slowbroOH)
   modifiedSaveFile1.updatedBoxSlots.push({ box: 13, index: 0 })
   modifiedSaveFile1.prepareBoxesAndGetModified()
 
@@ -96,5 +99,5 @@ test('inserting mon works', () => {
 
   expect(modifiedSaveFile2.boxes[13].pokemon[0]?.nickname).toEqual('UNOWN')
   expect(modifiedSaveFile2.boxes[13].pokemon[16]?.nickname).toEqual('WIGGLYTUFF')
-  expect(modifiedSaveFile2.boxes[13].pokemon[17]?.nickname).toEqual('Slowpoke')
+  expect(modifiedSaveFile2.boxes[13].pokemon[17]?.nickname).toEqual('Slowbro')
 })

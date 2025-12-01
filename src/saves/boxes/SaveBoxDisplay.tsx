@@ -1,12 +1,13 @@
-import { MetadataLookup } from '@pkm-rs-resources/pkg'
+import { MetadataLookup } from '@pkm-rs/pkg'
 import { Button, Card, Dialog, Flex, Grid } from '@radix-ui/themes'
 import lodash, { range } from 'lodash'
 import { useContext, useMemo, useState } from 'react'
 import { MdClose } from 'react-icons/md'
 import { BackendContext } from 'src/backend/backendContext'
+import Fallback from 'src/components/Fallback'
 import { MenuIcon } from 'src/components/Icons'
-import AttributeRow from 'src/pokemon/AttributeRow'
-import PokemonDetailsModal from 'src/pokemon/PokemonDetailsModal'
+import AttributeRow from 'src/pokemon-details/components/AttributeRow'
+import PokemonDetailsModal from 'src/pokemon-details/Modal'
 import { ErrorContext } from 'src/state/error'
 import { MonLocation } from 'src/state/saves/reducer'
 import { PKMInterface } from 'src/types/interfaces'
@@ -241,10 +242,18 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
           >
             <AttributeRow label="Game">Pokémon {save.gameName}</AttributeRow>
             <AttributeRow label="Trainer Name">{save.name}</AttributeRow>
-            <AttributeRow label="Trainer ID">{save.displayID}</AttributeRow>
-            {save.sid && (
+            <AttributeRow label="Trainer Display ID">{save.displayID}</AttributeRow>
+            <AttributeRow label="Trainer Real ID">
+              <code>0x{save.tid.toString(16)}</code>
+            </AttributeRow>
+            {save.sid !== undefined && (
               <AttributeRow label="Secret ID">
                 <code>0x{save.sid.toString(16)}</code>
+              </AttributeRow>
+            )}
+            {save.trainerGender !== undefined && (
+              <AttributeRow label="Trainer Gender">
+                {save.trainerGender ? 'Female' : 'Male'}
               </AttributeRow>
             )}
             <AttributeRow label="File">
@@ -274,24 +283,26 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
         </Dialog.Root>
       </Flex>
 
-      <PokemonDetailsModal
-        mon={selectedMon}
-        onClose={() => setSelectedIndex(undefined)}
-        navigateRight={navigateRight}
-        navigateLeft={navigateLeft}
-        boxIndicatorProps={
-          selectedIndex !== undefined
-            ? {
-                currentIndex: selectedIndex,
-                columns: save.boxColumns,
-                rows: save.boxRows,
-                emptyIndexes: range(save.boxColumns * save.boxRows).filter(
-                  (index) => !currentBox?.pokemon?.[index]
-                ),
-              }
-            : undefined
-        }
-      />
+      <Fallback>
+        <PokemonDetailsModal
+          mon={selectedMon}
+          onClose={() => setSelectedIndex(undefined)}
+          navigateRight={navigateRight}
+          navigateLeft={navigateLeft}
+          boxIndicatorProps={
+            selectedIndex !== undefined
+              ? {
+                  currentIndex: selectedIndex,
+                  columns: save.boxColumns,
+                  rows: save.boxRows,
+                  emptyIndexes: range(save.boxColumns * save.boxRows).filter(
+                    (index) => !currentBox?.pokemon?.[index]
+                  ),
+                }
+              : undefined
+          }
+        />
+      </Fallback>
     </>
   ) : (
     <div />

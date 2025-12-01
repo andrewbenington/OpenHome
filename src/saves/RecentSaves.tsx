@@ -1,4 +1,4 @@
-import { OriginGames } from '@pkm-rs-resources/pkg'
+import { OriginGames } from '@pkm-rs/pkg'
 import { Flex } from '@radix-ui/themes'
 import * as E from 'fp-ts/lib/Either'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'

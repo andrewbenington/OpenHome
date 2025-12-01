@@ -1,8 +1,8 @@
-import { OriginGames } from '@pkm-rs-resources/pkg'
+import { OriginGames } from '@pkm-rs/pkg'
 import { Badge, Card, Flex } from '@radix-ui/themes'
 import { useMemo, useState } from 'react'
 import { MdAdd } from 'react-icons/md'
-import PokemonDetailsModal from 'src/pokemon/PokemonDetailsModal'
+import PokemonDetailsModal from 'src/pokemon-details/Modal'
 import SavesModal from 'src/saves/SavesModal'
 import { getSortFunction, SortType, SortTypes } from 'src/types/pkm/sort'
 import { filterUndefined } from 'src/util/Sort'
@@ -70,6 +70,8 @@ export default function SortPokemon() {
           <PokemonIcon
             dexNumber={monWithSave.mon.dexNum}
             formeNumber={monWithSave.mon.formeNum}
+            isEgg={monWithSave.mon.isEgg}
+            isShiny={monWithSave.mon.isShiny()}
             style={{
               width: 30,
               height: 30,

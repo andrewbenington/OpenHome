@@ -1,7 +1,7 @@
 {
   "productName": "OpenHome",
   "name": "openhome",
-  "version": "1.7.1",
+  "version": "1.8.0-alpha-ohpkm-v2",
   "description": "A tool for moving Pokémon between game saves",
   "keywords": [
     "pokemon",
@@ -34,7 +34,9 @@
     "dev": "pnpm run wasm && pnpm vite",
     "tauri": "tauri",
     "test": "vitest run",
-    "wasm": "wasm-pack build ./pkm_rs_resources --target web -- --features wasm",
+    "wasm-resources": "wasm-pack build ./pkm_rs_resources --target web -- --features wasm",
+    "wasm-pkm-rs": "wasm-pack build ./pkm_rs --target web -- --features wasm",
+    "wasm": "npm run wasm-resources && npm run wasm-pkm-rs",
     "precommit": "prettier --write . && eslint src --report-unused-disable-directives -c eslint.config.mjs --fix"
   },
   "dependencies": {
@@ -76,6 +78,8 @@
     "@typescript-eslint/eslint-plugin": "^8.47.0",
     "@typescript-eslint/parser": "^8.47.0",
     "@vitejs/plugin-react": "^5.1.1",
+    "better-sqlite3": "^12.4.6",
+    "camelcase-keys": "^10.0.1",
     "eslint": "^9.39.1",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",

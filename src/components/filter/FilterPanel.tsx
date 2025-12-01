@@ -10,7 +10,7 @@ import {
   OriginGames,
   OriginGameWithData,
   SpeciesLookup,
-} from '@pkm-rs-resources/pkg'
+} from '@pkm-rs/pkg'
 import { Types } from '@pokemon-resources/index'
 import { Button, Flex, Text } from '@radix-ui/themes'
 import { useContext, useMemo } from 'react'

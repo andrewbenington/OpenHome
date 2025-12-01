@@ -137,6 +137,12 @@ impl Stats8 {
             spe,
         }
     }
+
+    // ensure TypeScript doesn't allow Stats8 and Stats16Le to be confused
+    #[wasm_bindgen(getter = stats8)]
+    pub fn rust_type_name(&self) -> bool {
+        true
+    }
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
@@ -198,6 +204,12 @@ impl Stats16Le {
             spd,
             spe,
         }
+    }
+
+    // ensure TypeScript doesn't allow Stats8 and Stats16Le to be confused
+    #[wasm_bindgen(getter = stats16Le)]
+    pub fn rust_type_name(&self) -> bool {
+        true
     }
 }
 
@@ -262,15 +274,21 @@ pub struct StatsPreSplit {
 }
 
 impl StatsPreSplit {
-    // pub fn from_bytes_be(bytes: [u8; 10]) -> Self {
-    //     StatsPreSplit {
-    //         hp: u16::from_be_bytes(bytes[0..2].try_into().unwrap()),
-    //         atk: u16::from_be_bytes(bytes[2..4].try_into().unwrap()),
-    //         def: u16::from_be_bytes(bytes[4..6].try_into().unwrap()),
-    //         spe: u16::from_be_bytes(bytes[6..8].try_into().unwrap()),
-    //         spc: u16::from_be_bytes(bytes[8..10].try_into().unwrap()),
-    //     }
-    // }
+    pub fn from_bytes(bytes: [u8; 10]) -> Self {
+        Self {
+            hp: u16::from_le_bytes(bytes[0..2].try_into().unwrap()),
+            atk: u16::from_le_bytes(bytes[2..4].try_into().unwrap()),
+            def: u16::from_le_bytes(bytes[4..6].try_into().unwrap()),
+            spe: u16::from_le_bytes(bytes[6..8].try_into().unwrap()),
+            spc: u16::from_le_bytes(bytes[8..10].try_into().unwrap()),
+        }
+    }
+
+    pub fn to_bytes(self) -> [u8; 10] {
+        u16_le_slice_to_u8([self.hp, self.atk, self.def, self.spe, self.spc])
+            .try_into()
+            .unwrap()
+    }
 
     pub const fn from_dv_bytes(bytes: &[u8; 2]) -> Self {
         let dv_bytes = u16::from_be_bytes([bytes[0], bytes[1]]);
@@ -293,6 +311,26 @@ impl StatsPreSplit {
         let dv_val_u16 = (dv_val_u16 << 4) | (self.spc & 0x0f);
 
         dv_val_u16.to_be_bytes()
+    }
+
+    pub const fn is_empty(&self) -> bool {
+        self.hp == 0 && self.atk == 0 && self.def == 0 && self.spc == 0 && self.spe == 0
+    }
+}
+
+#[cfg(feature = "wasm")]
+#[wasm_bindgen]
+impl StatsPreSplit {
+    #[wasm_bindgen(constructor)]
+    #[allow(clippy::missing_const_for_fn)]
+    pub fn new(hp: u16, atk: u16, def: u16, spc: u16, spe: u16) -> Self {
+        Self {
+            hp,
+            atk,
+            def,
+            spc,
+            spe,
+        }
     }
 }
 

@@ -1,9 +1,8 @@
-#[cfg(feature = "wasm")]
 use pkm_rs_types::Gender;
 use std::num::NonZeroU16;
 use strum_macros::{Display, EnumString};
 
-use pkm_rs_types::{GameSetting, Generation, PkmType, Stats16Le};
+use pkm_rs_types::{GameSetting, Generation, PkmType, Stats16Le, TeraType};
 use serde::{Serialize, Serializer};
 
 #[cfg(feature = "wasm")]
@@ -406,6 +405,15 @@ impl FormeMetadata {
             .iter()
             .any(|mega| mega.mega_forme.forme_index == self.forme_index)
     }
+
+    /// Tera Type assigned by Pokémon HOME for the species when not originally
+    /// from Scarlet/Violet
+    pub fn transferred_tera_type(&self) -> TeraType {
+        TeraType::Standard(match self.types {
+            (PkmType::Normal, Some(type2)) => type2,
+            (type1, _) => type1,
+        })
+    }
 }
 
 #[cfg(feature = "wasm")]
@@ -683,9 +691,15 @@ impl SpeciesAndForme {
     }
 }
 
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg(feature = "wasm")]
+#[wasm_bindgen]
 #[allow(clippy::missing_const_for_fn)]
 impl SpeciesAndForme {
+    #[wasm_bindgen(constructor)]
+    pub fn new_js(national_dex: u16, forme_index: u16) -> core::result::Result<Self, JsValue> {
+        Self::new(national_dex, forme_index).map_err(|e| JsValue::from_str(&e.to_string()))
+    }
+
     #[cfg_attr(feature = "wasm", wasm_bindgen(getter = nationalDex))]
     pub fn get_ndex_js(&self) -> u16 {
         self.national_dex.get()
