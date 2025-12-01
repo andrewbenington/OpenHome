@@ -24,6 +24,15 @@ export function range(startOrSize: number, end?: number) {
   return end ? [...Array(end).keys()].slice(startOrSize) : [...Array(startOrSize).keys()]
 }
 
+// remove this after node 22 is lts
+if (!Set.prototype.intersection) {
+  Set.prototype.intersection = function (other) {
+    const r = new Set()
+    for (const v of this) if (other.has(v)) r.add(v)
+    return r
+  }
+}
+
 export function intersection<T>(first: T[] | undefined, second: T[]): T[] {
   const set1 = new Set(first)
   const set2 = new Set(second)

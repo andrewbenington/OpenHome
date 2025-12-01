@@ -2,7 +2,7 @@
   "compilerOptions": {
     "strict": true,
     "composite": true,
-    "target": "es2024",
+    "target": "ESNext",
     "useDefineForClassFields": true,
     "lib": [
       "ESNext",
