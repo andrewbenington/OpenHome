@@ -25,17 +25,24 @@ If you use another distro, check the [Tauri docs](https://v2.tauri.app/start/pre
 
 ## Install Node.js and npm
 
-Node.js and npm are required to build the OpenHome application. Install them using your package manager. For example, on Ubuntu or Debian-based systems, run:
+Node.js is required to build the OpenHome application. Install it using your package manager. For example, on Ubuntu or Debian-based systems, run:
 
 ```bash
-sudo apt install nodejs npm
+sudo apt install nodejs
+
 ```
 
-Verify that Node.js and npm are installed by running:
+OpenHome uses the pnpm package manager, which can be installed by running
+
+```bash
+curl -fsSL https://get.pnpm.io/install.sh | sh -
+```
+
+Verify that Node.js and pnpm are installed by running:
 
 ```bash
 node -v
-npm -v
+pnpm -v
 ```
 
 If the versions are too old, consider using Node Version Manager (nvm) to install a newer version:
