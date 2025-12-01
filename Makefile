@@ -43,6 +43,10 @@ check:
 	@pnpm run lint
 	@pnpm run format
 
+.PHONY: test
+test: ensure-dependencies
+	@pnpm run test
+
 .PHONY: test-pkm-rs
 test-pkm-rs:
 	@cd pkm_rs && cargo test --package pkm_rs --lib -- tests::pkm::ohpkm --nocapture
