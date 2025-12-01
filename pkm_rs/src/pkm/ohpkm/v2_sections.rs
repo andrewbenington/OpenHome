@@ -996,6 +996,8 @@ pub struct PastHandlerData {
     pub affection: u8,
     pub gender: Gender,
     pub origin_game: Option<OriginGame>,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(getter_with_clone))]
+    pub origin_plugin: Option<String>,
 }
 
 impl PastHandlerData {
@@ -1010,16 +1012,24 @@ impl PastHandlerData {
                 affection: old.handler_affection,
                 gender: Gender::from(old.handler_gender),
                 origin_game: None,
+                origin_plugin: None,
             })
         } else {
             None
         }
     }
 
-    pub fn known_trainer_data_matches(&self, tid: u16, sid: u16, origin: OriginGame) -> bool {
+    pub fn known_trainer_data_matches(
+        &self,
+        tid: u16,
+        sid: u16,
+        game: OriginGame,
+        plugin: &Option<String>,
+    ) -> bool {
         self.id.is_some_and(|t| t.get() == tid)
             && self.secret_id.is_some_and(|s| s.get() == sid)
-            && self.origin_game.is_some_and(|game| game == origin)
+            && self.origin_game.is_some_and(|g| g == game)
+            && self.origin_plugin == *plugin
     }
 
     pub fn unknown_trainer_data_matches(
@@ -1030,13 +1040,14 @@ impl PastHandlerData {
         self.gender == gender && self.name == *name && self.origin_game.is_none()
     }
 
-    pub const fn update_from(&mut self, other: &TrainerData) {
+    pub fn update_from(&mut self, other: &TrainerData, plugin: Option<String>) {
         self.id = NonZeroU16::new(other.id);
         self.secret_id = NonZeroU16::new(other.secret_id);
         self.friendship = other.friendship;
         self.memory = other.memory;
         self.affection = other.affection;
         self.origin_game = other.origin_game;
+        self.origin_plugin = plugin;
     }
 }
 
@@ -1080,6 +1091,7 @@ impl PastHandlerData {
         affection: u8,
         gender: Gender,
         origin_game: Option<OriginGame>,
+        origin_plugin: Option<String>,
     ) -> Self {
         Self {
             id: id.and_then(NonZeroU16::new),
@@ -1090,6 +1102,7 @@ impl PastHandlerData {
             affection,
             gender,
             origin_game,
+            origin_plugin,
         }
     }
 }
@@ -1105,6 +1118,7 @@ impl From<TrainerData> for PastHandlerData {
             memory: other.memory,
             affection: other.affection,
             origin_game: other.origin_game,
+            origin_plugin: None,
         }
     }
 }
@@ -1116,6 +1130,12 @@ impl DataSection for PastHandlerData {
     type ErrorType = Error;
 
     fn from_bytes(bytes: &[u8]) -> Result<Self> {
+        let origin_plugin = if bytes.len() > SectionTagV2::PastHandler.min_size() {
+            String::from_utf8(bytes[SectionTagV2::PastHandler.min_size()..].to_vec()).ok()
+        } else {
+            None
+        };
+
         Ok(Self {
             id: Option::<NonZeroU16>::from_ohpkm_bytes(bytes[0..=1].try_into().unwrap()),
             secret_id: Option::<NonZeroU16>::from_ohpkm_bytes(bytes[2..=3].try_into().unwrap()),
@@ -1125,6 +1145,7 @@ impl DataSection for PastHandlerData {
             affection: bytes[36],
             gender: Gender::from_u8(bytes[37]),
             origin_game: Option::<OriginGame>::from_ohpkm_byte(bytes[38]),
+            origin_plugin,
         })
     }
 
@@ -1140,7 +1161,13 @@ impl DataSection for PastHandlerData {
         bytes[37] = self.gender.to_byte();
         bytes[38] = self.origin_game.to_ohpkm_byte();
 
-        Ok(bytes.to_vec())
+        let mut vec = bytes.to_vec();
+
+        if let Some(origin_plugin) = &self.origin_plugin {
+            vec.extend_from_slice(origin_plugin.as_bytes());
+        }
+
+        Ok(vec)
     }
 
     fn is_empty(&self) -> bool {

@@ -81,7 +81,7 @@ impl SectionTagV2 {
             Self::BdspTmFlags => 14,
             Self::LegendsArceus => 44,
             Self::ScarletViolet => 37,
-            Self::PastHandler => 12,
+            Self::PastHandler => 39,
             Self::PluginData => 0,
             Self::Notes => 0,
         }
@@ -1655,30 +1655,32 @@ impl OhpkmV2 {
         tid: u16,
         sid: u16,
         game: OriginGame,
+        plugin: Option<String>,
     ) -> Option<PastHandlerData> {
         self.handler_data
             .iter()
-            .find(|h| h.known_trainer_data_matches(tid, sid, game))
+            .find(|h| h.known_trainer_data_matches(tid, sid, game, &plugin))
             .cloned()
     }
 
     #[wasm_bindgen(js_name = registerHandler)]
-    pub fn register_handler(&mut self, handler: TrainerData) {
+    pub fn register_handler(&mut self, handler: TrainerData, plugin: Option<String>) {
         if let Some(origin_game) = handler.origin_game
-            && let Some(matching_known_record) = self
-                .handler_data
-                .iter_mut()
-                .find(|h| h.known_trainer_data_matches(handler.id, handler.secret_id, origin_game))
+            && let Some(matching_known_record) = self.handler_data.iter_mut().find(|h| {
+                h.known_trainer_data_matches(handler.id, handler.secret_id, origin_game, &plugin)
+            })
         {
-            matching_known_record.update_from(&handler);
+            matching_known_record.update_from(&handler, plugin);
         } else if let Some(matching_unknown_record) = self
             .handler_data
             .iter_mut()
             .find(|h| h.unknown_trainer_data_matches(&handler.name, handler.gender))
         {
-            matching_unknown_record.update_from(&handler)
+            matching_unknown_record.update_from(&handler, plugin)
         } else {
-            self.handler_data.push(handler.into());
+            let mut handler_data = PastHandlerData::from(handler);
+            handler_data.origin_plugin = plugin;
+            self.handler_data.push(handler_data);
         }
     }
 
