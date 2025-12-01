@@ -1,6 +1,7 @@
 # dependencies
 /node_modules
 /pkm_rs_resources/generate/node_modules
+/pkm_rs/generate/node_modules
 
 /.pnp
 .pnp.js
@@ -9,6 +10,8 @@ tsconfig.tsbuildinfo
 # testing
 /coverage
 tester.sh
+src/types/pkm/__test__/PKMFiles/OH
+src/types/pkm/__test__/PKMFiles/OhpkmV2
 
 # production
 /out
@@ -46,3 +49,5 @@ target/
 *.sublime-workspace
 *.sublime-project
 *.wakatime-project
+
+pkm_rs/pkm_files/ohpkm

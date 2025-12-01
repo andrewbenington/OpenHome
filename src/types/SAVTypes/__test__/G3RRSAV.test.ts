@@ -1,4 +1,4 @@
-import { SpeciesLookup } from '@pkm-rs-resources/pkg'
+import { SpeciesLookup } from '@pkm-rs/pkg'
 import { fail } from 'assert'
 import { existsSync, readFileSync, writeFileSync } from 'fs'
 import { resolve } from 'path'
@@ -6,6 +6,9 @@ import { beforeAll, describe, expect, test } from 'vitest'
 import { OHPKM } from '../../pkm/OHPKM'
 import { PathData } from '../path'
 import { G3RRSAV } from '../radicalred/G3RRSAV'
+import { initializeWasm } from './init'
+
+beforeAll(initializeWasm)
 
 describe('G3RRSAV - Radical Red Save File Read Test', () => {
   let radicalRedSave: G3RRSAV

@@ -1,4 +1,4 @@
-import { Item } from '@pkm-rs-resources/pkg'
+import { Item } from '@pkm-rs/pkg'
 
 const BallIcons: { [key: string]: string } = {
   Master: 'items/index/0001.png',

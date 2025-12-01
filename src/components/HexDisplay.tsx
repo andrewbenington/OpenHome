@@ -2,22 +2,16 @@ import { FileSchemas } from '@pokemon-files/schema'
 import { Flex, Grid } from '@radix-ui/themes'
 import { range } from 'lodash'
 import { useMemo, useState } from 'react'
-import { OHPKM } from 'src/types/pkm/OHPKM'
 import './components.css'
 
 interface HexDisplayProps {
   data: Uint8Array
-  format?: keyof typeof FileSchemas | 'OHPKM'
+  format?: keyof typeof FileSchemas
 }
 
 function HexDisplay({ data, format }: HexDisplayProps) {
   const [currentHover, setCurrentHover] = useState<number>()
-  const schema = useMemo(() => {
-    if (format === 'OHPKM') {
-      return OHPKM.schema
-    }
-    return format ? FileSchemas[format] : undefined
-  }, [format])
+  const schema = format ? FileSchemas[format] : undefined
 
   const hoveredField = useMemo(
     () =>

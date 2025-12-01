@@ -1,7 +1,7 @@
 import * as E from 'fp-ts/lib/Either'
 import fs from 'fs'
 import path from 'path'
-import { describe, expect, test } from 'vitest'
+import { beforeAll, describe, expect, test } from 'vitest'
 import { BW2SAV } from '../BW2SAV'
 import { BWSAV } from '../BWSAV'
 import { DPSAV } from '../DPSAV'
@@ -20,6 +20,9 @@ import { SMSAV } from '../SMSAV'
 import { G3UBSAV } from '../unbound/G3UBSAV'
 import { USUMSAV } from '../USUMSAV'
 import { XYSAV } from '../XYSAV'
+import { initializeWasm } from './init'
+
+beforeAll(initializeWasm)
 
 const files = {
   'crystal.sav': 'Crystal',

@@ -15,7 +15,7 @@ import { CSSProperties, useCallback, useContext, useEffect, useMemo, useRef, use
 import { BsFillGrid3X3GapFill } from 'react-icons/bs'
 import { FaSquare } from 'react-icons/fa'
 import { AddIcon, DevIcon, EditIcon, MenuIcon, MoveIcon, RemoveIcon } from 'src/components/Icons'
-import PokemonDetailsModal from 'src/pokemon/PokemonDetailsModal'
+import PokemonDetailsModal from 'src/pokemon-details/Modal'
 import { ErrorContext } from 'src/state/error'
 import { MonLocation, MonWithLocation } from 'src/state/saves/reducer'
 import { PKMInterface } from 'src/types/interfaces'

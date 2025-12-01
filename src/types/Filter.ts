@@ -1,4 +1,4 @@
-import { MetadataLookup, OriginGame } from '@pkm-rs-resources/pkg'
+import { MetadataLookup, OriginGame } from '@pkm-rs/pkg'
 import { Type } from '@pokemon-resources/index'
 import { PKMInterface } from './interfaces'
 import { isMegaStone, isZCrystal } from './pkm/util'
@@ -14,6 +14,8 @@ export interface Filter {
   ribbon?: string
   shiny?: string
   ball?: number
+  isEgg?: boolean
+  shinyLeaves?: number
 }
 
 export type HeldItemFilter = number | HeldItemCategory
@@ -30,6 +32,12 @@ export function filterApplies(filter: Filter, mon: PKMInterface) {
   }
   if (filter.ball !== undefined && 'ball' in mon && mon.ball !== filter.ball) {
     return false
+  }
+  if (filter.isEgg !== undefined && mon.isEgg !== filter.isEgg) {
+    return false
+  }
+  if (filter.shinyLeaves !== undefined && 'shinyLeaves' in mon) {
+    return mon.shinyLeaves && mon.shinyLeaves.count() >= filter.shinyLeaves
   }
   if (
     filter.ability !== undefined &&

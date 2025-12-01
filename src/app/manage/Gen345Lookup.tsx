@@ -1,4 +1,4 @@
-import { OriginGames } from '@pkm-rs-resources/pkg'
+import { OriginGames } from '@pkm-rs/pkg'
 import { Spinner } from '@radix-ui/themes'
 import OHDataGrid, { SortableColumn } from 'src/components/OHDataGrid'
 import PokemonIcon from 'src/components/PokemonIcon'

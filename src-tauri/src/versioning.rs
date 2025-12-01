@@ -1,8 +1,13 @@
+use pkm_rs::pkm::{
+    Pkm,
+    ohpkm::{OhpkmV1, OhpkmV2},
+};
 use semver::Version;
+use std::{fs, path::PathBuf};
 use strum::{self, EnumIter, IntoEnumIterator};
 
 use crate::{
-    deprecated::{self, BoxPreV1_5_0},
+    deprecated,
     error::{Error, Result},
     pkm_storage::{Bank, StoredBankData},
     util::{self, prepend_appdata_to_path, read_file_text, write_file_contents},
@@ -63,12 +68,14 @@ pub fn handle_version_migration(
         return Err(Error::outdated_version(last_used_semver, current_version));
     }
 
-    if current_version == last_used_semver {
+    if current_version == last_used_semver && !cfg!(debug_assertions) {
         println!("Version has not changed since last launch")
     } else {
-        println!(
-            "This version ({current_version}) is newer than last used version ({last_used_semver})"
-        );
+        if last_used_semver != current_version {
+            println!(
+                "This version ({current_version}) is newer than last used version ({last_used_semver})"
+            );
+        }
         let necessary_migrations = get_necessary_migrations(last_used_semver, current_version);
         println!("Necessary migrations: {necessary_migrations:?}");
 
@@ -85,18 +92,21 @@ pub fn handle_version_migration(
 #[derive(EnumIter, Clone, Copy, strum::Display, Debug)]
 pub enum Migration {
     V1_5_0ALPHA,
+    V1_8_0ALPHA,
 }
 
 impl Migration {
     pub fn version(&self) -> Version {
         match self {
             Migration::V1_5_0ALPHA => Version::parse("1.5.0-alpha-multiple-banks").unwrap(),
+            Migration::V1_8_0ALPHA => Version::parse("1.8.0-alpha-ohpkm-v2").unwrap(),
         }
     }
 
     pub fn do_migration(&self, app_handle: &tauri::AppHandle) -> Result<()> {
         match self {
             Migration::V1_5_0ALPHA => do_migration_1_5_0(app_handle),
+            Migration::V1_8_0ALPHA => do_migration_1_8_0(app_handle),
         }
     }
 }
@@ -117,8 +127,10 @@ pub fn do_migration_1_5_0(app_handle: &tauri::AppHandle) -> Result<()> {
         return Ok(());
     }
 
-    let mut old_boxes =
-        util::get_storage_file_json::<_, Vec<BoxPreV1_5_0>>(app_handle, deprecated::BOXDATA_FILE)?;
+    let mut old_boxes = util::get_storage_file_json::<_, Vec<deprecated::BoxPreV1_5_0>>(
+        app_handle,
+        deprecated::BOXDATA_FILE,
+    )?;
     old_boxes.sort_by_key(|b| b.index);
 
     let mut new_bank = Bank::default();
@@ -130,4 +142,45 @@ pub fn do_migration_1_5_0(app_handle: &tauri::AppHandle) -> Result<()> {
     let banks_path = util::prepend_appdata_storage_to_path(app_handle, "banks.json")?;
 
     util::write_file_json(banks_path, StoredBankData::from_banks(vec![new_bank]))
+}
+
+pub fn do_migration_1_8_0(app_handle: &tauri::AppHandle) -> Result<()> {
+    let mon_bytes = deprecated::get_all_ohpkm_v1_bytes(app_handle)?;
+    for (path, bytes) in mon_bytes {
+        let ohpkm_v1 = OhpkmV1::from_bytes(&bytes).map_err(|e| {
+            Error::other(&format!(
+                "Failed to parse OHPKM file during migration: {path}: {e}"
+            ))
+        })?;
+
+        let v2_dir = util::prepend_appdata_storage_to_path(app_handle, "mons_v2")?;
+        fs::create_dir_all(&v2_dir).map_err(|e| Error::FileWrite {
+            path: v2_dir,
+            source: Box::new(e),
+        })?;
+
+        let ohpkm_v2 = OhpkmV2::from_v1(ohpkm_v1);
+        let bytes_v2 = ohpkm_v2.to_bytes();
+        if let Ok(bytes_v2) = bytes_v2
+            && let Some(filename) = PathBuf::from(&path).file_name()
+        {
+            let v1_path = util::prepend_appdata_storage_to_path(
+                app_handle,
+                format!("mons_v1/{}", filename.to_string_lossy()),
+            )?;
+
+            if let Ok(bytes_v1) = ohpkm_v1.to_box_bytes() {
+                util::write_file_contents(v1_path, bytes_v1)?;
+            }
+
+            let v2_path = util::prepend_appdata_storage_to_path(
+                app_handle,
+                format!("mons_v2/{}", filename.to_string_lossy()),
+            )?;
+
+            util::write_file_contents(v2_path, bytes_v2)?;
+        }
+    }
+
+    Ok(())
 }

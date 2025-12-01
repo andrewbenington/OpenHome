@@ -1,4 +1,4 @@
-import { ItemGen2, Language, OriginGame } from '@pkm-rs-resources/pkg'
+import { Gender, ItemGen2, Language, OriginGame } from '@pkm-rs/pkg'
 import { PK2 } from '@pokemon-files/pkm'
 import { uniq } from 'lodash'
 import { EXCLAMATION } from 'src/consts/Formes'
@@ -296,5 +296,9 @@ export class G2SAV extends OfficialSAV<PK2> {
 
   static includesOrigin(origin: OriginGame) {
     return origin >= OriginGame.Gold && origin <= OriginGame.Crystal
+  }
+
+  get trainerGender() {
+    return this.origin === OriginGame.Crystal && this.bytes[0x3e3d] ? Gender.Female : Gender.Male
   }
 }

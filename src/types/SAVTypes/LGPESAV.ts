@@ -1,4 +1,4 @@
-import { OriginGame } from '@pkm-rs-resources/pkg'
+import { Gender, OriginGame } from '@pkm-rs/pkg'
 import { PB7 } from '@pokemon-files/pkm'
 import { utf16BytesToString } from '@pokemon-files/util'
 import { ceil, min } from 'lodash'
@@ -55,6 +55,7 @@ export class LGPESAV extends OfficialSAV<PB7> {
   tid: number = 0
   sid: number = 0
   displayID: string = ''
+  trainerGender: Gender = Gender.Male
 
   currentPCBox: number = 0 // TODO: Gen 7 current box
 
@@ -88,6 +89,7 @@ export class LGPESAV extends OfficialSAV<PB7> {
     this.currentPCBox = 0
     this.displayID = this.tid.toString().padStart(6, '0')
     this.origin = this.bytes[this.trainerDataOffset + 4]
+    this.trainerGender = this.bytes[this.trainerDataOffset + 5]
 
     this.pokeListHeader = new PokeListHeader(bytes.buffer as ArrayBuffer)
 

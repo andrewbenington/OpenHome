@@ -17,8 +17,8 @@ var slowpokeOhpkm: OHPKM
 
 beforeAll(() => {
   blazikenOhpkm = bytesToPKM(
-    new Uint8Array(fs.readFileSync(path.join(__dirname, './PKMFiles/OH', 'blaziken.ohpkm'))),
-    'OHPKM'
+    new Uint8Array(fs.readFileSync(path.join(__dirname, './PKMFiles/OhpkmV2', 'blaziken.ohpkm'))),
+    'OhpkmV2'
   ) as OHPKM
 
   blazikenPk3 = bytesToPKM(
@@ -27,8 +27,8 @@ beforeAll(() => {
   ) as PK3
 
   slowpokeOhpkm = bytesToPKM(
-    new Uint8Array(fs.readFileSync(path.join(__dirname, './PKMFiles/OH', 'slowpoke-shiny.ohpkm'))),
-    'OHPKM'
+    new Uint8Array(fs.readFileSync(path.join(__dirname, './PKMFiles/OhpkmV2', 'slowbro.ohpkm'))),
+    'OhpkmV2'
   ) as OHPKM
 })
 
@@ -60,7 +60,7 @@ test('gen 3 EVs are updated', () => {
     def: 0,
     spd: 0,
   }
-  blazikenOhpkm.updateData(emeraldPKM)
+  blazikenOhpkm.syncWithGameData(emeraldPKM)
   expect(blazikenOhpkm.evs).toStrictEqual({
     atk: 252,
     hp: 6,
@@ -83,7 +83,7 @@ test('gen 3 ribbons are updated', () => {
     'Cool Master (Hoenn)',
     'Winning',
   ]
-  blazikenOhpkm.updateData(emeraldPKM)
+  blazikenOhpkm.syncWithGameData(emeraldPKM)
   expect(blazikenOhpkm.ribbons).toContain('Cool Master (Hoenn)')
   expect(blazikenOhpkm.ribbons).toContain('Winning')
   expect(blazikenOhpkm.ribbons).toContain('Effort')
@@ -102,7 +102,7 @@ test('gen 3 contest stats are updated', () => {
     cute: 255,
     sheen: 1,
   }
-  blazikenOhpkm.updateData(emeraldPKM)
+  blazikenOhpkm.syncWithGameData(emeraldPKM)
   expect(blazikenOhpkm.contest).toStrictEqual({
     cool: 30,
     beauty: 255,

@@ -1,4 +1,4 @@
-VERSION=1.7.1
+VERSION=1.8.0-alpha-ohpkm-v2
 
 .PHONY: help
 help: # Display this help.
@@ -43,6 +43,10 @@ check:
 	@npm run lint
 	@npm run format
 
+.PHONY: test-pkm-rs
+test-pkm-rs:
+	@cd pkm_rs && cargo test --package pkm_rs --lib -- tests::pkm::ohpkm --nocapture
+
 .PHONY: check-rs
 check-rs:
 	@cd src-tauri && cargo clippy -- -Aclippy::needless_return
@@ -82,9 +86,11 @@ generate: generate/out/generate.js
 gen-wasm:
 # 	@node generate/gen_ribbons.ts
 # 	@cd pkm_rs_resources && node generate/gen_abilities.ts
-	@cd pkm_rs_resources && ts-node generate/gen_items.ts
-	@cd pkm_rs_resources && ts-node generate/gen_moves.ts
-	@cd pkm_rs_resources && ts-node generate/gen_species_data.ts
+	@npm i
+# 	@cd pkm_rs_resources && ts-node generate/gen_abilities.ts
+	@ts-node generate/gen_items.ts
+	@ts-node generate/gen_moves.ts
+	@ts-node generate/gen_species_data.ts
 	@cd pkm_rs_resources && cargo fmt
 	
 generate/out/syncPKHexResources.js: generate/syncPKHexResources.ts

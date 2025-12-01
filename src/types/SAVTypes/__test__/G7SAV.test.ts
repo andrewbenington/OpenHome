@@ -4,6 +4,9 @@ import { beforeAll, describe, expect, test } from 'vitest'
 import { PathData } from '../path'
 import { SMSAV } from '../SMSAV'
 import { USUMSAV } from '../USUMSAV'
+import { initializeWasm } from './init'
+
+beforeAll(initializeWasm)
 
 describe('gen 7 save files', () => {
   let ultraSunSave: USUMSAV

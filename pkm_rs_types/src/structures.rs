@@ -4,7 +4,7 @@ use strum_macros::{Display, EnumString};
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
-use crate::util;
+use crate::{OriginGame, strings::SizedUtf16String, util};
 
 const MASK_BITS_1_2: u8 = 0b00000110;
 const MASK_BITS_1_2_INVERTED: u8 = 0b11111001;
@@ -25,42 +25,51 @@ pub enum Gender {
 impl Gender {
     pub const fn set_bits_1_2(&self, dest: &mut u8) {
         *dest &= MASK_BITS_1_2_INVERTED;
-        *dest |= self.to_numeric() << 1
+        *dest |= self.to_byte() << 1
     }
 
-    pub const fn from_bits_1_2(source: u8) -> Self {
+    pub fn from_bits_1_2(source: u8) -> Self {
         let numeric_val = (source & MASK_BITS_1_2) >> 1;
         match numeric_val {
             0 => Self::Male,
             1 => Self::Female,
             2 => Self::Genderless,
             3 => Self::Invalid,
-            _ => unreachable!(),
+            _ => panic!("invalid gender: {numeric_val}"),
         }
     }
 
     pub const fn set_bits_2_3(&self, dest: &mut u8) {
         *dest &= MASK_BITS_2_3_INVERTED;
-        *dest |= self.to_numeric() << 2
+        *dest |= self.to_byte() << 2
     }
 
-    pub const fn from_bits_2_3(source: u8) -> Self {
+    pub fn from_bits_2_3(source: u8) -> Self {
         let numeric_val = (source & MASK_BITS_2_3) >> 2;
         match numeric_val {
             0 => Self::Male,
             1 => Self::Female,
             2 => Self::Genderless,
             3 => Self::Invalid,
-            _ => unreachable!(),
+            _ => panic!("invalid gender: {numeric_val}"),
         }
     }
 
-    const fn to_numeric(self) -> u8 {
+    pub const fn to_byte(self) -> u8 {
         match self {
             Gender::Male => 0,
             Gender::Female => 1,
             Gender::Genderless => 2,
             Gender::Invalid => 3,
+        }
+    }
+
+    pub const fn from_u8(byte: u8) -> Self {
+        match byte {
+            0 => Self::Male,
+            1 => Self::Female,
+            2 => Self::Genderless,
+            _ => Self::Invalid,
         }
     }
 }
@@ -76,11 +85,13 @@ pub fn gender_from_bool(value: bool) -> Gender {
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = genderToInt))]
+#[allow(clippy::missing_const_for_fn)]
 pub fn gender_to_int(value: Gender) -> u8 {
-    value.to_numeric()
+    value.to_byte()
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = genderFromInt))]
+#[allow(clippy::missing_const_for_fn)]
 pub fn gender_from_int(value: u8) -> Gender {
     Gender::from_bits_1_2(value)
 }
@@ -153,6 +164,10 @@ impl<const N: usize> FlagSet<N> {
         let mut set = Self::default();
         set.add_indices(indices);
         set
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.raw.iter().all(|byte| *byte == 0)
     }
 }
 
@@ -259,6 +274,54 @@ impl Serialize for PokeDate {
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[derive(Debug, Serialize, Clone)]
+pub struct TrainerData {
+    pub id: u16,
+    pub secret_id: u16,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+    pub name: SizedUtf16String<26>,
+    pub friendship: u8,
+    pub memory: TrainerMemory,
+    pub affection: u8,
+    pub gender: Gender,
+    pub origin_game: Option<OriginGame>,
+}
+
+#[cfg(feature = "wasm")]
+#[wasm_bindgen]
+#[allow(clippy::missing_const_for_fn)]
+#[allow(clippy::too_many_arguments)]
+impl TrainerData {
+    #[wasm_bindgen(getter)]
+    pub fn name(&self) -> String {
+        self.name.to_string()
+    }
+
+    #[wasm_bindgen(constructor)]
+    pub fn new(
+        id: u16,
+        secret_id: u16,
+        name: String,
+        friendship: u8,
+        memory: Option<TrainerMemory>,
+        affection: u8,
+        gender: Gender,
+        origin_game: Option<OriginGame>,
+    ) -> Self {
+        Self {
+            id,
+            secret_id,
+            name: name.into(),
+            friendship,
+            memory: memory.unwrap_or_default(),
+            affection,
+            gender,
+            origin_game,
+        }
+    }
+}
+
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Debug, Clone, Copy, Default, Serialize)]
 pub struct TrainerMemory {
     pub intensity: u8,
@@ -267,6 +330,28 @@ pub struct TrainerMemory {
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = textVariables))]
     pub text_variable: u16,
+}
+
+impl TrainerMemory {
+    pub fn from_bytes_in_order(bytes: &[u8; 5]) -> Self {
+        Self {
+            intensity: bytes[0],
+            memory: bytes[1],
+            feeling: bytes[2],
+            text_variable: u16::from_le_bytes(bytes[3..5].try_into().unwrap()),
+        }
+    }
+
+    pub fn to_bytes_in_order(&self) -> [u8; 5] {
+        let mut bytes = [0u8; 5];
+
+        bytes[0] = self.intensity;
+        bytes[1] = self.memory;
+        bytes[2] = self.feeling;
+        bytes[3..5].copy_from_slice(&self.text_variable.to_le_bytes());
+
+        bytes
+    }
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
@@ -375,6 +460,122 @@ impl BitSet for u8 {
     }
 }
 
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[derive(Default, Debug, Clone, Copy)]
+pub struct ShinyLeaves(u8);
+
+impl ShinyLeaves {
+    pub const fn from_byte(byte: u8) -> Self {
+        match byte >> 5 {
+            1 => Self(0b100000),
+            _ => Self(byte & 0b11111),
+        }
+    }
+
+    pub const fn to_byte(&self) -> u8 {
+        self.0
+    }
+
+    pub const fn is_empty(&self) -> bool {
+        self.0 == 0
+    }
+}
+
+#[cfg(feature = "wasm")]
+impl Serialize for ShinyLeaves {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        if self.has_crown() {
+            serializer.serialize_str("Crown")
+        } else if self.0 == 0 {
+            serializer.serialize_str("No Leaves")
+        } else {
+            let mut leaves = vec![];
+            if self.has_first() {
+                leaves.push("First");
+            }
+            if self.has_second() {
+                leaves.push("Second");
+            }
+            if self.has_third() {
+                leaves.push("Third");
+            }
+            if self.has_fourth() {
+                leaves.push("Fourth");
+            }
+            if self.has_fifth() {
+                leaves.push("Fifth");
+            }
+            serializer.serialize_str(&leaves.join(", "))
+        }
+    }
+}
+
+#[cfg(feature = "wasm")]
+#[wasm_bindgen]
+#[allow(clippy::missing_const_for_fn)]
+impl ShinyLeaves {
+    #[wasm_bindgen(constructor)]
+    pub fn new_empty() -> Self {
+        Self::default()
+    }
+
+    #[wasm_bindgen(js_name = fromByte)]
+    pub fn from_byte_js(byte: u8) -> Self {
+        Self::from_byte(byte)
+    }
+
+    #[wasm_bindgen(js_name = toByte)]
+    pub fn to_byte_js(&self) -> u8 {
+        self.to_byte()
+    }
+
+    #[wasm_bindgen(js_name = hasFirst)]
+    pub fn has_first(&self) -> bool {
+        (self.0 & 0b00001) != 0
+    }
+
+    #[wasm_bindgen(js_name = hasSecond)]
+    pub fn has_second(&self) -> bool {
+        (self.0 & 0b00010) != 0
+    }
+
+    #[wasm_bindgen(js_name = hasThird)]
+    pub fn has_third(&self) -> bool {
+        (self.0 & 0b00100) != 0
+    }
+
+    #[wasm_bindgen(js_name = hasFourth)]
+    pub fn has_fourth(&self) -> bool {
+        (self.0 & 0b01000) != 0
+    }
+
+    #[wasm_bindgen(js_name = hasFifth)]
+    pub fn has_fifth(&self) -> bool {
+        (self.0 & 0b10000) != 0
+    }
+
+    #[wasm_bindgen(js_name = hasCrown)]
+    pub fn has_crown(&self) -> bool {
+        (self.0 & 0b100000) != 0
+    }
+
+    pub fn count(&self) -> u8 {
+        if self.has_crown() {
+            return 0;
+        }
+
+        self.0.count_ones() as u8
+    }
+
+    #[wasm_bindgen(js_name = clone)]
+    pub fn clone_js(&self) -> Self {
+        Self::from_byte(self.0)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -419,5 +620,29 @@ mod tests {
         let mut byte_with_invalid_gender = 0b00000110;
         Gender::Female.set_bits_1_2(&mut byte_with_invalid_gender);
         assert_eq!(byte_with_invalid_gender, 0b00000010);
+    }
+
+    #[cfg(feature = "wasm")]
+    #[test]
+    fn shiny_leaves_to_from_byte() {
+        let byte = 0b01010;
+        let leaves = ShinyLeaves::from_byte(byte);
+
+        assert!(!leaves.has_first());
+        assert!(leaves.has_second());
+        assert!(!leaves.has_third());
+        assert!(leaves.has_fourth());
+        assert!(!leaves.has_fifth());
+        assert!(!leaves.has_crown());
+
+        let back_to_byte = leaves.to_byte();
+        assert_eq!(byte, back_to_byte);
+
+        let crown_byte = 0b100000;
+        let crown = ShinyLeaves::from_byte(crown_byte);
+
+        let ShinyLeaves::Crown = crown else {
+            panic!("expected crown, got leaves");
+        };
     }
 }

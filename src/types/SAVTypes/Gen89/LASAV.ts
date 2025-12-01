@@ -1,4 +1,4 @@
-import { Languages, OriginGame } from '@pkm-rs-resources/pkg'
+import { Gender, Languages, OriginGame } from '@pkm-rs/pkg'
 import { PA8 } from '@pokemon-files/pkm'
 import { utf16BytesToString } from '@pokemon-files/util'
 import { LA_TRANSFER_RESTRICTIONS } from '../../../consts/TransferRestrictions'
@@ -130,6 +130,10 @@ export class LASAV extends G89SAV<PA8> {
 
   static includesOrigin(origin: OriginGame) {
     return origin === OriginGame.LegendsArceus
+  }
+
+  get trainerGender() {
+    return this.myStatusBlock.getGender() ? Gender.Female : Gender.Male
   }
 }
 

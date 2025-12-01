@@ -36,7 +36,7 @@ const recoverOHPKMData = (
         const storedOhpkm = getOhpkmById?.(homeIdentifier)
 
         if (storedOhpkm) {
-          storedOhpkm.updateData(mon)
+          storedOhpkm.syncWithGameData(mon, saveFile)
           if (updateMonCallback) {
             updateMonCallback(storedOhpkm)
           }

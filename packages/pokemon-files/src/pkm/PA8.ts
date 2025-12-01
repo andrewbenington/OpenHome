@@ -9,7 +9,7 @@ import {
   MetadataLookup,
   NatureIndex,
   SpeciesLookup,
-} from '@pkm-rs-resources/pkg'
+} from '@pkm-rs/pkg'
 import { ModernRibbons } from '@pokemon-resources/index'
 import { getHeightCalculated, getWeightCalculated } from '../../../../src/types/pkm/util'
 import * as byteLogic from '../util/byteLogic'
