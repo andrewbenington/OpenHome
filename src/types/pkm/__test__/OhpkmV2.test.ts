@@ -57,12 +57,14 @@ describe('gen 3 conversion to OHPKM V2 and back is lossless', async () => {
 
 describe('OHPKM V1 → V2 → V1 is lossless', () => {
   const files = fs
-    .readdirSync(path.join(__dirname, 'PKMFiles', 'OH'))
+    .readdirSync(path.join(__dirname, 'PKMFiles', 'OhpkmV1'))
     .filter((f) => f.endsWith('.ohpkm'))
 
   for (const file of files) {
     test(file, () => {
-      const bytes = new Uint8Array(fs.readFileSync(path.join(__dirname, 'PKMFiles', 'OH', file)))
+      const bytes = new Uint8Array(
+        fs.readFileSync(path.join(__dirname, 'PKMFiles', 'OhpkmV1', file))
+      )
 
       const original = bytesToPKM(bytes, 'OhpkmV1') as OhpkmV1
       original.fixErrors()
@@ -86,11 +88,11 @@ describe('OHPKM V1 WASM → V2 → V1 is lossless', async () => {
   await initializeWasm()
 
   const files = fs
-    .readdirSync(path.join(__dirname, 'PKMFiles', 'OH'))
+    .readdirSync(path.join(__dirname, 'PKMFiles', 'OhpkmV1'))
     .filter((f) => f.endsWith('.ohpkm'))
 
   for (const file of files) {
-    const bytes = new Uint8Array(fs.readFileSync(path.join(__dirname, 'PKMFiles', 'OH', file)))
+    const bytes = new Uint8Array(fs.readFileSync(path.join(__dirname, 'PKMFiles', 'OhpkmV1', file)))
     const original = bytesToPKM(bytes, 'OhpkmV1') as OhpkmV1
     original.fixErrors()
 
