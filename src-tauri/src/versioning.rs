@@ -1,19 +1,15 @@
-use std::{fs, path::PathBuf};
-
 use pkm_rs::pkm::{
     Pkm,
     ohpkm::{OhpkmV1, OhpkmV2},
 };
 use semver::Version;
-use strum::{self, EnumIter};
-
-#[cfg(not(debug_assertions))]
-use strum::IntoEnumIterator;
+use std::{fs, path::PathBuf};
+use strum::{self, EnumIter, IntoEnumIterator};
 
 use crate::{
-    deprecated::{self, BoxPreV1_5_0},
+    deprecated,
     error::{Error, Result},
-    pkm_storage::{Bank, StoredBankData, get_all_ohpkm_bytes},
+    pkm_storage::{Bank, StoredBankData},
     util::{self, prepend_appdata_to_path, read_file_text, write_file_contents},
 };
 
@@ -75,9 +71,11 @@ pub fn handle_version_migration(
     if current_version == last_used_semver && !cfg!(debug_assertions) {
         println!("Version has not changed since last launch")
     } else {
-        println!(
-            "This version ({current_version}) is newer than last used version ({last_used_semver})"
-        );
+        if last_used_semver != current_version {
+            println!(
+                "This version ({current_version}) is newer than last used version ({last_used_semver})"
+            );
+        }
         let necessary_migrations = get_necessary_migrations(last_used_semver, current_version);
         println!("Necessary migrations: {necessary_migrations:?}");
 
@@ -113,7 +111,6 @@ impl Migration {
     }
 }
 
-#[cfg(not(debug_assertions))]
 pub fn get_necessary_migrations(
     last_launch_version: Version,
     current_version: Version,
@@ -123,14 +120,6 @@ pub fn get_necessary_migrations(
         .collect()
 }
 
-#[cfg(debug_assertions)]
-pub fn get_necessary_migrations(
-    last_launch_version: Version,
-    current_version: Version,
-) -> Vec<Migration> {
-    vec![Migration::V1_8_0ALPHA]
-}
-
 pub fn do_migration_1_5_0(app_handle: &tauri::AppHandle) -> Result<()> {
     // Skip migration logic if no box data file exists
     let full_path = util::prepend_appdata_storage_to_path(app_handle, deprecated::BOXDATA_FILE)?;
@@ -138,8 +127,10 @@ pub fn do_migration_1_5_0(app_handle: &tauri::AppHandle) -> Result<()> {
         return Ok(());
     }
 
-    let mut old_boxes =
-        util::get_storage_file_json::<_, Vec<BoxPreV1_5_0>>(app_handle, deprecated::BOXDATA_FILE)?;
+    let mut old_boxes = util::get_storage_file_json::<_, Vec<deprecated::BoxPreV1_5_0>>(
+        app_handle,
+        deprecated::BOXDATA_FILE,
+    )?;
     old_boxes.sort_by_key(|b| b.index);
 
     let mut new_bank = Bank::default();
@@ -154,18 +145,12 @@ pub fn do_migration_1_5_0(app_handle: &tauri::AppHandle) -> Result<()> {
 }
 
 pub fn do_migration_1_8_0(app_handle: &tauri::AppHandle) -> Result<()> {
-    let mon_bytes = get_all_ohpkm_bytes(app_handle)?;
+    let mon_bytes = deprecated::get_all_ohpkm_v1_bytes(app_handle)?;
     for (path, bytes) in mon_bytes {
         let ohpkm_v1 = OhpkmV1::from_bytes(&bytes).map_err(|e| {
             Error::other(&format!(
                 "Failed to parse OHPKM file during migration: {path}: {e}"
             ))
-        })?;
-
-        let v1_dir = util::prepend_appdata_storage_to_path(app_handle, "mons_v1")?;
-        fs::create_dir_all(&v1_dir).map_err(|e| Error::FileWrite {
-            path: v1_dir,
-            source: Box::new(e),
         })?;
 
         let v2_dir = util::prepend_appdata_storage_to_path(app_handle, "mons_v2")?;

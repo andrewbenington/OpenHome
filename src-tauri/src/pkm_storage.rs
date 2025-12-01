@@ -1,14 +1,9 @@
-use std::{collections::HashMap, fs};
+use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::{
-    commands::get_file_bytes,
-    deprecated,
-    error::{Error, Result},
-    util,
-};
+use crate::{error::Result, util};
 
 #[derive(Default, Serialize, Deserialize, Clone)]
 pub struct StoredBankData {
@@ -109,6 +104,7 @@ impl Box {
 }
 
 pub type BoxIdentifiers = HashMap<u8, String>;
+pub type FilenameToBytesMap = HashMap<String, Vec<u8>>;
 
 #[tauri::command]
 pub fn load_banks(app_handle: tauri::AppHandle) -> Result<StoredBankData> {
@@ -127,45 +123,5 @@ pub fn write_banks(app_handle: tauri::AppHandle, mut bank_data: StoredBankData) 
     bank_data.order_boxes_by_indices();
     bank_data.reset_box_indices();
 
-    util::write_storage_file_json(&app_handle, "banks.json", &bank_data)?;
-
-    // For now, we will also update box-data.json with Bank 1 data to work with previous versions of OpenHome
-    let first_bank = bank_data.banks.into_iter().find(|bank| bank.index == 0);
-    let Some(first_bank) = first_bank else {
-        return Err(Error::other(
-            "No bank with index 0; Previous versions of OpenHome will not see updated data.",
-        ));
-    };
-
-    let old_box_data: Vec<deprecated::BoxPreV1_5_0> = first_bank
-        .boxes
-        .into_iter()
-        .map(deprecated::BoxPreV1_5_0::from_current)
-        .collect();
-    util::write_storage_file_json(&app_handle, "box-data.json", old_box_data)
-}
-
-pub type FilenameToBytesMap = HashMap<String, Vec<u8>>;
-
-pub fn get_all_ohpkm_bytes(app_handle: &tauri::AppHandle) -> Result<FilenameToBytesMap> {
-    let mons_path = util::prepend_appdata_storage_to_path(app_handle, "mons")?;
-    let mon_files = fs::read_dir(&mons_path).map_err(|e| Error::file_access(&mons_path, e))?;
-
-    let mut map = HashMap::new();
-    for mon_file_os_str in mon_files.flatten() {
-        let path = mon_file_os_str.path();
-        if !path
-            .extension()
-            .is_some_and(|ext| ext.eq_ignore_ascii_case("ohpkm"))
-        {
-            continue;
-        }
-
-        if let Ok(mon_bytes) = util::read_file_bytes(path) {
-            let mon_filename = mon_file_os_str.file_name().to_string_lossy().into_owned();
-            map.insert(mon_filename, mon_bytes);
-        }
-    }
-
-    Ok(map)
+    util::write_storage_file_json(&app_handle, "banks.json", &bank_data)
 }

@@ -1,5 +1,5 @@
 use crate::error::{Error, Result};
-use crate::pkm_storage::{FilenameToBytesMap, get_all_ohpkm_bytes};
+use crate::pkm_storage::FilenameToBytesMap;
 use crate::plugin::{self, PluginMetadata, PluginMetadataWithIcon, list_downloaded_plugins};
 use crate::state::{AppState, AppStateSnapshot, PokedexState};
 use crate::util::ImageResponse;
