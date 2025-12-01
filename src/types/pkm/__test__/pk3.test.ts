@@ -72,9 +72,7 @@ test('gen 3 EVs are updated', () => {
 })
 
 test('gen 3 ribbons are updated', () => {
-  console.log('blazikenOhpkm ribbons', blazikenOhpkm.ribbons)
   const emeraldPKM = new PK3(blazikenOhpkm)
-  console.log('emeraldPKM ribbons', emeraldPKM.ribbons)
 
   // gaining Gen 3 ribbons
   emeraldPKM.ribbons = [
