@@ -12,6 +12,7 @@ npm -v
 ```
 
 ## Download and install pnpm
+
 This project uses pnpm, a package manager, to install and manage module dependencies.
 
 Compared to npm as a package manager, pnpm saves disk storage, reduces runtime and removes package redundancy by keeping a singular global store of installed packages referenced with symlinks from the project. You can visit https://pnpm.io/ for more info.
