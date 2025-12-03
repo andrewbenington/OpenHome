@@ -16,6 +16,7 @@
     "type": "git",
     "url": "git+https://github.com/andrewbenington/OpenHome.git"
   },
+  "packageManager": "pnpm@10.24.0",
   "license": "GPL-3.0-only",
   "author": {
     "name": "Andrew Benington",
@@ -23,14 +24,15 @@
   },
   "main": "./out/main/index.js",
   "scripts": {
+    "preinstall": "npx only-allow pnpm",
     "format": "prettier --write .",
     "lint": "eslint src --max-warnings 0 --report-unused-disable-directives -c eslint.config.mjs --fix",
     "lint:ci": "eslint src --max-warnings 0 --report-unused-disable-directives -c eslint.config.mjs",
     "typecheck": "tsc",
     "dev:unix": "./buildVersionJSON.sh && tauri dev",
     "dev:win": "powershell -ExecutionPolicy Bypass -File ./buildVersionJSON.ps1 && tauri dev",
-    "build": "npm run wasm && vite build",
-    "dev": "npm run wasm && vite",
+    "build": "pnpm run wasm && pnpm vite build",
+    "dev": "pnpm run wasm && pnpm vite",
     "tauri": "tauri",
     "test": "vitest run",
     "wasm-resources": "wasm-pack build ./pkm_rs_resources --target web -- --features wasm",
@@ -40,8 +42,10 @@
   },
   "dependencies": {
     "@dnd-kit/collision": "^0.1.21",
+    "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/react": "^0.1.21",
     "@dnd-kit/sortable": "^10.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
     "@radix-ui/themes": "^3.2.1",
     "@tanstack/react-virtual": "^3.13.12",
     "@tauri-apps/api": "^2.9.0",
@@ -54,10 +58,12 @@
     "dayjs": "^1.11.19",
     "fp-ts": "^2.16.11",
     "lodash": "^4.17.21",
+    "pnpm": "^10.23.0",
     "prando": "^6.0.1",
-    "react": "^19.1.0",
+    "radix-ui": "^1.4.3",
+    "react": "^19.2.0",
     "react-chartjs-2": "^5.3.1",
-    "react-data-grid": "^7.0.0-beta.58",
+    "react-data-grid": "7.0.0-beta.58",
     "react-error-boundary": "^6.0.0",
     "react-icons": "^5.5.0",
     "uuid": "^13.0.0"
@@ -67,10 +73,11 @@
     "@tauri-apps/cli": "^2.9.4",
     "@types/crypto-js": "^4.2.2",
     "@types/lodash": "^4.17.20",
+    "@types/node": "^24.10.1",
     "@types/react": "^19.2.6",
     "@types/react-dom": "^19.2.3",
     "@typescript-eslint/eslint-plugin": "^8.47.0",
-    "@typescript-eslint/parser": "^8.44.1",
+    "@typescript-eslint/parser": "^8.47.0",
     "@vitejs/plugin-react": "^5.1.1",
     "better-sqlite3": "^12.4.6",
     "camelcase-keys": "^10.0.1",
@@ -83,7 +90,7 @@
     "prettier": "^3.6.2",
     "react-dom": "^19.2.0",
     "typescript": "^5.9.3",
-    "vite": "^7.2.2",
-    "vitest": "^4.0.10"
+    "vite": "^7.2.4",
+    "vitest": "^4.0.12"
   }
 }

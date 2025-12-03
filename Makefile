@@ -13,9 +13,9 @@ build-mac-intel:
 	@npx tauri build --target x86_64-apple-darwin
 
 .PHONY: start
-start: wasm-deps
-	@npm i
-	@npm run tauri dev
+start: ensure-dependencies
+	@pnpm i
+	@pnpm run tauri dev
 
 .PHONY: build-appimage
 build-appimage:
@@ -27,11 +27,11 @@ bundle-appimage:
 
 .PHONY: preview
 preview:
-	@npm run start
+	@pnpm run start
 
 .PHONY: lint
 lint:
-	@npm run lint
+	@pnpm run lint
 
 .PHONY: clean
 clean:
@@ -39,9 +39,13 @@ clean:
 
 .PHONY: check
 check:
-	@npm run typecheck
-	@npm run lint
-	@npm run format
+	@pnpm run typecheck
+	@pnpm run lint
+	@pnpm run format
+
+.PHONY: test
+test: ensure-dependencies
+	@pnpm run test
 
 .PHONY: test-pkm-rs
 test-pkm-rs:
@@ -51,14 +55,22 @@ test-pkm-rs:
 check-rs:
 	@cd src-tauri && cargo clippy -- -Aclippy::needless_return
 
-.PHONY: wasm-deps
-wasm-deps:
+.PHONY: ensure-pnpm
+ensure-pnpm:
+ifeq ($(shell which pnpm 2>/dev/null), )
+	@echo "pnpm not installed! installing..."
+	@curl -fsSL https://get.pnpm.io/install.sh | sh -
+endif
+
+.PHONY: ensure-wasm-pack
+ensure-wasm-pack:
 ifeq ($(shell which wasm-pack 2>/dev/null), )
 	@echo "wasm-pack not installed! installing..."
 	@cargo install wasm-pack
-else
-	@echo "wasm-pack already installed!"
 endif
+
+.PHONY: ensure-dependencies
+ensure-dependencies: ensure-pnpm ensure-wasm-pack
 
 .PHONY: set-version
 set-version:
@@ -66,7 +78,7 @@ set-version:
 	@npx prettier --write src-tauri/tauri.conf.json
 	@cargo install cargo-edit
 	@cd src-tauri && cargo set-version $(VERSION)
-	@npm version $(VERSION) --no-git-tag-version --allow-same-version 
+	@pnpm version $(VERSION) --no-git-tag-version --allow-same-version 
 
 .PHONY: release-mac
 release-mac:
@@ -108,4 +120,4 @@ download-item-sprites:
 	@python3 generate/downloadAllItems.py
 
 %:
-	@npm run $@
+	@pnpm run $@
