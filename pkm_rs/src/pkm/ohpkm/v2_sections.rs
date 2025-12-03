@@ -1032,6 +1032,7 @@ impl PastHandlerData {
             && self.origin_plugin == *plugin
     }
 
+    #[cfg(feature = "wasm")]
     pub fn unknown_trainer_data_matches(
         &self,
         name: &SizedUtf16String<26>,
@@ -1040,6 +1041,7 @@ impl PastHandlerData {
         self.gender == gender && self.name == *name && self.origin_game.is_none()
     }
 
+    #[cfg(feature = "wasm")]
     pub fn update_from(&mut self, other: &TrainerData, plugin: Option<String>) {
         self.id = NonZeroU16::new(other.id);
         self.secret_id = NonZeroU16::new(other.secret_id);
