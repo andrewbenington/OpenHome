@@ -28,10 +28,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: setup node
-        uses: actions/setup-node@v4
-        with:
-          node-version: lts/*
+      - name: Install PNPM
+        uses: pnpm/action-setup@v4
 
       - name: install Rust stable
         uses: dtolnay/rust-toolchain@stable
@@ -41,8 +39,8 @@ jobs:
       - name: Install wasm-pack
         run: cargo install wasm-pack
 
-      - name: install frontend dependencies
-        run: npm install # change this to npm, pnpm or bun depending on which one you use.
+      - name: Install Frontend Dependencies
+        run: pnpm i --frozen-lockfile
 
       - name: build version.json
         run: powershell -ExecutionPolicy Bypass -File ./buildVersionJSON.ps1

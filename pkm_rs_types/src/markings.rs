@@ -182,8 +182,8 @@ impl MarkingsSixShapesColors {
         let u16_val = u16::from_le_bytes(bytes);
         Self {
             circle: MarkingValue::from_u16(u16_val & 3),
-            square: MarkingValue::from_u16((u16_val >> 2) & 3),
-            triangle: MarkingValue::from_u16((u16_val >> 4) & 3),
+            triangle: MarkingValue::from_u16((u16_val >> 2) & 3),
+            square: MarkingValue::from_u16((u16_val >> 4) & 3),
             heart: MarkingValue::from_u16((u16_val >> 6) & 3),
             star: MarkingValue::from_u16((u16_val >> 8) & 3),
             diamond: MarkingValue::from_u16((u16_val >> 10) & 3),
@@ -193,8 +193,8 @@ impl MarkingsSixShapesColors {
     pub const fn to_bytes(self) -> [u8; 2] {
         let mut u16_val = 0u16;
         u16_val |= self.circle.to_u16();
-        u16_val |= self.square.to_u16() << 2;
-        u16_val |= self.triangle.to_u16() << 4;
+        u16_val |= self.triangle.to_u16() << 2;
+        u16_val |= self.square.to_u16() << 4;
         u16_val |= self.heart.to_u16() << 6;
         u16_val |= self.star.to_u16() << 8;
         u16_val |= self.diamond.to_u16() << 10;

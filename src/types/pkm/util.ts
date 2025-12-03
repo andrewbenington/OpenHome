@@ -1,3 +1,4 @@
+import { AbilityIndex, MetadataLookup, SpeciesAndForme, SpeciesLookup } from '@pkm-rs/pkg'
 import { PKM } from '@pokemon-files/pkm'
 import { Stats, StatsPreSplit } from '@pokemon-files/util'
 import {
@@ -11,7 +12,6 @@ import {
   SpeedCharacteristics,
   Type,
 } from '@pokemon-resources/index'
-import lodash from 'lodash'
 import Prando from 'prando'
 import { NationalDex } from 'src/consts/NationalDex'
 import {
@@ -20,12 +20,6 @@ import {
   uint16ToBytesLittleEndian,
   writeUint32ToBuffer,
 } from 'src/util/byteLogic'
-import {
-  AbilityIndex,
-  MetadataLookup,
-  SpeciesAndForme,
-  SpeciesLookup,
-} from '../../../pkm_rs_resources/pkg/pkm_rs_resources'
 import { Item } from '../../consts/Items'
 import { PKMInterface } from '../interfaces'
 import { OHPKM } from './OHPKM'
@@ -297,7 +291,7 @@ export const getMoveMaxPP = (moveIndex: number, format: string, ppUps = 0) => {
   if ((format === 'PK1' || format === 'PK2') && baseMaxPP === 40) {
     return baseMaxPP + Math.floor(ppUps * 7)
   }
-  return move.pp // baseMaxPP + Math.floor(ppUps * (baseMaxPP / 5))
+  return baseMaxPP + Math.floor(ppUps * (baseMaxPP / 5))
 }
 
 export const adjustMovePPBetweenFormats = (
@@ -337,7 +331,14 @@ export function getCharacteristic(mon: PKMInterface) {
 
   if (!mon.ivs || !tiebreaker) return ''
   const statFields = ['hp', 'atk', 'def', 'spe', 'spa', 'spd']
-  const maxIV = lodash.max(Object.values(mon.ivs))
+  const maxIV = Math.max(
+    mon.ivs.hp,
+    mon.ivs.atk,
+    mon.ivs.def,
+    mon.ivs.spa,
+    mon.ivs.spd,
+    mon.ivs.spe
+  )
   const lastIndex = tiebreaker % 6 === 0 ? 5 : (tiebreaker % 6) - 1
   let determiningIV = 'hp'
 

@@ -3,11 +3,7 @@ use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::{
-    deprecated,
-    error::{Error, Result},
-    util,
-};
+use crate::{error::Result, util};
 
 #[derive(Default, Serialize, Deserialize, Clone)]
 pub struct StoredBankData {
@@ -108,6 +104,7 @@ impl Box {
 }
 
 pub type BoxIdentifiers = HashMap<u8, String>;
+pub type FilenameToBytesMap = HashMap<String, Vec<u8>>;
 
 #[tauri::command]
 pub fn load_banks(app_handle: tauri::AppHandle) -> Result<StoredBankData> {
@@ -126,20 +123,5 @@ pub fn write_banks(app_handle: tauri::AppHandle, mut bank_data: StoredBankData) 
     bank_data.order_boxes_by_indices();
     bank_data.reset_box_indices();
 
-    util::write_storage_file_json(&app_handle, "banks.json", &bank_data)?;
-
-    // For now, we will also update box-data.json with Bank 1 data to work with previous versions of OpenHome
-    let first_bank = bank_data.banks.into_iter().find(|bank| bank.index == 0);
-    let Some(first_bank) = first_bank else {
-        return Err(Error::other(
-            "No bank with index 0; Previous versions of OpenHome will not see updated data.",
-        ));
-    };
-
-    let old_box_data: Vec<deprecated::BoxPreV1_5_0> = first_bank
-        .boxes
-        .into_iter()
-        .map(deprecated::BoxPreV1_5_0::from_current)
-        .collect();
-    util::write_storage_file_json(&app_handle, "box-data.json", old_box_data)
+    util::write_storage_file_json(&app_handle, "banks.json", &bank_data)
 }

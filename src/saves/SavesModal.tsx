@@ -76,7 +76,7 @@ function useOpenSaveHandler(onClose?: () => void) {
           const identifier = getMonFileIdentifier(updatedMon)
 
           if (identifier !== undefined) {
-            backend.writeHomeMon(identifier, updatedMon.bytes)
+            backend.writeHomeMon(identifier, updatedMon.toByteArray())
           }
         }
       )

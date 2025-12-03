@@ -1,4 +1,4 @@
-import { Languages, OriginGame } from '@pkm-rs-resources/pkg'
+import { Gender, Languages, OriginGame } from '@pkm-rs/pkg'
 import { PK9 } from '@pokemon-files/pkm'
 import { utf16BytesToString } from '@pokemon-files/util'
 import { Item } from '../../../consts/Items'
@@ -144,6 +144,10 @@ export class SVSAV extends G89SAV<PK9> {
 
   static includesOrigin(origin: OriginGame) {
     return origin === OriginGame.Scarlet || origin === OriginGame.Violet
+  }
+
+  get trainerGender() {
+    return this.trainerBlock.getGender() ? Gender.Female : Gender.Male
   }
 }
 

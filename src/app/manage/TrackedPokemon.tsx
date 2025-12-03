@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import SideTabs from 'src/components/side-tabs/SideTabs'
-import PokemonDetailsModal from '../../pokemon/PokemonDetailsModal'
+import PokemonDetailsModal from '../../pokemon-details/Modal'
 import { PKMInterface } from '../../types/interfaces'
 import Gen12Lookup from './Gen12Lookup'
 import Gen345Lookup from './Gen345Lookup'

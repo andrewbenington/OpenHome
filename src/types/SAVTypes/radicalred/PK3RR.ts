@@ -1,4 +1,4 @@
-import { ItemRadicalRed } from '@pkm-rs-resources/pkg'
+import { ItemRadicalRed } from '@pkm-rs/pkg'
 import { PluginPKMInterface } from '../../interfaces'
 import PK3CFRU, { CFRUToNationalDexEntry } from '../cfru/PK3CFRU'
 

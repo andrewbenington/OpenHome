@@ -33,17 +33,4 @@ impl BoxPreV1_5_0 {
             identifiers,
         }
     }
-
-    pub fn from_current(current: pkm_storage::Box) -> Self {
-        let mut identifiers: HashMap<String, String> = HashMap::new();
-        for (index, identifier) in current.identifiers {
-            identifiers.insert(index.to_string(), identifier);
-        }
-
-        Self {
-            name: current.name,
-            index: current.index as u8,
-            mon_identifiers_by_index: identifiers,
-        }
-    }
 }
