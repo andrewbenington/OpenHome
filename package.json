@@ -70,14 +70,14 @@
   },
   "devDependencies": {
     "@stylistic/eslint-plugin": "^5.6.1",
-    "@tauri-apps/cli": "^2.9.4",
+    "@tauri-apps/cli": "^2.9.5",
     "@types/crypto-js": "^4.2.2",
-    "@types/lodash": "^4.17.20",
+    "@types/lodash": "^4.17.21",
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.6",
     "@types/react-dom": "^19.2.3",
-    "@typescript-eslint/eslint-plugin": "^8.47.0",
-    "@typescript-eslint/parser": "^8.47.0",
+    "@typescript-eslint/eslint-plugin": "^8.48.1",
+    "@typescript-eslint/parser": "^8.48.1",
     "@vitejs/plugin-react": "^5.1.1",
     "better-sqlite3": "^12.4.6",
     "camelcase-keys": "^10.0.1",
@@ -87,10 +87,10 @@
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",
-    "prettier": "^3.6.2",
-    "react-dom": "^19.2.0",
+    "prettier": "^3.7.4",
+    "react-dom": "^19.2.1",
     "typescript": "^5.9.3",
-    "vite": "^7.2.4",
-    "vitest": "^4.0.12"
+    "vite": "^7.2.6",
+    "vitest": "^4.0.15"
   }
 }
