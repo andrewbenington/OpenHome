@@ -155,6 +155,6 @@ export function genderSymbol(gender: Gender): string {
     case Gender.Female:
       return '♀'
     default:
-      return gender.toString()
+      return ''
   }
 }

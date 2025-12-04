@@ -21,8 +21,9 @@ import { BallsImageList, getItemIconPath } from 'src/images/items'
 import { getRibbonSpritePath } from 'src/images/ribbons'
 import { FilterContext } from 'src/state/filter'
 import { HeldItemCategory } from 'src/types/Filter'
-import { displayGender, genderSymbol } from 'src/types/types'
+import { displayGender } from 'src/types/types'
 import Autocomplete from '../Autocomplete'
+import GenderIcon from '../GenderIcon'
 import PokemonIcon from '../PokemonIcon'
 import TypeIcon from '../TypeIcon'
 import './style.css'
@@ -307,7 +308,7 @@ export default function FilterPanel() {
           onChange={(option) =>
             dispatchFilterState({ type: 'set_filter', payload: { gender: option?.gender } })
           }
-          getIconComponent={(opt) => genderSymbol(opt.gender)}
+          getIconComponent={(opt) => <GenderIcon gender={opt.gender} />}
         />
         <Autocomplete
           options={['Any Ribbon', 'No Ribbon', ...OpenHomeRibbons]}

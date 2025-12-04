@@ -29,6 +29,22 @@
   border-radius: 16px;
 }
 
+.gender-icon {
+  border-radius: 50%;
+  display: grid;
+  align-items: center;
+  position: relative;
+
+  p {
+    font-weight: bold;
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    font-size: 1rem;
+    margin: 0;
+  }
+}
+
 .hex-display-grid {
   margin: 4px 16px;
   width: 680px;
