@@ -98,7 +98,7 @@ impl Stats8 {
 
             if (atk_dv & 0b11) == 0b01 {
                 atk_dv += 1
-            } else if atk_dv % 4 == 0 {
+            } else if atk_dv.is_multiple_of(4) {
                 atk_dv += 2
             }
             let hp_dv = (atk_dv & 1) << 3;
@@ -122,8 +122,8 @@ impl Stats8 {
     }
 }
 
-#[cfg(feature = "wasm")]
 #[wasm_bindgen]
+#[cfg(feature = "wasm")]
 impl Stats8 {
     #[wasm_bindgen(constructor)]
     #[allow(clippy::missing_const_for_fn)]
@@ -190,8 +190,8 @@ impl Stats16Le {
     }
 }
 
-#[cfg(feature = "wasm")]
 #[wasm_bindgen]
+#[cfg(feature = "wasm")]
 impl Stats16Le {
     #[wasm_bindgen(constructor)]
     #[allow(clippy::missing_const_for_fn)]
@@ -246,8 +246,8 @@ impl HyperTraining {
     }
 }
 
-#[cfg(feature = "wasm")]
 #[wasm_bindgen]
+#[cfg(feature = "wasm")]
 impl HyperTraining {
     #[wasm_bindgen(constructor)]
     #[allow(clippy::missing_const_for_fn)]
@@ -318,8 +318,8 @@ impl StatsPreSplit {
     }
 }
 
-#[cfg(feature = "wasm")]
 #[wasm_bindgen]
+#[cfg(feature = "wasm")]
 impl StatsPreSplit {
     #[wasm_bindgen(constructor)]
     #[allow(clippy::missing_const_for_fn)]
@@ -369,9 +369,9 @@ impl ContestStats {
     }
 }
 
-#[cfg(feature = "wasm")]
-#[wasm_bindgen]
 #[allow(clippy::missing_const_for_fn)]
+#[wasm_bindgen]
+#[cfg(feature = "wasm")]
 impl ContestStats {
     #[wasm_bindgen(constructor)]
     pub fn new(cool: u8, beauty: u8, cute: u8, smart: u8, tough: u8, sheen: u8) -> Self {

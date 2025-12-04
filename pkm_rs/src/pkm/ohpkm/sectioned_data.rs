@@ -1,5 +1,6 @@
 use std::{fmt::Display, hash::Hash};
 
+#[cfg(feature = "wasm")]
 use crate::log;
 
 type CoreResult<T, E> = core::result::Result<T, E>;

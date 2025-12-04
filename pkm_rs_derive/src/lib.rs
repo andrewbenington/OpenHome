@@ -344,17 +344,16 @@ pub fn safe_wasm_impl(_attr: TokenStream, item: TokenStream) -> TokenStream {
                     && !ty.span().source_text().is_none_or(|s| {
                         s.starts_with("#") || s.starts_with("Vec") || s.starts_with("Option")
                     })
+                    && is_by_value_non_primitive(ty)
                 {
-                    if is_by_value_non_primitive(&*ty) {
-                        errors.push(syn::Error::new_spanned(
-                            ty,
-                            format!(
-                                "Function argument is a by-value non-primitive. \
+                    errors.push(syn::Error::new_spanned(
+                        ty,
+                        format!(
+                            "Function argument is a by-value non-primitive. \
                  Add #[unsafe_own] to opt into zero-copy ownership transfer 2, [{:?}]",
-                                ty.span().source_text()
-                            ),
-                        ));
-                    }
+                            ty.span().source_text()
+                        ),
+                    ));
                 }
             }
         }

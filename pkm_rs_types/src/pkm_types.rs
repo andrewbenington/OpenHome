@@ -49,7 +49,7 @@ impl PkmType {
         }
     }
 
-    pub fn from_byte(byte: u8) -> Option<Self> {
+    pub const fn from_byte(byte: u8) -> Option<Self> {
         match byte {
             0 => Some(Self::Normal),
             1 => Some(Self::Fighting),

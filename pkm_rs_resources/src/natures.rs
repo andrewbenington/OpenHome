@@ -16,14 +16,14 @@ impl NatureIndex {
             .expect("NatureIndex should never have an invalid index")
     }
 
-    pub fn to_byte(&self) -> u8 {
+    pub const fn to_byte(&self) -> u8 {
         self.0
     }
 }
 
-#[cfg(feature = "wasm")]
 #[wasm_bindgen]
 #[allow(clippy::missing_const_for_fn)]
+#[cfg(feature = "wasm")]
 impl NatureIndex {
     //! IMPORTANT: DO NOT ADD NON-BORROWING SELF METHODS
     //! (JavaScript will be copying this value and consuming

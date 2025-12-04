@@ -470,8 +470,9 @@ impl From<u8> for OriginGame {
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 pub struct OriginGames;
 
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[wasm_bindgen]
 #[allow(clippy::missing_const_for_fn)]
+#[cfg(feature = "wasm")]
 impl OriginGames {
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "gameName"))]
     pub fn game_name(value: u8) -> String {
@@ -565,8 +566,7 @@ pub fn plugin_color(plugin_identifier: &str) -> &'static str {
     }
 }
 
-#[cfg(feature = "wasm")]
-#[wasm_bindgen(js_name = "getPluginColor")]
+#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "getPluginColor"))]
 pub fn plugin_color_js(plugin_identifier: &str) -> String {
     plugin_color(plugin_identifier).to_owned()
 }
@@ -607,6 +607,7 @@ pub enum GameSetting {
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Debug, Clone)]
+#[cfg(feature = "wasm")]
 pub struct OriginGameWithData {
     origin: OriginGame,
     name: String,
@@ -614,6 +615,7 @@ pub struct OriginGameWithData {
     generation: Generation,
 }
 
+#[cfg(feature = "wasm")]
 impl OriginGameWithData {
     pub fn new(origin: OriginGame) -> Self {
         Self {
@@ -625,9 +627,9 @@ impl OriginGameWithData {
     }
 }
 
-#[cfg(feature = "wasm")]
 #[wasm_bindgen]
 #[allow(clippy::missing_const_for_fn)]
+#[cfg(feature = "wasm")]
 impl OriginGameWithData {
     #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
     pub fn game(&self) -> OriginGame {

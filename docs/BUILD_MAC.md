@@ -12,7 +12,7 @@ Homebrew is a package manager for macOS, and it streamlines the process of insta
 
 This may take a few minutes.
 
-## Install Node.js and npm
+## Install Node.js and pnpm
 
 Node.js and pnpm will allow you to build the OpenHome application. Execute the following commands to install them:
 
@@ -39,7 +39,7 @@ In the window that opens, run the following commands:
 
 ```zsh
 pnpm install
-npm run package
+npx tauri build --target aarch64-apple-darwin # for Intel Macs use --target x86_64-apple-darwin
 ```
 
 These will take a bit. When they're finished, execute the following command to open the folder with the disk image:
