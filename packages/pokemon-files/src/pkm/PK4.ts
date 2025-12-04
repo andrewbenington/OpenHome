@@ -3,6 +3,7 @@ import { Gen4Ribbons } from '@pokemon-resources/index'
 import {
   AbilityIndex,
   Ball,
+  Gender,
   Item,
   Language,
   Languages,
@@ -52,6 +53,7 @@ export class PK4 {
   ivs: types.Stats
   isEgg: boolean
   isNicknamed: boolean
+  gender: Gender
   formeNum: number
   shinyLeavesInner: ShinyLeaves = new ShinyLeaves()
   ribbonBytes: Uint8Array
@@ -126,6 +128,7 @@ export class PK4 {
       this.ivs = types.read30BitIVsFromBytes(dataView, 0x38)
       this.isEgg = byteLogic.getFlag(dataView, 0x38, 30)
       this.isNicknamed = byteLogic.getFlag(dataView, 0x38, 31)
+      this.gender = byteLogic.uIntFromBufferBits(dataView, 0x40, 1, 2, true)
       this.formeNum = byteLogic.uIntFromBufferBits(dataView, 0x40, 3, 5, true)
       this.shinyLeaves = ShinyLeaves.fromByte(dataView.getUint8(0x41))
       this.ribbonBytes = new Uint8Array(buffer).slice(0x4c, 0x50)
@@ -232,6 +235,8 @@ export class PK4 {
       }
       this.isEgg = other.isEgg ?? false
       this.isNicknamed = other.isNicknamed ?? false
+      this.gender =
+        other.gender ?? this.metadata?.genderFromPid(this.personalityValue) ?? Gender.Genderless
       this.formeNum = other.formeNum
       this.shinyLeaves = other.shinyLeaves?.clone() ?? new ShinyLeaves()
       this.ribbonBytes = other.ribbonBytes ?? new Uint8Array(4)
@@ -337,6 +342,7 @@ export class PK4 {
     types.write30BitIVsToBytes(dataView, 0x38, this.ivs)
     byteLogic.setFlag(dataView, 0x38, 30, this.isEgg)
     byteLogic.setFlag(dataView, 0x38, 31, this.isNicknamed)
+    byteLogic.uIntToBufferBits(dataView, this.gender, 64, 1, 2, true)
     byteLogic.uIntToBufferBits(dataView, this.formeNum, 0x40, 3, 5, true)
     dataView.setUint8(0x41, this.shinyLeaves.toByte())
     new Uint8Array(buffer).set(new Uint8Array(this.ribbonBytes.slice(0, 4)), 0x4c)
@@ -395,10 +401,6 @@ export class PK4 {
 
   public getStats() {
     return getStats(this)
-  }
-
-  public get gender() {
-    return this.metadata?.genderFromPid(this.personalityValue)
   }
 
   public get languageString() {
