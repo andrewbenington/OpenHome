@@ -1,4 +1,4 @@
-import { Ball } from '@pkm-rs/pkg'
+import { Ball, Gender } from '@pkm-rs/pkg'
 import { PKM } from '@pokemon-files/pkm'
 import { getDisplayID } from '@pokemon-files/util/util'
 import dayjs from 'dayjs'
@@ -10,6 +10,7 @@ export const SortTypes = [
   'Level',
   'Species',
   'Species Family',
+  'Gender',
   'Ribbon Count',
   'Met Date',
   'Origin',
@@ -110,6 +111,8 @@ export function getSortFunction(
       return chain([sortByDexNum, sortByFormeNum])
     case 'Species Family':
       return chain([sortByBaseMon, sortByDexNum, sortByFormeNum])
+    case 'Gender':
+      return (a, b) => (a.gender ?? Gender.Genderless) - (b.gender ?? Gender.Genderless)
     case 'Origin':
       return (a, b) => a.gameOfOrigin - b.gameOfOrigin
     case 'Met Date':

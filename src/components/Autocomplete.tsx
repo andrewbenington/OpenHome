@@ -185,7 +185,8 @@ export default function SLJAutocomplete<Option>(props: SLJAutocompleteProps<Opti
     label: label ?? '',
     getOptionString,
     highlightedIndex: null,
-    inputFieldValue: propValue ? getOptionString(propValue) : '',
+    inputFieldValue:
+      propValue !== undefined && propValue !== null ? getOptionString(propValue) : '',
   })
 
   const filteredOptions = useMemo(
@@ -203,7 +204,7 @@ export default function SLJAutocomplete<Option>(props: SLJAutocompleteProps<Opti
   }, [filteredOptions, state.inputFieldValue, state.highlightedIndex, dispatchState])
 
   useEffect(() => {
-    if (propValue) {
+    if (propValue !== undefined && propValue !== null) {
       dispatchState(['set-input', getOptionString(propValue)])
     } else if (state.inputFieldValue && !state.expanded) {
       // clear button
@@ -281,7 +282,7 @@ export default function SLJAutocomplete<Option>(props: SLJAutocompleteProps<Opti
         >
           {propValue && getIconComponent && (
             <TextField.Slot side="left" style={{ marginRight: 0, padding: '0px 4px 0px 8px' }}>
-              {propValue && getIconComponent?.(propValue)}
+              {propValue !== undefined && propValue !== null && getIconComponent?.(propValue)}
             </TextField.Slot>
           )}
           {state.inputFieldValue && (
