@@ -5,8 +5,9 @@ use wasm_bindgen::prelude::*;
 
 pub const ITEM_MAX_GEN3: usize = 376;
 
-#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "getAllItemsGen3"))]
 #[allow(clippy::missing_const_for_fn)]
+#[wasm_bindgen(js_name = "getAllItemsGen3")]
+#[cfg(feature = "wasm")]
 pub fn get_all_items_gen3() -> Vec<ItemMetadataPastGen> {
     ALL_ITEMS_GEN3.into_iter().copied().collect()
 }

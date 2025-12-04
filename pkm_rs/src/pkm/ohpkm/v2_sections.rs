@@ -931,6 +931,7 @@ impl ScarletVioletData {
         }
     }
 
+    #[cfg(feature = "wasm")]
     pub fn default_generated_tera_type(species_and_forme: SpeciesAndForme) -> Self {
         Self {
             tera_type_original: species_and_forme
@@ -1019,6 +1020,7 @@ impl PastHandlerData {
         }
     }
 
+    #[cfg(feature = "wasm")]
     pub fn known_trainer_data_matches(
         &self,
         tid: u16,

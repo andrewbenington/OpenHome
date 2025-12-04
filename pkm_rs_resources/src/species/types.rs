@@ -1,13 +1,15 @@
-use pkm_rs_types::Gender;
 use std::num::NonZeroU16;
 use strum_macros::{Display, EnumString};
 
+use crate::{Error, Result, abilities::AbilityIndex, species::ALL_SPECIES};
 use pkm_rs_types::{GameSetting, Generation, PkmType, Stats16Le, TeraType};
 use serde::{Serialize, Serializer};
 
 #[cfg(feature = "wasm")]
 use crate::stats::Stat;
-use crate::{Error, Result, abilities::AbilityIndex, species::ALL_SPECIES};
+
+#[cfg(feature = "wasm")]
+use pkm_rs_types::Gender;
 
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
@@ -103,6 +105,7 @@ pub enum GenderRatio {
 }
 
 impl GenderRatio {
+    #[cfg(feature = "wasm")]
     const fn male_pid_last_byte_threshold(&self) -> u8 {
         match self {
             GenderRatio::M1ToF7 => 225,
@@ -114,6 +117,7 @@ impl GenderRatio {
         }
     }
 
+    #[cfg(feature = "wasm")]
     const fn male_atk_dv_threshold(&self) -> u8 {
         match self {
             GenderRatio::AllMale => 0,
@@ -126,6 +130,7 @@ impl GenderRatio {
         }
     }
 
+    #[cfg(feature = "wasm")]
     const fn gender_for_pid(&self, pid: u32) -> Gender {
         match self {
             Self::Genderless => Gender::Genderless,
@@ -142,6 +147,7 @@ impl GenderRatio {
         }
     }
 
+    #[cfg(feature = "wasm")]
     const fn gender_for_atk_dv(&self, atk_dv: u8) -> Gender {
         match self {
             Self::Genderless => Gender::Genderless,
@@ -399,6 +405,7 @@ impl FormeMetadata {
         })
     }
 
+    #[cfg(feature = "wasm")]
     fn is_mega_forme_of(&self, other: &FormeMetadata) -> bool {
         other
             .mega_evolution_data
@@ -408,7 +415,7 @@ impl FormeMetadata {
 
     /// Tera Type assigned by Pokémon HOME for the species when not originally
     /// from Scarlet/Violet
-    pub fn transferred_tera_type(&self) -> TeraType {
+    pub const fn transferred_tera_type(&self) -> TeraType {
         TeraType::Standard(match self.types {
             (PkmType::Normal, Some(type2)) => type2,
             (type1, _) => type1,
@@ -416,9 +423,9 @@ impl FormeMetadata {
     }
 }
 
-#[cfg(feature = "wasm")]
 #[wasm_bindgen]
 #[allow(clippy::missing_const_for_fn)]
+#[cfg(feature = "wasm")]
 impl FormeMetadata {
     #[wasm_bindgen(getter = megaEvolutions)]
     pub fn mega_evolutions(&self) -> Vec<MegaEvolutionMetadata> {
@@ -691,9 +698,9 @@ impl SpeciesAndForme {
     }
 }
 
-#[cfg(feature = "wasm")]
 #[wasm_bindgen]
 #[allow(clippy::missing_const_for_fn)]
+#[cfg(feature = "wasm")]
 impl SpeciesAndForme {
     #[wasm_bindgen(constructor)]
     pub fn new_js(national_dex: u16, forme_index: u16) -> core::result::Result<Self, JsValue> {

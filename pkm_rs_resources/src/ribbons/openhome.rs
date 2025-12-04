@@ -315,7 +315,7 @@ pub enum OpenHomeRibbon {
 }
 
 impl OpenHomeRibbon {
-    pub fn get_name(&self) -> &'static str {
+    pub const fn get_name(&self) -> &'static str {
         match self {
             Self::Mod(modern_ribbon) => modern_ribbon.get_name(),
             Self::Obs(obsolete_ribbon) => obsolete_ribbon.get_name(),
