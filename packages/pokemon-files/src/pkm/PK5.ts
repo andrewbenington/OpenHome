@@ -5,6 +5,7 @@ import { Gen4Ribbons } from '@pokemon-resources/index'
 import {
   AbilityIndex,
   Ball,
+  Gender,
   Item,
   Language,
   Languages,
@@ -212,7 +213,8 @@ export class PK5 {
       }
       this.isEgg = other.isEgg ?? false
       this.isNicknamed = other.isNicknamed ?? false
-      this.gender = other.gender ?? 0
+      this.gender =
+        other.gender ?? this.metadata?.genderFromPid(this.personalityValue) ?? Gender.Genderless
       this.formeNum = other.formeNum
       this.nature = other.nature ?? NatureIndex.newFromPid(this.personalityValue)
       this.isNsPokemon = other.isNsPokemon ?? false

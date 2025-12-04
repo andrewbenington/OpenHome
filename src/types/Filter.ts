@@ -1,4 +1,4 @@
-import { MetadataLookup, OriginGame } from '@pkm-rs/pkg'
+import { Gender, MetadataLookup, OriginGame } from '@pkm-rs/pkg'
 import { Type } from '@pokemon-resources/index'
 import { PKMInterface } from './interfaces'
 import { isMegaStone, isZCrystal } from './pkm/util'
@@ -7,6 +7,7 @@ export interface Filter {
   dexNumber?: number
   formeNumber?: number
   heldItem?: number | HeldItemCategory
+  gender?: Gender
   ability?: number
   type1?: Type
   type2?: Type
@@ -28,6 +29,9 @@ export function filterApplies(filter: Filter, mon: PKMInterface) {
     return false
   }
   if (filter.heldItem !== undefined && !heldItemPassesFilter(mon.heldItemIndex, filter.heldItem)) {
+    return false
+  }
+  if (filter.gender !== undefined && mon.gender !== filter.gender) {
     return false
   }
   if (filter.ball !== undefined && 'ball' in mon && mon.ball !== filter.ball) {

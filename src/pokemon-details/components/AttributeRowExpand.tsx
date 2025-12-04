@@ -6,7 +6,7 @@ import './style.css'
 
 export default function AttributeRowExpand(props: {
   summary: string
-  value?: string
+  value?: string | ReactNode
   justifyEnd?: boolean
   indent?: number
   children?: ReactNode
@@ -32,7 +32,7 @@ export default function AttributeRowExpand(props: {
     >
       <summary>
         <div style={{ position: 'relative', width: '100%' }}>
-          <AttributeRow label={label} value={value} />
+          <AttributeRow label={label}>{value}</AttributeRow>
           <ExpandArrowIcon
             className="expandable-attribute-row-arrow"
             style={{ rotate: expanded ? '90deg' : '0deg' }}

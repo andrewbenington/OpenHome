@@ -1,7 +1,8 @@
-import { MetadataLookup } from '@pkm-rs/pkg'
+import { genderFromBool, MetadataLookup } from '@pkm-rs/pkg'
 import { getDisplayID } from '@pokemon-files/util'
 import { Badge, Flex, Grid, Spinner, Tooltip } from '@radix-ui/themes'
 import { useMemo } from 'react'
+import GenderIcon from 'src/components/GenderIcon'
 import { ErrorIcon } from 'src/components/Icons'
 import PokemonIcon from '../../components/PokemonIcon'
 import TypeIcon from '../../components/TypeIcon'
@@ -165,19 +166,24 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
       </div>
       <Flex direction="column" gap="2px">
         <AttributeRow label="Nickname" value={mon.nickname} />
-        <AttributeRow
-          label="Species"
-          value={`${MetadataLookup(mon.dexNum, mon.formeNum)?.formeName} ${
-            mon.gender !== undefined ? ['♂', '♀', ''][mon.gender] : ''
-          }`}
-        />
+        <AttributeRow label="Species">
+          <Flex gap="1">
+            {MetadataLookup(mon.dexNum, mon.formeNum)?.formeName}
+            <GenderIcon gender={mon.gender} />
+          </Flex>
+        </AttributeRow>
         <AttributeRow label="Dex No." value={`${mon.dexNum}`} />
         <AttributeRow label="Type">
           {getTypes(mon)?.map((type) => (
             <TypeIcon type={type} key={`${type}_type_icon`} />
           ))}
         </AttributeRow>
-        <AttributeRow label="OT" value={`${mon.trainerName} ${mon.trainerGender ? '♀' : '♂'}`} />
+        <AttributeRow label="OT">
+          <Flex gap="1">
+            {mon.trainerName}
+            <GenderIcon gender={genderFromBool(mon.trainerGender)} />
+          </Flex>
+        </AttributeRow>
         <AttributeRow label="Trainer ID" value={getDisplayID(mon as any)} />
         {mon.ability !== undefined && (
           <AttributeRow

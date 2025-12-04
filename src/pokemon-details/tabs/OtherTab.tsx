@@ -1,4 +1,4 @@
-import { Generation, OriginGames } from '@pkm-rs/pkg'
+import { genderFromBool, Generation, OriginGames } from '@pkm-rs/pkg'
 import { PK3, PK4, PK5 } from '@pokemon-files/pkm'
 import { AllPKMFields, getDisplayID, StatsPreSplit } from '@pokemon-files/util'
 import {
@@ -10,6 +10,7 @@ import {
 } from '@pokemon-resources/index'
 import { Flex } from '@radix-ui/themes'
 import { useMemo } from 'react'
+import GenderIcon from 'src/components/GenderIcon'
 import { Countries } from 'src/consts/Countries'
 import { EncounterTypes } from 'src/consts/EncounterTypes'
 import { SWEETS } from 'src/consts/Formes'
@@ -83,7 +84,12 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
         )}
         <AttributeRowExpand
           summary="Original Trainer"
-          value={`${mon.trainerName} ${mon.trainerGender ? '♀' : '♂'}`}
+          value={
+            <Flex gap="1">
+              {mon.trainerName}
+              <GenderIcon gender={genderFromBool(mon.trainerGender)} />
+            </Flex>
+          }
         >
           <AttributeRow label="ID" value={getDisplayID(mon as any)} indent={10} />
           {mon.secretID !== undefined && (
@@ -104,7 +110,16 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
         {mon.handlerName && (
           <AttributeRowExpand
             summary="Recent Trainer"
-            value={`${mon.handlerName} ${mon.handlerGender ? '♀' : '♂'}`}
+            value={
+              <Flex gap="1">
+                {mon.handlerName}
+                <GenderIcon
+                  gender={
+                    mon.handlerGender !== undefined ? genderFromBool(mon.handlerGender) : undefined
+                  }
+                />
+              </Flex>
+            }
           >
             {mon.handlerID !== undefined && mon.handlerID !== 0 && (
               <AttributeRow label="ID" value={mon.handlerID.toString()} indent={10} /> // unused in official games??

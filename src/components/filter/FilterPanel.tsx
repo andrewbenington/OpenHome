@@ -1,5 +1,6 @@
 import {
   all_species_data,
+  Gender,
   Generation,
   getAllAbilities,
   getAllBalls,
@@ -20,7 +21,9 @@ import { BallsImageList, getItemIconPath } from 'src/images/items'
 import { getRibbonSpritePath } from 'src/images/ribbons'
 import { FilterContext } from 'src/state/filter'
 import { HeldItemCategory } from 'src/types/Filter'
+import { displayGender } from 'src/types/types'
 import Autocomplete from '../Autocomplete'
+import GenderIcon from '../GenderIcon'
 import PokemonIcon from '../PokemonIcon'
 import TypeIcon from '../TypeIcon'
 import './style.css'
@@ -69,6 +72,10 @@ function itemIndexToSelectOption(index: number): SelectOption {
 
   return itemMetadataToSelectOption(item.getMetadata())
 }
+
+const allGenders = [Gender.Male, Gender.Female, Gender.Genderless].map((gender) => ({
+  gender,
+}))
 
 export default function FilterPanel() {
   const [filterState, dispatchFilterState] = useContext(FilterContext)
@@ -291,6 +298,17 @@ export default function FilterPanel() {
               src={BallsImageList[ball.id]}
             />
           )}
+        />
+        <Autocomplete
+          options={allGenders}
+          getOptionString={(opt) => displayGender(opt.gender)}
+          getOptionUniqueID={(opt) => opt.gender.toString()}
+          value={filterState.gender !== undefined ? { gender: filterState.gender } : undefined}
+          label="Gender"
+          onChange={(option) =>
+            dispatchFilterState({ type: 'set_filter', payload: { gender: option?.gender } })
+          }
+          getIconComponent={(opt) => <GenderIcon gender={opt.gender} />}
         />
         <Autocomplete
           options={['Any Ribbon', 'No Ribbon', ...OpenHomeRibbons]}

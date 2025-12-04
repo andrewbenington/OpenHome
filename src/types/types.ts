@@ -1,4 +1,4 @@
-import { OriginGame } from '@pkm-rs/pkg'
+import { Gender, OriginGame } from '@pkm-rs/pkg'
 import { Either, left, right } from 'fp-ts/Either'
 import { CSSProperties } from 'react'
 import { PathData } from './SAVTypes/path'
@@ -134,3 +134,27 @@ export interface JSONArray extends Array<JSONValue> {}
 
 type CSSVariable = `--${string}`
 export type CSSWithVariables = CSSProperties & Record<CSSVariable, string | undefined>
+
+export function displayGender(gender: Gender): string {
+  switch (gender) {
+    case Gender.Male:
+      return 'Male'
+    case Gender.Female:
+      return 'Female'
+    case Gender.Genderless:
+      return 'Genderless'
+    default:
+      return '(Invalid)'
+  }
+}
+
+export function genderSymbol(gender: Gender): string {
+  switch (gender) {
+    case Gender.Male:
+      return '♂'
+    case Gender.Female:
+      return '♀'
+    default:
+      return ''
+  }
+}
