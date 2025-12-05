@@ -1,5 +1,4 @@
 import { Flex, Text, Theme } from '@radix-ui/themes'
-import '@radix-ui/themes/styles.css'
 import * as E from 'fp-ts/lib/Either'
 import debounce from 'lodash/debounce'
 import { useCallback, useContext, useEffect, useReducer, useState } from 'react'
