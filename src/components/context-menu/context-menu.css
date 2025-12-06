@@ -5,14 +5,6 @@
   font-size: 0.8rem;
 }
 
-.ContextMenuSubContent {
-  z-index: 10;
-}
-
-.ContextMenuLabel {
-  font-weight: bold;
-}
-
 
 .rt-ContextMenuLabel,
 .rt-ContextMenuItem,
@@ -39,43 +31,17 @@
   cursor: pointer;
 }
 
-.ContextMenuCheckboxItem,
-.ContextMenuRadioItem,
-.ContextMenuSubTrigger {
-  padding: 0 0.3rem 0 1.25rem;
-}
-.ContextMenuSubTrigger[data-state='open'] {
-  background-color: var(--accent-4);
-  color: var(--accent-11);
-}
-
 .ContextMenuItem[data-disabled],
 .ContextMenuCheckboxItem[data-disabled],
 .ContextMenuRadioItem[data-disabled],
 .ContextMenuSubTrigger[data-disabled] {
   pointer-events: 'none';
 }
-.rt-ContextMenuItem[data-highlighted],
-.rt-ContextMenuCheckboxItem[data-highlighted],
-.rt-ContextMenuRadioItem[data-highlighted],
-.rt-ContextMenuSubTrigger[data-highlighted] {
-  background-color: var(--accent-9);
-  color: var(--accent-1);
-}
 
 .ContextMenuLabel {
-  display: flex;
-  align-items: center;
+  font-weight: bold;
 }
 
-.ContextMenuItemIndicator {
-  position: absolute;
-  left: 0;
-  width: 25px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
 
 .rt-ContextMenuContent {
   animation: none;

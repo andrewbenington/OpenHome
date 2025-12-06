@@ -33,7 +33,7 @@ function CtxMenuItem(props: RadixCtxMenu.ItemProps) {
 }
 
 function CtxMenuLabel(props: RadixCtxMenu.LabelProps) {
-  return <RadixCtxMenu.Label {...props} />
+  return <RadixCtxMenu.Label className="ContextMenuLabel" {...props} />
 }
 
 function CtxMenuSeparator() {
