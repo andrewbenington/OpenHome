@@ -1,6 +1,14 @@
 import { ReactNode } from 'react'
 
-export type Element = Item | Separator | Label
+export type Element = Item | Separator | Label | Submenu
+
+export interface CtxMenuElementBuilder {
+  build: () => Element
+}
+
+function buildElement(builder: CtxMenuElementBuilder): Element {
+  return builder.build()
+}
 
 type NoTag<T> = Omit<T, '__cm_type_tag'>
 
@@ -12,7 +20,7 @@ type Item = {
   __cm_type_tag: 'item'
 }
 
-export class ItemBuilder {
+export class ItemBuilder implements CtxMenuElementBuilder {
   data: NoTag<Item>
 
   private constructor(content: ElementContent) {
@@ -50,7 +58,7 @@ type Label = {
   __cm_type_tag: 'label'
 }
 
-export class LabelBuilder {
+export class LabelBuilder implements CtxMenuElementBuilder {
   data: NoTag<Label>
 
   private constructor(content: ElementContent) {
@@ -75,5 +83,64 @@ export class LabelBuilder {
 export const Separator = Object.freeze({ __cm_type_tag: 'separator' })
 
 type Separator = typeof Separator
+
+export const SeparatorBuilder = Object.freeze({
+  build() {
+    return Separator
+  },
+})
+
+//* Submenu *//
+
+type Submenu = {
+  content: ElementContent
+  items: Element[]
+  __cm_type_tag: 'submenu'
+}
+
+export class SubmenuBuilder implements CtxMenuElementBuilder {
+  content: ElementContent
+  builders: CtxMenuElementBuilder[] = []
+
+  private constructor(content: ElementContent) {
+    this.content = content
+  }
+
+  static fromLabel(label: string): SubmenuBuilder {
+    return new SubmenuBuilder({ label })
+  }
+
+  static fromComponent(component: ReactNode): SubmenuBuilder {
+    return new SubmenuBuilder({ component })
+  }
+
+  build(): Submenu {
+    return {
+      content: this.content,
+      items: this.builders.map(buildElement),
+      __cm_type_tag: 'submenu',
+    }
+  }
+
+  withBuilder(builder: CtxMenuElementBuilder): SubmenuBuilder {
+    this.builders.push(builder)
+    return this
+  }
+
+  withBuilders(builders: CtxMenuElementBuilder[]): SubmenuBuilder {
+    this.builders.push(...builders)
+    return this
+  }
+}
+
+export function includeIf(builders: CtxMenuElementBuilder[] | undefined): CtxMenuElementBuilder[] {
+  return builders ?? []
+}
+
+export function includeWithSeparatorIf(
+  builders: CtxMenuElementBuilder[] | undefined
+): CtxMenuElementBuilder[] {
+  return builders ? [SeparatorBuilder, ...builders] : []
+}
 
 export type CtxMenuElement = Element

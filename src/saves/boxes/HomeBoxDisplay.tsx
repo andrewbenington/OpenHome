@@ -42,6 +42,7 @@ import {
   sortableKeyboardCoordinates,
   useSortable,
 } from '@dnd-kit/sortable'
+import { ItemBuilder, SubmenuBuilder } from 'src/components/context-menu/types'
 import { range } from 'src/util/Functional'
 import ToggleButton from '../../components/ToggleButton'
 import useIsDev from '../../hooks/isDev'
@@ -340,6 +341,25 @@ function BoxMons() {
                 !dragData.is_home &&
                 !dragData.save.supportsMon(mon.dexNum, mon.formeNum)
               }
+              ctxMenuBuilders={[
+                ItemBuilder.fromLabel('Remove duplicates from this box').withAction(
+                  savesAndBanks.removeDupesCurrentHomeBox
+                ),
+                SubmenuBuilder.fromLabel('Sort this box...').withBuilders(
+                  SortTypes.filter((st) => st !== '').map((sortType) =>
+                    ItemBuilder.fromLabel(`By ${sortType}`).withAction(() =>
+                      savesAndBanks.sortCurrentHomeBox(sortType)
+                    )
+                  )
+                ),
+                SubmenuBuilder.fromLabel('Sort all boxes...').withBuilders(
+                  SortTypes.filter((st) => st !== '').map((sortType) =>
+                    ItemBuilder.fromLabel(`By ${sortType}`).withAction(() =>
+                      savesAndBanks.sortAllHomeBoxes(sortType)
+                    )
+                  )
+                ),
+              ]}
             />
           ))}
       </Grid>

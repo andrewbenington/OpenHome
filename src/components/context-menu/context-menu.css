@@ -13,6 +13,7 @@
   font-weight: bold;
 }
 
+
 .rt-ContextMenuLabel,
 .rt-ContextMenuItem,
 .rt-ContextMenuSubItem,
@@ -78,4 +79,8 @@
 
 .rt-ContextMenuContent {
   animation: none;
+}
+
+.rt-ContextMenuViewport {
+  gap: 3px;
 }

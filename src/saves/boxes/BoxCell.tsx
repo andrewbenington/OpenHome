@@ -2,7 +2,12 @@ import { useDroppable } from '@dnd-kit/react'
 import { useContext, useMemo } from 'react'
 import { BackendContext } from 'src/backend/backendContext'
 import OpenHomeCtxMenu from 'src/components/context-menu/OpenHomeCtxMenu'
-import { ItemBuilder, LabelBuilder, Separator } from 'src/components/context-menu/types'
+import {
+  CtxMenuElementBuilder,
+  ItemBuilder,
+  LabelBuilder,
+  SeparatorBuilder,
+} from 'src/components/context-menu/types'
 import PokemonIcon from 'src/components/PokemonIcon'
 import { FilterContext } from 'src/state/filter'
 import { MonLocation } from 'src/state/saves/reducer'
@@ -27,6 +32,7 @@ interface BoxCellProps {
   borderColor?: string
   dragID: string
   location: MonLocation
+  ctxMenuBuilders?: CtxMenuElementBuilder[]
 }
 
 const BoxCell = ({
@@ -39,6 +45,7 @@ const BoxCell = ({
   borderColor,
   dragID,
   location,
+  ctxMenuBuilders,
 }: BoxCellProps) => {
   const [filterState] = useContext(FilterContext)
   const backend = useContext(BackendContext)
@@ -105,9 +112,8 @@ const BoxCell = ({
     disabled,
   })
 
-  return (
-    <OpenHomeCtxMenu
-      getElements={() => [
+  const monCtxMenuItemBuilders = mon
+    ? [
         LabelBuilder.fromComponent(
           <>
             <PokemonIcon
@@ -117,13 +123,16 @@ const BoxCell = ({
             />
             {mon?.nickname}
           </>
-        ).build(),
-        Separator,
-        ItemBuilder.fromLabel('Move To Release Area')
-          .withAction(() => releaseMonAtLocation(location))
-          .build(),
-      ]}
-    >
+        ),
+        SeparatorBuilder,
+        ItemBuilder.fromLabel('Move To Release Area').withAction(() =>
+          releaseMonAtLocation(location)
+        ),
+      ]
+    : undefined
+
+  return (
+    <OpenHomeCtxMenu sections={[monCtxMenuItemBuilders, ctxMenuBuilders]}>
       <div
         ref={ref}
         style={{
