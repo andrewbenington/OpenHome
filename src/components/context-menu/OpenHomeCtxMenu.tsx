@@ -1,43 +1,47 @@
-import { ContextMenu as RadixCtxMenu } from 'radix-ui'
+import { Inset, ContextMenu as RadixCtxMenu } from '@radix-ui/themes'
 import { ReactNode } from 'react'
 import './context-menu.css'
 import { CtxMenuElement, contentIsLabel } from './types'
 
 type ContextMenuProps = {
   getElements: () => CtxMenuElement[]
-} & RadixCtxMenu.ContextMenuTriggerProps
+} & RadixCtxMenu.TriggerProps
 
 export default function OpenHomeCtxMenu(props: ContextMenuProps) {
   const { getElements, ...otherProps } = props
 
   return (
     <RadixCtxMenu.Root modal={false}>
-      <RadixCtxMenu.Trigger {...otherProps} asChild />
-      <CtxMenuPortal>
-        <CtxMenuContent>{getElements().map(componentFromElement)}</CtxMenuContent>
-      </CtxMenuPortal>
+      <RadixCtxMenu.Trigger {...otherProps} />
+      {/* <CtxMenuPortal> */}
+      <CtxMenuContent>{getElements().map(componentFromElement)}</CtxMenuContent>
+      {/* </CtxMenuPortal> */}
     </RadixCtxMenu.Root>
   )
 }
 
-function CtxMenuPortal(props: RadixCtxMenu.ContextMenuPortalProps) {
-  return <RadixCtxMenu.Portal {...props} />
+// function CtxMenuPortal(props: RadixCtxMenu.ContextMenuPortalProps) {
+//   return <RadixCtxMenu.Portal {...props} />
+// }
+
+function CtxMenuContent(props: RadixCtxMenu.ContentProps) {
+  return <RadixCtxMenu.Content className="ctx-menu" {...props} />
 }
 
-function CtxMenuContent(props: RadixCtxMenu.ContextMenuContentProps) {
-  return <RadixCtxMenu.Content className="ContextMenuContent" {...props} />
+function CtxMenuItem(props: RadixCtxMenu.ItemProps) {
+  return <RadixCtxMenu.Item {...props} />
 }
 
-function CtxMenuItem(props: RadixCtxMenu.ContextMenuItemProps) {
-  return <RadixCtxMenu.Item className="ContextMenuItem" {...props} />
-}
-
-function CtxMenuLabel(props: RadixCtxMenu.ContextMenuLabelProps) {
-  return <RadixCtxMenu.Label className="ContextMenuLabel" {...props} />
+function CtxMenuLabel(props: RadixCtxMenu.LabelProps) {
+  return <RadixCtxMenu.Label {...props} />
 }
 
 function CtxMenuSeparator() {
-  return <RadixCtxMenu.Separator className="ContextMenuSeparator" />
+  return (
+    <Inset>
+      <RadixCtxMenu.Separator />
+    </Inset>
+  )
 }
 
 function componentFromElement(element: CtxMenuElement, index: number): ReactNode {
