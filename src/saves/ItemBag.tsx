@@ -1,13 +1,13 @@
 import { Item } from '@pkm-rs/pkg'
 import { Flex, Grid } from '@radix-ui/themes'
 import { useContext } from 'react'
-import { ItemBagContext } from 'src/state/items/reducer'
 import { DragMonContext } from '../state/dragMon'
+import { useItems } from '../state/items/useItems'
 import DroppableSpace from './boxes/DroppableSpace'
 import DraggableItem from './DraggableItem'
 
 export default function ItemBag() {
-  const [bagState] = useContext(ItemBagContext)
+  const { itemCounts } = useItems()
   const [, dragMonDispatch] = useContext(DragMonContext)
 
   return (
@@ -26,7 +26,7 @@ export default function ItemBag() {
         onNotOver={() => dragMonDispatch({ type: 'set_mode', payload: 'mon' })}
       >
         <Grid columns="6" gap="2" justify="end" align={'end'}>
-          {Object.entries(bagState.itemCounts).map(([indexStr, count]) => {
+          {Object.entries(itemCounts).map(([indexStr, count]) => {
             const index = parseInt(indexStr)
             const validatedIndex = Item.fromIndex(index)
 

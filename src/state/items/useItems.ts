@@ -1,3 +1,4 @@
+import { Item } from '@pkm-rs/pkg'
 import { useContext } from 'react'
 import { MonLocation } from '../saves/reducer'
 import { useSaves } from '../saves/useSaves'
@@ -5,7 +6,7 @@ import { ItemBagContext } from './reducer'
 
 export function useItems() {
   const savesAndBanks = useSaves()
-  const [, bagDispatch] = useContext(ItemBagContext)
+  const [bagState, bagDispatch] = useContext(ItemBagContext)
 
   function moveMonItemToBag(monLocation: MonLocation) {
     const destMon = savesAndBanks.getMonAtLocation(monLocation)
@@ -15,5 +16,15 @@ export function useItems() {
     savesAndBanks.setMonHeldItem(undefined, monLocation)
   }
 
-  return { moveMonItemToBag }
+  function giveItemToMon(monLocation: MonLocation, item: Item) {
+    // Avoid losing the second item if mon already holding same item
+    const destMon = savesAndBanks.getMonAtLocation(monLocation)
+    if (destMon?.heldItemIndex === item.index) {
+      return
+    }
+    savesAndBanks.setMonHeldItem(item, monLocation)
+    bagDispatch({ type: 'remove_item', payload: { index: item.index, qty: 1 } })
+  }
+
+  return { moveMonItemToBag, giveItemToMon, itemCounts: bagState.itemCounts }
 }
