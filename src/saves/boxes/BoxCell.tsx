@@ -18,6 +18,7 @@ import { PKMInterface } from 'src/types/interfaces'
 import { displayIndexAdder, isBattleFormeItem } from 'src/types/pkm/util'
 import { PokedexUpdate } from 'src/types/pokedex'
 import useDisplayError from '../../hooks/displayError'
+import { useItems } from '../../state/items/useItems'
 import '../style.css'
 import DraggableMon from './DraggableMon'
 import DroppableSpace from './DroppableSpace'
@@ -51,6 +52,7 @@ const BoxCell = ({
   const backend = useContext(BackendContext)
   const displayError = useDisplayError()
   const { releaseMonAtLocation } = useSaves()
+  const { moveMonItemToBag } = useItems()
 
   const isFilteredOut = useMemo(() => {
     return (
@@ -125,6 +127,9 @@ const BoxCell = ({
           </>
         ),
         SeparatorBuilder,
+        mon.heldItemIndex > 0
+          ? ItemBuilder.fromLabel('Move Item to Bag').withAction(() => moveMonItemToBag(location))
+          : undefined,
         ItemBuilder.fromLabel('Move To Release Area').withAction(() =>
           releaseMonAtLocation(location)
         ),

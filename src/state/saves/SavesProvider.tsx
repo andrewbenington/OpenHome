@@ -17,7 +17,7 @@ import {
   getMonGen345Identifier,
 } from '../../util/Lookup'
 import { filterUndefined } from '../../util/Sort'
-import { ItemBagContext } from '../itemBag'
+import { ItemBagContext } from '../items/reducer'
 import { OhpkmLookup, useOhpkmStore } from '../ohpkm/useOhpkmStore'
 import { openSavesReducer, SavesContext } from './reducer'
 

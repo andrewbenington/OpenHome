@@ -5,7 +5,7 @@ import './context-menu.css'
 import { CtxMenuElement, CtxMenuElementBuilder, SeparatorBuilder, contentIsLabel } from './types'
 
 type ContextMenuProps = {
-  sections: (CtxMenuElementBuilder[] | undefined)[]
+  sections: ((CtxMenuElementBuilder | undefined)[] | undefined)[]
 } & RadixCtxMenu.TriggerProps
 
 export default function OpenHomeCtxMenu(props: ContextMenuProps) {
@@ -17,7 +17,7 @@ export default function OpenHomeCtxMenu(props: ContextMenuProps) {
       <CtxMenuContent>
         {sections.filter(filterUndefined).flatMap((section, i) => {
           const builders = i > 0 ? [SeparatorBuilder, ...section] : section
-          return builders.map(buildComponent)
+          return builders.filter(filterUndefined).map(buildComponent)
         })}
       </CtxMenuContent>
     </RadixCtxMenu.Root>

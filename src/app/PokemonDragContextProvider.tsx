@@ -1,11 +1,12 @@
 import { DragDropProvider, DragOverlay, PointerSensor } from '@dnd-kit/react'
 import { ReactNode, useContext } from 'react'
-import { ItemBagContext } from 'src/state/itemBag'
+import { ItemBagContext } from 'src/state/items/reducer'
 import { OHPKM } from 'src/types/pkm/OHPKM'
 import PokemonIcon from '../components/PokemonIcon'
 import { getPublicImageURL } from '../images/images'
 import { getItemIconPath } from '../images/items'
 import { DragMonContext, DragPayload } from '../state/dragMon'
+import { useItems } from '../state/items/useItems'
 import { useOhpkmStore } from '../state/ohpkm/useOhpkmStore'
 import { MonLocation } from '../state/saves/reducer'
 import { useSaves } from '../state/saves/useSaves'
@@ -16,6 +17,7 @@ export default function PokemonDragContextProvider(props: { children?: ReactNode
   const ohpkmStore = useOhpkmStore()
   const [dragMonState, dispatchDragMonState] = useContext(DragMonContext)
   const [, bagDispatch] = useContext(ItemBagContext)
+  const { moveMonItemToBag } = useItems()
 
   return (
     <DragDropProvider
@@ -44,10 +46,7 @@ export default function PokemonDragContextProvider(props: { children?: ReactNode
           if (target?.id === 'to_release') {
             savesAndBanks.releaseMonAtLocation(payload.monData)
           } else if (target?.id === 'item-bag') {
-            if (mon.heldItemIndex) {
-              bagDispatch({ type: 'add_item', payload: { index: mon.heldItemIndex, qty: 1 } })
-              savesAndBanks.setMonHeldItem(undefined, payload.monData)
-            }
+            moveMonItemToBag(payload.monData)
           } else if (
             isMonLocation(dest) &&
             (dest.is_home || dest.save.supportsMon(mon.dexNum, mon.formeNum))
