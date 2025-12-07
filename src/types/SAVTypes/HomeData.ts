@@ -1,6 +1,7 @@
 import { getHomeIdentifier, getMonFileIdentifier } from 'src/util/Lookup'
 import { v4 as UuidV4 } from 'uuid'
 import { OhpkmLookup } from '../../state/ohpkm/useOhpkmStore'
+import { MonLocation } from '../../state/saves/reducer'
 import { range } from '../../util/Functional'
 import { filterUndefined, numericSorter } from '../../util/Sort'
 import { TransferRestrictions } from '../TransferRestrictions'
@@ -57,12 +58,12 @@ export class HomeBox implements Box<OHPKM> {
     })
   }
 
-  firstOpenIndex(): number | undefined {
+  firstEmptyIndex(): number | undefined {
     return this.pokemon.findIndex((value) => value === undefined)
   }
 
-  getMonCount() {
-    return this.pokemon.filter(filterUndefined).length
+  containsMons() {
+    return this.pokemon.filter(filterUndefined).length > 0
   }
 }
 
@@ -197,40 +198,50 @@ export class HomeData {
     return Ok(null)
   }
 
-  deleteBoxCurrentBank(box_index: number, box_id: string): Errorable<null> {
+  deleteBoxCurrentBank(boxIndex: number, boxId: string): Errorable<null> {
     const bank = this.getCurrentBank()
 
-    if (box_index >= bank.boxes.length) {
+    if (boxIndex >= bank.boxes.length) {
       return Err(
-        `Cannot access box at index ${box_index} (${bank.name} has ${bank.boxes.length} boxes total)`
+        `Cannot access box at index ${boxIndex} (${bank.name} has ${bank.boxes.length} boxes total)`
       )
     }
 
-    const monCount = this.boxes[box_index].getMonCount()
-
-    if (monCount > 0) {
-      return Err(`Cannot delete box; ${monCount} Pokémon present`)
+    if (this.boxes[boxIndex].containsMons()) {
+      return Err('Cannot delete box; box is not empty')
     }
 
-    if (this.boxes[box_index].id !== box_id) {
+    if (this.boxes[boxIndex].id !== boxId) {
       return Err(`Box id and index mismatch`)
     }
-    this.boxes = [...this.boxes.filter((box) => box.id !== box_id)]
+    this.boxes = [...this.boxes.filter((box) => box.id !== boxId)]
     this.resetBoxIndices()
     this.syncBankToBoxes()
 
     return Ok(null)
   }
 
-  addBoxCurrentBank(): Errorable<null> {
-    const newBox: OpenHomeBox = {
+  addBoxCurrentBank(location: AddBoxLocation): Errorable<null> {
+    const newBox = new HomeBox({
       id: UuidV4(),
       name: null,
       index: this.boxes.length,
       identifiers: {},
+    })
+
+    if (location === 'start') {
+      this.boxes = [newBox, ...this.boxes]
+    } else if (location === 'end') {
+      this.boxes = [...this.boxes, newBox]
+    } else {
+      const index = location[1]
+      if (index >= this.boxes.length) {
+        return Err(`index ${index} is greater than box cound (${this.boxes.length})`)
+      }
+      const pivot = location[0] === 'before' ? index : index + 1
+      this.boxes = [...this.boxes.slice(0, pivot), newBox, ...this.boxes.slice(pivot)]
     }
 
-    this.boxes = [...this.boxes, new HomeBox(newBox)]
     this.resetBoxIndices()
     this.syncBankToBoxes()
 
@@ -250,11 +261,11 @@ export class HomeData {
     this.syncBankToBoxes()
   }
 
-  currentBoxRemoveDupes() {
+  removeDupesFromBox(boxIndex: number) {
     const alreadyPresent: Set<string> = new Set()
 
     for (let slot = 0; slot < HomeData.BOX_COLUMNS * HomeData.BOX_ROWS; slot++) {
-      const mon = this.boxes[this.currentPCBox].pokemon[slot]
+      const mon = this.boxes[boxIndex].pokemon[slot]
 
       if (!mon) continue
 
@@ -262,7 +273,7 @@ export class HomeData {
 
       if (!identifier) continue
       if (alreadyPresent.has(identifier)) {
-        this.boxes[this.currentPCBox].pokemon[slot] = undefined
+        this.boxes[boxIndex].pokemon[slot] = undefined
       } else {
         alreadyPresent.add(identifier)
       }
@@ -324,6 +335,17 @@ export class HomeData {
     }
   }
 
+  boxFirstEmptyLocation(boxIndex: number): MonLocation | undefined {
+    const firstOpenIndex = this.boxes[boxIndex].firstEmptyIndex()
+    if (firstOpenIndex === undefined) return undefined
+    return {
+      is_home: true,
+      bank: this.currentBankIndex,
+      box: boxIndex,
+      box_slot: firstOpenIndex,
+    }
+  }
+
   public get banks() {
     return this._banks
   }
@@ -382,3 +404,5 @@ export function bankBoxCoordinates(
 ): BankBoxCoordinates {
   return { bank, box, box_slot }
 }
+
+export type AddBoxLocation = 'start' | 'end' | ['before', number] | ['after', number]

@@ -7,13 +7,14 @@ import { getPluginIdentifier } from 'src/types/SAVTypes/util'
 import { SaveRef } from 'src/types/types'
 import { filterUndefined, numericSorter, stringSorter } from 'src/util/Sort'
 import { BackendContext } from '../backend/backendContext'
+import OpenHomeCtxMenu from '../components/context-menu/OpenHomeCtxMenu'
+import { SeparatorBuilder } from '../components/context-menu/types'
 import { ErrorIcon } from '../components/Icons'
 import OHDataGrid, { SortableColumn } from '../components/OHDataGrid'
 import useDisplayError from '../hooks/displayError'
 import { AppInfoContext } from '../state/appInfo'
 import { useSaves } from '../state/saves/useSaves'
 import SaveCard from './SaveCard'
-import SaveDetailsMenu from './SaveDetailsMenu'
 import { formatTime, formatTimeSince, SaveViewMode } from './util'
 
 interface SaveFileSelectorProps {
@@ -80,18 +81,6 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
 
   const columns: SortableColumn<SaveRef>[] = [
     {
-      key: 'menu',
-      name: '',
-      width: 50,
-      renderCell: (params) => (
-        <SaveDetailsMenu
-          save={params.row}
-          onRemove={() => removeRecentSave(params.row.filePath.raw)}
-        />
-      ),
-      cellClass: 'centered-cell',
-    },
-    {
       key: 'open',
       name: '',
       width: 80,
@@ -126,15 +115,17 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
       width: 130,
       renderValue: (value) =>
         value.game ? (
-          <img
-            alt="save logo"
-            height={40}
-            src={
-              value.pluginIdentifier
-                ? `logos/${value.pluginIdentifier}.png`
-                : OriginGames.logoPath(value.game)
-            }
-          />
+          <OpenHomeCtxMenu sections={[[SeparatorBuilder]]}>
+            <img
+              alt="save logo"
+              height={40}
+              src={
+                value.pluginIdentifier
+                  ? `logos/${value.pluginIdentifier}.png`
+                  : OriginGames.logoPath(value.game)
+              }
+            />
+          </OpenHomeCtxMenu>
         ) : (
           ''
         ),
@@ -202,16 +193,22 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
   ]
 
   return view === 'grid' ? (
-    <OHDataGrid
-      rows={Object.values(recentSaves ?? {}).map((save, i) => ({
-        ...save,
-        index: i,
-      }))}
-      columns={columns}
-      defaultSort="lastOpened"
-      defaultSortDir="DESC"
-      rowClass={(row) => (row.valid ? undefined : 'datagrid-error-row')}
-    />
+    <OpenHomeCtxMenu sections={[[SeparatorBuilder]]}>
+      <OHDataGrid
+        rows={Object.values(recentSaves ?? {}).map((save, i) => ({
+          ...save,
+          index: i,
+        }))}
+        columns={columns}
+        defaultSort="lastOpened"
+        defaultSortDir="DESC"
+        // onCellContextMenu={(_, e) => {
+        //   setContextAnchor(e.currentTarget)
+        //   console.log(e.currentTarget)
+        // }}
+        rowClass={(row) => (row.valid ? undefined : 'datagrid-error-row')}
+      />
+    </OpenHomeCtxMenu>
   ) : (
     <Flex wrap="wrap" direction="row" justify="center" m="4" gap="2">
       {Object.values(recentSaves ?? {})
