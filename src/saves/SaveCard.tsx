@@ -44,13 +44,11 @@ export default function SaveCard({ save, onOpen, onRemove, size = 240 }: SaveCar
 
   return (
     <OpenHomeCtxMenu
-      sections={[
-        [
-          onRemove ? ItemBuilder.fromLabel('Remove').withAction(onRemove) : undefined,
-          ItemBuilder.fromLabel(
-            `Reveal in ${backend.getPlatform() === 'macos' ? 'Finder' : 'File Explorer'}`
-          ).withAction(() => backend.openDirectory(save.filePath.dir)),
-        ],
+      elements={[
+        ItemBuilder.fromLabel('Remove').withAction(onRemove),
+        ItemBuilder.fromLabel(
+          `Reveal in ${backend.getPlatform() === 'macos' ? 'Finder' : 'File Explorer'}`
+        ).withAction(() => backend.openDirectory(save.filePath.dir)),
       ]}
     >
       <div style={{ position: 'relative' }}>

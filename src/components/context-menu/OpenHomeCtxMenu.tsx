@@ -1,25 +1,40 @@
 import { Inset, ContextMenu as RadixCtxMenu } from '@radix-ui/themes'
 import { ReactNode } from 'react'
+import { Option } from 'src/util/Functional'
 import { filterUndefined } from 'src/util/Sort'
 import './context-menu.css'
-import { CtxMenuElement, CtxMenuElementBuilder, SeparatorBuilder, contentIsLabel } from './types'
+import {
+  CtxMenuElement,
+  CtxMenuElementBuilder,
+  CtxMenuSectionBuilders,
+  SeparatorBuilder,
+  contentIsLabel,
+} from './types'
 
-type ContextMenuProps = {
-  sections: ((CtxMenuElementBuilder | undefined)[] | undefined)[]
-} & RadixCtxMenu.TriggerProps
+type ContextMenuProps = (
+  | {
+      sections: Option<CtxMenuSectionBuilders>[]
+      elements?: undefined
+    }
+  | { sections?: undefined; elements: Option<CtxMenuElementBuilder>[] }
+) &
+  RadixCtxMenu.TriggerProps
 
 export default function OpenHomeCtxMenu(props: ContextMenuProps) {
-  const { sections, ...otherProps } = props
+  const { elements, sections, ...triggerProps } = props
+
+  const allElements: CtxMenuElementBuilder[] =
+    elements?.filter(filterUndefined) ??
+    sections?.filter(filterUndefined).flatMap((section, i) => {
+      const builders = i > 0 ? [SeparatorBuilder, ...section] : section
+      return builders.filter(filterUndefined)
+    }) ??
+    []
 
   return (
     <RadixCtxMenu.Root modal={false}>
-      <RadixCtxMenu.Trigger {...otherProps} />
-      <CtxMenuContent>
-        {sections.filter(filterUndefined).flatMap((section, i) => {
-          const builders = i > 0 ? [SeparatorBuilder, ...section] : section
-          return builders.filter(filterUndefined).map(buildComponent)
-        })}
-      </CtxMenuContent>
+      <RadixCtxMenu.Trigger {...triggerProps} />
+      <CtxMenuContent>{allElements.map(buildComponent)}</CtxMenuContent>
     </RadixCtxMenu.Root>
   )
 }
@@ -64,7 +79,7 @@ function componentFromElement(element: CtxMenuElement, index: number): ReactNode
   switch (element.__cm_type_tag) {
     case 'item':
       return (
-        <CtxMenuItem key={index} onClick={element.action}>
+        <CtxMenuItem key={index} onClick={element.action} disabled={element.disabled}>
           {contentIsLabel(element.content) ? element.content.label : element.content.component}
         </CtxMenuItem>
       )

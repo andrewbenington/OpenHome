@@ -1,10 +1,13 @@
 import { ReactNode } from 'react'
+import { Option } from 'src/util/Functional'
 
 export type Element = Item | Separator | Label | Submenu
 
 export interface CtxMenuElementBuilder {
   build: () => Element
 }
+
+export type CtxMenuSectionBuilders = Option<CtxMenuElementBuilder>[]
 
 function buildElement(builder: CtxMenuElementBuilder): Element {
   return builder.build()
@@ -17,14 +20,17 @@ type NoTag<T> = Omit<T, '__cm_type_tag'>
 type Item = {
   content: ElementContent
   action?: () => void
+  disabled: boolean
   __cm_type_tag: 'item'
 }
 
 export class ItemBuilder implements CtxMenuElementBuilder {
-  data: NoTag<Item>
+  content: ElementContent
+  action?: () => void
+  disabled: boolean = true
 
   private constructor(content: ElementContent) {
-    this.data = { content }
+    this.content = content
   }
 
   static fromLabel(label: string): ItemBuilder {
@@ -35,13 +41,23 @@ export class ItemBuilder implements CtxMenuElementBuilder {
     return new ItemBuilder({ component })
   }
 
-  build(): Item {
-    return { ...this.data, __cm_type_tag: 'item' }
+  withAction(action?: () => void): ItemBuilder {
+    this.action = action
+    return this
   }
 
-  withAction(action: () => void): ItemBuilder {
-    this.data.action = action
+  withDisabled(disabled: boolean): ItemBuilder {
+    this.disabled = disabled
     return this
+  }
+
+  build(): Item {
+    return {
+      content: this.content,
+      action: this.action,
+      disabled: this.action === undefined,
+      __cm_type_tag: 'item',
+    }
   }
 }
 
@@ -95,12 +111,14 @@ export const SeparatorBuilder = Object.freeze({
 type Submenu = {
   content: ElementContent
   items: Element[]
+  disabled: boolean
   __cm_type_tag: 'submenu'
 }
 
 export class SubmenuBuilder implements CtxMenuElementBuilder {
   content: ElementContent
   builders: CtxMenuElementBuilder[] = []
+  disabled: boolean = true
 
   private constructor(content: ElementContent) {
     this.content = content
@@ -114,14 +132,6 @@ export class SubmenuBuilder implements CtxMenuElementBuilder {
     return new SubmenuBuilder({ component })
   }
 
-  build(): Submenu {
-    return {
-      content: this.content,
-      items: this.builders.map(buildElement),
-      __cm_type_tag: 'submenu',
-    }
-  }
-
   withBuilder(builder: CtxMenuElementBuilder): SubmenuBuilder {
     this.builders.push(builder)
     return this
@@ -130,6 +140,20 @@ export class SubmenuBuilder implements CtxMenuElementBuilder {
   withBuilders(builders: CtxMenuElementBuilder[]): SubmenuBuilder {
     this.builders.push(...builders)
     return this
+  }
+
+  withDisabled(disabled: boolean): SubmenuBuilder {
+    this.disabled = disabled
+    return this
+  }
+
+  build(): Submenu {
+    return {
+      content: this.content,
+      items: this.builders.map(buildElement),
+      disabled: this.disabled,
+      __cm_type_tag: 'submenu',
+    }
   }
 }
 

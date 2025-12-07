@@ -16,7 +16,11 @@ import { CSS } from '@dnd-kit/utilities'
 import { Button, Flex, Grid } from '@radix-ui/themes'
 import { CSSProperties } from 'react'
 import OpenHomeCtxMenu from '../../components/context-menu/OpenHomeCtxMenu'
-import { ItemBuilder, SubmenuBuilder } from '../../components/context-menu/types'
+import {
+  CtxMenuElementBuilder,
+  ItemBuilder,
+  SubmenuBuilder,
+} from '../../components/context-menu/types'
 import { RemoveIcon } from '../../components/Icons'
 import { SavesAndBanksManager, useSaves } from '../../state/saves/useSaves'
 import { SortTypes } from '../../types/pkm/sort'
@@ -62,35 +66,37 @@ export default function AllHomeBoxes(props: {
   }
 
   return (
-    <Grid columns="6" gap="1" overflowY="auto" maxHeight="80%">
-      {moving ? (
-        <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
-          <SortableContext
-            items={homeData.boxes.map((box) => box.id) ?? []}
-            strategy={rectSortingStrategy}
-          >
-            {homeData.boxes.map((box, boxIndex) => (
-              <DraggableBoxOverview
-                key={box.id}
-                box={box}
-                onBoxSelect={() => onBoxSelect(boxIndex)}
-                debugMode={debugMode}
-              />
-            ))}
-          </SortableContext>
-        </DndContext>
-      ) : (
-        homeData.boxes.map((box, boxIndex) => (
-          <ClickableBoxOverview
-            key={box.id}
-            box={box}
-            onBoxSelect={() => onBoxSelect(boxIndex)}
-            debugMode={debugMode}
-            deleting={deleting}
-          />
-        ))
-      )}
-    </Grid>
+    <OpenHomeCtxMenu elements={getBankContextActions(savesAndBanks)}>
+      <Grid columns="6" gap="1" overflowY="auto" maxHeight="80%">
+        {moving ? (
+          <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+            <SortableContext
+              items={homeData.boxes.map((box) => box.id) ?? []}
+              strategy={rectSortingStrategy}
+            >
+              {homeData.boxes.map((box, boxIndex) => (
+                <DraggableBoxOverview
+                  key={box.id}
+                  box={box}
+                  onBoxSelect={() => onBoxSelect(boxIndex)}
+                  debugMode={debugMode}
+                />
+              ))}
+            </SortableContext>
+          </DndContext>
+        ) : (
+          homeData.boxes.map((box, boxIndex) => (
+            <ClickableBoxOverview
+              key={box.id}
+              box={box}
+              onBoxSelect={() => onBoxSelect(boxIndex)}
+              debugMode={debugMode}
+              deleting={deleting}
+            />
+          ))
+        )}
+      </Grid>
+    </OpenHomeCtxMenu>
   )
 }
 
@@ -231,32 +237,50 @@ function calculateNewBoxOrder(movedFromIndex: number, movedIntoIndex: number, bo
   return newOrder
 }
 
-function getBoxContextActions(savesAndBanks: SavesAndBanksManager, box: HomeBox) {
-  const emptyDependentActions = box.containsMons()
-    ? [
-        ItemBuilder.fromLabel('Remove duplicates from this box').withAction(() =>
-          savesAndBanks.removeDupesFromHomeBox(box.index)
-        ),
-        SubmenuBuilder.fromLabel('Sort this box...').withBuilders(
-          SortTypes.map((sortType) =>
-            ItemBuilder.fromLabel(`By ${sortType}`).withAction(() =>
-              savesAndBanks.sortHomeBox(box.index, sortType)
-            )
+function getBankContextActions(savesAndBanks: SavesAndBanksManager) {
+  return [
+    SubmenuBuilder.fromLabel('Sort all boxes...').withBuilders(
+      SortTypes.map((sortType) =>
+        ItemBuilder.fromLabel(`By ${sortType}`).withAction(() =>
+          savesAndBanks.sortAllHomeBoxes(sortType)
+        )
+      )
+    ),
+    SubmenuBuilder.fromLabel('Add Box...').withBuilders([
+      ItemBuilder.fromLabel('Beginning').withAction(() => savesAndBanks.addBoxCurrentBank('start')),
+      ItemBuilder.fromLabel('End').withAction(() => savesAndBanks.addBoxCurrentBank('end')),
+    ]),
+  ]
+}
+
+function getBoxContextActions(
+  savesAndBanks: SavesAndBanksManager,
+  box: HomeBox
+): CtxMenuElementBuilder[][] {
+  const boxActions = [
+    ItemBuilder.fromLabel('Remove duplicates from this box')
+      .withAction(() => savesAndBanks.removeDupesFromHomeBox(box.index))
+      .withDisabled(!box.containsMons()),
+    SubmenuBuilder.fromLabel('Sort this box...')
+      .withBuilders(
+        SortTypes.map((sortType) =>
+          ItemBuilder.fromLabel(`By ${sortType}`).withAction(() =>
+            savesAndBanks.sortHomeBox(box.index, sortType)
           )
-        ),
-        SubmenuBuilder.fromLabel('Sort all boxes...').withBuilders(
-          SortTypes.map((sortType) =>
-            ItemBuilder.fromLabel(`By ${sortType}`).withAction(() =>
-              savesAndBanks.sortAllHomeBoxes(sortType)
-            )
-          )
-        ),
-      ]
-    : [
-        ItemBuilder.fromLabel('Delete').withAction(() =>
-          savesAndBanks.deleteBoxCurrentBank(box.id, box.index)
-        ),
-      ]
+        )
+      )
+      .withDisabled(!box.containsMons()),
+    SubmenuBuilder.fromLabel('Sort all boxes...').withBuilders(
+      SortTypes.map((sortType) =>
+        ItemBuilder.fromLabel(`By ${sortType}`).withAction(() =>
+          savesAndBanks.sortAllHomeBoxes(sortType)
+        )
+      )
+    ),
+    ItemBuilder.fromLabel('Delete Box')
+      .withAction(() => savesAndBanks.deleteBoxCurrentBank(box.id, box.index))
+      .withDisabled(box.containsMons()),
+  ]
 
   const addBoxActions = [
     SubmenuBuilder.fromLabel('Add Box...').withBuilders([
@@ -271,5 +295,5 @@ function getBoxContextActions(savesAndBanks: SavesAndBanksManager, box: HomeBox)
     ]),
   ]
 
-  return [emptyDependentActions, addBoxActions]
+  return [boxActions, addBoxActions]
 }

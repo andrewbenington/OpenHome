@@ -115,17 +115,15 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
       width: 130,
       renderValue: (value) =>
         value.game ? (
-          <OpenHomeCtxMenu sections={[[SeparatorBuilder]]}>
-            <img
-              alt="save logo"
-              height={40}
-              src={
-                value.pluginIdentifier
-                  ? `logos/${value.pluginIdentifier}.png`
-                  : OriginGames.logoPath(value.game)
-              }
-            />
-          </OpenHomeCtxMenu>
+          <img
+            alt="save logo"
+            height={40}
+            src={
+              value.pluginIdentifier
+                ? `logos/${value.pluginIdentifier}.png`
+                : OriginGames.logoPath(value.game)
+            }
+          />
         ) : (
           ''
         ),

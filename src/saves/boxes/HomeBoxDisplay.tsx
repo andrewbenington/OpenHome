@@ -22,6 +22,7 @@ import { OHPKM } from 'src/types/pkm/OHPKM'
 import { SortTypes } from 'src/types/pkm/sort'
 import { range } from 'src/util/Functional'
 import { getMonFileIdentifier } from 'src/util/Lookup'
+import OpenHomeCtxMenu from '../../components/context-menu/OpenHomeCtxMenu'
 import ToggleButton from '../../components/ToggleButton'
 import useIsDev from '../../hooks/isDev'
 import { DragMonContext } from '../../state/dragMon'
@@ -277,82 +278,86 @@ function SingleBoxMonDisplay() {
     [homeData, selectedIndex]
   )
 
+  const contextElements = [
+    ItemBuilder.fromLabel('Remove duplicates from this box').withAction(() =>
+      savesAndBanks.removeDupesFromHomeBox(homeData.currentPCBox)
+    ),
+    SubmenuBuilder.fromLabel('Sort this box...').withBuilders(
+      SortTypes.map((sortType) =>
+        ItemBuilder.fromLabel(`By ${sortType}`).withAction(() =>
+          savesAndBanks.sortHomeBox(homeData.currentPCBox, sortType)
+        )
+      )
+    ),
+    SubmenuBuilder.fromLabel('Sort all boxes...').withBuilders(
+      SortTypes.map((sortType) =>
+        ItemBuilder.fromLabel(`By ${sortType}`).withAction(() =>
+          savesAndBanks.sortAllHomeBoxes(sortType)
+        )
+      )
+    ),
+  ]
+
   return (
-    <>
-      <Grid columns={COLUMN_COUNT.toString()} gap="1">
-        {range(COLUMN_COUNT * ROW_COUNT)
-          .map((index: number) => currentBox.pokemon[index])
-          .map((mon, index) => (
-            <BoxCell
-              key={`${homeData.currentPCBox}-${index}`}
-              onClick={() => setSelectedIndex(index)}
-              dragID={`home_${homeData.currentPCBox}_${index}`}
-              location={{
-                bank: homeData.currentBankIndex,
-                box: homeData.currentPCBox,
-                box_slot: index,
-                is_home: true,
-              }}
-              mon={mon}
-              zIndex={0}
-              onDrop={(importedMons) => {
-                if (importedMons) {
-                  attemptImportMons(importedMons, {
-                    bank: homeData.currentBankIndex,
-                    box: homeData.currentPCBox,
-                    box_slot: index,
-                    is_home: true,
-                  })
+    <OpenHomeCtxMenu elements={contextElements}>
+      <div>
+        <Grid columns={COLUMN_COUNT.toString()} gap="1">
+          {range(COLUMN_COUNT * ROW_COUNT)
+            .map((index: number) => currentBox.pokemon[index])
+            .map((mon, index) => (
+              <BoxCell
+                key={`${homeData.currentPCBox}-${index}`}
+                onClick={() => setSelectedIndex(index)}
+                dragID={`home_${homeData.currentPCBox}_${index}`}
+                location={{
+                  bank: homeData.currentBankIndex,
+                  box: homeData.currentPCBox,
+                  box_slot: index,
+                  is_home: true,
+                }}
+                mon={mon}
+                zIndex={0}
+                onDrop={(importedMons) => {
+                  if (importedMons) {
+                    attemptImportMons(importedMons, {
+                      bank: homeData.currentBankIndex,
+                      box: homeData.currentPCBox,
+                      box_slot: index,
+                      is_home: true,
+                    })
+                  }
+                }}
+                disabled={
+                  // don't allow a swap with a pokémon not supported by the source save
+                  mon &&
+                  dragData &&
+                  !dragData.is_home &&
+                  !dragData.save.supportsMon(mon.dexNum, mon.formeNum)
                 }
-              }}
-              disabled={
-                // don't allow a swap with a pokémon not supported by the source save
-                mon &&
-                dragData &&
-                !dragData.is_home &&
-                !dragData.save.supportsMon(mon.dexNum, mon.formeNum)
-              }
-              ctxMenuBuilders={[
-                ItemBuilder.fromLabel('Remove duplicates from this box').withAction(() =>
-                  savesAndBanks.removeDupesFromHomeBox(homeData.currentPCBox)
-                ),
-                SubmenuBuilder.fromLabel('Sort this box...').withBuilders(
-                  SortTypes.map((sortType) =>
-                    ItemBuilder.fromLabel(`By ${sortType}`).withAction(() =>
-                      savesAndBanks.sortHomeBox(homeData.currentPCBox, sortType)
-                    )
-                  )
-                ),
-                SubmenuBuilder.fromLabel('Sort all boxes...').withBuilders(
-                  SortTypes.map((sortType) =>
-                    ItemBuilder.fromLabel(`By ${sortType}`).withAction(() =>
-                      savesAndBanks.sortAllHomeBoxes(sortType)
-                    )
-                  )
-                ),
-              ]}
-            />
-          ))}
-      </Grid>
-      <PokemonDetailsModal
-        mon={selectedMon}
-        onClose={() => setSelectedIndex(undefined)}
-        navigateRight={navigateRight}
-        navigateLeft={navigateLeft}
-        boxIndicatorProps={
-          selectedIndex !== undefined
-            ? {
-                currentIndex: selectedIndex,
-                columns: homeData.boxColumns,
-                rows: homeData.boxRows,
-                emptyIndexes: range(homeData.boxColumns * homeData.boxRows).filter(
-                  (index) => !currentBox?.pokemon?.[index]
-                ),
-              }
-            : undefined
-        }
-      />
-    </>
+                ctxMenuBuilders={contextElements}
+              />
+            ))}
+        </Grid>
+        <PokemonDetailsModal
+          mon={selectedMon}
+          onClose={() => setSelectedIndex(undefined)}
+          navigateRight={navigateRight}
+          navigateLeft={navigateLeft}
+          boxIndicatorProps={
+            selectedIndex !== undefined
+              ? {
+                  currentIndex: selectedIndex,
+                  columns: homeData.boxColumns,
+                  rows: homeData.boxRows,
+                  emptyIndexes: range(homeData.boxColumns * homeData.boxRows).filter(
+                    (index) => !currentBox?.pokemon?.[index]
+                  ),
+                }
+              : undefined
+          }
+        />
+      </div>
+    </OpenHomeCtxMenu>
   )
 }
 
