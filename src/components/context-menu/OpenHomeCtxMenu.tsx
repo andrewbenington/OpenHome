@@ -40,7 +40,7 @@ export default function OpenHomeCtxMenu(props: ContextMenuProps) {
 }
 
 export function CtxMenuContent(props: RadixCtxMenu.ContentProps) {
-  return <RadixCtxMenu.Content className="ctx-menu" {...props} />
+  return <RadixCtxMenu.Content {...props} />
 }
 
 function CtxMenuItem(props: RadixCtxMenu.ItemProps) {
