@@ -90,10 +90,10 @@ function componentFromElement(element: CtxMenuElement, index: number): ReactNode
         </CtxMenuLabel>
       )
     case 'separator':
-      return <CtxMenuSeparator />
+      return <CtxMenuSeparator key={index} />
     case 'submenu':
       return (
-        <CtxMenuSubmenu>
+        <CtxMenuSubmenu key={index}>
           <CtxMenuSubmenuTrigger>
             {contentIsLabel(element.content) ? element.content.label : element.content.component}
           </CtxMenuSubmenuTrigger>
