@@ -60,9 +60,9 @@
     "lodash": "^4.17.21",
     "prando": "^6.0.1",
     "radix-ui": "^1.4.3",
-    "react": "^19.2.0",
+    "react": "^19.2.1",
     "react-chartjs-2": "^5.3.1",
-    "react-data-grid": "7.0.0-beta.58",
+    "react-data-grid": "7.0.0-beta.59",
     "react-error-boundary": "^6.0.0",
     "react-icons": "^5.5.0",
     "uuid": "^13.0.0"
