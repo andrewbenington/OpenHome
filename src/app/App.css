@@ -190,7 +190,7 @@ label {
   --base-menu-item-height: 20px;
   .rt-BaseMenuSeparator {
     margin: 0px 0px;
-  };
+  }
   --cursor-menu-item: pointer;
   --default-font-size: 0.9em;
   .rt-BaseTabList {

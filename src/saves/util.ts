@@ -6,6 +6,7 @@ import { PKMInterface } from '../types/interfaces'
 import { HomeData } from '../types/SAVTypes/HomeData'
 import { Box, SAV } from '../types/SAVTypes/SAV'
 import { SaveRef } from '../types/types'
+import { Option } from '../util/Functional'
 import { filterUndefined } from '../util/Sort'
 
 export type SaveViewMode = 'card' | 'grid'
@@ -154,10 +155,12 @@ export function buildBackwardNavigator(
 export function buildRecentSaveContextElements(
   save: SaveRef,
   backend: BackendInterface,
-  removeRecentSave: (path: string) => void
-): CtxMenuElementBuilder[] {
+  removeRecentSave?: (path: string) => void
+): Option<CtxMenuElementBuilder>[] {
   return [
-    ItemBuilder.fromLabel('Remove Save').withAction(() => removeRecentSave(save.filePath.raw)),
+    removeRecentSave
+      ? ItemBuilder.fromLabel('Remove Save').withAction(() => removeRecentSave(save.filePath.raw))
+      : undefined,
     ItemBuilder.fromLabel(
       `Reveal in ${backend.getPlatform() === 'macos' ? 'Finder' : 'File Explorer'}`
     ).withAction(() => backend.openDirectory(save.filePath.dir)),

@@ -13,7 +13,7 @@ export type SaveCardProps = {
   save: SaveRef
   size?: number
   onOpen: () => void
-  onRemove: () => void
+  onRemove?: () => void
 }
 
 const expandedViewMinSize = 240
