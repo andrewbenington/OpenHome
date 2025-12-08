@@ -4,17 +4,16 @@ import { useContext, useMemo, useState } from 'react'
 import { SaveRef } from 'src/types/types'
 import { BackendContext } from '../backend/backendContext'
 import OpenHomeCtxMenu from '../components/context-menu/OpenHomeCtxMenu'
-import { ItemBuilder } from '../components/context-menu/types'
 import { ErrorIcon } from '../components/Icons'
 import useDisplayError from '../hooks/displayError'
 import './style.css'
-import { formatTimeSince, logoFromSaveRef } from './util'
+import { buildRecentSaveContextElements, formatTimeSince, logoFromSaveRef } from './util'
 
 export type SaveCardProps = {
   save: SaveRef
   size?: number
   onOpen: () => void
-  onRemove?: () => void
+  onRemove: () => void
 }
 
 const expandedViewMinSize = 240
@@ -43,14 +42,7 @@ export default function SaveCard({ save, onOpen, onRemove, size = 240 }: SaveCar
   const backgroundImage = saveLogoPath ? `url(${saveLogoPath})` : undefined
 
   return (
-    <OpenHomeCtxMenu
-      elements={[
-        ItemBuilder.fromLabel('Remove').withAction(onRemove),
-        ItemBuilder.fromLabel(
-          `Reveal in ${backend.getPlatform() === 'macos' ? 'Finder' : 'File Explorer'}`
-        ).withAction(() => backend.openDirectory(save.filePath.dir)),
-      ]}
-    >
+    <OpenHomeCtxMenu elements={buildRecentSaveContextElements(save, backend, onRemove)}>
       <div style={{ position: 'relative' }}>
         <div
           className="save-card"

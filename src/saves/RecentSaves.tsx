@@ -2,20 +2,19 @@ import { OriginGames } from '@pkm-rs/pkg'
 import { Flex } from '@radix-ui/themes'
 import * as E from 'fp-ts/lib/Either'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import OpenHomeCtxMenu from 'src/components/context-menu/OpenHomeCtxMenu'
 import { PathData, splitPath } from 'src/types/SAVTypes/path'
 import { getPluginIdentifier } from 'src/types/SAVTypes/util'
 import { SaveRef } from 'src/types/types'
 import { filterUndefined, numericSorter, stringSorter } from 'src/util/Sort'
 import { BackendContext } from '../backend/backendContext'
-import OpenHomeCtxMenu from '../components/context-menu/OpenHomeCtxMenu'
-import { SeparatorBuilder } from '../components/context-menu/types'
 import { ErrorIcon } from '../components/Icons'
 import OHDataGrid, { SortableColumn } from '../components/OHDataGrid'
 import useDisplayError from '../hooks/displayError'
 import { AppInfoContext } from '../state/appInfo'
 import { useSaves } from '../state/saves/useSaves'
 import SaveCard from './SaveCard'
-import { formatTime, formatTimeSince, SaveViewMode } from './util'
+import { buildRecentSaveContextElements, formatTime, formatTimeSince, SaveViewMode } from './util'
 
 interface SaveFileSelectorProps {
   onOpen: (path: PathData) => void
@@ -191,36 +190,75 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
   ]
 
   return view === 'grid' ? (
-    <OpenHomeCtxMenu sections={[[SeparatorBuilder]]}>
-      <OHDataGrid
-        rows={Object.values(recentSaves ?? {}).map((save, i) => ({
-          ...save,
-          index: i,
-        }))}
-        columns={columns}
-        defaultSort="lastOpened"
-        defaultSortDir="DESC"
-        // onCellContextMenu={(_, e) => {
-        //   setContextAnchor(e.currentTarget)
-        //   console.log(e.currentTarget)
-        // }}
-        rowClass={(row) => (row.valid ? undefined : 'datagrid-error-row')}
-      />
-    </OpenHomeCtxMenu>
+    <OHDataGrid
+      rows={Object.values(recentSaves ?? {}).map((save, i) => ({
+        ...save,
+        index: i,
+      }))}
+      columns={columns.map((column) => {
+        const newColumn = { ...column }
+        if (newColumn.renderCell) {
+          const renderCell = newColumn.renderCell
+          newColumn.renderCell = (props) => (
+            <OpenHomeCtxMenu
+              elements={buildRecentSaveContextElements(props.row, backend, removeRecentSave)}
+            >
+              <Flex height="100%" align="center" justify="center" width="100%">
+                {renderCell(props)}
+              </Flex>
+            </OpenHomeCtxMenu>
+          )
+        } else if (newColumn.renderValue) {
+          const renderValue = newColumn.renderValue
+          newColumn.renderValue = (value) => {
+            const rendered = renderValue(value)
+            const justify = typeof rendered === 'string' ? 'start' : 'center'
+            return (
+              <OpenHomeCtxMenu
+                elements={buildRecentSaveContextElements(value, backend, removeRecentSave)}
+              >
+                <Flex height="100%" align="center" justify={justify} width="100%">
+                  {rendered}
+                </Flex>
+              </OpenHomeCtxMenu>
+            )
+          }
+        } else {
+          newColumn.renderValue = (value) => {
+            const justify = typeof value === 'string' ? 'start' : 'center'
+            return (
+              <OpenHomeCtxMenu
+                elements={buildRecentSaveContextElements(value, backend, removeRecentSave)}
+              >
+                <Flex height="100%" align="center" justify={justify} width="100%">
+                  {value[column.key] as string | number | null}
+                </Flex>
+              </OpenHomeCtxMenu>
+            )
+          }
+        }
+        return newColumn
+      })}
+      defaultSort="lastOpened"
+      defaultSortDir="DESC"
+      rowClass={(row) => (row.valid ? undefined : 'datagrid-error-row')}
+    />
   ) : (
     <Flex wrap="wrap" direction="row" justify="center" m="4" gap="2">
       {Object.values(recentSaves ?? {})
         .sort((a, b) => (b.lastOpened ?? 0) - (a.lastOpened ?? 0))
         .map((save) => (
-          <SaveCard
+          <OpenHomeCtxMenu
             key={save.filePath.raw}
-            save={save}
-            onOpen={() => {
-              onOpen(save.filePath)
-            }}
-            onRemove={() => removeRecentSave(save.filePath.raw)}
-            size={cardSize}
-          />
+            elements={buildRecentSaveContextElements(save, backend, removeRecentSave)}
+          >
+            <SaveCard
+              save={save}
+              onOpen={() => onOpen(save.filePath)}
+              onRemove={() => removeRecentSave(save.filePath.raw)}
+              size={cardSize}
+            />
+          </OpenHomeCtxMenu>
         ))}
     </Flex>
   )

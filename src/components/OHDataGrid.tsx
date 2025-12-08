@@ -17,7 +17,7 @@ function sortRows<T>(rows: readonly T[], columns: SortableColumn<T>[], sortColum
 
 export type SortableColumn<T> = Column<T> & {
   sortFunction?: (a: T, b: T) => number
-  readonly renderValue?: (value: T) => ReactNode
+  renderValue?: (value: T) => ReactNode
 }
 
 export type OHDataGridProps<R> = {

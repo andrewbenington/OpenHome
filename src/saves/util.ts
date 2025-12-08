@@ -1,5 +1,7 @@
 import { OriginGames } from '@pkm-rs/pkg'
 import dayjs from 'dayjs'
+import BackendInterface from '../backend/backendInterface'
+import { CtxMenuElementBuilder, ItemBuilder } from '../components/context-menu/types'
 import { PKMInterface } from '../types/interfaces'
 import { HomeData } from '../types/SAVTypes/HomeData'
 import { Box, SAV } from '../types/SAVTypes/SAV'
@@ -147,4 +149,17 @@ export function buildBackwardNavigator(
   const getPrevious = (index: number) => (index === 0 ? boxSize - 1 : index - 1)
 
   return buildNavigator(getPrevious, save, index, callback)
+}
+
+export function buildRecentSaveContextElements(
+  save: SaveRef,
+  backend: BackendInterface,
+  removeRecentSave: (path: string) => void
+): CtxMenuElementBuilder[] {
+  return [
+    ItemBuilder.fromLabel('Remove Save').withAction(() => removeRecentSave(save.filePath.raw)),
+    ItemBuilder.fromLabel(
+      `Reveal in ${backend.getPlatform() === 'macos' ? 'Finder' : 'File Explorer'}`
+    ).withAction(() => backend.openDirectory(save.filePath.dir)),
+  ]
 }
