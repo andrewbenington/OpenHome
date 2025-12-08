@@ -149,6 +149,7 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
       name: 'Trainer',
       width: 160,
       renderValue: (save) => `${save.trainerName} (${save.trainerID})`,
+      sortFunction: stringSorter((save) => `${save.trainerName} (${save.trainerID})`),
     },
     {
       key: 'lastOpened',
