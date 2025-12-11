@@ -1,7 +1,7 @@
 use crate::error::{Error, Result};
 use crate::pkm_storage::FilenameToBytesMap;
 use crate::plugin::{self, PluginMetadata, PluginMetadataWithIcon, list_downloaded_plugins};
-use crate::state::{AppState, AppStateSnapshot, PokedexState};
+use crate::state::{AppState, AppStateInner};
 use crate::util::ImageResponse;
 use crate::{menu, saves, util};
 use serde_json::Value;
@@ -12,8 +12,8 @@ use std::time::SystemTime;
 use tauri::Manager;
 
 #[tauri::command]
-pub fn get_state(state: tauri::State<'_, AppState>) -> Result<AppStateSnapshot> {
-    Ok(state.lock()?.snapshot())
+pub fn get_state(state: tauri::State<'_, AppState>) -> Result<AppStateInner> {
+    Ok(state.lock()?.clone())
 }
 
 #[tauri::command]
@@ -23,9 +23,6 @@ pub fn get_file_bytes(absolute_path: PathBuf) -> Result<Vec<u8>> {
 
 #[tauri::command]
 pub fn get_file_created(absolute_path: PathBuf) -> Result<Option<u128>> {
-    // let full_path = prepend_appdata_to_path(&app_handle, path)?;
-
-    // Open the file, and return any error up the call stack
     let metadata =
         fs::metadata(&absolute_path).map_err(|e| Error::file_access(&absolute_path, e))?;
 
@@ -81,35 +78,6 @@ pub fn delete_storage_files(
     }
 
     result
-}
-
-#[tauri::command]
-pub fn start_transaction(state: tauri::State<'_, AppState>) -> Result<()> {
-    state.lock()?.start_transaction()
-}
-
-#[tauri::command]
-pub fn rollback_transaction(state: tauri::State<'_, AppState>) -> Result<()> {
-    state.lock()?.rollback_transaction()
-}
-
-#[tauri::command]
-pub fn commit_transaction(
-    app_handle: tauri::AppHandle,
-    app_state: tauri::State<'_, AppState>,
-    pokedex_state: tauri::State<'_, PokedexState>,
-) -> Result<()> {
-    app_state.lock()?.commit_transaction()?;
-    pokedex_state.lock()?.write_to_storage(&app_handle)
-}
-
-#[tauri::command]
-pub fn write_file_bytes(
-    state: tauri::State<'_, AppState>,
-    absolute_path: &Path,
-    bytes: Vec<u8>,
-) -> Result<()> {
-    state.lock()?.write_file_bytes_temped(absolute_path, bytes)
 }
 
 #[tauri::command]
@@ -201,6 +169,15 @@ pub fn find_suggested_saves(
     possible_saves.desamume = util::dedupe_paths(possible_saves.desamume);
 
     Ok(possible_saves)
+}
+
+#[tauri::command]
+pub fn write_file_bytes(
+    state: tauri::State<'_, AppState>,
+    absolute_path: &Path,
+    bytes: Vec<u8>,
+) -> Result<()> {
+    state.lock()?.write_file_bytes_temped(absolute_path, bytes)
 }
 
 #[tauri::command]

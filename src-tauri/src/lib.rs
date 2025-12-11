@@ -10,7 +10,7 @@ mod state;
 mod util;
 mod versioning;
 
-use std::env;
+use std::{env, thread, time::Duration};
 use tauri::Manager;
 use tauri_plugin_dialog::{DialogExt, MessageDialogKind};
 
@@ -21,7 +21,9 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_fs::init())
         .setup(|app| {
-            if let Err(launch_error) = startup::run_app_startup(app) {
+            let version_features_r = startup::run_app_startup(app);
+            let Ok(version_features) = version_features_r else {
+                let launch_error = version_features_r.unwrap_err();
                 match launch_error {
                     Error::OutdatedVersion { .. } => app.handle().exit(1),
                     _ => {
@@ -32,8 +34,10 @@ pub fn run() {
                             .blocking_show();
                         app.handle().exit(1);
                     }
-                }
-            }
+                };
+                thread::sleep(Duration::from_secs(10));
+                std::process::exit(1);
+            };
 
             let lookup_state = match state::LookupState::load_from_storage(app.handle()) {
                 Ok(lookup) => lookup,
@@ -63,7 +67,7 @@ pub fn run() {
             };
             app.manage(pokedex_state);
 
-            app.manage(state::AppState::default());
+            app.manage(state::AppState::from_update_features(version_features));
 
             match menu::create_menu(app) {
                 Ok(menu) => {
@@ -93,9 +97,6 @@ pub fn run() {
             commands::write_storage_file_bytes,
             commands::get_ohpkm_files,
             commands::delete_storage_files,
-            commands::start_transaction,
-            commands::rollback_transaction,
-            commands::commit_transaction,
             commands::find_suggested_saves,
             commands::set_app_theme,
             commands::validate_recent_saves,
@@ -111,6 +112,9 @@ pub fn run() {
             state::update_lookups,
             state::get_pokedex,
             state::update_pokedex,
+            state::start_transaction,
+            state::rollback_transaction,
+            state::commit_transaction,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
