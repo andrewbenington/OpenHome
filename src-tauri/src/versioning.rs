@@ -26,9 +26,11 @@ pub fn get_version_last_used(app_handle: &tauri::AppHandle) -> Result<Option<Str
     }
 }
 
-const SKIP_LAST_USED_UPDATE: bool = cfg!(debug_assertions);
+#[cfg(debug_assertions)]
+const SKIP_LAST_USED_UPDATE: bool = false;
 
 pub fn update_version_last_used(app_handle: &tauri::AppHandle) -> Result<()> {
+    #[cfg(debug_assertions)]
     if SKIP_LAST_USED_UPDATE {
         return Ok(());
     }
@@ -57,14 +59,14 @@ pub fn handle_updates_get_features(
         None => println!("User last used OpenHome version 1.4.13 or earlier"),
     }
 
-    let last_used_version = match last_used_version {
+    let last_version_or_1_4_13 = match last_used_version {
         Some(ref version) => version,
         None => "1.4.13",
     };
 
-    let Ok(last_used_semver) = Version::parse(last_used_version) else {
+    let Ok(last_used_semver) = Version::parse(last_version_or_1_4_13) else {
         return Err(Error::other(&format!(
-            "Invalid version number: {last_used_version}"
+            "Invalid version number: {last_version_or_1_4_13}"
         )));
     };
 
@@ -95,16 +97,27 @@ pub fn handle_updates_get_features(
             update.do_migration(app_handle)?;
             println!("Migration complete");
 
+            if last_used_version.is_none() {
+                // don't display new features if user is new to OpenHome
+                continue;
+            }
+
             if let Some(update_features) = update.get_features() {
                 if let Some(prev) = &mut prev_o {
-                    if prev.version_matches(update.get_major()) {
+                    if prev.version_matches(update.get_non_prerelease()) {
                         prev.add_feature_messages(&update_features);
                     } else {
                         version_features.push(prev.clone());
-                        prev_o = Some(UpdateFeatures::new(update.get_major(), update_features))
+                        prev_o = Some(UpdateFeatures::new(
+                            update.get_non_prerelease(),
+                            update_features,
+                        ))
                     }
                 } else {
-                    prev_o = Some(UpdateFeatures::new(update.get_major(), update_features));
+                    prev_o = Some(UpdateFeatures::new(
+                        update.get_non_prerelease(),
+                        update_features,
+                    ));
                 }
             }
         }
@@ -145,38 +158,38 @@ impl SignificantUpdate {
 
     pub fn get_features(&self) -> Option<Vec<String>> {
         match self {
-            SignificantUpdate::V1_8_0AlphaOhpkmV2 => Some(vec![
-                    "Tracked Pokémon may now have associated notes, using the 'Notes' tab in the Pokémon details popup".to_owned(),
+            Self::V1_8_0AlphaOhpkmV2 => Some(vec![
+                String::from(
+                    "Tracked Pokémon may now have associated notes, using the 'Notes' tab in the Pokémon details popup",
+                ),
                 String::from(
                     "Multiple past trainers' data are persisted, meaning friendship, etc can be independently tracked across many games for the same Pokémon",
                 ),
             ]),
-            SignificantUpdate::V1_8_0AlphaFeatureMessages => Some(vec![
-                String::from("Right clicking on some elements now offer actions in a context menu"),
-            ]),
+            Self::V1_8_0AlphaFeatureMessages => Some(vec![String::from(
+                "Right clicking on some elements now offer actions in a context menu",
+            )]),
             _ => None,
         }
     }
 
-    pub fn get_major(&self) -> Version {
-        match self {
-            SignificantUpdate::V1_5_0AlphaMultipleBanks => Version::new(1, 5, 0),
-            SignificantUpdate::V1_8_0AlphaOhpkmV2
-            | SignificantUpdate::V1_8_0AlphaFeatureMessages => Version::new(1, 8, 0),
-        }
+    pub fn get_non_prerelease(&self) -> Version {
+        let version = self.version();
+
+        Version::new(version.major, version.minor, version.patch)
     }
 }
 
 #[derive(Debug, Clone, Serialize)]
 pub struct UpdateFeatures {
-    major_version: String,
+    version: String,
     feature_messages: Vec<String>,
 }
 
 impl UpdateFeatures {
-    pub fn new(major_version: Version, feature_messages: Vec<String>) -> Self {
+    pub fn new(version: Version, feature_messages: Vec<String>) -> Self {
         Self {
-            major_version: major_version.to_string(),
+            version: version.to_string(),
             feature_messages,
         }
     }
@@ -186,7 +199,7 @@ impl UpdateFeatures {
     }
 
     pub fn version_matches(&self, other: Version) -> bool {
-        self.major_version == other.to_string()
+        self.version == other.to_string()
     }
 }
 

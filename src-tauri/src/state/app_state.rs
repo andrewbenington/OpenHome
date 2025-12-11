@@ -30,7 +30,7 @@ pub struct AppState(pub Mutex<AppStateInner>);
 
 impl AppState {
     pub fn from_update_features(update_features: Vec<UpdateFeatures>) -> Self {
-        Self(Mutex::new(AppStateInner::from_update_features(
+        Self(Mutex::new(AppStateInner::from_startup_messages(
             update_features,
         )))
     }
@@ -49,14 +49,14 @@ pub struct AppStateInner {
     open_transaction: bool,
     temp_files: Vec<PathBuf>,
     is_dev: bool,
-    update_features: Vec<UpdateFeatures>,
+    new_features_since_update: Vec<UpdateFeatures>,
 }
 
 impl AppStateInner {
-    pub fn from_update_features(update_features: Vec<UpdateFeatures>) -> Self {
+    pub fn from_startup_messages(update_features: Vec<UpdateFeatures>) -> Self {
         Self {
             is_dev: cfg!(debug_assertions),
-            update_features,
+            new_features_since_update: update_features,
             ..Default::default()
         }
     }
@@ -110,10 +110,6 @@ impl AppStateInner {
         }
 
         fs::write(&path, &bytes).map_err(|e| Error::file_write(&path, e))
-    }
-
-    pub fn clear_feature_messages(&mut self) {
-        self.update_features.clear();
     }
 }
 
