@@ -1,7 +1,7 @@
 import { Item } from '@pkm-rs/pkg'
 import { createContext, Dispatch, Reducer } from 'react'
 import { OHPKM } from 'src/types/pkm/OHPKM'
-import { HomeData } from 'src/types/SAVTypes/HomeData'
+import { AddBoxLocation, HomeData } from 'src/types/SAVTypes/HomeData'
 import { SAV } from 'src/types/SAVTypes/SAV'
 import { StoredBankData } from 'src/types/storage'
 import { getMonFileIdentifier } from 'src/util/Lookup'
@@ -69,19 +69,19 @@ export type OpenSavesAction =
    */
   | {
       type: 'set_home_box'
-      payload: { box: number }
+      payload: { boxIndex: number }
     }
   | {
-      type: 'sort_current_home_box'
-      payload: { sortType: SortType; getMonById: OhpkmLookup }
+      type: 'sort_home_box'
+      payload: { boxIndex: number; sortType: SortType; getMonById: OhpkmLookup }
     }
   | {
       type: 'sort_all_home_boxes'
       payload: { sortType: SortType; getMonById: OhpkmLookup }
     }
   | {
-      type: 'current_home_box_remove_dupes'
-      payload?: undefined
+      type: 'home_box_remove_dupes'
+      payload: { boxIndex: number }
     }
   | {
       type: 'set_home_box_name'
@@ -89,7 +89,7 @@ export type OpenSavesAction =
     }
   | {
       type: 'add_home_box'
-      payload: { currentBoxCount: number }
+      payload: { location: AddBoxLocation; currentBoxCount: number }
     }
   | {
       type: 'delete_home_box'
@@ -112,7 +112,7 @@ export type OpenSavesAction =
     }
   | {
       type: 'set_save_box'
-      payload: { save: SAV; boxNum: number }
+      payload: { save: SAV; boxIndex: number }
     }
   | {
       type: 'close_all_saves'
@@ -239,7 +239,7 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
      */
     case 'set_home_box': {
       if (!state.homeData) return state
-      const { box } = payload
+      const { boxIndex: box } = payload
 
       state.homeData.currentBoxIndex = box
       const newState: OpenSavesState = {
@@ -249,14 +249,14 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
 
       return newState
     }
-    case 'sort_current_home_box': {
+    case 'sort_home_box': {
       if (!state.homeData) return state
 
-      const boxMons = state.homeData
-        .getCurrentBox()
-        .pokemon.toSorted(getSortFunctionNullable(payload.sortType))
+      const boxMons = state.homeData.boxes[payload.boxIndex].pokemon.toSorted(
+        getSortFunctionNullable(payload.sortType)
+      )
 
-      state.homeData.boxes[state.homeData.currentPCBox].pokemon = boxMons
+      state.homeData.boxes[payload.boxIndex].pokemon = boxMons
       state.homeData.syncBankToBoxes()
       state.homeData = state.homeData.clone(payload.getMonById)
       return { ...state }
@@ -278,10 +278,10 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
 
       return { ...state }
     }
-    case 'current_home_box_remove_dupes': {
+    case 'home_box_remove_dupes': {
       if (!state.homeData) return state
 
-      state.homeData.currentBoxRemoveDupes()
+      state.homeData.removeDupesFromBox(payload.boxIndex)
       return { ...state }
     }
     case 'set_home_box_name': {
@@ -309,7 +309,7 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
         return { ...state }
       }
 
-      newState.homeData.addBoxCurrentBank()
+      newState.homeData.addBoxCurrentBank(payload.location)
 
       return newState
     }
@@ -352,7 +352,7 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
       const { save } = payload
       const identifier = saveToStringIdentifier(payload.save)
 
-      save.currentPCBox = payload.boxNum
+      save.currentPCBox = payload.boxIndex
       const newState: OpenSavesState = {
         ...state,
         openSaves: {

@@ -2,7 +2,7 @@ import { Item } from '@pkm-rs/pkg'
 import { useContext } from 'react'
 import { PKMInterface } from '../../types/interfaces'
 import { OHPKM } from '../../types/pkm/OHPKM'
-import { HomeData } from '../../types/SAVTypes/HomeData'
+import { AddBoxLocation, HomeData } from '../../types/SAVTypes/HomeData'
 import { Box, SAV } from '../../types/SAVTypes/SAV'
 import { OpenHomeBox } from '../../types/storage'
 import { useOhpkmStore } from '../ohpkm/useOhpkmStore'
@@ -16,12 +16,12 @@ export type SavesAndBanksManager = Required<Omit<OpenSavesState, 'error'>> & {
   addBank(name: string | undefined, boxCount: number): void
   setBoxNameCurrentBank(boxIndex: number, newName: string | undefined): void
 
-  removeDupesCurrentHomeBox(): void
-  sortCurrentHomeBox(sortType: string): void
+  removeDupesFromHomeBox(boxIndex: number): void
+  sortHomeBox(boxIndex: number, sortType: string): void
   sortAllHomeBoxes(sortType: string): void
 
   reorderBoxesCurrentBank(idsInNewOrder: string[]): void
-  addBoxCurrentBank(): void
+  addBoxCurrentBank(position: AddBoxLocation): void
   deleteBoxCurrentBank(boxId: string, boxIndex: number): void
 
   homeBoxNavigateLeft(): void
@@ -121,7 +121,7 @@ export function useSaves(): SavesAndBanksManager {
     openSavesDispatch({
       type: 'set_home_box',
       payload: {
-        box:
+        boxIndex:
           loadedHomeData.currentPCBox > 0
             ? loadedHomeData.currentPCBox - 1
             : loadedHomeData.boxes.length - 1,
@@ -133,7 +133,7 @@ export function useSaves(): SavesAndBanksManager {
     openSavesDispatch({
       type: 'set_home_box',
       payload: {
-        box: (loadedHomeData.currentPCBox + 1) % loadedHomeData.boxes.length,
+        boxIndex: (loadedHomeData.currentPCBox + 1) % loadedHomeData.boxes.length,
       },
     })
   }
@@ -152,14 +152,14 @@ export function useSaves(): SavesAndBanksManager {
     })
   }
 
-  function removeDupesCurrentHomeBox() {
-    openSavesDispatch({ type: 'current_home_box_remove_dupes' })
+  function removeDupesFromHomeBox(boxIndex: number) {
+    openSavesDispatch({ type: 'home_box_remove_dupes', payload: { boxIndex } })
   }
 
-  function sortCurrentHomeBox(sortType: string) {
+  function sortHomeBox(boxIndex: number, sortType: string) {
     openSavesDispatch({
-      type: 'sort_current_home_box',
-      payload: { sortType, getMonById: ohpkmStore.getById },
+      type: 'sort_home_box',
+      payload: { boxIndex, sortType, getMonById: ohpkmStore.getById },
     })
   }
 
@@ -170,10 +170,10 @@ export function useSaves(): SavesAndBanksManager {
     })
   }
 
-  function addBoxCurrentBank() {
+  function addBoxCurrentBank(location: AddBoxLocation = 'end') {
     openSavesDispatch({
       type: 'add_home_box',
-      payload: { currentBoxCount: loadedHomeData.boxes.length },
+      payload: { location, currentBoxCount: loadedHomeData.boxes.length },
     })
   }
 
@@ -181,7 +181,7 @@ export function useSaves(): SavesAndBanksManager {
     openSavesDispatch({
       type: 'set_save_box',
       payload: {
-        boxNum: save.currentPCBox > 0 ? save.currentPCBox - 1 : save.boxes.length - 1,
+        boxIndex: save.currentPCBox > 0 ? save.currentPCBox - 1 : save.boxes.length - 1,
         save,
       },
     })
@@ -191,7 +191,7 @@ export function useSaves(): SavesAndBanksManager {
     openSavesDispatch({
       type: 'set_save_box',
       payload: {
-        boxNum: (save.currentPCBox + 1) % save.boxes.length,
+        boxIndex: (save.currentPCBox + 1) % save.boxes.length,
         save,
       },
     })
@@ -288,8 +288,8 @@ export function useSaves(): SavesAndBanksManager {
     setBoxNameCurrentBank,
     reorderBoxesCurrentBank,
 
-    removeDupesCurrentHomeBox,
-    sortCurrentHomeBox,
+    removeDupesFromHomeBox,
+    sortHomeBox,
     sortAllHomeBoxes,
 
     addBoxCurrentBank,

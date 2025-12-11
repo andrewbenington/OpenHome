@@ -53,6 +53,7 @@
   padding: 2px 0px;
   position: relative;
 }
+
 .box-navigation svg {
   height: 18px;
   width: 18px;
@@ -72,6 +73,17 @@
   text-indent: 0px;
 }
 
+.home-box-header {
+  padding: 6px;
+  width: 100%;
+  height: fit-content;
+  max-height: 100%;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
 .save-header {
   display: flex;
   flex-direction: row;
@@ -79,6 +91,7 @@
   margin: 1px;
   align-items: center;
 }
+
 .save-header svg {
   height: 18px;
   width: 18px;
@@ -91,6 +104,20 @@
   flex-direction: row;
   gap: 4px;
   padding: 4px 14px 4px 4px;
+}
+
+.home-box-delete-button {
+  position: absolute !important;
+  z-index: 1;
+  top: 0;
+  right: 0;
+}
+
+.box-overview-button {
+  height: fit-content;
+  padding: 4px 8px;
+  width: 100%;
+  min-width: 100%;
 }
 
 .ToggleGroup {

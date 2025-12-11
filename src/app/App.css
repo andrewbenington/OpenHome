@@ -187,7 +187,10 @@ label {
   --cursor-button: pointer;
   --card-border-width: 2px;
   --base-menu-content-padding: 0px;
-  --base-menu-item-height: 26px;
+  --base-menu-item-height: 20px;
+  .rt-BaseMenuSeparator {
+    margin: 0px 0px;
+  }
   --cursor-menu-item: pointer;
   --default-font-size: 0.9em;
   .rt-BaseTabList {
@@ -200,7 +203,7 @@ label {
     display: flex;
     flex-direction: row;
   }
-  .rt-BaseMenuItem {
+  .rt-BaseMenuItem:not(.rt-ContextMenuItem) {
     border-radius: 0;
   }
   .rt-Card {

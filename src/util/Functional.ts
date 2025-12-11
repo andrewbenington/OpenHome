@@ -42,3 +42,5 @@ export function intersection<T>(first: T[] | undefined, second: T[]): T[] {
 export function unique<T>(items: T[] | undefined): T[] {
   return Array.from(new Set(items))
 }
+
+export type Option<T> = T | undefined

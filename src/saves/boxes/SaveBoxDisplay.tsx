@@ -13,9 +13,12 @@ import { MonLocation } from 'src/state/saves/reducer'
 import { PKMInterface } from 'src/types/interfaces'
 import { OHPKM } from 'src/types/pkm/OHPKM'
 import { getMonFileIdentifier } from 'src/util/Lookup'
+import OpenHomeCtxMenu from '../../components/context-menu/OpenHomeCtxMenu'
+import { ItemBuilder } from '../../components/context-menu/types'
 import { DragMonContext } from '../../state/dragMon'
 import { useOhpkmStore } from '../../state/ohpkm/useOhpkmStore'
 import { useSaves } from '../../state/saves/useSaves'
+import { SAV } from '../../types/SAVTypes/SAV'
 import { colorIsDark } from '../../util/color'
 import { buildBackwardNavigator, buildForwardNavigator } from '../util'
 import ArrowButton from './ArrowButton'
@@ -35,7 +38,6 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   const { saveIndex } = props
   const [selectedIndex, setSelectedIndex] = useState<number>()
   const [dragMonState] = useContext(DragMonContext)
-  const backend = useContext(BackendContext)
 
   const save = useMemo(
     () => savesAndBanks.allOpenSaves[saveIndex],
@@ -134,47 +136,8 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   return save && save.currentPCBox !== undefined ? (
     <>
       <Flex direction="column" width="100%" gap="1">
-        <Card style={{ padding: 0 }}>
-          <div className="save-header">
-            <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 4 }}>
-              <div
-                className="save-header-game diagonal-clip"
-                style={{
-                  backgroundColor: save.gameColor,
-                  color: colorIsDark(save.gameColor) ? 'white' : 'black',
-                }}
-              >
-                <Button
-                  className="save-close-button"
-                  onClick={() => savesAndBanks.removeSave(save)}
-                  disabled={!!save.updatedBoxSlots.length}
-                  color="tomato"
-                  style={{ padding: 1 }}
-                >
-                  <MdClose />
-                </Button>
-                {save.gameName}
-              </div>
-              {save?.name}
-            </div>
-            <div className="save-menu-buttons-right" style={{ marginRight: 4 }}>
-              <Button
-                className="mini-button"
-                onClick={() => setDetailsModal(true)}
-                variant="outline"
-                color="gray"
-              >
-                <MenuIcon />
-              </Button>
-            </div>
-          </div>
-        </Card>
-        <Card
-          className="box-card"
-          style={{
-            backgroundColor: isDisabled ? '#666' : undefined,
-          }}
-        >
+        <SaveHeader save={save} setDetailsModal={setDetailsModal} />
+        <Card className="box-card" style={{ backgroundColor: isDisabled ? '#666' : undefined }}>
           <div className="box-navigation">
             <Flex align="center" justify="center" flexGrow="4">
               <ArrowButton
@@ -257,15 +220,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
               </AttributeRow>
             )}
             <AttributeRow label="File">
-              <div style={{ overflowWrap: 'break-word', width: '100%' }}>
-                {save.filePath.raw}
-                <button
-                  style={{ padding: 0, marginLeft: 8 }}
-                  onClick={() => backend.openDirectory(save.filePath.dir)}
-                >
-                  Open
-                </button>
-              </div>
+              <div style={{ overflowWrap: 'break-word', width: '100%' }}>{save.filePath.raw}</div>
             </AttributeRow>
             {save.fileCreated && (
               <AttributeRow label="File">
@@ -282,7 +237,6 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
           </Dialog.Content>
         </Dialog.Root>
       </Flex>
-
       <Fallback>
         <PokemonDetailsModal
           mon={selectedMon}
@@ -306,6 +260,60 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
     </>
   ) : (
     <div />
+  )
+}
+
+type SaveHeaderProps = { save: SAV; setDetailsModal: (open: boolean) => void }
+
+function SaveHeader({ save, setDetailsModal }: SaveHeaderProps) {
+  const savesAndBanks = useSaves()
+  const backend = useContext(BackendContext)
+
+  const contextElements = [
+    ItemBuilder.fromLabel('Details...').withAction(() => setDetailsModal(true)),
+    ItemBuilder.fromLabel('Open file location').withAction(() =>
+      backend.openDirectory(save.filePath.dir)
+    ),
+  ]
+
+  return (
+    <OpenHomeCtxMenu elements={contextElements}>
+      <Card style={{ padding: 0 }}>
+        <div className="save-header">
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 4 }}>
+            <div
+              className="save-header-game diagonal-clip"
+              style={{
+                backgroundColor: save.gameColor,
+                color: colorIsDark(save.gameColor) ? 'white' : 'black',
+              }}
+            >
+              <Button
+                className="save-close-button"
+                onClick={() => savesAndBanks.removeSave(save)}
+                disabled={!!save.updatedBoxSlots.length}
+                color="tomato"
+                style={{ padding: 1 }}
+              >
+                <MdClose />
+              </Button>
+              {save.gameName}
+            </div>
+            {save?.name}
+          </div>
+          <div className="save-menu-buttons-right" style={{ marginRight: 4 }}>
+            <Button
+              className="mini-button"
+              onClick={() => setDetailsModal(true)}
+              variant="outline"
+              color="gray"
+            >
+              <MenuIcon />
+            </Button>
+          </div>
+        </div>
+      </Card>
+    </OpenHomeCtxMenu>
   )
 }
 

@@ -38,6 +38,18 @@
   /* border: 1px solid white; */
 }
 
+.save-card {
+  background-repeat: no-repeat !important;
+  background-position: center;
+  display: flex;
+  flex-direction: column;
+  transition: background-color 0.2s;
+  padding: 0;
+  cursor: pointer;
+  position: relative;
+  border-radius: 5px;
+}
+
 .save-card:hover::after {
   content: '';
   width: inherit;
@@ -60,6 +72,31 @@
   border-radius: inherit;
   transition: background-color 0.2s;
   pointer-events: none;
+}
+
+.save-file-path {
+  overflow-wrap: anywhere;
+  width: calc(100% - 12px);
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 6px;
+  line-height: 1.2;
+  transition: max-height 0.3s;
+  cursor: pointer;
+  text-align: start;
+  display: flex;
+  flex-direction: column-reverse;
+  padding: 0px 3px 3px;
+  z-index: 1;
+}
+
+.save-grid-error-button-container {
+  width: 100%;
+  position: absolute;
+  bottom: 8px;
+  display: grid;
+  justify-content: center;
 }
 
 .save-grid-error-button {

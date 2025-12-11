@@ -16,9 +16,11 @@
 }
 
 .centered-cell {
-  display: grid;
+  display: flex;
+  width: 100%;
   align-items: center;
   justify-content: center;
+  padding: 1px;
 }
 
 .mono-cell {
