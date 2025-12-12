@@ -10,6 +10,12 @@ export type AppState = {
   open_transaction: boolean
   temp_files: string[]
   is_dev: boolean
+  new_features_since_update: UpdateFeatures[]
+}
+
+export type UpdateFeatures = {
+  version: string
+  feature_messages: string[]
 }
 
 export type ImageResponse = {
