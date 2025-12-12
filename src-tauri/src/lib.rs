@@ -10,7 +10,7 @@ mod state;
 mod util;
 mod versioning;
 
-use std::{env, thread, time::Duration};
+use std::env;
 use tauri::Manager;
 use tauri_plugin_dialog::{DialogExt, MessageDialogKind};
 
@@ -35,7 +35,6 @@ pub fn run() {
                         app.handle().exit(1);
                     }
                 };
-                thread::sleep(Duration::from_secs(10));
                 std::process::exit(1);
             };
 
@@ -48,7 +47,7 @@ pub fn run() {
                         .kind(MessageDialogKind::Error)
                         .blocking_show();
                     app.handle().exit(1);
-                    unreachable!()
+                    std::process::exit(1);
                 }
             };
             app.manage(lookup_state);
@@ -62,7 +61,7 @@ pub fn run() {
                         .kind(MessageDialogKind::Error)
                         .blocking_show();
                     app.handle().exit(1);
-                    unreachable!()
+                    std::process::exit(1);
                 }
             };
             app.manage(pokedex_state);
