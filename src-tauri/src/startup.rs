@@ -6,34 +6,38 @@ use tauri_plugin_dialog::{DialogExt, MessageDialogButtons, MessageDialogKind};
 use crate::{
     error::{Error, Result},
     pkm_storage::StoredBankData,
-    util, versioning,
+    util,
+    versioning::{self, UpdateFeatures},
 };
 
-pub fn run_app_startup(app: &App) -> Result<()> {
+pub fn run_app_startup(app: &App) -> Result<Vec<UpdateFeatures>> {
     let handle = app.handle();
 
-    if let Err(error) = versioning::handle_version_migration(handle, false) {
-        match error {
-            Error::OutdatedVersion { .. } => {
-                let should_quit = app
-                    .dialog()
-                    .message(error.to_string())
-                    .title("OpenHome Version Error")
-                    .kind(MessageDialogKind::Error)
-                    .buttons(MessageDialogButtons::OkCancelCustom(
-                        "Quit".to_owned(),
-                        "Launch App Anyways".to_owned(),
-                    ))
-                    .blocking_show();
+    let update_features: Vec<UpdateFeatures> =
+        match versioning::handle_updates_get_features(handle, false) {
+            Err(error) => match error {
+                Error::OutdatedVersion { .. } => {
+                    let should_quit = app
+                        .dialog()
+                        .message(error.to_string())
+                        .title("OpenHome Version Error")
+                        .kind(MessageDialogKind::Error)
+                        .buttons(MessageDialogButtons::OkCancelCustom(
+                            "Quit".to_owned(),
+                            "Launch App Anyways".to_owned(),
+                        ))
+                        .blocking_show();
 
-                if should_quit {
-                    return Err(error);
+                    if should_quit {
+                        return Err(error);
+                    }
+
+                    versioning::handle_updates_get_features(handle, true)?
                 }
-                versioning::handle_version_migration(handle, true)?;
-            }
-            other => return Err(other),
-        }
-    }
+                other => return Err(other),
+            },
+            Ok(feature_messages) => feature_messages,
+        };
 
     versioning::update_version_last_used(handle)?;
 
@@ -42,10 +46,10 @@ pub fn run_app_startup(app: &App) -> Result<()> {
 
     let result = set_theme_from_settings(app);
     if let Err(error) = result {
-        eprintln!("{}", error)
+        eprintln!("{error}")
     }
 
-    Ok(())
+    Ok(update_features)
 }
 
 fn initialize_storage(app_handle: &tauri::AppHandle) -> Result<()> {

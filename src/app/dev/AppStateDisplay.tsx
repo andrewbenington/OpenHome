@@ -1,12 +1,9 @@
 import { Item, OriginGames, SpeciesLookup } from '@pkm-rs/pkg'
 import { Card, Flex, Heading, Separator } from '@radix-ui/themes'
-import * as E from 'fp-ts/lib/Either'
-import { useContext, useEffect, useState } from 'react'
-import { BackendContext } from 'src/backend/backendContext'
-import { AppState } from 'src/backend/backendInterface'
+import { useContext } from 'react'
 import { DevDataDisplay } from 'src/components/DevDataDisplay'
 import { InfoGrid } from 'src/components/InfoGrid2'
-import useDisplayError from 'src/hooks/displayError'
+import { useAppState } from 'src/state/app-state/appState'
 import { AppInfoContext, AppInfoState } from 'src/state/appInfo'
 import { ItemBagContext, ItemBagState } from 'src/state/items/reducer'
 import { OpenSavesState } from 'src/state/saves/reducer'
@@ -15,27 +12,11 @@ import { ErrorContext } from '../../state/error'
 import { useSaves } from '../../state/saves/useSaves'
 
 export default function AppStateDisplay() {
-  const [appState, setAppState] = useState<AppState>()
+  const appState = useAppState()
   const [appInfoState] = useContext(AppInfoContext)
   const savesAndBanks = useSaves()
   const [errorState, dispatchErrorState] = useContext(ErrorContext)
   const [bagState] = useContext(ItemBagContext)
-  const backend = useContext(BackendContext)
-  const [error, setError] = useState<string>()
-  const displayError = useDisplayError()
-
-  useEffect(() => {
-    if (error) return
-    backend.getState().then(
-      E.match(
-        (err) => {
-          setError(err)
-          displayError('Error Getting App State', err)
-        },
-        (state) => setAppState(state)
-      )
-    )
-  }, [backend, displayError, error])
 
   return (
     <Flex direction="column">

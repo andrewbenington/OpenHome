@@ -1,13 +1,12 @@
-use std::{
-    fs,
-    ops::Deref,
-    path::{Path, PathBuf},
-    sync::Mutex,
-};
-
 use serde::Serialize;
+use std::fs;
+use std::ops::Deref;
+use std::path::{Path, PathBuf};
+use std::sync::Mutex;
 
 use crate::error::{Error, Result};
+use crate::state::PokedexState;
+use crate::versioning::UpdateFeatures;
 
 fn add_tmp(path: &Path) -> PathBuf {
     if let Some(stem) = path.file_name() {
@@ -26,8 +25,16 @@ fn remove_tmp_extension(mut path: PathBuf) -> PathBuf {
     path
 }
 
-#[derive(Default, Serialize)]
+#[derive(Serialize)]
 pub struct AppState(pub Mutex<AppStateInner>);
+
+impl AppState {
+    pub fn from_update_features(update_features: Vec<UpdateFeatures>) -> Self {
+        Self(Mutex::new(AppStateInner::from_startup_messages(
+            update_features,
+        )))
+    }
+}
 
 impl Deref for AppState {
     type Target = Mutex<AppStateInner>;
@@ -37,21 +44,23 @@ impl Deref for AppState {
     }
 }
 
-#[derive(Default, Serialize)]
+#[derive(Default, Serialize, Clone)]
 pub struct AppStateInner {
-    pub open_transaction: bool,
-    pub temp_files: Vec<PathBuf>,
-}
-
-// A snapshot of the state for serialization
-#[derive(Serialize)]
-pub struct AppStateSnapshot {
-    pub open_transaction: bool,
-    pub temp_files: Vec<PathBuf>,
-    pub is_dev: bool,
+    open_transaction: bool,
+    temp_files: Vec<PathBuf>,
+    is_dev: bool,
+    new_features_since_update: Vec<UpdateFeatures>,
 }
 
 impl AppStateInner {
+    pub fn from_startup_messages(update_features: Vec<UpdateFeatures>) -> Self {
+        Self {
+            is_dev: cfg!(debug_assertions),
+            new_features_since_update: update_features,
+            ..Default::default()
+        }
+    }
+
     pub fn start_transaction(&mut self) -> Result<()> {
         if self.open_transaction {
             Err(Error::TransactionOpen)
@@ -102,12 +111,24 @@ impl AppStateInner {
 
         fs::write(&path, &bytes).map_err(|e| Error::file_write(&path, e))
     }
+}
 
-    pub fn snapshot(&self) -> AppStateSnapshot {
-        AppStateSnapshot {
-            temp_files: self.temp_files.clone(),
-            open_transaction: self.open_transaction,
-            is_dev: cfg!(debug_assertions),
-        }
-    }
+#[tauri::command]
+pub fn start_transaction(state: tauri::State<'_, AppState>) -> Result<()> {
+    state.lock()?.start_transaction()
+}
+
+#[tauri::command]
+pub fn rollback_transaction(state: tauri::State<'_, AppState>) -> Result<()> {
+    state.lock()?.rollback_transaction()
+}
+
+#[tauri::command]
+pub fn commit_transaction(
+    app_handle: tauri::AppHandle,
+    app_state: tauri::State<'_, AppState>,
+    pokedex_state: tauri::State<'_, PokedexState>,
+) -> Result<()> {
+    app_state.lock()?.commit_transaction()?;
+    pokedex_state.lock()?.write_to_storage(&app_handle)
 }

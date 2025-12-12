@@ -6,6 +6,7 @@ import { BackendContext } from 'src/backend/backendContext'
 import BackendInterface from 'src/backend/backendInterface'
 import { TauriBackend } from 'src/backend/tauri/tauriBackend'
 import useDisplayError from 'src/hooks/displayError'
+import AppStateProvider from 'src/state/app-state/AppStateProvider'
 import { ItemBagContext, itemBagReducer } from 'src/state/items/reducer'
 import { PluginContext, pluginReducer } from 'src/state/plugin'
 import { partitionResults } from 'src/util/Functional'
@@ -23,6 +24,7 @@ import './App.css'
 import AppTabs from './AppTabs'
 import ErrorMessageModal from './ErrorMessage'
 import PokemonDragContextProvider from './PokemonDragContextProvider'
+import UpdateMessageModal from './UpdateMessageModal'
 
 const debouncedUpdateSettings = debounce((backend: BackendInterface, settings: Settings) => {
   backend.updateSettings(settings).catch(console.error)
@@ -169,30 +171,33 @@ function AppWithBackend() {
   return (
     <PluginContext.Provider value={[pluginState, pluginDispatch]}>
       <AppInfoContext.Provider value={[appInfoState, appInfoDispatch, getEnabledSaveTypes]}>
-        <MouseContext.Provider value={[mouseState, mouseDispatch]}>
-          <OhpkmStoreProvider>
-            <ItemBagContext.Provider value={[bagState, bagDispatch]}>
-              <SavesProvider>
-                <DragMonContext.Provider value={[dragMonState, dragMonDispatch]}>
-                  <PokemonDragContextProvider>
-                    <FilterContext.Provider value={[filterState, filterDispatch]}>
-                      {settingsLoading ? (
-                        <Flex width="100%" height="100vh" align="center" justify="center">
-                          <Text size="9" weight="bold">
-                            OpenHome
-                          </Text>
-                        </Flex>
-                      ) : (
-                        <AppTabs />
-                      )}
-                      <ErrorMessageModal />
-                    </FilterContext.Provider>
-                  </PokemonDragContextProvider>
-                </DragMonContext.Provider>
-              </SavesProvider>
-            </ItemBagContext.Provider>
-          </OhpkmStoreProvider>
-        </MouseContext.Provider>
+        <AppStateProvider>
+          <MouseContext.Provider value={[mouseState, mouseDispatch]}>
+            <OhpkmStoreProvider>
+              <ItemBagContext.Provider value={[bagState, bagDispatch]}>
+                <SavesProvider>
+                  <DragMonContext.Provider value={[dragMonState, dragMonDispatch]}>
+                    <PokemonDragContextProvider>
+                      <FilterContext.Provider value={[filterState, filterDispatch]}>
+                        {settingsLoading ? (
+                          <Flex width="100%" height="100vh" align="center" justify="center">
+                            <Text size="9" weight="bold">
+                              OpenHome
+                            </Text>
+                          </Flex>
+                        ) : (
+                          <AppTabs />
+                        )}
+                        <ErrorMessageModal />
+                        <UpdateMessageModal />
+                      </FilterContext.Provider>
+                    </PokemonDragContextProvider>
+                  </DragMonContext.Provider>
+                </SavesProvider>
+              </ItemBagContext.Provider>
+            </OhpkmStoreProvider>
+          </MouseContext.Provider>
+        </AppStateProvider>
       </AppInfoContext.Provider>
     </PluginContext.Provider>
   )

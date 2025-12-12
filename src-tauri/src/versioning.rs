@@ -3,6 +3,7 @@ use pkm_rs::pkm::{
     ohpkm::{OhpkmV1, OhpkmV2},
 };
 use semver::Version;
+use serde::Serialize;
 use std::{fs, path::PathBuf};
 use strum::{self, EnumIter, IntoEnumIterator};
 
@@ -25,7 +26,15 @@ pub fn get_version_last_used(app_handle: &tauri::AppHandle) -> Result<Option<Str
     }
 }
 
+#[cfg(debug_assertions)]
+const SKIP_LAST_USED_UPDATE: bool = false;
+
 pub fn update_version_last_used(app_handle: &tauri::AppHandle) -> Result<()> {
+    #[cfg(debug_assertions)]
+    if SKIP_LAST_USED_UPDATE {
+        return Ok(());
+    }
+
     let last_version_path = prepend_appdata_to_path(app_handle, VERSION_FILE)?;
 
     // Create OpenHome directory if it doesn't exist
@@ -40,24 +49,24 @@ pub fn update_version_last_used(app_handle: &tauri::AppHandle) -> Result<()> {
     .map_err(|err| Error::file_write(last_version_path, err))
 }
 
-pub fn handle_version_migration(
+pub fn handle_updates_get_features(
     app_handle: &tauri::AppHandle,
     ignore_version_error: bool,
-) -> Result<()> {
+) -> Result<Vec<UpdateFeatures>> {
     let last_used_version = get_version_last_used(app_handle)?;
     match last_used_version {
         Some(ref from_file) => println!("User last used OpenHome version {from_file}"),
         None => println!("User last used OpenHome version 1.4.13 or earlier"),
     }
 
-    let last_used_version = match last_used_version {
+    let last_version_or_1_4_13 = match last_used_version {
         Some(ref version) => version,
         None => "1.4.13",
     };
 
-    let Ok(last_used_semver) = Version::parse(last_used_version) else {
+    let Ok(last_used_semver) = Version::parse(last_version_or_1_4_13) else {
         return Err(Error::other(&format!(
-            "Invalid version number: {last_used_version}"
+            "Invalid version number: {last_version_or_1_4_13}"
         )));
     };
 
@@ -68,6 +77,8 @@ pub fn handle_version_migration(
         return Err(Error::outdated_version(last_used_semver, current_version));
     }
 
+    let mut all_update_features: Vec<UpdateFeatures> = vec![];
+
     if current_version == last_used_semver && !cfg!(debug_assertions) {
         println!("Version has not changed since last launch")
     } else {
@@ -76,46 +87,127 @@ pub fn handle_version_migration(
                 "This version ({current_version}) is newer than last used version ({last_used_semver})"
             );
         }
-        let necessary_migrations = get_necessary_migrations(last_used_semver, current_version);
-        println!("Necessary migrations: {necessary_migrations:?}");
+        let significant_updates = get_significant_updates(last_used_semver, current_version);
+        println!("Significant update: {significant_updates:?}");
 
-        for migration in necessary_migrations {
-            println!("Running migration {migration}...");
-            migration.do_migration(app_handle)?;
+        let mut prev_o: Option<UpdateFeatures> = None;
+
+        for update in significant_updates {
+            println!("Running migration for {update}...");
+            update.do_migration(app_handle)?;
             println!("Migration complete");
+
+            if last_used_version.is_none() {
+                // don't display new features if user is new to OpenHome
+                continue;
+            }
+
+            if let Some(update_features) = update.get_features() {
+                if let Some(prev) = &mut prev_o {
+                    if prev.version_matches(update.get_non_prerelease()) {
+                        prev.add_feature_messages(&update_features);
+                    } else {
+                        all_update_features.push(prev.clone());
+                        prev_o = Some(UpdateFeatures::new(
+                            update.get_non_prerelease(),
+                            update_features,
+                        ))
+                    }
+                } else {
+                    prev_o = Some(UpdateFeatures::new(
+                        update.get_non_prerelease(),
+                        update_features,
+                    ));
+                }
+            }
+        }
+
+        if let Some(prev) = prev_o {
+            all_update_features.push(prev);
         }
     }
 
-    Ok(())
+    Ok(all_update_features)
 }
 
-#[derive(EnumIter, Clone, Copy, strum::Display, Debug)]
-pub enum Migration {
-    V1_5_0ALPHA,
-    V1_8_0ALPHA,
+#[derive(EnumIter, Clone, Copy, strum::Display, Debug, PartialEq, Eq, Hash, Serialize)]
+pub enum SignificantUpdate {
+    V1_5_0AlphaMultipleBanks,
+    V1_8_0AlphaOhpkmV2,
+    V1_8_0AlphaFeatureMessages,
 }
 
-impl Migration {
+impl SignificantUpdate {
     pub fn version(&self) -> Version {
         match self {
-            Migration::V1_5_0ALPHA => Version::parse("1.5.0-alpha-multiple-banks").unwrap(),
-            Migration::V1_8_0ALPHA => Version::parse("1.8.0-alpha-ohpkm-v2").unwrap(),
+            Self::V1_5_0AlphaMultipleBanks => Version::parse("1.5.0-alpha-multiple-banks").unwrap(),
+            Self::V1_8_0AlphaOhpkmV2 => Version::parse("1.8.0-alpha-ohpkm-v2").unwrap(),
+            Self::V1_8_0AlphaFeatureMessages => {
+                Version::parse("1.8.0-x-alpha.1.feature-messages").unwrap()
+            }
         }
     }
 
     pub fn do_migration(&self, app_handle: &tauri::AppHandle) -> Result<()> {
         match self {
-            Migration::V1_5_0ALPHA => do_migration_1_5_0(app_handle),
-            Migration::V1_8_0ALPHA => do_migration_1_8_0(app_handle),
+            Self::V1_5_0AlphaMultipleBanks => do_migration_1_5_0(app_handle),
+            Self::V1_8_0AlphaOhpkmV2 => do_migration_1_8_0(app_handle),
+            Self::V1_8_0AlphaFeatureMessages => Ok(()),
         }
+    }
+
+    pub fn get_features(&self) -> Option<Vec<String>> {
+        match self {
+            Self::V1_8_0AlphaOhpkmV2 => Some(vec![
+                String::from(
+                    "Tracked Pokémon may now have associated notes, using the 'Notes' tab in the Pokémon details popup",
+                ),
+                String::from(
+                    "Multiple past trainers' data are persisted, meaning friendship, etc can be independently tracked across many games for the same Pokémon",
+                ),
+            ]),
+            Self::V1_8_0AlphaFeatureMessages => Some(vec![String::from(
+                "Right clicking on some elements now offer actions in a context menu",
+            )]),
+            _ => None,
+        }
+    }
+
+    pub fn get_non_prerelease(&self) -> Version {
+        let version = self.version();
+
+        Version::new(version.major, version.minor, version.patch)
     }
 }
 
-pub fn get_necessary_migrations(
+#[derive(Debug, Clone, Serialize)]
+pub struct UpdateFeatures {
+    version: String,
+    feature_messages: Vec<String>,
+}
+
+impl UpdateFeatures {
+    pub fn new(version: Version, feature_messages: Vec<String>) -> Self {
+        Self {
+            version: version.to_string(),
+            feature_messages,
+        }
+    }
+
+    pub fn add_feature_messages(&mut self, feature_messages: &[String]) {
+        self.feature_messages.extend_from_slice(feature_messages);
+    }
+
+    pub fn version_matches(&self, other: Version) -> bool {
+        self.version == other.to_string()
+    }
+}
+
+pub fn get_significant_updates(
     last_launch_version: Version,
     current_version: Version,
-) -> Vec<Migration> {
-    Migration::iter()
+) -> Vec<SignificantUpdate> {
+    SignificantUpdate::iter()
         .filter(|m| m.version() > last_launch_version && m.version() <= current_version)
         .collect()
 }
