@@ -148,3 +148,20 @@
     rgba(0, 0, 0, 0.3) 0px 18px 36px -18px inset;
   contain: content;
 }
+
+.base-stats-table {
+  .rt-TableCell {
+    padding: 4px 8px;
+    height: fit-content;
+  }
+  width: fit-content;
+}
+
+.base-stats-container {
+  width: 100%;
+  margin: auto;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 4px;
+}

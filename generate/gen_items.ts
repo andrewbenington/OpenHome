@@ -37,8 +37,9 @@ use wasm_bindgen::prelude::*;
 
 pub const ITEM_MAX: usize = ${allItems.length};
 
-#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "getAllItems"))]
 #[allow(clippy::missing_const_for_fn)]
+#[wasm_bindgen(js_name = "getAllItems")]
+#[cfg(feature = "wasm")]
 pub fn get_all_items() -> Vec<ItemMetadata> {
     ALL_ITEMS.into_iter().copied().collect()
 }
@@ -75,8 +76,9 @@ use wasm_bindgen::prelude::*;
 
 pub const ITEM_MAX_GEN1: usize = ${allItems.length};
 
-#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "getAllItemsGen1"))]
 #[allow(clippy::missing_const_for_fn)]
+#[wasm_bindgen(js_name = "getAllItemsGen1")]
+#[cfg(feature = "wasm")]
 pub fn get_all_items_gen1() -> Vec<ItemMetadataPastGen> {
     ALL_ITEMS_GEN1.into_iter().copied().collect()
 }
@@ -120,8 +122,9 @@ use wasm_bindgen::prelude::*;
 
 pub const ITEM_MAX_GEN2: usize = ${allItems.length};
 
-#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "getAllItemsGen2"))]
 #[allow(clippy::missing_const_for_fn)]
+#[wasm_bindgen(js_name = "getAllItemsGen2")]
+#[cfg(feature = "wasm")]
 pub fn get_all_items_gen2() -> Vec<ItemMetadataPastGen> {
     ALL_ITEMS_GEN2.into_iter().copied().collect()
 }
@@ -165,8 +168,9 @@ use wasm_bindgen::prelude::*;
 
 pub const ITEM_MAX_GEN3: usize = ${allItems.length};
 
-#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "getAllItemsGen3"))]
 #[allow(clippy::missing_const_for_fn)]
+#[wasm_bindgen(js_name = "getAllItemsGen3")]
+#[cfg(feature = "wasm")]
 pub fn get_all_items_gen3() -> Vec<ItemMetadataPastGen> {
     ALL_ITEMS_GEN3.into_iter().copied().collect()
 }

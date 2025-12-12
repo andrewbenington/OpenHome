@@ -477,9 +477,8 @@ export function isMegaStone(itemIndex?: number): boolean {
     itemIndex !== undefined &&
     ((itemIndex >= Item.Gengarite && itemIndex <= Item.Latiosite) ||
       (itemIndex >= Item.Swampertite && itemIndex <= Item.Beedrillite) ||
-      (itemIndex >= Item.Clefablite && itemIndex <= Item.Froslassite) ||
-      (itemIndex >= Item.Emboarite && itemIndex <= Item.Drampanite) ||
-      (itemIndex as number) === Item.Falinksite)
+      (itemIndex >= Item.Clefablite && itemIndex <= Item.Falinksite) ||
+      (itemIndex >= Item.RaichuniteX && itemIndex <= Item.Glimmoranite))
   )
 }
 
