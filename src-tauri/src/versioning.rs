@@ -77,7 +77,7 @@ pub fn handle_updates_get_features(
         return Err(Error::outdated_version(last_used_semver, current_version));
     }
 
-    let mut version_features: Vec<UpdateFeatures> = vec![];
+    let mut all_update_features: Vec<UpdateFeatures> = vec![];
 
     if current_version == last_used_semver && !cfg!(debug_assertions) {
         println!("Version has not changed since last launch")
@@ -107,7 +107,7 @@ pub fn handle_updates_get_features(
                     if prev.version_matches(update.get_non_prerelease()) {
                         prev.add_feature_messages(&update_features);
                     } else {
-                        version_features.push(prev.clone());
+                        all_update_features.push(prev.clone());
                         prev_o = Some(UpdateFeatures::new(
                             update.get_non_prerelease(),
                             update_features,
@@ -123,11 +123,11 @@ pub fn handle_updates_get_features(
         }
 
         if let Some(prev) = prev_o {
-            version_features.push(prev);
+            all_update_features.push(prev);
         }
     }
 
-    Ok(version_features)
+    Ok(all_update_features)
 }
 
 #[derive(EnumIter, Clone, Copy, strum::Display, Debug, PartialEq, Eq, Hash, Serialize)]

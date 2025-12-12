@@ -21,9 +21,9 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_fs::init())
         .setup(|app| {
-            let version_features_r = startup::run_app_startup(app);
-            let Ok(version_features) = version_features_r else {
-                let launch_error = version_features_r.unwrap_err();
+            let update_features_r = startup::run_app_startup(app);
+            let Ok(update_features) = update_features_r else {
+                let launch_error = update_features_r.unwrap_err();
                 match launch_error {
                     Error::OutdatedVersion { .. } => app.handle().exit(1),
                     _ => {
@@ -66,7 +66,7 @@ pub fn run() {
             };
             app.manage(pokedex_state);
 
-            app.manage(state::AppState::from_update_features(version_features));
+            app.manage(state::AppState::from_update_features(update_features));
 
             match menu::create_menu(app) {
                 Ok(menu) => {

@@ -13,7 +13,7 @@ use crate::{
 pub fn run_app_startup(app: &App) -> Result<Vec<UpdateFeatures>> {
     let handle = app.handle();
 
-    let version_features: Vec<UpdateFeatures> =
+    let update_features: Vec<UpdateFeatures> =
         match versioning::handle_updates_get_features(handle, false) {
             Err(error) => match error {
                 Error::OutdatedVersion { .. } => {
@@ -49,7 +49,7 @@ pub fn run_app_startup(app: &App) -> Result<Vec<UpdateFeatures>> {
         eprintln!("{error}")
     }
 
-    Ok(version_features)
+    Ok(update_features)
 }
 
 fn initialize_storage(app_handle: &tauri::AppHandle) -> Result<()> {
