@@ -25,8 +25,8 @@ import {
   SubmenuBuilder,
 } from 'src/ui/components/context-menu/types'
 import { RemoveIcon } from 'src/ui/components/Icons'
-import { range } from '../../util/Functional'
-import { filterUndefined } from '../../util/Sort'
+import { range } from 'src/util/Functional'
+import { filterUndefined } from 'src/util/Sort'
 import DroppableSpace from './DroppableSpace'
 
 export default function AllHomeBoxes(props: {

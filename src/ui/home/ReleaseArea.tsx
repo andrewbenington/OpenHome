@@ -1,5 +1,5 @@
+import DroppableSpace from '@openhome/ui/saves/boxes/DroppableSpace'
 import { Flex } from '@radix-ui/themes'
-import DroppableSpace from 'src/saves/boxes/DroppableSpace'
 import { useSaves } from 'src/state/saves/useSaves'
 import PokemonIcon from 'src/ui/components/PokemonIcon'
 

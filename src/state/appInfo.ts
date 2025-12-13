@@ -18,8 +18,8 @@ import { G3UBSAV } from '@openhome/core/save/unbound/G3UBSAV'
 import { USUMSAV } from '@openhome/core/save/USUMSAV'
 import { SAVClass } from '@openhome/core/save/util/util'
 import { XYSAV } from '@openhome/core/save/XYSAV'
+import { SaveViewMode } from '@openhome/ui/saves/util'
 import { Dispatch, Reducer, createContext } from 'react'
-import { SaveViewMode } from '../saves/util'
 
 const OFFICIAL_SAVE_TYPES = [
   G1SAV,
