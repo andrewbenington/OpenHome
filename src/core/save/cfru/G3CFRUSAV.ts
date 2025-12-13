@@ -7,9 +7,9 @@ import {
 } from '@openhome/core/save/util/byteLogic'
 import { Gender, OriginGame } from '@pkm-rs/pkg'
 import { PluginPKMInterface } from 'src/types/interfaces'
-import { gen3StringToUTF } from '../../../util/Strings/StringConverter'
 import { Box, BoxCoordinates, PluginSAV } from '../interfaces'
 import { PathData } from '../util/path'
+import { gen3StringToUTF } from '../util/Strings/StringConverter'
 import { LOOKUP_TYPE } from '../util/util'
 // import { RRTransferMon } from './conversion/RRTransferMons'
 

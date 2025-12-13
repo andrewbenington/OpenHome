@@ -4,7 +4,7 @@ import * as E from 'fp-ts/lib/Either'
 import { Pokedex, PokedexUpdate } from 'src/types/pokedex'
 import { StoredBankData } from 'src/types/storage'
 import { Errorable, JSONArray, JSONObject, JSONValue, LookupMap, SaveRef } from 'src/types/types'
-import { PluginMetadataWithIcon } from 'src/util/Plugin'
+import { PluginMetadataWithIcon } from 'src/ui/util/Plugin'
 import { AppState, ImageResponse, StoredLookups } from '../backendInterface'
 import { RustResult } from './types'
 

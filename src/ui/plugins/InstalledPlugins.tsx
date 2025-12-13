@@ -6,7 +6,7 @@ import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { MdDelete } from 'react-icons/md'
 import { BackendContext } from 'src/ui/backend/backendContext'
 import useDisplayError from 'src/ui/hooks/displayError'
-import { loadPlugin, PluginMetadataWithIcon } from 'src/util/Plugin'
+import { loadPlugin, PluginMetadataWithIcon } from 'src/ui/util/Plugin'
 import { CURRENT_PLUGIN_API_VERSION } from './Plugins'
 import './style.css'
 

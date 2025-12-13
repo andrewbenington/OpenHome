@@ -5,11 +5,11 @@ import { OriginGames } from '@pkm-rs/pkg'
 import { Badge, Card, Flex } from '@radix-ui/themes'
 import { useMemo, useState } from 'react'
 import { MdAdd } from 'react-icons/md'
+import { filterUndefined } from 'src/core/util/Sort'
 import { PKMInterface } from 'src/types/interfaces'
 import Autocomplete from 'src/ui/components/Autocomplete'
 import PokemonIcon from 'src/ui/components/PokemonIcon'
 import PokemonDetailsModal from 'src/ui/pokemon-details//Modal'
-import { filterUndefined } from 'src/util/Sort'
 
 function getInnerSortFunction(
   sortStr: SortType | undefined

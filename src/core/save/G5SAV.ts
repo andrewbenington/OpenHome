@@ -8,7 +8,7 @@ import {
 import { Gender, OriginGame } from '@pkm-rs/pkg'
 import { PK5 } from '@pokemon-files/pkm'
 import { uniq } from 'lodash'
-import { gen5StringToUTF } from 'src/util/Strings/StringConverter'
+import { gen5StringToUTF } from 'src/core/save/util/Strings/StringConverter'
 import { Box, BoxCoordinates, OfficialSAV } from './interfaces'
 import { PathData } from './util/path'
 import { hasDesamumeFooter, LOOKUP_TYPE } from './util/util'

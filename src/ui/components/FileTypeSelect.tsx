@@ -2,8 +2,8 @@ import { supportsMon } from '@openhome/core/save/util/util'
 import { AppInfoContext } from '@openhome/ui/state/appInfo'
 import { uniq } from 'lodash'
 import { useContext, useMemo } from 'react'
+import { filterUndefined } from 'src/core/util/Sort'
 import { PKMFormeRef } from 'src/types/types'
-import { filterUndefined } from 'src/util/Sort'
 
 const fileTypeColors: Record<string, string> = {
   OHPKM: '#748fcd',

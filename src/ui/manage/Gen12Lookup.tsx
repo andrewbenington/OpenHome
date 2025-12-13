@@ -3,9 +3,9 @@ import { useLookups } from '@openhome/ui/state/lookups'
 import { useOhpkmStore } from '@openhome/ui/state/ohpkm/useOhpkmStore'
 import { OriginGames } from '@pkm-rs/pkg'
 import { Spinner } from '@radix-ui/themes'
+import { numericSorter, stringSorter } from 'src/core/util/Sort'
 import OHDataGrid, { SortableColumn } from 'src/ui/components/OHDataGrid'
 import PokemonIcon from 'src/ui/components/PokemonIcon'
-import { numericSorter, stringSorter } from 'src/util/Sort'
 
 type G12LookupRow = {
   gen12ID: string

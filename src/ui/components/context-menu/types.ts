@@ -1,5 +1,5 @@
 import { ReactNode } from 'react'
-import { Option } from 'src/util/Functional'
+import { Option } from 'src/core/util/Functional'
 
 export type Element = Item | Separator | Label | Submenu
 

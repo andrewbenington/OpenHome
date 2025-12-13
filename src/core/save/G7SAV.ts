@@ -7,7 +7,7 @@ import {
 } from '@openhome/core/save/util/byteLogic'
 import { Gender, OriginGame } from '@pkm-rs/pkg'
 import { PK7 } from '@pokemon-files/pkm'
-import { utf16BytesToString } from 'src/util/Strings/StringConverter'
+import { utf16BytesToString } from 'src/core/save/util/Strings/StringConverter'
 import { Box, BoxCoordinates, OfficialSAV } from './interfaces'
 import { PathData } from './util/path'
 import { SIZE_USUM } from './util/util'

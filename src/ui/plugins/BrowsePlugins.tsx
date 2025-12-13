@@ -7,7 +7,7 @@ import { BackendContext } from 'src/ui/backend/backendContext'
 import { ErrorIcon } from 'src/ui/components/Icons'
 import useDisplayError from 'src/ui/hooks/displayError'
 import useIsDev from 'src/ui/hooks/isDev'
-import { loadPlugin, PluginMetadata, PluginMetadataWithIcon } from 'src/util/Plugin'
+import { loadPlugin, PluginMetadata, PluginMetadataWithIcon } from 'src/ui/util/Plugin'
 import { CURRENT_PLUGIN_API_VERSION } from './Plugins'
 import './style.css'
 
