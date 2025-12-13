@@ -1,7 +1,7 @@
 import { MetadataLookup, SpeciesLookup } from '@pkm-rs/pkg'
 import { NationalDex } from 'src/consts/NationalDex'
-import { ImageResponse } from '../backend/backendInterface'
-import { OpenHomePlugin } from '../state/plugin'
+import { OpenHomePlugin } from 'src/state/plugin'
+import { ImageResponse } from 'src/ui/backend/backendInterface'
 
 type PluginBuilder = (
   metadataLookup: typeof MetadataLookup,

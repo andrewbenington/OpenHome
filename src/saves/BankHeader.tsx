@@ -1,9 +1,9 @@
 import { Button, Card, DataList, DropdownMenu, Flex, Heading, TextField } from '@radix-ui/themes'
 import { useState } from 'react'
-import { EditIcon } from 'src/components/Icons'
+import { useSaves } from 'src/state/saves/useSaves'
 import { getBankName } from 'src/types/storage'
-import ToggleButton from '../components/ToggleButton'
-import { useSaves } from '../state/saves/useSaves'
+import { EditIcon } from 'src/ui/components/Icons'
+import ToggleButton from 'src/ui/components/ToggleButton'
 
 export default function BankHeader() {
   const savesAndBanks = useSaves()

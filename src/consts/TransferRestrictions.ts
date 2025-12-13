@@ -8,7 +8,7 @@ import {
   PaldeanForms,
   RegionalForms,
   TransferRestrictions,
-} from '../types/TransferRestrictions'
+} from 'src/types/TransferRestrictions'
 import {
   BLOOD_MOON,
   COMPLETE,

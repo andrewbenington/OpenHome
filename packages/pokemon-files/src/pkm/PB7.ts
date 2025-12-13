@@ -10,8 +10,8 @@ import {
   NatureIndex,
   SpeciesLookup,
 } from '@pkm-rs/pkg'
-import { PKMInterface } from '../../../../src/types/interfaces'
-import { getHeightCalculated, getWeightCalculated } from '../../../../src/types/pkm/util'
+import { PKMInterface } from 'src/types/interfaces'
+import { getHeightCalculated, getWeightCalculated } from 'src/types/pkm/util'
 import * as byteLogic from '../util/byteLogic'
 import * as encryption from '../util/encryption'
 import { getStats } from '../util/statCalc'

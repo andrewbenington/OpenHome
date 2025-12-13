@@ -1,12 +1,12 @@
 import { Item } from '@pkm-rs/pkg'
 import { createContext, Dispatch, Reducer } from 'react'
+import { PKMInterface } from 'src/types/interfaces'
 import { OHPKM } from 'src/types/pkm/OHPKM'
+import { getSortFunctionNullable, SortType } from 'src/types/pkm/sort'
 import { AddBoxLocation, HomeData } from 'src/types/SAVTypes/HomeData'
 import { SAV } from 'src/types/SAVTypes/SAV'
 import { StoredBankData } from 'src/types/storage'
 import { getMonFileIdentifier } from 'src/util/Lookup'
-import { PKMInterface } from '../../types/interfaces'
-import { getSortFunctionNullable, SortType } from '../../types/pkm/sort'
 import { OhpkmLookup } from '../ohpkm/useOhpkmStore'
 
 export type OpenSave = {

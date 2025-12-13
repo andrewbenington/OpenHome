@@ -1,15 +1,7 @@
 import { useDroppable } from '@dnd-kit/react'
 import { useContext, useMemo } from 'react'
-import { BackendContext } from 'src/backend/backendContext'
-import OpenHomeCtxMenu from 'src/components/context-menu/OpenHomeCtxMenu'
-import {
-  CtxMenuElementBuilder,
-  ItemBuilder,
-  LabelBuilder,
-  SeparatorBuilder,
-} from 'src/components/context-menu/types'
-import PokemonIcon from 'src/components/PokemonIcon'
 import { FilterContext } from 'src/state/filter'
+import { useItems } from 'src/state/items/useItems'
 import { MonLocation } from 'src/state/saves/reducer'
 import { useSaves } from 'src/state/saves/useSaves'
 import { bytesToPKM } from 'src/types/FileImport'
@@ -17,8 +9,16 @@ import { filterApplies } from 'src/types/Filter'
 import { PKMInterface } from 'src/types/interfaces'
 import { displayIndexAdder, isBattleFormeItem } from 'src/types/pkm/util'
 import { PokedexUpdate } from 'src/types/pokedex'
-import useDisplayError from '../../hooks/displayError'
-import { useItems } from '../../state/items/useItems'
+import { BackendContext } from 'src/ui/backend/backendContext'
+import OpenHomeCtxMenu from 'src/ui/components/context-menu/OpenHomeCtxMenu'
+import {
+  CtxMenuElementBuilder,
+  ItemBuilder,
+  LabelBuilder,
+  SeparatorBuilder,
+} from 'src/ui/components/context-menu/types'
+import PokemonIcon from 'src/ui/components/PokemonIcon'
+import useDisplayError from 'src/ui/hooks/displayError'
 import '../style.css'
 import DraggableMon from './DraggableMon'
 import DroppableSpace from './DroppableSpace'

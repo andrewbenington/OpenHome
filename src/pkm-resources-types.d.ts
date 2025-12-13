@@ -1,5 +1,5 @@
 import '@pkm-rs/pkg'
-import { Type } from './types/types'
+import { Type } from 'src/types/types'
 
 declare module '@pkm-rs/pkg' {
   type FormeMetadata = {

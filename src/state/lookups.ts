@@ -1,9 +1,9 @@
 import { useCallback, useContext, useEffect, useState } from 'react'
-import { BackendContext } from '../backend/backendContext'
-import { StoredLookups } from '../backend/backendInterface'
+import { BackendContext } from 'src/ui/backend/backendContext'
+import { StoredLookups } from 'src/ui/backend/backendInterface'
 
 import * as E from 'fp-ts/lib/Either'
-import { Errorable } from '../types/types'
+import { Errorable } from 'src/types/types'
 
 export type LookupsManager = { getLookups: () => Promise<Errorable<StoredLookups>> } & (
   | {

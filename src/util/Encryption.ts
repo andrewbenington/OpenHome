@@ -8,7 +8,7 @@ import {
 import { MemeKey, pokedexAndSaveFileMemeKey, SIGNATURE_LENGTH } from './MemeKey'
 
 import { lib as cryptolib, MD5, SHA1, SHA256 } from 'crypto-js'
-import { SIZE_SM, SIZE_USUM } from '../types/SAVTypes/util'
+import { SIZE_SM, SIZE_USUM } from 'src/types/SAVTypes/util'
 const GEN3_BLOCKS_OFFSET = 0x20
 const GEN3_BLOCK_SIZE = 12
 const GEN456_BLOCKS_OFFSET = 0x08

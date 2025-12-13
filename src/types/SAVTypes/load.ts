@@ -1,10 +1,10 @@
 import * as E from 'fp-ts/lib/Either'
+import { OhpkmLookup } from 'src/state/ohpkm/useOhpkmStore'
 import {
   getMonFileIdentifier,
   getMonGen12Identifier,
   getMonGen345Identifier,
 } from 'src/util/Lookup'
-import { OhpkmLookup } from '../../state/ohpkm/useOhpkmStore'
 import { PKMInterface } from '../interfaces'
 import { OHPKM } from '../pkm/OHPKM'
 import { PathData } from './path'

@@ -1,5 +1,5 @@
 import { Gender, getPluginColor, OriginGame, OriginGames } from '@pkm-rs/pkg'
-import { SaveRef } from '../../types/types'
+import { SaveRef } from 'src/types/types'
 import { PKMInterface } from '../interfaces'
 import { OHPKM } from '../pkm/OHPKM'
 import { PathData } from './path'

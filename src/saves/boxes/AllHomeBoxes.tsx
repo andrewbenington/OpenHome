@@ -15,16 +15,16 @@ import {
 import { CSS } from '@dnd-kit/utilities'
 import { Button, Flex, Grid } from '@radix-ui/themes'
 import { CSSProperties } from 'react'
-import OpenHomeCtxMenu from '../../components/context-menu/OpenHomeCtxMenu'
+import { SavesAndBanksManager, useSaves } from 'src/state/saves/useSaves'
+import { SortTypes } from 'src/types/pkm/sort'
+import { HomeBox, HomeData } from 'src/types/SAVTypes/HomeData'
+import OpenHomeCtxMenu from 'src/ui/components/context-menu/OpenHomeCtxMenu'
 import {
   CtxMenuElementBuilder,
   ItemBuilder,
   SubmenuBuilder,
-} from '../../components/context-menu/types'
-import { RemoveIcon } from '../../components/Icons'
-import { SavesAndBanksManager, useSaves } from '../../state/saves/useSaves'
-import { SortTypes } from '../../types/pkm/sort'
-import { HomeBox, HomeData } from '../../types/SAVTypes/HomeData'
+} from 'src/ui/components/context-menu/types'
+import { RemoveIcon } from 'src/ui/components/Icons'
 import { range } from '../../util/Functional'
 import { filterUndefined } from '../../util/Sort'
 import DroppableSpace from './DroppableSpace'

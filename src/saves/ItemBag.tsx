@@ -1,8 +1,8 @@
 import { Item } from '@pkm-rs/pkg'
 import { Flex, Grid } from '@radix-ui/themes'
 import { useContext } from 'react'
-import { DragMonContext } from '../state/dragMon'
-import { useItems } from '../state/items/useItems'
+import { DragMonContext } from 'src/state/dragMon'
+import { useItems } from 'src/state/items/useItems'
 import DroppableSpace from './boxes/DroppableSpace'
 import DraggableItem from './DraggableItem'
 

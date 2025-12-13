@@ -1,7 +1,7 @@
 import { Callout, Flex } from '@radix-ui/themes'
 import { ReactNode } from 'react'
-import { ErrorIcon } from 'src/components/Icons'
-import LoadingIndicator from 'src/components/LoadingIndicator'
+import { ErrorIcon } from 'src/ui/components/Icons'
+import LoadingIndicator from 'src/ui/components/LoadingIndicator'
 import { AppStateContext, usePossiblyLoadedAppState } from './appState'
 
 type AppStateProviderProps = {

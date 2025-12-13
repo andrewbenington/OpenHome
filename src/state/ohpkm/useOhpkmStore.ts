@@ -1,7 +1,7 @@
 import * as E from 'fp-ts/lib/Either'
 import { useContext } from 'react'
-import { OHPKM } from '../../types/pkm/OHPKM'
-import { Errorable } from '../../types/types'
+import { OHPKM } from 'src/types/pkm/OHPKM'
+import { Errorable } from 'src/types/types'
 import { OhpkmStoreContext } from './reducer'
 
 export type OhpkmStore = {

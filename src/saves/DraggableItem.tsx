@@ -1,8 +1,8 @@
 import { useDraggable } from '@dnd-kit/react'
 import { Item } from '@pkm-rs/pkg'
 import { Text, Tooltip } from '@radix-ui/themes'
-import { getPublicImageURL } from '../images/images'
-import { getItemIconPath } from '../images/items'
+import { getPublicImageURL } from 'src/ui/images/images'
+import { getItemIconPath } from 'src/ui/images/items'
 
 type DraggableItemProps = {
   item: Item
