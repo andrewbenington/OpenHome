@@ -4,7 +4,7 @@ import { PK3, PK4, PK5 } from '../../packages/pokemon-files/src'
 import { PKMInterface } from '../types/interfaces'
 import { OHPKM } from '../types/pkm/OHPKM'
 import { OhpkmV1 } from '../types/pkm/OhpkmV1'
-import { getBaseMon } from '../types/pkm/util'
+import { dvsFromIVs, getBaseMon } from '../types/pkm/util'
 import { PKMFormeRef } from '../types/types'
 import { bytesToString } from './byteLogic'
 import { gen12StringToUTF, utf16StringToGen12 } from './Strings/StringConverter'
@@ -37,8 +37,11 @@ export function getHomeIdentifier(mon: OHPKM | OhpkmV1): string {
 }
 
 export const getMonGen12Identifier = (mon: PKMInterface) => {
-  const { dvs } = mon
-  if (!dvs) return undefined
+  let { dvs, ivs } = mon
+  if (!dvs) {
+    if (!ivs) return undefined
+    dvs = dvsFromIVs(ivs, mon.isShiny())
+  }
 
   const convertedTrainerName = gen12StringToUTF(utf16StringToGen12(mon.trainerName, 8, true), 0, 8)
   const baseMon = getBaseMon(mon.dexNum, mon.formeNum)
@@ -59,9 +62,6 @@ export const getMonGen12Identifier = (mon: PKMInterface) => {
 }
 
 export const getMonGen345Identifier = (mon: PK3 | PK4 | PK5 | OHPKM) => {
-  // if (!hasGen3OnData(mon)) {
-  //   return undefined
-  // }
   const baseMon = getBaseMon(mon.dexNum, mon.formeNum)
 
   try {
