@@ -48,7 +48,7 @@ describe('gen 8 save files', () => {
 
     arceusSave = new LASAV(arceusPath, saveBytes)
 
-    const monPath = resolve('src/core/pkm/__test__/PKMFiles/Gen4/magmortar.pkm')
+    const monPath = resolve('@openhome/core/pkm/__test__/PKMFiles/Gen4/magmortar.pkm')
     const monBytes = new Uint8Array(readFileSync(monPath))
 
     magmortar = new PK4(monBytes.buffer)

@@ -1,3 +1,4 @@
+import useIsDarkMode from '@openhome/ui/hooks/dark-mode'
 import { FormeMetadata } from '@pkm-rs/pkg'
 import { Table, Text } from '@radix-ui/themes'
 import {
@@ -10,7 +11,6 @@ import {
   Tooltip,
 } from 'chart.js'
 import { Radar } from 'react-chartjs-2'
-import useIsDarkMode from 'src/ui/hooks/dark-mode'
 
 export type BaseStatsChartProps = {
   forme: FormeMetadata

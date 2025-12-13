@@ -1,5 +1,5 @@
+import useIsDev from '@openhome/ui/hooks/isDev'
 import { Box, Tabs, ThemePanel } from '@radix-ui/themes'
-import useIsDev from 'src/ui/hooks/isDev'
 import AppStateDisplay from './dev/AppStateDisplay'
 import Home from './Home'
 import TrackedPokemon from './manage/TrackedPokemon'

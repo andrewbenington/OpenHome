@@ -1,6 +1,6 @@
+import { ArrowLeftIcon, ArrowRightIcon } from '@openhome/ui/components/Icons'
 import { Button } from '@radix-ui/themes'
 import { CSSProperties, useCallback, useEffect, useRef, useState } from 'react'
-import { ArrowLeftIcon, ArrowRightIcon } from 'src/ui/components/Icons'
 import '../style.css'
 import DroppableSpace from './DroppableSpace'
 

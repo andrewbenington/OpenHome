@@ -1,3 +1,4 @@
+import { intersection, unique } from '@openhome/core/util/functional'
 import {
   AbilityIndex,
   Ball,
@@ -31,7 +32,6 @@ import * as jsTypes from '@pokemon-files/util/types'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { Gen34ContestRibbons, Gen34TowerRibbons, ModernRibbons } from '@pokemon-resources/index'
 import Prando from 'prando'
-import { intersection, unique } from 'src/core/util/functional'
 import { PKMInterface } from 'src/types/interfaces'
 import { OhpkmV2 as OhpkmV2Wasm } from '../../../pkm_rs/pkg'
 import { SAV } from '../save/interfaces'

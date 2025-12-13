@@ -1,10 +1,10 @@
+import { bytesToPKM } from '@openhome/core/pkm/FileImport'
 import { OHPKM } from '@openhome/core/pkm/OHPKM'
 import { PK1 } from '@pokemon-files/pkm'
 import assert, { fail } from 'assert'
 import * as E from 'fp-ts/lib/Either'
 import fs from 'fs'
 import path from 'path'
-import { bytesToPKM } from 'src/core/pkm/FileImport'
 import { beforeAll, expect, test } from 'vitest'
 import { G1SAV } from '../G1SAV'
 import { buildUnknownSaveFile } from '../util/load'
@@ -29,7 +29,7 @@ beforeAll(() => {
 
   slowbroOH = bytesToPKM(
     new Uint8Array(
-      fs.readFileSync(path.join('src/core/pkm/__test__/PKMFiles/OhpkmV2', 'slowbro.ohpkm'))
+      fs.readFileSync(path.join('@openhome/core/pkm/__test__/PKMFiles/OhpkmV2', 'slowbro.ohpkm'))
     ),
     'OhpkmV2'
   ) as OHPKM

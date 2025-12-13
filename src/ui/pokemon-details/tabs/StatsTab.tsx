@@ -1,3 +1,5 @@
+import { isRestricted } from '@openhome/core/save/util/TransferRestrictions'
+import SheenStars from '@openhome/ui/components/pokemon/SheenStars'
 import { Stats } from '@pkm-rs/pkg'
 import {
   GEN2_TRANSFER_RESTRICTIONS,
@@ -17,10 +19,8 @@ import {
 } from 'chart.js'
 import { useEffect, useMemo, useState } from 'react'
 import { Radar } from 'react-chartjs-2'
-import { isRestricted } from 'src/core/save/util/TransferRestrictions'
 import { PKMInterface } from 'src/types/interfaces'
 import { Styles } from 'src/types/types'
-import SheenStars from 'src/ui/components/pokemon/SheenStars'
 const styles = {
   container: {
     display: 'flex',

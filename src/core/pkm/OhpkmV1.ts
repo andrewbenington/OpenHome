@@ -9,6 +9,10 @@ import {
   uint32ToBytesLittleEndian,
 } from '@openhome/core/save/util/byteLogic'
 import {
+  utf16BytesToString,
+  utf16StringToBytes,
+} from '@openhome/core/save/util/Strings/StringConverter'
+import {
   AbilityIndex,
   Ball,
   Gender,
@@ -52,7 +56,6 @@ import {
 } from '@pokemon-resources/index'
 import * as lodash from 'lodash'
 import Prando from 'prando'
-import { utf16BytesToString, utf16StringToBytes } from 'src/core/save/util/Strings/StringConverter'
 import { PKMInterface, PluginPKMInterface } from 'src/types/interfaces'
 import { getHomeIdentifier, isEvolution } from './Lookup'
 import schema from './OHPKM.json'

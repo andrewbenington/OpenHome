@@ -1,6 +1,6 @@
+import { getPublicImageURL, getTypeIconPath } from '@openhome/ui/images/images'
 import { PkmType } from '@pkm-rs/pkg'
 import { teraTypeFromIndex, Type } from '@pokemon-resources/index'
-import { getPublicImageURL, getTypeIconPath } from 'src/ui/images/images'
 import './style.css'
 
 interface TypeIconProps {

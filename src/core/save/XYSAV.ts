@@ -1,7 +1,7 @@
+import { isRestricted } from '@openhome/core/save/util/TransferRestrictions'
 import { OriginGame } from '@pkm-rs/pkg'
 import { Item } from '@pokemon-resources/consts/Items'
 import { XY_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
-import { isRestricted } from 'src/core/save/util/TransferRestrictions'
 import { G6SAV } from './G6SAV'
 import { PathData } from './util/path'
 

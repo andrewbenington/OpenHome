@@ -15,18 +15,18 @@ import {
 import { CSS } from '@dnd-kit/utilities'
 import { SortTypes } from '@openhome/core/pkm/sort'
 import { HomeBox, HomeData } from '@openhome/core/save/HomeData'
-import { SavesAndBanksManager, useSaves } from '@openhome/ui/state/saves/useSaves'
-import { Button, Flex, Grid } from '@radix-ui/themes'
-import { CSSProperties } from 'react'
-import { range } from 'src/core/util/functional'
-import { filterUndefined } from 'src/core/util/sort'
-import OpenHomeCtxMenu from 'src/ui/components/context-menu/OpenHomeCtxMenu'
+import { range } from '@openhome/core/util/functional'
+import { filterUndefined } from '@openhome/core/util/sort'
+import OpenHomeCtxMenu from '@openhome/ui/components/context-menu/OpenHomeCtxMenu'
 import {
   CtxMenuElementBuilder,
   ItemBuilder,
   SubmenuBuilder,
-} from 'src/ui/components/context-menu/types'
-import { RemoveIcon } from 'src/ui/components/Icons'
+} from '@openhome/ui/components/context-menu/types'
+import { RemoveIcon } from '@openhome/ui/components/Icons'
+import { SavesAndBanksManager, useSaves } from '@openhome/ui/state/saves/useSaves'
+import { Button, Flex, Grid } from '@radix-ui/themes'
+import { CSSProperties } from 'react'
 import DroppableSpace from './DroppableSpace'
 
 export default function AllHomeBoxes(props: {

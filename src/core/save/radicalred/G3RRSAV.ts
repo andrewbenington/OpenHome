@@ -1,5 +1,5 @@
+import { isRestricted, TransferRestrictions } from '@openhome/core/save/util/TransferRestrictions'
 import { ItemRadicalRed } from '@pkm-rs/pkg'
-import { isRestricted, TransferRestrictions } from 'src/core/save/util/TransferRestrictions'
 import { findFirstSectionOffset, G3CFRUSAV, SAVE_SIZES_BYTES } from '../cfru/G3CFRUSAV'
 import { FRLG_SECURITY_COPY_OFFSET, FRLG_SECURITY_OFFSET } from '../G3SAV'
 import { SlotMetadata } from '../interfaces'

@@ -1,9 +1,9 @@
+import { bytesToPKM } from '@openhome/core/pkm/FileImport'
 import { OHPKM } from '@openhome/core/pkm/OHPKM'
 import { PK2 } from '@pokemon-files/pkm'
 import * as E from 'fp-ts/lib/Either'
 import fs from 'fs'
 import path from 'path'
-import { bytesToPKM } from 'src/core/pkm/FileImport'
 import { beforeAll, expect, test } from 'vitest'
 import { G2SAV } from '../G2SAV'
 import { buildUnknownSaveFile } from '../util/load'
@@ -30,7 +30,7 @@ beforeAll(async () => {
   crystalSaveFile = result.right as G2SAV
 
   const slowpokeBytes = fs.readFileSync(
-    path.join('src/core/pkm/__test__/PKMFiles/OhpkmV2', 'slowbro.ohpkm')
+    path.join('@openhome/core/pkm/__test__/PKMFiles/OhpkmV2', 'slowbro.ohpkm')
   )
   slowbroOH = bytesToPKM(new Uint8Array(slowpokeBytes), 'OhpkmV2') as OHPKM
 })

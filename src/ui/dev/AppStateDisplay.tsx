@@ -1,3 +1,5 @@
+import { InfoGrid } from '@openhome/ui/components/InfoGrid2'
+import { DevDataDisplay } from '@openhome/ui/dev/DevDataDisplay'
 import { useAppState } from '@openhome/ui/state/app-state/appState'
 import { AppInfoContext, AppInfoState } from '@openhome/ui/state/appInfo'
 import { ErrorContext } from '@openhome/ui/state/error'
@@ -8,8 +10,6 @@ import { Item, OriginGames, SpeciesLookup } from '@pkm-rs/pkg'
 import { Card, Flex, Heading, Separator } from '@radix-ui/themes'
 import { useContext } from 'react'
 import { PKMInterface } from 'src/types/interfaces'
-import { InfoGrid } from 'src/ui/components/InfoGrid2'
-import { DevDataDisplay } from 'src/ui/dev/DevDataDisplay'
 
 export default function AppStateDisplay() {
   const appState = useAppState()

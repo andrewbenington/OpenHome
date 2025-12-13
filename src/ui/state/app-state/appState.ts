@@ -1,7 +1,7 @@
+import { BackendContext } from '@openhome/ui/backend/backendContext'
+import { AppState } from '@openhome/ui/backend/backendInterface'
 import * as E from 'fp-ts/lib/Either'
 import { createContext, useContext, useState } from 'react'
-import { BackendContext } from 'src/ui/backend/backendContext'
-import { AppState } from 'src/ui/backend/backendInterface'
 
 type PossiblyLoadedAppState =
   | {

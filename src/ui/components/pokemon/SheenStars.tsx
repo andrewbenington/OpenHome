@@ -1,8 +1,8 @@
+import { getPublicImageURL } from '@openhome/ui/images/images'
 import { COLOPKM, PK3, XDPKM } from '@pokemon-files/pkm'
 import lodash from 'lodash'
 import { PKMInterface } from 'src/types/interfaces'
 import { Styles } from 'src/types/types'
-import { getPublicImageURL } from 'src/ui/images/images'
 
 const styles = {
   container: {

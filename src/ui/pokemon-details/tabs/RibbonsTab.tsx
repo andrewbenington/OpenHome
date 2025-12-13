@@ -1,9 +1,9 @@
+import { getPublicImageURL } from '@openhome/ui/images/images'
+import { getRibbonSpritePath } from '@openhome/ui/images/ribbons'
 import { Gen9Ribbons } from '@pokemon-resources/consts/Ribbons'
 import { Tooltip } from '@radix-ui/themes'
 import { PKMInterface } from 'src/types/interfaces'
 import { Styles } from 'src/types/types'
-import { getPublicImageURL } from 'src/ui/images/images'
-import { getRibbonSpritePath } from 'src/ui/images/ribbons'
 
 const styles = {
   container: {

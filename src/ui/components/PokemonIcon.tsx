@@ -1,10 +1,10 @@
+import useIsDarkMode from '@openhome/ui/hooks/dark-mode'
+import BoxIcons from '@openhome/ui/images/BoxIcons.png'
+import { getPublicImageURL } from '@openhome/ui/images/images'
+import { getItemIconPath } from '@openhome/ui/images/items'
+import useMonSprite from '@openhome/ui/pokemon-details//useMonSprite'
 import { FormeMetadata, Generation, MetadataLookup } from '@pkm-rs/pkg'
 import { HTMLAttributes } from 'react'
-import useIsDarkMode from 'src/ui/hooks/dark-mode'
-import BoxIcons from 'src/ui/images/BoxIcons.png'
-import { getPublicImageURL } from 'src/ui/images/images'
-import { getItemIconPath } from 'src/ui/images/items'
-import useMonSprite from 'src/ui/pokemon-details//useMonSprite'
 import './components.css'
 
 export interface PokemonIconProps extends HTMLAttributes<HTMLDivElement> {

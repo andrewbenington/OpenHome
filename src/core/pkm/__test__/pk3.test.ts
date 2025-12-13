@@ -1,8 +1,8 @@
+import { bytesToPKM } from '@openhome/core/pkm/FileImport'
 import { PK3 } from '@pokemon-files/pkm'
 import fs from 'fs'
 import { TextDecoder } from 'node:util' // (ESM style imports)
 import path from 'path'
-import { bytesToPKM } from 'src/core/pkm/FileImport'
 import { beforeAll, expect, test } from 'vitest'
 import { getMonGen345Identifier } from '../Lookup'
 import { OHPKM } from '../OHPKM'

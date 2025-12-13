@@ -1,3 +1,4 @@
+import { isRestricted } from '@openhome/core/save/util/TransferRestrictions'
 import { Gender, Languages, OriginGame } from '@pkm-rs/pkg'
 import { PK9 } from '@pokemon-files/pkm'
 import { utf16BytesToString } from '@pokemon-files/util'
@@ -7,7 +8,6 @@ import {
   SV_TRANSFER_RESTRICTIONS_ID,
   SV_TRANSFER_RESTRICTIONS_TM,
 } from '@pokemon-resources/consts/TransferRestrictions'
-import { isRestricted } from 'src/core/save/util/TransferRestrictions'
 import { SCBlock, SCObjectBlock } from '../encryption/SwishCrypto/SCBlock'
 import { SwishCrypto } from '../encryption/SwishCrypto/SwishCrypto'
 import { PathData } from '../util/path'

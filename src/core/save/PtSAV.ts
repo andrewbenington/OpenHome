@@ -2,12 +2,12 @@ import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
 } from '@openhome/core/save/util/byteLogic'
+import { gen4StringToUTF } from '@openhome/core/save/util/Strings/StringConverter'
+import { isRestricted } from '@openhome/core/save/util/TransferRestrictions'
 import { Gender, OriginGame } from '@pkm-rs/pkg'
 import { PK4 } from '@pokemon-files/pkm'
 import { Item } from '@pokemon-resources/consts/Items'
 import { PT_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
-import { gen4StringToUTF } from 'src/core/save/util/Strings/StringConverter'
-import { isRestricted } from 'src/core/save/util/TransferRestrictions'
 import { G4SAV } from './G4SAV'
 import { PathData } from './util/path'
 import { hasDesamumeFooter } from './util/util'

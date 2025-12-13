@@ -1,9 +1,22 @@
+import {
+  getMonFileIdentifier,
+  getMonGen12Identifier,
+  getMonGen345Identifier,
+} from '@openhome/core/pkm/Lookup'
 import { OHPKM } from '@openhome/core/pkm/OHPKM'
 import {
   getHiddenPowerGen2,
   getHiddenPowerPower,
   getHiddenPowerType,
 } from '@openhome/core/pkm/util'
+import { isRestricted } from '@openhome/core/save/util/TransferRestrictions'
+import AttributeRow from '@openhome/ui/components/AttributeRow'
+import AttributeRowExpand from '@openhome/ui/components/AttributeRowExpand'
+import DynamaxLevel from '@openhome/ui/components/pokemon/DynamaxLevel'
+import GenderIcon from '@openhome/ui/components/pokemon/GenderIcon'
+import ShinyLeavesDisplay from '@openhome/ui/components/pokemon/ShinyLeaves'
+import TypeIcon from '@openhome/ui/components/pokemon/TypeIcon'
+import useIsDev from '@openhome/ui/hooks/isDev'
 import { genderFromBool, Generation, OriginGames } from '@pkm-rs/pkg'
 import { PK3, PK4, PK5 } from '@pokemon-files/pkm'
 import {
@@ -36,20 +49,7 @@ import {
 } from '@pokemon-resources/index'
 import { Flex } from '@radix-ui/themes'
 import { useMemo } from 'react'
-import {
-  getMonFileIdentifier,
-  getMonGen12Identifier,
-  getMonGen345Identifier,
-} from 'src/core/pkm/Lookup'
-import { isRestricted } from 'src/core/save/util/TransferRestrictions'
 import { PKMInterface } from 'src/types/interfaces'
-import AttributeRow from 'src/ui/components/AttributeRow'
-import AttributeRowExpand from 'src/ui/components/AttributeRowExpand'
-import DynamaxLevel from 'src/ui/components/pokemon/DynamaxLevel'
-import GenderIcon from 'src/ui/components/pokemon/GenderIcon'
-import ShinyLeavesDisplay from 'src/ui/components/pokemon/ShinyLeaves'
-import TypeIcon from 'src/ui/components/pokemon/TypeIcon'
-import useIsDev from 'src/ui/hooks/isDev'
 
 const HG_TO_LB = 0.2204623
 const CM_TO_IN = 0.3937008

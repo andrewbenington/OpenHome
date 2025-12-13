@@ -1,7 +1,7 @@
+import { BackendContext } from '@openhome/ui/backend/backendContext'
 import { AppInfoContext } from '@openhome/ui/state/appInfo'
 import { Card, RadioGroup } from '@radix-ui/themes'
 import { useContext, useEffect } from 'react'
-import { BackendContext } from 'src/ui/backend/backendContext'
 
 export default function Settings() {
   const [appInfoState, dispatchAppInfoState] = useContext(AppInfoContext)

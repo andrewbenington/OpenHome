@@ -1,9 +1,9 @@
+import { EditIcon } from '@openhome/ui/components/Icons'
+import ToggleButton from '@openhome/ui/components/ToggleButton'
 import { useSaves } from '@openhome/ui/state/saves/useSaves'
 import { Button, Card, DataList, DropdownMenu, Flex, Heading, TextField } from '@radix-ui/themes'
 import { useState } from 'react'
 import { getBankName } from 'src/types/storage'
-import { EditIcon } from 'src/ui/components/Icons'
-import ToggleButton from 'src/ui/components/ToggleButton'
 
 export default function BankHeader() {
   const savesAndBanks = useSaves()

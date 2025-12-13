@@ -1,12 +1,15 @@
 import { OHPKM } from '@openhome/core/pkm/OHPKM'
 import { get8BitChecksum } from '@openhome/core/save/util/byteLogic'
+import {
+  gen12StringToUTF,
+  utf16StringToGen12,
+} from '@openhome/core/save/util/Strings/StringConverter'
 import { Gender, ItemGen2, Language, OriginGame } from '@pkm-rs/pkg'
 import { PK2 } from '@pokemon-files/pkm'
 import { EXCLAMATION } from '@pokemon-resources/consts/Formes'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { GEN2_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
 import { uniq } from 'lodash'
-import { gen12StringToUTF, utf16StringToGen12 } from 'src/core/save/util/Strings/StringConverter'
 import { Box, BoxCoordinates, OfficialSAV } from './interfaces'
 import { emptyPathData, PathData } from './util/path'
 import { LOOKUP_TYPE } from './util/util'

@@ -5,9 +5,9 @@ import {
   bytesToUint32LittleEndian,
   uint16ToBytesLittleEndian,
 } from '@openhome/core/save/util/byteLogic'
+import { gen4StringToUTF } from '@openhome/core/save/util/Strings/StringConverter'
 import { OriginGame } from '@pkm-rs/pkg'
 import { PK4 } from '@pokemon-files/pkm'
-import { gen4StringToUTF } from 'src/core/save/util/Strings/StringConverter'
 import { Box, BoxCoordinates, OfficialSAV } from './interfaces'
 import { PathData } from './util/path'
 import { LOOKUP_TYPE } from './util/util'

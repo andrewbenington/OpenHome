@@ -1,6 +1,10 @@
 import { OHPKM } from '@openhome/core/pkm/OHPKM'
 import { getCharacteristic, getMoveMaxPP } from '@openhome/core/pkm/util'
 import { getPluginIdentifier } from '@openhome/core/save/util/util'
+import Markings from '@openhome/ui/components/pokemon/Markings'
+import MoveCard from '@openhome/ui/components/pokemon/MoveCard'
+import { getPublicImageURL } from '@openhome/ui/images/images'
+import { getBallIconPath } from '@openhome/ui/images/items'
 import { AppInfoContext } from '@openhome/ui/state/appInfo'
 import { OriginGames } from '@pkm-rs/pkg'
 import { getLocationString, RibbonTitles } from '@pokemon-resources/index'
@@ -8,10 +12,6 @@ import { Badge, Flex } from '@radix-ui/themes'
 import { useContext, useMemo } from 'react'
 import { PKMInterface } from 'src/types/interfaces'
 import { Styles } from 'src/types/types'
-import Markings from 'src/ui/components/pokemon/Markings'
-import MoveCard from 'src/ui/components/pokemon/MoveCard'
-import { getPublicImageURL } from 'src/ui/images/images'
-import { getBallIconPath } from 'src/ui/images/items'
 
 const styles = {
   gameContainer: {

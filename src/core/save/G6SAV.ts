@@ -4,9 +4,9 @@ import {
   bytesToUint16LittleEndian,
   uint16ToBytesLittleEndian,
 } from '@openhome/core/save/util/byteLogic'
+import { utf16BytesToString } from '@openhome/core/save/util/Strings/StringConverter'
 import { Gender, OriginGame } from '@pkm-rs/pkg'
 import { PK6 } from '@pokemon-files/pkm'
-import { utf16BytesToString } from 'src/core/save/util/Strings/StringConverter'
 import { Box, BoxCoordinates, OfficialSAV } from './interfaces'
 import { PathData } from './util/path'
 

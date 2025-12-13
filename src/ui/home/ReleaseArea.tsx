@@ -1,7 +1,7 @@
+import PokemonIcon from '@openhome/ui/components/PokemonIcon'
 import DroppableSpace from '@openhome/ui/saves/boxes/DroppableSpace'
 import { useSaves } from '@openhome/ui/state/saves/useSaves'
 import { Flex } from '@radix-ui/themes'
-import PokemonIcon from 'src/ui/components/PokemonIcon'
 
 export default function ReleaseArea() {
   const savesAndBanks = useSaves()
