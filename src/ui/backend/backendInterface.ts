@@ -1,6 +1,6 @@
 import { OHPKM } from '@openhome/core/pkm/OHPKM'
 import { PathData, PossibleSaves } from '@openhome/core/save/util/path'
-import { Settings } from 'src/state/appInfo'
+import { Settings } from '@openhome/ui/state/appInfo'
 import { Pokedex, PokedexUpdate } from 'src/types/pokedex'
 import { SaveFolder, StoredBankData } from 'src/types/storage'
 import { Errorable, LoadSaveResponse, LookupMap, SaveRef } from 'src/types/types'

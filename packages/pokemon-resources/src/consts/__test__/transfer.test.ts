@@ -1,6 +1,6 @@
 // import { TextDecoder } from 'node:util' // (ESM style imports)
 import { difference } from 'lodash'
-import { TransferRestrictions } from 'src/types/TransferRestrictions'
+import { TransferRestrictions } from 'src/core/save/util/TransferRestrictions'
 import { describe, test } from 'vitest'
 import {
   BDSP_TRANSFER_RESTRICTIONS,

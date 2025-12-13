@@ -1,5 +1,5 @@
+import { ErrorContext } from '@openhome/ui/state/error'
 import { useCallback, useContext } from 'react'
-import { ErrorContext } from 'src/state/error'
 
 export default function useDisplayError() {
   const [, dispatchErrorState] = useContext(ErrorContext)

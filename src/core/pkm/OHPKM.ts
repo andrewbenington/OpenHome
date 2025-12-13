@@ -34,7 +34,6 @@ import Prando from 'prando'
 import { PKMInterface } from 'src/types/interfaces'
 import { intersection, unique } from 'src/util/Functional'
 import { OhpkmV2 as OhpkmV2Wasm } from '../../../pkm_rs/pkg'
-import { getHomeIdentifier, isEvolution } from '../../util/Lookup'
 import { SAV } from '../save/interfaces'
 import {
   contestStatsFromWasm,
@@ -55,6 +54,7 @@ import {
   statsPreSplitToWasm,
   trainerMemoryToWasm,
 } from './convert'
+import { getHomeIdentifier, isEvolution } from './Lookup'
 import { OhpkmV1 } from './OhpkmV1'
 import { adjustMovePPBetweenFormats, generateIVs, getAbilityFromNumber, ivsFromDVs } from './util'
 

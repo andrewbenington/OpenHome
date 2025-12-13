@@ -1,5 +1,5 @@
+import { AppInfoContext } from '@openhome/ui/state/appInfo'
 import { useContext, useEffect } from 'react'
-import { AppInfoContext } from 'src/state/appInfo'
 import { BackendContext } from 'src/ui/backend/backendContext'
 import SideTabs from 'src/ui/components/side-tabs/SideTabs'
 import BrowsePlugins from './BrowsePlugins'

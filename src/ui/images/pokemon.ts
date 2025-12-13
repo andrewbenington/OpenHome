@@ -4,10 +4,10 @@ import { toGen3RRPokemonIndex } from '@openhome/core/save/radicalred/conversion/
 import { RRSprites } from '@openhome/core/save/radicalred/conversion/RadicalRedSprites'
 import { NationalDexToUnboundMap } from '@openhome/core/save/unbound/conversion/UnboundSpeciesMap'
 import { UBSprites } from '@openhome/core/save/unbound/conversion/UnboundSprites'
+import { MonSpriteData } from '@openhome/ui/state/plugin'
 import { MetadataLookup } from '@pkm-rs/pkg'
 import { BLOOD_MOON, SWEETS } from '@pokemon-resources/consts/Formes'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
-import { MonSpriteData } from 'src/state/plugin'
 
 export const fileToSpriteFolder: Record<string, string> = {
   PK1: 'gen1',

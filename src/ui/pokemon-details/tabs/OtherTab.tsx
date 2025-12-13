@@ -36,7 +36,12 @@ import {
 } from '@pokemon-resources/index'
 import { Flex } from '@radix-ui/themes'
 import { useMemo } from 'react'
-import { isRestricted } from 'src/types/TransferRestrictions'
+import {
+  getMonFileIdentifier,
+  getMonGen12Identifier,
+  getMonGen345Identifier,
+} from 'src/core/pkm/Lookup'
+import { isRestricted } from 'src/core/save/util/TransferRestrictions'
 import { PKMInterface } from 'src/types/interfaces'
 import AttributeRow from 'src/ui/components/AttributeRow'
 import AttributeRowExpand from 'src/ui/components/AttributeRowExpand'
@@ -45,11 +50,6 @@ import GenderIcon from 'src/ui/components/pokemon/GenderIcon'
 import ShinyLeavesDisplay from 'src/ui/components/pokemon/ShinyLeaves'
 import TypeIcon from 'src/ui/components/pokemon/TypeIcon'
 import useIsDev from 'src/ui/hooks/isDev'
-import {
-  getMonFileIdentifier,
-  getMonGen12Identifier,
-  getMonGen345Identifier,
-} from 'src/util/Lookup'
 
 const HG_TO_LB = 0.2204623
 const CM_TO_IN = 0.3937008

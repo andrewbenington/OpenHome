@@ -1,6 +1,6 @@
 import { ItemUnbound } from '@pkm-rs/pkg'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
-import { isRestricted, TransferRestrictions } from 'src/types/TransferRestrictions'
+import { isRestricted, TransferRestrictions } from 'src/core/save/util/TransferRestrictions'
 import { findFirstSectionOffset, G3CFRUSAV, SAVE_SIZES_BYTES } from '../cfru/G3CFRUSAV'
 import { SlotMetadata } from '../interfaces'
 import { bytesToUint32LittleEndian } from '../util/byteLogic'

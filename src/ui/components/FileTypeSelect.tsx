@@ -1,7 +1,7 @@
 import { supportsMon } from '@openhome/core/save/util/util'
+import { AppInfoContext } from '@openhome/ui/state/appInfo'
 import { uniq } from 'lodash'
 import { useContext, useMemo } from 'react'
-import { AppInfoContext } from 'src/state/appInfo'
 import { PKMFormeRef } from 'src/types/types'
 import { filterUndefined } from 'src/util/Sort'
 

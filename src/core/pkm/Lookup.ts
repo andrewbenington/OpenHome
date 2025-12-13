@@ -6,8 +6,8 @@ import { PK3, PK4, PK5 } from '@pokemon-files/pkm'
 import { generatePersonalityValuePreservingAttributes } from '@pokemon-files/util'
 import { PKMInterface } from 'src/types/interfaces'
 import { PKMFormeRef } from 'src/types/types'
-import { bytesToString } from '../core/save/util/byteLogic'
-import { gen12StringToUTF, utf16StringToGen12 } from './Strings/StringConverter'
+import { gen12StringToUTF, utf16StringToGen12 } from '../../util/Strings/StringConverter'
+import { bytesToString } from '../save/util/byteLogic'
 
 export const getMonFileIdentifier = (mon: PKMInterface) => {
   if (!('personalityValue' in mon)) {

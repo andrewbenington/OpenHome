@@ -1,7 +1,7 @@
 import { OriginGame } from '@pkm-rs/pkg'
 import { Item } from '@pokemon-resources/consts/Items'
 import { ORAS_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
-import { isRestricted } from 'src/types/TransferRestrictions'
+import { isRestricted } from 'src/core/save/util/TransferRestrictions'
 import { G6SAV } from './G6SAV'
 import { PathData } from './util/path'
 

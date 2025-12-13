@@ -54,7 +54,7 @@ import * as lodash from 'lodash'
 import Prando from 'prando'
 import { PKMInterface, PluginPKMInterface } from 'src/types/interfaces'
 import { utf16BytesToString, utf16StringToBytes } from 'src/util/Strings/StringConverter'
-import { getHomeIdentifier, isEvolution } from '../../util/Lookup'
+import { getHomeIdentifier, isEvolution } from './Lookup'
 import schema from './OHPKM.json'
 import {
   adjustMovePPBetweenFormats,

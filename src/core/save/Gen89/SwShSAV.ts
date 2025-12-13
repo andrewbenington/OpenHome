@@ -8,7 +8,7 @@ import {
   SWSH_TRANSFER_RESTRICTIONS_CT,
   SWSH_TRANSFER_RESTRICTIONS_IOA,
 } from '@pokemon-resources/consts/TransferRestrictions'
-import { isRestricted } from 'src/types/TransferRestrictions'
+import { isRestricted } from 'src/core/save/util/TransferRestrictions'
 import { SCBlock, SCObjectBlock } from '../encryption/SwishCrypto/SCBlock'
 import { SwishCrypto } from '../encryption/SwishCrypto/SwishCrypto'
 import { PathData } from '../util/path'

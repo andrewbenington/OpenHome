@@ -1,7 +1,7 @@
 import { OriginGame } from '@pkm-rs/pkg'
 import { Item } from '@pokemon-resources/consts/Items'
 import { BW_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
-import { isRestricted } from 'src/types/TransferRestrictions'
+import { isRestricted } from 'src/core/save/util/TransferRestrictions'
 import { G5SAV } from './G5SAV'
 import { hasDesamumeFooter } from './util/util'
 

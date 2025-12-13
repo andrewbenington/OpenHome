@@ -1,12 +1,12 @@
 import { OHPKM } from '@openhome/core/pkm/OHPKM'
+import { OhpkmLookup } from '@openhome/ui/state/ohpkm/useOhpkmStore'
 import * as E from 'fp-ts/lib/Either'
-import { OhpkmLookup } from 'src/state/ohpkm/useOhpkmStore'
-import { PKMInterface } from 'src/types/interfaces'
 import {
   getMonFileIdentifier,
   getMonGen12Identifier,
   getMonGen345Identifier,
-} from 'src/util/Lookup'
+} from 'src/core/pkm/Lookup'
+import { PKMInterface } from 'src/types/interfaces'
 import { SAV } from '../interfaces'
 import { PathData } from './path'
 import { SAVClass } from './util'

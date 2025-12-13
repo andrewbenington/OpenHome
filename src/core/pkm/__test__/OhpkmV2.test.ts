@@ -1,7 +1,7 @@
 import { PK3 } from '@pokemon-files/pkm'
 import fs from 'fs'
 import path from 'path'
-import { bytesToPKM } from 'src/types/FileImport'
+import { bytesToPKM } from 'src/core/pkm/FileImport'
 import { assert, beforeAll, describe, test } from 'vitest'
 import { OHPKM } from '../OHPKM'
 import { OhpkmV1 } from '../OhpkmV1'

@@ -17,7 +17,7 @@ import {
 } from 'chart.js'
 import { useEffect, useMemo, useState } from 'react'
 import { Radar } from 'react-chartjs-2'
-import { isRestricted } from 'src/types/TransferRestrictions'
+import { isRestricted } from 'src/core/save/util/TransferRestrictions'
 import { PKMInterface } from 'src/types/interfaces'
 import { Styles } from 'src/types/types'
 import SheenStars from 'src/ui/components/pokemon/SheenStars'

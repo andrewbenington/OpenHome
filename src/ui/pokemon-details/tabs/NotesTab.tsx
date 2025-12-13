@@ -1,7 +1,7 @@
 import { OHPKM } from '@openhome/core/pkm/OHPKM'
+import { useSaves } from '@openhome/ui/state/saves/useSaves'
 import { TextArea } from '@radix-ui/themes'
 import { useEffect, useState } from 'react'
-import { useSaves } from 'src/state/saves/useSaves'
 
 export default function NotesDisplay(props: { mon: OHPKM }) {
   const { mon } = props

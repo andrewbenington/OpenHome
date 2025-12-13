@@ -1,6 +1,6 @@
+import { ErrorContext } from '@openhome/ui/state/error'
 import { Callout, Dialog, Separator } from '@radix-ui/themes'
 import { useContext } from 'react'
-import { ErrorContext } from 'src/state/error'
 import { ErrorIcon } from 'src/ui/components/Icons'
 
 export default function ErrorMessageModal() {

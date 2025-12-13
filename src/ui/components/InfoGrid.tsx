@@ -4,7 +4,7 @@ import { PKM } from '@pokemon-files/pkm'
 import { Card, Flex, Grid } from '@radix-ui/themes'
 import { isDayjs } from 'dayjs'
 import React, { ReactNode, useCallback, useMemo } from 'react'
-import { getMonFileIdentifier } from 'src/util/Lookup'
+import { getMonFileIdentifier } from 'src/core/pkm/Lookup'
 import PokemonIcon from './PokemonIcon'
 
 type Breakpoint = 'xs' | 'sm' | 'md' | 'lg' | 'xl'

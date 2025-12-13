@@ -1,6 +1,6 @@
+import { OpenHomePlugin } from '@openhome/ui/state/plugin'
 import { MetadataLookup, SpeciesLookup } from '@pkm-rs/pkg'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
-import { OpenHomePlugin } from 'src/state/plugin'
 import { ImageResponse } from 'src/ui/backend/backendInterface'
 
 type PluginBuilder = (
