@@ -14,17 +14,17 @@ import { initializeWasm } from './init'
 beforeAll(initializeWasm)
 
 const swordPath: PathData = {
-  raw: 'SAVFiles/sword',
+  raw: 'save-files/sword',
   name: 'sword',
-  dir: 'SAVFiles',
+  dir: 'save-files',
   ext: '',
   separator: '/',
 }
 
 const arceusPath = {
-  raw: 'SAVFiles/legendsarceus',
+  raw: 'save-files/legendsarceus',
   name: 'legendsarceus',
-  dir: 'SAVFiles',
+  dir: 'save-files',
   ext: '',
   separator: '/',
 }
@@ -36,13 +36,13 @@ describe('gen 8 save files', () => {
   let magmortar: PK4
 
   beforeAll(() => {
-    let savePath = resolve(__dirname, 'SAVFiles/sword')
+    let savePath = resolve(__dirname, 'save-files/sword')
 
     saveBytes = new Uint8Array(readFileSync(savePath))
 
     swordSave = new SwShSAV(swordPath, saveBytes)
 
-    savePath = resolve(__dirname, 'SAVFiles/legendsarceus')
+    savePath = resolve(__dirname, 'save-files/legendsarceus')
 
     saveBytes = new Uint8Array(readFileSync(savePath))
 

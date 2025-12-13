@@ -14,7 +14,7 @@ describe('G3SAV - Gen 3 Save File Read Test', async () => {
 
   const result = buildUnknownSaveFile(
     emptyPathData,
-    new Uint8Array(fs.readFileSync(path.join(__dirname, 'SAVFiles', 'emerald.sav'))),
+    new Uint8Array(fs.readFileSync(path.join(__dirname, 'save-files', 'emerald.sav'))),
     {},
     [G3SAV]
   )

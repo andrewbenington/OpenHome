@@ -13,14 +13,14 @@ describe('gen 7 save files', () => {
   let saveBytes: Uint8Array
 
   beforeAll(() => {
-    const savePath = resolve(__dirname, 'SAVFiles/ultrasun')
+    const savePath = resolve(__dirname, 'save-files/ultrasun')
 
     saveBytes = new Uint8Array(readFileSync(savePath))
 
     const parsedPath: PathData = {
-      raw: 'SAVFiles/ultrasun',
+      raw: 'save-files/ultrasun',
       name: 'ultrasun',
-      dir: 'SAVFiles',
+      dir: 'save-files',
       ext: '',
       separator: '/',
     }
@@ -42,14 +42,14 @@ describe('moon save file', () => {
   let saveBytes: Uint8Array
 
   beforeAll(() => {
-    const savePath = resolve(__dirname, 'SAVFiles/moon')
+    const savePath = resolve(__dirname, 'save-files/moon')
 
     saveBytes = new Uint8Array(readFileSync(savePath))
 
     const parsedPath: PathData = {
-      raw: 'SAVFiles/moon',
+      raw: 'save-files/moon',
       name: 'moon',
-      dir: 'SAVFiles',
+      dir: 'save-files',
       ext: '',
       separator: '/',
     }

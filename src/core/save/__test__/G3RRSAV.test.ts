@@ -15,14 +15,14 @@ describe('G3RRSAV - Radical Red Save File Read Test', () => {
   let saveBytes: Uint8Array
 
   beforeAll(() => {
-    const savePath = resolve(__dirname, 'SAVFiles/radicalred.sav')
+    const savePath = resolve(__dirname, 'save-files/radicalred.sav')
 
     saveBytes = new Uint8Array(readFileSync(savePath))
 
     const parsedPath: PathData = {
-      raw: 'SAVFiles/radicalred.sav',
+      raw: 'save-files/radicalred.sav',
       name: 'radical red',
-      dir: 'SAVFiles',
+      dir: 'save-files',
       ext: '.sav',
       separator: '/',
     }
@@ -106,14 +106,14 @@ describe('G3RRSAV - Radical Red Save File Write Test', () => {
   let saveBytes: Uint8Array
 
   beforeAll(() => {
-    const savePath = resolve(__dirname, 'SAVFiles/radicalred.sav')
+    const savePath = resolve(__dirname, 'save-files/radicalred.sav')
 
     saveBytes = new Uint8Array(readFileSync(savePath))
 
     const parsedPath: PathData = {
-      raw: 'SAVFiles/radicalred.sav',
+      raw: 'save-files/radicalred.sav',
       name: 'radical red',
-      dir: 'SAVFiles',
+      dir: 'save-files',
       ext: '.sav',
       separator: '/',
     }
@@ -138,7 +138,7 @@ describe('G3RRSAV - Radical Red Save File Write Test', () => {
     // Modify the nickname, held item, or other properties of the first Pokémon in the first box
 
     if (radicalRedSave.boxes[0].pokemon[0]) {
-      const newSavePath = resolve(__dirname, 'SAVFiles/radicalred_modified.sav')
+      const newSavePath = resolve(__dirname, 'save-files/radicalred_modified.sav')
 
       writeFileSync(newSavePath, radicalRedSave.bytes)
 
@@ -152,14 +152,14 @@ describe('G3RRSAV - Radical Red Save File Write Test', () => {
 
   test('should check if modifications were made', () => {
     const parsedPath: PathData = {
-      raw: 'SAVFiles/radicalred_modified.sav',
+      raw: 'save-files/radicalred_modified.sav',
       name: 'radical red',
-      dir: 'SAVFiles',
+      dir: 'save-files',
       ext: '.sav',
       separator: '/',
     }
 
-    const newSavePath = resolve(__dirname, 'SAVFiles/radicalred_modified.sav')
+    const newSavePath = resolve(__dirname, 'save-files/radicalred_modified.sav')
     const fileExists = existsSync(newSavePath)
 
     expect(fileExists).toBe(true)

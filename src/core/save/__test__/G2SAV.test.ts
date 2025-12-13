@@ -18,7 +18,7 @@ beforeAll(async () => {
   await initializeWasm()
   const result = buildUnknownSaveFile(
     emptyPathData,
-    new Uint8Array(fs.readFileSync(path.join(__dirname, 'SAVFiles', 'crystal.sav'))),
+    new Uint8Array(fs.readFileSync(path.join(__dirname, 'save-files', 'crystal.sav'))),
     {},
     [G2SAV]
   )
