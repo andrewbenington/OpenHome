@@ -1,4 +1,4 @@
-VERSION=1.8.0-alpha-ohpkm-v2
+VERSION=1.8.0-x-rc-0
 
 .PHONY: help
 help: # Display this help.

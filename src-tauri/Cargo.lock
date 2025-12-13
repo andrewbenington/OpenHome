@@ -4,7 +4,7 @@ version = 4
 
 [[package]]
 name = "OpenHome"
-version = "1.8.0-alpha-ohpkm-v2"
+version = "1.8.0-x-rc-0"
 dependencies = [
  "base64 0.22.1",
  "bytes",
