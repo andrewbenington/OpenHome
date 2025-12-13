@@ -10,8 +10,8 @@ import { Gender, OriginGame } from '@pkm-rs/pkg'
 import { PK5 } from '@pokemon-files/pkm'
 import { uniq } from 'lodash'
 import { Box, BoxCoordinates, OfficialSAV } from './interfaces'
+import { hasDesamumeFooter, LOOKUP_TYPE } from './util'
 import { PathData } from './util/path'
-import { hasDesamumeFooter, LOOKUP_TYPE } from './util/util'
 
 const PC_OFFSET = 0x400
 const BOX_NAMES_OFFSET: number = 0x04

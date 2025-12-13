@@ -9,8 +9,8 @@ import { gen4StringToUTF } from '@openhome/core/save/util/Strings/StringConverte
 import { OriginGame } from '@pkm-rs/pkg'
 import { PK4 } from '@pokemon-files/pkm'
 import { Box, BoxCoordinates, OfficialSAV } from './interfaces'
+import { LOOKUP_TYPE } from './util'
 import { PathData } from './util/path'
-import { LOOKUP_TYPE } from './util/util'
 
 export abstract class G4SAV extends OfficialSAV<PK4> {
   static BOX_COUNT = 18

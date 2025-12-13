@@ -9,8 +9,8 @@ import { utf16BytesToString } from '@openhome/core/save/util/Strings/StringConve
 import { Gender, OriginGame } from '@pkm-rs/pkg'
 import { PK7 } from '@pokemon-files/pkm'
 import { Box, BoxCoordinates, OfficialSAV } from './interfaces'
+import { SIZE_USUM } from './util'
 import { PathData } from './util/path'
-import { SIZE_USUM } from './util/util'
 
 const BOX_SIZE: number = 232 * 30
 const BOX_COUNT = 32

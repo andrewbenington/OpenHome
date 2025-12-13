@@ -3,7 +3,7 @@ import { isRestricted } from '@openhome/core/save/util/TransferRestrictions'
 import { OriginGame } from '@pkm-rs/pkg'
 import { Item } from '@pokemon-resources/consts/Items'
 import { BW2_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
-import { hasDesamumeFooter } from './util/util'
+import { hasDesamumeFooter } from './util'
 
 export class BW2SAV extends G5SAV {
   static transferRestrictions = BW2_TRANSFER_RESTRICTIONS

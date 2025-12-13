@@ -1,5 +1,5 @@
+import { DevDataDisplay } from '@openhome/ui/components/DevDataDisplay'
 import { InfoGrid } from '@openhome/ui/components/InfoGrid2'
-import { DevDataDisplay } from '@openhome/ui/dev/DevDataDisplay'
 import { useAppState } from '@openhome/ui/state/app-state/appState'
 import { AppInfoContext, AppInfoState } from '@openhome/ui/state/appInfo'
 import { ErrorContext } from '@openhome/ui/state/error'

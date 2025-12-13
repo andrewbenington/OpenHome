@@ -1,12 +1,12 @@
 import useIsDev from '@openhome/ui/hooks/isDev'
 import { Box, Tabs, ThemePanel } from '@radix-ui/themes'
-import AppStateDisplay from './dev/AppStateDisplay'
-import Home from './Home'
-import TrackedPokemon from './manage/TrackedPokemon'
-import PluginsPage from './plugins/Plugins'
-import PokedexDisplay from './pokedex/PokedexDisplay'
-import Settings from './Settings'
-import SortPokemon from './sort/SortPokemon'
+import AppStateDisplay from './pages/AppStateDisplay'
+import Home from './pages/home/Home'
+import PluginsPage from './pages/plugins/Plugins'
+import PokedexDisplay from './pages/pokedex/PokedexDisplay'
+import Settings from './pages/Settings'
+import SortPokemon from './pages/sort/SortPokemon'
+import TrackedPokemon from './pages/tracked/TrackedPokemon'
 
 export default function AppTabs() {
   const isDev = useIsDev()

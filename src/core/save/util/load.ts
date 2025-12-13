@@ -7,9 +7,9 @@ import { OHPKM } from '@openhome/core/pkm/OHPKM'
 import { OhpkmLookup } from '@openhome/ui/state/ohpkm/useOhpkmStore'
 import * as E from 'fp-ts/lib/Either'
 import { PKMInterface } from 'src/types/interfaces'
+import { SAVClass } from '.'
 import { SAV } from '../interfaces'
 import { PathData } from './path'
-import { SAVClass } from './util'
 
 const SKIP_OHPKM_LOAD = false
 

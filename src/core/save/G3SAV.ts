@@ -11,8 +11,8 @@ import { PK3 } from '@pokemon-files/pkm'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { GEN3_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
 import { Box, BoxCoordinates, OfficialSAV } from './interfaces'
+import { LOOKUP_TYPE } from './util'
 import { emptyPathData, PathData } from './util/path'
-import { LOOKUP_TYPE } from './util/util'
 
 export const SAVE_SIZE_BYTES = 0x20000
 export const EMERALD_SECURITY_OFFSET = 0xac

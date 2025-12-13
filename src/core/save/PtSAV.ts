@@ -9,8 +9,8 @@ import { PK4 } from '@pokemon-files/pkm'
 import { Item } from '@pokemon-resources/consts/Items'
 import { PT_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
 import { G4SAV } from './G4SAV'
+import { hasDesamumeFooter } from './util'
 import { PathData } from './util/path'
-import { hasDesamumeFooter } from './util/util'
 
 export class PtSAV extends G4SAV {
   static pkmType = PK4

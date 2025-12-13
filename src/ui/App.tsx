@@ -27,9 +27,9 @@ import debounce from 'lodash/debounce'
 import { useCallback, useContext, useEffect, useReducer, useState } from 'react'
 import './App.css'
 import AppTabs from './AppTabs'
-import ErrorMessageModal from './ErrorMessage'
-import PokemonDragContextProvider from './PokemonDragContextProvider'
-import UpdateMessageModal from './UpdateMessageModal'
+import ErrorMessageModal from './top-level/ErrorMessageModal'
+import PokemonDragContextProvider from './top-level/PokemonDragContextProvider'
+import UpdateMessageModal from './top-level/UpdateMessageModal'
 
 const debouncedUpdateSettings = debounce((backend: BackendInterface, settings: Settings) => {
   backend.updateSettings(settings).catch(console.error)

@@ -11,8 +11,8 @@ import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { GEN2_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
 import { uniq } from 'lodash'
 import { Box, BoxCoordinates, OfficialSAV } from './interfaces'
+import { LOOKUP_TYPE } from './util'
 import { emptyPathData, PathData } from './util/path'
-import { LOOKUP_TYPE } from './util/util'
 
 const CURRENT_BOX_OFFSET_GS_INTL = 0x2724
 const CURRENT_BOX_OFFSET_C_INTL = 0x2700

@@ -1,6 +1,5 @@
 import { OHPKM } from '@openhome/core/pkm/OHPKM'
 import { BackendContext } from '@openhome/ui/backend/backendContext'
-import FilterPanel from '@openhome/ui/components/filter/FilterPanel'
 import PokemonIcon from '@openhome/ui/components/PokemonIcon'
 import useDisplayError from '@openhome/ui/hooks/displayError'
 import PokemonDetailsModal from '@openhome/ui/pokemon-details//Modal'
@@ -17,8 +16,9 @@ import { useCallback, useContext, useEffect, useState } from 'react'
 import { MdFileOpen } from 'react-icons/md'
 import { PKMInterface } from 'src/types/interfaces'
 import { CSSWithVariables } from 'src/types/types'
+import FilterPanel from 'src/ui/pages/home/filter/FilterPanel'
 import './Home.css'
-import ReleaseArea from './home/ReleaseArea'
+import ReleaseArea from './ReleaseArea'
 
 const Home = () => {
   const backend = useContext(BackendContext)

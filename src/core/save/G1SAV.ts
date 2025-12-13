@@ -11,8 +11,8 @@ import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { GEN1_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
 import lodash from 'lodash'
 import { Box, BoxCoordinates, OfficialSAV } from './interfaces'
+import { LOOKUP_TYPE } from './util'
 import { PathData } from './util/path'
-import { LOOKUP_TYPE } from './util/util'
 
 const SAVE_SIZE_BYTES = 0x8000
 

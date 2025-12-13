@@ -8,9 +8,9 @@ import {
 import { Gender, OriginGame } from '@pkm-rs/pkg'
 import { PluginPKMInterface } from 'src/types/interfaces'
 import { Box, BoxCoordinates, PluginSAV } from '../interfaces'
+import { LOOKUP_TYPE } from '../util'
 import { PathData } from '../util/path'
 import { gen3StringToUTF } from '../util/Strings/StringConverter'
-import { LOOKUP_TYPE } from '../util/util'
 // import { RRTransferMon } from './conversion/RRTransferMons'
 
 export const SAVE_SIZES_BYTES = [0x20000, 0x20010]
