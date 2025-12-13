@@ -1,6 +1,5 @@
 import json
 import os
-from pathlib import Path
 import re
 import threading
 import urllib.request
@@ -144,7 +143,6 @@ def scrape_bulbapedia_gen_8():
                 )
                 thread.start()
             except Exception as error:
-                print(sprite_src)
                 print(error)
 
 
@@ -226,7 +224,7 @@ def scrape_bulbapedia_mega_stones():
             (
                 stone
                 for stone in MEGA_STONES_ZA
-                if stone[1].replace(" ", "_") in sprite_src
+                if stone[1].replace(" ", "_") + "_ZA" in sprite_src
             ),
             (None, None),
         )
@@ -236,7 +234,7 @@ def scrape_bulbapedia_mega_stones():
 
         # Extract the item index, name, and type
         filename = f"{index:04}.png"
-        directory = "public/items/index/"
+        directory = "../../public/items/index/"
 
         thread = threading.Thread(
             target=download_png, args=(sprite_src, directory, filename, True)

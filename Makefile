@@ -98,6 +98,7 @@ generate: generate/out/generate.js
 gen-wasm:
 # 	@node generate/gen_ribbons.ts
 # 	@cd pkm_rs_resources && node generate/gen_abilities.ts
+	@cd generate
 	@pnpm i
 # 	@cd pkm_rs_resources && ts-node generate/gen_abilities.ts
 	@ts-node generate/gen_items.ts

@@ -48,8 +48,8 @@ export const Item = {
   BriarsBook: 2557,
 
   Clefablite: 2559,
-  Froslassite: 2566,
-  Emboarite: 2569,
-  Drampanite: 2585,
   Falinksite: 2587,
+
+  RaichuniteX: 2635,
+  Glimmoranite: 2650,
 }
