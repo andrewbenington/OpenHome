@@ -4,7 +4,7 @@ import { uniq } from 'lodash'
 import { EXCLAMATION } from 'src/consts/Formes'
 import { NationalDex } from 'src/consts/NationalDex'
 import { GEN2_TRANSFER_RESTRICTIONS } from 'src/consts/TransferRestrictions'
-import { bytesToUint16BigEndian, get8BitChecksum } from 'src/util/byteLogic'
+import { get8BitChecksum } from 'src/util/byteLogic'
 import { gen12StringToUTF, utf16StringToGen12 } from 'src/util/Strings/StringConverter'
 import { OHPKM } from '../pkm/OHPKM'
 import { emptyPathData, PathData } from './path'
@@ -48,10 +48,11 @@ export class G2SAV extends OfficialSAV<PK2> {
 
   constructor(path: PathData, bytes: Uint8Array, fileCreated?: Date) {
     super()
+    const dataView = new DataView(bytes.buffer)
     this.bytes = bytes
     this.filePath = path
     this.fileCreated = fileCreated
-    this.tid = bytesToUint16BigEndian(this.bytes, 0x2009)
+    this.tid = dataView.getInt16(0x2009)
     this.displayID = this.tid.toString().padStart(5, '0')
     this.name = gen12StringToUTF(this.bytes, 0x200b, 11)
     this.boxOffsets = [

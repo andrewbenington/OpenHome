@@ -11,7 +11,7 @@ import { PathData, splitPath } from 'src/types/SAVTypes/path'
 import { BackendContext } from 'src/ui/backend/backendContext'
 import OHDataGrid, { SortableColumn } from 'src/ui/components/OHDataGrid'
 import useDisplayError from 'src/ui/hooks/displayError'
-import { filterUndefined, numericSorter } from 'src/util/Sort'
+import { filterUndefined, numericSorter, stringSorter } from 'src/util/Sort'
 import SaveCard from './SaveCard'
 import { filterEmpty, SaveViewMode } from './util'
 
@@ -144,6 +144,7 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
       name: 'Trainer',
       width: 160,
       renderValue: (params) => `${params.name} (${params.tid})`,
+      sortFunction: stringSorter((save) => `${save.name} (${save.tid})`),
     },
     {
       key: 'filePath',

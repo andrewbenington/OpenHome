@@ -1,15 +1,3 @@
-export function getFlagsInRange(bytes: Uint8Array, offset: number, size: number) {
-  const flags: number[] = []
-
-  for (let i = 0; i < size * 8; i++) {
-    if (getFlag(bytes, offset, i)) {
-      flags.push(i)
-    }
-  }
-
-  return flags
-}
-
 const bytesToNumberBigEndian = (bytes: Uint8Array) => {
   let value = 0
 
@@ -38,10 +26,6 @@ export const bytesToUint64LittleEndian = (bytes: Uint8Array, index: number) => {
 
 export const bytesToUint16BigEndian = (bytes: Uint8Array, index: number) => {
   return bytesToNumberBigEndian(bytes.slice(index, index + 2))
-}
-
-export const bytesToUint24BigEndian = (bytes: Uint8Array, index: number) => {
-  return bytesToNumberBigEndian(bytes.slice(index, index + 3))
 }
 
 export const bytesToUint32BigEndian = (bytes: Uint8Array, index: number) => {

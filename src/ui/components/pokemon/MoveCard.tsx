@@ -1,7 +1,7 @@
 import { Moves, Type } from '@pokemon-resources/index'
 import { useMemo } from 'react'
 import TypeIcon from 'src/ui/components/pokemon/TypeIcon'
-import { getTypeColor } from 'src/util/PokemonSprite'
+import { colorForType } from 'src/ui/util/color'
 import './style.css'
 
 interface MoveCardProps {
@@ -56,7 +56,7 @@ const MoveCard = ({ move, movePP, maxPP, typeOverride }: MoveCardProps) => {
     <div
       className="move-card"
       style={{
-        backgroundColor: getTypeColor(type),
+        backgroundColor: colorForType(type),
       }}
     >
       {content}

@@ -1,10 +1,10 @@
 import { Gender, ItemGen1, Language, OriginGame } from '@pkm-rs/pkg'
+import * as conversion from '@pokemon-files/conversion'
 import { PK1 } from '@pokemon-files/pkm'
 import lodash from 'lodash'
 import { NationalDex } from 'src/consts/NationalDex'
 import { GEN1_TRANSFER_RESTRICTIONS } from 'src/consts/TransferRestrictions'
 import { bytesToUint16BigEndian, get8BitChecksum } from 'src/util/byteLogic'
-import { natDexToGen1ID } from 'src/util/ConvertPokemonID'
 import { gen12StringToUTF, utf16StringToGen12 } from 'src/util/Strings/StringConverter'
 import { OHPKM } from '../pkm/OHPKM'
 import { PathData } from './path'
@@ -166,7 +166,7 @@ export class G1SAV extends OfficialSAV<PK1> {
           const pk1Mon = boxMon instanceof PK1 ? boxMon : new PK1(boxMon)
 
           // set the mon's dex number in the box
-          this.bytes[boxByteOffset + 1 + numMons] = natDexToGen1ID[pk1Mon.dexNum]
+          this.bytes[boxByteOffset + 1 + numMons] = conversion.toGen1PokemonIndex(pk1Mon.dexNum)
           // set the mon's data in the box
           this.bytes.set(
             new Uint8Array(pk1Mon.toBytes()),

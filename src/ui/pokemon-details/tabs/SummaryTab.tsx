@@ -13,7 +13,7 @@ import TypeIcon from 'src/ui/components/pokemon/TypeIcon'
 import PokemonIcon from 'src/ui/components/PokemonIcon'
 import { getPublicImageURL } from 'src/ui/images/images'
 import { BallsImageList, getItemIconPath } from 'src/ui/images/items'
-import { getTypeColor } from 'src/util/PokemonSprite'
+import { colorForType } from 'src/ui/util/color'
 import useMonSprite from '../useMonSprite'
 
 const styles = {
@@ -157,7 +157,7 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
           )}
           {mon.isNoble && <AttributeTag label="NOBLE" backgroundColor="#cccc00" color="white" />}
           {'isShadow' in mon && (mon.isShadow as boolean) && (
-            <AttributeTag label="SHADOW" backgroundColor={getTypeColor('shadow')} color="white" />
+            <AttributeTag label="SHADOW" backgroundColor={colorForType('shadow')} color="white" />
           )}
           {mon.isNsPokemon && (
             <AttributeTag label="N's Pokémon" backgroundColor="green" color="white" />

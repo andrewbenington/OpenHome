@@ -1,6 +1,6 @@
 import { genderFromBool, Generation, OriginGames } from '@pkm-rs/pkg'
 import { PK3, PK4, PK5 } from '@pokemon-files/pkm'
-import { AllPKMFields, getDisplayID, StatsPreSplit } from '@pokemon-files/util'
+import { AllPKMFields, getDisplayID, getFlagsInRange, StatsPreSplit } from '@pokemon-files/util'
 import {
   BDSPTMMoveIndexes,
   LATutorMoveIndexes,
@@ -44,7 +44,6 @@ import {
   getMonGen12Identifier,
   getMonGen345Identifier,
 } from 'src/util/Lookup'
-import { getFlagsInRange } from 'src/util/byteLogic'
 
 const HG_TO_LB = 0.2204623
 const CM_TO_IN = 0.3937008
@@ -204,12 +203,12 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
           )}
         {!isRestricted(SWSH_TRANSFER_RESTRICTIONS_CT, mon.dexNum, mon.formeNum) &&
           mon.trFlagsSwSh &&
-          getFlagsInRange(mon.trFlagsSwSh, 0, 14).length > 0 && (
+          getFlagsInArrayRange(mon.trFlagsSwSh, 0, 14).length > 0 && (
             <AttributeRowExpand
               summary="SwSh TRs"
-              value={`${getFlagsInRange(mon.trFlagsSwSh, 0, 14).length} TRs`}
+              value={`${getFlagsInArrayRange(mon.trFlagsSwSh, 0, 14).length} TRs`}
             >
-              {getFlagsInRange(mon.trFlagsSwSh, 0, 14).map((i) => (
+              {getFlagsInArrayRange(mon.trFlagsSwSh, 0, 14).map((i) => (
                 <AttributeRow key={`swsh_tr_${i}`} label={`TR ${i}`} indent={10}>
                   {Moves[SwShTRMoveIndexes[i]].name}
                 </AttributeRow>
@@ -218,12 +217,12 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
           )}
         {!isRestricted(HGSS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
           mon.tmFlagsBDSP &&
-          getFlagsInRange(mon.tmFlagsBDSP, 0, 14).length > 0 && (
+          getFlagsInArrayRange(mon.tmFlagsBDSP, 0, 14).length > 0 && (
             <AttributeRowExpand
               summary="BDSP TMs"
-              value={`${getFlagsInRange(mon.tmFlagsBDSP, 0, 14).length} TMs`}
+              value={`${getFlagsInArrayRange(mon.tmFlagsBDSP, 0, 14).length} TMs`}
             >
-              {getFlagsInRange(mon.tmFlagsBDSP, 0, 14).map((i) => (
+              {getFlagsInArrayRange(mon.tmFlagsBDSP, 0, 14).map((i) => (
                 <AttributeRow key={`bdsp_tm_${i + 1}`} label={`TM ${i + 1}`} indent={10}>
                   {Moves[BDSPTMMoveIndexes[i]].name}
                 </AttributeRow>
@@ -232,12 +231,12 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
           )}
         {!isRestricted(LA_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
           mon.tutorFlagsLA &&
-          getFlagsInRange(mon.tutorFlagsLA, 0, 8).length > 0 && (
+          getFlagsInArrayRange(mon.tutorFlagsLA, 0, 8).length > 0 && (
             <AttributeRowExpand
               summary="LA Tutor Moves"
-              value={`${getFlagsInRange(mon.tutorFlagsLA, 0, 8).length} Tutor Moves`}
+              value={`${getFlagsInArrayRange(mon.tutorFlagsLA, 0, 8).length} Tutor Moves`}
             >
-              {getFlagsInRange(mon.tutorFlagsLA, 0, 8).map((i) => (
+              {getFlagsInArrayRange(mon.tutorFlagsLA, 0, 8).map((i) => (
                 <AttributeRow key={`la_tutor_${i + 1}`} label={`Tutor ${i + 1}`} indent={10}>
                   {Moves[LATutorMoveIndexes[i]].name}
                 </AttributeRow>
@@ -247,12 +246,12 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
 
         {!isRestricted(SV_TRANSFER_RESTRICTIONS_ID, mon.dexNum, mon.formeNum) &&
           mon.tmFlagsSV &&
-          getFlagsInRange(mon.tmFlagsSV, 0, 22).length > 0 && (
+          getFlagsInArrayRange(mon.tmFlagsSV, 0, 22).length > 0 && (
             <AttributeRowExpand
               summary="SV TMs"
-              value={`${getFlagsInRange(mon.tmFlagsSV, 0, 22).length} TMs`}
+              value={`${getFlagsInArrayRange(mon.tmFlagsSV, 0, 22).length} TMs`}
             >
-              {getFlagsInRange(mon.tmFlagsSV, 0, 22).map((i) => (
+              {getFlagsInArrayRange(mon.tmFlagsSV, 0, 22).map((i) => (
                 <AttributeRow key={`sv_tm_${i}`} label={`TM ${i}`} indent={10}>
                   {Moves[SVTMMoveIndexes[i]].name}
                 </AttributeRow>
@@ -522,4 +521,8 @@ const changeEndianness = (hex: string) => {
     len -= 2
   }
   return result.join('')
+}
+
+function getFlagsInArrayRange(bytes: Uint8Array, offset: number, size: number) {
+  return getFlagsInRange(new DataView(bytes.buffer), offset, size)
 }
