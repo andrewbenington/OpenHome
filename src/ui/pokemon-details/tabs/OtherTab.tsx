@@ -1,3 +1,9 @@
+import { OHPKM } from '@openhome/core/pkm/OHPKM'
+import {
+  getHiddenPowerGen2,
+  getHiddenPowerPower,
+  getHiddenPowerType,
+} from '@openhome/core/pkm/util'
 import { genderFromBool, Generation, OriginGames } from '@pkm-rs/pkg'
 import { PK3, PK4, PK5 } from '@pokemon-files/pkm'
 import {
@@ -30,8 +36,6 @@ import {
 } from '@pokemon-resources/index'
 import { Flex } from '@radix-ui/themes'
 import { useMemo } from 'react'
-import { OHPKM } from 'src/core/pkm/OHPKM'
-import { getHiddenPowerGen2, getHiddenPowerPower, getHiddenPowerType } from 'src/core/pkm/util'
 import { isRestricted } from 'src/types/TransferRestrictions'
 import { PKMInterface } from 'src/types/interfaces'
 import AttributeRow from 'src/ui/components/AttributeRow'

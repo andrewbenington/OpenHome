@@ -1,4 +1,14 @@
 import {
+  bytesToUint16BigEndian,
+  bytesToUint16LittleEndian,
+  bytesToUint32LittleEndian,
+  getFlag,
+  setFlag,
+  uint16ToBytesBigEndian,
+  uint16ToBytesLittleEndian,
+  uint32ToBytesLittleEndian,
+} from '@openhome/core/save/util/byteLogic'
+import {
   AbilityIndex,
   Ball,
   Gender,
@@ -42,16 +52,6 @@ import {
 } from '@pokemon-resources/index'
 import * as lodash from 'lodash'
 import Prando from 'prando'
-import {
-  bytesToUint16BigEndian,
-  bytesToUint16LittleEndian,
-  bytesToUint32LittleEndian,
-  getFlag,
-  setFlag,
-  uint16ToBytesBigEndian,
-  uint16ToBytesLittleEndian,
-  uint32ToBytesLittleEndian,
-} from 'src/core/save/util/byteLogic'
 import { PKMInterface, PluginPKMInterface } from 'src/types/interfaces'
 import { utf16BytesToString, utf16StringToBytes } from 'src/util/Strings/StringConverter'
 import { getHomeIdentifier, isEvolution } from '../../util/Lookup'

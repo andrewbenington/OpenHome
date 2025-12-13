@@ -1,8 +1,11 @@
+import {
+  bytesToUint16LittleEndian,
+  bytesToUint32LittleEndian,
+} from '@openhome/core/save/util/byteLogic'
 import { Gender, OriginGame } from '@pkm-rs/pkg'
 import { PK4 } from '@pokemon-files/pkm'
 import { Item } from '@pokemon-resources/consts/Items'
 import { DP_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
-import { bytesToUint16LittleEndian, bytesToUint32LittleEndian } from 'src/core/save/util/byteLogic'
 import { isRestricted } from 'src/types/TransferRestrictions'
 import { gen4StringToUTF } from 'src/util/Strings/StringConverter'
 import { G4SAV } from './G4SAV'

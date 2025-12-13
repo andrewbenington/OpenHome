@@ -1,11 +1,11 @@
-import { OriginGame } from '@pkm-rs/pkg'
-import { PK4 } from '@pokemon-files/pkm'
-import { CRC16_CCITT } from 'src/core/save/encryption/Encryption'
+import { CRC16_CCITT } from '@openhome/core/save/encryption/Encryption'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
   uint16ToBytesLittleEndian,
-} from 'src/core/save/util/byteLogic'
+} from '@openhome/core/save/util/byteLogic'
+import { OriginGame } from '@pkm-rs/pkg'
+import { PK4 } from '@pokemon-files/pkm'
 import { gen4StringToUTF } from 'src/util/Strings/StringConverter'
 import { OHPKM } from '../pkm/OHPKM'
 import { Box, BoxCoordinates, OfficialSAV } from './SAV'

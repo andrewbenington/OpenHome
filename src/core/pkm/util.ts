@@ -1,3 +1,9 @@
+import {
+  bytesToUint32LittleEndian,
+  getFlag,
+  uint16ToBytesLittleEndian,
+  writeUint32ToBuffer,
+} from '@openhome/core/save/util/byteLogic'
 import { AbilityIndex, MetadataLookup, SpeciesAndForme, SpeciesLookup } from '@pkm-rs/pkg'
 import { PKM } from '@pokemon-files/pkm'
 import { Stats, StatsPreSplit } from '@pokemon-files/util'
@@ -15,12 +21,6 @@ import {
   Type,
 } from '@pokemon-resources/index'
 import Prando from 'prando'
-import {
-  bytesToUint32LittleEndian,
-  getFlag,
-  uint16ToBytesLittleEndian,
-  writeUint32ToBuffer,
-} from 'src/core/save/util/byteLogic'
 import { PKMInterface } from 'src/types/interfaces'
 import { OHPKM } from './OHPKM'
 

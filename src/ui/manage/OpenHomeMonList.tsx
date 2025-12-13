@@ -1,5 +1,5 @@
+import { OHPKM } from '@openhome/core/pkm/OHPKM'
 import { OriginGames } from '@pkm-rs/pkg'
-import { OHPKM } from 'src/core/pkm/OHPKM'
 import { useOhpkmStore } from 'src/state/ohpkm/useOhpkmStore'
 import OHDataGrid, { SortableColumn } from 'src/ui/components/OHDataGrid'
 import PokemonIcon from 'src/ui/components/PokemonIcon'

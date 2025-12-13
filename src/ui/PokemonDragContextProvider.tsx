@@ -1,6 +1,6 @@
 import { DragDropProvider, DragOverlay, PointerSensor } from '@dnd-kit/react'
+import { OHPKM } from '@openhome/core/pkm/OHPKM'
 import { ReactNode, useContext } from 'react'
-import { OHPKM } from 'src/core/pkm/OHPKM'
 import { DragMonContext, DragPayload } from 'src/state/dragMon'
 import { useItems } from 'src/state/items/useItems'
 import { useOhpkmStore } from 'src/state/ohpkm/useOhpkmStore'

@@ -1,7 +1,10 @@
+import { CRC16_CCITT } from '@openhome/core/save/encryption/Encryption'
+import {
+  bytesToUint16LittleEndian,
+  uint16ToBytesLittleEndian,
+} from '@openhome/core/save/util/byteLogic'
 import { Gender, OriginGame } from '@pkm-rs/pkg'
 import { PK6 } from '@pokemon-files/pkm'
-import { CRC16_CCITT } from 'src/core/save/encryption/Encryption'
-import { bytesToUint16LittleEndian, uint16ToBytesLittleEndian } from 'src/core/save/util/byteLogic'
 import { utf16BytesToString } from 'src/util/Strings/StringConverter'
 import { OHPKM } from '../pkm/OHPKM'
 import { Box, BoxCoordinates, OfficialSAV } from './SAV'

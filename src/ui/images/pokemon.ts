@@ -1,12 +1,12 @@
+import { displayIndexAdder, isBattleFormeItem, isMegaStone } from '@openhome/core/pkm/util'
+import { toGen3CRFUPokemonIndex } from '@openhome/core/save/cfru/conversion/util'
+import { toGen3RRPokemonIndex } from '@openhome/core/save/radicalred/conversion/Gen3RRPokemonIndex'
+import { RRSprites } from '@openhome/core/save/radicalred/conversion/RadicalRedSprites'
+import { NationalDexToUnboundMap } from '@openhome/core/save/unbound/conversion/UnboundSpeciesMap'
+import { UBSprites } from '@openhome/core/save/unbound/conversion/UnboundSprites'
 import { MetadataLookup } from '@pkm-rs/pkg'
 import { BLOOD_MOON, SWEETS } from '@pokemon-resources/consts/Formes'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
-import { displayIndexAdder, isBattleFormeItem, isMegaStone } from 'src/core/pkm/util'
-import { toGen3CRFUPokemonIndex } from 'src/core/save/cfru/conversion/util'
-import { toGen3RRPokemonIndex } from 'src/core/save/radicalred/conversion/Gen3RRPokemonIndex'
-import { RRSprites } from 'src/core/save/radicalred/conversion/RadicalRedSprites'
-import { NationalDexToUnboundMap } from 'src/core/save/unbound/conversion/UnboundSpeciesMap'
-import { UBSprites } from 'src/core/save/unbound/conversion/UnboundSprites'
 import { MonSpriteData } from 'src/state/plugin'
 
 export const fileToSpriteFolder: Record<string, string> = {

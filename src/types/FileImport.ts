@@ -1,3 +1,8 @@
+import { OHPKM } from '@openhome/core/pkm/OHPKM'
+import { OhpkmV1 } from '@openhome/core/pkm/OhpkmV1'
+import { PK3RR } from '@openhome/core/save/radicalred/PK3RR'
+import { PK3UB } from '@openhome/core/save/unbound/PK3UB'
+import { AnyPkmClass, SavePkmClass } from '@openhome/core/save/util/util'
 import {
   COLOPKM,
   PA8,
@@ -14,11 +19,6 @@ import {
   PK9,
   XDPKM,
 } from '@pokemon-files/pkm'
-import { OHPKM } from 'src/core/pkm/OHPKM'
-import { OhpkmV1 } from 'src/core/pkm/OhpkmV1'
-import { PK3RR } from 'src/core/save/radicalred/PK3RR'
-import { PK3UB } from 'src/core/save/unbound/PK3UB'
-import { AnyPkmClass, SavePkmClass } from 'src/core/save/util/util'
 import { PKMInterface } from 'src/types/interfaces'
 
 function fileTypeFromBytes(bytes: Uint8Array): SavePkmClass | undefined {

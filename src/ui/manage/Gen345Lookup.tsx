@@ -1,6 +1,6 @@
+import { OHPKM } from '@openhome/core/pkm/OHPKM'
 import { OriginGames } from '@pkm-rs/pkg'
 import { Spinner } from '@radix-ui/themes'
-import { OHPKM } from 'src/core/pkm/OHPKM'
 import { useLookups } from 'src/state/lookups'
 import { useOhpkmStore } from 'src/state/ohpkm/useOhpkmStore'
 import OHDataGrid, { SortableColumn } from 'src/ui/components/OHDataGrid'

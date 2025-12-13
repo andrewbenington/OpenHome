@@ -1,10 +1,10 @@
-import { Gender, OriginGame } from '@pkm-rs/pkg'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
   uint16ToBytesLittleEndian,
   uint32ToBytesLittleEndian,
-} from 'src/core/save/util/byteLogic'
+} from '@openhome/core/save/util/byteLogic'
+import { Gender, OriginGame } from '@pkm-rs/pkg'
 import { PluginPKMInterface } from 'src/types/interfaces'
 import { gen3StringToUTF } from '../../../util/Strings/StringConverter'
 import { OHPKM } from '../../pkm/OHPKM'
