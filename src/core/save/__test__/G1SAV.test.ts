@@ -29,7 +29,7 @@ beforeAll(() => {
 
   slowbroOH = bytesToPKM(
     new Uint8Array(
-      fs.readFileSync(path.join('@openhome/core/pkm/__test__/PKMFiles/OhpkmV2', 'slowbro.ohpkm'))
+      fs.readFileSync(path.join('src/core/pkm/__test__/PKMFiles/OhpkmV2', 'slowbro.ohpkm'))
     ),
     'OhpkmV2'
   ) as OHPKM

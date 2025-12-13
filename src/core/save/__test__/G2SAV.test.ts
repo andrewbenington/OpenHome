@@ -30,7 +30,7 @@ beforeAll(async () => {
   crystalSaveFile = result.right as G2SAV
 
   const slowpokeBytes = fs.readFileSync(
-    path.join('@openhome/core/pkm/__test__/PKMFiles/OhpkmV2', 'slowbro.ohpkm')
+    path.join('src/core/pkm/__test__/PKMFiles/OhpkmV2', 'slowbro.ohpkm')
   )
   slowbroOH = bytesToPKM(new Uint8Array(slowpokeBytes), 'OhpkmV2') as OHPKM
 })
