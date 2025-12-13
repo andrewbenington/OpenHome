@@ -178,7 +178,7 @@ impl OhpkmV2 {
         }
     }
 
-    pub fn to_bytes(&self) -> Result<Vec<u8>> {
+    pub fn to_sectioned_data(&self) -> Result<SectionedData<SectionTagV2>> {
         let mut sectioned_data = SectionedData::new(MAGIC_NUMBER, CURRENT_VERSION);
         sectioned_data
             .add(self.main_data)?
@@ -192,8 +192,11 @@ impl OhpkmV2 {
             .add_all(self.handler_data.clone())?
             .add_if_some(self.plugin_data.clone())?
             .add_if_some(self.notes.clone())?;
+        Ok(sectioned_data)
+    }
 
-        Ok(sectioned_data.to_bytes()?)
+    pub fn to_bytes(&self) -> Result<Vec<u8>> {
+        Ok(self.to_sectioned_data()?.to_bytes()?)
     }
 }
 
@@ -882,15 +885,10 @@ impl OhpkmV2 {
     // Game Boy
 
     #[wasm_bindgen(getter = dvsWasm)]
-    pub fn dvs(&self) -> Option<StatsPreSplit> {
-        Some(self.gameboy_data?.dvs)
-    }
-
-    #[wasm_bindgen(setter = dvsWasm)]
-    pub fn set_dvs(&mut self, value: Option<StatsPreSplit>) {
-        match value {
-            Some(dvs) => self.gameboy_data.get_or_insert_default().dvs = dvs,
-            None => self.gameboy_data = None,
+    pub fn dvs(&self) -> StatsPreSplit {
+        match self.gameboy_data {
+            Some(data) => data.dvs,
+            None => GameboyData::from_main_data(&self.main_data).dvs,
         }
     }
 
@@ -899,25 +897,30 @@ impl OhpkmV2 {
         Some(self.gameboy_data?.met_time_of_day)
     }
 
-    #[wasm_bindgen(setter = metTimeOfDay)]
-    pub fn set_met_time_of_day(&mut self, value: Option<u8>) {
-        match value {
-            Some(met_tod) => self.gameboy_data.get_or_insert_default().met_time_of_day = met_tod,
-            None => self.gameboy_data = None,
-        }
-    }
-
     #[wasm_bindgen(getter = evsG12Wasm)]
     pub fn evs_g12(&self) -> Option<StatsPreSplit> {
         Some(self.gameboy_data?.evs_g12)
     }
 
     #[wasm_bindgen(setter = evsG12Wasm)]
-    pub fn set_evs_g12(&mut self, value: Option<StatsPreSplit>) {
-        match value {
-            Some(evs_g12) => self.gameboy_data.get_or_insert_default().evs_g12 = evs_g12,
-            None => self.gameboy_data = None,
+    pub fn update_evs_g12(&mut self, value: StatsPreSplit) {
+        if let Some(gameboy_data) = &mut self.gameboy_data {
+            gameboy_data.evs_g12 = value
         }
+    }
+
+    #[wasm_bindgen(js_name = setGameboyData)]
+    pub fn set_gameboy_data(
+        &mut self,
+        dvs: StatsPreSplit,
+        met_time_of_day: u8,
+        evs_g12: StatsPreSplit,
+    ) {
+        self.gameboy_data = Some(GameboyData {
+            dvs,
+            met_time_of_day,
+            evs_g12,
+        })
     }
 
     // Gen 4/5
@@ -1707,6 +1710,24 @@ impl OhpkmV2 {
     #[wasm_bindgen(js_name = isSquareShinyWasm)]
     pub fn is_square_shiny(&self) -> bool {
         self.main_data.is_square_shiny()
+    }
+
+    // Helpers
+    #[wasm_bindgen(js_name = tradeToGame)]
+    pub fn trade_to_game(&mut self, game: OriginGame) {
+        if game.is_gameboy() && self.gameboy_data.is_none() {
+            self.gameboy_data = Some(GameboyData::from_main_data(&self.main_data));
+        }
+    }
+
+    #[wasm_bindgen(js_name = getPresentSections)]
+    pub fn get_present_sections(&self) -> Result<Vec<String>> {
+        Ok(self
+            .to_sectioned_data()?
+            .all_section_tags()
+            .iter()
+            .map(|t| t.to_string())
+            .collect())
     }
 }
 

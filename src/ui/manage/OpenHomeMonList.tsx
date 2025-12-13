@@ -29,11 +29,13 @@ export default function OpenHomeMonList({ onSelectMon }: OpenHomeMonListProps) {
         </button>
       ),
       cellClass: 'centered-cell',
+      sortFunction: numericSorter((mon) => mon.dexNum),
     },
     {
       key: 'nickname',
       name: 'Nickname',
       width: 100,
+      sortFunction: stringSorter((mon) => mon.nickname),
     },
     {
       key: 'level',

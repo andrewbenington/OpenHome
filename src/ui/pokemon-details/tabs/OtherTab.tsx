@@ -102,37 +102,14 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
           {!!mon.trainerAffection && (
             <AttributeRow label="Affection" value={mon.trainerAffection.toString()} indent={10} />
           )}
-          {'isCurrentHandler' in mon && (
-            <AttributeRow label="Trained last" value={`${!mon.isCurrentHandler}`} indent={10} />
-          )}
         </AttributeRowExpand>
-        {mon.handlerName && (
-          <AttributeRowExpand
-            summary="Recent Trainer"
-            value={
-              <Flex gap="1">
-                {mon.handlerName}
-                <GenderIcon
-                  gender={
-                    mon.handlerGender !== undefined ? genderFromBool(mon.handlerGender) : undefined
-                  }
-                />
-              </Flex>
-            }
-          >
-            {mon.handlerID !== undefined && mon.handlerID !== 0 && (
-              <AttributeRow label="ID" value={mon.handlerID.toString()} indent={10} /> // unused in official games??
-            )}
-            {mon.handlerFriendship !== undefined && (
-              <AttributeRow
-                label="Friendship"
-                value={mon.handlerFriendship.toString()}
-                indent={10}
-              />
-            )}
-            {mon.handlerAffection !== undefined && (
-              <AttributeRow label="Affection" value={mon.handlerAffection.toString()} indent={10} />
-            )}
+        {mon instanceof OHPKM && (
+          <AttributeRowExpand summary="Data Sections" value={mon.getPresentSections().length}>
+            {mon.getPresentSections().map((section, i) => (
+              <AttributeRow key={`data_section_${i}`} label={`Section ${i + 1}`} indent={10}>
+                {section}
+              </AttributeRow>
+            ))}
           </AttributeRowExpand>
         )}
         <HiddenPowerDisplay mon={mon} />
@@ -283,30 +260,6 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
               </AttributeRow>
             </AttributeRowExpand>
           )}
-        {(!isRestricted(SWSH_TRANSFER_RESTRICTIONS_CT, mon.dexNum, mon.formeNum) ||
-          !isRestricted(ORAS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum)) &&
-          mon.handlerMemory && (
-            <AttributeRowExpand summary="Handler Memory" value={mon.handlerName}>
-              <AttributeRow
-                indent={10}
-                label="Intensity"
-                value={mon.handlerMemory.intensity.toString()}
-              />
-              <AttributeRow
-                indent={10}
-                label="Memory"
-                value={mon.handlerMemory.memory.toString()}
-              />
-              <AttributeRow
-                indent={10}
-                label="Feeling"
-                value={mon.handlerMemory.feeling.toString()}
-              />
-              <AttributeRow indent={10} label="Text Variables">
-                <code>{`0x${mon.handlerMemory.textVariables.toString(16).padStart(4, '0')}`}</code>
-              </AttributeRow>
-            </AttributeRowExpand>
-          )}
         {!isRestricted(SWSH_TRANSFER_RESTRICTIONS_CT, mon.dexNum, mon.formeNum) &&
           mon.dynamaxLevel !== undefined && (
             <>
@@ -359,13 +312,12 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
             )}
           </>
         )}
-        {!isRestricted(GEN2_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
-          mon.dvs !== undefined && (
-            <AttributeRow
-              label="Gen 1/2 ID"
-              value={getMonGen12Identifier(mon as PKMInterface & { dvs: StatsPreSplit })}
-            />
-          )}
+        {!isRestricted(GEN2_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) && (
+          <AttributeRow
+            label="Gen 1/2 ID"
+            value={getMonGen12Identifier(mon as PKMInterface & { dvs: StatsPreSplit })}
+          />
+        )}
         {!isRestricted(HGSS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
           (mon instanceof PK3 ||
             mon instanceof PK4 ||

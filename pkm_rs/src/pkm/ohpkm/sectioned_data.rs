@@ -135,6 +135,10 @@ impl<Tag: SectionTag> SectionedData<Tag> {
         self.tagged_buffers.iter().find(|tb| tb.tag == tag)
     }
 
+    pub fn all_section_tags(&self) -> Vec<Tag> {
+        self.tagged_buffers.iter().map(|s| s.tag).collect()
+    }
+
     pub fn all_section_data(&self, tag: Tag) -> Vec<&TaggedBuffer<Tag>> {
         self.tagged_buffers
             .iter()

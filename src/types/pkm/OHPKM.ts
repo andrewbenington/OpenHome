@@ -49,6 +49,7 @@ import {
   statsFromWasm,
   statsFromWasmNullable,
   statsPreSplitFromWasm,
+  statsPreSplitFromWasmNullable,
   statsPreSplitToWasm,
   trainerMemoryToWasm,
 } from './convert'
@@ -164,7 +165,6 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       if (other.evs) {
         this.evs = stats8ToWasm(other.evs)
       }
-      this.evsG12 = other.evsG12
 
       if (other.contest) {
         this.contest = contestStatsToWasm(other.contest)
@@ -173,23 +173,17 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       this.ball = other.ball !== undefined ? other.ball : Ball.Poke
       this.markings = types.markingsSixShapesWithColorFromOther(other.markings)
 
-      this.dvs = other.dvs
-
-      if (other.format === 'PK2' && other.dexNum === NationalDex.Unown && other.dvs) {
-        const letterBits = (other.formeNum ?? 0) * 10
-        const newDvs = { ...other.dvs }
-
-        newDvs.atk = (newDvs.atk & 0b1001) | (((letterBits >> 6) & 0b11) << 1)
-        newDvs.def = (newDvs.def & 0b1001) | (((letterBits >> 4) & 0b11) << 1)
-        newDvs.spe = (newDvs.spe & 0b1001) | (((letterBits >> 2) & 0b11) << 1)
-        newDvs.spc = (newDvs.spc & 0b1001) | ((letterBits & 0b11) << 1)
-        this.dvs = newDvs
-      }
-
       this.metLocationIndex = other.metLocationIndex ?? 0
       this.metLevel = other.metLevel ?? 0
 
-      this.metTimeOfDay = other.metTimeOfDay ?? 0
+      if (other.dvs && other.evsG12) {
+        this.setGameboyData(
+          statsPreSplitToWasm(other.dvs),
+          other.metTimeOfDay ?? 0,
+          statsPreSplitToWasm(other.evsG12)
+        )
+      }
+
       this.metLocationIndex = other.metLocationIndex ?? 0
       this.ability =
         other.ability ??
@@ -370,10 +364,12 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   }
 
   get evsG12() {
-    return statsPreSplitFromWasm(this.evsG12Wasm)
+    return statsPreSplitFromWasmNullable(this.evsG12Wasm)
   }
   set evsG12(value: types.StatsPreSplit | undefined) {
-    this.evsG12Wasm = statsPreSplitToWasm(value)
+    if (value) {
+      this.evsG12Wasm = statsPreSplitToWasm(value)
+    }
   }
 
   get ivs() {
@@ -393,9 +389,6 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
 
   get dvs() {
     return statsPreSplitFromWasm(this.dvsWasm)
-  }
-  set dvs(value: types.StatsPreSplit | undefined) {
-    this.dvsWasm = statsPreSplitToWasm(value)
   }
 
   get avs() {
@@ -587,6 +580,8 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   }
 
   public tradeToSave(save: SAV) {
+    this.tradeToGame(save.origin)
+
     this.isCurrentHandler = !this.isFrom(save)
     if (!this.isCurrentHandler) return
 

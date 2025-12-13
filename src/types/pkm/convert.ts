@@ -140,7 +140,21 @@ export function stats16LeToWasm(value: Stats): PkmWasm.Stats16Le {
   return new PkmWasm.Stats16Le(value.hp, value.atk, value.def, value.spa, value.spd, value.spe)
 }
 
-export function statsPreSplitFromWasm(
+export function statsPreSplitFromWasm(value: PkmWasm.StatsPreSplit): StatsPreSplit {
+  return {
+    hp: value.hp,
+    atk: value.atk,
+    def: value.def,
+    spc: value.spc,
+    spe: value.spe,
+  }
+}
+
+export function statsPreSplitToWasm(value: StatsPreSplit): PkmWasm.StatsPreSplit {
+  return new PkmWasm.StatsPreSplit(value.hp, value.atk, value.def, value.spc, value.spe)
+}
+
+export function statsPreSplitFromWasmNullable(
   value: PkmWasm.StatsPreSplit | undefined
 ): StatsPreSplit | undefined {
   if (!value) return undefined
@@ -151,13 +165,6 @@ export function statsPreSplitFromWasm(
     spc: value.spc,
     spe: value.spe,
   }
-}
-
-export function statsPreSplitToWasm(
-  value: StatsPreSplit | undefined
-): PkmWasm.StatsPreSplit | undefined {
-  if (!value) return undefined
-  return new PkmWasm.StatsPreSplit(value.hp, value.atk, value.def, value.spc, value.spe)
 }
 
 export function trainerMemoryFromWasm(value: PkmWasm.TrainerMemory): Memory {

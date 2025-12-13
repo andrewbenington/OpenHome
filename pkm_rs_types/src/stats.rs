@@ -316,6 +316,46 @@ impl StatsPreSplit {
     pub const fn is_empty(&self) -> bool {
         self.hp == 0 && self.atk == 0 && self.def == 0 && self.spc == 0 && self.spe == 0
     }
+
+    pub const fn dvs_from_ivs_lossy(ivs: &Stats8) -> Self {
+        Self {
+            hp: dv_from_iv(ivs.hp),
+            atk: dv_from_iv(ivs.atk),
+            def: dv_from_iv(ivs.def),
+            spc: dv_from_iv((ivs.spa + ivs.spd) / 2),
+            spe: dv_from_iv(ivs.spe),
+        }
+    }
+
+    pub const fn shiny_dvs_from_ivs(ivs: &Stats8) -> Self {
+        let mut atk = (ivs.atk - 1).div_ceil(2) as u16;
+        if atk & 0b11 == 0b01 {
+            atk += 1;
+        } else if atk % 4 == 0 {
+            atk += 2
+        }
+
+        Self {
+            hp: (atk & 1) << 3,
+            atk,
+            def: 10,
+            spc: 10,
+            spe: 10,
+        }
+    }
+
+    pub const fn force_dvs_for_unown_letter(&mut self, letter_index: u16) -> Self {
+        let letter_bits = letter_index * 10;
+        self.atk = (self.atk & 0b1001) | (((letter_bits >> 6) & 0b11) << 1);
+        self.def = (self.def & 0b1001) | (((letter_bits >> 4) & 0b11) << 1);
+        self.spe = (self.spe & 0b1001) | (((letter_bits >> 2) & 0b11) << 1);
+        self.spc = (self.spc & 0b1001) | ((letter_bits & 0b11) << 1);
+        *self
+    }
+}
+
+const fn dv_from_iv(iv: u8) -> u16 {
+    ((iv - 1) / 2) as u16
 }
 
 #[wasm_bindgen]
