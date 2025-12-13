@@ -20,7 +20,7 @@ import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'r
 import { BsFillGrid3X3GapFill } from 'react-icons/bs'
 import { FaSquare } from 'react-icons/fa'
 import { getMonFileIdentifier } from 'src/core/pkm/Lookup'
-import { range } from 'src/core/util/Functional'
+import { range } from 'src/core/util/functional'
 import { PKMInterface } from 'src/types/interfaces'
 import OpenHomeCtxMenu from 'src/ui/components/context-menu/OpenHomeCtxMenu'
 import { ItemBuilder, SubmenuBuilder } from 'src/ui/components/context-menu/types'

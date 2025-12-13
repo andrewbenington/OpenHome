@@ -1,7 +1,7 @@
 import { Inset, ContextMenu as RadixCtxMenu } from '@radix-ui/themes'
 import { ReactNode } from 'react'
-import { Option } from 'src/core/util/Functional'
-import { filterUndefined } from 'src/core/util/Sort'
+import { Option } from 'src/core/util/functional'
+import { filterUndefined } from 'src/core/util/sort'
 import './context-menu.css'
 import {
   CtxMenuElement,

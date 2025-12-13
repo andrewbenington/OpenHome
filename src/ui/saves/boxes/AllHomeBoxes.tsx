@@ -18,8 +18,8 @@ import { HomeBox, HomeData } from '@openhome/core/save/HomeData'
 import { SavesAndBanksManager, useSaves } from '@openhome/ui/state/saves/useSaves'
 import { Button, Flex, Grid } from '@radix-ui/themes'
 import { CSSProperties } from 'react'
-import { range } from 'src/core/util/Functional'
-import { filterUndefined } from 'src/core/util/Sort'
+import { range } from 'src/core/util/functional'
+import { filterUndefined } from 'src/core/util/sort'
 import OpenHomeCtxMenu from 'src/ui/components/context-menu/OpenHomeCtxMenu'
 import {
   CtxMenuElementBuilder,

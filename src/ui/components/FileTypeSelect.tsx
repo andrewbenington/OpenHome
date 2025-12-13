@@ -2,7 +2,7 @@ import { supportsMon } from '@openhome/core/save/util/util'
 import { AppInfoContext } from '@openhome/ui/state/appInfo'
 import { uniq } from 'lodash'
 import { useContext, useMemo } from 'react'
-import { filterUndefined } from 'src/core/util/Sort'
+import { filterUndefined } from 'src/core/util/sort'
 import { PKMFormeRef } from 'src/types/types'
 
 const fileTypeColors: Record<string, string> = {
