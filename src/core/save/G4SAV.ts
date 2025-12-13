@@ -1,3 +1,4 @@
+import { OHPKM } from '@openhome/core/pkm/OHPKM'
 import { CRC16_CCITT } from '@openhome/core/save/encryption/Encryption'
 import {
   bytesToUint16LittleEndian,
@@ -7,8 +8,7 @@ import {
 import { OriginGame } from '@pkm-rs/pkg'
 import { PK4 } from '@pokemon-files/pkm'
 import { gen4StringToUTF } from 'src/util/Strings/StringConverter'
-import { OHPKM } from '../pkm/OHPKM'
-import { Box, BoxCoordinates, OfficialSAV } from './SAV'
+import { Box, BoxCoordinates, OfficialSAV } from './interfaces'
 import { PathData } from './util/path'
 import { LOOKUP_TYPE } from './util/util'
 

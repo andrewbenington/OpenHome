@@ -1,12 +1,12 @@
+import { OHPKM } from '@openhome/core/pkm/OHPKM'
 import { Gender, OriginGame } from '@pkm-rs/pkg'
 import { PB8 } from '@pokemon-files/pkm'
 import { utf16BytesToString } from '@pokemon-files/util'
 import { Item } from '@pokemon-resources/consts/Items'
 import { BDSP_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
 import { isRestricted } from 'src/types/TransferRestrictions'
-import { OHPKM } from '../../pkm/OHPKM'
 import { md5Digest } from '../encryption/Encryption'
-import { Box, BoxCoordinates, OfficialSAV } from '../SAV'
+import { Box, BoxCoordinates, OfficialSAV } from '../interfaces'
 import { PathData } from '../util/path'
 
 const SAVE_SIZE_BYTES_MIN = 900000

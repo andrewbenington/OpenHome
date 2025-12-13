@@ -1,3 +1,4 @@
+import { OHPKM } from '@openhome/core/pkm/OHPKM'
 import { OhpkmLookup } from 'src/state/ohpkm/useOhpkmStore'
 import { MonLocation } from 'src/state/saves/reducer'
 import {
@@ -13,8 +14,7 @@ import { getHomeIdentifier, getMonFileIdentifier } from 'src/util/Lookup'
 import { v4 as UuidV4 } from 'uuid'
 import { range } from '../../util/Functional'
 import { filterUndefined, numericSorter } from '../../util/Sort'
-import { OHPKM } from '../pkm/OHPKM'
-import { Box } from './SAV'
+import { Box } from './interfaces'
 
 export class HomeBox implements Box<OHPKM> {
   id: string

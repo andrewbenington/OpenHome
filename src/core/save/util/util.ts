@@ -1,8 +1,8 @@
+import { OHPKM } from '@openhome/core/pkm/OHPKM'
+import { OhpkmV1 } from '@openhome/core/pkm/OhpkmV1'
 import { OriginGame } from '@pkm-rs/pkg'
 import { PKMInterface } from 'src/types/interfaces'
-import { OHPKM } from '../../pkm/OHPKM'
-import { OhpkmV1 } from '../../pkm/OhpkmV1'
-import { SAV } from '../SAV'
+import { SAV } from '../interfaces'
 import { PathData } from './path'
 
 export const SIZE_SM = 0x6be00

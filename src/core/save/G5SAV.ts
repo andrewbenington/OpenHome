@@ -1,3 +1,4 @@
+import { OHPKM } from '@openhome/core/pkm/OHPKM'
 import { CRC16_CCITT } from '@openhome/core/save/encryption/Encryption'
 import {
   bytesToUint16LittleEndian,
@@ -8,8 +9,7 @@ import { Gender, OriginGame } from '@pkm-rs/pkg'
 import { PK5 } from '@pokemon-files/pkm'
 import { uniq } from 'lodash'
 import { gen5StringToUTF } from 'src/util/Strings/StringConverter'
-import { OHPKM } from '../pkm/OHPKM'
-import { Box, BoxCoordinates, OfficialSAV } from './SAV'
+import { Box, BoxCoordinates, OfficialSAV } from './interfaces'
 import { PathData } from './util/path'
 import { hasDesamumeFooter, LOOKUP_TYPE } from './util/util'
 

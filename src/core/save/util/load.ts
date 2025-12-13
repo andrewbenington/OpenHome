@@ -1,3 +1,4 @@
+import { OHPKM } from '@openhome/core/pkm/OHPKM'
 import * as E from 'fp-ts/lib/Either'
 import { OhpkmLookup } from 'src/state/ohpkm/useOhpkmStore'
 import { PKMInterface } from 'src/types/interfaces'
@@ -6,8 +7,7 @@ import {
   getMonGen12Identifier,
   getMonGen345Identifier,
 } from 'src/util/Lookup'
-import { OHPKM } from '../../pkm/OHPKM'
-import { SAV } from '../SAV'
+import { SAV } from '../interfaces'
 import { PathData } from './path'
 import { SAVClass } from './util'
 

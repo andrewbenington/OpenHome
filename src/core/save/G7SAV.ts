@@ -1,3 +1,4 @@
+import { OHPKM } from '@openhome/core/pkm/OHPKM'
 import { CRC16_Invert, SignWithMemeCrypto } from '@openhome/core/save/encryption/Encryption'
 import {
   bytesToUint16LittleEndian,
@@ -7,8 +8,7 @@ import {
 import { Gender, OriginGame } from '@pkm-rs/pkg'
 import { PK7 } from '@pokemon-files/pkm'
 import { utf16BytesToString } from 'src/util/Strings/StringConverter'
-import { OHPKM } from '../pkm/OHPKM'
-import { Box, BoxCoordinates, OfficialSAV } from './SAV'
+import { Box, BoxCoordinates, OfficialSAV } from './interfaces'
 import { PathData } from './util/path'
 import { SIZE_USUM } from './util/util'
 

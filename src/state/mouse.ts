@@ -1,5 +1,5 @@
-import { SAV } from '@openhome/core/save/SAV'
 import { Dispatch, Reducer, createContext } from 'react'
+import { SAV } from 'src/core/save/interfaces'
 import { PKMInterface } from 'src/types/interfaces'
 
 export type DragSource = {

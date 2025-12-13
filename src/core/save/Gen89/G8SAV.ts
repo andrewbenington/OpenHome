@@ -1,7 +1,7 @@
+import { OHPKM } from '@openhome/core/pkm/OHPKM'
 import { OriginGame } from '@pkm-rs/pkg'
 import { PA8, PB8, PK8, PK9 } from '@pokemon-files/pkm'
 import { AllPKMFields } from '@pokemon-files/util'
-import { OHPKM } from '../../pkm/OHPKM'
 import {
   SCArrayBlock,
   SCBlock,
@@ -9,7 +9,7 @@ import {
   SCValueBlock,
 } from '../encryption/SwishCrypto/SCBlock'
 import { SwishCrypto } from '../encryption/SwishCrypto/SwishCrypto'
-import { Box, BoxCoordinates, OfficialSAV } from '../SAV'
+import { Box, BoxCoordinates, OfficialSAV } from '../interfaces'
 import { PathData } from '../util/path'
 import { BoxNamesBlock } from './BoxNamesBlock'
 

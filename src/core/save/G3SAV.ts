@@ -1,3 +1,4 @@
+import { OHPKM } from '@openhome/core/pkm/OHPKM'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -9,8 +10,7 @@ import { PK3 } from '@pokemon-files/pkm'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { GEN3_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
 import { gen3StringToUTF } from 'src/util/Strings/StringConverter'
-import { OHPKM } from '../pkm/OHPKM'
-import { Box, BoxCoordinates, OfficialSAV } from './SAV'
+import { Box, BoxCoordinates, OfficialSAV } from './interfaces'
 import { emptyPathData, PathData } from './util/path'
 import { LOOKUP_TYPE } from './util/util'
 
