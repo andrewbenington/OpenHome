@@ -1,4 +1,9 @@
 import { Stats } from '@pkm-rs/pkg'
+import {
+  GEN2_TRANSFER_RESTRICTIONS,
+  LA_TRANSFER_RESTRICTIONS,
+  LGPE_TRANSFER_RESTRICTIONS,
+} from '@pokemon-resources/consts/TransferRestrictions'
 import { Select } from '@radix-ui/themes'
 import {
   Chart as ChartJS,
@@ -12,11 +17,6 @@ import {
 } from 'chart.js'
 import { useEffect, useMemo, useState } from 'react'
 import { Radar } from 'react-chartjs-2'
-import {
-  GEN2_TRANSFER_RESTRICTIONS,
-  LA_TRANSFER_RESTRICTIONS,
-  LGPE_TRANSFER_RESTRICTIONS,
-} from 'src/consts/TransferRestrictions'
 import { isRestricted } from 'src/types/TransferRestrictions'
 import { PKMInterface } from 'src/types/interfaces'
 import { Styles } from 'src/types/types'

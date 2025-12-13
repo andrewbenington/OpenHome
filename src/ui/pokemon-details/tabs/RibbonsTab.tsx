@@ -1,5 +1,5 @@
+import { Gen9Ribbons } from '@pokemon-resources/consts/Ribbons'
 import { Tooltip } from '@radix-ui/themes'
-import { Gen9Ribbons } from 'src/consts/Ribbons'
 import { PKMInterface } from 'src/types/interfaces'
 import { Styles } from 'src/types/types'
 import { getPublicImageURL } from 'src/ui/images/images'

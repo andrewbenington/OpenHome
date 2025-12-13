@@ -1,7 +1,7 @@
 import { Gender, ItemGen3, OriginGame } from '@pkm-rs/pkg'
 import { PK3 } from '@pokemon-files/pkm'
-import { NationalDex } from 'src/consts/NationalDex'
-import { GEN3_TRANSFER_RESTRICTIONS } from 'src/consts/TransferRestrictions'
+import { NationalDex } from '@pokemon-resources/consts/NationalDex'
+import { GEN3_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,

@@ -1,7 +1,7 @@
 import { MetadataLookup, SpeciesAndForme } from '@pkm-rs/pkg'
+import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { Flex } from '@radix-ui/themes'
 import { Responsive } from '@radix-ui/themes/props'
-import { NationalDex } from 'src/consts/NationalDex'
 import { getBaseMon } from 'src/types/pkm/util'
 import { Pokedex } from 'src/types/pokedex'
 import { ArrowLeftIcon, ArrowLeftRightIcon, ArrowRightIcon } from 'src/ui/components/Icons'

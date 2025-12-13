@@ -1,6 +1,6 @@
 import { FormeMetadata, MetadataLookup } from '@pkm-rs/pkg'
+import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { assert, beforeAll, describe, expect, test } from 'vitest'
-import { NationalDex } from '../../consts/NationalDex'
 import { initializeWasm } from './init'
 
 var MimeJr: FormeMetadata

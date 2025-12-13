@@ -1,5 +1,5 @@
 import { ItemUnbound } from '@pkm-rs/pkg'
-import { NationalDex } from 'src/consts/NationalDex'
+import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { bytesToUint32LittleEndian } from '../../../util/byteLogic'
 import { isRestricted, TransferRestrictions } from '../../TransferRestrictions'
 import { findFirstSectionOffset, G3CFRUSAV, SAVE_SIZES_BYTES } from '../cfru/G3CFRUSAV'

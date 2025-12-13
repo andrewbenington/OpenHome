@@ -1,5 +1,11 @@
-import { NationalDex } from 'src/consts/NationalDex'
-import { BASE, BLOOD_MOON, LGE_STARTER, LGP_STARTER, MAROWAK_ALOLA_TOTEM } from '../consts/Formes'
+import {
+  BASE,
+  BLOOD_MOON,
+  LGE_STARTER,
+  LGP_STARTER,
+  MAROWAK_ALOLA_TOTEM,
+} from '@pokemon-resources/consts/Formes'
+import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 
 interface FormRestrictions {
   [dexNum: number]: number[] | undefined

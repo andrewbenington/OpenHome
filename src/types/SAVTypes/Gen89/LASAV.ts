@@ -1,7 +1,7 @@
 import { Gender, Languages, OriginGame } from '@pkm-rs/pkg'
 import { PA8 } from '@pokemon-files/pkm'
 import { utf16BytesToString } from '@pokemon-files/util'
-import { LA_TRANSFER_RESTRICTIONS } from '../../../consts/TransferRestrictions'
+import { LA_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
 import { isRestricted } from '../../TransferRestrictions'
 import { PathData } from '../path'
 import { BoxNamesBlock } from './BoxNamesBlock'

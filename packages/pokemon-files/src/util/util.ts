@@ -1,6 +1,6 @@
+import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { Moves } from '@pokemon-resources/index'
 import Prando from 'prando'
-import { NationalDex } from 'src/consts/NationalDex'
 
 import { PKM } from '../pkm'
 

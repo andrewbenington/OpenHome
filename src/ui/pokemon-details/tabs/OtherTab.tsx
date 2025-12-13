@@ -1,6 +1,19 @@
 import { genderFromBool, Generation, OriginGames } from '@pkm-rs/pkg'
 import { PK3, PK4, PK5 } from '@pokemon-files/pkm'
 import { AllPKMFields, getDisplayID, getFlagsInRange, StatsPreSplit } from '@pokemon-files/util'
+import { Countries } from '@pokemon-resources/consts/Countries'
+import { EncounterTypes } from '@pokemon-resources/consts/EncounterTypes'
+import { SWEETS } from '@pokemon-resources/consts/Formes'
+import { NationalDex } from '@pokemon-resources/consts/NationalDex'
+import {
+  GEN2_TRANSFER_RESTRICTIONS,
+  HGSS_TRANSFER_RESTRICTIONS,
+  LA_TRANSFER_RESTRICTIONS,
+  ORAS_TRANSFER_RESTRICTIONS,
+  SV_TRANSFER_RESTRICTIONS_ID,
+  SWSH_TRANSFER_RESTRICTIONS_CT,
+  USUM_TRANSFER_RESTRICTIONS,
+} from '@pokemon-resources/consts/TransferRestrictions'
 import {
   BDSPTMMoveIndexes,
   LATutorMoveIndexes,
@@ -10,19 +23,6 @@ import {
 } from '@pokemon-resources/index'
 import { Flex } from '@radix-ui/themes'
 import { useMemo } from 'react'
-import { Countries } from 'src/consts/Countries'
-import { EncounterTypes } from 'src/consts/EncounterTypes'
-import { SWEETS } from 'src/consts/Formes'
-import { NationalDex } from 'src/consts/NationalDex'
-import {
-  GEN2_TRANSFER_RESTRICTIONS,
-  HGSS_TRANSFER_RESTRICTIONS,
-  LA_TRANSFER_RESTRICTIONS,
-  ORAS_TRANSFER_RESTRICTIONS,
-  SV_TRANSFER_RESTRICTIONS_ID,
-  SWSH_TRANSFER_RESTRICTIONS_CT,
-  USUM_TRANSFER_RESTRICTIONS,
-} from 'src/consts/TransferRestrictions'
 import { isRestricted } from 'src/types/TransferRestrictions'
 import { PKMInterface } from 'src/types/interfaces'
 import { OHPKM } from 'src/types/pkm/OHPKM'

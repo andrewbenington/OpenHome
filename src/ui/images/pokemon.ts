@@ -1,6 +1,6 @@
 import { MetadataLookup } from '@pkm-rs/pkg'
-import { BLOOD_MOON, SWEETS } from 'src/consts/Formes'
-import { NationalDex } from 'src/consts/NationalDex'
+import { BLOOD_MOON, SWEETS } from '@pokemon-resources/consts/Formes'
+import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { MonSpriteData } from 'src/state/plugin'
 import { displayIndexAdder, isBattleFormeItem, isMegaStone } from 'src/types/pkm/util'
 import { toGen3CRFUPokemonIndex } from 'src/types/SAVTypes/cfru/conversion/util'

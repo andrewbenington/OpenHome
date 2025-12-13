@@ -9,7 +9,7 @@ import {
   OriginGames,
   SpeciesLookup,
 } from '@pkm-rs/pkg'
-import { NationalDex } from 'src/consts/NationalDex'
+import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import * as byteLogic from '../util/byteLogic'
 import { AllPKMFields } from '../util/pkmInterface'
 import { getLevelGen12, getStats } from '../util/statCalc'

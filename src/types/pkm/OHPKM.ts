@@ -25,11 +25,11 @@ import {
   getStandardPKMStats,
   markingsHaveColor,
 } from '@pokemon-files/util'
+import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { Gen34ContestRibbons, Gen34TowerRibbons, ModernRibbons } from '@pokemon-resources/index'
 import Prando from 'prando'
 import * as types from '../../../packages/pokemon-files/src/util/types'
 import { OhpkmV2 as OhpkmV2Wasm } from '../../../pkm_rs/pkg'
-import { NationalDex } from '../../consts/NationalDex'
 import { intersection, unique } from '../../util/Functional'
 import { getHomeIdentifier, isEvolution } from '../../util/Lookup'
 import { PKMInterface } from '../interfaces'

@@ -12,10 +12,10 @@ import {
   OriginGameWithData,
   SpeciesLookup,
 } from '@pkm-rs/pkg'
+import { OpenHomeRibbons } from '@pokemon-resources/consts/Ribbons'
 import { Types } from '@pokemon-resources/index'
 import { Button, Flex, Text } from '@radix-ui/themes'
 import { useContext, useMemo } from 'react'
-import { OpenHomeRibbons } from 'src/consts/Ribbons'
 import { FilterContext } from 'src/state/filter'
 import { HeldItemCategory } from 'src/types/Filter'
 import { displayGender } from 'src/types/types'

@@ -1,5 +1,5 @@
+import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { Gen3ContestRibbons, Gen3StandardRibbons } from '@pokemon-resources/other'
-import { NationalDex } from 'src/consts/NationalDex'
 
 import {
   Ball,

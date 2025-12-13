@@ -1,13 +1,13 @@
 import { Gender, Languages, OriginGame, SpeciesLookup } from '@pkm-rs/pkg'
 import { PK8 } from '@pokemon-files/pkm'
 import { utf16BytesToString } from '@pokemon-files/util'
-import { NationalDex } from 'src/consts/NationalDex'
-import { Item } from '../../../consts/Items'
+import { Item } from '@pokemon-resources/consts/Items'
+import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import {
   SWSH_TRANSFER_RESTRICTIONS_BASE,
   SWSH_TRANSFER_RESTRICTIONS_CT,
   SWSH_TRANSFER_RESTRICTIONS_IOA,
-} from '../../../consts/TransferRestrictions'
+} from '@pokemon-resources/consts/TransferRestrictions'
 import { isRestricted } from '../../TransferRestrictions'
 import { PathData } from '../path'
 import { G89BlockName, G89SAV } from './G8SAV'

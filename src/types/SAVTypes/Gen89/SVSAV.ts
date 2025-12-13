@@ -1,12 +1,12 @@
 import { Gender, Languages, OriginGame } from '@pkm-rs/pkg'
 import { PK9 } from '@pokemon-files/pkm'
 import { utf16BytesToString } from '@pokemon-files/util'
-import { Item } from '../../../consts/Items'
+import { Item } from '@pokemon-resources/consts/Items'
 import {
   SV_TRANSFER_RESTRICTIONS_BASE,
   SV_TRANSFER_RESTRICTIONS_ID,
   SV_TRANSFER_RESTRICTIONS_TM,
-} from '../../../consts/TransferRestrictions'
+} from '@pokemon-resources/consts/TransferRestrictions'
 import { isRestricted } from '../../TransferRestrictions'
 import { PathData } from '../path'
 import { G89BlockName, G89SAV } from './G8SAV'

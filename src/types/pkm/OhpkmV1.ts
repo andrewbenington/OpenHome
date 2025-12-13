@@ -29,6 +29,9 @@ import {
   markingsSixShapesWithColorFromOther,
   markingsSixShapesWithColorToBytes,
 } from '@pokemon-files/util'
+import { NationalDex } from '@pokemon-resources/consts/NationalDex'
+import { OpenHomeRibbons } from '@pokemon-resources/consts/Ribbons'
+import { ShadowIDsColosseum, ShadowIDsXD } from '@pokemon-resources/consts/ShadowIDs'
 import {
   Gen34ContestRibbons,
   Gen34TowerRibbons,
@@ -37,9 +40,6 @@ import {
 } from '@pokemon-resources/index'
 import * as lodash from 'lodash'
 import Prando from 'prando'
-import { NationalDex } from 'src/consts/NationalDex'
-import { OpenHomeRibbons } from 'src/consts/Ribbons'
-import { ShadowIDsColosseum, ShadowIDsXD } from 'src/consts/ShadowIDs'
 import {
   bytesToUint16BigEndian,
   bytesToUint16LittleEndian,

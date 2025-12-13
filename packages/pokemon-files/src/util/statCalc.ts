@@ -1,4 +1,4 @@
-import { NationalDex, NationalDexMax } from 'src/consts/NationalDex'
+import { NationalDex, NationalDexMax } from '@pokemon-resources/consts/NationalDex'
 
 import { PKM } from '../pkm'
 

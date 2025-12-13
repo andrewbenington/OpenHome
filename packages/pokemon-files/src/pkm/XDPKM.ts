@@ -9,8 +9,8 @@ import {
   NatureIndex,
   SpeciesLookup,
 } from '@pkm-rs/pkg'
+import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { Gen3ContestRibbons, Gen3StandardRibbons } from '@pokemon-resources/index'
-import { NationalDex } from 'src/consts/NationalDex'
 import * as byteLogic from '../util/byteLogic'
 import { AllPKMFields } from '../util/pkmInterface'
 import {

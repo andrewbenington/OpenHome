@@ -1,6 +1,8 @@
 import { AbilityIndex, MetadataLookup, SpeciesAndForme, SpeciesLookup } from '@pkm-rs/pkg'
 import { PKM } from '@pokemon-files/pkm'
 import { Stats, StatsPreSplit } from '@pokemon-files/util'
+import { Item } from '@pokemon-resources/consts/Items'
+import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import {
   AttackCharacteristics,
   DefenseCharacteristics,
@@ -13,14 +15,12 @@ import {
   Type,
 } from '@pokemon-resources/index'
 import Prando from 'prando'
-import { NationalDex } from 'src/consts/NationalDex'
 import {
   bytesToUint32LittleEndian,
   getFlag,
   uint16ToBytesLittleEndian,
   writeUint32ToBuffer,
 } from 'src/util/byteLogic'
-import { Item } from '../../consts/Items'
 import { PKMInterface } from '../interfaces'
 import { OHPKM } from './OHPKM'
 
