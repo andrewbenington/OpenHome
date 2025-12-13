@@ -1,6 +1,6 @@
 import { OriginGames } from '@pkm-rs/pkg'
+import { OHPKM } from 'src/core/pkm/OHPKM'
 import { useOhpkmStore } from 'src/state/ohpkm/useOhpkmStore'
-import { OHPKM } from 'src/types/pkm/OHPKM'
 import OHDataGrid, { SortableColumn } from 'src/ui/components/OHDataGrid'
 import PokemonIcon from 'src/ui/components/PokemonIcon'
 import { getMonFileIdentifier } from 'src/util/Lookup'

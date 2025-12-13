@@ -1,10 +1,10 @@
 import { useDraggable } from '@dnd-kit/react'
 import { MetadataLookup } from '@pkm-rs/pkg'
 import { useContext, useMemo } from 'react'
+import { displayIndexAdder, isBattleFormeItem, isMegaStone } from 'src/core/pkm/util'
 import { DragMonContext } from 'src/state/dragMon'
 import { MonWithLocation } from 'src/state/saves/reducer'
 import { PKMInterface } from 'src/types/interfaces'
-import { displayIndexAdder, isBattleFormeItem, isMegaStone } from 'src/types/pkm/util'
 import PokemonIcon from 'src/ui/components/PokemonIcon'
 
 const getBackgroundDetails = (disabled?: boolean) => {

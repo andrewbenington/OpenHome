@@ -1,6 +1,6 @@
 import { OriginGames } from '@pkm-rs/pkg'
 import { Card, Flex } from '@radix-ui/themes'
-import { OHPKM } from 'src/types/pkm/OHPKM'
+import { OHPKM } from 'src/core/pkm/OHPKM'
 
 export default function TrainersDisplay(props: { mon: OHPKM }) {
   const { mon } = props

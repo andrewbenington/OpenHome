@@ -206,3 +206,19 @@ export const adjustMovePPBetweenFormats = (
     return adjustedMovePP > 0 ? adjustedMovePP : 0
   }) as [number, number, number, number]
 }
+
+export function getHeightCalculated(mon: AllPKMFields) {
+  const formeMetadata = MetadataLookup(mon.dexNum, mon.formeNum)
+  if (!formeMetadata || mon.heightScalar === undefined || !mon.heightDeviation) return 0
+
+  const deviation = (mon.heightScalar / 255) * 0.40000004 + (1 - mon.heightDeviation)
+  return formeMetadata.baseHeight * 100 * deviation
+}
+
+export function getWeightCalculated(mon: AllPKMFields) {
+  const formeMetadata = MetadataLookup(mon.dexNum, mon.formeNum)
+  if (!formeMetadata || mon.weightScalar === undefined || !mon.weightDeviation) return 0
+
+  const deviation = (mon.weightScalar / 255) * 0.40000004 + (1 - mon.weightDeviation)
+  return formeMetadata.baseWeight * 10 * deviation
+}

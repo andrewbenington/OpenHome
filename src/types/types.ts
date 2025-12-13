@@ -1,7 +1,7 @@
 import { Gender, OriginGame } from '@pkm-rs/pkg'
 import { Either, left, right } from 'fp-ts/Either'
 import { CSSProperties } from 'react'
-import { PathData } from './SAVTypes/path'
+import { PathData } from 'src/core/SAVTypes/path'
 
 export type KeyValuePairList = { key: string; value: string }[]
 export type Stat = 'HP' | 'Atk' | 'Def' | 'SpA' | 'SpD' | 'Spe' | 'Sp'

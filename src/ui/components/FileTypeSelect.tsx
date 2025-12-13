@@ -1,7 +1,7 @@
 import { uniq } from 'lodash'
 import { useContext, useMemo } from 'react'
+import { supportsMon } from 'src/core/SAVTypes/util'
 import { AppInfoContext } from 'src/state/appInfo'
-import { supportsMon } from 'src/types/SAVTypes/util'
 import { PKMFormeRef } from 'src/types/types'
 import { filterUndefined } from 'src/util/Sort'
 

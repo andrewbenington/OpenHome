@@ -1,13 +1,13 @@
 import { MetadataLookup } from '@pkm-rs/pkg'
 import { BLOOD_MOON, SWEETS } from '@pokemon-resources/consts/Formes'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
+import { displayIndexAdder, isBattleFormeItem, isMegaStone } from 'src/core/pkm/util'
+import { toGen3CRFUPokemonIndex } from 'src/core/SAVTypes/cfru/conversion/util'
+import { toGen3RRPokemonIndex } from 'src/core/SAVTypes/radicalred/conversion/Gen3RRPokemonIndex'
+import { RRSprites } from 'src/core/SAVTypes/radicalred/conversion/RadicalRedSprites'
+import { NationalDexToUnboundMap } from 'src/core/SAVTypes/unbound/conversion/UnboundSpeciesMap'
+import { UBSprites } from 'src/core/SAVTypes/unbound/conversion/UnboundSprites'
 import { MonSpriteData } from 'src/state/plugin'
-import { displayIndexAdder, isBattleFormeItem, isMegaStone } from 'src/types/pkm/util'
-import { toGen3CRFUPokemonIndex } from 'src/types/SAVTypes/cfru/conversion/util'
-import { toGen3RRPokemonIndex } from 'src/types/SAVTypes/radicalred/conversion/Gen3RRPokemonIndex'
-import { RRSprites } from 'src/types/SAVTypes/radicalred/conversion/RadicalRedSprites'
-import { NationalDexToUnboundMap } from 'src/types/SAVTypes/unbound/conversion/UnboundSpeciesMap'
-import { UBSprites } from 'src/types/SAVTypes/unbound/conversion/UnboundSprites'
 
 export const fileToSpriteFolder: Record<string, string> = {
   PK1: 'gen1',

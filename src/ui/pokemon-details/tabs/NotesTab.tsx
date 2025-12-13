@@ -1,7 +1,7 @@
 import { TextArea } from '@radix-ui/themes'
 import { useEffect, useState } from 'react'
+import { OHPKM } from 'src/core/pkm/OHPKM'
 import { useSaves } from 'src/state/saves/useSaves'
-import { OHPKM } from 'src/types/pkm/OHPKM'
 
 export default function NotesDisplay(props: { mon: OHPKM }) {
   const { mon } = props

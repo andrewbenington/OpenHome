@@ -11,7 +11,6 @@ import {
   SpeciesLookup,
 } from '@pkm-rs/pkg'
 import { ModernRibbons } from '@pokemon-resources/index'
-import { getHeightCalculated, getWeightCalculated } from 'src/types/pkm/util'
 import * as byteLogic from '../util/byteLogic'
 import * as encryption from '../util/encryption'
 import { AllPKMFields } from '../util/pkmInterface'
@@ -19,7 +18,7 @@ import { filterRibbons } from '../util/ribbonLogic'
 import { getStats } from '../util/statCalc'
 import * as stringLogic from '../util/stringConversion'
 import * as types from '../util/types'
-import { adjustMovePPBetweenFormats } from '../util/util'
+import { adjustMovePPBetweenFormats, getHeightCalculated, getWeightCalculated } from '../util/util'
 
 export class PA8 {
   static getName() {

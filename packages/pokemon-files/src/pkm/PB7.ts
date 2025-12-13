@@ -11,13 +11,12 @@ import {
   SpeciesLookup,
 } from '@pkm-rs/pkg'
 import { PKMInterface } from 'src/types/interfaces'
-import { getHeightCalculated, getWeightCalculated } from 'src/types/pkm/util'
 import * as byteLogic from '../util/byteLogic'
 import * as encryption from '../util/encryption'
 import { getStats } from '../util/statCalc'
 import * as stringLogic from '../util/stringConversion'
 import * as types from '../util/types'
-import { adjustMovePPBetweenFormats } from '../util/util'
+import { adjustMovePPBetweenFormats, getHeightCalculated, getWeightCalculated } from '../util/util'
 
 export class PB7 {
   static getName() {

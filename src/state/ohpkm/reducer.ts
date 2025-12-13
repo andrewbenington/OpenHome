@@ -1,6 +1,6 @@
 import * as E from 'fp-ts/lib/Either'
 import { createContext, Dispatch, Reducer } from 'react'
-import { OHPKM } from 'src/types/pkm/OHPKM'
+import { OHPKM } from 'src/core/pkm/OHPKM'
 import { Errorable } from 'src/types/types'
 
 export type OhpkmStoreData = Record<string, OHPKM>

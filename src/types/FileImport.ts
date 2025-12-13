@@ -14,12 +14,12 @@ import {
   PK9,
   XDPKM,
 } from '@pokemon-files/pkm'
-import { PKMInterface } from './interfaces'
-import { OHPKM } from './pkm/OHPKM'
-import { OhpkmV1 } from './pkm/OhpkmV1'
-import { PK3RR } from './SAVTypes/radicalred/PK3RR'
-import { PK3UB } from './SAVTypes/unbound/PK3UB'
-import { AnyPkmClass, SavePkmClass } from './SAVTypes/util'
+import { OHPKM } from 'src/core/pkm/OHPKM'
+import { OhpkmV1 } from 'src/core/pkm/OhpkmV1'
+import { PK3RR } from 'src/core/SAVTypes/radicalred/PK3RR'
+import { PK3UB } from 'src/core/SAVTypes/unbound/PK3UB'
+import { AnyPkmClass, SavePkmClass } from 'src/core/SAVTypes/util'
+import { PKMInterface } from 'src/types/interfaces'
 
 function fileTypeFromBytes(bytes: Uint8Array): SavePkmClass | undefined {
   switch (bytes.length) {

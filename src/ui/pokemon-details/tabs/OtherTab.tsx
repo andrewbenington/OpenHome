@@ -1,6 +1,13 @@
 import { genderFromBool, Generation, OriginGames } from '@pkm-rs/pkg'
 import { PK3, PK4, PK5 } from '@pokemon-files/pkm'
-import { AllPKMFields, getDisplayID, getFlagsInRange, StatsPreSplit } from '@pokemon-files/util'
+import {
+  AllPKMFields,
+  getDisplayID,
+  getFlagsInRange,
+  getHeightCalculated,
+  getWeightCalculated,
+  StatsPreSplit,
+} from '@pokemon-files/util'
 import { Countries } from '@pokemon-resources/consts/Countries'
 import { EncounterTypes } from '@pokemon-resources/consts/EncounterTypes'
 import { SWEETS } from '@pokemon-resources/consts/Formes'
@@ -23,15 +30,10 @@ import {
 } from '@pokemon-resources/index'
 import { Flex } from '@radix-ui/themes'
 import { useMemo } from 'react'
+import { OHPKM } from 'src/core/pkm/OHPKM'
+import { getHiddenPowerGen2, getHiddenPowerPower, getHiddenPowerType } from 'src/core/pkm/util'
 import { isRestricted } from 'src/types/TransferRestrictions'
 import { PKMInterface } from 'src/types/interfaces'
-import { OHPKM } from 'src/types/pkm/OHPKM'
-import {
-  getHiddenPowerGen2,
-  getHiddenPowerPower,
-  getHiddenPowerType,
-  getWeightCalculated,
-} from 'src/types/pkm/util'
 import AttributeRow from 'src/ui/components/AttributeRow'
 import AttributeRowExpand from 'src/ui/components/AttributeRowExpand'
 import DynamaxLevel from 'src/ui/components/pokemon/DynamaxLevel'
@@ -52,7 +54,7 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
   const { mon } = props
   const isDev = useIsDev()
 
-  const heightCalculated = getWeightCalculated(mon)
+  const heightCalculated = getHeightCalculated(mon)
   const weightCalculated = getWeightCalculated(mon)
 
   return (
