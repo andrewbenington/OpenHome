@@ -79,7 +79,7 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
         )}
         {mon.encryptionConstant !== undefined && (
           <AttributeRow label="Shift Value">
-            <code>{(mon.encryptionConstant & 0x3e000) >> 0xd % 24}</code>
+            <code>{(mon.encryptionConstant & 0x3e000) >> (0xd % 24)}</code>
           </AttributeRow>
         )}
         <AttributeRowExpand

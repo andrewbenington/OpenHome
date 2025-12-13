@@ -15,16 +15,10 @@ import {
 import { StatAbbr } from './types'
 
 export interface PKMWithStandardStats
-  extends AllPKMs,
-    PKMWithModernIVs,
-    PKMWithModernEVs,
-    PKMWithNature {}
+  extends AllPKMs, PKMWithModernIVs, PKMWithModernEVs, PKMWithNature {}
 
 export interface PKMWithStandardStatCalc
-  extends SpeciesData,
-    PKMWithModernIVs,
-    PKMWithModernEVs,
-    PKMWithNature {}
+  extends SpeciesData, PKMWithModernIVs, PKMWithModernEVs, PKMWithNature {}
 
 export interface PKMWithGameBoyStats extends AllPKMs, PKMWithDVs, PKMWithGameBoyEVs {}
 
