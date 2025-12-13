@@ -20,7 +20,7 @@ import {
 import { isRestricted } from 'src/types/TransferRestrictions'
 import { PKMInterface } from 'src/types/interfaces'
 import { Styles } from 'src/types/types'
-import SheenStars from 'src/ui/components/SheenStars'
+import SheenStars from 'src/ui/components/pokemon/SheenStars'
 const styles = {
   container: {
     display: 'flex',

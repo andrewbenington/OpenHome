@@ -23,9 +23,9 @@ import { getPublicImageURL } from 'src/ui/images/images'
 import { BallsImageList, getItemIconPath } from 'src/ui/images/items'
 import { getRibbonSpritePath } from 'src/ui/images/ribbons'
 import Autocomplete from '../Autocomplete'
-import GenderIcon from '../GenderIcon'
+import GenderIcon from '../pokemon/GenderIcon'
+import TypeIcon from '../pokemon/TypeIcon'
 import PokemonIcon from '../PokemonIcon'
-import TypeIcon from '../TypeIcon'
 import './style.css'
 
 type SelectOption = {

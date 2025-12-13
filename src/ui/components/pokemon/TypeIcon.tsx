@@ -1,7 +1,7 @@
 import { PkmType } from '@pkm-rs/pkg'
 import { teraTypeFromIndex, Type } from '@pokemon-resources/index'
 import { getPublicImageURL, getTypeIconPath } from 'src/ui/images/images'
-import './components.css'
+import './style.css'
 
 interface TypeIconProps {
   type?: Type

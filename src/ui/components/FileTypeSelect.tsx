@@ -2,20 +2,8 @@ import { uniq } from 'lodash'
 import { useContext, useMemo } from 'react'
 import { AppInfoContext } from 'src/state/appInfo'
 import { supportsMon } from 'src/types/SAVTypes/util'
-import { PKMFormeRef, Styles } from 'src/types/types'
+import { PKMFormeRef } from 'src/types/types'
 import { filterUndefined } from 'src/util/Sort'
-
-const styles = {
-  fileTypeChip: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 'small',
-    boxShadow: 'none',
-    flex: 1,
-    padding: '4px 22px 2px 6px',
-    height: 'fit-content',
-  },
-} as Styles
 
 const fileTypeColors: Record<string, string> = {
   OHPKM: '#748fcd',
@@ -62,12 +50,10 @@ const FileTypeSelect = (props: FileTypeSelectProps) => {
 
   return (
     <select
+      className="file-type-chip"
       value={currentFormat}
       onChange={(e) => onChange(e.target.value)}
-      style={{
-        ...styles.fileTypeChip,
-        backgroundColor: color ?? fileTypeColors[currentFormat],
-      }}
+      style={{ backgroundColor: color ?? fileTypeColors[currentFormat] }}
     >
       <option value="OHPKM">OpenHome</option>
       {baseFormat === 'OHPKM' ? (

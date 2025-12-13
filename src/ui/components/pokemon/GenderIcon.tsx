@@ -1,6 +1,6 @@
 import { Gender } from '@pkm-rs/pkg'
 import { displayGender, genderSymbol } from 'src/types/types'
-import './components.css'
+import './style.css'
 
 interface GenderIconProps {
   gender?: Gender

@@ -4,14 +4,14 @@ import { ExpandArrowIcon } from 'src/ui/components/Icons'
 import AttributeRow from './AttributeRow'
 import './style.css'
 
-export default function AttributeRowExpand(props: {
+type AttributeRowExpandProps = {
   summary: string
   value?: string | ReactNode
-  justifyEnd?: boolean
-  indent?: number
   children?: ReactNode
   style?: any
-}) {
+}
+
+export default function AttributeRowExpand(props: AttributeRowExpandProps) {
   const { summary: label, value, children } = props
   const [expanded, setExpanded] = useState(false)
 
@@ -30,14 +30,12 @@ export default function AttributeRowExpand(props: {
       open={expanded}
       onToggle={(e) => setExpanded((e.nativeEvent as ToggleEvent).newState === 'open')}
     >
-      <summary>
-        <div style={{ position: 'relative', width: '100%' }}>
-          <AttributeRow label={label}>{value}</AttributeRow>
-          <ExpandArrowIcon
-            className="expandable-attribute-row-arrow"
-            style={{ rotate: expanded ? '90deg' : '0deg' }}
-          />
-        </div>
+      <summary style={{ position: 'relative', width: '100%' }}>
+        <AttributeRow label={label}>{value}</AttributeRow>
+        <ExpandArrowIcon
+          className="expandable-attribute-row-arrow"
+          style={{ rotate: expanded ? '90deg' : '0deg' }}
+        />
       </summary>
       <Flex direction="column" gap="2px" mt="2px">
         {children}

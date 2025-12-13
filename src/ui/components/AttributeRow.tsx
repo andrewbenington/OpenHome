@@ -17,25 +17,9 @@ const AttributeRow = (props: {
     <div className="attribute-row" style={style}>
       <div
         className="attribute-row-label"
-        style={{
-          minWidth: indent ? `calc(33% - ${indent}px)` : '33%',
-          height: '100%',
-          minHeight: 28,
-          marginLeft: indent,
-          display: 'grid',
-          alignItems: 'center',
-        }}
+        style={{ '--indent': `${indent ?? 0}px` } as React.CSSProperties}
       >
-        <div
-          style={{
-            paddingLeft: 8,
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {label}
-        </div>
+        <div className="attribute-row-label-text">{label}</div>
       </div>
       <div
         className="attribute-row-content"
@@ -53,14 +37,11 @@ const AttributeRow = (props: {
 function formatValue(value: AttributeRowValue): string {
   if (value === undefined) {
     return '<not present>'
-  }
-  if (typeof value === 'string') {
+  } else if (typeof value === 'string') {
     return value
-  }
-  if (typeof value === 'number') {
+  } else if (typeof value === 'number') {
     return value.toString()
-  }
-  if ('year' in value && 'month' in value) {
+  } else if ('year' in value && 'month' in value) {
     return dayjs(new Date(value.year, value.month, value.day)).format('MMM D, YYYY')
   }
   return `${value}`

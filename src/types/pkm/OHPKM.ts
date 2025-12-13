@@ -19,7 +19,7 @@ import {
 } from '@pkm-rs/pkg'
 import {
   AllPKMFields,
-  MarkingsSixShapesWithColor,
+  MarkingShape,
   Stats,
   generatePersonalityValuePreservingAttributes,
   getStandardPKMStats,
@@ -922,8 +922,6 @@ type AbilityNum = 1 | 2 | 4
 const FIRST_ABILITY: AbilityNum = 1
 const SECOND_ABILITY: AbilityNum = 2
 const HIDDEN_ABILITY: AbilityNum = 4
-
-type MarkingShape = keyof MarkingsSixShapesWithColor
 
 const FORMATS_WITHOUT_ABILITIES = ['PK1', 'PK2', 'PB7', 'PA8', 'PA9']
 

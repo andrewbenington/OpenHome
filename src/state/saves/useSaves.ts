@@ -5,6 +5,7 @@ import { OHPKM } from 'src/types/pkm/OHPKM'
 import { AddBoxLocation, HomeData } from 'src/types/SAVTypes/HomeData'
 import { Box, SAV } from 'src/types/SAVTypes/SAV'
 import { OpenHomeBox } from 'src/types/storage'
+import { MarkingsSixShapesWithColor } from '../../../packages/pokemon-files/src'
 import { useOhpkmStore } from '../ohpkm/useOhpkmStore'
 import { MonLocation, MonWithLocation, OpenSavesState, SavesContext } from './reducer'
 
@@ -37,6 +38,7 @@ export type SavesAndBanksManager = Required<Omit<OpenSavesState, 'error'>> & {
   getMonAtLocation(location: MonLocation): PKMInterface | OHPKM | undefined
   setMonHeldItem(item: Item | undefined, location: MonLocation): void
   updateMonNotes(monId: string, notes: string | undefined): void
+  updateMonMarkings(monId: string, markings: MarkingsSixShapesWithColor): void
   moveMon(source: MonWithLocation, dest: MonLocation): void
   releaseMonAtLocation(location: MonLocation): void
 }
@@ -266,6 +268,24 @@ export function useSaves(): SavesAndBanksManager {
     })
   }
 
+  function updateMonMarkings(monId: string, markings: MarkingsSixShapesWithColor) {
+    if (!homeData) return
+
+    const location: MonLocation | undefined = findMon(monId)
+    if (!location) return
+
+    openSavesDispatch({
+      type: 'update_home_mon',
+      payload: {
+        location: location,
+        updater: (mon) => {
+          mon.markings = markings
+          return mon
+        },
+      },
+    })
+  }
+
   function moveMon(source: MonWithLocation, dest: MonLocation) {
     openSavesDispatch({ type: 'move_mon', payload: { source, dest } })
   }
@@ -307,6 +327,7 @@ export function useSaves(): SavesAndBanksManager {
     getMonAtLocation,
     setMonHeldItem,
     updateMonNotes,
+    updateMonMarkings,
     moveMon,
     releaseMonAtLocation,
   }

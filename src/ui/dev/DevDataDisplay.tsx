@@ -2,8 +2,8 @@ import { Dialog } from '@radix-ui/themes'
 import { CSSProperties, useState } from 'react'
 import { IconType } from 'react-icons'
 import { MdDataObject } from 'react-icons/md'
-import { InfoGrid } from './InfoGrid2'
-import MiniButton, { MiniButtonProps } from './MiniButton'
+import { InfoGrid } from '../components/InfoGrid2'
+import MiniButton, { MiniButtonProps } from '../components/MiniButton'
 
 type DevDataDisplayProps = {
   data?: object

@@ -39,7 +39,7 @@ export interface pokedate {
 }
 
 // 1 = blue/black, 2 = red
-export type marking = boolean | 'blue' | 'red' | null
+export type MarkingValue = boolean | 'blue' | 'red' | null
 
 export interface SaveRef extends Partial<JSONObject> {
   filePath: PathData

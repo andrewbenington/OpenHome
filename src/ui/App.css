@@ -148,10 +148,6 @@ label {
   flex-direction: column;
 }
 
-.No-Select {
-  user-select: none;
-}
-
 /* Hide scrollbar for Chrome, Safari and Opera */
 .scroll-no-bar::-webkit-scrollbar {
   display: none;

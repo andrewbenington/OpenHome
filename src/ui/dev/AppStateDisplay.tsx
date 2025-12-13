@@ -8,8 +8,8 @@ import { ItemBagContext, ItemBagState } from 'src/state/items/reducer'
 import { OpenSavesState } from 'src/state/saves/reducer'
 import { useSaves } from 'src/state/saves/useSaves'
 import { PKMInterface } from 'src/types/interfaces'
-import { DevDataDisplay } from 'src/ui/components/DevDataDisplay'
 import { InfoGrid } from 'src/ui/components/InfoGrid2'
+import { DevDataDisplay } from 'src/ui/dev/DevDataDisplay'
 
 export default function AppStateDisplay() {
   const appState = useAppState()

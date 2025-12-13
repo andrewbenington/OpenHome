@@ -34,10 +34,10 @@ import {
 } from 'src/types/pkm/util'
 import AttributeRow from 'src/ui/components/AttributeRow'
 import AttributeRowExpand from 'src/ui/components/AttributeRowExpand'
-import DynamaxLevel from 'src/ui/components/DynamaxLevel'
-import GenderIcon from 'src/ui/components/GenderIcon'
-import ShinyLeavesDisplay from 'src/ui/components/ShinyLeaves'
-import TypeIcon from 'src/ui/components/TypeIcon'
+import DynamaxLevel from 'src/ui/components/pokemon/DynamaxLevel'
+import GenderIcon from 'src/ui/components/pokemon/GenderIcon'
+import ShinyLeavesDisplay from 'src/ui/components/pokemon/ShinyLeaves'
+import TypeIcon from 'src/ui/components/pokemon/TypeIcon'
 import useIsDev from 'src/ui/hooks/isDev'
 import {
   getMonFileIdentifier,

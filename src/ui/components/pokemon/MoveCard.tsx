@@ -1,6 +1,6 @@
 import { Moves, Type } from '@pokemon-resources/index'
 import { useMemo } from 'react'
-import TypeIcon from 'src/ui/components/TypeIcon'
+import TypeIcon from 'src/ui/components/pokemon/TypeIcon'
 import { getTypeColor } from 'src/util/PokemonSprite'
 import './style.css'
 

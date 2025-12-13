@@ -4,11 +4,12 @@ import { Badge, Flex } from '@radix-ui/themes'
 import { useContext, useMemo } from 'react'
 import { AppInfoContext } from 'src/state/appInfo'
 import { PKMInterface } from 'src/types/interfaces'
+import { OHPKM } from 'src/types/pkm/OHPKM'
 import { getCharacteristic, getMoveMaxPP } from 'src/types/pkm/util'
 import { getPluginIdentifier } from 'src/types/SAVTypes/util'
 import { Styles } from 'src/types/types'
-import Markings from 'src/ui/components/Markings'
-import MoveCard from 'src/ui/components/MoveCard'
+import Markings from 'src/ui/components/pokemon/Markings'
+import MoveCard from 'src/ui/components/pokemon/MoveCard'
 import { getPublicImageURL } from 'src/ui/images/images'
 import { getBallIconPath } from 'src/ui/images/items'
 
@@ -170,7 +171,13 @@ const MetDataMovesTab = (props: { mon: PKMInterface }) => {
               <img className="origin-mark" draggable={false} alt="origin mark" src={markImage} />
             )}
           </div>
-          {'markings' in mon && mon.markings ? <Markings markings={mon.markings} /> : <div />}
+          {mon instanceof OHPKM ? (
+            <Markings markings={mon.markings} openHomeId={mon.getHomeIdentifier()} allowUpdate />
+          ) : 'markings' in mon && mon.markings ? (
+            <Markings markings={mon.markings} />
+          ) : (
+            <div />
+          )}
         </Flex>
       </Flex>
       <div style={{ flex: 1 }} />
