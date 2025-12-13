@@ -35,7 +35,7 @@ import { PKMInterface } from 'src/types/interfaces'
 import { OhpkmV2 as OhpkmV2Wasm } from '../../../pkm_rs/pkg'
 import { intersection, unique } from '../../util/Functional'
 import { getHomeIdentifier, isEvolution } from '../../util/Lookup'
-import { SAV } from '../SAVTypes/SAV'
+import { SAV } from '../save/SAV'
 import {
   contestStatsFromWasm,
   contestStatsToWasm,

@@ -1,6 +1,6 @@
 import { invoke } from '@tauri-apps/api/core'
 import * as E from 'fp-ts/lib/Either'
-import { PossibleSaves } from 'src/core/SAVTypes/path'
+import { PossibleSaves } from 'src/core/save/util/path'
 import { Pokedex, PokedexUpdate } from 'src/types/pokedex'
 import { StoredBankData } from 'src/types/storage'
 import { Errorable, JSONArray, JSONObject, JSONValue, LookupMap, SaveRef } from 'src/types/types'

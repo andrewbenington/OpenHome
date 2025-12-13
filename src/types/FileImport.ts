@@ -16,9 +16,9 @@ import {
 } from '@pokemon-files/pkm'
 import { OHPKM } from 'src/core/pkm/OHPKM'
 import { OhpkmV1 } from 'src/core/pkm/OhpkmV1'
-import { PK3RR } from 'src/core/SAVTypes/radicalred/PK3RR'
-import { PK3UB } from 'src/core/SAVTypes/unbound/PK3UB'
-import { AnyPkmClass, SavePkmClass } from 'src/core/SAVTypes/util'
+import { PK3RR } from 'src/core/save/radicalred/PK3RR'
+import { PK3UB } from 'src/core/save/unbound/PK3UB'
+import { AnyPkmClass, SavePkmClass } from 'src/core/save/util/util'
 import { PKMInterface } from 'src/types/interfaces'
 
 function fileTypeFromBytes(bytes: Uint8Array): SavePkmClass | undefined {

@@ -1,4 +1,4 @@
-import { bytesToUint16BigEndian, bytesToUint16LittleEndian } from '../byteLogic'
+import { bytesToUint16BigEndian, bytesToUint16LittleEndian } from '../../core/save/util/byteLogic'
 import Gen4ToUTFMap from './Gen4ToUTFMap'
 import UTFToGen4Map from './UTFToGen4Map'
 

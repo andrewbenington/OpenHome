@@ -16,7 +16,7 @@ import { CSS } from '@dnd-kit/utilities'
 import { Button, Flex, Grid } from '@radix-ui/themes'
 import { CSSProperties } from 'react'
 import { SortTypes } from 'src/core/pkm/sort'
-import { HomeBox, HomeData } from 'src/core/SAVTypes/HomeData'
+import { HomeBox, HomeData } from 'src/core/save/HomeData'
 import { SavesAndBanksManager, useSaves } from 'src/state/saves/useSaves'
 import OpenHomeCtxMenu from 'src/ui/components/context-menu/OpenHomeCtxMenu'
 import {

@@ -42,7 +42,6 @@ import {
 } from '@pokemon-resources/index'
 import * as lodash from 'lodash'
 import Prando from 'prando'
-import { PKMInterface, PluginPKMInterface } from 'src/types/interfaces'
 import {
   bytesToUint16BigEndian,
   bytesToUint16LittleEndian,
@@ -52,7 +51,8 @@ import {
   uint16ToBytesBigEndian,
   uint16ToBytesLittleEndian,
   uint32ToBytesLittleEndian,
-} from 'src/util/byteLogic'
+} from 'src/core/save/util/byteLogic'
+import { PKMInterface, PluginPKMInterface } from 'src/types/interfaces'
 import { utf16BytesToString, utf16StringToBytes } from 'src/util/Strings/StringConverter'
 import { getHomeIdentifier, isEvolution } from '../../util/Lookup'
 import schema from './OHPKM.json'

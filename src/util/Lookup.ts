@@ -6,7 +6,7 @@ import { OhpkmV1 } from 'src/core/pkm/OhpkmV1'
 import { dvsFromIVs, getBaseMon } from 'src/core/pkm/util'
 import { PKMInterface } from 'src/types/interfaces'
 import { PKMFormeRef } from 'src/types/types'
-import { bytesToString } from './byteLogic'
+import { bytesToString } from '../core/save/util/byteLogic'
 import { gen12StringToUTF, utf16StringToGen12 } from './Strings/StringConverter'
 
 export const getMonFileIdentifier = (mon: PKMInterface) => {

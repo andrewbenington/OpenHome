@@ -15,13 +15,13 @@ import {
   Type,
 } from '@pokemon-resources/index'
 import Prando from 'prando'
-import { PKMInterface } from 'src/types/interfaces'
 import {
   bytesToUint32LittleEndian,
   getFlag,
   uint16ToBytesLittleEndian,
   writeUint32ToBuffer,
-} from 'src/util/byteLogic'
+} from 'src/core/save/util/byteLogic'
+import { PKMInterface } from 'src/types/interfaces'
 import { OHPKM } from './OHPKM'
 
 export const writeIVsToBuffer = (
