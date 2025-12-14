@@ -20,27 +20,8 @@ import {
 } from 'chart.js'
 import { useEffect, useMemo, useState } from 'react'
 import { Radar } from 'react-chartjs-2'
-import { Styles } from 'src/types/types'
-const styles = {
-  container: {
-    display: 'flex',
-    flexDirection: 'column',
-    height: '100%',
-    alignItems: 'center',
-    position: 'relative',
-  },
-  selectors: {
-    position: 'absolute',
-    right: 10,
-    top: 10,
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  chartContainer: { height: 'calc(100% - 40px)' },
-  sheenStars: { padding: 10 },
-} as Styles
 
-const getMaxValue = (stat: string, evType?: string): number | undefined => {
+function getMaxValue(stat: string, evType?: string): number | undefined {
   switch (stat) {
     case 'IVs':
       return 31
@@ -57,7 +38,7 @@ const getMaxValue = (stat: string, evType?: string): number | undefined => {
   }
 }
 
-const StatsDisplay = (props: { mon: PKMInterface }) => {
+export default function StatsDisplay(props: { mon: PKMInterface }) {
   const { mon } = props
   const [display, setDisplay] = useState('Stats')
   const [evType, setEVType] = useState(mon.evs ? 'Modern' : 'Game Boy')
@@ -103,8 +84,8 @@ const StatsDisplay = (props: { mon: PKMInterface }) => {
 
   ChartJS.register(RadialLinearScale, PointElement, LineElement, Title, Filler, Tooltip)
   return (
-    <div style={styles.container}>
-      <div style={styles.selectors}>
+    <div className="stats-container">
+      <div className="stats-selectors">
         <Select.Root value={display} onValueChange={(val) => val && setDisplay(val)}>
           <Select.Trigger />
           <Select.Content>{menuItems}</Select.Content>
@@ -121,7 +102,7 @@ const StatsDisplay = (props: { mon: PKMInterface }) => {
           <div />
         )}
       </div>
-      <div style={styles.chartContainer}>
+      <div className="chart-container">
         <Radar
           options={{
             plugins: {
@@ -363,12 +344,10 @@ const StatsDisplay = (props: { mon: PKMInterface }) => {
         />
       </div>
       {display === 'Contest' && 'contest' in mon && (
-        <div style={styles.sheenStars}>
+        <div>
           <SheenStars mon={mon} />
         </div>
       )}
     </div>
   )
 }
-
-export default StatsDisplay

@@ -2,27 +2,6 @@ import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { COLOPKM, PK3, XDPKM } from '@pokemon-files/pkm'
 import lodash from 'lodash'
-import { Styles } from 'src/types/types'
-
-const styles = {
-  container: {
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  starRow: {
-    backgroundColor: '#666',
-    borderRadius: 5,
-    display: 'flex',
-    alignItems: 'center',
-    marginLeft: 10,
-    marginRight: 10,
-  },
-  star: {
-    height: 30,
-    objectFit: 'contain',
-  },
-} as Styles
 
 interface SheenStarsProps {
   mon: PKMInterface
@@ -74,24 +53,17 @@ const getSheenStars = (mon: PKMInterface) => {
   return 12
 }
 
-const SheenStars = (props: SheenStarsProps) => {
-  const { mon } = props
-
+export default function SheenStars({ mon }: SheenStarsProps) {
   return (
-    <div style={styles.container}>
+    <div className="sheen-container">
       <div>Sheen:</div>
-      <div
-        style={{
-          ...styles.starRow,
-          width: mon instanceof PK3 || mon instanceof COLOPKM || mon instanceof XDPKM ? 300 : 360,
-        }}
-      >
+      <div className="sheen-star-row" style={{ width: isGen3(mon) ? 300 : 360 }}>
         {lodash.range(getSheenStars(mon)).map((level: number) => (
           <img
+            className="sheen-star"
             key={`sheen_star_${level}`}
             alt={`sheen star ${level}`}
             src={getPublicImageURL('icons/Sheen.gif')}
-            style={styles.star}
           />
         ))}
       </div>
@@ -100,4 +72,6 @@ const SheenStars = (props: SheenStarsProps) => {
   )
 }
 
-export default SheenStars
+function isGen3(mon: PKMInterface) {
+  return mon instanceof PK3 || mon instanceof COLOPKM || mon instanceof XDPKM
+}

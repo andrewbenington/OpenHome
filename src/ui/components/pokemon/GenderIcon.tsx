@@ -1,5 +1,5 @@
 import { Gender } from '@pkm-rs/pkg'
-import { displayGender, genderSymbol } from 'src/types/types'
+import { displayGender } from 'src/core/util/types'
 import './style.css'
 
 interface GenderIconProps {
@@ -24,4 +24,15 @@ export default function GenderIcon({ gender, size }: GenderIconProps) {
       </div>
     )
   )
+}
+
+function genderSymbol(gender: Gender): string {
+  switch (gender) {
+    case Gender.Male:
+      return '♂'
+    case Gender.Female:
+      return '♀'
+    default:
+      return ''
+  }
 }

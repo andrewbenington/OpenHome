@@ -55,3 +55,23 @@
   filter: grayscale(100%) drop-shadow(1px 1px grey);
   opacity: 0.8;
 }
+
+.sheen-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.sheen-star-row {
+  background-color: #666;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.sheen-star {
+  height: 30px;
+  object-fit: contain;
+}

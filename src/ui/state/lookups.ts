@@ -3,7 +3,7 @@ import { StoredLookups } from '@openhome-ui/backend/backendInterface'
 import { useCallback, useContext, useEffect, useState } from 'react'
 
 import * as E from 'fp-ts/lib/Either'
-import { Errorable } from 'src/types/types'
+import { Errorable } from 'src/core/util/functional'
 
 export type LookupsManager = { getLookups: () => Promise<Errorable<StoredLookups>> } & (
   | {

@@ -5,7 +5,7 @@ import useDisplayError from '@openhome-ui/hooks/displayError'
 import { Generation, getPluginColor, OriginGames } from '@pkm-rs/pkg'
 import { Badge, Flex } from '@radix-ui/themes'
 import { useContext, useMemo, useState } from 'react'
-import { SaveRef } from 'src/types/types'
+import { SaveRef } from 'src/core/util/types'
 import './style.css'
 import { buildRecentSaveContextElements, formatTimeSince, logoFromSaveRef } from './util'
 

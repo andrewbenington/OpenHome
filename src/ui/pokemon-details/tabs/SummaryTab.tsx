@@ -13,29 +13,7 @@ import { genderFromBool, MetadataLookup } from '@pkm-rs/pkg'
 import { getDisplayID } from '@pokemon-files/util'
 import { Badge, Flex, Grid, Spinner, Tooltip } from '@radix-ui/themes'
 import { useMemo } from 'react'
-import { Styles } from 'src/types/types'
 import useMonSprite from '../useMonSprite'
-
-const styles = {
-  column: {
-    height: 200,
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  image: {
-    maxHeight: 100,
-    transform: 'scale(2)',
-    imageRendering: 'pixelated',
-    objectFit: 'contain',
-  },
-  nicknameRow: {
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-} as Styles
 
 const SummaryDisplay = (props: { mon: PKMInterface }) => {
   const { mon } = props
@@ -58,56 +36,41 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
   return (
     <Grid columns="2" width="100%" p="3" gap="2">
       <div>
-        <div style={styles.column}>
-          <div
-            style={{
-              width: '100%',
-              height: '100%',
-              position: 'relative',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            {spriteResult.loading ? (
-              <Spinner style={{ margin: 'auto', height: 32 }} />
-            ) : spriteResult.path ? (
-              <img
-                draggable={false}
-                alt={itemAltText}
-                style={styles.image}
-                src={spriteResult.path}
-              />
-            ) : (
-              <PokemonIcon
-                dexNumber={mon.dexNum}
-                formeNumber={mon.formeNum}
-                style={{
-                  width: '60%',
-                  height: '90%',
-                  margin: 'auto',
-                  imageRendering: 'pixelated',
-                }}
-              />
-            )}
-            {spriteResult.errorMessage && (
-              <Tooltip content={spriteResult.errorMessage}>
-                <Badge
-                  variant="solid"
-                  color="tomato"
-                  style={{
-                    position: 'absolute',
-                    bottom: '10%',
-                    right: '10%',
-                  }}
-                >
-                  <ErrorIcon fontSize={20} />
-                </Badge>
-              </Tooltip>
-            )}
-          </div>
+        <div className="summary-column">
+          {spriteResult.loading ? (
+            <Spinner style={{ margin: 'auto', height: 32 }} />
+          ) : spriteResult.path ? (
+            <img
+              className="summary-image"
+              draggable={false}
+              alt={itemAltText}
+              src={spriteResult.path}
+            />
+          ) : (
+            <PokemonIcon
+              dexNumber={mon.dexNum}
+              formeNumber={mon.formeNum}
+              style={{
+                width: '60%',
+                height: '90%',
+                margin: 'auto',
+                imageRendering: 'pixelated',
+              }}
+            />
+          )}
+          {spriteResult.errorMessage && (
+            <Tooltip content={spriteResult.errorMessage}>
+              <Badge
+                variant="solid"
+                color="tomato"
+                style={{ position: 'absolute', bottom: '10%', right: '10%' }}
+              >
+                <ErrorIcon fontSize={20} />
+              </Badge>
+            </Tooltip>
+          )}
         </div>
-        <div style={styles.nicknameRow}>
+        <div className="nickname-row">
           {mon.ball ? (
             <img
               draggable={false}
@@ -133,7 +96,7 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
           )}
           <div>{mon.heldItemName}</div>
         </AttributeRow>
-        <div style={styles.flexRowWrap}>
+        <div>
           {mon.isShiny() && (
             <AttributeTag
               icon={getPublicImageURL('icons/Shiny.png')}

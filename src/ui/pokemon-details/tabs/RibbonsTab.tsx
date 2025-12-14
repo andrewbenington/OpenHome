@@ -3,45 +3,12 @@ import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getRibbonSpritePath } from '@openhome-ui/images/ribbons'
 import { Gen9Ribbons } from '@pokemon-resources/consts/Ribbons'
 import { Tooltip } from '@radix-ui/themes'
-import { Styles } from 'src/types/types'
-
-const styles = {
-  container: {
-    display: 'flex',
-    padding: 10,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  ribbon: {
-    width: 50,
-    height: 50,
-    borderWidth: 2,
-    imageRendering: 'pixelated',
-  },
-  noRibbonsMessage: {
-    width: '100%',
-    height: '100%',
-    display: 'grid',
-    alignItems: 'center',
-    textAlign: 'center',
-  },
-  affixedRibbon: {
-    width: 50,
-    height: 50,
-    imageRendering: 'pixelated',
-    backgroundColor: '#fff6',
-    borderRadius: 5,
-    borderWidth: 2,
-    borderStyle: 'solid',
-    borderColor: 'white',
-  },
-} as Styles
 
 const RibbonsDisplay = (props: { mon: PKMInterface }) => {
   const { mon } = props
 
   if (!mon.ribbons || mon.ribbons.length === 0) {
-    return <div style={styles.noRibbonsMessage}>This Pokémon has no ribbons.</div>
+    return <div className="no-ribbons-message">This Pokémon has no ribbons.</div>
   }
 
   const formatRibbon = (ribbon: string) => {
@@ -73,21 +40,21 @@ const RibbonsDisplay = (props: { mon: PKMInterface }) => {
   }
 
   return (
-    <div style={styles.container}>
+    <div className="ribbons-container">
       {mon.ribbons?.map((ribbon) => {
         const ribbonDisplay = formatRibbon(ribbon)
 
         return (
           <Tooltip key={`ribbon_${ribbon}`} content={ribbonDisplay} side="bottom">
             <img
+              className={
+                mon.affixedRibbon && Gen9Ribbons.indexOf(ribbon) === mon.affixedRibbon
+                  ? 'affixed-ribbon'
+                  : 'ribbon'
+              }
               draggable={false}
               key={ribbonDisplay}
               alt={ribbonDisplay}
-              style={
-                'affixedRibbon' in mon && Gen9Ribbons.indexOf(ribbon) === mon.affixedRibbon
-                  ? styles.affixedRibbon
-                  : styles.ribbon
-              }
               src={getRibbonImage(ribbon)}
             />
           </Tooltip>

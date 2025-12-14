@@ -2,7 +2,7 @@ import { BackendContext } from '@openhome-ui/backend/backendContext'
 import { useCallback, useContext, useEffect, useState } from 'react'
 
 import * as E from 'fp-ts/lib/Either'
-import { Errorable } from 'src/types/types'
+import { Errorable } from 'src/core/util/functional'
 import { Pokedex } from 'src/ui/util/pokedex'
 
 export type PokedexManager = { getPokedex: () => Promise<Errorable<Pokedex>> } & (

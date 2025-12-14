@@ -3,7 +3,7 @@ import { filterUndefined } from '@openhome-core/util/sort'
 import { AppInfoContext } from '@openhome-ui/state/appInfo'
 import { uniq } from 'lodash'
 import { useContext, useMemo } from 'react'
-import { PKMFormeRef } from 'src/types/types'
+import { PKMFormeRef } from 'src/core/util/types'
 
 const fileTypeColors: Record<string, string> = {
   OHPKM: '#748fcd',

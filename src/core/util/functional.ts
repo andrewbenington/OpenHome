@@ -1,4 +1,5 @@
 import * as E from 'fp-ts/lib/Either'
+import { Either, left, right } from 'fp-ts/lib/Either'
 
 export type PartitionedEither<E, A> = { failures: E[]; successes: A[] }
 
@@ -44,3 +45,10 @@ export function unique<T>(items: T[] | undefined): T[] {
 }
 
 export type Option<T> = T | undefined
+export type Errorable<T> = Either<string, T>
+export function Err<T>(inner: T) {
+  return left(inner)
+}
+export function Ok<T>(inner: T) {
+  return right(inner)
+}

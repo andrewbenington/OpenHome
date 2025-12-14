@@ -1,7 +1,7 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import * as E from 'fp-ts/lib/Either'
 import { useContext } from 'react'
-import { Errorable } from 'src/types/types'
+import { Errorable } from 'src/core/util/functional'
 import { OhpkmStoreContext } from './reducer'
 
 export type OhpkmStore = {

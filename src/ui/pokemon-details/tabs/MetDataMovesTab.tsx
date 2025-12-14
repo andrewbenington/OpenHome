@@ -11,35 +11,7 @@ import { OriginGames } from '@pkm-rs/pkg'
 import { getLocationString, RibbonTitles } from '@pokemon-resources/index'
 import { Badge, Flex } from '@radix-ui/themes'
 import { useContext, useMemo } from 'react'
-import { Styles } from 'src/types/types'
-
-const styles = {
-  gameContainer: {
-    position: 'relative',
-    width: 100,
-    height: 60,
-    alignItems: 'center',
-    display: 'flex',
-    justifyContent: 'center',
-  },
-  gameImage: {
-    width: 100,
-    height: 60,
-    objectFit: 'contain',
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    opacity: 0.6,
-  },
-  centerFlex: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'center',
-  },
-  description: {
-    textAlign: 'left',
-  },
-} as Styles
+import './style.css'
 
 const metTimesOfDay = ['in the morning', 'during the daytime', 'in the evening']
 
@@ -141,12 +113,12 @@ const MetDataMovesTab = (props: { mon: PKMInterface }) => {
               {mon.languageString}
             </Badge>
           </Flex>
-          {eggMessage ? <p style={styles.description}>{eggMessage}</p> : <div />}
-          <p style={styles.description}>{metMessage}</p>
+          {eggMessage ? <p>{eggMessage}</p> : <div />}
+          <p>{metMessage}</p>
           {/* check for undefined because 0 nature is Hardy */}
           {'nature' in mon ? (
             <div>
-              <p style={styles.description}>{natureMessage}</p>
+              <p>{natureMessage}</p>
               <p>{getCharacteristic(mon as any)}</p>
             </div>
           ) : (
@@ -154,9 +126,10 @@ const MetDataMovesTab = (props: { mon: PKMInterface }) => {
           )}
         </div>
         <Flex direction="column">
-          <div style={styles.gameContainer}>
+          <div className="game-container">
             {mon.gameOfOrigin && (
               <img
+                className="game-image"
                 draggable={false}
                 alt={`${mon.pluginOrigin ?? OriginGames.gameName(mon.gameOfOrigin)} logo`}
                 src={
@@ -164,7 +137,6 @@ const MetDataMovesTab = (props: { mon: PKMInterface }) => {
                     ? `logos/${mon.pluginOrigin}.png`
                     : OriginGames.logoPath(mon.gameOfOrigin)
                 }
-                style={styles.gameImage}
               />
             )}
             {markImage && (
@@ -181,7 +153,7 @@ const MetDataMovesTab = (props: { mon: PKMInterface }) => {
         </Flex>
       </Flex>
       <div style={{ flex: 1 }} />
-      <div style={styles.centerFlex}>
+      <div className="center-flex">
         <MoveCard
           move={mon.moves[0]}
           movePP={mon.moves[0] ? mon.movePP[0] : undefined}
@@ -193,7 +165,7 @@ const MetDataMovesTab = (props: { mon: PKMInterface }) => {
           maxPP={getMoveMaxPP(mon.moves[1], mon.format, mon.movePPUps[1])}
         />
       </div>
-      <div style={styles.centerFlex}>
+      <div className="center-flex">
         <MoveCard
           move={mon.moves[2]}
           movePP={mon.moves[2] ? mon.movePP[2] : undefined}

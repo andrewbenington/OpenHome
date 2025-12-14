@@ -3,7 +3,7 @@ import { HomeData } from '@openhome-core/save/HomeData'
 import { SAV } from '@openhome-core/save/interfaces'
 import * as E from 'fp-ts/lib/Either'
 import { createContext, PropsWithChildren } from 'react'
-import { Errorable } from 'src/types/types'
+import { Errorable } from 'src/core/util/functional'
 import BackendInterface from './backendInterface'
 import DummyBackend from './dummyBackend'
 

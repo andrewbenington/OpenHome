@@ -7,7 +7,7 @@ import BackendInterface from '@openhome-ui/backend/backendInterface'
 import { CtxMenuElementBuilder, ItemBuilder } from '@openhome-ui/components/context-menu/types'
 import { OriginGames } from '@pkm-rs/pkg'
 import dayjs from 'dayjs'
-import { SaveRef } from 'src/types/types'
+import { SaveRef } from 'src/core/util/types'
 
 export type SaveViewMode = 'card' | 'grid'
 

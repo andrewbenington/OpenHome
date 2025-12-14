@@ -4,7 +4,7 @@ import { dvsFromIVs, getBaseMon } from '@openhome-core/pkm/util'
 import { MetadataLookup, OriginGames } from '@pkm-rs/pkg'
 import { PK3, PK4, PK5 } from '@pokemon-files/pkm'
 import { generatePersonalityValuePreservingAttributes } from '@pokemon-files/util'
-import { PKMFormeRef } from 'src/types/types'
+import { PKMFormeRef } from 'src/core/util/types'
 import { gen12StringToUTF, utf16StringToGen12 } from '../save/util/Strings'
 import { bytesToString } from '../save/util/byteLogic'
 

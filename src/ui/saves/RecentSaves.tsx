@@ -12,7 +12,7 @@ import { OriginGames } from '@pkm-rs/pkg'
 import { Flex } from '@radix-ui/themes'
 import * as E from 'fp-ts/lib/Either'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
-import { SaveRef } from 'src/types/types'
+import { SaveRef } from 'src/core/util/types'
 import SaveCard from './SaveCard'
 import { buildRecentSaveContextElements, formatTime, formatTimeSince, SaveViewMode } from './util'
 

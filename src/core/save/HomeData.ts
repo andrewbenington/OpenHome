@@ -12,8 +12,8 @@ import { range } from '@openhome-core/util/functional'
 import { filterUndefined, numericSorter } from '@openhome-core/util/sort'
 import { OhpkmLookup } from '@openhome-ui/state/ohpkm'
 import { MonLocation } from '@openhome-ui/state/saves/reducer'
-import { Err, Errorable, Ok } from 'src/types/types'
 import { v4 as UuidV4 } from 'uuid'
+import { Err, Errorable, Ok } from '../util/functional'
 import { Box } from './interfaces'
 
 export class HomeBox implements Box<OHPKM> {
