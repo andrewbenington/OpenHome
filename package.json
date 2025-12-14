@@ -29,8 +29,6 @@
     "lint": "eslint src --max-warnings 0 --report-unused-disable-directives -c eslint.config.mjs --fix",
     "lint:ci": "eslint src --max-warnings 0 --report-unused-disable-directives -c eslint.config.mjs",
     "typecheck": "tsgo",
-    "dev:unix": "./buildVersionJSON.sh && tauri dev",
-    "dev:win": "powershell -ExecutionPolicy Bypass -File ./buildVersionJSON.ps1 && tauri dev",
     "build": "pnpm run wasm && pnpm vite build",
     "dev": "pnpm run wasm && pnpm vite",
     "tauri": "tauri",
