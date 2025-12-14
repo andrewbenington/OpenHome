@@ -1,5 +1,5 @@
+import { displayGender } from '@openhome-core/util/types'
 import { Gender } from '@pkm-rs/pkg'
-import { displayGender } from 'src/core/util/types'
 import './style.css'
 
 interface GenderIconProps {

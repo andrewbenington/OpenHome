@@ -1,5 +1,5 @@
+import { Filter } from '@openhome-ui/util/filter'
 import { Dispatch, Reducer, createContext } from 'react'
-import { Filter } from 'src/ui/util/filter'
 
 export type FilterState = Filter
 

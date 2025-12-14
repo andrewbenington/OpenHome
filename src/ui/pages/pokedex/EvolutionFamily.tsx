@@ -1,10 +1,10 @@
 import { getBaseMon } from '@openhome-core/pkm/util'
 import { ArrowLeftIcon, ArrowLeftRightIcon, ArrowRightIcon } from '@openhome-ui/components/Icons'
+import { Pokedex } from '@openhome-ui/util/pokedex'
 import { MetadataLookup, SpeciesAndForme } from '@pkm-rs/pkg'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { Flex } from '@radix-ui/themes'
 import { Responsive } from '@radix-ui/themes/props'
-import { Pokedex } from 'src/ui/util/pokedex'
 import TooltipPokemonIcon from './TooltipPokemonIcon'
 import { getFormeStatus } from './util'
 

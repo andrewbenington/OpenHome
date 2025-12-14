@@ -1,7 +1,7 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { SaveRef } from '@openhome-core/util/types'
 import { Gender, getPluginColor, OriginGame, OriginGames } from '@pkm-rs/pkg'
-import { SaveRef } from 'src/core/util/types'
 import { PathData } from './util/path'
 
 type SparseArray<T> = (T | undefined)[]

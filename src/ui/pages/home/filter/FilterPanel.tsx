@@ -1,7 +1,9 @@
+import { displayGender } from '@openhome-core/util/types'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { BallsImageList, getItemIconPath } from '@openhome-ui/images/items'
 import { getRibbonSpritePath } from '@openhome-ui/images/ribbons'
 import { FilterContext } from '@openhome-ui/state/filter'
+import { HeldItemCategory } from '@openhome-ui/util/filter'
 import {
   all_species_data,
   Gender,
@@ -20,8 +22,6 @@ import { OpenHomeRibbons } from '@pokemon-resources/consts/Ribbons'
 import { Types } from '@pokemon-resources/index'
 import { Button, Flex, Text } from '@radix-ui/themes'
 import { useContext, useMemo } from 'react'
-import { displayGender } from 'src/core/util/types'
-import { HeldItemCategory } from 'src/ui/util/filter'
 import Autocomplete from '../../../components/Autocomplete'
 import GenderIcon from '../../../components/pokemon/GenderIcon'
 import TypeIcon from '../../../components/pokemon/TypeIcon'

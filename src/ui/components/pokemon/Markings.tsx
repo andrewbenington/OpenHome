@@ -1,6 +1,6 @@
+import { MarkingValue } from '@openhome-core/util/types'
 import { useSaves } from '@openhome-ui/state/saves'
 import { markingDisplay, Markings, MarkingShape, markingsHaveColor } from '@pokemon-files/util'
-import { MarkingValue } from 'src/core/util/types'
 
 type MarkingsProps = {
   markings: Markings

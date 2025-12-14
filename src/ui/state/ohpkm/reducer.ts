@@ -1,7 +1,7 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { Errorable } from '@openhome-core/util/functional'
 import * as E from 'fp-ts/lib/Either'
 import { createContext, Dispatch, Reducer } from 'react'
-import { Errorable } from 'src/core/util/functional'
 
 export type OhpkmStoreData = Record<string, OHPKM>
 
