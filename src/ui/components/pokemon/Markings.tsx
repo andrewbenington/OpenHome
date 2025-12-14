@@ -1,4 +1,4 @@
-import { useSaves } from '@openhome-ui/state/saves/useSaves'
+import { useSaves } from '@openhome-ui/state/saves'
 import { markingDisplay, Markings, MarkingShape, markingsHaveColor } from '@pokemon-files/util'
 import { MarkingValue } from 'src/types/types'
 

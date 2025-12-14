@@ -1,6 +1,6 @@
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import DroppableSpace from '@openhome-ui/saves/boxes/DroppableSpace'
-import { useSaves } from '@openhome-ui/state/saves/useSaves'
+import { useSaves } from '@openhome-ui/state/saves'
 import { Flex } from '@radix-ui/themes'
 
 export default function ReleaseArea() {

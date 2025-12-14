@@ -1,4 +1,4 @@
-import { useAppState } from '@openhome-ui/state/app-state/appState'
+import { useAppState } from '@openhome-ui/state/app-state'
 import { Button, Dialog, Flex, Heading, ScrollArea, Separator } from '@radix-ui/themes'
 import { useState } from 'react'
 

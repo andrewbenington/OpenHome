@@ -5,7 +5,7 @@ import { BackendProvider } from '@openhome-ui/backend/backendProvider'
 import { TauriBackend } from '@openhome-ui/backend/tauri/tauriBackend'
 import useIsDarkMode from '@openhome-ui/hooks/dark-mode'
 import useDisplayError from '@openhome-ui/hooks/displayError'
-import AppStateProvider from '@openhome-ui/state/app-state/AppStateProvider'
+import { AppStateProvider } from '@openhome-ui/state/app-state'
 import {
   AppInfoContext,
   appInfoInitialState,
@@ -15,11 +15,11 @@ import {
 import { DragMonContext, dragMonReducer } from '@openhome-ui/state/dragMon'
 import { ErrorContext, errorReducer } from '@openhome-ui/state/error'
 import { FilterContext, filterReducer } from '@openhome-ui/state/filter'
-import { ItemBagContext, itemBagReducer } from '@openhome-ui/state/items/reducer'
+import { ItemBagContext, itemBagReducer } from '@openhome-ui/state/items'
 import { MouseContext, mouseReducer } from '@openhome-ui/state/mouse'
-import OhpkmStoreProvider from '@openhome-ui/state/ohpkm/OhpkmStoreProvider'
+import { OhpkmStoreProvider } from '@openhome-ui/state/ohpkm'
 import { PluginContext, pluginReducer } from '@openhome-ui/state/plugin'
-import SavesProvider from '@openhome-ui/state/saves/SavesProvider'
+import { SavesProvider } from '@openhome-ui/state/saves'
 import { loadPlugin } from '@openhome-ui/util/Plugin'
 import { Flex, Text, Theme } from '@radix-ui/themes'
 import * as E from 'fp-ts/lib/Either'
