@@ -1,23 +1,23 @@
 import { useDroppable } from '@dnd-kit/react'
 import { bytesToPKM } from '@openhome-core/pkm/FileImport'
+import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { displayIndexAdder, isBattleFormeItem } from '@openhome-core/pkm/util'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
-import OpenHomeCtxMenu from '@openhome-ui/components/context-menu/OpenHomeCtxMenu'
 import {
   CtxMenuElementBuilder,
   ItemBuilder,
   LabelBuilder,
+  OpenHomeCtxMenu,
   SeparatorBuilder,
-} from '@openhome-ui/components/context-menu/types'
+} from '@openhome-ui/components/context-menu'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import { FilterContext } from '@openhome-ui/state/filter'
 import { useItems } from '@openhome-ui/state/items'
 import { MonLocation, useSaves } from '@openhome-ui/state/saves'
 import { useContext, useMemo } from 'react'
-import { filterApplies } from 'src/types/Filter'
-import { PKMInterface } from 'src/types/interfaces'
-import { PokedexUpdate } from 'src/types/pokedex'
+import { filterApplies } from 'src/types/filter'
+import { PokedexUpdate } from 'src/ui/util/pokedex'
 import '../style.css'
 import DraggableMon from './DraggableMon'
 import DroppableSpace from './DroppableSpace'

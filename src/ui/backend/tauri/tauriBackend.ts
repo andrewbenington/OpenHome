@@ -1,5 +1,6 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { PathData, PossibleSaves } from '@openhome-core/save/util/path'
+import { SaveFolder, StoredBankData } from '@openhome-core/save/util/storage'
 import BackendInterface, {
   BankOrBoxChange,
   StoredLookups,
@@ -13,9 +14,8 @@ import { FileInfo, readFile, stat } from '@tauri-apps/plugin-fs'
 import { platform } from '@tauri-apps/plugin-os'
 import dayjs from 'dayjs'
 import * as E from 'fp-ts/lib/Either'
-import { Pokedex, PokedexUpdate } from 'src/types/pokedex'
-import { SaveFolder, StoredBankData } from 'src/types/storage'
 import { Errorable, JSONObject, LoadSaveResponse, LookupMap, SaveRef } from 'src/types/types'
+import { Pokedex, PokedexUpdate } from 'src/ui/util/pokedex'
 import { TauriInvoker } from './tauriInvoker'
 
 async function pathDataFromRaw(raw: string): Promise<PathData> {

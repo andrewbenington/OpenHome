@@ -23,7 +23,7 @@ import * as stringLogic from '../util/stringConversion'
 import * as types from '../util/types'
 import { adjustMovePPBetweenFormats } from '../util/util'
 
-export class COLOPKM {
+export default class COLOPKM {
   static getName() {
     return 'COLOPKM'
   }
@@ -322,5 +322,3 @@ export class COLOPKM {
     return []
   }
 }
-
-export default COLOPKM

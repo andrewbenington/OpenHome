@@ -1,8 +1,8 @@
+import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { Ball, Gender } from '@pkm-rs/pkg'
 import { PKM } from '@pokemon-files/pkm'
 import { getDisplayID } from '@pokemon-files/util/util'
 import dayjs from 'dayjs'
-import { PKMInterface } from 'src/types/interfaces'
 import { getBaseMon } from './util'
 
 export const SortTypes = [

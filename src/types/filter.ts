@@ -1,7 +1,7 @@
+import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { isMegaStone, isZCrystal } from '@openhome-core/pkm/util'
 import { Gender, MetadataLookup, OriginGame } from '@pkm-rs/pkg'
 import { Type } from '@pokemon-resources/index'
-import { PKMInterface } from 'src/types/interfaces'
 
 export interface Filter {
   dexNumber?: number

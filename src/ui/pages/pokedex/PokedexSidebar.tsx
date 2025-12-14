@@ -3,7 +3,7 @@ import { getPublicImageURL } from '@openhome-ui/images/images'
 import { all_species_data, FormeMetadata, SpeciesMetadata } from '@pkm-rs/pkg'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { CSSProperties, useEffect, useMemo, useRef } from 'react'
-import { Pokedex } from 'src/types/pokedex'
+import { Pokedex } from 'src/ui/util/pokedex'
 import './style.css'
 import { getHighestFormeStatus, StatusIndices } from './util'
 

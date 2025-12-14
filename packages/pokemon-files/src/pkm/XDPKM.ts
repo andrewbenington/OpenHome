@@ -23,7 +23,7 @@ import * as stringLogic from '../util/stringConversion'
 import * as types from '../util/types'
 import { adjustMovePPBetweenFormats } from '../util/util'
 
-export class XDPKM {
+export default class XDPKM {
   static getName() {
     return 'XDPKM'
   }
@@ -319,5 +319,3 @@ export class XDPKM {
     return []
   }
 }
-
-export default XDPKM

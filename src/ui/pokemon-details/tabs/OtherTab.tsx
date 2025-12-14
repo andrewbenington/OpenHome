@@ -1,3 +1,4 @@
+import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import {
   getMonFileIdentifier,
   getMonGen12Identifier,
@@ -49,7 +50,6 @@ import {
 } from '@pokemon-resources/index'
 import { Flex } from '@radix-ui/themes'
 import { useMemo } from 'react'
-import { PKMInterface } from 'src/types/interfaces'
 
 const HG_TO_LB = 0.2204623
 const CM_TO_IN = 0.3937008

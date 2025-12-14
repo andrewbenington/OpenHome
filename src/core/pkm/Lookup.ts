@@ -1,12 +1,11 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { OhpkmV1 } from '@openhome-core/pkm/OhpkmV1'
+import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { dvsFromIVs, getBaseMon } from '@openhome-core/pkm/util'
 import { MetadataLookup, OriginGames } from '@pkm-rs/pkg'
 import { PK3, PK4, PK5 } from '@pokemon-files/pkm'
 import { generatePersonalityValuePreservingAttributes } from '@pokemon-files/util'
-import { PKMInterface } from 'src/types/interfaces'
 import { PKMFormeRef } from 'src/types/types'
-import { gen12StringToUTF, utf16StringToGen12 } from '../save/util/Strings/StringConverter'
+import { gen12StringToUTF, utf16StringToGen12 } from '../save/util/Strings'
 import { bytesToString } from '../save/util/byteLogic'
 
 export const getMonFileIdentifier = (mon: PKMInterface) => {
@@ -21,7 +20,7 @@ export const getMonFileIdentifier = (mon: PKMInterface) => {
   return undefined
 }
 
-export function getHomeIdentifier(mon: OHPKM | OhpkmV1): string {
+export function getHomeIdentifier(mon: OHPKM): string {
   const baseMon = getBaseMon(mon.dexNum, mon.formeNum)
 
   if (!baseMon) {

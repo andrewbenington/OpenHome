@@ -1,5 +1,5 @@
+import { PluginPKMInterface } from '@openhome-core/pkm/interfaces'
 import { ItemRadicalRed } from '@pkm-rs/pkg'
-import { PluginPKMInterface } from 'src/types/interfaces'
 import PK3CFRU, { CFRUToNationalDexEntry } from '../cfru/PK3CFRU'
 
 import { fromGen3CRFUPokemonIndex, toGen3CRFUPokemonIndex } from '../cfru/conversion/util'
@@ -14,7 +14,7 @@ const FAKEMON_INDEXES = [
   1290, 1291, 1292, 1293, 1294, 1375,
 ]
 
-export class PK3RR extends PK3CFRU implements PluginPKMInterface {
+export default class PK3RR extends PK3CFRU implements PluginPKMInterface {
   format: 'PK3RR' = 'PK3RR'
   pluginIdentifier: string = 'radical_red'
 
@@ -60,5 +60,3 @@ export class PK3RR extends PK3CFRU implements PluginPKMInterface {
     return 'radical_red'
   }
 }
-
-export default PK3RR

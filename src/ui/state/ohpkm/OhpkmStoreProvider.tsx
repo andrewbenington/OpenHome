@@ -6,8 +6,8 @@ import LoadingIndicator from '@openhome-ui/components/LoadingIndicator'
 import { Callout } from '@radix-ui/themes'
 import * as E from 'fp-ts/lib/Either'
 import { ReactNode, useCallback, useContext, useEffect, useReducer } from 'react'
-import { PokedexUpdate } from 'src/types/pokedex'
 import { Errorable } from 'src/types/types'
+import { PokedexUpdate } from 'src/ui/util/pokedex'
 import { OhpkmStoreContext, ohpkmStoreReducer } from './reducer'
 
 export type OhpkmStoreProviderProps = {

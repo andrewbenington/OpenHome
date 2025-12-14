@@ -1,6 +1,6 @@
 use crate::pkm::ohpkm::sectioned_data::DataSection;
 use crate::pkm::ohpkm::{OhpkmV1, SectionTagV2};
-use crate::pkm::traits::{IsShiny, IsShiny4096, OhpkmByte, OhpkmBytes};
+use crate::pkm::traits::{IsShiny4096, OhpkmByte, OhpkmBytes};
 use crate::pkm::{Error, Result, StringErrorSource};
 use crate::util;
 
@@ -10,7 +10,13 @@ use pkm_rs_resources::language::Language;
 use pkm_rs_resources::moves::MoveSlot;
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbonSet};
-use pkm_rs_resources::species::{NatDexIndex, SpeciesAndForme};
+use pkm_rs_resources::species::SpeciesAndForme;
+
+#[cfg(feature = "wasm")]
+use pkm_rs_resources::species::NatDexIndex;
+
+#[cfg(feature = "wasm")]
+use crate::pkm::traits::IsShiny;
 
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{ContestStats, Stats8, Stats16Le, StatsPreSplit, TrainerData};
@@ -470,6 +476,7 @@ pub struct GameboyData {
     pub evs_g12: StatsPreSplit,
 }
 
+#[cfg(feature = "wasm")]
 const UNOWN: NatDexIndex = unsafe { NatDexIndex::new_unchecked(201) };
 
 impl GameboyData {
@@ -485,6 +492,7 @@ impl GameboyData {
         }
     }
 
+    #[cfg(feature = "wasm")]
     pub fn from_main_data(main_data: &MainDataV2) -> Self {
         if main_data.species_and_forme.get_ndex() == UNOWN {
             let letter_index = main_data.species_and_forme.get_forme_index();

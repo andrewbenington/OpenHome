@@ -157,14 +157,4 @@ export class SubmenuBuilder implements CtxMenuElementBuilder {
   }
 }
 
-export function includeIf(builders: CtxMenuElementBuilder[] | undefined): CtxMenuElementBuilder[] {
-  return builders ?? []
-}
-
-export function includeWithSeparatorIf(
-  builders: CtxMenuElementBuilder[] | undefined
-): CtxMenuElementBuilder[] {
-  return builders ? [SeparatorBuilder, ...builders] : []
-}
-
 export type CtxMenuElement = Element

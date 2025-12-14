@@ -1,5 +1,7 @@
+import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { getCharacteristic, getMoveMaxPP } from '@openhome-core/pkm/util'
+import { getPluginIdentifier } from '@openhome-core/save/util'
 import Markings from '@openhome-ui/components/pokemon/Markings'
 import MoveCard from '@openhome-ui/components/pokemon/MoveCard'
 import { getPublicImageURL } from '@openhome-ui/images/images'
@@ -9,8 +11,6 @@ import { OriginGames } from '@pkm-rs/pkg'
 import { getLocationString, RibbonTitles } from '@pokemon-resources/index'
 import { Badge, Flex } from '@radix-ui/themes'
 import { useContext, useMemo } from 'react'
-import { getPluginIdentifier } from 'src/core/save/util'
-import { PKMInterface } from 'src/types/interfaces'
 import { Styles } from 'src/types/types'
 
 const styles = {

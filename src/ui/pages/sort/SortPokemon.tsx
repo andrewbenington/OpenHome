@@ -1,3 +1,4 @@
+import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { getSortFunction, SortType, SortTypes } from '@openhome-core/pkm/sort'
 import { filterUndefined } from '@openhome-core/util/sort'
 import Autocomplete from '@openhome-ui/components/Autocomplete'
@@ -9,7 +10,6 @@ import { OriginGames } from '@pkm-rs/pkg'
 import { Badge, Card, Flex } from '@radix-ui/themes'
 import { useMemo, useState } from 'react'
 import { MdAdd } from 'react-icons/md'
-import { PKMInterface } from 'src/types/interfaces'
 
 function getInnerSortFunction(
   sortStr: SortType | undefined

@@ -1,5 +1,5 @@
 import { Dispatch, Reducer, createContext } from 'react'
-import { Filter } from 'src/types/Filter'
+import { Filter } from 'src/types/filter'
 
 export type FilterState = Filter
 

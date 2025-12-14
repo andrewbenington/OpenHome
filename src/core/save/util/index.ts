@@ -1,7 +1,6 @@
+import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { OhpkmV1 } from '@openhome-core/pkm/OhpkmV1'
 import { OriginGame } from '@pkm-rs/pkg'
-import { PKMInterface } from 'src/types/interfaces'
 import { SAV } from '../interfaces'
 import { PathData } from './path'
 
@@ -18,7 +17,7 @@ export interface SavePkmClass {
   getName(): string
 }
 
-export type AnyPkmClass = SavePkmClass | typeof OHPKM | typeof OhpkmV1
+export type AnyPkmClass = SavePkmClass | typeof OHPKM
 
 export interface SAVClass {
   new (path: PathData, bytes: Uint8Array): SAV

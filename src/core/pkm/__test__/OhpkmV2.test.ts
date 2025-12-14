@@ -4,7 +4,6 @@ import fs from 'fs'
 import path from 'path'
 import { assert, beforeAll, describe, test } from 'vitest'
 import { OHPKM } from '../OHPKM'
-import { OhpkmV1 } from '../OhpkmV1'
 import { initializeWasm } from './init'
 
 beforeAll(initializeWasm)
@@ -55,94 +54,6 @@ describe('gen 3 conversion to OHPKM V2 and back is lossless', async () => {
   }
 })
 
-describe('OHPKM V1 → V2 → V1 is lossless', () => {
-  const files = fs
-    .readdirSync(path.join(__dirname, 'PKMFiles', 'OhpkmV1'))
-    .filter((f) => f.endsWith('.ohpkm'))
-
-  for (const file of files) {
-    test(file, () => {
-      const bytes = new Uint8Array(
-        fs.readFileSync(path.join(__dirname, 'PKMFiles', 'OhpkmV1', file))
-      )
-
-      const original = bytesToPKM(bytes, 'OhpkmV1') as OhpkmV1
-      original.fixErrors()
-
-      const v2 = new OHPKM(original)
-      const roundTrip = new OhpkmV1(v2)
-
-      const expected = new Uint8Array(original.toBytes())
-      const actual = new Uint8Array(roundTrip.toBytes())
-
-      zeroOutRanges(expected, actual, [AbsoluteWeightHeight, UnknownBytesRange, HandlerMemory])
-
-      if (!expected.every((v, i) => v === actual[i])) {
-        throw new Error(diffSpans(expected, actual))
-      }
-    })
-  }
-})
-
-describe('OHPKM V1 WASM → V2 → V1 is lossless', async () => {
-  await initializeWasm()
-
-  const files = fs
-    .readdirSync(path.join(__dirname, 'PKMFiles', 'OhpkmV1'))
-    .filter((f) => f.endsWith('.ohpkm'))
-
-  for (const file of files) {
-    const bytes = new Uint8Array(fs.readFileSync(path.join(__dirname, 'PKMFiles', 'OhpkmV1', file)))
-    const original = bytesToPKM(bytes, 'OhpkmV1') as OhpkmV1
-    original.fixErrors()
-
-    const v2FromV1Wasm = OHPKM.fromV1Wasm(original)
-    const v2FromJs = new OHPKM(original)
-
-    test(`pids match - ${file}`, () => {
-      if (v2FromV1Wasm.personalityValue !== v2FromJs.personalityValue) {
-        throw new Error(
-          `PID mismatch: wasm=${v2FromV1Wasm.personalityValue} js=${v2FromJs.personalityValue}`
-        )
-      }
-    })
-
-    const bytesPerSectionWasm = v2FromV1Wasm.getSectionBytes() as Record<string, Uint8Array>
-    const bytesPerSectionJs = v2FromJs.getSectionBytes() as Record<string, Uint8Array>
-
-    for (const tag of Object.keys(bytesPerSectionJs) as Array<keyof typeof bytesPerSectionJs>) {
-      const wasmBytes = bytesPerSectionWasm[tag]
-      const jsBytes = bytesPerSectionJs[tag]
-
-      if (!wasmBytes) {
-        throw new Error(`Section ${tag} missing from WASM version`)
-      }
-
-      if (wasmBytes.length !== jsBytes.length) {
-        throw new Error(
-          `Section ${tag} length mismatch: WASM=${wasmBytes.length} JS=${jsBytes.length}`
-        )
-      }
-
-      zeroOutRanges(jsBytes, wasmBytes, [AbsoluteWeightHeight, UnknownBytesRange, HandlerMemory])
-
-      test(`${tag} bytes match - ${file}`, () => {
-        if (!jsBytes.every((v, i) => v === wasmBytes[i])) {
-          throw new Error(
-            diffSpans(
-              wasmBytes,
-              jsBytes,
-              10,
-              'OHPKM.ts -> fromV1Wasm() -> from_v1_bytes  ',
-              'OHPKM.ts -> new OhpkmV2()                  '
-            )
-          )
-        }
-      })
-    }
-  }
-})
-
 function diffSpans(
   a: Uint8Array,
   b: Uint8Array,
@@ -188,16 +99,4 @@ function diffSpans(
   }
 
   return out.trim()
-}
-const AbsoluteWeightHeight: [number, number] = [0xac, 0xb3]
-const UnknownBytesRange: [number, number] = [0x97, 0x97]
-const HandlerMemory: [number, number] = [0xd9, 0xdd]
-
-function zeroOutRanges(a: Uint8Array, b: Uint8Array, ignoreRanges: Array<[number, number]>) {
-  for (const [start, end] of ignoreRanges) {
-    for (let i = start; i <= end; i++) {
-      if (i < a.length) a[i] = 0
-      if (i < b.length) b[i] = 0
-    }
-  }
 }

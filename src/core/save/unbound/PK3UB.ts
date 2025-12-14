@@ -1,5 +1,5 @@
+import { PluginPKMInterface } from '@openhome-core/pkm/interfaces'
 import { ItemUnbound } from '@pkm-rs/pkg'
-import { PluginPKMInterface } from 'src/types/interfaces'
 import PK3CFRU, { CFRUToNationalDexEntry } from '../cfru/PK3CFRU'
 
 import { fromGen3CFRUMoveIndex, toGen3CFRUMoveIndex } from '../cfru/conversion/Gen3CFRUMovesIndex'
@@ -12,7 +12,7 @@ import { NationalDexToUnboundMap, UnboundToNationalDexMap } from './conversion/U
 // ]
 const FAKEMON_INDEXES: number[] = []
 
-export class PK3UB extends PK3CFRU implements PluginPKMInterface {
+export default class PK3UB extends PK3CFRU implements PluginPKMInterface {
   format: 'PK3UB' = 'PK3UB'
   pluginIdentifier: string = 'unbound'
 
@@ -58,5 +58,3 @@ export class PK3UB extends PK3CFRU implements PluginPKMInterface {
     return 'unbound'
   }
 }
-
-export default PK3UB

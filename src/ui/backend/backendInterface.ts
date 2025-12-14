@@ -1,10 +1,10 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { PathData, PossibleSaves } from '@openhome-core/save/util/path'
+import { SaveFolder, StoredBankData } from '@openhome-core/save/util/storage'
 import { Settings } from '@openhome-ui/state/appInfo'
 import { PluginMetadataWithIcon } from '@openhome-ui/util/Plugin'
-import { Pokedex, PokedexUpdate } from 'src/types/pokedex'
-import { SaveFolder, StoredBankData } from 'src/types/storage'
 import { Errorable, LoadSaveResponse, LookupMap, SaveRef } from 'src/types/types'
+import { Pokedex, PokedexUpdate } from 'src/ui/util/pokedex'
 
 export type AppState = {
   open_transaction: boolean

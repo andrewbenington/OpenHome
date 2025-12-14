@@ -1,6 +1,6 @@
 import { closestCenter } from '@dnd-kit/collision'
 import { useDroppable } from '@dnd-kit/react'
-import { MonLocation } from '@openhome-ui/state/saves/reducer'
+import { MonLocation } from '@openhome-ui/state/saves'
 import { CSSProperties, ReactNode, useEffect, useRef } from 'react'
 
 const getBackgroundDetails = (disabled?: boolean) => {

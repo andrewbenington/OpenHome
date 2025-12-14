@@ -4,7 +4,7 @@ import { MetadataLookup, SpeciesAndForme } from '@pkm-rs/pkg'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { Flex } from '@radix-ui/themes'
 import { Responsive } from '@radix-ui/themes/props'
-import { Pokedex } from 'src/types/pokedex'
+import { Pokedex } from 'src/ui/util/pokedex'
 import TooltipPokemonIcon from './TooltipPokemonIcon'
 import { getFormeStatus } from './util'
 

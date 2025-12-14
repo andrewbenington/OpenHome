@@ -1,7 +1,8 @@
+import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { OhpkmV1 } from '@openhome-core/pkm/OhpkmV1'
-import { PK3RR } from '@openhome-core/save/radicalred/PK3RR'
-import { PK3UB } from '@openhome-core/save/unbound/PK3UB'
+import PK3RR from '@openhome-core/save/radicalred/PK3RR'
+import PK3UB from '@openhome-core/save/unbound/PK3UB'
+import { AnyPkmClass, SavePkmClass } from '@openhome-core/save/util'
 import {
   COLOPKM,
   PA8,
@@ -18,8 +19,6 @@ import {
   PK9,
   XDPKM,
 } from '@pokemon-files/pkm'
-import { AnyPkmClass, SavePkmClass } from 'src/core/save/util'
-import { PKMInterface } from 'src/types/interfaces'
 
 function fileTypeFromBytes(bytes: Uint8Array): SavePkmClass | undefined {
   switch (bytes.length) {
@@ -77,8 +76,6 @@ export function fileTypeFromString(type: string): AnyPkmClass | undefined {
       return PB8
     case 'PK9':
       return PK9
-    case 'OhpkmV1':
-      return OhpkmV1
     case 'OhpkmV2':
       return OHPKM
     default:

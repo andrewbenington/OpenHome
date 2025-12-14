@@ -1,11 +1,11 @@
+import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { AddBoxLocation, HomeData } from '@openhome-core/save/HomeData'
 import { Box, SAV } from '@openhome-core/save/interfaces'
+import { OpenHomeBox } from '@openhome-core/save/util/storage'
 import { Item } from '@pkm-rs/pkg'
 import { MarkingsSixShapesWithColor } from '@pokemon-files/util'
 import { useContext } from 'react'
-import { PKMInterface } from 'src/types/interfaces'
-import { OpenHomeBox } from 'src/types/storage'
 import { useOhpkmStore } from '../ohpkm/useOhpkmStore'
 import { MonLocation, MonWithLocation, OpenSavesState, SavesContext } from './reducer'
 

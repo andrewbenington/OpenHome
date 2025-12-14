@@ -1,3 +1,4 @@
+import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { intersection, unique } from '@openhome-core/util/functional'
 import {
   AbilityIndex,
@@ -32,7 +33,6 @@ import * as jsTypes from '@pokemon-files/util/types'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { Gen34ContestRibbons, Gen34TowerRibbons, ModernRibbons } from '@pokemon-resources/index'
 import Prando from 'prando'
-import { PKMInterface } from 'src/types/interfaces'
 import { OhpkmV2 as OhpkmV2Wasm } from '../../../pkm_rs/pkg'
 import { SAV } from '../save/interfaces'
 import {
@@ -55,7 +55,6 @@ import {
   trainerMemoryToWasm,
 } from './convert'
 import { getHomeIdentifier, isEvolution } from './Lookup'
-import { OhpkmV1 } from './OhpkmV1'
 import { adjustMovePPBetweenFormats, generateIVs, getAbilityFromNumber, ivsFromDVs } from './util'
 
 export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
@@ -334,11 +333,6 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
 
   static fromBytes(buffer: ArrayBuffer): OHPKM {
     return new OHPKM(new Uint8Array(buffer))
-  }
-
-  static fromV1Wasm(v1: OhpkmV1) {
-    const v2 = OhpkmV2Wasm.fromV1Bytes(new Uint8Array(v1.toBytes()))
-    return new OHPKM(v2.toByteArray())
   }
 
   // getters / setters

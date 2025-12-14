@@ -1,5 +1,5 @@
 import { FormeMetadata, SpeciesMetadata } from '@pkm-rs/pkg'
-import { Pokedex, PokedexStatus } from 'src/types/pokedex'
+import { Pokedex, PokedexStatus } from 'src/ui/util/pokedex'
 
 export function getHighestFormeStatus(
   pokedex: Pokedex,

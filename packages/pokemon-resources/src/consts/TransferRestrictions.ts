@@ -1,5 +1,3 @@
-import { NationalDex } from '@pokemon-resources/consts/NationalDex'
-import { range } from 'lodash'
 import {
   CapPikachus,
   Gen89RegionalForms,
@@ -8,7 +6,9 @@ import {
   PaldeanForms,
   RegionalForms,
   TransferRestrictions,
-} from 'src/core/save/util/TransferRestrictions'
+} from '@openhome-core/save/util/TransferRestrictions'
+import { NationalDex } from '@pokemon-resources/consts/NationalDex'
+import { range } from 'lodash'
 import {
   BLOOD_MOON,
   COMPLETE,

@@ -1,10 +1,10 @@
 import { PossibleSaves } from '@openhome-core/save/util/path'
+import { StoredBankData } from '@openhome-core/save/util/storage'
 import { PluginMetadataWithIcon } from '@openhome-ui/util/Plugin'
 import { invoke } from '@tauri-apps/api/core'
 import * as E from 'fp-ts/lib/Either'
-import { Pokedex, PokedexUpdate } from 'src/types/pokedex'
-import { StoredBankData } from 'src/types/storage'
 import { Errorable, JSONArray, JSONObject, JSONValue, LookupMap, SaveRef } from 'src/types/types'
+import { Pokedex, PokedexUpdate } from 'src/ui/util/pokedex'
 import { AppState, ImageResponse, StoredLookups } from '../backendInterface'
 import { RustResult } from './types'
 

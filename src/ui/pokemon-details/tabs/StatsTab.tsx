@@ -1,3 +1,4 @@
+import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
 import SheenStars from '@openhome-ui/components/pokemon/SheenStars'
 import { Stats } from '@pkm-rs/pkg'
@@ -19,7 +20,6 @@ import {
 } from 'chart.js'
 import { useEffect, useMemo, useState } from 'react'
 import { Radar } from 'react-chartjs-2'
-import { PKMInterface } from 'src/types/interfaces'
 import { Styles } from 'src/types/types'
 const styles = {
   container: {

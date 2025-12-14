@@ -1,11 +1,5 @@
-import {
-  bytesToUint32LittleEndian,
-  getFlag,
-  uint16ToBytesLittleEndian,
-  writeUint32ToBuffer,
-} from '@openhome-core/save/util/byteLogic'
-import { AbilityIndex, MetadataLookup, SpeciesAndForme, SpeciesLookup } from '@pkm-rs/pkg'
-import { PKM } from '@pokemon-files/pkm'
+import { PKMInterface } from '@openhome-core/pkm/interfaces'
+import { AbilityIndex, MetadataLookup, SpeciesAndForme } from '@pkm-rs/pkg'
 import { Stats, StatsPreSplit } from '@pokemon-files/util'
 import { Item } from '@pokemon-resources/consts/Items'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
@@ -21,28 +15,6 @@ import {
   Type,
 } from '@pokemon-resources/index'
 import Prando from 'prando'
-import { PKMInterface } from 'src/types/interfaces'
-import { OHPKM } from './OHPKM'
-
-export const writeIVsToBuffer = (
-  ivs: Stats,
-  buffer: Uint8Array,
-  offset: number,
-  isEgg: boolean,
-  isNicknamed: boolean
-) => {
-  let ivsValue = 0
-
-  ivsValue = (ivsValue + (isNicknamed ? 1 : 0)) << 1
-  ivsValue = (ivsValue + (isEgg ? 1 : 0)) << 5
-  ivsValue = (ivsValue + (ivs.spd & 0x1f)) << 5
-  ivsValue = (ivsValue + (ivs.spa & 0x1f)) << 5
-  ivsValue = (ivsValue + (ivs.spe & 0x1f)) << 5
-  ivsValue = (ivsValue + (ivs.def & 0x1f)) << 5
-  ivsValue = (ivsValue + (ivs.atk & 0x1f)) << 5
-  ivsValue += ivs.hp & 0x1f
-  writeUint32ToBuffer(ivsValue, buffer, offset)
-}
 
 export const getAbilityFromNumber = (
   dexNum: number,
@@ -50,25 +22,6 @@ export const getAbilityFromNumber = (
   abilityNum: number
 ): AbilityIndex | undefined => {
   return MetadataLookup(dexNum, formeNum)?.abilityByNum(abilityNum)
-}
-
-export const generateTeraType = (prng: Prando, dexNum: number, formeNum: number) => {
-  const formeMetadata = SpeciesAndForme.tryNew(dexNum, formeNum)
-  if (!formeMetadata) {
-    return 0
-  }
-  const baseMon = getBaseMon(dexNum, formeNum)
-
-  const baseMonMetadata = baseMon?.getMetadata()
-  if (!baseMonMetadata) {
-    return 0
-  }
-
-  if (prng.nextInt(0, 1) === 1 && baseMonMetadata.type2Index) {
-    return baseMonMetadata.type2Index
-  }
-
-  return baseMonMetadata.type1Index
 }
 
 export const ivsFromDVs = (dvs: StatsPreSplit) => {
@@ -79,30 +32,6 @@ export const ivsFromDVs = (dvs: StatsPreSplit) => {
     spa: dvs.spc * 2 + 1,
     spd: dvs.spc * 2 + 1,
     spe: dvs.spe * 2 + 1,
-  }
-}
-
-const gvFromIV = (iv: number) => {
-  if (iv < 20) {
-    return 0
-  }
-  if (iv < 26) {
-    return 1
-  }
-  if (iv < 31) {
-    return 2
-  }
-  return 3
-}
-
-export const gvsFromIVs = (ivs: Stats) => {
-  return {
-    hp: gvFromIV(ivs.hp),
-    atk: gvFromIV(ivs.atk),
-    def: gvFromIV(ivs.def),
-    spa: gvFromIV(ivs.spa),
-    spd: gvFromIV(ivs.spd),
-    spe: gvFromIV(ivs.spe),
   }
 }
 
@@ -193,13 +122,6 @@ export const getBaseMon = (dexNum: number, forme?: number) => {
   }
 
   return mon
-}
-
-export const formatHasColorMarkings = (format: string) => {
-  return (
-    (format.charAt(0) === 'p' && ['7', '8', '9'].includes(format.charAt(format.length - 1))) ||
-    format === 'OHPKM'
-  )
 }
 
 export const getTypes = (mon: PKMInterface): Type[] => {
@@ -308,14 +230,6 @@ export const adjustMovePPBetweenFormats = (
   }) as [number, number, number, number]
 }
 
-export const getSixDigitTID = (tid: number, sid: number) => {
-  const bytes = new Uint8Array(4)
-
-  bytes.set(uint16ToBytesLittleEndian(tid), 0)
-  bytes.set(uint16ToBytesLittleEndian(sid), 2)
-  return bytesToUint32LittleEndian(bytes, 0x0c) % 1000000
-}
-
 export function getCharacteristic(mon: PKMInterface) {
   const preGen6 = mon.encryptionConstant === undefined
   const tiebreaker = preGen6 ? mon.personalityValue : mon.encryptionConstant
@@ -353,22 +267,6 @@ export function getCharacteristic(mon: PKMInterface) {
     default:
       return SpeedCharacteristics[maxIV % 5]
   }
-}
-
-// function getPLAMoveMasteredFlag(mon: PA8 | OHPKM, index: number) {
-//   return getFlag(mon.masterFlagsLA, 0, index);
-// }
-
-export function getFlagsInRange(bytes: Uint8Array, offset: number, size: number) {
-  const flags: number[] = []
-
-  for (let i = 0; i < size * 8; i++) {
-    if (getFlag(bytes, offset, i)) {
-      flags.push(i)
-    }
-  }
-
-  return flags
 }
 
 const hpTypes: Type[] = [
@@ -434,19 +332,6 @@ export function getHiddenPowerPower(ivs: Stats): number {
   return Math.floor(numerator / 63) + 30
 }
 
-export type PKMFile = PKM | OHPKM
-
-export function shinyLeafValues(shinyLeafNumber: number) {
-  return {
-    first: Boolean(shinyLeafNumber & 1),
-    second: Boolean(shinyLeafNumber & 2),
-    third: Boolean(shinyLeafNumber & 4),
-    fourth: Boolean(shinyLeafNumber & 8),
-    fifth: Boolean(shinyLeafNumber & 16),
-    crown: Boolean(shinyLeafNumber & 32),
-  }
-}
-
 export function isMegaStone(itemIndex?: number): boolean {
   return (
     itemIndex !== undefined &&
@@ -481,10 +366,4 @@ export function displayIndexAdder(itemIndex?: number) {
     return (x: number) => x + 3
   }
   return (x: number) => x + 1
-}
-
-export function hasMega(nationalDex: number) {
-  const formes = SpeciesLookup(nationalDex)?.formes ?? []
-
-  return formes.some((forme) => forme.isMega)
 }

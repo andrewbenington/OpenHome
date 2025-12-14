@@ -1,5 +1,5 @@
+import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { DevDataDisplay } from '@openhome-ui/components/DevDataDisplay'
-import { InfoGrid } from '@openhome-ui/components/InfoGrid2'
 import { useAppState } from '@openhome-ui/state/app-state'
 import { AppInfoContext, AppInfoState } from '@openhome-ui/state/appInfo'
 import { ErrorContext } from '@openhome-ui/state/error'
@@ -8,7 +8,7 @@ import { OpenSavesState, useSaves } from '@openhome-ui/state/saves'
 import { Item, OriginGames, SpeciesLookup } from '@pkm-rs/pkg'
 import { Card, Flex, Heading, Separator } from '@radix-ui/themes'
 import { useContext } from 'react'
-import { PKMInterface } from 'src/types/interfaces'
+import { InfoGrid } from 'src/ui/components/InfoGrid'
 
 export default function AppStateDisplay() {
   const appState = useAppState()

@@ -1,3 +1,4 @@
+import { PKMInterface, PluginPKMInterface } from '@openhome-core/pkm/interfaces'
 import {
   Ball,
   Language,
@@ -27,7 +28,6 @@ import {
   writeGen3StringToBytes,
   writeStatsToBytesU8,
 } from '@pokemon-files/util'
-import { PKMInterface, PluginPKMInterface } from 'src/types/interfaces'
 
 export interface CFRUToNationalDexEntry {
   NationalDexIndex: number

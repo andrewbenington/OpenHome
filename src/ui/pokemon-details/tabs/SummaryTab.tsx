@@ -1,3 +1,4 @@
+import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { getTypes } from '@openhome-core/pkm/util'
 import AttributeRow from '@openhome-ui/components/AttributeRow'
 import AttributeTag from '@openhome-ui/components/AttributeTag'
@@ -12,7 +13,6 @@ import { genderFromBool, MetadataLookup } from '@pkm-rs/pkg'
 import { getDisplayID } from '@pokemon-files/util'
 import { Badge, Flex, Grid, Spinner, Tooltip } from '@radix-ui/themes'
 import { useMemo } from 'react'
-import { PKMInterface } from 'src/types/interfaces'
 import { Styles } from 'src/types/types'
 import useMonSprite from '../useMonSprite'
 

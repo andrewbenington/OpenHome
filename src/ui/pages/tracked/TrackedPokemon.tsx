@@ -1,7 +1,7 @@
+import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import SideTabs from '@openhome-ui/components/side-tabs/SideTabs'
 import PokemonDetailsModal from '@openhome-ui/pokemon-details/Modal'
 import { useState } from 'react'
-import { PKMInterface } from 'src/types/interfaces'
 import Gen12Lookup from './Gen12Lookup'
 import Gen345Lookup from './Gen345Lookup'
 import OpenHomeMonList from './OpenHomeMonList'

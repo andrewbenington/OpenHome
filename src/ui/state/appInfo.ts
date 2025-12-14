@@ -16,10 +16,10 @@ import { G3RRSAV } from '@openhome-core/save/radicalred/G3RRSAV'
 import { SMSAV } from '@openhome-core/save/SMSAV'
 import { G3UBSAV } from '@openhome-core/save/unbound/G3UBSAV'
 import { USUMSAV } from '@openhome-core/save/USUMSAV'
+import { SAVClass } from '@openhome-core/save/util'
 import { XYSAV } from '@openhome-core/save/XYSAV'
 import { SaveViewMode } from '@openhome-ui/saves/util'
 import { Dispatch, Reducer, createContext } from 'react'
-import { SAVClass } from 'src/core/save/util'
 
 const OFFICIAL_SAVE_TYPES = [
   G1SAV,

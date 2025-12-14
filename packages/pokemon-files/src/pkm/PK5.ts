@@ -25,7 +25,7 @@ import {
   generatePersonalityValuePreservingAttributes,
 } from '../util/util'
 
-export class PK5 {
+export default class PK5 {
   static getName() {
     return 'PK5'
   }
@@ -416,5 +416,3 @@ export class PK5 {
     return []
   }
 }
-
-export default PK5

@@ -1,17 +1,17 @@
 import { getHomeIdentifier, getMonFileIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { TransferRestrictions } from '@openhome-core/save/util/TransferRestrictions'
-import { range } from '@openhome-core/util/functional'
-import { filterUndefined, numericSorter } from '@openhome-core/util/sort'
-import { OhpkmLookup } from '@openhome-ui/state/ohpkm'
-import { MonLocation } from '@openhome-ui/state/saves/reducer'
 import {
   BoxMonIdentifiers,
   getBankName,
   OpenHomeBank,
   OpenHomeBox,
   StoredBankData,
-} from 'src/types/storage'
+} from '@openhome-core/save/util/storage'
+import { TransferRestrictions } from '@openhome-core/save/util/TransferRestrictions'
+import { range } from '@openhome-core/util/functional'
+import { filterUndefined, numericSorter } from '@openhome-core/util/sort'
+import { OhpkmLookup } from '@openhome-ui/state/ohpkm'
+import { MonLocation } from '@openhome-ui/state/saves/reducer'
 import { Err, Errorable, Ok } from 'src/types/types'
 import { v4 as UuidV4 } from 'uuid'
 import { Box } from './interfaces'
