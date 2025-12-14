@@ -7,11 +7,11 @@ import {
   uint16ToBytesBigEndian,
   uint16ToBytesLittleEndian,
   uint32ToBytesLittleEndian,
-} from '@openhome/core/save/util/byteLogic'
+} from '@openhome-core/save/util/byteLogic'
 import {
   utf16BytesToString,
   utf16StringToBytes,
-} from '@openhome/core/save/util/Strings/StringConverter'
+} from '@openhome-core/save/util/Strings/StringConverter'
 import {
   AbilityIndex,
   Ball,

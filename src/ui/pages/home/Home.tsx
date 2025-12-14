@@ -1,4 +1,4 @@
-import { OHPKM } from '@openhome/core/pkm/OHPKM'
+import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { BackendContext } from '@openhome/ui/backend/backendContext'
 import PokemonIcon from '@openhome/ui/components/PokemonIcon'
 import useDisplayError from '@openhome/ui/hooks/displayError'

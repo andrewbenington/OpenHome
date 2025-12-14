@@ -1,7 +1,7 @@
-import { getMonFileIdentifier } from '@openhome/core/pkm/Lookup'
-import { OHPKM } from '@openhome/core/pkm/OHPKM'
-import { SortTypes } from '@openhome/core/pkm/sort'
-import { range } from '@openhome/core/util/functional'
+import { getMonFileIdentifier } from '@openhome-core/pkm/Lookup'
+import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { SortTypes } from '@openhome-core/pkm/sort'
+import { range } from '@openhome-core/util/functional'
 import OpenHomeCtxMenu from '@openhome/ui/components/context-menu/OpenHomeCtxMenu'
 import { ItemBuilder, SubmenuBuilder } from '@openhome/ui/components/context-menu/types'
 import {

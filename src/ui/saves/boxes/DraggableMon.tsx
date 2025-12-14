@@ -1,5 +1,5 @@
 import { useDraggable } from '@dnd-kit/react'
-import { displayIndexAdder, isBattleFormeItem, isMegaStone } from '@openhome/core/pkm/util'
+import { displayIndexAdder, isBattleFormeItem, isMegaStone } from '@openhome-core/pkm/util'
 import PokemonIcon from '@openhome/ui/components/PokemonIcon'
 import { DragMonContext } from '@openhome/ui/state/dragMon'
 import { MonWithLocation } from '@openhome/ui/state/saves/reducer'

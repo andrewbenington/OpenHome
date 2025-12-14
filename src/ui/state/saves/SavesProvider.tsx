@@ -2,10 +2,10 @@ import {
   getMonFileIdentifier,
   getMonGen12Identifier,
   getMonGen345Identifier,
-} from '@openhome/core/pkm/Lookup'
-import { OHPKM } from '@openhome/core/pkm/OHPKM'
-import { HomeData } from '@openhome/core/save/HomeData'
-import { filterUndefined } from '@openhome/core/util/sort'
+} from '@openhome-core/pkm/Lookup'
+import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { HomeData } from '@openhome-core/save/HomeData'
+import { filterUndefined } from '@openhome-core/util/sort'
 import { BackendContext } from '@openhome/ui/backend/backendContext'
 import { ErrorIcon } from '@openhome/ui/components/Icons'
 import LoadingIndicator from '@openhome/ui/components/LoadingIndicator'

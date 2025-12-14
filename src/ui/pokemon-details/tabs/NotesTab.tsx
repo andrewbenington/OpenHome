@@ -1,4 +1,4 @@
-import { OHPKM } from '@openhome/core/pkm/OHPKM'
+import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { useSaves } from '@openhome/ui/state/saves/useSaves'
 import { TextArea } from '@radix-ui/themes'
 import { useEffect, useState } from 'react'

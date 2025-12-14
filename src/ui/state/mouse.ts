@@ -1,4 +1,4 @@
-import { SAV } from '@openhome/core/save/interfaces'
+import { SAV } from '@openhome-core/save/interfaces'
 import { Dispatch, Reducer, createContext } from 'react'
 import { PKMInterface } from 'src/types/interfaces'
 

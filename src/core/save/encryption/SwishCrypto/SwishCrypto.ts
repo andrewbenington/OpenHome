@@ -1,4 +1,4 @@
-import { sha256Digest } from '@openhome/core/save/encryption/Encryption'
+import { sha256Digest } from '@openhome-core/save/encryption/Encryption'
 import { buildSCBlock, SCBlock, writeSCBlock } from './SCBlock'
 
 const SIZE_HASH = 0x20

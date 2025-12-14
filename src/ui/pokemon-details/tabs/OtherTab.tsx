@@ -2,14 +2,14 @@ import {
   getMonFileIdentifier,
   getMonGen12Identifier,
   getMonGen345Identifier,
-} from '@openhome/core/pkm/Lookup'
-import { OHPKM } from '@openhome/core/pkm/OHPKM'
+} from '@openhome-core/pkm/Lookup'
+import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import {
   getHiddenPowerGen2,
   getHiddenPowerPower,
   getHiddenPowerType,
-} from '@openhome/core/pkm/util'
-import { isRestricted } from '@openhome/core/save/util/TransferRestrictions'
+} from '@openhome-core/pkm/util'
+import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
 import AttributeRow from '@openhome/ui/components/AttributeRow'
 import AttributeRowExpand from '@openhome/ui/components/AttributeRowExpand'
 import DynamaxLevel from '@openhome/ui/components/pokemon/DynamaxLevel'

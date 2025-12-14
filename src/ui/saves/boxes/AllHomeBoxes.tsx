@@ -13,10 +13,10 @@ import {
   useSortable,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { SortTypes } from '@openhome/core/pkm/sort'
-import { HomeBox, HomeData } from '@openhome/core/save/HomeData'
-import { range } from '@openhome/core/util/functional'
-import { filterUndefined } from '@openhome/core/util/sort'
+import { SortTypes } from '@openhome-core/pkm/sort'
+import { HomeBox, HomeData } from '@openhome-core/save/HomeData'
+import { range } from '@openhome-core/util/functional'
+import { filterUndefined } from '@openhome-core/util/sort'
 import OpenHomeCtxMenu from '@openhome/ui/components/context-menu/OpenHomeCtxMenu'
 import {
   CtxMenuElementBuilder,

@@ -1,9 +1,9 @@
-import { OHPKM } from '@openhome/core/pkm/OHPKM'
-import { bytesToUint16BigEndian, get8BitChecksum } from '@openhome/core/save/util/byteLogic'
+import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { bytesToUint16BigEndian, get8BitChecksum } from '@openhome-core/save/util/byteLogic'
 import {
   gen12StringToUTF,
   utf16StringToGen12,
-} from '@openhome/core/save/util/Strings/StringConverter'
+} from '@openhome-core/save/util/Strings/StringConverter'
 import { Gender, ItemGen1, Language, OriginGame } from '@pkm-rs/pkg'
 import * as conversion from '@pokemon-files/conversion'
 import { PK1 } from '@pokemon-files/pkm'

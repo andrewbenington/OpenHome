@@ -1,4 +1,4 @@
-import { displayIndexAdder, isBattleFormeItem, isMegaStone } from '@openhome/core/pkm/util'
+import { displayIndexAdder, isBattleFormeItem, isMegaStone } from '@openhome-core/pkm/util'
 import { BackendContext } from '@openhome/ui/backend/backendContext'
 import useDisplayError from '@openhome/ui/hooks/displayError'
 import { getPublicImageURL } from '@openhome/ui/images/images'

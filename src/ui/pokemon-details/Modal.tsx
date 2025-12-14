@@ -1,5 +1,5 @@
-import { fileTypeFromString } from '@openhome/core/pkm/FileImport'
-import { OHPKM } from '@openhome/core/pkm/OHPKM'
+import { fileTypeFromString } from '@openhome-core/pkm/FileImport'
+import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { BackendContext } from '@openhome/ui/backend/backendContext'
 import Fallback from '@openhome/ui/components/Fallback'
 import FileTypeSelect from '@openhome/ui/components/FileTypeSelect'

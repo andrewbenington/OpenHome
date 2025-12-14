@@ -1,4 +1,4 @@
-import { OHPKM } from '@openhome/core/pkm/OHPKM'
+import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { Ball, OriginGame } from '@pkm-rs/pkg'
 import { PK4 } from '@pokemon-files/pkm'
 import { readFileSync } from 'fs'

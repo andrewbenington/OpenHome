@@ -1,5 +1,5 @@
-import { PathData, splitPath } from '@openhome/core/save/util/path'
-import { filterUndefined, numericSorter, stringSorter } from '@openhome/core/util/sort'
+import { PathData, splitPath } from '@openhome-core/save/util/path'
+import { filterUndefined, numericSorter, stringSorter } from '@openhome-core/util/sort'
 import { BackendContext } from '@openhome/ui/backend/backendContext'
 import OpenHomeCtxMenu from '@openhome/ui/components/context-menu/OpenHomeCtxMenu'
 import { ErrorIcon } from '@openhome/ui/components/Icons'

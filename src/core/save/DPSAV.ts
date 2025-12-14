@@ -1,9 +1,9 @@
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
-} from '@openhome/core/save/util/byteLogic'
-import { gen4StringToUTF } from '@openhome/core/save/util/Strings/StringConverter'
-import { isRestricted } from '@openhome/core/save/util/TransferRestrictions'
+} from '@openhome-core/save/util/byteLogic'
+import { gen4StringToUTF } from '@openhome-core/save/util/Strings/StringConverter'
+import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
 import { Gender, OriginGame } from '@pkm-rs/pkg'
 import { PK4 } from '@pokemon-files/pkm'
 import { Item } from '@pokemon-resources/consts/Items'

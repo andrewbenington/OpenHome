@@ -1,5 +1,5 @@
 import { DragDropProvider, DragOverlay, PointerSensor } from '@dnd-kit/react'
-import { OHPKM } from '@openhome/core/pkm/OHPKM'
+import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import PokemonIcon from '@openhome/ui/components/PokemonIcon'
 import { getPublicImageURL } from '@openhome/ui/images/images'
 import { getItemIconPath } from '@openhome/ui/images/items'

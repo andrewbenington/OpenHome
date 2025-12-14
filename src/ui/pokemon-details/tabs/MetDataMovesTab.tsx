@@ -1,5 +1,5 @@
-import { OHPKM } from '@openhome/core/pkm/OHPKM'
-import { getCharacteristic, getMoveMaxPP } from '@openhome/core/pkm/util'
+import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { getCharacteristic, getMoveMaxPP } from '@openhome-core/pkm/util'
 import Markings from '@openhome/ui/components/pokemon/Markings'
 import MoveCard from '@openhome/ui/components/pokemon/MoveCard'
 import { getPublicImageURL } from '@openhome/ui/images/images'

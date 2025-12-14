@@ -1,4 +1,4 @@
-import { bytesToPKM } from '@openhome/core/pkm/FileImport'
+import { bytesToPKM } from '@openhome-core/pkm/FileImport'
 import { PK3 } from '@pokemon-files/pkm'
 import fs from 'fs'
 import path from 'path'

@@ -1,4 +1,4 @@
-import { getTypes } from '@openhome/core/pkm/util'
+import { getTypes } from '@openhome-core/pkm/util'
 import AttributeRow from '@openhome/ui/components/AttributeRow'
 import AttributeTag from '@openhome/ui/components/AttributeTag'
 import { ErrorIcon } from '@openhome/ui/components/Icons'

@@ -1,5 +1,5 @@
-import { OHPKM } from '@openhome/core/pkm/OHPKM'
-import { isRestricted } from '@openhome/core/save/util/TransferRestrictions'
+import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
 import { Gender, OriginGame } from '@pkm-rs/pkg'
 import { PB8 } from '@pokemon-files/pkm'
 import { utf16BytesToString } from '@pokemon-files/util'

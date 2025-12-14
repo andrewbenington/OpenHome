@@ -1,10 +1,10 @@
-import { OHPKM } from '@openhome/core/pkm/OHPKM'
+import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
   uint16ToBytesLittleEndian,
   uint32ToBytesLittleEndian,
-} from '@openhome/core/save/util/byteLogic'
+} from '@openhome-core/save/util/byteLogic'
 import { Gender, OriginGame } from '@pkm-rs/pkg'
 import { PluginPKMInterface } from 'src/types/interfaces'
 import { Box, BoxCoordinates, PluginSAV } from '../interfaces'

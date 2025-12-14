@@ -1,5 +1,5 @@
-import { OHPKM } from '@openhome/core/pkm/OHPKM'
-import { OhpkmV1 } from '@openhome/core/pkm/OhpkmV1'
+import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { OhpkmV1 } from '@openhome-core/pkm/OhpkmV1'
 import { OriginGame } from '@pkm-rs/pkg'
 import { PKMInterface } from 'src/types/interfaces'
 import { SAV } from '../interfaces'

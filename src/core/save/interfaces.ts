@@ -1,4 +1,4 @@
-import { OHPKM } from '@openhome/core/pkm/OHPKM'
+import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { Gender, getPluginColor, OriginGame, OriginGames } from '@pkm-rs/pkg'
 import { PKMInterface } from 'src/types/interfaces'
 import { SaveRef } from 'src/types/types'

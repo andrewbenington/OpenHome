@@ -1,5 +1,5 @@
-import { bytesToPKM } from '@openhome/core/pkm/FileImport'
-import { OHPKM } from '@openhome/core/pkm/OHPKM'
+import { bytesToPKM } from '@openhome-core/pkm/FileImport'
+import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { PK2 } from '@pokemon-files/pkm'
 import * as E from 'fp-ts/lib/Either'
 import fs from 'fs'

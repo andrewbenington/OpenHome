@@ -1,5 +1,5 @@
-import { Option } from '@openhome/core/util/functional'
-import { filterUndefined } from '@openhome/core/util/sort'
+import { Option } from '@openhome-core/util/functional'
+import { filterUndefined } from '@openhome-core/util/sort'
 import { Inset, ContextMenu as RadixCtxMenu } from '@radix-ui/themes'
 import { ReactNode } from 'react'
 import './context-menu.css'

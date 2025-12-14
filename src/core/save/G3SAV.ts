@@ -1,11 +1,11 @@
-import { OHPKM } from '@openhome/core/pkm/OHPKM'
+import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
   uint16ToBytesLittleEndian,
   uint32ToBytesLittleEndian,
-} from '@openhome/core/save/util/byteLogic'
-import { gen3StringToUTF } from '@openhome/core/save/util/Strings/StringConverter'
+} from '@openhome-core/save/util/byteLogic'
+import { gen3StringToUTF } from '@openhome-core/save/util/Strings/StringConverter'
 import { Gender, ItemGen3, OriginGame } from '@pkm-rs/pkg'
 import { PK3 } from '@pokemon-files/pkm'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'

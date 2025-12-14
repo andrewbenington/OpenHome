@@ -1,5 +1,5 @@
-import { getSortFunction, SortType, SortTypes } from '@openhome/core/pkm/sort'
-import { filterUndefined } from '@openhome/core/util/sort'
+import { getSortFunction, SortType, SortTypes } from '@openhome-core/pkm/sort'
+import { filterUndefined } from '@openhome-core/util/sort'
 import Autocomplete from '@openhome/ui/components/Autocomplete'
 import PokemonIcon from '@openhome/ui/components/PokemonIcon'
 import PokemonDetailsModal from '@openhome/ui/pokemon-details//Modal'

@@ -1,4 +1,4 @@
-import { Option } from '@openhome/core/util/functional'
+import { Option } from '@openhome-core/util/functional'
 import { ReactNode } from 'react'
 
 export type Element = Item | Separator | Label | Submenu

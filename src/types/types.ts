@@ -1,4 +1,4 @@
-import { PathData } from '@openhome/core/save/util/path'
+import { PathData } from '@openhome-core/save/util/path'
 import { Gender, OriginGame } from '@pkm-rs/pkg'
 import { Either, left, right } from 'fp-ts/Either'
 import { CSSProperties } from 'react'

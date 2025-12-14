@@ -1,4 +1,4 @@
-import { OHPKM } from '@openhome/core/pkm/OHPKM'
+import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { OriginGame } from '@pkm-rs/pkg'
 import { PA8, PB8, PK8, PK9 } from '@pokemon-files/pkm'
 import { AllPKMFields } from '@pokemon-files/util'

@@ -1,5 +1,5 @@
-import { OHPKM } from '@openhome/core/pkm/OHPKM'
-import { displayIndexAdder, isBattleFormeItem } from '@openhome/core/pkm/util'
+import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { displayIndexAdder, isBattleFormeItem } from '@openhome-core/pkm/util'
 import { BackendContext } from '@openhome/ui/backend/backendContext'
 import { ErrorIcon } from '@openhome/ui/components/Icons'
 import LoadingIndicator from '@openhome/ui/components/LoadingIndicator'

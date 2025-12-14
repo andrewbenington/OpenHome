@@ -3,7 +3,7 @@ import {
   getFlag,
   uint16ToBytesLittleEndian,
   writeUint32ToBuffer,
-} from '@openhome/core/save/util/byteLogic'
+} from '@openhome-core/save/util/byteLogic'
 import { AbilityIndex, MetadataLookup, SpeciesAndForme, SpeciesLookup } from '@pkm-rs/pkg'
 import { PKM } from '@pokemon-files/pkm'
 import { Stats, StatsPreSplit } from '@pokemon-files/util'

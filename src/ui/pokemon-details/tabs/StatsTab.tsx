@@ -1,4 +1,4 @@
-import { isRestricted } from '@openhome/core/save/util/TransferRestrictions'
+import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
 import SheenStars from '@openhome/ui/components/pokemon/SheenStars'
 import { Stats } from '@pkm-rs/pkg'
 import {

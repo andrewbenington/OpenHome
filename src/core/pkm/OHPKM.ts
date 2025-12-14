@@ -1,4 +1,4 @@
-import { intersection, unique } from '@openhome/core/util/functional'
+import { intersection, unique } from '@openhome-core/util/functional'
 import {
   AbilityIndex,
   Ball,

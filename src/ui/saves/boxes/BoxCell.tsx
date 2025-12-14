@@ -1,6 +1,6 @@
 import { useDroppable } from '@dnd-kit/react'
-import { bytesToPKM } from '@openhome/core/pkm/FileImport'
-import { displayIndexAdder, isBattleFormeItem } from '@openhome/core/pkm/util'
+import { bytesToPKM } from '@openhome-core/pkm/FileImport'
+import { displayIndexAdder, isBattleFormeItem } from '@openhome-core/pkm/util'
 import { BackendContext } from '@openhome/ui/backend/backendContext'
 import OpenHomeCtxMenu from '@openhome/ui/components/context-menu/OpenHomeCtxMenu'
 import {

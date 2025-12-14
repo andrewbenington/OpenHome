@@ -1,4 +1,4 @@
-import { OHPKM } from '@openhome/core/pkm/OHPKM'
+import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SpeciesLookup } from '@pkm-rs/pkg'
 import { fail } from 'assert'
 import { existsSync, readFileSync, writeFileSync } from 'fs'

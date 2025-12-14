@@ -1,4 +1,4 @@
-import { OHPKM } from '@openhome/core/pkm/OHPKM'
+import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { OriginGames } from '@pkm-rs/pkg'
 import { Card, Flex } from '@radix-ui/themes'
 

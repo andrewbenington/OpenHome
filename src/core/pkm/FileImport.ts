@@ -1,7 +1,7 @@
-import { OHPKM } from '@openhome/core/pkm/OHPKM'
-import { OhpkmV1 } from '@openhome/core/pkm/OhpkmV1'
-import { PK3RR } from '@openhome/core/save/radicalred/PK3RR'
-import { PK3UB } from '@openhome/core/save/unbound/PK3UB'
+import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { OhpkmV1 } from '@openhome-core/pkm/OhpkmV1'
+import { PK3RR } from '@openhome-core/save/radicalred/PK3RR'
+import { PK3UB } from '@openhome-core/save/unbound/PK3UB'
 import {
   COLOPKM,
   PA8,

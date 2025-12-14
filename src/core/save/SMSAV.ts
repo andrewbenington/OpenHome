@@ -1,4 +1,4 @@
-import { isRestricted } from '@openhome/core/save/util/TransferRestrictions'
+import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
 import { OriginGame } from '@pkm-rs/pkg'
 import { Item } from '@pokemon-resources/consts/Items'
 import { SM_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'

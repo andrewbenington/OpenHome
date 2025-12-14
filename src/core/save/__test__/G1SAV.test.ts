@@ -1,5 +1,5 @@
-import { bytesToPKM } from '@openhome/core/pkm/FileImport'
-import { OHPKM } from '@openhome/core/pkm/OHPKM'
+import { bytesToPKM } from '@openhome-core/pkm/FileImport'
+import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { PK1 } from '@pokemon-files/pkm'
 import assert, { fail } from 'assert'
 import * as E from 'fp-ts/lib/Either'

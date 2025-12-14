@@ -1,5 +1,5 @@
-import { OHPKM } from '@openhome/core/pkm/OHPKM'
-import { PathData, PossibleSaves } from '@openhome/core/save/util/path'
+import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { PathData, PossibleSaves } from '@openhome-core/save/util/path'
 import BackendInterface, {
   BankOrBoxChange,
   StoredLookups,

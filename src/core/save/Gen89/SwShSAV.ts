@@ -1,4 +1,4 @@
-import { isRestricted } from '@openhome/core/save/util/TransferRestrictions'
+import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
 import { Gender, Languages, OriginGame, SpeciesLookup } from '@pkm-rs/pkg'
 import { PK8 } from '@pokemon-files/pkm'
 import { utf16BytesToString } from '@pokemon-files/util'

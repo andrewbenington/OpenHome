@@ -1,4 +1,4 @@
-import { filterUndefined } from '@openhome/core/util/sort'
+import { filterUndefined } from '@openhome-core/util/sort'
 import { AppInfoContext } from '@openhome/ui/state/appInfo'
 import { uniq } from 'lodash'
 import { useContext, useMemo } from 'react'

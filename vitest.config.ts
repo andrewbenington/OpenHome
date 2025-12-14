@@ -10,8 +10,8 @@ export default defineConfig({
   resolve: {
     alias: {
       src: fileURLToPath(new URL('./src', import.meta.url)),
-      '@openhome/core': fileURLToPath(new URL('./src/core', import.meta.url)),
-      '@openhome/ui': fileURLToPath(new URL('./src/ui', import.meta.url)),
+      '@openhome-core': fileURLToPath(new URL('./src/core', import.meta.url)),
+      '@openhome-ui': fileURLToPath(new URL('./src/ui', import.meta.url)),
       '@pokemon-files': fileURLToPath(new URL('./packages/pokemon-files/src', import.meta.url)),
       '@pokemon-resources': fileURLToPath(
         new URL('./packages/pokemon-resources/src', import.meta.url)

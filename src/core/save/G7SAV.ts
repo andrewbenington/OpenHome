@@ -1,11 +1,11 @@
-import { OHPKM } from '@openhome/core/pkm/OHPKM'
-import { CRC16_Invert, SignWithMemeCrypto } from '@openhome/core/save/encryption/Encryption'
+import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { CRC16_Invert, SignWithMemeCrypto } from '@openhome-core/save/encryption/Encryption'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
   uint16ToBytesLittleEndian,
-} from '@openhome/core/save/util/byteLogic'
-import { utf16BytesToString } from '@openhome/core/save/util/Strings/StringConverter'
+} from '@openhome-core/save/util/byteLogic'
+import { utf16BytesToString } from '@openhome-core/save/util/Strings/StringConverter'
 import { Gender, OriginGame } from '@pkm-rs/pkg'
 import { PK7 } from '@pokemon-files/pkm'
 import { Box, BoxCoordinates, OfficialSAV } from './interfaces'

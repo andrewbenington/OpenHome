@@ -1,4 +1,4 @@
-import { OHPKM } from '@openhome/core/pkm/OHPKM'
+import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import * as E from 'fp-ts/lib/Either'
 import { useContext } from 'react'
 import { Errorable } from 'src/types/types'

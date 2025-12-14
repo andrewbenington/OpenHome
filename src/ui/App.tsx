@@ -1,4 +1,4 @@
-import { partitionResults } from '@openhome/core/util/functional'
+import { partitionResults } from '@openhome-core/util/functional'
 import { BackendContext } from '@openhome/ui/backend/backendContext'
 import BackendInterface from '@openhome/ui/backend/backendInterface'
 import { BackendProvider } from '@openhome/ui/backend/backendProvider'
