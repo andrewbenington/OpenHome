@@ -1,5 +1,5 @@
-import { DragMonContext } from '@openhome/ui/state/dragMon'
-import { useItems } from '@openhome/ui/state/items/useItems'
+import { DragMonContext } from '@openhome-ui/state/dragMon'
+import { useItems } from '@openhome-ui/state/items/useItems'
 import { Item } from '@pkm-rs/pkg'
 import { Flex, Grid } from '@radix-ui/themes'
 import { useContext } from 'react'

@@ -1,5 +1,5 @@
-import { BackendContext } from '@openhome/ui/backend/backendContext'
-import { StoredLookups } from '@openhome/ui/backend/backendInterface'
+import { BackendContext } from '@openhome-ui/backend/backendContext'
+import { StoredLookups } from '@openhome-ui/backend/backendInterface'
 import { useCallback, useContext, useEffect, useState } from 'react'
 
 import * as E from 'fp-ts/lib/Either'

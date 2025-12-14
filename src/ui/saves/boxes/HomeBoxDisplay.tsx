@@ -2,8 +2,8 @@ import { getMonFileIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SortTypes } from '@openhome-core/pkm/sort'
 import { range } from '@openhome-core/util/functional'
-import OpenHomeCtxMenu from '@openhome/ui/components/context-menu/OpenHomeCtxMenu'
-import { ItemBuilder, SubmenuBuilder } from '@openhome/ui/components/context-menu/types'
+import OpenHomeCtxMenu from '@openhome-ui/components/context-menu/OpenHomeCtxMenu'
+import { ItemBuilder, SubmenuBuilder } from '@openhome-ui/components/context-menu/types'
 import {
   AddIcon,
   DevIcon,
@@ -11,15 +11,15 @@ import {
   MenuIcon,
   MoveIcon,
   RemoveIcon,
-} from '@openhome/ui/components/Icons'
-import ToggleButton from '@openhome/ui/components/ToggleButton'
-import useIsDev from '@openhome/ui/hooks/isDev'
-import PokemonDetailsModal from '@openhome/ui/pokemon-details/Modal'
-import { DragMonContext } from '@openhome/ui/state/dragMon'
-import { ErrorContext } from '@openhome/ui/state/error'
-import { useOhpkmStore } from '@openhome/ui/state/ohpkm/useOhpkmStore'
-import { MonLocation, MonWithLocation } from '@openhome/ui/state/saves/reducer'
-import { useSaves } from '@openhome/ui/state/saves/useSaves'
+} from '@openhome-ui/components/Icons'
+import ToggleButton from '@openhome-ui/components/ToggleButton'
+import useIsDev from '@openhome-ui/hooks/isDev'
+import PokemonDetailsModal from '@openhome-ui/pokemon-details/Modal'
+import { DragMonContext } from '@openhome-ui/state/dragMon'
+import { ErrorContext } from '@openhome-ui/state/error'
+import { useOhpkmStore } from '@openhome-ui/state/ohpkm/useOhpkmStore'
+import { MonLocation, MonWithLocation } from '@openhome-ui/state/saves/reducer'
+import { useSaves } from '@openhome-ui/state/saves/useSaves'
 import {
   Button,
   Card,

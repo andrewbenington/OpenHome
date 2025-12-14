@@ -1,4 +1,4 @@
-import useIsDev from '@openhome/ui/hooks/isDev'
+import useIsDev from '@openhome-ui/hooks/isDev'
 import { Box, Tabs, ThemePanel } from '@radix-ui/themes'
 import AppStateDisplay from './pages/AppStateDisplay'
 import Home from './pages/home/Home'

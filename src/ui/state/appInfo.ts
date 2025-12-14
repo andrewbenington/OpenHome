@@ -17,7 +17,7 @@ import { SMSAV } from '@openhome-core/save/SMSAV'
 import { G3UBSAV } from '@openhome-core/save/unbound/G3UBSAV'
 import { USUMSAV } from '@openhome-core/save/USUMSAV'
 import { XYSAV } from '@openhome-core/save/XYSAV'
-import { SaveViewMode } from '@openhome/ui/saves/util'
+import { SaveViewMode } from '@openhome-ui/saves/util'
 import { Dispatch, Reducer, createContext } from 'react'
 import { SAVClass } from 'src/core/save/util'
 

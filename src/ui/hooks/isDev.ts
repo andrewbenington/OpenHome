@@ -1,4 +1,4 @@
-import { BackendContext } from '@openhome/ui/backend/backendContext'
+import { BackendContext } from '@openhome-ui/backend/backendContext'
 import * as E from 'fp-ts/lib/Either'
 import { useContext, useEffect, useState } from 'react'
 

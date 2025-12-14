@@ -1,5 +1,5 @@
-import { ErrorIcon } from '@openhome/ui/components/Icons'
-import { ErrorContext } from '@openhome/ui/state/error'
+import { ErrorIcon } from '@openhome-ui/components/Icons'
+import { ErrorContext } from '@openhome-ui/state/error'
 import { Callout, Dialog, Separator } from '@radix-ui/themes'
 import { useContext } from 'react'
 

@@ -1,5 +1,5 @@
-import { ErrorIcon } from '@openhome/ui/components/Icons'
-import LoadingIndicator from '@openhome/ui/components/LoadingIndicator'
+import { ErrorIcon } from '@openhome-ui/components/Icons'
+import LoadingIndicator from '@openhome-ui/components/LoadingIndicator'
 import { Callout, Flex } from '@radix-ui/themes'
 import { ReactNode } from 'react'
 import { AppStateContext, usePossiblyLoadedAppState } from './appState'

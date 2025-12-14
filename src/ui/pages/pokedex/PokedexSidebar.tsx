@@ -1,5 +1,5 @@
-import PokemonIcon from '@openhome/ui/components/PokemonIcon'
-import { getPublicImageURL } from '@openhome/ui/images/images'
+import PokemonIcon from '@openhome-ui/components/PokemonIcon'
+import { getPublicImageURL } from '@openhome-ui/images/images'
 import { all_species_data, FormeMetadata, SpeciesMetadata } from '@pkm-rs/pkg'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { CSSProperties, useEffect, useMemo, useRef } from 'react'

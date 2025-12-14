@@ -1,7 +1,7 @@
-import { getPublicImageURL } from '@openhome/ui/images/images'
-import { BallsImageList, getItemIconPath } from '@openhome/ui/images/items'
-import { getRibbonSpritePath } from '@openhome/ui/images/ribbons'
-import { FilterContext } from '@openhome/ui/state/filter'
+import { getPublicImageURL } from '@openhome-ui/images/images'
+import { BallsImageList, getItemIconPath } from '@openhome-ui/images/items'
+import { getRibbonSpritePath } from '@openhome-ui/images/ribbons'
+import { FilterContext } from '@openhome-ui/state/filter'
 import {
   all_species_data,
   Gender,

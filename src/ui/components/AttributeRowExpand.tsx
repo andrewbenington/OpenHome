@@ -1,4 +1,4 @@
-import { ExpandArrowIcon } from '@openhome/ui/components/Icons'
+import { ExpandArrowIcon } from '@openhome-ui/components/Icons'
 import { Flex } from '@radix-ui/themes'
 import { ReactNode, useMemo, useState } from 'react'
 import AttributeRow from './AttributeRow'

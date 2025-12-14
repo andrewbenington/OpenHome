@@ -1,4 +1,4 @@
-import { getPublicImageURL } from '@openhome/ui/images/images'
+import { getPublicImageURL } from '@openhome-ui/images/images'
 import { COLOPKM, PK3, XDPKM } from '@pokemon-files/pkm'
 import lodash from 'lodash'
 import { PKMInterface } from 'src/types/interfaces'

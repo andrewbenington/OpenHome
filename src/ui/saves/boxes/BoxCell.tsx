@@ -1,20 +1,20 @@
 import { useDroppable } from '@dnd-kit/react'
 import { bytesToPKM } from '@openhome-core/pkm/FileImport'
 import { displayIndexAdder, isBattleFormeItem } from '@openhome-core/pkm/util'
-import { BackendContext } from '@openhome/ui/backend/backendContext'
-import OpenHomeCtxMenu from '@openhome/ui/components/context-menu/OpenHomeCtxMenu'
+import { BackendContext } from '@openhome-ui/backend/backendContext'
+import OpenHomeCtxMenu from '@openhome-ui/components/context-menu/OpenHomeCtxMenu'
 import {
   CtxMenuElementBuilder,
   ItemBuilder,
   LabelBuilder,
   SeparatorBuilder,
-} from '@openhome/ui/components/context-menu/types'
-import PokemonIcon from '@openhome/ui/components/PokemonIcon'
-import useDisplayError from '@openhome/ui/hooks/displayError'
-import { FilterContext } from '@openhome/ui/state/filter'
-import { useItems } from '@openhome/ui/state/items/useItems'
-import { MonLocation } from '@openhome/ui/state/saves/reducer'
-import { useSaves } from '@openhome/ui/state/saves/useSaves'
+} from '@openhome-ui/components/context-menu/types'
+import PokemonIcon from '@openhome-ui/components/PokemonIcon'
+import useDisplayError from '@openhome-ui/hooks/displayError'
+import { FilterContext } from '@openhome-ui/state/filter'
+import { useItems } from '@openhome-ui/state/items/useItems'
+import { MonLocation } from '@openhome-ui/state/saves/reducer'
+import { useSaves } from '@openhome-ui/state/saves/useSaves'
 import { useContext, useMemo } from 'react'
 import { filterApplies } from 'src/types/Filter'
 import { PKMInterface } from 'src/types/interfaces'

@@ -1,4 +1,4 @@
-import PokemonIcon, { PokemonIconProps } from '@openhome/ui/components/PokemonIcon'
+import PokemonIcon, { PokemonIconProps } from '@openhome-ui/components/PokemonIcon'
 import { MetadataLookup } from '@pkm-rs/pkg'
 import { Tooltip } from '@radix-ui/themes'
 

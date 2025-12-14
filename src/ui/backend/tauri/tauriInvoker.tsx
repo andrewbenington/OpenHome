@@ -1,5 +1,5 @@
 import { PossibleSaves } from '@openhome-core/save/util/path'
-import { PluginMetadataWithIcon } from '@openhome/ui/util/Plugin'
+import { PluginMetadataWithIcon } from '@openhome-ui/util/Plugin'
 import { invoke } from '@tauri-apps/api/core'
 import * as E from 'fp-ts/lib/Either'
 import { Pokedex, PokedexUpdate } from 'src/types/pokedex'

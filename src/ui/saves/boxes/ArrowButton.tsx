@@ -1,4 +1,4 @@
-import { ArrowLeftIcon, ArrowRightIcon } from '@openhome/ui/components/Icons'
+import { ArrowLeftIcon, ArrowRightIcon } from '@openhome-ui/components/Icons'
 import { Button } from '@radix-ui/themes'
 import { CSSProperties, useCallback, useEffect, useRef, useState } from 'react'
 import '../style.css'

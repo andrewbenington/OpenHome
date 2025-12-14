@@ -1,5 +1,5 @@
-import TypeIcon from '@openhome/ui/components/pokemon/TypeIcon'
-import { colorForType } from '@openhome/ui/util/color'
+import TypeIcon from '@openhome-ui/components/pokemon/TypeIcon'
+import { colorForType } from '@openhome-ui/util/color'
 import { Moves, Type } from '@pokemon-resources/index'
 import { useMemo } from 'react'
 import './style.css'

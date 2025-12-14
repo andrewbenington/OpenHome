@@ -1,5 +1,5 @@
-import { getPublicImageURL } from '@openhome/ui/images/images'
-import { getRibbonSpritePath } from '@openhome/ui/images/ribbons'
+import { getPublicImageURL } from '@openhome-ui/images/images'
+import { getRibbonSpritePath } from '@openhome-ui/images/ribbons'
 import { Gen9Ribbons } from '@pokemon-resources/consts/Ribbons'
 import { Tooltip } from '@radix-ui/themes'
 import { PKMInterface } from 'src/types/interfaces'

@@ -3,8 +3,8 @@ import { PathData, PossibleSaves } from '@openhome-core/save/util/path'
 import BackendInterface, {
   BankOrBoxChange,
   StoredLookups,
-} from '@openhome/ui/backend/backendInterface'
-import { defaultSettings, Settings } from '@openhome/ui/state/appInfo'
+} from '@openhome-ui/backend/backendInterface'
+import { defaultSettings, Settings } from '@openhome-ui/state/appInfo'
 import { path } from '@tauri-apps/api'
 import { Event, listen, UnlistenFn } from '@tauri-apps/api/event'
 import { getCurrentWindow } from '@tauri-apps/api/window'

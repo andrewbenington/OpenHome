@@ -1,4 +1,4 @@
-import useIsDarkMode from '@openhome/ui/hooks/dark-mode'
+import useIsDarkMode from '@openhome-ui/hooks/dark-mode'
 import { FormeMetadata } from '@pkm-rs/pkg'
 import { Table, Text } from '@radix-ui/themes'
 import {

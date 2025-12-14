@@ -1,5 +1,5 @@
-import { BackendContext } from '@openhome/ui/backend/backendContext'
-import { AppInfoContext } from '@openhome/ui/state/appInfo'
+import { BackendContext } from '@openhome-ui/backend/backendContext'
+import { AppInfoContext } from '@openhome-ui/state/appInfo'
 import { Card, RadioGroup } from '@radix-ui/themes'
 import { useContext, useEffect } from 'react'
 

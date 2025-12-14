@@ -1,4 +1,4 @@
-import { getPublicImageURL } from '@openhome/ui/images/images'
+import { getPublicImageURL } from '@openhome-ui/images/images'
 import { ShinyLeaves } from '@pkm-rs/pkg'
 
 interface ShinyLeafIconProps {

@@ -3,8 +3,8 @@ import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { TransferRestrictions } from '@openhome-core/save/util/TransferRestrictions'
 import { range } from '@openhome-core/util/functional'
 import { filterUndefined, numericSorter } from '@openhome-core/util/sort'
-import { OhpkmLookup } from '@openhome/ui/state/ohpkm/useOhpkmStore'
-import { MonLocation } from '@openhome/ui/state/saves/reducer'
+import { OhpkmLookup } from '@openhome-ui/state/ohpkm/useOhpkmStore'
+import { MonLocation } from '@openhome-ui/state/saves/reducer'
 import {
   BoxMonIdentifiers,
   getBankName,

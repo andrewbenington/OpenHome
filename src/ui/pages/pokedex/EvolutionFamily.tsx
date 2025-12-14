@@ -1,5 +1,5 @@
 import { getBaseMon } from '@openhome-core/pkm/util'
-import { ArrowLeftIcon, ArrowLeftRightIcon, ArrowRightIcon } from '@openhome/ui/components/Icons'
+import { ArrowLeftIcon, ArrowLeftRightIcon, ArrowRightIcon } from '@openhome-ui/components/Icons'
 import { MetadataLookup, SpeciesAndForme } from '@pkm-rs/pkg'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { Flex } from '@radix-ui/themes'
