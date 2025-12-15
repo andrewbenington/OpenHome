@@ -1,5 +1,5 @@
+import { Type } from '@openhome-core/util/types'
 import '@pkm-rs/pkg'
-import { Type } from './types/types'
 
 declare module '@pkm-rs/pkg' {
   type FormeMetadata = {

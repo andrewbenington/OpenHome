@@ -30,7 +30,7 @@ function validDPLocation(index: number): boolean {
   return index >= 0x0070 && index < 2000
 }
 
-export class PK4 {
+export default class PK4 {
   static getName() {
     return 'PK4'
   }
@@ -480,5 +480,3 @@ export class PK4 {
     return []
   }
 }
-
-export default PK4

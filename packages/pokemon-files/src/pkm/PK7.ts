@@ -20,7 +20,7 @@ import * as stringLogic from '../util/stringConversion'
 import * as types from '../util/types'
 import { adjustMovePPBetweenFormats } from '../util/util'
 
-export class PK7 {
+export default class PK7 {
   static getName() {
     return 'PK7'
   }
@@ -521,5 +521,3 @@ export class PK7 {
     return []
   }
 }
-
-export default PK7

@@ -1,0 +1,77 @@
+import { PKMInterface } from '@openhome-core/pkm/interfaces'
+import { range } from '@openhome-core/util/functional'
+import { getPublicImageURL } from '@openhome-ui/images/images'
+import { COLOPKM, PK3, XDPKM } from '@pokemon-files/pkm'
+
+interface SheenStarsProps {
+  mon: PKMInterface
+}
+
+const getSheenStars = (mon: PKMInterface) => {
+  if (!mon.contest) {
+    return 0
+  }
+  if (mon instanceof PK3 || mon instanceof COLOPKM || mon instanceof XDPKM) {
+    return mon.contest.sheen === 255 ? 10 : Math.floor(mon.contest.sheen / 29) + 1
+  }
+  if (mon.contest.sheen < 22) {
+    return 0
+  }
+  if (mon.contest.sheen < 43) {
+    return 1
+  }
+  if (mon.contest.sheen < 64) {
+    return 2
+  }
+  if (mon.contest.sheen < 86) {
+    return 3
+  }
+  if (mon.contest.sheen < 107) {
+    return 4
+  }
+  if (mon.contest.sheen < 128) {
+    return 5
+  }
+  if (mon.contest.sheen < 150) {
+    return 6
+  }
+  if (mon.contest.sheen < 171) {
+    return 7
+  }
+  if (mon.contest.sheen < 192) {
+    return 8
+  }
+  if (mon.contest.sheen < 214) {
+    return 9
+  }
+  if (mon.contest.sheen < 235) {
+    return 10
+  }
+  if (mon.contest.sheen < 255) {
+    return 11
+  }
+  return 12
+}
+
+export default function SheenStars({ mon }: SheenStarsProps) {
+  return (
+    <div className="sheen-container">
+      <div>Sheen:</div>
+      <div className="sheen-star-row" style={{ width: isGen3(mon) ? 300 : 360 }}>
+        {range(getSheenStars(mon)).map((level: number) => (
+          <img
+            className="sheen-star"
+            key={`sheen_star_${level}`}
+            alt={`sheen star ${level}`}
+            src={getPublicImageURL('icons/Sheen.gif')}
+          />
+        ))}
+      </div>
+      <div>({mon.contest?.sheen ?? '--'})</div>
+    </div>
+  )
+}
+
+function isGen3(mon: PKMInterface) {
+  return mon instanceof PK3 || mon instanceof COLOPKM || mon instanceof XDPKM
+}

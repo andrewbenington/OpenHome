@@ -1,7 +1,6 @@
 export * from './byteLogic'
 export * from './gen4ToUTFMap'
 export * from './interfaces'
-export * from './levelUpExp'
 export * from './pkmInterface'
 export * from './ribbonLogic'
 export * from './statCalc'

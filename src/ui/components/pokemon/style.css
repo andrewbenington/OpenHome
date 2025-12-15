@@ -1,0 +1,77 @@
+.type-icon-border {
+  border-radius: 16px;
+}
+
+.gender-icon {
+  border-radius: 50%;
+  display: grid;
+  align-items: center;
+  position: relative;
+
+  p {
+    font-weight: bold;
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    font-size: 1rem;
+    margin: 0;
+  }
+}
+
+.markings-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  padding: 5px;
+  background-color: #666;
+  margin-top: 10px;
+  border-radius: 5px;
+}
+
+.marking-shape {
+  user-select: none;
+  cursor: default;
+}
+
+.crown-icon {
+  height: 20px;
+  image-rendering: pixelated;
+  filter: drop-shadow(1px 1px grey);
+}
+
+.leaf-icon-full {
+  margin-right: -7px;
+  height: 20px;
+  width: 20px;
+  image-rendering: pixelated;
+  filter: drop-shadow(1px 1px grey);
+}
+
+.leaf-icon-empty {
+  margin-right: -7px;
+  height: 20px;
+  width: 20px;
+  image-rendering: pixelated;
+  filter: grayscale(100%) drop-shadow(1px 1px grey);
+  opacity: 0.8;
+}
+
+.sheen-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.sheen-star-row {
+  background-color: #666;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.sheen-star {
+  height: 30px;
+  object-fit: contain;
+}

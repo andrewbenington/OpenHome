@@ -11,7 +11,6 @@ import {
   SpeciesLookup,
 } from '@pkm-rs/pkg'
 import { ModernRibbons } from '@pokemon-resources/index'
-import { getHeightCalculated, getWeightCalculated } from '../../../../src/types/pkm/util'
 import * as byteLogic from '../util/byteLogic'
 import * as encryption from '../util/encryption'
 import { AllPKMFields } from '../util/pkmInterface'
@@ -19,9 +18,9 @@ import { filterRibbons } from '../util/ribbonLogic'
 import { getStats } from '../util/statCalc'
 import * as stringLogic from '../util/stringConversion'
 import * as types from '../util/types'
-import { adjustMovePPBetweenFormats } from '../util/util'
+import { adjustMovePPBetweenFormats, getHeightCalculated, getWeightCalculated } from '../util/util'
 
-export class PA8 {
+export default class PA8 {
   static getName() {
     return 'PA8'
   }
@@ -567,5 +566,3 @@ const LA_VALID_MOVES = [
   555, 556, 577, 583, 584, 585, 595, 605, 608, 667, 670, 710, 796, 827, 828, 829, 830, 831, 832,
   833, 834, 835, 836, 837, 838, 839, 840, 841, 842, 843, 844, 845, 846, 847, 848, 849, 850,
 ]
-
-export default PA8

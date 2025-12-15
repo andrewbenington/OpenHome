@@ -1,5 +1,5 @@
+import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { Gen3ContestRibbons, Gen3StandardRibbons } from '@pokemon-resources/other'
-import { NationalDex } from 'src/consts/NationalDex'
 
 import {
   Ball,
@@ -28,7 +28,7 @@ import {
   getGen3MiscFlags,
 } from '../util/util'
 
-export class PK3 {
+export default class PK3 {
   static getName() {
     return 'PK3'
   }
@@ -391,5 +391,3 @@ export class PK3 {
     return []
   }
 }
-
-export default PK3

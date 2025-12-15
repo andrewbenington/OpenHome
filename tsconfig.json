@@ -24,6 +24,12 @@
       "util/*": [
         "./util/*"
       ],
+      "@openhome-ui/*": [
+        "./src/ui/*"
+      ],
+      "@openhome-core/*": [
+        "./src/core/*"
+      ],
       "@pokemon-files/*": [
         "./packages/pokemon-files/src/*"
       ],

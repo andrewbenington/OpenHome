@@ -184,36 +184,33 @@ export interface Geolocation {
   country: number
 }
 
-export type marking = 0 | 1 | 2
+export type MarkingShapePreGen6 = 'circle' | 'square' | 'triangle' | 'heart'
+export type MarkingShape = MarkingShapePreGen6 | 'star' | 'diamond'
 
-export type MarkingsFourShapes = {
-  circle: boolean
-  square: boolean
-  triangle: boolean
-  heart: boolean
-}
-
-export type MarkingsSixShapesNoColor = {
-  circle: boolean
-  triangle: boolean
-  square: boolean
-  heart: boolean
-  star: boolean
-  diamond: boolean
-}
+export type MarkingsFourShapes = Record<MarkingShapePreGen6, boolean>
+export type MarkingsSixShapesNoColor = Record<MarkingShape, boolean>
 
 export type MarkingColorValue = null | 'blue' | 'red'
-
-export type MarkingsSixShapesWithColor = {
-  circle: MarkingColorValue
-  triangle: MarkingColorValue
-  square: MarkingColorValue
-  heart: MarkingColorValue
-  star: MarkingColorValue
-  diamond: MarkingColorValue
-}
+export type MarkingsSixShapesWithColor = Record<MarkingShape, MarkingColorValue>
 
 export type Markings = MarkingsFourShapes | MarkingsSixShapesNoColor | MarkingsSixShapesWithColor
+
+export function markingDisplay(marking: MarkingShape) {
+  switch (marking) {
+    case 'circle':
+      return '●'
+    case 'square':
+      return '■'
+    case 'triangle':
+      return '▲'
+    case 'heart':
+      return '♥'
+    case 'star':
+      return '★'
+    case 'diamond':
+      return '◆'
+  }
+}
 
 export function markingsHaveColor(markings: Markings): markings is MarkingsSixShapesWithColor {
   return typeof markings.circle !== 'boolean'

@@ -68,7 +68,7 @@ const unshuffleBlockOrders = [
   [3, 2, 1, 0],
 ]
 
-export const unshuffleBlocks = (
+const unshuffleBlocks = (
   bytes: ArrayBuffer,
   shiftValue: number,
   blockSize: number,
@@ -100,7 +100,7 @@ export const unshuffleBlocks = (
   return unshuffledBytes.buffer
 }
 
-export const shuffleBlocks = (
+const shuffleBlocks = (
   bytes: ArrayBuffer,
   shiftValue: number,
   blockSize: number,
@@ -256,7 +256,7 @@ export const decryptByteArrayGen67 = (bytes: ArrayBuffer) => {
   return decryptByteArray(bytes, encryptionConstant, GEN67_BLOCK_SIZE)
 }
 
-export function cryptPKM(bytes: ArrayBuffer, boxSize: number) {
+function cryptPKM(bytes: ArrayBuffer, boxSize: number) {
   const encryptionConstant = new DataView(bytes).getUint32(0x00, true)
   const boxData = bytes.slice(ENCRYPTION_OFFSET, boxSize)
   const partyData = bytes.slice(boxSize)
