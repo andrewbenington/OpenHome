@@ -1,7 +1,7 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
+import { range } from '@openhome-core/util/functional'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { COLOPKM, PK3, XDPKM } from '@pokemon-files/pkm'
-import lodash from 'lodash'
 
 interface SheenStarsProps {
   mon: PKMInterface
@@ -58,7 +58,7 @@ export default function SheenStars({ mon }: SheenStarsProps) {
     <div className="sheen-container">
       <div>Sheen:</div>
       <div className="sheen-star-row" style={{ width: isGen3(mon) ? 300 : 360 }}>
-        {lodash.range(getSheenStars(mon)).map((level: number) => (
+        {range(getSheenStars(mon)).map((level: number) => (
           <img
             className="sheen-star"
             key={`sheen_star_${level}`}

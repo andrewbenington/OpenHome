@@ -7,8 +7,8 @@ import {
   RegionalForms,
   TransferRestrictions,
 } from '@openhome-core/save/util/TransferRestrictions'
+import { range } from '@openhome-core/util/functional'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
-import { range } from 'lodash'
 import {
   BLOOD_MOON,
   COMPLETE,

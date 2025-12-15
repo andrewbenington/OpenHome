@@ -16,9 +16,9 @@ import { useSaves } from '@openhome-ui/state/saves'
 import { PokedexUpdate } from '@openhome-ui/util/pokedex'
 import { Button, Dialog, Flex, Separator, Slider, VisuallyHidden } from '@radix-ui/themes'
 import * as E from 'fp-ts/lib/Either'
-import { debounce } from 'lodash'
 import { useCallback, useContext, useState } from 'react'
 import 'react-data-grid/lib/styles.css'
+import useDebounce from '../hooks/useDebounce'
 import RecentSaves from './RecentSaves'
 import SaveFolders from './SaveFolders'
 import SuggestedSaves from './SuggestedSaves'
@@ -34,13 +34,6 @@ type AmbiguousOpenState = {
   filePath: PathData
   fileBytes: Uint8Array
 }
-
-const debouncedUpdateCardSize = debounce(
-  (size: number, dispatch: React.Dispatch<AppInfoAction>) => {
-    dispatch({ type: 'set_icon_size', payload: size })
-  },
-  500
-)
 
 function useOpenSaveHandler(onClose?: () => void) {
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
@@ -153,6 +146,12 @@ const SavesModal = (props: SavesModalProps) => {
   // these are kept as a local state to reduce lag
   const [cardSize, setCardSize] = useState(settings.saveCardSize)
   const [viewMode, setViewMode] = useState<SaveViewMode>(settings.saveViewMode)
+  const debouncedUpdateCardSize = useDebounce(
+    (size: number, dispatch: React.Dispatch<AppInfoAction>) => {
+      dispatch({ type: 'set_icon_size', payload: size })
+    },
+    500
+  )
 
   return (
     <Dialog.Root open={open} onOpenChange={(open) => !open && onClose?.()}>

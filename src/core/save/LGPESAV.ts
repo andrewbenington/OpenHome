@@ -7,7 +7,6 @@ import { LGE_STARTER, LGP_STARTER } from '@pokemon-resources/consts/Formes'
 import { Item } from '@pokemon-resources/consts/Items'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { LGPE_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
-import { ceil, min } from 'lodash'
 import { CRC16_NoInvert } from './encryption/Encryption'
 import { Box, BoxCoordinates, OfficialSAV, SlotMetadata } from './interfaces'
 import { bytesToUint16LittleEndian, bytesToUint32LittleEndian } from './util/byteLogic'
@@ -17,7 +16,7 @@ const PC_OFFSET = 0x5c00
 const PC_CHECKSUM_OFFSET = 0xb8662
 const PC_SIZE = 0x3f7a0
 const BOX_SLOTS_TOTAL = 1000
-const BOX_COUNT = ceil(BOX_SLOTS_TOTAL / 30)
+const BOX_COUNT = Math.ceil(BOX_SLOTS_TOTAL / 30)
 
 const SAVE_SIZE_BYTES = 0x100000
 const MON_BYTE_SIZE = 260
@@ -95,7 +94,7 @@ export class LGPESAV extends OfficialSAV<PB7> {
 
     this.boxes = Array(BOX_COUNT)
     for (let box = 0; box < BOX_COUNT; box++) {
-      const boxName = `Box Slots ${box * 30} - ${min([(box + 1) * 30 - 1, BOX_SLOTS_TOTAL])}`
+      const boxName = `Box Slots ${box * 30} - ${Math.min((box + 1) * 30 - 1, BOX_SLOTS_TOTAL)}`
 
       this.boxes[box] = new Box(boxName, 30)
     }

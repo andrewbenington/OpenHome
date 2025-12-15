@@ -6,9 +6,9 @@ import {
   uint16ToBytesLittleEndian,
 } from '@openhome-core/save/util/byteLogic'
 import { gen5StringToUTF } from '@openhome-core/save/util/Strings/StringConverter'
+import { unique } from '@openhome-core/util/functional'
 import { Gender, OriginGame } from '@pkm-rs/pkg'
 import { PK5 } from '@pokemon-files/pkm'
-import { uniq } from 'lodash'
 import { Box, BoxCoordinates, OfficialSAV } from './interfaces'
 import { hasDesamumeFooter, LOOKUP_TYPE } from './util'
 import { PathData } from './util/path'
@@ -171,7 +171,7 @@ export abstract class G5SAV extends OfficialSAV<PK5> {
         this.bytes.set(new Uint8Array(136), writeIndex)
       }
     })
-    uniq(this.updatedBoxSlots.map((coords) => coords.box)).forEach((boxIndex) =>
+    unique(this.updatedBoxSlots.map((coords) => coords.box)).forEach((boxIndex) =>
       this.updateBoxChecksum(boxIndex)
     )
     this.updateMirrorsChecksum()

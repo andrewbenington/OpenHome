@@ -1,6 +1,6 @@
+import { range } from '@openhome-core/util/functional'
 import { FileSchemas } from '@pokemon-files/schema'
 import { Flex, Grid } from '@radix-ui/themes'
-import { range } from 'lodash'
 import { useMemo, useState } from 'react'
 import './components.css'
 

@@ -23,17 +23,13 @@ import { SavesProvider } from '@openhome-ui/state/saves'
 import { loadPlugin } from '@openhome-ui/util/plugin'
 import { Flex, Text, Theme } from '@radix-ui/themes'
 import * as E from 'fp-ts/lib/Either'
-import debounce from 'lodash/debounce'
 import { useCallback, useContext, useEffect, useReducer, useState } from 'react'
 import './App.css'
 import AppTabs from './AppTabs'
+import useDebounce from './hooks/useDebounce'
 import ErrorMessageModal from './top-level/ErrorMessageModal'
 import PokemonDragContextProvider from './top-level/PokemonDragContextProvider'
 import UpdateMessageModal from './top-level/UpdateMessageModal'
-
-const debouncedUpdateSettings = debounce((backend: BackendInterface, settings: Settings) => {
-  backend.updateSettings(settings).catch(console.error)
-}, 500)
 
 export default function App() {
   const isDarkMode = useIsDarkMode()
@@ -99,6 +95,10 @@ function AppWithBackend() {
   const backend = useContext(BackendContext)
   const displayError = useDisplayError()
 
+  const debouncedUpdateSettings = useDebounce((backend: BackendInterface, settings: Settings) => {
+    backend.updateSettings(settings).catch(console.error)
+  }, 500)
+
   // only on app start
   useEffect(() => {
     if (appInfoState.error) {
@@ -129,7 +129,7 @@ function AppWithBackend() {
   useEffect(() => {
     if (!appInfoState.settingsLoaded) return
     debouncedUpdateSettings(backend, appInfoState.settings)
-  }, [backend, appInfoState.settings, appInfoState.settingsLoaded])
+  }, [backend, appInfoState.settings, appInfoState.settingsLoaded, debouncedUpdateSettings])
 
   const getEnabledSaveTypes = useCallback(() => {
     return appInfoState.extraSaveTypes

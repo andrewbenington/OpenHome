@@ -1,5 +1,6 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { range } from '@openhome-core/util/functional'
 import { CSSWithVariables } from '@openhome-core/util/types'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
@@ -14,7 +15,6 @@ import SavesModal from '@openhome-ui/saves/SavesModal'
 import { useSaves } from '@openhome-ui/state/saves'
 import { bytesToPKMInterface } from '@pokemon-files/pkm'
 import { Badge, Button, Card, Flex, Tabs } from '@radix-ui/themes'
-import lodash from 'lodash'
 import { useCallback, useContext, useEffect, useState } from 'react'
 import { MdFileOpen } from 'react-icons/md'
 import './Home.css'
@@ -76,7 +76,7 @@ const Home = () => {
   return (
     <Flex direction="row" style={{ height: '100%' }}>
       <Flex className="save-file-column" gap="3">
-        {lodash.range(savesAndBanks.allOpenSaves.length).map((i) => (
+        {range(savesAndBanks.allOpenSaves.length).map((i) => (
           <OpenSaveDisplay key={`save_display_${i}`} saveIndex={i} />
         ))}
         <Button onClick={() => setOpenSaveDialog(true)}>

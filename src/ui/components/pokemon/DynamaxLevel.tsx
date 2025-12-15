@@ -1,4 +1,4 @@
-import lodash from 'lodash'
+import { range } from '@openhome-core/util/functional'
 
 interface DynamaxLevelProps {
   level: number
@@ -22,7 +22,7 @@ const DynamaxLevel = (props: DynamaxLevelProps) => {
 
   return (
     <div style={dynamaxRowStyle}>
-      {lodash.range(10).map((index: number) => (
+      {range(10).map((index: number) => (
         <div
           key={`dynamax_meter_${index}`}
           style={{

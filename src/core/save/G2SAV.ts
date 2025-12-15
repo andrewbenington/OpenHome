@@ -1,12 +1,12 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { get8BitChecksum } from '@openhome-core/save/util/byteLogic'
 import { gen12StringToUTF, utf16StringToGen12 } from '@openhome-core/save/util/Strings'
+import { unique } from '@openhome-core/util/functional'
 import { Gender, ItemGen2, Language, OriginGame } from '@pkm-rs/pkg'
 import { PK2 } from '@pokemon-files/pkm'
 import { EXCLAMATION } from '@pokemon-resources/consts/Formes'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { GEN2_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
-import { uniq } from 'lodash'
 import { Box, BoxCoordinates, OfficialSAV } from './interfaces'
 import { LOOKUP_TYPE } from './util'
 import { emptyPathData, PathData } from './util/path'
@@ -122,7 +122,7 @@ export class G2SAV extends OfficialSAV<PK2> {
 
   prepareBoxesAndGetModified() {
     const changedMonPKMs: OHPKM[] = []
-    const changedBoxes = uniq(this.updatedBoxSlots.map((coords) => coords.box))
+    const changedBoxes = unique(this.updatedBoxSlots.map((coords) => coords.box))
     const pokemonPerBox = this.boxRows * this.boxColumns
 
     changedBoxes.forEach((boxNumber) => {

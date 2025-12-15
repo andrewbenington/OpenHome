@@ -1,6 +1,6 @@
 // import { TextDecoder } from 'node:util' // (ESM style imports)
 import { TransferRestrictions } from '@openhome-core/save/util/TransferRestrictions'
-import { difference } from 'lodash'
+import { difference } from '@openhome-core/util/functional'
 import { describe, test } from 'vitest'
 import {
   BDSP_TRANSFER_RESTRICTIONS,

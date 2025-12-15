@@ -1,8 +1,8 @@
 import { supportsMon } from '@openhome-core/save/util'
+import { unique } from '@openhome-core/util/functional'
 import { filterUndefined } from '@openhome-core/util/sort'
 import { PKMFormeRef } from '@openhome-core/util/types'
 import { AppInfoContext } from '@openhome-ui/state/appInfo'
-import { uniq } from 'lodash'
 import { useContext, useMemo } from 'react'
 
 const fileTypeColors: Record<string, string> = {
@@ -37,7 +37,7 @@ const FileTypeSelect = (props: FileTypeSelectProps) => {
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
 
   const supportedFormats = useMemo(() => {
-    const supportedFormats = uniq(
+    const supportedFormats = unique(
       getEnabledSaveTypes().map((saveType) =>
         supportsMon(saveType, formData.dexNum, formData.formeNum)
           ? saveType.pkmType.getName()

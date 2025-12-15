@@ -1,4 +1,4 @@
-import { range } from 'lodash'
+import { range } from '@openhome-core/util/functional'
 import './style.css'
 
 export type MiniBoxIndicatorProps = {

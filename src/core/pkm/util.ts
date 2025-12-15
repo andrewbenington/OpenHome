@@ -224,9 +224,9 @@ export const adjustMovePPBetweenFormats = (
   return sourceFormatMon.moves.map((move, i) => {
     const otherMaxPP = getMoveMaxPP(move, sourceFormatMon.format, sourceFormatMon.movePPUps[i]) ?? 0
     const thisMaxPP = getMoveMaxPP(move, destFormatMon.format, sourceFormatMon.movePPUps[i]) ?? 0
-    const adjustedMovePP = sourceFormatMon.movePP[i] - (otherMaxPP - thisMaxPP)
+    const difference = otherMaxPP - thisMaxPP
 
-    return adjustedMovePP // lodash.max([adjustedMovePP, 0]) ?? 0
+    return sourceFormatMon.movePP[i] - difference
   }) as [number, number, number, number]
 }
 

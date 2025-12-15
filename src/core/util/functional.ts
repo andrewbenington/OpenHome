@@ -44,6 +44,12 @@ export function unique<T>(items: T[] | undefined): T[] {
   return Array.from(new Set(items))
 }
 
+export function difference<T>(first: T[] | undefined, second: T[]): T[] {
+  const set1 = new Set(first)
+  const set2 = new Set(second)
+  return Array.from(set1.difference(set2))
+}
+
 export type Option<T> = T | undefined
 export type Errorable<T> = Either<string, T>
 export function Err<T>(inner: T) {

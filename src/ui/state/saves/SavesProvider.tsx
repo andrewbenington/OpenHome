@@ -15,7 +15,6 @@ import { Generation, OriginGame, OriginGames } from '@pkm-rs/pkg'
 import { PK1, PK2 } from '@pokemon-files/pkm'
 import { Callout } from '@radix-ui/themes'
 import * as E from 'fp-ts/lib/Either'
-import { flatten } from 'lodash'
 import { ReactNode, useCallback, useContext, useEffect, useReducer } from 'react'
 import { ItemBagContext } from '../items/reducer'
 import { OhpkmLookup, useOhpkmStore } from '../ohpkm/useOhpkmStore'
@@ -141,7 +140,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
       bagDispatch({ type: 'clear_modified' })
     }
 
-    const results = flatten(await Promise.all(promises))
+    const results = (await Promise.all(promises)).flat()
     const errors = results.filter(E.isLeft).map((err) => err.left)
 
     if (errors.length) {

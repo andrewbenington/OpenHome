@@ -2,6 +2,7 @@ import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { getMonFileIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SAV } from '@openhome-core/save/interfaces'
+import { range } from '@openhome-core/util/functional'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
 import AttributeRow from '@openhome-ui/components/AttributeRow'
 import { ItemBuilder, OpenHomeCtxMenu } from '@openhome-ui/components/context-menu'
@@ -15,7 +16,7 @@ import { MonLocation, useSaves } from '@openhome-ui/state/saves'
 import { colorIsDark } from '@openhome-ui/util/color'
 import { MetadataLookup } from '@pkm-rs/pkg'
 import { Button, Card, Dialog, Flex, Grid } from '@radix-ui/themes'
-import lodash, { range } from 'lodash'
+
 import { useContext, useMemo, useState } from 'react'
 import { MdClose } from 'react-icons/md'
 import { buildBackwardNavigator, buildForwardNavigator } from '../util'
@@ -154,8 +155,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
             </Flex>
           </div>
           <Grid columns={save.boxColumns.toString()} gap="1" p="1">
-            {lodash
-              .range(save.boxColumns * save.boxRows)
+            {range(save.boxColumns * save.boxRows)
               .map((index: number) => currentBox?.pokemon?.[index])
               .map((mon, index) => (
                 <BoxCell

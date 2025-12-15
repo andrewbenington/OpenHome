@@ -1,12 +1,12 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { bytesToUint16BigEndian, get8BitChecksum } from '@openhome-core/save/util/byteLogic'
 import { gen12StringToUTF, utf16StringToGen12 } from '@openhome-core/save/util/Strings'
+import { range, unique } from '@openhome-core/util/functional'
 import { Gender, ItemGen1, Language, OriginGame } from '@pkm-rs/pkg'
 import * as conversion from '@pokemon-files/conversion'
 import { PK1 } from '@pokemon-files/pkm'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { GEN1_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
-import lodash from 'lodash'
 import { Box, BoxCoordinates, OfficialSAV } from './interfaces'
 import { LOOKUP_TYPE } from './util'
 import { PathData } from './util/path'
@@ -98,7 +98,7 @@ export class G1SAV extends OfficialSAV<PK1> {
     }
     const pokemonPerBox = this.boxRows * this.boxColumns
 
-    lodash.range(this.NUM_BOXES).forEach((boxNumber) => {
+    range(this.NUM_BOXES).forEach((boxNumber) => {
       this.boxes[boxNumber] = new Box(`Box ${boxNumber + 1}`, pokemonPerBox)
       let boxByteOffset
 
@@ -144,7 +144,7 @@ export class G1SAV extends OfficialSAV<PK1> {
 
   prepareBoxesAndGetModified() {
     const changedMonPKMs: OHPKM[] = []
-    const changedBoxes: number[] = lodash.uniq(this.updatedBoxSlots.map((coords) => coords.box))
+    const changedBoxes: number[] = unique(this.updatedBoxSlots.map((coords) => coords.box))
     const pokemonPerBox = this.boxRows * this.boxColumns
 
     changedBoxes.forEach((boxNumber) => {
