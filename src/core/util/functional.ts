@@ -44,6 +44,15 @@ export function unique<T>(items: T[] | undefined): T[] {
   return Array.from(new Set(items))
 }
 
+// remove this after node 22 is lts
+if (!Set.prototype.difference) {
+  Set.prototype.difference = function (other) {
+    const r = new Set()
+    for (const v of this) if (!other.has(v)) r.add(v)
+    return r
+  }
+}
+
 export function difference<T>(first: T[] | undefined, second: T[]): T[] {
   const set1 = new Set(first)
   const set2 = new Set(second)
