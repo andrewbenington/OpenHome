@@ -48,10 +48,6 @@ jobs:
       - name: Install Frontend Dependencies
         run: pnpm i --frozen-lockfile
 
-      - name: build version.json (unix)
-        if: matrix.platform != 'windows-latest'
-        run: ./buildVersionJSON.sh
-
       - uses: tauri-apps/tauri-action@v0.5.22
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
