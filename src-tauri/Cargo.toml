@@ -25,14 +25,14 @@ tauri-build = { version = "2.5.1", features = [] }
 
 [dependencies]
 pkm_rs = {path = "../pkm_rs"}
-tauri = { version = "2.9.4", features = [] }
+tauri = { version = "2.9.5", features = [] }
 tauri-plugin-shell = "2.3.3"
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0.145"
 tauri-plugin-os = "2.3.2"
 tauri-plugin-dialog = "2.4.2"
 tauri-plugin-fs = "2.4.2"
-reqwest = { version = "0.12.24" }
+reqwest = { version = "0.12.25" }
 base64 = "0.22.1"
 zip = "6.0.0"
 static_assertions = "1.1.0"
