@@ -200,7 +200,8 @@ td:nth-child(1) {
 }
 
 .outer-download-container {
-  height: 400px;
+  min-height: 400px;
+  height: fit-content;
   background-color: #aedac3;
   padding: 16px 64px;
   display: flex;
