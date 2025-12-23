@@ -6,10 +6,7 @@ import { Pokedex } from '@openhome-ui/util/pokedex'
 import * as E from 'fp-ts/lib/Either'
 
 export type PokedexManager = { getPokedex: () => Promise<Errorable<Pokedex>> } & (
-  | {
-      loaded: true
-      pokedex: Pokedex
-    }
+  | { loaded: true; pokedex: Pokedex }
   | { loaded: false; pokedex: undefined }
 )
 
@@ -19,9 +16,7 @@ export function usePokedex(): PokedexManager {
   const backend = useContext(BackendContext)
 
   backend.registerListeners({
-    onPokedexUpdate: (updatedPokedex) => {
-      setPokedexCache(updatedPokedex)
-    },
+    onPokedexUpdate: setPokedexCache,
   })
 
   const loadAndCachePokedex = useCallback(async () => {

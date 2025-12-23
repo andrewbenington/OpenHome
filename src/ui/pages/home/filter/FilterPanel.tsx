@@ -2,7 +2,6 @@ import { displayGender } from '@openhome-core/util/types'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { BallsImageList, getItemIconPath } from '@openhome-ui/images/items'
 import { getRibbonSpritePath } from '@openhome-ui/images/ribbons'
-import { FilterContext } from '@openhome-ui/state/filter'
 import { HeldItemCategory } from '@openhome-ui/util/filter'
 import {
   all_species_data,
@@ -21,7 +20,8 @@ import {
 import { OpenHomeRibbons } from '@pokemon-resources/consts/Ribbons'
 import { Types } from '@pokemon-resources/index'
 import { Button, Flex, Text } from '@radix-ui/themes'
-import { useContext, useMemo } from 'react'
+import { useMemo } from 'react'
+import { useMonDisplay } from 'src/ui/state/monDisplay'
 import Autocomplete from '../../../components/Autocomplete'
 import GenderIcon from '../../../components/pokemon/GenderIcon'
 import TypeIcon from '../../../components/pokemon/TypeIcon'
@@ -78,7 +78,7 @@ const allGenders = [Gender.Male, Gender.Female, Gender.Genderless].map((gender) 
 }))
 
 export default function FilterPanel() {
-  const [filterState, dispatchFilterState] = useContext(FilterContext)
+  const { filter, setFilter, clearFilter } = useMonDisplay()
 
   const ALL_SPECIES_DATA = useMemo(all_species_data, [])
 
@@ -116,8 +116,8 @@ export default function FilterPanel() {
   ]
 
   const currentMon = useMemo(
-    () => (filterState.dexNumber ? SpeciesLookup(filterState.dexNumber) : undefined),
-    [filterState.dexNumber]
+    () => (filter.dexNumber ? SpeciesLookup(filter.dexNumber) : undefined),
+    [filter.dexNumber]
   )
 
   return (
@@ -128,9 +128,9 @@ export default function FilterPanel() {
         </Text>
         <Button
           variant="outline"
-          disabled={Object.values(filterState).length === 0}
+          disabled={Object.values(filter).length === 0}
           color="tomato"
-          onClick={() => dispatchFilterState({ type: 'clear_all' })}
+          onClick={clearFilter}
           size="1"
         >
           Clear All
@@ -141,14 +141,9 @@ export default function FilterPanel() {
           options={Object.values(ALL_SPECIES_DATA)}
           getOptionString={(opt) => opt.name}
           getOptionUniqueID={(opt) => opt.nationalDex.toString()}
-          value={filterState.dexNumber ? SpeciesLookup(filterState.dexNumber) : undefined}
+          value={filter.dexNumber ? SpeciesLookup(filter.dexNumber) : undefined}
           label="Species"
-          onChange={(option) =>
-            dispatchFilterState({
-              type: 'set_filter',
-              payload: { dexNumber: option?.nationalDex },
-            })
-          }
+          onChange={(option) => setFilter({ dexNumber: option?.nationalDex })}
           getIconComponent={(currentMon) => (
             <PokemonIcon dexNumber={currentMon.nationalDex} style={{ width: 24, height: 24 }} />
           )}
@@ -159,22 +154,15 @@ export default function FilterPanel() {
             getOptionString={(opt) => opt.formeName}
             getOptionUniqueID={(opt) => opt.formeIndex.toString()}
             value={
-              filterState.formeNumber !== undefined
-                ? currentMon.formes[filterState.formeNumber]
-                : undefined
+              filter.formeNumber !== undefined ? currentMon.formes[filter.formeNumber] : undefined
             }
             label="Forme"
-            onChange={(option) =>
-              dispatchFilterState({
-                type: 'set_filter',
-                payload: { formeNumber: option?.formeIndex },
-              })
-            }
+            onChange={(option) => setFilter({ formeNumber: option?.formeIndex })}
             getIconComponent={(currentForme) =>
-              filterState.dexNumber &&
+              filter.dexNumber &&
               currentForme && (
                 <PokemonIcon
-                  dexNumber={filterState.dexNumber}
+                  dexNumber={filter.dexNumber}
                   formeNumber={currentForme.formeIndex}
                   style={{ width: 24, height: 24 }}
                 />
@@ -189,25 +177,22 @@ export default function FilterPanel() {
             opt.type === 'specific_item' && opt.id ? opt.id.toString() : opt.type
           }
           value={
-            typeof filterState.heldItem === 'number'
+            typeof filter.heldItem === 'number'
               ? {
                   type: 'specific_item',
-                  ...itemIndexToSelectOption(filterState.heldItem),
+                  ...itemIndexToSelectOption(filter.heldItem),
                 }
-              : filterState.heldItem !== undefined
+              : filter.heldItem !== undefined
                 ? itemOptions.find(
-                    (opt) => opt.type !== 'specific_item' && opt.type === filterState.heldItem
+                    (opt) => opt.type !== 'specific_item' && opt.type === filter.heldItem
                   )
                 : undefined
           }
           label="Held Item"
           onChange={(option) =>
-            dispatchFilterState({
-              type: 'set_filter',
-              payload: {
-                heldItem:
-                  option?.type === 'specific_item' ? option.id : (option?.type as HeldItemCategory),
-              },
+            setFilter({
+              heldItem:
+                option?.type === 'specific_item' ? option.id : (option?.type as HeldItemCategory),
             })
           }
           getIconComponent={(currentItem) =>
@@ -227,44 +212,27 @@ export default function FilterPanel() {
           options={ALL_ABILITIES}
           getOptionString={(opt) => opt.label}
           getOptionUniqueID={(opt) => opt.id.toString()}
-          value={
-            filterState.ability !== undefined ? ALL_ABILITIES[filterState.ability - 1] : undefined
-          }
+          value={filter.ability !== undefined ? ALL_ABILITIES[filter.ability - 1] : undefined}
           label="Ability"
-          onChange={(option) =>
-            dispatchFilterState({
-              type: 'set_filter',
-              payload: { ability: option?.id },
-            })
-          }
+          onChange={(option) => setFilter({ ability: option?.id })}
         />
         <Autocomplete
           options={Types}
           getOptionString={(opt) => opt}
           getOptionUniqueID={(opt) => opt}
-          value={filterState.type1}
+          value={filter.type1}
           label="Type 1"
-          onChange={(option) =>
-            dispatchFilterState({
-              type: 'set_filter',
-              payload: { type1: option },
-            })
-          }
+          onChange={(option) => setFilter({ type1: option })}
           getIconComponent={(type) => <TypeIcon type={type} />}
         />
-        {filterState.type1 && (
+        {filter.type1 && (
           <Autocomplete
             options={Types}
             getOptionString={(opt) => opt}
             getOptionUniqueID={(opt) => opt}
-            value={filterState.type2}
+            value={filter.type2}
             label="Type 2"
-            onChange={(option) =>
-              dispatchFilterState({
-                type: 'set_filter',
-                payload: { type2: option },
-              })
-            }
+            onChange={(option) => setFilter({ type2: option })}
             getIconComponent={(type) => <TypeIcon type={type} />}
           />
         )}
@@ -272,24 +240,18 @@ export default function FilterPanel() {
           options={OriginGames.allMetadata()}
           getOptionString={(option) => option?.name}
           getOptionUniqueID={(opt) => opt.game.toString()}
-          value={
-            filterState.gameOfOrigin ? OriginGames.getMetadata(filterState.gameOfOrigin) : undefined
-          }
+          value={filter.gameOfOrigin ? OriginGames.getMetadata(filter.gameOfOrigin) : undefined}
           label="Game Of Origin"
-          onChange={(option) =>
-            dispatchFilterState({ type: 'set_filter', payload: { gameOfOrigin: option?.game } })
-          }
+          onChange={(option) => setFilter({ gameOfOrigin: option?.game })}
           getIconComponent={getOriginIcon}
         />
         <Autocomplete
           options={ALL_BALLS}
           getOptionString={(option) => option.label}
           getOptionUniqueID={(opt) => opt.id.toString()}
-          value={filterState.ball ? ALL_BALLS[filterState.ball] : undefined}
+          value={filter.ball ? ALL_BALLS[filter.ball] : undefined}
           label="Ball"
-          onChange={(option) =>
-            dispatchFilterState({ type: 'set_filter', payload: { ball: option?.id } })
-          }
+          onChange={(option) => setFilter({ ball: option?.id })}
           getIconComponent={(ball) => (
             <img
               draggable={false}
@@ -303,22 +265,18 @@ export default function FilterPanel() {
           options={allGenders}
           getOptionString={(opt) => displayGender(opt.gender)}
           getOptionUniqueID={(opt) => opt.gender.toString()}
-          value={filterState.gender !== undefined ? { gender: filterState.gender } : undefined}
+          value={filter.gender !== undefined ? { gender: filter.gender } : undefined}
           label="Gender"
-          onChange={(option) =>
-            dispatchFilterState({ type: 'set_filter', payload: { gender: option?.gender } })
-          }
+          onChange={(option) => setFilter({ gender: option?.gender })}
           getIconComponent={(opt) => <GenderIcon gender={opt.gender} />}
         />
         <Autocomplete
           options={['Any Ribbon', 'No Ribbon', ...OpenHomeRibbons]}
           getOptionString={(opt) => opt}
           getOptionUniqueID={(opt) => opt}
-          value={filterState.ribbon}
+          value={filter.ribbon}
           label="Ribbon"
-          onChange={(option) =>
-            dispatchFilterState({ type: 'set_filter', payload: { ribbon: option } })
-          }
+          onChange={(option) => setFilter({ ribbon: option })}
           getIconComponent={(ribbon) =>
             ribbon !== 'Any Ribbon' && ribbon !== 'No Ribbon' ? (
               <img
@@ -333,11 +291,9 @@ export default function FilterPanel() {
           options={['Shiny', 'Not Shiny', 'Square Shiny', 'Star Shiny']}
           getOptionString={(opt) => opt}
           getOptionUniqueID={(opt) => opt}
-          value={filterState.shiny}
+          value={filter.shiny}
           label="Shiny"
-          onChange={(option) =>
-            dispatchFilterState({ type: 'set_filter', payload: { shiny: option } })
-          }
+          onChange={(option) => setFilter({ shiny: option })}
           getIconComponent={(value) =>
             value !== 'Not Shiny' ? (
               <img

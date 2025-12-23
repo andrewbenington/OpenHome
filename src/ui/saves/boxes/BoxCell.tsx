@@ -12,12 +12,12 @@ import {
 } from '@openhome-ui/components/context-menu'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import useDisplayError from '@openhome-ui/hooks/displayError'
-import { FilterContext } from '@openhome-ui/state/filter'
 import { useItems } from '@openhome-ui/state/items'
 import { MonLocation, useSaves } from '@openhome-ui/state/saves'
 import { filterApplies } from '@openhome-ui/util/filter'
 import { PokedexUpdate } from '@openhome-ui/util/pokedex'
 import { useContext, useMemo } from 'react'
+import { useMonDisplay } from 'src/ui/state/monDisplay'
 import '../style.css'
 import DraggableMon from './DraggableMon'
 import DroppableSpace from './DroppableSpace'
@@ -35,7 +35,7 @@ interface BoxCellProps {
   ctxMenuBuilders?: CtxMenuElementBuilder[]
 }
 
-const BoxCell = ({
+function BoxCell({
   onClick,
   onDrop,
   disabled,
@@ -46,8 +46,8 @@ const BoxCell = ({
   dragID,
   location,
   ctxMenuBuilders,
-}: BoxCellProps) => {
-  const [filterState] = useContext(FilterContext)
+}: BoxCellProps) {
+  const { filter } = useMonDisplay()
   const backend = useContext(BackendContext)
   const displayError = useDisplayError()
   const { releaseMonAtLocation } = useSaves()
@@ -55,10 +55,10 @@ const BoxCell = ({
 
   const isFilteredOut = useMemo(() => {
     return (
-      Object.values(filterState).some((val) => val !== undefined) &&
-      (mon === undefined || !filterApplies(filterState, mon))
+      Object.values(filter).some((val) => val !== undefined) &&
+      (mon === undefined || !filterApplies(filter, mon))
     )
-  }, [filterState, mon])
+  }, [filter, mon])
 
   const onDropFromFiles = async (files: FileList) => {
     const importedMons: PKMInterface[] = []
