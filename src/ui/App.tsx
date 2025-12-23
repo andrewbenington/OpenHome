@@ -23,7 +23,7 @@ import { loadPlugin } from '@openhome-ui/util/plugin'
 import { Flex, Text, Theme } from '@radix-ui/themes'
 import * as E from 'fp-ts/lib/Either'
 import { useCallback, useContext, useEffect, useReducer, useState } from 'react'
-import { filterReducer, MonStateContext } from 'src/ui/state/monDisplay'
+import { initialMonDisplayState, MonDisplayState, MonStateContext } from 'src/ui/state/monDisplay'
 import './App.css'
 import AppTabs from './AppTabs'
 import useDebounce from './hooks/useDebounce'
@@ -83,7 +83,7 @@ function AppWithBackend() {
   const [mouseState, mouseDispatch] = useReducer(mouseReducer, { shift: false })
   const [dragMonState, dragMonDispatch] = useReducer(dragMonReducer, { mode: 'mon' })
   const [appInfoState, appInfoDispatch] = useReducer(appInfoReducer, appInfoInitialState)
-  const [filterState, filterDispatch] = useReducer(filterReducer, { filter: {} })
+  const [monDisplayState, setMonDisplayState] = useState<MonDisplayState>(initialMonDisplayState())
   const [pluginState, pluginDispatch] = useReducer(pluginReducer, { plugins: [], loaded: false })
   const [settingsLoading, setSettingsLoading] = useState(false)
   const [bagState, bagDispatch] = useReducer(itemBagReducer, {
@@ -183,7 +183,7 @@ function AppWithBackend() {
                 <SavesProvider>
                   <DragMonContext.Provider value={[dragMonState, dragMonDispatch]}>
                     <PokemonDragContextProvider>
-                      <MonStateContext.Provider value={[filterState, filterDispatch]}>
+                      <MonStateContext.Provider value={[monDisplayState, setMonDisplayState]}>
                         {settingsLoading ? (
                           <Flex width="100%" height="100vh" align="center" justify="center">
                             <Text size="9" weight="bold">
