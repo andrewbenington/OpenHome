@@ -167,7 +167,7 @@ impl SignificantUpdate {
                 ),
             ]),
             Self::V1_8_0AlphaFeatureMessages => Some(vec![String::from(
-                "Right clicking on some elements now offer actions in a context menu",
+                "Right clicking on some elements now offers actions in a context menu",
             )]),
             _ => None,
         }
