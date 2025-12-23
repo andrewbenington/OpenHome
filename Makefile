@@ -1,4 +1,4 @@
-VERSION=1.8.0-x-rc-1
+VERSION=1.8.0
 
 .PHONY: help
 help: # Display this help.
