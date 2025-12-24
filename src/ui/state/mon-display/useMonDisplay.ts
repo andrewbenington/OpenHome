@@ -7,13 +7,12 @@ export function initialMonDisplayState() {
   return { filter: {} }
 }
 
-export const MonStateContext = createContext<[MonDisplayState, (state: MonDisplayState) => void]>([
-  initialMonDisplayState(),
-  () => null,
-])
+export const MonDisplayContext = createContext<[MonDisplayState, (state: MonDisplayState) => void]>(
+  [initialMonDisplayState(), () => null]
+)
 
 export function useMonDisplay() {
-  const [state, setState] = useContext(MonStateContext)
+  const [state, setState] = useContext(MonDisplayContext)
 
   function setFilter(newFilter: Partial<Filter>) {
     setState({ ...state, filter: newFilter })
@@ -30,4 +29,4 @@ export function useMonDisplay() {
   return { ...state, setFilter, clearFilter, setExtraIndicatorType }
 }
 
-export type ExtraIndicatorType = 'GameOfOrigin' | 'Gender' | 'EVs' | 'IVs'
+export type ExtraIndicatorType = 'Origin Game' | 'Gender' | 'EVs' | 'IVs'

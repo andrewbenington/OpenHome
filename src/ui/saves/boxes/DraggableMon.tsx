@@ -6,6 +6,8 @@ import { DragMonContext } from '@openhome-ui/state/dragMon'
 import { MonWithLocation } from '@openhome-ui/state/saves'
 import { MetadataLookup } from '@pkm-rs/pkg'
 import { useContext, useMemo } from 'react'
+import { ExtraIndicatorType } from '../../state/mon-display/useMonDisplay'
+import ExtraIndicator from '../ExtraIndicator'
 
 const getBackgroundDetails = (disabled?: boolean) => {
   if (disabled) {
@@ -26,9 +28,17 @@ export interface DraggableMonProps {
   style: any
   dragID?: string
   dragData?: MonWithLocation
+  extraIndicator?: ExtraIndicatorType
 }
 
-const DraggableMon = ({ mon, onClick, disabled, dragData, dragID }: DraggableMonProps) => {
+const DraggableMon = ({
+  mon,
+  onClick,
+  disabled,
+  dragData,
+  dragID,
+  extraIndicator,
+}: DraggableMonProps) => {
   const { ref } = useDraggable({
     id: (dragID ?? '') + mon.personalityValue?.toString(),
     data: dragData ? { kind: 'mon', monData: dragData } : undefined,
@@ -81,6 +91,9 @@ const DraggableMon = ({ mon, onClick, disabled, dragData, dragID }: DraggableMon
           visibility: isDragging && dragState.mode === 'mon' ? 'hidden' : undefined,
         }}
         greyedOut={disabled}
+        extraIndicator={
+          extraIndicator ? <ExtraIndicator indicatorType={extraIndicator} mon={mon} /> : <></>
+        }
       />
     </div>
   )

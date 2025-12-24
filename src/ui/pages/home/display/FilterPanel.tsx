@@ -19,9 +19,9 @@ import {
 } from '@pkm-rs/pkg'
 import { OpenHomeRibbons } from '@pokemon-resources/consts/Ribbons'
 import { Types } from '@pokemon-resources/index'
-import { Button, Flex, Text } from '@radix-ui/themes'
+import { Button, Flex } from '@radix-ui/themes'
 import { useMemo } from 'react'
-import { useMonDisplay } from 'src/ui/state/monDisplay'
+import { useMonDisplay } from 'src/ui/state/mon-display/useMonDisplay'
 import Autocomplete from '../../../components/Autocomplete'
 import GenderIcon from '../../../components/pokemon/GenderIcon'
 import TypeIcon from '../../../components/pokemon/TypeIcon'
@@ -55,7 +55,7 @@ function getOriginIcon(origin: OriginGameWithData) {
             : undefined
 
   return path ? (
-    <img className="filter-icon invert-dark" draggable={false} alt="origin mark" src={path} />
+    <img className="white-filter" draggable={false} alt="origin mark" src={path} />
   ) : undefined
 }
 
@@ -122,20 +122,6 @@ export default function FilterPanel() {
 
   return (
     <div style={{ contain: 'none', padding: 4 }}>
-      <Flex direction="row" justify="between" p="4px 4px 0px 4px">
-        <Text size="3" weight="bold">
-          Filter
-        </Text>
-        <Button
-          variant="outline"
-          disabled={Object.values(filter).length === 0}
-          color="tomato"
-          onClick={clearFilter}
-          size="1"
-        >
-          Clear All
-        </Button>
-      </Flex>
       <Flex direction="column" m="1" gap="0">
         <Autocomplete
           options={Object.values(ALL_SPECIES_DATA)}
@@ -305,6 +291,16 @@ export default function FilterPanel() {
             ) : undefined
           }
         />
+        <Button
+          variant="outline"
+          disabled={Object.values(filter).length === 0}
+          color="tomato"
+          onClick={clearFilter}
+          size="1"
+          mt="1"
+        >
+          Clear All
+        </Button>
       </Flex>
     </div>
   )

@@ -4,7 +4,7 @@ import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getItemIconPath } from '@openhome-ui/images/items'
 import useMonSprite from '@openhome-ui/pokemon-details//useMonSprite'
 import { FormeMetadata, Generation, MetadataLookup } from '@pkm-rs/pkg'
-import { HTMLAttributes } from 'react'
+import { HTMLAttributes, ReactNode } from 'react'
 import './components.css'
 
 export interface PokemonIconProps extends HTMLAttributes<HTMLDivElement> {
@@ -15,6 +15,7 @@ export interface PokemonIconProps extends HTMLAttributes<HTMLDivElement> {
   heldItemIndex?: number
   greyedOut?: boolean
   silhouette?: boolean
+  extraIndicator?: ReactNode
 }
 
 function getBackgroundPosition(formeMetadata?: FormeMetadata, isEgg?: boolean) {
@@ -37,6 +38,7 @@ export default function PokemonIcon(props: PokemonIconProps) {
     greyedOut,
     silhouette,
     isEgg,
+    extraIndicator,
     ...attributes
   } = props
 
@@ -99,6 +101,20 @@ export default function PokemonIcon(props: PokemonIconProps) {
             filter: greyedOut ? 'grayscale(100%)' : undefined,
           }}
         />
+      )}
+      {extraIndicator && (
+        <div
+          style={{
+            position: 'absolute',
+            minWidth: '40%',
+            height: '40%',
+            right: 0,
+            top: 0,
+            filter: greyedOut ? 'grayscale(100%)' : undefined,
+          }}
+        >
+          {extraIndicator}
+        </div>
       )}
       {heldItemIndex ? (
         <img

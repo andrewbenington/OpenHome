@@ -5,7 +5,6 @@ import { CSSWithVariables } from '@openhome-core/util/types'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import useDisplayError from '@openhome-ui/hooks/displayError'
-import FilterPanel from '@openhome-ui/pages/home/filter/FilterPanel'
 import PokemonDetailsModal from '@openhome-ui/pokemon-details//Modal'
 import BankHeader from '@openhome-ui/saves/BankHeader'
 import HomeBoxDisplay from '@openhome-ui/saves/boxes/HomeBoxDisplay'
@@ -17,6 +16,8 @@ import { bytesToPKMInterface } from '@pokemon-files/pkm'
 import { Badge, Button, Card, Flex, Tabs } from '@radix-ui/themes'
 import { useCallback, useContext, useEffect, useState } from 'react'
 import { MdFileOpen } from 'react-icons/md'
+import FilterPanel from 'src/ui/pages/home/display/FilterPanel'
+import DisplayPanel from './display/DisplayPanel'
 import './Home.css'
 import ReleaseArea from './ReleaseArea'
 
@@ -102,15 +103,17 @@ const Home = () => {
           <Tabs.Root style={{ flex: 1, height: '100%' }} defaultValue="filter">
             <Tabs.List size="2" style={tabStyle}>
               <Tabs.Trigger value="filter">Filter</Tabs.Trigger>
+              <Tabs.Trigger value="display">Display</Tabs.Trigger>
               <Tabs.Trigger value="bag">
                 Item Bag <Badge style={{ marginLeft: 4, marginRight: -4 }}>BETA</Badge>
               </Tabs.Trigger>
             </Tabs.List>
-
             <Tabs.Content value="filter" style={{ flexGrow: 1 }}>
               <FilterPanel />
             </Tabs.Content>
-
+            <Tabs.Content value="display" style={{ flexGrow: 1 }}>
+              <DisplayPanel />
+            </Tabs.Content>
             <Tabs.Content value="bag" style={{ maxHeight: 'calc(100% - 32px)', overflow: 'auto' }}>
               <ItemBag />
             </Tabs.Content>

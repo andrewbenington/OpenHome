@@ -128,3 +128,32 @@
 .bank-ribbon input {
   text-indent: 0px;
 }
+
+.white-filter {
+  filter: brightness(0) invert(1);
+}
+
+.black-filter {
+  filter: brightness(0);
+}
+
+.badge-shadow {
+  box-shadow: rgba(255, 255, 255, 0.5) 0px 0px 0px 1px;
+}
+
+.origin-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50% !important;
+  width: 18px;
+  height: 18px;
+  z-index: -1 !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  .origin-badge {
+    filter: brightness(0.8);
+    z-index: -1;
+  }
+}

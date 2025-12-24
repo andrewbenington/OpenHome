@@ -23,10 +23,10 @@ import { loadPlugin } from '@openhome-ui/util/plugin'
 import { Flex, Text, Theme } from '@radix-ui/themes'
 import * as E from 'fp-ts/lib/Either'
 import { useCallback, useContext, useEffect, useReducer, useState } from 'react'
-import { initialMonDisplayState, MonDisplayState, MonStateContext } from 'src/ui/state/monDisplay'
 import './App.css'
 import AppTabs from './AppTabs'
 import useDebounce from './hooks/useDebounce'
+import MonDisplayProvider from './state/mon-display/MonDisplayProvider'
 import ErrorMessageModal from './top-level/ErrorMessageModal'
 import PokemonDragContextProvider from './top-level/PokemonDragContextProvider'
 import UpdateMessageModal from './top-level/UpdateMessageModal'
@@ -83,7 +83,6 @@ function AppWithBackend() {
   const [mouseState, mouseDispatch] = useReducer(mouseReducer, { shift: false })
   const [dragMonState, dragMonDispatch] = useReducer(dragMonReducer, { mode: 'mon' })
   const [appInfoState, appInfoDispatch] = useReducer(appInfoReducer, appInfoInitialState)
-  const [monDisplayState, setMonDisplayState] = useState<MonDisplayState>(initialMonDisplayState())
   const [pluginState, pluginDispatch] = useReducer(pluginReducer, { plugins: [], loaded: false })
   const [settingsLoading, setSettingsLoading] = useState(false)
   const [bagState, bagDispatch] = useReducer(itemBagReducer, {
@@ -183,7 +182,7 @@ function AppWithBackend() {
                 <SavesProvider>
                   <DragMonContext.Provider value={[dragMonState, dragMonDispatch]}>
                     <PokemonDragContextProvider>
-                      <MonStateContext.Provider value={[monDisplayState, setMonDisplayState]}>
+                      <MonDisplayProvider>
                         {settingsLoading ? (
                           <Flex width="100%" height="100vh" align="center" justify="center">
                             <Text size="9" weight="bold">
@@ -195,7 +194,7 @@ function AppWithBackend() {
                         )}
                         <ErrorMessageModal />
                         <UpdateMessageModal />
-                      </MonStateContext.Provider>
+                      </MonDisplayProvider>
                     </PokemonDragContextProvider>
                   </DragMonContext.Provider>
                 </SavesProvider>

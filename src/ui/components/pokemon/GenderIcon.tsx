@@ -12,7 +12,7 @@ export default function GenderIcon({ gender, size }: GenderIconProps) {
     gender !== undefined &&
     gender < Gender.Genderless && (
       <div
-        className="gender-icon"
+        className="gender-icon badge-shadow"
         title={displayGender(gender)}
         style={{
           height: size ?? '1.1rem',
