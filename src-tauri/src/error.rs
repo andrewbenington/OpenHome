@@ -50,7 +50,7 @@ impl Error {
         }
     }
 
-    pub fn file_access<P, E: std::error::Error + 'static>(path: P, source: E) -> Error
+    pub fn file_access<P, E: std::error::Error + 'static>(path: &P, source: E) -> Error
     where
         P: AsRef<Path>,
     {
@@ -67,7 +67,7 @@ impl Error {
         }
     }
 
-    pub fn file_malformed<P, E: std::error::Error + 'static>(path: P, source: E) -> Error
+    pub fn file_malformed<P, E: std::error::Error + 'static>(path: &P, source: E) -> Error
     where
         P: AsRef<Path>,
     {
@@ -83,7 +83,7 @@ impl Error {
         }
     }
 
-    pub fn file_write<P, E: std::error::Error + 'static>(path: P, source: E) -> Error
+    pub fn file_write<P, E: std::error::Error + 'static>(path: &P, source: E) -> Error
     where
         P: AsRef<Path>,
     {
