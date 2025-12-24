@@ -1,10 +1,10 @@
-use pkm_rs::pkm::{
-    Pkm,
-    ohpkm::{OhpkmV1, OhpkmV2},
-};
+use pkm_rs::pkm::ohpkm::{OhpkmV1, OhpkmV2};
 use semver::Version;
 use serde::Serialize;
-use std::{fs, path::PathBuf};
+use std::{
+    fs,
+    path::{Path, PathBuf},
+};
 use strum::{self, EnumIter, IntoEnumIterator};
 
 use crate::{
@@ -46,7 +46,7 @@ pub fn update_version_last_used(app_handle: &tauri::AppHandle) -> Result<()> {
         &last_version_path,
         app_handle.package_info().version.to_string(),
     )
-    .map_err(|err| Error::file_write(last_version_path, err))
+    .map_err(|err| Error::file_write(&last_version_path, err))
 }
 
 pub fn handle_updates_get_features(
@@ -135,6 +135,7 @@ pub enum SignificantUpdate {
     V1_5_0AlphaMultipleBanks,
     V1_8_0AlphaOhpkmV2,
     V1_8_0AlphaFeatureMessages,
+    V1_8_1,
 }
 
 impl SignificantUpdate {
@@ -145,6 +146,7 @@ impl SignificantUpdate {
             Self::V1_8_0AlphaFeatureMessages => {
                 Version::parse("1.8.0-x-alpha.1.feature-messages").unwrap()
             }
+            Self::V1_8_1 => Version::parse("1.8.1").unwrap(),
         }
     }
 
@@ -153,6 +155,7 @@ impl SignificantUpdate {
             Self::V1_5_0AlphaMultipleBanks => do_migration_1_5_0(app_handle),
             Self::V1_8_0AlphaOhpkmV2 => do_migration_1_8_0(app_handle),
             Self::V1_8_0AlphaFeatureMessages => Ok(()),
+            Self::V1_8_1 => handle_old_mons_directories_for_ohpkm_v2(app_handle),
         }
     }
 
@@ -168,6 +171,9 @@ impl SignificantUpdate {
             ]),
             Self::V1_8_0AlphaFeatureMessages => Some(vec![String::from(
                 "Right clicking on some elements now offers actions in a context menu",
+            )]),
+            Self::V1_8_1 => Some(vec![String::from(
+                "A bug present when launching v1.8.0 has been fixed",
             )]),
             _ => None,
         }
@@ -256,23 +262,30 @@ pub fn do_migration_1_8_0(app_handle: &tauri::AppHandle) -> Result<()> {
         if let Ok(bytes_v2) = bytes_v2
             && let Some(filename) = PathBuf::from(&path).file_name()
         {
-            let v1_path = util::prepend_appdata_storage_to_path(
-                app_handle,
-                format!("mons_v1/{}", filename.to_string_lossy()),
-            )?;
-
-            if let Ok(bytes_v1) = ohpkm_v1.to_box_bytes() {
-                util::write_file_contents(v1_path, bytes_v1)?;
-            }
-
-            let v2_path = util::prepend_appdata_storage_to_path(
-                app_handle,
-                format!("mons_v2/{}", filename.to_string_lossy()),
-            )?;
+            let v2_path = Path::join(
+                &util::prepend_appdata_storage_to_path(app_handle, "mons_v2")?,
+                filename,
+            );
 
             util::write_file_contents(v2_path, bytes_v2)?;
         }
     }
 
     Ok(())
+}
+
+pub fn handle_old_mons_directories_for_ohpkm_v2(app_handle: &tauri::AppHandle) -> Result<()> {
+    let old_mons_dir = util::prepend_appdata_storage_to_path(app_handle, "mons")?;
+
+    if !fs::exists(&old_mons_dir).map_err(|e| Error::file_access(&old_mons_dir, e))? {
+        return Ok(());
+    }
+
+    let v1_dir = util::prepend_appdata_storage_to_path(app_handle, "mons_v1")?;
+
+    if fs::exists(&v1_dir).map_err(|e| Error::file_access(&v1_dir, e))? {
+        fs::remove_dir_all(&v1_dir).map_err(|e| Error::file_access(&v1_dir, e))?;
+    }
+
+    fs::rename(&old_mons_dir, &v1_dir).map_err(|e| Error::file_access(&v1_dir, e))
 }

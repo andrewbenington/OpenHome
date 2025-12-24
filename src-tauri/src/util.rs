@@ -100,7 +100,7 @@ where
     P: AsRef<Path>,
     C: AsRef<[u8]>,
 {
-    fs::write(&path, contents).map_err(|err| Error::file_access(path, err))
+    fs::write(&path, contents).map_err(|err| Error::file_access(&path, err))
 }
 
 pub fn write_file_json<P, V>(path: P, value: V) -> Result<()>
@@ -129,14 +129,14 @@ pub fn create_directory<P>(path: P) -> Result<()>
 where
     P: AsRef<Path>,
 {
-    fs::create_dir_all(&path).map_err(|err| Error::file_access(path, err))
+    fs::create_dir_all(&path).map_err(|err| Error::file_access(&path, err))
 }
 
 pub fn read_file_bytes<P>(path: P) -> Result<Vec<u8>>
 where
     P: AsRef<Path>,
 {
-    fs::read(&path).map_err(|err| Error::file_access(path, err))
+    fs::read(&path).map_err(|err| Error::file_access(&path, err))
 }
 
 pub fn read_file_text(full_path: &Path) -> Result<String> {
@@ -144,7 +144,7 @@ pub fn read_file_text(full_path: &Path) -> Result<String> {
         return Err(Error::file_missing(full_path));
     }
 
-    fs::read_to_string(full_path).map_err(|e| Error::file_malformed(full_path, e))
+    fs::read_to_string(full_path).map_err(|e| Error::file_malformed(&full_path, e))
 }
 
 pub fn read_file_json<T>(full_path: &Path) -> Result<T>
@@ -155,7 +155,7 @@ where
         return Err(Error::file_missing(full_path));
     }
     let json_str = read_file_text(full_path)?;
-    serde_json::from_str(&json_str).map_err(|e| Error::file_malformed(full_path, e))
+    serde_json::from_str(&json_str).map_err(|e| Error::file_malformed(&full_path, e))
 }
 
 pub fn get_storage_file_json<P, T>(app_handle: &tauri::AppHandle, relative_path: P) -> Result<T>
@@ -231,7 +231,7 @@ where
             let mut outfile =
                 fs::File::create(&outpath).map_err(|err| Error::file_access(&outpath, err))?;
             std::io::copy(&mut file, &mut outfile)
-                .map_err(|err| Error::file_write(outpath, err))?;
+                .map_err(|err| Error::file_write(&outpath, err))?;
         }
     }
     Ok(())
@@ -245,7 +245,7 @@ where
     let body_text = download_text_file(url).await?;
 
     let body: T =
-        serde_json::from_str(&body_text).map_err(|err| Error::file_malformed(url, err))?;
+        serde_json::from_str(&body_text).map_err(|err| Error::file_malformed(&url, err))?;
 
     Ok(body)
 }
