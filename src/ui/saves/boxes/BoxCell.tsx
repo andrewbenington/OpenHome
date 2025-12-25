@@ -17,7 +17,7 @@ import { MonLocation, useSaves } from '@openhome-ui/state/saves'
 import { filterApplies } from '@openhome-ui/util/filter'
 import { PokedexUpdate } from '@openhome-ui/util/pokedex'
 import { useContext, useMemo } from 'react'
-import { useMonDisplay } from 'src/ui/state/monDisplay'
+import { useMonDisplay } from 'src/ui/state/mon-display/useMonDisplay'
 import '../style.css'
 import DraggableMon from './DraggableMon'
 import DroppableSpace from './DroppableSpace'
@@ -47,7 +47,7 @@ function BoxCell({
   location,
   ctxMenuBuilders,
 }: BoxCellProps) {
-  const { filter } = useMonDisplay()
+  const { filter, topRightIndicator: TopRightIndicator, showItem, showShiny } = useMonDisplay()
   const backend = useContext(BackendContext)
   const displayError = useDisplayError()
   const { releaseMonAtLocation } = useSaves()
@@ -168,6 +168,9 @@ function BoxCell({
             dragData={location ? { ...location, mon } : undefined}
             dragID={dragID}
             disabled={disabled || isFilteredOut}
+            topRightIndicator={TopRightIndicator}
+            showItem={showItem}
+            showShiny={showShiny}
           />
         ) : (
           <DroppableSpace dropID={dragID} dropData={location} disabled={disabled} />

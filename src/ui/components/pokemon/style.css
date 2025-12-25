@@ -18,6 +18,18 @@
   }
 }
 
+@media (prefers-color-scheme: light) {
+  .gender-icon {
+    color: white;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .gender-icon {
+    color: black;
+  }
+}
+
 .markings-container {
   display: flex;
   flex-direction: row;

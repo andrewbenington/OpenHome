@@ -106,3 +106,35 @@ summary::-webkit-details-marker {
   rotate: 0deg;
   transition: rotate 0.2s;
 }
+
+.greyed-out {
+  filter: grayscale(100%);
+}
+
+.shiny-icon {
+  position: absolute;
+  width: 40%;
+  height: 40%;
+  left: 0;
+  top: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.extra-indicator {
+  position: absolute;
+  min-width: 40%;
+  height: 40%;
+  right: 0;
+  top: 0;
+}
+
+.item-icon {
+  position: absolute;
+  width: 50%;
+  height: 50%;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  pointer-events: none;
+}

@@ -6,6 +6,8 @@ import { DragMonContext } from '@openhome-ui/state/dragMon'
 import { MonWithLocation } from '@openhome-ui/state/saves'
 import { MetadataLookup } from '@pkm-rs/pkg'
 import { useContext, useMemo } from 'react'
+import { TopRightIndicatorType } from '../../state/mon-display/useMonDisplay'
+import TopRightIndicator from '../TopRightIndicator'
 
 const getBackgroundDetails = (disabled?: boolean) => {
   if (disabled) {
@@ -26,9 +28,13 @@ export interface DraggableMonProps {
   style: any
   dragID?: string
   dragData?: MonWithLocation
+  topRightIndicator?: TopRightIndicatorType | null
+  showShiny?: boolean
+  showItem?: boolean
 }
 
-const DraggableMon = ({ mon, onClick, disabled, dragData, dragID }: DraggableMonProps) => {
+const DraggableMon = (props: DraggableMonProps) => {
+  const { onClick, disabled, mon, dragID, dragData, topRightIndicator, showItem, showShiny } = props
   const { ref } = useDraggable({
     id: (dragID ?? '') + mon.personalityValue?.toString(),
     data: dragData ? { kind: 'mon', monData: dragData } : undefined,
@@ -72,15 +78,24 @@ const DraggableMon = ({ mon, onClick, disabled, dragData, dragID }: DraggableMon
       <PokemonIcon
         dexNumber={mon.dexNum}
         formeNumber={formeNumber}
-        isShiny={mon.isShiny()}
+        isShiny={showShiny && mon.isShiny()}
         isEgg={mon.isEgg}
-        heldItemIndex={isDragging && dragState.mode === 'item' ? undefined : mon.heldItemIndex}
+        heldItemIndex={
+          showItem && (!isDragging || dragState.mode !== 'item') ? mon.heldItemIndex : undefined
+        }
         style={{
           width: '100%',
           height: '100%',
           visibility: isDragging && dragState.mode === 'mon' ? 'hidden' : undefined,
         }}
         greyedOut={disabled}
+        topRightIndicator={
+          topRightIndicator ? (
+            <TopRightIndicator indicatorType={topRightIndicator} mon={mon} />
+          ) : (
+            <></>
+          )
+        }
       />
     </div>
   )

@@ -4,7 +4,7 @@ import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getItemIconPath } from '@openhome-ui/images/items'
 import useMonSprite from '@openhome-ui/pokemon-details//useMonSprite'
 import { FormeMetadata, Generation, MetadataLookup } from '@pkm-rs/pkg'
-import { HTMLAttributes } from 'react'
+import { HTMLAttributes, ReactNode } from 'react'
 import './components.css'
 
 export interface PokemonIconProps extends HTMLAttributes<HTMLDivElement> {
@@ -15,6 +15,7 @@ export interface PokemonIconProps extends HTMLAttributes<HTMLDivElement> {
   heldItemIndex?: number
   greyedOut?: boolean
   silhouette?: boolean
+  topRightIndicator?: ReactNode
 }
 
 function getBackgroundPosition(formeMetadata?: FormeMetadata, isEgg?: boolean) {
@@ -37,6 +38,7 @@ export default function PokemonIcon(props: PokemonIconProps) {
     greyedOut,
     silhouette,
     isEgg,
+    topRightIndicator,
     ...attributes
   } = props
 
@@ -44,77 +46,36 @@ export default function PokemonIcon(props: PokemonIconProps) {
 
   const isGen9Mega = formeMetadata?.isMega && formeMetadata.introducedGen === Generation.G9
 
-  const isDarkMode = useIsDarkMode()
+  const monImage = isGen9Mega ? (
+    <PokemonIconUsingImage
+      dexNumber={dexNumber}
+      formeNumber={formeNumber}
+      silhouette={silhouette}
+    />
+  ) : formeMetadata ? (
+    <PokemonIconUsingSheet formeMetadata={formeMetadata} isEgg={isEgg} silhouette={silhouette} />
+  ) : null
 
-  if (isGen9Mega) {
-    return (
-      <PokemonIconUsingSprite
-        dexNumber={dexNumber}
-        formeNumber={formeNumber}
-        isShiny={isShiny}
-        heldItemIndex={heldItemIndex}
-        greyedOut={greyedOut}
-        silhouette={silhouette}
-        isEgg={isEgg}
-        {...attributes}
-      />
-    )
-  }
+  const className = greyedOut ? 'pokemon-icon-container greyed-out' : 'pokemon-icon-container'
 
   return (
-    <div
-      className="pokemon-icon-container"
-      {...attributes}
-      style={{
-        ...attributes.style,
-        filter: greyedOut ? 'grayscale(100%)' : undefined,
-      }}
-    >
-      <div
-        draggable={false}
-        className="pokemon-icon-image"
-        style={{
-          backgroundImage: `url(${BoxIcons})`,
-          backgroundPosition: getBackgroundPosition(formeMetadata, isEgg),
-          filter: silhouette
-            ? isDarkMode
-              ? 'contrast(0%) brightness(85%)'
-              : 'contrast(0%) brightness(25%)'
-            : undefined,
-        }}
-      />
+    <div className={className} {...attributes}>
+      {monImage}
       {isShiny && (
         <img
           alt="shiny icon"
+          className="shiny-icon"
           draggable={false}
           src={getPublicImageURL('icons/Shiny.png')}
-          style={{
-            position: 'absolute',
-            width: '40%',
-            height: '40%',
-            left: 0,
-            top: 0,
-            zIndex: 2,
-            pointerEvents: 'none',
-            filter: greyedOut ? 'grayscale(100%)' : undefined,
-          }}
         />
       )}
+      {topRightIndicator && <div className="extra-indicator">{topRightIndicator}</div>}
       {heldItemIndex ? (
         <img
           alt="item icon"
+          className="item-icon"
           draggable={false}
           src={getPublicImageURL(getItemIconPath(heldItemIndex))}
-          style={{
-            position: 'absolute',
-            width: '50%',
-            height: '50%',
-            right: 0,
-            bottom: 0,
-            zIndex: 2,
-            pointerEvents: 'none',
-            filter: greyedOut ? 'grayscale(100%)' : undefined,
-          }}
         />
       ) : (
         <></>
@@ -123,79 +84,66 @@ export default function PokemonIcon(props: PokemonIconProps) {
   )
 }
 
-function PokemonIconUsingSprite(props: PokemonIconProps) {
-  const { dexNumber, formeNumber, isShiny, heldItemIndex, greyedOut, silhouette, ...attributes } =
-    props
+interface PokemonIconUsingSheetProps {
+  formeMetadata: FormeMetadata
+  isEgg?: boolean
+  silhouette?: boolean
+}
 
-  const spriteResult = useMonSprite({
-    dexNum: dexNumber,
-    formeNum: formeNumber ?? 0,
-    format: 'OHPKM',
-    isShiny,
-  })
+function PokemonIconUsingSheet(props: PokemonIconUsingSheetProps) {
+  const { formeMetadata, isEgg, silhouette } = props
 
   const isDarkMode = useIsDarkMode()
 
   return (
     <div
-      className="pokemon-icon-container"
-      {...attributes}
+      draggable={false}
+      className="pokemon-icon-image"
       style={{
-        ...attributes.style,
-        filter: greyedOut ? 'grayscale(100%)' : undefined,
+        backgroundImage: `url(${BoxIcons})`,
+        backgroundPosition: getBackgroundPosition(formeMetadata, isEgg),
+        filter: silhouette
+          ? isDarkMode
+            ? 'contrast(0%) brightness(85%)'
+            : 'contrast(0%) brightness(25%)'
+          : undefined,
       }}
-    >
-      <img
-        alt="pokemon sprite"
-        draggable={false}
-        src={spriteResult.path}
-        style={{
-          width: '100%',
-          height: '100%',
-          imageRendering: 'pixelated',
-          filter: silhouette
-            ? isDarkMode
-              ? 'contrast(0%) brightness(85%)'
-              : 'contrast(0%) brightness(25%)'
-            : undefined,
-        }}
-      />
-      {isShiny && (
-        <img
-          alt="shiny icon"
-          draggable={false}
-          src={getPublicImageURL('icons/Shiny.png')}
-          style={{
-            position: 'absolute',
-            width: '40%',
-            height: '40%',
-            left: 0,
-            top: 0,
-            zIndex: 2,
-            pointerEvents: 'none',
-            filter: greyedOut ? 'grayscale(100%)' : undefined,
-          }}
-        />
-      )}
-      {heldItemIndex ? (
-        <img
-          alt="item icon"
-          draggable={false}
-          src={getPublicImageURL(getItemIconPath(heldItemIndex))}
-          style={{
-            position: 'absolute',
-            width: '50%',
-            height: '50%',
-            right: 0,
-            bottom: 0,
-            zIndex: 2,
-            pointerEvents: 'none',
-            filter: greyedOut ? 'grayscale(100%)' : undefined,
-          }}
-        />
-      ) : (
-        <></>
-      )}
-    </div>
+    />
+  )
+}
+
+interface PokemonIconUsingImageProps {
+  dexNumber: number
+  formeNumber?: number
+  silhouette?: boolean
+}
+
+function PokemonIconUsingImage(props: PokemonIconUsingImageProps) {
+  const { dexNumber, formeNumber, silhouette } = props
+
+  const isDarkMode = useIsDarkMode()
+
+  const spriteResult = useMonSprite({
+    dexNum: dexNumber,
+    formeNum: formeNumber ?? 0,
+    format: 'OHPKM',
+  })
+
+  return (
+    <img
+      alt="pokemon sprite"
+      draggable={false}
+      src={spriteResult.path}
+      style={{
+        width: '100%',
+        height: '100%',
+        imageRendering: 'pixelated',
+        filter: silhouette
+          ? isDarkMode
+            ? 'contrast(0%) brightness(85%)'
+            : 'contrast(0%) brightness(25%)'
+          : undefined,
+      }}
+    />
   )
 }
