@@ -10,6 +10,7 @@ export default function DisplayPanel() {
         <Select.Root
           value={extraIndicator}
           onValueChange={(value) => setExtraIndicatorType(value as ExtraIndicatorType)}
+          size="1"
         >
           <Select.Trigger placeholder="Extra Indicator" />
           <Select.Content>
@@ -25,4 +26,15 @@ export default function DisplayPanel() {
   )
 }
 
-const ExtraIndicatorTypes: ExtraIndicatorType[] = ['Gender', 'Origin Game', 'EVs', 'IVs']
+const ExtraIndicatorTypes: ExtraIndicatorType[] = [
+  'Gender',
+  'Origin Game',
+  'EVs (Total)',
+  'EV (HP)',
+  'EV (Attack)',
+  'EV (Defense)',
+  'EV (Special Attack)',
+  'EV (Special Defense)',
+  'EV (Speed)',
+  'IVs (Percent)',
+]

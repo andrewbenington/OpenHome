@@ -55,7 +55,7 @@ function getOriginIcon(origin: OriginGameWithData) {
             : undefined
 
   return path ? (
-    <img className="white-filter" draggable={false} alt="origin mark" src={path} />
+    <img className="filter-icon white-filter" draggable={false} alt="origin mark" src={path} />
   ) : undefined
 }
 
