@@ -57,5 +57,5 @@ const TopRightIndicatorTypes: TopRightIndicatorType[] = [
   'EV (Special Attack)',
   'EV (Special Defense)',
   'EV (Speed)',
-  'IVs (Percent)',
+  'IVs/DVs (Percent)',
 ]

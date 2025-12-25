@@ -1,4 +1,5 @@
 import { OriginGames } from '@pkm-rs/pkg'
+import { StatsPreSplit } from '@pokemon-files/util'
 import { Badge, Tooltip } from '@radix-ui/themes'
 import { PKMInterface } from '../../core/pkm/interfaces'
 import GenderIcon from '../components/pokemon/GenderIcon'
@@ -31,10 +32,9 @@ export default function TopRightIndicator({ mon, indicatorType }: TopRightIndica
       return <TopRightNumericalIndicator value={mon.evs?.spd} />
     case 'EV (Speed)':
       return <TopRightNumericalIndicator value={mon.evs?.spe} />
-    case 'IVs (Percent)':
-      const ivsTotal = Object.values(mon.ivs ?? {}).reduce((p, c) => p + c, 0)
-      const ivsPercent = Math.round((ivsTotal / (6 * 31)) * 100)
-      return <TopRightNumericalIndicator value={ivsPercent} percent />
+    case 'IVs/DVs (Percent)':
+      const ivsOrDvsPercent = mon.ivs ? getIvsPercent(mon) : hasDvs(mon) ? getDvsPercent(mon) : 0
+      return <TopRightNumericalIndicator value={ivsOrDvsPercent} percent />
     case 'Origin Game':
       const gameMetadata = OriginGames.getMetadata(mon.gameOfOrigin)
       const markImage = mon.gameOfOrigin ? getOriginIconPath(gameMetadata) : undefined
@@ -70,18 +70,28 @@ type TopRightNumericalIndicatorProps = {
   percent?: boolean
 }
 
+function hasDvs(mon: PKMInterface): mon is PKMInterface & { dvs: StatsPreSplit } {
+  return (mon as any).dvs !== undefined
+}
+
 function TopRightNumericalIndicator({ value, percent }: TopRightNumericalIndicatorProps) {
   return (
     value !== undefined &&
-    value > 0 && (
-      <Badge
-        size="1"
-        style={{ fontWeight: 'bold', borderRadius: 32, fontSize: 10, padding: '0px 4px' }}
-        variant="solid"
-      >
+    (percent || value > 0) && (
+      <Badge className="badge-shadow numerical-indicator" size="1" variant="solid">
         {value}
         {percent ? '%' : ''}
       </Badge>
     )
   )
+}
+
+function getIvsPercent(mon: PKMInterface): number {
+  const ivsTotal = Object.values(mon.ivs ?? {}).reduce((p, c) => p + c, 0)
+  return Math.round((ivsTotal / (6 * 31)) * 100)
+}
+
+function getDvsPercent(mon: PKMInterface & { dvs: StatsPreSplit }): number {
+  const dvsTotal = Object.values(mon.dvs).reduce((p, c) => p + c, 0)
+  return Math.round((dvsTotal / (5 * 15)) * 100)
 }

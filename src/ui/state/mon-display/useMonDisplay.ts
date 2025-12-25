@@ -46,7 +46,7 @@ export type TopRightIndicatorType =
   | 'Origin Game'
   | 'Gender'
   | 'EVs (Total)'
-  | 'IVs (Percent)'
+  | 'IVs/DVs (Percent)'
   | EvIndicator
 
 type StatDisplay = 'HP' | 'Attack' | 'Defense' | 'Special Attack' | 'Special Defense' | 'Speed'
