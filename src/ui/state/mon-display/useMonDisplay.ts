@@ -3,13 +3,13 @@ import { createContext, useContext } from 'react'
 
 export type MonDisplayState = {
   filter: Filter
-  extraIndicator?: ExtraIndicatorType
+  extraIndicator: ExtraIndicatorType | null
   showShiny: boolean
   showItem: boolean
 }
 
 export function initialMonDisplayState() {
-  return { filter: {}, showShiny: true, showItem: true }
+  return { filter: {}, extraIndicator: null, showShiny: true, showItem: true }
 }
 
 export const MonDisplayContext = createContext<[MonDisplayState, (state: MonDisplayState) => void]>(
@@ -27,11 +27,19 @@ export function useMonDisplay() {
     setState({ ...state, filter: {} })
   }
 
-  function setExtraIndicatorType(extraIndicator: ExtraIndicatorType | undefined) {
+  function setExtraIndicatorType(extraIndicator: ExtraIndicatorType | null) {
     setState({ ...state, extraIndicator })
   }
 
-  return { ...state, setFilter, clearFilter, setExtraIndicatorType }
+  function setShowShiny(showShiny: boolean) {
+    setState({ ...state, showShiny })
+  }
+
+  function setShowItem(showItem: boolean) {
+    setState({ ...state, showItem })
+  }
+
+  return { ...state, setFilter, clearFilter, setExtraIndicatorType, setShowShiny, setShowItem }
 }
 
 export type ExtraIndicatorType =

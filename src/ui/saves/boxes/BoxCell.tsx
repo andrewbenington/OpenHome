@@ -47,7 +47,7 @@ function BoxCell({
   location,
   ctxMenuBuilders,
 }: BoxCellProps) {
-  const { filter, extraIndicator } = useMonDisplay()
+  const { filter, extraIndicator, showItem, showShiny } = useMonDisplay()
   const backend = useContext(BackendContext)
   const displayError = useDisplayError()
   const { releaseMonAtLocation } = useSaves()
@@ -169,6 +169,8 @@ function BoxCell({
             dragID={dragID}
             disabled={disabled || isFilteredOut}
             extraIndicator={extraIndicator}
+            showItem={showItem}
+            showShiny={showShiny}
           />
         ) : (
           <DroppableSpace dropID={dragID} dropData={location} disabled={disabled} />
