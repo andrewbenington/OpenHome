@@ -15,7 +15,7 @@ export interface PokemonIconProps extends HTMLAttributes<HTMLDivElement> {
   heldItemIndex?: number
   greyedOut?: boolean
   silhouette?: boolean
-  extraIndicator?: ReactNode
+  topRightIndicator?: ReactNode
 }
 
 function getBackgroundPosition(formeMetadata?: FormeMetadata, isEgg?: boolean) {
@@ -38,7 +38,7 @@ export default function PokemonIcon(props: PokemonIconProps) {
     greyedOut,
     silhouette,
     isEgg,
-    extraIndicator,
+    topRightIndicator,
     ...attributes
   } = props
 
@@ -69,7 +69,7 @@ export default function PokemonIcon(props: PokemonIconProps) {
           src={getPublicImageURL('icons/Shiny.png')}
         />
       )}
-      {extraIndicator && <div className="extra-indicator">{extraIndicator}</div>}
+      {topRightIndicator && <div className="extra-indicator">{topRightIndicator}</div>}
       {heldItemIndex ? (
         <img
           alt="item icon"

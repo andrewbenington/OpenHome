@@ -1,5 +1,5 @@
 import { Flex, Select, Switch } from '@radix-ui/themes'
-import { ExtraIndicatorType, useMonDisplay } from '../../../state/mon-display/useMonDisplay'
+import { TopRightIndicatorType, useMonDisplay } from '../../../state/mon-display/useMonDisplay'
 
 export default function DisplayPanel() {
   const displayState = useMonDisplay()
@@ -8,10 +8,10 @@ export default function DisplayPanel() {
     <div style={{ contain: 'none', padding: 4 }}>
       <Flex direction="column" m="1" gap="1">
         <Select.Root
-          value={displayState.extraIndicator ?? ''}
+          value={displayState.topRightIndicator ?? ''}
           onValueChange={(value) =>
-            displayState.setExtraIndicatorType(
-              value === 'None' ? null : (value as ExtraIndicatorType)
+            displayState.setTopRightIndicatorType(
+              value === 'None' ? null : (value as TopRightIndicatorType)
             )
           }
           size="1"
@@ -19,7 +19,7 @@ export default function DisplayPanel() {
           <Select.Trigger placeholder="Top-Right Indicator" />
           <Select.Content position="popper">
             <Select.Item value="None">None</Select.Item>
-            {ExtraIndicatorTypes.map((indicatorType) => (
+            {TopRightIndicatorTypes.map((indicatorType) => (
               <Select.Item key={indicatorType} value={indicatorType}>
                 {indicatorType}
               </Select.Item>
@@ -47,7 +47,7 @@ export default function DisplayPanel() {
   )
 }
 
-const ExtraIndicatorTypes: ExtraIndicatorType[] = [
+const TopRightIndicatorTypes: TopRightIndicatorType[] = [
   'Gender',
   'Origin Game',
   'EVs (Total)',

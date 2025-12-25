@@ -47,7 +47,7 @@ function BoxCell({
   location,
   ctxMenuBuilders,
 }: BoxCellProps) {
-  const { filter, extraIndicator, showItem, showShiny } = useMonDisplay()
+  const { filter, topRightIndicator: TopRightIndicator, showItem, showShiny } = useMonDisplay()
   const backend = useContext(BackendContext)
   const displayError = useDisplayError()
   const { releaseMonAtLocation } = useSaves()
@@ -168,7 +168,7 @@ function BoxCell({
             dragData={location ? { ...location, mon } : undefined}
             dragID={dragID}
             disabled={disabled || isFilteredOut}
-            extraIndicator={extraIndicator}
+            topRightIndicator={TopRightIndicator}
             showItem={showItem}
             showShiny={showShiny}
           />
