@@ -6,7 +6,6 @@ import { PKMInterface } from '../../core/pkm/interfaces'
 import GenderIcon from '../components/pokemon/GenderIcon'
 import { getOriginIconPath } from '../images/game'
 import { TopRightIndicatorType } from '../state/mon-display/useMonDisplay'
-import { useSaves } from '../state/saves'
 import { colorIsDark } from '../util/color'
 import './style.css'
 
@@ -16,8 +15,6 @@ type TopRightIndicatorProps = {
 }
 
 export default function TopRightIndicator({ mon, indicatorType }: TopRightIndicatorProps) {
-  const { modifiedOHPKMs } = useSaves()
-
   switch (indicatorType) {
     case 'Gender':
       return <GenderIcon gender={mon.gender} />
@@ -45,12 +42,6 @@ export default function TopRightIndicator({ mon, indicatorType }: TopRightIndica
       return (
         mon instanceof OHPKM && <OriginGameIndicator originGame={mon.mostRecentSaveWasm?.game} />
       )
-    case 'Modified':
-      return (
-        <TopRightCheckmarkIndicator
-          value={mon instanceof OHPKM && mon.getHomeIdentifier() in modifiedOHPKMs}
-        />
-      )
     default:
       return <></>
   }
@@ -72,16 +63,6 @@ function TopRightNumericalIndicator({ value, percent }: TopRightNumericalIndicat
       <Badge className="badge-shadow numerical-indicator" size="1" variant="solid">
         {value}
         {percent ? '%' : ''}
-      </Badge>
-    )
-  )
-}
-
-function TopRightCheckmarkIndicator({ value }: { value?: boolean }) {
-  return (
-    Boolean(value) && (
-      <Badge className="badge-shadow numerical-indicator" size="1" variant="solid">
-        √
       </Badge>
     )
   )

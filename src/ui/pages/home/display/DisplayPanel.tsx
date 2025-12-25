@@ -1,10 +1,8 @@
 import { Flex, Select, Switch } from '@radix-ui/themes'
-import useIsDev from 'src/ui/hooks/isDev'
 import { TopRightIndicatorType, useMonDisplay } from '../../../state/mon-display/useMonDisplay'
 
 export default function DisplayPanel() {
   const displayState = useMonDisplay()
-  const isDev = useIsDev()
 
   return (
     <div style={{ contain: 'none', padding: 4 }}>
@@ -26,12 +24,6 @@ export default function DisplayPanel() {
                 {indicatorType}
               </Select.Item>
             ))}
-            {isDev &&
-              DevIndicatorTypes.map((indicatorType) => (
-                <Select.Item key={indicatorType} value={indicatorType}>
-                  {indicatorType}
-                </Select.Item>
-              ))}
           </Select.Content>
         </Select.Root>
         <Flex align="center" gap="2">
@@ -68,5 +60,3 @@ const TopRightIndicatorTypes: TopRightIndicatorType[] = [
   'EV (Speed)',
   'IVs/DVs (Percent)',
 ]
-
-const DevIndicatorTypes: TopRightIndicatorType[] = ['Modified']
