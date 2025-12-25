@@ -275,6 +275,7 @@ pub enum StringErrorSource {
     Other,
     PluginOrigin(FromUtf8Error),
     Notes(FromUtf8Error),
+    MostRecentSaveFilePath(FromUtf8Error),
 }
 
 
@@ -286,6 +287,7 @@ impl Display for StringErrorSource {
                 f.write_fmt(format_args!("OHPKM plugin origin: {utf_error}"))
             },
             Self::Notes(utf_error) => f.write_fmt(format_args!("OHPKM notes: {utf_error}")),
+            Self::MostRecentSaveFilePath(utf_error) => f.write_fmt(format_args!("OHPKM most recent save file path: {utf_error}")),
         }
     }
 }

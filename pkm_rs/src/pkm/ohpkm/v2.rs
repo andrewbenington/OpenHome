@@ -1,8 +1,8 @@
 use crate::pkm::ohpkm::OhpkmV1;
 use crate::pkm::ohpkm::sectioned_data::{DataSection, SectionTag, SectionedData};
 use crate::pkm::ohpkm::v2_sections::{
-    BdspData, GameboyData, Gen45Data, Gen67Data, LegendsArceusData, MainDataV2, Notes,
-    PastHandlerData, PluginData, ScarletVioletData, SwordShieldData,
+    BdspData, GameboyData, Gen45Data, Gen67Data, LegendsArceusData, MainDataV2, MostRecentSave,
+    Notes, PastHandlerData, PluginData, ScarletVioletData, SwordShieldData,
 };
 use crate::pkm::{Error, Result};
 
@@ -51,6 +51,7 @@ pub enum SectionTagV2 {
     PastHandler,
     PluginData,
     Notes,
+    MostRecentSave,
 }
 
 impl SectionTagV2 {
@@ -67,7 +68,8 @@ impl SectionTagV2 {
             8 => Some(Self::PastHandler),
             9 => Some(Self::PluginData),
             10 => Some(Self::Notes),
-            _ => None,
+            11 => Some(Self::MostRecentSave),
+            12.. => None,
         }
     }
 
@@ -84,6 +86,7 @@ impl SectionTagV2 {
             Self::PastHandler => 39,
             Self::PluginData => 0,
             Self::Notes => 0,
+            Self::MostRecentSave => 31,
         }
     }
 }
@@ -119,6 +122,7 @@ pub struct OhpkmV2 {
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     plugin_data: Option<PluginData>,
     notes: Option<Notes>,
+    most_recent_save: Option<MostRecentSave>,
 }
 
 impl OhpkmV2 {
@@ -135,6 +139,7 @@ impl OhpkmV2 {
             handler_data: Vec::new(),
             plugin_data: None,
             notes: None,
+            most_recent_save: None,
         })
     }
     pub fn from_bytes(bytes: &[u8]) -> Result<Self> {
@@ -159,6 +164,7 @@ impl OhpkmV2 {
             handler_data: PastHandlerData::extract_all_from(&sectioned_data)?,
             plugin_data: PluginData::extract_from(&sectioned_data)?,
             notes: Notes::extract_from(&sectioned_data)?,
+            most_recent_save: MostRecentSave::extract_from(&sectioned_data)?,
         })
     }
 
@@ -175,6 +181,7 @@ impl OhpkmV2 {
             handler_data: PastHandlerData::from_v1(old).map_or(Vec::new(), |hd| vec![hd]),
             plugin_data: PluginData::from_v1(old),
             notes: None,
+            most_recent_save: None,
         }
     }
 
@@ -191,7 +198,8 @@ impl OhpkmV2 {
             .add_if_some(self.clone().sv_data)?
             .add_all(self.handler_data.clone())?
             .add_if_some(self.plugin_data.clone())?
-            .add_if_some(self.notes.clone())?;
+            .add_if_some(self.notes.clone())?
+            .add_if_some(self.most_recent_save.clone())?;
         Ok(sectioned_data)
     }
 
@@ -1701,6 +1709,12 @@ impl OhpkmV2 {
         }
     }
 
+    // Most Recent save
+    #[wasm_bindgen(getter = mostRecentSaveWasm)]
+    pub fn most_recent_save(&self) -> Option<MostRecentSave> {
+        self.most_recent_save.clone()
+    }
+
     // Calculated
     #[wasm_bindgen(js_name = isShinyWasm)]
     pub fn is_shiny(&self) -> bool {
@@ -1713,11 +1727,29 @@ impl OhpkmV2 {
     }
 
     // Helpers
-    #[wasm_bindgen(js_name = tradeToGame)]
-    pub fn trade_to_game(&mut self, game: OriginGame) {
+    #[wasm_bindgen(js_name = tradeToSaveWasm)]
+    pub fn trade_to_save(&mut self, game: OriginGame) {
         if game.is_gameboy() && self.gameboy_data.is_none() {
             self.gameboy_data = Some(GameboyData::from_main_data(&self.main_data));
         }
+    }
+
+    #[wasm_bindgen(js_name = setRecentSaveWasm)]
+    pub fn set_recent_save(
+        &mut self,
+        game: OriginGame,
+        trainer_id: u16,
+        secret_id: u16,
+        trainer_name: String,
+        save_path: String,
+    ) {
+        self.most_recent_save = Some(MostRecentSave {
+            trainer_id,
+            secret_id,
+            game,
+            trainer_name: trainer_name.into(),
+            file_path: save_path,
+        })
     }
 
     #[wasm_bindgen(js_name = getPresentSections)]

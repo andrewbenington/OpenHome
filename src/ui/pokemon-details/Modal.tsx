@@ -16,6 +16,7 @@ import './style.css'
 import MetDataMovesTab from './tabs/MetDataMovesTab'
 import NotesDisplay from './tabs/NotesTab'
 import OtherDisplay from './tabs/OtherTab'
+import RecentSaveTab from './tabs/RecentSaveTab'
 import RibbonsDisplay from './tabs/RibbonsTab'
 import StatsDisplay from './tabs/StatsTab'
 import SummaryDisplay from './tabs/SummaryTab'
@@ -154,6 +155,7 @@ const PokemonDetailsModal = (props: {
                 <>
                   <SideTabs.Tab value="trainers">Trainers</SideTabs.Tab>
                   <SideTabs.Tab value="notes">Notes</SideTabs.Tab>
+                  <SideTabs.Tab value="recent-save">Recent Save</SideTabs.Tab>
                 </>
               )}
               <SideTabs.Tab value="raw">Raw</SideTabs.Tab>
@@ -181,6 +183,9 @@ const PokemonDetailsModal = (props: {
                   </SideTabs.Panel>
                   <SideTabs.Panel value="notes">
                     <NotesDisplay mon={mon} />
+                  </SideTabs.Panel>
+                  <SideTabs.Panel value="recent-save">
+                    <RecentSaveTab mon={mon} />
                   </SideTabs.Panel>
                 </>
               )}

@@ -385,8 +385,11 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
       if (sourceSave !== destSave) {
         if (sourceMon) {
           if (!(sourceMon instanceof OHPKM)) {
-            sourceMon = new OHPKM(sourceMon)
+            sourceMon = OHPKM.fromMonInSave(sourceMon, sourceSave as SAV)
+          } else if (!source.is_home) {
+            sourceMon.setRecentSave(sourceSave as SAV)
           }
+
           const identifier = getMonFileIdentifier(sourceMon)
 
           if (identifier) {
@@ -395,8 +398,11 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
         }
         if (destMon) {
           if (!(destMon instanceof OHPKM)) {
-            destMon = new OHPKM(destMon)
+            destMon = OHPKM.fromMonInSave(destMon, destSave as SAV)
+          } else if (!dest.is_home) {
+            destMon.setRecentSave(destSave as SAV)
           }
+
           const identifier = getMonFileIdentifier(destMon)
 
           if (identifier) {

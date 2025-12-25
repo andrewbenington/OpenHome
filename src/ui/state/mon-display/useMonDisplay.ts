@@ -44,10 +44,12 @@ export function useMonDisplay() {
 
 export type TopRightIndicatorType =
   | 'Origin Game'
+  | 'Most Recent Save'
   | 'Gender'
   | 'EVs (Total)'
   | 'IVs/DVs (Percent)'
   | EvIndicator
+  | 'Modified'
 
 type StatDisplay = 'HP' | 'Attack' | 'Defense' | 'Special Attack' | 'Special Defense' | 'Speed'
 
