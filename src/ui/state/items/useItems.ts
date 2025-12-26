@@ -17,13 +17,14 @@ export function useItems() {
   }
 
   function giveItemToMon(monLocation: MonLocation, item: Item) {
-    // Avoid losing the second item if mon already holding same item
     const destMon = savesAndBanks.getMonAtLocation(monLocation)
-    if (destMon?.heldItemIndex === item.index) {
-      return
+    bagDispatch({ type: 'remove_item', payload: { index: item.index, qty: 1 } })
+
+    // If already holding an item, move it to the bag
+    if (destMon?.heldItemIndex !== undefined) {
+      bagDispatch({ type: 'add_item', payload: { index: destMon.heldItemIndex, qty: 1 } })
     }
     savesAndBanks.setMonHeldItem(item, monLocation)
-    bagDispatch({ type: 'remove_item', payload: { index: item.index, qty: 1 } })
   }
 
   return { moveMonItemToBag, giveItemToMon, itemCounts: bagState.itemCounts }

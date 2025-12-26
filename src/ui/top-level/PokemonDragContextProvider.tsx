@@ -9,6 +9,15 @@ import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { MonLocation, useSaves } from '@openhome-ui/state/saves'
 import { ReactNode, useContext } from 'react'
 
+const pointerSensor = PointerSensor.configure({
+  activationConstraints: {
+    // Start dragging after moving 5px
+    distance: { value: 5 },
+    // Or after holding for 200ms
+    delay: { value: 200, tolerance: 10 },
+  },
+})
+
 export default function PokemonDragContextProvider(props: { children?: ReactNode }) {
   const { children } = props
   const savesAndBanks = useSaves()
@@ -73,16 +82,7 @@ export default function PokemonDragContextProvider(props: { children?: ReactNode
           dispatchDragMonState({ type: 'start_drag', payload: data })
         }
       }}
-      sensors={[
-        PointerSensor.configure({
-          activationConstraints: {
-            // Start dragging after moving 5px
-            distance: { value: 5 },
-            // Or after holding for 200ms
-            delay: { value: 200, tolerance: 10 },
-          },
-        }),
-      ]}
+      sensors={[pointerSensor]}
     >
       <DragOverlay style={{ cursor: 'grabbing' }}>
         {dragMonState.payload?.kind === 'item' ? (
