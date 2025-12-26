@@ -1,5 +1,6 @@
 import { Filter } from '@openhome-ui/util/filter'
 import { createContext, useContext } from 'react'
+import { AppInfoContext, initialMonDisplayState } from '../state/appInfo'
 
 export type MonDisplayState = {
   filter: Filter
@@ -8,38 +9,47 @@ export type MonDisplayState = {
   showItem: boolean
 }
 
-export function initialMonDisplayState() {
-  return { filter: {}, topRightIndicator: null, showShiny: true, showItem: true }
-}
-
 export const MonDisplayContext = createContext<[MonDisplayState, (state: MonDisplayState) => void]>(
   [initialMonDisplayState(), () => null]
 )
 
 export function useMonDisplay() {
-  const [state, setState] = useContext(MonDisplayContext)
+  const [{ settings }, dispatchAppInfo] = useContext(AppInfoContext)
+
+  const monDisplayState = settings.monDisplayState
+
+  function updateState(newState: MonDisplayState) {
+    dispatchAppInfo({ type: 'set_mon_display_state', payload: newState })
+  }
 
   function setFilter(newFilter: Partial<Filter>) {
-    setState({ ...state, filter: newFilter })
+    updateState({ ...monDisplayState, filter: newFilter })
   }
 
   function clearFilter() {
-    setState({ ...state, filter: {} })
+    updateState({ ...monDisplayState, filter: {} })
   }
 
   function setTopRightIndicatorType(topRightIndicator: TopRightIndicatorType | null) {
-    setState({ ...state, topRightIndicator })
+    updateState({ ...monDisplayState, topRightIndicator })
   }
 
   function setShowShiny(showShiny: boolean) {
-    setState({ ...state, showShiny })
+    updateState({ ...monDisplayState, showShiny })
   }
 
   function setShowItem(showItem: boolean) {
-    setState({ ...state, showItem })
+    updateState({ ...monDisplayState, showItem })
   }
 
-  return { ...state, setFilter, clearFilter, setTopRightIndicatorType, setShowShiny, setShowItem }
+  return {
+    ...monDisplayState,
+    setFilter,
+    clearFilter,
+    setTopRightIndicatorType,
+    setShowShiny,
+    setShowItem,
+  }
 }
 
 export type TopRightIndicatorType =

@@ -1,5 +1,5 @@
 import { Flex, Select, Switch } from '@radix-ui/themes'
-import { TopRightIndicatorType, useMonDisplay } from '../../../state/mon-display/useMonDisplay'
+import { TopRightIndicatorType, useMonDisplay } from '../../../hooks/useMonDisplay'
 
 export default function DisplayPanel() {
   const displayState = useMonDisplay()

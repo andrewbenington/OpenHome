@@ -26,7 +26,6 @@ import { useCallback, useContext, useEffect, useReducer, useState } from 'react'
 import './App.css'
 import AppTabs from './AppTabs'
 import useDebounce from './hooks/useDebounce'
-import MonDisplayProvider from './state/mon-display/MonDisplayProvider'
 import ErrorMessageModal from './top-level/ErrorMessageModal'
 import PokemonDragContextProvider from './top-level/PokemonDragContextProvider'
 import UpdateMessageModal from './top-level/UpdateMessageModal'
@@ -182,19 +181,17 @@ function AppWithBackend() {
                 <SavesProvider>
                   <DragMonContext.Provider value={[dragMonState, dragMonDispatch]}>
                     <PokemonDragContextProvider>
-                      <MonDisplayProvider>
-                        {settingsLoading ? (
-                          <Flex width="100%" height="100vh" align="center" justify="center">
-                            <Text size="9" weight="bold">
-                              OpenHome
-                            </Text>
-                          </Flex>
-                        ) : (
-                          <AppTabs />
-                        )}
-                        <ErrorMessageModal />
-                        <UpdateMessageModal />
-                      </MonDisplayProvider>
+                      {settingsLoading ? (
+                        <Flex width="100%" height="100vh" align="center" justify="center">
+                          <Text size="9" weight="bold">
+                            OpenHome
+                          </Text>
+                        </Flex>
+                      ) : (
+                        <AppTabs />
+                      )}
+                      <ErrorMessageModal />
+                      <UpdateMessageModal />
                     </PokemonDragContextProvider>
                   </DragMonContext.Provider>
                 </SavesProvider>
