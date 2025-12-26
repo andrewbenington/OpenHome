@@ -76,6 +76,7 @@ export default interface BackendInterface {
   pickFolder: () => Promise<Errorable<string | undefined>>
   getResourcesPath: () => Promise<string>
   openDirectory: (directory: string) => Promise<Errorable<null>>
+  openFileLocation: (filePath: string) => Promise<Errorable<null>>
   getPlatform: () => string
   registerListeners: (listeners: Partial<BackendListeners>) => () => void
   getState: () => Promise<Errorable<AppState>>

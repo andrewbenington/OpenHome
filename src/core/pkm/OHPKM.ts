@@ -335,6 +335,13 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     return new OHPKM(new Uint8Array(buffer))
   }
 
+  static fromMonInSave(mon: PKMInterface, save: SAV): OHPKM {
+    const ohpkm = new OHPKM(mon)
+    ohpkm.syncWithGameData(mon, save)
+
+    return ohpkm
+  }
+
   // getters / setters
 
   get dexNum() {
@@ -569,7 +576,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   }
 
   public tradeToSave(save: SAV) {
-    this.tradeToGame(save.origin)
+    this.tradeToSaveWasm(save.origin)
 
     this.isCurrentHandler = !this.isFrom(save)
     if (!this.isCurrentHandler) return
@@ -586,6 +593,10 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       this.handlerFriendship = 70 // TODO: PER-FORM BASE FRIENDSHIP
       this.updateTrainerData(save, 70, 0)
     }
+  }
+
+  public setRecentSave(save: SAV): void {
+    this.setRecentSaveWasm(save.origin, save.tid, save.sid ?? 0, save.name, save.filePath.raw)
   }
 
   static maxValidMove() {
@@ -739,6 +750,10 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
 
     if (other.pokerusByte) {
       this.pokerusByte = other.pokerusByte
+    }
+
+    if (save) {
+      this.setRecentSave(save)
     }
 
     const shouldUpdateOriginalTrainer = save

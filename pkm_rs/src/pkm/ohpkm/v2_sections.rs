@@ -1210,6 +1210,74 @@ impl DataSection for PastHandlerData {
     }
 }
 
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[derive(Debug, Default, Clone)]
+pub struct MostRecentSave {
+    pub trainer_id: u16,
+    pub secret_id: u16,
+    pub game: OriginGame,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+    pub trainer_name: SizedUtf16String<26>,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(getter_with_clone))]
+    pub file_path: String,
+}
+
+#[cfg(feature = "wasm")]
+#[wasm_bindgen]
+#[allow(clippy::missing_const_for_fn)]
+#[allow(clippy::too_many_arguments)]
+impl MostRecentSave {
+    #[wasm_bindgen(getter)]
+    pub fn trainer_name(&self) -> String {
+        self.trainer_name.to_string()
+    }
+}
+
+impl DataSection for MostRecentSave {
+    type TagType = SectionTagV2;
+    const TAG: Self::TagType = SectionTagV2::MostRecentSave;
+
+    type ErrorType = Error;
+
+    fn from_bytes(bytes: &[u8]) -> Result<Self> {
+        Self::ensure_buffer_size(bytes)?;
+
+        let trainer_id = u16::from_le_bytes(bytes[0..=1].try_into().unwrap());
+        let secret_id = u16::from_le_bytes(bytes[2..=3].try_into().unwrap());
+        let game = OriginGame::from(bytes[4]);
+        let trainer_name = SizedUtf16String::<26>::from_bytes(bytes[5..=30].try_into().unwrap());
+
+        let file_path =
+            String::from_utf8(bytes[31..].to_vec()).map_err(|e| Error::StringDecode {
+                source: StringErrorSource::MostRecentSaveFilePath(e),
+            })?;
+
+        Ok(Self {
+            trainer_id,
+            secret_id,
+            game,
+            trainer_name,
+            file_path,
+        })
+    }
+
+    fn to_bytes(&self) -> Result<Vec<u8>> {
+        let mut bytes = Vec::new();
+
+        bytes.extend_from_slice(&self.trainer_id.to_le_bytes());
+        bytes.extend_from_slice(&self.secret_id.to_le_bytes());
+        bytes.push(self.game as u8);
+        bytes.extend_from_slice(&self.trainer_name.bytes());
+        bytes.extend_from_slice(self.file_path.as_bytes());
+
+        Ok(bytes)
+    }
+
+    fn is_empty(&self) -> bool {
+        self.file_path.is_empty()
+    }
+}
+
 #[derive(Debug, Default, Clone)]
 pub struct PluginData {
     pub plugin_origin: String,

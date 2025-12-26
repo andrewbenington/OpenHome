@@ -20,6 +20,7 @@ import { SAVClass } from '@openhome-core/save/util'
 import { XYSAV } from '@openhome-core/save/XYSAV'
 import { SaveViewMode } from '@openhome-ui/saves/util'
 import { Dispatch, Reducer, createContext } from 'react'
+import { MonDisplayState } from '../hooks/useMonDisplay'
 
 const OFFICIAL_SAVE_TYPES = [
   G1SAV,
@@ -42,6 +43,10 @@ const OFFICIAL_SAVE_TYPES = [
 ]
 const EXTRA_SAVE_TYPES = [G3RRSAV, G3UBSAV]
 
+export function initialMonDisplayState() {
+  return { filter: {}, topRightIndicator: null, showShiny: true, showItem: true }
+}
+
 export const defaultSettings: Settings = {
   enabledSaveTypes: Object.fromEntries(
     [...OFFICIAL_SAVE_TYPES, ...EXTRA_SAVE_TYPES].map((savetype) => [savetype.saveTypeID, true])
@@ -49,6 +54,7 @@ export const defaultSettings: Settings = {
   enabledPlugins: {},
   saveCardSize: 180,
   saveViewMode: 'card',
+  monDisplayState: initialMonDisplayState(),
   appTheme: 'system',
 }
 
@@ -57,6 +63,7 @@ export type Settings = {
   enabledPlugins: Record<string, boolean>
   saveCardSize: number
   saveViewMode: SaveViewMode
+  monDisplayState: MonDisplayState
   appTheme: 'light' | 'dark' | 'system'
 }
 
@@ -99,6 +106,7 @@ export type AppInfoAction =
       type: 'set_app_theme'
       payload: 'light' | 'dark' | 'system'
     }
+  | { type: 'set_mon_display_state'; payload: MonDisplayState }
   | {
       type: 'set_error'
       payload: string | undefined
@@ -167,6 +175,9 @@ export const appInfoReducer: Reducer<AppInfoState, AppInfoAction> = (
     }
     case 'set_app_theme': {
       return { ...state, settings: { ...state.settings, appTheme: payload } }
+    }
+    case 'set_mon_display_state': {
+      return { ...state, settings: { ...state.settings, monDisplayState: payload } }
     }
     case 'set_error': {
       return { ...state, error: payload }

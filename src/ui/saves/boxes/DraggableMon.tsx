@@ -6,7 +6,7 @@ import { DragMonContext } from '@openhome-ui/state/dragMon'
 import { MonWithLocation } from '@openhome-ui/state/saves'
 import { MetadataLookup } from '@pkm-rs/pkg'
 import { useContext, useMemo } from 'react'
-import { TopRightIndicatorType } from '../../state/mon-display/useMonDisplay'
+import { TopRightIndicatorType } from '../../hooks/useMonDisplay'
 import TopRightIndicator from '../TopRightIndicator'
 
 const getBackgroundDetails = (disabled?: boolean) => {

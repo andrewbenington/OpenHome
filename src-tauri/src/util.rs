@@ -290,7 +290,7 @@ pub fn delete_directory(directory_path: &Path) -> Result<()> {
         .map_err(|err| Error::other_with_source("Failed to delete directory", err))
 }
 
-pub fn open_directory(directory_path: &str) -> Result<()> {
+pub fn open_directory(directory_path: &Path) -> Result<()> {
     if let Err(err) = Command::new("open").arg(directory_path).spawn() {
         Err(Error::other_with_source(
             "Failed to open directory in file browser",

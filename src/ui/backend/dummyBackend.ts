@@ -46,6 +46,7 @@ const DummyBackend: BackendInterface = {
   pickFolder: async () => E.left('no backend in use'),
   getResourcesPath: async () => '',
   openDirectory: async () => E.left('no backend in use'),
+  openFileLocation: async () => E.left('no backend in use'),
   getPlatform: () => 'none',
   registerListeners: (_: Partial<BackendListeners>) => () => {},
   getState: async () => E.left('no backend in use'),
