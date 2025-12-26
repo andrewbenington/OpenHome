@@ -27,20 +27,24 @@ const recoverOHPKMData = (
   saveFile.boxes.forEach((box) => {
     box.pokemon.forEach((mon, monIndex) => {
       if (mon) {
-        const lookupIdentifier = getIdentifier(mon)
+        try {
+          const lookupIdentifier = getIdentifier(mon)
 
-        if (!lookupIdentifier) return
-        const homeIdentifier = lookupMap ? lookupMap[lookupIdentifier] : lookupIdentifier
+          if (!lookupIdentifier) return
+          const homeIdentifier = lookupMap ? lookupMap[lookupIdentifier] : lookupIdentifier
 
-        if (!homeIdentifier) return
-        const storedOhpkm = getOhpkmById?.(homeIdentifier)
+          if (!homeIdentifier) return
+          const storedOhpkm = getOhpkmById?.(homeIdentifier)
 
-        if (storedOhpkm) {
-          storedOhpkm.syncWithGameData(mon, saveFile)
-          if (updateMonCallback) {
-            updateMonCallback(storedOhpkm)
+          if (storedOhpkm) {
+            storedOhpkm.syncWithGameData(mon, saveFile)
+            if (updateMonCallback) {
+              updateMonCallback(storedOhpkm)
+            }
+            box.pokemon[monIndex] = storedOhpkm
           }
-          box.pokemon[monIndex] = storedOhpkm
+        } catch (e) {
+          console.error('Error recovering OHPKM data for mon:', mon, e)
         }
       }
     })

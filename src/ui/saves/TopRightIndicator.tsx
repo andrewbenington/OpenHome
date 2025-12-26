@@ -6,6 +6,8 @@ import { PKMInterface } from '../../core/pkm/interfaces'
 import GenderIcon from '../components/pokemon/GenderIcon'
 import { TopRightIndicatorType } from '../hooks/useMonDisplay'
 import { getOriginIconPath } from '../images/game'
+import { getPublicImageURL } from '../images/images'
+import { BallsImageList } from '../images/items'
 import { colorIsDark } from '../util/color'
 import './style.css'
 
@@ -41,6 +43,34 @@ export default function TopRightIndicator({ mon, indicatorType }: TopRightIndica
     case 'Most Recent Save':
       return (
         mon instanceof OHPKM && <OriginGameIndicator originGame={mon.mostRecentSaveWasm?.game} />
+      )
+    case 'Ribbon Count':
+      return <TopRightNumericalIndicator value={mon.ribbons?.length} />
+    case 'Ball':
+      return (
+        mon.ball && (
+          <img draggable={false} style={{ width: 24, height: 24 }} src={BallsImageList[mon.ball]} />
+        )
+      )
+    case 'Alpha':
+      return (
+        mon.isAlpha && (
+          <img
+            draggable={false}
+            style={{ width: 18, height: 18 }}
+            src={getPublicImageURL('icons/Alpha.png')}
+          />
+        )
+      )
+    case 'Gigantamax':
+      return (
+        mon.canGigantamax && (
+          <img
+            draggable={false}
+            style={{ width: 18, height: 18 }}
+            src={getPublicImageURL('icons/GMax.png')}
+          />
+        )
       )
     default:
       return <></>

@@ -65,7 +65,6 @@ const FileTypeSelect = (props: FileTypeSelectProps) => {
       ) : (
         <option value={baseFormat}>{baseFormat}</option>
       )}
-      <option value="OhpkmV1">OpenHome V1</option>
     </select>
   )
 }

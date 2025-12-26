@@ -1,12 +1,16 @@
 import { Flex, Select, Switch } from '@radix-ui/themes'
-import { TopRightIndicatorType, useMonDisplay } from '../../../hooks/useMonDisplay'
+import {
+  TopRightIndicatorType,
+  TopRightIndicatorTypes,
+  useMonDisplay,
+} from '../../../hooks/useMonDisplay'
 
 export default function DisplayPanel() {
   const displayState = useMonDisplay()
 
   return (
-    <div style={{ contain: 'none', padding: 4 }}>
-      <Flex direction="column" m="1" gap="1">
+    <div style={{ contain: 'none', padding: '8px 4px' }}>
+      <Flex direction="column" m="1" gap="2">
         <Select.Root
           value={displayState.topRightIndicator ?? ''}
           onValueChange={(value) =>
@@ -46,17 +50,3 @@ export default function DisplayPanel() {
     </div>
   )
 }
-
-const TopRightIndicatorTypes: TopRightIndicatorType[] = [
-  'Gender',
-  'Origin Game',
-  'Most Recent Save',
-  'EVs (Total)',
-  'EV (HP)',
-  'EV (Attack)',
-  'EV (Defense)',
-  'EV (Special Attack)',
-  'EV (Special Defense)',
-  'EV (Speed)',
-  'IVs/DVs (Percent)',
-]

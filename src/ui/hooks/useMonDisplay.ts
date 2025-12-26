@@ -52,15 +52,22 @@ export function useMonDisplay() {
   }
 }
 
-export type TopRightIndicatorType =
-  | 'Origin Game'
-  | 'Most Recent Save'
-  | 'Gender'
-  | 'EVs (Total)'
-  | 'IVs/DVs (Percent)'
-  | EvIndicator
-  | 'Modified'
+export const TopRightIndicatorTypes = [
+  'Gender',
+  'Origin Game',
+  'Most Recent Save',
+  'EVs (Total)',
+  'EV (HP)',
+  'EV (Attack)',
+  'EV (Defense)',
+  'EV (Special Attack)',
+  'EV (Special Defense)',
+  'EV (Speed)',
+  'IVs/DVs (Percent)',
+  'Ribbon Count',
+  'Ball',
+  'Alpha',
+  'Gigantamax',
+] as const
 
-type StatDisplay = 'HP' | 'Attack' | 'Defense' | 'Special Attack' | 'Special Defense' | 'Speed'
-
-type EvIndicator = `EV (${StatDisplay})`
+export type TopRightIndicatorType = (typeof TopRightIndicatorTypes)[number]

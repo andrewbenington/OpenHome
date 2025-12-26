@@ -586,12 +586,12 @@ impl OhpkmV2 {
     }
 
     #[wasm_bindgen(getter = gameOfOriginBattle)]
-    pub fn game_of_origin_battle(&self) -> Option<OriginGame> {
-        self.main_data.game_of_origin_battle
+    pub fn game_of_origin_battle(&self) -> Option<u8> {
+        self.main_data.game_of_origin_battle.map(|v| v as u8)
     }
     #[wasm_bindgen(setter = gameOfOriginBattle)]
-    pub fn set_game_of_origin_battle(&mut self, v: Option<OriginGame>) {
-        self.main_data.game_of_origin_battle = v;
+    pub fn set_game_of_origin_battle(&mut self, v: Option<u8>) {
+        self.main_data.game_of_origin_battle = v.and_then(OriginGame::try_from_u8);
     }
 
     #[wasm_bindgen(getter = consoleRegion)]

@@ -70,6 +70,15 @@ pub enum OriginGame {
 }
 
 impl OriginGame {
+    pub fn try_from_u8(value: u8) -> Option<Self> {
+        let origin = Self::from(value);
+        if origin == Self::Invalid0 {
+            None
+        } else {
+            Some(origin)
+        }
+    }
+
     pub const fn game_name(&self) -> &'static str {
         match *self {
             Self::Red => "Red",
