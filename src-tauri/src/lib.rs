@@ -105,6 +105,7 @@ pub fn run() {
             commands::delete_plugin,
             commands::handle_windows_accellerator,
             commands::open_directory,
+            commands::open_file_location,
             pkm_storage::load_banks,
             pkm_storage::write_banks,
             state::get_lookups,

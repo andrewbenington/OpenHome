@@ -257,6 +257,8 @@ export const TauriBackend: BackendInterface = {
   },
   openDirectory: async (directory: string): Promise<Errorable<null>> =>
     TauriInvoker.openDirectory(directory),
+  openFileLocation: async (filePath: string): Promise<Errorable<null>> =>
+    TauriInvoker.openFileLocation(filePath),
   getPlatform: platform,
   getState: async () => TauriInvoker.getState(),
   getSettings: async () => {

@@ -95,7 +95,6 @@ function OriginGameIndicator({ originGame }: OriginGameIndicatorProps) {
         size="1"
         style={{ backgroundColor }}
         variant="solid"
-        title={gameMetadata.name}
       >
         <img
           className={colorIsDark(backgroundColor) ? 'white-filter' : 'black-filter'}

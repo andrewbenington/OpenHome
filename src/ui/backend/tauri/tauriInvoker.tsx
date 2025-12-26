@@ -212,8 +212,14 @@ export const TauriInvoker = {
     return promise
   },
 
-  openDirectory(directoryPath: string): Promise<Errorable<null>> {
-    const promise: Promise<null> = invoke('open_directory', { absolutePath: directoryPath })
+  openDirectory(absolutePath: string): Promise<Errorable<null>> {
+    const promise: Promise<null> = invoke('open_directory', { absolutePath })
+
+    return promise.then(E.right).catch(E.left)
+  },
+
+  openFileLocation(filePath: string): Promise<Errorable<null>> {
+    const promise: Promise<null> = invoke('open_file_location', { filePath })
 
     return promise.then(E.right).catch(E.left)
   },

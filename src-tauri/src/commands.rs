@@ -219,7 +219,15 @@ pub fn get_image_data(absolute_path: String) -> Result<ImageResponse> {
 
 #[tauri::command]
 pub fn open_directory(absolute_path: String) -> Result<()> {
-    util::open_directory(&absolute_path)
+    util::open_directory(&PathBuf::from(absolute_path))
+}
+
+#[tauri::command]
+pub fn open_file_location(file_path: String) -> Result<()> {
+    let Some(parent_dir) = Path::new(&file_path).parent() else {
+        return Err(Error::other("File has no parent directory"));
+    };
+    util::open_directory(parent_dir)
 }
 
 #[tauri::command]
