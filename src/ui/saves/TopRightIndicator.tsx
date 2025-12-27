@@ -55,20 +55,20 @@ export default function TopRightIndicator({ mon, indicatorType }: TopRightIndica
     case 'Alpha':
       return (
         mon.isAlpha && (
-          <img
-            draggable={false}
-            style={{ width: 18, height: 18 }}
+          <IndicatorBadge
+            description="Alpha"
             src={getPublicImageURL('icons/Alpha.png')}
+            backgroundColor="#f2352d"
           />
         )
       )
     case 'Gigantamax':
       return (
         mon.canGigantamax && (
-          <img
-            draggable={false}
-            style={{ width: 18, height: 18 }}
+          <IndicatorBadge
+            description="Gigantamax"
             src={getPublicImageURL('icons/GMax.png')}
+            backgroundColor="#e60040"
           />
         )
       )
@@ -118,8 +118,27 @@ function OriginGameIndicator({ originGame }: OriginGameIndicatorProps) {
   const gameMetadata = OriginGames.getMetadata(originGame)
   const markImage = getOriginIconPath(gameMetadata)
   const backgroundColor = OriginGames.color(originGame)
+
+  if (!markImage) return null
+
   return (
-    <Tooltip content={gameMetadata.name}>
+    <IndicatorBadge
+      description={gameMetadata.name}
+      src={markImage}
+      backgroundColor={backgroundColor}
+    />
+  )
+}
+
+type IndicatorBadgeProps = {
+  description: string
+  src: string
+  backgroundColor: string
+}
+
+function IndicatorBadge({ description, src, backgroundColor }: IndicatorBadgeProps) {
+  return (
+    <Tooltip content={description}>
       <Badge
         className="badge-shadow origin-badge"
         size="1"
@@ -128,10 +147,10 @@ function OriginGameIndicator({ originGame }: OriginGameIndicatorProps) {
       >
         <img
           className={colorIsDark(backgroundColor) ? 'white-filter' : 'black-filter'}
-          style={{ width: 15, height: 15 }}
+          style={{ maxHeight: 15, maxWidth: 15 }}
           draggable={false}
           alt="origin mark"
-          src={markImage}
+          src={src}
         />
       </Badge>
     </Tooltip>

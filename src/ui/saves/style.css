@@ -155,15 +155,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50% !important;
   width: 18px;
   height: 18px;
-  z-index: -1 !important;
 }
 
 @media (prefers-color-scheme: dark) {
   .origin-badge {
     filter: brightness(0.8);
-    z-index: -1;
   }
 }
