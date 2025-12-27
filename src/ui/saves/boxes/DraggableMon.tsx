@@ -1,10 +1,10 @@
-import { useDraggable } from '@dnd-kit/react'
+import { useDraggable } from '@dnd-kit/core'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { displayIndexAdder, isBattleFormeItem, isMegaStone } from '@openhome-core/pkm/util'
-import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import { MonWithLocation } from '@openhome-ui/state/saves'
 import { MetadataLookup } from '@pkm-rs/pkg'
 import { useMemo } from 'react'
+import PokemonIcon from '../../components/PokemonIcon'
 import { TopRightIndicatorType } from '../../hooks/useMonDisplay'
 import useDragAndDrop from '../../state/drag-and-drop/useDragAndDrop'
 import TopRightIndicator from '../TopRightIndicator'
@@ -35,7 +35,7 @@ export interface DraggableMonProps {
 
 const DraggableMon = (props: DraggableMonProps) => {
   const { onClick, disabled, mon, dragID, dragData, topRightIndicator, showItem, showShiny } = props
-  const { ref } = useDraggable({
+  const { attributes, listeners, setNodeRef } = useDraggable({
     id: (dragID ?? '') + mon.personalityValue?.toString(),
     data: dragData ? { kind: 'mon', monData: dragData } : undefined,
     disabled: disabled || !dragID,
@@ -66,7 +66,9 @@ const DraggableMon = (props: DraggableMonProps) => {
 
   return (
     <div
-      ref={ref}
+      ref={setNodeRef}
+      {...listeners}
+      {...attributes}
       style={{
         width: '100%',
         height: '100%',

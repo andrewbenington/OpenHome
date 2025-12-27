@@ -1,5 +1,4 @@
-import { closestCenter } from '@dnd-kit/collision'
-import { useDroppable } from '@dnd-kit/react'
+import { useDroppable } from '@dnd-kit/core'
 import { MonLocation } from '@openhome-ui/state/saves'
 import { CSSProperties, ReactNode, useEffect, useRef } from 'react'
 
@@ -36,11 +35,11 @@ const DroppableSpace = ({
   children,
   style,
 }: DroppableSpaceProps) => {
-  const { isDropTarget, ref } = useDroppable({
+  const { isOver, setNodeRef } = useDroppable({
     id: dropID ?? '',
     data: dropData,
     disabled: !dropID,
-    collisionDetector: closestCenter,
+    // collisionDetector: closestCenter,
   })
   const onOverRef = useRef(onOver)
   const onNotOverRef = useRef(onNotOver)
@@ -54,12 +53,12 @@ const DroppableSpace = ({
   }, [onNotOver])
 
   useEffect(() => {
-    if (isDropTarget) {
+    if (isOver) {
       onOverRef.current?.()
     } else {
       onNotOverRef.current?.()
     }
-  }, [isDropTarget])
+  }, [isOver])
 
   return (
     <div
@@ -68,7 +67,7 @@ const DroppableSpace = ({
         ...getBackgroundDetails(disabled),
         outlineStyle: 'solid',
         outlineWidth: 2,
-        outlineColor: isDropTarget ? 'var(--accent-8)' : 'transparent',
+        outlineColor: isOver ? 'var(--accent-8)' : 'transparent',
         borderRadius: 3,
         display: 'grid',
         alignItems: 'center',
@@ -77,7 +76,7 @@ const DroppableSpace = ({
         height: '100%',
         ...style,
       }}
-      ref={ref}
+      ref={setNodeRef}
     >
       {children}
     </div>
