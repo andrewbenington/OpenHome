@@ -29,10 +29,6 @@ export type MouseAction =
       type: 'set_save_index'
       payload?: number | undefined
     }
-  | {
-      type: 'set_drag_source'
-      payload: DragSource | undefined
-    }
 
 export const mouseReducer: Reducer<MouseState, MouseAction> = (
   state: MouseState,
@@ -64,9 +60,6 @@ export const mouseReducer: Reducer<MouseState, MouseAction> = (
       }
 
       return newState
-    }
-    case 'set_drag_source': {
-      return { ...state, dragSource: payload }
     }
   }
 }

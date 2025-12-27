@@ -12,7 +12,6 @@ import {
   appInfoReducer,
   Settings,
 } from '@openhome-ui/state/appInfo'
-import { DragMonContext, dragMonReducer } from '@openhome-ui/state/dragMon'
 import { ErrorContext, errorReducer } from '@openhome-ui/state/error'
 import { ItemBagContext, itemBagReducer } from '@openhome-ui/state/items'
 import { MouseContext, mouseReducer } from '@openhome-ui/state/mouse'
@@ -23,9 +22,11 @@ import { loadPlugin } from '@openhome-ui/util/plugin'
 import { Flex, Text, Theme } from '@radix-ui/themes'
 import * as E from 'fp-ts/lib/Either'
 import { useCallback, useContext, useEffect, useReducer, useState } from 'react'
+import { DragMonContext } from 'src/ui/state/drag-and-drop'
 import './App.css'
 import AppTabs from './AppTabs'
 import useDebounce from './hooks/useDebounce'
+import { DragMonState } from './state/drag-and-drop'
 import ErrorMessageModal from './top-level/ErrorMessageModal'
 import PokemonDragContextProvider from './top-level/PokemonDragContextProvider'
 import UpdateMessageModal from './top-level/UpdateMessageModal'
@@ -80,7 +81,7 @@ function buildKeyboardHandler(backend: BackendInterface) {
 
 function AppWithBackend() {
   const [mouseState, mouseDispatch] = useReducer(mouseReducer, { shift: false })
-  const [dragMonState, dragMonDispatch] = useReducer(dragMonReducer, { mode: 'mon' })
+  const [dragState, setDragState] = useState<DragMonState>({ payload: undefined, mode: 'mon' })
   const [appInfoState, appInfoDispatch] = useReducer(appInfoReducer, appInfoInitialState)
   const [pluginState, pluginDispatch] = useReducer(pluginReducer, { plugins: [], loaded: false })
   const [settingsLoading, setSettingsLoading] = useState(false)
@@ -179,7 +180,7 @@ function AppWithBackend() {
             <OhpkmStoreProvider>
               <ItemBagContext.Provider value={[bagState, bagDispatch]}>
                 <SavesProvider>
-                  <DragMonContext.Provider value={[dragMonState, dragMonDispatch]}>
+                  <DragMonContext.Provider value={[dragState, setDragState]}>
                     <PokemonDragContextProvider>
                       {settingsLoading ? (
                         <Flex width="100%" height="100vh" align="center" justify="center">

@@ -16,7 +16,6 @@ import {
 import ToggleButton from '@openhome-ui/components/ToggleButton'
 import useIsDev from '@openhome-ui/hooks/isDev'
 import PokemonDetailsModal from '@openhome-ui/pokemon-details/Modal'
-import { DragMonContext } from '@openhome-ui/state/dragMon'
 import { ErrorContext } from '@openhome-ui/state/error'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { MonLocation, MonWithLocation, useSaves } from '@openhome-ui/state/saves'
@@ -34,6 +33,7 @@ import { ToggleGroup } from 'radix-ui'
 import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { BsFillGrid3X3GapFill } from 'react-icons/bs'
 import { FaSquare } from 'react-icons/fa'
+import useDragAndDrop from '../../state/drag-and-drop/useDragAndDrop'
 import { buildBackwardNavigator, buildForwardNavigator } from '../util'
 import AllHomeBoxes from './AllHomeBoxes'
 import ArrowButton from './ArrowButton'
@@ -219,7 +219,7 @@ function SingleBoxMonDisplay() {
   const savesAndBanks = useSaves()
   const [, dispatchError] = useContext(ErrorContext)
   const [selectedIndex, setSelectedIndex] = useState<number>()
-  const [dragMonState] = useContext(DragMonContext)
+  const { dragState } = useDragAndDrop()
 
   const homeData = savesAndBanks.homeData
 
@@ -257,13 +257,13 @@ function SingleBoxMonDisplay() {
   }
 
   const dragData: MonWithLocation | undefined = useMemo(() => {
-    const payload = dragMonState.payload
+    const payload = dragState.payload
 
     if (payload?.kind === 'mon') {
       return payload.monData
     }
     return undefined
-  }, [dragMonState])
+  }, [dragState])
 
   const currentBox = homeData.boxes[homeData.currentPCBox]
 
@@ -377,7 +377,7 @@ const DRAG_OVER_COOLDOWN_MS = 500
 
 function ViewToggle(props: ViewToggleProps) {
   const { viewMode, setViewMode, disabled } = props
-  const [dragMonState] = useContext(DragMonContext)
+  const { dragState } = useDragAndDrop()
   const [timer, setTimer] = useState<NodeJS.Timeout>()
   const setViewModeRef = useRef(setViewMode)
 
@@ -411,7 +411,11 @@ function ViewToggle(props: ViewToggleProps) {
       onValueChange={(newVal: BoxViewMode) => setViewMode(newVal)}
       disabled={disabled}
     >
-      <ToggleGroup.Item value="one" className="ToggleGroupItem" disabled={!!dragMonState.payload}>
+      <ToggleGroup.Item
+        value="one"
+        className="ToggleGroupItem"
+        disabled={Boolean(dragState.payload)}
+      >
         <FaSquare />
       </ToggleGroup.Item>
       <ToggleGroup.Item value="all" className="ToggleGroupItem">

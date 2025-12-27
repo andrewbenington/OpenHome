@@ -3,11 +3,12 @@ import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getItemIconPath } from '@openhome-ui/images/items'
-import { DragMonContext, DragPayload } from '@openhome-ui/state/dragMon'
 import { useItems } from '@openhome-ui/state/items'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { MonLocation, useSaves } from '@openhome-ui/state/saves'
-import { ReactNode, useContext } from 'react'
+import { ReactNode } from 'react'
+import { DragPayload } from '../state/drag-and-drop'
+import useDragAndDrop from '../state/drag-and-drop/useDragAndDrop'
 
 const pointerSensor = PointerSensor.configure({
   activationConstraints: {
@@ -22,17 +23,16 @@ export default function PokemonDragContextProvider(props: { children?: ReactNode
   const { children } = props
   const savesAndBanks = useSaves()
   const ohpkmStore = useOhpkmStore()
-  const [dragMonState, dispatchDragMonState] = useContext(DragMonContext)
   const { moveMonItemToBag, giveItemToMon } = useItems()
+  const { dragState, startDragging, endDragging } = useDragAndDrop()
 
   return (
     <DragDropProvider
       onDragEnd={(e) => {
-        const { operation } = e
-        const { target } = operation
+        const target = e.operation.target
 
         const dest = target?.data
-        const payload = dragMonState.payload
+        const payload = dragState.payload
 
         if (!payload) return
 
@@ -68,45 +68,38 @@ export default function PokemonDragContextProvider(props: { children?: ReactNode
           }
         }
 
-        dispatchDragMonState({ type: 'end_drag' })
+        endDragging()
       }}
       onDragStart={(e) => {
-        const { source } = e.operation
-
-        if (!source?.data) return
-        const data = source.data as DragPayload
-
-        if (data.kind === 'item') {
-          dispatchDragMonState({ type: 'start_drag', payload: data })
-        } else if (data.kind === 'mon') {
-          dispatchDragMonState({ type: 'start_drag', payload: data })
+        if (e.operation.source?.data) {
+          startDragging(e.operation.source.data as DragPayload)
         }
       }}
       sensors={[pointerSensor]}
     >
       <DragOverlay style={{ cursor: 'grabbing' }}>
-        {dragMonState.payload?.kind === 'item' ? (
+        {dragState.payload?.kind === 'item' ? (
           <img
-            src={getPublicImageURL(getItemIconPath(dragMonState.payload.item.index))}
-            alt={dragMonState.payload.item.name}
+            src={getPublicImageURL(getItemIconPath(dragState.payload.item.index))}
+            alt={dragState.payload.item.name}
             style={{ width: 32, height: 32 }}
             draggable={false}
           />
-        ) : dragMonState.mode === 'item' ? (
+        ) : dragState.mode === 'item' ? (
           <img
             src={getPublicImageURL(
-              getItemIconPath(dragMonState.payload?.monData.mon.heldItemIndex ?? 0)
+              getItemIconPath(dragState.payload?.monData.mon.heldItemIndex ?? 0)
             )}
             style={{ width: 32, height: 32 }}
             draggable={false}
           />
         ) : (
-          dragMonState.payload?.kind === 'mon' && (
+          dragState.payload?.kind === 'mon' && (
             <PokemonIcon
-              dexNumber={dragMonState.payload?.monData.mon.dexNum ?? 0}
-              formeNumber={dragMonState.payload?.monData.mon.formeNum ?? 0}
-              isShiny={dragMonState.payload?.monData.mon.isShiny()}
-              heldItemIndex={dragMonState.payload?.monData.mon.heldItemIndex}
+              dexNumber={dragState.payload?.monData.mon.dexNum ?? 0}
+              formeNumber={dragState.payload?.monData.mon.formeNum ?? 0}
+              isShiny={dragState.payload?.monData.mon.isShiny()}
+              heldItemIndex={dragState.payload?.monData.mon.heldItemIndex}
               style={{ width: '100%', height: '100%' }}
             />
           )
