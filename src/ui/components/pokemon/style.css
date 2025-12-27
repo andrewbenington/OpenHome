@@ -87,3 +87,12 @@
   height: 30px;
   object-fit: contain;
 }
+
+.stats-table {
+  border-radius: 4px;
+  .rt-TableCell {
+    padding: 4px 8px;
+    height: fit-content;
+  }
+  width: fit-content;
+}
