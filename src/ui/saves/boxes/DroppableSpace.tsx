@@ -38,7 +38,7 @@ const DroppableSpace = ({
   const { isOver, setNodeRef } = useDroppable({
     id: dropID ?? '',
     data: dropData,
-    disabled: !dropID,
+    disabled: disabled || !dropID,
   })
   const onOverRef = useRef(onOver)
   const onNotOverRef = useRef(onNotOver)
