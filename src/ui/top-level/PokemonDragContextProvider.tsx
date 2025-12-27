@@ -21,8 +21,7 @@ export default function PokemonDragContextProvider(props: { children?: ReactNode
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
-      activationConstraint: { distance: 5 },
-      delay: { value: 200, tolerance: 10 },
+      activationConstraint: { distance: 0 },
     })
   )
   const draggingMon = dragState.payload?.kind === 'mon' ? dragState.payload.monData.mon : undefined

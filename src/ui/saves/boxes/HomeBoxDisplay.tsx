@@ -333,13 +333,13 @@ function SingleBoxMonDisplay() {
                     })
                   }
                 }}
-                // disabled={
-                //   // don't allow a swap with a pokémon not supported by the source save
-                //   mon &&
-                //   dragData &&
-                //   !dragData.is_home &&
-                //   !dragData.save.supportsMon(mon.dexNum, mon.formeNum)
-                // }
+                disabled={
+                  // don't allow a swap with a pokémon not supported by the source save
+                  mon &&
+                  dragData &&
+                  !dragData.is_home &&
+                  !dragData.save.supportsMon(mon.dexNum, mon.formeNum)
+                }
                 ctxMenuBuilders={contextElements}
               />
             ))}

@@ -39,7 +39,6 @@ const DroppableSpace = ({
     id: dropID ?? '',
     data: dropData,
     disabled: !dropID,
-    // collisionDetector: closestCenter,
   })
   const onOverRef = useRef(onOver)
   const onNotOverRef = useRef(onNotOver)
@@ -69,7 +68,7 @@ const DroppableSpace = ({
         outlineWidth: 2,
         outlineColor: isOver ? 'var(--accent-8)' : 'transparent',
         borderRadius: 3,
-        display: 'grid',
+        display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         width: '100%',

@@ -109,12 +109,6 @@ function BoxCell({
     }
   }
 
-  // const { isOver, setNodeRef } = useDroppable({
-  //   id: dragID,
-  //   data: location,
-  //   disabled,
-  // })
-
   const monCtxMenuItemBuilders = mon
     ? [
         LabelBuilder.fromComponent(
@@ -140,7 +134,6 @@ function BoxCell({
   return (
     <OpenHomeCtxMenu sections={[monCtxMenuItemBuilders, ctxMenuBuilders]}>
       <div
-        // ref={setNodeRef}
         style={{
           padding: 0,
           width: '100%',
@@ -159,21 +152,23 @@ function BoxCell({
         title={disabledReason}
       >
         {mon ? (
-          <DraggableMon
-            onClick={onClick}
-            mon={mon}
-            style={{
-              width: '100%',
-              height: '100%',
-              ...getBackgroundDetails(),
-            }}
-            dragData={location ? { ...location, mon } : undefined}
-            dragID={dragID}
-            disabled={disabled || isFilteredOut}
-            topRightIndicator={topRightIndicator}
-            showItem={showItem}
-            showShiny={showShiny}
-          />
+          <DroppableSpace dropID={dragID} dropData={location} disabled={disabled}>
+            <DraggableMon
+              onClick={onClick}
+              mon={mon}
+              style={{
+                width: '100%',
+                height: '100%',
+                ...getBackgroundDetails(),
+              }}
+              dragData={location ? { ...location, mon } : undefined}
+              dragID={dragID}
+              disabled={disabled || isFilteredOut}
+              topRightIndicator={topRightIndicator}
+              showItem={showItem}
+              showShiny={showShiny}
+            />
+          </DroppableSpace>
         ) : (
           <DroppableSpace dropID={dragID} dropData={location} disabled={disabled} />
         )}
