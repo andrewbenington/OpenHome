@@ -149,14 +149,6 @@
   contain: content;
 }
 
-.base-stats-table {
-  .rt-TableCell {
-    padding: 4px 8px;
-    height: fit-content;
-  }
-  width: fit-content;
-}
-
 .base-stats-container {
   width: 100%;
   margin: auto;

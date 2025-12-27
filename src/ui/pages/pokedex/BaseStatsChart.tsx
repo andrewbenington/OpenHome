@@ -1,6 +1,6 @@
 import useIsDarkMode from '@openhome-ui/hooks/darkMode'
 import { FormeMetadata } from '@pkm-rs/pkg'
-import { Table, Text } from '@radix-ui/themes'
+import { Text } from '@radix-ui/themes'
 import {
   Chart as ChartJS,
   Filler,
@@ -11,6 +11,7 @@ import {
   Tooltip,
 } from 'chart.js'
 import { Radar } from 'react-chartjs-2'
+import StatsTable from '../../components/pokemon/StatsTable'
 
 export type BaseStatsChartProps = {
   forme: FormeMetadata
@@ -84,26 +85,7 @@ export default function BaseStatsChart({ forme }: BaseStatsChartProps) {
           ],
         }}
       />
-      <Table.Root className="base-stats-table" variant="surface">
-        <Table.Header>
-          <Table.ColumnHeaderCell>HP</Table.ColumnHeaderCell>
-          <Table.ColumnHeaderCell>Atk</Table.ColumnHeaderCell>
-          <Table.ColumnHeaderCell>Def</Table.ColumnHeaderCell>
-          <Table.ColumnHeaderCell>SpA</Table.ColumnHeaderCell>
-          <Table.ColumnHeaderCell>SpD</Table.ColumnHeaderCell>
-          <Table.ColumnHeaderCell>Spe</Table.ColumnHeaderCell>
-        </Table.Header>
-        <Table.Body>
-          <Table.Row>
-            <Table.Cell>{forme.baseStats.hp}</Table.Cell>
-            <Table.Cell>{forme.baseStats.atk}</Table.Cell>
-            <Table.Cell>{forme.baseStats.def}</Table.Cell>
-            <Table.Cell>{forme.baseStats.spa}</Table.Cell>
-            <Table.Cell>{forme.baseStats.spd}</Table.Cell>
-            <Table.Cell>{forme.baseStats.spe}</Table.Cell>
-          </Table.Row>
-        </Table.Body>
-      </Table.Root>
+      <StatsTable.Standard stats={forme.baseStats} />
     </div>
   )
 }
