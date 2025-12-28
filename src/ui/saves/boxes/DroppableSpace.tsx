@@ -1,6 +1,6 @@
-import { useDroppable } from '@dnd-kit/core'
+import { useDndMonitor, useDroppable } from '@dnd-kit/core'
 import { MonLocation } from '@openhome-ui/state/saves'
-import { CSSProperties, ReactNode, useEffect, useRef } from 'react'
+import { CSSProperties, ReactNode } from 'react'
 
 const getBackgroundDetails = (disabled?: boolean) => {
   if (disabled) {
@@ -40,24 +40,16 @@ const DroppableSpace = ({
     data: dropData,
     disabled: disabled || !dropID,
   })
-  const onOverRef = useRef(onOver)
-  const onNotOverRef = useRef(onNotOver)
 
-  useEffect(() => {
-    onOverRef.current = onOver
-  }, [onOver])
-
-  useEffect(() => {
-    onNotOverRef.current = onNotOver
-  }, [onNotOver])
-
-  useEffect(() => {
-    if (isOver) {
-      onOverRef.current?.()
-    } else {
-      onNotOverRef.current?.()
-    }
-  }, [isOver])
+  useDndMonitor({
+    onDragOver: (e) => {
+      if (e.over?.id === dropID) {
+        onOver?.()
+      } else if (e.collisions?.some((c) => c.id === dropID)) {
+        onNotOver?.()
+      }
+    },
+  })
 
   return (
     <div

@@ -8,11 +8,11 @@ import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { MonLocation, useSaves } from '@openhome-ui/state/saves'
 import { MetadataLookup } from '@pkm-rs/pkg'
 import { ReactNode } from 'react'
-import { displayIndexAdder, isBattleFormeItem, isMegaStone } from '../../core/pkm/util'
-import { DragPayload } from '../state/drag-and-drop'
-import useDragAndDrop from '../state/drag-and-drop/useDragAndDrop'
+import { DragPayload } from '.'
+import { displayIndexAdder, isBattleFormeItem, isMegaStone } from '../../../core/pkm/util'
+import useDragAndDrop from './useDragAndDrop'
 
-export default function PokemonDragContextProvider(props: { children?: ReactNode }) {
+export default function PokemonDndContext(props: { children?: ReactNode }) {
   const { children } = props
   const savesAndBanks = useSaves()
   const ohpkmStore = useOhpkmStore()
@@ -41,7 +41,7 @@ export default function PokemonDragContextProvider(props: { children?: ReactNode
   return (
     <DndContext
       onDragEnd={(e) => {
-        const target: DragPayload | undefined = e.active.data.current as DragPayload | undefined
+        const target = e.active.data.current as DragPayload | undefined
         if (!target) return
 
         const dest = e.over?.data.current
@@ -55,32 +55,33 @@ export default function PokemonDragContextProvider(props: { children?: ReactNode
           if (isMonLocation(dest) && target) {
             giveItemToMon(dest, payload.item)
           }
-        } else if (payload.kind === 'mon') {
-          const { mon } = payload.monData
+          return
+        }
 
-          if (dropElementId === 'to_release') {
-            savesAndBanks.releaseMonAtLocation(payload.monData)
-          } else if (dropElementId === 'item-bag') {
-            moveMonItemToBag(payload.monData)
-          } else if (
-            isMonLocation(dest) &&
-            (dest.is_home || dest.save.supportsMon(mon.dexNum, mon.formeNum))
-          ) {
-            const source = payload.monData
+        const { mon } = payload.monData
 
-            // If moving mon outside of its save, start persisting this mon's data in OpenHome
-            // (if it isnt already)
-            if (source.save !== dest.save) {
-              ohpkmStore.overwrite(new OHPKM(mon))
-            }
+        if (dropElementId === 'to_release') {
+          savesAndBanks.releaseMonAtLocation(payload.monData)
+        } else if (dropElementId === 'item-bag') {
+          moveMonItemToBag(payload.monData)
+        } else if (
+          isMonLocation(dest) &&
+          (dest.is_home || dest.save.supportsMon(mon.dexNum, mon.formeNum))
+        ) {
+          const source = payload.monData
 
-            // Move item to OpenHome bag if not supported by the save file
-            if (mon.heldItemIndex && !dest.is_home && !dest.save?.supportsItem(mon.heldItemIndex)) {
-              moveMonItemToBag(source)
-            }
-
-            savesAndBanks.moveMon(source, dest)
+          // If moving mon outside of its save, start persisting this mon's data in OpenHome
+          // (if it isnt already)
+          if (source.save !== dest.save) {
+            ohpkmStore.overwrite(new OHPKM(mon))
           }
+
+          // Move item to OpenHome bag if not supported by the save file
+          if (mon.heldItemIndex && !dest.is_home && !dest.save?.supportsItem(mon.heldItemIndex)) {
+            moveMonItemToBag(source)
+          }
+
+          savesAndBanks.moveMon(source, dest)
         }
 
         endDragging()

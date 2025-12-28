@@ -27,8 +27,8 @@ import './App.css'
 import AppTabs from './AppTabs'
 import useDebounce from './hooks/useDebounce'
 import { DragMonState } from './state/drag-and-drop'
+import PokemonDndContext from './state/drag-and-drop/PokemonDndContext'
 import ErrorMessageModal from './top-level/ErrorMessageModal'
-import PokemonDragContextProvider from './top-level/PokemonDragContextProvider'
 import UpdateMessageModal from './top-level/UpdateMessageModal'
 
 export default function App() {
@@ -181,7 +181,7 @@ function AppWithBackend() {
               <ItemBagContext.Provider value={[bagState, bagDispatch]}>
                 <SavesProvider>
                   <DragMonContext.Provider value={[dragState, setDragState]}>
-                    <PokemonDragContextProvider>
+                    <PokemonDndContext>
                       {settingsLoading ? (
                         <Flex width="100%" height="100vh" align="center" justify="center">
                           <Text size="9" weight="bold">
@@ -193,7 +193,7 @@ function AppWithBackend() {
                       )}
                       <ErrorMessageModal />
                       <UpdateMessageModal />
-                    </PokemonDragContextProvider>
+                    </PokemonDndContext>
                   </DragMonContext.Provider>
                 </SavesProvider>
               </ItemBagContext.Provider>
