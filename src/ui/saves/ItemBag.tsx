@@ -1,21 +1,11 @@
 import { useItems } from '@openhome-ui/state/items'
 import { Item } from '@pkm-rs/pkg'
 import { Flex, Grid } from '@radix-ui/themes'
-import { useCallback, useEffect } from 'react'
-import useDragAndDrop from '../state/drag-and-drop/useDragAndDrop'
 import DroppableSpace from './boxes/DroppableSpace'
 import DraggableItem from './DraggableItem'
 
 export default function ItemBag() {
   const { itemCounts } = useItems()
-  const { setMode } = useDragAndDrop()
-
-  const onOver = useCallback(() => setMode('item'), [setMode])
-  const onNotOver = useCallback(() => setMode('mon'), [setMode])
-
-  useEffect(() => {
-    console.log('setMode changed')
-  }, [setMode])
 
   return (
     <Flex direction="column" p="1" gap="2" style={{ marginLeft: 5 }}>
@@ -29,8 +19,6 @@ export default function ItemBag() {
           height: '100%',
           padding: '5px 0px',
         }}
-        // onOver={onOver}
-        // onNotOver={onNotOver}
       >
         <Grid columns="6" gap="2" justify="end" align={'end'}>
           {Object.entries(itemCounts).map(([indexStr, count]) => {

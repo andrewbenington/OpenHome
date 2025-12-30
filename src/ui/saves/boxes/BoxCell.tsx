@@ -15,8 +15,7 @@ import { useItems } from '@openhome-ui/state/items'
 import { MonLocation, useSaves } from '@openhome-ui/state/saves'
 import { filterApplies } from '@openhome-ui/util/filter'
 import { PokedexUpdate } from '@openhome-ui/util/pokedex'
-import { NationalDex } from '@pokemon-resources/consts/NationalDex'
-import { useCallback, useContext, useEffect, useMemo } from 'react'
+import { useCallback, useContext, useMemo } from 'react'
 import { useMonDisplay } from 'src/ui/hooks/useMonDisplay'
 import '../style.css'
 import DraggableMon from './DraggableMon'
@@ -59,12 +58,6 @@ function BoxCell({
       (mon === undefined || !filterApplies(filter, mon))
     )
   }, [filter, mon])
-
-  useEffect(() => {
-    if (mon?.dexNum === NationalDex.Ursaluna) {
-      console.log('BoxCell: location changed')
-    }
-  }, [mon?.dexNum, location])
 
   const onDropFromFiles = useCallback(
     async (files: FileList) => {

@@ -3,8 +3,7 @@ import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { displayIndexAdder, isBattleFormeItem, isMegaStone } from '@openhome-core/pkm/util'
 import { MonWithLocation } from '@openhome-ui/state/saves'
 import { MetadataLookup } from '@pkm-rs/pkg'
-import { NationalDex } from '@pokemon-resources/consts/NationalDex'
-import { CSSProperties, useEffect, useMemo } from 'react'
+import { CSSProperties, useMemo } from 'react'
 import PokemonIcon from '../../components/PokemonIcon'
 import { TopRightIndicatorType } from '../../hooks/useMonDisplay'
 import useDragAndDrop from '../../state/drag-and-drop/useDragAndDrop'
@@ -41,16 +40,7 @@ const DraggableMon = (props: DraggableMonProps) => {
     data: dragData ? { kind: 'mon', monData: dragData } : undefined,
     disabled: disabled || !dragID,
   })
-  const { dragMode, dragPayload } = useDragAndDrop()
-
-  if (mon.dexNum === NationalDex.Ursaluna) {
-    console.log('rendering DraggableMon')
-  }
-  useEffect(() => {
-    if (mon.dexNum === NationalDex.Ursaluna) {
-      console.log('dragData changed')
-    }
-  }, [mon.dexNum, dragData])
+  const { dragState } = useDragAndDrop()
 
   const formeNumber = useMemo(() => {
     let formeNumber = mon.formeNum
@@ -78,9 +68,9 @@ const DraggableMon = (props: DraggableMonProps) => {
     () => ({
       width: '100%',
       height: '100%',
-      visibility: isDragging && dragMode === 'mon' ? 'hidden' : undefined,
+      visibility: isDragging && dragState.mode === 'mon' ? 'hidden' : undefined,
     }),
-    [dragMode, isDragging]
+    [dragState.mode, isDragging]
   )
 
   return (
@@ -102,7 +92,7 @@ const DraggableMon = (props: DraggableMonProps) => {
         isShiny={showShiny && mon.isShiny()}
         isEgg={mon.isEgg}
         heldItemIndex={
-          showItem && (!isDragging || dragMode !== 'item') ? mon.heldItemIndex : undefined
+          showItem && (!isDragging || dragState.mode !== 'item') ? mon.heldItemIndex : undefined
         }
         style={style}
         greyedOut={disabled}
