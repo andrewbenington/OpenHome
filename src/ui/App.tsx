@@ -22,7 +22,7 @@ import { loadPlugin } from '@openhome-ui/util/plugin'
 import { Flex, Text, Theme } from '@radix-ui/themes'
 import * as E from 'fp-ts/lib/Either'
 import { useCallback, useContext, useEffect, useReducer, useState } from 'react'
-import { DragMonContext } from 'src/ui/state/drag-and-drop'
+import { DragMonContext, emptyDragState } from 'src/ui/state/drag-and-drop'
 import './App.css'
 import AppTabs from './AppTabs'
 import useDebounce from './hooks/useDebounce'
@@ -81,7 +81,7 @@ function buildKeyboardHandler(backend: BackendInterface) {
 
 function AppWithBackend() {
   const [mouseState, mouseDispatch] = useReducer(mouseReducer, { shift: false })
-  const [dragState, setDragState] = useState<DragMonState>({ payload: undefined, mode: 'mon' })
+  const [dragState, setDragState] = useState<DragMonState>(emptyDragState())
   const [appInfoState, appInfoDispatch] = useReducer(appInfoReducer, appInfoInitialState)
   const [pluginState, pluginDispatch] = useReducer(pluginReducer, { plugins: [], loaded: false })
   const [settingsLoading, setSettingsLoading] = useState(false)

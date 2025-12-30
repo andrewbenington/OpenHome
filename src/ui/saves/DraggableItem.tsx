@@ -1,8 +1,8 @@
-import { useDraggable } from '@dnd-kit/react'
+import { useDraggable } from '@dnd-kit/core'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getItemIconPath } from '@openhome-ui/images/items'
 import { Item } from '@pkm-rs/pkg'
-import { Text, Tooltip } from '@radix-ui/themes'
+import { Text } from '@radix-ui/themes'
 
 type DraggableItemProps = {
   item: Item
@@ -10,14 +10,16 @@ type DraggableItemProps = {
 }
 
 function DraggableItem({ item, count }: DraggableItemProps) {
-  const { ref, isDragging } = useDraggable({
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: `item-${item.name}`,
     data: { kind: 'item', item: item },
   })
 
   return (
     <div
-      ref={ref}
+      ref={setNodeRef}
+      {...listeners}
+      {...attributes}
       style={{
         position: 'relative',
         width: 24,
@@ -25,18 +27,18 @@ function DraggableItem({ item, count }: DraggableItemProps) {
         cursor: 'grab',
       }}
     >
-      <Tooltip content={item.name}>
-        <img
-          src={getPublicImageURL(getItemIconPath(item.index))}
-          alt={item.name}
-          style={{
-            width: '100%',
-            height: '100%',
-            visibility: isDragging ? 'hidden' : undefined,
-          }}
-          draggable={false}
-        />
-      </Tooltip>
+      {/* <Tooltip content={item.name}> */}
+      <img
+        src={getPublicImageURL(getItemIconPath(item.index))}
+        alt={item.name}
+        style={{
+          width: '100%',
+          height: '100%',
+          visibility: isDragging ? 'hidden' : undefined,
+        }}
+        draggable={false}
+      />
+      {/* </Tooltip> */}
 
       <Text
         size="1"

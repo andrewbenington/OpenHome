@@ -1,6 +1,6 @@
-import { useDndMonitor, useDroppable } from '@dnd-kit/core'
+import { useDroppable } from '@dnd-kit/core'
 import { MonLocation } from '@openhome-ui/state/saves'
-import { CSSProperties, ReactNode } from 'react'
+import { CSSProperties, ReactNode, useEffect, useRef } from 'react'
 
 const getBackgroundDetails = (disabled?: boolean) => {
   if (disabled) {
@@ -38,18 +38,31 @@ const DroppableSpace = ({
   const { isOver, setNodeRef } = useDroppable({
     id: dropID ?? '',
     data: dropData,
-    disabled: disabled || !dropID,
+    // disabled: disabled || !dropID,
   })
+  const onOverRef = useRef(onOver)
+  const onNotOverRef = useRef(onNotOver)
+  useEffect(() => {
+    onOverRef.current = onOver
+    // return () => {
+    //   onOverRef.current = undefined
+    // }
+  }, [onOver])
 
-  useDndMonitor({
-    onDragOver: (e) => {
-      if (e.over?.id === dropID) {
-        onOver?.()
-      } else if (e.collisions?.some((c) => c.id === dropID)) {
-        onNotOver?.()
-      }
-    },
-  })
+  useEffect(() => {
+    onNotOverRef.current = onNotOver
+    // return () => {
+    //   onNotOverRef.current = undefined
+    // }
+  }, [onNotOver])
+
+  useEffect(() => {
+    if (isOver) {
+      onOverRef.current?.()
+    } else {
+      onNotOverRef.current?.()
+    }
+  }, [isOver])
 
   return (
     <div
@@ -68,6 +81,7 @@ const DroppableSpace = ({
         ...style,
       }}
       ref={setNodeRef}
+      // onMouseEnter={() => console.log('mouse entering ' + dropID)}
     >
       {children}
     </div>

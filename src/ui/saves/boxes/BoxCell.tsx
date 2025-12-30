@@ -15,7 +15,8 @@ import { useItems } from '@openhome-ui/state/items'
 import { MonLocation, useSaves } from '@openhome-ui/state/saves'
 import { filterApplies } from '@openhome-ui/util/filter'
 import { PokedexUpdate } from '@openhome-ui/util/pokedex'
-import { useCallback, useContext, useMemo } from 'react'
+import { NationalDex } from '@pokemon-resources/consts/NationalDex'
+import { useCallback, useContext, useEffect, useMemo } from 'react'
 import { useMonDisplay } from 'src/ui/hooks/useMonDisplay'
 import '../style.css'
 import DraggableMon from './DraggableMon'
@@ -58,6 +59,12 @@ function BoxCell({
       (mon === undefined || !filterApplies(filter, mon))
     )
   }, [filter, mon])
+
+  useEffect(() => {
+    if (mon?.dexNum === NationalDex.Ursaluna) {
+      console.log('BoxCell: location changed')
+    }
+  }, [mon?.dexNum, location])
 
   const onDropFromFiles = useCallback(
     async (files: FileList) => {
@@ -131,6 +138,11 @@ function BoxCell({
       ]
     : undefined
 
+  const dragData = useMemo(
+    () => (location && mon ? { ...location, mon } : undefined),
+    [location, mon]
+  )
+
   return (
     <OpenHomeCtxMenu sections={[monCtxMenuItemBuilders, ctxMenuBuilders]}>
       <div
@@ -161,7 +173,7 @@ function BoxCell({
                 height: '100%',
                 ...getBackgroundDetails(),
               }}
-              dragData={location ? { ...location, mon } : undefined}
+              dragData={dragData}
               dragID={dragID}
               disabled={disabled || isFilteredOut}
               topRightIndicator={topRightIndicator}

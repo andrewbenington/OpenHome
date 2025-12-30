@@ -3,7 +3,8 @@ import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { displayIndexAdder, isBattleFormeItem, isMegaStone } from '@openhome-core/pkm/util'
 import { MonWithLocation } from '@openhome-ui/state/saves'
 import { MetadataLookup } from '@pkm-rs/pkg'
-import { useMemo } from 'react'
+import { NationalDex } from '@pokemon-resources/consts/NationalDex'
+import { CSSProperties, useEffect, useMemo } from 'react'
 import PokemonIcon from '../../components/PokemonIcon'
 import { TopRightIndicatorType } from '../../hooks/useMonDisplay'
 import useDragAndDrop from '../../state/drag-and-drop/useDragAndDrop'
@@ -35,34 +36,52 @@ export interface DraggableMonProps {
 
 const DraggableMon = (props: DraggableMonProps) => {
   const { onClick, disabled, mon, dragID, dragData, topRightIndicator, showItem, showShiny } = props
-  const { attributes, listeners, setNodeRef } = useDraggable({
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: (dragID ?? '') + mon.personalityValue?.toString(),
     data: dragData ? { kind: 'mon', monData: dragData } : undefined,
     disabled: disabled || !dragID,
   })
-  const { dragState } = useDragAndDrop()
+  const { dragMode, dragPayload } = useDragAndDrop()
 
-  const isDragging = useMemo(
+  if (mon.dexNum === NationalDex.Ursaluna) {
+    console.log('rendering DraggableMon')
+  }
+  useEffect(() => {
+    if (mon.dexNum === NationalDex.Ursaluna) {
+      console.log('dragData changed')
+    }
+  }, [mon.dexNum, dragData])
+
+  const formeNumber = useMemo(() => {
+    let formeNumber = mon.formeNum
+
+    if (isMegaStone(mon.heldItemIndex)) {
+      const megaForStone = MetadataLookup(mon.dexNum, mon.formeNum)?.megaEvolutions.find(
+        (mega) => mega.requiredItemId === mon.heldItemIndex
+      )
+
+      if (megaForStone) formeNumber = megaForStone.megaForme.formeIndex
+    } else if (isBattleFormeItem(mon.dexNum, mon.heldItemIndex)) {
+      formeNumber = displayIndexAdder(mon.heldItemIndex)(mon.formeNum)
+    }
+
+    return formeNumber
+  }, [mon.dexNum, mon.formeNum, mon.heldItemIndex])
+
+  const topRightIndicatorComponent = useMemo(
     () =>
-      dragState.payload?.kind === 'mon' &&
-      dragData &&
-      dragState.payload.monData.box === dragData.box &&
-      dragState.payload.monData.box_slot === dragData.box_slot &&
-      dragState.payload.monData.save === dragData.save,
-    [dragData, dragState.payload]
+      topRightIndicator ? <TopRightIndicator indicatorType={topRightIndicator} mon={mon} /> : <></>,
+    [mon, topRightIndicator]
   )
 
-  let formeNumber = mon.formeNum
-
-  if (isMegaStone(mon.heldItemIndex)) {
-    const megaForStone = MetadataLookup(mon.dexNum, mon.formeNum)?.megaEvolutions.find(
-      (mega) => mega.requiredItemId === mon.heldItemIndex
-    )
-
-    if (megaForStone) formeNumber = megaForStone.megaForme.formeIndex
-  } else if (isBattleFormeItem(mon.dexNum, mon.heldItemIndex)) {
-    formeNumber = displayIndexAdder(mon.heldItemIndex)(mon.formeNum)
-  }
+  const style: CSSProperties = useMemo(
+    () => ({
+      width: '100%',
+      height: '100%',
+      visibility: isDragging && dragMode === 'mon' ? 'hidden' : undefined,
+    }),
+    [dragMode, isDragging]
+  )
 
   return (
     <div
@@ -83,21 +102,11 @@ const DraggableMon = (props: DraggableMonProps) => {
         isShiny={showShiny && mon.isShiny()}
         isEgg={mon.isEgg}
         heldItemIndex={
-          showItem && (!isDragging || dragState.mode !== 'item') ? mon.heldItemIndex : undefined
+          showItem && (!isDragging || dragMode !== 'item') ? mon.heldItemIndex : undefined
         }
-        style={{
-          width: '100%',
-          height: '100%',
-          visibility: isDragging && dragState.mode === 'mon' ? 'hidden' : undefined,
-        }}
+        style={style}
         greyedOut={disabled}
-        topRightIndicator={
-          topRightIndicator ? (
-            <TopRightIndicator indicatorType={topRightIndicator} mon={mon} />
-          ) : (
-            <></>
-          )
-        }
+        topRightIndicator={topRightIndicatorComponent}
       />
     </div>
   )

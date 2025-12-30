@@ -13,6 +13,7 @@ export interface PokemonIconProps extends HTMLAttributes<HTMLDivElement> {
   isShiny?: boolean
   isEgg?: boolean
   heldItemIndex?: number
+  onlyItem?: boolean
   greyedOut?: boolean
   silhouette?: boolean
   topRightIndicator?: ReactNode
@@ -35,12 +36,22 @@ export default function PokemonIcon(props: PokemonIconProps) {
     formeNumber,
     isShiny,
     heldItemIndex,
+    onlyItem,
     greyedOut,
     silhouette,
     isEgg,
     topRightIndicator,
-    ...attributes
+    style,
   } = props
+
+  // if (dexNumber === NationalDex.Ursaluna) {
+  //   console.log('rendering PokemonIcon')
+  // }
+  // useEffect(() => {
+  //   if (dexNumber === NationalDex.Ursaluna) {
+  //     console.log('something changed')
+  //   }
+  // }, [props])
 
   const formeMetadata = MetadataLookup(dexNumber, formeNumber ?? 0)
 
@@ -59,8 +70,8 @@ export default function PokemonIcon(props: PokemonIconProps) {
   const className = greyedOut ? 'pokemon-icon-container greyed-out' : 'pokemon-icon-container'
 
   return (
-    <div className={className} {...attributes}>
-      {monImage}
+    <div className={className} style={style}>
+      {!onlyItem && monImage}
       {isShiny && (
         <img
           alt="shiny icon"
