@@ -147,6 +147,7 @@ pub enum SignificantUpdate {
     V1_8_0AlphaOhpkmV2,
     V1_8_0AlphaFeatureMessages,
     V1_8_1,
+    V1_8_2,
 }
 
 impl SignificantUpdate {
@@ -158,6 +159,7 @@ impl SignificantUpdate {
                 Version::parse("1.8.0-x-alpha.1.feature-messages").unwrap()
             }
             Self::V1_8_1 => Version::parse("1.8.1").unwrap(),
+            Self::V1_8_2 => Version::parse("1.8.2").unwrap(),
         }
     }
 
@@ -167,6 +169,7 @@ impl SignificantUpdate {
             Self::V1_8_0AlphaOhpkmV2 => do_migration_1_8_0(app_handle),
             Self::V1_8_0AlphaFeatureMessages => Ok(()),
             Self::V1_8_1 => handle_old_mons_directories_for_ohpkm_v2(app_handle),
+            Self::V1_8_2 => Ok(()),
         }
     }
 
@@ -186,6 +189,14 @@ impl SignificantUpdate {
             Self::V1_8_1 => Some(vec![String::from(
                 "A bug present when launching v1.8.0 has been fixed",
             )]),
+            Self::V1_8_2 => Some(vec![
+                String::from(
+                    "Pokémon can optionally display extra information on the top-right of box view icons. This can be changed using the \"Display\" tab on the right panel of the home screen.",
+                ),
+                String::from(
+                    "A bug preventing new users from launching v1.8.0 or v1.8.1 has been fixed",
+                ),
+            ]),
             _ => None,
         }
     }
