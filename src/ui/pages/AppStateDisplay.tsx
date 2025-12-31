@@ -26,7 +26,7 @@ export default function AppStateDisplay() {
           <InfoGrid data={appState ?? {}} />
         </Flex>
       </Card>
-      <Card style={{ margin: 8, display: 'flex', flexDirection: 'row', gap: 8 }}>
+      <Card className="flex-row" style={{ margin: 8, gap: 8 }}>
         <DevDataDisplay data={appInfoDisplay(appInfoState)} label="App Info State" />
         <DevDataDisplay data={openSavesDisplay(savesAndBanks)} label="Saves/Mons State" />
         <DevDataDisplay data={bagDisplay(bagState)} label="Bag State" />

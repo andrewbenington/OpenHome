@@ -164,3 +164,26 @@
     filter: brightness(0.8);
   }
 }
+
+.draggable-item {
+  position: relative;
+  width: 24px;
+  height: 24px;
+  cursor: grab;
+}
+
+.item-bag-area {
+  border-radius: 6px;
+  box-sizing: content-box;
+  justify-content: start;
+  align-items: start;
+  height: 100%;
+  padding: 5px 0px;
+}
+
+.item-bag-slot {
+  padding: 6px;
+  aspect-ratio: 1;
+  background-color: #6662;
+  border-radius: 4px;
+}

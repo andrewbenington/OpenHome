@@ -9,7 +9,7 @@ type MarkingsProps = {
 const getMarkingColorByNumber = (value: MarkingValue) => {
   if (value === 'blue' || value === true) return 'blue'
   if (value === 'red') return 'red'
-  return 'grey'
+  return 'gray'
 }
 
 const MarkingsDisplay = (props: MarkingsProps) => {
