@@ -9,48 +9,30 @@ export default function ItemBag() {
 
   return (
     <Flex direction="column" p="1" gap="2" style={{ marginLeft: 5 }}>
-      <DroppableSpace
-        dropID="item-bag"
-        style={{
-          borderRadius: 6,
-          boxSizing: 'content-box',
-          justifyContent: 'start',
-          alignItems: 'start',
-          height: '100%',
-          padding: '5px 0px',
-        }}
-      >
+      <DroppableSpace dropID="item-bag" className="item-bag-area">
         <Grid columns="6" gap="2" justify="end" align={'end'}>
-          {Object.entries(itemCounts).map(([indexStr, count]) => {
-            const index = parseInt(indexStr)
-            const validatedIndex = Item.fromIndex(index)
+          {Object.entries(itemCounts)
+            .filter(([indexStr]) => parseInt(indexStr) > 0)
+            .map(([indexStr, count]) => {
+              const index = parseInt(indexStr)
+              const validatedIndex = Item.fromIndex(index)
 
-            return (
-              <Flex
-                key={index}
-                align="center"
-                justify="center"
-                style={{
-                  padding: 6,
-                  aspectRatio: '1',
-                  backgroundColor: '#6662',
-                  borderRadius: 4,
-                }}
-              >
-                {validatedIndex ? (
-                  <DraggableItem item={validatedIndex} count={count} />
-                ) : (
-                  <img
-                    src="/items/index/0000.png"
-                    alt=""
-                    aria-hidden
-                    draggable={false}
-                    style={{ opacity: 0 }}
-                  />
-                )}
-              </Flex>
-            )
-          })}
+              return (
+                <Flex className="item-bag-slot" key={index} align="center" justify="center">
+                  {validatedIndex ? (
+                    <DraggableItem item={validatedIndex} count={count} />
+                  ) : (
+                    <img
+                      src="/items/index/0000.png"
+                      alt=""
+                      aria-hidden
+                      draggable={false}
+                      style={{ opacity: 0 }}
+                    />
+                  )}
+                </Flex>
+              )
+            })}
         </Grid>
       </DroppableSpace>
     </Flex>

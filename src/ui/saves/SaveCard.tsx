@@ -6,6 +6,7 @@ import useDisplayError from '@openhome-ui/hooks/displayError'
 import { Generation, getPluginColor, OriginGames } from '@pkm-rs/pkg'
 import { Badge, Flex } from '@radix-ui/themes'
 import { useContext, useMemo, useState } from 'react'
+import { classNames, grayscaleIf } from '../util/style'
 import './style.css'
 import { buildRecentSaveContextElements, formatTimeSince, logoFromSaveRef } from './util'
 
@@ -45,14 +46,13 @@ export default function SaveCard({ save, onOpen, onRemove, size = 240 }: SaveCar
     <OpenHomeCtxMenu elements={buildRecentSaveContextElements(save, backend, onRemove)}>
       <div style={{ position: 'relative' }}>
         <div
-          className="save-card"
+          className={classNames('save-card', grayscaleIf(!save.valid))}
           style={{
             width: size,
             height: size,
             backgroundImage,
             backgroundSize: isGameBoy ? size : size * 0.9,
             backgroundColor,
-            filter: save.valid ? undefined : 'grayscale(1)',
           }}
           onClick={onOpen}
         >

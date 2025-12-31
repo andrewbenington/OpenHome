@@ -75,12 +75,11 @@ const DraggableMon = (props: DraggableMonProps) => {
 
   return (
     <div
+      className="fill-parent"
       ref={setNodeRef}
       {...listeners}
       {...attributes}
       style={{
-        width: '100%',
-        height: '100%',
         ...getBackgroundDetails(),
         cursor: 'pointer',
       }}
@@ -95,7 +94,7 @@ const DraggableMon = (props: DraggableMonProps) => {
           showItem && (!isDragging || dragState.mode !== 'item') ? mon.heldItemIndex : undefined
         }
         style={style}
-        greyedOut={disabled}
+        grayedOut={disabled}
         topRightIndicator={topRightIndicatorComponent}
       />
     </div>

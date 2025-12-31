@@ -122,7 +122,7 @@ function PokedexTab({ pokedex, species, onClick, selected, style }: PokedexTabPr
         dexNumber={species.nationalDex}
         formeNumber={formeIndex}
         silhouette={!isSeen}
-        greyedOut={!isCaught}
+        grayedOut={!isCaught}
         style={{ minWidth: 32, minHeight: 32 }}
       />
       {species.nationalDex}. {species.name}

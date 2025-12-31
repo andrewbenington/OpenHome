@@ -119,9 +119,9 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
       <DragOverlay style={{ cursor: 'grabbing' }}>
         {dragState.payload?.kind === 'item' ? (
           <img
+            className="draggable-item"
             src={getPublicImageURL(getItemIconPath(dragState.payload.item.index))}
             alt={dragState.payload.item.name}
-            style={{ width: 32, height: 32 }}
             draggable={false}
           />
         ) : (

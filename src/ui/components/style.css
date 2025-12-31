@@ -107,10 +107,6 @@ summary::-webkit-details-marker {
   transition: rotate 0.2s;
 }
 
-.greyed-out {
-  filter: grayscale(100%);
-}
-
 .shiny-icon {
   position: absolute;
   width: 40%;

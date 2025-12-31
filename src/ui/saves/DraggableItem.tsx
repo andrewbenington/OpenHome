@@ -2,7 +2,9 @@ import { useDraggable } from '@dnd-kit/core'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getItemIconPath } from '@openhome-ui/images/items'
 import { Item } from '@pkm-rs/pkg'
-import { Text } from '@radix-ui/themes'
+import { Text, Tooltip } from '@radix-ui/themes'
+import { useState } from 'react'
+import { classNames, hiddenIf } from '../util/style'
 
 type DraggableItemProps = {
   item: Item
@@ -10,36 +12,34 @@ type DraggableItemProps = {
 }
 
 function DraggableItem({ item, count }: DraggableItemProps) {
-  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
-    id: `item-${item.name}`,
+  const { attributes, listeners, setNodeRef, isDragging, active } = useDraggable({
+    id: `item-${item.index}`,
     data: { kind: 'item', item: item },
   })
+  const [imageError, setImageError] = useState(false)
+
+  const image = !imageError ? (
+    <img
+      className={classNames('fill-parent', hiddenIf(isDragging))}
+      src={getPublicImageURL(getItemIconPath(item.index))}
+      alt={item.name}
+      title={item.name}
+      draggable={false}
+      onError={() => setImageError(true)}
+    />
+  ) : (
+    <img
+      className={classNames('fill-parent', hiddenIf(isDragging))}
+      src={getPublicImageURL('items/index/0000.png')}
+      alt={item.name}
+      draggable={false}
+    />
+  )
 
   return (
-    <div
-      ref={setNodeRef}
-      {...listeners}
-      {...attributes}
-      style={{
-        position: 'relative',
-        width: 24,
-        height: 24,
-        cursor: 'grab',
-      }}
-    >
-      {/* <Tooltip content={item.name}> */}
-      <img
-        src={getPublicImageURL(getItemIconPath(item.index))}
-        alt={item.name}
-        style={{
-          width: '100%',
-          height: '100%',
-          visibility: isDragging ? 'hidden' : undefined,
-        }}
-        draggable={false}
-      />
-      {/* </Tooltip> */}
-
+    <div className="draggable-item" ref={setNodeRef} {...listeners} {...attributes}>
+      {/* tooltip causes performance issues when dragging; only show when not */}
+      {active ? image : <Tooltip content={item.name}>{image}</Tooltip>}
       <Text
         size="1"
         weight="bold"

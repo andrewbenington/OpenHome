@@ -228,7 +228,7 @@ function PokedexDetails({
           </Flex>
         </Flex>
         <Flex width="100%" height="50%">
-          <Card style={{ width: '100%', display: 'flex', flexDirection: 'row', gap: 8 }}>
+          <Card className="flex-row" style={{ width: '100%', gap: 8 }}>
             <Text style={{ flex: 2 }}>{getPokedexSummary(species, selectedForme)}</Text>
             <Separator orientation="vertical" style={{ height: '100%' }} />
             <div style={{ height: '100%', flex: 1 }}>

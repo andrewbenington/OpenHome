@@ -22,6 +22,8 @@ export function useItems() {
   const giveItemToMon = useCallback(
     (monLocation: MonLocation, item: Item) => {
       const destMon = getMonAtLocation(monLocation)
+      if (!destMon) return
+
       bagDispatch({ type: 'remove_item', payload: { index: item.index, qty: 1 } })
 
       // If already holding an item, move it to the bag

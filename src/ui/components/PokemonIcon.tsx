@@ -5,6 +5,7 @@ import { getItemIconPath } from '@openhome-ui/images/items'
 import useMonSprite from '@openhome-ui/pokemon-details//useMonSprite'
 import { FormeMetadata, Generation, MetadataLookup } from '@pkm-rs/pkg'
 import { HTMLAttributes, ReactNode } from 'react'
+import { classNames, grayscaleIf } from '../util/style'
 import './components.css'
 
 export interface PokemonIconProps extends HTMLAttributes<HTMLDivElement> {
@@ -14,7 +15,7 @@ export interface PokemonIconProps extends HTMLAttributes<HTMLDivElement> {
   isEgg?: boolean
   heldItemIndex?: number
   onlyItem?: boolean
-  greyedOut?: boolean
+  grayedOut?: boolean
   silhouette?: boolean
   topRightIndicator?: ReactNode
 }
@@ -37,21 +38,12 @@ export default function PokemonIcon(props: PokemonIconProps) {
     isShiny,
     heldItemIndex,
     onlyItem,
-    greyedOut,
+    grayedOut,
     silhouette,
     isEgg,
     topRightIndicator,
     style,
   } = props
-
-  // if (dexNumber === NationalDex.Ursaluna) {
-  //   console.log('rendering PokemonIcon')
-  // }
-  // useEffect(() => {
-  //   if (dexNumber === NationalDex.Ursaluna) {
-  //     console.log('something changed')
-  //   }
-  // }, [props])
 
   const formeMetadata = MetadataLookup(dexNumber, formeNumber ?? 0)
 
@@ -67,10 +59,8 @@ export default function PokemonIcon(props: PokemonIconProps) {
     <PokemonIconUsingSheet formeMetadata={formeMetadata} isEgg={isEgg} silhouette={silhouette} />
   ) : null
 
-  const className = greyedOut ? 'pokemon-icon-container greyed-out' : 'pokemon-icon-container'
-
   return (
-    <div className={className} style={style}>
+    <div className={classNames('pokemon-icon-container', grayscaleIf(grayedOut))} style={style}>
       {!onlyItem && monImage}
       {isShiny && (
         <img
@@ -142,12 +132,11 @@ function PokemonIconUsingImage(props: PokemonIconUsingImageProps) {
 
   return (
     <img
+      className="fill-parent"
       alt="pokemon sprite"
       draggable={false}
       src={spriteResult.path}
       style={{
-        width: '100%',
-        height: '100%',
         imageRendering: 'pixelated',
         filter: silhouette
           ? isDarkMode

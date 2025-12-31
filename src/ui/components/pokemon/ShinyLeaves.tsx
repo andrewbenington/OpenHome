@@ -32,7 +32,7 @@ const ShinyLeavesDisplay = ({ leaves }: ShinyLeavesProps) => {
       src={getPublicImageURL('icons/LeafCrown.png')}
     />
   ) : (
-    <div style={{ display: 'flex', flexDirection: 'row' }}>
+    <div className="flex-row">
       <ShinyLeafIcon full={leaves.hasFirst()} index={0} />
       <ShinyLeafIcon full={leaves.hasSecond()} index={1} />
       <ShinyLeafIcon full={leaves.hasThird()} index={2} />
