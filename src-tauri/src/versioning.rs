@@ -53,6 +53,10 @@ pub fn handle_updates_get_features(
     app_handle: &tauri::AppHandle,
     ignore_version_error: bool,
 ) -> Result<Vec<UpdateFeatures>> {
+    if !appdata_dir_exists(app_handle)? {
+        return Ok(vec![]);
+    }
+
     let last_used_version = get_version_last_used(app_handle)?;
     match last_used_version {
         Some(ref from_file) => println!("User last used OpenHome version {from_file}"),
@@ -128,6 +132,13 @@ pub fn handle_updates_get_features(
     }
 
     Ok(all_update_features)
+}
+
+fn appdata_dir_exists(app_handle: &tauri::AppHandle) -> Result<bool> {
+    tauri::Manager::path(app_handle)
+        .app_data_dir()
+        .map(|dir| dir.exists())
+        .map_err(Error::appdata)
 }
 
 #[derive(EnumIter, Clone, Copy, strum::Display, Debug, PartialEq, Eq, Hash, Serialize)]
