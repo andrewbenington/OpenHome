@@ -17,7 +17,7 @@ export default function Settings() {
         <b>Enabled ROM Hack Formats</b>
         <div style={{ margin: 8 }}>
           {appInfoState.extraSaveTypes.map((saveType) => (
-            <label style={{ display: 'flex', flexDirection: 'row' }} key={saveType.saveTypeName}>
+            <label className="flex-row" key={saveType.saveTypeName}>
               <input
                 type="checkbox"
                 onChange={(e) =>

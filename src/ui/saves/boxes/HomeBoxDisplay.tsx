@@ -16,7 +16,6 @@ import {
 import ToggleButton from '@openhome-ui/components/ToggleButton'
 import useIsDev from '@openhome-ui/hooks/isDev'
 import PokemonDetailsModal from '@openhome-ui/pokemon-details/Modal'
-import { DragMonContext } from '@openhome-ui/state/dragMon'
 import { ErrorContext } from '@openhome-ui/state/error'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { MonLocation, MonWithLocation, useSaves } from '@openhome-ui/state/saves'
@@ -34,6 +33,7 @@ import { ToggleGroup } from 'radix-ui'
 import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { BsFillGrid3X3GapFill } from 'react-icons/bs'
 import { FaSquare } from 'react-icons/fa'
+import useDragAndDrop from '../../state/drag-and-drop/useDragAndDrop'
 import { buildBackwardNavigator, buildForwardNavigator } from '../util'
 import AllHomeBoxes from './AllHomeBoxes'
 import ArrowButton from './ArrowButton'
@@ -216,54 +216,56 @@ export default function HomeBoxDisplay() {
 
 function SingleBoxMonDisplay() {
   const ohpkmStore = useOhpkmStore()
-  const savesAndBanks = useSaves()
+  const { importMonsToLocation, homeData, sortHomeBox, sortAllHomeBoxes, removeDupesFromHomeBox } =
+    useSaves()
   const [, dispatchError] = useContext(ErrorContext)
   const [selectedIndex, setSelectedIndex] = useState<number>()
-  const [dragMonState] = useContext(DragMonContext)
+  const { dragState } = useDragAndDrop()
 
-  const homeData = savesAndBanks.homeData
+  const attemptImportMons = useCallback(
+    (mons: PKMInterface[], location: MonLocation) => {
+      for (const mon of mons) {
+        try {
+          const identifier = getMonFileIdentifier(new OHPKM(mon))
 
-  const attemptImportMons = (mons: PKMInterface[], location: MonLocation) => {
-    for (const mon of mons) {
-      try {
-        const identifier = getMonFileIdentifier(new OHPKM(mon))
+          if (!identifier) continue
 
-        if (!identifier) continue
+          const inCurrentBox = homeData.boxes[homeData.currentPCBox].pokemon.some(
+            (mon) => mon && getMonFileIdentifier(mon) === identifier
+          )
 
-        const inCurrentBox = homeData.boxes[homeData.currentPCBox].pokemon.some(
-          (mon) => mon && getMonFileIdentifier(mon) === identifier
-        )
+          if (!ALLOW_DUPE_IMPORT && (ohpkmStore.monIsStored(identifier) || inCurrentBox)) {
+            const message =
+              mons.length === 1
+                ? 'This Pokémon has been moved into OpenHome before.'
+                : 'One or more of these Pokémon has been moved into OpenHome before.'
 
-        if (!ALLOW_DUPE_IMPORT && (ohpkmStore.monIsStored(identifier) || inCurrentBox)) {
-          const message =
-            mons.length === 1
-              ? 'This Pokémon has been moved into OpenHome before.'
-              : 'One or more of these Pokémon has been moved into OpenHome before.'
-
+            dispatchError({
+              type: 'set_message',
+              payload: { title: 'Import Failed', messages: [message] },
+            })
+            return
+          }
+        } catch (e) {
           dispatchError({
             type: 'set_message',
-            payload: { title: 'Import Failed', messages: [message] },
+            payload: { title: 'Import Failed', messages: [`${e}`] },
           })
-          return
         }
-      } catch (e) {
-        dispatchError({
-          type: 'set_message',
-          payload: { title: 'Import Failed', messages: [`${e}`] },
-        })
       }
-    }
-    savesAndBanks.importMonsToLocation(mons, location)
-  }
+      importMonsToLocation(mons, location)
+    },
+    [dispatchError, homeData.boxes, homeData.currentPCBox, importMonsToLocation, ohpkmStore]
+  )
 
   const dragData: MonWithLocation | undefined = useMemo(() => {
-    const payload = dragMonState.payload
+    const payload = dragState.payload
 
     if (payload?.kind === 'mon') {
       return payload.monData
     }
     return undefined
-  }, [dragMonState])
+  }, [dragState.payload])
 
   const currentBox = homeData.boxes[homeData.currentPCBox]
 
@@ -284,25 +286,26 @@ function SingleBoxMonDisplay() {
     [homeData, selectedIndex]
   )
 
-  const contextElements = [
-    ItemBuilder.fromLabel('Remove duplicates from this box').withAction(() =>
-      savesAndBanks.removeDupesFromHomeBox(homeData.currentPCBox)
-    ),
-    SubmenuBuilder.fromLabel('Sort this box...').withBuilders(
-      SortTypes.map((sortType) =>
-        ItemBuilder.fromLabel(`By ${sortType}`).withAction(() =>
-          savesAndBanks.sortHomeBox(homeData.currentPCBox, sortType)
+  const contextElements = useMemo(
+    () => [
+      ItemBuilder.fromLabel('Remove duplicates from this box').withAction(() =>
+        removeDupesFromHomeBox(homeData.currentPCBox)
+      ),
+      SubmenuBuilder.fromLabel('Sort this box...').withBuilders(
+        SortTypes.map((sortType) =>
+          ItemBuilder.fromLabel(`By ${sortType}`).withAction(() =>
+            sortHomeBox(homeData.currentPCBox, sortType)
+          )
         )
-      )
-    ),
-    SubmenuBuilder.fromLabel('Sort all boxes...').withBuilders(
-      SortTypes.map((sortType) =>
-        ItemBuilder.fromLabel(`By ${sortType}`).withAction(() =>
-          savesAndBanks.sortAllHomeBoxes(sortType)
+      ),
+      SubmenuBuilder.fromLabel('Sort all boxes...').withBuilders(
+        SortTypes.map((sortType) =>
+          ItemBuilder.fromLabel(`By ${sortType}`).withAction(() => sortAllHomeBoxes(sortType))
         )
-      )
-    ),
-  ]
+      ),
+    ],
+    [homeData.currentPCBox, removeDupesFromHomeBox, sortAllHomeBoxes, sortHomeBox]
+  )
 
   return (
     <OpenHomeCtxMenu elements={contextElements}>
@@ -377,7 +380,7 @@ const DRAG_OVER_COOLDOWN_MS = 500
 
 function ViewToggle(props: ViewToggleProps) {
   const { viewMode, setViewMode, disabled } = props
-  const [dragMonState] = useContext(DragMonContext)
+  const { dragState } = useDragAndDrop()
   const [timer, setTimer] = useState<NodeJS.Timeout>()
   const setViewModeRef = useRef(setViewMode)
 
@@ -411,7 +414,11 @@ function ViewToggle(props: ViewToggleProps) {
       onValueChange={(newVal: BoxViewMode) => setViewMode(newVal)}
       disabled={disabled}
     >
-      <ToggleGroup.Item value="one" className="ToggleGroupItem" disabled={!!dragMonState.payload}>
+      <ToggleGroup.Item
+        value="one"
+        className="ToggleGroupItem"
+        disabled={Boolean(dragState.payload)}
+      >
         <FaSquare />
       </ToggleGroup.Item>
       <ToggleGroup.Item value="all" className="ToggleGroupItem">

@@ -1,4 +1,3 @@
-import { useDroppable } from '@dnd-kit/react'
 import { bytesToPKM } from '@openhome-core/pkm/FileImport'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { displayIndexAdder, isBattleFormeItem } from '@openhome-core/pkm/util'
@@ -16,7 +15,7 @@ import { useItems } from '@openhome-ui/state/items'
 import { MonLocation, useSaves } from '@openhome-ui/state/saves'
 import { filterApplies } from '@openhome-ui/util/filter'
 import { PokedexUpdate } from '@openhome-ui/util/pokedex'
-import { useContext, useMemo } from 'react'
+import { useCallback, useContext, useMemo } from 'react'
 import { useMonDisplay } from 'src/ui/hooks/useMonDisplay'
 import '../style.css'
 import DraggableMon from './DraggableMon'
@@ -47,7 +46,7 @@ function BoxCell({
   location,
   ctxMenuBuilders,
 }: BoxCellProps) {
-  const { filter, topRightIndicator: TopRightIndicator, showItem, showShiny } = useMonDisplay()
+  const { filter, topRightIndicator, showItem, showShiny } = useMonDisplay()
   const backend = useContext(BackendContext)
   const displayError = useDisplayError()
   const { releaseMonAtLocation } = useSaves()
@@ -60,40 +59,43 @@ function BoxCell({
     )
   }, [filter, mon])
 
-  const onDropFromFiles = async (files: FileList) => {
-    const importedMons: PKMInterface[] = []
-    const pokedexUpdates: PokedexUpdate[] = []
+  const onDropFromFiles = useCallback(
+    async (files: FileList) => {
+      const importedMons: PKMInterface[] = []
+      const pokedexUpdates: PokedexUpdate[] = []
 
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i]
-      const bytes = new Uint8Array(await file.arrayBuffer())
-      const [extension] = file.name.split('.').slice(-1)
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i]
+        const bytes = new Uint8Array(await file.arrayBuffer())
+        const [extension] = file.name.split('.').slice(-1)
 
-      try {
-        const mon = bytesToPKM(bytes, extension.toUpperCase())
+        try {
+          const mon = bytesToPKM(bytes, extension.toUpperCase())
 
-        importedMons.push(mon)
-        pokedexUpdates.push({
-          dexNumber: mon.dexNum,
-          formeNumber: mon.formeNum,
-          status: mon.isShiny() ? 'ShinyCaught' : 'Caught',
-        })
-
-        if (isBattleFormeItem(mon.dexNum, mon.heldItemIndex)) {
+          importedMons.push(mon)
           pokedexUpdates.push({
             dexNumber: mon.dexNum,
-            formeNumber: displayIndexAdder(mon.heldItemIndex)(mon.formeNum),
+            formeNumber: mon.formeNum,
             status: mon.isShiny() ? 'ShinyCaught' : 'Caught',
           })
-        }
-      } catch (e) {
-        displayError('Error Importing Pokémon', `${e}`)
-      }
 
-      backend.registerInPokedex(pokedexUpdates)
-    }
-    onDrop(importedMons)
-  }
+          if (isBattleFormeItem(mon.dexNum, mon.heldItemIndex)) {
+            pokedexUpdates.push({
+              dexNumber: mon.dexNum,
+              formeNumber: displayIndexAdder(mon.heldItemIndex)(mon.formeNum),
+              status: mon.isShiny() ? 'ShinyCaught' : 'Caught',
+            })
+          }
+        } catch (e) {
+          displayError('Error Importing Pokémon', `${e}`)
+        }
+
+        backend.registerInPokedex(pokedexUpdates)
+      }
+      onDrop(importedMons)
+    },
+    [backend, displayError, onDrop]
+  )
 
   const getBackgroundDetails = () => {
     if (disabled) {
@@ -106,12 +108,6 @@ function BoxCell({
       backgroundColor: '#0000',
     }
   }
-
-  const { ref } = useDroppable({
-    id: dragID,
-    data: location,
-    disabled,
-  })
 
   const monCtxMenuItemBuilders = mon
     ? [
@@ -135,10 +131,14 @@ function BoxCell({
       ]
     : undefined
 
+  const dragData = useMemo(
+    () => (location && mon ? { ...location, mon } : undefined),
+    [location, mon]
+  )
+
   return (
     <OpenHomeCtxMenu sections={[monCtxMenuItemBuilders, ctxMenuBuilders]}>
       <div
-        ref={ref}
         style={{
           padding: 0,
           width: '100%',
@@ -157,21 +157,23 @@ function BoxCell({
         title={disabledReason}
       >
         {mon ? (
-          <DraggableMon
-            onClick={onClick}
-            mon={mon}
-            style={{
-              width: '100%',
-              height: '100%',
-              ...getBackgroundDetails(),
-            }}
-            dragData={location ? { ...location, mon } : undefined}
-            dragID={dragID}
-            disabled={disabled || isFilteredOut}
-            topRightIndicator={TopRightIndicator}
-            showItem={showItem}
-            showShiny={showShiny}
-          />
+          <DroppableSpace dropID={dragID} dropData={location} disabled={disabled}>
+            <DraggableMon
+              onClick={onClick}
+              mon={mon}
+              style={{
+                width: '100%',
+                height: '100%',
+                ...getBackgroundDetails(),
+              }}
+              dragData={dragData}
+              dragID={dragID}
+              disabled={disabled || isFilteredOut}
+              topRightIndicator={topRightIndicator}
+              showItem={showItem}
+              showShiny={showShiny}
+            />
+          </DroppableSpace>
         ) : (
           <DroppableSpace dropID={dragID} dropData={location} disabled={disabled} />
         )}

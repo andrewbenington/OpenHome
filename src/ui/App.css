@@ -261,3 +261,21 @@ label {
     width: 18px;
   }
 }
+
+.hidden {
+  visibility: hidden;
+}
+
+.fill-parent {
+  width: 100%;
+  height: 100%;
+}
+
+.grayed-out {
+  filter: grayscale(100%);
+}
+
+.flex-row {
+  display: flex;
+  flex-direction: row;
+}

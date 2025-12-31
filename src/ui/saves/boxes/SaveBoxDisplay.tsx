@@ -9,7 +9,6 @@ import { ItemBuilder, OpenHomeCtxMenu } from '@openhome-ui/components/context-me
 import Fallback from '@openhome-ui/components/Fallback'
 import { MenuIcon } from '@openhome-ui/components/Icons'
 import PokemonDetailsModal from '@openhome-ui/pokemon-details/Modal'
-import { DragMonContext } from '@openhome-ui/state/dragMon'
 import { ErrorContext } from '@openhome-ui/state/error'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { MonLocation, useSaves } from '@openhome-ui/state/saves'
@@ -19,6 +18,7 @@ import { Button, Card, Dialog, Flex, Grid } from '@radix-ui/themes'
 
 import { useContext, useMemo, useState } from 'react'
 import { MdClose } from 'react-icons/md'
+import useDragAndDrop from '../../state/drag-and-drop/useDragAndDrop'
 import { buildBackwardNavigator, buildForwardNavigator } from '../util'
 import ArrowButton from './ArrowButton'
 import BoxCell from './BoxCell'
@@ -36,7 +36,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   const [detailsModal, setDetailsModal] = useState(false)
   const { saveIndex } = props
   const [selectedIndex, setSelectedIndex] = useState<number>()
-  const [dragMonState] = useContext(DragMonContext)
+  const { dragState } = useDragAndDrop()
 
   const save = useMemo(
     () => savesAndBanks.allOpenSaves[saveIndex],
@@ -105,7 +105,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   }
 
   const isDisabled = useMemo(() => {
-    const dragPayload = dragMonState?.payload
+    const dragPayload = dragState?.payload
 
     if (!dragPayload) return false
 
@@ -118,7 +118,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
     if (!dragData || Object.entries(dragData).length === 0) return false
 
     return !save.supportsMon(dragData.mon.dexNum, dragData.mon.formeNum)
-  }, [save, dragMonState])
+  }, [save, dragState?.payload])
 
   const navigateRight = useMemo(
     () => buildForwardNavigator(save, selectedIndex, setSelectedIndex),

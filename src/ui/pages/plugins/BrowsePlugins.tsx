@@ -75,7 +75,7 @@ export default function BrowsePlugins() {
   ) : (
     <div style={{ padding: 16 }}>
       {isDev && (
-        <label style={{ display: 'flex', flexDirection: 'row', gap: 8, marginBottom: 8 }}>
+        <label className="flex-row" style={{ gap: 8, marginBottom: 8 }}>
           <Switch
             checked={useDevRepo}
             onCheckedChange={(val) => {
