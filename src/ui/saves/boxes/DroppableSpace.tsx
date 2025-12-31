@@ -38,22 +38,16 @@ const DroppableSpace = ({
   const { isOver, setNodeRef } = useDroppable({
     id: dropID ?? '',
     data: dropData,
-    // disabled: disabled || !dropID,
+    disabled: disabled || !dropID,
   })
   const onOverRef = useRef(onOver)
   const onNotOverRef = useRef(onNotOver)
   useEffect(() => {
     onOverRef.current = onOver
-    // return () => {
-    //   onOverRef.current = undefined
-    // }
   }, [onOver])
 
   useEffect(() => {
     onNotOverRef.current = onNotOver
-    // return () => {
-    //   onNotOverRef.current = undefined
-    // }
   }, [onNotOver])
 
   useEffect(() => {
