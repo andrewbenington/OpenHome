@@ -2,6 +2,7 @@ import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
 import { OriginGame } from '@pkm-rs/pkg'
 import { Item } from '@pokemon-resources/consts/Items'
 import { SM_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
+import { OhpkmTracker } from '../../tracker'
 import { G7SAV } from './G7SAV'
 import { PathData } from './util/path'
 
@@ -12,8 +13,18 @@ const BOX_NAMES_OFFSET: number = 0x04800
 const SAVE_SIZE_BYTES = 0x6be00
 
 export class SMSAV extends G7SAV {
-  constructor(path: PathData, bytes: Uint8Array) {
-    super(path, bytes, PC_OFFSET, PC_CHECKSUM_OFFSET, BOX_NAMES_OFFSET)
+  pcChecksumOffset: number = PC_CHECKSUM_OFFSET
+
+  constructor(path: PathData, bytes: Uint8Array, tracker: OhpkmTracker) {
+    super(path, bytes, tracker)
+  }
+
+  getBoxNamesOffset(): number {
+    return BOX_NAMES_OFFSET
+  }
+
+  getPcOffset(): number {
+    return PC_OFFSET
   }
 
   supportsMon(dexNumber: number, formeNumber: number): boolean {

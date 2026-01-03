@@ -1,4 +1,3 @@
-import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
 import { Gender, OriginGame } from '@pkm-rs/pkg'
 import { PB8 } from '@pokemon-files/pkm'
@@ -6,7 +5,7 @@ import { utf16BytesToString } from '@pokemon-files/util'
 import { Item } from '@pokemon-resources/consts/Items'
 import { BDSP_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
 import { md5Digest } from '../encryption/Encryption'
-import { Box, BoxCoordinates, OfficialSAV } from '../interfaces'
+import { Box, OfficialSAV, SaveMonLocation } from '../interfaces'
 import { PathData } from '../util/path'
 
 const SAVE_SIZE_BYTES_MIN = 900000
@@ -51,7 +50,7 @@ export class BDSPSAV extends OfficialSAV<PB8> {
   myStatusBlock: MyStatusBlock
   boxes: Box<PB8>[] = []
 
-  updatedBoxSlots: BoxCoordinates[] = []
+  updatedBoxSlots: SaveMonLocation[] = []
 
   constructor(path: PathData, bytes: Uint8Array) {
     super()
@@ -134,24 +133,26 @@ export class BDSPSAV extends OfficialSAV<PB8> {
 
   // TODO: implement
   prepareBoxesAndGetModified() {
-    const changedMonPKMs: OHPKM[] = []
+    const changedMonIdentifiers: OhpkmIdentifier[] = []
 
     this.updatedBoxSlots.forEach(({ box, index: monIndex }) => {
-      const changedMon = this.boxes[box].pokemon[monIndex]
+      const updatedSlotContent = this.boxes[box].pokemon[monIndex]
 
       // we don't want to save OHPKM files of mons that didn't leave the save
       // (and would still be PB8s)
-      if (changedMon instanceof OHPKM) {
-        changedMonPKMs.push(changedMon)
+      if (updatedSlotContent?.isTracked()) {
+        changedMonIdentifiers.push(updatedSlotContent.identifier)
       }
       const writeIndex =
         BOX_MONS_OFFSET + this.getBoxSizeBytes() * box + this.getMonBoxSizeBytes() * monIndex
 
-      // changedMon will be undefined if pokemon was moved from this slot
+      // updatedSlotContent will be undefined if pokemon was moved from this slot
       // and the slot was left empty
-      if (changedMon) {
+      if (updatedSlotContent) {
         try {
-          const mon = changedMon instanceof OHPKM ? new PB8(changedMon) : changedMon
+          const mon = updatedSlotContent?.isTracked()
+            ? new PB8(updatedSlotContent)
+            : updatedSlotContent
 
           if (mon?.gameOfOrigin && mon?.dexNum) {
             mon.refreshChecksum()
@@ -167,7 +168,7 @@ export class BDSPSAV extends OfficialSAV<PB8> {
       }
     })
     this.bytes.set(this.calculateChecksumBytes(), HASH_OFFSET)
-    return changedMonPKMs
+    return changedMonIdentifiers
   }
 
   calculateChecksumBytes() {

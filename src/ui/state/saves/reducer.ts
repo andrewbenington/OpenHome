@@ -1,5 +1,5 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
-import { getMonFileIdentifier } from '@openhome-core/pkm/Lookup'
+import { getMonFileIdentifier, OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { getSortFunctionNullable, SortType } from '@openhome-core/pkm/sort'
 import { AddBoxLocation, HomeData } from '@openhome-core/save/HomeData'
@@ -26,12 +26,15 @@ export type OpenSavesState = {
   error?: string
 }
 
+export type HomeMonLocation = { is_home: true; bank: number; save?: undefined }
+export type SaveMonLocation = { is_home: false; bank?: undefined; save: SAV }
+
 export type MonLocation = {
   box: number
   box_slot: number
 } & (
-  | { is_home: false; bank?: undefined; save: SAV }
-  | { is_home: true; bank: number; save?: undefined }
+  | SaveMonLocation
+  | HomeMonLocation
 )
 
 export type MonWithLocation = MonLocation & {
@@ -159,18 +162,19 @@ export type OpenSavesAction =
 
 const updateMonInSave = (
   state: OpenSavesState,
-  mon: PKMInterface | undefined,
+  mon: PKMInterface | OhpkmIdentifier | undefined,
   dest: MonLocation
 ) => {
-  let replacedMon
-
   if (dest.is_home) {
-    if (state.homeData && (mon === undefined || mon instanceof OHPKM)) {
-      replacedMon = state.homeData.boxes[dest.box].pokemon[dest.box_slot]
+    let replacedMon: OhpkmIdentifier | undefined
+    if (state.homeData && (mon === undefined || typeof mon === 'string')) {
+      replacedMon = state.homeData.boxes[dest.box].pokemonIdentifiers[dest.box_slot]
       state.homeData.setPokemon(dest, mon)
     }
     return replacedMon
   }
+
+  let replacedMon
 
   const saveID = saveToStringIdentifier(dest.save)
 
@@ -378,7 +382,7 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
         : source.save.boxes[source.box]
       const destBox = dest.is_home ? state.homeData.boxes[dest.box] : dest.save.boxes[dest.box]
 
-      let sourceMon = sourceBox.pokemon[source.box_slot]
+      let sourceMon = sourceBox.[source.box_slot]
       let destMon = destBox.pokemon[dest.box_slot]
 
       if (sourceMon !== source.mon) return state // necessary in strict mode, otherwise the swap will happen twice and revert

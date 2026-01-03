@@ -1,4 +1,3 @@
-import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { CRC16_CCITT } from '@openhome-core/save/encryption/Encryption'
 import {
   bytesToUint16LittleEndian,
@@ -7,7 +6,8 @@ import {
 import { utf16BytesToString } from '@openhome-core/save/util/Strings/StringConverter'
 import { Gender, OriginGame } from '@pkm-rs/pkg'
 import { PK6 } from '@pokemon-files/pkm'
-import { Box, BoxCoordinates, OfficialSAV } from './interfaces'
+import { OhpkmTracker } from '../../tracker'
+import { Box, OfficialSAV, SaveMonLocation } from './interfaces'
 import { PathData } from './util/path'
 
 const BOX_NAMES_OFFSET: number = 0x04400
@@ -44,17 +44,18 @@ export abstract class G6SAV extends OfficialSAV<PK6> {
   invalid: boolean = false
   tooEarlyToOpen: boolean = false
 
-  updatedBoxSlots: BoxCoordinates[] = []
+  updatedBoxSlots: SaveMonLocation[] = []
 
   trainerDataOffset: number = 0x14000
 
   boxChecksumOffset: number = 0x75fda
 
-  pcOffset: number
+  abstract getPcOffset(): number
   pcDataSize = BOX_DATA_SIZE
-  pcChecksumOffset: number
 
-  constructor(path: PathData, bytes: Uint8Array, pcOffset: number, pcChecksumOffset: number) {
+  abstract pcChecksumOffset: number
+
+  constructor(path: PathData, bytes: Uint8Array, tracker: OhpkmTracker) {
     super()
     this.bytes = bytes
     this.filePath = path
@@ -65,8 +66,6 @@ export abstract class G6SAV extends OfficialSAV<PK6> {
     this.displayID = this.tid.toString().padStart(5, '0')
     this.origin = this.bytes[this.trainerDataOffset + 4]
     this.trainerGender = this.bytes[this.trainerDataOffset + 5]
-    this.pcOffset = pcOffset
-    this.pcChecksumOffset = pcChecksumOffset
 
     this.boxes = Array(31)
     for (let box = 0; box < 31; box++) {
@@ -78,13 +77,13 @@ export abstract class G6SAV extends OfficialSAV<PK6> {
     for (let box = 0; box < 31; box++) {
       for (let monIndex = 0; monIndex < 30; monIndex++) {
         try {
-          const startByte = this.pcOffset + BOX_SIZE * box + 232 * monIndex
-          const endByte = this.pcOffset + BOX_SIZE * box + 232 * (monIndex + 1)
+          const startByte = this.getPcOffset() + BOX_SIZE * box + 232 * monIndex
+          const endByte = this.getPcOffset() + BOX_SIZE * box + 232 * (monIndex + 1)
           const monData = bytes.slice(startByte, endByte)
           const mon = new PK6(monData.buffer, true)
 
           if (mon.gameOfOrigin !== 0 && mon.dexNum !== 0) {
-            this.boxes[box].pokemon[monIndex] = mon
+            this.boxes[box].pokemon[monIndex] = tracker.wrapWithIdentifier(mon)
           }
         } catch (e) {
           console.error(e)
@@ -93,26 +92,18 @@ export abstract class G6SAV extends OfficialSAV<PK6> {
     }
   }
 
-  prepareBoxesAndGetModified() {
-    const changedMonPKMs: OHPKM[] = []
-
+  prepareForSaving() {
     this.updatedBoxSlots.forEach(({ box, index }) => {
-      const changedMon = this.boxes[box].pokemon[index]
+      const updatedSlotContent = this.boxes[box].pokemon[index]
+      const writeIndex = this.getPcOffset() + BOX_SIZE * box + 232 * index
 
-      // we don't want to save OHPKM files of mons that didn't leave the save
-      // (and would still be PK6s)
-      if (changedMon instanceof OHPKM) {
-        changedMonPKMs.push(changedMon)
-      }
-      const writeIndex = this.pcOffset + BOX_SIZE * box + 232 * index
-
-      // changedMon will be undefined if pokemon was moved from this slot
+      // updatedSlotContent will be undefined if pokemon was moved from this slot
       // and the slot was left empty
-      if (changedMon) {
+      if (updatedSlotContent) {
         try {
-          const mon = changedMon instanceof OHPKM ? new PK6(changedMon) : changedMon
+          const mon = updatedSlotContent.data
 
-          if (mon?.gameOfOrigin && mon?.dexNum) {
+          if (mon.gameOfOrigin && mon.dexNum) {
             mon.refreshChecksum()
             this.bytes.set(new Uint8Array(mon.toPCBytes()), writeIndex)
           }
@@ -126,13 +117,12 @@ export abstract class G6SAV extends OfficialSAV<PK6> {
       }
     })
     this.bytes.set(uint16ToBytesLittleEndian(this.calculatePcChecksum()), this.pcChecksumOffset)
-    return changedMonPKMs
   }
 
   abstract supportsMon(dexNumber: number, formeNumber: number): boolean
 
   calculatePcChecksum(): number {
-    return CRC16_CCITT(this.bytes, this.pcOffset, this.pcDataSize)
+    return CRC16_CCITT(this.bytes, this.getPcOffset(), this.pcDataSize)
   }
 
   getCurrentBox() {

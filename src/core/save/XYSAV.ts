@@ -2,6 +2,7 @@ import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
 import { OriginGame } from '@pkm-rs/pkg'
 import { Item } from '@pokemon-resources/consts/Items'
 import { XY_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
+import { OhpkmTracker } from '../../tracker'
 import { G6SAV } from './G6SAV'
 import { PathData } from './util/path'
 
@@ -12,8 +13,16 @@ const SAVE_SIZE_BYTES = 0x65600
 export class XYSAV extends G6SAV {
   static transferRestrictions = XY_TRANSFER_RESTRICTIONS
 
-  constructor(path: PathData, bytes: Uint8Array) {
-    super(path, bytes, PC_OFFSET, PC_CHECKSUM_OFFSET)
+  constructor(path: PathData, bytes: Uint8Array, tracker: OhpkmTracker) {
+    super(path, bytes, tracker)
+  }
+
+  getPcOffset(): number {
+    return PC_OFFSET
+  }
+
+  public get pcChecksumOffset() {
+    return PC_CHECKSUM_OFFSET
   }
 
   supportsMon(dexNumber: number, formeNumber: number): boolean {

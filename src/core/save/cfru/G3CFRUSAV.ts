@@ -1,5 +1,4 @@
 import { PluginPKMInterface } from '@openhome-core/pkm/interfaces'
-import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -7,7 +6,7 @@ import {
   uint32ToBytesLittleEndian,
 } from '@openhome-core/save/util/byteLogic'
 import { Gender, OriginGame } from '@pkm-rs/pkg'
-import { Box, BoxCoordinates, PluginSAV } from '../interfaces'
+import { Box, PluginSAV, SaveMonLocation } from '../interfaces'
 import { LOOKUP_TYPE } from '../util'
 import { PathData } from '../util/path'
 import { gen3StringToUTF } from '../util/Strings/StringConverter'
@@ -181,7 +180,7 @@ export abstract class G3CFRUSAV<T extends PluginPKMInterface> extends PluginSAV<
 
   invalid: boolean = false
   tooEarlyToOpen: boolean = false
-  updatedBoxSlots: BoxCoordinates[] = []
+  updatedBoxSlots: SaveMonLocation[] = []
 
   constructor(path: PathData, bytes: Uint8Array, pkmType: any) {
     super()
@@ -219,25 +218,25 @@ export abstract class G3CFRUSAV<T extends PluginPKMInterface> extends PluginSAV<
   calculateChecksum?: (() => number) | undefined
 
   prepareBoxesAndGetModified() {
-    const changedMonPKMs: OHPKM[] = []
+    const changedMonIdentifiers: OhpkmIdentifier[] = []
 
     this.updatedBoxSlots.forEach(({ box, index }) => {
       const monOffset = 30 * box + index
       const pcBytes = new Uint8Array(58) // Per pokemon bytes
 
       // Current Mon in loop
-      const changedMon = this.boxes[box].pokemon[index]
+      const updatedSlotContent = this.boxes[box].pokemon[index]
 
       // We don't want to save OHPKM files of mons that didn't leave the save
       //  (and would still be PK3s)
-      if (changedMon instanceof OHPKM) {
-        changedMonPKMs.push(changedMon)
+      if (updatedSlotContent?.isTracked()) {
+        changedMonIdentifiers.push(updatedSlotContent.identifier)
       }
-      // changedMon will be undefined if pokemon was moved from this slot
+      // updatedSlotContent will be undefined if pokemon was moved from this slot
       //  and the slot was left empty
       const slotMon = this.boxes[box].pokemon[index]
 
-      if (changedMon && slotMon) {
+      if (updatedSlotContent && slotMon) {
         try {
           // If mon is a OHPKM then convert to PK3RR
           const mon =
@@ -269,7 +268,7 @@ export abstract class G3CFRUSAV<T extends PluginPKMInterface> extends PluginSAV<
       sector.writeToBuffer(this.primarySave.bytes, i + 5, this.primarySave.firstSectorIndex)
     })
     this.bytes.set(this.primarySave.bytes, this.primarySaveOffset)
-    return changedMonPKMs
+    return changedMonIdentifiers
   }
 
   abstract supportsMon(dexNumber: number, formeNumber: number): boolean

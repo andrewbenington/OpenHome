@@ -2,6 +2,7 @@ import {
   getMonFileIdentifier,
   getMonGen12Identifier,
   getMonGen345Identifier,
+  OhpkmIdentifier,
 } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { HomeData } from '@openhome-core/save/HomeData'
@@ -11,11 +12,13 @@ import { BackendContext } from '@openhome-ui/backend/backendContext'
 import { ErrorIcon } from '@openhome-ui/components/Icons'
 import LoadingIndicator from '@openhome-ui/components/LoadingIndicator'
 import useDisplayError from '@openhome-ui/hooks/displayError'
-import { Generation, OriginGame, OriginGames } from '@pkm-rs/pkg'
-import { PK1, PK2 } from '@pokemon-files/pkm'
+import { Generation, OriginGames } from '@pkm-rs/pkg'
 import { Callout } from '@radix-ui/themes'
-import * as E from 'fp-ts/lib/Either'
+import * as A from 'fp-ts/Array'
+import * as E from 'fp-ts/Either'
+import { pipe } from 'fp-ts/function'
 import { ReactNode, useCallback, useContext, useEffect, useReducer } from 'react'
+import { Err, Ok, Result } from 'src/core/util/functional'
 import { ItemBagContext } from '../items/reducer'
 import { OhpkmLookup, useOhpkmStore } from '../ohpkm/useOhpkmStore'
 import { openSavesReducer, SavesContext } from './reducer'
@@ -61,14 +64,14 @@ export default function SavesProvider({ children }: SavesProviderProps) {
     [backend, displayError, openSavesDispatch, openSavesState.error]
   )
 
-  const saveChanges = useCallback(async () => {
-    if (!openSavesState.homeData) return
+  const saveChanges = useCallback(async (): Promise<Result<null, SaveError[]>> => {
+    if (!openSavesState.homeData) return Err([HomeDataNotLoaded])
 
     const result = await backend.startTransaction()
 
     if (E.isLeft(result)) {
       displayError('Error Starting Save Transaction', result.left)
-      return
+      return Err([TransactionStart(result.left)])
     }
 
     // Write appropriate trainer data to handler fields
@@ -84,19 +87,29 @@ export default function SavesProvider({ children }: SavesProviderProps) {
 
     const newGen12Lookup: LookupMap = {}
     const newGen345Lookup: LookupMap = {}
-    const saveTypesAndChangedMons = allOpenSaves.map(
-      (save) => [save.origin, save.prepareBoxesAndGetModified()] as [OriginGame, OHPKM[]]
+    const trackedIdentifiersPerSave = allOpenSaves.map(
+      (save) => [save.origin, save.getTrackedMonIdentifiers()] as const
     )
 
-    for (const [saveOrigin, changedMons] of saveTypesAndChangedMons) {
+    const monErrors: SaveError[] = []
+
+    for (const [saveOrigin, trackedIdentifiers] of trackedIdentifiersPerSave) {
+      const { left: missingIdentifiers, right: foundMons } = pipe(
+        ohpkmStore.tryLoadFromIds(trackedIdentifiers),
+        A.separate
+      )
+
+      monErrors.push(
+        ...missingIdentifiers.map((missing) => missing.identifier).map(IdentifierNotTracked)
+      )
+
       const generation = OriginGames.generation(saveOrigin)
       if (generation === Generation.G1 || generation === Generation.G2) {
-        changedMons.forEach((mon: PK1 | PK2 | OHPKM) => {
-          const openHomeIdentifier = getMonFileIdentifier(mon)
+        foundMons.forEach((mon) => {
           const gen12Identifier = getMonGen12Identifier(mon)
 
-          if (openHomeIdentifier !== undefined && gen12Identifier) {
-            newGen12Lookup[gen12Identifier] = openHomeIdentifier
+          if (gen12Identifier) {
+            newGen12Lookup[gen12Identifier] = mon.getHomeIdentifier()
           }
         })
       } else if (
@@ -104,20 +117,25 @@ export default function SavesProvider({ children }: SavesProviderProps) {
         generation === Generation.G4 ||
         generation === Generation.G5
       ) {
-        changedMons.forEach((mon) => {
-          const openHomeIdentifier = getMonFileIdentifier(mon)
+        foundMons.forEach((mon) => {
           const gen345Identifier = getMonGen345Identifier(mon)
 
-          if (openHomeIdentifier !== undefined && gen345Identifier) {
-            newGen345Lookup[gen345Identifier] = openHomeIdentifier
+          if (gen345Identifier) {
+            newGen345Lookup[gen345Identifier] = mon.getHomeIdentifier()
           }
         })
       }
     }
 
+    if (monErrors.length) {
+      return Err(monErrors)
+    }
+
+    const saveWriters = allOpenSaves.map((save) => save.prepareWriter())
+
     const promises = [
       backend.updateLookups(newGen12Lookup, newGen345Lookup),
-      backend.writeAllSaveFiles(allOpenSaves),
+      backend.writeAllSaveFiles(saveWriters),
       backend.writeAllHomeData(
         openSavesState.homeData,
         Object.values(openSavesState.modifiedOHPKMs)
@@ -135,7 +153,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
       if (E.isLeft(saveBagResult)) {
         displayError('Error Saving Bag', saveBagResult.left)
         await backend.rollbackTransaction()
-        return
+        return Err([SaveItemBagData(saveBagResult.left)])
       }
       bagDispatch({ type: 'clear_modified' })
     }
@@ -146,7 +164,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
     if (errors.length) {
       displayError('Error Saving', errors)
       backend.rollbackTransaction()
-      return
+      return Err(errors.map(BackendSaveError))
     }
     backend.commitTransaction()
     // backend.rollbackTransaction()
@@ -155,13 +173,17 @@ export default function SavesProvider({ children }: SavesProviderProps) {
     openSavesDispatch({ type: 'clear_mons_to_release' })
 
     ohpkmStore.setSaving()
-    await ohpkmStore.reloadStore().then(
+    return await ohpkmStore.reloadStore().then(
       E.match(
-        (err) => {
+        async (err) => {
           openSavesDispatch({ type: 'set_error', payload: err })
           displayError('Error Loading Lookup Data', err)
+          return Err([ReloadLookup(err)])
         },
-        (getMonById) => loadAllHomeData(getMonById)
+        async (getMonById) => {
+          await loadAllHomeData(getMonById)
+          return Ok<null, SaveError[]>(null)
+        }
       )
     )
   }, [
@@ -249,3 +271,42 @@ export default function SavesProvider({ children }: SavesProviderProps) {
     </SavesContext.Provider>
   )
 }
+
+const HomeDataNotLoaded = Object.freeze({ _SaveErrorType: 'HomeDataNotLoaded' })
+
+type SaveError =
+  | { _SaveErrorType: 'HomeDataNotLoaded' }
+  | { _SaveErrorType: 'TransactionStart'; message: string }
+  | { _SaveErrorType: 'IdentifierNotTracked'; identifier: OhpkmIdentifier }
+  | { _SaveErrorType: 'GenG12Identifier'; mon: OHPKM }
+  | { _SaveErrorType: 'GenG345Identifier'; mon: OHPKM }
+  | { _SaveErrorType: 'SaveItemBagData'; message: string }
+  | { _SaveErrorType: 'BackendSaveError'; message: string }
+  | { _SaveErrorType: 'ReloadLookup'; message: string }
+
+const TransactionStart: (message: string) => SaveError = (message: string) => ({
+  _SaveErrorType: 'TransactionStart',
+  message,
+})
+
+export const IdentifierNotTracked: (identifier: OhpkmIdentifier) => SaveError = (
+  identifier: OhpkmIdentifier
+) => ({
+  _SaveErrorType: 'IdentifierNotTracked',
+  identifier,
+})
+
+const SaveItemBagData: (message: string) => SaveError = (message: string) => ({
+  _SaveErrorType: 'SaveItemBagData',
+  message,
+})
+
+const BackendSaveError: (message: string) => SaveError = (message: string) => ({
+  _SaveErrorType: 'BackendSaveError',
+  message,
+})
+
+const ReloadLookup: (message: string) => SaveError = (message: string) => ({
+  _SaveErrorType: 'ReloadLookup',
+  message,
+})

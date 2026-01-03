@@ -79,7 +79,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
         if (!identifier) continue
 
         const inCurrentBox = save.boxes[save.currentPCBox].pokemon.some(
-          (mon) => mon && getMonFileIdentifier(mon) === identifier
+          (mon) => mon && mon.identifier === identifier
         )
 
         if (!ALLOW_DUPE_IMPORT && (ohpkmStore.monIsStored(identifier) || inCurrentBox)) {
@@ -172,7 +172,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                     isDisabled || save.getSlotMetadata?.(save.currentPCBox, index)?.isDisabled
                   }
                   disabledReason={save.getSlotMetadata?.(save.currentPCBox, index)?.disabledReason}
-                  mon={mon}
+                  mon={mon?.data}
                   zIndex={1}
                   onDrop={(importedMons) => {
                     if (importedMons) {
@@ -237,7 +237,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
       </Flex>
       <Fallback>
         <PokemonDetailsModal
-          mon={selectedMon}
+          mon={selectedMon?.data}
           onClose={() => setSelectedIndex(undefined)}
           navigateRight={navigateRight}
           navigateLeft={navigateLeft}

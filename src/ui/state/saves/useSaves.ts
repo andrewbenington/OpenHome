@@ -6,6 +6,7 @@ import { OpenHomeBox } from '@openhome-core/save/util/storage'
 import { Item } from '@pkm-rs/pkg'
 import { MarkingsSixShapesWithColor } from '@pokemon-files/util'
 import { useCallback, useContext } from 'react'
+import { OhpkmIdentifier } from '../../../core/pkm/Lookup'
 import { useOhpkmStore } from '../ohpkm/useOhpkmStore'
 import { MonLocation, MonWithLocation, OpenSavesState, SavesContext } from './reducer'
 
@@ -352,6 +353,8 @@ export function useSaves(): SavesAndBanksManager {
     },
     [openSavesDispatch]
   )
+
+  function moveMon2(identifier: OhpkmIdentifier, source: MonLocation, dest: MonLocation) {}
 
   const releaseMonAtLocation = useCallback(
     (location: MonLocation) => {

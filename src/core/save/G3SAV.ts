@@ -1,4 +1,3 @@
-import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -10,7 +9,9 @@ import { Gender, ItemGen3, OriginGame } from '@pkm-rs/pkg'
 import { PK3 } from '@pokemon-files/pkm'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { GEN3_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
-import { Box, BoxCoordinates, OfficialSAV } from './interfaces'
+import { EmptyTracker, OhpkmTracker } from '../../tracker'
+import { filterUndefined } from '../util/sort'
+import { Box, OfficialSAV, SaveMonLocation } from './interfaces'
 import { LOOKUP_TYPE } from './util'
 import { emptyPathData, PathData } from './util/path'
 
@@ -106,7 +107,7 @@ export class G3SaveBackup {
 
   firstSectorIndex: number = 0
 
-  constructor(bytes: Uint8Array) {
+  constructor(bytes: Uint8Array, tracker: OhpkmTracker) {
     this.bytes = bytes
     this.saveIndex = bytesToUint32LittleEndian(bytes, 0xffc)
     this.sectors = []
@@ -164,7 +165,7 @@ export class G3SaveBackup {
         const box = this.boxes[Math.floor(i / 30)]
 
         if (mon.isValid()) {
-          box.pokemon[i % 30] = mon
+          box.pokemon[i % 30] = tracker.wrapWithIdentifier(mon)
         } else {
           box.pokemon[i % 30] = undefined
         }
@@ -221,14 +222,14 @@ export class G3SAV extends OfficialSAV<PK3> {
   invalid: boolean = false
   tooEarlyToOpen: boolean = false
 
-  updatedBoxSlots: BoxCoordinates[] = []
+  updatedBoxSlots: SaveMonLocation[] = []
 
-  constructor(path: PathData, bytes: Uint8Array) {
+  constructor(path: PathData, bytes: Uint8Array, tracker: OhpkmTracker) {
     super()
     this.bytes = bytes
     this.filePath = path
-    const saveOne = new G3SaveBackup(bytes.slice(0, 0xe000))
-    const saveTwo = new G3SaveBackup(bytes.slice(0xe000, 0x1c000))
+    const saveOne = new G3SaveBackup(bytes.slice(0, 0xe000), tracker)
+    const saveTwo = new G3SaveBackup(bytes.slice(0xe000, 0x1c000), tracker)
 
     if (saveOne.saveIndex > saveTwo.saveIndex) {
       this.primarySave = saveOne
@@ -252,12 +253,11 @@ export class G3SAV extends OfficialSAV<PK3> {
     // TODO: make more robust
     const trainerMon = this.boxes
       .flatMap((box) => box.pokemon)
+      .filter(filterUndefined)
+      .map((slot) => slot.data)
       .find(
         (mon) =>
-          mon &&
-          mon.trainerID === this.tid &&
-          mon.secretID === this.sid &&
-          mon.trainerName === this.name
+          mon.trainerID === this.tid && mon.secretID === this.sid && mon.trainerName === this.name
       )
 
     if (trainerMon) {
@@ -286,26 +286,18 @@ export class G3SAV extends OfficialSAV<PK3> {
     }
   }
 
-  prepareBoxesAndGetModified() {
-    const changedMonPKMs: OHPKM[] = []
-
+  prepareForSaving() {
     this.updatedBoxSlots.forEach(({ box, index }) => {
       const monOffset = 30 * box + index
       const pcBytes = new Uint8Array(80)
-      const changedMon = this.boxes[box].pokemon[index]
+      const updatedSlotContent = this.boxes[box].pokemon[index]
 
-      // we don't want to save OHPKM files of mons that didn't leave the save
-      // (and would still be PK3s)
-      if (changedMon instanceof OHPKM) {
-        changedMonPKMs.push(changedMon)
-      }
-      // changedMon will be undefined if pokemon was moved from this slot
+      // updatedSlotContent will be undefined if pokemon was moved from this slot
       // and the slot was left empty
-      const slotMon = this.boxes[box].pokemon[index]
 
-      if (changedMon && slotMon) {
+      if (updatedSlotContent) {
         try {
-          const mon = slotMon instanceof PK3 ? slotMon : new PK3(slotMon)
+          const mon = updatedSlotContent.data
 
           if (mon?.gameOfOrigin && mon?.dexNum) {
             mon.refreshChecksum()
@@ -329,7 +321,6 @@ export class G3SAV extends OfficialSAV<PK3> {
       sector.writeToBuffer(this.primarySave.bytes, i + 5, this.primarySave.firstSectorIndex)
     })
     this.bytes.set(this.primarySave.bytes, this.primarySaveOffset)
-    return changedMonPKMs
   }
 
   supportsMon(dexNumber: number, formeNumber: number) {
@@ -353,7 +344,7 @@ export class G3SAV extends OfficialSAV<PK3> {
       return false
     }
     try {
-      const save = new G3SAV(emptyPathData, bytes)
+      const save = new G3SAV(emptyPathData, bytes, EmptyTracker())
 
       if (save.primarySave.gameCode === 0) {
         return true

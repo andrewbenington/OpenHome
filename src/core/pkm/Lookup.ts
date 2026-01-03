@@ -8,7 +8,9 @@ import { generatePersonalityValuePreservingAttributes } from '@pokemon-files/uti
 import { gen12StringToUTF, utf16StringToGen12 } from '../save/util/Strings'
 import { bytesToString } from '../save/util/byteLogic'
 
-export const getMonFileIdentifier = (mon: PKMInterface) => {
+export type OhpkmIdentifier = string
+
+export const getMonFileIdentifier = (mon: PKMInterface): OhpkmIdentifier | undefined => {
   if (!('personalityValue' in mon)) {
     return undefined
   }
@@ -20,7 +22,7 @@ export const getMonFileIdentifier = (mon: PKMInterface) => {
   return undefined
 }
 
-export function getHomeIdentifier(mon: OHPKM): string {
+export function getHomeIdentifier(mon: OHPKM): OhpkmIdentifier {
   const baseMon = getBaseMon(mon.dexNum, mon.formeNum)
 
   if (!baseMon) {

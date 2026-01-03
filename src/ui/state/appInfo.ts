@@ -20,9 +20,10 @@ import { SAVClass } from '@openhome-core/save/util'
 import { XYSAV } from '@openhome-core/save/XYSAV'
 import { SaveViewMode } from '@openhome-ui/saves/util'
 import { Dispatch, Reducer, createContext } from 'react'
+import { OfficialSAV } from '../../core/save/interfaces'
 import { MonDisplayState } from '../hooks/useMonDisplay'
 
-const OFFICIAL_SAVE_TYPES = [
+const OFFICIAL_SAVE_TYPES: SAVClass<OfficialSAV>[] = [
   G1SAV,
   G2SAV,
   G3SAV,

@@ -1,7 +1,8 @@
-import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { OriginGame } from '@pkm-rs/pkg'
 import { PA8, PB8, PK8, PK9 } from '@pokemon-files/pkm'
 import { AllPKMFields } from '@pokemon-files/util'
+import { OhpkmTracker } from '../../../tracker'
+import { OhpkmIdentifier } from '../../pkm/Lookup'
 import {
   SCArrayBlock,
   SCBlock,
@@ -9,7 +10,7 @@ import {
   SCValueBlock,
 } from '../encryption/SwishCrypto/SCBlock'
 import { SwishCrypto } from '../encryption/SwishCrypto/SwishCrypto'
-import { Box, BoxCoordinates, OfficialSAV } from '../interfaces'
+import { Box, OfficialSAV, SaveMonLocation } from '../interfaces'
 import { PathData } from '../util/path'
 import { BoxNamesBlock } from './BoxNamesBlock'
 
@@ -41,9 +42,9 @@ export abstract class G89SAV<P extends PK8 | PB8 | PA8 | PK9> extends OfficialSA
   invalid: boolean = false
   tooEarlyToOpen: boolean = false
 
-  updatedBoxSlots: BoxCoordinates[] = []
+  updatedBoxSlots: SaveMonLocation[] = []
 
-  constructor(path: PathData, bytes: Uint8Array) {
+  constructor(path: PathData, bytes: Uint8Array, tracker: OhpkmTracker) {
     super()
     this.bytes = bytes
     this.filePath = path
@@ -73,7 +74,7 @@ export abstract class G89SAV<P extends PK8 | PB8 | PA8 | PK9> extends OfficialSA
           const mon = this.monConstructor(monData, true)
 
           if (mon.gameOfOrigin !== 0 && mon.dexNum !== 0) {
-            this.boxes[box].pokemon[monIndex] = mon
+            this.boxes[box].pokemon[monIndex] = tracker.wrapWithIdentifier(mon)
           }
         } catch (e) {
           console.error(e)
@@ -97,28 +98,28 @@ export abstract class G89SAV<P extends PK8 | PB8 | PA8 | PK9> extends OfficialSA
   abstract monConstructor(arg: ArrayBuffer | AllPKMFields, encrypted?: boolean): P
 
   prepareBoxesAndGetModified() {
-    const changedMonPKMs: OHPKM[] = []
+    const changedMonIdentifiers: OhpkmIdentifier[] = []
     const boxBlock = this.getBlockMust<SCObjectBlock>('Box', 'object')
 
     this.updatedBoxSlots.forEach(({ box, index }) => {
-      const changedMon = this.boxes[box].pokemon[index]
+      const updatedSlotContent = this.boxes[box].pokemon[index]
 
       // we don't want to save OHPKM files of mons that didn't leave the save
       // (and would still be PK8/PA8s)
-      if (changedMon instanceof OHPKM) {
-        changedMonPKMs.push(changedMon)
+      if (updatedSlotContent?.isTracked()) {
+        changedMonIdentifiers.push(updatedSlotContent.identifier)
       }
 
       const writeIndex = this.getBoxSizeBytes() * box + this.getMonBoxSizeBytes() * index
       const blockBuffer = new Uint8Array(boxBlock.raw)
 
-      // changedMon will be undefined if pokemon was moved from this slot
+      // updatedSlotContent will be undefined if pokemon was moved from this slot
       // and the slot was left empty
-      if (changedMon) {
+      if (updatedSlotContent) {
         try {
-          const mon = changedMon instanceof OHPKM ? this.monConstructor(changedMon) : changedMon
+          const mon = updatedSlotContent.data
 
-          if (mon?.gameOfOrigin && mon?.dexNum) {
+          if (mon.gameOfOrigin && mon?.dexNum) {
             if ('stats' in mon) {
               mon.stats = mon.getStats()
             }
@@ -142,7 +143,7 @@ export abstract class G89SAV<P extends PK8 | PB8 | PA8 | PK9> extends OfficialSA
 
     this.bytes = SwishCrypto.encrypt(this.scBlocks, this.bytes.length)
 
-    return changedMonPKMs
+    return changedMonIdentifiers
   }
 
   getPluginIdentifier() {

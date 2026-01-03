@@ -1,4 +1,3 @@
-import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { CRC16_CCITT } from '@openhome-core/save/encryption/Encryption'
 import {
   bytesToUint16LittleEndian,
@@ -8,7 +7,8 @@ import {
 import { gen4StringToUTF } from '@openhome-core/save/util/Strings/StringConverter'
 import { OriginGame } from '@pkm-rs/pkg'
 import { PK4 } from '@pokemon-files/pkm'
-import { Box, BoxCoordinates, OfficialSAV } from './interfaces'
+import { OhpkmTracker } from '../../tracker'
+import { Box, OfficialSAV, SaveMonLocation } from './interfaces'
 import { LOOKUP_TYPE } from './util'
 import { PathData } from './util/path'
 
@@ -42,7 +42,7 @@ export abstract class G4SAV extends OfficialSAV<PK4> {
   invalid: boolean = false
   tooEarlyToOpen: boolean = false
 
-  updatedBoxSlots: BoxCoordinates[] = []
+  updatedBoxSlots: SaveMonLocation[] = []
 
   currentSaveStorageBlockOffset: number = 0
 
@@ -69,7 +69,7 @@ export abstract class G4SAV extends OfficialSAV<PK4> {
     this.origin = bytes[0x80]
   }
 
-  buildBoxes() {
+  buildBoxes(tracker: OhpkmTracker) {
     if (bytesToUint32LittleEndian(this.bytes, this.currentSaveBoxStartOffset) === 0xffffffff) {
       this.tooEarlyToOpen = true
       return
@@ -99,7 +99,7 @@ export abstract class G4SAV extends OfficialSAV<PK4> {
             ) {
               this.origin = mon.gameOfOrigin
             }
-            this.boxes[box].pokemon[monIndex] = mon
+            this.boxes[box].pokemon[monIndex] = tracker.wrapWithIdentifier(mon)
           }
         } catch (e) {
           console.error(e)
@@ -128,24 +128,17 @@ export abstract class G4SAV extends OfficialSAV<PK4> {
     )
   }
 
-  prepareBoxesAndGetModified() {
-    const changedMonPKMs: OHPKM[] = []
-
+  prepareForSaving() {
     this.updatedBoxSlots.forEach(({ box, index }) => {
-      const changedMon = this.boxes[box].pokemon[index]
+      const updatedSlotContent = this.boxes[box].pokemon[index]
 
-      // we don't want to save OHPKM files of mons that didn't leave the save
-      // (and would still be PK4s)
-      if (changedMon instanceof OHPKM) {
-        changedMonPKMs.push(changedMon)
-      }
       const writeIndex = this.currentSaveBoxStartOffset + this.boxSize * box + 136 * index
 
-      // changedMon will be undefined if pokemon was moved from this slot
+      // updatedSlotContent will be undefined if pokemon was moved from this slot
       // and the slot was left empty
-      if (changedMon) {
+      if (updatedSlotContent) {
         try {
-          const mon = changedMon instanceof OHPKM ? new PK4(changedMon) : changedMon
+          const mon = updatedSlotContent.data
 
           if (mon.gameOfOrigin && mon.dexNum) {
             mon.refreshChecksum()
@@ -159,8 +152,6 @@ export abstract class G4SAV extends OfficialSAV<PK4> {
       }
     })
     this.updateStorageChecksum()
-
-    return changedMonPKMs
   }
 
   abstract supportsMon(dexNumber: number, formeNumber: number): boolean
