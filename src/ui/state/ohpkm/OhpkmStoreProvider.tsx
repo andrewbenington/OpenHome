@@ -1,12 +1,11 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { displayIndexAdder, isBattleFormeItem } from '@openhome-core/pkm/util'
-import { Errorable } from '@openhome-core/util/functional'
+import { Errorable, R } from '@openhome-core/util/functional'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
 import { ErrorIcon } from '@openhome-ui/components/Icons'
 import LoadingIndicator from '@openhome-ui/components/LoadingIndicator'
 import { PokedexUpdate } from '@openhome-ui/util/pokedex'
 import { Callout } from '@radix-ui/themes'
-import * as E from 'fp-ts/lib/Either'
 import { ReactNode, useCallback, useContext, useEffect, useReducer } from 'react'
 import { OhpkmStoreContext, ohpkmStoreReducer } from './reducer'
 
@@ -28,14 +27,14 @@ export default function OhpkmStoreProvider({ children }: OhpkmStoreProviderProps
     }
     const homeResult = await backend.loadHomeMonLookup()
 
-    if (E.isLeft(homeResult)) {
-      onLoadError(homeResult.left)
-      return E.left(homeResult.left)
+    if (R.isErr(homeResult)) {
+      onLoadError(homeResult.err)
+      return homeResult
     }
 
     const pokedexUpdates: PokedexUpdate[] = []
 
-    for (const [identifier, mon] of Object.entries(homeResult.right)) {
+    for (const [identifier, mon] of Object.entries(homeResult.ok!)) {
       const hadErrors = mon.fixErrors()
 
       if (hadErrors) {
@@ -59,7 +58,7 @@ export default function OhpkmStoreProvider({ children }: OhpkmStoreProviderProps
 
     backend.registerInPokedex(pokedexUpdates)
 
-    ohpkmStoreDispatch({ type: 'load_persisted_pkm_data', payload: homeResult.right })
+    ohpkmStoreDispatch({ type: 'load_persisted_pkm_data', payload: homeResult.ok! })
 
     return homeResult
   }, [backend, ohpkmStoreDispatch])

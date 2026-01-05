@@ -1,6 +1,6 @@
+import { R } from '@openhome-core/util/functional'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
 import { AppState } from '@openhome-ui/backend/backendInterface'
-import * as E from 'fp-ts/lib/Either'
 import { createContext, useContext, useState } from 'react'
 
 type PossiblyLoadedAppState =
@@ -36,13 +36,13 @@ export function usePossiblyLoadedAppState(): PossiblyLoadedAppState {
 
   if (!loading && !error && !appState) {
     backend.getState().then(
-      E.match(
-        (err) => setError(err),
+      R.match(
         (state) => {
           setAppState(state)
           setLoading(false)
           setError(undefined)
-        }
+        },
+        (err) => setError(err)
       )
     )
   }

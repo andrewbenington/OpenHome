@@ -58,13 +58,15 @@ export const defaultSettings: Settings = {
   appTheme: 'system',
 }
 
+export type AppTheme = 'light' | 'dark' | 'system'
+
 export type Settings = {
   enabledSaveTypes: Record<string, boolean>
   enabledPlugins: Record<string, boolean>
   saveCardSize: number
   saveViewMode: SaveViewMode
   monDisplayState: MonDisplayState
-  appTheme: 'light' | 'dark' | 'system'
+  appTheme: AppTheme
 }
 
 export type AppInfoState = {
@@ -104,7 +106,7 @@ export type AppInfoAction =
     }
   | {
       type: 'set_app_theme'
-      payload: 'light' | 'dark' | 'system'
+      payload: AppTheme
     }
   | { type: 'set_mon_display_state'; payload: MonDisplayState }
   | {

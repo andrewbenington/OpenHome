@@ -11,8 +11,8 @@ import { AppInfoContext } from '@openhome-ui/state/appInfo'
 import { useSaves } from '@openhome-ui/state/saves'
 import { OriginGames } from '@pkm-rs/pkg'
 import { Flex } from '@radix-ui/themes'
-import * as E from 'fp-ts/lib/Either'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { R } from 'src/core/util/functional'
 import SaveCard from './SaveCard'
 import { buildRecentSaveContextElements, formatTime, formatTimeSince, SaveViewMode } from './util'
 
@@ -37,11 +37,7 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
 
   const getRecentSaves = useCallback(() => {
     backend.getRecentSaves().then(
-      E.match(
-        (err) => {
-          displayError('Error Getting Recents', err)
-          setRecentSaves({})
-        },
+      R.match(
         (recents) => {
           const extraSaveIdentifiers = getEnabledSaveTypes()
             .map(getPluginIdentifier)
@@ -54,6 +50,10 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
           )
 
           setRecentSaves(Object.fromEntries(filteredRecents))
+        },
+        (err) => {
+          displayError('Error Getting Recents', err)
+          setRecentSaves({})
         }
       )
     )
@@ -62,11 +62,11 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
   const removeRecentSave = useCallback(
     (path: string) =>
       backend.removeRecentSave(path).then(
-        E.match(
+        R.match(
+          async () => getRecentSaves(),
           async (err) => {
             displayError('Could Not Remove Save', err)
-          },
-          () => getRecentSaves()
+          }
         )
       ),
     [backend, getRecentSaves, displayError]

@@ -1,6 +1,5 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { Errorable } from '@openhome-core/util/functional'
-import * as E from 'fp-ts/lib/Either'
+import { Errorable, R } from '@openhome-core/util/functional'
 import { useContext } from 'react'
 import { OhpkmStoreContext } from './reducer'
 
@@ -52,7 +51,7 @@ export function useOhpkmStore(): OhpkmStore {
 
   async function reloadAndReturnLookup() {
     return reloadStore().then(
-      E.map((newLookup) => {
+      R.map((newLookup) => {
         return (id: string) => newLookup[id]
       })
     )

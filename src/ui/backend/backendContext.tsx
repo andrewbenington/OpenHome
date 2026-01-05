@@ -1,8 +1,7 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { HomeData } from '@openhome-core/save/HomeData'
 import { SAV } from '@openhome-core/save/interfaces'
-import { Errorable } from '@openhome-core/util/functional'
-import * as E from 'fp-ts/lib/Either'
+import { Errorable, R } from '@openhome-core/util/functional'
 import { createContext, PropsWithChildren } from 'react'
 import BackendInterface from './backendInterface'
 import DummyBackend from './dummyBackend'
@@ -14,8 +13,8 @@ export type BackendProviderProps = {
 function addHelpersToBackend(backend: BackendInterface): BackendWithHelpersInterface {
   return {
     ...backend,
-    writeAllSaveFiles: async (_saveFiles: SAV[]) => [E.left('No backend in use')],
-    writeAllHomeData: async (_homeData: HomeData, _mons: OHPKM[]) => [E.left('No backend in use')],
+    writeAllSaveFiles: async (_saveFiles: SAV[]) => [R.Err('No backend in use')],
+    writeAllHomeData: async (_homeData: HomeData, _mons: OHPKM[]) => [R.Err('No backend in use')],
   }
 }
 

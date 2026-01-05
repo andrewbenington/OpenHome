@@ -18,6 +18,7 @@ import { Button, Dialog, Flex, Separator, Slider, VisuallyHidden } from '@radix-
 import * as E from 'fp-ts/lib/Either'
 import { useCallback, useContext, useState } from 'react'
 import 'react-data-grid/lib/styles.css'
+import { R } from 'src/core/util/functional'
 import useDebounce from '../hooks/useDebounce'
 import RecentSaves from './RecentSaves'
 import SaveFolders from './SaveFolders'
@@ -49,12 +50,12 @@ function useOpenSaveHandler(onClose?: () => void) {
     async (saveType: SAVClass, filePath: PathData, fileBytes: Uint8Array) => {
       const lookupsResult = await getLookups()
 
-      if (E.isLeft(lookupsResult)) {
-        displayError('Error Loading Lookups', lookupsResult.left)
+      if (lookupsResult.isErr()) {
+        displayError('Error Loading Lookups', lookupsResult.err)
         return
       }
 
-      const lookups = lookupsResult.right
+      const lookups = lookupsResult.ok!
 
       const result = buildSaveFile(
         filePath,
@@ -97,16 +98,15 @@ function useOpenSaveHandler(onClose?: () => void) {
       if (!filePath) {
         const pickedFile = await backend.pickFile()
 
-        if (E.isLeft(pickedFile)) {
-          displayError('Error Selecting File', pickedFile.left)
+        if (pickedFile.isErr()) {
+          displayError('Error Selecting File', pickedFile.err)
           return
         }
-        if (!pickedFile.right) return
-        filePath = pickedFile.right
+        if (!pickedFile.ok) return
+        filePath = pickedFile.ok
       }
       backend.loadSaveFile(filePath).then(
-        E.match(
-          (err) => displayError('Error loading save file', err),
+        R.match(
           async ({ path, fileBytes }) => {
             filePath = path
             if (filePath && fileBytes) {
@@ -127,7 +127,8 @@ function useOpenSaveHandler(onClose?: () => void) {
 
               setTentativeSaveData({ possibleSaveTypes: saveTypes, filePath, fileBytes })
             }
-          }
+          },
+          async (err) => displayError('Error loading save file', err)
         )
       )
     },

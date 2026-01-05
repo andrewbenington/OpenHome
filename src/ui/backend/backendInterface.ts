@@ -3,7 +3,7 @@ import { PathData, PossibleSaves } from '@openhome-core/save/util/path'
 import { SaveFolder, StoredBankData } from '@openhome-core/save/util/storage'
 import { Errorable } from '@openhome-core/util/functional'
 import { LoadSaveResponse, LookupMap, SaveRef } from '@openhome-core/util/types'
-import { Settings } from '@openhome-ui/state/appInfo'
+import { AppTheme, Settings } from '@openhome-ui/state/appInfo'
 import { PluginMetadataWithIcon } from '@openhome-ui/util/plugin'
 import { Pokedex, PokedexUpdate } from '@openhome-ui/util/pokedex'
 
@@ -82,9 +82,9 @@ export default interface BackendInterface {
   getState: () => Promise<Errorable<AppState>>
   getSettings: () => Promise<Errorable<Settings>>
   updateSettings: (settings: Settings) => Promise<Errorable<null>>
-  setTheme(appTheme: 'light' | 'dark' | 'system'): Promise<Errorable<null>>
+  setTheme(appTheme: AppTheme): Promise<Errorable<null>>
   saveLocalFile: (bytes: Uint8Array, suggestedName: string) => Promise<Errorable<null>>
-  emitMenuEvent: (menuEventId: string) => Promise<null>
+  emitMenuEvent: (menuEventId: string) => Promise<Errorable<null>>
 
   /* plugins */
   getImageData: (absolutePath: string) => Promise<Errorable<ImageResponse>>

@@ -12,6 +12,7 @@ import { useSaves } from '@openhome-ui/state/saves'
 import { Flex } from '@radix-ui/themes'
 import * as E from 'fp-ts/lib/Either'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { R } from 'src/core/util/functional'
 import SaveCard from './SaveCard'
 import { filterEmpty, SaveViewMode } from './util'
 
@@ -50,16 +51,16 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
       const response = await backend.loadSaveFile(savePath)
       const lookupsResponse = await getLookups()
 
-      if (E.isLeft(lookupsResponse)) {
-        console.error(lookupsResponse.left)
-        handleError('Error loading lookups', lookupsResponse.left)
+      if (lookupsResponse.isErr()) {
+        console.error(lookupsResponse.err)
+        handleError('Error loading lookups', lookupsResponse.err)
         return
       }
 
-      const lookups = lookupsResponse.right
+      const lookups = lookupsResponse.ok!
 
-      if (E.isRight(response)) {
-        const { fileBytes } = response.right
+      if (response.isOk()) {
+        const { fileBytes } = response.ok
 
         return buildUnknownSaveFile(
           savePath,
@@ -80,8 +81,7 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
   useEffect(() => {
     if (error || suggestedSaves) return
     backend.findSuggestedSaves().then(
-      E.match(
-        (err) => handleError('Error getting suggested saves', err),
+      R.match(
         async (possibleSaves) => {
           const allPaths = (possibleSaves?.citra ?? [])
             .concat(possibleSaves?.open_emu ?? [])
@@ -101,7 +101,8 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
                 .filter(filterUndefined)
             )
           }
-        }
+        },
+        async (err) => handleError('Error getting suggested saves', err)
       )
     )
   }, [backend, error, handleError, loadSaveData, suggestedSaves])

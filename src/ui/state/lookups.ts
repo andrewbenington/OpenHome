@@ -2,8 +2,7 @@ import { BackendContext } from '@openhome-ui/backend/backendContext'
 import { StoredLookups } from '@openhome-ui/backend/backendInterface'
 import { useCallback, useContext, useEffect, useState } from 'react'
 
-import { Errorable } from '@openhome-core/util/functional'
-import * as E from 'fp-ts/lib/Either'
+import { Errorable, R } from '@openhome-core/util/functional'
 
 export type LookupsManager = { getLookups: () => Promise<Errorable<StoredLookups>> } & (
   | {
@@ -24,14 +23,11 @@ export function useLookups(): LookupsManager {
 
   const loadAndCacheLookups = useCallback(async () => {
     if (lookupsCache) {
-      return E.right(lookupsCache)
+      return R.Ok<typeof lookupsCache, string>(lookupsCache)
     }
 
     const result = await backend.loadLookups()
-
-    if (E.isRight(result)) {
-      setLookupsCache(result.right)
-    }
+    result.onOk(setLookupsCache)
 
     return result
   }, [backend, lookupsCache])

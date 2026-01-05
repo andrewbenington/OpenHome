@@ -13,7 +13,7 @@ import { filterUndefined, numericSorter } from '@openhome-core/util/sort'
 import { OhpkmLookup } from '@openhome-ui/state/ohpkm'
 import { MonLocation } from '@openhome-ui/state/saves/reducer'
 import { v4 as UuidV4 } from 'uuid'
-import { Err, Errorable, Ok } from '../util/functional'
+import { Errorable, R } from '../util/functional'
 import { Box } from './interfaces'
 
 export class HomeBox implements Box<OHPKM> {
@@ -186,7 +186,7 @@ export class HomeData {
     const bank = this.getCurrentBank()
 
     if (box_index >= bank.boxes.length) {
-      return Err(
+      return R.Err(
         `Cannot access box at index ${box_index} (${bank.name} has ${bank.boxes.length} boxes total)`
       )
     }
@@ -195,30 +195,30 @@ export class HomeData {
     this.boxes = [...this.boxes]
     this.syncBankToBoxes()
 
-    return Ok(null)
+    return R.Ok(null)
   }
 
   deleteBoxCurrentBank(boxIndex: number, boxId: string): Errorable<null> {
     const bank = this.getCurrentBank()
 
     if (boxIndex >= bank.boxes.length) {
-      return Err(
+      return R.Err(
         `Cannot access box at index ${boxIndex} (${bank.name} has ${bank.boxes.length} boxes total)`
       )
     }
 
     if (this.boxes[boxIndex].containsMons()) {
-      return Err('Cannot delete box; box is not empty')
+      return R.Err('Cannot delete box; box is not empty')
     }
 
     if (this.boxes[boxIndex].id !== boxId) {
-      return Err(`Box id and index mismatch`)
+      return R.Err(`Box id and index mismatch`)
     }
     this.boxes = [...this.boxes.filter((box) => box.id !== boxId)]
     this.resetBoxIndices()
     this.syncBankToBoxes()
 
-    return Ok(null)
+    return R.Ok(null)
   }
 
   addBoxCurrentBank(location: AddBoxLocation): Errorable<null> {
@@ -236,7 +236,7 @@ export class HomeData {
     } else {
       const index = location[1]
       if (index >= this.boxes.length) {
-        return Err(`index ${index} is greater than box cound (${this.boxes.length})`)
+        return R.Err(`index ${index} is greater than box cound (${this.boxes.length})`)
       }
       const pivot = location[0] === 'before' ? index : index + 1
       this.boxes = [...this.boxes.slice(0, pivot), newBox, ...this.boxes.slice(pivot)]
@@ -245,7 +245,7 @@ export class HomeData {
     this.resetBoxIndices()
     this.syncBankToBoxes()
 
-    return Ok(null)
+    return R.Ok(null)
   }
 
   reorderBoxesCurrentBank(ids_in_new_order: string[]) {
@@ -294,12 +294,12 @@ export class HomeData {
 
   setBankName(bank_index: number, name: string | undefined): Errorable<null> {
     if (this._banks.length <= bank_index) {
-      return Err(`Cannot access bank at index ${bank_index} (${this._banks.length} banks total)`)
+      return R.Err(`Cannot access bank at index ${bank_index} (${this._banks.length} banks total)`)
     }
 
     this._banks[bank_index].name = name
 
-    return Ok(null)
+    return R.Ok(null)
   }
 
   slotIsEmpty(location: BankBoxCoordinates): boolean {

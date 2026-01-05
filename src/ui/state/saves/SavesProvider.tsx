@@ -5,6 +5,7 @@ import {
 } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { HomeData } from '@openhome-core/save/HomeData'
+import { R } from '@openhome-core/util/functional'
 import { filterUndefined } from '@openhome-core/util/sort'
 import { LookupMap } from '@openhome-core/util/types'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
@@ -14,7 +15,6 @@ import useDisplayError from '@openhome-ui/hooks/displayError'
 import { Generation, OriginGame, OriginGames } from '@pkm-rs/pkg'
 import { PK1, PK2 } from '@pokemon-files/pkm'
 import { Callout } from '@radix-ui/themes'
-import * as E from 'fp-ts/lib/Either'
 import { ReactNode, useCallback, useContext, useEffect, useReducer } from 'react'
 import { ItemBagContext } from '../items/reducer'
 import { OhpkmLookup, useOhpkmStore } from '../ohpkm/useOhpkmStore'
@@ -45,16 +45,12 @@ export default function SavesProvider({ children }: SavesProviderProps) {
     async (getMonById: OhpkmLookup) => {
       if (openSavesState.error) return
       await backend.loadHomeBanks().then(
-        E.match(
+        R.match(
+          (banks) => openSavesDispatch({ type: 'load_home_banks', payload: { banks, getMonById } }),
           (err) => {
             displayError('Error Loading OpenHome Data', err)
             openSavesDispatch({ type: 'set_error', payload: err })
-          },
-          (banks) =>
-            openSavesDispatch({
-              type: 'load_home_banks',
-              payload: { banks, getMonById },
-            })
+          }
         )
       )
     },
@@ -66,8 +62,8 @@ export default function SavesProvider({ children }: SavesProviderProps) {
 
     const result = await backend.startTransaction()
 
-    if (E.isLeft(result)) {
-      displayError('Error Starting Save Transaction', result.left)
+    if (result.isErr()) {
+      displayError('Error Starting Save Transaction', result.err)
       return
     }
 
@@ -132,8 +128,8 @@ export default function SavesProvider({ children }: SavesProviderProps) {
 
     if (itemBagState.modified) {
       const saveBagResult = await backend.saveItemBag(itemBagState.itemCounts)
-      if (E.isLeft(saveBagResult)) {
-        displayError('Error Saving Bag', saveBagResult.left)
+      if (saveBagResult.isErr()) {
+        displayError('Error Saving Bag', saveBagResult.err)
         await backend.rollbackTransaction()
         return
       }
@@ -141,7 +137,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
     }
 
     const results = (await Promise.all(promises)).flat()
-    const errors = results.filter(E.isLeft).map((err) => err.left)
+    const errors = results.filter(R.isErr).map((r) => r.err)
 
     if (errors.length) {
       displayError('Error Saving', errors)
@@ -156,12 +152,12 @@ export default function SavesProvider({ children }: SavesProviderProps) {
 
     ohpkmStore.setSaving()
     await ohpkmStore.reloadStore().then(
-      E.match(
-        (err) => {
+      R.match(
+        (getMonById) => loadAllHomeData(getMonById),
+        async (err) => {
           openSavesDispatch({ type: 'set_error', payload: err })
           displayError('Error Loading Lookup Data', err)
-        },
-        (getMonById) => loadAllHomeData(getMonById)
+        }
       )
     )
   }, [
@@ -182,12 +178,12 @@ export default function SavesProvider({ children }: SavesProviderProps) {
   useEffect(() => {
     if (!itemBagState.loaded && !itemBagState.error) {
       backend.loadItemBag().then(
-        E.match(
-          (err) => {
-            bagDispatch({ type: 'set_error', payload: err })
-          },
+        R.match(
           (bagObj) => {
             bagDispatch({ type: 'load_item_bag', payload: bagObj })
+          },
+          (err) => {
+            bagDispatch({ type: 'set_error', payload: err })
           }
         )
       )
