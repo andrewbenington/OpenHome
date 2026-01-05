@@ -1,4 +1,4 @@
-import { partitionResults } from '@openhome-core/util/functional'
+import { partitionResults, R } from '@openhome-core/util/functional'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
 import BackendInterface from '@openhome-ui/backend/backendInterface'
 import { BackendProvider } from '@openhome-ui/backend/backendProvider'
@@ -20,7 +20,6 @@ import { PluginContext, pluginReducer } from '@openhome-ui/state/plugin'
 import { SavesProvider } from '@openhome-ui/state/saves'
 import { loadPlugin } from '@openhome-ui/util/plugin'
 import { Flex, Text, Theme } from '@radix-ui/themes'
-import * as E from 'fp-ts/lib/Either'
 import { useCallback, useContext, useEffect, useReducer, useState } from 'react'
 import { DragMonContext, emptyDragState } from 'src/ui/state/drag-and-drop'
 import './App.css'
@@ -106,9 +105,9 @@ function AppWithBackend() {
     backend
       .getSettings()
       .then(
-        E.match(
-          async (err) => displayError('Error loading settings', err),
-          async (settings) => appInfoDispatch({ type: 'load_settings', payload: settings })
+        R.match(
+          async (settings) => appInfoDispatch({ type: 'load_settings', payload: settings }),
+          async (err) => displayError('Error loading settings', err)
         )
       )
       .finally(() => setSettingsLoading(false))
@@ -139,11 +138,7 @@ function AppWithBackend() {
   useEffect(() => {
     if (pluginState.loaded || !appInfoState.settingsLoaded) return
     backend.listInstalledPlugins().then(
-      E.match(
-        (err) => {
-          pluginDispatch({ type: 'set_loaded', payload: true })
-          displayError('Error Getting Installed Plugins', err)
-        },
+      R.match(
         (plugins) => {
           const promises = plugins
             .filter((plugin) => appInfoState.settings.enabledPlugins[plugin.id])
@@ -161,6 +156,10 @@ function AppWithBackend() {
             pluginDispatch({ type: 'register_plugins', payload: plugins })
             pluginDispatch({ type: 'set_loaded', payload: true })
           })
+        },
+        (err) => {
+          pluginDispatch({ type: 'set_loaded', payload: true })
+          displayError('Error Getting Installed Plugins', err)
         }
       )
     )

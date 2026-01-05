@@ -6,6 +6,7 @@ import {
 } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { HomeData } from '@openhome-core/save/HomeData'
+import { partitionResults, R } from '@openhome-core/util/functional'
 import { filterUndefined } from '@openhome-core/util/sort'
 import { LookupMap } from '@openhome-core/util/types'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
@@ -14,11 +15,8 @@ import LoadingIndicator from '@openhome-ui/components/LoadingIndicator'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import { Generation, OriginGames } from '@pkm-rs/pkg'
 import { Callout } from '@radix-ui/themes'
-import * as A from 'fp-ts/Array'
-import * as E from 'fp-ts/Either'
-import { pipe } from 'fp-ts/function'
 import { ReactNode, useCallback, useContext, useEffect, useReducer } from 'react'
-import { Err, Ok, Result } from 'src/core/util/functional'
+import { Result } from 'src/core/util/functional'
 import { ItemBagContext } from '../items/reducer'
 import { OhpkmLookup, useOhpkmStore } from '../ohpkm/useOhpkmStore'
 import { openSavesReducer, SavesContext } from './reducer'
@@ -48,16 +46,12 @@ export default function SavesProvider({ children }: SavesProviderProps) {
     async (getMonById: OhpkmLookup) => {
       if (openSavesState.error) return
       await backend.loadHomeBanks().then(
-        E.match(
+        R.match(
+          (banks) => openSavesDispatch({ type: 'load_home_banks', payload: { banks, getMonById } }),
           (err) => {
             displayError('Error Loading OpenHome Data', err)
             openSavesDispatch({ type: 'set_error', payload: err })
-          },
-          (banks) =>
-            openSavesDispatch({
-              type: 'load_home_banks',
-              payload: { banks, getMonById },
-            })
+          }
         )
       )
     },
@@ -65,13 +59,13 @@ export default function SavesProvider({ children }: SavesProviderProps) {
   )
 
   const saveChanges = useCallback(async (): Promise<Result<null, SaveError[]>> => {
-    if (!openSavesState.homeData) return Err([HomeDataNotLoaded])
+    if (!openSavesState.homeData) return R.Err([HomeDataNotLoaded])
 
     const result = await backend.startTransaction()
 
-    if (E.isLeft(result)) {
-      displayError('Error Starting Save Transaction', result.left)
-      return Err([TransactionStart(result.left)])
+    if (R.isErr(result)) {
+      displayError('Error Starting Save Transaction', result.err)
+      return R.Err([TransactionStart(result.err)])
     }
 
     // Write appropriate trainer data to handler fields
@@ -94,9 +88,8 @@ export default function SavesProvider({ children }: SavesProviderProps) {
     const monErrors: SaveError[] = []
 
     for (const [saveOrigin, trackedIdentifiers] of trackedIdentifiersPerSave) {
-      const { left: missingIdentifiers, right: foundMons } = pipe(
-        ohpkmStore.tryLoadFromIds(trackedIdentifiers),
-        A.separate
+      const { failures: missingIdentifiers, successes: foundMons } = partitionResults(
+        ohpkmStore.tryLoadFromIds(trackedIdentifiers)
       )
 
       monErrors.push(
@@ -128,7 +121,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
     }
 
     if (monErrors.length) {
-      return Err(monErrors)
+      return R.Err(monErrors)
     }
 
     const saveWriters = allOpenSaves.map((save) => save.prepareWriter())
@@ -150,21 +143,21 @@ export default function SavesProvider({ children }: SavesProviderProps) {
 
     if (itemBagState.modified) {
       const saveBagResult = await backend.saveItemBag(itemBagState.itemCounts)
-      if (E.isLeft(saveBagResult)) {
-        displayError('Error Saving Bag', saveBagResult.left)
+      if (R.isErr(saveBagResult)) {
+        displayError('Error Saving Bag', saveBagResult.err)
         await backend.rollbackTransaction()
-        return Err([SaveItemBagData(saveBagResult.left)])
+        return R.Err([SaveItemBagData(saveBagResult.err)])
       }
       bagDispatch({ type: 'clear_modified' })
     }
 
     const results = (await Promise.all(promises)).flat()
-    const errors = results.filter(E.isLeft).map((err) => err.left)
+    const errors = results.filter(R.isErr).map((r) => r.err)
 
     if (errors.length) {
       displayError('Error Saving', errors)
       backend.rollbackTransaction()
-      return Err(errors.map(BackendSaveError))
+      return R.Err(errors.map(BackendSaveError))
     }
     backend.commitTransaction()
     // backend.rollbackTransaction()
@@ -174,15 +167,15 @@ export default function SavesProvider({ children }: SavesProviderProps) {
 
     ohpkmStore.setSaving()
     return await ohpkmStore.reloadStore().then(
-      E.match(
+      R.match(
+        async (getMonById) => {
+          await loadAllHomeData(getMonById)
+          return R.Ok<null, SaveError[]>(null)
+        },
         async (err) => {
           openSavesDispatch({ type: 'set_error', payload: err })
           displayError('Error Loading Lookup Data', err)
-          return Err([ReloadLookup(err)])
-        },
-        async (getMonById) => {
-          await loadAllHomeData(getMonById)
-          return Ok<null, SaveError[]>(null)
+          return R.Err([ReloadLookup(err)])
         }
       )
     )
@@ -204,12 +197,12 @@ export default function SavesProvider({ children }: SavesProviderProps) {
   useEffect(() => {
     if (!itemBagState.loaded && !itemBagState.error) {
       backend.loadItemBag().then(
-        E.match(
-          (err) => {
-            bagDispatch({ type: 'set_error', payload: err })
-          },
+        R.match(
           (bagObj) => {
             bagDispatch({ type: 'load_item_bag', payload: bagObj })
+          },
+          (err) => {
+            bagDispatch({ type: 'set_error', payload: err })
           }
         )
       )

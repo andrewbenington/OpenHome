@@ -1,6 +1,5 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { Errorable } from '@openhome-core/util/functional'
-import * as E from 'fp-ts/Either'
+import { Errorable, R, Result } from '@openhome-core/util/functional'
 import { useContext } from 'react'
 import { OhpkmIdentifier } from '../../../core/pkm/Lookup'
 import { OhpkmStoreContext } from './reducer'
@@ -8,8 +7,8 @@ import { OhpkmStoreContext } from './reducer'
 export type OhpkmStore = {
   reloadStore: () => Promise<Errorable<OhpkmLookup>>
   getById(id: string): OHPKM | undefined
-  tryLoadFromId(id: OhpkmIdentifier): E.Either<IdentifierNotPresentError, OHPKM>
-  tryLoadFromIds(ids: OhpkmIdentifier[]): E.Either<IdentifierNotPresentError, OHPKM>[]
+  tryLoadFromId(id: OhpkmIdentifier): Result<OHPKM, IdentifierNotPresentError>
+  tryLoadFromIds(ids: OhpkmIdentifier[]): Result<OHPKM, IdentifierNotPresentError>[]
   monIsStored(id: string): boolean
   overwrite(mon: OHPKM): void
   getAllStored: () => OHPKM[]
@@ -37,11 +36,11 @@ export function useOhpkmStore(): OhpkmStore {
     return monsById[id]
   }
 
-  function tryLoadFromId(id: string): E.Either<IdentifierNotPresentError, OHPKM> {
-    return E.fromNullable(IdentifierNotPresent(id))(monsById[id])
+  function tryLoadFromId(id: string): Result<OHPKM, IdentifierNotPresentError> {
+    return R.fromNullable(IdentifierNotPresent(id))(getById(id))
   }
 
-  function tryLoadFromIds(ids: OhpkmIdentifier[]): E.Either<IdentifierNotPresentError, OHPKM>[] {
+  function tryLoadFromIds(ids: OhpkmIdentifier[]): Result<OHPKM, IdentifierNotPresentError>[] {
     return ids.map(tryLoadFromId)
   }
 
@@ -63,7 +62,7 @@ export function useOhpkmStore(): OhpkmStore {
 
   async function reloadAndReturnLookup() {
     return reloadStore().then(
-      E.map((newLookup) => {
+      R.map((newLookup) => {
         return (id: string) => newLookup[id]
       })
     )

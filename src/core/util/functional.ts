@@ -1,10 +1,7 @@
-import * as E from 'fp-ts/lib/Either'
-import { Either, left, right } from 'fp-ts/lib/Either'
+export type PartitionedResults<A, E> = { successes: A[]; failures: E[] }
 
-export type PartitionedEither<E, A> = { failures: E[]; successes: A[] }
-
-export function partitionResults<E, A>(results: E.Either<E, A>[]) {
-  const acc: PartitionedEither<E, A> = {
+export function partitionResults<A, E>(results: Result<A, E>[]) {
+  const acc: PartitionedResults<A, E> = {
     failures: [],
     successes: [],
   }
@@ -12,11 +9,11 @@ export function partitionResults<E, A>(results: E.Either<E, A>[]) {
   return results.reduce(partitionResultsRecursive, acc)
 }
 
-function partitionResultsRecursive<E, A>(acc: PartitionedEither<E, A>, either: E.Either<E, A>) {
-  if (E.isLeft(either)) {
-    acc.failures.push(either.left)
+function partitionResultsRecursive<A, E>(acc: PartitionedResults<A, E>, result: Result<A, E>) {
+  if (isErr(result)) {
+    acc.failures.push(result.err)
   } else {
-    acc.successes.push(either.right)
+    acc.successes.push(result.value)
   }
   return acc
 }
@@ -60,46 +57,77 @@ export function difference<T>(first: T[] | undefined, second: T[]): T[] {
 }
 
 export type Option<T> = T | undefined
-export type Errorable<T> = Either<string, T>
-export class Result<T, E> {
-  private container: Either<E, T>
+export type Errorable<T> = Result<T, string>
 
-  private constructor(container: Either<E, T>) {
-    this.container = container
-  }
-
-  static Ok<T, E>(value: T): Result<T, E> {
-    return new Result<T, E>(right(value))
-  }
-
-  static Err<T, E>(error: E): Result<T, E> {
-    return new Result<T, E>(left(error))
-  }
-
-  public match(onOk: (value: T) => void, onErr: (error: E) => void): void {
-    E.match(onErr, onOk)(this.container)
-  }
-
-  public async matchAsync(
-    onOk: (value: T) => Promise<void>,
-    onErr: (error: E) => Promise<void>
-  ): Promise<void> {
-    return await E.match(onErr, onOk)(this.container)
-  }
-
-  public map<U>(f: (value: T) => U): Result<U, E> {
-    return new Result<U, E>(E.map(f)(this.container))
-  }
+function buildOk<T = never, E = never>(value: T): Result<T, E> {
+  return { _tag: 'Ok', value }
 }
 
-export function Err<T, E>(inner: E) {
-  return Result.Err<T, E>(inner)
+function buildErr<T = never, E = never>(err: E): Result<T, E> {
+  return { _tag: 'Err', err }
 }
 
-export function Ok<T, E>(inner: T) {
-  return Result.Ok<T, E>(inner)
+function isOk<T>(result: Result<T, unknown>): result is Ok<T> {
+  return result._tag === 'Ok'
 }
 
-export function matches<T>(value: T | undefined) {
-  return (other: T | undefined) => other === value
+function isErr<E>(result: Result<unknown, E>): result is Err<E> {
+  return result._tag === 'Err'
+}
+
+function map<T, E, U>(transform: (val: T) => U): (result: Result<T, E>) => Result<U, E> {
+  return (result) => (isOk(result) ? buildOk(transform(result.value)) : result)
+}
+
+function mapErr<T, E, U>(transform: (val: E) => U): (result: Result<T, E>) => Result<T, U> {
+  return (result) => (isErr(result) ? buildErr(transform(result.err)) : result)
+}
+
+function flatMap<T, E, U>(
+  transform: (val: T) => Result<U, E>
+): (result: Result<T, E>) => Result<U, E> {
+  return (result) => (isErr(result) ? result : transform(result.value))
+}
+
+function asyncFlatMap<T, E, U>(
+  transform: (val: T) => Promise<Result<U, E>>
+): (result: Result<T, E>) => Promise<Result<U, E>> {
+  return (result) => (isErr(result) ? Promise.resolve(result) : transform(result.value))
+}
+
+function match<T, E, R>(onOk: (val: T) => R, onErr: (val: E) => R): (result: Result<T, E>) => R {
+  return (result) => (isOk(result) ? onOk(result.value) : onErr(result.err))
+}
+
+function buildStringErr<T = never>(err: any): Result<T, string> {
+  return buildErr(String(err))
+}
+
+function tryPromise<T>(promise: Promise<T>): Promise<Result<T, string>> {
+  return promise.then(buildOk).catch(buildStringErr)
+}
+
+export type Err<E> = {
+  readonly _tag: 'Err'
+  readonly err: E
+}
+
+export type Ok<T> = {
+  readonly _tag: 'Ok'
+  readonly value: T
+}
+
+export type Result<T, E> = Ok<T> | Err<E>
+
+export const R = {
+  match,
+  map,
+  mapErr,
+  flatMap,
+  asyncFlatMap,
+  Ok: buildOk,
+  Err: buildErr,
+  isOk,
+  isErr,
+  tryPromise,
 }

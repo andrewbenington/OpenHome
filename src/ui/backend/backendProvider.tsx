@@ -2,8 +2,7 @@ import { getMonFileIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { HomeData } from '@openhome-core/save/HomeData'
 import { SAV } from '@openhome-core/save/interfaces'
-import { Errorable } from '@openhome-core/util/functional'
-import * as E from 'fp-ts/lib/Either'
+import { Errorable, R } from '@openhome-core/util/functional'
 import { PropsWithChildren } from 'react'
 import { BackendContext } from './backendContext'
 import BackendInterface from './backendInterface'
@@ -48,7 +47,7 @@ async function writeAllHomeData(
     current_bank: homeData.currentBankIndex,
   })
 
-  if (E.isLeft(banksResult)) {
+  if (R.isErr(banksResult)) {
     return [banksResult, await backend.rollbackTransaction()]
   }
 
@@ -61,7 +60,7 @@ async function writeAllHomeData(
 
       if (identifier === undefined) {
         results.push(
-          E.left(`Could not get identifier for mon: ${mon.nickname} (${mon.metadata?.formeName})`)
+          R.Err(`Could not get identifier for mon: ${mon.nickname} (${mon.metadata?.formeName})`)
         )
         continue
       }
@@ -71,7 +70,7 @@ async function writeAllHomeData(
     } catch (e) {
       const species = mon.speciesMetadata?.name ?? 'Unknown Species'
 
-      results.push(E.left(`Error encoding ${mon.nickname} (${species}): ${e}`))
+      results.push(R.Err(`Error encoding ${mon.nickname} (${species}): ${e}`))
     }
   }
   return results

@@ -1,5 +1,5 @@
+import { R } from '@openhome-core/util/functional'
 import { fail } from 'assert'
-import * as E from 'fp-ts/lib/Either'
 import fs from 'fs'
 import path from 'path'
 import { describe, expect, test } from 'vitest'
@@ -19,11 +19,11 @@ describe('G3SAV - Gen 3 Save File Read Test', async () => {
     [G3SAV]
   )
 
-  if (E.isLeft(result)) {
-    fail(`Failed to build save file: ${result.left}`)
+  if (R.isErr(result)) {
+    fail(`Failed to build save file: ${result.err}`)
   }
 
-  const emeraldSaveFile = result.right as G3SAV
+  const emeraldSaveFile = result.value as G3SAV
   test('should load initial save data correctly', () => {
     expect(emeraldSaveFile.name).toBe('RoC')
   })

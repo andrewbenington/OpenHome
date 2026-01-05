@@ -1,7 +1,7 @@
 import { bytesToPKM } from '@openhome-core/pkm/FileImport'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { R } from '@openhome-core/util/functional'
 import { PK2 } from '@pokemon-files/pkm'
-import * as E from 'fp-ts/lib/Either'
 import fs from 'fs'
 import path from 'path'
 import { beforeAll, expect, test } from 'vitest'
@@ -23,11 +23,11 @@ beforeAll(async () => {
     [G2SAV]
   )
 
-  if (E.isLeft(result)) {
-    throw result.left
+  if (R.isErr(result)) {
+    throw result.err
   }
 
-  crystalSaveFile = result.right as G2SAV
+  crystalSaveFile = result.value as G2SAV
 
   const slowpokeBytes = fs.readFileSync(
     path.join('src/core/pkm/__test__/PKMFiles/OhpkmV2', 'slowbro.ohpkm')
@@ -47,11 +47,11 @@ test('removing mon shifts others in box', () => {
     G2SAV,
   ])
 
-  if (E.isLeft(result1)) {
-    throw Error(result1.left)
+  if (R.isErr(result1)) {
+    throw Error(result1.err)
   }
 
-  const modifiedSaveFile1 = result1.right as G2SAV
+  const modifiedSaveFile1 = result1.value as G2SAV
 
   modifiedSaveFile1.boxes[9].pokemon[0] = undefined
   modifiedSaveFile1.updatedBoxSlots.push({ box: 9, index: 0 })
@@ -61,11 +61,11 @@ test('removing mon shifts others in box', () => {
     G2SAV,
   ])
 
-  if (E.isLeft(result2)) {
-    throw Error(result2.left)
+  if (R.isErr(result2)) {
+    throw Error(result2.err)
   }
 
-  const modifiedSaveFile2 = result2.right as G2SAV
+  const modifiedSaveFile2 = result2.value as G2SAV
 
   expect(modifiedSaveFile2.boxes[9].pokemon[0]?.nickname).toEqual('BELLOSSOM')
   expect(modifiedSaveFile2.boxes[9].pokemon[18]?.nickname).toEqual('MISDREAVUS')
@@ -77,11 +77,11 @@ test('inserting mon works', () => {
     G2SAV,
   ])
 
-  if (E.isLeft(result1)) {
-    throw Error(result1.left)
+  if (R.isErr(result1)) {
+    throw Error(result1.err)
   }
 
-  const modifiedSaveFile1 = result1.right as G2SAV
+  const modifiedSaveFile1 = result1.value as G2SAV
 
   modifiedSaveFile1.boxes[13].pokemon[17] = new PK2(slowbroOH)
   modifiedSaveFile1.updatedBoxSlots.push({ box: 13, index: 0 })
@@ -91,11 +91,11 @@ test('inserting mon works', () => {
     G2SAV,
   ])
 
-  if (E.isLeft(result2)) {
-    throw Error(result2.left)
+  if (R.isErr(result2)) {
+    throw Error(result2.err)
   }
 
-  const modifiedSaveFile2 = result2.right as G2SAV
+  const modifiedSaveFile2 = result2.value as G2SAV
 
   expect(modifiedSaveFile2.boxes[13].pokemon[0]?.nickname).toEqual('UNOWN')
   expect(modifiedSaveFile2.boxes[13].pokemon[16]?.nickname).toEqual('WIGGLYTUFF')

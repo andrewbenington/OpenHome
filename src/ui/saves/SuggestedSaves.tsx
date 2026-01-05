@@ -10,8 +10,8 @@ import { useLookups } from '@openhome-ui/state/lookups'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { useSaves } from '@openhome-ui/state/saves'
 import { Flex } from '@radix-ui/themes'
-import * as E from 'fp-ts/lib/Either'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { R } from 'src/core/util/functional'
 import SaveCard from './SaveCard'
 import { filterEmpty, SaveViewMode } from './util'
 
@@ -50,16 +50,16 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
       const response = await backend.loadSaveFile(savePath)
       const lookupsResponse = await getLookups()
 
-      if (E.isLeft(lookupsResponse)) {
-        console.error(lookupsResponse.left)
-        handleError('Error loading lookups', lookupsResponse.left)
+      if (R.isErr(lookupsResponse)) {
+        console.error(lookupsResponse.err)
+        handleError('Error loading lookups', lookupsResponse.err)
         return
       }
 
-      const lookups = lookupsResponse.right
+      const lookups = lookupsResponse.value
 
-      if (E.isRight(response)) {
-        const { fileBytes } = response.right
+      if (R.isOk(response)) {
+        const { fileBytes } = response.value
 
         return buildUnknownSaveFile(
           savePath,
@@ -80,8 +80,7 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
   useEffect(() => {
     if (error || suggestedSaves) return
     backend.findSuggestedSaves().then(
-      E.match(
-        (err) => handleError('Error getting suggested saves', err),
+      R.match(
         async (possibleSaves) => {
           const allPaths = (possibleSaves?.citra ?? [])
             .concat(possibleSaves?.open_emu ?? [])
@@ -92,16 +91,17 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
               filterEmpty
             )
 
-            saves.filter(E.isLeft).forEach((s) => console.warn(`Suggested save error: ${s.left}`))
+            saves.filter(R.isErr).forEach((s) => console.warn(`Suggested save error: ${s.err}`))
 
             setSuggestedSaves(
               saves
-                .filter(E.isRight)
-                .map((s) => s.right)
+                .filter(R.isOk)
+                .map((s) => s.value)
                 .filter(filterUndefined)
             )
           }
-        }
+        },
+        async (err) => handleError('Error getting suggested saves', err)
       )
     )
   }, [backend, error, handleError, loadSaveData, suggestedSaves])

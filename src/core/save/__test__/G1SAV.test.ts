@@ -1,8 +1,8 @@
 import { bytesToPKM } from '@openhome-core/pkm/FileImport'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { R } from '@openhome-core/util/functional'
 import { PK1 } from '@pokemon-files/pkm'
 import assert, { fail } from 'assert'
-import * as E from 'fp-ts/lib/Either'
 import fs from 'fs'
 import path from 'path'
 import { beforeAll, expect, test } from 'vitest'
@@ -23,9 +23,9 @@ beforeAll(() => {
     [G1SAV]
   )
 
-  assert(E.isRight(result))
+  assert(R.isOk(result))
 
-  blueSaveFile = result.right as G1SAV
+  blueSaveFile = result.value as G1SAV
 
   slowbroOH = bytesToPKM(
     new Uint8Array(
@@ -47,11 +47,11 @@ test('removing mon shifts others in box', () => {
     G1SAV,
   ])
 
-  if (E.isLeft(result1)) {
-    fail(result1.left)
+  if (R.isErr(result1)) {
+    fail(result1.err)
   }
 
-  const modifiedSaveFile1 = result1.right as G1SAV
+  const modifiedSaveFile1 = result1.value as G1SAV
 
   modifiedSaveFile1.boxes[7].pokemon[0] = undefined
   modifiedSaveFile1.updatedBoxSlots.push({ box: 7, index: 0 })
@@ -61,11 +61,11 @@ test('removing mon shifts others in box', () => {
     G1SAV,
   ])
 
-  if (E.isLeft(result2)) {
-    fail(result2.left)
+  if (R.isErr(result2)) {
+    fail(result2.err)
   }
 
-  const modifiedSaveFile2 = result2.right as G1SAV
+  const modifiedSaveFile2 = result2.value as G1SAV
 
   expect(modifiedSaveFile2.boxes[7].pokemon[0]?.nickname).toEqual('AERODACTYL')
   expect(modifiedSaveFile2.boxes[7].pokemon[9]?.nickname).toEqual('MEW')
@@ -77,10 +77,10 @@ test('inserting mon works', () => {
     G1SAV,
   ])
 
-  if (E.isLeft(result1)) {
-    fail(result1.left)
+  if (R.isErr(result1)) {
+    fail(result1.err)
   }
-  const modifiedSaveFile1 = result1.right as G1SAV
+  const modifiedSaveFile1 = result1.value as G1SAV
 
   modifiedSaveFile1.boxes[7].pokemon[11] = new PK1(slowbroOH)
   modifiedSaveFile1.updatedBoxSlots.push({ box: 7, index: 0 })
@@ -90,11 +90,11 @@ test('inserting mon works', () => {
     G1SAV,
   ])
 
-  if (E.isLeft(result2)) {
-    fail(result2.left)
+  if (R.isErr(result2)) {
+    fail(result2.err)
   }
 
-  const modifiedSaveFile2 = result2.right as G1SAV
+  const modifiedSaveFile2 = result2.value as G1SAV
 
   expect(modifiedSaveFile2.boxes[7].pokemon[0]?.nickname).toEqual('KABUTOPS')
   expect(modifiedSaveFile2.boxes[7].pokemon[10]?.nickname).toEqual('MEW')
