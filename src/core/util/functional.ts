@@ -99,6 +99,10 @@ function match<T, E, R>(onOk: (val: T) => R, onErr: (val: E) => R): (result: Res
   return (result) => (isOk(result) ? onOk(result.value) : onErr(result.err))
 }
 
+function fromNullable<E>(err: E): <T>(value: T | undefined) => Result<T, E> {
+  return (value: any | undefined) => (value === undefined ? buildErr(err) : buildOk(value))
+}
+
 function buildStringErr<T = never>(err: any): Result<T, string> {
   return buildErr(String(err))
 }
@@ -125,6 +129,7 @@ export const R = {
   mapErr,
   flatMap,
   asyncFlatMap,
+  fromNullable,
   Ok: buildOk,
   Err: buildErr,
   isOk,
