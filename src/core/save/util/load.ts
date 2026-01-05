@@ -5,9 +5,10 @@ import {
   getMonGen345Identifier,
 } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { R } from '@openhome-core/util/functional'
 import { OhpkmLookup } from '@openhome-ui/state/ohpkm'
-import * as E from 'fp-ts/lib/Either'
 import { SAVClass } from '.'
+import { Errorable } from '../../util/functional'
 import { SAV } from '../interfaces'
 import { PathData } from './path'
 
@@ -71,20 +72,20 @@ export const buildUnknownSaveFile = (
   lookupMaps: MonLookup,
   supportedSaveTypes: SAVClass[],
   updateMonCallback?: (mon: OHPKM) => void
-): E.Either<string, SAV | undefined> => {
+): Errorable<SAV | undefined> => {
   const saveTypes = getPossibleSaveTypes(fileBytes, supportedSaveTypes)
 
   if (saveTypes.length > 1) {
-    return E.left(
+    return R.Err(
       'Could not distinguish between multiple possible save types: ' +
         saveTypes.map((st) => st.saveTypeName).join(', ')
     )
   } else if (saveTypes.length === 0) {
-    return E.left('Could not detect save type')
+    return R.Err('Could not detect save type')
   }
   const saveType = saveTypes[0]
 
-  if (!saveType) return E.right(undefined)
+  if (!saveType) return R.Ok(undefined)
 
   return buildSaveFile(filePath, fileBytes, lookupMaps, saveType, updateMonCallback)
 }
@@ -95,7 +96,7 @@ export const buildSaveFile = (
   lookupMaps: MonLookup,
   saveType: SAVClass,
   updateMonCallback?: (mon: OHPKM) => void
-): E.Either<string, SAV | undefined> => {
+): Errorable<SAV | undefined> => {
   const { getOhpkmById, gen12LookupMap, gen345LookupMap } = lookupMaps
 
   const lookupMap =
@@ -121,8 +122,8 @@ export const buildSaveFile = (
       updateMonCallback
     )
 
-    return E.right(saveFile)
+    return R.Ok(saveFile)
   } catch (e) {
-    return E.left(`${e}`)
+    return R.Err(String(e))
   }
 }

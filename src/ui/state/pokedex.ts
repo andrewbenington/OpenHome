@@ -25,7 +25,9 @@ export function usePokedex(): PokedexManager {
 
     const result = await backend.loadPokedex()
 
-    result.onOk(setPokedexCache)
+    if (R.isOk(result)) {
+      setPokedexCache(result.value)
+    }
 
     return result
   }, [backend, pokedexCache])

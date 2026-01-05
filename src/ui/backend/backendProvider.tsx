@@ -47,7 +47,7 @@ async function writeAllHomeData(
     current_bank: homeData.currentBankIndex,
   })
 
-  if (banksResult.isErr()) {
+  if (R.isErr(banksResult)) {
     return [banksResult, await backend.rollbackTransaction()]
   }
 

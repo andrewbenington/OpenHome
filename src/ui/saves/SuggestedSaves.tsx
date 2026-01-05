@@ -10,7 +10,6 @@ import { useLookups } from '@openhome-ui/state/lookups'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { useSaves } from '@openhome-ui/state/saves'
 import { Flex } from '@radix-ui/themes'
-import * as E from 'fp-ts/lib/Either'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { R } from 'src/core/util/functional'
 import SaveCard from './SaveCard'
@@ -51,16 +50,16 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
       const response = await backend.loadSaveFile(savePath)
       const lookupsResponse = await getLookups()
 
-      if (lookupsResponse.isErr()) {
+      if (R.isErr(lookupsResponse)) {
         console.error(lookupsResponse.err)
         handleError('Error loading lookups', lookupsResponse.err)
         return
       }
 
-      const lookups = lookupsResponse.ok!
+      const lookups = lookupsResponse.value
 
-      if (response.isOk()) {
-        const { fileBytes } = response.ok
+      if (R.isOk(response)) {
+        const { fileBytes } = response.value
 
         return buildUnknownSaveFile(
           savePath,
@@ -92,12 +91,12 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
               filterEmpty
             )
 
-            saves.filter(E.isLeft).forEach((s) => console.warn(`Suggested save error: ${s.left}`))
+            saves.filter(R.isErr).forEach((s) => console.warn(`Suggested save error: ${s.err}`))
 
             setSuggestedSaves(
               saves
-                .filter(E.isRight)
-                .map((s) => s.right)
+                .filter(R.isOk)
+                .map((s) => s.value)
                 .filter(filterUndefined)
             )
           }

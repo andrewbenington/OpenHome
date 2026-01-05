@@ -34,7 +34,7 @@ export default function OhpkmStoreProvider({ children }: OhpkmStoreProviderProps
 
     const pokedexUpdates: PokedexUpdate[] = []
 
-    for (const [identifier, mon] of Object.entries(homeResult.ok!)) {
+    for (const [identifier, mon] of Object.entries(homeResult.value)) {
       const hadErrors = mon.fixErrors()
 
       if (hadErrors) {
@@ -58,7 +58,7 @@ export default function OhpkmStoreProvider({ children }: OhpkmStoreProviderProps
 
     backend.registerInPokedex(pokedexUpdates)
 
-    ohpkmStoreDispatch({ type: 'load_persisted_pkm_data', payload: homeResult.ok! })
+    ohpkmStoreDispatch({ type: 'load_persisted_pkm_data', payload: homeResult.value })
 
     return homeResult
   }, [backend, ohpkmStoreDispatch])

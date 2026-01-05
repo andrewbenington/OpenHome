@@ -27,7 +27,9 @@ export function useLookups(): LookupsManager {
     }
 
     const result = await backend.loadLookups()
-    result.onOk(setLookupsCache)
+    if (R.isOk(result)) {
+      setLookupsCache(result.value)
+    }
 
     return result
   }, [backend, lookupsCache])

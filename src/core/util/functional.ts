@@ -1,6 +1,3 @@
-import * as E from 'fp-ts/lib/Either'
-import { Either, left, right } from 'fp-ts/lib/Either'
-
 export type PartitionedResults<A, E> = { successes: A[]; failures: E[] }
 
 export function partitionResults<A, E>(results: Result<A, E>[]) {
@@ -13,10 +10,10 @@ export function partitionResults<A, E>(results: Result<A, E>[]) {
 }
 
 function partitionResultsRecursive<A, E>(acc: PartitionedResults<A, E>, result: Result<A, E>) {
-  if (result.isErr()) {
+  if (isErr(result)) {
     acc.failures.push(result.err)
   } else {
-    acc.successes.push(result.ok!)
+    acc.successes.push(result.value)
   }
   return acc
 }
@@ -62,101 +59,75 @@ export function difference<T>(first: T[] | undefined, second: T[]): T[] {
 export type Option<T> = T | undefined
 export type Errorable<T> = Result<T, string>
 
-export class Result<T, E> {
-  private container: Either<E, T>
-
-  private constructor(container: Either<E, T>) {
-    this.container = container
-  }
-
-  static Ok<T, E>(value: T): Result<T, E> {
-    return new Result<T, E>(right(value))
-  }
-
-  static Err<T, E>(error: E): Result<T, E> {
-    return new Result<T, E>(left(error))
-  }
-
-  static handlePromise<T>(promise: Promise<T>): Promise<Result<T, string>> {
-    return promise.then(Result.Ok<T, string>).catch((reason) => Result.Err(String(reason)))
-  }
-
-  public match<R>(onOk: (value: T) => R, onErr: (error: E) => R): R {
-    return E.match(onErr, onOk)(this.container)
-  }
-
-  public onOk(f: (value: T) => void) {
-    this.match(f, () => {})
-  }
-
-  public map<U>(f: (value: T) => U): Result<U, E> {
-    return new Result<U, E>(E.map(f)(this.container))
-  }
-
-  public flatMap<U>(f: (value: T) => Result<U, E>): Result<U, E> {
-    const applyAndGetContainer = (value: T) => f(value).container
-
-    return new Result<U, E>(E.flatMap(applyAndGetContainer)(this.container))
-  }
-
-  public asyncFlatMap<U>(f: AsyncMapper<T, E, U>): Promise<Result<U, E>> {
-    return applyAsyncMapper(this.container, f)
-  }
-
-  public get ok() {
-    return E.isRight(this.container) ? this.container.right : undefined
-  }
-
-  public get err() {
-    return E.isLeft(this.container) ? this.container.left : undefined
-  }
-
-  public isOk(): this is OkResult<T> {
-    return E.isRight(this.container)
-  }
-
-  public isErr(): this is ErrResult<E> {
-    return E.isLeft(this.container)
-  }
+function buildOk<T = never, E = never>(value: T): Result<T, E> {
+  return { _tag: 'Ok', value }
 }
 
-type AsyncMapper<T, E, U> = (value: T) => Promise<Result<U, E>>
-
-async function applyAsyncMapper<T, E, U>(
-  input: Either<E, T>,
-  mapper: AsyncMapper<T, E, U>
-): Promise<Result<U, E>> {
-  return E.isLeft(input) ? Err(input.left) : await mapper(input.right)
+function buildErr<T = never, E = never>(err: E): Result<T, E> {
+  return { _tag: 'Err', err }
 }
 
-type OkResult<T> = Result<T, any> & { ok: T }
-
-type ErrResult<E> = Result<any, E> & { err: E }
-
-function Err<T, E>(inner: E) {
-  return Result.Err<T, E>(inner)
+function isOk<T>(result: Result<T, unknown>): result is Ok<T> {
+  return result._tag === 'Ok'
 }
 
-function Ok<T, E>(inner: T) {
-  return Result.Ok<T, E>(inner)
+function isErr<E>(result: Result<unknown, E>): result is Err<E> {
+  return result._tag === 'Err'
+}
+
+function map<T, E, U>(transform: (val: T) => U): (result: Result<T, E>) => Result<U, E> {
+  return (result) => (isOk(result) ? buildOk(transform(result.value)) : result)
+}
+
+function mapErr<T, E, U>(transform: (val: E) => U): (result: Result<T, E>) => Result<T, U> {
+  return (result) => (isErr(result) ? buildErr(transform(result.err)) : result)
+}
+
+function flatMap<T, E, U>(
+  transform: (val: T) => Result<U, E>
+): (result: Result<T, E>) => Result<U, E> {
+  return (result) => (isErr(result) ? result : transform(result.value))
+}
+
+function asyncFlatMap<T, E, U>(
+  transform: (val: T) => Promise<Result<U, E>>
+): (result: Result<T, E>) => Promise<Result<U, E>> {
+  return (result) => (isErr(result) ? Promise.resolve(result) : transform(result.value))
 }
 
 function match<T, E, R>(onOk: (val: T) => R, onErr: (val: E) => R): (result: Result<T, E>) => R {
-  return (result) => result.match(onOk, onErr)
+  return (result) => (isOk(result) ? onOk(result.value) : onErr(result.err))
 }
 
-function map<T, E, U>(onOk: (val: T) => U): (result: Result<T, E>) => Result<U, E> {
-  return (result) => result.map(onOk)
+function buildStringErr<T = never>(err: any): Result<T, string> {
+  return buildErr(String(err))
 }
 
-function isErr<T, E>(result: Result<T, E>) {
-  return result.isErr()
+function tryPromise<T>(promise: Promise<T>): Promise<Result<T, string>> {
+  return promise.then(buildOk).catch(buildStringErr)
 }
+
+export type Err<E> = {
+  readonly _tag: 'Err'
+  readonly err: E
+}
+
+export type Ok<T> = {
+  readonly _tag: 'Ok'
+  readonly value: T
+}
+
+export type Result<T, E> = Ok<T> | Err<E>
 
 export const R = {
-  Err,
-  Ok,
   match,
   map,
+  mapErr,
+  flatMap,
+  asyncFlatMap,
+  Ok: buildOk,
+  Err: buildErr,
+  isOk,
   isErr,
+  tryPromise,
 }

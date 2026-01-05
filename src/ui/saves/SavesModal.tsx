@@ -4,6 +4,7 @@ import { getSaveRef, SAV } from '@openhome-core/save/interfaces'
 import { SAVClass } from '@openhome-core/save/util'
 import { buildSaveFile, getPossibleSaveTypes } from '@openhome-core/save/util/load'
 import { PathData } from '@openhome-core/save/util/path'
+import { R } from '@openhome-core/util/functional'
 import { filterUndefined } from '@openhome-core/util/sort'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
 import { CardsIcon, GridIcon } from '@openhome-ui/components/Icons'
@@ -15,10 +16,8 @@ import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { useSaves } from '@openhome-ui/state/saves'
 import { PokedexUpdate } from '@openhome-ui/util/pokedex'
 import { Button, Dialog, Flex, Separator, Slider, VisuallyHidden } from '@radix-ui/themes'
-import * as E from 'fp-ts/lib/Either'
 import { useCallback, useContext, useState } from 'react'
 import 'react-data-grid/lib/styles.css'
-import { R } from 'src/core/util/functional'
 import useDebounce from '../hooks/useDebounce'
 import RecentSaves from './RecentSaves'
 import SaveFolders from './SaveFolders'
@@ -50,12 +49,12 @@ function useOpenSaveHandler(onClose?: () => void) {
     async (saveType: SAVClass, filePath: PathData, fileBytes: Uint8Array) => {
       const lookupsResult = await getLookups()
 
-      if (lookupsResult.isErr()) {
+      if (R.isErr(lookupsResult)) {
         displayError('Error Loading Lookups', lookupsResult.err)
         return
       }
 
-      const lookups = lookupsResult.ok!
+      const lookups = lookupsResult.value
 
       const result = buildSaveFile(
         filePath,
@@ -75,11 +74,11 @@ function useOpenSaveHandler(onClose?: () => void) {
         }
       )
 
-      if (E.isLeft(result)) {
-        displayError('Error Loading Save', result.left)
+      if (R.isErr(result)) {
+        displayError('Error Loading Save', result.err)
         return
       }
-      const saveFile = result.right
+      const saveFile = result.value
 
       if (!saveFile) {
         displayError('Error Identifying Save', 'Make sure you opened a supported save file.')
@@ -98,12 +97,12 @@ function useOpenSaveHandler(onClose?: () => void) {
       if (!filePath) {
         const pickedFile = await backend.pickFile()
 
-        if (pickedFile.isErr()) {
+        if (R.isErr(pickedFile)) {
           displayError('Error Selecting File', pickedFile.err)
           return
         }
-        if (!pickedFile.ok) return
-        filePath = pickedFile.ok
+        if (!pickedFile.value) return
+        filePath = pickedFile.value
       }
       backend.loadSaveFile(filePath).then(
         R.match(

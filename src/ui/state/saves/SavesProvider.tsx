@@ -62,7 +62,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
 
     const result = await backend.startTransaction()
 
-    if (result.isErr()) {
+    if (R.isErr(result)) {
       displayError('Error Starting Save Transaction', result.err)
       return
     }
@@ -128,7 +128,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
 
     if (itemBagState.modified) {
       const saveBagResult = await backend.saveItemBag(itemBagState.itemCounts)
-      if (saveBagResult.isErr()) {
+      if (R.isErr(saveBagResult)) {
         displayError('Error Saving Bag', saveBagResult.err)
         await backend.rollbackTransaction()
         return

@@ -1,6 +1,6 @@
 import { PossibleSaves } from '@openhome-core/save/util/path'
 import { StoredBankData } from '@openhome-core/save/util/storage'
-import { Errorable, Result } from '@openhome-core/util/functional'
+import { Errorable, R } from '@openhome-core/util/functional'
 import { JSONArray, JSONObject, JSONValue, LookupMap, SaveRef } from '@openhome-core/util/types'
 import { AppTheme } from '@openhome-ui/state/appInfo'
 import { PluginMetadataWithIcon } from '@openhome-ui/util/plugin'
@@ -14,7 +14,7 @@ function invokeAndCatch<C extends OhCommand>(
   args?: InvokeArgs,
   options?: InvokeOptions
 ): Promise<Errorable<OhCommandResult<C>>> {
-  return Result.handlePromise(invoke(cmd, args, options))
+  return R.tryPromise(invoke(cmd, args, options))
 }
 
 type OhTauriApi = {
@@ -65,7 +65,7 @@ type OhTauriApiNoThrow = {
 
 export const Commands: OhTauriApiNoThrow = {
   get_state() {
-    return invoke('get_state')
+    return invokeAndCatch('get_state')
   },
 
   get_file_bytes(absolutePath: string) {
