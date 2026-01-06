@@ -86,7 +86,7 @@ export class BDSPSAV extends OfficialSAV<PB8> {
           const mon = this.buildPKM(monData, true)
 
           if (mon.gameOfOrigin !== 0 && mon.dexNum !== 0) {
-            this.boxes[box].pokemon[monIndex] = mon
+            this.boxes[box].boxSlots[monIndex] = mon
           }
         } catch (e) {
           console.error(e)
@@ -136,7 +136,7 @@ export class BDSPSAV extends OfficialSAV<PB8> {
     const changedMonIdentifiers: OhpkmIdentifier[] = []
 
     this.updatedBoxSlots.forEach(({ box, index: monIndex }) => {
-      const updatedSlotContent = this.boxes[box].pokemon[monIndex]
+      const updatedSlotContent = this.boxes[box].boxSlots[monIndex]
 
       // we don't want to save OHPKM files of mons that didn't leave the save
       // (and would still be PB8s)

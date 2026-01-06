@@ -29,7 +29,7 @@ export default function SortPokemon() {
     const all: { mon: PKMInterface; color: string }[] = savesAndBanks.allOpenSaves
       .flatMap((save) =>
         save.boxes.flatMap((box) =>
-          box.pokemon.flatMap((mon) =>
+          box.boxSlots.flatMap((mon) =>
             mon ? { mon, color: OriginGames.color(save.origin) } : undefined
           )
         )

@@ -1,5 +1,4 @@
 import { PossibleSaves } from '@openhome-core/save/util/path'
-import { StoredBankData } from '@openhome-core/save/util/storage'
 import { Errorable, R } from '@openhome-core/util/functional'
 import { JSONArray, JSONObject, JSONValue, LookupMap, SaveRef } from '@openhome-core/util/types'
 import { AppTheme } from '@openhome-ui/state/appInfo'
@@ -39,8 +38,8 @@ type OhTauriApi = {
   delete_plugin(pluginId: string): string
   handle_windows_accellerator(menuEventId: string): null
 
-  load_banks(): StoredBankData
-  write_banks(bankData: StoredBankData): null
+  load_banks(): StoredBankDataSerialized
+  write_banks(bankData: StoredBankDataSerialized): null
 
   get_lookups(): StoredLookups
   update_lookups(gen12: LookupMap, gen345: LookupMap): null
@@ -104,7 +103,7 @@ export const Commands: OhTauriApiNoThrow = {
     return invokeAndCatch('load_banks')
   },
 
-  write_banks(bankData: StoredBankData) {
+  write_banks(bankData: StoredBankDataSerialized) {
     return invokeAndCatch('write_banks', { bankData })
   },
 
@@ -179,4 +178,24 @@ export const Commands: OhTauriApiNoThrow = {
   open_file_location(filePath: string) {
     return invokeAndCatch('open_file_location', { filePath })
   },
+}
+
+export type StoredBankDataSerialized = {
+  banks: OpenHomeBankSerialized[]
+  current_bank: number
+}
+
+export type OpenHomeBankSerialized = {
+  id: string
+  index: number
+  name: string | undefined
+  boxes: OpenHomeBoxSerialized[]
+  current_box: number
+}
+
+export type OpenHomeBoxSerialized = {
+  id: string
+  index: number
+  name: string | null
+  identifiers: Record<number, string>
 }

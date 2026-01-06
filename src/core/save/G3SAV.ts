@@ -10,9 +10,10 @@ import { PK3 } from '@pokemon-files/pkm'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { GEN3_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
 import { EmptyTracker, OhpkmTracker } from '../../tracker'
+import { OHPKM } from '../pkm/OHPKM'
 import { filterUndefined } from '../util/sort'
 import { Box, OfficialSAV, SaveMonLocation } from './interfaces'
-import { LOOKUP_TYPE } from './util'
+import { LookupType } from './util'
 import { emptyPathData, PathData } from './util/path'
 
 export const SAVE_SIZE_BYTES = 0x20000
@@ -165,9 +166,9 @@ export class G3SaveBackup {
         const box = this.boxes[Math.floor(i / 30)]
 
         if (mon.isValid()) {
-          box.pokemon[i % 30] = tracker.wrapWithIdentifier(mon)
+          box.boxSlots[i % 30] = tracker.wrapWithIdentifier(mon)
         } else {
-          box.pokemon[i % 30] = undefined
+          box.boxSlots[i % 30] = undefined
         }
       } catch (e) {
         throw Error(`File does not have valid Pokémon data: ${e}`)
@@ -185,7 +186,7 @@ export class G3SAV extends OfficialSAV<PK3> {
   static pkmType = PK3
 
   static transferRestrictions = GEN3_TRANSFER_RESTRICTIONS
-  static lookupType: LOOKUP_TYPE = 'gen345'
+  static lookupType: LookupType = 'gen345'
 
   static TRAINER_OFFSET = 0x0ff4 * 0
 
@@ -252,7 +253,7 @@ export class G3SAV extends OfficialSAV<PK3> {
     // hacky way to detect save version
     // TODO: make more robust
     const trainerMon = this.boxes
-      .flatMap((box) => box.pokemon)
+      .flatMap((box) => box.boxSlots)
       .filter(filterUndefined)
       .map((slot) => slot.data)
       .find(
@@ -290,7 +291,7 @@ export class G3SAV extends OfficialSAV<PK3> {
     this.updatedBoxSlots.forEach(({ box, index }) => {
       const monOffset = 30 * box + index
       const pcBytes = new Uint8Array(80)
-      const updatedSlotContent = this.boxes[box].pokemon[index]
+      const updatedSlotContent = this.boxes[box].boxSlots[index]
 
       // updatedSlotContent will be undefined if pokemon was moved from this slot
       // and the slot was left empty
@@ -321,6 +322,10 @@ export class G3SAV extends OfficialSAV<PK3> {
       sector.writeToBuffer(this.primarySave.bytes, i + 5, this.primarySave.firstSectorIndex)
     })
     this.bytes.set(this.primarySave.bytes, this.primarySaveOffset)
+  }
+
+  convertOhpkm(ohpkm: OHPKM): PK3 {
+    return new PK3(ohpkm)
   }
 
   supportsMon(dexNumber: number, formeNumber: number) {

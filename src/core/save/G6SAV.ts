@@ -7,6 +7,7 @@ import { utf16BytesToString } from '@openhome-core/save/util/Strings/StringConve
 import { Gender, OriginGame } from '@pkm-rs/pkg'
 import { PK6 } from '@pokemon-files/pkm'
 import { OhpkmTracker } from '../../tracker'
+import { OHPKM } from '../pkm/OHPKM'
 import { Box, OfficialSAV, SaveMonLocation } from './interfaces'
 import { PathData } from './util/path'
 
@@ -83,7 +84,7 @@ export abstract class G6SAV extends OfficialSAV<PK6> {
           const mon = new PK6(monData.buffer, true)
 
           if (mon.gameOfOrigin !== 0 && mon.dexNum !== 0) {
-            this.boxes[box].pokemon[monIndex] = tracker.wrapWithIdentifier(mon)
+            this.boxes[box].boxSlots[monIndex] = tracker.wrapWithIdentifier(mon)
           }
         } catch (e) {
           console.error(e)
@@ -94,7 +95,7 @@ export abstract class G6SAV extends OfficialSAV<PK6> {
 
   prepareForSaving() {
     this.updatedBoxSlots.forEach(({ box, index }) => {
-      const updatedSlotContent = this.boxes[box].pokemon[index]
+      const updatedSlotContent = this.boxes[box].boxSlots[index]
       const writeIndex = this.getPcOffset() + BOX_SIZE * box + 232 * index
 
       // updatedSlotContent will be undefined if pokemon was moved from this slot
@@ -117,6 +118,10 @@ export abstract class G6SAV extends OfficialSAV<PK6> {
       }
     })
     this.bytes.set(uint16ToBytesLittleEndian(this.calculatePcChecksum()), this.pcChecksumOffset)
+  }
+
+  convertOhpkm(ohpkm: OHPKM): PK6 {
+    return new PK6(ohpkm)
   }
 
   abstract supportsMon(dexNumber: number, formeNumber: number): boolean

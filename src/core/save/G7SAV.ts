@@ -8,6 +8,7 @@ import { utf16BytesToString } from '@openhome-core/save/util/Strings/StringConve
 import { Gender, OriginGame } from '@pkm-rs/pkg'
 import { PK7 } from '@pokemon-files/pkm'
 import { OhpkmTracker } from '../../tracker'
+import { OHPKM } from '../pkm/OHPKM'
 import { Box, OfficialSAV, SaveMonLocation } from './interfaces'
 import { SIZE_USUM } from './util'
 import { PathData } from './util/path'
@@ -87,7 +88,7 @@ export abstract class G7SAV extends OfficialSAV<PK7> {
           const mon = new PK7(monData.buffer, true)
 
           if (mon.gameOfOrigin !== 0 && mon.dexNum !== 0) {
-            this.boxes[box].pokemon[monIndex] = tracker.wrapWithIdentifier(mon)
+            this.boxes[box].boxSlots[monIndex] = tracker.wrapWithIdentifier(mon)
           }
         } catch (e) {
           console.error(e)
@@ -103,7 +104,7 @@ export abstract class G7SAV extends OfficialSAV<PK7> {
   prepareForSaving() {
     this.updatedBoxSlots.forEach(({ box, index }) => {
       const writeIndex = this.getPcOffset() + BOX_SIZE * box + 232 * index
-      const updatedSlotContent = this.boxes[box].pokemon[index]
+      const updatedSlotContent = this.boxes[box].boxSlots[index]
       if (!updatedSlotContent) {
         // mon was moved from this now-empty slot
         this.bytes.set(emptyBoxSlotBytes(), writeIndex)
@@ -122,6 +123,10 @@ export abstract class G7SAV extends OfficialSAV<PK7> {
     })
     this.bytes.set(uint16ToBytesLittleEndian(this.calculatePcChecksum()), this.pcChecksumOffset)
     this.bytes = SignWithMemeCrypto(this.bytes)
+  }
+
+  convertOhpkm(ohpkm: OHPKM): PK7 {
+    return new PK7(ohpkm)
   }
 
   abstract supportsMon(dexNumber: number, formeNumber: number): boolean

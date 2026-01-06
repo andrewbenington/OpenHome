@@ -3,17 +3,18 @@ import { SaveRef } from '@openhome-core/util/types'
 import { Gender, getPluginColor, OriginGame, OriginGames } from '@pkm-rs/pkg'
 import { isTracked, MaybeTracked } from '../../tracker'
 import { OhpkmIdentifier } from '../pkm/Lookup'
+import { OHPKM } from '../pkm/OHPKM'
 import { filterUndefined as notNull } from '../util/sort'
 import { PathData } from './util/path'
 
 type SparseArray<T> = (T | undefined)[]
 export class Box<P extends PKMInterface> {
   name: string | undefined
-  pokemon: SparseArray<MaybeTracked<P, OhpkmIdentifier>>
+  boxSlots: SparseArray<MaybeTracked<P>>
 
   constructor(name: string, boxSize: number) {
     this.name = name
-    this.pokemon = new Array(boxSize)
+    this.boxSlots = new Array(boxSize)
   }
 }
 
@@ -71,6 +72,7 @@ export interface BaseSAV<P extends PKMInterface = PKMInterface> {
   prepareWriter: () => SaveWriter
 
   getDisplayData(): Record<string, string | number | undefined> | undefined
+  convertOhpkm(ohpkm: OHPKM): P
 }
 
 export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> implements BaseSAV<P> {
@@ -95,6 +97,7 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
   abstract supportsMon(dexNumber: number, formeNumber: number): boolean
   abstract supportsItem(itemIndex: number): boolean
   abstract prepareForSaving(): void
+  abstract convertOhpkm(ohpkm: OHPKM): P
 
   prepareWriter(): SaveWriter {
     this.prepareForSaving()
@@ -106,7 +109,7 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
 
   getTrackedMonIdentifiers(): OhpkmIdentifier[] {
     return this.updatedBoxSlots
-      .map(({ box, index }) => this.boxes[box].pokemon[index])
+      .map(({ box, index }) => this.boxes[box].boxSlots[index])
       .filter(notNull)
       .filter(isTracked)
       .map((slot) => slot.identifier)
@@ -160,6 +163,7 @@ export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implement
   abstract supportsItem(itemIndex: number): boolean
   abstract getSlotMetadata?: ((boxNum: number, boxSlot: number) => SlotMetadata) | undefined
   abstract prepareForSaving(): void
+  abstract convertOhpkm(ohpkm: OHPKM): P
 
   prepareWriter(): SaveWriter {
     this.prepareForSaving()
@@ -171,7 +175,7 @@ export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implement
 
   getTrackedMonIdentifiers(): OhpkmIdentifier[] {
     return this.updatedBoxSlots
-      .map(({ box, index }) => this.boxes[box].pokemon[index])
+      .map(({ box, index }) => this.boxes[box].boxSlots[index])
       .filter(notNull)
       .filter(isTracked)
       .map((slot) => slot.identifier)

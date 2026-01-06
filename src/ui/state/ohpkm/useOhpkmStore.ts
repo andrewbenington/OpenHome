@@ -1,18 +1,24 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { Errorable, R, Result } from '@openhome-core/util/functional'
 import { useContext } from 'react'
+import { PKMInterface } from '../../../core/pkm/interfaces'
 import { OhpkmIdentifier } from '../../../core/pkm/Lookup'
+import { isTracked, MaybeTracked, OhpkmTracker } from '../../../tracker'
 import { OhpkmStoreContext } from './reducer'
 
 export type OhpkmStore = {
   reloadStore: () => Promise<Errorable<OhpkmLookup>>
   getById(id: string): OHPKM | undefined
+  loadOhpkmIfTracked<P extends PKMInterface>(
+    maybeTracked: MaybeTracked<P> | undefined
+  ): OHPKM | P | undefined
   tryLoadFromId(id: OhpkmIdentifier): Result<OHPKM, IdentifierNotPresentError>
   tryLoadFromIds(ids: OhpkmIdentifier[]): Result<OHPKM, IdentifierNotPresentError>[]
   monIsStored(id: string): boolean
   overwrite(mon: OHPKM): void
   getAllStored: () => OHPKM[]
   setSaving(): void
+  tracker: OhpkmTracker
 }
 
 export type OhpkmLookup = (id: string) => OHPKM | undefined
@@ -34,6 +40,14 @@ export function useOhpkmStore(): OhpkmStore {
 
   function getById(id: string): OHPKM | undefined {
     return monsById[id]
+  }
+
+  function loadOhpkmIfTracked<P extends PKMInterface>(
+    maybeTracked: MaybeTracked<P> | undefined
+  ): OHPKM | P | undefined {
+    if (!maybeTracked) return undefined
+    if (!isTracked(maybeTracked)) return maybeTracked.data
+    return getById(maybeTracked.identifier) ?? maybeTracked.data
   }
 
   function tryLoadFromId(id: string): Result<OHPKM, IdentifierNotPresentError> {
@@ -68,19 +82,23 @@ export function useOhpkmStore(): OhpkmStore {
     )
   }
 
+  const tracker = new OhpkmTracker(monsById, ohpkmStore.lookups)
+
   return {
     reloadStore: reloadAndReturnLookup,
     getById,
+    loadOhpkmIfTracked,
     tryLoadFromId,
     tryLoadFromIds,
     monIsStored,
     overwrite,
     getAllStored,
     setSaving,
+    tracker,
   }
 }
 
-type IdentifierNotPresentError = { identifier: OhpkmIdentifier }
+export type IdentifierNotPresentError = { identifier: OhpkmIdentifier }
 
 function IdentifierNotPresent(identifier: OhpkmIdentifier): IdentifierNotPresentError {
   return { identifier }

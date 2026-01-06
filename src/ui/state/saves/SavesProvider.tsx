@@ -71,7 +71,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
     // Write appropriate trainer data to handler fields
     for (const save of allOpenSaves) {
       save.boxes.forEach((box) =>
-        box.pokemon.forEach((mon) => {
+        box.boxSlots.forEach((mon) => {
           if (mon instanceof OHPKM) {
             mon.tradeToSave(save)
           }

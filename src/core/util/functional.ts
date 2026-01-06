@@ -22,6 +22,10 @@ export function range(startOrSize: number, end?: number) {
   return end ? [...Array(end).keys()].slice(startOrSize) : [...Array(startOrSize).keys()]
 }
 
+export function matches<T>(value: T) {
+  return (other: T | undefined) => other === value
+}
+
 // remove this after node 22 is lts
 if (!Set.prototype.intersection) {
   Set.prototype.intersection = function (other) {

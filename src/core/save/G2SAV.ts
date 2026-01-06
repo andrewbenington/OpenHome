@@ -7,8 +7,9 @@ import { EXCLAMATION } from '@pokemon-resources/consts/Formes'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { GEN2_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
 import { EmptyTracker, OhpkmTracker } from '../../tracker'
+import { OHPKM } from '../pkm/OHPKM'
 import { Box, OfficialSAV, SaveMonLocation } from './interfaces'
-import { LOOKUP_TYPE } from './util'
+import { LookupType } from './util'
 import { emptyPathData, PathData } from './util/path'
 
 const CURRENT_BOX_OFFSET_GS_INTL = 0x2724
@@ -20,7 +21,7 @@ export class G2SAV extends OfficialSAV<PK2> {
   boxOffsets: number[]
 
   static transferRestrictions = GEN2_TRANSFER_RESTRICTIONS
-  static lookupType: LOOKUP_TYPE = 'gen12'
+  static lookupType: LookupType = 'gen12'
 
   origin: OriginGame = OriginGame.Gold
   isPlugin: false = false
@@ -109,7 +110,7 @@ export class G2SAV extends OfficialSAV<PK2> {
         )
         mon.gameOfOrigin = mon.metLevel ? OriginGame.Crystal : this.origin
         mon.language = Language.English
-        this.boxes[boxNumber].pokemon[monIndex] = tracker.wrapWithIdentifier(mon)
+        this.boxes[boxNumber].boxSlots[monIndex] = tracker.wrapWithIdentifier(mon, G2SAV.lookupType)
       }
     })
   }
@@ -129,7 +130,7 @@ export class G2SAV extends OfficialSAV<PK2> {
       // functions as an index, to skip empty slots
       let numMons = 0
 
-      box.pokemon.forEach((boxMon) => {
+      box.boxSlots.forEach((boxMon) => {
         if (boxMon) {
           const pk2Mon = boxMon.data
 
@@ -206,6 +207,10 @@ export class G2SAV extends OfficialSAV<PK2> {
         this.bytes[0x1f0d] = this.getCrystalInternationalChecksum2()
         break
     }
+  }
+
+  convertOhpkm(ohpkm: OHPKM): PK2 {
+    return new PK2(ohpkm)
   }
 
   areGoldSilverChecksumsValid() {

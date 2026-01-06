@@ -73,7 +73,7 @@ describe('gen 8 save files', () => {
     expect(swordSave.currentPCBox).toBe(15)
     expect(swordSave.boxes[17].name).toBe('huevos sorpresa')
 
-    const flapple = swordSave.boxes[1].pokemon[3]
+    const flapple = swordSave.boxes[1].boxSlots[3]
 
     expect(flapple?.nickname).toBe('Flapple')
     expect(flapple?.canGigantamax).toBe(true)
@@ -129,14 +129,14 @@ describe('gen 8 save files', () => {
 
     expect(decrypted.name).toBe(swordSave.name)
 
-    const flapple = decrypted.boxes[1].pokemon[3]
+    const flapple = decrypted.boxes[1].boxSlots[3]
 
     expect(flapple?.nickname).toBe('Flapple')
     expect(flapple?.canGigantamax).toBe(true)
     expect(flapple?.ball).toBe(Ball.Premier)
     expect(flapple?.getLevel()).toBe(100)
 
-    const mon = swordSave.boxes[1].pokemon[3]
+    const mon = swordSave.boxes[1].boxSlots[3]
 
     if (!mon) {
       throw new Error('Expected mon not found')
@@ -145,18 +145,18 @@ describe('gen 8 save files', () => {
     const ohpkm = new OHPKM(mon)
 
     ohpkm.nickname = 'NEW NAME'
-    swordSave.boxes[1].pokemon[3] = ohpkm
+    swordSave.boxes[1].boxSlots[3] = ohpkm
     swordSave.updatedBoxSlots.push({ box: 1, index: 3 })
 
     swordSave.prepareBoxesAndGetModified()
     const modified = new SwShSAV(swordPath, swordSave.bytes)
-    const modifiedFlapple = modified.boxes[1].pokemon[3]
+    const modifiedFlapple = modified.boxes[1].boxSlots[3]
 
     expect(modifiedFlapple?.nickname).toBe('NEW NAME')
   })
 
   test('sword save boxes', () => {
-    const mon = swordSave.boxes[1].pokemon[3]
+    const mon = swordSave.boxes[1].boxSlots[3]
 
     if (!mon) {
       throw new Error('Expected mon not found')
@@ -165,19 +165,19 @@ describe('gen 8 save files', () => {
     const ohpkm = new OHPKM(mon)
 
     ohpkm.nickname = 'NEW NAME'
-    swordSave.boxes[1].pokemon[3] = ohpkm
+    swordSave.boxes[1].boxSlots[3] = ohpkm
     swordSave.updatedBoxSlots.push({ box: 1, index: 3 })
 
     swordSave.prepareBoxesAndGetModified()
     const modified = new SwShSAV(swordPath, swordSave.bytes)
-    const modifiedFlapple = modified.boxes[1].pokemon[3]
+    const modifiedFlapple = modified.boxes[1].boxSlots[3]
 
     expect(modifiedFlapple?.nickname).toBe('NEW NAME')
     expect(SwishCrypto.getIsHashValid(swordSave.bytes)).toBe(true)
   })
 
   test('legends arceus save boxes', () => {
-    const mon = arceusSave.boxes[13].pokemon[1]
+    const mon = arceusSave.boxes[13].boxSlots[1]
 
     if (!mon) {
       throw new Error('Expected mon not found')
@@ -187,20 +187,20 @@ describe('gen 8 save files', () => {
     const ohpkm = new OHPKM(mon)
 
     ohpkm.nickname = 'NEW NAME'
-    arceusSave.boxes[13].pokemon[1] = ohpkm
+    arceusSave.boxes[13].boxSlots[1] = ohpkm
     arceusSave.updatedBoxSlots.push({ box: 13, index: 1 })
 
-    arceusSave.boxes[2].pokemon[8] = new OHPKM(magmortar)
+    arceusSave.boxes[2].boxSlots[8] = new OHPKM(magmortar)
     arceusSave.updatedBoxSlots.push({ box: 2, index: 8 })
 
     arceusSave.prepareBoxesAndGetModified()
     const modified = new LASAV(arceusPath, arceusSave.bytes)
-    const modifiedDecidueye = modified.boxes[13].pokemon[1]
+    const modifiedDecidueye = modified.boxes[13].boxSlots[1]
 
     expect(modifiedDecidueye?.nickname).toBe('NEW NAME')
     expect(SwishCrypto.getIsHashValid(arceusSave.bytes)).toBe(true)
 
-    const modifiedMagmortar = modified.boxes[2].pokemon[8]
+    const modifiedMagmortar = modified.boxes[2].boxSlots[8]
 
     expect(modifiedMagmortar?.nickname).toBe('MAGMORTAR')
   })

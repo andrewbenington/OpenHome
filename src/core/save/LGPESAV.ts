@@ -7,6 +7,7 @@ import { Item } from '@pokemon-resources/consts/Items'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { LGPE_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
 import { OhpkmTracker } from '../../tracker'
+import { OHPKM } from '../pkm/OHPKM'
 import { CRC16_NoInvert } from './encryption/Encryption'
 import { Box, OfficialSAV, SaveMonLocation, SlotMetadata } from './interfaces'
 import { bytesToUint16LittleEndian, bytesToUint32LittleEndian } from './util/byteLogic'
@@ -108,7 +109,7 @@ export class LGPESAV extends OfficialSAV<PB7> {
         const displayBoxSlot = monIndex % 30
 
         if (mon !== null) {
-          this.boxes[displayBoxNum].pokemon[displayBoxSlot] = tracker.wrapWithIdentifier(mon)
+          this.boxes[displayBoxNum].boxSlots[displayBoxSlot] = tracker.wrapWithIdentifier(mon)
         }
       } catch (e) {
         console.error(e)
@@ -118,7 +119,7 @@ export class LGPESAV extends OfficialSAV<PB7> {
 
   prepareForSaving() {
     this.updatedBoxSlots.forEach(({ box, index }) => {
-      const updatedSlotContent = this.boxes[box].pokemon[index]
+      const updatedSlotContent = this.boxes[box].boxSlots[index]
 
       const monIndex = 30 * box + index
 
@@ -177,6 +178,10 @@ export class LGPESAV extends OfficialSAV<PB7> {
     this.bytes.set(storageBufferCopy, PC_OFFSET)
 
     return nextEmptyIndex
+  }
+
+  convertOhpkm(ohpkm: OHPKM): PB7 {
+    return new PB7(ohpkm)
   }
 
   getMonAtIndex(monIndex: number) {
@@ -253,7 +258,7 @@ export class LGPESAV extends OfficialSAV<PB7> {
       }
     }
 
-    const mon = this.boxes[boxNum].pokemon[boxSlot]?.data
+    const mon = this.boxes[boxNum].boxSlots[boxSlot]?.data
 
     if (
       (mon?.dexNum === NationalDex.Pikachu && mon.formeNum === LGP_STARTER) ||

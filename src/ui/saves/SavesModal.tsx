@@ -65,6 +65,7 @@ function useOpenSaveHandler(onClose?: () => void) {
           gen345LookupMap: lookups.gen345,
         },
         saveType,
+        ohpkmStore.tracker,
         (updatedMon) => {
           const identifier = getMonFileIdentifier(updatedMon)
 
@@ -89,7 +90,15 @@ function useOpenSaveHandler(onClose?: () => void) {
         onClose?.()
       }
     },
-    [getLookups, ohpkmStore.getById, displayError, backend, savesAndBanks, onClose]
+    [
+      getLookups,
+      ohpkmStore.getById,
+      ohpkmStore.tracker,
+      displayError,
+      backend,
+      savesAndBanks,
+      onClose,
+    ]
   )
 
   const pickSaveFile = useCallback(
@@ -309,7 +318,8 @@ function SelectSaveType({ open, saveTypes, onSelect }: SelectSaveTypeProps) {
 function pokedexSeenFromSave(saveFile: SAV) {
   const pokedexUpdates: PokedexUpdate[] = []
 
-  for (const mon of saveFile.boxes.flatMap((box) => box.pokemon).filter(filterUndefined)) {
+  for (const boxSlot of saveFile.boxes.flatMap((box) => box.boxSlots).filter(filterUndefined)) {
+    const mon = boxSlot.data
     pokedexUpdates.push({
       dexNumber: mon.dexNum,
       formeNumber: mon.formeNum,

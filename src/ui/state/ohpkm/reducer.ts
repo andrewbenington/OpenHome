@@ -1,6 +1,7 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { Errorable, R } from '@openhome-core/util/functional'
 import { createContext, Dispatch, Reducer } from 'react'
+import { StoredLookups } from '../../backend/backendInterface'
 
 export type OhpkmStoreData = Record<string, OHPKM>
 
@@ -9,11 +10,13 @@ export type OhpkmStoreStateInternal = {
 } & (
   | {
       homeMons: OhpkmStoreData
+      lookups: StoredLookups
       saving: boolean
       loaded: true
     }
   | {
       homeMons?: OhpkmStoreData
+      lookups?: StoredLookups
       saving: false
       loaded: false
     }
@@ -23,6 +26,10 @@ export type OhpkmStoreAction =
   | {
       type: 'load_persisted_pkm_data'
       payload: OhpkmStoreData
+    }
+  | {
+      type: 'load_lookups'
+      payload: StoredLookups
     }
   | {
       type: 'set_error'
@@ -52,7 +59,45 @@ export const ohpkmStoreReducer: Reducer<OhpkmStoreStateInternal, OhpkmStoreActio
     }
     case 'load_persisted_pkm_data': {
       const homeMons: Record<string, OHPKM> = payload
-      const newState: OhpkmStoreStateInternal = { ...state, homeMons, loaded: true, saving: false }
+      let newState: OhpkmStoreStateInternal
+      if (state.lookups) {
+        newState = {
+          ...state,
+          homeMons,
+          loaded: true,
+          saving: false,
+          lookups: state.lookups,
+        }
+      } else {
+        newState = {
+          ...state,
+          homeMons,
+          loaded: false,
+          saving: false,
+        }
+      }
+
+      return newState
+    }
+    case 'load_lookups': {
+      const lookups = payload
+      let newState: OhpkmStoreStateInternal
+      if (state.homeMons) {
+        newState = {
+          ...state,
+          lookups,
+          loaded: true,
+          saving: false,
+          homeMons: state.homeMons,
+        }
+      } else {
+        newState = {
+          ...state,
+          lookups,
+          loaded: false,
+          saving: false,
+        }
+      }
 
       return newState
     }

@@ -9,8 +9,9 @@ import { unique } from '@openhome-core/util/functional'
 import { Gender, OriginGame } from '@pkm-rs/pkg'
 import { PK5 } from '@pokemon-files/pkm'
 import { OhpkmTracker } from '../../tracker'
+import { OHPKM } from '../pkm/OHPKM'
 import { Box, OfficialSAV, SaveMonLocation } from './interfaces'
-import { hasDesamumeFooter, LOOKUP_TYPE } from './util'
+import { hasDesamumeFooter, LookupType } from './util'
 import { PathData } from './util/path'
 
 const PC_OFFSET = 0x400
@@ -22,7 +23,7 @@ export abstract class G5SAV extends OfficialSAV<PK5> {
   static BOX_COUNT = 24
   static pkmType = PK5
   static SAVE_SIZE_BYTES = 0x80000
-  static lookupType: LOOKUP_TYPE = 'gen345'
+  static lookupType: LookupType = 'gen345'
 
   static saveTypeAbbreviation = 'BW/BW2'
   static saveTypeID = 'G5SAV'
@@ -101,7 +102,7 @@ export abstract class G5SAV extends OfficialSAV<PK5> {
           const mon = new PK5(monData.buffer, true)
 
           if (mon.gameOfOrigin !== 0 && mon.dexNum !== 0) {
-            this.boxes[box].pokemon[monIndex] = tracker.wrapWithIdentifier(mon)
+            this.boxes[box].boxSlots[monIndex] = tracker.wrapWithIdentifier(mon)
           }
         } catch (e) {
           console.error(e)
@@ -143,7 +144,7 @@ export abstract class G5SAV extends OfficialSAV<PK5> {
 
   prepareForSaving() {
     this.updatedBoxSlots.forEach(({ box, index }) => {
-      const updatedSlotContent = this.boxes[box].pokemon[index]
+      const updatedSlotContent = this.boxes[box].boxSlots[index]
 
       const writeIndex = PC_OFFSET + BOX_SIZE * box + 136 * index
 
@@ -168,6 +169,10 @@ export abstract class G5SAV extends OfficialSAV<PK5> {
       this.updateBoxChecksum(boxIndex)
     )
     this.updateMirrorsChecksum()
+  }
+
+  convertOhpkm(ohpkm: OHPKM): PK5 {
+    return new PK5(ohpkm)
   }
 
   abstract supportsMon(dexNumber: number, formeNumber: number): boolean

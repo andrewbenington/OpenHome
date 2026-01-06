@@ -18,6 +18,7 @@ import { Button, Card, Dialog, Flex, Grid } from '@radix-ui/themes'
 
 import { useContext, useMemo, useState } from 'react'
 import { MdClose } from 'react-icons/md'
+import { isTracked } from 'src/tracker'
 import useDragAndDrop from '../../state/drag-and-drop/useDragAndDrop'
 import { buildBackwardNavigator, buildForwardNavigator } from '../util'
 import ArrowButton from './ArrowButton'
@@ -49,11 +50,11 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   )
 
   const selectedMon = useMemo(() => {
-    if (!currentBox || selectedIndex === undefined || selectedIndex >= currentBox.pokemon.length) {
+    if (!currentBox || selectedIndex === undefined || selectedIndex >= currentBox.boxSlots.length) {
       return undefined
     }
-    return currentBox.pokemon[selectedIndex]
-  }, [currentBox, selectedIndex])
+    return ohpkmStore.loadOhpkmIfTracked(currentBox.boxSlots[selectedIndex])
+  }, [currentBox, ohpkmStore, selectedIndex])
 
   const attemptImportMons = (mons: PKMInterface[], location: MonLocation) => {
     const unsupportedMons = mons.filter((mon) => !save.supportsMon(mon.dexNum, mon.formeNum))
@@ -78,8 +79,8 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
 
         if (!identifier) continue
 
-        const inCurrentBox = save.boxes[save.currentPCBox].pokemon.some(
-          (mon) => mon && mon.identifier === identifier
+        const inCurrentBox = save.boxes[save.currentPCBox].boxSlots.some(
+          (mon) => mon && isTracked(mon) && mon.identifier === identifier
         )
 
         if (!ALLOW_DUPE_IMPORT && (ohpkmStore.monIsStored(identifier) || inCurrentBox)) {
@@ -156,7 +157,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
           </div>
           <Grid columns={save.boxColumns.toString()} gap="1" p="1">
             {range(save.boxColumns * save.boxRows)
-              .map((index: number) => currentBox?.pokemon?.[index])
+              .map((index: number) => currentBox?.boxSlots?.[index])
               .map((mon, index) => (
                 <BoxCell
                   onClick={() => setSelectedIndex(index)}
@@ -172,7 +173,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                     isDisabled || save.getSlotMetadata?.(save.currentPCBox, index)?.isDisabled
                   }
                   disabledReason={save.getSlotMetadata?.(save.currentPCBox, index)?.disabledReason}
-                  mon={mon?.data}
+                  mon={ohpkmStore.loadOhpkmIfTracked(mon)}
                   zIndex={1}
                   onDrop={(importedMons) => {
                     if (importedMons) {
@@ -237,7 +238,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
       </Flex>
       <Fallback>
         <PokemonDetailsModal
-          mon={selectedMon?.data}
+          mon={selectedMon}
           onClose={() => setSelectedIndex(undefined)}
           navigateRight={navigateRight}
           navigateLeft={navigateLeft}
@@ -248,7 +249,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                   columns: save.boxColumns,
                   rows: save.boxRows,
                   emptyIndexes: range(save.boxColumns * save.boxRows).filter(
-                    (index) => !currentBox?.pokemon?.[index]
+                    (index) => !currentBox?.boxSlots?.[index]
                   ),
                 }
               : undefined

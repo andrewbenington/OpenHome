@@ -1,6 +1,6 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { PathData, PossibleSaves } from '@openhome-core/save/util/path'
-import { SaveFolder } from '@openhome-core/save/util/storage'
+import { SaveFolder, StoredBankData } from '@openhome-core/save/util/storage'
 import { Errorable, R } from '@openhome-core/util/functional'
 import { JSONObject, LoadSaveResponse, SaveRef } from '@openhome-core/util/types'
 import BackendInterface, {
@@ -16,7 +16,7 @@ import { open as fileDialog, save } from '@tauri-apps/plugin-dialog'
 import { FileInfo, readFile, stat } from '@tauri-apps/plugin-fs'
 import { platform } from '@tauri-apps/plugin-os'
 import dayjs from 'dayjs'
-import { Commands } from './tauriInvoker'
+import { Commands, StoredBankDataSerialized } from './tauriInvoker'
 import { isRustErr } from './types'
 
 async function pathDataFromRaw(raw: string): Promise<PathData> {
@@ -71,8 +71,8 @@ export const TauriBackend: BackendInterface = {
   },
 
   /* openhome boxes */
-  loadHomeBanks: Commands.load_banks,
-  writeHomeBanks: Commands.write_banks,
+  loadHomeBanks: () => Commands.load_banks().then(R.map(deserializeBankData)),
+  writeHomeBanks: (bankData: StoredBankData) => Commands.write_banks(serializeBankData(bankData)),
 
   /* game saves */
   loadSaveFile: async (pathData: PathData): Promise<Errorable<LoadSaveResponse>> => {
@@ -325,4 +325,34 @@ function buildOhpkmMap(bytesByFilename: Record<string, number[]>) {
       new OHPKM(new Uint8Array(bytes)),
     ])
   )
+}
+
+function deserializeBankData(data: StoredBankDataSerialized): StoredBankData {
+  return {
+    ...data,
+    banks: data.banks.map((bank) => ({
+      ...bank,
+      boxes: bank.boxes.map((box) => ({
+        ...box,
+        identifiers: new Map(
+          Object.entries(box.identifiers).map(
+            ([indexStr, identifier]) => [parseInt(indexStr), identifier] as const
+          )
+        ),
+      })),
+    })),
+  }
+}
+
+function serializeBankData(data: StoredBankData): StoredBankDataSerialized {
+  return {
+    ...data,
+    banks: data.banks.map((bank) => ({
+      ...bank,
+      boxes: bank.boxes.map((box) => ({
+        ...box,
+        identifiers: Object.fromEntries(box.identifiers.entries()),
+      })),
+    })),
+  }
 }

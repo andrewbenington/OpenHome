@@ -8,6 +8,7 @@ import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { R } from '@openhome-core/util/functional'
 import { OhpkmLookup } from '@openhome-ui/state/ohpkm'
 import { SAVClass } from '.'
+import { OhpkmTracker } from '../../../tracker'
 import { Errorable } from '../../util/functional'
 import { SAV } from '../interfaces'
 import { PathData } from './path'
@@ -26,10 +27,10 @@ const recoverOHPKMData = (
     return saveFile
   }
   saveFile.boxes.forEach((box) => {
-    box.pokemon.forEach((mon, monIndex) => {
+    box.boxSlots.forEach((mon) => {
       if (mon) {
         try {
-          const lookupIdentifier = getIdentifier(mon)
+          const lookupIdentifier = getIdentifier(mon.data)
 
           if (!lookupIdentifier) return
           const homeIdentifier = lookupMap ? lookupMap[lookupIdentifier] : lookupIdentifier
@@ -38,11 +39,8 @@ const recoverOHPKMData = (
           const storedOhpkm = getOhpkmById?.(homeIdentifier)
 
           if (storedOhpkm) {
-            storedOhpkm.syncWithGameData(mon, saveFile)
-            if (updateMonCallback) {
-              updateMonCallback(storedOhpkm)
-            }
-            box.pokemon[monIndex] = storedOhpkm
+            storedOhpkm.syncWithGameData(mon.data, saveFile)
+            updateMonCallback?.(storedOhpkm)
           }
         } catch (e) {
           console.error('Error recovering OHPKM data for mon:', mon, e)
@@ -71,6 +69,7 @@ export const buildUnknownSaveFile = (
   fileBytes: Uint8Array,
   lookupMaps: MonLookup,
   supportedSaveTypes: SAVClass[],
+  tracker: OhpkmTracker,
   updateMonCallback?: (mon: OHPKM) => void
 ): Errorable<SAV | undefined> => {
   const saveTypes = getPossibleSaveTypes(fileBytes, supportedSaveTypes)
@@ -87,7 +86,7 @@ export const buildUnknownSaveFile = (
 
   if (!saveType) return R.Ok(undefined)
 
-  return buildSaveFile(filePath, fileBytes, lookupMaps, saveType, updateMonCallback)
+  return buildSaveFile(filePath, fileBytes, lookupMaps, saveType, tracker, updateMonCallback)
 }
 
 export const buildSaveFile = (
@@ -95,6 +94,7 @@ export const buildSaveFile = (
   fileBytes: Uint8Array,
   lookupMaps: MonLookup,
   saveType: SAVClass,
+  tracker: OhpkmTracker,
   updateMonCallback?: (mon: OHPKM) => void
 ): Errorable<SAV | undefined> => {
   const { getOhpkmById, gen12LookupMap, gen345LookupMap } = lookupMaps
@@ -115,7 +115,7 @@ export const buildSaveFile = (
 
   try {
     const saveFile = recoverOHPKMData(
-      new saveType(filePath, fileBytes),
+      new saveType(filePath, fileBytes, tracker),
       getIdentifier as (_: PKMInterface) => string | undefined,
       getOhpkmById,
       lookupMap,

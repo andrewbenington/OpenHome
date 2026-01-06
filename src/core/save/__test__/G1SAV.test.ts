@@ -36,10 +36,10 @@ beforeAll(() => {
 })
 
 test('pc box decoded correctly', () => {
-  expect(blueSaveFile.boxes[7].pokemon[0]?.nickname).toEqual('KABUTOPS')
-  expect(blueSaveFile.boxes[7].pokemon[1]?.nickname).toEqual('AERODACTYL')
-  expect(blueSaveFile.boxes[7].pokemon[9]?.nickname).toEqual('MEWTWO')
-  expect(blueSaveFile.boxes[7].pokemon[10]?.nickname).toEqual('MEW')
+  expect(blueSaveFile.boxes[7].boxSlots[0]?.nickname).toEqual('KABUTOPS')
+  expect(blueSaveFile.boxes[7].boxSlots[1]?.nickname).toEqual('AERODACTYL')
+  expect(blueSaveFile.boxes[7].boxSlots[9]?.nickname).toEqual('MEWTWO')
+  expect(blueSaveFile.boxes[7].boxSlots[10]?.nickname).toEqual('MEW')
 })
 
 test('removing mon shifts others in box', () => {
@@ -53,7 +53,7 @@ test('removing mon shifts others in box', () => {
 
   const modifiedSaveFile1 = result1.value as G1SAV
 
-  modifiedSaveFile1.boxes[7].pokemon[0] = undefined
+  modifiedSaveFile1.boxes[7].boxSlots[0] = undefined
   modifiedSaveFile1.updatedBoxSlots.push({ box: 7, index: 0 })
   modifiedSaveFile1.prepareBoxesAndGetModified()
 
@@ -67,9 +67,9 @@ test('removing mon shifts others in box', () => {
 
   const modifiedSaveFile2 = result2.value as G1SAV
 
-  expect(modifiedSaveFile2.boxes[7].pokemon[0]?.nickname).toEqual('AERODACTYL')
-  expect(modifiedSaveFile2.boxes[7].pokemon[9]?.nickname).toEqual('MEW')
-  expect(modifiedSaveFile2.boxes[7].pokemon[10]).toEqual(undefined)
+  expect(modifiedSaveFile2.boxes[7].boxSlots[0]?.nickname).toEqual('AERODACTYL')
+  expect(modifiedSaveFile2.boxes[7].boxSlots[9]?.nickname).toEqual('MEW')
+  expect(modifiedSaveFile2.boxes[7].boxSlots[10]).toEqual(undefined)
 })
 
 test('inserting mon works', () => {
@@ -82,7 +82,7 @@ test('inserting mon works', () => {
   }
   const modifiedSaveFile1 = result1.value as G1SAV
 
-  modifiedSaveFile1.boxes[7].pokemon[11] = new PK1(slowbroOH)
+  modifiedSaveFile1.boxes[7].boxSlots[11] = new PK1(slowbroOH)
   modifiedSaveFile1.updatedBoxSlots.push({ box: 7, index: 0 })
   modifiedSaveFile1.prepareBoxesAndGetModified()
 
@@ -96,7 +96,7 @@ test('inserting mon works', () => {
 
   const modifiedSaveFile2 = result2.value as G1SAV
 
-  expect(modifiedSaveFile2.boxes[7].pokemon[0]?.nickname).toEqual('KABUTOPS')
-  expect(modifiedSaveFile2.boxes[7].pokemon[10]?.nickname).toEqual('MEW')
-  expect(modifiedSaveFile2.boxes[7].pokemon[11]?.nickname).toEqual('Slowbro')
+  expect(modifiedSaveFile2.boxes[7].boxSlots[0]?.nickname).toEqual('KABUTOPS')
+  expect(modifiedSaveFile2.boxes[7].boxSlots[10]?.nickname).toEqual('MEW')
+  expect(modifiedSaveFile2.boxes[7].boxSlots[11]?.nickname).toEqual('Slowbro')
 })

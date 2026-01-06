@@ -69,12 +69,13 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
             gen12LookupMap: lookups.gen12,
             gen345LookupMap: lookups.gen345,
           },
-          getEnabledSaveTypes()
+          getEnabledSaveTypes(),
+          ohpkmStore.tracker
         )
       }
       return undefined
     },
-    [backend, getEnabledSaveTypes, getLookups, handleError, ohpkmStore.getById]
+    [backend, getEnabledSaveTypes, getLookups, handleError, ohpkmStore.getById, ohpkmStore.tracker]
   )
 
   useEffect(() => {

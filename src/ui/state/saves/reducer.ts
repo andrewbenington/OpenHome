@@ -5,37 +5,47 @@ import { getSortFunctionNullable, SortType } from '@openhome-core/pkm/sort'
 import { AddBoxLocation, HomeData } from '@openhome-core/save/HomeData'
 import { SAV } from '@openhome-core/save/interfaces'
 import { StoredBankData } from '@openhome-core/save/util/storage'
-import { Item } from '@pkm-rs/pkg'
+import { Item, OriginGame } from '@pkm-rs/pkg'
 import { createContext, Dispatch, Reducer } from 'react'
-import { OhpkmLookup } from '../ohpkm/useOhpkmStore'
 
 export type OpenSave = {
   index: number
   save: SAV
 }
+const Delimiter = '$' as const
 
-function saveToStringIdentifier(save: SAV): string {
-  return `${save.origin}$${save.tid}$${save.sid ?? 0}`
+type Delim = typeof Delimiter
+
+export type SaveIdentifier = `${OriginGame}${Delim}${number}${Delim}${number}`
+
+export function saveToStringIdentifier(save: SAV): SaveIdentifier {
+  return `${save.origin}${Delimiter}${save.tid}${Delimiter}${save.sid ?? 0}`
 }
 
 export type OpenSavesState = {
   modifiedOHPKMs: { [key: string]: OHPKM }
   monsToRelease: PKMInterface[]
-  openSaves: Record<string, OpenSave>
+  openSaves: Record<SaveIdentifier, OpenSave>
   homeData?: HomeData
   error?: string
 }
 
-export type HomeMonLocation = { is_home: true; bank: number; save?: undefined }
-export type SaveMonLocation = { is_home: false; bank?: undefined; save: SAV }
-
-export type MonLocation = {
+export type HomeMonLocation = {
   box: number
   box_slot: number
-} & (
-  | SaveMonLocation
-  | HomeMonLocation
-)
+  is_home: true
+  bank: number
+  save?: undefined
+}
+export type SaveMonLocation = {
+  box: number
+  box_slot: number
+  is_home: false
+  bank?: undefined
+  save: SAV
+}
+
+export type MonLocation = SaveMonLocation | HomeMonLocation
 
 export type MonWithLocation = MonLocation & {
   mon: PKMInterface
@@ -47,7 +57,7 @@ export type OpenSavesAction =
    */
   | {
       type: 'load_home_banks'
-      payload: { banks: StoredBankData; getMonById: OhpkmLookup }
+      payload: { banks: StoredBankData }
     }
   | {
       type: 'add_home_bank'
@@ -56,12 +66,11 @@ export type OpenSavesAction =
         boxCount: number
         currentCount: number
         switchToBank: boolean
-        getMonById: OhpkmLookup
       }
     }
   | {
       type: 'set_current_home_bank'
-      payload: { bank: number; getMonById: (id: string) => OHPKM | undefined }
+      payload: { bank: number }
     }
   | {
       type: 'set_home_bank_name'
@@ -76,11 +85,11 @@ export type OpenSavesAction =
     }
   | {
       type: 'sort_home_box'
-      payload: { boxIndex: number; sortType: SortType; getMonById: OhpkmLookup }
+      payload: { boxIndex: number; sortType: SortType }
     }
   | {
       type: 'sort_all_home_boxes'
-      payload: { sortType: SortType; getMonById: OhpkmLookup }
+      payload: { sortType: SortType }
     }
   | {
       type: 'home_box_remove_dupes'
@@ -159,6 +168,10 @@ export type OpenSavesAction =
       type: 'set_error'
       payload: string | undefined
     }
+  | {
+      type: 'set_home_data'
+      payload: HomeData
+    }
 
 const updateMonInSave = (
   state: OpenSavesState,
@@ -168,7 +181,7 @@ const updateMonInSave = (
   if (dest.is_home) {
     let replacedMon: OhpkmIdentifier | undefined
     if (state.homeData && (mon === undefined || typeof mon === 'string')) {
-      replacedMon = state.homeData.boxes[dest.box].pokemonIdentifiers[dest.box_slot]
+      replacedMon = state.homeData.boxes[dest.box].boxSlots[dest.box_slot]
       state.homeData.setPokemon(dest, mon)
     }
     return replacedMon
@@ -181,8 +194,8 @@ const updateMonInSave = (
   if (saveID in state.openSaves) {
     const tempSaves = { ...state.openSaves }
 
-    replacedMon = tempSaves[saveID].save.boxes[dest.box].pokemon[dest.box_slot]
-    tempSaves[saveID].save.boxes[dest.box].pokemon[dest.box_slot] = mon
+    replacedMon = tempSaves[saveID].save.boxes[dest.box].boxSlots[dest.box_slot]
+    tempSaves[saveID].save.boxes[dest.box].boxSlots[dest.box_slot] = mon
     tempSaves[saveID].save.updatedBoxSlots.push({ box: dest.box, index: dest.box_slot })
     state.openSaves = tempSaves
   }
@@ -202,13 +215,13 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
      *  BANKS
      */
     case 'load_home_banks': {
-      const { banks, getMonById } = payload
-      const newHomeData = new HomeData(banks, getMonById)
+      const { banks } = payload
+      const newHomeData = new HomeData(banks)
 
       return { ...state, homeData: newHomeData }
     }
     case 'add_home_bank': {
-      const { name, boxCount, currentCount, switchToBank, getMonById } = payload
+      const { name, boxCount, currentCount, switchToBank } = payload
 
       // handle duplicate event dispatches in strict mode
       if (!state.homeData || state.homeData?.banks.length !== currentCount) {
@@ -220,15 +233,15 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
       const newBank = updatedHomeData.addBank(name, boxCount)
 
       if (switchToBank) {
-        updatedHomeData.setAndLoadBank(newBank.index, getMonById)
+        updatedHomeData.setAndLoadBank(newBank.index)
       }
       return { ...state, homeData: updatedHomeData }
     }
     case 'set_current_home_bank': {
       if (!state.homeData) return state
-      const { bank, getMonById } = payload
+      const { bank } = payload
 
-      state.homeData.setAndLoadBank(bank, getMonById)
+      state.homeData.setAndLoadBank(bank)
       return { ...state, homeData: state.homeData }
     }
     case 'set_home_bank_name': {
@@ -262,7 +275,7 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
 
       state.homeData.boxes[payload.boxIndex].pokemon = boxMons
       state.homeData.syncBankToBoxes()
-      state.homeData = state.homeData.clone(payload.getMonById)
+      state.homeData = state.homeData.clone()
       return { ...state }
     }
     case 'sort_all_home_boxes': {
@@ -382,7 +395,7 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
         : source.save.boxes[source.box]
       const destBox = dest.is_home ? state.homeData.boxes[dest.box] : dest.save.boxes[dest.box]
 
-      let sourceMon = sourceBox.[source.box_slot]
+      let sourceMon = sourceBox.pokemon[source.box_slot]
       let destMon = destBox.pokemon[dest.box_slot]
 
       if (sourceMon !== source.mon) return state // necessary in strict mode, otherwise the swap will happen twice and revert
@@ -529,7 +542,7 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
           const homeMon = mon instanceof OHPKM ? mon : new OHPKM(mon)
 
           while (
-            tempSave.boxes[dest.box].pokemon[nextIndex] &&
+            tempSave.boxes[dest.box].boxSlots[nextIndex] &&
             nextIndex < tempSave.boxRows * tempSave.boxColumns
           ) {
             nextIndex++
@@ -580,6 +593,9 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
     case 'close_all_saves': {
       return { ...state, openSaves: {} }
     }
+    case 'set_home_data': {
+      return { ...state, homeData: payload.clone() }
+    }
   }
 }
 
@@ -603,7 +619,7 @@ export function getMonAtLocation(state: OpenSavesState, location: MonLocation) {
   const saveID = saveToStringIdentifier(location.save)
 
   if (saveID in state.openSaves) {
-    return state.openSaves[saveID].save.boxes[location.box].pokemon[location.box_slot]
+    return state.openSaves[saveID].save.boxes[location.box].boxSlots[location.box_slot]
   }
   return undefined
 }

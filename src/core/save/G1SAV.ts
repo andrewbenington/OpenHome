@@ -7,8 +7,9 @@ import { PK1 } from '@pokemon-files/pkm'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { GEN1_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
 import { OhpkmTracker } from '../../tracker'
+import { OHPKM } from '../pkm/OHPKM'
 import { Box, OfficialSAV, SaveMonLocation } from './interfaces'
-import { LOOKUP_TYPE } from './util'
+import { LookupType } from './util'
 import { PathData } from './util/path'
 
 const SAVE_SIZE_BYTES = 0x8000
@@ -17,7 +18,7 @@ export class G1SAV extends OfficialSAV<PK1> {
   static pkmType = PK1
 
   static transferRestrictions = GEN1_TRANSFER_RESTRICTIONS
-  static lookupType: LOOKUP_TYPE = 'gen12'
+  static lookupType: LookupType = 'gen12'
 
   NUM_BOXES = 14
 
@@ -128,7 +129,10 @@ export class G1SAV extends OfficialSAV<PK1> {
             )
             mon.gameOfOrigin = this.origin
             mon.language = Language.English
-            this.boxes[boxNumber].pokemon[monIndex] = tracker.wrapWithIdentifier(mon)
+            this.boxes[boxNumber].boxSlots[monIndex] = tracker.wrapWithIdentifier(
+              mon,
+              G1SAV.lookupType
+            )
           } catch (e) {
             console.error(e)
           }
@@ -157,7 +161,7 @@ export class G1SAV extends OfficialSAV<PK1> {
       const box = this.boxes[boxNumber]
       let numMons = 0
 
-      box.pokemon.forEach((boxMon) => {
+      box.boxSlots.forEach((boxMon) => {
         if (boxMon) {
           const pk1Mon = boxMon.data
 
@@ -229,6 +233,10 @@ export class G1SAV extends OfficialSAV<PK1> {
     const wholeSaveChecksum = get8BitChecksum(this.bytes, 0x2598, 0x3521) ^ 0xff
 
     this.bytes[0x3523] = wholeSaveChecksum
+  }
+
+  convertOhpkm(ohpkm: OHPKM): PK1 {
+    return new PK1(ohpkm)
   }
 
   supportsMon(dexNumber: number, formeNumber: number) {

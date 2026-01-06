@@ -1,7 +1,13 @@
-import { getMonFileIdentifier, OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
+import {
+  getMonFileIdentifier,
+  getMonGen12Identifier,
+  OhpkmIdentifier,
+} from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { PKMInterface } from './core/pkm/interfaces'
+import { LookupType } from './core/save/util'
 import { type Option } from './core/util/functional'
+import { StoredLookups } from './ui/backend/backendInterface'
 
 // export interface Tracked<Data, Identifier> {
 //   readonly data: Data
@@ -54,47 +60,36 @@ import { type Option } from './core/util/functional'
 //   }
 // }
 
-type Tracked<Data, Identifier> = { _tag: 'Tracked'; data: Data; identifier: Identifier }
+type Tracked<P extends PKMInterface> = { _tag: 'Tracked'; data: P; identifier: OhpkmIdentifier }
 
-type Untracked<Data> = { _tag: 'Untracked'; data: Data }
+type Untracked<P> = { _tag: 'Untracked'; data: P }
 
-export type MaybeTracked<Data, Identifier> = Tracked<Data, Identifier> | Untracked<Data>
+export type MaybeTracked<P extends PKMInterface = PKMInterface> = Tracked<P> | Untracked<P>
 
-export const URI = 'MaybeTracked'
-export type URI = typeof URI
-
-declare module 'fp-ts/HKT' {
-  interface URItoKind2<E, A> {
-    readonly MaybeTracked: MaybeTracked<A, E>
-  }
-}
-
-const tracked = <A, E>(data: A, id: E): MaybeTracked<A, E> => ({
+const tracked = <P extends PKMInterface>(data: P, id: OhpkmIdentifier): MaybeTracked<P> => ({
   _tag: 'Tracked',
   data,
   identifier: id,
 })
 
-const untracked = <A, E>(data: A): MaybeTracked<A, E> => ({
+const untracked = <P extends PKMInterface>(data: P): MaybeTracked<P> => ({
   _tag: 'Untracked',
   data,
 })
 
-export function isTracked<A, E>(maybe: MaybeTracked<A, E>) {
+export function isTracked<P extends PKMInterface>(maybe: MaybeTracked<P>) {
   return maybe._tag === 'Tracked'
 }
 
-export interface Tracker<Tracked, Identifier, ToTracked = Tracked> {
-  load(identifier: Identifier): Option<Tracked>
-  generateIdentifier(toTracked: ToTracked): Option<Identifier>
-  wrapWithIdentifier<T extends ToTracked>(data: T): MaybeTracked<T, Identifier>
-}
-
-export class OhpkmTracker implements Tracker<OHPKM, OhpkmIdentifier, PKMInterface> {
+export class OhpkmTracker {
   private _trackedMons: Map<OhpkmIdentifier, OHPKM>
+  private _gen12Lookup: Map<string, string>
+  private _gen345Lookup: Map<string, string>
 
-  constructor() {
-    this._trackedMons = new Map()
+  constructor(mons?: Record<string, OHPKM>, lookups?: StoredLookups) {
+    this._trackedMons = new Map(Object.entries(mons ?? {}))
+    this._gen12Lookup = new Map(Object.entries(lookups?.gen12 ?? {}))
+    this._gen345Lookup = new Map(Object.entries(lookups?.gen345 ?? {}))
   }
 
   load(identifier: string): Option<OHPKM> {
@@ -105,8 +100,25 @@ export class OhpkmTracker implements Tracker<OHPKM, OhpkmIdentifier, PKMInterfac
     return getMonFileIdentifier(toTracked)
   }
 
-  wrapWithIdentifier<P extends PKMInterface>(data: P): MaybeTracked<P, string> {
-    const identifier = this.generateIdentifier(data)
+  getOhpkmIdentifierIfTrackedGen12(mon: PKMInterface): Option<OhpkmIdentifier> {
+    const g12Identifier = getMonGen12Identifier(mon)
+    if (!g12Identifier) return undefined
+    return this._gen12Lookup.get(g12Identifier)
+  }
+
+  getOhpkmIdentifierIfTrackedGen345(mon: PKMInterface): Option<OhpkmIdentifier> {
+    const g345Identifier = getMonGen12Identifier(mon)
+    if (!g345Identifier) return undefined
+    return this._gen345Lookup.get(g345Identifier)
+  }
+
+  wrapWithIdentifier<P extends PKMInterface>(data: P, lookupType?: LookupType): MaybeTracked<P> {
+    const identifier =
+      lookupType === 'gen12'
+        ? this.getOhpkmIdentifierIfTrackedGen12(data)
+        : lookupType === 'gen345'
+          ? this.getOhpkmIdentifierIfTrackedGen345(data)
+          : this.generateIdentifier(data)
     if (identifier && this._trackedMons.has(identifier)) {
       return tracked(data, identifier)
     } else {

@@ -7,7 +7,7 @@ import { PathData } from './path'
 
 export const SIZE_SM = 0x6be00
 export const SIZE_USUM = 0x6cc00
-export type LOOKUP_TYPE = 'gen12' | 'gen345'
+export type LookupType = 'gen12' | 'gen345'
 
 export const DESAMUME_FOOTER_START =
   '|<--Snip above here to create a raw sav by excluding this DeSmuME savedata footer:'

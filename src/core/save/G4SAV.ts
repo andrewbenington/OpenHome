@@ -8,15 +8,16 @@ import { gen4StringToUTF } from '@openhome-core/save/util/Strings/StringConverte
 import { OriginGame } from '@pkm-rs/pkg'
 import { PK4 } from '@pokemon-files/pkm'
 import { OhpkmTracker } from '../../tracker'
+import { OHPKM } from '../pkm/OHPKM'
 import { Box, OfficialSAV, SaveMonLocation } from './interfaces'
-import { LOOKUP_TYPE } from './util'
+import { LookupType } from './util'
 import { PathData } from './util/path'
 
 export abstract class G4SAV extends OfficialSAV<PK4> {
   static BOX_COUNT = 18
   static pkmType = PK4
   static SAVE_SIZE_BYTES = 0x80000
-  static lookupType: LOOKUP_TYPE = 'gen345'
+  static lookupType: LookupType = 'gen345'
 
   origin: OriginGame
   isPlugin: false = false
@@ -99,7 +100,7 @@ export abstract class G4SAV extends OfficialSAV<PK4> {
             ) {
               this.origin = mon.gameOfOrigin
             }
-            this.boxes[box].pokemon[monIndex] = tracker.wrapWithIdentifier(mon)
+            this.boxes[box].boxSlots[monIndex] = tracker.wrapWithIdentifier(mon)
           }
         } catch (e) {
           console.error(e)
@@ -130,7 +131,7 @@ export abstract class G4SAV extends OfficialSAV<PK4> {
 
   prepareForSaving() {
     this.updatedBoxSlots.forEach(({ box, index }) => {
-      const updatedSlotContent = this.boxes[box].pokemon[index]
+      const updatedSlotContent = this.boxes[box].boxSlots[index]
 
       const writeIndex = this.currentSaveBoxStartOffset + this.boxSize * box + 136 * index
 
@@ -152,6 +153,10 @@ export abstract class G4SAV extends OfficialSAV<PK4> {
       }
     })
     this.updateStorageChecksum()
+  }
+
+  convertOhpkm(ohpkm: OHPKM): PK4 {
+    return new PK4(ohpkm)
   }
 
   abstract supportsMon(dexNumber: number, formeNumber: number): boolean

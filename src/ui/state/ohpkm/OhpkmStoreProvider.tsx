@@ -7,6 +7,7 @@ import LoadingIndicator from '@openhome-ui/components/LoadingIndicator'
 import { PokedexUpdate } from '@openhome-ui/util/pokedex'
 import { Callout } from '@radix-ui/themes'
 import { ReactNode, useCallback, useContext, useEffect, useReducer } from 'react'
+import { useLookups } from '../lookups'
 import { OhpkmStoreContext, ohpkmStoreReducer } from './reducer'
 
 export type OhpkmStoreProviderProps = {
@@ -19,6 +20,7 @@ export default function OhpkmStoreProvider({ children }: OhpkmStoreProviderProps
     loaded: false,
     saving: false,
   })
+  const lookups = useLookups()
 
   const loadStore = useCallback(async (): Promise<Errorable<Record<string, OHPKM>>> => {
     const onLoadError = (message: string) => {
@@ -68,6 +70,12 @@ export default function OhpkmStoreProvider({ children }: OhpkmStoreProviderProps
       loadStore()
     }
   }, [ohpkmStore.loaded, ohpkmStore.error, loadStore])
+
+  useEffect(() => {
+    if (lookups.loaded) {
+      ohpkmStoreDispatch({ type: 'load_lookups', payload: lookups.lookups })
+    }
+  }, [lookups.loaded, lookups.lookups])
 
   if (ohpkmStore.error) {
     return (

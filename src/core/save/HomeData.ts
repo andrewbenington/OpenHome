@@ -18,7 +18,7 @@ export class HomeBox {
   name: string | undefined
   index: number
 
-  pokemonIdentifiers: Array<OhpkmIdentifier | undefined> = new Array(120)
+  boxSlots: Array<OhpkmIdentifier | undefined> = new Array(120)
 
   constructor(homeBox: OpenHomeBox) {
     const { id, name, index } = homeBox
@@ -29,10 +29,13 @@ export class HomeBox {
 
     this.id = id
     this.index = index
+    for (const [index, identifier] of homeBox.identifiers) {
+      this.boxSlots[index] = identifier
+    }
   }
 
-  getIdentifierMapping(): BoxMonIdentifiers {
-    const entries = this.pokemonIdentifiers
+  getIdentifierMapping(): Map<number, OhpkmIdentifier> {
+    const entries = this.boxSlots
       .map((identifier, i) => [i, identifier] as [number, OhpkmIdentifier | undefined])
       .filter(([, identifier]) => !!identifier) as [number, OhpkmIdentifier][]
 
@@ -40,18 +43,18 @@ export class HomeBox {
   }
 
   loadSlots(boxIdentifers: BoxMonIdentifiers) {
-    this.pokemonIdentifiers = new Array(120)
-    boxIdentifers.entries().forEach(([slotIndex, identifier]) => {
-      this.pokemonIdentifiers[slotIndex] = identifier
-    })
+    this.boxSlots = new Array(120)
+    for (const [index, identifier] of boxIdentifers) {
+      this.boxSlots[index] = identifier
+    }
   }
 
   firstEmptyIndex(): number | undefined {
-    return this.pokemonIdentifiers.findIndex((value) => value === undefined)
+    return this.boxSlots.findIndex((value) => value === undefined)
   }
 
   containsMons() {
-    return this.pokemonIdentifiers.filter(filterUndefined).length > 0
+    return this.boxSlots.filter(filterUndefined).length > 0
   }
 }
 
@@ -157,11 +160,11 @@ export class HomeData {
 
     if (identifier) {
       this._banks[location.bank].boxes[location.box].identifiers.set(location.box_slot, identifier)
-      this.boxes[location.box].pokemonIdentifiers[location.box_slot] = identifier
+      this.boxes[location.box].boxSlots[location.box_slot] = identifier
     } else {
       this._banks[location.bank].boxes[location.box].identifiers.delete(location.box_slot)
       if (location.bank === this._currentBankIndex) {
-        this.boxes[location.box].pokemonIdentifiers[location.box_slot] = undefined
+        this.boxes[location.box].boxSlots[location.box_slot] = undefined
       }
     }
   }
@@ -249,11 +252,11 @@ export class HomeData {
     const alreadyPresent: Set<string> = new Set()
 
     for (let slot = 0; slot < HomeData.BOX_COLUMNS * HomeData.BOX_ROWS; slot++) {
-      const identifier = this.boxes[boxIndex].pokemonIdentifiers[slot]
+      const identifier = this.boxes[boxIndex].boxSlots[slot]
 
       if (!identifier) continue
       if (alreadyPresent.has(identifier)) {
-        this.boxes[boxIndex].pokemonIdentifiers[slot] = undefined
+        this.boxes[boxIndex].boxSlots[slot] = undefined
       } else {
         alreadyPresent.add(identifier)
       }

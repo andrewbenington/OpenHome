@@ -230,7 +230,7 @@ function SingleBoxMonDisplay() {
 
           if (!identifier) continue
 
-          const inCurrentBox = homeData.boxes[homeData.currentPCBox].pokemonIdentifiers.some(
+          const inCurrentBox = homeData.boxes[homeData.currentPCBox].boxSlots.some(
             matches(identifier)
           )
 
@@ -270,14 +270,10 @@ function SingleBoxMonDisplay() {
   const currentBox = homeData.boxes[homeData.currentPCBox]
 
   const selectedMon = useMemo(() => {
-    if (
-      !currentBox ||
-      selectedIndex === undefined ||
-      selectedIndex >= currentBox.pokemonIdentifiers.length
-    ) {
+    if (!currentBox || selectedIndex === undefined || selectedIndex >= currentBox.boxSlots.length) {
       return undefined
     }
-    const selectedMonIdentifier = currentBox.pokemonIdentifiers[selectedIndex]
+    const selectedMonIdentifier = currentBox.boxSlots[selectedIndex]
     if (!selectedMonIdentifier) return undefined
 
     return ohpkmStore.getById(selectedMonIdentifier)
@@ -319,7 +315,7 @@ function SingleBoxMonDisplay() {
       <div>
         <Grid columns={COLUMN_COUNT.toString()} gap="1">
           {range(COLUMN_COUNT * ROW_COUNT)
-            .map((index: number) => currentBox.pokemonIdentifiers[index])
+            .map((index: number) => currentBox.boxSlots[index])
             .map((identifier, index) => {
               const mon = identifier ? ohpkmStore.getById(identifier) : undefined
               return (
@@ -369,7 +365,7 @@ function SingleBoxMonDisplay() {
                   columns: homeData.boxColumns,
                   rows: homeData.boxRows,
                   emptyIndexes: range(homeData.boxColumns * homeData.boxRows).filter(
-                    (index) => !currentBox?.pokemonIdentifiers?.[index]
+                    (index) => !currentBox?.boxSlots?.[index]
                   ),
                 }
               : undefined

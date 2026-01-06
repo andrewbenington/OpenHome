@@ -74,7 +74,7 @@ export abstract class G89SAV<P extends PK8 | PB8 | PA8 | PK9> extends OfficialSA
           const mon = this.monConstructor(monData, true)
 
           if (mon.gameOfOrigin !== 0 && mon.dexNum !== 0) {
-            this.boxes[box].pokemon[monIndex] = tracker.wrapWithIdentifier(mon)
+            this.boxes[box].boxSlots[monIndex] = tracker.wrapWithIdentifier(mon)
           }
         } catch (e) {
           console.error(e)
@@ -102,7 +102,7 @@ export abstract class G89SAV<P extends PK8 | PB8 | PA8 | PK9> extends OfficialSA
     const boxBlock = this.getBlockMust<SCObjectBlock>('Box', 'object')
 
     this.updatedBoxSlots.forEach(({ box, index }) => {
-      const updatedSlotContent = this.boxes[box].pokemon[index]
+      const updatedSlotContent = this.boxes[box].boxSlots[index]
 
       // we don't want to save OHPKM files of mons that didn't leave the save
       // (and would still be PK8/PA8s)
