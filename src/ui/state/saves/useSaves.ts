@@ -432,24 +432,26 @@ export function useSaves(): SavesAndBanksManager {
   )
 
   function moveMonToSave(
-    maybeTracked: MaybeTracked,
+    maybeTracked: MaybeTracked | undefined,
     dest: SaveMonLocation
   ): Result<Option<MaybeTracked>, IdentifierNotPresentError> {
     const save = openSavesState.openSaves[saveToStringIdentifier(dest.save)].save
 
-    let ohpkm: OHPKM
-    if (isTracked(maybeTracked)) {
+    let ohpkm: OHPKM | undefined = undefined
+    if (maybeTracked && isTracked(maybeTracked)) {
       const monResult = ohpkmStore.tryLoadFromId(maybeTracked.identifier)
       if (R.isErr(monResult)) {
         return monResult
       }
 
       ohpkm = monResult.value
-    } else {
+    } else if (maybeTracked) {
       ohpkm = new OHPKM(maybeTracked.data)
     }
 
-    const tracked = ohpkmStore.tracker.wrapWithIdentifier(save.convertOhpkm(ohpkm))
+    const tracked = ohpkm
+      ? ohpkmStore.tracker.wrapWithIdentifier(save.convertOhpkm(ohpkm))
+      : undefined
     const displacedMon = save.boxes[dest.box].boxSlots[dest.box_slot]
     save.boxes[dest.box].boxSlots[dest.box_slot] = tracked
 
