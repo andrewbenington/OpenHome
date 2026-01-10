@@ -18,6 +18,7 @@ import * as E from 'fp-ts/lib/Either'
 import { ReactNode, useCallback, useContext, useEffect, useReducer } from 'react'
 import { ItemBagContext } from '../items/reducer'
 import { OhpkmLookup, useOhpkmStore } from '../ohpkm/useOhpkmStore'
+import { useRustState } from '../rustState'
 import { openSavesReducer, SavesContext } from './reducer'
 
 export type SavesProviderProps = {
@@ -34,6 +35,11 @@ export default function SavesProvider({ children }: SavesProviderProps) {
     monsToRelease: [],
     openSaves: {},
   })
+  const ohpkmStoreState = useRustState<Record<string, OHPKM>>(
+    'ohpkm_store',
+    (backend) => backend.loadOhpkmStore(),
+    (backend, updated) => backend.updateOhpkmStore(updated)
+  )
 
   const allOpenSaves = Object.values(openSavesState.openSaves)
     .filter((data) => !!data)
@@ -128,6 +134,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
           .map(getMonFileIdentifier)
           .filter(filterUndefined)
       ),
+      ohpkmStoreState.updateState(openSavesState.modifiedOHPKMs),
     ]
 
     if (itemBagState.modified) {
@@ -154,25 +161,17 @@ export default function SavesProvider({ children }: SavesProviderProps) {
     openSavesDispatch({ type: 'clear_updated_box_slots' })
     openSavesDispatch({ type: 'clear_mons_to_release' })
 
-    ohpkmStore.setSaving()
-    await ohpkmStore.reloadStore().then(
-      E.match(
-        (err) => {
-          openSavesDispatch({ type: 'set_error', payload: err })
-          displayError('Error Loading Lookup Data', err)
-        },
-        (getMonById) => loadAllHomeData(getMonById)
-      )
-    )
+    const updatedOhpkmStore = { ...ohpkmStoreState.state, ...openSavesState.modifiedOHPKMs }
+    await loadAllHomeData((id) => updatedOhpkmStore[id])
   }, [
     openSavesState.homeData,
     openSavesState.modifiedOHPKMs,
     openSavesState.monsToRelease,
     backend,
     allOpenSaves,
+    ohpkmStoreState,
     itemBagState.modified,
     itemBagState.itemCounts,
-    ohpkmStore,
     displayError,
     bagDispatch,
     loadAllHomeData,

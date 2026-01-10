@@ -20,6 +20,7 @@ export function useLookups(): LookupsManager {
 
   backend.registerListeners({
     onLookupsUpdate: (updatedLookups) => setLookupsCache(updatedLookups),
+    onStateUpdate: { lookups: (updatedLookups) => console.log('new lookups V2:', updatedLookups) },
   })
 
   const loadAndCacheLookups = useCallback(async () => {

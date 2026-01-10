@@ -1,7 +1,7 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { Errorable } from '@openhome-core/util/functional'
 import * as E from 'fp-ts/lib/Either'
-import { createContext, Dispatch, Reducer } from 'react'
+import { createContext, Reducer } from 'react'
 
 export type OhpkmStoreData = Record<string, OHPKM>
 
@@ -70,8 +70,6 @@ export const ohpkmStoreReducer: Reducer<OhpkmStoreStateInternal, OhpkmStoreActio
   }
 }
 
-const initialState: OhpkmStoreStateInternal = { loaded: false, saving: false }
-
 export const OhpkmStoreContext = createContext<
-  [OhpkmStoreStateInternal, Dispatch<OhpkmStoreAction>, () => Promise<Errorable<OhpkmStoreData>>]
->([initialState, () => {}, async () => E.left('Uninitialized')])
+  [OhpkmStoreData, (updated: OhpkmStoreData) => Promise<Errorable<null>>]
+>([{}, async () => E.left('Uninitialized')])

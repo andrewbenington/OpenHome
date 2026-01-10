@@ -1,69 +1,39 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { Errorable } from '@openhome-core/util/functional'
-import * as E from 'fp-ts/lib/Either'
 import { useContext } from 'react'
 import { OhpkmStoreContext } from './reducer'
 
 export type OhpkmStore = {
-  reloadStore: () => Promise<Errorable<OhpkmLookup>>
   getById(id: string): OHPKM | undefined
   monIsStored(id: string): boolean
   overwrite(mon: OHPKM): void
   getAllStored: () => OHPKM[]
-  setSaving(): void
 }
 
 export type OhpkmLookup = (id: string) => OHPKM | undefined
 
 export function useOhpkmStore(): OhpkmStore {
-  const [ohpkmStore, ohpkmStoreDispatch, reloadStore] = useContext(OhpkmStoreContext)
-
-  if (ohpkmStore.error) {
-    throw new Error(`Error loading OHPKM store: ${ohpkmStore.error}`)
-  }
-
-  if (!ohpkmStore.loaded) {
-    throw new Error(
-      `OHPKM store not loaded. useOhpkmStore() must not be called in a component that is not descended from an OhpkmStoreProvider.`
-    )
-  }
-
-  const monsById = ohpkmStore.homeMons
+  const [ohpkmStore, updateStore] = useContext(OhpkmStoreContext)
 
   function getById(id: string): OHPKM | undefined {
-    return monsById[id]
+    return ohpkmStore[id]
   }
 
   function monIsStored(id: string): boolean {
-    return id in monsById
+    return id in ohpkmStore
   }
 
   function overwrite(mon: OHPKM) {
-    ohpkmStoreDispatch({ type: 'persist_data', payload: mon })
+    updateStore({ [mon.getHomeIdentifier()]: mon })
   }
 
   function getAllStored(): OHPKM[] {
-    return Object.values(monsById)
-  }
-
-  function setSaving() {
-    ohpkmStoreDispatch({ type: 'set_saving' })
-  }
-
-  async function reloadAndReturnLookup() {
-    return reloadStore().then(
-      E.map((newLookup) => {
-        return (id: string) => newLookup[id]
-      })
-    )
+    return Object.values(ohpkmStore)
   }
 
   return {
-    reloadStore: reloadAndReturnLookup,
     getById,
     monIsStored,
     overwrite,
     getAllStored,
-    setSaving,
   }
 }

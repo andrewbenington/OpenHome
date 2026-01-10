@@ -9,6 +9,9 @@ import * as E from 'fp-ts/lib/Either'
 import { AppState, ImageResponse, StoredLookups } from '../backendInterface'
 import { RustResult } from './types'
 
+export type StringToBytes = Record<string, Uint8Array>
+export type StringToB64 = Record<string, string>
+
 function rustResultToEither<T, E>(result: RustResult<T, E>): E.Either<E, T> {
   return 'Ok' in result ? E.right(result.Ok) : E.left(result.Err)
 }
@@ -44,6 +47,29 @@ export const TauriInvoker = {
 
   updateLookups(gen12: LookupMap, gen345: LookupMap): Promise<Errorable<null>> {
     const promise: Promise<null> = invoke('update_lookups', { gen12, gen345 })
+
+    return promise.then(E.right).catch(E.left)
+  },
+
+  getOhpkmStore(): Promise<Errorable<StringToBytes>> {
+    const promise: Promise<StringToB64> = invoke('get_ohpkm_store')
+
+    return promise
+      .then((result) => {
+        return E.right(
+          Object.fromEntries(
+            Object.entries(result).map(([filename, b64String]) => [
+              filename,
+              Uint8Array.fromBase64(b64String),
+            ])
+          )
+        )
+      })
+      .catch(E.left)
+  },
+
+  updateOhpkmStore(updates: StringToBytes): Promise<Errorable<null>> {
+    const promise: Promise<null> = invoke('update_ohpkm_store', { updates })
 
     return promise.then(E.right).catch(E.left)
   },
@@ -107,7 +133,7 @@ export const TauriInvoker = {
     return promise.then(E.right).catch(E.left)
   },
 
-  async getOHPKMFiles(): Promise<Errorable<Record<string, Uint8Array>>> {
+  async getOHPKMFiles(): Promise<Errorable<StringToBytes>> {
     const promise: Promise<Record<string, number[]>> = invoke('get_ohpkm_files')
 
     return promise

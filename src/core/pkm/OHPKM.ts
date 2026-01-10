@@ -100,6 +100,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
 
         this.personalityValue = generatePersonalityValuePreservingAttributes(other)
       } else {
+        console.log(other)
         prng = new Prando(other.trainerName.concat(other.trainerID.toString()))
       }
 

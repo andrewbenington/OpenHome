@@ -5,6 +5,7 @@ import { Errorable } from '@openhome-core/util/functional'
 import { JSONObject, LoadSaveResponse, LookupMap, SaveRef } from '@openhome-core/util/types'
 import BackendInterface, {
   BankOrBoxChange,
+  OhpkmStore,
   StoredLookups,
 } from '@openhome-ui/backend/backendInterface'
 import { defaultSettings, Settings } from '@openhome-ui/state/appInfo'
@@ -17,7 +18,7 @@ import { FileInfo, readFile, stat } from '@tauri-apps/plugin-fs'
 import { platform } from '@tauri-apps/plugin-os'
 import dayjs from 'dayjs'
 import * as E from 'fp-ts/lib/Either'
-import { TauriInvoker } from './tauriInvoker'
+import { StringToBytes, TauriInvoker } from './tauriInvoker'
 
 async function pathDataFromRaw(raw: string): Promise<PathData> {
   const filename = await path.basename(raw)
@@ -44,6 +45,28 @@ export const TauriBackend: BackendInterface = {
   },
   updateLookups: function (gen_12: LookupMap, gen_345: LookupMap): Promise<Errorable<null>> {
     return TauriInvoker.updateLookups(gen_12, gen_345)
+  },
+
+  /* ohpkm store */
+  loadOhpkmStore: async function (): Promise<Errorable<OhpkmStore>> {
+    const bytesByIdentifier = await TauriInvoker.getOhpkmStore()
+
+    if (E.isLeft(bytesByIdentifier)) return bytesByIdentifier
+    return E.right(
+      Object.fromEntries(
+        Object.entries(bytesByIdentifier.right).map(([identifier, bytes]) => [
+          identifier,
+          new OHPKM(bytes),
+        ])
+      )
+    )
+  },
+  updateOhpkmStore: function (updates: OhpkmStore): Promise<Errorable<null>> {
+    const bytesMap: StringToBytes = {}
+    Object.entries(updates).forEach(
+      ([identifier, ohpkm]) => (bytesMap[identifier] = ohpkm.toByteArray())
+    )
+    return TauriInvoker.updateOhpkmStore(bytesMap)
   },
 
   /* pokedex */

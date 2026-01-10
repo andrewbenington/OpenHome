@@ -9,6 +9,8 @@ import { OpenSavesState, useSaves } from '@openhome-ui/state/saves'
 import { Item, OriginGames, SpeciesLookup } from '@pkm-rs/pkg'
 import { Card, Flex, Heading, Separator } from '@radix-ui/themes'
 import { useContext } from 'react'
+import { OHPKM } from 'src/core/pkm/OHPKM'
+import { useRustState } from '../state/rustState'
 
 export default function AppStateDisplay() {
   const appState = useAppState()
@@ -16,6 +18,11 @@ export default function AppStateDisplay() {
   const savesAndBanks = useSaves()
   const [errorState, dispatchErrorState] = useContext(ErrorContext)
   const [bagState] = useContext(ItemBagContext)
+  const ohpkmStore = useRustState<Record<string, OHPKM>>('ohpkm_store', (backend) =>
+    backend.loadOhpkmStore()
+  )
+
+  console.log(ohpkmStore.state)
 
   return (
     <Flex direction="column">
@@ -29,6 +36,10 @@ export default function AppStateDisplay() {
       <Card className="flex-row" style={{ margin: 8, gap: 8 }}>
         <DevDataDisplay data={appInfoDisplay(appInfoState)} label="App Info State" />
         <DevDataDisplay data={openSavesDisplay(savesAndBanks)} label="Saves/Mons State" />
+        <DevDataDisplay
+          data={ohpkmStore.loaded ? ohpkmStoreDisplay(ohpkmStore.state) : {}}
+          label="OHPKM Store"
+        />
         <DevDataDisplay data={bagDisplay(bagState)} label="Bag State" />
         <DevDataDisplay data={errorState} label="Error State" />
         <button
@@ -66,6 +77,10 @@ function openSavesDisplay(state: OpenSavesState) {
     })),
     Error: state.error,
   }
+}
+
+function ohpkmStoreDisplay(state: Record<string, OHPKM>) {
+  return Object.fromEntries(Object.entries(state).map(([key, val]) => [key, monDisplay(val)]))
 }
 
 function monDisplay(mon: PKMInterface) {

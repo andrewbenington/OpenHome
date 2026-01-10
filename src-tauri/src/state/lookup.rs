@@ -4,6 +4,7 @@ use serde::Serialize;
 use tauri::Emitter;
 
 use crate::error::{Error, Result};
+use crate::state::shared_state::{self, AllSharedState};
 use crate::util;
 
 // type OhpkmBytesLookup = HashMap<String, Vec<u8>>;
@@ -36,7 +37,11 @@ pub struct LookupStateInner {
 }
 
 impl LookupStateInner {
-    fn load_from_storage(app_handle: &tauri::AppHandle) -> Result<Self> {
+    pub fn from_components(gen_12: IdentifierLookup, gen_345: IdentifierLookup) -> Self {
+        Self { gen_12, gen_345 }
+    }
+
+    pub fn load_from_storage(app_handle: &tauri::AppHandle) -> Result<Self> {
         Ok(Self {
             gen_12: util::get_storage_file_json(app_handle, "gen12_lookup.json")?,
             gen_345: util::get_storage_file_json(app_handle, "gen345_lookup.json")?,
@@ -63,13 +68,17 @@ impl LookupStateInner {
     }
 }
 
+impl shared_state::SharedState for LookupStateInner {
+    const ID: &'static str = "lookup";
+}
+
 #[tauri::command]
-pub fn get_lookups(lookup_state: tauri::State<'_, LookupState>) -> Result<LookupStateInner> {
+pub fn get_lookups_old(lookup_state: tauri::State<'_, LookupState>) -> Result<LookupStateInner> {
     Ok(lookup_state.lock()?.clone())
 }
 
 #[tauri::command]
-pub fn update_lookups(
+pub fn update_lookups_old(
     app_handle: tauri::AppHandle,
     lookup_state: tauri::State<'_, LookupState>,
     gen_12: IdentifierLookup,
@@ -78,4 +87,21 @@ pub fn update_lookups(
     lookup_state
         .lock()?
         .update_lookups(&app_handle, gen_12, gen_345)
+}
+
+#[tauri::command]
+pub fn get_lookups(shared_state: tauri::State<'_, AllSharedState>) -> Result<LookupStateInner> {
+    shared_state.clone_lookups()
+}
+
+#[tauri::command]
+pub fn update_lookups(
+    app_handle: tauri::AppHandle,
+    shared_state: tauri::State<'_, AllSharedState>,
+    gen_12: IdentifierLookup,
+    gen_345: IdentifierLookup,
+) -> Result<()> {
+    shared_state.lock()?.update_lookups(&app_handle, |_| {
+        LookupStateInner::from_components(gen_12, gen_345)
+    })
 }
