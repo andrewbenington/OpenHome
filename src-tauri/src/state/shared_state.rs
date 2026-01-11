@@ -6,7 +6,7 @@ use serde::Serialize;
 use tauri::Emitter;
 
 use crate::error::{Error, Result};
-use crate::state::{LookupStateInner, OhpkmBytesStore};
+use crate::state::{LookupState, OhpkmBytesStore};
 
 pub trait SharedState: Clone + Serialize + tauri::ipc::IpcResponse {
     const ID: &'static str;
@@ -30,7 +30,7 @@ impl<State: SharedState> SharedStateWrapper<State> {
 }
 
 pub struct AllSharedStateInner {
-    lookups: SharedStateWrapper<LookupStateInner>,
+    lookups: SharedStateWrapper<LookupState>,
     ohpkm_store: SharedStateWrapper<OhpkmBytesStore>,
 }
 
@@ -41,7 +41,7 @@ impl AllSharedStateInner {
         update_function: F,
     ) -> Result<()>
     where
-        F: FnOnce(&LookupStateInner) -> LookupStateInner,
+        F: FnOnce(&LookupState) -> LookupState,
     {
         self.lookups.update(app_handle, update_function)
     }
@@ -61,14 +61,14 @@ impl AllSharedStateInner {
 pub struct AllSharedState(pub Mutex<AllSharedStateInner>);
 
 impl AllSharedState {
-    pub fn from_states(lookups: LookupStateInner, ohpkm_store: OhpkmBytesStore) -> Self {
+    pub fn from_states(lookups: LookupState, ohpkm_store: OhpkmBytesStore) -> Self {
         Self(Mutex::new(AllSharedStateInner {
             lookups: SharedStateWrapper(lookups),
             ohpkm_store: SharedStateWrapper(ohpkm_store),
         }))
     }
 
-    pub fn clone_lookups(&self) -> Result<LookupStateInner> {
+    pub fn clone_lookups(&self) -> Result<LookupState> {
         Ok(self.lock()?.lookups.0.clone())
     }
 

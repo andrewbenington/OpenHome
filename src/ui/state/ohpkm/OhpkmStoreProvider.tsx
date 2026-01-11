@@ -5,8 +5,8 @@ import LoadingIndicator from '@openhome-ui/components/LoadingIndicator'
 import { PokedexUpdate } from '@openhome-ui/util/pokedex'
 import { Callout } from '@radix-ui/themes'
 import { ReactNode, useCallback, useContext } from 'react'
+import { OhpkmStoreContext, OhpkmStoreData } from '.'
 import { useRustState } from '../rustState'
-import { OhpkmStoreContext, OhpkmStoreData } from './reducer'
 
 export type OhpkmStoreProviderProps = {
   children: ReactNode

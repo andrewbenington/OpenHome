@@ -28,6 +28,7 @@ import AppTabs from './AppTabs'
 import useDebounce from './hooks/useDebounce'
 import { DragMonState } from './state/drag-and-drop'
 import PokemonDndContext from './state/drag-and-drop/PokemonDndContext'
+import LookupsProvider from './state/lookups/LookupsProvider'
 import ErrorMessageModal from './top-level/ErrorMessageModal'
 import UpdateMessageModal from './top-level/UpdateMessageModal'
 
@@ -177,27 +178,29 @@ function AppWithBackend() {
       <AppInfoContext.Provider value={[appInfoState, appInfoDispatch, getEnabledSaveTypes]}>
         <AppStateProvider>
           <MouseContext.Provider value={[mouseState, mouseDispatch]}>
-            <OhpkmStoreProvider>
-              <ItemBagContext.Provider value={[bagState, bagDispatch]}>
-                <SavesProvider>
-                  <DragMonContext.Provider value={[dragState, setDragState]}>
-                    <PokemonDndContext>
-                      {settingsLoading ? (
-                        <Flex width="100%" height="100vh" align="center" justify="center">
-                          <Text size="9" weight="bold">
-                            OpenHome
-                          </Text>
-                        </Flex>
-                      ) : (
-                        <AppTabs />
-                      )}
-                      <ErrorMessageModal />
-                      <UpdateMessageModal />
-                    </PokemonDndContext>
-                  </DragMonContext.Provider>
-                </SavesProvider>
-              </ItemBagContext.Provider>
-            </OhpkmStoreProvider>
+            <LookupsProvider>
+              <OhpkmStoreProvider>
+                <ItemBagContext.Provider value={[bagState, bagDispatch]}>
+                  <SavesProvider>
+                    <DragMonContext.Provider value={[dragState, setDragState]}>
+                      <PokemonDndContext>
+                        {settingsLoading ? (
+                          <Flex width="100%" height="100vh" align="center" justify="center">
+                            <Text size="9" weight="bold">
+                              OpenHome
+                            </Text>
+                          </Flex>
+                        ) : (
+                          <AppTabs />
+                        )}
+                        <ErrorMessageModal />
+                        <UpdateMessageModal />
+                      </PokemonDndContext>
+                    </DragMonContext.Provider>
+                  </SavesProvider>
+                </ItemBagContext.Provider>
+              </OhpkmStoreProvider>
+            </LookupsProvider>
           </MouseContext.Provider>
         </AppStateProvider>
       </AppInfoContext.Provider>

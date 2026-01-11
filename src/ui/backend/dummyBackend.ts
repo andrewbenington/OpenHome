@@ -6,7 +6,10 @@ const DummyBackend: BackendInterface = {
   loadLookups: async () => E.left('no backend in use'),
   updateLookups: async () => E.left('no backend in use'),
 
-  /* past gen identifier lookups */
+  loadOhpkmStore: async () => E.left('no backend in use'),
+  updateOhpkmStore: async () => E.left('no backend in use'),
+
+  /* pokedex */
   loadPokedex: async () => E.left('no backend in use'),
   registerInPokedex: async () => E.left('no backend in use'),
 

@@ -6,12 +6,12 @@ import { BackendContext } from '@openhome-ui/backend/backendContext'
 import OHDataGrid, { SortableColumn } from '@openhome-ui/components/OHDataGrid'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import { AppInfoContext } from '@openhome-ui/state/appInfo'
-import { useLookups } from '@openhome-ui/state/lookups'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { useSaves } from '@openhome-ui/state/saves'
 import { Flex } from '@radix-ui/themes'
 import * as E from 'fp-ts/lib/Either'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { useLookups } from 'src/ui/state/lookups/lookups'
 import SaveCard from './SaveCard'
 import { filterEmpty, SaveViewMode } from './util'
 
@@ -27,7 +27,7 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
   const [suggestedSaves, setSuggestedSaves] = useState<SAV[]>()
   const ohpkmStore = useOhpkmStore()
-  const { getLookups } = useLookups()
+  const { lookups } = useLookups()
   const savesAndBanks = useSaves()
   const [error, setError] = useState(false)
   const displayError = useDisplayError()
@@ -48,15 +48,6 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
   const loadSaveData = useCallback(
     async (savePath: PathData) => {
       const response = await backend.loadSaveFile(savePath)
-      const lookupsResponse = await getLookups()
-
-      if (E.isLeft(lookupsResponse)) {
-        console.error(lookupsResponse.left)
-        handleError('Error loading lookups', lookupsResponse.left)
-        return
-      }
-
-      const lookups = lookupsResponse.right
 
       if (E.isRight(response)) {
         const { fileBytes } = response.right
@@ -74,7 +65,7 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
       }
       return undefined
     },
-    [backend, getEnabledSaveTypes, getLookups, handleError, ohpkmStore.getById]
+    [backend, getEnabledSaveTypes, lookups, ohpkmStore.getById]
   )
 
   useEffect(() => {

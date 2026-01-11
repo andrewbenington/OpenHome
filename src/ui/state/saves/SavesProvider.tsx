@@ -6,7 +6,6 @@ import {
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { HomeData } from '@openhome-core/save/HomeData'
 import { filterUndefined } from '@openhome-core/util/sort'
-import { LookupMap } from '@openhome-core/util/types'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
 import { ErrorIcon } from '@openhome-ui/components/Icons'
 import LoadingIndicator from '@openhome-ui/components/LoadingIndicator'
@@ -17,8 +16,8 @@ import { Callout } from '@radix-ui/themes'
 import * as E from 'fp-ts/lib/Either'
 import { ReactNode, useCallback, useContext, useEffect, useReducer } from 'react'
 import { ItemBagContext } from '../items/reducer'
+import { useLookups } from '../lookups/lookups'
 import { OhpkmLookup, useOhpkmStore } from '../ohpkm/useOhpkmStore'
-import { useRustState } from '../rustState'
 import { openSavesReducer, SavesContext } from './reducer'
 
 export type SavesProviderProps = {
@@ -28,6 +27,7 @@ export type SavesProviderProps = {
 export default function SavesProvider({ children }: SavesProviderProps) {
   const backend = useContext(BackendContext)
   const ohpkmStore = useOhpkmStore()
+  const lookupsState = useLookups()
   const [itemBagState, bagDispatch] = useContext(ItemBagContext)
   const displayError = useDisplayError()
   const [openSavesState, openSavesDispatch] = useReducer(openSavesReducer, {
@@ -35,11 +35,6 @@ export default function SavesProvider({ children }: SavesProviderProps) {
     monsToRelease: [],
     openSaves: {},
   })
-  const ohpkmStoreState = useRustState<Record<string, OHPKM>>(
-    'ohpkm_store',
-    (backend) => backend.loadOhpkmStore(),
-    (backend, updated) => backend.updateOhpkmStore(updated)
-  )
 
   const allOpenSaves = Object.values(openSavesState.openSaves)
     .filter((data) => !!data)
@@ -88,8 +83,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
       )
     }
 
-    const newGen12Lookup: LookupMap = {}
-    const newGen345Lookup: LookupMap = {}
+    const newLookups = { ...lookupsState.lookups }
     const saveTypesAndChangedMons = allOpenSaves.map(
       (save) => [save.origin, save.prepareBoxesAndGetModified()] as [OriginGame, OHPKM[]]
     )
@@ -102,7 +96,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
           const gen12Identifier = getMonGen12Identifier(mon)
 
           if (openHomeIdentifier !== undefined && gen12Identifier) {
-            newGen12Lookup[gen12Identifier] = openHomeIdentifier
+            newLookups.gen12[gen12Identifier] = openHomeIdentifier
           }
         })
       } else if (
@@ -115,14 +109,14 @@ export default function SavesProvider({ children }: SavesProviderProps) {
           const gen345Identifier = getMonGen345Identifier(mon)
 
           if (openHomeIdentifier !== undefined && gen345Identifier) {
-            newGen345Lookup[gen345Identifier] = openHomeIdentifier
+            newLookups.gen345[gen345Identifier] = openHomeIdentifier
           }
         })
       }
     }
 
     const promises = [
-      backend.updateLookups(newGen12Lookup, newGen345Lookup),
+      lookupsState.updateLookups(newLookups),
       backend.writeAllSaveFiles(allOpenSaves),
       backend.writeAllHomeData(
         openSavesState.homeData,
@@ -134,7 +128,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
           .map(getMonFileIdentifier)
           .filter(filterUndefined)
       ),
-      ohpkmStoreState.updateState(openSavesState.modifiedOHPKMs),
+      ohpkmStore.overwriteAll(openSavesState.modifiedOHPKMs),
     ]
 
     if (itemBagState.modified) {
@@ -161,20 +155,21 @@ export default function SavesProvider({ children }: SavesProviderProps) {
     openSavesDispatch({ type: 'clear_updated_box_slots' })
     openSavesDispatch({ type: 'clear_mons_to_release' })
 
-    const updatedOhpkmStore = { ...ohpkmStoreState.state, ...openSavesState.modifiedOHPKMs }
+    const updatedOhpkmStore = { ...ohpkmStore.byId, ...openSavesState.modifiedOHPKMs }
     await loadAllHomeData((id) => updatedOhpkmStore[id])
   }, [
     openSavesState.homeData,
     openSavesState.modifiedOHPKMs,
     openSavesState.monsToRelease,
     backend,
+    lookupsState,
     allOpenSaves,
-    ohpkmStoreState,
+    ohpkmStore,
     itemBagState.modified,
     itemBagState.itemCounts,
+    loadAllHomeData,
     displayError,
     bagDispatch,
-    loadAllHomeData,
   ])
 
   // load bag

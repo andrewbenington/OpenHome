@@ -30,10 +30,6 @@ export function useRustState<State>(
   })
 
   const loadAndCacheState = useCallback(async () => {
-    if (stateCache) {
-      return E.right(stateCache)
-    }
-
     stateGetter(backend).then(
       E.match(
         (err) => setError(err),
@@ -43,7 +39,7 @@ export function useRustState<State>(
         }
       )
     )
-  }, [backend, onLoaded, stateCache, stateGetter])
+  }, [backend, onLoaded, stateGetter])
 
   const updateState = useCallback(
     async (updated: State) => {
@@ -65,5 +61,3 @@ export function useRustState<State>(
     return { updateState, state: undefined, loaded: false, error }
   }
 }
-
-// export const LookupsContext = createContext<LookupsManager>([initialState, () => {}])

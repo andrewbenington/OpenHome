@@ -14,10 +14,7 @@ use std::env;
 use tauri::Manager;
 use tauri_plugin_dialog::{DialogExt, MessageDialogKind};
 
-use crate::{
-    error::Error,
-    state::shared_state::{AllSharedState, SharedState},
-};
+use crate::{error::Error, state::shared_state::AllSharedState};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -54,8 +51,7 @@ pub fn run() {
                 }
             };
 
-            let lookup_state_inner = match state::LookupStateInner::load_from_storage(app.handle())
-            {
+            let lookup_state_inner = match state::LookupState::load_from_storage(app.handle()) {
                 Ok(lookup) => lookup,
                 Err(err) => {
                     app.dialog()
@@ -70,20 +66,6 @@ pub fn run() {
 
             let shared_state = AllSharedState::from_states(lookup_state_inner, ohpkm_store);
             app.manage(shared_state);
-
-            let lookup_state = match state::LookupState::load_from_storage(app.handle()) {
-                Ok(lookup) => lookup,
-                Err(err) => {
-                    app.dialog()
-                        .message(err.to_string())
-                        .title("OpenHome Failed to Launch - Lookup File Error")
-                        .kind(MessageDialogKind::Error)
-                        .blocking_show();
-                    app.handle().exit(1);
-                    std::process::exit(1);
-                }
-            };
-            app.manage(lookup_state);
 
             let pokedex_state = match state::PokedexState::load_from_storage(app.handle()) {
                 Ok(pokedex) => pokedex,
@@ -141,8 +123,6 @@ pub fn run() {
             commands::open_file_location,
             pkm_storage::load_banks,
             pkm_storage::write_banks,
-            state::get_lookups_old,
-            state::update_lookups_old,
             state::get_lookups,
             state::update_lookups,
             state::get_ohpkm_store,

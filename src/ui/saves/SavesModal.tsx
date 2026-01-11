@@ -10,7 +10,6 @@ import { CardsIcon, GridIcon } from '@openhome-ui/components/Icons'
 import SideTabs from '@openhome-ui/components/side-tabs/SideTabs'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import { AppInfoAction, AppInfoContext } from '@openhome-ui/state/appInfo'
-import { useLookups } from '@openhome-ui/state/lookups'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { useSaves } from '@openhome-ui/state/saves'
 import { PokedexUpdate } from '@openhome-ui/util/pokedex'
@@ -18,6 +17,7 @@ import { Button, Dialog, Flex, Separator, Slider, VisuallyHidden } from '@radix-
 import * as E from 'fp-ts/lib/Either'
 import { useCallback, useContext, useState } from 'react'
 import 'react-data-grid/lib/styles.css'
+import { useLookups } from 'src/ui/state/lookups/lookups'
 import useDebounce from '../hooks/useDebounce'
 import RecentSaves from './RecentSaves'
 import SaveFolders from './SaveFolders'
@@ -41,21 +41,14 @@ function useOpenSaveHandler(onClose?: () => void) {
   const [tentativeSaveData, setTentativeSaveData] = useState<AmbiguousOpenState>()
   const backend = useContext(BackendContext)
   const ohpkmStore = useOhpkmStore()
-  const { getLookups } = useLookups()
+  const { lookups } = useLookups()
+
+  console.log({ lookups })
 
   const displayError = useDisplayError()
 
   const buildAndOpenSave = useCallback(
     async (saveType: SAVClass, filePath: PathData, fileBytes: Uint8Array) => {
-      const lookupsResult = await getLookups()
-
-      if (E.isLeft(lookupsResult)) {
-        displayError('Error Loading Lookups', lookupsResult.left)
-        return
-      }
-
-      const lookups = lookupsResult.right
-
       const result = buildSaveFile(
         filePath,
         fileBytes,
@@ -89,7 +82,7 @@ function useOpenSaveHandler(onClose?: () => void) {
         onClose?.()
       }
     },
-    [getLookups, ohpkmStore.getById, displayError, backend, savesAndBanks, onClose]
+    [lookups, ohpkmStore.getById, displayError, backend, savesAndBanks, onClose]
   )
 
   const pickSaveFile = useCallback(
