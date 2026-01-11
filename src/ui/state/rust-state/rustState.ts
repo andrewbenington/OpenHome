@@ -2,8 +2,8 @@ import { BackendContext } from '@openhome-ui/backend/backendContext'
 import { useCallback, useContext, useEffect, useState } from 'react'
 
 import * as E from 'fp-ts/lib/Either'
-import { Errorable, Option } from '../../core/util/functional'
-import BackendInterface from '../backend/backendInterface'
+import { Errorable, Option } from '../../../core/util/functional'
+import BackendInterface from '../../backend/backendInterface'
 
 export type RustStateManager<State> = {
   updateState: (updated: State) => Promise<Errorable<null>>

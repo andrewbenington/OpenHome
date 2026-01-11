@@ -16,7 +16,7 @@ import { Callout } from '@radix-ui/themes'
 import * as E from 'fp-ts/lib/Either'
 import { ReactNode, useCallback, useContext, useEffect, useReducer } from 'react'
 import { ItemBagContext } from '../items/reducer'
-import { useLookups } from '../lookups/lookups'
+import { useLookups } from '../lookups/useLookups'
 import { OhpkmLookup, useOhpkmStore } from '../ohpkm/useOhpkmStore'
 import { openSavesReducer, SavesContext } from './reducer'
 

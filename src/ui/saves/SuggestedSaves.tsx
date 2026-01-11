@@ -11,7 +11,7 @@ import { useSaves } from '@openhome-ui/state/saves'
 import { Flex } from '@radix-ui/themes'
 import * as E from 'fp-ts/lib/Either'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
-import { useLookups } from 'src/ui/state/lookups/lookups'
+import { useLookups } from 'src/ui/state/lookups/useLookups'
 import SaveCard from './SaveCard'
 import { filterEmpty, SaveViewMode } from './util'
 

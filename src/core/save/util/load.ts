@@ -24,7 +24,6 @@ const recoverOHPKMData = (
   if (!getIdentifier || SKIP_OHPKM_LOAD) {
     return saveFile
   }
-  console.log(lookupMap)
   saveFile.boxes.forEach((box) => {
     box.pokemon.forEach((mon, monIndex) => {
       if (mon) {

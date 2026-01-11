@@ -39,7 +39,6 @@ impl shared_state::SharedState for LookupState {
 
 #[tauri::command]
 pub fn get_lookups(shared_state: tauri::State<'_, AllSharedState>) -> Result<LookupState> {
-    println!("lookups: {:?}", shared_state.clone_lookups());
     shared_state.clone_lookups()
 }
 

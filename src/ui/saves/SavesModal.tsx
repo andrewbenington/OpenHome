@@ -17,7 +17,7 @@ import { Button, Dialog, Flex, Separator, Slider, VisuallyHidden } from '@radix-
 import * as E from 'fp-ts/lib/Either'
 import { useCallback, useContext, useState } from 'react'
 import 'react-data-grid/lib/styles.css'
-import { useLookups } from 'src/ui/state/lookups/lookups'
+import { useLookups } from 'src/ui/state/lookups/useLookups'
 import useDebounce from '../hooks/useDebounce'
 import RecentSaves from './RecentSaves'
 import SaveFolders from './SaveFolders'
@@ -42,8 +42,6 @@ function useOpenSaveHandler(onClose?: () => void) {
   const backend = useContext(BackendContext)
   const ohpkmStore = useOhpkmStore()
   const { lookups } = useLookups()
-
-  console.log({ lookups })
 
   const displayError = useDisplayError()
 

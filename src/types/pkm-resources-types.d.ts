@@ -8,3 +8,9 @@ declare module '@pkm-rs/pkg' {
     readonly eggGroups: EggGroup[]
   }
 }
+
+declare module '@openhome-ui' {
+  interface Uint8ArrayConstructor {
+    fromBase64(base64: string): Uint8Array
+  }
+}

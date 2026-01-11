@@ -4,7 +4,7 @@ import OHDataGrid, { SortableColumn } from '@openhome-ui/components/OHDataGrid'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { OriginGames } from '@pkm-rs/pkg'
-import { useLookups } from 'src/ui/state/lookups/lookups'
+import { useLookups } from 'src/ui/state/lookups/useLookups'
 
 type G12LookupRow = {
   gen12ID: string

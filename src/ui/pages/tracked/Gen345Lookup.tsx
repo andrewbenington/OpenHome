@@ -4,7 +4,7 @@ import OHDataGrid, { SortableColumn } from '@openhome-ui/components/OHDataGrid'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { OriginGames } from '@pkm-rs/pkg'
-import { useLookups } from 'src/ui/state/lookups/lookups'
+import { useLookups } from 'src/ui/state/lookups/useLookups'
 
 type G345LookupRow = {
   gen345ID: string
@@ -19,7 +19,6 @@ type Gen345LookupProps = {
 export default function Gen345Lookup({ onSelectMon }: Gen345LookupProps) {
   const ohpkmStore = useOhpkmStore()
   const { lookups } = useLookups()
-  console.log({ lookups })
 
   const columns: SortableColumn<G345LookupRow>[] = [
     {
