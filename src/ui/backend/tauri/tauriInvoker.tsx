@@ -16,6 +16,22 @@ function rustResultToEither<T, E>(result: RustResult<T, E>): E.Either<E, T> {
   return 'Ok' in result ? E.right(result.Ok) : E.left(result.Err)
 }
 
+// remove this after node 25 is lts
+if (!('fromBase64' in Uint8Array)) {
+  // @ts-expect-error – intentionally adding this static constructor because it is relatively new to javascript
+  Uint8Array.fromBase64 = function (base64: string): Uint8Array {
+    const binary = atob(base64)
+    const len = binary.length
+    const bytes = new Uint8Array(len)
+
+    for (let i = 0; i < len; i++) {
+      bytes[i] = binary.charCodeAt(i)
+    }
+
+    return bytes
+  }
+}
+
 export const TauriInvoker = {
   getState() {
     const promise = invoke('get_state') as Promise<AppState>
