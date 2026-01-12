@@ -1,8 +1,7 @@
 import { BackendContext } from '@openhome-ui/backend/backendContext'
 import { useCallback, useContext, useEffect, useState } from 'react'
 
-import * as E from 'fp-ts/lib/Either'
-import { Errorable, Option } from '../../../core/util/functional'
+import { Errorable, Option, R } from '../../../core/util/functional'
 import BackendInterface from '../../backend/backendInterface'
 
 export type RustStateManager<State> = {
@@ -12,11 +11,12 @@ export type RustStateManager<State> = {
   | { loaded: false; state: undefined; error: Option<string> }
 )
 
-export function useRustState<State>(
+export function useRustState<State, TauriResponse = State>(
   stateType: string,
   stateGetter: (b: BackendInterface) => Promise<Errorable<State>>,
   stateUpdater: (b: BackendInterface, updated: State) => Promise<Errorable<null>>,
-  onLoaded?: (data: State) => void
+  onLoaded?: (data: State) => void,
+  transformTauriResponse?: (payload: TauriResponse) => State
 ): RustStateManager<State> {
   const [stateCache, setStateCache] = useState<State>()
   const [loading, setLoading] = useState(false)
@@ -25,18 +25,24 @@ export function useRustState<State>(
 
   backend.registerListeners({
     onStateUpdate: {
-      [stateType]: (updatedState) => setStateCache(updatedState as unknown as State),
+      [stateType]: (updatedState) => {
+        console.log(`received state update for ${stateType}`)
+        const transformedResponse = transformTauriResponse
+          ? transformTauriResponse(updatedState as unknown as TauriResponse)
+          : (updateState as unknown as State)
+        setStateCache(transformedResponse)
+      },
     },
   })
 
   const loadAndCacheState = useCallback(async () => {
     stateGetter(backend).then(
-      E.match(
-        (err) => setError(err),
+      R.match(
         (data) => {
           onLoaded?.(data)
           setStateCache(data)
-        }
+        },
+        (err) => setError(err)
       )
     )
   }, [backend, onLoaded, stateGetter])

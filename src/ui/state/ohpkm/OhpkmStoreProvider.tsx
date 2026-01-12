@@ -4,6 +4,8 @@ import { RustStateProvider, useRustState } from '@openhome-ui/state/rust-state'
 import { PokedexUpdate } from '@openhome-ui/util/pokedex'
 import { PropsWithChildren, useCallback, useContext } from 'react'
 import { OhpkmStoreContext, OhpkmStoreData } from '.'
+import { OHPKM } from '../../../core/pkm/OHPKM'
+import { StringToB64 } from '../../backend/tauri/tauriInvoker'
 
 function useOhpkmStoreTauri() {
   const backend = useContext(BackendContext)
@@ -38,11 +40,12 @@ function useOhpkmStoreTauri() {
     [backend]
   )
 
-  return useRustState<OhpkmStoreData>(
+  return useRustState<OhpkmStoreData, StringToB64>(
     'ohpkm_store',
     (backend) => backend.loadOhpkmStore(),
     (backend, updated) => backend.updateOhpkmStore(updated),
-    updatePokedexFromStored
+    updatePokedexFromStored,
+    transformResponse
   )
 }
 
@@ -54,5 +57,14 @@ export default function OhpkmStoreProvider({ children }: PropsWithChildren) {
       stateDescription="OHPKM Store"
       children={children}
     />
+  )
+}
+
+function transformResponse(response: StringToB64): OhpkmStoreData {
+  return Object.fromEntries(
+    Object.entries(response).map(([identifier, b64String]) => [
+      identifier,
+      new OHPKM(Uint8Array.fromBase64(b64String)),
+    ])
   )
 }

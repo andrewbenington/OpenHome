@@ -48,7 +48,7 @@ export const TauriBackend: BackendInterface = {
     return Commands.get_ohpkm_store().then(
       R.map((b64ByIdentifier) =>
         Object.fromEntries(
-          Object.entries(b64ByIdentifier.value).map(([identifier, b64String]) => [
+          Object.entries(b64ByIdentifier).map(([identifier, b64String]) => [
             identifier,
             new OHPKM(Uint8Array.fromBase64(b64String)),
           ])
@@ -298,6 +298,13 @@ export const TauriBackend: BackendInterface = {
     }
     if (listeners.onOpen) {
       unlistenPromises.push(listen('open', listeners.onOpen))
+    }
+    if (listeners.onStateUpdate) {
+      for (const [stateType, listener] of Object.entries(listeners.onStateUpdate)) {
+        unlistenPromises.push(
+          listen(`shared_state_update::${stateType}`, (event) => listener(event.payload))
+        )
+      }
     }
     if (listeners.onLookupsUpdate) {
       const listener = listeners.onLookupsUpdate

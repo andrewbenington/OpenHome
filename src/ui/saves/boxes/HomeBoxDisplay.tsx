@@ -2,7 +2,7 @@ import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { getMonFileIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SortTypes } from '@openhome-core/pkm/sort'
-import { matches, range } from '@openhome-core/util/functional'
+import { matches, R, range } from '@openhome-core/util/functional'
 import OpenHomeCtxMenu from '@openhome-ui/components/context-menu/OpenHomeCtxMenu'
 import { ItemBuilder, SubmenuBuilder } from '@openhome-ui/components/context-menu/types'
 import {
@@ -317,7 +317,13 @@ function SingleBoxMonDisplay() {
           {range(COLUMN_COUNT * ROW_COUNT)
             .map((index: number) => currentBox.boxSlots[index])
             .map((identifier, index) => {
-              const mon = identifier ? ohpkmStore.getById(identifier) : undefined
+              const result = identifier ? ohpkmStore.tryLoadFromId(identifier) : undefined
+
+              if (result && R.isErr(result)) {
+                return <div key={`${homeData.currentPCBox}-${index}`}>!</div>
+              }
+              const mon = result?.value
+
               return (
                 <BoxCell
                   key={`${homeData.currentPCBox}-${index}`}

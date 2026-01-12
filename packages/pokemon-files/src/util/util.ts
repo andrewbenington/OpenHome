@@ -261,7 +261,9 @@ export class MoveFilter {
   }
 
   relearnMovesOrDefault(mon: AllPKMFields): FourMoves {
-    return mon.relearnMoves ? this.filterByMoves(mon, mon.relearnMoves) : [0, 0, 0, 0]
+    return (mon.relearnMoves?.map((moveIndex) =>
+      this.moveIsAllowed(moveIndex) ? moveIndex : 0
+    ) ?? [0, 0, 0, 0]) as FourMoves
   }
 }
 

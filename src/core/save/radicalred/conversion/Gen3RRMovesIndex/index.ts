@@ -1,3 +1,5 @@
+import { Option } from '@openhome-core/util/functional'
+
 export const Gen3RRMoves = [
   'None',
   'Pound',
@@ -1009,16 +1011,16 @@ import { RRToNationalMap } from './RRToNationalMap'
 
 // const dne_moves = [89, 538, 526, 659]
 
-export function fromGen3RRMoveIndex(rrIndex: number): number {
+export function fromGen3RRMoveIndex(rrIndex: number): Option<number> {
   if (rrIndex === 0) return 0
   const key = Gen3RRMoves[rrIndex]
 
-  return key ? RRToNationalMap[key] : -1
+  return key ? RRToNationalMap[key] : undefined
 }
 
-export function toGen3RRMoveIndex(nationalMoveId: number): number {
+export function toGen3RRMoveIndex(nationalMoveId: number): Option<number> {
   if (nationalMoveId === 0) return 0
   const key = Moves[nationalMoveId]?.name
 
-  return key ? NationalToRRMap[key][0] : -1
+  return key ? NationalToRRMap[key] : undefined
 }

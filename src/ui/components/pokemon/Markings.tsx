@@ -3,7 +3,7 @@ import { useSaves } from '@openhome-ui/state/saves'
 import { markingDisplay, Markings, MarkingShape, markingsHaveColor } from '@pokemon-files/util'
 
 type MarkingsProps = {
-  markings: Markings
+  readonly markings: Markings
 } & ({ openHomeId: string; allowUpdate: true } | { openHomeId?: string; allowUpdate?: false })
 
 const getMarkingColorByNumber = (value: MarkingValue) => {
@@ -17,30 +17,31 @@ const MarkingsDisplay = (props: MarkingsProps) => {
 
   const { updateMonMarkings } = useSaves()
 
+  const modifiedMarkings = { ...markings }
+
   const cycleMarkingValue =
-    allowUpdate && markingsHaveColor(markings)
+    allowUpdate && markingsHaveColor(modifiedMarkings)
       ? (shape: MarkingShape) => {
-          if (markings[shape] === 'blue') {
-            markings[shape] = 'red'
-          } else if (markings[shape] === 'red') {
-            markings[shape] = null
+          if (modifiedMarkings[shape] === 'blue') {
+            modifiedMarkings[shape] = 'red'
+          } else if (modifiedMarkings[shape] === 'red') {
+            modifiedMarkings[shape] = null
           } else {
-            markings[shape] = 'blue'
+            modifiedMarkings[shape] = 'blue'
           }
 
-          updateMonMarkings(openHomeId, markings)
-          props.markings = { ...markings }
+          updateMonMarkings(openHomeId, modifiedMarkings)
         }
       : undefined
 
   return (
     <div className="markings-container">
-      <Marking marking="circle" markings={markings} onClick={cycleMarkingValue} />
-      <Marking marking="square" markings={markings} onClick={cycleMarkingValue} />
-      <Marking marking="triangle" markings={markings} onClick={cycleMarkingValue} />
-      <Marking marking="heart" markings={markings} onClick={cycleMarkingValue} />
-      <Marking marking="star" markings={markings} onClick={cycleMarkingValue} />
-      <Marking marking="diamond" markings={markings} onClick={cycleMarkingValue} />
+      <Marking marking="circle" markings={modifiedMarkings} onClick={cycleMarkingValue} />
+      <Marking marking="square" markings={modifiedMarkings} onClick={cycleMarkingValue} />
+      <Marking marking="triangle" markings={modifiedMarkings} onClick={cycleMarkingValue} />
+      <Marking marking="heart" markings={modifiedMarkings} onClick={cycleMarkingValue} />
+      <Marking marking="star" markings={modifiedMarkings} onClick={cycleMarkingValue} />
+      <Marking marking="diamond" markings={modifiedMarkings} onClick={cycleMarkingValue} />
     </div>
   )
 }

@@ -36,6 +36,7 @@ impl OhpkmBytesStore {
     }
 
     fn write_to_directory(data: &Self, path: &Path) -> Result<()> {
+        println!("writing {} ohpkm files", data.0.len());
         let mut errors: Vec<(PathBuf, Box<dyn std::error::Error>)> = Vec::new();
         data.0.iter().for_each(|(identifier, bytes)| {
             let filename = format!("{identifier}.ohpkm");
@@ -74,6 +75,10 @@ impl OhpkmBytesStore {
 
 impl shared_state::SharedState for OhpkmBytesStore {
     const ID: &'static str = "ohpkm_store";
+
+    fn to_command_response(&self) -> impl Clone + Serialize + tauri::ipc::IpcResponse {
+        self.to_b64_map()
+    }
 }
 
 #[tauri::command]
@@ -89,7 +94,7 @@ pub fn update_ohpkm_store(
     shared_state: tauri::State<'_, shared_state::AllSharedState>,
     updates: OhpkmBytesStore,
 ) -> Result<()> {
-    OhpkmBytesStore::write_to_mons_v2(&updates, &app_handle)?;
+    // OhpkmBytesStore::write_to_mons_v2(&updates, &app_handle)?;
     shared_state
         .lock()?
         .update_ohpkm_store(&app_handle, |old_data| {

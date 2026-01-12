@@ -10,6 +10,9 @@ use crate::state::{LookupState, OhpkmBytesStore};
 
 pub trait SharedState: Clone + Serialize + tauri::ipc::IpcResponse {
     const ID: &'static str;
+    fn to_command_response(&self) -> impl Clone + Serialize + tauri::ipc::IpcResponse {
+        self
+    }
 }
 
 pub struct SharedStateWrapper<State: SharedState>(State);
@@ -23,9 +26,11 @@ impl<State: SharedState> SharedStateWrapper<State> {
 
         let event = format!("shared_state_update::{}", State::ID);
 
-        app_handle.emit(&event, self.0.clone()).map_err(|err| {
-            Error::other_with_source(&format!("Could not emit '{event}' to frontend"), err)
-        })
+        app_handle
+            .emit(&event, self.0.to_command_response())
+            .map_err(|err| {
+                Error::other_with_source(&format!("Could not emit '{event}' to frontend"), err)
+            })
     }
 }
 

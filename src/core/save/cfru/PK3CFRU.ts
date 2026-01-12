@@ -9,6 +9,7 @@ import {
   SpeciesLookup,
 } from '@pkm-rs/pkg'
 import {
+  FourMoves,
   generatePersonalityValuePreservingAttributes,
   getFlag,
   getMoveMaxPP,
@@ -17,6 +18,7 @@ import {
   markingsFourShapesFromBytes,
   markingsFourShapesFromOther,
   markingsFourShapesToBytes,
+  MoveFilter,
   read30BitIVsFromBytes,
   readGen3StringFromBytes,
   readStatsFromBytesU8,
@@ -239,15 +241,13 @@ export abstract class PK3CFRU implements PluginPKMInterface {
       this.formeNum = other.formeNum
       this.internalHeldItemIndex = this.internalItemIndexFromModern(other.heldItemIndex)
       this.exp = other.exp
-      this.movePPUps = other.movePPUps
       this.trainerFriendship = other.trainerFriendship ?? 0
-      this.moves = other.moves.map(this.moveToGameIndex).map(this.moveFromGameIndex)
 
-      for (let i = 0; i < 4; i++) {
-        const pp = getMoveMaxPP(this.moves[i], this.format, this.movePPUps[i])
+      const moveFilter = MoveFilter.fromMoveIndices(this.getValidMoveIndices())
+      this.moves = moveFilter.moves(other)
+      this.movePP = moveFilter.movePp(other, this.format)
+      this.movePPUps = moveFilter.movePpUps(other)
 
-        if (pp) this.movePP[i] = pp
-      }
       this.evs = other.evs ?? {
         hp: 0,
         atk: 0,
@@ -318,6 +318,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
 
   abstract moveFromGameIndex(gameIndex: number): number
   abstract moveToGameIndex(nationalMoveId: number): number
+  abstract getValidMoveIndices(): number[]
 
   abstract monFromGameIndex(gameIndex: number): CFRUToNationalDexEntry
   abstract monToGameIndex(nationalDexNumber: number, formIndex: number): number

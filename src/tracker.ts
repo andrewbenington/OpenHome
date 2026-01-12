@@ -15,13 +15,13 @@ type Untracked<P> = { _tag: 'Untracked'; data: P }
 
 export type MaybeTracked<P extends PKMInterface = PKMInterface> = Tracked<P> | Untracked<P>
 
-const tracked = <P extends PKMInterface>(data: P, id: OhpkmIdentifier): MaybeTracked<P> => ({
+export const tracked = <P extends PKMInterface>(data: P, id: OhpkmIdentifier): MaybeTracked<P> => ({
   _tag: 'Tracked',
   data,
   identifier: id,
 })
 
-const untracked = <P extends PKMInterface>(data: P): MaybeTracked<P> => ({
+export const untracked = <P extends PKMInterface>(data: P): MaybeTracked<P> => ({
   _tag: 'Untracked',
   data,
 })
