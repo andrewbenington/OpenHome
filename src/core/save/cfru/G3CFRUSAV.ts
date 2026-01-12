@@ -6,6 +6,7 @@ import {
   uint32ToBytesLittleEndian,
 } from '@openhome-core/save/util/byteLogic'
 import { Gender, OriginGame } from '@pkm-rs/pkg'
+import { OhpkmTracker } from '../../../tracker'
 import { Box, PluginSAV, SaveMonLocation } from '../interfaces'
 import { LookupType } from '../util'
 import { PathData } from '../util/path'
@@ -75,7 +76,7 @@ class G3CFRUSaveBackup<T extends PluginPKMInterface> {
   boxNames: string[]
   firstSectorIndex: number = 0
 
-  constructor(bytes: Uint8Array, pkmType: any) {
+  constructor(bytes: Uint8Array, PkmClass: new (bytes: ArrayBuffer) => T, tracker: OhpkmTracker) {
     this.bytes = bytes
     this.saveIndex = bytesToUint32LittleEndian(bytes, 0xffc)
     this.securityKey = bytesToUint32LittleEndian(bytes, 0xf20)
@@ -115,12 +116,12 @@ class G3CFRUSaveBackup<T extends PluginPKMInterface> {
     }
     for (let i = 0; i < nMons; i++) {
       try {
-        const mon = new pkmType(this.pcDataContiguous.slice(4 + i * 58, 4 + (i + 1) * 58).buffer)
+        const mon = new PkmClass(this.pcDataContiguous.slice(4 + i * 58, 4 + (i + 1) * 58).buffer)
 
         if (mon.dexNum !== 0 && mon.trainerID !== 0) {
           const box = this.boxes[Math.floor(i / 30)]
 
-          box.boxSlots[i % 30] = mon
+          box.boxSlots[i % 30] = tracker.wrapWithIdentifier(mon)
           if (mon.trainerID === this.tid) {
             mon.gameOfOrigin = OriginGame.FireRed
           }
@@ -182,14 +183,14 @@ export abstract class G3CFRUSAV<T extends PluginPKMInterface> extends PluginSAV<
   tooEarlyToOpen: boolean = false
   updatedBoxSlots: SaveMonLocation[] = []
 
-  constructor(path: PathData, bytes: Uint8Array, pkmType: any) {
+  constructor(path: PathData, bytes: Uint8Array, pkmType: any, tracker: OhpkmTracker) {
     super()
     this.pkmTypeClass = pkmType
     this.bytes = bytes
     this.filePath = path
 
-    const saveOne = new G3CFRUSaveBackup<T>(bytes.slice(0, 0xe000), pkmType)
-    const saveTwo = new G3CFRUSaveBackup<T>(bytes.slice(0xe000, 0x1c000), pkmType)
+    const saveOne = new G3CFRUSaveBackup<T>(bytes.slice(0, 0xe000), pkmType, tracker)
+    const saveTwo = new G3CFRUSaveBackup<T>(bytes.slice(0xe000, 0x1c000), pkmType, tracker)
 
     if (saveOne.saveIndex > saveTwo.saveIndex) {
       this.primarySave = saveOne

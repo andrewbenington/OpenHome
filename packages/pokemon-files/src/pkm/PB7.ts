@@ -11,12 +11,13 @@ import {
   NatureIndex,
   SpeciesLookup,
 } from '@pkm-rs/pkg'
+import { FourMoves } from '../util'
 import * as byteLogic from '../util/byteLogic'
 import * as encryption from '../util/encryption'
 import { getStats } from '../util/statCalc'
 import * as stringLogic from '../util/stringConversion'
 import * as types from '../util/types'
-import { adjustMovePPBetweenFormats, getHeightCalculated, getWeightCalculated } from '../util/util'
+import { getHeightCalculated, getWeightCalculated, MoveFilter } from '../util/util'
 
 export default class PB7 {
   static getName() {
@@ -50,10 +51,10 @@ export default class PB7 {
   weightScalar: number
   formArgument: number
   nickname: string
-  moves: number[]
-  movePP: number[]
-  movePPUps: number[]
-  relearnMoves: number[]
+  moves: FourMoves
+  movePP: FourMoves
+  movePPUps: FourMoves
+  relearnMoves: FourMoves
   ivs: types.Stats
   isEgg: boolean
   isNicknamed: boolean
@@ -234,14 +235,13 @@ export default class PB7 {
       this.weightScalar = other.weightScalar ?? 127
       this.formArgument = other.formArgument ?? 0
       this.nickname = other.nickname
-      this.moves = other.moves.filter((_, i) => LGPE_VALID_MOVES.includes(other.moves[i]))
-      this.movePP = adjustMovePPBetweenFormats(this, other).filter((_, i) =>
-        LGPE_VALID_MOVES.includes(other.moves[i])
-      )
-      this.movePPUps = other.movePPUps.filter((_, i) => LGPE_VALID_MOVES.includes(other.moves[i]))
-      this.relearnMoves = other.relearnMoves?.filter(
-        (_, i) => other.relearnMoves && LGPE_VALID_MOVES.includes(other.relearnMoves[i])
-      ) ?? [0, 0, 0, 0]
+
+      const moveFilter = MoveFilter.fromMoveIndices(LGPE_VALID_MOVES)
+      this.moves = moveFilter.moves(other)
+      this.movePP = moveFilter.movePp(other, this.format)
+      this.movePPUps = moveFilter.movePpUps(other)
+      this.relearnMoves = moveFilter.relearnMovesOrDefault(other)
+
       this.ivs = other.ivs ?? {
         hp: 0,
         atk: 0,
@@ -487,7 +487,7 @@ export default class PB7 {
   }
 }
 
-const LGPE_VALID_MOVES = [
+export const LGPE_VALID_MOVES = [
   1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27,
   28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51,
   52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75,

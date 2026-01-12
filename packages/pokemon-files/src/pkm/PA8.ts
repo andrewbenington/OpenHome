@@ -13,12 +13,12 @@ import {
 import { ModernRibbons } from '@pokemon-resources/index'
 import * as byteLogic from '../util/byteLogic'
 import * as encryption from '../util/encryption'
-import { AllPKMFields } from '../util/pkmInterface'
+import { AllPKMFields, FourMoves } from '../util/pkmInterface'
 import { filterRibbons } from '../util/ribbonLogic'
 import { getStats } from '../util/statCalc'
 import * as stringLogic from '../util/stringConversion'
 import * as types from '../util/types'
-import { adjustMovePPBetweenFormats, getHeightCalculated, getWeightCalculated } from '../util/util'
+import { getHeightCalculated, getWeightCalculated, MoveFilter } from '../util/util'
 
 export default class PA8 {
   static getName() {
@@ -57,11 +57,11 @@ export default class PA8 {
   heightScalar: number
   weightScalar: number
   scale: number
-  moves: number[]
-  movePP: number[]
+  moves: FourMoves
+  movePP: FourMoves
   nickname: string
-  movePPUps: number[]
-  relearnMoves: number[]
+  movePPUps: FourMoves
+  relearnMoves: FourMoves
   currentHP: number
   ivs: types.Stats
   isEgg: boolean
@@ -106,6 +106,7 @@ export default class PA8 {
   ribbons: string[]
   trainerGender: boolean
   constructor(arg: ArrayBuffer | AllPKMFields, encrypted?: boolean) {
+    // console.log('building PA8')
     if (arg instanceof ArrayBuffer) {
       let buffer = arg
       if (encrypted) {
@@ -221,6 +222,7 @@ export default class PA8 {
       this.trainerGender = byteLogic.getFlag(dataView, 0x13d, 7)
     } else {
       const other = arg
+      console.log(other.relearnMoves)
       this.encryptionConstant = other.encryptionConstant ?? 0
       this.sanity = other.sanity ?? 0
       this.checksum = other.checksum ?? 0
@@ -271,15 +273,14 @@ export default class PA8 {
       this.heightScalar = other.heightScalar ?? 127
       this.weightScalar = other.weightScalar ?? 127
       this.scale = other.scale ?? this.heightScalar
-      this.moves = other.moves.filter((_, i) => LA_VALID_MOVES.includes(other.moves[i]))
-      this.movePP = adjustMovePPBetweenFormats(this, other).filter((_, i) =>
-        LA_VALID_MOVES.includes(other.moves[i])
-      )
       this.nickname = other.nickname
-      this.movePPUps = other.movePPUps.filter((_, i) => LA_VALID_MOVES.includes(other.moves[i]))
-      this.relearnMoves = other.relearnMoves?.filter(
-        (_, i) => other.relearnMoves && LA_VALID_MOVES.includes(other.relearnMoves[i])
-      ) ?? [0, 0, 0, 0]
+
+      const moveFilter = MoveFilter.fromMoveIndices(LA_VALID_MOVES)
+      this.moves = moveFilter.moves(other)
+      this.movePP = moveFilter.movePp(other, this.format)
+      this.movePPUps = moveFilter.movePpUps(other)
+      this.relearnMoves = moveFilter.relearnMovesOrDefault(other)
+
       this.currentHP = other.currentHP ?? 0
       this.ivs = other.ivs ?? {
         hp: 0,
@@ -555,7 +556,7 @@ export default class PA8 {
   }
 }
 
-const LA_VALID_MOVES = [
+export const LA_VALID_MOVES = [
   7, 8, 9, 14, 16, 33, 38, 40, 42, 44, 52, 53, 56, 58, 59, 63, 71, 77, 78, 79, 80, 84, 85, 86, 87,
   93, 94, 95, 98, 100, 102, 105, 116, 120, 126, 129, 135, 139, 141, 145, 147, 150, 151, 156, 157,
   161, 163, 165, 172, 181, 183, 188, 189, 190, 191, 196, 200, 205, 206, 209, 224, 231, 237, 239,

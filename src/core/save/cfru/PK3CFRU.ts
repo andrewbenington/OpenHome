@@ -86,10 +86,10 @@ export abstract class PK3CFRU implements PluginPKMInterface {
   internalHeldItemIndex: number
   abstract heldItemIndex: number
   exp: number
-  movePPUps: number[]
-  movePP: number[] = [0, 0, 0, 0]
+  movePPUps: FourMoves
+  movePP: FourMoves = [0, 0, 0, 0]
   trainerFriendship: number
-  moves: number[]
+  moves: FourMoves
   evs: Stats
   pokerusByte: number
   internalMetLocationIndex: number

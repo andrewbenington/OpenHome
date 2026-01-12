@@ -12,7 +12,7 @@ import {
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { Gen3ContestRibbons, Gen3StandardRibbons } from '@pokemon-resources/index'
 import * as byteLogic from '../util/byteLogic'
-import { AllPKMFields } from '../util/pkmInterface'
+import { AllPKMFields, FourMoves } from '../util/pkmInterface'
 import {
   filterRibbons,
   gen3ContestRibbonsFromBytes,
@@ -21,7 +21,7 @@ import {
 import { getStats } from '../util/statCalc'
 import * as stringLogic from '../util/stringConversion'
 import * as types from '../util/types'
-import { adjustMovePPBetweenFormats } from '../util/util'
+import { MoveFilter } from '../util/util'
 
 export default class COLOPKM {
   static getName() {
@@ -46,9 +46,9 @@ export default class COLOPKM {
   ribbonBytes: Uint8Array
   exp: number
   statLevel: number
-  moves: number[]
-  movePP: number[]
-  movePPUps: number[]
+  moves: FourMoves
+  movePP: FourMoves
+  movePPUps: FourMoves
   heldItemIndexGen3?: ItemGen3
   currentHP: number
   evs: types.Stats
@@ -133,11 +133,12 @@ export default class COLOPKM {
       this.ribbonBytes = other.ribbonBytes ?? new Uint8Array(4)
       this.exp = other.exp
       this.statLevel = other.statLevel ?? 0
-      this.moves = other.moves.filter((_, i) => other.moves[i] <= COLOPKM.maxValidMove())
-      this.movePP = adjustMovePPBetweenFormats(this, other).filter(
-        (_, i) => other.moves[i] <= COLOPKM.maxValidMove()
-      )
-      this.movePPUps = other.movePPUps.filter((_, i) => other.moves[i] <= COLOPKM.maxValidMove())
+
+      const moveFilter = MoveFilter.fromPkmClass(COLOPKM)
+      this.moves = moveFilter.moves(other)
+      this.movePP = moveFilter.movePp(other, this.format)
+      this.movePPUps = moveFilter.movePpUps(other)
+
       this.heldItemIndexGen3 = ItemGen3.fromModern(other.heldItemIndex)
       this.currentHP = other.currentHP ?? 0
       this.evs = other.evs ?? {

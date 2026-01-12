@@ -9,57 +9,6 @@ import { LookupType } from './core/save/util'
 import { type Option } from './core/util/functional'
 import { StoredLookups } from './ui/backend/backendInterface'
 
-// export interface Tracked<Data, Identifier> {
-//   readonly data: Data
-//   readonly identifier: Identifier
-// }
-
-// export class MaybeTracked<Data, Identifier> implements HKT<Data, Identifier | undefined> {
-//   private _identifier?: Identifier
-//   private _data: Data
-
-//   private constructor(data: Data, identifier?: Identifier) {
-//     this._data = data
-//     this._identifier = identifier
-//   }
-
-//   static tracked<Data, Identifier>(data: Data, identifier: Identifier) {
-//     return new MaybeTracked(data, identifier)
-//   }
-
-//   static untracked<Data, Identifier>(data: Data) {
-//     return new MaybeTracked<Data, Identifier>(data)
-//   }
-
-//   public get data() {
-//     return this._data
-//   }
-
-//   public get identifier() {
-//     return this._identifier
-//   }
-
-//   isTracked(): this is Tracked<Data, Identifier> {
-//     return this._identifier !== undefined
-//   }
-
-//   get _URI() {
-//     return this._data
-//   }
-
-//   set _URI(value: Data) {
-//     this._URI = value
-//   }
-
-//   get _A() {
-//     return this._identifier
-//   }
-
-//   set _A(value: Identifier | undefined) {
-//     this._identifier = value
-//   }
-// }
-
 type Tracked<P extends PKMInterface> = { _tag: 'Tracked'; data: P; identifier: OhpkmIdentifier }
 
 type Untracked<P> = { _tag: 'Untracked'; data: P }
@@ -94,6 +43,14 @@ export class OhpkmTracker {
 
   load(identifier: string): Option<OHPKM> {
     return this._trackedMons.get(identifier)
+  }
+
+  ohpkmIfTracked<P extends PKMInterface>(maybeTracked: MaybeTracked<P>): OHPKM | P {
+    if (isTracked(maybeTracked)) {
+      return this.load(maybeTracked.identifier) ?? maybeTracked.data
+    } else {
+      return maybeTracked.data
+    }
   }
 
   generateIdentifier(toTracked: PKMInterface): Option<OhpkmIdentifier> {

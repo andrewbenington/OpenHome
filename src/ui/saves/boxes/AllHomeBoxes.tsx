@@ -195,7 +195,7 @@ function BoxWithMons({ box, debugMode }: BoxMonIconsProps) {
           <div className="box-icon-mon-col" key={`pos-display-col-${i}`}>
             {range(HomeData.BOX_ROWS).map((j) => (
               <div
-                className={`box-icon-mon-indicator ${!box?.pokemon?.[j * HomeData.BOX_COLUMNS + i] ? 'box-icon-mon-empty' : ''}`}
+                className={`box-icon-mon-indicator ${!box?.boxSlots?.[j * HomeData.BOX_COLUMNS + i] ? 'box-icon-mon-empty' : ''}`}
                 key={`pos-display-cell-${i}-${j}`}
               />
             ))}

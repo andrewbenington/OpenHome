@@ -10,6 +10,7 @@ import { OriginGames } from '@pkm-rs/pkg'
 import { Badge, Card, Flex } from '@radix-ui/themes'
 import { useMemo, useState } from 'react'
 import { MdAdd } from 'react-icons/md'
+import { useOhpkmStore } from '../../state/ohpkm'
 
 function getInnerSortFunction(
   sortStr: SortType | undefined
@@ -24,25 +25,38 @@ export default function SortPokemon() {
   const [openSaveDialog, setOpenSaveDialog] = useState(false)
   const [selectedIndex, setSelectedIndex] = useState<number>()
   const [sort, setSort] = useState<SortType>('')
+  const ohpkmStore = useOhpkmStore()
 
   const allMonsWithColors = useMemo(() => {
     const all: { mon: PKMInterface; color: string }[] = savesAndBanks.allOpenSaves
       .flatMap((save) =>
         save.boxes.flatMap((box) =>
           box.boxSlots.flatMap((mon) =>
-            mon ? { mon, color: OriginGames.color(save.origin) } : undefined
+            mon
+              ? {
+                  mon: ohpkmStore.tracker.ohpkmIfTracked(mon),
+                  color: OriginGames.color(save.origin),
+                }
+              : undefined
           )
         )
       )
       .concat(
-        Object.values(savesAndBanks.homeData.boxes.flatMap((box) => box.pokemon) ?? {}).map(
-          (mon) => (mon ? { mon, color: savesAndBanks.homeData.gameColor() } : undefined)
-        )
+        Object.values(savesAndBanks.homeData.boxes.flatMap((box) => box.boxSlots) ?? {})
+          .map((identifier) => (identifier ? ohpkmStore.tracker.load(identifier) : undefined))
+          .map((mon) =>
+            mon
+              ? {
+                  mon,
+                  color: savesAndBanks.homeData.gameColor(),
+                }
+              : undefined
+          )
       )
       .filter(filterUndefined)
 
     return all
-  }, [savesAndBanks.allOpenSaves, savesAndBanks.homeData])
+  }, [ohpkmStore.tracker, savesAndBanks.allOpenSaves, savesAndBanks.homeData])
 
   const sortedMonsWithColors = useMemo(() => {
     return sort

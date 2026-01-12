@@ -9,6 +9,7 @@ import {
   SV_TRANSFER_RESTRICTIONS_TM,
 } from '@pokemon-resources/consts/TransferRestrictions'
 import { OhpkmTracker } from '../../../tracker'
+import { OHPKM } from '../../pkm/OHPKM'
 import { SCBlock, SCObjectBlock } from '../encryption/SwishCrypto/SCBlock'
 import { SwishCrypto } from '../encryption/SwishCrypto/SwishCrypto'
 import { PathData } from '../util/path'
@@ -47,6 +48,10 @@ export class SVSAV extends G89SAV<PK9> {
     this.sid = this.trainerBlock.getSID()
     this.displayID = this.tid.toString().padStart(6, '0')
     this.origin = this.trainerBlock.getGame()
+  }
+
+  convertOhpkm(ohpkm: OHPKM): PK9 {
+    return new PK9(ohpkm)
   }
 
   getBoxCount(): number {

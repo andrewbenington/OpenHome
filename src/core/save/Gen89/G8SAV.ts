@@ -2,7 +2,6 @@ import { OriginGame } from '@pkm-rs/pkg'
 import { PA8, PB8, PK8, PK9 } from '@pokemon-files/pkm'
 import { AllPKMFields } from '@pokemon-files/util'
 import { OhpkmTracker } from '../../../tracker'
-import { OhpkmIdentifier } from '../../pkm/Lookup'
 import {
   SCArrayBlock,
   SCBlock,
@@ -97,18 +96,11 @@ export abstract class G89SAV<P extends PK8 | PB8 | PA8 | PK9> extends OfficialSA
 
   abstract monConstructor(arg: ArrayBuffer | AllPKMFields, encrypted?: boolean): P
 
-  prepareBoxesAndGetModified() {
-    const changedMonIdentifiers: OhpkmIdentifier[] = []
+  prepareForSaving() {
     const boxBlock = this.getBlockMust<SCObjectBlock>('Box', 'object')
 
     this.updatedBoxSlots.forEach(({ box, index }) => {
       const updatedSlotContent = this.boxes[box].boxSlots[index]
-
-      // we don't want to save OHPKM files of mons that didn't leave the save
-      // (and would still be PK8/PA8s)
-      if (updatedSlotContent?.isTracked()) {
-        changedMonIdentifiers.push(updatedSlotContent.identifier)
-      }
 
       const writeIndex = this.getBoxSizeBytes() * box + this.getMonBoxSizeBytes() * index
       const blockBuffer = new Uint8Array(boxBlock.raw)
@@ -142,8 +134,6 @@ export abstract class G89SAV<P extends PK8 | PB8 | PA8 | PK9> extends OfficialSA
     })
 
     this.bytes = SwishCrypto.encrypt(this.scBlocks, this.bytes.length)
-
-    return changedMonIdentifiers
   }
 
   getPluginIdentifier() {

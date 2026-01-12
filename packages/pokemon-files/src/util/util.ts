@@ -2,7 +2,7 @@ import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { Moves } from '@pokemon-resources/index'
 import Prando from 'prando'
 
-import { PKM } from '../pkm'
+import { PKM, PkmClass } from '../pkm'
 
 import {
   Gender,
@@ -12,7 +12,7 @@ import {
   OriginGame,
   OriginGames,
 } from '@pkm-rs/pkg'
-import { AllPKMFields } from './pkmInterface'
+import { AllPKMFields, FourMoves } from './pkmInterface'
 
 export function getGen3MiscFlags(pokemon: PKM): number {
   if ('isEgg' in pokemon && pokemon.isEgg) {
@@ -194,17 +194,75 @@ export const getMoveMaxPP = (moveIndex: number, format: string, ppUps = 0) => {
   return baseMaxPP + Math.floor(ppUps * (baseMaxPP / 5))
 }
 
-export const adjustMovePPBetweenFormats = (
-  destFormatMon: AllPKMFields,
-  sourceFormatMon: AllPKMFields
-) => {
-  return sourceFormatMon.moves.map((move, i) => {
-    const otherMaxPP = getMoveMaxPP(move, sourceFormatMon.format, sourceFormatMon.movePPUps[i]) ?? 0
-    const thisMaxPP = getMoveMaxPP(move, destFormatMon.format, sourceFormatMon.movePPUps[i]) ?? 0
-    const adjustedMovePP = sourceFormatMon.movePP[i] - (otherMaxPP - thisMaxPP)
+export function adjustPpForFormat(
+  sourceFormat: string,
+  moves: FourMoves,
+  currentPp: FourMoves,
+  ppUps: FourMoves,
+  destFormat: string
+) {
+  return moves.map((move, i) => {
+    const otherMaxPP = getMoveMaxPP(move, sourceFormat, ppUps[i]) ?? 0
+    const thisMaxPP = getMoveMaxPP(move, destFormat, ppUps[i]) ?? 0
+    const adjustedMovePP = currentPp[i] - (otherMaxPP - thisMaxPP)
 
     return adjustedMovePP > 0 ? adjustedMovePP : 0
-  }) as [number, number, number, number]
+  }) as FourMoves
+}
+
+type AllowedMoveIndices = number[]
+type PkmClassWithMoveLimit = PkmClass & { maxValidMove: () => number }
+
+export class MoveFilter {
+  filter: AllowedMoveIndices | PkmClassWithMoveLimit
+
+  private constructor(filter: AllowedMoveIndices | PkmClassWithMoveLimit) {
+    this.filter = filter
+  }
+
+  static fromMoveIndices(filter: AllowedMoveIndices) {
+    return new MoveFilter(filter)
+  }
+
+  static fromPkmClass(filter: PkmClassWithMoveLimit) {
+    return new MoveFilter(filter)
+  }
+
+  moveIsAllowed(moveIndex: number) {
+    console.log(
+      moveIndex,
+      this.filter,
+      Array.isArray(this.filter)
+        ? this.filter.includes(moveIndex)
+        : moveIndex <= this.filter.maxValidMove()
+    )
+    return Array.isArray(this.filter)
+      ? this.filter.includes(moveIndex)
+      : moveIndex <= this.filter.maxValidMove()
+  }
+
+  private filterByMoves(mon: AllPKMFields, values: FourMoves): FourMoves {
+    return mon.moves.map((moveIndex, i) =>
+      this.moveIsAllowed(moveIndex) ? values[i] : 0
+    ) as FourMoves
+  }
+
+  moves(mon: AllPKMFields) {
+    return this.filterByMoves(mon, mon.moves)
+  }
+
+  movePp(mon: AllPKMFields, adjustForFormat: string) {
+    const filteredMovePp = this.filterByMoves(mon, mon.movePP)
+    return adjustPpForFormat(mon.format, mon.moves, filteredMovePp, mon.movePPUps, adjustForFormat)
+  }
+
+  movePpUps(mon: AllPKMFields) {
+    return this.filterByMoves(mon, mon.movePPUps)
+  }
+
+  relearnMovesOrDefault(mon: AllPKMFields): FourMoves {
+    return mon.relearnMoves ? this.filterByMoves(mon, mon.relearnMoves) : [0, 0, 0, 0]
+  }
 }
 
 export function getHeightCalculated(mon: AllPKMFields) {

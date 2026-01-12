@@ -1,10 +1,10 @@
 import { getMonFileIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { HomeData } from '@openhome-core/save/HomeData'
-import { SAV } from '@openhome-core/save/interfaces'
+import { SaveWriter } from '@openhome-core/save/interfaces'
 import { Errorable, R } from '@openhome-core/util/functional'
 import { PropsWithChildren } from 'react'
-import { BackendContext } from './backendContext'
+import { BackendContext, BackendWithHelpersInterface } from './backendContext'
 import BackendInterface from './backendInterface'
 
 export type BackendProviderProps = {
@@ -14,26 +14,18 @@ export type BackendProviderProps = {
 function addHelpersToBackend(backend: BackendInterface): BackendWithHelpersInterface {
   return {
     ...backend,
-    writeAllSaveFiles: async (saveFiles: SAV[]) => writeAllSaveFiles(backend, saveFiles),
+    writeAllSaveFiles: async (saveWriters: SaveWriter[]) => writeAllSaveFiles(backend, saveWriters),
     writeAllHomeData: async (homeData: HomeData, mons: OHPKM[]) =>
       writeAllHomeData(backend, homeData, mons),
   }
 }
 
-export interface BackendWithHelpersInterface extends BackendInterface {
-  /* game saves */
-  writeAllSaveFiles: (saveFiles: SAV[]) => Promise<Errorable<null>[]>
-
-  /* home data */
-  writeAllHomeData: (homeData: HomeData, mons: OHPKM[]) => Promise<Errorable<null>[]>
-}
-
 async function writeAllSaveFiles(
   backend: BackendInterface,
-  saveFiles: SAV[]
+  saveWriters: SaveWriter[]
 ): Promise<Errorable<null>[]> {
   return Promise.all(
-    saveFiles.map((saveFile) => backend.writeSaveFile(saveFile.filePath.raw, saveFile.bytes))
+    saveWriters.map((saveWriter) => backend.writeSaveFile(saveWriter.filepath, saveWriter.bytes))
   )
 }
 

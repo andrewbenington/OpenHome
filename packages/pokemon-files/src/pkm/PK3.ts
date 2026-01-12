@@ -13,7 +13,7 @@ import {
 import * as conversion from '../conversion'
 import * as byteLogic from '../util/byteLogic'
 import * as encryption from '../util/encryption'
-import { AllPKMFields } from '../util/pkmInterface'
+import { AllPKMFields, FourMoves } from '../util/pkmInterface'
 import {
   filterRibbons,
   gen3ContestRibbonsFromBuffer,
@@ -23,9 +23,9 @@ import { getStats } from '../util/statCalc'
 import * as stringLogic from '../util/stringConversion'
 import * as types from '../util/types'
 import {
-  adjustMovePPBetweenFormats,
   generatePersonalityValuePreservingAttributes,
   getGen3MiscFlags,
+  MoveFilter,
 } from '../util/util'
 
 export default class PK3 {
@@ -41,10 +41,10 @@ export default class PK3 {
   dexNum: number
   heldItemIndexGen3?: ItemGen3
   exp: number
-  movePPUps: number[]
+  movePPUps: FourMoves
   trainerFriendship: number
-  moves: number[]
-  movePP: number[]
+  moves: FourMoves
+  movePP: FourMoves
   evs: types.Stats
   contest: types.ContestStats
   pokerusByte: number
@@ -154,12 +154,14 @@ export default class PK3 {
       this.dexNum = other.dexNum
       this.heldItemIndexGen3 = ItemGen3.fromModern(other.heldItemIndex)
       this.exp = other.exp
-      this.movePPUps = other.movePPUps.filter((_, i) => other.moves[i] <= PK3.maxValidMove())
       this.trainerFriendship = other.trainerFriendship ?? 0
-      this.moves = other.moves.filter((_, i) => other.moves[i] <= PK3.maxValidMove())
-      this.movePP = adjustMovePPBetweenFormats(this, other).filter(
-        (_, i) => other.moves[i] <= PK3.maxValidMove()
-      )
+
+      const moveFilter = MoveFilter.fromPkmClass(PK3)
+      this.moves = moveFilter.moves(other)
+      console.error(other.nickname, this.moves, other.moves)
+      this.movePP = moveFilter.movePp(other, this.format)
+      this.movePPUps = moveFilter.movePpUps(other)
+
       this.evs = other.evs ?? {
         hp: 0,
         atk: 0,

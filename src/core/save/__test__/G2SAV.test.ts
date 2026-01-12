@@ -9,6 +9,7 @@ import { G2SAV } from '../G2SAV'
 import { buildUnknownSaveFile } from '../util/load'
 import { emptyPathData } from '../util/path'
 import { initializeWasm } from './init'
+import { dummyTrack } from './util'
 
 beforeAll(initializeWasm)
 let crystalSaveFile: G2SAV
@@ -36,10 +37,10 @@ beforeAll(async () => {
 })
 
 test('pc box decoded correctly', () => {
-  expect(crystalSaveFile.boxes[9].boxSlots[0]?.nickname).toEqual('AMPHAROS')
-  expect(crystalSaveFile.boxes[9].boxSlots[1]?.nickname).toEqual('BELLOSSOM')
-  expect(crystalSaveFile.boxes[9].boxSlots[18]?.nickname).toEqual('SLOWKING')
-  expect(crystalSaveFile.boxes[9].boxSlots[19]?.nickname).toEqual('MISDREAVUS')
+  expect(crystalSaveFile.boxes[9].boxSlots[0]?.data.nickname).toEqual('AMPHAROS')
+  expect(crystalSaveFile.boxes[9].boxSlots[1]?.data.nickname).toEqual('BELLOSSOM')
+  expect(crystalSaveFile.boxes[9].boxSlots[18]?.data.nickname).toEqual('SLOWKING')
+  expect(crystalSaveFile.boxes[9].boxSlots[19]?.data.nickname).toEqual('MISDREAVUS')
 })
 
 test('removing mon shifts others in box', () => {
@@ -55,7 +56,7 @@ test('removing mon shifts others in box', () => {
 
   modifiedSaveFile1.boxes[9].boxSlots[0] = undefined
   modifiedSaveFile1.updatedBoxSlots.push({ box: 9, index: 0 })
-  modifiedSaveFile1.prepareBoxesAndGetModified()
+  modifiedSaveFile1.prepareForSaving()
 
   const result2 = buildUnknownSaveFile(emptyPathData, new Uint8Array(modifiedSaveFile1.bytes), {}, [
     G2SAV,
@@ -67,8 +68,8 @@ test('removing mon shifts others in box', () => {
 
   const modifiedSaveFile2 = result2.value as G2SAV
 
-  expect(modifiedSaveFile2.boxes[9].boxSlots[0]?.nickname).toEqual('BELLOSSOM')
-  expect(modifiedSaveFile2.boxes[9].boxSlots[18]?.nickname).toEqual('MISDREAVUS')
+  expect(modifiedSaveFile2.boxes[9].boxSlots[0]?.data.nickname).toEqual('BELLOSSOM')
+  expect(modifiedSaveFile2.boxes[9].boxSlots[18]?.data.nickname).toEqual('MISDREAVUS')
   expect(modifiedSaveFile2.boxes[9].boxSlots[19]).toEqual(undefined)
 })
 
@@ -83,9 +84,9 @@ test('inserting mon works', () => {
 
   const modifiedSaveFile1 = result1.value as G2SAV
 
-  modifiedSaveFile1.boxes[13].boxSlots[17] = new PK2(slowbroOH)
+  modifiedSaveFile1.boxes[13].boxSlots[17] = dummyTrack(new PK2(slowbroOH))
   modifiedSaveFile1.updatedBoxSlots.push({ box: 13, index: 0 })
-  modifiedSaveFile1.prepareBoxesAndGetModified()
+  modifiedSaveFile1.prepareForSaving()
 
   const result2 = buildUnknownSaveFile(emptyPathData, new Uint8Array(modifiedSaveFile1.bytes), {}, [
     G2SAV,
@@ -97,7 +98,7 @@ test('inserting mon works', () => {
 
   const modifiedSaveFile2 = result2.value as G2SAV
 
-  expect(modifiedSaveFile2.boxes[13].boxSlots[0]?.nickname).toEqual('UNOWN')
-  expect(modifiedSaveFile2.boxes[13].boxSlots[16]?.nickname).toEqual('WIGGLYTUFF')
-  expect(modifiedSaveFile2.boxes[13].boxSlots[17]?.nickname).toEqual('Slowbro')
+  expect(modifiedSaveFile2.boxes[13].boxSlots[0]?.data.nickname).toEqual('UNOWN')
+  expect(modifiedSaveFile2.boxes[13].boxSlots[16]?.data.nickname).toEqual('WIGGLYTUFF')
+  expect(modifiedSaveFile2.boxes[13].boxSlots[17]?.data.nickname).toEqual('Slowbro')
 })

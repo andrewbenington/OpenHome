@@ -9,6 +9,8 @@ import {
 } from '@pkm-rs/pkg'
 import * as types from './types'
 
+export type FourMoves = [number, number, number, number]
+
 export interface AllPKMFields {
   format: string
   ability?: AbilityIndex
@@ -91,9 +93,9 @@ export interface AllPKMFields {
   metLocationIndexPtHGSS?: number
   metTimeOfDay?: number
   moveFlagsLA?: Uint8Array
-  movePP: number[]
-  movePPUps: number[]
-  moves: number[]
+  movePP: FourMoves
+  movePPUps: FourMoves
+  moves: FourMoves
   nature?: NatureIndex
   nickname: string
   obedienceLevel?: number
@@ -110,7 +112,7 @@ export interface AllPKMFields {
   receivedSecond?: number
   receivedYear?: number
   region?: number
-  relearnMoves?: number[]
+  relearnMoves?: FourMoves
   resortEventStatus?: number
   ribbonBytes?: Uint8Array
   ribbons?: string[]
