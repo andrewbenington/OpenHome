@@ -26,6 +26,10 @@ export function matches<T>(value: T) {
   return (other: T | undefined) => other === value
 }
 
+export function unique<T>(items: T[] | undefined): T[] {
+  return Array.from(new Set(items))
+}
+
 // remove this after node 22 is lts
 if (!Set.prototype.intersection) {
   Set.prototype.intersection = function (other) {
@@ -39,10 +43,6 @@ export function intersection<T>(first: T[] | undefined, second: T[]): T[] {
   const set1 = new Set(first)
   const set2 = new Set(second)
   return Array.from(set1.intersection(set2))
-}
-
-export function unique<T>(items: T[] | undefined): T[] {
-  return Array.from(new Set(items))
 }
 
 // remove this after node 22 is lts

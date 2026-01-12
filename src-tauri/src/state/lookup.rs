@@ -1,81 +1,58 @@
-use std::{collections::HashMap, ops::Deref, sync::Mutex};
+use std::collections::HashMap;
 
 use serde::Serialize;
-use tauri::Emitter;
 
-use crate::error::{Error, Result};
+use crate::error::Result;
+use crate::state::shared_state::{self, AllSharedState};
 use crate::util;
 
-// type OhpkmBytesLookup = HashMap<String, Vec<u8>>;
 type IdentifierLookup = HashMap<String, String>;
 
-#[derive(Default, Serialize)]
-pub struct LookupState(pub Mutex<LookupStateInner>);
-
-impl Deref for LookupState {
-    type Target = Mutex<LookupStateInner>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl LookupState {
-    pub fn load_from_storage(app_handle: &tauri::AppHandle) -> Result<Self> {
-        let inner = LookupStateInner::load_from_storage(app_handle)?;
-        Ok(Self(Mutex::new(inner)))
-    }
-}
-
-#[derive(Default, Serialize, Clone)]
+#[derive(Default, Debug, Serialize, Clone)]
 #[serde(rename_all = "camelCase")]
-pub struct LookupStateInner {
-    // pub openhome: OhpkmBytesLookup,
+pub struct LookupState {
     gen_12: IdentifierLookup,
     gen_345: IdentifierLookup,
 }
 
-impl LookupStateInner {
-    fn load_from_storage(app_handle: &tauri::AppHandle) -> Result<Self> {
+impl LookupState {
+    pub fn from_components(gen_12: IdentifierLookup, gen_345: IdentifierLookup) -> Self {
+        Self { gen_12, gen_345 }
+    }
+
+    pub fn load_from_storage(app_handle: &tauri::AppHandle) -> Result<Self> {
         Ok(Self {
             gen_12: util::get_storage_file_json(app_handle, "gen12_lookup.json")?,
             gen_345: util::get_storage_file_json(app_handle, "gen345_lookup.json")?,
         })
     }
 
-    fn update_lookups(
-        &mut self,
-        app_handle: &tauri::AppHandle,
-        gen_12: IdentifierLookup,
-        gen_345: IdentifierLookup,
-    ) -> Result<()> {
-        self.gen_12.extend(gen_12);
-        self.gen_345.extend(gen_345);
-
+    fn write_to_files(&self, app_handle: &tauri::AppHandle) -> Result<()> {
         util::write_storage_file_json(app_handle, "gen12_lookup.json", &self.gen_12)?;
-        util::write_storage_file_json(app_handle, "gen345_lookup.json", &self.gen_345)?;
-
-        app_handle
-            .emit("lookups_update", self.clone())
-            .map_err(|err| {
-                Error::other_with_source("Could not emit 'lookups_update' to frontend", err)
-            })
+        util::write_storage_file_json(app_handle, "gen345_lookup.json", &self.gen_345)
     }
 }
 
+impl shared_state::SharedState for LookupState {
+    const ID: &'static str = "lookup";
+}
+
 #[tauri::command]
-pub fn get_lookups(lookup_state: tauri::State<'_, LookupState>) -> Result<LookupStateInner> {
-    Ok(lookup_state.lock()?.clone())
+pub fn get_lookups(shared_state: tauri::State<'_, AllSharedState>) -> Result<LookupState> {
+    shared_state.clone_lookups()
 }
 
 #[tauri::command]
 pub fn update_lookups(
     app_handle: tauri::AppHandle,
-    lookup_state: tauri::State<'_, LookupState>,
+    shared_state: tauri::State<'_, AllSharedState>,
     gen_12: IdentifierLookup,
     gen_345: IdentifierLookup,
 ) -> Result<()> {
-    lookup_state
+    let new_lookups = LookupState::from_components(gen_12, gen_345);
+    new_lookups.write_to_files(&app_handle)?;
+
+    shared_state
         .lock()?
-        .update_lookups(&app_handle, gen_12, gen_345)
+        .update_lookups(&app_handle, |_| new_lookups)
 }

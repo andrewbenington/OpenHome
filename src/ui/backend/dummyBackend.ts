@@ -6,7 +6,11 @@ const DummyBackend: BackendInterface = {
   loadLookups: async () => R.Err('no backend in use'),
   updateLookups: async () => R.Err('no backend in use'),
 
-  /* past gen identifier lookups */
+  /* ohpkm store */
+  loadOhpkmStore: async () => R.Err('no backend in use'),
+  updateOhpkmStore: async () => R.Err('no backend in use'),
+
+  /* pokedex */
   loadPokedex: async () => R.Err('no backend in use'),
   registerInPokedex: async () => R.Err('no backend in use'),
 

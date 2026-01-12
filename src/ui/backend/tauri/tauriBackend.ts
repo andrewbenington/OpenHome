@@ -5,6 +5,7 @@ import { Errorable, R } from '@openhome-core/util/functional'
 import { JSONObject, LoadSaveResponse, SaveRef } from '@openhome-core/util/types'
 import BackendInterface, {
   BankOrBoxChange,
+  OhpkmStore,
   StoredLookups,
 } from '@openhome-ui/backend/backendInterface'
 import { defaultSettings, Settings } from '@openhome-ui/state/appInfo'
@@ -41,6 +42,27 @@ export const TauriBackend: BackendInterface = {
   /* past gen identifier lookups */
   loadLookups: Commands.get_lookups,
   updateLookups: Commands.update_lookups,
+
+  /* ohpkm store */
+  loadOhpkmStore: async function (): Promise<Errorable<OhpkmStore>> {
+    return Commands.get_ohpkm_store().then(
+      R.map((b64ByIdentifier) =>
+        Object.fromEntries(
+          Object.entries(b64ByIdentifier.value).map(([identifier, b64String]) => [
+            identifier,
+            new OHPKM(Uint8Array.fromBase64(b64String)),
+          ])
+        )
+      )
+    )
+  },
+  updateOhpkmStore: function (updates: OhpkmStore): Promise<Errorable<null>> {
+    return Commands.update_ohpkm_store(
+      Object.fromEntries(
+        Object.entries(updates).map(([identifier, ohpkm]) => [identifier, ohpkm.toByteArray()])
+      )
+    )
+  },
 
   /* pokedex */
   loadPokedex: Commands.get_pokedex,

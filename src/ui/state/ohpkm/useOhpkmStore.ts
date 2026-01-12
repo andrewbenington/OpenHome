@@ -1,45 +1,35 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { Errorable, R, Result } from '@openhome-core/util/functional'
-import { useContext } from 'react'
+import { createContext, useContext } from 'react'
+import { OhpkmStoreData } from '.'
 import { PKMInterface } from '../../../core/pkm/interfaces'
 import { OhpkmIdentifier } from '../../../core/pkm/Lookup'
 import { isTracked, MaybeTracked, OhpkmTracker } from '../../../tracker'
-import { OhpkmStoreContext } from './reducer'
+import { useLookups } from '../lookups'
 
 export type OhpkmStore = {
-  reloadStore: () => Promise<Errorable<OhpkmLookup>>
   getById(id: string): OHPKM | undefined
   loadOhpkmIfTracked<P extends PKMInterface>(
     maybeTracked: MaybeTracked<P> | undefined
   ): OHPKM | P | undefined
   tryLoadFromId(id: OhpkmIdentifier): Result<OHPKM, IdentifierNotPresentError>
   tryLoadFromIds(ids: OhpkmIdentifier[]): Result<OHPKM, IdentifierNotPresentError>[]
+  byId: OhpkmStoreData
   monIsStored(id: string): boolean
   overwrite(mon: OHPKM): void
+  overwriteAll(mons: OhpkmStoreData): Promise<Errorable<null>>
   getAllStored: () => OHPKM[]
-  setSaving(): void
   tracker: OhpkmTracker
 }
 
 export type OhpkmLookup = (id: string) => OHPKM | undefined
 
 export function useOhpkmStore(): OhpkmStore {
-  const [ohpkmStore, ohpkmStoreDispatch, reloadStore] = useContext(OhpkmStoreContext)
-
-  if (ohpkmStore.error) {
-    throw new Error(`Error loading OHPKM store: ${ohpkmStore.error}`)
-  }
-
-  if (!ohpkmStore.loaded) {
-    throw new Error(
-      `OHPKM store not loaded. useOhpkmStore() must not be called in a component that is not descended from an OhpkmStoreProvider.`
-    )
-  }
-
-  const monsById = ohpkmStore.homeMons
+  const [ohpkmStore, updateStore] = useContext(OhpkmStoreContext)
+  const { lookups } = useLookups()
 
   function getById(id: string): OHPKM | undefined {
-    return monsById[id]
+    return ohpkmStore[id]
   }
 
   function loadOhpkmIfTracked<P extends PKMInterface>(
@@ -59,41 +49,33 @@ export function useOhpkmStore(): OhpkmStore {
   }
 
   function monIsStored(id: string): boolean {
-    return id in monsById
+    return id in ohpkmStore
   }
 
   function overwrite(mon: OHPKM) {
-    ohpkmStoreDispatch({ type: 'persist_data', payload: mon })
+    updateStore({ [mon.getHomeIdentifier()]: mon })
+  }
+
+  function overwriteAll(mons: OhpkmStoreData) {
+    return updateStore(mons)
   }
 
   function getAllStored(): OHPKM[] {
-    return Object.values(monsById)
+    return Object.values(ohpkmStore)
   }
 
-  function setSaving() {
-    ohpkmStoreDispatch({ type: 'set_saving' })
-  }
-
-  async function reloadAndReturnLookup() {
-    return reloadStore().then(
-      R.map((newLookup) => {
-        return (id: string) => newLookup[id]
-      })
-    )
-  }
-
-  const tracker = new OhpkmTracker(monsById, ohpkmStore.lookups)
+  const tracker = new OhpkmTracker(ohpkmStore, lookups)
 
   return {
-    reloadStore: reloadAndReturnLookup,
     getById,
     loadOhpkmIfTracked,
     tryLoadFromId,
     tryLoadFromIds,
+    byId: ohpkmStore,
     monIsStored,
     overwrite,
+    overwriteAll,
     getAllStored,
-    setSaving,
     tracker,
   }
 }
@@ -103,3 +85,6 @@ export type IdentifierNotPresentError = { identifier: OhpkmIdentifier }
 function IdentifierNotPresent(identifier: OhpkmIdentifier): IdentifierNotPresentError {
   return { identifier }
 }
+export const OhpkmStoreContext = createContext<
+  [OhpkmStoreData, (updated: OhpkmStoreData) => Promise<Errorable<null>>]
+>([{}, async () => R.Err('Uninitialized')])

@@ -8,7 +8,6 @@ import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { HomeData } from '@openhome-core/save/HomeData'
 import { partitionResults, R } from '@openhome-core/util/functional'
 import { filterUndefined } from '@openhome-core/util/sort'
-import { LookupMap } from '@openhome-core/util/types'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
 import { ErrorIcon } from '@openhome-ui/components/Icons'
 import LoadingIndicator from '@openhome-ui/components/LoadingIndicator'
@@ -18,7 +17,8 @@ import { Callout } from '@radix-ui/themes'
 import { ReactNode, useCallback, useContext, useEffect, useReducer } from 'react'
 import { Result } from 'src/core/util/functional'
 import { ItemBagContext } from '../items/reducer'
-import { OhpkmLookup, useOhpkmStore } from '../ohpkm/useOhpkmStore'
+import { useLookups } from '../lookups/useLookups'
+import { useOhpkmStore } from '../ohpkm/useOhpkmStore'
 import { openSavesReducer, SavesContext } from './reducer'
 
 export type SavesProviderProps = {
@@ -28,6 +28,7 @@ export type SavesProviderProps = {
 export default function SavesProvider({ children }: SavesProviderProps) {
   const backend = useContext(BackendContext)
   const ohpkmStore = useOhpkmStore()
+  const lookupsState = useLookups()
   const [itemBagState, bagDispatch] = useContext(ItemBagContext)
   const displayError = useDisplayError()
   const [openSavesState, openSavesDispatch] = useReducer(openSavesReducer, {
@@ -42,21 +43,18 @@ export default function SavesProvider({ children }: SavesProviderProps) {
     .sort((a, b) => a.index - b.index)
     .map((data) => data.save)
 
-  const loadAllHomeData = useCallback(
-    async (getMonById: OhpkmLookup) => {
-      if (openSavesState.error) return
-      await backend.loadHomeBanks().then(
-        R.match(
-          (banks) => openSavesDispatch({ type: 'load_home_banks', payload: { banks, getMonById } }),
-          (err) => {
-            displayError('Error Loading OpenHome Data', err)
-            openSavesDispatch({ type: 'set_error', payload: err })
-          }
-        )
+  const loadAllHomeData = useCallback(async () => {
+    if (openSavesState.error) return
+    await backend.loadHomeBanks().then(
+      R.match(
+        (banks) => openSavesDispatch({ type: 'load_home_banks', payload: { banks } }),
+        (err) => {
+          displayError('Error Loading OpenHome Data', err)
+          openSavesDispatch({ type: 'set_error', payload: err })
+        }
       )
-    },
-    [backend, displayError, openSavesDispatch, openSavesState.error]
-  )
+    )
+  }, [backend, displayError, openSavesDispatch, openSavesState.error])
 
   const saveChanges = useCallback(async (): Promise<Result<null, SaveError[]>> => {
     if (!openSavesState.homeData) return R.Err([HomeDataNotLoaded])
@@ -79,8 +77,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
       )
     }
 
-    const newGen12Lookup: LookupMap = {}
-    const newGen345Lookup: LookupMap = {}
+    const newLookups = { ...lookupsState.lookups }
     const trackedIdentifiersPerSave = allOpenSaves.map(
       (save) => [save.origin, save.getTrackedMonIdentifiers()] as const
     )
@@ -102,7 +99,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
           const gen12Identifier = getMonGen12Identifier(mon)
 
           if (gen12Identifier) {
-            newGen12Lookup[gen12Identifier] = mon.getHomeIdentifier()
+            newLookups.gen12[gen12Identifier] = mon.getHomeIdentifier()
           }
         })
       } else if (
@@ -114,7 +111,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
           const gen345Identifier = getMonGen345Identifier(mon)
 
           if (gen345Identifier) {
-            newGen345Lookup[gen345Identifier] = mon.getHomeIdentifier()
+            newLookups.gen345[gen345Identifier] = mon.getHomeIdentifier()
           }
         })
       }
@@ -127,8 +124,8 @@ export default function SavesProvider({ children }: SavesProviderProps) {
     const saveWriters = allOpenSaves.map((save) => save.prepareWriter())
 
     const promises = [
-      backend.updateLookups(newGen12Lookup, newGen345Lookup),
       backend.writeAllSaveFiles(saveWriters),
+      lookupsState.updateLookups(newLookups),
       backend.writeAllHomeData(
         openSavesState.homeData,
         Object.values(openSavesState.modifiedOHPKMs)
@@ -139,6 +136,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
           .map(getMonFileIdentifier)
           .filter(filterUndefined)
       ),
+      ohpkmStore.overwriteAll(openSavesState.modifiedOHPKMs),
     ]
 
     if (itemBagState.modified) {
@@ -165,32 +163,22 @@ export default function SavesProvider({ children }: SavesProviderProps) {
     openSavesDispatch({ type: 'clear_updated_box_slots' })
     openSavesDispatch({ type: 'clear_mons_to_release' })
 
-    ohpkmStore.setSaving()
-    return await ohpkmStore.reloadStore().then(
-      R.match(
-        async (getMonById) => {
-          await loadAllHomeData(getMonById)
-          return R.Ok<null, SaveError[]>(null)
-        },
-        async (err) => {
-          openSavesDispatch({ type: 'set_error', payload: err })
-          displayError('Error Loading Lookup Data', err)
-          return R.Err([ReloadLookup(err)])
-        }
-      )
-    )
+    await loadAllHomeData()
+
+    return R.Ok(null)
   }, [
     openSavesState.homeData,
     openSavesState.modifiedOHPKMs,
     openSavesState.monsToRelease,
     backend,
+    lookupsState,
     allOpenSaves,
+    ohpkmStore,
     itemBagState.modified,
     itemBagState.itemCounts,
-    ohpkmStore,
+    loadAllHomeData,
     displayError,
     bagDispatch,
-    loadAllHomeData,
   ])
 
   // load bag
@@ -215,7 +203,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
       onSave: saveChanges,
       onReset: () => {
         openSavesDispatch({ type: 'clear_mons_to_release' })
-        loadAllHomeData(ohpkmStore.getById)
+        loadAllHomeData()
         openSavesDispatch({ type: 'close_all_saves' })
       },
     })
@@ -225,13 +213,13 @@ export default function SavesProvider({ children }: SavesProviderProps) {
     return () => {
       stopListening()
     }
-  }, [backend, saveChanges, ohpkmStore, openSavesDispatch, loadAllHomeData, bagDispatch])
+  }, [backend, saveChanges, openSavesDispatch, loadAllHomeData, bagDispatch])
 
   useEffect(() => {
     if (!openSavesState.homeData) {
-      loadAllHomeData(ohpkmStore.getById)
+      loadAllHomeData()
     }
-  }, [loadAllHomeData, ohpkmStore.getById, openSavesState.homeData])
+  }, [loadAllHomeData, openSavesState.homeData])
 
   if (openSavesState.error) {
     return (
@@ -296,10 +284,5 @@ const SaveItemBagData: (message: string) => SaveError = (message: string) => ({
 
 const BackendSaveError: (message: string) => SaveError = (message: string) => ({
   _SaveErrorType: 'BackendSaveError',
-  message,
-})
-
-const ReloadLookup: (message: string) => SaveError = (message: string) => ({
-  _SaveErrorType: 'ReloadLookup',
   message,
 })

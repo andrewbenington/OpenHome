@@ -6,12 +6,12 @@ import { BackendContext } from '@openhome-ui/backend/backendContext'
 import OHDataGrid, { SortableColumn } from '@openhome-ui/components/OHDataGrid'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import { AppInfoContext } from '@openhome-ui/state/appInfo'
-import { useLookups } from '@openhome-ui/state/lookups'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { useSaves } from '@openhome-ui/state/saves'
 import { Flex } from '@radix-ui/themes'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { R } from 'src/core/util/functional'
+import { useLookups } from 'src/ui/state/lookups/useLookups'
 import SaveCard from './SaveCard'
 import { filterEmpty, SaveViewMode } from './util'
 
@@ -27,7 +27,7 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
   const [suggestedSaves, setSuggestedSaves] = useState<SAV[]>()
   const ohpkmStore = useOhpkmStore()
-  const { getLookups } = useLookups()
+  const { lookups } = useLookups()
   const savesAndBanks = useSaves()
   const [error, setError] = useState(false)
   const displayError = useDisplayError()
@@ -48,15 +48,6 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
   const loadSaveData = useCallback(
     async (savePath: PathData) => {
       const response = await backend.loadSaveFile(savePath)
-      const lookupsResponse = await getLookups()
-
-      if (R.isErr(lookupsResponse)) {
-        console.error(lookupsResponse.err)
-        handleError('Error loading lookups', lookupsResponse.err)
-        return
-      }
-
-      const lookups = lookupsResponse.value
 
       if (R.isOk(response)) {
         const { fileBytes } = response.value
@@ -75,7 +66,14 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
       }
       return undefined
     },
-    [backend, getEnabledSaveTypes, getLookups, handleError, ohpkmStore.getById, ohpkmStore.tracker]
+    [
+      backend,
+      getEnabledSaveTypes,
+      lookups.gen12,
+      lookups.gen345,
+      ohpkmStore.getById,
+      ohpkmStore.tracker,
+    ]
   )
 
   useEffect(() => {

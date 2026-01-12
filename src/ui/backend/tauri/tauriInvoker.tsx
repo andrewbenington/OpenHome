@@ -8,12 +8,31 @@ import { invoke, InvokeArgs, InvokeOptions } from '@tauri-apps/api/core'
 import { AppState, ImageResponse, StoredLookups } from '../backendInterface'
 import { RustResult } from './types'
 
+export type StringToBytes = Record<string, Uint8Array>
+export type StringToB64 = Record<string, string>
+
 function invokeAndCatch<C extends OhCommand>(
   cmd: C,
   args?: InvokeArgs,
   options?: InvokeOptions
 ): Promise<Errorable<OhCommandResult<C>>> {
   return R.tryPromise(invoke(cmd, args, options))
+}
+
+// remove this after node 25 is lts
+if (!('fromBase64' in Uint8Array)) {
+  // @ts-expect-error – intentionally adding this static constructor because it is relatively new to javascript
+  Uint8Array.fromBase64 = function (base64: string): Uint8Array {
+    const binary = atob(base64)
+    const len = binary.length
+    const bytes = new Uint8Array(len)
+
+    for (let i = 0; i < len; i++) {
+      bytes[i] = binary.charCodeAt(i)
+    }
+
+    return bytes
+  }
 }
 
 type OhTauriApi = {
@@ -43,6 +62,9 @@ type OhTauriApi = {
 
   get_lookups(): StoredLookups
   update_lookups(gen12: LookupMap, gen345: LookupMap): null
+
+  get_ohpkm_store(): StringToB64
+  update_ohpkm_store(updates: StringToBytes): null
 
   get_pokedex(): Pokedex
   update_pokedex(updates: PokedexUpdate[]): null
@@ -81,6 +103,14 @@ export const Commands: OhTauriApiNoThrow = {
 
   update_lookups(gen12: LookupMap, gen345: LookupMap) {
     return invokeAndCatch('update_lookups', { gen12, gen345 })
+  },
+
+  get_ohpkm_store() {
+    return invokeAndCatch('get_ohpkm_store')
+  },
+
+  update_ohpkm_store(updates: StringToBytes): Promise<Errorable<null>> {
+    return invokeAndCatch('update_ohpkm_store', { updates })
   },
 
   get_pokedex() {

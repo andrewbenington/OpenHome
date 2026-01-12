@@ -1,100 +1,58 @@
-import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { displayIndexAdder, isBattleFormeItem } from '@openhome-core/pkm/util'
-import { Errorable, R } from '@openhome-core/util/functional'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
-import { ErrorIcon } from '@openhome-ui/components/Icons'
-import LoadingIndicator from '@openhome-ui/components/LoadingIndicator'
+import { RustStateProvider, useRustState } from '@openhome-ui/state/rust-state'
 import { PokedexUpdate } from '@openhome-ui/util/pokedex'
-import { Callout } from '@radix-ui/themes'
-import { ReactNode, useCallback, useContext, useEffect, useReducer } from 'react'
-import { useLookups } from '../lookups'
-import { OhpkmStoreContext, ohpkmStoreReducer } from './reducer'
+import { PropsWithChildren, useCallback, useContext } from 'react'
+import { OhpkmStoreContext, OhpkmStoreData } from '.'
 
-export type OhpkmStoreProviderProps = {
-  children: ReactNode
-}
-
-export default function OhpkmStoreProvider({ children }: OhpkmStoreProviderProps) {
+function useOhpkmStoreTauri() {
   const backend = useContext(BackendContext)
-  const [ohpkmStore, ohpkmStoreDispatch] = useReducer(ohpkmStoreReducer, {
-    loaded: false,
-    saving: false,
-  })
-  const lookups = useLookups()
+  const updatePokedexFromStored = useCallback(
+    async (data: OhpkmStoreData) => {
+      const pokedexUpdates: PokedexUpdate[] = []
 
-  const loadStore = useCallback(async (): Promise<Errorable<Record<string, OHPKM>>> => {
-    const onLoadError = (message: string) => {
-      console.error(message)
-      ohpkmStoreDispatch({ type: 'set_error', payload: message })
-    }
-    const homeResult = await backend.loadHomeMonLookup()
+      for (const [identifier, mon] of Object.entries(data)) {
+        const hadErrors = mon.fixErrors()
 
-    if (R.isErr(homeResult)) {
-      onLoadError(homeResult.err)
-      return homeResult
-    }
+        if (hadErrors) {
+          backend.writeHomeMon(identifier, new Uint8Array(mon.toBytes()))
+        }
 
-    const pokedexUpdates: PokedexUpdate[] = []
-
-    for (const [identifier, mon] of Object.entries(homeResult.value)) {
-      const hadErrors = mon.fixErrors()
-
-      if (hadErrors) {
-        backend.writeHomeMon(identifier, new Uint8Array(mon.toBytes()))
-      }
-
-      pokedexUpdates.push({
-        dexNumber: mon.dexNum,
-        formeNumber: mon.formeNum,
-        status: mon.isShiny() ? 'ShinyCaught' : 'Caught',
-      })
-
-      if (isBattleFormeItem(mon.dexNum, mon.heldItemIndex)) {
         pokedexUpdates.push({
           dexNumber: mon.dexNum,
-          formeNumber: displayIndexAdder(mon.heldItemIndex)(mon.formeNum),
+          formeNumber: mon.formeNum,
           status: mon.isShiny() ? 'ShinyCaught' : 'Caught',
         })
+
+        if (isBattleFormeItem(mon.dexNum, mon.heldItemIndex)) {
+          pokedexUpdates.push({
+            dexNumber: mon.dexNum,
+            formeNumber: displayIndexAdder(mon.heldItemIndex)(mon.formeNum),
+            status: mon.isShiny() ? 'ShinyCaught' : 'Caught',
+          })
+        }
       }
-    }
 
-    backend.registerInPokedex(pokedexUpdates)
+      backend.registerInPokedex(pokedexUpdates)
+    },
+    [backend]
+  )
 
-    ohpkmStoreDispatch({ type: 'load_persisted_pkm_data', payload: homeResult.value })
+  return useRustState<OhpkmStoreData>(
+    'ohpkm_store',
+    (backend) => backend.loadOhpkmStore(),
+    (backend, updated) => backend.updateOhpkmStore(updated),
+    updatePokedexFromStored
+  )
+}
 
-    return homeResult
-  }, [backend, ohpkmStoreDispatch])
-
-  useEffect(() => {
-    if (!ohpkmStore.loaded && !ohpkmStore.error) {
-      loadStore()
-    }
-  }, [ohpkmStore.loaded, ohpkmStore.error, loadStore])
-
-  useEffect(() => {
-    if (lookups.loaded) {
-      ohpkmStoreDispatch({ type: 'load_lookups', payload: lookups.lookups })
-    }
-  }, [lookups.loaded, lookups.lookups])
-
-  if (ohpkmStore.error) {
-    return (
-      <Callout.Root>
-        <Callout.Icon>
-          <ErrorIcon />
-        </Callout.Icon>
-        <Callout.Text>{ohpkmStore.error}</Callout.Text>
-      </Callout.Root>
-    )
-  }
-
-  if (!ohpkmStore.loaded) {
-    return <LoadingIndicator message="Loading OHPKM store..." />
-  }
-
+export default function OhpkmStoreProvider({ children }: PropsWithChildren) {
   return (
-    <OhpkmStoreContext.Provider value={[ohpkmStore, ohpkmStoreDispatch, loadStore]}>
-      {children}
-    </OhpkmStoreContext.Provider>
+    <RustStateProvider
+      useStateManager={useOhpkmStoreTauri}
+      StateContext={OhpkmStoreContext}
+      stateDescription="OHPKM Store"
+      children={children}
+    />
   )
 }

@@ -31,10 +31,16 @@ export type PluginDownloadProgress = {
 
 export type StoredLookups = { gen12: LookupMap; gen345: LookupMap }
 
+export type OhpkmStore = Record<string, OHPKM>
+
 export default interface BackendInterface {
   /* past gen identifier lookups */
   loadLookups: () => Promise<Errorable<StoredLookups>>
   updateLookups: (gen_12: LookupMap, gen_345: LookupMap) => Promise<Errorable<null>>
+
+  /* ohpkm bytes store by identifier */
+  loadOhpkmStore: () => Promise<Errorable<OhpkmStore>>
+  updateOhpkmStore: (updates: OhpkmStore) => Promise<Errorable<null>>
 
   /* past gen identifier lookups */
   loadPokedex: () => Promise<Errorable<Pokedex>>
@@ -102,6 +108,7 @@ export interface BackendListeners {
   onReset: () => void
   onOpen: () => void
   onLookupsUpdate: (updated_lookups: StoredLookups) => void
+  onStateUpdate: Record<string, <State>(updated_state: State) => void>
   onPokedexUpdate: (updated_pokedex: Pokedex) => void
   onPluginDownloadProgress: [string, (_progress_pct: number) => void]
   onBankOrBoxChange: (change: BankOrBoxChange) => void
