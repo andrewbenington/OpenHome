@@ -132,6 +132,7 @@ pub fn run() {
             state::start_transaction,
             state::rollback_transaction,
             state::commit_transaction,
+            state::shared_state::save_shared_state,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

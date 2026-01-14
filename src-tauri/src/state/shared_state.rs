@@ -80,6 +80,12 @@ impl AllSharedState {
     pub fn ohpkm_store_b64(&self) -> Result<HashMap<String, String>> {
         Ok(self.lock()?.ohpkm_store.0.to_b64_map())
     }
+
+    pub fn save_to_files(&self, app_handle: &tauri::AppHandle) -> Result<()> {
+        let locked = self.lock()?;
+        locked.ohpkm_store.0.write_to_mons_v2(app_handle)?;
+        locked.lookups.0.write_to_files(app_handle)
+    }
 }
 
 impl Deref for AllSharedState {
@@ -88,4 +94,12 @@ impl Deref for AllSharedState {
     fn deref(&self) -> &Self::Target {
         &self.0
     }
+}
+
+#[tauri::command]
+pub fn save_shared_state(
+    app_handle: tauri::AppHandle,
+    shared_state: tauri::State<'_, AllSharedState>,
+) -> Result<()> {
+    shared_state.save_to_files(&app_handle)
 }

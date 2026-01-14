@@ -58,9 +58,9 @@ impl OhpkmBytesStore {
         Self::load_from_directory(&mons_v2_dir)
     }
 
-    pub fn write_to_mons_v2(data: &Self, app_handle: &tauri::AppHandle) -> Result<()> {
+    pub fn write_to_mons_v2(&self, app_handle: &tauri::AppHandle) -> Result<()> {
         let mons_v2_dir = util::prepend_appdata_storage_to_path(app_handle, "mons_v2")?;
-        Self::write_to_directory(data, &mons_v2_dir)
+        Self::write_to_directory(self, &mons_v2_dir)
     }
 
     pub fn to_b64_map(&self) -> HashMap<String, String> {
@@ -94,7 +94,6 @@ pub fn update_ohpkm_store(
     shared_state: tauri::State<'_, shared_state::AllSharedState>,
     updates: OhpkmBytesStore,
 ) -> Result<()> {
-    // OhpkmBytesStore::write_to_mons_v2(&updates, &app_handle)?;
     shared_state
         .lock()?
         .update_ohpkm_store(&app_handle, |old_data| {

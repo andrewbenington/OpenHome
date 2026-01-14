@@ -7,6 +7,10 @@ function useLookupsTauri() {
   return useRustState<StoredLookups>(
     'lookups',
     (backend) => backend.loadLookups(),
+    (prev, updated) => ({
+      gen12: { ...prev.gen12, ...updated.gen12 },
+      gen345: { ...prev.gen345, ...updated.gen345 },
+    }),
     (backend, updated) => backend.updateLookups(updated.gen12, updated.gen345)
   )
 }

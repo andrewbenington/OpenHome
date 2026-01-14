@@ -42,6 +42,9 @@ export default interface BackendInterface {
   loadOhpkmStore: () => Promise<Errorable<OhpkmStore>>
   updateOhpkmStore: (updates: OhpkmStore) => Promise<Errorable<null>>
 
+  /* save shared frontend/backend state */
+  saveSharedState: () => Promise<Errorable<void>>
+
   /* past gen identifier lookups */
   loadPokedex: () => Promise<Errorable<Pokedex>>
   registerInPokedex: (updates: PokedexUpdate[]) => Promise<Errorable<null>>

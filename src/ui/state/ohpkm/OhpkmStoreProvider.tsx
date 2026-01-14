@@ -43,6 +43,7 @@ function useOhpkmStoreTauri() {
   return useRustState<OhpkmStoreData, StringToB64>(
     'ohpkm_store',
     (backend) => backend.loadOhpkmStore(),
+    (prev, updated) => ({ ...prev, ...updated }),
     (backend, updated) => backend.updateOhpkmStore(updated),
     updatePokedexFromStored,
     transformResponse
@@ -55,12 +56,14 @@ export default function OhpkmStoreProvider({ children }: PropsWithChildren) {
       useStateManager={useOhpkmStoreTauri}
       StateContext={OhpkmStoreContext}
       stateDescription="OHPKM Store"
-      children={children}
-    />
+    >
+      {children}
+    </RustStateProvider>
   )
 }
 
 function transformResponse(response: StringToB64): OhpkmStoreData {
+  console.log(response)
   return Object.fromEntries(
     Object.entries(response).map(([identifier, b64String]) => [
       identifier,

@@ -8,7 +8,6 @@ import { TopRightIndicatorType } from '../hooks/useMonDisplay'
 import { getOriginIconPath } from '../images/game'
 import { getPublicImageURL } from '../images/images'
 import { BallsImageList } from '../images/items'
-import { useSaves } from '../state/saves'
 import { colorIsDark } from '../util/color'
 import './style.css'
 
@@ -18,7 +17,7 @@ type TopRightIndicatorProps = {
 }
 
 export default function TopRightIndicator({ mon, indicatorType }: TopRightIndicatorProps) {
-  const savesState = useSaves()
+  // const savesState = useSaves()
 
   switch (indicatorType) {
     case 'Gender':
@@ -75,12 +74,12 @@ export default function TopRightIndicator({ mon, indicatorType }: TopRightIndica
           />
         )
       )
-    case 'Modified':
-      return (
-        new OHPKM(mon).getHomeIdentifier() in savesState.modifiedOHPKMs && (
-          <TopRightNumericalIndicator value={1} />
-        )
-      )
+    // case 'Modified':
+    //   return (
+    //     new OHPKM(mon).getHomeIdentifier() in savesState.modifiedOHPKMs && (
+    //       <TopRightNumericalIndicator value={1} />
+    //     )
+    //   )
     default:
       return <></>
   }

@@ -125,11 +125,11 @@ export default function SavesProvider({ children }: SavesProviderProps) {
 
     const promises = [
       backend.writeAllSaveFiles(saveWriters),
-      lookupsState.updateLookups(newLookups),
-      backend.writeAllHomeData(
-        openSavesState.homeData,
-        Object.values(openSavesState.modifiedOHPKMs)
-      ),
+      // lookupsState.updateLookups(newLookups),
+      // backend.writeAllHomeData(
+      //   openSavesState.homeData,
+      //   Object.values(openSavesState.modifiedOHPKMs)
+      // ),
       backend.deleteHomeMons(
         openSavesState.monsToRelease
           .filter((mon) => mon instanceof OHPKM)
@@ -157,7 +157,17 @@ export default function SavesProvider({ children }: SavesProviderProps) {
       backend.rollbackTransaction()
       return R.Err(errors.map(BackendSaveError))
     }
-    backend.commitTransaction()
+
+    const sharedStateResult = await backend.saveSharedState()
+    if (R.isErr(sharedStateResult)) {
+      displayError('Error Saving', sharedStateResult.err)
+      return R.Err([BackendSaveError(sharedStateResult.err)])
+    }
+
+    const commitResult = await backend.commitTransaction()
+    if (R.isErr(commitResult)) {
+      return R.Err([TransactionCommit(commitResult.err)])
+    }
     // backend.rollbackTransaction()
 
     openSavesDispatch({ type: 'clear_updated_box_slots' })
@@ -258,6 +268,7 @@ const HomeDataNotLoaded = Object.freeze({ _SaveErrorType: 'HomeDataNotLoaded' })
 type SaveError =
   | { _SaveErrorType: 'HomeDataNotLoaded' }
   | { _SaveErrorType: 'TransactionStart'; message: string }
+  | { _SaveErrorType: 'TransactionCommit'; message: string }
   | { _SaveErrorType: 'IdentifierNotTracked'; identifier: OhpkmIdentifier }
   | { _SaveErrorType: 'GenG12Identifier'; mon: OHPKM }
   | { _SaveErrorType: 'GenG345Identifier'; mon: OHPKM }
@@ -267,6 +278,11 @@ type SaveError =
 
 const TransactionStart: (message: string) => SaveError = (message: string) => ({
   _SaveErrorType: 'TransactionStart',
+  message,
+})
+
+const TransactionCommit: (message: string) => SaveError = (message: string) => ({
+  _SaveErrorType: 'TransactionCommit',
   message,
 })
 

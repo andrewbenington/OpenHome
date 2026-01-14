@@ -27,14 +27,14 @@ impl LookupState {
         })
     }
 
-    fn write_to_files(&self, app_handle: &tauri::AppHandle) -> Result<()> {
+    pub fn write_to_files(&self, app_handle: &tauri::AppHandle) -> Result<()> {
         util::write_storage_file_json(app_handle, "gen12_lookup.json", &self.gen_12)?;
         util::write_storage_file_json(app_handle, "gen345_lookup.json", &self.gen_345)
     }
 }
 
 impl shared_state::SharedState for LookupState {
-    const ID: &'static str = "lookup";
+    const ID: &'static str = "lookups";
 }
 
 #[tauri::command]
@@ -50,7 +50,6 @@ pub fn update_lookups(
     gen_345: IdentifierLookup,
 ) -> Result<()> {
     let new_lookups = LookupState::from_components(gen_12, gen_345);
-    new_lookups.write_to_files(&app_handle)?;
 
     shared_state
         .lock()?
