@@ -1,6 +1,6 @@
 import { PossibleSaves } from '@openhome-core/save/util/path'
 import { Errorable, R } from '@openhome-core/util/functional'
-import { JSONArray, JSONObject, JSONValue, LookupMap, SaveRef } from '@openhome-core/util/types'
+import { JSONArray, JSONObject, JSONValue, SaveRef } from '@openhome-core/util/types'
 import { AppTheme } from '@openhome-ui/state/appInfo'
 import { PluginMetadataWithIcon } from '@openhome-ui/util/plugin'
 import { Pokedex, PokedexUpdate } from '@openhome-ui/util/pokedex'
@@ -62,10 +62,10 @@ type OhTauriApi = {
   write_banks(bankData: StoredBankDataSerialized): null
 
   get_lookups(): StoredLookups
-  update_lookups(gen12: LookupMap, gen345: LookupMap): null
+  add_to_lookups(newEntries: StoredLookups): null
 
   get_ohpkm_store(): StringToB64
-  update_ohpkm_store(updates: StringToBytes): null
+  add_to_ohpkm_store(updates: StringToBytes): null
 
   get_pokedex(): Pokedex
   update_pokedex(updates: PokedexUpdate[]): null
@@ -106,16 +106,16 @@ export const Commands: OhTauriApiNoThrow = {
     return invokeAndCatch('get_lookups')
   },
 
-  update_lookups(gen12: LookupMap, gen345: LookupMap) {
-    return invokeAndCatch('update_lookups', { gen12, gen345 })
+  add_to_lookups(newEntries: StoredLookups) {
+    return invokeAndCatch('add_to_lookups', { newEntries })
   },
 
   get_ohpkm_store() {
     return invokeAndCatch('get_ohpkm_store')
   },
 
-  update_ohpkm_store(updates: StringToBytes): Promise<Errorable<null>> {
-    return invokeAndCatch('update_ohpkm_store', { updates })
+  add_to_ohpkm_store(updates: StringToBytes): Promise<Errorable<null>> {
+    return invokeAndCatch('add_to_ohpkm_store', { updates })
   },
 
   get_pokedex() {

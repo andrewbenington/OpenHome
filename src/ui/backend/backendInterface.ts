@@ -36,11 +36,11 @@ export type OhpkmStore = Record<string, OHPKM>
 export default interface BackendInterface {
   /* past gen identifier lookups */
   loadLookups: () => Promise<Errorable<StoredLookups>>
-  updateLookups: (gen_12: LookupMap, gen_345: LookupMap) => Promise<Errorable<null>>
+  addToLookups: (new_entries: StoredLookups) => Promise<Errorable<null>>
 
   /* ohpkm bytes store by identifier */
   loadOhpkmStore: () => Promise<Errorable<OhpkmStore>>
-  updateOhpkmStore: (updates: OhpkmStore) => Promise<Errorable<null>>
+  addToOhpkmStore: (updates: OhpkmStore) => Promise<Errorable<null>>
 
   /* save shared frontend/backend state */
   saveSharedState: () => Promise<Errorable<void>>

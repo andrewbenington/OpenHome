@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::error::Result;
 use crate::state::shared_state::{self, AllSharedState};
@@ -8,7 +8,7 @@ use crate::util;
 
 type IdentifierLookup = HashMap<String, String>;
 
-#[derive(Default, Debug, Serialize, Clone)]
+#[derive(Default, Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct LookupState {
     gen_12: IdentifierLookup,
@@ -31,6 +31,15 @@ impl LookupState {
 
 impl shared_state::SharedState for LookupState {
     const ID: &'static str = "lookups";
+
+    fn update_from(&mut self, other: Self) {
+        other.gen_12.into_iter().for_each(|(k, v)| {
+            self.gen_12.insert(k, v);
+        });
+        other.gen_345.into_iter().for_each(|(k, v)| {
+            self.gen_345.insert(k, v);
+        });
+    }
 }
 
 #[tauri::command]
@@ -39,22 +48,13 @@ pub fn get_lookups(shared_state: tauri::State<'_, AllSharedState>) -> Result<Loo
 }
 
 #[tauri::command]
-pub fn update_lookups(
+pub fn add_to_lookups(
     app_handle: tauri::AppHandle,
     shared_state: tauri::State<'_, AllSharedState>,
-    gen_12: IdentifierLookup,
-    gen_345: IdentifierLookup,
+    new_entries: LookupState,
 ) -> Result<()> {
     shared_state
         .lock()?
-        .update_lookups(&app_handle, |old_data| {
-            let mut new_state = old_data.clone();
-            gen_12.into_iter().for_each(|(k, v)| {
-                new_state.gen_12.insert(k, v);
-            });
-            gen_345.into_iter().for_each(|(k, v)| {
-                new_state.gen_345.insert(k, v);
-            });
-            new_state
-        })
+        .lookups
+        .update(&app_handle, new_entries)
 }

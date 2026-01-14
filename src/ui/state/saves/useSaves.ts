@@ -6,7 +6,7 @@ import { OpenHomeBox } from '@openhome-core/save/util/storage'
 import { Item } from '@pkm-rs/pkg'
 import { MarkingsSixShapesWithColor } from '@pokemon-files/util'
 import { useCallback, useContext } from 'react'
-import { getMonFileIdentifier, OhpkmIdentifier } from '../../../core/pkm/Lookup'
+import { OhpkmIdentifier } from '../../../core/pkm/Lookup'
 import { getSortFunctionNullable } from '../../../core/pkm/sort'
 import { Option, partitionResults, R, range, Result } from '../../../core/util/functional'
 import { filterUndefined } from '../../../core/util/sort'
@@ -203,6 +203,7 @@ export function useSaves(): SavesAndBanksManager {
       if (!identifier) {
         const displacedMon = save.boxes[dest.box].boxSlots[dest.box_slot]
         save.boxes[dest.box].boxSlots[dest.box_slot] = undefined
+        save.updatedBoxSlots.push({ box: dest.box, index: dest.box_slot })
         return R.Ok(displacedMon)
       }
 
@@ -309,9 +310,6 @@ export function useSaves(): SavesAndBanksManager {
         openSavesState.openSaves[saveToStringIdentifier(tempSave)].save = tempSave
       }
 
-      addedMons.forEach(
-        (mon) => (openSavesState.modifiedOHPKMs[getMonFileIdentifier(mon) ?? ''] = mon)
-      )
       return { ...openSavesState, openSaves: { ...openSavesState.openSaves } }
     },
     [loadedHomeData, moveMonToSave, moveOhpkmToHome, ohpkmStore, openSavesState]
@@ -494,15 +492,11 @@ export function useSaves(): SavesAndBanksManager {
           )
 
           ohpkmStore.overwrite(mon)
-          const location = findMon(mon.getHomeIdentifier())
-          if (location) {
-            openSavesDispatch({ type: 'mark_as_modified', payload: { mon } })
-          }
         }
       }
       openSavesDispatch({ type: 'add_save', payload: save })
     },
-    [openSavesDispatch, findMon, ohpkmStore]
+    [openSavesDispatch, ohpkmStore]
   )
 
   const removeSave = useCallback(
@@ -567,9 +561,8 @@ export function useSaves(): SavesAndBanksManager {
       mon.notes = notes
 
       ohpkmStore.overwrite(mon)
-      openSavesDispatch({ type: 'mark_as_modified', payload: { mon } })
     },
-    [homeData, findMon, ohpkmStore, openSavesDispatch]
+    [homeData, findMon, ohpkmStore]
   )
 
   const updateMonMarkings = useCallback(
@@ -586,9 +579,8 @@ export function useSaves(): SavesAndBanksManager {
       mon.markings = markings
 
       ohpkmStore.overwrite(mon)
-      openSavesDispatch({ type: 'mark_as_modified', payload: { mon } })
     },
-    [homeData, findMon, ohpkmStore, openSavesDispatch]
+    [homeData, findMon, ohpkmStore]
   )
 
   // const moveMon1 = useCallback(

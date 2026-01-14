@@ -10,6 +10,7 @@ use crate::state::{LookupState, OhpkmBytesStore};
 
 pub trait SharedState: Clone + Serialize + tauri::ipc::IpcResponse {
     const ID: &'static str;
+    fn update_from(&mut self, other: Self);
     fn to_command_response(&self) -> impl Clone + Serialize + tauri::ipc::IpcResponse {
         self
     }
@@ -18,11 +19,8 @@ pub trait SharedState: Clone + Serialize + tauri::ipc::IpcResponse {
 pub struct SharedStateWrapper<State: SharedState>(State);
 
 impl<State: SharedState> SharedStateWrapper<State> {
-    pub fn update<F>(&mut self, app_handle: &tauri::AppHandle, update_function: F) -> Result<()>
-    where
-        F: FnOnce(&State) -> State,
-    {
-        self.0 = update_function(&self.0);
+    pub fn update(&mut self, app_handle: &tauri::AppHandle, new_data: State) -> Result<()> {
+        self.0.update_from(new_data);
 
         let event = format!("shared_state_update::{}", State::ID);
 
@@ -35,32 +33,8 @@ impl<State: SharedState> SharedStateWrapper<State> {
 }
 
 pub struct AllSharedStateInner {
-    lookups: SharedStateWrapper<LookupState>,
-    ohpkm_store: SharedStateWrapper<OhpkmBytesStore>,
-}
-
-impl AllSharedStateInner {
-    pub fn update_lookups<F>(
-        &mut self,
-        app_handle: &tauri::AppHandle,
-        update_function: F,
-    ) -> Result<()>
-    where
-        F: FnOnce(&LookupState) -> LookupState,
-    {
-        self.lookups.update(app_handle, update_function)
-    }
-
-    pub fn update_ohpkm_store<F>(
-        &mut self,
-        app_handle: &tauri::AppHandle,
-        update_function: F,
-    ) -> Result<()>
-    where
-        F: FnOnce(&OhpkmBytesStore) -> OhpkmBytesStore,
-    {
-        self.ohpkm_store.update(app_handle, update_function)
-    }
+    pub lookups: SharedStateWrapper<LookupState>,
+    pub ohpkm_store: SharedStateWrapper<OhpkmBytesStore>,
 }
 
 pub struct AllSharedState(pub Mutex<AllSharedStateInner>);

@@ -2,13 +2,16 @@ import { R } from '../../core/util/functional'
 import BackendInterface, { BackendListeners } from './backendInterface'
 
 const DummyBackend: BackendInterface = {
+  /* saving */
+  saveSharedState: async () => R.Err('no backend in use'),
+
   /* past gen identifier lookups */
   loadLookups: async () => R.Err('no backend in use'),
-  updateLookups: async () => R.Err('no backend in use'),
+  addToLookups: async () => R.Err('no backend in use'),
 
   /* ohpkm store */
   loadOhpkmStore: async () => R.Err('no backend in use'),
-  updateOhpkmStore: async () => R.Err('no backend in use'),
+  addToOhpkmStore: async () => R.Err('no backend in use'),
 
   /* pokedex */
   loadPokedex: async () => R.Err('no backend in use'),

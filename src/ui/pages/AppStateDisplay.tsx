@@ -59,9 +59,6 @@ function appInfoDisplay(state: AppInfoState) {
 
 function openSavesDisplay(state: OpenSavesState) {
   return {
-    'Modified Mons': Object.fromEntries(
-      Object.entries(state.modifiedOHPKMs).map(([key, val]) => [key, monDisplay(val)])
-    ),
     'Home Data': state.homeData?.displayState(),
     Banks: state.homeData?.banks.map((bank) => ({
       name: bank.name,

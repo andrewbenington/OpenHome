@@ -6,9 +6,6 @@ import App from './ui/App'
 
 await init()
 
-window.addEventListener('unload', function (e) {
-  console.log('WINDOW UNLOADED')
-})
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
     <App />

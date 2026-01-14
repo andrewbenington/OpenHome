@@ -1,8 +1,5 @@
-import { getMonFileIdentifier } from '@openhome-core/pkm/Lookup'
-import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { HomeData } from '@openhome-core/save/HomeData'
 import { SaveWriter } from '@openhome-core/save/interfaces'
-import { Errorable, R } from '@openhome-core/util/functional'
+import { Errorable } from '@openhome-core/util/functional'
 import { PropsWithChildren } from 'react'
 import { BackendContext, BackendWithHelpersInterface } from './backendContext'
 import BackendInterface from './backendInterface'
@@ -15,8 +12,6 @@ function addHelpersToBackend(backend: BackendInterface): BackendWithHelpersInter
   return {
     ...backend,
     writeAllSaveFiles: async (saveWriters: SaveWriter[]) => writeAllSaveFiles(backend, saveWriters),
-    writeAllHomeData: async (homeData: HomeData, mons: OHPKM[]) =>
-      writeAllHomeData(backend, homeData, mons),
   }
 }
 
@@ -27,45 +22,6 @@ async function writeAllSaveFiles(
   return Promise.all(
     saveWriters.map((saveWriter) => backend.writeSaveFile(saveWriter.filepath, saveWriter.bytes))
   )
-}
-
-async function writeAllHomeData(
-  backend: BackendInterface,
-  homeData: HomeData,
-  mons: OHPKM[]
-): Promise<Errorable<null>[]> {
-  const banksResult = await backend.writeHomeBanks({
-    banks: homeData.banks,
-    current_bank: homeData.currentBankIndex,
-  })
-
-  if (R.isErr(banksResult)) {
-    return [banksResult, await backend.rollbackTransaction()]
-  }
-
-  const results: Errorable<null>[] = []
-
-  for (const mon of mons) {
-    try {
-      const bytes = new Uint8Array(mon.toBytes())
-      const identifier = getMonFileIdentifier(mon)
-
-      if (identifier === undefined) {
-        results.push(
-          R.Err(`Could not get identifier for mon: ${mon.nickname} (${mon.metadata?.formeName})`)
-        )
-        continue
-      }
-      const result = await backend.writeHomeMon(identifier, bytes)
-
-      results.push(result)
-    } catch (e) {
-      const species = mon.speciesMetadata?.name ?? 'Unknown Species'
-
-      results.push(R.Err(`Error encoding ${mon.nickname} (${species}): ${e}`))
-    }
-  }
-  return results
 }
 
 export function BackendProvider({ backend, children }: BackendProviderProps) {

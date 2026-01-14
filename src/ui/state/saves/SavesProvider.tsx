@@ -32,7 +32,6 @@ export default function SavesProvider({ children }: SavesProviderProps) {
   const [itemBagState, bagDispatch] = useContext(ItemBagContext)
   const displayError = useDisplayError()
   const [openSavesState, openSavesDispatch] = useReducer(openSavesReducer, {
-    modifiedOHPKMs: {},
     monsToRelease: [],
     openSaves: {},
   })
@@ -125,18 +124,16 @@ export default function SavesProvider({ children }: SavesProviderProps) {
 
     const promises = [
       backend.writeAllSaveFiles(saveWriters),
-      // lookupsState.updateLookups(newLookups),
-      // backend.writeAllHomeData(
-      //   openSavesState.homeData,
-      //   Object.values(openSavesState.modifiedOHPKMs)
-      // ),
+      backend.writeHomeBanks({
+        banks: openSavesState.homeData.banks,
+        current_bank: openSavesState.homeData.currentBankIndex,
+      }),
       backend.deleteHomeMons(
         openSavesState.monsToRelease
           .filter((mon) => mon instanceof OHPKM)
           .map(getMonFileIdentifier)
           .filter(filterUndefined)
       ),
-      ohpkmStore.overwriteAll(openSavesState.modifiedOHPKMs),
     ]
 
     if (itemBagState.modified) {
@@ -168,7 +165,6 @@ export default function SavesProvider({ children }: SavesProviderProps) {
     if (R.isErr(commitResult)) {
       return R.Err([TransactionCommit(commitResult.err)])
     }
-    // backend.rollbackTransaction()
 
     openSavesDispatch({ type: 'clear_updated_box_slots' })
     openSavesDispatch({ type: 'clear_mons_to_release' })
@@ -178,7 +174,6 @@ export default function SavesProvider({ children }: SavesProviderProps) {
     return R.Ok(null)
   }, [
     openSavesState.homeData,
-    openSavesState.modifiedOHPKMs,
     openSavesState.monsToRelease,
     backend,
     lookupsState,

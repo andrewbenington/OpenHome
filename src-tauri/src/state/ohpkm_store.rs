@@ -79,6 +79,12 @@ impl shared_state::SharedState for OhpkmBytesStore {
     fn to_command_response(&self) -> impl Clone + Serialize + tauri::ipc::IpcResponse {
         self.to_b64_map()
     }
+
+    fn update_from(&mut self, other: Self) {
+        other.0.into_iter().for_each(|(k, v)| {
+            self.0.insert(k, v);
+        });
+    }
 }
 
 #[tauri::command]
@@ -89,18 +95,13 @@ pub fn get_ohpkm_store(
 }
 
 #[tauri::command]
-pub fn update_ohpkm_store(
+pub fn add_to_ohpkm_store(
     app_handle: tauri::AppHandle,
     shared_state: tauri::State<'_, shared_state::AllSharedState>,
     updates: OhpkmBytesStore,
 ) -> Result<()> {
     shared_state
         .lock()?
-        .update_ohpkm_store(&app_handle, |old_data| {
-            let mut new_state = old_data.clone();
-            updates.0.into_iter().for_each(|(k, v)| {
-                new_state.0.insert(k, v);
-            });
-            new_state
-        })
+        .ohpkm_store
+        .update(&app_handle, updates)
 }

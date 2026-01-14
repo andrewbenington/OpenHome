@@ -34,8 +34,8 @@ function useSharedLookupsState(): SharedStateController<StoredLookups> {
   const backend = useContext(BackendContext)
 
   const stateUpdater = useCallback(
-    (updated: StoredLookups) => {
-      return backend.updateLookups(updated.gen12, updated.gen345)
+    (newEntries: StoredLookups) => {
+      return backend.addToLookups(newEntries)
     },
     [backend]
   )

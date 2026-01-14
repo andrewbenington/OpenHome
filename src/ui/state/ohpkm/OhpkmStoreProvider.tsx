@@ -45,7 +45,7 @@ function useSharedOhpkmState(): SharedStateController<OhpkmStoreData, StringToB6
   const backend = useContext(BackendContext)
 
   const stateGetter = backend.loadOhpkmStore
-  const stateUpdater = backend.updateOhpkmStore
+  const stateUpdater = backend.addToOhpkmStore
   const updatePokedexFromStored = useCallback(
     async (data: OhpkmStoreData) => {
       console.log(Object.keys(data).toSorted())

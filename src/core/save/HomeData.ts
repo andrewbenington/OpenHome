@@ -158,6 +158,7 @@ export class HomeData {
       )
     }
 
+    this.updatedBoxSlots.push(location)
     if (identifier) {
       this._banks[location.bank].boxes[location.box].identifiers.set(location.box_slot, identifier)
       this.boxes[location.box].boxSlots[location.box_slot] = identifier
@@ -313,6 +314,7 @@ export class HomeData {
     return {
       currentBox: this._currentBoxIndex,
       _currentBankIndex: this._currentBankIndex,
+      updatedBoxSlots: this.updatedBoxSlots,
       currentBank: this.getCurrentBank(),
       boxCount: this.boxes.length,
     }

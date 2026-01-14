@@ -41,7 +41,7 @@ type OnDropEvent = Event<{ position: { x: number; y: number }; paths: string[] }
 export const TauriBackend: BackendInterface = {
   /* past gen identifier lookups */
   loadLookups: Commands.get_lookups,
-  updateLookups: Commands.update_lookups,
+  addToLookups: Commands.add_to_lookups,
 
   /* ohpkm store */
   loadOhpkmStore: async function (): Promise<Errorable<OhpkmStore>> {
@@ -56,14 +56,15 @@ export const TauriBackend: BackendInterface = {
       )
     )
   },
-  updateOhpkmStore: function (updates: OhpkmStore): Promise<Errorable<null>> {
-    return Commands.update_ohpkm_store(
+  addToOhpkmStore: function (updates: OhpkmStore): Promise<Errorable<null>> {
+    return Commands.add_to_ohpkm_store(
       Object.fromEntries(
         Object.entries(updates).map(([identifier, ohpkm]) => [identifier, ohpkm.toByteArray()])
       )
     )
   },
 
+  /* saving */
   saveSharedState: Commands.save_shared_state,
 
   /* pokedex */

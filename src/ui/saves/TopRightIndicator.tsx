@@ -74,12 +74,6 @@ export default function TopRightIndicator({ mon, indicatorType }: TopRightIndica
           />
         )
       )
-    // case 'Modified':
-    //   return (
-    //     new OHPKM(mon).getHomeIdentifier() in savesState.modifiedOHPKMs && (
-    //       <TopRightNumericalIndicator value={1} />
-    //     )
-    //   )
     default:
       return <></>
   }
