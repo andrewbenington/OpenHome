@@ -50,7 +50,7 @@ export const getUnownLetterGen3 = (personalityValue: number) => {
 }
 
 export function generatePersonalityValuePreservingAttributes(mon: AllPKMFields): number {
-  const prng = new Prando(mon.personalityValue ?? mon.ivs?.atk)
+  const prng = new Prando(mon.personalityValue ?? mon.dvs?.atk)
 
   let personalityValue = 0
   let otherNature: NatureIndex | undefined
@@ -229,13 +229,6 @@ export class MoveFilter {
   }
 
   moveIsAllowed(moveIndex: number) {
-    console.log(
-      moveIndex,
-      this.filter,
-      Array.isArray(this.filter)
-        ? this.filter.includes(moveIndex)
-        : moveIndex <= this.filter.maxValidMove()
-    )
     return Array.isArray(this.filter)
       ? this.filter.includes(moveIndex)
       : moveIndex <= this.filter.maxValidMove()

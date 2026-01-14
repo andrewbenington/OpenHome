@@ -2,15 +2,20 @@ import { BackendContext } from '@openhome-ui/backend/backendContext'
 import { useCallback, useContext, useEffect, useState } from 'react'
 
 import { Errorable, Option, R } from '../../../core/util/functional'
-import BackendInterface from '../../backend/backendInterface'
 
-export interface SharedRustState<State, RustState = State> {
+type StateConverter<State, RustState> = [State] extends [RustState]
+  ? { convertRustState?: undefined } // rust state is the same type as typescript state
+  : {
+      convertRustState: (payload: RustState) => State
+    }
+
+export type SharedStateController<State, RustState = State> = {
+  identifier: string
   stateGetter: () => Promise<Errorable<State>>
   stateReducer: (prev: State, updated: State) => State
   stateUpdater: (updated: State) => Promise<Errorable<null>>
   onLoaded?: (data: State) => void
-  transformRustState?: (payload: RustState) => State
-}
+} & StateConverter<State, RustState>
 
 export type RustStateManager<State> = {
   updateState: (updated: State) => Promise<Errorable<null>>
@@ -19,33 +24,31 @@ export type RustStateManager<State> = {
   | { loaded: false; state: undefined; error: Option<string> }
 )
 
-export function useRustState<State, TauriResponse = State>(
-  stateType: string,
-  stateGetter: (b: BackendInterface) => Promise<Errorable<State>>,
-  stateReducer: (prev: State, updated: State) => State,
-  stateUpdater: (b: BackendInterface, updated: State) => Promise<Errorable<null>>,
-  onLoaded?: (data: State) => void,
-  transformTauriResponse?: (payload: TauriResponse) => State
+export function useSharedState<State, RustState = State>(
+  controller: SharedStateController<State, RustState>
 ): RustStateManager<State> {
   const [stateCache, setStateCache] = useState<State>()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string>()
   const backend = useContext(BackendContext)
 
+  const { identifier, stateGetter, stateReducer, stateUpdater, convertRustState, onLoaded } =
+    controller
+
   const updateState = useCallback(
     async (updated: State) => {
       if (stateCache) setStateCache(stateReducer(stateCache, updated))
-      return await stateUpdater(backend, updated)
+      return await stateUpdater(updated)
     },
-    [backend, stateCache, stateReducer, stateUpdater]
+    [stateCache, stateReducer, stateUpdater]
   )
 
   useEffect(() => {
     const stopListening = backend.registerListeners({
       onStateUpdate: {
-        [stateType]: (updatedState) => {
-          const transformedResponse = transformTauriResponse
-            ? transformTauriResponse(updatedState as unknown as TauriResponse)
+        [identifier]: (updatedState) => {
+          const transformedResponse = convertRustState
+            ? convertRustState(updatedState as unknown as RustState)
             : (updatedState as unknown as State)
           setStateCache(transformedResponse)
         },
@@ -55,10 +58,10 @@ export function useRustState<State, TauriResponse = State>(
     return () => {
       stopListening()
     }
-  }, [backend, stateType, transformTauriResponse])
+  }, [backend, convertRustState, identifier])
 
   const loadAndCacheState = useCallback(async () => {
-    stateGetter(backend).then(
+    stateGetter().then(
       R.match(
         (data) => {
           onLoaded?.(data)
@@ -67,7 +70,7 @@ export function useRustState<State, TauriResponse = State>(
         (err) => setError(err)
       )
     )
-  }, [backend, onLoaded, stateGetter])
+  }, [stateGetter, onLoaded])
 
   useEffect(() => {
     if (!stateCache && !loading) {

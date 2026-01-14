@@ -186,6 +186,7 @@ export function useSaves(): SavesAndBanksManager {
       const tracked = ohpkm ? ohpkmStore.moveToSave(ohpkm, save) : undefined
       const displacedMon = save.boxes[dest.box].boxSlots[dest.box_slot]
       save.boxes[dest.box].boxSlots[dest.box_slot] = tracked
+      save.updatedBoxSlots.push({ box: dest.box, index: dest.box_slot })
 
       return R.Ok(displacedMon)
     },
@@ -214,6 +215,7 @@ export function useSaves(): SavesAndBanksManager {
       const tracked = ohpkmStore.moveToSave(mon, save)
       const displacedMon = save.boxes[dest.box].boxSlots[dest.box_slot]
       save.boxes[dest.box].boxSlots[dest.box_slot] = tracked
+      save.updatedBoxSlots.push({ box: dest.box, index: dest.box_slot })
 
       return R.Ok(displacedMon)
     },

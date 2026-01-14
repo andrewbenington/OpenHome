@@ -45,7 +45,7 @@ export function useOhpkmStore(): OhpkmStore {
     <P extends PKMInterface>(maybeTracked: MaybeTracked<P> | undefined): OHPKM | P | undefined => {
       if (!maybeTracked) return undefined
       if (!isTracked(maybeTracked)) return maybeTracked.data
-      return getById(maybeTracked.identifier) ?? maybeTracked.data
+      return getById(maybeTracked.identifier) ?? undefined
     },
     [getById]
   )

@@ -1,5 +1,5 @@
 import { Callout } from '@radix-ui/themes'
-import { Context, ReactNode } from 'react'
+import { Context, ReactNode, useMemo } from 'react'
 import { Errorable } from '../../../core/util/functional'
 import { ErrorIcon } from '../../components/Icons'
 import LoadingIndicator from '../../components/LoadingIndicator'
@@ -16,6 +16,9 @@ export default function RustStateProvider<State>(props: RustStateProviderProps<S
   const { useStateManager, StateContext, stateDescription, children } = props
   const stateManager = useStateManager()
 
+  const state = useMemo(() => stateManager.state, [stateManager.state])
+  const updateState = useMemo(() => stateManager.updateState, [stateManager.updateState])
+
   if (stateManager.error) {
     return (
       <Callout.Root>
@@ -27,11 +30,9 @@ export default function RustStateProvider<State>(props: RustStateProviderProps<S
     )
   }
 
-  if (!stateManager.loaded) {
+  if (!stateManager.loaded || !state) {
     return <LoadingIndicator message={`Loading ${stateDescription}`} />
   }
 
-  return (
-    <StateContext value={[stateManager.state, stateManager.updateState]}>{children}</StateContext>
-  )
+  return <StateContext value={[state, updateState]}>{children}</StateContext>
 }

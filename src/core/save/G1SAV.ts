@@ -145,8 +145,7 @@ export class G1SAV extends OfficialSAV<PK1> {
   pcOffset?: number | undefined
   calculatePcChecksum?: (() => number) | undefined
 
-  prepareForSaving() {}
-  prepareBoxesAndGetModified() {
+  prepareForSaving() {
     const changedBoxes: number[] = unique(this.updatedBoxSlots.map((coords) => coords.box))
     const pokemonPerBox = this.boxRows * this.boxColumns
 

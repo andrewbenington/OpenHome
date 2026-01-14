@@ -16,10 +16,6 @@ pub struct LookupState {
 }
 
 impl LookupState {
-    pub fn from_components(gen_12: IdentifierLookup, gen_345: IdentifierLookup) -> Self {
-        Self { gen_12, gen_345 }
-    }
-
     pub fn load_from_storage(app_handle: &tauri::AppHandle) -> Result<Self> {
         Ok(Self {
             gen_12: util::get_storage_file_json(app_handle, "gen12_lookup.json")?,
@@ -49,9 +45,16 @@ pub fn update_lookups(
     gen_12: IdentifierLookup,
     gen_345: IdentifierLookup,
 ) -> Result<()> {
-    let new_lookups = LookupState::from_components(gen_12, gen_345);
-
     shared_state
         .lock()?
-        .update_lookups(&app_handle, |_| new_lookups)
+        .update_lookups(&app_handle, |old_data| {
+            let mut new_state = old_data.clone();
+            gen_12.into_iter().for_each(|(k, v)| {
+                new_state.gen_12.insert(k, v);
+            });
+            gen_345.into_iter().for_each(|(k, v)| {
+                new_state.gen_345.insert(k, v);
+            });
+            new_state
+        })
 }

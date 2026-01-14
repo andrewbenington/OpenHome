@@ -68,7 +68,6 @@ export interface BaseSAV<P extends PKMInterface = PKMInterface> {
   supportsItem: (itemIndex: number) => boolean
 
   getTrackedMonIdentifiers(): OhpkmIdentifier[]
-  // prepareBoxesAndGetModified: () => OhpkmIdentifier[]
   prepareWriter: () => SaveWriter
 
   getDisplayData(): Record<string, string | number | undefined> | undefined
