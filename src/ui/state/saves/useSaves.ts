@@ -163,6 +163,7 @@ export function useSaves(): SavesAndBanksManager {
     },
     [getMonAtHomeLocation, getMonAtSaveLocation, ohpkmStore]
   )
+
   const moveMonToSave = useCallback(
     (
       maybeTracked: MaybeTracked | undefined,
@@ -607,6 +608,8 @@ export function useSaves(): SavesAndBanksManager {
         const displacedMon = result.value
         moveMonToHome(displacedMon, source)
       }
+    } else if (source.save === dest.save) {
+      moveMonWithinSave(source.save, source, dest)
     } else {
       const sourceMon = getMonAtSaveLocation(source)
       if (!sourceMon) return
@@ -735,4 +738,13 @@ function findMonInHome(monId: string, homeData: HomeData): MonLocation | undefin
       if (found) return found
     }
   }
+}
+
+function moveMonWithinSave(save: SAV, source: SaveMonLocation, dest: SaveMonLocation) {
+  const sourceMon = save.boxes[source.box].boxSlots[source.box_slot]
+  const displacedMon = save.boxes[dest.box].boxSlots[dest.box_slot]
+  save.boxes[dest.box].boxSlots[dest.box_slot] = sourceMon
+  save.updatedBoxSlots.push({ box: dest.box, index: dest.box_slot })
+  save.boxes[source.box].boxSlots[source.box_slot] = displacedMon
+  save.updatedBoxSlots.push({ box: source.box, index: source.box_slot })
 }
