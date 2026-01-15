@@ -51,7 +51,7 @@ pub fn run() {
                 }
             };
 
-            let lookup_state_inner = match state::LookupState::load_from_storage(app.handle()) {
+            let lookup_state = match state::LookupState::load_from_storage(app.handle()) {
                 Ok(lookup) => lookup,
                 Err(err) => {
                     app.dialog()
@@ -64,7 +64,7 @@ pub fn run() {
                 }
             };
 
-            let shared_state = AllSharedState::from_states(lookup_state_inner, ohpkm_store);
+            let shared_state = AllSharedState::from_states(lookup_state, ohpkm_store);
             app.manage(shared_state);
 
             let pokedex_state = match state::PokedexState::load_from_storage(app.handle()) {

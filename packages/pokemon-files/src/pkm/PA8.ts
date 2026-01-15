@@ -106,7 +106,6 @@ export default class PA8 {
   ribbons: string[]
   trainerGender: boolean
   constructor(arg: ArrayBuffer | AllPKMFields, encrypted?: boolean) {
-    // console.log('building PA8')
     if (arg instanceof ArrayBuffer) {
       let buffer = arg
       if (encrypted) {
@@ -222,7 +221,6 @@ export default class PA8 {
       this.trainerGender = byteLogic.getFlag(dataView, 0x13d, 7)
     } else {
       const other = arg
-      console.log(other.relearnMoves)
       this.encryptionConstant = other.encryptionConstant ?? 0
       this.sanity = other.sanity ?? 0
       this.checksum = other.checksum ?? 0
