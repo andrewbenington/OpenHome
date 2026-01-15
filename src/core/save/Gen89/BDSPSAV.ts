@@ -133,7 +133,6 @@ export class BDSPSAV extends OfficialSAV<PB8> {
     return BDSPSAV.boxSizeBytes
   }
 
-  // TODO: implement
   prepareForSaving() {
     this.updatedBoxSlots.forEach(({ box, index: monIndex }) => {
       const updatedSlotContent = this.boxes[box].boxSlots[monIndex]

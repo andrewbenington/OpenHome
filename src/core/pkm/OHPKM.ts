@@ -65,7 +65,6 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   format: 'OHPKM' = 'OHPKM'
 
   constructor(arg: Uint8Array | AllPKMFields) {
-    // console.log('building OHPKM')
     if (arg instanceof Uint8Array) {
       super(arg)
     } else {
@@ -437,8 +436,6 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     return values as FourMoves
   }
   set relearnMoves(value: FourMoves) {
-    // console.log('nickname:', this.nickname)
-    // console.log('relearnMoves:', value, new Uint16Array(value))
     this.relearn_move_indices = new Uint16Array(value)
   }
 
