@@ -36,7 +36,6 @@ impl OhpkmBytesStore {
     }
 
     fn write_to_directory(data: &Self, path: &Path) -> Result<()> {
-        println!("writing {} ohpkm files", data.0.len());
         let mut errors: Vec<(PathBuf, Box<dyn std::error::Error>)> = Vec::new();
         data.0.iter().for_each(|(identifier, bytes)| {
             let filename = format!("{identifier}.ohpkm");

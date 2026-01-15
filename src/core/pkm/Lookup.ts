@@ -2,7 +2,7 @@ import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { dvsFromIVs, getBaseMon } from '@openhome-core/pkm/util'
 import { PKMFormeRef } from '@openhome-core/util/types'
-import { MetadataLookup, OriginGames } from '@pkm-rs/pkg'
+import { MetadataLookup, OriginGame, OriginGames } from '@pkm-rs/pkg'
 import { generatePersonalityValuePreservingAttributes } from '@pokemon-files/util'
 import { gen12StringToUTF, utf16StringToGen12 } from '../save/util/Strings'
 import { bytesToString } from '../save/util/byteLogic'
@@ -10,18 +10,22 @@ import { bytesToString } from '../save/util/byteLogic'
 export type OhpkmIdentifier = string
 
 export const getMonFileIdentifier = (mon: PKMInterface): OhpkmIdentifier | undefined => {
-  if (!('personalityValue' in mon)) {
+  if (!mon.personalityValue) {
     return undefined
   }
-  const baseMon = getBaseMon(mon.dexNum, mon.formeNum)
-
-  if (baseMon) {
-    return getHomeIdentifier(new OHPKM(mon))
-  }
-  return undefined
+  return getHomeIdentifier({ ...mon, personalityValue: mon.personalityValue }) // 🙄
 }
 
-export function getHomeIdentifier(mon: OHPKM): OhpkmIdentifier {
+type HomeIdentifierDerivableMon = {
+  dexNum: number
+  formeNum: number
+  trainerID: number
+  secretID: number
+  personalityValue: number
+  gameOfOrigin: OriginGame
+}
+
+export function getHomeIdentifier(mon: HomeIdentifierDerivableMon): OhpkmIdentifier {
   const baseMon = getBaseMon(mon.dexNum, mon.formeNum)
 
   if (!baseMon) {
