@@ -7,7 +7,6 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core'
-import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getItemIconPath } from '@openhome-ui/images/items'
 import { useItems } from '@openhome-ui/state/items'
@@ -93,12 +92,6 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
               .supportsMon(mon.dexNum, mon.formeNum))
         ) {
           const source = payload.monData
-
-          // If moving mon outside of its save, start persisting this mon's data in OpenHome
-          // (if it isnt already)
-          if (source.is_home || dest.is_home || source.saveIdentifier !== dest.saveIdentifier) {
-            ohpkmStore.overwrite(new OHPKM(mon))
-          }
 
           // Move item to OpenHome bag if not supported by the save file
           if (
