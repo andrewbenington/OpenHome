@@ -87,18 +87,25 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
           moveMonItemToBag(payload.monData)
         } else if (
           isMonLocation(dest) &&
-          (dest.is_home || dest.save.supportsMon(mon.dexNum, mon.formeNum))
+          (dest.is_home ||
+            savesAndBanks
+              .saveFromIdentifier(dest.saveIdentifier)
+              .supportsMon(mon.dexNum, mon.formeNum))
         ) {
           const source = payload.monData
 
           // If moving mon outside of its save, start persisting this mon's data in OpenHome
           // (if it isnt already)
-          if (source.save !== dest.save) {
+          if (source.is_home || dest.is_home || source.saveIdentifier !== dest.saveIdentifier) {
             ohpkmStore.overwrite(new OHPKM(mon))
           }
 
           // Move item to OpenHome bag if not supported by the save file
-          if (mon.heldItemIndex && !dest.is_home && !dest.save?.supportsItem(mon.heldItemIndex)) {
+          if (
+            mon.heldItemIndex &&
+            !dest.is_home &&
+            !savesAndBanks.saveFromIdentifier(dest.saveIdentifier).supportsItem(mon.heldItemIndex)
+          ) {
             moveMonItemToBag(source)
           }
 

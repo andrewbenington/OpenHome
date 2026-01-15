@@ -30,12 +30,12 @@ impl NatureIndex {
     //! methods could result in use-after-free)
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(constructor))]
-    pub fn new_js(val: u8) -> Result<NatureIndex, JsValue> {
+    pub fn new_js(val: u8) -> NatureIndex {
         // log("creating new");
         if val > NATURE_MAX {
-            Err(format!("Invalid nature index: {val}").into())
+            NatureIndex(0)
         } else {
-            Ok(NatureIndex(val))
+            NatureIndex(val)
         }
     }
 

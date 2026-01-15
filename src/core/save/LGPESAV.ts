@@ -109,7 +109,10 @@ export class LGPESAV extends OfficialSAV<PB7> {
         const displayBoxSlot = monIndex % 30
 
         if (mon !== null) {
-          this.boxes[displayBoxNum].boxSlots[displayBoxSlot] = tracker.wrapWithIdentifier(mon)
+          this.boxes[displayBoxNum].boxSlots[displayBoxSlot] = tracker.wrapWithIdentifier(
+            mon,
+            undefined
+          )
         }
       } catch (e) {
         console.error(e)

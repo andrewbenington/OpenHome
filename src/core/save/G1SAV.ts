@@ -141,9 +141,6 @@ export class G1SAV extends OfficialSAV<PK1> {
     })
   }
   sid?: number | undefined
-  pcChecksumOffset?: number | undefined
-  pcOffset?: number | undefined
-  calculatePcChecksum?: (() => number) | undefined
 
   prepareForSaving() {
     const changedBoxes: number[] = unique(this.updatedBoxSlots.map((coords) => coords.box))

@@ -166,7 +166,7 @@ export class G3SaveBackup {
         const box = this.boxes[Math.floor(i / 30)]
 
         if (mon.isValid()) {
-          box.boxSlots[i % 30] = tracker.wrapWithIdentifier(mon)
+          box.boxSlots[i % 30] = tracker.wrapWithIdentifier(mon, G3SAV.lookupType)
         } else {
           box.boxSlots[i % 30] = undefined
         }

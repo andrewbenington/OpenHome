@@ -84,7 +84,7 @@ export abstract class G6SAV extends OfficialSAV<PK6> {
           const mon = new PK6(monData.buffer, true)
 
           if (mon.gameOfOrigin !== 0 && mon.dexNum !== 0) {
-            this.boxes[box].boxSlots[monIndex] = tracker.wrapWithIdentifier(mon)
+            this.boxes[box].boxSlots[monIndex] = tracker.wrapWithIdentifier(mon, undefined)
           }
         } catch (e) {
           console.error(e)

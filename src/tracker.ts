@@ -1,6 +1,7 @@
 import {
   getMonFileIdentifier,
   getMonGen12Identifier,
+  getMonGen345Identifier,
   OhpkmIdentifier,
 } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
@@ -64,12 +65,15 @@ export class OhpkmTracker {
   }
 
   getOhpkmIdentifierIfTrackedGen345(mon: PKMInterface): Option<OhpkmIdentifier> {
-    const g345Identifier = getMonGen12Identifier(mon)
+    const g345Identifier = getMonGen345Identifier(mon)
     if (!g345Identifier) return undefined
     return this._gen345Lookup.get(g345Identifier)
   }
 
-  wrapWithIdentifier<P extends PKMInterface>(data: P, lookupType?: LookupType): MaybeTracked<P> {
+  wrapWithIdentifier<P extends PKMInterface>(
+    data: P,
+    lookupType: Option<LookupType>
+  ): MaybeTracked<P> {
     const identifier =
       lookupType === 'gen12'
         ? this.getOhpkmIdentifierIfTrackedGen12(data)

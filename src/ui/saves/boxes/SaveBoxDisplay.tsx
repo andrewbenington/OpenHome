@@ -167,7 +167,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                     is_home: false,
                     box: save.currentPCBox,
                     box_slot: index,
-                    save,
+                    saveIdentifier: save.identifier,
                   }}
                   disabled={
                     isDisabled || save.getSlotMetadata?.(save.currentPCBox, index)?.isDisabled
@@ -179,9 +179,9 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                     if (importedMons) {
                       attemptImportMons(importedMons, {
                         is_home: false,
-                        save,
                         box: save.currentPCBox,
                         box_slot: index,
+                        saveIdentifier: save.identifier,
                       })
                     }
                   }}

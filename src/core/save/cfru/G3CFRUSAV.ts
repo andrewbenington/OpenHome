@@ -121,7 +121,7 @@ class G3CFRUSaveBackup<T extends PluginPKMInterface> {
         if (mon.dexNum !== 0 && mon.trainerID !== 0) {
           const box = this.boxes[Math.floor(i / 30)]
 
-          box.boxSlots[i % 30] = tracker.wrapWithIdentifier(mon)
+          box.boxSlots[i % 30] = tracker.wrapWithIdentifier(mon, G3CFRUSAV.lookupType)
           if (mon.trainerID === this.tid) {
             mon.gameOfOrigin = OriginGame.FireRed
           }

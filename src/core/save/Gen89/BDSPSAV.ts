@@ -88,7 +88,7 @@ export class BDSPSAV extends OfficialSAV<PB8> {
           const mon = this.buildPKM(monData, true)
 
           if (mon.gameOfOrigin !== 0 && mon.dexNum !== 0) {
-            this.boxes[box].boxSlots[monIndex] = tracker.wrapWithIdentifier(mon)
+            this.boxes[box].boxSlots[monIndex] = tracker.wrapWithIdentifier(mon, undefined)
           }
         } catch (e) {
           console.error(e)

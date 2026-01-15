@@ -100,7 +100,7 @@ export abstract class G4SAV extends OfficialSAV<PK4> {
             ) {
               this.origin = mon.gameOfOrigin
             }
-            this.boxes[box].boxSlots[monIndex] = tracker.wrapWithIdentifier(mon)
+            this.boxes[box].boxSlots[monIndex] = tracker.wrapWithIdentifier(mon, G4SAV.lookupType)
           }
         } catch (e) {
           console.error(e)

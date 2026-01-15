@@ -102,7 +102,7 @@ export abstract class G5SAV extends OfficialSAV<PK5> {
           const mon = new PK5(monData.buffer, true)
 
           if (mon.gameOfOrigin !== 0 && mon.dexNum !== 0) {
-            this.boxes[box].boxSlots[monIndex] = tracker.wrapWithIdentifier(mon)
+            this.boxes[box].boxSlots[monIndex] = tracker.wrapWithIdentifier(mon, G5SAV.lookupType)
           }
         } catch (e) {
           console.error(e)

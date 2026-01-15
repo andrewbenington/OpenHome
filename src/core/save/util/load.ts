@@ -8,6 +8,7 @@ import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { R } from '@openhome-core/util/functional'
 import { OhpkmLookup } from '@openhome-ui/state/ohpkm'
 import { SAVClass } from '.'
+import { NationalDex } from '../../../../packages/pokemon-resources/src/consts/NationalDex'
 import { EmptyTracker, OhpkmTracker } from '../../../tracker'
 import { Errorable } from '../../util/functional'
 import { SAV } from '../interfaces'
@@ -29,6 +30,9 @@ const recoverOHPKMData = (
   saveFile.boxes.forEach((box) => {
     box.boxSlots.forEach((mon) => {
       if (mon) {
+        if (mon.data.dexNum === NationalDex.Arbok) {
+          console.log('arbok')
+        }
         try {
           const lookupIdentifier = getIdentifier(mon.data)
 

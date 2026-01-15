@@ -15,10 +15,16 @@ const Delimiter = '$' as const
 
 type Delim = typeof Delimiter
 
-export type SaveIdentifier = `${OriginGame}${Delim}${number}${Delim}${number}`
+type OfficialSaveIdentifier = `${OriginGame}${Delim}${number}${Delim}${number}`
+
+type PluginSaveIdentifier = `${OriginGame}${Delim}${number}${Delim}${number}${Delim}${string}`
+
+export type SaveIdentifier = OfficialSaveIdentifier | PluginSaveIdentifier
 
 export function saveToStringIdentifier(save: SAV): SaveIdentifier {
-  return `${save.origin}${Delimiter}${save.tid}${Delimiter}${save.sid ?? 0}`
+  return save.pluginIdentifier
+    ? `${save.origin}${Delimiter}${save.tid}${Delimiter}${save.sid ?? 0}${Delimiter}${save.pluginIdentifier}`
+    : `${save.origin}${Delimiter}${save.tid}${Delimiter}${save.sid ?? 0}`
 }
 
 export type OpenSavesState = {
@@ -40,7 +46,7 @@ export type SaveMonLocation = {
   box_slot: number
   is_home: false
   bank?: undefined
-  save: SAV
+  saveIdentifier: SaveIdentifier
 }
 
 export type MonLocation = SaveMonLocation | HomeMonLocation
@@ -389,10 +395,8 @@ export function getMonAtLocation(state: OpenSavesState, location: MonLocation) {
     return state.homeData?.boxes[location.box].boxSlots[location.box_slot]
   }
 
-  const saveID = saveToStringIdentifier(location.save)
-
-  if (saveID in state.openSaves) {
-    const save = saveFromIdentifier(state, saveID)
+  if (location.saveIdentifier in state.openSaves) {
+    const save = saveFromIdentifier(state, location.saveIdentifier)
     return save?.boxes[location.box].boxSlots[location.box_slot]
   }
   return undefined

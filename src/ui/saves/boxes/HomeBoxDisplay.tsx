@@ -216,8 +216,14 @@ export default function HomeBoxDisplay() {
 
 function SingleBoxMonDisplay() {
   const ohpkmStore = useOhpkmStore()
-  const { importMonsToLocation, homeData, sortHomeBox, sortAllHomeBoxes, removeDupesFromHomeBox } =
-    useSaves()
+  const {
+    importMonsToLocation,
+    homeData,
+    sortHomeBox,
+    sortAllHomeBoxes,
+    removeDupesFromHomeBox,
+    saveFromIdentifier,
+  } = useSaves()
   const [, dispatchError] = useContext(ErrorContext)
   const [selectedIndex, setSelectedIndex] = useState<number>()
   const { dragState } = useDragAndDrop()
@@ -266,6 +272,14 @@ function SingleBoxMonDisplay() {
     }
     return undefined
   }, [dragState.payload])
+
+  const sourceSupportsMon = useCallback(
+    (dexNum: number, formeNum: number) =>
+      !dragData || dragData?.is_home
+        ? true
+        : saveFromIdentifier(dragData.saveIdentifier).supportsMon(dexNum, formeNum),
+    [dragData, saveFromIdentifier]
+  )
 
   const currentBox = homeData.boxes[homeData.currentPCBox]
 
@@ -352,7 +366,7 @@ function SingleBoxMonDisplay() {
                     mon &&
                     dragData &&
                     !dragData.is_home &&
-                    !dragData.save.supportsMon(mon.dexNum, mon.formeNum)
+                    !sourceSupportsMon(mon.dexNum, mon.formeNum)
                   }
                   ctxMenuBuilders={contextElements}
                 />

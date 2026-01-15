@@ -47,6 +47,7 @@ export function useSharedState<State, RustState = State>(
     const stopListening = backend.registerListeners({
       onStateUpdate: {
         [identifier]: (updatedState) => {
+          console.log(identifier, updatedState)
           const transformedResponse = convertRustState
             ? convertRustState(updatedState as unknown as RustState)
             : (updatedState as unknown as State)

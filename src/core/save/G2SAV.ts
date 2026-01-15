@@ -35,6 +35,7 @@ export class G2SAV extends OfficialSAV<PK2> {
   money: number = 0 // TODO: set money for gen 2 saves
   name: string
   tid: number
+  sid?: number | undefined
   displayID: string
 
   currentPCBox: number
@@ -114,11 +115,6 @@ export class G2SAV extends OfficialSAV<PK2> {
       }
     })
   }
-  pluginIdentifier?: string | undefined
-  sid?: number | undefined
-  pcChecksumOffset?: number | undefined
-  pcOffset?: number | undefined
-  calculatePcChecksum?: (() => number) | undefined
 
   prepareForSaving() {
     const changedBoxes = unique(this.updatedBoxSlots.map((coords) => coords.box))

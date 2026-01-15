@@ -2,6 +2,7 @@ import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { SaveRef } from '@openhome-core/util/types'
 import { Gender, getPluginColor, OriginGame, OriginGames } from '@pkm-rs/pkg'
 import { isTracked, MaybeTracked } from '../../tracker'
+import { SaveIdentifier, saveToStringIdentifier } from '../../ui/state/saves'
 import { OhpkmIdentifier } from '../pkm/Lookup'
 import { OHPKM } from '../pkm/OHPKM'
 import { filterUndefined as notNull } from '../util/sort'
@@ -123,6 +124,7 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
   }
 
   isPlugin: false = false
+  pluginIdentifier: undefined = undefined
 
   getSlotMetadata?: (boxNum: number, boxSlot: number) => SlotMetadata = undefined
 
@@ -136,6 +138,10 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
 
   get gameLogoPath(): string | undefined {
     return OriginGames.logoPath(this.origin)
+  }
+
+  get identifier(): SaveIdentifier {
+    return saveToStringIdentifier(this)
   }
 }
 
@@ -200,6 +206,10 @@ export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implement
 
   get gameLogoPath(): string {
     return `logos/${this.pluginIdentifier}.png`
+  }
+
+  get identifier(): SaveIdentifier {
+    return saveToStringIdentifier(this)
   }
 }
 
