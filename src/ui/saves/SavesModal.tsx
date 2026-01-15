@@ -1,4 +1,3 @@
-import { getMonFileIdentifier } from '@openhome-core/pkm/Lookup'
 import { displayIndexAdder, isBattleFormeItem } from '@openhome-core/pkm/util'
 import { getSaveRef, SAV } from '@openhome-core/save/interfaces'
 import { SAVClass } from '@openhome-core/save/util'
@@ -17,7 +16,6 @@ import { PokedexUpdate } from '@openhome-ui/util/pokedex'
 import { Button, Dialog, Flex, Separator, Slider, VisuallyHidden } from '@radix-ui/themes'
 import { useCallback, useContext, useState } from 'react'
 import 'react-data-grid/lib/styles.css'
-import { useLookups } from 'src/ui/state/lookups/useLookups'
 import useDebounce from '../hooks/useDebounce'
 import RecentSaves from './RecentSaves'
 import SaveFolders from './SaveFolders'
@@ -41,30 +39,12 @@ function useOpenSaveHandler(onClose?: () => void) {
   const [tentativeSaveData, setTentativeSaveData] = useState<AmbiguousOpenState>()
   const backend = useContext(BackendContext)
   const ohpkmStore = useOhpkmStore()
-  const { lookups } = useLookups()
 
   const displayError = useDisplayError()
 
   const buildAndOpenSave = useCallback(
     async (saveType: SAVClass, filePath: PathData, fileBytes: Uint8Array) => {
-      const result = buildSaveFile(
-        filePath,
-        fileBytes,
-        {
-          getOhpkmById: ohpkmStore.getById,
-          gen12LookupMap: lookups.gen12,
-          gen345LookupMap: lookups.gen345,
-        },
-        saveType,
-        ohpkmStore.tracker,
-        (updatedMon) => {
-          const identifier = getMonFileIdentifier(updatedMon)
-
-          if (identifier !== undefined) {
-            backend.writeHomeMon(identifier, updatedMon.toByteArray())
-          }
-        }
-      )
+      const result = buildSaveFile(filePath, fileBytes, saveType, ohpkmStore.tracker)
 
       if (R.isErr(result)) {
         displayError('Error Loading Save', result.err)
@@ -81,16 +61,7 @@ function useOpenSaveHandler(onClose?: () => void) {
         onClose?.()
       }
     },
-    [
-      ohpkmStore.getById,
-      ohpkmStore.tracker,
-      lookups.gen12,
-      lookups.gen345,
-      backend,
-      displayError,
-      savesAndBanks,
-      onClose,
-    ]
+    [ohpkmStore.tracker, backend, displayError, savesAndBanks, onClose]
   )
 
   const pickSaveFile = useCallback(

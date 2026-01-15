@@ -10,7 +10,7 @@ import {
 } from '../../../core/pkm/Lookup'
 import { SAV } from '../../../core/save/interfaces'
 import { SAVClass } from '../../../core/save/util'
-import { isTracked, MaybeTracked, OhpkmTracker, tracked } from '../../../tracker'
+import { MaybeTracked, OhpkmTracker, tracked } from '../../../tracker'
 import { useLookups } from '../lookups'
 
 export type OhpkmStore = {
@@ -41,15 +41,6 @@ export function useOhpkmStore(): OhpkmStore {
     [ohpkmStore]
   )
 
-  const loadOhpkmIfTracked = useCallback(
-    <P extends PKMInterface>(maybeTracked: MaybeTracked<P> | undefined): OHPKM | P | undefined => {
-      if (!maybeTracked) return undefined
-      if (!isTracked(maybeTracked)) return maybeTracked.data
-      return getById(maybeTracked.identifier) ?? undefined
-    },
-    [getById]
-  )
-
   const tryLoadFromId = useCallback(
     (id: string): Result<OHPKM, IdentifierNotPresentError> => {
       return R.fromNullable(IdentifierNotPresent(id))(getById(id))
@@ -73,7 +64,6 @@ export function useOhpkmStore(): OhpkmStore {
 
   const overwrite = useCallback(
     (mon: OHPKM) => {
-      console.log(`registering ${mon.nickname}: ${mon.getHomeIdentifier()}`)
       updateStore({ [mon.getHomeIdentifier()]: mon })
     },
     [updateStore]
@@ -91,6 +81,14 @@ export function useOhpkmStore(): OhpkmStore {
   }, [ohpkmStore])
 
   const tracker = useMemo(() => new OhpkmTracker(ohpkmStore, lookups), [ohpkmStore, lookups])
+
+  const loadOhpkmIfTracked = useCallback(
+    <P extends PKMInterface>(maybeTracked: MaybeTracked<P> | undefined): OHPKM | P | undefined => {
+      if (!maybeTracked) return undefined
+      return tracker.loadIfTracked(maybeTracked.data) ?? maybeTracked.data
+    },
+    [tracker]
+  )
 
   const moveToSave = useCallback(
     <P extends PKMInterface>(ohpkm: OHPKM, save: SAV<P>) => {

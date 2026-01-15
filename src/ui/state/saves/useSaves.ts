@@ -501,6 +501,14 @@ export function useSaves(): SavesAndBanksManager {
           ohpkmStore.overwrite(mon)
         }
       }
+      for (const mon of save.boxes
+        .flatMap((b) => b.boxSlots.map((slot) => slot?.data))
+        .filter(filterUndefined)) {
+        const trackedData = ohpkmStore.tracker.loadIfTracked(mon)
+        if (trackedData) {
+          trackedData.syncWithGameData(mon, save)
+        }
+      }
       openSavesDispatch({ type: 'add_save', payload: save })
     },
     [openSavesDispatch, ohpkmStore]

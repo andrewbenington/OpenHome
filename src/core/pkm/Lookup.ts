@@ -9,11 +9,20 @@ import { bytesToString } from '../save/util/byteLogic'
 
 export type OhpkmIdentifier = string
 
+function hasPersonalityValue(
+  mon: PKMInterface
+): mon is PKMInterface & { personalityValue: number } {
+  return mon.personalityValue !== undefined
+}
+
 export const getMonFileIdentifier = (mon: PKMInterface): OhpkmIdentifier | undefined => {
-  if (!mon.personalityValue) {
+  if (mon instanceof OHPKM) {
+    return getHomeIdentifier(mon)
+  }
+  if (!hasPersonalityValue(mon)) {
     return undefined
   }
-  return getHomeIdentifier({ ...mon, personalityValue: mon.personalityValue }) // 🙄
+  return getHomeIdentifier(mon) // 🙄
 }
 
 type HomeIdentifierDerivableMon = {
@@ -29,7 +38,8 @@ export function getHomeIdentifier(mon: HomeIdentifierDerivableMon): OhpkmIdentif
   const baseMon = getBaseMon(mon.dexNum, mon.formeNum)
 
   if (!baseMon) {
-    throw Error('Invalid dex number')
+    console.log(mon)
+    throw Error(`Invalid dex/forme: ${mon.dexNum} / ${mon.formeNum}`)
   }
 
   return `${baseMon.nationalDex.toString().padStart(4, '0')}-${bytesToString(

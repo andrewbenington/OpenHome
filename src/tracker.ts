@@ -86,6 +86,56 @@ export class OhpkmTracker {
       return untracked(data)
     }
   }
+
+  loadIfTracked(mon: PKMInterface): Option<OHPKM> {
+    switch (mon.format) {
+      case 'PK1':
+      case 'PK2': {
+        const gen12Identifier = getMonGen12Identifier(mon)
+        if (!gen12Identifier) {
+          throw Error(`unable to calculate gen 1/2 identifier for ${mon.nickname} (${mon.format})`)
+        }
+
+        const homeIdentifier = this._gen12Lookup.get(gen12Identifier)
+        if (!homeIdentifier) return undefined
+
+        return this._trackedMons.get(homeIdentifier)
+      }
+      case 'PK3':
+      case 'COLOPKM':
+      case 'XDPKM':
+      case 'PK4':
+      case 'PK5': {
+        const gen345Identifier = getMonGen345Identifier(mon)
+        if (!gen345Identifier) {
+          throw Error(
+            `unable to calculate gen 3/4/5 identifier for ${mon.nickname} (${mon.format})`
+          )
+        }
+
+        const homeIdentifier = this._gen345Lookup.get(gen345Identifier)
+        if (!homeIdentifier) return undefined
+
+        return this._trackedMons.get(homeIdentifier)
+      }
+      case 'PK6':
+      case 'PK7':
+      case 'PB7':
+      case 'PK8':
+      case 'PA8':
+      case 'PB8':
+      case 'PK9': {
+        const homeIdentifier = getMonFileIdentifier(mon)
+        if (!homeIdentifier) {
+          throw Error(`unable to calculate OpenHome identifier for ${mon.nickname} (${mon.format})`)
+        }
+
+        return this._trackedMons.get(homeIdentifier)
+      }
+      default:
+        throw Error(`unrecognized pkm format: ${mon.format}`)
+    }
+  }
 }
 
 export function EmptyTracker() {

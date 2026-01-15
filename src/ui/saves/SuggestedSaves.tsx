@@ -11,7 +11,6 @@ import { useSaves } from '@openhome-ui/state/saves'
 import { Flex } from '@radix-ui/themes'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { R } from 'src/core/util/functional'
-import { useLookups } from 'src/ui/state/lookups/useLookups'
 import SaveCard from './SaveCard'
 import { filterEmpty, SaveViewMode } from './util'
 
@@ -27,7 +26,6 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
   const [suggestedSaves, setSuggestedSaves] = useState<SAV[]>()
   const ohpkmStore = useOhpkmStore()
-  const { lookups } = useLookups()
   const savesAndBanks = useSaves()
   const [error, setError] = useState(false)
   const displayError = useDisplayError()
@@ -52,28 +50,11 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
       if (R.isOk(response)) {
         const { fileBytes } = response.value
 
-        return buildUnknownSaveFile(
-          savePath,
-          fileBytes,
-          {
-            getOhpkmById: ohpkmStore.getById,
-            gen12LookupMap: lookups.gen12,
-            gen345LookupMap: lookups.gen345,
-          },
-          getEnabledSaveTypes(),
-          ohpkmStore.tracker
-        )
+        return buildUnknownSaveFile(savePath, fileBytes, getEnabledSaveTypes(), ohpkmStore.tracker)
       }
       return undefined
     },
-    [
-      backend,
-      getEnabledSaveTypes,
-      lookups.gen12,
-      lookups.gen345,
-      ohpkmStore.getById,
-      ohpkmStore.tracker,
-    ]
+    [backend, getEnabledSaveTypes, ohpkmStore.tracker]
   )
 
   useEffect(() => {

@@ -48,21 +48,6 @@ export type PKM =
   | PA8
   | PB8
   | PK9
-export type PKMType =
-  | typeof PK1
-  | typeof PK2
-  | typeof PK3
-  | typeof COLOPKM
-  | typeof XDPKM
-  | typeof PK4
-  | typeof PK5
-  | typeof PK6
-  | typeof PK7
-  | typeof PB7
-  | typeof PK8
-  | typeof PA8
-  | typeof PB8
-  | typeof PK9
 
 export type PkmClass = new (
   arg: ArrayBuffer | AllPKMFields,
