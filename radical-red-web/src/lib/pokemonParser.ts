@@ -1,5 +1,5 @@
 import { PokemonData, Gender, OriginGame, BaseStats } from './types'
-import { bytesToUint16LittleEndian, bytesToUint32LittleEndian, uint32ToBytesLittleEndian } from './byteLogic'
+import { bytesToUint16LittleEndian, bytesToUint32LittleEndian, uint16ToBytesLittleEndian, uint32ToBytesLittleEndian } from './byteLogic'
 import { gen3StringToUTF, utf8ToGen3String } from './stringConversion'
 import speciesDataRaw from './species-data.json'
 import movesDataRaw from './moves-data.json'
@@ -317,6 +317,46 @@ export const parsePokemon = (bytes: Uint8Array): PokemonData | null => {
 export const serializePokemon = (pokemon: PokemonData, originalBytes: Uint8Array): Uint8Array => {
   const bytes = new Uint8Array(originalBytes)
 
+  // Update personality value for nature and shiny changes
+  let personalityValue = bytesToUint32LittleEndian(originalBytes, 0x00)
+  const originalNature = ((personalityValue % 25) + 25) % 25 // Handle negative modulo
+  const originalPersonalityValue = personalityValue
+
+  // Check if nature needs to be changed
+  if (pokemon.nature !== originalNature) {
+    // Adjust personality value to set the correct nature
+    const diff = (pokemon.nature - originalNature + 25) % 25
+    personalityValue = (personalityValue + diff) >>> 0 // Ensure unsigned 32-bit
+  }
+
+  // Check if shiny status needs to be changed
+  const trainerID = pokemon.trainerID
+  const secretID = pokemon.secretID
+  const currentShiny = (trainerID ^ secretID ^ (personalityValue & 0xffff) ^ (personalityValue >>> 16)) < 8
+
+  if (pokemon.isShiny !== currentShiny) {
+    if (pokemon.isShiny) {
+      // Make it shiny by setting the lower 16 bits to create XOR result of 0
+      const targetXor = trainerID ^ secretID
+      const upperHalf = (personalityValue >>> 16) & 0xffff
+      const lowerHalf = (upperHalf ^ targetXor) & 0xffff
+      personalityValue = ((upperHalf << 16) | lowerHalf) >>> 0
+    } else {
+      // Make it not shiny by ensuring XOR result is >= 8
+      const xorResult = (trainerID ^ secretID ^ (personalityValue & 0xffff) ^ (personalityValue >>> 16))
+      if (xorResult < 8) {
+        // Add 8 to the lower half to make XOR result >= 8
+        const lowerHalf = ((personalityValue & 0xffff) + 8) & 0xffff
+        personalityValue = ((personalityValue & 0xffff0000) | lowerHalf) >>> 0
+      }
+    }
+  }
+
+  // Write personality value if it changed
+  if (personalityValue !== originalPersonalityValue) {
+    bytes.set(uint32ToBytesLittleEndian(personalityValue), 0x00)
+  }
+
   // Update nickname
   const nicknameBytes = utf8ToGen3String(pokemon.nickname, 10)
   bytes.set(nicknameBytes, 0x08)
@@ -324,6 +364,9 @@ export const serializePokemon = (pokemon: PokemonData, originalBytes: Uint8Array
   // Update trainer name
   const trainerNameBytes = utf8ToGen3String(pokemon.trainerName, 7)
   bytes.set(trainerNameBytes, 0x14)
+
+  // Update held item
+  bytes.set(uint16ToBytesLittleEndian(pokemon.heldItem), 0x1e)
 
   // Update experience
   bytes.set(uint32ToBytesLittleEndian(pokemon.exp), 0x20)
