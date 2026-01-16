@@ -1,5 +1,6 @@
 import { isRestricted, TransferRestrictions } from '@openhome-core/save/util/TransferRestrictions'
 import { ItemRadicalRed } from '@pkm-rs/pkg'
+import { OHPKM } from '../../pkm/OHPKM'
 import { findFirstSectionOffset, G3CFRUSAV, SAVE_SIZES_BYTES } from '../cfru/G3CFRUSAV'
 import { FRLG_SECURITY_COPY_OFFSET, FRLG_SECURITY_OFFSET } from '../G3SAV'
 import { SlotMetadata } from '../interfaces'
@@ -21,6 +22,10 @@ export class G3RRSAV extends G3CFRUSAV<PK3RR> {
 
   get gameName() {
     return 'Radical Red'
+  }
+
+  convertOhpkm(ohpkm: OHPKM): PK3RR {
+    return new PK3RR(ohpkm)
   }
 
   supportsMon(dexNumber: number, formeNumber: number) {
@@ -62,7 +67,7 @@ export class G3RRSAV extends G3CFRUSAV<PK3RR> {
   }
 
   getSlotMetadata = (boxNum: number, boxSlot: number): SlotMetadata => {
-    const mon = this.boxes[boxNum].pokemon[boxSlot]
+    const mon = this.boxes[boxNum].boxSlots[boxSlot]
 
     if (mon instanceof PK3RR && mon.isFakemon) {
       return {

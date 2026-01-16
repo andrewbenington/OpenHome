@@ -1,9 +1,9 @@
 import { SaveFolder } from '@openhome-core/save/util/storage'
+import { R } from '@openhome-core/util/functional'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
 import { AddFolderIcon, RemoveIcon } from '@openhome-ui/components/Icons'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import { Button, Card, Dialog, Flex } from '@radix-ui/themes'
-import * as E from 'fp-ts/lib/Either'
 import { useCallback, useContext, useEffect, useState } from 'react'
 
 export default function SaveFolders() {
@@ -24,12 +24,12 @@ export default function SaveFolders() {
   const refreshFolders = useCallback(
     () =>
       backend.getSaveFolders().then(
-        E.match(
-          (err) => handleError('Error getting save folders', err),
+        R.match(
           (folders) => {
             setError(false)
             setSaveFolders(folders)
-          }
+          },
+          (err) => handleError('Error getting save folders', err)
         )
       ),
     [backend, handleError]
@@ -43,9 +43,9 @@ export default function SaveFolders() {
   const addFolder = useCallback(
     () =>
       backend.pickFolder().then(
-        E.match(
-          (err) => handleError('Error picking folder', err),
-          (dir) => setPendingDirPath(dir)
+        R.match(
+          (dir) => setPendingDirPath(dir),
+          (err) => handleError('Error picking folder', err)
         )
       ),
     [backend, handleError]
@@ -54,9 +54,9 @@ export default function SaveFolders() {
   const removeFolder = useCallback(
     (path: string) =>
       backend.removeSaveFolder(path).then(
-        E.match(
-          async (err) => handleError('Error removing folder', err),
-          () => refreshFolders()
+        R.match(
+          () => refreshFolders(),
+          async (err) => handleError('Error removing folder', err)
         )
       ),
     [backend, refreshFolders, handleError]
@@ -65,12 +65,12 @@ export default function SaveFolders() {
   const upsertFolder = useCallback(
     (path: string, label: string) =>
       backend.upsertSaveFolder(path, label).then(
-        E.match(
-          async (err) => handleError('Error saving folder', err),
-          () => {
+        R.match(
+          async () => {
             setPendingDirPath(undefined)
             refreshFolders()
-          }
+          },
+          async (err) => handleError('Error saving folder', err)
         )
       ),
     [backend, refreshFolders, handleError]

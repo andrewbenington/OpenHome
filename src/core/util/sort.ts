@@ -19,6 +19,6 @@ export function numericSorter<T>(func: (val: T) => number | undefined) {
   }
 }
 
-export function filterUndefined<T>(value: T | undefined): value is T {
-  return value !== undefined
+export function filterUndefined<T>(value: T | undefined | null): value is T {
+  return value !== undefined && value !== null
 }

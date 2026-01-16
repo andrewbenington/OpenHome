@@ -15,15 +15,12 @@ import {
 } from '@pkm-rs/pkg'
 import * as byteLogic from '../util/byteLogic'
 import * as encryption from '../util/encryption'
-import { AllPKMFields } from '../util/pkmInterface'
+import { AllPKMFields, FourMoves } from '../util/pkmInterface'
 import { filterRibbons } from '../util/ribbonLogic'
 import { getStats } from '../util/statCalc'
 import * as stringLogic from '../util/stringConversion'
 import * as types from '../util/types'
-import {
-  adjustMovePPBetweenFormats,
-  generatePersonalityValuePreservingAttributes,
-} from '../util/util'
+import { generatePersonalityValuePreservingAttributes, MoveFilter } from '../util/util'
 
 export default class PK5 {
   static getName() {
@@ -45,9 +42,9 @@ export default class PK5 {
   language: Language
   evs: types.Stats
   contest: types.ContestStats
-  moves: number[]
-  movePP: number[]
-  movePPUps: number[]
+  moves: FourMoves
+  movePP: FourMoves
+  movePPUps: FourMoves
   ivs: types.Stats
   isEgg: boolean
   isNicknamed: boolean
@@ -198,11 +195,12 @@ export default class PK5 {
         tough: 0,
         sheen: 0,
       }
-      this.moves = other.moves.filter((_, i) => other.moves[i] <= PK5.maxValidMove())
-      this.movePP = adjustMovePPBetweenFormats(this, other).filter(
-        (_, i) => other.moves[i] <= PK5.maxValidMove()
-      )
-      this.movePPUps = other.movePPUps.filter((_, i) => other.moves[i] <= PK5.maxValidMove())
+
+      const moveFilter = MoveFilter.fromPkmClass(PK5)
+      this.moves = moveFilter.moves(other)
+      this.movePP = moveFilter.movePp(other, this.format)
+      this.movePPUps = moveFilter.movePpUps(other)
+
       this.ivs = other.ivs ?? {
         hp: 0,
         atk: 0,

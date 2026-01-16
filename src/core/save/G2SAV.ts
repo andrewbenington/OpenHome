@@ -1,4 +1,3 @@
-import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { get8BitChecksum } from '@openhome-core/save/util/byteLogic'
 import { gen12StringToUTF, utf16StringToGen12 } from '@openhome-core/save/util/Strings'
 import { unique } from '@openhome-core/util/functional'
@@ -7,8 +6,9 @@ import { PK2 } from '@pokemon-files/pkm'
 import { EXCLAMATION } from '@pokemon-resources/consts/Formes'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { GEN2_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
-import { Box, BoxCoordinates, OfficialSAV } from './interfaces'
-import { LOOKUP_TYPE } from './util'
+import { OHPKM } from '../pkm/OHPKM'
+import { Box, BoxAndSlot, OfficialSAV } from './interfaces'
+import { LookupType } from './util'
 import { emptyPathData, PathData } from './util/path'
 
 const CURRENT_BOX_OFFSET_GS_INTL = 0x2724
@@ -20,7 +20,7 @@ export class G2SAV extends OfficialSAV<PK2> {
   boxOffsets: number[]
 
   static transferRestrictions = GEN2_TRANSFER_RESTRICTIONS
-  static lookupType: LOOKUP_TYPE = 'gen12'
+  static lookupType: LookupType = 'gen12'
 
   origin: OriginGame = OriginGame.Gold
   isPlugin: false = false
@@ -34,6 +34,7 @@ export class G2SAV extends OfficialSAV<PK2> {
   money: number = 0 // TODO: set money for gen 2 saves
   name: string
   tid: number
+  sid?: number | undefined
   displayID: string
 
   currentPCBox: number
@@ -44,14 +45,13 @@ export class G2SAV extends OfficialSAV<PK2> {
   invalid: boolean = false
   tooEarlyToOpen: boolean = false
 
-  updatedBoxSlots: BoxCoordinates[] = []
+  updatedBoxSlots: BoxAndSlot[] = []
 
-  constructor(path: PathData, bytes: Uint8Array, fileCreated?: Date) {
+  constructor(path: PathData, bytes: Uint8Array) {
     super()
     const dataView = new DataView(bytes.buffer)
     this.bytes = bytes
     this.filePath = path
-    this.fileCreated = fileCreated
     this.tid = dataView.getInt16(0x2009)
     this.displayID = this.tid.toString().padStart(5, '0')
     this.name = gen12StringToUTF(this.bytes, 0x200b, 11)
@@ -110,18 +110,12 @@ export class G2SAV extends OfficialSAV<PK2> {
         )
         mon.gameOfOrigin = mon.metLevel ? OriginGame.Crystal : this.origin
         mon.language = Language.English
-        this.boxes[boxNumber].pokemon[monIndex] = mon
+        this.boxes[boxNumber].boxSlots[monIndex] = mon
       }
     })
   }
-  pluginIdentifier?: string | undefined
-  sid?: number | undefined
-  pcChecksumOffset?: number | undefined
-  pcOffset?: number | undefined
-  calculatePcChecksum?: (() => number) | undefined
 
-  prepareBoxesAndGetModified() {
-    const changedMonPKMs: OHPKM[] = []
+  prepareForSaving() {
     const changedBoxes = unique(this.updatedBoxSlots.map((coords) => coords.box))
     const pokemonPerBox = this.boxRows * this.boxColumns
 
@@ -131,29 +125,24 @@ export class G2SAV extends OfficialSAV<PK2> {
       // functions as an index, to skip empty slots
       let numMons = 0
 
-      box.pokemon.forEach((boxMon) => {
+      box.boxSlots.forEach((boxMon) => {
         if (boxMon) {
-          if (boxMon instanceof OHPKM) {
-            changedMonPKMs.push(boxMon)
-          }
-          const pk2Mon = boxMon instanceof PK2 ? boxMon : new PK2(boxMon)
-
           // set the mon's dex number in the box (separate location)
-          this.bytes[boxByteOffset + 1 + numMons] = pk2Mon.dexNum
+          this.bytes[boxByteOffset + 1 + numMons] = boxMon.dexNum
           // set the mon's data in the box
           this.bytes.set(
-            new Uint8Array(pk2Mon.toBytes().slice(0, 32)),
+            new Uint8Array(boxMon.toBytes().slice(0, 32)),
             boxByteOffset + 1 + pokemonPerBox + 1 + numMons * 0x20
           )
           // set the mon's OT name in the box
-          const trainerNameBuffer = utf16StringToGen12(pk2Mon.trainerName, 11, true)
+          const trainerNameBuffer = utf16StringToGen12(boxMon.trainerName, 11, true)
 
           this.bytes.set(
             trainerNameBuffer,
             boxByteOffset + 1 + pokemonPerBox + 1 + pokemonPerBox * 0x20 + numMons * 11
           )
           // set the mon's nickname in the box
-          const nicknameBuffer = utf16StringToGen12(pk2Mon.nickname, 11, true)
+          const nicknameBuffer = utf16StringToGen12(boxMon.nickname, 11, true)
 
           this.bytes.set(
             nicknameBuffer,
@@ -211,7 +200,10 @@ export class G2SAV extends OfficialSAV<PK2> {
         this.bytes[0x1f0d] = this.getCrystalInternationalChecksum2()
         break
     }
-    return changedMonPKMs
+  }
+
+  convertOhpkm(ohpkm: OHPKM): PK2 {
+    return new PK2(ohpkm)
   }
 
   areGoldSilverChecksumsValid() {

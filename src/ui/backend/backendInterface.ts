@@ -3,7 +3,7 @@ import { PathData, PossibleSaves } from '@openhome-core/save/util/path'
 import { SaveFolder, StoredBankData } from '@openhome-core/save/util/storage'
 import { Errorable } from '@openhome-core/util/functional'
 import { LoadSaveResponse, LookupMap, SaveRef } from '@openhome-core/util/types'
-import { Settings } from '@openhome-ui/state/appInfo'
+import { AppTheme, Settings } from '@openhome-ui/state/appInfo'
 import { PluginMetadataWithIcon } from '@openhome-ui/util/plugin'
 import { Pokedex, PokedexUpdate } from '@openhome-ui/util/pokedex'
 
@@ -31,19 +31,24 @@ export type PluginDownloadProgress = {
 
 export type StoredLookups = { gen12: LookupMap; gen345: LookupMap }
 
+export type OhpkmStore = Record<string, OHPKM>
+
 export default interface BackendInterface {
   /* past gen identifier lookups */
   loadLookups: () => Promise<Errorable<StoredLookups>>
-  updateLookups: (gen_12: LookupMap, gen_345: LookupMap) => Promise<Errorable<null>>
+  addToLookups: (new_entries: StoredLookups) => Promise<Errorable<null>>
+
+  /* ohpkm bytes store by identifier */
+  loadOhpkmStore: () => Promise<Errorable<OhpkmStore>>
+  addToOhpkmStore: (updates: OhpkmStore) => Promise<Errorable<null>>
+  deleteHomeMons: (identifiers: string[]) => Promise<Errorable<null>>
+
+  /* write synced state to disk during save */
+  saveSyncedState: () => Promise<Errorable<void>>
 
   /* past gen identifier lookups */
   loadPokedex: () => Promise<Errorable<Pokedex>>
   registerInPokedex: (updates: PokedexUpdate[]) => Promise<Errorable<null>>
-
-  /* OHPKM management */
-  loadHomeMonLookup: () => Promise<Errorable<Record<string, OHPKM>>>
-  writeHomeMon: (identifier: string, monBytes: Uint8Array) => Promise<Errorable<null>>
-  deleteHomeMons: (identifiers: string[]) => Promise<Errorable<null>>
 
   /* openhome banks/boxes */
   loadHomeBanks: () => Promise<Errorable<StoredBankData>>
@@ -82,9 +87,9 @@ export default interface BackendInterface {
   getState: () => Promise<Errorable<AppState>>
   getSettings: () => Promise<Errorable<Settings>>
   updateSettings: (settings: Settings) => Promise<Errorable<null>>
-  setTheme(appTheme: 'light' | 'dark' | 'system'): Promise<Errorable<null>>
+  setTheme(appTheme: AppTheme): Promise<Errorable<null>>
   saveLocalFile: (bytes: Uint8Array, suggestedName: string) => Promise<Errorable<null>>
-  emitMenuEvent: (menuEventId: string) => Promise<null>
+  emitMenuEvent: (menuEventId: string) => Promise<Errorable<null>>
 
   /* plugins */
   getImageData: (absolutePath: string) => Promise<Errorable<ImageResponse>>
@@ -102,6 +107,7 @@ export interface BackendListeners {
   onReset: () => void
   onOpen: () => void
   onLookupsUpdate: (updated_lookups: StoredLookups) => void
+  onStateUpdate: Record<string, <State>(updated_state: State) => void>
   onPokedexUpdate: (updated_pokedex: Pokedex) => void
   onPluginDownloadProgress: [string, (_progress_pct: number) => void]
   onBankOrBoxChange: (change: BankOrBoxChange) => void

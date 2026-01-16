@@ -17,6 +17,8 @@ type TopRightIndicatorProps = {
 }
 
 export default function TopRightIndicator({ mon, indicatorType }: TopRightIndicatorProps) {
+  // const savesState = useSaves()
+
   switch (indicatorType) {
     case 'Gender':
       return <GenderIcon gender={mon.gender} />

@@ -21,6 +21,7 @@ import {
 } from '@pkm-rs/pkg'
 import {
   AllPKMFields,
+  FourMoves,
   MarkingShape,
   Stats,
   generatePersonalityValuePreservingAttributes,
@@ -118,9 +119,9 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       this.secretID = other.secretID
       this.exp = other.exp
 
-      this.moves = other.moves as [number, number, number, number]
+      this.moves = other.moves as FourMoves
       this.movePP = adjustMovePPBetweenFormats(this, other)
-      this.movePPUps = other.movePPUps as [number, number, number, number]
+      this.movePPUps = other.movePPUps as FourMoves
       this.nickname = other.nickname
       this.language = other.language
       this.gameOfOrigin = other.gameOfOrigin
@@ -403,30 +404,38 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   }
 
   get moves() {
-    return Array.from(this.move_indices)
+    const values = Array.from(this.move_indices)
+    if (values.length !== 4) throw Error('move array length != 4')
+    return values as FourMoves
   }
-  set moves(value: number[]) {
+  set moves(value: FourMoves) {
     this.move_indices = new Uint16Array(value)
   }
 
   get movePP() {
-    return Array.from(this.move_pp)
+    const values = Array.from(this.move_pp)
+    if (values.length !== 4) throw Error('move pp array length != 4')
+    return values as FourMoves
   }
-  set movePP(value: number[]) {
+  set movePP(value: FourMoves) {
     this.move_pp = new Uint8Array(value)
   }
 
   get movePPUps() {
-    return Array.from(this.move_pp_ups)
+    const values = Array.from(this.move_pp_ups)
+    if (values.length !== 4) throw Error('move pp up array length != 4')
+    return values as FourMoves
   }
-  set movePPUps(value: number[]) {
+  set movePPUps(value: FourMoves) {
     this.move_pp_ups = new Uint8Array(value)
   }
 
   get relearnMoves() {
-    return Array.from(this.relearn_move_indices)
+    const values = Array.from(this.relearn_move_indices)
+    if (values.length !== 4) throw Error('relearn move array length != 4')
+    return values as FourMoves
   }
-  set relearnMoves(value: number[]) {
+  set relearnMoves(value: FourMoves) {
     this.relearn_move_indices = new Uint16Array(value)
   }
 
@@ -680,9 +689,9 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   public syncWithGameData(other: PKMInterface, save?: SAV) {
     this.exp = other.exp
 
-    this.moves = other.moves as [number, number, number, number]
+    this.moves = other.moves as FourMoves
     this.movePP = adjustMovePPBetweenFormats(this, other)
-    this.movePPUps = other.movePPUps as [number, number, number, number]
+    this.movePPUps = other.movePPUps as FourMoves
 
     if (this.dexNum !== other.dexNum && isEvolution(this, other)) {
       this.speciesAndForme = new SpeciesAndForme(other.dexNum, this.formeNum)

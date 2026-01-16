@@ -3,6 +3,7 @@ import { ItemUnbound } from '@pkm-rs/pkg'
 import PK3CFRU, { CFRUToNationalDexEntry } from '../cfru/PK3CFRU'
 
 import { fromGen3CFRUMoveIndex, toGen3CFRUMoveIndex } from '../cfru/conversion/Gen3CFRUMovesIndex'
+import { CFRUToNationalMap } from '../cfru/conversion/Gen3CFRUMovesIndex/CFRUToNationalMap'
 import { fromGen3CRFUPokemonIndex, toGen3CRFUPokemonIndex } from '../cfru/conversion/util'
 import { NationalDexToUnboundMap, UnboundToNationalDexMap } from './conversion/UnboundSpeciesMap'
 
@@ -11,6 +12,8 @@ import { NationalDexToUnboundMap, UnboundToNationalDexMap } from './conversion/U
 //   1290, 1291, 1292, 1293, 1294, 1375,
 // ]
 const FAKEMON_INDEXES: number[] = []
+
+const VALID_MOVE_INDICES_UB = Object.values(CFRUToNationalMap).filter((index) => index > 0)
 
 export default class PK3UB extends PK3CFRU implements PluginPKMInterface {
   format: 'PK3UB' = 'PK3UB'
@@ -35,11 +38,15 @@ export default class PK3UB extends PK3CFRU implements PluginPKMInterface {
   }
 
   moveFromGameIndex(gameIndex: number): number {
-    return fromGen3CFRUMoveIndex(gameIndex)
+    return fromGen3CFRUMoveIndex(gameIndex) ?? 0
   }
 
   moveToGameIndex(nationalMoveId: number): number {
-    return toGen3CFRUMoveIndex(nationalMoveId)
+    return toGen3CFRUMoveIndex(nationalMoveId) ?? 0
+  }
+
+  getValidMoveIndices(): number[] {
+    return VALID_MOVE_INDICES_UB
   }
 
   monFromGameIndex(gameIndex: number): CFRUToNationalDexEntry {

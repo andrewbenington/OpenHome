@@ -1,5 +1,4 @@
 import { PluginPKMInterface } from '@openhome-core/pkm/interfaces'
-import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -7,8 +6,8 @@ import {
   uint32ToBytesLittleEndian,
 } from '@openhome-core/save/util/byteLogic'
 import { Gender, OriginGame } from '@pkm-rs/pkg'
-import { Box, BoxCoordinates, PluginSAV } from '../interfaces'
-import { LOOKUP_TYPE } from '../util'
+import { Box, BoxAndSlot, PluginSAV } from '../interfaces'
+import { LookupType } from '../util'
 import { PathData } from '../util/path'
 import { gen3StringToUTF } from '../util/Strings/StringConverter'
 // import { RRTransferMon } from './conversion/RRTransferMons'
@@ -76,7 +75,7 @@ class G3CFRUSaveBackup<T extends PluginPKMInterface> {
   boxNames: string[]
   firstSectorIndex: number = 0
 
-  constructor(bytes: Uint8Array, pkmType: any) {
+  constructor(bytes: Uint8Array, PkmClass: new (bytes: ArrayBuffer) => T) {
     this.bytes = bytes
     this.saveIndex = bytesToUint32LittleEndian(bytes, 0xffc)
     this.securityKey = bytesToUint32LittleEndian(bytes, 0xf20)
@@ -116,12 +115,12 @@ class G3CFRUSaveBackup<T extends PluginPKMInterface> {
     }
     for (let i = 0; i < nMons; i++) {
       try {
-        const mon = new pkmType(this.pcDataContiguous.slice(4 + i * 58, 4 + (i + 1) * 58).buffer)
+        const mon = new PkmClass(this.pcDataContiguous.slice(4 + i * 58, 4 + (i + 1) * 58).buffer)
 
         if (mon.dexNum !== 0 && mon.trainerID !== 0) {
           const box = this.boxes[Math.floor(i / 30)]
 
-          box.pokemon[i % 30] = mon
+          box.boxSlots[i % 30] = mon
           if (mon.trainerID === this.tid) {
             mon.gameOfOrigin = OriginGame.FireRed
           }
@@ -149,7 +148,7 @@ export abstract class G3CFRUSAV<T extends PluginPKMInterface> extends PluginSAV<
   static TEAM_ITEMS_OFFSET = 0x0ff4 * 1
   static PC_OFFSET = 0x0ff4 * 5
 
-  static lookupType: LOOKUP_TYPE = 'gen345'
+  static lookupType: LookupType = 'gen345'
 
   primarySave: G3CFRUSaveBackup<T>
   backupSave: G3CFRUSaveBackup<T>
@@ -181,7 +180,7 @@ export abstract class G3CFRUSAV<T extends PluginPKMInterface> extends PluginSAV<
 
   invalid: boolean = false
   tooEarlyToOpen: boolean = false
-  updatedBoxSlots: BoxCoordinates[] = []
+  updatedBoxSlots: BoxAndSlot[] = []
 
   constructor(path: PathData, bytes: Uint8Array, pkmType: any) {
     super()
@@ -218,26 +217,19 @@ export abstract class G3CFRUSAV<T extends PluginPKMInterface> extends PluginSAV<
   pcOffset?: number | undefined
   calculateChecksum?: (() => number) | undefined
 
-  prepareBoxesAndGetModified() {
-    const changedMonPKMs: OHPKM[] = []
-
-    this.updatedBoxSlots.forEach(({ box, index }) => {
+  prepareForSaving() {
+    this.updatedBoxSlots.forEach(({ box, boxSlot: index }) => {
       const monOffset = 30 * box + index
       const pcBytes = new Uint8Array(58) // Per pokemon bytes
 
       // Current Mon in loop
-      const changedMon = this.boxes[box].pokemon[index]
+      const mon = this.boxes[box].boxSlots[index]
 
-      // We don't want to save OHPKM files of mons that didn't leave the save
-      //  (and would still be PK3s)
-      if (changedMon instanceof OHPKM) {
-        changedMonPKMs.push(changedMon)
-      }
-      // changedMon will be undefined if pokemon was moved from this slot
+      // mon will be undefined if pokemon was moved from this slot
       //  and the slot was left empty
-      const slotMon = this.boxes[box].pokemon[index]
+      const slotMon = this.boxes[box].boxSlots[index]
 
-      if (changedMon && slotMon) {
+      if (mon && slotMon) {
         try {
           // If mon is a OHPKM then convert to PK3RR
           const mon =
@@ -269,7 +261,6 @@ export abstract class G3CFRUSAV<T extends PluginPKMInterface> extends PluginSAV<
       sector.writeToBuffer(this.primarySave.bytes, i + 5, this.primarySave.firstSectorIndex)
     })
     this.bytes.set(this.primarySave.bytes, this.primarySaveOffset)
-    return changedMonPKMs
   }
 
   abstract supportsMon(dexNumber: number, formeNumber: number): boolean

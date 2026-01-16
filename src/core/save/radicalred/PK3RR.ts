@@ -4,6 +4,7 @@ import PK3CFRU, { CFRUToNationalDexEntry } from '../cfru/PK3CFRU'
 
 import { fromGen3CRFUPokemonIndex, toGen3CRFUPokemonIndex } from '../cfru/conversion/util'
 import { fromGen3RRMoveIndex, toGen3RRMoveIndex } from './conversion/Gen3RRMovesIndex'
+import { RRToNationalMap } from './conversion/Gen3RRMovesIndex/RRToNationalMap'
 import {
   NationalDexToRadicalRedMap,
   RadicalRedToNationalDexMap,
@@ -13,6 +14,8 @@ const FAKEMON_INDEXES = [
   1186, 1200, 1274, 1275, 1276, 1277, 1278, 1279, 1282, 1283, 1284, 1285, 1286, 1287, 1288, 1289,
   1290, 1291, 1292, 1293, 1294, 1375,
 ]
+
+const VALID_MOVE_INDICES_RR = Object.values(RRToNationalMap).filter((index) => index > 0)
 
 export default class PK3RR extends PK3CFRU implements PluginPKMInterface {
   format: 'PK3RR' = 'PK3RR'
@@ -37,11 +40,15 @@ export default class PK3RR extends PK3CFRU implements PluginPKMInterface {
   }
 
   moveFromGameIndex(gameIndex: number): number {
-    return fromGen3RRMoveIndex(gameIndex)
+    return fromGen3RRMoveIndex(gameIndex) ?? 0
   }
 
   moveToGameIndex(nationalMoveId: number): number {
-    return toGen3RRMoveIndex(nationalMoveId)
+    return toGen3RRMoveIndex(nationalMoveId) ?? 0
+  }
+
+  getValidMoveIndices(): number[] {
+    return VALID_MOVE_INDICES_RR
   }
 
   monFromGameIndex(gameIndex: number): CFRUToNationalDexEntry {

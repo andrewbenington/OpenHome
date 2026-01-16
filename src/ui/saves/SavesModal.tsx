@@ -1,21 +1,18 @@
-import { getMonFileIdentifier } from '@openhome-core/pkm/Lookup'
 import { displayIndexAdder, isBattleFormeItem } from '@openhome-core/pkm/util'
 import { getSaveRef, SAV } from '@openhome-core/save/interfaces'
 import { SAVClass } from '@openhome-core/save/util'
 import { buildSaveFile, getPossibleSaveTypes } from '@openhome-core/save/util/load'
 import { PathData } from '@openhome-core/save/util/path'
+import { R } from '@openhome-core/util/functional'
 import { filterUndefined } from '@openhome-core/util/sort'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
 import { CardsIcon, GridIcon } from '@openhome-ui/components/Icons'
 import SideTabs from '@openhome-ui/components/side-tabs/SideTabs'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import { AppInfoAction, AppInfoContext } from '@openhome-ui/state/appInfo'
-import { useLookups } from '@openhome-ui/state/lookups'
-import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { useSaves } from '@openhome-ui/state/saves'
 import { PokedexUpdate } from '@openhome-ui/util/pokedex'
 import { Button, Dialog, Flex, Separator, Slider, VisuallyHidden } from '@radix-ui/themes'
-import * as E from 'fp-ts/lib/Either'
 import { useCallback, useContext, useState } from 'react'
 import 'react-data-grid/lib/styles.css'
 import useDebounce from '../hooks/useDebounce'
@@ -40,45 +37,18 @@ function useOpenSaveHandler(onClose?: () => void) {
   const savesAndBanks = useSaves()
   const [tentativeSaveData, setTentativeSaveData] = useState<AmbiguousOpenState>()
   const backend = useContext(BackendContext)
-  const ohpkmStore = useOhpkmStore()
-  const { getLookups } = useLookups()
 
   const displayError = useDisplayError()
 
   const buildAndOpenSave = useCallback(
     async (saveType: SAVClass, filePath: PathData, fileBytes: Uint8Array) => {
-      const lookupsResult = await getLookups()
+      const result = buildSaveFile(filePath, fileBytes, saveType)
 
-      if (E.isLeft(lookupsResult)) {
-        displayError('Error Loading Lookups', lookupsResult.left)
+      if (R.isErr(result)) {
+        displayError('Error Loading Save', result.err)
         return
       }
-
-      const lookups = lookupsResult.right
-
-      const result = buildSaveFile(
-        filePath,
-        fileBytes,
-        {
-          getOhpkmById: ohpkmStore.getById,
-          gen12LookupMap: lookups.gen12,
-          gen345LookupMap: lookups.gen345,
-        },
-        saveType,
-        (updatedMon) => {
-          const identifier = getMonFileIdentifier(updatedMon)
-
-          if (identifier !== undefined) {
-            backend.writeHomeMon(identifier, updatedMon.toByteArray())
-          }
-        }
-      )
-
-      if (E.isLeft(result)) {
-        displayError('Error Loading Save', result.left)
-        return
-      }
-      const saveFile = result.right
+      const saveFile = result.value
 
       if (!saveFile) {
         displayError('Error Identifying Save', 'Make sure you opened a supported save file.')
@@ -89,7 +59,7 @@ function useOpenSaveHandler(onClose?: () => void) {
         onClose?.()
       }
     },
-    [getLookups, ohpkmStore.getById, displayError, backend, savesAndBanks, onClose]
+    [backend, displayError, savesAndBanks, onClose]
   )
 
   const pickSaveFile = useCallback(
@@ -97,16 +67,15 @@ function useOpenSaveHandler(onClose?: () => void) {
       if (!filePath) {
         const pickedFile = await backend.pickFile()
 
-        if (E.isLeft(pickedFile)) {
-          displayError('Error Selecting File', pickedFile.left)
+        if (R.isErr(pickedFile)) {
+          displayError('Error Selecting File', pickedFile.err)
           return
         }
-        if (!pickedFile.right) return
-        filePath = pickedFile.right
+        if (!pickedFile.value) return
+        filePath = pickedFile.value
       }
       backend.loadSaveFile(filePath).then(
-        E.match(
-          (err) => displayError('Error loading save file', err),
+        R.match(
           async ({ path, fileBytes }) => {
             filePath = path
             if (filePath && fileBytes) {
@@ -127,7 +96,8 @@ function useOpenSaveHandler(onClose?: () => void) {
 
               setTentativeSaveData({ possibleSaveTypes: saveTypes, filePath, fileBytes })
             }
-          }
+          },
+          async (err) => displayError('Error loading save file', err)
         )
       )
     },
@@ -309,7 +279,7 @@ function SelectSaveType({ open, saveTypes, onSelect }: SelectSaveTypeProps) {
 function pokedexSeenFromSave(saveFile: SAV) {
   const pokedexUpdates: PokedexUpdate[] = []
 
-  for (const mon of saveFile.boxes.flatMap((box) => box.pokemon).filter(filterUndefined)) {
+  for (const mon of saveFile.boxes.flatMap((box) => box.boxSlots).filter(filterUndefined)) {
     pokedexUpdates.push({
       dexNumber: mon.dexNum,
       formeNumber: mon.formeNum,
