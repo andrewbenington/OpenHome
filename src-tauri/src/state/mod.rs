@@ -8,4 +8,4 @@ pub use lookup::*;
 pub use ohpkm_store::*;
 pub use pokedex::*;
 
-pub mod shared_state;
+pub mod synced_state;

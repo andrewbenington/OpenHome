@@ -9,7 +9,7 @@ type StateConverter<State, RustState> = [State] extends [RustState]
       convertRustState: (payload: RustState) => State
     }
 
-export type SharedStateController<State, RustState = State> = {
+export type SyncedStateController<State, RustState = State> = {
   identifier: string
   stateGetter: () => Promise<Errorable<State>>
   stateReducer: (prev: State, updated: State) => State
@@ -24,8 +24,8 @@ export type RustStateManager<State> = {
   | { loaded: false; state: undefined; error: Option<string> }
 )
 
-export function useSharedState<State, RustState = State>(
-  controller: SharedStateController<State, RustState>
+export function useSyncedState<State, RustState = State>(
+  controller: SyncedStateController<State, RustState>
 ): RustStateManager<State> {
   const [stateCache, setStateCache] = useState<State>()
   const [loading, setLoading] = useState(false)

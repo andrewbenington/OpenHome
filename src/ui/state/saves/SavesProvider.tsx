@@ -101,10 +101,10 @@ export default function SavesProvider({ children }: SavesProviderProps) {
       return R.Err(errors.map(BackendSaveError))
     }
 
-    const sharedStateResult = await backend.saveSharedState()
-    if (R.isErr(sharedStateResult)) {
-      displayError('Error Saving', sharedStateResult.err)
-      return R.Err([BackendSaveError(sharedStateResult.err)])
+    const syncedStateResult = await backend.saveSyncedState()
+    if (R.isErr(syncedStateResult)) {
+      displayError('Error Saving', syncedStateResult.err)
+      return R.Err([BackendSaveError(syncedStateResult.err)])
     }
 
     const commitResult = await backend.commitTransaction()

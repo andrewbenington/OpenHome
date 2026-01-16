@@ -1,18 +1,14 @@
 import { displayIndexAdder, isBattleFormeItem } from '@openhome-core/pkm/util'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
-import {
-  RustStateProvider,
-  SharedStateController,
-  useSharedState,
-} from '@openhome-ui/state/rust-state'
 import { PokedexUpdate } from '@openhome-ui/util/pokedex'
 import { PropsWithChildren, useCallback, useContext } from 'react'
+import { RustStateProvider, SyncedStateController, useSyncedState } from 'src/ui/state/synced-state'
 import { OhpkmStoreContext, OhpkmStoreData } from '.'
 import { OHPKM } from '../../../core/pkm/OHPKM'
 import { StringToB64 } from '../../backend/tauri/tauriInvoker'
 
 function useOhpkmStoreTauri() {
-  return useSharedState(useSharedOhpkmState())
+  return useSyncedState(useSyncedOhpkmState())
 }
 
 export default function OhpkmStoreProvider({ children }: PropsWithChildren) {
@@ -40,7 +36,7 @@ function stateReducer(prev: OhpkmStoreData, updated: OhpkmStoreData): OhpkmStore
   return { ...prev, ...updated }
 }
 
-function useSharedOhpkmState(): SharedStateController<OhpkmStoreData, StringToB64> {
+function useSyncedOhpkmState(): SyncedStateController<OhpkmStoreData, StringToB64> {
   const backend = useContext(BackendContext)
 
   const stateGetter = backend.loadOhpkmStore

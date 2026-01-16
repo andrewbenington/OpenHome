@@ -77,8 +77,8 @@ export const TauriBackend: BackendInterface = {
     )
   },
 
-  /* saving */
-  saveSharedState: Commands.save_shared_state,
+  /* write synced state to disk during save */
+  saveSyncedState: Commands.save_synced_state,
 
   /* pokedex */
   loadPokedex: Commands.get_pokedex,
@@ -294,7 +294,7 @@ export const TauriBackend: BackendInterface = {
     if (listeners.onStateUpdate) {
       for (const [stateType, listener] of Object.entries(listeners.onStateUpdate)) {
         unlistenPromises.push(
-          listen(`shared_state_update::${stateType}`, (event) => listener(event.payload), {})
+          listen(`synced_state_update::${stateType}`, (event) => listener(event.payload), {})
         )
       }
     }

@@ -3,16 +3,16 @@ import { Context, ReactNode, useMemo } from 'react'
 import { Errorable } from '../../../core/util/functional'
 import { ErrorIcon } from '../../components/Icons'
 import LoadingIndicator from '../../components/LoadingIndicator'
-import { RustStateManager } from './rustState'
+import { RustStateManager } from './useSyncedState'
 
-export type RustStateProviderProps<State> = {
+export type SyncedStateProviderProps<State> = {
   useStateManager: () => RustStateManager<State>
   StateContext: Context<[State, (updated: State) => Promise<Errorable<null>>]>
   stateDescription: string
   children: ReactNode
 }
 
-export default function RustStateProvider<State>(props: RustStateProviderProps<State>) {
+export default function SyncedStateProvider<State>(props: SyncedStateProviderProps<State>) {
   const { useStateManager, StateContext, stateDescription, children } = props
   const stateManager = useStateManager()
 

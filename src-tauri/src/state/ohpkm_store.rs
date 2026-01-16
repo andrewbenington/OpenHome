@@ -1,5 +1,5 @@
 use crate::error::{Error, Result};
-use crate::{state::shared_state, util};
+use crate::{state::synced_state, util};
 use base64::prelude::*;
 use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
@@ -72,7 +72,7 @@ impl OhpkmBytesStore {
     }
 }
 
-impl shared_state::SharedState for OhpkmBytesStore {
+impl synced_state::SyncedState for OhpkmBytesStore {
     const ID: &'static str = "ohpkm_store";
 
     fn to_command_response(&self) -> impl Clone + Serialize + tauri::ipc::IpcResponse {
@@ -88,18 +88,18 @@ impl shared_state::SharedState for OhpkmBytesStore {
 
 #[tauri::command]
 pub fn get_ohpkm_store(
-    shared_state: tauri::State<'_, shared_state::AllSharedState>,
+    synced_state: tauri::State<'_, synced_state::AllSyncedState>,
 ) -> Result<HashMap<String, String>> {
-    shared_state.ohpkm_store_b64()
+    synced_state.ohpkm_store_b64()
 }
 
 #[tauri::command]
 pub fn add_to_ohpkm_store(
     app_handle: tauri::AppHandle,
-    shared_state: tauri::State<'_, shared_state::AllSharedState>,
+    synced_state: tauri::State<'_, synced_state::AllSyncedState>,
     updates: OhpkmBytesStore,
 ) -> Result<()> {
-    shared_state
+    synced_state
         .lock()?
         .ohpkm_store
         .update(&app_handle, updates)

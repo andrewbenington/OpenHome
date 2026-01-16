@@ -14,7 +14,7 @@ use std::env;
 use tauri::Manager;
 use tauri_plugin_dialog::{DialogExt, MessageDialogKind};
 
-use crate::{error::Error, state::shared_state::AllSharedState};
+use crate::{error::Error, state::synced_state::AllSyncedState};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -64,8 +64,8 @@ pub fn run() {
                 }
             };
 
-            let shared_state = AllSharedState::from_states(lookup_state, ohpkm_store);
-            app.manage(shared_state);
+            let synced_state = AllSyncedState::from_states(lookup_state, ohpkm_store);
+            app.manage(synced_state);
 
             let pokedex_state = match state::PokedexState::load_from_storage(app.handle()) {
                 Ok(pokedex) => pokedex,
@@ -132,7 +132,7 @@ pub fn run() {
             state::start_transaction,
             state::rollback_transaction,
             state::commit_transaction,
-            state::shared_state::save_shared_state,
+            state::synced_state::save_synced_state,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

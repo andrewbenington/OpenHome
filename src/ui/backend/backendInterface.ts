@@ -43,8 +43,8 @@ export default interface BackendInterface {
   addToOhpkmStore: (updates: OhpkmStore) => Promise<Errorable<null>>
   deleteHomeMons: (identifiers: string[]) => Promise<Errorable<null>>
 
-  /* save shared frontend/backend state */
-  saveSharedState: () => Promise<Errorable<void>>
+  /* write synced state to disk during save */
+  saveSyncedState: () => Promise<Errorable<void>>
 
   /* past gen identifier lookups */
   loadPokedex: () => Promise<Errorable<Pokedex>>

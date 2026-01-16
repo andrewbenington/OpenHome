@@ -37,7 +37,7 @@ if (!('fromBase64' in Uint8Array)) {
 
 type OhTauriApi = {
   get_state(): AppState
-  save_shared_state(): void
+  save_synced_state(): void
   get_file_bytes(absolutePath: string): number[]
   get_file_created(absolutePath: string): number
   get_ohpkm_files(): Record<string, number[]>
@@ -90,8 +90,8 @@ export const Commands: OhTauriApiNoThrow = {
     return invokeAndCatch('get_state')
   },
 
-  save_shared_state() {
-    return invokeAndCatch('save_shared_state')
+  save_synced_state() {
+    return invokeAndCatch('save_synced_state')
   },
 
   get_file_bytes(absolutePath: string) {

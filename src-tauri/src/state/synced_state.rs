@@ -8,7 +8,7 @@ use tauri::Emitter;
 use crate::error::{Error, Result};
 use crate::state::{LookupState, OhpkmBytesStore};
 
-pub trait SharedState: Clone + Serialize + tauri::ipc::IpcResponse {
+pub trait SyncedState: Clone + Serialize + tauri::ipc::IpcResponse {
     const ID: &'static str;
     fn update_from(&mut self, other: Self);
     fn to_command_response(&self) -> impl Clone + Serialize + tauri::ipc::IpcResponse {
@@ -16,13 +16,13 @@ pub trait SharedState: Clone + Serialize + tauri::ipc::IpcResponse {
     }
 }
 
-pub struct SharedStateWrapper<State: SharedState>(State);
+pub struct SyncedStateWrapper<State: SyncedState>(State);
 
-impl<State: SharedState> SharedStateWrapper<State> {
+impl<State: SyncedState> SyncedStateWrapper<State> {
     pub fn update(&mut self, app_handle: &tauri::AppHandle, new_data: State) -> Result<()> {
         self.0.update_from(new_data);
 
-        let event = format!("shared_state_update::{}", State::ID);
+        let event = format!("synced_state_update::{}", State::ID);
 
         app_handle
             .emit(&event, self.0.to_command_response())
@@ -32,18 +32,18 @@ impl<State: SharedState> SharedStateWrapper<State> {
     }
 }
 
-pub struct AllSharedStateInner {
-    pub lookups: SharedStateWrapper<LookupState>,
-    pub ohpkm_store: SharedStateWrapper<OhpkmBytesStore>,
+pub struct AllSyncedStateInner {
+    pub lookups: SyncedStateWrapper<LookupState>,
+    pub ohpkm_store: SyncedStateWrapper<OhpkmBytesStore>,
 }
 
-pub struct AllSharedState(pub Mutex<AllSharedStateInner>);
+pub struct AllSyncedState(pub Mutex<AllSyncedStateInner>);
 
-impl AllSharedState {
+impl AllSyncedState {
     pub fn from_states(lookups: LookupState, ohpkm_store: OhpkmBytesStore) -> Self {
-        Self(Mutex::new(AllSharedStateInner {
-            lookups: SharedStateWrapper(lookups),
-            ohpkm_store: SharedStateWrapper(ohpkm_store),
+        Self(Mutex::new(AllSyncedStateInner {
+            lookups: SyncedStateWrapper(lookups),
+            ohpkm_store: SyncedStateWrapper(ohpkm_store),
         }))
     }
 
@@ -62,8 +62,8 @@ impl AllSharedState {
     }
 }
 
-impl Deref for AllSharedState {
-    type Target = Mutex<AllSharedStateInner>;
+impl Deref for AllSyncedState {
+    type Target = Mutex<AllSyncedStateInner>;
 
     fn deref(&self) -> &Self::Target {
         &self.0
@@ -71,9 +71,9 @@ impl Deref for AllSharedState {
 }
 
 #[tauri::command]
-pub fn save_shared_state(
+pub fn save_synced_state(
     app_handle: tauri::AppHandle,
-    shared_state: tauri::State<'_, AllSharedState>,
+    synced_state: tauri::State<'_, AllSyncedState>,
 ) -> Result<()> {
-    shared_state.save_to_files(&app_handle)
+    synced_state.save_to_files(&app_handle)
 }

@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
 
 use crate::error::Result;
-use crate::state::shared_state::{self, AllSharedState};
+use crate::state::synced_state::{self, AllSyncedState};
 use crate::util;
 
 type IdentifierLookup = HashMap<String, String>;
@@ -29,7 +29,7 @@ impl LookupState {
     }
 }
 
-impl shared_state::SharedState for LookupState {
+impl synced_state::SyncedState for LookupState {
     const ID: &'static str = "lookups";
 
     fn update_from(&mut self, other: Self) {
@@ -43,17 +43,17 @@ impl shared_state::SharedState for LookupState {
 }
 
 #[tauri::command]
-pub fn get_lookups(shared_state: tauri::State<'_, AllSharedState>) -> Result<LookupState> {
-    shared_state.clone_lookups()
+pub fn get_lookups(synced_state: tauri::State<'_, AllSyncedState>) -> Result<LookupState> {
+    synced_state.clone_lookups()
 }
 
 #[tauri::command]
 pub fn add_to_lookups(
     app_handle: tauri::AppHandle,
-    shared_state: tauri::State<'_, AllSharedState>,
+    synced_state: tauri::State<'_, AllSyncedState>,
     new_entries: LookupState,
 ) -> Result<()> {
-    shared_state
+    synced_state
         .lock()?
         .lookups
         .update(&app_handle, new_entries)

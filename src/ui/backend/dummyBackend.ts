@@ -2,8 +2,8 @@ import { R } from '../../core/util/functional'
 import BackendInterface, { BackendListeners } from './backendInterface'
 
 const DummyBackend: BackendInterface = {
-  /* saving */
-  saveSharedState: async () => R.Err('no backend in use'),
+  /* write synced state to disk during save */
+  saveSyncedState: async () => R.Err('no backend in use'),
 
   /* past gen identifier lookups */
   loadLookups: async () => R.Err('no backend in use'),
