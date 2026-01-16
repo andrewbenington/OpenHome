@@ -21,7 +21,7 @@ export const BoxViewer: React.FC<BoxViewerProps> = ({ box, boxIndex, onPokemonCl
           >
             {pokemon ? (
               <div className="pokemon-info-compact">
-                <div className="pokemon-sprite">
+                <div className="pokemon-sprite" title={pokemon.speciesName}>
                   #{pokemon.dexNum}
                 </div>
                 <div className="pokemon-level">Lv.{pokemon.level}</div>
