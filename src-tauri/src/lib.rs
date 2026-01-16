@@ -16,6 +16,9 @@ use tauri_plugin_dialog::{DialogExt, MessageDialogKind};
 
 use crate::{error::Error, state::synced_state::AllSyncedState};
 
+#[cfg(target_os = "linux")]
+use dialog::DialogBox;
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -27,11 +30,19 @@ pub fn run() {
                 match launch_error {
                     Error::OutdatedVersion { .. } => app.handle().exit(1),
                     _ => {
+                        #[cfg(not(target_os = "linux"))]
                         app.dialog()
                             .message(launch_error.to_string())
                             .title("OpenHome Failed to Launch")
                             .kind(MessageDialogKind::Error)
                             .blocking_show();
+
+                        #[cfg(target_os = "linux")]
+                        dialog::Message::new(launch_error.to_string())
+                            .title("OpenHome Failed to Launch")
+                            .show()
+                            .expect("Could not display dialog box");
+
                         app.handle().exit(1);
                     }
                 };
@@ -54,11 +65,19 @@ pub fn run() {
             let lookup_state = match state::LookupState::load_from_storage(app.handle()) {
                 Ok(lookup) => lookup,
                 Err(err) => {
+                    #[cfg(not(target_os = "linux"))]
                     app.dialog()
                         .message(err.to_string())
                         .title("OpenHome Failed to Launch - Lookup File Error")
                         .kind(MessageDialogKind::Error)
                         .blocking_show();
+
+                    #[cfg(target_os = "linux")]
+                    dialog::Message::new(err.to_string())
+                        .title("OpenHome Failed to Launch - Lookup File Error")
+                        .show()
+                        .expect("Could not display dialog box");
+
                     app.handle().exit(1);
                     std::process::exit(1);
                 }
