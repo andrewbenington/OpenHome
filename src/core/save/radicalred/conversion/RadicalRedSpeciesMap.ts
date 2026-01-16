@@ -1003,7 +1003,7 @@ export const RadicalRedToNationalDexMap: Record<string, GameToNationalDexEntry |
   },
   '250': {
     NationalDexIndex: 250,
-    FormIndex: 250,
+    FormIndex: 0,
   },
   '251': {
     NationalDexIndex: 251,
