@@ -50,8 +50,6 @@ export interface BaseSAV<P extends PKMInterface = PKMInterface> {
   currentPCBox: number
   boxes: Array<Box<P>>
 
-  // bytes: Uint8Array
-
   invalid: boolean
   tooEarlyToOpen: boolean
 
@@ -65,7 +63,6 @@ export interface BaseSAV<P extends PKMInterface = PKMInterface> {
   supportsMon: (dexNumber: number, formeNumber: number) => boolean
   supportsItem: (itemIndex: number) => boolean
 
-  // getTrackedMonIdentifiers(): OhpkmIdentifier[]
   prepareWriter: () => SaveWriter
 
   getDisplayData(): Record<string, string | number | undefined> | undefined

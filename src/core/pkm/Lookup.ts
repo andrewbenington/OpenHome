@@ -84,7 +84,7 @@ export const getMonGen345Identifier = (mon: PKMInterface) => {
     if (mon instanceof OHPKM) {
       // Get the personality value that will be generated
       pk3CompatiblePID = generatePersonalityValuePreservingAttributes(mon)
-    } else if (mon.personalityValue) {
+    } else if (mon.personalityValue !== undefined) {
       pk3CompatiblePID = mon.personalityValue
     } else {
       return undefined

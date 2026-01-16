@@ -145,6 +145,8 @@ export function useOhpkmStore(): OhpkmStore {
         case 'PK3':
         case 'COLOPKM':
         case 'XDPKM':
+        case 'PK3RR':
+        case 'PK3UB':
         case 'PK4':
         case 'PK5': {
           const gen345Identifier = getMonGen345Identifier(mon)
