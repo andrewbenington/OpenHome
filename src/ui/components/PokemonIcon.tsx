@@ -4,7 +4,7 @@ import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getItemIconPath } from '@openhome-ui/images/items'
 import useMonSprite from '@openhome-ui/pokemon-details//useMonSprite'
 import { FormeMetadata, Generation, MetadataLookup } from '@pkm-rs/pkg'
-import { HTMLAttributes, ReactNode } from 'react'
+import { HTMLAttributes, MouseEventHandler, ReactNode } from 'react'
 import { classNames, grayscaleIf } from '../util/style'
 import './components.css'
 
@@ -43,6 +43,7 @@ export default function PokemonIcon(props: PokemonIconProps) {
     isEgg,
     topRightIndicator,
     style,
+    onClick,
   } = props
 
   const formeMetadata = MetadataLookup(dexNumber, formeNumber ?? 0)
@@ -54,9 +55,15 @@ export default function PokemonIcon(props: PokemonIconProps) {
       dexNumber={dexNumber}
       formeNumber={formeNumber}
       silhouette={silhouette}
+      onClick={onClick}
     />
   ) : formeMetadata ? (
-    <PokemonIconUsingSheet formeMetadata={formeMetadata} isEgg={isEgg} silhouette={silhouette} />
+    <PokemonIconUsingSheet
+      formeMetadata={formeMetadata}
+      isEgg={isEgg}
+      silhouette={silhouette}
+      onClick={onClick}
+    />
   ) : null
 
   return (
@@ -89,10 +96,11 @@ interface PokemonIconUsingSheetProps {
   formeMetadata: FormeMetadata
   isEgg?: boolean
   silhouette?: boolean
+  onClick?: MouseEventHandler
 }
 
 function PokemonIconUsingSheet(props: PokemonIconUsingSheetProps) {
-  const { formeMetadata, isEgg, silhouette } = props
+  const { formeMetadata, isEgg, silhouette, onClick } = props
 
   const isDarkMode = useIsDarkMode()
 
@@ -109,6 +117,7 @@ function PokemonIconUsingSheet(props: PokemonIconUsingSheetProps) {
             : 'contrast(0%) brightness(25%)'
           : undefined,
       }}
+      onClick={onClick}
     />
   )
 }
@@ -117,10 +126,11 @@ interface PokemonIconUsingImageProps {
   dexNumber: number
   formeNumber?: number
   silhouette?: boolean
+  onClick?: MouseEventHandler
 }
 
 function PokemonIconUsingImage(props: PokemonIconUsingImageProps) {
-  const { dexNumber, formeNumber, silhouette } = props
+  const { dexNumber, formeNumber, silhouette, onClick } = props
 
   const isDarkMode = useIsDarkMode()
 
@@ -144,6 +154,7 @@ function PokemonIconUsingImage(props: PokemonIconUsingImageProps) {
             : 'contrast(0%) brightness(25%)'
           : undefined,
       }}
+      onClick={onClick}
     />
   )
 }

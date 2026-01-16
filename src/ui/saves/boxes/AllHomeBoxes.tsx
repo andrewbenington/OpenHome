@@ -6,6 +6,7 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core'
+import { restrictToParentElement } from '@dnd-kit/modifiers'
 import {
   SortableContext,
   rectSortingStrategy,
@@ -69,7 +70,11 @@ export default function AllHomeBoxes(props: {
     <OpenHomeCtxMenu elements={getBankContextActions(savesAndBanks)}>
       <Grid columns="6" gap="1" overflowY="auto" maxHeight="80%">
         {moving ? (
-          <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+          <DndContext
+            sensors={sensors}
+            onDragEnd={handleDragEnd}
+            modifiers={[restrictToParentElement]}
+          >
             <SortableContext
               items={homeData.boxes.map((box) => box.id) ?? []}
               strategy={rectSortingStrategy}
@@ -115,13 +120,13 @@ function ClickableBoxOverview({ box, onBoxSelect, debugMode, deleting }: BoxOver
   return (
     <DroppableSpace
       dropID={`box-${box.id}`}
-      key={box.name ?? `Box ${box.index + 1}`}
+      key={box.nameOrDefault()}
       dropData={savesAndBanks.homeData.boxFirstEmptyLocation(box.index)}
       disabled={firstOpenIndex === undefined}
       style={{ justifyContent: undefined }}
     >
       <OpenHomeCtxMenu sections={getBoxContextActions(savesAndBanks, box)}>
-        <div style={{ position: 'relative' }}>
+        <div className="box-overview-container">
           <Button
             className="box-overview-button"
             variant="soft"
@@ -159,9 +164,6 @@ function DraggableBoxOverview({ box, debugMode }: BoxOverviewProps) {
   const style: CSSProperties = {
     transform: CSS.Transform.toString(transform),
     transition,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
     zIndex: isDragging ? 1000 : undefined,
   }
 
@@ -169,7 +171,13 @@ function DraggableBoxOverview({ box, debugMode }: BoxOverviewProps) {
 
   return (
     <OpenHomeCtxMenu sections={getBoxContextActions(savesAndBanks, box)}>
-      <Flex ref={setNodeRef} style={style} {...attributes} {...listeners}>
+      <div
+        ref={setNodeRef}
+        className="box-overview-container"
+        style={style}
+        {...attributes}
+        {...listeners}
+      >
         <Button
           className="box-overview-button"
           variant="solid"
@@ -177,7 +185,7 @@ function DraggableBoxOverview({ box, debugMode }: BoxOverviewProps) {
         >
           <BoxWithMons box={box} debugMode={debugMode} />
         </Button>
-      </Flex>
+      </div>
     </OpenHomeCtxMenu>
   )
 }
@@ -189,7 +197,7 @@ type BoxMonIconsProps = {
 
 function BoxWithMons({ box, debugMode }: BoxMonIconsProps) {
   return (
-    <Flex direction="column" width="100%">
+    <Flex direction="column" width="100%" height="100%">
       <div className="box-icon-mon-container">
         {range(HomeData.BOX_COLUMNS).map((i) => (
           <div className="box-icon-mon-col" key={`pos-display-col-${i}`}>
@@ -202,7 +210,12 @@ function BoxWithMons({ box, debugMode }: BoxMonIconsProps) {
           </div>
         ))}
       </div>
-      {box.name ?? `Box ${box.index + 1}`}
+      <div
+        className="box-overview-title-container"
+        style={fontStyleFromStringLength(box.nameOrDefault())}
+      >
+        <div className="box-overview-title">{box.nameOrDefault()}</div>
+      </div>
       {debugMode && (
         <div style={{ fontWeight: 'lighter' }}>
           <div>Index: {box.index}</div>
@@ -296,4 +309,33 @@ function getBoxContextActions(
   ]
 
   return [boxActions, addBoxActions]
+}
+
+function fontStyleFromStringLength(value: string): CSSProperties {
+  return {
+    fontSize: fontSizeFromStringLength(value.length),
+    lineHeight: lineHeightFromStringLength(value.length),
+  }
+}
+
+function fontSizeFromStringLength(length: number): `${number}rem` {
+  if (length <= 10) {
+    return '0.85rem'
+  } else if (length <= 20) {
+    return '0.75rem'
+  } else if (length <= 50) {
+    return '0.6rem'
+  } else {
+    return '0.5rem'
+  }
+}
+
+function lineHeightFromStringLength(length: number): number {
+  if (length <= 10) {
+    return 1.5
+  } else if (length <= 20) {
+    return 1.3
+  } else {
+    return 1.2
+  }
 }

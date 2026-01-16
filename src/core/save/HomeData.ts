@@ -65,6 +65,10 @@ export class HomeBox implements Box<OHPKM> {
   containsMons() {
     return this.pokemon.filter(filterUndefined).length > 0
   }
+
+  nameOrDefault() {
+    return this.name ?? `Box ${this.index + 1}`
+  }
 }
 
 export class HomeData {

@@ -33,7 +33,15 @@ export default function OpenHomeCtxMenu(props: ContextMenuProps) {
 
   return (
     <RadixCtxMenu.Root modal={false}>
-      <RadixCtxMenu.Trigger {...triggerProps} />
+      <RadixCtxMenu.Trigger
+        {...triggerProps}
+        onContextMenuCapture={(e) => {
+          // show native context menu if alt is held
+          if (e.altKey) {
+            e.stopPropagation()
+          }
+        }}
+      />
       <CtxMenuContent>{allElements.map(buildComponent)}</CtxMenuContent>
     </RadixCtxMenu.Root>
   )
