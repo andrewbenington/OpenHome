@@ -20,15 +20,28 @@ export interface BoxCoordinates {
   index: number
 }
 
+export interface BaseStats {
+  hp: number
+  atk: number
+  def: number
+  spa: number
+  spd: number
+  spe: number
+}
+
 export interface PokemonData {
   // Basic info
   dexNum: number
   formNum: number
+  speciesName: string
   nickname: string
   level: number
   exp: number
 
-  // Stats
+  // Base stats
+  baseStats: BaseStats
+
+  // Calculated stats
   hp: number
   attack: number
   defense: number
@@ -54,6 +67,7 @@ export interface PokemonData {
 
   // Moves
   moves: number[]
+  moveNames: string[]
   movePP: number[]
   movePPUps: number[]
 

@@ -41,7 +41,7 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="flex justify-between items-center mb-2">
           <h2 className="wireframe-title" style={{ margin: 0 }}>
-            {pokemon.nickname} #{pokemon.dexNum}
+            {pokemon.nickname} (#{pokemon.dexNum} {pokemon.speciesName})
           </h2>
           <button className="wireframe-button" onClick={onClose}>
             CLOSE
@@ -96,6 +96,34 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
         {activeTab === 'stats' && (
           <div>
             <h3 className="wireframe-subtitle">Base Stats</h3>
+            <div className="stats-grid">
+              <div className="stat-item">
+                <div className="stat-label">HP</div>
+                <div className="stat-value">{pokemon.baseStats.hp}</div>
+              </div>
+              <div className="stat-item">
+                <div className="stat-label">ATTACK</div>
+                <div className="stat-value">{pokemon.baseStats.atk}</div>
+              </div>
+              <div className="stat-item">
+                <div className="stat-label">DEFENSE</div>
+                <div className="stat-value">{pokemon.baseStats.def}</div>
+              </div>
+              <div className="stat-item">
+                <div className="stat-label">SP. ATK</div>
+                <div className="stat-value">{pokemon.baseStats.spa}</div>
+              </div>
+              <div className="stat-item">
+                <div className="stat-label">SP. DEF</div>
+                <div className="stat-value">{pokemon.baseStats.spd}</div>
+              </div>
+              <div className="stat-item">
+                <div className="stat-label">SPEED</div>
+                <div className="stat-value">{pokemon.baseStats.spe}</div>
+              </div>
+            </div>
+
+            <h3 className="wireframe-subtitle">Calculated Stats (at Level {pokemon.level})</h3>
             <div className="stats-grid">
               <div className="stat-item">
                 <div className="stat-label">HP</div>
@@ -269,7 +297,7 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
           <div>
             <h3 className="wireframe-subtitle">Moves</h3>
             <div className="form-group">
-              <label className="form-label">Move 1 (ID: {pokemon.moves[0]})</label>
+              <label className="form-label">{pokemon.moveNames[0] || 'None'} (ID: {pokemon.moves[0]})</label>
               <input
                 type="number"
                 className="wireframe-input"
@@ -279,7 +307,7 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
               />
             </div>
             <div className="form-group">
-              <label className="form-label">Move 2 (ID: {pokemon.moves[1]})</label>
+              <label className="form-label">{pokemon.moveNames[1] || 'None'} (ID: {pokemon.moves[1]})</label>
               <input
                 type="number"
                 className="wireframe-input"
@@ -289,7 +317,7 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
               />
             </div>
             <div className="form-group">
-              <label className="form-label">Move 3 (ID: {pokemon.moves[2]})</label>
+              <label className="form-label">{pokemon.moveNames[2] || 'None'} (ID: {pokemon.moves[2]})</label>
               <input
                 type="number"
                 className="wireframe-input"
@@ -299,7 +327,7 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
               />
             </div>
             <div className="form-group">
-              <label className="form-label">Move 4 (ID: {pokemon.moves[3]})</label>
+              <label className="form-label">{pokemon.moveNames[3] || 'None'} (ID: {pokemon.moves[3]})</label>
               <input
                 type="number"
                 className="wireframe-input"
@@ -308,9 +336,6 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
                 min="0"
               />
             </div>
-            <p style={{ fontSize: '12px', marginTop: '8px' }}>
-              Note: Move names are shown as IDs. Refer to Radical Red move list for IDs.
-            </p>
           </div>
         )}
 
