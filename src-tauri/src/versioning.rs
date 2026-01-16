@@ -137,7 +137,8 @@ pub fn handle_updates_get_features(
 fn appdata_dir_exists(app_handle: &tauri::AppHandle) -> Result<bool> {
     tauri::Manager::path(app_handle)
         .app_data_dir()
-        .map(|dir| dir.exists())
+        .map_err(Error::appdata)?
+        .try_exists()
         .map_err(Error::appdata)
 }
 
