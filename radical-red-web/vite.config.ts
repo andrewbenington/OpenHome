@@ -4,11 +4,7 @@ import path from 'path'
 
 export default defineConfig({
   plugins: [react()],
-  base: '/OpenHome/radical-red-web/',
-  build: {
-    outDir: '../docs/radical-red-web',
-    emptyOutDir: true,
-  },
+  base: '/',
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
