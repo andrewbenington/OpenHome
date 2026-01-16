@@ -7,7 +7,6 @@ import {
 import { gen4StringToUTF } from '@openhome-core/save/util/Strings/StringConverter'
 import { OriginGame } from '@pkm-rs/pkg'
 import { PK4 } from '@pokemon-files/pkm'
-import { OhpkmTracker } from '../../tracker'
 import { OHPKM } from '../pkm/OHPKM'
 import { Box, OfficialSAV, SaveMonLocation } from './interfaces'
 import { LookupType } from './util'
@@ -70,7 +69,7 @@ export abstract class G4SAV extends OfficialSAV<PK4> {
     this.origin = bytes[0x80]
   }
 
-  buildBoxes(tracker: OhpkmTracker) {
+  buildBoxes() {
     if (bytesToUint32LittleEndian(this.bytes, this.currentSaveBoxStartOffset) === 0xffffffff) {
       this.tooEarlyToOpen = true
       return
@@ -100,7 +99,7 @@ export abstract class G4SAV extends OfficialSAV<PK4> {
             ) {
               this.origin = mon.gameOfOrigin
             }
-            this.boxes[box].boxSlots[monIndex] = tracker.wrapWithIdentifier(mon, G4SAV.lookupType)
+            this.boxes[box].boxSlots[monIndex] = mon
           }
         } catch (e) {
           console.error(e)
@@ -131,16 +130,14 @@ export abstract class G4SAV extends OfficialSAV<PK4> {
 
   prepareForSaving() {
     this.updatedBoxSlots.forEach(({ box, index }) => {
-      const updatedSlotContent = this.boxes[box].boxSlots[index]
+      const mon = this.boxes[box].boxSlots[index]
 
       const writeIndex = this.currentSaveBoxStartOffset + this.boxSize * box + 136 * index
 
-      // updatedSlotContent will be undefined if pokemon was moved from this slot
+      // mon will be undefined if pokemon was moved from this slot
       // and the slot was left empty
-      if (updatedSlotContent) {
+      if (mon) {
         try {
-          const mon = updatedSlotContent.data
-
           if (mon.gameOfOrigin && mon.dexNum) {
             mon.refreshChecksum()
             this.bytes.set(new Uint8Array(mon.toPCBytes()), writeIndex)

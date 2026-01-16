@@ -9,7 +9,6 @@ import { Gender, ItemGen3, OriginGame } from '@pkm-rs/pkg'
 import { PK3 } from '@pokemon-files/pkm'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { GEN3_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
-import { EmptyTracker, OhpkmTracker } from '../../tracker'
 import { OHPKM } from '../pkm/OHPKM'
 import { filterUndefined } from '../util/sort'
 import { Box, OfficialSAV, SaveMonLocation } from './interfaces'
@@ -108,7 +107,7 @@ export class G3SaveBackup {
 
   firstSectorIndex: number = 0
 
-  constructor(bytes: Uint8Array, tracker: OhpkmTracker) {
+  constructor(bytes: Uint8Array) {
     this.bytes = bytes
     this.saveIndex = bytesToUint32LittleEndian(bytes, 0xffc)
     this.sectors = []
@@ -166,7 +165,7 @@ export class G3SaveBackup {
         const box = this.boxes[Math.floor(i / 30)]
 
         if (mon.isValid()) {
-          box.boxSlots[i % 30] = tracker.wrapWithIdentifier(mon, G3SAV.lookupType)
+          box.boxSlots[i % 30] = mon
         } else {
           box.boxSlots[i % 30] = undefined
         }
@@ -225,12 +224,12 @@ export class G3SAV extends OfficialSAV<PK3> {
 
   updatedBoxSlots: SaveMonLocation[] = []
 
-  constructor(path: PathData, bytes: Uint8Array, tracker: OhpkmTracker) {
+  constructor(path: PathData, bytes: Uint8Array) {
     super()
     this.bytes = bytes
     this.filePath = path
-    const saveOne = new G3SaveBackup(bytes.slice(0, 0xe000), tracker)
-    const saveTwo = new G3SaveBackup(bytes.slice(0xe000, 0x1c000), tracker)
+    const saveOne = new G3SaveBackup(bytes.slice(0, 0xe000))
+    const saveTwo = new G3SaveBackup(bytes.slice(0xe000, 0x1c000))
 
     if (saveOne.saveIndex > saveTwo.saveIndex) {
       this.primarySave = saveOne
@@ -255,7 +254,6 @@ export class G3SAV extends OfficialSAV<PK3> {
     const trainerMon = this.boxes
       .flatMap((box) => box.boxSlots)
       .filter(filterUndefined)
-      .map((slot) => slot.data)
       .find(
         (mon) =>
           mon.trainerID === this.tid && mon.secretID === this.sid && mon.trainerName === this.name
@@ -291,15 +289,13 @@ export class G3SAV extends OfficialSAV<PK3> {
     this.updatedBoxSlots.forEach(({ box, index }) => {
       const monOffset = 30 * box + index
       const pcBytes = new Uint8Array(80)
-      const updatedSlotContent = this.boxes[box].boxSlots[index]
+      const mon = this.boxes[box].boxSlots[index]
 
-      // updatedSlotContent will be undefined if pokemon was moved from this slot
+      // mon will be undefined if pokemon was moved from this slot
       // and the slot was left empty
 
-      if (updatedSlotContent) {
+      if (mon) {
         try {
-          const mon = updatedSlotContent.data
-
           if (mon?.gameOfOrigin && mon?.dexNum) {
             mon.refreshChecksum()
             pcBytes.set(new Uint8Array(mon.toPCBytes()), 0)
@@ -349,7 +345,7 @@ export class G3SAV extends OfficialSAV<PK3> {
       return false
     }
     try {
-      const save = new G3SAV(emptyPathData, bytes, EmptyTracker())
+      const save = new G3SAV(emptyPathData, bytes)
 
       if (save.primarySave.gameCode === 0) {
         return true

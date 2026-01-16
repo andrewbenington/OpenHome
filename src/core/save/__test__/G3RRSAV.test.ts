@@ -4,12 +4,10 @@ import { fail } from 'assert'
 import { existsSync, readFileSync, writeFileSync } from 'fs'
 import { resolve } from 'path'
 import { beforeAll, describe, expect, test } from 'vitest'
-import { EmptyTracker } from '../../../tracker'
 import { G3RRSAV } from '../radicalred/G3RRSAV'
 import PK3RR from '../radicalred/PK3RR'
 import { PathData } from '../util/path'
 import { initializeWasm } from './init'
-import { dummyTrack } from './util'
 
 beforeAll(initializeWasm)
 
@@ -30,7 +28,7 @@ describe('G3RRSAV - Radical Red Save File Read Test', () => {
       separator: '/',
     }
 
-    radicalRedSave = new G3RRSAV(parsedPath, saveBytes, EmptyTracker())
+    radicalRedSave = new G3RRSAV(parsedPath, saveBytes)
   })
 
   test('should load initial save data correctly', () => {
@@ -38,7 +36,7 @@ describe('G3RRSAV - Radical Red Save File Read Test', () => {
   })
 
   test('should print the first Pokémon in the first box', () => {
-    const firstPokemon = radicalRedSave.boxes[0].boxSlots[0]?.data
+    const firstPokemon = radicalRedSave.boxes[0].boxSlots[0]
 
     if (firstPokemon) {
       // display_mon(firstPokemon)
@@ -54,7 +52,7 @@ describe('G3RRSAV - Radical Red Save File Read Test', () => {
       fail('No Pokémon found in the first box, first slot.')
     }
 
-    const secondPokemon = radicalRedSave.boxes[1].boxSlots[1]?.data
+    const secondPokemon = radicalRedSave.boxes[1].boxSlots[1]
 
     if (secondPokemon) {
       // display_mon(secondPokemon)
@@ -66,7 +64,7 @@ describe('G3RRSAV - Radical Red Save File Read Test', () => {
       fail('No Pokémon found in the second box, second slot.')
     }
 
-    const sevii_lokix = radicalRedSave.boxes[0].boxSlots[3]?.data
+    const sevii_lokix = radicalRedSave.boxes[0].boxSlots[3]
 
     if (sevii_lokix) {
       // display_mon(sevii_lokix)
@@ -78,7 +76,7 @@ describe('G3RRSAV - Radical Red Save File Read Test', () => {
       fail('Sevii Lokix not found.')
     }
 
-    const lastpokemon = radicalRedSave.boxes[0].boxSlots[29]?.data
+    const lastpokemon = radicalRedSave.boxes[0].boxSlots[29]
 
     if (lastpokemon) {
       // display_mon(lastpokemon)
@@ -90,7 +88,7 @@ describe('G3RRSAV - Radical Red Save File Read Test', () => {
       fail('No Pokémon found in the second box, second slot.')
     }
 
-    const slowbroG = radicalRedSave.boxes[1].boxSlots[5]?.data
+    const slowbroG = radicalRedSave.boxes[1].boxSlots[5]
 
     if (slowbroG) {
       // display_mon(slowbroG)
@@ -121,14 +119,14 @@ describe('G3RRSAV - Radical Red Save File Write Test', () => {
       separator: '/',
     }
 
-    radicalRedSave = new G3RRSAV(parsedPath, saveBytes, EmptyTracker())
-    const firstMon = radicalRedSave.boxes[0].boxSlots[0]?.data
+    radicalRedSave = new G3RRSAV(parsedPath, saveBytes)
+    const firstMon = radicalRedSave.boxes[0].boxSlots[0]
 
     if (firstMon) {
       const newMon = new OHPKM(firstMon)
 
       newMon.nickname = 'ModTest'
-      radicalRedSave.boxes[0].boxSlots[0] = dummyTrack(new PK3RR(newMon))
+      radicalRedSave.boxes[0].boxSlots[0] = new PK3RR(newMon)
       // radicalRedSave.boxes[0].pokemon[0].heldItemIndex = 123;
       // radicalRedSave.boxes[0].pokemon[0].moves[0] = 101;
 
@@ -168,9 +166,9 @@ describe('G3RRSAV - Radical Red Save File Write Test', () => {
     expect(fileExists).toBe(true)
 
     const modifiedSaveBytes = new Uint8Array(readFileSync(newSavePath))
-    const modifiedRadicalRedSave = new G3RRSAV(parsedPath, modifiedSaveBytes, EmptyTracker())
+    const modifiedRadicalRedSave = new G3RRSAV(parsedPath, modifiedSaveBytes)
 
-    const mon = modifiedRadicalRedSave.boxes[0].boxSlots[0]?.data
+    const mon = modifiedRadicalRedSave.boxes[0].boxSlots[0]
     expect(mon?.nickname).toBe('ModTest')
   })
 })

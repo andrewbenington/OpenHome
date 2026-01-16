@@ -38,7 +38,6 @@ export function getHomeIdentifier(mon: HomeIdentifierDerivableMon): OhpkmIdentif
   const baseMon = getBaseMon(mon.dexNum, mon.formeNum)
 
   if (!baseMon) {
-    console.log(mon)
     throw Error(`Invalid dex/forme: ${mon.dexNum} / ${mon.formeNum}`)
   }
 

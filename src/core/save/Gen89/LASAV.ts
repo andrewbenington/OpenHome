@@ -3,7 +3,6 @@ import { Gender, Languages, OriginGame } from '@pkm-rs/pkg'
 import { PA8 } from '@pokemon-files/pkm'
 import { utf16BytesToString } from '@pokemon-files/util'
 import { LA_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
-import { OhpkmTracker } from '../../../tracker'
 import { OHPKM } from '../../pkm/OHPKM'
 import { SCArrayBlock, SCBlock, SCObjectBlock } from '../encryption/SwishCrypto/SCBlock'
 import { SwishCrypto } from '../encryption/SwishCrypto/SwishCrypto'
@@ -27,8 +26,8 @@ export class LASAV extends G89SAV<PA8> {
   myStatusBlock: MyStatusBlock
   origin = OriginGame.LegendsArceus
 
-  constructor(path: PathData, bytes: Uint8Array, tracker: OhpkmTracker) {
-    super(path, bytes, tracker)
+  constructor(path: PathData, bytes: Uint8Array) {
+    super(path, bytes)
 
     this.boxes.forEach((box, i) => {
       if (!box.name) {

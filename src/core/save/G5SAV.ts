@@ -8,7 +8,6 @@ import { gen5StringToUTF } from '@openhome-core/save/util/Strings/StringConverte
 import { unique } from '@openhome-core/util/functional'
 import { Gender, OriginGame } from '@pkm-rs/pkg'
 import { PK5 } from '@pokemon-files/pkm'
-import { OhpkmTracker } from '../../tracker'
 import { OHPKM } from '../pkm/OHPKM'
 import { Box, OfficialSAV, SaveMonLocation } from './interfaces'
 import { hasDesamumeFooter, LookupType } from './util'
@@ -63,7 +62,7 @@ export abstract class G5SAV extends OfficialSAV<PK5> {
 
   checksumMirrorsChecksumOffset: number = 0x23f9a
 
-  constructor(path: PathData, bytes: Uint8Array, tracker: OhpkmTracker) {
+  constructor(path: PathData, bytes: Uint8Array) {
     super()
     this.bytes = bytes
     this.filePath = path
@@ -102,7 +101,7 @@ export abstract class G5SAV extends OfficialSAV<PK5> {
           const mon = new PK5(monData.buffer, true)
 
           if (mon.gameOfOrigin !== 0 && mon.dexNum !== 0) {
-            this.boxes[box].boxSlots[monIndex] = tracker.wrapWithIdentifier(mon, G5SAV.lookupType)
+            this.boxes[box].boxSlots[monIndex] = mon
           }
         } catch (e) {
           console.error(e)
@@ -144,16 +143,14 @@ export abstract class G5SAV extends OfficialSAV<PK5> {
 
   prepareForSaving() {
     this.updatedBoxSlots.forEach(({ box, index }) => {
-      const updatedSlotContent = this.boxes[box].boxSlots[index]
+      const mon = this.boxes[box].boxSlots[index]
 
       const writeIndex = PC_OFFSET + BOX_SIZE * box + 136 * index
 
-      // updatedSlotContent will be undefined if pokemon was moved from this slot
+      // mon will be undefined if pokemon was moved from this slot
       // and the slot was left empty
-      if (updatedSlotContent) {
+      if (mon) {
         try {
-          const mon = updatedSlotContent.data
-
           if (mon.gameOfOrigin && mon?.dexNum) {
             mon.refreshChecksum()
             this.bytes.set(new Uint8Array(mon.toPCBytes()), writeIndex)

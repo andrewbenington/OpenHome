@@ -10,7 +10,6 @@ import { CardsIcon, GridIcon } from '@openhome-ui/components/Icons'
 import SideTabs from '@openhome-ui/components/side-tabs/SideTabs'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import { AppInfoAction, AppInfoContext } from '@openhome-ui/state/appInfo'
-import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { useSaves } from '@openhome-ui/state/saves'
 import { PokedexUpdate } from '@openhome-ui/util/pokedex'
 import { Button, Dialog, Flex, Separator, Slider, VisuallyHidden } from '@radix-ui/themes'
@@ -38,13 +37,12 @@ function useOpenSaveHandler(onClose?: () => void) {
   const savesAndBanks = useSaves()
   const [tentativeSaveData, setTentativeSaveData] = useState<AmbiguousOpenState>()
   const backend = useContext(BackendContext)
-  const ohpkmStore = useOhpkmStore()
 
   const displayError = useDisplayError()
 
   const buildAndOpenSave = useCallback(
     async (saveType: SAVClass, filePath: PathData, fileBytes: Uint8Array) => {
-      const result = buildSaveFile(filePath, fileBytes, saveType, ohpkmStore.tracker)
+      const result = buildSaveFile(filePath, fileBytes, saveType)
 
       if (R.isErr(result)) {
         displayError('Error Loading Save', result.err)
@@ -61,7 +59,7 @@ function useOpenSaveHandler(onClose?: () => void) {
         onClose?.()
       }
     },
-    [ohpkmStore.tracker, backend, displayError, savesAndBanks, onClose]
+    [backend, displayError, savesAndBanks, onClose]
   )
 
   const pickSaveFile = useCallback(
@@ -281,8 +279,7 @@ function SelectSaveType({ open, saveTypes, onSelect }: SelectSaveTypeProps) {
 function pokedexSeenFromSave(saveFile: SAV) {
   const pokedexUpdates: PokedexUpdate[] = []
 
-  for (const boxSlot of saveFile.boxes.flatMap((box) => box.boxSlots).filter(filterUndefined)) {
-    const mon = boxSlot.data
+  for (const mon of saveFile.boxes.flatMap((box) => box.boxSlots).filter(filterUndefined)) {
     pokedexUpdates.push({
       dexNumber: mon.dexNum,
       formeNumber: mon.formeNum,

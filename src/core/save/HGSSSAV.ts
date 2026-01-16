@@ -8,7 +8,6 @@ import { Gender, OriginGame } from '@pkm-rs/pkg'
 import { PK4 } from '@pokemon-files/pkm'
 import { Item } from '@pokemon-resources/consts/Items'
 import { HGSS_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
-import { OhpkmTracker } from '../../tracker'
 import { G4SAV } from './G4SAV'
 import { hasDesamumeFooter } from './util'
 import { PathData } from './util/path'
@@ -53,7 +52,7 @@ export class HGSSSAV extends G4SAV {
 
   footerSize: number = HGSSSAV.BLOCK_FOOTER_SIZE
 
-  constructor(path: PathData, bytes: Uint8Array, tracker: OhpkmTracker) {
+  constructor(path: PathData, bytes: Uint8Array) {
     super(path, bytes)
     // current storage block could be either the first or second one,
     // depending on save count
@@ -70,7 +69,7 @@ export class HGSSSAV extends G4SAV {
     this.sid = bytesToUint16LittleEndian(bytes, HGSSSAV.TRAINER_ID_OFFSET + 2)
     this.displayID = this.tid.toString().padStart(5, '0')
     this.trainerGender = bytes[HGSSSAV.TRAINER_ID_OFFSET + 8]
-    this.buildBoxes(tracker)
+    this.buildBoxes()
   }
 
   getCurrentSaveCount(blockOffset: number, blockSize: number) {

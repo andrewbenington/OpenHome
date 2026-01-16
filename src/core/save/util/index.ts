@@ -1,7 +1,6 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { OriginGame } from '@pkm-rs/pkg'
-import { OhpkmTracker } from '../../../tracker'
 import { SAV } from '../interfaces'
 import { PathData } from './path'
 
@@ -21,7 +20,7 @@ export interface SavePkmClass {
 export type AnyPkmClass = SavePkmClass | typeof OHPKM
 
 export interface SAVClass<S extends SAV = SAV> {
-  new (path: PathData, bytes: Uint8Array, tracker: OhpkmTracker): S
+  new (path: PathData, bytes: Uint8Array): S
   pkmType: SavePkmClass
   fileIsSave: (bytes: Uint8Array) => boolean
   includesOrigin: (origin: OriginGame) => boolean

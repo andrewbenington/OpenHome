@@ -6,7 +6,6 @@ import { PK2 } from '@pokemon-files/pkm'
 import { EXCLAMATION } from '@pokemon-resources/consts/Formes'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { GEN2_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
-import { EmptyTracker, OhpkmTracker } from '../../tracker'
 import { OHPKM } from '../pkm/OHPKM'
 import { Box, OfficialSAV, SaveMonLocation } from './interfaces'
 import { LookupType } from './util'
@@ -48,7 +47,7 @@ export class G2SAV extends OfficialSAV<PK2> {
 
   updatedBoxSlots: SaveMonLocation[] = []
 
-  constructor(path: PathData, bytes: Uint8Array, tracker: OhpkmTracker) {
+  constructor(path: PathData, bytes: Uint8Array) {
     super()
     const dataView = new DataView(bytes.buffer)
     this.bytes = bytes
@@ -111,7 +110,7 @@ export class G2SAV extends OfficialSAV<PK2> {
         )
         mon.gameOfOrigin = mon.metLevel ? OriginGame.Crystal : this.origin
         mon.language = Language.English
-        this.boxes[boxNumber].boxSlots[monIndex] = tracker.wrapWithIdentifier(mon, G2SAV.lookupType)
+        this.boxes[boxNumber].boxSlots[monIndex] = mon
       }
     })
   }
@@ -128,24 +127,22 @@ export class G2SAV extends OfficialSAV<PK2> {
 
       box.boxSlots.forEach((boxMon) => {
         if (boxMon) {
-          const pk2Mon = boxMon.data
-
           // set the mon's dex number in the box (separate location)
-          this.bytes[boxByteOffset + 1 + numMons] = pk2Mon.dexNum
+          this.bytes[boxByteOffset + 1 + numMons] = boxMon.dexNum
           // set the mon's data in the box
           this.bytes.set(
-            new Uint8Array(pk2Mon.toBytes().slice(0, 32)),
+            new Uint8Array(boxMon.toBytes().slice(0, 32)),
             boxByteOffset + 1 + pokemonPerBox + 1 + numMons * 0x20
           )
           // set the mon's OT name in the box
-          const trainerNameBuffer = utf16StringToGen12(pk2Mon.trainerName, 11, true)
+          const trainerNameBuffer = utf16StringToGen12(boxMon.trainerName, 11, true)
 
           this.bytes.set(
             trainerNameBuffer,
             boxByteOffset + 1 + pokemonPerBox + 1 + pokemonPerBox * 0x20 + numMons * 11
           )
           // set the mon's nickname in the box
-          const nicknameBuffer = utf16StringToGen12(pk2Mon.nickname, 11, true)
+          const nicknameBuffer = utf16StringToGen12(boxMon.nickname, 11, true)
 
           this.bytes.set(
             nicknameBuffer,
@@ -282,7 +279,7 @@ export class G2SAV extends OfficialSAV<PK2> {
       return false
     }
     try {
-      const g2Save = new G2SAV(emptyPathData, bytes, EmptyTracker())
+      const g2Save = new G2SAV(emptyPathData, bytes)
 
       return g2Save.areCrystalInternationalChecksumsValid() || g2Save.areGoldSilverChecksumsValid()
     } catch {

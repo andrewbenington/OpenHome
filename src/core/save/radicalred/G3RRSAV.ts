@@ -1,6 +1,5 @@
 import { isRestricted, TransferRestrictions } from '@openhome-core/save/util/TransferRestrictions'
 import { ItemRadicalRed } from '@pkm-rs/pkg'
-import { OhpkmTracker } from '../../../tracker'
 import { OHPKM } from '../../pkm/OHPKM'
 import { findFirstSectionOffset, G3CFRUSAV, SAVE_SIZES_BYTES } from '../cfru/G3CFRUSAV'
 import { FRLG_SECURITY_COPY_OFFSET, FRLG_SECURITY_OFFSET } from '../G3SAV'
@@ -37,8 +36,8 @@ export class G3RRSAV extends G3CFRUSAV<PK3RR> {
     return ItemRadicalRed.fromModern(itemIndex) !== undefined
   }
 
-  constructor(path: PathData, bytes: Uint8Array, tracker: OhpkmTracker) {
-    super(path, bytes, PK3RR, tracker)
+  constructor(path: PathData, bytes: Uint8Array) {
+    super(path, bytes, PK3RR)
   }
 
   static pkmType = PK3RR

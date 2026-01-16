@@ -1,7 +1,6 @@
 import { OriginGame } from '@pkm-rs/pkg'
 import { PA8, PB8, PK8, PK9 } from '@pokemon-files/pkm'
 import { AllPKMFields } from '@pokemon-files/util'
-import { OhpkmTracker } from '../../../tracker'
 import {
   SCArrayBlock,
   SCBlock,
@@ -43,7 +42,7 @@ export abstract class G89SAV<P extends PK8 | PB8 | PA8 | PK9> extends OfficialSA
 
   updatedBoxSlots: SaveMonLocation[] = []
 
-  constructor(path: PathData, bytes: Uint8Array, tracker: OhpkmTracker) {
+  constructor(path: PathData, bytes: Uint8Array) {
     super()
     this.bytes = bytes
     this.filePath = path
@@ -73,7 +72,7 @@ export abstract class G89SAV<P extends PK8 | PB8 | PA8 | PK9> extends OfficialSA
           const mon = this.monConstructor(monData, true)
 
           if (mon.gameOfOrigin !== 0 && mon.dexNum !== 0) {
-            this.boxes[box].boxSlots[monIndex] = tracker.wrapWithIdentifier(mon, undefined)
+            this.boxes[box].boxSlots[monIndex] = mon
           }
         } catch (e) {
           console.error(e)
@@ -100,17 +99,15 @@ export abstract class G89SAV<P extends PK8 | PB8 | PA8 | PK9> extends OfficialSA
     const boxBlock = this.getBlockMust<SCObjectBlock>('Box', 'object')
 
     this.updatedBoxSlots.forEach(({ box, index }) => {
-      const updatedSlotContent = this.boxes[box].boxSlots[index]
+      const mon = this.boxes[box].boxSlots[index]
 
       const writeIndex = this.getBoxSizeBytes() * box + this.getMonBoxSizeBytes() * index
       const blockBuffer = new Uint8Array(boxBlock.raw)
 
-      // updatedSlotContent will be undefined if pokemon was moved from this slot
+      // mon will be undefined if pokemon was moved from this slot
       // and the slot was left empty
-      if (updatedSlotContent) {
+      if (mon) {
         try {
-          const mon = updatedSlotContent.data
-
           if (mon.gameOfOrigin && mon?.dexNum) {
             if ('stats' in mon) {
               mon.stats = mon.getStats()

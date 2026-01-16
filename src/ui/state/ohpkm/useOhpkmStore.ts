@@ -1,5 +1,5 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { Errorable, R, Result } from '@openhome-core/util/functional'
+import { Errorable, Option, R, Result } from '@openhome-core/util/functional'
 import { createContext, useCallback, useContext, useMemo } from 'react'
 import { OhpkmStoreData } from '.'
 import { PKMInterface } from '../../../core/pkm/interfaces'
@@ -10,23 +10,23 @@ import {
 } from '../../../core/pkm/Lookup'
 import { SAV } from '../../../core/save/interfaces'
 import { SAVClass } from '../../../core/save/util'
-import { MaybeTracked, OhpkmTracker, tracked } from '../../../tracker'
+import { OhpkmTracker } from '../../../tracker'
 import { useLookups } from '../lookups'
 
 export type OhpkmStore = {
   getById(id: string): OHPKM | undefined
-  loadOhpkmIfTracked<P extends PKMInterface>(
-    maybeTracked: MaybeTracked<P> | undefined
-  ): OHPKM | P | undefined
   tryLoadFromId(id: OhpkmIdentifier): Result<OHPKM, IdentifierNotPresentError>
   tryLoadFromIds(ids: OhpkmIdentifier[]): Result<OHPKM, IdentifierNotPresentError>[]
   byId: OhpkmStoreData
   monIsStored(id: string): boolean
-  overwrite(mon: OHPKM): void
-  overwriteAll(mons: OhpkmStoreData): Promise<Errorable<null>>
+  insertOrUpdate(mon: OHPKM): void
+  insertOrUpdateAll(mons: OhpkmStoreData): Promise<Errorable<null>>
   getAllStored: () => OHPKM[]
   tracker: OhpkmTracker
-  moveToSave: <P extends PKMInterface>(ohpkm: OHPKM, save: SAV<P>) => MaybeTracked<P>
+  getIdIfTracked: (mon: PKMInterface) => Option<OhpkmIdentifier>
+  loadOhpkmIfTracked: <P extends PKMInterface>(mon: P) => OHPKM | P
+  trackAndConvertForSave: <P extends PKMInterface>(ohpkm: OHPKM, save: SAV<P>) => P
+  startTracking: <P extends PKMInterface>(mon: P, sourceSave: Option<SAV<P>>) => OHPKM
 }
 
 export type OhpkmLookup = (id: string) => OHPKM | undefined
@@ -62,14 +62,14 @@ export function useOhpkmStore(): OhpkmStore {
     [ohpkmStore]
   )
 
-  const overwrite = useCallback(
+  const insertOrUpdate = useCallback(
     (mon: OHPKM) => {
       updateStore({ [mon.getHomeIdentifier()]: mon })
     },
     [updateStore]
   )
 
-  const overwriteAll = useCallback(
+  const insertOrUpdateAll = useCallback(
     (mons: OhpkmStoreData) => {
       return updateStore(mons)
     },
@@ -82,15 +82,7 @@ export function useOhpkmStore(): OhpkmStore {
 
   const tracker = useMemo(() => new OhpkmTracker(ohpkmStore, lookups), [ohpkmStore, lookups])
 
-  const loadOhpkmIfTracked = useCallback(
-    <P extends PKMInterface>(maybeTracked: MaybeTracked<P> | undefined): OHPKM | P | undefined => {
-      if (!maybeTracked) return undefined
-      return tracker.loadIfTracked(maybeTracked.data) ?? maybeTracked.data
-    },
-    [tracker]
-  )
-
-  const moveToSave = useCallback(
+  const trackAndConvertForSave = useCallback(
     <P extends PKMInterface>(ohpkm: OHPKM, save: SAV<P>) => {
       const lookupType = (save.constructor as SAVClass).lookupType
       const ohpkmIdentifier = ohpkm.getHomeIdentifier()
@@ -117,27 +109,51 @@ export function useOhpkmStore(): OhpkmStore {
         })
       }
 
-      overwrite(ohpkm)
+      insertOrUpdate(ohpkm)
 
-      return tracked(save.convertOhpkm(ohpkm), ohpkmIdentifier)
+      return save.convertOhpkm(ohpkm)
     },
-    [lookups, overwrite, updateLookups]
+    [lookups, insertOrUpdate, updateLookups]
   )
 
+  const startTracking = useCallback(
+    <P extends PKMInterface>(mon: P, sourceSave: Option<SAV<P>>) => {
+      const ohpkm = sourceSave ? OHPKM.fromMonInSave(mon, sourceSave) : new OHPKM(mon)
+      insertOrUpdate(ohpkm)
+      return ohpkm
+    },
+    [insertOrUpdate]
+  )
+
+  const getIdIfTracked = useCallback(
+    (mon: PKMInterface): Option<OhpkmIdentifier> => {
+      return tracker.loadIfTracked(mon)?.getHomeIdentifier()
+    },
+    [tracker]
+  )
+
+  const loadOhpkmIfTracked = useCallback(
+    <P extends PKMInterface>(mon: P): OHPKM | P => {
+      return tracker.loadIfTracked(mon) ?? mon
+    },
+    [tracker]
+  )
   // console.log('tracked mons:', Object.values(ohpkmStore).length)
 
   return {
     getById,
-    loadOhpkmIfTracked,
     tryLoadFromId,
     tryLoadFromIds,
     byId: ohpkmStore,
     monIsStored,
-    overwrite,
-    overwriteAll,
+    insertOrUpdate,
+    insertOrUpdateAll,
     getAllStored,
     tracker,
-    moveToSave,
+    trackAndConvertForSave,
+    startTracking,
+    getIdIfTracked,
+    loadOhpkmIfTracked,
   }
 }
 

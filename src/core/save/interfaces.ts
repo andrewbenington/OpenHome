@@ -1,17 +1,14 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { SaveRef } from '@openhome-core/util/types'
 import { Gender, getPluginColor, OriginGame, OriginGames } from '@pkm-rs/pkg'
-import { isTracked, MaybeTracked } from '../../tracker'
 import { SaveIdentifier, saveToStringIdentifier } from '../../ui/state/saves'
-import { OhpkmIdentifier } from '../pkm/Lookup'
 import { OHPKM } from '../pkm/OHPKM'
-import { filterUndefined as notNull } from '../util/sort'
 import { PathData } from './util/path'
 
 type SparseArray<T> = (T | undefined)[]
 export class Box<P extends PKMInterface> {
   name: string | undefined
-  boxSlots: SparseArray<MaybeTracked<P>>
+  boxSlots: SparseArray<P>
 
   constructor(name: string, boxSize: number) {
     this.name = name
@@ -68,7 +65,7 @@ export interface BaseSAV<P extends PKMInterface = PKMInterface> {
   supportsMon: (dexNumber: number, formeNumber: number) => boolean
   supportsItem: (itemIndex: number) => boolean
 
-  getTrackedMonIdentifiers(): OhpkmIdentifier[]
+  // getTrackedMonIdentifiers(): OhpkmIdentifier[]
   prepareWriter: () => SaveWriter
 
   getDisplayData(): Record<string, string | number | undefined> | undefined
@@ -107,13 +104,13 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
     }
   }
 
-  getTrackedMonIdentifiers(): OhpkmIdentifier[] {
-    return this.updatedBoxSlots
-      .map(({ box, index }) => this.boxes[box].boxSlots[index])
-      .filter(notNull)
-      .filter(isTracked)
-      .map((slot) => slot.identifier)
-  }
+  // getTrackedMonIdentifiers(): OhpkmIdentifier[] {
+  //   return this.updatedBoxSlots
+  //     .map(({ box, index }) => this.boxes[box].boxSlots[index])
+  //     .filter(notNull)
+  //     .filter(isTracked)
+  //     .map((slot) => slot.identifier)
+  // }
 
   getDisplayData(): Record<string, string | number | undefined> | undefined {
     return {
@@ -178,13 +175,13 @@ export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implement
     }
   }
 
-  getTrackedMonIdentifiers(): OhpkmIdentifier[] {
-    return this.updatedBoxSlots
-      .map(({ box, index }) => this.boxes[box].boxSlots[index])
-      .filter(notNull)
-      .filter(isTracked)
-      .map((slot) => slot.identifier)
-  }
+  // getTrackedMonIdentifiers(): OhpkmIdentifier[] {
+  //   return this.updatedBoxSlots
+  //     .map(({ box, index }) => this.boxes[box].boxSlots[index])
+  //     .filter(notNull)
+  //     .filter(isTracked)
+  //     .map((slot) => slot.identifier)
+  // }
 
   getDisplayData(): Record<string, string | number | undefined> | undefined {
     return {

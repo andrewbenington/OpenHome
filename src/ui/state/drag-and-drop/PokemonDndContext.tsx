@@ -10,7 +10,6 @@ import {
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getItemIconPath } from '@openhome-ui/images/items'
 import { useItems } from '@openhome-ui/state/items'
-import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { MonLocation, useSaves } from '@openhome-ui/state/saves'
 import { MetadataLookup } from '@pkm-rs/pkg'
 import { ReactNode, useCallback, useState } from 'react'
@@ -22,7 +21,6 @@ import useDragAndDrop from './useDragAndDrop'
 export default function PokemonDndContext(props: { children?: ReactNode }) {
   const { children } = props
   const savesAndBanks = useSaves()
-  const ohpkmStore = useOhpkmStore()
   const { moveMonItemToBag, giveItemToMon } = useItems()
   const { dragState, startDragging, endDragging } = useDragAndDrop()
   const [dragOverId, setDragOverId] = useState<UniqueIdentifier | null>(null)

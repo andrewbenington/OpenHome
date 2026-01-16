@@ -6,7 +6,6 @@ import {
   uint32ToBytesLittleEndian,
 } from '@openhome-core/save/util/byteLogic'
 import { Gender, OriginGame } from '@pkm-rs/pkg'
-import { OhpkmTracker } from '../../../tracker'
 import { Box, PluginSAV, SaveMonLocation } from '../interfaces'
 import { LookupType } from '../util'
 import { PathData } from '../util/path'
@@ -76,7 +75,7 @@ class G3CFRUSaveBackup<T extends PluginPKMInterface> {
   boxNames: string[]
   firstSectorIndex: number = 0
 
-  constructor(bytes: Uint8Array, PkmClass: new (bytes: ArrayBuffer) => T, tracker: OhpkmTracker) {
+  constructor(bytes: Uint8Array, PkmClass: new (bytes: ArrayBuffer) => T) {
     this.bytes = bytes
     this.saveIndex = bytesToUint32LittleEndian(bytes, 0xffc)
     this.securityKey = bytesToUint32LittleEndian(bytes, 0xf20)
@@ -121,7 +120,7 @@ class G3CFRUSaveBackup<T extends PluginPKMInterface> {
         if (mon.dexNum !== 0 && mon.trainerID !== 0) {
           const box = this.boxes[Math.floor(i / 30)]
 
-          box.boxSlots[i % 30] = tracker.wrapWithIdentifier(mon, G3CFRUSAV.lookupType)
+          box.boxSlots[i % 30] = mon
           if (mon.trainerID === this.tid) {
             mon.gameOfOrigin = OriginGame.FireRed
           }
@@ -183,14 +182,14 @@ export abstract class G3CFRUSAV<T extends PluginPKMInterface> extends PluginSAV<
   tooEarlyToOpen: boolean = false
   updatedBoxSlots: SaveMonLocation[] = []
 
-  constructor(path: PathData, bytes: Uint8Array, pkmType: any, tracker: OhpkmTracker) {
+  constructor(path: PathData, bytes: Uint8Array, pkmType: any) {
     super()
     this.pkmTypeClass = pkmType
     this.bytes = bytes
     this.filePath = path
 
-    const saveOne = new G3CFRUSaveBackup<T>(bytes.slice(0, 0xe000), pkmType, tracker)
-    const saveTwo = new G3CFRUSaveBackup<T>(bytes.slice(0xe000, 0x1c000), pkmType, tracker)
+    const saveOne = new G3CFRUSaveBackup<T>(bytes.slice(0, 0xe000), pkmType)
+    const saveTwo = new G3CFRUSaveBackup<T>(bytes.slice(0xe000, 0x1c000), pkmType)
 
     if (saveOne.saveIndex > saveTwo.saveIndex) {
       this.primarySave = saveOne
@@ -224,13 +223,13 @@ export abstract class G3CFRUSAV<T extends PluginPKMInterface> extends PluginSAV<
       const pcBytes = new Uint8Array(58) // Per pokemon bytes
 
       // Current Mon in loop
-      const updatedSlotContent = this.boxes[box].boxSlots[index]
+      const mon = this.boxes[box].boxSlots[index]
 
-      // updatedSlotContent will be undefined if pokemon was moved from this slot
+      // mon will be undefined if pokemon was moved from this slot
       //  and the slot was left empty
       const slotMon = this.boxes[box].boxSlots[index]
 
-      if (updatedSlotContent && slotMon) {
+      if (mon && slotMon) {
         try {
           // If mon is a OHPKM then convert to PK3RR
           const mon =

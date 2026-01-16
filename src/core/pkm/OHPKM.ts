@@ -687,7 +687,6 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   }
 
   public syncWithGameData(other: PKMInterface, save?: SAV) {
-    console.log(`syncing new data for mon ${this.nickname} (${this.getHomeIdentifier()})`)
     this.exp = other.exp
 
     this.moves = other.moves as FourMoves

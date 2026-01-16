@@ -1,7 +1,6 @@
 import { readFileSync } from 'fs'
 import { resolve } from 'path'
 import { beforeAll, describe, expect, test } from 'vitest'
-import { EmptyTracker } from '../../../tracker'
 import { SMSAV } from '../SMSAV'
 import { USUMSAV } from '../USUMSAV'
 import { PathData } from '../util/path'
@@ -26,7 +25,7 @@ describe('gen 7 save files', () => {
       separator: '/',
     }
 
-    ultraSunSave = new USUMSAV(parsedPath, saveBytes, EmptyTracker())
+    ultraSunSave = new USUMSAV(parsedPath, saveBytes)
   })
 
   test('should have expected trainer name', () => {
@@ -34,7 +33,7 @@ describe('gen 7 save files', () => {
   })
 
   test('first mon is as expected', () => {
-    expect(ultraSunSave.boxes[0].boxSlots[0]?.data.nickname === 'Bulbasaur')
+    expect(ultraSunSave.boxes[0].boxSlots[0]?.nickname === 'Bulbasaur')
   })
 })
 
@@ -55,7 +54,7 @@ describe('moon save file', () => {
       separator: '/',
     }
 
-    moonSav = new SMSAV(parsedPath, saveBytes, EmptyTracker())
+    moonSav = new SMSAV(parsedPath, saveBytes)
   })
 
   test('should have expected trainer name', () => {
@@ -63,6 +62,6 @@ describe('moon save file', () => {
   })
 
   test('first mon is as expected', () => {
-    expect(moonSav.boxes[0].boxSlots[0]?.data.nickname === 'Bulbasaur')
+    expect(moonSav.boxes[0].boxSlots[0]?.nickname === 'Bulbasaur')
   })
 })

@@ -6,30 +6,8 @@ import {
 } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { PKMInterface } from './core/pkm/interfaces'
-import { LookupType } from './core/save/util'
 import { type Option } from './core/util/functional'
 import { StoredLookups } from './ui/backend/backendInterface'
-
-type Tracked<P extends PKMInterface> = { _tag: 'Tracked'; data: P; identifier: OhpkmIdentifier }
-
-type Untracked<P> = { _tag: 'Untracked'; data: P }
-
-export type MaybeTracked<P extends PKMInterface = PKMInterface> = Tracked<P> | Untracked<P>
-
-export const tracked = <P extends PKMInterface>(data: P, id: OhpkmIdentifier): MaybeTracked<P> => ({
-  _tag: 'Tracked',
-  data,
-  identifier: id,
-})
-
-export const untracked = <P extends PKMInterface>(data: P): MaybeTracked<P> => ({
-  _tag: 'Untracked',
-  data,
-})
-
-export function isTracked<P extends PKMInterface>(maybe: MaybeTracked<P>) {
-  return maybe._tag === 'Tracked'
-}
 
 export class OhpkmTracker {
   private _trackedMons: Map<OhpkmIdentifier, OHPKM>
@@ -46,14 +24,6 @@ export class OhpkmTracker {
     return this._trackedMons.get(identifier)
   }
 
-  ohpkmIfTracked<P extends PKMInterface>(maybeTracked: MaybeTracked<P>): OHPKM | P {
-    if (isTracked(maybeTracked)) {
-      return this.load(maybeTracked.identifier) ?? maybeTracked.data
-    } else {
-      return maybeTracked.data
-    }
-  }
-
   generateIdentifier(toTracked: PKMInterface): Option<OhpkmIdentifier> {
     return getMonFileIdentifier(toTracked)
   }
@@ -68,23 +38,6 @@ export class OhpkmTracker {
     const g345Identifier = getMonGen345Identifier(mon)
     if (!g345Identifier) return undefined
     return this._gen345Lookup.get(g345Identifier)
-  }
-
-  wrapWithIdentifier<P extends PKMInterface>(
-    data: P,
-    lookupType: Option<LookupType>
-  ): MaybeTracked<P> {
-    const identifier =
-      lookupType === 'gen12'
-        ? this.getOhpkmIdentifierIfTrackedGen12(data)
-        : lookupType === 'gen345'
-          ? this.getOhpkmIdentifierIfTrackedGen345(data)
-          : this.generateIdentifier(data)
-    if (identifier && this._trackedMons.has(identifier)) {
-      return tracked(data, identifier)
-    } else {
-      return untracked(data)
-    }
   }
 
   loadIfTracked(mon: PKMInterface): Option<OHPKM> {

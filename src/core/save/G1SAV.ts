@@ -6,7 +6,6 @@ import * as conversion from '@pokemon-files/conversion'
 import { PK1 } from '@pokemon-files/pkm'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { GEN1_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
-import { OhpkmTracker } from '../../tracker'
 import { OHPKM } from '../pkm/OHPKM'
 import { Box, OfficialSAV, SaveMonLocation } from './interfaces'
 import { LookupType } from './util'
@@ -60,7 +59,7 @@ export class G1SAV extends OfficialSAV<PK1> {
 
   updatedBoxSlots: SaveMonLocation[] = []
 
-  constructor(path: PathData, bytes: Uint8Array, tracker: OhpkmTracker) {
+  constructor(path: PathData, bytes: Uint8Array) {
     super()
     this.bytes = bytes
     this.filePath = path
@@ -129,10 +128,7 @@ export class G1SAV extends OfficialSAV<PK1> {
             )
             mon.gameOfOrigin = this.origin
             mon.language = Language.English
-            this.boxes[boxNumber].boxSlots[monIndex] = tracker.wrapWithIdentifier(
-              mon,
-              G1SAV.lookupType
-            )
+            this.boxes[boxNumber].boxSlots[monIndex] = mon
           } catch (e) {
             console.error(e)
           }
@@ -159,21 +155,19 @@ export class G1SAV extends OfficialSAV<PK1> {
 
       box.boxSlots.forEach((boxMon) => {
         if (boxMon) {
-          const pk1Mon = boxMon.data
-
           // set the mon's dex number in the box
-          this.bytes[boxByteOffset + 1 + numMons] = conversion.toGen1PokemonIndex(pk1Mon.dexNum)
+          this.bytes[boxByteOffset + 1 + numMons] = conversion.toGen1PokemonIndex(boxMon.dexNum)
           // set the mon's data in the box
           this.bytes.set(
-            new Uint8Array(pk1Mon.toBytes()),
+            new Uint8Array(boxMon.toBytes()),
             boxByteOffset + this.BOX_PKM_OFFSET + numMons * this.BOX_PKM_SIZE
           )
           // set the mon's OT name in the box
-          const trainerNameBuffer = utf16StringToGen12(pk1Mon.trainerName, 11, true)
+          const trainerNameBuffer = utf16StringToGen12(boxMon.trainerName, 11, true)
 
           this.bytes.set(trainerNameBuffer, boxByteOffset + this.BOX_OT_OFFSET + numMons * 11)
           // set the mon's nickname in the box
-          const nicknameBuffer = utf16StringToGen12(pk1Mon.nickname, 11, true)
+          const nicknameBuffer = utf16StringToGen12(boxMon.nickname, 11, true)
 
           this.bytes.set(nicknameBuffer, boxByteOffset + this.BOX_NICKNAME_OFFSET + numMons * 11)
           numMons++

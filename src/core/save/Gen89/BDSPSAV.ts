@@ -4,7 +4,6 @@ import { PB8 } from '@pokemon-files/pkm'
 import { utf16BytesToString } from '@pokemon-files/util'
 import { Item } from '@pokemon-resources/consts/Items'
 import { BDSP_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
-import { OhpkmTracker } from '../../../tracker'
 import { OHPKM } from '../../pkm/OHPKM'
 import { md5Digest } from '../encryption/Encryption'
 import { Box, OfficialSAV, SaveMonLocation } from '../interfaces'
@@ -54,7 +53,7 @@ export class BDSPSAV extends OfficialSAV<PB8> {
 
   updatedBoxSlots: SaveMonLocation[] = []
 
-  constructor(path: PathData, bytes: Uint8Array, tracker: OhpkmTracker) {
+  constructor(path: PathData, bytes: Uint8Array) {
     super()
     this.bytes = bytes
     this.filePath = path
@@ -88,7 +87,7 @@ export class BDSPSAV extends OfficialSAV<PB8> {
           const mon = this.buildPKM(monData, true)
 
           if (mon.gameOfOrigin !== 0 && mon.dexNum !== 0) {
-            this.boxes[box].boxSlots[monIndex] = tracker.wrapWithIdentifier(mon, undefined)
+            this.boxes[box].boxSlots[monIndex] = mon
           }
         } catch (e) {
           console.error(e)
@@ -135,16 +134,15 @@ export class BDSPSAV extends OfficialSAV<PB8> {
 
   prepareForSaving() {
     this.updatedBoxSlots.forEach(({ box, index: monIndex }) => {
-      const updatedSlotContent = this.boxes[box].boxSlots[monIndex]
+      const mon = this.boxes[box].boxSlots[monIndex]
 
       const writeIndex =
         BOX_MONS_OFFSET + this.getBoxSizeBytes() * box + this.getMonBoxSizeBytes() * monIndex
 
-      // updatedSlotContent will be undefined if pokemon was moved from this slot
+      // mon will be undefined if pokemon was moved from this slot
       // and the slot was left empty
-      if (updatedSlotContent) {
+      if (mon) {
         try {
-          const mon = updatedSlotContent.data
           if (mon?.gameOfOrigin && mon?.dexNum) {
             mon.refreshChecksum()
             this.bytes.set(new Uint8Array(mon.toPCBytes()), writeIndex)

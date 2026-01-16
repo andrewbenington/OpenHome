@@ -6,7 +6,6 @@ import {
 import { utf16BytesToString } from '@openhome-core/save/util/Strings/StringConverter'
 import { Gender, OriginGame } from '@pkm-rs/pkg'
 import { PK6 } from '@pokemon-files/pkm'
-import { OhpkmTracker } from '../../tracker'
 import { OHPKM } from '../pkm/OHPKM'
 import { Box, OfficialSAV, SaveMonLocation } from './interfaces'
 import { PathData } from './util/path'
@@ -56,7 +55,7 @@ export abstract class G6SAV extends OfficialSAV<PK6> {
 
   abstract pcChecksumOffset: number
 
-  constructor(path: PathData, bytes: Uint8Array, tracker: OhpkmTracker) {
+  constructor(path: PathData, bytes: Uint8Array) {
     super()
     this.bytes = bytes
     this.filePath = path
@@ -84,7 +83,7 @@ export abstract class G6SAV extends OfficialSAV<PK6> {
           const mon = new PK6(monData.buffer, true)
 
           if (mon.gameOfOrigin !== 0 && mon.dexNum !== 0) {
-            this.boxes[box].boxSlots[monIndex] = tracker.wrapWithIdentifier(mon, undefined)
+            this.boxes[box].boxSlots[monIndex] = mon
           }
         } catch (e) {
           console.error(e)
@@ -95,15 +94,13 @@ export abstract class G6SAV extends OfficialSAV<PK6> {
 
   prepareForSaving() {
     this.updatedBoxSlots.forEach(({ box, index }) => {
-      const updatedSlotContent = this.boxes[box].boxSlots[index]
+      const mon = this.boxes[box].boxSlots[index]
       const writeIndex = this.getPcOffset() + BOX_SIZE * box + 232 * index
 
-      // updatedSlotContent will be undefined if pokemon was moved from this slot
+      // mon will be undefined if pokemon was moved from this slot
       // and the slot was left empty
-      if (updatedSlotContent) {
+      if (mon) {
         try {
-          const mon = updatedSlotContent.data
-
           if (mon.gameOfOrigin && mon.dexNum) {
             mon.refreshChecksum()
             this.bytes.set(new Uint8Array(mon.toPCBytes()), writeIndex)

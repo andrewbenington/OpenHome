@@ -1,24 +1,16 @@
-import {
-  getMonFileIdentifier,
-  getMonGen12Identifier,
-  getMonGen345Identifier,
-  OhpkmIdentifier,
-} from '@openhome-core/pkm/Lookup'
+import { getMonFileIdentifier, OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { HomeData } from '@openhome-core/save/HomeData'
-import { partitionResults, R } from '@openhome-core/util/functional'
+import { R } from '@openhome-core/util/functional'
 import { filterUndefined } from '@openhome-core/util/sort'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
 import { ErrorIcon } from '@openhome-ui/components/Icons'
 import LoadingIndicator from '@openhome-ui/components/LoadingIndicator'
 import useDisplayError from '@openhome-ui/hooks/displayError'
-import { Generation, OriginGames } from '@pkm-rs/pkg'
 import { Callout } from '@radix-ui/themes'
 import { ReactNode, useCallback, useContext, useEffect, useReducer } from 'react'
 import { Result } from 'src/core/util/functional'
 import { ItemBagContext } from '../items/reducer'
-import { useLookups } from '../lookups/useLookups'
-import { useOhpkmStore } from '../ohpkm/useOhpkmStore'
 import { openSavesReducer, SavesContext } from './reducer'
 
 export type SavesProviderProps = {
@@ -27,8 +19,6 @@ export type SavesProviderProps = {
 
 export default function SavesProvider({ children }: SavesProviderProps) {
   const backend = useContext(BackendContext)
-  const ohpkmStore = useOhpkmStore()
-  const lookupsState = useLookups()
   const [itemBagState, bagDispatch] = useContext(ItemBagContext)
   const displayError = useDisplayError()
   const [openSavesState, openSavesDispatch] = useReducer(openSavesReducer, {
@@ -76,49 +66,49 @@ export default function SavesProvider({ children }: SavesProviderProps) {
       )
     }
 
-    const newLookups = { ...lookupsState.lookups }
-    const trackedIdentifiersPerSave = allOpenSaves.map(
-      (save) => [save.origin, save.getTrackedMonIdentifiers()] as const
-    )
+    // const newLookups = { ...lookupsState.lookups }
+    // const trackedIdentifiersPerSave = allOpenSaves.map(
+    //   (save) => [save.origin, save.getTrackedMonIdentifiers()] as const
+    // )
 
-    const monErrors: SaveError[] = []
+    // const monErrors: SaveError[] = []
 
-    for (const [saveOrigin, trackedIdentifiers] of trackedIdentifiersPerSave) {
-      const { failures: missingIdentifiers, successes: foundMons } = partitionResults(
-        ohpkmStore.tryLoadFromIds(trackedIdentifiers)
-      )
+    // for (const [saveOrigin, trackedIdentifiers] of trackedIdentifiersPerSave) {
+    //   const { failures: missingIdentifiers, successes: foundMons } = partitionResults(
+    //     ohpkmStore.tryLoadFromIds(trackedIdentifiers)
+    //   )
 
-      monErrors.push(
-        ...missingIdentifiers.map((missing) => missing.identifier).map(IdentifierNotTracked)
-      )
+    //   monErrors.push(
+    //     ...missingIdentifiers.map((missing) => missing.identifier).map(IdentifierNotTracked)
+    //   )
 
-      const generation = OriginGames.generation(saveOrigin)
-      if (generation === Generation.G1 || generation === Generation.G2) {
-        foundMons.forEach((mon) => {
-          const gen12Identifier = getMonGen12Identifier(mon)
+    //   const generation = OriginGames.generation(saveOrigin)
+    //   if (generation === Generation.G1 || generation === Generation.G2) {
+    //     foundMons.forEach((mon) => {
+    //       const gen12Identifier = getMonGen12Identifier(mon)
 
-          if (gen12Identifier) {
-            newLookups.gen12[gen12Identifier] = mon.getHomeIdentifier()
-          }
-        })
-      } else if (
-        generation === Generation.G3 ||
-        generation === Generation.G4 ||
-        generation === Generation.G5
-      ) {
-        foundMons.forEach((mon) => {
-          const gen345Identifier = getMonGen345Identifier(mon)
+    //       if (gen12Identifier) {
+    //         newLookups.gen12[gen12Identifier] = mon.getHomeIdentifier()
+    //       }
+    //     })
+    //   } else if (
+    //     generation === Generation.G3 ||
+    //     generation === Generation.G4 ||
+    //     generation === Generation.G5
+    //   ) {
+    //     foundMons.forEach((mon) => {
+    //       const gen345Identifier = getMonGen345Identifier(mon)
 
-          if (gen345Identifier) {
-            newLookups.gen345[gen345Identifier] = mon.getHomeIdentifier()
-          }
-        })
-      }
-    }
+    //       if (gen345Identifier) {
+    //         newLookups.gen345[gen345Identifier] = mon.getHomeIdentifier()
+    //       }
+    //     })
+    //   }
+    // }
 
-    if (monErrors.length) {
-      return R.Err(monErrors)
-    }
+    // if (monErrors.length) {
+    //   return R.Err(monErrors)
+    // }
 
     const saveWriters = allOpenSaves.map((save) => save.prepareWriter())
 
@@ -176,9 +166,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
     openSavesState.homeData,
     openSavesState.monsToRelease,
     backend,
-    lookupsState,
     allOpenSaves,
-    ohpkmStore,
     itemBagState.modified,
     itemBagState.itemCounts,
     loadAllHomeData,

@@ -62,7 +62,6 @@ describe('Save file detection', () => {
       const result = buildUnknownSaveFile(
         emptyPathData,
         new Uint8Array(fs.readFileSync(path.join(__dirname, 'save-files', fileName))),
-        {},
         allSaveTypes
       )
 

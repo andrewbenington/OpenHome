@@ -1,7 +1,6 @@
 import { isRestricted, TransferRestrictions } from '@openhome-core/save/util/TransferRestrictions'
 import { ItemUnbound } from '@pkm-rs/pkg'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
-import { OhpkmTracker } from '../../../tracker'
 import { OHPKM } from '../../pkm/OHPKM'
 import { findFirstSectionOffset, G3CFRUSAV, SAVE_SIZES_BYTES } from '../cfru/G3CFRUSAV'
 import { SlotMetadata } from '../interfaces'
@@ -42,8 +41,8 @@ export class G3UBSAV extends G3CFRUSAV<PK3UB> {
     return 'Unbound'
   }
 
-  constructor(path: PathData, bytes: Uint8Array, tracker: OhpkmTracker) {
-    super(path, bytes, PK3UB, tracker)
+  constructor(path: PathData, bytes: Uint8Array) {
+    super(path, bytes, PK3UB)
   }
 
   static pkmType = PK3UB

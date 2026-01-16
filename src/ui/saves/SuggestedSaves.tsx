@@ -6,7 +6,6 @@ import { BackendContext } from '@openhome-ui/backend/backendContext'
 import OHDataGrid, { SortableColumn } from '@openhome-ui/components/OHDataGrid'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import { AppInfoContext } from '@openhome-ui/state/appInfo'
-import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { useSaves } from '@openhome-ui/state/saves'
 import { Flex } from '@radix-ui/themes'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
@@ -25,7 +24,6 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
   const backend = useContext(BackendContext)
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
   const [suggestedSaves, setSuggestedSaves] = useState<SAV[]>()
-  const ohpkmStore = useOhpkmStore()
   const savesAndBanks = useSaves()
   const [error, setError] = useState(false)
   const displayError = useDisplayError()
@@ -50,11 +48,11 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
       if (R.isOk(response)) {
         const { fileBytes } = response.value
 
-        return buildUnknownSaveFile(savePath, fileBytes, getEnabledSaveTypes(), ohpkmStore.tracker)
+        return buildUnknownSaveFile(savePath, fileBytes, getEnabledSaveTypes())
       }
       return undefined
     },
-    [backend, getEnabledSaveTypes, ohpkmStore.tracker]
+    [backend, getEnabledSaveTypes]
   )
 
   useEffect(() => {

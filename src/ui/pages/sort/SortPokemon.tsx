@@ -34,7 +34,7 @@ export default function SortPokemon() {
           box.boxSlots.flatMap((mon) =>
             mon
               ? {
-                  mon: ohpkmStore.tracker.ohpkmIfTracked(mon),
+                  mon: ohpkmStore.loadOhpkmIfTracked(mon),
                   color: OriginGames.color(save.origin),
                 }
               : undefined
@@ -56,7 +56,7 @@ export default function SortPokemon() {
       .filter(filterUndefined)
 
     return all
-  }, [ohpkmStore.tracker, savesAndBanks.allOpenSaves, savesAndBanks.homeData])
+  }, [ohpkmStore, savesAndBanks.allOpenSaves, savesAndBanks.homeData])
 
   const sortedMonsWithColors = useMemo(() => {
     return sort

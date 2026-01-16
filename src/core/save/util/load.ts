@@ -1,7 +1,6 @@
 import { R } from '@openhome-core/util/functional'
 import { OhpkmLookup } from '@openhome-ui/state/ohpkm'
 import { SAVClass } from '.'
-import { EmptyTracker, OhpkmTracker } from '../../../tracker'
 import { Errorable } from '../../util/functional'
 import { SAV } from '../interfaces'
 import { PathData } from './path'
@@ -22,8 +21,7 @@ export type MonLookup = {
 export const buildUnknownSaveFile = (
   filePath: PathData,
   fileBytes: Uint8Array,
-  supportedSaveTypes: SAVClass[],
-  tracker?: OhpkmTracker
+  supportedSaveTypes: SAVClass[]
 ): Errorable<SAV | undefined> => {
   const saveTypes = getPossibleSaveTypes(fileBytes, supportedSaveTypes)
 
@@ -39,17 +37,16 @@ export const buildUnknownSaveFile = (
 
   if (!saveType) return R.Ok(undefined)
 
-  return buildSaveFile(filePath, fileBytes, saveType, tracker ?? EmptyTracker())
+  return buildSaveFile(filePath, fileBytes, saveType)
 }
 
 export const buildSaveFile = (
   filePath: PathData,
   fileBytes: Uint8Array,
-  saveType: SAVClass,
-  tracker: OhpkmTracker
+  saveType: SAVClass
 ): Errorable<SAV | undefined> => {
   try {
-    const saveFile = new saveType(filePath, fileBytes, tracker)
+    const saveFile = new saveType(filePath, fileBytes)
     return R.Ok(saveFile)
   } catch (e) {
     return R.Err(String(e))

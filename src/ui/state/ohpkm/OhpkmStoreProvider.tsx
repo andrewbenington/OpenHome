@@ -28,7 +28,6 @@ export default function OhpkmStoreProvider({ children }: PropsWithChildren) {
 }
 
 function loadOhpkmFromB64(response: StringToB64): OhpkmStoreData {
-  console.log(response)
   return Object.fromEntries(
     Object.entries(response).map(([identifier, b64String]) => [
       identifier,
@@ -48,7 +47,6 @@ function useSharedOhpkmState(): SharedStateController<OhpkmStoreData, StringToB6
   const stateUpdater = backend.addToOhpkmStore
   const updatePokedexFromStored = useCallback(
     async (data: OhpkmStoreData) => {
-      console.log(Object.keys(data).toSorted())
       const pokedexUpdates: PokedexUpdate[] = []
 
       for (const [identifier, mon] of Object.entries(data)) {

@@ -15,7 +15,7 @@ describe('G3SAV - Gen 3 Save File Read Test', async () => {
   const result = buildUnknownSaveFile(
     emptyPathData,
     new Uint8Array(fs.readFileSync(path.join(__dirname, 'save-files', 'emerald.sav'))),
-    {},
+
     [G3SAV]
   )
 
@@ -29,7 +29,7 @@ describe('G3SAV - Gen 3 Save File Read Test', async () => {
   })
 
   test('should print the first Pokémon in the first box', () => {
-    const firstPokemon = emeraldSaveFile.boxes[0].boxSlots[0]?.data
+    const firstPokemon = emeraldSaveFile.boxes[0].boxSlots[0]
 
     if (firstPokemon) {
       // display_mon(firstPokemon)
@@ -46,7 +46,7 @@ describe('G3SAV - Gen 3 Save File Read Test', async () => {
       fail('No Pokémon found in the first box, first slot.')
     }
 
-    const secondPokemon = emeraldSaveFile.boxes[1].boxSlots[1]?.data
+    const secondPokemon = emeraldSaveFile.boxes[1].boxSlots[1]
 
     if (secondPokemon) {
       expect(secondPokemon.nickname).toBe('NIDORAN♂')

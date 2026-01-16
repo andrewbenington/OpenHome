@@ -6,7 +6,6 @@ import { LGE_STARTER, LGP_STARTER } from '@pokemon-resources/consts/Formes'
 import { Item } from '@pokemon-resources/consts/Items'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { LGPE_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
-import { OhpkmTracker } from '../../tracker'
 import { OHPKM } from '../pkm/OHPKM'
 import { CRC16_NoInvert } from './encryption/Encryption'
 import { Box, OfficialSAV, SaveMonLocation, SlotMetadata } from './interfaces'
@@ -72,7 +71,7 @@ export class LGPESAV extends OfficialSAV<PB7> {
 
   pokeListHeader: PokeListHeader
 
-  constructor(path: PathData, bytes: Uint8Array, tracker: OhpkmTracker) {
+  constructor(path: PathData, bytes: Uint8Array) {
     super()
     this.bytes = bytes
     this.filePath = path
@@ -109,10 +108,7 @@ export class LGPESAV extends OfficialSAV<PB7> {
         const displayBoxSlot = monIndex % 30
 
         if (mon !== null) {
-          this.boxes[displayBoxNum].boxSlots[displayBoxSlot] = tracker.wrapWithIdentifier(
-            mon,
-            undefined
-          )
+          this.boxes[displayBoxNum].boxSlots[displayBoxSlot] = mon
         }
       } catch (e) {
         console.error(e)
@@ -122,14 +118,13 @@ export class LGPESAV extends OfficialSAV<PB7> {
 
   prepareForSaving() {
     this.updatedBoxSlots.forEach(({ box, index }) => {
-      const updatedSlotContent = this.boxes[box].boxSlots[index]
+      const mon = this.boxes[box].boxSlots[index]
 
       const monIndex = 30 * box + index
 
-      // updatedSlotContent will be undefined if pokemon was moved from this slot
+      // mon will be undefined if pokemon was moved from this slot
       // and the slot was left empty
-      if (updatedSlotContent) {
-        const mon = updatedSlotContent.data
+      if (mon) {
         try {
           if (mon.gameOfOrigin && mon.dexNum) {
             this.writeMonAtIndex(mon, monIndex)
@@ -261,7 +256,7 @@ export class LGPESAV extends OfficialSAV<PB7> {
       }
     }
 
-    const mon = this.boxes[boxNum].boxSlots[boxSlot]?.data
+    const mon = this.boxes[boxNum].boxSlots[boxSlot]
 
     if (
       (mon?.dexNum === NationalDex.Pikachu && mon.formeNum === LGP_STARTER) ||

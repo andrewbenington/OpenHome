@@ -8,7 +8,6 @@ import {
   SV_TRANSFER_RESTRICTIONS_ID,
   SV_TRANSFER_RESTRICTIONS_TM,
 } from '@pokemon-resources/consts/TransferRestrictions'
-import { OhpkmTracker } from '../../../tracker'
 import { OHPKM } from '../../pkm/OHPKM'
 import { SCBlock, SCObjectBlock } from '../encryption/SwishCrypto/SCBlock'
 import { SwishCrypto } from '../encryption/SwishCrypto/SwishCrypto'
@@ -31,8 +30,8 @@ export class SVSAV extends G89SAV<PK9> {
 
   origin: OriginGame
 
-  constructor(path: PathData, bytes: Uint8Array, tracker: OhpkmTracker) {
-    super(path, bytes, tracker)
+  constructor(path: PathData, bytes: Uint8Array) {
+    super(path, bytes)
 
     this.trainerBlock = new MyStatus(this.getBlockMust('MyStatus', 'object'))
     this.name = this.trainerBlock.getName()

@@ -10,7 +10,6 @@ import { OhpkmIdentifier } from '../../../core/pkm/Lookup'
 import { getSortFunctionNullable } from '../../../core/pkm/sort'
 import { Option, partitionResults, R, range, Result } from '../../../core/util/functional'
 import { filterUndefined } from '../../../core/util/sort'
-import { isTracked, MaybeTracked, tracked } from '../../../tracker'
 import { IdentifierNotPresentError, useOhpkmStore } from '../ohpkm/useOhpkmStore'
 import {
   HomeMonLocation,
@@ -148,63 +147,53 @@ export function useSaves(): SavesAndBanksManager {
     (location: MonLocation) => {
       let identifier: OhpkmIdentifier | undefined
       if (!location.is_home) {
-        const maybeTracked = getMonAtSaveLocation(location)
-        if (!maybeTracked) return undefined
-        if (!isTracked(maybeTracked)) return maybeTracked?.data
-
-        identifier = maybeTracked.identifier
+        const mon = getMonAtSaveLocation(location)
+        if (!mon) return undefined
+        return ohpkmStore.tracker.loadIfTracked(mon) ?? mon
       } else {
         identifier = getMonAtHomeLocation(location)
+        if (!identifier) return undefined
+        const monResult = ohpkmStore.tryLoadFromId(identifier)
+        if (R.isErr(monResult)) {
+          console.error('COULD NOT FIND MON WITH IDENTIFIER: ' + monResult.err.identifier)
+          return undefined
+        }
+
+        return monResult.value
       }
-
-      if (!identifier) return undefined
-
-      const monResult = ohpkmStore.tryLoadFromId(identifier)
-      if (R.isErr(monResult)) {
-        // console.error(`COULD NOT FIND MON WITH IDENTIFIER: ${monResult.err.identifier}`)
-        return undefined
-      }
-
-      return monResult.value
     },
     [getMonAtHomeLocation, getMonAtSaveLocation, ohpkmStore]
   )
 
-  const moveMonToSave = useCallback(
+  const moveMonBetweenSaves = useCallback(
     (
-      maybeTracked: MaybeTracked | undefined,
+      sourceSaveIdentifier: Option<SaveIdentifier>,
+      mon: PKMInterface | undefined,
       dest: SaveMonLocation
-    ): Result<Option<MaybeTracked>, IdentifierNotPresentError> => {
-      const save = openSavesState.openSaves[dest.saveIdentifier].save
+    ): Option<PKMInterface> => {
+      const sourceSave = sourceSaveIdentifier ? saveFromIdentifier(sourceSaveIdentifier) : undefined
+      const destSave = openSavesState.openSaves[dest.saveIdentifier].save
 
-      let ohpkm: OHPKM | undefined = undefined
-      if (maybeTracked && isTracked(maybeTracked)) {
-        const monResult = ohpkmStore.tryLoadFromId(maybeTracked.identifier)
-        if (R.isErr(monResult)) {
-          return monResult
-        }
-
-        ohpkm = monResult.value
-      } else if (maybeTracked) {
-        ohpkm = new OHPKM(maybeTracked.data)
-        ohpkmStore.overwrite(ohpkm)
+      let ohpkm: Option<OHPKM>
+      if (mon) {
+        ohpkm = ohpkmStore.tracker.loadIfTracked(mon) ?? ohpkmStore.startTracking(mon, sourceSave)
       }
 
-      const tracked = ohpkm ? ohpkmStore.moveToSave(ohpkm, save) : undefined
-      const displacedMon = save.boxes[dest.box].boxSlots[dest.box_slot]
-      save.boxes[dest.box].boxSlots[dest.box_slot] = tracked
-      save.updatedBoxSlots.push({ box: dest.box, index: dest.box_slot })
+      const destSaveMon = ohpkm ? ohpkmStore.trackAndConvertForSave(ohpkm, destSave) : undefined
+      const displacedMon = destSave.boxes[dest.box].boxSlots[dest.box_slot]
+      destSave.boxes[dest.box].boxSlots[dest.box_slot] = destSaveMon
+      destSave.updatedBoxSlots.push({ box: dest.box, index: dest.box_slot })
 
-      return R.Ok(displacedMon)
+      return displacedMon
     },
-    [ohpkmStore, openSavesState.openSaves]
+    [ohpkmStore, openSavesState.openSaves, saveFromIdentifier]
   )
 
   const moveOhpkmToSave = useCallback(
     (
       identifier: Option<OhpkmIdentifier>,
       dest: SaveMonLocation
-    ): Result<Option<MaybeTracked>, IdentifierNotPresentError> => {
+    ): Result<Option<PKMInterface>, IdentifierNotPresentError> => {
       const save = openSavesState.openSaves[dest.saveIdentifier].save
 
       if (!identifier) {
@@ -220,7 +209,7 @@ export function useSaves(): SavesAndBanksManager {
       }
 
       const mon = monResult.value
-      const tracked = ohpkmStore.moveToSave(mon, save)
+      const tracked = ohpkmStore.trackAndConvertForSave(mon, save)
       const displacedMon = save.boxes[dest.box].boxSlots[dest.box_slot]
       save.boxes[dest.box].boxSlots[dest.box_slot] = tracked
       save.updatedBoxSlots.push({ box: dest.box, index: dest.box_slot })
@@ -232,24 +221,27 @@ export function useSaves(): SavesAndBanksManager {
 
   const moveMonToHome = useCallback(
     <P extends PKMInterface>(
-      maybeTracked: Option<MaybeTracked<P>>,
+      sourceSaveIdentifier: Option<SaveIdentifier>,
+      mon: Option<P>,
       location: HomeMonLocation
     ): Option<OhpkmIdentifier> => {
+      const sourceSave = sourceSaveIdentifier ? saveFromIdentifier(sourceSaveIdentifier) : undefined
       const displacedMonId = getMonAtHomeLocation(location)
 
-      if (!maybeTracked) {
+      let ohpkm: Option<OHPKM>
+      if (mon) {
+        ohpkm = ohpkmStore.tracker.loadIfTracked(mon) ?? ohpkmStore.startTracking(mon, sourceSave)
+      }
+
+      if (!mon) {
         loadedHomeData.setPokemon(location, undefined)
-      } else if (isTracked(maybeTracked)) {
-        loadedHomeData.setPokemon(location, maybeTracked.identifier)
-      } else {
-        const ohpkm = new OHPKM(maybeTracked.data)
-        ohpkmStore.overwrite(ohpkm)
+      } else if (ohpkm) {
         loadedHomeData.setPokemon(location, ohpkm.getHomeIdentifier())
       }
 
       return displacedMonId
     },
-    [getMonAtHomeLocation, loadedHomeData, ohpkmStore]
+    [getMonAtHomeLocation, loadedHomeData, ohpkmStore, saveFromIdentifier]
   )
 
   const moveOhpkmToHome = useCallback(
@@ -283,7 +275,7 @@ export function useSaves(): SavesAndBanksManager {
 
           if (nextSlot.box < loadedHomeData.getCurrentBank().boxes.length) {
             const homeMon = mon instanceof OHPKM ? mon : new OHPKM(mon)
-            ohpkmStore.overwrite(homeMon)
+            ohpkmStore.insertOrUpdate(homeMon)
 
             moveOhpkmToHome(homeMon.getHomeIdentifier(), nextSlot)
             addedMons.push(homeMon)
@@ -308,7 +300,11 @@ export function useSaves(): SavesAndBanksManager {
           if (nextIndex < tempSave.boxRows * tempSave.boxColumns) {
             const homeMon = mon instanceof OHPKM ? mon : new OHPKM(mon)
 
-            moveMonToSave(ohpkmStore.moveToSave(homeMon, tempSave), dest)
+            moveMonBetweenSaves(
+              undefined,
+              ohpkmStore.trackAndConvertForSave(homeMon, tempSave),
+              dest
+            )
             addedMons.push(homeMon)
             nextIndex++
           }
@@ -319,7 +315,14 @@ export function useSaves(): SavesAndBanksManager {
 
       return { ...openSavesState, openSaves: { ...openSavesState.openSaves } }
     },
-    [loadedHomeData, moveMonToSave, moveOhpkmToHome, ohpkmStore, openSavesState, saveFromIdentifier]
+    [
+      loadedHomeData,
+      moveMonBetweenSaves,
+      moveOhpkmToHome,
+      ohpkmStore,
+      openSavesState,
+      saveFromIdentifier,
+    ]
   )
 
   const reorderBoxesCurrentBank = useCallback(
@@ -498,12 +501,10 @@ export function useSaves(): SavesAndBanksManager {
             matchingHandler.memory
           )
 
-          ohpkmStore.overwrite(mon)
+          ohpkmStore.insertOrUpdate(mon)
         }
       }
-      for (const mon of save.boxes
-        .flatMap((b) => b.boxSlots.map((slot) => slot?.data))
-        .filter(filterUndefined)) {
+      for (const mon of save.boxes.flatMap((b) => b.boxSlots).filter(filterUndefined)) {
         const trackedData = ohpkmStore.tracker.loadIfTracked(mon)
         if (trackedData) {
           trackedData.syncWithGameData(mon, save)
@@ -526,38 +527,30 @@ export function useSaves(): SavesAndBanksManager {
       const itemIndex = item?.index ?? 0
       let ohpkm: OHPKM
       if (location.is_home) {
-        const sourceMonId = getMonAtHomeLocation(location)
-        if (!sourceMonId) return
+        const identifier = getMonAtHomeLocation(location)
+        if (!identifier) return
 
-        const result = ohpkmStore.tryLoadFromId(sourceMonId)
+        const result = ohpkmStore.tryLoadFromId(identifier)
         if (R.isErr(result)) {
           return result
         }
 
         ohpkm = result.value
       } else {
-        const sourceMon = getMonAtSaveLocation(location)
-        if (!sourceMon) return
+        const mon = getMonAtSaveLocation(location)
+        if (!mon) return
 
-        if (isTracked(sourceMon)) {
-          const result = ohpkmStore.tryLoadFromId(sourceMon.identifier)
-          if (R.isErr(result)) {
-            return result
-          }
+        const save = saveFromIdentifier(location.saveIdentifier)
+        ohpkm = ohpkmStore.tracker.loadIfTracked(mon) ?? ohpkmStore.startTracking(mon, save)
 
-          ohpkm = result.value
-        } else {
-          const save = saveFromIdentifier(location.saveIdentifier)
-          ohpkm = OHPKM.fromMonInSave(sourceMon.data, save)
-          save.boxes[location.box].boxSlots[location.box_slot] = tracked(
-            save.convertOhpkm(ohpkm),
-            ohpkm.getHomeIdentifier()
-          )
-        }
+        save.boxes[location.box].boxSlots[location.box_slot] = save.convertOhpkm(ohpkm)
+        save.updatedBoxSlots.push({ box: location.box, index: location.box_slot })
       }
 
       ohpkm.heldItemIndex = itemIndex
-      ohpkmStore.overwrite(ohpkm)
+      ohpkmStore.insertOrUpdate(ohpkm)
+
+      return R.Ok(null)
     },
     [getMonAtHomeLocation, getMonAtSaveLocation, ohpkmStore, saveFromIdentifier]
   )
@@ -575,7 +568,7 @@ export function useSaves(): SavesAndBanksManager {
       const mon = result.value
       mon.notes = notes
 
-      ohpkmStore.overwrite(mon)
+      ohpkmStore.insertOrUpdate(mon)
     },
     [homeData, findMon, ohpkmStore]
   )
@@ -593,7 +586,7 @@ export function useSaves(): SavesAndBanksManager {
       const mon = result.value
       mon.markings = markings
 
-      ohpkmStore.overwrite(mon)
+      ohpkmStore.insertOrUpdate(mon)
     },
     [homeData, findMon, ohpkmStore]
   )
@@ -620,7 +613,7 @@ export function useSaves(): SavesAndBanksManager {
         }
 
         const displacedMon = result.value
-        moveMonToHome(displacedMon, source)
+        moveMonToHome(dest.saveIdentifier, displacedMon, source)
       }
     } else if (!dest.is_home && source.saveIdentifier === dest.saveIdentifier) {
       moveMonWithinSave(saveFromIdentifier(source.saveIdentifier), source, dest)
@@ -629,16 +622,11 @@ export function useSaves(): SavesAndBanksManager {
       if (!sourceMon) return
 
       if (dest.is_home) {
-        const displacedMonId = moveMonToHome(sourceMon, dest)
+        const displacedMonId = moveMonToHome(source.saveIdentifier, sourceMon, dest)
         moveOhpkmToSave(displacedMonId, source)
       } else {
-        const result = moveMonToSave(sourceMon, dest)
-        if (R.isErr(result)) {
-          return result
-        }
-
-        const displacedMon = result.value
-        moveMonToSave(displacedMon, source)
+        const displacedMon = moveMonBetweenSaves(source.saveIdentifier, sourceMon, dest)
+        moveMonBetweenSaves(dest.saveIdentifier, displacedMon, source)
       }
     }
 
@@ -656,27 +644,16 @@ export function useSaves(): SavesAndBanksManager {
           payload: identifier,
         })
       } else {
-        const result = moveMonToSave(undefined, location)
-        if (R.isErr(result)) {
-          throw Error('Failed identifier lookup when setting slot empty (SHOULD NOT HAPPEN)')
-        }
+        const releasedMon = moveMonBetweenSaves(undefined, undefined, location)
+        if (!releasedMon) return
 
-        if (result.value) {
-          if (isTracked(result.value)) {
-            openSavesDispatch({
-              type: 'add_mon_to_release',
-              payload: result.value.identifier,
-            })
-          } else {
-            openSavesDispatch({
-              type: 'add_mon_to_release',
-              payload: result.value.data,
-            })
-          }
-        }
+        openSavesDispatch({
+          type: 'add_mon_to_release',
+          payload: ohpkmStore.getIdIfTracked(releasedMon) ?? releasedMon,
+        })
       }
     },
-    [moveMonToSave, moveOhpkmToHome, openSavesDispatch]
+    [moveMonBetweenSaves, moveOhpkmToHome, ohpkmStore, openSavesDispatch]
   )
 
   return {
