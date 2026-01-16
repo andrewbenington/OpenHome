@@ -22,7 +22,7 @@ tester.sh
 .env.test.local
 .env.production.local
 /.erb/dll
-src/core/save/__test__/save-files/radicalred-modified.sav
+src/core/save/__test__/save-files/radicalred_modified.sav
 
 # python
 *.pyc
