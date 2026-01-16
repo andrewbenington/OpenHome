@@ -35,6 +35,7 @@ export function useOhpkmStore(): OhpkmStore {
   const [ohpkmStore, updateStore] = useContext(OhpkmStoreContext)
   const { lookups, updateLookups } = useLookups()
   const { gen12: gen12Lookup, gen345: gen345Lookup } = lookups
+
   const getById = useCallback(
     (id: string): OHPKM | undefined => {
       return ohpkmStore[id]

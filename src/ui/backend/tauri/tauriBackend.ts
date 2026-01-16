@@ -63,19 +63,6 @@ export const TauriBackend: BackendInterface = {
       )
     )
   },
-
-  /* saving */
-  saveSharedState: Commands.save_shared_state,
-
-  /* pokedex */
-  loadPokedex: Commands.get_pokedex,
-  registerInPokedex: Commands.update_pokedex,
-
-  // /* OHPKM management */
-  loadHomeMonLookup: async function (): Promise<Errorable<Record<string, OHPKM>>> {
-    return Commands.get_ohpkm_files().then(R.map(buildOhpkmMap))
-  },
-
   deleteHomeMons: async function (identifiers: string[]): Promise<Errorable<null>> {
     const monFilePaths = identifiers.map((identifier) => `mons/${identifier}.ohpkm`)
     return Commands.delete_storage_files(monFilePaths).then(
@@ -90,10 +77,12 @@ export const TauriBackend: BackendInterface = {
     )
   },
 
-  writeHomeMon: async (identifier: string, bytes: Uint8Array): Promise<Errorable<null>> => {
-    const relativePath = await path.join('mons_v2', `${identifier}.ohpkm`)
-    return Commands.write_storage_file_bytes(relativePath, bytes)
-  },
+  /* saving */
+  saveSharedState: Commands.save_shared_state,
+
+  /* pokedex */
+  loadPokedex: Commands.get_pokedex,
+  registerInPokedex: Commands.update_pokedex,
 
   /* openhome boxes */
   loadHomeBanks: () => Commands.load_banks().then(R.map(deserializeBankData)),
@@ -348,15 +337,6 @@ export const TauriBackend: BackendInterface = {
         }
       })
   },
-}
-
-function buildOhpkmMap(bytesByFilename: Record<string, number[]>) {
-  return Object.fromEntries(
-    Object.entries(bytesByFilename).map(([filename, bytes]) => [
-      filename.slice(0, filename.length - 6),
-      new OHPKM(new Uint8Array(bytes)),
-    ])
-  )
 }
 
 function deserializeBankData(data: StoredBankDataSerialized): StoredBankData {

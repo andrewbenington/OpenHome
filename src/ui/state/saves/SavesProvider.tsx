@@ -66,50 +66,6 @@ export default function SavesProvider({ children }: SavesProviderProps) {
       )
     }
 
-    // const newLookups = { ...lookupsState.lookups }
-    // const trackedIdentifiersPerSave = allOpenSaves.map(
-    //   (save) => [save.origin, save.getTrackedMonIdentifiers()] as const
-    // )
-
-    // const monErrors: SaveError[] = []
-
-    // for (const [saveOrigin, trackedIdentifiers] of trackedIdentifiersPerSave) {
-    //   const { failures: missingIdentifiers, successes: foundMons } = partitionResults(
-    //     ohpkmStore.tryLoadFromIds(trackedIdentifiers)
-    //   )
-
-    //   monErrors.push(
-    //     ...missingIdentifiers.map((missing) => missing.identifier).map(IdentifierNotTracked)
-    //   )
-
-    //   const generation = OriginGames.generation(saveOrigin)
-    //   if (generation === Generation.G1 || generation === Generation.G2) {
-    //     foundMons.forEach((mon) => {
-    //       const gen12Identifier = getMonGen12Identifier(mon)
-
-    //       if (gen12Identifier) {
-    //         newLookups.gen12[gen12Identifier] = mon.getHomeIdentifier()
-    //       }
-    //     })
-    //   } else if (
-    //     generation === Generation.G3 ||
-    //     generation === Generation.G4 ||
-    //     generation === Generation.G5
-    //   ) {
-    //     foundMons.forEach((mon) => {
-    //       const gen345Identifier = getMonGen345Identifier(mon)
-
-    //       if (gen345Identifier) {
-    //         newLookups.gen345[gen345Identifier] = mon.getHomeIdentifier()
-    //       }
-    //     })
-    //   }
-    // }
-
-    // if (monErrors.length) {
-    //   return R.Err(monErrors)
-    // }
-
     const saveWriters = allOpenSaves.map((save) => save.prepareWriter())
 
     const promises = [

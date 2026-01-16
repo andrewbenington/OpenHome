@@ -41,6 +41,7 @@ export default interface BackendInterface {
   /* ohpkm bytes store by identifier */
   loadOhpkmStore: () => Promise<Errorable<OhpkmStore>>
   addToOhpkmStore: (updates: OhpkmStore) => Promise<Errorable<null>>
+  deleteHomeMons: (identifiers: string[]) => Promise<Errorable<null>>
 
   /* save shared frontend/backend state */
   saveSharedState: () => Promise<Errorable<void>>
@@ -48,11 +49,6 @@ export default interface BackendInterface {
   /* past gen identifier lookups */
   loadPokedex: () => Promise<Errorable<Pokedex>>
   registerInPokedex: (updates: PokedexUpdate[]) => Promise<Errorable<null>>
-
-  /* OHPKM management */
-  loadHomeMonLookup: () => Promise<Errorable<Record<string, OHPKM>>>
-  writeHomeMon: (identifier: string, monBytes: Uint8Array) => Promise<Errorable<null>>
-  deleteHomeMons: (identifiers: string[]) => Promise<Errorable<null>>
 
   /* openhome banks/boxes */
   loadHomeBanks: () => Promise<Errorable<StoredBankData>>

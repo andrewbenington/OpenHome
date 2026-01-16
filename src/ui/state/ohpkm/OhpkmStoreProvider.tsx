@@ -45,16 +45,14 @@ function useSharedOhpkmState(): SharedStateController<OhpkmStoreData, StringToB6
 
   const stateGetter = backend.loadOhpkmStore
   const stateUpdater = backend.addToOhpkmStore
-  const updatePokedexFromStored = useCallback(
+  const updatePokedexAndFixOhpkms = useCallback(
     async (data: OhpkmStoreData) => {
       const pokedexUpdates: PokedexUpdate[] = []
 
       for (const [identifier, mon] of Object.entries(data)) {
         const hadErrors = mon.fixErrors()
-
         if (hadErrors) {
           console.warn(`mon had errors: ${mon.nickname} (${identifier})`)
-          // backend.writeHomeMon(identifier, new Uint8Array(mon.toBytes()))
         }
 
         pokedexUpdates.push(...getPokedexUpdates(mon))
@@ -70,7 +68,7 @@ function useSharedOhpkmState(): SharedStateController<OhpkmStoreData, StringToB6
     stateGetter,
     stateReducer,
     stateUpdater,
-    onLoaded: updatePokedexFromStored,
+    onLoaded: updatePokedexAndFixOhpkms,
     convertRustState: loadOhpkmFromB64,
   }
 }
