@@ -101,14 +101,6 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
     }
   }
 
-  // getTrackedMonIdentifiers(): OhpkmIdentifier[] {
-  //   return this.updatedBoxSlots
-  //     .map(({ box, index }) => this.boxes[box].boxSlots[index])
-  //     .filter(notNull)
-  //     .filter(isTracked)
-  //     .map((slot) => slot.identifier)
-  // }
-
   getDisplayData(): Record<string, string | number | undefined> | undefined {
     return {
       'Trainer Name': this.name,
@@ -171,14 +163,6 @@ export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implement
       filepath: this.filePath.raw,
     }
   }
-
-  // getTrackedMonIdentifiers(): OhpkmIdentifier[] {
-  //   return this.updatedBoxSlots
-  //     .map(({ box, index }) => this.boxes[box].boxSlots[index])
-  //     .filter(notNull)
-  //     .filter(isTracked)
-  //     .map((slot) => slot.identifier)
-  // }
 
   getDisplayData(): Record<string, string | number | undefined> | undefined {
     return {
