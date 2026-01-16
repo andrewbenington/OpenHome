@@ -22,7 +22,7 @@ export const getMonFileIdentifier = (mon: PKMInterface): OhpkmIdentifier | undef
   if (!hasPersonalityValue(mon)) {
     return undefined
   }
-  return getHomeIdentifier(mon) // 🙄
+  return getHomeIdentifier(mon)
 }
 
 type HomeIdentifierDerivableMon = {
