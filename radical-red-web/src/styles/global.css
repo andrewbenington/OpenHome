@@ -282,3 +282,207 @@ body {
 .items-center {
   align-items: center;
 }
+
+/* ===========================================
+   MOBILE-FIRST RESPONSIVE DESIGN
+   =========================================== */
+
+/* Mobile devices (default - up to 480px) */
+@media (max-width: 480px) {
+  /* Reduce root padding on mobile */
+  #root {
+    padding: 12px;
+  }
+
+  /* Pokemon box grid - 3 columns on mobile */
+  .box-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    margin: 12px 0;
+  }
+
+  /* Modal adjustments for mobile */
+  .modal-overlay {
+    padding: 12px;
+  }
+
+  .modal-content {
+    padding: 16px;
+    max-height: 95vh;
+  }
+
+  /* Stack form rows to single column on mobile */
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  /* Stats grid - single column on mobile */
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin: 12px 0;
+  }
+
+  /* Smaller titles on mobile */
+  .wireframe-title {
+    font-size: 20px;
+    margin-bottom: 12px;
+    letter-spacing: 1px;
+  }
+
+  .wireframe-subtitle {
+    font-size: 16px;
+    margin: 12px 0 8px 0;
+  }
+
+  /* Tabs - better mobile spacing */
+  .tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 12px;
+  }
+
+  .tab {
+    padding: 10px 16px;
+    font-size: 13px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* Box selector buttons - smaller on mobile */
+  .box-selector-button {
+    padding: 8px 10px;
+    font-size: 11px;
+    min-width: 50px;
+  }
+
+  /* Larger touch targets for buttons on mobile */
+  .wireframe-button {
+    padding: 10px 16px;
+    font-size: 14px;
+    min-height: 44px; /* iOS recommended touch target */
+  }
+
+  /* Pokemon slot adjustments */
+  .pokemon-slot {
+    padding: 2px;
+  }
+
+  .pokemon-info-compact {
+    font-size: 9px;
+  }
+
+  .pokemon-sprite {
+    width: 28px;
+    height: 28px;
+    font-size: 7px;
+  }
+
+  /* Form elements */
+  .form-group {
+    margin: 12px 0;
+  }
+
+  /* Stat items */
+  .stat-item {
+    padding: 10px;
+  }
+
+  .stat-value {
+    font-size: 16px;
+  }
+}
+
+/* Tablet devices (481px - 768px) */
+@media (min-width: 481px) and (max-width: 768px) {
+  /* Pokemon box grid - 4 columns on tablet */
+  .box-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+
+  /* Reduce root padding slightly on tablet */
+  #root {
+    padding: 16px;
+  }
+
+  /* Modal adjustments for tablet */
+  .modal-content {
+    padding: 20px;
+  }
+
+  /* Keep 2-column layout for forms on tablet */
+  .form-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Keep 2-column layout for stats on tablet */
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Desktop devices (769px and up) */
+@media (min-width: 769px) {
+  /* Pokemon box grid - 6 columns on desktop (default) */
+  .box-grid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}
+
+/* Landscape orientation optimization for mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+  /* Use 4 columns in landscape on mobile/tablet */
+  .box-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+  }
+
+  /* Reduce modal height for landscape */
+  .modal-content {
+    max-height: 85vh;
+  }
+}
+
+/* Extra small devices (max 360px - very small phones) */
+@media (max-width: 360px) {
+  /* Even smaller padding for very small phones */
+  #root {
+    padding: 8px;
+  }
+
+  .modal-overlay {
+    padding: 8px;
+  }
+
+  .modal-content {
+    padding: 12px;
+  }
+
+  /* Reduce font sizes further */
+  .wireframe-title {
+    font-size: 18px;
+  }
+
+  .wireframe-subtitle {
+    font-size: 14px;
+  }
+
+  /* Smaller sprites for very small screens */
+  .pokemon-sprite {
+    width: 24px;
+    height: 24px;
+  }
+
+  .pokemon-info-compact {
+    font-size: 8px;
+  }
+
+  /* Smaller box selector buttons */
+  .box-selector-button {
+    padding: 6px 8px;
+    font-size: 10px;
+    min-width: 45px;
+  }
+}
