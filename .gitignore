@@ -10,6 +10,9 @@ tsconfig.tsbuildinfo
 # testing
 /coverage
 tester.sh
+test-*.mjs
+*_test.sav
+*_modified_test.sav
 
 # production
 /out
