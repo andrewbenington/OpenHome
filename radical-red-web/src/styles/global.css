@@ -1,0 +1,284 @@
+/* Wireframe styling */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Courier New', monospace;
+  background-color: #f5f5f5;
+  color: #333;
+  line-height: 1.6;
+}
+
+#root {
+  min-height: 100vh;
+  padding: 20px;
+}
+
+/* Wireframe elements */
+.wireframe-box {
+  border: 2px solid #333;
+  background-color: white;
+  padding: 16px;
+  margin: 8px 0;
+}
+
+.wireframe-button {
+  border: 2px solid #333;
+  background-color: white;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.wireframe-button:hover {
+  background-color: #333;
+  color: white;
+}
+
+.wireframe-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.wireframe-button:disabled:hover {
+  background-color: white;
+  color: #333;
+}
+
+.wireframe-input {
+  border: 2px solid #333;
+  padding: 8px;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  width: 100%;
+}
+
+.wireframe-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 16px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.wireframe-subtitle {
+  font-size: 18px;
+  font-weight: bold;
+  margin: 16px 0 8px 0;
+  text-transform: uppercase;
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal-content {
+  background-color: white;
+  border: 3px solid #333;
+  max-width: 800px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 24px;
+}
+
+/* Grid layouts */
+.box-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+  margin: 16px 0;
+}
+
+.pokemon-slot {
+  border: 2px solid #333;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background-color: white;
+  transition: all 0.2s;
+  position: relative;
+  padding: 4px;
+}
+
+.pokemon-slot:hover {
+  background-color: #f0f0f0;
+  transform: scale(1.05);
+}
+
+.pokemon-slot.empty {
+  background-color: #f9f9f9;
+  cursor: default;
+}
+
+.pokemon-slot.empty:hover {
+  background-color: #f9f9f9;
+  transform: none;
+}
+
+.pokemon-slot.fakemon {
+  border-color: #cc0000;
+  background-color: #fff0f0;
+}
+
+.pokemon-info-compact {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 10px;
+  width: 100%;
+}
+
+.pokemon-sprite {
+  width: 32px;
+  height: 32px;
+  background-color: #ddd;
+  border: 1px solid #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8px;
+  margin-bottom: 4px;
+}
+
+.pokemon-level {
+  font-weight: bold;
+}
+
+/* Stats display */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin: 16px 0;
+}
+
+.stat-item {
+  border: 1px solid #333;
+  padding: 12px;
+}
+
+.stat-label {
+  font-weight: bold;
+  margin-bottom: 4px;
+  font-size: 12px;
+}
+
+.stat-value {
+  font-size: 18px;
+}
+
+/* Forms */
+.form-group {
+  margin: 16px 0;
+}
+
+.form-label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 4px;
+  font-size: 12px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  border-bottom: 2px solid #333;
+  margin-bottom: 16px;
+}
+
+.tab {
+  padding: 12px 24px;
+  cursor: pointer;
+  border: 2px solid #333;
+  border-bottom: none;
+  margin-right: 4px;
+  background-color: white;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+}
+
+.tab.active {
+  background-color: #333;
+  color: white;
+}
+
+.tab:hover:not(.active) {
+  background-color: #f0f0f0;
+}
+
+/* Box selector */
+.box-selector {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 16px 0;
+}
+
+.box-selector-button {
+  border: 2px solid #333;
+  background-color: white;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  min-width: 60px;
+}
+
+.box-selector-button.active {
+  background-color: #333;
+  color: white;
+}
+
+.box-selector-button:hover:not(.active) {
+  background-color: #f0f0f0;
+}
+
+/* Utilities */
+.text-center {
+  text-align: center;
+}
+
+.mb-2 {
+  margin-bottom: 16px;
+}
+
+.flex {
+  display: flex;
+}
+
+.gap-2 {
+  gap: 16px;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.items-center {
+  align-items: center;
+}
