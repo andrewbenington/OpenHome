@@ -20,6 +20,8 @@ function getInnerSortFunction(
   return (a, b) => sortFunction(a.mon, b.mon)
 }
 
+type MonWithColors = { mon: PKMInterface; color: string }
+
 export default function SortPokemon() {
   const savesAndBanks = useSaves()
   const [openSaveDialog, setOpenSaveDialog] = useState(false)
@@ -27,35 +29,26 @@ export default function SortPokemon() {
   const [sort, setSort] = useState<SortType>('')
   const ohpkmStore = useOhpkmStore()
 
-  const allMonsWithColors = useMemo(() => {
-    const all: { mon: PKMInterface; color: string }[] = savesAndBanks.allOpenSaves
+  const allMonsWithColors: MonWithColors[] = useMemo(() => {
+    return savesAndBanks.allOpenSaves
       .flatMap((save) =>
-        save.boxes.flatMap((box) =>
-          box.boxSlots.flatMap((mon) =>
-            mon
-              ? {
-                  mon: ohpkmStore.loadOhpkmIfTracked(mon),
-                  color: OriginGames.color(save.origin),
-                }
-              : undefined
-          )
-        )
+        save.boxes
+          .flatMap((box) => box.boxSlots)
+          .filter(filterUndefined)
+          .map((mon) => ({
+            mon: ohpkmStore.monOrOhpkmIfTracked(mon),
+            color: OriginGames.color(save.origin),
+          }))
       )
       .concat(
         Object.values(savesAndBanks.homeData.boxes.flatMap((box) => box.boxSlots) ?? {})
-          .map((identifier) => (identifier ? ohpkmStore.tracker.load(identifier) : undefined))
-          .map((mon) =>
-            mon
-              ? {
-                  mon,
-                  color: savesAndBanks.homeData.gameColor(),
-                }
-              : undefined
-          )
+          .map((identifier) => (identifier ? ohpkmStore.getById(identifier) : undefined))
+          .filter(filterUndefined)
+          .map((mon) => ({
+            mon,
+            color: savesAndBanks.homeData.gameColor(),
+          }))
       )
-      .filter(filterUndefined)
-
-    return all
   }, [ohpkmStore, savesAndBanks.allOpenSaves, savesAndBanks.homeData])
 
   const sortedMonsWithColors = useMemo(() => {
@@ -86,10 +79,7 @@ export default function SortPokemon() {
             formeNumber={monWithSave.mon.formeNum}
             isEgg={monWithSave.mon.isEgg}
             isShiny={monWithSave.mon.isShiny()}
-            style={{
-              width: 30,
-              height: 30,
-            }}
+            style={{ width: 30, height: 30 }}
           />
         </button>
       </div>

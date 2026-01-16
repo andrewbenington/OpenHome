@@ -1,16 +1,16 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { Errorable, Option, R, Result } from '@openhome-core/util/functional'
-import { createContext, useCallback, useContext, useMemo } from 'react'
+import { createContext, useCallback, useContext } from 'react'
 import { OhpkmStoreData } from '.'
 import { PKMInterface } from '../../../core/pkm/interfaces'
 import {
+  getMonFileIdentifier,
   getMonGen12Identifier,
   getMonGen345Identifier,
   OhpkmIdentifier,
 } from '../../../core/pkm/Lookup'
 import { SAV } from '../../../core/save/interfaces'
 import { SAVClass } from '../../../core/save/util'
-import { OhpkmTracker } from '../../../tracker'
 import { useLookups } from '../lookups'
 
 export type OhpkmStore = {
@@ -22,9 +22,9 @@ export type OhpkmStore = {
   insertOrUpdate(mon: OHPKM): void
   insertOrUpdateAll(mons: OhpkmStoreData): Promise<Errorable<null>>
   getAllStored: () => OHPKM[]
-  tracker: OhpkmTracker
   getIdIfTracked: (mon: PKMInterface) => Option<OhpkmIdentifier>
-  loadOhpkmIfTracked: <P extends PKMInterface>(mon: P) => OHPKM | P
+  loadIfTracked: <P extends PKMInterface>(mon: P) => Option<OHPKM>
+  monOrOhpkmIfTracked: <P extends PKMInterface>(mon: P) => OHPKM | P
   trackAndConvertForSave: <P extends PKMInterface>(ohpkm: OHPKM, save: SAV<P>) => P
   startTracking: <P extends PKMInterface>(mon: P, sourceSave: Option<SAV<P>>) => OHPKM
 }
@@ -34,6 +34,7 @@ export type OhpkmLookup = (id: string) => OHPKM | undefined
 export function useOhpkmStore(): OhpkmStore {
   const [ohpkmStore, updateStore] = useContext(OhpkmStoreContext)
   const { lookups, updateLookups } = useLookups()
+  const { gen12: gen12Lookup, gen345: gen345Lookup } = lookups
   const getById = useCallback(
     (id: string): OHPKM | undefined => {
       return ohpkmStore[id]
@@ -80,8 +81,6 @@ export function useOhpkmStore(): OhpkmStore {
     return Object.values(ohpkmStore)
   }, [ohpkmStore])
 
-  const tracker = useMemo(() => new OhpkmTracker(ohpkmStore, lookups), [ohpkmStore, lookups])
-
   const trackAndConvertForSave = useCallback(
     <P extends PKMInterface>(ohpkm: OHPKM, save: SAV<P>) => {
       const lookupType = (save.constructor as SAVClass).lookupType
@@ -125,21 +124,76 @@ export function useOhpkmStore(): OhpkmStore {
     [insertOrUpdate]
   )
 
+  const loadIfTracked = useCallback(
+    (mon: PKMInterface): Option<OHPKM> => {
+      switch (mon.format) {
+        case 'PK1':
+        case 'PK2': {
+          const gen12Identifier = getMonGen12Identifier(mon)
+          if (!gen12Identifier) {
+            throw Error(
+              `unable to calculate gen 1/2 identifier for ${mon.nickname} (${mon.format})`
+            )
+          }
+
+          const homeIdentifier = gen12Lookup[gen12Identifier]
+          if (!homeIdentifier) return undefined
+
+          return ohpkmStore[homeIdentifier]
+        }
+        case 'PK3':
+        case 'COLOPKM':
+        case 'XDPKM':
+        case 'PK4':
+        case 'PK5': {
+          const gen345Identifier = getMonGen345Identifier(mon)
+          if (!gen345Identifier) {
+            throw Error(
+              `unable to calculate gen 3/4/5 identifier for ${mon.nickname} (${mon.format})`
+            )
+          }
+
+          const homeIdentifier = gen345Lookup[gen345Identifier]
+          if (!homeIdentifier) return undefined
+
+          return ohpkmStore[homeIdentifier]
+        }
+        case 'PK6':
+        case 'PK7':
+        case 'PB7':
+        case 'PK8':
+        case 'PA8':
+        case 'PB8':
+        case 'PK9': {
+          const homeIdentifier = getMonFileIdentifier(mon)
+          if (!homeIdentifier) {
+            throw Error(
+              `unable to calculate OpenHome identifier for ${mon.nickname} (${mon.format})`
+            )
+          }
+
+          return ohpkmStore[homeIdentifier]
+        }
+        default:
+          throw Error(`unrecognized pkm format: ${mon.format}`)
+      }
+    },
+    [gen12Lookup, gen345Lookup, ohpkmStore]
+  )
+
+  const monOrOhpkmIfTracked = useCallback(
+    <P extends PKMInterface>(mon: P): OHPKM | P => {
+      return loadIfTracked(mon) ?? mon
+    },
+    [loadIfTracked]
+  )
+
   const getIdIfTracked = useCallback(
     (mon: PKMInterface): Option<OhpkmIdentifier> => {
-      return tracker.loadIfTracked(mon)?.getHomeIdentifier()
+      return loadIfTracked(mon)?.getHomeIdentifier()
     },
-    [tracker]
+    [loadIfTracked]
   )
-
-  const loadOhpkmIfTracked = useCallback(
-    <P extends PKMInterface>(mon: P): OHPKM | P => {
-      return tracker.loadIfTracked(mon) ?? mon
-    },
-    [tracker]
-  )
-  // console.log('tracked mons:', Object.values(ohpkmStore).length)
-
   return {
     getById,
     tryLoadFromId,
@@ -149,11 +203,11 @@ export function useOhpkmStore(): OhpkmStore {
     insertOrUpdate,
     insertOrUpdateAll,
     getAllStored,
-    tracker,
     trackAndConvertForSave,
     startTracking,
     getIdIfTracked,
-    loadOhpkmIfTracked,
+    loadIfTracked,
+    monOrOhpkmIfTracked,
   }
 }
 

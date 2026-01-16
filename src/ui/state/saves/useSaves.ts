@@ -149,7 +149,7 @@ export function useSaves(): SavesAndBanksManager {
       if (!location.is_home) {
         const mon = getMonAtSaveLocation(location)
         if (!mon) return undefined
-        return ohpkmStore.tracker.loadIfTracked(mon) ?? mon
+        return ohpkmStore.loadIfTracked(mon) ?? mon
       } else {
         identifier = getMonAtHomeLocation(location)
         if (!identifier) return undefined
@@ -176,7 +176,7 @@ export function useSaves(): SavesAndBanksManager {
 
       let ohpkm: Option<OHPKM>
       if (mon) {
-        ohpkm = ohpkmStore.tracker.loadIfTracked(mon) ?? ohpkmStore.startTracking(mon, sourceSave)
+        ohpkm = ohpkmStore.loadIfTracked(mon) ?? ohpkmStore.startTracking(mon, sourceSave)
       }
 
       const destSaveMon = ohpkm ? ohpkmStore.trackAndConvertForSave(ohpkm, destSave) : undefined
@@ -230,7 +230,7 @@ export function useSaves(): SavesAndBanksManager {
 
       let ohpkm: Option<OHPKM>
       if (mon) {
-        ohpkm = ohpkmStore.tracker.loadIfTracked(mon) ?? ohpkmStore.startTracking(mon, sourceSave)
+        ohpkm = ohpkmStore.loadIfTracked(mon) ?? ohpkmStore.startTracking(mon, sourceSave)
       }
 
       if (!mon) {
@@ -505,7 +505,7 @@ export function useSaves(): SavesAndBanksManager {
         }
       }
       for (const mon of save.boxes.flatMap((b) => b.boxSlots).filter(filterUndefined)) {
-        const trackedData = ohpkmStore.tracker.loadIfTracked(mon)
+        const trackedData = ohpkmStore.loadIfTracked(mon)
         if (trackedData) {
           trackedData.syncWithGameData(mon, save)
         }
@@ -541,7 +541,7 @@ export function useSaves(): SavesAndBanksManager {
         if (!mon) return
 
         const save = saveFromIdentifier(location.saveIdentifier)
-        ohpkm = ohpkmStore.tracker.loadIfTracked(mon) ?? ohpkmStore.startTracking(mon, save)
+        ohpkm = ohpkmStore.loadIfTracked(mon) ?? ohpkmStore.startTracking(mon, save)
 
         save.boxes[location.box].boxSlots[location.box_slot] = save.convertOhpkm(ohpkm)
         save.updatedBoxSlots.push({ box: location.box, index: location.box_slot })

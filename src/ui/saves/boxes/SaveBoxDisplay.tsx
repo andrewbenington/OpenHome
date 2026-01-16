@@ -53,7 +53,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
       return undefined
     }
     const selectedSlot = currentBox.boxSlots[selectedIndex]
-    return selectedSlot ? ohpkmStore.loadOhpkmIfTracked(selectedSlot) : undefined
+    return selectedSlot ? ohpkmStore.monOrOhpkmIfTracked(selectedSlot) : undefined
   }, [currentBox, ohpkmStore, selectedIndex])
 
   const attemptImportMons = (mons: PKMInterface[], location: MonLocation) => {
@@ -181,7 +181,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                     isDisabled(mon) || save.getSlotMetadata?.(save.currentPCBox, index)?.isDisabled
                   }
                   disabledReason={save.getSlotMetadata?.(save.currentPCBox, index)?.disabledReason}
-                  mon={mon ? ohpkmStore.loadOhpkmIfTracked(mon) : undefined}
+                  mon={mon ? ohpkmStore.monOrOhpkmIfTracked(mon) : undefined}
                   zIndex={1}
                   onDrop={(importedMons) => {
                     if (importedMons) {
