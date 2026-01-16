@@ -117,14 +117,16 @@ function PokedexTab({ pokedex, species, onClick, selected, style }: PokedexTabPr
         ...style,
       }}
     >
-      <PokemonIcon
-        className="pokedex-icon-container"
-        dexNumber={species.nationalDex}
-        formeNumber={formeIndex}
-        silhouette={!isSeen}
-        grayedOut={!isCaught}
-        style={{ minWidth: 32, minHeight: 32 }}
-      />
+      {/* pokedex-icon-container must be on an outer element for unknown reasons */}
+      <div className="pokedex-icon-container">
+        <PokemonIcon
+          dexNumber={species.nationalDex}
+          formeNumber={formeIndex}
+          silhouette={!isSeen}
+          grayedOut={!isCaught}
+          style={{ minWidth: 32, height: 36 }} // leave this alone
+        />
+      </div>
       {species.nationalDex}. {species.name}
       <div style={{ flex: 1 }} />
       {maxStatus === 'ShinyCaught' && (
