@@ -57,14 +57,21 @@ export const isRadicalRedSave = (bytes: Uint8Array): boolean => {
 }
 
 export const parseSave = (bytes: Uint8Array): SaveData => {
+  console.log('=== SAVE PARSER DEBUG ===')
+  console.log('Save file size:', bytes.length)
+
   // Parse all 14 sectors from the first save slot
   const sectors: Sector[] = []
   for (let i = 0; i < 14; i++) {
     sectors.push(parseSector(bytes, i))
   }
 
+  console.log('Sectors before sorting:', sectors.map(s => ({ sectionID: s.sectionID, saveIndex: s.saveIndex })))
+
   // Sort sectors by section ID
   sectors.sort((a, b) => a.sectionID - b.sectionID)
+
+  console.log('Sectors after sorting:', sectors.map(s => ({ sectionID: s.sectionID, saveIndex: s.saveIndex })))
 
   // Extract trainer info from sector 0
   const trainerName = gen3StringToUTF(sectors[0].data, 0x00, 7)
@@ -73,9 +80,22 @@ export const parseSave = (bytes: Uint8Array): SaveData => {
   const securityKey = bytesToUint32LittleEndian(sectors[0].data, 0xaf8)
   const money = bytesToUint32LittleEndian(sectors[1].data, 0x290) ^ securityKey
 
+  console.log('Trainer Info:')
+  console.log('  Name:', trainerName)
+  console.log('  ID:', trainerID)
+  console.log('  Secret ID:', secretID)
+  console.log('  Money:', money)
+  console.log('  Security Key:', securityKey)
+
   // Concatenate PC data from sectors 5-11
   const fullSectionsUsed = Math.floor((NUM_BOXES * POKEMON_SIZE * POKEMON_PER_BOX) / 4080)
   const leftoverBytes = (NUM_BOXES * POKEMON_SIZE * POKEMON_PER_BOX) % 4080
+
+  console.log('PC Data Info:')
+  console.log('  Total PC bytes:', NUM_BOXES * POKEMON_SIZE * POKEMON_PER_BOX)
+  console.log('  Full sections used:', fullSectionsUsed)
+  console.log('  Leftover bytes:', leftoverBytes)
+  console.log('  PC sectors range:', `5-${5 + fullSectionsUsed}`)
 
   const pcDataContiguous = new Uint8Array(4080 * fullSectionsUsed + leftoverBytes + 4)
 
@@ -83,10 +103,13 @@ export const parseSave = (bytes: Uint8Array): SaveData => {
     const startOffset = i * 4080
     const length = i < fullSectionsUsed ? 4080 : leftoverBytes + 4
     pcDataContiguous.set(sector.data.slice(0, length), startOffset)
+    console.log(`  Copying sector ${sector.sectionID}: ${length} bytes at offset ${startOffset}`)
   })
 
   // Parse boxes
   const boxes: Box[] = []
+  let totalPokemonFound = 0
+
   for (let boxIdx = 0; boxIdx < NUM_BOXES; boxIdx++) {
     const box: Box = {
       name: `Box ${boxIdx + 1}`,
@@ -102,6 +125,18 @@ export const parseSave = (bytes: Uint8Array): SaveData => {
         const pokemon = parsePokemon(pokemonBytes)
         if (pokemon) {
           box.pokemon[slotIdx] = pokemon
+          totalPokemonFound++
+
+          // Log first 5 Pokemon
+          if (totalPokemonFound <= 5) {
+            console.log(`Pokemon ${totalPokemonFound}:`, {
+              box: boxIdx,
+              slot: slotIdx,
+              species: pokemon.dexNum,
+              nickname: pokemon.nickname,
+              level: pokemon.level
+            })
+          }
         }
       } catch (e) {
         console.error(`Error parsing Pokemon at box ${boxIdx}, slot ${slotIdx}:`, e)
@@ -110,6 +145,10 @@ export const parseSave = (bytes: Uint8Array): SaveData => {
 
     boxes.push(box)
   }
+
+  console.log('Total Pokemon found:', totalPokemonFound)
+  console.log('=== END DEBUG ===')
+  console.log('')
 
   return {
     boxes,
