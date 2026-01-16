@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Save File Parser Test</title>
+</head>
+<body>
+    <h1>Radical Red Save Parser Test</h1>
+    <input type="file" id="fileInput" accept=".sav">
+    <div id="output" style="white-space: pre-wrap; font-family: monospace; margin-top: 20px;"></div>
+
+    <script type="module">
+        const output = document.getElementById('output');
+
+        // Byte conversion functions
+        const bytesToNumberBigEndian = (bytes) => {
+            let value = 0;
+            bytes.forEach((byte) => {
+                value *= 256;
+                value += byte;
+            });
+            return value;
+        };
+
+        const bytesToNumberLittleEndian = (bytes) => {
+            return bytesToNumberBigEndian(bytes.slice().reverse());
+        };
+
+        const bytesToUint16LittleEndian = (bytes, index) => {
+            return bytesToNumberLittleEndian(bytes.slice(index, index + 2));
+        };
+
+        const bytesToUint32LittleEndian = (bytes, index) => {
+            return bytesToNumberLittleEndian(bytes.slice(index, index + 4));
+        };
+
+        // Gen3 string conversion
+        const Gen3CharacterSet = [
+            ' ', 'À', 'Á', 'Â', 'Ç', 'È', 'É', 'Ê', 'Ë', 'Ì', 'こ', 'Î', 'Ï', 'Ò', 'Ó', 'Ô',
+            'Œ', 'Ù', 'Ú', 'Û', 'Ñ', 'ß', 'à', 'á', 'ね', 'Ç', 'È', 'é', 'ê', 'ë', 'ì', 'í',
+            'î', 'ï', 'ò', 'ó', 'ô', 'œ', 'ù', 'ú', 'û', 'ñ', 'º', 'ª', '⒅', '&', '+', 'あ',
+            'ぃ', 'ぅ', 'ぇ', 'ぉ', 'ゃ', '=', 'ょ', 'が', 'ぎ', 'ぐ', 'げ', 'ご', 'ざ', 'じ', 'ず',
+            'ぜ', 'ぞ', 'だ', 'ぢ', 'づ', 'で', 'ど', 'ば', 'び', 'ぶ', 'べ', 'ぼ', 'ぱ', 'ぴ', 'ぷ',
+            'ぺ', 'ぽ', 'っ', '¿', '¡', 'PK', 'MN', 'オ', 'カ', 'キ', 'ク', 'ケ', 'Í', 'コ', 'サ',
+            'シ', 'ス', 'セ', 'ソ', 'タ', 'チ', 'ツ', 'テ', 'ト', 'ナ', 'ニ', 'ヌ', 'ネ', 'ノ', 'ハ',
+            'ヒ', 'フ', 'ヘ', 'ホ', 'í', 'ミ', 'ム', 'メ', 'モ', 'ヤ', 'ユ', 'ヨ', 'ラ', 'リ', 'ル',
+            'レ', 'ロ', 'ワ', 'ヲ', 'ン', 'ァ', 'ィ', 'ゥ', 'ェ', 'ォ', 'ャ', 'ュ', 'ョ', 'が', 'ぎ',
+            'ぐ', 'げ', 'ご', 'ざ', 'じ', 'ず', 'ぜ', 'ぞ', 'だ', 'ぢ', 'づ', 'で', 'ど', 'ば', 'び',
+            'ぶ', 'べ', 'ぼ', 'ぱ', 'ぴ', 'ぷ', 'ぺ', 'ぽ', 'っ', '0', '1', '2', '3', '4', '5',
+            '6', '7', '8', '9', '!', '?', '.', '-', '・', '...', '"', '"', "'", "'", '♂', '♀',
+            '$', ',', '×', '/', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
+            'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b',
+            'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
+            's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '▶', ':', 'Ä', 'Ö', 'Ü', 'ä', 'ö', 'ü',
+        ];
+
+        const gen3StringToUTF = (bytes, start, maxLength) => {
+            let result = '';
+            for (let i = start; i < start + maxLength && i < bytes.length; i++) {
+                const byte = bytes[i];
+                if (byte === 0xff || byte === 0x00) break;
+                if (byte < Gen3CharacterSet.length) {
+                    result += Gen3CharacterSet[byte];
+                } else {
+                    result += '?';
+                }
+            }
+            return result.trim();
+        };
+
+        // Parse sector
+        const parseSector = (bytes, index) => {
+            const data = bytes.slice(index * 0x1000, index * 0x1000 + 4080);
+            const sectionID = bytesToUint16LittleEndian(bytes, index * 0x1000 + 0xff4);
+            const checksum = bytesToUint16LittleEndian(bytes, index * 0x1000 + 0xff6);
+            const signature = bytesToUint32LittleEndian(bytes, index * 0x1000 + 0xff8);
+            const saveIndex = bytesToUint32LittleEndian(bytes, index * 0x1000 + 0xffc);
+
+            return { data, sectionID, checksum, signature, saveIndex };
+        };
+
+        // Parse save
+        const parseSave = (bytes) => {
+            let log = '';
+
+            log += `Save file size: ${bytes.length} bytes\n`;
+            log += `Expected sizes: ${JSON.stringify([0x20000, 0x20010])}\n\n`;
+
+            // Parse all 14 sectors from the first save slot
+            const sectors = [];
+            for (let i = 0; i < 14; i++) {
+                sectors.push(parseSector(bytes, i));
+            }
+
+            log += 'Sectors before sorting:\n';
+            sectors.forEach((s, i) => {
+                log += `  Sector ${i}: sectionID=${s.sectionID}\n`;
+            });
+
+            // Sort sectors by section ID
+            sectors.sort((a, b) => a.sectionID - b.sectionID);
+
+            log += '\nSectors after sorting:\n';
+            sectors.forEach((s, i) => {
+                log += `  Sector ${i}: sectionID=${s.sectionID}\n`;
+            });
+
+            // Extract trainer info from sector 0
+            const trainerName = gen3StringToUTF(sectors[0].data, 0x00, 7);
+            const trainerID = bytesToUint16LittleEndian(sectors[0].data, 0x0a);
+            const secretID = bytesToUint16LittleEndian(sectors[0].data, 0x0c);
+            const securityKey = bytesToUint32LittleEndian(sectors[0].data, 0xaf8);
+            const money = bytesToUint32LittleEndian(sectors[1].data, 0x290) ^ securityKey;
+
+            log += `\nTrainer Info:\n`;
+            log += `  Name: ${trainerName}\n`;
+            log += `  ID: ${trainerID}\n`;
+            log += `  Secret ID: ${secretID}\n`;
+            log += `  Money: ${money}\n`;
+
+            // Concatenate PC data from sectors 5-11
+            const POKEMON_SIZE = 58;
+            const POKEMON_PER_BOX = 30;
+            const NUM_BOXES = 18;
+
+            const fullSectionsUsed = Math.floor((NUM_BOXES * POKEMON_SIZE * POKEMON_PER_BOX) / 4080);
+            const leftoverBytes = (NUM_BOXES * POKEMON_SIZE * POKEMON_PER_BOX) % 4080;
+
+            const pcDataContiguous = new Uint8Array(4080 * fullSectionsUsed + leftoverBytes + 4);
+
+            sectors.slice(5, 5 + fullSectionsUsed + 1).forEach((sector, i) => {
+                const startOffset = i * 4080;
+                const length = i < fullSectionsUsed ? 4080 : leftoverBytes + 4;
+                pcDataContiguous.set(sector.data.slice(0, length), startOffset);
+            });
+
+            log += `\nPC Data:\n`;
+            log += `  Total size: ${NUM_BOXES * POKEMON_SIZE * POKEMON_PER_BOX} bytes\n`;
+            log += `  Full sectors: ${fullSectionsUsed}\n`;
+            log += `  Leftover bytes: ${leftoverBytes}\n`;
+
+            // Parse first few Pokemon
+            log += `\nFirst 10 Pokemon:\n`;
+            for (let i = 0; i < 10; i++) {
+                const offset = 4 + i * POKEMON_SIZE;
+                const pokemonBytes = pcDataContiguous.slice(offset, offset + POKEMON_SIZE);
+
+                const speciesIndex = bytesToUint16LittleEndian(pokemonBytes, 0x1c);
+                const nickname = gen3StringToUTF(pokemonBytes, 0x08, 10);
+                const trainerName = gen3StringToUTF(pokemonBytes, 0x14, 7);
+                const level = Math.floor(Math.pow(bytesToUint32LittleEndian(pokemonBytes, 0x20) / 1000, 1/3)) + 1;
+
+                if (speciesIndex !== 0) {
+                    log += `  Pokemon ${i}: Species=${speciesIndex}, Nickname="${nickname}", Level=${level}, Trainer="${trainerName}"\n`;
+                } else {
+                    log += `  Pokemon ${i}: Empty slot\n`;
+                }
+            }
+
+            return log;
+        };
+
+        // File upload handler
+        document.getElementById('fileInput').addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const arrayBuffer = e.target.result;
+                const bytes = new Uint8Array(arrayBuffer);
+
+                try {
+                    const result = parseSave(bytes);
+                    output.textContent = result;
+                } catch (err) {
+                    output.textContent = `Error: ${err.message}\n${err.stack}`;
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        });
+    </script>
+</body>
+</html>
