@@ -158,7 +158,6 @@ export default class PK3 {
 
       const moveFilter = MoveFilter.fromPkmClass(PK3)
       this.moves = moveFilter.moves(other)
-      console.error(other.nickname, this.moves, other.moves)
       this.movePP = moveFilter.movePp(other, this.format)
       this.movePPUps = moveFilter.movePpUps(other)
 

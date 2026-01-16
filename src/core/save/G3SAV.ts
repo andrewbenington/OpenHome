@@ -301,7 +301,7 @@ export class G3SAV extends OfficialSAV<PK3> {
             pcBytes.set(new Uint8Array(mon.toPCBytes()), 0)
           }
         } catch (e) {
-          console.error(e)
+          console.error(`G3SAV: ${e}`)
         }
       }
       this.primarySave.pcDataContiguous.set(pcBytes, 4 + monOffset * 80)

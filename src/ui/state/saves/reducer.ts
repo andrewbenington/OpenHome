@@ -51,6 +51,10 @@ export type SaveMonLocation = {
 
 export type MonLocation = SaveMonLocation | HomeMonLocation
 
+export function isMonLocation(obj: object | undefined): obj is MonLocation {
+  return obj !== undefined && 'box' in obj && 'boxSlot' in obj
+}
+
 export type MonWithLocation = MonLocation & {
   mon: PKMInterface
 }

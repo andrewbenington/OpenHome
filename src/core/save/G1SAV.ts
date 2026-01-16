@@ -130,7 +130,7 @@ export class G1SAV extends OfficialSAV<PK1> {
             mon.language = Language.English
             this.boxes[boxNumber].boxSlots[monIndex] = mon
           } catch (e) {
-            console.error(e)
+            console.error(`G1SAV: ${e}`)
           }
         }
       }

@@ -10,7 +10,7 @@ import {
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getItemIconPath } from '@openhome-ui/images/items'
 import { useItems } from '@openhome-ui/state/items'
-import { MonLocation, useSaves } from '@openhome-ui/state/saves'
+import { isMonLocation, useSaves } from '@openhome-ui/state/saves'
 import { MetadataLookup } from '@pkm-rs/pkg'
 import { ReactNode, useCallback, useState } from 'react'
 import { displayIndexAdder, isBattleFormeItem, isMegaStone } from 'src/core/pkm/util'
@@ -140,8 +140,4 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
       {children}
     </DndContext>
   )
-}
-
-function isMonLocation(obj: object | undefined): obj is MonLocation {
-  return obj !== undefined && 'box' in obj && 'box_slot' in obj
 }

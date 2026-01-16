@@ -102,7 +102,7 @@ export abstract class G4SAV extends OfficialSAV<PK4> {
             this.boxes[box].boxSlots[monIndex] = mon
           }
         } catch (e) {
-          console.error(e)
+          console.error(`G4SAV: ${e}`)
         }
       }
     }
@@ -143,7 +143,7 @@ export abstract class G4SAV extends OfficialSAV<PK4> {
             this.bytes.set(new Uint8Array(mon.toPCBytes()), writeIndex)
           }
         } catch (e) {
-          console.error(e)
+          console.error(`G4SAV.prepareForSaving: ${e}`)
         }
       } else {
         this.bytes.set(new Uint8Array(136), writeIndex)

@@ -100,7 +100,7 @@ export const getMonGen345Identifier = (mon: PKMInterface) => {
       ).concat(bytesToString(secretId, 2))}-${bytesToString(pk3CompatiblePID, 4)}`
     }
   } catch (error) {
-    console.error(error)
+    console.error(`getMonGen345Identifier: ${error}`)
   }
   return undefined
 }
