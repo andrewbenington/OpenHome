@@ -56,6 +56,10 @@ export class HomeBox {
   containsMons() {
     return this.boxSlots.filter(filterUndefined).length > 0
   }
+
+  nameOrDefault() {
+    return this.name ?? `Box ${this.index + 1}`
+  }
 }
 
 export class HomeData {

@@ -68,8 +68,9 @@
   align-items: center;
   text-align: center;
   flex: 3;
-  width: 0px;
-  min-width: fit-content;
+  min-width: 50%;
+  width: fit-content;
+  max-width: 80%;
   margin: 0px 6px;
 }
 
@@ -86,6 +87,12 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
+}
+
+.horiz-collapse {
+  visibility: collapse;
+  width: 0px !important;
+  height: 0px !important;
 }
 
 .save-header {
@@ -117,11 +124,41 @@
   right: 0;
 }
 
+.box-overview-container {
+  display: flex;
+  align-items: start;
+  justify-content: start;
+  width: 100%;
+  height: 120px;
+}
+
 .box-overview-button {
-  height: fit-content;
-  padding: 4px 8px;
+  align-items: start;
+  padding: 4px 4px 0px 4px;
   width: 100%;
   min-width: 100%;
+  height: 100%;
+}
+
+.box-overview-title-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.box-overview-title {
+  display: flex;
+  display: -webkit-box;
+  flex-direction: column;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-clamp: 3;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
 }
 
 .ToggleGroup {

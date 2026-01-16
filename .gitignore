@@ -33,6 +33,8 @@ __pycache__/
 
 # js
 generate/out/
+# if npm is accidentally used, this will regenerate
+package-lock.json
 
 planning.md
 

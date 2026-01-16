@@ -21,5 +21,8 @@ export function includeClass(className: string) {
         },
       }
     },
+    if(condition: boolean | undefined) {
+      return condition ? className : undefined
+    },
   }
 }
