@@ -138,9 +138,9 @@ export class HomeData {
   }
 
   setPokemon(location: BankBoxCoordinates, identifier: OhpkmIdentifier | undefined) {
-    if (location.box_slot >= HomeData.BOX_COLUMNS * HomeData.BOX_ROWS) {
+    if (location.boxSlot >= HomeData.BOX_COLUMNS * HomeData.BOX_ROWS) {
       throw new Error(
-        `Box slot ${location.box_slot} exceeds box size (${HomeData.BOX_COLUMNS * HomeData.BOX_ROWS}))`
+        `Box slot ${location.boxSlot} exceeds box size (${HomeData.BOX_COLUMNS * HomeData.BOX_ROWS}))`
       )
     }
 
@@ -160,12 +160,12 @@ export class HomeData {
 
     this.updatedBoxSlots.push(location)
     if (identifier) {
-      this._banks[location.bank].boxes[location.box].identifiers.set(location.box_slot, identifier)
-      this.boxes[location.box].boxSlots[location.box_slot] = identifier
+      this._banks[location.bank].boxes[location.box].identifiers.set(location.boxSlot, identifier)
+      this.boxes[location.box].boxSlots[location.boxSlot] = identifier
     } else {
-      this._banks[location.bank].boxes[location.box].identifiers.delete(location.box_slot)
+      this._banks[location.bank].boxes[location.box].identifiers.delete(location.boxSlot)
       if (location.bank === this._currentBankIndex) {
-        this.boxes[location.box].boxSlots[location.box_slot] = undefined
+        this.boxes[location.box].boxSlots[location.boxSlot] = undefined
       }
     }
   }
@@ -287,9 +287,9 @@ export class HomeData {
   }
 
   slotIsEmpty(location: BankBoxCoordinates): boolean {
-    if (location.box_slot >= HomeData.BOX_COLUMNS * HomeData.BOX_ROWS) {
+    if (location.boxSlot >= HomeData.BOX_COLUMNS * HomeData.BOX_ROWS) {
       throw new Error(
-        `Box slot ${location.box_slot} exceeds box size (${HomeData.BOX_COLUMNS * HomeData.BOX_ROWS}))`
+        `Box slot ${location.boxSlot} exceeds box size (${HomeData.BOX_COLUMNS * HomeData.BOX_ROWS}))`
       )
     }
 
@@ -307,7 +307,7 @@ export class HomeData {
       )
     }
 
-    return !bank.boxes[location.box].identifiers.has(location.box_slot)
+    return !bank.boxes[location.box].identifiers.has(location.boxSlot)
   }
 
   displayState() {
@@ -324,10 +324,10 @@ export class HomeData {
     const firstOpenIndex = this.boxes[boxIndex].firstEmptyIndex()
     if (firstOpenIndex === undefined) return undefined
     return {
-      is_home: true,
+      isHome: true,
       bank: this.currentBankIndex,
       box: boxIndex,
-      box_slot: firstOpenIndex,
+      boxSlot: firstOpenIndex,
     }
   }
 
@@ -379,15 +379,11 @@ export class HomeData {
 export interface BankBoxCoordinates {
   bank: number
   box: number
-  box_slot: number
+  boxSlot: number
 }
 
-export function bankBoxCoordinates(
-  bank: number,
-  box: number,
-  box_slot: number
-): BankBoxCoordinates {
-  return { bank, box, box_slot }
+export function bankBoxCoordinates(bank: number, box: number, boxSlot: number): BankBoxCoordinates {
+  return { bank, box, boxSlot }
 }
 
 export type AddBoxLocation = 'start' | 'end' | ['before', number] | ['after', number]

@@ -6,7 +6,7 @@ import { Item } from '@pokemon-resources/consts/Items'
 import { BDSP_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
 import { OHPKM } from '../../pkm/OHPKM'
 import { md5Digest } from '../encryption/Encryption'
-import { Box, OfficialSAV, SaveMonLocation } from '../interfaces'
+import { Box, BoxAndSlot, OfficialSAV } from '../interfaces'
 import { PathData } from '../util/path'
 
 const SAVE_SIZE_BYTES_MIN = 900000
@@ -51,7 +51,7 @@ export class BDSPSAV extends OfficialSAV<PB8> {
   myStatusBlock: MyStatusBlock
   boxes: Box<PB8>[] = []
 
-  updatedBoxSlots: SaveMonLocation[] = []
+  updatedBoxSlots: BoxAndSlot[] = []
 
   constructor(path: PathData, bytes: Uint8Array) {
     super()
@@ -133,7 +133,7 @@ export class BDSPSAV extends OfficialSAV<PB8> {
   }
 
   prepareForSaving() {
-    this.updatedBoxSlots.forEach(({ box, index: monIndex }) => {
+    this.updatedBoxSlots.forEach(({ box, boxSlot: monIndex }) => {
       const mon = this.boxes[box].boxSlots[monIndex]
 
       const writeIndex =

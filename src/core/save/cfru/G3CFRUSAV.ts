@@ -6,7 +6,7 @@ import {
   uint32ToBytesLittleEndian,
 } from '@openhome-core/save/util/byteLogic'
 import { Gender, OriginGame } from '@pkm-rs/pkg'
-import { Box, PluginSAV, SaveMonLocation } from '../interfaces'
+import { Box, BoxAndSlot, PluginSAV } from '../interfaces'
 import { LookupType } from '../util'
 import { PathData } from '../util/path'
 import { gen3StringToUTF } from '../util/Strings/StringConverter'
@@ -180,7 +180,7 @@ export abstract class G3CFRUSAV<T extends PluginPKMInterface> extends PluginSAV<
 
   invalid: boolean = false
   tooEarlyToOpen: boolean = false
-  updatedBoxSlots: SaveMonLocation[] = []
+  updatedBoxSlots: BoxAndSlot[] = []
 
   constructor(path: PathData, bytes: Uint8Array, pkmType: any) {
     super()
@@ -218,7 +218,7 @@ export abstract class G3CFRUSAV<T extends PluginPKMInterface> extends PluginSAV<
   calculateChecksum?: (() => number) | undefined
 
   prepareForSaving() {
-    this.updatedBoxSlots.forEach(({ box, index }) => {
+    this.updatedBoxSlots.forEach(({ box, boxSlot: index }) => {
       const monOffset = 30 * box + index
       const pcBytes = new Uint8Array(58) // Per pokemon bytes
 

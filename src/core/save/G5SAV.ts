@@ -9,7 +9,7 @@ import { unique } from '@openhome-core/util/functional'
 import { Gender, OriginGame } from '@pkm-rs/pkg'
 import { PK5 } from '@pokemon-files/pkm'
 import { OHPKM } from '../pkm/OHPKM'
-import { Box, OfficialSAV, SaveMonLocation } from './interfaces'
+import { Box, BoxAndSlot, OfficialSAV } from './interfaces'
 import { hasDesamumeFooter, LookupType } from './util'
 import { PathData } from './util/path'
 
@@ -51,7 +51,7 @@ export abstract class G5SAV extends OfficialSAV<PK5> {
   invalid: boolean = false
   tooEarlyToOpen: boolean = false
 
-  updatedBoxSlots: SaveMonLocation[] = []
+  updatedBoxSlots: BoxAndSlot[] = []
 
   trainerDataOffset: number = 0x19400
   static originOffset = 0x1941f
@@ -142,7 +142,7 @@ export abstract class G5SAV extends OfficialSAV<PK5> {
   }
 
   prepareForSaving() {
-    this.updatedBoxSlots.forEach(({ box, index }) => {
+    this.updatedBoxSlots.forEach(({ box, boxSlot: index }) => {
       const mon = this.boxes[box].boxSlots[index]
 
       const writeIndex = PC_OFFSET + BOX_SIZE * box + 136 * index

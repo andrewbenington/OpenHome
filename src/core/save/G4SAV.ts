@@ -8,7 +8,7 @@ import { gen4StringToUTF } from '@openhome-core/save/util/Strings/StringConverte
 import { OriginGame } from '@pkm-rs/pkg'
 import { PK4 } from '@pokemon-files/pkm'
 import { OHPKM } from '../pkm/OHPKM'
-import { Box, OfficialSAV, SaveMonLocation } from './interfaces'
+import { Box, BoxAndSlot, OfficialSAV } from './interfaces'
 import { LookupType } from './util'
 import { PathData } from './util/path'
 
@@ -42,7 +42,7 @@ export abstract class G4SAV extends OfficialSAV<PK4> {
   invalid: boolean = false
   tooEarlyToOpen: boolean = false
 
-  updatedBoxSlots: SaveMonLocation[] = []
+  updatedBoxSlots: BoxAndSlot[] = []
 
   currentSaveStorageBlockOffset: number = 0
 
@@ -129,7 +129,7 @@ export abstract class G4SAV extends OfficialSAV<PK4> {
   }
 
   prepareForSaving() {
-    this.updatedBoxSlots.forEach(({ box, index }) => {
+    this.updatedBoxSlots.forEach(({ box, boxSlot: index }) => {
       const mon = this.boxes[box].boxSlots[index]
 
       const writeIndex = this.currentSaveBoxStartOffset + this.boxSize * box + 136 * index

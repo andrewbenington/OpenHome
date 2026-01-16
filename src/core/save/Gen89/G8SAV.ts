@@ -8,7 +8,7 @@ import {
   SCValueBlock,
 } from '../encryption/SwishCrypto/SCBlock'
 import { SwishCrypto } from '../encryption/SwishCrypto/SwishCrypto'
-import { Box, OfficialSAV, SaveMonLocation } from '../interfaces'
+import { Box, BoxAndSlot, OfficialSAV } from '../interfaces'
 import { PathData } from '../util/path'
 import { BoxNamesBlock } from './BoxNamesBlock'
 
@@ -40,7 +40,7 @@ export abstract class G89SAV<P extends PK8 | PB8 | PA8 | PK9> extends OfficialSA
   invalid: boolean = false
   tooEarlyToOpen: boolean = false
 
-  updatedBoxSlots: SaveMonLocation[] = []
+  updatedBoxSlots: BoxAndSlot[] = []
 
   constructor(path: PathData, bytes: Uint8Array) {
     super()
@@ -98,7 +98,7 @@ export abstract class G89SAV<P extends PK8 | PB8 | PA8 | PK9> extends OfficialSA
   prepareForSaving() {
     const boxBlock = this.getBlockMust<SCObjectBlock>('Box', 'object')
 
-    this.updatedBoxSlots.forEach(({ box, index }) => {
+    this.updatedBoxSlots.forEach(({ box, boxSlot: index }) => {
       const mon = this.boxes[box].boxSlots[index]
 
       const writeIndex = this.getBoxSizeBytes() * box + this.getMonBoxSizeBytes() * index

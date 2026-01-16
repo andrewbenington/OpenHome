@@ -36,15 +36,15 @@ export type OpenSavesState = {
 
 export type HomeMonLocation = {
   box: number
-  box_slot: number
-  is_home: true
+  boxSlot: number
+  isHome: true
   bank: number
   save?: undefined
 }
 export type SaveMonLocation = {
   box: number
-  box_slot: number
-  is_home: false
+  boxSlot: number
+  isHome: false
   bank?: undefined
   saveIdentifier: SaveIdentifier
 }
@@ -391,13 +391,13 @@ export function saveFromIdentifier(state: OpenSavesState, identifier: SaveIdenti
 }
 
 export function getMonAtLocation(state: OpenSavesState, location: MonLocation) {
-  if (location.is_home) {
-    return state.homeData?.boxes[location.box].boxSlots[location.box_slot]
+  if (location.isHome) {
+    return state.homeData?.boxes[location.box].boxSlots[location.boxSlot]
   }
 
   if (location.saveIdentifier in state.openSaves) {
     const save = saveFromIdentifier(state, location.saveIdentifier)
-    return save?.boxes[location.box].boxSlots[location.box_slot]
+    return save?.boxes[location.box].boxSlots[location.boxSlot]
   }
   return undefined
 }

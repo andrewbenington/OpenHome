@@ -147,7 +147,7 @@ describe('gen 8 save files', () => {
 
     ohpkm.nickname = 'NEW NAME'
     swordSave.boxes[1].boxSlots[3] = convertToPk8(ohpkm)
-    swordSave.updatedBoxSlots.push({ box: 1, index: 3 })
+    swordSave.updatedBoxSlots.push({ box: 1, boxSlot: 3 })
 
     swordSave.prepareForSaving()
     const modified = new SwShSAV(swordPath, swordSave.bytes)
@@ -167,7 +167,7 @@ describe('gen 8 save files', () => {
 
     ohpkm.nickname = 'NEW NAME'
     swordSave.boxes[1].boxSlots[3] = convertToPk8(ohpkm)
-    swordSave.updatedBoxSlots.push({ box: 1, index: 3 })
+    swordSave.updatedBoxSlots.push({ box: 1, boxSlot: 3 })
 
     swordSave.prepareForSaving()
     const modified = new SwShSAV(swordPath, swordSave.bytes)
@@ -189,10 +189,10 @@ describe('gen 8 save files', () => {
 
     ohpkm.nickname = 'NEW NAME'
     arceusSave.boxes[13].boxSlots[1] = convertToPa8(ohpkm)
-    arceusSave.updatedBoxSlots.push({ box: 13, index: 1 })
+    arceusSave.updatedBoxSlots.push({ box: 13, boxSlot: 1 })
 
     arceusSave.boxes[2].boxSlots[8] = convertToPa8(magmortar)
-    arceusSave.updatedBoxSlots.push({ box: 2, index: 8 })
+    arceusSave.updatedBoxSlots.push({ box: 2, boxSlot: 8 })
 
     arceusSave.prepareForSaving()
     const modified = new LASAV(arceusPath, arceusSave.bytes)

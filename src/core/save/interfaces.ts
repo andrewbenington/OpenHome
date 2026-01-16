@@ -16,9 +16,9 @@ export class Box<P extends PKMInterface> {
   }
 }
 
-export interface SaveMonLocation {
+export interface BoxAndSlot {
   box: number
-  index: number
+  boxSlot: number
 }
 
 export type SlotMetadata =
@@ -55,7 +55,7 @@ export interface BaseSAV<P extends PKMInterface = PKMInterface> {
   invalid: boolean
   tooEarlyToOpen: boolean
 
-  updatedBoxSlots: SaveMonLocation[]
+  updatedBoxSlots: BoxAndSlot[]
 
   isPlugin: boolean
 
@@ -89,7 +89,7 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
   abstract bytes: Uint8Array<ArrayBufferLike>
   abstract invalid: boolean
   abstract tooEarlyToOpen: boolean
-  abstract updatedBoxSlots: SaveMonLocation[]
+  abstract updatedBoxSlots: BoxAndSlot[]
   abstract getCurrentBox(): Box<P>
   abstract supportsMon(dexNumber: number, formeNumber: number): boolean
   abstract supportsItem(itemIndex: number): boolean
@@ -159,7 +159,7 @@ export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implement
   abstract bytes: Uint8Array<ArrayBufferLike>
   abstract invalid: boolean
   abstract tooEarlyToOpen: boolean
-  abstract updatedBoxSlots: SaveMonLocation[]
+  abstract updatedBoxSlots: BoxAndSlot[]
   abstract getCurrentBox(): Box<P>
   abstract supportsMon(dexNumber: number, formeNumber: number): boolean
   abstract supportsItem(itemIndex: number): boolean

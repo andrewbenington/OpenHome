@@ -8,7 +8,7 @@ import { utf16BytesToString } from '@openhome-core/save/util/Strings/StringConve
 import { Gender, OriginGame } from '@pkm-rs/pkg'
 import { PK7 } from '@pokemon-files/pkm'
 import { OHPKM } from '../pkm/OHPKM'
-import { Box, OfficialSAV, SaveMonLocation } from './interfaces'
+import { Box, BoxAndSlot, OfficialSAV } from './interfaces'
 import { SIZE_USUM } from './util'
 import { PathData } from './util/path'
 
@@ -44,7 +44,7 @@ export abstract class G7SAV extends OfficialSAV<PK7> {
   invalid: boolean = false
   tooEarlyToOpen: boolean = false
 
-  updatedBoxSlots: SaveMonLocation[] = []
+  updatedBoxSlots: BoxAndSlot[] = []
 
   trainerDataOffset: number = 0x1200
 
@@ -101,7 +101,7 @@ export abstract class G7SAV extends OfficialSAV<PK7> {
   abstract getPcOffset(): number
 
   prepareForSaving() {
-    this.updatedBoxSlots.forEach(({ box, index }) => {
+    this.updatedBoxSlots.forEach(({ box, boxSlot: index }) => {
       const writeIndex = this.getPcOffset() + BOX_SIZE * box + 232 * index
       const mon = this.boxes[box].boxSlots[index]
       if (!mon) {

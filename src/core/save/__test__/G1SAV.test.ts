@@ -51,7 +51,7 @@ test('removing mon shifts others in box', () => {
   const modifiedSaveFile1 = result1.value as G1SAV
 
   modifiedSaveFile1.boxes[7].boxSlots[0] = undefined
-  modifiedSaveFile1.updatedBoxSlots.push({ box: 7, index: 0 })
+  modifiedSaveFile1.updatedBoxSlots.push({ box: 7, boxSlot: 0 })
   modifiedSaveFile1.prepareForSaving()
 
   const result2 = buildUnknownSaveFile(emptyPathData, new Uint8Array(modifiedSaveFile1.bytes), [
@@ -78,7 +78,7 @@ test('inserting mon works', () => {
   const modifiedSaveFile1 = result1.value as G1SAV
 
   modifiedSaveFile1.boxes[7].boxSlots[11] = new PK1(slowbroOH)
-  modifiedSaveFile1.updatedBoxSlots.push({ box: 7, index: 0 })
+  modifiedSaveFile1.updatedBoxSlots.push({ box: 7, boxSlot: 0 })
   modifiedSaveFile1.prepareForSaving()
 
   const result2 = buildUnknownSaveFile(emptyPathData, new Uint8Array(modifiedSaveFile1.bytes), [

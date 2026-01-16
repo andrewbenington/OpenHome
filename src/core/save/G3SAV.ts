@@ -11,7 +11,7 @@ import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { GEN3_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
 import { OHPKM } from '../pkm/OHPKM'
 import { filterUndefined } from '../util/sort'
-import { Box, OfficialSAV, SaveMonLocation } from './interfaces'
+import { Box, BoxAndSlot, OfficialSAV } from './interfaces'
 import { LookupType } from './util'
 import { emptyPathData, PathData } from './util/path'
 
@@ -222,7 +222,7 @@ export class G3SAV extends OfficialSAV<PK3> {
   invalid: boolean = false
   tooEarlyToOpen: boolean = false
 
-  updatedBoxSlots: SaveMonLocation[] = []
+  updatedBoxSlots: BoxAndSlot[] = []
 
   constructor(path: PathData, bytes: Uint8Array) {
     super()
@@ -286,7 +286,7 @@ export class G3SAV extends OfficialSAV<PK3> {
   }
 
   prepareForSaving() {
-    this.updatedBoxSlots.forEach(({ box, index }) => {
+    this.updatedBoxSlots.forEach(({ box, boxSlot: index }) => {
       const monOffset = 30 * box + index
       const pcBytes = new Uint8Array(80)
       const mon = this.boxes[box].boxSlots[index]

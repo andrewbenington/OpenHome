@@ -8,7 +8,7 @@ import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { LGPE_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
 import { OHPKM } from '../pkm/OHPKM'
 import { CRC16_NoInvert } from './encryption/Encryption'
-import { Box, OfficialSAV, SaveMonLocation, SlotMetadata } from './interfaces'
+import { Box, BoxAndSlot, OfficialSAV, SlotMetadata } from './interfaces'
 import { bytesToUint16LittleEndian, bytesToUint32LittleEndian } from './util/byteLogic'
 import { PathData } from './util/path'
 
@@ -65,7 +65,7 @@ export class LGPESAV extends OfficialSAV<PB7> {
   invalid: boolean = false
   tooEarlyToOpen: boolean = false
 
-  updatedBoxSlots: SaveMonLocation[] = []
+  updatedBoxSlots: BoxAndSlot[] = []
 
   trainerDataOffset: number = 0x1000
 
@@ -117,7 +117,7 @@ export class LGPESAV extends OfficialSAV<PB7> {
   }
 
   prepareForSaving() {
-    this.updatedBoxSlots.forEach(({ box, index }) => {
+    this.updatedBoxSlots.forEach(({ box, boxSlot: index }) => {
       const mon = this.boxes[box].boxSlots[index]
 
       const monIndex = 30 * box + index

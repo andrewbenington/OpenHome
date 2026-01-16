@@ -129,7 +129,7 @@ export function useSaves(): SavesAndBanksManager {
   const getMonAtHomeLocation = useCallback(
     (location: HomeMonLocation) => {
       return loadedHomeData.banks[location.bank].boxes[location.box].identifiers.get(
-        location.box_slot
+        location.boxSlot
       )
     },
     [loadedHomeData.banks]
@@ -138,7 +138,7 @@ export function useSaves(): SavesAndBanksManager {
   const getMonAtSaveLocation = useCallback(
     (location: SaveMonLocation) => {
       const save = openSavesState.openSaves[location.saveIdentifier].save
-      return save.boxes[location.box].boxSlots[location.box_slot]
+      return save.boxes[location.box].boxSlots[location.boxSlot]
     },
     [openSavesState.openSaves]
   )
@@ -146,7 +146,7 @@ export function useSaves(): SavesAndBanksManager {
   const getMonAtLocation = useCallback(
     (location: MonLocation) => {
       let identifier: OhpkmIdentifier | undefined
-      if (!location.is_home) {
+      if (!location.isHome) {
         const mon = getMonAtSaveLocation(location)
         if (!mon) return undefined
         return ohpkmStore.loadIfTracked(mon) ?? mon
@@ -180,9 +180,9 @@ export function useSaves(): SavesAndBanksManager {
       }
 
       const destSaveMon = ohpkm ? ohpkmStore.trackAndConvertForSave(ohpkm, destSave) : undefined
-      const displacedMon = destSave.boxes[dest.box].boxSlots[dest.box_slot]
-      destSave.boxes[dest.box].boxSlots[dest.box_slot] = destSaveMon
-      destSave.updatedBoxSlots.push({ box: dest.box, index: dest.box_slot })
+      const displacedMon = destSave.boxes[dest.box].boxSlots[dest.boxSlot]
+      destSave.boxes[dest.box].boxSlots[dest.boxSlot] = destSaveMon
+      destSave.updatedBoxSlots.push({ box: dest.box, boxSlot: dest.boxSlot })
 
       return displacedMon
     },
@@ -197,9 +197,9 @@ export function useSaves(): SavesAndBanksManager {
       const save = openSavesState.openSaves[dest.saveIdentifier].save
 
       if (!identifier) {
-        const displacedMon = save.boxes[dest.box].boxSlots[dest.box_slot]
-        save.boxes[dest.box].boxSlots[dest.box_slot] = undefined
-        save.updatedBoxSlots.push({ box: dest.box, index: dest.box_slot })
+        const displacedMon = save.boxes[dest.box].boxSlots[dest.boxSlot]
+        save.boxes[dest.box].boxSlots[dest.boxSlot] = undefined
+        save.updatedBoxSlots.push({ box: dest.box, boxSlot: dest.boxSlot })
         return R.Ok(displacedMon)
       }
 
@@ -210,9 +210,9 @@ export function useSaves(): SavesAndBanksManager {
 
       const mon = monResult.value
       const tracked = ohpkmStore.trackAndConvertForSave(mon, save)
-      const displacedMon = save.boxes[dest.box].boxSlots[dest.box_slot]
-      save.boxes[dest.box].boxSlots[dest.box_slot] = tracked
-      save.updatedBoxSlots.push({ box: dest.box, index: dest.box_slot })
+      const displacedMon = save.boxes[dest.box].boxSlots[dest.boxSlot]
+      save.boxes[dest.box].boxSlots[dest.boxSlot] = tracked
+      save.updatedBoxSlots.push({ box: dest.box, boxSlot: dest.boxSlot })
 
       return R.Ok(displacedMon)
     },
@@ -258,7 +258,7 @@ export function useSaves(): SavesAndBanksManager {
       const addedMons: OHPKM[] = []
       const dest = startingAt
 
-      if (dest.is_home) {
+      if (dest.isHome) {
         let nextSlot = dest
 
         mons.forEach((mon) => {
@@ -266,9 +266,9 @@ export function useSaves(): SavesAndBanksManager {
             !loadedHomeData.slotIsEmpty(nextSlot) &&
             nextSlot.box < loadedHomeData.getCurrentBank().boxes.length
           ) {
-            nextSlot.box_slot++
-            if (nextSlot.box_slot >= HomeData.BOX_COLUMNS * HomeData.BOX_ROWS) {
-              nextSlot.box_slot = 0
+            nextSlot.boxSlot++
+            if (nextSlot.boxSlot >= HomeData.BOX_COLUMNS * HomeData.BOX_ROWS) {
+              nextSlot.boxSlot = 0
               nextSlot.box++
             }
           }
@@ -279,15 +279,15 @@ export function useSaves(): SavesAndBanksManager {
 
             moveOhpkmToHome(homeMon.getHomeIdentifier(), nextSlot)
             addedMons.push(homeMon)
-            nextSlot.box_slot++
-            if (nextSlot.box_slot >= HomeData.BOX_COLUMNS * HomeData.BOX_ROWS) {
-              nextSlot.box_slot = 0
+            nextSlot.boxSlot++
+            if (nextSlot.boxSlot >= HomeData.BOX_COLUMNS * HomeData.BOX_ROWS) {
+              nextSlot.boxSlot = 0
               nextSlot.box++
             }
           }
         })
       } else {
-        let nextIndex = dest.box_slot
+        let nextIndex = dest.boxSlot
         const tempSave = saveFromIdentifier(dest.saveIdentifier)
 
         mons.forEach((mon) => {
@@ -526,7 +526,7 @@ export function useSaves(): SavesAndBanksManager {
     (item: Item | undefined, location: MonLocation) => {
       const itemIndex = item?.index ?? 0
       let ohpkm: OHPKM
-      if (location.is_home) {
+      if (location.isHome) {
         const identifier = getMonAtHomeLocation(location)
         if (!identifier) return
 
@@ -543,8 +543,8 @@ export function useSaves(): SavesAndBanksManager {
         const save = saveFromIdentifier(location.saveIdentifier)
         ohpkm = ohpkmStore.loadIfTracked(mon) ?? ohpkmStore.startTracking(mon, save)
 
-        save.boxes[location.box].boxSlots[location.box_slot] = save.convertOhpkm(ohpkm)
-        save.updatedBoxSlots.push({ box: location.box, index: location.box_slot })
+        save.boxes[location.box].boxSlots[location.boxSlot] = save.convertOhpkm(ohpkm)
+        save.updatedBoxSlots.push({ box: location.box, boxSlot: location.boxSlot })
       }
 
       ohpkm.heldItemIndex = itemIndex
@@ -599,11 +599,11 @@ export function useSaves(): SavesAndBanksManager {
   // )
 
   function moveMon(source: MonLocation, dest: MonLocation) {
-    if (source.is_home) {
+    if (source.isHome) {
       const sourceMonId = getMonAtHomeLocation(source)
       if (!sourceMonId) return
 
-      if (dest.is_home) {
+      if (dest.isHome) {
         const displacedMonId = moveOhpkmToHome(sourceMonId, dest)
         moveOhpkmToHome(displacedMonId, source)
       } else {
@@ -615,13 +615,13 @@ export function useSaves(): SavesAndBanksManager {
         const displacedMon = result.value
         moveMonToHome(dest.saveIdentifier, displacedMon, source)
       }
-    } else if (!dest.is_home && source.saveIdentifier === dest.saveIdentifier) {
+    } else if (!dest.isHome && source.saveIdentifier === dest.saveIdentifier) {
       moveMonWithinSave(saveFromIdentifier(source.saveIdentifier), source, dest)
     } else {
       const sourceMon = getMonAtSaveLocation(source)
       if (!sourceMon) return
 
-      if (dest.is_home) {
+      if (dest.isHome) {
         const displacedMonId = moveMonToHome(source.saveIdentifier, sourceMon, dest)
         moveOhpkmToSave(displacedMonId, source)
       } else {
@@ -635,7 +635,7 @@ export function useSaves(): SavesAndBanksManager {
 
   const releaseMonAtLocation = useCallback(
     (location: MonLocation) => {
-      if (location.is_home) {
+      if (location.isHome) {
         const identifier = moveOhpkmToHome(undefined, location)
         if (!identifier) return // slot is empty
 
@@ -703,8 +703,8 @@ function findMonInBox(
     if (mon instanceof OHPKM && mon.getHomeIdentifier() === monId) {
       return {
         box: boxIndex,
-        box_slot: boxSlot,
-        is_home: false,
+        boxSlot: boxSlot,
+        isHome: false,
         saveIdentifier: save.identifier,
       }
     }
@@ -724,7 +724,7 @@ function findMonInHomeBox(
 ): MonLocation | undefined {
   for (const [boxSlot, identifier] of box.identifiers.entries()) {
     if (identifier === monId)
-      return { box: box.index, box_slot: boxSlot, bank: bankIndex, is_home: true }
+      return { box: box.index, boxSlot: boxSlot, bank: bankIndex, isHome: true }
   }
 }
 
@@ -738,10 +738,10 @@ function findMonInHome(monId: string, homeData: HomeData): MonLocation | undefin
 }
 
 function moveMonWithinSave(save: SAV, source: SaveMonLocation, dest: SaveMonLocation) {
-  const sourceMon = save.boxes[source.box].boxSlots[source.box_slot]
-  const displacedMon = save.boxes[dest.box].boxSlots[dest.box_slot]
-  save.boxes[dest.box].boxSlots[dest.box_slot] = sourceMon
-  save.updatedBoxSlots.push({ box: dest.box, index: dest.box_slot })
-  save.boxes[source.box].boxSlots[source.box_slot] = displacedMon
-  save.updatedBoxSlots.push({ box: source.box, index: source.box_slot })
+  const sourceMon = save.boxes[source.box].boxSlots[source.boxSlot]
+  const displacedMon = save.boxes[dest.box].boxSlots[dest.boxSlot]
+  save.boxes[dest.box].boxSlots[dest.boxSlot] = sourceMon
+  save.updatedBoxSlots.push({ box: dest.box, boxSlot: dest.boxSlot })
+  save.boxes[source.box].boxSlots[source.boxSlot] = displacedMon
+  save.updatedBoxSlots.push({ box: source.box, boxSlot: source.boxSlot })
 }

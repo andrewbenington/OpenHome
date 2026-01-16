@@ -275,7 +275,7 @@ function SingleBoxMonDisplay() {
 
   const sourceSupportsMon = useCallback(
     (dexNum: number, formeNum: number) =>
-      !dragData || dragData?.is_home
+      !dragData || dragData?.isHome
         ? true
         : saveFromIdentifier(dragData.saveIdentifier).supportsMon(dexNum, formeNum),
     [dragData, saveFromIdentifier]
@@ -346,8 +346,8 @@ function SingleBoxMonDisplay() {
                   location={{
                     bank: homeData.currentBankIndex,
                     box: homeData.currentPCBox,
-                    box_slot: index,
-                    is_home: true,
+                    boxSlot: index,
+                    isHome: true,
                   }}
                   mon={mon}
                   zIndex={0}
@@ -356,8 +356,8 @@ function SingleBoxMonDisplay() {
                       attemptImportMons(importedMons, {
                         bank: homeData.currentBankIndex,
                         box: homeData.currentPCBox,
-                        box_slot: index,
-                        is_home: true,
+                        boxSlot: index,
+                        isHome: true,
                       })
                     }
                   }}
@@ -365,7 +365,7 @@ function SingleBoxMonDisplay() {
                     // don't allow a swap with a pokémon not supported by the source save
                     mon &&
                     dragData &&
-                    !dragData.is_home &&
+                    !dragData.isHome &&
                     !sourceSupportsMon(mon.dexNum, mon.formeNum)
                   }
                   ctxMenuBuilders={contextElements}

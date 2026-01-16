@@ -130,7 +130,7 @@ describe('G3RRSAV - Radical Red Save File Write Test', () => {
       // radicalRedSave.boxes[0].pokemon[0].heldItemIndex = 123;
       // radicalRedSave.boxes[0].pokemon[0].moves[0] = 101;
 
-      radicalRedSave.updatedBoxSlots.push({ box: 0, index: 0 })
+      radicalRedSave.updatedBoxSlots.push({ box: 0, boxSlot: 0 })
       radicalRedSave.prepareForSaving()
     }
   })

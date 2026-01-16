@@ -84,7 +84,7 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
           moveMonItemToBag(payload.monData)
         } else if (
           isMonLocation(dest) &&
-          (dest.is_home ||
+          (dest.isHome ||
             savesAndBanks
               .saveFromIdentifier(dest.saveIdentifier)
               .supportsMon(mon.dexNum, mon.formeNum))
@@ -94,7 +94,7 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
           // Move item to OpenHome bag if not supported by the save file
           if (
             mon.heldItemIndex &&
-            !dest.is_home &&
+            !dest.isHome &&
             !savesAndBanks.saveFromIdentifier(dest.saveIdentifier).supportsItem(mon.heldItemIndex)
           ) {
             moveMonItemToBag(source)

@@ -115,7 +115,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
 
       if (!dragData || Object.entries(dragData).length === 0) return false
 
-      const sourceSave = dragData.is_home ? undefined : saveFromIdentifier(dragData.saveIdentifier)
+      const sourceSave = dragData.isHome ? undefined : saveFromIdentifier(dragData.saveIdentifier)
 
       return (
         !save.supportsMon(dragData.mon.dexNum, dragData.mon.formeNum) ||
@@ -172,9 +172,9 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                   key={`${save.currentPCBox}-${index}`}
                   dragID={`${save.tid}_${save.sid}_${save.currentPCBox}_${index}`}
                   location={{
-                    is_home: false,
+                    isHome: false,
                     box: save.currentPCBox,
-                    box_slot: index,
+                    boxSlot: index,
                     saveIdentifier: save.identifier,
                   }}
                   disabled={
@@ -186,9 +186,9 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                   onDrop={(importedMons) => {
                     if (importedMons) {
                       attemptImportMons(importedMons, {
-                        is_home: false,
+                        isHome: false,
                         box: save.currentPCBox,
-                        box_slot: index,
+                        boxSlot: index,
                         saveIdentifier: save.identifier,
                       })
                     }
