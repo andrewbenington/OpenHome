@@ -33,6 +33,7 @@ import { ToggleGroup } from 'radix-ui'
 import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { BsFillGrid3X3GapFill } from 'react-icons/bs'
 import { FaSquare } from 'react-icons/fa'
+import { includeClass } from 'src/ui/util/style'
 import useDragAndDrop from '../../state/drag-and-drop/useDragAndDrop'
 import { buildBackwardNavigator, buildForwardNavigator } from '../util'
 import AllHomeBoxes from './AllHomeBoxes'
@@ -68,23 +69,23 @@ export default function HomeBoxDisplay() {
         <Flex align="center" justify="between" flexGrow="3" width="0">
           <ViewToggle viewMode={viewMode} setViewMode={setViewMode} disabled={editing || moving} />
           <ArrowButton
+            className={includeClass('horiz-collapse').if(viewMode !== 'one')}
             onClick={savesAndBanks.homeBoxNavigateLeft}
-            style={{ visibility: viewMode === 'one' ? 'visible' : 'collapse' }}
             dragID="home-arrow-left"
             direction="left"
             disabled={editing}
           />
         </Flex>
-        <div className="box-name">
+        <div
+          className={includeClass('box-name')
+            .with('horiz-collapse')
+            .if(viewMode !== 'one')}
+        >
           {editing ? (
             <TextField.Root
               value={editingBoxName}
               size="1"
-              style={{
-                minWidth: 0,
-                textAlign: 'center',
-                visibility: viewMode === 'one' ? 'visible' : 'collapse',
-              }}
+              style={{ minWidth: 0, textAlign: 'center' }}
               placeholder={`Box ${currentBox.index + 1}`}
               onChange={(e) => setEditingBoxName(e.target.value)}
               onKeyDown={(e) => {
@@ -105,8 +106,8 @@ export default function HomeBoxDisplay() {
         </div>
         <Flex align="center" flexGrow="3" width="0" justify="between">
           <ArrowButton
+            className={includeClass('horiz-collapse').if(viewMode !== 'one')}
             onClick={savesAndBanks.homeBoxNavigateRight}
-            style={{ visibility: viewMode === 'one' ? 'visible' : 'collapse' }}
             dragID="home-arrow-right"
             direction="right"
             disabled={editing}
