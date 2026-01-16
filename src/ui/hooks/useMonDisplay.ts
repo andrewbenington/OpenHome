@@ -68,7 +68,6 @@ export const TopRightIndicatorTypes = [
   'Ball',
   'Alpha',
   'Gigantamax',
-  'Modified',
 ] as const
 
 export type TopRightIndicatorType = (typeof TopRightIndicatorTypes)[number]
