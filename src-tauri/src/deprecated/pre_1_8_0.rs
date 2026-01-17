@@ -8,6 +8,10 @@ use crate::{
 
 pub fn get_all_ohpkm_v1_bytes(app_handle: &tauri::AppHandle) -> Result<FilenameToBytesMap> {
     let mons_path = util::prepend_appdata_storage_to_path(app_handle, "mons")?;
+    if !mons_path.try_exists().is_ok_and(|exists| exists) {
+        return Ok(HashMap::new());
+    }
+
     let mon_files = fs::read_dir(&mons_path).map_err(|e| Error::file_access(&mons_path, e))?;
 
     let mut map = HashMap::new();

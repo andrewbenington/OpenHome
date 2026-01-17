@@ -12,7 +12,6 @@ mod versioning;
 
 use std::env;
 use tauri::Manager;
-use tauri_plugin_dialog::{DialogExt, MessageDialogKind};
 
 use crate::error::Error;
 
@@ -27,11 +26,12 @@ pub fn run() {
                 match launch_error {
                     Error::OutdatedVersion { .. } => app.handle().exit(1),
                     _ => {
-                        app.dialog()
-                            .message(launch_error.to_string())
-                            .title("OpenHome Failed to Launch")
-                            .kind(MessageDialogKind::Error)
-                            .blocking_show();
+                        util::show_error_dialog(
+                            app,
+                            launch_error.to_string(),
+                            "OpenHome Failed to Launch",
+                        );
+
                         app.handle().exit(1);
                     }
                 };
@@ -41,11 +41,12 @@ pub fn run() {
             let lookup_state = match state::LookupState::load_from_storage(app.handle()) {
                 Ok(lookup) => lookup,
                 Err(err) => {
-                    app.dialog()
-                        .message(err.to_string())
-                        .title("OpenHome Failed to Launch - Lookup File Error")
-                        .kind(MessageDialogKind::Error)
-                        .blocking_show();
+                    util::show_error_dialog(
+                        app,
+                        err.to_string(),
+                        "OpenHome Failed to Launch - Lookup File Error",
+                    );
+
                     app.handle().exit(1);
                     std::process::exit(1);
                 }
@@ -55,11 +56,12 @@ pub fn run() {
             let pokedex_state = match state::PokedexState::load_from_storage(app.handle()) {
                 Ok(pokedex) => pokedex,
                 Err(err) => {
-                    app.dialog()
-                        .message(err.to_string())
-                        .title("OpenHome Failed to Launch - Pokedex File Error")
-                        .kind(MessageDialogKind::Error)
-                        .blocking_show();
+                    util::show_error_dialog(
+                        app,
+                        err.to_string(),
+                        "OpenHome Failed to Launch - Pokedex File Error",
+                    );
+
                     app.handle().exit(1);
                     std::process::exit(1);
                 }
