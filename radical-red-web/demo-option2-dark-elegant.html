@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Option 2: Dark Elegant - Radical Red Save Editor</title>
+  <style>
+    /* Option 2: Dark Elegant Design */
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #1a1d23 0%, #252930 100%);
+      color: #e4e6eb;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    #root {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px 24px;
+    }
+
+    /* Card/Panel styling */
+    .card {
+      background: linear-gradient(135deg, #2d3139 0%, #25282e 100%);
+      border-radius: 16px;
+      padding: 28px;
+      margin-bottom: 24px;
+      box-shadow:
+        0 4px 16px rgba(0, 0, 0, 0.4),
+        0 0 1px rgba(91, 124, 153, 0.3);
+      transition: all 0.3s ease;
+      border: 1px solid rgba(91, 124, 153, 0.1);
+    }
+
+    .card:hover {
+      box-shadow:
+        0 8px 24px rgba(0, 0, 0, 0.5),
+        0 0 1px rgba(91, 124, 153, 0.5);
+      border-color: rgba(91, 124, 153, 0.2);
+    }
+
+    /* Typography */
+    .title {
+      font-family: 'Poppins', sans-serif;
+      font-size: 36px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #e4e6eb 0%, #b8bcc4 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+      letter-spacing: -0.5px;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: #8b8f99;
+      font-weight: 400;
+    }
+
+    .section-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: 20px;
+      font-weight: 600;
+      color: #e4e6eb;
+      margin-bottom: 20px;
+      position: relative;
+      padding-left: 16px;
+    }
+
+    .section-title::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 4px;
+      height: 24px;
+      background: linear-gradient(180deg, #5b7c99 0%, #d4a574 100%);
+      border-radius: 2px;
+    }
+
+    /* Buttons */
+    .btn {
+      background: linear-gradient(135deg, #5b7c99 0%, #4a6a85 100%);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 14px 28px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(91, 124, 153, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .btn:hover::before {
+      left: 100%;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow:
+        0 6px 20px rgba(91, 124, 153, 0.4),
+        0 0 20px rgba(91, 124, 153, 0.2);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 8px rgba(91, 124, 153, 0.3);
+    }
+
+    .btn:disabled {
+      background: #3a3d45;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+      opacity: 0.5;
+    }
+
+    .btn-secondary {
+      background: linear-gradient(135deg, #3a3d45 0%, #2d3038 100%);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .btn-secondary:hover {
+      box-shadow:
+        0 6px 20px rgba(0, 0, 0, 0.4),
+        0 0 20px rgba(255, 255, 255, 0.05);
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, #d4a574 0%, #b8915f 100%);
+      box-shadow: 0 4px 12px rgba(212, 165, 116, 0.3);
+    }
+
+    .btn-success:hover {
+      box-shadow:
+        0 6px 20px rgba(212, 165, 116, 0.4),
+        0 0 20px rgba(212, 165, 116, 0.2);
+    }
+
+    /* File Upload */
+    .upload-area {
+      border: 2px dashed rgba(91, 124, 153, 0.3);
+      border-radius: 16px;
+      padding: 56px 24px;
+      text-align: center;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      background: rgba(91, 124, 153, 0.03);
+    }
+
+    .upload-area:hover {
+      border-color: #5b7c99;
+      background: rgba(91, 124, 153, 0.08);
+      box-shadow: 0 0 30px rgba(91, 124, 153, 0.15);
+    }
+
+    .upload-icon {
+      font-size: 56px;
+      margin-bottom: 20px;
+      filter: drop-shadow(0 0 10px rgba(91, 124, 153, 0.5));
+    }
+
+    /* Box Grid */
+    .box-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 14px;
+      margin: 24px 0;
+    }
+
+    .pokemon-slot {
+      aspect-ratio: 1;
+      background: linear-gradient(135deg, #1f2229 0%, #181b20 100%);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      padding: 10px;
+      border: 2px solid rgba(91, 124, 153, 0.15);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .pokemon-slot::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(91, 124, 153, 0.1) 0%, transparent 70%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .pokemon-slot:hover::before {
+      opacity: 1;
+    }
+
+    .pokemon-slot:hover {
+      background: linear-gradient(135deg, #252930 0%, #1f2229 100%);
+      transform: scale(1.08);
+      box-shadow:
+        0 8px 24px rgba(0, 0, 0, 0.5),
+        0 0 20px rgba(91, 124, 153, 0.3);
+      border-color: rgba(91, 124, 153, 0.4);
+    }
+
+    .pokemon-slot.empty {
+      background: linear-gradient(135deg, #1a1d23 0%, #151820 100%);
+      cursor: default;
+      opacity: 0.4;
+      border-style: dashed;
+    }
+
+    .pokemon-slot.empty:hover {
+      transform: none;
+      box-shadow: none;
+      border-color: rgba(91, 124, 153, 0.15);
+    }
+
+    .pokemon-slot.empty::before {
+      display: none;
+    }
+
+    .pokemon-slot.shiny {
+      border-color: #d4a574;
+      box-shadow:
+        0 0 20px rgba(212, 165, 116, 0.4),
+        inset 0 0 20px rgba(212, 165, 116, 0.1);
+      animation: shimmer 3s ease-in-out infinite;
+    }
+
+    @keyframes shimmer {
+      0%, 100% { box-shadow: 0 0 20px rgba(212, 165, 116, 0.4), inset 0 0 20px rgba(212, 165, 116, 0.1); }
+      50% { box-shadow: 0 0 30px rgba(212, 165, 116, 0.6), inset 0 0 30px rgba(212, 165, 116, 0.2); }
+    }
+
+    .pokemon-slot.fakemon {
+      border-color: rgba(220, 53, 69, 0.6);
+      background: linear-gradient(135deg, rgba(220, 53, 69, 0.1) 0%, rgba(220, 53, 69, 0.05) 100%);
+    }
+
+    .pokemon-sprite {
+      width: 64px;
+      height: 64px;
+      image-rendering: pixelated;
+      margin-bottom: 6px;
+      filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.5));
+    }
+
+    .pokemon-info {
+      font-size: 11px;
+      font-weight: 600;
+      color: #b8bcc4;
+      text-align: center;
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Box Selector */
+    .box-selector {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin: 20px 0;
+    }
+
+    .box-btn {
+      padding: 10px 18px;
+      border: 2px solid rgba(91, 124, 153, 0.2);
+      background: linear-gradient(135deg, #2d3139 0%, #25282e 100%);
+      border-radius: 10px;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: #b8bcc4;
+      transition: all 0.3s ease;
+    }
+
+    .box-btn:hover {
+      border-color: #5b7c99;
+      background: linear-gradient(135deg, #353842 0%, #2d3038 100%);
+      box-shadow: 0 0 15px rgba(91, 124, 153, 0.2);
+    }
+
+    .box-btn.active {
+      background: linear-gradient(135deg, #5b7c99 0%, #4a6a85 100%);
+      color: white;
+      border-color: #5b7c99;
+      box-shadow:
+        0 4px 12px rgba(91, 124, 153, 0.3),
+        0 0 20px rgba(91, 124, 153, 0.2);
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .modal-content {
+      background: linear-gradient(135deg, #2d3139 0%, #25282e 100%);
+      border-radius: 20px;
+      max-width: 700px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 36px;
+      box-shadow:
+        0 30px 80px rgba(0, 0, 0, 0.6),
+        0 0 2px rgba(91, 124, 153, 0.5);
+      border: 1px solid rgba(91, 124, 153, 0.2);
+      animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(40px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin: 24px 0;
+    }
+
+    .stat-item {
+      background: linear-gradient(135deg, #1f2229 0%, #181b20 100%);
+      padding: 18px;
+      border-radius: 12px;
+      border-left: 3px solid #5b7c99;
+      transition: all 0.3s ease;
+    }
+
+    .stat-item:hover {
+      background: linear-gradient(135deg, #252930 0%, #1f2229 100%);
+      border-left-color: #d4a574;
+      box-shadow: 0 4px 12px rgba(91, 124, 153, 0.2);
+    }
+
+    .stat-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #8b8f99;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+
+    .stat-value {
+      font-size: 22px;
+      font-weight: 700;
+      color: #e4e6eb;
+      text-shadow: 0 2px 8px rgba(91, 124, 153, 0.3);
+    }
+
+    /* Form Elements */
+    .form-group {
+      margin: 24px 0;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      color: #b8bcc4;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid rgba(91, 124, 153, 0.2);
+      border-radius: 10px;
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      transition: all 0.3s ease;
+      background: linear-gradient(135deg, #1f2229 0%, #181b20 100%);
+      color: #e4e6eb;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: #5b7c99;
+      box-shadow:
+        0 0 0 4px rgba(91, 124, 153, 0.1),
+        0 0 20px rgba(91, 124, 153, 0.2);
+    }
+
+    /* Utilities */
+    .flex {
+      display: flex;
+    }
+
+    .flex-between {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .gap-2 {
+      gap: 14px;
+    }
+
+    .text-center {
+      text-align: center;
+    }
+
+    .alert {
+      padding: 18px 20px;
+      border-radius: 12px;
+      margin-bottom: 24px;
+      font-size: 14px;
+      border-left: 4px solid;
+    }
+
+    .alert-success {
+      background: linear-gradient(135deg, rgba(212, 165, 116, 0.15) 0%, rgba(212, 165, 116, 0.08) 100%);
+      color: #d4a574;
+      border-left-color: #d4a574;
+    }
+
+    .alert-error {
+      background: linear-gradient(135deg, rgba(220, 53, 69, 0.15) 0%, rgba(220, 53, 69, 0.08) 100%);
+      color: #dc3545;
+      border-left-color: #dc3545;
+    }
+
+    /* View Toggle Buttons */
+    .view-toggle {
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      margin-bottom: 32px;
+      padding: 24px;
+      background: linear-gradient(135deg, #2d3139 0%, #25282e 100%);
+      border-radius: 16px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(91, 124, 153, 0.1);
+    }
+
+    .view-toggle button {
+      padding: 12px 24px;
+      background: linear-gradient(135deg, #1f2229 0%, #181b20 100%);
+      color: #b8bcc4;
+      border: 2px solid rgba(91, 124, 153, 0.2);
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 700;
+      font-family: 'Poppins', sans-serif;
+      transition: all 0.3s ease;
+    }
+
+    .view-toggle button:hover {
+      border-color: #5b7c99;
+      box-shadow: 0 0 20px rgba(91, 124, 153, 0.2);
+    }
+
+    .view-toggle button.active {
+      background: linear-gradient(135deg, #5b7c99 0%, #4a6a85 100%);
+      color: white;
+      border-color: #5b7c99;
+      box-shadow:
+        0 4px 12px rgba(91, 124, 153, 0.3),
+        0 0 20px rgba(91, 124, 153, 0.2);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* Scrollbar styling */
+    ::-webkit-scrollbar {
+      width: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #1a1d23;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, #5b7c99 0%, #4a6a85 100%);
+      border-radius: 5px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(180deg, #6a8ba9 0%, #5b7c99 100%);
+    }
+  </style>
+</head>
+<body>
+  <div id="root">
+    <!-- View Toggle -->
+    <div class="view-toggle">
+      <button id="viewMainBtn" class="active">Main Page</button>
+      <button id="viewLoadedBtn">Loaded Save</button>
+      <button id="viewModalBtn">Pokemon Modal</button>
+    </div>
+
+    <!-- Main Page View -->
+    <div id="mainView">
+      <div class="card text-center">
+        <h1 class="title">Radical Red Save Editor</h1>
+        <p class="subtitle">Web-based editor for Pokemon Radical Red .sav files</p>
+      </div>
+
+      <div class="card">
+        <div class="upload-area">
+          <div class="upload-icon">📁</div>
+          <h3 style="margin-bottom: 12px; color: #e4e6eb; font-family: 'Poppins', sans-serif;">Drop your .sav file here</h3>
+          <p style="color: #8b8f99; font-size: 14px;">or click to browse</p>
+          <input type="file" accept=".sav" style="display: none;">
+        </div>
+      </div>
+    </div>
+
+    <!-- Loaded Save View -->
+    <div id="loadedView" class="hidden">
+      <div class="card text-center">
+        <h1 class="title">Radical Red Save Editor</h1>
+        <p class="subtitle">Web-based editor for Pokemon Radical Red .sav files</p>
+      </div>
+
+      <div class="card">
+        <div class="flex-between">
+          <div style="font-size: 14px; color: #b8bcc4;">
+            <span style="font-weight: 700; color: #e4e6eb;">Trainer:</span> ASH |
+            <span style="font-weight: 700; color: #e4e6eb;">ID:</span> 12345 |
+            <span style="font-weight: 700; color: #e4e6eb;">Money:</span> $999,999
+          </div>
+          <div class="flex gap-2">
+            <button class="btn btn-success">💾 DOWNLOAD MODIFIED .SAV (3 changes)</button>
+            <button class="btn btn-secondary">🔄 LOAD NEW FILE</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="section-title">Box Selector</h2>
+        <div class="box-selector">
+          <button class="box-btn active">Box 1</button>
+          <button class="box-btn">Box 2</button>
+          <button class="box-btn">Box 3</button>
+          <button class="box-btn">Box 4</button>
+          <button class="box-btn">Box 5</button>
+          <button class="box-btn">Box 6</button>
+          <button class="box-btn">Box 7</button>
+          <button class="box-btn">Box 8</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="section-title">Box 1</h2>
+        <div class="box-grid">
+          <div class="pokemon-slot shiny">
+            <img class="pokemon-sprite" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64'%3E%3Crect fill='%23e74c3c' width='64' height='64'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='white' font-size='10'%3EPikachu%3C/text%3E%3C/svg%3E" alt="Pikachu">
+            <div class="pokemon-info">Lv.85 ⚡</div>
+          </div>
+          <div class="pokemon-slot">
+            <img class="pokemon-sprite" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64'%3E%3Crect fill='%233498db' width='64' height='64'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='white' font-size='10'%3EBlastoise%3C/text%3E%3C/svg%3E" alt="Blastoise">
+            <div class="pokemon-info">Lv.92 💧</div>
+          </div>
+          <div class="pokemon-slot">
+            <img class="pokemon-sprite" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64'%3E%3Crect fill='%23e67e22' width='64' height='64'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='white' font-size='10'%3ECharizard%3C/text%3E%3C/svg%3E" alt="Charizard">
+            <div class="pokemon-info">Lv.88 🔥</div>
+          </div>
+          <div class="pokemon-slot fakemon">
+            <img class="pokemon-sprite" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64'%3E%3Crect fill='%239b59b6' width='64' height='64'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='white' font-size='10'%3EFAKEMON%3C/text%3E%3C/svg%3E" alt="Fakemon">
+            <div class="pokemon-info">Lv.99 ❌</div>
+          </div>
+          <div class="pokemon-slot">
+            <img class="pokemon-sprite" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64'%3E%3Crect fill='%2327ae60' width='64' height='64'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='white' font-size='10'%3EVenusaur%3C/text%3E%3C/svg%3E" alt="Venusaur">
+            <div class="pokemon-info">Lv.90 🌿</div>
+          </div>
+          <div class="pokemon-slot">
+            <img class="pokemon-sprite" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64'%3E%3Crect fill='%23f39c12' width='64' height='64'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='white' font-size='10'%3EDragonite%3C/text%3E%3C/svg%3E" alt="Dragonite">
+            <div class="pokemon-info">Lv.94 🐉</div>
+          </div>
+          <div class="pokemon-slot empty">
+            <div class="pokemon-info">Empty</div>
+          </div>
+          <div class="pokemon-slot empty">
+            <div class="pokemon-info">Empty</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="alert alert-success">
+        <strong>✓ Modified Slots:</strong> 3 Pokemon have been edited. Click "DOWNLOAD MODIFIED .SAV" to save changes.
+      </div>
+    </div>
+
+    <!-- Modal View -->
+    <div id="modalView" class="hidden">
+      <div class="modal-overlay">
+        <div class="modal-content">
+          <div class="flex-between" style="margin-bottom: 28px;">
+            <h2 class="section-title" style="margin: 0;">Pikachu Details</h2>
+            <button class="btn btn-secondary" style="padding: 10px 18px;">✕ Close</button>
+          </div>
+
+          <div class="text-center" style="margin-bottom: 28px;">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Crect fill='%23e74c3c' width='150' height='150'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='white' font-size='20'%3EPikachu%3C/text%3E%3C/svg%3E" alt="Pikachu" style="width: 150px; height: 150px; border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);">
+            <div style="margin-top: 16px; font-size: 20px; font-weight: 700; color: #d4a574; font-family: 'Poppins', sans-serif; text-shadow: 0 2px 8px rgba(212, 165, 116, 0.5);">
+              ✨ Shiny Pikachu
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Level</label>
+            <input type="number" class="form-input" value="85" min="1" max="100">
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat-item">
+              <div class="stat-label">HP</div>
+              <div class="stat-value">245</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-label">Attack</div>
+              <div class="stat-value">189</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-label">Defense</div>
+              <div class="stat-value">152</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-label">Sp. Atk</div>
+              <div class="stat-value">165</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-label">Sp. Def</div>
+              <div class="stat-value">178</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-label">Speed</div>
+              <div class="stat-value">234</div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Nature</label>
+            <input type="text" class="form-input" value="Jolly">
+          </div>
+
+          <div class="flex gap-2" style="margin-top: 28px;">
+            <button class="btn btn-success" style="flex: 1;">💾 Save Changes</button>
+            <button class="btn btn-secondary" style="flex: 1;">✕ Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const viewMainBtn = document.getElementById('viewMainBtn');
+    const viewLoadedBtn = document.getElementById('viewLoadedBtn');
+    const viewModalBtn = document.getElementById('viewModalBtn');
+
+    const mainView = document.getElementById('mainView');
+    const loadedView = document.getElementById('loadedView');
+    const modalView = document.getElementById('modalView');
+
+    function switchView(view) {
+      mainView.classList.add('hidden');
+      loadedView.classList.add('hidden');
+      modalView.classList.add('hidden');
+
+      viewMainBtn.classList.remove('active');
+      viewLoadedBtn.classList.remove('active');
+      viewModalBtn.classList.remove('active');
+
+      if (view === 'main') {
+        mainView.classList.remove('hidden');
+        viewMainBtn.classList.add('active');
+      } else if (view === 'loaded') {
+        loadedView.classList.remove('hidden');
+        viewLoadedBtn.classList.add('active');
+      } else if (view === 'modal') {
+        modalView.classList.remove('hidden');
+        viewModalBtn.classList.add('active');
+      }
+    }
+
+    viewMainBtn.addEventListener('click', () => switchView('main'));
+    viewLoadedBtn.addEventListener('click', () => switchView('loaded'));
+    viewModalBtn.addEventListener('click', () => switchView('modal'));
+  </script>
+</body>
+</html>
