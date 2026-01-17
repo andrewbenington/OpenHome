@@ -269,22 +269,26 @@ body {
 }
 
 .box-selector-button {
-  border: 2px solid #333;
-  background-color: white;
+  border: 1px solid #d4d4d8;
+  background-color: #ffffff;
   padding: 8px 12px;
   cursor: pointer;
   font-family: 'Courier New', monospace;
   font-size: 12px;
   min-width: 60px;
+  border-radius: 4px;
+  color: #4a4a4a;
+  transition: all 0.2s;
 }
 
 .box-selector-button.active {
-  background-color: #333;
-  color: white;
+  background-color: #f3f4f6;
+  color: #1f2937;
+  border-color: #6b7280;
 }
 
 .box-selector-button:hover:not(.active) {
-  background-color: #f0f0f0;
+  border-color: #9ca3af;
 }
 
 /* Utilities */
