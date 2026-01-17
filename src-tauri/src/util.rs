@@ -320,30 +320,3 @@ pub fn show_error_dialog(_app: &tauri::App, message: impl Into<String>, title: i
         .show()
         .expect("Could not display dialog box");
 }
-
-pub fn show_prompt_dialog(
-    _app: &tauri::App,
-    message: impl Into<String>,
-    title: impl Into<String>,
-    _yes: impl Into<String>,
-    _no: impl Into<String>,
-) -> bool {
-    #[cfg(not(target_os = "linux"))]
-    return _app
-        .dialog()
-        .message(message)
-        .title(title)
-        .kind(MessageDialogKind::Error)
-        .buttons(MessageDialogButtons::OkCancelCustom(
-            _yes.into(),
-            _no.into(),
-        ))
-        .blocking_show();
-
-    #[cfg(target_os = "linux")]
-    dialog::Question::new(message)
-        .title(title)
-        .show()
-        .expect("Could not display dialog box")
-        .eq(&dialog::Choice::Yes)
-}
