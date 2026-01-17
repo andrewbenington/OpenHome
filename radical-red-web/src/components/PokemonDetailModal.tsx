@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { PokemonData, Gender } from '../lib/types'
+import { getPokemonSpriteUrl, getFallbackSpriteUrl } from '../lib/spriteUtils'
 
 interface PokemonDetailModalProps {
   pokemon: PokemonData
@@ -46,6 +47,26 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
           <button className="wireframe-button" onClick={onClose}>
             CLOSE
           </button>
+        </div>
+
+        <div style={{ textAlign: 'center', margin: '16px 0' }}>
+          <img
+            src={getPokemonSpriteUrl(pokemon.dexNum, pokemon.isShiny, 'large')}
+            alt={pokemon.speciesName}
+            className="pokemon-sprite-large"
+            title={`${pokemon.speciesName}${pokemon.isShiny ? ' (Shiny)' : ''}`}
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              if (target.src !== getFallbackSpriteUrl(pokemon.dexNum)) {
+                target.src = getFallbackSpriteUrl(pokemon.dexNum);
+              }
+            }}
+          />
+          {pokemon.isShiny && (
+            <div style={{ color: '#ffd700', fontWeight: 'bold', marginTop: '4px' }}>
+              ✨ SHINY ✨
+            </div>
+          )}
         </div>
 
         <div className="wireframe-box">

@@ -150,13 +150,24 @@ body {
 .pokemon-sprite {
   width: 32px;
   height: 32px;
-  background-color: #ddd;
-  border: 1px solid #333;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 8px;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
   margin-bottom: 4px;
+  object-fit: contain;
+}
+
+.pokemon-sprite.shiny {
+  filter: drop-shadow(0 0 2px gold);
+}
+
+.pokemon-sprite-large {
+  width: 120px;
+  height: 120px;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+  object-fit: contain;
 }
 
 .pokemon-level {
@@ -376,7 +387,11 @@ body {
   .pokemon-sprite {
     width: 28px;
     height: 28px;
-    font-size: 7px;
+  }
+
+  .pokemon-sprite-large {
+    width: 100px;
+    height: 100px;
   }
 
   /* Form elements */
@@ -473,6 +488,11 @@ body {
   .pokemon-sprite {
     width: 24px;
     height: 24px;
+  }
+
+  .pokemon-sprite-large {
+    width: 80px;
+    height: 80px;
   }
 
   .pokemon-info-compact {
