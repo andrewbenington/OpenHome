@@ -1,6 +1,8 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import { PokemonData, Gender } from '../lib/types'
 import { getPokemonSpriteUrl, getFallbackSpriteUrl } from '../lib/spriteUtils'
+import speciesData from '../lib/species-data.json'
+import movesData from '../lib/moves-data.json'
 
 interface PokemonDetailModalProps {
   pokemon: PokemonData
@@ -31,6 +33,31 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
   const updatePokemon = (updates: Partial<PokemonData>) => {
     setPokemon(prev => ({ ...prev, ...updates }))
   }
+
+  // Get abilities for the current Pokemon
+  const abilities = useMemo(() => {
+    const species = (speciesData as any)[pokemon.dexNum.toString()]
+    if (!species || !species.formes || species.formes.length === 0) {
+      return { ability1: null, ability2: null, abilityH: null }
+    }
+    // Use the forme that matches the pokemon's formNum
+    const forme = species.formes[pokemon.formNum] || species.formes[0]
+    return {
+      ability1: forme.ability1 || null,
+      ability2: forme.ability2 || null,
+      abilityH: forme.abilityH || null,
+    }
+  }, [pokemon.dexNum, pokemon.formNum])
+
+  // Get all moves sorted by name
+  const allMoves = useMemo(() => {
+    const moves = Object.values(movesData as any).map((move: any) => ({
+      id: move.id,
+      name: move.name,
+    }))
+    moves.sort((a, b) => a.name.localeCompare(b.name))
+    return [{ id: 0, name: 'None' }, ...moves]
+  }, [])
 
   const handleSave = () => {
     onSave(pokemon, boxIndex, slotIndex)
@@ -318,44 +345,60 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
           <div>
             <h3 className="wireframe-subtitle">Moves</h3>
             <div className="form-group">
-              <label className="form-label">{pokemon.moveNames[0] || 'None'} (ID: {pokemon.moves[0]})</label>
-              <input
-                type="number"
+              <label className="form-label">Move 1</label>
+              <select
                 className="wireframe-input"
                 value={pokemon.moves[0]}
-                onChange={(e) => updatePokemon({ moves: [parseInt(e.target.value) || 0, pokemon.moves[1], pokemon.moves[2], pokemon.moves[3]] })}
-                min="0"
-              />
+                onChange={(e) => updatePokemon({ moves: [parseInt(e.target.value), pokemon.moves[1], pokemon.moves[2], pokemon.moves[3]] })}
+              >
+                {allMoves.map((move) => (
+                  <option key={move.id} value={move.id}>
+                    {move.name}
+                  </option>
+                ))}
+              </select>
             </div>
             <div className="form-group">
-              <label className="form-label">{pokemon.moveNames[1] || 'None'} (ID: {pokemon.moves[1]})</label>
-              <input
-                type="number"
+              <label className="form-label">Move 2</label>
+              <select
                 className="wireframe-input"
                 value={pokemon.moves[1]}
-                onChange={(e) => updatePokemon({ moves: [pokemon.moves[0], parseInt(e.target.value) || 0, pokemon.moves[2], pokemon.moves[3]] })}
-                min="0"
-              />
+                onChange={(e) => updatePokemon({ moves: [pokemon.moves[0], parseInt(e.target.value), pokemon.moves[2], pokemon.moves[3]] })}
+              >
+                {allMoves.map((move) => (
+                  <option key={move.id} value={move.id}>
+                    {move.name}
+                  </option>
+                ))}
+              </select>
             </div>
             <div className="form-group">
-              <label className="form-label">{pokemon.moveNames[2] || 'None'} (ID: {pokemon.moves[2]})</label>
-              <input
-                type="number"
+              <label className="form-label">Move 3</label>
+              <select
                 className="wireframe-input"
                 value={pokemon.moves[2]}
-                onChange={(e) => updatePokemon({ moves: [pokemon.moves[0], pokemon.moves[1], parseInt(e.target.value) || 0, pokemon.moves[3]] })}
-                min="0"
-              />
+                onChange={(e) => updatePokemon({ moves: [pokemon.moves[0], pokemon.moves[1], parseInt(e.target.value), pokemon.moves[3]] })}
+              >
+                {allMoves.map((move) => (
+                  <option key={move.id} value={move.id}>
+                    {move.name}
+                  </option>
+                ))}
+              </select>
             </div>
             <div className="form-group">
-              <label className="form-label">{pokemon.moveNames[3] || 'None'} (ID: {pokemon.moves[3]})</label>
-              <input
-                type="number"
+              <label className="form-label">Move 4</label>
+              <select
                 className="wireframe-input"
                 value={pokemon.moves[3]}
-                onChange={(e) => updatePokemon({ moves: [pokemon.moves[0], pokemon.moves[1], pokemon.moves[2], parseInt(e.target.value) || 0] })}
-                min="0"
-              />
+                onChange={(e) => updatePokemon({ moves: [pokemon.moves[0], pokemon.moves[1], pokemon.moves[2], parseInt(e.target.value)] })}
+              >
+                {allMoves.map((move) => (
+                  <option key={move.id} value={move.id}>
+                    {move.name}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
         )}
@@ -413,15 +456,24 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
             </div>
             <div className="form-row">
               <div className="form-group">
-                <label className="form-label">Ability Slot</label>
+                <label className="form-label">Ability</label>
                 <select
                   className="wireframe-input"
                   value={pokemon.ability}
                   onChange={(e) => updatePokemon({ ability: parseInt(e.target.value) })}
                 >
-                  <option value={0}>Ability 1</option>
-                  <option value={1}>Ability 2</option>
-                  <option value={2}>Hidden Ability</option>
+                  {abilities.ability1 && (
+                    <option value={0}>{abilities.ability1}</option>
+                  )}
+                  {abilities.ability2 && (
+                    <option value={1}>{abilities.ability2}</option>
+                  )}
+                  {abilities.abilityH && (
+                    <option value={2}>{abilities.abilityH} (Hidden)</option>
+                  )}
+                  {!abilities.ability1 && !abilities.ability2 && !abilities.abilityH && (
+                    <option value={0}>No abilities found</option>
+                  )}
                 </select>
               </div>
               <div className="form-group">
