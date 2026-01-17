@@ -68,17 +68,19 @@ body {
 
 .wireframe-title {
   font-size: 24px;
-  font-weight: bold;
+  font-weight: 700;
   margin-bottom: 16px;
-  text-transform: uppercase;
-  letter-spacing: 2px;
+  text-transform: capitalize;
+  letter-spacing: 0.5px;
+  color: #1f2937;
 }
 
 .wireframe-subtitle {
   font-size: 18px;
-  font-weight: bold;
+  font-weight: 600;
   margin: 16px 0 8px 0;
-  text-transform: uppercase;
+  text-transform: capitalize;
+  color: #1f2937;
 }
 
 /* Modal */
