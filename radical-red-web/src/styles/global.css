@@ -19,25 +19,29 @@ body {
 
 /* Wireframe elements */
 .wireframe-box {
-  border: 2px solid #333;
-  background-color: white;
+  border: 1px solid #d4d4d8;
+  background-color: #ffffff;
   padding: 16px;
   margin: 8px 0;
+  border-radius: 6px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .wireframe-button {
-  border: 2px solid #333;
-  background-color: white;
+  border: 1px solid #d4d4d8;
+  background-color: #ffffff;
   padding: 8px 16px;
   cursor: pointer;
   font-family: 'Courier New', monospace;
   font-size: 14px;
   transition: all 0.2s;
+  border-radius: 4px;
+  color: #4a4a4a;
 }
 
 .wireframe-button:hover {
-  background-color: #333;
-  color: white;
+  background-color: #f4f4f5;
+  border-color: #a1a1a6;
 }
 
 .wireframe-button:disabled {
@@ -46,16 +50,20 @@ body {
 }
 
 .wireframe-button:disabled:hover {
-  background-color: white;
-  color: #333;
+  background-color: #ffffff;
+  color: #4a4a4a;
+  border-color: #d4d4d8;
 }
 
 .wireframe-input {
-  border: 2px solid #333;
+  border: 1px solid #d4d4d8;
   padding: 8px;
   font-family: 'Courier New', monospace;
   font-size: 14px;
   width: 100%;
+  border-radius: 4px;
+  color: #4a4a4a;
+  background-color: #ffffff;
 }
 
 .wireframe-title {
