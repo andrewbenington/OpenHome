@@ -93,6 +93,26 @@ function calculateLevel(exp: number, levelUpType: string): number {
   return 100
 }
 
+// Convert level to minimum EXP required for that level
+export function levelToExp(level: number, levelUpType: string): number {
+  const curve = EXPERIENCE_CURVES[levelUpType] || EXPERIENCE_CURVES['Medium Fast']
+
+  if (level <= 1) return 0
+  if (level >= 100) return curve[99] // Max level exp
+
+  return curve[level - 1] // Return minimum EXP for this level
+}
+
+// Calculate gender threshold based on gender ratio
+function getGenderThreshold(genderRatio: { M: number; F: number } | null): number {
+  if (!genderRatio) return 127 // Default 50/50
+
+  // Gender ratio is stored as percentage (e.g., M: 0.875, F: 0.125)
+  // Convert female percentage to threshold (0-255 range)
+  const femalePercent = genderRatio.F
+  return Math.floor(femalePercent * 255)
+}
+
 function getSpeciesInfo(internalIndex: number): { name: string; baseStats: BaseStats; levelUpType: string; nationalDex: number } {
   // Convert internal species index to national dex number
   const nationalDex = speciesIndexMapping[internalIndex] || internalIndex
@@ -113,6 +133,27 @@ function getSpeciesInfo(internalIndex: number): { name: string; baseStats: BaseS
     baseStats: forme?.baseStats || { hp: 80, atk: 80, def: 80, spa: 80, spd: 80, spe: 80 },
     levelUpType: species.levelUpType || 'Medium Fast',
     nationalDex: species.nationalDex || nationalDex
+  }
+}
+
+// Get complete species info including gender ratio
+function getCompleteSpeciesInfo(nationalDex: number, formNum: number): {
+  levelUpType: string;
+  genderRatio: { M: number; F: number } | null
+} {
+  const species = speciesData[nationalDex]
+
+  if (!species) {
+    return {
+      levelUpType: 'Medium Fast',
+      genderRatio: null
+    }
+  }
+
+  const forme = species.formes?.[formNum] || species.formes?.[0]
+  return {
+    levelUpType: species.levelUpType || 'Medium Fast',
+    genderRatio: forme?.genderRatio || null
   }
 }
 
@@ -324,7 +365,10 @@ export const parsePokemon = (bytes: Uint8Array): PokemonData | null => {
 export const serializePokemon = (pokemon: PokemonData, originalBytes: Uint8Array): Uint8Array => {
   const bytes = new Uint8Array(originalBytes)
 
-  // Update personality value for nature and shiny changes
+  // Get species info for gender ratio and level up type
+  const speciesInfo = getCompleteSpeciesInfo(pokemon.dexNum, pokemon.formNum)
+
+  // Update personality value for nature, gender, and shiny changes
   let personalityValue = bytesToUint32LittleEndian(originalBytes, 0x00)
   const originalNature = ((personalityValue % 25) + 25) % 25 // Handle negative modulo
   const originalPersonalityValue = personalityValue
@@ -334,6 +378,25 @@ export const serializePokemon = (pokemon: PokemonData, originalBytes: Uint8Array
     // Adjust personality value to set the correct nature
     const diff = (pokemon.nature - originalNature + 25) % 25
     personalityValue = (personalityValue + diff) >>> 0 // Ensure unsigned 32-bit
+  }
+
+  // Check if gender needs to be changed
+  const genderThreshold = getGenderThreshold(speciesInfo.genderRatio)
+  const originalGenderValue = personalityValue & 0xff
+  const originalGender = originalGenderValue <= genderThreshold ? Gender.Female : Gender.Male
+
+  if (pokemon.gender !== originalGender && pokemon.gender !== Gender.Genderless) {
+    // Calculate new gender value based on desired gender
+    let newGenderValue: number
+    if (pokemon.gender === Gender.Female) {
+      // Set to a value <= threshold (use middle of female range)
+      newGenderValue = Math.floor(genderThreshold / 2)
+    } else {
+      // Set to a value > threshold (use middle of male range)
+      newGenderValue = Math.floor((genderThreshold + 255) / 2)
+    }
+    // Replace the lower 8 bits of personality value with new gender value
+    personalityValue = ((personalityValue & 0xffffff00) | newGenderValue) >>> 0
   }
 
   // Check if shiny status needs to be changed

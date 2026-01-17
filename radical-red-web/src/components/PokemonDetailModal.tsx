@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react'
 import { PokemonData, Gender } from '../lib/types'
 import { getPokemonSpriteUrl, getFallbackSpriteUrl } from '../lib/spriteUtils'
+import { levelToExp } from '../lib/pokemonParser'
 import speciesData from '../lib/species-data.json'
 import movesData from '../lib/moves-data.json'
 
@@ -20,6 +21,44 @@ const NATURES = [
   'Calm', 'Gentle', 'Sassy', 'Careful', 'Quirky'
 ]
 
+// Nature stat modifiers: [increasedStat, decreasedStat] or null for neutral
+const NATURE_MODIFIERS: Array<{ increased: string | null; decreased: string | null }> = [
+  { increased: null, decreased: null }, // Hardy
+  { increased: 'Atk', decreased: 'Def' }, // Lonely
+  { increased: 'Atk', decreased: 'Spe' }, // Brave
+  { increased: 'Atk', decreased: 'SpA' }, // Adamant
+  { increased: 'Atk', decreased: 'SpD' }, // Naughty
+  { increased: 'Def', decreased: 'Atk' }, // Bold
+  { increased: null, decreased: null }, // Docile
+  { increased: 'Def', decreased: 'Spe' }, // Relaxed
+  { increased: 'Def', decreased: 'SpA' }, // Impish
+  { increased: 'Def', decreased: 'SpD' }, // Lax
+  { increased: 'Spe', decreased: 'Atk' }, // Timid
+  { increased: 'Spe', decreased: 'Def' }, // Hasty
+  { increased: null, decreased: null }, // Serious
+  { increased: 'Spe', decreased: 'SpA' }, // Jolly
+  { increased: 'Spe', decreased: 'SpD' }, // Naive
+  { increased: 'SpA', decreased: 'Atk' }, // Modest
+  { increased: 'SpA', decreased: 'Def' }, // Mild
+  { increased: 'SpA', decreased: 'Spe' }, // Quiet
+  { increased: null, decreased: null }, // Bashful
+  { increased: 'SpA', decreased: 'SpD' }, // Rash
+  { increased: 'SpD', decreased: 'Atk' }, // Calm
+  { increased: 'SpD', decreased: 'Def' }, // Gentle
+  { increased: 'SpD', decreased: 'Spe' }, // Sassy
+  { increased: 'SpD', decreased: 'SpA' }, // Careful
+  { increased: null, decreased: null }, // Quirky
+]
+
+// Helper function to get nature modifier display text
+const getNatureModifierText = (natureIndex: number): string => {
+  const modifier = NATURE_MODIFIERS[natureIndex]
+  if (!modifier.increased || !modifier.decreased) {
+    return '(Neutral)'
+  }
+  return `(+${modifier.increased}, -${modifier.decreased})`
+}
+
 export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
   pokemon: initialPokemon,
   boxIndex,
@@ -34,11 +73,16 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
     setPokemon(prev => ({ ...prev, ...updates }))
   }
 
-  // Get abilities for the current Pokemon
-  const abilities = useMemo(() => {
+  // Get species info including abilities and level up type
+  const speciesInfo = useMemo(() => {
     const species = (speciesData as any)[pokemon.dexNum.toString()]
     if (!species || !species.formes || species.formes.length === 0) {
-      return { ability1: null, ability2: null, abilityH: null }
+      return {
+        ability1: null,
+        ability2: null,
+        abilityH: null,
+        levelUpType: 'Medium Fast'
+      }
     }
     // Use the forme that matches the pokemon's formNum
     const forme = species.formes[pokemon.formNum] || species.formes[0]
@@ -46,8 +90,23 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
       ability1: forme.ability1 || null,
       ability2: forme.ability2 || null,
       abilityH: forme.abilityH || null,
+      levelUpType: species.levelUpType || 'Medium Fast'
     }
   }, [pokemon.dexNum, pokemon.formNum])
+
+  // Get abilities for the current Pokemon (for backward compatibility)
+  const abilities = useMemo(() => ({
+    ability1: speciesInfo.ability1,
+    ability2: speciesInfo.ability2,
+    abilityH: speciesInfo.abilityH,
+  }), [speciesInfo])
+
+  // Handler for level changes - also updates EXP
+  const handleLevelChange = (newLevel: number) => {
+    const clampedLevel = Math.min(100, Math.max(1, newLevel))
+    const newExp = levelToExp(clampedLevel, speciesInfo.levelUpType)
+    updatePokemon({ level: clampedLevel, exp: newExp })
+  }
 
   // Get all moves sorted by name
   const allMoves = useMemo(() => {
@@ -105,12 +164,31 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
               <strong>ID:</strong> {pokemon.trainerID.toString().padStart(5, '0')}
             </div>
           </div>
-          <div className="form-row" style={{ marginTop: '8px' }}>
-            <div>
-              <strong>Level:</strong> {pokemon.level}
+          <div className="form-row" style={{ marginTop: '8px', display: 'flex', gap: '16px' }}>
+            <div style={{ flex: 1 }}>
+              <label className="form-label">Level</label>
+              <input
+                type="number"
+                className="wireframe-input"
+                value={pokemon.level}
+                onChange={(e) => handleLevelChange(parseInt(e.target.value) || 1)}
+                min="1"
+                max="100"
+                style={{ width: '100%' }}
+              />
             </div>
-            <div>
-              <strong>Gender:</strong> {pokemon.gender === Gender.Male ? '♂' : pokemon.gender === Gender.Female ? '♀' : '—'}
+            <div style={{ flex: 1 }}>
+              <label className="form-label">Gender</label>
+              <select
+                className="wireframe-input"
+                value={pokemon.gender}
+                onChange={(e) => updatePokemon({ gender: parseInt(e.target.value) as Gender })}
+                style={{ width: '100%' }}
+              >
+                <option value={Gender.Male}>♂ Male</option>
+                <option value={Gender.Female}>♀ Female</option>
+                <option value={Gender.Genderless}>— Genderless</option>
+              </select>
             </div>
           </div>
           {pokemon.isFakemon && (
@@ -452,6 +530,9 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
                     </option>
                   ))}
                 </select>
+                <div style={{ fontSize: '12px', marginTop: '4px', color: '#666' }}>
+                  {NATURES[pokemon.nature]} {getNatureModifierText(pokemon.nature)}
+                </div>
               </div>
             </div>
             <div className="form-row">
