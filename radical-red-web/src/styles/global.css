@@ -382,30 +382,30 @@ body {
 }
 
 /* ==========================================
-   DARK MODE STYLES
+   DARK MODE STYLES (Pixel Art Gamer)
    ========================================== */
 
 :root.dark-mode body {
-  background-color: #111827;
-  color: #d1d5db;
+  background: linear-gradient(135deg, #0f0f1e 0%, #1a0a2e 100%);
+  color: #fff;
 }
 
 :root.dark-mode .wireframe-box {
-  border-color: #374151;
-  background-color: #1f2937;
-  color: #d1d5db;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  border-color: #ff1493;
+  background: linear-gradient(135deg, #0f0f2e 0%, #1a0a3e 100%);
+  color: #fff;
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.5), 8px 8px 0 rgba(255, 20, 147, 0.3);
 }
 
 :root.dark-mode .wireframe-button {
-  border-color: #4b5563;
-  background-color: #2d3748;
-  color: #d1d5db;
+  border-color: #ffed4e;
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+  color: #fff;
 }
 
 :root.dark-mode .wireframe-button:hover {
-  background-color: #3d4757;
-  border-color: #6b7280;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  border-color: #ffed4e;
 }
 
 :root.dark-mode .wireframe-button:disabled {
@@ -413,71 +413,77 @@ body {
 }
 
 :root.dark-mode .wireframe-button:disabled:hover {
-  background-color: #2d3748;
-  color: #d1d5db;
-  border-color: #4b5563;
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+  color: #fff;
+  border-color: #ffed4e;
 }
 
 :root.dark-mode .wireframe-input {
-  border-color: #4b5563;
-  background-color: #2d3748;
-  color: #d1d5db;
+  border-color: #ffed4e;
+  background-color: #0a0a0a;
+  color: #ffed4e;
 }
 
 :root.dark-mode .wireframe-title {
-  color: #f3f4f6;
+  color: #ffed4e;
+  text-shadow: 2px 2px 0 #ff1493, 4px 4px 0 rgba(0, 0, 0, 0.5);
 }
 
 :root.dark-mode .wireframe-subtitle {
-  color: #f3f4f6;
+  color: #ffed4e;
+  text-shadow: 1px 1px 0 #ff1493;
 }
 
 :root.dark-mode .modal-overlay {
-  background-color: rgba(0, 0, 0, 0.6);
+  background-color: rgba(0, 0, 0, 0.9);
 }
 
 :root.dark-mode .modal-content {
-  background-color: #1f2937;
-  border-color: #374151;
-  color: #d1d5db;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(135deg, #0f0f2e 0%, #1a0a3e 100%);
+  border-color: #ff1493;
+  color: #fff;
+  box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.6), 12px 12px 0 rgba(255, 20, 147, 0.3);
 }
 
 :root.dark-mode .pokemon-slot {
-  border-color: #374151;
-  background-color: #2d3748;
+  border-color: #00ff00;
+  background-color: #0a0a0a;
+  box-shadow: inset 2px 2px 0 rgba(0, 255, 0, 0.2), 3px 3px 0 rgba(0, 0, 0, 0.5);
 }
 
 :root.dark-mode .pokemon-slot:hover {
-  background-color: #3d4757;
-  border-color: #4b5563;
+  background-color: #111;
+  border-color: #ffed4e;
+  box-shadow: inset 2px 2px 0 rgba(0, 255, 0, 0.2), 4px 4px 0 rgba(255, 237, 74, 0.5);
 }
 
 :root.dark-mode .pokemon-slot.empty {
-  background-color: #111827;
+  background-color: #050505;
+  opacity: 0.6;
 }
 
 :root.dark-mode .pokemon-slot.empty:hover {
-  background-color: #111827;
+  background-color: #050505;
 }
 
 :root.dark-mode .pokemon-slot.fakemon {
-  border-color: #f87171;
-  background-color: #2d2121;
+  border-color: #ff1493;
+  background-color: #1a0000;
 }
 
 :root.dark-mode .stat-item {
-  border-color: #374151;
-  background-color: #2d3748;
-  color: #d1d5db;
+  border-color: #ffed4e;
+  background-color: #1a0a2e;
+  color: #fff;
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.4);
 }
 
 :root.dark-mode .stat-label {
-  color: #9ca3af;
+  color: #ffed4e;
 }
 
 :root.dark-mode .stat-value {
-  color: #f3f4f6;
+  color: #00ff00;
 }
 
 :root.dark-mode .tabs {
