@@ -292,6 +292,168 @@ body {
   align-items: center;
 }
 
+/* Dark mode toggle */
+.dark-mode-toggle {
+  border: 2px solid #333;
+  background-color: white;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-family: 'Courier New', monospace;
+  font-size: 16px;
+  transition: all 0.2s;
+  min-width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dark-mode-toggle:hover {
+  background-color: #333;
+  color: white;
+  transform: scale(1.05);
+}
+
+/* ==========================================
+   DARK MODE STYLES
+   ========================================== */
+
+:root.dark-mode body {
+  background-color: #1a1a1a;
+  color: #e0e0e0;
+}
+
+:root.dark-mode .wireframe-box {
+  border-color: #555;
+  background-color: #2a2a2a;
+  color: #e0e0e0;
+}
+
+:root.dark-mode .wireframe-button {
+  border-color: #555;
+  background-color: #2a2a2a;
+  color: #e0e0e0;
+}
+
+:root.dark-mode .wireframe-button:hover {
+  background-color: #555;
+  color: white;
+}
+
+:root.dark-mode .wireframe-button:disabled {
+  opacity: 0.5;
+}
+
+:root.dark-mode .wireframe-button:disabled:hover {
+  background-color: #2a2a2a;
+  color: #e0e0e0;
+}
+
+:root.dark-mode .wireframe-input {
+  border-color: #555;
+  background-color: #3a3a3a;
+  color: #e0e0e0;
+}
+
+:root.dark-mode .wireframe-title {
+  color: #e0e0e0;
+}
+
+:root.dark-mode .wireframe-subtitle {
+  color: #e0e0e0;
+}
+
+:root.dark-mode .modal-overlay {
+  background-color: rgba(0, 0, 0, 0.9);
+}
+
+:root.dark-mode .modal-content {
+  background-color: #2a2a2a;
+  border-color: #555;
+  color: #e0e0e0;
+}
+
+:root.dark-mode .pokemon-slot {
+  border-color: #555;
+  background-color: #3a3a3a;
+}
+
+:root.dark-mode .pokemon-slot:hover {
+  background-color: #4a4a4a;
+}
+
+:root.dark-mode .pokemon-slot.empty {
+  background-color: #242424;
+}
+
+:root.dark-mode .pokemon-slot.empty:hover {
+  background-color: #242424;
+}
+
+:root.dark-mode .pokemon-slot.fakemon {
+  border-color: #ff4444;
+  background-color: #3a1515;
+}
+
+:root.dark-mode .stat-item {
+  border-color: #555;
+  background-color: #3a3a3a;
+  color: #e0e0e0;
+}
+
+:root.dark-mode .stat-label {
+  color: #b0b0b0;
+}
+
+:root.dark-mode .stat-value {
+  color: #e0e0e0;
+}
+
+:root.dark-mode .tabs {
+  border-bottom-color: #555;
+}
+
+:root.dark-mode .tab {
+  border-color: #555;
+  background-color: #3a3a3a;
+  color: #e0e0e0;
+}
+
+:root.dark-mode .tab.active {
+  background-color: #555;
+  color: white;
+}
+
+:root.dark-mode .tab:hover:not(.active) {
+  background-color: #4a4a4a;
+}
+
+:root.dark-mode .box-selector-button {
+  border-color: #555;
+  background-color: #3a3a3a;
+  color: #e0e0e0;
+}
+
+:root.dark-mode .box-selector-button.active {
+  background-color: #555;
+  color: white;
+}
+
+:root.dark-mode .box-selector-button:hover:not(.active) {
+  background-color: #4a4a4a;
+}
+
+:root.dark-mode .dark-mode-toggle {
+  border-color: #555;
+  background-color: #3a3a3a;
+  color: #e0e0e0;
+}
+
+:root.dark-mode .dark-mode-toggle:hover {
+  background-color: #555;
+  color: white;
+}
+
 /* ===========================================
    MOBILE-FIRST RESPONSIVE DESIGN
    =========================================== */
