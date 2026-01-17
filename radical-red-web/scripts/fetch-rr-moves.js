@@ -8,6 +8,7 @@ import https from 'https';
 
 const MOVES_H_URL = 'https://raw.githubusercontent.com/Klendy/radical_red/master/include/constants/moves.h';
 const BATTLE_MOVES_URL = 'https://raw.githubusercontent.com/Klendy/radical_red/master/src/Tables/battle_moves.c';
+const ATTACK_NAMES_URL = 'https://raw.githubusercontent.com/Klendy/radical_red/master/strings/attack_name_table.string';
 
 async function fetchFile(url) {
   return new Promise((resolve, reject) => {
@@ -19,7 +20,32 @@ async function fetchFile(url) {
   });
 }
 
-function parseMovesH(content) {
+function parseAttackNameTable(content) {
+  const displayNames = [];
+  const lines = content.split('\n');
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+
+    // Look for #org @NAME_ lines
+    if (line.startsWith('#org @NAME_')) {
+      // The next non-empty line is the display name
+      i++;
+      while (i < lines.length) {
+        const nameLine = lines[i].trim();
+        if (nameLine) {
+          displayNames.push(nameLine);
+          break;
+        }
+        i++;
+      }
+    }
+  }
+
+  return displayNames;
+}
+
+function parseMovesH(content, displayNames) {
   const moves = {};
   const lines = content.split('\n');
 
@@ -34,15 +60,15 @@ function parseMovesH(content) {
 
       // Skip MAX and GMAX moves as they're calculated values
       if (!name.includes('MOVES_COUNT') && !name.includes('_MAX_') && !name.includes('_GMAX_')) {
-        // Convert MOVE_NAME to proper case: MOVE_POUND -> Pound
-        const properName = name
+        // Use the display name from attack_name_table.string if available
+        const displayName = displayNames[id] || name
           .split('_')
           .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
           .join(' ');
 
         moves[id] = {
           id,
-          name: properName,
+          name: displayName,
           constantName: `MOVE_${name}`
         };
       }
@@ -112,16 +138,49 @@ function parseBattleMovesC(content, moves) {
 
 async function main() {
   try {
+    console.log('Fetching Radical Red attack name table...');
+    let attackNames;
+
+    // Try local file first, fall back to network
+    const localAttackNamesPath = './scripts/attack_name_table.string';
+    if (fs.existsSync(localAttackNamesPath)) {
+      console.log('  Using local attack_name_table.string file');
+      attackNames = fs.readFileSync(localAttackNamesPath, 'utf8');
+    } else {
+      console.log('  Fetching from remote...');
+      attackNames = await fetchFile(ATTACK_NAMES_URL);
+    }
+
+    console.log('Parsing display names...');
+    const displayNames = parseAttackNameTable(attackNames);
+    console.log(`Found ${displayNames.length} display names`);
+
     console.log('Fetching Radical Red move constants...');
-    const movesH = await fetchFile(MOVES_H_URL);
+    let movesH;
+    const localMovesHPath = './scripts/moves.h';
+    if (fs.existsSync(localMovesHPath)) {
+      console.log('  Using local moves.h file');
+      movesH = fs.readFileSync(localMovesHPath, 'utf8');
+    } else {
+      console.log('  Fetching from remote...');
+      movesH = await fetchFile(MOVES_H_URL);
+    }
 
     console.log('Parsing move IDs and names...');
-    let moves = parseMovesH(movesH);
+    let moves = parseMovesH(movesH, displayNames);
 
     console.log(`Found ${Object.keys(moves).length} moves`);
 
     console.log('Fetching Radical Red move data...');
-    const battleMovesC = await fetchFile(BATTLE_MOVES_URL);
+    let battleMovesC;
+    const localBattleMovesCPath = './scripts/battle_moves.c';
+    if (fs.existsSync(localBattleMovesCPath)) {
+      console.log('  Using local battle_moves.c file');
+      battleMovesC = fs.readFileSync(localBattleMovesCPath, 'utf8');
+    } else {
+      console.log('  Fetching from remote...');
+      battleMovesC = await fetchFile(BATTLE_MOVES_URL);
+    }
 
     console.log('Parsing move properties...');
     moves = parseBattleMovesC(battleMovesC, moves);
@@ -150,6 +209,7 @@ async function main() {
     // Verify the problematic moves
     console.log('\nVerifying key moves:');
     const testMoves = {
+      'Disarm Cry': 0x1D3,
       'Black Hole Eclipse (P)': 0x304,
       'Circle Throw': 0x1BD,
       'Reflect Type': 0x28E,
