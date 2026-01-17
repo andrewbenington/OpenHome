@@ -487,47 +487,55 @@ body {
 }
 
 :root.dark-mode .tabs {
-  border-bottom-color: #374151;
+  border-bottom-color: #ff1493;
 }
 
 :root.dark-mode .tab {
-  color: #9ca3af;
+  border-color: #00ff00;
+  background-color: #0f0f2e;
+  color: #ffed4e;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
 }
 
 :root.dark-mode .tab.active {
-  color: #f3f4f6;
-  border-bottom-color: #6b7280;
+  background-color: #1a0a3e;
+  color: #fff;
+  border-color: #ffed4e;
 }
 
 :root.dark-mode .tab:hover:not(.active) {
-  color: #d1d5db;
+  color: #fff;
+  border-color: #ffed4e;
 }
 
 :root.dark-mode .box-selector-button {
-  border-color: #4b5563;
-  background-color: #2d3748;
-  color: #d1d5db;
+  border-color: #00ff00;
+  background-color: #0f0f2e;
+  color: #ffed4e;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
 }
 
 :root.dark-mode .box-selector-button.active {
-  background-color: #3d4757;
-  color: #f3f4f6;
-  border-color: #6b7280;
+  background-color: #1a0a3e;
+  color: #fff;
+  border-color: #ffed4e;
+  box-shadow: 3px 3px 0 rgba(255, 237, 74, 0.4);
 }
 
 :root.dark-mode .box-selector-button:hover:not(.active) {
-  border-color: #6b7280;
+  border-color: #ffed4e;
 }
 
 :root.dark-mode .dark-mode-toggle {
-  border-color: #4b5563;
-  background-color: #2d3748;
-  color: #d1d5db;
+  border-color: #ffed4e;
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+  color: #fff;
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.5);
 }
 
 :root.dark-mode .dark-mode-toggle:hover {
-  background-color: #3d4757;
-  border-color: #6b7280;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  border-color: #ffed4e;
 }
 
 /* ===========================================
