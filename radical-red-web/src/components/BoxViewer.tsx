@@ -28,10 +28,10 @@ export const BoxViewer: React.FC<BoxViewerProps> = ({ box, boxIndex, onPokemonCl
                   className={`pokemon-sprite ${pokemon.isShiny ? 'shiny' : ''}`}
                   title={`${pokemon.speciesName}${pokemon.isShiny ? ' (Shiny)' : ''}`}
                   onError={(e) => {
-                    // Fallback to non-shiny sprite if shiny fails to load
+                    // Fallback to appropriate sprite if loading fails
                     const target = e.target as HTMLImageElement;
-                    if (target.src !== getFallbackSpriteUrl(pokemon.dexNum, pokemon.speciesName)) {
-                      target.src = getFallbackSpriteUrl(pokemon.dexNum, pokemon.speciesName);
+                    if (target.src !== getFallbackSpriteUrl(pokemon.dexNum, pokemon.speciesName, pokemon.isShiny)) {
+                      target.src = getFallbackSpriteUrl(pokemon.dexNum, pokemon.speciesName, pokemon.isShiny);
                     }
                   }}
                 />

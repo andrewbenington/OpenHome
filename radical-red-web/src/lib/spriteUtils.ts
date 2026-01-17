@@ -48,10 +48,12 @@ export function getPokemonSpriteUrl(
  * Gets a fallback sprite URL for when the primary sprite fails to load
  * @param _dexNum - National Pokedex number (reserved for future use)
  * @param speciesName - Pokemon species name
+ * @param isShiny - Whether to get shiny fallback sprite
  * @returns A fallback sprite URL
  */
-export function getFallbackSpriteUrl(_dexNum: number, speciesName: string): string {
+export function getFallbackSpriteUrl(_dexNum: number, speciesName: string, isShiny: boolean = false): string {
   const formattedName = formatPokemonName(speciesName);
-  // Use the default (non-shiny) sprite as fallback
-  return `https://play.pokemonshowdown.com/sprites/gen5/${formattedName}.png`;
+  // Use the appropriate sprite based on shiny status
+  const folder = isShiny ? 'gen5-shiny' : 'gen5';
+  return `https://play.pokemonshowdown.com/sprites/${folder}/${formattedName}.png`;
 }
