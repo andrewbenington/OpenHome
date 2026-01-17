@@ -344,25 +344,26 @@ body {
    ========================================== */
 
 :root.dark-mode body {
-  background-color: #1a1a1a;
-  color: #e0e0e0;
+  background-color: #111827;
+  color: #d1d5db;
 }
 
 :root.dark-mode .wireframe-box {
-  border-color: #555;
-  background-color: #2a2a2a;
-  color: #e0e0e0;
+  border-color: #374151;
+  background-color: #1f2937;
+  color: #d1d5db;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 :root.dark-mode .wireframe-button {
-  border-color: #555;
-  background-color: #2a2a2a;
-  color: #e0e0e0;
+  border-color: #4b5563;
+  background-color: #2d3748;
+  color: #d1d5db;
 }
 
 :root.dark-mode .wireframe-button:hover {
-  background-color: #555;
-  color: white;
+  background-color: #3d4757;
+  border-color: #6b7280;
 }
 
 :root.dark-mode .wireframe-button:disabled {
@@ -370,113 +371,115 @@ body {
 }
 
 :root.dark-mode .wireframe-button:disabled:hover {
-  background-color: #2a2a2a;
-  color: #e0e0e0;
+  background-color: #2d3748;
+  color: #d1d5db;
+  border-color: #4b5563;
 }
 
 :root.dark-mode .wireframe-input {
-  border-color: #555;
-  background-color: #3a3a3a;
-  color: #e0e0e0;
+  border-color: #4b5563;
+  background-color: #2d3748;
+  color: #d1d5db;
 }
 
 :root.dark-mode .wireframe-title {
-  color: #e0e0e0;
+  color: #f3f4f6;
 }
 
 :root.dark-mode .wireframe-subtitle {
-  color: #e0e0e0;
+  color: #f3f4f6;
 }
 
 :root.dark-mode .modal-overlay {
-  background-color: rgba(0, 0, 0, 0.9);
+  background-color: rgba(0, 0, 0, 0.6);
 }
 
 :root.dark-mode .modal-content {
-  background-color: #2a2a2a;
-  border-color: #555;
-  color: #e0e0e0;
+  background-color: #1f2937;
+  border-color: #374151;
+  color: #d1d5db;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
 }
 
 :root.dark-mode .pokemon-slot {
-  border-color: #555;
-  background-color: #3a3a3a;
+  border-color: #374151;
+  background-color: #2d3748;
 }
 
 :root.dark-mode .pokemon-slot:hover {
-  background-color: #4a4a4a;
+  background-color: #3d4757;
+  border-color: #4b5563;
 }
 
 :root.dark-mode .pokemon-slot.empty {
-  background-color: #242424;
+  background-color: #111827;
 }
 
 :root.dark-mode .pokemon-slot.empty:hover {
-  background-color: #242424;
+  background-color: #111827;
 }
 
 :root.dark-mode .pokemon-slot.fakemon {
-  border-color: #ff4444;
-  background-color: #3a1515;
+  border-color: #f87171;
+  background-color: #2d2121;
 }
 
 :root.dark-mode .stat-item {
-  border-color: #555;
-  background-color: #3a3a3a;
-  color: #e0e0e0;
+  border-color: #374151;
+  background-color: #2d3748;
+  color: #d1d5db;
 }
 
 :root.dark-mode .stat-label {
-  color: #b0b0b0;
+  color: #9ca3af;
 }
 
 :root.dark-mode .stat-value {
-  color: #e0e0e0;
+  color: #f3f4f6;
 }
 
 :root.dark-mode .tabs {
-  border-bottom-color: #555;
+  border-bottom-color: #374151;
 }
 
 :root.dark-mode .tab {
-  border-color: #555;
-  background-color: #3a3a3a;
-  color: #e0e0e0;
+  color: #9ca3af;
 }
 
 :root.dark-mode .tab.active {
-  background-color: #555;
-  color: white;
+  color: #f3f4f6;
+  border-bottom-color: #6b7280;
 }
 
 :root.dark-mode .tab:hover:not(.active) {
-  background-color: #4a4a4a;
+  color: #d1d5db;
 }
 
 :root.dark-mode .box-selector-button {
-  border-color: #555;
-  background-color: #3a3a3a;
-  color: #e0e0e0;
+  border-color: #4b5563;
+  background-color: #2d3748;
+  color: #d1d5db;
 }
 
 :root.dark-mode .box-selector-button.active {
-  background-color: #555;
-  color: white;
+  background-color: #3d4757;
+  color: #f3f4f6;
+  border-color: #6b7280;
 }
 
 :root.dark-mode .box-selector-button:hover:not(.active) {
-  background-color: #4a4a4a;
+  border-color: #6b7280;
 }
 
 :root.dark-mode .dark-mode-toggle {
-  border-color: #555;
-  background-color: #3a3a3a;
-  color: #e0e0e0;
+  border-color: #4b5563;
+  background-color: #2d3748;
+  color: #d1d5db;
 }
 
 :root.dark-mode .dark-mode-toggle:hover {
-  background-color: #555;
-  color: white;
+  background-color: #3d4757;
+  border-color: #6b7280;
 }
 
 /* ===========================================
