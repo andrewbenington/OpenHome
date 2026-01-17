@@ -83,19 +83,23 @@ body {
 
 .wireframe-title {
   font-size: 24px;
-  font-weight: 700;
+  font-weight: 900;
   margin-bottom: 16px;
-  text-transform: capitalize;
-  letter-spacing: 0.5px;
-  color: #1f2937;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #ffed4e;
+  text-shadow: 2px 2px 0 #ff1493, 4px 4px 0 rgba(0, 0, 0, 0.3);
+  font-family: 'Press Start 2P', 'Courier New', monospace;
 }
 
 .wireframe-subtitle {
-  font-size: 18px;
-  font-weight: 600;
+  font-size: 16px;
+  font-weight: 700;
   margin: 16px 0 8px 0;
-  text-transform: capitalize;
-  color: #1f2937;
+  text-transform: uppercase;
+  color: #ffed4e;
+  text-shadow: 1px 1px 0 #ff1493;
+  font-family: 'Press Start 2P', 'Courier New', monospace;
 }
 
 /* Modal */
