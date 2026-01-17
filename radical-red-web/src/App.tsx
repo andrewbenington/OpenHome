@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { FileUpload } from './components/FileUpload'
 import { BoxViewer } from './components/BoxViewer'
 import { PokemonDetailModal } from './components/PokemonDetailModal'
+import { DarkModeToggle } from './components/DarkModeToggle'
 import { SaveData, PokemonData } from './lib/types'
 import { parseSave, isRadicalRedSave, serializeSave } from './lib/saveParser'
 
