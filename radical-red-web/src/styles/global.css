@@ -1,4 +1,6 @@
-/* Wireframe styling */
+/* Pixel Art Gamer Theme */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
 * {
   margin: 0;
   padding: 0;
@@ -6,10 +8,13 @@
 }
 
 body {
-  font-family: 'Courier New', monospace;
-  background-color: #f5f5f5;
-  color: #333;
+  font-family: 'Press Start 2P', 'Courier New', monospace;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
   line-height: 1.6;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
 }
 
 #root {
@@ -17,60 +22,88 @@ body {
   padding: 20px;
 }
 
-/* Wireframe elements */
+/* Pixel Art Gamer Elements */
 .wireframe-box {
-  border: 2px solid #333;
-  background-color: white;
+  border: 4px solid #ff1493;
+  background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
   padding: 16px;
   margin: 8px 0;
+  border-radius: 0;
+  box-shadow:
+    4px 4px 0 rgba(0, 0, 0, 0.3),
+    8px 8px 0 rgba(255, 20, 147, 0.2);
+  color: #fff;
 }
 
 .wireframe-button {
-  border: 2px solid #333;
-  background-color: white;
-  padding: 8px 16px;
+  border: 3px solid #ffed4e;
+  background: linear-gradient(135deg, #ff1493 0%, #ff69b4 100%);
+  padding: 10px 20px;
   cursor: pointer;
-  font-family: 'Courier New', monospace;
-  font-size: 14px;
-  transition: all 0.2s;
+  font-family: 'Press Start 2P', 'Courier New', monospace;
+  font-size: 12px;
+  transition: all 0.1s;
+  border-radius: 0;
+  color: #000;
+  font-weight: bold;
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.3);
 }
 
 .wireframe-button:hover {
-  background-color: #333;
-  color: white;
+  background: linear-gradient(135deg, #ff69b4 0%, #ff1493 100%);
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.4);
+}
+
+.wireframe-button:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.2);
 }
 
 .wireframe-button:disabled {
-  opacity: 0.5;
+  opacity: 0.6;
   cursor: not-allowed;
 }
 
 .wireframe-button:disabled:hover {
-  background-color: white;
-  color: #333;
+  background: linear-gradient(135deg, #ff1493 0%, #ff69b4 100%);
+  transform: none;
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.3);
 }
 
 .wireframe-input {
-  border: 2px solid #333;
-  padding: 8px;
-  font-family: 'Courier New', monospace;
-  font-size: 14px;
+  border: 3px solid #ffed4e;
+  padding: 10px;
+  font-family: 'Press Start 2P', 'Courier New', monospace;
+  font-size: 12px;
   width: 100%;
+  border-radius: 0;
+  color: #000;
+  background-color: #fff;
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.2);
 }
 
 .wireframe-title {
   font-size: 24px;
-  font-weight: bold;
+  font-weight: 900;
   margin-bottom: 16px;
   text-transform: uppercase;
   letter-spacing: 2px;
+  color: #ffed4e;
+  text-shadow:
+    2px 2px 0 #ff1493,
+    4px 4px 0 rgba(0, 0, 0, 0.3);
+  font-family: 'Press Start 2P', 'Courier New', monospace;
 }
 
 .wireframe-subtitle {
-  font-size: 18px;
-  font-weight: bold;
+  font-size: 16px;
+  font-weight: 700;
   margin: 16px 0 8px 0;
   text-transform: uppercase;
+  color: #ffed4e;
+  text-shadow: 1px 1px 0 #ff1493;
+  font-family: 'Press Start 2P', 'Courier New', monospace;
 }
 
 /* Modal */
@@ -80,7 +113,7 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: rgba(0, 0, 0, 0.8);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -89,13 +122,18 @@ body {
 }
 
 .modal-content {
-  background-color: white;
-  border: 3px solid #333;
+  background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+  border: 4px solid #ff1493;
   max-width: 800px;
   width: 100%;
   max-height: 90vh;
   overflow-y: auto;
   padding: 24px;
+  border-radius: 0;
+  box-shadow:
+    6px 6px 0 rgba(0, 0, 0, 0.5),
+    12px 12px 0 rgba(255, 20, 147, 0.2);
+  color: #fff;
 }
 
 /* Grid layouts */
@@ -107,36 +145,46 @@ body {
 }
 
 .pokemon-slot {
-  border: 2px solid #333;
+  border: 3px solid #00ff00;
   aspect-ratio: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  background-color: white;
-  transition: all 0.2s;
+  background-color: #000;
+  transition: all 0.1s;
   position: relative;
   padding: 4px;
+  border-radius: 0;
+  box-shadow:
+    inset 2px 2px 0 rgba(0, 255, 0, 0.3),
+    3px 3px 0 rgba(0, 0, 0, 0.4);
 }
 
 .pokemon-slot:hover {
-  background-color: #f0f0f0;
-  transform: scale(1.05);
+  background-color: #111;
+  border-color: #ffed4e;
+  box-shadow:
+    inset 2px 2px 0 rgba(0, 255, 0, 0.3),
+    4px 4px 0 rgba(255, 237, 74, 0.5);
+  transform: translate(-1px, -1px);
 }
 
 .pokemon-slot.empty {
-  background-color: #f9f9f9;
+  background-color: #0a0a0a;
   cursor: default;
+  opacity: 0.6;
 }
 
 .pokemon-slot.empty:hover {
-  background-color: #f9f9f9;
+  background-color: #0a0a0a;
   transform: none;
+  border-color: #00ff00;
 }
 
 .pokemon-slot.fakemon {
-  border-color: #cc0000;
-  background-color: #fff0f0;
+  border-color: #ff1493;
+  background-color: #1a0000;
 }
 
 .pokemon-info-compact {
@@ -181,18 +229,27 @@ body {
 }
 
 .stat-item {
-  border: 1px solid #333;
+  border: 3px solid #ffed4e;
   padding: 12px;
+  border-radius: 0;
+  background-color: #1e3a8a;
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.3);
 }
 
 .stat-label {
-  font-weight: bold;
+  font-weight: 900;
   margin-bottom: 4px;
-  font-size: 12px;
+  font-size: 10px;
+  color: #ffed4e;
+  font-family: 'Press Start 2P', 'Courier New', monospace;
+  text-transform: uppercase;
 }
 
 .stat-value {
-  font-size: 18px;
+  font-size: 16px;
+  color: #00ff00;
+  font-family: 'Press Start 2P', 'Courier New', monospace;
+  font-weight: bold;
 }
 
 /* Forms */
@@ -202,9 +259,12 @@ body {
 
 .form-label {
   display: block;
-  font-weight: bold;
+  font-weight: 900;
   margin-bottom: 4px;
-  font-size: 12px;
+  font-size: 11px;
+  color: #ffed4e;
+  font-family: 'Press Start 2P', 'Courier New', monospace;
+  text-transform: uppercase;
 }
 
 .form-row {
@@ -216,28 +276,33 @@ body {
 /* Tabs */
 .tabs {
   display: flex;
-  border-bottom: 2px solid #333;
+  border-bottom: 3px solid #ff1493;
   margin-bottom: 16px;
 }
 
 .tab {
   padding: 12px 24px;
   cursor: pointer;
-  border: 2px solid #333;
+  border: 3px solid #00ff00;
   border-bottom: none;
   margin-right: 4px;
-  background-color: white;
-  font-family: 'Courier New', monospace;
-  font-size: 14px;
+  background-color: #1e3a8a;
+  font-family: 'Press Start 2P', 'Courier New', monospace;
+  font-size: 10px;
+  color: #ffed4e;
+  transition: all 0.1s;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.3);
 }
 
 .tab.active {
-  background-color: #333;
-  color: white;
+  background-color: #2563eb;
+  color: #fff;
+  border-color: #ffed4e;
 }
 
 .tab:hover:not(.active) {
-  background-color: #f0f0f0;
+  color: #fff;
+  border-color: #ffed4e;
 }
 
 /* Box selector */
@@ -249,22 +314,30 @@ body {
 }
 
 .box-selector-button {
-  border: 2px solid #333;
-  background-color: white;
+  border: 3px solid #00ff00;
+  background-color: #1e3a8a;
   padding: 8px 12px;
   cursor: pointer;
-  font-family: 'Courier New', monospace;
-  font-size: 12px;
-  min-width: 60px;
+  font-family: 'Press Start 2P', 'Courier New', monospace;
+  font-size: 10px;
+  min-width: 70px;
+  border-radius: 0;
+  color: #ffed4e;
+  transition: all 0.1s;
+  font-weight: bold;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.3);
 }
 
 .box-selector-button.active {
-  background-color: #333;
-  color: white;
+  background-color: #2563eb;
+  color: #fff;
+  border-color: #ffed4e;
+  box-shadow: 3px 3px 0 rgba(255, 237, 74, 0.4);
 }
 
 .box-selector-button:hover:not(.active) {
-  background-color: #f0f0f0;
+  border-color: #ffed4e;
+  transform: translate(-1px, -1px);
 }
 
 /* Utilities */
@@ -290,6 +363,199 @@ body {
 
 .items-center {
   align-items: center;
+}
+
+/* Dark mode toggle */
+.dark-mode-toggle {
+  border: 3px solid #ffed4e;
+  background: linear-gradient(135deg, #ff1493 0%, #ff69b4 100%);
+  padding: 8px 12px;
+  cursor: pointer;
+  font-family: 'Press Start 2P', 'Courier New', monospace;
+  font-size: 16px;
+  transition: all 0.1s;
+  min-width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0;
+  color: #000;
+  font-weight: bold;
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.3);
+}
+
+.dark-mode-toggle:hover {
+  background: linear-gradient(135deg, #ff69b4 0%, #ff1493 100%);
+  transform: translate(-2px, -2px);
+  box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.4);
+}
+
+/* ==========================================
+   DARK MODE STYLES (Pixel Art Gamer)
+   ========================================== */
+
+:root.dark-mode body {
+  background: linear-gradient(135deg, #0f0f1e 0%, #1a0a2e 100%);
+  color: #fff;
+}
+
+:root.dark-mode .wireframe-box {
+  border-color: #ff1493;
+  background: linear-gradient(135deg, #0f0f2e 0%, #1a0a3e 100%);
+  color: #fff;
+  box-shadow:
+    4px 4px 0 rgba(0, 0, 0, 0.5),
+    8px 8px 0 rgba(255, 20, 147, 0.3);
+}
+
+:root.dark-mode .wireframe-button {
+  border-color: #ffed4e;
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+  color: #fff;
+}
+
+:root.dark-mode .wireframe-button:hover {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  border-color: #ffed4e;
+}
+
+:root.dark-mode .wireframe-button:disabled {
+  opacity: 0.5;
+}
+
+:root.dark-mode .wireframe-button:disabled:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+  color: #fff;
+  border-color: #ffed4e;
+}
+
+:root.dark-mode .wireframe-input {
+  border-color: #ffed4e;
+  background-color: #0a0a0a;
+  color: #ffed4e;
+}
+
+:root.dark-mode .wireframe-title {
+  color: #ffed4e;
+  text-shadow:
+    2px 2px 0 #ff1493,
+    4px 4px 0 rgba(0, 0, 0, 0.5);
+}
+
+:root.dark-mode .wireframe-subtitle {
+  color: #ffed4e;
+  text-shadow: 1px 1px 0 #ff1493;
+}
+
+:root.dark-mode .modal-overlay {
+  background-color: rgba(0, 0, 0, 0.9);
+}
+
+:root.dark-mode .modal-content {
+  background: linear-gradient(135deg, #0f0f2e 0%, #1a0a3e 100%);
+  border-color: #ff1493;
+  color: #fff;
+  box-shadow:
+    6px 6px 0 rgba(0, 0, 0, 0.6),
+    12px 12px 0 rgba(255, 20, 147, 0.3);
+}
+
+:root.dark-mode .pokemon-slot {
+  border-color: #00ff00;
+  background-color: #0a0a0a;
+  box-shadow:
+    inset 2px 2px 0 rgba(0, 255, 0, 0.2),
+    3px 3px 0 rgba(0, 0, 0, 0.5);
+}
+
+:root.dark-mode .pokemon-slot:hover {
+  background-color: #111;
+  border-color: #ffed4e;
+  box-shadow:
+    inset 2px 2px 0 rgba(0, 255, 0, 0.2),
+    4px 4px 0 rgba(255, 237, 74, 0.5);
+}
+
+:root.dark-mode .pokemon-slot.empty {
+  background-color: #050505;
+  opacity: 0.6;
+}
+
+:root.dark-mode .pokemon-slot.empty:hover {
+  background-color: #050505;
+}
+
+:root.dark-mode .pokemon-slot.fakemon {
+  border-color: #ff1493;
+  background-color: #1a0000;
+}
+
+:root.dark-mode .stat-item {
+  border-color: #ffed4e;
+  background-color: #1a0a2e;
+  color: #fff;
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.4);
+}
+
+:root.dark-mode .stat-label {
+  color: #ffed4e;
+}
+
+:root.dark-mode .stat-value {
+  color: #00ff00;
+}
+
+:root.dark-mode .tabs {
+  border-bottom-color: #ff1493;
+}
+
+:root.dark-mode .tab {
+  border-color: #00ff00;
+  background-color: #0f0f2e;
+  color: #ffed4e;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
+}
+
+:root.dark-mode .tab.active {
+  background-color: #1a0a3e;
+  color: #fff;
+  border-color: #ffed4e;
+}
+
+:root.dark-mode .tab:hover:not(.active) {
+  color: #fff;
+  border-color: #ffed4e;
+}
+
+:root.dark-mode .box-selector-button {
+  border-color: #00ff00;
+  background-color: #0f0f2e;
+  color: #ffed4e;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
+}
+
+:root.dark-mode .box-selector-button.active {
+  background-color: #1a0a3e;
+  color: #fff;
+  border-color: #ffed4e;
+  box-shadow: 3px 3px 0 rgba(255, 237, 74, 0.4);
+}
+
+:root.dark-mode .box-selector-button:hover:not(.active) {
+  border-color: #ffed4e;
+}
+
+:root.dark-mode .dark-mode-toggle {
+  border-color: #ffed4e;
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+  color: #fff;
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.5);
+}
+
+:root.dark-mode .dark-mode-toggle:hover {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  border-color: #ffed4e;
 }
 
 /* ===========================================
