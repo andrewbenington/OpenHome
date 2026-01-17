@@ -139,39 +139,42 @@ body {
 }
 
 .pokemon-slot {
-  border: 1px solid #e5e7eb;
+  border: 3px solid #00ff00;
   aspect-ratio: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  background-color: #ffffff;
-  transition: all 0.2s;
+  background-color: #000;
+  transition: all 0.1s;
   position: relative;
   padding: 4px;
-  border-radius: 6px;
+  border-radius: 0;
+  box-shadow: inset 2px 2px 0 rgba(0, 255, 0, 0.3), 3px 3px 0 rgba(0, 0, 0, 0.4);
 }
 
 .pokemon-slot:hover {
-  background-color: #f9fafb;
-  border-color: #d1d5db;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  transform: translateY(-2px);
+  background-color: #111;
+  border-color: #ffed4e;
+  box-shadow: inset 2px 2px 0 rgba(0, 255, 0, 0.3), 4px 4px 0 rgba(255, 237, 74, 0.5);
+  transform: translate(-1px, -1px);
 }
 
 .pokemon-slot.empty {
-  background-color: #f3f4f6;
+  background-color: #0a0a0a;
   cursor: default;
+  opacity: 0.6;
 }
 
 .pokemon-slot.empty:hover {
-  background-color: #f3f4f6;
+  background-color: #0a0a0a;
   transform: none;
+  border-color: #00ff00;
 }
 
 .pokemon-slot.fakemon {
-  border-color: #fca5a5;
-  background-color: #fef2f2;
+  border-color: #ff1493;
+  background-color: #1a0000;
 }
 
 .pokemon-info-compact {
