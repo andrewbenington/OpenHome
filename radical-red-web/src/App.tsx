@@ -112,13 +112,13 @@ function App() {
       ) : (
         <>
           <div className="wireframe-box">
-            <div className="flex justify-between items-center mb-2">
+            <div className="flex justify-between items-center mb-2 trainer-info-header">
               <div>
                 <strong>Trainer:</strong> {saveData.trainerName} |<strong> ID:</strong>{' '}
                 {saveData.trainerID.toString().padStart(5, '0')} |<strong> Money:</strong> $
                 {saveData.money.toLocaleString()}
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-2 save-action-buttons">
                 <button
                   className="wireframe-button"
                   onClick={handleDownload}

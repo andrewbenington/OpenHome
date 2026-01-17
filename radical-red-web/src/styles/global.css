@@ -639,6 +639,23 @@ body {
     min-height: 44px; /* iOS recommended touch target */
   }
 
+  /* Stack trainer info and buttons vertically on mobile */
+  .trainer-info-header {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 12px;
+  }
+
+  /* Stack save action buttons vertically on mobile */
+  .save-action-buttons {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .save-action-buttons .wireframe-button {
+    width: 100%;
+  }
+
   /* Pokemon slot adjustments */
   .pokemon-slot {
     padding: 2px;
