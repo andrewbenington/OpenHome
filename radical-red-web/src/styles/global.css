@@ -1,4 +1,6 @@
-/* Wireframe styling */
+/* Pixel Art Gamer Theme */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
 * {
   margin: 0;
   padding: 0;
@@ -6,10 +8,13 @@
 }
 
 body {
-  font-family: 'Courier New', monospace;
-  background-color: #fafafa;
-  color: #4a4a4a;
+  font-family: 'Press Start 2P', 'Courier New', monospace;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
   line-height: 1.6;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
 }
 
 #root {
