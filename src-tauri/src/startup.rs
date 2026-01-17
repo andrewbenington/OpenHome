@@ -1,7 +1,6 @@
 use std::path::{Path, PathBuf};
 
 use tauri::{App, Manager};
-use tauri_plugin_dialog::{DialogExt, MessageDialogButtons, MessageDialogKind};
 
 use crate::{
     error::{Error, Result},
@@ -17,16 +16,15 @@ pub fn run_app_startup(app: &App) -> Result<Vec<UpdateFeatures>> {
         match versioning::handle_updates_get_features(handle, false) {
             Err(error) => match error {
                 Error::OutdatedVersion { .. } => {
-                    let should_quit = app
-                        .dialog()
-                        .message(error.to_string())
-                        .title("OpenHome Version Error")
-                        .kind(MessageDialogKind::Error)
-                        .buttons(MessageDialogButtons::OkCancelCustom(
-                            "Quit".to_owned(),
-                            "Launch App Anyways".to_owned(),
-                        ))
-                        .blocking_show();
+                    let should_quit = util::show_prompt_dialog(
+                        app,
+                        format!(
+                            "{error}\nWould you like to quit and avoid potential storage issues?"
+                        ),
+                        "OpenHome Version Error",
+                        "Quit",
+                        "Launch App Anyways",
+                    );
 
                     if should_quit {
                         return Err(error);
