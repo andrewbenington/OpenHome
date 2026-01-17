@@ -3,41 +3,55 @@
  */
 
 /**
- * Gets the sprite URL for a Pokemon
- * @param dexNum - National Pokedex number
+ * Converts a Pokemon species name to Pokemon Showdown format
+ * @param speciesName - The Pokemon species name
+ * @returns The formatted name for Pokemon Showdown URLs
+ */
+function formatPokemonName(speciesName: string): string {
+  return speciesName
+    .toLowerCase()
+    .replace(/[♀]/g, '-f')
+    .replace(/[♂]/g, '-m')
+    .replace(/['\s.]/g, '')
+    .replace(/:/g, '');
+}
+
+/**
+ * Gets the sprite URL for a Pokemon using Pokemon Showdown sprites
+ * @param _dexNum - National Pokedex number (reserved for future use)
+ * @param speciesName - Pokemon species name
  * @param isShiny - Whether the Pokemon is shiny
  * @param size - Size variant ('small' for box view, 'large' for modal)
  * @returns The URL to the Pokemon sprite
  */
 export function getPokemonSpriteUrl(
-  dexNum: number,
+  _dexNum: number,
+  speciesName: string,
   isShiny: boolean = false,
   size: 'small' | 'large' = 'small'
 ): string {
-  // Use PokeAPI sprites repository
-  const baseUrl = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon';
+  const formattedName = formatPokemonName(speciesName);
+  const baseUrl = 'https://play.pokemonshowdown.com/sprites';
 
   if (size === 'large') {
-    // Use official artwork for larger displays
-    if (isShiny) {
-      return `${baseUrl}/other/official-artwork/shiny/${dexNum}.png`;
-    }
-    return `${baseUrl}/other/official-artwork/${dexNum}.png`;
+    // Use animated sprites for larger displays
+    const folder = isShiny ? 'ani-shiny' : 'ani';
+    return `${baseUrl}/${folder}/${formattedName}.gif`;
   }
 
-  // Use standard sprites for small/box view
-  if (isShiny) {
-    return `${baseUrl}/shiny/${dexNum}.png`;
-  }
-  return `${baseUrl}/${dexNum}.png`;
+  // Use gen5 sprites for small/box view (higher quality than default)
+  const folder = isShiny ? 'gen5-shiny' : 'gen5';
+  return `${baseUrl}/${folder}/${formattedName}.png`;
 }
 
 /**
  * Gets a fallback sprite URL for when the primary sprite fails to load
- * @param dexNum - National Pokedex number
+ * @param _dexNum - National Pokedex number (reserved for future use)
+ * @param speciesName - Pokemon species name
  * @returns A fallback sprite URL
  */
-export function getFallbackSpriteUrl(dexNum: number): string {
+export function getFallbackSpriteUrl(_dexNum: number, speciesName: string): string {
+  const formattedName = formatPokemonName(speciesName);
   // Use the default (non-shiny) sprite as fallback
-  return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${dexNum}.png`;
+  return `https://play.pokemonshowdown.com/sprites/gen5/${formattedName}.png`;
 }

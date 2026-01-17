@@ -148,25 +148,23 @@ body {
 }
 
 .pokemon-sprite {
-  width: 32px;
-  height: 32px;
+  width: 64px;
+  height: 64px;
   image-rendering: pixelated;
   image-rendering: -moz-crisp-edges;
   image-rendering: crisp-edges;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
   object-fit: contain;
 }
 
 .pokemon-sprite.shiny {
-  filter: drop-shadow(0 0 2px gold);
+  filter: drop-shadow(0 0 3px gold);
 }
 
 .pokemon-sprite-large {
-  width: 120px;
-  height: 120px;
-  image-rendering: pixelated;
-  image-rendering: -moz-crisp-edges;
-  image-rendering: crisp-edges;
+  width: 150px;
+  height: 150px;
+  image-rendering: auto;
   object-fit: contain;
 }
 
@@ -385,13 +383,13 @@ body {
   }
 
   .pokemon-sprite {
-    width: 28px;
-    height: 28px;
+    width: 52px;
+    height: 52px;
   }
 
   .pokemon-sprite-large {
-    width: 100px;
-    height: 100px;
+    width: 120px;
+    height: 120px;
   }
 
   /* Form elements */
@@ -486,13 +484,13 @@ body {
 
   /* Smaller sprites for very small screens */
   .pokemon-sprite {
-    width: 24px;
-    height: 24px;
+    width: 44px;
+    height: 44px;
   }
 
   .pokemon-sprite-large {
-    width: 80px;
-    height: 80px;
+    width: 100px;
+    height: 100px;
   }
 
   .pokemon-info-compact {
