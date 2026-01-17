@@ -318,8 +318,8 @@ body {
 
 /* Dark mode toggle */
 .dark-mode-toggle {
-  border: 2px solid #333;
-  background-color: white;
+  border: 1px solid #d4d4d8;
+  background-color: #ffffff;
   padding: 8px 12px;
   cursor: pointer;
   font-family: 'Courier New', monospace;
@@ -330,12 +330,13 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 4px;
+  color: #4a4a4a;
 }
 
 .dark-mode-toggle:hover {
-  background-color: #333;
-  color: white;
-  transform: scale(1.05);
+  background-color: #f4f4f5;
+  border-color: #a1a1a6;
 }
 
 /* ==========================================
