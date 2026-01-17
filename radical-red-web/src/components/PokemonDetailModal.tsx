@@ -108,6 +108,29 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
     updatePokemon({ level: clampedLevel, exp: newExp })
   }
 
+  // Helper to create number input handlers that allow free typing
+  const createNumberInputHandlers = (
+    field: keyof PokemonData,
+    min: number,
+    max: number,
+    defaultVal: number = min
+  ) => ({
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+      const val = e.target.value === '' ? defaultVal : parseInt(e.target.value)
+      if (!isNaN(val)) {
+        updatePokemon({ [field]: val } as Partial<PokemonData>)
+      }
+    },
+    onBlur: (e: React.FocusEvent<HTMLInputElement>) => {
+      const val = parseInt(e.target.value)
+      if (isNaN(val) || val < min) {
+        updatePokemon({ [field]: defaultVal } as Partial<PokemonData>)
+      } else if (val > max) {
+        updatePokemon({ [field]: max } as Partial<PokemonData>)
+      }
+    }
+  })
+
   // Get all moves sorted by name
   const allMoves = useMemo(() => {
     const moves = Object.values(movesData as any).map((move: any) => ({
@@ -170,8 +193,16 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
               <input
                 type="number"
                 className="wireframe-input"
-                value={pokemon.level}
-                onChange={(e) => handleLevelChange(parseInt(e.target.value) || 1)}
+                value={pokemon.level || ''}
+                onChange={(e) => {
+                  const val = e.target.value === '' ? 1 : parseInt(e.target.value)
+                  if (!isNaN(val)) handleLevelChange(val)
+                }}
+                onBlur={(e) => {
+                  const val = parseInt(e.target.value)
+                  if (isNaN(val) || val < 1) handleLevelChange(1)
+                  else if (val > 100) handleLevelChange(100)
+                }}
                 min="1"
                 max="100"
                 style={{ width: '100%' }}
@@ -284,8 +315,8 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
                 <input
                   type="number"
                   className="wireframe-input"
-                  value={pokemon.hpIV}
-                  onChange={(e) => updatePokemon({ hpIV: Math.min(31, Math.max(0, parseInt(e.target.value) || 0)) })}
+                  value={pokemon.hpIV ?? ''}
+                  {...createNumberInputHandlers('hpIV', 0, 31, 0)}
                   min="0"
                   max="31"
                 />
@@ -295,8 +326,8 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
                 <input
                   type="number"
                   className="wireframe-input"
-                  value={pokemon.attackIV}
-                  onChange={(e) => updatePokemon({ attackIV: Math.min(31, Math.max(0, parseInt(e.target.value) || 0)) })}
+                  value={pokemon.attackIV ?? ''}
+                  {...createNumberInputHandlers('attackIV', 0, 31, 0)}
                   min="0"
                   max="31"
                 />
@@ -306,8 +337,8 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
                 <input
                   type="number"
                   className="wireframe-input"
-                  value={pokemon.defenseIV}
-                  onChange={(e) => updatePokemon({ defenseIV: Math.min(31, Math.max(0, parseInt(e.target.value) || 0)) })}
+                  value={pokemon.defenseIV ?? ''}
+                  {...createNumberInputHandlers('defenseIV', 0, 31, 0)}
                   min="0"
                   max="31"
                 />
@@ -317,8 +348,8 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
                 <input
                   type="number"
                   className="wireframe-input"
-                  value={pokemon.spAtkIV}
-                  onChange={(e) => updatePokemon({ spAtkIV: Math.min(31, Math.max(0, parseInt(e.target.value) || 0)) })}
+                  value={pokemon.spAtkIV ?? ''}
+                  {...createNumberInputHandlers('spAtkIV', 0, 31, 0)}
                   min="0"
                   max="31"
                 />
@@ -328,8 +359,8 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
                 <input
                   type="number"
                   className="wireframe-input"
-                  value={pokemon.spDefIV}
-                  onChange={(e) => updatePokemon({ spDefIV: Math.min(31, Math.max(0, parseInt(e.target.value) || 0)) })}
+                  value={pokemon.spDefIV ?? ''}
+                  {...createNumberInputHandlers('spDefIV', 0, 31, 0)}
                   min="0"
                   max="31"
                 />
@@ -339,8 +370,8 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
                 <input
                   type="number"
                   className="wireframe-input"
-                  value={pokemon.speedIV}
-                  onChange={(e) => updatePokemon({ speedIV: Math.min(31, Math.max(0, parseInt(e.target.value) || 0)) })}
+                  value={pokemon.speedIV ?? ''}
+                  {...createNumberInputHandlers('speedIV', 0, 31, 0)}
                   min="0"
                   max="31"
                 />
@@ -354,8 +385,8 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
                 <input
                   type="number"
                   className="wireframe-input"
-                  value={pokemon.hpEV}
-                  onChange={(e) => updatePokemon({ hpEV: Math.min(255, Math.max(0, parseInt(e.target.value) || 0)) })}
+                  value={pokemon.hpEV ?? ''}
+                  {...createNumberInputHandlers('hpEV', 0, 255, 0)}
                   min="0"
                   max="255"
                 />
@@ -365,8 +396,8 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
                 <input
                   type="number"
                   className="wireframe-input"
-                  value={pokemon.attackEV}
-                  onChange={(e) => updatePokemon({ attackEV: Math.min(255, Math.max(0, parseInt(e.target.value) || 0)) })}
+                  value={pokemon.attackEV ?? ''}
+                  {...createNumberInputHandlers('attackEV', 0, 255, 0)}
                   min="0"
                   max="255"
                 />
@@ -376,8 +407,8 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
                 <input
                   type="number"
                   className="wireframe-input"
-                  value={pokemon.defenseEV}
-                  onChange={(e) => updatePokemon({ defenseEV: Math.min(255, Math.max(0, parseInt(e.target.value) || 0)) })}
+                  value={pokemon.defenseEV ?? ''}
+                  {...createNumberInputHandlers('defenseEV', 0, 255, 0)}
                   min="0"
                   max="255"
                 />
@@ -387,8 +418,8 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
                 <input
                   type="number"
                   className="wireframe-input"
-                  value={pokemon.spAtkEV}
-                  onChange={(e) => updatePokemon({ spAtkEV: Math.min(255, Math.max(0, parseInt(e.target.value) || 0)) })}
+                  value={pokemon.spAtkEV ?? ''}
+                  {...createNumberInputHandlers('spAtkEV', 0, 255, 0)}
                   min="0"
                   max="255"
                 />
@@ -398,8 +429,8 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
                 <input
                   type="number"
                   className="wireframe-input"
-                  value={pokemon.spDefEV}
-                  onChange={(e) => updatePokemon({ spDefEV: Math.min(255, Math.max(0, parseInt(e.target.value) || 0)) })}
+                  value={pokemon.spDefEV ?? ''}
+                  {...createNumberInputHandlers('spDefEV', 0, 255, 0)}
                   min="0"
                   max="255"
                 />
@@ -409,8 +440,8 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
                 <input
                   type="number"
                   className="wireframe-input"
-                  value={pokemon.speedEV}
-                  onChange={(e) => updatePokemon({ speedEV: Math.min(255, Math.max(0, parseInt(e.target.value) || 0)) })}
+                  value={pokemon.speedEV ?? ''}
+                  {...createNumberInputHandlers('speedEV', 0, 255, 0)}
                   min="0"
                   max="255"
                 />
@@ -499,8 +530,8 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
                 <input
                   type="number"
                   className="wireframe-input"
-                  value={pokemon.friendship}
-                  onChange={(e) => updatePokemon({ friendship: Math.min(255, Math.max(0, parseInt(e.target.value) || 0)) })}
+                  value={pokemon.friendship ?? ''}
+                  {...createNumberInputHandlers('friendship', 0, 255, 0)}
                   min="0"
                   max="255"
                 />
@@ -512,8 +543,8 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
                 <input
                   type="number"
                   className="wireframe-input"
-                  value={pokemon.exp}
-                  onChange={(e) => updatePokemon({ exp: Math.max(0, parseInt(e.target.value) || 0) })}
+                  value={pokemon.exp ?? ''}
+                  {...createNumberInputHandlers('exp', 0, 16777215, 0)}
                   min="0"
                 />
               </div>
@@ -562,8 +593,8 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
                 <input
                   type="number"
                   className="wireframe-input"
-                  value={pokemon.ball}
-                  onChange={(e) => updatePokemon({ ball: Math.max(0, parseInt(e.target.value) || 0) })}
+                  value={pokemon.ball ?? ''}
+                  {...createNumberInputHandlers('ball', 0, 65535, 0)}
                   min="0"
                 />
               </div>
@@ -573,8 +604,8 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
               <input
                 type="number"
                 className="wireframe-input"
-                value={pokemon.heldItem}
-                onChange={(e) => updatePokemon({ heldItem: Math.max(0, parseInt(e.target.value) || 0) })}
+                value={pokemon.heldItem ?? ''}
+                {...createNumberInputHandlers('heldItem', 0, 65535, 0)}
                 min="0"
               />
             </div>
