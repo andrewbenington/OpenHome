@@ -51,14 +51,14 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
 
         <div style={{ textAlign: 'center', margin: '16px 0' }}>
           <img
-            src={getPokemonSpriteUrl(pokemon.dexNum, pokemon.isShiny, 'large')}
+            src={getPokemonSpriteUrl(pokemon.dexNum, pokemon.speciesName, pokemon.isShiny, 'large')}
             alt={pokemon.speciesName}
             className="pokemon-sprite-large"
             title={`${pokemon.speciesName}${pokemon.isShiny ? ' (Shiny)' : ''}`}
             onError={(e) => {
               const target = e.target as HTMLImageElement;
-              if (target.src !== getFallbackSpriteUrl(pokemon.dexNum)) {
-                target.src = getFallbackSpriteUrl(pokemon.dexNum);
+              if (target.src !== getFallbackSpriteUrl(pokemon.dexNum, pokemon.speciesName)) {
+                target.src = getFallbackSpriteUrl(pokemon.dexNum, pokemon.speciesName);
               }
             }}
           />
