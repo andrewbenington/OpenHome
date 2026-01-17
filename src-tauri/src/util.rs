@@ -14,7 +14,7 @@ use crate::error::{Error, Result};
 #[cfg(target_os = "linux")]
 use dialog::DialogBox;
 #[cfg(not(target_os = "linux"))]
-use tauri_plugin_dialog::{DialogExt, MessageDialogButtons, MessageDialogKind};
+use tauri_plugin_dialog::{DialogExt, MessageDialogKind};
 
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
 pub struct ImageResponse {
