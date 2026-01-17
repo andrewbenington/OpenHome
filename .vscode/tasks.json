@@ -1,0 +1,39 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "frontend:dev",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["run", "dev"],
+      "isBackground": true,
+      "problemMatcher": "$tsc"
+    },
+    {
+      "label": "backend:build:debug",
+      "type": "shell",
+      "command": "cargo",
+      "args": ["build", "--manifest-path=./src-tauri/Cargo.toml", "--no-default-features"]
+    },
+    {
+      "label": "dev",
+      "dependsOn": ["frontend:dev", "backend:build:debug"],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "clean",
+      "type": "shell",
+      "command": "cmd",
+      "args": ["/c", "del /s /q dist && cargo clean --manifest-path=./src-tauri/Cargo.toml"],
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "detail": "Cleans the dist folder and performs a cargo clean."
+    }
+  ]
+}

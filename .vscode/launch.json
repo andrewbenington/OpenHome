@@ -1,0 +1,13 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Tauri Development Debug (MSVC)",
+      "type": "cppvsdbg",
+      "request": "launch",
+      "program": "${workspaceRoot}/src-tauri/target/debug/OpenHome.exe",
+      "cwd": "${workspaceRoot}",
+      "preLaunchTask": "frontend:dev"
+    }
+  ]
+}

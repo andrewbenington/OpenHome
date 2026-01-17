@@ -1,0 +1,241 @@
+{
+  "totalBytes": 312,
+  "fileName": "COLOPKM",
+  "fields": [
+    {
+      "name": "dexNum",
+      "type": "number",
+      "numBytes": 2,
+      "endian": "Big",
+      "byteOffset": 0
+    },
+    {
+      "name": "personalityValue",
+      "type": "number",
+      "numBytes": 4,
+      "endian": "Big",
+      "byteOffset": 4
+    },
+    {
+      "name": "gameOfOrigin",
+      "type": "number",
+      "byteOffset": 8,
+      "numBytes": 1
+    },
+    {
+      "name": "languageIndex",
+      "type": "number",
+      "byteOffset": 11,
+      "numBytes": 1
+    },
+    {
+      "name": "metLocationIndex",
+      "type": "number",
+      "numBytes": 2,
+      "endian": "Big",
+      "byteOffset": 12
+    },
+    {
+      "name": "metLevel",
+      "type": "number",
+      "byteOffset": 14,
+      "numBytes": 1
+    },
+    {
+      "name": "ball",
+      "type": "number",
+      "byteOffset": 15,
+      "numBytes": 1
+    },
+    {
+      "name": "trainerGender",
+      "type": "boolean",
+      "byteOffset": 16,
+      "bitOffset": 1
+    },
+    {
+      "name": "trainerID",
+      "type": "number",
+      "numBytes": 2,
+      "endian": "Big",
+      "byteOffset": 20
+    },
+    {
+      "name": "secretID",
+      "type": "number",
+      "numBytes": 2,
+      "endian": "Big",
+      "byteOffset": 22
+    },
+    {
+      "name": "trainerName",
+      "type": "string",
+      "numBytes": 22,
+      "byteOffset": 24,
+      "stringEncoding": "UTF-16"
+    },
+    {
+      "name": "nickname",
+      "type": "string",
+      "numBytes": 22,
+      "byteOffset": 46,
+      "stringEncoding": "UTF-16"
+    },
+    {
+      "name": "ribbonBytes",
+      "type": "FlagSet",
+      "byteOffset": 76,
+      "numBytes": 4
+    },
+    {
+      "name": "exp",
+      "type": "number",
+      "numBytes": 4,
+      "endian": "Big",
+      "byteOffset": 92
+    },
+    {
+      "name": "statLevel",
+      "type": "number",
+      "byteOffset": 96,
+      "numBytes": 1
+    },
+    {
+      "name": "moves",
+      "type": "tuple",
+      "tupleType": "number",
+      "tupleLength": 4,
+      "numBytes": 2,
+      "endian": "Big",
+      "byteOffset": 120
+    },
+    {
+      "name": "movePP",
+      "type": "tuple",
+      "tupleType": "number",
+      "tupleLength": 4,
+      "byteOffset": 122,
+      "numBytes": 1
+    },
+    {
+      "name": "movePPUps",
+      "type": "tuple",
+      "tupleType": "number",
+      "tupleLength": 4,
+      "byteOffset": 123,
+      "numBytes": 1
+    },
+    {
+      "name": "heldItemIndex",
+      "type": "number",
+      "numBytes": 2,
+      "endian": "Big",
+      "byteOffset": 136
+    },
+    {
+      "name": "currentHP",
+      "type": "number",
+      "numBytes": 2,
+      "endian": "Big",
+      "byteOffset": 138
+    },
+    {
+      "name": "evs",
+      "type": "stats",
+      "byteOffset": 153,
+      "numBytes": 6
+    },
+    {
+      "name": "ivs",
+      "type": "stats",
+      "byteOffset": 165,
+      "numBytes": 6
+    },
+    {
+      "name": "contest",
+      "type": "contestStats",
+      "byteOffset": 178,
+      "numBytes": 6
+    },
+    {
+      "name": "isFatefulEncounter",
+      "type": "boolean",
+      "byteOffset": 201,
+      "bitOffset": 4
+    },
+    {
+      "name": "pokerusByte",
+      "type": "number",
+      "byteOffset": 202,
+      "numBytes": 1
+    },
+    {
+      "name": "markings",
+      "type": "MarkingsFourShapes",
+      "byteOffset": 207,
+      "numBytes": 1
+    },
+    {
+      "name": "trainerFriendship",
+      "type": "number",
+      "byteOffset": 208,
+      "numBytes": 1
+    },
+    {
+      "name": "shadowID",
+      "type": "number",
+      "numBytes": 2,
+      "endian": "Big",
+      "byteOffset": 216
+    },
+    {
+      "name": "shadowGauge",
+      "type": "number",
+      "numBytes": 4,
+      "endian": "Big",
+      "byteOffset": 220
+    },
+    {
+      "name": "ribbons",
+      "type": "ribbons",
+      "ribbonSpans": [
+        {
+          "ribbonSet": "gen-3-contest",
+          "ribbonOffset": 0,
+          "byteOffset": 183,
+          "numBits": 40,
+          "contestCounts": true
+        },
+        {
+          "ribbonSet": "gen-3-standard",
+          "ribbonOffset": 0,
+          "byteOffset": 189,
+          "numBytes": 11
+        }
+      ]
+    },
+    {
+      "name": "isEgg",
+      "type": "boolean"
+    },
+    {
+      "name": "abilityNum",
+      "type": "unknown"
+    },
+    {
+      "name": "isShadow",
+      "type": "boolean"
+    }
+  ],
+  "stringEncoding": "UTF-16",
+  "endian": "Big",
+  "natureFromPV": true,
+  "genderFromPV": true,
+  "unownFromPV": true,
+  "markingType": "fourShapes",
+  "shinyThreshold": 8,
+  "maxValidMove": 354,
+  "pvAbilityBit": 0,
+  "isGen3": true,
+  "maxBall": 12
+}

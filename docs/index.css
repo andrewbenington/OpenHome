@@ -1,0 +1,400 @@
+html {
+  background-color: #aedac3;
+}
+
+body {
+  margin: 0;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell',
+    'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: linear-gradient(355deg, rgba(83, 180, 165, 1) 0%, rgba(125, 206, 171, 1) 85%);
+  min-height: 100vh;
+  --dark-color: #333;
+  padding-bottom: 32px;
+}
+
+a {
+  color: inherit;
+  transition: background-color 0.15s;
+}
+
+.container > p:first-child {
+  margin-top: 48px;
+}
+
+table {
+  border-collapse: collapse;
+  font-size: small;
+}
+
+th {
+  border-bottom: 1px solid #333;
+  text-align: left;
+  font-size: 16px;
+}
+
+tr {
+  border-bottom: 1px solid #333;
+  height: 36px;
+}
+
+tr:last-child {
+  border-bottom: none;
+}
+
+th:nth-child(2),
+th:nth-child(5),
+th:nth-child(6),
+td:nth-child(2),
+td:nth-child(8),
+td:nth-child(10) {
+  border-left: 1px solid #333;
+  padding-left: 8px;
+}
+
+td:nth-child(1) {
+  font-weight: bold;
+}
+
+.openhome-name {
+  font-weight: bold;
+  font-size: 24px;
+}
+
+.larger-font {
+  font-size: 20px;
+}
+
+.active {
+  background-color: #dfd;
+  color: var(--dark-color);
+}
+
+.container {
+  max-width: 900px;
+  min-width: 600px;
+  width: 80%;
+  background-color: #dfd;
+  margin: 0px auto;
+  min-height: 100vh;
+  padding: 4px 64px;
+}
+
+.downloads-table {
+  width: 90%;
+  min-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.downloads-table a {
+  background-color: rgb(243, 250, 255);
+  padding: 4px;
+  border-radius: 5px;
+  box-shadow:
+    rgba(0, 0, 0, 0.02) 0px 1px 3px 0px,
+    rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
+  transition:
+    background-color 0.1s,
+    color 0.1s;
+}
+
+.downloads-table a:hover {
+  background-color: rgb(249, 204, 195);
+  /* color: white; */
+}
+
+.downloads-table a:before {
+  content: url('download.svg');
+  display: inline-block;
+  vertical-align: middle;
+  width: 12px;
+  margin-right: 4px;
+}
+
+.header {
+  background-color: #466;
+  box-sizing: border-box;
+  color: #fff;
+  font-weight: bold;
+  box-shadow:
+    0px 2px 1px -1px rgba(0, 0, 0, 0.2),
+    0px 1px 1px 0px rgba(0, 0, 0, 0.14),
+    0px 1px 3px 0px rgba(0, 0, 0, 0.12);
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.header-links {
+  padding: 4px 8px;
+  margin: 0;
+  display: flex;
+  align-items: center;
+}
+
+.header-links li {
+  display: inline-block;
+  margin-right: 8px;
+}
+
+.header-links a {
+  box-sizing: border-box;
+  padding: 8px;
+  border-radius: 8px;
+  text-decoration: none;
+}
+
+.header-links a:not(.github-button) {
+  display: inline-block;
+}
+
+.header-links a:hover:not(.active):not(.github-button) {
+  background-color: #688;
+}
+
+.github-button {
+  img {
+    height: 24px;
+  }
+  color: white;
+  background-color: #333;
+  height: fit-content;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+  box-sizing: border-box;
+  padding: 8px;
+  border-radius: 8px;
+  text-decoration: none;
+}
+
+.npm-button {
+  svg {
+    height: 24px;
+  }
+  color: white;
+  background-color: #333;
+  height: fit-content;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+  box-sizing: border-box;
+  padding: 8px;
+  border-radius: 8px;
+  text-decoration: none;
+}
+
+.github-button:hover {
+  background-color: #444;
+}
+
+.header-title {
+  font-size: 32px;
+  margin: 0px 4px 0px 0px;
+  padding: 4px 8px;
+}
+
+.outer-download-container {
+  min-height: 400px;
+  height: fit-content;
+  background-color: #aedac3;
+  padding: 16px 64px;
+  display: flex;
+  align-items: center;
+}
+
+.other-downloads-label {
+  margin: 32px 64px 16px;
+  font-weight: bold;
+  font-size: 24px;
+}
+
+.download-label {
+  font-weight: bold;
+  font-size: 28px;
+  margin-top: 28px;
+}
+
+.experimental-label {
+  font-weight: bold;
+  font-size: 20px;
+  padding-top: 24px;
+}
+
+.download-buttons {
+  width: 100%;
+  display: flex;
+  margin: 16px 4px;
+}
+
+.download-buttons > a {
+  border: none;
+  border-radius: 8px;
+  padding: 12px 48px 12px 20px;
+  background-color: #e45454;
+  font-weight: bold;
+  font-size: 18px;
+  min-width: 128px;
+  text-align: start;
+  position: relative;
+  color: white;
+  text-decoration: none;
+  box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
+  transition: background-color 0.15s;
+}
+
+.all-platforms-toggle {
+  border: none;
+  border-radius: 8px;
+  padding: 4px 8px;
+  margin-left: 4px;
+  font-size: 14px;
+  box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
+}
+
+.download-buttons > a:hover {
+  background-color: #c85252;
+}
+
+.download-buttons-experimental > a {
+  background-color: #425452;
+}
+
+.download-buttons-experimental > a:hover {
+  background-color: #316e67;
+}
+
+.download-buttons > svg {
+  color: white;
+}
+
+.download-buttons > a:not(:first-of-type) {
+  margin-left: 8px;
+}
+
+.download-buttons > a::after {
+  content: url('download-white.svg');
+  display: inline-block;
+  vertical-align: middle;
+  text-align: end;
+  width: 20px;
+  right: 16px;
+  position: absolute;
+}
+
+.image-flex {
+  display: flex;
+  margin-top: 48px;
+  align-items: center;
+}
+
+.image-flex > :first-child {
+  margin-right: 16px;
+}
+
+img {
+  height: 360px;
+  width: auto;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.module-header {
+  img {
+    height: 16px;
+  }
+  svg {
+    height: 16px;
+  }
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 5px;
+  a {
+    padding: 5px;
+  }
+}
+
+.module-header > a:first-child {
+  margin-left: 16px;
+}
+
+.issue-button {
+  height: 50px;
+  width: 150px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.5s ease-in-out;
+}
+
+.issue-button:hover {
+  box-shadow: 0.5px 0.5px 150px #252525;
+}
+
+.issue-button::after {
+  content: 'Thanks';
+  height: 50px;
+  width: 150px;
+  background-color: #008080;
+  color: #fff;
+  position: absolute;
+  top: 0%;
+  left: 0%;
+  transform: translateY(50px);
+  font-size: 1.2rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.5s ease-in-out;
+}
+
+.issue-button::before {
+  height: 50px;
+  width: 150px;
+  background-color: #fff;
+  color: #008080;
+  position: absolute;
+  top: 0%;
+  left: 0%;
+  transform: translateY(0px) scale(1.2);
+  font-size: 1.2rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.5s ease-in-out;
+}
+
+.ibbug.issue-button::before {
+  content: 'Bug';
+}
+
+.ibfeature.issue-button::before {
+  content: 'Feature';
+}
+
+.issue-button:hover::after {
+  transform: translateY(0) scale(1.2);
+}
+
+.issue-button:hover::before {
+  transform: translateY(-50px) scale(0) rotate(120deg);
+}
+
+.issue-button-container {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 10px 0;
+}

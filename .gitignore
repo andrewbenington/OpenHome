@@ -1,0 +1,53 @@
+# dependencies
+/node_modules
+/pkm_rs_resources/generate/node_modules
+/pkm_rs/generate/node_modules
+
+/.pnp
+.pnp.js
+tsconfig.tsbuildinfo
+
+# testing
+/coverage
+tester.sh
+test-*.mjs
+*_test.sav
+*_modified_test.sav
+
+# production
+/out
+/dist
+
+# misc
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+/.erb/dll
+
+# python
+*.pyc
+__pycache__/
+.venv/
+
+*.log*
+.env
+
+# js
+generate/out/
+
+planning.md
+
+# generated
+src/consts/JSON/version.json
+src-tauri/gen
+src-tauri/target
+target/
+
+# IDE files
+*.code-workspace
+*.sublime-workspace
+*.sublime-project
+*.wakatime-project
+.idea

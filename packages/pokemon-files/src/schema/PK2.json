@@ -1,0 +1,167 @@
+{
+  "totalBytes": 32,
+  "totalBytesExtraFields": 73,
+  "fileName": "PK2",
+  "fields": [
+    { "name": "gameOfOrigin", "type": "number", "noWrite": true },
+    {
+      "name": "languageIndex",
+      "type": "number",
+      "noWrite": true
+    },
+    {
+      "name": "dexNum",
+      "type": "number",
+      "byteOffset": 0,
+      "numBytes": 1
+    },
+    {
+      "name": "heldItemIndex",
+      "type": "number",
+      "byteOffset": 1,
+      "numBytes": 1
+    },
+    {
+      "name": "moves",
+      "type": "tuple",
+      "tupleType": "number",
+      "tupleLength": 4,
+      "byteOffset": 2,
+      "numBytes": 1
+    },
+    {
+      "name": "trainerID",
+      "type": "number",
+      "numBytes": 2,
+      "endian": "Big",
+      "byteOffset": 6
+    },
+    {
+      "name": "exp",
+      "type": "number",
+      "numBytes": 3,
+      "endian": "Big",
+      "byteOffset": 8
+    },
+    {
+      "name": "evsG12",
+      "type": "statsPreSplit",
+      "byteOffset": 11,
+      "numBytes": 2
+    },
+    {
+      "name": "dvs",
+      "type": "dvs",
+      "byteOffset": 21,
+      "numBytes": 1
+    },
+    {
+      "name": "movePP",
+      "type": "tuple",
+      "tupleType": "number",
+      "tupleLength": 4,
+      "byteOffset": 23,
+      "numBytes": 1,
+      "bitOffset": 0,
+      "numBits": 6,
+      "seperateBytes": true
+    },
+    {
+      "name": "movePPUps",
+      "type": "tuple",
+      "tupleType": "number",
+      "tupleLength": 4,
+      "byteOffset": 23,
+      "numBytes": 1,
+      "bitOffset": 6,
+      "numBits": 2,
+      "seperateBytes": true
+    },
+    {
+      "name": "trainerFriendship",
+      "type": "number",
+      "byteOffset": 27,
+      "numBytes": 1
+    },
+    {
+      "name": "pokerusByte",
+      "type": "number",
+      "byteOffset": 28,
+      "numBytes": 1
+    },
+    {
+      "name": "metTimeOfDay",
+      "type": "number",
+      "byteOffset": 29,
+      "numBytes": 1,
+      "bitOffset": 6,
+      "numBits": 2
+    },
+    {
+      "name": "metLevel",
+      "type": "number",
+      "byteOffset": 29,
+      "numBytes": 1,
+      "bitOffset": 0,
+      "numBits": 6
+    },
+    {
+      "name": "metLocationIndex",
+      "type": "number",
+      "byteOffset": 30,
+      "numBytes": 1,
+      "bitOffset": 0,
+      "numBits": 7
+    },
+    {
+      "name": "level",
+      "type": "number",
+      "byteOffset": 31,
+      "numBytes": 1
+    },
+    {
+      "name": "statusCondition",
+      "type": "number",
+      "byteOffset": 32,
+      "numBytes": 1,
+      "lengthCheck": 70
+    },
+    {
+      "name": "currentHP",
+      "type": "number",
+      "byteOffset": 34,
+      "numBytes": 1,
+      "lengthCheck": 70
+    },
+    {
+      "name": "trainerName",
+      "type": "string",
+      "byteOffset": 48,
+      "numBytes": 8,
+      "lengthCheck": 70,
+      "terminateString": true
+    },
+    {
+      "name": "nickname",
+      "type": "string",
+      "byteOffset": 59,
+      "numBytes": 11,
+      "lengthCheck": 70,
+      "terminateString": true
+    },
+    {
+      "name": "trainerGender",
+      "type": "boolean",
+      "byteOffset": 30,
+      "bitOffset": 7
+    }
+  ],
+  "stringEncoding": "GameBoy",
+  "endian": "Big",
+  "unownFromIVs": true,
+  "detectPrefix": true,
+  "genderFromDVs": true,
+  "shinyFromDVs": true,
+  "maxValidMove": 251,
+  "trainerIDTracker": true
+}

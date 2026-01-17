@@ -1,0 +1,35 @@
+name: 'Feature Request'
+description: 'Suggest a new feature or improvement.'
+title: '[FEAT] <short-description>'
+labels: ['enhancement']
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a feature! Please provide as much detail as possible so we can understand what you would like us to add.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: 'Is your feature request related to a problem?'
+      description: "Describe the problem your feature would solve. If it's not related to a problem, you can skip this."
+      placeholder: "I'm always frustrated when..."
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: "Describe the solution you'd like"
+      description: 'Be clear and concise about what you want to happen. The more detail you give, the easier it is for us to imagine your feature.'
+      placeholder: 'I would like a button that automatically...'
+
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: 'Additional context'
+      description: 'Add any other context, examples, or screenshots to help explain your idea.'
+      placeholder: 'For example: mockups, diagrams, or links to related issues.'

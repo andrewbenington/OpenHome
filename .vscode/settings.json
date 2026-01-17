@@ -1,0 +1,57 @@
+{
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "typescript.preferences.importModuleSpecifier": "relative",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit",
+      "source.fixAll": "never"
+    }
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+  "[css]": {
+    "editor.formatOnSave": true
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[rust]": {
+    "editor.defaultFormatter": "rust-lang.rust-analyzer",
+    "editor.formatOnSave": true
+  },
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "explicit",
+    "source.fixAll": "explicit",
+    "source.removeUnusedImports": "explicit"
+  },
+  "makefile.configureOnOpen": false,
+  "python.languageServer": "Pylance",
+  "rust-analyzer.cargo.extraEnv": {
+    "MACOSX_DEPLOYMENT_TARGET": "14.6"
+  },
+  "postcssSorting.config": {
+    "properties-order": [
+      "width",
+      "height",
+      "padding",
+      "margin",
+      "display",
+      "flex-direction",
+      "justify-content",
+      "align-items"
+    ],
+    "unspecified-properties-position": "bottomAlphabetical"
+  },
+  "rust-analyzer.check.command": "clippy",
+  "editor.inlayHints.enabled": "off",
+  "editor.tabSize": 2,
+  "rust-analyzer.cargo.features": ["pkm_rs/wasm"],
+  "css.completion.completePropertyWithSemicolon": false,
+  "rust-analyzer.cargo.targetDir": true
+}

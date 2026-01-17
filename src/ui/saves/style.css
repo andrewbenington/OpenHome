@@ -1,0 +1,189 @@
+.arrow-button {
+  border: none;
+  transition: color 0.25s;
+  padding: 0;
+  width: 36px;
+  height: 21px;
+}
+.arrow-button div svg {
+  width: 18px;
+  height: 18px;
+}
+
+.arrow-button:hover {
+  opacity: 0.8;
+}
+
+.details-button {
+  --svg-size: 26px;
+  padding: 2px;
+  border-radius: 16px !important;
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  min-height: 0px;
+  margin-bottom: 3px;
+  & svg {
+    height: var(--svg-size);
+    width: var(--svg-size);
+  }
+}
+
+.details-button-img-background {
+  background-color: #0007;
+}
+
+.details-button:hover {
+  background-color: var(--hover-bg);
+  /* border: 1px solid white; */
+}
+
+.save-card {
+  background-repeat: no-repeat !important;
+  background-position: center;
+  display: flex;
+  flex-direction: column;
+  transition: background-color 0.2s;
+  padding: 0;
+  cursor: pointer;
+  position: relative;
+  border-radius: 5px;
+}
+
+.save-card:hover::after {
+  content: '';
+  width: inherit;
+  height: inherit;
+  background-color: #fff3;
+  position: absolute;
+  left: 0;
+  top: 0;
+  border-radius: inherit;
+  transition: background-color 0.2s;
+}
+
+.save-card::after {
+  content: '';
+  width: inherit;
+  height: inherit;
+  position: absolute;
+  left: 0;
+  top: 0;
+  border-radius: inherit;
+  transition: background-color 0.2s;
+  pointer-events: none;
+}
+
+.save-file-path {
+  overflow-wrap: anywhere;
+  width: calc(100% - 12px);
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 6px;
+  line-height: 1.2;
+  transition: max-height 0.3s;
+  cursor: pointer;
+  text-align: start;
+  display: flex;
+  flex-direction: column-reverse;
+  padding: 0px 3px 3px;
+  z-index: 1;
+}
+
+.save-grid-error-button-container {
+  width: 100%;
+  position: absolute;
+  bottom: 8px;
+  display: grid;
+  justify-content: center;
+}
+
+.save-grid-error-button {
+  background-color: rgb(213, 18, 18);
+  color: white;
+  height: 26px;
+  width: 56px;
+  padding: 0;
+  display: grid;
+  align-items: center;
+  justify-content: center;
+}
+
+.save-grid-open-button {
+  height: 26px;
+  width: 56px;
+}
+
+.bank-ribbon {
+  padding: 2px 6px;
+  height: 32px;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.bank-ribbon input {
+  text-indent: 0px;
+}
+
+.white-filter {
+  filter: brightness(0) invert(1);
+}
+
+.black-filter {
+  filter: brightness(0);
+}
+
+.badge-shadow {
+  box-shadow: rgba(255, 255, 255, 0.5) 0px 0px 0px 1px;
+}
+
+.numerical-indicator {
+  font-weight: bold;
+  border-radius: 7px;
+  font-size: 12px;
+  padding: 4px;
+  height: 14px;
+  min-width: 14px;
+  line-height: 1;
+}
+
+.origin-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .origin-badge {
+    filter: brightness(0.8);
+  }
+}
+
+.draggable-item {
+  position: relative;
+  width: 24px;
+  height: 24px;
+  cursor: grab;
+}
+
+.item-bag-area {
+  border-radius: 6px;
+  box-sizing: content-box;
+  justify-content: start;
+  align-items: start;
+  height: 100%;
+  padding: 5px 0px;
+}
+
+.item-bag-slot {
+  padding: 6px;
+  aspect-ratio: 1;
+  background-color: #6662;
+  border-radius: 4px;
+}

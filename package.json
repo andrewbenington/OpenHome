@@ -1,0 +1,92 @@
+{
+  "productName": "OpenHome",
+  "name": "openhome",
+  "version": "1.8.2",
+  "description": "A tool for moving Pokémon between game saves",
+  "keywords": [
+    "pokemon",
+    "home",
+    "openhome"
+  ],
+  "homepage": "https://github.com/andrewbenington/OpenHome#readme",
+  "bugs": {
+    "url": "https://github.com/andrewbenington/OpenHome/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/andrewbenington/OpenHome.git"
+  },
+  "packageManager": "pnpm@10.24.0",
+  "license": "GPL-3.0-only",
+  "author": {
+    "name": "Andrew Benington",
+    "email": "andrewbenington57@gmail.com"
+  },
+  "main": "./out/main/index.js",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "format": "prettier --write .",
+    "lint": "eslint src --max-warnings 0 --report-unused-disable-directives -c eslint.config.mjs --fix",
+    "lint:ci": "eslint src --max-warnings 0 --report-unused-disable-directives -c eslint.config.mjs",
+    "typecheck": "tsgo",
+    "build": "pnpm run wasm && pnpm vite build",
+    "dev": "pnpm run wasm && pnpm vite",
+    "tauri": "tauri",
+    "test": "vitest run",
+    "wasm-resources": "wasm-pack build ./pkm_rs_resources --target web -- --features wasm",
+    "wasm-pkm-rs": "wasm-pack build ./pkm_rs --target web -- --features wasm",
+    "wasm": "pnpm run wasm-resources && pnpm run wasm-pkm-rs",
+    "precommit": "prettier --write . && eslint src --report-unused-disable-directives -c eslint.config.mjs --fix"
+  },
+  "dependencies": {
+    "@dnd-kit/collision": "^0.2.1",
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/react": "^0.2.1",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
+    "@radix-ui/themes": "^3.2.1",
+    "@tanstack/react-virtual": "^3.13.18",
+    "@tauri-apps/api": "2.9.1",
+    "@tauri-apps/plugin-dialog": "^2.5.0",
+    "@tauri-apps/plugin-fs": "^2.4.5",
+    "@tauri-apps/plugin-os": "^2.3.2",
+    "chart.js": "^4.5.1",
+    "crypto-js": "^4.2.0",
+    "dayjs": "^1.11.19",
+    "fp-ts": "^2.16.11",
+    "prando": "^6.0.1",
+    "radix-ui": "^1.4.3",
+    "react": "^19.2.0",
+    "react-chartjs-2": "^5.3.1",
+    "react-data-grid": "7.0.0-beta.59",
+    "react-error-boundary": "^6.0.3",
+    "react-icons": "^5.5.0",
+    "uuid": "^13.0.0"
+  },
+  "devDependencies": {
+    "@stylistic/eslint-plugin": "^5.7.0",
+    "@tauri-apps/cli": "^2.9.4",
+    "@types/crypto-js": "^4.2.2",
+    "@types/lodash": "^4.17.23",
+    "@types/node": "^25.0.6",
+    "@types/react": "^19.2.8",
+    "@types/react-dom": "^19.2.3",
+    "@typescript-eslint/eslint-plugin": "^8.52.0",
+    "@typescript-eslint/parser": "^8.52.0",
+    "@typescript/native-preview": "7.0.0-dev.20260111.1",
+    "@vitejs/plugin-react": "^5.1.1",
+    "better-sqlite3": "^12.6.0",
+    "camelcase-keys": "^10.0.1",
+    "eslint": "^9.39.2",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-refresh": "^0.4.26",
+    "prettier": "^3.6.2",
+    "react-dom": "^19.2.0",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.1",
+    "vitest": "^4.0.16"
+  }
+}

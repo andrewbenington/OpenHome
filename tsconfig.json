@@ -1,0 +1,62 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "composite": true,
+    "target": "ESNext",
+    "useDefineForClassFields": true,
+    "lib": [
+      "ESNext",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "module": "ESNext",
+    "skipLibCheck": true,
+    "paths": {
+      "src/*": [
+        "./src/*"
+      ],
+      "src/types/*": [
+        "./src/types/*"
+      ],
+      "src/consts/*": [
+        "./src/consts/*"
+      ],
+      "util/*": [
+        "./util/*"
+      ],
+      "@openhome-ui/*": [
+        "./src/ui/*"
+      ],
+      "@openhome-core/*": [
+        "./src/core/*"
+      ],
+      "@pokemon-files/*": [
+        "./packages/pokemon-files/src/*"
+      ],
+      "@pokemon-resources/*": [
+        "./packages/pokemon-resources/src/*"
+      ],
+      "@pkm-rs/*": [
+        "./pkm_rs/*"
+      ]
+    },
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "esModuleInterop": true,
+    /* Linting */
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true
+  },
+  "include": [
+    "src",
+    "packages",
+    "generate/_rename.js",
+    "generate/generate-cfru/generateMoveMap.ts"
+  ]
+}

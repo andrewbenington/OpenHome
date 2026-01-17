@@ -1,0 +1,23 @@
+.fill-container {
+  min-width: 32px;
+  height: 32px;
+  position: relative;
+  margin-right: 8px;
+}
+
+.filter-icon {
+  width: 24px;
+  height: 24px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .invert-dark {
+    filter: invert();
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  .invert-light {
+    filter: invert();
+  }
+}

@@ -1,0 +1,8 @@
+[Desktop Entry]
+Categories=Utility
+Comment=A tool for moving Pokémon between game saves
+Exec=OpenHome
+Icon=OpenHome
+Name=OpenHome
+Terminal=false
+Type=Application
