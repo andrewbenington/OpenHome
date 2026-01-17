@@ -1,5 +1,4 @@
 use std::path::{Path, PathBuf};
-
 use tauri::{App, Manager};
 
 use crate::{
@@ -9,6 +8,9 @@ use crate::{
     versioning::{self, UpdateFeatures},
 };
 
+#[cfg(target_os = "linux")]
+use dialog::DialogBox;
+
 pub fn run_app_startup(app: &App) -> Result<Vec<UpdateFeatures>> {
     let handle = app.handle();
 
@@ -16,17 +18,9 @@ pub fn run_app_startup(app: &App) -> Result<Vec<UpdateFeatures>> {
         match versioning::handle_updates_get_features(handle, false) {
             Err(error) => match error {
                 Error::OutdatedVersion { .. } => {
-                    let should_quit = util::show_prompt_dialog(
-                        app,
-                        format!(
-                            "{error}\nWould you like to quit and avoid potential storage issues?"
-                        ),
-                        "OpenHome Version Error",
-                        "Quit",
-                        "Launch App Anyways",
-                    );
+                    let should_launch = show_version_error_prompt(app, &error);
 
-                    if should_quit {
+                    if should_launch {
                         return Err(error);
                     }
 
@@ -114,4 +108,27 @@ fn set_theme_from_settings(app: &App) -> Result<()> {
         .ok_or(Error::WindowAccess { source: None })?
         .set_theme(theme_option)
         .map_err(|e| Error::other_with_source("Could not set theme", e))
+}
+
+pub fn show_version_error_prompt(_app: &tauri::App, error: &Error) -> bool {
+    #[cfg(not(target_os = "linux"))]
+    return !_app
+        .dialog()
+        .message(message)
+        .title("OpenHome Version Error")
+        .kind(MessageDialogKind::Error)
+        .buttons(MessageDialogButtons::OkCancelCustom(
+            "Quit",
+            "Launch App Anyways",
+        ))
+        .blocking_show();
+
+    #[cfg(target_os = "linux")]
+    dialog::Question::new(format!(
+        "{error}\nDo you want to accept the risk and launch anyways?"
+    ))
+    .title("OpenHome Version Error")
+    .show()
+    .expect("Could not display dialog box")
+    .eq(&dialog::Choice::Yes)
 }
