@@ -1,5 +1,6 @@
 import React from 'react'
 import { Box, PokemonData } from '../lib/types'
+import { getPokemonSpriteUrl, getFallbackSpriteUrl } from '../lib/spriteUtils'
 
 interface BoxViewerProps {
   box: Box
@@ -21,9 +22,19 @@ export const BoxViewer: React.FC<BoxViewerProps> = ({ box, boxIndex, onPokemonCl
           >
             {pokemon ? (
               <div className="pokemon-info-compact">
-                <div className="pokemon-sprite" title={pokemon.speciesName}>
-                  #{pokemon.dexNum}
-                </div>
+                <img
+                  src={getPokemonSpriteUrl(pokemon.dexNum, pokemon.isShiny, 'small')}
+                  alt={pokemon.speciesName}
+                  className={`pokemon-sprite ${pokemon.isShiny ? 'shiny' : ''}`}
+                  title={`${pokemon.speciesName}${pokemon.isShiny ? ' (Shiny)' : ''}`}
+                  onError={(e) => {
+                    // Fallback to non-shiny sprite if shiny fails to load
+                    const target = e.target as HTMLImageElement;
+                    if (target.src !== getFallbackSpriteUrl(pokemon.dexNum)) {
+                      target.src = getFallbackSpriteUrl(pokemon.dexNum);
+                    }
+                  }}
+                />
                 <div className="pokemon-level">Lv.{pokemon.level}</div>
                 <div style={{ fontSize: '9px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', width: '100%', textAlign: 'center' }}>
                   {pokemon.nickname}
