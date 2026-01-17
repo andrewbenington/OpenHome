@@ -3,9 +3,11 @@ import { bytesToUint16LittleEndian, bytesToUint32LittleEndian, uint16ToBytesLitt
 import { gen3StringToUTF, utf8ToGen3String } from './stringConversion'
 import speciesDataRaw from './species-data.json'
 import movesDataRaw from './moves-data.json'
+import speciesIndexMappingRaw from './species-index-mapping.json'
 
 const speciesData = speciesDataRaw as Record<string, any>
 const movesData = movesDataRaw as Record<string, any>
+const speciesIndexMapping = speciesIndexMappingRaw as Record<string, number>
 
 const FAKEMON_INDEXES = [
   1186, 1200, 1274, 1275, 1276, 1277, 1278, 1279, 1282, 1283, 1284, 1285, 1286, 1287, 1288, 1289,
@@ -91,13 +93,17 @@ function calculateLevel(exp: number, levelUpType: string): number {
   return 100
 }
 
-function getSpeciesInfo(speciesIndex: number): { name: string; baseStats: BaseStats; levelUpType: string } {
-  const species = speciesData[speciesIndex]
+function getSpeciesInfo(internalIndex: number): { name: string; baseStats: BaseStats; levelUpType: string; nationalDex: number } {
+  // Convert internal species index to national dex number
+  const nationalDex = speciesIndexMapping[internalIndex] || internalIndex
+  const species = speciesData[nationalDex]
+
   if (!species) {
     return {
-      name: `Unknown (${speciesIndex})`,
+      name: `Unknown (${internalIndex})`,
       baseStats: { hp: 80, atk: 80, def: 80, spa: 80, spd: 80, spe: 80 },
-      levelUpType: 'Medium Fast'
+      levelUpType: 'Medium Fast',
+      nationalDex: internalIndex
     }
   }
 
@@ -105,7 +111,8 @@ function getSpeciesInfo(speciesIndex: number): { name: string; baseStats: BaseSt
   return {
     name: species.name,
     baseStats: forme?.baseStats || { hp: 80, atk: 80, def: 80, spa: 80, spd: 80, spe: 80 },
-    levelUpType: species.levelUpType || 'Medium Fast'
+    levelUpType: species.levelUpType || 'Medium Fast',
+    nationalDex: species.nationalDex || nationalDex
   }
 }
 
@@ -142,8 +149,8 @@ export const parsePokemon = (bytes: Uint8Array): PokemonData | null => {
   if (bytes.length < 58) return null
 
   // Check if Pokemon exists (species must be > 0)
-  const speciesIndex = bytesToUint16LittleEndian(bytes, 0x1c)
-  if (speciesIndex === 0) return null
+  const internalIndex = bytesToUint16LittleEndian(bytes, 0x1c)
+  if (internalIndex === 0) return null
 
   // Basic data structure based on CFRU format
   const personalityValue = bytesToUint32LittleEndian(bytes, 0x00)
@@ -152,9 +159,9 @@ export const parsePokemon = (bytes: Uint8Array): PokemonData | null => {
   const nickname = gen3StringToUTF(bytes, 0x08, 10)
   const trainerName = gen3StringToUTF(bytes, 0x14, 7)
 
-  // Get species information
-  const speciesInfo = getSpeciesInfo(speciesIndex)
-  const dexNum = speciesIndex
+  // Get species information (converts internal index to national dex)
+  const speciesInfo = getSpeciesInfo(internalIndex)
+  const dexNum = speciesInfo.nationalDex
   const formNum = 0
   const speciesName = speciesInfo.name
   const baseStats = speciesInfo.baseStats
@@ -263,8 +270,8 @@ export const parsePokemon = (bytes: Uint8Array): PokemonData | null => {
   // Trainer gender from personality value's low bit
   const trainerGender = (personalityValue & 0x8000) ? Gender.Female : Gender.Male
 
-  // Check if fakemon
-  const isFakemon = FAKEMON_INDEXES.includes(speciesIndex)
+  // Check if fakemon (using internal index)
+  const isFakemon = FAKEMON_INDEXES.includes(internalIndex)
 
   return {
     dexNum,
