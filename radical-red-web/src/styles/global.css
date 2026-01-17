@@ -357,25 +357,28 @@ body {
 
 /* Dark mode toggle */
 .dark-mode-toggle {
-  border: 1px solid #d4d4d8;
-  background-color: #ffffff;
+  border: 3px solid #ffed4e;
+  background: linear-gradient(135deg, #ff1493 0%, #ff69b4 100%);
   padding: 8px 12px;
   cursor: pointer;
-  font-family: 'Courier New', monospace;
+  font-family: 'Press Start 2P', 'Courier New', monospace;
   font-size: 16px;
-  transition: all 0.2s;
-  min-width: 44px;
-  height: 44px;
+  transition: all 0.1s;
+  min-width: 50px;
+  height: 50px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 4px;
-  color: #4a4a4a;
+  border-radius: 0;
+  color: #000;
+  font-weight: bold;
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.3);
 }
 
 .dark-mode-toggle:hover {
-  background-color: #f4f4f5;
-  border-color: #a1a1a6;
+  background: linear-gradient(135deg, #ff69b4 0%, #ff1493 100%);
+  transform: translate(-2px, -2px);
+  box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.4);
 }
 
 /* ==========================================
