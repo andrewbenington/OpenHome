@@ -57,8 +57,8 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
             title={`${pokemon.speciesName}${pokemon.isShiny ? ' (Shiny)' : ''}`}
             onError={(e) => {
               const target = e.target as HTMLImageElement;
-              if (target.src !== getFallbackSpriteUrl(pokemon.dexNum, pokemon.speciesName)) {
-                target.src = getFallbackSpriteUrl(pokemon.dexNum, pokemon.speciesName);
+              if (target.src !== getFallbackSpriteUrl(pokemon.dexNum, pokemon.speciesName, pokemon.isShiny)) {
+                target.src = getFallbackSpriteUrl(pokemon.dexNum, pokemon.speciesName, pokemon.isShiny);
               }
             }}
           />
