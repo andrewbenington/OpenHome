@@ -25,7 +25,13 @@ npm install -g pnpm@latest-10
 
 ## Download and Install Rust
 
-You need to download Rust preferably using `rustup`. You may need the Windows C++ build tools. Get it from here https://www.rust-lang.org/tools/install.
+You need to download Rust and `cargo`, preferably using `rustup`. You may need the Windows C++ build tools. Get it from here https://www.rust-lang.org/tools/install.
+
+After installing Rust, use `cargo` to install wasm-pack:
+
+```powershell
+cargo install wasm-pack
+```
 
 ## Download the OpenHome source code
 

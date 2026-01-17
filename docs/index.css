@@ -277,7 +277,7 @@ td:nth-child(1) {
   margin-left: 8px;
 }
 
-.download-buttons > a::after {
+.download-buttons > a:not(.disabled)::after {
   content: url('download-white.svg');
   display: inline-block;
   vertical-align: middle;
@@ -285,6 +285,13 @@ td:nth-child(1) {
   width: 20px;
   right: 16px;
   position: absolute;
+}
+
+.download-buttons > a.disabled {
+  background: #aaa;
+  color: #ccc;
+  box-shadow: none;
+  cursor: not-allowed;
 }
 
 .image-flex {
