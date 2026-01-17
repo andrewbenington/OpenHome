@@ -85,9 +85,12 @@ function App() {
   return (
     <div>
       <div className="wireframe-box" style={{ marginBottom: '24px' }}>
-        <h1 className="wireframe-title text-center">
-          Radical Red Save Editor
-        </h1>
+        <div className="flex justify-between items-center" style={{ marginBottom: '16px' }}>
+          <h1 className="wireframe-title" style={{ margin: 0 }}>
+            Radical Red Save Editor
+          </h1>
+          <DarkModeToggle />
+        </div>
         <p className="text-center" style={{ fontSize: '12px' }}>
           Web-based editor for Pokemon Radical Red .sav files
         </p>
