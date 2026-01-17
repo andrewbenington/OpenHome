@@ -10,6 +10,8 @@ use crate::{
 
 #[cfg(target_os = "linux")]
 use dialog::DialogBox;
+#[cfg(not(target_os = "linux"))]
+use tauri_plugin_dialog::{DialogExt, MessageDialogButtons, MessageDialogKind};
 
 pub fn run_app_startup(app: &App) -> Result<Vec<UpdateFeatures>> {
     let handle = app.handle();
@@ -114,12 +116,12 @@ pub fn show_version_error_prompt(_app: &tauri::App, error: &Error) -> bool {
     #[cfg(not(target_os = "linux"))]
     return !_app
         .dialog()
-        .message(message)
+        .message(error.to_string())
         .title("OpenHome Version Error")
         .kind(MessageDialogKind::Error)
         .buttons(MessageDialogButtons::OkCancelCustom(
-            "Quit",
-            "Launch App Anyways",
+            "Quit".to_owned(),
+            "Launch App Anyways".to_owned(),
         ))
         .blocking_show();
 
