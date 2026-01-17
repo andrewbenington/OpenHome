@@ -49,7 +49,7 @@ function App() {
 
     // Track this slot as updated
     const existingSlot = newSaveData.updatedBoxSlots.find(
-      slot => slot.box === boxIndex && slot.index === slotIndex
+      (slot) => slot.box === boxIndex && slot.index === slotIndex
     )
     if (!existingSlot) {
       newSaveData.updatedBoxSlots.push({ box: boxIndex, index: slotIndex })
@@ -67,7 +67,9 @@ function App() {
       const modifiedBytes = serializeSave(saveData)
 
       // Create blob and download
-      const blob = new Blob([modifiedBytes as unknown as BlobPart], { type: 'application/octet-stream' })
+      const blob = new Blob([modifiedBytes as unknown as BlobPart], {
+        type: 'application/octet-stream',
+      })
       const url = URL.createObjectURL(blob)
       const link = document.createElement('a')
       link.href = url
@@ -97,7 +99,10 @@ function App() {
       </div>
 
       {error && (
-        <div className="wireframe-box" style={{ backgroundColor: '#ffe0e0', borderColor: '#cc0000', marginBottom: '16px' }}>
+        <div
+          className="wireframe-box"
+          style={{ backgroundColor: '#ffe0e0', borderColor: '#cc0000', marginBottom: '16px' }}
+        >
           <strong>Error:</strong> {error}
         </div>
       )}
@@ -109,9 +114,9 @@ function App() {
           <div className="wireframe-box">
             <div className="flex justify-between items-center mb-2">
               <div>
-                <strong>Trainer:</strong> {saveData.trainerName} |
-                <strong> ID:</strong> {saveData.trainerID.toString().padStart(5, '0')} |
-                <strong> Money:</strong> ${saveData.money.toLocaleString()}
+                <strong>Trainer:</strong> {saveData.trainerName} |<strong> ID:</strong>{' '}
+                {saveData.trainerID.toString().padStart(5, '0')} |<strong> Money:</strong> $
+                {saveData.money.toLocaleString()}
               </div>
               <div className="flex gap-2">
                 <button
@@ -120,7 +125,8 @@ function App() {
                   disabled={saveData.updatedBoxSlots.length === 0}
                 >
                   DOWNLOAD MODIFIED .SAV
-                  {saveData.updatedBoxSlots.length > 0 && ` (${saveData.updatedBoxSlots.length} changes)`}
+                  {saveData.updatedBoxSlots.length > 0 &&
+                    ` (${saveData.updatedBoxSlots.length} changes)`}
                 </button>
                 <button
                   className="wireframe-button"
@@ -161,8 +167,8 @@ function App() {
 
           {saveData.updatedBoxSlots.length > 0 && (
             <div className="wireframe-box" style={{ backgroundColor: '#e0ffe0' }}>
-              <strong>Modified Slots:</strong> {saveData.updatedBoxSlots.length} Pokemon have been edited.
-              Click "DOWNLOAD MODIFIED .SAV" to save changes.
+              <strong>Modified Slots:</strong> {saveData.updatedBoxSlots.length} Pokemon have been
+              edited. Click "DOWNLOAD MODIFIED .SAV" to save changes.
             </div>
           )}
         </>
