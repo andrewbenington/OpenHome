@@ -22,53 +22,63 @@ body {
   padding: 20px;
 }
 
-/* Wireframe elements */
+/* Pixel Art Gamer Elements */
 .wireframe-box {
-  border: 1px solid #d4d4d8;
-  background-color: #ffffff;
+  border: 4px solid #ff1493;
+  background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
   padding: 16px;
   margin: 8px 0;
-  border-radius: 6px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  border-radius: 0;
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.3), 8px 8px 0 rgba(255, 20, 147, 0.2);
+  color: #fff;
 }
 
 .wireframe-button {
-  border: 1px solid #d4d4d8;
-  background-color: #ffffff;
-  padding: 8px 16px;
+  border: 3px solid #ffed4e;
+  background: linear-gradient(135deg, #ff1493 0%, #ff69b4 100%);
+  padding: 10px 20px;
   cursor: pointer;
-  font-family: 'Courier New', monospace;
-  font-size: 14px;
-  transition: all 0.2s;
-  border-radius: 4px;
-  color: #4a4a4a;
+  font-family: 'Press Start 2P', 'Courier New', monospace;
+  font-size: 12px;
+  transition: all 0.1s;
+  border-radius: 0;
+  color: #000;
+  font-weight: bold;
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.3);
 }
 
 .wireframe-button:hover {
-  background-color: #f4f4f5;
-  border-color: #a1a1a6;
+  background: linear-gradient(135deg, #ff69b4 0%, #ff1493 100%);
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.4);
+}
+
+.wireframe-button:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.2);
 }
 
 .wireframe-button:disabled {
-  opacity: 0.5;
+  opacity: 0.6;
   cursor: not-allowed;
 }
 
 .wireframe-button:disabled:hover {
-  background-color: #ffffff;
-  color: #4a4a4a;
-  border-color: #d4d4d8;
+  background: linear-gradient(135deg, #ff1493 0%, #ff69b4 100%);
+  transform: none;
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.3);
 }
 
 .wireframe-input {
-  border: 1px solid #d4d4d8;
-  padding: 8px;
-  font-family: 'Courier New', monospace;
-  font-size: 14px;
+  border: 3px solid #ffed4e;
+  padding: 10px;
+  font-family: 'Press Start 2P', 'Courier New', monospace;
+  font-size: 12px;
   width: 100%;
-  border-radius: 4px;
-  color: #4a4a4a;
-  background-color: #ffffff;
+  border-radius: 0;
+  color: #000;
+  background-color: #fff;
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.2);
 }
 
 .wireframe-title {
