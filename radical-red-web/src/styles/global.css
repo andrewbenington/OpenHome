@@ -196,8 +196,10 @@ body {
 }
 
 .stat-item {
-  border: 1px solid #333;
+  border: 1px solid #e5e7eb;
   padding: 12px;
+  border-radius: 4px;
+  background-color: #f9fafb;
 }
 
 .stat-label {
