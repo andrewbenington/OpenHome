@@ -233,28 +233,31 @@ body {
 /* Tabs */
 .tabs {
   display: flex;
-  border-bottom: 2px solid #333;
+  border-bottom: 1px solid #e5e7eb;
   margin-bottom: 16px;
 }
 
 .tab {
   padding: 12px 24px;
   cursor: pointer;
-  border: 2px solid #333;
-  border-bottom: none;
+  border: none;
+  border-bottom: 2px solid transparent;
   margin-right: 4px;
-  background-color: white;
+  background-color: transparent;
   font-family: 'Courier New', monospace;
   font-size: 14px;
+  color: #6b7280;
+  transition: all 0.2s;
 }
 
 .tab.active {
-  background-color: #333;
-  color: white;
+  background-color: transparent;
+  color: #1f2937;
+  border-bottom-color: #6b7280;
 }
 
 .tab:hover:not(.active) {
-  background-color: #f0f0f0;
+  color: #4a4a4a;
 }
 
 /* Box selector */
