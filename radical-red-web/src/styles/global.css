@@ -304,26 +304,30 @@ body {
 }
 
 .box-selector-button {
-  border: 1px solid #d4d4d8;
-  background-color: #ffffff;
+  border: 3px solid #00ff00;
+  background-color: #1e3a8a;
   padding: 8px 12px;
   cursor: pointer;
-  font-family: 'Courier New', monospace;
-  font-size: 12px;
-  min-width: 60px;
-  border-radius: 4px;
-  color: #4a4a4a;
-  transition: all 0.2s;
+  font-family: 'Press Start 2P', 'Courier New', monospace;
+  font-size: 10px;
+  min-width: 70px;
+  border-radius: 0;
+  color: #ffed4e;
+  transition: all 0.1s;
+  font-weight: bold;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.3);
 }
 
 .box-selector-button.active {
-  background-color: #f3f4f6;
-  color: #1f2937;
-  border-color: #6b7280;
+  background-color: #2563eb;
+  color: #fff;
+  border-color: #ffed4e;
+  box-shadow: 3px 3px 0 rgba(255, 237, 74, 0.4);
 }
 
 .box-selector-button:hover:not(.active) {
-  border-color: #9ca3af;
+  border-color: #ffed4e;
+  transform: translate(-1px, -1px);
 }
 
 /* Utilities */
