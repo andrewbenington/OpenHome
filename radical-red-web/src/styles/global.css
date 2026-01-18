@@ -426,7 +426,7 @@ body {
   color: #fff;
   box-shadow:
     4px 4px 0 rgba(0, 0, 0, 0.5),
-    8px 8px 0 rgba(255, 20, 147, 0.3);
+    8px 8px 0 rgba(204, 0, 0, 0.3);
 }
 
 :root.dark-mode .wireframe-button {
@@ -478,7 +478,7 @@ body {
   color: #fff;
   box-shadow:
     6px 6px 0 rgba(0, 0, 0, 0.6),
-    12px 12px 0 rgba(255, 20, 147, 0.3);
+    12px 12px 0 rgba(204, 0, 0, 0.3);
 }
 
 :root.dark-mode .pokemon-slot {
