@@ -526,6 +526,23 @@ body {
   color: #00ff00;
 }
 
+:root.dark-mode .read-only-stat {
+  border: 3px solid #555555;
+  background-color: #1a1a1a;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.4);
+  opacity: 0.9;
+}
+
+:root.dark-mode .read-only-stat .stat-label {
+  color: #999999;
+  font-weight: 700;
+}
+
+:root.dark-mode .read-only-stat .stat-value {
+  color: #cccccc;
+  font-weight: bold;
+}
+
 :root.dark-mode .tabs {
   border-bottom-color: #ff1493;
 }
