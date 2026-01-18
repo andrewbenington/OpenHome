@@ -463,7 +463,7 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
                 onChange={(e) => updatePokemon({ moves: [parseInt(e.target.value), pokemon.moves[1], pokemon.moves[2], pokemon.moves[3]] })}
               >
                 {allMoves.map((move) => (
-                  <option key={move.id} value={move.id}>
+                  <option value={move.id}>
                     {move.name}
                   </option>
                 ))}
@@ -477,7 +477,7 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
                 onChange={(e) => updatePokemon({ moves: [pokemon.moves[0], parseInt(e.target.value), pokemon.moves[2], pokemon.moves[3]] })}
               >
                 {allMoves.map((move) => (
-                  <option key={move.id} value={move.id}>
+                  <option value={move.id}>
                     {move.name}
                   </option>
                 ))}
@@ -491,7 +491,7 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
                 onChange={(e) => updatePokemon({ moves: [pokemon.moves[0], pokemon.moves[1], parseInt(e.target.value), pokemon.moves[3]] })}
               >
                 {allMoves.map((move) => (
-                  <option key={move.id} value={move.id}>
+                  <option value={move.id}>
                     {move.name}
                   </option>
                 ))}
@@ -505,7 +505,7 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
                 onChange={(e) => updatePokemon({ moves: [pokemon.moves[0], pokemon.moves[1], pokemon.moves[2], parseInt(e.target.value)] })}
               >
                 {allMoves.map((move) => (
-                  <option key={move.id} value={move.id}>
+                  <option value={move.id}>
                     {move.name}
                   </option>
                 ))}
