@@ -3,7 +3,7 @@ import { numericSorter, SortableColumn, stringSorter } from '@openhome-core/util
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { OriginGames } from '@pkm-rs/pkg'
-import SortableDataGrid from 'src/ui/components/OHDataGrid'
+import SortableDataGrid from 'src/ui/components/SortableDataGrid'
 import { useLookups } from 'src/ui/state/lookups/useLookups'
 
 type G12LookupRow = {

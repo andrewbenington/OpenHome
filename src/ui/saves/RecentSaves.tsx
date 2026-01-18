@@ -17,7 +17,7 @@ import { OriginGames } from '@pkm-rs/pkg'
 import { Flex } from '@radix-ui/themes'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { R } from 'src/core/util/functional'
-import SortableDataGrid from 'src/ui/components/OHDataGrid'
+import SortableDataGrid from 'src/ui/components/SortableDataGrid'
 import SaveCard from './SaveCard'
 import { buildRecentSaveContextElements, formatTime, formatTimeSince, SaveViewMode } from './util'
 
