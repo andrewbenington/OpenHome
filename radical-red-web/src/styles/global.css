@@ -252,6 +252,26 @@ body {
   font-weight: bold;
 }
 
+/* Read-only stats styling */
+.read-only-stat {
+  border: 3px solid #999999;
+  padding: 12px;
+  border-radius: 0;
+  background-color: #e8e8e8;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.2);
+  opacity: 0.85;
+}
+
+.read-only-stat .stat-label {
+  color: #555555;
+  font-weight: 700;
+}
+
+.read-only-stat .stat-value {
+  color: #333333;
+  font-weight: bold;
+}
+
 /* Forms */
 .form-group {
   margin: 16px 0;
