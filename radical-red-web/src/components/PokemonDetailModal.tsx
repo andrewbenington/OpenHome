@@ -180,11 +180,13 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
 
         <div className="wireframe-box">
           <div className="form-row">
-            <div>
-              <strong>OT:</strong> {pokemon.trainerName}
+            <div className="read-only-stat" style={{ padding: '12px', border: '3px solid #999999' }}>
+              <div className="stat-label" style={{ color: '#555555' }}>OT</div>
+              <div className="stat-value" style={{ color: '#333333', fontSize: '14px' }}>{pokemon.trainerName}</div>
             </div>
-            <div>
-              <strong>ID:</strong> {pokemon.trainerID.toString().padStart(5, '0')}
+            <div className="read-only-stat" style={{ padding: '12px', border: '3px solid #999999' }}>
+              <div className="stat-label" style={{ color: '#555555' }}>ID</div>
+              <div className="stat-value" style={{ color: '#333333', fontSize: '14px' }}>{pokemon.trainerID.toString().padStart(5, '0')}</div>
             </div>
           </div>
           <div className="form-row" style={{ marginTop: '8px', display: 'flex', gap: '16px' }}>
