@@ -1,0 +1,54 @@
+.ContextMenuTrigger {
+  display: block;
+  border: 2px white dashed;
+  color: white;
+  border-radius: 4px;
+  font-size: 1rem;
+  user-select: none;
+  padding: 2.75rem 0;
+  width: 18.75rem;
+  text-align: center;
+}
+
+.rt-ContextMenuContent,
+.rt-ContextMenuViewport {
+  min-width: 13.75rem;
+  background-color: var(--color-panel-solid);
+  border-radius: 3px;
+}
+
+.rt-ContextMenuSubContent {
+  z-index: 10;
+}
+
+.rt-ContextMenuItem,
+.rt-ContextMenuSubItem,
+.rt-ContextMenuCheckboxItem,
+.rt-ContextMenuRadioItem,
+.rt-ContextMenuSubTrigger {
+  font-size: 1rem;
+  line-height: 1;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  height: 1.5rem;
+  position: relative;
+  user-select: none;
+  outline: none;
+  cursor: pointer;
+  padding: 0.3rem;
+}
+
+.rt-ContextMenuSeparator {
+  margin: 0.5rem;
+}
+
+.ContextMenuCheckboxItem,
+.ContextMenuRadioItem,
+.ContextMenuSubTrigger {
+  padding: 0 0.3rem 0 1.25rem;
+}
+.ContextMenuSubTrigger[data-state='open'] {
+  background-color: var(--accent-4);
+  color: var(--accent-11);
+}

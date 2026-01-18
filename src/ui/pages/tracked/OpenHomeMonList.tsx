@@ -1,11 +1,11 @@
 import { getMonFileIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { numericSorter, stringSorter } from '@openhome-core/util/sort'
-import OHDataGrid, { SortableColumn } from '@openhome-ui/components/OHDataGrid'
+import { numericSorter, SortableColumn, stringSorter } from '@openhome-core/util/sort'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { OriginGames } from '@pkm-rs/pkg'
 import { Flex } from '@radix-ui/themes'
+import SortableDataGrid from 'src/ui/components/OHDataGrid'
 import { Indicator } from 'src/ui/saves/Indicator'
 import { useSaves } from 'src/ui/state/saves'
 import './style.css'
@@ -21,8 +21,8 @@ export default function OpenHomeMonList({ onSelectMon }: OpenHomeMonListProps) {
   const columns: SortableColumn<OHPKM>[] = [
     {
       key: 'Pokémon',
-      name: '',
-      width: 60,
+      name: 'Mon',
+      width: '5rem',
       renderValue: (value) => (
         <button onClick={() => onSelectMon(value)} className="mon-icon-button">
           <PokemonIcon
@@ -38,13 +38,13 @@ export default function OpenHomeMonList({ onSelectMon }: OpenHomeMonListProps) {
     {
       key: 'nickname',
       name: 'Nickname',
-      width: 100,
+      width: '6rem',
       sortFunction: stringSorter((mon) => mon.nickname),
     },
     {
       key: 'home_box',
       name: 'OpenHome Location',
-      width: 150,
+      width: '9rem',
       renderValue: (value) => {
         for (const bank of saves.homeData.banks) {
           for (const box of bank.boxes) {
@@ -64,7 +64,7 @@ export default function OpenHomeMonList({ onSelectMon }: OpenHomeMonListProps) {
     {
       key: 'last_save',
       name: 'Last Save',
-      width: 150,
+      width: '9rem',
       renderValue: (value) => (
         <Flex direction="column">
           <Indicator.OriginGame originGame={value.mostRecentSaveWasm?.game} />
@@ -79,12 +79,12 @@ export default function OpenHomeMonList({ onSelectMon }: OpenHomeMonListProps) {
     {
       key: 'level',
       name: 'Level',
-      width: 100,
+      width: '6rem',
     },
     {
       key: 'game',
       name: 'Original Game',
-      width: 130,
+      width: '8rem',
       renderValue: (value) => (
         <img
           alt="save logo"
@@ -102,7 +102,7 @@ export default function OpenHomeMonList({ onSelectMon }: OpenHomeMonListProps) {
     {
       key: 'trainerName',
       name: 'OT',
-      width: 100,
+      width: '6rem',
     },
     {
       key: 'homeID',
@@ -115,7 +115,7 @@ export default function OpenHomeMonList({ onSelectMon }: OpenHomeMonListProps) {
   ]
 
   return (
-    <OHDataGrid
+    <SortableDataGrid
       rows={ohpkmStore.getAllStored()}
       columns={columns}
       style={{ borderLeft: 'none', borderBottom: 'none' }}

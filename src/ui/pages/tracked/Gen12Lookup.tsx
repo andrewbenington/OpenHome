@@ -1,9 +1,9 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { numericSorter, stringSorter } from '@openhome-core/util/sort'
-import OHDataGrid, { SortableColumn } from '@openhome-ui/components/OHDataGrid'
+import { numericSorter, SortableColumn, stringSorter } from '@openhome-core/util/sort'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { OriginGames } from '@pkm-rs/pkg'
+import SortableDataGrid from 'src/ui/components/OHDataGrid'
 import { useLookups } from 'src/ui/state/lookups/useLookups'
 
 type G12LookupRow = {
@@ -24,7 +24,7 @@ export default function Gen12Lookup({ onSelectMon }: Gen12LookupProps) {
     {
       key: 'Pokémon',
       name: '',
-      width: 60,
+      width: '5rem',
       renderValue: (value) =>
         value.homeMon && (
           <button
@@ -43,7 +43,7 @@ export default function Gen12Lookup({ onSelectMon }: Gen12LookupProps) {
     {
       key: 'game',
       name: 'Original Game',
-      width: 130,
+      width: '8rem',
       renderValue: (value) =>
         value.homeMon && (
           <img
@@ -76,7 +76,7 @@ export default function Gen12Lookup({ onSelectMon }: Gen12LookupProps) {
   ]
 
   return (
-    <OHDataGrid
+    <SortableDataGrid
       rows={Object.entries(lookups.gen12).map(([gen12ID, homeID]) => ({
         gen12ID,
         homeID,

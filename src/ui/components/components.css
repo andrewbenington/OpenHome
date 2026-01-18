@@ -175,3 +175,62 @@
   padding: 4px 22px 2px 6px;
   height: fit-content;
 }
+
+.datagrid {
+  position: relative;
+
+  .rdg-cell {
+    border-right: none;
+
+    &:not(:last-child) {
+      padding-inline-end: 0.75rem;
+    }
+  }
+
+  .rdg-row .rdg-cell {
+    border-bottom: none;
+    font-size: 0.8rem;
+
+    &:first-child {
+      border-radius: var(--row-border-radius) 0 0 var(--row-border-radius);
+    }
+    &:last-child {
+      border-radius: 0 var(--row-border-radius) var(--row-border-radius) 0;
+    }
+  }
+
+  .rdg-header-row {
+    font-size: var(--header-font-size);
+    /* --rdg-border-color: black;
+    background-color: var(--color-panel-solid); */
+    line-height: 1rem;
+  }
+
+  .rdg-row-even:not([aria-selected='true']) {
+    background-color: var(--gray-a3);
+  }
+
+  a {
+    text-decoration: underline;
+  }
+}
+
+.datagrid:not(.datagrid-editing) {
+  --rdg-row-selected-hover-background-color: var(--focus-8);
+  --rdg-row-selected-background-color: var(--focus-7);
+
+  .rdg-row:not([aria-selected='true']):not(.disabled-party) {
+    &:hover {
+      background-color: var(--accent-a3);
+    }
+  }
+}
+
+.datagrid-editing {
+  --rdg-selection-color: var(--focus-8);
+  --rdg-selection-width: 0px;
+  --rdg-row-selected-hover-background-color: var(--focus-10);
+  --rdg-row-selected-background-color: var(--focus-10);
+
+  opacity: 0.4;
+}

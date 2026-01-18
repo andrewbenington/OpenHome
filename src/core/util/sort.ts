@@ -1,4 +1,5 @@
 import dayjs, { Dayjs } from 'dayjs'
+import { ReactNode } from 'react'
 import type { Column } from 'react-data-grid'
 import { CssRemSize } from '../../ui/util/style'
 
@@ -6,23 +7,28 @@ export type Sorter<T> = (a: T, b: T) => number
 
 export type SortType = 'string' | 'number' | 'dayjs' | 'boolean'
 
-export type SortableColumn<T extends Record<string, unknown>> = (
-  | (Column<T> & {
-      sortFunction?: (a: T, b: T) => number
-      sortType?: undefined
-    })
-  | (Column<T> & {
-      key: keyof T
-      sortFunction?: undefined
-      sortType?: SortType
-    })
-) & {
-  hideByDefault?: boolean
-  disableCopy?: boolean
-  noFilter?: boolean
-  width?: CssRemSize
-  getFilterValue?: (row: T) => string | undefined | null
-}
+export type SortableValue = Record<string, any>
+
+export type SortableColumn<T extends SortableValue> = Readonly<
+  (
+    | (Column<T> & {
+        sortFunction?: (a: T, b: T) => number
+        sortType?: undefined
+      })
+    | (Column<T> & {
+        key: keyof T
+        sortFunction?: undefined
+        sortType?: SortType
+      })
+  ) & {
+    hideByDefault?: boolean
+    disableCopy?: boolean
+    noFilter?: boolean
+    width?: CssRemSize
+    getFilterValue?: (row: T) => string | undefined | null
+    renderValue?: (value: T) => ReactNode
+  }
+>
 
 export function stringSorter<T>(func: (val: T) => string | undefined | null) {
   return (a: T, b: T) => {
