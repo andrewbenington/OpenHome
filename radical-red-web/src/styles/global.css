@@ -162,7 +162,7 @@ body {
 }
 
 .pokemon-slot:hover {
-  background-color: #111;
+  background-color: #F0F0F0;
   border-color: #FFD700;
   box-shadow:
     inset 2px 2px 0 rgba(204, 0, 0, 0.3),
