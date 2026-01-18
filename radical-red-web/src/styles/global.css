@@ -282,7 +282,7 @@ body {
   font-weight: 900;
   margin-bottom: 4px;
   font-size: 11px;
-  color: #ffed4e;
+  color: #FFD700;
   font-family: 'Press Start 2P', 'Courier New', monospace;
   text-transform: uppercase;
 }
@@ -309,7 +309,7 @@ body {
   background-color: #1e3a8a;
   font-family: 'Press Start 2P', 'Courier New', monospace;
   font-size: 10px;
-  color: #ffed4e;
+  color: #FFD700;
   transition: all 0.1s;
   box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.3);
 }
@@ -317,12 +317,12 @@ body {
 .tab.active {
   background-color: #2563eb;
   color: #fff;
-  border-color: #ffed4e;
+  border-color: #FFD700;
 }
 
 .tab:hover:not(.active) {
   color: #fff;
-  border-color: #ffed4e;
+  border-color: #FFD700;
 }
 
 /* Box selector */
@@ -342,7 +342,7 @@ body {
   font-size: 10px;
   min-width: 70px;
   border-radius: 0;
-  color: #ffed4e;
+  color: #FFD700;
   transition: all 0.1s;
   font-weight: bold;
   box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.3);
@@ -351,12 +351,12 @@ body {
 .box-selector-button.active {
   background-color: #2563eb;
   color: #fff;
-  border-color: #ffed4e;
+  border-color: #FFD700;
   box-shadow: 3px 3px 0 rgba(255, 237, 74, 0.4);
 }
 
 .box-selector-button:hover:not(.active) {
-  border-color: #ffed4e;
+  border-color: #FFD700;
   transform: translate(-1px, -1px);
 }
 
@@ -387,7 +387,7 @@ body {
 
 /* Dark mode toggle */
 .dark-mode-toggle {
-  border: 3px solid #ffed4e;
+  border: 3px solid #FFD700;
   background: linear-gradient(135deg, #ff1493 0%, #ff69b4 100%);
   padding: 8px 12px;
   cursor: pointer;
@@ -430,14 +430,14 @@ body {
 }
 
 :root.dark-mode .wireframe-button {
-  border-color: #ffed4e;
+  border-color: #FFD700;
   background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
   color: #fff;
 }
 
 :root.dark-mode .wireframe-button:hover {
   background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-  border-color: #ffed4e;
+  border-color: #FFD700;
 }
 
 :root.dark-mode .wireframe-button:disabled {
@@ -447,24 +447,24 @@ body {
 :root.dark-mode .wireframe-button:disabled:hover {
   background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
   color: #fff;
-  border-color: #ffed4e;
+  border-color: #FFD700;
 }
 
 :root.dark-mode .wireframe-input {
-  border-color: #ffed4e;
+  border-color: #FFD700;
   background-color: #0a0a0a;
-  color: #ffed4e;
+  color: #FFD700;
 }
 
 :root.dark-mode .wireframe-title {
-  color: #ffed4e;
+  color: #FFD700;
   text-shadow:
     2px 2px 0 #ff1493,
     4px 4px 0 rgba(0, 0, 0, 0.5);
 }
 
 :root.dark-mode .wireframe-subtitle {
-  color: #ffed4e;
+  color: #FFD700;
   text-shadow: 1px 1px 0 #ff1493;
 }
 
@@ -491,7 +491,7 @@ body {
 
 :root.dark-mode .pokemon-slot:hover {
   background-color: #111;
-  border-color: #ffed4e;
+  border-color: #FFD700;
   box-shadow:
     inset 2px 2px 0 rgba(0, 255, 0, 0.2),
     4px 4px 0 rgba(255, 237, 74, 0.5);
@@ -512,14 +512,14 @@ body {
 }
 
 :root.dark-mode .stat-item {
-  border-color: #ffed4e;
+  border-color: #FFD700;
   background-color: #1a0a2e;
   color: #fff;
   box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.4);
 }
 
 :root.dark-mode .stat-label {
-  color: #ffed4e;
+  color: #FFD700;
 }
 
 :root.dark-mode .stat-value {
@@ -550,41 +550,41 @@ body {
 :root.dark-mode .tab {
   border-color: #00ff00;
   background-color: #0f0f2e;
-  color: #ffed4e;
+  color: #FFD700;
   box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
 }
 
 :root.dark-mode .tab.active {
   background-color: #1a0a3e;
   color: #fff;
-  border-color: #ffed4e;
+  border-color: #FFD700;
 }
 
 :root.dark-mode .tab:hover:not(.active) {
   color: #fff;
-  border-color: #ffed4e;
+  border-color: #FFD700;
 }
 
 :root.dark-mode .box-selector-button {
   border-color: #00ff00;
   background-color: #0f0f2e;
-  color: #ffed4e;
+  color: #FFD700;
   box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
 }
 
 :root.dark-mode .box-selector-button.active {
   background-color: #1a0a3e;
   color: #fff;
-  border-color: #ffed4e;
+  border-color: #FFD700;
   box-shadow: 3px 3px 0 rgba(255, 237, 74, 0.4);
 }
 
 :root.dark-mode .box-selector-button:hover:not(.active) {
-  border-color: #ffed4e;
+  border-color: #FFD700;
 }
 
 :root.dark-mode .dark-mode-toggle {
-  border-color: #ffed4e;
+  border-color: #FFD700;
   background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
   color: #fff;
   box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.5);
@@ -592,7 +592,7 @@ body {
 
 :root.dark-mode .dark-mode-toggle:hover {
   background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-  border-color: #ffed4e;
+  border-color: #FFD700;
 }
 
 /* ===========================================
