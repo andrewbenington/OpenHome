@@ -1,4 +1,5 @@
 import React from 'react'
+import { Moon, Sun } from 'lucide-react'
 import { useDarkMode } from '../contexts/DarkModeContext'
 
 export const DarkModeToggle: React.FC = () => {
@@ -9,8 +10,9 @@ export const DarkModeToggle: React.FC = () => {
       className="dark-mode-toggle"
       onClick={toggleDarkMode}
       title={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+      aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
     >
-      {isDarkMode ? '☀️' : '🌙'}
+      {isDarkMode ? <Sun className="icon" /> : <Moon className="icon" />}
     </button>
   )
 }
