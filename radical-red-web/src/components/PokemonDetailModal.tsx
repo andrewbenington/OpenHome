@@ -14,11 +14,31 @@ interface PokemonDetailModalProps {
 }
 
 const NATURES = [
-  'Hardy', 'Lonely', 'Brave', 'Adamant', 'Naughty',
-  'Bold', 'Docile', 'Relaxed', 'Impish', 'Lax',
-  'Timid', 'Hasty', 'Serious', 'Jolly', 'Naive',
-  'Modest', 'Mild', 'Quiet', 'Bashful', 'Rash',
-  'Calm', 'Gentle', 'Sassy', 'Careful', 'Quirky'
+  'Hardy',
+  'Lonely',
+  'Brave',
+  'Adamant',
+  'Naughty',
+  'Bold',
+  'Docile',
+  'Relaxed',
+  'Impish',
+  'Lax',
+  'Timid',
+  'Hasty',
+  'Serious',
+  'Jolly',
+  'Naive',
+  'Modest',
+  'Mild',
+  'Quiet',
+  'Bashful',
+  'Rash',
+  'Calm',
+  'Gentle',
+  'Sassy',
+  'Careful',
+  'Quirky',
 ]
 
 // Nature stat modifiers: [increasedStat, decreasedStat] or null for neutral
@@ -70,7 +90,7 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
   const [activeTab, setActiveTab] = useState<'stats' | 'moves' | 'other'>('stats')
 
   const updatePokemon = (updates: Partial<PokemonData>) => {
-    setPokemon(prev => ({ ...prev, ...updates }))
+    setPokemon((prev) => ({ ...prev, ...updates }))
   }
 
   // Get species info including abilities and level up type
@@ -81,7 +101,7 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
         ability1: null,
         ability2: null,
         abilityH: null,
-        levelUpType: 'Medium Fast'
+        levelUpType: 'Medium Fast',
       }
     }
     // Use the forme that matches the pokemon's formNum
@@ -90,16 +110,19 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
       ability1: forme.ability1 || null,
       ability2: forme.ability2 || null,
       abilityH: forme.abilityH || null,
-      levelUpType: species.levelUpType || 'Medium Fast'
+      levelUpType: species.levelUpType || 'Medium Fast',
     }
   }, [pokemon.dexNum, pokemon.formNum])
 
   // Get abilities for the current Pokemon (for backward compatibility)
-  const abilities = useMemo(() => ({
-    ability1: speciesInfo.ability1,
-    ability2: speciesInfo.ability2,
-    abilityH: speciesInfo.abilityH,
-  }), [speciesInfo])
+  const abilities = useMemo(
+    () => ({
+      ability1: speciesInfo.ability1,
+      ability2: speciesInfo.ability2,
+      abilityH: speciesInfo.abilityH,
+    }),
+    [speciesInfo]
+  )
 
   // Handler for level changes - also updates EXP
   const handleLevelChange = (newLevel: number) => {
@@ -128,7 +151,7 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
       } else if (val > max) {
         updatePokemon({ [field]: max } as Partial<PokemonData>)
       }
-    }
+    },
   })
 
   // Get all moves sorted by name
@@ -165,9 +188,16 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
             className="pokemon-sprite-large"
             title={`${pokemon.speciesName}${pokemon.isShiny ? ' (Shiny)' : ''}`}
             onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              if (target.src !== getFallbackSpriteUrl(pokemon.dexNum, pokemon.speciesName, pokemon.isShiny)) {
-                target.src = getFallbackSpriteUrl(pokemon.dexNum, pokemon.speciesName, pokemon.isShiny);
+              const target = e.target as HTMLImageElement
+              if (
+                target.src !==
+                getFallbackSpriteUrl(pokemon.dexNum, pokemon.speciesName, pokemon.isShiny)
+              ) {
+                target.src = getFallbackSpriteUrl(
+                  pokemon.dexNum,
+                  pokemon.speciesName,
+                  pokemon.isShiny
+                )
               }
             }}
           />
@@ -180,13 +210,27 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
 
         <div className="wireframe-box">
           <div className="form-row">
-            <div className="read-only-stat" style={{ padding: '12px', border: '3px solid #999999' }}>
-              <div className="stat-label" style={{ color: '#555555' }}>OT</div>
-              <div className="stat-value" style={{ color: '#333333', fontSize: '14px' }}>{pokemon.trainerName}</div>
+            <div
+              className="read-only-stat"
+              style={{ padding: '12px', border: '3px solid #999999' }}
+            >
+              <div className="stat-label" style={{ color: '#555555' }}>
+                OT
+              </div>
+              <div className="stat-value" style={{ color: '#333333', fontSize: '14px' }}>
+                {pokemon.trainerName}
+              </div>
             </div>
-            <div className="read-only-stat" style={{ padding: '12px', border: '3px solid #999999' }}>
-              <div className="stat-label" style={{ color: '#555555' }}>ID</div>
-              <div className="stat-value" style={{ color: '#333333', fontSize: '14px' }}>{pokemon.trainerID.toString().padStart(5, '0')}</div>
+            <div
+              className="read-only-stat"
+              style={{ padding: '12px', border: '3px solid #999999' }}
+            >
+              <div className="stat-label" style={{ color: '#555555' }}>
+                ID
+              </div>
+              <div className="stat-value" style={{ color: '#333333', fontSize: '14px' }}>
+                {pokemon.trainerID.toString().padStart(5, '0')}
+              </div>
             </div>
           </div>
           <div className="form-row" style={{ marginTop: '8px', display: 'flex', gap: '16px' }}>
@@ -468,12 +512,19 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
               <select
                 className="wireframe-input"
                 value={pokemon.moves[0]}
-                onChange={(e) => updatePokemon({ moves: [parseInt(e.target.value), pokemon.moves[1], pokemon.moves[2], pokemon.moves[3]] })}
+                onChange={(e) =>
+                  updatePokemon({
+                    moves: [
+                      parseInt(e.target.value),
+                      pokemon.moves[1],
+                      pokemon.moves[2],
+                      pokemon.moves[3],
+                    ],
+                  })
+                }
               >
                 {allMoves.map((move) => (
-                  <option value={move.id}>
-                    {move.name}
-                  </option>
+                  <option value={move.id}>{move.name}</option>
                 ))}
               </select>
             </div>
@@ -482,12 +533,19 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
               <select
                 className="wireframe-input"
                 value={pokemon.moves[1]}
-                onChange={(e) => updatePokemon({ moves: [pokemon.moves[0], parseInt(e.target.value), pokemon.moves[2], pokemon.moves[3]] })}
+                onChange={(e) =>
+                  updatePokemon({
+                    moves: [
+                      pokemon.moves[0],
+                      parseInt(e.target.value),
+                      pokemon.moves[2],
+                      pokemon.moves[3],
+                    ],
+                  })
+                }
               >
                 {allMoves.map((move) => (
-                  <option value={move.id}>
-                    {move.name}
-                  </option>
+                  <option value={move.id}>{move.name}</option>
                 ))}
               </select>
             </div>
@@ -496,12 +554,19 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
               <select
                 className="wireframe-input"
                 value={pokemon.moves[2]}
-                onChange={(e) => updatePokemon({ moves: [pokemon.moves[0], pokemon.moves[1], parseInt(e.target.value), pokemon.moves[3]] })}
+                onChange={(e) =>
+                  updatePokemon({
+                    moves: [
+                      pokemon.moves[0],
+                      pokemon.moves[1],
+                      parseInt(e.target.value),
+                      pokemon.moves[3],
+                    ],
+                  })
+                }
               >
                 {allMoves.map((move) => (
-                  <option value={move.id}>
-                    {move.name}
-                  </option>
+                  <option value={move.id}>{move.name}</option>
                 ))}
               </select>
             </div>
@@ -510,12 +575,19 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
               <select
                 className="wireframe-input"
                 value={pokemon.moves[3]}
-                onChange={(e) => updatePokemon({ moves: [pokemon.moves[0], pokemon.moves[1], pokemon.moves[2], parseInt(e.target.value)] })}
+                onChange={(e) =>
+                  updatePokemon({
+                    moves: [
+                      pokemon.moves[0],
+                      pokemon.moves[1],
+                      pokemon.moves[2],
+                      parseInt(e.target.value),
+                    ],
+                  })
+                }
               >
                 {allMoves.map((move) => (
-                  <option value={move.id}>
-                    {move.name}
-                  </option>
+                  <option value={move.id}>{move.name}</option>
                 ))}
               </select>
             </div>
@@ -584,15 +656,9 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
                   value={pokemon.ability}
                   onChange={(e) => updatePokemon({ ability: parseInt(e.target.value) })}
                 >
-                  {abilities.ability1 && (
-                    <option value={0}>{abilities.ability1}</option>
-                  )}
-                  {abilities.ability2 && (
-                    <option value={1}>{abilities.ability2}</option>
-                  )}
-                  {abilities.abilityH && (
-                    <option value={2}>{abilities.abilityH} (Hidden)</option>
-                  )}
+                  {abilities.ability1 && <option value={0}>{abilities.ability1}</option>}
+                  {abilities.ability2 && <option value={1}>{abilities.ability2}</option>}
+                  {abilities.abilityH && <option value={2}>{abilities.abilityH} (Hidden)</option>}
                   {!abilities.ability1 && !abilities.ability2 && !abilities.abilityH && (
                     <option value={0}>No abilities found</option>
                   )}
@@ -620,7 +686,9 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
               />
             </div>
             <div style={{ marginTop: '16px' }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+              <label
+                style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}
+              >
                 <input
                   type="checkbox"
                   checked={pokemon.isShiny}

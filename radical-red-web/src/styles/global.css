@@ -9,7 +9,7 @@
 
 body {
   font-family: 'Press Start 2P', 'Courier New', monospace;
-  background: linear-gradient(135deg, #FF0000 0%, #CC0000 100%);
+  background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
   color: #fff;
   line-height: 1.6;
   image-rendering: pixelated;
@@ -24,8 +24,8 @@ body {
 
 /* Pixel Art Gamer Elements */
 .wireframe-box {
-  border: 4px solid #CC0000;
-  background: linear-gradient(135deg, #FFFFFF 0%, #F5F5F5 100%);
+  border: 4px solid #cc0000;
+  background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
   padding: 16px;
   margin: 8px 0;
   border-radius: 0;
@@ -36,8 +36,8 @@ body {
 }
 
 .wireframe-button {
-  border: 3px solid #FFD700;
-  background: linear-gradient(135deg, #CC0000 0%, #FF0000 100%);
+  border: 3px solid #ffd700;
+  background: linear-gradient(135deg, #cc0000 0%, #ff0000 100%);
   padding: 10px 20px;
   cursor: pointer;
   font-family: 'Press Start 2P', 'Courier New', monospace;
@@ -50,7 +50,7 @@ body {
 }
 
 .wireframe-button:hover {
-  background: linear-gradient(135deg, #FF0000 0%, #CC0000 100%);
+  background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
   transform: translate(-2px, -2px);
   box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.4);
 }
@@ -66,13 +66,13 @@ body {
 }
 
 .wireframe-button:disabled:hover {
-  background: linear-gradient(135deg, #CC0000 0%, #FF0000 100%);
+  background: linear-gradient(135deg, #cc0000 0%, #ff0000 100%);
   transform: none;
   box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.3);
 }
 
 .wireframe-input {
-  border: 3px solid #FFD700;
+  border: 3px solid #ffd700;
   padding: 10px;
   font-family: 'Press Start 2P', 'Courier New', monospace;
   font-size: 12px;
@@ -89,9 +89,9 @@ body {
   margin-bottom: 16px;
   text-transform: uppercase;
   letter-spacing: 2px;
-  color: #FFD700;
+  color: #ffd700;
   text-shadow:
-    2px 2px 0 #CC0000,
+    2px 2px 0 #cc0000,
     4px 4px 0 rgba(0, 0, 0, 0.3);
   font-family: 'Press Start 2P', 'Courier New', monospace;
 }
@@ -101,8 +101,8 @@ body {
   font-weight: 700;
   margin: 16px 0 8px 0;
   text-transform: uppercase;
-  color: #FFD700;
-  text-shadow: 1px 1px 0 #CC0000;
+  color: #ffd700;
+  text-shadow: 1px 1px 0 #cc0000;
   font-family: 'Press Start 2P', 'Courier New', monospace;
 }
 
@@ -122,8 +122,8 @@ body {
 }
 
 .modal-content {
-  background: linear-gradient(135deg, #FFFFFF 0%, #F5F5F5 100%);
-  border: 4px solid #CC0000;
+  background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
+  border: 4px solid #cc0000;
   max-width: 800px;
   width: 100%;
   max-height: 90vh;
@@ -145,13 +145,13 @@ body {
 }
 
 .pokemon-slot {
-  border: 3px solid #CC0000;
+  border: 3px solid #cc0000;
   aspect-ratio: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  background-color: #FFFFFF;
+  background-color: #ffffff;
   transition: all 0.1s;
   position: relative;
   padding: 4px;
@@ -162,8 +162,8 @@ body {
 }
 
 .pokemon-slot:hover {
-  background-color: #F0F0F0;
-  border-color: #FFD700;
+  background-color: #f0f0f0;
+  border-color: #ffd700;
   box-shadow:
     inset 2px 2px 0 rgba(204, 0, 0, 0.3),
     4px 4px 0 rgba(255, 215, 0, 0.5);
@@ -171,19 +171,19 @@ body {
 }
 
 .pokemon-slot.empty {
-  background-color: #E8E8E8;
+  background-color: #e8e8e8;
   cursor: default;
   opacity: 0.6;
 }
 
 .pokemon-slot.empty:hover {
-  background-color: #E8E8E8;
+  background-color: #e8e8e8;
   transform: none;
-  border-color: #CC0000;
+  border-color: #cc0000;
 }
 
 .pokemon-slot.fakemon {
-  border-color: #CC0000;
+  border-color: #cc0000;
   background-color: #660000;
 }
 
@@ -229,10 +229,10 @@ body {
 }
 
 .stat-item {
-  border: 3px solid #FFD700;
+  border: 3px solid #ffd700;
   padding: 12px;
   border-radius: 0;
-  background-color: #FFFFFF;
+  background-color: #ffffff;
   box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.3);
 }
 
@@ -240,14 +240,14 @@ body {
   font-weight: 900;
   margin-bottom: 4px;
   font-size: 10px;
-  color: #FFD700;
+  color: #ffd700;
   font-family: 'Press Start 2P', 'Courier New', monospace;
   text-transform: uppercase;
 }
 
 .stat-value {
   font-size: 16px;
-  color: #CC0000;
+  color: #cc0000;
   font-family: 'Press Start 2P', 'Courier New', monospace;
   font-weight: bold;
 }
@@ -282,7 +282,7 @@ body {
   font-weight: 900;
   margin-bottom: 4px;
   font-size: 11px;
-  color: #FFD700;
+  color: #ffd700;
   font-family: 'Press Start 2P', 'Courier New', monospace;
   text-transform: uppercase;
 }
@@ -296,33 +296,33 @@ body {
 /* Tabs */
 .tabs {
   display: flex;
-  border-bottom: 3px solid #CC0000;
+  border-bottom: 3px solid #cc0000;
   margin-bottom: 16px;
 }
 
 .tab {
   padding: 12px 24px;
   cursor: pointer;
-  border: 3px solid #CC0000;
+  border: 3px solid #cc0000;
   border-bottom: none;
   margin-right: 4px;
-  background-color: #FFFFFF;
+  background-color: #ffffff;
   font-family: 'Press Start 2P', 'Courier New', monospace;
   font-size: 10px;
-  color: #FFD700;
+  color: #ffd700;
   transition: all 0.1s;
   box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.3);
 }
 
 .tab.active {
-  background-color: #FF0000;
+  background-color: #ff0000;
   color: #fff;
-  border-color: #FFD700;
+  border-color: #ffd700;
 }
 
 .tab:hover:not(.active) {
   color: #fff;
-  border-color: #FFD700;
+  border-color: #ffd700;
 }
 
 /* Box selector */
@@ -334,29 +334,29 @@ body {
 }
 
 .box-selector-button {
-  border: 3px solid #CC0000;
-  background-color: #FFFFFF;
+  border: 3px solid #cc0000;
+  background-color: #ffffff;
   padding: 8px 12px;
   cursor: pointer;
   font-family: 'Press Start 2P', 'Courier New', monospace;
   font-size: 10px;
   min-width: 70px;
   border-radius: 0;
-  color: #FFD700;
+  color: #ffd700;
   transition: all 0.1s;
   font-weight: bold;
   box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.3);
 }
 
 .box-selector-button.active {
-  background-color: #FF0000;
+  background-color: #ff0000;
   color: #fff;
-  border-color: #FFD700;
+  border-color: #ffd700;
   box-shadow: 3px 3px 0 rgba(255, 215, 0, 0.4);
 }
 
 .box-selector-button:hover:not(.active) {
-  border-color: #FFD700;
+  border-color: #ffd700;
   transform: translate(-1px, -1px);
 }
 
@@ -387,8 +387,8 @@ body {
 
 /* Dark mode toggle */
 .dark-mode-toggle {
-  border: 3px solid #FFD700;
-  background: linear-gradient(135deg, #CC0000 0%, #FF0000 100%);
+  border: 3px solid #ffd700;
+  background: linear-gradient(135deg, #cc0000 0%, #ff0000 100%);
   padding: 8px 12px;
   cursor: pointer;
   font-family: 'Press Start 2P', 'Courier New', monospace;
@@ -406,7 +406,7 @@ body {
 }
 
 .dark-mode-toggle:hover {
-  background: linear-gradient(135deg, #FF0000 0%, #CC0000 100%);
+  background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
   transform: translate(-2px, -2px);
   box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.4);
 }
@@ -416,12 +416,12 @@ body {
    ========================================== */
 
 :root.dark-mode body {
-  background: linear-gradient(135deg, #1A0000 0%, #330000 100%);
+  background: linear-gradient(135deg, #1a0000 0%, #330000 100%);
   color: #fff;
 }
 
 :root.dark-mode .wireframe-box {
-  border-color: #CC0000;
+  border-color: #cc0000;
   background: linear-gradient(135deg, #330000 0%, #440000 100%);
   color: #fff;
   box-shadow:
@@ -430,14 +430,14 @@ body {
 }
 
 :root.dark-mode .wireframe-button {
-  border-color: #FFD700;
-  background: linear-gradient(135deg, #FF0000 0%, #CC0000 100%);
+  border-color: #ffd700;
+  background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
   color: #fff;
 }
 
 :root.dark-mode .wireframe-button:hover {
-  background: linear-gradient(135deg, #FF3333 0%, #FF0000 100%);
-  border-color: #FFD700;
+  background: linear-gradient(135deg, #ff3333 0%, #ff0000 100%);
+  border-color: #ffd700;
 }
 
 :root.dark-mode .wireframe-button:disabled {
@@ -445,27 +445,27 @@ body {
 }
 
 :root.dark-mode .wireframe-button:disabled:hover {
-  background: linear-gradient(135deg, #FF0000 0%, #CC0000 100%);
+  background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
   color: #fff;
-  border-color: #FFD700;
+  border-color: #ffd700;
 }
 
 :root.dark-mode .wireframe-input {
-  border-color: #FFD700;
+  border-color: #ffd700;
   background-color: #0a0a0a;
-  color: #FFD700;
+  color: #ffd700;
 }
 
 :root.dark-mode .wireframe-title {
-  color: #FFD700;
+  color: #ffd700;
   text-shadow:
-    2px 2px 0 #CC0000,
+    2px 2px 0 #cc0000,
     4px 4px 0 rgba(0, 0, 0, 0.5);
 }
 
 :root.dark-mode .wireframe-subtitle {
-  color: #FFD700;
-  text-shadow: 1px 1px 0 #CC0000;
+  color: #ffd700;
+  text-shadow: 1px 1px 0 #cc0000;
 }
 
 :root.dark-mode .modal-overlay {
@@ -474,7 +474,7 @@ body {
 
 :root.dark-mode .modal-content {
   background: linear-gradient(135deg, #330000 0%, #440000 100%);
-  border-color: #CC0000;
+  border-color: #cc0000;
   color: #fff;
   box-shadow:
     6px 6px 0 rgba(0, 0, 0, 0.6),
@@ -482,7 +482,7 @@ body {
 }
 
 :root.dark-mode .pokemon-slot {
-  border-color: #CC0000;
+  border-color: #cc0000;
   background-color: #0a0a0a;
   box-shadow:
     inset 2px 2px 0 rgba(204, 0, 0, 0.2),
@@ -491,7 +491,7 @@ body {
 
 :root.dark-mode .pokemon-slot:hover {
   background-color: #111;
-  border-color: #FFD700;
+  border-color: #ffd700;
   box-shadow:
     inset 2px 2px 0 rgba(204, 0, 0, 0.2),
     4px 4px 0 rgba(255, 215, 0, 0.5);
@@ -507,23 +507,23 @@ body {
 }
 
 :root.dark-mode .pokemon-slot.fakemon {
-  border-color: #CC0000;
+  border-color: #cc0000;
   background-color: #1a0000;
 }
 
 :root.dark-mode .stat-item {
-  border-color: #FFD700;
+  border-color: #ffd700;
   background-color: #330000;
   color: #fff;
   box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.4);
 }
 
 :root.dark-mode .stat-label {
-  color: #FFD700;
+  color: #ffd700;
 }
 
 :root.dark-mode .stat-value {
-  color: #CC0000;
+  color: #cc0000;
 }
 
 :root.dark-mode .read-only-stat {
@@ -544,55 +544,55 @@ body {
 }
 
 :root.dark-mode .tabs {
-  border-bottom-color: #CC0000;
+  border-bottom-color: #cc0000;
 }
 
 :root.dark-mode .tab {
-  border-color: #CC0000;
+  border-color: #cc0000;
   background-color: #330000;
-  color: #FFD700;
+  color: #ffd700;
   box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
 }
 
 :root.dark-mode .tab.active {
   background-color: #440000;
   color: #fff;
-  border-color: #FFD700;
+  border-color: #ffd700;
 }
 
 :root.dark-mode .tab:hover:not(.active) {
   color: #fff;
-  border-color: #FFD700;
+  border-color: #ffd700;
 }
 
 :root.dark-mode .box-selector-button {
-  border-color: #CC0000;
+  border-color: #cc0000;
   background-color: #330000;
-  color: #FFD700;
+  color: #ffd700;
   box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
 }
 
 :root.dark-mode .box-selector-button.active {
   background-color: #440000;
   color: #fff;
-  border-color: #FFD700;
+  border-color: #ffd700;
   box-shadow: 3px 3px 0 rgba(255, 215, 0, 0.4);
 }
 
 :root.dark-mode .box-selector-button:hover:not(.active) {
-  border-color: #FFD700;
+  border-color: #ffd700;
 }
 
 :root.dark-mode .dark-mode-toggle {
-  border-color: #FFD700;
-  background: linear-gradient(135deg, #FF0000 0%, #CC0000 100%);
+  border-color: #ffd700;
+  background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
   color: #fff;
   box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.5);
 }
 
 :root.dark-mode .dark-mode-toggle:hover {
-  background: linear-gradient(135deg, #FF3333 0%, #FF0000 100%);
-  border-color: #FFD700;
+  background: linear-gradient(135deg, #ff3333 0%, #ff0000 100%);
+  border-color: #ffd700;
 }
 
 /* ===========================================
