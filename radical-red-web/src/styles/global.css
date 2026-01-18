@@ -352,7 +352,7 @@ body {
   background-color: #FF0000;
   color: #fff;
   border-color: #FFD700;
-  box-shadow: 3px 3px 0 rgba(255, 237, 74, 0.4);
+  box-shadow: 3px 3px 0 rgba(255, 215, 0, 0.4);
 }
 
 .box-selector-button:hover:not(.active) {
@@ -494,7 +494,7 @@ body {
   border-color: #FFD700;
   box-shadow:
     inset 2px 2px 0 rgba(0, 255, 0, 0.2),
-    4px 4px 0 rgba(255, 237, 74, 0.5);
+    4px 4px 0 rgba(255, 215, 0, 0.5);
 }
 
 :root.dark-mode .pokemon-slot.empty {
@@ -576,7 +576,7 @@ body {
   background-color: #440000;
   color: #fff;
   border-color: #FFD700;
-  box-shadow: 3px 3px 0 rgba(255, 237, 74, 0.4);
+  box-shadow: 3px 3px 0 rgba(255, 215, 0, 0.4);
 }
 
 :root.dark-mode .box-selector-button:hover:not(.active) {
