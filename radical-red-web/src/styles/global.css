@@ -416,7 +416,7 @@ body {
    ========================================== */
 
 :root.dark-mode body {
-  background: linear-gradient(135deg, #1A0000 0%, #1a0a2e 100%);
+  background: linear-gradient(135deg, #1A0000 0%, #330000 100%);
   color: #fff;
 }
 
@@ -513,7 +513,7 @@ body {
 
 :root.dark-mode .stat-item {
   border-color: #FFD700;
-  background-color: #1a0a2e;
+  background-color: #330000;
   color: #fff;
   box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.4);
 }
