@@ -88,14 +88,18 @@ const DraggableMon = (props: DraggableMonProps) => {
       <PokemonIcon
         dexNumber={mon.dexNum}
         formeNumber={formeNumber}
-        isShiny={showShiny && mon.isShiny()}
+        format={mon.format}
+        formArgument={mon.formArgument}
+        isShiny={showShiny ? mon.isShiny() : false}
         isEgg={mon.isEgg}
+        isFemale={mon.gender === 1}
         heldItemIndex={
           showItem && (!isDragging || dragState.mode !== 'item') ? mon.heldItemIndex : undefined
         }
         style={style}
         grayedOut={disabled}
         topRightIndicator={topRightIndicatorComponent}
+        useAnimatedSprite
       />
     </div>
   )
