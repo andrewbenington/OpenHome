@@ -7,7 +7,7 @@ import { CSSProperties, useMemo } from 'react'
 import PokemonIcon from '../../components/PokemonIcon'
 import { TopRightIndicatorType } from '../../hooks/useMonDisplay'
 import useDragAndDrop from '../../state/drag-and-drop/useDragAndDrop'
-import TopRightIndicator from '../TopRightIndicator'
+import { Indicator } from '../Indicator'
 
 const getBackgroundDetails = (disabled?: boolean) => {
   if (disabled) {
@@ -60,7 +60,11 @@ const DraggableMon = (props: DraggableMonProps) => {
 
   const topRightIndicatorComponent = useMemo(
     () =>
-      topRightIndicator ? <TopRightIndicator indicatorType={topRightIndicator} mon={mon} /> : <></>,
+      topRightIndicator ? (
+        <Indicator.TopRight indicatorType={topRightIndicator} mon={mon} />
+      ) : (
+        <></>
+      ),
     [mon, topRightIndicator]
   )
 

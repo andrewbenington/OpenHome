@@ -41,11 +41,12 @@ pub fn run() {
             let ohpkm_store = match state::OhpkmBytesStore::load_from_mons_v2(app.handle()) {
                 Ok(state) => state,
                 Err(err) => {
-                    app.dialog()
-                        .message(err.to_string())
-                        .title("OpenHome Failed to Launch - OHPKM load error")
-                        .kind(MessageDialogKind::Error)
-                        .blocking_show();
+                    util::show_error_dialog(
+                        app,
+                        err.to_string(),
+                        "OpenHome Failed to Launch - OHPKM load error",
+                    );
+
                     app.handle().exit(1);
                     std::process::exit(1);
                 }

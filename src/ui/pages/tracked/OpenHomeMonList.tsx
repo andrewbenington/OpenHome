@@ -5,6 +5,9 @@ import OHDataGrid, { SortableColumn } from '@openhome-ui/components/OHDataGrid'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { OriginGames } from '@pkm-rs/pkg'
+import { Flex } from '@radix-ui/themes'
+import { Indicator } from 'src/ui/saves/Indicator'
+import { useSaves } from 'src/ui/state/saves'
 import './style.css'
 
 export type OpenHomeMonListProps = {
@@ -13,6 +16,7 @@ export type OpenHomeMonListProps = {
 
 export default function OpenHomeMonList({ onSelectMon }: OpenHomeMonListProps) {
   const ohpkmStore = useOhpkmStore()
+  const saves = useSaves()
 
   const columns: SortableColumn<OHPKM>[] = [
     {
@@ -36,6 +40,41 @@ export default function OpenHomeMonList({ onSelectMon }: OpenHomeMonListProps) {
       name: 'Nickname',
       width: 100,
       sortFunction: stringSorter((mon) => mon.nickname),
+    },
+    {
+      key: 'home_box',
+      name: 'OpenHome Location',
+      width: 150,
+      renderValue: (value) => {
+        for (const bank of saves.homeData.banks) {
+          for (const box of bank.boxes) {
+            if (
+              box.identifiers
+                .keys()
+                .some((slot) => box.identifiers.get(slot) === value.getHomeIdentifier())
+            ) {
+              const bankName = bank.name ?? `Bank ${bank.index + 1}`
+              const boxName = box.name ?? `Box ${box.index + 1}`
+              return `${bankName} -> ${boxName}`
+            }
+          }
+        }
+      },
+    },
+    {
+      key: 'last_save',
+      name: 'Last Save',
+      width: 150,
+      renderValue: (value) => (
+        <Flex direction="column">
+          <Indicator.OriginGame originGame={value.mostRecentSaveWasm?.game} />
+          <div title={value.mostRecentSaveWasm?.file_path}>
+            {value.mostRecentSaveWasm?.file_path}
+
+            {value.mostRecentSaveWasm?.file_path}
+          </div>
+        </Flex>
+      ),
     },
     {
       key: 'level',
