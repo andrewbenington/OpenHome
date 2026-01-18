@@ -9,7 +9,7 @@
 
 body {
   font-family: 'Press Start 2P', 'Courier New', monospace;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #FF0000 0%, #CC0000 100%);
   color: #fff;
   line-height: 1.6;
   image-rendering: pixelated;
@@ -24,33 +24,33 @@ body {
 
 /* Pixel Art Gamer Elements */
 .wireframe-box {
-  border: 4px solid #ff1493;
-  background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+  border: 4px solid #CC0000;
+  background: linear-gradient(135deg, #FFFFFF 0%, #F5F5F5 100%);
   padding: 16px;
   margin: 8px 0;
   border-radius: 0;
   box-shadow:
     4px 4px 0 rgba(0, 0, 0, 0.3),
-    8px 8px 0 rgba(255, 20, 147, 0.2);
-  color: #fff;
+    8px 8px 0 rgba(204, 0, 0, 0.2);
+  color: #000;
 }
 
 .wireframe-button {
-  border: 3px solid #ffed4e;
-  background: linear-gradient(135deg, #ff1493 0%, #ff69b4 100%);
+  border: 3px solid #FFD700;
+  background: linear-gradient(135deg, #CC0000 0%, #FF0000 100%);
   padding: 10px 20px;
   cursor: pointer;
   font-family: 'Press Start 2P', 'Courier New', monospace;
   font-size: 12px;
   transition: all 0.1s;
   border-radius: 0;
-  color: #000;
+  color: #fff;
   font-weight: bold;
   box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.3);
 }
 
 .wireframe-button:hover {
-  background: linear-gradient(135deg, #ff69b4 0%, #ff1493 100%);
+  background: linear-gradient(135deg, #FF0000 0%, #CC0000 100%);
   transform: translate(-2px, -2px);
   box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.4);
 }
@@ -66,13 +66,13 @@ body {
 }
 
 .wireframe-button:disabled:hover {
-  background: linear-gradient(135deg, #ff1493 0%, #ff69b4 100%);
+  background: linear-gradient(135deg, #CC0000 0%, #FF0000 100%);
   transform: none;
   box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.3);
 }
 
 .wireframe-input {
-  border: 3px solid #ffed4e;
+  border: 3px solid #FFD700;
   padding: 10px;
   font-family: 'Press Start 2P', 'Courier New', monospace;
   font-size: 12px;
@@ -89,9 +89,9 @@ body {
   margin-bottom: 16px;
   text-transform: uppercase;
   letter-spacing: 2px;
-  color: #ffed4e;
+  color: #FFD700;
   text-shadow:
-    2px 2px 0 #ff1493,
+    2px 2px 0 #CC0000,
     4px 4px 0 rgba(0, 0, 0, 0.3);
   font-family: 'Press Start 2P', 'Courier New', monospace;
 }
@@ -101,8 +101,8 @@ body {
   font-weight: 700;
   margin: 16px 0 8px 0;
   text-transform: uppercase;
-  color: #ffed4e;
-  text-shadow: 1px 1px 0 #ff1493;
+  color: #FFD700;
+  text-shadow: 1px 1px 0 #CC0000;
   font-family: 'Press Start 2P', 'Courier New', monospace;
 }
 
@@ -122,8 +122,8 @@ body {
 }
 
 .modal-content {
-  background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
-  border: 4px solid #ff1493;
+  background: linear-gradient(135deg, #FFFFFF 0%, #F5F5F5 100%);
+  border: 4px solid #CC0000;
   max-width: 800px;
   width: 100%;
   max-height: 90vh;
@@ -132,8 +132,8 @@ body {
   border-radius: 0;
   box-shadow:
     6px 6px 0 rgba(0, 0, 0, 0.5),
-    12px 12px 0 rgba(255, 20, 147, 0.2);
-  color: #fff;
+    12px 12px 0 rgba(204, 0, 0, 0.2);
+  color: #000;
 }
 
 /* Grid layouts */
