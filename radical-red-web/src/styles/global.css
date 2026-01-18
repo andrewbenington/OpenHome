@@ -171,13 +171,13 @@ body {
 }
 
 .pokemon-slot.empty {
-  background-color: #0a0a0a;
+  background-color: #E8E8E8;
   cursor: default;
   opacity: 0.6;
 }
 
 .pokemon-slot.empty:hover {
-  background-color: #0a0a0a;
+  background-color: #E8E8E8;
   transform: none;
   border-color: #CC0000;
 }
