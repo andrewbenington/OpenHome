@@ -303,7 +303,7 @@ body {
 .tab {
   padding: 12px 24px;
   cursor: pointer;
-  border: 3px solid #00ff00;
+  border: 3px solid #CC0000;
   border-bottom: none;
   margin-right: 4px;
   background-color: #1e3a8a;
@@ -334,7 +334,7 @@ body {
 }
 
 .box-selector-button {
-  border: 3px solid #00ff00;
+  border: 3px solid #CC0000;
   background-color: #1e3a8a;
   padding: 8px 12px;
   cursor: pointer;
@@ -482,7 +482,7 @@ body {
 }
 
 :root.dark-mode .pokemon-slot {
-  border-color: #00ff00;
+  border-color: #CC0000;
   background-color: #0a0a0a;
   box-shadow:
     inset 2px 2px 0 rgba(0, 255, 0, 0.2),
@@ -523,7 +523,7 @@ body {
 }
 
 :root.dark-mode .stat-value {
-  color: #00ff00;
+  color: #CC0000;
 }
 
 :root.dark-mode .read-only-stat {
@@ -548,7 +548,7 @@ body {
 }
 
 :root.dark-mode .tab {
-  border-color: #00ff00;
+  border-color: #CC0000;
   background-color: #0f0f2e;
   color: #FFD700;
   box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
@@ -566,7 +566,7 @@ body {
 }
 
 :root.dark-mode .box-selector-button {
-  border-color: #00ff00;
+  border-color: #CC0000;
   background-color: #0f0f2e;
   color: #FFD700;
   box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
