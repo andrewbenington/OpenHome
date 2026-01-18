@@ -296,7 +296,7 @@ body {
 /* Tabs */
 .tabs {
   display: flex;
-  border-bottom: 3px solid #ff1493;
+  border-bottom: 3px solid #CC0000;
   margin-bottom: 16px;
 }
 
@@ -388,7 +388,7 @@ body {
 /* Dark mode toggle */
 .dark-mode-toggle {
   border: 3px solid #FFD700;
-  background: linear-gradient(135deg, #ff1493 0%, #ff69b4 100%);
+  background: linear-gradient(135deg, #CC0000 0%, #ff69b4 100%);
   padding: 8px 12px;
   cursor: pointer;
   font-family: 'Press Start 2P', 'Courier New', monospace;
@@ -406,7 +406,7 @@ body {
 }
 
 .dark-mode-toggle:hover {
-  background: linear-gradient(135deg, #ff69b4 0%, #ff1493 100%);
+  background: linear-gradient(135deg, #ff69b4 0%, #CC0000 100%);
   transform: translate(-2px, -2px);
   box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.4);
 }
@@ -421,7 +421,7 @@ body {
 }
 
 :root.dark-mode .wireframe-box {
-  border-color: #ff1493;
+  border-color: #CC0000;
   background: linear-gradient(135deg, #0f0f2e 0%, #1a0a3e 100%);
   color: #fff;
   box-shadow:
@@ -459,13 +459,13 @@ body {
 :root.dark-mode .wireframe-title {
   color: #FFD700;
   text-shadow:
-    2px 2px 0 #ff1493,
+    2px 2px 0 #CC0000,
     4px 4px 0 rgba(0, 0, 0, 0.5);
 }
 
 :root.dark-mode .wireframe-subtitle {
   color: #FFD700;
-  text-shadow: 1px 1px 0 #ff1493;
+  text-shadow: 1px 1px 0 #CC0000;
 }
 
 :root.dark-mode .modal-overlay {
@@ -474,7 +474,7 @@ body {
 
 :root.dark-mode .modal-content {
   background: linear-gradient(135deg, #0f0f2e 0%, #1a0a3e 100%);
-  border-color: #ff1493;
+  border-color: #CC0000;
   color: #fff;
   box-shadow:
     6px 6px 0 rgba(0, 0, 0, 0.6),
@@ -507,7 +507,7 @@ body {
 }
 
 :root.dark-mode .pokemon-slot.fakemon {
-  border-color: #ff1493;
+  border-color: #CC0000;
   background-color: #1a0000;
 }
 
@@ -544,7 +544,7 @@ body {
 }
 
 :root.dark-mode .tabs {
-  border-bottom-color: #ff1493;
+  border-bottom-color: #CC0000;
 }
 
 :root.dark-mode .tab {
