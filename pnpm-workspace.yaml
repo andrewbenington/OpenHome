@@ -1,3 +1,5 @@
 onlyBuiltDependencies:
   - better-sqlite3
   - esbuild
+packages:
+  - "radical-red-web"
