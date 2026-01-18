@@ -43,11 +43,9 @@ function App() {
   const handlePokemonSave = (pokemon: PokemonData, boxIndex: number, slotIndex: number) => {
     if (!saveData) return
 
-    // Update the Pokemon in the save data
     const newSaveData = { ...saveData }
     newSaveData.boxes[boxIndex].pokemon[slotIndex] = pokemon
 
-    // Track this slot as updated
     const existingSlot = newSaveData.updatedBoxSlots.find(
       (slot) => slot.box === boxIndex && slot.index === slotIndex
     )
@@ -63,10 +61,8 @@ function App() {
     if (!saveData) return
 
     try {
-      // Serialize the modified save
       const modifiedBytes = serializeSave(saveData)
 
-      // Create blob and download
       const blob = new Blob([modifiedBytes as unknown as BlobPart], {
         type: 'application/octet-stream',
       })
@@ -85,24 +81,19 @@ function App() {
   }
 
   return (
-    <div>
-      <div className="wireframe-box" style={{ marginBottom: '24px' }}>
-        <div className="flex justify-between items-center" style={{ marginBottom: '16px' }}>
-          <h1 className="wireframe-title" style={{ margin: 0 }}>
-            Radical Red Save Editor
-          </h1>
+    <div className="page">
+      <header className="wireframe-box page-header">
+        <div className="flex justify-between items-center">
+          <h1 className="wireframe-title">Radical Red Save Editor</h1>
           <DarkModeToggle />
         </div>
-        <p className="text-center" style={{ fontSize: '12px' }}>
+        <p className="text-center page-subtitle">
           Web-based editor for Pokemon Radical Red .sav files
         </p>
-      </div>
+      </header>
 
       {error && (
-        <div
-          className="wireframe-box"
-          style={{ backgroundColor: '#ffe0e0', borderColor: '#cc0000', marginBottom: '16px' }}
-        >
+        <div className="wireframe-box status-card status-error">
           <strong>Error:</strong> {error}
         </div>
       )}
@@ -124,7 +115,7 @@ function App() {
                   onClick={handleDownload}
                   disabled={saveData.updatedBoxSlots.length === 0}
                 >
-                  DOWNLOAD MODIFIED .SAV
+                  Download Modified .sav
                   {saveData.updatedBoxSlots.length > 0 &&
                     ` (${saveData.updatedBoxSlots.length} changes)`}
                 </button>
@@ -136,7 +127,7 @@ function App() {
                     setError('')
                   }}
                 >
-                  LOAD NEW FILE
+                  Load New File
                 </button>
               </div>
             </div>
@@ -166,9 +157,9 @@ function App() {
           </div>
 
           {saveData.updatedBoxSlots.length > 0 && (
-            <div className="wireframe-box" style={{ backgroundColor: '#e0ffe0' }}>
+            <div className="wireframe-box status-card status-success">
               <strong>Modified Slots:</strong> {saveData.updatedBoxSlots.length} Pokemon have been
-              edited. Click "DOWNLOAD MODIFIED .SAV" to save changes.
+              edited. Click "Download Modified .sav" to save changes.
             </div>
           )}
         </>

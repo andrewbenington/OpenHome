@@ -23,25 +23,34 @@ export const BoxViewer: React.FC<BoxViewerProps> = ({ box, boxIndex, onPokemonCl
             {pokemon ? (
               <div className="pokemon-info-compact">
                 <img
-                  src={getPokemonSpriteUrl(pokemon.dexNum, pokemon.speciesName, pokemon.isShiny, 'small')}
+                  src={getPokemonSpriteUrl(
+                    pokemon.dexNum,
+                    pokemon.speciesName,
+                    pokemon.isShiny,
+                    'small'
+                  )}
                   alt={pokemon.speciesName}
                   className={`pokemon-sprite ${pokemon.isShiny ? 'shiny' : ''}`}
                   title={`${pokemon.speciesName}${pokemon.isShiny ? ' (Shiny)' : ''}`}
                   onError={(e) => {
-                    // Fallback to appropriate sprite if loading fails
-                    const target = e.target as HTMLImageElement;
-                    if (target.src !== getFallbackSpriteUrl(pokemon.dexNum, pokemon.speciesName, pokemon.isShiny)) {
-                      target.src = getFallbackSpriteUrl(pokemon.dexNum, pokemon.speciesName, pokemon.isShiny);
+                    const target = e.target as HTMLImageElement
+                    if (
+                      target.src !==
+                      getFallbackSpriteUrl(pokemon.dexNum, pokemon.speciesName, pokemon.isShiny)
+                    ) {
+                      target.src = getFallbackSpriteUrl(
+                        pokemon.dexNum,
+                        pokemon.speciesName,
+                        pokemon.isShiny
+                      )
                     }
                   }}
                 />
                 <div className="pokemon-level">Lv.{pokemon.level}</div>
-                <div style={{ fontSize: '9px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', width: '100%', textAlign: 'center' }}>
-                  {pokemon.nickname}
-                </div>
+                <div className="pokemon-name">{pokemon.nickname}</div>
               </div>
             ) : (
-              <div style={{ fontSize: '20px', opacity: 0.3 }}>—</div>
+              <div className="empty-slot-placeholder">—</div>
             )}
           </div>
         ))}

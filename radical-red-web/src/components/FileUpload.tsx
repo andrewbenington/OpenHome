@@ -1,4 +1,5 @@
 import React, { useRef } from 'react'
+import { Upload } from 'lucide-react'
 
 interface FileUploadProps {
   onFileLoad: (bytes: Uint8Array, filename: string) => void
@@ -23,8 +24,8 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFileLoad }) => {
   return (
     <div className="wireframe-box text-center">
       <h2 className="wireframe-subtitle">Load Radical Red Save File</h2>
-      <p style={{ marginBottom: '16px' }}>
-        Select your .sav file to view and edit your Pokemon boxes
+      <p className="muted-text" style={{ marginBottom: '16px' }}>
+        Select your .sav file to view and edit your Pokemon boxes.
       </p>
       <input
         ref={fileInputRef}
@@ -33,10 +34,8 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFileLoad }) => {
         onChange={handleFileChange}
         style={{ display: 'none' }}
       />
-      <button
-        className="wireframe-button"
-        onClick={() => fileInputRef.current?.click()}
-      >
+      <button className="wireframe-button" onClick={() => fileInputRef.current?.click()}>
+        <Upload className="icon" />
         Choose .sav File
       </button>
     </div>

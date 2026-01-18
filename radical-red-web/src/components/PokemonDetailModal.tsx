@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react'
+import { AlertTriangle, Sparkles } from 'lucide-react'
 import { PokemonData, Gender } from '../lib/types'
 import { getPokemonSpriteUrl, getFallbackSpriteUrl } from '../lib/spriteUtils'
 import { levelToExp } from '../lib/pokemonParser'
@@ -172,8 +173,8 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <div className="flex justify-between items-center mb-2">
-          <h2 className="wireframe-title" style={{ margin: 0 }}>
+        <div className="modal-header">
+          <h2 className="wireframe-title">
             {pokemon.nickname} (#{pokemon.dexNum} {pokemon.speciesName})
           </h2>
           <button className="wireframe-button" onClick={onClose}>
@@ -181,7 +182,7 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
           </button>
         </div>
 
-        <div style={{ textAlign: 'center', margin: '16px 0' }}>
+        <div className="text-center" style={{ margin: '16px 0' }}>
           <img
             src={getPokemonSpriteUrl(pokemon.dexNum, pokemon.speciesName, pokemon.isShiny, 'large')}
             alt={pokemon.speciesName}
@@ -202,38 +203,25 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
             }}
           />
           {pokemon.isShiny && (
-            <div style={{ color: '#ffd700', fontWeight: 'bold', marginTop: '4px' }}>
-              ✨ SHINY ✨
+            <div className="shiny-banner">
+              <Sparkles className="icon icon-muted" />
+              <span>Shiny</span>
             </div>
           )}
         </div>
 
         <div className="wireframe-box">
           <div className="form-row">
-            <div
-              className="read-only-stat"
-              style={{ padding: '12px', border: '3px solid #999999' }}
-            >
-              <div className="stat-label" style={{ color: '#555555' }}>
-                OT
-              </div>
-              <div className="stat-value" style={{ color: '#333333', fontSize: '14px' }}>
-                {pokemon.trainerName}
-              </div>
+            <div className="read-only-stat">
+              <div className="stat-label">OT</div>
+              <div className="stat-value">{pokemon.trainerName}</div>
             </div>
-            <div
-              className="read-only-stat"
-              style={{ padding: '12px', border: '3px solid #999999' }}
-            >
-              <div className="stat-label" style={{ color: '#555555' }}>
-                ID
-              </div>
-              <div className="stat-value" style={{ color: '#333333', fontSize: '14px' }}>
-                {pokemon.trainerID.toString().padStart(5, '0')}
-              </div>
+            <div className="read-only-stat">
+              <div className="stat-label">ID</div>
+              <div className="stat-value">{pokemon.trainerID.toString().padStart(5, '0')}</div>
             </div>
           </div>
-          <div className="form-row" style={{ marginTop: '8px', display: 'flex', gap: '16px' }}>
+          <div className="form-row tight">
             <div style={{ flex: 1 }}>
               <label className="form-label">Level</label>
               <input
@@ -259,7 +247,6 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
                 }}
                 min="1"
                 max="100"
-                style={{ width: '100%' }}
               />
             </div>
             <div style={{ flex: 1 }}>
@@ -268,7 +255,6 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
                 className="wireframe-input"
                 value={pokemon.gender}
                 onChange={(e) => updatePokemon({ gender: parseInt(e.target.value) as Gender })}
-                style={{ width: '100%' }}
               >
                 <option value={Gender.Male}>♂ Male</option>
                 <option value={Gender.Female}>♀ Female</option>
@@ -277,8 +263,9 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
             </div>
           </div>
           {pokemon.isFakemon && (
-            <div style={{ marginTop: '8px', color: '#cc0000', fontWeight: 'bold' }}>
-              ⚠ FAKEMON - Cannot be transferred
+            <div className="fakemon-warning">
+              <AlertTriangle className="icon icon-muted" />
+              <span>Fakemon - Cannot be transferred</span>
             </div>
           )}
         </div>
@@ -643,7 +630,7 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
                     </option>
                   ))}
                 </select>
-                <div style={{ fontSize: '12px', marginTop: '4px', color: '#666' }}>
+                <div className="helper-text">
                   {NATURES[pokemon.nature]} {getNatureModifierText(pokemon.nature)}
                 </div>
               </div>
@@ -685,22 +672,18 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
                 min="0"
               />
             </div>
-            <div style={{ marginTop: '16px' }}>
-              <label
-                style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}
-              >
-                <input
-                  type="checkbox"
-                  checked={pokemon.isShiny}
-                  onChange={(e) => updatePokemon({ isShiny: e.target.checked })}
-                />
-                <span>Shiny (Note: May not work correctly)</span>
-              </label>
-            </div>
+            <label className="checkbox-row">
+              <input
+                type="checkbox"
+                checked={pokemon.isShiny}
+                onChange={(e) => updatePokemon({ isShiny: e.target.checked })}
+              />
+              <span>Shiny (Note: May not work correctly)</span>
+            </label>
           </div>
         )}
 
-        <div className="flex gap-2" style={{ marginTop: '24px' }}>
+        <div className="modal-actions">
           <button className="wireframe-button" onClick={handleSave} style={{ flex: 1 }}>
             SAVE CHANGES
           </button>
