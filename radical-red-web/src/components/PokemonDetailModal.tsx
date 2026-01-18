@@ -197,13 +197,21 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
                 className="wireframe-input"
                 value={pokemon.level || ''}
                 onChange={(e) => {
-                  const val = e.target.value === '' ? 1 : parseInt(e.target.value)
-                  if (!isNaN(val)) handleLevelChange(val)
+                  const val = e.target.value === '' ? '' : e.target.value
+                  if (val === '') {
+                    updatePokemon({ level: 0 })
+                  } else {
+                    const parsed = parseInt(val)
+                    if (!isNaN(parsed)) {
+                      updatePokemon({ level: parsed })
+                    }
+                  }
                 }}
                 onBlur={(e) => {
                   const val = parseInt(e.target.value)
                   if (isNaN(val) || val < 1) handleLevelChange(1)
                   else if (val > 100) handleLevelChange(100)
+                  else handleLevelChange(val)
                 }}
                 min="1"
                 max="100"
