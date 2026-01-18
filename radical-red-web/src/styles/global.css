@@ -431,7 +431,7 @@ body {
 
 :root.dark-mode .wireframe-button {
   border-color: #FFD700;
-  background: linear-gradient(135deg, #FF0000 0%, #1e40af 100%);
+  background: linear-gradient(135deg, #FF0000 0%, #CC0000 100%);
   color: #fff;
 }
 
@@ -445,7 +445,7 @@ body {
 }
 
 :root.dark-mode .wireframe-button:disabled:hover {
-  background: linear-gradient(135deg, #FF0000 0%, #1e40af 100%);
+  background: linear-gradient(135deg, #FF0000 0%, #CC0000 100%);
   color: #fff;
   border-color: #FFD700;
 }
@@ -585,7 +585,7 @@ body {
 
 :root.dark-mode .dark-mode-toggle {
   border-color: #FFD700;
-  background: linear-gradient(135deg, #FF0000 0%, #1e40af 100%);
+  background: linear-gradient(135deg, #FF0000 0%, #CC0000 100%);
   color: #fff;
   box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.5);
 }
