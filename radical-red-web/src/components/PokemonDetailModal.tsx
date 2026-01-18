@@ -178,7 +178,7 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
             {pokemon.nickname} (#{pokemon.dexNum} {pokemon.speciesName})
           </h2>
           <button className="wireframe-button" onClick={onClose}>
-            CLOSE
+            Close
           </button>
         </div>
 
@@ -265,7 +265,7 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
           {pokemon.isFakemon && (
             <div className="fakemon-warning">
               <AlertTriangle className="icon icon-muted" />
-              <span>Fakemon - Cannot be transferred</span>
+              <span>Fakemon — cannot be transferred</span>
             </div>
           )}
         </div>
@@ -275,19 +275,19 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
             className={`tab ${activeTab === 'stats' ? 'active' : ''}`}
             onClick={() => setActiveTab('stats')}
           >
-            STATS
+            Stats
           </div>
           <div
             className={`tab ${activeTab === 'moves' ? 'active' : ''}`}
             onClick={() => setActiveTab('moves')}
           >
-            MOVES
+            Moves
           </div>
           <div
             className={`tab ${activeTab === 'other' ? 'active' : ''}`}
             onClick={() => setActiveTab('other')}
           >
-            OTHER
+            Other
           </div>
         </div>
 
@@ -685,10 +685,10 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
 
         <div className="modal-actions">
           <button className="wireframe-button" onClick={handleSave} style={{ flex: 1 }}>
-            SAVE CHANGES
+            Save changes
           </button>
           <button className="wireframe-button" onClick={onClose} style={{ flex: 1 }}>
-            CANCEL
+            Cancel
           </button>
         </div>
       </div>
