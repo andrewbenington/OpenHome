@@ -485,7 +485,7 @@ body {
   border-color: #CC0000;
   background-color: #0a0a0a;
   box-shadow:
-    inset 2px 2px 0 rgba(0, 255, 0, 0.2),
+    inset 2px 2px 0 rgba(204, 0, 0, 0.2),
     3px 3px 0 rgba(0, 0, 0, 0.5);
 }
 
@@ -493,7 +493,7 @@ body {
   background-color: #111;
   border-color: #FFD700;
   box-shadow:
-    inset 2px 2px 0 rgba(0, 255, 0, 0.2),
+    inset 2px 2px 0 rgba(204, 0, 0, 0.2),
     4px 4px 0 rgba(255, 215, 0, 0.5);
 }
 
