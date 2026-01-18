@@ -254,27 +254,27 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
           <div>
             <h3 className="wireframe-subtitle">Base Stats</h3>
             <div className="stats-grid">
-              <div className="stat-item">
+              <div className="stat-item read-only-stat">
                 <div className="stat-label">HP</div>
                 <div className="stat-value">{pokemon.baseStats.hp}</div>
               </div>
-              <div className="stat-item">
+              <div className="stat-item read-only-stat">
                 <div className="stat-label">ATTACK</div>
                 <div className="stat-value">{pokemon.baseStats.atk}</div>
               </div>
-              <div className="stat-item">
+              <div className="stat-item read-only-stat">
                 <div className="stat-label">DEFENSE</div>
                 <div className="stat-value">{pokemon.baseStats.def}</div>
               </div>
-              <div className="stat-item">
+              <div className="stat-item read-only-stat">
                 <div className="stat-label">SP. ATK</div>
                 <div className="stat-value">{pokemon.baseStats.spa}</div>
               </div>
-              <div className="stat-item">
+              <div className="stat-item read-only-stat">
                 <div className="stat-label">SP. DEF</div>
                 <div className="stat-value">{pokemon.baseStats.spd}</div>
               </div>
-              <div className="stat-item">
+              <div className="stat-item read-only-stat">
                 <div className="stat-label">SPEED</div>
                 <div className="stat-value">{pokemon.baseStats.spe}</div>
               </div>
