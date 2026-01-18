@@ -2,46 +2,46 @@
 
 :root {
   color-scheme: light;
-  --bg: #f6f6f7;
+  --bg: #f5f3f0;
   --panel: #ffffff;
-  --panel-muted: #f0f1f3;
-  --border: #d8d9dd;
-  --text: #1b1c20;
-  --text-muted: #5e6168;
-  --accent: #bfc2c8;
-  --accent-strong: #8c9098;
-  --shadow: rgba(0, 0, 0, 0.08);
-  --shadow-strong: rgba(0, 0, 0, 0.12);
-  --button-bg: #1b1c20;
-  --button-text: #f7f7f9;
-  --button-border: #1b1c20;
-  --button-hover: #2a2c31;
-  --button-disabled: #c9cbd1;
-  --tab-active-bg: #1b1c20;
-  --tab-active-text: #f7f7f9;
-  --focus-ring: rgba(27, 28, 32, 0.2);
+  --panel-muted: #eeece8;
+  --border: #e2ded8;
+  --text: #1f2422;
+  --text-muted: #6b716d;
+  --accent: #a4ada6;
+  --accent-strong: #56615b;
+  --shadow: rgba(17, 20, 18, 0.08);
+  --shadow-strong: rgba(17, 20, 18, 0.14);
+  --button-bg: #1f2422;
+  --button-text: #f7f6f2;
+  --button-border: #1f2422;
+  --button-hover: #2a312d;
+  --button-disabled: #c8c4be;
+  --tab-active-bg: #1f2422;
+  --tab-active-text: #f7f6f2;
+  --focus-ring: rgba(86, 97, 91, 0.18);
 }
 
 :root.dark-mode {
   color-scheme: dark;
-  --bg: #0c0d11;
-  --panel: #15161b;
-  --panel-muted: #1c1d23;
-  --border: #2a2d35;
-  --text: #f2f2f4;
-  --text-muted: #b3b6bd;
-  --accent: #c4c6cc;
-  --accent-strong: #e0e2e7;
+  --bg: #0f1211;
+  --panel: #151a18;
+  --panel-muted: #1d2220;
+  --border: #2c332f;
+  --text: #f1f2ee;
+  --text-muted: #aeb4b0;
+  --accent: #b5beb7;
+  --accent-strong: #e0e6e2;
   --shadow: rgba(0, 0, 0, 0.45);
   --shadow-strong: rgba(0, 0, 0, 0.6);
-  --button-bg: #f2f2f4;
-  --button-text: #15161b;
-  --button-border: #f2f2f4;
-  --button-hover: #d9dbe1;
-  --button-disabled: #3a3c43;
-  --tab-active-bg: #f2f2f4;
-  --tab-active-text: #15161b;
-  --focus-ring: rgba(242, 242, 244, 0.16);
+  --button-bg: #f1f2ee;
+  --button-text: #151a18;
+  --button-border: #f1f2ee;
+  --button-hover: #d7dbd8;
+  --button-disabled: #3a423d;
+  --tab-active-bg: #f1f2ee;
+  --tab-active-text: #151a18;
+  --focus-ring: rgba(241, 242, 238, 0.16);
 }
 
 * {
@@ -55,47 +55,64 @@ body {
   background: var(--bg);
   color: var(--text);
   line-height: 1.6;
+  letter-spacing: -0.01em;
 }
 
 #root {
   min-height: 100vh;
-  padding: 32px 20px 48px;
+  padding: 56px 24px 64px;
 }
 
 .page {
-  max-width: 1200px;
+  max-width: 1180px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 32px;
 }
 
 /* Layout and cards */
 .wireframe-box {
   border: 1px solid var(--border);
   background: var(--panel);
-  padding: 24px;
-  border-radius: 16px;
-  box-shadow: 0 18px 40px var(--shadow);
+  padding: 28px;
+  border-radius: 20px;
+  box-shadow: 0 14px 30px var(--shadow);
   color: var(--text);
 }
 
 .page-header {
-  padding: 28px 32px;
+  padding: 32px 36px;
+}
+
+.page-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.page-eyebrow {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.24em;
+  color: var(--text-muted);
+  margin-bottom: 8px;
 }
 
 .page-subtitle {
-  margin-top: 8px;
-  font-size: 14px;
+  margin-top: 12px;
+  font-size: 15px;
   color: var(--text-muted);
+  max-width: 640px;
 }
 
 .status-card {
   display: flex;
   align-items: center;
   gap: 12px;
-  border-radius: 14px;
-  padding: 16px 20px;
+  border-radius: 16px;
+  padding: 18px 22px;
   background: var(--panel-muted);
   border: 1px solid var(--border);
   color: var(--text);
@@ -115,8 +132,8 @@ body {
 
 /* Typography */
 .wireframe-title {
-  font-size: 28px;
-  font-weight: 700;
+  font-size: 30px;
+  font-weight: 600;
   letter-spacing: -0.02em;
 }
 
@@ -124,7 +141,7 @@ body {
   font-size: 16px;
   font-weight: 600;
   color: var(--text);
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
 .muted-text {
@@ -136,17 +153,17 @@ body {
 .wireframe-button {
   border: 1px solid var(--button-border);
   background: var(--button-bg);
-  padding: 12px 18px;
+  padding: 12px 20px;
   cursor: pointer;
   font-family: inherit;
-  font-size: 12px;
+  font-size: 13px;
   text-transform: none;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
   border-radius: 999px;
   color: var(--button-text);
   font-weight: 600;
   transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
-  box-shadow: 0 10px 24px var(--shadow);
+  box-shadow: 0 8px 20px var(--shadow);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -156,12 +173,12 @@ body {
 .wireframe-button:hover:not(:disabled) {
   background: var(--button-hover);
   transform: translateY(-1px);
-  box-shadow: 0 16px 32px var(--shadow-strong);
+  box-shadow: 0 14px 30px var(--shadow-strong);
 }
 
 .wireframe-button:active:not(:disabled) {
   transform: translateY(0);
-  box-shadow: 0 8px 18px var(--shadow);
+  box-shadow: 0 6px 16px var(--shadow);
 }
 
 .wireframe-button:disabled {
@@ -175,11 +192,11 @@ body {
 /* Inputs */
 .wireframe-input {
   border: 1px solid var(--border);
-  padding: 10px 12px;
+  padding: 12px 14px;
   font-family: inherit;
   font-size: 14px;
   width: 100%;
-  border-radius: 12px;
+  border-radius: 14px;
   color: var(--text);
   background-color: var(--panel);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
@@ -210,13 +227,13 @@ body {
 .modal-content {
   background: var(--panel);
   border: 1px solid var(--border);
-  max-width: 880px;
+  max-width: 920px;
   width: 100%;
   max-height: 90vh;
   overflow-y: auto;
-  padding: 28px;
-  border-radius: 20px;
-  box-shadow: 0 30px 60px var(--shadow-strong);
+  padding: 32px;
+  border-radius: 22px;
+  box-shadow: 0 28px 60px var(--shadow-strong);
   color: var(--text);
 }
 
@@ -230,15 +247,15 @@ body {
 .modal-actions {
   display: flex;
   gap: 16px;
-  margin-top: 24px;
+  margin-top: 28px;
 }
 
 /* Grid layouts */
 .box-grid {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
-  gap: 12px;
-  margin: 16px 0 4px;
+  gap: 14px;
+  margin: 18px 0 6px;
 }
 
 .pokemon-slot {
@@ -251,13 +268,13 @@ body {
   background-color: var(--panel);
   transition: all 0.15s ease;
   position: relative;
-  padding: 6px;
-  border-radius: 14px;
+  padding: 8px;
+  border-radius: 16px;
 }
 
 .pokemon-slot:hover {
   border-color: var(--accent-strong);
-  box-shadow: 0 12px 20px var(--shadow);
+  box-shadow: 0 14px 22px var(--shadow);
   transform: translateY(-2px);
 }
 
@@ -288,7 +305,7 @@ body {
   align-items: center;
   font-size: 11px;
   width: 100%;
-  gap: 2px;
+  gap: 4px;
 }
 
 .pokemon-name {
@@ -344,13 +361,13 @@ body {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 16px;
-  margin: 16px 0;
+  margin: 18px 0;
 }
 
 .stat-item {
   border: 1px solid var(--border);
-  padding: 14px;
-  border-radius: 14px;
+  padding: 16px;
+  border-radius: 16px;
   background-color: var(--panel-muted);
 }
 
@@ -372,8 +389,8 @@ body {
 /* Read-only stats styling */
 .read-only-stat {
   border: 1px solid var(--border);
-  padding: 14px;
-  border-radius: 14px;
+  padding: 16px;
+  border-radius: 16px;
   background-color: var(--panel-muted);
 }
 
@@ -389,7 +406,7 @@ body {
 
 /* Forms */
 .form-group {
-  margin: 14px 0;
+  margin: 16px 0;
 }
 
 .form-label {
@@ -405,7 +422,7 @@ body {
 .form-row {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
+  gap: 18px;
 }
 
 .form-row.tight {
@@ -414,7 +431,7 @@ body {
 
 .helper-text {
   font-size: 12px;
-  margin-top: 6px;
+  margin-top: 8px;
   color: var(--text-muted);
 }
 
@@ -431,8 +448,8 @@ body {
   display: flex;
   gap: 10px;
   border-bottom: 1px solid var(--border);
-  padding-bottom: 8px;
-  margin-bottom: 16px;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
 }
 
 .tab {
@@ -442,8 +459,8 @@ body {
   background-color: var(--panel-muted);
   font-family: inherit;
   font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+  text-transform: none;
+  letter-spacing: 0.02em;
   color: var(--text-muted);
   transition: all 0.15s ease;
   border-radius: 999px;
@@ -465,17 +482,17 @@ body {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
-  margin: 12px 0 4px;
+  margin: 14px 0 6px;
 }
 
 .box-selector-button {
   border: 1px solid var(--border);
   background-color: var(--panel);
-  padding: 8px 14px;
+  padding: 8px 16px;
   cursor: pointer;
   font-family: inherit;
   font-size: 12px;
-  min-width: 72px;
+  min-width: 76px;
   border-radius: 999px;
   color: var(--text-muted);
   transition: all 0.15s ease;
@@ -534,13 +551,46 @@ body {
   justify-content: center;
   border-radius: 999px;
   color: var(--text);
-  box-shadow: 0 10px 24px var(--shadow);
+  box-shadow: 0 8px 18px var(--shadow);
 }
 
 .dark-mode-toggle:hover {
   border-color: var(--accent-strong);
   transform: translateY(-1px);
-  box-shadow: 0 16px 32px var(--shadow-strong);
+  box-shadow: 0 14px 28px var(--shadow-strong);
+}
+
+.trainer-info-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.trainer-info {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.trainer-label {
+  display: block;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.trainer-value {
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.save-action-buttons {
+  display: flex;
+  gap: 12px;
+  align-items: center;
 }
 
 .icon {
@@ -558,19 +608,24 @@ body {
 
 @media (max-width: 768px) {
   #root {
-    padding: 24px 16px 40px;
+    padding: 32px 16px 48px;
   }
 
   .page {
-    gap: 20px;
+    gap: 24px;
   }
 
   .wireframe-box {
-    padding: 20px;
+    padding: 22px;
   }
 
   .page-header {
     padding: 24px;
+  }
+
+  .page-header-row {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   .box-grid {
@@ -579,7 +634,7 @@ body {
   }
 
   .modal-content {
-    padding: 20px;
+    padding: 22px;
   }
 
   .form-row {
@@ -610,8 +665,12 @@ body {
 
   .trainer-info-header {
     flex-direction: column;
-    align-items: flex-start !important;
-    gap: 12px;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .trainer-info {
+    grid-template-columns: 1fr;
   }
 
   .save-action-buttons {
@@ -636,7 +695,7 @@ body {
 
 @media (max-width: 480px) {
   #root {
-    padding: 20px 12px 32px;
+    padding: 24px 12px 32px;
   }
 
   .wireframe-title {

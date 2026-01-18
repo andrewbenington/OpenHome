@@ -83,12 +83,15 @@ function App() {
   return (
     <div className="page">
       <header className="wireframe-box page-header">
-        <div className="flex justify-between items-center">
-          <h1 className="wireframe-title">Radical Red Save Editor</h1>
+        <div className="page-header-row">
+          <div>
+            <p className="page-eyebrow">Radical Red Suite</p>
+            <h1 className="wireframe-title">Save Editor</h1>
+          </div>
           <DarkModeToggle />
         </div>
-        <p className="text-center page-subtitle">
-          Web-based editor for Pokemon Radical Red .sav files
+        <p className="page-subtitle">
+          Precision editing for Pokémon Radical Red .sav files with curated, secure workflows.
         </p>
       </header>
 
@@ -103,19 +106,30 @@ function App() {
       ) : (
         <>
           <div className="wireframe-box">
-            <div className="flex justify-between items-center mb-2 trainer-info-header">
-              <div>
-                <strong>Trainer:</strong> {saveData.trainerName} |<strong> ID:</strong>{' '}
-                {saveData.trainerID.toString().padStart(5, '0')} |<strong> Money:</strong> $
-                {saveData.money.toLocaleString()}
+            <div className="trainer-info-header">
+              <div className="trainer-info">
+                <div>
+                  <span className="trainer-label">Trainer</span>
+                  <span className="trainer-value">{saveData.trainerName}</span>
+                </div>
+                <div>
+                  <span className="trainer-label">ID</span>
+                  <span className="trainer-value">
+                    {saveData.trainerID.toString().padStart(5, '0')}
+                  </span>
+                </div>
+                <div>
+                  <span className="trainer-label">Money</span>
+                  <span className="trainer-value">${saveData.money.toLocaleString()}</span>
+                </div>
               </div>
-              <div className="flex gap-2 save-action-buttons">
+              <div className="save-action-buttons">
                 <button
                   className="wireframe-button"
                   onClick={handleDownload}
                   disabled={saveData.updatedBoxSlots.length === 0}
                 >
-                  Download Modified .sav
+                  Download modified save
                   {saveData.updatedBoxSlots.length > 0 &&
                     ` (${saveData.updatedBoxSlots.length} changes)`}
                 </button>
@@ -127,7 +141,7 @@ function App() {
                     setError('')
                   }}
                 >
-                  Load New File
+                  Load new file
                 </button>
               </div>
             </div>
@@ -158,8 +172,8 @@ function App() {
 
           {saveData.updatedBoxSlots.length > 0 && (
             <div className="wireframe-box status-card status-success">
-              <strong>Modified Slots:</strong> {saveData.updatedBoxSlots.length} Pokemon have been
-              edited. Click "Download Modified .sav" to save changes.
+              <strong>Modified slots:</strong> {saveData.updatedBoxSlots.length} Pokémon have been
+              edited. Download the modified save to keep your updates.
             </div>
           )}
         </>

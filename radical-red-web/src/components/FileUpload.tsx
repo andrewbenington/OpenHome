@@ -23,9 +23,9 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFileLoad }) => {
 
   return (
     <div className="wireframe-box text-center">
-      <h2 className="wireframe-subtitle">Load Radical Red Save File</h2>
+      <h2 className="wireframe-subtitle">Load a Radical Red save</h2>
       <p className="muted-text" style={{ marginBottom: '16px' }}>
-        Select your .sav file to view and edit your Pokemon boxes.
+        Choose a .sav file to browse, review, and refine your boxed Pokémon.
       </p>
       <input
         ref={fileInputRef}
@@ -36,7 +36,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFileLoad }) => {
       />
       <button className="wireframe-button" onClick={() => fileInputRef.current?.click()}>
         <Upload className="icon" />
-        Choose .sav File
+        Choose .sav file
       </button>
     </div>
   )
