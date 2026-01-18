@@ -315,7 +315,7 @@ body {
 }
 
 .tab.active {
-  background-color: #2563eb;
+  background-color: #FF0000;
   color: #fff;
   border-color: #FFD700;
 }
@@ -349,7 +349,7 @@ body {
 }
 
 .box-selector-button.active {
-  background-color: #2563eb;
+  background-color: #FF0000;
   color: #fff;
   border-color: #FFD700;
   box-shadow: 3px 3px 0 rgba(255, 237, 74, 0.4);
@@ -431,12 +431,12 @@ body {
 
 :root.dark-mode .wireframe-button {
   border-color: #FFD700;
-  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+  background: linear-gradient(135deg, #FF0000 0%, #1e40af 100%);
   color: #fff;
 }
 
 :root.dark-mode .wireframe-button:hover {
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  background: linear-gradient(135deg, #3b82f6 0%, #FF0000 100%);
   border-color: #FFD700;
 }
 
@@ -445,7 +445,7 @@ body {
 }
 
 :root.dark-mode .wireframe-button:disabled:hover {
-  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+  background: linear-gradient(135deg, #FF0000 0%, #1e40af 100%);
   color: #fff;
   border-color: #FFD700;
 }
@@ -585,13 +585,13 @@ body {
 
 :root.dark-mode .dark-mode-toggle {
   border-color: #FFD700;
-  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+  background: linear-gradient(135deg, #FF0000 0%, #1e40af 100%);
   color: #fff;
   box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.5);
 }
 
 :root.dark-mode .dark-mode-toggle:hover {
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  background: linear-gradient(135deg, #3b82f6 0%, #FF0000 100%);
   border-color: #FFD700;
 }
 
