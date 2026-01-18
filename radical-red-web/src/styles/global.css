@@ -422,7 +422,7 @@ body {
 
 :root.dark-mode .wireframe-box {
   border-color: #CC0000;
-  background: linear-gradient(135deg, #0f0f2e 0%, #1a0a3e 100%);
+  background: linear-gradient(135deg, #330000 0%, #1a0a3e 100%);
   color: #fff;
   box-shadow:
     4px 4px 0 rgba(0, 0, 0, 0.5),
@@ -473,7 +473,7 @@ body {
 }
 
 :root.dark-mode .modal-content {
-  background: linear-gradient(135deg, #0f0f2e 0%, #1a0a3e 100%);
+  background: linear-gradient(135deg, #330000 0%, #1a0a3e 100%);
   border-color: #CC0000;
   color: #fff;
   box-shadow:
@@ -549,7 +549,7 @@ body {
 
 :root.dark-mode .tab {
   border-color: #CC0000;
-  background-color: #0f0f2e;
+  background-color: #330000;
   color: #FFD700;
   box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
 }
@@ -567,7 +567,7 @@ body {
 
 :root.dark-mode .box-selector-button {
   border-color: #CC0000;
-  background-color: #0f0f2e;
+  background-color: #330000;
   color: #FFD700;
   box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
 }
