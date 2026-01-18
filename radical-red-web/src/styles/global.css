@@ -306,7 +306,7 @@ body {
   border: 3px solid #CC0000;
   border-bottom: none;
   margin-right: 4px;
-  background-color: #1e3a8a;
+  background-color: #FFFFFF;
   font-family: 'Press Start 2P', 'Courier New', monospace;
   font-size: 10px;
   color: #FFD700;
@@ -335,7 +335,7 @@ body {
 
 .box-selector-button {
   border: 3px solid #CC0000;
-  background-color: #1e3a8a;
+  background-color: #FFFFFF;
   padding: 8px 12px;
   cursor: pointer;
   font-family: 'Press Start 2P', 'Courier New', monospace;
