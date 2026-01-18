@@ -388,7 +388,7 @@ body {
 /* Dark mode toggle */
 .dark-mode-toggle {
   border: 3px solid #FFD700;
-  background: linear-gradient(135deg, #CC0000 0%, #ff69b4 100%);
+  background: linear-gradient(135deg, #CC0000 0%, #FF0000 100%);
   padding: 8px 12px;
   cursor: pointer;
   font-family: 'Press Start 2P', 'Courier New', monospace;
@@ -406,7 +406,7 @@ body {
 }
 
 .dark-mode-toggle:hover {
-  background: linear-gradient(135deg, #ff69b4 0%, #CC0000 100%);
+  background: linear-gradient(135deg, #FF0000 0%, #CC0000 100%);
   transform: translate(-2px, -2px);
   box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.4);
 }
