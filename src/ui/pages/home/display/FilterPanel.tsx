@@ -86,13 +86,11 @@ export default function FilterPanel() {
     label: name,
     id,
   }))
-  .sort((a, b) => a.label.localeCompare(b.label));
 
   const ALL_BALLS: SelectOption[] = getAllBalls().map(({ name, index }) => ({
     label: name,
     id: index,
   }))
-  .sort((a, b) => a.label.localeCompare(b.label));
 
   const ALL_ITEMS: SelectOption[] = getAllItems().map(itemMetadataToSelectOption)
 
