@@ -5,9 +5,12 @@ import {
   CircleDot,
   KeyRound,
   Leaf,
+  Search,
   PackagePlus,
   Plus,
   Trash2,
+  X,
+  ArrowUpDown,
 } from 'lucide-react'
 import { BagData, ItemSlot } from '../lib/types'
 import { RADICAL_RED_ITEMS } from '../lib/radicalRedItems'
@@ -42,17 +45,51 @@ export const BagEditor: React.FC<BagEditorProps> = ({
   compact = false,
 }) => {
   const [activePocket, setActivePocket] = useState<BagPocketKey>('items')
+  const [searchTerm, setSearchTerm] = useState('')
+  const [sortKey, setSortKey] = useState<'name' | 'quantity'>('name')
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
   const itemOptions = useMemo(
     () => [{ id: 0, name: 'None' }, ...RADICAL_RED_ITEMS],
     []
   )
+  const itemNameLookup = useMemo(
+    () => new Map(itemOptions.map((item) => [item.id, item.name])),
+    [itemOptions]
+  )
 
-  const entries = useMemo(() => {
+  const pocketEntries = useMemo(() => {
     const slots = bag[activePocket]
     return slots
       .map((slot, index) => ({ ...slot, index }))
       .filter((slot) => slot.itemId > 0 || slot.quantity > 0)
   }, [bag, activePocket])
+
+  const filteredEntries = useMemo(() => {
+    const term = searchTerm.trim().toLowerCase()
+    const results = term
+      ? pocketEntries.filter((slot) =>
+          (itemNameLookup.get(slot.itemId) ?? '').toLowerCase().includes(term)
+        )
+      : pocketEntries
+
+    return [...results].sort((a, b) => {
+      if (sortKey === 'quantity') {
+        return sortDirection === 'asc'
+          ? a.quantity - b.quantity
+          : b.quantity - a.quantity
+      }
+      const nameA = (itemNameLookup.get(a.itemId) ?? '').toLowerCase()
+      const nameB = (itemNameLookup.get(b.itemId) ?? '').toLowerCase()
+      return sortDirection === 'asc'
+        ? nameA.localeCompare(nameB)
+        : nameB.localeCompare(nameA)
+    })
+  }, [itemNameLookup, pocketEntries, searchTerm, sortDirection, sortKey])
+
+  const totalQuantity = useMemo(
+    () => pocketEntries.reduce((sum, slot) => sum + slot.quantity, 0),
+    [pocketEntries]
+  )
 
   return (
     <div className={`bag-editor ${compact ? 'compact' : ''}`}>
@@ -80,21 +117,90 @@ export const BagEditor: React.FC<BagEditorProps> = ({
         ))}
       </div>
 
+      <div className="bag-controls">
+        <div className="bag-controls-main">
+          <div className="bag-field">
+            <label className="form-label" htmlFor="bag-search">
+              Search items
+            </label>
+            <div className="input-with-icon">
+              <Search className="icon" />
+              <input
+                id="bag-search"
+                className="wireframe-input"
+                placeholder="Search by item name"
+                value={searchTerm}
+                onChange={(event) => setSearchTerm(event.target.value)}
+              />
+              {searchTerm ? (
+                <button
+                  type="button"
+                  className="icon-button"
+                  onClick={() => setSearchTerm('')}
+                  aria-label="Clear search"
+                >
+                  <X className="icon" />
+                </button>
+              ) : null}
+            </div>
+          </div>
+          <div className="bag-field">
+            <label className="form-label" htmlFor="bag-sort">
+              Sort pocket
+            </label>
+            <div className="bag-sort-controls">
+              <select
+                id="bag-sort"
+                className="wireframe-input wireframe-select"
+                value={sortKey}
+                onChange={(event) => setSortKey(event.target.value as typeof sortKey)}
+              >
+                <option value="name">Item name</option>
+                <option value="quantity">Quantity</option>
+              </select>
+              <button
+                type="button"
+                className="wireframe-button ghost icon-only"
+                onClick={() =>
+                  setSortDirection((direction) => (direction === 'asc' ? 'desc' : 'asc'))
+                }
+                aria-label="Toggle sort direction"
+              >
+                <ArrowUpDown className="icon" />
+              </button>
+            </div>
+          </div>
+        </div>
+        <div className="bag-summary">
+          <div>
+            Showing <strong>{filteredEntries.length}</strong> of{' '}
+            <strong>{pocketEntries.length}</strong> items
+          </div>
+          <div>
+            Total quantity <strong>{totalQuantity}</strong>
+          </div>
+        </div>
+      </div>
+
       <div className="bag-grid">
-        {entries.length === 0 ? (
+        {filteredEntries.length === 0 ? (
           <div className="empty-state">
             <div className="empty-state-icon">
               <Plus className="icon" />
             </div>
             <div>
-              <div className="empty-state-title">No items in this pocket</div>
+              <div className="empty-state-title">
+                {pocketEntries.length === 0 ? 'No items in this pocket' : 'No matching items'}
+              </div>
               <div className="empty-state-subtitle">
-                Add an item to start tracking quantities in this pocket.
+                {pocketEntries.length === 0
+                  ? 'Add an item to start tracking quantities in this pocket.'
+                  : 'Try adjusting your search or sort filters.'}
               </div>
             </div>
           </div>
         ) : (
-          entries.map((slot) => (
+          filteredEntries.map((slot) => (
             <div key={slot.index} className="bag-row">
               <div>
                 <label className="form-label">Item</label>
