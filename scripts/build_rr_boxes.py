@@ -373,9 +373,16 @@ def serialize_pokemon(
     return data
 
 
+def resolve_repo_root(start: Path) -> Path:
+    for parent in [start, *start.parents]:
+        if (parent / "radical-red-web").exists():
+            return parent
+    raise FileNotFoundError("Unable to locate repo root containing radical-red-web/")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Populate Radical Red PC boxes with base-stage Pokemon.")
-    parser.add_argument("--input", default="completed_rr.sav", help="Path to the input .sav file.")
+    parser.add_argument("--input", help="Path to the input .sav file.")
     parser.add_argument(
         "--output",
         default="completed_rr_single_stage_and_first_stage.sav",
@@ -384,14 +391,17 @@ def main() -> None:
     parser.add_argument("--seed", type=int, default=1337, help="Random seed for move selection/personality.")
     args = parser.parse_args()
 
-    save_path = Path(args.input)
+    script_dir = Path(__file__).resolve().parent
+    repo_root = resolve_repo_root(script_dir)
+
+    save_path = Path(args.input) if args.input else (repo_root / "completed_rr.sav")
     save_bytes = save_path.read_bytes()
     if len(save_bytes) not in SAVE_SIZES_BYTES:
         raise SystemExit(f"Unexpected save size: {len(save_bytes)} bytes")
 
-    species_data = json.loads(Path("radical-red-web/src/lib/species-data.json").read_text())
-    moves_data = json.loads(Path("radical-red-web/src/lib/moves-data.json").read_text())
-    mapping_data = json.loads(Path("radical-red-web/src/lib/species-index-mapping.json").read_text())
+    species_data = json.loads((repo_root / "radical-red-web/src/lib/species-data.json").read_text())
+    moves_data = json.loads((repo_root / "radical-red-web/src/lib/moves-data.json").read_text())
+    mapping_data = json.loads((repo_root / "radical-red-web/src/lib/species-index-mapping.json").read_text())
 
     move_ids = sorted(int(move_id) for move_id in moves_data.keys())
     rng = random.Random(args.seed)
