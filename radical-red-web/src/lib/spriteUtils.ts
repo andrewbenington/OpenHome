@@ -33,13 +33,13 @@ export function getPokemonSpriteUrl(
   const formattedName = formatPokemonName(speciesName);
   const baseUrl = 'https://play.pokemonshowdown.com/sprites';
 
-  if (size === 'large') {
-    // Use animated sprites for larger displays
+  if (size === 'large' || size === 'small') {
+    // Use animated sprites for both modal and box displays
     const folder = isShiny ? 'ani-shiny' : 'ani';
     return `${baseUrl}/${folder}/${formattedName}.gif`;
   }
 
-  // Use gen5 sprites for small/box view (higher quality than default)
+  // Fallback to gen5 sprites if needed
   const folder = isShiny ? 'gen5-shiny' : 'gen5';
   return `${baseUrl}/${folder}/${formattedName}.png`;
 }
