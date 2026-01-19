@@ -38,7 +38,7 @@ export default function TopRightIndicator({ mon, indicatorType }: TopRightIndica
     case 'IVs/DVs (Percent)':
       const ivsOrDvsPercent = mon.ivs ? getIvsPercent(mon) : hasDvs(mon) ? getDvsPercent(mon) : 0
       return <TopRightNumericalIndicator value={ivsOrDvsPercent} percent />
-    case 'Perfect IVs (Count)':
+    case 'Perfect IVs Count':
       const perfectIvsCount = getPerfectIvsCount(mon)
       return <TopRightNumericalIndicator value={perfectIvsCount} />
     case 'Origin Game':
