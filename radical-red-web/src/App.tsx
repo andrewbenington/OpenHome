@@ -20,6 +20,7 @@ function App() {
   const [error, setError] = useState<string>('')
   const [trainerDirty, setTrainerDirty] = useState(false)
   const [bagDirty, setBagDirty] = useState(false)
+  const [activeTab, setActiveTab] = useState<'box' | 'bag'>('box')
 
   const handleFileLoad = (bytes: Uint8Array, name: string) => {
     setError('')
@@ -36,6 +37,7 @@ function App() {
       setSelectedBox(0)
       setTrainerDirty(false)
       setBagDirty(false)
+      setActiveTab('box')
     } catch (err) {
       setError(`Error parsing save file: ${err}`)
       console.error(err)
@@ -268,34 +270,59 @@ function App() {
             </div>
           </div>
 
-          <BagEditor
-            bag={saveData.bag}
-            onUpdate={handleBagUpdate}
-            onAddItem={handleBagAddItem}
-            onRemoveItem={handleBagRemoveItem}
-          />
-
           <div className="wireframe-box">
-            <h2 className="wireframe-subtitle">Box Selector</h2>
-            <div className="box-selector">
-              {saveData.boxes.map((_, index) => (
+            <div className="section-header">
+              <div>
+                <p className="section-eyebrow">Storage</p>
+                <h2 className="wireframe-subtitle">Box & Bag</h2>
+              </div>
+              <div className="primary-tabs">
                 <button
-                  key={index}
-                  className={`box-selector-button ${selectedBox === index ? 'active' : ''}`}
-                  onClick={() => setSelectedBox(index)}
+                  className={`primary-tab ${activeTab === 'box' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('box')}
                 >
-                  Box {index + 1}
+                  Box
                 </button>
-              ))}
+                <button
+                  className={`primary-tab ${activeTab === 'bag' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('bag')}
+                >
+                  Bag
+                </button>
+              </div>
             </div>
-          </div>
 
-          <div className="wireframe-box">
-            <BoxViewer
-              box={saveData.boxes[selectedBox]}
-              boxIndex={selectedBox}
-              onPokemonClick={handlePokemonClick}
-            />
+            {activeTab === 'box' ? (
+              <>
+                <h3 className="wireframe-subtitle">Box Selector</h3>
+                <div className="box-selector">
+                  {saveData.boxes.map((_, index) => (
+                    <button
+                      key={index}
+                      className={`box-selector-button ${selectedBox === index ? 'active' : ''}`}
+                      onClick={() => setSelectedBox(index)}
+                    >
+                      Box {index + 1}
+                    </button>
+                  ))}
+                </div>
+                <BoxViewer
+                  box={saveData.boxes[selectedBox]}
+                  boxIndex={selectedBox}
+                  onPokemonClick={handlePokemonClick}
+                />
+              </>
+            ) : (
+              <div className="tab-panel">
+                <BagEditor
+                  bag={saveData.bag}
+                  onUpdate={handleBagUpdate}
+                  onAddItem={handleBagAddItem}
+                  onRemoveItem={handleBagRemoveItem}
+                  compact
+                />
+              </div>
+            )}
           </div>
 
           {saveData.updatedBoxSlots.length > 0 && (

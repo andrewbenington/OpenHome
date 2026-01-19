@@ -18,6 +18,7 @@ interface BagEditorProps {
   onUpdate: (pocket: BagPocketKey, index: number, slot: ItemSlot) => void
   onAddItem: (pocket: BagPocketKey) => void
   onRemoveItem: (pocket: BagPocketKey, index: number) => void
+  compact?: boolean
 }
 
 const pocketConfigs: Array<{
@@ -37,6 +38,7 @@ export const BagEditor: React.FC<BagEditorProps> = ({
   onUpdate,
   onAddItem,
   onRemoveItem,
+  compact = false,
 }) => {
   const [activePocket, setActivePocket] = useState<BagPocketKey>('items')
 
@@ -48,7 +50,7 @@ export const BagEditor: React.FC<BagEditorProps> = ({
   }, [bag, activePocket])
 
   return (
-    <div className="wireframe-box">
+    <div className={`bag-editor ${compact ? 'compact' : ''}`}>
       <div className="section-header">
         <div>
           <p className="section-eyebrow">Bag Inventory</p>
