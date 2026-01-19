@@ -3,6 +3,7 @@ import { AlertTriangle, Sparkles } from 'lucide-react'
 import { PokemonData, Gender } from '../lib/types'
 import { getPokemonSpriteUrl, getFallbackSpriteUrl } from '../lib/spriteUtils'
 import { levelToExp } from '../lib/pokemonParser'
+import { RADICAL_RED_ITEMS } from '../lib/radicalRedItems'
 import speciesData from '../lib/species-data.json'
 import movesData from '../lib/moves-data.json'
 
@@ -41,6 +42,8 @@ const NATURES = [
   'Careful',
   'Quirky',
 ]
+
+const ITEM_OPTIONS = [{ id: 0, name: 'None' }, ...RADICAL_RED_ITEMS]
 
 // Nature stat modifiers: [increasedStat, decreasedStat] or null for neutral
 const NATURE_MODIFIERS: Array<{ increased: string | null; decreased: string | null }> = [
@@ -663,14 +666,18 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
               </div>
             </div>
             <div className="form-group">
-              <label className="form-label">Held Item (ID)</label>
-              <input
-                type="number"
-                className="wireframe-input"
-                value={pokemon.heldItem ?? ''}
-                {...createNumberInputHandlers('heldItem', 0, 65535, 0)}
-                min="0"
-              />
+              <label className="form-label">Held Item</label>
+              <select
+                className="wireframe-input wireframe-select"
+                value={pokemon.heldItem ?? 0}
+                onChange={(e) => updatePokemon({ heldItem: parseInt(e.target.value) })}
+              >
+                {ITEM_OPTIONS.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.name}
+                  </option>
+                ))}
+              </select>
             </div>
             <label className="checkbox-row">
               <input
