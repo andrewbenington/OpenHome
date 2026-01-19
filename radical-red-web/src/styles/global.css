@@ -330,6 +330,10 @@ body {
   margin-top: 28px;
 }
 
+.modal-summary {
+  margin-bottom: 28px;
+}
+
 /* Grid layouts */
 .box-grid {
   display: grid;
@@ -529,7 +533,7 @@ body {
   gap: 12px;
   border-bottom: 1px solid var(--border);
   padding-bottom: 12px;
-  margin-bottom: 22px;
+  margin: 6px 0 22px;
 }
 
 .bag-pocket-tabs {
