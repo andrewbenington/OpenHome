@@ -256,9 +256,9 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
                 value={pokemon.gender}
                 onChange={(e) => updatePokemon({ gender: parseInt(e.target.value) as Gender })}
               >
-                <option value={Gender.Male}>♂ Male</option>
-                <option value={Gender.Female}>♀ Female</option>
-                <option value={Gender.Genderless}>— Genderless</option>
+                <option value={Gender.Male}>Male</option>
+                <option value={Gender.Female}>Female</option>
+                <option value={Gender.Genderless}>Genderless</option>
               </select>
             </div>
           </div>

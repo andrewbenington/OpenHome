@@ -1,9 +1,11 @@
 import { useState } from 'react'
+import { BadgeCheck, KeyRound, User, Wallet } from 'lucide-react'
 import { FileUpload } from './components/FileUpload'
 import { BoxViewer } from './components/BoxViewer'
+import { BagEditor } from './components/BagEditor'
 import { PokemonDetailModal } from './components/PokemonDetailModal'
 import { DarkModeToggle } from './components/DarkModeToggle'
-import { SaveData, PokemonData } from './lib/types'
+import { SaveData, PokemonData, ItemSlot } from './lib/types'
 import { parseSave, isRadicalRedSave, serializeSave } from './lib/saveParser'
 
 function App() {
@@ -16,6 +18,9 @@ function App() {
   } | null>(null)
   const [filename, setFilename] = useState<string>('')
   const [error, setError] = useState<string>('')
+  const [trainerDirty, setTrainerDirty] = useState(false)
+  const [bagDirty, setBagDirty] = useState(false)
+  const [activeTab, setActiveTab] = useState<'box' | 'bag'>('box')
 
   const handleFileLoad = (bytes: Uint8Array, name: string) => {
     setError('')
@@ -30,6 +35,9 @@ function App() {
       setSaveData(parsed)
       setFilename(name)
       setSelectedBox(0)
+      setTrainerDirty(false)
+      setBagDirty(false)
+      setActiveTab('box')
     } catch (err) {
       setError(`Error parsing save file: ${err}`)
       console.error(err)
@@ -57,6 +65,72 @@ function App() {
     setSelectedPokemon(null)
   }
 
+  const handleTrainerUpdate = <K extends keyof SaveData>(field: K, value: SaveData[K]) => {
+    if (!saveData) return
+    setSaveData({ ...saveData, [field]: value })
+    setTrainerDirty(true)
+  }
+
+  const handleBagUpdate = (
+    pocket: keyof SaveData['bag'],
+    index: number,
+    slot: ItemSlot
+  ) => {
+    if (!saveData) return
+    const nextPocket = [...saveData.bag[pocket]]
+    nextPocket[index] = slot
+    setSaveData({
+      ...saveData,
+      bag: { ...saveData.bag, [pocket]: nextPocket },
+    })
+    setBagDirty(true)
+  }
+
+  const handleBagAddItem = (pocket: keyof SaveData['bag']) => {
+    if (!saveData) return
+    const nextPocket = [...saveData.bag[pocket]]
+    const emptyIndex = nextPocket.findIndex((slot) => slot.itemId === 0 && slot.quantity === 0)
+    if (emptyIndex === -1) return
+    nextPocket[emptyIndex] = { itemId: 1, quantity: 1 }
+    setSaveData({
+      ...saveData,
+      bag: { ...saveData.bag, [pocket]: nextPocket },
+    })
+    setBagDirty(true)
+  }
+
+  const handleBagRemoveItem = (pocket: keyof SaveData['bag'], index: number) => {
+    if (!saveData) return
+    const nextPocket = [...saveData.bag[pocket]]
+    nextPocket[index] = { itemId: 0, quantity: 0 }
+    setSaveData({
+      ...saveData,
+      bag: { ...saveData.bag, [pocket]: nextPocket },
+    })
+    setBagDirty(true)
+  }
+
+  const createTrainerNumberHandlers = (
+    field: 'trainerID' | 'secretID' | 'money',
+    min: number,
+    max: number
+  ) => ({
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+      const val = e.target.value === '' ? min : parseInt(e.target.value)
+      if (!isNaN(val)) {
+        handleTrainerUpdate(field, val as SaveData[typeof field])
+      }
+    },
+    onBlur: (e: React.FocusEvent<HTMLInputElement>) => {
+      const val = parseInt(e.target.value)
+      if (isNaN(val) || val < min) {
+        handleTrainerUpdate(field, min as SaveData[typeof field])
+      } else if (val > max) {
+        handleTrainerUpdate(field, max as SaveData[typeof field])
+      }
+    },
+  })
+
   const handleDownload = () => {
     if (!saveData) return
 
@@ -79,6 +153,10 @@ function App() {
       console.error(err)
     }
   }
+
+  const totalChanges = saveData
+    ? saveData.updatedBoxSlots.length + (trainerDirty ? 1 : 0) + (bagDirty ? 1 : 0)
+    : 0
 
   return (
     <div className="page">
@@ -107,67 +185,144 @@ function App() {
         <>
           <div className="wireframe-box">
             <div className="trainer-info-header">
-              <div className="trainer-info">
-                <div>
-                  <span className="trainer-label">Trainer</span>
-                  <span className="trainer-value">{saveData.trainerName}</span>
-                </div>
-                <div>
-                  <span className="trainer-label">ID</span>
-                  <span className="trainer-value">
-                    {saveData.trainerID.toString().padStart(5, '0')}
-                  </span>
-                </div>
-                <div>
-                  <span className="trainer-label">Money</span>
-                  <span className="trainer-value">${saveData.money.toLocaleString()}</span>
-                </div>
+              <div>
+                <p className="section-eyebrow">Trainer Profile</p>
+                <h2 className="wireframe-subtitle">Identity & Ledger</h2>
               </div>
               <div className="save-action-buttons">
                 <button
                   className="wireframe-button"
                   onClick={handleDownload}
-                  disabled={saveData.updatedBoxSlots.length === 0}
+                  disabled={totalChanges === 0}
                 >
                   Download modified save
-                  {saveData.updatedBoxSlots.length > 0 &&
-                    ` (${saveData.updatedBoxSlots.length} changes)`}
+                  {totalChanges > 0 && ` (${totalChanges} changes)`}
                 </button>
                 <button
-                  className="wireframe-button"
+                  className="wireframe-button secondary"
                   onClick={() => {
                     setSaveData(null)
                     setFilename('')
                     setError('')
+                    setTrainerDirty(false)
+                    setBagDirty(false)
                   }}
                 >
                   Load new file
                 </button>
               </div>
             </div>
-          </div>
-
-          <div className="wireframe-box">
-            <h2 className="wireframe-subtitle">Box Selector</h2>
-            <div className="box-selector">
-              {saveData.boxes.map((_, index) => (
-                <button
-                  key={index}
-                  className={`box-selector-button ${selectedBox === index ? 'active' : ''}`}
-                  onClick={() => setSelectedBox(index)}
-                >
-                  Box {index + 1}
-                </button>
-              ))}
+            <div className="trainer-form">
+              <div className="trainer-field">
+                <div className="trainer-field-label">
+                  <User className="icon" />
+                  <span>Trainer name</span>
+                </div>
+                <input
+                  type="text"
+                  className="wireframe-input"
+                  value={saveData.trainerName}
+                  onChange={(e) => handleTrainerUpdate('trainerName', e.target.value.slice(0, 7))}
+                  maxLength={7}
+                />
+              </div>
+              <div className="trainer-field">
+                <div className="trainer-field-label">
+                  <BadgeCheck className="icon" />
+                  <span>Trainer ID</span>
+                </div>
+                <input
+                  type="number"
+                  className="wireframe-input"
+                  value={saveData.trainerID}
+                  {...createTrainerNumberHandlers('trainerID', 0, 65535)}
+                  min="0"
+                  max="65535"
+                />
+              </div>
+              <div className="trainer-field">
+                <div className="trainer-field-label">
+                  <KeyRound className="icon" />
+                  <span>Secret ID</span>
+                </div>
+                <input
+                  type="number"
+                  className="wireframe-input"
+                  value={saveData.secretID}
+                  {...createTrainerNumberHandlers('secretID', 0, 65535)}
+                  min="0"
+                  max="65535"
+                />
+              </div>
+              <div className="trainer-field">
+                <div className="trainer-field-label">
+                  <Wallet className="icon" />
+                  <span>Money</span>
+                </div>
+                <input
+                  type="number"
+                  className="wireframe-input"
+                  value={saveData.money}
+                  {...createTrainerNumberHandlers('money', 0, 99999999)}
+                  min="0"
+                />
+              </div>
             </div>
           </div>
 
           <div className="wireframe-box">
-            <BoxViewer
-              box={saveData.boxes[selectedBox]}
-              boxIndex={selectedBox}
-              onPokemonClick={handlePokemonClick}
-            />
+            <div className="section-header">
+              <div>
+                <p className="section-eyebrow">Storage</p>
+                <h2 className="wireframe-subtitle">Box & Bag</h2>
+              </div>
+              <div className="primary-tabs">
+                <button
+                  className={`primary-tab ${activeTab === 'box' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('box')}
+                >
+                  Box
+                </button>
+                <button
+                  className={`primary-tab ${activeTab === 'bag' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('bag')}
+                >
+                  Bag
+                </button>
+              </div>
+            </div>
+
+            {activeTab === 'box' ? (
+              <>
+                <h3 className="wireframe-subtitle">Box Selector</h3>
+                <div className="box-selector">
+                  {saveData.boxes.map((_, index) => (
+                    <button
+                      key={index}
+                      className={`box-selector-button ${selectedBox === index ? 'active' : ''}`}
+                      onClick={() => setSelectedBox(index)}
+                    >
+                      Box {index + 1}
+                    </button>
+                  ))}
+                </div>
+                <BoxViewer
+                  box={saveData.boxes[selectedBox]}
+                  boxIndex={selectedBox}
+                  onPokemonClick={handlePokemonClick}
+                />
+              </>
+            ) : (
+              <div className="tab-panel">
+                <BagEditor
+                  bag={saveData.bag}
+                  onUpdate={handleBagUpdate}
+                  onAddItem={handleBagAddItem}
+                  onRemoveItem={handleBagRemoveItem}
+                  compact
+                />
+              </div>
+            )}
           </div>
 
           {saveData.updatedBoxSlots.length > 0 && (

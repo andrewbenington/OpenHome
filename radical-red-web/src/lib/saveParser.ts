@@ -1,12 +1,35 @@
-import { SaveData, Box } from './types'
+import { SaveData, Box, BagData, ItemSlot } from './types'
 import { bytesToUint16LittleEndian, bytesToUint32LittleEndian, uint16ToBytesLittleEndian, uint32ToBytesLittleEndian } from './byteLogic'
-import { gen3StringToUTF } from './stringConversion'
+import { gen3StringToUTF, utf8ToGen3String } from './stringConversion'
 import { parsePokemon, serializePokemon } from './pokemonParser'
 
 const SAVE_SIZES_BYTES = [0x20000, 0x20010]
+const SECTOR_SIZE = 0x1000
+const SECTOR_DATA_SIZE = 0xff0
 const POKEMON_SIZE = 58
 const POKEMON_PER_BOX = 30
 const NUM_BOXES = 18
+
+const PARASITE_SIZES: Record<number, number> = {
+  0: 0x0cc,
+  4: 0x258,
+  13: 0x0ba0,
+}
+
+const PARASITE_OFFSETS: Record<number, number> = {
+  0: SECTOR_DATA_SIZE - PARASITE_SIZES[0],
+  4: SECTOR_DATA_SIZE - PARASITE_SIZES[4],
+  13: SECTOR_DATA_SIZE - PARASITE_SIZES[13],
+}
+
+const PARASITE_TOTAL_SIZE = 0xec4
+const EXTRA_SAVE_DATA_SIZE = 0x2ea4
+const BAG_DATA_OFFSET = 0x9ac
+const BAG_ITEMS_COUNT = 450
+const BAG_KEY_ITEMS_COUNT = 75
+const BAG_BALLS_COUNT = 50
+const BAG_TMS_COUNT = 128
+const BAG_BERRIES_COUNT = 75
 
 interface Sector {
   data: Uint8Array
@@ -17,11 +40,11 @@ interface Sector {
 }
 
 const parseSector = (bytes: Uint8Array, index: number): Sector => {
-  const data = bytes.slice(index * 0x1000, index * 0x1000 + 4080)
-  const sectionID = bytesToUint16LittleEndian(bytes, index * 0x1000 + 0xff4)
-  const checksum = bytesToUint16LittleEndian(bytes, index * 0x1000 + 0xff6)
-  const signature = bytesToUint32LittleEndian(bytes, index * 0x1000 + 0xff8)
-  const saveIndex = bytesToUint32LittleEndian(bytes, index * 0x1000 + 0xffc)
+  const data = bytes.slice(index * SECTOR_SIZE, index * SECTOR_SIZE + SECTOR_DATA_SIZE)
+  const sectionID = bytesToUint16LittleEndian(bytes, index * SECTOR_SIZE + 0xff4)
+  const checksum = bytesToUint16LittleEndian(bytes, index * SECTOR_SIZE + 0xff6)
+  const signature = bytesToUint32LittleEndian(bytes, index * SECTOR_SIZE + 0xff8)
+  const saveIndex = bytesToUint32LittleEndian(bytes, index * SECTOR_SIZE + 0xffc)
 
   return { data, sectionID, checksum, signature, saveIndex }
 }
@@ -42,6 +65,110 @@ const calculateSectorChecksum = (data: Uint8Array, sectionID: number): number =>
   }
 
   return ((checksum & 0xffff) + ((checksum >> 16) & 0xffff)) & 0xffff
+}
+
+const parseItemSlots = (data: Uint8Array, offset: number, count: number): ItemSlot[] => {
+  const slots: ItemSlot[] = []
+  for (let i = 0; i < count; i++) {
+    const base = offset + i * 4
+    slots.push({
+      itemId: bytesToUint16LittleEndian(data, base),
+      quantity: bytesToUint16LittleEndian(data, base + 2),
+    })
+  }
+  return slots
+}
+
+const writeItemSlots = (data: Uint8Array, offset: number, slots: ItemSlot[]) => {
+  slots.forEach((slot, index) => {
+    const base = offset + index * 4
+    data.set(uint16ToBytesLittleEndian(slot.itemId), base)
+    data.set(uint16ToBytesLittleEndian(slot.quantity), base + 2)
+  })
+}
+
+const parseBagData = (extraData: Uint8Array): BagData => {
+  let cursor = BAG_DATA_OFFSET
+
+  const items = parseItemSlots(extraData, cursor, BAG_ITEMS_COUNT)
+  cursor += BAG_ITEMS_COUNT * 4
+
+  const keyItems = parseItemSlots(extraData, cursor, BAG_KEY_ITEMS_COUNT)
+  cursor += BAG_KEY_ITEMS_COUNT * 4
+
+  const balls = parseItemSlots(extraData, cursor, BAG_BALLS_COUNT)
+  cursor += BAG_BALLS_COUNT * 4
+
+  const tms = parseItemSlots(extraData, cursor, BAG_TMS_COUNT)
+  cursor += BAG_TMS_COUNT * 4
+
+  const berries = parseItemSlots(extraData, cursor, BAG_BERRIES_COUNT)
+
+  return { items, keyItems, balls, tms, berries }
+}
+
+const writeBagData = (extraData: Uint8Array, bag: BagData) => {
+  let cursor = BAG_DATA_OFFSET
+  writeItemSlots(extraData, cursor, bag.items)
+  cursor += BAG_ITEMS_COUNT * 4
+  writeItemSlots(extraData, cursor, bag.keyItems)
+  cursor += BAG_KEY_ITEMS_COUNT * 4
+  writeItemSlots(extraData, cursor, bag.balls)
+  cursor += BAG_BALLS_COUNT * 4
+  writeItemSlots(extraData, cursor, bag.tms)
+  cursor += BAG_TMS_COUNT * 4
+  writeItemSlots(extraData, cursor, bag.berries)
+}
+
+const getExtraSaveData = (bytes: Uint8Array, sectors: Sector[]): Uint8Array => {
+  const sectorMap = new Map(sectors.map((sector) => [sector.sectionID, sector]))
+  const extraData = new Uint8Array(EXTRA_SAVE_DATA_SIZE)
+  let cursor = 0
+
+  ;[0, 4, 13].forEach((id) => {
+    const sector = sectorMap.get(id)
+    if (!sector) return
+    const size = PARASITE_SIZES[id]
+    const offset = PARASITE_OFFSETS[id]
+    extraData.set(sector.data.slice(offset, offset + size), cursor)
+    cursor += size
+  })
+
+  if (bytes.length >= SECTOR_SIZE * 32) {
+    const sector30 = parseSector(bytes, 30)
+    const sector31 = parseSector(bytes, 31)
+    extraData.set(sector30.data, cursor)
+    cursor += SECTOR_DATA_SIZE
+    extraData.set(sector31.data, cursor)
+  }
+
+  return extraData
+}
+
+const writeExtraSaveData = (bytes: Uint8Array, sectors: Sector[], extraData: Uint8Array) => {
+  const sectorMap = new Map(sectors.map((sector) => [sector.sectionID, sector]))
+  let cursor = 0
+
+  ;[0, 4, 13].forEach((id) => {
+    const sector = sectorMap.get(id)
+    if (!sector) return
+    const size = PARASITE_SIZES[id]
+    const offset = PARASITE_OFFSETS[id]
+    sector.data.set(extraData.slice(cursor, cursor + size), offset)
+    cursor += size
+  })
+
+  const sector30Start = PARASITE_TOTAL_SIZE
+  const sector31Start = PARASITE_TOTAL_SIZE + SECTOR_DATA_SIZE
+
+  if (bytes.length >= SECTOR_SIZE * 32) {
+    const sector30 = parseSector(bytes, 30)
+    const sector31 = parseSector(bytes, 31)
+    sector30.data.set(extraData.slice(sector30Start, sector30Start + SECTOR_DATA_SIZE), 0)
+    sector31.data.set(extraData.slice(sector31Start, sector31Start + SECTOR_DATA_SIZE), 0)
+    bytes.set(sector30.data, 30 * SECTOR_SIZE)
+    bytes.set(sector31.data, 31 * SECTOR_SIZE)
+  }
 }
 
 export const isRadicalRedSave = (bytes: Uint8Array): boolean => {
@@ -150,12 +277,16 @@ export const parseSave = (bytes: Uint8Array): SaveData => {
   console.log('=== END DEBUG ===')
   console.log('')
 
+  const extraData = getExtraSaveData(bytes, sectors)
+  const bag = parseBagData(extraData)
+
   return {
     boxes,
     trainerName,
     trainerID,
     secretID,
     money,
+    bag,
     updatedBoxSlots: [],
     bytes: new Uint8Array(bytes), // Clone the original bytes
   }
@@ -170,6 +301,28 @@ export const serializeSave = (saveData: SaveData): Uint8Array => {
     sectors.push(parseSector(bytes, i))
   }
   sectors.sort((a, b) => a.sectionID - b.sectionID)
+
+  const trainerSector = sectors.find((sector) => sector.sectionID === 0)
+  const moneySector = sectors.find((sector) => sector.sectionID === 1)
+
+  if (trainerSector) {
+    const trainerNameBytes = utf8ToGen3String(saveData.trainerName, 7)
+    trainerSector.data.set(trainerNameBytes, 0x00)
+    trainerSector.data.set(uint16ToBytesLittleEndian(saveData.trainerID), 0x0a)
+    trainerSector.data.set(uint16ToBytesLittleEndian(saveData.secretID), 0x0c)
+  }
+
+  if (trainerSector && moneySector) {
+    const securityKey = bytesToUint32LittleEndian(trainerSector.data, 0xaf8)
+    moneySector.data.set(
+      uint32ToBytesLittleEndian(saveData.money ^ securityKey),
+      0x290
+    )
+  }
+
+  const extraData = getExtraSaveData(bytes, sectors)
+  writeBagData(extraData, saveData.bag)
+  writeExtraSaveData(bytes, sectors, extraData)
 
   // Rebuild PC data for modified slots
   const fullSectionsUsed = Math.floor((NUM_BOXES * POKEMON_SIZE * POKEMON_PER_BOX) / 4080)
@@ -211,6 +364,14 @@ export const serializeSave = (saveData: SaveData): Uint8Array => {
     // Recalculate checksum
     sector.checksum = calculateSectorChecksum(sector.data, sector.sectionID)
   })
+
+  if (trainerSector) {
+    trainerSector.checksum = calculateSectorChecksum(trainerSector.data, trainerSector.sectionID)
+  }
+
+  if (moneySector) {
+    moneySector.checksum = calculateSectorChecksum(moneySector.data, moneySector.sectionID)
+  }
 
   // Write sectors back to bytes
   const firstSectorIndex = sectors[0].sectionID
