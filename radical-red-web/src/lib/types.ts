@@ -29,6 +29,19 @@ export interface BaseStats {
   spe: number
 }
 
+export interface ItemSlot {
+  itemId: number
+  quantity: number
+}
+
+export interface BagData {
+  items: ItemSlot[]
+  keyItems: ItemSlot[]
+  balls: ItemSlot[]
+  tms: ItemSlot[]
+  berries: ItemSlot[]
+}
+
 export interface PokemonData {
   // Basic info
   dexNum: number
@@ -108,6 +121,7 @@ export interface SaveData {
   trainerID: number
   secretID: number
   money: number
+  bag: BagData
   updatedBoxSlots: BoxCoordinates[]
   bytes: Uint8Array
 }

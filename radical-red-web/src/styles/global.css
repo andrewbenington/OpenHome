@@ -2,46 +2,46 @@
 
 :root {
   color-scheme: light;
-  --bg: #f5f3f0;
+  --bg: #f2f4f2;
   --panel: #ffffff;
-  --panel-muted: #eeece8;
-  --border: #e2ded8;
-  --text: #1f2422;
-  --text-muted: #6b716d;
-  --accent: #a4ada6;
-  --accent-strong: #56615b;
-  --shadow: rgba(17, 20, 18, 0.08);
-  --shadow-strong: rgba(17, 20, 18, 0.14);
-  --button-bg: #1f2422;
-  --button-text: #f7f6f2;
-  --button-border: #1f2422;
-  --button-hover: #2a312d;
-  --button-disabled: #c8c4be;
-  --tab-active-bg: #1f2422;
-  --tab-active-text: #f7f6f2;
-  --focus-ring: rgba(86, 97, 91, 0.18);
+  --panel-muted: #edf1ee;
+  --border: #dce2de;
+  --text: #1b211f;
+  --text-muted: #6b7470;
+  --accent: #8b9790;
+  --accent-strong: #2a3531;
+  --shadow: rgba(16, 20, 18, 0.06);
+  --shadow-strong: rgba(16, 20, 18, 0.12);
+  --button-bg: #1b211f;
+  --button-text: #f7f8f6;
+  --button-border: #1b211f;
+  --button-hover: #28302d;
+  --button-disabled: #cbd2ce;
+  --tab-active-bg: #1b211f;
+  --tab-active-text: #f7f8f6;
+  --focus-ring: rgba(42, 53, 49, 0.18);
 }
 
 :root.dark-mode {
   color-scheme: dark;
-  --bg: #0f1211;
-  --panel: #151a18;
-  --panel-muted: #1d2220;
-  --border: #2c332f;
-  --text: #f1f2ee;
-  --text-muted: #aeb4b0;
-  --accent: #b5beb7;
-  --accent-strong: #e0e6e2;
-  --shadow: rgba(0, 0, 0, 0.45);
-  --shadow-strong: rgba(0, 0, 0, 0.6);
-  --button-bg: #f1f2ee;
-  --button-text: #151a18;
-  --button-border: #f1f2ee;
-  --button-hover: #d7dbd8;
-  --button-disabled: #3a423d;
-  --tab-active-bg: #f1f2ee;
-  --tab-active-text: #151a18;
-  --focus-ring: rgba(241, 242, 238, 0.16);
+  --bg: #0e1210;
+  --panel: #141a17;
+  --panel-muted: #1b211e;
+  --border: #2a312d;
+  --text: #f4f6f3;
+  --text-muted: #a8b0ab;
+  --accent: #a9b5ae;
+  --accent-strong: #e3e9e4;
+  --shadow: rgba(0, 0, 0, 0.4);
+  --shadow-strong: rgba(0, 0, 0, 0.55);
+  --button-bg: #f4f6f3;
+  --button-text: #141a17;
+  --button-border: #f4f6f3;
+  --button-hover: #d7ddd9;
+  --button-disabled: #363d39;
+  --tab-active-bg: #f4f6f3;
+  --tab-active-text: #141a17;
+  --focus-ring: rgba(244, 246, 243, 0.14);
 }
 
 * {
@@ -60,29 +60,29 @@ body {
 
 #root {
   min-height: 100vh;
-  padding: 56px 24px 64px;
+  padding: 52px 24px 64px;
 }
 
 .page {
-  max-width: 1180px;
+  max-width: 1200px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  gap: 28px;
 }
 
 /* Layout and cards */
 .wireframe-box {
   border: 1px solid var(--border);
   background: var(--panel);
-  padding: 28px;
-  border-radius: 20px;
-  box-shadow: 0 14px 30px var(--shadow);
+  padding: 30px;
+  border-radius: 24px;
+  box-shadow: 0 18px 36px var(--shadow);
   color: var(--text);
 }
 
 .page-header {
-  padding: 32px 36px;
+  padding: 36px;
 }
 
 .page-header-row {
@@ -97,22 +97,22 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.24em;
   color: var(--text-muted);
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .page-subtitle {
-  margin-top: 12px;
+  margin-top: 14px;
   font-size: 15px;
   color: var(--text-muted);
-  max-width: 640px;
+  max-width: 680px;
 }
 
 .status-card {
   display: flex;
   align-items: center;
   gap: 12px;
-  border-radius: 16px;
-  padding: 18px 22px;
+  border-radius: 18px;
+  padding: 18px 24px;
   background: var(--panel-muted);
   border: 1px solid var(--border);
   color: var(--text);
@@ -132,7 +132,7 @@ body {
 
 /* Typography */
 .wireframe-title {
-  font-size: 30px;
+  font-size: 32px;
   font-weight: 600;
   letter-spacing: -0.02em;
 }
@@ -141,12 +141,27 @@ body {
   font-size: 16px;
   font-weight: 600;
   color: var(--text);
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 
 .muted-text {
   color: var(--text-muted);
   font-size: 14px;
+}
+
+.section-eyebrow {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.28em;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+.section-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
 }
 
 /* Buttons */
@@ -163,7 +178,7 @@ body {
   color: var(--button-text);
   font-weight: 600;
   transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
-  box-shadow: 0 8px 20px var(--shadow);
+  box-shadow: 0 10px 24px var(--shadow);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -173,7 +188,7 @@ body {
 .wireframe-button:hover:not(:disabled) {
   background: var(--button-hover);
   transform: translateY(-1px);
-  box-shadow: 0 14px 30px var(--shadow-strong);
+  box-shadow: 0 14px 28px var(--shadow-strong);
 }
 
 .wireframe-button:active:not(:disabled) {
@@ -187,6 +202,19 @@ body {
   color: var(--text-muted);
   cursor: not-allowed;
   box-shadow: none;
+}
+
+.wireframe-button.secondary {
+  background: transparent;
+  color: var(--text);
+  border-color: var(--border);
+  box-shadow: none;
+}
+
+.wireframe-button.secondary:hover:not(:disabled) {
+  background: var(--panel-muted);
+  border-color: var(--accent);
+  box-shadow: 0 10px 24px var(--shadow);
 }
 
 /* Inputs */
@@ -232,7 +260,7 @@ body {
   max-height: 90vh;
   overflow-y: auto;
   padding: 32px;
-  border-radius: 22px;
+  border-radius: 24px;
   box-shadow: 0 28px 60px var(--shadow-strong);
   color: var(--text);
 }
@@ -255,7 +283,7 @@ body {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
   gap: 14px;
-  margin: 18px 0 6px;
+  margin: 20px 0 6px;
 }
 
 .pokemon-slot {
@@ -269,7 +297,7 @@ body {
   transition: all 0.15s ease;
   position: relative;
   padding: 8px;
-  border-radius: 16px;
+  border-radius: 18px;
 }
 
 .pokemon-slot:hover {
@@ -305,7 +333,7 @@ body {
   align-items: center;
   font-size: 11px;
   width: 100%;
-  gap: 4px;
+  gap: 6px;
 }
 
 .pokemon-name {
@@ -361,13 +389,13 @@ body {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 16px;
-  margin: 18px 0;
+  margin: 18px 0 20px;
 }
 
 .stat-item {
   border: 1px solid var(--border);
   padding: 16px;
-  border-radius: 16px;
+  border-radius: 18px;
   background-color: var(--panel-muted);
 }
 
@@ -390,7 +418,7 @@ body {
 .read-only-stat {
   border: 1px solid var(--border);
   padding: 16px;
-  border-radius: 16px;
+  border-radius: 18px;
   background-color: var(--panel-muted);
 }
 
@@ -406,7 +434,7 @@ body {
 
 /* Forms */
 .form-group {
-  margin: 16px 0;
+  margin: 14px 0;
 }
 
 .form-label {
@@ -422,7 +450,7 @@ body {
 .form-row {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 18px;
+  gap: 20px;
 }
 
 .form-row.tight {
@@ -446,10 +474,105 @@ body {
 /* Tabs */
 .tabs {
   display: flex;
-  gap: 10px;
+  gap: 12px;
   border-bottom: 1px solid var(--border);
-  padding-bottom: 10px;
-  margin-bottom: 20px;
+  padding-bottom: 12px;
+  margin-bottom: 22px;
+}
+
+.bag-pocket-tabs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  margin: 20px 0 12px;
+}
+
+.bag-pocket-tab {
+  border: 1px solid var(--border);
+  background: var(--panel-muted);
+  padding: 12px 16px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.bag-pocket-tab.active {
+  background: var(--tab-active-bg);
+  color: var(--tab-active-text);
+  border-color: var(--tab-active-bg);
+}
+
+.bag-pocket-tab:hover:not(.active) {
+  border-color: var(--accent-strong);
+  color: var(--text);
+}
+
+.bag-grid {
+  display: grid;
+  gap: 14px;
+  margin-top: 10px;
+}
+
+.bag-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) auto;
+  gap: 16px;
+  align-items: end;
+  padding: 16px;
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  background: var(--panel-muted);
+}
+
+.wireframe-button.ghost {
+  background: transparent;
+  color: var(--text);
+  border-color: var(--border);
+  box-shadow: none;
+  padding: 10px 14px;
+}
+
+.wireframe-button.ghost:hover:not(:disabled) {
+  background: var(--panel);
+  border-color: var(--accent);
+  box-shadow: 0 8px 18px var(--shadow);
+}
+
+.empty-state {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 20px;
+  border-radius: 18px;
+  border: 1px dashed var(--border);
+  background: var(--panel-muted);
+}
+
+.empty-state-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--panel);
+}
+
+.empty-state-title {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.empty-state-subtitle {
+  font-size: 13px;
+  color: var(--text-muted);
 }
 
 .tab {
@@ -480,9 +603,9 @@ body {
 /* Box selector */
 .box-selector {
   display: flex;
-  gap: 10px;
+  gap: 12px;
   flex-wrap: wrap;
-  margin: 14px 0 6px;
+  margin: 16px 0 6px;
 }
 
 .box-selector-button {
@@ -551,7 +674,7 @@ body {
   justify-content: center;
   border-radius: 999px;
   color: var(--text);
-  box-shadow: 0 8px 18px var(--shadow);
+  box-shadow: 0 10px 24px var(--shadow);
 }
 
 .dark-mode-toggle:hover {
@@ -562,29 +685,33 @@ body {
 
 .trainer-info-header {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: space-between;
   gap: 24px;
 }
 
-.trainer-info {
+.trainer-form {
+  margin-top: 24px;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 18px;
 }
 
-.trainer-label {
-  display: block;
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.16em;
-  color: var(--text-muted);
-  margin-bottom: 6px;
+.trainer-field {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.trainer-value {
+.trainer-field-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
   font-weight: 600;
-  font-size: 16px;
 }
 
 .save-action-buttons {
@@ -620,7 +747,7 @@ body {
   }
 
   .page-header {
-    padding: 24px;
+    padding: 26px;
   }
 
   .page-header-row {
@@ -669,7 +796,16 @@ body {
     gap: 16px;
   }
 
-  .trainer-info {
+  .trainer-form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .bag-row {
     grid-template-columns: 1fr;
   }
 
@@ -708,6 +844,14 @@ body {
 
   .box-grid {
     grid-template-columns: repeat(3, 1fr);
+  }
+
+  .trainer-form {
+    grid-template-columns: 1fr;
+  }
+
+  .bag-pocket-tabs {
+    grid-template-columns: 1fr;
   }
 }
 
