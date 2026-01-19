@@ -177,15 +177,23 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h2 className="wireframe-title">
-            {pokemon.nickname} (#{pokemon.dexNum} {pokemon.speciesName})
-          </h2>
+          <div className="modal-title-group">
+            <h2 className="wireframe-title">
+              {pokemon.nickname} (#{pokemon.dexNum} {pokemon.speciesName})
+            </h2>
+            {pokemon.isShiny && (
+              <div className="shiny-banner">
+                <Sparkles className="icon icon-muted" />
+                <span>Shiny</span>
+              </div>
+            )}
+          </div>
           <button className="wireframe-button" onClick={onClose}>
             Close
           </button>
         </div>
 
-        <div className="text-center" style={{ margin: '16px 0' }}>
+        <div className="text-center pokemon-hero">
           <img
             src={getPokemonSpriteUrl(pokemon.dexNum, pokemon.speciesName, pokemon.isShiny, 'large')}
             alt={pokemon.speciesName}
@@ -205,12 +213,6 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
               }
             }}
           />
-          {pokemon.isShiny && (
-            <div className="shiny-banner">
-              <Sparkles className="icon icon-muted" />
-              <span>Shiny</span>
-            </div>
-          )}
         </div>
 
         <div className="wireframe-box">
