@@ -314,6 +314,16 @@ body {
   gap: 16px;
 }
 
+.modal-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pokemon-hero {
+  margin: 20px 0 10px;
+}
+
 .modal-actions {
   display: flex;
   gap: 16px;
@@ -412,7 +422,7 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  margin-top: 6px;
+  margin-top: 2px;
   font-weight: 600;
   color: var(--text-muted);
 }
