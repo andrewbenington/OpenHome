@@ -529,6 +529,93 @@ body {
   margin: 22px 0 14px;
 }
 
+.bag-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 18px;
+  border-radius: 22px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  margin-bottom: 16px;
+}
+
+.bag-controls-main {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: 18px;
+}
+
+.bag-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.input-with-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-with-icon .wireframe-input {
+  padding-left: 42px;
+}
+
+.input-with-icon .icon {
+  position: absolute;
+  left: 16px;
+  width: 16px;
+  height: 16px;
+  color: var(--text-muted);
+}
+
+.icon-button {
+  position: absolute;
+  right: 12px;
+  border: none;
+  background: transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  padding: 4px;
+  cursor: pointer;
+}
+
+.icon-button:hover {
+  color: var(--text);
+}
+
+.bag-sort-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+}
+
+.wireframe-button.icon-only {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bag-summary {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.bag-summary strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
 .bag-pocket-tab {
   border: 1px solid var(--border);
   background: var(--panel-muted);
@@ -559,6 +646,9 @@ body {
   display: grid;
   gap: 16px;
   margin-top: 12px;
+  max-height: clamp(320px, 55vh, 560px);
+  overflow: auto;
+  padding-right: 4px;
 }
 
 .bag-row {
@@ -877,6 +967,19 @@ body {
     grid-template-columns: 1fr;
   }
 
+  .bag-controls {
+    padding: 16px;
+  }
+
+  .bag-controls-main {
+    grid-template-columns: 1fr;
+  }
+
+  .bag-summary {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
   .save-action-buttons {
     flex-direction: column;
     width: 100%;
@@ -920,6 +1023,10 @@ body {
 
   .bag-pocket-tabs {
     grid-template-columns: 1fr;
+  }
+
+  .bag-summary {
+    font-size: 12px;
   }
 }
 
