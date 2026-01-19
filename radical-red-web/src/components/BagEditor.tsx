@@ -10,6 +10,7 @@ import {
   Trash2,
 } from 'lucide-react'
 import { BagData, ItemSlot } from '../lib/types'
+import { RADICAL_RED_ITEMS } from '../lib/radicalRedItems'
 
 type BagPocketKey = keyof BagData
 
@@ -41,6 +42,10 @@ export const BagEditor: React.FC<BagEditorProps> = ({
   compact = false,
 }) => {
   const [activePocket, setActivePocket] = useState<BagPocketKey>('items')
+  const itemOptions = useMemo(
+    () => [{ id: 0, name: 'None' }, ...RADICAL_RED_ITEMS],
+    []
+  )
 
   const entries = useMemo(() => {
     const slots = bag[activePocket]
@@ -92,10 +97,9 @@ export const BagEditor: React.FC<BagEditorProps> = ({
           entries.map((slot) => (
             <div key={slot.index} className="bag-row">
               <div>
-                <label className="form-label">Item ID</label>
-                <input
-                  type="number"
-                  className="wireframe-input"
+                <label className="form-label">Item</label>
+                <select
+                  className="wireframe-input wireframe-select"
                   value={slot.itemId}
                   onChange={(e) =>
                     onUpdate(activePocket, slot.index, {
@@ -103,8 +107,13 @@ export const BagEditor: React.FC<BagEditorProps> = ({
                       quantity: slot.quantity,
                     })
                   }
-                  min="0"
-                />
+                >
+                  {itemOptions.map((item) => (
+                    <option key={item.id} value={item.id}>
+                      {item.name}
+                    </option>
+                  ))}
+                </select>
               </div>
               <div>
                 <label className="form-label">Quantity</label>
