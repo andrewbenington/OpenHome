@@ -215,7 +215,7 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
           />
         </div>
 
-        <div className="wireframe-box">
+        <div className="wireframe-box modal-summary">
           <div className="form-row">
             <div className="read-only-stat">
               <div className="stat-label">OT</div>
