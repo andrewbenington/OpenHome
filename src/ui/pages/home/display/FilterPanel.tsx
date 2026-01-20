@@ -10,9 +10,9 @@ import {
   getAllAbilities,
   getAllBalls,
   getAllItems,
-  getAllNatures,
   Item,
   ItemMetadata,
+  NatureIndex,
   OriginGame,
   OriginGames,
   OriginGameWithData,
@@ -97,11 +97,10 @@ export default function FilterPanel() {
     id: index,
   }))
 
-  const ALL_NATURES: SelectOption[] = getAllNatures()
+  const NatureIndex: SelectOption[] = getNatureIndex()
     .sort((a, b) => a.name.localeCompare(b.name))
-    .map(({ name, index }) => ({
+    .map(({ name }) => ({
     label: name,
-    id: index,
   }))
 
   const ALL_ITEMS: SelectOption[] = getAllItems().map(itemMetadataToSelectOption)
@@ -269,12 +268,11 @@ export default function FilterPanel() {
           getIconComponent={(opt) => <GenderIcon gender={opt.gender} />}
         />
         <Autocomplete
-          options={ALL_NATURES}
+          options={NatureIndex}
           getOptionString={(opt) => opt.label}
-          getOptionUniqueID={(opt) => opt.id.toString()}
-          value={filter.nature !== undefined ? ALL_NATURES.find(a => a.id === filter.nature) : undefined}
+          value={filter.nature !== undefined ? NatureIndex.find(a => a.label === filter.nature) : undefined}
           label="Nature"
-          onChange={(option) => setFilter({ nature: option?.id })}
+          onChange={(option) => setFilter({ nature: option?.label })}
         />
         <Autocomplete
           options={['Any Ribbon', 'No Ribbon', ...OpenHomeRibbons]}
