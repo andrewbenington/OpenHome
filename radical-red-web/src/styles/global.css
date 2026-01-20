@@ -288,7 +288,7 @@ body {
   width: 100%;
   border-radius: 10px;
   color: var(--text);
-  background-color: var(--panel-muted);
+  background-color: var(--panel);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
   backdrop-filter: blur(var(--glassmorphism-blur));
 }
@@ -549,6 +549,17 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.08em;
   font-family: var(--pixel-font-family);
+}
+
+.form-label-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.form-label-row .form-label {
+  margin-bottom: 0;
 }
 
 .form-row {
