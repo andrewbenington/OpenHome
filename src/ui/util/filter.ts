@@ -12,6 +12,7 @@ export interface Filter {
   type1?: Type
   type2?: Type
   gameOfOrigin?: OriginGame
+  nature?: NatureIndex
   ribbon?: string
   shiny?: string
   ball?: number
@@ -50,6 +51,9 @@ export function filterApplies(filter: Filter, mon: PKMInterface) {
     return false
   }
   if (filter.gameOfOrigin !== undefined && mon.gameOfOrigin !== filter.gameOfOrigin) {
+    return false
+  }
+  if (filter.nature !== undefined && mon.nature !== filter.nature) {
     return false
   }
   if (filter.ribbon !== undefined) {
