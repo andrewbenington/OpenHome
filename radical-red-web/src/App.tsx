@@ -169,9 +169,6 @@ function App() {
           </div>
           <DarkModeToggle />
         </div>
-        <p className="page-subtitle">
-          Precision editing for Pokémon Radical Red .sav files with curated, secure workflows.
-        </p>
       </header>
 
       {error && (
@@ -188,7 +185,6 @@ function App() {
             <div className="trainer-info-header">
               <div>
                 <p className="section-eyebrow">Trainer Profile</p>
-                <h2 className="wireframe-subtitle">Identity & Ledger</h2>
               </div>
               <div className="save-action-buttons">
                 <button
