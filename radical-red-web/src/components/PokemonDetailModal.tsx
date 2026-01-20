@@ -613,7 +613,10 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
             </div>
             <div className="form-row">
               <div className="form-group is-locked">
-                <label className="form-label">Experience</label>
+                <div className="form-label-row">
+                  <label className="form-label">Experience</label>
+                  <span className="field-lock-indicator">Locked</span>
+                </div>
                 <input
                   type="number"
                   className="wireframe-input"
@@ -688,7 +691,7 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
                 checked={pokemon.isShiny}
                 onChange={(e) => updatePokemon({ isShiny: e.target.checked })}
               />
-              <span>Shiny (Note: May not work correctly)</span>
+              <span>Shiny</span>
             </label>
           </div>
         )}
