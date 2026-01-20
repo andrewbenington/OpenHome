@@ -239,7 +239,7 @@ export default function FilterPanel() {
           options={ALL_BALLS}
           getOptionString={(option) => option.label}
           getOptionUniqueID={(opt) => opt.id.toString()}
-          value={filter.ball ? ALL_BALLS[filter.ball] : undefined}
+          value={filter.ball !== undefined ? ALL_BALLS.find(a => a.id === filter.ball) : undefined}
           label="Ball"
           onChange={(option) => setFilter({ ball: option?.id })}
           getIconComponent={(ball) => (
