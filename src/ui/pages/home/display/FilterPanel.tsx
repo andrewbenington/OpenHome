@@ -82,16 +82,12 @@ export default function FilterPanel() {
 
   const ALL_SPECIES_DATA = useMemo(all_species_data, [])
 
-  const ALL_ABILITIES: SelectOption[] = getAllAbilities()
-    .sort((a, b) => a.name.localeCompare(b.name))
-    .map(({ name, id }) => ({
+  const ALL_ABILITIES: SelectOption[] = getAllAbilities().map(({ name, id }) => ({
     label: name,
     id,
   }))
 
-  const ALL_BALLS: SelectOption[] = getAllBalls()
-    .sort((a, b) => a.name.localeCompare(b.name))
-    .map(({ name, index }) => ({
+  const ALL_BALLS: SelectOption[] = getAllBalls().map(({ name, index }) => ({
     label: name,
     id: index,
   }))
@@ -202,7 +198,7 @@ export default function FilterPanel() {
           options={ALL_ABILITIES}
           getOptionString={(opt) => opt.label}
           getOptionUniqueID={(opt) => opt.id.toString()}
-          value={filter.ability !== undefined ? ALL_ABILITIES[filter.ability - 1] : undefined}
+          value={filter.ability !== undefined ? ALL_ABILITIES.find(a => a.id === filter.ability) : undefined}
           label="Ability"
           onChange={(option) => setFilter({ ability: option?.id })}
         />
