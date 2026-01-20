@@ -10,6 +10,7 @@ import {
   getAllAbilities,
   getAllBalls,
   getAllItems,
+  getAllNatures,
   Item,
   ItemMetadata,
   OriginGame,
@@ -90,6 +91,13 @@ export default function FilterPanel() {
   }))
 
   const ALL_BALLS: SelectOption[] = getAllBalls()
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map(({ name, index }) => ({
+    label: name,
+    id: index,
+  }))
+
+  const ALL_NATURES: SelectOption[] = getAllNatures()
     .sort((a, b) => a.name.localeCompare(b.name))
     .map(({ name, index }) => ({
     label: name,
@@ -259,6 +267,14 @@ export default function FilterPanel() {
           label="Gender"
           onChange={(option) => setFilter({ gender: option?.gender })}
           getIconComponent={(opt) => <GenderIcon gender={opt.gender} />}
+        />
+        <Autocomplete
+          options={ALL_NATURES}
+          getOptionString={(opt) => opt.label}
+          getOptionUniqueID={(opt) => opt.id.toString()}
+          value={filter.nature !== undefined ? ALL_NATURES.find(a => a.id === filter.nature) : undefined}
+          label="Nature"
+          onChange={(option) => setFilter({ nature: option?.id })}
         />
         <Autocomplete
           options={['Any Ribbon', 'No Ribbon', ...OpenHomeRibbons]}
