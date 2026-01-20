@@ -12,7 +12,7 @@ export interface Filter {
   type1?: Type
   type2?: Type
   gameOfOrigin?: OriginGame
-  nature?: NatureIndex
+  nature?: number
   ribbon?: string
   shiny?: string
   ball?: number
