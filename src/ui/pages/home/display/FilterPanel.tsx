@@ -96,14 +96,6 @@ export default function FilterPanel() {
     id: index,
   }))
 
-  const ballOptions: BallOption[] = [
-    {
-      type: 'specific_ball',
-      id: 0,
-      label: 'None',
-    },
-    ...ALL_BALLS.map((item) => ({ type: 'specific_ball', ...ball }) as BallOption),
-
   const ALL_ITEMS: SelectOption[] = getAllItems().map(itemMetadataToSelectOption)
 
   const itemOptions: ItemOption[] = [
