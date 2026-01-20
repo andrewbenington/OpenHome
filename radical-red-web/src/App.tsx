@@ -67,6 +67,7 @@ function App() {
 
   const handleTrainerUpdate = <K extends keyof SaveData>(field: K, value: SaveData[K]) => {
     if (!saveData) return
+    if (field === 'trainerID' || field === 'secretID') return
     setSaveData({ ...saveData, [field]: value })
     setTrainerDirty(true)
   }
@@ -226,30 +227,32 @@ function App() {
                   maxLength={7}
                 />
               </div>
-              <div className="trainer-field">
+              <div className="trainer-field is-locked">
                 <div className="trainer-field-label">
                   <BadgeCheck className="icon" />
                   <span>Trainer ID</span>
+                  <span className="field-lock-indicator">Locked</span>
                 </div>
                 <input
                   type="number"
                   className="wireframe-input"
                   value={saveData.trainerID}
-                  {...createTrainerNumberHandlers('trainerID', 0, 65535)}
+                  disabled
                   min="0"
                   max="65535"
                 />
               </div>
-              <div className="trainer-field">
+              <div className="trainer-field is-locked">
                 <div className="trainer-field-label">
                   <KeyRound className="icon" />
                   <span>Secret ID</span>
+                  <span className="field-lock-indicator">Locked</span>
                 </div>
                 <input
                   type="number"
                   className="wireframe-input"
                   value={saveData.secretID}
-                  {...createTrainerNumberHandlers('secretID', 0, 65535)}
+                  disabled
                   min="0"
                   max="65535"
                 />
