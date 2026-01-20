@@ -8,17 +8,935 @@ This document provides comprehensive guidelines for creating mobile-friendly, re
 
 ## Table of Contents
 
-1. [Technical Stack & Foundation](#technical-stack--foundation)
-2. [Project Architecture & Organization](#project-architecture--organization)
-3. [Responsive Design Principles](#responsive-design-principles)
-4. [Component Design Patterns](#component-design-patterns)
-5. [State Management](#state-management)
-6. [User Experience (UX) Features](#user-experience-ux-features)
-7. [Accessibility Requirements](#accessibility-requirements)
-8. [Performance Optimization](#performance-optimization)
-9. [Code Quality Standards](#code-quality-standards)
-10. [Error Handling & Resilience](#error-handling--resilience)
-11. [Testing Considerations](#testing-considerations)
+1. [Visual Design & Contextual Aesthetics](#visual-design--contextual-aesthetics)
+2. [Technical Stack & Foundation](#technical-stack--foundation)
+3. [Project Architecture & Organization](#project-architecture--organization)
+4. [Responsive Design Principles](#responsive-design-principles)
+5. [Component Design Patterns](#component-design-patterns)
+6. [State Management](#state-management)
+7. [User Experience (UX) Features](#user-experience-ux-features)
+8. [Accessibility Requirements](#accessibility-requirements)
+9. [Performance Optimization](#performance-optimization)
+10. [Code Quality Standards](#code-quality-standards)
+11. [Error Handling & Resilience](#error-handling--resilience)
+12. [Testing Considerations](#testing-considerations)
+
+---
+
+## Visual Design & Contextual Aesthetics
+
+### Philosophy: Design Should Match Context
+
+While the technical guidelines in this document are universal, **visual design should be contextually appropriate** to the application's domain, purpose, and target audience. A Pokemon save editor should feel different from a financial dashboard, which should feel different from a recipe app.
+
+**Key Principle:** Analyze the domain first, then choose visual aesthetics that reinforce the application's purpose and create an cohesive, memorable experience.
+
+---
+
+### Step 1: Domain Analysis
+
+Before writing any CSS, ask these questions:
+
+1. **What is this application about?**
+   - Subject matter (gaming, finance, education, entertainment, etc.)
+   - User expectations and mental models
+   - Industry conventions and familiar patterns
+
+2. **Who are the users?**
+   - Demographics and preferences
+   - Technical sophistication
+   - Device usage patterns (mobile-first, desktop power users, etc.)
+
+3. **What feeling should it evoke?**
+   - Professional and trustworthy (banking, healthcare)
+   - Playful and creative (games, social media)
+   - Minimal and focused (productivity tools)
+   - Nostalgic and familiar (retro themes)
+   - Modern and cutting-edge (tech products)
+
+4. **What are the core metaphors?**
+   - Does it mirror a physical object? (notebook, dashboard, deck of cards)
+   - Does it reference a specific era or style? (retro gaming, brutalism, neumorphism)
+   - Are there domain-specific UI patterns? (trading charts, game inventories, timelines)
+
+---
+
+### Step 2: Choosing Visual Direction
+
+Based on domain analysis, select an appropriate aesthetic direction:
+
+#### Gaming & Entertainment
+**Characteristics:**
+- Bold, vibrant colors
+- Playful typography (pixel fonts, rounded sans-serifs)
+- Animations and micro-interactions
+- Visual effects (shadows, glows, particles)
+- Thematic consistency with game/content
+
+**Example: Retro Game Save Editor**
+```css
+:root {
+  /* Pixel/retro gaming aesthetic */
+  --pixel-font-family: 'Press Start 2P', monospace;
+  --pixel-border-width: 3px;
+  --pixel-shadow: rgba(10, 14, 39, 0.25);
+
+  /* Color palette matching game theme */
+  --accent: #8b1538; /* Deep crimson for Pokemon Radical Red */
+  --bg: #f8f7f3; /* Vintage paper tone */
+
+  /* Retro effects */
+  --scanline-pattern: repeating-linear-gradient(
+    0deg,
+    rgba(10, 14, 39, 0.04),
+    rgba(10, 14, 39, 0.04) 1px,
+    transparent 1px,
+    transparent 4px
+  );
+  --glassmorphism-blur: 18px;
+}
+
+body {
+  font-family: 'DotGothic16', monospace;
+  background-image: var(--scanline-pattern);
+}
+
+.button {
+  border: var(--pixel-border-width) solid var(--accent);
+  box-shadow: 4px 4px 0 var(--pixel-shadow);
+  font-family: var(--pixel-font-family);
+  text-transform: uppercase;
+}
+```
+
+#### Professional & Business
+**Characteristics:**
+- Clean, minimal layouts
+- Professional typography (Inter, SF Pro, Roboto)
+- Muted, sophisticated colors
+- Subtle shadows and depth
+- Data visualization friendly
+
+**Example: Analytics Dashboard**
+```css
+:root {
+  /* Professional color palette */
+  --primary: #0066cc; /* Trust-building blue */
+  --bg: #ffffff;
+  --surface: #f8f9fa;
+  --text: #1a1a1a;
+  --text-secondary: #6c757d;
+  --border: #dee2e6;
+
+  /* Refined shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+
+  /* Spacing scale */
+  --spacing-unit: 8px;
+  --border-radius: 8px;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  letter-spacing: -0.011em;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-sm);
+  padding: calc(var(--spacing-unit) * 3);
+}
+```
+
+#### Creative & Artistic
+**Characteristics:**
+- Bold typography and creative layouts
+- Vibrant or unconventional color palettes
+- Generous whitespace
+- Asymmetric layouts
+- Expressive visual effects
+
+**Example: Portfolio Website**
+```css
+:root {
+  /* Vibrant, creative palette */
+  --primary: #ff6b6b; /* Energetic coral */
+  --secondary: #4ecdc4; /* Refreshing teal */
+  --accent: #ffe66d; /* Warm yellow */
+  --bg: #f7f7f7;
+  --text: #2d3436;
+
+  /* Dynamic typography */
+  --font-display: 'Playfair Display', serif;
+  --font-body: 'Roboto', sans-serif;
+
+  /* Expressive shadows */
+  --shadow-creative: 12px 12px 0 rgba(0, 0, 0, 0.1);
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.featured-work {
+  border: 3px solid var(--text);
+  box-shadow: var(--shadow-creative);
+  transition: transform 0.3s ease;
+}
+
+.featured-work:hover {
+  transform: translate(-4px, -4px);
+  box-shadow: 16px 16px 0 rgba(0, 0, 0, 0.1);
+}
+```
+
+#### Productivity & Tools
+**Characteristics:**
+- Minimal, distraction-free interface
+- Monochromatic or low-contrast palettes
+- Functional typography (system fonts)
+- Fast, snappy interactions
+- Keyboard-first design
+
+**Example: Text Editor / Note App**
+```css
+:root {
+  /* Minimal palette */
+  --bg: #fafafa;
+  --surface: #ffffff;
+  --text: #333333;
+  --text-muted: #999999;
+  --accent: #5865f2;
+  --border: #e8e8e8;
+
+  /* System fonts for familiarity */
+  --font-mono: 'SF Mono', 'Consolas', 'Monaco', monospace;
+  --font-ui: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  /* Subtle transitions */
+  --transition-fast: 120ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body {
+  font-family: var(--font-ui);
+  background: var(--bg);
+  color: var(--text);
+}
+
+.editor {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 1.8;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 24px;
+}
+
+.button {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  transition: color var(--transition-fast);
+}
+
+.button:hover {
+  color: var(--text);
+}
+```
+
+#### E-commerce & Retail
+**Characteristics:**
+- Product-focused layouts
+- Trust-building elements (badges, reviews)
+- Clear CTAs with conversion optimization
+- High-quality imagery
+- Established e-commerce patterns
+
+**Example: Online Store**
+```css
+:root {
+  /* Trustworthy, conversion-focused palette */
+  --primary: #16a34a; /* Green for CTAs */
+  --bg: #ffffff;
+  --surface: #f9fafb;
+  --text: #111827;
+  --text-secondary: #6b7280;
+  --border: #e5e7eb;
+  --success: #10b981;
+  --warning: #f59e0b;
+
+  /* E-commerce spacing */
+  --product-gap: 24px;
+  --border-radius: 12px;
+
+  /* Shadows for product cards */
+  --shadow-product: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-product-hover: 0 8px 16px rgba(0, 0, 0, 0.12);
+}
+
+.product-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-product);
+  transition: all 0.2s ease;
+}
+
+.product-card:hover {
+  box-shadow: var(--shadow-product-hover);
+  transform: translateY(-2px);
+}
+
+.add-to-cart {
+  background: var(--primary);
+  color: white;
+  font-weight: 600;
+  padding: 14px 28px;
+  border-radius: 8px;
+  border: none;
+  width: 100%;
+}
+```
+
+---
+
+### Step 3: Design System with CSS Custom Properties
+
+Always build a cohesive design system using CSS custom properties (variables):
+
+#### Essential Design Tokens
+
+```css
+:root {
+  /* ===== COLORS ===== */
+  /* Backgrounds */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --bg-tertiary: #e9ecef;
+
+  /* Surfaces (cards, modals) */
+  --surface: #ffffff;
+  --surface-elevated: #ffffff;
+
+  /* Text */
+  --text-primary: #1a1a1a;
+  --text-secondary: #6c757d;
+  --text-tertiary: #adb5bd;
+
+  /* Borders */
+  --border-color: #dee2e6;
+  --border-color-strong: #adb5bd;
+
+  /* Brand colors */
+  --brand-primary: #0066cc;
+  --brand-secondary: #6610f2;
+  --brand-accent: #fd7e14;
+
+  /* Semantic colors */
+  --success: #28a745;
+  --warning: #ffc107;
+  --error: #dc3545;
+  --info: #17a2b8;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15);
+
+  /* ===== TYPOGRAPHY ===== */
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-serif: Georgia, Cambria, 'Times New Roman', serif;
+  --font-mono: 'SF Mono', 'Consolas', 'Monaco', monospace;
+
+  /* Font sizes (responsive via clamp) */
+  --text-xs: 0.75rem;    /* 12px */
+  --text-sm: 0.875rem;   /* 14px */
+  --text-base: 1rem;     /* 16px */
+  --text-lg: 1.125rem;   /* 18px */
+  --text-xl: 1.25rem;    /* 20px */
+  --text-2xl: 1.5rem;    /* 24px */
+  --text-3xl: 1.875rem;  /* 30px */
+  --text-4xl: 2.25rem;   /* 36px */
+
+  /* Font weights */
+  --font-normal: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+
+  /* Line heights */
+  --leading-tight: 1.25;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.75;
+
+  /* ===== SPACING ===== */
+  --spacing-1: 0.25rem;  /* 4px */
+  --spacing-2: 0.5rem;   /* 8px */
+  --spacing-3: 0.75rem;  /* 12px */
+  --spacing-4: 1rem;     /* 16px */
+  --spacing-5: 1.25rem;  /* 20px */
+  --spacing-6: 1.5rem;   /* 24px */
+  --spacing-8: 2rem;     /* 32px */
+  --spacing-10: 2.5rem;  /* 40px */
+  --spacing-12: 3rem;    /* 48px */
+  --spacing-16: 4rem;    /* 64px */
+
+  /* ===== BORDERS ===== */
+  --border-width-thin: 1px;
+  --border-width-medium: 2px;
+  --border-width-thick: 4px;
+
+  --border-radius-sm: 4px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+  --border-radius-xl: 16px;
+  --border-radius-full: 9999px;
+
+  /* ===== TRANSITIONS ===== */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ===== Z-INDEX SCALE ===== */
+  --z-dropdown: 1000;
+  --z-sticky: 1020;
+  --z-fixed: 1030;
+  --z-modal-backdrop: 1040;
+  --z-modal: 1050;
+  --z-popover: 1060;
+  --z-tooltip: 1070;
+}
+
+/* Dark mode variants */
+:root.dark-mode {
+  --bg-primary: #1a1a1a;
+  --bg-secondary: #2d2d2d;
+  --bg-tertiary: #404040;
+
+  --surface: #2d2d2d;
+  --surface-elevated: #404040;
+
+  --text-primary: #ffffff;
+  --text-secondary: #b0b0b0;
+  --text-tertiary: #808080;
+
+  --border-color: #404040;
+  --border-color-strong: #606060;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.6);
+}
+```
+
+---
+
+### Step 4: Typography Selection
+
+Choose fonts that reinforce your aesthetic direction:
+
+#### Font Pairing Strategies
+
+1. **Classic Professional:**
+   ```css
+   --font-display: 'Inter', sans-serif;
+   --font-body: 'Inter', sans-serif;
+   ```
+
+2. **Editorial / Content-Heavy:**
+   ```css
+   --font-display: 'Playfair Display', serif; /* Headers */
+   --font-body: 'Source Sans Pro', sans-serif; /* Body text */
+   ```
+
+3. **Technical / Developer Tools:**
+   ```css
+   --font-ui: -apple-system, BlinkMacSystemFont, sans-serif;
+   --font-code: 'JetBrains Mono', 'Fira Code', monospace;
+   ```
+
+4. **Retro / Gaming:**
+   ```css
+   --font-display: 'Press Start 2P', monospace;
+   --font-body: 'DotGothic16', monospace;
+   ```
+
+5. **Modern / Minimal:**
+   ```css
+   --font-display: 'Sohne', 'Helvetica Neue', sans-serif;
+   --font-body: system-ui, sans-serif;
+   ```
+
+#### Typography Best Practices
+
+```css
+body {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  letter-spacing: -0.011em; /* Slight negative tracking for modern look */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: var(--font-bold);
+  line-height: var(--leading-tight);
+  letter-spacing: -0.02em; /* Tighter for large text */
+}
+
+/* Responsive typography with clamp */
+h1 {
+  font-size: clamp(2rem, 5vw, 3rem);
+}
+
+h2 {
+  font-size: clamp(1.5rem, 4vw, 2.25rem);
+}
+
+/* Optimize for readability */
+p {
+  max-width: 65ch; /* Optimal line length */
+  line-height: var(--leading-relaxed);
+}
+
+/* Code/monospace text */
+code, pre {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+}
+```
+
+---
+
+### Step 5: Color Psychology & Palette Creation
+
+#### Color Psychology Guide
+
+| Color | Associations | Best For |
+|-------|-------------|----------|
+| **Blue** | Trust, stability, professionalism | Finance, healthcare, business software |
+| **Green** | Growth, health, success | E-commerce CTAs, health apps, environmental |
+| **Red** | Energy, urgency, passion | Gaming, entertainment, alerts, sales |
+| **Purple** | Creativity, luxury, spirituality | Creative tools, premium products |
+| **Orange** | Enthusiasm, affordability, fun | Social media, food, entertainment |
+| **Yellow** | Optimism, clarity, warmth | Education, children's apps, warnings |
+| **Gray** | Neutrality, sophistication | Professional, minimal, backgrounds |
+| **Black** | Luxury, elegance, power | Premium brands, fashion, photography |
+
+#### Creating a Cohesive Palette
+
+```css
+:root {
+  /* Start with a primary brand color */
+  --brand-primary: #0066cc;
+
+  /* Generate shades (lighter and darker variants) */
+  --brand-50: #e6f2ff;   /* Very light */
+  --brand-100: #b3d9ff;  /* Light */
+  --brand-200: #80bfff;  /* Light-medium */
+  --brand-300: #4da6ff;  /* Medium */
+  --brand-400: #1a8cff;  /* Medium-dark */
+  --brand-500: #0066cc;  /* Base (primary) */
+  --brand-600: #0052a3;  /* Dark */
+  --brand-700: #003d7a;  /* Darker */
+  --brand-800: #002952;  /* Very dark */
+  --brand-900: #001429;  /* Almost black */
+
+  /* Use shades contextually */
+  --button-bg: var(--brand-500);
+  --button-hover: var(--brand-600);
+  --button-active: var(--brand-700);
+  --link-color: var(--brand-600);
+  --focus-ring: var(--brand-200);
+}
+```
+
+**Tools for palette generation:**
+- Use HSL instead of hex for easier manipulation
+- Generate shades by adjusting lightness
+- Maintain consistent saturation for harmony
+
+```css
+:root {
+  /* HSL for easier shade generation */
+  --primary-h: 210;   /* Hue */
+  --primary-s: 100%;  /* Saturation */
+
+  /* Generate shades by adjusting lightness (L) */
+  --primary-50: hsl(var(--primary-h), var(--primary-s), 95%);
+  --primary-100: hsl(var(--primary-h), var(--primary-s), 85%);
+  --primary-500: hsl(var(--primary-h), var(--primary-s), 50%);
+  --primary-900: hsl(var(--primary-h), var(--primary-s), 15%);
+}
+```
+
+---
+
+### Step 6: Visual Effects & Micro-Interactions
+
+Add personality through subtle details:
+
+#### Shadows & Depth
+
+```css
+/* Soft, modern shadows */
+.card {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08),
+              0 1px 2px rgba(0, 0, 0, 0.12);
+}
+
+.card:hover {
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12),
+              0 6px 6px rgba(0, 0, 0, 0.08);
+}
+
+/* Retro/pixel shadows */
+.pixel-button {
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.25);
+}
+
+/* Neumorphism (subtle) */
+.neumorphic {
+  background: #e0e5ec;
+  box-shadow: 9px 9px 16px rgba(163, 177, 198, 0.6),
+              -9px -9px 16px rgba(255, 255, 255, 0.5);
+}
+
+/* Glassmorphism */
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+```
+
+#### Transitions & Animations
+
+```css
+/* Smooth, purposeful transitions */
+button {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Loading states */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.loading {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Fade in content */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.4s ease-out;
+}
+```
+
+#### Hover & Focus States
+
+```css
+/* Clear, accessible hover states */
+.interactive-element {
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.interactive-element::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: inherit;
+  background: var(--accent);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  z-index: -1;
+}
+
+.interactive-element:hover::before {
+  opacity: 0.1;
+}
+
+/* Focus states for accessibility */
+.interactive-element:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+```
+
+---
+
+### Step 7: Domain-Specific Patterns
+
+Apply UI patterns that match the domain:
+
+#### Data Dashboards
+- Card-based layouts with metrics
+- Charts and data visualizations
+- Filters and date pickers
+- Tables with sorting
+- KPI highlights
+
+#### Content Platforms
+- Hero sections with imagery
+- Card grids for articles/posts
+- Tags and categories
+- Search and filtering
+- Pagination or infinite scroll
+
+#### E-commerce
+- Product grids with imagery
+- Shopping cart and checkout flow
+- Product detail pages
+- Reviews and ratings
+- Wishlist and favorites
+
+#### Gaming / Entertainment
+- Inventory-style grids
+- Character/item cards
+- Stats and progression bars
+- Achievement badges
+- Leaderboards and rankings
+
+#### Productivity Tools
+- Sidebar navigation
+- Command palette (Cmd+K)
+- Keyboard shortcuts
+- Split views and panels
+- Quick actions and shortcuts
+
+---
+
+### Examples: Matching Design to Domain
+
+#### Example 1: Pokemon Save Editor (Retro Gaming)
+
+**Domain Analysis:**
+- **Subject:** Pokemon game data, ROM hack tools
+- **Users:** Gamers, ROM hackers, nostalgic players
+- **Feeling:** Nostalgic, playful, retro gaming aesthetic
+- **Metaphors:** Game Boy/GBA era, PC storage boxes, trainer bags
+
+**Design Decisions:**
+```css
+:root {
+  /* Retro gaming palette */
+  --font-pixel: 'Press Start 2P', monospace;
+  --font-retro: 'DotGothic16', monospace;
+  --accent: #8b1538; /* Radical Red theme color */
+  --bg: #f8f7f3; /* Vintage paper */
+  --pixel-border: 3px;
+
+  /* CRT screen effect */
+  --scanlines: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.04),
+    rgba(0, 0, 0, 0.04) 1px,
+    transparent 1px,
+    transparent 4px
+  );
+}
+
+body {
+  font-family: var(--font-retro);
+  background-image: var(--scanlines);
+}
+
+.box-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr); /* Classic PC box layout */
+  gap: 14px;
+}
+
+.pokemon-slot {
+  border: var(--pixel-border) solid var(--border);
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.25); /* Pixel shadow */
+  backdrop-filter: blur(18px); /* Glassmorphism */
+}
+
+button {
+  font-family: var(--font-pixel);
+  text-transform: uppercase;
+  border: var(--pixel-border) solid var(--accent);
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.25);
+}
+```
+
+#### Example 2: Financial Dashboard (Professional)
+
+**Domain Analysis:**
+- **Subject:** Financial data, analytics, reporting
+- **Users:** Business professionals, analysts
+- **Feeling:** Trustworthy, professional, data-focused
+- **Metaphors:** Spreadsheets, reports, charts
+
+**Design Decisions:**
+```css
+:root {
+  /* Professional palette */
+  --font-sans: 'Inter', -apple-system, sans-serif;
+  --primary: #0066cc; /* Trust-building blue */
+  --bg: #ffffff;
+  --surface: #f8f9fa;
+  --text: #1a1a1a;
+  --border: #dee2e6;
+
+  /* Subtle, refined shadows */
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.6;
+  letter-spacing: -0.011em;
+}
+
+.metric-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: var(--shadow);
+}
+
+.data-table {
+  font-variant-numeric: tabular-nums; /* Aligned numbers */
+  font-feature-settings: 'tnum'; /* Tabular numerals */
+}
+
+button {
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 20px;
+  font-weight: 500;
+}
+```
+
+#### Example 3: Recipe App (Warm & Inviting)
+
+**Domain Analysis:**
+- **Subject:** Cooking, food, recipes
+- **Users:** Home cooks, food enthusiasts
+- **Feeling:** Warm, inviting, appetizing, approachable
+- **Metaphors:** Recipe cards, cookbooks, kitchen
+
+**Design Decisions:**
+```css
+:root {
+  /* Warm, appetizing palette */
+  --font-display: 'Playfair Display', serif;
+  --font-body: 'Source Sans Pro', sans-serif;
+  --primary: #d4773c; /* Warm terracotta */
+  --accent: #6b9080; /* Fresh herb green */
+  --bg: #fdfcf9; /* Cream */
+  --surface: #ffffff;
+  --text: #2d2d2d;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  color: var(--primary);
+}
+
+.recipe-card {
+  background: var(--surface);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease;
+}
+
+.recipe-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.recipe-image {
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
+button.save-recipe {
+  background: var(--accent);
+  color: white;
+  border-radius: 24px;
+  padding: 12px 24px;
+}
+```
+
+---
+
+### Checklist: Creating Contextually Appropriate Design
+
+Before starting implementation, ensure you've addressed:
+
+- [ ] **Analyzed the domain** and identified core metaphors
+- [ ] **Chosen an aesthetic direction** that matches user expectations
+- [ ] **Created a design system** with CSS custom properties for colors, typography, spacing
+- [ ] **Selected appropriate typography** that reinforces the brand/purpose
+- [ ] **Built a cohesive color palette** with semantic meaning
+- [ ] **Implemented dark mode** (if appropriate) with proper theme switching
+- [ ] **Added micro-interactions** and transitions for polish
+- [ ] **Used domain-appropriate UI patterns** (grids, cards, tables, etc.)
+- [ ] **Maintained consistency** across all components and pages
+- [ ] **Tested accessibility** (contrast ratios, font sizes, touch targets)
+- [ ] **Verified responsive behavior** across mobile, tablet, and desktop
+
+---
+
+### Key Principles Summary
+
+1. **Context First:** Always analyze the domain before choosing visual aesthetics
+2. **Cohesive Systems:** Use CSS custom properties to create consistent design systems
+3. **Meaningful Choices:** Every design decision (color, typography, spacing) should reinforce the application's purpose
+4. **Polish Matters:** Subtle details (shadows, transitions, hover states) create memorable experiences
+5. **User Expectations:** Match industry conventions while adding unique personality
+6. **Accessibility Always:** Beautiful design must be accessible to all users
+
+By following these guidelines, every web application you create will have a unique, contextually appropriate visual identity while maintaining technical excellence.
 
 ---
 
