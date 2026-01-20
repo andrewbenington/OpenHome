@@ -293,6 +293,14 @@ body {
   backdrop-filter: blur(var(--glassmorphism-blur));
 }
 
+.wireframe-input:disabled {
+  background-color: var(--panel-muted);
+  border-color: var(--border);
+  color: var(--text-muted);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
 .wireframe-input:focus {
   outline: none;
   border-color: var(--accent-strong);
@@ -932,6 +940,29 @@ body {
   color: var(--text-muted);
   font-weight: 600;
   font-family: var(--pixel-font-family);
+}
+
+.is-locked .trainer-field-label,
+.is-locked .form-label {
+  color: var(--text-muted);
+  opacity: 0.7;
+}
+
+.is-locked .icon {
+  color: var(--text-muted);
+}
+
+.field-lock-indicator {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 6px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--panel-muted);
+  font-size: 9px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
 }
 
 .save-action-buttons {

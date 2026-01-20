@@ -612,15 +612,16 @@ export const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
               </div>
             </div>
             <div className="form-row">
-              <div className="form-group">
+              <div className="form-group is-locked">
                 <label className="form-label">Experience</label>
                 <input
                   type="number"
                   className="wireframe-input"
                   value={pokemon.exp ?? ''}
-                  {...createNumberInputHandlers('exp', 0, 16777215, 0)}
+                  disabled
                   min="0"
                 />
+                <div className="helper-text">Locked to level progression.</div>
               </div>
               <div className="form-group">
                 <label className="form-label">Nature</label>
