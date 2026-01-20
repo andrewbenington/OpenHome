@@ -91,9 +91,9 @@ export default function FilterPanel() {
 
   const ALL_BALLS: SelectOption[] = getAllBalls()
     .sort((a, b) => a.name.localeCompare(b.name))
-    .map(({ name, id }) => ({
+    .map(({ name, index }) => ({
     label: name,
-    id,
+    id: index,
   }))
 
   const ALL_ITEMS: SelectOption[] = getAllItems().map(itemMetadataToSelectOption)
