@@ -1,6 +1,7 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
 import SheenStars from '@openhome-ui/components/pokemon/SheenStars'
+import StatsTable from '@openhome-ui/components/pokemon/StatsTable'
 import { Stats as PkmRsStats, StatsPreSplit } from '@pkm-rs/pkg'
 import {
   GEN2_TRANSFER_RESTRICTIONS,
@@ -27,7 +28,6 @@ import {
   isStatsPreSplit,
   Stats,
 } from '../../../../packages/pokemon-files/src'
-import StatsTable from '../../components/pokemon/StatsTable'
 import { colorIsDark } from '../../util/color'
 
 function getMaxValue(stat: string, evType?: string): number | undefined {

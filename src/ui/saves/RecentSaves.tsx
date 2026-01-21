@@ -1,5 +1,7 @@
+import { PluginIdentifier } from '@openhome-core/save/interfaces'
 import { getPluginIdentifier } from '@openhome-core/save/util'
 import { PathData, splitPath } from '@openhome-core/save/util/path'
+import { R } from '@openhome-core/util/functional'
 import {
   filterUndefined,
   numericSorter,
@@ -10,14 +12,14 @@ import { SaveRef } from '@openhome-core/util/types'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
 import OpenHomeCtxMenu from '@openhome-ui/components/context-menu/OpenHomeCtxMenu'
 import { ErrorIcon } from '@openhome-ui/components/Icons'
+import { OriginGameIndicator } from '@openhome-ui/components/pokemon/indicator/OriginGame'
+import SortableDataGrid from '@openhome-ui/components/SortableDataGrid'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import { AppInfoContext } from '@openhome-ui/state/appInfo'
 import { useSaves } from '@openhome-ui/state/saves'
 import { OriginGames } from '@pkm-rs/pkg'
 import { Flex } from '@radix-ui/themes'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
-import { R } from 'src/core/util/functional'
-import SortableDataGrid from 'src/ui/components/SortableDataGrid'
 import SaveCard from './SaveCard'
 import { buildRecentSaveContextElements, formatTime, formatTimeSince, SaveViewMode } from './util'
 
@@ -116,37 +118,19 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
     {
       key: 'game',
       name: 'Game',
-      width: '8rem',
-      renderValue: (value) =>
-        value.game ? (
-          <img
-            alt="save logo"
-            height={40}
-            src={
-              value.pluginIdentifier
-                ? `logos/${value.pluginIdentifier}.png`
-                : OriginGames.logoPath(value.game)
-            }
+      width: '10rem',
+      renderValue: (value) => (
+        <div className="flex-row-centered">
+          <OriginGameIndicator
+            originGame={value.game ?? undefined}
+            plugin={value.pluginIdentifier as PluginIdentifier}
+            withName
+            tooltip={value.filePath.raw}
           />
-        ) : (
-          ''
-        ),
+        </div>
+      ),
       sortFunction: numericSorter((val) => val.game ?? -1),
-      cellClass: 'centered-cell',
-    },
-    {
-      key: 'game_origin',
-      name: 'Origin',
-      width: '8rem',
-      renderValue: (value) => value.game,
-      sortFunction: numericSorter((val) => val.game ?? -1),
-      cellClass: 'centered-cell',
-    },
-    {
-      key: 'pluginIdentifier',
-      name: 'Plugin',
-      width: '8rem',
-      sortFunction: stringSorter((val) => val.pluginIdentifier ?? ''),
+      getFilterValue: (val) => OriginGames.gameName(val.game ?? -1),
       cellClass: 'centered-cell',
     },
     {

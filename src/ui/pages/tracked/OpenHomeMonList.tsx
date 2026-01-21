@@ -1,12 +1,12 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { PluginIdentifier } from '@openhome-core/save/interfaces'
 import { multiSorter, numericSorter, SortableColumn, stringSorter } from '@openhome-core/util/sort'
+import { OriginGameIndicator } from '@openhome-ui/components/pokemon/indicator/OriginGame'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
+import SortableDataGrid from '@openhome-ui/components/SortableDataGrid'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
+import { useSaves } from '@openhome-ui/state/saves'
 import { MetadataLookup } from '@pkm-rs/pkg'
-import { OriginGameIndicator } from 'src/ui/components/pokemon/indicator/OriginGame'
-import SortableDataGrid from 'src/ui/components/SortableDataGrid'
-import { useSaves } from 'src/ui/state/saves'
-import { PluginIdentifier } from '../../../core/save/interfaces'
 import './style.css'
 
 export type OpenHomeMonListProps = {
@@ -86,9 +86,7 @@ export default function OpenHomeMonList({ onSelectMon }: OpenHomeMonListProps) {
       name: 'Last Save',
       width: '9rem',
       renderValue: (value) => (
-        <div
-          style={{ width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'center' }}
-        >
+        <div className="flex-row-centered">
           <OriginGameIndicator
             originGame={value.mostRecentSaveWasm?.game}
             withName
@@ -109,9 +107,7 @@ export default function OpenHomeMonList({ onSelectMon }: OpenHomeMonListProps) {
       name: 'Original Game',
       width: '10rem',
       renderValue: (value) => (
-        <div
-          style={{ width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'center' }}
-        >
+        <div className="flex-row-centered">
           <OriginGameIndicator
             originGame={value.gameOfOrigin}
             plugin={value.pluginOrigin as PluginIdentifier}
