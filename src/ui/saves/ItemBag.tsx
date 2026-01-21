@@ -20,22 +20,20 @@ export default function ItemBag() {
             })
             .sort((a, b) => a.validatedIndex.name.localeCompare(b.validatedIndex.name))
             .map(({ validatedIndex, count, index }) => (
-                <Flex className="item-bag-slot" key={index} align="center" justify="center">
-                  {validatedIndex ? (
-                    <DraggableItem item={validatedIndex} count={count} />
-                  ) : (
-                    <img
-                      src="/items/index/0000.png"
-                      alt=""
-                      aria-hidden
-                      draggable={false}
-                      style={{ opacity: 0 }}
-                    />
-                  )}
-                </Flex>
-              )
-            )
-          }
+              <Flex className="item-bag-slot" key={index} align="center" justify="center">
+                {validatedIndex ? (
+                  <DraggableItem item={validatedIndex} count={count} />
+                ) : (
+                  <img
+                    src="/items/index/0000.png"
+                    alt=""
+                    aria-hidden
+                    draggable={false}
+                    style={{ opacity: 0 }}
+                  />
+                )}
+              </Flex>
+            ))}
         </Grid>
       </DroppableSpace>
     </Flex>
