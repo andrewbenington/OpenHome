@@ -16,8 +16,10 @@ export default function ItemBag() {
             .map(([indexStr, count]) => {
               const index = parseInt(indexStr)
               const validatedIndex = Item.fromIndex(index)
-
-              return (
+              return { validatedIndex, count, index }
+            })
+            .sort((a, b) => a.validatedIndex.name.localeCompare(b.validatedIndex.name))
+            .map(({ validatedIndex, count, index }) => (
                 <Flex className="item-bag-slot" key={index} align="center" justify="center">
                   {validatedIndex ? (
                     <DraggableItem item={validatedIndex} count={count} />
@@ -32,7 +34,8 @@ export default function ItemBag() {
                   )}
                 </Flex>
               )
-            })}
+            )
+          }
         </Grid>
       </DroppableSpace>
     </Flex>
