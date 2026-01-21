@@ -75,6 +75,17 @@ export function dayjsSorter<T>(func: (val: T) => Dayjs | undefined) {
   }
 }
 
+export function multiSorter<T>(...sorters: Sorter<T>[]): Sorter<T> {
+  return (a: T, b: T) => {
+    for (const sorter of sorters) {
+      const diff = sorter(a, b)
+
+      if (diff !== 0) return diff
+    }
+    return 0
+  }
+}
+
 export function filterUndefined<T>(value: T | undefined | null): value is T {
   return value !== undefined && value !== null
 }

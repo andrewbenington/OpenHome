@@ -18,11 +18,7 @@ const RR_TRANSFER_RESTRICTIONS: TransferRestrictions = {
 export class G3RRSAV extends G3CFRUSAV<PK3RR> {
   static transferRestrictions: TransferRestrictions = RR_TRANSFER_RESTRICTIONS
 
-  pluginIdentifier = 'radical_red'
-
-  get gameName() {
-    return 'Radical Red'
-  }
+  pluginIdentifier = 'radical_red' as const
 
   convertOhpkm(ohpkm: OHPKM): PK3RR {
     return new PK3RR(ohpkm)

@@ -1,4 +1,4 @@
-import { ContextMenu, Flex } from '@radix-ui/themes'
+import { Flex } from '@radix-ui/themes'
 import { isDayjs } from 'dayjs'
 import { ReactNode, useMemo, useRef, useState, type RefAttributes } from 'react'
 import {
@@ -20,6 +20,14 @@ import {
   SortType,
   stringSorter,
 } from 'src/core/util/sort'
+import {
+  CheckboxBuilder,
+  ItemBuilder,
+  LabelBuilder,
+  OpenHomeCtxMenu,
+  SeparatorBuilder,
+  SubmenuBuilder,
+} from './context-menu'
 import './context-menu.css'
 import { DropdownArrowIcon } from './Icons'
 import './style.css'
@@ -169,7 +177,7 @@ export default function SortableDataGrid<R extends SortableValue>(props: Sortabl
 
   // The data grid library only accepts a row height in pixels, so we need to manually calculate it
   // based on the site ui scaling
-  const baseRowHeight = rowHeight ?? 40
+  const baseRowHeight = rowHeight ?? 28
   const scalingVar = getComputedStyle(document.documentElement).getPropertyValue('--scaling').trim()
   const scaling = parseFloat(scalingVar) || 1
   const scaledRowHeight =
@@ -196,20 +204,18 @@ export default function SortableDataGrid<R extends SortableValue>(props: Sortabl
             renderCell: hasRenderValueMethod(col)
               ? (value: RenderCellProps<R>) => col.renderValue(value.row)
               : col.renderCell,
-            renderHeaderCell:
-              col.renderHeaderCell ??
-              ((props: RenderHeaderCellProps<R>) => (
-                <HeaderWithContextMenu
-                  column={props.column}
-                  columns={columns}
-                  sortColumns={sortColumns}
-                  rows={sortedRows}
-                  filters={filters}
-                  setFilters={setFilters}
-                  hiddenColumns={hiddenColumns}
-                  setHiddenColumns={setHiddenColumns}
-                />
-              )),
+            renderHeaderCell: (props: RenderHeaderCellProps<R>) => (
+              <HeaderWithContextMenu
+                column={props.column}
+                columns={columns}
+                sortColumns={sortColumns}
+                rows={sortedRows}
+                filters={filters}
+                setFilters={setFilters}
+                hiddenColumns={hiddenColumns}
+                setHiddenColumns={setHiddenColumns}
+              />
+            ),
           }))}
         sortColumns={sortColumns}
         onSortColumnsChange={(params) => setSortColumns(params)}
@@ -290,121 +296,88 @@ function HeaderWithContextMenu<R extends Record<string, unknown>>({
     [columns, hiddenColumns]
   )
 
+  const headerCtxMenuBuilders = [
+    LabelBuilder.fromComponent(column.name),
+    SeparatorBuilder,
+    getFilterValue
+      ? SubmenuBuilder.fromLabel('Filter...')
+          .withBuilder(
+            ItemBuilder.fromLabel('Deselect All').withAction(() =>
+              setFilters({ ...filters, [columnKey]: [] })
+            )
+          )
+          .withBuilders(
+            filterValues.toSorted().map((filterValue) =>
+              CheckboxBuilder.fromLabel(filterValue)
+                .handleValueChanged(() => {
+                  if (columnFilter === undefined) {
+                    setFilters({
+                      ...filters,
+                      [columnKey]: filterValues.filter((otherValue) => filterValue !== otherValue),
+                    })
+                  } else if (columnFilter.includes(filterValue)) {
+                    setFilters({
+                      ...filters,
+                      [columnKey]: columnFilter.filter((otherValue) => filterValue !== otherValue),
+                    })
+                  } else {
+                    setFilters({
+                      ...filters,
+                      [columnKey]: [...columnFilter, filterValue],
+                    })
+                  }
+                })
+                .handleIsChecked(() => !columnFilter || columnFilter.includes(filterValue))
+            )
+          )
+      : undefined,
+    getFilterValue
+      ? ItemBuilder.fromLabel('Clear Filters').withAction(() => setFilters({}))
+      : undefined,
+    getFilterValue ? SeparatorBuilder : undefined,
+    SubmenuBuilder.fromLabel('Show/Hide Columns').withBuilders(
+      columns
+        .filter((col) => !!col.name)
+        .map((col) =>
+          CheckboxBuilder.fromComponent(col.name)
+            .handleValueChanged(() => {
+              if (visibleColumnKeys.has(col.key)) {
+                if (visibleColumnKeys.size > 1) {
+                  setHiddenColumns([...hiddenColumns, col.key])
+                }
+              } else {
+                setHiddenColumns([...hiddenColumns.filter((k) => k !== col.key)])
+              }
+            })
+            .handleIsChecked(() => visibleColumnKeys.has(col.key))
+        )
+    ),
+    ItemBuilder.fromLabel('Reset to Default').withAction(() =>
+      setHiddenColumns(columns.filter((c) => c.hideByDefault).map((c) => c.key))
+    ),
+  ]
+
   return (
-    <ContextMenu.Root>
-      <ContextMenu.Trigger style={{ overflow: 'hidden' }}>
-        <Flex align="center" gap="1">
-          <div style={{ width: 0, flex: 1 }}>
-            {typeof column.name === 'string' ? (
-              <div style={{ height: '100%', display: 'grid', alignItems: 'center' }}>
-                {column.name}
-              </div>
-            ) : (
-              column.name
-            )}
-          </div>
-          {sortDirection && (
-            <DropdownArrowIcon
-              style={{
-                rotate: sortDirection === 'DESC' ? '180deg' : undefined,
-                transition: 'rotate 0.15s',
-              }}
-            />
+    <OpenHomeCtxMenu elements={headerCtxMenuBuilders}>
+      <Flex align="center" gap="1">
+        <div style={{ width: 0, flex: 1 }}>
+          {typeof column.name === 'string' ? (
+            <div style={{ height: '100%', display: 'grid', alignItems: 'center' }}>
+              {column.name}
+            </div>
+          ) : (
+            column.name
           )}
-        </Flex>
-      </ContextMenu.Trigger>
-      <ContextMenu.Content className="ContextMenuContent" onClick={(e) => e.stopPropagation()}>
-        {getFilterValue && (
-          <>
-            <ContextMenu.Sub>
-              <ContextMenu.SubTrigger>Filter...</ContextMenu.SubTrigger>
-              <ContextMenu.SubContent>
-                {filterValues.toSorted().map((filterValue) => {
-                  return (
-                    <ContextMenu.CheckboxItem
-                      className="ContextMenuCheckboxItem"
-                      key={filterValue}
-                      style={{ padding: '0px 8px' }}
-                      checked={!columnFilter || columnFilter.includes(filterValue)}
-                      // using instead of onCheckedChange to prevent closing the menu
-                      onClick={(e) => {
-                        if (columnFilter === undefined) {
-                          setFilters({
-                            ...filters,
-                            [columnKey]: filterValues.filter(
-                              (otherValue) => filterValue !== otherValue
-                            ),
-                          })
-                        } else if (columnFilter.includes(filterValue)) {
-                          setFilters({
-                            ...filters,
-                            [columnKey]: columnFilter.filter(
-                              (otherValue) => filterValue !== otherValue
-                            ),
-                          })
-                        } else {
-                          setFilters({
-                            ...filters,
-                            [columnKey]: [...columnFilter, filterValue],
-                          })
-                        }
-
-                        e.preventDefault()
-                        e.stopPropagation()
-                      }}
-                    >
-                      <div className="ContextMenuCheckboxItem" style={{ color: 'inherit' }}>
-                        {filterValue}
-                      </div>
-                    </ContextMenu.CheckboxItem>
-                  )
-                })}
-              </ContextMenu.SubContent>
-            </ContextMenu.Sub>
-            <ContextMenu.Item onClick={() => setFilters({})}>Clear Filters</ContextMenu.Item>
-            <ContextMenu.Separator className="ContextMenuSeparator" />
-          </>
+        </div>
+        {sortDirection && (
+          <DropdownArrowIcon
+            style={{
+              rotate: sortDirection === 'DESC' ? '180deg' : undefined,
+              transition: 'rotate 0.15s',
+            }}
+          />
         )}
-        <ContextMenu.Sub>
-          <ContextMenu.SubTrigger>Show/Hide Columns</ContextMenu.SubTrigger>
-          <ContextMenu.SubContent>
-            {columns
-              .filter((col) => !!col.name)
-              .map((col) => (
-                <ContextMenu.CheckboxItem
-                  className="ContextMenuCheckboxItem"
-                  key={col.key}
-                  style={{ padding: '0 0.5rem' }}
-                  checked={visibleColumnKeys.has(col.key)}
-                  disabled={visibleColumnKeys.size === 1 && visibleColumnKeys.has(col.key)}
-                  // using instead of onCheckedChange to prevent closing the menu
-                  onClick={(e) => {
-                    if (visibleColumnKeys.has(col.key)) {
-                      if (visibleColumnKeys.size > 1) {
-                        setHiddenColumns([...hiddenColumns, col.key])
-                      }
-                    } else {
-                      setHiddenColumns([...hiddenColumns.filter((k) => k !== col.key)])
-                    }
-
-                    e.preventDefault()
-                    e.stopPropagation()
-                  }}
-                >
-                  <div className="ContextMenuCheckboxItem" style={{ color: 'inherit' }}>
-                    {col.name}
-                  </div>
-                </ContextMenu.CheckboxItem>
-              ))}
-          </ContextMenu.SubContent>
-        </ContextMenu.Sub>
-        <ContextMenu.Item onClick={() => setHiddenColumns([])}>Show All Columns</ContextMenu.Item>
-        <ContextMenu.Item
-          onClick={() => setHiddenColumns(columns.filter((c) => c.hideByDefault).map((c) => c.key))}
-        >
-          Reset to Default
-        </ContextMenu.Item>
-      </ContextMenu.Content>
-    </ContextMenu.Root>
+      </Flex>
+    </OpenHomeCtxMenu>
   )
 }

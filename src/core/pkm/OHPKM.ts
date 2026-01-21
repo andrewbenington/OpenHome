@@ -35,7 +35,7 @@ import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { Gen34ContestRibbons, Gen34TowerRibbons, ModernRibbons } from '@pokemon-resources/index'
 import Prando from 'prando'
 import { OhpkmV2 as OhpkmV2Wasm } from '../../../pkm_rs/pkg'
-import { SAV } from '../save/interfaces'
+import { PluginIdentifier, SAV } from '../save/interfaces'
 import {
   contestStatsFromWasm,
   contestStatsToWasm,
@@ -126,7 +126,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       this.language = other.language
       this.gameOfOrigin = other.gameOfOrigin
       this.gameOfOriginBattle = other.gameOfOriginBattle
-      this.pluginOrigin = other.pluginOrigin
+      this.pluginOrigin = other.pluginOrigin as PluginIdentifier | undefined
 
       this.isEgg = other.isEgg ?? false
       this.pokerusByte = other.pokerusByte ?? 0
@@ -511,6 +511,14 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   }
   set shinyLeaves(value: ShinyLeaves | undefined) {
     this.shinyLeavesWasm = value
+  }
+
+  get pluginOrigin() {
+    return this.pluginOriginWasm as PluginIdentifier | undefined
+  }
+
+  set pluginOrigin(value: PluginIdentifier | undefined) {
+    this.pluginOriginWasm = value
   }
 
   // derived fields

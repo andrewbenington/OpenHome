@@ -174,9 +174,11 @@ export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implement
 
   isPlugin = true
 
-  abstract pluginIdentifier: string
+  abstract pluginIdentifier: PluginIdentifier
 
-  abstract get gameName(): string
+  get gameName(): string {
+    return pluginGameName(this.pluginIdentifier)
+  }
 
   get gameColor(): string {
     return getPluginColor(this.pluginIdentifier)
@@ -201,5 +203,23 @@ export function getSaveRef(save: SAV): SaveRef {
     lastModified: null,
     pluginIdentifier: save.isPlugin ? save.pluginIdentifier : null,
     valid: true,
+  }
+}
+export type PluginIdentifier = 'radical_red' | 'unbound'
+
+export function pluginGameName(identifier: PluginIdentifier): string {
+  switch (identifier) {
+    case 'radical_red':
+      return 'Radical Red'
+    case 'unbound':
+      return 'Unbound'
+  }
+}
+
+export function pluginOriginMarkPath(identifier: PluginIdentifier): string | undefined {
+  switch (identifier) {
+    case 'radical_red':
+    case 'unbound':
+      return '/icons/gba.png'
   }
 }

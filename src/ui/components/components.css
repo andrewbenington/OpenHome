@@ -179,14 +179,6 @@
 .datagrid {
   position: relative;
 
-  .rdg-cell {
-    border-right: none;
-
-    &:not(:last-child) {
-      padding-inline-end: 0.75rem;
-    }
-  }
-
   .rdg-row .rdg-cell {
     border-bottom: none;
     font-size: 0.8rem;
@@ -201,8 +193,6 @@
 
   .rdg-header-row {
     font-size: var(--header-font-size);
-    /* --rdg-border-color: black;
-    background-color: var(--color-panel-solid); */
     line-height: 1rem;
   }
 

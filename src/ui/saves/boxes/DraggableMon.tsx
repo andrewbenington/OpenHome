@@ -4,10 +4,10 @@ import { displayIndexAdder, isBattleFormeItem, isMegaStone } from '@openhome-cor
 import { MonWithLocation } from '@openhome-ui/state/saves'
 import { MetadataLookup } from '@pkm-rs/pkg'
 import { CSSProperties, useMemo } from 'react'
+import { TopRightIndicator } from 'src/ui/components/pokemon/indicator/TopRightIndicator'
 import PokemonIcon from '../../components/PokemonIcon'
 import { TopRightIndicatorType } from '../../hooks/useMonDisplay'
 import useDragAndDrop from '../../state/drag-and-drop/useDragAndDrop'
-import { Indicator } from '../Indicator'
 
 const getBackgroundDetails = (disabled?: boolean) => {
   if (disabled) {
@@ -60,11 +60,7 @@ const DraggableMon = (props: DraggableMonProps) => {
 
   const topRightIndicatorComponent = useMemo(
     () =>
-      topRightIndicator ? (
-        <Indicator.TopRight indicatorType={topRightIndicator} mon={mon} />
-      ) : (
-        <></>
-      ),
+      topRightIndicator ? <TopRightIndicator indicatorType={topRightIndicator} mon={mon} /> : <></>,
     [mon, topRightIndicator]
   )
 
