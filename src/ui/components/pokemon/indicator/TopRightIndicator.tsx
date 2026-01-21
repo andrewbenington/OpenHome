@@ -39,6 +39,9 @@ export function TopRightIndicator({ mon, indicatorType }: TopRightIndicatorProps
     case 'IVs/DVs (Percent)':
       const ivsOrDvsPercent = mon.ivs ? getIvsPercent(mon) : hasDvs(mon) ? getDvsPercent(mon) : 0
       return <TopRightNumericalIndicator value={ivsOrDvsPercent} percent />
+    case 'Perfect IVs Count':
+      const perfectIvsCount = getPerfectIvsCount(mon)
+      return <TopRightNumericalIndicator value={perfectIvsCount} />
     case 'Origin Game':
       return <OriginGameIndicator originGame={mon.gameOfOrigin} plugin={mon.pluginOrigin} />
     case 'Most Recent Save':
@@ -107,4 +110,9 @@ function getIvsPercent(mon: PKMInterface): number {
 function getDvsPercent(mon: PKMInterface & { dvs: StatsPreSplit }): number {
   const dvsTotal = Object.values(mon.dvs).reduce((p, c) => p + c, 0)
   return Math.round((dvsTotal / (5 * 15)) * 100)
+}
+
+function getPerfectIvsCount(mon: PKMInterface): number {
+  if (!mon.ivs) return 0
+  return Object.values(mon.ivs).filter((iv) => iv === 31).length
 }
