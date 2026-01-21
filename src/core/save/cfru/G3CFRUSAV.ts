@@ -6,7 +6,7 @@ import {
   uint32ToBytesLittleEndian,
 } from '@openhome-core/save/util/byteLogic'
 import { Gender, OriginGame } from '@pkm-rs/pkg'
-import { Box, BoxAndSlot, PluginSAV } from '../interfaces'
+import { Box, BoxAndSlot, PluginIdentifier, PluginSAV } from '../interfaces'
 import { LookupType } from '../util'
 import { PathData } from '../util/path'
 import { gen3StringToUTF } from '../util/Strings/StringConverter'
@@ -156,8 +156,7 @@ export abstract class G3CFRUSAV<T extends PluginPKMInterface> extends PluginSAV<
 
   origin = OriginGame.FireRed
   isPlugin: true = true
-  abstract pluginIdentifier: string
-  abstract get gameName(): string
+  abstract pluginIdentifier: PluginIdentifier
 
   boxRows = 5
   boxColumns = 6

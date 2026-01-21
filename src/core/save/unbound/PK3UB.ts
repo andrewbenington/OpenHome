@@ -5,6 +5,7 @@ import PK3CFRU, { CFRUToNationalDexEntry } from '../cfru/PK3CFRU'
 import { fromGen3CFRUMoveIndex, toGen3CFRUMoveIndex } from '../cfru/conversion/Gen3CFRUMovesIndex'
 import { CFRUToNationalMap } from '../cfru/conversion/Gen3CFRUMovesIndex/CFRUToNationalMap'
 import { fromGen3CRFUPokemonIndex, toGen3CRFUPokemonIndex } from '../cfru/conversion/util'
+import { PluginIdentifier } from '../interfaces'
 import { NationalDexToUnboundMap, UnboundToNationalDexMap } from './conversion/UnboundSpeciesMap'
 
 // const FAKEMON_INDEXES = [
@@ -17,7 +18,7 @@ const VALID_MOVE_INDICES_UB = Object.values(CFRUToNationalMap).filter((index) =>
 
 export default class PK3UB extends PK3CFRU implements PluginPKMInterface {
   format: 'PK3UB' = 'PK3UB'
-  pluginIdentifier: string = 'unbound'
+  pluginIdentifier: PluginIdentifier = 'unbound'
 
   selectColor: string = '#c127fe'
 
@@ -61,7 +62,7 @@ export default class PK3UB extends PK3CFRU implements PluginPKMInterface {
     return FAKEMON_INDEXES.includes(speciesIndex)
   }
 
-  getPluginIdentifier(): string {
+  getPluginIdentifier(): PluginIdentifier {
     return 'unbound'
   }
 }

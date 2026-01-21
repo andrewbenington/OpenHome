@@ -1,15 +1,20 @@
 import { getSaveRef, SAV } from '@openhome-core/save/interfaces'
 import { buildUnknownSaveFile } from '@openhome-core/save/util/load'
 import { PathData, splitPath } from '@openhome-core/save/util/path'
-import { filterUndefined, numericSorter, stringSorter } from '@openhome-core/util/sort'
+import {
+  filterUndefined,
+  numericSorter,
+  SortableColumn,
+  stringSorter,
+} from '@openhome-core/util/sort'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
-import OHDataGrid, { SortableColumn } from '@openhome-ui/components/OHDataGrid'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import { AppInfoContext } from '@openhome-ui/state/appInfo'
 import { useSaves } from '@openhome-ui/state/saves'
 import { Flex } from '@radix-ui/themes'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { R } from 'src/core/util/functional'
+import SortableDataGrid from 'src/ui/components/SortableDataGrid'
 import SaveCard from './SaveCard'
 import { filterEmpty, SaveViewMode } from './util'
 
@@ -88,7 +93,7 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
     {
       key: 'open',
       name: 'Open',
-      width: 80,
+      width: '5rem',
 
       renderCell: (params) => (
         <button
@@ -106,7 +111,7 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
     {
       key: 'game',
       name: 'Game',
-      width: 130,
+      width: '8rem',
       renderValue: (value) => {
         return value.gameLogoPath ? (
           <img alt="save logo" height={40} src={value.gameLogoPath} />
@@ -120,7 +125,7 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
     {
       key: 'trainerDetails',
       name: 'Trainer',
-      width: 160,
+      width: '10rem',
       renderValue: (params) => `${params.name} (${params.tid})`,
       sortFunction: stringSorter((save) => `${save.name} (${save.tid})`),
     },
@@ -150,7 +155,7 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
   ]
 
   return view === 'grid' ? (
-    <OHDataGrid rows={suggestedSaves ?? []} columns={columns} />
+    <SortableDataGrid rows={suggestedSaves ?? []} columns={columns} />
   ) : (
     <Flex wrap="wrap" direction="row" justify="center" m="4" gap="2">
       {suggestedSaves?.map((save) => (

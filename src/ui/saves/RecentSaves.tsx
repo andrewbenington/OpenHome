@@ -1,18 +1,25 @@
+import { PluginIdentifier } from '@openhome-core/save/interfaces'
 import { getPluginIdentifier } from '@openhome-core/save/util'
 import { PathData, splitPath } from '@openhome-core/save/util/path'
-import { filterUndefined, numericSorter, stringSorter } from '@openhome-core/util/sort'
+import { R } from '@openhome-core/util/functional'
+import {
+  filterUndefined,
+  numericSorter,
+  SortableColumn,
+  stringSorter,
+} from '@openhome-core/util/sort'
 import { SaveRef } from '@openhome-core/util/types'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
 import OpenHomeCtxMenu from '@openhome-ui/components/context-menu/OpenHomeCtxMenu'
 import { ErrorIcon } from '@openhome-ui/components/Icons'
-import OHDataGrid, { SortableColumn } from '@openhome-ui/components/OHDataGrid'
+import { OriginGameIndicator } from '@openhome-ui/components/pokemon/indicator/OriginGame'
+import SortableDataGrid from '@openhome-ui/components/SortableDataGrid'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import { AppInfoContext } from '@openhome-ui/state/appInfo'
 import { useSaves } from '@openhome-ui/state/saves'
 import { OriginGames } from '@pkm-rs/pkg'
 import { Flex } from '@radix-ui/themes'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
-import { R } from 'src/core/util/functional'
 import SaveCard from './SaveCard'
 import { buildRecentSaveContextElements, formatTime, formatTimeSince, SaveViewMode } from './util'
 
@@ -82,7 +89,7 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
     {
       key: 'open',
       name: '',
-      width: 80,
+      width: '5rem',
       renderCell: (params) =>
         params.row.valid ? (
           <button
@@ -111,57 +118,39 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
     {
       key: 'game',
       name: 'Game',
-      width: 130,
-      renderValue: (value) =>
-        value.game ? (
-          <img
-            alt="save logo"
-            height={40}
-            src={
-              value.pluginIdentifier
-                ? `logos/${value.pluginIdentifier}.png`
-                : OriginGames.logoPath(value.game)
-            }
+      width: '10rem',
+      renderValue: (value) => (
+        <div className="flex-row-centered">
+          <OriginGameIndicator
+            originGame={value.game ?? undefined}
+            plugin={value.pluginIdentifier as PluginIdentifier}
+            withName
+            tooltip={value.filePath.raw}
           />
-        ) : (
-          ''
-        ),
+        </div>
+      ),
       sortFunction: numericSorter((val) => val.game ?? -1),
-      cellClass: 'centered-cell',
-    },
-    {
-      key: 'game_origin',
-      name: 'Origin',
-      width: 130,
-      renderValue: (value) => value.game,
-      sortFunction: numericSorter((val) => val.game ?? -1),
-      cellClass: 'centered-cell',
-    },
-    {
-      key: 'pluginIdentifier',
-      name: 'Plugin',
-      width: 130,
-      sortFunction: stringSorter((val) => val.pluginIdentifier ?? ''),
+      getFilterValue: (val) => OriginGames.gameName(val.game ?? -1),
       cellClass: 'centered-cell',
     },
     {
       key: 'trainerDetails',
       name: 'Trainer',
-      width: 160,
+      width: '10rem',
       renderValue: (save) => `${save.trainerName} (${save.trainerID})`,
       sortFunction: stringSorter((save) => `${save.trainerName} (${save.trainerID})`),
     },
     {
       key: 'lastOpened',
       name: 'Last Opened',
-      width: 160,
+      width: '10rem',
       renderValue: (save) => (save.lastOpened ? formatTimeSince(save.lastOpened) : ''),
       sortFunction: numericSorter((val) => val.lastOpened ?? -1),
     },
     {
       key: 'lastModified',
       name: 'Last Modified',
-      width: 240,
+      width: '15rem',
       renderValue: (save) => (save.lastModified ? formatTime(save.lastModified) : ''),
       sortFunction: numericSorter((val) => val.lastModified ?? -1),
     },
@@ -191,7 +180,7 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
   ]
 
   return view === 'grid' ? (
-    <OHDataGrid
+    <SortableDataGrid
       rows={Object.values(recentSaves ?? {}).map((save, i) => ({
         ...save,
         index: i,
@@ -241,7 +230,7 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
         return newColumn
       })}
       defaultSort="lastOpened"
-      defaultSortDir="DESC"
+      defaultSortOrder="DESC"
       rowClass={(row) => (row.valid ? undefined : 'datagrid-error-row')}
     />
   ) : (

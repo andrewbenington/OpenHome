@@ -1,7 +1,7 @@
 import { Option } from '@openhome-core/util/functional'
 import { ReactNode } from 'react'
 
-export type Element = Item | Separator | Label | Submenu
+export type Element = Item | Separator | Label | Submenu | Checkbox
 
 export interface CtxMenuElementBuilder {
   build: () => Element
@@ -66,6 +66,9 @@ export function contentIsLabel(content: ElementContent): content is { label: str
 }
 
 type ElementContent = { label: string } | { component: ReactNode }
+export function renderContent(content: ElementContent): ReactNode {
+  return contentIsLabel(content) ? content.label : content.component
+}
 
 //* LABEL *//
 
@@ -106,7 +109,7 @@ export const SeparatorBuilder = Object.freeze({
   },
 })
 
-//* Submenu *//
+//* SUBMENU *//
 
 type Submenu = {
   content: ElementContent
@@ -153,6 +156,66 @@ export class SubmenuBuilder implements CtxMenuElementBuilder {
       items: this.builders.map(buildElement),
       disabled: this.disabled,
       __cm_type_tag: 'submenu',
+    }
+  }
+}
+
+//* CHECKBOX *//
+
+type Checkbox = {
+  content: ElementContent
+  onValueChanged: () => void
+  getIsChecked: () => boolean
+  disabled: boolean
+  __cm_type_tag: 'checkbox'
+}
+
+export class CheckboxBuilder implements CtxMenuElementBuilder {
+  content: ElementContent
+  onValueChanged: Option<() => void>
+  getIsChecked: Option<() => boolean>
+  disabled: boolean = true
+
+  private constructor(content: ElementContent) {
+    this.content = content
+  }
+
+  static fromLabel(label: string): CheckboxBuilder {
+    return new CheckboxBuilder({ label })
+  }
+
+  static fromComponent(component: ReactNode): CheckboxBuilder {
+    return new CheckboxBuilder({ component })
+  }
+
+  handleValueChanged(handler: () => void): CheckboxBuilder {
+    this.onValueChanged = handler
+    return this
+  }
+
+  handleIsChecked(handler: () => boolean): CheckboxBuilder {
+    this.getIsChecked = handler
+    return this
+  }
+
+  withDisabled(disabled: boolean): CheckboxBuilder {
+    this.disabled = disabled
+    return this
+  }
+
+  build(): Checkbox {
+    if (!this.onValueChanged) {
+      throw Error('CheckboxBuilder not provided onValueChanged() function')
+    }
+
+    const notChecked = () => false
+
+    return {
+      content: this.content,
+      onValueChanged: this.onValueChanged,
+      getIsChecked: this.getIsChecked ?? notChecked,
+      disabled: this.disabled,
+      __cm_type_tag: 'checkbox',
     }
   }
 }

@@ -2,13 +2,12 @@ import { Option } from '@openhome-core/util/functional'
 import { filterUndefined } from '@openhome-core/util/sort'
 import { Inset, ContextMenu as RadixCtxMenu } from '@radix-ui/themes'
 import { ReactNode } from 'react'
-import './context-menu.css'
 import {
   CtxMenuElement,
   CtxMenuElementBuilder,
   CtxMenuSectionBuilders,
   SeparatorBuilder,
-  contentIsLabel,
+  renderContent,
 } from './types'
 
 type ContextMenuProps = (
@@ -79,6 +78,15 @@ function CtxMenuSubmenuContent(props: RadixCtxMenu.SubContentProps) {
   return <RadixCtxMenu.SubContent {...props} />
 }
 
+function CtxMenuCheckboxItem(props: RadixCtxMenu.CheckboxItemProps) {
+  return (
+    <RadixCtxMenu.CheckboxItem
+      {...props}
+      style={{ padding: '0 0.3rem 0 1rem', color: 'inherit', ...props.style }}
+    />
+  )
+}
+
 function buildComponent(builder: CtxMenuElementBuilder, index: number): ReactNode {
   return componentFromElement(builder.build(), index)
 }
@@ -88,25 +96,36 @@ function componentFromElement(element: CtxMenuElement, index: number): ReactNode
     case 'item':
       return (
         <CtxMenuItem key={index} onClick={element.action} disabled={element.disabled}>
-          {contentIsLabel(element.content) ? element.content.label : element.content.component}
+          {renderContent(element.content)}
         </CtxMenuItem>
       )
     case 'label':
-      return (
-        <CtxMenuLabel key={index}>
-          {contentIsLabel(element.content) ? element.content.label : element.content.component}
-        </CtxMenuLabel>
-      )
+      return <CtxMenuLabel key={index}>{renderContent(element.content)}</CtxMenuLabel>
     case 'separator':
       return <CtxMenuSeparator key={index} />
     case 'submenu':
       return (
         <CtxMenuSubmenu key={index}>
-          <CtxMenuSubmenuTrigger>
-            {contentIsLabel(element.content) ? element.content.label : element.content.component}
-          </CtxMenuSubmenuTrigger>
+          <CtxMenuSubmenuTrigger>{renderContent(element.content)}</CtxMenuSubmenuTrigger>
           <CtxMenuSubmenuContent>{element.items.map(componentFromElement)}</CtxMenuSubmenuContent>
         </CtxMenuSubmenu>
+      )
+    case 'checkbox':
+      return (
+        <CtxMenuCheckboxItem
+          key={index}
+          checked={element.getIsChecked()}
+          onClick={(e) => {
+            element.onValueChanged()
+
+            e.preventDefault()
+            e.stopPropagation()
+          }}
+        >
+          <div className="ContextMenuCheckboxItem" style={{ color: 'inherit' }}>
+            {renderContent(element.content)}
+          </div>
+        </CtxMenuCheckboxItem>
       )
   }
 }

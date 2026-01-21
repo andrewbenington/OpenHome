@@ -1,0 +1,37 @@
+.white-filter {
+  filter: brightness(0) invert(1);
+  color: white;
+}
+
+.black-filter {
+  filter: brightness(0);
+  color: black;
+}
+
+.badge-shadow {
+  box-shadow: rgba(255, 255, 255, 0.5) 0px 0px 0px 1px;
+}
+
+.numerical-indicator {
+  font-weight: bold;
+  border-radius: 7px;
+  font-size: 12px;
+  padding: 4px;
+  height: 14px;
+  min-width: 14px;
+  line-height: 1;
+}
+
+.origin-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .origin-badge {
+    filter: brightness(0.8);
+  }
+}

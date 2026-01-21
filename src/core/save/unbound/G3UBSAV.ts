@@ -15,7 +15,7 @@ const UB_TRANSFER_RESTRICTIONS: TransferRestrictions = {
 export class G3UBSAV extends G3CFRUSAV<PK3UB> {
   static transferRestrictions: TransferRestrictions = UB_TRANSFER_RESTRICTIONS
 
-  pluginIdentifier = 'unbound'
+  pluginIdentifier = 'unbound' as const
 
   static saveTypeAbbreviation = 'Unbound'
   static saveTypeName = 'Pokémon Unbound'

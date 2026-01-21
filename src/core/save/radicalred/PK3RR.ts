@@ -3,6 +3,7 @@ import { ItemRadicalRed } from '@pkm-rs/pkg'
 import PK3CFRU, { CFRUToNationalDexEntry } from '../cfru/PK3CFRU'
 
 import { fromGen3CRFUPokemonIndex, toGen3CRFUPokemonIndex } from '../cfru/conversion/util'
+import { PluginIdentifier } from '../interfaces'
 import { fromGen3RRMoveIndex, toGen3RRMoveIndex } from './conversion/Gen3RRMovesIndex'
 import { RRToNationalMap } from './conversion/Gen3RRMovesIndex/RRToNationalMap'
 import {
@@ -19,7 +20,7 @@ const VALID_MOVE_INDICES_RR = Object.values(RRToNationalMap).filter((index) => i
 
 export default class PK3RR extends PK3CFRU implements PluginPKMInterface {
   format: 'PK3RR' = 'PK3RR'
-  pluginIdentifier: string = 'radical_red'
+  pluginIdentifier: PluginIdentifier = 'radical_red'
 
   selectColor = '#660000'
 
@@ -63,7 +64,7 @@ export default class PK3RR extends PK3CFRU implements PluginPKMInterface {
     return FAKEMON_INDEXES.includes(speciesIndex)
   }
 
-  getPluginIdentifier(): string {
+  getPluginIdentifier(): PluginIdentifier {
     return 'radical_red'
   }
 }

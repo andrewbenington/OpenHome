@@ -1,14 +1,13 @@
-import { OriginGames } from '@pkm-rs/pkg'
 import { StatsPreSplit } from '@pokemon-files/util'
-import { Badge, Tooltip } from '@radix-ui/themes'
+import { Badge } from '@radix-ui/themes'
 import { OHPKM } from 'src/core/pkm/OHPKM'
-import { PKMInterface } from '../../core/pkm/interfaces'
-import GenderIcon from '../components/pokemon/GenderIcon'
-import { TopRightIndicatorType } from '../hooks/useMonDisplay'
-import { getOriginIconPath } from '../images/game'
-import { getPublicImageURL } from '../images/images'
-import { BallsImageList } from '../images/items'
-import { colorIsDark } from '../util/color'
+import { PKMInterface } from '../../../../core/pkm/interfaces'
+import { TopRightIndicatorType } from '../../../hooks/useMonDisplay'
+import { getPublicImageURL } from '../../../images/images'
+import { BallsImageList } from '../../../images/items'
+import GenderIcon from '../GenderIcon'
+import { IndicatorBadge } from './IndicatorBadge'
+import { OriginGameIndicator } from './OriginGame'
 import './style.css'
 
 type TopRightIndicatorProps = {
@@ -16,7 +15,7 @@ type TopRightIndicatorProps = {
   indicatorType: TopRightIndicatorType
 }
 
-function TopRightIndicator({ mon, indicatorType }: TopRightIndicatorProps) {
+export function TopRightIndicator({ mon, indicatorType }: TopRightIndicatorProps) {
   // const savesState = useSaves()
 
   switch (indicatorType) {
@@ -41,7 +40,7 @@ function TopRightIndicator({ mon, indicatorType }: TopRightIndicatorProps) {
       const ivsOrDvsPercent = mon.ivs ? getIvsPercent(mon) : hasDvs(mon) ? getDvsPercent(mon) : 0
       return <TopRightNumericalIndicator value={ivsOrDvsPercent} percent />
     case 'Origin Game':
-      return <OriginGameIndicator originGame={mon.gameOfOrigin} />
+      return <OriginGameIndicator originGame={mon.gameOfOrigin} plugin={mon.pluginOrigin} />
     case 'Most Recent Save':
       return (
         mon instanceof OHPKM && <OriginGameIndicator originGame={mon.mostRecentSaveWasm?.game} />
@@ -108,58 +107,4 @@ function getIvsPercent(mon: PKMInterface): number {
 function getDvsPercent(mon: PKMInterface & { dvs: StatsPreSplit }): number {
   const dvsTotal = Object.values(mon.dvs).reduce((p, c) => p + c, 0)
   return Math.round((dvsTotal / (5 * 15)) * 100)
-}
-
-type OriginGameIndicatorProps = {
-  originGame: number | undefined
-}
-
-function OriginGameIndicator({ originGame }: OriginGameIndicatorProps) {
-  if (originGame === undefined) return null
-
-  const gameMetadata = OriginGames.getMetadata(originGame)
-  const markImage = getOriginIconPath(gameMetadata)
-  const backgroundColor = OriginGames.color(originGame)
-
-  if (!markImage) return null
-
-  return (
-    <IndicatorBadge
-      description={gameMetadata.name}
-      src={markImage}
-      backgroundColor={backgroundColor}
-    />
-  )
-}
-
-type IndicatorBadgeProps = {
-  description: string
-  src: string
-  backgroundColor: string
-}
-
-function IndicatorBadge({ description, src, backgroundColor }: IndicatorBadgeProps) {
-  return (
-    <Tooltip content={description}>
-      <Badge
-        className="badge-shadow origin-badge"
-        size="1"
-        style={{ backgroundColor }}
-        variant="solid"
-      >
-        <img
-          className={colorIsDark(backgroundColor) ? 'white-filter' : 'black-filter'}
-          style={{ maxHeight: 15, maxWidth: 15 }}
-          draggable={false}
-          alt="origin mark"
-          src={src}
-        />
-      </Badge>
-    </Tooltip>
-  )
-}
-
-export const Indicator = {
-  TopRight: TopRightIndicator,
-  OriginGame: OriginGameIndicator,
 }

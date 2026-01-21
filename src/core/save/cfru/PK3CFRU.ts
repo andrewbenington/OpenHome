@@ -30,6 +30,7 @@ import {
   writeGen3StringToBytes,
   writeStatsToBytesU8,
 } from '@pokemon-files/util'
+import { PluginIdentifier } from '../interfaces'
 
 export interface CFRUToNationalDexEntry {
   NationalDexIndex: number
@@ -75,9 +76,9 @@ export abstract class PK3CFRU implements PluginPKMInterface {
   //   return 'PK3RR'
   // }
   format: string = 'PK3CFRU'
-  abstract pluginIdentifier: string
+  abstract pluginIdentifier: PluginIdentifier
 
-  pluginOrigin?: string
+  pluginOrigin?: PluginIdentifier
   personalityValue: number
   trainerID: number
   secretID: number
@@ -484,7 +485,9 @@ export abstract class PK3CFRU implements PluginPKMInterface {
     return []
   }
 
-  abstract getPluginIdentifier(): string
+  getPluginIdentifier(): PluginIdentifier {
+    return this.pluginIdentifier
+  }
 }
 
 export default PK3CFRU

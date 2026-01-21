@@ -7,7 +7,7 @@ import {
   StoredBankData,
 } from '@openhome-core/save/util/storage'
 import { TransferRestrictions } from '@openhome-core/save/util/TransferRestrictions'
-import { range, Result } from '@openhome-core/util/functional'
+import { Option, range, Result } from '@openhome-core/util/functional'
 import { filterUndefined, numericSorter } from '@openhome-core/util/sort'
 import { MonLocation } from '@openhome-ui/state/saves/reducer'
 import { v4 as UuidV4 } from 'uuid'
@@ -377,6 +377,22 @@ export class HomeData {
     newHomeData.updatedBoxSlots = this.updatedBoxSlots
 
     return newHomeData
+  }
+
+  findIfPresent(identifier: OhpkmIdentifier): Option<BankBoxCoordinates> {
+    for (const bank of this.banks) {
+      for (const box of bank.boxes) {
+        for (const [boxSlot, idInSlot] of box.identifiers.entries()) {
+          if (idInSlot === identifier) {
+            return {
+              bank: bank.index,
+              box: box.index,
+              boxSlot,
+            }
+          }
+        }
+      }
+    }
   }
 }
 
