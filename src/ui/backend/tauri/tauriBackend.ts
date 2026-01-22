@@ -56,6 +56,7 @@ export const TauriBackend: BackendInterface = {
       )
     )
   },
+  removeDangling: Commands.remove_dangling,
   addToOhpkmStore: function (updates: OhpkmStore): Promise<Errorable<null>> {
     return Commands.add_to_ohpkm_store(
       Object.fromEntries(
