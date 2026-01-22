@@ -113,7 +113,7 @@ function getDvsPercent(mon: PKMInterface & { dvs: StatsPreSplit }): number {
 
 function getPerfectIvsCount(mon: PKMInterface): number {
   if (!mon.ivs) return 0
-  return Object.values(mon.ivs).filter(iv => iv === 31).length
+  return Object.values(mon.ivs).filter((iv) => iv === 31).length
 }
 
 type OriginGameIndicatorProps = {
