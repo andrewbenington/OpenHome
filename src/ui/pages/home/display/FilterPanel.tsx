@@ -85,16 +85,16 @@ export default function FilterPanel() {
   const ALL_ABILITIES: SelectOption[] = getAllAbilities()
     .sort((a, b) => a.name.localeCompare(b.name))
     .map(({ name, id }) => ({
-    label: name,
-    id,
-  }))
+      label: name,
+      id,
+    }))
 
   const ALL_BALLS: SelectOption[] = getAllBalls()
     .sort((a, b) => a.name.localeCompare(b.name))
     .map(({ name, index }) => ({
-    label: name,
-    id: index,
-  }))
+      label: name,
+      id: index,
+    }))
 
   const ALL_ITEMS: SelectOption[] = getAllItems().map(itemMetadataToSelectOption)
 
@@ -202,7 +202,11 @@ export default function FilterPanel() {
           options={ALL_ABILITIES}
           getOptionString={(opt) => opt.label}
           getOptionUniqueID={(opt) => opt.id.toString()}
-          value={filter.ability !== undefined ? ALL_ABILITIES.find(a => a.id === filter.ability) : undefined}
+          value={
+            filter.ability !== undefined
+              ? ALL_ABILITIES.find((a) => a.id === filter.ability)
+              : undefined
+          }
           label="Ability"
           onChange={(option) => setFilter({ ability: option?.id })}
         />
@@ -239,7 +243,9 @@ export default function FilterPanel() {
           options={ALL_BALLS}
           getOptionString={(option) => option.label}
           getOptionUniqueID={(opt) => opt.id.toString()}
-          value={filter.ball !== undefined ? ALL_BALLS.find(a => a.id === filter.ball) : undefined}
+          value={
+            filter.ball !== undefined ? ALL_BALLS.find((a) => a.id === filter.ball) : undefined
+          }
           label="Ball"
           onChange={(option) => setFilter({ ball: option?.id })}
           getIconComponent={(ball) => (
