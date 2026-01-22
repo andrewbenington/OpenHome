@@ -57,14 +57,7 @@ export default function Gen12Lookup({ onSelectMon }: Gen12LookupProps) {
         name: 'Original Game',
         width: '10rem',
         renderValue: (value) => (
-          <div
-            style={{
-              width: '100%',
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'center',
-            }}
-          >
+          <div className="flex-row-centered">
             <OriginGameIndicator
               originGame={value.homeMon?.gameOfOrigin}
               plugin={value.homeMon?.pluginOrigin as PluginIdentifier}

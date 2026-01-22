@@ -1,6 +1,8 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { PluginIdentifier } from '@openhome-core/save/interfaces'
 import { multiSorter, numericSorter, SortableColumn, stringSorter } from '@openhome-core/util/sort'
+import { BackendContext } from '@openhome-ui/backend/backendContext'
+import { ItemBuilder, OpenHomeCtxMenu } from '@openhome-ui/components/context-menu'
 import { OriginGameIndicator } from '@openhome-ui/components/pokemon/indicator/OriginGame'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
@@ -8,8 +10,6 @@ import { Flex } from '@radix-ui/themes'
 import { useContext, useMemo } from 'react'
 import SortableDataGrid from 'src/ui/components/SortableDataGrid'
 import { useLookups } from 'src/ui/state/lookups/useLookups'
-import { BackendContext } from '../../backend/backendContext'
-import { ItemBuilder, OpenHomeCtxMenu } from '../../components/context-menu'
 
 type G345LookupRow = {
   gen345ID: string
@@ -57,14 +57,7 @@ export default function Gen345Lookup({ onSelectMon }: Gen345LookupProps) {
         name: 'Original Game',
         width: '10rem',
         renderValue: (value) => (
-          <div
-            style={{
-              width: '100%',
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'center',
-            }}
-          >
+          <div className="flex-row-centered">
             <OriginGameIndicator
               originGame={value.homeMon?.gameOfOrigin}
               plugin={value.homeMon?.pluginOrigin as PluginIdentifier}
