@@ -8,7 +8,8 @@ import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { useSaves } from '@openhome-ui/state/saves'
 import { MetadataLookup } from '@pkm-rs/pkg'
 import { Flex } from '@radix-ui/themes'
-import { useCallback, useMemo } from 'react'
+import { useCallback, useMemo, useState } from 'react'
+import { OhpkmIdentifier } from 'src/core/pkm/Lookup'
 import { ItemBuilder, OpenHomeCtxMenu } from '../../components/context-menu'
 import './style.css'
 
@@ -25,15 +26,25 @@ export default function OpenHomeMonList({
 }: OpenHomeMonListProps) {
   const ohpkmStore = useOhpkmStore()
   const saves = useSaves()
+  const rows = useMemo(
+    () => ohpkmStore.getAllStored().toSorted(stringSorter((mon) => mon.openhomeId)),
+    [ohpkmStore]
+  )
+  const { selectedIds, deselectIds, shiftClick, singleClick } = useSelectedMons(rows)
 
   const buildContextElements = useCallback(
-    (mon: OHPKM) => [
+    (mon: OHPKM, monsAreSelected: boolean) => [
       ItemBuilder.fromLabel('Find Containing Save').withAction(() =>
-        findSaveForMon(mon.getHomeIdentifier())
+        findSaveForMon(mon.openhomeId)
       ),
       ItemBuilder.fromLabel('Find Recent Saves For All').withAction(findSavesForAllMons),
+      monsAreSelected
+        ? ItemBuilder.fromLabel('Delete Selected ' + selectedIds.size).withAction(() => {
+            deselectIds(...Array.from(selectedIds))
+          })
+        : undefined,
     ],
-    [findSaveForMon, findSavesForAllMons]
+    [deselectIds, findSaveForMon, findSavesForAllMons, selectedIds]
   )
 
   const columns: SortableColumn<OHPKM>[] = useMemo(
@@ -71,21 +82,18 @@ export default function OpenHomeMonList({
         name: 'Bank',
         width: '4rem',
         renderValue: (value) => {
-          const bankIndex = saves.homeData.findIfPresent(value.getHomeIdentifier())?.bank
+          const bankIndex = saves.homeData.findIfPresent(value.openhomeId)?.bank
           return typeof bankIndex === 'number' ? `Bank ${bankIndex + 1}` : undefined
         },
-        getFilterValue: (value) =>
-          saves.homeData.findIfPresent(value.getHomeIdentifier())?.bank?.toString(),
-        sortFunction: numericSorter(
-          (mon) => saves.homeData.findIfPresent(mon.getHomeIdentifier())?.bank
-        ),
+        getFilterValue: (value) => saves.homeData.findIfPresent(value.openhomeId)?.bank?.toString(),
+        sortFunction: numericSorter((mon) => saves.homeData.findIfPresent(mon.openhomeId)?.bank),
       },
       {
         key: 'home_box',
         name: 'Box + Slot',
         width: '8rem',
         renderValue: (mon) => {
-          const location = saves.homeData.findIfPresent(mon.getHomeIdentifier())
+          const location = saves.homeData.findIfPresent(mon.openhomeId)
           return location ? (
             <span>
               <b>Box {location.box + 1}</b> [{location.boxSlot + 1}]
@@ -93,11 +101,11 @@ export default function OpenHomeMonList({
           ) : undefined
         },
         getFilterValue: (mon) => {
-          const location = saves.homeData.findIfPresent(mon.getHomeIdentifier())
+          const location = saves.homeData.findIfPresent(mon.openhomeId)
           return location ? `Box ${location.box + 1}` : 'Not in OpenHome Boxes'
         },
         sortFunction: numericSorter((mon) => {
-          const location = saves.homeData.findIfPresent(mon.getHomeIdentifier())
+          const location = saves.homeData.findIfPresent(mon.openhomeId)
           return location ? location.box + location.boxSlot / 120 : -1
         }),
       },
@@ -150,8 +158,8 @@ export default function OpenHomeMonList({
         key: 'homeID',
         name: 'OpenHome ID',
         minWidth: 240,
-        sortFunction: stringSorter((mon) => mon.getHomeIdentifier()),
-        renderValue: (mon) => mon.getHomeIdentifier(),
+        sortFunction: stringSorter((mon) => mon.openhomeId),
+        renderValue: (mon) => mon.openhomeId,
         cellClass: 'mono-cell',
       },
     ],
@@ -165,7 +173,7 @@ export default function OpenHomeMonList({
         if (newColumn.renderCell) {
           const renderCell = newColumn.renderCell
           newColumn.renderCell = (props) => (
-            <OpenHomeCtxMenu elements={buildContextElements(props.row)}>
+            <OpenHomeCtxMenu elements={buildContextElements(props.row, selectedIds.size > 0)}>
               <Flex height="100%" align="center" justify="center" width="100%">
                 {renderCell(props)}
               </Flex>
@@ -178,8 +186,8 @@ export default function OpenHomeMonList({
             const justify = typeof rendered === 'string' ? 'start' : 'center'
             return (
               <OpenHomeCtxMenu
-                key={value.getHomeIdentifier()}
-                elements={buildContextElements(value)}
+                key={value.openhomeId}
+                elements={buildContextElements(value, selectedIds.size > 0)}
               >
                 <Flex height="100%" align="center" justify={justify} width="100%">
                   {rendered}
@@ -194,8 +202,8 @@ export default function OpenHomeMonList({
             return (
               typeof data === 'string' && (
                 <OpenHomeCtxMenu
-                  key={value.getHomeIdentifier()}
-                  elements={buildContextElements(value)}
+                  key={value.openhomeId}
+                  elements={buildContextElements(value, selectedIds.size > 0)}
                 >
                   <Flex height="100%" justify={justify} width="100%">
                     {data}
@@ -207,19 +215,64 @@ export default function OpenHomeMonList({
         }
         return newColumn
       }),
-    [buildContextElements, columns]
+    [buildContextElements, columns, selectedIds.size]
   )
 
   const keyGetter = (row: NoInfer<OHPKM>): string => {
-    return row.getHomeIdentifier()
+    return row.openhomeId
   }
 
   return (
     <SortableDataGrid
-      rows={ohpkmStore.getAllStored().toSorted(stringSorter((mon) => mon.getHomeIdentifier()))}
+      rows={ohpkmStore.getAllStored().toSorted(stringSorter((mon) => mon.openhomeId))}
       columns={modifiedColumns}
       style={{ borderLeft: 'none', borderBottom: 'none' }}
       rowKeyGetter={keyGetter}
+      onCellClick={(props, e) => {
+        if (e.shiftKey) {
+          shiftClick(props.row.openhomeId, props.rowIdx)
+          return
+        }
+        singleClick(props.row.openhomeId, props.rowIdx)
+      }}
+      rowClass={(row) => (selectedIds.has(row.openhomeId) ? 'selected-row' : undefined)}
     />
   )
+}
+
+function useSelectedMons(monsInOrder: OHPKM[]) {
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [lastClickedIndex, setLastClickedIndex] = useState<number | null>(null)
+
+  function selectIds(...ids: OhpkmIdentifier[]) {
+    setSelectedIds((prev) => new Set(ids).union(prev))
+  }
+
+  function deselectIds(...ids: OhpkmIdentifier[]) {
+    setSelectedIds((prev) => new Set(prev).difference(new Set(ids)))
+  }
+
+  function singleClick(id: OhpkmIdentifier, index: number) {
+    if (selectedIds.size === 1 && selectedIds.has(id)) {
+      setSelectedIds(new Set())
+      setLastClickedIndex(null)
+    } else {
+      setSelectedIds(new Set([id]))
+      setLastClickedIndex(index)
+    }
+  }
+
+  function shiftClick(id: OhpkmIdentifier, index: number) {
+    if (lastClickedIndex === null) {
+      singleClick(id, index)
+    } else {
+      selectIds(
+        ...monsInOrder
+          .slice(Math.min(lastClickedIndex, index), Math.max(lastClickedIndex, index) + 1)
+          .map((mon) => mon.openhomeId)
+      )
+    }
+  }
+
+  return { selectedIds, selectIds, deselectIds, singleClick, shiftClick }
 }

@@ -196,7 +196,12 @@
     line-height: 1rem;
   }
 
-  .rdg-row-even:not([aria-selected='true']) {
+  .selected-row {
+    background-color: var(--focus-6);
+    outline: 0;
+  }
+
+  .rdg-row-even:not([aria-selected='true']):not(.selected-row) {
     background-color: var(--gray-a3);
   }
 
@@ -209,7 +214,7 @@
   --rdg-row-selected-hover-background-color: var(--focus-8);
   --rdg-row-selected-background-color: var(--focus-7);
 
-  .rdg-row:not([aria-selected='true']):not(.disabled-party) {
+  .rdg-row:not([aria-selected='true']):not(.selected-row) {
     &:hover {
       background-color: var(--accent-a3);
     }

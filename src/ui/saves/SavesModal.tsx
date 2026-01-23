@@ -135,6 +135,8 @@ const SavesModal = (props: SavesModalProps) => {
           minWidth: 800,
           height: 'calc(90vh - 32px)',
           overflow: 'hidden',
+          padding: 0,
+          borderRadius: 4,
         }}
       >
         <SideTabs.Root defaultValue="recents">

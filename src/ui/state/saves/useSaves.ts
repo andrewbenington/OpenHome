@@ -236,7 +236,7 @@ export function useSaves(): SavesAndBanksManager {
       if (!mon) {
         loadedHomeData.setPokemon(location, undefined)
       } else if (ohpkm) {
-        loadedHomeData.setPokemon(location, ohpkm.getHomeIdentifier())
+        loadedHomeData.setPokemon(location, ohpkm.openhomeId)
       }
 
       return displacedMonId
@@ -277,7 +277,7 @@ export function useSaves(): SavesAndBanksManager {
             const homeMon = mon instanceof OHPKM ? mon : new OHPKM(mon)
             ohpkmStore.insertOrUpdate(homeMon)
 
-            moveOhpkmToHome(homeMon.getHomeIdentifier(), nextSlot)
+            moveOhpkmToHome(homeMon.openhomeId, nextSlot)
             addedMons.push(homeMon)
             nextSlot.boxSlot++
             if (nextSlot.boxSlot >= HomeData.BOX_COLUMNS * HomeData.BOX_ROWS) {
@@ -396,7 +396,7 @@ export function useSaves(): SavesAndBanksManager {
       const sorted = mons.toSorted(getSortFunctionNullable(sortType))
       for (const i of range(loadedHomeData.boxes[boxIndex].boxSlots.length)) {
         if (i < sorted.length) {
-          loadedHomeData.boxes[boxIndex].boxSlots[i] = sorted[i].getHomeIdentifier()
+          loadedHomeData.boxes[boxIndex].boxSlots[i] = sorted[i].openhomeId
         } else {
           loadedHomeData.boxes[boxIndex].boxSlots[i] = undefined
         }
@@ -430,7 +430,7 @@ export function useSaves(): SavesAndBanksManager {
         for (const slot of range(boxSize)) {
           const monIndex = box * boxSize + slot
           if (monIndex < sorted.length) {
-            loadedHomeData.boxes[box].boxSlots[slot] = sorted[monIndex].getHomeIdentifier()
+            loadedHomeData.boxes[box].boxSlots[slot] = sorted[monIndex].openhomeId
           } else {
             loadedHomeData.boxes[box].boxSlots[slot] = undefined
           }
@@ -700,7 +700,7 @@ function findMonInBox(
   save: SAV
 ): MonLocation | undefined {
   for (const [boxSlot, mon] of box.boxSlots.entries()) {
-    if (mon instanceof OHPKM && mon.getHomeIdentifier() === monId) {
+    if (mon instanceof OHPKM && mon.openhomeId === monId) {
       return {
         box: boxIndex,
         boxSlot: boxSlot,
