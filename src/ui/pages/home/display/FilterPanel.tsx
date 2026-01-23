@@ -1,3 +1,4 @@
+import { stringSorter } from '@openhome-core/util/sort'
 import { displayGender } from '@openhome-core/util/types'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { BallsImageList, getItemIconPath } from '@openhome-ui/images/items'
