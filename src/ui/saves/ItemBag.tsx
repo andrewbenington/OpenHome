@@ -1,3 +1,4 @@
+import { stringSorter } from '@openhome-core/util/sort'
 import { useItems } from '@openhome-ui/state/items'
 import { Item } from '@pkm-rs/pkg'
 import { Flex, Grid } from '@radix-ui/themes'
