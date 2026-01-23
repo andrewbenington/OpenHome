@@ -23,6 +23,7 @@ export default [
     files: ['src/**/*.{js,mjs,cjs,ts,mts,jsx,tsx}'],
     rules: {
       'react-refresh/only-export-components': ['error', { allowConstantExport: true }],
+      '@typescript-eslint/no-non-null-assertion': 'error',
       '@typescript-eslint/no-unused-vars': [
         'warn',
         {
