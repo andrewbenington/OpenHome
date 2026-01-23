@@ -83,14 +83,14 @@ export default function FilterPanel() {
   const ALL_SPECIES_DATA = useMemo(all_species_data, [])
 
   const ALL_ABILITIES: SelectOption[] = getAllAbilities()
-    .sort((a, b) => a.name.localeCompare(b.name))
+    .sort(stringSorter((a) => a.name))
     .map(({ name, id }) => ({
       label: name,
       id,
     }))
 
   const ALL_BALLS: SelectOption[] = getAllBalls()
-    .sort((a, b) => a.name.localeCompare(b.name))
+    .sort(stringSorter((b) => b.name))
     .map(({ name, index }) => ({
       label: name,
       id: index,

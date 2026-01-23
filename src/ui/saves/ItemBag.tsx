@@ -18,7 +18,7 @@ export default function ItemBag() {
               const validatedIndex = Item.fromIndex(index)
               return { validatedIndex, count, index }
             })
-            .sort((a, b) => a.validatedIndex!.name.localeCompare(b.validatedIndex!.name))
+            .sort(stringSorter(({ validatedIndex }) => validatedIndex?.name))
             .map(({ validatedIndex, count, index }) => (
               <Flex className="item-bag-slot" key={index} align="center" justify="center">
                 {validatedIndex ? (
