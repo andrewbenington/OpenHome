@@ -195,6 +195,7 @@ impl MainDataV2 {
         }
     }
 
+    #[cfg(feature = "wasm")]
     pub fn openhome_id(&self) -> String {
         let base_mon = self.species_and_forme.get_base_evolution();
         format!(

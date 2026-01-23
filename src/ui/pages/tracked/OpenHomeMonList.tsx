@@ -7,7 +7,6 @@ import SortableDataGrid from '@openhome-ui/components/SortableDataGrid'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { useSaves } from '@openhome-ui/state/saves'
 import { MetadataLookup } from '@pkm-rs/pkg'
-import { Flex } from '@radix-ui/themes'
 import { useCallback, useMemo, useState } from 'react'
 import { OhpkmIdentifier } from 'src/core/pkm/Lookup'
 import { ItemBuilder, OpenHomeCtxMenu } from '../../components/context-menu'
@@ -33,17 +32,19 @@ export default function OpenHomeMonList({
   const { selectedIds, deselectIds, shiftClick, singleClick } = useSelectedMons(rows)
 
   const buildContextElements = useCallback(
-    (mon: OHPKM, monsAreSelected: boolean) => [
-      ItemBuilder.fromLabel('Find Containing Save').withAction(() =>
-        findSaveForMon(mon.openhomeId)
-      ),
-      ItemBuilder.fromLabel('Find Recent Saves For All').withAction(findSavesForAllMons),
-      monsAreSelected
-        ? ItemBuilder.fromLabel('Delete Selected ' + selectedIds.size).withAction(() => {
-            deselectIds(...Array.from(selectedIds))
-          })
-        : undefined,
-    ],
+    (mon: OHPKM) => {
+      return [
+        ItemBuilder.fromLabel('Find Containing Save').withAction(() =>
+          findSaveForMon(mon.openhomeId)
+        ),
+        ItemBuilder.fromLabel('Find Recent Saves For All').withAction(findSavesForAllMons),
+        selectedIds.size > 0
+          ? ItemBuilder.fromLabel('Delete Selected ' + selectedIds.size).withAction(() => {
+              deselectIds(...selectedIds)
+            })
+          : undefined,
+      ]
+    },
     [deselectIds, findSaveForMon, findSavesForAllMons, selectedIds]
   )
 
@@ -166,77 +167,36 @@ export default function OpenHomeMonList({
     [onSelectMon, saves.homeData]
   )
 
-  const modifiedColumns = useMemo(
-    () =>
-      columns.map((column) => {
-        const newColumn = { ...column }
-        if (newColumn.renderCell) {
-          const renderCell = newColumn.renderCell
-          newColumn.renderCell = (props) => (
-            <OpenHomeCtxMenu elements={buildContextElements(props.row, selectedIds.size > 0)}>
-              <Flex height="100%" align="center" justify="center" width="100%">
-                {renderCell(props)}
-              </Flex>
-            </OpenHomeCtxMenu>
-          )
-        } else if (newColumn.renderValue) {
-          const renderValue = newColumn.renderValue
-          newColumn.renderValue = (value) => {
-            const rendered = renderValue(value)
-            const justify = typeof rendered === 'string' ? 'start' : 'center'
-            return (
-              <OpenHomeCtxMenu
-                key={value.openhomeId}
-                elements={buildContextElements(value, selectedIds.size > 0)}
-              >
-                <Flex height="100%" align="center" justify={justify} width="100%">
-                  {rendered}
-                </Flex>
-              </OpenHomeCtxMenu>
-            )
-          }
-        } else {
-          newColumn.renderValue = (value) => {
-            const data = value[column.key as keyof OHPKM]
-            const justify = typeof data === 'string' ? 'start' : 'center'
-            return (
-              typeof data === 'string' && (
-                <OpenHomeCtxMenu
-                  key={value.openhomeId}
-                  elements={buildContextElements(value, selectedIds.size > 0)}
-                >
-                  <Flex height="100%" justify={justify} width="100%">
-                    {data}
-                  </Flex>
-                </OpenHomeCtxMenu>
-              )
-            )
-          }
-        }
-        return newColumn
-      }),
-    [buildContextElements, columns, selectedIds.size]
-  )
-
   const keyGetter = (row: NoInfer<OHPKM>): string => {
     return row.openhomeId
   }
 
   return (
-    <SortableDataGrid
-      rows={ohpkmStore.getAllStored().toSorted(stringSorter((mon) => mon.openhomeId))}
-      columns={modifiedColumns}
-      style={{ borderLeft: 'none', borderBottom: 'none' }}
-      rowKeyGetter={keyGetter}
-      onCellClick={(props, e) => {
-        if (e.shiftKey) {
-          shiftClick(props.row.openhomeId, props.rowIdx)
-          return
-        }
-        singleClick(props.row.openhomeId, props.rowIdx)
-      }}
-      rowClass={(row) => (selectedIds.has(row.openhomeId) ? 'selected-row' : undefined)}
-    />
+    <OpenHomeCtxMenu elements={buildContextElements(rows[0])}>
+      <div style={{ height: '100%', width: '100%' }}>
+        <SortableDataGrid
+          rows={ohpkmStore.getAllStored().toSorted(stringSorter((mon) => mon.openhomeId))}
+          columns={columns}
+          style={{ borderLeft: 'none', borderBottom: 'none' }}
+          rowKeyGetter={keyGetter}
+          onCellClick={(props, e) => {
+            if (e.shiftKey) {
+              shiftClick(props.row.openhomeId, props.rowIdx)
+              return
+            }
+            singleClick(props.row.openhomeId, props.rowIdx)
+          }}
+          onCellContextMenu={(_, e) => {
+            // ooh i hate this, radix please expose your context menu api
+            const menu = document.querySelector('[data-radix-popper-content-wrapper]')
+            if (menu) {
+              ;(menu as HTMLElement).style.transform = `translate(${e.clientX}px, ${e.clientY}px)`
+            }
+          }}
+          rowClass={(row) => (selectedIds.has(row.openhomeId) ? 'selected-row' : undefined)}
+        />
+      </div>
+    </OpenHomeCtxMenu>
   )
 }
 
