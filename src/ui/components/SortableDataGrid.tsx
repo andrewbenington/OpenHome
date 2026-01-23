@@ -185,6 +185,34 @@ export default function SortableDataGrid<R extends SortableValue>(props: Sortabl
       ? scaling * baseRowHeight
       : (row: NoInfer<R>) => scaling * baseRowHeight(row)
 
+  const modifiedColumns = useMemo(
+    () =>
+      reorderedColumns
+        .filter((col) => !hiddenColumns.includes(col.key))
+        .map((col) => ({
+          ...col,
+          resizable: true,
+          sortable: !!(col.sortType ?? col.sortFunction),
+          draggable: true,
+          renderCell: hasRenderValueMethod(col)
+            ? (value: RenderCellProps<R>) => col.renderValue(value.row)
+            : col.renderCell,
+          renderHeaderCell: (props: RenderHeaderCellProps<R>) => (
+            <HeaderWithContextMenu
+              column={props.column}
+              columns={columns}
+              sortColumns={sortColumns}
+              rows={sortedRows}
+              filters={filters}
+              setFilters={setFilters}
+              hiddenColumns={hiddenColumns}
+              setHiddenColumns={setHiddenColumns}
+            />
+          ),
+        })),
+    [columns, filters, hiddenColumns, reorderedColumns, sortColumns, sortedRows]
+  )
+
   return (
     <div style={{ height: '100%', overflow: 'hidden ' }}>
       <DataGrid
@@ -194,29 +222,7 @@ export default function SortableDataGrid<R extends SortableValue>(props: Sortabl
         {...otherProps}
         rowHeight={scaledRowHeight}
         rows={filteredRows}
-        columns={reorderedColumns
-          .filter((col) => !hiddenColumns.includes(col.key))
-          .map((col) => ({
-            ...col,
-            resizable: true,
-            sortable: !!(col.sortType ?? col.sortFunction),
-            draggable: true,
-            renderCell: hasRenderValueMethod(col)
-              ? (value: RenderCellProps<R>) => col.renderValue(value.row)
-              : col.renderCell,
-            renderHeaderCell: (props: RenderHeaderCellProps<R>) => (
-              <HeaderWithContextMenu
-                column={props.column}
-                columns={columns}
-                sortColumns={sortColumns}
-                rows={sortedRows}
-                filters={filters}
-                setFilters={setFilters}
-                hiddenColumns={hiddenColumns}
-                setHiddenColumns={setHiddenColumns}
-              />
-            ),
-          }))}
+        columns={modifiedColumns}
         sortColumns={sortColumns}
         onSortColumnsChange={(params) => setSortColumns(params)}
         onColumnsReorder={(col1, col2) => {
@@ -281,13 +287,17 @@ function HeaderWithContextMenu<R extends Record<string, unknown>>({
 
   const columnFilter = filters[columnKey]
 
-  const getFilterValue = buildFilterValueGetter(rows, column)
+  const getFilterValue = useMemo(() => buildFilterValueGetter(rows, column), [rows, column])
 
-  const filterValues = getFilterValue
-    ? Array.from(new Set(rows.map(getFilterValue))).filter(
-        (val) => val !== null && val !== undefined
-      )
-    : []
+  const filterValues = useMemo(
+    () =>
+      getFilterValue
+        ? Array.from(new Set(rows.map(getFilterValue))).filter(
+            (val) => val !== null && val !== undefined
+          )
+        : [],
+    [getFilterValue, rows]
+  )
 
   const sortDirection = sortColumns.find((s) => s.columnKey === column.key)?.direction
 
@@ -296,66 +306,86 @@ function HeaderWithContextMenu<R extends Record<string, unknown>>({
     [columns, hiddenColumns]
   )
 
-  const headerCtxMenuBuilders = [
-    LabelBuilder.fromComponent(column.name),
-    SeparatorBuilder,
-    getFilterValue
-      ? SubmenuBuilder.fromLabel('Filter...')
-          .withBuilder(
-            ItemBuilder.fromLabel('Deselect All').withAction(() =>
-              setFilters({ ...filters, [columnKey]: [] })
+  const headerCtxMenuBuilders = useMemo(
+    () => [
+      LabelBuilder.fromComponent(column.name),
+      SeparatorBuilder,
+      getFilterValue
+        ? SubmenuBuilder.fromLabel('Filter...')
+            .withBuilder(
+              ItemBuilder.fromLabel('Deselect All').withAction(() =>
+                setFilters({ ...filters, [columnKey]: [] })
+              )
             )
-          )
-          .withBuilders(
-            filterValues.toSorted().map((filterValue) =>
-              CheckboxBuilder.fromLabel(filterValue)
-                .handleValueChanged(() => {
-                  if (columnFilter === undefined) {
-                    setFilters({
-                      ...filters,
-                      [columnKey]: filterValues.filter((otherValue) => filterValue !== otherValue),
-                    })
-                  } else if (columnFilter.includes(filterValue)) {
-                    setFilters({
-                      ...filters,
-                      [columnKey]: columnFilter.filter((otherValue) => filterValue !== otherValue),
-                    })
-                  } else {
-                    setFilters({
-                      ...filters,
-                      [columnKey]: [...columnFilter, filterValue],
-                    })
+            .withBuilders(
+              filterValues.toSorted().map((filterValue) =>
+                CheckboxBuilder.fromLabel(filterValue)
+                  .handleValueChanged(() => {
+                    if (columnFilter === undefined) {
+                      setFilters({
+                        ...filters,
+                        [columnKey]: filterValues.filter(
+                          (otherValue) => filterValue !== otherValue
+                        ),
+                      })
+                    } else if (columnFilter.includes(filterValue)) {
+                      setFilters({
+                        ...filters,
+                        [columnKey]: columnFilter.filter(
+                          (otherValue) => filterValue !== otherValue
+                        ),
+                      })
+                    } else {
+                      setFilters({
+                        ...filters,
+                        [columnKey]: [...columnFilter, filterValue],
+                      })
+                    }
+                  })
+                  .handleIsChecked(() => !columnFilter || columnFilter.includes(filterValue))
+              )
+            )
+        : undefined,
+      getFilterValue
+        ? ItemBuilder.fromLabel('Clear Filters').withAction(() => setFilters({}))
+        : undefined,
+      getFilterValue ? SeparatorBuilder : undefined,
+      SubmenuBuilder.fromLabel('Show/Hide Columns').withBuilders(
+        columns
+          .filter((col) => !!col.name)
+          .map((col) =>
+            CheckboxBuilder.fromComponent(col.name)
+              .handleValueChanged(() => {
+                if (visibleColumnKeys.has(col.key)) {
+                  if (visibleColumnKeys.size > 1) {
+                    setHiddenColumns([...hiddenColumns, col.key])
                   }
-                })
-                .handleIsChecked(() => !columnFilter || columnFilter.includes(filterValue))
-            )
-          )
-      : undefined,
-    getFilterValue
-      ? ItemBuilder.fromLabel('Clear Filters').withAction(() => setFilters({}))
-      : undefined,
-    getFilterValue ? SeparatorBuilder : undefined,
-    SubmenuBuilder.fromLabel('Show/Hide Columns').withBuilders(
-      columns
-        .filter((col) => !!col.name)
-        .map((col) =>
-          CheckboxBuilder.fromComponent(col.name)
-            .handleValueChanged(() => {
-              if (visibleColumnKeys.has(col.key)) {
-                if (visibleColumnKeys.size > 1) {
-                  setHiddenColumns([...hiddenColumns, col.key])
+                } else {
+                  setHiddenColumns([...hiddenColumns.filter((k) => k !== col.key)])
                 }
-              } else {
-                setHiddenColumns([...hiddenColumns.filter((k) => k !== col.key)])
-              }
-            })
-            .handleIsChecked(() => visibleColumnKeys.has(col.key))
-        )
-    ),
-    ItemBuilder.fromLabel('Reset to Default').withAction(() =>
-      setHiddenColumns(columns.filter((c) => c.hideByDefault).map((c) => c.key))
-    ),
-  ]
+              })
+              .handleIsChecked(() => visibleColumnKeys.has(col.key))
+          )
+      ),
+      ItemBuilder.fromLabel('Reset to Default').withAction(() =>
+        setHiddenColumns(columns.filter((c) => c.hideByDefault).map((c) => c.key))
+      ),
+    ],
+    [
+      ,
+      column.name,
+      columnFilter,
+      columnKey,
+      columns,
+      filterValues,
+      filters,
+      getFilterValue,
+      hiddenColumns,
+      setFilters,
+      setHiddenColumns,
+      visibleColumnKeys,
+    ]
+  )
 
   return (
     <OpenHomeCtxMenu elements={headerCtxMenuBuilders}>

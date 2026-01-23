@@ -21,6 +21,7 @@ import { UB_TRANSFER_RESTRICTIONS } from '../../../core/save/unbound/G3UBSAV'
 import { buildUnknownSaveFile } from '../../../core/save/util/load'
 import { isRestricted, TransferRestrictions } from '../../../core/save/util/TransferRestrictions'
 import { R } from '../../../core/util/functional'
+import { filterUndefined } from '../../../core/util/sort'
 import { SaveRef } from '../../../core/util/types'
 import { BackendContext } from '../../backend/backendContext'
 import useDisplayError from '../../hooks/displayError'
@@ -32,21 +33,25 @@ export function useManageTracked() {
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
   const backend = useContext(BackendContext)
   const displayError = useDisplayError()
-  const [findingSaveState, setFindingSaveState] = useState<FindingSaveState>()
+  const [findingSaveState, setFindingSaveState] = useState<FindingSavesState>()
 
   const enabledSaveTypes = useMemo(getEnabledSaveTypes, [getEnabledSaveTypes])
 
   const findSaveForMon = useCallback(
     async (identifier: OhpkmIdentifier) => {
+      function setState(state: FindingSaveForOneState) {
+        setFindingSaveState({ type: 'finding_one', state })
+      }
+
       const mon = ohpkmStore.getById(identifier)
       if (!mon) {
         console.error('mon not tracked!')
 
-        setFindingSaveState({ state: 'error', error: `Pokémon not found: ${identifier}` })
+        setState({ type: 'error', error: `Pokémon not found: ${identifier}` })
         return
       }
 
-      setFindingSaveState({ state: 'getting_recent_saves' })
+      setState({ type: 'getting_recent_saves' })
       const savePaths = await backend.getRecentSaves().then(
         R.map((saves) =>
           Object.values(saves)
@@ -61,8 +66,8 @@ export function useManageTracked() {
       }
 
       for (const [i, savePath] of savePaths.value.entries()) {
-        setFindingSaveState({
-          state: 'finding',
+        setState({
+          type: 'finding',
           currentSavePath: savePath.raw,
           currentIndex: i + 1,
           totalSaves: savePaths.value.length,
@@ -90,37 +95,111 @@ export function useManageTracked() {
           .find((boxSlot) => boxSlot && getMonFileIdentifier(boxSlot) === identifier)
 
         if (match && saveFile.value) {
-          setFindingSaveState({ state: 'found', save: saveFile.value })
+          setState({ type: 'found', save: saveFile.value })
 
           mon.syncWithGameData(match, saveFile.value)
           ohpkmStore.insertOrUpdate(mon)
-          return savePath
+          return saveFile.value
         }
 
-        setFindingSaveState({ state: 'not_found' })
+        setState({ type: 'not_found' })
       }
     },
     [backend, displayError, enabledSaveTypes, ohpkmStore]
   )
 
+  const findSavesForAllMons = useCallback(async () => {
+    function setState(state: FindingSavesForAllState) {
+      setFindingSaveState({ type: 'finding_all', state })
+    }
+
+    const result = await backend.getRecentSaves().then(R.map((saves) => Object.values(saves)))
+
+    if (R.isErr(result)) {
+      displayError('Get Recent Saves', result.err)
+      return
+    }
+
+    const allStoredById = ohpkmStore.byId
+    const totalMons = Object.keys(allStoredById).length
+    let foundMonIds = new Set<string>()
+
+    const saveRefs = result.value
+
+    for (const [i, saveRef] of saveRefs.entries()) {
+      setState({
+        type: 'checking_save',
+        currentSaveRef: saveRef,
+        currentIndex: i + 1,
+        totalSaves: saveRefs.length,
+        foundMons: foundMonIds.size,
+        totalMons,
+      })
+
+      const savePath = saveRef.filePath
+
+      const saveFileBytes = await backend.loadSaveFile(savePath)
+      if (R.isErr(saveFileBytes)) {
+        console.error(`could not open save file ${savePath.raw}: ${saveFileBytes.err}`)
+        continue
+      }
+
+      const result = buildUnknownSaveFile(savePath, saveFileBytes.value.fileBytes, enabledSaveTypes)
+
+      if (R.isErr(result)) {
+        console.error(`could not build save file ${savePath.raw}: ${result.err}`)
+        continue
+      } else if (!result.value) {
+        continue
+      }
+
+      const save = result.value
+      for (const saveMon of save.boxes.flatMap((b) => b.boxSlots).filter(filterUndefined)) {
+        const saveMonId = getMonFileIdentifier(saveMon)
+        if (saveMonId === undefined || foundMonIds.has(saveMonId)) continue
+
+        const trackedMon = allStoredById[saveMonId]
+        if (trackedMon) {
+          trackedMon.syncWithGameData(saveMon, save)
+          ohpkmStore.insertOrUpdate(trackedMon)
+          foundMonIds.add(saveMonId)
+        }
+      }
+    }
+
+    setState({ type: 'complete', foundMons: foundMonIds.size, totalMons })
+  }, [backend, displayError, enabledSaveTypes, ohpkmStore])
+
   return {
     findSaveForMon,
+    findSavesForAllMons,
     findingSaveState,
     clearFindingState: () => setFindingSaveState(undefined),
   }
 }
 
-export type FindingSaveState =
-  | { state: 'getting_recent_saves' }
+export type FindingSavesState =
+  | { type: 'finding_one'; state: FindingSaveForOneState }
+  | { type: 'finding_all'; state: FindingSavesForAllState }
+
+export type FindingSaveForOneState =
+  | { type: 'getting_recent_saves' }
+  | { type: 'finding'; currentSavePath: string; currentIndex: number; totalSaves: number }
+  | { type: 'found'; save: SAV }
+  | { type: 'not_found' }
+  | { type: 'error'; error: string }
+
+export type FindingSavesForAllState =
   | {
-      state: 'finding'
-      currentSavePath: string
+      type: 'checking_save'
+      currentSaveRef: SaveRef
       currentIndex: number
       totalSaves: number
+      foundMons: number
+      totalMons: number
     }
-  | { state: 'found'; save: SAV }
-  | { state: 'not_found' }
-  | { state: 'error'; error: string }
+  | { type: 'complete'; foundMons: number; totalMons: number }
+  | { type: 'error'; error: string }
 
 function monPossiblySupported(dexNumber: number, formeNumber: number, saveRef: SaveRef) {
   if (saveRef.game === null) return false

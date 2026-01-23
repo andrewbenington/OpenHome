@@ -205,6 +205,9 @@ label {
   .rt-Card {
     --base-card-border-radius: 5px;
   }
+  .rt-Separator {
+    width: 100%;
+  }
 }
 
 @media (prefers-color-scheme: light) {
@@ -235,7 +238,7 @@ label {
 }
 
 .rt-BaseDialogContent {
-  padding: 0px;
+  --dialog-content-padding: 0.75rem;
   &:where([data-state='open']) {
     animation: none !important;
   }
@@ -285,4 +288,8 @@ label {
   display: flex;
   flex-direction: row;
   justify-content: center;
+}
+
+.rdg-cell * {
+  align-items: center;
 }

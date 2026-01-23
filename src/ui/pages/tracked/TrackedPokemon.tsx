@@ -1,16 +1,23 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import SideTabs from '@openhome-ui/components/side-tabs/SideTabs'
 import PokemonDetailsModal from '@openhome-ui/pokemon-details/Modal'
-import { Button, Dialog } from '@radix-ui/themes'
+import { Button, Dialog, Flex, Inset, Separator } from '@radix-ui/themes'
 import { useState } from 'react'
+import { OriginGameIndicator } from 'src/ui/components/pokemon/indicator/OriginGame'
 import Gen12Lookup from './Gen12Lookup'
 import Gen345Lookup from './Gen345Lookup'
 import OpenHomeMonList from './OpenHomeMonList'
-import { FindingSaveState, useManageTracked } from './useManageTracked'
+import {
+  FindingSaveForOneState,
+  FindingSavesForAllState,
+  FindingSavesState,
+  useManageTracked,
+} from './useManageTracked'
 
 export default function TrackedPokemon() {
   const [selectedMon, setSelectedMon] = useState<PKMInterface>()
-  const { findSaveForMon, findingSaveState, clearFindingState } = useManageTracked()
+  const { findSaveForMon, findingSaveState, findSavesForAllMons, clearFindingState } =
+    useManageTracked()
 
   return (
     <SideTabs.Root defaultValue="all">
@@ -25,6 +32,7 @@ export default function TrackedPokemon() {
         <OpenHomeMonList
           onSelectMon={(mon) => setSelectedMon(mon)}
           findSaveForMon={findSaveForMon}
+          findSavesForAllMons={findSavesForAllMons}
         />
       </SideTabs.Panel>
       <SideTabs.Panel value="gen12">
@@ -48,29 +56,48 @@ function ToolsDialog(props: { onClose: () => void }) {
       <Dialog.Trigger>
         <Button size="1">Manage...</Button>
       </Dialog.Trigger>
-      <Dialog.Content style={{ padding: 8 }}>
-        <Dialog.Title>Tracked Mon Management</Dialog.Title>
-        <p>Hello</p>
+      <Dialog.Content>
+        <Flex direction="column">
+          <Dialog.Title>Tracked Mon Management</Dialog.Title>
+          <Inset side="x" my="-1">
+            <Separator />
+          </Inset>
+          <p>Hello</p>
+        </Flex>
       </Dialog.Content>
     </Dialog.Root>
   )
 }
 
-function FindingSaveDialog(props: { state: FindingSaveState; onClose: () => void }) {
+function FindingSaveDialog(props: { state: FindingSavesState; onClose: () => void }) {
   const { state, onClose } = props
   return (
     <Dialog.Root open={Boolean(state)} onOpenChange={(o) => !o && onClose()}>
-      <Dialog.Content style={{ padding: 8 }} minHeight="16rem">
-        <Dialog.Title>Searching Saves for Pokémon</Dialog.Title>
-        <p>{stateSummary(state)}</p>
-        <StateBody state={state} />
+      <Dialog.Content minHeight="16rem">
+        <Flex direction="column">
+          <Dialog.Title>Searching Saves for Pokémon</Dialog.Title>
+          <Inset side="x" my="-1">
+            <Separator />
+          </Inset>
+          <p>{stateSummary(state)}</p>
+          <DialogBody state={state} />
+        </Flex>
       </Dialog.Content>
     </Dialog.Root>
   )
 }
 
-function stateSummary(state: FindingSaveState): string {
-  switch (state.state) {
+function stateSummary(state: FindingSavesState): string {
+  switch (state.type) {
+    case 'finding_one':
+      return forOneStateSummary(state.state)
+    case 'finding_all':
+      return forAllStateSummary(state.state)
+  }
+}
+
+function forOneStateSummary(state: FindingSaveForOneState): string {
+  switch (state.type) {
     case 'getting_recent_saves':
       return 'Getting recent saves...'
     case 'finding':
@@ -84,9 +111,30 @@ function stateSummary(state: FindingSaveState): string {
   }
 }
 
-function StateBody(props: { state: FindingSaveState }) {
+function forAllStateSummary(state: FindingSavesForAllState): string {
+  switch (state.type) {
+    case 'checking_save':
+      return `Checking Pokémon in save ${state.currentIndex} / ${state.totalSaves}...`
+    case 'complete':
+      return 'All saves have been checked!'
+    case 'error':
+      return `Error: ${state.error}`
+  }
+}
+
+function DialogBody(props: { state: FindingSavesState }) {
   const { state } = props
-  switch (state.state) {
+  switch (state.type) {
+    case 'finding_one':
+      return <ForOneStateBody state={state.state} />
+    case 'finding_all':
+      return <ForAllStateBody state={state.state} />
+  }
+}
+
+function ForOneStateBody(props: { state: FindingSaveForOneState }) {
+  const { state } = props
+  switch (state.type) {
     case 'finding':
       return (
         <div>
@@ -102,6 +150,43 @@ function StateBody(props: { state: FindingSaveState }) {
           <br />
           <b>File:</b>
           <div>{state.save.filePath.raw}</div>
+        </div>
+      )
+    default:
+      return null
+  }
+}
+
+function ForAllStateBody(props: { state: FindingSavesForAllState }) {
+  const { state } = props
+  switch (state.type) {
+    case 'checking_save':
+      return (
+        <div>
+          <Flex gap="1" align="center">
+            <b>Checking:</b>
+            <OriginGameIndicator
+              originGame={state.currentSaveRef.game}
+              plugin={state.currentSaveRef.pluginIdentifier}
+              withName
+            />
+          </Flex>
+          <Flex gap="1" align="center">
+            <b>Player:</b>
+            {state.currentSaveRef.trainerName} ({state.currentSaveRef.trainerID})
+          </Flex>
+          <p>
+            {state.foundMons} Pokémon found in saves so far (
+            {Math.round((state.foundMons / state.totalSaves) * 100)}%)
+          </p>
+        </div>
+      )
+    case 'complete':
+      return (
+        <div>
+          <p>
+            {state.foundMons} / {state.totalMons} processed Pokémon were found
+          </p>
         </div>
       )
     default:

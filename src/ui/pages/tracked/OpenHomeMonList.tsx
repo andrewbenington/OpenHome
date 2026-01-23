@@ -1,5 +1,5 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { PluginIdentifier } from '@openhome-core/save/interfaces'
+import { PluginIdentifier, SAV } from '@openhome-core/save/interfaces'
 import { multiSorter, numericSorter, SortableColumn, stringSorter } from '@openhome-core/util/sort'
 import { OriginGameIndicator } from '@openhome-ui/components/pokemon/indicator/OriginGame'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
@@ -9,16 +9,20 @@ import { useSaves } from '@openhome-ui/state/saves'
 import { MetadataLookup } from '@pkm-rs/pkg'
 import { Flex } from '@radix-ui/themes'
 import { useCallback, useMemo } from 'react'
-import { PathData } from '../../../core/save/util/path'
 import { ItemBuilder, OpenHomeCtxMenu } from '../../components/context-menu'
 import './style.css'
 
 export type OpenHomeMonListProps = {
   onSelectMon: (mon: OHPKM) => void
-  findSaveForMon: (identifier: string) => Promise<PathData | undefined>
+  findSaveForMon: (identifier: string) => Promise<SAV | undefined>
+  findSavesForAllMons: () => Promise<void>
 }
 
-export default function OpenHomeMonList({ onSelectMon, findSaveForMon }: OpenHomeMonListProps) {
+export default function OpenHomeMonList({
+  onSelectMon,
+  findSaveForMon,
+  findSavesForAllMons,
+}: OpenHomeMonListProps) {
   const ohpkmStore = useOhpkmStore()
   const saves = useSaves()
 
@@ -27,8 +31,9 @@ export default function OpenHomeMonList({ onSelectMon, findSaveForMon }: OpenHom
       ItemBuilder.fromLabel('Find Containing Save').withAction(() =>
         findSaveForMon(mon.getHomeIdentifier())
       ),
+      ItemBuilder.fromLabel('Find Recent Saves For All').withAction(findSavesForAllMons),
     ],
-    [findSaveForMon]
+    [findSaveForMon, findSavesForAllMons]
   )
 
   const columns: SortableColumn<OHPKM>[] = useMemo(
@@ -132,7 +137,7 @@ export default function OpenHomeMonList({ onSelectMon, findSaveForMon }: OpenHom
         ),
         sortFunction: multiSorter(
           numericSorter((val) => val?.gameOfOrigin),
-          stringSorter((val) => val?.pluginOrigin ?? '.') // so official games come before plugins
+          stringSorter((val) => val?.pluginOrigin ?? '.') // ensure official games come before plugins with the same origin (e.g. FireRed + Unbound)
         ),
         cellClass: 'centered-cell',
       },
@@ -211,7 +216,7 @@ export default function OpenHomeMonList({ onSelectMon, findSaveForMon }: OpenHom
 
   return (
     <SortableDataGrid
-      rows={ohpkmStore.getAllStored()}
+      rows={ohpkmStore.getAllStored().toSorted(stringSorter((mon) => mon.getHomeIdentifier()))}
       columns={modifiedColumns}
       style={{ borderLeft: 'none', borderBottom: 'none' }}
       rowKeyGetter={keyGetter}

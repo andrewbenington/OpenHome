@@ -1,6 +1,7 @@
 import { PathData } from '@openhome-core/save/util/path'
 import { Gender, OriginGame } from '@pkm-rs/pkg'
 import { CSSProperties } from 'react'
+import { PluginIdentifier } from '../save/interfaces'
 
 export type Type =
   | 'Fire'
@@ -33,7 +34,7 @@ export interface SaveRef extends Partial<JSONObject> {
   lastOpened: number | null
   lastModified: number | null
   valid: boolean | null
-  pluginIdentifier: string | null
+  pluginIdentifier: PluginIdentifier | null
 }
 
 export type LookupMap = Record<string, string>
