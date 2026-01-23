@@ -198,7 +198,7 @@ impl MainDataV2 {
     pub fn openhome_id(&self) -> String {
         let base_mon = self.species_and_forme.get_base_evolution();
         format!(
-            "{:04}-{:04x}{:04x}-{:08x}-{:02}",
+            "{:04}-{:04x}{:04x}-{:08x}-{:02x}",
             base_mon.get_ndex().get(),
             self.trainer_id,
             self.secret_id,
