@@ -14,13 +14,14 @@ import {
   SWSH_TRANSFER_RESTRICTIONS_CT,
   USUM_TRANSFER_RESTRICTIONS,
 } from '../../../../packages/pokemon-resources/src/consts/TransferRestrictions'
+import { PKMInterface } from '../../../core/pkm/interfaces'
 import { getMonFileIdentifier, OhpkmIdentifier } from '../../../core/pkm/Lookup'
-import { SAV } from '../../../core/save/interfaces'
+import { BoxAndSlot, SAV } from '../../../core/save/interfaces'
 import { RR_TRANSFER_RESTRICTIONS } from '../../../core/save/radicalred/G3RRSAV'
 import { UB_TRANSFER_RESTRICTIONS } from '../../../core/save/unbound/G3UBSAV'
 import { buildUnknownSaveFile } from '../../../core/save/util/load'
 import { isRestricted, TransferRestrictions } from '../../../core/save/util/TransferRestrictions'
-import { R } from '../../../core/util/functional'
+import { Option, R, range } from '../../../core/util/functional'
 import { filterUndefined } from '../../../core/util/sort'
 import { SaveRef } from '../../../core/util/types'
 import { BackendContext } from '../../backend/backendContext'
@@ -88,22 +89,28 @@ export function useManageTracked() {
         if (R.isErr(saveFile)) {
           console.error(`could not build save file ${savePath.raw}: ${saveFile.err}`)
           continue
+        } else if (!saveFile.value) {
+          console.error(`could not build save file ${savePath.raw}: result is undefined`)
+          continue
         }
 
-        const match = saveFile.value?.boxes
-          .flatMap((b) => b.boxSlots)
-          .find((boxSlot) => boxSlot && getMonFileIdentifier(boxSlot) === identifier)
+        const searchResult = searchSaveForMon(saveFile.value, identifier)
+        if (!searchResult) {
+          continue
+        }
+
+        const { match, location } = searchResult
 
         if (match && saveFile.value) {
-          setState({ type: 'found', save: saveFile.value })
+          setState({ type: 'found', save: saveFile.value, location })
 
           mon.syncWithGameData(match, saveFile.value)
           ohpkmStore.insertOrUpdate(mon)
           return saveFile.value
         }
-
-        setState({ type: 'not_found' })
       }
+
+      setState({ type: 'not_found' })
     },
     [backend, displayError, enabledSaveTypes, ohpkmStore]
   )
@@ -185,7 +192,7 @@ export type FindingSavesState =
 export type FindingSaveForOneState =
   | { type: 'getting_recent_saves' }
   | { type: 'finding'; currentSavePath: string; currentIndex: number; totalSaves: number }
-  | { type: 'found'; save: SAV }
+  | { type: 'found'; save: SAV; location: BoxAndSlot }
   | { type: 'not_found' }
   | { type: 'error'; error: string }
 
@@ -242,4 +249,24 @@ function monPossiblySupported(dexNumber: number, formeNumber: number, saveRef: S
         return isSupported(SV_TRANSFER_RESTRICTIONS_ID)
       }
   }
+}
+
+function searchSaveForMon(save: SAV, id: OhpkmIdentifier): Option<SaveSearchResult> {
+  for (const boxIndex of range(save.boxes.length)) {
+    const box = save.boxes[boxIndex]
+    for (const boxSlot of range(box.boxSlots.length)) {
+      const mon = box.boxSlots[boxSlot]
+      if (mon && getMonFileIdentifier(mon) === id) {
+        return {
+          match: mon,
+          location: { box: boxIndex, boxSlot },
+        }
+      }
+    }
+  }
+}
+
+type SaveSearchResult = {
+  match: PKMInterface
+  location: BoxAndSlot
 }

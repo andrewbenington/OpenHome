@@ -1,5 +1,7 @@
 import { Option } from '@openhome-core/util/functional'
-import { ReactNode } from 'react'
+import React, { ReactNode } from 'react'
+import { PKMInterface } from '../../../core/pkm/interfaces'
+import PokemonIcon from '../PokemonIcon'
 
 export type Element = Item | Separator | Label | Submenu | Checkbox
 
@@ -90,6 +92,21 @@ export class LabelBuilder implements CtxMenuElementBuilder {
 
   static fromComponent(component: ReactNode): LabelBuilder {
     return new LabelBuilder({ component })
+  }
+
+  static fromMon(mon: PKMInterface, size: number = 16): LabelBuilder {
+    return LabelBuilder.fromComponent(
+      React.createElement(
+        React.Fragment,
+        null,
+        React.createElement(PokemonIcon, {
+          dexNumber: mon.dexNum,
+          formeNumber: mon.formeNum,
+          style: { width: size, height: size, marginRight: 8 },
+        }),
+        mon.nickname
+      )
+    )
   }
 
   build(): Label {

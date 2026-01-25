@@ -37,6 +37,7 @@ export default function App() {
   return (
     <Theme
       accentColor="red"
+      grayColor="gray"
       appearance={isDarkMode ? 'dark' : 'light'}
       style={{ background: 'var(--background-gradient)' }}
     >

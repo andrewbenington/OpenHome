@@ -58,6 +58,14 @@ export default [
           endOfLine: 'auto',
         },
       ],
+      'no-restricted-syntax': [
+        'warn',
+        {
+          message:
+            'useValueChanged should only be used for debugging purposes. Remove this call before committing your code.',
+          selector: 'CallExpression[callee.name="useValueChanged"]',
+        },
+      ],
     },
   },
 ]

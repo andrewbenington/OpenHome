@@ -13,12 +13,16 @@ import { MonLocation } from '@openhome-ui/state/saves/reducer'
 import { v4 as UuidV4 } from 'uuid'
 import { R } from '../util/functional'
 
+const BOX_ROWS = 10
+const BOX_COLUMNS = 12
+const SLOTS_PER_BOX = BOX_ROWS * BOX_COLUMNS
+
 export class HomeBox {
   id: string
   name: string | undefined
   index: number
 
-  boxSlots: Array<OhpkmIdentifier | undefined> = new Array(120)
+  boxSlots: Array<OhpkmIdentifier | undefined> = new Array(SLOTS_PER_BOX)
 
   constructor(homeBox: OpenHomeBox) {
     const { id, name, index } = homeBox
@@ -43,7 +47,7 @@ export class HomeBox {
   }
 
   loadSlots(boxIdentifers: BoxMonIdentifiers) {
-    this.boxSlots = new Array(120)
+    this.boxSlots = new Array(SLOTS_PER_BOX)
     for (const [index, identifier] of boxIdentifers) {
       this.boxSlots[index] = identifier
     }
@@ -63,8 +67,8 @@ export class HomeBox {
 }
 
 export class HomeData {
-  static BOX_ROWS = 10
-  static BOX_COLUMNS = 12
+  static BOX_ROWS = BOX_ROWS
+  static BOX_COLUMNS = BOX_COLUMNS
 
   boxRows = HomeData.BOX_ROWS
   boxColumns = HomeData.BOX_COLUMNS

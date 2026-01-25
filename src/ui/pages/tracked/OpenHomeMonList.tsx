@@ -3,14 +3,22 @@ import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { PluginIdentifier, SAV } from '@openhome-core/save/interfaces'
 import { Option } from '@openhome-core/util/functional'
 import { multiSorter, numericSorter, SortableColumn, stringSorter } from '@openhome-core/util/sort'
-import { ItemBuilder, OpenHomeCtxMenu } from '@openhome-ui/components/context-menu'
+import {
+  CtxMenuElementBuilder,
+  ItemBuilder,
+  LabelBuilder,
+  OpenHomeCtxMenu,
+  SeparatorBuilder,
+} from '@openhome-ui/components/context-menu'
 import { OriginGameIndicator } from '@openhome-ui/components/pokemon/indicator/OriginGame'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import SortableDataGrid from '@openhome-ui/components/SortableDataGrid'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { useSaves } from '@openhome-ui/state/saves'
 import { MetadataLookup } from '@pkm-rs/pkg'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
+import { SelectColumn } from 'react-data-grid'
+import { BankBoxCoordinates, HomeData } from 'src/core/save/HomeData'
 import './style.css'
 
 export type OpenHomeMonListProps = {
@@ -26,151 +34,47 @@ export default function OpenHomeMonList({
 }: OpenHomeMonListProps) {
   const ohpkmStore = useOhpkmStore()
   const saves = useSaves()
-  const rows = useMemo(
-    () => ohpkmStore.getAllStored().toSorted(stringSorter((mon) => mon.openhomeId)),
-    [ohpkmStore]
+  const selectionController = useSelectedMons()
+  const { selectedIds, deselectIds } = selectionController
+  const [contextMenuBuilders, setContextMenuBuilders] = useState<Option<CtxMenuElementBuilder>[]>(
+    []
   )
-  const { selectedIds, deselectIds, onShiftClick, onSingleClick } = useSelectedMons(rows)
-  const [contextMenuBuilders, setContextMenuBuilders] = useState<Option<ItemBuilder>[]>([])
+  const [ctxMenuMonId, setCtxMenuMonId] = useState<Option<OhpkmIdentifier>>()
   const { releaseMonsById, trackedMonsToRelease } = saves
+  const columns = useColumns(trackedMonsToRelease, onSelectMon, saves.homeData)
 
   const buildContextElements = useCallback(
     (mon: OHPKM) => {
-      return [
+      const actions: CtxMenuElementBuilder[] = [
+        LabelBuilder.fromMon(mon),
         ItemBuilder.fromLabel('Find Containing Save').withAction(() =>
           findSaveForMon(mon.openhomeId)
         ),
-        ItemBuilder.fromLabel('Find Recent Saves For All').withAction(findSavesForAllMons),
-        selectedIds.size > 0
-          ? ItemBuilder.fromLabel(`Move ${selectedIds.size} Selected To Release Area`).withAction(
-              () => {
-                releaseMonsById(...selectedIds)
-                deselectIds(...selectedIds)
-              }
-            )
-          : undefined,
+        ItemBuilder.fromLabel(`Move To Release Area`).withAction(() => {
+          releaseMonsById(mon.openhomeId)
+          deselectIds(mon.openhomeId)
+        }),
       ]
+
+      if (selectedIds.size > 0) {
+        actions.push(
+          SeparatorBuilder,
+          LabelBuilder.fromLabel(`Bulk Actions (${selectedIds.size} selected)`),
+          ItemBuilder.fromLabel(`Move Selected To Release Area`).withAction(() => {
+            releaseMonsById(...selectedIds)
+            deselectIds(...selectedIds)
+          })
+        )
+      }
+
+      actions.push(
+        SeparatorBuilder,
+        LabelBuilder.fromLabel(`For All Tracked`),
+        ItemBuilder.fromLabel('Find Recent Saves For All').withAction(findSavesForAllMons)
+      )
+      return actions
     },
     [deselectIds, findSaveForMon, findSavesForAllMons, releaseMonsById, selectedIds]
-  )
-
-  const columns: SortableColumn<OHPKM>[] = useMemo(
-    () => [
-      {
-        key: 'Pokémon',
-        name: 'Mon',
-        width: '5rem',
-        renderValue: (value) => (
-          <button onClick={() => onSelectMon(value)} className="mon-icon-button">
-            <PokemonIcon
-              dexNumber={value.dexNum}
-              formeNumber={value.formeNum}
-              style={{ width: 30, height: 30 }}
-            />
-          </button>
-        ),
-        cellClass: 'centered-cell',
-        sortFunction: multiSorter(
-          numericSorter((mon) => mon.dexNum),
-          numericSorter((mon) => mon.formeNum)
-        ),
-        getFilterValue: (value) =>
-          MetadataLookup(value.dexNum, value.formeNum)?.speciesName || 'Unknown',
-      },
-      {
-        key: 'nickname',
-        name: 'Nickname',
-        width: '8rem',
-        sortFunction: stringSorter((mon) => mon.nickname),
-        noFilter: true,
-      },
-      {
-        key: 'home_bank',
-        name: 'Bank',
-        width: '4rem',
-        renderValue: (value) => {
-          const bankIndex = saves.homeData.findIfPresent(value.openhomeId)?.bank
-          return typeof bankIndex === 'number' ? `Bank ${bankIndex + 1}` : undefined
-        },
-        getFilterValue: (value) => saves.homeData.findIfPresent(value.openhomeId)?.bank?.toString(),
-        sortFunction: numericSorter((mon) => saves.homeData.findIfPresent(mon.openhomeId)?.bank),
-      },
-      {
-        key: 'home_box',
-        name: 'Box + Slot',
-        width: '8rem',
-        renderValue: (mon) => {
-          const location = saves.homeData.findIfPresent(mon.openhomeId)
-          return location ? (
-            <span>
-              <b>Box {location.box + 1}</b> [{location.boxSlot + 1}]
-            </span>
-          ) : undefined
-        },
-        getFilterValue: (mon) => {
-          const location = saves.homeData.findIfPresent(mon.openhomeId)
-          return location ? `Box ${location.box + 1}` : 'Not in OpenHome Boxes'
-        },
-        sortFunction: numericSorter((mon) => {
-          const location = saves.homeData.findIfPresent(mon.openhomeId)
-          return location ? location.box + location.boxSlot / 120 : -1
-        }),
-      },
-      {
-        key: 'last_save',
-        name: 'Last Save',
-        width: '9rem',
-        renderValue: (value) => (
-          <div className="flex-row-centered">
-            <OriginGameIndicator
-              originGame={value.mostRecentSaveWasm?.game}
-              withName
-              tooltip={value.mostRecentSaveWasm?.file_path}
-            />
-          </div>
-        ),
-        cellClass: 'centered-cell',
-      },
-      {
-        key: 'level',
-        name: 'Level',
-        width: '4rem',
-        renderValue: (value) => value.getLevel(),
-      },
-      {
-        key: 'game',
-        name: 'Original Game',
-        width: '10rem',
-        renderValue: (value) => (
-          <div className="flex-row-centered">
-            <OriginGameIndicator
-              originGame={value.gameOfOrigin}
-              plugin={value.pluginOrigin as PluginIdentifier}
-              withName
-            />
-          </div>
-        ),
-        sortFunction: multiSorter(
-          numericSorter((val) => val?.gameOfOrigin),
-          stringSorter((val) => val?.pluginOrigin ?? '.') // ensure official games come before plugins with the same origin (e.g. FireRed + Unbound)
-        ),
-        cellClass: 'centered-cell',
-      },
-      {
-        key: 'trainerName',
-        name: 'OT',
-        width: '6rem',
-      },
-      {
-        key: 'homeID',
-        name: 'OpenHome ID',
-        minWidth: 240,
-        sortFunction: stringSorter((mon) => mon.openhomeId),
-        renderValue: (mon) => mon.openhomeId,
-        cellClass: 'mono-cell',
-      },
-    ],
-    [onSelectMon, saves.homeData]
   )
 
   const keyGetter = (row: NoInfer<OHPKM>): string => {
@@ -178,21 +82,20 @@ export default function OpenHomeMonList({
   }
 
   return (
-    <OpenHomeCtxMenu elements={contextMenuBuilders}>
+    <OpenHomeCtxMenu
+      elements={contextMenuBuilders}
+      onOpenChange={(open) => {
+        if (!open) setCtxMenuMonId(undefined)
+      }}
+    >
       <div style={{ height: '100%', width: '100%' }}>
         <SortableDataGrid
           rows={ohpkmStore.getAllStored().toSorted(stringSorter((mon) => mon.openhomeId))}
           columns={columns}
           style={{ borderLeft: 'none' }}
           rowKeyGetter={keyGetter}
-          onCellClick={(props, e) => {
-            if (e.shiftKey) {
-              onShiftClick(props.row.openhomeId, props.rowIdx)
-            } else {
-              onSingleClick(props.row.openhomeId, props.rowIdx)
-            }
-          }}
           onCellContextMenu={(props, e) => {
+            setCtxMenuMonId(props.row.openhomeId)
             setContextMenuBuilders(buildContextElements(props.row))
             // ooh i hate this, radix please expose your context menu api
             const menu = document.querySelector('[data-radix-popper-content-wrapper]')
@@ -203,9 +106,15 @@ export default function OpenHomeMonList({
           rowClass={(row) =>
             trackedMonsToRelease.includes(row.openhomeId)
               ? 'releasing-mon-row'
-              : selectedIds.has(row.openhomeId)
+              : selectedIds.has(row.openhomeId) || ctxMenuMonId === row.openhomeId
                 ? 'selected-row'
                 : undefined
+          }
+          isRowSelectionDisabled={(row) => trackedMonsToRelease.includes(row.openhomeId)}
+          selectedRows={selectedIds}
+          // onSortColumnsChange={onColOrderingChange}
+          onSelectedRowsChange={(ids) =>
+            selectionController.forceSetSelectedIds(ids as Set<OhpkmIdentifier>)
           }
         />
       </div>
@@ -213,9 +122,8 @@ export default function OpenHomeMonList({
   )
 }
 
-function useSelectedMons(monsInOrder: OHPKM[]) {
+function useSelectedMons() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
-  const [lastClickedIndex, setLastClickedIndex] = useState<number | null>(null)
 
   function selectIds(...ids: OhpkmIdentifier[]) {
     setSelectedIds((prev) => new Set(ids).union(prev))
@@ -225,27 +133,168 @@ function useSelectedMons(monsInOrder: OHPKM[]) {
     setSelectedIds((prev) => new Set(prev).difference(new Set(ids)))
   }
 
-  function onSingleClick(id: OhpkmIdentifier, index: number) {
-    if (selectedIds.size === 1 && selectedIds.has(id)) {
-      setSelectedIds(new Set())
-      setLastClickedIndex(null)
-    } else {
-      setSelectedIds(new Set([id]))
-      setLastClickedIndex(index)
-    }
+  function forceSetSelectedIds(ids: Set<string>) {
+    setSelectedIds(new Set(ids))
   }
 
-  function onShiftClick(id: OhpkmIdentifier, index: number) {
-    if (lastClickedIndex === null) {
-      onSingleClick(id, index)
-    } else {
-      selectIds(
-        ...monsInOrder
-          .slice(Math.min(lastClickedIndex, index), Math.max(lastClickedIndex, index) + 1)
-          .map((mon) => mon.openhomeId)
-      )
-    }
+  return {
+    selectedIds,
+    selectIds,
+    deselectIds,
+    forceSetSelectedIds,
   }
+}
 
-  return { selectedIds, selectIds, deselectIds, onSingleClick, onShiftClick }
+function locationToSortableString(location: Option<BankBoxCoordinates>): string {
+  if (!location) {
+    return 'NO_LOCATION'
+  }
+  return `$${location.box.toString().padStart(3, '0')}~${location.boxSlot.toString().padStart(3, '0')}`
+}
+
+function useColumns(
+  trackedMonsToRelease: OhpkmIdentifier[],
+  onSelectMon: (mon: OHPKM) => void,
+  homeData: HomeData
+): SortableColumn<OHPKM>[] {
+  // this is necessary because the renderer functions do not update correctly when dependencies change
+  const trackedMonsRef = useRef(trackedMonsToRelease)
+  trackedMonsRef.current = trackedMonsToRelease
+
+  return [
+    { ...SelectColumn, minWidth: 36, width: undefined },
+    {
+      key: 'Pokémon',
+      name: 'Mon',
+      width: '3rem',
+      frozen: true,
+      renderValue: (value) => (
+        <button onClick={() => onSelectMon(value)} className="mon-icon-button">
+          <PokemonIcon
+            dexNumber={value.dexNum}
+            formeNumber={value.formeNum}
+            style={{ width: 30, height: 30 }}
+          />
+        </button>
+      ),
+      cellClass: 'centered-cell',
+      sortFunction: multiSorter(
+        numericSorter((mon) => mon.dexNum),
+        numericSorter((mon) => mon.formeNum)
+      ),
+      getFilterValue: (value) =>
+        MetadataLookup(value.dexNum, value.formeNum)?.speciesName || 'Unknown',
+    },
+    {
+      key: 'nickname',
+      name: 'Nickname',
+      width: '8rem',
+      sortFunction: stringSorter((mon) => mon.nickname),
+      noFilter: true,
+    },
+    {
+      key: 'home_bank',
+      name: 'Bank',
+      width: '4rem',
+      renderValue: (mon) => {
+        if (trackedMonsRef.current.includes(mon.openhomeId)) {
+          return 'Release Area'
+        }
+        const bankIndex = homeData.findIfPresent(mon.openhomeId)?.bank
+        return typeof bankIndex === 'number' ? `Bank ${bankIndex + 1}` : undefined
+      },
+      getFilterValue: (mon) =>
+        trackedMonsToRelease.includes(mon.openhomeId)
+          ? 'Release Area'
+          : homeData.findIfPresent(mon.openhomeId)?.bank?.toString(),
+      sortFunction: numericSorter((mon) =>
+        trackedMonsToRelease.includes(mon.openhomeId)
+          ? Number.POSITIVE_INFINITY
+          : homeData.findIfPresent(mon.openhomeId)?.bank
+      ),
+    },
+    {
+      key: 'home_box',
+      name: 'Box + Slot',
+      width: '8rem',
+      renderValue: (mon: OHPKM) => {
+        if (trackedMonsRef.current.includes(mon.openhomeId)) {
+          return 'Release Area'
+        }
+        const location = homeData.findIfPresent(mon.openhomeId)
+        return location ? (
+          <span>
+            <b>Box {location.box + 1}</b> [{location.boxSlot + 1}]
+          </span>
+        ) : undefined
+      },
+      getFilterValue: (mon) => {
+        if (trackedMonsToRelease.includes(mon.openhomeId)) {
+          return 'Release Area'
+        }
+        const location = homeData.findIfPresent(mon.openhomeId)
+        return location ? `Box ${location.box + 1}` : 'Not in OpenHome Boxes'
+      },
+      sortFunction: stringSorter((mon) => {
+        if (trackedMonsToRelease.includes(mon.openhomeId)) {
+          return '$RELEASE'
+        }
+        const location = homeData.findIfPresent(mon.openhomeId)
+        return locationToSortableString(location)
+      }),
+    },
+    {
+      key: 'last_save',
+      name: 'Last Save',
+      width: '9rem',
+      renderValue: (value) => (
+        <div className="flex-row-centered">
+          <OriginGameIndicator
+            originGame={value.mostRecentSaveWasm?.game}
+            withName
+            tooltip={value.mostRecentSaveWasm?.file_path}
+          />
+        </div>
+      ),
+      cellClass: 'centered-cell',
+    },
+    {
+      key: 'level',
+      name: 'Level',
+      width: '4rem',
+      renderValue: (value) => value.getLevel(),
+    },
+    {
+      key: 'game',
+      name: 'Original Game',
+      width: '10rem',
+      renderValue: (value) => (
+        <div className="flex-row-centered">
+          <OriginGameIndicator
+            originGame={value.gameOfOrigin}
+            plugin={value.pluginOrigin as PluginIdentifier}
+            withName
+          />
+        </div>
+      ),
+      sortFunction: multiSorter(
+        numericSorter((val) => val?.gameOfOrigin),
+        stringSorter((val) => val?.pluginOrigin ?? '.') // ensure official games come before plugins with the same origin (e.g. FireRed + Unbound)
+      ),
+      cellClass: 'centered-cell',
+    },
+    {
+      key: 'trainerName',
+      name: 'OT',
+      width: '6rem',
+    },
+    {
+      key: 'homeID',
+      name: 'OpenHome ID',
+      minWidth: 240,
+      sortFunction: stringSorter((mon) => mon.openhomeId),
+      renderValue: (mon) => mon.openhomeId,
+      cellClass: 'mono-cell',
+    },
+  ]
 }

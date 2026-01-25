@@ -2,7 +2,8 @@ import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import SideTabs from '@openhome-ui/components/side-tabs/SideTabs'
 import PokemonDetailsModal from '@openhome-ui/pokemon-details/Modal'
 import { Button, Dialog, Flex, Inset, Separator } from '@radix-ui/themes'
-import { useState } from 'react'
+import { ReactNode, useState } from 'react'
+import MessageRibbon from 'src/ui/components/MessageRibbon'
 import { OriginGameIndicator } from 'src/ui/components/pokemon/indicator/OriginGame'
 import Gen12Lookup from './Gen12Lookup'
 import Gen345Lookup from './Gen345Lookup'
@@ -71,23 +72,29 @@ function ToolsDialog(props: { onClose: () => void }) {
 
 function FindingSaveDialog(props: { state: FindingSavesState; onClose: () => void }) {
   const { state, onClose } = props
+  const summary = stateSummary(state)
+  const summaryNode = typeof summary === 'string' ? <h3>{summary}</h3> : summary
   return (
     <Dialog.Root open={Boolean(state)} onOpenChange={(o) => !o && onClose()}>
-      <Dialog.Content minHeight="16rem">
+      <Dialog.Content minHeight="18rem">
         <Flex direction="column">
-          <Dialog.Title>Searching Saves for Pokémon</Dialog.Title>
-          <Inset side="x" my="-1">
-            <Separator />
-          </Inset>
-          <p>{stateSummary(state)}</p>
-          <DialogBody state={state} />
+          <Dialog.Title>
+            Searching Saves for Pokémon
+            <Inset side="x" mt="2">
+              <Separator />
+            </Inset>
+          </Dialog.Title>
+          <Flex direction="column" gap="3">
+            {summaryNode}
+            <DialogBody state={state} />
+          </Flex>
         </Flex>
       </Dialog.Content>
     </Dialog.Root>
   )
 }
 
-function stateSummary(state: FindingSavesState): string {
+function stateSummary(state: FindingSavesState): ReactNode {
   switch (state.type) {
     case 'finding_one':
       return forOneStateSummary(state.state)
@@ -96,39 +103,42 @@ function stateSummary(state: FindingSavesState): string {
   }
 }
 
-function forOneStateSummary(state: FindingSaveForOneState): string {
+function forOneStateSummary(state: FindingSaveForOneState): ReactNode {
   switch (state.type) {
     case 'getting_recent_saves':
       return 'Getting recent saves...'
     case 'finding':
       return `Checking save ${state.currentIndex} / ${state.totalSaves}...`
     case 'found':
-      return 'Pokémon found in save file!'
+      return <MessageRibbon type="success">Pokémon found in save file!</MessageRibbon>
     case 'not_found':
-      return 'Pokémon not found in any recent save file currently accessible'
+      return (
+        <MessageRibbon type="warning">
+          Pokémon not found in any recent save file currently accessible
+        </MessageRibbon>
+      )
     case 'error':
-      return `Error: ${state.error}`
+      return <MessageRibbon type="error">Error: {state.error}</MessageRibbon>
   }
 }
 
-function forAllStateSummary(state: FindingSavesForAllState): string {
+function forAllStateSummary(state: FindingSavesForAllState): ReactNode {
   switch (state.type) {
     case 'checking_save':
       return `Checking Pokémon in save ${state.currentIndex} / ${state.totalSaves}...`
     case 'complete':
-      return 'All saves have been checked!'
+      return <MessageRibbon type="success">All saves have been checked!</MessageRibbon>
     case 'error':
-      return `Error: ${state.error}`
+      return <MessageRibbon type="error">Error: {state.error}</MessageRibbon>
   }
 }
 
 function DialogBody(props: { state: FindingSavesState }) {
-  const { state } = props
-  switch (state.type) {
+  switch (props.state.type) {
     case 'finding_one':
-      return <ForOneStateBody state={state.state} />
+      return <ForOneStateBody state={props.state.state} />
     case 'finding_all':
-      return <ForAllStateBody state={state.state} />
+      return <ForAllStateBody state={props.state.state} />
   }
 }
 
@@ -144,13 +154,28 @@ function ForOneStateBody(props: { state: FindingSaveForOneState }) {
       )
     case 'found':
       return (
-        <div>
-          <b>Game:</b>
-          <div>{state.save.gameName}</div>
-          <br />
-          <b>File:</b>
-          <div>{state.save.filePath.raw}</div>
-        </div>
+        <Flex direction="column" gap="2" ml="4">
+          <Flex gap="1" align="center">
+            <b style={{ minWidth: '5rem' }}>Game:</b>
+            <OriginGameIndicator
+              originGame={state.save.origin}
+              plugin={state.save.pluginIdentifier}
+              withName
+            />
+          </Flex>
+          <Flex gap="1" align="center">
+            <b style={{ minWidth: '5rem' }}>Player:</b>
+            {state.save.name} ({state.save.displayID})
+          </Flex>
+          <Flex gap="1" align="center">
+            <b style={{ minWidth: '5rem' }}>Location:</b>
+            Box {state.location.box + 1}, Slot {state.location.boxSlot + 1}
+          </Flex>
+          <Flex gap="1">
+            <b style={{ minWidth: '5rem' }}>File:</b>
+            {state.save.filePath.raw}
+          </Flex>
+        </Flex>
       )
     default:
       return null

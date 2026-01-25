@@ -4,6 +4,7 @@ import { ReactNode, useMemo, useRef, useState, type RefAttributes } from 'react'
 import {
   DataGrid,
   RenderCellProps,
+  SELECT_COLUMN_KEY,
   type DataGridHandle,
   type DataGridProps,
   type RenderHeaderCellProps,
@@ -28,7 +29,6 @@ import {
   SeparatorBuilder,
   SubmenuBuilder,
 } from './context-menu'
-import './context-menu.css'
 import { DropdownArrowIcon } from './Icons'
 import './style.css'
 
@@ -189,27 +189,31 @@ export default function SortableDataGrid<R extends SortableValue>(props: Sortabl
     () =>
       reorderedColumns
         .filter((col) => !hiddenColumns.includes(col.key))
-        .map((col) => ({
-          ...col,
-          resizable: true,
-          sortable: !!(col.sortType ?? col.sortFunction),
-          draggable: true,
-          renderCell: hasRenderValueMethod(col)
-            ? (value: RenderCellProps<R>) => col.renderValue(value.row)
-            : col.renderCell,
-          renderHeaderCell: (props: RenderHeaderCellProps<R>) => (
-            <HeaderWithContextMenu
-              column={props.column}
-              columns={columns}
-              sortColumns={sortColumns}
-              rows={sortedRows}
-              filters={filters}
-              setFilters={setFilters}
-              hiddenColumns={hiddenColumns}
-              setHiddenColumns={setHiddenColumns}
-            />
-          ),
-        })),
+        .map((col) =>
+          col.key === SELECT_COLUMN_KEY
+            ? col
+            : {
+                ...col,
+                resizable: true,
+                sortable: !!(col.sortType ?? col.sortFunction),
+                draggable: true,
+                renderCell: hasRenderValueMethod(col)
+                  ? (value: RenderCellProps<R>) => col.renderValue(value.row)
+                  : col.renderCell,
+                renderHeaderCell: (props: RenderHeaderCellProps<R>) => (
+                  <HeaderWithContextMenu
+                    column={props.column}
+                    columns={columns}
+                    sortColumns={sortColumns}
+                    rows={sortedRows}
+                    filters={filters}
+                    setFilters={setFilters}
+                    hiddenColumns={hiddenColumns}
+                    setHiddenColumns={setHiddenColumns}
+                  />
+                ),
+              }
+        ),
     [columns, filters, hiddenColumns, reorderedColumns, sortColumns, sortedRows]
   )
 

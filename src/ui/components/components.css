@@ -178,10 +178,18 @@
 
 .datagrid {
   position: relative;
+  background-color: var(--gray-3);
+
+  .rdg-cell[role='columnheader'] {
+    background-color: var(--gray-8);
+  }
 
   .rdg-row .rdg-cell {
+    outline: none;
     border-bottom: none;
     font-size: 0.8rem;
+    border-color: var(--gray-8);
+    border-width: 0.5px;
 
     &:first-child {
       border-radius: var(--row-border-radius) 0 0 var(--row-border-radius);
@@ -202,9 +210,8 @@
   }
 
   .releasing-mon-row {
-    color: var(--tomato-8);
+    color: var(--tomato-9);
     background-color: var(--tomato-2);
-    border-bottom: 2px solid var(--red-7) !important;
     outline: 0;
 
     .pokemon-icon-image {
@@ -213,10 +220,23 @@
   }
 
   .rdg-row-even:not([aria-selected='true']):not(.selected-row) {
-    background-color: var(--gray-a3);
+    background-color: var(--gray-5);
+  }
+
+  .rdg-row-odd:not([aria-selected='true']):not(.selected-row) {
+    background-color: var(--gray-3);
   }
 
   .rdg-row-even:not([aria-selected='true']).releasing-mon-row {
+    background-color: var(--tomato-3);
+  }
+
+  .releasing-mon-row .rdg-cell {
+    border-bottom: 0.5px solid;
+    border-color: var(--tomato-7);
+  }
+
+  .rdg-row-odd:not([aria-selected='true']).releasing-mon-row {
     background-color: var(--tomato-3);
   }
 
@@ -231,7 +251,7 @@
 
   .rdg-row:not([aria-selected='true']):not(.selected-row) {
     &:hover {
-      background-color: var(--accent-a3);
+      background-color: var(--accent-5);
     }
   }
 }
