@@ -1,6 +1,9 @@
+import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { PluginIdentifier, SAV } from '@openhome-core/save/interfaces'
+import { Option } from '@openhome-core/util/functional'
 import { multiSorter, numericSorter, SortableColumn, stringSorter } from '@openhome-core/util/sort'
+import { ItemBuilder, OpenHomeCtxMenu } from '@openhome-ui/components/context-menu'
 import { OriginGameIndicator } from '@openhome-ui/components/pokemon/indicator/OriginGame'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import SortableDataGrid from '@openhome-ui/components/SortableDataGrid'
@@ -8,8 +11,6 @@ import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { useSaves } from '@openhome-ui/state/saves'
 import { MetadataLookup } from '@pkm-rs/pkg'
 import { useCallback, useMemo, useState } from 'react'
-import { OhpkmIdentifier } from 'src/core/pkm/Lookup'
-import { ItemBuilder, OpenHomeCtxMenu } from '../../components/context-menu'
 import './style.css'
 
 export type OpenHomeMonListProps = {
@@ -29,7 +30,9 @@ export default function OpenHomeMonList({
     () => ohpkmStore.getAllStored().toSorted(stringSorter((mon) => mon.openhomeId)),
     [ohpkmStore]
   )
-  const { selectedIds, deselectIds, shiftClick, singleClick } = useSelectedMons(rows)
+  const { selectedIds, deselectIds, onShiftClick, onSingleClick } = useSelectedMons(rows)
+  const [contextMenuBuilders, setContextMenuBuilders] = useState<Option<ItemBuilder>[]>([])
+  const { releaseMonsById, trackedMonsToRelease } = saves
 
   const buildContextElements = useCallback(
     (mon: OHPKM) => {
@@ -39,13 +42,16 @@ export default function OpenHomeMonList({
         ),
         ItemBuilder.fromLabel('Find Recent Saves For All').withAction(findSavesForAllMons),
         selectedIds.size > 0
-          ? ItemBuilder.fromLabel('Delete Selected ' + selectedIds.size).withAction(() => {
-              deselectIds(...selectedIds)
-            })
+          ? ItemBuilder.fromLabel(`Move ${selectedIds.size} Selected To Release Area`).withAction(
+              () => {
+                releaseMonsById(...selectedIds)
+                deselectIds(...selectedIds)
+              }
+            )
           : undefined,
       ]
     },
-    [deselectIds, findSaveForMon, findSavesForAllMons, selectedIds]
+    [deselectIds, findSaveForMon, findSavesForAllMons, releaseMonsById, selectedIds]
   )
 
   const columns: SortableColumn<OHPKM>[] = useMemo(
@@ -172,28 +178,35 @@ export default function OpenHomeMonList({
   }
 
   return (
-    <OpenHomeCtxMenu elements={buildContextElements(rows[0])}>
+    <OpenHomeCtxMenu elements={contextMenuBuilders}>
       <div style={{ height: '100%', width: '100%' }}>
         <SortableDataGrid
           rows={ohpkmStore.getAllStored().toSorted(stringSorter((mon) => mon.openhomeId))}
           columns={columns}
-          style={{ borderLeft: 'none', borderBottom: 'none' }}
+          style={{ borderLeft: 'none' }}
           rowKeyGetter={keyGetter}
           onCellClick={(props, e) => {
             if (e.shiftKey) {
-              shiftClick(props.row.openhomeId, props.rowIdx)
-              return
+              onShiftClick(props.row.openhomeId, props.rowIdx)
+            } else {
+              onSingleClick(props.row.openhomeId, props.rowIdx)
             }
-            singleClick(props.row.openhomeId, props.rowIdx)
           }}
-          onCellContextMenu={(_, e) => {
+          onCellContextMenu={(props, e) => {
+            setContextMenuBuilders(buildContextElements(props.row))
             // ooh i hate this, radix please expose your context menu api
             const menu = document.querySelector('[data-radix-popper-content-wrapper]')
             if (menu) {
               ;(menu as HTMLElement).style.transform = `translate(${e.clientX}px, ${e.clientY}px)`
             }
           }}
-          rowClass={(row) => (selectedIds.has(row.openhomeId) ? 'selected-row' : undefined)}
+          rowClass={(row) =>
+            trackedMonsToRelease.includes(row.openhomeId)
+              ? 'releasing-mon-row'
+              : selectedIds.has(row.openhomeId)
+                ? 'selected-row'
+                : undefined
+          }
         />
       </div>
     </OpenHomeCtxMenu>
@@ -212,7 +225,7 @@ function useSelectedMons(monsInOrder: OHPKM[]) {
     setSelectedIds((prev) => new Set(prev).difference(new Set(ids)))
   }
 
-  function singleClick(id: OhpkmIdentifier, index: number) {
+  function onSingleClick(id: OhpkmIdentifier, index: number) {
     if (selectedIds.size === 1 && selectedIds.has(id)) {
       setSelectedIds(new Set())
       setLastClickedIndex(null)
@@ -222,9 +235,9 @@ function useSelectedMons(monsInOrder: OHPKM[]) {
     }
   }
 
-  function shiftClick(id: OhpkmIdentifier, index: number) {
+  function onShiftClick(id: OhpkmIdentifier, index: number) {
     if (lastClickedIndex === null) {
-      singleClick(id, index)
+      onSingleClick(id, index)
     } else {
       selectIds(
         ...monsInOrder
@@ -234,5 +247,5 @@ function useSelectedMons(monsInOrder: OHPKM[]) {
     }
   }
 
-  return { selectedIds, selectIds, deselectIds, singleClick, shiftClick }
+  return { selectedIds, selectIds, deselectIds, onSingleClick, onShiftClick }
 }

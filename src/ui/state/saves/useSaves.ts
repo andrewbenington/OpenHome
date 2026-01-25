@@ -53,7 +53,10 @@ export type SavesAndBanksManager = Required<Omit<OpenSavesState, 'error'>> & {
   updateMonNotes(monId: string, notes: string | undefined): void
   updateMonMarkings(monId: string, markings: MarkingsSixShapesWithColor): void
   moveMon(source: MonWithLocation, dest: MonLocation): void
+
   releaseMonAtLocation(location: MonLocation): void
+  releaseMonsById(...ids: OhpkmIdentifier[]): void
+  trackedMonsToRelease: OhpkmIdentifier[]
 }
 
 export function useSaves(): SavesAndBanksManager {
@@ -79,10 +82,10 @@ export function useSaves(): SavesAndBanksManager {
   )
 
   const findMon = useCallback(
-    (monId: string) => {
+    (monId: OhpkmIdentifier) => {
       return (
         findMonInHome(monId, loadedHomeData) ??
-        allOpenSaves.reduce<MonLocation | undefined>(
+        allOpenSaves.reduce<Option<MonLocation>>(
           (foundSaveMon, save) => foundSaveMon ?? findMonInSave(monId, save),
           undefined
         )
@@ -633,6 +636,16 @@ export function useSaves(): SavesAndBanksManager {
     openSavesDispatch({ type: 'set_home_data', payload: loadedHomeData })
   }
 
+  const releaseMonById = useCallback(
+    (id: OhpkmIdentifier) => {
+      openSavesDispatch({
+        type: 'add_mon_to_release',
+        payload: id,
+      })
+    },
+    [openSavesDispatch]
+  )
+
   const releaseMonAtLocation = useCallback(
     (location: MonLocation) => {
       if (location.isHome) {
@@ -654,6 +667,13 @@ export function useSaves(): SavesAndBanksManager {
       }
     },
     [moveMonBetweenSaves, moveOhpkmToHome, ohpkmStore, openSavesDispatch]
+  )
+
+  const releaseMonsById = useCallback(
+    (...ids: OhpkmIdentifier[]) => {
+      ids.forEach(releaseMonById)
+    },
+    [releaseMonById]
   )
 
   return {
@@ -689,7 +709,12 @@ export function useSaves(): SavesAndBanksManager {
     updateMonNotes,
     updateMonMarkings,
     moveMon,
+
     releaseMonAtLocation,
+    releaseMonsById,
+    trackedMonsToRelease: openSavesState.monsToRelease.filter(
+      (toRelease) => typeof toRelease === 'string'
+    ),
   }
 }
 

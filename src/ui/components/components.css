@@ -201,8 +201,23 @@
     outline: 0;
   }
 
+  .releasing-mon-row {
+    color: var(--tomato-8);
+    background-color: var(--tomato-2);
+    border-bottom: 2px solid var(--red-7) !important;
+    outline: 0;
+
+    .pokemon-icon-image {
+      filter: grayscale(100%);
+    }
+  }
+
   .rdg-row-even:not([aria-selected='true']):not(.selected-row) {
     background-color: var(--gray-a3);
+  }
+
+  .rdg-row-even:not([aria-selected='true']).releasing-mon-row {
+    background-color: var(--tomato-3);
   }
 
   a {
