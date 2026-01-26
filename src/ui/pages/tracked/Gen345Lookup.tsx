@@ -144,6 +144,7 @@ export default function Gen345Lookup({ onSelectMon }: Gen345LookupProps) {
       }))}
       columns={modifiedColumns}
       enableVirtualization={Object.entries(lookups.gen345).length > 2000} // maybe this should be user-togglable
+      style={{ width: '100%', flexGrow: 1 }}
     />
   )
 }

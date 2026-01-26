@@ -1,3 +1,4 @@
+import { stringSorter } from '@openhome-core/util/sort'
 import { displayGender } from '@openhome-core/util/types'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { BallsImageList, getItemIconPath } from '@openhome-ui/images/items'
@@ -6,13 +7,11 @@ import { HeldItemCategory } from '@openhome-ui/util/filter'
 import {
   all_species_data,
   Gender,
-  Generation,
   getAllAbilities,
   getAllBalls,
   getAllItems,
   Item,
   ItemMetadata,
-  OriginGame,
   OriginGames,
   OriginGameWithData,
   SpeciesLookup,
@@ -22,6 +21,7 @@ import { Types } from '@pokemon-resources/index'
 import { Button, Flex } from '@radix-ui/themes'
 import { useMemo } from 'react'
 import { useMonDisplay } from 'src/ui/hooks/useMonDisplay'
+import { getOriginIconPath } from 'src/ui/images/game'
 import Autocomplete from '../../../components/Autocomplete'
 import GenderIcon from '../../../components/pokemon/GenderIcon'
 import TypeIcon from '../../../components/pokemon/TypeIcon'
@@ -43,16 +43,7 @@ type ItemOption =
     }
 
 function getOriginIcon(origin: OriginGameWithData) {
-  const path =
-    origin.generation === Generation.G4 || origin.generation === Generation.G5
-      ? 'icons/ds.png'
-      : origin.game === OriginGame.ColosseumXd
-        ? '/icons/gcn.png'
-        : origin.generation === Generation.G3
-          ? '/icons/gba.png'
-          : origin.mark
-            ? `/origin_marks/${origin.mark}.png`
-            : undefined
+  const path = getOriginIconPath(origin)
 
   return path ? (
     <img className="filter-icon white-filter" draggable={false} alt="origin mark" src={path} />
@@ -82,15 +73,19 @@ export default function FilterPanel() {
 
   const ALL_SPECIES_DATA = useMemo(all_species_data, [])
 
-  const ALL_ABILITIES: SelectOption[] = getAllAbilities().map(({ name, id }) => ({
-    label: name,
-    id,
-  }))
+  const ALL_ABILITIES: SelectOption[] = getAllAbilities()
+    .sort(stringSorter((a) => a.name))
+    .map(({ name, id }) => ({
+      label: name,
+      id,
+    }))
 
-  const ALL_BALLS: SelectOption[] = getAllBalls().map(({ name, index }) => ({
-    label: name,
-    id: index,
-  }))
+  const ALL_BALLS: SelectOption[] = getAllBalls()
+    .sort(stringSorter((b) => b.name))
+    .map(({ name, index }) => ({
+      label: name,
+      id: index,
+    }))
 
   const ALL_ITEMS: SelectOption[] = getAllItems().map(itemMetadataToSelectOption)
 
@@ -198,7 +193,11 @@ export default function FilterPanel() {
           options={ALL_ABILITIES}
           getOptionString={(opt) => opt.label}
           getOptionUniqueID={(opt) => opt.id.toString()}
-          value={filter.ability !== undefined ? ALL_ABILITIES[filter.ability - 1] : undefined}
+          value={
+            filter.ability !== undefined
+              ? ALL_ABILITIES.find((a) => a.id === filter.ability)
+              : undefined
+          }
           label="Ability"
           onChange={(option) => setFilter({ ability: option?.id })}
         />
@@ -235,7 +234,9 @@ export default function FilterPanel() {
           options={ALL_BALLS}
           getOptionString={(option) => option.label}
           getOptionUniqueID={(opt) => opt.id.toString()}
-          value={filter.ball ? ALL_BALLS[filter.ball] : undefined}
+          value={
+            filter.ball !== undefined ? ALL_BALLS.find((a) => a.id === filter.ball) : undefined
+          }
           label="Ball"
           onChange={(option) => setFilter({ ball: option?.id })}
           getIconComponent={(ball) => (

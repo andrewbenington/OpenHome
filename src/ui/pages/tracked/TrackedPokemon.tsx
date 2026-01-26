@@ -3,8 +3,10 @@ import SideTabs from '@openhome-ui/components/side-tabs/SideTabs'
 import PokemonDetailsModal from '@openhome-ui/pokemon-details/Modal'
 import { Button, Dialog, Flex, Inset, Separator } from '@radix-ui/themes'
 import { ReactNode, useState } from 'react'
+import { Route, Routes } from 'react-router'
 import MessageRibbon from 'src/ui/components/MessageRibbon'
 import { OriginGameIndicator } from 'src/ui/components/pokemon/indicator/OriginGame'
+import { usePathSegment } from 'src/ui/hooks/routing'
 import Gen12Lookup from './Gen12Lookup'
 import Gen345Lookup from './Gen345Lookup'
 import OpenHomeMonList from './OpenHomeMonList'
@@ -19,9 +21,18 @@ export default function TrackedPokemon() {
   const [selectedMon, setSelectedMon] = useState<PKMInterface>()
   const { findSaveForMon, findingSaveState, findSavesForAllMons, clearFindingState } =
     useManageTracked()
+  const { currentSegment, setCurrentSegment } = usePathSegment('manage', 'all')
+
+  const allTrackedElement = (
+    <OpenHomeMonList
+      onSelectMon={setSelectedMon}
+      findSaveForMon={findSaveForMon}
+      findSavesForAllMons={findSavesForAllMons}
+    />
+  )
 
   return (
-    <SideTabs.Root defaultValue="all">
+    <SideTabs.Root value={currentSegment} onValueChange={setCurrentSegment}>
       <SideTabs.TabList>
         <SideTabs.Tab value="all"> All Pokémon</SideTabs.Tab>
         <SideTabs.Tab value="gen12">Gen 1/2 IDs</SideTabs.Tab>
@@ -29,19 +40,12 @@ export default function TrackedPokemon() {
         <div style={{ flex: 1 }} />
         <ToolsDialog onClose={clearFindingState} />
       </SideTabs.TabList>
-      <SideTabs.Panel value="all">
-        <OpenHomeMonList
-          onSelectMon={(mon) => setSelectedMon(mon)}
-          findSaveForMon={findSaveForMon}
-          findSavesForAllMons={findSavesForAllMons}
-        />
-      </SideTabs.Panel>
-      <SideTabs.Panel value="gen12">
-        <Gen12Lookup onSelectMon={(mon) => setSelectedMon(mon)} />
-      </SideTabs.Panel>
-      <SideTabs.Panel value="gen345">
-        <Gen345Lookup onSelectMon={(mon) => setSelectedMon(mon)} />
-      </SideTabs.Panel>
+      <Routes>
+        <Route index path="" element={allTrackedElement} />
+        <Route path="all" element={allTrackedElement} />
+        <Route path="gen12" element={<Gen12Lookup onSelectMon={setSelectedMon} />} />
+        <Route path="gen345" element={<Gen345Lookup onSelectMon={setSelectedMon} />} />
+      </Routes>
       <PokemonDetailsModal mon={selectedMon} onClose={() => setSelectedMon(undefined)} />
       {findingSaveState && (
         <FindingSaveDialog state={findingSaveState} onClose={clearFindingState} />
