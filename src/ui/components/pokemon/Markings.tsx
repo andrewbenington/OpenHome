@@ -4,7 +4,7 @@ import { markingDisplay, Markings, MarkingShape, markingsHaveColor } from '@poke
 
 type MarkingsProps = {
   readonly markings: Markings
-} & ({ openHomeId: string; allowUpdate: true } | { openHomeId?: string; allowUpdate?: false })
+} & ({ openhomeId: string; allowUpdate: true } | { openhomeId?: string; allowUpdate?: false })
 
 const getMarkingColorByNumber = (value: MarkingValue) => {
   if (value === 'blue' || value === true) return 'blue'
@@ -13,7 +13,7 @@ const getMarkingColorByNumber = (value: MarkingValue) => {
 }
 
 const MarkingsDisplay = (props: MarkingsProps) => {
-  const { markings, openHomeId, allowUpdate } = props
+  const { markings, openhomeId, allowUpdate } = props
 
   const { updateMonMarkings } = useSaves()
 
@@ -30,7 +30,7 @@ const MarkingsDisplay = (props: MarkingsProps) => {
             modifiedMarkings[shape] = 'blue'
           }
 
-          updateMonMarkings(openHomeId, modifiedMarkings)
+          updateMonMarkings(openhomeId, modifiedMarkings)
         }
       : undefined
 

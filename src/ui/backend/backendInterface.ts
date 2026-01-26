@@ -37,6 +37,7 @@ export default interface BackendInterface {
   /* past gen identifier lookups */
   loadLookups: () => Promise<Errorable<StoredLookups>>
   addToLookups: (new_entries: StoredLookups) => Promise<Errorable<null>>
+  removeDangling: () => Promise<Errorable<null>>
 
   /* ohpkm bytes store by identifier */
   loadOhpkmStore: () => Promise<Errorable<OhpkmStore>>

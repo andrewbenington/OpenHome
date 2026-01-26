@@ -10,18 +10,18 @@ use crate::state::{LookupState, OhpkmBytesStore};
 
 pub trait SyncedState: Clone + Serialize + tauri::ipc::IpcResponse {
     const ID: &'static str;
-    fn update_from(&mut self, other: Self);
+    fn union_with(&mut self, other: Self);
     fn to_command_response(&self) -> impl Clone + Serialize + tauri::ipc::IpcResponse {
         self
     }
 }
 
+/// SyncedStateWrapper wraps state synced with the React frontend. All mutations
+/// result in an emitted event to ensure the React side is up to date.
 pub struct SyncedStateWrapper<State: SyncedState>(State);
 
 impl<State: SyncedState> SyncedStateWrapper<State> {
-    pub fn update(&mut self, app_handle: &tauri::AppHandle, new_data: State) -> Result<()> {
-        self.0.update_from(new_data);
-
+    fn emit_update(&self, app_handle: &tauri::AppHandle) -> Result<()> {
         let event = format!("synced_state_update::{}", State::ID);
 
         app_handle
@@ -29,6 +29,26 @@ impl<State: SyncedState> SyncedStateWrapper<State> {
             .map_err(|err| {
                 Error::other_with_source(&format!("Could not emit '{event}' to frontend"), err)
             })
+    }
+
+    pub fn read(&self) -> &State {
+        &self.0
+    }
+
+    /// Safe to use even if called twice in one hook cycle. Better, debounced frontend code would probably eliminate
+    /// that concern.
+    pub fn union_with(&mut self, app_handle: &tauri::AppHandle, new_data: State) -> Result<()> {
+        self.0.union_with(new_data);
+        self.emit_update(app_handle)
+    }
+
+    /// Will cause bugs if called too often. Only for "batch" mutations.
+    pub fn replace<F>(&mut self, app_handle: &tauri::AppHandle, updater: F) -> Result<()>
+    where
+        F: FnOnce(&State) -> State,
+    {
+        self.0 = updater(&self.0);
+        self.emit_update(app_handle)
     }
 }
 

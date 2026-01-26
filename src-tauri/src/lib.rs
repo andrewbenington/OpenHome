@@ -129,6 +129,7 @@ pub fn run() {
             state::get_lookups,
             state::add_to_lookups,
             state::get_ohpkm_store,
+            state::remove_dangling,
             state::add_to_ohpkm_store,
             state::get_pokedex,
             state::update_pokedex,

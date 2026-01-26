@@ -63,6 +63,7 @@ type OhTauriApi = {
 
   get_lookups(): StoredLookups
   add_to_lookups(newEntries: StoredLookups): null
+  remove_dangling(): null
 
   get_ohpkm_store(): StringToB64
   add_to_ohpkm_store(updates: StringToBytes): null
@@ -108,6 +109,10 @@ export const Commands: OhTauriApiNoThrow = {
 
   add_to_lookups(newEntries: StoredLookups) {
     return invokeAndCatch('add_to_lookups', { newEntries })
+  },
+
+  remove_dangling() {
+    return invokeAndCatch('remove_dangling')
   },
 
   get_ohpkm_store() {

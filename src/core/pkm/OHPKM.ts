@@ -55,7 +55,7 @@ import {
   statsPreSplitToWasm,
   trainerMemoryToWasm,
 } from './convert'
-import { getHomeIdentifier, isEvolution } from './Lookup'
+import { isEvolution } from './Lookup'
 import { adjustMovePPBetweenFormats, generateIVs, getAbilityFromNumber, ivsFromDVs } from './util'
 
 export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
@@ -688,10 +688,6 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     errorsFound = false
 
     return errorsFound
-  }
-
-  public getHomeIdentifier() {
-    return getHomeIdentifier(this)
   }
 
   public syncWithGameData(other: PKMInterface, save?: SAV) {

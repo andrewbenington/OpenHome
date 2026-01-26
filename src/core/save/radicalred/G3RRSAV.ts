@@ -10,7 +10,7 @@ import { RRExcludedForms, RRTransferMon } from './conversion/RRTransferMons'
 import PK3RR from './PK3RR'
 
 // https://docs.google.com/spreadsheets/d/15mUFUcN8250hRL7iUOJPX0s1rMcgVuJPuHANioL4o2o/edit?gid=45654363#gid=962831839
-const RR_TRANSFER_RESTRICTIONS: TransferRestrictions = {
+export const RR_TRANSFER_RESTRICTIONS: TransferRestrictions = {
   transferableDexNums: RRTransferMon,
   excludedForms: RRExcludedForms,
 }

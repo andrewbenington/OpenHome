@@ -8,7 +8,7 @@ import { bytesToUint32LittleEndian } from '../util/byteLogic'
 import { PathData } from '../util/path'
 import PK3UB from './PK3UB'
 
-const UB_TRANSFER_RESTRICTIONS: TransferRestrictions = {
+export const UB_TRANSFER_RESTRICTIONS: TransferRestrictions = {
   maxDexNum: NationalDex.Enamorus,
 }
 

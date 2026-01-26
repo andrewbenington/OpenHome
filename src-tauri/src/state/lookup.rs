@@ -32,7 +32,7 @@ impl LookupState {
 impl synced_state::SyncedState for LookupState {
     const ID: &'static str = "lookups";
 
-    fn update_from(&mut self, other: Self) {
+    fn union_with(&mut self, other: Self) {
         other.gen_12.into_iter().for_each(|(k, v)| {
             self.gen_12.insert(k, v);
         });
@@ -56,5 +56,30 @@ pub fn add_to_lookups(
     synced_state
         .lock()?
         .lookups
-        .update(&app_handle, new_entries)
+        .union_with(&app_handle, new_entries)
+}
+
+#[tauri::command]
+pub fn remove_dangling(
+    app_handle: tauri::AppHandle,
+    synced_state: tauri::State<'_, AllSyncedState>,
+) -> Result<()> {
+    // definitely unnecessary clones here
+    let mut synced_state = synced_state.lock()?;
+    let ohpkm_store = synced_state.ohpkm_store.read().clone();
+
+    synced_state.lookups.replace(&app_handle, |l| LookupState {
+        gen_12: l
+            .gen_12
+            .clone()
+            .into_iter()
+            .filter(|(_, openhome_id)| ohpkm_store.includes(openhome_id))
+            .collect(),
+        gen_345: l
+            .gen_345
+            .clone()
+            .into_iter()
+            .filter(|(_, openhome_id)| ohpkm_store.includes(openhome_id))
+            .collect(),
+    })
 }

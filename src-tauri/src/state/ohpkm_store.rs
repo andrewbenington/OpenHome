@@ -70,6 +70,10 @@ impl OhpkmBytesStore {
 
         output
     }
+
+    pub fn includes(&self, identifier: &str) -> bool {
+        self.0.contains_key(identifier)
+    }
 }
 
 impl synced_state::SyncedState for OhpkmBytesStore {
@@ -79,7 +83,7 @@ impl synced_state::SyncedState for OhpkmBytesStore {
         self.to_b64_map()
     }
 
-    fn update_from(&mut self, other: Self) {
+    fn union_with(&mut self, other: Self) {
         other.0.into_iter().for_each(|(k, v)| {
             self.0.insert(k, v);
         });
@@ -102,5 +106,5 @@ pub fn add_to_ohpkm_store(
     synced_state
         .lock()?
         .ohpkm_store
-        .update(&app_handle, updates)
+        .union_with(&app_handle, updates)
 }
