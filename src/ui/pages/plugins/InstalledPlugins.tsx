@@ -3,7 +3,7 @@ import useDisplayError from '@openhome-ui/hooks/displayError'
 import { AppInfoContext } from '@openhome-ui/state/appInfo'
 import { PluginContext } from '@openhome-ui/state/plugin'
 import { loadPlugin, PluginMetadataWithIcon } from '@openhome-ui/util/plugin'
-import { Badge } from '@radix-ui/themes'
+import { Badge, Flex } from '@radix-ui/themes'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { MdDelete } from 'react-icons/md'
 import { R } from 'src/core/util/functional'
@@ -51,7 +51,7 @@ export default function InstalledPlugins() {
   }
 
   return (
-    <div style={{ gap: 8, display: 'flex', flexWrap: 'wrap', padding: 16 }}>
+    <Flex gap="2" wrap="wrap" p="4" align="start" justify="start" style={{ alignContent: 'start' }}>
       {installedPlugins &&
         Object.entries(installedPlugins).map(([, metadata]) => (
           <InstalledPluginCard
@@ -60,7 +60,7 @@ export default function InstalledPlugins() {
             onDelete={handleDeletePlugin}
           />
         ))}
-    </div>
+    </Flex>
   )
 }
 

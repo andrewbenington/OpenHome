@@ -144,7 +144,7 @@ export default function OpenHomeMonList({ onSelectMon }: OpenHomeMonListProps) {
     <SortableDataGrid
       rows={ohpkmStore.getAllStored()}
       columns={columns}
-      style={{ borderLeft: 'none', borderBottom: 'none' }}
+      style={{ borderLeft: 'none', borderBottom: 'none', width: '100%', flex: 1 }}
       rowKeyGetter={keyGetter}
     />
   )

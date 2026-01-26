@@ -186,7 +186,7 @@ export default function SortableDataGrid<R extends SortableValue>(props: Sortabl
       : (row: NoInfer<R>) => scaling * baseRowHeight(row)
 
   return (
-    <div style={{ height: '100%', overflow: 'hidden ' }}>
+    <div style={{ height: '100%', overflow: 'hidden ', flex: 1 }}>
       <DataGrid
         ref={gridRef}
         className="datagrid"
