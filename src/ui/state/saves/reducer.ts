@@ -6,6 +6,7 @@ import { StoredBankData } from '@openhome-core/save/util/storage'
 import { Option } from '@openhome-core/util/functional'
 import { OriginGame } from '@pkm-rs/pkg'
 import { createContext, Dispatch, Reducer } from 'react'
+import { SAVClass } from '../../../core/save/util'
 
 export type OpenSave = {
   index: number
@@ -235,35 +236,6 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
 
       return newState
     }
-    // case 'sort_home_box': {
-    //   if (!state.homeData) return state
-
-    //   const boxMons = state.homeData.boxes[payload.boxIndex].pokemon.toSorted(
-    //     getSortFunctionNullable(payload.sortType)
-    //   )
-
-    //   state.homeData.boxes[payload.boxIndex].pokemon = boxMons
-    //   state.homeData.syncBankToBoxes()
-    //   state.homeData = state.homeData.clone()
-    //   return { ...state }
-    // }
-    // case 'sort_all_home_boxes': {
-    //   if (!state.homeData) return { ...state }
-
-    //   const allMons = state.homeData.boxes
-    //     .flatMap((box) => box.pokemon)
-    //     .toSorted(getSortFunctionNullable(payload.sortType))
-    //   const boxSize = HomeData.BOX_COLUMNS * HomeData.BOX_ROWS
-
-    //   for (let i = 0; i < state.homeData.boxes.length; i++) {
-    //     state.homeData.boxes[i].pokemon = allMons.slice(i * boxSize, (i + 1) * boxSize)
-    //   }
-
-    //   state.homeData.syncBankToBoxes()
-    //   state.homeData = state.homeData.clone(payload.getMonById)
-
-    //   return { ...state }
-    // }
     case 'home_box_remove_dupes': {
       if (!state.homeData) return state
 
@@ -379,16 +351,24 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
   }
 }
 
+type SavesContextValue = {
+  openSavesState: OpenSavesState
+  openSavesDispatch: Dispatch<OpenSavesAction>
+  allOpenSaves: SAV[]
+  promptDisambiguation: (possibleSaveTypes: SAVClass<SAV>[]) => Promise<Option<SAVClass<SAV>>>
+}
+
 const initialState: OpenSavesState = {
   monsToRelease: [],
   openSaves: {},
 }
 
-export const SavesContext = createContext<[OpenSavesState, Dispatch<OpenSavesAction>, SAV[]]>([
-  initialState,
-  () => {},
-  [],
-])
+export const SavesContext = createContext<SavesContextValue>({
+  openSavesState: initialState,
+  openSavesDispatch: () => {},
+  allOpenSaves: [],
+  promptDisambiguation: async () => {},
+})
 
 export function saveFromIdentifier(state: OpenSavesState, identifier: SaveIdentifier): Option<SAV> {
   return state.openSaves[identifier]?.save

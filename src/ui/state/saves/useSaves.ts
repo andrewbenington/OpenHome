@@ -1,15 +1,22 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
+import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { getSortFunctionNullable } from '@openhome-core/pkm/sort'
 import { AddBoxLocation, HomeData } from '@openhome-core/save/HomeData'
-import { Box, SAV } from '@openhome-core/save/interfaces'
+import { Box, getSaveRef, SAV } from '@openhome-core/save/interfaces'
+import { SAVClass } from '@openhome-core/save/util'
+import { buildSaveFile, getPossibleSaveTypes } from '@openhome-core/save/util/load'
+import { PathData } from '@openhome-core/save/util/path'
 import { OpenHomeBox } from '@openhome-core/save/util/storage'
+import { Option, partitionResults, R, range, Result } from '@openhome-core/util/functional'
+import { filterUndefined } from '@openhome-core/util/sort'
 import { Item } from '@pkm-rs/pkg'
 import { MarkingsSixShapesWithColor } from '@pokemon-files/util'
 import { useCallback, useContext } from 'react'
-import { OhpkmIdentifier } from '../../../core/pkm/Lookup'
-import { getSortFunctionNullable } from '../../../core/pkm/sort'
-import { Option, partitionResults, R, range, Result } from '../../../core/util/functional'
-import { filterUndefined } from '../../../core/util/sort'
+import { displayIndexAdder, isBattleFormeItem } from '../../../core/pkm/util'
+import { BackendContext } from '../../backend/backendContext'
+import { PokedexUpdate } from '../../util/pokedex'
+import { AppInfoContext } from '../appInfo'
 import { IdentifierNotPresentError, useOhpkmStore } from '../ohpkm/useOhpkmStore'
 import {
   HomeMonLocation,
@@ -43,6 +50,7 @@ export type SavesAndBanksManager = Required<Omit<OpenSavesState, 'error'>> & {
   importMonsToLocation(mons: PKMInterface[], startingAt: MonLocation): void
 
   addSave(save: SAV): void
+  buildAndOpenSave: (filePath?: PathData | undefined) => Promise<Result<Option<SAV>, SaveError>>
   removeSave(save: SAV): void
   saveBoxNavigateLeft(save: SAV): void
   saveBoxNavigateRight(save: SAV): void
@@ -61,7 +69,10 @@ export type SavesAndBanksManager = Required<Omit<OpenSavesState, 'error'>> & {
 
 export function useSaves(): SavesAndBanksManager {
   const ohpkmStore = useOhpkmStore()
-  const [openSavesState, openSavesDispatch, allOpenSaves] = useContext(SavesContext)
+  const backend = useContext(BackendContext)
+  const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
+  const { openSavesState, openSavesDispatch, allOpenSaves, promptDisambiguation } =
+    useContext(SavesContext)
 
   if (openSavesState.error) {
     throw new Error(`Error loading saves state: ${openSavesState.error}`)
@@ -489,6 +500,8 @@ export function useSaves(): SavesAndBanksManager {
 
   const addSave = useCallback(
     (save: SAV) => {
+      backend.addRecentSave(getSaveRef(save))
+      backend.registerInPokedex(pokedexSeenFromSave(save))
       if (save.trainerGender !== undefined) {
         const allOhpkms = ohpkmStore.getAllStored()
         for (const mon of allOhpkms) {
@@ -515,7 +528,63 @@ export function useSaves(): SavesAndBanksManager {
       }
       openSavesDispatch({ type: 'add_save', payload: save })
     },
-    [openSavesDispatch, ohpkmStore]
+    [backend, openSavesDispatch, ohpkmStore]
+  )
+
+  const buildAndOpenSave = useCallback(
+    async (filePath?: PathData): Promise<Result<Option<SAV>, SaveError>> => {
+      if (!filePath) {
+        const result = await backend.pickFile()
+
+        if (R.isErr(result)) {
+          return R.Err({ type: 'SELECT_FILE', cause: result.err })
+        }
+        if (!result.value) return R.Ok(undefined)
+        filePath = result.value
+      }
+
+      const bytesResult = await backend.loadSaveFile(filePath)
+      if (R.isErr(bytesResult)) {
+        return R.Err({ type: 'READ_FILE', cause: bytesResult.err })
+      }
+
+      const fileBytes = bytesResult.value.fileBytes
+
+      let saveTypes = getPossibleSaveTypes(fileBytes, getEnabledSaveTypes())
+
+      let saveType: Option<SAVClass>
+      switch (saveTypes.length) {
+        case 0:
+          return R.Err({ type: 'UNRECOGNIZED' })
+        case 1:
+          saveType = saveTypes[0]
+          break
+        default:
+          saveType = await promptDisambiguation(saveTypes)
+      }
+
+      if (!saveType) {
+        return R.Ok(undefined)
+      }
+
+      const result = buildSaveFile(filePath, fileBytes, saveType)
+
+      if (R.isErr(result)) {
+        return R.Err({
+          type: 'BUILD_SAVE',
+          cause: result.err,
+        })
+      }
+      const saveFile = result.value
+
+      if (!saveFile) {
+        return R.Err({ type: 'UNRECOGNIZED' })
+      } else {
+        addSave(saveFile)
+        return R.Ok(saveFile)
+      }
+    },
+    [addSave, backend, getEnabledSaveTypes, promptDisambiguation]
   )
 
   const removeSave = useCallback(
@@ -699,6 +768,7 @@ export function useSaves(): SavesAndBanksManager {
     homeBoxNavigateRight,
 
     addSave,
+    buildAndOpenSave,
     removeSave,
     saveBoxNavigateLeft,
     saveBoxNavigateRight,
@@ -769,4 +839,45 @@ function moveMonWithinSave(save: SAV, source: SaveMonLocation, dest: SaveMonLoca
   save.updatedBoxSlots.push({ box: dest.box, boxSlot: dest.boxSlot })
   save.boxes[source.box].boxSlots[source.boxSlot] = displacedMon
   save.updatedBoxSlots.push({ box: source.box, boxSlot: source.boxSlot })
+}
+
+export type SaveError =
+  | {
+      type: 'SELECT_FILE'
+      cause: string
+    }
+  | {
+      type: 'READ_FILE'
+      cause: string
+    }
+  | {
+      type: 'UNRECOGNIZED'
+    }
+  | {
+      type: 'BUILD_SAVE'
+      cause: string
+    }
+
+export type SaveErrorType = SaveError['type']
+
+export function pokedexSeenFromSave(saveFile: SAV) {
+  const pokedexUpdates: PokedexUpdate[] = []
+
+  for (const mon of saveFile.boxes.flatMap((box) => box.boxSlots).filter(filterUndefined)) {
+    pokedexUpdates.push({
+      dexNumber: mon.dexNum,
+      formeNumber: mon.formeNum,
+      status: 'Seen',
+    })
+
+    if (isBattleFormeItem(mon.dexNum, mon.heldItemIndex)) {
+      pokedexUpdates.push({
+        dexNumber: mon.dexNum,
+        formeNumber: displayIndexAdder(mon.heldItemIndex)(mon.formeNum),
+        status: 'Seen',
+      })
+    }
+  }
+
+  return pokedexUpdates
 }

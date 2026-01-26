@@ -1,17 +1,14 @@
-import { displayIndexAdder, isBattleFormeItem } from '@openhome-core/pkm/util'
-import { getSaveRef, SAV } from '@openhome-core/save/interfaces'
+import { getSaveRef } from '@openhome-core/save/interfaces'
 import { SAVClass } from '@openhome-core/save/util'
 import { buildSaveFile, getPossibleSaveTypes } from '@openhome-core/save/util/load'
 import { PathData } from '@openhome-core/save/util/path'
 import { R } from '@openhome-core/util/functional'
-import { filterUndefined } from '@openhome-core/util/sort'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
 import { CardsIcon, GridIcon } from '@openhome-ui/components/Icons'
 import SideTabs from '@openhome-ui/components/side-tabs/SideTabs'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import { AppInfoAction, AppInfoContext } from '@openhome-ui/state/appInfo'
-import { useSaves } from '@openhome-ui/state/saves'
-import { PokedexUpdate } from '@openhome-ui/util/pokedex'
+import { pokedexSeenFromSave, useSaves } from '@openhome-ui/state/saves'
 import { Button, Dialog, Flex, Separator, Slider, VisuallyHidden } from '@radix-ui/themes'
 import { useCallback, useContext, useState } from 'react'
 import 'react-data-grid/lib/styles.css'
@@ -26,7 +23,7 @@ interface SavesModalProps {
   onClose: () => void
 }
 
-type AmbiguousOpenState = {
+export type AmbiguousOpenState = {
   possibleSaveTypes: SAVClass[]
   filePath: PathData
   fileBytes: Uint8Array
@@ -276,26 +273,4 @@ function SelectSaveType({ open, saveTypes, onSelect }: SelectSaveTypeProps) {
       </Dialog.Content>
     </Dialog.Root>
   )
-}
-
-function pokedexSeenFromSave(saveFile: SAV) {
-  const pokedexUpdates: PokedexUpdate[] = []
-
-  for (const mon of saveFile.boxes.flatMap((box) => box.boxSlots).filter(filterUndefined)) {
-    pokedexUpdates.push({
-      dexNumber: mon.dexNum,
-      formeNumber: mon.formeNum,
-      status: 'Seen',
-    })
-
-    if (isBattleFormeItem(mon.dexNum, mon.heldItemIndex)) {
-      pokedexUpdates.push({
-        dexNumber: mon.dexNum,
-        formeNumber: displayIndexAdder(mon.heldItemIndex)(mon.formeNum),
-        status: 'Seen',
-      })
-    }
-  }
-
-  return pokedexUpdates
 }

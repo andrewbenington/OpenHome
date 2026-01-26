@@ -3,10 +3,11 @@ import SideTabs from '@openhome-ui/components/side-tabs/SideTabs'
 import PokemonDetailsModal from '@openhome-ui/pokemon-details/Modal'
 import { Button, Dialog, Flex, Inset, Separator } from '@radix-ui/themes'
 import { ReactNode, useState } from 'react'
-import { Route, Routes } from 'react-router'
+import { Route, Routes, useNavigate } from 'react-router'
 import MessageRibbon from 'src/ui/components/MessageRibbon'
 import { OriginGameIndicator } from 'src/ui/components/pokemon/indicator/OriginGame'
 import { usePathSegment } from 'src/ui/hooks/routing'
+import { useSaves } from 'src/ui/state/saves'
 import Gen12Lookup from './Gen12Lookup'
 import Gen345Lookup from './Gen345Lookup'
 import OpenHomeMonList from './OpenHomeMonList'
@@ -148,6 +149,9 @@ function DialogBody(props: { state: FindingSavesState }) {
 
 function ForOneStateBody(props: { state: FindingSaveForOneState }) {
   const { state } = props
+  const saves = useSaves()
+  const navigate = useNavigate()
+
   switch (state.type) {
     case 'finding':
       return (
@@ -179,6 +183,15 @@ function ForOneStateBody(props: { state: FindingSaveForOneState }) {
             <b style={{ minWidth: '5rem' }}>File:</b>
             {state.save.filePath.raw}
           </Flex>
+          <Button
+            style={{ width: 'fit-content ' }}
+            onClick={() => {
+              saves.addSave(state.save)
+              navigate('/home')
+            }}
+          >
+            Open Save
+          </Button>
         </Flex>
       )
     default:
