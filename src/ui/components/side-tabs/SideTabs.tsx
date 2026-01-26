@@ -1,28 +1,42 @@
 /* eslint-disable react-refresh/only-export-components */
+import { Option } from '@openhome-core/util/functional'
+import { Flex } from '@radix-ui/themes'
 import { HTMLAttributes, useContext, useState } from 'react'
 import { SideTabsContext } from './SideTabsContext'
 import './style.css'
 
 export type SideTabsProps = {
-  defaultValue: string
+  value?: Option<string>
+  onValueChange?: (value: Option<string>) => void
+  defaultValue?: Option<string>
   children: React.ReactNode
-} & HTMLAttributes<HTMLDivElement>
+} & Omit<HTMLAttributes<HTMLDivElement>, 'value' | 'defaultValue'>
 
 function SideTabsRoot(props: SideTabsProps) {
-  const { className, defaultValue, children, ...otherProps } = props
-  const [value, setValue] = useState(defaultValue)
+  const { className, value, onValueChange, defaultValue, children, ...otherProps } = props
+  const [controlledValue, setControllerdValue] = useState(defaultValue)
+
+  const valueToUse = value !== undefined ? value : controlledValue
+  const updateValue = (newValue: Option<string>) => {
+    if (onValueChange) {
+      onValueChange(newValue)
+    }
+    if (value === undefined) {
+      setControllerdValue(newValue)
+    }
+  }
 
   return (
-    <SideTabsContext.Provider value={[value, setValue]}>
+    <SideTabsContext.Provider value={[valueToUse, updateValue]}>
       <div className={`side-tabs ${className ?? ''}`} {...otherProps}>
-        {children}
+        <Flex style={{ width: '100%' }}>{children}</Flex>
       </div>
     </SideTabsContext.Provider>
   )
 }
 
 export type SideTabProps = {
-  value: string
+  value: Option<string>
   children: React.ReactNode
 }
 
@@ -51,7 +65,7 @@ function SideTabList(props: SideTabListProps) {
 }
 
 export type SideTabPanelProps = {
-  value: string
+  value: Option<string>
   children: React.ReactNode
 }
 
