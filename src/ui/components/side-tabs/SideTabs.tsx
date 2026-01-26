@@ -1,6 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
 import { Option } from '@openhome-core/util/functional'
-import { Flex } from '@radix-ui/themes'
 import { HTMLAttributes, useContext, useState } from 'react'
 import { SideTabsContext } from './SideTabsContext'
 import './style.css'
@@ -29,7 +28,7 @@ function SideTabsRoot(props: SideTabsProps) {
   return (
     <SideTabsContext.Provider value={[valueToUse, updateValue]}>
       <div className={`side-tabs ${className ?? ''}`} {...otherProps}>
-        <Flex style={{ width: '100%' }}>{children}</Flex>
+        {children}
       </div>
     </SideTabsContext.Provider>
   )
