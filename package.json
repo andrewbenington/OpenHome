@@ -39,16 +39,16 @@
     "precommit": "prettier --write . && eslint src --report-unused-disable-directives -c eslint.config.mjs --fix"
   },
   "dependencies": {
-    "@dnd-kit/collision": "^0.2.1",
+    "@dnd-kit/collision": "^0.2.3",
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/modifiers": "^9.0.0",
-    "@dnd-kit/react": "^0.2.1",
+    "@dnd-kit/react": "^0.2.3",
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
     "@radix-ui/themes": "^3.2.1",
     "@tanstack/react-virtual": "^3.13.18",
     "@tauri-apps/api": "2.9.1",
-    "@tauri-apps/plugin-dialog": "^2.5.0",
+    "@tauri-apps/plugin-dialog": "^2.6.0",
     "@tauri-apps/plugin-fs": "^2.4.5",
     "@tauri-apps/plugin-os": "^2.3.2",
     "chart.js": "^4.5.1",
@@ -60,7 +60,7 @@
     "react": "^19.2.0",
     "react-chartjs-2": "^5.3.1",
     "react-data-grid": "7.0.0-beta.59",
-    "react-error-boundary": "^6.0.3",
+    "react-error-boundary": "^6.1.0",
     "react-icons": "^5.5.0",
     "uuid": "^13.0.0"
   },
