@@ -1,3 +1,4 @@
+import { stringSorter } from '@openhome-core/util/sort'
 import { useItems } from '@openhome-ui/state/items'
 import { Item } from '@pkm-rs/pkg'
 import { Flex, Grid } from '@radix-ui/themes'
@@ -16,23 +17,24 @@ export default function ItemBag() {
             .map(([indexStr, count]) => {
               const index = parseInt(indexStr)
               const validatedIndex = Item.fromIndex(index)
-
-              return (
-                <Flex className="item-bag-slot" key={index} align="center" justify="center">
-                  {validatedIndex ? (
-                    <DraggableItem item={validatedIndex} count={count} />
-                  ) : (
-                    <img
-                      src="/items/index/0000.png"
-                      alt=""
-                      aria-hidden
-                      draggable={false}
-                      style={{ opacity: 0 }}
-                    />
-                  )}
-                </Flex>
-              )
-            })}
+              return { validatedIndex, count, index }
+            })
+            .sort(stringSorter(({ validatedIndex }) => validatedIndex?.name))
+            .map(({ validatedIndex, count, index }) => (
+              <Flex className="item-bag-slot" key={index} align="center" justify="center">
+                {validatedIndex ? (
+                  <DraggableItem item={validatedIndex} count={count} />
+                ) : (
+                  <img
+                    src="/items/index/0000.png"
+                    alt=""
+                    aria-hidden
+                    draggable={false}
+                    style={{ opacity: 0 }}
+                  />
+                )}
+              </Flex>
+            ))}
         </Grid>
       </DroppableSpace>
     </Flex>
