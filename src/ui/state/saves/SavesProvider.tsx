@@ -9,6 +9,7 @@ import LoadingIndicator from '@openhome-ui/components/LoadingIndicator'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import { Button, Callout, Dialog, Flex, Separator } from '@radix-ui/themes'
 import { ReactNode, useCallback, useContext, useEffect, useReducer, useRef, useState } from 'react'
+import { useNavigate } from 'react-router'
 import { SAVClass } from 'src/core/save/util'
 import { Result } from 'src/core/util/functional'
 import { ItemBagContext } from '../items/reducer'
@@ -30,6 +31,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
   })
   const disambiguationResolver = useRef<Option<SaveTypeCallback>>(undefined)
   const [disambiguationSaveTypes, setDisambiguationSaveTypes] = useState<Option<SAVClass[]>>()
+  const navigate = useNavigate()
 
   const promptDisambiguation = useCallback(async (possibleSaveTypes: SAVClass[]) => {
     setDisambiguationSaveTypes(possibleSaveTypes)
@@ -216,7 +218,12 @@ export default function SavesProvider({ children }: SavesProviderProps) {
       </SavesContext.Provider>
       <SaveDisambiguationDialog
         open={Boolean(disambiguationSaveTypes)}
-        onSelect={disambiguationResolver.current}
+        saveTypes={disambiguationSaveTypes}
+        onSelect={(selected) => {
+          setDisambiguationSaveTypes(undefined)
+          disambiguationResolver.current?.(selected)
+          navigate('/home')
+        }}
       />
     </>
   )

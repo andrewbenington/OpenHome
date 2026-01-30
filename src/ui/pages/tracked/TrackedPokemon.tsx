@@ -183,15 +183,20 @@ function ForOneStateBody(props: { state: FindingSaveForOneState }) {
             <b style={{ minWidth: '5rem' }}>File:</b>
             {state.save.filePath.raw}
           </Flex>
-          <Button
-            style={{ width: 'fit-content ' }}
-            onClick={() => {
-              saves.addSave(state.save)
-              navigate('/home')
-            }}
-          >
-            Open Save
-          </Button>
+          <Flex direction="column" justify="center" ml="auto" mt="4" width="6rem" gap="1">
+            <Button
+              size="1"
+              onClick={() => {
+                saves.addSave(state.save)
+                navigate('/home')
+              }}
+            >
+              Open Save
+            </Button>
+            <Button size="1" color="gray">
+              Close
+            </Button>
+          </Flex>
         </Flex>
       )
     default:

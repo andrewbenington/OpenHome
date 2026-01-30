@@ -12,7 +12,7 @@ import { Option, partitionResults, R, range, Result } from '@openhome-core/util/
 import { filterUndefined } from '@openhome-core/util/sort'
 import { Item } from '@pkm-rs/pkg'
 import { MarkingsSixShapesWithColor } from '@pokemon-files/util'
-import { useCallback, useContext } from 'react'
+import { useCallback, useContext, useRef } from 'react'
 import { displayIndexAdder, isBattleFormeItem } from '../../../core/pkm/util'
 import { BackendContext } from '../../backend/backendContext'
 import { PokedexUpdate } from '../../util/pokedex'
@@ -73,6 +73,7 @@ export function useSaves(): SavesAndBanksManager {
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
   const { openSavesState, openSavesDispatch, allOpenSaves, promptDisambiguation } =
     useContext(SavesContext)
+  const filePickerOpen = useRef(false)
 
   if (openSavesState.error) {
     throw new Error(`Error loading saves state: ${openSavesState.error}`)
@@ -534,13 +535,19 @@ export function useSaves(): SavesAndBanksManager {
   const buildAndOpenSave = useCallback(
     async (filePath?: PathData): Promise<Result<Option<SAV>, SaveError>> => {
       if (!filePath) {
+        filePickerOpen.current = true
         const result = await backend.pickFile()
+        filePickerOpen.current = false
 
         if (R.isErr(result)) {
           return R.Err({ type: 'SELECT_FILE', cause: result.err })
         }
         if (!result.value) return R.Ok(undefined)
         filePath = result.value
+      }
+
+      if (allOpenSaves.some((other) => other.filePath.raw === filePath.raw)) {
+        return R.Err({ type: 'ALREADY_OPEN' })
       }
 
       const bytesResult = await backend.loadSaveFile(filePath)
@@ -584,7 +591,7 @@ export function useSaves(): SavesAndBanksManager {
         return R.Ok(saveFile)
       }
     },
-    [addSave, backend, getEnabledSaveTypes, promptDisambiguation]
+    [addSave, allOpenSaves, backend, getEnabledSaveTypes, promptDisambiguation]
   )
 
   const removeSave = useCallback(
@@ -842,6 +849,9 @@ function moveMonWithinSave(save: SAV, source: SaveMonLocation, dest: SaveMonLoca
 }
 
 export type SaveError =
+  | {
+      type: 'ALREADY_OPEN'
+    }
   | {
       type: 'SELECT_FILE'
       cause: string
